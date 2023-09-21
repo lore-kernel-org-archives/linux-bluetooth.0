@@ -2,207 +2,101 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A91BE7D0A9
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Sep 2023 19:36:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B14DCE7D0A6
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Sep 2023 19:54:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229596AbjIUThB (ORCPT
+        id S230426AbjIUTyc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 21 Sep 2023 15:37:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54378 "EHLO
+        Thu, 21 Sep 2023 15:54:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229606AbjIUTgz (ORCPT
+        with ESMTP id S230450AbjIUTyQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 21 Sep 2023 15:36:55 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24953A5CF
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Sep 2023 10:50:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695318602; x=1726854602;
-  h=date:from:to:cc:subject:message-id;
-  bh=zh6fTydPRnnfL1gwj25/RWOBUt+GLLrG9EEZkurrWic=;
-  b=GhHiR2qlB5a+J4nV3As4RHPZjiiBwUYDqSG2jyXsSgyqar2oBIrV80B9
-   Re3YxvdCbBJUGFCocq/kIe9VdGzB3YN+rqOv0YHrsYeY51uERoX981Vlu
-   9Z0bXpziOuFrbKle5Flxifwg1yHDRgT9OWVOyGDL7KGlBCqXzEQSnR+hG
-   OIF/WRneoJUXBFfDMSyTplEqSaO9hAn1wA2W/+MWeAv1XAq4AyJl7p5Dc
-   XeppaTDCKiGBtbAlk5lsocP0M1beVd+TVg8elWZQrhzwLfJeTpldIS0jv
-   S7fMzAbIE281ej5msZF1teMSWw1tVGBS0IXvscweDMQrWP1YYz3Tte7n/
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="359871021"
-X-IronPort-AV: E=Sophos;i="6.03,165,1694761200"; 
-   d="scan'208";a="359871021"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 04:06:24 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="870765812"
-X-IronPort-AV: E=Sophos;i="6.03,165,1694761200"; 
-   d="scan'208";a="870765812"
-Received: from lkp-server02.sh.intel.com (HELO 9ef86b2655e5) ([10.239.97.151])
-  by orsmga004.jf.intel.com with ESMTP; 21 Sep 2023 04:06:23 -0700
-Received: from kbuild by 9ef86b2655e5 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qjHVl-0009uD-1H;
-        Thu, 21 Sep 2023 11:06:21 +0000
-Date:   Thu, 21 Sep 2023 19:06:01 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 091e25d6b54992d1d702ae91cbac139d4c243251
-Message-ID: <202309211959.9gPZ6EUO-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+        Thu, 21 Sep 2023 15:54:16 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45B1C66342
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Sep 2023 12:02:10 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1c5bbb205e3so12063435ad.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Sep 2023 12:02:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695322929; x=1695927729; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=WU/ytcwtBCmxBKDAuChAeWFI27o1b45Ab5bfpr6voEY=;
+        b=nTVb/7hcyTsJh1Pij9HuQ6CNVBGOHUX9PNP45iHSm7hkpDtOv5sHjfJGLJiKu8OQmN
+         JRUtCJpYcSnbTkcwMcWfKWluiRFIz8ADNhf3pFnOg5P7gxb6+2YWrvy7/NyhTt2QCjNy
+         QgEYbLuTRgtkvORIa+pqRWhkDS4DhhI6+MpguW0Z90ffbA3M6ewW9jthMeTW8n2dsTt5
+         KixVASLh7E7tdsz8HWFQ7Tt6Qc1yh3eEbgrFxplcgMwUdYhXysVVaqkyUw21dXMI37Xf
+         TMFn48VRxpkqz2J1WbQ50d0NV6V5bTskcxo3ka/sjPsvcNGvpKZxaC0TyRr6TGDqYAoN
+         35sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695322929; x=1695927729;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WU/ytcwtBCmxBKDAuChAeWFI27o1b45Ab5bfpr6voEY=;
+        b=qhDrk6Ov1vuUQ838+LNcc8D94UL1IvLvMnYY/GQwPaxmHl11UtZ/pD3ghPJu7tg4l9
+         Yxqlw/IVe5n2O5fuO6Ezzl6vRMIfqXskI8FQlrUUxEz14AlWgAp3qBtwNWiqx2gtBvm/
+         MYdpU1PQfSqInu6DTTlHQqhV4OFB1wz9g6+1VkjL8Fs+IUljJOa+4ih2XM0Mffm4gQHb
+         E2Odv6Se9g00m3JuVG3PrxXuecxj8BsnxFDBSYO3YoBSZOLHzFzP4FJF8QqTeMtYXcu0
+         ZI7/mALJdXhM1AsBxPcJM12LSxR1DPBO2q4FsvZyoD4MHh1wDjQGrcFeW7y6oB1wv4as
+         e3Pw==
+X-Gm-Message-State: AOJu0YyzkpQP1ortAes9btk/cSmm0Gvo+0nsnIi4n8Vz+MbwtU9mG75u
+        c6pdGCB6DHS+DEMn++Ov0qmXxFH1vQY=
+X-Google-Smtp-Source: AGHT+IHXv0naB6saWPt90mvCYDBxsJa15JdLP8h01Nh1XAxqpY+lS/nwaPrmxUY/fWqzvFIG/NaHMA==
+X-Received: by 2002:a17:902:da81:b0:1c3:323f:f531 with SMTP id j1-20020a170902da8100b001c3323ff531mr6752083plx.20.1695322929263;
+        Thu, 21 Sep 2023 12:02:09 -0700 (PDT)
+Received: from [172.17.0.2] ([13.64.11.215])
+        by smtp.gmail.com with ESMTPSA id h12-20020a170902f54c00b001c55e13bf2asm1868391plf.283.2023.09.21.12.02.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Sep 2023 12:02:08 -0700 (PDT)
+Message-ID: <650c9330.170a0220.ad36.7b2b@mx.google.com>
+Date:   Thu, 21 Sep 2023 12:02:08 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8852524929467329284=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, vlad.pruteanu@nxp.com
+Subject: RE: client/player: Allow the user to control BIG encryption
+In-Reply-To: <20230921103945.36180-2-vlad.pruteanu@nxp.com>
+References: <20230921103945.36180-2-vlad.pruteanu@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 091e25d6b54992d1d702ae91cbac139d4c243251  Bluetooth: vhci: Fix race when opening vhci device
+--===============8852524929467329284==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-elapsed time: 947m
+This is automated email and please do not reply to this email!
 
-configs tested: 135
-configs skipped: 2
+Dear submitter,
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=786290
 
-tested configs:
-alpha                             allnoconfig   gcc  
-alpha                            allyesconfig   gcc  
-alpha                               defconfig   gcc  
-arc                              allmodconfig   gcc  
-arc                               allnoconfig   gcc  
-arc                              allyesconfig   gcc  
-arc                                 defconfig   gcc  
-arc                   randconfig-001-20230921   gcc  
-arm                              allmodconfig   gcc  
-arm                               allnoconfig   gcc  
-arm                              allyesconfig   gcc  
-arm                                 defconfig   gcc  
-arm                   randconfig-001-20230921   gcc  
-arm64                            allmodconfig   gcc  
-arm64                             allnoconfig   gcc  
-arm64                            allyesconfig   gcc  
-arm64                               defconfig   gcc  
-csky                             allmodconfig   gcc  
-csky                              allnoconfig   gcc  
-csky                             allyesconfig   gcc  
-csky                                defconfig   gcc  
-i386                             allmodconfig   gcc  
-i386                              allnoconfig   gcc  
-i386                             allyesconfig   gcc  
-i386         buildonly-randconfig-001-20230921   gcc  
-i386         buildonly-randconfig-002-20230921   gcc  
-i386         buildonly-randconfig-003-20230921   gcc  
-i386         buildonly-randconfig-004-20230921   gcc  
-i386         buildonly-randconfig-005-20230921   gcc  
-i386         buildonly-randconfig-006-20230921   gcc  
-i386                              debian-10.3   gcc  
-i386                                defconfig   gcc  
-i386                  randconfig-001-20230921   gcc  
-i386                  randconfig-002-20230921   gcc  
-i386                  randconfig-003-20230921   gcc  
-i386                  randconfig-004-20230921   gcc  
-i386                  randconfig-005-20230921   gcc  
-i386                  randconfig-006-20230921   gcc  
-i386                  randconfig-011-20230921   gcc  
-i386                  randconfig-012-20230921   gcc  
-i386                  randconfig-013-20230921   gcc  
-i386                  randconfig-014-20230921   gcc  
-i386                  randconfig-015-20230921   gcc  
-i386                  randconfig-016-20230921   gcc  
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch                        allyesconfig   gcc  
-loongarch                           defconfig   gcc  
-loongarch             randconfig-001-20230921   gcc  
-m68k                             allmodconfig   gcc  
-m68k                              allnoconfig   gcc  
-m68k                             allyesconfig   gcc  
-m68k                                defconfig   gcc  
-microblaze                       allmodconfig   gcc  
-microblaze                        allnoconfig   gcc  
-microblaze                       allyesconfig   gcc  
-microblaze                          defconfig   gcc  
-mips                             allmodconfig   gcc  
-mips                              allnoconfig   gcc  
-mips                             allyesconfig   gcc  
-nios2                            allmodconfig   gcc  
-nios2                             allnoconfig   gcc  
-nios2                            allyesconfig   gcc  
-nios2                               defconfig   gcc  
-openrisc                         allmodconfig   gcc  
-openrisc                          allnoconfig   gcc  
-openrisc                         allyesconfig   gcc  
-openrisc                            defconfig   gcc  
-parisc                           allmodconfig   gcc  
-parisc                            allnoconfig   gcc  
-parisc                           allyesconfig   gcc  
-parisc                              defconfig   gcc  
-parisc64                            defconfig   gcc  
-powerpc                          allmodconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc                          allyesconfig   gcc  
-riscv                            allmodconfig   gcc  
-riscv                             allnoconfig   gcc  
-riscv                            allyesconfig   gcc  
-riscv                               defconfig   gcc  
-riscv                 randconfig-001-20230921   gcc  
-riscv                          rv32_defconfig   gcc  
-s390                             allmodconfig   gcc  
-s390                              allnoconfig   gcc  
-s390                             allyesconfig   gcc  
-s390                                defconfig   gcc  
-s390                  randconfig-001-20230921   gcc  
-sh                               allmodconfig   gcc  
-sh                                allnoconfig   gcc  
-sh                               allyesconfig   gcc  
-sh                                  defconfig   gcc  
-sparc                            allmodconfig   gcc  
-sparc                             allnoconfig   gcc  
-sparc                            allyesconfig   gcc  
-sparc                               defconfig   gcc  
-sparc                 randconfig-001-20230921   gcc  
-sparc64                          allmodconfig   gcc  
-sparc64                          allyesconfig   gcc  
-sparc64                             defconfig   gcc  
-um                               allmodconfig   clang
-um                                allnoconfig   clang
-um                               allyesconfig   clang
-um                                  defconfig   gcc  
-um                             i386_defconfig   gcc  
-um                           x86_64_defconfig   gcc  
-x86_64                            allnoconfig   gcc  
-x86_64                           allyesconfig   gcc  
-x86_64       buildonly-randconfig-001-20230921   gcc  
-x86_64       buildonly-randconfig-002-20230921   gcc  
-x86_64       buildonly-randconfig-003-20230921   gcc  
-x86_64       buildonly-randconfig-004-20230921   gcc  
-x86_64       buildonly-randconfig-005-20230921   gcc  
-x86_64       buildonly-randconfig-006-20230921   gcc  
-x86_64                              defconfig   gcc  
-x86_64                randconfig-001-20230921   gcc  
-x86_64                randconfig-002-20230921   gcc  
-x86_64                randconfig-003-20230921   gcc  
-x86_64                randconfig-004-20230921   gcc  
-x86_64                randconfig-005-20230921   gcc  
-x86_64                randconfig-006-20230921   gcc  
-x86_64                randconfig-011-20230921   gcc  
-x86_64                randconfig-012-20230921   gcc  
-x86_64                randconfig-013-20230921   gcc  
-x86_64                randconfig-014-20230921   gcc  
-x86_64                randconfig-015-20230921   gcc  
-x86_64                randconfig-016-20230921   gcc  
-x86_64                randconfig-071-20230921   gcc  
-x86_64                randconfig-072-20230921   gcc  
-x86_64                randconfig-073-20230921   gcc  
-x86_64                randconfig-074-20230921   gcc  
-x86_64                randconfig-075-20230921   gcc  
-x86_64                randconfig-076-20230921   gcc  
-x86_64                          rhel-8.3-rust   clang
-x86_64                               rhel-8.3   gcc  
-xtensa                           allyesconfig   gcc  
+---Test result---
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Test Summary:
+CheckPatch                    PASS      0.48 seconds
+GitLint                       PASS      0.28 seconds
+BuildEll                      PASS      37.16 seconds
+BluezMake                     PASS      1261.17 seconds
+MakeCheck                     PASS      13.59 seconds
+MakeDistcheck                 PASS      211.70 seconds
+CheckValgrind                 PASS      338.49 seconds
+CheckSmatch                   PASS      472.16 seconds
+bluezmakeextell               PASS      142.40 seconds
+IncrementalBuild              PASS      1072.57 seconds
+ScanBuild                     PASS      1491.32 seconds
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============8852524929467329284==--
