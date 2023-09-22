@@ -2,172 +2,306 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79363CD484A
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Sep 2023 17:47:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9110ECD4858
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Sep 2023 19:23:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233029AbjIVRrL (ORCPT
+        id S233173AbjIVTXq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 22 Sep 2023 13:47:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35442 "EHLO
+        Fri, 22 Sep 2023 15:23:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229541AbjIVRrK (ORCPT
+        with ESMTP id S229590AbjIVTXp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 22 Sep 2023 13:47:10 -0400
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8A2299
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Sep 2023 10:47:00 -0700 (PDT)
-Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2c022ce8114so42007311fa.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Sep 2023 10:47:00 -0700 (PDT)
+        Fri, 22 Sep 2023 15:23:45 -0400
+Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3C41A3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Sep 2023 12:23:39 -0700 (PDT)
+Received: by mail-io1-xd2f.google.com with SMTP id ca18e2360f4ac-79fa5d9f3a2so28041339f.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Sep 2023 12:23:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695404818; x=1696009618; darn=vger.kernel.org;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bxaTriwWVRjK3jQxV2aiD1R9PoEOapIKPQgR46w/QrM=;
-        b=e9fyVP+S8rA+Ev0G+6lQC5S5KfFgrcCCd8Ld4/b5PCZ3wopVW/ZjQRg/0BDa6sY3gL
-         K6+SUCHsbeiyXOqBIHsAS4y0luEWjP0JdH30Qj3alQ+GRoZYK6BcmlPmFRP5t7BSO1Rl
-         eqpfF9bN/MbYFCT2uwg0lkst8LsTZXm3xWNUWwliSjk0J94MdujBDhglJLGPQB2lNBfl
-         UQUPHlgg4v9bB0JKSQt1f7xgbAqTa6GCsx+ppIw1yZpIqw9GRFQIbwL0P+ARiY3I02UN
-         6gWSE+gkB9/qJ04yw4R6ZETevqn+InwJQ0bdVQUfKw+TJKvWSxMhgRMJYbwdE9G8NcSO
-         1zfQ==
+        d=gmail.com; s=20230601; t=1695410618; x=1696015418; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=O8UvCzpydCqEJ8G9A6NMOVjDAbhJMdAdjKtdbYeGZO0=;
+        b=PuAHCCGS8n1/ohZ8r9w5lr0zu09TA36NaZuPahH5FUOoPBGIqQuN6OFY1Lph3IMUqC
+         PhLifzb3WYBxVpAA0IqRlq44RsgKTHnWy4BI14gxJdx8LWvt9qHo074j8CdwgZFR/kIv
+         TCOgUjOPeVVWYD2zJRQE6jl6waLwGcBxSfAexSpzMwiTMvh/VnB2WZU6Uz/kOhgZXIc+
+         dK8cKmHYdXDFwSDYMwG/VSJK8YmR0gLxdlJ9+2SjkVMZljCjw5v0T6/7J3nu4YJeV0aG
+         DTvEmkuP3HHXxXVi2ujpaqTjWYdpOQeCjw6zk6a3z7YBI5Q5oU0yQMZzR08tyZ8F3ASp
+         WnkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695404818; x=1696009618;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bxaTriwWVRjK3jQxV2aiD1R9PoEOapIKPQgR46w/QrM=;
-        b=WSTFy0dIViD+ItOHB/wn6GKoKJdTbu+jZMju1x8mbll+mWUSA0r1qCwqXphiqgqBfR
-         sx0dgqQlVdrJJ23oTsg0tQVNDJvT/TU3vcK7QgVKdvAYiNrnCRw9cHIn6y0p0M3cGU8e
-         MkajXwu7kWr15MpI+Y8wUadGNtH4DS3t4h9cKw6P+V/+sikHLPgAuX9CrbXKs2Yyc632
-         eeP1MliZHUvwNeDd0kWcYZrFVM3VYmKIyxNyPQE8MPnjE4UQwjWIelqy3GOUVDQDOWvr
-         G1QbDjZaril4anyWxzywuM6F82HqI51XN89U2mNmubDH6VdNFTSwY0rIZLl6M52gGjLY
-         Wvfg==
-X-Gm-Message-State: AOJu0YxRq6EvjTaWDm4RDI0gnBrokMdyjqdONI0n6h9w2R/y+vR0bToh
-        Hj7zeXD5FplxX0NDlvfeX15mnsgvwngo5BJz8LoUAtnc
-X-Google-Smtp-Source: AGHT+IFAzKi9Lapm+j/oOnncxPDXBm2BTJYN8XQ2J+tfF2fI860jXHzSz4l5rfNp+tMobzlChY5VdwMuCn3JbOwKa0Y=
-X-Received: by 2002:a2e:8193:0:b0:2c0:2e25:5730 with SMTP id
- e19-20020a2e8193000000b002c02e255730mr8384527ljg.5.1695404817703; Fri, 22 Sep
- 2023 10:46:57 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230921234738.929423-1-luiz.dentz@gmail.com> <650d08ad.170a0220.dc361.dbe0@mx.google.com>
-In-Reply-To: <650d08ad.170a0220.dc361.dbe0@mx.google.com>
+        d=1e100.net; s=20230601; t=1695410618; x=1696015418;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=O8UvCzpydCqEJ8G9A6NMOVjDAbhJMdAdjKtdbYeGZO0=;
+        b=GYBXJqleqGvvMeIN5ZSzgWfvuCQXr5h+GQEG5KvxulYkeNvsmQ0vCUMI/iIIKxUnYa
+         ORROsoOyZCdXWGCGboerLlEmOM4vvL5+fNNSy8kUSOqccGuP8mVHz3WilJYWTe8rl80Z
+         tOiZX9BYAq0ThBtqF42gg3WAjZOq4H65SzAg2PycqKutTQ+F8v/hPwE+uXP9ebRQP0Ip
+         JPd4QIfFqTlZOerg/xEW0xH8zgjqX9zFqdw8HngT1pYWhceT+bcZ+NZ6N0see3fexOh8
+         pjwpwLzX7dlcA88umjX5R8EHaq1QNKDApKV6ZRs1A1cYE9kiFk5w5yhXX4GtarxJyDT6
+         NbZQ==
+X-Gm-Message-State: AOJu0YwGfjv4r1HCde1MVQe4Mam6+p1NNplO2owqeDVhKec9QVT2ASHK
+        2XvDqsM8O50zgUhHbIZgvOmkIyq04Xc=
+X-Google-Smtp-Source: AGHT+IG8X9HSUqu21ERTU4QyFMuo9oIVhR8bfwpw1tHTT5qliW1IlpWHI5rB8PQP/pQHc7NsEppstg==
+X-Received: by 2002:a6b:4414:0:b0:791:acd7:233f with SMTP id r20-20020a6b4414000000b00791acd7233fmr290753ioa.15.1695410618299;
+        Fri, 22 Sep 2023 12:23:38 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-98-232-221-87.hsd1.or.comcast.net. [98.232.221.87])
+        by smtp.gmail.com with ESMTPSA id s5-20020a02cc85000000b0042b6a760c31sm1211519jap.28.2023.09.22.12.23.36
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Sep 2023 12:23:37 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 22 Sep 2023 10:46:45 -0700
-Message-ID: <CABBYNZ+2e-b565H5=BtkeSaviUf+8MgXrYOP0LRoxo8pYov-XA@mail.gmail.com>
-Subject: Re: [BlueZ,1/5] media-api: Update to reflect the last code changes
-To:     linux-bluetooth@vger.kernel.org,
-        Vlad Pruteanu <vlad.pruteanu@nxp.com>,
-        Claudia Draghicescu <claudia.rosu@nxp.com>,
-        iulia-tanasescu <iulia.tanasescu@nxp.com>,
-        Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>,
-        Pauli Virtanen <pav@iki.fi>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 1/6] media-api: Update to reflect the last code changes
+Date:   Fri, 22 Sep 2023 12:23:30 -0700
+Message-ID: <20230922192335.1060601-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.41.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Thu, Sep 21, 2023 at 8:23=E2=80=AFPM <bluez.test.bot@gmail.com> wrote:
->
-> This is automated email and please do not reply to this email!
->
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=3D786=
-455
+This reflect the last code changes adding the missing Broadcast
+properties.
+---
+ doc/media-api.rst | 179 +++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 138 insertions(+), 41 deletions(-)
 
-Have a look if I capture everything correctly, Ive made sure the
-bluetoothctl works with QoS being a single property but we still have
-to do the changes at upper layers.
+diff --git a/doc/media-api.rst b/doc/media-api.rst
+index 34bf44e8ffbb..b37ae8f01630 100644
+--- a/doc/media-api.rst
++++ b/doc/media-api.rst
+@@ -710,28 +710,45 @@ void SetConfiguration(object transport, dict properties)
+ 	properties:
+ 
+ 	:array{byte} Capabilities [Mandatory]:
++
++		See Endpoint.Capabilities property.
++
+ 	:array{byte} Metadata [ISO only]:
+-	:byte CIG [ISO only]:
+-	:byte CIS [ISO only]:
+-	:uint32 Interval [ISO only]:
+-	:bool Framing [ISO only]:
+-	:string PHY [ISO only]:
+-	:uint16 SDU [ISO only]:
+-	:byte Retransmissions [ISO only]:
+-	:uint16 Latency [ISO only]:
+-	:uint32 Delay [ISO only]:
+-	:uint8 TargetLatency [ISO Latency]:
+-	:byte BIG [ISO broadcast only]:
+-	:byte BIS [ISO broadcast only]:
+-	:byte SyncInterval [ISO broadcast only]:
+-	:byte Encryption [ISO broadcast only]:
+-	:byte Options [ISO broadcast only]:
+-	:uint16 Skip [ISO broadcast only]:
+-	:uint16 SyncTimeout [ISO broadcast only]:
+-	:byte SyncCteType [ISO broadcast only]:
+-	:byte MSE [ISO broadcast only]:
+-	:uint16 Timeout [ISO broadcast only]:
+-	:array{byte} BroadcastCode [ISO broadcast only]:
++
++		See Endpoint.Metadata property.
++
++	:uint32 Location [ISO only]:
++
++		See Endpoint.Location property.
++
++	:byte Framing [ISO only]:
++
++		See Endpoint.Framing property.
++
++	:byte PHY [ISO only]:
++
++		See Endpoint.PHY property.
++
++	:uint16 MaximumLatency [ISO only]:
++
++		See Endpoint.MaximumLatency property.
++
++	:uint32 MinimumDelay [ISO only]:
++
++		See Endpoint.MinimumDelay property.
++
++	:uint32 MaximumDelay [ISO only]:
++
++		See Endpoint.MaximumDelay property.
++
++	:uint32 PreferredMinimumDelay [ISO only]:
++
++		See Endpoint.PreferredMinimumDelay property.
++
++	:uint32 PreferredMaximumDelay [ISO only]:
++
++		See Endpoint.PreferredMaximumDelay property.
++
+ 
+ array{byte} SelectConfiguration(array{byte} capabilities)
+ `````````````````````````````````````````````````````````
+@@ -984,33 +1001,65 @@ dict QoS [readonly, optional, ISO only, experimental]
+ 
+ 		Indicates configured CIG.
+ 
++		Possible values:
++
++		:0x00 - 0xef:
++
++			Valid ID range.
++
++		:0xff:
++
++			Auto allocate.
++
+ 	:byte CIS:
+ 
+ 		Indicates configured CIS.
+ 
+-	:uint32 Interval:
++		Possible values:
+ 
+-		Indicates configured ISO interval.
++		:0x00 - 0xef:
+ 
+-	:boolean Framing:
++			Valid ID range.
++
++		:0xff:
++
++			Auto allocate.
++
++	:byte Framing:
+ 
+ 		Indicates configured framing.
+ 
+-	:byte PHY:
++		Possible values:
+ 
+-		Indicates configured PHY.
++		:0x00:
+ 
+-	:uint16 SDU:
++			Unframed.
+ 
+-		Indicates configured SDU.
++		:0x01:
+ 
+-	:byte Retransmissions:
++			Framed.
+ 
+-		Indicates configured retransmissions.
++	:uint32 PresentationDelay:
+ 
+-	:uint16 Latency:
++		Indicates configured transport presentation delay (us).
+ 
+-		Indicates configured transport latency.
++	:byte TargetLatency:
++
++		Indicates the requested target latency.
++
++		Possible values:
++
++		:0x01:
++
++			Low Latency.
++
++		:0x02:
++
++			Balanced Latency/Reliability.
++
++		:0x03:
++
++			High Reliability.
+ 
+ 	Possible values for Broadcast:
+ 
+@@ -1022,26 +1071,74 @@ dict QoS [readonly, optional, ISO only, experimental]
+ 
+ 		Indicates configured BIS.
+ 
+-	:uint32 SyncFactor:
++	:byte SyncFactor:
+ 
+-		Indicates configured sync factor.
++		Indicates configured broadcast sync factor.
+ 
+-	:uint32 Interval:
++	:byte Packing:
+ 
+-		Indicates configured ISO interval.
++		Indicates configured packing.
+ 
+-	:byte PHY:
++	:byte Framing:
+ 
+-		Indicates configured PHY.
++		Indicates configured framing.
+ 
+-	:uint16 SDU:
++	:byte Options:
+ 
+-		Indicates configured maximum SDU.
++		Indicates configured broadcast options.
++
++	:uint16 Skip:
++
++		Indicates configured broadcast skip.
+ 
+ 	:byte SyncTimeout:
+ 
+ 		Indicates configured broadcast sync timeout.
+ 
++	:byte SyncType:
++
++		Indicates configured broadcast sync CTE type.
++
++	:byte MSE:
++
++		Indicates configured broadcast MSE.
++
++	:uint16 Timeout:
++
++		Indicates configured broadcast timeout.
++
++	Possible values for both Unicast and Broadcast:
++
++	:uint32 Interval:
++
++		Indicates configured ISO interval (us).
++
+ 	:uint16 Latency:
+ 
+-		Indicates configured transport latency.
++		Indicates configured transport latency (ms).
++
++	:uint16 SDU:
++
++		Indicates configured maximum SDU.
++
++	:byte PHY:
++
++		Indicates configured PHY.
++
++		Possible values:
++
++		:bit 0:
++
++			LE 1M
++
++		:bit 1:
++
++			LE 2M
++
++		:bit 2:
++
++			LE Coded
++
++	:byte Retransmissions:
++
++		Indicates configured retransmissions.
+-- 
+2.41.0
 
-@Pauli Virtanen You can use bluetoothctl as an example how to encode
-the QoS property, note that there are multiple containers involved
-because the QoS dict becomes the variant portion of the outer
-dictionary but you will notice if the daemon is not able to parse it.
-I could consider supporting the old format though if you think we
-should maintain backwards compatibility.
-
-> ---Test result---
->
-> Test Summary:
-> CheckPatch                    PASS      2.52 seconds
-> GitLint                       FAIL      1.58 seconds
-> BuildEll                      PASS      34.31 seconds
-> BluezMake                     PASS      1192.51 seconds
-> MakeCheck                     PASS      13.44 seconds
-> MakeDistcheck                 PASS      195.33 seconds
-> CheckValgrind                 PASS      314.03 seconds
-> CheckSmatch                   PASS      437.84 seconds
-> bluezmakeextell               PASS      131.38 seconds
-> IncrementalBuild              PASS      5145.48 seconds
-> ScanBuild                     PASS      1374.82 seconds
->
-> Details
-> ##############################
-> Test: GitLint - FAIL
-> Desc: Run gitlint
-> Output:
-> [BlueZ,3/5] client: Make transport.show to print QoS property
->
-> WARNING: I3 - ignore-body-lines: gitlint will be switching from using Pyt=
-hon regex 'match' (match beginning) to 'search' (match anywhere) semantics.=
- Please review your ignore-body-lines.regex option accordingly. To remove t=
-his warning, set general.regex-style-search=3DTrue. More details: https://j=
-orisroovers.github.io/gitlint/configuration/#regex-style-search
-> 10: B3 Line contains hard tab characters (\t): "        UUID: 00002bcb-00=
-00-1000-8000-00805f9b34fb"
-> 11: B3 Line contains hard tab characters (\t): "        Codec: 0x06 (6)"
-> 12: B3 Line contains hard tab characters (\t): "        Configuration:"
-> 14: B3 Line contains hard tab characters (\t): "        Device: /org/blue=
-z/hci0/dev_00_AA_01_01_00_03"
-> 15: B3 Line contains hard tab characters (\t): "        State: idle"
-> 16: B3 Line contains hard tab characters (\t): "        Endpoint: /org/bl=
-uez/hci0/dev_00_AA_01_01_00_03/pac_sink0"
-> 17: B3 Line contains hard tab characters (\t): "        QoS Key: CIG"
-> 18: B3 Line contains hard tab characters (\t): "        QoS Value: 0x00 (=
-0)"
-> 19: B3 Line contains hard tab characters (\t): "        QoS Key: CIS"
-> 20: B3 Line contains hard tab characters (\t): "        QoS Value: 0x00 (=
-0)"
-> 21: B3 Line contains hard tab characters (\t): "        QoS Key: Framing"
-> 22: B3 Line contains hard tab characters (\t): "        QoS Value: 0x00 (=
-0)"
-> 23: B3 Line contains hard tab characters (\t): "        QoS Key: Presenta=
-tionDelay"
-> 24: B3 Line contains hard tab characters (\t): "        QoS Value: 0x0000=
-9c40 (40000)"
-> 25: B3 Line contains hard tab characters (\t): "        QoS Key: Interval=
-"
-> 26: B3 Line contains hard tab characters (\t): "        QoS Value: 0x0000=
-2710 (10000)"
-> 27: B3 Line contains hard tab characters (\t): "        QoS Key: Latency"
-> 28: B3 Line contains hard tab characters (\t): "        QoS Value: 0x000a=
- (10)"
-> 29: B3 Line contains hard tab characters (\t): "        QoS Key: SDU"
-> 30: B3 Line contains hard tab characters (\t): "        QoS Value: 0x0028=
- (40)"
-> 31: B3 Line contains hard tab characters (\t): "        QoS Key: PHY"
-> 32: B3 Line contains hard tab characters (\t): "        QoS Value: 0x02 (=
-2)"
-> 33: B3 Line contains hard tab characters (\t): "        QoS Key: Retransm=
-issions"
-> 34: B3 Line contains hard tab characters (\t): "        QoS Value: 0x02 (=
-2)"
-> 35: B3 Line contains hard tab characters (\t): "        Location: 0x00000=
-003 (3)"
-> 36: B3 Line contains hard tab characters (\t): "        Links: /org/bluez=
-/hci0/dev_00_AA_01_01_00_03/pac_source0/fd0"
->
->
-> ---
-> Regards,
-> Linux Bluetooth
->
-
-
---=20
-Luiz Augusto von Dentz
