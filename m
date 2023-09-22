@@ -2,84 +2,77 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3218CD4F49
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Sep 2023 10:05:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85491C04AAB
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Sep 2023 12:01:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231180AbjIVKGD (ORCPT
+        id S233835AbjIVMBh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 22 Sep 2023 06:06:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38618 "EHLO
+        Fri, 22 Sep 2023 08:01:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229669AbjIVKGD (ORCPT
+        with ESMTP id S233971AbjIVMBf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 22 Sep 2023 06:06:03 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F26B98F
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Sep 2023 03:05:56 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1c328b53aeaso17045455ad.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Sep 2023 03:05:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=orcam.com; s=google; t=1695377156; x=1695981956; darn=vger.kernel.org;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9J33lH94QtvPkB+U8Op8ioYJqL6rZGiBxLVupCpDATM=;
-        b=HXbxAjU/r/H1jkLHmpNbdsmtDTL0GQPENCGUf2GfuKtdl9f/6c58r+O1gQsYTpog5L
-         dVxbTWz7hGRKeoiaSxjAX7dc7SbNSfCT7+ms7JLNOnu0SxUJkZkFH/kBcdTFR+XYoIPN
-         coXFs0AkCVITzGnG4qYE+PSDmqeek9lkTpnEA=
+        Fri, 22 Sep 2023 08:01:35 -0400
+Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com [209.85.161.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D80E19C
+        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Sep 2023 05:01:29 -0700 (PDT)
+Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-57abf1ee779so2704139eaf.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Sep 2023 05:01:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695377156; x=1695981956;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9J33lH94QtvPkB+U8Op8ioYJqL6rZGiBxLVupCpDATM=;
-        b=R2Dv61BJywTQ3gfpUcBUS6R2QYQRPqsDiXT9O6nhmWBOKsqKy393zvFvPSJ5BiYBXu
-         zDu/tiO677N3c1RGEHsLePJmKJuXzwFWE6c1+rEYlb4MX7VJIGkZxwFho/gJZHl9H/Uu
-         Egh2ibQKvcHil1meBB8HK4ExKKKMyiDUkj8kwXO/8GPue19/yxSdtd/OplIEh+NO70te
-         BW5f/0/o07nHxFULzR3OrVnZbCsP01tFmdMgIqmYBUBFr1fRzGrq/B/Ng2TGo/Pet5MA
-         ghrgwT+uZLquVGpPp8RqHsUgURPZPmkQ8AJKFvH9UHkAhHjHnj/vYtaVN0fBpG3Lh3To
-         l4gA==
-X-Gm-Message-State: AOJu0YxSnY5upXw7qjUlojrDf6rHAPLdt3qdpp14svf6wG9H62EqBf+/
-        ZP27CgWbg2Dv2OFb0aAO1Ad3N9jYLrBVhqnFVPVQ3vrfNsYS37r/ibQ=
-X-Google-Smtp-Source: AGHT+IEAIM7MmInwc29GRUxIswq/gX7qGT8Doy1FhOJ5qQvKr38oqV0EcXTxo86olbHsLZoaxWRZVCNmp9z+st5GNcU=
-X-Received: by 2002:a17:90a:4f0b:b0:267:ffcf:e9e3 with SMTP id
- p11-20020a17090a4f0b00b00267ffcfe9e3mr7981235pjh.46.1695377156087; Fri, 22
- Sep 2023 03:05:56 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1695384088; x=1695988888;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jj2QWvmiK+0WWAcmrF4T0yz3RCgK8HWXoA++/rR1IPw=;
+        b=f/SANEywMCnPr/HTlUJKS6qoTSk+O507QQsh3SlIEqbf2iUyq39L3YmM1gCiTjzR1A
+         UyaKtW2iJLZZmKN3PwY/Hrri6Klkj+pRbDTray2bjw9+qndaBjiDs+IO+6o3oLrI4vi7
+         hXsxCz8IZBPZMFwLsdDmPv55ZBuMawxC2BXRRZlFsrQAiGe54ewZiy2CbYq6LAwL99Se
+         HwH0M1lCMryLOm6IpRcpl/y0NeyXfAlExYibUb3v8vMUpGYSOrmP/Y5/jTo61bCLfUJG
+         c80qdXjvq+9WVyB2QhlunCgs8+N81dKlGnEtuPl91yPBzR/mMGtJO+PAmhnTwrW0K1Yu
+         k0WA==
+X-Gm-Message-State: AOJu0YwWbMt90gXKcNI8oVVaeY7mETm8qUCT4wJLau1UQEnvFlKWWWKh
+        z8jof1BLK/QoVOWYlT+9YPB5liwmI/Yi2Z1EHPujyX7lFdzk
+X-Google-Smtp-Source: AGHT+IGQtOov5rgUCSHUmJaUiEHw6Xxzi7sjyCjTogbyObjGLfUVrtFsovgvSWXfW6nmE42beN87+I5IFZm0BLhP45xFVBRc0qio
 MIME-Version: 1.0
-References: <CAB+bgRZvEeGhuqBQ0cf5sFggQZNQ+dsFB4V1HCMGw6JHsDJVMg@mail.gmail.com>
-In-Reply-To: <CAB+bgRZvEeGhuqBQ0cf5sFggQZNQ+dsFB4V1HCMGw6JHsDJVMg@mail.gmail.com>
-From:   Ordit Gross <ordit.gross@orcam.com>
-Date:   Fri, 22 Sep 2023 13:05:45 +0300
-Message-ID: <CAB+bgRbEEB2Hv9uw3LOAGsMKRg2tKW7T+W=T9X1LGcaTBhhSnQ@mail.gmail.com>
-Subject: Re: running gatt over classic server
-To:     linux-bluetooth@vger.kernel.org
+X-Received: by 2002:a05:6870:954d:b0:1d6:41c0:c9bf with SMTP id
+ v13-20020a056870954d00b001d641c0c9bfmr3173482oal.5.1695384088583; Fri, 22 Sep
+ 2023 05:01:28 -0700 (PDT)
+Date:   Fri, 22 Sep 2023 05:01:28 -0700
+In-Reply-To: <000000000000140b1405fce42c66@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000005be6710605f15e50@google.com>
+Subject: Re: [syzbot] [bluetooth?] KASAN: slab-use-after-free Write in sco_conn_del
+From:   syzbot <syzbot+6b9277cad941daf126a2@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, edumazet@google.com, hdanton@sina.com,
+        johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        luiz.dentz@gmail.com, luiz.von.dentz@intel.com,
+        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
+        syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-hi,
-any chance someone can give me a hint?
-thanks!
+syzbot has bisected this issue to:
 
+commit 9a8ec9e8ebb5a7c0cfbce2d6b4a6b67b2b78e8f3
+Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date:   Thu Mar 30 21:15:50 2023 +0000
 
-On Thu, Sep 14, 2023 at 8:13=E2=80=AFPM Ordit Gross <ordit.gross@orcam.com>=
- wrote:
->
-> hi,
-> I'm trying to run btgatt-server over bluetooth classic.
-> I've configured in mgmt: le off, connectable on, discoverable on.
-> ./btgatt-server -r
-> I attempt to connect via ios bluetooth settings.
-> The test does not detect connection being done (even though hci show a
-> successful connection) and looking in hcidump I see discovery of gatt
-> and gap only and not of heart rate service.
->
-> I'm probably missing something very basic..
-> Can you please help?
->
-> ** running the python test works well, namely heart-rate service is seen.
-> ** using bluez v5.64
->
-> thanks in advance!
+    Bluetooth: SCO: Fix possible circular locking dependency on sco_connect_cfm
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10b66646680000
+start commit:   bd6c11bc43c4 Merge tag 'net-next-6.6' of git://git.kernel...
+git tree:       net-next
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=12b66646680000
+console output: https://syzkaller.appspot.com/x/log.txt?x=14b66646680000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=634e05b4025da9da
+dashboard link: https://syzkaller.appspot.com/bug?extid=6b9277cad941daf126a2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10f06d04680000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=107fdcd0680000
+
+Reported-by: syzbot+6b9277cad941daf126a2@syzkaller.appspotmail.com
+Fixes: 9a8ec9e8ebb5 ("Bluetooth: SCO: Fix possible circular locking dependency on sco_connect_cfm")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
