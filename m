@@ -2,135 +2,187 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1EB5CE7A81
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Sep 2023 21:54:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 403A7CE7A89
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 23 Sep 2023 09:14:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229897AbjIVVyh (ORCPT
+        id S229743AbjIWJOT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 22 Sep 2023 17:54:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57004 "EHLO
+        Sat, 23 Sep 2023 05:14:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229674AbjIVVyg (ORCPT
+        with ESMTP id S229706AbjIWJOT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 22 Sep 2023 17:54:36 -0400
-Received: from mail-vs1-xe30.google.com (mail-vs1-xe30.google.com [IPv6:2607:f8b0:4864:20::e30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 205B1F7
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Sep 2023 14:54:30 -0700 (PDT)
-Received: by mail-vs1-xe30.google.com with SMTP id ada2fe7eead31-4526d872941so1452404137.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Sep 2023 14:54:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695419669; x=1696024469; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=sLDkgoOJBcZTEXI0TpB4/47M2qTKEkykMrxpcxSm++g=;
-        b=NuZee03zduM+lkiwWD0lyamtD6xTz8U7J31fKId+qlYhpdVVW21hmoL52e5wIwwTup
-         yLAcwmxq7eUd4Cp3BesjqjpkPYoVE+lOV2WsaQOMbLqawWmV1eOdTcV75u7vGRypM3kk
-         2gctbhMt/baTiVsLNJyygTFgNGoxQ9LB1qYI5xxEZYeBUoSC76fw967v+VLthadYp4qx
-         MfFdvQYmaa/SVRvc2oUwaYnL4oM9LXL+nWrrkLR+Wz8RtxYaRaEJpNcYn+RM6aWU+dRf
-         ML1jVKN8QwZu88i1DDuq3rhftOz6473ILHddSIQ7A0P4iIhVLjUFXtKMx/+b6h33AWYq
-         WPMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695419669; x=1696024469;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sLDkgoOJBcZTEXI0TpB4/47M2qTKEkykMrxpcxSm++g=;
-        b=t2LoazY71Pbe/ADAK/9/Y/8y4wr2ARbFoGRF58se5WeGMeFG6CT4hZVV4kGEUbVata
-         uK+LgQ+r/TssltdhmVUbpVK2DeMqBAXBv2yjJD3gEr3fM4htdCiO/9VSTSuWALAeLEyg
-         G1oI2ugWMlki7LYDZ2Kvf5UOwYmt9I4I3tE+oqBNcWV5g/5DTwBXK2seFXLb3B5+kEqq
-         /cCAocPfa0eqZ3R7e7IkE85qZkwOIKYVVRSU7i4gK1MpDdQlttlhoHmm2nI8oAKQ46qJ
-         eH4nstT147+up5IkVif4F6fnwM/aU4TZsMeEUp1pB2aBAedNgsXXG++pTwNnNX25ydj2
-         7eQA==
-X-Gm-Message-State: AOJu0YwtHZc+6eVyOmvmr5xy+O11dcbfSsHhkAtlmyHvQxRRfkyoIIuo
-        1u4r68WvYfhd072n34PGLr0p9lQwj7c=
-X-Google-Smtp-Source: AGHT+IFGuMO2iRXc3kKkIH4NouUtrD2bMupUylVGU49adFtAcii/4JDmR4Txsx/iwOp/zrpaT8SDpw==
-X-Received: by 2002:a05:6102:3a6e:b0:452:84fd:4a0a with SMTP id bf14-20020a0561023a6e00b0045284fd4a0amr812905vsb.17.1695419668982;
-        Fri, 22 Sep 2023 14:54:28 -0700 (PDT)
-Received: from [172.17.0.2] ([20.51.128.141])
-        by smtp.gmail.com with ESMTPSA id bs24-20020ac86f18000000b0041072408126sm1786137qtb.5.2023.09.22.14.54.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Sep 2023 14:54:28 -0700 (PDT)
-Message-ID: <650e0d14.c80a0220.97078.7598@mx.google.com>
-Date:   Fri, 22 Sep 2023 14:54:28 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0819114637224901333=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v2,1/6] media-api: Update to reflect the last code changes
-In-Reply-To: <20230922192335.1060601-1-luiz.dentz@gmail.com>
+        Sat, 23 Sep 2023 05:14:19 -0400
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 289D5136
+        for <linux-bluetooth@vger.kernel.org>; Sat, 23 Sep 2023 02:14:12 -0700 (PDT)
+Received: from [192.168.1.195] (unknown [IPv6:2a0c:f040:0:2790::a01d])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pav@iki.fi)
+        by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4Rt3Nb2jcbz49Psw;
+        Sat, 23 Sep 2023 12:14:07 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+        t=1695460447;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jK0/+mlqnTF6UIanKWHATQ7cco3waG6M+WU8Awo/Eps=;
+        b=ZJEMXjKzcyU8gxZPSukv/yimdMFfItUZndKj398u+dDpfr+DOBC5T5XqMK//84pd9UQXVO
+        cR5FPEjBdQGoVOTTMhJHkTEzBL5YkWUN024VyV+esjhnNesBW2BX234RAA9yfSvUNJu2LH
+        +/TuF0L3sBh0HekguVC2grZkUQna2NuaXhVqUQC7q1ZxwAQjcIvWE6xTOd7B2+Uor2zVEu
+        LtCwFFo3rBSE8JwgBkefDzV2otjSSEf6qwuDTxNmm9Bg12w3P2kgXXk2S7aXAgzg1q2MaQ
+        Sws0nEkTRZSkdSw8KMiJ9fFCrc3rxzH1hqgIFsZqg5jBxP32vDQFtwHFtILUjw==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1695460447; a=rsa-sha256;
+        cv=none;
+        b=ZcyRyFE9jR+cF0JwYtxI6N4Qmq5sR6RN70iYVRtDol0Nv8W9J6HeZFo30xjM+Z5/TrX2H2
+        b8iu6tosnBjqSZetFxuCkm9jB2PIxpeowqVAnoB2Rkgk7C+EOA8NzH9TX0DKd4dPp4rgFH
+        VxOYBhk6oUqaWUiWkd2nLmhvHm+K5MHF2vnN2zXZT4W1YHdQSdg9gvCwUU2jjMmB8YUWo9
+        xMOtTBPNVOVXIvyzS4OiPrFyQQLXZlJoyqgpUK1jf8q+/G/dVFfy/RXSlkT5AdE+q8mNSu
+        T9s/7z+DH4b6PQ9BmrZX9COhzdjd1PjNDud9T3kuqICJxChyRxIV5Gtg6KbnVA==
+ARC-Authentication-Results: i=1;
+        ORIGINATING;
+        auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+        s=lahtoruutu; t=1695460447;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jK0/+mlqnTF6UIanKWHATQ7cco3waG6M+WU8Awo/Eps=;
+        b=CIM/6RPSFed6JMJ/A+hmcTUy12Svr4mJ1fGHtk2y1UzUu9QIspNmpte7pv1ZO69n2Nb8nh
+        5Ao/hoJoEBTB7l8XywkasXCC/pVEUqombWRuwcgDhhrR2MWe4zDsmxJCNZp2eTRRJMBJXX
+        afNcZ58HFJfK0hwaYcFYQgwbB1xpKuIn1D9GuzOXLPS2Ll0yiSttz+XoeHocJQNjqLCjXq
+        KyNTnFTabP9e8rwEK9WxFH1k3yYwW0pcnAiCkn4SlS2qudR/G45zVxPG+HSOuoWRRMi99i
+        ofldpx+YUZv9dij1Zx90Xt6sB+p17DDWgwzWhYwh4Xz/bZqm9Y9vgu53omt4bQ==
+Message-ID: <9100eb19ee8fb16e78cfee86e953dfe2afd6efe9.camel@iki.fi>
+Subject: Re: [PATCH v2 6/6] doc/media: Convert media-api.rst into manpages
+From:   Pauli Virtanen <pav@iki.fi>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Date:   Sat, 23 Sep 2023 12:14:05 +0300
+In-Reply-To: <20230922192335.1060601-6-luiz.dentz@gmail.com>
 References: <20230922192335.1060601-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+         <20230922192335.1060601-6-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0819114637224901333==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Luiz,
 
-This is automated email and please do not reply to this email!
+pe, 2023-09-22 kello 12:23 -0700, Luiz Augusto von Dentz kirjoitti:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>=20
+> This splits media-api.rst into org.bluez.Media<interface>.rst and
+> generate manpages for them.
 
-Dear submitter,
+I made a pass looking at the implementations of the transport/endpoint
+and SetConfiguration/SelectProperties/SelectConfiguration and comparing
+to docs.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=786884
+Note that the SelectProperties API has a problem with BAP endpoint
+configuration. We maybe should redesign it while we still can?
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      4.24 seconds
-GitLint                       FAIL      2.39 seconds
-BuildEll                      PASS      28.66 seconds
-BluezMake                     PASS      1020.76 seconds
-MakeCheck                     PASS      12.07 seconds
-MakeDistcheck                 PASS      163.66 seconds
-CheckValgrind                 PASS      265.29 seconds
-CheckSmatch                   PASS      358.10 seconds
-bluezmakeextell               PASS      109.72 seconds
-IncrementalBuild              PASS      5193.51 seconds
-ScanBuild                     PASS      1080.16 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v2,3/6] client: Make transport.show to print QoS property
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-10: B3 Line contains hard tab characters (\t): "	UUID: 00002bcb-0000-1000-8000-00805f9b34fb"
-11: B3 Line contains hard tab characters (\t): "	Codec: 0x06 (6)"
-12: B3 Line contains hard tab characters (\t): "	Configuration:"
-14: B3 Line contains hard tab characters (\t): "	Device: /org/bluez/hci0/dev_00_AA_01_01_00_03"
-15: B3 Line contains hard tab characters (\t): "	State: idle"
-16: B3 Line contains hard tab characters (\t): "	Endpoint: /org/bluez/hci0/dev_00_AA_01_01_00_03/pac_sink0"
-17: B3 Line contains hard tab characters (\t): "	QoS Key: CIG"
-18: B3 Line contains hard tab characters (\t): "	QoS Value: 0x00 (0)"
-19: B3 Line contains hard tab characters (\t): "	QoS Key: CIS"
-20: B3 Line contains hard tab characters (\t): "	QoS Value: 0x00 (0)"
-21: B3 Line contains hard tab characters (\t): "	QoS Key: Framing"
-22: B3 Line contains hard tab characters (\t): "	QoS Value: 0x00 (0)"
-23: B3 Line contains hard tab characters (\t): "	QoS Key: PresentationDelay"
-24: B3 Line contains hard tab characters (\t): "	QoS Value: 0x00009c40 (40000)"
-25: B3 Line contains hard tab characters (\t): "	QoS Key: Interval"
-26: B3 Line contains hard tab characters (\t): "	QoS Value: 0x00002710 (10000)"
-27: B3 Line contains hard tab characters (\t): "	QoS Key: Latency"
-28: B3 Line contains hard tab characters (\t): "	QoS Value: 0x000a (10)"
-29: B3 Line contains hard tab characters (\t): "	QoS Key: SDU"
-30: B3 Line contains hard tab characters (\t): "	QoS Value: 0x0028 (40)"
-31: B3 Line contains hard tab characters (\t): "	QoS Key: PHY"
-32: B3 Line contains hard tab characters (\t): "	QoS Value: 0x02 (2)"
-33: B3 Line contains hard tab characters (\t): "	QoS Key: Retransmissions"
-34: B3 Line contains hard tab characters (\t): "	QoS Value: 0x02 (2)"
-35: B3 Line contains hard tab characters (\t): "	Location: 0x00000003 (3)"
-36: B3 Line contains hard tab characters (\t): "	Links: /org/bluez/hci0/dev_00_AA_01_01_00_03/pac_source0/fd0"
+I think generally at least from Pipewire side there's no need to keep
+backward compatibility while this is experimental. We can target BlueZ
+master branch.
 
 
----
-Regards,
-Linux Bluetooth
+SelectProperties API problem:
+
+As BAP client one first does Config Codec (ASCS =C2=A75.1) which takes
+Target_Latency, Target_PHY and Codec.
+
+After this, the ASE properties (ACSS Table 4.3) in Codec Configured
+state contain the server supported values for Max_Transport_Latency,
+Presentation_Delay_Min/Max etc.
+
+SelectProperties is called before Config Codec, so it cannot
+necessarily know the server supported values. In this case the sound
+server cannot fill in QoS correctly.
+
+The client-invoked SetConfiguration API also seems to have similar
+issue.
+
+Probably: SelectProperties should be called twice, once to get
+parameters for Config Codec, and then again to get parameters for
+Config QoS. Or, there should be a separate "SelectCodec" and
+"SelectQoS" calls. Calling "SelectProperties" twice could be simpler
+for everyone.=C2=A0
+
+In client-invoked "SetConfiguration" API, one probably should only pass
+in the parameters needed for Config Codec, and BlueZ should then make a
+SelectProperties call to get the QoS ones once the server-side values
+are known.
+
+I can take a look at this...
 
 
---===============0819114637224901333==--
+MediaTransport:
+
+"Delay" field only exists for A2DP in code.
+
+"Volume" field only exists for A2DP in code.
+
+"Links" is ucast only in code.
+
+"QoS.TargetLatency" does not exist in code. Maybe it should be exposed
+for consistency, since it's expected as return from SelectProperties.
+
+
+SetConfiguration:
+
+SetConfiguration properties dict when called by BlueZ contains exactly
+the properties of the transport. The documentation probably should say
+that this is so.
+
+When called by client, the contents of the properties dict are expected
+to be different. QoS parameters are not packed in a "QoS" dict. Maybe
+they should be. The "PHY" key is also still a string here.
+
+The documented input parameters expected from client are wrong, the
+documentation explains fields of struct bt_bap_pac_qos, but what the
+code parses are that of struct bt_bap_qos.
+
+"MaximumLatency": no such field in code, seems to be called "Latency"
+everywhere.
+
+
+SelectProperties:
+
+In code, the return parameter expects QoS parameters (struct
+bt_bap_qos) to be packed in "QoS" dict.
+
+They are not packed in "QoS" dict in the input parameters. These are
+not exactly QoS, but instead struct bt_bap_pac_qos, so not clear if
+they should be packed.
+
+The input and return parameters are not documented. The input QoS
+contains fields of struct bt_bap_pac_qos. The return QoS has fields of
+struct bt_bap_qos.
+
+
+MediaEndpoint:
+
+The endpoints published by BlueZ only have the properties
+"UUID", "Codec", "Capabilities", "Device".
+
+The documentation lists various other things, but they are not
+implemented as server endpoint properties.
+
+As client endpoint properties:
+
+"RTN" is expected to be present in code, but is not documented.
+
+"MaximumLatency" "Location" "SupportedContext" "Context" are documented
+but not present in code.
+
+
+--=20
+Pauli Virtanen
