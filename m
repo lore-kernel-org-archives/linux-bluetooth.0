@@ -2,246 +2,215 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30427CE7A89
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Sep 2023 05:15:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48F72CD54BE
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Sep 2023 19:24:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231880AbjIYFPr (ORCPT
+        id S233045AbjIYTZB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 25 Sep 2023 01:15:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50630 "EHLO
+        Mon, 25 Sep 2023 15:25:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229504AbjIYFPr (ORCPT
+        with ESMTP id S232165AbjIYTY7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 25 Sep 2023 01:15:47 -0400
-Received: from mail-oa1-f77.google.com (mail-oa1-f77.google.com [209.85.160.77])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F944B3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 24 Sep 2023 22:15:40 -0700 (PDT)
-Received: by mail-oa1-f77.google.com with SMTP id 586e51a60fabf-1dd008b6d6eso6454356fac.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 24 Sep 2023 22:15:40 -0700 (PDT)
+        Mon, 25 Sep 2023 15:24:59 -0400
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 437D3101
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Sep 2023 12:24:52 -0700 (PDT)
+Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2b95d5ee18dso121769481fa.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Sep 2023 12:24:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695669890; x=1696274690; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nzBWbovDD16kBxCEH0xkSy+YZfw9wutbMWDfxWxFbZs=;
+        b=R5tGVCARdOQPLmuY3aVDLMRz/svgvMK/41UG+RHml8n8Nzch1C5KPPbEssPFQcNk4w
+         Vt3TsUfcITXmJexf16cvFjbwFYQjQPEwAbNm9dgBEewyiyCUyiYPdrm4IgLFhMvxfq0h
+         5g9+7pmIjTlT/OJ77BZkLQqybUKhoWBnw7uW+4gKFQmHo2wR/aApzWfhThsTYPFAkTzx
+         VbQXf/x/EUYhn+mFwL3ndZ4+ph0uDiGDTtKLYH525JLB/GP11BJ4C7uibyCesTHmOVja
+         vnfKUXiLTnm36N/P/fZMkfByZACuDicjU8KHeek8aaX2gUiaUjuuXZvy26T2XDc/7FPO
+         SOGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695618939; x=1696223739;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+trtCoWLzpt+DqhJCsYQjTlyNOAhChajs6wwqaNIFO0=;
-        b=xVNE/Wym5NUGRyr1x96gePoHuNlJSrzQKnpSh5pNey5bYVZWPWgi1Sju1nnjcuJ3ji
-         uMuvdZc9DBTlROwEtBuWJWL+vPW6w/Kdix+D44RDrlJVkp1VqCkZji8SgZZb0ZVLFvaH
-         jqce1AeS9eMbb4LRc7qdgCzbhQto42ehstfoH4ndSon2hHnUenCF9hQ5ZTHanXmkCmB3
-         mBg8uGzKNBA55pcAeEHjRU6T1aQeYGFhi4pfRxuLYiUendfMjkJ5inn1uh76/lZ0OMXf
-         ew1aFzGTYv6VSg7Rf7/xO+nT7OYIgskCmIrcpJeci0LJvIg5KNY6yUhTmHvlkAGNcD1k
-         7Ddw==
-X-Gm-Message-State: AOJu0Yx91gwsRT+nE5YKre6HFjAKvr21pgHGZNUCTwKHyAFV+8ptGD+G
-        OsDUe/MWrKIJ676hjlmBnxqSEtKiOrUyW2WL8z51LhOlUeQ6
-X-Google-Smtp-Source: AGHT+IGb/X74i2tzyu45+Xxl8pesjShLGYWs6NBpTAuliFyRfxKVyZO+CSMhxj4mB46jEJrGKOuKKej++NJXSFbzf8rx9bUrGBIC
+        d=1e100.net; s=20230601; t=1695669890; x=1696274690;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nzBWbovDD16kBxCEH0xkSy+YZfw9wutbMWDfxWxFbZs=;
+        b=rcyv+0ZMisNQzrTr76YyaL5IZ3zfRbp7sSvnClOGKMbs77Ua0o5jNaaxHRz5nu0Etm
+         9r1BOhDbgzK7HbUTMBfeBbQ8uec1Q+XnuRo25XDGHI+oE7S1mBnrQeieebtT4aH+DZyR
+         wMMsOhi8HQu6KfJa2HqrzQpxAHoBf0ukuLwqiyHqeeB7wrRpKJwcUe3RvMuV8W+rBw+N
+         jtsKIxi689/cjpJQOv2w/hfowXt50bbvDBE2xYefFfjFqxtkzQpZjGVNKPZvpOVirIlH
+         kTnMOItktBPsXrdZ6qxhSEADayyEhxquQgpmja8iHQVygPU635nKAbXE9x6ViICXyFvR
+         ufEw==
+X-Gm-Message-State: AOJu0YxImUHWM6JY9IjOZ7K86uKGA8P9112TOpvFTyy+n9PeA+hKR0SX
+        iGzaYrnzsnu6PjuqVM0n1QgECnLjDv1r7XAVxlBmN6HBVsPY/g==
+X-Google-Smtp-Source: AGHT+IE9tde9IOR86zh433x1mU6GCG4Wl4bubQVarQMV+9kQkrexfg4NNTCeAe6CoJv1HUUupDXxgptEXhPpZXmKoGI=
+X-Received: by 2002:a2e:9555:0:b0:2bd:1804:29fa with SMTP id
+ t21-20020a2e9555000000b002bd180429famr6431807ljh.39.1695669890094; Mon, 25
+ Sep 2023 12:24:50 -0700 (PDT)
 MIME-Version: 1.0
-X-Received: by 2002:a05:6870:b68a:b0:1dc:fc5f:5f6b with SMTP id
- cy10-20020a056870b68a00b001dcfc5f5f6bmr2584344oab.7.1695618939708; Sun, 24
- Sep 2023 22:15:39 -0700 (PDT)
-Date:   Sun, 24 Sep 2023 22:15:39 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000936c2d0606280cb2@google.com>
-Subject: [syzbot] [bluetooth?] possible deadlock in hci_dev_do_close
-From:   syzbot <syzbot+4e3a76c5c505a3f49083@syzkaller.appspotmail.com>
-To:     arkadiusz.bokowy@gmail.com, johan.hedberg@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        luiz.dentz@gmail.com, luiz.von.dentz@intel.com,
-        marcel@holtmann.org, syzkaller-bugs@googlegroups.com
+References: <20230922192335.1060601-1-luiz.dentz@gmail.com>
+ <20230922192335.1060601-6-luiz.dentz@gmail.com> <9100eb19ee8fb16e78cfee86e953dfe2afd6efe9.camel@iki.fi>
+In-Reply-To: <9100eb19ee8fb16e78cfee86e953dfe2afd6efe9.camel@iki.fi>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 25 Sep 2023 12:24:37 -0700
+Message-ID: <CABBYNZJ51nCXhmohvjr+XMuJ5yb1fw-Wao50RyyGuBx+NADmSg@mail.gmail.com>
+Subject: Re: [PATCH v2 6/6] doc/media: Convert media-api.rst into manpages
+To:     Pauli Virtanen <pav@iki.fi>
+Cc:     linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+Hi Pauli,
 
-syzbot found the following issue on:
+On Sat, Sep 23, 2023 at 2:14=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
+>
+> Hi Luiz,
+>
+> pe, 2023-09-22 kello 12:23 -0700, Luiz Augusto von Dentz kirjoitti:
+> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >
+> > This splits media-api.rst into org.bluez.Media<interface>.rst and
+> > generate manpages for them.
+>
+> I made a pass looking at the implementations of the transport/endpoint
+> and SetConfiguration/SelectProperties/SelectConfiguration and comparing
+> to docs.
+>
+> Note that the SelectProperties API has a problem with BAP endpoint
+> configuration. We maybe should redesign it while we still can?
+>
+> I think generally at least from Pipewire side there's no need to keep
+> backward compatibility while this is experimental. We can target BlueZ
+> master branch.
+>
+>
+> SelectProperties API problem:
+>
+> As BAP client one first does Config Codec (ASCS =C2=A75.1) which takes
+> Target_Latency, Target_PHY and Codec.
+>
+> After this, the ASE properties (ACSS Table 4.3) in Codec Configured
+> state contain the server supported values for Max_Transport_Latency,
+> Presentation_Delay_Min/Max etc.
+>
+> SelectProperties is called before Config Codec, so it cannot
+> necessarily know the server supported values. In this case the sound
+> server cannot fill in QoS correctly.
+>
+> The client-invoked SetConfiguration API also seems to have similar
+> issue.
+>
+> Probably: SelectProperties should be called twice, once to get
+> parameters for Config Codec, and then again to get parameters for
+> Config QoS. Or, there should be a separate "SelectCodec" and
+> "SelectQoS" calls. Calling "SelectProperties" twice could be simpler
+> for everyone.
+>
+> In client-invoked "SetConfiguration" API, one probably should only pass
+> in the parameters needed for Config Codec, and BlueZ should then make a
+> SelectProperties call to get the QoS ones once the server-side values
+> are known.
+>
+> I can take a look at this...
 
-HEAD commit:    940fcc189c51 Add linux-next specific files for 20230921
-git tree:       linux-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=127d4f64680000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=1f140ae6e669ac24
-dashboard link: https://syzkaller.appspot.com/bug?extid=4e3a76c5c505a3f49083
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1081124a680000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10cfe14a680000
+Sound like a good idea, it means the actual configuration is always
+done via SelectProperties, that said we need to make sure this works
+with A2DP as well or state that it only applies to BAP, we could
+perhaps introduce a property to indicate that the endpoint implements
+SelectProperties.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/b8921b235c24/disk-940fcc18.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/c80a9f6bcdd4/vmlinux-940fcc18.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/ed10a4df6950/bzImage-940fcc18.xz
+>
+> MediaTransport:
+>
+> "Delay" field only exists for A2DP in code.
 
-The issue was bisected to:
+Yeah, the PresentationDelay was moved into QoS property.
 
-commit 091e25d6b54992d1d702ae91cbac139d4c243251
-Author: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-Date:   Wed Sep 20 15:30:07 2023 +0000
+> "Volume" field only exists for A2DP in code.
 
-    Bluetooth: vhci: Fix race when opening vhci device
+That is subject to change though.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1326e53c680000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=10a6e53c680000
-console output: https://syzkaller.appspot.com/x/log.txt?x=1726e53c680000
+> "Links" is ucast only in code.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+4e3a76c5c505a3f49083@syzkaller.appspotmail.com
-Fixes: 091e25d6b549 ("Bluetooth: vhci: Fix race when opening vhci device")
+Will mark it as unicast only.
 
-======================================================
-WARNING: possible circular locking dependency detected
-6.6.0-rc2-next-20230921-syzkaller #0 Not tainted
-------------------------------------------------------
-syz-executor126/5053 is trying to acquire lock:
-ffff88807df1cdc0 ((work_completion)(&hdev->tx_work)){+.+.}-{0:0}, at: __flush_work+0xfa/0xa10 kernel/workqueue.c:3403
+> "QoS.TargetLatency" does not exist in code. Maybe it should be exposed
+> for consistency, since it's expected as return from SelectProperties.
 
-but task is already holding lock:
-ffff88807df1d0b8 (&hdev->req_lock){+.+.}-{3:3}, at: hci_dev_do_close+0x26/0x90 net/bluetooth/hci_core.c:552
+Yeah, it seems we never implemented it, but I consider it a gap not a
+inconsistency with the code.
 
-which lock already depends on the new lock.
+>
+> SetConfiguration:
+>
+> SetConfiguration properties dict when called by BlueZ contains exactly
+> the properties of the transport. The documentation probably should say
+> that this is so.
+>
+> When called by client, the contents of the properties dict are expected
+> to be different. QoS parameters are not packed in a "QoS" dict. Maybe
+> they should be. The "PHY" key is also still a string here.
 
+Is it? Or perhaps I had changed it later on when splitting the
+documentation on a per-interface, at least on
+org.bluez.MediaEndpoint.rst there is no entry were PHY is a string, or
+you are talking about the actual code here?
 
-the existing dependency chain (in reverse order) is:
+> The documented input parameters expected from client are wrong, the
+> documentation explains fields of struct bt_bap_pac_qos, but what the
+> code parses are that of struct bt_bap_qos.
+>
+> "MaximumLatency": no such field in code, seems to be called "Latency"
+> everywhere.
 
--> #3 (&hdev->req_lock){+.+.}-{3:3}:
-       __mutex_lock_common kernel/locking/mutex.c:603 [inline]
-       __mutex_lock+0x181/0x1340 kernel/locking/mutex.c:747
-       hci_dev_do_close+0x26/0x90 net/bluetooth/hci_core.c:552
-       hci_rfkill_set_block+0x1b9/0x200 net/bluetooth/hci_core.c:956
-       rfkill_set_block+0x200/0x550 net/rfkill/core.c:346
-       rfkill_fop_write+0x2d4/0x570 net/rfkill/core.c:1306
-       vfs_write+0x2a4/0xe40 fs/read_write.c:582
-       ksys_write+0x1f0/0x250 fs/read_write.c:637
-       do_syscall_x64 arch/x86/entry/common.c:51 [inline]
-       do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:81
-       entry_SYSCALL_64_after_hwframe+0x63/0xcd
+The way Im designing these properties are that MediaEndpoint actually
+carries the preferences and MediaTransport the configuration as far as
+BAP is concerned, perhaps I shall actually state it though.
 
--> #2 (rfkill_global_mutex){+.+.}-{3:3}:
-       __mutex_lock_common kernel/locking/mutex.c:603 [inline]
-       __mutex_lock+0x181/0x1340 kernel/locking/mutex.c:747
-       rfkill_register+0x3a/0xb30 net/rfkill/core.c:1075
-       hci_register_dev+0x43a/0xd40 net/bluetooth/hci_core.c:2656
-       __vhci_create_device+0x393/0x800 drivers/bluetooth/hci_vhci.c:437
-       vhci_create_device drivers/bluetooth/hci_vhci.c:478 [inline]
-       vhci_get_user drivers/bluetooth/hci_vhci.c:535 [inline]
-       vhci_write+0x2c7/0x470 drivers/bluetooth/hci_vhci.c:615
-       call_write_iter include/linux/fs.h:1957 [inline]
-       new_sync_write fs/read_write.c:491 [inline]
-       vfs_write+0x650/0xe40 fs/read_write.c:584
-       ksys_write+0x12f/0x250 fs/read_write.c:637
-       do_syscall_x64 arch/x86/entry/common.c:51 [inline]
-       do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:81
-       entry_SYSCALL_64_after_hwframe+0x63/0xcd
+>
+> SelectProperties:
+>
+> In code, the return parameter expects QoS parameters (struct
+> bt_bap_qos) to be packed in "QoS" dict.
+>
+> They are not packed in "QoS" dict in the input parameters. These are
+> not exactly QoS, but instead struct bt_bap_pac_qos, so not clear if
+> they should be packed.
 
--> #1 (&data->open_mutex){+.+.}-{3:3}:
-       __mutex_lock_common kernel/locking/mutex.c:603 [inline]
-       __mutex_lock+0x181/0x1340 kernel/locking/mutex.c:747
-       vhci_send_frame+0x67/0xa0 drivers/bluetooth/hci_vhci.c:78
-       hci_send_frame+0x220/0x470 net/bluetooth/hci_core.c:3039
-       hci_sched_acl_pkt net/bluetooth/hci_core.c:3651 [inline]
-       hci_sched_acl net/bluetooth/hci_core.c:3736 [inline]
-       hci_tx_work+0x1456/0x1e40 net/bluetooth/hci_core.c:3835
-       process_one_work+0x884/0x15c0 kernel/workqueue.c:2630
-       process_scheduled_works kernel/workqueue.c:2703 [inline]
-       worker_thread+0x8b9/0x1290 kernel/workqueue.c:2784
-       kthread+0x33c/0x440 kernel/kthread.c:388
-       ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
-       ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+Input shall be considered the remote preferences and the output the
+local configuration.
 
--> #0 ((work_completion)(&hdev->tx_work)){+.+.}-{0:0}:
-       check_prev_add kernel/locking/lockdep.c:3134 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3253 [inline]
-       validate_chain kernel/locking/lockdep.c:3868 [inline]
-       __lock_acquire+0x2e3d/0x5de0 kernel/locking/lockdep.c:5136
-       lock_acquire kernel/locking/lockdep.c:5753 [inline]
-       lock_acquire+0x1ae/0x510 kernel/locking/lockdep.c:5718
-       __flush_work+0x103/0xa10 kernel/workqueue.c:3403
-       hci_dev_close_sync+0x22d/0x1160 net/bluetooth/hci_sync.c:4982
-       hci_dev_do_close+0x2e/0x90 net/bluetooth/hci_core.c:554
-       hci_rfkill_set_block+0x1b9/0x200 net/bluetooth/hci_core.c:956
-       rfkill_set_block+0x200/0x550 net/rfkill/core.c:346
-       rfkill_fop_write+0x2d4/0x570 net/rfkill/core.c:1306
-       vfs_write+0x2a4/0xe40 fs/read_write.c:582
-       ksys_write+0x1f0/0x250 fs/read_write.c:637
-       do_syscall_x64 arch/x86/entry/common.c:51 [inline]
-       do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:81
-       entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> The input and return parameters are not documented. The input QoS
+> contains fields of struct bt_bap_pac_qos. The return QoS has fields of
+> struct bt_bap_qos.
 
-other info that might help us debug this:
+I will attempt to clarify that.
 
-Chain exists of:
-  (work_completion)(&hdev->tx_work) --> rfkill_global_mutex --> &hdev->req_lock
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&hdev->req_lock);
-                               lock(rfkill_global_mutex);
-                               lock(&hdev->req_lock);
-  lock((work_completion)(&hdev->tx_work));
-
- *** DEADLOCK ***
-
-2 locks held by syz-executor126/5053:
- #0: ffffffff8ea842a8 (rfkill_global_mutex){+.+.}-{3:3}, at: rfkill_fop_write+0x16e/0x570 net/rfkill/core.c:1298
- #1: ffff88807df1d0b8 (&hdev->req_lock){+.+.}-{3:3}, at: hci_dev_do_close+0x26/0x90 net/bluetooth/hci_core.c:552
-
-stack backtrace:
-CPU: 1 PID: 5053 Comm: syz-executor126 Not tainted 6.6.0-rc2-next-20230921-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/04/2023
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
- check_noncircular+0x311/0x3f0 kernel/locking/lockdep.c:2187
- check_prev_add kernel/locking/lockdep.c:3134 [inline]
- check_prevs_add kernel/locking/lockdep.c:3253 [inline]
- validate_chain kernel/locking/lockdep.c:3868 [inline]
- __lock_acquire+0x2e3d/0x5de0 kernel/locking/lockdep.c:5136
- lock_acquire kernel/locking/lockdep.c:5753 [inline]
- lock_acquire+0x1ae/0x510 kernel/locking/lockdep.c:5718
- __flush_work+0x103/0xa10 kernel/workqueue.c:3403
- hci_dev_close_sync+0x22d/0x1160 net/bluetooth/hci_sync.c:4982
- hci_dev_do_close+0x2e/0x90 net/bluetooth/hci_core.c:554
- hci_rfkill_set_block+0x1b9/0x200 net/bluetooth/hci_core.c:956
- rfkill_set_block+0x200/0x550 net/rfkill/core.c:346
- rfkill_fop_write+0x2d4/0x570 net/rfkill/core.c:1306
- vfs_write+0x2a4/0xe40 fs/read_write.c:582
- ksys_write+0x1f0/0x250 fs/read_write.c:637
- do_syscall_x64 arch/x86/entry/common.c:51 [inline]
- do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:81
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7f8297388479
-Code: 48 83 c4 28 c3 e8 e7 18 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffc9ef0d068 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 00007f82973df043 RCX: 00007f8297388479
-RDX: 0000000000000008 RSI: 0000000020000080 RDI: 0000000000000003
-RBP: 00007ffc9ef0d0b0 R08: 000000ff00ffa650 R09: 000000ff00ffa650
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007ffc9ef0d098
-R13: 00007f829740c5b0 R14: 0000000000000000 R15: 0000000000000001
- </TASK>
+>
+> MediaEndpoint:
+>
+> The endpoints published by BlueZ only have the properties
+> "UUID", "Codec", "Capabilities", "Device".
+>
+> The documentation lists various other things, but they are not
+> implemented as server endpoint properties.
+>
+> As client endpoint properties:
+>
+> "RTN" is expected to be present in code, but is not documented.
+>
+> "MaximumLatency" "Location" "SupportedContext" "Context" are documented
+> but not present in code.
+>
+>
+> --
+> Pauli Virtanen
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+--=20
+Luiz Augusto von Dentz
