@@ -2,166 +2,157 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C965FE80A8A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Sep 2023 21:40:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2204E82CC0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Sep 2023 21:46:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230038AbjI0Vkd (ORCPT
+        id S229746AbjI0Vqs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 Sep 2023 17:40:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45448 "EHLO
+        Wed, 27 Sep 2023 17:46:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229969AbjI0Vkc (ORCPT
+        with ESMTP id S229458AbjI0Vqr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 27 Sep 2023 17:40:32 -0400
-Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDDE212A
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Sep 2023 14:40:30 -0700 (PDT)
-Received: by mail-qk1-x729.google.com with SMTP id af79cd13be357-7741b18a06aso730369885a.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Sep 2023 14:40:30 -0700 (PDT)
+        Wed, 27 Sep 2023 17:46:47 -0400
+Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F14358E
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Sep 2023 14:46:44 -0700 (PDT)
+Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2c135cf2459so185900481fa.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Sep 2023 14:46:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695850829; x=1696455629; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UZDbId/Oq6bQoYjYM1BCQT82RB8NkOnAtSqUmB0Kd0w=;
-        b=nSn/QFh3oJUqNf/SVdBIfrnZuJrkdXW2fFP+ZWn1k0jNm2MzrL5arolTn7g9bdNGge
-         F8+uR5nEH6KefXRWPyZNUKMHu2nhQjtWDF9URlhYLOKVK8XYlkRbRHMCbm3JkMBiclov
-         VVH8oDt3GcRVBxugnZOFTzgXd4cZnZ+q2/EtbM3FuNGhrIqEYnlONAMyhi7B/y6HOr4G
-         bknrIa5dCgD2jW4hZSyrS0u83f1Vej8AYkw6WpuHUQ+BftdOlN6Gx6Tr3k/dQAxIcMCG
-         YW7BKKNzsgf/AIiucw3BKYC2zjDaeBmtsFeWgRf8d0DdLkolGF8lsgoGrXDvT8lcqCPx
-         xufw==
+        d=gmail.com; s=20230601; t=1695851203; x=1696456003; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iB63DcVyqxbhMRdT1D5mscGB0SuAdUA1QlLHxGnMCMY=;
+        b=PHXqtytNzVzhCdScHrAmaR8PjAtO0L/lXB0eZx/zaGRJ0rTStU0iaMZd9tzLlrDv3W
+         mj8gAqznDA9FM8XeP3A/q++FMNjFa74uyeo+O2NkqLqCF2/6rRghPm6JcIttVw9w/Un8
+         xPKAi4Zyhc+fIvEcWb/YKCr3fyRynAt4Qz1hfouVs5uXwn+6VhISX+gy8rXeztS+cjPH
+         d5DWlTPmZKM5s8AdJnTT+Pk/q5hSqlNMpvTjhw6hdtSUoFqtk1eF5ThvANiNOhcHnL92
+         UTEd3qa8TPlmPQLcy7cIVaUWQduN0avlT80yAJdWjeGfwWyM8LyrA4pn46Ms7ctqwexj
+         DRtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695850829; x=1696455629;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1695851203; x=1696456003;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UZDbId/Oq6bQoYjYM1BCQT82RB8NkOnAtSqUmB0Kd0w=;
-        b=r3PDTjLH0ZYI/AVM5Czejod07izh4Cbuxtpvf4EIXxMYEHbahLfJNzGJ69kyzzAYBe
-         yLTc4RVN7jpzv+a6XaJlQA0goBof/WepEN1ZzKh6PfeEDa1Fg7EilzV7wtWsKnR5mKU2
-         IXg17T4aU5mKxn8FH+bWHj8a9E8GoVU/OPTXGMQ5gJ2JojLrJ5ZKYdWix2MY0eXnTAmA
-         QC+VQIWcFUIHL6TsWOIExY3j3Rmgpd+pYm1yui5m8hsnzpP2KwTjQ74cyMAkD7NIMRTc
-         o/Cv/bb0wWQ7uT4azb+9i1fzXITNjYjNehkUG4/f2uS8Mif8knhE7w8jXxo9axKN1XA6
-         4N/A==
-X-Gm-Message-State: AOJu0Yy/Q8o/zadFetwImPYj0vW6jHOX5e5F54EV6K9Vo68DVMnfhmCr
-        nvTk8EmaOGuw0XlESDcv5p2SpzaY+sQc0xTO
-X-Google-Smtp-Source: AGHT+IEWT7/Y2regfcxchE/qqtqxhAlngMHkAJUXyUMxUWRAx2FZno/9rPTHJhzxbRnhvuMVZXPkIw==
-X-Received: by 2002:a05:620a:448f:b0:774:226b:c327 with SMTP id x15-20020a05620a448f00b00774226bc327mr4183872qkp.67.1695850829165;
-        Wed, 27 Sep 2023 14:40:29 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-98-232-221-87.hsd1.or.comcast.net. [98.232.221.87])
-        by smtp.gmail.com with ESMTPSA id s26-20020aa78d5a000000b00672ea40b8a9sm12546004pfe.170.2023.09.27.14.40.27
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Sep 2023 14:40:28 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 12/12] bap: Fix freeing value of dbus_message_iter_get_fixed_array
-Date:   Wed, 27 Sep 2023 14:40:03 -0700
-Message-ID: <20230927214003.1873224-13-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230927214003.1873224-1-luiz.dentz@gmail.com>
-References: <20230927214003.1873224-1-luiz.dentz@gmail.com>
+        bh=iB63DcVyqxbhMRdT1D5mscGB0SuAdUA1QlLHxGnMCMY=;
+        b=YEl/RVZDxnhR15tUWJJkrESXjlULgItkPha6SDTLAytck7/VpPOP4XLBl4wHjrtw5O
+         x28wZS9l+arjmrElPaF0n3bzwrH5ZO5Nfxaj3mT3l6b5C6+ibKNh2VqHH57A3mhBqb9I
+         zw2yIQOZUfxsGvzP37Wwuy/VsM6b9rzONSv3/PctRkSOl8AvBN95nGhvXoqMW3rBZz7b
+         0+ibL7DC6l4f5CAVphak1fCirvtxES+j27n8E0MYYx94+16iSVLBM7UAffdKMmfiEkrh
+         o6je6O8eO/2ttIQoJqgN8brcJvXsaMXAdXW5ba+qkJwEDCxNtxg5H4K/WdkkZtNnVMa+
+         1JDQ==
+X-Gm-Message-State: AOJu0YxY3q6iKJQPlVG6zDig2akRle3omKB/J0jxkSWK3bK53DaNMMDB
+        QtEvLlpm2BP3qMuEAH+Vm621MjP+ERQGBj1klP3CeGFD/wCUYA==
+X-Google-Smtp-Source: AGHT+IE4OhI6yZP9cssxOSDHS975tHuzaehs/EPgf/VGtL/c6Tb2ukIGoHi03kD3L21/qZBFRom8VNPHeGeuEhoLYk4=
+X-Received: by 2002:a2e:7209:0:b0:2b6:d6e1:a191 with SMTP id
+ n9-20020a2e7209000000b002b6d6e1a191mr2968827ljc.23.1695851202840; Wed, 27 Sep
+ 2023 14:46:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20230927113739.3332-1-iulia.tanasescu@nxp.com> <20230927113739.3332-2-iulia.tanasescu@nxp.com>
+In-Reply-To: <20230927113739.3332-2-iulia.tanasescu@nxp.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 27 Sep 2023 14:46:30 -0700
+Message-ID: <CABBYNZJ1AKTiLtnu29Sax9=-R4u0oAGmBiNy6k20aHNVH9aLHQ@mail.gmail.com>
+Subject: Re: [PATCH 1/1] Bluetooth: ISO: Fix invalid context error
+To:     Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Cc:     linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com,
+        mihai-octavian.urzica@nxp.com, silviu.barbulescu@nxp.com,
+        vlad.pruteanu@nxp.com, andrei.istodorescu@nxp.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Iulia,
 
-The value returned by dbus_message_iter_get_fixed_array is a reference
-and shall not be freed:
+On Wed, Sep 27, 2023 at 4:37=E2=80=AFAM Iulia Tanasescu <iulia.tanasescu@nx=
+p.com> wrote:
+>
+> This moves the hci_le_terminate_big_sync call from rx_work
+> to cmd_sync_work, to avoid calling sleeping function from
+> an invalid context.
+>
+> Signed-off-by: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+> ---
+>  net/bluetooth/hci_event.c | 31 +++++++++++++++++++++++++++----
+>  1 file changed, 27 insertions(+), 4 deletions(-)
+>
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index d242f956dea8..640921358e5f 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -7020,12 +7020,26 @@ static void hci_le_cis_req_evt(struct hci_dev *hd=
+ev, void *data,
+>         hci_dev_unlock(hdev);
+>  }
+>
+> +static int hci_iso_term_big_sync(struct hci_dev *hdev, void *data)
+> +{
+> +       __u8 *handle =3D data;
+> +
+> +       return hci_le_terminate_big_sync(hdev, *handle,
+> +                                        HCI_ERROR_LOCAL_HOST_TERM);
+> +}
+> +
+> +static void hci_iso_term_big_destroy(struct hci_dev *hdev, void *data, i=
+nt err)
+> +{
+> +       kfree(data);
+> +}
+> +
+>  static void hci_le_create_big_complete_evt(struct hci_dev *hdev, void *d=
+ata,
+>                                            struct sk_buff *skb)
+>  {
+>         struct hci_evt_le_create_big_complete *ev =3D data;
+>         struct hci_conn *conn;
+>         __u8 i =3D 0;
+> +       __u8 *big_handle;
+>
+>         BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
+>
+> @@ -7064,16 +7078,25 @@ static void hci_le_create_big_complete_evt(struct=
+ hci_dev *hdev, void *data,
+>                 rcu_read_lock();
+>         }
+>
+> -       if (!ev->status && !i)
+> +       rcu_read_unlock();
+> +
+> +       if (!ev->status && !i) {
+>                 /* If no BISes have been connected for the BIG,
+>                  * terminate. This is in case all bound connections
+>                  * have been closed before the BIG creation
+>                  * has completed.
+>                  */
+> -               hci_le_terminate_big_sync(hdev, ev->handle,
+> -                                         HCI_ERROR_LOCAL_HOST_TERM);
+> +               big_handle =3D kzalloc(sizeof(*big_handle), GFP_KERNEL);
+> +               if (!big_handle)
+> +                       goto unlock;
 
- 'The returned value is by reference and should not be freed.'
----
- profiles/audio/bap.c | 31 ++++++++++++++++++++++---------
- 1 file changed, 22 insertions(+), 9 deletions(-)
+You don't need to allocate a pointer to the handle, just pass it with UINT_=
+PTR.
 
-diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index 18872329d4ac..48a1a4f86f8d 100644
---- a/profiles/audio/bap.c
-+++ b/profiles/audio/bap.c
-@@ -365,19 +365,17 @@ static const GDBusPropertyTable ep_properties[] = {
- 	{ }
- };
- 
--static int parse_array(DBusMessageIter *iter, struct iovec **iov)
-+static int parse_array(DBusMessageIter *iter, struct iovec *iov)
- {
- 	DBusMessageIter array;
- 
- 	if (!iov)
- 		return 0;
- 
--	if (!(*iov))
--		*iov = new0(struct iovec, 1);
--
- 	dbus_message_iter_recurse(iter, &array);
--	dbus_message_iter_get_fixed_array(&array, &(*iov)->iov_base,
--						(int *)&(*iov)->iov_len);
-+	dbus_message_iter_get_fixed_array(&array, &iov->iov_base,
-+						(int *)&iov->iov_len);
-+
- 	return 0;
- }
- 
-@@ -594,10 +592,15 @@ static int parse_bcast_qos(const char *key, int var, DBusMessageIter *iter,
- 
- 		dbus_message_iter_get_basic(iter, &qos->bcast.timeout);
- 	} else if (!strcasecmp(key, "BCode")) {
-+		struct iovec iov;
-+
- 		if (var != DBUS_TYPE_ARRAY)
- 			return -EINVAL;
- 
--		parse_array(iter, &qos->bcast.bcode);
-+		parse_array(iter, &iov);
-+
-+		util_iov_free(qos->bcast.bcode, 1);
-+		qos->bcast.bcode = util_iov_dup(&iov, 1);
- 	} else {
- 		int err;
- 
-@@ -653,6 +656,9 @@ static int parse_configuration(DBusMessageIter *props, struct iovec **caps,
- 				struct bt_bap_qos *qos)
- {
- 	const char *key;
-+	struct iovec iov;
-+
-+	memset(&iov, 0, sizeof(iov));
- 
- 	while (dbus_message_iter_get_arg_type(props) == DBUS_TYPE_DICT_ENTRY) {
- 		DBusMessageIter value, entry;
-@@ -670,14 +676,20 @@ static int parse_configuration(DBusMessageIter *props, struct iovec **caps,
- 			if (var != DBUS_TYPE_ARRAY)
- 				goto fail;
- 
--			if (parse_array(&value, caps))
-+			if (parse_array(&value, &iov))
- 				goto fail;
-+
-+			util_iov_free(*caps, 1);
-+			*caps = util_iov_dup(&iov, 1);
- 		} else if (!strcasecmp(key, "Metadata")) {
- 			if (var != DBUS_TYPE_ARRAY)
- 				goto fail;
- 
--			if (parse_array(&value, metadata))
-+			if (parse_array(&value, &iov))
- 				goto fail;
-+
-+			util_iov_free(*metadata, 1);
-+			*metadata = util_iov_dup(&iov, 1);
- 		} else if (!strcasecmp(key, "QoS")) {
- 			if (var != DBUS_TYPE_ARRAY)
- 				goto fail;
-@@ -1202,6 +1214,7 @@ static void select_cb(struct bt_bap_pac *pac, int err, struct iovec *caps,
- 		goto done;
- 	}
- 
-+	util_iov_free(ep->caps, 1);
- 	ep->caps = util_iov_dup(caps, 1);
- 
- 	if (metadata && metadata->iov_base && metadata->iov_len) {
--- 
-2.41.0
+>
+> -       rcu_read_unlock();
+> +               *big_handle =3D ev->handle;
+> +
+> +               hci_cmd_sync_queue(hdev, hci_iso_term_big_sync, big_handl=
+e,
+> +                                  hci_iso_term_big_destroy);
+> +       }
+> +
+> +unlock:
+>         hci_dev_unlock(hdev);
+>  }
+>
+> --
+> 2.39.2
+>
 
+
+--=20
+Luiz Augusto von Dentz
