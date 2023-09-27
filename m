@@ -2,128 +2,130 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59B48E82CA1
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Sep 2023 15:03:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2D07E82CAE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Sep 2023 16:14:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232285AbjI0PD7 (ORCPT
+        id S230107AbjI0QOT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 Sep 2023 11:03:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37732 "EHLO
+        Wed, 27 Sep 2023 12:14:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232292AbjI0PD5 (ORCPT
+        with ESMTP id S229880AbjI0QOS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 27 Sep 2023 11:03:57 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56E7012A
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Sep 2023 08:03:56 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1c0ecb9a075so82921755ad.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Sep 2023 08:03:56 -0700 (PDT)
+        Wed, 27 Sep 2023 12:14:18 -0400
+Received: from mail-oo1-xc32.google.com (mail-oo1-xc32.google.com [IPv6:2607:f8b0:4864:20::c32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 258BC92;
+        Wed, 27 Sep 2023 09:14:17 -0700 (PDT)
+Received: by mail-oo1-xc32.google.com with SMTP id 006d021491bc7-57b72cef02bso4948917eaf.2;
+        Wed, 27 Sep 2023 09:14:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695827035; x=1696431835; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=FGRGkr81yf5h/jryOr3RnhKT/JuGOXKK4XJE+8n0dg0=;
-        b=jULRJgZ7Flxw6D5eeEt8+sFjRxUVFNMu4UXtR4Ef1k4GDxwo84V3cJVkYYwim/1tJY
-         +80by6Rh2Fol42/1AhlvvqNrbSk3JAL7SUxinNIlTttaQr/JtPpSxqHDEdrRlHGBKZGp
-         accVofOhBKKcMWg9eBgBGgPo/WGjaO8uy8jyspVInQKh0EKO21Dn2vSlrO8xabCeSxYt
-         ioQLV12Ndegw8L6ls9B/INzFpeZ0jYohnlmnvMMRue4Cj5nSNZnG5l9lDsRaBugpoDOy
-         hCYLs4iYFd2NJMBEF/KkCQBJrwoRc4X5pYwah2ZUYzMjot1TAX+RTJqY/4Cru5P2x6tZ
-         +3sw==
+        d=gmail.com; s=20230601; t=1695831256; x=1696436056; darn=vger.kernel.org;
+        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aPVMsO4dy15tYkSfR0MZiY/PHHrdbRR00gTtlnDNepY=;
+        b=BLDwpMklol1jmIEJYT3ruSqqGAa2vVtSGfCSvp7zH2t3hqDiixv9qQyEYthiUolVrF
+         PLHHrxpPYZ9z87w7AI7aTXnCvQw4GF0x1wwT4HTNZM1suJYNZa2HIVgHGjOcxiBOVABF
+         4ttICcE+zwrR1uemsjyn3GPlBs+kH0NN/FmdbDFOvrubJ6vZhR6rpv1VMETOqf2f4isb
+         eZQWtX2cx+i2YvdGaEm/M5VOg1qh/fU/IbhtoPSziP200AaftE70ymMsEd+rKp6ECXe4
+         wESal9+rLf20Tk+e05qtrUMArxG+XUjcDBZb5SBbufQCrxBXswuWW7xIaHPBldt71NLK
+         UKtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695827035; x=1696431835;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FGRGkr81yf5h/jryOr3RnhKT/JuGOXKK4XJE+8n0dg0=;
-        b=XWkW2ePihijUeE3luU4SUgcjxARdJBMtYW9ob7ii27Tf6/hube5vL4BC8Q40wq9Sxi
-         aUhnnSmfpYyjwNxSupaDDCqVN/G6pBkyswxklHxHdjJvVK93obanYs5GL+lIFS6EIvtK
-         AqEotHqE2YcFJhhyaHmZ1sZzEQc9q+c8ZjVBwE5UxVrbUVw0aHLBNbvJCBX548lXs4wi
-         nBJVYVjzeda534bWetWlLPYWZ3TwX+LP45kq6zISSNsSH6OF627o0svFbZvrX/oAdcGZ
-         RyKmOuwHYaTgQEwayFHdNQvMCgPqL6PFEoF6f9NeTIiui3E/DTV+OWxHA7tR/ZWSJBB2
-         WfUg==
-X-Gm-Message-State: AOJu0YwzhB8D7sRUmQ+3k/TlFGBCtz99uBhPFee/J1wlJxZgvAAErtOg
-        VEOHRdZAnxRePFnZ/JHB/Q9qN2s2TCU=
-X-Google-Smtp-Source: AGHT+IEdjk89U63QMGS8rNPEiTpYGLqUgnm4DNwp/GHr2rgmRauxRL/vwWC7vOYGaJffAnP8UlVijg==
-X-Received: by 2002:a17:902:b282:b0:1c3:8679:6ed4 with SMTP id u2-20020a170902b28200b001c386796ed4mr2002151plr.8.1695827035417;
-        Wed, 27 Sep 2023 08:03:55 -0700 (PDT)
-Received: from [172.17.0.2] ([13.91.164.224])
-        by smtp.gmail.com with ESMTPSA id b17-20020a170902ed1100b001c6187f2875sm6867264pld.225.2023.09.27.08.03.54
+        d=1e100.net; s=20230601; t=1695831256; x=1696436056;
+        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aPVMsO4dy15tYkSfR0MZiY/PHHrdbRR00gTtlnDNepY=;
+        b=GSroGbGjmYtmnUzIiUtjUJaSjN5HY/+uoZVHjRHtZlRAcsKZz8OlSD4EDrAbaX9NHL
+         1O4cUD0Pj5G/BQIAg8z78cRpZw1voOUZR6XKKSjBRrWKG2At7LabSLufDVjkiAcPwF16
+         wBS6Reggu56n0Q+IMqwFJIs4iewwHHz/MXFcg6nCyRl2A3+AqlZojIPETi+cBI0jSXdu
+         NrwNxh12zVWpAlVCUBIShOl8IDTyiqias22weVRbOP5MVX7y7EVkG7uIw4D+qHLKXfDg
+         5HwmVOOohtEwN+wnv8M3FZXuhi2W0kZZPZKT6JBMaqfUwCXD3Ov9S9R0M7ypnEMotX7r
+         E4CQ==
+X-Gm-Message-State: AOJu0YyzPbmZ5797RZWTQwo5NvF8MQ5gfo6F6k+p+m1+bBjxZ1Fluh7r
+        BJXS0oRkR727ypsiUmCRlNs=
+X-Google-Smtp-Source: AGHT+IERYckSTdynsb5Q47O6bCj46USZVHNjVEuDCfUetctnSSqA3z3HZFtreeJt9toHG6UE3v5A5g==
+X-Received: by 2002:a05:6358:5e0a:b0:140:f6ab:b11e with SMTP id q10-20020a0563585e0a00b00140f6abb11emr2544687rwn.28.1695831256011;
+        Wed, 27 Sep 2023 09:14:16 -0700 (PDT)
+Received: from 377044c6c369.cse.ust.hk (191host097.mobilenet.cse.ust.hk. [143.89.191.97])
+        by smtp.gmail.com with ESMTPSA id e24-20020a62aa18000000b0068fbaea118esm11951040pff.45.2023.09.27.09.14.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Sep 2023 08:03:55 -0700 (PDT)
-Message-ID: <6514445b.170a0220.f2fb2.6f2e@mx.google.com>
-Date:   Wed, 27 Sep 2023 08:03:55 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8859616996943576514=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, andrei.istodorescu@nxp.com
-Subject: RE: [BlueZ,1/2] bap: Remove memory leaks and buffer usage after free
-In-Reply-To: <20230927133001.6639-1-andrei.istodorescu@nxp.com>
-References: <20230927133001.6639-1-andrei.istodorescu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+        Wed, 27 Sep 2023 09:14:15 -0700 (PDT)
+From:   Chengfeng Ye <dg573847474@gmail.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Chengfeng Ye <dg573847474@gmail.com>
+Subject: [PATCH] Bluetooth: hci_core: fix potential deadlock on &hci_dev_list_lock
+Date:   Wed, 27 Sep 2023 16:13:58 +0000
+Message-Id: <20230927161358.32353-1-dg573847474@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8859616996943576514==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+&hci_dev_list_lock is acquired under a2mp_chan_recv_cb(), which I
+think should be a softirq context cb. So it seems that the
+write_lock() on &hci_dev_list_lock should at least disable bh.
+hci_register_dev() and hci_unregister_dev() are exactly that two
+functions acquire &hci_dev_list_lock with write_lock(), and should
+be called under process context without disable bh at most case.
 
-This is automated email and please do not reply to this email!
+Note that I am not sure whether this could happen at real, as I
+am not sure whether the rx callback could be invoked during
+register() and unregister().
 
-Dear submitter,
+<deadlock #1>
+hci_register_dev()
+--> write_lock(&hci_dev_list_lock)
+<interrupt>
+   --> a2mp_chan_recv_cb()
+   --> a2mp_discover_req()
+   --> read_lock(&hci_dev_list_lock)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=788126
+<deadlock #2>
+hci_unregister_dev()
+--> write_lock(&hci_dev_list_lock)
+<interrupt>
+   --> a2mp_chan_recv_cb()
+   --> a2mp_discover_req()
+   --> read_lock(&hci_dev_list_lock)
 
----Test result---
+This flaw was found by an experimental static analysis tool I am
+developing for irq-related deadlock.
 
-Test Summary:
-CheckPatch                    FAIL      0.92 seconds
-GitLint                       PASS      0.28 seconds
-BuildEll                      PASS      37.96 seconds
-BluezMake                     PASS      1276.07 seconds
-MakeCheck                     PASS      14.42 seconds
-MakeDistcheck                 PASS      222.45 seconds
-CheckValgrind                 PASS      350.82 seconds
-CheckSmatch                   PASS      486.05 seconds
-bluezmakeextell               PASS      147.46 seconds
-IncrementalBuild              PASS      1105.79 seconds
-ScanBuild                     PASS      1526.83 seconds
+To prevent the potential problem, I change to write_lock_bh().
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,1/2] bap: Remove memory leaks and buffer usage after free
-WARNING:LONG_LINE_COMMENT: line length of 90 exceeds 80 columns
-#214: FILE: profiles/audio/bap.c:387:
-+	/* Update caps and meta with received Codec Specific Configuration and Metadata */
-
-WARNING:LONG_LINE_COMMENT: line length of 87 exceeds 80 columns
-#249: FILE: profiles/audio/bap.c:824:
-+	/* Update endpoint with the value received from the peer's (BAP source) BASE */
-
-/github/workspace/src/src/13400808.patch total: 0 errors, 2 warnings, 150 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13400808.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
+Signed-off-by: Chengfeng Ye <dg573847474@gmail.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hci_core.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index a5992f1b3c9b..dd3107daed03 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2670,9 +2670,9 @@ int hci_register_dev(struct hci_dev *hdev)
+ 		hci_dev_set_flag(hdev, HCI_BREDR_ENABLED);
+ 	}
+ 
+-	write_lock(&hci_dev_list_lock);
++	write_lock_bh(&hci_dev_list_lock);
+ 	list_add(&hdev->list, &hci_dev_list);
+-	write_unlock(&hci_dev_list_lock);
++	write_unlock_bh(&hci_dev_list_lock);
+ 
+ 	/* Devices that are marked for raw-only usage are unconfigured
+ 	 * and should not be included in normal operation.
+@@ -2720,9 +2720,9 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 	hci_dev_set_flag(hdev, HCI_UNREGISTER);
+ 	mutex_unlock(&hdev->unregister_lock);
+ 
+-	write_lock(&hci_dev_list_lock);
++	write_lock_bh(&hci_dev_list_lock);
+ 	list_del(&hdev->list);
+-	write_unlock(&hci_dev_list_lock);
++	write_unlock_bh(&hci_dev_list_lock);
+ 
+ 	cancel_work_sync(&hdev->power_on);
+ 
+-- 
+2.17.1
 
---===============8859616996943576514==--
