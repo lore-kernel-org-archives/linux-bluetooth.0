@@ -2,110 +2,162 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EB7DE82CB2
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Sep 2023 17:06:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45D19E82CC0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Sep 2023 21:40:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229517AbjI0RGE (ORCPT
+        id S229955AbjI0VkJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 Sep 2023 13:06:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41834 "EHLO
+        Wed, 27 Sep 2023 17:40:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229464AbjI0RGE (ORCPT
+        with ESMTP id S229458AbjI0VkI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 27 Sep 2023 13:06:04 -0400
-Received: from mail-ua1-x934.google.com (mail-ua1-x934.google.com [IPv6:2607:f8b0:4864:20::934])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8683D92
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Sep 2023 10:06:02 -0700 (PDT)
-Received: by mail-ua1-x934.google.com with SMTP id a1e0cc1a2514c-7a50a1d1246so4569383241.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Sep 2023 10:06:02 -0700 (PDT)
+        Wed, 27 Sep 2023 17:40:08 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C2C3D6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Sep 2023 14:40:07 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-690d8fb3b7eso10889752b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Sep 2023 14:40:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695834361; x=1696439161; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=SNEtZ7lQ1rGNsY4vOGr45QI22udTbZ3xbm1HarE8iIU=;
-        b=mBW+DGQA9Dq2pvb1xHw/jYXERA93klCqfg/GbPNXNv7l6W5zmjuI3tPukBMuSuvUBL
-         L4/rtZQ+T4Wn76KJZLzzvrMYiVszbcUH2kqBpP/pd8057TMi4eRSNpDgoq7DMtg+YBMR
-         AEOKItLdnd1pujAem5wYRlexZ+IOE4bkzd39D1HHej9b0j588NATdDqs7+h4qZP3zQIX
-         gCj4pAlkiyBF3q2XTOl8IuguNi8Bo7jQ9Qr328aLiPfk2Bwk0ZqTb4avq7tIVwVpvcEH
-         ONLou69mxdQCLI1fwTCcknmTTMyzsjqQ84+XF26DEOS1jo886Z62Bmm2AXv7wYrPKduF
-         sdXw==
+        d=gmail.com; s=20230601; t=1695850806; x=1696455606; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=UZDbId/Oq6bQoYjYM1BCQT82RB8NkOnAtSqUmB0Kd0w=;
+        b=KuzB7LRIUHXGG9MhBkrycDv52nC+4MIva/x3XnB5upiKYQVDm/iUB3j9OnzBbSffWw
+         TBywpKUHRWybNW++hcQot35ZjYutBOvyyTxXvP1Z4RayqgSVov++FaUMQrQtK1UHSK3a
+         vGkgvnP1Z+VXHFFD1OwXt10+uOIm+TaWLIT8wE0ZsDMx/HrMiETbBhPMG04oWBqe1lWQ
+         B6Csdk/H74quYJJbqMmNLKveMONY2F3X5/Uuf46sF1g49IdDN5adp3nyHiah8ESNgwZs
+         dt1JJWfmegdGtswql7Idm3bt6natlGhaiA5GzeI2dJhoR3Ge0uMC2Pz4KclRBxAl2+6s
+         hI7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695834361; x=1696439161;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SNEtZ7lQ1rGNsY4vOGr45QI22udTbZ3xbm1HarE8iIU=;
-        b=QfkM1b7Yzhm0iWVnYzuWV4RZqmf63F/7nIlZJPbudjXY2Ss1KksMAn9Bunki7BqsYw
-         dm4QC/9NqcZ9D3XtxEkmZCn/WHztNXT+Hr2Q0T5mLmJS801O+JKN5VCUle8jIwpgewqU
-         kikWJv2RS9qIxZFVm4A4O091QpKOrCIV49+cmQeaN7DYz/zs3SsJGznMI31wx5vf+x0r
-         DK6PV11okkWIb9KPbyv3k2uFUJIi9EV8L7jkFY+1J243UYfDd8DsnODtMGQSNygp1hbB
-         hhYxz8Yn2GCVDoPr/Qz5F5RnbdXIK3rKL4dGxVa2d3NofZWHzhOy6fbPZIfIqKE6AsEo
-         CJWw==
-X-Gm-Message-State: AOJu0Yz2aAmjhQaR5bzoOWIyG04WNIKo9GzyYLTkzbMvcctGKmnYkpJ1
-        JGytd/bM+7RJUpNL4W/acfSl1tBtVMs=
-X-Google-Smtp-Source: AGHT+IELVTABY0za1GNrMtzRvH0l4CftdQ/HAazVfdtrP1EkQH0dUJhNVrKlMzGnGXFeVW5tjtrwZA==
-X-Received: by 2002:a1f:e2c1:0:b0:49a:5545:72dc with SMTP id z184-20020a1fe2c1000000b0049a554572dcmr2383009vkg.9.1695834361410;
-        Wed, 27 Sep 2023 10:06:01 -0700 (PDT)
-Received: from [172.17.0.2] ([172.176.163.147])
-        by smtp.gmail.com with ESMTPSA id x14-20020ac86b4e000000b004181e5a724csm2073613qts.88.2023.09.27.10.06.01
+        d=1e100.net; s=20230601; t=1695850806; x=1696455606;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UZDbId/Oq6bQoYjYM1BCQT82RB8NkOnAtSqUmB0Kd0w=;
+        b=nXQmoYzQMTK1Nn/iz1S94oxY3UevhKyL3VfCWjH8rMcGoQpXcDuIQj83tTOhLiU9YP
+         LQp/OL6xmCo/X1zAnh16MiYnlFFZn4BfzD+tQTjl7MRT+eouMwVFuDSoxf8bJnPhdYLA
+         eEc+3RON9M8Dzg+rpAqBnZrqpkkTF35H45I7Tq3Mioa8VghSR6IIfDP9UDR6Jok5T2bM
+         nAHaRe2KiS+WA668EswwDfYKAnDx7tt9o8Erl88AhRvdf0deRPWHhNgDfrlyY9Rbc+8C
+         wPpJQnh7YGaeDIuQ6nU1dr+mGW2f5tU/jSvCVQ0C26ujSf2QumOkDdhwlK4Gdc+op1GU
+         eJmg==
+X-Gm-Message-State: AOJu0Yy4+1otrctJcdUHg8ivCEDBzp9lzI9N+PxuSpU+l4gIrTsu/9kC
+        1uFjFH5nP04WfA+DvnT9YAHxRQ3onYxBalZR
+X-Google-Smtp-Source: AGHT+IEjeadmeW3e7ehJUayzq5wu79oLTxAGjFS3b2ZAZ5gn0QnlqBagVEl+OhdHKoyjfVdfVhyQlQ==
+X-Received: by 2002:aa7:8893:0:b0:690:3a0f:4165 with SMTP id z19-20020aa78893000000b006903a0f4165mr3675217pfe.32.1695850806074;
+        Wed, 27 Sep 2023 14:40:06 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-98-232-221-87.hsd1.or.comcast.net. [98.232.221.87])
+        by smtp.gmail.com with ESMTPSA id s26-20020aa78d5a000000b00672ea40b8a9sm12546004pfe.170.2023.09.27.14.40.04
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Sep 2023 10:06:01 -0700 (PDT)
-Message-ID: <651460f9.c80a0220.21cfc.96cc@mx.google.com>
-Date:   Wed, 27 Sep 2023 10:06:01 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1431582336267054573=="
+        Wed, 27 Sep 2023 14:40:04 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] bap: Fix freeing value of dbus_message_iter_get_fixed_array
+Date:   Wed, 27 Sep 2023 14:39:51 -0700
+Message-ID: <20230927214003.1873224-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, dg573847474@gmail.com
-Subject: RE: Bluetooth: hci_core: fix potential deadlock on &hci_dev_list_lock
-In-Reply-To: <20230927161358.32353-1-dg573847474@gmail.com>
-References: <20230927161358.32353-1-dg573847474@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1431582336267054573==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+The value returned by dbus_message_iter_get_fixed_array is a reference
+and shall not be freed:
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=788180
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.72 seconds
-GitLint                       PASS      0.35 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      34.14 seconds
-CheckAllWarning               PASS      36.80 seconds
-CheckSparse                   PASS      42.36 seconds
-CheckSmatch                   PASS      114.53 seconds
-BuildKernel32                 PASS      32.74 seconds
-TestRunnerSetup               PASS      501.56 seconds
-TestRunner_l2cap-tester       PASS      31.05 seconds
-TestRunner_iso-tester         PASS      52.30 seconds
-TestRunner_bnep-tester        PASS      10.54 seconds
-TestRunner_mgmt-tester        PASS      224.86 seconds
-TestRunner_rfcomm-tester      PASS      16.31 seconds
-TestRunner_sco-tester         PASS      19.87 seconds
-TestRunner_ioctl-tester       PASS      18.49 seconds
-TestRunner_mesh-tester        PASS      13.49 seconds
-TestRunner_smp-tester         PASS      14.55 seconds
-TestRunner_userchan-tester    PASS      11.30 seconds
-IncrementalBuild              PASS      31.30 seconds
-
-
-
+ 'The returned value is by reference and should not be freed.'
 ---
-Regards,
-Linux Bluetooth
+ profiles/audio/bap.c | 31 ++++++++++++++++++++++---------
+ 1 file changed, 22 insertions(+), 9 deletions(-)
 
+diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
+index 18872329d4ac..48a1a4f86f8d 100644
+--- a/profiles/audio/bap.c
++++ b/profiles/audio/bap.c
+@@ -365,19 +365,17 @@ static const GDBusPropertyTable ep_properties[] = {
+ 	{ }
+ };
+ 
+-static int parse_array(DBusMessageIter *iter, struct iovec **iov)
++static int parse_array(DBusMessageIter *iter, struct iovec *iov)
+ {
+ 	DBusMessageIter array;
+ 
+ 	if (!iov)
+ 		return 0;
+ 
+-	if (!(*iov))
+-		*iov = new0(struct iovec, 1);
+-
+ 	dbus_message_iter_recurse(iter, &array);
+-	dbus_message_iter_get_fixed_array(&array, &(*iov)->iov_base,
+-						(int *)&(*iov)->iov_len);
++	dbus_message_iter_get_fixed_array(&array, &iov->iov_base,
++						(int *)&iov->iov_len);
++
+ 	return 0;
+ }
+ 
+@@ -594,10 +592,15 @@ static int parse_bcast_qos(const char *key, int var, DBusMessageIter *iter,
+ 
+ 		dbus_message_iter_get_basic(iter, &qos->bcast.timeout);
+ 	} else if (!strcasecmp(key, "BCode")) {
++		struct iovec iov;
++
+ 		if (var != DBUS_TYPE_ARRAY)
+ 			return -EINVAL;
+ 
+-		parse_array(iter, &qos->bcast.bcode);
++		parse_array(iter, &iov);
++
++		util_iov_free(qos->bcast.bcode, 1);
++		qos->bcast.bcode = util_iov_dup(&iov, 1);
+ 	} else {
+ 		int err;
+ 
+@@ -653,6 +656,9 @@ static int parse_configuration(DBusMessageIter *props, struct iovec **caps,
+ 				struct bt_bap_qos *qos)
+ {
+ 	const char *key;
++	struct iovec iov;
++
++	memset(&iov, 0, sizeof(iov));
+ 
+ 	while (dbus_message_iter_get_arg_type(props) == DBUS_TYPE_DICT_ENTRY) {
+ 		DBusMessageIter value, entry;
+@@ -670,14 +676,20 @@ static int parse_configuration(DBusMessageIter *props, struct iovec **caps,
+ 			if (var != DBUS_TYPE_ARRAY)
+ 				goto fail;
+ 
+-			if (parse_array(&value, caps))
++			if (parse_array(&value, &iov))
+ 				goto fail;
++
++			util_iov_free(*caps, 1);
++			*caps = util_iov_dup(&iov, 1);
+ 		} else if (!strcasecmp(key, "Metadata")) {
+ 			if (var != DBUS_TYPE_ARRAY)
+ 				goto fail;
+ 
+-			if (parse_array(&value, metadata))
++			if (parse_array(&value, &iov))
+ 				goto fail;
++
++			util_iov_free(*metadata, 1);
++			*metadata = util_iov_dup(&iov, 1);
+ 		} else if (!strcasecmp(key, "QoS")) {
+ 			if (var != DBUS_TYPE_ARRAY)
+ 				goto fail;
+@@ -1202,6 +1214,7 @@ static void select_cb(struct bt_bap_pac *pac, int err, struct iovec *caps,
+ 		goto done;
+ 	}
+ 
++	util_iov_free(ep->caps, 1);
+ 	ep->caps = util_iov_dup(caps, 1);
+ 
+ 	if (metadata && metadata->iov_base && metadata->iov_len) {
+-- 
+2.41.0
 
---===============1431582336267054573==--
