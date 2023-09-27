@@ -2,61 +2,61 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57C39E7F14F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Sep 2023 21:54:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D773E7109E
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Sep 2023 21:54:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229846AbjI0VyI (ORCPT
+        id S229834AbjI0VyM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 Sep 2023 17:54:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37996 "EHLO
+        Wed, 27 Sep 2023 17:54:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229517AbjI0VyH (ORCPT
+        with ESMTP id S229511AbjI0VyL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 27 Sep 2023 17:54:07 -0400
-Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A5DEFB
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Sep 2023 14:54:05 -0700 (PDT)
-Received: by mail-il1-x135.google.com with SMTP id e9e14a558f8ab-351365e47f6so26040465ab.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Sep 2023 14:54:05 -0700 (PDT)
+        Wed, 27 Sep 2023 17:54:11 -0400
+Received: from mail-io1-xd2d.google.com (mail-io1-xd2d.google.com [IPv6:2607:f8b0:4864:20::d2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1E2211F
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Sep 2023 14:54:08 -0700 (PDT)
+Received: by mail-io1-xd2d.google.com with SMTP id ca18e2360f4ac-79fb64b5265so317310439f.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Sep 2023 14:54:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695851644; x=1696456444; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1695851647; x=1696456447; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=7LYirlf9dOaUzJulMGXdd1bw4TsoU8BSK/GBa/WWho8=;
-        b=LlKPycqyf3zV2gOrDsiOivhFrRu2Vs75JnIZEA+nJjRM90tdoew+61pYl/yCp7c4na
-         aDD38I++knlSQnAR7lbZbTq44OKi2J6jMezHT2MCX1L47KCog5fL8zCy/PpUBHdCxUmA
-         Vk8KUlZPqh3YnLGp2H9MdHQlYu9zohzvvloqOWRA2c3D70W94WVxhTheyKkoTs/zxm+0
-         1UDsbiSFQ8ImdDJ5LuLWG3+JVr1YJAgsgV6Mk0DTokVKvxpPZN5/+mxeoPl4a/h+WyJO
-         fR23qyyhvLhOFuqFJAUMDQ0qn71kNukbBuik1QW3cbCijqNHcjmBo4cExSBBsCfexGEa
-         /Rdw==
+        bh=jwjHUPbdhZ0jdDmdOXswQrPccCOLqfWqLeXxUdDF1vI=;
+        b=ZkHjZCKFw+XHeVxbpIkOwMZNSxvAF6nPRV6hiA5bVm4jgOsjuVXRTvExEla2s2+idU
+         Je9DkRa470HvYVtgxZmiJ4Wa01kVY0tWYvOz1cbR8s7JKi0l7uFgIO6+DChl+4xTwmri
+         /FtFMidJrw4O1/NodP4JRYFRPAovaV8XVzH5knCChFdYh0dyYK+6wntnl3dsGoqrANfe
+         BCaYXBMFKwTE4EGdipRyoyRp11i7cPFrvm9iJ3HW1+GDcRD/jD6x+8SXe/xSFlE4nCqJ
+         piMtEHO7WCwXEmpnnXpEbFim5KTM9/+5bTUrEmrhhEgyD38sBM9hwdLvb51fewEshuJd
+         8kwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695851644; x=1696456444;
+        d=1e100.net; s=20230601; t=1695851647; x=1696456447;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7LYirlf9dOaUzJulMGXdd1bw4TsoU8BSK/GBa/WWho8=;
-        b=Xb4B+klSz3zESDk95aKf/j43DUoNfFIzCTxASoutjFZFUZcTwbyneTkcmDWqH0hBUy
-         O+f5G0Lk+WhXczVjvXMgFhzo/oAL/TA1KvQok3foq6z9X25+1v7kRBoSXa/xoX+4NFId
-         JaCeeDj6KtP9GG0qwgvAyXKMTgQpTYWRukcyBEM8NKVfoscb5kTKvfxuA86zXR2KwBEg
-         HxbjsvIklMysoChHPnJ8yyfd09N+m5Hsf3+VbkbmUQovZFhEcWG/4CWwVCihRgpszkvh
-         LjC6WnPBzwy4bUSubYMHbB9NDXvCulmuXZM00V8WvkBHpD0OReExojP0mwodDXAnlkiT
-         CcGA==
-X-Gm-Message-State: AOJu0Yx9IocQ0nQZqc+7hVe6d6q2CKKZO2Bep81oOjEZQLjncm3nxlBk
-        yjNf64k8gcEv2uyAtMos9Eev+Jm3qJJOEZcs
-X-Google-Smtp-Source: AGHT+IESa7nKrF1Kl5wZegFhe/Lz0rCPyGOiMgZXyKG8SsUNmJA5F1Lkxw42NkZu50ifgiPR1nH1ig==
-X-Received: by 2002:a92:cc82:0:b0:34f:fdbd:244a with SMTP id x2-20020a92cc82000000b0034ffdbd244amr2762212ilo.32.1695851643857;
-        Wed, 27 Sep 2023 14:54:03 -0700 (PDT)
+        bh=jwjHUPbdhZ0jdDmdOXswQrPccCOLqfWqLeXxUdDF1vI=;
+        b=Z532YeZMQ0N0d0iwkt/ks3biSLRvuYWAhjD5BTiBrs6dvqzbVOO33pCmNYMM7eEcTI
+         mHjmuTyPjYAv6nNatZbKdGiuCEoF0FJcKp0phWl5QNu1A+DaVRN9aj3jDiEnffn+CGau
+         d+n1TTGJZHTuDKoL+43Xj6GhZbFgDDTLX1Lv0X1Ot9Vf9QM8ZfOkC8g2GhyXWcrGydew
+         U7GmKROEYtf0CrYBR1S9NikXxTnrxUuIkxBmTsOyHtoXgj1RLdet1Irx5r4gH6pQ8BQd
+         GXr+TfpTr6TDu7ze8xOcpz8nlvx76aQ/DGJZ9jCiF9abVkp+K9FlLL4+cGhkClx/SgRO
+         Tqqg==
+X-Gm-Message-State: AOJu0YyRKjRsv/n1+KH/nSWOhS/ax6cgMiaFk/gcw4SlmoTf0zJxUfDV
+        qI2V8FI6ya3TEHySW7FSh1loK/3nkzEctc9M
+X-Google-Smtp-Source: AGHT+IGiJnV+5DiGKlExSu2udJvZc821MhWqm7U6461Umm7zSqreNafrovAjE1AYqkixD1t1Jvk8tg==
+X-Received: by 2002:a6b:e015:0:b0:790:f866:d717 with SMTP id z21-20020a6be015000000b00790f866d717mr3822401iog.10.1695851647518;
+        Wed, 27 Sep 2023 14:54:07 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-98-232-221-87.hsd1.or.comcast.net. [98.232.221.87])
-        by smtp.gmail.com with ESMTPSA id g15-20020a02cd0f000000b0042bbfe3dc42sm4225331jaq.173.2023.09.27.14.54.02
+        by smtp.gmail.com with ESMTPSA id g15-20020a02cd0f000000b0042bbfe3dc42sm4225331jaq.173.2023.09.27.14.54.06
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Sep 2023 14:54:02 -0700 (PDT)
+        Wed, 27 Sep 2023 14:54:06 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 05/12] client: Make Endpoint.SelectProperties reply properly
-Date:   Wed, 27 Sep 2023 14:53:47 -0700
-Message-ID: <20230927215354.1874835-5-luiz.dentz@gmail.com>
+Subject: [PATCH v4 07/12] shared/bap: Add support content and contexts to bt_bap_pac_qos
+Date:   Wed, 27 Sep 2023 14:53:49 -0700
+Message-ID: <20230927215354.1874835-7-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230927215354.1874835-1-luiz.dentz@gmail.com>
 References: <20230927215354.1874835-1-luiz.dentz@gmail.com>
@@ -68,428 +68,238 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This makes Endpoint.SelectProperties reply with QoS property since it
-is now a single property.
+This adds support for setting supported content and contexts on a per
+PAC record basis which then is carried over to their respective PACS
+attribute and notified properly when changed (added/removed).
 ---
- client/player.c | 316 +++++++++++++++++++++++++++---------------------
- client/print.c  |  16 ++-
- 2 files changed, 188 insertions(+), 144 deletions(-)
+ src/shared/bap.c | 168 ++++++++++++++++++++++++++++++++++++++++++++++-
+ src/shared/bap.h |   3 +
+ 2 files changed, 170 insertions(+), 1 deletion(-)
 
-diff --git a/client/player.c b/client/player.c
-index d72ad6a5da01..6953eff28543 100644
---- a/client/player.c
-+++ b/client/player.c
-@@ -1199,7 +1199,7 @@ static const struct capabilities {
- struct codec_qos {
- 	uint32_t interval;
- 	uint8_t  framing;
--	char *phy;
-+	uint8_t  phy;
- 	uint16_t sdu;
- 	uint8_t  rtn;
- 	uint16_t latency;
-@@ -1274,22 +1274,22 @@ static struct codec_preset sbc_presets[] = {
- 	QOS_CONFIG(_interval, 0x01, _phy, _sdu, _rtn, _latency, _delay)
- 
- #define QOS_UNFRAMED_1M(_interval, _sdu, _rtn, _latency, _delay) \
--	QOS_UNFRAMED(_interval, "1M", _sdu, _rtn, _latency, _delay) \
-+	QOS_UNFRAMED(_interval, 0x01, _sdu, _rtn, _latency, _delay) \
- 
- #define QOS_FRAMED_1M(_interval, _sdu, _rtn, _latency, _delay) \
--	QOS_FRAMED(_interval, "1M", _sdu, _rtn, _latency, _delay) \
-+	QOS_FRAMED(_interval, 0x01, _sdu, _rtn, _latency, _delay) \
- 
- #define QOS_UNFRAMED_2M(_interval, _sdu, _rtn, _latency, _delay) \
--	QOS_UNFRAMED(_interval, "2M", _sdu, _rtn, _latency, _delay) \
-+	QOS_UNFRAMED(_interval, 0x02, _sdu, _rtn, _latency, _delay) \
- 
- #define QOS_FRAMED_2M(_interval, _sdu, _rtn, _latency, _delay) \
--	QOS_FRAMED(_interval, "2M", _sdu, _rtn, _latency, _delay) \
-+	QOS_FRAMED(_interval, 0x02, _sdu, _rtn, _latency, _delay) \
- 
- #define LC3_7_5_UNFRAMED(_sdu, _rtn, _latency, _delay) \
--	QOS_UNFRAMED(7500u, "2M", _sdu, _rtn, _latency, _delay)
-+	QOS_UNFRAMED(7500u, 0x02, _sdu, _rtn, _latency, _delay)
- 
- #define LC3_7_5_FRAMED(_sdu, _rtn, _latency, _delay) \
--	QOS_FRAMED(7500u, "2M", _sdu, _rtn, _latency, _delay)
-+	QOS_FRAMED(7500u, 0x02, _sdu, _rtn, _latency, _delay)
- 
- #define LC3_10_UNFRAMED(_sdu, _rtn, _latency, _delay) \
- 	QOS_UNFRAMED_2M(10000u, _sdu, _rtn, _latency, _delay)
-@@ -1770,14 +1770,174 @@ static struct bt_iso_qos bcast_qos = {
- 	}
- };
- 
-+static void append_io_qos(DBusMessageIter *iter, struct endpoint_config *cfg)
-+{
-+	struct codec_qos *qos = (void *)cfg->qos;
-+
-+	bt_shell_printf("Interval %u\n", qos->interval);
-+
-+	g_dbus_dict_append_entry(iter, "Interval", DBUS_TYPE_UINT32,
-+						&qos->interval);
-+
-+	bt_shell_printf("PHY 0x%02x\n", qos->phy);
-+
-+	g_dbus_dict_append_entry(iter, "PHY", DBUS_TYPE_BYTE, &qos->phy);
-+
-+	bt_shell_printf("SDU %u\n", cfg->qos->sdu);
-+
-+	g_dbus_dict_append_entry(iter, "SDU", DBUS_TYPE_UINT16, &qos->sdu);
-+
-+	bt_shell_printf("Retransmissions %u\n", qos->rtn);
-+
-+	g_dbus_dict_append_entry(iter, "Retransmissions",
-+					DBUS_TYPE_BYTE, &qos->rtn);
-+
-+	bt_shell_printf("Latency %u\n", qos->latency);
-+
-+	g_dbus_dict_append_entry(iter, "Latency",
-+					DBUS_TYPE_UINT16, &qos->latency);
-+}
-+
-+static void append_ucast_qos(DBusMessageIter *iter, struct endpoint_config *cfg)
-+{
-+	struct codec_qos *qos = (void *)cfg->qos;
-+
-+	if (cfg->ep->iso_group != BT_ISO_QOS_GROUP_UNSET) {
-+		bt_shell_printf("CIG 0x%2.2x\n", cfg->ep->iso_group);
-+		g_dbus_dict_append_entry(iter, "CIG", DBUS_TYPE_BYTE,
-+							&cfg->ep->iso_group);
-+	}
-+
-+	if (cfg->ep->iso_stream != BT_ISO_QOS_STREAM_UNSET) {
-+		bt_shell_printf("CIS 0x%2.2x\n", cfg->ep->iso_stream);
-+		g_dbus_dict_append_entry(iter, "CIS", DBUS_TYPE_BYTE,
-+							&cfg->ep->iso_stream);
-+	}
-+
-+	bt_shell_printf("Framing 0x%02x\n", qos->framing);
-+
-+	g_dbus_dict_append_entry(iter, "Framing", DBUS_TYPE_BYTE,
-+							&qos->framing);
-+
-+	bt_shell_printf("PresentationDelay %u\n", qos->delay);
-+
-+	g_dbus_dict_append_entry(iter, "PresentationDelay",
-+					DBUS_TYPE_UINT32, &qos->delay);
-+
-+	if (cfg->target_latency) {
-+		bt_shell_printf("TargetLatency 0x%02x\n", cfg->target_latency);
-+		g_dbus_dict_append_entry(iter, "TargetLatency",
-+					DBUS_TYPE_BYTE, &cfg->target_latency);
-+	}
-+
-+	append_io_qos(iter, cfg);
-+}
-+
-+static void append_bcast_qos(DBusMessageIter *iter, struct endpoint_config *cfg)
-+{
-+	if (bcast_qos.bcast.big != BT_ISO_QOS_BIG_UNSET) {
-+		bt_shell_printf("BIG 0x%2.2x\n", bcast_qos.bcast.big);
-+		g_dbus_dict_append_entry(iter, "BIG", DBUS_TYPE_BYTE,
-+							&bcast_qos.bcast.big);
-+	}
-+
-+	if (bcast_qos.bcast.bis != BT_ISO_QOS_BIS_UNSET) {
-+		bt_shell_printf("BIS 0x%2.2x\n", bcast_qos.bcast.bis);
-+		g_dbus_dict_append_entry(iter, "BIS", DBUS_TYPE_BYTE,
-+							&bcast_qos.bcast.bis);
-+	}
-+
-+	bt_shell_printf("Framing 0x%02x\n", bcast_qos.bcast.framing);
-+
-+	g_dbus_dict_append_entry(iter, "Framing", DBUS_TYPE_BYTE,
-+						&bcast_qos.bcast.framing);
-+
-+	bt_shell_printf("SyncFactor %u\n", bcast_qos.bcast.sync_factor);
-+
-+	g_dbus_dict_append_entry(iter, "SyncFactor", DBUS_TYPE_BYTE,
-+						&bcast_qos.bcast.sync_factor);
-+
-+	bt_shell_printf("Options %u\n", bcast_qos.bcast.options);
-+
-+	g_dbus_dict_append_entry(iter, "Options", DBUS_TYPE_BYTE,
-+						&bcast_qos.bcast.options);
-+
-+	bt_shell_printf("Skip %u\n", bcast_qos.bcast.skip);
-+
-+	g_dbus_dict_append_entry(iter, "Skip", DBUS_TYPE_UINT16,
-+						&bcast_qos.bcast.skip);
-+
-+	bt_shell_printf("SyncTimeout %u\n", bcast_qos.bcast.sync_timeout);
-+
-+	g_dbus_dict_append_entry(iter, "SyncTimeout", DBUS_TYPE_UINT16,
-+						&bcast_qos.bcast.sync_timeout);
-+
-+	bt_shell_printf("SyncCteType %u\n", bcast_qos.bcast.sync_cte_type);
-+
-+	g_dbus_dict_append_entry(iter, "SyncType", DBUS_TYPE_BYTE,
-+					&bcast_qos.bcast.sync_cte_type);
-+
-+	bt_shell_printf("MSE %u\n", bcast_qos.bcast.mse);
-+
-+	g_dbus_dict_append_entry(iter, "MSE", DBUS_TYPE_BYTE,
-+						&bcast_qos.bcast.mse);
-+
-+	bt_shell_printf("Timeout %u\n", bcast_qos.bcast.timeout);
-+
-+	g_dbus_dict_append_entry(iter, "Timeout", DBUS_TYPE_UINT16,
-+						&bcast_qos.bcast.timeout);
-+
-+	if (cfg->ep->bcode) {
-+		const char *key = "BCode";
-+
-+		bt_shell_printf("BCode:\n");
-+		bt_shell_hexdump(cfg->ep->bcode->iov_base,
-+				cfg->ep->bcode->iov_len);
-+
-+		g_dbus_dict_append_basic_array(iter, DBUS_TYPE_STRING,
-+						&key, DBUS_TYPE_BYTE,
-+						&cfg->ep->bcode->iov_base,
-+						cfg->ep->bcode->iov_len);
-+	}
-+
-+	append_io_qos(iter, cfg);
-+}
-+
-+static void append_qos(DBusMessageIter *iter, struct endpoint_config *cfg)
-+{
-+	DBusMessageIter entry, var, dict;
-+	struct codec_qos *qos = (void *)cfg->qos;
-+	const char *key = "QoS";
-+
-+	if (!qos)
-+		return;
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_DICT_ENTRY,
-+						NULL, &entry);
-+
-+	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
-+
-+	dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT,
-+						"a{sv}", &var);
-+
-+	dbus_message_iter_open_container(&var, DBUS_TYPE_ARRAY, "{sv}",
-+					&dict);
-+
-+	if (cfg->ep->broadcast)
-+		append_bcast_qos(&dict, cfg);
-+	else
-+		append_ucast_qos(&dict, cfg);
-+
-+	dbus_message_iter_close_container(&var, &dict);
-+	dbus_message_iter_close_container(&entry, &var);
-+	dbus_message_iter_close_container(iter, &entry);
-+}
-+
- static void append_properties(DBusMessageIter *iter,
- 						struct endpoint_config *cfg)
- {
- 	DBusMessageIter dict;
--	struct codec_qos *qos = (void *)cfg->qos;
- 	const char *key = "Capabilities";
--	const char *meta = "Metadata";
--	const char *keyBCode = "BroadcastCode";
- 
- 	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "{sv}", &dict);
- 
-@@ -1789,6 +1949,8 @@ static void append_properties(DBusMessageIter *iter,
- 					cfg->caps->iov_len);
- 
- 	if (cfg->meta && cfg->meta->iov_len) {
-+		const char *meta = "Metadata";
-+
- 		g_dbus_dict_append_basic_array(&dict, DBUS_TYPE_STRING, &meta,
- 				DBUS_TYPE_BYTE, &cfg->meta->iov_base,
- 				cfg->meta->iov_len);
-@@ -1797,132 +1959,8 @@ static void append_properties(DBusMessageIter *iter,
- 		bt_shell_hexdump(cfg->meta->iov_base, cfg->meta->iov_len);
- 	}
- 
--	if (!qos)
--		goto done;
-+	append_qos(&dict, cfg);
- 
--	if (cfg->target_latency) {
--		bt_shell_printf("TargetLatency 0x%02x\n", qos->interval);
--		g_dbus_dict_append_entry(&dict, "TargetLatency",
--					DBUS_TYPE_BYTE, &cfg->target_latency);
--	}
--
--	if ((!cfg->ep->broadcast) &&
--			(cfg->ep->iso_group != BT_ISO_QOS_GROUP_UNSET)) {
--		bt_shell_printf("CIG 0x%2.2x\n", cfg->ep->iso_group);
--		g_dbus_dict_append_entry(&dict, "CIG", DBUS_TYPE_BYTE,
--							&cfg->ep->iso_group);
--	} else {
--		bt_shell_printf("BIG 0x%2.2x\n", bcast_qos.bcast.big);
--		g_dbus_dict_append_entry(&dict, "BIG", DBUS_TYPE_BYTE,
--							&bcast_qos.bcast.big);
--	}
--
--	if ((!cfg->ep->broadcast) &&
--			(cfg->ep->iso_stream != BT_ISO_QOS_STREAM_UNSET)) {
--		bt_shell_printf("CIS 0x%2.2x\n", cfg->ep->iso_stream);
--		g_dbus_dict_append_entry(&dict, "CIS", DBUS_TYPE_BYTE,
--							&cfg->ep->iso_stream);
--
--	} else {
--		bt_shell_printf("BIS 0x%2.2x\n", bcast_qos.bcast.bis);
--		g_dbus_dict_append_entry(&dict, "BIS", DBUS_TYPE_BYTE,
--							&bcast_qos.bcast.bis);
--	}
--
--	bt_shell_printf("Interval %u\n", qos->interval);
--
--	g_dbus_dict_append_entry(&dict, "Interval", DBUS_TYPE_UINT32,
--						&qos->interval);
--
--	if (!cfg->ep->broadcast) {
--		bt_shell_printf("Framing %s\n",
--					qos->framing ? "true" : "false");
--
--		g_dbus_dict_append_entry(&dict, "Framing", DBUS_TYPE_BOOLEAN,
--							&qos->framing);
--	} else {
--		bt_shell_printf("Framing %s\n",
--				bcast_qos.bcast.framing ? "true" : "false");
--
--		g_dbus_dict_append_entry(&dict, "Framing", DBUS_TYPE_BOOLEAN,
--						&bcast_qos.bcast.framing);
--	}
--
--	bt_shell_printf("PHY %s\n", qos->phy);
--
--	g_dbus_dict_append_entry(&dict, "PHY", DBUS_TYPE_STRING, &qos->phy);
--
--	bt_shell_printf("SDU %u\n", cfg->qos->sdu);
--
--	g_dbus_dict_append_entry(&dict, "SDU", DBUS_TYPE_UINT16, &qos->sdu);
--
--	bt_shell_printf("Retransmissions %u\n", qos->rtn);
--
--	g_dbus_dict_append_entry(&dict, "Retransmissions", DBUS_TYPE_BYTE,
--						&qos->rtn);
--
--	bt_shell_printf("Latency %u\n", qos->latency);
--
--	g_dbus_dict_append_entry(&dict, "Latency", DBUS_TYPE_UINT16,
--						&qos->latency);
--
--	bt_shell_printf("Delay %u\n", qos->delay);
--
--	g_dbus_dict_append_entry(&dict, "Delay", DBUS_TYPE_UINT32,
--						&qos->delay);
--
--	if (!cfg->ep->broadcast)
--		goto done;
--
--	bt_shell_printf("SyncInterval %u\n", bcast_qos.bcast.sync_factor);
--
--	g_dbus_dict_append_entry(&dict, "SyncInterval", DBUS_TYPE_BYTE,
--						&bcast_qos.bcast.sync_factor);
--
--	bt_shell_printf("Encryption %u\n", bcast_qos.bcast.encryption);
--
--	g_dbus_dict_append_entry(&dict, "Encryption", DBUS_TYPE_BYTE,
--						&bcast_qos.bcast.encryption);
--
--	bt_shell_printf("Options %u\n", bcast_qos.bcast.options);
--
--	g_dbus_dict_append_entry(&dict, "Options", DBUS_TYPE_BYTE,
--						&bcast_qos.bcast.options);
--
--	bt_shell_printf("Skip %u\n", bcast_qos.bcast.skip);
--
--	g_dbus_dict_append_entry(&dict, "Skip", DBUS_TYPE_UINT16,
--						&bcast_qos.bcast.skip);
--
--	bt_shell_printf("SyncTimeout %u\n", bcast_qos.bcast.sync_timeout);
--
--	g_dbus_dict_append_entry(&dict, "SyncTimeout", DBUS_TYPE_UINT16,
--						&bcast_qos.bcast.sync_timeout);
--
--	bt_shell_printf("SyncCteType %u\n", bcast_qos.bcast.sync_cte_type);
--
--	g_dbus_dict_append_entry(&dict, "SyncCteType", DBUS_TYPE_BYTE,
--					&bcast_qos.bcast.sync_cte_type);
--
--	bt_shell_printf("MSE %u\n", bcast_qos.bcast.mse);
--
--	g_dbus_dict_append_entry(&dict, "MSE", DBUS_TYPE_BYTE,
--						&bcast_qos.bcast.mse);
--
--	bt_shell_printf("Timeout %u\n", bcast_qos.bcast.timeout);
--
--	g_dbus_dict_append_entry(&dict, "Timeout", DBUS_TYPE_UINT16,
--						&bcast_qos.bcast.timeout);
--
--	bt_shell_printf("BroadcastCode:\n");
--	bt_shell_hexdump(cfg->ep->bcode->iov_base, cfg->ep->bcode->iov_len);
--
--	g_dbus_dict_append_basic_array(&dict, DBUS_TYPE_STRING, &keyBCode,
--						DBUS_TYPE_BYTE,
--						&cfg->ep->bcode->iov_base,
--						cfg->ep->bcode->iov_len);
--
--done:
- 	dbus_message_iter_close_container(iter, &dict);
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index 1c43680c2457..6400d1d69221 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -2468,6 +2468,80 @@ static void bap_pac_free(void *data)
+ 	free(pac);
  }
  
-@@ -2892,9 +2930,9 @@ static void custom_phy(const char *input, void *user_data)
- 	struct codec_qos *qos = (void *)&p->qos;
- 
- 	if (!strcmp(input, "1M"))
--		qos->phy = "1M";
-+		qos->phy = 0x01;
- 	else if (!strcmp(input, "2M"))
--		qos->phy = "2M";
-+		qos->phy = 0x02;
- 	else {
- 		char *endptr = NULL;
- 		uint8_t phy = strtol(input, &endptr, 0);
-@@ -2906,10 +2944,8 @@ static void custom_phy(const char *input, void *user_data)
- 
- 		switch (phy) {
- 		case 0x01:
--			qos->phy = "1M";
--			break;
- 		case 0x02:
--			qos->phy = "2M";
-+			qos->phy = phy;
- 			break;
- 		default:
- 			bt_shell_printf("Invalid argument: %s\n", input);
-diff --git a/client/print.c b/client/print.c
-index 66439e541307..8d721e21df4b 100644
---- a/client/print.c
-+++ b/client/print.c
-@@ -165,11 +165,19 @@ void print_iter(const char *label, const char *name, DBusMessageIter *iter)
- 		break;
- 	case DBUS_TYPE_DICT_ENTRY:
- 		dbus_message_iter_recurse(iter, &subiter);
--		entry = g_strconcat(name, " Key", NULL);
--		print_iter(label, entry, &subiter);
--		g_free(entry);
- 
--		entry = g_strconcat(name, " Value", NULL);
-+		if (dbus_message_iter_get_arg_type(&subiter) ==
-+						DBUS_TYPE_STRING) {
-+			dbus_message_iter_get_basic(&subiter, &valstr);
-+			entry = g_strconcat(name, ".", valstr, NULL);
-+		} else {
-+			entry = g_strconcat(name, ".Key", NULL);
-+			print_iter(label, entry, &subiter);
-+			g_free(entry);
++static void pacs_sink_location_changed(struct bt_pacs *pacs)
++{
++	uint32_t location = cpu_to_le32(pacs->sink_loc_value);
 +
-+			entry = g_strconcat(name, ".Value", NULL);
++	gatt_db_attribute_notify(pacs->sink_loc, (void *)&location,
++					sizeof(location), NULL);
++}
++
++static void pacs_add_sink_location(struct bt_pacs *pacs, uint32_t location)
++{
++	location |= pacs->sink_loc_value;
++
++	/* Check if location value needs updating */
++	if (location == pacs->sink_loc_value)
++		return;
++
++	pacs->sink_loc_value = location;
++
++	pacs_sink_location_changed(pacs);
++}
++
++static void pacs_supported_context_changed(struct bt_pacs *pacs)
++{
++	struct bt_pacs_context ctx;
++
++	memset(&ctx, 0, sizeof(ctx));
++
++	ctx.snk = cpu_to_le16(pacs->supported_sink_context_value);
++	ctx.src = cpu_to_le16(pacs->supported_source_context_value);
++
++	gatt_db_attribute_notify(pacs->supported_context, (void *)&ctx,
++					sizeof(ctx), NULL);
++}
++
++static void pacs_add_sink_supported_context(struct bt_pacs *pacs,
++						uint16_t context)
++{
++	context |= pacs->supported_sink_context_value;
++
++	/* Check if context value needs updating */
++	if (context == pacs->supported_sink_context_value)
++		return;
++
++	pacs->supported_sink_context_value = context;
++
++	pacs_supported_context_changed(pacs);
++}
++
++static void pacs_context_changed(struct bt_pacs *pacs)
++{
++	struct bt_pacs_context ctx;
++
++	memset(&ctx, 0, sizeof(ctx));
++
++	ctx.snk = cpu_to_le16(pacs->sink_context_value);
++	ctx.src = cpu_to_le16(pacs->source_context_value);
++
++	gatt_db_attribute_notify(pacs->context, (void *)&ctx, sizeof(ctx),
++					NULL);
++}
++
++static void pacs_add_sink_context(struct bt_pacs *pacs, uint16_t context)
++{
++	context |= pacs->supported_sink_context_value;
++
++	/* Check if context value needs updating */
++	if (context == pacs->sink_context_value)
++		return;
++
++	pacs->sink_context_value = context;
++
++	pacs_context_changed(pacs);
++}
++
+ static void bap_add_sink(struct bt_bap_pac *pac)
+ {
+ 	struct iovec iov;
+@@ -2482,10 +2556,62 @@ static void bap_add_sink(struct bt_bap_pac *pac)
+ 
+ 	queue_foreach(pac->bdb->sinks, pac_foreach, &iov);
+ 
++	pacs_add_sink_location(pac->bdb->pacs, pac->qos.location);
++	pacs_add_sink_supported_context(pac->bdb->pacs,
++					pac->qos.supported_context);
++	pacs_add_sink_context(pac->bdb->pacs, pac->qos.context);
+ 	gatt_db_attribute_notify(pac->bdb->pacs->sink, iov.iov_base,
+ 				iov.iov_len, NULL);
+ }
+ 
++static void pacs_source_location_changed(struct bt_pacs *pacs)
++{
++	uint32_t location = cpu_to_le32(pacs->source_loc_value);
++
++	gatt_db_attribute_notify(pacs->source_loc, (void *)&location,
++					sizeof(location), NULL);
++}
++
++static void pacs_add_source_location(struct bt_pacs *pacs, uint32_t location)
++{
++	location |= pacs->source_loc_value;
++
++	/* Check if location value needs updating */
++	if (location == pacs->source_loc_value)
++		return;
++
++	pacs->source_loc_value = location;
++
++	pacs_source_location_changed(pacs);
++}
++
++static void pacs_add_source_supported_context(struct bt_pacs *pacs,
++						uint16_t context)
++{
++	context |= pacs->supported_source_context_value;
++
++	/* Check if context value needs updating */
++	if (context == pacs->supported_source_context_value)
++		return;
++
++	pacs->supported_source_context_value = context;
++
++	pacs_supported_context_changed(pacs);
++}
++
++static void pacs_add_source_context(struct bt_pacs *pacs, uint16_t context)
++{
++	context |= pacs->supported_sink_context_value;
++
++	/* Check if context value needs updating */
++	if (context == pacs->sink_context_value)
++		return;
++
++	pacs->sink_context_value = context;
++
++	pacs_context_changed(pacs);
++}
++
+ static void bap_add_source(struct bt_bap_pac *pac)
+ {
+ 	struct iovec iov;
+@@ -2500,6 +2626,11 @@ static void bap_add_source(struct bt_bap_pac *pac)
+ 
+ 	queue_foreach(pac->bdb->sinks, pac_foreach, &iov);
+ 
++	pacs_add_source_location(pac->bdb->pacs, pac->qos.location);
++	pacs_add_source_supported_context(pac->bdb->pacs,
++					pac->qos.supported_context);
++	pacs_add_source_context(pac->bdb->pacs, pac->qos.context);
++
+ 	gatt_db_attribute_notify(pac->bdb->pacs->source, iov.iov_base,
+ 				iov.iov_len, NULL);
+ }
+@@ -2685,13 +2816,48 @@ static void remove_streams(void *data, void *user_data)
+ 		bt_bap_stream_release(stream, NULL, NULL);
+ }
+ 
++static void bap_pac_sink_removed(void *data, void *user_data)
++{
++	struct bt_bap_pac *pac = data;
++	struct bt_bap_pac_qos *qos = user_data;
++
++	qos->location |= pac->qos.location;
++	qos->supported_context |= pac->qos.supported_context;
++	qos->context |= pac->qos.context;
++}
++
+ bool bt_bap_remove_pac(struct bt_bap_pac *pac)
+ {
+ 	if (!pac)
+ 		return false;
+ 
+-	if (queue_remove_if(pac->bdb->sinks, NULL, pac))
++	if (queue_remove_if(pac->bdb->sinks, NULL, pac)) {
++		struct bt_pacs *pacs = pac->bdb->pacs;
++		struct bt_bap_pac_qos qos;
++
++		memset(&qos, 0, sizeof(qos));
++		queue_foreach(pac->bdb->sinks, bap_pac_sink_removed, &qos);
++
++		if (pacs->sink_loc_value != qos.location) {
++			pacs->sink_loc_value = qos.location;
++			pacs_sink_location_changed(pacs);
 +		}
 +
- 		dbus_message_iter_next(&subiter);
- 		print_iter(label, entry, &subiter);
- 		g_free(entry);
++		if (pacs->supported_sink_context_value !=
++				qos.supported_context) {
++			pacs->supported_sink_context_value =
++							qos.supported_context;
++			pacs_supported_context_changed(pacs);
++		}
++
++		if (pacs->sink_context_value != qos.context) {
++			pacs->sink_context_value = qos.context;
++			pacs_context_changed(pacs);
++		}
++
++
+ 		goto found;
++	}
+ 
+ 	if (queue_remove_if(pac->bdb->sources, NULL, pac))
+ 		goto found;
+diff --git a/src/shared/bap.h b/src/shared/bap.h
+index e4eae86502f3..72d6022a32ec 100644
+--- a/src/shared/bap.h
++++ b/src/shared/bap.h
+@@ -131,6 +131,9 @@ struct bt_bap_pac_qos {
+ 	uint32_t pd_max;
+ 	uint32_t ppd_min;
+ 	uint32_t ppd_max;
++	uint32_t location;
++	uint16_t supported_context;
++	uint16_t context;
+ };
+ 
+ struct bt_bap_pac *bt_bap_add_vendor_pac(struct gatt_db *db,
 -- 
 2.41.0
 
