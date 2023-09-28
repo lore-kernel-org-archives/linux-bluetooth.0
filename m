@@ -2,157 +2,132 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59D21E810D5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Sep 2023 02:14:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D19DCE7B0A
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Sep 2023 07:53:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229493AbjI1COR (ORCPT
+        id S231126AbjI1HxN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 Sep 2023 22:14:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57352 "EHLO
+        Thu, 28 Sep 2023 03:53:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbjI1COQ (ORCPT
+        with ESMTP id S230434AbjI1HxI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 27 Sep 2023 22:14:16 -0400
-Received: from mail-qv1-xf2b.google.com (mail-qv1-xf2b.google.com [IPv6:2607:f8b0:4864:20::f2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D09BAAC
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Sep 2023 19:14:14 -0700 (PDT)
-Received: by mail-qv1-xf2b.google.com with SMTP id 6a1803df08f44-65af7d102b3so58145956d6.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Sep 2023 19:14:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695867254; x=1696472054; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=VCnU4friet94zHXNfFv6djWkmcpdYy0QrD6ptr4JN7A=;
-        b=fn2Ye6mihBfOUOFnhTeq2o3FcQQHNc4nboDhPkm5vt+qNU5rKG3bqEg0wptZyhwi+u
-         jo+aJyuItRWG6JvcY2eNITIB0mF9cK4DrU/pded1cU1YoVDUK45xOD5qa6rUtaSXlcs/
-         YEFJiDytDzMxQru0zTklVW2LCthimgsPzvd2XDC76Crux8fGFWTMR8U3Ip8rKh0wQTsP
-         G6gl4N+rSW0WGhwX1tgdnKx7xdIFT+W4XmvohFWWFQIYSHl1Bl6/UT79Q8bCZw5Av2mI
-         Xy7GcyuAomcl7Ql/PsJ/WJUZ/0Ymqn2muutmKTT7ae3n0QzIIPUGTaKZDbGx72KLIhVE
-         SVDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695867254; x=1696472054;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VCnU4friet94zHXNfFv6djWkmcpdYy0QrD6ptr4JN7A=;
-        b=WrUPoRdp6QiTBJiZz7vM29/46W4ZLfbn8DwPZ1MOMz5Q2SU3ZO43dbSFemlTm1iyGV
-         EMDFk1iznlGtkbDlYqWKQMsUMEzCXhnR3VNuo6RKBmrnlS7dp0RHs1hf1l0zxvsd9ZRo
-         zJVeYWBfOgmePjPM0g/QUv8weRrxnxs8eMwNMUEDDRFa9h+j6VGiMCJiwfp6kEYexcnb
-         /v4ZMqGLck5tyeHO/3gkfz0EUOOUFfUTpnqjq8aSlR+qXl0JQcYfaAtHuyKKaUQYjZzI
-         OH3mNJMcv9smhri3sSPxiVcO1tKhMsF2oL/xNaTIkivLEWw1M513ze1FYFL8SmKr5Irj
-         4+1Q==
-X-Gm-Message-State: AOJu0Yx5ef+b3CDTSjLoImHDXEUJx3UWXAdb6KiglAYh0KphxPHtJPcr
-        nfmSscDvNuqvLW4uQnuNaF9bxOpKQg8=
-X-Google-Smtp-Source: AGHT+IGGu2cNx7hWbWUbG4rh1Dg83s+oBzocaTrHQ6BOdlmzX4c2ClH0Ar3tHok/WPZHpNXweOm01g==
-X-Received: by 2002:a0c:e1d4:0:b0:65b:2660:f58b with SMTP id v20-20020a0ce1d4000000b0065b2660f58bmr3941737qvl.12.1695867253812;
-        Wed, 27 Sep 2023 19:14:13 -0700 (PDT)
-Received: from [172.17.0.2] ([20.57.69.216])
-        by smtp.gmail.com with ESMTPSA id oo25-20020a05620a531900b0076cc0a6e127sm3665717qkn.116.2023.09.27.19.14.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Sep 2023 19:14:13 -0700 (PDT)
-Message-ID: <6514e175.050a0220.177d7.f1ac@mx.google.com>
-Date:   Wed, 27 Sep 2023 19:14:13 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2879654825851461336=="
+        Thu, 28 Sep 2023 03:53:08 -0400
+Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02on2074.outbound.protection.outlook.com [40.107.241.74])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C55D8F
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Sep 2023 00:53:06 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mMaJraJaeK+hLYIlsnnrWXX0GCV5rJdb8+44sFbXrg6RdOJEz4Plpz0G3c34Klq0LkmqdAwEhq7QFw43eQz5vExA0DGnDqIwp+8gSNnlDiDePLbDNnTex9nS0G5YRlbhe+PXsvasUhoT3KbtyeUt88/sfcZx4+AhIiPUiaR3ZNDbSTMWBrJ5blVz76k1T2kTJO/rXJqlDvl4pTRLqP2LSwDusPOYg83fPoKwVpPZyAyLUPvQ1+uwsRpvdWXeWE7WM98bbD/H/uU/y49QTU49Ikx/7qYtIJXOT/W1wKXDcWAiF4mxMwVYNxgksFAIpxm0UndvaZmq/FBTMVqlP1QMqw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=otyqqJ+FDk8RqwyL0jOlK/QMLwfhpKkQ4AKoj2KKgBU=;
+ b=IWwYxlFQ1H9K1Io0bg5lARoxyBigZ8XA+q3BZnPIuBwSIrPAExhWNsbTJg/2t2m2oq9BmJY67ZrVeO0fPzPXZgOiS8j2omU+X7U4XYiItpdcIGRHQBc0wd/0bZIaqS0dxaoLMqAqOw3WQXIfeJj4Gq9pROUqltcwIpShuup3Zn84thyDcGB+ZK6a8TViNZWnr/dBp7RFkC206/mMHb7n2tSSGs2lGBUtJEcnwdm/8g2RUWLlThEJi08iONU34butszWpoOe5ZTV4xiSHS4f8e98BCCWFzUoswhGAM9nhTLkts/Ls6o/TFpeOoHOv0o49LnEa3v7fTXZHbU0m+z2e1g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=otyqqJ+FDk8RqwyL0jOlK/QMLwfhpKkQ4AKoj2KKgBU=;
+ b=G9ce7uOpT5imhBX1cjmbQ0C2lpOQ9LDKXHBIWWNxBnITY+oV+HM80jiIX6Ux6VCftzbrWRlZn9mA5mZujMeB4xT5K2YusnXsGeihXbRs2eySNNT1K6DlMtfomFvx/YNYt+1MMqu2L/r9TrLN3YnhZe/oEHzbZ8SFX0e7Z8gpX0k=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
+ by AM0PR04MB7027.eurprd04.prod.outlook.com (2603:10a6:208:191::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.25; Thu, 28 Sep
+ 2023 07:53:03 +0000
+Received: from AS8PR04MB8898.eurprd04.prod.outlook.com
+ ([fe80::7763:779b:1a89:47da]) by AS8PR04MB8898.eurprd04.prod.outlook.com
+ ([fe80::7763:779b:1a89:47da%3]) with mapi id 15.20.6813.027; Thu, 28 Sep 2023
+ 07:53:03 +0000
+From:   Iulia Tanasescu <iulia.tanasescu@nxp.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     claudia.rosu@nxp.com, mihai-octavian.urzica@nxp.com,
+        silviu.barbulescu@nxp.com, vlad.pruteanu@nxp.com,
+        andrei.istodorescu@nxp.com, luiz.dentz@gmail.com,
+        Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Subject: [PATCH v2 0/1] Bluetooth: ISO: Fix invalid context error
+Date:   Thu, 28 Sep 2023 10:52:56 +0300
+Message-Id: <20230928075257.3123-1-iulia.tanasescu@nxp.com>
+X-Mailer: git-send-email 2.39.2
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: VI1PR07CA0220.eurprd07.prod.outlook.com
+ (2603:10a6:802:58::23) To AS8PR04MB8898.eurprd04.prod.outlook.com
+ (2603:10a6:20b:42d::15)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v4,01/12] media-api: Update to reflect the last code changes
-In-Reply-To: <20230927215354.1874835-1-luiz.dentz@gmail.com>
-References: <20230927215354.1874835-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|AM0PR04MB7027:EE_
+X-MS-Office365-Filtering-Correlation-Id: 71e0420a-0971-4137-3030-08dbbff7f19c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: i0rMROu/yvI5zJMTE6yWY/BDHsOOTwFcyPVgi7NavOEK140A4i9m552gCEZXK6rFxpINeL7yuumHpxAwPDd98aaIkusynKGeXpEUyzIAlHnCtIK/RzmSaGN+CKkp4lki9lqAVVyET/wJHBySDU7GXTw11b9H7vpydj+Y/8hjpVwpGu5kyANlSY/kGmsQU2K7QA+gVHzX5YlaRTCXQ+t8w1r3jFEMNNWaQh5jkQtLWLYO7/KU98sHRxA+kxjNNP3ltyP4UVRPubujN61DZzcMw+ZSCzu7j+IjJU/MzfEPf7k+/g4p8IUUY0gAAvbxhs0Tgbne4OVKC6h17LcUQuEBt8ZJr6argIMGICSpo2/15cErpP6VVPDa5KIwnndrSTghX2DzzJiXTo1H01eXMX8Q4xvR1vdksN4RIl8QdmS3fNLxAypzJrNJG+PkruWNDrg5Wayfoycr7NSOY+1wkThwgnMjNrkhLtOmCiBtY2ke0h0jryBjb1T7cxlYF+YSkOdOubZQOgw/sx3xEQqQ/H76zO/tDKQ9d5kw7yJLCvU2T0lhS/M4NNj4fKXtOXZjoP/t
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(396003)(376002)(39860400002)(136003)(366004)(230922051799003)(451199024)(186009)(64100799003)(1800799009)(26005)(6512007)(6486002)(6506007)(6666004)(478600001)(83380400001)(2616005)(2906002)(4744005)(316002)(6916009)(1076003)(66556008)(66476007)(66946007)(8936002)(41300700001)(8676002)(5660300002)(44832011)(4326008)(36756003)(38100700002)(86362001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Wqa4WweXSy9zuWgWBv8N6Wn587FcDzwwl1qQ9ilpAUs3YjKy3YqZgWKOy+q0?=
+ =?us-ascii?Q?YlmFLJRL4GY+cZbSudQZXu9v3wTW7KRODthXBR8O1LZVPIqxYo7XldgmuYCr?=
+ =?us-ascii?Q?67lVxGUKSl/OpqDIP9CC1jKGDSuVpPL7l2qq/YFpwa8/o/c+LtELO6BNQ1mK?=
+ =?us-ascii?Q?1Ad0+162I9RE4asiTWSCydognCTbmeSTrZb8bb8p+LvA80zb7BttfxByfYBF?=
+ =?us-ascii?Q?dM37WufHmXaRh12VEfUNpR7KHuv5/GP+fQEOG0HbsXCYdTryoDCtr9PTj4Y+?=
+ =?us-ascii?Q?NpEfD9tPLJlqvLuSHxCu2WXAMZ+/gTE3l5U4A4XZK2MbHWwCo3RO+DEo/SaG?=
+ =?us-ascii?Q?McUx8k5hKUTnKvSIDuuQw3XMYgD0EJ6YiEI9Nc3e26/eShp5VxIBctSyE+tD?=
+ =?us-ascii?Q?hqIx2t/VvF41NvgoOTq6P6IrzsdlO1kbeGws3Pc+L0Tsomui1w9yJnwCOjI1?=
+ =?us-ascii?Q?EeWYMgkkUEKS1ZOu61eTPB7HMDxfT/Q9C7Ys2R83D7Jo4VEYmVxJ5WT1T4Xm?=
+ =?us-ascii?Q?9dohlp4E4kT+rcDy32oYJ/xZIZoOWkGlZV88esw2FK8mzCqjj267RbWP3ICA?=
+ =?us-ascii?Q?6vDYV3JIXoa4rwh7rrDkYOC6USFziiLetA7dSCkabwz0mydJCJN8WIQNM8fi?=
+ =?us-ascii?Q?nKFsEqFkAtlQFrzUl2S8MO91Zu3yopV3yBERIQQ8I2Ww8dYLmYAToRJE/8R9?=
+ =?us-ascii?Q?OioakGD4ckpfR346KLIN6YF4vDRsaDKomjVXUfpmmLyot///W4/tvRl4j30G?=
+ =?us-ascii?Q?Xqmimp2tbOBfgTNvCJlI86ByEEtEM3QwXJuMDU0kVWkKmLglMGaZ8uw9OzC+?=
+ =?us-ascii?Q?DuLs2CfXiuGYNUni9QQInjLC8iOIpEyLNGabNJFKRGsvmTfY9mFzch+a1eCk?=
+ =?us-ascii?Q?e5FROzc3467IwVMYNFoCoJr/kSoOiL8VEbwP96Rp0A7yzkybIGcRCiu9fNqK?=
+ =?us-ascii?Q?idKbAqoUhmxfgzuhLDSQItaUOLlAgaRKzgtj5usozFqcIXsvZru4bWQymcM6?=
+ =?us-ascii?Q?8Fh38fIFfCLAn51DDXiRmxWUsXDzGnzv0w08n15HuKlZ+JgZmS2r5GWiN55N?=
+ =?us-ascii?Q?YfctauSf/a7wc1vfin2vxccutaHKoBz6XVXUum9pSZGowzY8jItccOwirmnb?=
+ =?us-ascii?Q?ZFBOyNkILDrjtXDrO8/ph26iabyzM8Ca763994rgMRcGhf9/hQc0d3moezra?=
+ =?us-ascii?Q?uPCoXB01oK7ZTfLFbVuEE4Kbht06BbHq5KqIIwADZsWNoSCBf0/1eRhLqcFM?=
+ =?us-ascii?Q?bMjaibG3dDtBpNScahMEyaGbK0RyhcRU5UFEs33XdCqs578EHZgGdWSu+sDP?=
+ =?us-ascii?Q?PQAgGMROdoAebw/PbOfg8Mc2SJUL+kFSmCz5awzOvgqmr1eqf4QwOFg3O14y?=
+ =?us-ascii?Q?X8mK4NrPpXqdA/VuukLiSTH0zIJ6VPeg71TNiIVOcuyKHmnW5PldkFMFqesb?=
+ =?us-ascii?Q?eUQjGXcFxOjRqEALFpSV9Q7u5WKeV6DynlN82qZF6qOJNIjHKrk0HrBYtgBC?=
+ =?us-ascii?Q?a/dEPfqdR3hONNReHjOhWrm/hyfVKUvmAgJ1bQl6yB5g9UoERefaC0P7gGtC?=
+ =?us-ascii?Q?LzXqBM2HZkxD9/WuCvEB+EFkmTniQmjuvyq3oavVBXQzojbBDt8OFp8D0dCe?=
+ =?us-ascii?Q?rA=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 71e0420a-0971-4137-3030-08dbbff7f19c
+X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8898.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Sep 2023 07:53:03.6640
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 54P3O4XDAktmiYixwSOnZVL6vMJLB3IrUbdjOnW4wMX7DTYjlp77I+3wOLvkA1MxZN5kTkxcfjSkdwMAkOgJNw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR04MB7027
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2879654825851461336==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+This patch fixes the error introduced by commit a0bfde167b50
+("Bluetooth: ISO: Add support for connecting multiple BISes"):
 
-This is automated email and please do not reply to this email!
+BUG: sleeping function called from invalid context in __hci_cmd_sync_sk
 
-Dear submitter,
+When handling the Create BIG Complete event, in case no bound BISes
+have been found for the BIG handle, the hci_le_terminate_big_sync
+call should be made from the cmd_sync_work, not from the rx_work.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=788267
+This patch version addresses review comments.
 
----Test result---
+Iulia Tanasescu (1):
+  Bluetooth: ISO: Fix invalid context error
 
-Test Summary:
-CheckPatch                    FAIL      8.55 seconds
-GitLint                       FAIL      4.65 seconds
-BuildEll                      PASS      31.88 seconds
-BluezMake                     PASS      1162.52 seconds
-MakeCheck                     PASS      13.58 seconds
-MakeDistcheck                 PASS      206.98 seconds
-CheckValgrind                 PASS      325.92 seconds
-CheckSmatch                   PASS      439.84 seconds
-bluezmakeextell               PASS      129.00 seconds
-IncrementalBuild              PASS      10914.56 seconds
-ScanBuild                     PASS      1216.72 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v4,10/12] bap: Add support for missing MediaEndpoint properties
-ERROR:SPACING: space prohibited before that close parenthesis ')'
-#561: FILE: profiles/audio/bap.c:991:
-+						{ "Configuration", "a{sv}" } ),
-
-/github/workspace/src/src/13401723.patch total: 1 errors, 0 warnings, 476 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13401723.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+ net/bluetooth/hci_event.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
 
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v4,03/12] client: Make transport.show to print QoS configuration
+base-commit: 091e25d6b54992d1d702ae91cbac139d4c243251
+-- 
+2.39.2
 
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-10: B3 Line contains hard tab characters (\t): "	UUID: 00002bcb-0000-1000-8000-00805f9b34fb"
-11: B3 Line contains hard tab characters (\t): "	Codec: 0x06 (6)"
-12: B3 Line contains hard tab characters (\t): "	Configuration:"
-14: B3 Line contains hard tab characters (\t): "	Device: /org/bluez/hci0/dev_00_AA_01_01_00_03"
-15: B3 Line contains hard tab characters (\t): "	State: idle"
-16: B3 Line contains hard tab characters (\t): "	Endpoint: /org/bluez/hci0/dev_00_AA_01_01_00_03/pac_sink0"
-17: B3 Line contains hard tab characters (\t): "	QoS Key: CIG"
-18: B3 Line contains hard tab characters (\t): "	QoS Value: 0x00 (0)"
-19: B3 Line contains hard tab characters (\t): "	QoS Key: CIS"
-20: B3 Line contains hard tab characters (\t): "	QoS Value: 0x00 (0)"
-21: B3 Line contains hard tab characters (\t): "	QoS Key: Framing"
-22: B3 Line contains hard tab characters (\t): "	QoS Value: 0x00 (0)"
-23: B3 Line contains hard tab characters (\t): "	QoS Key: PresentationDelay"
-24: B3 Line contains hard tab characters (\t): "	QoS Value: 0x00009c40 (40000)"
-25: B3 Line contains hard tab characters (\t): "	QoS Key: Interval"
-26: B3 Line contains hard tab characters (\t): "	QoS Value: 0x00002710 (10000)"
-27: B3 Line contains hard tab characters (\t): "	QoS Key: Latency"
-28: B3 Line contains hard tab characters (\t): "	QoS Value: 0x000a (10)"
-29: B3 Line contains hard tab characters (\t): "	QoS Key: SDU"
-30: B3 Line contains hard tab characters (\t): "	QoS Value: 0x0028 (40)"
-31: B3 Line contains hard tab characters (\t): "	QoS Key: PHY"
-32: B3 Line contains hard tab characters (\t): "	QoS Value: 0x02 (2)"
-33: B3 Line contains hard tab characters (\t): "	QoS Key: Retransmissions"
-34: B3 Line contains hard tab characters (\t): "	QoS Value: 0x02 (2)"
-35: B3 Line contains hard tab characters (\t): "	Location: 0x00000003 (3)"
-36: B3 Line contains hard tab characters (\t): "	Links: /org/bluez/hci0/dev_00_AA_01_01_00_03/pac_source0/fd0"
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============2879654825851461336==--
