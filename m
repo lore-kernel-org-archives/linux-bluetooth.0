@@ -2,94 +2,77 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76AE1E7F153
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Sep 2023 19:13:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF09FE732D0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Sep 2023 20:00:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231195AbjI1TNz (ORCPT
+        id S231582AbjI1UA3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 28 Sep 2023 15:13:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34672 "EHLO
+        Thu, 28 Sep 2023 16:00:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229478AbjI1TNy (ORCPT
+        with ESMTP id S229864AbjI1UA2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 28 Sep 2023 15:13:54 -0400
-Received: from mail-il1-x12c.google.com (mail-il1-x12c.google.com [IPv6:2607:f8b0:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E07EA194
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Sep 2023 12:13:52 -0700 (PDT)
-Received: by mail-il1-x12c.google.com with SMTP id e9e14a558f8ab-3512b425662so34914925ab.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Sep 2023 12:13:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695928431; x=1696533231; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PfcLBxqQve7MJ6XzHEZsc4t3QqnDlrmUCOhNfNdtDcY=;
-        b=EM0sMXU8Yb4c2IFz29U23xyMb6eh4PXwxssC0SU7eyCM8OuRryaJ5DauUQ1rfq7TV1
-         e0zZm/1MN6G3NxVhtOoI2v9jfZezaFDKEz/9XV56VP/nRpz+Q2kz750T2ygFR2NDLWNI
-         WHszKeoPKEy3wvkQnWoQf7/VTALpym7EwuxLcxMKWV6jBp5j1lLzYU+rniYknGWwHmN/
-         qVQ99k64zEF3nCbBxIBcj2QTo8774VoT9Xs4SE8MnXAv65crZP4EaRxvEIQgOxeavhBy
-         kp2uUAoQi4PEl4mcbZ6RC5MMPRS5N0f1MRgGMZzITbPf43abVJdhv5A92Mgycms/gLlT
-         848A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695928431; x=1696533231;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PfcLBxqQve7MJ6XzHEZsc4t3QqnDlrmUCOhNfNdtDcY=;
-        b=YzIr8X5bTtgyMz4DcJ7zMnweaqzoueQK+nmAFeWeX00Uvzr8+tlS0iatI2Ow9JM2G0
-         dQaJ8IZTxhl3QSZ8/aTqVbiWGf8KyrwpVLD/PstCVlq9jDAZiIGw9xLDiAU3jDcyS2Tb
-         REhuWEpkK+TYmcY7rGqbraJtr+SWcZiTvqgB+7D+GEVK9FSWRyypX8iAPPE/KdNhTWT2
-         KojMjyqj9RbI6aJLguBF2B/4G7hXkn1WtYaz6ZSiBPWVfTas70/UArMuaPlyebJZEBSm
-         8jBX7qOvD3dcavbjDVw1vB0NGsb03bRHLA/U1uUObUlCDTKSCYTnyFD03yJr2zuvyzhx
-         mJJA==
-X-Gm-Message-State: AOJu0Yzz1LMtgxo7nCvemgHYtBYhVdXVdVNOHwEe3bIUqQs/gSg3h2rO
-        CCqISb+7uwnS7w3f1VNEyazidvWfPJY43pAT
-X-Google-Smtp-Source: AGHT+IEOdG2cqrARnf5+Z+R2a9YzT0b6LbGPBVv6q1KZhUI/8nHyTuBWn6igjuF3qegx8dzF9YxZMw==
-X-Received: by 2002:a05:6e02:152f:b0:34d:ee49:5114 with SMTP id i15-20020a056e02152f00b0034dee495114mr2064680ilu.23.1695928431469;
-        Thu, 28 Sep 2023 12:13:51 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-98-232-221-87.hsd1.or.comcast.net. [98.232.221.87])
-        by smtp.gmail.com with ESMTPSA id w16-20020a637b10000000b0057c44503835sm11643370pgc.65.2023.09.28.12.13.49
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Sep 2023 12:13:50 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] shared/csip: Remove bt_csip_add_db
-Date:   Thu, 28 Sep 2023 12:13:47 -0700
-Message-ID: <20230928191347.2086937-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230928191347.2086937-1-luiz.dentz@gmail.com>
-References: <20230928191347.2086937-1-luiz.dentz@gmail.com>
+        Thu, 28 Sep 2023 16:00:28 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A993A193
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Sep 2023 13:00:25 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 50AC0C433C9;
+        Thu, 28 Sep 2023 20:00:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1695931225;
+        bh=MxD5dbF00geYo3n/jF2elSiX6HpEhf1gg/PHlwnws8M=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=Z6vHT9y0POPK0LjMQ4Neo7rPJ1FmjxcmTdGYeJghKEPTo1XdmqfMgJiEDyw8gWoFk
+         A2w0K5QIH3g286DqTZkbLrrUXUL2cJw4IXoRji2Owu729edKUnYHA/C44DGcAUmQ9y
+         Fp+hcNhr7o5HjuXjPwTPBrc0CwHeYlAxHnk9QhP2xVzti7sZHXU/CxxJl+9kpGQElZ
+         gf+vqJjxCTcZTwU4rIp0F9ihKlx/kYXPe9HChQbt6sQYSa68B9J95q4A0dh7Y97XSv
+         NPo/MfDloW7bMvi4z6F0aYMrLEmnI7QXGjI5Qd1a9qwwju9Rgg11/clsnpChOflg0E
+         22lMupC86SmsQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3562AC395E0;
+        Thu, 28 Sep 2023 20:00:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 0/1] Bluetooth: ISO: Fix invalid context error
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <169593122521.10640.7001764205432711977.git-patchwork-notify@kernel.org>
+Date:   Thu, 28 Sep 2023 20:00:25 +0000
+References: <20230928075257.3123-1-iulia.tanasescu@nxp.com>
+In-Reply-To: <20230928075257.3123-1-iulia.tanasescu@nxp.com>
+To:     Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Cc:     linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com,
+        mihai-octavian.urzica@nxp.com, silviu.barbulescu@nxp.com,
+        vlad.pruteanu@nxp.com, andrei.istodorescu@nxp.com,
+        luiz.dentz@gmail.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hello:
 
-bt_csip_add_db is unused since csip plugin does use bt_csip_new to
-properly create the attributes for CSIS.
----
- src/shared/csip.c | 5 -----
- 1 file changed, 5 deletions(-)
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-diff --git a/src/shared/csip.c b/src/shared/csip.c
-index 7e90a3c97614..04a8d542b390 100644
---- a/src/shared/csip.c
-+++ b/src/shared/csip.c
-@@ -389,11 +389,6 @@ static struct bt_csip_db *csip_get_db(struct gatt_db *db)
- 	return csip_db_new(db);
- }
- 
--void bt_csip_add_db(struct gatt_db *db)
--{
--	csip_db_new(db);
--}
--
- bool bt_csip_set_debug(struct bt_csip *csip, bt_csip_debug_func_t func,
- 			void *user_data, bt_csip_destroy_func_t destroy)
- {
+On Thu, 28 Sep 2023 10:52:56 +0300 you wrote:
+> This patch fixes the error introduced by commit a0bfde167b50
+> ("Bluetooth: ISO: Add support for connecting multiple BISes"):
+> 
+> BUG: sleeping function called from invalid context in __hci_cmd_sync_sk
+> 
+> When handling the Create BIG Complete event, in case no bound BISes
+> have been found for the BIG handle, the hci_le_terminate_big_sync
+> call should be made from the cmd_sync_work, not from the rx_work.
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2,1/1] Bluetooth: ISO: Fix invalid context error
+    https://git.kernel.org/bluetooth/bluetooth-next/c/62dc24251217
+
+You are awesome, thank you!
 -- 
-2.41.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
