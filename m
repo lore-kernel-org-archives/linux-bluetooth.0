@@ -2,235 +2,128 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65B20E732D8
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Sep 2023 13:45:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 629A1E732DB
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Sep 2023 14:28:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231966AbjI1NpZ (ORCPT
+        id S231845AbjI1O2p (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 28 Sep 2023 09:45:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40704 "EHLO
+        Thu, 28 Sep 2023 10:28:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231871AbjI1NpY (ORCPT
+        with ESMTP id S231480AbjI1O2n (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 28 Sep 2023 09:45:24 -0400
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC78D11F
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Sep 2023 06:45:22 -0700 (PDT)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20230928134518euoutp01ba85cccc6bc0263040cdbadf34ab756e~JE-5j8YdS1757317573euoutp01i
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Sep 2023 13:45:17 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20230928134518euoutp01ba85cccc6bc0263040cdbadf34ab756e~JE-5j8YdS1757317573euoutp01i
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1695908718;
-        bh=yzjAFToDCY0sWP6m8orD3SoziS7U2dg1LG7e9I3h2A4=;
-        h=From:To:Cc:Subject:Date:References:From;
-        b=OWSqbM/xWgeyXax2TuZ+dxKT7xAuSk1Ni1EvlqhO9JSL/T97Bys3fvsNcbUXQ2FLS
-         DAYn0mSa2ORgyFc5wXFODlzEy1/MpmaVRa7PQY7l2xfoj7fuXz1ed7b+mf4R8lFeU5
-         x7yFzUuf7BWoyyEe2lrkmYwpuCPl2Un94306aqpU=
-Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20230928134517eucas1p24e073f38612c9124389cd4a0f6c345e1~JE-5OrDVF1260812608eucas1p2A;
-        Thu, 28 Sep 2023 13:45:17 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges1new.samsung.com (EUCPMTA) with SMTP id 2D.17.42423.D6385156; Thu, 28
-        Sep 2023 14:45:17 +0100 (BST)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20230928134517eucas1p296d2f03574a8948e642cfbfb5826539b~JE-45GYHs0616106161eucas1p2H;
-        Thu, 28 Sep 2023 13:45:17 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20230928134517eusmtrp2888444279f9e6be0def165f58696bf0a~JE-44f2DU3206832068eusmtrp23;
-        Thu, 28 Sep 2023 13:45:17 +0000 (GMT)
-X-AuditID: cbfec7f2-a3bff7000002a5b7-64-6515836d3ef9
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-        eusmgms1.samsung.com (EUCPMTA) with SMTP id 57.EE.10549.D6385156; Thu, 28
-        Sep 2023 14:45:17 +0100 (BST)
-Received: from AMDC3832.digital.local (unknown [106.120.50.37]) by
-        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20230928134516eusmtip1863c082d40bf3934964196266e3f5009~JE-4nryjU2301823018eusmtip1U;
-        Thu, 28 Sep 2023 13:45:16 +0000 (GMT)
-From:   Arkadiusz Bokowy <a.bokowy@samsung.com>
+        Thu, 28 Sep 2023 10:28:43 -0400
+Received: from EUR02-AM0-obe.outbound.protection.outlook.com (mail-am0eur02on2078.outbound.protection.outlook.com [40.107.247.78])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFA1BF5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Sep 2023 07:28:41 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Rqfkviox7Bdw6R/ukXV2htAgWwjvh9fJKNe7aSQ46UgOboQUiuLyEIg9dDgFLITyMvkbz5jLwlNROf9lsFoJ7NHD6odHwjb8WTS/1IuCwFKBHBrnd7sizCebc7S6p58wb82LQ8e1jPz6TFQoJBOaWjIrapjoSMSGmmLO6DI5YtWKw7YML65gWdbksqSfIH0+TwfXqvPITTZAZfk/s7x8e2nQ4b3H03K0WE4NNEcO5e80gE6LQQ/tJHIU5hv4R8hHgEB98x83N6LUTVKbetfDGPf1QmEiDRZ9EjrazxyEfwIDo6Aid0AEqK0k8xgDCPEo9V5McvXHkguQp3U/Vvurmw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WF017Pll7NAWqLimeff5EGryomJrYCdgC4+a4gvOc28=;
+ b=bNzGHmKlYB+0Rcmq97IvV9NjwYVaeaoRGDIo3zqZIJ8pNIP9ojwFZTFtdeTcgoufwXcyboxYqiXIFkxMtLRXtLEPdBqAX+l6/qc9jRj9PPkS42eSfLlma0xn2a5Ko02XzCtqfLJGIPmW8CxvEb/n1d1bGzOzkG9UYWYebs+UjbvGlflxlRkKnlhNupOrpCBSoGmnEBmfiixiPtyDKtAUogFZhp6Y+zFDPCiIsP0FhEiPGoSvE1SRKUbYDTa9iZxGIN5tCsL2/PXS9FIur/P6WGNoZN0ugI0wkAAcMlDAiIHZ4fCz9WUiKCwG6OLbzeUP+ENoxFJgUdoYwqQ7gTm8bA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WF017Pll7NAWqLimeff5EGryomJrYCdgC4+a4gvOc28=;
+ b=C20yt4yUNMU1aOhZc1LCADwsR/uE8C6IlfrwVjRN99jaQHe5bIhWH/ZTuINyKGmAIQR+kQUy/LCtuPmjTKNkUkilSl8KWdo2OPiKDoUB1+EhB9Z8n34HV7I3A2/a+2e1w2EYsQYyz5ybYjoxMcD1b0LDoGdbd1adB3nEdEYLw4Y=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
+ by AM9PR04MB7619.eurprd04.prod.outlook.com (2603:10a6:20b:284::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.25; Thu, 28 Sep
+ 2023 14:28:39 +0000
+Received: from AS8PR04MB8898.eurprd04.prod.outlook.com
+ ([fe80::7763:779b:1a89:47da]) by AS8PR04MB8898.eurprd04.prod.outlook.com
+ ([fe80::7763:779b:1a89:47da%3]) with mapi id 15.20.6813.027; Thu, 28 Sep 2023
+ 14:28:39 +0000
+From:   Iulia Tanasescu <iulia.tanasescu@nxp.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     Arkadiusz Bokowy <a.bokowy@samsung.com>
-Subject: [PATCH] Bluetooth: MGMT: Synchronize scan start and LE Meta events
-Date:   Thu, 28 Sep 2023 15:45:06 +0200
-Message-Id: <20230928134506.130545-1-a.bokowy@samsung.com>
-X-Mailer: git-send-email 2.34.1
-MIME-Version: 1.0
+Cc:     claudia.rosu@nxp.com, mihai-octavian.urzica@nxp.com,
+        silviu.barbulescu@nxp.com, vlad.pruteanu@nxp.com,
+        andrei.istodorescu@nxp.com, luiz.dentz@gmail.com,
+        Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Subject: [PATCH BlueZ 0/1] iso-tester: Test bcast receiver with PA sync, no BIS
+Date:   Thu, 28 Sep 2023 17:28:31 +0300
+Message-Id: <20230928142832.3174-1-iulia.tanasescu@nxp.com>
+X-Mailer: git-send-email 2.39.2
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrGIsWRmVeSWpSXmKPExsWy7djPc7q5zaKpBleXqFis7VzKbDHnWh+z
-        A5NH35ZVjB6fN8kFMEVx2aSk5mSWpRbp2yVwZSzt281UMFuj4mfLHfYGxhmKXYycHBICJhKP
-        m9axgNhCAisYJR69lO1i5AKyvzBK3H7fwgThfGaUWPi5gxWm48OEc2wQHcsZJfq2lMB1fO26
-        xA6SYBPQlfi25ARYg4iAssSzfYeZQGxmAW2JF4emgzULC3hLzF2+HWw1i4CqRPPUb2A1vAJW
-        EktXLWaEWCYvsf/gWWaIuKDEyZlPWCDmyEs0b53NDLJYQuARu8SuWROBlnEAOS4SzWfrIHqF
-        JV4d38IOYctI/N85nwmipFxiTlsqRGsDo8Sx7VuZIWqsJQ7/+80GUsMsoCmxfpc+RNhR4tSv
-        l+wQrXwSN94KQlzAJzFp23RmiDCvREebEES1ksSCuYfZIGwJiXXHf7BA2B4Sx36tYYaEWqzE
-        7O9tLBMYFWYh+WsWkr9mIdywgJF5FaN4amlxbnpqsWFearlecWJucWleul5yfu4mRmBSOP3v
-        +KcdjHNffdQ7xMjEwXiIUYKDWUmE9+FtoVQh3pTEyqrUovz4otKc1OJDjNIcLErivNq2J5OF
-        BNITS1KzU1MLUotgskwcnFINTHF/qxe9XXnP7gXvQebO3yePuRc6qu1O2mx/oJrDfNmxpQen
-        VRydnLQ274vfFI+ulSJ/+y+938P4YmG7hfbOCc4vTHfxhCyVjpFdZRl4ekm/xVPHqLR9Nh9/
-        pJ14+Gf3HiGlIoXpSy8Uqsy5Vxq+4mPh0q8xCbU3avdJtEvWc3Q/vve1SqS/3XfTAbu7r86Z
-        V4RdqCzMebqYYZrmkwXJXuFvpGXqQ35depG1cvrtON0Nm9xyZ0pv+5pz/1ymcv/sxtBAp3OH
-        uyz+vZ48fXfhjv9W7yW2nm5e5/Tir61M3bbMnzatF08GvfK1Y/USiFA7dzg8cKOe/Y85CQ1X
-        uLk7mRoeHvm1Qv3sU/OABS/TOY2UWIozEg21mIuKEwGYIPXQeQMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrALMWRmVeSWpSXmKPExsVy+t/xu7q5zaKpBu/W8lms7VzKbDHnWh+z
-        A5NH35ZVjB6fN8kFMEXp2RTll5akKmTkF5fYKkUbWhjpGVpa6BmZWOoZGpvHWhmZKunb2aSk
-        5mSWpRbp2yXoZSzt281UMFuj4mfLHfYGxhmKXYycHBICJhIfJpxj62Lk4hASWMoo0bn8OTtE
-        QkJi7+PnLBC2sMSfa11QRZ8YJe5/nc8EkmAT0JX4tuQEK4gtIqAs8WzfYbA4s4C2xItD09lA
-        bGEBb4m5y7eDDWIRUJVonvoNrIZXwEpi6arFjBAL5CX2HzzLDBEXlDg58wkLxBx5ieats5kn
-        MPLNQpKahSS1gJFpFaNIamlxbnpusaFecWJucWleul5yfu4mRmBQbjv2c/MOxnmvPuodYmTi
-        YDzEKMHBrCTC+/C2UKoQb0piZVVqUX58UWlOavEhRlOg+yYyS4km5wPjIq8k3tDMwNTQxMzS
-        wNTSzFhJnNezoCNRSCA9sSQ1OzW1ILUIpo+Jg1OqgSnIbebinUeedZcLR0898mMm24bIidnr
-        H7LJZIV6+e36Eqce4sVvuiSv5GAzTzr3K7/+ObVVhgfS7J1WHS/laJD96fPOY03pm33C+Q6u
-        PsZh3Fbrtj05PWdequ6iSMvtP1ljow67S5TbRm1Wjz0hqJ8XF7dKgf3I+X0rs7kmrbr6dOHX
-        0vUHHzWJXTk1vzFpy6PUdM7+yHZ3j8/ntJrWn9o4fSHb4rMzpTedvhZ+zPLQyZMxtzdtMV5l
-        dP61N4dVu8Jni2VNb2ar2cXukooNfrL3BP/caWcm/z68ZL77e37uzxu3Tk0JuvCcS2yxdXez
-        zO4du8v+uO1brpV1/8q86413GUNMLQq3FlXPTbjCLZ+vxFKckWioxVxUnAgAKNFa89MCAAA=
-X-CMS-MailID: 20230928134517eucas1p296d2f03574a8948e642cfbfb5826539b
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20230928134517eucas1p296d2f03574a8948e642cfbfb5826539b
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20230928134517eucas1p296d2f03574a8948e642cfbfb5826539b
-References: <CGME20230928134517eucas1p296d2f03574a8948e642cfbfb5826539b@eucas1p2.samsung.com>
+Content-Type: text/plain
+X-ClientProxiedBy: VI1PR08CA0255.eurprd08.prod.outlook.com
+ (2603:10a6:803:dc::28) To AS8PR04MB8898.eurprd04.prod.outlook.com
+ (2603:10a6:20b:42d::15)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|AM9PR04MB7619:EE_
+X-MS-Office365-Filtering-Correlation-Id: b716ddbd-349b-401e-52a4-08dbc02f3550
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: uFhikqKB6jZ0AhEBKAjz5zmQVLgn5CVtfDTeTX4Bi5tT0xsoR3Zzo8SG7Go72v9jX1YIRUTMvD6nnAt76pQcPKay4zZwBSlsMa0msJTQmPI8JTOWQdgT0ApzJUnCre0h/qNYNgydrOPIm5Km6mwzw4cNOfpDfmiCIEvlTru2H/3KvyWjVUXKw9fBWPIUAn14V5VS6OzQfhRoK/ZHHrdSSrxjlOanyWBRUy2ATWGZvW+F2fe5yd+505sAhAQJ5t6cHGgg3giyQ1H9GZCImv05kpcrQGSA9IkUjwKqK2HNZtF0g7VOFgTZAahNvKioKCnHev2Au4jlfAaAynRaGcKjsBtlUB4tHr9PHCPDxf3Qw9snUTuv+P6PtwnjGLcFVwWYzC8ylsT/fnzhWEeeRoJ/si6l5yIXIfj/bsOLy0eq5QVz2QWllc++7KDoi+4TUZ9TeE2o39/n/pvxcYVn6m7QEG6bduzpT8mOEPBz30wVPeHyrhyF4noOtzmVhBITFJsKFJQg90Dn/Y5FxGBCzaFbBQrmmyyt30gSNy8H/gavcuWhMJnPUolCQU57YPxH3pVJ
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(366004)(376002)(396003)(39860400002)(136003)(230922051799003)(186009)(64100799003)(451199024)(1800799009)(38100700002)(6666004)(478600001)(6512007)(6486002)(6506007)(86362001)(26005)(5660300002)(66556008)(8676002)(36756003)(66476007)(8936002)(44832011)(66946007)(4744005)(41300700001)(4326008)(316002)(6916009)(2906002)(83380400001)(1076003)(2616005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?3tcGNydpLkUIec5kCprwdGKom3q0/KulkV7Nm53Xg/otruT7lK/ugmWBJvqc?=
+ =?us-ascii?Q?H3cct/6FqoBLniuyacwdy7zl4osD/nXuz0o8/rYE4SiXhV30Qe4KjSqM4Hkq?=
+ =?us-ascii?Q?oni22CzzUwqiB5rDdg53VnUySaoB8NLVzS/9POONwUhHwG1TfgsDUh67MVxO?=
+ =?us-ascii?Q?6KlSwpCiZrEUiyrm/U3GbF22c5zGOGI4bQMO/ilSt4AfLR6dmMCctLPMh+vK?=
+ =?us-ascii?Q?mF7aREMtMro2ZcrpAM5too/lPrXE9fMKqyOetWy67IXItCPYYIi3ObfRddwN?=
+ =?us-ascii?Q?D44zO+YPkuqSkF+P4st9SKpc/wBQIGkHPwni1A0RE8/wgGH6g+i03cF58EL+?=
+ =?us-ascii?Q?LBUpkCpESdw2IyCJKx5yfP6kfPPbxQP+0J0mVsJBS6cqbPRdvnxA6LA7Te09?=
+ =?us-ascii?Q?VG8C/eWoyiGvUKQLZ43h4Az8bm8g9nPVFYYwwEjb1j+GvCaFEZ4HPdzMFGYX?=
+ =?us-ascii?Q?VLpBX6C8lCLeK0mnFRjQBJ+s7/atT9+3nXLEMW6AhGzgaecDSA8nysrauLKK?=
+ =?us-ascii?Q?vYBeWIbcXwDZfK2YFP67GpzNiBaUhpGSIcpS3oZDXXIXxf8kUbz704y/yB2B?=
+ =?us-ascii?Q?V35Ys0uy20ZDWCBPve3aOwBznApnmv+VeDtSdfTesU3mLm54LEL7avSQZUGa?=
+ =?us-ascii?Q?wHYaalN7qO50oF0FAXEI5Hx2x3uj6A80jiWm9xBuzzc/HEi9FG2PGws/bnmd?=
+ =?us-ascii?Q?iA5WsLfJlLpNEuEjSu3m9m5Pfn3brYPspAQW3QyxO2rdAnuRbkAHitai1ymx?=
+ =?us-ascii?Q?NxHvBW7Ap0ZBxlqvOCM3UXPI0eTMnVLeah/3lQ9AkqoAsibG+3ztQtDkxJ0o?=
+ =?us-ascii?Q?/YHpuYc4X4feOSFdjZktec4G2tWshQhUh2PCSlzKBtYUmWACTsQNeZJJYkgC?=
+ =?us-ascii?Q?0vHjDVEruEZ66oaxitODqTNMwar8bDlHnPPwuz60zU7jGeD3LSYikfWr4Jgc?=
+ =?us-ascii?Q?3HHAtidMPP8NkU2K5lNrlYmbDoiyd7sXBeXAtRUQ5efw2HfCHz9zHvuAw+WD?=
+ =?us-ascii?Q?mJAODNzEfShGOxvSOHKwefnZo15DBlHcgI7ipAHOLKPzus8EcU0aJcXgFiaE?=
+ =?us-ascii?Q?8R9b9mSJy/P1Spjjzkr/pvyfCTUg6fdHd68NXtrKoGpeolI/UgiRlomsnLQz?=
+ =?us-ascii?Q?37tPNVgtxCsXt7i1Q3v6P1V/AaWiVaKalxRUp+gtIj7wRXsibqgmNK9z1uJW?=
+ =?us-ascii?Q?L9AETtu/IpgjcbTLERAmap+SkLbieI9BcSOO8qVkyx6+DiHjIwVgie876Xgc?=
+ =?us-ascii?Q?+dJ2wDwnzwrvrX6FUnrtXUynxPOO2FA3pVrc4afXZ/hD7aanrlIKrZCmu6g8?=
+ =?us-ascii?Q?uWcNYh7Ub49h2ft2i92VJq9HVEK/uOIZ3iocRlycAIO9TrT+WL35UnZm0BfN?=
+ =?us-ascii?Q?/TpDu59heI4re1Guj+ODNUr5MjLoWtHqOrWq9bs+RSlMaLW+7g6yKUpqSk6w?=
+ =?us-ascii?Q?l+FtyndX/Dg+69I7GyeCIFFx/in+KLlmDmw/qcVOyxpghBeDX9VjUqOGnxiP?=
+ =?us-ascii?Q?NGVVGYeevLKeC8akc9Ya3CJbsT3whLK/UIER/RSPkbkQoHvRweObaI2LM65b?=
+ =?us-ascii?Q?vtSD5X1pmqLR+kq92uVH2vbOzTZ77VBkl3BKER+XK8E+oG1d3c65UDz+/cr2?=
+ =?us-ascii?Q?2A=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b716ddbd-349b-401e-52a4-08dbc02f3550
+X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8898.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Sep 2023 14:28:39.5076
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: VI5VxVdaxPCH8NEGYSnLjKbZ2/UZ/5CzQfloqQXMqzFOmpFQ8RLwU0ccyZAbRcwTmLi7L9mRgldHB+/JqR5BNQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB7619
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-It is possible that the Bluetooth management will receive scan enabled
-signal and LE meta events one by another without any delay. Since the
-start discovery procedure is performed in an asynchronous manner, it is
-possible that these HCI events will be processed concurrently by two
-different worker threads. In such case, it is possible that the LE meta
-event, which reports new device, will be discarded, because discovering
-is still in the starting state.
+Some BASS test scenarios require the BASS Server to only sync to the
+PA transmitted by a source, and not any BIS.
 
-The problem is most prominent with the btvirt userspace tool, which
-sends LE Meta events just after reporting scan as enabled. Testing
-scenario:
+This patch implements a test to exercise this scenario, where a broadcast
+receiver is able to successfully perform PA sync, without listening for
+any BIS.
 
-  1. Create two HCI interfaces:
-  > btvirt -l2
+Iulia Tanasescu (1):
+  iso-tester: Test bcast receiver with PA sync, no BIS
 
-  2. Setup BLE advertisement on hci1:
-  > bluetoothctl
-  >> select 00:AA:01:00:00:00
-  >> menu advertise
-  >> uuids 03B80E5A-EDE8-4B33-A751-6CE34EC4C700
-  >> discoverable on
-  >> back
-  >> advertise peripheral
+ tools/iso-tester.c | 41 +++++++++++++++++++++++++++++++++++------
+ 1 file changed, 35 insertions(+), 6 deletions(-)
 
-  3. Start scanning on hci2:
-  > bluetoothctl
-  >> select 00:AA:01:01:00:01
-  >> scan le
-  // From time to time, new device is not reported
 
-To make this issue 100% reproducible, one can simply add slight delay,
-e.g. msleep(100) at the beginning of the start_discovery_complete()
-function in the net/bluetooth/mgmt.c file.
-
-This patch adds synchronization for start discovery procedure and device
-found reporting by the Bluetooth management. In case of discovering
-being in the starting state, the worker which processes LE Meta event
-will wait for the cmd_sync_work on which the start discovery procedure
-is queued.
-
-Signed-off-by: Arkadiusz Bokowy <a.bokowy@samsung.com>
----
- include/net/bluetooth/hci_core.h |  5 +++++
- include/net/bluetooth/hci_sync.h |  1 +
- net/bluetooth/hci_sync.c         |  7 +++++++
- net/bluetooth/mgmt.c             | 17 +++++++++++++++--
- 4 files changed, 28 insertions(+), 2 deletions(-)
-
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index f36c1fd5d64e..456bbdf56246 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -916,6 +916,11 @@ static inline void hci_discovery_filter_clear(struct hci_dev *hdev)
- 
- bool hci_discovery_active(struct hci_dev *hdev);
- 
-+static inline bool hci_discovery_starting(struct hci_dev *hdev)
-+{
-+	return hdev->discovery.state == DISCOVERY_STARTING;
-+}
-+
- void hci_discovery_set_state(struct hci_dev *hdev, int state);
- 
- static inline int inquiry_cache_empty(struct hci_dev *hdev)
-diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
-index 6efbc2152146..67cf6689a692 100644
---- a/include/net/bluetooth/hci_sync.h
-+++ b/include/net/bluetooth/hci_sync.h
-@@ -43,6 +43,7 @@ void hci_cmd_sync_init(struct hci_dev *hdev);
- void hci_cmd_sync_clear(struct hci_dev *hdev);
- void hci_cmd_sync_cancel(struct hci_dev *hdev, int err);
- void __hci_cmd_sync_cancel(struct hci_dev *hdev, int err);
-+void hci_cmd_sync_flush(struct hci_dev *hdev);
- 
- int hci_cmd_sync_submit(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
- 			void *data, hci_cmd_sync_work_destroy_t destroy);
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 3640d73f9595..58905a5b7b1e 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -681,6 +681,13 @@ void hci_cmd_sync_cancel(struct hci_dev *hdev, int err)
- }
- EXPORT_SYMBOL(hci_cmd_sync_cancel);
- 
-+/* Wait for all pending HCI commands to complete.
-+ */
-+void hci_cmd_sync_flush(struct hci_dev *hdev)
-+{
-+	flush_work(&hdev->cmd_sync_work);
-+}
-+
- /* Submit HCI command to be run in as cmd_sync_work:
-  *
-  * - hdev must _not_ be unregistered
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index ba2e00646e8e..fc494348f2f7 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -10374,18 +10374,31 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- {
- 	struct sk_buff *skb;
- 	struct mgmt_ev_device_found *ev;
--	bool report_device = hci_discovery_active(hdev);
-+	bool report_device;
- 
- 	if (hci_dev_test_flag(hdev, HCI_MESH) && link_type == LE_LINK)
- 		mesh_device_found(hdev, bdaddr, addr_type, rssi, flags,
- 				  eir, eir_len, scan_rsp, scan_rsp_len,
- 				  instant);
- 
-+	/* Discovery start procedure is perfomed on a workqueue in an
-+	 * asynchronous manner. This procedure is finished when the scan
-+	 * enabled signal is received from the controller. Just after
-+	 * this signal, the controller might send another event (e.g. LE
-+	 * Meta). In such case, we need to make sure that the discovery
-+	 * procedure is finished, because otherwise we might omit some
-+	 * scan results.
-+	 */
-+	if (hci_discovery_starting(hdev))
-+		hci_cmd_sync_flush(hdev);
-+
-+	report_device = hci_discovery_active(hdev);
-+
- 	/* Don't send events for a non-kernel initiated discovery. With
- 	 * LE one exception is if we have pend_le_reports > 0 in which
- 	 * case we're doing passive scanning and want these events.
- 	 */
--	if (!hci_discovery_active(hdev)) {
-+	if (!report_device) {
- 		if (link_type == ACL_LINK)
- 			return;
- 		if (link_type == LE_LINK && !list_empty(&hdev->pend_le_reports))
+base-commit: 5ab5352531a9cc7058cce569607f3a6831464443
 -- 
-2.34.1
+2.39.2
 
