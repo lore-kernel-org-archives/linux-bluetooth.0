@@ -2,65 +2,68 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DC08E71D2B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Sep 2023 13:06:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8455AE71D2B
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Sep 2023 13:08:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233066AbjI2NG4 (ORCPT
+        id S233127AbjI2NIH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 29 Sep 2023 09:06:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57824 "EHLO
+        Fri, 29 Sep 2023 09:08:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232997AbjI2NGz (ORCPT
+        with ESMTP id S232803AbjI2NIH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 29 Sep 2023 09:06:55 -0400
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BC511A4
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Sep 2023 06:06:53 -0700 (PDT)
-Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-99bf3f59905so1868718366b.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Sep 2023 06:06:53 -0700 (PDT)
+        Fri, 29 Sep 2023 09:08:07 -0400
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B195B7
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Sep 2023 06:08:05 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-4064876e8b8so39252355e9.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Sep 2023 06:08:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695992811; x=1696597611; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=R4cXG9GUHshc9MmICiDCLZeSp6wrATCb1MedDKQCIpw=;
-        b=dg6jS/yF1zKlKjzLWHfTQk6aGWvIZjoeECi4sbAUaftB1cwhYwAd01dYnt6v7UTYeM
-         jL337gktqoJ1Ppgg8Gq8HA/VHQjFqbzImY2GBPsjCW4em/3xcQ5BS8JOLKTkaTv5cYsF
-         cGeRO8LSFedfbWh/RM4QQ1Jaf0+KxXCQLXYG8eyBG+BI0we+pl3/beEAzGYD5blVltjZ
-         atAh6v2Ob7zyNyNuZL2nxUhVEE53+psvbysUj5MhtH7VMllPm80sJsKdcIivpNFXkVpa
-         mMss5cZj4rmE3O9IhbrMXWGDfLlFq+f2JNykAnAnpAQumrU2yVJfbLqr8isKvIWp6U7y
-         w6mA==
+        d=gmail.com; s=20230601; t=1695992883; x=1696597683; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Sxc4agaIOHDfdQGAhSf2b1+Pi5vZPV6mJGvc4RbSvv4=;
+        b=iHmqtN3VD4fANclurlBzoVtOv7sXxS/+p49C92DWRNjbtfIlw/3qpJvlFpKHwYnwfo
+         yK8e1Hc/F/g2mDfiWmUv7jwhvs/CxFrDHjyB6kaYYoXbTJAmUFnI5U3s8KGDKN4NIMSC
+         zpeiW2UYPmH+x3Jyu5H+1s+A2q+KvA1BQzF5XZLkFX7ApL6U3LmipEBfd1n77iwvbNW8
+         34zAtXqsWN4GI2dbWzs9QVsL42rLGL4tzjVvP6+d6oKd1rcqxD0b6m/6wUUHIrKC3Ft2
+         KXL4XOoAutVnW/voo9uK5V4LuZe/csT/97s9jhGsSLqkceNWSS4wOcajJlj9F+4tu5DH
+         00OA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695992811; x=1696597611;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=R4cXG9GUHshc9MmICiDCLZeSp6wrATCb1MedDKQCIpw=;
-        b=nvGlrXy6EePRVxroseEPSNDktGTuHBmt9+Yw12TZReQJZp0VKCYHz5/OFXl+buoA1I
-         1i+jnihZjVkPu2C4e1a6O1I6BT7LIY8oXHxoWSRQlsZdZQ3poamdaVVQ1EKRnXTXIdCg
-         kXTSKQgDrYPdHk2hg7U9FDwZ2azKXrKXGeY04k92xd4TGeD690c6yzQCYtDkLt6/AgrB
-         scMS/5BrOqkObmrkmZlQgN5A8/m2naGO57w+jCzpUA4/t+6w1QI7JGN9LYDrXiPVBQah
-         Zb/PnjMpjGYbvjo44NSfLOTildPZz7Cy52Nh4o43o7qb6e8gzv/xpioh+qXmAfjofptB
-         n4og==
-X-Gm-Message-State: AOJu0YypQWPH2/iLkAIsF3GSYykvgXCwX0+63pBMpA4e1KAGr+Puh9ov
-        x9qRXvmXEpYdLtRr+Z4gIABIpx+lH2LAVg==
-X-Google-Smtp-Source: AGHT+IHrK55KuYLYKnNi0V6Trd/ecBUhsMB4rfy3bOXwK3aL+fWmb0hirZEbsd/2yGWB2Uv7dl9iNw==
-X-Received: by 2002:a17:906:8a64:b0:9a1:ff2f:28f1 with SMTP id hy4-20020a1709068a6400b009a1ff2f28f1mr4193663ejc.40.1695992811486;
-        Fri, 29 Sep 2023 06:06:51 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1695992883; x=1696597683;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Sxc4agaIOHDfdQGAhSf2b1+Pi5vZPV6mJGvc4RbSvv4=;
+        b=JbUtTc23ZuaN85jS4cacjf3QIFdR+1NEVq56dTDyN0Ozc2t05s1PfiuKo5CUAy98Sm
+         1a91DHJKtPg1b8yQgjbBRcwPamM70tLGUX1PwP0trE9ZSpRpGKOgVyWDKYNPOhHlHAZr
+         hGOFRYQgBR980PdRO6dxWhuzH5JaRWNXkj/yRHFBHSGsbeR90GoHSvs7nUii1fvMVsY3
+         Dy5RxM0tR6rMMm714PUc18d/E5/IYIhAXg19gy9rDI+Oa7Lqz3T1ArJgtW6CrSz7Zric
+         UAJ2ya6WJN0xvFRl+u1Drw9s+xiYmEkxB1Q9Pby1vMJYWSjl5c+kXPzU/ey17mc0Aybo
+         T+nw==
+X-Gm-Message-State: AOJu0YxYFUMQ9qERQ7xYieIWJo2A4FCI/e9KuDYCC4ldJ2t8vau3oCCS
+        aPf0vcsjD53e8Q6HjkuDiZJ13G9u0KNleQ==
+X-Google-Smtp-Source: AGHT+IHLc4o8vBrhiPxdHyqb3umeeiKJrMbn9rCVVrJpZCVvczrNJRhifRm8hfnAZQT6LVOWIDRKyg==
+X-Received: by 2002:a7b:ce8b:0:b0:402:98cd:a3e9 with SMTP id q11-20020a7bce8b000000b0040298cda3e9mr3887186wmj.32.1695992882014;
+        Fri, 29 Sep 2023 06:08:02 -0700 (PDT)
 Received: from vibhavp-vivobook.lan ([2401:4900:1c53:793f:bf1d:92a:6f4f:5e80])
-        by smtp.gmail.com with ESMTPSA id mh2-20020a170906eb8200b00992b2c55c67sm12422199ejb.156.2023.09.29.06.06.49
-        for <linux-bluetooth@vger.kernel.org>
+        by smtp.gmail.com with ESMTPSA id a6-20020a05600c224600b00403b63e87f2sm1409099wmm.32.2023.09.29.06.07.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Sep 2023 06:06:50 -0700 (PDT)
-From:   Vibhav Pant <vibhavp@gmail.com>
+        Fri, 29 Sep 2023 06:08:01 -0700 (PDT)
+From:   vibhavp@gmail.com
 To:     linux-bluetooth@vger.kernel.org
+Cc:     Vibhav Pant <vibhavp@gmail.com>
 Subject: [PATCH BlueZ v2 1/2] adapter: Add Version and Manufacturer props to org.bluez.Adapter1.
-Date:   Fri, 29 Sep 2023 18:35:52 +0530
-Message-ID: <20230929130622.146306-2-vibhavp@gmail.com>
+Date:   Fri, 29 Sep 2023 18:37:24 +0530
+Message-ID: <20230929130742.146571-1-vibhavp@gmail.com>
 X-Mailer: git-send-email 2.42.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
+
+From: Vibhav Pant <vibhavp@gmail.com>
 
 This allows DBus clients to find an adapter's version and
 manufacturer company code without querying the management API.
