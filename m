@@ -2,101 +2,158 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01148E728CC
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Sep 2023 17:38:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01BAEE77371
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 30 Sep 2023 12:53:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232954AbjI2Rin (ORCPT
+        id S234010AbjI3Mxq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 29 Sep 2023 13:38:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54902 "EHLO
+        Sat, 30 Sep 2023 08:53:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233144AbjI2Ril (ORCPT
+        with ESMTP id S233939AbjI3Mxp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 29 Sep 2023 13:38:41 -0400
-Received: from mail-vk1-xa2c.google.com (mail-vk1-xa2c.google.com [IPv6:2607:f8b0:4864:20::a2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E8F1CF5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Sep 2023 10:28:58 -0700 (PDT)
-Received: by mail-vk1-xa2c.google.com with SMTP id 71dfb90a1353d-49040dc5cedso5516155e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Sep 2023 10:28:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696008537; x=1696613337; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=xYywyKa19YLjfKbNEYbxlOxmDJfb0PD6Yi+sQ7JET3c=;
-        b=SAQMbf4+U1Nu2QYjXZwsQf5qUxGXyfbIzU4Zs7rc2Y5mmM2oW3Gtj5NvfF97zjRTEX
-         MZncpmuSit9yebMVTfxrrehI7CqtKLpq8udc+ay2HluLXC22dQKV0BZkT4aQf8MPWypu
-         5IJg3cC5KTcsQtZyv+fhY12m9trsfwbLE+irAeKQ4kxjhbDgd+gzunjoJtwTl8qC9CFX
-         FnngGEUUnffdxU+DFgZFlDBgUfbNS8WIrNses/IdRL/Bt3cHQJSdihGmQbmrjHCkHoBS
-         cE1J7NiVGx7kzUfDp6pbEv1iXObpcKE1g5oh20tXLB92Bu7dQq9UPTeCnxtbwsN2nE5B
-         SaUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696008537; x=1696613337;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xYywyKa19YLjfKbNEYbxlOxmDJfb0PD6Yi+sQ7JET3c=;
-        b=hXSdbxknayUxxrRPSGTnqpw1+ToE9vNa6L4pMSI+gctt6Mjg94flLk2ua+HN6fW3QU
-         ORZXkSNTu7+a6szvwVC5DggrYHbM8pQzawnm7l3diKbWqJdG9n/QqMSm5YMIWPJ2G2xP
-         EdBD3dpsgaUuz5olI0gdDwdBWKHRKVvIlHdcYCCv2kvFcM7xx/V4uKODtH7lj3Sw5eUP
-         4hVIEtnAzbCNnxEKPcEw+nj/uF1XBNFNEiVklsVbFndQr8GPqyizhbW4I9pT5J6txvAx
-         55BDcviRd06YXMvOLQoMYeQ7d3rwQWbARwLMSTEpEkR/BFWje+9B/qxP/30Pac8ze1Ky
-         YEUw==
-X-Gm-Message-State: AOJu0YwLdUqpz5LD8Z5JyPk0oJ+b6+QE9MW/I4mh8k97UY6cq13RG/Jy
-        se8eb8YskGs5B8JIHYu5HsJd3vLT0G4=
-X-Google-Smtp-Source: AGHT+IG82Fq89NuP2t1RQ0QPT2yshvadKrtY5oeNOBtV+6SjkNI0Y/jKp7f8Ekib4VbqMpFdefi4jw==
-X-Received: by 2002:a1f:e3c4:0:b0:49a:b737:4df7 with SMTP id a187-20020a1fe3c4000000b0049ab7374df7mr4487089vkh.5.1696008537383;
-        Fri, 29 Sep 2023 10:28:57 -0700 (PDT)
-Received: from [172.17.0.2] ([20.57.41.139])
-        by smtp.gmail.com with ESMTPSA id w3-20020ac87e83000000b0040ff0e520besm6970031qtj.35.2023.09.29.10.28.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Sep 2023 10:28:56 -0700 (PDT)
-Message-ID: <65170958.c80a0220.30ebe.c6af@mx.google.com>
-Date:   Fri, 29 Sep 2023 10:28:56 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3935823532666915494=="
+        Sat, 30 Sep 2023 08:53:45 -0400
+Received: from meesny.iki.fi (meesny.iki.fi [IPv6:2001:67c:2b0:1c1::201])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92F96E6
+        for <linux-bluetooth@vger.kernel.org>; Sat, 30 Sep 2023 05:53:43 -0700 (PDT)
+Received: from monolith.lan (91-152-120-176.elisa-laajakaista.fi [91.152.120.176])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pav)
+        by meesny.iki.fi (Postfix) with ESMTPSA id 4RyRwh2l9kzyXv;
+        Sat, 30 Sep 2023 15:53:39 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+        t=1696078420;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=/AMsXO9IMyLMxzv4Xz4AhWb5QaTAdBihj6zISEM8lVk=;
+        b=iionRygwcN/sp3O8e4Lpir+z3zyKdiNvSQyxku8ophR+kOGlQqiROCybC0SBp+GORHZSTD
+        5WwgUzDIr4WUycNpBzj+IUBcA3I+LN3IrlSKyaqe0lVCIaz0wUG/WFaj8dbmiu2bhDNT2o
+        XCcfdSNhp6YAByNzDPaRlirO2/BtFBM=
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1696078420; a=rsa-sha256; cv=none;
+        b=Ixbw3tXqKJOMR/XS2wG3R1i5HJxPb+EPCBXWh3DEz6C3F4DZEB/OwzZV7DcoQxGYjRSuZv
+        999+ok0y70sTnQ5uWZcS7lNbNO/5QcM5iiupaROHidY5ekqALzpqYa4N1kptu5BGUht9Wd
+        VRLe/EOYcBPY/VrrSGRrqMXzTV/zqyo=
+ARC-Authentication-Results: i=1;
+        ORIGINATING;
+        auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+        s=meesny; t=1696078420;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=/AMsXO9IMyLMxzv4Xz4AhWb5QaTAdBihj6zISEM8lVk=;
+        b=jsY263zxdi7NpCV/QRs6l3OwiKVANsa8dwvnGUxcnUVTix3x78nrbQurSAaSIO4rt1666X
+        hEGMY723/Dlxqvnx0LUKDebgdiYSLwwOt0kgrz7yuZMQAmbPHTZMLIgNr6x/BHKyuZjN8B
+        W+fCfhBjVP5R3qmsf9sZBLtq4xNFobc=
+From:   Pauli Virtanen <pav@iki.fi>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH v2 1/2] Bluetooth: hci_sync: always check if connection is alive before deleting
+Date:   Sat, 30 Sep 2023 15:53:32 +0300
+Message-ID: <53130b4a5fb21a15f2674c336282d25ef5d2232e.1696077070.git.pav@iki.fi>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com
-Subject: RE: iso-tester: Add test for bcast AC 13 BIS unset
-In-Reply-To: <20230929154421.3820-2-iulia.tanasescu@nxp.com>
-References: <20230929154421.3820-2-iulia.tanasescu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3935823532666915494==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+In hci_abort_conn_sync it is possible that conn is deleted concurrently
+by something else, also e.g. when waiting for hdev->lock.  This causes
+double deletion of the conn, so UAF or conn_hash.list corruption.
 
-This is automated email and please do not reply to this email!
+Fix by having all code paths check that the connection is still in
+conn_hash before deleting it, while holding hdev->lock which prevents
+any races.
 
-Dear submitter,
+Log (when powering off while BAP streaming, occurs rarely):
+=======================================================================
+kernel BUG at lib/list_debug.c:56!
+...
+ ? __list_del_entry_valid (lib/list_debug.c:56)
+ hci_conn_del (net/bluetooth/hci_conn.c:154) bluetooth
+ hci_abort_conn_sync (net/bluetooth/hci_sync.c:5415) bluetooth
+ ? __pfx_hci_abort_conn_sync+0x10/0x10 [bluetooth]
+ ? lock_release+0x1d5/0x3c0
+ ? hci_disconnect_all_sync.constprop.0+0xb2/0x230 [bluetooth]
+ ? __pfx_lock_release+0x10/0x10
+ ? __kmem_cache_free+0x14d/0x2e0
+ hci_disconnect_all_sync.constprop.0+0xda/0x230 [bluetooth]
+ ? __pfx_hci_disconnect_all_sync.constprop.0+0x10/0x10 [bluetooth]
+ ? hci_clear_adv_sync+0x14f/0x170 [bluetooth]
+ ? __pfx_set_powered_sync+0x10/0x10 [bluetooth]
+ hci_set_powered_sync+0x293/0x450 [bluetooth]
+=======================================================================
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=788861
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.58 seconds
-GitLint                       PASS      0.41 seconds
-BuildEll                      PASS      34.53 seconds
-BluezMake                     PASS      1025.19 seconds
-MakeCheck                     PASS      14.25 seconds
-MakeDistcheck                 PASS      201.02 seconds
-CheckValgrind                 PASS      317.96 seconds
-CheckSmatch                   PASS      422.61 seconds
-bluezmakeextell               PASS      131.40 seconds
-IncrementalBuild              PASS      835.38 seconds
-ScanBuild                     PASS      1311.41 seconds
-
-
-
+Fixes: 94d9ba9f9888 ("Bluetooth: hci_sync: Fix UAF in hci_disconnect_all_sync")
+Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
-Regards,
-Linux Bluetooth
 
+Notes:
+    v2: rebased
 
---===============3935823532666915494==--
+ net/bluetooth/hci_sync.c | 26 ++++++++++++--------------
+ 1 file changed, 12 insertions(+), 14 deletions(-)
+
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 3640d73f9595..c6f57af88bfd 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -5380,6 +5380,7 @@ int hci_abort_conn_sync(struct hci_dev *hdev, struct hci_conn *conn, u8 reason)
+ {
+ 	int err = 0;
+ 	u16 handle = conn->handle;
++	bool disconnect = false;
+ 	struct hci_conn *c;
+ 
+ 	switch (conn->state) {
+@@ -5395,24 +5396,15 @@ int hci_abort_conn_sync(struct hci_dev *hdev, struct hci_conn *conn, u8 reason)
+ 		break;
+ 	case BT_OPEN:
+ 	case BT_BOUND:
+-		hci_dev_lock(hdev);
+-		hci_conn_failed(conn, reason);
+-		hci_dev_unlock(hdev);
+-		return 0;
++		break;
+ 	default:
+-		hci_dev_lock(hdev);
+-		conn->state = BT_CLOSED;
+-		hci_disconn_cfm(conn, reason);
+-		hci_conn_del(conn);
+-		hci_dev_unlock(hdev);
+-		return 0;
++		disconnect = true;
++		break;
+ 	}
+ 
+ 	hci_dev_lock(hdev);
+ 
+-	/* Check if the connection hasn't been cleanup while waiting
+-	 * commands to complete.
+-	 */
++	/* Check if the connection has been cleaned up concurrently */
+ 	c = hci_conn_hash_lookup_handle(hdev, handle);
+ 	if (!c || c != conn) {
+ 		err = 0;
+@@ -5424,7 +5416,13 @@ int hci_abort_conn_sync(struct hci_dev *hdev, struct hci_conn *conn, u8 reason)
+ 	 * or in case of LE it was still scanning so it can be cleanup
+ 	 * safely.
+ 	 */
+-	hci_conn_failed(conn, reason);
++	if (disconnect) {
++		conn->state = BT_CLOSED;
++		hci_disconn_cfm(conn, reason);
++		hci_conn_del(conn);
++	} else {
++		hci_conn_failed(conn, reason);
++	}
+ 
+ unlock:
+ 	hci_dev_unlock(hdev);
+-- 
+2.41.0
+
