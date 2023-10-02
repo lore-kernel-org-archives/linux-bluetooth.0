@@ -2,176 +2,154 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CE5CE776D1
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Oct 2023 23:22:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80A3CE776D4
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Oct 2023 23:47:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229675AbjJBXWn (ORCPT
+        id S230046AbjJBXrI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 2 Oct 2023 19:22:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40922 "EHLO
+        Mon, 2 Oct 2023 19:47:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237155AbjJBXWm (ORCPT
+        with ESMTP id S229549AbjJBXrI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 2 Oct 2023 19:22:42 -0400
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7F0FDD
-        for <linux-bluetooth@vger.kernel.org>; Mon,  2 Oct 2023 16:22:39 -0700 (PDT)
-Received: by mail-lj1-x231.google.com with SMTP id 38308e7fff4ca-2c012232792so3359991fa.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Oct 2023 16:22:39 -0700 (PDT)
+        Mon, 2 Oct 2023 19:47:08 -0400
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29DDA83;
+        Mon,  2 Oct 2023 16:47:05 -0700 (PDT)
+Received: by mail-pg1-x536.google.com with SMTP id 41be03b00d2f7-578b4997decso186005a12.0;
+        Mon, 02 Oct 2023 16:47:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696288958; x=1696893758; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5XIJtX1EAuQjwSpl0j0+OjDfDYaeOZIQiAK0siVjdD0=;
-        b=mjqJ7QphVVVv24SBGJX8mAl96Xw5Z8mikGo7hbtpkp54gDdLNwxo2Yn4bac3ffiAUj
-         i9OxIfdYW6PAvylZ8jYSPDvEbStKSc7ifqvTnyXBYoK+1LKTw5l2GX9dzQ9hG0eg3n3R
-         fwlvkmj6FzsonRggtAfQQMonSngJ02hSKqZefwfp7E0vFkARNwtdrCvElDtx7HgnRi9F
-         X4s/8X01CWiN2+Dd+ERysegADnrrgZvIJ2FpbgHpPLMnVN17vyZ3g/wW5tyipk7HAPcG
-         M5DoiZmqZAFtC0/tzyEDO9O67xPKPT3/FKMMD3KV2Teac/TqfUh0MQUC0ghmOGmrDODO
-         a4Vg==
+        d=gmail.com; s=20230601; t=1696290424; x=1696895224; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MsrzhgDbcJtwYX/2EGwafIR0w5juOFXJIQAbPgvHjTw=;
+        b=BNSzChieo1c8zE1ZESxP6nS9C1dZj3+U/zZh8dQO/EIFTc9BygTKvbStJ0QubiPjVO
+         MZWdunWKvI50eGCFKxWO/kzTiIgioa2Wvfl8iyX7ufSxL4jBWnJ1LVwobMh+mdmqYnJS
+         mwnxA9mr53RiVdpoYYty3GOx1Np5XmUmdxolIKcTSY0YK3k+y/6o3Ww8Zy+y87vcZ5Lp
+         m2VluND9St5oi2ShkwZay6PHuKf1xw4GgEQ2TDTUsbPHvAD0vX7uSypyY5cBNKnSgduG
+         V6gKz4eTlsoLe4RgB/Eh4afmlO4s++gODKpFK3Cf7ky3RCrtxPwsEDxXC8aATEP76W2a
+         pWvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696288958; x=1696893758;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5XIJtX1EAuQjwSpl0j0+OjDfDYaeOZIQiAK0siVjdD0=;
-        b=hq8evtC5DOF2kifpkrd7O2zpqY5r2B2pTMogTiWFY+gkaor0oIuVxYMjhLaMVf41i4
-         cFPpBh8ykA1SiIe9u7xN8HrekxnVu+Fo7ZSm3NYafYf/NfbKRumyO7n8Bjp8+nCj2pc2
-         LnyVx+iCPY5MoH9dEQpQh7rU1mA9m3j3tld/VCrV0J9TFJ+9CQcvNMaar0rEdrOCmXOM
-         H/oCjk9onRjC0SFQORqH26vNLgTU9B8l6qVVDtz+Mte/xRD94c0MdWj9FA/6PlFytF2v
-         gERoWB/lj46Rwkz7kaXYV0NVBQdqZVvmyr8iaER20WMvpwLyFW0YgqbZ+lmB1828BuR1
-         Guqg==
-X-Gm-Message-State: AOJu0YyR9ZDzq6CgdJI1YPa6HQqdCIiZw7s5pZuifnoLqE7cKMgM8Xxf
-        ppbwO/KuamC0AhN4LfYgeDnE8qb6Td0804bjXGW4VOU7nmyyOQ==
-X-Google-Smtp-Source: AGHT+IHn2eXVJmOx7+CcMGFcH6j5dz7pqSxym52Lh3UTap4VtdLoGZfAitcxHoKuo5ZVo8jI+ZNk2YuGIVWJ+sW6uz0=
-X-Received: by 2002:a2e:bc27:0:b0:2c2:966f:8cc with SMTP id
- b39-20020a2ebc27000000b002c2966f08ccmr7129745ljf.0.1696288957796; Mon, 02 Oct
- 2023 16:22:37 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1696290424; x=1696895224;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MsrzhgDbcJtwYX/2EGwafIR0w5juOFXJIQAbPgvHjTw=;
+        b=AX4NzU/c4tdYrJ2IXmVjY1O2HYoKhcwsQzv5AbyVARFMLS2+L7wbqI4UK4U2XOsNWR
+         I421oAi5LuA0HGsyFOoYmtIaLqu3JN5uoQEvp4M0ShM2OD+RDcHivoTOZZaIYF18HQSl
+         5zLsSjVGab/IyY27kyRLbZ3VC1AyV9A3X8B1DNIUg6rR5X3B/31qIDwCBj5fjBiJhsEG
+         p/MUXqb1v162tvJuJ3hu4Q0SLub2IpaEP3Qh9lQgI4phDutbpOWmfyQK/kPb1ZyH8/S+
+         fknZ/MAJNOCfZkpQ3oALsmh7044X5ZX+uCCflJUgp58orcoD0+7IL48JdxorSCYeysab
+         7Bqg==
+X-Gm-Message-State: AOJu0YypGlm7iznDNKlwe8PoNFF8hSEB8pbIUU8GU6v4y6IpIfNe/G+e
+        XiBhjhwq4MzDhaTUPIzUK0Y=
+X-Google-Smtp-Source: AGHT+IEBCTbSZM/8E/uKaeav4fYt2K5qKUh3CuUFJFJQXANJT3CbxyYRJqvtwNk3zj/OuJrUW2TzCQ==
+X-Received: by 2002:a17:90b:1194:b0:269:32d2:5ac4 with SMTP id gk20-20020a17090b119400b0026932d25ac4mr13277538pjb.25.1696290424438;
+        Mon, 02 Oct 2023 16:47:04 -0700 (PDT)
+Received: from debian.me ([103.131.18.64])
+        by smtp.gmail.com with ESMTPSA id ft13-20020a17090b0f8d00b00276b60aa43bsm6884452pjb.17.2023.10.02.16.47.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Oct 2023 16:47:03 -0700 (PDT)
+Received: by debian.me (Postfix, from userid 1000)
+        id 8117881A3121; Tue,  3 Oct 2023 06:46:58 +0700 (WIB)
+Date:   Tue, 3 Oct 2023 06:46:58 +0700
+From:   Bagas Sanjaya <bagasdotme@gmail.com>
+To:     Erik =?utf-8?B?RG9iw6Fr?= <erik.dobak@gmail.com>,
+        Linux Stable <stable@vger.kernel.org>,
+        Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Mediatek <linux-mediatek@lists.infradead.org>,
+        Linux Regressions <regressions@lists.linux.dev>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        AngeloGioacchino Del Regno 
+        <angelogioacchino.delregno@collabora.com>,
+        Tomasz =?utf-8?Q?Mo=C5=84?= <tomasz.mon@nordicsemi.no>
+Subject: Re: bluetooth issues since kernel 6.4 - not discovering other bt
+ devices - /linux/drivers/bluetooth/btusb.c
+Message-ID: <ZRtWcgiH5JhD5NU2@debian.me>
+References: <CAH7-e5sb+kT_LRb1_y-c5JaFN0=KrrRT97otUPKzTCgzGsVdrQ@mail.gmail.com>
 MIME-Version: 1.0
-References: <53130b4a5fb21a15f2674c336282d25ef5d2232e.1696077070.git.pav@iki.fi>
- <fd9c0f0eddb8a7d73e9797568dc3cf2bc9b8ad62.1696077070.git.pav@iki.fi>
-In-Reply-To: <fd9c0f0eddb8a7d73e9797568dc3cf2bc9b8ad62.1696077070.git.pav@iki.fi>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 2 Oct 2023 16:22:25 -0700
-Message-ID: <CABBYNZKcTxZ916gdjCSWe6j+9JJ=Jz-Yazfm5bu-vzNss8U9oQ@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] Bluetooth: hci_conn: verify connection is to be
- aborted before doing it
-To:     Pauli Virtanen <pav@iki.fi>
-Cc:     linux-bluetooth@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        syzbot+a0c80b06ae2cb8895bc4@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="fW063juLwqeEFwfL"
+Content-Disposition: inline
+In-Reply-To: <CAH7-e5sb+kT_LRb1_y-c5JaFN0=KrrRT97otUPKzTCgzGsVdrQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Pauli,
 
-On Sat, Sep 30, 2023 at 3:25=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote:
->
-> There is a race condition where a connection handle is reused, after
-> hci_abort_conn but before abort_conn_sync is processed in hci_sync. In
-> this case, hci_abort_conn_sync ends up working on the wrong connection,
-> which can have abort_reason=3D=3D0, in which case hci_connect_cfm is call=
-ed
-> with success status and then connection is deleted, which causes various
-> use-after-free.
->
-> Fix by checking abort_reason is nonzero before calling
-> hci_abort_conn_sync. If it's zero, then the connection is probably a
-> different one than we expected and should not be aborted.
->
-> Also fix some theoretical UAF / races, where something frees the conn
-> while hci_abort_conn_sync is working on it.
->
-> Fixes: a13f316e90fd ("Bluetooth: hci_conn: Consolidate code for aborting =
-connections")
-> Reported-by: syzbot+a0c80b06ae2cb8895bc4@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/linux-bluetooth/0000000000005ab9840603715=
-83e@google.com/
-> Signed-off-by: Pauli Virtanen <pav@iki.fi>
-> ---
->
-> Notes:
->     v2: drop one probably not necessary WARN_ON
->
->     Not sure how you'd hit this condition in real controller, but syzbot
->     does end up calling hci_abort_conn_sync with reason =3D=3D 0 which th=
-en
->     causes havoc.
->
->     This can be verified: with a patch that changes abort_conn_sync to
->
->         2874    conn =3D hci_conn_hash_lookup_handle(hdev, handle);
->         2875    if (!conn || WARN_ON(!conn->abort_reason))
->         2876            return 0;
->
->     https://syzkaller.appspot.com/text?tag=3DPatch&x=3D16eff740680000
->
->     it hits that WARN_ON:
->
->     https://syzkaller.appspot.com/x/log.txt?x=3D10affb97a80000
->
-> #syz test git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetoo=
-th-next.git master
->
->  net/bluetooth/hci_conn.c | 17 ++++++++++++++++-
->  1 file changed, 16 insertions(+), 1 deletion(-)
->
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index e62a5f368a51..22de82071e35 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -2901,12 +2901,25 @@ static int abort_conn_sync(struct hci_dev *hdev, =
-void *data)
->  {
->         struct hci_conn *conn;
->         u16 handle =3D PTR_UINT(data);
-> +       u8 reason;
-> +       int err;
-> +
-> +       rcu_read_lock();
->
->         conn =3D hci_conn_hash_lookup_handle(hdev, handle);
-> +       if (conn) {
-> +               reason =3D READ_ONCE(conn->abort_reason);
-> +               conn =3D reason ? hci_conn_get(conn) : NULL;
-> +       }
-> +
-> +       rcu_read_unlock();
-> +
->         if (!conn)
->                 return 0;
->
-> -       return hci_abort_conn_sync(hdev, conn, conn->abort_reason);
-> +       err =3D hci_abort_conn_sync(hdev, conn, reason);
-> +       hci_conn_put(conn);
-> +       return err;
->  }
->
->  int hci_abort_conn(struct hci_conn *conn, u8 reason)
-> @@ -2918,6 +2931,8 @@ int hci_abort_conn(struct hci_conn *conn, u8 reason=
-)
->          */
->         if (conn->abort_reason)
->                 return 0;
-> +       if (WARN_ON(!reason))
-> +               reason =3D HCI_ERROR_UNSPECIFIED;
->
->         bt_dev_dbg(hdev, "handle 0x%2.2x reason 0x%2.2x", conn->handle, r=
-eason);
->
-> --
-> 2.41.0
+--fW063juLwqeEFwfL
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Don't really like where this is going, the culprit here seems that we
-are not able to cancel the callback when freeing the hci_conn so it
-stays enqueued while the new connection is created with the same
-handle, so I think we need to introduce a function that cancel queued
-like Ive sent sometime back, that way we don't need to keep trying to
-check if it is the same connection or not.
+On Sun, Oct 01, 2023 at 07:47:54AM +0200, Erik Dob=C3=A1k wrote:
+> Hello!
+>=20
+> I bought a new laptop fujitsu life book and everything is going fine
+> on artix just the bt makes trouble:
+>=20
+> /var/log/error.log
+> Sep 30 18:43:48 nexus bluetoothd[2266]:
+> src/adapter.c:reset_adv_monitors_complete() Failed to reset Adv
+> Monitors: Failed (0x03)
+> Sep 30 18:43:48 nexus bluetoothd[2266]: Failed to clear UUIDs: Failed (0x=
+03)
+> Sep 30 18:43:48 nexus bluetoothd[2266]: Failed to add UUID: Failed (0x03)
+> Sep 30 18:43:48 nexus bluetoothd[2266]: Failed to add UUID: Failed (0x03)
+>=20
+> i searched a bit the webs and found a new commit at kernel org that
+> does do the trouble:
+> https://bugs.archlinux.org/task/78980
+>=20
+> follow the linkeys inside the commits there or read this one:
+>=20
+> ---------------before------------------------------------
+> /* interface numbers are hardcoded in the spec */
+>         if (intf->cur_altsetting->desc.bInterfaceNumber !=3D 0) {
+>                 if (!(id->driver_info & BTUSB_IFNUM_2))
+>                         return -ENODEV;
+>                 if (intf->cur_altsetting->desc.bInterfaceNumber !=3D 2)
+>                         return -ENODEV;
+>         }
+> -----------after----------------------------------------------------
+> if ((id->driver_info & BTUSB_IFNUM_2) &&
+>     (intf->cur_altsetting->desc.bInterfaceNumber !=3D 0) &&
+>     (intf->cur_altsetting->desc.bInterfaceNumber !=3D 2))
+> return -ENODEV;
+> --------------------------------------------------------
+>=20
+> the dude just hooked up 3 conditions in a row with && where before it
+> was 2 conditions in 1 condition. + the comment was removed.
+>=20
+>=20
 
+Try latest mainline first (currently v6.6-rc4). Because you have to
+compile your own kernel, please refer to
+Documentation/admin-guide/quickly-build-trimmed-linux.rst if you don't know=
+ how to do the compilation.
+
+Also, don't top-post when replying; reply inline with appropriate context
+instead.
+
+Thanks.
 
 --=20
-Luiz Augusto von Dentz
+An old man doll... just what I always wanted! - Clara
+
+--fW063juLwqeEFwfL
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZRtWagAKCRD2uYlJVVFO
+o0d+AP4oNwd9Cjay1Ao/Mm5lLmmn0rZYovuJO9UIOSdBN/w/sAEAuTvELS2Y3NZ+
+a45nNYc16F/Qn5lYdAjNfJcrgNQwyQE=
+=X3ML
+-----END PGP SIGNATURE-----
+
+--fW063juLwqeEFwfL--
