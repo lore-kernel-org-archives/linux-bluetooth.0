@@ -2,61 +2,61 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3147BE776CB
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Oct 2023 23:13:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31D06E776D4
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Oct 2023 23:13:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237218AbjJBXN0 (ORCPT
+        id S237222AbjJBXN1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 2 Oct 2023 19:13:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57310 "EHLO
+        Mon, 2 Oct 2023 19:13:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237222AbjJBXNZ (ORCPT
+        with ESMTP id S237244AbjJBXN0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 2 Oct 2023 19:13:25 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98140D7
-        for <linux-bluetooth@vger.kernel.org>; Mon,  2 Oct 2023 16:13:21 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1c723f1c80fso2579945ad.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Oct 2023 16:13:21 -0700 (PDT)
+        Mon, 2 Oct 2023 19:13:26 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A835DD
+        for <linux-bluetooth@vger.kernel.org>; Mon,  2 Oct 2023 16:13:23 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-690d2e13074so239508b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Oct 2023 16:13:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696288400; x=1696893200; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1696288402; x=1696893202; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=jTfkD4LB0wR3NJmaf5Zf1JnCjxtvsB7d6ETy73XgILw=;
-        b=Eo5qjrkdYurH+JaU9Fh+52dpH6uZJD6BUlnU+o1UDVMY6AHM2hQ7Inl3YbSjd3JfIw
-         iCCxC/PdZBOzvjJv0wOGQ6lBo8VR91qWpXQ+SxDoANerKHbwEB2PBmWPjDWWaOAe8MGE
-         Epv7p/NVZtH0v5TXSvkBZupTV02ggUdqiaZjgamtM7qG9GJo3VMtlDxhLX//BdN1B1dY
-         irNHVEVOrZGKfj8RR+lfbkc7J3+WcBGm0dsf+BVWdfK6ZoB4T0b+eye1FYgGuBwbSe+Q
-         /M1KgQqlduwH2wMul8z0tDaq5MjOtrGw1UKTEq12ggResSSVyURF8v6s+LGdeDB1g9+G
-         NorQ==
+        bh=9bOC1VWOkzWPvLAfHiyqGBjBEjQKxpPMPr3QmumM+hI=;
+        b=gEuvx4kwefP7Q0Pn5wMil5iyl4ZDcWOjNq1tGputuspprYE1axPR3E3YUsa+pHkuCd
+         1O9EW4rnAGFnT/RJ/VR4Lahr15aBQE8N93lmm6NujVJ4vdTNxOfhxH2UMhBhIlQSwjBk
+         9rEi3ui03UytE552b9icQfPGhE+C+kCVz4pbqXx4l1HM5BAl1pOwCAemBBGl32Zv70TD
+         RzxsM9QaJ2y3y2timLDwmgJiVcdKuGNT4VbRlSsPsqsn31kL3qyES9noSNKjhpI4mX4d
+         TYCgWeyzjxbhWZdJJ6T/rv3b8XnaJLtf2HT9pWdmpELIHMvy58k4f9sEikJM3CwGNmqS
+         xFDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696288400; x=1696893200;
+        d=1e100.net; s=20230601; t=1696288402; x=1696893202;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jTfkD4LB0wR3NJmaf5Zf1JnCjxtvsB7d6ETy73XgILw=;
-        b=kYbEP5E1zLVqB09jFYJas5/b6oE42C+Wsl4nSleLxhe4ntZd3uBgMDqcq7tlbMbq/a
-         1Qwbqla59pjL6L0AfzzSVsRgdbbQgqgAE6siFYpdfgxpWHoQjhro2UvtGH17kn0YGQ5p
-         dQMzkoTP2Z1EdD2AY04mOKvTqXM/U18UVj5Vum2+jCXND4GWzbAmWXMDBXnPDe6jZX/P
-         OfEDMR4IDMGVbSFVcH2hrmUFJ/RtrxEr7bmdbPEJyjZyVD7Ov89MkqXVAaQgs3qtk8VQ
-         VThd+Ss/yDWyRc+k6cOt0w8VQqnX5aQvx1UxsvHRvogBez17X3lqzii+k7py9LEZifNc
-         5dGw==
-X-Gm-Message-State: AOJu0YwMm2C6yqp2gJBT8bsXMURhUZ9TCN6F2gioibsymLKCrJ1s1WAv
-        cboN0j6yQxXXZyPonlF+LB5mpSmRMnnDQDH0
-X-Google-Smtp-Source: AGHT+IHWbavW4s0LKB4zGTtVMv+IMcrWnXJtoPXE3u30Uud5xHLT1f+F5vRdWWlzV3PdSL+6/iL9Cg==
-X-Received: by 2002:a17:902:c409:b0:1c5:ea60:85c1 with SMTP id k9-20020a170902c40900b001c5ea6085c1mr13693506plk.12.1696288400148;
-        Mon, 02 Oct 2023 16:13:20 -0700 (PDT)
+        bh=9bOC1VWOkzWPvLAfHiyqGBjBEjQKxpPMPr3QmumM+hI=;
+        b=uBRvgwm2cTvJFoHpsU++YMW2AcpVOU6aH63IoTEy7wOVs4jGGRis+f7i4aphc4MyFv
+         Rm7NtrFUYCxisyCEjPCIrek0e9PnOg7crzorbXwwxtDgoQEA4uOYK/jR+X4IcMD1z9FT
+         mGdcEY7tV9wJvCtLmUuYRnjQqUwQnNYr6053BhNJzJrJmuOhkOwPM5gQ2s30wX09uIBa
+         2QEkM24sNIoYGwQVtq4rbpcGM1nNw7UItu5nBZFtPnhG2Vpox7aaR5K8JBvi+hLXT6Oo
+         YXg9jiKl53Qgi3+mP3wHqCi9x+N0T36h43keBp78fH6U5DwhWlEtpdb843LDTPP7aZ9I
+         pqKQ==
+X-Gm-Message-State: AOJu0YxgeQdfeHMz3Ddzr+3NT5MoTO8fyWrib5J87d1VuJAC9QpxbF3n
+        TXCRJovk02Q+D9Mrz26RSHeYX/cpVt1jAZOv
+X-Google-Smtp-Source: AGHT+IGtye+3+8UyljIW0DCUmMZilPydAwhorVqjGSypd/sULvlUnpocYvlmwe/DCS4zI6ZjG8j8eQ==
+X-Received: by 2002:a05:6a21:a590:b0:160:8984:6cc6 with SMTP id gd16-20020a056a21a59000b0016089846cc6mr14298969pzc.58.1696288401985;
+        Mon, 02 Oct 2023 16:13:21 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-98-232-221-87.hsd1.or.comcast.net. [98.232.221.87])
-        by smtp.gmail.com with ESMTPSA id l11-20020a170902d34b00b001c75627545csm5181817plk.135.2023.10.02.16.13.18
+        by smtp.gmail.com with ESMTPSA id l11-20020a170902d34b00b001c75627545csm5181817plk.135.2023.10.02.16.13.20
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Oct 2023 16:13:19 -0700 (PDT)
+        Mon, 02 Oct 2023 16:13:20 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 5/6] csip: Add support for SIRK encryption
-Date:   Mon,  2 Oct 2023 16:13:09 -0700
-Message-ID: <20231002231311.3104749-5-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 6/6] main.conf: Fix default of CSIS.encrypt
+Date:   Mon,  2 Oct 2023 16:13:10 -0700
+Message-ID: <20231002231311.3104749-6-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231002231311.3104749-1-luiz.dentz@gmail.com>
 References: <20231002231311.3104749-1-luiz.dentz@gmail.com>
@@ -68,196 +68,23 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This implements SIRK value encryption using the LTK which is accessed
-using btd_device_get_ltk.
+CSIS.encrypt setting shall default to true, not false.
 ---
- profiles/audio/csip.c | 36 ++++++++++++++++++++++++++----
- src/shared/csip.c     | 51 ++++---------------------------------------
- src/shared/csip.h     |  5 ++---
- 3 files changed, 38 insertions(+), 54 deletions(-)
+ src/main.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/profiles/audio/csip.c b/profiles/audio/csip.c
-index 05bf588d8d6f..a697ebdfbda0 100644
---- a/profiles/audio/csip.c
-+++ b/profiles/audio/csip.c
-@@ -40,6 +40,7 @@
- #include "src/shared/gatt-client.h"
- #include "src/shared/gatt-server.h"
- #include "src/shared/csip.h"
-+#include "src/shared/crypto.h"
+diff --git a/src/main.c b/src/main.c
+index cddf1396197b..ddb73431df94 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -1195,6 +1195,7 @@ static void init_defaults(void)
+ 	btd_opts.avdtp.stream_mode = BT_IO_MODE_BASIC;
  
- #include "btio/btio.h"
- #include "src/plugin.h"
-@@ -313,10 +314,37 @@ static struct btd_profile csip_profile = {
- 	.experimental	= true,
- };
- 
--static bool csis_ltk_read(struct bt_csip *csip, uint8_t k[16], void *user_data)
-+static bool csis_encrypt(struct bt_att *att, uint8_t val[16])
- {
--	/* TODO: Retrieve LTK using device object */
--	return false;
-+	struct btd_device *device;
-+	struct bt_crypto *crypto;
-+	uint8_t ltk[16];
-+	bool ret;
-+
-+	device = btd_adapter_find_device_by_fd(bt_att_get_fd(att));
-+	if (!device) {
-+		error("Unable to find device");
-+		return false;
-+	}
-+
-+	if (!btd_device_get_ltk(device, ltk, NULL, NULL)) {
-+		error("Unable to get device LTK");
-+		return false;
-+	}
-+
-+	crypto = bt_crypto_new();
-+	if (!crypto) {
-+		error("Failed to open crypto");
-+		return false;
-+	}
-+
-+	ret = bt_crypto_sef(crypto, ltk, val, val);
-+	if (!ret)
-+		error("Failed to encrypt SIRK using LTK");
-+
-+	bt_crypto_unref(crypto);
-+
-+	return ret;
+ 	btd_opts.advmon.rssi_sampling_period = 0xFF;
++	btd_opts.csis.encrypt = true;
  }
  
- static void csis_data_add(struct csis_data *data)
-@@ -332,7 +360,7 @@ static void csis_data_add(struct csis_data *data)
- 
- 	bt_csip_set_sirk(data->csip, btd_opts.csis.encrypt, btd_opts.csis.sirk,
- 				btd_opts.csis.size, btd_opts.csis.rank,
--				csis_ltk_read, data);
-+				csis_encrypt);
- 
- 	if (!servers)
- 		servers = queue_new();
-diff --git a/src/shared/csip.c b/src/shared/csip.c
-index 85de63ea626b..53ce155416c7 100644
---- a/src/shared/csip.c
-+++ b/src/shared/csip.c
-@@ -66,6 +66,7 @@ struct bt_csis {
- 	struct gatt_db_attribute *lock;
- 	struct gatt_db_attribute *lock_ccc;
- 	struct gatt_db_attribute *rank;
-+	bt_csip_encrypt_func_t encrypt;
- };
- 
- struct bt_csip_cb {
-@@ -96,9 +97,6 @@ struct bt_csip {
- 	bt_csip_destroy_func_t debug_destroy;
- 	void *debug_data;
- 
--	bt_csip_ltk_func_t ltk_func;
--	void *ltk_data;
--
- 	bt_csip_sirk_func_t sirk_func;
- 	void *sirk_data;
- 
-@@ -218,46 +216,6 @@ static void csip_debug(struct bt_csip *csip, const char *format, ...)
- 	va_end(ap);
- }
- 
--static bool csip_match_att(const void *data, const void *match_data)
--{
--	const struct bt_csip *csip = data;
--	const struct bt_att *att = match_data;
--
--	return bt_csip_get_att((void *)csip) == att;
--}
--
--static bool csis_sirk_enc(struct bt_csis *csis, struct bt_att *att,
--						struct csis_sirk *sirk)
--{
--	struct bt_csip *csip;
--	uint8_t k[16];
--	struct bt_crypto *crypto;
--	bool ret;
--
--	csip = queue_find(sessions, csip_match_att, att);
--	if (!csip)
--		return false;
--
--	if (!csip->ltk_func(csip, k, csip->ltk_data)) {
--		DBG(csip, "Unable to read sef key");
--		return false;
--	}
--
--	crypto = bt_crypto_new();
--	if (!crypto) {
--		DBG(csip, "Failed to open crypto");
--		return false;
--	}
--
--	ret = bt_crypto_sef(crypto, k, sirk->val, sirk->val);
--	if (!ret)
--		DBG(csip, "Failed to encrypt SIRK using sef");
--
--	bt_crypto_unref(crypto);
--
--	return ret;
--}
--
- static void csis_sirk_read(struct gatt_db_attribute *attrib,
- 				unsigned int id, uint16_t offset,
- 				uint8_t opcode, struct bt_att *att,
-@@ -270,7 +228,7 @@ static void csis_sirk_read(struct gatt_db_attribute *attrib,
- 	memcpy(&sirk, csis->sirk_val, sizeof(sirk));
- 
- 	if (sirk.type == BT_CSIP_SIRK_ENCRYPT &&
--				!csis_sirk_enc(csis, att, &sirk)) {
-+				!csis->encrypt(att, sirk.val)) {
- 		gatt_db_attribute_read_result(attrib, id, BT_ATT_ERROR_UNLIKELY,
- 							NULL, 0);
- 		return;
-@@ -776,7 +734,7 @@ static struct csis_sirk *sirk_new(struct bt_csis *csis, struct gatt_db *db,
- 
- bool bt_csip_set_sirk(struct bt_csip *csip, bool encrypt,
- 				uint8_t k[16], uint8_t size, uint8_t rank,
--				bt_csip_ltk_func_t func, void *user_data)
-+				bt_csip_encrypt_func_t func)
- {
- 	uint8_t zero[16] = {};
- 	uint8_t type;
-@@ -793,8 +751,7 @@ bool bt_csip_set_sirk(struct bt_csip *csip, bool encrypt,
- 	if (!sirk_new(csip->ldb->csis, csip->ldb->db, type, k, size, rank))
- 		return false;
- 
--	csip->ltk_func = func;
--	csip->ltk_data = user_data;
-+	csip->ldb->csis->encrypt = func;
- 
- 	return true;
- }
-diff --git a/src/shared/csip.h b/src/shared/csip.h
-index bc5519cfbc49..81c8954aba8d 100644
---- a/src/shared/csip.h
-+++ b/src/shared/csip.h
-@@ -27,8 +27,7 @@ typedef void (*bt_csip_ready_func_t)(struct bt_csip *csip, void *user_data);
- typedef void (*bt_csip_destroy_func_t)(void *user_data);
- typedef void (*bt_csip_debug_func_t)(const char *str, void *user_data);
- typedef void (*bt_csip_func_t)(struct bt_csip *csip, void *user_data);
--typedef bool (*bt_csip_ltk_func_t)(struct bt_csip *csip, uint8_t k[16],
--							void *user_data);
-+typedef bool (*bt_csip_encrypt_func_t)(struct bt_att *att, uint8_t k[16]);
- typedef bool (*bt_csip_sirk_func_t)(struct bt_csip *csip, uint8_t type,
- 				    uint8_t k[16], uint8_t size, uint8_t rank,
- 				    void *user_data);
-@@ -54,7 +53,7 @@ struct bt_csip *bt_csip_new(struct gatt_db *ldb, struct gatt_db *rdb);
- 
- bool bt_csip_set_sirk(struct bt_csip *csip, bool encrypt,
- 				uint8_t k[16], uint8_t size, uint8_t rank,
--				bt_csip_ltk_func_t func, void *user_data);
-+				bt_csip_encrypt_func_t func);
- 
- bool bt_csip_get_sirk(struct bt_csip *csip, uint8_t *type,
- 				uint8_t k[16], uint8_t *size, uint8_t *rank);
+ static void log_handler(const gchar *log_domain, GLogLevelFlags log_level,
 -- 
 2.41.0
 
