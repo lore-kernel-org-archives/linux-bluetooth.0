@@ -2,101 +2,167 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E16E9E748FE
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Oct 2023 17:42:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 062D3E776C2
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Oct 2023 21:07:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229727AbjJBRmh (ORCPT
+        id S229671AbjJBVHn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 2 Oct 2023 13:42:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57262 "EHLO
+        Mon, 2 Oct 2023 17:07:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229446AbjJBRmg (ORCPT
+        with ESMTP id S236578AbjJBVHj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 2 Oct 2023 13:42:36 -0400
-Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C019283
-        for <linux-bluetooth@vger.kernel.org>; Mon,  2 Oct 2023 10:42:33 -0700 (PDT)
-Received: by mail-io1-xd2c.google.com with SMTP id ca18e2360f4ac-77acb04309dso604014739f.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Oct 2023 10:42:33 -0700 (PDT)
+        Mon, 2 Oct 2023 17:07:39 -0400
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48E67E1
+        for <linux-bluetooth@vger.kernel.org>; Mon,  2 Oct 2023 14:07:36 -0700 (PDT)
+Received: by mail-lj1-x229.google.com with SMTP id 38308e7fff4ca-2c186ea81c7so2089671fa.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Oct 2023 14:07:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696268553; x=1696873353; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=5lEtGCur1daujBDfEh4DBgVIyKi405Qc9bL/q5hkJ7Y=;
-        b=B6KE/qS5542AWg8oah+LeUhlB+OgRPrNFmd8ERyqRz3r3fyxGadqyckbIIp0TEGRFe
-         w/6hMW2e+omCCGWFd6LznVoYtz7EgEVbsR6e8oRwOYQ0TLtTSZ5Nzs2BxM9fq+XiMawU
-         Wy73b272JMWHnPAD8n/lqKGx9WwK90AtvkaAgNYF9RFTBFQ7B1Hou2/W1IOoIZE2vmv9
-         7uY7EOMayGCjSP4gU17M6ZmgzAog/PqT6OTWMOgka7glaAgJ07/KdkhD9iFQRCsdRndq
-         ToWmQyMxUwCus0zsfWEwooUjQpTWA/r7vAVDYENBVW8fETWUuJzEgI8OWpvQNAFGtGYW
-         FoPw==
+        d=gmail.com; s=20230601; t=1696280854; x=1696885654; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DBslQK7WVL4OH3i7rxkt5y9WULvpul8FN533k76aoVI=;
+        b=nVTm3n4Jd2W8EMh82lU+t4Yb5LMzqC4u69IXU9pi2BWds7gHeN/xotm8tYQJ8AaL6g
+         NiIst7axLEkLBRHxDJOh73C2UUYy6oQUwPoJYHIlhCst4zgbLJvsJpECys4loeuvUQ00
+         hEiPpZFIPrKHafZZzaje9t9utxjEkZOaSltGJvNQj7DUclDNmGyG8wpfa/cHKo3WAtGp
+         eIhaqSSAM4s5uli5E/fhiomcSqsvTi5muXLhKfJl6tcqNtzlevm9/5g2XQm9jzmWEkwP
+         dygigaqQf9F/e8MBu71fE5NL0+2HYJsEdRhi/EPZXrAZFCQvtkazN3Rbh2IZsSmBZIko
+         AwDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696268553; x=1696873353;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5lEtGCur1daujBDfEh4DBgVIyKi405Qc9bL/q5hkJ7Y=;
-        b=CLmcE+E6fhNgrBOXLNmu5lWv47ERTwl6ExY6qaLL4BZ+cAFkEFENiyLACuJtSX9mbs
-         HiIbgk4pQaofbJJMQXlL0wg4fCz1gcqRk67RlLh1K1sihu29TCIuvJzjJJY5SEf0+WmU
-         uOiNcbOqkzGMBlgWdY0raPNvauWTLqhmQ5DkSdIdVzQbV7NgisufzpxcvggqJZH7aytW
-         RwL1sGCGSYK0A81U1IiW8vy7ZXrsRvUDOu9QFJhxVlmVIPtFM3xuo9C9oMMDeEZCaS/X
-         7B1hMNSn06rQWpGcQkTT6j8Hb/oLKfQQz8+SozouyAqDx9g+6Hq3nX4bgoix6mcSNq7Z
-         3F4Q==
-X-Gm-Message-State: AOJu0YzHyuBoweNr4+NBdzY38SXQCbE2rwA4lA5yGfb4KkYd3zHs6jqN
-        hpgbZ603WVDSmVJxtjnR9AUHeC/KpMw=
-X-Google-Smtp-Source: AGHT+IGduvmUuxT4ANph5nC1VlZt9BXeUPqRz7kbsrWOhQbsNUMLzKzqh3DD+Bg8gjj5N/AUmqLoaQ==
-X-Received: by 2002:a6b:5c01:0:b0:798:3e95:274f with SMTP id z1-20020a6b5c01000000b007983e95274fmr14138369ioh.19.1696268552599;
-        Mon, 02 Oct 2023 10:42:32 -0700 (PDT)
-Received: from [172.17.0.2] ([40.77.125.162])
-        by smtp.gmail.com with ESMTPSA id i12-20020a02c60c000000b00430bb70004dsm7111256jan.103.2023.10.02.10.42.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Oct 2023 10:42:32 -0700 (PDT)
-Message-ID: <651b0108.020a0220.7da6d.9864@mx.google.com>
-Date:   Mon, 02 Oct 2023 10:42:32 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0987954861331903791=="
+        d=1e100.net; s=20230601; t=1696280854; x=1696885654;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DBslQK7WVL4OH3i7rxkt5y9WULvpul8FN533k76aoVI=;
+        b=BuM2Ct9SOI/oN87psiXNV4htogYEPakp9mHZQvw48yhQT+Z5DitDfaAlYnh4DG6tEv
+         fQkoswR9HH+D0W1jPxE358B8NqcRd69D4qKGvI2NGv+Ff3QOCzYpNNH3dpKI6wBybZno
+         l0LAccUdfaZxDXKrIPjfSUFcN8zqiDSmqwSi5i/lJXiw+sBAYPtthsimbmBB7zy/4ezm
+         jtkIA2+IYl2vNNVqe22NyNfNu+lTHOlS1z3fzfZc+rl8YJUmdG4JhZJQt/oGhetLqoZ7
+         bfoisHikAoAOIZta+Dzi2KmMt1/eflQyBfGLumfihgYfCJooD8lQ0vafkeTpI/Hei+Q0
+         iiaw==
+X-Gm-Message-State: AOJu0YyjE4WzAg1ekoQNfq53FuZ7alILRxCqgG3/SygUPMMzl2I/F9Io
+        TVFWMDOGf0QsSTCx04YEGjpGQxW3WvfXHnwkX+YOvNzlz9Q08g==
+X-Google-Smtp-Source: AGHT+IHIxz6HA4pz9i8ObE2Qs/klVkT1QroLDc2MKL2uRNZdXRfgoUuteU/Q72Ao5FQ+GQ+HFDDh0veLecCGCW7Ds1w=
+X-Received: by 2002:a2e:3a10:0:b0:2bf:fae0:5cf1 with SMTP id
+ h16-20020a2e3a10000000b002bffae05cf1mr10028481lja.14.1696280854145; Mon, 02
+ Oct 2023 14:07:34 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com
-Subject: RE: Update transport acquire/release flow BAP bcast source
-In-Reply-To: <20231002153352.3163-2-iulia.tanasescu@nxp.com>
-References: <20231002153352.3163-2-iulia.tanasescu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <3358dfd1591df242507755cea63d00db3d2c959e.1696157794.git.pav@iki.fi>
+ <d5bf0d4ac79bd447d78adad743ed5ae7e8f47048.1696157794.git.pav@iki.fi>
+In-Reply-To: <d5bf0d4ac79bd447d78adad743ed5ae7e8f47048.1696157794.git.pav@iki.fi>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 2 Oct 2023 14:07:21 -0700
+Message-ID: <CABBYNZJKOk6KCnnRoSfra8RLDeDV_cVWdYv5Np84nsPxKPHKAA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/2] doc: clarify org.bluez.MediaEndpoint documentation
+To:     Pauli Virtanen <pav@iki.fi>
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0987954861331903791==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Pauli,
 
-This is automated email and please do not reply to this email!
+On Sun, Oct 1, 2023 at 5:06=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
+>
+> Document the actual input and output parameter values used in
+> SelectProperties. These differ from SetConfiguration.
+>
+> Mention SelectProperties is used for unicast only.
+>
+> Document SetConfiguration input parameters.
+> ---
+>  doc/org.bluez.MediaEndpoint.rst | 42 ++++++++++++++++++++++++++-------
+>  1 file changed, 34 insertions(+), 8 deletions(-)
+>
+> diff --git a/doc/org.bluez.MediaEndpoint.rst b/doc/org.bluez.MediaEndpoin=
+t.rst
+> index 0e201ff9d..11b7280bd 100644
+> --- a/doc/org.bluez.MediaEndpoint.rst
+> +++ b/doc/org.bluez.MediaEndpoint.rst
+> @@ -24,14 +24,24 @@ Interface
+>  Methods
+>  -------
+>
+> +.. _SetConfiguration:
+> +
+>  void SetConfiguration(object transport, dict properties)
+>  ````````````````````````````````````````````````````````
+>
+>         Set configuration for the transport.
+>
+> -       For client role transport must be set with a server endpoint ojec=
+t which
+> -       will be configured and the properties must contain the following
+> -       properties:
+> +       :object transport:
+> +
+> +               Configured transport object.
+> +
+> +       :dict properties:
+> +
+> +               Configured **org.bluez.MediaTransport(5)** properties.
+> +
+> +       For client role transport must be set with a server endpoint
+> +       object which will be configured and the properties must
+> +       contain the following properties:
+>
+>         :array{byte} Capabilities [Mandatory]:
+>
+> @@ -59,13 +69,29 @@ array{byte} SelectConfiguration(array{byte} capabilit=
+ies)
+>  dict SelectProperties(dict capabilities)
+>  ````````````````````````````````````````
+>
+> -       Select configuration from the supported capabilities:
+> +       Select BAP unicast configuration from the supported capabilities:
+>
+> -       :object Endpoint [ISO only]:
+> -       :Refer to SetConfiguration for the list of other possible propert=
+ies.:
+> +       :object Endpoint:
+> +       :array{byte} Capabilities:
+> +       :array{byte} Metadata:
+> +       :uint32 Locations:
 
-Dear submitter,
+The idea is these below are passed as in one container as in
+MediaEndpoint.QoS, looks like I missed changing the handling on
+pac_select since bluetoothctl doesn't check it but most likely
+pipewire does.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=789347
+> +       :byte Framing:
+> +       :byte PHY:
+> +       :uint16 MaximumLatency:
+> +       :uint32 MinimumDelay:
+> +       :uint32 MaximumDelay:
+> +       :uint32 PreferredMinimumDelay:
+> +       :uint32 PreferredMaximumDelay:
+>
+> -       Returns a configuration which can be used to setup a transport, s=
+ee
+> -       **org.bluez.MediaTransport(5)** for possible values.
+> +       See `MediaEndpoint Properties`_ for their possible values.
+> +
+> +       Returns a configuration which can be used to setup a transport:
+> +
+> +       :array{byte} Capabilities:
+> +       :array{byte} Metadata [optional]:
+> +       :dict QoS:
+> +
+> +       See `SetConfiguration`_ for their possible values.
 
----Test result---
+Interesting, need to check if the references works on manpages as well.
 
-Test Summary:
-CheckPatch                    PASS      1.46 seconds
-GitLint                       PASS      0.89 seconds
-BuildEll                      PASS      28.53 seconds
-BluezMake                     PASS      885.38 seconds
-MakeCheck                     PASS      12.39 seconds
-MakeDistcheck                 PASS      162.32 seconds
-CheckValgrind                 PASS      261.73 seconds
-CheckSmatch                   PASS      352.83 seconds
-bluezmakeextell               PASS      108.54 seconds
-IncrementalBuild              PASS      2179.90 seconds
-ScanBuild                     PASS      1078.14 seconds
+>         Note: There is no need to cache the selected properties since on
+>         success the configuration is send back as parameter of SetConfigu=
+ration.
+> --
+> 2.41.0
+>
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0987954861331903791==--
+--=20
+Luiz Augusto von Dentz
