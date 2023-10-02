@@ -2,165 +2,199 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 062D3E776C2
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Oct 2023 21:07:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 538A5E7491F
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Oct 2023 21:21:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229671AbjJBVHn (ORCPT
+        id S229744AbjJBVVi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 2 Oct 2023 17:07:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56856 "EHLO
+        Mon, 2 Oct 2023 17:21:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236578AbjJBVHj (ORCPT
+        with ESMTP id S229671AbjJBVVh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 2 Oct 2023 17:07:39 -0400
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48E67E1
-        for <linux-bluetooth@vger.kernel.org>; Mon,  2 Oct 2023 14:07:36 -0700 (PDT)
-Received: by mail-lj1-x229.google.com with SMTP id 38308e7fff4ca-2c186ea81c7so2089671fa.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Oct 2023 14:07:36 -0700 (PDT)
+        Mon, 2 Oct 2023 17:21:37 -0400
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77047A4
+        for <linux-bluetooth@vger.kernel.org>; Mon,  2 Oct 2023 14:21:34 -0700 (PDT)
+Received: by mail-lj1-x233.google.com with SMTP id 38308e7fff4ca-2bffdf50212so2174231fa.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Oct 2023 14:21:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696280854; x=1696885654; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1696281693; x=1696886493; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DBslQK7WVL4OH3i7rxkt5y9WULvpul8FN533k76aoVI=;
-        b=nVTm3n4Jd2W8EMh82lU+t4Yb5LMzqC4u69IXU9pi2BWds7gHeN/xotm8tYQJ8AaL6g
-         NiIst7axLEkLBRHxDJOh73C2UUYy6oQUwPoJYHIlhCst4zgbLJvsJpECys4loeuvUQ00
-         hEiPpZFIPrKHafZZzaje9t9utxjEkZOaSltGJvNQj7DUclDNmGyG8wpfa/cHKo3WAtGp
-         eIhaqSSAM4s5uli5E/fhiomcSqsvTi5muXLhKfJl6tcqNtzlevm9/5g2XQm9jzmWEkwP
-         dygigaqQf9F/e8MBu71fE5NL0+2HYJsEdRhi/EPZXrAZFCQvtkazN3Rbh2IZsSmBZIko
-         AwDA==
+        bh=jCVLqNqyj1ppWnZ9AH0dZshCKn4F8OT28jO1i4PdCxY=;
+        b=RaK+C95hS4w6q+X/FcQo4Cb2doBgQw0oZhK7vRY8bPnClE16KhmoD28f9QH7bMwl2G
+         jWbEp/dZYHfeGST2uvfP1BsG36xFV9E8LR0u6YOH0xgEc08Ke76feMQvkNUrExR7CZBL
+         ye9QYfK3DSlw36s5oVeTzDFYvMqYs74KkmZJVkz66hUyUpMh0f/maaI99aO2eU7PzabH
+         P8e3FgpFGUjLL18z1TXcRsiE53himl3oUTLuSyh5DeFX0i8E5LzoXH7aud6C+tsEotvy
+         pQmcv8Tb7eKkPdvvhr2WydGLjM5SJa7Ofgf0wJsae0wJSyHGMaqr6RULdSYK0+v+1Ov/
+         TsYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696280854; x=1696885654;
+        d=1e100.net; s=20230601; t=1696281693; x=1696886493;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=DBslQK7WVL4OH3i7rxkt5y9WULvpul8FN533k76aoVI=;
-        b=BuM2Ct9SOI/oN87psiXNV4htogYEPakp9mHZQvw48yhQT+Z5DitDfaAlYnh4DG6tEv
-         fQkoswR9HH+D0W1jPxE358B8NqcRd69D4qKGvI2NGv+Ff3QOCzYpNNH3dpKI6wBybZno
-         l0LAccUdfaZxDXKrIPjfSUFcN8zqiDSmqwSi5i/lJXiw+sBAYPtthsimbmBB7zy/4ezm
-         jtkIA2+IYl2vNNVqe22NyNfNu+lTHOlS1z3fzfZc+rl8YJUmdG4JhZJQt/oGhetLqoZ7
-         bfoisHikAoAOIZta+Dzi2KmMt1/eflQyBfGLumfihgYfCJooD8lQ0vafkeTpI/Hei+Q0
-         iiaw==
-X-Gm-Message-State: AOJu0YyjE4WzAg1ekoQNfq53FuZ7alILRxCqgG3/SygUPMMzl2I/F9Io
-        TVFWMDOGf0QsSTCx04YEGjpGQxW3WvfXHnwkX+YOvNzlz9Q08g==
-X-Google-Smtp-Source: AGHT+IHIxz6HA4pz9i8ObE2Qs/klVkT1QroLDc2MKL2uRNZdXRfgoUuteU/Q72Ao5FQ+GQ+HFDDh0veLecCGCW7Ds1w=
-X-Received: by 2002:a2e:3a10:0:b0:2bf:fae0:5cf1 with SMTP id
- h16-20020a2e3a10000000b002bffae05cf1mr10028481lja.14.1696280854145; Mon, 02
- Oct 2023 14:07:34 -0700 (PDT)
+        bh=jCVLqNqyj1ppWnZ9AH0dZshCKn4F8OT28jO1i4PdCxY=;
+        b=jp1JHkcyIaGlDIeMq8SRA+elFx76i7tJe6hw1PRrL4pNJfntCBGrxA702K1cV81pG6
+         L0ucehn3I3XTTTTDcCgKxm4PVphN9gswDhiNTOh02xireFdXsdfTke9piyZ3Z6zZZgQi
+         eANv08RoE6vN5Rssvs0k0IwNq7yxNWeOZ5ktiRD+C9lMmfzsNZAiSGgQf1d5oofJ/7Jy
+         dxkfQKkWJMDCfykLUrYloLa7IdwqzNdh5ItolrMj5uziiVNNmZTXoBUPjDasU9htJ1aE
+         yiR7YGY98YU6PfU5DBDsmQd8nHPyrVKKxWJoW43YGV/AJTC8UVGfk7NNn2d0segC/18G
+         qZ3Q==
+X-Gm-Message-State: AOJu0Ywsjb4gnDQkY0e29yhuKgOJcxeKvKktEFwIIrzcYCWXCBDyBGuz
+        /0OdRA6bj2/AaNkkilI7g2vrMnXNBtIXjhlzC4StPiQ8rD1ycA==
+X-Google-Smtp-Source: AGHT+IF1ST9ydsVhIqMzpfN+nXG/yhYRfcVakmYrfLLI1Sxm2IeAzfJN8HJTUNfI1LVgYe97Uh+GpucOT3QZ+UzM10o=
+X-Received: by 2002:a2e:964d:0:b0:2c0:192a:c567 with SMTP id
+ z13-20020a2e964d000000b002c0192ac567mr12798540ljh.20.1696281692314; Mon, 02
+ Oct 2023 14:21:32 -0700 (PDT)
 MIME-Version: 1.0
-References: <3358dfd1591df242507755cea63d00db3d2c959e.1696157794.git.pav@iki.fi>
- <d5bf0d4ac79bd447d78adad743ed5ae7e8f47048.1696157794.git.pav@iki.fi>
-In-Reply-To: <d5bf0d4ac79bd447d78adad743ed5ae7e8f47048.1696157794.git.pav@iki.fi>
+References: <20231002123738.22210-1-vlad.pruteanu@nxp.com> <20231002123738.22210-2-vlad.pruteanu@nxp.com>
+In-Reply-To: <20231002123738.22210-2-vlad.pruteanu@nxp.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 2 Oct 2023 14:07:21 -0700
-Message-ID: <CABBYNZJKOk6KCnnRoSfra8RLDeDV_cVWdYv5Np84nsPxKPHKAA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/2] doc: clarify org.bluez.MediaEndpoint documentation
-To:     Pauli Virtanen <pav@iki.fi>
-Cc:     linux-bluetooth@vger.kernel.org
+Date:   Mon, 2 Oct 2023 14:21:19 -0700
+Message-ID: <CABBYNZJguwGA6VJRqPmUUP2TiicAFUHu5BifRgDn=6bQhyDjGA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/1] client/player: Allow the user to control BIG encryption
+To:     Vlad Pruteanu <vlad.pruteanu@nxp.com>
+Cc:     linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com,
+        mihai-octavian.urzica@nxp.com, silviu.barbulescu@nxp.com,
+        iulia.tanasescu@nxp.com, andrei.istodorescu@nxp.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Pauli,
+Hi Vlad,
 
-On Sun, Oct 1, 2023 at 5:06=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
+On Mon, Oct 2, 2023 at 5:37=E2=80=AFAM Vlad Pruteanu <vlad.pruteanu@nxp.com=
+> wrote:
 >
-> Document the actual input and output parameter values used in
-> SelectProperties. These differ from SetConfiguration.
->
-> Mention SelectProperties is used for unicast only.
->
-> Document SetConfiguration input parameters.
+> This commit adds support for controling the use of encryption and
+> setting the broadcast code. This is done as part of the endpoint.config
+> command. For source endpoints the encryption flag and broadcast code can
+> be set, while the sink supports only broadcast code setting. If no custom
+> broadcast code is provided, the default one will be used.
 > ---
->  doc/org.bluez.MediaEndpoint.rst | 42 ++++++++++++++++++++++++++-------
->  1 file changed, 34 insertions(+), 8 deletions(-)
+>  client/player.c | 50 ++++++++++++++++++++++++++++++++++++++++++-------
+>  1 file changed, 43 insertions(+), 7 deletions(-)
 >
-> diff --git a/doc/org.bluez.MediaEndpoint.rst b/doc/org.bluez.MediaEndpoin=
-t.rst
-> index 0e201ff9d..11b7280bd 100644
-> --- a/doc/org.bluez.MediaEndpoint.rst
-> +++ b/doc/org.bluez.MediaEndpoint.rst
-> @@ -24,14 +24,24 @@ Interface
->  Methods
->  -------
+> diff --git a/client/player.c b/client/player.c
+> index d1809f24f..3a9313bfd 100644
+> --- a/client/player.c
+> +++ b/client/player.c
+> @@ -2792,10 +2792,10 @@ static void cmd_config_endpoint(int argc, char *a=
+rgv[])
+>         const struct capabilities *cap;
+>         char *uuid;
+>         uint8_t codec_id;
+> -       bool broadcast =3D false;
+> +       bool local_ep_not_provided =3D false;
+> +       uint8_t bcode_arg_position =3D 0;
 >
-> +.. _SetConfiguration:
+>         cfg =3D new0(struct endpoint_config, 1);
+> -
+>         /* Search for the remote endpoint name on DBUS */
+>         cfg->proxy =3D g_dbus_proxy_lookup(endpoints, NULL, argv[1],
+>                                                 BLUEZ_MEDIA_ENDPOINT_INTE=
+RFACE);
+> @@ -2815,7 +2815,7 @@ static void cmd_config_endpoint(int argc, char *arg=
+v[])
+>                 codec_id =3D strtol(argv[3], NULL, 0);
+>                 cap =3D find_capabilities(uuid, codec_id);
+>                 if (cap) {
+> -                       broadcast =3D true;
+> +                       local_ep_not_provided =3D true;
+>                         cfg->ep =3D endpoint_new(cap);
+>                         cfg->ep->preset =3D find_presets_name(uuid, argv[=
+3]);
+>                         if (!cfg->ep->preset)
+> @@ -2827,9 +2827,10 @@ static void cmd_config_endpoint(int argc, char *ar=
+gv[])
+>                 }
+>         }
+>
+> -       if (((broadcast =3D=3D false) && (argc > 3)) ||
+> -               ((broadcast =3D=3D true) && (argc > 4))) {
+> -               char *preset_name =3D (broadcast =3D=3D false)?argv[3]:ar=
+gv[4];
+> +       if (((local_ep_not_provided =3D=3D false) && (argc > 3)) ||
+> +               ((local_ep_not_provided =3D=3D true) && (argc > 4))) {
+> +               uint8_t offset =3D (local_ep_not_provided =3D=3D false)?0=
+:1;
+> +               char *preset_name =3D argv[3 + offset];
+>
+>                 preset =3D preset_find_name(cfg->ep->preset, preset_name)=
+;
+>                 if (!preset) {
+> @@ -2837,7 +2838,42 @@ static void cmd_config_endpoint(int argc, char *ar=
+gv[])
+>                         goto fail;
+>                 }
+>
+> +               /* If the endpoint is configured to be a source allow
+> +                *the user to decide if encryption is enabled or not.
+> +                */
+> +               if (!strcmp(cfg->ep->uuid, BCAA_SERVICE_UUID) &&
+> +                       argc > 4 + offset) {
+> +                       uint8_t value =3D strtol(argv[4 + offset],
+> +                                                       NULL, 0);
 > +
->  void SetConfiguration(object transport, dict properties)
->  ````````````````````````````````````````````````````````
->
->         Set configuration for the transport.
->
-> -       For client role transport must be set with a server endpoint ojec=
-t which
-> -       will be configured and the properties must contain the following
-> -       properties:
-> +       :object transport:
+> +                       if (value < 2)
+> +                               bcast_qos.bcast.encryption =3D value;
+> +                       else
+> +                               goto fail;
+> +               }
 > +
-> +               Configured transport object.
+> +               /* If the endpoint is configured to be a source or a
+> +                *sink allow the user to set a custom broadcast code.
+> +                *If no broadcast code is set, the default will be used.
+> +                */
+> +               if (!strcmp(cfg->ep->uuid, BCAA_SERVICE_UUID) &&
+> +                       (argc > 5 + offset))
+> +                       bcode_arg_position =3D 5 + offset;
 > +
-> +       :dict properties:
+> +               /*The broadcast code is found at a smaller index due to t=
+he sink
+> +                *config not using the encryption flag parameter.
+> +                */
+> +               if (!strcmp(cfg->ep->uuid, BAA_SERVICE_UUID) &&
+> +                       argc > 4 + offset)
+> +                       bcode_arg_position =3D 4  + offset;
 > +
-> +               Configured **org.bluez.MediaTransport(5)** properties.
+> +               if (bcode_arg_position !=3D 0)
+> +                       for (uint8_t i =3D 0; i < 16; i++)
+> +                               bcast_qos.bcast.bcode[i] =3D
+> +                               strtol(argv[bcode_arg_position + i], NULL=
+, 16);
 > +
-> +       For client role transport must be set with a server endpoint
-> +       object which will be configured and the properties must
-> +       contain the following properties:
->
->         :array{byte} Capabilities [Mandatory]:
->
-> @@ -59,13 +69,29 @@ array{byte} SelectConfiguration(array{byte} capabilit=
-ies)
->  dict SelectProperties(dict capabilities)
->  ````````````````````````````````````````
->
-> -       Select configuration from the supported capabilities:
-> +       Select BAP unicast configuration from the supported capabilities:
->
-> -       :object Endpoint [ISO only]:
-> -       :Refer to SetConfiguration for the list of other possible propert=
-ies.:
-> +       :object Endpoint:
-> +       :array{byte} Capabilities:
-> +       :array{byte} Metadata:
-> +       :uint32 Locations:
+>                 if (cfg->ep->broadcast) {
+> +
+>                         iov_append(&cfg->ep->bcode, bcast_qos.bcast.bcode=
+,
+>                                 sizeof(bcast_qos.bcast.bcode));
+>                         /* Copy capabilities for broadcast*/
+> @@ -3253,7 +3289,7 @@ static const struct bt_shell_menu endpoint_menu =3D=
+ {
+>                                                 "Register Endpoint",
+>                                                 local_endpoint_generator =
+},
+>         { "config",
+> -               "<endpoint> [local endpoint/UUID] [preset/codec id] [pres=
+et]",
+> +               "<endpoint> [local endpoint/UUID] [preset/codec id] [pres=
+et] [encryption] [broadcast code=3Dxx xx ...]",
 
-The idea is these below are passed as in one container as in
-MediaEndpoint.QoS, looks like I missed changing the handling on
-pac_select since bluetoothctl doesn't check it but most likely
-pipewire does.
+I think I'd prefer to have it prompted (see bt_shell_prompt_input) to
+the user when we detect it is configuring a broadcast transport,
+rather than have it passed upfront which might confuse the user of
+unicast where the encryption is done at a different layer.
 
-> +       :byte Framing:
-> +       :byte PHY:
-> +       :uint16 MaximumLatency:
-> +       :uint32 MinimumDelay:
-> +       :uint32 MaximumDelay:
-> +       :uint32 PreferredMinimumDelay:
-> +       :uint32 PreferredMaximumDelay:
->
-> -       Returns a configuration which can be used to setup a transport, s=
-ee
-> -       **org.bluez.MediaTransport(5)** for possible values.
-> +       See `MediaEndpoint Properties`_ for their possible values.
-> +
-> +       Returns a configuration which can be used to setup a transport:
-> +
-> +       :array{byte} Capabilities:
-> +       :array{byte} Metadata [optional]:
-> +       :dict QoS:
-> +
-> +       See `SetConfiguration`_ for their possible values.
-
-Interesting, need to check if the references works on manpages as well.
-
->         Note: There is no need to cache the selected properties since on
->         success the configuration is send back as parameter of SetConfigu=
-ration.
+>                                                 cmd_config_endpoint,
+>                                                 "Configure Endpoint",
+>                                                 endpoint_generator },
 > --
-> 2.41.0
+> 2.34.1
 >
 
 
