@@ -2,41 +2,40 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19252E7542B
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8E71E7542C
 	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Oct 2023 17:49:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240548AbjJCRt3 (ORCPT
+        id S232071AbjJCRta (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 3 Oct 2023 13:49:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47612 "EHLO
+        Tue, 3 Oct 2023 13:49:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240668AbjJCRtZ (ORCPT
+        with ESMTP id S240669AbjJCRtZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Tue, 3 Oct 2023 13:49:25 -0400
 Received: from meesny.iki.fi (meesny.iki.fi [IPv6:2001:67c:2b0:1c1::201])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE815A6
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE62D8E
         for <linux-bluetooth@vger.kernel.org>; Tue,  3 Oct 2023 10:49:21 -0700 (PDT)
 Received: from monolith.lan (91-152-120-176.elisa-laajakaista.fi [91.152.120.176])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
         (Authenticated sender: pav)
-        by meesny.iki.fi (Postfix) with ESMTPSA id 4S0QLR2WjQzydm;
-        Tue,  3 Oct 2023 20:49:19 +0300 (EEST)
+        by meesny.iki.fi (Postfix) with ESMTPSA id 4S0QLQ0ksVzyRq;
+        Tue,  3 Oct 2023 20:49:16 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
         t=1696355359;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7zKHwBs1GVkDtC9I8vqMQlneiHzFw56wVry4kh+U85I=;
-        b=IHtJzB/ISEHa6rooG210EdfWfVQvu5dU1VFJ6HqH/5TnVbBsmOvW1sAggRxbOtnXeEmNXR
-        4SaHQDuBvJO9rEJ/j7YwDwrXuRTQUAXhr3f6i5zO1j9kiwPXprYxoX6neF0xfuL1RM5KYe
-        cOCMsGwl5AnGLBRcsNFTAvjSXc5RE9w=
+         content-transfer-encoding:content-transfer-encoding;
+        bh=M5k91QPsDI3nSGiLWU40+DcpGwSOpNfwfI5MNpLeW7A=;
+        b=drmerg0oS/31TKf/xJZSU9RnZfX/NDf442hFLMjmqAMEUuHjGJtLEmiPVa5qjoQM5V6ZKm
+        5gkIToHlWkv3Dd+N+ZeMWF/qrZGy2MGo0buw+xUOfnRt26DAm1SdPalaynXCu5n7yi0BYb
+        xKEJwdpkqUMQ5LOgEMoD2Xdz/2LHKbM=
 ARC-Seal: i=1; s=meesny; d=iki.fi; t=1696355359; a=rsa-sha256; cv=none;
-        b=BSrpYVKR64OoRDMDOnIL1GP97wRPXZPs3clICFO7GabRdj9rgQ9JU/4s8KcPeTXkRtSuGF
-        V+0HbikvF9YhhLStftR/AG4UqUedrF/onTuoiMZ1gobx+cLudD7VAm608afT6FqkI3UJAV
-        aoDRdTK2HqJHFl7gKRPm2bnxs5wHMic=
+        b=I/cOEhyJ63XS0V2/PLTRwu8MEsQijSSDJLAge+Q5ef/NFtPzh6UFOxIvyx2Ur+35LLc16k
+        qFuuDYCyQS5LxUVplUlVaF8JVfWCbBiUPqIszHptxFx69LGnqLHXu0rzOqoxy09waFKNvO
+        LixZrpuGIWND0s/35V9e1shjSDSvJVk=
 ARC-Authentication-Results: i=1;
         ORIGINATING;
         auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
@@ -44,114 +43,119 @@ ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
         s=meesny; t=1696355359;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7zKHwBs1GVkDtC9I8vqMQlneiHzFw56wVry4kh+U85I=;
-        b=pmaLN9g38zQ/GejvMbfY2sabTaWH7L6phUYCXqYYXQKoxTEsnw2UkHXSK7oCclh8Wcrioq
-        T2Hu9Fp7acU/Ea+Hxd1Gk53bPG8mrXsd1LEJycSJV82IdzAhYoyqK47r042C1591i8b8ca
-        Yt9SCGISadltHBNPn7DNyBttYSPula0=
+         content-transfer-encoding:content-transfer-encoding;
+        bh=M5k91QPsDI3nSGiLWU40+DcpGwSOpNfwfI5MNpLeW7A=;
+        b=Yvnhk18g37+IpoIY5a/vc0McTldsmBm8RlwwM85ifCp+5dR6ddk+xB8nIHQiL9oHT18OL3
+        /gv9udXS1C9wqHTiVEflgetIYUhDR+FdfEurMRyGq0eohJ4u22pMy6zAUer9aXt3CMrhOH
+        Hl+1M/rVmSA2ielbHAoSWcxF7dtBpfU=
 From:   Pauli Virtanen <pav@iki.fi>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v2 2/2] doc: clarify org.bluez.MediaEndpoint documentation
-Date:   Tue,  3 Oct 2023 20:49:14 +0300
-Message-ID: <a1cd22d65600f06977e8557066d5c8a618d33dc1.1696354690.git.pav@iki.fi>
+Subject: [PATCH BlueZ v2 1/2] bap: use MediaEndpoint related properties consistently
+Date:   Tue,  3 Oct 2023 20:49:13 +0300
+Message-ID: <112613bc64e4d17573b75a9d245b5fe5e51b5fa1.1696354690.git.pav@iki.fi>
 X-Mailer: git-send-email 2.41.0
-In-Reply-To: <112613bc64e4d17573b75a9d245b5fe5e51b5fa1.1696354690.git.pav@iki.fi>
-References: <112613bc64e4d17573b75a9d245b5fe5e51b5fa1.1696354690.git.pav@iki.fi>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Document the actual input and output parameter values used in
-SelectProperties. These differ from SetConfiguration.
+Use the documented name "MaximumLatency" for the MediaEndpoint QoS
+Max_Transport_Latency field, in SelectProperties input parameters and
+expected client MediaEndpoint properties.
 
-Mention SelectProperties is used for unicast only.
+Put QoS fields to a "QoS" dict in SelectProperties input.
 
-Document SetConfiguration input parameters.
+Use the name "Locations" for SelectProperties supported locations input
+parameter, to match the MediaEndpoint property name which indicates the
+same thing.
 ---
 
 Notes:
     v2: put SelectProperties QoS things to "QoS" dict
 
- doc/org.bluez.MediaEndpoint.rst | 48 +++++++++++++++++++++++++++------
- 1 file changed, 40 insertions(+), 8 deletions(-)
+ profiles/audio/media.c | 41 +++++++++++++++++++++++++++++++----------
+ 1 file changed, 31 insertions(+), 10 deletions(-)
 
-diff --git a/doc/org.bluez.MediaEndpoint.rst b/doc/org.bluez.MediaEndpoint.rst
-index 0e201ff9d..6754d6e3b 100644
---- a/doc/org.bluez.MediaEndpoint.rst
-+++ b/doc/org.bluez.MediaEndpoint.rst
-@@ -24,14 +24,24 @@ Interface
- Methods
- -------
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index 8345487d7..4bffc9cde 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -965,7 +965,7 @@ static int pac_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
  
-+.. _SetConfiguration:
-+
- void SetConfiguration(object transport, dict properties)
- ````````````````````````````````````````````````````````
+ 	loc = bt_bap_pac_get_locations(rpac);
+ 	if (loc)
+-		g_dbus_dict_append_entry(&dict, "Location", DBUS_TYPE_UINT32,
++		g_dbus_dict_append_entry(&dict, "Locations", DBUS_TYPE_UINT32,
+ 									&loc);
  
- 	Set configuration for the transport.
+ 	if (metadata) {
+@@ -977,26 +977,47 @@ static int pac_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
+ 	}
  
--	For client role transport must be set with a server endpoint oject which
--	will be configured and the properties must contain the following
--	properties:
-+	:object transport:
+ 	if (qos && qos->phy) {
+-		g_dbus_dict_append_entry(&dict, "Framing", DBUS_TYPE_BYTE,
++		DBusMessageIter entry, variant, qos_dict;
 +
-+		Configured transport object.
++		key = "QoS";
++		dbus_message_iter_open_container(&dict, DBUS_TYPE_DICT_ENTRY,
++								NULL, &entry);
++		dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
++		dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT,
++							"a{sv}", &variant);
++		dbus_message_iter_open_container(&variant, DBUS_TYPE_ARRAY,
++							"{sv}", &qos_dict);
 +
-+	:dict properties:
++		g_dbus_dict_append_entry(&qos_dict, "PreferredMaximumDelay",
++					DBUS_TYPE_UINT32, &qos->ppd_min);
 +
-+		Configured **org.bluez.MediaTransport(5)** properties.
++		g_dbus_dict_append_entry(&qos_dict, "PreferredMaximumDelay",
++					DBUS_TYPE_UINT32, &qos->ppd_min);
 +
-+	For client role transport must be set with a server endpoint
-+	object which will be configured and the properties must
-+	contain the following properties:
++		g_dbus_dict_append_entry(&qos_dict, "Framing", DBUS_TYPE_BYTE,
+ 							&qos->framing);
  
- 	:array{byte} Capabilities [Mandatory]:
+-		g_dbus_dict_append_entry(&dict, "PHY", DBUS_TYPE_BYTE,
++		g_dbus_dict_append_entry(&qos_dict, "PHY", DBUS_TYPE_BYTE,
+ 							&qos->phy);
  
-@@ -59,13 +69,35 @@ array{byte} SelectConfiguration(array{byte} capabilities)
- dict SelectProperties(dict capabilities)
- ````````````````````````````````````````
+-		g_dbus_dict_append_entry(&dict, "Latency", DBUS_TYPE_UINT16,
+-							&qos->latency);
++		g_dbus_dict_append_entry(&qos_dict, "MaximumLatency",
++					DBUS_TYPE_UINT16, &qos->latency);
  
--	Select configuration from the supported capabilities:
-+	Select BAP unicast configuration from the supported capabilities:
+-		g_dbus_dict_append_entry(&dict, "MinimumDelay",
++		g_dbus_dict_append_entry(&qos_dict, "MinimumDelay",
+ 					DBUS_TYPE_UINT32, &qos->pd_min);
  
--	:object Endpoint [ISO only]:
--	:Refer to SetConfiguration for the list of other possible properties.:
-+	:object Endpoint:
+-		g_dbus_dict_append_entry(&dict, "MaximumDelay",
++		g_dbus_dict_append_entry(&qos_dict, "MaximumDelay",
+ 					DBUS_TYPE_UINT32, &qos->pd_max);
  
--	Returns a configuration which can be used to setup a transport, see
--	**org.bluez.MediaTransport(5)** for possible values.
-+	:array{byte} Capabilities:
-+
-+	:array{byte} Metadata:
-+
-+	:uint32 Locations:
-+
-+	:dict QoS:
-+
-+		:byte Framing:
-+		:byte PHY:
-+		:uint16 MaximumLatency:
-+		:uint32 MinimumDelay:
-+		:uint32 MaximumDelay:
-+		:uint32 PreferredMinimumDelay:
-+		:uint32 PreferredMaximumDelay:
-+
-+	See `MediaEndpoint Properties`_ for their possible values.
-+
-+	Returns a configuration which can be used to setup a transport:
-+
-+	:array{byte} Capabilities:
-+	:array{byte} Metadata [optional]:
-+	:dict QoS:
-+
-+	See `SetConfiguration`_ for their possible values.
+-		g_dbus_dict_append_entry(&dict, "PreferredMinimumDelay",
++		g_dbus_dict_append_entry(&qos_dict, "PreferredMinimumDelay",
+ 					DBUS_TYPE_UINT32, &qos->ppd_min);
  
- 	Note: There is no need to cache the selected properties since on
- 	success the configuration is send back as parameter of SetConfiguration.
+-		g_dbus_dict_append_entry(&dict, "PreferredMaximumDelay",
++		g_dbus_dict_append_entry(&qos_dict, "PreferredMaximumDelay",
+ 					DBUS_TYPE_UINT32, &qos->ppd_min);
++
++		dbus_message_iter_close_container(&variant, &qos_dict);
++		dbus_message_iter_close_container(&entry, &variant);
++		dbus_message_iter_close_container(&dict, &entry);
+ 	}
+ 
+ 	dbus_message_iter_close_container(&iter, &dict);
+@@ -2749,7 +2770,7 @@ static void app_register_endpoint(void *data, void *user_data)
+ 		dbus_message_iter_get_basic(&iter, &qos.phy);
+ 	}
+ 
+-	if (g_dbus_proxy_get_property(proxy, "Latency", &iter)) {
++	if (g_dbus_proxy_get_property(proxy, "MaximumLatency", &iter)) {
+ 		if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_UINT16)
+ 			goto fail;
+ 
 -- 
 2.41.0
 
