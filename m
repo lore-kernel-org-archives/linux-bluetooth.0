@@ -2,101 +2,72 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB2ACE8FDBE
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Oct 2023 22:34:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4005E8FDBF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Oct 2023 23:20:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229954AbjJCWeY (ORCPT
+        id S231535AbjJCXUd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 3 Oct 2023 18:34:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35448 "EHLO
+        Tue, 3 Oct 2023 19:20:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229776AbjJCWeX (ORCPT
+        with ESMTP id S234830AbjJCXUc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 3 Oct 2023 18:34:23 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C984AF
-        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Oct 2023 15:34:20 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1bf55a81eeaso11552405ad.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Oct 2023 15:34:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696372460; x=1696977260; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=N2ewrZ10SRCqecrOwA6CYdTUnIw7YhqMnkOaLdc9g6g=;
-        b=mvy0nrPc1xqB2VRf05Ye2xawR7kKQHatyvEcio+u3o4CYZd2dIoldCKj4hcopNN121
-         zVRefyrAh4WhUkRYGrS4Hi8/NygVVQ13Hp9/DlWRzAsZckPt/FntrfCTILPh4/d198HP
-         4sxzti/gBnxrQy4aPPsCLFtKGUr0vncwAfEYfTRMGEozItoRoGUIqhuaZC/o70gZ8SVa
-         HBAxotn3JDdLFyngnOikJLY9fNjlJYv6u9WxtAFzNQXDywK1BXjID2n+oDLxmQhdrULP
-         vA8NM09X3+M9XzSKtFejJKnTkJQ1k6o2J+SeQWzFB9hm4th2pyfHMyXrPhsSAVW6ixb9
-         dZ3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696372460; x=1696977260;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=N2ewrZ10SRCqecrOwA6CYdTUnIw7YhqMnkOaLdc9g6g=;
-        b=JqDg71c2c240dtyugtaxzejusKmHYIYuvKf2vx+yUl595jm7uoKqr0j2CeQEj6FAKs
-         Ve03/KxpIGMrzJLsWgI6rwOTOSUILN+HuGG3KDNNZDm88me6f7P7/nzHKxmfZ+Xk86ql
-         +pvjEd17nzrROlKrql3TvM/K027rr7dduwmXf06z2rGm0aF/S7q+Fsx65RKoVzwnTGh6
-         CoKUGXoQ+2RksGhww3tlHXJND3rqCb6JX5SXkNLaODnpCwlJoCHyV32Te4VYH6MwCy2a
-         QEnXgYbk9JZdSq6wmPjKfOT9K6GS9Znn6sC9heEN1dXp4TZLQI92YW47wS4NQZFssakr
-         jczw==
-X-Gm-Message-State: AOJu0Yw3CcTK7ILR6bXrrmEDFOyKySIfeZnoCouVKr3nWTRoOrQotSkE
-        s7UPZHDZfQf0MYoBcrgHOOeZ0WjD0l4=
-X-Google-Smtp-Source: AGHT+IHFd8C2Vaef36G5oZcW3/o5BCD/qSPcIKmXiHrfoC3X0pIunqrWg0ECFp/5SQ8X6fTjDh6iYA==
-X-Received: by 2002:a17:902:82ca:b0:1c3:83e2:d0c6 with SMTP id u10-20020a17090282ca00b001c383e2d0c6mr885892plz.52.1696372459677;
-        Tue, 03 Oct 2023 15:34:19 -0700 (PDT)
-Received: from [172.17.0.2] ([20.168.76.145])
-        by smtp.gmail.com with ESMTPSA id l19-20020a170902f69300b001c465bedaccsm2149321plg.83.2023.10.03.15.34.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Oct 2023 15:34:18 -0700 (PDT)
-Message-ID: <651c96ea.170a0220.e70b2.6969@mx.google.com>
-Date:   Tue, 03 Oct 2023 15:34:18 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1953544381701475068=="
+        Tue, 3 Oct 2023 19:20:32 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3E63DC
+        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Oct 2023 16:20:29 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4F3ABC433CA;
+        Tue,  3 Oct 2023 23:20:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1696375229;
+        bh=1iZcCgrBZMlkWRkIFeIUXqJWM2OX3QVnOopuICG62+s=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=AaM9uw/OJ/yaUzRTJYJoc4gz/5BOZeBLM1LsMDOmOywlBw5AC//w7IoiGSRgO8fdf
+         AMTzPOkenT99ZVhvEe4wQKqyHzATTHQmiVRvFRsY96ddq+rQFbw9eutWkBc/1Pxw8P
+         9j6HLKNEsSS+QbHHAp4PzfhRxBr/L2j9e+G3eU8NI/iwakjLiE7zskYTDKm9sqCcBW
+         59Th9zz/u36HL/w8n5d8tUSeV8VUol/8R5ACB5y2TDb0QiMcSU2LvVOn4zEG1HfrEb
+         4ReFrGvtkwa60KHorqXkyXlQVugqsuXwOtwgj8CpsADS+CrpVxHcCzcgfGqpeZccIW
+         HB2PzvEXHEU8g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 38A84E632D1;
+        Tue,  3 Oct 2023 23:20:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ] client/mgmt: Fix registering pairing callbacks
-In-Reply-To: <20231003211442.3348427-1-luiz.dentz@gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ] client/mgmt: Fix registering pairing callbacks
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <169637522922.21629.5075861699176018133.git-patchwork-notify@kernel.org>
+Date:   Tue, 03 Oct 2023 23:20:29 +0000
 References: <20231003211442.3348427-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20231003211442.3348427-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1953544381701475068==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello:
 
-This is automated email and please do not reply to this email!
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Dear submitter,
+On Tue,  3 Oct 2023 14:14:42 -0700 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> Don't register pairing callbacks until mgmt.pair is called otherwise it
+> may take over the role of pairing agent when bluetoothctl agent is in
+> use.
+> ---
+>  client/mgmt.c | 22 ++++++++++++++--------
+>  1 file changed, 14 insertions(+), 8 deletions(-)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=789713
+Here is the summary with links:
+  - [BlueZ] client/mgmt: Fix registering pairing callbacks
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9741e47aebcd
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.38 seconds
-GitLint                       PASS      0.26 seconds
-BuildEll                      PASS      27.84 seconds
-BluezMake                     PASS      783.27 seconds
-MakeCheck                     PASS      12.19 seconds
-MakeDistcheck                 PASS      160.83 seconds
-CheckValgrind                 PASS      255.32 seconds
-CheckSmatch                   PASS      348.54 seconds
-bluezmakeextell               PASS      106.02 seconds
-IncrementalBuild              PASS      659.30 seconds
-ScanBuild                     PASS      1041.71 seconds
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============1953544381701475068==--
