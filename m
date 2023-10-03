@@ -2,72 +2,73 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4303E8FDC2
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Oct 2023 23:20:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02E8BE8FDC4
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Oct 2023 23:20:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235144AbjJCXUf (ORCPT
+        id S234460AbjJCXUg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 3 Oct 2023 19:20:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47876 "EHLO
+        Tue, 3 Oct 2023 19:20:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229805AbjJCXUd (ORCPT
+        with ESMTP id S235111AbjJCXUc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 3 Oct 2023 19:20:33 -0400
+        Tue, 3 Oct 2023 19:20:32 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D42FAEA
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3FFBE8
         for <linux-bluetooth@vger.kernel.org>; Tue,  3 Oct 2023 16:20:29 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 64A4EC433CD;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 46CC8C433C9;
         Tue,  3 Oct 2023 23:20:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1696375229;
-        bh=Op44w+dedUEBys0nuiVoZMAEbd0x5es+D7Qx1hIE+HE=;
+        bh=rxWsuLcW2GdFoA1u2njszkkDPFTK++0xHcA1ZXRyQv4=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=A0ONHQnHaRoRZqJW/Lducdp7cMGWDdMqPmylv4myiP9ZOAvbx4QOca9PsUAsmGzAl
-         kqIuXVPmS9D8R7iuo+wdrJ84JT3O1CYSFjHN+dYM7w3fUYTKXE7Vd1TpV5mnxdrqbn
-         SK3oM9Q1YPo0HcgUw8+XgyvemKn9WZ3Ic34qg415C7QRYbPQn/1rAXmoXVDsvXS4+N
-         ps0nGe9cPnMF+kEO7JJ1OJiZo9EKbmA1CbJi+3rqOJSsiEKEs9MBVS5RwP3eyswUUQ
-         Vz0BbpraCyaMaNW3SVFPnYTVR5FHnWSBjdTOIf4pmhqdqsTqF3oVbqu+BXnbHjVE9q
-         sHk+iSa0G+j2Q==
+        b=nfD7QcGdyt29PghJkTn8znoaIqq+ni+K/RNTIN+RxPpLZufKe4QYwrlO17o9C1Dyi
+         RnwytQIL4ZgcVBtTkC0LwLlc1XelbojRRunaq+liFLQ1EA7pzHyDq/Zvs4nuEbOQb/
+         KdPrPYHX9fN1eZPFft1K6kzFVNAHeiKLuHliwGAQR6ZTR3NnH77Dj5UBGmwOpzgEDN
+         YkV7ou2EAOUTvHtrth08XUFzQbi/Ogg29xZAFhyrgBLNCHlDN5rJJSaspE61L+/8tO
+         jksdTKC9NTAodiGRS3A9LXHkz3lT9CZpRqZTtanfaUgHEZSD/xDxJXMESFI2Sgd5KT
+         ZkzJ8q4sLKnfw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 495FAE270F0;
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2F789E270EF;
         Tue,  3 Oct 2023 23:20:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v3 1/2] bap: use MediaEndpoint related properties
- consistently
+Subject: Re: [PATCH BlueZ 0/1] iso-tester: Add test for bcast AC 13 BIS unset
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <169637522929.21629.18022470109434488634.git-patchwork-notify@kernel.org>
+Message-Id: <169637522919.21629.12052597362468031555.git-patchwork-notify@kernel.org>
 Date:   Tue, 03 Oct 2023 23:20:29 +0000
-References: <530fedd2233740d401c67bc1470756c86cb578a2.1696360700.git.pav@iki.fi>
-In-Reply-To: <530fedd2233740d401c67bc1470756c86cb578a2.1696360700.git.pav@iki.fi>
-To:     Pauli Virtanen <pav@iki.fi>
-Cc:     linux-bluetooth@vger.kernel.org
+References: <20231003143840.3009-1-iulia.tanasescu@nxp.com>
+In-Reply-To: <20231003143840.3009-1-iulia.tanasescu@nxp.com>
+To:     Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Cc:     linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com,
+        mihai-octavian.urzica@nxp.com, silviu.barbulescu@nxp.com,
+        vlad.pruteanu@nxp.com, andrei.istodorescu@nxp.com,
+        luiz.dentz@gmail.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluez.git (master)
+This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue,  3 Oct 2023 22:19:03 +0300 you wrote:
-> Use the documented name "MaximumLatency" for the MediaEndpoint QoS
-> Max_Transport_Latency field, in SelectProperties input parameters and
-> expected client MediaEndpoint properties.
+On Tue,  3 Oct 2023 17:38:39 +0300 you wrote:
+> This adds a new test for the ISO Broadcast AC 13, when the BIG handle
+> is set but the advertising handle is unset.
 > 
-> Put QoS fields to a "QoS" dict in SelectProperties input.
+> This test depends on the kernel support implemented in
+> Bluetooth: ISO: Match QoS adv handle with BIG handle
 > 
-> Fix typoed ppd_min -> ppd_max in SelectProperties input.
+> Iulia Tanasescu (1):
+>   iso-tester: Add test for bcast AC 13 BIS unset
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ,v3,1/2] bap: use MediaEndpoint related properties consistently
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=5e582e34e392
-  - [BlueZ,v3,2/2] doc: clarify org.bluez.MediaEndpoint documentation
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=6683305d827a
+  - [BlueZ,1/1] iso-tester: Add test for bcast AC 13 BIS unset
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=232f6f68531b
 
 You are awesome, thank you!
 -- 
