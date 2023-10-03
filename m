@@ -2,179 +2,142 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25CD6E75440
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Oct 2023 10:17:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8733BE75452
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Oct 2023 12:26:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239882AbjJCKR0 (ORCPT
+        id S232395AbjJCM0D (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 3 Oct 2023 06:17:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37732 "EHLO
+        Tue, 3 Oct 2023 08:26:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239803AbjJCKRY (ORCPT
+        with ESMTP id S231440AbjJCM0D (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 3 Oct 2023 06:17:24 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B11EBB8
-        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Oct 2023 03:17:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696328240; x=1727864240;
-  h=date:from:to:cc:subject:message-id;
-  bh=W1WK5n3T+C3gIwcsai1Mj11di5ovPDgfs06UTPJBTaw=;
-  b=fMGBaC90eM2viyFuTsmX9Wpv0VY/kEm3grdU87BBd17hsmbGkxAJSZqM
-   RuZr4J6AarusnP+ngJavu/yhX2QY+/o5FDSNqQBNgfg+ConJ9hn1M/Ky8
-   KrawH2etNf3t+qmTaR6ZE2O8uqiCrZRzkhNtUG6zJGDE52xqnr/qfHv0x
-   2MSJmN4lTzSekjKNFkhyTX/ncjiV42AkHMVBT9bF3CW33TOo05i63bMhs
-   rahdvKTOUKKZA1a2g3aJpCre3kYDdnVGmonaYLaLcQKvJAzQc0MCrvVFq
-   C/ZSz1J3h1G/c7MGlmr8jiN2iOnUsycQ1/WCsO0O5I3S63Jd+TI10S8zm
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="380117091"
-X-IronPort-AV: E=Sophos;i="6.03,196,1694761200"; 
-   d="scan'208";a="380117091"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2023 03:17:17 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="727566238"
-X-IronPort-AV: E=Sophos;i="6.03,196,1694761200"; 
-   d="scan'208";a="727566238"
-Received: from lkp-server02.sh.intel.com (HELO c3b01524d57c) ([10.239.97.151])
-  by orsmga006.jf.intel.com with ESMTP; 03 Oct 2023 03:17:16 -0700
-Received: from kbuild by c3b01524d57c with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qncSn-00071e-33;
-        Tue, 03 Oct 2023 10:17:13 +0000
-Date:   Tue, 03 Oct 2023 18:16:51 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- d70e44fef8621aeae895e1cbc62059df9e31836b
-Message-ID: <202310031849.80Xhw6xb-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+        Tue, 3 Oct 2023 08:26:03 -0400
+Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9686B8;
+        Tue,  3 Oct 2023 05:25:58 -0700 (PDT)
+Received: by mail-yb1-xb33.google.com with SMTP id 3f1490d57ef6-d8162698f0dso917009276.0;
+        Tue, 03 Oct 2023 05:25:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696335958; x=1696940758; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LNO5GJBfVgDppnnjLs8Ey/aGvi+SY8q8n/RPtqg6Lb0=;
+        b=hsK9jHxmOtLJ2VlYpbe5A0BRGU/6RDLVwpPRxUb0G1oC85PnNiA52gzFW2ObtQVlQL
+         iQ2zTKF6rKkpISQFpKJ+X4dUzNmD9iFsSO4F+c58xpvoj3jcfsprEDV+bNrfeGVsDB4s
+         yC4iZbmASYhXgWa2L0fw1DtJFzInEJBb8SDldCwtT+2weRTfVuDou98lFk6OUYiF1Phk
+         5NkqUZE2W2rkVfrV6J37Sv/kdggOGseURs+SukdCAdTeyLXKhDDzHMS8EkhGrJ3acBhs
+         zhWeFL11SZ/X4Pl/6ieo0fClJGLt3IzvHeOWOeJAdXbNpbkOUaZvOu26mYMjj6tk0COQ
+         AZUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696335958; x=1696940758;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LNO5GJBfVgDppnnjLs8Ey/aGvi+SY8q8n/RPtqg6Lb0=;
+        b=f+uOcryYhMYlLLC0HYOFWaCEY/jEsPMqwojaHDkpErDjlNufs/UIV937Z78TwvAeDK
+         wz1WvxSX+ttvRaULy7Lod+BA4b+T15xcPbe2O3c2D6z0tCxwg6yZhnWT8t+vhtoNEonL
+         FvFdxWu2fV6qwVug9n8yAgNUgIgdjW9IELcD16toWr6aWy//fLtKQRIihR3IVh8qf0DQ
+         lwuk3OcRy+eRej2jNxWyxN9Czpl/i/uU+84XoRtyJbxwNb/u+QCdV1SeAqjDiLUrJDDl
+         L4ffkfvI2gyB+QEq8rlilh1iziLxt9q3El2WBYuU+DndqnVOJW0VlpqtmClwo2p7Zl0w
+         bqow==
+X-Gm-Message-State: AOJu0YzD3/8uxZCcJ1PwrmK5CYbRE+oS0N2//prvH1T+eOMnwIFzX2TW
+        Hx7TWYLX4QLamVrDLBmDxWMnQYq5ICmPWC9tdiw=
+X-Google-Smtp-Source: AGHT+IH3vFPI8wkZPSB+huGryIAf1o97KjtxkawCjpbmFqLZ7a060PcmeyqhgyDquT7PF4ujt0bcej93HgDs77wHvAQ=
+X-Received: by 2002:a05:6902:707:b0:d85:aa81:53f0 with SMTP id
+ k7-20020a056902070700b00d85aa8153f0mr16641798ybt.4.1696335957740; Tue, 03 Oct
+ 2023 05:25:57 -0700 (PDT)
+MIME-Version: 1.0
+References: <CAH7-e5sb+kT_LRb1_y-c5JaFN0=KrrRT97otUPKzTCgzGsVdrQ@mail.gmail.com>
+ <ZRtWcgiH5JhD5NU2@debian.me>
+In-Reply-To: <ZRtWcgiH5JhD5NU2@debian.me>
+From:   =?UTF-8?Q?Erik_Dob=C3=A1k?= <erik.dobak@gmail.com>
+Date:   Tue, 3 Oct 2023 14:25:46 +0200
+Message-ID: <CAH7-e5uspavg_VBJxKLOKJfU3nAq-OrPqzihF2opffY-ReiC-w@mail.gmail.com>
+Subject: Re: bluetooth issues since kernel 6.4 - not discovering other bt
+ devices - /linux/drivers/bluetooth/btusb.c
+To:     Bagas Sanjaya <bagasdotme@gmail.com>
+Cc:     Linux Stable <stable@vger.kernel.org>,
+        Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Mediatek <linux-mediatek@lists.infradead.org>,
+        Linux Regressions <regressions@lists.linux.dev>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        AngeloGioacchino Del Regno 
+        <angelogioacchino.delregno@collabora.com>,
+        =?UTF-8?Q?Tomasz_Mo=C5=84?= <tomasz.mon@nordicsemi.no>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: d70e44fef8621aeae895e1cbc62059df9e31836b  Bluetooth: Reject connection with the device which has same BD_ADDR
+On Tue, 3 Oct 2023 at 01:47, Bagas Sanjaya <bagasdotme@gmail.com> wrote:
+>
+> On Sun, Oct 01, 2023 at 07:47:54AM +0200, Erik Dob=C3=A1k wrote:
+> > Hello!
+> >
+> > I bought a new laptop fujitsu life book and everything is going fine
+> > on artix just the bt makes trouble:
+> >
+> > /var/log/error.log
+> > Sep 30 18:43:48 nexus bluetoothd[2266]:
+> > src/adapter.c:reset_adv_monitors_complete() Failed to reset Adv
+> > Monitors: Failed (0x03)
+> > Sep 30 18:43:48 nexus bluetoothd[2266]: Failed to clear UUIDs: Failed (=
+0x03)
+> > Sep 30 18:43:48 nexus bluetoothd[2266]: Failed to add UUID: Failed (0x0=
+3)
+> > Sep 30 18:43:48 nexus bluetoothd[2266]: Failed to add UUID: Failed (0x0=
+3)
+> >
+> > i searched a bit the webs and found a new commit at kernel org that
+> > does do the trouble:
+> > https://bugs.archlinux.org/task/78980
+> >
+> > follow the linkeys inside the commits there or read this one:
+> >
+> > ---------------before------------------------------------
+> > /* interface numbers are hardcoded in the spec */
+> >         if (intf->cur_altsetting->desc.bInterfaceNumber !=3D 0) {
+> >                 if (!(id->driver_info & BTUSB_IFNUM_2))
+> >                         return -ENODEV;
+> >                 if (intf->cur_altsetting->desc.bInterfaceNumber !=3D 2)
+> >                         return -ENODEV;
+> >         }
+> > -----------after----------------------------------------------------
+> > if ((id->driver_info & BTUSB_IFNUM_2) &&
+> >     (intf->cur_altsetting->desc.bInterfaceNumber !=3D 0) &&
+> >     (intf->cur_altsetting->desc.bInterfaceNumber !=3D 2))
+> > return -ENODEV;
+> > --------------------------------------------------------
+> >
+> > the dude just hooked up 3 conditions in a row with && where before it
+> > was 2 conditions in 1 condition. + the comment was removed.
+> >
+> >
+>
+> Try latest mainline first (currently v6.6-rc4). Because you have to
+> compile your own kernel, please refer to
+> Documentation/admin-guide/quickly-build-trimmed-linux.rst if you don't kn=
+ow how to do the compilation.
+>
+> Also, don't top-post when replying; reply inline with appropriate context
+> instead.
+>
+> Thanks.
+>
+> --
+> An old man doll... just what I always wanted! - Clara
 
-elapsed time: 749m
+Hi i booted now into linux-6.6-rc4 and the issue is still there. No
+bluetooth devices are discovered.
+with this device: Bus 001 Device 004: ID 04c5:1670 Fujitsu, Ltd Bluetooth R=
+adio
 
-configs tested: 107
-configs skipped: 2
-
-The following configs have been built successfully.
-More configs may be tested in the coming days.
-
-tested configs:
-alpha                             allnoconfig   gcc  
-alpha                            allyesconfig   gcc  
-alpha                               defconfig   gcc  
-arc                              allmodconfig   gcc  
-arc                               allnoconfig   gcc  
-arc                              allyesconfig   gcc  
-arc                                 defconfig   gcc  
-arc                   randconfig-001-20231003   gcc  
-arm                              allmodconfig   gcc  
-arm                               allnoconfig   gcc  
-arm                              allyesconfig   gcc  
-arm                                 defconfig   gcc  
-arm                   randconfig-001-20231003   gcc  
-arm64                            allmodconfig   gcc  
-arm64                             allnoconfig   gcc  
-arm64                            allyesconfig   gcc  
-arm64                               defconfig   gcc  
-csky                             allmodconfig   gcc  
-csky                              allnoconfig   gcc  
-csky                             allyesconfig   gcc  
-csky                                defconfig   gcc  
-i386                             allmodconfig   gcc  
-i386                              allnoconfig   gcc  
-i386                             allyesconfig   gcc  
-i386         buildonly-randconfig-001-20231003   gcc  
-i386         buildonly-randconfig-002-20231003   gcc  
-i386         buildonly-randconfig-003-20231003   gcc  
-i386         buildonly-randconfig-004-20231003   gcc  
-i386         buildonly-randconfig-005-20231003   gcc  
-i386         buildonly-randconfig-006-20231003   gcc  
-i386                              debian-10.3   gcc  
-i386                                defconfig   gcc  
-i386                  randconfig-001-20231003   gcc  
-i386                  randconfig-002-20231003   gcc  
-i386                  randconfig-003-20231003   gcc  
-i386                  randconfig-004-20231003   gcc  
-i386                  randconfig-005-20231003   gcc  
-i386                  randconfig-006-20231003   gcc  
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch                        allyesconfig   gcc  
-loongarch                           defconfig   gcc  
-loongarch             randconfig-001-20231003   gcc  
-m68k                             allmodconfig   gcc  
-m68k                              allnoconfig   gcc  
-m68k                             allyesconfig   gcc  
-m68k                                defconfig   gcc  
-microblaze                       allmodconfig   gcc  
-microblaze                        allnoconfig   gcc  
-microblaze                       allyesconfig   gcc  
-microblaze                          defconfig   gcc  
-mips                             allmodconfig   gcc  
-mips                              allnoconfig   gcc  
-mips                             allyesconfig   gcc  
-nios2                            allmodconfig   gcc  
-nios2                             allnoconfig   gcc  
-nios2                            allyesconfig   gcc  
-nios2                               defconfig   gcc  
-openrisc                         allmodconfig   gcc  
-openrisc                          allnoconfig   gcc  
-openrisc                         allyesconfig   gcc  
-openrisc                            defconfig   gcc  
-parisc                           allmodconfig   gcc  
-parisc                            allnoconfig   gcc  
-parisc                           allyesconfig   gcc  
-parisc                              defconfig   gcc  
-parisc64                            defconfig   gcc  
-powerpc                          allmodconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc                          allyesconfig   gcc  
-riscv                            allmodconfig   gcc  
-riscv                             allnoconfig   gcc  
-riscv                            allyesconfig   gcc  
-riscv                               defconfig   gcc  
-riscv                          rv32_defconfig   gcc  
-s390                             allmodconfig   gcc  
-s390                              allnoconfig   gcc  
-s390                             allyesconfig   gcc  
-s390                                defconfig   gcc  
-sh                               allmodconfig   gcc  
-sh                                allnoconfig   gcc  
-sh                               allyesconfig   gcc  
-sh                                  defconfig   gcc  
-sparc                            allmodconfig   gcc  
-sparc                             allnoconfig   gcc  
-sparc                            allyesconfig   gcc  
-sparc                               defconfig   gcc  
-sparc64                          allmodconfig   gcc  
-sparc64                          allyesconfig   gcc  
-sparc64                             defconfig   gcc  
-um                               allmodconfig   clang
-um                                allnoconfig   clang
-um                               allyesconfig   clang
-um                                  defconfig   gcc  
-um                             i386_defconfig   gcc  
-um                           x86_64_defconfig   gcc  
-x86_64                            allnoconfig   gcc  
-x86_64                           allyesconfig   gcc  
-x86_64                              defconfig   gcc  
-x86_64                randconfig-001-20231003   gcc  
-x86_64                randconfig-002-20231003   gcc  
-x86_64                randconfig-003-20231003   gcc  
-x86_64                randconfig-004-20231003   gcc  
-x86_64                randconfig-005-20231003   gcc  
-x86_64                randconfig-006-20231003   gcc  
-x86_64                          rhel-8.3-rust   clang
-x86_64                               rhel-8.3   gcc  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+E
