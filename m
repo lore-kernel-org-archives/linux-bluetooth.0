@@ -2,277 +2,126 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2228E8FDC0
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Oct 2023 23:35:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22CB4E8FDC0
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Oct 2023 23:56:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230325AbjJCXfT (ORCPT
+        id S238679AbjJCX4m (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 3 Oct 2023 19:35:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49742 "EHLO
+        Tue, 3 Oct 2023 19:56:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229782AbjJCXfS (ORCPT
+        with ESMTP id S237225AbjJCX4l (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 3 Oct 2023 19:35:18 -0400
-Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AB06AF
-        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Oct 2023 16:35:14 -0700 (PDT)
-Received: from github.com (hubbernetes-node-ca9b8e1.ash1-iad.github.net [10.56.148.19])
-        by smtp.github.com (Postfix) with ESMTPA id 77D83600168
-        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Oct 2023 16:35:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2023; t=1696376113;
-        bh=ebYe5btKOSbyUI8F1mkOACAiebXyyYxHhq89UhNWFHE=;
-        h=Date:From:To:Subject:From;
-        b=eTZola0P/DAkVOF0uF6r1S/Ke1/mAYrxqPv+RCa/+j2g/SfAKP3fZkc/OfiNOng7W
-         Jmn9+coK5eL8zNLnlsLa56Ai3wxjUxHrLv5gDHWyOLikzlZoATZnJs6uUQnkmLOEA0
-         L/GRhw0u3Nm9HEenZh/KBZ7HXXCmEkPnFxMq64Y8=
-Date:   Tue, 03 Oct 2023 16:35:13 -0700
-From:   Luiz Augusto von Dentz <noreply@github.com>
-To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/7a79ff-9741e4@github.com>
-Subject: [bluez/bluez] 32b6d7: doc/set-api: Rename to org.bluez.DeviceSet
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+        Tue, 3 Oct 2023 19:56:41 -0400
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AD08A7;
+        Tue,  3 Oct 2023 16:56:22 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1c874b43123so3000165ad.2;
+        Tue, 03 Oct 2023 16:56:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696377381; x=1696982181; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZCCBj410ajq0re8t8s28xHlISeDJPhGS19VANz63K9o=;
+        b=OSh2MQ4ANh1QwS1uiRujguNzfepjGkSNtKiBdh4Pve6XSeihn08PNH++WBIeyQOttR
+         gxVQb53BQi7xYA6j402WfZa/LAvmFLDDOpB3jugvG7MoFgTyHd7tssjDoxLZk+XcGZfm
+         aGgeh0S3WDhz23znU+XGwM+tR19u0iGNdi64DCMLbpZgOxG23xDo9hRDdX6OgpHNHuzB
+         C7ev72xL4w5pZEqOOvL8uBFIC1uMN658i4fChWknbmGdxpbkw97VRYHmSqVhWj7IRPIO
+         vCTWRsqKN3u3bV0EWRbBBSAA7T01tS7s8sMrrZXE8l9DHvhhduc0qUy5VyN57ZCRP3l9
+         5Exw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696377381; x=1696982181;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZCCBj410ajq0re8t8s28xHlISeDJPhGS19VANz63K9o=;
+        b=M+qVz3aHvmfkSpjm8W2LD6eKGCZ+d5m7ZfbDiqeRe79BcYJQlUP5In78FC7bhapoG+
+         mCfKM5MrtzdZYMnqMmPfZnOxxeOOoJxqlKIkPPOp9GMfZZMmBPIyZ2lCS8iWTjUfkrpT
+         x4W6Clu8QTmQkTaZzhRPuwd+Q3V7pY7FCq49xe3TgpjRHXvUcbFmg8cIRANa/1DNBBuF
+         l4GYzTgo9kp6/EHmY1fDiCM3ch61V05BArrHzK3sMyu5gldwQSrbTuhntUZjiHxiwAbY
+         Aty3zKlG4sgTZikKfAs6gGTWcgMzNdPUD0J6rl0fy3tPbpb/txMySiRO3Iy2dg1e+5VY
+         Pawg==
+X-Gm-Message-State: AOJu0YxPWTrpcf97VFGivFx3Z2Ubhi/+uyBVcLtfzVSzz01LomMz8PhI
+        dEGZIfanYUIjVMr5Umc2IU4=
+X-Google-Smtp-Source: AGHT+IEQ/w1Y8P4IJ6FMYu9I9SDAvd9lq2qE+CakE2eHWL6oVHapQH7nJH+ONsuq9pi4d0n04dR+CQ==
+X-Received: by 2002:a17:902:9885:b0:1c6:117b:7086 with SMTP id s5-20020a170902988500b001c6117b7086mr935395plp.5.1696377381492;
+        Tue, 03 Oct 2023 16:56:21 -0700 (PDT)
+Received: from debian.me ([103.131.18.64])
+        by smtp.gmail.com with ESMTPSA id m1-20020a170902db0100b001b8b45b177esm2179485plx.274.2023.10.03.16.56.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Oct 2023 16:56:20 -0700 (PDT)
+Received: by debian.me (Postfix, from userid 1000)
+        id A41D781A7EC5; Wed,  4 Oct 2023 06:56:18 +0700 (WIB)
+Date:   Wed, 4 Oct 2023 06:56:18 +0700
+From:   Bagas Sanjaya <bagasdotme@gmail.com>
+To:     "Kirill A. Shutemov" <kirill@shutemov.name>,
+        Hilda Wu <hildawu@realtek.com>
+Cc:     Alex Lu <alex_lu@realsil.com.cn>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Max Chou <max.chou@realtek.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Juerg Haefliger <juerg.haefliger@canonical.com>,
+        Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
+        Thorsten Leemhuis <linux@leemhuis.info>,
+        Linux Regressions <regressions@lists.linux.dev>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: Regression: devcoredump patch broke Realtek usb bluetooth adapter
+Message-ID: <ZRyqIn0_qqEFBPdy@debian.me>
+References: <20231003182038.k57nirtt4sonvt7c@box.shutemov.name>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="lOp0O5Hmv9c8nMC0"
+Content-Disposition: inline
+In-Reply-To: <20231003182038.k57nirtt4sonvt7c@box.shutemov.name>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 32b6d7394e9466d1769ad6a9b9fc65c6943a9b1d
-      https://github.com/bluez/bluez/commit/32b6d7394e9466d1769ad6a9b9fc65c6943a9b1d
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-10-03 (Tue, 03 Oct 2023)
 
-  Changed paths:
-    M Makefile.am
-    A doc/org.bluez.DeviceSet.rst
-    R doc/set-api.rst
+--lOp0O5Hmv9c8nMC0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-  Log Message:
-  -----------
-  doc/set-api: Rename to org.bluez.DeviceSet
+On Tue, Oct 03, 2023 at 09:20:38PM +0300, Kirill A. Shutemov wrote:
+> Hi,
+>=20
+> Commit 044014ce85a1 ("Bluetooth: btrtl: Add Realtek devcoredump support")
+> broke Realtek-based ASUS USB-BT500, ID 0b05:190e.
+>=20
+> Devices failed to connect. hciconfig showed a controller with all-zero BD
+> address.
 
-This renames set-api.rst to org.bluez.DeviceSet.rst and generate a
-manpage org.bluez.DeviceSet.5.
+What is its output then? And dmesg log?
 
+>=20
+> I reverted the commit as well as bd003fb338af that depends on the commit.
+> It made the problem go away.
+>=20
+> I know virtually nothing about bluetooth. Let me know what info you need
+> to debug the issue.
+>=20
 
-  Commit: b938b05559d345306486b6badc245b18d88f0ccf
-      https://github.com/bluez/bluez/commit/b938b05559d345306486b6badc245b18d88f0ccf
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-10-03 (Tue, 03 Oct 2023)
+Hilda, it looks like this regression is caused by a commit of yours. Would
+you like to take a look on it?
 
-  Changed paths:
-    M src/shared/csip.c
+Regardless, thanks for the regression report. I'm adding it to regzbot:
 
-  Log Message:
-  -----------
-  shared/csip: Fix returning invalid data to attribute Size reads
+#regzbot ^introduced: 044014ce85a17c
 
-The attribute Size value is stored in the size_val not on size member
-which represents the attribute object.
+--=20
+An old man doll... just what I always wanted! - Clara
 
+--lOp0O5Hmv9c8nMC0
+Content-Type: application/pgp-signature; name="signature.asc"
 
-  Commit: a1920af6f81fba7917784c2ca09159b0cef4e779
-      https://github.com/bluez/bluez/commit/a1920af6f81fba7917784c2ca09159b0cef4e779
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-10-03 (Tue, 03 Oct 2023)
+-----BEGIN PGP SIGNATURE-----
 
-  Changed paths:
-    M src/shared/csip.c
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZRyqGwAKCRD2uYlJVVFO
+o6UyAP9Slr9mZ+rRmtvUXh8WNdiIJEL1pcR6Ja0Bt3M/3Qr4qgEAnebbqTZM6ny7
+9ZiB/gqtVQo7ARGVnp9hOJXS5BHafQQ=
+=IV+/
+-----END PGP SIGNATURE-----
 
-  Log Message:
-  -----------
-  shared/csip: Fix not requiring encryption
-
-According to CSIS spec all attributes shall require encryption:
-
-  'Table 5.1: Coordinated Set Identification Service characteristics'
-
-
-  Commit: 65b53b0d3a8836eee6cff23518ef62c9409a301d
-      https://github.com/bluez/bluez/commit/65b53b0d3a8836eee6cff23518ef62c9409a301d
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-10-03 (Tue, 03 Oct 2023)
-
-  Changed paths:
-    M src/shared/csip.c
-
-  Log Message:
-  -----------
-  shared/csip: Fix not always reading SIRK value
-
-This makes sure the SIRK value is always read otherwise its value can
-be outdated or not even read if the connection was interrupted before
-read procedure was completed.
-
-
-  Commit: c35304f32c42125ec92fbae1b5f18223c4cde86a
-      https://github.com/bluez/bluez/commit/c35304f32c42125ec92fbae1b5f18223c4cde86a
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-10-03 (Tue, 03 Oct 2023)
-
-  Changed paths:
-    M src/device.c
-    M src/device.h
-
-  Log Message:
-  -----------
-  device: Add btd_device_get_ltk
-
-This adds btd_device_get_ltk function which can be used by plugins to
-access the LTK key.
-
-
-  Commit: 267bf36d844bd8813acba74434dfa2dc4d81a37b
-      https://github.com/bluez/bluez/commit/267bf36d844bd8813acba74434dfa2dc4d81a37b
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-10-03 (Tue, 03 Oct 2023)
-
-  Changed paths:
-    M profiles/audio/csip.c
-    M src/shared/csip.c
-    M src/shared/csip.h
-
-  Log Message:
-  -----------
-  csip: Add support for SIRK encryption
-
-This implements SIRK value encryption using the LTK which is accessed
-using btd_device_get_ltk.
-
-
-  Commit: 954b8e5324fdecbabd2da3ce2f1e884ac847d80d
-      https://github.com/bluez/bluez/commit/954b8e5324fdecbabd2da3ce2f1e884ac847d80d
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-10-03 (Tue, 03 Oct 2023)
-
-  Changed paths:
-    M src/main.c
-
-  Log Message:
-  -----------
-  main.conf: Fix default of CSIS.encrypt
-
-CSIS.encrypt setting shall default to true, not false.
-
-
-  Commit: 7ff68ce57fb4475f259cf5a7453cbd3cb9b8a5bd
-      https://github.com/bluez/bluez/commit/7ff68ce57fb4475f259cf5a7453cbd3cb9b8a5bd
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-10-03 (Tue, 03 Oct 2023)
-
-  Changed paths:
-    M src/shared/att.c
-
-  Log Message:
-  -----------
-  shared/att: Don't keep retrying the same operation
-
-If an operation has been retried already don't attempt to change the
-security again.
-
-
-  Commit: 5e582e34e39210ffdf5bc2a4695e884c00e7116f
-      https://github.com/bluez/bluez/commit/5e582e34e39210ffdf5bc2a4695e884c00e7116f
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2023-10-03 (Tue, 03 Oct 2023)
-
-  Changed paths:
-    M profiles/audio/media.c
-
-  Log Message:
-  -----------
-  bap: use MediaEndpoint related properties consistently
-
-Use the documented name "MaximumLatency" for the MediaEndpoint QoS
-Max_Transport_Latency field, in SelectProperties input parameters and
-expected client MediaEndpoint properties.
-
-Put QoS fields to a "QoS" dict in SelectProperties input.
-
-Fix typoed ppd_min -> ppd_max in SelectProperties input.
-
-Use the name "Locations" for SelectProperties supported locations input
-parameter, to match the MediaEndpoint property name which indicates the
-same thing.
-
-
-  Commit: 6683305d827a2f5626a2ae11cf0c8dae2e832899
-      https://github.com/bluez/bluez/commit/6683305d827a2f5626a2ae11cf0c8dae2e832899
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2023-10-03 (Tue, 03 Oct 2023)
-
-  Changed paths:
-    M doc/org.bluez.MediaEndpoint.rst
-
-  Log Message:
-  -----------
-  doc: clarify org.bluez.MediaEndpoint documentation
-
-Document the actual input and output parameter values used in
-SelectProperties. These differ from SetConfiguration.
-
-Mention SelectProperties is used for unicast only.
-
-Document SetConfiguration input parameters.
-
-
-  Commit: 232f6f68531bbe8be44c45a1094b26ee20a56c19
-      https://github.com/bluez/bluez/commit/232f6f68531bbe8be44c45a1094b26ee20a56c19
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2023-10-03 (Tue, 03 Oct 2023)
-
-  Changed paths:
-    M tools/iso-tester.c
-
-  Log Message:
-  -----------
-  iso-tester: Add test for bcast AC 13 BIS unset
-
-This adds a new test for the ISO Broadcast AC 13, when the BIG handle
-is set but the advertising handle is unset:
-
-ISO Broadcaster AC 13 BIG 0x01 - Success
-
-
-  Commit: d9445f6d0f087ecfc99cc94b558f1d8c5cf3272d
-      https://github.com/bluez/bluez/commit/d9445f6d0f087ecfc99cc94b558f1d8c5cf3272d
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2023-10-03 (Tue, 03 Oct 2023)
-
-  Changed paths:
-    M tools/iso-tester.c
-
-  Log Message:
-  -----------
-  iso-tester: Test bcast receiver with PA sync, no BIS
-
-This tests that a broadcast receiver is able to successfully sync to the
-PA transmitted by a source, without performing BIS sync also:
-
-ISO Broadcaster Receiver Defer No BIS - Success
-
-
-  Commit: 9741e47aebcdcff343dd2ca7dadc3ec41b66744f
-      https://github.com/bluez/bluez/commit/9741e47aebcdcff343dd2ca7dadc3ec41b66744f
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-10-03 (Tue, 03 Oct 2023)
-
-  Changed paths:
-    M client/mgmt.c
-
-  Log Message:
-  -----------
-  client/mgmt: Fix registering pairing callbacks
-
-Don't register pairing callbacks until mgmt.pair is called otherwise it
-may take over the role of pairing agent when bluetoothctl agent is in
-use.
-
-
-Compare: https://github.com/bluez/bluez/compare/7a79ff88fd95...9741e47aebcd
+--lOp0O5Hmv9c8nMC0--
