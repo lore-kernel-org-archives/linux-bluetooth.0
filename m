@@ -2,101 +2,122 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFEA3E8FDB6
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Oct 2023 20:50:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B051E8FDB7
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Oct 2023 21:14:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232210AbjJCUu7 (ORCPT
+        id S241167AbjJCVOv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 3 Oct 2023 16:50:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35608 "EHLO
+        Tue, 3 Oct 2023 17:14:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232190AbjJCUu5 (ORCPT
+        with ESMTP id S241158AbjJCVOv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 3 Oct 2023 16:50:57 -0400
-Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FF00AC
-        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Oct 2023 13:50:54 -0700 (PDT)
-Received: by mail-qt1-x82f.google.com with SMTP id d75a77b69052e-4195fddd6d7so2087191cf.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Oct 2023 13:50:54 -0700 (PDT)
+        Tue, 3 Oct 2023 17:14:51 -0400
+Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD958AF
+        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Oct 2023 14:14:46 -0700 (PDT)
+Received: by mail-ot1-x32c.google.com with SMTP id 46e09a7af769-6c62cb79b02so903602a34.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Oct 2023 14:14:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696366253; x=1696971053; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=vcHEZjTFzSFGAso5sTdW/ssEwjvWW3Dn406OmlaLPiY=;
-        b=noY9iqXt8nfeVG9o8YK7Xo1+Abx3EtHN1PTTQny7gQP6r2q5np0/LEB78li0QrLdPY
-         ZCEbt+ldfQCh109lD5KbTp6M7JrbwqktuKkxA/P/7OglTUA/sh9VVgEPf9JW5DYg4oEN
-         Lxp/0samjGlCU9CnnHad+5G1C/qOb9skkprNraHDvyzL/oQHFA3wDpL4XqeOKyrrtEL1
-         antGQOsuXlzAPbACSypENdRRyslzXd4MdCAqwZPSmoUe3euC1k21zGcfrBQDVbALFqM3
-         04ahWkqXOo69gSxk4iliJn1p7fTe9eWMscOwNy2a5rnhGbOtCMswK2uMU1zOQBdWLWO0
-         273g==
+        d=gmail.com; s=20230601; t=1696367685; x=1696972485; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ybON3hguA2NBAyfA9nsZYVM31BU7eZSbOEejEhk/g4c=;
+        b=k4HHPpX4olv/L7naJD9tsi7kv9fP9Xfrcy/o4wN1vCpmo2G5+Rzp1AApNUolZbTxsE
+         eGY1gsJzGUYFDnSsBTvcP4GfdR1ZUDyKyiMjdmhkXSRtsov6FVJn0ArA+naZTLWI3+57
+         okjTrJaY9hNwyk+FIOkoIY7o5uWquY1xeA3o/atOEYLKXRMEdDj7HW9BXaUjI3+85fnE
+         muRPKMuRoayHV0lrlnIu+4K90hOuGKcEb44EeYgAp+5TXoN7GfljEhopo1gOJbOf605Y
+         /z7zUJDJYwcgzgB7JRAPh0rAfq3uTYijKwdDnD0ChOq/+4a12SXpFkIsAMUxfC2rW7OE
+         lndw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696366253; x=1696971053;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vcHEZjTFzSFGAso5sTdW/ssEwjvWW3Dn406OmlaLPiY=;
-        b=El7WVZwcRITWVXlQYaqs55VMzl9Qr3ZC4O4TGQxdlr5hYPOlVG35VX5F6tCB0iAVoF
-         pVl138bKj2+d9gnENsYQa23U+47+pltXi7n7ToxZ3fL4X2PLta3oZW2xTSoeeqrUbFYU
-         AK5WDzxzsieaDibF/kPuki8oJwXnubeBseBW9Qa86Xnj+xhy4JVcZXuSKtCFYIBr05wu
-         /pU4RUavHAr9+Kh0l4mDyTJmZH0ASbl24KNueMS/j40jGB/kHFEJmdUKHdEuVnG9EDj1
-         xMj+uQXFcqj1VtD+I4pcea6fB/YgBX+2BPpQh4/UYxE8xWOFHyu3X7N2gWiWg2dOyu01
-         sQGw==
-X-Gm-Message-State: AOJu0YxlY8XsdWPve2GZ6j36RQ19YQCsE6448Y55Ntx6FqG8RpSiKb97
-        NKFKnzbCWWiVefJF1bWPbelf1wUGMhk=
-X-Google-Smtp-Source: AGHT+IHJeoysR1uWju9hzOM0/RIggFygQbjekhrbeaKfZAipuI30cT1F7B6rYzl9uY166ClWvk8p1w==
-X-Received: by 2002:ac8:7c4e:0:b0:410:9668:530a with SMTP id o14-20020ac87c4e000000b004109668530amr576950qtv.21.1696366253243;
-        Tue, 03 Oct 2023 13:50:53 -0700 (PDT)
-Received: from [172.17.0.2] ([20.57.76.102])
-        by smtp.gmail.com with ESMTPSA id t3-20020ac87383000000b0041957506ca9sm722792qtp.15.2023.10.03.13.50.52
+        d=1e100.net; s=20230601; t=1696367685; x=1696972485;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ybON3hguA2NBAyfA9nsZYVM31BU7eZSbOEejEhk/g4c=;
+        b=a8IzPQSGA/iZtg9RzJZLFIwfRc97Fw7/PRyh9ABb4kPJBxz5qvPRrNi6uXu497FSHj
+         WCAjowBh6xw58wIFNxbcImJ4r3FDw+wpGNZdJe/ieglVx7hSZm3Xf/xi07P/fgji87a3
+         b63No8lPuO/SEEz4o2/uxJxtPrArqTyV985uAVvbYr+eMHqZ9Ra+7sOjUUAbxEebJeHi
+         4z7PciDMV/ZEkzp2wiogL++HO64iGDvb7Hb6trkrTjihKVPukiC7fe8sRTw7n924Rzvf
+         TUamS3ybJnFScwJPhDJn4d2Of+Z1fUwQ9OfMEygpaTWLmUxx6G0eOSGSxDfuGfkMguIo
+         mpPQ==
+X-Gm-Message-State: AOJu0YxYMfEr2yJ6dZ9ZPuarQ6t7b06zaVDnqvLgu/5cJ9vZHe2QiOoR
+        GOSnq11e17MKc2DyYSNmXdqIzZK/5cILZtbs
+X-Google-Smtp-Source: AGHT+IGnF+yGkZVNKX8eHmxuspwX9e8N/tsNPasTcWRK2tWcgKAIgZyYMj4P/MCiIM9IrHGbZTrd+Q==
+X-Received: by 2002:a05:6830:d6:b0:6be:fc8b:40fc with SMTP id x22-20020a05683000d600b006befc8b40fcmr423058oto.36.1696367685218;
+        Tue, 03 Oct 2023 14:14:45 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-98-232-221-87.hsd1.or.comcast.net. [98.232.221.87])
+        by smtp.gmail.com with ESMTPSA id o1-20020a63a801000000b0057412d84d25sm1848293pgf.4.2023.10.03.14.14.43
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Oct 2023 13:50:52 -0700 (PDT)
-Message-ID: <651c7eac.c80a0220.601aa.3ff6@mx.google.com>
-Date:   Tue, 03 Oct 2023 13:50:52 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8480787155770362819=="
+        Tue, 03 Oct 2023 14:14:43 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] client/mgmt: Fix registering pairing callbacks
+Date:   Tue,  3 Oct 2023 14:14:42 -0700
+Message-ID: <20231003211442.3348427-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [BlueZ,v3,1/2] bap: use MediaEndpoint related properties consistently
-In-Reply-To: <530fedd2233740d401c67bc1470756c86cb578a2.1696360700.git.pav@iki.fi>
-References: <530fedd2233740d401c67bc1470756c86cb578a2.1696360700.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8480787155770362819==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=789693
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.17 seconds
-GitLint                       PASS      1.98 seconds
-BuildEll                      PASS      28.77 seconds
-BluezMake                     PASS      897.30 seconds
-MakeCheck                     PASS      12.03 seconds
-MakeDistcheck                 PASS      163.96 seconds
-CheckValgrind                 PASS      266.65 seconds
-CheckSmatch                   PASS      359.83 seconds
-bluezmakeextell               PASS      109.91 seconds
-IncrementalBuild              PASS      1459.07 seconds
-ScanBuild                     PASS      1105.26 seconds
-
-
-
+Don't register pairing callbacks until mgmt.pair is called otherwise it
+may take over the role of pairing agent when bluetoothctl agent is in
+use.
 ---
-Regards,
-Linux Bluetooth
+ client/mgmt.c | 22 ++++++++++++++--------
+ 1 file changed, 14 insertions(+), 8 deletions(-)
 
+diff --git a/client/mgmt.c b/client/mgmt.c
+index c056d018a9da..947d8fcd5556 100644
+--- a/client/mgmt.c
++++ b/client/mgmt.c
+@@ -3056,6 +3056,18 @@ static void pair_rsp(uint8_t status, uint16_t len, const void *param,
+ 	bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+ 
++static void register_pair_callbacks(struct mgmt *mgmt, uint16_t index)
++{
++	mgmt_register(mgmt, MGMT_EV_PIN_CODE_REQUEST, index, request_pin,
++								mgmt, NULL);
++	mgmt_register(mgmt, MGMT_EV_USER_CONFIRM_REQUEST, index, user_confirm,
++								mgmt, NULL);
++	mgmt_register(mgmt, MGMT_EV_USER_PASSKEY_REQUEST, index,
++						request_passkey, mgmt, NULL);
++	mgmt_register(mgmt, MGMT_EV_PASSKEY_NOTIFY, index,
++						passkey_notify, mgmt, NULL);
++}
++
+ static struct option pair_options[] = {
+ 	{ "help",	0, 0, 'h' },
+ 	{ "capability",	1, 0, 'c' },
+@@ -3105,6 +3117,8 @@ static void cmd_pair(int argc, char **argv)
+ 	if (index == MGMT_INDEX_NONE)
+ 		index = 0;
+ 
++	register_pair_callbacks(mgmt, index);
++
+ 	memset(&cp, 0, sizeof(cp));
+ 	str2ba(argv[0], &cp.addr.bdaddr);
+ 	cp.addr.type = type;
+@@ -5780,14 +5794,6 @@ static void register_mgmt_callbacks(struct mgmt *mgmt, uint16_t index)
+ 					local_name_changed, NULL, NULL);
+ 	mgmt_register(mgmt, MGMT_EV_DEVICE_FOUND, index, device_found,
+ 								mgmt, NULL);
+-	mgmt_register(mgmt, MGMT_EV_PIN_CODE_REQUEST, index, request_pin,
+-								mgmt, NULL);
+-	mgmt_register(mgmt, MGMT_EV_USER_CONFIRM_REQUEST, index, user_confirm,
+-								mgmt, NULL);
+-	mgmt_register(mgmt, MGMT_EV_USER_PASSKEY_REQUEST, index,
+-						request_passkey, mgmt, NULL);
+-	mgmt_register(mgmt, MGMT_EV_PASSKEY_NOTIFY, index,
+-						passkey_notify, mgmt, NULL);
+ 	mgmt_register(mgmt, MGMT_EV_UNCONF_INDEX_ADDED, index,
+ 					unconf_index_added, NULL, NULL);
+ 	mgmt_register(mgmt, MGMT_EV_UNCONF_INDEX_REMOVED, index,
+-- 
+2.41.0
 
---===============8480787155770362819==--
