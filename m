@@ -2,151 +2,108 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFAF3E8FDCD
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Oct 2023 05:56:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24F64E8FDCC
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Oct 2023 06:35:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241323AbjJDFpi convert rfc822-to-8bit (ORCPT
+        id S241389AbjJDGfh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Oct 2023 01:45:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38238 "EHLO
+        Wed, 4 Oct 2023 02:35:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232178AbjJDFph (ORCPT
+        with ESMTP id S241298AbjJDGff (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Oct 2023 01:45:37 -0400
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 179A6A9;
-        Tue,  3 Oct 2023 22:45:30 -0700 (PDT)
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 3945ionlF2967808, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-        by rtits2.realtek.com.tw (8.15.2/2.92/5.92) with ESMTPS id 3945ionlF2967808
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 4 Oct 2023 13:44:51 +0800
-Received: from RTEXMBS06.realtek.com.tw (172.21.6.99) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.32; Wed, 4 Oct 2023 13:44:51 +0800
-Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
- RTEXMBS06.realtek.com.tw (172.21.6.99) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.34; Wed, 4 Oct 2023 13:44:50 +0800
-Received: from RTEXMBS03.realtek.com.tw ([fe80::5510:ad08:5390:1ed3]) by
- RTEXMBS03.realtek.com.tw ([fe80::5510:ad08:5390:1ed3%2]) with mapi id
- 15.01.2375.007; Wed, 4 Oct 2023 13:44:50 +0800
-From:   Max Chou <max.chou@realtek.com>
-To:     "Kirill A. Shutemov" <kirill@shutemov.name>
-CC:     Bagas Sanjaya <bagasdotme@gmail.com>,
-        Hilda Wu <hildawu@realtek.com>,
-        "alex_lu@realsil.com.cn" <alex_lu@realsil.com.cn>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        "Johan Hedberg" <johan.hedberg@gmail.com>,
-        Juerg Haefliger <juerg.haefliger@canonical.com>,
-        Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
-        Thorsten Leemhuis <linux@leemhuis.info>,
-        Linux Regressions <regressions@lists.linux.dev>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: RE: Regression: devcoredump patch broke Realtek usb bluetooth adapter
-Thread-Topic: Regression: devcoredump patch broke Realtek usb bluetooth
- adapter
-Thread-Index: AQHZ9iZZqIk9cnxrEkOIPrwHFnXgfLA4N/0AgAA1ZDCAABycgIAAkrXQ
-Date:   Wed, 4 Oct 2023 05:44:49 +0000
-Message-ID: <b452257b550a47feb1c45b905018fe17@realtek.com>
-References: <20231003182038.k57nirtt4sonvt7c@box.shutemov.name>
- <ZRyqIn0_qqEFBPdy@debian.me> <b2ef2f1c457a4cf7a246b2e8b8598a30@realtek.com>
- <20231004044947.vgegwvxxindkjo7g@box.shutemov.name>
-In-Reply-To: <20231004044947.vgegwvxxindkjo7g@box.shutemov.name>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-x-originating-ip: [172.21.132.197]
-x-kse-serverinfo: RTEXMBS06.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        Wed, 4 Oct 2023 02:35:35 -0400
+Received: from mail-yb1-xb32.google.com (mail-yb1-xb32.google.com [IPv6:2607:f8b0:4864:20::b32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C3D4B4;
+        Tue,  3 Oct 2023 23:35:32 -0700 (PDT)
+Received: by mail-yb1-xb32.google.com with SMTP id 3f1490d57ef6-d84f18e908aso1832877276.1;
+        Tue, 03 Oct 2023 23:35:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696401331; x=1697006131; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rV98O++0wueY4Se3RDk4FS6DnLpx+AEq9azMKtwZP3M=;
+        b=V0985F8ykDY0xsmflVX9zHC6U0HsC0i+aq258+2/KB5ecuBvErreCCfd7PuxuNhj7W
+         RoHzymRMLmAbc96X8AIG+v1KZKZqirXWxS2hMs02qqrFHYYZcDnmnTs3oBUnHUFztCfo
+         ajNhg/lzM9W50XrHPHG2mnqTEEFLzXvqDLwyJIAqHWNZQ94qeK1n/7QcNRiw5+dsqnW5
+         6dbGhrxmomg4cacXcgoiQ3x9vy8YOhV5Ashb+JBayXZ88S7FeNW8dp2MqBioHNK8QdAG
+         TwEsKzzKV8JnYxwa+sbq80FCEzC2Po14D/+ZmyhTWCL70ZdXeqMWol9XIks5AV25UiZw
+         T0Cw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696401331; x=1697006131;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rV98O++0wueY4Se3RDk4FS6DnLpx+AEq9azMKtwZP3M=;
+        b=kU0pEacaQcmTTW0dFVj/7lPurwzyHDaOyWSvbo6Z90Q6h1O5rjGYX+rWeUHTtAqdIn
+         tNXz+w46I50W3bGtsaMuw1092ejdLJRG+qqOEdhIzqHN8FAbj/Tl5iplEeRf8Y/Dy61Z
+         /byG6LvODBAPb0x24zvwRhe/pcF7yPdR36qSJJZQYcicDUd0Mw2K3bDXfXh5/KEQm9tI
+         5XEz5vjQyH+n0oHf6zf3nSqavQh068qB6d1E1WeBNwonEs9nrf6mM+P49z7xemeGkbwa
+         unPHwQznt0owJZwSRZfVPQejinXeXal5Rb1XNZqN/XmuhI85uEgLMWhmr4lAxMMQ7XvT
+         V/9g==
+X-Gm-Message-State: AOJu0YyWJ5XYIpApvcpUfLzLMVgr05Q4BbkCv/CujPxS5P6iH0kgYskZ
+        YfmeInFI4avA7Enpp4py5t25d7VDnW2g3qGkL0Q=
+X-Google-Smtp-Source: AGHT+IG7t8/D8MEUEDHRVj12H+fsSO3OXBRZh3THZje73nXUbViNRQLJzuIsSOZ8BZVwVH1m0A8ACfq2fRgIxM82ZRU=
+X-Received: by 2002:a25:d18a:0:b0:d84:b0f8:90e with SMTP id
+ i132-20020a25d18a000000b00d84b0f8090emr1303793ybg.5.1696401331543; Tue, 03
+ Oct 2023 23:35:31 -0700 (PDT)
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
+References: <CAH7-e5sb+kT_LRb1_y-c5JaFN0=KrrRT97otUPKzTCgzGsVdrQ@mail.gmail.com>
+ <ZRtWcgiH5JhD5NU2@debian.me> <CAH7-e5uspavg_VBJxKLOKJfU3nAq-OrPqzihF2opffY-ReiC-w@mail.gmail.com>
+ <834062302e6a98e773dc4b03d7ed568a0f1c44fc.camel@nordicsemi.no>
+ <CAH7-e5uZzmnFJAJrG664G6_JbK--DfbKC50aeVN5gMMxDJ51UA@mail.gmail.com>
+ <ba7aaaed859ea2c4f5aac597deb382cceab33d65.camel@nordicsemi.no>
+ <CAH7-e5unq6ggNjVkSsriUAmpvk4s7-NCYJrZnLK_3BjFO_Dceg@mail.gmail.com> <3e86e69c-64bc-4776-9ee8-75b98be1bf3e@leemhuis.info>
+In-Reply-To: <3e86e69c-64bc-4776-9ee8-75b98be1bf3e@leemhuis.info>
+From:   =?UTF-8?Q?Erik_Dob=C3=A1k?= <erik.dobak@gmail.com>
+Date:   Wed, 4 Oct 2023 08:35:20 +0200
+Message-ID: <CAH7-e5vfhcsPiM4qqFdTxv4C=1An=y0uk1o44ryPc+FZ5wa=cw@mail.gmail.com>
+Subject: Re: bluetooth issues since kernel 6.4 - not discovering other bt
+ devices - /linux/drivers/bluetooth/btusb.c
+To:     Linux regressions mailing list <regressions@lists.linux.dev>
+Cc:     =?UTF-8?Q?Tomasz_Mo=C5=84?= <tomasz.mon@nordicsemi.no>,
+        Bagas Sanjaya <bagasdotme@gmail.com>,
+        Linux Stable <stable@vger.kernel.org>,
+        Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Mediatek <linux-mediatek@lists.infradead.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        AngeloGioacchino Del Regno 
+        <angelogioacchino.delregno@collabora.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi! Kirill,
-As your mentions, there's not obvious wrong from the dmesg.
-Could you capture btmon log with raw data? (btmon -w xxx.log)
-In additional, did you build the last version of bluetooth-next?
-By my understanding, you can just duplicate the issue by the commit "044014ce85a1 Bluetooth: btrtl: Add Realtek devcoredump support"?
-Unfortunately, I can not duplicate this issue sofar.
-
-
-BRs,
-Max
-
-
-> -----Original Message-----
-> From: Kirill A. Shutemov <kirill@shutemov.name>
-> Sent: Wednesday, October 4, 2023 12:50 PM
-> To: Max Chou <max.chou@realtek.com>
-> Cc: Bagas Sanjaya <bagasdotme@gmail.com>; Hilda Wu
-> <hildawu@realtek.com>; alex_lu@realsil.com.cn; Luiz Augusto von Dentz
-> <luiz.von.dentz@intel.com>; Marcel Holtmann <marcel@holtmann.org>;
-> Johan Hedberg <johan.hedberg@gmail.com>; Juerg Haefliger
-> <juerg.haefliger@canonical.com>; Linux Bluetooth
-> <linux-bluetooth@vger.kernel.org>; Thorsten Leemhuis <linux@leemhuis.info>;
-> Linux Regressions <regressions@lists.linux.dev>; Linux Kernel Mailing List
-> <linux-kernel@vger.kernel.org>
-> Subject: Re: Regression: devcoredump patch broke Realtek usb bluetooth
-> adapter
-> 
-> 
-> External mail.
-> 
-> 
-> 
-> On Wed, Oct 04, 2023 at 03:07:24AM +0000, Max Chou wrote:
-> > Hi! Kirill,
-> > I based on Kernel v6.5.5 and updated drivers/bluetooth to the last version of
-> bluetooth-next tree for a test with RTL8761BUV.
-> > The dmesg log and "hciconfig -a" are correct.
-> > Could you share the dmesg for your failure case?
+On Wed, 4 Oct 2023 at 07:20, Linux regression tracking (Thorsten
+Leemhuis) <regressions@leemhuis.info> wrote:
+>
+> On 03.10.23 18:10, Erik Dob=C3=A1k wrote:
+> > Sorry Tomasz,
 > >
-> > [56133.563293] usb 3-1: new full-speed USB device number 28 using
-> > xhci_hcd [56133.712559] usb 3-1: New USB device found, idVendor=0bda,
-> > idProduct=8771, bcdDevice= 2.00 [56133.712577] usb 3-1: New USB device
-> > strings: Mfr=1, Product=2, SerialNumber=3 [56133.712582] usb 3-1:
-> > Product: Bluetooth Radio [56133.712585] usb 3-1: Manufacturer: Realtek
-> > [56133.712588] usb 3-1: SerialNumber: 00E04C239987 [56133.737812]
-> > usbcore: registered new interface driver btusb [56133.742126]
-> > Bluetooth: hci0: RTL: examining hci_ver=0a hci_rev=000b lmp_ver=0a
-> > lmp_subver=8761 [56133.743115] Bluetooth: hci0: RTL: rom_version
-> > status=0 version=1 [56133.743124] Bluetooth: hci0: RTL: loading
-> > rtl_bt/rtl8761bu_fw.bin [56133.743754] Bluetooth: hci0: RTL: loading
-> > rtl_bt/rtl8761bu_config.bin [56133.743829] Bluetooth: hci0: RTL:
-> > cfg_sz 6, total sz 30210 [56133.913311] Bluetooth: hci0: RTL: fw
-> > version 0xdfc6d922 [56133.980299] Bluetooth: MGMT ver 1.22
-> >
-> > hci0:   Type: Primary  Bus: USB
-> >         BD Address: 98:A2:35:85:56:F1  ACL MTU: 1021:6  SCO MTU:
-> 255:12
-> >         UP RUNNING
-> >         RX bytes:1670 acl:0 sco:0 events:184 errors:0
-> >         TX bytes:33917 acl:0 sco:0 commands:184 errors:0
-> >         Features: 0xff 0xff 0xff 0xfe 0xdb 0xfd 0x7b 0x87
-> >         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-> >         Link policy: RSWITCH HOLD SNIFF PARK
-> >         Link mode: PERIPHERAL ACCEPT
-> >         Name: 'max-ThinkPad-X230'
-> >         Class: 0x6c010c
-> >         Service Classes: Rendering, Capturing, Audio, Telephony
-> >         Device Class: Computer, Laptop
-> >         HCI Version: 5.1 (0xa)  Revision: 0xdfc6
-> >         LMP Version: 5.1 (0xa)  Subversion: 0xd922
-> >         Manufacturer: Realtek Semiconductor Corporation (93)
-> 
-> I don't see anything obviously wrong in dmesg. Attached hciconfig and dmesg
-> for both functional and broken cases.
-> 
-> --
->   Kiryl Shutsemau / Kirill A. Shutemov
+> > that must have been a reality glitch with your commit (cant find the
+> > page refering to your commit now). But yes it is probably a kernel bug
+> > as it manifests kernels 6.4 and not in the 6.1 LTS version.
+>
+> Could you then please try a bisection to get us closer to the problem?
+> You might want to try mainline (e.g. 6.6-rc4) first, with a bit of luck
+> the problem is fixed there already; FWIW, a few BT fixes that might or
+> might not be relevant for your case are heading that way and will most
+> likely be in 6.6-rc5.
+>
+> Ciao, Thorsten
+Hi Thorsten,
+
+i was able to compile vanila kernel 6.6-rc4 yesterday and the issue
+was still there. as it takes ages to compile i will try the
+precompiled artix kernel 6.3.4 next to see if the issue disapears.
+
+Regards
+
+E
