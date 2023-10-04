@@ -2,208 +2,125 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46312E8FDD5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Oct 2023 07:29:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3AEDE8FDD9
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Oct 2023 07:57:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241519AbjJDH3i convert rfc822-to-8bit (ORCPT
+        id S241608AbjJDH5F (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Oct 2023 03:29:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34436 "EHLO
+        Wed, 4 Oct 2023 03:57:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241513AbjJDH3i (ORCPT
+        with ESMTP id S241663AbjJDH5C (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Oct 2023 03:29:38 -0400
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33E3C98;
-        Wed,  4 Oct 2023 00:29:30 -0700 (PDT)
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 3947SmKhA3077984, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-        by rtits2.realtek.com.tw (8.15.2/2.92/5.92) with ESMTPS id 3947SmKhA3077984
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 4 Oct 2023 15:28:48 +0800
-Received: from RTEXMBS05.realtek.com.tw (172.21.6.98) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.32; Wed, 4 Oct 2023 15:28:47 +0800
-Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
- RTEXMBS05.realtek.com.tw (172.21.6.98) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.34; Wed, 4 Oct 2023 15:28:45 +0800
-Received: from RTEXMBS03.realtek.com.tw ([fe80::5510:ad08:5390:1ed3]) by
- RTEXMBS03.realtek.com.tw ([fe80::5510:ad08:5390:1ed3%2]) with mapi id
- 15.01.2375.007; Wed, 4 Oct 2023 15:28:45 +0800
-From:   Max Chou <max.chou@realtek.com>
-To:     "Kirill A. Shutemov" <kirill@shutemov.name>
-CC:     Bagas Sanjaya <bagasdotme@gmail.com>,
-        Hilda Wu <hildawu@realtek.com>,
-        "alex_lu@realsil.com.cn" <alex_lu@realsil.com.cn>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        "Johan Hedberg" <johan.hedberg@gmail.com>,
-        Juerg Haefliger <juerg.haefliger@canonical.com>,
-        Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
-        Thorsten Leemhuis <linux@leemhuis.info>,
-        Linux Regressions <regressions@lists.linux.dev>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: RE: Regression: devcoredump patch broke Realtek usb bluetooth adapter
-Thread-Topic: Regression: devcoredump patch broke Realtek usb bluetooth
- adapter
-Thread-Index: AQHZ9iZZqIk9cnxrEkOIPrwHFnXgfLA4N/0AgAA1ZDCAABycgIAAkrXQgAAclfA=
-Date:   Wed, 4 Oct 2023 07:28:45 +0000
-Message-ID: <7507ad6c8a964b179bf2b3318104a124@realtek.com>
-References: <20231003182038.k57nirtt4sonvt7c@box.shutemov.name>
- <ZRyqIn0_qqEFBPdy@debian.me> <b2ef2f1c457a4cf7a246b2e8b8598a30@realtek.com>
- <20231004044947.vgegwvxxindkjo7g@box.shutemov.name> 
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-x-originating-ip: [172.21.132.197]
-x-kse-serverinfo: RTEXMBS05.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        Wed, 4 Oct 2023 03:57:02 -0400
+Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2070.outbound.protection.outlook.com [40.107.7.70])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7296BEA
+        for <linux-bluetooth@vger.kernel.org>; Wed,  4 Oct 2023 00:56:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=B/zVFADqNUt4o621TXeMO81E5+YyJdfXNvpkLWPlEj/WaQuWtV8FihuCTwAsMIuQaC+QkTD6tRz3G2kNoqLk+Rx5taT+JTAF5c0XmFfDb35jsclvLmSUQ2XsiDXwrMdu6Sb4ZqWj4tPCQVTkDX6FNDQUNy9EyM5BNO8Q4JFG8sLoOv4Z7jdNLbyMeGoG/U0cGsyp935horR6KoxQS4Mvvq0schaTHY3/j61QPMUGf8NRGkuEudBdO8vw4dSLnv9dT8DpYmqxUe+0GtnmJq7GT1igvL/iHAcf5NsMU4wxwmLDCE13e51QDpXDhvrflnfFAb+UYv3G+Zic88b82BUgCw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DPGOd0iZaH5amcPJM+xODsa3IVBYjRljQyUNZiA+QJw=;
+ b=S/XaoTsLoVQy73jiAW6ylijdVrvjxTFGPsslxxxtuBrhPrcvF5ONeTgpAwnePnZuzmw3HstZp0OAKruWxWpbFcZnaDKaTUgAdKj7pWSGilNwA1TRyaKJC4Ytbelu/sTNqWKhEjKhXmg0etJmzJ0veg7i//CSciWL/nc5BsXMAeybKu1vptoFowe/mzxN9agw1IHQKr14HPvQI6x+pCs1s/ardppmzD+tk2vq4h6iwje2NswHCTaI6agQPGNxzggtSH9GRsq9NTJ2RlV1UdnEipx0QfKE9ebquSv4bsqQ5WdFNsv1OzD22SQChmAU9h0O7utJwVLZUwh5wHziLCZxtg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=DPGOd0iZaH5amcPJM+xODsa3IVBYjRljQyUNZiA+QJw=;
+ b=oRrJvvsCJ0rI/BCiGwsGKMpff3gKe5iXrN/8ZTqbptKFZNRPVvn+k+D9j4sVKolWDNkdH0xtpLAumKrSdIxZU1JdeKPsPXKXLIWc1a0Tbh0yHeve9ISG7USRTLii/6mr0Dgq15RYFYz3r8DbUBee5yytgPSH8N1feywyV49uJCY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from DBBPR04MB6331.eurprd04.prod.outlook.com (2603:10a6:10:ca::21)
+ by DBAPR04MB7239.eurprd04.prod.outlook.com (2603:10a6:10:1a8::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.33; Wed, 4 Oct
+ 2023 07:56:52 +0000
+Received: from DBBPR04MB6331.eurprd04.prod.outlook.com
+ ([fe80::c031:474b:cd00:5f95]) by DBBPR04MB6331.eurprd04.prod.outlook.com
+ ([fe80::c031:474b:cd00:5f95%4]) with mapi id 15.20.6838.028; Wed, 4 Oct 2023
+ 07:56:52 +0000
+From:   Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     claudia.rosu@nxp.com, mihai-octavian.urzica@nxp.com,
+        silviu.barbulescu@nxp.com, vlad.pruteanu@nxp.com,
+        andrei.istodorescu@nxp.com, iulia.tanasescu@nxp.com
+Subject: [PATCH v3 0/2] Update transport acquire/release flow BAP bcast source
+Date:   Wed,  4 Oct 2023 10:56:44 +0300
+Message-Id: <20231004075646.4277-1-silviu.barbulescu@nxp.com>
+X-Mailer: git-send-email 2.39.2
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: VI1PR0102CA0028.eurprd01.prod.exchangelabs.com
+ (2603:10a6:802::41) To DBBPR04MB6331.eurprd04.prod.outlook.com
+ (2603:10a6:10:ca::21)
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DBBPR04MB6331:EE_|DBAPR04MB7239:EE_
+X-MS-Office365-Filtering-Correlation-Id: efa3f564-3979-4114-976e-08dbc4af782e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: IwRDWiyU2ranXyQtEnaUdgM3KzvZpoWKafuMMmksBi4HnQNv3iP+UQXCNxSTVLnZHRYHbeM+eCaQKG7wZrX0q1KvvpNUDcYCwGETRMW6W/ZjDDAOQ+gZKEqeclMgp9F/aeoqS96XhnyoGpUA8JUWLdNOIKsrbZXS8uFjPEYci7FwHODVQsoSnkspIPshHTs2zeHoTbm8pHkZlOx0HSY3EW6IdfOKrEpnUXdjBF3Wl2OZhcQvXVkhE5xBm2qn33KP/bRm74qGDf/yDW3VwWZ51CvGw81pK8gYqQyaphTJHkEuaIf3A2xl5y8DsvC8h6v5MqVMyPT1rdhGToMKQOAnSXIDDjwmdYbpK3N29qDnrv4tHZvQI6dDFJxDvt5ZoOG1snvuHIUGjs9/dHkbIwG8VJhRA8XswGiHcDOvw7FidOIKEdvN5HoyvQU2cJKmdpDcUg/dUzteD9P8bHIwCIcEA8fs7j2TryB380fjGgmxr1jdRGvxrESxTzmJqDSwdXl97280jt0aElbyXicaFGyzIBaHaXWdruJyGV69DDzcdZAPtOAg9VqvyIiqXzaE99+U
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR04MB6331.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(39860400002)(396003)(376002)(366004)(136003)(230922051799003)(186009)(451199024)(1800799009)(64100799003)(8676002)(5660300002)(2906002)(41300700001)(4744005)(15650500001)(4326008)(8936002)(66946007)(6486002)(6506007)(6666004)(66556008)(6512007)(316002)(66476007)(478600001)(6916009)(83380400001)(86362001)(38100700002)(36756003)(1076003)(26005)(2616005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?k31IqzbQVsf6X+y6yJuYlq8S1PW7BsiYErrzKrowZAELml4jNQcUjsTKzroF?=
+ =?us-ascii?Q?jrs4ZOBjS4V5afYAcdDaSbA/ccVmo99O47RabS06Jw459eXUGdbzWg03CtN5?=
+ =?us-ascii?Q?8cmFiDSacAd4xl38L08zdIcc05FeUN7Z+HIJzlMrJGZa1M/U9omd3V3Qe43P?=
+ =?us-ascii?Q?WVtZofJ+24OK0Um6syqlfwP8Sq/J+A4RYa49CpOVLAis5CXysjB1pOTMI5WJ?=
+ =?us-ascii?Q?lOgl1Ci8IJxXFFPeMt+FrrUJabYd2lh5XXKnrByp9FOp8S7fCyXgP22e3nNs?=
+ =?us-ascii?Q?hjXUMrjHwH4klAqR/XFYOwT9S5uxBVBa7D9zaKN7wqJ3ieKtssdpBM0mCKly?=
+ =?us-ascii?Q?M7NZl82vvcbccdJXFiZJ8S+YtJL1e30CED7xQgzC2IZhSk6mLBhaMioOJPJf?=
+ =?us-ascii?Q?0IrXOoeZc9Az0HdaME8bDZaCM5yMp1t9TfK9iFzKjIv6NaVclpx/tPdJCL/c?=
+ =?us-ascii?Q?CQSTXHxmhFF5rMUvkUIgXtvgy+FvIRWYKOFW91vek5i3Cn5AOa32Jjfyv1VC?=
+ =?us-ascii?Q?xPe+g3yA1Q0ps2VsZQRdWJ+MgAon59kEAjGdOepxgw6hFcFEYdLrK+jyGPaQ?=
+ =?us-ascii?Q?5TphiOTndFXNDrUftGLwBFezhzanI0QXirpsbe6k7Fh8TXknYsjk7/GoIy4L?=
+ =?us-ascii?Q?WluIaG3BMCq5WNkpLWk7hk/Uq+TdnajD4kU2RAG0v1ofeKR13JR4AbtkJvX/?=
+ =?us-ascii?Q?1G2stEOeqmLjbXpBb2NZOBMswc3Udrr70IBsxhuSvj5KLKuygZno5B3o844N?=
+ =?us-ascii?Q?tAAxvmoMe+fnIP6e7I2+mezK/b7HpKe8MBBfsTQhf1gVUxAZMFtTEKwGMblN?=
+ =?us-ascii?Q?fPjuo0gvXbwn1iVGPF3ZwvSROxKhLbfZvAlgGfS+C9khQsz+FEcKj8v3O4TM?=
+ =?us-ascii?Q?sVuBzghrwE1m+4kMYS/qLce9qPhicGzzYsdycP/Ykatz/2hSnSVUdH83n4Mc?=
+ =?us-ascii?Q?PLSPvYwqJo/uvjK8PqQ/4NfNjxlvKS3pYXkdMUGgOPxBktQkQIKiIp99pzAv?=
+ =?us-ascii?Q?/2AWXDIYRA8icc0R7hEmVDucI6wChnK22PhpPGk0YMLcoj37Qfpd/N8R1l4e?=
+ =?us-ascii?Q?nLVDwF85eaxrU7jj9Uu7awQlywrzUD/F1nAejTOp7E21GxCAk2gd4qB3f9WY?=
+ =?us-ascii?Q?jESLYubnzLIqLuzWMEL9nLT/tcUREEBZuun/UA4TsXFzc6YokyHVo3RfTbBw?=
+ =?us-ascii?Q?Yh4kCXRpEPLSKKaklRRxBNbw1LC2H/n+3gizbsdQOuLO6XPJR+niVROEfMFb?=
+ =?us-ascii?Q?zB2rlrOWMAo1e+GAmLptxwuF2YQNG2C5E+5GZfZAZNIpMolq/ayWCW9ZJKQX?=
+ =?us-ascii?Q?rWHBTKja0Zfp++wP44Zx8Udx27RCeoLgzxWt7hHo7gYkswfB4A+dDXVjlGa7?=
+ =?us-ascii?Q?RB7XCMlfW60BeNZBbXOUTGpokTpevxY26Z5+Ehe1ntsxFqLkyQSAqXLBhf/k?=
+ =?us-ascii?Q?E697Cl68F7ub4lMBYsf98F2vuxt1v2fErAscqH+xi4K1qe7+RV3szjwJTW3W?=
+ =?us-ascii?Q?ayFXY/04gtHMawVWTWo9ZQAwrDHyzqU8Hp49c/iFau4+Wb7ZWADU8KVQjVDP?=
+ =?us-ascii?Q?9GvNDr0wEEM0VzGpC20ldvP5/qtTyneJY78sIdUFHnJRBfoETqaI+viiO6+0?=
+ =?us-ascii?Q?Gw=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: efa3f564-3979-4114-976e-08dbc4af782e
+X-MS-Exchange-CrossTenant-AuthSource: DBBPR04MB6331.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Oct 2023 07:56:52.0041
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mgzwsQRHMAQfo8qPCzEoY4VuB22vPHERbsNjQ9DyoizcHMohkITCQprVxTjUzjZrXIcbOZMggc2zaCqAL8VTUxwpYqWncAyngPXL1P1BTP8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBAPR04MB7239
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi! Kirill,
-I guess the root cause is as below.
-===
-static int btrtl_register_devcoredump_support(struct hci_dev *hdev)
-{
-        int err;
+Update transport acquire/release flow for BAP broadcast source to 
+fix failure on transport release, and second acquire
 
-        err = hci_devcd_register(hdev, btrtl_coredump, btrtl_dmp_hdr, NULL);
+Silviu Florian Barbulescu (2):
+  transport: Update transport release flow for broadcast source
+  bap:Update transport acquire/release flow for bcast source
 
-        return err;
-}
-===
-If CONFIG_DEV_COREDUMP is not enabled, it would return -EOPNOTSUPP for hci_devcd_register().
-Unfortunately, btrtl_register_devcoredump_support() will return it. 
-Finally, -EOPNOSTUPP will be returned for btrtl_setup_realtek().
-
-Could you have the following workaround for the root cause checked?
-Please share dmesg as well. Thanks,
-===
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -967,8 +967,9 @@ static int btrtl_register_devcoredump_support(struct hci_dev *hdev)
-        int err;
-
-        err = hci_devcd_register(hdev, btrtl_coredump, btrtl_dmp_hdr, NULL);
-+       rtl_dev_info(hdev, "%s(): err = %d", __func__, err);
-
--       return err;
-+       return 0;
- }
-
- void btrtl_set_driver_name(struct hci_dev *hdev, const char *driver_name)
-===
-
-BRs,
-Max
+ profiles/audio/bap.c       | 51 ++++++++++++++++++++++++++----
+ profiles/audio/transport.c | 65 ++++++++++++++++++++++----------------
+ 2 files changed, 82 insertions(+), 34 deletions(-)
 
 
-> -----Original Message-----
-> From: Max Chou
-> Sent: Wednesday, October 4, 2023 1:45 PM
-> To: 'Kirill A. Shutemov' <kirill@shutemov.name>
-> Cc: Bagas Sanjaya <bagasdotme@gmail.com>; Hilda Wu
-> <hildawu@realtek.com>; alex_lu@realsil.com.cn; Luiz Augusto von Dentz
-> <luiz.von.dentz@intel.com>; Marcel Holtmann <marcel@holtmann.org>;
-> Johan Hedberg <johan.hedberg@gmail.com>; Juerg Haefliger
-> <juerg.haefliger@canonical.com>; Linux Bluetooth
-> <linux-bluetooth@vger.kernel.org>; Thorsten Leemhuis <linux@leemhuis.info>;
-> Linux Regressions <regressions@lists.linux.dev>; Linux Kernel Mailing List
-> <linux-kernel@vger.kernel.org>
-> Subject: RE: Regression: devcoredump patch broke Realtek usb bluetooth
-> adapter
-> 
-> Hi! Kirill,
-> As your mentions, there's not obvious wrong from the dmesg.
-> Could you capture btmon log with raw data? (btmon -w xxx.log) In additional,
-> did you build the last version of bluetooth-next?
-> By my understanding, you can just duplicate the issue by the commit
-> "044014ce85a1 Bluetooth: btrtl: Add Realtek devcoredump support"?
-> Unfortunately, I can not duplicate this issue sofar.
-> 
-> 
-> BRs,
-> Max
-> 
-> 
-> > -----Original Message-----
-> > From: Kirill A. Shutemov <kirill@shutemov.name>
-> > Sent: Wednesday, October 4, 2023 12:50 PM
-> > To: Max Chou <max.chou@realtek.com>
-> > Cc: Bagas Sanjaya <bagasdotme@gmail.com>; Hilda Wu
-> > <hildawu@realtek.com>; alex_lu@realsil.com.cn; Luiz Augusto von Dentz
-> > <luiz.von.dentz@intel.com>; Marcel Holtmann <marcel@holtmann.org>;
-> > Johan Hedberg <johan.hedberg@gmail.com>; Juerg Haefliger
-> > <juerg.haefliger@canonical.com>; Linux Bluetooth
-> > <linux-bluetooth@vger.kernel.org>; Thorsten Leemhuis
-> > <linux@leemhuis.info>; Linux Regressions
-> > <regressions@lists.linux.dev>; Linux Kernel Mailing List
-> > <linux-kernel@vger.kernel.org>
-> > Subject: Re: Regression: devcoredump patch broke Realtek usb bluetooth
-> > adapter
-> >
-> >
-> > External mail.
-> >
-> >
-> >
-> > On Wed, Oct 04, 2023 at 03:07:24AM +0000, Max Chou wrote:
-> > > Hi! Kirill,
-> > > I based on Kernel v6.5.5 and updated drivers/bluetooth to the last
-> > > version of
-> > bluetooth-next tree for a test with RTL8761BUV.
-> > > The dmesg log and "hciconfig -a" are correct.
-> > > Could you share the dmesg for your failure case?
-> > >
-> > > [56133.563293] usb 3-1: new full-speed USB device number 28 using
-> > > xhci_hcd [56133.712559] usb 3-1: New USB device found,
-> > > idVendor=0bda, idProduct=8771, bcdDevice= 2.00 [56133.712577] usb
-> > > 3-1: New USB device
-> > > strings: Mfr=1, Product=2, SerialNumber=3 [56133.712582] usb 3-1:
-> > > Product: Bluetooth Radio [56133.712585] usb 3-1: Manufacturer:
-> > > Realtek [56133.712588] usb 3-1: SerialNumber: 00E04C239987
-> > > [56133.737812]
-> > > usbcore: registered new interface driver btusb [56133.742126]
-> > > Bluetooth: hci0: RTL: examining hci_ver=0a hci_rev=000b lmp_ver=0a
-> > > lmp_subver=8761 [56133.743115] Bluetooth: hci0: RTL: rom_version
-> > > status=0 version=1 [56133.743124] Bluetooth: hci0: RTL: loading
-> > > rtl_bt/rtl8761bu_fw.bin [56133.743754] Bluetooth: hci0: RTL: loading
-> > > rtl_bt/rtl8761bu_config.bin [56133.743829] Bluetooth: hci0: RTL:
-> > > cfg_sz 6, total sz 30210 [56133.913311] Bluetooth: hci0: RTL: fw
-> > > version 0xdfc6d922 [56133.980299] Bluetooth: MGMT ver 1.22
-> > >
-> > > hci0:   Type: Primary  Bus: USB
-> > >         BD Address: 98:A2:35:85:56:F1  ACL MTU: 1021:6  SCO MTU:
-> > 255:12
-> > >         UP RUNNING
-> > >         RX bytes:1670 acl:0 sco:0 events:184 errors:0
-> > >         TX bytes:33917 acl:0 sco:0 commands:184 errors:0
-> > >         Features: 0xff 0xff 0xff 0xfe 0xdb 0xfd 0x7b 0x87
-> > >         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-> > >         Link policy: RSWITCH HOLD SNIFF PARK
-> > >         Link mode: PERIPHERAL ACCEPT
-> > >         Name: 'max-ThinkPad-X230'
-> > >         Class: 0x6c010c
-> > >         Service Classes: Rendering, Capturing, Audio, Telephony
-> > >         Device Class: Computer, Laptop
-> > >         HCI Version: 5.1 (0xa)  Revision: 0xdfc6
-> > >         LMP Version: 5.1 (0xa)  Subversion: 0xd922
-> > >         Manufacturer: Realtek Semiconductor Corporation (93)
-> >
-> > I don't see anything obviously wrong in dmesg. Attached hciconfig and
-> > dmesg for both functional and broken cases.
-> >
-> > --
-> >   Kiryl Shutsemau / Kirill A. Shutemov
+base-commit: 7a79ff88fd9576cd9935a8c0bab4906b7c38ea03
+-- 
+2.39.2
+
