@@ -2,123 +2,96 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C667E7B5F9
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Oct 2023 11:46:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2931CE7B60C
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Oct 2023 12:42:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242248AbjJDLqW (ORCPT
+        id S242443AbjJDMmh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Oct 2023 07:46:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38008 "EHLO
+        Wed, 4 Oct 2023 08:42:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229687AbjJDLqV (ORCPT
+        with ESMTP id S233193AbjJDMmh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Oct 2023 07:46:21 -0400
-Received: from wout3-smtp.messagingengine.com (wout3-smtp.messagingengine.com [64.147.123.19])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1191A1;
-        Wed,  4 Oct 2023 04:46:18 -0700 (PDT)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailout.west.internal (Postfix) with ESMTP id 8ECAF32009AF;
-        Wed,  4 Oct 2023 07:46:15 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute5.internal (MEProxy); Wed, 04 Oct 2023 07:46:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
-         h=cc:cc:content-type:content-type:date:date:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to; s=fm1; t=1696419975; x=
-        1696506375; bh=Q/KtTjvMil+v8KL+aP+mJR97Myi1BBiXbwWlZPHU1Nk=; b=W
-        QU7IJa8O83F6rFW5rMKN2xMNCNAO1E7kUjaswcY+1o/OLZI1+fUzPCt2QpdcBQNy
-        133NAH7ERLxK6zxMxRSIyhuYHevx1B5hqmgCxC8fcpHvonn1WZLjG6pg6G0VqWLV
-        VxjQG8vCnyaXwDHSxn4yH0ih/7v8GErRNK3gkQ+qHwrFEibMWTZoIE6YKW/+dQiX
-        ec1wbiu2/9/bjopMAJlM5gysJwhmooAwCzzRrhTP9ztCFzZvnC5FJmQR0PeJB84m
-        iWme/Bil+ufrmwcyJiAzvpsoaY+MRdqxeGix8n4LhFBH6jIEi3HjBunYm+rAqBPr
-        7J+R58NuSauCqFvmm4muw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:content-type:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm2; t=1696419975; x=1696506375; bh=Q/KtTjvMil+v8
-        KL+aP+mJR97Myi1BBiXbwWlZPHU1Nk=; b=eFnwXzXm1yTdESHDZdKWoRIe9KrRJ
-        IgPDpJaykVDGIUCjSwXnP5pdlL1NxvdPahaHo+ySa1sbe1nBQX2k9J7fT/sOks5F
-        u3czjoFrLfJ9GdLxaGo5swCw3e4WBQthLLlAD+GgYpkW+ueCmXm4enGlHsyY6Zkk
-        UPvmddDgMESAntvoytwnuqEDVuQeOWO4X67YhnkXh/SkQGDHKAVvBrthcKzmbjg4
-        /jakHeX1HZw7duKvycYugS39KGwFxJsUM7pIi/m0RskCdp1yZjH6Mj6ksqV4KcZW
-        X6XR5o2Im49KqMGZ6orpCDsjdgjduJgKkFMgGo33ZhghmGsPi5GhaK+pA==
-X-ME-Sender: <xms:hVAdZUtoJ0iPK9HFbvQ9SKfr1XB7_yfGF7r9iPlilrWJBoBEGw7U2A>
-    <xme:hVAdZRfmlJflt9ZWukW7n5BFWK67Z9Z35YA9XJJWa7QOv16NXgTih5mRHJR8kJBWk
-    caXui3JO69XBBPNd4Y>
-X-ME-Received: <xmr:hVAdZfz5sldCLkd4cNsslD93WhLhJsDOp5DvdhlHpJdoMsK_hkz9KnGw0e2gZcx_ct3nYA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrgedvgdegvdcutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvvefukfhfgggtuggjsehttddttddttddvnecuhfhrohhmpedfmfhirhhi
-    lhhlucetrdcuufhhuhhtvghmohhvfdcuoehkihhrihhllhesshhhuhhtvghmohhvrdhnrg
-    hmvgeqnecuggftrfgrthhtvghrnhephfeigefhtdefhedtfedthefghedutddvueehtedt
-    tdehjeeukeejgeeuiedvkedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
-    hmrghilhhfrhhomhepkhhirhhilhhlsehshhhuthgvmhhovhdrnhgrmhgv
-X-ME-Proxy: <xmx:hVAdZXNEAGWcGCtzozspDnqIn2K0H6T6T4HNNgbVjAb5miVRmITD3w>
-    <xmx:hVAdZU875E7jEbhJIjeFLh74_j9-qkEnzKwTMbo1it_fi1AyiHnNxQ>
-    <xmx:hVAdZfXWMFTrVfF75yasj8R6qpYy0AunTXqpp_mQ3q7TVrYIJoVT5Q>
-    <xmx:h1AdZV0_nOCEO7VcmXqGnqVYN5ipphMc1jm1NvwYUFmZhWSqv9oVeA>
-Feedback-ID: ie3994620:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 4 Oct 2023 07:46:13 -0400 (EDT)
-Received: by box.shutemov.name (Postfix, from userid 1000)
-        id C8BD710989F; Wed,  4 Oct 2023 14:46:09 +0300 (+03)
-Date:   Wed, 4 Oct 2023 14:46:09 +0300
-From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-To:     Max Chou <max.chou@realtek.com>
-Cc:     Bagas Sanjaya <bagasdotme@gmail.com>,
-        Hilda Wu <hildawu@realtek.com>,
-        "alex_lu@realsil.com.cn" <alex_lu@realsil.com.cn>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Juerg Haefliger <juerg.haefliger@canonical.com>,
-        Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
-        Thorsten Leemhuis <linux@leemhuis.info>,
-        Linux Regressions <regressions@lists.linux.dev>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: Regression: devcoredump patch broke Realtek usb bluetooth adapter
-Message-ID: <20231004114609.dca6ebtmx37fsx5l@box.shutemov.name>
-References: <20231003182038.k57nirtt4sonvt7c@box.shutemov.name>
- <ZRyqIn0_qqEFBPdy@debian.me>
- <b2ef2f1c457a4cf7a246b2e8b8598a30@realtek.com>
- <20231004044947.vgegwvxxindkjo7g@box.shutemov.name>
- <7507ad6c8a964b179bf2b3318104a124@realtek.com>
+        Wed, 4 Oct 2023 08:42:37 -0400
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 898F6C9;
+        Wed,  4 Oct 2023 05:42:32 -0700 (PDT)
+Received: from canpemm500006.china.huawei.com (unknown [172.30.72.53])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4S0vRB0TD5z1P7cC;
+        Wed,  4 Oct 2023 20:40:06 +0800 (CST)
+Received: from localhost.localdomain (10.175.104.82) by
+ canpemm500006.china.huawei.com (7.192.105.130) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Wed, 4 Oct 2023 20:42:30 +0800
+From:   Ziyang Xuan <william.xuanziyang@huawei.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <luiz.dentz@gmail.com>, <linux-bluetooth@vger.kernel.org>
+CC:     <linux-kernel@vger.kernel.org>
+Subject: [PATCH] Bluetooth: Fix a refcnt underflow problem for hci_conn
+Date:   Wed, 4 Oct 2023 20:42:24 +0800
+Message-ID: <20231004124224.630914-1-william.xuanziyang@huawei.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7507ad6c8a964b179bf2b3318104a124@realtek.com>
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.104.82]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ canpemm500006.china.huawei.com (7.192.105.130)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Oct 04, 2023 at 07:28:45AM +0000, Max Chou wrote:
-> Hi! Kirill,
-> I guess the root cause is as below.
-> ===
-> static int btrtl_register_devcoredump_support(struct hci_dev *hdev)
-> {
->         int err;
-> 
->         err = hci_devcd_register(hdev, btrtl_coredump, btrtl_dmp_hdr, NULL);
-> 
->         return err;
-> }
-> ===
-> If CONFIG_DEV_COREDUMP is not enabled, it would return -EOPNOTSUPP for hci_devcd_register().
-> Unfortunately, btrtl_register_devcoredump_support() will return it. 
-> Finally, -EOPNOSTUPP will be returned for btrtl_setup_realtek().
-> 
-> Could you have the following workaround for the root cause checked?
-> Please share dmesg as well. Thanks,
+Syzbot reports a warning as follows:
 
-Yes. It works and I see 
+WARNING: CPU: 1 PID: 26946 at net/bluetooth/hci_conn.c:619 hci_conn_timeout+0x122/0x210 net/bluetooth/hci_conn.c:619
+...
+Call Trace:
+ <TASK>
+ process_one_work+0x884/0x15c0 kernel/workqueue.c:2630
+ process_scheduled_works kernel/workqueue.c:2703 [inline]
+ worker_thread+0x8b9/0x1290 kernel/workqueue.c:2784
+ kthread+0x33c/0x440 kernel/kthread.c:388
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+ </TASK>
 
-[    3.640539] Bluetooth: hci0: RTL: btrtl_register_devcoredump_support(): err = -95
+It is because the HCI_EV_SIMPLE_PAIR_COMPLETE event handler drops hci_conn
+directly without check Simple Pairing whether be enabled. But the Simple
+Pairing process can only be used if both sides have the support enabled
+in the host stack.
 
-in dmesg. -EOPNOTSUPP indeed.
+Add hci_conn_ssp_enabled() for hci_conn in HCI_EV_IO_CAPA_REQUEST and
+HCI_EV_SIMPLE_PAIR_COMPLETE event handlers to fix the problem.
 
+Fixes: 0493684ed239 ("[Bluetooth] Disable disconnect timer during Simple Pairing")
+Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
+---
+ net/bluetooth/hci_event.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 35f251041eeb..0b1487dcef24 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -5302,7 +5302,7 @@ static void hci_io_capa_request_evt(struct hci_dev *hdev, void *data,
+ 	hci_dev_lock(hdev);
+ 
+ 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
+-	if (!conn)
++	if (!conn || !hci_conn_ssp_enabled(conn))
+ 		goto unlock;
+ 
+ 	hci_conn_hold(conn);
+@@ -5549,7 +5549,7 @@ static void hci_simple_pair_complete_evt(struct hci_dev *hdev, void *data,
+ 	hci_dev_lock(hdev);
+ 
+ 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
+-	if (!conn)
++	if (!conn || !hci_conn_ssp_enabled(conn))
+ 		goto unlock;
+ 
+ 	/* Reset the authentication requirement to unknown */
 -- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+2.25.1
+
