@@ -2,140 +2,151 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9C3BE8FDCB
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Oct 2023 05:20:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFAF3E8FDCD
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Oct 2023 05:56:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241323AbjJDFU1 (ORCPT
+        id S241323AbjJDFpi convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Oct 2023 01:20:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56842 "EHLO
+        Wed, 4 Oct 2023 01:45:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232178AbjJDFU0 (ORCPT
+        with ESMTP id S232178AbjJDFph (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Oct 2023 01:20:26 -0400
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6589EA7;
-        Tue,  3 Oct 2023 22:20:22 -0700 (PDT)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1qnuIy-0004Si-FW; Wed, 04 Oct 2023 07:20:16 +0200
-Message-ID: <3e86e69c-64bc-4776-9ee8-75b98be1bf3e@leemhuis.info>
-Date:   Wed, 4 Oct 2023 07:20:15 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: bluetooth issues since kernel 6.4 - not discovering other bt
- devices - /linux/drivers/bluetooth/btusb.c
-Content-Language: en-US, de-DE
-To:     =?UTF-8?Q?Erik_Dob=C3=A1k?= <erik.dobak@gmail.com>,
-        =?UTF-8?Q?Tomasz_Mo=C5=84?= <tomasz.mon@nordicsemi.no>
-Cc:     Bagas Sanjaya <bagasdotme@gmail.com>,
-        Linux Stable <stable@vger.kernel.org>,
-        Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Mediatek <linux-mediatek@lists.infradead.org>,
-        Linux Regressions <regressions@lists.linux.dev>,
+        Wed, 4 Oct 2023 01:45:37 -0400
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 179A6A9;
+        Tue,  3 Oct 2023 22:45:30 -0700 (PDT)
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 3945ionlF2967808, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+        by rtits2.realtek.com.tw (8.15.2/2.92/5.92) with ESMTPS id 3945ionlF2967808
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 4 Oct 2023 13:44:51 +0800
+Received: from RTEXMBS06.realtek.com.tw (172.21.6.99) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.32; Wed, 4 Oct 2023 13:44:51 +0800
+Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
+ RTEXMBS06.realtek.com.tw (172.21.6.99) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.34; Wed, 4 Oct 2023 13:44:50 +0800
+Received: from RTEXMBS03.realtek.com.tw ([fe80::5510:ad08:5390:1ed3]) by
+ RTEXMBS03.realtek.com.tw ([fe80::5510:ad08:5390:1ed3%2]) with mapi id
+ 15.01.2375.007; Wed, 4 Oct 2023 13:44:50 +0800
+From:   Max Chou <max.chou@realtek.com>
+To:     "Kirill A. Shutemov" <kirill@shutemov.name>
+CC:     Bagas Sanjaya <bagasdotme@gmail.com>,
+        Hilda Wu <hildawu@realtek.com>,
+        "alex_lu@realsil.com.cn" <alex_lu@realsil.com.cn>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        AngeloGioacchino Del Regno 
-        <angelogioacchino.delregno@collabora.com>
-References: <CAH7-e5sb+kT_LRb1_y-c5JaFN0=KrrRT97otUPKzTCgzGsVdrQ@mail.gmail.com>
- <ZRtWcgiH5JhD5NU2@debian.me>
- <CAH7-e5uspavg_VBJxKLOKJfU3nAq-OrPqzihF2opffY-ReiC-w@mail.gmail.com>
- <834062302e6a98e773dc4b03d7ed568a0f1c44fc.camel@nordicsemi.no>
- <CAH7-e5uZzmnFJAJrG664G6_JbK--DfbKC50aeVN5gMMxDJ51UA@mail.gmail.com>
- <ba7aaaed859ea2c4f5aac597deb382cceab33d65.camel@nordicsemi.no>
- <CAH7-e5unq6ggNjVkSsriUAmpvk4s7-NCYJrZnLK_3BjFO_Dceg@mail.gmail.com>
-From:   "Linux regression tracking (Thorsten Leemhuis)" 
-        <regressions@leemhuis.info>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <CAH7-e5unq6ggNjVkSsriUAmpvk4s7-NCYJrZnLK_3BjFO_Dceg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1696396822;a9ff83e7;
-X-HE-SMSGID: 1qnuIy-0004Si-FW
+        "Johan Hedberg" <johan.hedberg@gmail.com>,
+        Juerg Haefliger <juerg.haefliger@canonical.com>,
+        Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
+        Thorsten Leemhuis <linux@leemhuis.info>,
+        Linux Regressions <regressions@lists.linux.dev>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: RE: Regression: devcoredump patch broke Realtek usb bluetooth adapter
+Thread-Topic: Regression: devcoredump patch broke Realtek usb bluetooth
+ adapter
+Thread-Index: AQHZ9iZZqIk9cnxrEkOIPrwHFnXgfLA4N/0AgAA1ZDCAABycgIAAkrXQ
+Date:   Wed, 4 Oct 2023 05:44:49 +0000
+Message-ID: <b452257b550a47feb1c45b905018fe17@realtek.com>
+References: <20231003182038.k57nirtt4sonvt7c@box.shutemov.name>
+ <ZRyqIn0_qqEFBPdy@debian.me> <b2ef2f1c457a4cf7a246b2e8b8598a30@realtek.com>
+ <20231004044947.vgegwvxxindkjo7g@box.shutemov.name>
+In-Reply-To: <20231004044947.vgegwvxxindkjo7g@box.shutemov.name>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+x-originating-ip: [172.21.132.197]
+x-kse-serverinfo: RTEXMBS06.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 03.10.23 18:10, Erik Dobák wrote:
-> Sorry Tomasz,
-> 
-> that must have been a reality glitch with your commit (cant find the
-> page refering to your commit now). But yes it is probably a kernel bug
-> as it manifests kernels 6.4 and not in the 6.1 LTS version.
+Hi! Kirill,
+As your mentions, there's not obvious wrong from the dmesg.
+Could you capture btmon log with raw data? (btmon -w xxx.log)
+In additional, did you build the last version of bluetooth-next?
+By my understanding, you can just duplicate the issue by the commit "044014ce85a1 Bluetooth: btrtl: Add Realtek devcoredump support"?
+Unfortunately, I can not duplicate this issue sofar.
 
-Could you then please try a bisection to get us closer to the problem?
-You might want to try mainline (e.g. 6.6-rc4) first, with a bit of luck
-the problem is fixed there already; FWIW, a few BT fixes that might or
-might not be relevant for your case are heading that way and will most
-likely be in 6.6-rc5.
 
-Ciao, Thorsten
+BRs,
+Max
 
-> On Tue, 3 Oct 2023 at 15:08, Tomasz Moń <tomasz.mon@nordicsemi.no> wrote:
->>
->> On Tue, 2023-10-03 at 14:42 +0200, Erik Dobák wrote:
->>> Sure here you go:
->>>
->>> # lsusb -d 04c5:1670 -v
->>>
->>> Bus 001 Device 004: ID 04c5:1670 Fujitsu, Ltd Bluetooth Radio
->>> Device Descriptor:
->>>   bLength                18
->>>   bDescriptorType         1
->>>   bcdUSB               1.00
->>>   bDeviceClass          224 Wireless
->>>   bDeviceSubClass         1 Radio Frequency
->>>   bDeviceProtocol         1 Bluetooth
->>>   bMaxPacketSize0        64
->>>   idVendor           0x04c5 Fujitsu, Ltd
->>>   idProduct          0x1670
->>>   bcdDevice            0.00
->>>   iManufacturer           1 Realtek
->>>   iProduct                2 Bluetooth Radio
->>>   iSerial                 3 00e04c000001
->>>   bNumConfigurations      1
->>>   Configuration Descriptor:
->>>     bLength                 9
->>>     bDescriptorType         2
->>>     wTotalLength       0x00b1
->>>     bNumInterfaces          2
->>>     bConfigurationValue     1
->>>     iConfiguration          0
->>>     bmAttributes         0xe0
->>>       Self Powered
->>>       Remote Wakeup
->>>     MaxPower              500mA
->>>     Interface Descriptor:
->>>       bLength                 9
->>>       bDescriptorType         4
->>>       bInterfaceNumber        0
->>>       bAlternateSetting       0
->>>       bNumEndpoints           3
->>>       bInterfaceClass       224 Wireless
->>>       bInterfaceSubClass      1 Radio Frequency
->>>       bInterfaceProtocol      1 Bluetooth
->>>       iInterface              4 Bluetooth Radio
->>
->> I have no idea why you referred to my commits, i.e. c13380a55522
->> ("Bluetooth: btusb: Do not require hardcoded interface numbers") later
->> fixed by eaac6e223a0d ("Bluetooth: btusb: Fix bluetooth on Intel
->> Macbook 2014") in the first place.
->>
->> BTUSB_IFNUM_2 is not even getting set for this device and therefore the
->> patches have no impact on your issue. If you were affected, like the
->> Intel Macbook 2014 was, then bear in mind that the issue would manifest
->> as btusb driver not even binding to the device. From your emails
->> however it appears that the issue is something different.
->>
->> I honestly don't think it has anything to do with my patches. If you
->> know a Linux version where your bluetooth device works, then the next
->> step would be to bisect to find the first bad commit.
->>
->> Best Regards,
->> Tomasz Moń
+
+> -----Original Message-----
+> From: Kirill A. Shutemov <kirill@shutemov.name>
+> Sent: Wednesday, October 4, 2023 12:50 PM
+> To: Max Chou <max.chou@realtek.com>
+> Cc: Bagas Sanjaya <bagasdotme@gmail.com>; Hilda Wu
+> <hildawu@realtek.com>; alex_lu@realsil.com.cn; Luiz Augusto von Dentz
+> <luiz.von.dentz@intel.com>; Marcel Holtmann <marcel@holtmann.org>;
+> Johan Hedberg <johan.hedberg@gmail.com>; Juerg Haefliger
+> <juerg.haefliger@canonical.com>; Linux Bluetooth
+> <linux-bluetooth@vger.kernel.org>; Thorsten Leemhuis <linux@leemhuis.info>;
+> Linux Regressions <regressions@lists.linux.dev>; Linux Kernel Mailing List
+> <linux-kernel@vger.kernel.org>
+> Subject: Re: Regression: devcoredump patch broke Realtek usb bluetooth
+> adapter
 > 
 > 
+> External mail.
+> 
+> 
+> 
+> On Wed, Oct 04, 2023 at 03:07:24AM +0000, Max Chou wrote:
+> > Hi! Kirill,
+> > I based on Kernel v6.5.5 and updated drivers/bluetooth to the last version of
+> bluetooth-next tree for a test with RTL8761BUV.
+> > The dmesg log and "hciconfig -a" are correct.
+> > Could you share the dmesg for your failure case?
+> >
+> > [56133.563293] usb 3-1: new full-speed USB device number 28 using
+> > xhci_hcd [56133.712559] usb 3-1: New USB device found, idVendor=0bda,
+> > idProduct=8771, bcdDevice= 2.00 [56133.712577] usb 3-1: New USB device
+> > strings: Mfr=1, Product=2, SerialNumber=3 [56133.712582] usb 3-1:
+> > Product: Bluetooth Radio [56133.712585] usb 3-1: Manufacturer: Realtek
+> > [56133.712588] usb 3-1: SerialNumber: 00E04C239987 [56133.737812]
+> > usbcore: registered new interface driver btusb [56133.742126]
+> > Bluetooth: hci0: RTL: examining hci_ver=0a hci_rev=000b lmp_ver=0a
+> > lmp_subver=8761 [56133.743115] Bluetooth: hci0: RTL: rom_version
+> > status=0 version=1 [56133.743124] Bluetooth: hci0: RTL: loading
+> > rtl_bt/rtl8761bu_fw.bin [56133.743754] Bluetooth: hci0: RTL: loading
+> > rtl_bt/rtl8761bu_config.bin [56133.743829] Bluetooth: hci0: RTL:
+> > cfg_sz 6, total sz 30210 [56133.913311] Bluetooth: hci0: RTL: fw
+> > version 0xdfc6d922 [56133.980299] Bluetooth: MGMT ver 1.22
+> >
+> > hci0:   Type: Primary  Bus: USB
+> >         BD Address: 98:A2:35:85:56:F1  ACL MTU: 1021:6  SCO MTU:
+> 255:12
+> >         UP RUNNING
+> >         RX bytes:1670 acl:0 sco:0 events:184 errors:0
+> >         TX bytes:33917 acl:0 sco:0 commands:184 errors:0
+> >         Features: 0xff 0xff 0xff 0xfe 0xdb 0xfd 0x7b 0x87
+> >         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+> >         Link policy: RSWITCH HOLD SNIFF PARK
+> >         Link mode: PERIPHERAL ACCEPT
+> >         Name: 'max-ThinkPad-X230'
+> >         Class: 0x6c010c
+> >         Service Classes: Rendering, Capturing, Audio, Telephony
+> >         Device Class: Computer, Laptop
+> >         HCI Version: 5.1 (0xa)  Revision: 0xdfc6
+> >         LMP Version: 5.1 (0xa)  Subversion: 0xd922
+> >         Manufacturer: Realtek Semiconductor Corporation (93)
+> 
+> I don't see anything obviously wrong in dmesg. Attached hciconfig and dmesg
+> for both functional and broken cases.
+> 
+> --
+>   Kiryl Shutsemau / Kirill A. Shutemov
