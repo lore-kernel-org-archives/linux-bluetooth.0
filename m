@@ -2,126 +2,133 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22CB4E8FDC0
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Oct 2023 23:56:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9673BE8FDC3
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Oct 2023 03:08:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238679AbjJCX4m (ORCPT
+        id S230447AbjJDDIQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 3 Oct 2023 19:56:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33372 "EHLO
+        Tue, 3 Oct 2023 23:08:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237225AbjJCX4l (ORCPT
+        with ESMTP id S229530AbjJDDIP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 3 Oct 2023 19:56:41 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AD08A7;
-        Tue,  3 Oct 2023 16:56:22 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1c874b43123so3000165ad.2;
-        Tue, 03 Oct 2023 16:56:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696377381; x=1696982181; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZCCBj410ajq0re8t8s28xHlISeDJPhGS19VANz63K9o=;
-        b=OSh2MQ4ANh1QwS1uiRujguNzfepjGkSNtKiBdh4Pve6XSeihn08PNH++WBIeyQOttR
-         gxVQb53BQi7xYA6j402WfZa/LAvmFLDDOpB3jugvG7MoFgTyHd7tssjDoxLZk+XcGZfm
-         aGgeh0S3WDhz23znU+XGwM+tR19u0iGNdi64DCMLbpZgOxG23xDo9hRDdX6OgpHNHuzB
-         C7ev72xL4w5pZEqOOvL8uBFIC1uMN658i4fChWknbmGdxpbkw97VRYHmSqVhWj7IRPIO
-         vCTWRsqKN3u3bV0EWRbBBSAA7T01tS7s8sMrrZXE8l9DHvhhduc0qUy5VyN57ZCRP3l9
-         5Exw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696377381; x=1696982181;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZCCBj410ajq0re8t8s28xHlISeDJPhGS19VANz63K9o=;
-        b=M+qVz3aHvmfkSpjm8W2LD6eKGCZ+d5m7ZfbDiqeRe79BcYJQlUP5In78FC7bhapoG+
-         mCfKM5MrtzdZYMnqMmPfZnOxxeOOoJxqlKIkPPOp9GMfZZMmBPIyZ2lCS8iWTjUfkrpT
-         x4W6Clu8QTmQkTaZzhRPuwd+Q3V7pY7FCq49xe3TgpjRHXvUcbFmg8cIRANa/1DNBBuF
-         l4GYzTgo9kp6/EHmY1fDiCM3ch61V05BArrHzK3sMyu5gldwQSrbTuhntUZjiHxiwAbY
-         Aty3zKlG4sgTZikKfAs6gGTWcgMzNdPUD0J6rl0fy3tPbpb/txMySiRO3Iy2dg1e+5VY
-         Pawg==
-X-Gm-Message-State: AOJu0YxPWTrpcf97VFGivFx3Z2Ubhi/+uyBVcLtfzVSzz01LomMz8PhI
-        dEGZIfanYUIjVMr5Umc2IU4=
-X-Google-Smtp-Source: AGHT+IEQ/w1Y8P4IJ6FMYu9I9SDAvd9lq2qE+CakE2eHWL6oVHapQH7nJH+ONsuq9pi4d0n04dR+CQ==
-X-Received: by 2002:a17:902:9885:b0:1c6:117b:7086 with SMTP id s5-20020a170902988500b001c6117b7086mr935395plp.5.1696377381492;
-        Tue, 03 Oct 2023 16:56:21 -0700 (PDT)
-Received: from debian.me ([103.131.18.64])
-        by smtp.gmail.com with ESMTPSA id m1-20020a170902db0100b001b8b45b177esm2179485plx.274.2023.10.03.16.56.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Oct 2023 16:56:20 -0700 (PDT)
-Received: by debian.me (Postfix, from userid 1000)
-        id A41D781A7EC5; Wed,  4 Oct 2023 06:56:18 +0700 (WIB)
-Date:   Wed, 4 Oct 2023 06:56:18 +0700
-From:   Bagas Sanjaya <bagasdotme@gmail.com>
-To:     "Kirill A. Shutemov" <kirill@shutemov.name>,
+        Tue, 3 Oct 2023 23:08:15 -0400
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D465DAF;
+        Tue,  3 Oct 2023 20:08:09 -0700 (PDT)
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 39437PNe82806956, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+        by rtits2.realtek.com.tw (8.15.2/2.92/5.92) with ESMTPS id 39437PNe82806956
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 4 Oct 2023 11:07:25 +0800
+Received: from RTEXDAG02.realtek.com.tw (172.21.6.101) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.17; Wed, 4 Oct 2023 11:07:25 +0800
+Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
+ RTEXDAG02.realtek.com.tw (172.21.6.101) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.7; Wed, 4 Oct 2023 11:07:24 +0800
+Received: from RTEXMBS03.realtek.com.tw ([fe80::5510:ad08:5390:1ed3]) by
+ RTEXMBS03.realtek.com.tw ([fe80::5510:ad08:5390:1ed3%2]) with mapi id
+ 15.01.2375.007; Wed, 4 Oct 2023 11:07:24 +0800
+From:   Max Chou <max.chou@realtek.com>
+To:     Bagas Sanjaya <bagasdotme@gmail.com>,
+        "Kirill A. Shutemov" <kirill@shutemov.name>,
         Hilda Wu <hildawu@realtek.com>
-Cc:     Alex Lu <alex_lu@realsil.com.cn>,
+CC:     "alex_lu@realsil.com.cn" <alex_lu@realsil.com.cn>,
         Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Max Chou <max.chou@realtek.com>,
         Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
+        "Johan Hedberg" <johan.hedberg@gmail.com>,
         Juerg Haefliger <juerg.haefliger@canonical.com>,
         Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
         Thorsten Leemhuis <linux@leemhuis.info>,
         Linux Regressions <regressions@lists.linux.dev>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: Regression: devcoredump patch broke Realtek usb bluetooth adapter
-Message-ID: <ZRyqIn0_qqEFBPdy@debian.me>
+Subject: RE: Regression: devcoredump patch broke Realtek usb bluetooth adapter
+Thread-Topic: Regression: devcoredump patch broke Realtek usb bluetooth
+ adapter
+Thread-Index: AQHZ9iZZqIk9cnxrEkOIPrwHFnXgfLA4N/0AgAA1ZDA=
+Date:   Wed, 4 Oct 2023 03:07:24 +0000
+Message-ID: <b2ef2f1c457a4cf7a246b2e8b8598a30@realtek.com>
 References: <20231003182038.k57nirtt4sonvt7c@box.shutemov.name>
+ <ZRyqIn0_qqEFBPdy@debian.me>
+In-Reply-To: <ZRyqIn0_qqEFBPdy@debian.me>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+x-originating-ip: [172.21.132.197]
+x-kse-serverinfo: RTEXDAG02.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="lOp0O5Hmv9c8nMC0"
-Content-Disposition: inline
-In-Reply-To: <20231003182038.k57nirtt4sonvt7c@box.shutemov.name>
+X-KSE-AntiSpam-Interceptor-Info: fallback
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-
---lOp0O5Hmv9c8nMC0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Oct 03, 2023 at 09:20:38PM +0300, Kirill A. Shutemov wrote:
-> Hi,
->=20
-> Commit 044014ce85a1 ("Bluetooth: btrtl: Add Realtek devcoredump support")
-> broke Realtek-based ASUS USB-BT500, ID 0b05:190e.
->=20
-> Devices failed to connect. hciconfig showed a controller with all-zero BD
-> address.
-
-What is its output then? And dmesg log?
-
->=20
-> I reverted the commit as well as bd003fb338af that depends on the commit.
-> It made the problem go away.
->=20
-> I know virtually nothing about bluetooth. Let me know what info you need
-> to debug the issue.
->=20
-
-Hilda, it looks like this regression is caused by a commit of yours. Would
-you like to take a look on it?
-
-Regardless, thanks for the regression report. I'm adding it to regzbot:
-
-#regzbot ^introduced: 044014ce85a17c
-
---=20
-An old man doll... just what I always wanted! - Clara
-
---lOp0O5Hmv9c8nMC0
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZRyqGwAKCRD2uYlJVVFO
-o6UyAP9Slr9mZ+rRmtvUXh8WNdiIJEL1pcR6Ja0Bt3M/3Qr4qgEAnebbqTZM6ny7
-9ZiB/gqtVQo7ARGVnp9hOJXS5BHafQQ=
-=IV+/
------END PGP SIGNATURE-----
-
---lOp0O5Hmv9c8nMC0--
+SGkhIEtpcmlsbCwNCkkgYmFzZWQgb24gS2VybmVsIHY2LjUuNSBhbmQgdXBkYXRlZCBkcml2ZXJz
+L2JsdWV0b290aCB0byB0aGUgbGFzdCB2ZXJzaW9uIG9mIGJsdWV0b290aC1uZXh0IHRyZWUgZm9y
+IGEgdGVzdCB3aXRoIFJUTDg3NjFCVVYuDQpUaGUgZG1lc2cgbG9nIGFuZCAiaGNpY29uZmlnIC1h
+IiBhcmUgY29ycmVjdC4NCkNvdWxkIHlvdSBzaGFyZSB0aGUgZG1lc2cgZm9yIHlvdXIgZmFpbHVy
+ZSBjYXNlPw0KDQpbNTYxMzMuNTYzMjkzXSB1c2IgMy0xOiBuZXcgZnVsbC1zcGVlZCBVU0IgZGV2
+aWNlIG51bWJlciAyOCB1c2luZyB4aGNpX2hjZA0KWzU2MTMzLjcxMjU1OV0gdXNiIDMtMTogTmV3
+IFVTQiBkZXZpY2UgZm91bmQsIGlkVmVuZG9yPTBiZGEsIGlkUHJvZHVjdD04NzcxLCBiY2REZXZp
+Y2U9IDIuMDANCls1NjEzMy43MTI1NzddIHVzYiAzLTE6IE5ldyBVU0IgZGV2aWNlIHN0cmluZ3M6
+IE1mcj0xLCBQcm9kdWN0PTIsIFNlcmlhbE51bWJlcj0zDQpbNTYxMzMuNzEyNTgyXSB1c2IgMy0x
+OiBQcm9kdWN0OiBCbHVldG9vdGggUmFkaW8NCls1NjEzMy43MTI1ODVdIHVzYiAzLTE6IE1hbnVm
+YWN0dXJlcjogUmVhbHRlaw0KWzU2MTMzLjcxMjU4OF0gdXNiIDMtMTogU2VyaWFsTnVtYmVyOiAw
+MEUwNEMyMzk5ODcNCls1NjEzMy43Mzc4MTJdIHVzYmNvcmU6IHJlZ2lzdGVyZWQgbmV3IGludGVy
+ZmFjZSBkcml2ZXIgYnR1c2INCls1NjEzMy43NDIxMjZdIEJsdWV0b290aDogaGNpMDogUlRMOiBl
+eGFtaW5pbmcgaGNpX3Zlcj0wYSBoY2lfcmV2PTAwMGIgbG1wX3Zlcj0wYSBsbXBfc3VidmVyPTg3
+NjENCls1NjEzMy43NDMxMTVdIEJsdWV0b290aDogaGNpMDogUlRMOiByb21fdmVyc2lvbiBzdGF0
+dXM9MCB2ZXJzaW9uPTENCls1NjEzMy43NDMxMjRdIEJsdWV0b290aDogaGNpMDogUlRMOiBsb2Fk
+aW5nIHJ0bF9idC9ydGw4NzYxYnVfZncuYmluDQpbNTYxMzMuNzQzNzU0XSBCbHVldG9vdGg6IGhj
+aTA6IFJUTDogbG9hZGluZyBydGxfYnQvcnRsODc2MWJ1X2NvbmZpZy5iaW4NCls1NjEzMy43NDM4
+MjldIEJsdWV0b290aDogaGNpMDogUlRMOiBjZmdfc3ogNiwgdG90YWwgc3ogMzAyMTANCls1NjEz
+My45MTMzMTFdIEJsdWV0b290aDogaGNpMDogUlRMOiBmdyB2ZXJzaW9uIDB4ZGZjNmQ5MjINCls1
+NjEzMy45ODAyOTldIEJsdWV0b290aDogTUdNVCB2ZXIgMS4yMg0KDQpoY2kwOiAgIFR5cGU6IFBy
+aW1hcnkgIEJ1czogVVNCDQogICAgICAgIEJEIEFkZHJlc3M6IDk4OkEyOjM1Ojg1OjU2OkYxICBB
+Q0wgTVRVOiAxMDIxOjYgIFNDTyBNVFU6IDI1NToxMg0KICAgICAgICBVUCBSVU5OSU5HDQogICAg
+ICAgIFJYIGJ5dGVzOjE2NzAgYWNsOjAgc2NvOjAgZXZlbnRzOjE4NCBlcnJvcnM6MA0KICAgICAg
+ICBUWCBieXRlczozMzkxNyBhY2w6MCBzY286MCBjb21tYW5kczoxODQgZXJyb3JzOjANCiAgICAg
+ICAgRmVhdHVyZXM6IDB4ZmYgMHhmZiAweGZmIDB4ZmUgMHhkYiAweGZkIDB4N2IgMHg4Nw0KICAg
+ICAgICBQYWNrZXQgdHlwZTogRE0xIERNMyBETTUgREgxIERIMyBESDUgSFYxIEhWMiBIVjMNCiAg
+ICAgICAgTGluayBwb2xpY3k6IFJTV0lUQ0ggSE9MRCBTTklGRiBQQVJLDQogICAgICAgIExpbmsg
+bW9kZTogUEVSSVBIRVJBTCBBQ0NFUFQNCiAgICAgICAgTmFtZTogJ21heC1UaGlua1BhZC1YMjMw
+Jw0KICAgICAgICBDbGFzczogMHg2YzAxMGMNCiAgICAgICAgU2VydmljZSBDbGFzc2VzOiBSZW5k
+ZXJpbmcsIENhcHR1cmluZywgQXVkaW8sIFRlbGVwaG9ueQ0KICAgICAgICBEZXZpY2UgQ2xhc3M6
+IENvbXB1dGVyLCBMYXB0b3ANCiAgICAgICAgSENJIFZlcnNpb246IDUuMSAoMHhhKSAgUmV2aXNp
+b246IDB4ZGZjNg0KICAgICAgICBMTVAgVmVyc2lvbjogNS4xICgweGEpICBTdWJ2ZXJzaW9uOiAw
+eGQ5MjINCiAgICAgICAgTWFudWZhY3R1cmVyOiBSZWFsdGVrIFNlbWljb25kdWN0b3IgQ29ycG9y
+YXRpb24gKDkzKQ0KDQoNCkJScywNCk1heA0KDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0t
+LS0NCj4gRnJvbTogQmFnYXMgU2FuamF5YSA8YmFnYXNkb3RtZUBnbWFpbC5jb20+DQo+IFNlbnQ6
+IFdlZG5lc2RheSwgT2N0b2JlciA0LCAyMDIzIDc6NTYgQU0NCj4gVG86IEtpcmlsbCBBLiBTaHV0
+ZW1vdiA8a2lyaWxsQHNodXRlbW92Lm5hbWU+OyBIaWxkYSBXdQ0KPiA8aGlsZGF3dUByZWFsdGVr
+LmNvbT4NCj4gQ2M6IGFsZXhfbHVAcmVhbHNpbC5jb20uY247IEx1aXogQXVndXN0byB2b24gRGVu
+dHoNCj4gPGx1aXoudm9uLmRlbnR6QGludGVsLmNvbT47IE1heCBDaG91IDxtYXguY2hvdUByZWFs
+dGVrLmNvbT47IE1hcmNlbA0KPiBIb2x0bWFubiA8bWFyY2VsQGhvbHRtYW5uLm9yZz47IEpvaGFu
+IEhlZGJlcmcNCj4gPGpvaGFuLmhlZGJlcmdAZ21haWwuY29tPjsgSnVlcmcgSGFlZmxpZ2VyDQo+
+IDxqdWVyZy5oYWVmbGlnZXJAY2Fub25pY2FsLmNvbT47IExpbnV4IEJsdWV0b290aA0KPiA8bGlu
+dXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZz47IFRob3JzdGVuIExlZW1odWlzIDxsaW51eEBs
+ZWVtaHVpcy5pbmZvPjsNCj4gTGludXggUmVncmVzc2lvbnMgPHJlZ3Jlc3Npb25zQGxpc3RzLmxp
+bnV4LmRldj47IExpbnV4IEtlcm5lbCBNYWlsaW5nIExpc3QNCj4gPGxpbnV4LWtlcm5lbEB2Z2Vy
+Lmtlcm5lbC5vcmc+DQo+IFN1YmplY3Q6IFJlOiBSZWdyZXNzaW9uOiBkZXZjb3JlZHVtcCBwYXRj
+aCBicm9rZSBSZWFsdGVrIHVzYiBibHVldG9vdGgNCj4gYWRhcHRlcg0KPiANCj4gT24gVHVlLCBP
+Y3QgMDMsIDIwMjMgYXQgMDk6MjA6MzhQTSArMDMwMCwgS2lyaWxsIEEuIFNodXRlbW92IHdyb3Rl
+Og0KPiA+IEhpLA0KPiA+DQo+ID4gQ29tbWl0IDA0NDAxNGNlODVhMSAoIkJsdWV0b290aDogYnRy
+dGw6IEFkZCBSZWFsdGVrIGRldmNvcmVkdW1wDQo+ID4gc3VwcG9ydCIpIGJyb2tlIFJlYWx0ZWst
+YmFzZWQgQVNVUyBVU0ItQlQ1MDAsIElEIDBiMDU6MTkwZS4NCj4gPg0KPiA+IERldmljZXMgZmFp
+bGVkIHRvIGNvbm5lY3QuIGhjaWNvbmZpZyBzaG93ZWQgYSBjb250cm9sbGVyIHdpdGggYWxsLXpl
+cm8NCj4gPiBCRCBhZGRyZXNzLg0KPiANCj4gV2hhdCBpcyBpdHMgb3V0cHV0IHRoZW4/IEFuZCBk
+bWVzZyBsb2c/DQo+IA0KPiA+DQo+ID4gSSByZXZlcnRlZCB0aGUgY29tbWl0IGFzIHdlbGwgYXMg
+YmQwMDNmYjMzOGFmIHRoYXQgZGVwZW5kcyBvbiB0aGUgY29tbWl0Lg0KPiA+IEl0IG1hZGUgdGhl
+IHByb2JsZW0gZ28gYXdheS4NCj4gPg0KPiA+IEkga25vdyB2aXJ0dWFsbHkgbm90aGluZyBhYm91
+dCBibHVldG9vdGguIExldCBtZSBrbm93IHdoYXQgaW5mbyB5b3UNCj4gPiBuZWVkIHRvIGRlYnVn
+IHRoZSBpc3N1ZS4NCj4gPg0KPiANCj4gSGlsZGEsIGl0IGxvb2tzIGxpa2UgdGhpcyByZWdyZXNz
+aW9uIGlzIGNhdXNlZCBieSBhIGNvbW1pdCBvZiB5b3Vycy4gV291bGQgeW91DQo+IGxpa2UgdG8g
+dGFrZSBhIGxvb2sgb24gaXQ/DQo+IA0KPiBSZWdhcmRsZXNzLCB0aGFua3MgZm9yIHRoZSByZWdy
+ZXNzaW9uIHJlcG9ydC4gSSdtIGFkZGluZyBpdCB0byByZWd6Ym90Og0KPiANCj4gI3JlZ3pib3Qg
+XmludHJvZHVjZWQ6IDA0NDAxNGNlODVhMTdjDQo+IA0KPiAtLQ0KPiBBbiBvbGQgbWFuIGRvbGwu
+Li4ganVzdCB3aGF0IEkgYWx3YXlzIHdhbnRlZCEgLSBDbGFyYQ0K
