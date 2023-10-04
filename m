@@ -2,59 +2,101 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31A72E8FDDA
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Oct 2023 07:59:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCFD9E7B5E1
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Oct 2023 09:25:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241645AbjJDH7D (ORCPT
+        id S241782AbjJDJZZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Oct 2023 03:59:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47260 "EHLO
+        Wed, 4 Oct 2023 05:25:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241646AbjJDH7B (ORCPT
+        with ESMTP id S232947AbjJDJZY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Oct 2023 03:59:01 -0400
-X-Greylist: delayed 502 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 04 Oct 2023 00:58:58 PDT
-Received: from mail.citycodes.pl (mail.citycodes.pl [158.255.215.195])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C739A7
-        for <linux-bluetooth@vger.kernel.org>; Wed,  4 Oct 2023 00:58:57 -0700 (PDT)
-Received: by mail.citycodes.pl (Postfix, from userid 1001)
-        id 9BCF61F343; Wed,  4 Oct 2023 09:50:33 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=citycodes.pl; s=mail;
-        t=1696405834; bh=mMhfBvhM53FtUQl1P3lyeSY5aDBQYiR8qQBy6YFQHi0=;
-        h=Date:From:To:Subject:From;
-        b=APxZzYnZ3jLrtVOTexuxaBn6+SxFSpx8yaUobHmlOcuk291Jjtj0tGqa8SlIuDRyT
-         IsRuV5DomDHtAzHCuikQJXvMKTwyBB5xDhzvDyA7wtlYeoqzsRPT3GfvxdiY5xDv5g
-         YQQLoRimUBIOUC3VjyjxiRs2gv1zCO6ziII+Mwj0d+VYEbgKIKXctHRMZvOutB1yPE
-         nXHOkhW/W6B6LGWD1JUK3d2nR8Glzq7EjXWc9g21E2T1Nk7+/8Ewya/hqvNmtRIbrl
-         NCWMQ0+agmyi0uPJGKuIhs9Ge+yw+WMjVXHcuxb814qRjOhorZPCSYHpBK0dlHzTbK
-         oAsUtEKnuK++w==
-Received: by mail.citycodes.pl for <linux-bluetooth@vger.kernel.org>; Wed,  4 Oct 2023 07:50:33 GMT
-Message-ID: <20231004084500-0.1.7v.j1bm.0.db7zp7oh8i@citycodes.pl>
-Date:   Wed,  4 Oct 2023 07:50:33 GMT
-From:   "Kamil Lasek" <kamil.lasek@citycodes.pl>
-To:     <linux-bluetooth@vger.kernel.org>
-Subject: =?UTF-8?Q?Rozszerzenie_Programu_M=C3=B3j_Pr=C4=85d_5.0?=
-X-Mailer: mail.citycodes.pl
+        Wed, 4 Oct 2023 05:25:24 -0400
+Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04C98A7
+        for <linux-bluetooth@vger.kernel.org>; Wed,  4 Oct 2023 02:25:22 -0700 (PDT)
+Received: by mail-qk1-x731.google.com with SMTP id af79cd13be357-7741c5bac51so126822685a.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Oct 2023 02:25:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696411521; x=1697016321; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ciMRzpAxa/FuvUG+5wz5t01tXeYPxVZMvz5bzB1ZvDI=;
+        b=EAi7IRvTUDRdQ/9G8bIJBHspcc8dEDyXMqEHX8LIa8vvah8fBu7uZVKw1zWgWBQ+XO
+         sPfHZfUJHQgHg7VBsvFHDXbJd67ZAKeJ5iep74hVt+GoULhbSfJf4ItWHqvlWDv7/b0J
+         Knlrd9sYS45yFWV8wuw3NPKUvewvWHpSfxWD0hNe4QHGpIh0xKf7ZIQ5cAdCMejQrPGu
+         pSU0e+rayfFL6eSjKEnWbjF2oZAc+XL8lNL9GF1yXTMqFmjkCQBvF13j2cVbF47MrOxz
+         CDYYAcc8OVrS96JygtEuF/YHe8lgCWcjyUrWy7hByx5TXWm7GfIJ9Lnl2piwmFezkxQN
+         S2OA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696411521; x=1697016321;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ciMRzpAxa/FuvUG+5wz5t01tXeYPxVZMvz5bzB1ZvDI=;
+        b=Z/bf7TfbZMBw+SgoCj+V9bwEFA7RBihrtfpXUlZZ1MOmfBRRzCU9LKDK1gz/qjbiMw
+         0Ht10fHryJgsZqAzMc/5NMAClMt8Oyehl7Rh/sS9IeBBfWnnBWaOy1lfC7uirSAXKD2L
+         LonxbZsmOisXqXDBbuKAt8OPQTkfM6V0FLzB7BDNTERmvxm+xASBg2rgnHnxEDZ3B8Kg
+         jVuGYIvSxaFdje9tgFH6uXCxP1zJBPXGM3R1KGpXOQopBzdMa1fnEmtTMyj9MDz18s0o
+         e13PQLqQipp/H1VbKEhKjQtRBzW6yeTRXmXGl0usOTqJhKydzYf2IkTtxstb/vSpd5bP
+         Qn9Q==
+X-Gm-Message-State: AOJu0YwCUNGi34EHg4GeL/ywj+RG4awxB4bwUNRkDF9z8zLDjQbDeby9
+        BKZCAZ4c0Kn57WjwzJekLaAabD+OqlI=
+X-Google-Smtp-Source: AGHT+IHARBk8MQSeuTQhDSvE9uiBNQDyvHSEq6zgSJ0xrtQEz9D2Sfqs8cPOeUOA5HbgL6lj+dst3w==
+X-Received: by 2002:a05:620a:2907:b0:775:c5cc:7ce4 with SMTP id m7-20020a05620a290700b00775c5cc7ce4mr2038808qkp.13.1696411520787;
+        Wed, 04 Oct 2023 02:25:20 -0700 (PDT)
+Received: from [172.17.0.2] ([20.57.68.52])
+        by smtp.gmail.com with ESMTPSA id d15-20020a05620a136f00b007756d233fbdsm1133742qkl.37.2023.10.04.02.25.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Oct 2023 02:25:20 -0700 (PDT)
+Message-ID: <651d2f80.050a0220.aa9b3.571b@mx.google.com>
+Date:   Wed, 04 Oct 2023 02:25:20 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6008508898307786200=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, silviu.barbulescu@nxp.com
+Subject: RE: Update transport acquire/release flow BAP bcast source
+In-Reply-To: <20231004075646.4277-2-silviu.barbulescu@nxp.com>
+References: <20231004075646.4277-2-silviu.barbulescu@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Szanowni Pa=C5=84stwo!
+--===============6008508898307786200==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-W ramach nowej edycji programu M=C3=B3j Pr=C4=85d mog=C4=85 otrzyma=C4=87=
- Pa=C5=84stwo dofinansowanie na zakup i monta=C5=BC fotowoltaiki i/lub ma=
-gazynu energii. Maksymalna kwota dofinansowania wynosi 58 tys. z=C5=82.=20
+This is automated email and please do not reply to this email!
 
-Jako firma wyspecjalizowana w tym zakresie zajmiemy si=C4=99 Pa=C5=84stwa=
- wnioskiem o dofinansowanie oraz instalacj=C4=85 i serwisem dopasowanych =
-do Pa=C5=84stwa budynku paneli s=C5=82onecznych.
+Dear submitter,
 
-B=C4=99d=C4=99 wdzi=C4=99czny za informacj=C4=99 czy s=C4=85 Pa=C5=84stwo=
- zainteresowani.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=789831
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.12 seconds
+GitLint                       PASS      0.70 seconds
+BuildEll                      PASS      27.88 seconds
+BluezMake                     PASS      774.89 seconds
+MakeCheck                     PASS      12.10 seconds
+MakeDistcheck                 PASS      160.36 seconds
+CheckValgrind                 PASS      257.00 seconds
+CheckSmatch                   PASS      349.02 seconds
+bluezmakeextell               PASS      106.28 seconds
+IncrementalBuild              PASS      1308.43 seconds
+ScanBuild                     PASS      1032.29 seconds
 
 
-Pozdrawiam,
-Kamil Lasek
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6008508898307786200==--
