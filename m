@@ -2,96 +2,129 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2931CE7B60C
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Oct 2023 12:42:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D73A3E7B611
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Oct 2023 13:25:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242443AbjJDMmh (ORCPT
+        id S233345AbjJDNZp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Oct 2023 08:42:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48988 "EHLO
+        Wed, 4 Oct 2023 09:25:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233193AbjJDMmh (ORCPT
+        with ESMTP id S233105AbjJDNZo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Oct 2023 08:42:37 -0400
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 898F6C9;
-        Wed,  4 Oct 2023 05:42:32 -0700 (PDT)
-Received: from canpemm500006.china.huawei.com (unknown [172.30.72.53])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4S0vRB0TD5z1P7cC;
-        Wed,  4 Oct 2023 20:40:06 +0800 (CST)
-Received: from localhost.localdomain (10.175.104.82) by
- canpemm500006.china.huawei.com (7.192.105.130) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Wed, 4 Oct 2023 20:42:30 +0800
-From:   Ziyang Xuan <william.xuanziyang@huawei.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-        <luiz.dentz@gmail.com>, <linux-bluetooth@vger.kernel.org>
-CC:     <linux-kernel@vger.kernel.org>
-Subject: [PATCH] Bluetooth: Fix a refcnt underflow problem for hci_conn
-Date:   Wed, 4 Oct 2023 20:42:24 +0800
-Message-ID: <20231004124224.630914-1-william.xuanziyang@huawei.com>
-X-Mailer: git-send-email 2.25.1
+        Wed, 4 Oct 2023 09:25:44 -0400
+Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 044D2AB
+        for <linux-bluetooth@vger.kernel.org>; Wed,  4 Oct 2023 06:25:41 -0700 (PDT)
+Received: by mail-qt1-x831.google.com with SMTP id d75a77b69052e-4180f5c51f8so7462531cf.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Oct 2023 06:25:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696425940; x=1697030740; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=parZ1pE96t1B/WiWE/rhl1XX8vxsbtGJZyxCGDL7s/Q=;
+        b=QSCieNQwbcGYcT1ua3XrHh7edWEpgrM+/J4Fe6eld85OEMHKBZzF/8e5cfzThbhbwY
+         rLTaClh07N6wpTfDZqWs9PT3fG1ufPYa/Pg9fs6GbOQEz/EkRw+74hYdlycoThRHkJGH
+         bjyF4/bywOgVBfVOvcCXkcfy2Vxl0pgh2i4anbx65yzv2fPjJmSdknFyHjjN8XxDyyb6
+         uEuSpjPPmuqnq2taO0k0naUuwn8nvUfYOKCqzvjUeFzb7N3wPeQ6naxZoQLRLfFORuu5
+         OfsZB+1mz3eXrJwC4ipmvorRUCu6PVM+DSkOTI2XqMKjArXs2YDMBfhztoNITw2bhtbG
+         MqSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696425940; x=1697030740;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=parZ1pE96t1B/WiWE/rhl1XX8vxsbtGJZyxCGDL7s/Q=;
+        b=YkuC28hRKZCrx5TQ6chEk/PODGUJh0FXgow/t9H1+6VrjQqGVnWp/rfENsNk30reiO
+         bAKDjc7+QO0uf9DoXN6aOpNJ++uGxalkZPTIgzyVm8gXfY88kURSkkNU0LIR5kUCX5uK
+         j1FicFfhMxTu110BEhzXCTxaaUnnJAM6TBcHbwK0Nqdj0gQdG8aI62HTrfEXeqqmWskI
+         JvCi9HDPdmoj4+uVrbanAhUI2cuc4cHabUgHaHZeyvingiKH+iarqxzMilCUVntIPOJ7
+         fMOx84H8/wfYgOoVToXPsRKdvNeHZ1NIfjM8rvxPMDa5L0Acx5EsIbXngZZQpWraQXjD
+         TZYA==
+X-Gm-Message-State: AOJu0YxmENnvmEZuVPITBIaLtVXIJTZTt2eRj4VSIFO27MOxOIsZCu51
+        YDbNuGXDd1EEygnA8/Kj09e9QTcZhtY=
+X-Google-Smtp-Source: AGHT+IFkV6Q6mfd2i+jv3YoKxMUsrW3RFdiG+QitAUNwCGTC5Xwe4aWtfFJ2mCb106mWee3P8BLqMg==
+X-Received: by 2002:a05:622a:1046:b0:407:c2e2:2a06 with SMTP id f6-20020a05622a104600b00407c2e22a06mr6823210qte.8.1696425939886;
+        Wed, 04 Oct 2023 06:25:39 -0700 (PDT)
+Received: from [172.17.0.2] ([20.57.75.230])
+        by smtp.gmail.com with ESMTPSA id x25-20020ac87a99000000b004198ae7f841sm1209167qtr.90.2023.10.04.06.25.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Oct 2023 06:25:39 -0700 (PDT)
+Message-ID: <651d67d3.c80a0220.9d145.615d@mx.google.com>
+Date:   Wed, 04 Oct 2023 06:25:39 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8194173198965444625=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.104.82]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- canpemm500006.china.huawei.com (7.192.105.130)
-X-CFilter-Loop: Reflected
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, william.xuanziyang@huawei.com
+Subject: RE: Bluetooth: Fix a refcnt underflow problem for hci_conn
+In-Reply-To: <20231004124224.630914-1-william.xuanziyang@huawei.com>
+References: <20231004124224.630914-1-william.xuanziyang@huawei.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Syzbot reports a warning as follows:
+--===============8194173198965444625==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-WARNING: CPU: 1 PID: 26946 at net/bluetooth/hci_conn.c:619 hci_conn_timeout+0x122/0x210 net/bluetooth/hci_conn.c:619
-...
-Call Trace:
- <TASK>
- process_one_work+0x884/0x15c0 kernel/workqueue.c:2630
- process_scheduled_works kernel/workqueue.c:2703 [inline]
- worker_thread+0x8b9/0x1290 kernel/workqueue.c:2784
- kthread+0x33c/0x440 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
- </TASK>
+This is automated email and please do not reply to this email!
 
-It is because the HCI_EV_SIMPLE_PAIR_COMPLETE event handler drops hci_conn
-directly without check Simple Pairing whether be enabled. But the Simple
-Pairing process can only be used if both sides have the support enabled
-in the host stack.
+Dear submitter,
 
-Add hci_conn_ssp_enabled() for hci_conn in HCI_EV_IO_CAPA_REQUEST and
-HCI_EV_SIMPLE_PAIR_COMPLETE event handlers to fix the problem.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=789919
 
-Fixes: 0493684ed239 ("[Bluetooth] Disable disconnect timer during Simple Pairing")
-Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.81 seconds
+GitLint                       FAIL      0.65 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      43.45 seconds
+CheckAllWarning               PASS      45.87 seconds
+CheckSparse                   WARNING   53.57 seconds
+CheckSmatch                   WARNING   154.17 seconds
+BuildKernel32                 PASS      44.99 seconds
+TestRunnerSetup               PASS      652.20 seconds
+TestRunner_l2cap-tester       PASS      37.78 seconds
+TestRunner_iso-tester         PASS      94.68 seconds
+TestRunner_bnep-tester        PASS      13.16 seconds
+TestRunner_mgmt-tester        PASS      266.03 seconds
+TestRunner_rfcomm-tester      PASS      20.14 seconds
+TestRunner_sco-tester         PASS      23.29 seconds
+TestRunner_ioctl-tester       PASS      23.21 seconds
+TestRunner_mesh-tester        PASS      17.11 seconds
+TestRunner_smp-tester         PASS      17.68 seconds
+TestRunner_userchan-tester    PASS      13.96 seconds
+IncrementalBuild              PASS      38.79 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+Bluetooth: Fix a refcnt underflow problem for hci_conn
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+5: B1 Line exceeds max length (116>80): "WARNING: CPU: 1 PID: 26946 at net/bluetooth/hci_conn.c:619 hci_conn_timeout+0x122/0x210 net/bluetooth/hci_conn.c:619"
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+
+
 ---
- net/bluetooth/hci_event.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 35f251041eeb..0b1487dcef24 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -5302,7 +5302,7 @@ static void hci_io_capa_request_evt(struct hci_dev *hdev, void *data,
- 	hci_dev_lock(hdev);
- 
- 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
--	if (!conn)
-+	if (!conn || !hci_conn_ssp_enabled(conn))
- 		goto unlock;
- 
- 	hci_conn_hold(conn);
-@@ -5549,7 +5549,7 @@ static void hci_simple_pair_complete_evt(struct hci_dev *hdev, void *data,
- 	hci_dev_lock(hdev);
- 
- 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
--	if (!conn)
-+	if (!conn || !hci_conn_ssp_enabled(conn))
- 		goto unlock;
- 
- 	/* Reset the authentication requirement to unknown */
--- 
-2.25.1
 
+--===============8194173198965444625==--
