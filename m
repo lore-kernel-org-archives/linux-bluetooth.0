@@ -2,130 +2,130 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BE59E936EC
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Oct 2023 23:17:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F26EE936ED
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Oct 2023 00:21:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233866AbjJDXR3 (ORCPT
+        id S233943AbjJEAVh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Oct 2023 19:17:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44982 "EHLO
+        Wed, 4 Oct 2023 20:21:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230165AbjJDXR2 (ORCPT
+        with ESMTP id S233891AbjJEAVg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Oct 2023 19:17:28 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ED1DC0
-        for <linux-bluetooth@vger.kernel.org>; Wed,  4 Oct 2023 16:17:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696461443; x=1727997443;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=eRLOOD3IBkoDaoIvNdoryIpNSgz0fN9f44CtaFUY23Y=;
-  b=UZPVpPRLy9BZXWli40VayVpLglAHhCByPKxZ0cKRzWzmDtYmZkU22SMy
-   ztGvdZJmrK0xbJuHQFw5WNYN6rZ9y85gbjl3C8S+yOT8RVCSsEbtT8gm5
-   C32v+nmZW8bp908vZET9JsDkg/pND9EFw5DiJJ9tbgY0Fe0awl3zwXFOP
-   0KaJhZGOlL9c2Yu2HbbpytXpJaNrXV0tPNqHz4LkhskfZgKae81umm1sG
-   8d2bXJX9+2yFZIl/pBrvktoY8nRhww0LLCMuIj9u0GRUv0/puvWdiUiL6
-   r902EzgKdR8PcyuXFOAnNLX6Sk5fXY+5H+nwC7dvILaGojI68Koh6xi9e
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10853"; a="449824005"
-X-IronPort-AV: E=Sophos;i="6.03,201,1694761200"; 
-   d="scan'208";a="449824005"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2023 16:17:23 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10853"; a="998703425"
-X-IronPort-AV: E=Sophos;i="6.03,201,1694761200"; 
-   d="scan'208";a="998703425"
-Received: from lkp-server02.sh.intel.com (HELO c3b01524d57c) ([10.239.97.151])
-  by fmsmga006.fm.intel.com with ESMTP; 04 Oct 2023 16:17:20 -0700
-Received: from kbuild by c3b01524d57c with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qoB7E-000Kji-2V;
-        Wed, 04 Oct 2023 23:17:17 +0000
-Date:   Thu, 5 Oct 2023 07:16:23 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     "Lee, Chun-Yi" <jlee@suse.com>
-Cc:     oe-kbuild-all@lists.linux.dev, linux-bluetooth@vger.kernel.org,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Subject: [bluetooth-next:master 19/23] include/linux/fortify-string.h:63:33:
- warning: '__builtin_memcmp' specified bound 6 exceeds source size 0
-Message-ID: <202310050755.e0kabNON-lkp@intel.com>
+        Wed, 4 Oct 2023 20:21:36 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE8A5CE
+        for <linux-bluetooth@vger.kernel.org>; Wed,  4 Oct 2023 17:21:31 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4CDFEC433C9
+        for <linux-bluetooth@vger.kernel.org>; Thu,  5 Oct 2023 00:21:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1696465291;
+        bh=2ZW9m7b3m2xtkSipuUdrtxA1owVJZxWdNgcpr6uFM7c=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=W2ZgZ1a334blXKfdeFhZnrZFC5FLFas9Bm9P2p4ptlcJ3x8A+2Tda9zfVVq9wRDNn
+         b82L3F5NPn8vYDAvuPckH3XpzkY+xkDuKuhlcsGa+5UoRTNIfylnDUmnvt4CxmZxl4
+         PBbErfSAjtxBD2fg83QtRODtQMjQuH0O/RTW4It8uNS6YhZUobNTgzGHu3Zxpyli0N
+         L2Cti5EstzfLW4clY+utxgamLTYL8Oh+StsqwYVgg0q0wUJiLrjVSq6J1NK0JTRrCy
+         3NyC7tfvAJ2Lm1Y1wJ5BuZTuQrDOXdVUcHy+zl9NS/h1uhByTz1uzyjy0k8dIj7Jgy
+         wm20DgBHrsp7g==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 34234C53BC6; Thu,  5 Oct 2023 00:21:31 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 217023] [Intel AX200] hci0: Malformed MSFT vendor event: 0x02
+Date:   Thu, 05 Oct 2023 00:21:29 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: nelson@live.cl
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-217023-62941-E4gM9aizvx@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-217023-62941@https.bugzilla.kernel.org/>
+References: <bug-217023-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-head:   6be21d9878685e926d8e21fbfd8be7d0b6b105e4
-commit: d70e44fef8621aeae895e1cbc62059df9e31836b [19/23] Bluetooth: Reject connection with the device which has same BD_ADDR
-config: arm-randconfig-001-20231005 (https://download.01.org/0day-ci/archive/20231005/202310050755.e0kabNON-lkp@intel.com/config)
-compiler: arm-linux-gnueabi-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231005/202310050755.e0kabNON-lkp@intel.com/reproduce)
+https://bugzilla.kernel.org/show_bug.cgi?id=3D217023
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202310050755.e0kabNON-lkp@intel.com/
+Nelson (nelson@live.cl) changed:
 
-All warnings (new ones prefixed by >>):
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |nelson@live.cl
 
-   In file included from include/linux/string.h:254,
-                    from include/linux/bitmap.h:11,
-                    from include/linux/cpumask.h:12,
-                    from include/linux/smp.h:13,
-                    from include/linux/lockdep.h:14,
-                    from include/linux/spinlock.h:63,
-                    from include/linux/wait.h:9,
-                    from include/linux/poll.h:8,
-                    from include/net/bluetooth/bluetooth.h:29,
-                    from net/bluetooth/hci_event.c:30:
-   net/bluetooth/hci_event.c: In function 'hci_cc_read_class_of_dev':
-   include/linux/fortify-string.h:57:33: warning: '__builtin_memcpy' writing 3 bytes into a region of size 0 overflows the destination [-Wstringop-overflow=]
-      57 | #define __underlying_memcpy     __builtin_memcpy
-         |                                 ^
-   include/linux/fortify-string.h:648:9: note: in expansion of macro '__underlying_memcpy'
-     648 |         __underlying_##op(p, q, __fortify_size);                        \
-         |         ^~~~~~~~~~~~~
-   include/linux/fortify-string.h:693:26: note: in expansion of macro '__fortify_memcpy_chk'
-     693 | #define memcpy(p, q, s)  __fortify_memcpy_chk(p, q, s,                  \
-         |                          ^~~~~~~~~~~~~~~~~~~~
-   net/bluetooth/hci_event.c:522:9: note: in expansion of macro 'memcpy'
-     522 |         memcpy(hdev->dev_class, rp->dev_class, 3);
-         |         ^~~~~~
-   cc1: note: destination object is likely at address zero
-   In function 'memcmp',
-       inlined from 'bacmp' at include/net/bluetooth/bluetooth.h:364:9,
-       inlined from 'hci_conn_request_evt' at net/bluetooth/hci_event.c:3274:7:
->> include/linux/fortify-string.h:63:33: warning: '__builtin_memcmp' specified bound 6 exceeds source size 0 [-Wstringop-overread]
-      63 | #define __underlying_memcmp     __builtin_memcmp
-         |                                 ^
-   include/linux/fortify-string.h:728:16: note: in expansion of macro '__underlying_memcmp'
-     728 |         return __underlying_memcmp(p, q, size);
-         |                ^~~~~~~~~~~~~~~~~~~
+--- Comment #9 from Nelson (nelson@live.cl) ---
+- LT: HP ProBook 430 G8
+- Kernel Version: 6.4.12-zen1-1-zen
 
+lsusb | grep -i bluetooth
+Bus 003 Device 005: ID 8087:0026 Intel Corp. AX201 Bluetooth
 
-vim +/__builtin_memcmp +63 include/linux/fortify-string.h
+rfkill list
+0: hci0: Bluetooth
+    Soft blocked: no
+    Hard blocked: no
+1: phy0: Wireless LAN
+    Soft blocked: no
+    Hard blocked: no
 
-78a498c3a227f2 Alexander Potapenko 2022-10-24  61  
-78a498c3a227f2 Alexander Potapenko 2022-10-24  62  #define __underlying_memchr	__builtin_memchr
-78a498c3a227f2 Alexander Potapenko 2022-10-24 @63  #define __underlying_memcmp	__builtin_memcmp
-a28a6e860c6cf2 Francis Laniel      2021-02-25  64  #define __underlying_strcat	__builtin_strcat
-a28a6e860c6cf2 Francis Laniel      2021-02-25  65  #define __underlying_strcpy	__builtin_strcpy
-a28a6e860c6cf2 Francis Laniel      2021-02-25  66  #define __underlying_strlen	__builtin_strlen
-a28a6e860c6cf2 Francis Laniel      2021-02-25  67  #define __underlying_strncat	__builtin_strncat
-a28a6e860c6cf2 Francis Laniel      2021-02-25  68  #define __underlying_strncpy	__builtin_strncpy
-a28a6e860c6cf2 Francis Laniel      2021-02-25  69  #endif
-a28a6e860c6cf2 Francis Laniel      2021-02-25  70  
+journalctl -p err -b
+sep 01 22:07:54 amida kernel: Bluetooth: hci0: Malformed MSFT vendor event:
+0x02
 
-:::::: The code at line 63 was first introduced by commit
-:::::: 78a498c3a227f2ac773a8234b2ce092a4403f2c3 x86: fortify: kmsan: fix KMSAN fortify builds
+dmesg | grep Bluetooth
+[    2.135878] Bluetooth: Core ver 2.22
+[    2.135896] Bluetooth: HCI device and connection manager initialized
+[    2.135901] Bluetooth: HCI socket layer initialized
+[    2.135904] Bluetooth: L2CAP socket layer initialized
+[    2.135907] Bluetooth: SCO socket layer initialized
+[    2.215220] Bluetooth: hci0: Bootloader revision 0.4 build 0 week 30 2018
+[    2.216228] Bluetooth: hci0: Device revision is 2
+[    2.216231] Bluetooth: hci0: Secure boot is enabled
+[    2.216232] Bluetooth: hci0: OTP lock is enabled
+[    2.216233] Bluetooth: hci0: API lock is enabled
+[    2.216234] Bluetooth: hci0: Debug lock is disabled
+[    2.216235] Bluetooth: hci0: Minimum firmware build 1 week 10 2014
+[    2.224767] Bluetooth: hci0: Found device firmware: intel/ibt-19-0-4.sfi
+[    2.224796] Bluetooth: hci0: Boot Address: 0x24800
+[    2.224797] Bluetooth: hci0: Firmware Version: 206-22.23
+[    2.312520] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+[    2.312523] Bluetooth: BNEP filters: protocol multicast
+[    2.312527] Bluetooth: BNEP socket layer initialized
+[    3.954983] Bluetooth: hci0: Waiting for firmware download to complete
+[    3.955209] Bluetooth: hci0: Firmware loaded in 1689881 usecs
+[    3.955250] Bluetooth: hci0: Waiting for device to boot
+[    3.970455] Bluetooth: hci0: Device booted in 14875 usecs
+[    3.970474] Bluetooth: hci0: Malformed MSFT vendor event: 0x02
+[    3.980165] Bluetooth: hci0: Found Intel DDC parameters:
+intel/ibt-19-0-4.ddc
+[    3.982432] Bluetooth: hci0: Applying Intel DDC parameters completed
+[    3.983427] Bluetooth: hci0: Firmware revision 0.4 build 206 week 22 2023
+[    4.052609] Bluetooth: MGMT ver 1.22
+[   42.896475] Bluetooth: RFCOMM TTY layer initialized
+[   42.896481] Bluetooth: RFCOMM socket layer initialized
+[   42.896484] Bluetooth: RFCOMM ver 1.11
 
-:::::: TO: Alexander Potapenko <glider@google.com>
-:::::: CC: Andrew Morton <akpm@linux-foundation.org>
+Despite the error, my Bluetooth devices seem to be functioning correctly.
+However, I'd like to address this error if possible.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
