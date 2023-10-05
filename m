@@ -2,194 +2,146 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AE16E92716
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Oct 2023 15:59:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA34EE772B6
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Oct 2023 16:05:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232358AbjJEP7C (ORCPT
+        id S237638AbjJEQFa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 5 Oct 2023 11:59:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53376 "EHLO
+        Thu, 5 Oct 2023 12:05:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237455AbjJEP5k (ORCPT
+        with ESMTP id S237604AbjJEQEI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 5 Oct 2023 11:57:40 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3232935A0
-        for <linux-bluetooth@vger.kernel.org>; Thu,  5 Oct 2023 08:17:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696519060; x=1728055060;
-  h=date:from:to:cc:subject:message-id;
-  bh=kdmOJ8ldvZK372GhnyNMSXe5Paum63UhDFTT6mlk+3I=;
-  b=ZuJpql+5EzZj1EkZJaE9nW1qqSWuaOPwZbB1RWJggt84fnsJ0uIdGOQH
-   vxID93pbHfH23rlaIeORqhQSdpAfhgfBsu+FkuC4uJ5bXJ19V4zc+yy4j
-   ZK4DFF3U2yryv9RGh3oAIKi+jt247/fRO/UWgg5TwPc2e0s5pAz7Qpztm
-   CdTZtPQbjsturc8cGkuSgfFHyxUqTjfOfBP0xUQ6Cl8iT4T70yecjiawX
-   52ANtaBaj4qDqPwKoyEQ0gf+ZRdjNCnS9s22cho14XFFIJKMqLru/Q4c1
-   PvEjdqg1kZNSbzZ1YJI7j/qpBnEtbwOjszKADEIolpTXJwwDvpAJ2XUNE
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10854"; a="368602557"
-X-IronPort-AV: E=Sophos;i="6.03,203,1694761200"; 
-   d="scan'208";a="368602557"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Oct 2023 08:17:39 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10854"; a="998996831"
-X-IronPort-AV: E=Sophos;i="6.03,203,1694761200"; 
-   d="scan'208";a="998996831"
-Received: from lkp-server02.sh.intel.com (HELO c3b01524d57c) ([10.239.97.151])
-  by fmsmga006.fm.intel.com with ESMTP; 05 Oct 2023 08:17:38 -0700
-Received: from kbuild by c3b01524d57c with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qoQ5S-000LXu-1Q;
-        Thu, 05 Oct 2023 15:16:39 +0000
-Date:   Thu, 05 Oct 2023 23:13:51 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS WITH WARNING
- 6be21d9878685e926d8e21fbfd8be7d0b6b105e4
-Message-ID: <202310052348.wKTxQIAT-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+        Thu, 5 Oct 2023 12:04:08 -0400
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on20630.outbound.protection.outlook.com [IPv6:2a01:111:f400:7d00::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BBDD261A7
+        for <linux-bluetooth@vger.kernel.org>; Thu,  5 Oct 2023 05:16:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mwN0vlX9SEsgl/cWZ8vzK+lzypFDH+z1EzlzlN1Ml5ovbDNh99dJtjkgUWsT4hdrPR2nyl2th967nvaNcuxpSqGPjZxYUjnvgi/dO5k/6bRnvmqTX0xMNbOc+qxU5Ec37jN8CsbKms+l5wwqNVVuqfMLfxwu1r7uKBB3CrDpd+jft+6/1D8qUJRWmoobQIRNJx2meRcUm5itfElXqYHX+2XqF6pISQxXME9+QEajfcl6OhsmESmuNAU/ED51r21rfv0iZKuuqWFxKZJE2ve4SG6NRiN/ZNgVAeDW/CDE/XX1ER8NJEKu3ktO8xhvBG7OR76oaAsZlX8tieo8pzBFSw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hcoQ1J1Pf1OQUAK5JjmSR5ysmhT0O/avzIfiDMMI/5s=;
+ b=UaxypCSYeWkctcEP28Xm1U9KYRamNZ6ncmNWlRT/XxfiqrOLJBYTPBel3NTU9j712KoaeBIinit+82sLDhZoCxcG8VkiTLOgeyW7U+fmiFERbMT2I9PL0dyEeCdTvgOFWuVsDCX44p8yexiP9LaGbOBtdjNsryGashphXVpyIS6CzSauz0Fj9cqAsTgLj9VYalWSSnR8UHNKebCG1tSJ0AhhP7w849C02ULC9g/BBWkE8Ic8jI0n3UDywE/ia4e+pFEK1FhnLO3o12Zp0tt1E7/Zj1uScAItTzNRcMulFJndoyWeakWaDhKPPtYuHUJ3Q9sD8XPSnEEPHBIMNaNPSQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hcoQ1J1Pf1OQUAK5JjmSR5ysmhT0O/avzIfiDMMI/5s=;
+ b=TyqEgWKdUBkpU+SWvrW7xI0zO5lFjs3JjhNbPrQiBzkOPvwhEesE3tMAa/IumRbLOEiqe2WwesUoTRUz/NHgd4RcVJdPQKnxWsJsPnfi6wA/Q5nrhJTM3Kf1SwVuVjwl0sUhxIVJ70BhqMlTxokRdNuiRpsAjnhE0OWhh1PO7xw=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AS1PR04MB9654.eurprd04.prod.outlook.com (2603:10a6:20b:476::22)
+ by PAXPR04MB8928.eurprd04.prod.outlook.com (2603:10a6:102:20f::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.35; Thu, 5 Oct
+ 2023 12:16:19 +0000
+Received: from AS1PR04MB9654.eurprd04.prod.outlook.com
+ ([fe80::74d9:fef3:348a:ef3b]) by AS1PR04MB9654.eurprd04.prod.outlook.com
+ ([fe80::74d9:fef3:348a:ef3b%7]) with mapi id 15.20.6838.033; Thu, 5 Oct 2023
+ 12:16:19 +0000
+From:   Mahesh Talewad <mahesh.talewad@nxp.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     luiz.dentz@gmail.com, devyani.godbole@nxp.com,
+        nitin.jadhav@nxp.com, mahesh.talewad@nxp.com
+Subject: [PATCH BlueZ v4 2/2] src/shared/micp.c :MICP-MICS implementation memory leak fix
+Date:   Thu,  5 Oct 2023 15:15:44 +0300
+Message-Id: <20231005121544.306495-3-mahesh.talewad@nxp.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20231005121544.306495-1-mahesh.talewad@nxp.com>
+References: <20231005121544.306495-1-mahesh.talewad@nxp.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AS4PR09CA0017.eurprd09.prod.outlook.com
+ (2603:10a6:20b:5d4::11) To AS1PR04MB9654.eurprd04.prod.outlook.com
+ (2603:10a6:20b:476::22)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS1PR04MB9654:EE_|PAXPR04MB8928:EE_
+X-MS-Office365-Filtering-Correlation-Id: a56c47dc-37d8-4936-7adf-08dbc59ce1ad
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: AhougToV04BhcSjfllrKyJuCzYlUaJuvx3BGUoKuCWlgBUnXk7lwPwmCrkLw1gFw8iJOxi5aT2J42TVYcBLt5gnM6WJANdS0z8wbuWNXoMSFLo2nDn4PCmC6efn+ak9Eu/Dmw4u4ILm7guLNaNFGMlrR7nPtgg6wwwdxU2y+fsXF2/MSiem+F97BUU5+iRsVzs3RChJxol8ZEoWrL/UzEPztEYo1Spi0/Godmb768WMzNLE/erlduJXgHSskCOE0Xvnh5SBJtF/WeDvXyYgdl0XRSv8hOkRN9fErbCVJqzCa9URk+Hwe31HjER5sHWh7Zbp50z94xCBw3c69rvJa/InmXZA6qrbvyO86ojscS63q6XBb886UZ0rQ7w9rBACSgwpNbrpOhZpi8Y9TYHW+lqdnmrItM76lqZJ8k5QDA7/5RPNIu3HaysX8tW9wIOj0i3wpz6zhumEvkNaWO8yxrjBWEas7yPgCHL0LdbhYbOVAdPdA7Y2OhJLOCV7EULrFRIAB4qaRXNy1vp7M4mtpQrVpgPJKjP0OwmJ7VCZgPkVhsbLmW7N6t4beRTA9injGjEAClyGzbgqixU0os63/s1R0qABqkxPBK7Cx7sGSb/+Ux0MSbAyKCq7O1ClrOkeo
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS1PR04MB9654.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(376002)(136003)(39860400002)(366004)(396003)(230922051799003)(186009)(1800799009)(451199024)(64100799003)(6666004)(6506007)(52116002)(55236004)(2616005)(478600001)(6486002)(26005)(1076003)(6512007)(2906002)(4744005)(41300700001)(66946007)(6916009)(44832011)(5660300002)(66556008)(8676002)(316002)(8936002)(4326008)(36756003)(86362001)(38100700002)(38350700002)(66476007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?bHs/uIgcJjzDBRHbJN2Zpdr/qBUAsbEU/Kh4qDaSNO1gT6/QR988J14B/mkt?=
+ =?us-ascii?Q?WaZCexo42i8BwitPfYi5mHpcjA9HuxPVB3b8DHYpCHIwbWq8eVidfvffwTs9?=
+ =?us-ascii?Q?hY159v8fLLjkveJdIScG0WE+ZgTuop7JPY39474JmzpQD8yhd9OciTGMNQuv?=
+ =?us-ascii?Q?uNsAHQSKelthKLFwVeJ2bwGnh0JU+GHk5cVvHbYCjELMnBN8hHylg1m8Xx2W?=
+ =?us-ascii?Q?zBKnb88nh99UzQIpordCpJnXuz/8jSm85JSNqtImz1EjQXnidMTSLUOas4Ab?=
+ =?us-ascii?Q?dNIt1r2K/Yt+sSQh6pfMaLXftfeFRuOlXEGYbOVDVtE3iT4B/0DENTz68j2z?=
+ =?us-ascii?Q?iJ5p+x0WwSKmuesHq1Q48RXB/ehuAoMUcXjZwyxBSC8ze2LRoEHu/Y6RpaYg?=
+ =?us-ascii?Q?gem8XVwo8o216quup/bvRGZNrc2Z2vbgJ9LK4FIcPQ0yjuLLL0HGIjFPuT35?=
+ =?us-ascii?Q?OeFj+cTiKXDPu8e576swxolOekWGroAmk3Pukja/aLm84cLfkh9uefF/Zkh4?=
+ =?us-ascii?Q?i4qG/lJygrgGZmeaRUPDeuash0QRwQH4j2kPn/sFY24LIYj1JBN5pyh2FBHS?=
+ =?us-ascii?Q?S4V2Wd9txzLYU8lixVwBKJDqF9OhmuskmVosr80R5aDA0Ab5fxfkNsE0IEai?=
+ =?us-ascii?Q?RH65xfF85nhzAkwVGLB8AMDugXaT5PMOqZmdZ1K3ECZfv+gDzrCNC47uFmN9?=
+ =?us-ascii?Q?Mt7bARAUBCD8PG0Su6/oAE3HXdtBtgrJGof8c3EgsSZJ4KItqimD7bTcOYr7?=
+ =?us-ascii?Q?1R5QuWF5Rr+kMtP3zEEzkNWVCizNAYK5/Kp1kx5V3nPAxFqPdGCYpG16eUkG?=
+ =?us-ascii?Q?aYKWb5nOUd3cFmIXkYSklOEZXuW/p8ro/7BhqAAedUjLNEbGxQ+8aDaNLPhq?=
+ =?us-ascii?Q?jdq/cgWo2F3KPhJeFYu/sO2+favqKUQ+2ASHHogMkUlgeCmj6UjCrp34QUpi?=
+ =?us-ascii?Q?HScG1pSg3OcQ9+eX7nMenog4t3rtFfgBqNyUPXdn+C8Uex92Pd22FUIgh8ON?=
+ =?us-ascii?Q?NnjKNUuZMgeYsGPhVLoo4sHdpztii/lvLVfUnevxUwfWbkcVGxUiKzHI7+Wn?=
+ =?us-ascii?Q?Avafo1RiCklZuxp6hO/pAqQebSmPV2h5goI9v7UriV09mY6EFdR0E+TElngW?=
+ =?us-ascii?Q?dGpVTZPiPYqLnqqJgoMcr377Vr1NHNYSDCc9MX74MBHmrZkBQ4yzgJKTpXyy?=
+ =?us-ascii?Q?sWzuXqvVbSQfwtq6R4hsaO8X5oC47+fMnnXdDopZvIBbVaLfEf6+Mu8OalVR?=
+ =?us-ascii?Q?v6D6bDpyVAiENzG5oWjr6Sg+rEXahm3p0f4LFOONhDOiHuIOHnAR2jdjT4sH?=
+ =?us-ascii?Q?J+dLHvHRyZURfH/0iEtwSL+jlXhRpDSWrhaWEMksI+b1vL9QDqyYZbH2bpqV?=
+ =?us-ascii?Q?i4z3JSty5/B+HSS5EimWq1o+IalrGGjZkpx00qhH2I5HiBqTBpXLwpBA9H+W?=
+ =?us-ascii?Q?fUyuy6r3mAc1Zs2YrZlvhqiVH6hti8grmTarwz/gCwJGrEce500s5hAxTDaS?=
+ =?us-ascii?Q?qBAAltq/DI8G8aLjVCTavoErUO1BPzaXtUvoMUAGuc4vQa9Xtg0u80T4CFzJ?=
+ =?us-ascii?Q?O/lgV3q9CsNez67WG6fnBtID1aAeUGFIv2gVIwfm/jZCqbWKul0NPaA7Qfi/?=
+ =?us-ascii?Q?FQ=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a56c47dc-37d8-4936-7adf-08dbc59ce1ad
+X-MS-Exchange-CrossTenant-AuthSource: AS1PR04MB9654.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Oct 2023 12:16:19.6258
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BZ0oBP1D5aP/1lb/lBKZTsFzQUT0ab/9o6QNyi/JocUcxwUec3KWlRRLmCKAXFtPziJQ4YmSV2QoKPvYrU6MNg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8928
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 6be21d9878685e926d8e21fbfd8be7d0b6b105e4  Bluetooth: Fix a refcnt underflow problem for hci_conn
+- Fixed memory leak issue
+---
+ src/shared/micp.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Warning reports:
-
-https://lore.kernel.org/oe-kbuild-all/202310050755.e0kabNON-lkp@intel.com
-
-Warning: (recently discovered and may have been fixed)
-
-include/linux/fortify-string.h:63:33: warning: '__builtin_memcmp' specified bound 6 exceeds source size 0 [-Wstringop-overread]
-
-Warning ids grouped by kconfigs:
-
-gcc_recent_errors
-`-- arm-randconfig-001-20231005
-    `-- include-linux-fortify-string.h:warning:__builtin_memcmp-specified-bound-exceeds-source-size
-
-elapsed time: 1038m
-
-configs tested: 111
-configs skipped: 2
-
-tested configs:
-alpha                             allnoconfig   gcc  
-alpha                            allyesconfig   gcc  
-alpha                               defconfig   gcc  
-arc                              allmodconfig   gcc  
-arc                               allnoconfig   gcc  
-arc                              allyesconfig   gcc  
-arc                                 defconfig   gcc  
-arc                   randconfig-001-20231005   gcc  
-arm                              allmodconfig   gcc  
-arm                               allnoconfig   gcc  
-arm                              allyesconfig   gcc  
-arm                                 defconfig   gcc  
-arm                         orion5x_defconfig   clang
-arm                          pxa168_defconfig   clang
-arm                   randconfig-001-20231005   gcc  
-arm64                            allmodconfig   gcc  
-arm64                             allnoconfig   gcc  
-arm64                            allyesconfig   gcc  
-arm64                               defconfig   gcc  
-csky                             allmodconfig   gcc  
-csky                              allnoconfig   gcc  
-csky                             allyesconfig   gcc  
-csky                                defconfig   gcc  
-i386                             allmodconfig   gcc  
-i386                              allnoconfig   gcc  
-i386                             allyesconfig   gcc  
-i386         buildonly-randconfig-001-20231005   gcc  
-i386         buildonly-randconfig-002-20231005   gcc  
-i386         buildonly-randconfig-003-20231005   gcc  
-i386         buildonly-randconfig-004-20231005   gcc  
-i386         buildonly-randconfig-005-20231005   gcc  
-i386         buildonly-randconfig-006-20231005   gcc  
-i386                              debian-10.3   gcc  
-i386                                defconfig   gcc  
-i386                  randconfig-001-20231005   gcc  
-i386                  randconfig-002-20231005   gcc  
-i386                  randconfig-003-20231005   gcc  
-i386                  randconfig-004-20231005   gcc  
-i386                  randconfig-005-20231005   gcc  
-i386                  randconfig-006-20231005   gcc  
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch                        allyesconfig   gcc  
-loongarch                           defconfig   gcc  
-loongarch             randconfig-001-20231005   gcc  
-m68k                             allmodconfig   gcc  
-m68k                              allnoconfig   gcc  
-m68k                             allyesconfig   gcc  
-m68k                                defconfig   gcc  
-microblaze                       allmodconfig   gcc  
-microblaze                        allnoconfig   gcc  
-microblaze                       allyesconfig   gcc  
-microblaze                          defconfig   gcc  
-mips                             allmodconfig   gcc  
-mips                              allnoconfig   gcc  
-mips                             allyesconfig   gcc  
-nios2                            allmodconfig   gcc  
-nios2                             allnoconfig   gcc  
-nios2                            allyesconfig   gcc  
-nios2                               defconfig   gcc  
-openrisc                         allmodconfig   gcc  
-openrisc                          allnoconfig   gcc  
-openrisc                         allyesconfig   gcc  
-openrisc                            defconfig   gcc  
-parisc                           allmodconfig   gcc  
-parisc                            allnoconfig   gcc  
-parisc                           allyesconfig   gcc  
-parisc                              defconfig   gcc  
-parisc64                            defconfig   gcc  
-powerpc                          allmodconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc                          allyesconfig   gcc  
-powerpc                  storcenter_defconfig   gcc  
-riscv                            allmodconfig   gcc  
-riscv                             allnoconfig   gcc  
-riscv                            allyesconfig   gcc  
-riscv                               defconfig   gcc  
-riscv                          rv32_defconfig   gcc  
-s390                             alldefconfig   clang
-s390                             allmodconfig   gcc  
-s390                              allnoconfig   gcc  
-s390                             allyesconfig   gcc  
-s390                                defconfig   gcc  
-sh                               allmodconfig   gcc  
-sh                                allnoconfig   gcc  
-sh                               allyesconfig   gcc  
-sh                                  defconfig   gcc  
-sparc                            allmodconfig   gcc  
-sparc                             allnoconfig   gcc  
-sparc                            allyesconfig   gcc  
-sparc                               defconfig   gcc  
-sparc64                          allmodconfig   gcc  
-sparc64                          allyesconfig   gcc  
-sparc64                             defconfig   gcc  
-um                               allmodconfig   clang
-um                                allnoconfig   clang
-um                               allyesconfig   clang
-um                                  defconfig   gcc  
-um                             i386_defconfig   gcc  
-um                           x86_64_defconfig   gcc  
-x86_64                            allnoconfig   gcc  
-x86_64                           allyesconfig   gcc  
-x86_64                              defconfig   gcc  
-x86_64                randconfig-001-20231005   gcc  
-x86_64                randconfig-002-20231005   gcc  
-x86_64                randconfig-003-20231005   gcc  
-x86_64                randconfig-004-20231005   gcc  
-x86_64                randconfig-005-20231005   gcc  
-x86_64                randconfig-006-20231005   gcc  
-x86_64                          rhel-8.3-rust   clang
-x86_64                               rhel-8.3   gcc  
-
+diff --git a/src/shared/micp.c b/src/shared/micp.c
+index 90d05b301..b82bd92de 100644
+--- a/src/shared/micp.c
++++ b/src/shared/micp.c
+@@ -138,6 +138,7 @@ void bt_micp_detach(struct bt_micp *micp)
+ 	if (!queue_remove(sessions, micp))
+ 		return;
+ 
++	bt_gatt_client_idle_unregister(micp->client, micp->idle_id);
+ 	bt_gatt_client_unref(micp->client);
+ 	micp->client = NULL;
+ 
+@@ -175,6 +176,7 @@ static void micp_free(void *data)
+ 
+ 	micp_db_free(micp->rdb);
+ 
++	queue_destroy(micp->notify, free);
+ 	queue_destroy(micp->pending, NULL);
+ 	queue_destroy(micp->ready_cbs, micp_ready_free);
+ 
+@@ -594,6 +596,7 @@ struct bt_micp *bt_micp_new(struct gatt_db *ldb, struct gatt_db *rdb)
+ 	micp->ldb = mdb;
+ 	micp->pending = queue_new();
+ 	micp->ready_cbs = queue_new();
++	micp->notify = queue_new();
+ 
+ 	if (!rdb)
+ 		goto done;
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.34.1
+
