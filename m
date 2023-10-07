@@ -2,295 +2,94 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08DA0E95A61
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  7 Oct 2023 09:35:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6313E95A61
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  7 Oct 2023 10:12:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234171AbjJGJfe (ORCPT
+        id S1343733AbjJGKM2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 7 Oct 2023 05:35:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45568 "EHLO
+        Sat, 7 Oct 2023 06:12:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233085AbjJGJfd (ORCPT
+        with ESMTP id S234148AbjJGKM1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 7 Oct 2023 05:35:33 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4097FB9;
-        Sat,  7 Oct 2023 02:35:30 -0700 (PDT)
-Received: from canpemm500006.china.huawei.com (unknown [172.30.72.56])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4S2g6G0vgMzRhlv;
-        Sat,  7 Oct 2023 17:31:34 +0800 (CST)
-Received: from localhost.localdomain (10.175.104.82) by
- canpemm500006.china.huawei.com (7.192.105.130) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Sat, 7 Oct 2023 17:35:27 +0800
-From:   Ziyang Xuan <william.xuanziyang@huawei.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-        <luiz.dentz@gmail.com>, <linux-bluetooth@vger.kernel.org>
-CC:     <linux-kernel@vger.kernel.org>
-Subject: [PATCH] Bluetooth: Fix UAF for hci_chan
-Date:   Sat, 7 Oct 2023 17:35:21 +0800
-Message-ID: <20231007093521.2404844-1-william.xuanziyang@huawei.com>
-X-Mailer: git-send-email 2.25.1
+        Sat, 7 Oct 2023 06:12:27 -0400
+Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92E9692
+        for <linux-bluetooth@vger.kernel.org>; Sat,  7 Oct 2023 03:12:26 -0700 (PDT)
+Received: by mail-ot1-x329.google.com with SMTP id 46e09a7af769-6c7bbfb7a73so1972354a34.3
+        for <linux-bluetooth@vger.kernel.org>; Sat, 07 Oct 2023 03:12:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696673546; x=1697278346; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=K5iM9N2DAv9GqnRngNRoNpQ/h3/1GnSmZJ17Mp+sf2w=;
+        b=mHK8AFguIkz+p/QOZd0CydnaBqBUoKFJI7nZqVnVjIbfLxaB5bNenGT86tyMliAC/n
+         xuzv3pPHSsdYuB0oGKH7zJMM1o6Ms7w4GRNx7TzW0t6RuhASEH+hCQhI+hqmD8KiD0sj
+         4sIVtBAikrsle4yez9CPruHmlyEs/6OmikfX3iWuXCL47nPQMxTeknULZeSum/uy3wLm
+         1sq20BR0rkkk83ZJRiacRyfOX8ZM2lKx/iD80FMtkQcTO7xt3i2fluYniQQdych5X+qj
+         A9At/wUfmE99+jnfCnQkRCDl5/m/xyvQ6iRTB3EEUHlbLRIcxHNbUjVijswfZLU+pUbg
+         YepA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696673546; x=1697278346;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=K5iM9N2DAv9GqnRngNRoNpQ/h3/1GnSmZJ17Mp+sf2w=;
+        b=lL9zBD6wSrH5Et62O4O9Ruqpfkss47f3kAchP54DJ3WWY67eJlg4/vZ/70sj6GCLFz
+         u6qYjBZz5cMi7HdJxxISKTTBphQ23MXLdgR+RFU9u414oihe0Mb0/jRRG8vByE358zEq
+         EJPXsn0CT6y5Z7L1uWgNNKf0xwGaZ8W7zEVIg8Y68KA0/g1OOxnuwtiDOrornDMxBd0o
+         vaKl+BLZRboIxl6gw+jOymzqaDBTjX8NbSwWqHchiz0bzdNinw4FQliveCCMkscRU6t0
+         kAnsO5C8a40sjnoFmBbGryA40SPKlLPNF3zDpkzrZq4XESbLqp50uNsY49lgpjccgVW4
+         pM9g==
+X-Gm-Message-State: AOJu0YxitYlInf9VSDkViGTr3Aq4czN3s1UZqiUbQppR1u8zVLa/f7qL
+        JnLfxs3klBcSG2pYBLLYpVXiGvVeRLs=
+X-Google-Smtp-Source: AGHT+IF7LducNA8yudGCO80wLGqeEa6wbRSnkOgAlIqg/ir7EWe8tOO7Hx3diWEWSFWFAFDGZ78bag==
+X-Received: by 2002:a05:6830:1d6c:b0:6b9:9f84:dc8b with SMTP id l12-20020a0568301d6c00b006b99f84dc8bmr10300941oti.19.1696673545644;
+        Sat, 07 Oct 2023 03:12:25 -0700 (PDT)
+Received: from [172.17.0.2] ([40.84.173.123])
+        by smtp.gmail.com with ESMTPSA id w19-20020a9d6753000000b006c480563197sm868626otm.26.2023.10.07.03.12.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 07 Oct 2023 03:12:25 -0700 (PDT)
+Message-ID: <65212f09.9d0a0220.33713.590c@mx.google.com>
+Date:   Sat, 07 Oct 2023 03:12:25 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8294532496178716783=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.104.82]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- canpemm500006.china.huawei.com (7.192.105.130)
-X-CFilter-Loop: Reflected
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, william.xuanziyang@huawei.com
+Subject: RE: Bluetooth: Fix UAF for hci_chan
+In-Reply-To: <20231007093521.2404844-1-william.xuanziyang@huawei.com>
+References: <20231007093521.2404844-1-william.xuanziyang@huawei.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Syzbot reports a UAF problem as follows:
+--===============8294532496178716783==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-BUG: KASAN: slab-use-after-free in hci_send_acl+0x48/0xe70 net/bluetooth/hci_core.c:3231
-...
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x1e7/0x2d0 lib/dump_stack.c:106
- print_address_description mm/kasan/report.c:364 [inline]
- print_report+0x163/0x540 mm/kasan/report.c:475
- kasan_report+0x175/0x1b0 mm/kasan/report.c:588
- hci_send_acl+0x48/0xe70 net/bluetooth/hci_core.c:3231
- l2cap_send_conn_req net/bluetooth/l2cap_core.c:1286 [inline]
- l2cap_start_connection+0x465/0x620 net/bluetooth/l2cap_core.c:1514
- l2cap_conn_start+0xbf3/0x1130 net/bluetooth/l2cap_core.c:1661
- process_one_work kernel/workqueue.c:2630 [inline]
- process_scheduled_works+0x90f/0x1400 kernel/workqueue.c:2703
- worker_thread+0xa5f/0xff0 kernel/workqueue.c:2784
- kthread+0x2d3/0x370 kernel/kthread.c:388
- ret_from_fork+0x48/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
- </TASK>
+This is an automated email and please do not reply to this email.
 
-Allocated by task 27110:
- kasan_save_stack mm/kasan/common.c:45 [inline]
- kasan_set_track+0x4f/0x70 mm/kasan/common.c:52
- ____kasan_kmalloc mm/kasan/common.c:374 [inline]
- __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:383
- kmalloc include/linux/slab.h:599 [inline]
- kzalloc include/linux/slab.h:720 [inline]
- hci_chan_create+0xc8/0x300 net/bluetooth/hci_conn.c:2714
- l2cap_conn_add+0x69/0xc10 net/bluetooth/l2cap_core.c:7841
- l2cap_chan_connect+0x61f/0xeb0 net/bluetooth/l2cap_core.c:8053
- bt_6lowpan_connect net/bluetooth/6lowpan.c:894 [inline]
- lowpan_control_write+0x55e/0x850 net/bluetooth/6lowpan.c:1129
- full_proxy_write+0x113/0x1c0 fs/debugfs/file.c:236
- vfs_write+0x286/0xaf0 fs/read_write.c:582
- ksys_write+0x1a0/0x2c0 fs/read_write.c:637
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
+Dear Submitter,
 
-Freed by task 5067:
- kasan_save_stack mm/kasan/common.c:45 [inline]
- kasan_set_track+0x4f/0x70 mm/kasan/common.c:52
- kasan_save_free_info+0x28/0x40 mm/kasan/generic.c:522
- ____kasan_slab_free+0xd6/0x120 mm/kasan/common.c:236
- kasan_slab_free include/linux/kasan.h:164 [inline]
- slab_free_hook mm/slub.c:1800 [inline]
- slab_free_freelist_hook mm/slub.c:1826 [inline]
- slab_free mm/slub.c:3809 [inline]
- __kmem_cache_free+0x25f/0x3b0 mm/slub.c:3822
- hci_chan_list_flush net/bluetooth/hci_conn.c:2754 [inline]
- hci_conn_cleanup net/bluetooth/hci_conn.c:152 [inline]
- hci_conn_del+0x4f8/0xc40 net/bluetooth/hci_conn.c:1156
- hci_abort_conn_sync+0xa45/0xfe0
- hci_cmd_sync_work+0x228/0x400 net/bluetooth/hci_sync.c:306
- process_one_work kernel/workqueue.c:2630 [inline]
- process_scheduled_works+0x90f/0x1400 kernel/workqueue.c:2703
- worker_thread+0xa5f/0xff0 kernel/workqueue.c:2784
- kthread+0x2d3/0x370 kernel/kthread.c:388
- ret_from_fork+0x48/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-There are two main reasons for this:
-1. In the case of hci_conn_add() concurrency, the handle of
-hci_conn allocated through hci_conn_hash_alloc_unset() is not unique.
-2. The processes related to hci_abort_conn() and hci_connect_xxx()
-can be concurrent, but the two processes lack synchronization.
+----- Output -----
 
-To fix this, use ida to manage the allocation of conn->handle, and
-add the HCI_CONN_DISC flag to achieve synchronization between
-hci_abort_conn() and hci_connect_xxx() related processes.
+error: patch failed: include/net/bluetooth/hci_core.h:350
+error: include/net/bluetooth/hci_core.h: patch does not apply
+error: patch failed: net/bluetooth/hci_core.c:2786
+error: net/bluetooth/hci_core.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
+Please resolve the issue and submit the patches again.
+
+
 ---
- include/net/bluetooth/hci_core.h | 17 ++++++++++----
- net/bluetooth/hci_conn.c         | 39 ++++++++++++++++----------------
- net/bluetooth/hci_core.c         |  3 +++
- 3 files changed, 35 insertions(+), 24 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index e6359f7346f1..72818fc49ccd 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -350,6 +350,8 @@ struct hci_dev {
- 	struct list_head list;
- 	struct mutex	lock;
- 
-+	struct ida	unset_handle_ida;
-+
- 	char		name[8];
- 	unsigned long	flags;
- 	__u16		id;
-@@ -969,6 +971,7 @@ enum {
- 	HCI_CONN_AUTH_INITIATOR,
- 	HCI_CONN_DROP,
- 	HCI_CONN_CANCEL,
-+	HCI_CONN_DISC,
- 	HCI_CONN_PARAM_REMOVAL_PEND,
- 	HCI_CONN_NEW_LINK_KEY,
- 	HCI_CONN_SCANNING,
-@@ -1174,7 +1177,8 @@ static inline struct hci_conn *hci_conn_hash_lookup_ba(struct hci_dev *hdev,
- 	rcu_read_lock();
- 
- 	list_for_each_entry_rcu(c, &h->list, list) {
--		if (c->type == type && !bacmp(&c->dst, ba)) {
-+		if (c->type == type && !bacmp(&c->dst, ba) &&
-+		    !test_bit(HCI_CONN_DISC, &c->flags)) {
- 			rcu_read_unlock();
- 			return c;
- 		}
-@@ -1195,8 +1199,9 @@ static inline struct hci_conn *hci_conn_hash_lookup_le(struct hci_dev *hdev,
- 	rcu_read_lock();
- 
- 	list_for_each_entry_rcu(c, &h->list, list) {
--		if (c->type != LE_LINK)
--		       continue;
-+		if (c->type != LE_LINK ||
-+		    test_bit(HCI_CONN_DISC, &c->flags))
-+			continue;
- 
- 		if (ba_type == c->dst_type && !bacmp(&c->dst, ba)) {
- 			rcu_read_unlock();
-@@ -1386,7 +1391,8 @@ static inline struct hci_conn *hci_lookup_le_connect(struct hci_dev *hdev)
- 
- 	list_for_each_entry_rcu(c, &h->list, list) {
- 		if (c->type == LE_LINK && c->state == BT_CONNECT &&
--		    !test_bit(HCI_CONN_SCANNING, &c->flags)) {
-+		    !test_bit(HCI_CONN_SCANNING, &c->flags) &&
-+		    !test_bit(HCI_CONN_DISC, &c->flags)) {
- 			rcu_read_unlock();
- 			return c;
- 		}
-@@ -1520,7 +1526,8 @@ static inline void hci_conn_drop(struct hci_conn *conn)
- {
- 	BT_DBG("hcon %p orig refcnt %d", conn, atomic_read(&conn->refcnt));
- 
--	if (atomic_dec_and_test(&conn->refcnt)) {
-+	if (atomic_dec_and_test(&conn->refcnt) &&
-+	    !test_bit(HCI_CONN_DISC, &conn->flags)) {
- 		unsigned long timeo;
- 
- 		switch (conn->type) {
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 9d5057cef30a..6045d32e28d3 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -153,6 +153,9 @@ static void hci_conn_cleanup(struct hci_conn *conn)
- 
- 	hci_conn_hash_del(hdev, conn);
- 
-+	if (HCI_CONN_HANDLE_UNSET(conn->handle))
-+		ida_free(&hdev->unset_handle_ida, conn->handle);
-+
- 	if (conn->cleanup)
- 		conn->cleanup(conn);
- 
-@@ -928,29 +931,17 @@ static void cis_cleanup(struct hci_conn *conn)
- 	hci_le_remove_cig(hdev, conn->iso_qos.ucast.cig);
- }
- 
--static u16 hci_conn_hash_alloc_unset(struct hci_dev *hdev)
-+static int hci_conn_hash_alloc_unset(struct hci_dev *hdev)
- {
--	struct hci_conn_hash *h = &hdev->conn_hash;
--	struct hci_conn  *c;
--	u16 handle = HCI_CONN_HANDLE_MAX + 1;
--
--	rcu_read_lock();
--
--	list_for_each_entry_rcu(c, &h->list, list) {
--		/* Find the first unused handle */
--		if (handle == 0xffff || c->handle != handle)
--			break;
--		handle++;
--	}
--	rcu_read_unlock();
--
--	return handle;
-+	return ida_alloc_range(&hdev->unset_handle_ida, HCI_CONN_HANDLE_MAX + 1,
-+			       U16_MAX, GFP_ATOMIC);
- }
- 
- struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 			      u8 role)
- {
- 	struct hci_conn *conn;
-+	int handle;
- 
- 	BT_DBG("%s dst %pMR", hdev->name, dst);
- 
-@@ -960,7 +951,12 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 
- 	bacpy(&conn->dst, dst);
- 	bacpy(&conn->src, &hdev->bdaddr);
--	conn->handle = hci_conn_hash_alloc_unset(hdev);
-+	handle = hci_conn_hash_alloc_unset(hdev);
-+	if (unlikely(handle < 0)) {
-+		kfree(conn);
-+		return NULL;
-+	}
-+	conn->handle = handle;
- 	conn->hdev  = hdev;
- 	conn->type  = type;
- 	conn->role  = role;
-@@ -2897,6 +2893,7 @@ static int abort_conn_sync(struct hci_dev *hdev, void *data)
- int hci_abort_conn(struct hci_conn *conn, u8 reason)
- {
- 	struct hci_dev *hdev = conn->hdev;
-+	int ret;
- 
- 	/* If abort_reason has already been set it means the connection is
- 	 * already being aborted so don't attempt to overwrite it.
-@@ -2925,6 +2922,10 @@ int hci_abort_conn(struct hci_conn *conn, u8 reason)
- 		}
- 	}
- 
--	return hci_cmd_sync_queue(hdev, abort_conn_sync, UINT_PTR(conn->handle),
--				  NULL);
-+	ret = hci_cmd_sync_queue(hdev, abort_conn_sync,
-+				 UINT_PTR(conn->handle), NULL);
-+	if (!ret)
-+		set_bit(HCI_CONN_DISC, &conn->flags);
-+
-+	return ret;
- }
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index a5992f1b3c9b..67b652c18a44 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2535,6 +2535,8 @@ struct hci_dev *hci_alloc_dev_priv(int sizeof_priv)
- 	mutex_init(&hdev->lock);
- 	mutex_init(&hdev->req_lock);
- 
-+	ida_init(&hdev->unset_handle_ida);
-+
- 	INIT_LIST_HEAD(&hdev->mesh_pending);
- 	INIT_LIST_HEAD(&hdev->mgmt_pending);
- 	INIT_LIST_HEAD(&hdev->reject_list);
-@@ -2786,6 +2788,7 @@ void hci_release_dev(struct hci_dev *hdev)
- 	hci_blocked_keys_clear(hdev);
- 	hci_dev_unlock(hdev);
- 
-+	ida_destroy(&hdev->unset_handle_ida);
- 	ida_simple_remove(&hci_index_ida, hdev->id);
- 	kfree_skb(hdev->sent_cmd);
- 	kfree_skb(hdev->recv_event);
--- 
-2.25.1
 
+--===============8294532496178716783==--
