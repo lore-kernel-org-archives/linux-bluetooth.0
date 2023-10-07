@@ -2,61 +2,61 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9757EE94139
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  7 Oct 2023 01:02:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0100E94139
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  7 Oct 2023 01:02:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233985AbjJGBCJ (ORCPT
+        id S234010AbjJGBCN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 6 Oct 2023 21:02:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49438 "EHLO
+        Fri, 6 Oct 2023 21:02:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233984AbjJGBCH (ORCPT
+        with ESMTP id S233984AbjJGBCM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 6 Oct 2023 21:02:07 -0400
-Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60AF9BD
-        for <linux-bluetooth@vger.kernel.org>; Fri,  6 Oct 2023 18:02:04 -0700 (PDT)
-Received: by mail-oi1-x236.google.com with SMTP id 5614622812f47-3af65455e7cso1796369b6e.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Oct 2023 18:02:04 -0700 (PDT)
+        Fri, 6 Oct 2023 21:02:12 -0400
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE883CA
+        for <linux-bluetooth@vger.kernel.org>; Fri,  6 Oct 2023 18:02:06 -0700 (PDT)
+Received: by mail-pg1-x533.google.com with SMTP id 41be03b00d2f7-564b6276941so1988629a12.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Oct 2023 18:02:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696640523; x=1697245323; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1696640525; x=1697245325; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=8zSSh2OLmHJPWCsoIzOBiFXvCbYCi1LbC5M2JuOLtPE=;
-        b=Ek+aClDLaWqoYVuh4X7bTweMaU48h4nTZsjxF0JkTYDVaE//EsZRM+UihmkaQOqAOH
-         t3Or2Zp1j4UfAUBR4exX8rCnp2qmidhVmLgbUsv4mmmQqL3C9qbwyaFrfpMeb/U7GiIs
-         tbjy2CxrsJMZqbOueQw1qqsYjfman3B3mTfE+eNbQvnkYTUcaXa/EjCwanQFpoPvFQjI
-         T7D8QlH75CuKnsogykoqw90UzVSL0cYAAGOsyIsT9Vf25fu7MvwrxS1TEI64C1mrUjR9
-         T2j8zkMpqBei9LCW+o17L+IOrk81N3htXBSbUuDixc7BCCo/76gpb37DG7Ae4D+WpXqn
-         qv7A==
+        bh=a86wI1ZNAlgU2PnlOjRPjzbEAtoUse4LSuKIerJSG+Q=;
+        b=EstbBsZDZWWGYzlnSgjA+hkQOynZs+GpB2ABQfCHVS3lG4Svtzbg8b8/exvjIJdKxi
+         Xk6JwlYODZ7LnnFKhFmoSkUph0OinezK9oNJK5skEGouQJqFCzKFe88tf4VYjuTYjelX
+         FPhK1AW90MtR59oWV3NJpVYfFgIEHsEymnj573HeYN7P6372C8ph/VIjomzKaWlv8uTm
+         MOr/1a5fnsoNd8F9G6vVkX6K7zmZ3g+XqHhRiK3BIhsYiII4ikO9yxsAUo6tZ6ADOMaZ
+         HXoRtUTZRfK9I+QICh2xHDuSQSL8KYLgI9Zmt7ZHzaE+xoh/JuEgZlGgckGoWOrmxpqh
+         AmJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696640523; x=1697245323;
+        d=1e100.net; s=20230601; t=1696640525; x=1697245325;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8zSSh2OLmHJPWCsoIzOBiFXvCbYCi1LbC5M2JuOLtPE=;
-        b=D74jTz2eDBVY46J092ZxijxXhRfneSB6BPwnkqtFGkeNlKZiLBBKsM+cRBfLNM0WOe
-         +bOyajU+YnxMDkWZrgx0WEIaC79WuJ6OYd0NFgqzXA5iUhpAjP+h7jTntoHWa8e4Ma6+
-         d2VnFr+bEvUpesQmZz8jH+VkNCLFDbyotJ3L2IvPw/xTcZ8Ev9J/HesqeIJIl/BdPyQ4
-         OUYjwuy33v5reZS4MitoKKZIyDUh8DcIpD1TDM0BoTVph9746SO7oZIYWr1R+RuBZsF5
-         PAgf8hEcwuK4yYl7J7xtxTdMqOB9M9z29Rsy6mdK+PSN/GfKLO7HOKujZIBMwKTMTTDX
-         aG4g==
-X-Gm-Message-State: AOJu0YxFDi2e4RH9GMteNpIhSv4+Qq8cyqFBZ7t7yveoqkj0CRE1F/LS
-        QQS2CR+uwJVUjexTM9akKBqqhlBLVENVvmVO
-X-Google-Smtp-Source: AGHT+IGzsuDBpiFy6gE7RheDV6uF4ZJBLrpgjhbLs1Q8d0yQFc2pXRAzyPFtlxXbgvJGE/yi+wb7lw==
-X-Received: by 2002:a05:6358:3407:b0:134:e3d2:1e50 with SMTP id h7-20020a056358340700b00134e3d21e50mr8745754rwd.18.1696640522575;
-        Fri, 06 Oct 2023 18:02:02 -0700 (PDT)
+        bh=a86wI1ZNAlgU2PnlOjRPjzbEAtoUse4LSuKIerJSG+Q=;
+        b=g3itXts65JUDY1CCPXhHOyjHaUkegdHLS2C2iRcIFXjiuycAKbXDu3Qfpe1ICw3Web
+         TVXOuu7Ha32nQIBuwX41/9Hj+qxrgZriy+8QP/kSEc+4TxY5zgXmRKnSTeoaV0MWef6q
+         Hp2hTrDTUDna2p+v0DXZCHvsuvHMBJN7Ndi5mPrTf7iUn+z8bByAbqv4QwNfUhHZlBjt
+         Wtx9CdkBp/o2NmS/PyF5iaP63EWAnIkjEq9U9WdLt1uC8XbJ2KCrCPk73zV2FtUxlLRB
+         /xOWctlM61YEpKe0BJqo2UINkPeuwieLaikxe0sih1HW81vcMniyscIy3lOXBfivyWLq
+         kTGw==
+X-Gm-Message-State: AOJu0Yy6anwTpWLBU/L437p/fg68I/0raabh6P0b/ep0jD1Ye05moHge
+        owvfaQ9gOSPYpKPLHJe00qZzXu2T+zIACYbU
+X-Google-Smtp-Source: AGHT+IFwlJHloscmpTbd8se7jROgw+h4NikQ3kjvSn5x/5hh5bW8gyw7iIFOZkBhP0vgO3+6uNAcEg==
+X-Received: by 2002:a17:90a:8004:b0:274:6a79:17c1 with SMTP id b4-20020a17090a800400b002746a7917c1mr9721009pjn.15.1696640524687;
+        Fri, 06 Oct 2023 18:02:04 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-98-232-221-87.hsd1.or.comcast.net. [98.232.221.87])
-        by smtp.gmail.com with ESMTPSA id co11-20020a17090afe8b00b00279060a0fccsm4098360pjb.9.2023.10.06.18.02.01
+        by smtp.gmail.com with ESMTPSA id co11-20020a17090afe8b00b00279060a0fccsm4098360pjb.9.2023.10.06.18.02.02
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Oct 2023 18:02:01 -0700 (PDT)
+        Fri, 06 Oct 2023 18:02:03 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 7/8] doc/advertising-api: Rename to org.bluez.LEAdvertis*.rst
-Date:   Fri,  6 Oct 2023 18:01:49 -0700
-Message-ID: <20231007010150.4103452-7-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 8/8] doc/gatt-api: Rename to org.bluez.Gatt*.rst
+Date:   Fri,  6 Oct 2023 18:01:50 -0700
+Message-ID: <20231007010150.4103452-8-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231007010150.4103452-1-luiz.dentz@gmail.com>
 References: <20231007010150.4103452-1-luiz.dentz@gmail.com>
@@ -68,347 +68,598 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This renames advertising-api.txt to org.bluez.LEAdvertis*.rst and
-generate manpages org.bluez.LEAdvertis*.5.
+This renames gatt-api.txt to org.bluez.Gatt*.rst and generate manpages
+org.bluez.Gatt*.5.
 ---
- Makefile.am                            |   7 +-
- doc/advertising-api.txt                | 278 -------------------------
- doc/org.bluez.LEAdvertisement.rst      | 195 +++++++++++++++++
- doc/org.bluez.LEAdvertisingManager.rst | 144 +++++++++++++
- 4 files changed, 345 insertions(+), 279 deletions(-)
- delete mode 100644 doc/advertising-api.txt
- create mode 100644 doc/org.bluez.LEAdvertisement.rst
- create mode 100644 doc/org.bluez.LEAdvertisingManager.rst
+ Makefile.am                          |  18 +-
+ doc/gatt-api.txt                     | 512 ---------------------------
+ doc/org.bluez.GattCharacteristic.rst | 375 ++++++++++++++++++++
+ doc/org.bluez.GattDescriptor.rst     | 167 +++++++++
+ doc/org.bluez.GattManager.rst        | 114 ++++++
+ doc/org.bluez.GattProfile.rst        |  46 +++
+ doc/org.bluez.GattService.rst        |  79 +++++
+ 7 files changed, 796 insertions(+), 515 deletions(-)
+ delete mode 100644 doc/gatt-api.txt
+ create mode 100644 doc/org.bluez.GattCharacteristic.rst
+ create mode 100644 doc/org.bluez.GattDescriptor.rst
+ create mode 100644 doc/org.bluez.GattManager.rst
+ create mode 100644 doc/org.bluez.GattProfile.rst
+ create mode 100644 doc/org.bluez.GattService.rst
 
 diff --git a/Makefile.am b/Makefile.am
-index 38074c773b4f..892965261bef 100644
+index 892965261bef..d658dc27500a 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -366,6 +366,8 @@ man_MANS += doc/org.bluez.Media.5 doc/org.bluez.MediaControl.5 \
+@@ -366,7 +366,11 @@ man_MANS += doc/org.bluez.Media.5 doc/org.bluez.MediaControl.5 \
  		doc/org.bluez.MediaPlayer.5 doc/org.bluez.MediaFolder.5 \
  		doc/org.bluez.MediaItem.5 doc/org.bluez.MediaEndpoint.5 \
  		doc/org.bluez.MediaTransport.5
-+man_MANS += doc/org.bluez.LEAdvertisingManager.5 \
-+		doc/org.bluez.LEAdvertisement.5
+-man_MANS += doc/org.bluez.LEAdvertisingManager.5 \
++man_MANS += doc/org.bluez.GattManager.5 doc/org.bluez.GattProfile.5 \
++		doc/org.bluez.GattService.5 \
++		doc/org.bluez.GattCharacteristic.5 \
++		doc/org.bluez.GattDescriptor.5 \
++		doc/org.bluez.LEAdvertisingManager.5 \
+ 		doc/org.bluez.LEAdvertisement.5
  endif
  manual_pages += src/bluetoothd.8
- manual_pages += doc/org.bluez.Adapter.5 doc/org.bluez.Device.5 \
-@@ -377,6 +379,8 @@ manual_pages += doc/org.bluez.Media.5 doc/org.bluez.MediaControl.5 \
+@@ -379,7 +383,11 @@ manual_pages += doc/org.bluez.Media.5 doc/org.bluez.MediaControl.5 \
  		doc/org.bluez.MediaPlayer.5 doc/org.bluez.MediaFolder.5 \
  		doc/org.bluez.MediaItem.5 doc/org.bluez.MediaEndpoint.5 \
  		doc/org.bluez.MediaTransport.5
-+manual_pages += doc/org.bluez.LEAdvertisingManager.5 \
-+		doc/org.bluez.LEAdvertisement.5
+-manual_pages += doc/org.bluez.LEAdvertisingManager.5 \
++manual_pages += doc/org.bluez.GattManager.5 doc/org.bluez.GattProfile.5 \
++		doc/org.bluez.GattService.5 \
++		doc/org.bluez.GattCharacteristic.5 \
++		doc/org.bluez.GattDescriptor.5 \
++		doc/org.bluez.LEAdvertisingManager.5 \
+ 		doc/org.bluez.LEAdvertisement.5
  
  EXTRA_DIST += src/genbuiltin src/bluetooth.conf \
- 			src/main.conf profiles/network/network.conf \
-@@ -427,7 +431,8 @@ EXTRA_DIST += doc/org.bluez.Media.rst doc/org.bluez.MediaControl.rst \
+@@ -431,7 +439,11 @@ EXTRA_DIST += doc/org.bluez.Media.rst doc/org.bluez.MediaControl.rst \
  		doc/org.bluez.MediaItem.rst doc/org.bluez.MediaEndpoint.rst \
  		doc/org.bluez.MediaTransport.rst
  
--EXTRA_DIST += doc/gatt-api.txt doc/advertising-api.txt
-+EXTRA_DIST += doc/gatt-api.txt doc/org.bluez.LEAdvertisingManager.rst \
-+		doc/org.bluez.LEAdvertisement.rst
+-EXTRA_DIST += doc/gatt-api.txt doc/org.bluez.LEAdvertisingManager.rst \
++EXTRA_DIST += doc/org.bluez.GattManager.rst doc/org.bluez.GattProfile.rst\
++		doc/org.bluez.GattService.rst \
++		doc/org.bluez.GattCharacteristic.rst \
++		doc/org.bluez.GattDescriptor.rst \
++		doc/org.bluez.LEAdvertisingManager.rst \
+ 		doc/org.bluez.LEAdvertisement.rst
  
  EXTRA_DIST += doc/obex-api.txt doc/obex-agent-api.txt
- 
-diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
+diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
 deleted file mode 100644
-index a0077843defd..000000000000
---- a/doc/advertising-api.txt
+index f29308aec843..000000000000
+--- a/doc/gatt-api.txt
 +++ /dev/null
-@@ -1,278 +0,0 @@
--BlueZ D-Bus LE Advertising API Description
--******************************************
+@@ -1,512 +0,0 @@
+-BlueZ D-Bus GATT API description
+-********************************
 -
--Advertising packets are structured data which is broadcast on the LE Advertising
--channels and available for all devices in range.  Because of the limited space
--available in LE Advertising packets (31 bytes), each packet's contents must be
--carefully controlled.
+-GATT local and remote services share the same high-level D-Bus API. Local
+-refers to GATT based service exported by a BlueZ plugin or an external
+-application. Remote refers to GATT services exported by the peer.
 -
--BlueZ acts as a store for the Advertisement Data which is meant to be sent.
--It constructs the correct Advertisement Data from the structured
--data and configured the kernel to send the correct advertisement.
+-BlueZ acts as a proxy, translating ATT operations to D-Bus method calls and
+-Properties (or the opposite). Support for D-Bus Object Manager is mandatory for
+-external services to allow seamless GATT declarations (Service, Characteristic
+-and Descriptors) discovery. Each GATT service tree is required to export a D-Bus
+-Object Manager at its root that is solely responsible for the objects that
+-belong to that service.
 -
--Advertisement Data objects are registered freely and then referenced by BlueZ
--when constructing the data sent to the kernel.
+-Releasing a registered GATT service is not defined yet. Any API extension
+-should avoid breaking the defined API, and if possible keep an unified GATT
+-remote and local services representation.
 -
--LE Advertisement Data hierarchy
--===============================
+-Service hierarchy
+-=================
 -
--Specifies the Advertisement Data to be broadcast and some advertising
--parameters.  Properties which are not present will not be included in the
--data.  Required advertisement data types will always be included.
--All UUIDs are 128-bit versions in the API, and 16 or 32-bit
--versions of the same UUID will be used in the advertising data as appropriate.
+-GATT remote and local service representation. Object path for local services
+-is freely definable.
+-
+-External applications implementing local services must register the services
+-using GattManager1 registration method and must implement the methods and
+-properties defined in GattService1 interface.
 -
 -Service		org.bluez
--Interface	org.bluez.LEAdvertisement1
--Object path	freely definable
+-Interface	org.bluez.GattService1
+-Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX
 -
--Methods		void Release() [noreply]
+-Properties	string UUID [read-only]
 -
--			This method gets called when the service daemon
--			removes the Advertisement. A client can use it to do
--			cleanup tasks. There is no need to call
--			UnregisterAdvertisement because when this method gets
--			called it has already been unregistered.
+-			128-bit service UUID.
 -
--Properties	string Type
+-		boolean Primary [read-only]
 -
--			Determines the type of advertising packet requested.
+-			Indicates whether or not this GATT service is a
+-			primary service. If false, the service is secondary.
 -
--			Possible values: "broadcast" or "peripheral"
+-		object Device [read-only, optional]
 -
--		array{string} ServiceUUIDs
+-			Object path of the Bluetooth device the service
+-			belongs to. Only present on services from remote
+-			devices.
 -
--			List of UUIDs to include in the "Service UUID" field of
--			the Advertising Data.
+-		array{object} Includes [read-only, optional]
 -
--		dict ManufacturerData
+-			Array of object paths representing the included
+-			services of this service.
 -
--			Manufactuer Data fields to include in
--			the Advertising Data.  Keys are the Manufacturer ID
--			to associate with the data.
+-		uint16 Handle [read-write, optional] (Server Only)
+-		              [read-only] (Client Only)
 -
--		array{string} SolicitUUIDs
+-			Service handle. When available in the server it
+-			would attempt to use to allocate into the database
+-			which may fail, to auto allocate the value 0x0000
+-			shall be used which will cause the allocated handle to
+-			be set once registered.
 -
--			Array of UUIDs to include in "Service Solicitation"
--			Advertisement Data.
 -
--		dict ServiceData
+-Characteristic hierarchy
+-========================
 -
--			Service Data elements to include. The keys are the
--			UUID to associate with the data.
+-For local GATT defined services, the object paths need to follow the service
+-path hierarchy and are freely definable.
 -
--		dict Data [Experimental]
+-Service		org.bluez
+-Interface	org.bluez.GattCharacteristic1
+-Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX/charYYYY
 -
--			Advertising Type to include in the Advertising
--			Data. Key is the advertising type and value is the
--			data as byte array.
+-Methods		array{byte} ReadValue(dict options)
 -
--			Note: Types already handled by other properties shall
--			not be used.
+-			Issues a request to read the value of the
+-			characteristic and returns the value if the
+-			operation was successful.
+-
+-			Possible options: "offset": uint16 offset
+-					  "mtu": Exchanged MTU (Server only)
+-					  "device": Object Device (Server only)
+-
+-			Possible Errors: org.bluez.Error.Failed(string ecode)
+-					 org.bluez.Error.InProgress
+-					 org.bluez.Error.NotPermitted
+-					 org.bluez.Error.NotAuthorized
+-					 org.bluez.Error.InvalidOffset
+-					 org.bluez.Error.NotSupported
+-
+-			Possible Error Code: string 0x80 - 0x9f
+-
+-		void WriteValue(array{byte} value, dict options)
+-
+-			Issues a request to write the value of the
+-			characteristic.
+-
+-			Possible options: "offset": Start offset
+-					  "type": string
+-						Possible values:
+-						"command": Write without
+-						response
+-						"request": Write with response
+-						"reliable": Reliable Write
+-					  "mtu": Exchanged MTU (Server only)
+-					  "device": Device path (Server only)
+-					  "link": Link type (Server only)
+-					  "prepare-authorize": True if prepare
+-							       authorization
+-							       request
+-
+-			Possible Errors: org.bluez.Error.Failed(string ecode)
+-					 org.bluez.Error.InProgress
+-					 org.bluez.Error.NotPermitted
+-					 org.bluez.Error.InvalidValueLength
+-					 org.bluez.Error.NotAuthorized
+-					 org.bluez.Error.NotSupported
+-
+-			Possible Error Code: string 0x80 - 0x9f
+-
+-		fd, uint16 AcquireWrite(dict options) [optional]
+-
+-			Acquire file descriptor and MTU for writing. Only
+-			sockets are supported. Usage of WriteValue will be
+-			locked causing it to return NotPermitted error.
+-
+-			For server the MTU returned shall be equal or smaller
+-			than the negotiated MTU.
+-
+-			For client it only works with characteristic that has
+-			WriteAcquired property which relies on
+-			write-without-response Flag.
+-
+-			To release the lock the client shall close the file
+-			descriptor, a HUP is generated in case the device
+-			is disconnected.
+-
+-			Note: the MTU can only be negotiated once and is
+-			symmetric therefore this method may be delayed in
+-			order to have the exchange MTU completed, because of
+-			that the file descriptor is closed during
+-			reconnections as the MTU has to be renegotiated.
+-
+-			Possible options: "device": Object Device (Server only)
+-					  "mtu": Exchanged MTU (Server only)
+-					  "link": Link type (Server only)
+-
+-			Possible Errors: org.bluez.Error.Failed
+-					 org.bluez.Error.NotSupported
+-
+-		fd, uint16 AcquireNotify(dict options) [optional]
+-
+-			Acquire file descriptor and MTU for notify. Only
+-			sockets are support. Usage of StartNotify will be locked
+-			causing it to return NotPermitted error.
+-
+-			For server the MTU returned shall be equal or smaller
+-			than the negotiated MTU.
+-
+-			Only works with characteristic that has NotifyAcquired
+-			which relies on notify Flag and no other client have
+-			called StartNotify.
+-
+-			Notification are enabled during this procedure so
+-			StartNotify shall not be called, any notification
+-			will be dispatched via file descriptor therefore the
+-			Value property is not affected during the time where
+-			notify has been acquired.
+-
+-			To release the lock the client shall close the file
+-			descriptor, a HUP is generated in case the device
+-			is disconnected.
+-
+-			Note: the MTU can only be negotiated once and is
+-			symmetric therefore this method may be delayed in
+-			order to have the exchange MTU completed, because of
+-			that the file descriptor is closed during
+-			reconnections as the MTU has to be renegotiated.
+-
+-			Possible options: "device": Object Device (Server only)
+-					  "mtu": Exchanged MTU (Server only)
+-					  "link": Link type (Server only)
+-
+-			Possible Errors: org.bluez.Error.Failed
+-					 org.bluez.Error.NotSupported
+-
+-		void StartNotify()
+-
+-			Starts a notification session from this characteristic
+-			if it supports value notifications or indications.
+-
+-			Possible Errors: org.bluez.Error.Failed
+-					 org.bluez.Error.NotPermitted
+-					 org.bluez.Error.InProgress
+-					 org.bluez.Error.NotConnected
+-					 org.bluez.Error.NotSupported
+-
+-		void StopNotify()
+-
+-			This method will cancel any previous StartNotify
+-			transaction. Note that notifications from a
+-			characteristic are shared between sessions thus
+-			calling StopNotify will release a single session.
+-
+-			Possible Errors: org.bluez.Error.Failed
+-
+-		void Confirm() [optional] (Server only)
+-
+-			This method doesn't expect a reply so it is just a
+-			confirmation that value was received.
+-
+-			Possible Errors: org.bluez.Error.Failed
+-
+-Properties	string UUID [read-only]
+-
+-			128-bit characteristic UUID.
+-
+-		object Service [read-only]
+-
+-			Object path of the GATT service the characteristic
+-			belongs to.
+-
+-		array{byte} Value [read-only, optional]
+-
+-			The cached value of the characteristic. This property
+-			gets updated only after a successful read request and
+-			when a notification or indication is received, upon
+-			which a PropertiesChanged signal will be emitted.
+-
+-		boolean WriteAcquired [read-only, optional]
+-
+-			True, if this characteristic has been acquired by any
+-			client using AcquireWrite.
+-
+-			For client properties is ommited in case
+-			'write-without-response' flag is not set.
+-
+-			For server the presence of this property indicates
+-			that AcquireWrite is supported.
+-
+-		boolean NotifyAcquired [read-only, optional]
+-
+-			True, if this characteristic has been acquired by any
+-			client using AcquireNotify.
+-
+-			For client this properties is ommited in case 'notify'
+-			flag is not set.
+-
+-			For server the presence of this property indicates
+-			that AcquireNotify is supported.
+-
+-		boolean Notifying [read-only, optional]
+-
+-			True, if notifications or indications on this
+-			characteristic are currently enabled.
+-
+-		array{string} Flags [read-only]
+-
+-			Defines how the characteristic value can be used. See
+-			Core spec "Table 3.5: Characteristic Properties bit
+-			field", and "Table 3.8: Characteristic Extended
+-			Properties bit field".
+-
+-			The "x-notify" and "x-indicate" flags restrict access
+-			to notifications and indications by imposing write
+-			restrictions on a characteristic's client
+-			characteristic configuration descriptor.
+-
+-			Allowed values:
+-
+-				"broadcast"
+-				"read"
+-				"write-without-response"
+-				"write"
+-				"notify"
+-				"indicate"
+-				"authenticated-signed-writes"
+-				"extended-properties"
+-				"reliable-write"
+-				"writable-auxiliaries"
+-				"encrypt-read"
+-				"encrypt-write"
+-				"encrypt-notify" (Server only)
+-				"encrypt-indicate" (Server only)
+-				"encrypt-authenticated-read"
+-				"encrypt-authenticated-write"
+-				"encrypt-authenticated-notify" (Server only)
+-				"encrypt-authenticated-indicate" (Server only)
+-				"secure-read" (Server only)
+-				"secure-write" (Server only)
+-				"secure-notify" (Server only)
+-				"secure-indicate" (Server only)
+-				"authorize"
+-
+-		uint16 Handle [read-write, optional] (Server Only)
+-		              [read-only] (Client Only)
+-
+-			Characteristic handle. When available in the server it
+-			would attempt to use to allocate into the database
+-			which may fail, to auto allocate the value 0x0000
+-			shall be used which will cause the allocated handle to
+-			be set once registered.
+-
+-		uint16 MTU [read-only]
+-
+-			Characteristic MTU, this is valid both for ReadValue
+-			and WriteValue but either method can use long
+-			procedures when supported.
+-
+-Characteristic Descriptors hierarchy
+-====================================
+-
+-Local or remote GATT characteristic descriptors hierarchy.
+-
+-Service		org.bluez
+-Interface	org.bluez.GattDescriptor1
+-Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX/charYYYY/descriptorZZZ
+-
+-Methods		array{byte} ReadValue(dict flags)
+-
+-			Issues a request to read the value of the
+-			characteristic and returns the value if the
+-			operation was successful.
+-
+-			Possible options: "offset": Start offset
+-					  "device": Device path (Server only)
+-					  "link": Link type (Server only)
+-
+-			Possible Errors: org.bluez.Error.Failed
+-					 org.bluez.Error.InProgress
+-					 org.bluez.Error.NotPermitted
+-					 org.bluez.Error.NotAuthorized
+-					 org.bluez.Error.NotSupported
+-
+-		void WriteValue(array{byte} value, dict flags)
+-
+-			Issues a request to write the value of the
+-			characteristic.
+-
+-			Possible options: "offset": Start offset
+-					  "device": Device path (Server only)
+-					  "link": Link type (Server only)
+-					  "prepare-authorize": boolean Is prepare
+-							       authorization
+-							       request
+-
+-			Possible Errors: org.bluez.Error.Failed
+-					 org.bluez.Error.InProgress
+-					 org.bluez.Error.NotPermitted
+-					 org.bluez.Error.InvalidValueLength
+-					 org.bluez.Error.NotAuthorized
+-					 org.bluez.Error.NotSupported
+-
+-Properties	string UUID [read-only]
+-
+-			128-bit descriptor UUID.
+-
+-		object Characteristic [read-only]
+-
+-			Object path of the GATT characteristic the descriptor
+-			belongs to.
+-
+-		array{byte} Value [read-only, optional]
+-
+-			The cached value of the descriptor. This property
+-			gets updated only after a successful read request, upon
+-			which a PropertiesChanged signal will be emitted.
+-
+-		array{string} Flags [read-only]
+-
+-			Defines how the descriptor value can be used.
 -
 -			Possible values:
--				<type> <byte array>
--				...
 -
--			Example:
--				<Transport Discovery> <Organization Flags...>
--				0x26                   0x01         0x01...
+-				"read"
+-				"write"
+-				"encrypt-read"
+-				"encrypt-write"
+-				"encrypt-authenticated-read"
+-				"encrypt-authenticated-write"
+-				"secure-read" (Server Only)
+-				"secure-write" (Server Only)
+-				"authorize"
 -
--		bool Discoverable [Experimental]
+-		uint16 Handle [read-write, optional] (Server Only)
+-		              [read-only] (Client Only)
 -
--			Advertise as general discoverable. When present this
--			will override adapter Discoverable property.
+-			Characteristic handle. When available in the server it
+-			would attempt to use to allocate into the database
+-			which may fail, to auto allocate the value 0x0000
+-			shall be used which will cause the allocated handle to
+-			be set once registered.
 -
--			Note: This property shall not be set when Type is set
--			to broadcast.
+-GATT Profile hierarchy
+-=====================
 -
--		uint16 DiscoverableTimeout [Experimental]
+-Local profile (GATT client) instance. By registering this type of object
+-an application effectively indicates support for a specific GATT profile
+-and requests automatic connections to be established to devices
+-supporting it.
 -
--			The discoverable timeout in seconds. A value of zero
--			means that the timeout is disabled and it will stay in
--			discoverable/limited mode forever.
+-Service		<application dependent>
+-Interface	org.bluez.GattProfile1
+-Object path	<application dependent>
 -
--			Note: This property shall not be set when Type is set
--			to broadcast.
+-Methods		void Release()
 -
--		array{string} Includes
+-			This method gets called when the service daemon
+-			unregisters the profile. The profile can use it to
+-			do cleanup tasks. There is no need to unregister the
+-			profile, because when this method gets called it has
+-			already been unregistered.
 -
--			List of features to be included in the advertising
--			packet.
+-Properties	array{string} UUIDs [read-only]
 -
--			Possible values: as found on
--					LEAdvertisingManager.SupportedIncludes
--
--		string LocalName
--
--			Local name to be used in the advertising report. If the
--			string is too big to fit into the packet it will be
--			truncated.
--
--			If this property is available 'local-name' cannot be
--			present in the Includes.
--
--		uint16 Appearance
--
--			Appearance to be used in the advertising report.
--
--			Possible values: as found on GAP Service.
--
--		uint16_t Duration
--
--			Rotation duration of the advertisement in seconds. If
--			there are other applications advertising no duration is
--			set the default is 2 seconds.
--
--		uint16_t Timeout
--
--			Timeout of the advertisement in seconds. This defines
--			the lifetime of the advertisement.
--
--		string SecondaryChannel [Experimental]
--
--			Secondary channel to be used. Primary channel is
--			always set to "1M" except when "Coded" is set.
--
--			Possible value: "1M" (default)
--					"2M"
--					"Coded"
--
--		uint32 MinInterval [Experimental]
--
--			Minimum advertising interval to be used by the
--			advertising set, in milliseconds. Acceptable values
--			are in the range [20ms, 10,485s]. If the provided
--			MinInterval is larger than the provided MaxInterval,
--			the registration will return failure.
--
--		uint32 MaxInterval [Experimental]
--
--			Maximum advertising interval to be used by the
--			advertising set, in milliseconds. Acceptable values
--			are in the range [20ms, 10,485s]. If the provided
--			MinInterval is larger than the provided MaxInterval,
--			the registration will return failure.
--
--		int16 TxPower [Experimental]
--
--			Requested transmission power of this advertising set.
--			The provided value is used only if the "CanSetTxPower"
--			feature is enabled on the Advertising Manager. The
--			provided value must be in range [-127 to +20], where
--			units are in dBm.
+-			128-bit GATT service UUIDs to auto connect.
 -
 -
--LE Advertising Manager hierarchy
--================================
+-GATT Manager hierarchy
+-======================
 -
--The Advertising Manager allows external applications to register Advertisement
--Data which should be broadcast to devices.  Advertisement Data elements must
--follow the API for LE Advertisement Data described above.
+-GATT Manager allows external applications to register GATT services and
+-profiles.
+-
+-Registering a profile allows applications to subscribe to *remote* services.
+-These must implement the GattProfile1 interface defined above.
+-
+-Registering a service allows applications to publish a *local* GATT service,
+-which then becomes available to remote devices. A GATT service is represented by
+-a D-Bus object hierarchy where the root node corresponds to a service and the
+-child nodes represent characteristics and descriptors that belong to that
+-service. Each node must implement one of GattService1, GattCharacteristic1,
+-or GattDescriptor1 interfaces described above, based on the attribute it
+-represents. Each node must also implement the standard D-Bus Properties
+-interface to expose their properties. These objects collectively represent a
+-GATT service definition.
+-
+-To make service registration simple, BlueZ requires that all objects that belong
+-to a GATT service be grouped under a D-Bus Object Manager that solely manages
+-the objects of that service. Hence, the standard DBus.ObjectManager interface
+-must be available on the root service path. An example application hierarchy
+-containing two separate GATT services may look like this:
+-
+--> /com/example
+-  |   - org.freedesktop.DBus.ObjectManager
+-  |
+-  -> /com/example/service0
+-  | |   - org.freedesktop.DBus.Properties
+-  | |   - org.bluez.GattService1
+-  | |
+-  | -> /com/example/service0/char0
+-  | |     - org.freedesktop.DBus.Properties
+-  | |     - org.bluez.GattCharacteristic1
+-  | |
+-  | -> /com/example/service0/char1
+-  |   |   - org.freedesktop.DBus.Properties
+-  |   |   - org.bluez.GattCharacteristic1
+-  |   |
+-  |   -> /com/example/service0/char1/desc0
+-  |       - org.freedesktop.DBus.Properties
+-  |       - org.bluez.GattDescriptor1
+-  |
+-  -> /com/example/service1
+-    |   - org.freedesktop.DBus.Properties
+-    |   - org.bluez.GattService1
+-    |
+-    -> /com/example/service1/char0
+-        - org.freedesktop.DBus.Properties
+-        - org.bluez.GattCharacteristic1
+-
+-When a service is registered, BlueZ will automatically obtain information about
+-all objects using the service's Object Manager. Once a service has been
+-registered, the objects of a service should not be removed. If BlueZ receives an
+-InterfacesRemoved signal from a service's Object Manager, it will immediately
+-unregister the service. Similarly, if the application disconnects from the bus,
+-all of its registered services will be automatically unregistered.
+-InterfacesAdded signals will be ignored.
+-
+-Examples:
+-	- Client
+-		test/example-gatt-client
+-		client/bluetoothctl
+-	- Server
+-		test/example-gatt-server
+-		tools/gatt-service
+-
 -
 -Service		org.bluez
--Interface	org.bluez.LEAdvertisingManager1
--Object path	/org/bluez/{hci0,hci1,...}
+-Interface	org.bluez.GattManager1
+-Object path	[variable prefix]/{hci0,hci1,...}
 -
--Methods		RegisterAdvertisement(object advertisement, dict options)
+-Methods		void RegisterApplication(object application, dict options)
 -
--			Registers an advertisement object to be sent over the LE
--			Advertising channel.  The service must be exported
--			under interface LEAdvertisement1.
+-			Registers a local GATT services hierarchy as described
+-			above (GATT Server) and/or GATT profiles (GATT Client).
 -
--			InvalidArguments error indicates that the object has
--			invalid or conflicting properties.
--
--			InvalidLength error indicates that the data
--			provided generates a data packet which is too long.
--
--			The properties of this object are parsed when it is
--			registered, and any changes are ignored.
--
--			If the same object is registered twice it will result in
--			an AlreadyExists error.
--
--			If the maximum number of advertisement instances is
--			reached it will result in NotPermitted error.
+-			The application object path together with the D-Bus
+-			system bus connection ID define the identification of
+-			the application registering a GATT based
+-			service or profile.
 -
 -			Possible errors: org.bluez.Error.InvalidArguments
 -					 org.bluez.Error.AlreadyExists
--					 org.bluez.Error.InvalidLength
--					 org.bluez.Error.NotPermitted
 -
--		UnregisterAdvertisement(object advertisement)
+-		void UnregisterApplication(object application)
 -
--			This unregisters an advertisement that has been
--			previously registered.  The object path parameter must
--			match the same value that has been used on registration.
+-			This unregisters the services that has been
+-			previously registered. The object path parameter
+-			must match the same value that has been used
+-			on registration.
 -
 -			Possible errors: org.bluez.Error.InvalidArguments
 -					 org.bluez.Error.DoesNotExist
--
--Properties	byte ActiveInstances
--
--			Number of active advertising instances.
--
--		byte SupportedInstances
--
--			Number of available advertising instances.
--
--		array{string} SupportedIncludes
--
--			List of supported system includes.
--
--			Possible values: "tx-power"
--					 "appearance"
--					 "local-name"
--					 "rsi"
--
--		array{string} SupportedSecondaryChannels [Experimental]
--
--			List of supported Secondary channels. Secondary
--			channels can be used to advertise with the
--			corresponding PHY.
--
--			Possible values: "1M"
--					 "2M"
--					 "Coded"
--
--		dict SupportedCapabilities [Experimental]
--
--			Enumerates Advertising-related controller capabilities
--			useful to the client.
--
--			Possible Values:
--
--				byte MaxAdvLen
--
--					Max advertising data length
--
--				byte MaxScnRspLen
--
--					Max advertising scan response length
--
--				int16 MinTxPower
--
--					Min advertising tx power (dBm)
--
--				int16 MaxTxPower
--
--					Max advertising tx power (dBm)
--
--		array{string} SupportedFeatures [readonly,optional,Experimental]
--
--			List of supported platform features. If no features
--			are available on the platform, the SupportedFeatures
--			array will be empty.
--
--			Possible values: "CanSetTxPower"
--
--						Indicates whether platform can
--						specify tx power on each
--						advertising instance.
--
--					 "HardwareOffload"
--
--						Indicates whether multiple
--						advertising will be offloaded
--						to the controller.
-diff --git a/doc/org.bluez.LEAdvertisement.rst b/doc/org.bluez.LEAdvertisement.rst
+diff --git a/doc/org.bluez.GattCharacteristic.rst b/doc/org.bluez.GattCharacteristic.rst
 new file mode 100644
-index 000000000000..4609bde74a5e
+index 000000000000..cd5a0d0c788f
 --- /dev/null
-+++ b/doc/org.bluez.LEAdvertisement.rst
-@@ -0,0 +1,195 @@
-+=========================
-+org.bluez.LEAdvertisement
-+=========================
++++ b/doc/org.bluez.GattCharacteristic.rst
+@@ -0,0 +1,375 @@
++============================
++org.bluez.GattCharacteristic
++============================
 +
-+---------------------------------------------
-+BlueZ D-Bus LEAdvertisement API documentation
-+---------------------------------------------
++------------------------------------------------
++BlueZ D-Bus GattCharacteristic API documentation
++------------------------------------------------
 +
 +:Version: BlueZ
 +:Date: October 2023
@@ -418,197 +669,722 @@ index 000000000000..4609bde74a5e
 +Description
 +===========
 +
-+Advertising packets are structured data which is broadcast on the LE Advertising
-+channels and available for all devices in range.  Because of the limited space
-+available in LE Advertising packets, each packet's contents must be carefully
-+controlled.
++GATT local/server and remote/client characteristic attribute representation
++share the same high-level D-Bus API.
 +
-+The service daemon acts as a store for the Advertisement Data which is meant to
-+be sent. It constructs the correct Advertisement Data from the structured
-+data and configured the kernel to send the correct advertisement.
++Local/Server refers to GATT based characteristics exported by a plugin or an
++external application.
++
++Remote/Client refers to GATT characteristics exported by the peer.
 +
 +Interface
 +=========
 +
-+Specifies the Advertisement Data to be broadcast and some advertising
-+parameters.  Properties which are not present will not be included in the
-+data.  Required advertisement data types will always be included.
-+All UUIDs are 128-bit versions in the API, and 16 or 32-bit
-+versions of the same UUID will be used in the advertising data as appropriate.
++Client
++------
 +
 +:Service:	org.bluez
-+:Interface:	org.bluez.LEAdvertisement1
++:Interface:	org.bluez.GattCharacteristic1
++:Object path:	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX/charYYYY
++
++Server
++------
++
++:Service:	unique name
++:Interface:	org.bluez.GattCharacteristic1
 +:Object path:	freely definable
 +
 +Methods
 +-------
 +
-+void Release() [noreply]
-+````````````````````````
++array{byte} ReadValue(dict options)
++```````````````````````````````````
 +
-+	This method gets called when the service daemon removes the
-+	Advertisement. A client can use it to do cleanup tasks. There is no
-+	need to call **UnregisterAdvertisement()** because when this method
++	Issues a request to read the value of the characteristic and returns the
++	value if the operation was successful.
++
++	Possible options:
++
++	:uint16_t offset:
++
++		Read start offset in bytes.
++
++	:uint16_t mtu (server only):
++
++		Exchange MTU in bytes.
++
++	:object device (server only):
++
++		Device object.
++
++	Possible Errors:
++
++	:org.bluez.Error.Failed:
++
++		Possible values: string 0x80 - 0x9f
++
++	:org.bluez.Error.InProgress:
++	:org.bluez.Error.NotPermitted:
++	:org.bluez.Error.NotAuthorized:
++	:org.bluez.Error.InvalidOffset:
++	:org.bluez.Error.NotSupported:
++
++void WriteValue(array{byte} value, dict options)
++````````````````````````````````````````````````
++
++	Issues a request to write the value of the characteristic.
++
++	Possible options:
++
++	:uint16 offset:
++
++		Write start offset in bytes.
++
++	:string type:
++
++		Possible values:
++
++		:"command":
++
++			Use Write without response procedure.
++
++		:"request":
++
++			Use Write with response procedure.
++
++		:"reliable":
++
++			Use Reliable Write procedure.
++
++	:uint16 mtu:
++
++		Exchanged MTU (Server only).
++
++	:object device:
++
++		Device path (Server only).
++
++	:string link:
++
++		Link type (Server only).
++
++		Possible values:
++
++		:"BR/EDR":
++		:"LE":
++
++	:boolean prepare-authorize:
++
++		True if prepare authorization request.
++
++	Possible Errors:
++
++	:org.bluez.Error.Failed:
++
++		Possible values: string 0x80 - 0x9f
++
++	:org.bluez.Error.InProgress:
++	:org.bluez.Error.NotPermitted:
++	:org.bluez.Error.InvalidValueLength:
++	:org.bluez.Error.NotAuthorized:
++	:org.bluez.Error.NotSupported:
++
++fd, uint16 AcquireWrite(dict options) [optional]
++````````````````````````````````````````````````
++
++	Acquire file descriptor and MTU for writing. Only sockets are supported.
++	Usage of WriteValue will be locked causing it to return NotPermitted
++	error.
++
++	For server the MTU returned shall be equal or smaller than the
++	negotiated MTU.
++
++	For client it only works with characteristic that has **WriteAcquired**
++	property which relies on write-without-response **Flag**.
++
++	To release the lock the client shall close the file descriptor, a HUP
++	is generated in case the device is disconnected.
++
++	Note: the MTU can only be negotiated once and is symmetric therefore
++	this method may be delayed in order to have the exchange MTU completed,
++	because of that the file descriptor is closed during reconnections as
++	the MTU has to be renegotiated.
++
++	Possible options:
++
++	:object device:
++
++		Object Device (Server only).
++
++	:uint16 mtu:
++
++		Exchanged MTU (Server only).
++
++	:string link:
++
++		Link type (Server only).
++
++		Possible values:
++
++		:"BR/EDR":
++		:"LE":
++
++	Possible Errors:
++
++	:org.bluez.Error.Failed:
++	:org.bluez.Error.NotSupported:
++
++fd, uint16 AcquireNotify(dict options) [optional]
++`````````````````````````````````````````````````
++
++	Acquire file descriptor and MTU for notify. Only sockets are support.
++
++	Usage of StartNotify will be locked causing it to return
++	**org.bluez.Error.NotPermitted**.
++
++	For server the MTU returned shall be equal or smaller than the
++	negotiated MTU.
++
++	Only works with characteristic that has **NotifyAcquired** property
++	which relies on **"notify"** **Flag** and no other client have called
++	**StartNotify()**.
++
++	Notification are enabled during this procedure so **StartNotify()**
++	shall not be called, any notification will be dispatched via file
++	descriptor therefore the Value property is not affected during the time
++	where notify has been acquired.
++
++	To release the lock the client shall close the file descriptor, a HUP is
++	generated in case the device is disconnected.
++
++	Note: the MTU can only be negotiated once and is symmetric therefore
++	this method may be delayed in order to have the exchange MTU completed,
++	because of that the file descriptor is closed during reconnections as
++	the MTU has to be renegotiated.
++
++	Possible options:
++
++	:object device:
++
++		Object Device (Server only).
++
++	:uint16 mtu:
++
++		Exchanged MTU (Server only).
++
++	:string link:
++
++		Link type (Server only).
++
++		Possible values:
++
++		:"BR/EDR":
++		:"LE":
++
++	Possible Errors:
++
++	:org.bluez.Error.Failed:
++	:org.bluez.Error.NotSupported:
++	:org.bluez.Error.NotPermitted:
++
++void StartNotify()
++``````````````````
++
++	Starts a notification session from this characteristic if it supports
++	value notifications or indications.
++
++	Possible Errors:
++
++	:org.bluez.Error.Failed:
++	:org.bluez.Error.NotPermitted:
++	:org.bluez.Error.InProgress:
++	:org.bluez.Error.NotConnected:
++	:org.bluez.Error.NotSupported:
++
++void StopNotify()
++`````````````````
++
++	Stops or cancel session previously created by **StartNotify()**.
++
++	Note that notifications from a characteristic are shared between
++	sessions thus calling StopNotify will release a single session.
++
++	Possible Errors:
++
++	:org.bluez.Error.Failed:
++
++void Confirm() [noreply, optional] (Server only)
++````````````````````````````````````````````````
++
++
++	Confirms value was received.
++
++	Possible Errors:
++
++	org.bluez.Error.Failed
++
++Properties
++----------
++
++string UUID [read-only]
++```````````````````````
++
++	128-bit characteristic UUID.
++
++object Service [read-only]
++``````````````````````````
++
++	Object path of the GATT service the characteristic belongs to.
++
++array{byte} Value [read-only, optional]
++```````````````````````````````````````
++
++	The cached value of the characteristic. This property gets updated only
++	after a successful read request and when a notification or indication
++	is received, upon which a PropertiesChanged signal will be emitted.
++
++boolean WriteAcquired [read-only, optional]
++```````````````````````````````````````````
++
++	True, if this characteristic has been acquired by any client using
++	AcquireWrite.
++
++	For client properties is ommited in case 'write-without-response' flag
++	is not set.
++
++	For server the presence of this property indicates that AcquireWrite is
++	supported.
++
++boolean NotifyAcquired [read-only, optional]
++````````````````````````````````````````````
++
++	True, if this characteristic has been acquired by any client using
++	AcquireNotify.
++
++	For client this properties is ommited in case 'notify' flag is not set.
++
++	For server the presence of this property indicates that AcquireNotify
++	is supported.
++
++boolean Notifying [read-only, optional]
++```````````````````````````````````````
++
++	True, if notifications or indications on this characteristic are
++	currently enabled.
++
++array{string} Flags [read-only]
++```````````````````````````````
++
++	Defines how the characteristic value can be used. See Core spec
++	"Table 3.5: Characteristic Properties bit field", and
++	"Table 3.8: Characteristic Extended Properties bit field".
++
++	The "x-notify" and "x-indicate" flags restrict access to notifications
++	and indications by imposing write restrictions on a characteristic's
++	client characteristic configuration descriptor.
++
++	Possible values:
++
++	:"broadcast":
++	:"read":
++	:"write-without-response":
++	:"write":
++	:"notify":
++	:"indicate":
++	:"authenticated-signed-writes":
++	:"extended-properties":
++	:"reliable-write":
++	:"writable-auxiliaries":
++	:"encrypt-read":
++	:"encrypt-write":
++	:"encrypt-notify" (Server only):
++	:"encrypt-indicate" (Server only):
++	:"encrypt-authenticated-read":
++	:"encrypt-authenticated-write":
++	:"encrypt-authenticated-notify" (Server only):
++	:"encrypt-authenticated-indicate" (Server only):
++	:"secure-read" (Server only):
++	:"secure-write" (Server only):
++	:"secure-notify" (Server only):
++	:"secure-indicate" (Server only):
++	:"authorize":
++
++uint16 Handle [read-only] (Client Only)
++```````````````````````````````````````
++
++	Characteristic handle.
++
++uint16 Handle [read-write, optional] (Server Only)
++``````````````````````````````````````````````````
++
++	Characteristic handle. When available in the server it would attempt to
++	use to allocate into the database which may fail, to auto allocate the
++	value 0x0000 shall be used which will cause the allocated handle to be
++	set once registered.
++
++uint16 MTU [read-only]
++``````````````````````
++
++	Characteristic MTU, this is valid both for **ReadValue()** and
++	**WriteValue()** but either method can use long procedures when
++	supported.
+diff --git a/doc/org.bluez.GattDescriptor.rst b/doc/org.bluez.GattDescriptor.rst
+new file mode 100644
+index 000000000000..94cc8b26af29
+--- /dev/null
++++ b/doc/org.bluez.GattDescriptor.rst
+@@ -0,0 +1,167 @@
++========================
++org.bluez.GattDescriptor
++========================
++
++--------------------------------------------
++BlueZ D-Bus GattDescriptor API documentation
++--------------------------------------------
++
++:Version: BlueZ
++:Date: October 2023
++:Manual section: 5
++:Manual group: Linux System Administration
++
++Description
++===========
++
++GATT local/server and remote/client descriptor attribute representation
++share the same high-level D-Bus API.
++
++Local/Server refers to GATT based descriptors exported by a plugin or an
++external application.
++
++Remote/Client refers to GATT descriptors exported by the peer.
++
++Interface
++=========
++
++Client
++------
++
++:Service:	org.bluez
++:Interface:	org.bluez.GattDescriptor1
++:Object path:	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX/charYYYY/descriptorZZZ
++
++Server
++------
++
++:Service:	unique name
++:Interface:	org.bluez.GattDescriptor1
++:Object path:	freely definable
++
++Methods
++-------
++
++array{byte} ReadValue(dict flags)
++`````````````````````````````````
++
++	Issues a request to read the value of the descriptor and returns the
++	value if the operation was successful.
++
++	Possible options:
++
++	:uint16_t offset:
++
++		Read start offset in bytes.
++
++	:object device (server only):
++
++		Device object.
++
++	:string link:
++
++		Link type (Server only).
++
++		Possible values:
++
++		:"BR/EDR":
++		:"LE":
++
++	Possible Errors:
++
++	:org.bluez.Error.Failed:
++	:org.bluez.Error.InProgress:
++	:org.bluez.Error.NotPermitted:
++	:org.bluez.Error.NotAuthorized:
++	:org.bluez.Error.NotSupported:
++
++void WriteValue(array{byte} value, dict flags)
++``````````````````````````````````````````````
++
++	Issues a request to write the value of the descriptor.
++
++	Possible flags:
++
++	:uint16 offset:
++
++		Write start offset in bytes.
++
++	:uint16 mtu:
++
++		Exchanged MTU (Server only).
++
++	:object device:
++
++		Device path (Server only).
++
++	:string link:
++
++		Link type (Server only).
++
++		Possible values:
++
++		:"BR/EDR":
++		:"LE":
++
++	:boolean prepare-authorize:
++
++		True if prepare authorization request.
++
++	Possible Errors:
++
++	:org.bluez.Error.Failed:
++	:org.bluez.Error.InProgress:
++	:org.bluez.Error.NotPermitted:
++	:org.bluez.Error.InvalidValueLength:
++	:org.bluez.Error.NotAuthorized:
++	:org.bluez.Error.NotSupported:
++
++Properties
++----------
++
++string UUID [read-only]
++```````````````````````
++
++	128-bit descriptor UUID.
++
++object Characteristic [read-only]
++`````````````````````````````````
++
++	Object path of the GATT characteristic the descriptor belongs to.
++
++array{byte} Value [read-only, optional]
++```````````````````````````````````````
++
++	The cached value of the descriptor. This property gets updated only
++	after a successful read request, upon which a PropertiesChanged signal
++	will be emitted.
++
++array{string} Flags [read-only]
++```````````````````````````````
++
++	Defines how the descriptor value can be used.
++
++	Possible values:
++
++	:"read":
++	:"write":
++	:"encrypt-read":
++	:"encrypt-write":
++	:"encrypt-authenticated-read":
++	:"encrypt-authenticated-write":
++	:"secure-read" (Server Only):
++	:"secure-write" (Server Only):
++	:"authorize":
++
++uint16 Handle [read-only] (Client Only)
++```````````````````````````````````````
++
++	Descriptor handle.
++
++uint16 Handle [read-write, optional] (Server Only)
++``````````````````````````````````````````````````
++
++	Descriptor handle. When available in the server it would attempt to
++	use to allocate into the database which may fail, to auto allocate the
++	value 0x0000 shall be used which will cause the allocated handle to be
++	set once registered.
+diff --git a/doc/org.bluez.GattManager.rst b/doc/org.bluez.GattManager.rst
+new file mode 100644
+index 000000000000..f98296b89a01
+--- /dev/null
++++ b/doc/org.bluez.GattManager.rst
+@@ -0,0 +1,114 @@
++=====================
++org.bluez.GattManager
++=====================
++
++-----------------------------------------
++BlueZ D-Bus GattManager API documentation
++-----------------------------------------
++
++:Version: BlueZ
++:Date: October 2023
++:Manual section: 5
++:Manual group: Linux System Administration
++
++Description
++===========
++
++GATT Manager allows external applications to register GATT services and
++profiles.
++
++Registering a profile allows applications to subscribe to *remote/client*
++services.
++
++Registering a service allows applications to publish a *local/server* GATT
++service, which then becomes available to remote devices. A GATT service is
++represented by a D-Bus object hierarchy where the root node corresponds to a
++service and the child nodes represent characteristics and descriptors that
++belong to that service. Each node must implement one of
++**org.bluez.GattService(5)**, **org.bluez.GattCharacteristic(5)** or
++**org.bluez.GattDescriptor(5)** interfaces, based on the attribute it
++represents. Each node must also implement the standard D-Bus Properties
++interface to expose their properties. These objects collectively represent a
++GATT service definition.
++
++To make service registration simple, **bluetoothd(8)** requires that all objects
++that belong to a GATT service be grouped under a D-Bus Object Manager that
++solely manages the objects of that service. Hence, the standard
++DBus.ObjectManager interface must be available on the root service path. An
++example application hierarchy containing two separate GATT services may look
++like this:
++
++.. code-block::
++
++    -> /com/example
++      |   - org.freedesktop.DBus.ObjectManager
++      |
++      -> /com/example/service0
++      | |   - org.freedesktop.DBus.Properties
++      | |   - org.bluez.GattService1
++      | |
++      | -> /com/example/service0/char0
++      | |     - org.freedesktop.DBus.Properties
++      | |     - org.bluez.GattCharacteristic1
++      | |
++      | -> /com/example/service0/char1
++      |   |   - org.freedesktop.DBus.Properties
++      |   |   - org.bluez.GattCharacteristic1
++      |   |
++      |   -> /com/example/service0/char1/desc0
++      |       - org.freedesktop.DBus.Properties
++      |       - org.bluez.GattDescriptor1
++      |
++      -> /com/example/service1
++        |   - org.freedesktop.DBus.Properties
++        |   - org.bluez.GattService1
++        |
++       -> /com/example/service1/char0
++            - org.freedesktop.DBus.Properties
++            - org.bluez.GattCharacteristic1
++
++When a service is registered, **bluetoothd(8)** will automatically obtain
++information about all objects using the service's Object Manager. Once a service
++has been registered, the objects of a service should not be removed. If
++**bluetoothd(8)** receives an InterfacesRemoved signal from a service's Object
++Manager, it will immediately unregister the service. Similarly, if the
++application disconnects from the bus, all of its registered services will be
++automatically unregistered. InterfacesAdded signals will be ignored.
++
++Interface
++=========
++
++:Service:	org.bluez
++:Interface:	org.bluez.GattManager1
++:Object path:	[variable prefix]/{hci0,hci1,...}
++
++Methods
++-------
++
++void RegisterApplication(object application, dict options)
++``````````````````````````````````````````````````````````
++
++	Registers a local GATT services hierarchy as described above
++	(GATT Server) and/or GATT profiles (GATT Client).
++
++	The application object path together with the D-Bus system bus
++	connection ID define the identification of the application registering
++	a GATT based service (**org.bluez.GattService(5)**) and/or profile
++	(**org.bluez.GattProfile(5)**).
++
++	Possible errors:
++
++	:org.bluez.Error.InvalidArguments:
++	:org.bluez.Error.AlreadyExists:
++
++void UnregisterApplication(object application)
++``````````````````````````````````````````````
++
++	This unregisters the services and/or profiles that has been previously
++	registered using **RegisterApplication()**. The object path parameter
++	must match the same value that has been used on registration.
++
++	Possible errors:
++
++	:org.bluez.Error.InvalidArguments:
++	:org.bluez.Error.DoesNotExist:
+diff --git a/doc/org.bluez.GattProfile.rst b/doc/org.bluez.GattProfile.rst
+new file mode 100644
+index 000000000000..904301a9773b
+--- /dev/null
++++ b/doc/org.bluez.GattProfile.rst
+@@ -0,0 +1,46 @@
++=====================
++org.bluez.GattProfile
++=====================
++
++-----------------------------------------
++BlueZ D-Bus GattProfile API documentation
++-----------------------------------------
++
++:Version: BlueZ
++:Date: October 2023
++:Manual section: 5
++:Manual group: Linux System Administration
++
++Description
++===========
++
++Local profile (GATT client) instance. By registering this type of object
++an application effectively indicates support for a specific GATT profile
++and requests automatic connections to be established to devices
++supporting it.
++
++Interface
++=========
++
++:Service:	<application dependent>
++:Interface:	org.bluez.GattProfile1
++:Object path:	<application dependent>
++
++Methods
++-------
++
++void Release()
++``````````````
++
++	This method gets called when the service daemon
++	unregisters the profile. The profile can use it to do cleanup tasks.
++	There is no need to unregister the profile, because when this method
 +	gets called it has already been unregistered.
 +
 +Properties
 +----------
 +
-+string Type [readonly]
-+``````````````````````
++array{string} UUIDs [read-only]
++```````````````````````````````
 +
-+	Determines the type of advertising packet requested.
-+
-+	Possible values:
-+
-+	:"broadcast":
-+	:"peripheral":
-+
-+array{string} ServiceUUIDs
-+``````````````````````````
-+
-+	List of UUIDs to include in the "Service UUID" field of the Advertising
-+	Data.
-+
-+dict ManufacturerData
-+`````````````````````
-+
-+	Manufacturer Data fields to include in the Advertising Data.  Keys are
-+	the Manufacturer ID to associate with the data.
-+
-+array{string} SolicitUUIDs
-+``````````````````````````
-+
-+	Array of UUIDs to include in "Service Solicitation" Advertisement Data.
-+
-+dict ServiceData
-+````````````````
-+
-+	Service Data elements to include. The keys are the UUID to associate
-+	with the data.
-+
-+dict Data [Experimental]
-+````````````````````````
-+
-+	Advertising Data to include. Key is the advertising type and value is
-+	the data as byte array.
-+
-+	Note: Types already handled by other properties shall not be used.
-+
-+	Possible values:
-+
-+	:<type>:
-+
-+		<byte array>
-+
-+	Example:
-+		<Transport Discovery> <Organization Flags...>
-+		0x26                   0x01         0x01...
-+
-+bool Discoverable [Experimental]
-+````````````````````````````````
-+
-+	Advertise as general discoverable. When present this will override
-+	adapter Discoverable property.
-+
-+	Note: This property shall not be set when **Type** is set to
-+	"broadcast".
-+
-+uint16 DiscoverableTimeout [Experimental]
-+`````````````````````````````````````````
-+
-+	The discoverable timeout in seconds. A value of zero means that the
-+	timeout is disabled and it will stay in discoverable/limited mode
-+	forever.
-+
-+	Note: This property shall not be set when **Type** is set to
-+	"broadcast".
-+
-+array{string} Includes
-+``````````````````````
-+
-+	List of features to be included in the advertising packet.
-+
-+	Possible values:
-+
-+	See **org.bluez.LEAdvertisingManager(5)** **SupportedIncludes**
-+	property.
-+
-+string LocalName
-+````````````````
-+
-+	Local name to be used in the advertising report. If the string is too
-+	big to fit into the packet it will be truncated.
-+
-+	If this property is available 'local-name' cannot be present in the
-+	**Includes**.
-+
-+uint16 Appearance
-+`````````````````
-+
-+	Appearance to be used in the advertising report.
-+
-+	Possible values: as found on GAP Service.
-+
-+uint16_t Duration
-+`````````````````
-+
-+	Rotation duration of the advertisement in seconds. If there are other
-+	applications advertising no duration is set the default is 2 seconds.
-+
-+uint16_t Timeout
-+````````````````
-+
-+	Timeout of the advertisement in seconds. This defines the lifetime of
-+	the advertisement.
-+
-+string SecondaryChannel [Experimental]
-+``````````````````````````````````````
-+
-+	Secondary channel to be used. Primary channel is always set to "1M"
-+	except when "Coded" is set.
-+
-+	Possible value:
-+
-+	:"1M" (default):
-+	:"2M":
-+	:"Coded":
-+
-+uint32 MinInterval [Experimental]
-+`````````````````````````````````
-+
-+	Minimum advertising interval to be used by the advertising set, in
-+	milliseconds. Acceptable values are in the range [20ms, 10,485s].
-+	If the provided MinInterval is larger than the provided MaxInterval,
-+	the registration will return failure.
-+
-+uint32 MaxInterval [Experimental]
-+`````````````````````````````````
-+
-+	Maximum advertising interval to be used by the advertising set, in
-+	milliseconds. Acceptable values are in the range [20ms, 10,485s]. If the
-+	provided MinInterval is larger than the provided MaxInterval, the
-+	registration will return failure.
-+
-+int16 TxPower [Experimental]
-+````````````````````````````
-+
-+	Requested transmission power of this advertising set. The provided value
-+	is used only if the "CanSetTxPower" feature is enabled on the
-+	**org.bluez.LEAdvertisingManager(5)**. The provided value must be in
-+	range [-127 to +20], where units are in dBm.
-diff --git a/doc/org.bluez.LEAdvertisingManager.rst b/doc/org.bluez.LEAdvertisingManager.rst
++	128-bit GATT service UUIDs to auto connect.
+diff --git a/doc/org.bluez.GattService.rst b/doc/org.bluez.GattService.rst
 new file mode 100644
-index 000000000000..b9d5cafc6ff3
+index 000000000000..4a1e81fc9e03
 --- /dev/null
-+++ b/doc/org.bluez.LEAdvertisingManager.rst
-@@ -0,0 +1,144 @@
-+==============================
-+org.bluez.LEAdvertisingManager
-+==============================
++++ b/doc/org.bluez.GattService.rst
+@@ -0,0 +1,79 @@
++=====================
++org.bluez.GattService
++=====================
 +
 +-------------------------------------------------
-+BlueZ D-Bus LEAvertisingManager API documentation
++BlueZ D-Bus GattService API documentation
 +-------------------------------------------------
 +
 +:Version: BlueZ
@@ -616,137 +1392,72 @@ index 000000000000..b9d5cafc6ff3
 +:Manual section: 5
 +:Manual group: Linux System Administration
 +
++Description
++===========
++
++GATT local/server and remote/client services share the same high-level D-Bus
++API.
++
++Local/Server refers to GATT based service exported by a plugin or an external
++application.
++
++Remote/Client refers to GATT services exported by the peer.
++
 +Interface
 +=========
 +
-+The Advertising Manager allows external applications to register Advertisement
-+Data which should be broadcast to devices.  Advertisement Data elements must
-+follow the API for LE Advertisement Data described above.
++Client
++------
 +
 +:Service:	org.bluez
-+:Interface:	org.bluez.LEAdvertisingManager1
-+:Object path:	/org/bluez/{hci0,hci1,...}
++:Interface:	org.bluez.GattService1
++:Object path:	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX
 +
-+Methods
-+-------
++Server
++------
 +
-+void RegisterAdvertisement(object advertisement, dict options)
-+``````````````````````````````````````````````````````````````
-+
-+	Registers an advertisement object to be sent over the LE Advertising
-+	channel.  The service must implement **org.bluez.LEAdvertisement(5)**
-+	interface.
-+
-+	Possible errors:
-+
-+	:org.bluez.Error.InvalidArguments:
-+
-+		Indicates that the object has invalid or conflicting properties.
-+
-+	:org.bluez.Error.AlreadyExists:
-+
-+		Indicates the object is already registered.
-+
-+	:org.bluez.Error.InvalidLength:
-+
-+		Indicates that the data provided generates a data packet which
-+		is too long
-+
-+	:org.bluez.Error.NotPermitted:
-+
-+		Indicates the maximum number of advertisement instances has
-+		been reached.
-+
-+void UnregisterAdvertisement(object advertisement)
-+``````````````````````````````````````````````````
-+
-+	Unregisters an advertisement that has been previously registered using
-+	**RegisterAdvertisement()**.  The object path parameter must match the
-+	same value that has been used on registration.
-+
-+	Possible errors:
-+
-+	:org.bluez.Error.InvalidArguments:
-+	:org.bluez.Error.DoesNotExist:
++:Service:	unique name
++:Interface:	org.bluez.GattService1
++:Object path:	freely definable
 +
 +Properties
 +----------
 +
-+byte ActiveInstances [readonly]
-+```````````````````````````````
++string UUID [read-only]
++```````````````````````
 +
-+	Number of active advertising instances.
++	128-bit service UUID.
 +
-+byte SupportedInstances [readonly]
-+``````````````````````````````````
++boolean Primary [read-only]
++```````````````````````````
 +
-+	Number of available advertising instances.
++	Indicates whether or not this GATT service is a primary service. If
++	false, the service is secondary.
 +
-+array{string} SupportedIncludes [readonly]
-+``````````````````````````````````````````
++object Device [read-only, optional]
++```````````````````````````````````
 +
-+	List of supported system includes.
++	Object path of the Bluetooth device the service belongs to. Only
++	present on services from remote devices.
 +
-+	Possible values:
++array{object} Includes [read-only, optional]
++````````````````````````````````````````````
 +
-+	:"tx-power":
-+	:"appearance":
-+	:"local-name":
-+	:"rsi":
++	Array of object paths representing the included services of this
++	service.
 +
-+array{string} SupportedSecondaryChannels [readonly, Experimental]
-+`````````````````````````````````````````````````````````````````
++uint16 Handle [read-only] (client only)
++```````````````````````````````````````
 +
-+	List of supported Secondary channels. Secondary channels can be used to
-+	advertise with the corresponding PHY.
++	Service handle.
 +
-+	Possible values:
++uint16 Handle [read-write, optional] (Server Only)
++``````````````````````````````````````````````````
 +
-+	:"1M":
-+	:"2M":
-+	:"Coded":
-+
-+dict SupportedCapabilities [readonly, Experimental]
-+```````````````````````````````````````````````````
-+
-+	Enumerates Advertising-related controller capabilities useful to the
-+	client.
-+
-+	Possible Values:
-+
-+	:byte MaxAdvLen:
-+
-+		Max advertising data length
-+
-+	:byte MaxScnRspLen:
-+
-+		Max advertising scan response length
-+
-+	;int16 MinTxPower:
-+
-+		Min advertising tx power (dBm)
-+
-+	:int16 MaxTxPower:
-+
-+		Max advertising tx power (dBm)
-+
-+array{string} SupportedFeatures [readonly,optional,Experimental]
-+````````````````````````````````````````````````````````````````
-+
-+	List of supported platform features. If no features are available on
-+	the platform, the SupportedFeatures array will be empty.
-+
-+	Possible values:
-+
-+	:"CanSetTxPower":
-+
-+		Indicates whether platform can specify tx power on each
-+		advertising instance.
-+
-+	:"HardwareOffload":
-+
-+		Indicates whether multiple advertising will be offloaded to the
-+		controller.
++	Service handle. When available in the server it would attempt to use to
++	allocate into the database which may fail, to auto allocate the value
++	0x0000 shall be used which will cause the allocated handle to be set
++	once registered.
 -- 
 2.41.0
 
