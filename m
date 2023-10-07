@@ -2,94 +2,132 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6313E95A61
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  7 Oct 2023 10:12:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 947D0E95A61
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  7 Oct 2023 11:39:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343733AbjJGKM2 (ORCPT
+        id S1343878AbjJGLjb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 7 Oct 2023 06:12:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40968 "EHLO
+        Sat, 7 Oct 2023 07:39:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234148AbjJGKM1 (ORCPT
+        with ESMTP id S233669AbjJGLja (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 7 Oct 2023 06:12:27 -0400
-Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92E9692
-        for <linux-bluetooth@vger.kernel.org>; Sat,  7 Oct 2023 03:12:26 -0700 (PDT)
-Received: by mail-ot1-x329.google.com with SMTP id 46e09a7af769-6c7bbfb7a73so1972354a34.3
-        for <linux-bluetooth@vger.kernel.org>; Sat, 07 Oct 2023 03:12:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696673546; x=1697278346; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=K5iM9N2DAv9GqnRngNRoNpQ/h3/1GnSmZJ17Mp+sf2w=;
-        b=mHK8AFguIkz+p/QOZd0CydnaBqBUoKFJI7nZqVnVjIbfLxaB5bNenGT86tyMliAC/n
-         xuzv3pPHSsdYuB0oGKH7zJMM1o6Ms7w4GRNx7TzW0t6RuhASEH+hCQhI+hqmD8KiD0sj
-         4sIVtBAikrsle4yez9CPruHmlyEs/6OmikfX3iWuXCL47nPQMxTeknULZeSum/uy3wLm
-         1sq20BR0rkkk83ZJRiacRyfOX8ZM2lKx/iD80FMtkQcTO7xt3i2fluYniQQdych5X+qj
-         A9At/wUfmE99+jnfCnQkRCDl5/m/xyvQ6iRTB3EEUHlbLRIcxHNbUjVijswfZLU+pUbg
-         YepA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696673546; x=1697278346;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=K5iM9N2DAv9GqnRngNRoNpQ/h3/1GnSmZJ17Mp+sf2w=;
-        b=lL9zBD6wSrH5Et62O4O9Ruqpfkss47f3kAchP54DJ3WWY67eJlg4/vZ/70sj6GCLFz
-         u6qYjBZz5cMi7HdJxxISKTTBphQ23MXLdgR+RFU9u414oihe0Mb0/jRRG8vByE358zEq
-         EJPXsn0CT6y5Z7L1uWgNNKf0xwGaZ8W7zEVIg8Y68KA0/g1OOxnuwtiDOrornDMxBd0o
-         vaKl+BLZRboIxl6gw+jOymzqaDBTjX8NbSwWqHchiz0bzdNinw4FQliveCCMkscRU6t0
-         kAnsO5C8a40sjnoFmBbGryA40SPKlLPNF3zDpkzrZq4XESbLqp50uNsY49lgpjccgVW4
-         pM9g==
-X-Gm-Message-State: AOJu0YxitYlInf9VSDkViGTr3Aq4czN3s1UZqiUbQppR1u8zVLa/f7qL
-        JnLfxs3klBcSG2pYBLLYpVXiGvVeRLs=
-X-Google-Smtp-Source: AGHT+IF7LducNA8yudGCO80wLGqeEa6wbRSnkOgAlIqg/ir7EWe8tOO7Hx3diWEWSFWFAFDGZ78bag==
-X-Received: by 2002:a05:6830:1d6c:b0:6b9:9f84:dc8b with SMTP id l12-20020a0568301d6c00b006b99f84dc8bmr10300941oti.19.1696673545644;
-        Sat, 07 Oct 2023 03:12:25 -0700 (PDT)
-Received: from [172.17.0.2] ([40.84.173.123])
-        by smtp.gmail.com with ESMTPSA id w19-20020a9d6753000000b006c480563197sm868626otm.26.2023.10.07.03.12.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 07 Oct 2023 03:12:25 -0700 (PDT)
-Message-ID: <65212f09.9d0a0220.33713.590c@mx.google.com>
-Date:   Sat, 07 Oct 2023 03:12:25 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8294532496178716783=="
+        Sat, 7 Oct 2023 07:39:30 -0400
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05olkn2034.outbound.protection.outlook.com [40.92.89.34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CAC1B6;
+        Sat,  7 Oct 2023 04:39:28 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fIQlwNPAOV+mQu5LhpSf+F3WUE3wP41CsV/hySql0vi6AHZ2uQIEWGmtb6IDDr/K9pZZEO2VZAUpjW3h6WbsJ052LVzVWNcTDFv8ttC8ACayXr2lwhe1te6XGj/wwbeVE3dHAIZGq8ZPUl3qgWQddRcEatgnpq4iglpIBO/pEtQpevaL3w9AGdcdhryqQ7O7XjCO2BHmIPcW/LZClz9rFIrmm1ixW47QAx1FsKv6TryxII49EyjTc1kdq3TGiq8Nt4cDSNnYZyCS849s/Bo39Fid77zbXujfQir+xpXVH4Gz5pSgirpv5JqjGizlOODR5CDacvDzb6eORHBERbLYEQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=lnLyyMJP8yRxdOnJ0/PrBjD4FhLJ2rx1lMdub3vQl64=;
+ b=atjsP6KphjwUHRNPSOWor/SkOIAxdIuWJwJfdBTj2AbMCXUAOvJKJSXfKyqrmSFLIgW2WWvNSc2o4I9J9zxLfnA2B31CaOaCq9wTqD4kChaBT4L/ijn1e3zowMvl6weplhvOu+dIzSQJc9FCsdovjAiHDANGlsq1O16+kK7JNodiLSvkAkKOabApf5Z9u4IjPrwhdhV2U18WQA8LYUX4vrURSeA6dILdzmc0VnTVjM/gpwfn0xldpkJxuSFkHMWjQr0uGF+eMCSjA4JZ6ISLORWVZ/gJnriJMeGC6jKmX98kCUxe4bRCofNSZIRnLPNnAyvPpq50VKN0vGe8YlN0jw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lnLyyMJP8yRxdOnJ0/PrBjD4FhLJ2rx1lMdub3vQl64=;
+ b=XyGghgS1kAaSvXFKO9q/AwndEQjrXI0Y9Yi7Y507Y6cssBB2XuutprLam8NajAmfAZ/JVLI2HDND1bIra97R60PeuLsr+74584uIakqCipEwQ7Vgspo7xn5g7WMzEtejZwHLL2caY+w6dCj0UUeM2mTwSAU0BK2u31o4APlVsOEoPvCp+EYp7WmCpVbFKJAJM6wWFQMK6xP8nKqvKzw/ollHAcTrsFk3Xg+Wl3nlAqzsKntQ9IKtsLob/p6Jh2cWDMsQccFJiH9XKHKVgYtMNYcbgZqOXOG2VWC6xNWCUQOfQ5Eh8qkaEYag6sY0a8QArLKx1wxPNAP9/GQ1iZ21eA==
+Received: from AM9P192MB1267.EURP192.PROD.OUTLOOK.COM (2603:10a6:20b:3a7::7)
+ by DB5P192MB2197.EURP192.PROD.OUTLOOK.COM (2603:10a6:10:4a7::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.38; Sat, 7 Oct
+ 2023 11:39:26 +0000
+Received: from AM9P192MB1267.EURP192.PROD.OUTLOOK.COM
+ ([fe80::628d:d050:3672:a203]) by AM9P192MB1267.EURP192.PROD.OUTLOOK.COM
+ ([fe80::628d:d050:3672:a203%7]) with mapi id 15.20.6838.033; Sat, 7 Oct 2023
+ 11:39:26 +0000
+From:   Yuran Pereira <yuran.pereira@hotmail.com>
+To:     marcel@holtmann.org
+Cc:     Yuran Pereira <yuran.pereira@hotmail.com>, johan.hedberg@gmail.com,
+        luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        syzbot+39ec16ff6cc18b1d066d@syzkaller.appspotmail.com
+Subject: [PATCH] Bluetooth: hci_conn_failed: Fixes memory leak
+Date:   Sat,  7 Oct 2023 17:09:01 +0530
+Message-ID: <AM9P192MB12672AA34A0480B522D23741E8C8A@AM9P192MB1267.EURP192.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN:  [92CQgJDPQ3qekFenKEftQSxTumWaYRYm]
+X-ClientProxiedBy: JN2P275CA0040.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:2::28)
+ To AM9P192MB1267.EURP192.PROD.OUTLOOK.COM (2603:10a6:20b:3a7::7)
+X-Microsoft-Original-Message-ID: <20231007113901.206517-1-yuran.pereira@hotmail.com>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, william.xuanziyang@huawei.com
-Subject: RE: Bluetooth: Fix UAF for hci_chan
-In-Reply-To: <20231007093521.2404844-1-william.xuanziyang@huawei.com>
-References: <20231007093521.2404844-1-william.xuanziyang@huawei.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9P192MB1267:EE_|DB5P192MB2197:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0ba6f99a-0493-41d7-56f5-08dbc72a0ecb
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: aSRWJLKdLfkn/gmXV567fc7b47eIUCYdxc+B4XVS9NljW7Pqx+pRkr2+bDuzroH1rMca9Q/Yohbwz/1PuCkO1qS7QoN4LCFAJ5Rb5Toi91I/QSRs9N6anOtngh9Mrl4Y6EdF9BvMEfq14iBP/SosImZ5gDE7HR6Zky9beifj6rqTqeJeZ9Z4NDlhMjzY/GtqWKGJc6MQwXvnJdgGEjv0MnpBScOqZTASroyRobzCBBWvFEI8D+nU87N9p/zeolGYhwg9OSTtUjoaNOIBsEZsWf5i0F/1nZJ/04siZi91pBNAnDhAbtjdRLUPsVJW43if8/2M5BzqOBIu20HltUiOssuL9NzXLZY/vP/eR7g2M+DkJ7A+H1kzTbRYgiikr0eyD2oHTIBdIu8STzBSKe7n6EcA/t+wkK+egbIGDAttJACvHJNlyVTcYZfZZ0jd9Dv0LCrT/zBHEM0tk7Gl5Paw6TtlxTauf4yaPCaB3zej2lN/heM9WFR/7Rfy/kPy3cR3Nr0PzBIcGaQyBp7BHSWillnuc4HxQ1/iuA4VoI4zXCcSiifDCepfDBN91fJFbe4WeA8c1H6/0lG0eufn3233RSOEatTfWIQzRrmfKJA9V/iSDGVysH0FIFJmAS6VpdrE
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?9C+g7i+d25tDpTPrMi5n9n1iJRUGyfLa9GofXmclFdm8wpU7bPrc9tsrGRKF?=
+ =?us-ascii?Q?QoEsyGkHtM7OgKvnHamg+Pq5ngJKu5gsZSTyp05jkGhqvGBOZsTz4ZGCVZw0?=
+ =?us-ascii?Q?TdGLJ1vwxwlUzA4UzxW6hraxPfUdoeBHMEburQtuvJQ0k8lG/7Ko7CMGiY1/?=
+ =?us-ascii?Q?mcuYSLfNSBNic/AahO2XDBtxUVWo0xjGmduCU2yQPdhlI1k6R6fXxLFEn4Si?=
+ =?us-ascii?Q?wi6IJ8RFw2sc1+Pd/jhf6u9c2xlQ+YSnx+T4GwzCRxFCMP9b8AVHjuE5ZG9B?=
+ =?us-ascii?Q?fLRRmSsZ86ITLOz/GYfGDgUlB7Pfaa6BjavodWSOsC7WjkjEZzNDO8A46Y5S?=
+ =?us-ascii?Q?+3Qt1qnwuUcS784zAVXnjuSRS6vXfl3+UfZNDU81T/26bx+g8DXEeyTSRrr1?=
+ =?us-ascii?Q?xtuOM0gGI+LTPNcTwINUbbkMcwUfEwDLHUYphAO/i19OvCQi5Kx56SVZ/tN1?=
+ =?us-ascii?Q?TkzFiudPrRS63y9/G1bej76qUJDVh5oPnLBASt6Yo7gfq77tupDnN+xeGiDX?=
+ =?us-ascii?Q?Guei6XlvNgek0S864URAZxzgrEltXfy6/YBBxiIk+tV12OS9j2Iq8TcfpUKU?=
+ =?us-ascii?Q?OBmwevZJz1HpTSlYkH2vdyvQ5da4VbtO9+R2qPjqhzFejV1N5Y4bkPRHD1YO?=
+ =?us-ascii?Q?WyJ31fefrnGwJPi/mU6tHuCoDBC7gE8cbKVyhe3+qZkngKT+09U63cqGjr9n?=
+ =?us-ascii?Q?a7wm31fpW/nXBTLSrE3XAy9w92uIjGNZoWVE3r5fYPEU919EXG16EvTVClLP?=
+ =?us-ascii?Q?1CBulP5PMRmrbUUq9KZC5CfrnGR3dxxIlTbJuR80uzDZ0DOHydyy5/RgQZRa?=
+ =?us-ascii?Q?t2IS6OP3TdoMt5S51DGgSdCrB709jeXzwITUgfD35S5K3qA6lPsbNOVdPPDc?=
+ =?us-ascii?Q?AlPfnpE0M4beuu83DqzJ5hY6LrdJHFgpeS+QwCMtaqQ1EMntn72v5T4mqIS/?=
+ =?us-ascii?Q?ffumKg7Qq/HRL79s5rKx4RdQastNEw39aNpxbpRAbcvTCLLXkIECFAo9eSfA?=
+ =?us-ascii?Q?zsoS0FU68gKeMh72nqi9Jj6h61HJdoMQVrjPwmQUoCndWsekncpVAvKqMs4x?=
+ =?us-ascii?Q?HPHDiybN3MavVu3VN5nRa+uGVMI/d3Yc5Rzf9Vmp+jLo2hPLTnGTpeSbZZQv?=
+ =?us-ascii?Q?zfoW+3LueIJPL5E2o+rb2tPX0p9DIjRng+/pEvt71LVE9opJdKEHRg01dyg+?=
+ =?us-ascii?Q?PHgf4gWkUBy1I2Uh6UKlhIPpDq4gt43NESvf9RBxkY2GCFrLTlZ+PQ1NKOs?=
+ =?us-ascii?Q?=3D?=
+X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-fb43a.templateTenant
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0ba6f99a-0493-41d7-56f5-08dbc72a0ecb
+X-MS-Exchange-CrossTenant-AuthSource: AM9P192MB1267.EURP192.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Oct 2023 11:39:26.5978
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB5P192MB2197
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8294532496178716783==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+The hci_conn_failed() function currently calls hci_connect_cfm(), which
+indirectly leads to the allocation of an l2cap_conn struct in l2cap_conn_add().
+This operation results in a memory leak, as the l2cap_conn structure
+becomes unreferenced.
 
-This is an automated email and please do not reply to this email.
+To address this issue and prevent the memory leak, this patch modifies
+hci_conn_failed() to replace the call to hci_connect_cfm() with a
+call to hci_disconn_cfm().
 
-Dear Submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-
-error: patch failed: include/net/bluetooth/hci_core.h:350
-error: include/net/bluetooth/hci_core.h: patch does not apply
-error: patch failed: net/bluetooth/hci_core.c:2786
-error: net/bluetooth/hci_core.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
+Reported-by: syzbot+39ec16ff6cc18b1d066d@syzkaller.appspotmail.com
+Signed-off-by: Yuran Pereira <yuran.pereira@hotmail.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hci_conn.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 7a6f20338db8..1d2d03b4a98a 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1248,7 +1248,7 @@ void hci_conn_failed(struct hci_conn *conn, u8 status)
+ 	}
+ 
+ 	conn->state = BT_CLOSED;
+-	hci_connect_cfm(conn, status);
++	hci_disconn_cfm(conn, status);
+ 	hci_conn_del(conn);
+ }
+ 
+-- 
+2.25.1
 
---===============8294532496178716783==--
