@@ -2,115 +2,139 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F3CECD611C
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Oct 2023 18:23:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F117CD612D
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Oct 2023 19:42:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377444AbjJISXb (ORCPT
+        id S1378451AbjJITml (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 9 Oct 2023 14:23:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36570 "EHLO
+        Mon, 9 Oct 2023 15:42:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346618AbjJISXb (ORCPT
+        with ESMTP id S1378443AbjJITml (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 9 Oct 2023 14:23:31 -0400
-Received: from out3-smtp.messagingengine.com (out3-smtp.messagingengine.com [66.111.4.27])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 137129C;
-        Mon,  9 Oct 2023 11:23:30 -0700 (PDT)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailout.nyi.internal (Postfix) with ESMTP id 7A83B5C02A5;
-        Mon,  9 Oct 2023 14:23:29 -0400 (EDT)
-Received: from imap50 ([10.202.2.100])
-  by compute5.internal (MEProxy); Mon, 09 Oct 2023 14:23:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-        :cc:content-type:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm2; t=1696875809; x=1696962209; bh=Wc
-        d9Ij4JYV1E+nR/hpGySlpt2XMckRY/pSxHN2nuT44=; b=XV7aUMVw6tBmZF3184
-        benoVGAqBsGo6v+7HlonfIiZ2GxFf+B7g/2BoXMSSxJxX1Yvb88PYiXT5YaD4yod
-        wjnvP9vFBgO/REAxQc3h84AdLI351ANAvIlM59fYsk+8uLEAWze3aXTwUVZdJJQw
-        FHJCONrZSeQnPABoXquUds7I+7OlWSnHjUetjPQNgIKT7vAjDuLO9oryuRtqpzDX
-        gKX296v1suXSoXehtKhgs1JV7H0t6WVMbz4PRAwoSp/zSxmFhdps3nb/UsbY0xTC
-        q8WRta6MXRTD/tO9huHomZj4jCa2Ig8YAIIy/c5h2F0lyoYTHMN9Z916aPjQhH/T
-        AFZg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:content-type:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm2; t=1696875809; x=1696962209; bh=Wcd9Ij4JYV1E+
-        nR/hpGySlpt2XMckRY/pSxHN2nuT44=; b=bFwMxcn/u/mOSCI/OoRvcCkh7yPnT
-        PEUWerddl5JyuFUlZuj8wKEfufOjYZXmVZBzpXnkP7aqabXUS/UnyIgO9oA9iwJJ
-        wVYnUNF8EIReb2/VPhqb8S3iHcjMVXkMxK/laoO/ajSFqTyU1fJFbpTTfPvVbj1T
-        ZsLwdBcafWXJ7vFw3/Yfy8rBieGi9JOrBZ7KIiVGdo8uVNhmczmuWsB0ZxYOFu9B
-        MSJB5a1QhfioUudWn7yybpmgV3bPZRPcop8arFqsmN1JmwYNiAav/NnjthnvE1Uq
-        3uBjUds8dHkIU+Fw/i2GBKjWB8oHlFhRijfP6ZLqiRsLQwTYOagopq5Sw==
-X-ME-Sender: <xms:IUUkZfx61kLuqlmo_Xzt6mxU03h4sdJtBGdE6bwdxFtLLUDD82MeYg>
-    <xme:IUUkZXThFlhaKZOfEz0udhCU2YQmizYf74jZHxbMRWlkaUUIR4ju_EsIxKixDVrp5
-    7rB5ttvswOf0wmuXPk>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrheefgdduvdegucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
-    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
-    htvghrnhepgeetiefhjedvhfeffffhvddvvdffgfetvdetiefghefhheduffeljeeuuddv
-    lefgnecuffhomhgrihhnpehprghsthgvsghinhdrtghomhenucevlhhushhtvghrufhiii
-    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggv
-X-ME-Proxy: <xmx:IUUkZZWOnHZ6D_AxNeVCRq48W-cLG71GQCa-yh5fcIdqIfw_-TupmA>
-    <xmx:IUUkZZj_ARXhwR4BgEavEGWjgVSLRNF2IFmBYPV6E7RXcBc8zwvDLA>
-    <xmx:IUUkZRAo4Gl-XuQUUf5XAr51WrvBtD0DYn9pqbHwCZf_ZN6C3UU0pA>
-    <xmx:IUUkZZZJzi5o-nTsyjt6CK0RtWwN_XVrxH_wbLntoKHmaGTZ_IknIg>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id E93751700089; Mon,  9 Oct 2023 14:23:28 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-958-g1b1b911df8-fm-20230927.002-g1b1b911d
+        Mon, 9 Oct 2023 15:42:41 -0400
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5601B6
+        for <linux-bluetooth@vger.kernel.org>; Mon,  9 Oct 2023 12:42:39 -0700 (PDT)
+Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2b9d07a8d84so61781251fa.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Oct 2023 12:42:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696880558; x=1697485358; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aUCAdcJRNl7fOVahEJi4wyoNXnCF3/Nv5hIB7ql4CN4=;
+        b=cpaTsOBTNhHHWrLNaOLkmIhHwHXa2kRD65pVd3cbLwuKKpLWS8b1p4LBzUu3M+lzPy
+         WjHKtAIz9Cq848yBVsq3ungjZY0OBQRhjrlvqg5PXCpuA8trrJQZAh35vJsGcH0YIM3y
+         cJ+dbEz8e8o85vPPDVPDYoNU7om7Q56+FcFKwTYslDNzRHzU4K3gYDN8Yc0x/HBfV6/y
+         33sMn+CgCa05f29s5TcFPZZ5WS+5kREYvmAWP7wMAfC9XGEDk2q2eyeEjuPOYtQ54YEy
+         YPiPRHJKOA+6/rfpAp5TySYtiARYGewCqYUvuSL3kldZ4X8nvPjHL3RXOmCkB9yMQfC0
+         iXCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696880558; x=1697485358;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aUCAdcJRNl7fOVahEJi4wyoNXnCF3/Nv5hIB7ql4CN4=;
+        b=P1h4nxkdEkjZLuh8BGrxu2vzo2OR+2hW9KOslZO28fKDvz9TzjbQlk7Y+rYgcZRVMD
+         w2Bo6b0DvWL3d1wCcdBgJ523dJckaTImC2zkpZledhblC+PvcWXb8nez2EKy0S8FAL0e
+         DSiJfWucIsoKsPtmHZEzyJ2WocesQB5MDeAmBqGUjeA8ryPKCzPfsWqFZ2VT1B48dJbn
+         Fqo25eZHXHEA0h/BiXhdiD2klIVv/CmgJEbdXv/4q3ttzfJIb1K+QzQfglO8z89rDIYS
+         wBcawOZVP7L9a1DUmcI0yYwnIvEsFQa2QogPDIH9PYCK8XAiNaTFam+MzcVHiJtjeKf8
+         bnbw==
+X-Gm-Message-State: AOJu0YyxC6Z433oKknYMwo3NpnleBr/bI2c6rlyICG9sbv3zqWfcWfis
+        LBzCUcU4tlbVzPuqPYqeJSpclRogBoFS7rDLgUc=
+X-Google-Smtp-Source: AGHT+IEon7AbB/VEewfixxgGlYTyOfVioVBLzaD4HUKyYXkprSlaLlOMACJtDFinl8mBLDKswx+WJD7G2qu/S1dhWno=
+X-Received: by 2002:a2e:9001:0:b0:2c1:7df1:14a6 with SMTP id
+ h1-20020a2e9001000000b002c17df114a6mr15020668ljg.9.1696880557717; Mon, 09 Oct
+ 2023 12:42:37 -0700 (PDT)
 MIME-Version: 1.0
-Message-Id: <73f552a4-4ff5-441a-a624-ddc34365742f@app.fastmail.com>
-In-Reply-To: <202310090902.10ED782652@keescook>
-References: <20231009134826.1063869-1-arnd@kernel.org>
- <2abaad09-b6e0-4dd5-9796-939f20804865@app.fastmail.com>
- <202310090902.10ED782652@keescook>
-Date:   Mon, 09 Oct 2023 20:23:08 +0200
-From:   "Arnd Bergmann" <arnd@arndb.de>
-To:     "Kees Cook" <keescook@chromium.org>
-Cc:     "Arnd Bergmann" <arnd@kernel.org>,
-        "Marcel Holtmann" <marcel@holtmann.org>,
-        "Johan Hedberg" <johan.hedberg@gmail.com>,
-        "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        "Eric Dumazet" <edumazet@google.com>,
-        "Jakub Kicinski" <kuba@kernel.org>,
-        "Paolo Abeni" <pabeni@redhat.com>, "Chun-Yi Lee" <jlee@suse.com>,
-        "Luiz Augusto von Dentz" <luiz.von.dentz@intel.com>,
-        stable@vger.kernel.org,
-        "Iulia Tanasescu" <iulia.tanasescu@nxp.com>,
-        "Wenjia Zhang" <wenjia@linux.ibm.com>,
-        linux-bluetooth@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: mark bacmp() and bacpy() as __always_inline
-Content-Type: text/plain
+References: <CGME20230928134517eucas1p296d2f03574a8948e642cfbfb5826539b@eucas1p2.samsung.com>
+ <20230928134506.130545-1-a.bokowy@samsung.com> <CABBYNZ+=c_G9wRRw4BvzypSu980ThzzdcUz_jMthe5_UZnE9Ew@mail.gmail.com>
+ <94802ffc-9949-c968-ab96-e63f98cb684a@samsung.com>
+In-Reply-To: <94802ffc-9949-c968-ab96-e63f98cb684a@samsung.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 9 Oct 2023 12:42:25 -0700
+Message-ID: <CABBYNZJJE=WUbWck_2_MESEp=DOFxkL5nhdyjhaMs+1561VOHQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: MGMT: Synchronize scan start and LE Meta events
+To:     Arkadiusz Bokowy <a.bokowy@samsung.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Oct 9, 2023, at 18:02, Kees Cook wrote:
-> On Mon, Oct 09, 2023 at 05:36:55PM +0200, Arnd Bergmann wrote:
->> On Mon, Oct 9, 2023, at 15:48, Arnd Bergmann wrote:
->> 
->> Sorry, I have to retract this, something went wrong on my
->> testing and I now see the same problem in some configs regardless
->> of whether the patch is applied or not.
+Hi Arek,
+
+On Mon, Oct 9, 2023 at 2:25=E2=80=AFAM Arkadiusz Bokowy <a.bokowy@samsung.c=
+om> wrote:
 >
-> Perhaps turn them into macros instead?
+> Hi,
+>
+> >> +/* Wait for all pending HCI commands to complete.
+> >> + */
+> >> +void hci_cmd_sync_flush(struct hci_dev *hdev)
+> >> +{
+> >> +       flush_work(&hdev->cmd_sync_work);
+> >
+> > Afaik this will block waiting the work to complete which sounds a
+> > little dangerous especially if hdev has been locked.
+>
+> Yes, this will block wait for all tasks queued on the cmd_synd_work.
+> Unfortunately, I'm not very familiar (not yet) with BlueZ kernel
+> component, so I'm not saying that this solution is correct. I hoped
+> that someone with actual kernel knowledge will review it :)
+>
+> Anyway, my simple test case passes with such solution without any lockups=
+.
+>
+> Alternatively, I can move this block wait before hdev lock in
+> hci_le_*_adv_report_evt() functions.
+>
+> > Couldn't we just do:
+> >
+> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> > index 195aea2198a9..78f0a8fb0a19 100644
+> > --- a/net/bluetooth/hci_core.c
+> > +++ b/net/bluetooth/hci_core.c
+> > @@ -136,6 +136,7 @@ bool hci_discovery_active(struct hci_dev *hdev)
+> >          struct discovery_state *discov =3D &hdev->discovery;
+> >
+> >          switch (discov->state) {
+> > +       case DISCOVERY_STARTING:
+> >          case DISCOVERY_FINDING:
+> >          case DISCOVERY_RESOLVING:
+> >                  return true;
+>
+> I'm not sure whether it will fix the issue... I've tested it and it does
+> not pass my test with a delay added to the start_discovery_complete()
+> function. The problem here is with synchronization. Since the LE meta
+> event (device found) and start discovery completion might be processed
+> simultaneously... Also, it will not be true that discovery is active if
+> the state is "starting", because HCI might return error when enabling
+> scanning.
+>
+> There is other solution to my problem, though. In a real world case
+> scenario, it's not an issue that the LE meta event coming just after
+> scan enabled signal will be dropped, because there will be more such
+> events later. The problem is with btvirt, which does not "broadcasts" LE
+> meta events when discovering is enabled. So, I can "fix" btvirt instead
+> of patching the kernel, by repeatedly signaling LE meta events. This
+> will slightly increase CPU load with btvirt, but will work. What do you
+> think?
 
-I just tried that and still see the problem even with the macro,
-so whatever gcc is doing must be a different issue. Maybe it
-has correctly found a codepath that triggers this?
+Yeah, I think it is more of an issue with btdev then, perhaps we need
+to add a delay or something to generate the reports, or we keep
+generating them based on the scan parameters that way it would emulate
+a little bit better how it works with real controllers, that said keep
+in mind that we need to cancel all timers properly as well if we go
+ahead with this change.
 
-If you are able to help debug the issue better,
-see these defconfigs for examples:
+> Regards,
+> Arek
 
-https://pastebin.com/raw/pC8Lnrn2
-https://pastebin.com/raw/yb965unC
 
-     Arnd
+
+--=20
+Luiz Augusto von Dentz
