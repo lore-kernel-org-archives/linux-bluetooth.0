@@ -2,61 +2,61 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB5CDE9371F
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Oct 2023 23:30:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D619EE9413E
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Oct 2023 23:30:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379101AbjJIXaA (ORCPT
+        id S1379133AbjJIXaC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 9 Oct 2023 19:30:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59008 "EHLO
+        Mon, 9 Oct 2023 19:30:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379105AbjJIX35 (ORCPT
+        with ESMTP id S1379118AbjJIX36 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 9 Oct 2023 19:29:57 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5821EA4
-        for <linux-bluetooth@vger.kernel.org>; Mon,  9 Oct 2023 16:29:50 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1c8a1541233so12601785ad.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Oct 2023 16:29:50 -0700 (PDT)
+        Mon, 9 Oct 2023 19:29:58 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00268D3
+        for <linux-bluetooth@vger.kernel.org>; Mon,  9 Oct 2023 16:29:54 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1c63164a2b6so44790825ad.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Oct 2023 16:29:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696894188; x=1697498988; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1696894193; x=1697498993; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=gkPh2UbzNSyJBColBTH9IoJdkJTLS0KGu6b2bTjbbRM=;
-        b=Cslg2cyr6+IsqCZTyGhxOqi5bymawJmNIkPB83AmecU8QDSfoCZia21t0oUBc4O0Xh
-         b3+YRWjF/MX+0LLW9GaDXt5OSmwNhv6T49sRTenrZPzydwhYP+J6XHN+RHpHjEVYr9hI
-         xghgqs8b0YZOhKRlVwV5XB05ZMynaw/5T786ST/0+dYVS5i4Li61ecTZoHO+64T3xtmt
-         sNMgkI02jEKTfsVTxjMhMWk5qajNECAtNSSmcVcNMgY/0/WPCOw0l8hj6h+qeXe+/UjY
-         x5YkCmu6PwgPTcqK0898EEHwKCK5viZYYLs5X2LNZtHsiDlybkiapxluw0h1c1BhIuPv
-         EdOQ==
+        bh=MbKjzGfYFvrYz69Oh9xHak9Tm1bwzVG1Okvcmnq9mbQ=;
+        b=C55mzXCywGd+3OSClnkH3A6lUYFvmeLO4zn8NACyrfl3K4vEb/AxvBvSQZhjb/2Tcc
+         WrO+SvmXsnsYKOpIbrSqJi3F++BXH4pA0a8fGKMrUkYbHsbAC6WvtZ7O56vaGMlBQJu5
+         lZF+evLc6zoXcYVF6tXvgMxtxOAkugRAK+bZ2jxHcHKbO25m8Y5vdXXJYFfNxVmpgxy2
+         sm9Q4DoqMTZBXkKsLvkPQgxL7Zc5Mhu75qncX366wVSIfZHvnNKItBIklhpSKaHzS3Gi
+         m2cu3TJg+ZxNE8IV9izbfvSvts+PbXCdCQ/IYmTsnDnsPtqXP+v1SZKo2GLvqHq2cyUT
+         PBag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696894188; x=1697498988;
+        d=1e100.net; s=20230601; t=1696894193; x=1697498993;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=gkPh2UbzNSyJBColBTH9IoJdkJTLS0KGu6b2bTjbbRM=;
-        b=cPDRM34mM0wn32xHrcARtE1QKr+kVE3BTMOiUMe61plSFGmples02mwFfF4cTyim+i
-         KPFn0effwXWotnnPZr/2pssOSEK/PHSxioB39kn0/FqAe8E7HLYfLoKvkrNZqJEk5w46
-         +zEAss8pn6TnkHT6Ee1mUACOTGV44JywvgKC5b67aAfPmQii/0gqoGmqF9CnvssWTr8H
-         G+qofAHRJg0GFF6p5RvEYYGcabfxSbzNMeQm2C12dGG+xFeX0FjEsVx4mjdwH7WeIhwO
-         FdjhyLJc6jiTABLdjj3Uc3bKFcnemmurLtHL2LRCnZNewcatDY9WghDQaZ4XezgaGl0A
-         z5Yg==
-X-Gm-Message-State: AOJu0YxpLG20mZbaY4tR6KVC6/JhJ1qZjf3eHVxsyjuVJ5WqqyE2oSKP
-        zUj0MRzAQOUBpm9L2ynPuNzViNV8JekQQ/14
-X-Google-Smtp-Source: AGHT+IFBFR1TNzLsZ4vLwV3IhaBxE99wWK8ESq3oyenuNRkKNqCs/tWgam8ejuw8kjM4Hyo/oryb2A==
-X-Received: by 2002:a17:902:e550:b0:1b9:e937:9763 with SMTP id n16-20020a170902e55000b001b9e9379763mr16646835plf.12.1696894188132;
-        Mon, 09 Oct 2023 16:29:48 -0700 (PDT)
+        bh=MbKjzGfYFvrYz69Oh9xHak9Tm1bwzVG1Okvcmnq9mbQ=;
+        b=nKp10qDC3dg1QCCc6PoQofccQ1fEHIQ5VuaK47eARZI7SjM6ciZVQYL2e1GyLUOwxl
+         J8Rbwzn5ELBy2RGhs90wJCKC1yAHiRa0WMlwCUHb8Zb8jJ78ONc23enIq/EPpHJ9kL/U
+         jZfLEbql9WWVJYyyOlDnWlYI4/mrHtFPKVGehpS9d8LBiIin7BeXMgFBV5TiFi+HJE/s
+         u0AagnQUi64oKXAk5A+5Xy49piiWAQm9CLvkBaV19T8pgBlJF4krylbo3qYjNzY6kHyF
+         /Chsm6pikw+/toPtu1jVte8F6/AKgpgmnFIhAIW6yUIX22sDN60R5RWC10uhOVlXw23I
+         7/mg==
+X-Gm-Message-State: AOJu0Yy6+qg6+VPjnPUWYqqaXBO/5vB0Vq/ebDGXkJ4SphAUdm6NR8kW
+        yqwbr6xcJIyzFA2kbbY6OI0tzX4emD+g1YsS
+X-Google-Smtp-Source: AGHT+IGFdZgVfENn8XCUK4IvKjVqEiiYcmmlWqCnKO6pp6tmA/FEiw1qrynQb3HdHIXidDfGha5RrQ==
+X-Received: by 2002:a17:902:c404:b0:1c9:9fa6:ce5b with SMTP id k4-20020a170902c40400b001c99fa6ce5bmr4945303plk.16.1696894193172;
+        Mon, 09 Oct 2023 16:29:53 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-98-232-221-87.hsd1.or.comcast.net. [98.232.221.87])
-        by smtp.gmail.com with ESMTPSA id s20-20020a170902989400b001c5b8087fe5sm10182711plp.94.2023.10.09.16.29.46
+        by smtp.gmail.com with ESMTPSA id s20-20020a170902989400b001c5b8087fe5sm10182711plp.94.2023.10.09.16.29.51
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Oct 2023 16:29:47 -0700 (PDT)
+        Mon, 09 Oct 2023 16:29:51 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 07/11] doc/advertising-api: Rename to org.bluez.LEAdvertis*.rst
-Date:   Mon,  9 Oct 2023 16:29:29 -0700
-Message-ID: <20231009232933.500652-7-luiz.dentz@gmail.com>
+Subject: [PATCH v2 10/11] doc/advertisement-monitor-api: Rename to org.bluez.AdvertisementMonitor*.rst
+Date:   Mon,  9 Oct 2023 16:29:32 -0700
+Message-ID: <20231009232933.500652-10-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231009232933.500652-1-luiz.dentz@gmail.com>
 References: <20231009232933.500652-1-luiz.dentz@gmail.com>
@@ -68,347 +68,262 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This renames advertising-api.txt to org.bluez.LEAdvertis*.rst and
-generate manpages org.bluez.LEAdvertis*.5.
+This renames advertisement-monitor-api.txt to
+org.bluez.AdvertisementMonitor*.rst and generate manpages
+org.bluez.AdvertisementMonitor*.5.
 ---
- Makefile.am                            |   7 +-
- doc/advertising-api.txt                | 278 -------------------------
- doc/org.bluez.LEAdvertisement.rst      | 195 +++++++++++++++++
- doc/org.bluez.LEAdvertisingManager.rst | 144 +++++++++++++
- 4 files changed, 345 insertions(+), 279 deletions(-)
- delete mode 100644 doc/advertising-api.txt
- create mode 100644 doc/org.bluez.LEAdvertisement.rst
- create mode 100644 doc/org.bluez.LEAdvertisingManager.rst
+ Makefile.am                                   |  12 +-
+ doc/advertisement-monitor-api.txt             | 187 ------------------
+ doc/org.bluez.AdvertisementMonitor.rst        | 153 ++++++++++++++
+ doc/org.bluez.AdvertisementMonitorManager.rst |  90 +++++++++
+ 4 files changed, 252 insertions(+), 190 deletions(-)
+ delete mode 100644 doc/advertisement-monitor-api.txt
+ create mode 100644 doc/org.bluez.AdvertisementMonitor.rst
+ create mode 100644 doc/org.bluez.AdvertisementMonitorManager.rst
 
 diff --git a/Makefile.am b/Makefile.am
-index f717d2c2336b..cf72a7905274 100644
+index 239d2da7bb05..ae44937a50e1 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -366,6 +366,8 @@ man_MANS += doc/org.bluez.Media.5 doc/org.bluez.MediaControl.5 \
- 		doc/org.bluez.MediaPlayer.5 doc/org.bluez.MediaFolder.5 \
- 		doc/org.bluez.MediaItem.5 doc/org.bluez.MediaEndpoint.5 \
- 		doc/org.bluez.MediaTransport.5
-+man_MANS += doc/org.bluez.LEAdvertisingManager.5 \
-+		doc/org.bluez.LEAdvertisement.5
+@@ -373,7 +373,9 @@ man_MANS += doc/org.bluez.GattManager.5 doc/org.bluez.GattProfile.5 \
+ 		doc/org.bluez.GattCharacteristic.5 \
+ 		doc/org.bluez.GattDescriptor.5 \
+ 		doc/org.bluez.LEAdvertisingManager.5 \
+-		doc/org.bluez.LEAdvertisement.5
++		doc/org.bluez.LEAdvertisement.5 \
++		doc/org.bluez.AdvertisementMonitorManager.5 \
++		doc/org.bluez.AdvertisementMonitor.5
  endif
  manual_pages += src/bluetoothd.8
  manual_pages += doc/org.bluez.Adapter.5 doc/org.bluez.Device.5 \
-@@ -377,6 +379,8 @@ manual_pages += doc/org.bluez.Media.5 doc/org.bluez.MediaControl.5 \
- 		doc/org.bluez.MediaPlayer.5 doc/org.bluez.MediaFolder.5 \
- 		doc/org.bluez.MediaItem.5 doc/org.bluez.MediaEndpoint.5 \
- 		doc/org.bluez.MediaTransport.5
-+manual_pages += doc/org.bluez.LEAdvertisingManager.5 \
-+		doc/org.bluez.LEAdvertisement.5
+@@ -392,7 +394,9 @@ manual_pages += doc/org.bluez.GattManager.5 doc/org.bluez.GattProfile.5 \
+ 		doc/org.bluez.GattCharacteristic.5 \
+ 		doc/org.bluez.GattDescriptor.5 \
+ 		doc/org.bluez.LEAdvertisingManager.5 \
+-		doc/org.bluez.LEAdvertisement.5
++		doc/org.bluez.LEAdvertisement.5 \
++		doc/org.bluez.AdvertisementMonitorManager.5 \
++		doc/org.bluez.AdvertisementMonitor.5
  
  EXTRA_DIST += src/genbuiltin src/bluetooth.conf \
  			src/main.conf profiles/network/network.conf \
-@@ -427,7 +431,8 @@ EXTRA_DIST += doc/org.bluez.Media.rst doc/org.bluez.MediaControl.rst \
- 		doc/org.bluez.MediaItem.rst doc/org.bluez.MediaEndpoint.rst \
- 		doc/org.bluez.MediaTransport.rst
- 
--EXTRA_DIST += doc/gatt-api.txt doc/advertising-api.txt
-+EXTRA_DIST += doc/gatt-api.txt doc/org.bluez.LEAdvertisingManager.rst \
-+		doc/org.bluez.LEAdvertisement.rst
+@@ -450,7 +454,9 @@ EXTRA_DIST += doc/org.bluez.GattManager.rst doc/org.bluez.GattProfile.rst\
+ 		doc/org.bluez.GattCharacteristic.rst \
+ 		doc/org.bluez.GattDescriptor.rst \
+ 		doc/org.bluez.LEAdvertisingManager.rst \
+-		doc/org.bluez.LEAdvertisement.rst
++		doc/org.bluez.LEAdvertisement.rst \
++		doc/org.bluez.AdvertisementMonitorManager.rst \
++		doc/org.bluez.AdvertisementMonitor.rst
  
  EXTRA_DIST += doc/obex-api.txt doc/obex-agent-api.txt
  
-diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
+diff --git a/doc/advertisement-monitor-api.txt b/doc/advertisement-monitor-api.txt
 deleted file mode 100644
-index a0077843defd..000000000000
---- a/doc/advertising-api.txt
+index 9189f2cceb96..000000000000
+--- a/doc/advertisement-monitor-api.txt
 +++ /dev/null
-@@ -1,278 +0,0 @@
--BlueZ D-Bus LE Advertising API Description
--******************************************
+@@ -1,187 +0,0 @@
+-BlueZ D-Bus Advertisement Monitor API Description
+-*************************************************
 -
--Advertising packets are structured data which is broadcast on the LE Advertising
--channels and available for all devices in range.  Because of the limited space
--available in LE Advertising packets (31 bytes), each packet's contents must be
--carefully controlled.
+-This API allows an client to specify a job of monitoring advertisements by
+-registering the root of hierarchy and then exposing advertisement monitors
+-under the root with filtering conditions, thresholds of RSSI and timers
+-of RSSI thresholds.
 -
--BlueZ acts as a store for the Advertisement Data which is meant to be sent.
--It constructs the correct Advertisement Data from the structured
--data and configured the kernel to send the correct advertisement.
+-Once a monitoring job is activated by BlueZ, the client can expect to get
+-notified on the targeted advertisements no matter if there is an ongoing
+-discovery session (a discovery session is started/stopped with methods in
+-org.bluez.Adapter1 interface).
 -
--Advertisement Data objects are registered freely and then referenced by BlueZ
--when constructing the data sent to the kernel.
--
--LE Advertisement Data hierarchy
+-Advertisement Monitor hierarchy
 -===============================
--
--Specifies the Advertisement Data to be broadcast and some advertising
--parameters.  Properties which are not present will not be included in the
--data.  Required advertisement data types will always be included.
--All UUIDs are 128-bit versions in the API, and 16 or 32-bit
--versions of the same UUID will be used in the advertising data as appropriate.
--
 -Service		org.bluez
--Interface	org.bluez.LEAdvertisement1
+-Interface	org.bluez.AdvertisementMonitor1 [experimental]
 -Object path	freely definable
 -
 -Methods		void Release() [noreply]
 -
--			This method gets called when the service daemon
--			removes the Advertisement. A client can use it to do
--			cleanup tasks. There is no need to call
--			UnregisterAdvertisement because when this method gets
--			called it has already been unregistered.
+-			This gets called as a signal for a client to perform
+-			clean-up when (1)a monitor cannot be activated after it
+-			was exposed or (2)a monitor has been deactivated.
 -
--Properties	string Type
+-		void Activate() [noreply]
 -
--			Determines the type of advertising packet requested.
+-			After a monitor was exposed, this gets called as a
+-			signal for client to get acknowledged when a monitor
+-			has been activated, so the client can expect to receive
+-			calls on DeviceFound() or DeviceLost().
 -
--			Possible values: "broadcast" or "peripheral"
+-		void DeviceFound(object device) [noreply]
 -
--		array{string} ServiceUUIDs
+-			This gets called to notify the client of finding the
+-			targeted device. Once receiving the call, the client
+-			should start to monitor the corresponding device to
+-			retrieve the changes on RSSI and advertisement content.
 -
--			List of UUIDs to include in the "Service UUID" field of
--			the Advertising Data.
+-		void DeviceLost(object device) [noreply]
 -
--		dict ManufacturerData
+-			This gets called to notify the client of losing the
+-			targeted device. Once receiving this call, the client
+-			should stop monitoring the corresponding device.
 -
--			Manufactuer Data fields to include in
--			the Advertising Data.  Keys are the Manufacturer ID
--			to associate with the data.
+-Properties	string Type [read-only]
 -
--		array{string} SolicitUUIDs
+-			The type of the monitor. See SupportedMonitorTypes in
+-			org.bluez.AdvertisementMonitorManager1 for the available
+-			options.
 -
--			Array of UUIDs to include in "Service Solicitation"
--			Advertisement Data.
+-		Int16 RSSILowThreshold [read-only, optional]
 -
--		dict ServiceData
+-			Used in conjunction with RSSILowTimeout to determine
+-			whether a device becomes out-of-range. Valid range is
+-			-127 to 20 (dBm), while 127 indicates unset.
 -
--			Service Data elements to include. The keys are the
--			UUID to associate with the data.
+-		Int16 RSSIHighThreshold [read-only, optional]
 -
--		dict Data [Experimental]
+-			Used in conjunction with RSSIHighTimeout to determine
+-			whether a device becomes in-range. Valid range is
+-			-127 to 20 (dBm), while 127 indicates unset.
 -
--			Advertising Type to include in the Advertising
--			Data. Key is the advertising type and value is the
--			data as byte array.
+-		Uint16 RSSILowTimeout [read-only, optional]
 -
--			Note: Types already handled by other properties shall
--			not be used.
+-			The time it takes to consider a device as out-of-range.
+-			If this many seconds elapses without receiving any
+-			signal at least as strong as RSSILowThreshold, a
+-			currently in-range device will be considered as
+-			out-of-range (lost). Valid range is 1 to 300 (seconds),
+-			while 0 indicates unset.
 -
--			Possible values:
--				<type> <byte array>
--				...
+-		Uint16 RSSIHighTimeout [read-only, optional]
 -
--			Example:
--				<Transport Discovery> <Organization Flags...>
--				0x26                   0x01         0x01...
+-			The time it takes to consider a device as in-range.
+-			If this many seconds elapses while we continuously
+-			receive signals at least as strong as RSSIHighThreshold,
+-			a currently out-of-range device will be considered as
+-			in-range (found). Valid range is 1 to 300 (seconds),
+-			while 0 indicates unset.
 -
--		bool Discoverable [Experimental]
+-		Uint16 RSSISamplingPeriod [read-only, optional]
 -
--			Advertise as general discoverable. When present this
--			will override adapter Discoverable property.
+-			Grouping rules on how to propagate the received
+-			advertisement packets to the client. Valid range is 0 to
+-			255 while 256 indicates unset.
 -
--			Note: This property shall not be set when Type is set
--			to broadcast.
+-			The meaning of this property is as follows:
+-			0:
+-				All advertisement packets from in-range devices
+-				would be propagated.
+-			255:
+-				Only the first advertisement packet of in-range
+-				devices would be propagated. If the device
+-				becomes lost, then the first packet when it is
+-				found again will also be propagated.
+-			1 to 254:
+-				Advertisement packets would be grouped into
+-				100ms * N time period. Packets in the same group
+-				will only be reported once, with the RSSI value
+-				being averaged out.
 -
--		uint16 DiscoverableTimeout [Experimental]
+-			Currently this is unimplemented in user space, so the
+-			value is only used to be forwarded to the kernel.
 -
--			The discoverable timeout in seconds. A value of zero
--			means that the timeout is disabled and it will stay in
--			discoverable/limited mode forever.
+-		array{(uint8, uint8, array{byte})} Patterns [read-only, optional]
 -
--			Note: This property shall not be set when Type is set
--			to broadcast.
+-			If the Type property is set to "or_patterns", then this
+-			property must exist and have at least one entry in the
+-			array.
 -
--		array{string} Includes
+-			The structure of a pattern contains the following:
+-			uint8 start_position
+-				The index in an AD data field where the search
+-				should start. The beginning of an AD data field
+-				is index 0.
+-			uint8 AD_data_type
+-				See https://www.bluetooth.com/specifications/
+-				assigned-numbers/generic-access-profile/ for
+-				the possible allowed value.
+-			array{byte} content_of_pattern
+-				This is the value of the pattern. The maximum
+-				length of the bytes is 31.
 -
--			List of features to be included in the advertising
--			packet.
--
--			Possible values: as found on
--					LEAdvertisingManager.SupportedIncludes
--
--		string LocalName
--
--			Local name to be used in the advertising report. If the
--			string is too big to fit into the packet it will be
--			truncated.
--
--			If this property is available 'local-name' cannot be
--			present in the Includes.
--
--		uint16 Appearance
--
--			Appearance to be used in the advertising report.
--
--			Possible values: as found on GAP Service.
--
--		uint16_t Duration
--
--			Rotation duration of the advertisement in seconds. If
--			there are other applications advertising no duration is
--			set the default is 2 seconds.
--
--		uint16_t Timeout
--
--			Timeout of the advertisement in seconds. This defines
--			the lifetime of the advertisement.
--
--		string SecondaryChannel [Experimental]
--
--			Secondary channel to be used. Primary channel is
--			always set to "1M" except when "Coded" is set.
--
--			Possible value: "1M" (default)
--					"2M"
--					"Coded"
--
--		uint32 MinInterval [Experimental]
--
--			Minimum advertising interval to be used by the
--			advertising set, in milliseconds. Acceptable values
--			are in the range [20ms, 10,485s]. If the provided
--			MinInterval is larger than the provided MaxInterval,
--			the registration will return failure.
--
--		uint32 MaxInterval [Experimental]
--
--			Maximum advertising interval to be used by the
--			advertising set, in milliseconds. Acceptable values
--			are in the range [20ms, 10,485s]. If the provided
--			MinInterval is larger than the provided MaxInterval,
--			the registration will return failure.
--
--		int16 TxPower [Experimental]
--
--			Requested transmission power of this advertising set.
--			The provided value is used only if the "CanSetTxPower"
--			feature is enabled on the Advertising Manager. The
--			provided value must be in range [-127 to +20], where
--			units are in dBm.
--
--
--LE Advertising Manager hierarchy
--================================
--
--The Advertising Manager allows external applications to register Advertisement
--Data which should be broadcast to devices.  Advertisement Data elements must
--follow the API for LE Advertisement Data described above.
--
+-Advertisement Monitor Manager hierarchy
+-=======================================
 -Service		org.bluez
--Interface	org.bluez.LEAdvertisingManager1
+-Interface	org.bluez.AdvertisementMonitorManager1 [experimental]
 -Object path	/org/bluez/{hci0,hci1,...}
 -
--Methods		RegisterAdvertisement(object advertisement, dict options)
+-Methods		void RegisterMonitor(object application)
 -
--			Registers an advertisement object to be sent over the LE
--			Advertising channel.  The service must be exported
--			under interface LEAdvertisement1.
--
--			InvalidArguments error indicates that the object has
--			invalid or conflicting properties.
--
--			InvalidLength error indicates that the data
--			provided generates a data packet which is too long.
--
--			The properties of this object are parsed when it is
--			registered, and any changes are ignored.
--
--			If the same object is registered twice it will result in
--			an AlreadyExists error.
--
--			If the maximum number of advertisement instances is
--			reached it will result in NotPermitted error.
+-			This registers the root path of a hierarchy of
+-			advertisement monitors.
+-			The application object path together with the D-Bus
+-			system bus connection ID define the identification of
+-			the application registering advertisement monitors.
+-			Once a root path is registered by a client via this
+-			method, the client can freely expose/unexpose
+-			advertisement monitors without re-registering the root
+-			path again. After use, the client should call
+-			UnregisterMonitor() method to invalidate the
+-			advertisement monitors.
 -
 -			Possible errors: org.bluez.Error.InvalidArguments
 -					 org.bluez.Error.AlreadyExists
--					 org.bluez.Error.InvalidLength
--					 org.bluez.Error.NotPermitted
+-					 org.bluez.Error.Failed
 -
--		UnregisterAdvertisement(object advertisement)
+-		void UnregisterMonitor(object application)
 -
--			This unregisters an advertisement that has been
--			previously registered.  The object path parameter must
--			match the same value that has been used on registration.
+-			This unregisters a hierarchy of advertisement monitors
+-			that has been previously registered. The object path
+-			parameter must match the same value that has been used
+-			on registration. Upon unregistration, the advertisement
+-			monitor(s) should expect to receive Release() method as
+-			the signal that the advertisement monitor(s) has been
+-			deactivated.
 -
 -			Possible errors: org.bluez.Error.InvalidArguments
 -					 org.bluez.Error.DoesNotExist
 -
--Properties	byte ActiveInstances
+-Properties	array{string} SupportedMonitorTypes [read-only]
 -
--			Number of active advertising instances.
+-			This lists the supported types of advertisement
+-			monitors. An application should check this before
+-			instantiate and expose an object of
+-			org.bluez.AdvertisementMonitor1.
 -
--		byte SupportedInstances
+-			Possible values for monitor types:
 -
--			Number of available advertising instances.
+-			"or_patterns"
+-				Patterns with logic OR applied. With this type,
+-				property "Patterns" must exist and has at least
+-				one pattern.
 -
--		array{string} SupportedIncludes
+-		array{string} SupportedFeatures [read-only]
 -
--			List of supported system includes.
+-			This lists the features of advertisement monitoring
+-			supported by BlueZ.
 -
--			Possible values: "tx-power"
--					 "appearance"
--					 "local-name"
--					 "rsi"
+-			Possible values for features:
 -
--		array{string} SupportedSecondaryChannels [Experimental]
--
--			List of supported Secondary channels. Secondary
--			channels can be used to advertise with the
--			corresponding PHY.
--
--			Possible values: "1M"
--					 "2M"
--					 "Coded"
--
--		dict SupportedCapabilities [Experimental]
--
--			Enumerates Advertising-related controller capabilities
--			useful to the client.
--
--			Possible Values:
--
--				byte MaxAdvLen
--
--					Max advertising data length
--
--				byte MaxScnRspLen
--
--					Max advertising scan response length
--
--				int16 MinTxPower
--
--					Min advertising tx power (dBm)
--
--				int16 MaxTxPower
--
--					Max advertising tx power (dBm)
--
--		array{string} SupportedFeatures [readonly,optional,Experimental]
--
--			List of supported platform features. If no features
--			are available on the platform, the SupportedFeatures
--			array will be empty.
--
--			Possible values: "CanSetTxPower"
--
--						Indicates whether platform can
--						specify tx power on each
--						advertising instance.
--
--					 "HardwareOffload"
--
--						Indicates whether multiple
--						advertising will be offloaded
--						to the controller.
-diff --git a/doc/org.bluez.LEAdvertisement.rst b/doc/org.bluez.LEAdvertisement.rst
+-			"controller-patterns"
+-				If the controller is capable of performing
+-				advertisement monitoring by patterns, BlueZ
+-				would offload the patterns to the controller to
+-				reduce power consumption.
+diff --git a/doc/org.bluez.AdvertisementMonitor.rst b/doc/org.bluez.AdvertisementMonitor.rst
 new file mode 100644
-index 000000000000..4609bde74a5e
+index 000000000000..98852ac68b59
 --- /dev/null
-+++ b/doc/org.bluez.LEAdvertisement.rst
-@@ -0,0 +1,195 @@
-+=========================
-+org.bluez.LEAdvertisement
-+=========================
++++ b/doc/org.bluez.AdvertisementMonitor.rst
+@@ -0,0 +1,153 @@
++==============================
++org.bluez.AdvertisementMonitor
++==============================
 +
-+---------------------------------------------
-+BlueZ D-Bus LEAdvertisement API documentation
-+---------------------------------------------
++--------------------------------------------------
++BlueZ D-Bus AdvertisementMonitor API documentation
++--------------------------------------------------
 +
 +:Version: BlueZ
 +:Date: October 2023
@@ -418,26 +333,20 @@ index 000000000000..4609bde74a5e
 +Description
 +===========
 +
-+Advertising packets are structured data which is broadcast on the LE Advertising
-+channels and available for all devices in range.  Because of the limited space
-+available in LE Advertising packets, each packet's contents must be carefully
-+controlled.
++This API allows an client to specify a job of monitoring advertisements by
++registering the root of hierarchy and then exposing advertisement monitors
++under the root with filtering conditions, thresholds of RSSI and timers
++of RSSI thresholds.
 +
-+The service daemon acts as a store for the Advertisement Data which is meant to
-+be sent. It constructs the correct Advertisement Data from the structured
-+data and configured the kernel to send the correct advertisement.
++Once a monitoring job is activated by **bluetoothd(8)**, the client can expect
++to get notified on the targeted advertisements no matter if there is an ongoing
++discovery session (see **StartDiscovery()** in **org.bluez.Adapter(5)**).
 +
 +Interface
 +=========
 +
-+Specifies the Advertisement Data to be broadcast and some advertising
-+parameters.  Properties which are not present will not be included in the
-+data.  Required advertisement data types will always be included.
-+All UUIDs are 128-bit versions in the API, and 16 or 32-bit
-+versions of the same UUID will be used in the advertising data as appropriate.
-+
 +:Service:	org.bluez
-+:Interface:	org.bluez.LEAdvertisement1
++:Interface:	org.bluez.AdvertisementMonitor1 [experimental]
 +:Object path:	freely definable
 +
 +Methods
@@ -446,170 +355,134 @@ index 000000000000..4609bde74a5e
 +void Release() [noreply]
 +````````````````````````
 +
-+	This method gets called when the service daemon removes the
-+	Advertisement. A client can use it to do cleanup tasks. There is no
-+	need to call **UnregisterAdvertisement()** because when this method
-+	gets called it has already been unregistered.
++	This gets called as a signal for a client to perform clean-up when:
++
++	- Monitor cannot be activated after it was exposed
++	- Monitor has been deactivated.
++
++void Activate() [noreply]
++`````````````````````````
++
++	After a monitor was exposed, this gets called as a signal for client to
++	get acknowledged when a monitor has been activated, so the client can
++	expect to receive calls on **DeviceFound()** or **DeviceLost()**.
++
++void DeviceFound(object device) [noreply]
++`````````````````````````````````````````
++
++	This gets called to notify the client of finding the targeted device.
++	Once receiving the call, the client should start to monitor the
++	corresponding device to retrieve the changes on RSSI and advertisement
++	content.
++
++void DeviceLost(object device) [noreply]
++````````````````````````````````````````
++
++	This gets called to notify the client of losing the targeted device.
++	Once receiving this call, the client should stop monitoring the
++	corresponding device.
 +
 +Properties
 +----------
 +
-+string Type [readonly]
-+``````````````````````
++string Type [read-only]
++```````````````````````
 +
-+	Determines the type of advertising packet requested.
++	The type of the monitor. See **SupportedMonitorTypes** in
++	**org.bluez.AdvertisementMonitorManager(5)** for the available options.
 +
-+	Possible values:
++int16 RSSILowThreshold [read-only, optional]
++````````````````````````````````````````````
 +
-+	:"broadcast":
-+	:"peripheral":
++	Used in conjunction with **RSSILowTimeout** to determine whether a
++	device becomes out-of-range. Valid range is -127 to 20 (dBm), while 127
++	indicates unset.
 +
-+array{string} ServiceUUIDs
-+``````````````````````````
++int16 RSSIHighThreshold [read-only, optional]
++`````````````````````````````````````````````
 +
-+	List of UUIDs to include in the "Service UUID" field of the Advertising
-+	Data.
++	Used in conjunction with RSSIHighTimeout to determine whether a device
++	becomes in-range. Valid range is -127 to 20 (dBm), while 127 indicates
++	unset.
 +
-+dict ManufacturerData
-+`````````````````````
++uint16 RSSILowTimeout [read-only, optional]
++```````````````````````````````````````````
 +
-+	Manufacturer Data fields to include in the Advertising Data.  Keys are
-+	the Manufacturer ID to associate with the data.
++	The time it takes to consider a device as out-of-range. If this many
++	seconds elapses without receiving any signal at least as strong as
++	**RSSILowThreshold**, a currently in-range device will be considered as
++	out-of-range (lost). Valid range is 1 to 300 (seconds), while 0
++	indicates unset.
 +
-+array{string} SolicitUUIDs
-+``````````````````````````
++uint16 RSSIHighTimeout [read-only, optional]
++````````````````````````````````````````````
 +
-+	Array of UUIDs to include in "Service Solicitation" Advertisement Data.
++	The time it takes to consider a device as in-range. If this many
++	seconds elapses while we continuouslyreceive signals at least as strong
++	as **RSSIHighThreshold**, a currently out-of-range device will be
++	considered as in-range (found). Valid range is 1 to 300 (seconds),
++	while 0 indicates unset.
 +
-+dict ServiceData
-+````````````````
++uint16 RSSISamplingPeriod [read-only, optional]
++```````````````````````````````````````````````
 +
-+	Service Data elements to include. The keys are the UUID to associate
-+	with the data.
-+
-+dict Data [Experimental]
-+````````````````````````
-+
-+	Advertising Data to include. Key is the advertising type and value is
-+	the data as byte array.
-+
-+	Note: Types already handled by other properties shall not be used.
-+
-+	Possible values:
-+
-+	:<type>:
-+
-+		<byte array>
-+
-+	Example:
-+		<Transport Discovery> <Organization Flags...>
-+		0x26                   0x01         0x01...
-+
-+bool Discoverable [Experimental]
-+````````````````````````````````
-+
-+	Advertise as general discoverable. When present this will override
-+	adapter Discoverable property.
-+
-+	Note: This property shall not be set when **Type** is set to
-+	"broadcast".
-+
-+uint16 DiscoverableTimeout [Experimental]
-+`````````````````````````````````````````
-+
-+	The discoverable timeout in seconds. A value of zero means that the
-+	timeout is disabled and it will stay in discoverable/limited mode
-+	forever.
-+
-+	Note: This property shall not be set when **Type** is set to
-+	"broadcast".
-+
-+array{string} Includes
-+``````````````````````
-+
-+	List of features to be included in the advertising packet.
++	Grouping rules on how to propagate the received advertisement packets
++	to the client.
 +
 +	Possible values:
 +
-+	See **org.bluez.LEAdvertisingManager(5)** **SupportedIncludes**
-+	property.
++	:0:
++		All advertisement packets from in-range devices would be
++		propagated.
 +
-+string LocalName
-+````````````````
++	:255:
++		Only the first advertisement packet of in-range devices would
++		be propagated. If the device becomes lost, then the first
++		packet when it is found again will also be propagated.
 +
-+	Local name to be used in the advertising report. If the string is too
-+	big to fit into the packet it will be truncated.
++	:1 to 254:
++		Advertisement packets would be grouped into 100ms * N time
++		period. Packets in the same group will only be reported once,
++		with the RSSI value being averaged out.
 +
-+	If this property is available 'local-name' cannot be present in the
-+	**Includes**.
++	Currently this is unimplemented in user space, so the value is only
++	used to be forwarded to the kernel.
 +
-+uint16 Appearance
-+`````````````````
++array{(uint8, uint8, array{byte})} Patterns [read-only, optional]
++`````````````````````````````````````````````````````````````````
 +
-+	Appearance to be used in the advertising report.
++	If the **Type** property is set to **"or_patterns"**, then this
++	property must exist and have at least one entry in the array.
 +
-+	Possible values: as found on GAP Service.
++	The structure of a pattern contains the following:
 +
-+uint16_t Duration
-+`````````````````
++	:uint8 start_position:
 +
-+	Rotation duration of the advertisement in seconds. If there are other
-+	applications advertising no duration is set the default is 2 seconds.
++		The index in an AD data field where the search hould start. The
++		beginning of an AD data field is index 0.
 +
-+uint16_t Timeout
-+````````````````
++	:uint8 AD_data_type:
 +
-+	Timeout of the advertisement in seconds. This defines the lifetime of
-+	the advertisement.
++		See https://www.bluetooth.com/specifications/assigned-numbers/
++		generic-access-profile/ for the possible allowed value.
 +
-+string SecondaryChannel [Experimental]
-+``````````````````````````````````````
++	:array{byte} content_of_pattern:
 +
-+	Secondary channel to be used. Primary channel is always set to "1M"
-+	except when "Coded" is set.
-+
-+	Possible value:
-+
-+	:"1M" (default):
-+	:"2M":
-+	:"Coded":
-+
-+uint32 MinInterval [Experimental]
-+`````````````````````````````````
-+
-+	Minimum advertising interval to be used by the advertising set, in
-+	milliseconds. Acceptable values are in the range [20ms, 10,485s].
-+	If the provided MinInterval is larger than the provided MaxInterval,
-+	the registration will return failure.
-+
-+uint32 MaxInterval [Experimental]
-+`````````````````````````````````
-+
-+	Maximum advertising interval to be used by the advertising set, in
-+	milliseconds. Acceptable values are in the range [20ms, 10,485s]. If the
-+	provided MinInterval is larger than the provided MaxInterval, the
-+	registration will return failure.
-+
-+int16 TxPower [Experimental]
-+````````````````````````````
-+
-+	Requested transmission power of this advertising set. The provided value
-+	is used only if the "CanSetTxPower" feature is enabled on the
-+	**org.bluez.LEAdvertisingManager(5)**. The provided value must be in
-+	range [-127 to +20], where units are in dBm.
-diff --git a/doc/org.bluez.LEAdvertisingManager.rst b/doc/org.bluez.LEAdvertisingManager.rst
++		This is the value of the pattern. The maximum length of the
++		bytes is 31.
+diff --git a/doc/org.bluez.AdvertisementMonitorManager.rst b/doc/org.bluez.AdvertisementMonitorManager.rst
 new file mode 100644
-index 000000000000..b9d5cafc6ff3
+index 000000000000..3775a483543c
 --- /dev/null
-+++ b/doc/org.bluez.LEAdvertisingManager.rst
-@@ -0,0 +1,144 @@
-+==============================
-+org.bluez.LEAdvertisingManager
-+==============================
++++ b/doc/org.bluez.AdvertisementMonitorManager.rst
+@@ -0,0 +1,90 @@
++=====================================
++org.bluez.AdvertisementMonitorManager
++=====================================
 +
-+-------------------------------------------------
-+BlueZ D-Bus LEAvertisingManager API documentation
-+-------------------------------------------------
++---------------------------------------------------------
++BlueZ D-Bus AdvertisementMonitorManager API documentation
++---------------------------------------------------------
 +
 +:Version: BlueZ
 +:Date: October 2023
@@ -619,50 +492,44 @@ index 000000000000..b9d5cafc6ff3
 +Interface
 +=========
 +
-+The Advertising Manager allows external applications to register Advertisement
-+Data which should be broadcast to devices.  Advertisement Data elements must
-+follow the API for LE Advertisement Data described above.
-+
-+:Service:	org.bluez
-+:Interface:	org.bluez.LEAdvertisingManager1
-+:Object path:	/org/bluez/{hci0,hci1,...}
++Service		org.bluez
++Interface	org.bluez.AdvertisementMonitorManager1 [experimental]
++Object path	/org/bluez/{hci0,hci1,...}
 +
 +Methods
 +-------
 +
-+void RegisterAdvertisement(object advertisement, dict options)
-+``````````````````````````````````````````````````````````````
++void RegisterMonitor(object application)
++````````````````````````````````````````
 +
-+	Registers an advertisement object to be sent over the LE Advertising
-+	channel.  The service must implement **org.bluez.LEAdvertisement(5)**
-+	interface.
++	Registers the root path of a hierarchy of advertisement monitors
++	implementing **org.bluez.AdvertisementMonitor(5)**.
++
++	The application object path together with the D-Bus ystem bus
++	connection ID define the identification of the application registering
++	advertisement monitors.
++
++	Once a root path is registered by a client via this method, the client
++	can freely expose/unexpose advertisement monitors without re-registering
++	the root path again. After use, the client should call
++	**UnregisterMonitor()** method to invalidate the advertisement monitors.
 +
 +	Possible errors:
 +
 +	:org.bluez.Error.InvalidArguments:
-+
-+		Indicates that the object has invalid or conflicting properties.
-+
 +	:org.bluez.Error.AlreadyExists:
++	:org.bluez.Error.Failed:
 +
-+		Indicates the object is already registered.
++void UnregisterMonitor(object application)
++``````````````````````````````````````````
 +
-+	:org.bluez.Error.InvalidLength:
++	Unregisters a hierarchy of advertisement monitors that has been
++	previously registered with **RegisterMonitor()**. The object path
++	parameter must match the same value that has been used on registration.
 +
-+		Indicates that the data provided generates a data packet which
-+		is too long
-+
-+	:org.bluez.Error.NotPermitted:
-+
-+		Indicates the maximum number of advertisement instances has
-+		been reached.
-+
-+void UnregisterAdvertisement(object advertisement)
-+``````````````````````````````````````````````````
-+
-+	Unregisters an advertisement that has been previously registered using
-+	**RegisterAdvertisement()**.  The object path parameter must match the
-+	same value that has been used on registration.
++	Upon unregistration, the advertisement monitor(s) should expect to
++	receive **Release()** method as the signal that the advertisement
++	monitor(s) has been deactivated.
 +
 +	Possible errors:
 +
@@ -672,81 +539,33 @@ index 000000000000..b9d5cafc6ff3
 +Properties
 +----------
 +
-+byte ActiveInstances [readonly]
-+```````````````````````````````
++array{string} SupportedMonitorTypes [read-only]
++```````````````````````````````````````````````
 +
-+	Number of active advertising instances.
-+
-+byte SupportedInstances [readonly]
-+``````````````````````````````````
-+
-+	Number of available advertising instances.
-+
-+array{string} SupportedIncludes [readonly]
-+``````````````````````````````````````````
-+
-+	List of supported system includes.
++	This lists the supported types of advertisement monitors. An application
++	should check this before instantiate and expose an object of
++	**org.bluez.AdvertisementMonitor(5)**.
 +
 +	Possible values:
 +
-+	:"tx-power":
-+	:"appearance":
-+	:"local-name":
-+	:"rsi":
++	:"or_patterns":
 +
-+array{string} SupportedSecondaryChannels [readonly, Experimental]
-+`````````````````````````````````````````````````````````````````
++		Patterns with logic OR applied. With this type, property
++		**Patterns** must exist and has at least one pattern.
 +
-+	List of supported Secondary channels. Secondary channels can be used to
-+	advertise with the corresponding PHY.
++array{string} SupportedFeatures [read-only]
++```````````````````````````````````````````
 +
-+	Possible values:
-+
-+	:"1M":
-+	:"2M":
-+	:"Coded":
-+
-+dict SupportedCapabilities [readonly, Experimental]
-+```````````````````````````````````````````````````
-+
-+	Enumerates Advertising-related controller capabilities useful to the
-+	client.
-+
-+	Possible Values:
-+
-+	:byte MaxAdvLen:
-+
-+		Max advertising data length
-+
-+	:byte MaxScnRspLen:
-+
-+		Max advertising scan response length
-+
-+	;int16 MinTxPower:
-+
-+		Min advertising tx power (dBm)
-+
-+	:int16 MaxTxPower:
-+
-+		Max advertising tx power (dBm)
-+
-+array{string} SupportedFeatures [readonly,optional,Experimental]
-+````````````````````````````````````````````````````````````````
-+
-+	List of supported platform features. If no features are available on
-+	the platform, the SupportedFeatures array will be empty.
++	This lists the features of advertisement monitoring supported by
++	**bluetoothd(8)**.
 +
 +	Possible values:
 +
-+	:"CanSetTxPower":
++	:"controller-patterns":
 +
-+		Indicates whether platform can specify tx power on each
-+		advertising instance.
-+
-+	:"HardwareOffload":
-+
-+		Indicates whether multiple advertising will be offloaded to the
-+		controller.
++		If the controller is capable of performing advertisement
++		monitoring by patterns, **bluetoothd(8)** would offload the
++		patterns to the controller to reduce power consumption.
 -- 
 2.41.0
 
