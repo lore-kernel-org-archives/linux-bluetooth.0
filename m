@@ -2,45 +2,44 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C250CCD80BE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Oct 2023 12:32:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE5B3CD80C2
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Oct 2023 12:49:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231609AbjJJMcE (ORCPT
+        id S231876AbjJJMth (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 10 Oct 2023 08:32:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38740 "EHLO
+        Tue, 10 Oct 2023 08:49:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231246AbjJJMcB (ORCPT
+        with ESMTP id S230220AbjJJMtg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 10 Oct 2023 08:32:01 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F812C4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Oct 2023 05:31:59 -0700 (PDT)
-Received: from canpemm500006.china.huawei.com (unknown [172.30.72.54])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4S4ZtS2Gs2zkY5P;
-        Tue, 10 Oct 2023 20:28:00 +0800 (CST)
+        Tue, 10 Oct 2023 08:49:36 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E281B7
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Oct 2023 05:49:34 -0700 (PDT)
+Received: from canpemm500006.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4S4bFz53K2ztTLh;
+        Tue, 10 Oct 2023 20:44:55 +0800 (CST)
 Received: from [10.174.179.200] (10.174.179.200) by
  canpemm500006.china.huawei.com (7.192.105.130) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Tue, 10 Oct 2023 20:31:56 +0800
+ 15.1.2507.31; Tue, 10 Oct 2023 20:49:31 +0800
 Subject: Re: [PATCH v2] Bluetooth: Fix UAF for hci_chan
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-        <linux-bluetooth@vger.kernel.org>
+To:     Pauli Virtanen <pav@iki.fi>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>
 References: <20231009123045.587882-1-william.xuanziyang@huawei.com>
- <CABBYNZ+49MXzbbJcu2oOw6apXzxXBf8J6D3+PNE_v2aDnV1DdQ@mail.gmail.com>
+ <117a47da5324a02cece6d601ff8b51b331d072fa.camel@iki.fi>
 From:   "Ziyang Xuan (William)" <william.xuanziyang@huawei.com>
-Message-ID: <6dcd1d93-129e-b7bf-a04f-b316e9cb1999@huawei.com>
-Date:   Tue, 10 Oct 2023 20:31:56 +0800
+Message-ID: <8f61ef8e-f959-3feb-fb9b-b9b60bf26758@huawei.com>
+Date:   Tue, 10 Oct 2023 20:49:31 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZ+49MXzbbJcu2oOw6apXzxXBf8J6D3+PNE_v2aDnV1DdQ@mail.gmail.com>
+In-Reply-To: <117a47da5324a02cece6d601ff8b51b331d072fa.camel@iki.fi>
 Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-Originating-IP: [10.174.179.200]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
  canpemm500006.china.huawei.com (7.192.105.130)
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -49,9 +48,7 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 > Hi,
 > 
-> On Mon, Oct 9, 2023 at 5:30 AM Ziyang Xuan
-> <william.xuanziyang@huawei.com> wrote:
->>
+> ma, 2023-10-09 kello 20:30 +0800, Ziyang Xuan kirjoitti:
 >> Syzbot reports a UAF problem as follows:
 >>
 >> BUG: KASAN: slab-use-after-free in hci_send_acl+0x48/0xe70 net/bluetooth/hci_core.c:3231
@@ -146,32 +143,99 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 >> --- a/include/net/bluetooth/hci_core.h
 >> +++ b/include/net/bluetooth/hci_core.h
 >> @@ -350,6 +350,8 @@ struct hci_dev {
->>         struct list_head list;
->>         struct mutex    lock;
->>
->> +       struct ida      unset_handle_ida;
+>>  	struct list_head list;
+>>  	struct mutex	lock;
+>>  
+>> +	struct ida	unset_handle_ida;
 >> +
->>         const char      *name;
->>         unsigned long   flags;
->>         __u16           id;
+>>  	const char	*name;
+>>  	unsigned long	flags;
+>>  	__u16		id;
 >> @@ -969,6 +971,7 @@ enum {
->>         HCI_CONN_AUTH_INITIATOR,
->>         HCI_CONN_DROP,
->>         HCI_CONN_CANCEL,
->> +       HCI_CONN_DISC,
+>>  	HCI_CONN_AUTH_INITIATOR,
+>>  	HCI_CONN_DROP,
+>>  	HCI_CONN_CANCEL,
+>> +	HCI_CONN_DISC,
+>>  	HCI_CONN_PARAM_REMOVAL_PEND,
+>>  	HCI_CONN_NEW_LINK_KEY,
+>>  	HCI_CONN_SCANNING,
+>> @@ -1543,7 +1546,8 @@ static inline void hci_conn_drop(struct hci_conn *conn)
+>>  {
+>>  	BT_DBG("hcon %p orig refcnt %d", conn, atomic_read(&conn->refcnt));
+>>  
+>> -	if (atomic_dec_and_test(&conn->refcnt)) {
+>> +	if (atomic_dec_and_test(&conn->refcnt) &&
+>> +	    !test_bit(HCI_CONN_DISC, &conn->flags)) {
+>>  		unsigned long timeo;
 > 
-> Can't we just use HCI_CONN_DROP instead of introducing yet another flag?
+> hci_abort_conn already checks if conn->abort_reason was already set, to
+> avoid queuing abort for the same conn again. Does this flag not try to
+> do the same thing?
 
-I don't think this works. When the processes related to hci_abort_conn() be re-entered,
-hci_conn can occur UAF in hci_proto_disconn_ind().
+That is not enough. hci_conn occur UAF in hci_proto_disconn_ind() before enter
+hci_abort_conn().
 
-syzbot:
-https://syzkaller.appspot.com/bug?extid=a0c80b06ae2cb8895bc4
-Reproducer:
-https://syzkaller.appspot.com/text?tag=ReproC&x=103036d6680000
-config file:
-https://syzkaller.appspot.com/text?tag=KernelConfig&x=bf95903690e3be2d
-
-Ziyang Xuan
 > 
->>         HCI_CONN_PARAM_REMOVAL_PEND,
+> There are potential races in hci_sync vs. handle reuse since the queued
+> abort is not canceled if the conn is deleted by something else. But now
+> I'm not sure syzbot hits this race.
+
+Sorry, can you give a specific scenario. I can't understand exactly what you mean.
+
+> 
+>>  
+>>  		switch (conn->type) {
+>> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+>> index 974631e652c1..f87281b4386f 100644
+>> --- a/net/bluetooth/hci_conn.c
+>> +++ b/net/bluetooth/hci_conn.c
+>> @@ -153,6 +153,9 @@ static void hci_conn_cleanup(struct hci_conn *conn)
+>>  
+>>  	hci_conn_hash_del(hdev, conn);
+>>  
+>> +	if (HCI_CONN_HANDLE_UNSET(conn->handle))
+>> +		ida_free(&hdev->unset_handle_ida, conn->handle);
+>> +
+>>  	if (conn->cleanup)
+>>  		conn->cleanup(conn);
+>>  
+>> @@ -929,29 +932,17 @@ static void cis_cleanup(struct hci_conn *conn)
+>>  	hci_le_remove_cig(hdev, conn->iso_qos.ucast.cig);
+>>  }
+>>  
+>> -static u16 hci_conn_hash_alloc_unset(struct hci_dev *hdev)
+>> +static int hci_conn_hash_alloc_unset(struct hci_dev *hdev)
+>>  {
+>> -	struct hci_conn_hash *h = &hdev->conn_hash;
+>> -	struct hci_conn  *c;
+>> -	u16 handle = HCI_CONN_HANDLE_MAX + 1;
+>> -
+>> -	rcu_read_lock();
+>> -
+>> -	list_for_each_entry_rcu(c, &h->list, list) {
+>> -		/* Find the first unused handle */
+>> -		if (handle == 0xffff || c->handle != handle)
+>> -			break;
+>> -		handle++;
+>> -	}
+>> -	rcu_read_unlock();
+> 
+> The original hci_conn_hash_alloc_unset seems to have wrong logic. It'll
+> e.g. always return HCI_CONN_HANDLE_MAX+1 except if the first conn in
+> conn_hash (which is not in particular order) has that handle...
+> 
+> The code paths adding/deleting conns or entering here / setting handles
+> should be holding hdev->lock, so probably no concurrency issue in it.
+> 
+> Is syzbot happy with just this handle allocation fixed?
+
+Just fix handle, hci_conn occur UAF in hci_proto_disconn_ind() within hci_conn_timeout() process.
+
+> 
+>> -
+>> -	return handle;
+>> +	return ida_alloc_range(&hdev->unset_handle_ida, HCI_CONN_HANDLE_MAX + 1,
+>> +			       U16_MAX, GFP_ATOMIC);
+>>  }
+>>  
+> 
