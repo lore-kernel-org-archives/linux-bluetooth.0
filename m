@@ -2,169 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DFA9E95A9C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Oct 2023 00:02:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44703CD68E4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Oct 2023 02:26:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379139AbjJJACL (ORCPT
+        id S1441848AbjJJC0M (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 9 Oct 2023 20:02:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56928 "EHLO
+        Mon, 9 Oct 2023 22:26:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379126AbjJJACK (ORCPT
+        with ESMTP id S1378796AbjJJC0L (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 9 Oct 2023 20:02:10 -0400
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A084A6;
-        Mon,  9 Oct 2023 17:02:08 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2b9c907bc68so57225251fa.2;
-        Mon, 09 Oct 2023 17:02:07 -0700 (PDT)
+        Mon, 9 Oct 2023 22:26:11 -0400
+Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12C6AA7
+        for <linux-bluetooth@vger.kernel.org>; Mon,  9 Oct 2023 19:26:10 -0700 (PDT)
+Received: by mail-qk1-x735.google.com with SMTP id af79cd13be357-77432add7caso297587585a.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Oct 2023 19:26:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696896126; x=1697500926; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CDnb1p+glowcF71zVOlOG3V+bIV/ai4H1gZvWv2Y0Wk=;
-        b=Qh6Inl8TgJn6SUGyQk/wF1dBTvT3oN1OPWB7iZztC0vw1CMSLe30mwi7zPntk1UCpf
-         dbNqHn75lu4UbWF8PUf++L0ghkt+W9oiuI099sVAZfiWQ7Dvchnp1Tezv+jeEKPIR7VE
-         dFcaQUzZ2C5O2E2HCW+qUaeovzO9C5XP/HoQk2WGRPaPBzga8H6xMrkC5MmTcHbkyQGW
-         VIZVlEHp5eIl5Zpc1rrsgOUqKPEIdVGmc6E3wks6pfOcBFP4SKzfBrqDTVhQpD7BPMPn
-         5GGMoSFw4nKf+qCRS2pM8KzQOU0uX6/C573l8FB3L2Y0wz97KZIR/T48tLyBtoTYWjSV
-         asdw==
+        d=gmail.com; s=20230601; t=1696904769; x=1697509569; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ahaOyyuk9B8UJytux7L3k7HiwgKUX5JT/mTM+EXP6vg=;
+        b=ADnj1XLQTa5Q00X2mzdP6TBq1S/nZcAyjyZPD3qnwQjls7k/vX+DRugM0RdpG6PgsK
+         Ad11KHj2aMguPkVrDHjrTxOtYrHTqU3bw22ldJBzxTdWV0ORCowsJEZUFyorKZuZPKLF
+         2mvnMhosvh9NoIvsZ4sheHmuS3S176/N1Yp7qMm/Nfu7iI/1ZZFGpOWWAzzUbceMiQMj
+         Av8C6S+Scll2x9nEJl2MJ5IyjuG+rpw+QAXcw8lJEjVMqG/wlaydHSNoWCxAro2X17le
+         j/Q/hOMvX0TbWig8b2NFJ4Onprr8pDvHCZnWGmeLTLJ2rDB3QybaIqpxnYRfNU53w77K
+         e7Vw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696896126; x=1697500926;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CDnb1p+glowcF71zVOlOG3V+bIV/ai4H1gZvWv2Y0Wk=;
-        b=LfhcTfTGXMP9T0DLnsYW0CqmpssMsMPM2kF30/SWTOaOf7glxUxBPneqjK/dYurDyz
-         iwpp1P5jKfRdUso6ojxWZwju5asOgZKqNW6ucm9CZWuK4eUoIR2NTJaSl4THj9UPV+sP
-         DZKbNBzS1v31ED8/gU2hq2o8bRPEEFwWOgj7N+LRH9LtjiuivukbLrhK/gmJ27vFEk0G
-         1gHeTYyTxTzeDiWDfzAKKUUTnUeqwgXp6rHgqQlUBGWG1YUW5/SqZC2DM4SCaoGDUqPw
-         Qwz4yMTAn0bRN/mn2qF2iyxPQpXbrBCRWMgmuZGdx/uE/TPHy212xP4v2+fsDEpLZlGB
-         T6Pg==
-X-Gm-Message-State: AOJu0YxFX2Q6fUFv/WUcZQFtSbXkEDsj72mQEzhuQK+K19GtFC5OWE0Y
-        oxaUlNerQADtCm6OyOgJXCdCzptQC0OHeT8REMQ=
-X-Google-Smtp-Source: AGHT+IF+aZwlOMjAQJgZgnMUJ38QN5pEMIHjDdXYb1dQAkpabk8532OdjITUL5Bq/m7RpYz2asYp1TbSHngKE9JyhYM=
-X-Received: by 2002:a2e:8707:0:b0:2bc:d889:2d89 with SMTP id
- m7-20020a2e8707000000b002bcd8892d89mr14554685lji.44.1696896125904; Mon, 09
- Oct 2023 17:02:05 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1696904769; x=1697509569;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ahaOyyuk9B8UJytux7L3k7HiwgKUX5JT/mTM+EXP6vg=;
+        b=bxFqYvJv9IpZphQbRaOWXCnz+U5s/xFiE8YuFPk3pnOPfT/Qyq3nZlI89xO5nIjPKn
+         pOlshcSSGSHke0qHPkKIbQ05LIe91ZmIDhkTzqvNZ3ZWQdzyC9mdosaZLleg7e507ABD
+         a2dDqbMAyii1ogdivjXzCpZBfX7+X5qyA+kihHfkMI4/wuH+ap6mRpUA+synZ2ouIzQp
+         UcNKwoAve0Dayh1DfFb7B9G4MO/5W0+ginwuYgn0XQRaAiBlD+FB9OYEwEVMN6isTh1p
+         bRY8FzWy1VMIXJXuIz48P4JCiJ+Xdi8xXAjGsLpZSY6nZLODr/pdHqLBYZ66lc78tOeb
+         u8/A==
+X-Gm-Message-State: AOJu0YyUHFToHmiKaC3RmGM2krsGNoDs1L2vDnbeKFUswNSnQkk6E0D6
+        E5fjZXZV5MEcwbPNWkl7cfrbhfRwsbw=
+X-Google-Smtp-Source: AGHT+IHQBoo+NoMRm/vCKTz3Onrh96TI973lEOagfgSvWDfXDXYk1uHl7QktT/nkYjmsJCnDoIiSIw==
+X-Received: by 2002:a0c:dd90:0:b0:65b:177b:a430 with SMTP id v16-20020a0cdd90000000b0065b177ba430mr16886397qvk.47.1696904768909;
+        Mon, 09 Oct 2023 19:26:08 -0700 (PDT)
+Received: from [172.17.0.2] ([20.57.124.94])
+        by smtp.gmail.com with ESMTPSA id v9-20020a0cdd89000000b0064c1b27bf2dsm4281912qvk.140.2023.10.09.19.26.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Oct 2023 19:26:08 -0700 (PDT)
+Message-ID: <6524b640.0c0a0220.1ecad.1227@mx.google.com>
+Date:   Mon, 09 Oct 2023 19:26:08 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5033564976008541973=="
 MIME-Version: 1.0
-References: <20231009134826.1063869-1-arnd@kernel.org> <2abaad09-b6e0-4dd5-9796-939f20804865@app.fastmail.com>
- <202310090902.10ED782652@keescook> <73f552a4-4ff5-441a-a624-ddc34365742f@app.fastmail.com>
- <202310091246.ED5A2AFB21@keescook> <15f6b85f-b1ce-409a-a728-38a7223a7c6c@app.fastmail.com>
- <202310091310.F560494@keescook>
-In-Reply-To: <202310091310.F560494@keescook>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 9 Oct 2023 17:01:53 -0700
-Message-ID: <CABBYNZJYYoseM04eWd+rRVmyS1YbssHxt9bowkX544VXGcZUeA@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: mark bacmp() and bacpy() as __always_inline
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Arnd Bergmann <arnd@arndb.de>, Arnd Bergmann <arnd@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Chun-Yi Lee <jlee@suse.com>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        stable@vger.kernel.org, Iulia Tanasescu <iulia.tanasescu@nxp.com>,
-        Wenjia Zhang <wenjia@linux.ibm.com>,
-        linux-bluetooth@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v2,01/11] doc/adapter-api: Rename to org.bluez.Adapter.rst
+In-Reply-To: <20231009232933.500652-1-luiz.dentz@gmail.com>
+References: <20231009232933.500652-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+--===============5033564976008541973==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Mon, Oct 9, 2023 at 1:15=E2=80=AFPM Kees Cook <keescook@chromium.org> wr=
-ote:
->
-> On Mon, Oct 09, 2023 at 10:08:01PM +0200, Arnd Bergmann wrote:
-> > On Mon, Oct 9, 2023, at 21:48, Kees Cook wrote:
-> > > On Mon, Oct 09, 2023 at 08:23:08PM +0200, Arnd Bergmann wrote:
-> > >> On Mon, Oct 9, 2023, at 18:02, Kees Cook wrote:
-> > >> > On Mon, Oct 09, 2023 at 05:36:55PM +0200, Arnd Bergmann wrote:
-> > >> >> On Mon, Oct 9, 2023, at 15:48, Arnd Bergmann wrote:
-> > >> >>
-> > >> >> Sorry, I have to retract this, something went wrong on my
-> > >> >> testing and I now see the same problem in some configs regardless
-> > >> >> of whether the patch is applied or not.
-> > >> >
-> > >> > Perhaps turn them into macros instead?
-> > >>
-> > >> I just tried that and still see the problem even with the macro,
-> > >> so whatever gcc is doing must be a different issue. Maybe it
-> > >> has correctly found a codepath that triggers this?
-> > >>
-> > >> If you are able to help debug the issue better,
-> > >> see these defconfigs for examples:
-> > >>
-> > >> https://pastebin.com/raw/pC8Lnrn2
-> > >> https://pastebin.com/raw/yb965unC
-> > >
-> > > This seems like a GCC bug. It is complaining about &hdev->bdaddr for
-> > > some reason. This silences it:
-> > >
-> > > -   if (!bacmp(&hdev->bdaddr, &ev->bdaddr)) {
-> > > +   a =3D hdev->bdaddr;
-> > > +   if (!bacmp(&a, &ev->bdaddr)) {
-> >
-> > Right, I see this addresses all instances. I tried another thing
-> > and this also seems to address them for me:
-> >
-> > --- a/net/bluetooth/hci_event.c
-> > +++ b/net/bluetooth/hci_event.c
-> > @@ -3273,7 +3273,7 @@ static void hci_conn_request_evt(struct hci_dev *=
-hdev, void *data,
-> >         /* Reject incoming connection from device with same BD ADDR aga=
-inst
-> >          * CVE-2020-26555
-> >          */
-> > -       if (!bacmp(&hdev->bdaddr, &ev->bdaddr)) {
-> > +       if (hdev && !bacmp(&hdev->bdaddr, &ev->bdaddr)) {
-> >                 bt_dev_dbg(hdev, "Reject connection with same BD_ADDR %=
-pMR\n",
-> >                            &ev->bdaddr);
-> >                 hci_reject_conn(hdev, &ev->bdaddr);
-> >
-> > and also this one does the trick:
-> >
-> > --- a/include/net/bluetooth/bluetooth.h
-> > +++ b/include/net/bluetooth/bluetooth.h
-> > @@ -266,7 +266,7 @@ void bt_err_ratelimited(const char *fmt, ...);
-> >  #define BT_DBG(fmt, ...)       pr_debug(fmt "\n", ##__VA_ARGS__)
-> >  #endif
-> >
-> > -#define bt_dev_name(hdev) ((hdev) ? (hdev)->name : "null")
-> > +#define bt_dev_name(hdev) ((hdev)->name)
-> >
-> >  #define bt_dev_info(hdev, fmt, ...)                            \
-> >         BT_INFO("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
-> >
-> > So what is actually going on is that the bt_dev_dbg() introduces
-> > the idea that hdev might be NULL because of the check.
->
-> Oh thank you for finding that. Yeah, it looked to me like it thought
-> hdev was NULL, but I couldn't find where. :)
->
-> I think the best work-around here is your "hdev && " addition.
+This is automated email and please do not reply to this email!
 
-Perhaps we could something like:
+Dear submitter,
 
-#define bt_dev_bacmp(hdev, bdaddr) ((hdev) ? bacmp(&(hdev)->bdaddr,
-bdaddr) : -EINVAL)
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=791597
 
-Or the fact that we test for hdev makes the compiler assume it could
-NULL? If I recall correctly we did that because in some codepaths
-there is actually no hdev to use so it is passed as NULL.
+---Test result---
 
-> --
-> Kees Cook
+Test Summary:
+CheckPatch                    PASS      5.17 seconds
+GitLint                       FAIL      3.88 seconds
+BuildEll                      PASS      28.05 seconds
+BluezMake                     PASS      786.38 seconds
+MakeCheck                     PASS      11.55 seconds
+MakeDistcheck                 PASS      165.95 seconds
+CheckValgrind                 PASS      260.49 seconds
+CheckSmatch                   PASS      353.50 seconds
+bluezmakeextell               PASS      108.82 seconds
+IncrementalBuild              PASS      7338.07 seconds
+ScanBuild                     PASS      1045.91 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v2,10/11] doc/advertisement-monitor-api: Rename to org.bluez.AdvertisementMonitor*.rst
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (87>80): "[v2,10/11] doc/advertisement-monitor-api: Rename to org.bluez.AdvertisementMonitor*.rst"
 
 
+---
+Regards,
+Linux Bluetooth
 
---=20
-Luiz Augusto von Dentz
+
+--===============5033564976008541973==--
