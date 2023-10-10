@@ -2,110 +2,97 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44703CD68E4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Oct 2023 02:26:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57A51CD68EC
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Oct 2023 05:37:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1441848AbjJJC0M (ORCPT
+        id S1442117AbjJJFhJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 9 Oct 2023 22:26:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39936 "EHLO
+        Tue, 10 Oct 2023 01:37:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378796AbjJJC0L (ORCPT
+        with ESMTP id S1442113AbjJJFhI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 9 Oct 2023 22:26:11 -0400
-Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12C6AA7
-        for <linux-bluetooth@vger.kernel.org>; Mon,  9 Oct 2023 19:26:10 -0700 (PDT)
-Received: by mail-qk1-x735.google.com with SMTP id af79cd13be357-77432add7caso297587585a.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Oct 2023 19:26:10 -0700 (PDT)
+        Tue, 10 Oct 2023 01:37:08 -0400
+Received: from mail-oa1-x30.google.com (mail-oa1-x30.google.com [IPv6:2001:4860:4864:20::30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BE37AF;
+        Mon,  9 Oct 2023 22:37:06 -0700 (PDT)
+Received: by mail-oa1-x30.google.com with SMTP id 586e51a60fabf-1dd71c0a41fso3550555fac.2;
+        Mon, 09 Oct 2023 22:37:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696904769; x=1697509569; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ahaOyyuk9B8UJytux7L3k7HiwgKUX5JT/mTM+EXP6vg=;
-        b=ADnj1XLQTa5Q00X2mzdP6TBq1S/nZcAyjyZPD3qnwQjls7k/vX+DRugM0RdpG6PgsK
-         Ad11KHj2aMguPkVrDHjrTxOtYrHTqU3bw22ldJBzxTdWV0ORCowsJEZUFyorKZuZPKLF
-         2mvnMhosvh9NoIvsZ4sheHmuS3S176/N1Yp7qMm/Nfu7iI/1ZZFGpOWWAzzUbceMiQMj
-         Av8C6S+Scll2x9nEJl2MJ5IyjuG+rpw+QAXcw8lJEjVMqG/wlaydHSNoWCxAro2X17le
-         j/Q/hOMvX0TbWig8b2NFJ4Onprr8pDvHCZnWGmeLTLJ2rDB3QybaIqpxnYRfNU53w77K
-         e7Vw==
+        d=gmail.com; s=20230601; t=1696916226; x=1697521026; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3+ydGI7sff09G/7JETRhlsl6DkdhesL7wxe7Wc1ipso=;
+        b=NyGXX67rUNDetTjJkPKNiEevjYDyNjEGyGle1kwtvtf86bv3AQ6e8DTE4T8ffIYSNB
+         cRmLJECQVcHhaMP6XjhGKUBpv2Xykds0denH4vAo5xoxEmA5DUXgyqbL4l1yhG3oomKH
+         pT5PRPYw0b9RvRlrqKHEmKp+g3/Kvb609aw0HeCg0S9w088DbPVV+z51gFDCYMwkxdEh
+         xrgCkG28iCASfzbXgnvyupPMXDjYP5lYIFSdzPB2T01x5gmfpyvjYLEiTnChANvr77fB
+         U7CuwUyoxakHQSy/CIM1GHoWVx1DtQ82lnsuDOeLRXC+jEbX9h8l7mNghifU7/zSsbMV
+         4fKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696904769; x=1697509569;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ahaOyyuk9B8UJytux7L3k7HiwgKUX5JT/mTM+EXP6vg=;
-        b=bxFqYvJv9IpZphQbRaOWXCnz+U5s/xFiE8YuFPk3pnOPfT/Qyq3nZlI89xO5nIjPKn
-         pOlshcSSGSHke0qHPkKIbQ05LIe91ZmIDhkTzqvNZ3ZWQdzyC9mdosaZLleg7e507ABD
-         a2dDqbMAyii1ogdivjXzCpZBfX7+X5qyA+kihHfkMI4/wuH+ap6mRpUA+synZ2ouIzQp
-         UcNKwoAve0Dayh1DfFb7B9G4MO/5W0+ginwuYgn0XQRaAiBlD+FB9OYEwEVMN6isTh1p
-         bRY8FzWy1VMIXJXuIz48P4JCiJ+Xdi8xXAjGsLpZSY6nZLODr/pdHqLBYZ66lc78tOeb
-         u8/A==
-X-Gm-Message-State: AOJu0YyUHFToHmiKaC3RmGM2krsGNoDs1L2vDnbeKFUswNSnQkk6E0D6
-        E5fjZXZV5MEcwbPNWkl7cfrbhfRwsbw=
-X-Google-Smtp-Source: AGHT+IHQBoo+NoMRm/vCKTz3Onrh96TI973lEOagfgSvWDfXDXYk1uHl7QktT/nkYjmsJCnDoIiSIw==
-X-Received: by 2002:a0c:dd90:0:b0:65b:177b:a430 with SMTP id v16-20020a0cdd90000000b0065b177ba430mr16886397qvk.47.1696904768909;
-        Mon, 09 Oct 2023 19:26:08 -0700 (PDT)
-Received: from [172.17.0.2] ([20.57.124.94])
-        by smtp.gmail.com with ESMTPSA id v9-20020a0cdd89000000b0064c1b27bf2dsm4281912qvk.140.2023.10.09.19.26.08
+        d=1e100.net; s=20230601; t=1696916226; x=1697521026;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3+ydGI7sff09G/7JETRhlsl6DkdhesL7wxe7Wc1ipso=;
+        b=AYxcDl9YJKXUgxfIWr9lNrhqC79aI/GCp1owJNJcT0atk9AisJyBWr1VB0xoH7kaGi
+         uWXtDnguz9maMCeegMvyqB+P2uYW9t78AHdyEfPtyaX7AnisBOpUUderT5gC2gn0oOfq
+         YzlTvM847E+qAXef3TMNMUtcFx0mNbhOzri4i8yhiSVSp+g9u5BK7pt8iKQCTSpTMro3
+         At2Fbj7lgZyUX2NQVn59yChfaXtGgNkKVrCNi3WpDLE2WgTEDzBqFMQBkuICqId0oV4a
+         QyJcdF41TAQ4tt4leruH1IkURMgp5nlfK5qr/NR7pOqAg072sBgo68i/mLBFPrYoQraw
+         mymw==
+X-Gm-Message-State: AOJu0YybPOoSZoSLqunYtCD3ns/h8+N6a8/AG6Ik5agGl1GAU1p1kZvT
+        EOX/ITer9w92QuiV5eEVQMM=
+X-Google-Smtp-Source: AGHT+IEKsubtOOGHSEohPCYMGjWslsLGkbDHkHKk9Srkm0L4XmEWSyeocHgsc01rhV7A0Rnkjd+ptA==
+X-Received: by 2002:a05:6870:71ce:b0:1d6:51aa:13a2 with SMTP id p14-20020a05687071ce00b001d651aa13a2mr19869311oag.10.1696916225861;
+        Mon, 09 Oct 2023 22:37:05 -0700 (PDT)
+Received: from pek-lxu-l1.wrs.com ([111.198.228.56])
+        by smtp.gmail.com with ESMTPSA id n9-20020aa79049000000b0068fe7c4148fsm7267060pfo.57.2023.10.09.22.37.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Oct 2023 19:26:08 -0700 (PDT)
-Message-ID: <6524b640.0c0a0220.1ecad.1227@mx.google.com>
-Date:   Mon, 09 Oct 2023 19:26:08 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5033564976008541973=="
+        Mon, 09 Oct 2023 22:37:05 -0700 (PDT)
+From:   Edward AD <twuufnxlz@gmail.com>
+To:     syzbot+c90849c50ed209d77689@syzkaller.appspotmail.com
+Cc:     davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com,
+        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
+        luiz.von.dentz@intel.com, marcel@holtmann.org,
+        netdev@vger.kernel.org, pabeni@redhat.com,
+        syzkaller-bugs@googlegroups.com
+Subject: [PATCH] Bluetooth: hci_sock: fix slab oob read in create_monitor_event
+Date:   Tue, 10 Oct 2023 13:36:57 +0800
+Message-ID: <20231010053656.2034368-2-twuufnxlz@gmail.com>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <000000000000ae9ff70607461186@google.com>
+References: <000000000000ae9ff70607461186@google.com>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v2,01/11] doc/adapter-api: Rename to org.bluez.Adapter.rst
-In-Reply-To: <20231009232933.500652-1-luiz.dentz@gmail.com>
-References: <20231009232933.500652-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5033564976008541973==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+When accessing hdev->name, the actual string length should prevail
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=791597
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      5.17 seconds
-GitLint                       FAIL      3.88 seconds
-BuildEll                      PASS      28.05 seconds
-BluezMake                     PASS      786.38 seconds
-MakeCheck                     PASS      11.55 seconds
-MakeDistcheck                 PASS      165.95 seconds
-CheckValgrind                 PASS      260.49 seconds
-CheckSmatch                   PASS      353.50 seconds
-bluezmakeextell               PASS      108.82 seconds
-IncrementalBuild              PASS      7338.07 seconds
-ScanBuild                     PASS      1045.91 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v2,10/11] doc/advertisement-monitor-api: Rename to org.bluez.AdvertisementMonitor*.rst
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T1 Title exceeds max length (87>80): "[v2,10/11] doc/advertisement-monitor-api: Rename to org.bluez.AdvertisementMonitor*.rst"
-
-
+Reported-by: syzbot+c90849c50ed209d77689@syzkaller.appspotmail.com
+Fixes: dcda165706b9 ("Bluetooth: hci_core: Fix build warnings")
+Signed-off-by: Edward AD <twuufnxlz@gmail.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hci_sock.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 5e4f718073b7..72abe54c45dd 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -488,7 +488,7 @@ static struct sk_buff *create_monitor_event(struct hci_dev *hdev, int event)
+ 		ni->type = hdev->dev_type;
+ 		ni->bus = hdev->bus;
+ 		bacpy(&ni->bdaddr, &hdev->bdaddr);
+-		memcpy(ni->name, hdev->name, 8);
++		memcpy(ni->name, hdev->name, strlen(hdev->name));
+ 
+ 		opcode = cpu_to_le16(HCI_MON_NEW_INDEX);
+ 		break;
+-- 
+2.25.1
 
---===============5033564976008541973==--
