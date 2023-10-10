@@ -2,257 +2,124 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D064BCD98C0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Oct 2023 22:38:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F11BCD98C0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Oct 2023 23:18:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231926AbjJJWiE (ORCPT
+        id S229578AbjJJXSe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 10 Oct 2023 18:38:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41766 "EHLO
+        Tue, 10 Oct 2023 19:18:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230347AbjJJWiD (ORCPT
+        with ESMTP id S229546AbjJJXSd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 10 Oct 2023 18:38:03 -0400
-Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1886399
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Oct 2023 15:38:01 -0700 (PDT)
-Received: from github.com (hubbernetes-node-bc9b7c8.ac4-iad.github.net [10.52.132.39])
-        by smtp.github.com (Postfix) with ESMTPA id 603DA1E093D
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Oct 2023 15:38:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2023; t=1696977480;
-        bh=sHmUxohvcY9zSyS6N1lHO9eTTaqOk54B6XqwG9V7wSk=;
-        h=Date:From:To:Subject:From;
-        b=SDVJiwbH+YP2e8OLG/vEhsoBmYfyClq/AdIqcTbPgTkhtNbNjuAIn+095JBr6zyaX
-         5YaSaICJVBwla1P4ThppyjXZPIZEjiIsEtBle5gv/sf8i9PxbasbEQ7708BZs/GsB3
-         x7l7VPQJdgRaK9G0k8JqnSa2btsUNZA1tuoTszOE=
-Date:   Tue, 10 Oct 2023 15:38:00 -0700
-From:   Luiz Augusto von Dentz <noreply@github.com>
-To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/d4a0d2-ee2762@github.com>
-Subject: [bluez/bluez] 6f7eff: doc/adapter-api: Rename to
- org.bluez.Adapter.rst
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+        Tue, 10 Oct 2023 19:18:33 -0400
+Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 450888E
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Oct 2023 16:18:31 -0700 (PDT)
+Received: by mail-ot1-x335.google.com with SMTP id 46e09a7af769-6c63588b554so4233755a34.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Oct 2023 16:18:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696979910; x=1697584710; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=NlYcBclCrOfZocHUPXSQqkeQ3lZ8boMeiRj6gqvmbuI=;
+        b=hxMtCoOnECDM3Apg5gP94DaHA2zouhId15zuaWGvXAkB3kPcCkn1btMxkJfS64qMu+
+         uUC/14WMtdShAsxz/eHpOhsfG3ivDUOnhO3PnVeoXOTXKOc61RzsziYEqLpzdQcA3HTS
+         sVfe9v2/CCbPXVz4Z3mOTOG5G5Ic8j/Qt8qAIs3nE++0luU7m94EIqupupJvT1F3Egll
+         ukpNWn4oC4sRZS8lR1oxxTo4sh12+PjSKykK1/PCrqndsywi1IrbnJaCJdcWJ7xGlque
+         zSxYhYkbeZpwAqq0FhRucWTfWgL79mMANvprQReTEQrCHBli8Aop2LW6ZN21r71ApouL
+         x/vw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696979910; x=1697584710;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NlYcBclCrOfZocHUPXSQqkeQ3lZ8boMeiRj6gqvmbuI=;
+        b=VdmlOczg0zGj7kmo6xEaWDgmD2yKnZzwGQIEzT6ZzsdTmbT3gaa7W5OxIuSc63kHCD
+         9cPT/v7JMPnu1a4mhq0GTUTfvwoA6V1SeWanbmruJ4TcTEVe+L5wrjx7P2nWcSDjy8G1
+         dqgzPOKihDTrWAZcpYmQ4bNpnVb6Jr+0hYGR7Ks5B9zOlWHHaYqgJyD9mmQNClfSi/0J
+         t6nrjCVpSW3jTtCoPRrieTld05/D0ex4TvVW7NVfzXezqypuh8FemKMngv9tO+osX1lA
+         +gQuOWR5lKEQw/Uzqw45PAhFZdG6cOav6dLDV6IlFB4qsK2bYDl27LAPjlwfdo51cm6k
+         lk9g==
+X-Gm-Message-State: AOJu0YxMwSczNPIetIXy3onYhtz42H+f1gaC7kCKrt8dGxVrRDSqImmS
+        b3KXyCfzZahYJx9ck2UrmpoYw4JOsSU=
+X-Google-Smtp-Source: AGHT+IFhN55IWs/UmrkWbY+hu2NOya2rIRLyquzQYZWugJrX/ir9JsCXMmHg9GQz+cfnEfV+LfKKMg==
+X-Received: by 2002:a05:6870:d60e:b0:1d5:aa83:c225 with SMTP id a14-20020a056870d60e00b001d5aa83c225mr21292001oaq.21.1696979910365;
+        Tue, 10 Oct 2023 16:18:30 -0700 (PDT)
+Received: from [172.17.0.2] ([40.84.170.229])
+        by smtp.gmail.com with ESMTPSA id r6-20020a056870734600b001dd60c202e6sm2511236oal.10.2023.10.10.16.18.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Oct 2023 16:18:30 -0700 (PDT)
+Message-ID: <6525dbc6.050a0220.56f6e.0315@mx.google.com>
+Date:   Tue, 10 Oct 2023 16:18:30 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4367529435538727859=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ] input: Fix smatch warning
+In-Reply-To: <20231010215853.629963-1-luiz.dentz@gmail.com>
+References: <20231010215853.629963-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 6f7effa4534f4f1d52f74860c204bc9317b68ee4
-      https://github.com/bluez/bluez/commit/6f7effa4534f4f1d52f74860c204bc9317b68ee4
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-10-05 (Thu, 05 Oct 2023)
+--===============4367529435538727859==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-  Changed paths:
-    M Makefile.am
-    R doc/adapter-api.txt
-    A doc/org.bluez.Adapter.rst
+This is automated email and please do not reply to this email!
 
-  Log Message:
-  -----------
-  doc/adapter-api: Rename to org.bluez.Adapter.rst
+Dear submitter,
 
-This renames adapter-api.txt to org.bluez.Adapter.rst and generate a
-manpage org.bluez.Adapter.5.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=791982
 
+---Test result---
 
-  Commit: 359132ba897e3b3e942953b351450254443fa8d1
-      https://github.com/bluez/bluez/commit/359132ba897e3b3e942953b351450254443fa8d1
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-10-05 (Thu, 05 Oct 2023)
+Test Summary:
+CheckPatch                    FAIL      0.66 seconds
+GitLint                       PASS      0.28 seconds
+BuildEll                      PASS      28.97 seconds
+BluezMake                     PASS      996.51 seconds
+MakeCheck                     PASS      12.73 seconds
+MakeDistcheck                 PASS      169.57 seconds
+CheckValgrind                 PASS      268.41 seconds
+CheckSmatch                   PASS      360.78 seconds
+bluezmakeextell               PASS      111.29 seconds
+IncrementalBuild              PASS      858.81 seconds
+ScanBuild                     PASS      1115.70 seconds
 
-  Changed paths:
-    M Makefile.am
-    R doc/device-api.txt
-    A doc/org.bluez.Device.rst
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ] input: Fix smatch warning
+WARNING:EMAIL_SUBJECT: A patch subject line should describe the change not the tool that found it
+#71: 
+Subject: [PATCH BlueZ] input: Fix smatch warning
 
-  Log Message:
-  -----------
-  doc/device-api: Rename to org.bluez.Device.rst
+/github/workspace/src/src/13416197.patch total: 0 errors, 1 warnings, 48 lines checked
 
-This renames device-api.txt to org.bluez.Device.rst and generate a
-manpage org.bluez.Device.5.
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
+/github/workspace/src/src/13416197.patch has style problems, please review.
 
-  Commit: 42e2934c235685fcb86ad19745e2f10b78b3eba3
-      https://github.com/bluez/bluez/commit/42e2934c235685fcb86ad19745e2f10b78b3eba3
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-10-09 (Mon, 09 Oct 2023)
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
 
-  Changed paths:
-    M Makefile.am
-    R doc/agent-api.txt
-    A doc/org.bluez.Agent.rst
-    A doc/org.bluez.AgentManager.rst
-
-  Log Message:
-  -----------
-  doc/agent-api: Rename to org.bluez.Agent{Manager}.rst
-
-This renames agent-api.txt to org.bluez.Agent{Manager}.rst and generate
-manpages org.bluez.Agent{Manager}.5.
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
-  Commit: c5729e61b1506b5df45c9a267640136a5419f287
-      https://github.com/bluez/bluez/commit/c5729e61b1506b5df45c9a267640136a5419f287
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-10-09 (Mon, 09 Oct 2023)
-
-  Changed paths:
-    M Makefile.am
-    A doc/org.bluez.Profile.rst
-    A doc/org.bluez.ProfileManager.rst
-    R doc/profile-api.txt
-
-  Log Message:
-  -----------
-  doc/profile-api: Rename to org.bluez.Profile{Manager}.rst
-
-This renames profile-api.txt to org.bluez.Profile{Manager}.rst and
-generate manpages org.bluez.Profile{Manager}.5.
 
 
-  Commit: 6481b9095b3484d9e224e6a69744b926bb0aee99
-      https://github.com/bluez/bluez/commit/6481b9095b3484d9e224e6a69744b926bb0aee99
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-10-09 (Mon, 09 Oct 2023)
-
-  Changed paths:
-    M Makefile.am
-    R doc/network-api.txt
-    A doc/org.bluez.Network.rst
-    A doc/org.bluez.NetworkServer.rst
-
-  Log Message:
-  -----------
-  doc/network-api: Rename to org.bluez.Network{Server}.rst
-
-This renames network-api.txt to org.bluez.Network{Server}.rst and
-generate manpages org.bluez.Network{Server}.5.
+---
+Regards,
+Linux Bluetooth
 
 
-  Commit: cfc76016b4d4fbc720e588831ee3f6f3b1e283f0
-      https://github.com/bluez/bluez/commit/cfc76016b4d4fbc720e588831ee3f6f3b1e283f0
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-10-09 (Mon, 09 Oct 2023)
-
-  Changed paths:
-    M Makefile.am
-    R doc/input-api.txt
-    A doc/org.bluez.Input.rst
-
-  Log Message:
-  -----------
-  doc/input-api: Rename to org.bluez.Input.rst
-
-This renames input-api.txt to org.bluez.Input.rst and generate manpages
-org.bluez.Input.5.
-
-
-  Commit: dec59a07fb115bb26067f13cac1c7751ed6f83ad
-      https://github.com/bluez/bluez/commit/dec59a07fb115bb26067f13cac1c7751ed6f83ad
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-10-09 (Mon, 09 Oct 2023)
-
-  Changed paths:
-    M Makefile.am
-    R doc/advertising-api.txt
-    A doc/org.bluez.LEAdvertisement.rst
-    A doc/org.bluez.LEAdvertisingManager.rst
-
-  Log Message:
-  -----------
-  doc/advertising-api: Rename to org.bluez.LEAdvertis*.rst
-
-This renames advertising-api.txt to org.bluez.LEAdvertis*.rst and
-generate manpages org.bluez.LEAdvertis*.5.
-
-
-  Commit: c6c412d6ccbc5ce2df46a7530a45cf2d7cbb37e8
-      https://github.com/bluez/bluez/commit/c6c412d6ccbc5ce2df46a7530a45cf2d7cbb37e8
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-10-09 (Mon, 09 Oct 2023)
-
-  Changed paths:
-    M Makefile.am
-    R doc/gatt-api.txt
-    A doc/org.bluez.GattCharacteristic.rst
-    A doc/org.bluez.GattDescriptor.rst
-    A doc/org.bluez.GattManager.rst
-    A doc/org.bluez.GattProfile.rst
-    A doc/org.bluez.GattService.rst
-
-  Log Message:
-  -----------
-  doc/gatt-api: Rename to org.bluez.Gatt*.rst
-
-This renames gatt-api.txt to org.bluez.Gatt*.rst and generate manpages
-org.bluez.Gatt*.5.
-
-
-  Commit: cba68babe1e6714d93be27bc9c3891b6874f30ea
-      https://github.com/bluez/bluez/commit/cba68babe1e6714d93be27bc9c3891b6874f30ea
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-10-09 (Mon, 09 Oct 2023)
-
-  Changed paths:
-    M Makefile.am
-    R doc/battery-api.txt
-    A doc/org.bluez.Battery.rst
-    A doc/org.bluez.BatteryProvider.rst
-    A doc/org.bluez.BatteryProviderManager.rst
-
-  Log Message:
-  -----------
-  doc/battery-api: Rename to org.bluez.Battery*.rst
-
-This renames battery-api.txt to org.bluez.Battery*.rst and generate
-manpages org.bluez.Battery*.5.
-
-
-  Commit: 87151d1904ada0c151bef96c69d70e9bb3d3a08a
-      https://github.com/bluez/bluez/commit/87151d1904ada0c151bef96c69d70e9bb3d3a08a
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-10-09 (Mon, 09 Oct 2023)
-
-  Changed paths:
-    M Makefile.am
-    R doc/advertisement-monitor-api.txt
-    A doc/org.bluez.AdvertisementMonitor.rst
-    A doc/org.bluez.AdvertisementMonitorManager.rst
-
-  Log Message:
-  -----------
-  doc/advertisement-monitor-api: Rename to org.bluez.AdvertisementMonitor*.rst
-
-This renames advertisement-monitor-api.txt to
-org.bluez.AdvertisementMonitor*.rst and generate manpages
-org.bluez.AdvertisementMonitor*.5.
-
-
-  Commit: ee27626c7a06b21a59cb46c192b7045fe9da5fb9
-      https://github.com/bluez/bluez/commit/ee27626c7a06b21a59cb46c192b7045fe9da5fb9
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-10-09 (Mon, 09 Oct 2023)
-
-  Changed paths:
-    M Makefile.am
-    R doc/admin-policy-api.txt
-    A doc/org.bluez.AdminPolicySet.rst
-    A doc/org.bluez.AdminPolicyStatus.rst
-
-  Log Message:
-  -----------
-  doc/admin-policy-api: Rename to org.bluez.AdminPolicy*.rst
-
-This renames admin-policy-api.txt to org.bluez.AdminPolicy*.rst and
-generate manpages org.bluez.AdminPolicy*.5.
-
-
-Compare: https://github.com/bluez/bluez/compare/d4a0d223eaa5...ee27626c7a06
+--===============4367529435538727859==--
