@@ -2,109 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0902DCD98F3
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Oct 2023 05:15:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6696CD98F3
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Oct 2023 06:02:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229747AbjJKFPM (ORCPT
+        id S1343923AbjJKGCA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 Oct 2023 01:15:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59636 "EHLO
+        Wed, 11 Oct 2023 02:02:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229723AbjJKFPM (ORCPT
+        with ESMTP id S1343606AbjJKGB7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 11 Oct 2023 01:15:12 -0400
-Received: from m15.mail.126.com (m15.mail.126.com [45.254.50.224])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 197D994;
-        Tue, 10 Oct 2023 22:15:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
-        s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=GHLxU
-        J0loRJ9r4GOSYvf9jItgsWbOtM0fRl1SM8P5Xc=; b=fopABb1QbIDfE2q69USNZ
-        dolsvhrO6qh3g34qtWLxJ6+iwjCbDKTaflpBLikA8Qesv6rMxlo6LrhTwad+KveZ
-        gKPzHTf7hy7e3H8j3PgJczPnUa4COXfyewzfP+TVDPp//4lw3H1qQMeSEJUAUGbu
-        lLRhhJFn4QK9HmDtnT3Kwc=
-Received: from king.lan (unknown [103.163.180.22])
-        by zwqz-smtp-mta-g0-0 (Coremail) with SMTP id _____wDnDyFKLyZlE7idBg--.360S2;
-        Wed, 11 Oct 2023 13:14:51 +0800 (CST)
-From:   wangyouwan@126.com
-To:     marcel@holtmann.org
-Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        youwan Wang <wangyouwan@126.com>
-Subject: [PATCH] Bluetooth: btusb: Add date->evt_skb is NULL check
-Date:   Wed, 11 Oct 2023 13:14:47 +0800
-Message-Id: <20231011051447.92581-1-wangyouwan@126.com>
-X-Mailer: git-send-email 2.25.1
+        Wed, 11 Oct 2023 02:01:59 -0400
+Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BEFD8E
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Oct 2023 23:01:58 -0700 (PDT)
+Received: by mail-io1-xd29.google.com with SMTP id ca18e2360f4ac-7a5a746e355so16487639f.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Oct 2023 23:01:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697004117; x=1697608917; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=qkQfFxRfuHnEMVR1A+wbDEzFopZ5Ofccak6TVNlVzD4=;
+        b=OQtgDDWEdY0YuS4NLu4Ny45WwZWRkF3eKca7EAXVcUNf6+hOjfzI4aUbr2lAF/QYCY
+         F0BeyJzsrrXIQKk+ftwVJ23gysQmhsOsaUGDG8k4H1io3qmO1pBZidXHPGBRWSETVfmo
+         rG5vTuDS8H4ZJd2K6Ln5unJevRcev8u4dU+gf9UF4c4ia73HV1ahFyLFdT4eLE6s0f6S
+         gC8uLR0t/WqzUXDQdmhFNq1/y1flMGytG+HYZQmRPxs/l5D4CtOYPuH3vhj6/bPMgBjK
+         7TqNW7ssrz97Fq5UWh5F8HnPnThCsntXaVCerC7RaVFlnVCqz+W89uTuM0u/0ZYw4hM5
+         Z2Bg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697004117; x=1697608917;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qkQfFxRfuHnEMVR1A+wbDEzFopZ5Ofccak6TVNlVzD4=;
+        b=fqbIKOMjF/A6WWB2sNfoAJKZPie82a7WDKknjV2c/bj/RBASI5bhgWh1CYsPfsU/lQ
+         V3km9R7EKfgEEGxOT1TixpL3HiGmrN6me5cOXSmMviH57RMZxiXfGjMuILFocPxgJe2r
+         XQ/Y5Vgzu/RbSfkR4FroVXnIqRu+/nt9fnMQuiKpnUncywN4wn2+bOWyX0YcLGT1/fiw
+         6jUQbL6QKL4E3VfZA3pQbvyjn/mSpbpqQPFb30gV2eMatythk+Anl8EYEhxWkY8riARK
+         wnrVmupCOaefwUW5qrUb/1mBQyVdhanPG9xUf4/P07ONVI8+Goci/s/nW+H+e2KEjSdr
+         jUHg==
+X-Gm-Message-State: AOJu0Ywt3uEYzHNtKhi96i91gTP1tPIUslm1LETVND305ahAx3jvuNnm
+        IXvX0EeC7Zh3gin8fGzSoDQnPr/gy/c=
+X-Google-Smtp-Source: AGHT+IEovQSb/34grIlT5DhufBGd0RkBg8fCalrfehF62euKQTsKa3ej6GQMgQYEN8xdB05Nm6e+ZQ==
+X-Received: by 2002:a5e:cb4c:0:b0:79f:b4f1:186a with SMTP id h12-20020a5ecb4c000000b0079fb4f1186amr15028268iok.1.1697004117627;
+        Tue, 10 Oct 2023 23:01:57 -0700 (PDT)
+Received: from [172.17.0.2] ([13.86.66.34])
+        by smtp.gmail.com with ESMTPSA id c23-20020a6bfd17000000b0079fdeed3ab6sm3400962ioi.40.2023.10.10.23.01.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Oct 2023 23:01:57 -0700 (PDT)
+Message-ID: <65263a55.6b0a0220.ec807.48a4@mx.google.com>
+Date:   Tue, 10 Oct 2023 23:01:57 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5260396786223571724=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _____wDnDyFKLyZlE7idBg--.360S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxGr4kXFy7Cr47GFyUtF15XFb_yoW5AFW3pr
-        1rt3WDCF4kW3yUJr15XF18Aw4UXr42vFy5Jr9rZr45XFy3Ka1DJa4xJrWUKr1DGr4agw13
-        ta4kJw10gw1DGaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zidb15UUUUU=
-X-Originating-IP: [103.163.180.22]
-X-CM-SenderInfo: 5zdqw5prxzt0a6rslhhfrp/1tbidxAGFVpD3-acQAAAsY
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, wangyouwan@126.com
+Subject: RE: Bluetooth: btusb: Add date->evt_skb is NULL check
+In-Reply-To: <20231011051447.92581-1-wangyouwan@126.com>
+References: <20231011051447.92581-1-wangyouwan@126.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: youwan Wang <wangyouwan@126.com>
+--===============5260396786223571724==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-fix crash because of null pointers
+This is automated email and please do not reply to this email!
 
-[ 6104.969662] BUG: kernel NULL pointer dereference, address: 00000000000000c8
-[ 6104.969667] #PF: supervisor read access in kernel mode
-[ 6104.969668] #PF: error_code(0x0000) - not-present page
-[ 6104.969670] PGD 0 P4D 0
-[ 6104.969673] Oops: 0000 [#1] SMP NOPTI
-[ 6104.969684] RIP: 0010:btusb_mtk_hci_wmt_sync+0x144/0x220 [btusb]
-[ 6104.969688] RSP: 0018:ffffb8d681533d48 EFLAGS: 00010246
-[ 6104.969689] RAX: 0000000000000000 RBX: ffff8ad560bb2000 RCX: 0000000000000006
-[ 6104.969691] RDX: 0000000000000000 RSI: ffffb8d681533d08 RDI: 0000000000000000
-[ 6104.969692] RBP: ffffb8d681533d70 R08: 0000000000000001 R09: 0000000000000001
-[ 6104.969694] R10: 0000000000000001 R11: 00000000fa83b2da R12: ffff8ad461d1d7c0
-[ 6104.969695] R13: 0000000000000000 R14: ffff8ad459618c18 R15: ffffb8d681533d90
-[ 6104.969697] FS:  00007f5a1cab9d40(0000) GS:ffff8ad578200000(0000) knlGS:00000
-[ 6104.969699] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[ 6104.969700] CR2: 00000000000000c8 CR3: 000000018620c001 CR4: 0000000000760ef0
-[ 6104.969701] PKRU: 55555554
-[ 6104.969702] Call Trace:
-[ 6104.969708]  btusb_mtk_shutdown+0x44/0x80 [btusb]
-[ 6104.969732]  hci_dev_do_close+0x470/0x5c0 [bluetooth]
-[ 6104.969748]  hci_rfkill_set_block+0x56/0xa0 [bluetooth]
-[ 6104.969753]  rfkill_set_block+0x92/0x160
-[ 6104.969755]  rfkill_fop_write+0x136/0x1e0
-[ 6104.969759]  __vfs_write+0x18/0x40
-[ 6104.969761]  vfs_write+0xdf/0x1c0
-[ 6104.969763]  ksys_write+0xb1/0xe0
-[ 6104.969765]  __x64_sys_write+0x1a/0x20
-[ 6104.969769]  do_syscall_64+0x51/0x180
-[ 6104.969771]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-[ 6104.969773] RIP: 0033:0x7f5a21f18fef
-[ 6104.9] RSP: 002b:00007ffeefe39010 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
-[ 6104.969780] RAX: ffffffffffffffda RBX: 000055c10a7560a0 RCX: 00007f5a21f18fef
-[ 6104.969781] RDX: 0000000000000008 RSI: 00007ffeefe39060 RDI: 0000000000000012
-[ 6104.969782] RBP: 00007ffeefe39060 R08: 0000000000000000 R09: 0000000000000017
-[ 6104.969784] R10: 00007ffeefe38d97 R11: 0000000000000293 R12: 0000000000000002
-[ 6104.969785] R13: 00007ffeefe39220 R14: 00007ffeefe391a0 R15: 000055c10a72acf0
+Dear submitter,
 
-Signed-off-by: youwan Wang <wangyouwan@126.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=792044
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.61 seconds
+GitLint                       PASS      0.28 seconds
+SubjectPrefix                 PASS      0.08 seconds
+BuildKernel                   PASS      35.48 seconds
+CheckAllWarning               PASS      38.26 seconds
+CheckSparse                   PASS      44.26 seconds
+CheckSmatch                   PASS      117.11 seconds
+BuildKernel32                 PASS      34.25 seconds
+TestRunnerSetup               PASS      525.24 seconds
+TestRunner_l2cap-tester       PASS      31.43 seconds
+TestRunner_iso-tester         PASS      55.62 seconds
+TestRunner_bnep-tester        PASS      10.71 seconds
+TestRunner_mgmt-tester        PASS      223.06 seconds
+TestRunner_rfcomm-tester      PASS      16.46 seconds
+TestRunner_sco-tester         PASS      19.86 seconds
+TestRunner_ioctl-tester       PASS      18.50 seconds
+TestRunner_mesh-tester        PASS      15.09 seconds
+TestRunner_smp-tester         PASS      15.11 seconds
+TestRunner_userchan-tester    PASS      11.38 seconds
+IncrementalBuild              PASS      32.91 seconds
+
+
+
 ---
- drivers/bluetooth/btusb.c | 3 +++
- 1 file changed, 3 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 3fdad35e5e1d..d793dcd06687 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2824,6 +2824,9 @@ static int btusb_mtk_hci_wmt_sync(struct hci_dev *hdev,
- 		goto err_free_wc;
- 	}
- 
-+	if (data->evt_skb == NULL)
-+		goto err_free_wc;
-+
- 	/* Parse and handle the return WMT event */
- 	wmt_evt = (struct btmtk_hci_wmt_evt *)data->evt_skb->data;
- 	if (wmt_evt->whdr.op != hdr->op) {
--- 
-2.25.1
 
+--===============5260396786223571724==--
