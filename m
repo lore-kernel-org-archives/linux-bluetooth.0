@@ -2,148 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABCF6CDB467
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Oct 2023 16:31:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCABFCDB46B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Oct 2023 17:09:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235105AbjJKQbv (ORCPT
+        id S232406AbjJKRJM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 Oct 2023 12:31:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49260 "EHLO
+        Wed, 11 Oct 2023 13:09:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34448 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235077AbjJKQbu (ORCPT
+        with ESMTP id S230158AbjJKRJL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 11 Oct 2023 12:31:50 -0400
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F066CC0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Oct 2023 09:31:48 -0700 (PDT)
-Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-69af8a42066so4461478b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Oct 2023 09:31:48 -0700 (PDT)
+        Wed, 11 Oct 2023 13:09:11 -0400
+Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0723F98
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Oct 2023 10:09:09 -0700 (PDT)
+Received: by mail-pg1-x52c.google.com with SMTP id 41be03b00d2f7-5859b2eaa55so23371a12.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Oct 2023 10:09:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1697041908; x=1697646708; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=H+MMx8yPQF+8HcCzQjqdZnLD/WD4YyZebT9qiOBQ8gg=;
-        b=DCUCJVOdtsgwD+XFhC5rjJ/2yawUhJ8I5aWSZ6N3+cycUsL4ZQ1aepWAD2auyjLJtc
-         qKsk5so7IzN4YKc60U4rymWANux/juBb6BaXT48VrREVDF48kBE96UtkwQYbMK8CL5jl
-         Fn4fRposp6Baiw5I8+nkphoqXKV36pR551Izk=
+        d=gmail.com; s=20230601; t=1697044148; x=1697648948; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=PrN0P2cOxxpS9ML8ydrldHv1/uOlGizvSO9iDpbVB2w=;
+        b=dGpygNeXHbwC8iJfEFwEe9/9anS6CBk3yuKHHL+B3tWe5VUANFPstKihWE2oWE+uyH
+         RghgemnYmnbs5fOKplHJUS+aiv8TQFUwVN2x6nRPfbJuHFcaPN3ixaQ5xA2sI0oQjE92
+         14js4TFVXs+uWkgUrioejqKfMGmHgH+84QC9O5Pb8kztIEg2G3ICiPmCCFvVsncr4D6l
+         q4dHLMsuopSsRtlaxF5NlU0RGwWMOJl83Z4EcHXO5rHb+1IUhw5/p0MVGcxnzlVhR/WY
+         JAhbasDo8HWnjhm7+42mkxOf5S2VSWqg1MWKFanaDQk9LsF01AYecE3gA6nB/0QbNIZD
+         AhCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697041908; x=1697646708;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1697044148; x=1697648948;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=H+MMx8yPQF+8HcCzQjqdZnLD/WD4YyZebT9qiOBQ8gg=;
-        b=SGHfkojcRAvzRFtCMGPGQVBw6uHdoy7yamqS+lPYlscp2GrpJ3GVsCg2n0lGNf6k7e
-         7yXzRs8oeTpVHXlKMRip6niB18E1Ou7MFFNf/ocEYeVqaUWYcBjoUPWJVwMjDg0HNp2p
-         tPIChq1scEPWtJQ32uWT8wvzgqasFDTYYg5IvpU4NRrjcqShqGXdtKYtZWksFYOYfoLP
-         uQ7lNst3dccxpEyjARWWnqiAYprn72zbIXZPLmBGnOjo8L0eW84moERXYXr21Tl+FBeH
-         Om8rO14KdWEY3Bq6lssG9Lx/U3YqPLzttDHY8rDx7NbRKiKaUKK9fMAArxzr/wJefjM1
-         hqPw==
-X-Gm-Message-State: AOJu0YwoFbzowJYUPKapHp/K/9iS/Fq9BM2chiUYEJc9DIoXjPclLH7Z
-        KDpBVQi9MjzPA81ino8RB0b74A==
-X-Google-Smtp-Source: AGHT+IES01ZbXdY6aRhuBKS26Q5mlzP46k5cW0I7syaN7Gn4A+8DmL/xUNf667TCEWUfCACCDgb8xQ==
-X-Received: by 2002:a05:6a20:dd9a:b0:167:af7d:9e8c with SMTP id kw26-20020a056a20dd9a00b00167af7d9e8cmr14523020pzb.56.1697041908446;
-        Wed, 11 Oct 2023 09:31:48 -0700 (PDT)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id q4-20020a656a84000000b00563df2ba23bsm66090pgu.50.2023.10.11.09.31.47
+        bh=PrN0P2cOxxpS9ML8ydrldHv1/uOlGizvSO9iDpbVB2w=;
+        b=ntSsdV97jIBPYeiH+VH5UxMEtKRCJOMjjc4dDrgl2idtBJUUYrP/yL0hFt+YceJ75b
+         YyGh2Tpru3IBQP4FQIHKbQiZ3iaBrlOdbAjKN/HtAHiOJbGqAndEbMrc0j+K1Vh7FdgZ
+         /ZhzMFMu65AxY+UhuQagjOKYG0TubhJIUeSD09Y7ZS17nJwX/iJSmD7/Q1UskXtjfq3j
+         74VKQjjjaBbTMlxdqXxckyXBZmrmof3uI1C/av55v1K0yU2eUpvtiaIxEfyA5V1U1TAk
+         fTO4ZAxZk5DfTgrhPlDqGk32NuOCqQHIvNFVftOJwKqlvuthFO0a1O6aLqxySKNWo8L2
+         +RDA==
+X-Gm-Message-State: AOJu0YzRkCZnGK02Q7ndqBTuAMnlP2psmQ4s9cKYKA3EtIlQN9TGjeWJ
+        udoKNUqEG4855DdLaz1U4ywFxlE4BQo=
+X-Google-Smtp-Source: AGHT+IF8Fq0VBhE+Ghgq8bsjv6gAxQbqEZMGywGRFSL9HQAYPpCC/rS+dAjqXFdnukHjmFYyDxXfog==
+X-Received: by 2002:a17:90a:d804:b0:273:efc0:33eb with SMTP id a4-20020a17090ad80400b00273efc033ebmr17094116pjv.14.1697044148216;
+        Wed, 11 Oct 2023 10:09:08 -0700 (PDT)
+Received: from [172.17.0.2] ([13.91.165.252])
+        by smtp.gmail.com with ESMTPSA id 29-20020a17090a199d00b00278ff752eacsm158961pji.50.2023.10.11.10.09.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Oct 2023 09:31:47 -0700 (PDT)
-From:   Kees Cook <keescook@chromium.org>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     Kees Cook <keescook@chromium.org>, Edward AD <twuufnxlz@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-kernel@vger.kernel.org,
-        syzbot+c90849c50ed209d77689@syzkaller.appspotmail.com,
-        linux-hardening@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_sock: Correctly bounds check and pad HCI_MON_NEW_INDEX name
-Date:   Wed, 11 Oct 2023 09:31:44 -0700
-Message-Id: <20231011163140.work.317-kees@kernel.org>
-X-Mailer: git-send-email 2.34.1
+        Wed, 11 Oct 2023 10:09:07 -0700 (PDT)
+Message-ID: <6526d6b3.170a0220.dda8e.0b84@mx.google.com>
+Date:   Wed, 11 Oct 2023 10:09:07 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3848034567968521252=="
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2385; i=keescook@chromium.org;
- h=from:subject:message-id; bh=on0TcWQI6be5JbFS4MvZB6HiilmbXCZNq0hVdsTZcTA=;
- b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBlJs3wuHKC8tFUYtd66UFMEWlaF6VGRB0wyy4r4
- v0kXJ9+LcuJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZSbN8AAKCRCJcvTf3G3A
- JuqXD/9HcIT6Ydof+BGGggd18PoUB8YhhWaiA8oKdvxkbk3Iumw5829rLzHYLeXZFlNYjAGHJ4w
- YGdSNyjF2lzjbJFZ6wLTuVN7zy0aK9MeyNiT1ch8f3EewDWqA9+P19sq4aSINnJ6L4IIysOPL1J
- Tp7pmoKzWngdKXAXARarmZ0G05FOIyyhnkmJXRuEyiv58jcsvLZTfcpuwJ1gUcJsiK+LFwLgRih
- 1JpDT7C2MQTzrLf9gzsEeFabAQwczaq5l6Kf2BTerw5trq03upcF6Vme6OAlyTCjwUxnxzpS1c1
- ofPNtp18esK1fHIrptpkuEyx2jngkEHn/MQwZ9WlhNC2UtiDgPgDlTLuCW65uA38lNzJHW16fcp
- tISkBl6vPUkmux1FOIDab1LKa149zIZRVPjYg6oDpKSQP3e5rdBTHyEU40aNRJe90uEaOUOOqZQ
- m50d99pztGFeDJ7Pfdz1jKBI76dDKJXjg7wzHNYe8vlmFyjDnV5oMWaIa2Or2ZU3qGQfeQkQhI+
- Cj6oI87eX2uaqqzAb1UO/Cb55BVerNIIbDTHnNGljfQ2rihIKChwA3SIfrwkrukcwGcVtVo7JF2
- mWProGQLXUAVvM/+G0FSQlt99cKkJryGbF5/5KbqNpaORdEcOuQIqt//SPEQFLcVRbuJSAY5dJ5
- d25ys4e FE7RuudQ==
-X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, keescook@chromium.org
+Subject: RE: Bluetooth: hci_sock: Correctly bounds check and pad HCI_MON_NEW_INDEX name
+In-Reply-To: <20231011163140.work.317-kees@kernel.org>
+References: <20231011163140.work.317-kees@kernel.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The code pattern of memcpy(dst, src, strlen(src)) is almost always
-wrong. In this case it is wrong because it leaves memory uninitialized
-if it is less than sizeof(ni->name), and overflows ni->name when longer.
+--===============3848034567968521252==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Normally strtomem_pad() could be used here, but since ni->name is a
-trailing array in struct hci_mon_new_index, compilers that don't support
--fstrict-flex-arrays=3 can't tell how large this array is via
-__builtin_object_size(). Instead, open-code the helper and use sizeof()
-since it will work correctly.
+This is automated email and please do not reply to this email!
 
-Additionally mark ni->name as __nonstring since it appears to not be a
-%NUL terminated C string.
+Dear submitter,
 
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: Edward AD <twuufnxlz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: linux-bluetooth@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Fixes: 78480de55a96 ("Bluetooth: hci_sock: fix slab oob read in create_monitor_event")
-Link: https://lore.kernel.org/lkml/202310110908.F2639D3276@keescook/
-Signed-off-by: Kees Cook <keescook@chromium.org>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=792247
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.82 seconds
+GitLint                       PASS      1.86 seconds
+SubjectPrefix                 PASS      0.06 seconds
+BuildKernel                   PASS      41.40 seconds
+CheckAllWarning               PASS      45.62 seconds
+CheckSparse                   PASS      51.89 seconds
+CheckSmatch                   PASS      136.78 seconds
+BuildKernel32                 PASS      39.60 seconds
+TestRunnerSetup               PASS      611.26 seconds
+TestRunner_l2cap-tester       PASS      36.60 seconds
+TestRunner_iso-tester         PASS      64.47 seconds
+TestRunner_bnep-tester        PASS      12.89 seconds
+TestRunner_mgmt-tester        PASS      258.17 seconds
+TestRunner_rfcomm-tester      PASS      19.17 seconds
+TestRunner_sco-tester         PASS      22.53 seconds
+TestRunner_ioctl-tester       PASS      22.02 seconds
+TestRunner_mesh-tester        PASS      15.88 seconds
+TestRunner_smp-tester         PASS      17.19 seconds
+TestRunner_userchan-tester    PASS      14.01 seconds
+IncrementalBuild              PASS      37.07 seconds
+
+
+
 ---
- include/net/bluetooth/hci_mon.h | 2 +-
- net/bluetooth/hci_sock.c        | 3 ++-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/include/net/bluetooth/hci_mon.h b/include/net/bluetooth/hci_mon.h
-index 2d5fcda1bcd0..082f89531b88 100644
---- a/include/net/bluetooth/hci_mon.h
-+++ b/include/net/bluetooth/hci_mon.h
-@@ -56,7 +56,7 @@ struct hci_mon_new_index {
- 	__u8		type;
- 	__u8		bus;
- 	bdaddr_t	bdaddr;
--	char		name[8];
-+	char		name[8] __nonstring;
- } __packed;
- #define HCI_MON_NEW_INDEX_SIZE 16
- 
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 72abe54c45dd..3e7cd330d731 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -488,7 +488,8 @@ static struct sk_buff *create_monitor_event(struct hci_dev *hdev, int event)
- 		ni->type = hdev->dev_type;
- 		ni->bus = hdev->bus;
- 		bacpy(&ni->bdaddr, &hdev->bdaddr);
--		memcpy(ni->name, hdev->name, strlen(hdev->name));
-+		memcpy_and_pad(ni->name, sizeof(ni->name), hdev->name,
-+			       strnlen(hdev->name, sizeof(ni->name)), '\0');
- 
- 		opcode = cpu_to_le16(HCI_MON_NEW_INDEX);
- 		break;
--- 
-2.34.1
 
+--===============3848034567968521252==--
