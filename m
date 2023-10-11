@@ -2,154 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A362CD6E56
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Oct 2023 10:01:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DA6DCD6E54
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Oct 2023 10:38:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231215AbjJKKBH (ORCPT
+        id S1345805AbjJKKiJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 Oct 2023 06:01:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40886 "EHLO
+        Wed, 11 Oct 2023 06:38:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229506AbjJKKBF (ORCPT
+        with ESMTP id S229750AbjJKKiI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 11 Oct 2023 06:01:05 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A7F192
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Oct 2023 03:01:03 -0700 (PDT)
-Received: from canpemm500006.china.huawei.com (unknown [172.30.72.56])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4S57VM4fdPzVl97;
-        Wed, 11 Oct 2023 17:57:31 +0800 (CST)
-Received: from localhost.localdomain (10.175.104.82) by
- canpemm500006.china.huawei.com (7.192.105.130) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Wed, 11 Oct 2023 18:01:00 +0800
-From:   Ziyang Xuan <william.xuanziyang@huawei.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-        <luiz.dentz@gmail.com>, <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH] Bluetooth: Make handle of hci_conn be unique
-Date:   Wed, 11 Oct 2023 17:57:31 +0800
-Message-ID: <20231011095731.1947052-1-william.xuanziyang@huawei.com>
-X-Mailer: git-send-email 2.25.1
+        Wed, 11 Oct 2023 06:38:08 -0400
+Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE2C692
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Oct 2023 03:38:07 -0700 (PDT)
+Received: by mail-qt1-x829.google.com with SMTP id d75a77b69052e-419c8911049so44454171cf.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Oct 2023 03:38:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697020686; x=1697625486; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=+X2v3JYBRXV8Qd33DYI9+4bHx3Tbc97NvvSC+hOqIaA=;
+        b=E3WfXEcl/H1j2usJcyUtNrtvCDIU6CvF0FN4JHkeuSSsxLf1YcgUMuBV9LJs5QoWre
+         Vx+YdBoo3ihWBzZj95Brg1BlhDoaEnA5u/dVLijEURUd8blwg+wbBt4u8DcqVla8P3px
+         HOHVP433V8mqtYhDP3xbaGm029Cmn4Ks+5uHIpTGjl2IPIKo9cfMmsZOPZQEsbTOXg6a
+         n89k1ItypeieH83S/xDb6nm+xGycHJyZ1mDDjavv8KOS3aj8RTkTtr64dbc2URWVCkQ0
+         jx7SsQr5HDxK5PI38G/YmAFTprIhkwJvBcRJ75QfygPfIlCgHbZi4AC0l1+tUOdLIe68
+         Rd3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697020686; x=1697625486;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+X2v3JYBRXV8Qd33DYI9+4bHx3Tbc97NvvSC+hOqIaA=;
+        b=QBInZYPBDU+dFyoP8Vv89sLuURQvkVCb7oleX5tvWnEJ55LDfd2Tf6WyHbSKxbtkRQ
+         TeNDiR7Be/RXXsccmUAavObXZnfWEbOsZfzJmU4lQCQtmJwD86glpcgp9LmBYr3GiHei
+         pRrC72a/CO+PHADqZJ4xUOFBPTQlTNobVKgckihZCviT4f4rOqj7TPpCqSDPv3KWNBcI
+         XP6cdOpEYM57ZmjKfFKqQvCSKh+Je/GvQ4gp7y5ptMrdZExITH8N3hF5VjN1CyOWDyDn
+         YmdYoLaf9huPCPFAT+ME3OW2J2odBJvMHYlQ46yzjmnAWY54dqSI54zzDy4yre7iCm3r
+         E9rw==
+X-Gm-Message-State: AOJu0YwGgNpvNHSzBiaUJQj9PiPrfCrNAyD1YokFlROvjJdfFUIRgzwL
+        wwQ/yZYfSgNJfQMVrBAIY2FbQ5XJ9n8=
+X-Google-Smtp-Source: AGHT+IEjjcogQQrnpwd2sUfEi8ztxEo88/KxIWxf1fiH+hdZAx3DBgh+eVFpnX23Jwblr64bYo/Mkw==
+X-Received: by 2002:a05:622a:1c2:b0:418:1aed:ad5f with SMTP id t2-20020a05622a01c200b004181aedad5fmr25310340qtw.7.1697020686653;
+        Wed, 11 Oct 2023 03:38:06 -0700 (PDT)
+Received: from [172.17.0.2] ([20.57.68.124])
+        by smtp.gmail.com with ESMTPSA id 8-20020ac85648000000b00419792c1be7sm5281690qtt.30.2023.10.11.03.38.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Oct 2023 03:38:06 -0700 (PDT)
+Message-ID: <65267b0e.c80a0220.b0eb2.5d5f@mx.google.com>
+Date:   Wed, 11 Oct 2023 03:38:06 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5861704273090397787=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.104.82]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- canpemm500006.china.huawei.com (7.192.105.130)
-X-CFilter-Loop: Reflected
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, william.xuanziyang@huawei.com
+Subject: RE: Bluetooth: Make handle of hci_conn be unique
+In-Reply-To: <20231011095731.1947052-1-william.xuanziyang@huawei.com>
+References: <20231011095731.1947052-1-william.xuanziyang@huawei.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The handle of new hci_conn is always HCI_CONN_HANDLE_MAX + 1 if
-the handle of the first hci_conn entry in hci_dev->conn_hash->list
-is not HCI_CONN_HANDLE_MAX + 1. Use ida to manage the allocation of
-hci_conn->handle to make it be unique.
+--===============5861704273090397787==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Fixes: 9f78191cc9f1 ("Bluetooth: hci_conn: Always allocate unique handles")
-Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=792120
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.03 seconds
+GitLint                       PASS      0.32 seconds
+SubjectPrefix                 PASS      0.11 seconds
+BuildKernel                   PASS      33.89 seconds
+CheckAllWarning               PASS      36.58 seconds
+CheckSparse                   PASS      41.67 seconds
+CheckSmatch                   PASS      117.20 seconds
+BuildKernel32                 PASS      32.48 seconds
+TestRunnerSetup               PASS      505.08 seconds
+TestRunner_l2cap-tester       PASS      30.01 seconds
+TestRunner_iso-tester         PASS      53.87 seconds
+TestRunner_bnep-tester        PASS      9.82 seconds
+TestRunner_mgmt-tester        PASS      210.95 seconds
+TestRunner_rfcomm-tester      PASS      15.18 seconds
+TestRunner_sco-tester         PASS      18.52 seconds
+TestRunner_ioctl-tester       PASS      17.00 seconds
+TestRunner_mesh-tester        PASS      12.57 seconds
+TestRunner_smp-tester         PASS      13.68 seconds
+TestRunner_userchan-tester    PASS      10.48 seconds
+IncrementalBuild              PASS      31.30 seconds
+
+
+
 ---
- include/net/bluetooth/hci_core.h |  2 ++
- net/bluetooth/hci_conn.c         | 30 +++++++++++++-----------------
- net/bluetooth/hci_core.c         |  3 +++
- 3 files changed, 18 insertions(+), 17 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index f36c1fd5d64e..a0c0e12e3a18 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -350,6 +350,8 @@ struct hci_dev {
- 	struct list_head list;
- 	struct mutex	lock;
- 
-+	struct ida	unset_handle_ida;
-+
- 	const char	*name;
- 	unsigned long	flags;
- 	__u16		id;
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 974631e652c1..6ec161bf569a 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -153,6 +153,9 @@ static void hci_conn_cleanup(struct hci_conn *conn)
- 
- 	hci_conn_hash_del(hdev, conn);
- 
-+	if (HCI_CONN_HANDLE_UNSET(conn->handle))
-+		ida_free(&hdev->unset_handle_ida, conn->handle);
-+
- 	if (conn->cleanup)
- 		conn->cleanup(conn);
- 
-@@ -929,29 +932,17 @@ static void cis_cleanup(struct hci_conn *conn)
- 	hci_le_remove_cig(hdev, conn->iso_qos.ucast.cig);
- }
- 
--static u16 hci_conn_hash_alloc_unset(struct hci_dev *hdev)
-+static int hci_conn_hash_alloc_unset(struct hci_dev *hdev)
- {
--	struct hci_conn_hash *h = &hdev->conn_hash;
--	struct hci_conn  *c;
--	u16 handle = HCI_CONN_HANDLE_MAX + 1;
--
--	rcu_read_lock();
--
--	list_for_each_entry_rcu(c, &h->list, list) {
--		/* Find the first unused handle */
--		if (handle == 0xffff || c->handle != handle)
--			break;
--		handle++;
--	}
--	rcu_read_unlock();
--
--	return handle;
-+	return ida_alloc_range(&hdev->unset_handle_ida, HCI_CONN_HANDLE_MAX + 1,
-+			       U16_MAX, GFP_ATOMIC);
- }
- 
- struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 			      u8 role)
- {
- 	struct hci_conn *conn;
-+	int handle;
- 
- 	BT_DBG("%s dst %pMR", hdev->name, dst);
- 
-@@ -961,7 +952,12 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 
- 	bacpy(&conn->dst, dst);
- 	bacpy(&conn->src, &hdev->bdaddr);
--	conn->handle = hci_conn_hash_alloc_unset(hdev);
-+	handle = hci_conn_hash_alloc_unset(hdev);
-+	if (unlikely(handle < 0)) {
-+		kfree(conn);
-+		return NULL;
-+	}
-+	conn->handle = handle;
- 	conn->hdev  = hdev;
- 	conn->type  = type;
- 	conn->role  = role;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 195aea2198a9..65601aa52e0d 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2535,6 +2535,8 @@ struct hci_dev *hci_alloc_dev_priv(int sizeof_priv)
- 	mutex_init(&hdev->lock);
- 	mutex_init(&hdev->req_lock);
- 
-+	ida_init(&hdev->unset_handle_ida);
-+
- 	INIT_LIST_HEAD(&hdev->mesh_pending);
- 	INIT_LIST_HEAD(&hdev->mgmt_pending);
- 	INIT_LIST_HEAD(&hdev->reject_list);
-@@ -2789,6 +2791,7 @@ void hci_release_dev(struct hci_dev *hdev)
- 	hci_codec_list_clear(&hdev->local_codecs);
- 	hci_dev_unlock(hdev);
- 
-+	ida_destroy(&hdev->unset_handle_ida);
- 	ida_simple_remove(&hci_index_ida, hdev->id);
- 	kfree_skb(hdev->sent_cmd);
- 	kfree_skb(hdev->recv_event);
--- 
-2.25.1
 
+--===============5861704273090397787==--
