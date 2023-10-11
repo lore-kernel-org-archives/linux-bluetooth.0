@@ -2,178 +2,121 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B76ECC41513
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Oct 2023 21:53:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA27BCDB47E
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Oct 2023 22:02:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233710AbjJKVxd (ORCPT
+        id S233640AbjJKWCE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 Oct 2023 17:53:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35190 "EHLO
+        Wed, 11 Oct 2023 18:02:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233451AbjJKVxb (ORCPT
+        with ESMTP id S233552AbjJKWCE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 11 Oct 2023 17:53:31 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32E179E;
-        Wed, 11 Oct 2023 14:53:30 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87540C433C9;
-        Wed, 11 Oct 2023 21:53:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697061209;
-        bh=qY9Rp5zkRIt2DsQivgERNNESbVTGEul4kS5s7/dIoho=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=EAwNFrclnTWEuXdB+Z8mt3u3kuEAAoUwY82PbS8J18XDNC6E3OiHHHxAFbbd17IOO
-         T6KemaFOH4w9WVID23kFc5vCnMeXYebhs7yahyg9gnbxexaaSqR+KOEgoCrxijFWyG
-         dnCiAysL1ttbyJnzXZGaT8aqz/DwQbEhhDfWR38iscslUEL9bLiDHhVjMYSwKPoaYH
-         vE7EY6dncxhXQ4FluROOjHz7swY5mrWHaRm0x+YRj0w+mEnls2n/6+o4Mg69zLynhg
-         wf5HljSZ4OwbmmK2VZKj4KXyrtee/VgZ11v8Vna96PUYyaJ2T6vmKgYUE3ho/7KBKo
-         bDWaoqyCH5pFQ==
-Date:   Wed, 11 Oct 2023 16:53:27 -0500
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>
-Cc:     linux-pci@vger.kernel.org,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Rob Herring <robh@kernel.org>,
-        Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
-        Lukas Wunner <lukas@wunner.de>,
-        "Rafael J . Wysocki" <rafael@kernel.org>,
-        Heiner Kallweit <hkallweit1@gmail.com>,
-        Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
-        linux-kernel@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
-        ath10k@lists.infradead.org, ath11k@lists.infradead.org,
-        ath12k@lists.infradead.org, intel-wired-lan@lists.osuosl.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-bluetooth@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-rdma@vger.kernel.org,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 05/13] PCI/ASPM: Add pci_enable_link_state()
-Message-ID: <20231011215327.GA1043654@bhelgaas>
+        Wed, 11 Oct 2023 18:02:04 -0400
+Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B2D69E
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Oct 2023 15:02:02 -0700 (PDT)
+Received: by mail-qk1-x735.google.com with SMTP id af79cd13be357-775810b032aso19933885a.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Oct 2023 15:02:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697061721; x=1697666521; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=/ftLBmH9HDSYHVBEvF4b38q+Wa2AsUCCuK/NUNESLFo=;
+        b=X/z/KeNKctENmoJ2mS9CNPPkdnL9YnwbXesfpnpK2Qk0ydnOVFS7lKX+Z2xdgaFvej
+         647WH2UkX2dY2knvu4Dx4KC9FuW37ERfiY56GE7uRL0L6sQ4w6cSwgedFjY8DfWAQoq6
+         FhEKD7CAA5EuBetDakJD+kRwUtMP1DU8SdmwFWKLQ1BAFgZu5dfolp8n8In++gg6wUTy
+         FJpdrNvjQel6orVjcVI/STl+T1+zpSzusWe88W3DWYDoNiswm7pfz1F74d/yOqsioD14
+         tfkjscGieaFwL88YgcRp4yDx5xklZyLG1uIKlqpPQaTPJgDdQUqhtG3wxC0m/0Essk8Z
+         J2hQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697061721; x=1697666521;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/ftLBmH9HDSYHVBEvF4b38q+Wa2AsUCCuK/NUNESLFo=;
+        b=qaCQGqDLslKZK115NcFmDIhLUwmOjC4Cyk2rrvw9fLdykorTYp5J1IjrMsXeJDnkgY
+         znlxrpXmzwLNhnAXbuDihrPNRMm1AwMecPFaY7V7a1PpPYYi2eDBu9pUB7zr8lv29nj3
+         rG20fc5J6tNKcjWtf0m95d72JtP6nD1sxvNfV9ZdYZidMD8d2P5CGakbpfIqr65fNA58
+         RD8FjjicjLVW4tgCO9EVRDyoFR6ZMtUbCzF1u37B/G6Xbkp/kqK7IUp0p+a1EgdNy2PI
+         uu4Dpwbo66E3SwVN9XXaPzat1ioToYQ6/4deEN6Lp1vNlbPnfwR0OrUTo+AafvNXI7pX
+         RJjg==
+X-Gm-Message-State: AOJu0YxqlwZfSZFcQphtXWBGEE7mjnV5iIEsCxOhFgB1bAljgH4RQUl6
+        S0OfnaDs0doziDW5bl8iMFSpwyVjBi8=
+X-Google-Smtp-Source: AGHT+IGBfkZEHxiouf0mnHykKE9n5s38d4rctUWxsANUsncqz75gWsOzfc/sfT7gs/JtR91b1wzr3g==
+X-Received: by 2002:a05:620a:2945:b0:775:cf5f:8a57 with SMTP id n5-20020a05620a294500b00775cf5f8a57mr25568755qkp.7.1697061721540;
+        Wed, 11 Oct 2023 15:02:01 -0700 (PDT)
+Received: from [172.17.0.2] ([104.45.202.160])
+        by smtp.gmail.com with ESMTPSA id j30-20020a05620a001e00b00767d2870e39sm5544907qki.41.2023.10.11.15.02.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Oct 2023 15:02:01 -0700 (PDT)
+Message-ID: <65271b59.050a0220.b25d5.a69b@mx.google.com>
+Date:   Wed, 11 Oct 2023 15:02:01 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7860868421258741723=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230918131103.24119-6-ilpo.jarvinen@linux.intel.com>
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v2] Bluetooth: Make handle of hci_conn be unique
+In-Reply-To: <20231011212624.1206326-1-luiz.dentz@gmail.com>
+References: <20231011212624.1206326-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Sep 18, 2023 at 04:10:55PM +0300, Ilpo Järvinen wrote:
-> pci_disable_link_state() lacks a symmetric pair. Some drivers want to
-> disable ASPM during certain phases of their operation but then
-> re-enable it later on. If pci_disable_link_state() is made for the
-> device, there is currently no way to re-enable the states that were
-> disabled.
+--===============7860868421258741723==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-pci_disable_link_state() gives drivers a way to disable specified ASPM
-states using a bitmask (PCIE_LINK_STATE_L0S, PCIE_LINK_STATE_L1,
-PCIE_LINK_STATE_L1_1, etc), but IIUC the driver can't tell exactly
-what changed and can't directly restore the original state, e.g.,
+This is automated email and please do not reply to this email!
 
-  - PCIE_LINK_STATE_L1 enabled initially
-  - driver calls pci_disable_link_state(PCIE_LINK_STATE_L0S)
-  - driver calls pci_enable_link_state(PCIE_LINK_STATE_L0S)
-  - PCIE_LINK_STATE_L0S and PCIE_LINK_STATE_L1 are enabled now
+Dear submitter,
 
-Now PCIE_LINK_STATE_L0S is enabled even though it was not initially
-enabled.  Maybe that's what we want; I dunno.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=792337
 
-pci_disable_link_state() currently returns success/failure, but only
-r8169 and mt76 even check, and only rtl_init_one() (r8169) has a
-non-trivial reason, so it's conceivable that it could return a bitmask
-instead.
+---Test result---
 
-> Add pci_enable_link_state() to remove ASPM states from the state
-> disable mask.
-> 
-> Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
-> ---
->  drivers/pci/pcie/aspm.c | 42 +++++++++++++++++++++++++++++++++++++++++
->  include/linux/pci.h     |  2 ++
->  2 files changed, 44 insertions(+)
-> 
-> diff --git a/drivers/pci/pcie/aspm.c b/drivers/pci/pcie/aspm.c
-> index 91dc95aca90f..f45d18d47c20 100644
-> --- a/drivers/pci/pcie/aspm.c
-> +++ b/drivers/pci/pcie/aspm.c
-> @@ -1117,6 +1117,48 @@ int pci_disable_link_state(struct pci_dev *pdev, int state)
->  }
->  EXPORT_SYMBOL(pci_disable_link_state);
->  
-> +/**
-> + * pci_enable_link_state - Re-enable device's link state
-> + * @pdev: PCI device
-> + * @state: ASPM link states to re-enable
-> + *
-> + * Enable device's link state that were previously disable so the link is
+Test Summary:
+CheckPatch                    PASS      1.59 seconds
+GitLint                       PASS      0.35 seconds
+SubjectPrefix                 PASS      0.51 seconds
+BuildKernel                   PASS      34.45 seconds
+CheckAllWarning               PASS      37.71 seconds
+CheckSparse                   WARNING   42.87 seconds
+CheckSmatch                   WARNING   116.10 seconds
+BuildKernel32                 PASS      32.85 seconds
+TestRunnerSetup               PASS      514.90 seconds
+TestRunner_l2cap-tester       PASS      31.00 seconds
+TestRunner_iso-tester         PASS      60.61 seconds
+TestRunner_bnep-tester        PASS      10.36 seconds
+TestRunner_mgmt-tester        PASS      220.87 seconds
+TestRunner_rfcomm-tester      PASS      16.09 seconds
+TestRunner_sco-tester         PASS      20.00 seconds
+TestRunner_ioctl-tester       PASS      18.24 seconds
+TestRunner_mesh-tester        PASS      13.64 seconds
+TestRunner_smp-tester         PASS      14.56 seconds
+TestRunner_userchan-tester    PASS      11.14 seconds
+IncrementalBuild              PASS      32.77 seconds
 
-"state[s] that were previously disable[d]" alludes to the use case you
-have in mind, but I don't think it describes how this function
-actually works.  This function just makes it possible to enable the
-specified states.  The @state parameter may have nothing to do with
-any previously disabled states.
+Details
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
 
-> + * allowed to enter the specific states. Note that if the BIOS didn't grant
-> + * ASPM control to the OS, this does nothing because we can't touch the
-> + * LNKCTL register.
-> + *
-> + * Return: 0 or a negative errno.
-> + */
-> +int pci_enable_link_state(struct pci_dev *pdev, int state)
-> +{
-> +	struct pcie_link_state *link = pcie_aspm_get_link(pdev);
-> +
-> +	if (!link)
-> +		return -EINVAL;
-> +	/*
-> +	 * A driver requested that ASPM be enabled on this device, but
-> +	 * if we don't have permission to manage ASPM (e.g., on ACPI
-> +	 * systems we have to observe the FADT ACPI_FADT_NO_ASPM bit and
-> +	 * the _OSC method), we can't honor that request.
-> +	 */
-> +	if (aspm_disabled) {
-> +		pci_warn(pdev, "can't enable ASPM; OS doesn't have ASPM control\n");
-> +		return -EPERM;
-> +	}
-> +
-> +	mutex_lock(&aspm_lock);
-> +	link->aspm_disable &= ~pci_link_state_mask(state);
-> +	pcie_config_aspm_link(link, policy_to_aspm_state(link));
-> +
-> +	if (state & PCIE_LINK_STATE_CLKPM)
-> +		link->clkpm_disable = 0;
-> +	pcie_set_clkpm(link, policy_to_clkpm_state(link));
-> +	mutex_unlock(&aspm_lock);
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL(pci_enable_link_state);
-> +
->  /**
->   * pci_set_default_link_state - Set the default device link state
->   * @pdev: PCI device
-> diff --git a/include/linux/pci.h b/include/linux/pci.h
-> index 3c24ca164104..844d09230264 100644
-> --- a/include/linux/pci.h
-> +++ b/include/linux/pci.h
-> @@ -1776,11 +1776,13 @@ extern bool pcie_ports_native;
->  int pci_disable_link_state(struct pci_dev *pdev, int state);
->  int pci_disable_link_state_locked(struct pci_dev *pdev, int state);
->  #ifdef CONFIG_PCIEASPM
-> +int pci_enable_link_state(struct pci_dev *pdev, int state);
->  int pci_set_default_link_state(struct pci_dev *pdev, int state);
->  void pcie_no_aspm(void);
->  bool pcie_aspm_support_enabled(void);
->  bool pcie_aspm_enabled(struct pci_dev *pdev);
->  #else
-> +static inline int pci_enable_link_state(struct pci_dev *pdev, int state) { return -EOPNOTSUPP; }
->  static inline int pci_set_default_link_state(struct pci_dev *pdev, int state)
->  { return 0; }
->  static inline void pcie_no_aspm(void) { }
-> -- 
-> 2.30.2
-> 
-> 
-> -- 
-> ath12k mailing list
-> ath12k@lists.infradead.org
-> https://lists.infradead.org/mailman/listinfo/ath12k
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7860868421258741723==--
