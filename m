@@ -2,73 +2,129 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49F04CDB484
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Oct 2023 21:20:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3943C41513
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Oct 2023 21:22:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233583AbjJKVUa (ORCPT
+        id S233665AbjJKVWL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 Oct 2023 17:20:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40636 "EHLO
+        Wed, 11 Oct 2023 17:22:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233573AbjJKVU2 (ORCPT
+        with ESMTP id S233390AbjJKVWK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 11 Oct 2023 17:20:28 -0400
+        Wed, 11 Oct 2023 17:22:10 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 372BCC9
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Oct 2023 14:20:25 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C3146C433CB;
-        Wed, 11 Oct 2023 21:20:24 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 007C490;
+        Wed, 11 Oct 2023 14:22:08 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FCE2C433C8;
+        Wed, 11 Oct 2023 21:22:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697059224;
-        bh=opgvKO4s04O2tSOc/ZoOyPfsiG6UVD7SYaFw0pPKNJI=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=ljLNOdD5Q0Nwub0B8NoJx6RaWCgxh9OU0+tyrmv368PoBJ3H0WYs9opnkJ/ekP1Ed
-         JnM7IY0Y+sulGanjYNulzK0oVQn4DHRsD97DQiL5CNxsVTOsPWAJ2qVvDljJAXXsd6
-         aFrrWCn4W3cqwi5i4UvIYfw2Vb6ANT10IQQ9YqKldUE3O+yn1zagqejPySZE8QDXPM
-         08pJWBhNO9Nq53tBe+wva6J16bHoRBWOkW5mbJeDaMbSGnY7nXgmE84FQxv2c+WAN2
-         4TxBaVzzZQYy+X3bCqe0F0hxxq+o1ydktwakLhmAk5rUBqmwoGLApiiyhZ0R4z8tSy
-         iocLaVflh5gGg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A409FE000BB;
-        Wed, 11 Oct 2023 21:20:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        s=k20201202; t=1697059328;
+        bh=qpNUqw05PLc7b1md/614fr1Zk6arYszd1WK9gMvl0Os=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=ghyoFWHuCUoYAQQVImwLJec5By6IY8ldZU+IpgLhM86gHWNMMGsDK4I3bZN3O9HN6
+         DZ662abX5LzoV0AuEi9+5Ki6vZZQBQwOyiKdPRI4rA2aI7uLPzLKnygGYsAASzsGrz
+         QKdQ9RXXuApQ6HirgahUGTdW+uLPDMBSzhJdQjS18i+uHHpiCtlwWFOhjYSCOugggW
+         Duv0TMGaORQs/RXdvsCl/MbpQ76sczbG4Y1+Ext0ZSAafYpDZUgO9tYsFTZwJorZnI
+         X29tvX4dE26f0/NdjlsksaHY7OVFRWeD2ft2MA6pgB+n+l9lv7LOpuKtJ8H4lcIsBg
+         tvwjDEZAHbqog==
+Date:   Wed, 11 Oct 2023 16:22:06 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>
+Cc:     linux-pci@vger.kernel.org,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
+        Lukas Wunner <lukas@wunner.de>,
+        "Rafael J . Wysocki" <rafael@kernel.org>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
+        linux-kernel@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
+        ath10k@lists.infradead.org, ath11k@lists.infradead.org,
+        ath12k@lists.infradead.org, intel-wired-lan@lists.osuosl.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-rdma@vger.kernel.org,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 03/13] PCI/ASPM: Disable ASPM when driver requests it
+Message-ID: <20231011212206.GA1043224@bhelgaas>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ] input: Fix .device_probe failing if SDP record is not
- found
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <169705922466.14030.9443337374373837708.git-patchwork-notify@kernel.org>
-Date:   Wed, 11 Oct 2023 21:20:24 +0000
-References: <20231010194306.603745-1-luiz.dentz@gmail.com>
-In-Reply-To: <20231010194306.603745-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
+In-Reply-To: <20230918131103.24119-4-ilpo.jarvinen@linux.intel.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+On Mon, Sep 18, 2023 at 04:10:53PM +0300, Ilpo Järvinen wrote:
+> PCI core/ASPM service driver allows controlling ASPM state through
+> pci_disable_link_state() and pci_enable_link_state() API. It was
+> decided earlier (see the Link below), to not allow ASPM changes when OS
+> does not have control over it but only log a warning about the problem
+> (commit 2add0ec14c25 ("PCI/ASPM: Warn when driver asks to disable ASPM,
+> but we can't do it")). Similarly, if ASPM is not enabled through
+> config, ASPM cannot be disabled.
+> ...
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+> +#ifndef CONFIG_PCIEASPM
+> +/*
+> + * Always disable ASPM when requested, even when CONFIG_PCIEASPM is
+> + * not build to avoid drivers adding code to do it on their own
+> + * which caused issues when core does not know about the out-of-band
+> + * ASPM state changes.
+> + */
+> +int pci_disable_link_state_locked(struct pci_dev *pdev, int state)
+> +{
+> +	struct pci_dev *parent = pdev->bus->self;
+> +	struct pci_bus *linkbus = pdev->bus;
+> +	struct pci_dev *child;
+> +	u16 aspm_enabled, linkctl;
+> +	int ret;
+> +
+> +	if (!parent)
+> +		return -ENODEV;
 
-On Tue, 10 Oct 2023 12:43:06 -0700 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> Due to changes introduced by 67a26abe53bf
-> ("profile: Add probe_on_discover flag") profiles may get probed when
-> their profile UUID are discovered, rather than resolved, which means
-> the SDP record may not be available.
-> 
-> [...]
+P.S. I think this should look the same to the user (same dmesg log and
+same taint, if we do that) as the CONFIG_PCIEASPM=y case.
 
-Here is the summary with links:
-  - [BlueZ] input: Fix .device_probe failing if SDP record is not found
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3a9c637010f8
+> +	ret = pcie_capability_read_word(parent, PCI_EXP_LNKCTL, &linkctl);
+> +	if (ret != PCIBIOS_SUCCESSFUL)
+> +		return pcibios_err_to_errno(ret);
+> +	aspm_enabled = linkctl & PCI_EXP_LNKCTL_ASPMC;
+> +
+> +	ret = pcie_capability_read_word(pdev, PCI_EXP_LNKCTL, &linkctl);
+> +	if (ret != PCIBIOS_SUCCESSFUL)
+> +		return pcibios_err_to_errno(ret);
+> +	aspm_enabled |= linkctl & PCI_EXP_LNKCTL_ASPMC;
+> +
+> +	/* If no states need to be disabled, don't touch LNKCTL */
+> +	if (state & aspm_enabled)
+> +		return 0;
+> +
+> +	ret = pcie_capability_clear_word(parent, PCI_EXP_LNKCTL, PCI_EXP_LNKCTL_ASPMC);
+> +	if (ret != PCIBIOS_SUCCESSFUL)
+> +		return pcibios_err_to_errno(ret);
+> +	list_for_each_entry(child, &linkbus->devices, bus_list)
+> +		pcie_capability_clear_word(child, PCI_EXP_LNKCTL, PCI_EXP_LNKCTL_ASPMC);
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+This disables *all* ASPM states, unlike the version when
+CONFIG_PCIEASPM is enabled.  I suppose there's a reason, and maybe a
+comment could elaborate on it?
 
+When CONFIG_PCIEASPM is not enabled, I don't think we actively
+*disable* ASPM in the hardware; we just leave it as-is, so firmware
+might have left it enabled.
 
+> +
+> +	return 0;
+> +}
+
+Conceptually it seems like the LNKCTL updates here should be the same
+whether CONFIG_PCIEASPM is enabled or not (subject to the question
+above).
+
+When CONFIG_PCIEASPM is enabled, we might need to do more stuff, but
+it seems like the core should be the same.
+
+Bjorn
