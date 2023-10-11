@@ -2,110 +2,104 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6696CD98F3
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Oct 2023 06:02:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 342E4CD6E54
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Oct 2023 09:31:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343923AbjJKGCA (ORCPT
+        id S231196AbjJKJbN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 Oct 2023 02:02:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34200 "EHLO
+        Wed, 11 Oct 2023 05:31:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343606AbjJKGB7 (ORCPT
+        with ESMTP id S231221AbjJKJbM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 11 Oct 2023 02:01:59 -0400
-Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BEFD8E
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Oct 2023 23:01:58 -0700 (PDT)
-Received: by mail-io1-xd29.google.com with SMTP id ca18e2360f4ac-7a5a746e355so16487639f.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Oct 2023 23:01:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697004117; x=1697608917; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=qkQfFxRfuHnEMVR1A+wbDEzFopZ5Ofccak6TVNlVzD4=;
-        b=OQtgDDWEdY0YuS4NLu4Ny45WwZWRkF3eKca7EAXVcUNf6+hOjfzI4aUbr2lAF/QYCY
-         F0BeyJzsrrXIQKk+ftwVJ23gysQmhsOsaUGDG8k4H1io3qmO1pBZidXHPGBRWSETVfmo
-         rG5vTuDS8H4ZJd2K6Ln5unJevRcev8u4dU+gf9UF4c4ia73HV1ahFyLFdT4eLE6s0f6S
-         gC8uLR0t/WqzUXDQdmhFNq1/y1flMGytG+HYZQmRPxs/l5D4CtOYPuH3vhj6/bPMgBjK
-         7TqNW7ssrz97Fq5UWh5F8HnPnThCsntXaVCerC7RaVFlnVCqz+W89uTuM0u/0ZYw4hM5
-         Z2Bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697004117; x=1697608917;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qkQfFxRfuHnEMVR1A+wbDEzFopZ5Ofccak6TVNlVzD4=;
-        b=fqbIKOMjF/A6WWB2sNfoAJKZPie82a7WDKknjV2c/bj/RBASI5bhgWh1CYsPfsU/lQ
-         V3km9R7EKfgEEGxOT1TixpL3HiGmrN6me5cOXSmMviH57RMZxiXfGjMuILFocPxgJe2r
-         XQ/Y5Vgzu/RbSfkR4FroVXnIqRu+/nt9fnMQuiKpnUncywN4wn2+bOWyX0YcLGT1/fiw
-         6jUQbL6QKL4E3VfZA3pQbvyjn/mSpbpqQPFb30gV2eMatythk+Anl8EYEhxWkY8riARK
-         wnrVmupCOaefwUW5qrUb/1mBQyVdhanPG9xUf4/P07ONVI8+Goci/s/nW+H+e2KEjSdr
-         jUHg==
-X-Gm-Message-State: AOJu0Ywt3uEYzHNtKhi96i91gTP1tPIUslm1LETVND305ahAx3jvuNnm
-        IXvX0EeC7Zh3gin8fGzSoDQnPr/gy/c=
-X-Google-Smtp-Source: AGHT+IEovQSb/34grIlT5DhufBGd0RkBg8fCalrfehF62euKQTsKa3ej6GQMgQYEN8xdB05Nm6e+ZQ==
-X-Received: by 2002:a5e:cb4c:0:b0:79f:b4f1:186a with SMTP id h12-20020a5ecb4c000000b0079fb4f1186amr15028268iok.1.1697004117627;
-        Tue, 10 Oct 2023 23:01:57 -0700 (PDT)
-Received: from [172.17.0.2] ([13.86.66.34])
-        by smtp.gmail.com with ESMTPSA id c23-20020a6bfd17000000b0079fdeed3ab6sm3400962ioi.40.2023.10.10.23.01.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Oct 2023 23:01:57 -0700 (PDT)
-Message-ID: <65263a55.6b0a0220.ec807.48a4@mx.google.com>
-Date:   Tue, 10 Oct 2023 23:01:57 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5260396786223571724=="
+        Wed, 11 Oct 2023 05:31:12 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF4A49C
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Oct 2023 02:31:09 -0700 (PDT)
+Received: from canpemm500006.china.huawei.com (unknown [172.30.72.55])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4S56pZ6m8rzvPt0;
+        Wed, 11 Oct 2023 17:26:30 +0800 (CST)
+Received: from [10.174.179.200] (10.174.179.200) by
+ canpemm500006.china.huawei.com (7.192.105.130) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Wed, 11 Oct 2023 17:31:07 +0800
+Subject: Re: [PATCH v2] Bluetooth: Fix UAF for hci_chan
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Pauli Virtanen <pav@iki.fi>
+CC:     linux-bluetooth <linux-bluetooth@vger.kernel.org>
+References: <20231009123045.587882-1-william.xuanziyang@huawei.com>
+ <117a47da5324a02cece6d601ff8b51b331d072fa.camel@iki.fi>
+ <8f61ef8e-f959-3feb-fb9b-b9b60bf26758@huawei.com>
+ <a72b89cd520f502d6d384f97fcaf83f92ead147f.camel@iki.fi>
+ <CABBYNZKiXwGWR296TU7_4wVMsemzY=mV2CUo-DDMYvSAWX5RwQ@mail.gmail.com>
+From:   "Ziyang Xuan (William)" <william.xuanziyang@huawei.com>
+Message-ID: <8ccca432-912e-1f89-802f-addde3652e31@huawei.com>
+Date:   Wed, 11 Oct 2023 17:31:07 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, wangyouwan@126.com
-Subject: RE: Bluetooth: btusb: Add date->evt_skb is NULL check
-In-Reply-To: <20231011051447.92581-1-wangyouwan@126.com>
-References: <20231011051447.92581-1-wangyouwan@126.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <CABBYNZKiXwGWR296TU7_4wVMsemzY=mV2CUo-DDMYvSAWX5RwQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.179.200]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ canpemm500006.china.huawei.com (7.192.105.130)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5260396786223571724==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+> Hi Pauli,
+> 
+> On Tue, Oct 10, 2023 at 11:32 AM Pauli Virtanen <pav@iki.fi> wrote:
+>>
+>> Hi,
+>>
+>> ti, 2023-10-10 kello 20:49 +0800, Ziyang Xuan (William)
+>> kirjoitti:[clip]
+>>>>>
+>>>>> - if (atomic_dec_and_test(&conn->refcnt)) {
+>>>>> + if (atomic_dec_and_test(&conn->refcnt) &&
+>>>>> +     !test_bit(HCI_CONN_DISC, &conn->flags)) {
+>>>>>           unsigned long timeo;
+>>>>
+>>>> hci_abort_conn already checks if conn->abort_reason was already set, to
+>>>> avoid queuing abort for the same conn again. Does this flag not try to
+>>>> do the same thing?
+>>>
+>>> That is not enough. hci_conn occur UAF in hci_proto_disconn_ind() before enter
+>>> hci_abort_conn().
+>>
+>> Thanks, this was not clear to me from the patch.
+>>
+>> So the problem is that the cancel_delayed_work_sync(&conn->disc_work)
+>> in hci_conn_del doesn't help in a few cases:
+>>
+>> 1. [task A] hci_conn_del(conn) entered
+>> 2. [A] cancel_delayed_work_sync(conn->disc_work)
+>> 3. [B] concurrent hci_conn_drop(conn) queues disc_work again
+>> 4. [A] hci_conn_del finishes
+>> 5. UAF when disc_work runs
+>>
+>> or without needing concurrency
+>>
+>> 1. hci_conn_del(conn) entered and finishes
+>> 2. hci_conn_drop(conn); hci_conn_put(conn); as done in several places
+>>
+>> ?
+> 
+> Either way Im not sure what the IDA logic has to with it, that said I
+> think using ida function is actually a much better solution then the
+> lookup one so I would be happy to apply it if someone split the
+> changes related to it and send a patch.
 
-This is automated email and please do not reply to this email!
+I will send a patch just with handle ida modification. The remaining UAF issues
+continue to be tracked.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=792044
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.61 seconds
-GitLint                       PASS      0.28 seconds
-SubjectPrefix                 PASS      0.08 seconds
-BuildKernel                   PASS      35.48 seconds
-CheckAllWarning               PASS      38.26 seconds
-CheckSparse                   PASS      44.26 seconds
-CheckSmatch                   PASS      117.11 seconds
-BuildKernel32                 PASS      34.25 seconds
-TestRunnerSetup               PASS      525.24 seconds
-TestRunner_l2cap-tester       PASS      31.43 seconds
-TestRunner_iso-tester         PASS      55.62 seconds
-TestRunner_bnep-tester        PASS      10.71 seconds
-TestRunner_mgmt-tester        PASS      223.06 seconds
-TestRunner_rfcomm-tester      PASS      16.46 seconds
-TestRunner_sco-tester         PASS      19.86 seconds
-TestRunner_ioctl-tester       PASS      18.50 seconds
-TestRunner_mesh-tester        PASS      15.09 seconds
-TestRunner_smp-tester         PASS      15.11 seconds
-TestRunner_userchan-tester    PASS      11.38 seconds
-IncrementalBuild              PASS      32.91 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============5260396786223571724==--
+> 
+>> The hci_conn_del here is not necessarily from hci_abort_conn. Should
+>> the atomic flag be set in hci_conn_del before
+>> cancel_delayed_work_sync(&conn->disc_work) to catch possible other
+>> cases?
+>>
