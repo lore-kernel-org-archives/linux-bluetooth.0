@@ -2,110 +2,82 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCABFCDB46B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Oct 2023 17:09:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DB10CDB471
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Oct 2023 17:40:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232406AbjJKRJM (ORCPT
+        id S232992AbjJKRks (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 Oct 2023 13:09:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34448 "EHLO
+        Wed, 11 Oct 2023 13:40:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230158AbjJKRJL (ORCPT
+        with ESMTP id S234817AbjJKRkf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 11 Oct 2023 13:09:11 -0400
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0723F98
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Oct 2023 10:09:09 -0700 (PDT)
-Received: by mail-pg1-x52c.google.com with SMTP id 41be03b00d2f7-5859b2eaa55so23371a12.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Oct 2023 10:09:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697044148; x=1697648948; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=PrN0P2cOxxpS9ML8ydrldHv1/uOlGizvSO9iDpbVB2w=;
-        b=dGpygNeXHbwC8iJfEFwEe9/9anS6CBk3yuKHHL+B3tWe5VUANFPstKihWE2oWE+uyH
-         RghgemnYmnbs5fOKplHJUS+aiv8TQFUwVN2x6nRPfbJuHFcaPN3ixaQ5xA2sI0oQjE92
-         14js4TFVXs+uWkgUrioejqKfMGmHgH+84QC9O5Pb8kztIEg2G3ICiPmCCFvVsncr4D6l
-         q4dHLMsuopSsRtlaxF5NlU0RGwWMOJl83Z4EcHXO5rHb+1IUhw5/p0MVGcxnzlVhR/WY
-         JAhbasDo8HWnjhm7+42mkxOf5S2VSWqg1MWKFanaDQk9LsF01AYecE3gA6nB/0QbNIZD
-         AhCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697044148; x=1697648948;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PrN0P2cOxxpS9ML8ydrldHv1/uOlGizvSO9iDpbVB2w=;
-        b=ntSsdV97jIBPYeiH+VH5UxMEtKRCJOMjjc4dDrgl2idtBJUUYrP/yL0hFt+YceJ75b
-         YyGh2Tpru3IBQP4FQIHKbQiZ3iaBrlOdbAjKN/HtAHiOJbGqAndEbMrc0j+K1Vh7FdgZ
-         /ZhzMFMu65AxY+UhuQagjOKYG0TubhJIUeSD09Y7ZS17nJwX/iJSmD7/Q1UskXtjfq3j
-         74VKQjjjaBbTMlxdqXxckyXBZmrmof3uI1C/av55v1K0yU2eUpvtiaIxEfyA5V1U1TAk
-         fTO4ZAxZk5DfTgrhPlDqGk32NuOCqQHIvNFVftOJwKqlvuthFO0a1O6aLqxySKNWo8L2
-         +RDA==
-X-Gm-Message-State: AOJu0YzRkCZnGK02Q7ndqBTuAMnlP2psmQ4s9cKYKA3EtIlQN9TGjeWJ
-        udoKNUqEG4855DdLaz1U4ywFxlE4BQo=
-X-Google-Smtp-Source: AGHT+IF8Fq0VBhE+Ghgq8bsjv6gAxQbqEZMGywGRFSL9HQAYPpCC/rS+dAjqXFdnukHjmFYyDxXfog==
-X-Received: by 2002:a17:90a:d804:b0:273:efc0:33eb with SMTP id a4-20020a17090ad80400b00273efc033ebmr17094116pjv.14.1697044148216;
-        Wed, 11 Oct 2023 10:09:08 -0700 (PDT)
-Received: from [172.17.0.2] ([13.91.165.252])
-        by smtp.gmail.com with ESMTPSA id 29-20020a17090a199d00b00278ff752eacsm158961pji.50.2023.10.11.10.09.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Oct 2023 10:09:07 -0700 (PDT)
-Message-ID: <6526d6b3.170a0220.dda8e.0b84@mx.google.com>
-Date:   Wed, 11 Oct 2023 10:09:07 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3848034567968521252=="
+        Wed, 11 Oct 2023 13:40:35 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADAAB115;
+        Wed, 11 Oct 2023 10:40:25 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 50678C433C9;
+        Wed, 11 Oct 2023 17:40:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1697046025;
+        bh=ASe+Jx12t2/axReJbaYPLyiArb/zifhujifxJT1BgeE=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=TMQSrzaMvfjlwCu1l7I7IKb//ZqRmZ6a6t0FSYx+E2xIv90vzoMLoM54VmmmPfpXv
+         3mcusSKSdn9DNvyEdeDX4d5+VEqZMWqadFmIUXqUSI8sHEjrTwwC5B3Z3E4vJHGmTG
+         fgtZKsjZBMgUBcDgVrGcMQR1XX2afKyz/izrx4vnWnYhomQFSCpUYKKSTS72myc3A7
+         +PAHoxDW75OiTHr6VzlE+oftKx/tmzIwkYQzFwqEc9l1cc2r9Bxc/nRl4FbeOP5Hr1
+         M7n9vT54dksRBJW4HKp3z6SHXSBgH0zL2ww806Kj0VrnHB1f7PMyzmgdtcjsclMamC
+         KJfcHOewF8pCA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 34FC0C1614E;
+        Wed, 11 Oct 2023 17:40:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, keescook@chromium.org
-Subject: RE: Bluetooth: hci_sock: Correctly bounds check and pad HCI_MON_NEW_INDEX name
-In-Reply-To: <20231011163140.work.317-kees@kernel.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth: hci_sock: Correctly bounds check and pad
+ HCI_MON_NEW_INDEX name
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <169704602521.20012.6049823285233364562.git-patchwork-notify@kernel.org>
+Date:   Wed, 11 Oct 2023 17:40:25 +0000
 References: <20231011163140.work.317-kees@kernel.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20231011163140.work.317-kees@kernel.org>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     luiz.von.dentz@intel.com, twuufnxlz@gmail.com, marcel@holtmann.org,
+        johan.hedberg@gmail.com, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        luiz.dentz@gmail.com, linux-kernel@vger.kernel.org,
+        syzbot+c90849c50ed209d77689@syzkaller.appspotmail.com,
+        linux-hardening@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3848034567968521252==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello:
 
-This is automated email and please do not reply to this email!
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Dear submitter,
+On Wed, 11 Oct 2023 09:31:44 -0700 you wrote:
+> The code pattern of memcpy(dst, src, strlen(src)) is almost always
+> wrong. In this case it is wrong because it leaves memory uninitialized
+> if it is less than sizeof(ni->name), and overflows ni->name when longer.
+> 
+> Normally strtomem_pad() could be used here, but since ni->name is a
+> trailing array in struct hci_mon_new_index, compilers that don't support
+> -fstrict-flex-arrays=3 can't tell how large this array is via
+> __builtin_object_size(). Instead, open-code the helper and use sizeof()
+> since it will work correctly.
+> 
+> [...]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=792247
+Here is the summary with links:
+  - Bluetooth: hci_sock: Correctly bounds check and pad HCI_MON_NEW_INDEX name
+    https://git.kernel.org/bluetooth/bluetooth-next/c/fbd34cc57479
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.82 seconds
-GitLint                       PASS      1.86 seconds
-SubjectPrefix                 PASS      0.06 seconds
-BuildKernel                   PASS      41.40 seconds
-CheckAllWarning               PASS      45.62 seconds
-CheckSparse                   PASS      51.89 seconds
-CheckSmatch                   PASS      136.78 seconds
-BuildKernel32                 PASS      39.60 seconds
-TestRunnerSetup               PASS      611.26 seconds
-TestRunner_l2cap-tester       PASS      36.60 seconds
-TestRunner_iso-tester         PASS      64.47 seconds
-TestRunner_bnep-tester        PASS      12.89 seconds
-TestRunner_mgmt-tester        PASS      258.17 seconds
-TestRunner_rfcomm-tester      PASS      19.17 seconds
-TestRunner_sco-tester         PASS      22.53 seconds
-TestRunner_ioctl-tester       PASS      22.02 seconds
-TestRunner_mesh-tester        PASS      15.88 seconds
-TestRunner_smp-tester         PASS      17.19 seconds
-TestRunner_userchan-tester    PASS      14.01 seconds
-IncrementalBuild              PASS      37.07 seconds
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============3848034567968521252==--
