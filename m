@@ -2,119 +2,156 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B477CDB46E
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Oct 2023 12:01:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DB2ECDB47E
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Oct 2023 12:53:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378662AbjJLMBR (ORCPT
+        id S1378440AbjJLMxt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 12 Oct 2023 08:01:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33254 "EHLO
+        Thu, 12 Oct 2023 08:53:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235765AbjJLMAy (ORCPT
+        with ESMTP id S1343867AbjJLMxs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 12 Oct 2023 08:00:54 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E22BF19A
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Oct 2023 05:00:43 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id 98e67ed59e1d1-2773f776f49so646477a91.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Oct 2023 05:00:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697112043; x=1697716843; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=uQg5NFejB36ARMTIEaFFf8ctRv0Upollbx9hy65E0fE=;
-        b=RNpDWclyNPnc7y2CTu92j6JyM8698jl8QtTzL1WrWJexa12rlSLTQDnVJmNob3lUtD
-         YWOjnPbbryYxkhoj8WF2GDTibMJJ6mv1jy3CSNO5P8xPNFveIXrn4pvGta6OzZT/mDdU
-         81iGXS+4lPpNYIGF5JpzNfNr6rkcOIQ6ibEjc+fmpKb5Zu4IDum2vmI1Ql7C1P4Pg0J3
-         pHIGWFd3Mj2AXi/hK6LR33h0lWr+9L+kREk+gj/9SPux6g9R8V1Gxuf42uf6Wuqq4i08
-         EOSERRePnUWKuImpodPM339KuDOMCswor02kwpBNrnU69yD6rtG2zxiswqGUdfHIuRtX
-         HE2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697112043; x=1697716843;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uQg5NFejB36ARMTIEaFFf8ctRv0Upollbx9hy65E0fE=;
-        b=AdirRYxVc9VjPjLm2rpBQ40Jxl/b45rv/tqNIuP5Lc9IqCcczvSK0cLvY95mQPdjEc
-         GRf5A9fyh5JOZDtqpd9251FCCRzH1bu36nZ1b2guy5a4EGxVRZMel1Jrzkr6hlAX5xdQ
-         QczPUR/ajnI7zdlThvusQEOkkBbNVvy5F9lhV4MVDYe3UwnZuSsvz1VdHrqtGtaW1aY+
-         ixEAG2Ni5d4oUxJeI2Iau6sT4fSZQn3BjFKqbBlNJf0HmNE3Qwj5OhJYxe/nOJw2E9kb
-         /Rwur8fO2ZqTcBo4f3b6YcDLFHJgjsfTwMc5xszP8u0iTP233zkAGHvdJ0EURfbd2aDJ
-         9uBg==
-X-Gm-Message-State: AOJu0Yz+aImeFp5KLNjy/8mG03twguFLG4JkGQhdhG2Rc+pmGISIRBVL
-        5DQio6FkNfuy/MZc9SerXRxUOZMDsS0=
-X-Google-Smtp-Source: AGHT+IHFC8TWJWApBLsj3pVv903kGfHcRTKIsze0a5FpPTbO4aODFb+hzU0qCDydfS3jcrpFnVVaXA==
-X-Received: by 2002:a17:90b:1bc4:b0:274:dd15:87bf with SMTP id oa4-20020a17090b1bc400b00274dd1587bfmr30293560pjb.20.1697112042995;
-        Thu, 12 Oct 2023 05:00:42 -0700 (PDT)
-Received: from [172.17.0.2] ([4.227.0.230])
-        by smtp.gmail.com with ESMTPSA id l14-20020a17090ac58e00b00263cca08d95sm1659049pjt.55.2023.10.12.05.00.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Oct 2023 05:00:42 -0700 (PDT)
-Message-ID: <6527dfea.170a0220.7e840.4f5a@mx.google.com>
-Date:   Thu, 12 Oct 2023 05:00:42 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6688776822249080777=="
+        Thu, 12 Oct 2023 08:53:48 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BBA194;
+        Thu, 12 Oct 2023 05:53:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697115227; x=1728651227;
+  h=date:from:to:cc:subject:in-reply-to:message-id:
+   references:mime-version;
+  bh=gNLNaEec64/5yPf43OhzXjxJ+9f0AwPObPN0gw90rTk=;
+  b=XkJ9DZi5gy3NgX1d7rCxq+rNL5s/H7mbScg9qZtZuE0o2ovQ6o1aTPfT
+   RSkn6+wb8jlENZvCR1cjCzBDMsPR4EVEUqfMche/YjYjxViTWu4FfobjZ
+   CUIaoL0Vn88ucROtDhnXUx8cGrpkNZlqzvBTl+tEYjfJXXv5HwINStMMu
+   8zBmNOBuAp3ttOy2oERrV+cd3OPVAUXLpZtxRF48y1iThmGNEYQk/nnxp
+   M5gc4C0aQJrhAithjm3hwCNljAEN+5WvwJjIgaNcaMlWVEUrwTo4vvUHc
+   f6Aea66STp3AIMpiHaWybUqw4Q6mkcqqgbb1kzpYS7Qrk5evW4cL4CAl5
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10861"; a="471169655"
+X-IronPort-AV: E=Sophos;i="6.03,219,1694761200"; 
+   d="scan'208";a="471169655"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2023 05:53:46 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10861"; a="783688889"
+X-IronPort-AV: E=Sophos;i="6.03,219,1694761200"; 
+   d="scan'208";a="783688889"
+Received: from asroczyn-mobl.ger.corp.intel.com ([10.249.36.107])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2023 05:53:41 -0700
+Date:   Thu, 12 Oct 2023 15:53:39 +0300 (EEST)
+From:   =?ISO-8859-15?Q?Ilpo_J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
+To:     Bjorn Helgaas <helgaas@kernel.org>
+cc:     linux-pci@vger.kernel.org,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Rob Herring <robh@kernel.org>,
+        =?ISO-8859-2?Q?Krzysztof_Wilczy=F1ski?= <kw@linux.com>,
+        Lukas Wunner <lukas@wunner.de>,
+        "Rafael J . Wysocki" <rafael@kernel.org>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        ath10k@lists.infradead.org, ath11k@lists.infradead.org,
+        ath12k@lists.infradead.org, intel-wired-lan@lists.osuosl.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-rdma@vger.kernel.org,
+        linux-wireless@vger.kernel.org, Netdev <netdev@vger.kernel.org>
+Subject: Re: [PATCH v2 05/13] PCI/ASPM: Add pci_enable_link_state()
+In-Reply-To: <20231011215327.GA1043654@bhelgaas>
+Message-ID: <afb4db5-5fe1-9f5d-a910-032adf195c@linux.intel.com>
+References: <20231011215327.GA1043654@bhelgaas>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, guanwentao@uniontech.com
-Subject: RE: Bluetooth: btusb: Add 0bda:b85b for Fn-Link RTL8852BE
-In-Reply-To: <20231012112118.11431-1-guanwentao@uniontech.com>
-References: <20231012112118.11431-1-guanwentao@uniontech.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary="8323329-1586418908-1697115226=:1692"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6688776822249080777==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-This is automated email and please do not reply to this email!
+--8323329-1586418908-1697115226=:1692
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 
-Dear submitter,
+On Wed, 11 Oct 2023, Bjorn Helgaas wrote:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=792565
+> On Mon, Sep 18, 2023 at 04:10:55PM +0300, Ilpo Järvinen wrote:
+> > pci_disable_link_state() lacks a symmetric pair. Some drivers want to
+> > disable ASPM during certain phases of their operation but then
+> > re-enable it later on. If pci_disable_link_state() is made for the
+> > device, there is currently no way to re-enable the states that were
+> > disabled.
+> 
+> pci_disable_link_state() gives drivers a way to disable specified ASPM
+> states using a bitmask (PCIE_LINK_STATE_L0S, PCIE_LINK_STATE_L1,
+> PCIE_LINK_STATE_L1_1, etc), but IIUC the driver can't tell exactly
+> what changed and can't directly restore the original state, e.g.,
+> 
+>   - PCIE_LINK_STATE_L1 enabled initially
+>   - driver calls pci_disable_link_state(PCIE_LINK_STATE_L0S)
+>   - driver calls pci_enable_link_state(PCIE_LINK_STATE_L0S)
+>   - PCIE_LINK_STATE_L0S and PCIE_LINK_STATE_L1 are enabled now
+> 
+> Now PCIE_LINK_STATE_L0S is enabled even though it was not initially
+> enabled.  Maybe that's what we want; I dunno.
+> 
+> pci_disable_link_state() currently returns success/failure, but only
+> r8169 and mt76 even check, and only rtl_init_one() (r8169) has a
+> non-trivial reason, so it's conceivable that it could return a bitmask
+> instead.
 
----Test result---
+It's great that you suggested this since it's actually what also I've been 
+started to think should be done instead of this straightforward approach
+I used in V2. 
 
-Test Summary:
-CheckPatch                    PASS      0.53 seconds
-GitLint                       FAIL      0.73 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      32.96 seconds
-CheckAllWarning               PASS      36.09 seconds
-CheckSparse                   PASS      41.61 seconds
-CheckSmatch                   PASS      114.90 seconds
-BuildKernel32                 PASS      32.27 seconds
-TestRunnerSetup               PASS      501.00 seconds
-TestRunner_l2cap-tester       PASS      29.43 seconds
-TestRunner_iso-tester         PASS      53.55 seconds
-TestRunner_bnep-tester        PASS      9.74 seconds
-TestRunner_mgmt-tester        PASS      212.36 seconds
-TestRunner_rfcomm-tester      PASS      14.96 seconds
-TestRunner_sco-tester         PASS      18.38 seconds
-TestRunner_ioctl-tester       PASS      16.84 seconds
-TestRunner_mesh-tester        PASS      14.01 seconds
-TestRunner_smp-tester         PASS      13.38 seconds
-TestRunner_userchan-tester    PASS      10.16 seconds
-IncrementalBuild              PASS      30.20 seconds
+That is, don't have the drivers to get anything directly from LNKCTL
+but they should get everything through the API provided by the 
+disable/enable calls which makes it easy for the driver to pass the same
+value back into the enable call.
 
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-Bluetooth: btusb: Add 0bda:b85b for Fn-Link RTL8852BE
+> > Add pci_enable_link_state() to remove ASPM states from the state
+> > disable mask.
+> > 
+> > Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
+> > ---
+> >  drivers/pci/pcie/aspm.c | 42 +++++++++++++++++++++++++++++++++++++++++
+> >  include/linux/pci.h     |  2 ++
+> >  2 files changed, 44 insertions(+)
+> > 
+> > diff --git a/drivers/pci/pcie/aspm.c b/drivers/pci/pcie/aspm.c
+> > index 91dc95aca90f..f45d18d47c20 100644
+> > --- a/drivers/pci/pcie/aspm.c
+> > +++ b/drivers/pci/pcie/aspm.c
+> > @@ -1117,6 +1117,48 @@ int pci_disable_link_state(struct pci_dev *pdev, int state)
+> >  }
+> >  EXPORT_SYMBOL(pci_disable_link_state);
+> >  
+> > +/**
+> > + * pci_enable_link_state - Re-enable device's link state
+> > + * @pdev: PCI device
+> > + * @state: ASPM link states to re-enable
+> > + *
+> > + * Enable device's link state that were previously disable so the link is
+> 
+> "state[s] that were previously disable[d]" alludes to the use case you
+> have in mind, but I don't think it describes how this function
+> actually works.  This function just makes it possible to enable the
+> specified states.  The @state parameter may have nothing to do with
+> any previously disabled states.
 
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-40: B1 Line exceeds max length (84>80): "Link: https://lore.kernel.org/all/20220420052402.19049-1-tangmeng@uniontech.com/ [1]"
+Yes, it's what I've been thinking between the lines. But I see your point 
+that this API didn't make it easy/obvious as is.
+
+Would you want me to enforce it too besides altering the API such that the 
+states are actually returned from disable call? (I don't personally find
+that necessary as long as the API pair itself makes it obvious what the 
+driver is expect to pass there.)
 
 
----
-Regards,
-Linux Bluetooth
+-- 
+ i.
 
-
---===============6688776822249080777==--
+--8323329-1586418908-1697115226=:1692--
