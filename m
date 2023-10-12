@@ -2,166 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B67D7C41513
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Oct 2023 10:56:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91F17CDB482
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Oct 2023 11:24:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343649AbjJLK4b (ORCPT
+        id S1347155AbjJLLYG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 12 Oct 2023 06:56:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37078 "EHLO
+        Thu, 12 Oct 2023 07:24:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235696AbjJLK40 (ORCPT
+        with ESMTP id S1343649AbjJLLYF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 12 Oct 2023 06:56:26 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E182CF;
-        Thu, 12 Oct 2023 03:56:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697108185; x=1728644185;
-  h=date:from:to:cc:subject:in-reply-to:message-id:
-   references:mime-version;
-  bh=ncUYHUPUudbeDBu1X+DbOYSPV06JH2dv47rcK32PQ+0=;
-  b=CYclsOvOPtH3Q8m1wMMmDYUHx/L6vQrIQRlGlDiTpobaSJ/SD8nZa1yQ
-   lmY9YqnctCNWpDlmbqOQfO8u3cwjxe1sBLbcfgWfX7nJ+ZrNDZ4y23gAX
-   HbkMANv6j4C80UF4fY2QznF81/dmYLkDw/KG2IiTPs7jbdaRuZ4TdQFxh
-   wlLZwCWV8LmydShMWfIj8HsKLUGGxyKHhIL2h8Yd4USZuVsQsWxWUShau
-   izP+1118O9PObYimo3ulINXAXq9pIBJWoqzKEwS/rGrv3vJAdEgdjHiSQ
-   VeVAmvpuDHBN7XAu6gEJd7JD4Cb/HMGDGmdPiPIXwKpyDJUTvWKLeg2qw
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10860"; a="3483256"
-X-IronPort-AV: E=Sophos;i="6.03,218,1694761200"; 
-   d="scan'208";a="3483256"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2023 03:56:24 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10860"; a="789349717"
-X-IronPort-AV: E=Sophos;i="6.03,218,1694761200"; 
-   d="scan'208";a="789349717"
-Received: from asroczyn-mobl.ger.corp.intel.com ([10.249.36.107])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2023 03:56:18 -0700
-Date:   Thu, 12 Oct 2023 13:56:16 +0300 (EEST)
-From:   =?ISO-8859-15?Q?Ilpo_J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
-To:     Bjorn Helgaas <helgaas@kernel.org>,
-        "Rafael J . Wysocki" <rafael@kernel.org>
-cc:     linux-pci@vger.kernel.org,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Rob Herring <robh@kernel.org>,
-        =?ISO-8859-2?Q?Krzysztof_Wilczy=F1ski?= <kw@linux.com>,
-        Lukas Wunner <lukas@wunner.de>,
-        Heiner Kallweit <hkallweit1@gmail.com>,
-        Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        ath10k@lists.infradead.org, ath11k@lists.infradead.org,
-        ath12k@lists.infradead.org, intel-wired-lan@lists.osuosl.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-bluetooth@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-rdma@vger.kernel.org,
-        linux-wireless@vger.kernel.org, Netdev <netdev@vger.kernel.org>
-Subject: Re: [PATCH v2 03/13] PCI/ASPM: Disable ASPM when driver requests
- it
-In-Reply-To: <20231011212206.GA1043224@bhelgaas>
-Message-ID: <aa3386a4-c22d-6d5d-112d-f36b22cda6d3@linux.intel.com>
-References: <20231011212206.GA1043224@bhelgaas>
+        Thu, 12 Oct 2023 07:24:05 -0400
+Received: from smtpbgbr1.qq.com (smtpbgbr1.qq.com [54.207.19.206])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4336D90;
+        Thu, 12 Oct 2023 04:24:00 -0700 (PDT)
+X-QQ-mid: bizesmtp85t1697109739t1lnnidg
+Received: from localhost.localdomain ( [113.57.152.160])
+        by bizesmtp.qq.com (ESMTP) with 
+        id ; Thu, 12 Oct 2023 19:22:18 +0800 (CST)
+X-QQ-SSF: 01400000000000F0F000000A0000000
+X-QQ-FEAT: CR3LFp2JE4ltdTud+4AYKJcdUD+uXs6VvqjLXfu+SzUIUtAKlVb/Hy1fQTboe
+        yEa6+SWXN8euKCoBBuoM0FGQ6NBCTFzkq8ZMMR73I9t+gfwhvrNth6EVU/jSIjdcv4I5p3S
+        Dli5iTHPbmirkl+6cMaofPb/mNxeQc5K6b2tD/uBgux3umFb1Z8LJaMH6PfZYW56/6dBob9
+        I04ni6lNKaSeDlE/6Dojo9ZIzoqMM56NjMCJmRbsRXNNWxeVLO+Z64UrSZtbUQbk/QOnw3R
+        U/i5e4wIx/u269qu8G7iOQpiF6biZdIyVo3e+Meo7Vs1CdFhWpcn+18DTOU/27roKQtgyZn
+        AN2MwLgrixegFsbeCnBYrQxUZdlXtTCXSj5bqAxw4SsMJWP/Fl+lt2jqlo5/57S2sbNP3km
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 14250982440802780419
+From:   Guan Wentao <guanwentao@uniontech.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        guanwentao@uniontech.com, stable@vger.kernel.org
+Subject: [PATCH] Bluetooth: btusb: Add 0bda:b85b for Fn-Link RTL8852BE
+Date:   Thu, 12 Oct 2023 19:21:17 +0800
+Message-Id: <20231012112118.11431-1-guanwentao@uniontech.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="8323329-1326969328-1697108183=:1692"
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:uniontech.com:qybglogicsvrgz:qybglogicsvrgz5a-2
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+Add PID/VID 0bda:b85b for Realtek RTL8852BE USB bluetooth part.
+The PID/VID was reported by the patch last year. [1]
+Some SBCs like rockpi 5B A8 module contains the device.
+And it`s founded in website. [2] [3]
 
---8323329-1326969328-1697108183=:1692
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+Here is the device tables in /sys/kernel/debug/usb/devices .
 
-On Wed, 11 Oct 2023, Bjorn Helgaas wrote:
+T:  Bus=07 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
+D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0bda ProdID=b85b Rev= 0.00
+S:  Manufacturer=Realtek
+S:  Product=Bluetooth Radio
+S:  SerialNumber=00e04c000001
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 
-> On Mon, Sep 18, 2023 at 04:10:53PM +0300, Ilpo Järvinen wrote:
-> > PCI core/ASPM service driver allows controlling ASPM state through
-> > pci_disable_link_state() and pci_enable_link_state() API. It was
-> > decided earlier (see the Link below), to not allow ASPM changes when OS
-> > does not have control over it but only log a warning about the problem
-> > (commit 2add0ec14c25 ("PCI/ASPM: Warn when driver asks to disable ASPM,
-> > but we can't do it")). Similarly, if ASPM is not enabled through
-> > config, ASPM cannot be disabled.
-> > ...
-> 
-> > +#ifndef CONFIG_PCIEASPM
-> > +/*
-> > + * Always disable ASPM when requested, even when CONFIG_PCIEASPM is
-> > + * not build to avoid drivers adding code to do it on their own
-> > + * which caused issues when core does not know about the out-of-band
-> > + * ASPM state changes.
-> > + */
-> > +int pci_disable_link_state_locked(struct pci_dev *pdev, int state)
-> > +{
-> > +	struct pci_dev *parent = pdev->bus->self;
-> > +	struct pci_bus *linkbus = pdev->bus;
-> > +	struct pci_dev *child;
-> > +	u16 aspm_enabled, linkctl;
-> > +	int ret;
-> > +
-> > +	if (!parent)
-> > +		return -ENODEV;
-> 
-> P.S. I think this should look the same to the user (same dmesg log and
-> same taint, if we do that) as the CONFIG_PCIEASPM=y case.
+Link: https://lore.kernel.org/all/20220420052402.19049-1-tangmeng@uniontech.com/ [1]
+Link: https://forum.radxa.com/t/bluetooth-on-ubuntu/13051/4 [2]
+Link: https://ubuntuforums.org/showthread.php?t=2489527 [3]
 
-Okay.
+Cc: stable@vger.kernel.org
+Signed-off-by: Meng Tang <tangmeng@uniontech.com>
+Signed-off-by: Guan Wentao <guanwentao@uniontech.com>
+---
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-> > +	ret = pcie_capability_read_word(parent, PCI_EXP_LNKCTL, &linkctl);
-> > +	if (ret != PCIBIOS_SUCCESSFUL)
-> > +		return pcibios_err_to_errno(ret);
-> > +	aspm_enabled = linkctl & PCI_EXP_LNKCTL_ASPMC;
-> > +
-> > +	ret = pcie_capability_read_word(pdev, PCI_EXP_LNKCTL, &linkctl);
-> > +	if (ret != PCIBIOS_SUCCESSFUL)
-> > +		return pcibios_err_to_errno(ret);
-> > +	aspm_enabled |= linkctl & PCI_EXP_LNKCTL_ASPMC;
-> > +
-> > +	/* If no states need to be disabled, don't touch LNKCTL */
-> > +	if (state & aspm_enabled)
-> > +		return 0;
-> > +
-> > +	ret = pcie_capability_clear_word(parent, PCI_EXP_LNKCTL, PCI_EXP_LNKCTL_ASPMC);
-> > +	if (ret != PCIBIOS_SUCCESSFUL)
-> > +		return pcibios_err_to_errno(ret);
-> > +	list_for_each_entry(child, &linkbus->devices, bus_list)
-> > +		pcie_capability_clear_word(child, PCI_EXP_LNKCTL, PCI_EXP_LNKCTL_ASPMC);
-> 
-> This disables *all* ASPM states, unlike the version when
-> CONFIG_PCIEASPM is enabled.  I suppose there's a reason, and maybe a
-> comment could elaborate on it?
->
-> When CONFIG_PCIEASPM is not enabled, I don't think we actively
-> *disable* ASPM in the hardware; we just leave it as-is, so firmware
-> might have left it enabled.
-
-This whole trickery is intended for drivers that do not want to have ASPM 
-because the devices are broken with it. So leaving it as-is is not really 
-an option (as demonstrated by the custom workarounds).
-
-> > +
-> > +	return 0;
-> > +}
-> 
-> Conceptually it seems like the LNKCTL updates here should be the same
-> whether CONFIG_PCIEASPM is enabled or not (subject to the question
-> above).
-> 
-> When CONFIG_PCIEASPM is enabled, we might need to do more stuff, but
-> it seems like the core should be the same.
-
-So you think it's safer to partially disable ASPM (as per driver's 
-request) rather than disable it completely? I got the impression that the 
-latter might be safer from what Rafael said earlier but I suppose I might 
-have misinterpreted him since he didn't exactly say that it might be safer 
-to _completely_ disable it.
-
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 3fdad35e5..894938d2b 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -544,6 +544,8 @@ static const struct usb_device_id quirks_table[] = {
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0bda, 0x887b), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0bda, 0xb85b), .driver_info = BTUSB_REALTEK |
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3570), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3571), .driver_info = BTUSB_REALTEK |
 -- 
- i.
+2.20.1
 
---8323329-1326969328-1697108183=:1692--
