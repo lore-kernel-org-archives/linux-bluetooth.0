@@ -2,153 +2,124 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 580C0CDB482
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Oct 2023 10:24:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE792CDB47E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Oct 2023 11:26:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229903AbjJMKY4 (ORCPT
+        id S230150AbjJML0g (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 13 Oct 2023 06:24:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51372 "EHLO
+        Fri, 13 Oct 2023 07:26:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229726AbjJMKYz (ORCPT
+        with ESMTP id S229903AbjJML0f (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 13 Oct 2023 06:24:55 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4321AD;
-        Fri, 13 Oct 2023 03:24:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697192692; x=1728728692;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=XVTI+KtH248Y6N2mDkGmVGWxc0Mtj1GwtiXmRY/C2Xo=;
-  b=OpUuNDVP9osR3+c0YcPI+FBEOrQCk41nAT8iiQ5EEPO1LfOL3bKGJUxC
-   3y02emDi5G+s+XWwqPsApR1t0yDutofWH6CBHXhlgoTeGH09fbWZEuw46
-   /6BMB0w4/m7fKyNcm3NcG0XPQ+wjzQr0F50uIPPfXlsD6QunJQzxUpLcU
-   /KIqBu2iopOpTUB6lKwMAdYjo0Mw0Lt6o++s5x2nq79isiUDIHSrCjYE/
-   QuVV6852D+UqsIQqVcASj0hjGmYukBiFaYNduM/udqS5v6JfIkwtNdT6R
-   t2NkT8ffFcuWybNUH4oJUzV2hfRfdJTsVPbfv/WD0cFYqmzbfuZFL7oGK
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10861"; a="375499626"
-X-IronPort-AV: E=Sophos;i="6.03,221,1694761200"; 
-   d="scan'208";a="375499626"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2023 03:24:52 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10861"; a="731318523"
-X-IronPort-AV: E=Sophos;i="6.03,221,1694761200"; 
-   d="scan'208";a="731318523"
-Received: from lkp-server02.sh.intel.com (HELO f64821696465) ([10.239.97.151])
-  by orsmga006.jf.intel.com with ESMTP; 13 Oct 2023 03:24:48 -0700
-Received: from kbuild by f64821696465 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qrFLa-0004cw-29;
-        Fri, 13 Oct 2023 10:24:46 +0000
-Date:   Fri, 13 Oct 2023 18:23:55 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Zhengping Jiang <jiangzp@google.com>,
-        linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        luiz.dentz@gmail.com
-Cc:     oe-kbuild-all@lists.linux.dev,
-        chromeos-bluetooth-upstreaming@chromium.org,
-        Zhengping Jiang <jiangzp@google.com>,
-        AngeloGioacchino Del Regno 
-        <angelogioacchino.delregno@collabora.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-mediatek@lists.infradead.org
-Subject: Re: [kernel PATCH v2] Bluetooth: btmtksdio: enable bluetooth wakeup
- in system suspend
-Message-ID: <202310131817.oEUPvya8-lkp@intel.com>
-References: <20231011153928.kernel.v2.1.I6dbfc1fedddf0633b55ce7e7a10ef7f3929a9bdc@changeid>
+        Fri, 13 Oct 2023 07:26:35 -0400
+Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 958EBB7
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Oct 2023 04:26:33 -0700 (PDT)
+Received: by mail-qt1-x836.google.com with SMTP id d75a77b69052e-41b513e4a22so5287151cf.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Oct 2023 04:26:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697196392; x=1697801192; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=takQQLdk3E29UXf0CbZugt7CA31RX9dtloqSLuAqhK8=;
+        b=h6xdJ5Z6v16yeWomyXNj8pVCKh0gtBicDYUfTNzucYmIcJ6KCtOdiEE7ptktxcgYma
+         10q8PW0xopj+Lqz5TWqRK3+eC1owzknDkHAT6Y16R+eJ/h4WOxv9zv6z8Ry+81ZgD4sY
+         Sq5saVBgdwOZbROpfx5V8vr7g92RgRGhD09MiBXg7vi4R9pCb8S7QKT2ChvcZf6l1/Gl
+         zqpA+1uBxqakP9l26Jv7QN3MgtuMYuZEemu6U7M2Kh8rscxM3ROG4SESe/LRyNI37u1m
+         v/wIaLgDnyMWH90OZPFVU54e2K0WkHvCxb0NM5ltoFm1KBrqWwfDRNwA8g7nO0mzxhix
+         EcrQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697196392; x=1697801192;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=takQQLdk3E29UXf0CbZugt7CA31RX9dtloqSLuAqhK8=;
+        b=rxT8C9qITqjsrI0fV24gsW9CofOBXPQh9W9JspRhl/gagH5C0KaXtYGIeqnbhuTSYX
+         T9c8swSOPJQQOoSputjfdx+mJSKyWy5q2Uby/rRX0+KXCTLTVvwwiRiY9V8eHpaHd5t4
+         +Q8whOt6mwuoX2if/eUlPNtlVR1xsdsRqI8RGJfwsN6i5xCh5NYS2kfdCdvrqFaeNFgN
+         no6DRZ+AOQt6OOa1/k5PtWk+73OWwtPULwD6nntk/w+/A9+t2bz94tmCM7Vbs8TYOTu1
+         zYrNvAYRrCHIXbaqAgGJvCfKz/8B8C9IAHwZQucCNBh7ZyIZV25wsS0sFjwUZo3XtZal
+         9BRA==
+X-Gm-Message-State: AOJu0YxEbWb2rZzbbUuniU8dqhEQx4ht6qzAB2R5QAsink5XH6KyFWBT
+        s2PZ0PXKzYy/TPGKpDY/39x8ioQD75w=
+X-Google-Smtp-Source: AGHT+IED72d7XojMZTi+R+JvRJ/Vf5FBjDnZFeVD4TW4okW6m8xzIZ3cgE5pVhUJquOTYtuNkArXxg==
+X-Received: by 2002:ac8:7f05:0:b0:410:9836:8066 with SMTP id f5-20020ac87f05000000b0041098368066mr27350369qtk.43.1697196392372;
+        Fri, 13 Oct 2023 04:26:32 -0700 (PDT)
+Received: from [172.17.0.2] ([20.57.43.91])
+        by smtp.gmail.com with ESMTPSA id he19-20020a05622a601300b0041b381b9833sm519490qtb.75.2023.10.13.04.26.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Oct 2023 04:26:31 -0700 (PDT)
+Message-ID: <65292967.050a0220.67d56.23bf@mx.google.com>
+Date:   Fri, 13 Oct 2023 04:26:31 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6090177972091587211=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231011153928.kernel.v2.1.I6dbfc1fedddf0633b55ce7e7a10ef7f3929a9bdc@changeid>
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com
+Subject: RE: bap: Fix source+sink endpoint registration
+In-Reply-To: <20231013100537.3867-2-claudia.rosu@nxp.com>
+References: <20231013100537.3867-2-claudia.rosu@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Zhengping,
+--===============6090177972091587211==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-kernel test robot noticed the following build warnings:
+This is automated email and please do not reply to this email!
 
-[auto build test WARNING on bluetooth/master]
-[also build test WARNING on bluetooth-next/master linus/master v6.6-rc5 next-20231012]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Dear submitter,
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Zhengping-Jiang/Bluetooth-btmtksdio-enable-bluetooth-wakeup-in-system-suspend/20231012-064116
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
-patch link:    https://lore.kernel.org/r/20231011153928.kernel.v2.1.I6dbfc1fedddf0633b55ce7e7a10ef7f3929a9bdc%40changeid
-patch subject: [kernel PATCH v2] Bluetooth: btmtksdio: enable bluetooth wakeup in system suspend
-config: sh-allyesconfig (https://download.01.org/0day-ci/archive/20231013/202310131817.oEUPvya8-lkp@intel.com/config)
-compiler: sh4-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231013/202310131817.oEUPvya8-lkp@intel.com/reproduce)
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=792936
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202310131817.oEUPvya8-lkp@intel.com/
+---Test result---
 
-All warnings (new ones prefixed by >>):
+Test Summary:
+CheckPatch                    FAIL      1.32 seconds
+GitLint                       PASS      0.74 seconds
+BuildEll                      PASS      27.69 seconds
+BluezMake                     PASS      884.34 seconds
+MakeCheck                     PASS      11.65 seconds
+MakeDistcheck                 PASS      172.79 seconds
+CheckValgrind                 PASS      267.85 seconds
+CheckSmatch                   PASS      361.35 seconds
+bluezmakeextell               PASS      115.77 seconds
+IncrementalBuild              PASS      1379.67 seconds
+ScanBuild                     PASS      1048.46 seconds
 
->> drivers/bluetooth/btmtksdio.c:1501:12: warning: 'btmtksdio_system_resume' defined but not used [-Wunused-function]
-    1501 | static int btmtksdio_system_resume(struct device *dev)
-         |            ^~~~~~~~~~~~~~~~~~~~~~~
->> drivers/bluetooth/btmtksdio.c:1464:12: warning: 'btmtksdio_system_suspend' defined but not used [-Wunused-function]
-    1464 | static int btmtksdio_system_suspend(struct device *dev)
-         |            ^~~~~~~~~~~~~~~~~~~~~~~~
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ,1/2] bap: Fix source+sink endpoint registration
+WARNING:LONG_LINE: line length of 86 exceeds 80 columns
+#158: FILE: src/shared/bap.c:2720:
++		queue_foreach(sessions, notify_session_pac_added, pac_broadcast_sink);
+
+/github/workspace/src/src/13420604.patch total: 0 errors, 1 warnings, 115 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13420604.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
-vim +/btmtksdio_system_resume +1501 drivers/bluetooth/btmtksdio.c
 
-  1463	
-> 1464	static int btmtksdio_system_suspend(struct device *dev)
-  1465	{
-  1466		struct sdio_func *func = dev_to_sdio_func(dev);
-  1467		struct btmtksdio_dev *bdev;
-  1468	
-  1469		bdev = sdio_get_drvdata(func);
-  1470		if (!bdev)
-  1471			return 0;
-  1472	
-  1473		if (!test_bit(BTMTKSDIO_FUNC_ENABLED, &bdev->tx_state))
-  1474			return 0;
-  1475	
-  1476		set_bit(BTMTKSDIO_BT_WAKE_ENABLED, &bdev->tx_state);
-  1477	
-  1478		return btmtksdio_runtime_suspend(dev);
-  1479	}
-  1480	
-  1481	static int btmtksdio_runtime_resume(struct device *dev)
-  1482	{
-  1483		struct sdio_func *func = dev_to_sdio_func(dev);
-  1484		struct btmtksdio_dev *bdev;
-  1485		int err;
-  1486	
-  1487		bdev = sdio_get_drvdata(func);
-  1488		if (!bdev)
-  1489			return 0;
-  1490	
-  1491		if (!test_bit(BTMTKSDIO_FUNC_ENABLED, &bdev->tx_state))
-  1492			return 0;
-  1493	
-  1494		err = btmtksdio_drv_pmctrl(bdev);
-  1495	
-  1496		bt_dev_dbg(bdev->hdev, "status (%d) get ownership from device", err);
-  1497	
-  1498		return err;
-  1499	}
-  1500	
-> 1501	static int btmtksdio_system_resume(struct device *dev)
-  1502	{
-  1503		return btmtksdio_runtime_resume(dev);
-  1504	}
-  1505	
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6090177972091587211==--
