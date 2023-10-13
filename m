@@ -2,178 +2,153 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DB41CDB483
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Oct 2023 10:06:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 580C0CDB482
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Oct 2023 10:24:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231182AbjJMKGj (ORCPT
+        id S229903AbjJMKY4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 13 Oct 2023 06:06:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44334 "EHLO
+        Fri, 13 Oct 2023 06:24:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231189AbjJMKGh (ORCPT
+        with ESMTP id S229726AbjJMKYz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 13 Oct 2023 06:06:37 -0400
-Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2082.outbound.protection.outlook.com [40.107.104.82])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D5FFD6
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Oct 2023 03:06:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QKwxHT2xt8WIJ9QV//OFH0QEZ6a5ioH8WtewszLNoRQYViKbO4poyJQPms0c7QkeSiUSXEOFb7vt8Y03dQwNkxB60aV6zWKnrL150JKYy0d6U1V7xBeb/ExcQlRxwjUrr5v/YwPWiTdNeolkeyd84TR2h0r9ouaU5wT3eypI9BH+Sg/GvPhYVQj3AtEDCrUS6ZFEOKC6XW546s0H3f/AKDXEL82pLMvBVHFtd2eXxeSjfSBO7DWwWMhMWNBDYVZyGEIB6VxzdUdOtldeU+JZOgpgV7nSCj+Jrqa+6bueLml2ywGL4cd/e6GuONNPg8174dXFQS+N0VKsHHK4uSRrYw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2iwQzgGXnLwyQA/YmSlwyG7Ih/dUeVyOkY/pNqsZeo4=;
- b=Qf9JiPkZSbXgNRzEK2dlCa8oXzEtIF1sUg0BcfjCm9V4Z0ZUqrQHScOIxAnYFyRLCINVdylmzFt97zOhpjPh1Fex05KsbjBaEc65P9vVNNQ2ZNltFlOMmvVkFId7zO/zudAeztIazKTcTm4BY590spH1byZHgrqFpMbyPXyBi0RPdGnWlUk46tk6s7h052g6y+cKFbRZsVmDNjRp/FSaQAEQEKezG6klUtdW45mF6YNB8kx3ZtpEzs+CboiDl0N7NCKbFG7qdt1V5Pc2d3ASvsKqQOnUp33OWq3c4deAMDfTfAF9dNuu+8Y0zkQjvka6yWgO06YXA4i8XsJmumBGSw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2iwQzgGXnLwyQA/YmSlwyG7Ih/dUeVyOkY/pNqsZeo4=;
- b=GCR7dsnoRfGPJd2GRAEb8PWIaJ4oag2o1YtJcXTr8qnKf9rnEi6dk+JQqPUkbZgzb0LoAgrmQVJfrOqhr7cSHfKKeRI7n+J6pznnoZcQuWdLZa9bG+7DqqWJD4SwDuH62FRV0WqDdZXlKTRz82DxVhLTS9IkjthDKCeeChJf6gA=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from GV1PR04MB9151.eurprd04.prod.outlook.com (2603:10a6:150:26::9)
- by AS8PR04MB9080.eurprd04.prod.outlook.com (2603:10a6:20b:447::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.46; Fri, 13 Oct
- 2023 10:06:31 +0000
-Received: from GV1PR04MB9151.eurprd04.prod.outlook.com
- ([fe80::a53f:4bda:e012:a73d]) by GV1PR04MB9151.eurprd04.prod.outlook.com
- ([fe80::a53f:4bda:e012:a73d%7]) with mapi id 15.20.6863.046; Fri, 13 Oct 2023
- 10:06:31 +0000
-From:   Claudia Draghicescu <claudia.rosu@nxp.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     iulia.tanasescu@nxp.com, mihai-octavian.urzica@nxp.com,
-        silviu.barbulescu@nxp.com, vlad.pruteanu@nxp.com,
-        andrei.istodorescu@nxp.com,
-        Claudia Draghicescu <claudia.rosu@nxp.com>
-Subject: [PATCH BlueZ 2/2] bap: Fix source+sink endpoint registration
-Date:   Fri, 13 Oct 2023 13:05:37 +0300
-Message-Id: <20231013100537.3867-3-claudia.rosu@nxp.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231013100537.3867-1-claudia.rosu@nxp.com>
-References: <20231013100537.3867-1-claudia.rosu@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: VI1P191CA0010.EURP191.PROD.OUTLOOK.COM
- (2603:10a6:800:1ba::18) To GV1PR04MB9151.eurprd04.prod.outlook.com
- (2603:10a6:150:26::9)
+        Fri, 13 Oct 2023 06:24:55 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4321AD;
+        Fri, 13 Oct 2023 03:24:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697192692; x=1728728692;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=XVTI+KtH248Y6N2mDkGmVGWxc0Mtj1GwtiXmRY/C2Xo=;
+  b=OpUuNDVP9osR3+c0YcPI+FBEOrQCk41nAT8iiQ5EEPO1LfOL3bKGJUxC
+   3y02emDi5G+s+XWwqPsApR1t0yDutofWH6CBHXhlgoTeGH09fbWZEuw46
+   /6BMB0w4/m7fKyNcm3NcG0XPQ+wjzQr0F50uIPPfXlsD6QunJQzxUpLcU
+   /KIqBu2iopOpTUB6lKwMAdYjo0Mw0Lt6o++s5x2nq79isiUDIHSrCjYE/
+   QuVV6852D+UqsIQqVcASj0hjGmYukBiFaYNduM/udqS5v6JfIkwtNdT6R
+   t2NkT8ffFcuWybNUH4oJUzV2hfRfdJTsVPbfv/WD0cFYqmzbfuZFL7oGK
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10861"; a="375499626"
+X-IronPort-AV: E=Sophos;i="6.03,221,1694761200"; 
+   d="scan'208";a="375499626"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2023 03:24:52 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10861"; a="731318523"
+X-IronPort-AV: E=Sophos;i="6.03,221,1694761200"; 
+   d="scan'208";a="731318523"
+Received: from lkp-server02.sh.intel.com (HELO f64821696465) ([10.239.97.151])
+  by orsmga006.jf.intel.com with ESMTP; 13 Oct 2023 03:24:48 -0700
+Received: from kbuild by f64821696465 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qrFLa-0004cw-29;
+        Fri, 13 Oct 2023 10:24:46 +0000
+Date:   Fri, 13 Oct 2023 18:23:55 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Zhengping Jiang <jiangzp@google.com>,
+        linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        luiz.dentz@gmail.com
+Cc:     oe-kbuild-all@lists.linux.dev,
+        chromeos-bluetooth-upstreaming@chromium.org,
+        Zhengping Jiang <jiangzp@google.com>,
+        AngeloGioacchino Del Regno 
+        <angelogioacchino.delregno@collabora.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-mediatek@lists.infradead.org
+Subject: Re: [kernel PATCH v2] Bluetooth: btmtksdio: enable bluetooth wakeup
+ in system suspend
+Message-ID: <202310131817.oEUPvya8-lkp@intel.com>
+References: <20231011153928.kernel.v2.1.I6dbfc1fedddf0633b55ce7e7a10ef7f3929a9bdc@changeid>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: GV1PR04MB9151:EE_|AS8PR04MB9080:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6eab1099-a14d-4643-da13-08dbcbd412b0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: iGzt8ruFz8ijsMBucnerxgdGXmAH6Iw/pmnEmU89jxr56c0d+pESICaPDizZ+y0ulc3WfQbkN79O8wrh2Bo75TiMNO5RJSw6TFJuaPSFTr5p9vsQSRFE0Vm2zkdP8g4quuFx7MRPszhvgri5hRAhmv+hVAUV3JrTy+hL6RlUULxr1YoCsUfccWYrw03zgi6wULv35DM92CvgmO6M6c76+WYouwzSXks0YuEwtetTp14+fhqI396ozbn2VdeO9vR7ghHejP/0GkwMq3bHDl3cNE27HrijBcjhKIOXDcCYsafGtndHZU97St9mTA2ObVdLGGm+oQUWWxDw70W1RCz1Kj3r8ohQgfBqFbSdS0nc3VNj+ReGRF6YeFD4bMz1AdipfOmiNNGr84PjSrxvC6EjvY8T97MJILuGaGy17lEhhEpgjyyLt+/qCcipMRnAC/oUmnt0o5G8KdvAPC7ouuLDwdBT/yzlKn1woIXekH1iwPSgMJf+PWHMZjhVjxW05+dI1RP4hgCvuLrxoA30KqHoe08kWnH7h8M6v+NUXkLdbl1MpBSSR84Oy5h2xpLZB91q
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR04MB9151.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(366004)(136003)(346002)(39860400002)(230922051799003)(451199024)(186009)(1800799009)(64100799003)(6512007)(6506007)(38100700002)(86362001)(1076003)(2616005)(83380400001)(26005)(8936002)(8676002)(4326008)(2906002)(41300700001)(316002)(6916009)(5660300002)(6486002)(66556008)(66476007)(66946007)(36756003)(478600001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?PNsETQERsFCEAu2qnjRQ8zELdB0k5JLbskCDfU4AwOwQTXyG7okEY1NBhL1o?=
- =?us-ascii?Q?ZN6+VOOaIKADNvnJtOcdm4o6r/W9WFgblvIH2ysFG9UOUhWFu6cq3xE9aY+A?=
- =?us-ascii?Q?5dyDg3Gnwopljbv75ZdatvlnOXobwXm/ndAN/cOAahcCpl5cY3fhsMBa4YhX?=
- =?us-ascii?Q?AC1aaOT+wXTjBBLoYUGLn6Vdjp00kCuKBIsMsoFmGDFB+395w9/W6qgYofeo?=
- =?us-ascii?Q?KX1tRW/Ee0fwYRoPGKrrmqCLxUR5Pyh+iVHDThDJ9pacCBBi1rs2+pvQXnah?=
- =?us-ascii?Q?GLv9A5kHl9O7h3QnSRciNtZurJg5HT82vO5dLRndHPgYfCLM9GDZQXeRMIeW?=
- =?us-ascii?Q?gYYC5+UkVszpvuRzdiiQmsatQ9JPH3k0/7xF5daZyl7YVuRbVjFTHOVln4/8?=
- =?us-ascii?Q?pOLgSO2X9rnATqmjRtyRump/zUZFQ7VXDj5i4fR369v6XT7R7uFLkJ6sMm7I?=
- =?us-ascii?Q?aw5atiHqKekSaSlFQEJz7RJnOvGZTHoYHih4XXqL3qlBEacWDHbII6AMMXER?=
- =?us-ascii?Q?SWohqRbqsdG90RhrKVA9yuTkttsxvqhV3AM/FE1CjeKBz1DAblvutfykDqMv?=
- =?us-ascii?Q?J7yJYpddXXlBy6N2lwqFOpS7znwDHb6howWExkrL/kYo3rIqskHuHZ3qnzWC?=
- =?us-ascii?Q?QBCB6bYDLH3nX3J5SpBbeYHAAOHmgkTI6zZ5vVjPMxMwgS9b/mRrETm7c1o4?=
- =?us-ascii?Q?el08iec762r/NyrocwiiI99XHYCvGq5EHQp1JBARSnriEMWAN44UTewSk1Jq?=
- =?us-ascii?Q?nQf4N2bUvp3T64WlJoEL991/kEepFNFf/2AHP7vAiS78dc85Tbw/aiXEMvCo?=
- =?us-ascii?Q?RHEcCQ5GWzSIOWwHRNNu3dRAzz288Hyr/27GChQ6g8aTdY1Z6wR4GY27mYoG?=
- =?us-ascii?Q?qwsHhsu8bju4BWeMB0F8JmTsRF0ccgMNOESEsAazpJKE4iZ0xgbmW23H+Mji?=
- =?us-ascii?Q?5CPv53nKsgLjbvjTxPXeaVEpIqhan3EYMHS3Q2wZ/1Ltgjk8GmId/FM8fKb2?=
- =?us-ascii?Q?BMLwprXHXSvCRkmNeDELA+h1AwlpR6t3oJznQpN2brn/1AACuTyFISJyXbuu?=
- =?us-ascii?Q?5LETu8aGoLLMJSaknXacaZ698EyQ58FFdY20T5QOQ+a5mHqmmjlYLJBUrRGO?=
- =?us-ascii?Q?riHdDmV2DnR/w1Ujwk04kMM+7BAWjSgxnBZkNKgBw3QtQezYbWhVbCf9cWap?=
- =?us-ascii?Q?LXLn6ZFzAP5nv0b3AMk1fqzy/R/zDDY1URsdxx/sju7NZhcSESk3Rq8mYp6R?=
- =?us-ascii?Q?plZR5hLZ0hXL17f3FAQ/rMxwiQEYtf5WFYD3jkLn+hBXsDBdXJhPbbGcxviw?=
- =?us-ascii?Q?oe34ejV6PcFn+CJnQj7NwoVglfDRDI+YkkPCddAcvDrQU7Zq9Jxg4VH/lMwb?=
- =?us-ascii?Q?8aszgT+ERqhzGXJoc1+76dL25Vm6y0xSA2yotuWtRPQuZW6iKmzWXw2hIydc?=
- =?us-ascii?Q?wnESvZROXNCohQuQsflgPyEBHz+SpVWj2Fvu+/zPXAaG/B6pRSGoBNeV/wTn?=
- =?us-ascii?Q?z+lxXATpNRdSNb3y9hx2RBSlBo+PlC6Cts0TqySrfcOTZPWuEVNRYutbc4vQ?=
- =?us-ascii?Q?4QJQJtsyPJ/lE2U6MJLh4b/aSxw7J803BZnXzfF1?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6eab1099-a14d-4643-da13-08dbcbd412b0
-X-MS-Exchange-CrossTenant-AuthSource: GV1PR04MB9151.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2023 10:06:31.5308
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: m/aAHtt5HMc7067q527stAAEtqTu7NkQjPU/xUK6b60vXbMtOXZGj6RUgnm1XWMQLo0ZZ+8nEcBc3yHfF5d7TA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB9080
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231011153928.kernel.v2.1.I6dbfc1fedddf0633b55ce7e7a10ef7f3929a9bdc@changeid>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Create new endpoint name for the simulated broadcast sink that is
-created when registering a broadcast source endpoint.
-This removes the ambiguity when having registered a local
-broadcast sink and fixes the situation when multiple remote
-endpoints are created when discovering a broadcast source.
+Hi Zhengping,
 
----
- profiles/audio/bap.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+kernel test robot noticed the following build warnings:
 
-diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index fa5cf1f54..cdb84d4bd 100644
---- a/profiles/audio/bap.c
-+++ b/profiles/audio/bap.c
-@@ -1053,6 +1053,7 @@ static struct bap_ep *ep_register_bcast(struct bap_data *data,
- 	switch (bt_bap_pac_get_type(rpac)) {
- 	case BT_BAP_BCAST_SOURCE:
- 	case BT_BAP_BCAST_SINK:
-+	case BT_BAP_SIMULATED_BCAST_SINK:
- 		queue = data->bcast;
- 		i = queue_length(data->bcast);
- 		suffix = "bcast";
-@@ -1075,6 +1076,7 @@ static struct bap_ep *ep_register_bcast(struct bap_data *data,
- 
- 	switch (bt_bap_pac_get_type(rpac)) {
- 	case BT_BAP_BCAST_SINK:
-+	case BT_BAP_SIMULATED_BCAST_SINK:
- 		err = asprintf(&ep->path, "%s/pac_%s%d",
- 				adapter_get_path(adapter), suffix, i);
- 		ep->base = new0(struct iovec, 1);
-@@ -1266,6 +1268,9 @@ static bool pac_found_bcast(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
- 
- 	DBG("lpac %p rpac %p", lpac, rpac);
- 
-+	if (bt_bap_pac_get_type(lpac) == BT_BAP_SIMULATED_BCAST_SINK)
-+		return true;
-+
- 	ep = ep_register_bcast(user_data, lpac, rpac);
- 	if (!ep) {
- 		error("Unable to register endpoint for pac %p", rpac);
-@@ -1792,7 +1797,7 @@ static void bap_listen_io_broadcast(struct bap_data *data, struct bap_ep *ep,
- 		error("%s", err->message);
- 		g_error_free(err);
- 	}
--
-+	ep->io = io;
- 	ep->data->listen_io = io;
- 
- }
-@@ -1958,12 +1963,8 @@ static void pac_added_broadcast(struct bt_bap_pac *pac, void *user_data)
- {
- 	struct bap_data *data = user_data;
- 
--	if (bt_bap_pac_get_type(pac) == BT_BAP_BCAST_SOURCE)
--		bt_bap_foreach_pac(data->bap, BT_BAP_BCAST_SOURCE,
--						pac_found_bcast, data);
--	else if (bt_bap_pac_get_type(pac) == BT_BAP_BCAST_SINK)
--		bt_bap_foreach_pac(data->bap, BT_BAP_BCAST_SINK,
--						pac_found_bcast, data);
-+	bt_bap_foreach_pac(data->bap, bt_bap_pac_get_type(pac),
-+				pac_found_bcast, data);
- }
- 
- static bool ep_match_pac(const void *data, const void *match_data)
+[auto build test WARNING on bluetooth/master]
+[also build test WARNING on bluetooth-next/master linus/master v6.6-rc5 next-20231012]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Zhengping-Jiang/Bluetooth-btmtksdio-enable-bluetooth-wakeup-in-system-suspend/20231012-064116
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
+patch link:    https://lore.kernel.org/r/20231011153928.kernel.v2.1.I6dbfc1fedddf0633b55ce7e7a10ef7f3929a9bdc%40changeid
+patch subject: [kernel PATCH v2] Bluetooth: btmtksdio: enable bluetooth wakeup in system suspend
+config: sh-allyesconfig (https://download.01.org/0day-ci/archive/20231013/202310131817.oEUPvya8-lkp@intel.com/config)
+compiler: sh4-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231013/202310131817.oEUPvya8-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310131817.oEUPvya8-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/bluetooth/btmtksdio.c:1501:12: warning: 'btmtksdio_system_resume' defined but not used [-Wunused-function]
+    1501 | static int btmtksdio_system_resume(struct device *dev)
+         |            ^~~~~~~~~~~~~~~~~~~~~~~
+>> drivers/bluetooth/btmtksdio.c:1464:12: warning: 'btmtksdio_system_suspend' defined but not used [-Wunused-function]
+    1464 | static int btmtksdio_system_suspend(struct device *dev)
+         |            ^~~~~~~~~~~~~~~~~~~~~~~~
+
+
+vim +/btmtksdio_system_resume +1501 drivers/bluetooth/btmtksdio.c
+
+  1463	
+> 1464	static int btmtksdio_system_suspend(struct device *dev)
+  1465	{
+  1466		struct sdio_func *func = dev_to_sdio_func(dev);
+  1467		struct btmtksdio_dev *bdev;
+  1468	
+  1469		bdev = sdio_get_drvdata(func);
+  1470		if (!bdev)
+  1471			return 0;
+  1472	
+  1473		if (!test_bit(BTMTKSDIO_FUNC_ENABLED, &bdev->tx_state))
+  1474			return 0;
+  1475	
+  1476		set_bit(BTMTKSDIO_BT_WAKE_ENABLED, &bdev->tx_state);
+  1477	
+  1478		return btmtksdio_runtime_suspend(dev);
+  1479	}
+  1480	
+  1481	static int btmtksdio_runtime_resume(struct device *dev)
+  1482	{
+  1483		struct sdio_func *func = dev_to_sdio_func(dev);
+  1484		struct btmtksdio_dev *bdev;
+  1485		int err;
+  1486	
+  1487		bdev = sdio_get_drvdata(func);
+  1488		if (!bdev)
+  1489			return 0;
+  1490	
+  1491		if (!test_bit(BTMTKSDIO_FUNC_ENABLED, &bdev->tx_state))
+  1492			return 0;
+  1493	
+  1494		err = btmtksdio_drv_pmctrl(bdev);
+  1495	
+  1496		bt_dev_dbg(bdev->hdev, "status (%d) get ownership from device", err);
+  1497	
+  1498		return err;
+  1499	}
+  1500	
+> 1501	static int btmtksdio_system_resume(struct device *dev)
+  1502	{
+  1503		return btmtksdio_runtime_resume(dev);
+  1504	}
+  1505	
+
 -- 
-2.39.2
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
