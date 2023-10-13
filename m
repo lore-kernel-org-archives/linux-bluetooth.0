@@ -2,65 +2,112 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC735CDB47E
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Oct 2023 13:24:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6B2CCDB47E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Oct 2023 16:42:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231892AbjJMNYE (ORCPT
+        id S231390AbjJMQmd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 13 Oct 2023 09:24:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52972 "EHLO
+        Fri, 13 Oct 2023 12:42:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231880AbjJMNYD (ORCPT
+        with ESMTP id S229518AbjJMQmc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 13 Oct 2023 09:24:03 -0400
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74311AD;
-        Fri, 13 Oct 2023 06:24:02 -0700 (PDT)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1qrI93-0003Hg-1g; Fri, 13 Oct 2023 15:24:01 +0200
-Message-ID: <b96190f1-44f4-4562-9030-6916e97c8b82@leemhuis.info>
-Date:   Fri, 13 Oct 2023 15:24:00 +0200
+        Fri, 13 Oct 2023 12:42:32 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD657B7;
+        Fri, 13 Oct 2023 09:42:30 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C518C433C8;
+        Fri, 13 Oct 2023 16:42:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1697215350;
+        bh=MqC3yrRRj3UMGOPti8ERknVNqGEUu0oFiV03E0Vidv0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=b86OTm7/vWPz1lXdWBiZn7RcGveX1aFsvL5jmXTq2YbcyNGIbGhWA6q1/AnMGbd1N
+         IFYYegR+vc8lMskeUk8lajThoc+bo1PlPWPhNqD2fwOG3AfKYpg90Eza/kNH0uSNPW
+         Jky7Vj9783vlIkTQS3O7jJucPYVzjXAq/DJZUjUVY+A/BEROWzFLMN0GpWgbN/I8Vu
+         ImQsRWZuesvRBHjxd0H3/8ZdxSWJjJnhbYb4F5CAQ1P15D5R2lTSA+hkWwJq0LpHAe
+         Bn/6fD9G+fr9mHm/5sCM1EEe3TdFQCGEcv6U3ysqKGhpLI6CBcvRuzJ9zOUE+g+0U1
+         YdquVEXDnza8g==
+Date:   Fri, 13 Oct 2023 11:42:28 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>
+Cc:     "Rafael J . Wysocki" <rafael@kernel.org>,
+        linux-pci@vger.kernel.org,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
+        Lukas Wunner <lukas@wunner.de>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        ath10k@lists.infradead.org, ath11k@lists.infradead.org,
+        ath12k@lists.infradead.org, intel-wired-lan@lists.osuosl.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-rdma@vger.kernel.org,
+        linux-wireless@vger.kernel.org, Netdev <netdev@vger.kernel.org>
+Subject: Re: [PATCH v2 03/13] PCI/ASPM: Disable ASPM when driver requests it
+Message-ID: <20231013164228.GA1117889@bhelgaas>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Regression: devcoredump patch broke Realtek usb bluetooth adapter
-Content-Language: en-US, de-DE
-To:     Linux Regressions <regressions@lists.linux.dev>
-Cc:     Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-References: <20231003182038.k57nirtt4sonvt7c@box.shutemov.name>
- <ZRyqIn0_qqEFBPdy@debian.me>
-From:   "Linux regression tracking #update (Thorsten Leemhuis)" 
-        <regressions@leemhuis.info>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <ZRyqIn0_qqEFBPdy@debian.me>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1697203442;e0bf53fd;
-X-HE-SMSGID: 1qrI93-0003Hg-1g
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aa3386a4-c22d-6d5d-112d-f36b22cda6d3@linux.intel.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-[TLDR: This mail in primarily relevant for Linux kernel regression
-tracking. See link in footer if these mails annoy you.]
+On Thu, Oct 12, 2023 at 01:56:16PM +0300, Ilpo Järvinen wrote:
+> On Wed, 11 Oct 2023, Bjorn Helgaas wrote:
+> > On Mon, Sep 18, 2023 at 04:10:53PM +0300, Ilpo Järvinen wrote:
+> > > PCI core/ASPM service driver allows controlling ASPM state through
+> > > pci_disable_link_state() and pci_enable_link_state() API. It was
+> > > decided earlier (see the Link below), to not allow ASPM changes when OS
+> > > does not have control over it but only log a warning about the problem
+> > > (commit 2add0ec14c25 ("PCI/ASPM: Warn when driver asks to disable ASPM,
+> > > but we can't do it")). Similarly, if ASPM is not enabled through
+> > > config, ASPM cannot be disabled.
+> ...
 
-On 04.10.23 01:56, Bagas Sanjaya wrote:
-> On Tue, Oct 03, 2023 at 09:20:38PM +0300, Kirill A. Shutemov wrote:
->>
->> Commit 044014ce85a1 ("Bluetooth: btrtl: Add Realtek devcoredump support")
->> broke Realtek-based ASUS USB-BT500, ID 0b05:190e.
->>
->> Devices failed to connect. hciconfig showed a controller with all-zero BD
->> address.
+> > This disables *all* ASPM states, unlike the version when
+> > CONFIG_PCIEASPM is enabled.  I suppose there's a reason, and maybe a
+> > comment could elaborate on it?
+> >
+> > When CONFIG_PCIEASPM is not enabled, I don't think we actively
+> > *disable* ASPM in the hardware; we just leave it as-is, so firmware
+> > might have left it enabled.
+> 
+> This whole trickery is intended for drivers that do not want to have ASPM 
+> because the devices are broken with it. So leaving it as-is is not really 
+> an option (as demonstrated by the custom workarounds).
 
-#regzbot fix: Bluetooth: btrtl: Ignore error return for hci_devcd_register()
-#regzbot ignore-activity
+Right.
 
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
---
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-That page also explains what to do if mails like this annoy you.
+> > Conceptually it seems like the LNKCTL updates here should be the same
+> > whether CONFIG_PCIEASPM is enabled or not (subject to the question
+> > above).
+> > 
+> > When CONFIG_PCIEASPM is enabled, we might need to do more stuff, but
+> > it seems like the core should be the same.
+> 
+> So you think it's safer to partially disable ASPM (as per driver's 
+> request) rather than disable it completely? I got the impression that the 
+> latter might be safer from what Rafael said earlier but I suppose I might 
+> have misinterpreted him since he didn't exactly say that it might be safer 
+> to _completely_ disable it.
 
+My question is whether the state of the device should depend on
+CONFIG_PCIEASPM.  If the driver does this:
 
+  pci_disable_link_state(PCIE_LINK_STATE_L0S)
+
+do we want to leave L1 enabled when CONFIG_PCIEASPM=y but disable L1
+when CONFIG_PCIEASPM is unset?
+
+I can see arguments both ways.  My thought was that it would be nice
+to end up with a single implementation of pci_disable_link_state()
+with an #ifdef around the CONFIG_PCIEASPM-enabled stuff because it
+makes the code easier to read.
+
+Bjorn
