@@ -2,137 +2,119 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B6C5CDB465
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 14 Oct 2023 19:41:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0E29CDB482
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 14 Oct 2023 20:36:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229644AbjJNTlf (ORCPT
+        id S231338AbjJNUgC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 14 Oct 2023 15:41:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43282 "EHLO
+        Sat, 14 Oct 2023 16:36:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229464AbjJNTle (ORCPT
+        with ESMTP id S230371AbjJNUgB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 14 Oct 2023 15:41:34 -0400
-Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1817EB7
-        for <linux-bluetooth@vger.kernel.org>; Sat, 14 Oct 2023 12:41:33 -0700 (PDT)
-Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2c515527310so6462051fa.2
-        for <linux-bluetooth@vger.kernel.org>; Sat, 14 Oct 2023 12:41:33 -0700 (PDT)
+        Sat, 14 Oct 2023 16:36:01 -0400
+Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35917B7
+        for <linux-bluetooth@vger.kernel.org>; Sat, 14 Oct 2023 13:36:00 -0700 (PDT)
+Received: by mail-qt1-x830.google.com with SMTP id d75a77b69052e-419787a43ebso21168431cf.1
+        for <linux-bluetooth@vger.kernel.org>; Sat, 14 Oct 2023 13:36:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697312491; x=1697917291; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=quRXq43BRUvNxzNxX1eh163n0hacy/wdLQuWvUi9i/s=;
-        b=ekRz0dEdsIVFk+7NOQ2Nj6O1o7CvsHx44SpMjtTlTaJIZqQXkuDn6F/+et24ze9/6/
-         JnXk+9sgsPHf6LLo5S/euB52TPAqghKc2dsKGCbQX64hmH/21zHBkyxHWwDia83KmRb+
-         tKvd6BsvwctjfoHY12GwYBCNJPFX1EtcnDfvgYsgTQyXAuX91lpdVvavOpzRqKT2bITk
-         GUT65TlFuu5mE2bF1aInEQURKMxo5zWZzcwCAefN/S4oYUKqJzm7g06a2xHdoPOEk5Hr
-         Uw5TFFz+tMgoa19S88lJ/XCCNQ6M1fgkMzKmWbKIvffAPBDlt1YRN3CuPnExgAS6+xDI
-         MaMA==
+        d=gmail.com; s=20230601; t=1697315759; x=1697920559; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=GV5el7z90cHB//Pitf29YW8UHfdygVM14+aCWx9SQso=;
+        b=kxYBpr0F0Zxcz769zcFQzf2FfM0UAh1M0v7Pufoz2fgh9fwpuywu6O3d56F7O8KMYS
+         MQZtcUfcgw8WTkoZfwiR7tqaFhmIzKOUN6wGIeqN82adzNexbH7YXeq2W18+0rH54CAs
+         u11+eCOAmhOrN5BQAG4w/WherPBQq3/QLoSRCbZgCNOnt74SXWVE38yPXegSRLIxGSAQ
+         NX05WI4FeyW1zCTSwBZRmMFklkLtqGtLXYLyKMNCvTzAmYKO1Tv9YQFjQQ5+Y+Zh17AY
+         0unmxW78Ut44jjJdh+vHzqozjXUiCjwFdlYntfOCr7/1zX7ZTm1K4VckLs95cH5WHUVG
+         eS6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697312491; x=1697917291;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1697315759; x=1697920559;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=quRXq43BRUvNxzNxX1eh163n0hacy/wdLQuWvUi9i/s=;
-        b=uOcLozdGXqt7xJX3UHg1pgjBrkDbyU8HZRg6gHD6/zy1SVrUHqLTwPsZb2UBXMu6Zc
-         S8e1UyMRSXICypm0fKvhQXP2gt+JpPXLNBCF4IV73pe6CXUb7u7SEIaCwCfgmvMxcPcK
-         fRXWYfI+EjgAd15oPya9mGInB9yAgoF5JWmqV1I9mu2I5ycr/+qksPTbP3THms6InEut
-         GxwmRgO39kKUUTJge7aWzXgFo2bpisdfrb8+ntMAIzFOcs2YYQpTJzcg+rhqoZY4X4Hs
-         gR0MeEFdWLn5BYAr8t5gGBKvssuyQs656alaZVswuriK3jUKj66UGyEMN7gJqnuyWcgq
-         0/Vw==
-X-Gm-Message-State: AOJu0Ywt3XtkknJLxVe7hlSD0/yoDwr6ivED0i8kw3E6++P9LOEjgibJ
-        /RUcGVgFEUcSeFB7Xe5sLNdwBRQpOpk=
-X-Google-Smtp-Source: AGHT+IE7rcHYlJ49BxKXhJ/SBylmM2vbirYZ0Jez9jLGm4WqfafRk21jLplQiMtod8N3ndza4pvdgQ==
-X-Received: by 2002:a2e:9589:0:b0:2bf:af49:daf7 with SMTP id w9-20020a2e9589000000b002bfaf49daf7mr26640903ljh.42.1697312490904;
-        Sat, 14 Oct 2023 12:41:30 -0700 (PDT)
-Received: from localhost.localdomain (46.205.208.24.nat.ftth.dynamic.t-mobile.pl. [46.205.208.24])
-        by smtp.gmail.com with ESMTPSA id v8-20020a2e5048000000b002c4fdb0ef12sm509029ljd.19.2023.10.14.12.41.30
+        bh=GV5el7z90cHB//Pitf29YW8UHfdygVM14+aCWx9SQso=;
+        b=RsQK8xMydEqw/BnJpw58C5qKvTYcLuLKGK0roeGRG2LZU8iJ2AFHvpQKOuyp2DDOmY
+         cANQOf960Cqq5YVAf1lQKiRnOH3UMkPnGWX2tFO/O7lxXcCF2yDvmNekNWROsVNf0R17
+         0V8LIoW2tHcKUoqCHkoo75VT3zJpdlzqzS/YpYx/Xt+Z35ac/WlwMGC35RMoKlwpX1lt
+         65DABGYIG2EOj2PnKNfbXqO7ePnv9FX//JdhsoMptYUmkprQlZ+h09hPLFa3h1kNrjD0
+         ixFTGZH5Ywzox6ixFbwrvizmg3sb8JCD7jWTD+nTZPVbLOB4yZpswcO3GpJjM5eAg8Tf
+         z4/g==
+X-Gm-Message-State: AOJu0YyseOVEss+6GRpYhRA8wxd1iBW7uebjvcKdtLFxgAIqkC2WDGPW
+        w+DTLxKXbkwLijzKWTnSMNGSBeqwtPM=
+X-Google-Smtp-Source: AGHT+IFVYYeGjapsGN4ni+7LWFAmPaYvwVpdFI978IpWWEpJZZJnWlOrJQ1nRjJYBiT8R6aJHgoCQA==
+X-Received: by 2002:a05:622a:1209:b0:412:a69:3a01 with SMTP id y9-20020a05622a120900b004120a693a01mr35707592qtx.6.1697315759160;
+        Sat, 14 Oct 2023 13:35:59 -0700 (PDT)
+Received: from [172.17.0.2] ([172.177.96.44])
+        by smtp.gmail.com with ESMTPSA id g28-20020ac8775c000000b00419792c1be7sm1732183qtu.30.2023.10.14.13.35.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Oct 2023 12:41:30 -0700 (PDT)
-From:   Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-Subject: [PATCH BlueZ] btdev: Do not call auth_complete with NULL conn
-Date:   Sat, 14 Oct 2023 21:41:20 +0200
-Message-Id: <20231014194120.1884126-1-arkadiusz.bokowy@gmail.com>
-X-Mailer: git-send-email 2.39.2
+        Sat, 14 Oct 2023 13:35:58 -0700 (PDT)
+Message-ID: <652afbae.c80a0220.15f93.7dba@mx.google.com>
+Date:   Sat, 14 Oct 2023 13:35:58 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2508316305839072861=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, arkadiusz.bokowy@gmail.com
+Subject: RE: [BlueZ] btdev: Fix NULL pointer dereference
+In-Reply-To: <20231014191609.1883047-1-arkadiusz.bokowy@gmail.com>
+References: <20231014191609.1883047-1-arkadiusz.bokowy@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Make sure that the auto_complete() function will not be called with the
-NULL connection, because it is required by that function.
+--===============2508316305839072861==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-** NOTE FOR REVIEWERS **
-The change in the cmd_link_key_reply_complete() function was done based
-on the code from other *_complete() functions. In most of them, in case
-of NULL connection the conn_complete() was used instead. But I'm not
-100% sure that it's the right approach (not even 90% sure...).
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=793240
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.67 seconds
+GitLint                       PASS      0.33 seconds
+BuildEll                      PASS      27.98 seconds
+BluezMake                     PASS      805.35 seconds
+MakeCheck                     PASS      11.51 seconds
+MakeDistcheck                 PASS      175.45 seconds
+CheckValgrind                 PASS      268.81 seconds
+CheckSmatch                   WARNING   362.31 seconds
+bluezmakeextell               PASS      116.69 seconds
+IncrementalBuild              PASS      699.10 seconds
+ScanBuild                     WARNING   1066.45 seconds
+
+Details
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+emulator/btdev.c:420:29: warning: Variable length array is used.
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+emulator/btdev.c:1083:10: warning: Although the value stored to 'conn' is used in the enclosing expression, the value is never actually read from 'conn'
+        while ((conn = queue_find(dev->conns, match_handle,
+                ^      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+emulator/btdev.c:1456:13: warning: Access to field 'dev' results in a dereference of a null pointer (loaded from variable 'conn')
+        send_event(conn->dev, BT_HCI_EVT_AUTH_COMPLETE, &ev, sizeof(ev));
+                   ^~~~~~~~~
+2 warnings generated.
+
+
+
 ---
- emulator/btdev.c | 15 ++++++---------
- 1 file changed, 6 insertions(+), 9 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index c76b89db9..2564d96f2 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -1453,7 +1453,7 @@ static void auth_complete(struct btdev_conn *conn, uint8_t status)
- 
- 	memset(&ev, 0, sizeof(ev));
- 
--	ev.handle = conn ? cpu_to_le16(conn->handle) : 0x0000;
-+	ev.handle = cpu_to_le16(conn->handle);
- 	ev.status = status;
- 
- 	send_event(conn->dev, BT_HCI_EVT_AUTH_COMPLETE, &ev, sizeof(ev));
-@@ -1491,10 +1491,10 @@ static int cmd_link_key_reply_complete(struct btdev *dev, const void *data,
- 		status = BT_HCI_ERR_AUTH_FAILURE;
- 
- done:
--	auth_complete(conn, status);
--
- 	if (conn)
- 		auth_complete(conn->link, status);
-+	else
-+		conn_complete(dev, cmd->bdaddr, status);
- 
- 	return 0;
- }
-@@ -1681,28 +1681,25 @@ static int cmd_pin_code_neg_reply_complete(struct btdev *dev, const void *data,
- 							uint8_t len)
- {
- 	const struct bt_hci_cmd_pin_code_request_neg_reply *cmd = data;
-+	const uint8_t status = BT_HCI_ERR_PIN_OR_KEY_MISSING;
- 	struct btdev *remote;
- 	struct btdev_conn *conn;
--	uint8_t status;
- 
- 	remote = find_btdev_by_bdaddr(cmd->bdaddr);
- 	if (!remote)
- 		return 0;
- 
--	status = BT_HCI_ERR_PIN_OR_KEY_MISSING;
--
- 	conn = queue_find(dev->conns, match_bdaddr, cmd->bdaddr);
- 	if (conn)
- 		auth_complete(conn, status);
- 	else
--		conn_complete(dev, cmd->bdaddr, BT_HCI_ERR_PIN_OR_KEY_MISSING);
-+		conn_complete(dev, cmd->bdaddr, status);
- 
- 	if (conn) {
- 		if (remote->pin_len)
- 			auth_complete(conn->link, status);
- 	} else {
--		conn_complete(remote, dev->bdaddr,
--					BT_HCI_ERR_PIN_OR_KEY_MISSING);
-+		conn_complete(remote, dev->bdaddr, status);
- 	}
- 
- 	return 0;
--- 
-2.39.2
 
+--===============2508316305839072861==--
