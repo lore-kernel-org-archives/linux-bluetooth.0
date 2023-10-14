@@ -2,211 +2,144 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0946CDB465
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 14 Oct 2023 09:19:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51B0ECDB465
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 14 Oct 2023 18:52:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233014AbjJNJTG (ORCPT
+        id S233279AbjJNSwZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 14 Oct 2023 05:19:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50078 "EHLO
+        Sat, 14 Oct 2023 14:52:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231377AbjJNJTF (ORCPT
+        with ESMTP id S233264AbjJNSwY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 14 Oct 2023 05:19:05 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8839DC2
-        for <linux-bluetooth@vger.kernel.org>; Sat, 14 Oct 2023 02:19:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697275144; x=1728811144;
-  h=date:from:to:cc:subject:message-id;
-  bh=3wQVtgduTcG7BntVm/xUvZ5iYuII09fhEicfcQjdo2Y=;
-  b=TsGePcTb6uVpL5mMIGyjb9YstrvIQAj8TgK4feHk7WpnBZXTZFzaRBNP
-   tWrXoTUrXtmmpLDt7C9XZGVKkdobAPYIaEoIZgo+M2mjUMQhmOSilO8Md
-   se1uQRKBk+q3ZzScAFX9T0bfc9QXOY6cmjcISWBoWlyWsrHUzFfnGskgJ
-   1fzsxPxZNT6SgW0wdY2gc1U+8N6NbweZDCkOLFuTA9sMWRJZAwg9IZlUW
-   +7CbYuURH07x7rx0ta7SuEeHxYGRtbFuGD0jYoAKsG3o3PHuPY4h9ze7k
-   cBD46fLD0rKwzZUFFOa2N6jn58fJUjFvIPXCCAqWfUQ+kEEKDVVGoBxYz
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10862"; a="385155451"
-X-IronPort-AV: E=Sophos;i="6.03,224,1694761200"; 
-   d="scan'208";a="385155451"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2023 02:19:04 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10862"; a="754993469"
-X-IronPort-AV: E=Sophos;i="6.03,224,1694761200"; 
-   d="scan'208";a="754993469"
-Received: from lkp-server02.sh.intel.com (HELO f64821696465) ([10.239.97.151])
-  by orsmga002.jf.intel.com with ESMTP; 14 Oct 2023 02:19:02 -0700
-Received: from kbuild by f64821696465 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qranU-0005yj-1k;
-        Sat, 14 Oct 2023 09:19:00 +0000
-Date:   Sat, 14 Oct 2023 17:18:45 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+        Sat, 14 Oct 2023 14:52:24 -0400
+Received: from mail-oo1-xc33.google.com (mail-oo1-xc33.google.com [IPv6:2607:f8b0:4864:20::c33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 390E1BF
+        for <linux-bluetooth@vger.kernel.org>; Sat, 14 Oct 2023 11:52:23 -0700 (PDT)
+Received: by mail-oo1-xc33.google.com with SMTP id 006d021491bc7-57b6a7e0deeso1924576eaf.2
+        for <linux-bluetooth@vger.kernel.org>; Sat, 14 Oct 2023 11:52:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697309542; x=1697914342; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=elVqQSyfPhurBvWwTLp9j0YocoOf6qVQXNgOxgKYhpY=;
+        b=DbZaRIByMk5yX6ToDjvcqJHluuHCD+UEcjLCGD7GgzRVV0FHh0FsXPVtjJjt3coLem
+         Wr1e2Phv6do7mMiX8RcObkx2yU6CLvfUDUxqwZifVStssdhwVB8U2fd6FAiOwJnJvWUP
+         9s0NvV8xElyLetAOItEM8E7cDd428hIXOEiei7id40wsKZtafQirGFXY5l4L5sDb/WAm
+         qZCZdcoMOXgiwlP5jxFxSb23tBxj/Wa/WP3qF9tO8lebYqOZuHhwQFQ4RNq6fRtPwa3o
+         PFkUZUwWO/Kn7EqxyTjuNR56q4+41H20j7cznTNwVpFUlZY8bflwwjtaXcogcjA5+oBS
+         SmEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697309542; x=1697914342;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=elVqQSyfPhurBvWwTLp9j0YocoOf6qVQXNgOxgKYhpY=;
+        b=ohO2joXP71BdDt4QEXFz0QDZ1xX2LqPj/9vI3Oei8BvLjkgb60CPvQNKVKaK7XXK8s
+         4ExXfIPWSYcaym3FuQ/felfo9nc7qB6asvrPpi/sfqO54v1C0GCuhz6/kmCm9W6yky/x
+         wRfIKLPo/9HkCeGg2YYlMEvCDEvSwsKFM2lAk5NI+Ck5EcgUW/qVk3BDIE7lFUNvgmOU
+         UJItr3WYjBSCV0yaYCsu+Efnrli+FcenEgRO5+4Gm/0tMOqNKur0qIt0WH5uOgUd5XY9
+         F8aPeYCM2GgvTPpnvPMC+fdLdcSEj07DdNZ/AohHZeMjQfMqw9upyRPr1kR+8N+DW95M
+         L36w==
+X-Gm-Message-State: AOJu0YxDECGVmxOJpspR6lGzNtJMEZIOfzZUgJGM7zAVH9+84Dcujvtx
+        iJVRRxhPFY+Eehry1ALpHfj9EW7RegRxAHlwWd876i0rllQ/xQ==
+X-Google-Smtp-Source: AGHT+IHjQB0osprDfzcSNLCSaFJUaG1wo1xJ5wHnIxxYdtieykEn49j5Ad8HygToV/+1XM2/Lgtvk9jeGO7z/GEVGlc=
+X-Received: by 2002:a05:6870:1356:b0:1e9:c1e3:beb4 with SMTP id
+ 22-20020a056870135600b001e9c1e3beb4mr6987360oac.31.1697309542366; Sat, 14 Oct
+ 2023 11:52:22 -0700 (PDT)
+MIME-Version: 1.0
+References: <20231014074716.1866266-1-arkadiusz.bokowy@gmail.com> <e706186e-e64f-490f-9162-11bfdc589619@molgen.mpg.de>
+In-Reply-To: <e706186e-e64f-490f-9162-11bfdc589619@molgen.mpg.de>
+From:   Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+Date:   Sat, 14 Oct 2023 20:52:11 +0200
+Message-ID: <CAGFh026-11qh0jRQ5=NS4SmH7JQy7BfNwJh9N=bs-K-aVNba-g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] btdev: Broadcast EXT_ADV packets every 200 ms
+To:     Paul Menzel <pmenzel@molgen.mpg.de>
 Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 8fa4c368ba691e6d92bc7a71279ed4ce5f1a6a1d
-Message-ID: <202310141742.0Hhdg9d4-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 8fa4c368ba691e6d92bc7a71279ed4ce5f1a6a1d  Bluetooth: ISO: Copy BASE if service data matches EIR_BAA_SERVICE_UUID
+Hi Paul,
 
-elapsed time: 2187m
+> > Real BLE devices transmit LE advertisement report packages in given
+> > intervals (typically in range between 20 ms and 10.24 s). With current
+> > kernel module Bluetooth stack implementation it is possible that the
+> > first LE meta packet just after enabling scanning will be lost. It is
+> > not an issue for real devices, because more advertisement reports will
+> > be delivered later (in given interval time).
+> >
+> > This patch changes optimistic implementation of sending only one LE
+> > meta packets just after enabling scanning to sending LE meta packets
+> > in 200 ms intervals. Such behavior will better emulate real HCI and
+> > will workaround the issue of dropping the very first LE meta packet
+> > by the kernel.
+>
+> Could you please describe your test setup? I guess you optimized the 200
+> ms for your setup, and that is the reason you did not choose an even
+> lower value like 100 ms?
 
-configs tested: 139
-configs skipped: 2
+No, it's not an optimization for my particular setup, but more
+generally for CPU load. I thought that it might be better not to run
+advertisement code too frequently. But I guess that lower values
+should also be OK, e.g. 100 ms or 50 ms. There is one "issue" with
+that, though.... Now, the advertisement packet will be sent one
+interval after the advertisement was enabled. If that's indeed an
+issue, it can be fixed by calling the callback function in the moment
+when the timer is armed.
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+> > -static void le_set_ext_adv_enable_complete(struct btdev *btdev,
+> > -                                             struct le_ext_adv *ext_adv)
+> > +static bool ext_adv_broadcast(void *user_data)
+> >   {
+> > +     struct le_ext_adv *ext_adv = user_data;
+> > +     struct btdev *btdev = ext_adv->dev;
+>
+> Are these used?
+>
+> Why rename the function?
 
-tested configs:
-alpha                             allnoconfig   gcc  
-alpha                            allyesconfig   gcc  
-alpha                               defconfig   gcc  
-arc                              allmodconfig   gcc  
-arc                               allnoconfig   gcc  
-arc                              allyesconfig   gcc  
-arc                                 defconfig   gcc  
-arc                   randconfig-001-20231013   gcc  
-arm                              allmodconfig   gcc  
-arm                               allnoconfig   gcc  
-arm                              allyesconfig   gcc  
-arm                     am200epdkit_defconfig   clang
-arm                                 defconfig   gcc  
-arm                   randconfig-001-20231013   gcc  
-arm                   randconfig-001-20231014   gcc  
-arm                         socfpga_defconfig   clang
-arm64                            allmodconfig   gcc  
-arm64                             allnoconfig   gcc  
-arm64                            allyesconfig   gcc  
-arm64                               defconfig   gcc  
-csky                             allmodconfig   gcc  
-csky                              allnoconfig   gcc  
-csky                             allyesconfig   gcc  
-csky                                defconfig   gcc  
-i386                             allmodconfig   gcc  
-i386                              allnoconfig   gcc  
-i386                             allyesconfig   gcc  
-i386                              debian-10.3   gcc  
-i386                                defconfig   gcc  
-i386                  randconfig-001-20231013   gcc  
-i386                  randconfig-001-20231014   gcc  
-i386                  randconfig-002-20231013   gcc  
-i386                  randconfig-002-20231014   gcc  
-i386                  randconfig-003-20231013   gcc  
-i386                  randconfig-003-20231014   gcc  
-i386                  randconfig-004-20231013   gcc  
-i386                  randconfig-004-20231014   gcc  
-i386                  randconfig-005-20231013   gcc  
-i386                  randconfig-005-20231014   gcc  
-i386                  randconfig-006-20231013   gcc  
-i386                  randconfig-006-20231014   gcc  
-loongarch                        alldefconfig   gcc  
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch                        allyesconfig   gcc  
-loongarch                           defconfig   gcc  
-loongarch             randconfig-001-20231013   gcc  
-m68k                             allmodconfig   gcc  
-m68k                              allnoconfig   gcc  
-m68k                             allyesconfig   gcc  
-m68k                                defconfig   gcc  
-m68k                       m5249evb_defconfig   gcc  
-m68k                           virt_defconfig   gcc  
-microblaze                       allmodconfig   gcc  
-microblaze                        allnoconfig   gcc  
-microblaze                       allyesconfig   gcc  
-microblaze                          defconfig   gcc  
-mips                             allmodconfig   gcc  
-mips                              allnoconfig   gcc  
-mips                             allyesconfig   gcc  
-mips                  decstation_64_defconfig   gcc  
-mips                           ip27_defconfig   clang
-mips                        maltaup_defconfig   clang
-nios2                            allmodconfig   gcc  
-nios2                             allnoconfig   gcc  
-nios2                            allyesconfig   gcc  
-nios2                               defconfig   gcc  
-openrisc                         allmodconfig   gcc  
-openrisc                          allnoconfig   gcc  
-openrisc                         allyesconfig   gcc  
-openrisc                            defconfig   gcc  
-parisc                           allmodconfig   gcc  
-parisc                            allnoconfig   gcc  
-parisc                           allyesconfig   gcc  
-parisc                              defconfig   gcc  
-parisc                generic-64bit_defconfig   gcc  
-parisc64                            defconfig   gcc  
-powerpc                          allmodconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc                          allyesconfig   gcc  
-powerpc                    sam440ep_defconfig   gcc  
-riscv                            allmodconfig   gcc  
-riscv                             allnoconfig   gcc  
-riscv                            allyesconfig   gcc  
-riscv                               defconfig   gcc  
-riscv                 randconfig-001-20231013   gcc  
-riscv                 randconfig-001-20231014   gcc  
-riscv                          rv32_defconfig   gcc  
-s390                             allmodconfig   gcc  
-s390                              allnoconfig   gcc  
-s390                             allyesconfig   gcc  
-s390                                defconfig   gcc  
-s390                  randconfig-001-20231013   gcc  
-s390                  randconfig-001-20231014   gcc  
-sh                               allmodconfig   gcc  
-sh                                allnoconfig   gcc  
-sh                               allyesconfig   gcc  
-sh                                  defconfig   gcc  
-sh                           se7705_defconfig   gcc  
-sh                            titan_defconfig   gcc  
-sparc                            allmodconfig   gcc  
-sparc                             allnoconfig   gcc  
-sparc                            allyesconfig   gcc  
-sparc                               defconfig   gcc  
-sparc                 randconfig-001-20231014   gcc  
-sparc64                          allmodconfig   gcc  
-sparc64                          allyesconfig   gcc  
-sparc64                             defconfig   gcc  
-um                               allmodconfig   clang
-um                                allnoconfig   clang
-um                               allyesconfig   clang
-um                                  defconfig   gcc  
-um                             i386_defconfig   gcc  
-um                           x86_64_defconfig   gcc  
-x86_64                            allnoconfig   gcc  
-x86_64                           allyesconfig   gcc  
-x86_64                              defconfig   gcc  
-x86_64                                  kexec   gcc  
-x86_64                randconfig-001-20231013   gcc  
-x86_64                randconfig-001-20231014   gcc  
-x86_64                randconfig-002-20231013   gcc  
-x86_64                randconfig-002-20231014   gcc  
-x86_64                randconfig-003-20231013   gcc  
-x86_64                randconfig-003-20231014   gcc  
-x86_64                randconfig-004-20231013   gcc  
-x86_64                randconfig-004-20231014   gcc  
-x86_64                randconfig-005-20231013   gcc  
-x86_64                randconfig-005-20231014   gcc  
-x86_64                randconfig-006-20231013   gcc  
-x86_64                randconfig-006-20231014   gcc  
-x86_64                           rhel-8.3-bpf   gcc  
-x86_64                          rhel-8.3-func   gcc  
-x86_64                    rhel-8.3-kselftests   gcc  
-x86_64                         rhel-8.3-kunit   gcc  
-x86_64                           rhel-8.3-ltp   gcc  
-x86_64                          rhel-8.3-rust   clang
-x86_64                               rhel-8.3   gcc  
-xtensa                            allnoconfig   gcc  
-xtensa                           allyesconfig   gcc  
+In the previous implementation, the le_set_ext_adv_enable_complete()
+function was called after advertisement was enabled in order to send
+LE meta packages to devices which have enabled scanning. But this code
+was run only once. I thought that we can reuse this logic to send LE
+meta packages every interval time. That's why I've renamed this
+function, so the name will be more descriptive (it's not enable
+complete callback anymore). And in order to provide compatibility with
+new sygnature, I've added ext_adv and btdev variables.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> >   static void scan_pa(struct btdev *dev, struct btdev *remote)
+> >   {
+> >       if (dev->le_pa_sync_handle != INV_HANDLE || !remote->le_pa_enable)
+> > @@ -5440,7 +5411,6 @@ static int cmd_set_ext_scan_enable_complete(struct btdev *dev, const void *data,
+> >               if (!btdev_list[i] || btdev_list[i] == dev)
+> >                       continue;
+> >
+> > -             scan_ext_adv(dev, btdev_list[i]);
+> >               scan_pa(dev, btdev_list[i]);
+> >       }
+>
+> Excuse my ignorance, but the remove code is really not necessary anymore?
+
+Maybe I will briefly describe the previous implementation. There are
+two possible cases for sending and receiving advertisements: a) device
+A (B, C, ...) enables advertisement and then device Z enables
+scanning; b) device Z enables scanning and then other devices enable
+advertisement. So, in previous implementation, the LE meta packets
+have been sent to devices with enabled scanning from devices which
+have enabled advertisement either when the scan was enabled (in device
+Z) or when the advertisement was enabled (in device A, B, C ...). The
+removed code corresponds to the case of enabling scanning. It's not
+required any more, because now advertising is governed by the devices
+A, B, C by running advertisement logic every interval time (in the
+original patch, every 200 ms, but that can be changed to lover
+values).
+
+To be honest I'm not sure what about scan_pa(). Maybe that logic
+should also be moved to some timer callback and should be governed by
+the A, C, B, ... devices? I would have to read more about sync in the
+BLE spec.
+
+Regards,
+Arek
