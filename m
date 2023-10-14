@@ -2,263 +2,145 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B812CDB465
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 14 Oct 2023 09:09:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3169FCDB465
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 14 Oct 2023 09:15:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231377AbjJNJJf (ORCPT
+        id S233009AbjJNJPQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 14 Oct 2023 05:09:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43674 "EHLO
+        Sat, 14 Oct 2023 05:15:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233043AbjJNJJd (ORCPT
+        with ESMTP id S232977AbjJNJPP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 14 Oct 2023 05:09:33 -0400
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86372CE
-        for <linux-bluetooth@vger.kernel.org>; Sat, 14 Oct 2023 02:09:30 -0700 (PDT)
-Received: from [192.168.0.233] (ip5f5bf23c.dynamic.kabel-deutschland.de [95.91.242.60])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pmenzel)
-        by mx.molgen.mpg.de (Postfix) with ESMTPSA id D6AB861E5FE01;
-        Sat, 14 Oct 2023 11:09:23 +0200 (CEST)
-Message-ID: <e706186e-e64f-490f-9162-11bfdc589619@molgen.mpg.de>
-Date:   Sat, 14 Oct 2023 11:09:21 +0200
+        Sat, 14 Oct 2023 05:15:15 -0400
+Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35FA2AD
+        for <linux-bluetooth@vger.kernel.org>; Sat, 14 Oct 2023 02:15:14 -0700 (PDT)
+Received: by mail-ot1-x32c.google.com with SMTP id 46e09a7af769-6c62cb79b02so1865628a34.2
+        for <linux-bluetooth@vger.kernel.org>; Sat, 14 Oct 2023 02:15:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697274913; x=1697879713; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=LM0l7EI9GNZmLJCWGOKRcu8YimBuITEmxNE2Ql9Tu5U=;
+        b=kRbsRYjLF2cc2cqjFkFxNzfyFLKxIC2YJ6+1/pN/pAuloWnk/T4BFTOoQmsI4lbvAQ
+         8EnJGGBoglBIhMsbVsqZMcA2qUzOY5rmZx2ax6urm+j7bdz7d3bNwQjDsXE+d7UFaj50
+         D0u+ZCeXQWU2y2kC6DS9AiR6OvdLso174hl2MM9LqFDtYfErtSLuJEYHNdkZIObe0e3a
+         HfdEATXLmpylqcRZUL27TizxKsrhW+AnYiE5/3XyR5TzxUb0NQBf4JkmVDxqeNxYsB7A
+         Cj6qC6Eg15Qzac6RWOm9Yhv7KOMxWI3PUiDg7T3ltf3xYWKcmfq2YZrCiN6t5viH5qMG
+         SS2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697274913; x=1697879713;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LM0l7EI9GNZmLJCWGOKRcu8YimBuITEmxNE2Ql9Tu5U=;
+        b=dgU31oc+Yv8wU3mqlrfoILibWY2zv8mkHTN7cuYxzy+IJGCXpH3r3GaVs3FKq8VlkP
+         ckiXagII7irbTdkftoP613Kjsv8r89Zgftc9fSUp66xlqqNJXCuMIIKSTicEtvPODPnL
+         0NJDeoSp+DKr4Jgu+aFta3ytEYPoycvlZuGEpy0U/iGJKDuYE9xf3gFNR8ZZMlrE9Xqj
+         WXTRPlCkd8avTNNj66C3hwfiSe9959Pi1On6HPlinT66zIpazYysrKislPwP0vY5trU9
+         LjGIKVfsEGcv1shLyBqMo7SIfiwE0QX+9MDTpdRzkNmh5+jLEK0UQF4YGxRRDay5YpsZ
+         0mLA==
+X-Gm-Message-State: AOJu0YxGDjlSbQ4nq9MvxWrQDsSF7O7BZHytlD0karV5htek0ECt8N7q
+        n4e1IJc2TGmklSdhIpDjZ+RNzwZu7Q2u9A==
+X-Google-Smtp-Source: AGHT+IH3Yz4WmGigdFut1lkSGrY41CiSBfBTficvsYqsLHsCguwGUmrMWVJRPG1lduQhbTUBVYLT6A==
+X-Received: by 2002:a05:6830:207:b0:6c6:4a8d:da98 with SMTP id em7-20020a056830020700b006c64a8dda98mr30581447otb.24.1697274913295;
+        Sat, 14 Oct 2023 02:15:13 -0700 (PDT)
+Received: from [172.17.0.2] ([40.84.172.174])
+        by smtp.gmail.com with ESMTPSA id g5-20020a9d6c45000000b006c480563197sm977450otq.26.2023.10.14.02.15.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 14 Oct 2023 02:15:12 -0700 (PDT)
+Message-ID: <652a5c20.9d0a0220.cb84f.9d58@mx.google.com>
+Date:   Sat, 14 Oct 2023 02:15:12 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2300024614753450340=="
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH BlueZ] btdev: Broadcast EXT_ADV packets every 200 ms
-To:     Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-References: <20231014074716.1866266-1-arkadiusz.bokowy@gmail.com>
-Content-Language: en-US
-Cc:     linux-bluetooth@vger.kernel.org
-From:   Paul Menzel <pmenzel@molgen.mpg.de>
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, arkadiusz.bokowy@gmail.com
+Subject: RE: [BlueZ] btdev: Broadcast EXT_ADV packets every 200 ms
 In-Reply-To: <20231014074716.1866266-1-arkadiusz.bokowy@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20231014074716.1866266-1-arkadiusz.bokowy@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dear Arkadiusz,
+--===============2300024614753450340==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=793193
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.65 seconds
+GitLint                       PASS      0.28 seconds
+BuildEll                      PASS      28.00 seconds
+BluezMake                     PASS      811.79 seconds
+MakeCheck                     PASS      11.86 seconds
+MakeDistcheck                 PASS      175.90 seconds
+CheckValgrind                 PASS      270.00 seconds
+CheckSmatch                   WARNING   363.05 seconds
+bluezmakeextell               PASS      116.87 seconds
+IncrementalBuild              PASS      706.09 seconds
+ScanBuild                     WARNING   1076.17 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ] btdev: Broadcast EXT_ADV packets every 200 ms
+WARNING:LINE_SPACING: Missing a blank line after declarations
+#192: FILE: emulator/btdev.c:5068:
++				unsigned int duration_ms = eas->duration * 10;
++				ext_adv->timeout_id = timeout_add(duration_ms,
+
+/github/workspace/src/src/13421935.patch total: 0 errors, 1 warnings, 165 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13421935.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
-Thank you for your patch.
-
-Am 14.10.23 um 09:47 schrieb Arkadiusz Bokowy:
-> Real BLE devices transmit LE advertisement report packages in given
-> intervals (typically in range between 20 ms and 10.24 s). With current
-> kernel module Bluetooth stack implementation it is possible that the
-> first LE meta packet just after enabling scanning will be lost. It is
-> not an issue for real devices, because more advertisement reports will
-> be delivered later (in given interval time).
-> 
-> This patch changes optimistic implementation of sending only one LE
-> meta packets just after enabling scanning to sending LE meta packets
-> in 200 ms intervals. Such behavior will better emulate real HCI and
-> will workaround the issue of dropping the very first LE meta packet
-
-(The verb *work around* is spelled with a space.)
-
-> by the kernel.
-
-Could you please describe your test setup? I guess you optimized the 200 
-ms for your setup, and that is the reason you did not choose an even 
-lower value like 100 ms?
-
-> ---
->   emulator/btdev.c | 102 +++++++++++++++++------------------------------
->   1 file changed, 36 insertions(+), 66 deletions(-)
-> 
-> diff --git a/emulator/btdev.c b/emulator/btdev.c
-> index 65ad0a40c..3840c6150 100644
-> --- a/emulator/btdev.c
-> +++ b/emulator/btdev.c
-> @@ -100,7 +100,8 @@ struct le_ext_adv {
->   	uint8_t adv_data_len;
->   	uint8_t scan_data[252];
->   	uint8_t scan_data_len;
-> -	unsigned int id;
-> +	unsigned int broadcast_id;
-> +	unsigned int timeout_id;
->   };
->   
->   struct le_cig {
-> @@ -547,8 +548,10 @@ static void le_ext_adv_free(void *data)
->   	/* Remove to queue */
->   	queue_remove(ext_adv->dev->le_ext_adv, ext_adv);
->   
-> -	if (ext_adv->id)
-> -		timeout_remove(ext_adv->id);
-> +	if (ext_adv->broadcast_id)
-> +		timeout_remove(ext_adv->broadcast_id);
-> +	if (ext_adv->timeout_id)
-> +		timeout_remove(ext_adv->timeout_id);
->   
->   	free(ext_adv);
->   }
-> @@ -4682,9 +4685,13 @@ static void ext_adv_disable(void *data, void *user_data)
->   	if (handle && ext_adv->handle != handle)
->   		return;
->   
-> -	if (ext_adv->id) {
-> -		timeout_remove(ext_adv->id);
-> -		ext_adv->id = 0;
-> +	if (ext_adv->broadcast_id) {
-> +		timeout_remove(ext_adv->broadcast_id);
-> +		ext_adv->broadcast_id = 0;
-> +	}
-> +	if (ext_adv->timeout_id) {
-> +		timeout_remove(ext_adv->timeout_id);
-> +		ext_adv->timeout_id = 0;
->   	}
->   
->   	ext_adv->enable = 0x00;
-> @@ -4901,9 +4908,10 @@ static void send_ext_adv(struct btdev *btdev, const struct btdev *remote,
->   					1 + 24 + meta_event.lear.data_len);
->   }
->   
-> -static void le_set_ext_adv_enable_complete(struct btdev *btdev,
-> -						struct le_ext_adv *ext_adv)
-> +static bool ext_adv_broadcast(void *user_data)
->   {
-> +	struct le_ext_adv *ext_adv = user_data;
-> +	struct btdev *btdev = ext_adv->dev;
-
-Are these used?
-
-Why rename the function?
-
->   	uint16_t report_type;
->   	int i;
->   
-> @@ -4939,7 +4947,10 @@ static void le_set_ext_adv_enable_complete(struct btdev *btdev,
->   							report_type, true);
->   		}
->   	}
-> +
-> +	return true;
->   }
-> +
->   static void adv_set_terminate(struct btdev *dev, uint8_t status, uint8_t handle,
->   					uint16_t conn_handle, uint8_t num_evts)
->   {
-> @@ -4958,7 +4969,7 @@ static bool ext_adv_timeout(void *user_data)
->   {
->   	struct le_ext_adv *adv = user_data;
->   
-> -	adv->id = 0;
-> +	adv->timeout_id = 0;
->   	adv_set_terminate(adv->dev, BT_HCI_ERR_ADV_TIMEOUT, adv->handle,
->   								0x0000, 0x00);
->   	le_ext_adv_free(adv);
-> @@ -5043,32 +5054,29 @@ static int cmd_set_ext_adv_enable(struct btdev *dev, const void *data,
->   
->   		if (!cmd->enable)
->   			ext_adv_disable(ext_adv, NULL);
-> -		else if (eas->duration)
-> -			ext_adv->id = timeout_add(eas->duration * 10,
-> -							ext_adv_timeout,
-> +		else {
-> +			/* BLE advertising interval shall be between 20 ms
-> +			 * and 10.24 s in 0.625 ms steps. Most devices which
-> +			 * require fast advertising use interval between
-
-an interval
-
-> +			 * 100 ms and 500 ms.
-> +			 */
-> +			ext_adv->broadcast_id = timeout_add(200 /* 200 ms */,
-> +							ext_adv_broadcast,
->   							ext_adv, NULL);
-> +			if (eas->duration) {
-> +				unsigned int duration_ms = eas->duration * 10;
-> +				ext_adv->timeout_id = timeout_add(duration_ms,
-> +								ext_adv_timeout,
-> +								ext_adv, NULL);
-> +			}
-> +		}
-> +
->   	}
->   
->   exit_complete:
->   	cmd_complete(dev, BT_HCI_CMD_LE_SET_EXT_ADV_ENABLE, &status,
->   							sizeof(status));
->   
-> -	if (status == BT_HCI_ERR_SUCCESS && cmd->enable) {
-> -		/* Go through each sets and send adv event to peer device */
-> -		for (i = 0; i < cmd->num_of_sets; i++) {
-> -			const struct bt_hci_cmd_ext_adv_set *eas;
-> -			struct le_ext_adv *ext_adv;
-> -
-> -			eas = data + sizeof(*cmd) + (sizeof(*eas) * i);
-> -
-> -			ext_adv = queue_find(dev->le_ext_adv,
-> -						match_ext_adv_handle,
-> -						UINT_TO_PTR(eas->handle));
-> -			if (ext_adv)
-> -				le_set_ext_adv_enable_complete(dev, ext_adv);
-> -		}
-> -	}
-> -
->   	return 0;
->   }
->   
-> @@ -5378,43 +5386,6 @@ done:
->   	return 0;
->   }
->   
-> -static void scan_ext_adv(struct btdev *dev, struct btdev *remote)
-> -{
-> -	const struct queue_entry *entry;
-> -
-> -	for (entry = queue_get_entries(remote->le_ext_adv); entry;
-> -							entry = entry->next) {
-> -		struct le_ext_adv *ext_adv = entry->data;
-> -		uint16_t report_type;
-> -
-> -		if (!ext_adv->enable)
-> -			continue;
-> -
-> -		if (!ext_adv_match_addr(dev, ext_adv))
-> -			continue;
-> -
-> -		report_type = get_ext_adv_type(ext_adv->type);
-> -		send_ext_adv(dev, remote, ext_adv, report_type, false);
-> -
-> -		if (dev->le_scan_type != 0x01)
-> -			continue;
-> -
-> -		/* if scannable bit is set the send scan response */
-> -		if (ext_adv->type & 0x02) {
-> -			if (ext_adv->type == 0x13)
-> -				report_type = 0x1b;
-> -			else if (ext_adv->type == 0x12)
-> -				report_type = 0x1a;
-> -			else if (!(ext_adv->type & 0x10))
-> -				report_type &= 0x08;
-> -			else
-> -				continue;
-> -
-> -			send_ext_adv(dev, remote, ext_adv, report_type, true);
-> -		}
-> -	}
-> -}
-> -
->   static void scan_pa(struct btdev *dev, struct btdev *remote)
->   {
->   	if (dev->le_pa_sync_handle != INV_HANDLE || !remote->le_pa_enable)
-> @@ -5440,7 +5411,6 @@ static int cmd_set_ext_scan_enable_complete(struct btdev *dev, const void *data,
->   		if (!btdev_list[i] || btdev_list[i] == dev)
->   			continue;
->   
-> -		scan_ext_adv(dev, btdev_list[i]);
->   		scan_pa(dev, btdev_list[i]);
->   	}
-
-Excuse my ignorance, but the remove code is really not necessary anymore?
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+emulator/btdev.c:421:29: warning: Variable length array is used.
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+emulator/btdev.c:1086:10: warning: Although the value stored to 'conn' is used in the enclosing expression, the value is never actually read from 'conn'
+        while ((conn = queue_find(dev->conns, match_handle,
+                ^      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+emulator/btdev.c:1337:24: warning: Access to field 'link' results in a dereference of a null pointer (loaded from variable 'conn')
+        pending_conn_del(dev, conn->link->dev);
+                              ^~~~~~~~~~
+emulator/btdev.c:1459:13: warning: Access to field 'dev' results in a dereference of a null pointer (loaded from variable 'conn')
+        send_event(conn->dev, BT_HCI_EVT_AUTH_COMPLETE, &ev, sizeof(ev));
+                   ^~~~~~~~~
+3 warnings generated.
 
 
-Kind regards,
 
-Paul
+---
+Regards,
+Linux Bluetooth
+
+
+--===============2300024614753450340==--
