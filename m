@@ -2,168 +2,299 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A560CDB465
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Oct 2023 17:34:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 885A8CDB465
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Oct 2023 17:38:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231221AbjJPRe0 (ORCPT
+        id S231221AbjJPRi7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 16 Oct 2023 13:34:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53062 "EHLO
+        Mon, 16 Oct 2023 13:38:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229666AbjJPReZ (ORCPT
+        with ESMTP id S229666AbjJPRi6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 16 Oct 2023 13:34:25 -0400
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FBB683
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Oct 2023 10:34:23 -0700 (PDT)
-Received: by mail-lj1-x231.google.com with SMTP id 38308e7fff4ca-2c1807f3400so56019061fa.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Oct 2023 10:34:23 -0700 (PDT)
+        Mon, 16 Oct 2023 13:38:58 -0400
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F248B9F
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Oct 2023 10:38:56 -0700 (PDT)
+Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2b9d07a8d84so56777571fa.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Oct 2023 10:38:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697477661; x=1698082461; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1697477935; x=1698082735; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=PBt4ueYYlzL1IZJDM3R56oSh68/0VWM5tuNZpg5eLgc=;
-        b=Ju0GdNgCz4CV/38mXqHlC6gEHjZM4HxaxIe/coOqNQc9EgwRAdb7wYvvK6Ox1TY2O2
-         p2GzEWFpROyLijgWC+AZe1eCsLhXQ8ACJsFW/3VlZCp0K1q1ssaiO789xwsSUH+KXKin
-         qR19TBH2SvZNYUxq6xO5MK20v9obSWgSBq+UNvX5w/uE2uGSkXAD07cF41wc/otqXUkS
-         gOcvjnPzXoXKkJNL0KSWDhXIg6k3EYOQ/bFl1V/xPZgBl1J2eWvYOYDHpsNMb25CxCfH
-         SzMQw/5E4bucHkHxK0ehX/kwpOUqhvpcekcOt1ywhE1VYFGcgsx3dQO7vYphaD1Pakv+
-         Afow==
+        bh=ghMcYpkILOBuDxVmUFZtc7IfK/aJdU94Act/Au6z7OM=;
+        b=OcSN9jjvp6c9XzyJCHLkxkYRCSaGX016k1lXwLdh5tt1/CXDXXsEq4BRLxoU0PPyKP
+         ZAPdZftZGp7yrR2/jXBKRaFG+2388GoJIAVO1jlUZ++8o1bZ5T31i7yTDdw6aIbF1E+2
+         I5XtS5aFIb1+K8qSndsqcdDTJsrk/PiMpV4RDLB9bAUW47DzJax9GhX72SpsLlCgDgOQ
+         TJD4p1F2z+ADEKp2qQNeuksvd9Pf1KQD2Rk1otYnsVr/+/SyeytlBVcmLT6MwZIzqgcz
+         WZDmyPT9WFCU6oHVCX1CmaIrZ6rDpTEE9G+JCTJZNr5X29Z0bDZYqTn9i2i2GkEMz3e4
+         pDMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697477661; x=1698082461;
+        d=1e100.net; s=20230601; t=1697477935; x=1698082735;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=PBt4ueYYlzL1IZJDM3R56oSh68/0VWM5tuNZpg5eLgc=;
-        b=t+QJntmA6oOX4v16iLfB9o8teDNfyf/LsHlzTmpmDy8jkG+8ETgeNQvTUBGD08zlwJ
-         6MWHEzSpLoSs3PSa6ZyYCbcQSRUwInMWtjiQonSiIWCcNey/b30Yia2Cx+9PRh/qW2Ca
-         a4qx2uHiy7AssGHbPVvAqU1qDfpzJoQPxtNKo2EykQW94JO8LaCMnHIJOHfowluz77Pm
-         6WxzBYkUfCxp+uby+4kGNd4zKSG7u8FdifKl3HbEfD0aDXflYHR/V429+yJGBNXR1Oyw
-         +C0O7Rvoj9voln5TWTZC7pG/9un+arJXgXXikELZoP6EnJfAlbknJ0DDsnKdgVUlyJcR
-         79Uw==
-X-Gm-Message-State: AOJu0YxI1E0t0cU0yqylhgarps9fNbjQX17HwPmqPh8SyJWLqxrFs6ii
-        wdH7muQbnuovlapntSye7ydG+oWlyTSC0/P8VSk=
-X-Google-Smtp-Source: AGHT+IE0wuZ6KHO/z10Zmh2OQUsXp4rBr+ESeach+7Qv119ZIRht41RC7V0RAGa9v68h3nasTkn8j/zWFTzcEfi1/WE=
-X-Received: by 2002:a2e:bea1:0:b0:2c3:eed6:f4f with SMTP id
- a33-20020a2ebea1000000b002c3eed60f4fmr96923ljr.5.1697477661295; Mon, 16 Oct
- 2023 10:34:21 -0700 (PDT)
+        bh=ghMcYpkILOBuDxVmUFZtc7IfK/aJdU94Act/Au6z7OM=;
+        b=CCuFBp0YQ1qAFIY4Vr24Z5bwE+JU75LGUoYlxYF+0b/GRa037+xVGHxnkJXIcelE8E
+         6eOG5hEmflX96jiffSB7lqChVN6uHhky56ZNJf/udTJKizGB9ZhGwzC8e1nLnVabkH/n
+         0GiIgdx6hP2V89rE8vIZpmktwo+MhulV6fD2NgGpzIJBwqitscPj9B39xrK1tqIBxVkS
+         iFCD8ya5ims2E6iZ/3pa2Hrnbm5GqC2G2fHYhSSKJiAB9YxRh6CIA+aze6n9m6KM5MfJ
+         Kfa+4h8Kf0NIs7A1/fZmAnKJCYEMlj+BemFNnjopQ+uk8O6w72FcAPHdUFpchQB7trdL
+         6KfA==
+X-Gm-Message-State: AOJu0YwQQL83oktUyXK6WKULXgManwnc9MdrvvhkbOpJ5EfkqYXnjeEJ
+        UCoLjkAo+ir1WhpCCW7/5GDtKkx1dFmrJyhraouObmDzaal6EtHy
+X-Google-Smtp-Source: AGHT+IFImubqMCBJ4LGRz/GMdHDwilavdcYuhIKBT+MHmSafYjBiKlFsFkJyl0K6BKYLNc/L77/VunTCMjRBr7dZX8k=
+X-Received: by 2002:a05:651c:90:b0:2c5:31de:6c07 with SMTP id
+ 16-20020a05651c009000b002c531de6c07mr445626ljq.14.1697477934920; Mon, 16 Oct
+ 2023 10:38:54 -0700 (PDT)
 MIME-Version: 1.0
-References: <20231014074716.1866266-1-arkadiusz.bokowy@gmail.com>
- <e706186e-e64f-490f-9162-11bfdc589619@molgen.mpg.de> <CAGFh026-11qh0jRQ5=NS4SmH7JQy7BfNwJh9N=bs-K-aVNba-g@mail.gmail.com>
-In-Reply-To: <CAGFh026-11qh0jRQ5=NS4SmH7JQy7BfNwJh9N=bs-K-aVNba-g@mail.gmail.com>
+References: <20231016065228.424400-1-kiran.k@intel.com> <20231016065228.424400-2-kiran.k@intel.com>
+In-Reply-To: <20231016065228.424400-2-kiran.k@intel.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 16 Oct 2023 10:34:08 -0700
-Message-ID: <CABBYNZ+SYtZ48Rc5mife8bLV12ri4EvqL7QDJLnxuSNBmV46rg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] btdev: Broadcast EXT_ADV packets every 200 ms
-To:     Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-Cc:     Paul Menzel <pmenzel@molgen.mpg.de>,
-        linux-bluetooth@vger.kernel.org
+Date:   Mon, 16 Oct 2023 10:38:41 -0700
+Message-ID: <CABBYNZKOzgP5ordRNK9UX=i3r=BMM4OushpaN2nO=Ntuexe_kg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] shared/bap: Add support for Audio Locations
+To:     Kiran K <kiran.k@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
+        chethan.tumkur.narayan@intel.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Arkadiusz,
+Hi Kiran,
 
-On Sat, Oct 14, 2023 at 11:58=E2=80=AFAM Arkadiusz Bokowy
-<arkadiusz.bokowy@gmail.com> wrote:
+On Sun, Oct 15, 2023 at 11:40=E2=80=AFPM Kiran K <kiran.k@intel.com> wrote:
 >
-> Hi Paul,
+> This adds support to provide Audio Locations for BAP Sink and Source Endp=
+oints
+> ---
+>  profiles/audio/media.c |  2 +-
+>  src/shared/bap.c       | 56 ++++++++++++++++++++++++++++++++----------
+>  src/shared/bap.h       |  6 +++--
+>  3 files changed, 48 insertions(+), 16 deletions(-)
 >
-> > > Real BLE devices transmit LE advertisement report packages in given
-> > > intervals (typically in range between 20 ms and 10.24 s). With curren=
-t
-> > > kernel module Bluetooth stack implementation it is possible that the
-> > > first LE meta packet just after enabling scanning will be lost. It is
-> > > not an issue for real devices, because more advertisement reports wil=
-l
-> > > be delivered later (in given interval time).
-> > >
-> > > This patch changes optimistic implementation of sending only one LE
-> > > meta packets just after enabling scanning to sending LE meta packets
-> > > in 200 ms intervals. Such behavior will better emulate real HCI and
-> > > will workaround the issue of dropping the very first LE meta packet
-> > > by the kernel.
-> >
-> > Could you please describe your test setup? I guess you optimized the 20=
-0
-> > ms for your setup, and that is the reason you did not choose an even
-> > lower value like 100 ms?
+> diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+> index 51e3ab65d12d..d063bbf11cf9 100644
+> --- a/profiles/audio/media.c
+> +++ b/profiles/audio/media.c
+> @@ -1250,7 +1250,7 @@ static bool endpoint_init_pac(struct media_endpoint=
+ *endpoint, uint8_t type,
 >
-> No, it's not an optimization for my particular setup, but more
-> generally for CPU load. I thought that it might be better not to run
-> advertisement code too frequently. But I guess that lower values
-> should also be OK, e.g. 100 ms or 50 ms. There is one "issue" with
-> that, though.... Now, the advertisement packet will be sent one
-> interval after the advertisement was enabled. If that's indeed an
-> issue, it can be fixed by calling the callback function in the moment
-> when the timer is armed.
+>         endpoint->pac =3D bt_bap_add_vendor_pac(db, name, type, endpoint-=
+>codec,
+>                                 endpoint->cid, endpoint->vid, &endpoint->=
+qos,
+> -                               &data, metadata);
+> +                               &data, metadata, endpoint->location);
+>         if (!endpoint->pac) {
+>                 error("Unable to create PAC");
+>                 free(metadata);
+> diff --git a/src/shared/bap.c b/src/shared/bap.c
+> index 925501c48d98..bee19039900f 100644
+> --- a/src/shared/bap.c
+> +++ b/src/shared/bap.c
+> @@ -190,6 +190,7 @@ struct bt_bap_pac {
+>         uint8_t type;
+>         struct bt_bap_codec codec;
+>         struct bt_bap_pac_qos qos;
+> +       uint32_t location;
+>         struct iovec *data;
+>         struct iovec *metadata;
+>         struct bt_bap_pac_ops *ops;
+> @@ -368,6 +369,14 @@ static void pac_foreach(void *data, void *user_data)
+>                 meta->len =3D 0;
+>  }
+>
+> +static void get_pac_loc(void *data, void *user_data)
+> +{
+> +       struct bt_bap_pac *pac =3D data;
+> +       uint32_t *location =3D user_data;
+> +
+> +       *location |=3D pac->location;
+> +}
+> +
+>  static void pacs_sink_read(struct gatt_db_attribute *attrib,
+>                                 unsigned int id, uint16_t offset,
+>                                 uint8_t opcode, struct bt_att *att,
+> @@ -395,7 +404,15 @@ static void pacs_sink_loc_read(struct gatt_db_attrib=
+ute *attrib,
+>                                 void *user_data)
+>  {
+>         struct bt_pacs *pacs =3D user_data;
+> -       uint32_t value =3D cpu_to_le32(pacs->sink_loc_value);
+> +       struct bt_bap_db *bdb =3D pacs->bdb;
+> +       uint32_t value;
+> +
+> +       queue_foreach(bdb->sinks, get_pac_loc, &pacs->sink_loc_value);
+> +       if (pacs->sink_loc_value)
+> +               value =3D cpu_to_le32(pacs->sink_loc_value);
+> +       else
+> +               /* Set default value */
+> +               value =3D cpu_to_le32(PACS_SNK_LOCATION);
+>
+>         gatt_db_attribute_read_result(attrib, id, 0, (void *) &value,
+>                                                         sizeof(value));
+> @@ -428,7 +445,15 @@ static void pacs_source_loc_read(struct gatt_db_attr=
+ibute *attrib,
+>                                 void *user_data)
+>  {
+>         struct bt_pacs *pacs =3D user_data;
+> -       uint32_t value =3D cpu_to_le32(pacs->source_loc_value);
+> +       struct bt_bap_db *bdb =3D pacs->bdb;
+> +       uint32_t value;
+> +
+> +       queue_foreach(bdb->sources, get_pac_loc, &pacs->source_loc_value)=
+;
+> +       if (pacs->source_loc_value)
+> +               value =3D cpu_to_le32(pacs->source_loc_value);
+> +       else
+> +               /* Set default value */
+> +               value =3D cpu_to_le32(PACS_SRC_LOCATION);
+>
+>         gatt_db_attribute_read_result(attrib, id, 0, (void *) &value,
+>                                                         sizeof(value));
+> @@ -474,9 +499,8 @@ static struct bt_pacs *pacs_new(struct gatt_db *db)
+>
+>         pacs =3D new0(struct bt_pacs, 1);
+>
+> -       /* Set default values */
+> -       pacs->sink_loc_value =3D PACS_SNK_LOCATION;
+> -       pacs->source_loc_value =3D PACS_SRC_LOCATION;
+> +       pacs->sink_loc_value =3D 0;
+> +       pacs->source_loc_value =3D 0;
+>         pacs->sink_context_value =3D PACS_SNK_CTXT;
+>         pacs->source_context_value =3D PACS_SRC_CTXT;
+>         pacs->supported_sink_context_value =3D PACS_SUPPORTED_SNK_CTXT;
+> @@ -2451,7 +2475,8 @@ static struct bt_bap_pac *bap_pac_new(struct bt_bap=
+_db *bdb, const char *name,
+>                                         struct bt_bap_codec *codec,
+>                                         struct bt_bap_pac_qos *qos,
+>                                         struct iovec *data,
+> -                                       struct iovec *metadata)
+> +                                       struct iovec *metadata,
+> +                                       uint32_t location)
+>  {
+>         struct bt_bap_pac *pac;
+>
+> @@ -2468,6 +2493,8 @@ static struct bt_bap_pac *bap_pac_new(struct bt_bap=
+_db *bdb, const char *name,
+>         if (qos)
+>                 pac->qos =3D *qos;
+>
+> +       pac->location =3D location;
+> +
+>         return pac;
+>  }
+>
+> @@ -2679,7 +2706,8 @@ struct bt_bap_pac *bt_bap_add_vendor_pac(struct gat=
+t_db *db,
+>                                         uint8_t id, uint16_t cid, uint16_=
+t vid,
+>                                         struct bt_bap_pac_qos *qos,
+>                                         struct iovec *data,
+> -                                       struct iovec *metadata)
+> +                                       struct iovec *metadata,
+> +                                       uint32_t location)
+>  {
+>         struct bt_bap_db *bdb;
+>         struct bt_bap_pac *pac, *pac_broadcast_sink;
+> @@ -2699,7 +2727,8 @@ struct bt_bap_pac *bt_bap_add_vendor_pac(struct gat=
+t_db *db,
+>         codec.cid =3D cid;
+>         codec.vid =3D vid;
+>
+> -       pac =3D bap_pac_new(bdb, name, type, &codec, qos, data, metadata)=
+;
+> +       pac =3D bap_pac_new(bdb, name, type, &codec, qos, data, metadata,
+> +                               location);
+>
+>         switch (type) {
+>         case BT_BAP_SINK:
+> @@ -2716,7 +2745,7 @@ struct bt_bap_pac *bt_bap_add_vendor_pac(struct gat=
+t_db *db,
+>                          */
+>                         pac_broadcast_sink =3D bap_pac_new(bdb, name,
+>                                         BT_BAP_BCAST_SINK, &codec, qos,
+> -                                       data, metadata);
+> +                                       data, metadata, 0);
+>                         bap_add_broadcast_sink(pac_broadcast_sink);
+>                 }
+>                 break;
+> @@ -2737,10 +2766,11 @@ struct bt_bap_pac *bt_bap_add_pac(struct gatt_db =
+*db, const char *name,
+>                                         uint8_t type, uint8_t id,
+>                                         struct bt_bap_pac_qos *qos,
+>                                         struct iovec *data,
+> -                                       struct iovec *metadata)
+> +                                       struct iovec *metadata,
+> +                                       uint32_t location)
+>  {
+>         return bt_bap_add_vendor_pac(db, name, type, id, 0x0000, 0x0000, =
+qos,
+> -                                                       data, metadata);
+> +                                               data, metadata, location)=
+;
+>  }
+>
+>  uint8_t bt_bap_pac_get_type(struct bt_bap_pac *pac)
+> @@ -3256,7 +3286,7 @@ static void bap_parse_pacs(struct bt_bap *bap, uint=
+8_t type,
+>                 }
+>
+>                 pac =3D bap_pac_new(bap->rdb, NULL, type, &p->codec, NULL=
+, &data,
+> -                                                               &metadata=
+);
+> +                                                       &metadata, 0);
+>                 if (!pac)
+>                         continue;
+>
+> @@ -5481,7 +5511,7 @@ bool bt_bap_new_bcast_source(struct bt_bap *bap, co=
+nst char *name)
+>                 return true;
+>
+>         pac_broadcast_source =3D bap_pac_new(bap->rdb, name, BT_BAP_BCAST=
+_SOURCE,
+> -                       NULL, NULL, NULL, NULL);
+> +                       NULL, NULL, NULL, NULL, 0);
+>         queue_push_tail(bap->rdb->broadcast_sources, pac_broadcast_source=
+);
+>
+>         if (!pac_broadcast_source)
+> diff --git a/src/shared/bap.h b/src/shared/bap.h
+> index ebe4dbf7d858..10e82f35e547 100644
+> --- a/src/shared/bap.h
+> +++ b/src/shared/bap.h
+> @@ -141,13 +141,15 @@ struct bt_bap_pac *bt_bap_add_vendor_pac(struct gat=
+t_db *db,
+>                                         uint8_t id, uint16_t cid, uint16_=
+t vid,
+>                                         struct bt_bap_pac_qos *qos,
+>                                         struct iovec *data,
+> -                                       struct iovec *metadata);
+> +                                       struct iovec *metadata,
+> +                                       uint32_t location);
+>
+>  struct bt_bap_pac *bt_bap_add_pac(struct gatt_db *db, const char *name,
+>                                         uint8_t type, uint8_t id,
+>                                         struct bt_bap_pac_qos *qos,
+>                                         struct iovec *data,
+> -                                       struct iovec *metadata);
+> +                                       struct iovec *metadata,
+> +                                       uint32_t location);
 
-I'd keep the initial logic of sending the advertisement immediately
-since the likes of mgmt-tester, and other testers, do have a number of
-tests that connect so adding a delay can probably cause us to spend
-more time waiting.
+If you change the API you will need to fix their users as well
+otherwise it won't build and CI will fail.
 
-> > > -static void le_set_ext_adv_enable_complete(struct btdev *btdev,
-> > > -                                             struct le_ext_adv *ext_=
-adv)
-> > > +static bool ext_adv_broadcast(void *user_data)
-> > >   {
-> > > +     struct le_ext_adv *ext_adv =3D user_data;
-> > > +     struct btdev *btdev =3D ext_adv->dev;
-> >
-> > Are these used?
-> >
-> > Why rename the function?
->
-> In the previous implementation, the le_set_ext_adv_enable_complete()
-> function was called after advertisement was enabled in order to send
-> LE meta packages to devices which have enabled scanning. But this code
-> was run only once. I thought that we can reuse this logic to send LE
-> meta packages every interval time. That's why I've renamed this
-> function, so the name will be more descriptive (it's not enable
-> complete callback anymore). And in order to provide compatibility with
-> new sygnature, I've added ext_adv and btdev variables.
->
-> > >   static void scan_pa(struct btdev *dev, struct btdev *remote)
-> > >   {
-> > >       if (dev->le_pa_sync_handle !=3D INV_HANDLE || !remote->le_pa_en=
-able)
-> > > @@ -5440,7 +5411,6 @@ static int cmd_set_ext_scan_enable_complete(str=
-uct btdev *dev, const void *data,
-> > >               if (!btdev_list[i] || btdev_list[i] =3D=3D dev)
-> > >                       continue;
-> > >
-> > > -             scan_ext_adv(dev, btdev_list[i]);
-> > >               scan_pa(dev, btdev_list[i]);
-> > >       }
-> >
-> > Excuse my ignorance, but the remove code is really not necessary anymor=
-e?
->
-> Maybe I will briefly describe the previous implementation. There are
-> two possible cases for sending and receiving advertisements: a) device
-> A (B, C, ...) enables advertisement and then device Z enables
-> scanning; b) device Z enables scanning and then other devices enable
-> advertisement. So, in previous implementation, the LE meta packets
-> have been sent to devices with enabled scanning from devices which
-> have enabled advertisement either when the scan was enabled (in device
-> Z) or when the advertisement was enabled (in device A, B, C ...). The
-> removed code corresponds to the case of enabling scanning. It's not
-> required any more, because now advertising is governed by the devices
-> A, B, C by running advertisement logic every interval time (in the
-> original patch, every 200 ms, but that can be changed to lover
-> values).
->
-> To be honest I'm not sure what about scan_pa(). Maybe that logic
-> should also be moved to some timer callback and should be governed by
-> the A, C, B, ... devices? I would have to read more about sync in the
-> BLE spec.
+>  struct bt_bap_pac_ops {
+>         int (*select)(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
+> --
+> 2.34.1
 
-Btw, make sure you run the testers to confirm you are not breaking any
-kernel testers.
+
 
 --=20
 Luiz Augusto von Dentz
