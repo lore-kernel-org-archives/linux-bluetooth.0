@@ -2,70 +2,159 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95689CDB465
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Oct 2023 13:40:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 661BCC41513
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Oct 2023 14:27:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233876AbjJPNkN (ORCPT
+        id S233736AbjJPO1w (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 16 Oct 2023 09:40:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45724 "EHLO
+        Mon, 16 Oct 2023 10:27:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233913AbjJPNkB (ORCPT
+        with ESMTP id S232381AbjJPO1v (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 16 Oct 2023 09:40:01 -0400
-Received: from mail.sig21.net (mail.sig21.net [217.197.84.222])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7623310F5
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Oct 2023 06:39:55 -0700 (PDT)
-Received: from localhorst ([127.0.0.1])
-         by mail.sig21.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-         (Exim 4.94.2)
-        (envelope-from <michael.hunold@eu.panasonic.com>)
-         id 1qsN8D-0004FR-6E ; Mon, 16 Oct 2023 14:55:37 +0200
-From:   Michael Hunold <michael.hunold@eu.panasonic.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Michael Hunold <michael.hunold@eu.panasonic.com>
-Subject: [PATCH 1/1] tools/hciattach: Increase timeout for TI-specific initialization
-Date:   Mon, 16 Oct 2023 14:55:26 +0200
-Message-Id: <20231016125526.749848-2-michael.hunold@eu.panasonic.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231016125526.749848-1-michael.hunold@eu.panasonic.com>
-References: <20231016125526.749848-1-michael.hunold@eu.panasonic.com>
+        Mon, 16 Oct 2023 10:27:51 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFA8683;
+        Mon, 16 Oct 2023 07:27:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697466468; x=1729002468;
+  h=date:from:to:cc:subject:in-reply-to:message-id:
+   references:mime-version:content-id;
+  bh=WAHtEU+QRIIV0hjjctV4dFUOMA87lFSZZckv/e6FmbI=;
+  b=MLdYaMUrX5YccmQcg2hEP63YIkH+x1b3KeRgjLxsRYMcuSx99wFnnN6R
+   IzN66rHPFhvJKLQ5WOEcR5hT9yNZ5cybG6UUjUvmz6wtAPXVToW0V62OQ
+   KWIsNyrR/rnjiWcpfFHWYHYRzurXPtROJnnmoOY/gJUYmC/SAREcjIa8G
+   dr+7jGx5XGCIU974YKCV8goveF9t0DYWMxLia3zr31EIN2VMir1eVyQXc
+   ghvlcbrHLr8zwmKLE1HtgSvqd+Mc+eQ/s0YnbLieqOoVgsSWB/76qp6TV
+   AS10mjor5216OwX7Lpd9ZCG58YtCpoikRazXWSM0i+nYQqeeyZuCo2kwW
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10863"; a="388396812"
+X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
+   d="scan'208";a="388396812"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 07:27:48 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10863"; a="759416190"
+X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
+   d="scan'208";a="759416190"
+Received: from rhaeussl-mobl.ger.corp.intel.com ([10.252.59.103])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 07:27:40 -0700
+Date:   Mon, 16 Oct 2023 17:27:37 +0300 (EEST)
+From:   =?ISO-8859-15?Q?Ilpo_J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
+To:     Bjorn Helgaas <helgaas@kernel.org>,
+        "Rafael J . Wysocki" <rafael@kernel.org>
+cc:     linux-pci@vger.kernel.org,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Rob Herring <robh@kernel.org>,
+        =?ISO-8859-2?Q?Krzysztof_Wilczy=F1ski?= <kw@linux.com>,
+        Lukas Wunner <lukas@wunner.de>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        ath10k@lists.infradead.org, ath11k@lists.infradead.org,
+        ath12k@lists.infradead.org, intel-wired-lan@lists.osuosl.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-rdma@vger.kernel.org,
+        linux-wireless@vger.kernel.org, Netdev <netdev@vger.kernel.org>
+Subject: Re: [PATCH v2 03/13] PCI/ASPM: Disable ASPM when driver requests
+ it
+In-Reply-To: <20231013164228.GA1117889@bhelgaas>
+Message-ID: <a434d9f-48ec-cfe5-900-8923361798a9@linux.intel.com>
+References: <20231013164228.GA1117889@bhelgaas>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/mixed; BOUNDARY="8323329-158890400-1697462044=:1986"
+Content-ID: <58c8d854-b57c-582-1ba0-efeb857febe@linux.intel.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The call to hci_send_req() in the function brf_send_command_socket() in
-bluez/tools/hciattach_ti.c uses a timeout value of 15 milliseconds which
-seems to be too short for newer variants of the CC2564 chipset, for
-example the CC2564C revision B.
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-During initialization of these newer variants the initialization always
-stops at a certain point during the processing of the device-specific
-init script.
+--8323329-158890400-1697462044=:1986
+Content-Type: text/plain; CHARSET=ISO-8859-15
+Content-Transfer-Encoding: 8BIT
+Content-ID: <a321263b-cac2-11d0-6cb1-43cc78d1c6d1@linux.intel.com>
 
-Increasing this value makes everything work again for the CC2564C
-revision B.
+On Fri, 13 Oct 2023, Bjorn Helgaas wrote:
+> On Thu, Oct 12, 2023 at 01:56:16PM +0300, Ilpo Järvinen wrote:
+> > On Wed, 11 Oct 2023, Bjorn Helgaas wrote:
+> > > On Mon, Sep 18, 2023 at 04:10:53PM +0300, Ilpo Järvinen wrote:
+> > > > PCI core/ASPM service driver allows controlling ASPM state through
+> > > > pci_disable_link_state() and pci_enable_link_state() API. It was
+> > > > decided earlier (see the Link below), to not allow ASPM changes when OS
+> > > > does not have control over it but only log a warning about the problem
+> > > > (commit 2add0ec14c25 ("PCI/ASPM: Warn when driver asks to disable ASPM,
+> > > > but we can't do it")). Similarly, if ASPM is not enabled through
+> > > > config, ASPM cannot be disabled.
+> > ...
+> 
+> > > This disables *all* ASPM states, unlike the version when
+> > > CONFIG_PCIEASPM is enabled.  I suppose there's a reason, and maybe a
+> > > comment could elaborate on it?
+> > >
+> > > When CONFIG_PCIEASPM is not enabled, I don't think we actively
+> > > *disable* ASPM in the hardware; we just leave it as-is, so firmware
+> > > might have left it enabled.
+> > 
+> > This whole trickery is intended for drivers that do not want to have ASPM 
+> > because the devices are broken with it. So leaving it as-is is not really 
+> > an option (as demonstrated by the custom workarounds).
+> 
+> Right.
+> 
+> > > Conceptually it seems like the LNKCTL updates here should be the same
+> > > whether CONFIG_PCIEASPM is enabled or not (subject to the question
+> > > above).
+> > > 
+> > > When CONFIG_PCIEASPM is enabled, we might need to do more stuff, but
+> > > it seems like the core should be the same.
+> > 
+> > So you think it's safer to partially disable ASPM (as per driver's 
+> > request) rather than disable it completely? I got the impression that the 
+> > latter might be safer from what Rafael said earlier but I suppose I might 
+> > have misinterpreted him since he didn't exactly say that it might be safer 
+> > to _completely_ disable it.
+> 
+> My question is whether the state of the device should depend on
+> CONFIG_PCIEASPM.  If the driver does this:
+> 
+>   pci_disable_link_state(PCIE_LINK_STATE_L0S)
+> 
+> do we want to leave L1 enabled when CONFIG_PCIEASPM=y but disable L1
+> when CONFIG_PCIEASPM is unset?
+> 
+> I can see arguments both ways.  My thought was that it would be nice
+> to end up with a single implementation of pci_disable_link_state()
+> with an #ifdef around the CONFIG_PCIEASPM-enabled stuff because it
+> makes the code easier to read.
 
-Signed-off-by: Michael Hunold <michael.hunold@eu.panasonic.com>
----
- tools/hciattach_ti.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Bjorn,
 
-diff --git a/tools/hciattach_ti.c b/tools/hciattach_ti.c
-index 24efceaa1..918db868b 100644
---- a/tools/hciattach_ti.c
-+++ b/tools/hciattach_ti.c
-@@ -241,7 +241,7 @@ static int brf_send_command_socket(int fd, struct bts_action_send *send_action)
- 	rq.rparam = response;
- 	rq.rlen   = sizeof(response);
- 
--	if (hci_send_req(fd, &rq, 15) < 0) {
-+	if (hci_send_req(fd, &rq, 100) < 0) {
- 		perror("Cannot send hci command to socket");
- 		return -1;
- 	}
+Thanks a lot for all your feedback so far, it has been very helpful.
+
+I think there's still one important thing to discuss and none of the 
+comments have covered that area so far.
+
+The drivers that have workaround are not going to turn more dangerous than 
+they're already without this change, so we're mostly within charted waters 
+there even with what you propose. However, I think the bigger catch and 
+potential source of problems, with both this v2 and your alternative, are 
+the drivers that do not have the workarounds around CONFIG_PCIEASPM=n 
+and/or _OSC permissions. Those code paths just call 
+pci_disable_link_state() and do nothing else.
+
+Do you think it's okay to alter the behavior for those drivers too 
+(disable ASPM where it previously was a no-op)?
+
+I'm okay with going the direction you indicated but I just wanted to ask
+this in advance before reworking the behavior so I can take that detail 
+also into account.
+
+
 -- 
-2.34.1
-
+ i.
+--8323329-158890400-1697462044=:1986--
