@@ -2,118 +2,89 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3303DCDB474
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Oct 2023 17:53:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 152AFCDB465
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Oct 2023 23:58:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232033AbjJPRxM (ORCPT
+        id S232845AbjJPX6I (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 16 Oct 2023 13:53:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46664 "EHLO
+        Mon, 16 Oct 2023 19:58:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231611AbjJPRxL (ORCPT
+        with ESMTP id S232172AbjJPX6H (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 16 Oct 2023 13:53:11 -0400
-Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBA78A7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Oct 2023 10:53:09 -0700 (PDT)
-Received: by mail-il1-x133.google.com with SMTP id e9e14a558f8ab-3515deaa7c1so19564275ab.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Oct 2023 10:53:09 -0700 (PDT)
+        Mon, 16 Oct 2023 19:58:07 -0400
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5732092
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Oct 2023 16:58:06 -0700 (PDT)
+Received: by mail-pg1-x530.google.com with SMTP id 41be03b00d2f7-5ac88d2cfaaso2578231a12.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Oct 2023 16:58:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697478789; x=1698083589; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=mdRcp3Mz7afY74JIdYRLptkbNsR6r5DiHWw3DEinxoY=;
-        b=I/IszNVSoIfIBUHd3ROt5PVGdZQo1qbRc/Wa/cz70Gyee7Ib1Gj6RRkXAP1c35x596
-         RsS7jxIFX7LWStZOlrS+Sg7Ht3KtI3C8+pGAkgmfDAT5AiGEYUt42evzakbxpQ+8ZpKv
-         drna4vQoSZKen/LZRWZsj+J9wEQuCnSOvJN0QFXPE3OFVEBO9IX6L6yZXfeccdB74BDq
-         axh/80g48oLJDMGohPYfYszIRg7QD99dObk6x9x+5helMyBSCY4wiRbX6lP7xROBVof8
-         tlqegKxF1DgWbb3LIg1JvW+p//hIJOQqTkeYyxnoE5/lH4pvGmQLOhpwojcqs40GiEv8
-         8mpw==
+        d=gmail.com; s=20230601; t=1697500686; x=1698105486; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vl0A0wS4mipx03/z/XIztqTRHHUzp08WNJNVKjlc1zs=;
+        b=AenvYRN/l73jU99J7HhAUCjTLAeBAvHKgKBnVAYpu05RfSAn3bz62hDMHD2IpnBoqd
+         +GNtfpKTu4CuHCU80yIeH4bpY5BVbXmaA3bvEp3y0h8HVGJNhzieXIm4Moh3ioKz7BAq
+         ntKleORXdStDO9F/xzrGS7SvJhXXSapyk1uiO7quFQMiYSYtQwhrpM15haWVKPNoVLjE
+         Go47cKk/jWwR4sbCe/S4KGxLTW6SIdk+amWjv9sqIflW0oZASseHN+QmfdPVqAdfBlOQ
+         Jq3gyKDyFvvW/fJAB03KVE6iUmoGlCzKQuztOASOj7/9BW7bo5dG4I0XkhrpaQHDBadX
+         jWng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697478789; x=1698083589;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1697500686; x=1698105486;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=mdRcp3Mz7afY74JIdYRLptkbNsR6r5DiHWw3DEinxoY=;
-        b=FUObC1l34iPUKIWBQA6TEuDRI0Y10yk1MZLESLxxJNEUbJoUywIESLULMGq3ilZbi8
-         dB4ofR8NvWH9obFJIXVc1etIJ+uBQKeeYFLppmpVTuwwLaiR+4J4aVGqrYQd7LGzg1jW
-         BFD//j0dvOOi7qSblGeoIRUuyxPmP5XEwOa/jqyeEqOwce9+5QGwqMUp/dPhzN00bSOS
-         tHIH1XKSRvZOLmsDGlVjDQ0d++YALVSu6M63ov9atxUhTQn3wGObUK9boSAPSPq6CSf8
-         gcO546oVG91j5dfDghzDWcVYiT9ITvknf2UuBqfSViaYV02PQoLULJotRrDHf+VPXHSw
-         0bFQ==
-X-Gm-Message-State: AOJu0YxskxEtbWKautnlH8zFlWW8XgOl9RLzhYdRyxKhgIIBtkuUJqLF
-        77RzZy3zMoP1tV3vqCcc6lIQU1laC1M=
-X-Google-Smtp-Source: AGHT+IG8lHB15ACtahyfy5ybOp+652Yg2+b0YUgGlo0gMU6zBe2D30x5Ezisg/5Y5V0NVCWhcL8/ow==
-X-Received: by 2002:a92:4a10:0:b0:351:47fd:e9d4 with SMTP id m16-20020a924a10000000b0035147fde9d4mr107231ilf.20.1697478789025;
-        Mon, 16 Oct 2023 10:53:09 -0700 (PDT)
-Received: from [172.17.0.2] ([52.165.197.248])
-        by smtp.gmail.com with ESMTPSA id j20-20020a02a694000000b0045b05457189sm603264jam.92.2023.10.16.10.53.08
+        bh=vl0A0wS4mipx03/z/XIztqTRHHUzp08WNJNVKjlc1zs=;
+        b=v81cs7Ic0zTBEAmtIgxxi+V6pKLJ3udAoxjgYUUD1bLuw4MKmVBcdLHovNmVk9+y73
+         4ZKcNyadza9I8wAw1ZdkgsP6Kmg5wSffgSaFPDcUZBCHkmd75R0tqWmGuu37vd4DYlh9
+         6tjeMzofaGtfusNn0iAzOZ78D55PjYrfgCVyktL+BwTG3J1I2Jm62o1gGLWwXjkpdlTE
+         9/f+uIXAaOfbp818ou67M1rbaKKT7WKYEo2KIt7Qe1E2bGQWs6k/FeaR653cOafV3iqO
+         a/uiDbV5V9OvCIYPP75NYFnmyXhf2cUSGA8UujEcAg1BEW3zIdfcaGYbUuL+TRZlz+8B
+         28ag==
+X-Gm-Message-State: AOJu0Yz3v7tpoAI8ctnpCwV1andr5d5uGw0zhzmsDfNLaQWyAvJekBNg
+        1y7EnGu14jB9YSEIk3HGIl2+5V1HLZOLOA==
+X-Google-Smtp-Source: AGHT+IGmQeLWQX8wEO5IG4S041jvH4jmY1jXALTqkGSXNA4OkDBcBNnkzUGIdtF/9D6wYhCfHjLXtQ==
+X-Received: by 2002:a05:6a21:a108:b0:136:e26b:6401 with SMTP id aq8-20020a056a21a10800b00136e26b6401mr576977pzc.16.1697500685506;
+        Mon, 16 Oct 2023 16:58:05 -0700 (PDT)
+Received: from fedora.. ([2601:601:a480:c78:c3f1:c438:9351:a6f1])
+        by smtp.googlemail.com with ESMTPSA id l185-20020a6325c2000000b005898a3619c7sm190178pgl.48.2023.10.16.16.58.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Oct 2023 10:53:08 -0700 (PDT)
-Message-ID: <652d7884.020a0220.1d82.0bac@mx.google.com>
-Date:   Mon, 16 Oct 2023 10:53:08 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2931215514850985745=="
+        Mon, 16 Oct 2023 16:58:05 -0700 (PDT)
+From:   Inga Stotland <inga.stotland@gmail.com>
+To:     brian.gix@gmail.com, luiz.von.dentz@intel.com,
+        linux-bluetooth@vger.kernel.org
+Cc:     Inga Stotland <inga.stotland@gmail.com>
+Subject: [PATCH BlueZ] mesh: Fix check for active scan when using generic IO
+Date:   Mon, 16 Oct 2023 16:56:37 -0700
+Message-ID: <20231016235637.41364-1-inga.stotland@gmail.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com
-Subject: RE: Add Modify Source initial implementation
-In-Reply-To: <20231016154900.3094-2-iulia.tanasescu@nxp.com>
-References: <20231016154900.3094-2-iulia.tanasescu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2931215514850985745==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+This modifies the check for an active scan in generic IO:
+the bug has been introduced during earlier code refactoring.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=793607
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      2.06 seconds
-GitLint                       PASS      1.10 seconds
-BuildEll                      PASS      27.73 seconds
-BluezMake                     PASS      798.70 seconds
-MakeCheck                     PASS      12.22 seconds
-MakeDistcheck                 PASS      175.13 seconds
-CheckValgrind                 PASS      267.39 seconds
-CheckSmatch                   PASS      360.77 seconds
-bluezmakeextell               PASS      115.59 seconds
-IncrementalBuild              PASS      2814.91 seconds
-ScanBuild                     WARNING   1102.61 seconds
-
-Details
-##############################
-Test: ScanBuild - WARNING
-Desc: Run Scan Build
-Output:
-btio/btio.c:1852:4: warning: Potential leak of memory pointed to by 'addr'
-                        ERROR_FAILED(err, "bind", errno);
-                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-btio/btio.c:41:3: note: expanded from macro 'ERROR_FAILED'
-                g_set_error(gerr, BT_IO_ERROR, err, \
-                ^~~~~~~~~~~
-1 warning generated.
-src/shared/bass.c:1294:3: warning: Potential leak of memory pointed to by 'subgroup_data'
-                return;
-                ^~~~~~
-1 warning generated.
-
-
-
+Fixes: https://github.com/bluez/bluez/issues/625
 ---
-Regards,
-Linux Bluetooth
+ mesh/mesh-io-generic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/mesh/mesh-io-generic.c b/mesh/mesh-io-generic.c
+index 00932ade7..2afe440e7 100644
+--- a/mesh/mesh-io-generic.c
++++ b/mesh/mesh-io-generic.c
+@@ -781,7 +781,7 @@ static bool recv_register(struct mesh_io *io, const uint8_t *filter,
+ 	bool already_scanning;
+ 	bool active = false;
+ 
+-	already_scanning = !l_queue_isempty(io->rx_regs);
++	already_scanning = (l_queue_length(io->rx_regs) > 1);
+ 
+ 	/* Look for any AD types requiring Active Scanning */
+ 	if (l_queue_find(io->rx_regs, find_active, NULL))
+-- 
+2.41.0
 
---===============2931215514850985745==--
