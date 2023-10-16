@@ -2,150 +2,175 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19C66CDB465
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Oct 2023 10:23:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9903C41513
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Oct 2023 12:57:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232643AbjJPKXD (ORCPT
+        id S233266AbjJPM5R (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 16 Oct 2023 06:23:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59298 "EHLO
+        Mon, 16 Oct 2023 08:57:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232401AbjJPKXC (ORCPT
+        with ESMTP id S230017AbjJPM5Q (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 16 Oct 2023 06:23:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99B6ADE
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Oct 2023 03:22:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697451739;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Gp85qeDzi8U6mzQo/nR8ijZYIV2Eq5Pjoam1JtOSHss=;
-        b=g3noSIbf4LV9xTzlxYysJTe7Ng6pxcSOv3jZlJ3pdtDgOg37V/51W6b2AxLKDENPSadiQs
-        VVRHlJtCqKPDB21yk5mqJAHJ9+MFhbx4BILyvUPGBU362LH0wQXTUtuya96/IbCaAKxnCd
-        9cQQ0PS7q8hUM6SDd43KkFum9bFbBh0=
-Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
- [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-607-wZOUxAXUMj2A8s8vCDO81Q-1; Mon, 16 Oct 2023 06:22:18 -0400
-X-MC-Unique: wZOUxAXUMj2A8s8vCDO81Q-1
-Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-6936a25f49bso3915040b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Oct 2023 03:22:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697451737; x=1698056537;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Gp85qeDzi8U6mzQo/nR8ijZYIV2Eq5Pjoam1JtOSHss=;
-        b=Qk3XiwtaakQs+3jiIDxbeUPN6ynSVxAV0V8ybp/EdzHT+w+jZlGUQRWfIKTG7H5MXE
-         eiswiE2QFrQ5Kn93nesCfNqWMvfgiMUw1D11Y96Pmyi66/eHifuxbX1MiykFLgb6H1n0
-         f26U9hOyoEJoocxssWfztwmp54wCvPEQaZQV2MGzgGssw4tbFp/RsqQ8BfQcGQseBd9s
-         kd0xkkq0jKr2gBp9krfpuhjpb4fHoe/X8qG4eNbEy8J6cVGW2Xkar3ukcHV0ANfvPlIK
-         wU7xPC8NN1DsHUvpyBl6tV4W441F7UgxhwEC79FJ02U3zu5Z7ua4KkHVNpCUWxN0PkQm
-         KA3g==
-X-Gm-Message-State: AOJu0YwxAODYt2pFh8mxHaEn5ufoyY1Qq0sA2qZ6B273hVQyDsLLl0po
-        ff7tHhmmRP2z1+CX+9UHGwhglEGui+RBzm+2vz9kb8J+3ZHZIos7vJXSNClqMTWUyW5WGwUbD+s
-        PkigqAU4SIimpGyXXYCyG9RGHXccd9LU7I0+44lp2idAo
-X-Received: by 2002:a05:6a21:819c:b0:169:535f:2687 with SMTP id pd28-20020a056a21819c00b00169535f2687mr29186292pzb.49.1697451737407;
-        Mon, 16 Oct 2023 03:22:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH6NFZbUqAnxzUeRwXsjJ2wD+9lzj4oz8AbfJAYlMT5H+FPNWTMEdzeJdUlW0ZcPPLf3ZC6bpKJ5qo+m110tjE=
-X-Received: by 2002:a05:6a21:819c:b0:169:535f:2687 with SMTP id
- pd28-20020a056a21819c00b00169535f2687mr29186286pzb.49.1697451737127; Mon, 16
- Oct 2023 03:22:17 -0700 (PDT)
+        Mon, 16 Oct 2023 08:57:16 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 674ABAD;
+        Mon, 16 Oct 2023 05:57:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697461034; x=1728997034;
+  h=date:from:to:cc:subject:in-reply-to:message-id:
+   references:mime-version;
+  bh=33VN831uWAKG7f4eIn44PpDJgWUV0McuEtJM+oSWIh4=;
+  b=Xf/12PbHv7oGM5zCun8OHZP2oOMZxmhEH6ZJ5/lUhqXfYAqUQEckGFxg
+   uhBxh6kGxA949FC6FN2zZBWyvKJUifUexGABTLbcEAf1OWjx7mkTVa8Th
+   xcjaHeb44AZsDmv4pcw7gCTgvOCLukytu2kdP8klIQpb52JMIVDCQIG4w
+   L1wXdn9S2w13DghDuKXdK3k7ITNbCmmBqcE7MLPz8phNpEUDr+k3GznJW
+   WWb2zBxOO8yfgVXUiNz7waOrIXsq+sVisX6XfG9x/jLpM0Arh3YOUHPEd
+   Uq4Y8ewK7wuy0L394EulosARaZq0Chiyy9OV9IB39oKpZLPVvwycCESLJ
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10863"; a="4130579"
+X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
+   d="scan'208";a="4130579"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 05:57:13 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10863"; a="1087063948"
+X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
+   d="scan'208";a="1087063948"
+Received: from rhaeussl-mobl.ger.corp.intel.com (HELO bhoerz-mobl1.ger.corp.intel.com) ([10.252.59.103])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 05:57:07 -0700
+Date:   Mon, 16 Oct 2023 15:57:05 +0300 (EEST)
+From:   =?ISO-8859-15?Q?Ilpo_J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
+To:     Bjorn Helgaas <helgaas@kernel.org>
+cc:     linux-pci@vger.kernel.org,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Rob Herring <robh@kernel.org>,
+        =?ISO-8859-2?Q?Krzysztof_Wilczy=F1ski?= <kw@linux.com>,
+        Lukas Wunner <lukas@wunner.de>,
+        "Rafael J . Wysocki" <rafael@kernel.org>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        ath10k@lists.infradead.org, ath11k@lists.infradead.org,
+        ath12k@lists.infradead.org, intel-wired-lan@lists.osuosl.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-rdma@vger.kernel.org,
+        linux-wireless@vger.kernel.org, Netdev <netdev@vger.kernel.org>
+Subject: Re: [PATCH v2 05/13] PCI/ASPM: Add pci_enable_link_state()
+In-Reply-To: <20231013164850.GA1118214@bhelgaas>
+Message-ID: <9da430a3-9336-8e75-7385-3d5ddcb6cb7@linux.intel.com>
+References: <20231013164850.GA1118214@bhelgaas>
 MIME-Version: 1.0
-References: <20231016-bt-bcm4377-quirk-broken-le-coded-v1-1-52ea69d3c979@jannau.net>
-In-Reply-To: <20231016-bt-bcm4377-quirk-broken-le-coded-v1-1-52ea69d3c979@jannau.net>
-From:   Eric Curtin <ecurtin@redhat.com>
-Date:   Mon, 16 Oct 2023 11:21:41 +0100
-Message-ID: <CAOgh=Fxn7Ga7p-FaP-ef=+F1MTFWs-5OOna9piJa-nFcCwe=NA@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_bcm4377: Mark bcm4378/bcm4387 as BROKEN_LE_CODED
-To:     j@jannau.net
-Cc:     Hector Martin <marcan@marcan.st>, Sven Peter <sven@svenpeter.dev>,
-        Alyssa Rosenzweig <alyssa@rosenzweig.io>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        asahi@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        regressions@lists.linux.dev, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/mixed; boundary="8323329-1750157713-1697461032=:1986"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, 16 Oct 2023 at 08:21, Janne Grunau via B4 Relay
-<devnull+j.jannau.net@kernel.org> wrote:
->
-> From: Janne Grunau <j@jannau.net>
->
-> bcm4378 and bcm4387 claim to support LE Coded PHY but fail to pair
-> (reliably) with BLE devices if it is enabled.
-> On bcm4378 pairing usually succeeds after 2-3 tries. On bcm4387
-> pairing appears to be completely broken.
->
-> Cc: stable@vger.kernel.org # 6.4.y+
-> Link: https://discussion.fedoraproject.org/t/mx-master-3-bluetooth-mouse-doesnt-connect/87072/33
-> Link: https://github.com/AsahiLinux/linux/issues/177
-> Fixes: 288c90224eec ("Bluetooth: Enable all supported LE PHY by default")
-> Signed-off-by: Janne Grunau <j@jannau.net>
-> ---
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Reviewed-by: Eric Curtin <ecurtin@redhat.com>
+--8323329-1750157713-1697461032=:1986
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 
-Is mise le meas/Regards,
+On Fri, 13 Oct 2023, Bjorn Helgaas wrote:
 
-Eric Curtin
+> On Thu, Oct 12, 2023 at 03:53:39PM +0300, Ilpo Järvinen wrote:
+> > On Wed, 11 Oct 2023, Bjorn Helgaas wrote:
+> > > On Mon, Sep 18, 2023 at 04:10:55PM +0300, Ilpo Järvinen wrote:
+> > > > pci_disable_link_state() lacks a symmetric pair. Some drivers want to
+> > > > disable ASPM during certain phases of their operation but then
+> > > > re-enable it later on. If pci_disable_link_state() is made for the
+> > > > device, there is currently no way to re-enable the states that were
+> > > > disabled.
+> > > 
+> > > pci_disable_link_state() gives drivers a way to disable specified ASPM
+> > > states using a bitmask (PCIE_LINK_STATE_L0S, PCIE_LINK_STATE_L1,
+> > > PCIE_LINK_STATE_L1_1, etc), but IIUC the driver can't tell exactly
+> > > what changed and can't directly restore the original state, e.g.,
+> > > 
+> > >   - PCIE_LINK_STATE_L1 enabled initially
+> > >   - driver calls pci_disable_link_state(PCIE_LINK_STATE_L0S)
+> > >   - driver calls pci_enable_link_state(PCIE_LINK_STATE_L0S)
+> > >   - PCIE_LINK_STATE_L0S and PCIE_LINK_STATE_L1 are enabled now
+> > > 
+> > > Now PCIE_LINK_STATE_L0S is enabled even though it was not initially
+> > > enabled.  Maybe that's what we want; I dunno.
+> > > 
+> > > pci_disable_link_state() currently returns success/failure, but only
+> > > r8169 and mt76 even check, and only rtl_init_one() (r8169) has a
+> > > non-trivial reason, so it's conceivable that it could return a bitmask
+> > > instead.
+> > 
+> > It's great that you suggested this since it's actually what also I've been 
+> > started to think should be done instead of this straightforward approach
+> > I used in V2. 
+> > 
+> > That is, don't have the drivers to get anything directly from LNKCTL
+> > but they should get everything through the API provided by the 
+> > disable/enable calls which makes it easy for the driver to pass the same
+> > value back into the enable call.
+> > 
+> > > > Add pci_enable_link_state() to remove ASPM states from the state
+> > > > disable mask.
+> > > > 
+> > > > Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
+> > > > ---
+> > > >  drivers/pci/pcie/aspm.c | 42 +++++++++++++++++++++++++++++++++++++++++
+> > > >  include/linux/pci.h     |  2 ++
+> > > >  2 files changed, 44 insertions(+)
+> > > > 
+> > > > diff --git a/drivers/pci/pcie/aspm.c b/drivers/pci/pcie/aspm.c
+> > > > index 91dc95aca90f..f45d18d47c20 100644
+> > > > --- a/drivers/pci/pcie/aspm.c
+> > > > +++ b/drivers/pci/pcie/aspm.c
+> > > > @@ -1117,6 +1117,48 @@ int pci_disable_link_state(struct pci_dev *pdev, int state)
+> > > >  }
+> > > >  EXPORT_SYMBOL(pci_disable_link_state);
+> > > >  
+> > > > +/**
+> > > > + * pci_enable_link_state - Re-enable device's link state
+> > > > + * @pdev: PCI device
+> > > > + * @state: ASPM link states to re-enable
+> > > > + *
+> > > > + * Enable device's link state that were previously disable so the link is
+> > > 
+> > > "state[s] that were previously disable[d]" alludes to the use case you
+> > > have in mind, but I don't think it describes how this function
+> > > actually works.  This function just makes it possible to enable the
+> > > specified states.  The @state parameter may have nothing to do with
+> > > any previously disabled states.
+> > 
+> > Yes, it's what I've been thinking between the lines. But I see your point 
+> > that this API didn't make it easy/obvious as is.
+> > 
+> > Would you want me to enforce it too besides altering the API such that the 
+> > states are actually returned from disable call? (I don't personally find
+> > that necessary as long as the API pair itself makes it obvious what the 
+> > driver is expect to pass there.)
+> 
+> This was just a comment about the doc not matching the function
+> behavior.
+> 
+> I think we have to support pci_enable_link_state() even if the driver
+> hasn't previously called pci_disable_link_state(), so drivers have to
+> be able to specify the pci_enable_link_state() @state from scratch.
+> 
+> Does that answer the enforcement question?
 
->  drivers/bluetooth/hci_bcm4377.c | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/drivers/bluetooth/hci_bcm4377.c b/drivers/bluetooth/hci_bcm4377.c
-> index 19ad0e788646..a61757835695 100644
-> --- a/drivers/bluetooth/hci_bcm4377.c
-> +++ b/drivers/bluetooth/hci_bcm4377.c
-> @@ -512,6 +512,7 @@ struct bcm4377_hw {
->         unsigned long disable_aspm : 1;
->         unsigned long broken_ext_scan : 1;
->         unsigned long broken_mws_transport_config : 1;
-> +       unsigned long broken_le_coded : 1;
->
->         int (*send_calibration)(struct bcm4377_data *bcm4377);
->         int (*send_ptb)(struct bcm4377_data *bcm4377,
-> @@ -2372,6 +2373,8 @@ static int bcm4377_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->                 set_bit(HCI_QUIRK_BROKEN_MWS_TRANSPORT_CONFIG, &hdev->quirks);
->         if (bcm4377->hw->broken_ext_scan)
->                 set_bit(HCI_QUIRK_BROKEN_EXT_SCAN, &hdev->quirks);
-> +       if (bcm4377->hw->broken_le_coded)
-> +               set_bit(HCI_QUIRK_BROKEN_LE_CODED, &hdev->quirks);
->
->         pci_set_drvdata(pdev, bcm4377);
->         hci_set_drvdata(hdev, bcm4377);
-> @@ -2461,6 +2464,7 @@ static const struct bcm4377_hw bcm4377_hw_variants[] = {
->                 .bar0_core2_window2 = 0x18107000,
->                 .has_bar0_core2_window2 = true,
->                 .broken_mws_transport_config = true,
-> +               .broken_le_coded = true,
->                 .send_calibration = bcm4378_send_calibration,
->                 .send_ptb = bcm4378_send_ptb,
->         },
-> @@ -2474,6 +2478,7 @@ static const struct bcm4377_hw bcm4377_hw_variants[] = {
->                 .has_bar0_core2_window2 = true,
->                 .clear_pciecfg_subsystem_ctrl_bit19 = true,
->                 .broken_mws_transport_config = true,
-> +               .broken_le_coded = true,
->                 .send_calibration = bcm4387_send_calibration,
->                 .send_ptb = bcm4378_send_ptb,
->         },
->
-> ---
-> base-commit: 0bb80ecc33a8fb5a682236443c1e740d5c917d1d
-> change-id: 20231016-bt-bcm4377-quirk-broken-le-coded-599688e3c4a0
->
-> Best regards,
-> --
-> Janne Grunau <j@jannau.net>
->
->
+Yes.
 
+-- 
+ i.
+
+> I don't think we can
+> really enforce anything other than that @state specifies valid ASPM
+> states.
+> 
+> Bjorn
+> 
+
+--8323329-1750157713-1697461032=:1986--
