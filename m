@@ -2,255 +2,130 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63288CDB465
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Oct 2023 06:40:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CABE2CDB465
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Oct 2023 07:13:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231584AbjJPGkZ (ORCPT
+        id S231830AbjJPHNh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 16 Oct 2023 02:40:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45354 "EHLO
+        Mon, 16 Oct 2023 03:13:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229478AbjJPGkY (ORCPT
+        with ESMTP id S231671AbjJPHNg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 16 Oct 2023 02:40:24 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70B43D9
-        for <linux-bluetooth@vger.kernel.org>; Sun, 15 Oct 2023 23:40:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697438421; x=1728974421;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=iwSQW3LRdbZL6YIdusgTJ6DCps8BH+4ZP7CuDA6wPnk=;
-  b=N6RrqiIzzMu2T/nvbaixkEbX2jWh4+l2woLKcoalSPTcrGTDdCQuM2L3
-   S5CpS5Or9or1F7jI5i112+mfccHWWEPx+pNN4WLZAMNGXekdhoWg73GU7
-   7gzICd79EgLAXCrCuAtrT+WBclLs10OUtXP9zwTQLqogdda/k8kotgGgh
-   YSiGyMp0ETyljYjOu5T0trkolZo+4x94Lb2pmHsBN5LHIY+/zLiXPC8X+
-   lbZvIEHraP9eWHAo18J4CAwKN2ZmLEM3Wlp0BMpUXihMehnSSsh2mQuGJ
-   ou6hymJaeHZZf4aRCuI1Pwtgb51dZ+dl8oNv+dkAmdmIjYrvZOPdsFLhy
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10863"; a="382682015"
-X-IronPort-AV: E=Sophos;i="6.03,228,1694761200"; 
-   d="scan'208";a="382682015"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2023 23:40:21 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10863"; a="929246528"
-X-IronPort-AV: E=Sophos;i="6.03,228,1694761200"; 
-   d="scan'208";a="929246528"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by orsmga005.jf.intel.com with ESMTP; 15 Oct 2023 23:40:19 -0700
-From:   Kiran K <kiran.k@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com,
-        Kiran K <kiran.k@intel.com>
-Subject: [PATCH 2/2] shared/bap: Add support for Audio Locations
-Date:   Mon, 16 Oct 2023 12:22:28 +0530
-Message-Id: <20231016065228.424400-2-kiran.k@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231016065228.424400-1-kiran.k@intel.com>
-References: <20231016065228.424400-1-kiran.k@intel.com>
+        Mon, 16 Oct 2023 03:13:36 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AC83AD;
+        Mon, 16 Oct 2023 00:13:34 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 14A24C433C7;
+        Mon, 16 Oct 2023 07:13:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1697440414;
+        bh=xNlXAuE+bCPUAWJr1nwMfcT6VUi0d0nMbIyJW/0hZW8=;
+        h=From:Date:Subject:To:Cc:Reply-To:From;
+        b=PcjYNHTjD/zqBiMcLKzPl6308JDp1LgAibKKMuFEsec11g5fAofXcmS5E3JbMI0mi
+         0zg+X8vMWKbomehNTxU7efFC8Ym3+Yvc531ud2TSlUs0uoG6+kBNKQ1RnEmnq+S0ix
+         XA6AgGhwyjkT/+wdFOp5xkCgTjZ/Niyye89F7uhCvoCDfZmYZ2kl95zVB4qXUj5Pxk
+         i6TaPDnRL2zkQcHFfkgm1DtdaSzBOx21E+OQAg9lBU++5ZikE2PmyXlBx3R39a82yj
+         uQGi7K9hx/tHN5cJfYeDAA6CjeMxzlyx68cGXHLHUdehH/gtGU4bG0l2JqoDb40071
+         85I0VkblLnygg==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by smtp.lore.kernel.org (Postfix) with ESMTP id EA340CDB465;
+        Mon, 16 Oct 2023 07:13:33 +0000 (UTC)
+From:   Janne Grunau via B4 Relay <devnull+j.jannau.net@kernel.org>
+Date:   Mon, 16 Oct 2023 09:13:08 +0200
+Subject: [PATCH] Bluetooth: hci_bcm4377: Mark bcm4378/bcm4387 as
+ BROKEN_LE_CODED
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20231016-bt-bcm4377-quirk-broken-le-coded-v1-1-52ea69d3c979@jannau.net>
+X-B4-Tracking: v=1; b=H4sIAIPiLGUC/x3NywrCMBBG4Vcps3YgaWovvoq4aJJfHaqJTlSE0
+ nc3uPw256xUoIJCh2YlxUeK5FRhdw2F65wuYInV1JrWWWN79i/24d65YeDnW3Rhr3lB4hs45Ij
+ I+2nqxxEudLOhmnkozvL9L46nbfsB4PTdgHIAAAA=
+To:     Hector Martin <marcan@marcan.st>, Sven Peter <sven@svenpeter.dev>,
+        Alyssa Rosenzweig <alyssa@rosenzweig.io>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        asahi@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        regressions@lists.linux.dev, stable@vger.kernel.org
+X-Mailer: b4 0.12.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2372; i=j@jannau.net;
+ h=from:subject:message-id; bh=tGCXqB0xwKnmC4wp0Z2D26g3zMlTAh/Veq7m/j3H66A=;
+ b=owGbwMvMwCG2UNrmdq9+ahrjabUkhlSdR3N8Ll/eFrPoypqAqzppXl93h7Rt0NBQeXLi9fkna
+ 0KuBzFEdJSyMIhxMMiKKbIkab/sYFhdoxhT+yAMZg4rE8gQBi5OAZiIsDUjQ98EJ1aXF7zHfXwE
+ Hc/YvDj59n/7livy05TF44sudn3dVMzIsITZmXeuLEvwp6v/0hZNCFrCdki8cunOZ5O0uEWPph6
+ /yAsA
+X-Developer-Key: i=j@jannau.net; a=openpgp;
+ fpr=8B336A6BE4E5695E89B8532B81E806F586338419
+X-Endpoint-Received: by B4 Relay for j@jannau.net/default with auth_id=62
+X-Original-From: Janne Grunau <j@jannau.net>
+Reply-To: <j@jannau.net>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This adds support to provide Audio Locations for BAP Sink and Source Endpoints
----
- profiles/audio/media.c |  2 +-
- src/shared/bap.c       | 56 ++++++++++++++++++++++++++++++++----------
- src/shared/bap.h       |  6 +++--
- 3 files changed, 48 insertions(+), 16 deletions(-)
+From: Janne Grunau <j@jannau.net>
 
-diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index 51e3ab65d12d..d063bbf11cf9 100644
---- a/profiles/audio/media.c
-+++ b/profiles/audio/media.c
-@@ -1250,7 +1250,7 @@ static bool endpoint_init_pac(struct media_endpoint *endpoint, uint8_t type,
+bcm4378 and bcm4387 claim to support LE Coded PHY but fail to pair
+(reliably) with BLE devices if it is enabled.
+On bcm4378 pairing usually succeeds after 2-3 tries. On bcm4387
+pairing appears to be completely broken.
+
+Cc: stable@vger.kernel.org # 6.4.y+
+Link: https://discussion.fedoraproject.org/t/mx-master-3-bluetooth-mouse-doesnt-connect/87072/33
+Link: https://github.com/AsahiLinux/linux/issues/177
+Fixes: 288c90224eec ("Bluetooth: Enable all supported LE PHY by default")
+Signed-off-by: Janne Grunau <j@jannau.net>
+---
+ drivers/bluetooth/hci_bcm4377.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/drivers/bluetooth/hci_bcm4377.c b/drivers/bluetooth/hci_bcm4377.c
+index 19ad0e788646..a61757835695 100644
+--- a/drivers/bluetooth/hci_bcm4377.c
++++ b/drivers/bluetooth/hci_bcm4377.c
+@@ -512,6 +512,7 @@ struct bcm4377_hw {
+ 	unsigned long disable_aspm : 1;
+ 	unsigned long broken_ext_scan : 1;
+ 	unsigned long broken_mws_transport_config : 1;
++	unsigned long broken_le_coded : 1;
  
- 	endpoint->pac = bt_bap_add_vendor_pac(db, name, type, endpoint->codec,
- 				endpoint->cid, endpoint->vid, &endpoint->qos,
--				&data, metadata);
-+				&data, metadata, endpoint->location);
- 	if (!endpoint->pac) {
- 		error("Unable to create PAC");
- 		free(metadata);
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 925501c48d98..bee19039900f 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -190,6 +190,7 @@ struct bt_bap_pac {
- 	uint8_t type;
- 	struct bt_bap_codec codec;
- 	struct bt_bap_pac_qos qos;
-+	uint32_t location;
- 	struct iovec *data;
- 	struct iovec *metadata;
- 	struct bt_bap_pac_ops *ops;
-@@ -368,6 +369,14 @@ static void pac_foreach(void *data, void *user_data)
- 		meta->len = 0;
- }
+ 	int (*send_calibration)(struct bcm4377_data *bcm4377);
+ 	int (*send_ptb)(struct bcm4377_data *bcm4377,
+@@ -2372,6 +2373,8 @@ static int bcm4377_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 		set_bit(HCI_QUIRK_BROKEN_MWS_TRANSPORT_CONFIG, &hdev->quirks);
+ 	if (bcm4377->hw->broken_ext_scan)
+ 		set_bit(HCI_QUIRK_BROKEN_EXT_SCAN, &hdev->quirks);
++	if (bcm4377->hw->broken_le_coded)
++		set_bit(HCI_QUIRK_BROKEN_LE_CODED, &hdev->quirks);
  
-+static void get_pac_loc(void *data, void *user_data)
-+{
-+	struct bt_bap_pac *pac = data;
-+	uint32_t *location = user_data;
-+
-+	*location |= pac->location;
-+}
-+
- static void pacs_sink_read(struct gatt_db_attribute *attrib,
- 				unsigned int id, uint16_t offset,
- 				uint8_t opcode, struct bt_att *att,
-@@ -395,7 +404,15 @@ static void pacs_sink_loc_read(struct gatt_db_attribute *attrib,
- 				void *user_data)
- {
- 	struct bt_pacs *pacs = user_data;
--	uint32_t value = cpu_to_le32(pacs->sink_loc_value);
-+	struct bt_bap_db *bdb = pacs->bdb;
-+	uint32_t value;
-+
-+	queue_foreach(bdb->sinks, get_pac_loc, &pacs->sink_loc_value);
-+	if (pacs->sink_loc_value)
-+		value = cpu_to_le32(pacs->sink_loc_value);
-+	else
-+		/* Set default value */
-+		value = cpu_to_le32(PACS_SNK_LOCATION);
- 
- 	gatt_db_attribute_read_result(attrib, id, 0, (void *) &value,
- 							sizeof(value));
-@@ -428,7 +445,15 @@ static void pacs_source_loc_read(struct gatt_db_attribute *attrib,
- 				void *user_data)
- {
- 	struct bt_pacs *pacs = user_data;
--	uint32_t value = cpu_to_le32(pacs->source_loc_value);
-+	struct bt_bap_db *bdb = pacs->bdb;
-+	uint32_t value;
-+
-+	queue_foreach(bdb->sources, get_pac_loc, &pacs->source_loc_value);
-+	if (pacs->source_loc_value)
-+		value = cpu_to_le32(pacs->source_loc_value);
-+	else
-+		/* Set default value */
-+		value = cpu_to_le32(PACS_SRC_LOCATION);
- 
- 	gatt_db_attribute_read_result(attrib, id, 0, (void *) &value,
- 							sizeof(value));
-@@ -474,9 +499,8 @@ static struct bt_pacs *pacs_new(struct gatt_db *db)
- 
- 	pacs = new0(struct bt_pacs, 1);
- 
--	/* Set default values */
--	pacs->sink_loc_value = PACS_SNK_LOCATION;
--	pacs->source_loc_value = PACS_SRC_LOCATION;
-+	pacs->sink_loc_value = 0;
-+	pacs->source_loc_value = 0;
- 	pacs->sink_context_value = PACS_SNK_CTXT;
- 	pacs->source_context_value = PACS_SRC_CTXT;
- 	pacs->supported_sink_context_value = PACS_SUPPORTED_SNK_CTXT;
-@@ -2451,7 +2475,8 @@ static struct bt_bap_pac *bap_pac_new(struct bt_bap_db *bdb, const char *name,
- 					struct bt_bap_codec *codec,
- 					struct bt_bap_pac_qos *qos,
- 					struct iovec *data,
--					struct iovec *metadata)
-+					struct iovec *metadata,
-+					uint32_t location)
- {
- 	struct bt_bap_pac *pac;
- 
-@@ -2468,6 +2493,8 @@ static struct bt_bap_pac *bap_pac_new(struct bt_bap_db *bdb, const char *name,
- 	if (qos)
- 		pac->qos = *qos;
- 
-+	pac->location = location;
-+
- 	return pac;
- }
- 
-@@ -2679,7 +2706,8 @@ struct bt_bap_pac *bt_bap_add_vendor_pac(struct gatt_db *db,
- 					uint8_t id, uint16_t cid, uint16_t vid,
- 					struct bt_bap_pac_qos *qos,
- 					struct iovec *data,
--					struct iovec *metadata)
-+					struct iovec *metadata,
-+					uint32_t location)
- {
- 	struct bt_bap_db *bdb;
- 	struct bt_bap_pac *pac, *pac_broadcast_sink;
-@@ -2699,7 +2727,8 @@ struct bt_bap_pac *bt_bap_add_vendor_pac(struct gatt_db *db,
- 	codec.cid = cid;
- 	codec.vid = vid;
- 
--	pac = bap_pac_new(bdb, name, type, &codec, qos, data, metadata);
-+	pac = bap_pac_new(bdb, name, type, &codec, qos, data, metadata,
-+				location);
- 
- 	switch (type) {
- 	case BT_BAP_SINK:
-@@ -2716,7 +2745,7 @@ struct bt_bap_pac *bt_bap_add_vendor_pac(struct gatt_db *db,
- 			 */
- 			pac_broadcast_sink = bap_pac_new(bdb, name,
- 					BT_BAP_BCAST_SINK, &codec, qos,
--					data, metadata);
-+					data, metadata, 0);
- 			bap_add_broadcast_sink(pac_broadcast_sink);
- 		}
- 		break;
-@@ -2737,10 +2766,11 @@ struct bt_bap_pac *bt_bap_add_pac(struct gatt_db *db, const char *name,
- 					uint8_t type, uint8_t id,
- 					struct bt_bap_pac_qos *qos,
- 					struct iovec *data,
--					struct iovec *metadata)
-+					struct iovec *metadata,
-+					uint32_t location)
- {
- 	return bt_bap_add_vendor_pac(db, name, type, id, 0x0000, 0x0000, qos,
--							data, metadata);
-+						data, metadata, location);
- }
- 
- uint8_t bt_bap_pac_get_type(struct bt_bap_pac *pac)
-@@ -3256,7 +3286,7 @@ static void bap_parse_pacs(struct bt_bap *bap, uint8_t type,
- 		}
- 
- 		pac = bap_pac_new(bap->rdb, NULL, type, &p->codec, NULL, &data,
--								&metadata);
-+							&metadata, 0);
- 		if (!pac)
- 			continue;
- 
-@@ -5481,7 +5511,7 @@ bool bt_bap_new_bcast_source(struct bt_bap *bap, const char *name)
- 		return true;
- 
- 	pac_broadcast_source = bap_pac_new(bap->rdb, name, BT_BAP_BCAST_SOURCE,
--			NULL, NULL, NULL, NULL);
-+			NULL, NULL, NULL, NULL, 0);
- 	queue_push_tail(bap->rdb->broadcast_sources, pac_broadcast_source);
- 
- 	if (!pac_broadcast_source)
-diff --git a/src/shared/bap.h b/src/shared/bap.h
-index ebe4dbf7d858..10e82f35e547 100644
---- a/src/shared/bap.h
-+++ b/src/shared/bap.h
-@@ -141,13 +141,15 @@ struct bt_bap_pac *bt_bap_add_vendor_pac(struct gatt_db *db,
- 					uint8_t id, uint16_t cid, uint16_t vid,
- 					struct bt_bap_pac_qos *qos,
- 					struct iovec *data,
--					struct iovec *metadata);
-+					struct iovec *metadata,
-+					uint32_t location);
- 
- struct bt_bap_pac *bt_bap_add_pac(struct gatt_db *db, const char *name,
- 					uint8_t type, uint8_t id,
- 					struct bt_bap_pac_qos *qos,
- 					struct iovec *data,
--					struct iovec *metadata);
-+					struct iovec *metadata,
-+					uint32_t location);
- 
- struct bt_bap_pac_ops {
- 	int (*select)(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
+ 	pci_set_drvdata(pdev, bcm4377);
+ 	hci_set_drvdata(hdev, bcm4377);
+@@ -2461,6 +2464,7 @@ static const struct bcm4377_hw bcm4377_hw_variants[] = {
+ 		.bar0_core2_window2 = 0x18107000,
+ 		.has_bar0_core2_window2 = true,
+ 		.broken_mws_transport_config = true,
++		.broken_le_coded = true,
+ 		.send_calibration = bcm4378_send_calibration,
+ 		.send_ptb = bcm4378_send_ptb,
+ 	},
+@@ -2474,6 +2478,7 @@ static const struct bcm4377_hw bcm4377_hw_variants[] = {
+ 		.has_bar0_core2_window2 = true,
+ 		.clear_pciecfg_subsystem_ctrl_bit19 = true,
+ 		.broken_mws_transport_config = true,
++		.broken_le_coded = true,
+ 		.send_calibration = bcm4387_send_calibration,
+ 		.send_ptb = bcm4378_send_ptb,
+ 	},
+
+---
+base-commit: 0bb80ecc33a8fb5a682236443c1e740d5c917d1d
+change-id: 20231016-bt-bcm4377-quirk-broken-le-coded-599688e3c4a0
+
+Best regards,
 -- 
-2.34.1
+Janne Grunau <j@jannau.net>
 
