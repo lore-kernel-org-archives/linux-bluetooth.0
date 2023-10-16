@@ -2,159 +2,101 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 661BCC41513
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Oct 2023 14:27:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD21BCDB465
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Oct 2023 15:38:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233736AbjJPO1w (ORCPT
+        id S233627AbjJPPiY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 16 Oct 2023 10:27:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42206 "EHLO
+        Mon, 16 Oct 2023 11:38:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45422 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232381AbjJPO1v (ORCPT
+        with ESMTP id S232375AbjJPPiW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 16 Oct 2023 10:27:51 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFA8683;
-        Mon, 16 Oct 2023 07:27:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697466468; x=1729002468;
-  h=date:from:to:cc:subject:in-reply-to:message-id:
-   references:mime-version:content-id;
-  bh=WAHtEU+QRIIV0hjjctV4dFUOMA87lFSZZckv/e6FmbI=;
-  b=MLdYaMUrX5YccmQcg2hEP63YIkH+x1b3KeRgjLxsRYMcuSx99wFnnN6R
-   IzN66rHPFhvJKLQ5WOEcR5hT9yNZ5cybG6UUjUvmz6wtAPXVToW0V62OQ
-   KWIsNyrR/rnjiWcpfFHWYHYRzurXPtROJnnmoOY/gJUYmC/SAREcjIa8G
-   dr+7jGx5XGCIU974YKCV8goveF9t0DYWMxLia3zr31EIN2VMir1eVyQXc
-   ghvlcbrHLr8zwmKLE1HtgSvqd+Mc+eQ/s0YnbLieqOoVgsSWB/76qp6TV
-   AS10mjor5216OwX7Lpd9ZCG58YtCpoikRazXWSM0i+nYQqeeyZuCo2kwW
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10863"; a="388396812"
-X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="388396812"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 07:27:48 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10863"; a="759416190"
-X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="759416190"
-Received: from rhaeussl-mobl.ger.corp.intel.com ([10.252.59.103])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 07:27:40 -0700
-Date:   Mon, 16 Oct 2023 17:27:37 +0300 (EEST)
-From:   =?ISO-8859-15?Q?Ilpo_J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
-To:     Bjorn Helgaas <helgaas@kernel.org>,
-        "Rafael J . Wysocki" <rafael@kernel.org>
-cc:     linux-pci@vger.kernel.org,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Rob Herring <robh@kernel.org>,
-        =?ISO-8859-2?Q?Krzysztof_Wilczy=F1ski?= <kw@linux.com>,
-        Lukas Wunner <lukas@wunner.de>,
-        Heiner Kallweit <hkallweit1@gmail.com>,
-        Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        ath10k@lists.infradead.org, ath11k@lists.infradead.org,
-        ath12k@lists.infradead.org, intel-wired-lan@lists.osuosl.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-bluetooth@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-rdma@vger.kernel.org,
-        linux-wireless@vger.kernel.org, Netdev <netdev@vger.kernel.org>
-Subject: Re: [PATCH v2 03/13] PCI/ASPM: Disable ASPM when driver requests
- it
-In-Reply-To: <20231013164228.GA1117889@bhelgaas>
-Message-ID: <a434d9f-48ec-cfe5-900-8923361798a9@linux.intel.com>
-References: <20231013164228.GA1117889@bhelgaas>
+        Mon, 16 Oct 2023 11:38:22 -0400
+Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5089BE6
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Oct 2023 08:38:21 -0700 (PDT)
+Received: by mail-ot1-x32b.google.com with SMTP id 46e09a7af769-6c4b9e09528so3191560a34.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Oct 2023 08:38:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697470700; x=1698075500; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=f52VUSbwaZK0gC3x5c7u3OkdQFDmyQyX85yG2odV81c=;
+        b=crSMBbg82s44NmGkLySy7gqmLGx14Sy9TobiXZtuR6sZgRvtFjawnqDc9wwXxH6xJU
+         +RVw5YjxRkXSUCyM2kCkDURylPPsC0udHJAjuUqq2emv3359C5KbAOcEOCxZHSVCHaQk
+         O1EkUnLhyeyHlqJzJwt6yan6bhpxlI5zgm3SNQuBqIIidOQuv+TMbChnIGkTPi0BOFQc
+         7syh1jK5WddNHtpG07og3C5xV1FxF4lX75eRLsSPRVM+fjxT7WXfCGMPHz7+3T7Z3ivd
+         NP2f3V/VXbFWGFor1k8wk7AjEQ2gZ6n5mcypWM97afX/s2a/3Wg6r2D2/aVt6M+vEZqV
+         YENQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697470700; x=1698075500;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=f52VUSbwaZK0gC3x5c7u3OkdQFDmyQyX85yG2odV81c=;
+        b=tnmgTMSC511mIpSKHnVI2ypFvtQ0pBtMHKn6cpAeYtgXDpAhPxhpIa/AHs13gTb03r
+         NEIolsqWHb4y7WMdaP7o7s4Num+UpmCliNyWDPI+smLMuA3fhzk0g0ZJ6v2SBK45gEqA
+         yqXwZGLTNLlvV3wQErZ3+CdrR1yBCOKRvVLyNyUt4KS6yK9Gt124l/Q9/32ykRRw5qNJ
+         /OKGLIDqZIhmGFLAZ9baxzEg8WSRcgAEP1Wi1KotBKoQog8gCU897Oghcguh1IfSY2LX
+         CEkMuusvwTcoA0HOFlS2vXMweu9G6JhJMJ/D/nHlBA9ssimAvDtWyzFVL46UqprpYw5Z
+         YtsA==
+X-Gm-Message-State: AOJu0YxOYjOJv0hidTKy1OFCY8qrjPc8zNVjTlBGNc6SleCKKPNcLk7w
+        rhmP6kR8G4ZD7lxqKitxL8UayFmTF+o=
+X-Google-Smtp-Source: AGHT+IHLN6NYti9e89nOBrivXkPSw/5Z1MDfpTtS6SdeusO8l80cmLUzacTuhHq0heJ+xUTacevdUQ==
+X-Received: by 2002:a05:6871:ae81:b0:1e9:e975:4418 with SMTP id zs1-20020a056871ae8100b001e9e9754418mr8434040oab.53.1697470700412;
+        Mon, 16 Oct 2023 08:38:20 -0700 (PDT)
+Received: from [172.17.0.2] ([40.84.220.247])
+        by smtp.gmail.com with ESMTPSA id r9-20020a056870e98900b001e578de89cesm2051687oao.37.2023.10.16.08.38.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Oct 2023 08:38:19 -0700 (PDT)
+Message-ID: <652d58eb.050a0220.1e8e5.e0ae@mx.google.com>
+Date:   Mon, 16 Oct 2023 08:38:19 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7522721721910812934=="
 MIME-Version: 1.0
-Content-Type: multipart/mixed; BOUNDARY="8323329-158890400-1697462044=:1986"
-Content-ID: <58c8d854-b57c-582-1ba0-efeb857febe@linux.intel.com>
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, michael.hunold@eu.panasonic.com
+Subject: RE: Make initialization work for newer versions of TI CC2564
+In-Reply-To: <20231016125526.749848-2-michael.hunold@eu.panasonic.com>
+References: <20231016125526.749848-2-michael.hunold@eu.panasonic.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+--===============7522721721910812934==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
---8323329-158890400-1697462044=:1986
-Content-Type: text/plain; CHARSET=ISO-8859-15
-Content-Transfer-Encoding: 8BIT
-Content-ID: <a321263b-cac2-11d0-6cb1-43cc78d1c6d1@linux.intel.com>
+This is automated email and please do not reply to this email!
 
-On Fri, 13 Oct 2023, Bjorn Helgaas wrote:
-> On Thu, Oct 12, 2023 at 01:56:16PM +0300, Ilpo Järvinen wrote:
-> > On Wed, 11 Oct 2023, Bjorn Helgaas wrote:
-> > > On Mon, Sep 18, 2023 at 04:10:53PM +0300, Ilpo Järvinen wrote:
-> > > > PCI core/ASPM service driver allows controlling ASPM state through
-> > > > pci_disable_link_state() and pci_enable_link_state() API. It was
-> > > > decided earlier (see the Link below), to not allow ASPM changes when OS
-> > > > does not have control over it but only log a warning about the problem
-> > > > (commit 2add0ec14c25 ("PCI/ASPM: Warn when driver asks to disable ASPM,
-> > > > but we can't do it")). Similarly, if ASPM is not enabled through
-> > > > config, ASPM cannot be disabled.
-> > ...
-> 
-> > > This disables *all* ASPM states, unlike the version when
-> > > CONFIG_PCIEASPM is enabled.  I suppose there's a reason, and maybe a
-> > > comment could elaborate on it?
-> > >
-> > > When CONFIG_PCIEASPM is not enabled, I don't think we actively
-> > > *disable* ASPM in the hardware; we just leave it as-is, so firmware
-> > > might have left it enabled.
-> > 
-> > This whole trickery is intended for drivers that do not want to have ASPM 
-> > because the devices are broken with it. So leaving it as-is is not really 
-> > an option (as demonstrated by the custom workarounds).
-> 
-> Right.
-> 
-> > > Conceptually it seems like the LNKCTL updates here should be the same
-> > > whether CONFIG_PCIEASPM is enabled or not (subject to the question
-> > > above).
-> > > 
-> > > When CONFIG_PCIEASPM is enabled, we might need to do more stuff, but
-> > > it seems like the core should be the same.
-> > 
-> > So you think it's safer to partially disable ASPM (as per driver's 
-> > request) rather than disable it completely? I got the impression that the 
-> > latter might be safer from what Rafael said earlier but I suppose I might 
-> > have misinterpreted him since he didn't exactly say that it might be safer 
-> > to _completely_ disable it.
-> 
-> My question is whether the state of the device should depend on
-> CONFIG_PCIEASPM.  If the driver does this:
-> 
->   pci_disable_link_state(PCIE_LINK_STATE_L0S)
-> 
-> do we want to leave L1 enabled when CONFIG_PCIEASPM=y but disable L1
-> when CONFIG_PCIEASPM is unset?
-> 
-> I can see arguments both ways.  My thought was that it would be nice
-> to end up with a single implementation of pci_disable_link_state()
-> with an #ifdef around the CONFIG_PCIEASPM-enabled stuff because it
-> makes the code easier to read.
+Dear submitter,
 
-Hi Bjorn,
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=793555
 
-Thanks a lot for all your feedback so far, it has been very helpful.
+---Test result---
 
-I think there's still one important thing to discuss and none of the 
-comments have covered that area so far.
-
-The drivers that have workaround are not going to turn more dangerous than 
-they're already without this change, so we're mostly within charted waters 
-there even with what you propose. However, I think the bigger catch and 
-potential source of problems, with both this v2 and your alternative, are 
-the drivers that do not have the workarounds around CONFIG_PCIEASPM=n 
-and/or _OSC permissions. Those code paths just call 
-pci_disable_link_state() and do nothing else.
-
-Do you think it's okay to alter the behavior for those drivers too 
-(disable ASPM where it previously was a no-op)?
-
-I'm okay with going the direction you indicated but I just wanted to ask
-this in advance before reworking the behavior so I can take that detail 
-also into account.
+Test Summary:
+CheckPatch                    PASS      0.45 seconds
+GitLint                       PASS      0.31 seconds
+BuildEll                      PASS      35.11 seconds
+BluezMake                     PASS      1198.01 seconds
+MakeCheck                     PASS      13.54 seconds
+MakeDistcheck                 PASS      226.94 seconds
+CheckValgrind                 PASS      348.68 seconds
+CheckSmatch                   PASS      476.52 seconds
+bluezmakeextell               PASS      150.97 seconds
+IncrementalBuild              PASS      1084.78 seconds
+ScanBuild                     PASS      1491.80 seconds
 
 
--- 
- i.
---8323329-158890400-1697462044=:1986--
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7522721721910812934==--
