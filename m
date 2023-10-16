@@ -2,119 +2,140 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09023CDB465
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 14 Oct 2023 21:16:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E87FFCDB465
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Oct 2023 06:39:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232947AbjJNVQQ (ORCPT
+        id S229636AbjJPGjB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 14 Oct 2023 17:16:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33574 "EHLO
+        Mon, 16 Oct 2023 02:39:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230371AbjJNVQQ (ORCPT
+        with ESMTP id S229478AbjJPGjA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 14 Oct 2023 17:16:16 -0400
-Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D92FBCE
-        for <linux-bluetooth@vger.kernel.org>; Sat, 14 Oct 2023 14:16:14 -0700 (PDT)
-Received: by mail-oi1-x22b.google.com with SMTP id 5614622812f47-3af609b9264so2145547b6e.2
-        for <linux-bluetooth@vger.kernel.org>; Sat, 14 Oct 2023 14:16:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697318174; x=1697922974; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=1XTbyfQJ4E9/+d4qhWbjp05QbKekFcqYNoBUprXU2qo=;
-        b=h6hLbtH0F3oWyficvPxxbQMDq2iWR0j/AiladWHy+91H6y4Dbi9lQXhk9xNF6TbHQT
-         Hrw2SoQkxD65zoA4wbIzDxHc9wokDqZ7+/jEgO7YmggO7u/XOj14dr7ayOqxlspX9zpU
-         3ECOp38bu6WgQWh9XZ19Rs0+acw1l9TQs0t2IxJGl8Tsf1Krz85pneK0MwMWeSRIjKBa
-         WKno2u7XUka+3Tb0E8uqhaVs4gL47Fkax9EfSwY+YORpEqGHaGWaj8MTm6FNGAo9gR/n
-         3Ybz6HeFvGvYFfKUhaMnTb1afzk5PQuqvOEaHuQDeKiVOdKwgSXPJA7h0Hf4C7gHOgL6
-         s9FA==
+        Mon, 16 Oct 2023 02:39:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1432E97
+        for <linux-bluetooth@vger.kernel.org>; Sun, 15 Oct 2023 23:38:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1697438291;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cifvyOUkqDm99gRqA7r8HDAmuZ+jj3vv6LzHyAB/feI=;
+        b=Bfvg4A1jEYLReoydDFhGJjkLR04R3tpqofgUgoT8R5blFhphjYqxN+t+1sxfWkgDVEb9zF
+        iOmewbd7R7zl5hpCHl7jpkeShGYmmcyGy3y0G4Zuz8ppg7NGB/PuX/BIHW9M6qJCFN37L+
+        30fYgzhAU/+c0aaxMljSYH6CDwePHEY=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-414-fJ7z5jAVOI-uCIP7b89yIg-1; Mon, 16 Oct 2023 02:38:09 -0400
+X-MC-Unique: fJ7z5jAVOI-uCIP7b89yIg-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-9b2d2d8f9e0so51067866b.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 15 Oct 2023 23:38:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697318174; x=1697922974;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1XTbyfQJ4E9/+d4qhWbjp05QbKekFcqYNoBUprXU2qo=;
-        b=t4SP528PVTNgJFL8YCtM/1AbmSYfwfScOb5RAm30kaJLkMdcOMJ4vy3Yvl88mtN3QY
-         5KIL4GUFEdsrFrDuhcigBkxx4rE3Dk69ylBJlxqEIYXX5TuZ21zfYPryVb/8DTrAO6cV
-         u/NlYFGBjYCUfR5XHKYNc96BshC/mRnGI9Yq6jDW6s/miMXIHJt1iuhMbf0kc1x/MUxr
-         qejqipzi/GnOEs/Q+ymBsmkoFGmdGdLZhuTEKDvhE2sVqfzdASq/JCMFlGxvrP0kgCzv
-         7Fds7gW1NDGHLbtJCIeI88miEkTHhwT+QTwXcmQpd9QwBsLhswuTOm++AKJUqdvhQfxd
-         Qo0w==
-X-Gm-Message-State: AOJu0YxWR69+NL9f/sDhMVb4haJCpAYO0RelEh0/oU/YZa7hve6ggTdA
-        e55o5xEOPhb5K4PQz91Nqbg3j63ZFcQ=
-X-Google-Smtp-Source: AGHT+IF3JsODNrDpXCnysDv/E/6i5k2zVKhpcZEF/K6zf6j5alJ9pERE33CfD8FmC6wcN0YravFCdg==
-X-Received: by 2002:a05:6808:989:b0:3ae:1031:594 with SMTP id a9-20020a056808098900b003ae10310594mr31630199oic.34.1697318173919;
-        Sat, 14 Oct 2023 14:16:13 -0700 (PDT)
-Received: from [172.17.0.2] ([20.185.154.0])
-        by smtp.gmail.com with ESMTPSA id v5-20020a0ccd85000000b00655e428604esm1966465qvm.137.2023.10.14.14.16.13
+        d=1e100.net; s=20230601; t=1697438288; x=1698043088;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cifvyOUkqDm99gRqA7r8HDAmuZ+jj3vv6LzHyAB/feI=;
+        b=pW/GdTrgd5FIhCCoWvT3OZQpgl0DjdCsOEkL1yASRQxsXL1Ie2fPNYrsy/9N0r+hd/
+         Xis/hSDLScFmOLPHD0xLMROAMToF1SQ7wZe8qdKcPRHPb76mQcYBOenYqe2aFUVcTzo0
+         GgBDamdcDOGFnyPEGfMmphZR8JTEnS3Z+X/ny1bRvOLKqL/TQbySZL7BnJuzlhLHw995
+         xD/eN2fKg7n45JPAvQt92O7Zv6+bKiry0gAzIEyigOxPTuNpcvJkey7yx4TIXNl+GkSE
+         s5kZaQ2qD9ic1N4i1HxljfjdQl4MwUntzhGiTorjO8q3HG6GFCkentv2YcVt2oiGnv91
+         1uEg==
+X-Gm-Message-State: AOJu0YwEGoUiNgGMhqbL8I3gJsteCXLF7RtjmusF7MGTtVfsC0HJ0B2e
+        nuyQ1LUykMEU/BYg4/qEz0fqfGOJV7OUsLnqFglNNZmsDP+vHOh+i6gXoOVfJ4v3qMRfIWKmfkx
+        CXXn9EjfJ47rxzEBUDY702zNa0dXX
+X-Received: by 2002:a17:907:7d86:b0:9be:4cf4:d62e with SMTP id oz6-20020a1709077d8600b009be4cf4d62emr5865229ejc.5.1697438288021;
+        Sun, 15 Oct 2023 23:38:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGkR1i0Sh+EH7Z7RwQC8HFYLm0NaqBGAtpxuoR8egMYiDQuV9OHzfRfOzWFHGoA+PwFm0GqbA==
+X-Received: by 2002:a17:907:7d86:b0:9be:4cf4:d62e with SMTP id oz6-20020a1709077d8600b009be4cf4d62emr5865211ejc.5.1697438287595;
+        Sun, 15 Oct 2023 23:38:07 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-231-136.dyn.eolo.it. [146.241.231.136])
+        by smtp.gmail.com with ESMTPSA id j27-20020a170906535b00b0099ddc81903asm3417011ejo.221.2023.10.15.23.38.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Oct 2023 14:16:13 -0700 (PDT)
-Message-ID: <652b051d.0c0a0220.85d2e.8327@mx.google.com>
-Date:   Sat, 14 Oct 2023 14:16:13 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3878334311445795490=="
+        Sun, 15 Oct 2023 23:38:07 -0700 (PDT)
+Message-ID: <57af5c65ee5510ce03c451456679be7654a4047b.camel@redhat.com>
+Subject: Re: pull-request: bluetooth 2023-10-11
+From:   Paolo Abeni <pabeni@redhat.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Jakub Kicinski <kuba@kernel.org>
+Cc:     davem@davemloft.net, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org
+Date:   Mon, 16 Oct 2023 08:38:05 +0200
+In-Reply-To: <CABBYNZ+A9Zk8HbQBPNXFLbaR_maCY7o5qHtx_MTJqhQ=LNBMPQ@mail.gmail.com>
+References: <20231011191524.1042566-1-luiz.dentz@gmail.com>
+         <20231013175443.5cb5c2ce@kernel.org>
+         <CABBYNZ+A9Zk8HbQBPNXFLbaR_maCY7o5qHtx_MTJqhQ=LNBMPQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, arkadiusz.bokowy@gmail.com
-Subject: RE: [BlueZ] btdev: Do not call auth_complete with NULL conn
-In-Reply-To: <20231014194120.1884126-1-arkadiusz.bokowy@gmail.com>
-References: <20231014194120.1884126-1-arkadiusz.bokowy@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3878334311445795490==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Fri, 2023-10-13 at 20:12 -0700, Luiz Augusto von Dentz wrote:
+> Hi Jakub,
+>=20
+> On Fri, Oct 13, 2023 at 5:54=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
+wrote:
+> >=20
+> > On Wed, 11 Oct 2023 12:15:24 -0700 Luiz Augusto von Dentz wrote:
+> > >  - Fix race when opening vhci device
+> > >  - Avoid memcmp() out of bounds warning
+> > >  - Correctly bounds check and pad HCI_MON_NEW_INDEX name
+> > >  - Fix using memcmp when comparing keys
+> > >  - Ignore error return for hci_devcd_register() in btrtl
+> > >  - Always check if connection is alive before deleting
+> > >  - Fix a refcnt underflow problem for hci_conn
+> >=20
+> > Commit: fc11ae648f03 ("Bluetooth: hci_sock: Correctly bounds check and =
+pad HCI_MON_NEW_INDEX name")
+> >         Fixes tag: Fixes: 78480de55a96 ("Bluetooth: hci_sock: fix slab =
+oob read in create_monitor_event")
+> >         Has these problem(s):
+> >                 - Target SHA1 does not exist
+> >=20
+> > Commit: 6f0ff718ed67 ("Bluetooth: avoid memcmp() out of bounds warning"=
+)
+> >         Fixes tag: Fixes: d70e44fef8621 ("Bluetooth: Reject connection =
+with the device which has same BD_ADDR")
+> >         Has these problem(s):
+> >                 - Target SHA1 does not exist
+> >=20
+> > Commit: b03f32b195df ("Bluetooth: hci_event: Fix coding style")
+> >         Fixes tag: Fixes: d70e44fef862 ("Bluetooth: Reject connection w=
+ith the device which has same BD_ADDR")
+> >         Has these problem(s):
+> >                 - Target SHA1 does not exist
+> >=20
+> > Commit: a9500f272b3b ("Bluetooth: hci_event: Fix using memcmp when comp=
+aring keys")
+> >         Fixes tag: Fixes: fe7a9da4fa54 ("Bluetooth: hci_event: Ignore N=
+ULL link key")
+> >         Has these problem(s):
+> >                 - Target SHA1 does not exist
+> >=20
+> > :(
+>=20
+> Not sure what I'm doing wrong, because verify_fixes.sh doesn't
+> actually warn these for me, or perhaps it needs to be used in a clean
+> tree/new clone since it may match commit ids of different
+> branchs/remotes?=C2=A0
 
-This is automated email and please do not reply to this email!
+Indeed verify_fixes will match any commit in your tree. I personally
+stumbled upon similar issues while doing backports - when references to
+different trees converged in my repo.
 
-Dear submitter,
+One things that did help me is using a specific, clean, clone with a
+single remote for all the netdev patches.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=793242
+Cheers,
 
----Test result---
+Paolo
 
-Test Summary:
-CheckPatch                    PASS      0.52 seconds
-GitLint                       PASS      0.35 seconds
-BuildEll                      PASS      29.36 seconds
-BluezMake                     PASS      900.58 seconds
-MakeCheck                     PASS      12.56 seconds
-MakeDistcheck                 PASS      178.02 seconds
-CheckValgrind                 PASS      277.59 seconds
-CheckSmatch                   WARNING   368.83 seconds
-bluezmakeextell               PASS      119.38 seconds
-IncrementalBuild              PASS      753.77 seconds
-ScanBuild                     WARNING   1122.62 seconds
+> Anyway, I'm preparing a new pull-request.
 
-Details
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-emulator/btdev.c:420:29: warning: Variable length array is used.
-##############################
-Test: ScanBuild - WARNING
-Desc: Run Scan Build
-Output:
-emulator/btdev.c:1083:10: warning: Although the value stored to 'conn' is used in the enclosing expression, the value is never actually read from 'conn'
-        while ((conn = queue_find(dev->conns, match_handle,
-                ^      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-emulator/btdev.c:1334:24: warning: Access to field 'link' results in a dereference of a null pointer (loaded from variable 'conn')
-        pending_conn_del(dev, conn->link->dev);
-                              ^~~~~~~~~~
-2 warnings generated.
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============3878334311445795490==--
