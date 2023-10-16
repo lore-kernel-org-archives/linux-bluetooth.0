@@ -2,52 +2,54 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8519BCDB474
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Oct 2023 06:40:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63288CDB465
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Oct 2023 06:40:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231526AbjJPGkX (ORCPT
+        id S231584AbjJPGkZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 16 Oct 2023 02:40:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45298 "EHLO
+        Mon, 16 Oct 2023 02:40:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229831AbjJPGkW (ORCPT
+        with ESMTP id S229478AbjJPGkY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 16 Oct 2023 02:40:22 -0400
+        Mon, 16 Oct 2023 02:40:24 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D20DA97
-        for <linux-bluetooth@vger.kernel.org>; Sun, 15 Oct 2023 23:40:19 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70B43D9
+        for <linux-bluetooth@vger.kernel.org>; Sun, 15 Oct 2023 23:40:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697438419; x=1728974419;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Crv0Ji7lShfM23NNzUTmYwmGamBhPZNXRYfwpLRfE38=;
-  b=Anezgh0lr4YV/b6D+1eKcU/ZVoYoRLtNTDEkuAr8LnDutAzN8HdQ4/Wr
-   u9KSV90J1QlSVn/39POzblOmqoOlo4SDQwbNg4K9Knuawn6fNfD5w8XiX
-   RXKcSDcTfhzTFoy5GxlVkYA6BG5ibYHKm4I+tgOvcdR1PWtEjoZnmXL5Q
-   hv/I7apGRrmbMyPR1OFqG6sJtkKwLE9ltrEauKuGs/+MRaTz3OB2uWP7g
-   lXZCLeOn4Kj0jLvG1MBXlqhHIdXSzlVCSC2wVXdcCDpo2AOka5b9EBq3c
-   CcT0oR5LqOL2By2rdylX8AK1IyrjzkocxnG17s81AUCEKJHYTcbYtlISF
+  t=1697438421; x=1728974421;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=iwSQW3LRdbZL6YIdusgTJ6DCps8BH+4ZP7CuDA6wPnk=;
+  b=N6RrqiIzzMu2T/nvbaixkEbX2jWh4+l2woLKcoalSPTcrGTDdCQuM2L3
+   S5CpS5Or9or1F7jI5i112+mfccHWWEPx+pNN4WLZAMNGXekdhoWg73GU7
+   7gzICd79EgLAXCrCuAtrT+WBclLs10OUtXP9zwTQLqogdda/k8kotgGgh
+   YSiGyMp0ETyljYjOu5T0trkolZo+4x94Lb2pmHsBN5LHIY+/zLiXPC8X+
+   lbZvIEHraP9eWHAo18J4CAwKN2ZmLEM3Wlp0BMpUXihMehnSSsh2mQuGJ
+   ou6hymJaeHZZf4aRCuI1Pwtgb51dZ+dl8oNv+dkAmdmIjYrvZOPdsFLhy
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10863"; a="382682013"
+X-IronPort-AV: E=McAfee;i="6600,9927,10863"; a="382682015"
 X-IronPort-AV: E=Sophos;i="6.03,228,1694761200"; 
-   d="scan'208";a="382682013"
+   d="scan'208";a="382682015"
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2023 23:40:19 -0700
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2023 23:40:21 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10863"; a="929246525"
+X-IronPort-AV: E=McAfee;i="6600,9927,10863"; a="929246528"
 X-IronPort-AV: E=Sophos;i="6.03,228,1694761200"; 
-   d="scan'208";a="929246525"
+   d="scan'208";a="929246528"
 Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by orsmga005.jf.intel.com with ESMTP; 15 Oct 2023 23:40:17 -0700
+  by orsmga005.jf.intel.com with ESMTP; 15 Oct 2023 23:40:19 -0700
 From:   Kiran K <kiran.k@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com,
         Kiran K <kiran.k@intel.com>
-Subject: [PATCH 1/2] profiles: Add support for Audio Locations
-Date:   Mon, 16 Oct 2023 12:22:27 +0530
-Message-Id: <20231016065228.424400-1-kiran.k@intel.com>
+Subject: [PATCH 2/2] shared/bap: Add support for Audio Locations
+Date:   Mon, 16 Oct 2023 12:22:28 +0530
+Message-Id: <20231016065228.424400-2-kiran.k@intel.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20231016065228.424400-1-kiran.k@intel.com>
+References: <20231016065228.424400-1-kiran.k@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -56,112 +58,199 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 This adds support to provide Audio Locations for BAP Sink and Source Endpoints
 ---
- profiles/audio/media.c | 25 +++++++++++++++++++++----
- 1 file changed, 21 insertions(+), 4 deletions(-)
+ profiles/audio/media.c |  2 +-
+ src/shared/bap.c       | 56 ++++++++++++++++++++++++++++++++----------
+ src/shared/bap.h       |  6 +++--
+ 3 files changed, 48 insertions(+), 16 deletions(-)
 
 diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index 1d98ac5a1a70..51e3ab65d12d 100644
+index 51e3ab65d12d..d063bbf11cf9 100644
 --- a/profiles/audio/media.c
 +++ b/profiles/audio/media.c
-@@ -99,6 +99,7 @@ struct media_endpoint {
- 	size_t			size;		/* Endpoint capabilities size */
- 	uint8_t                 *metadata;      /* Endpoint property metadata */
- 	size_t                  metadata_size;  /* Endpoint metadata size */
-+	uint32_t		location;	/* Endpoint location */
- 	guint			hs_watch;
- 	guint			ag_watch;
- 	guint			watch;
-@@ -1445,6 +1446,7 @@ media_endpoint_create(struct media_adapter *adapter,
- 						int size,
- 						uint8_t *metadata,
- 						int metadata_size,
-+						uint32_t location,
- 						int *err)
- {
- 	struct media_endpoint *endpoint;
-@@ -1460,6 +1462,7 @@ media_endpoint_create(struct media_adapter *adapter,
- 	endpoint->cid = cid;
- 	endpoint->vid = vid;
- 	endpoint->delay_reporting = delay_reporting;
-+	endpoint->location = location;
+@@ -1250,7 +1250,7 @@ static bool endpoint_init_pac(struct media_endpoint *endpoint, uint8_t type,
  
- 	if (qos)
- 		endpoint->qos = *qos;
-@@ -1525,7 +1528,8 @@ static int parse_properties(DBusMessageIter *props, const char **uuid,
- 				uint16_t *cid, uint16_t *vid,
- 				struct bt_bap_pac_qos *qos,
- 				uint8_t **capabilities, int *size,
--				uint8_t **metadata, int *metadata_size)
-+				uint8_t **metadata, int *metadata_size,
-+				uint32_t *location)
+ 	endpoint->pac = bt_bap_add_vendor_pac(db, name, type, endpoint->codec,
+ 				endpoint->cid, endpoint->vid, &endpoint->qos,
+-				&data, metadata);
++				&data, metadata, endpoint->location);
+ 	if (!endpoint->pac) {
+ 		error("Unable to create PAC");
+ 		free(metadata);
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index 925501c48d98..bee19039900f 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -190,6 +190,7 @@ struct bt_bap_pac {
+ 	uint8_t type;
+ 	struct bt_bap_codec codec;
+ 	struct bt_bap_pac_qos qos;
++	uint32_t location;
+ 	struct iovec *data;
+ 	struct iovec *metadata;
+ 	struct bt_bap_pac_ops *ops;
+@@ -368,6 +369,14 @@ static void pac_foreach(void *data, void *user_data)
+ 		meta->len = 0;
+ }
+ 
++static void get_pac_loc(void *data, void *user_data)
++{
++	struct bt_bap_pac *pac = data;
++	uint32_t *location = user_data;
++
++	*location |= pac->location;
++}
++
+ static void pacs_sink_read(struct gatt_db_attribute *attrib,
+ 				unsigned int id, uint16_t offset,
+ 				uint8_t opcode, struct bt_att *att,
+@@ -395,7 +404,15 @@ static void pacs_sink_loc_read(struct gatt_db_attribute *attrib,
+ 				void *user_data)
  {
- 	gboolean has_uuid = FALSE;
- 	gboolean has_codec = FALSE;
-@@ -1609,6 +1613,10 @@ static int parse_properties(DBusMessageIter *props, const char **uuid,
- 			if (var != DBUS_TYPE_UINT16)
- 				return -EINVAL;
- 			dbus_message_iter_get_basic(&value, &qos->ppd_max);
-+		} else if (strcasecmp(key, "Location") == 0) {
-+			if (var != DBUS_TYPE_UINT32)
-+				return -EINVAL;
-+			dbus_message_iter_get_basic(&value, location);
+ 	struct bt_pacs *pacs = user_data;
+-	uint32_t value = cpu_to_le32(pacs->sink_loc_value);
++	struct bt_bap_db *bdb = pacs->bdb;
++	uint32_t value;
++
++	queue_foreach(bdb->sinks, get_pac_loc, &pacs->sink_loc_value);
++	if (pacs->sink_loc_value)
++		value = cpu_to_le32(pacs->sink_loc_value);
++	else
++		/* Set default value */
++		value = cpu_to_le32(PACS_SNK_LOCATION);
+ 
+ 	gatt_db_attribute_read_result(attrib, id, 0, (void *) &value,
+ 							sizeof(value));
+@@ -428,7 +445,15 @@ static void pacs_source_loc_read(struct gatt_db_attribute *attrib,
+ 				void *user_data)
+ {
+ 	struct bt_pacs *pacs = user_data;
+-	uint32_t value = cpu_to_le32(pacs->source_loc_value);
++	struct bt_bap_db *bdb = pacs->bdb;
++	uint32_t value;
++
++	queue_foreach(bdb->sources, get_pac_loc, &pacs->source_loc_value);
++	if (pacs->source_loc_value)
++		value = cpu_to_le32(pacs->source_loc_value);
++	else
++		/* Set default value */
++		value = cpu_to_le32(PACS_SRC_LOCATION);
+ 
+ 	gatt_db_attribute_read_result(attrib, id, 0, (void *) &value,
+ 							sizeof(value));
+@@ -474,9 +499,8 @@ static struct bt_pacs *pacs_new(struct gatt_db *db)
+ 
+ 	pacs = new0(struct bt_pacs, 1);
+ 
+-	/* Set default values */
+-	pacs->sink_loc_value = PACS_SNK_LOCATION;
+-	pacs->source_loc_value = PACS_SRC_LOCATION;
++	pacs->sink_loc_value = 0;
++	pacs->source_loc_value = 0;
+ 	pacs->sink_context_value = PACS_SNK_CTXT;
+ 	pacs->source_context_value = PACS_SRC_CTXT;
+ 	pacs->supported_sink_context_value = PACS_SUPPORTED_SNK_CTXT;
+@@ -2451,7 +2475,8 @@ static struct bt_bap_pac *bap_pac_new(struct bt_bap_db *bdb, const char *name,
+ 					struct bt_bap_codec *codec,
+ 					struct bt_bap_pac_qos *qos,
+ 					struct iovec *data,
+-					struct iovec *metadata)
++					struct iovec *metadata,
++					uint32_t location)
+ {
+ 	struct bt_bap_pac *pac;
+ 
+@@ -2468,6 +2493,8 @@ static struct bt_bap_pac *bap_pac_new(struct bt_bap_db *bdb, const char *name,
+ 	if (qos)
+ 		pac->qos = *qos;
+ 
++	pac->location = location;
++
+ 	return pac;
+ }
+ 
+@@ -2679,7 +2706,8 @@ struct bt_bap_pac *bt_bap_add_vendor_pac(struct gatt_db *db,
+ 					uint8_t id, uint16_t cid, uint16_t vid,
+ 					struct bt_bap_pac_qos *qos,
+ 					struct iovec *data,
+-					struct iovec *metadata)
++					struct iovec *metadata,
++					uint32_t location)
+ {
+ 	struct bt_bap_db *bdb;
+ 	struct bt_bap_pac *pac, *pac_broadcast_sink;
+@@ -2699,7 +2727,8 @@ struct bt_bap_pac *bt_bap_add_vendor_pac(struct gatt_db *db,
+ 	codec.cid = cid;
+ 	codec.vid = vid;
+ 
+-	pac = bap_pac_new(bdb, name, type, &codec, qos, data, metadata);
++	pac = bap_pac_new(bdb, name, type, &codec, qos, data, metadata,
++				location);
+ 
+ 	switch (type) {
+ 	case BT_BAP_SINK:
+@@ -2716,7 +2745,7 @@ struct bt_bap_pac *bt_bap_add_vendor_pac(struct gatt_db *db,
+ 			 */
+ 			pac_broadcast_sink = bap_pac_new(bdb, name,
+ 					BT_BAP_BCAST_SINK, &codec, qos,
+-					data, metadata);
++					data, metadata, 0);
+ 			bap_add_broadcast_sink(pac_broadcast_sink);
+ 		}
+ 		break;
+@@ -2737,10 +2766,11 @@ struct bt_bap_pac *bt_bap_add_pac(struct gatt_db *db, const char *name,
+ 					uint8_t type, uint8_t id,
+ 					struct bt_bap_pac_qos *qos,
+ 					struct iovec *data,
+-					struct iovec *metadata)
++					struct iovec *metadata,
++					uint32_t location)
+ {
+ 	return bt_bap_add_vendor_pac(db, name, type, id, 0x0000, 0x0000, qos,
+-							data, metadata);
++						data, metadata, location);
+ }
+ 
+ uint8_t bt_bap_pac_get_type(struct bt_bap_pac *pac)
+@@ -3256,7 +3286,7 @@ static void bap_parse_pacs(struct bt_bap *bap, uint8_t type,
  		}
  
- 		dbus_message_iter_next(props);
-@@ -1633,6 +1641,7 @@ static DBusMessage *register_endpoint(DBusConnection *conn, DBusMessage *msg,
- 	int size = 0;
- 	int metadata_size = 0;
- 	int err;
-+	uint32_t location;
+ 		pac = bap_pac_new(bap->rdb, NULL, type, &p->codec, NULL, &data,
+-								&metadata);
++							&metadata, 0);
+ 		if (!pac)
+ 			continue;
  
- 	sender = dbus_message_get_sender(msg);
+@@ -5481,7 +5511,7 @@ bool bt_bap_new_bcast_source(struct bt_bap *bap, const char *name)
+ 		return true;
  
-@@ -1650,12 +1659,12 @@ static DBusMessage *register_endpoint(DBusConnection *conn, DBusMessage *msg,
+ 	pac_broadcast_source = bap_pac_new(bap->rdb, name, BT_BAP_BCAST_SOURCE,
+-			NULL, NULL, NULL, NULL);
++			NULL, NULL, NULL, NULL, 0);
+ 	queue_push_tail(bap->rdb->broadcast_sources, pac_broadcast_source);
  
- 	if (parse_properties(&props, &uuid, &delay_reporting, &codec, &cid,
- 			&vid, &qos, &capabilities, &size, &metadata,
--			&metadata_size) < 0)
-+			&metadata_size, &location) < 0)
- 		return btd_error_invalid_args(msg);
+ 	if (!pac_broadcast_source)
+diff --git a/src/shared/bap.h b/src/shared/bap.h
+index ebe4dbf7d858..10e82f35e547 100644
+--- a/src/shared/bap.h
++++ b/src/shared/bap.h
+@@ -141,13 +141,15 @@ struct bt_bap_pac *bt_bap_add_vendor_pac(struct gatt_db *db,
+ 					uint8_t id, uint16_t cid, uint16_t vid,
+ 					struct bt_bap_pac_qos *qos,
+ 					struct iovec *data,
+-					struct iovec *metadata);
++					struct iovec *metadata,
++					uint32_t location);
  
- 	if (media_endpoint_create(adapter, sender, path, uuid, delay_reporting,
- 					codec, cid, vid, &qos, capabilities,
--					size, metadata, metadata_size,
-+					size, metadata, metadata_size, location,
- 					&err) == NULL) {
- 		if (err == -EPROTONOSUPPORT)
- 			return btd_error_not_supported(msg);
-@@ -2688,6 +2697,7 @@ static void app_register_endpoint(void *data, void *user_data)
- 	int size = 0;
- 	uint8_t *metadata = NULL;
- 	int metadata_size = 0;
-+	uint32_t location;
- 	DBusMessageIter iter, array;
- 	struct media_endpoint *endpoint;
+ struct bt_bap_pac *bt_bap_add_pac(struct gatt_db *db, const char *name,
+ 					uint8_t type, uint8_t id,
+ 					struct bt_bap_pac_qos *qos,
+ 					struct iovec *data,
+-					struct iovec *metadata);
++					struct iovec *metadata,
++					uint32_t location);
  
-@@ -2748,6 +2758,13 @@ static void app_register_endpoint(void *data, void *user_data)
- 						&metadata_size);
- 	}
- 
-+	if (g_dbus_proxy_get_property(proxy, "Location", &iter))	{
-+		if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_UINT32)
-+			goto fail;
-+
-+		dbus_message_iter_get_basic(&iter, &location);
-+	}
-+
- 	/* Parse QoS preferences */
- 	memset(&qos, 0, sizeof(qos));
- 	if (g_dbus_proxy_get_property(proxy, "Framing", &iter)) {
-@@ -2804,7 +2821,7 @@ static void app_register_endpoint(void *data, void *user_data)
- 						vendor.cid, vendor.vid, &qos,
- 						capabilities, size,
- 						metadata, metadata_size,
--						&app->err);
-+						location, &app->err);
- 	if (!endpoint) {
- 		error("Unable to register endpoint %s:%s: %s", app->sender,
- 						path, strerror(-app->err));
+ struct bt_bap_pac_ops {
+ 	int (*select)(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
 -- 
 2.34.1
 
