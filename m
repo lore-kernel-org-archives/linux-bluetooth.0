@@ -2,74 +2,101 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 888CCCDB465
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Oct 2023 01:10:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CC5ECDB474
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Oct 2023 02:22:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234169AbjJQBK0 (ORCPT
+        id S230343AbjJQCWR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 16 Oct 2023 21:10:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54036 "EHLO
+        Mon, 16 Oct 2023 22:22:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233333AbjJQBKZ (ORCPT
+        with ESMTP id S230209AbjJQCWQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 16 Oct 2023 21:10:25 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D1059B
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Oct 2023 18:10:24 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 16EABC433C9;
-        Tue, 17 Oct 2023 01:10:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697505024;
-        bh=DdeqRcKlBQ/+BhS/2gKujHNhtsc3mNA2gqQ3eKEHjBE=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=CVTyKhN45x6gD+6WyeV5uv5oF+/XraBRSJJrhbIGjskEoYDcsM+Xsm3/mxcWJRa4P
-         GFk3NY/+oD+A0pw8xT8jZsLq7h5rJTXi2yxikRx43O/6ahqDomEAM+hqT4RJK3LL2x
-         DR2emnqBG9v1fbIvYDNbnPenV/s71+M0alosLi17Sjf6W6B4MgM+9Ql4rbWLyWIUhs
-         J00bmsO2jVrAVM3XHP4Md67qf9nZRqSeGxHDeAPbiWDZCCGMk4FqJYLHcDAn1hMacV
-         dIzSYqx9meIeGEJPwFvnYxMqK0nkKpo40nZPh6xZbdtx7DRLhsow6AMhJUyRZ4uazY
-         eUz9XoZJasLog==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EC16EC4316B;
-        Tue, 17 Oct 2023 01:10:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Mon, 16 Oct 2023 22:22:16 -0400
+Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5304E6
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Oct 2023 19:22:14 -0700 (PDT)
+Received: by mail-qk1-x72a.google.com with SMTP id af79cd13be357-77575233636so367624485a.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Oct 2023 19:22:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697509334; x=1698114134; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=du8WvivYRb/QNbkJ7Brgg1wJnGuxZ5dB8zG8UFFPER0=;
+        b=h3WoHgXtYo+0f37uC1I/WraHQSEkbejGxjwRDfkftGmUKssCKugK+p+a9HFOW9jKtJ
+         +av+mgC0KDi2R5hv4IiNi28F3IHRPGUIYzx0J8PQ5WG77j8d8coDVLsTM5zeTzFz+zBG
+         MFz3Bxw5VU2ETcwtczb1agHsHRNwY9e0xSFX0T3djFbXoFhG1Scwe5R/91V3JPgwsT9q
+         pREJ7IHxXHD8vC29EmgblU9Kgrvl6lzNdn3/bR96lvZiTieIIuD+lESa90ifBO2T4hlO
+         Vvp1W2pi1u7RnFnQURQblH9t0Q6tOpTOS1xmcnmpwmKfOm8oFYHHlv+eLkWrFpw4ZCp6
+         XvKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697509334; x=1698114134;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=du8WvivYRb/QNbkJ7Brgg1wJnGuxZ5dB8zG8UFFPER0=;
+        b=OUekKTe5/IgH0XRcwpVEyt5asHj2kNvxhJQ6GB9+s7Mv/K2e+LgignVuiwh6qvARQx
+         7oUqez85Fc47nl2G/mU50v0EaihOltUwUgbgUAtzg9WVgHCFmUuCpmAXQufT6koSHfq5
+         PZ+TIOqGNhfDoeZVU9aVuqeR/Byo22TGo8PVyPuag+/Ms8Ljyk/CP6kSTXoiKYFNyD3I
+         p0ypf8u/0SfRnkteZRed8O3dBIn/KF/KF8Dx4//OlKZycPBKyH6HoDMdZ0qEYhnB11E8
+         YO0hg+MoiGEJN/aI4qh8Svd7oILCKtD9DwS5zvXwkHL+S8s/0g8eB94HcQKAWxmJNgte
+         cxEQ==
+X-Gm-Message-State: AOJu0Yy/GOTQ1HumXlIU3XvVsWwdxx2IEFzavLpLdr42Q7HJ/98Dh3eh
+        Xp9aRSLqai5hfumlOiA/rqCgE4xkyeo=
+X-Google-Smtp-Source: AGHT+IH+2iIkYHM0/CgLJw2UQoMyD9Yb7VsCCk3RxlLyIST2TK9bci1AF3NwQAH8pvvpsbu4XTw4Bw==
+X-Received: by 2002:a05:620a:171e:b0:774:2c12:1363 with SMTP id az30-20020a05620a171e00b007742c121363mr1158270qkb.58.1697509333735;
+        Mon, 16 Oct 2023 19:22:13 -0700 (PDT)
+Received: from [172.17.0.2] ([20.39.61.81])
+        by smtp.gmail.com with ESMTPSA id dt33-20020a05620a47a100b0076f35d17d06sm258216qkb.69.2023.10.16.19.22.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Oct 2023 19:22:13 -0700 (PDT)
+Message-ID: <652defd5.050a0220.cc5ae.0ebe@mx.google.com>
+Date:   Mon, 16 Oct 2023 19:22:13 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4916367223106461141=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: bluetooth 2023-10-13
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <169750502395.8129.10858482508717627477.git-patchwork-notify@kernel.org>
-Date:   Tue, 17 Oct 2023 01:10:23 +0000
-References: <20231014031336.1664558-1-luiz.dentz@gmail.com>
-In-Reply-To: <20231014031336.1664558-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     davem@davemloft.net, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, inga.stotland@gmail.com
+Subject: RE: [BlueZ,v2] mesh: Fix check for active scan when using generic IO
+In-Reply-To: <20231017002123.43533-1-inga.stotland@gmail.com>
+References: <20231017002123.43533-1-inga.stotland@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+--===============4916367223106461141==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This is automated email and please do not reply to this email!
 
-On Fri, 13 Oct 2023 20:13:36 -0700 you wrote:
-> The following changes since commit a950a5921db450c74212327f69950ff03419483a:
-> 
->   net/smc: Fix pos miscalculation in statistics (2023-10-11 10:36:35 +0100)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2023-10-13
-> 
-> [...]
+Dear submitter,
 
-Here is the summary with links:
-  - pull-request: bluetooth 2023-10-13
-    https://git.kernel.org/netdev/net/c/2b10740ce74a
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=793761
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.57 seconds
+GitLint                       PASS      1.14 seconds
+BuildEll                      PASS      36.74 seconds
+BluezMake                     PASS      1225.66 seconds
+MakeCheck                     PASS      14.24 seconds
+MakeDistcheck                 PASS      230.61 seconds
+CheckValgrind                 PASS      350.93 seconds
+CheckSmatch                   PASS      483.93 seconds
+bluezmakeextell               PASS      155.13 seconds
+IncrementalBuild              PASS      1108.57 seconds
+ScanBuild                     PASS      1486.37 seconds
 
 
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============4916367223106461141==--
