@@ -2,75 +2,133 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1721BCDB47E
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Oct 2023 20:31:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51D38CDB483
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Oct 2023 22:07:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231986AbjJRUbM (ORCPT
+        id S232076AbjJRWHr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 18 Oct 2023 16:31:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49506 "EHLO
+        Wed, 18 Oct 2023 18:07:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231961AbjJRUa5 (ORCPT
+        with ESMTP id S230334AbjJRWHq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 18 Oct 2023 16:30:57 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CE4712B;
-        Wed, 18 Oct 2023 13:30:25 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8E4B2C433CA;
-        Wed, 18 Oct 2023 20:30:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697661024;
-        bh=P9A/X5s37ke3+Nv2Wh+UccKUBLUAL5edEf7VhXuM7oQ=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=vLnHkwlif2dlA25Y5kNogc+b9K0Ji1yxdlKCNv08CUDN7VSnfJdmXx1pHtC+O6ib/
-         if7iLM4gSvZe4oEviDVKmaCQGgxyKjh+bOyc6EnMYUZsxMHFXzxcdSRRtQs/wPJqLB
-         r/5nyvvhMRkypjhe80ppOkl6cJL+1OfyoLYxfmWBTghOxvEfLfMxbdKrXK00icZvkS
-         2vGX5rsJtugNLPSS05t5UERNCSAt/Pdl0RjPXW8GqZrgXyWHGajtWLB/wUd+54pyBd
-         pKOGd9S7Uy8/TkzsK21dwq+GDSKuVaSALGDBlCdOsDacLm1QCM3BYtsGsnwlZ4O8mj
-         aM+ZY/MIDu2IQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 74282C04DD9;
-        Wed, 18 Oct 2023 20:30:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Wed, 18 Oct 2023 18:07:46 -0400
+Received: from mail-qv1-xf2a.google.com (mail-qv1-xf2a.google.com [IPv6:2607:f8b0:4864:20::f2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 550C5121
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Oct 2023 15:07:40 -0700 (PDT)
+Received: by mail-qv1-xf2a.google.com with SMTP id 6a1803df08f44-66cfd874520so47240446d6.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Oct 2023 15:07:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697666859; x=1698271659; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=TmxuLgO2OPFWn/4ZBkovJJHi7q68ANRrEaZMsNWSC8E=;
+        b=PHc9RG/vIT45QQCDFMJOIt2wCYUysCMxQ86sFkQKAf1kT05e3zVmX6Li409S8OBinM
+         /xU/WLah8JltVZm4lFzMtswVVaJ5E1tFsRy6fQO/umEYIsgM5aJTyGDKAOlUrbr4PMTA
+         2aR59xGGn/tP533lntHY3imz7rzGdotdGBCCz69yCGuoSBByCrxspdYuosAcNjTZqGCX
+         dF8D8LArbyWnSbJtbOvc+jRSCq6tOecmgU48Pf7zLYK8yJxdgQRfhOkO3PadOFswJApY
+         QnJKENXcxXnnKSpLeTRsQBmU/57RPbjf7jjBYWTWgXREamacg0PMQiHgOuHmDl6CSPYu
+         I9sg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697666859; x=1698271659;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TmxuLgO2OPFWn/4ZBkovJJHi7q68ANRrEaZMsNWSC8E=;
+        b=RY/JPHdBp3xI7cGvx903CG+KJGFp2hGNGEzMjE7h9Fg2/jItzJJ57xA1U3X+WlcXlt
+         /UEyeHkjXPYwrs400MIMeZaplFq8x5N3i+HXO9KYcrkMoidcY07KmSzqPVpQDgroaWZa
+         yKrTykyx/Zflt4DOK1XZhqp4It6IXPaoyTtv/0iJGJClwA5SSGZEnr74PPsbQNoWR6bT
+         vRgKvEgXMcvPbPBLqeeDt+deKwRSOiF22teLoFaV4lSSDAKp9HYkdJ7jnQRTMk7q1q3F
+         jdaLVMROFGHzirSUOHoDKl04/xTZQlaXchDNre4vEtjuzOP4Sl0rXrye5wRbp4gd2Sbz
+         8iUQ==
+X-Gm-Message-State: AOJu0YwkMi6zAlzdNiuuEVCj3lDXGwSJtOEg1eV/G6UlB16pj6y8cg2H
+        DL66ohqDarpfXAM9/yM3LQKc0nZfNUc=
+X-Google-Smtp-Source: AGHT+IHa03xT7SmblYS3OTipyCpXP+aegNjNHIrhNWX1MqIUGB9/cLnreBRw/JWDRbydRousMDHCog==
+X-Received: by 2002:ad4:5bca:0:b0:65b:21c8:2d74 with SMTP id t10-20020ad45bca000000b0065b21c82d74mr642265qvt.6.1697666859325;
+        Wed, 18 Oct 2023 15:07:39 -0700 (PDT)
+Received: from [172.17.0.2] ([20.57.43.169])
+        by smtp.gmail.com with ESMTPSA id x10-20020ad440ca000000b0066d1d2242desm271107qvp.120.2023.10.18.15.07.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Oct 2023 15:07:38 -0700 (PDT)
+Message-ID: <6530572a.d40a0220.d52be.226c@mx.google.com>
+Date:   Wed, 18 Oct 2023 15:07:38 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7275471775568922457=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: hci_sync: Fix Opcode prints in bt_dev_dbg/err
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <169766102447.20333.11792523121901366005.git-patchwork-notify@kernel.org>
-Date:   Wed, 18 Oct 2023 20:30:24 +0000
-References: <20231018144735.33085-1-marcel@ziswiler.com>
-In-Reply-To: <20231018144735.33085-1-marcel@ziswiler.com>
-To:     Marcel Ziswiler <marcel@ziswiler.com>
-Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        luiz.dentz@gmail.com, linux-kernel@vger.kernel.org,
-        johan.hedberg@gmail.com, marcel.ziswiler@toradex.com
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,1/4] shared/util: Add util_debug_{tlv, bit} helpers
+In-Reply-To: <20231018195653.2532882-1-luiz.dentz@gmail.com>
+References: <20231018195653.2532882-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+--===============7275471775568922457==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+This is automated email and please do not reply to this email!
 
-On Wed, 18 Oct 2023 16:47:35 +0200 you wrote:
-> From: Marcel Ziswiler <marcel.ziswiler@toradex.com>
-> 
-> Printed Opcodes may be missing leading zeros:
-> 
-> 	Bluetooth: hci0: Opcode 0x c03 failed: -110
-> 
-> Fix this by always printing leading zeros:
-> 
-> [...]
+Dear submitter,
 
-Here is the summary with links:
-  - Bluetooth: hci_sync: Fix Opcode prints in bt_dev_dbg/err
-    https://git.kernel.org/bluetooth/bluetooth-next/c/8a589c6d138e
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=794477
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      2.83 seconds
+GitLint                       PASS      1.34 seconds
+BuildEll                      PASS      29.80 seconds
+BluezMake                     PASS      1041.66 seconds
+MakeCheck                     PASS      12.51 seconds
+MakeDistcheck                 PASS      181.54 seconds
+CheckValgrind                 PASS      281.03 seconds
+CheckSmatch                   WARNING   379.25 seconds
+bluezmakeextell               PASS      121.31 seconds
+IncrementalBuild              PASS      3585.54 seconds
+ScanBuild                     WARNING   1135.29 seconds
+
+Details
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+monitor/att.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c:1859:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3606:52: warning: array of flexible structuresmonitor/bt.h:3594:40: warning: array of flexible structures
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+In file included from tools/mesh-gatt/crypto.c:32:
+./src/shared/util.h:221:9: warning: 1st function call argument is an uninitialized value
+        return be32_to_cpu(get_unaligned((const uint32_t *) ptr));
+               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+./src/shared/util.h:33:26: note: expanded from macro 'be32_to_cpu'
+#define be32_to_cpu(val) bswap_32(val)
+                         ^~~~~~~~~~~~~
+/usr/include/byteswap.h:34:21: note: expanded from macro 'bswap_32'
+#define bswap_32(x) __bswap_32 (x)
+                    ^~~~~~~~~~~~~~
+In file included from tools/mesh-gatt/crypto.c:32:
+./src/shared/util.h:231:9: warning: 1st function call argument is an uninitialized value
+        return be64_to_cpu(get_unaligned((const uint64_t *) ptr));
+               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+./src/shared/util.h:34:26: note: expanded from macro 'be64_to_cpu'
+#define be64_to_cpu(val) bswap_64(val)
+                         ^~~~~~~~~~~~~
+/usr/include/byteswap.h:37:21: note: expanded from macro 'bswap_64'
+#define bswap_64(x) __bswap_64 (x)
+                    ^~~~~~~~~~~~~~
+2 warnings generated.
 
 
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7275471775568922457==--
