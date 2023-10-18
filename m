@@ -2,79 +2,59 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09FB4CDB482
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Oct 2023 23:30:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92D9FCDB482
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Oct 2023 07:59:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344321AbjJQXab (ORCPT
+        id S1344651AbjJRH7Q (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 17 Oct 2023 19:30:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45486 "EHLO
+        Wed, 18 Oct 2023 03:59:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234843AbjJQXa2 (ORCPT
+        with ESMTP id S1344638AbjJRH7P (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 17 Oct 2023 19:30:28 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BF9992;
-        Tue, 17 Oct 2023 16:30:26 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D54B5C433C7;
-        Tue, 17 Oct 2023 23:30:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697585425;
-        bh=F19AIuWps+oFrYH8x6B7coL3wkdUt+k3yWrH9Gy2Mkg=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=t9OSlMXAflk4PpJblN8Uo2R2260sS8qQzSn6UefWFZ2DWS5M4x/rz7kPoyQ03KYco
-         uGZCJKIayPfOQrJqEv2rHaKg2MOXR9HYXAHrCZOJGHG6RKVPdSq00OMHuYeUwMw9qU
-         N0eYCSZRidNJTLHfGqLAADNJtXvKYj1u9mNAVQKXEcfmT/+CR3QKyQFQ3HZ8rFYUUg
-         iiJZAAj+89S+tfGoS2dHg7vWEliFIX3uGPlKsk3J6s4lcd1IyrzGtQmUNuIscV/9dW
-         ZZMmN3+fUTOAi8c16TfQvle2Ia2ikszhAlWAwbTUBhAtoBiFPARcpkIPJN7joR6AbS
-         X+kE4CujJYfHw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B8D98E4E9DD;
-        Tue, 17 Oct 2023 23:30:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Wed, 18 Oct 2023 03:59:15 -0400
+X-Greylist: delayed 476 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 18 Oct 2023 00:59:11 PDT
+Received: from mail.raportygospodarcze.pl (mail.raportygospodarcze.pl [51.195.117.175])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA269FF
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Oct 2023 00:59:11 -0700 (PDT)
+Received: by mail.raportygospodarcze.pl (Postfix, from userid 1002)
+        id 5F571A2AE6; Wed, 18 Oct 2023 07:51:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=raportygospodarcze.pl; s=mail; t=1697615471;
+        bh=Q787bUI8wqiKELAtyWRvCTxaBwNaZfpooGhkyk63cfU=;
+        h=Date:From:To:Subject:From;
+        b=hHe1Ze4+y8d90lzsISC5J07e4u/8YHnbZbG/gPjU8gdtaQ4+w1d/zVDjFYG6JCo+B
+         JGSEsRdSfcJuWzPSka9i3lbOK1YYbzI+Zv5mFlKAq7B0eAQl9bKe+CW102vEMVG1Qq
+         ak9GBeahJFGK8nGioF1+4zMhSBJCowvKSItSVzKtvmK+tl7oKajS732zVaI0XUzme2
+         Ra5YZ69qUC9cKOXfPHZQFno52DSijQR3MCu7T3fOxs/oY82VnEg9vv40sAA6LU1fxz
+         6yCARgaQYtr+i3XyNhMTrLiovJAeacKkUJfatZtomh4y6l8hAL1g6/jQnmwPtLP06p
+         1RlTAXBdePKNg==
+Received: by mail.raportygospodarcze.pl for <linux-bluetooth@vger.kernel.org>; Wed, 18 Oct 2023 07:51:08 GMT
+Message-ID: <20231018064500-0.1.b1.1fbkj.0.pb4clemgkd@raportygospodarcze.pl>
+Date:   Wed, 18 Oct 2023 07:51:08 GMT
+From:   "Maksymilian Ciszewski" <maksymilian.ciszewski@raportygospodarcze.pl>
+To:     <linux-bluetooth@vger.kernel.org>
+Subject: =?UTF-8?Q?Prosz=C4=99_o_kontakt?=
+X-Mailer: mail.raportygospodarcze.pl
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [kernel PATCH v3] Bluetooth: btmtksdio: enable bluetooth wakeup in
- system suspend
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <169758542575.4587.5326115164218555952.git-patchwork-notify@kernel.org>
-Date:   Tue, 17 Oct 2023 23:30:25 +0000
-References: <20231013124707.kernel.v3.1.I6dbfc1fedddf0633b55ce7e7a10ef7f3929a9bdc@changeid>
-In-Reply-To: <20231013124707.kernel.v3.1.I6dbfc1fedddf0633b55ce7e7a10ef7f3929a9bdc@changeid>
-To:     Zhengping Jiang <jiangzp@google.com>
-Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        luiz.dentz@gmail.com, chromeos-bluetooth-upstreaming@chromium.org,
-        angelogioacchino.delregno@collabora.com, johan.hedberg@gmail.com,
-        matthias.bgg@gmail.com, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+Dzie=C5=84 dobry,
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+Czy jest mo=C5=BCliwo=C5=9B=C4=87 nawi=C4=85zania wsp=C3=B3=C5=82pracy z =
+Pa=C5=84stwem?
 
-On Fri, 13 Oct 2023 12:47:07 -0700 you wrote:
-> The BTMTKSDIO_BT_WAKE_ENABLED flag is set for bluetooth interrupt
-> during system suspend and increases wakeup count for bluetooth event.
-> 
-> Signed-off-by: Zhengping Jiang <jiangzp@google.com>
-> ---
-> 
-> Changes in v3:
-> - Replace deprecated macro.
-> 
-> [...]
+Z ch=C4=99ci=C4=85 porozmawiam z osob=C4=85 zajmuj=C4=85c=C4=85 si=C4=99 =
+dzia=C5=82aniami zwi=C4=85zanymi ze sprzeda=C5=BC=C4=85.
 
-Here is the summary with links:
-  - [kernel,v3] Bluetooth: btmtksdio: enable bluetooth wakeup in system suspend
-    https://git.kernel.org/bluetooth/bluetooth-next/c/2fddfadb0478
+Pomagamy skutecznie pozyskiwa=C4=87 nowych klient=C3=B3w.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Zapraszam do kontaktu.
 
 
+Pozdrawiam
+Maksymilian Ciszewski
