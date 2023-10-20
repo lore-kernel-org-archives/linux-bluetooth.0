@@ -2,61 +2,61 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 282EECDB474
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Oct 2023 18:08:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33159C0032E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Oct 2023 18:08:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377935AbjJTSIn (ORCPT
+        id S1377970AbjJTSIs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 20 Oct 2023 14:08:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49506 "EHLO
+        Fri, 20 Oct 2023 14:08:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229839AbjJTSIm (ORCPT
+        with ESMTP id S230084AbjJTSIq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 20 Oct 2023 14:08:42 -0400
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7328D51
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Oct 2023 11:08:39 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id 41be03b00d2f7-5aa7172bafdso790341a12.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Oct 2023 11:08:39 -0700 (PDT)
+        Fri, 20 Oct 2023 14:08:46 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41942D57
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Oct 2023 11:08:43 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id 98e67ed59e1d1-27cfb8bc7eeso891018a91.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Oct 2023 11:08:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697825318; x=1698430118; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1697825322; x=1698430122; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=BWx5/DcIXZe+PMT+T7cEJe+SPzRjZhlFlFktx0kNpXY=;
-        b=hJkQxbEX93hkynU97SBh+Cf5suWHBSu6qex9x82OCFvxQ4SVzTLIASixtnr++biR7u
-         /RYEE+yzGfXciR+YYr94oiDlZnO9F/fBZrdZAFKqg0oIVBp78k4CFPZIG30ZMhEqEspv
-         5k1KOppcflMUHI50d6dhQ2XxLmQG2HSox/M5cSyZj9dwygb+aQK/5LMP5KQhVnV/WOjN
-         H+AHNuIUQiFUFByUA12G4XvxcyTeLg/x3Y9azM5iKlM1lRkL0igmYWSU5vMkiiVDpT0d
-         RVt329UQxcvFWIlqdGGx1dlEh0fgJecpRLVe7/DM97yI9qj3NRo0hEii56yJ++T2ngAU
-         +q1Q==
+        bh=cwt/O4BE9qXnQZw8zoFRGFUPhkxOc2BZrusO3xMXvaQ=;
+        b=jClA7HcbjhWha4S9rvfb37MyHBWwN0DpuEgYjIVozDmcn7aVhm101IWQ0afLxbYJJs
+         ARN+L5JbQBTMofFSE4wa928OpSxxfiRaAUA14HYg2SOApmh31A7446eFpO0QiuDmS1pH
+         PqADD470UpIczeM4bMb5fKDjWRevoUdJoU6W0qOP95VSbhDxzKvRQJY8cnPcTqahxS8N
+         Zl41n5VrvF3/DLTbIu88YbKmzKv6+cAAgJu2/zPMECKTsPIeCY57jlJwpnWop4FlStFy
+         9OB8W8ADk/ilE5NwGjBaFwU3F32QdCu/48JnklVEzEvj5goWSyTzVIQQWWD9bCpYqpjV
+         tWXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697825318; x=1698430118;
+        d=1e100.net; s=20230601; t=1697825322; x=1698430122;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=BWx5/DcIXZe+PMT+T7cEJe+SPzRjZhlFlFktx0kNpXY=;
-        b=vVOCXBoSzbALP9k46cNWWvt/TBhw5AP4SlriOEKBpV/oaFsXYjboHAPhkMIHeDEB/3
-         KirFJzLO/If2MMrsQm6Qb/u2Lf42+Ro4qLkjr2Q3D+Y4HAZUHce8acAmFHwH6dUXGzma
-         Or3Udm3PFi+lvQK5ndEOJD8rh6Bb5qvKq8G+HXn880rLkDm0yQGD/54e43zTa0vKL5Ie
-         GoEFjz6rczti2S9j1VjewNx7S1V4wwKmXlrVeOlmrTLgy/uCnuQLhBuxt7bxJu4pV2DZ
-         Er7spRB//9Q/EdNr05eaK2OVk8mZXE6CLkC4DYBGDDEL+tjFxJXI8JKFMpkTpq9siAE+
-         9Vbw==
-X-Gm-Message-State: AOJu0YzS+gu1UA6SUvPchrc3chUnGr8aWdai9mhmoKfcNvf4pxzo5smK
-        ewD4MtI30Vx0qulj2l02LlEpt2JRbb+AwnR1HDI=
-X-Google-Smtp-Source: AGHT+IGUzRO7S7WwPtVsdDVgjTPxDDn7UQ1fPl57XgtQTiJdHtBdkExkXdwAUf2WZSlXVKOnzF0kqw==
-X-Received: by 2002:a17:90a:1947:b0:27c:f80a:2c8a with SMTP id 7-20020a17090a194700b0027cf80a2c8amr2852353pjh.0.1697825318488;
-        Fri, 20 Oct 2023 11:08:38 -0700 (PDT)
+        bh=cwt/O4BE9qXnQZw8zoFRGFUPhkxOc2BZrusO3xMXvaQ=;
+        b=lgFcSJtRJytgM6KejmyDvAH9diy41WlftoFJbhvRJoaCB7tiPw/v3lxUGO5oGm26MM
+         XZaIqA4F//aTiwb3Kn+2vnz1BHLygA5u+qPZAvs55nz1BDENhSGZ9163uY0dKJjJupUw
+         LGVv7dbtJB007iEiFWl5mJo2/N+Net2CUFa9bCa0bYZdGYSByb859HOjsSpMKBKfP0Ty
+         iY3jNWQ/ywRQnCkh973e0GvK4RrLP3hVulVET4TX/EQ0gtyJJFT8PFXHHm3cQP1CaXpH
+         3YGmU1e685CodQ1EYP4vbAMeMsTJCXLBo5xAvCWgTtXSUwFGHLfqNOhBNbZ9wiBa3c6e
+         x/Cg==
+X-Gm-Message-State: AOJu0YwXKoKelXe4f2DGvkhNunsYiPmrAHgg0n4BCcWr1gNsc3lW0/Cv
+        5lprLB8r1myZRfI6NEeBVH9zx4UAH7K5I5Vh0Yo=
+X-Google-Smtp-Source: AGHT+IFCYxxjePkeE8GhnAVSn9MY3MpHvbpsrrjHYO8437dJ8I2/58AMNF/Ik2UXJugM7yWVdMuUJA==
+X-Received: by 2002:a17:90b:2890:b0:27d:63ae:f376 with SMTP id qc16-20020a17090b289000b0027d63aef376mr2906266pjb.38.1697825321849;
+        Fri, 20 Oct 2023 11:08:41 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-98-232-221-87.hsd1.or.comcast.net. [98.232.221.87])
-        by smtp.gmail.com with ESMTPSA id i4-20020a17090ad34400b00263b9e75aecsm1729800pjx.41.2023.10.20.11.08.36
+        by smtp.gmail.com with ESMTPSA id i4-20020a17090ad34400b00263b9e75aecsm1729800pjx.41.2023.10.20.11.08.40
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Oct 2023 11:08:37 -0700 (PDT)
+        Fri, 20 Oct 2023 11:08:41 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 2/4] monitor: Make use of util_debug_tlv to decode TLV entries
-Date:   Fri, 20 Oct 2023 11:08:32 -0700
-Message-ID: <20231020180834.3010421-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 4/4] client: Make use of bap-debug functions
+Date:   Fri, 20 Oct 2023 11:08:34 -0700
+Message-ID: <20231020180834.3010421-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231020180834.3010421-1-luiz.dentz@gmail.com>
 References: <20231020180834.3010421-1-luiz.dentz@gmail.com>
@@ -68,415 +68,203 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This uses util_debug_tlv to decode TLV entries.
+This make use of bap-debug functions to decode Capabilities,
+Configuration and Metadata.
 ---
- monitor/att.c    | 101 +++++++++++++++++++++++++++++------------------
- monitor/packet.c |  81 ++++++-------------------------------
- monitor/packet.h |  14 -------
- 3 files changed, 75 insertions(+), 121 deletions(-)
+ client/player.c | 124 ++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 116 insertions(+), 8 deletions(-)
 
-diff --git a/monitor/att.c b/monitor/att.c
-index 0e12ee352078..39ea5d6dac5a 100644
---- a/monitor/att.c
-+++ b/monitor/att.c
-@@ -675,8 +675,15 @@ static bool print_ase_codec(const struct l2cap_frame *frame)
- 	return true;
- }
+diff --git a/client/player.c b/client/player.c
+index d1809f24fd27..603447a9df46 100644
+--- a/client/player.c
++++ b/client/player.c
+@@ -42,6 +42,7 @@
+ #include "src/shared/shell.h"
+ #include "src/shared/io.h"
+ #include "src/shared/queue.h"
++#include "src/shared/bap-debug.h"
+ #include "print.h"
+ #include "player.h"
+ 
+@@ -1451,6 +1452,34 @@ static struct codec_preset lc3_presets[] = {
+ 			LC3_10_UNFRAMED(155u, 13u, 100u, 40000u)),
+ };
  
 +static void print_ltv(const char *str, void *user_data)
 +{
 +	const char *label = user_data;
 +
-+	print_field("%s: %s", label, str);
++	bt_shell_printf("\t%s.%s\n", label, str);
 +}
 +
- static bool print_ase_lv(const struct l2cap_frame *frame, const char *label,
--			struct packet_ltv_decoder *decoder, size_t decoder_len)
-+			struct util_ltv_debugger *decoder, size_t decoder_len)
- {
- 	struct bt_hci_lv_data *lv;
++static void print_lc3_caps(uint8_t *data, int len)
++{
++	const char *label = "Capabilities";
++
++	bt_bap_debug_caps(data, len, print_ltv, (void *)label);
++}
++
++static void print_lc3_cfg(void *data, int len)
++{
++	const char *label = "Configuration";
++
++	bt_bap_debug_config(data, len, print_ltv, (void *)label);
++}
++
++static void print_lc3_meta(void *data, int len)
++{
++	const char *label = "Metadata";
++
++	bt_bap_debug_metadata(data, len, print_ltv, (void *)label);
++}
++
+ #define PRESET(_uuid, _codec, _presets, _default_index) \
+ 	{ \
+ 		.uuid = _uuid, \
+@@ -1941,8 +1970,12 @@ static void append_properties(DBusMessageIter *iter,
  
-@@ -691,13 +698,14 @@ static bool print_ase_lv(const struct l2cap_frame *frame, const char *label,
- 		return false;
+ 	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "{sv}", &dict);
+ 
+-	bt_shell_printf("Capabilities: ");
+-	bt_shell_hexdump(cfg->caps->iov_base, cfg->caps->iov_len);
++	if (cfg->ep->codec == LC3_ID) {
++		print_lc3_cfg(cfg->caps->iov_base, cfg->caps->iov_len);
++	} else {
++		bt_shell_printf("Capabilities: ");
++		bt_shell_hexdump(cfg->caps->iov_base, cfg->caps->iov_len);
++	}
+ 
+ 	g_dbus_dict_append_basic_array(&dict, DBUS_TYPE_STRING, &key,
+ 					DBUS_TYPE_BYTE, &cfg->caps->iov_base,
+@@ -1955,8 +1988,13 @@ static void append_properties(DBusMessageIter *iter,
+ 				DBUS_TYPE_BYTE, &cfg->meta->iov_base,
+ 				cfg->meta->iov_len);
+ 
+-		bt_shell_printf("Metadata:\n");
+-		bt_shell_hexdump(cfg->meta->iov_base, cfg->meta->iov_len);
++		if (cfg->ep->codec == LC3_ID) {
++			print_lc3_meta(cfg->meta->iov_base, cfg->meta->iov_len);
++		} else {
++			bt_shell_printf("Metadata:\n");
++			bt_shell_hexdump(cfg->meta->iov_base,
++						cfg->meta->iov_len);
++		}
  	}
  
--	packet_print_ltv(label, lv->data, lv->len, decoder, decoder_len);
-+	util_debug_ltv(lv->data, lv->len, decoder, decoder_len, print_ltv,
-+			(void *) label);
- 
- 	return true;
+ 	append_qos(&dict, cfg);
+@@ -2124,6 +2162,42 @@ static struct endpoint *endpoint_find(const char *pattern)
+ 	return NULL;
  }
  
- static bool print_ase_cc(const struct l2cap_frame *frame, const char *label,
--			struct packet_ltv_decoder *decoder, size_t decoder_len)
-+			struct util_ltv_debugger *decoder, size_t decoder_len)
- {
- 	return print_ase_lv(frame, label, decoder, decoder_len);
- }
-@@ -744,7 +752,8 @@ done:
- 		print_hex_field("    Data", frame->data, frame->size);
- }
- 
--static void ase_decode_preferred_context(const uint8_t *data, uint8_t len)
-+static void ase_debug_preferred_context(const uint8_t *data, uint8_t len,
-+				util_debug_func_t func, void *user_data)
- {
- 	struct l2cap_frame frame;
- 
-@@ -753,7 +762,8 @@ static void ase_decode_preferred_context(const uint8_t *data, uint8_t len)
- 	print_context(&frame, "      Preferred Context");
- }
- 
--static void ase_decode_context(const uint8_t *data, uint8_t len)
-+static void ase_debug_context(const uint8_t *data, uint8_t len,
-+				util_debug_func_t func, void *user_data)
- {
- 	struct l2cap_frame frame;
- 
-@@ -762,7 +772,8 @@ static void ase_decode_context(const uint8_t *data, uint8_t len)
- 	print_context(&frame, "      Context");
- }
- 
--static void ase_decode_program_info(const uint8_t *data, uint8_t len)
-+static void ase_debug_program_info(const uint8_t *data, uint8_t len,
-+				util_debug_func_t func, void *user_data)
- {
- 	struct l2cap_frame frame;
- 	const char *str;
-@@ -782,7 +793,8 @@ done:
- 		print_hex_field("    Data", frame.data, frame.size);
- }
- 
--static void ase_decode_language(const uint8_t *data, uint8_t len)
-+static void ase_debug_language(const uint8_t *data, uint8_t len,
-+				util_debug_func_t func, void *user_data)
- {
- 	struct l2cap_frame frame;
- 	uint32_t value;
-@@ -801,16 +813,17 @@ done:
- 		print_hex_field("    Data", frame.data, frame.size);
- }
- 
--struct packet_ltv_decoder ase_metadata_table[] = {
--	LTV_DEC(0x01, ase_decode_preferred_context),
--	LTV_DEC(0x02, ase_decode_context),
--	LTV_DEC(0x03, ase_decode_program_info),
--	LTV_DEC(0x04, ase_decode_language)
-+struct util_ltv_debugger ase_metadata_table[] = {
-+	UTIL_LTV_DEBUG(0x01, ase_debug_preferred_context),
-+	UTIL_LTV_DEBUG(0x02, ase_debug_context),
-+	UTIL_LTV_DEBUG(0x03, ase_debug_program_info),
-+	UTIL_LTV_DEBUG(0x04, ase_debug_language)
- };
- 
- static bool print_ase_metadata(const struct l2cap_frame *frame)
- {
--	return print_ase_lv(frame, "    Metadata", NULL, 0);
-+	return print_ase_lv(frame, "    Metadata", ase_metadata_table,
-+					ARRAY_SIZE(ase_metadata_table));
- }
- 
- static const struct bitfield_data pac_freq_table[] = {
-@@ -833,7 +846,8 @@ static const struct bitfield_data pac_freq_table[] = {
- 	{ }
- };
- 
--static void pac_decode_freq(const uint8_t *data, uint8_t len)
-+static void pac_decode_freq(const uint8_t *data, uint8_t len,
-+				util_debug_func_t func, void *user_data)
- {
- 	struct l2cap_frame frame;
- 	uint16_t value;
-@@ -870,7 +884,8 @@ static const struct bitfield_data pac_duration_table[] = {
- 	{ }
- };
- 
--static void pac_decode_duration(const uint8_t *data, uint8_t len)
-+static void pac_decode_duration(const uint8_t *data, uint8_t len,
-+				util_debug_func_t func, void *user_data)
- {
- 	struct l2cap_frame frame;
- 	uint8_t value;
-@@ -907,7 +922,8 @@ static const struct bitfield_data pac_channel_table[] = {
- 	{ }
- };
- 
--static void pac_decode_channels(const uint8_t *data, uint8_t len)
-+static void pac_decode_channels(const uint8_t *data, uint8_t len,
-+				util_debug_func_t func, void *user_data)
- {
- 	struct l2cap_frame frame;
- 	uint8_t value;
-@@ -932,7 +948,8 @@ done:
- 		print_hex_field("    Data", frame.data, frame.size);
- }
- 
--static void pac_decode_frame_length(const uint8_t *data, uint8_t len)
-+static void pac_decode_frame_length(const uint8_t *data, uint8_t len,
-+				util_debug_func_t func, void *user_data)
- {
- 	struct l2cap_frame frame;
- 	uint16_t min, max;
-@@ -957,7 +974,8 @@ done:
- 		print_hex_field("    Data", frame.data, frame.size);
- }
- 
--static void pac_decode_sdu(const uint8_t *data, uint8_t len)
-+static void pac_decode_sdu(const uint8_t *data, uint8_t len,
-+				util_debug_func_t func, void *user_data)
- {
- 	struct l2cap_frame frame;
- 	uint8_t value;
-@@ -976,12 +994,12 @@ done:
- 		print_hex_field("    Data", frame.data, frame.size);
- }
- 
--struct packet_ltv_decoder pac_cap_table[] = {
--	LTV_DEC(0x01, pac_decode_freq),
--	LTV_DEC(0x02, pac_decode_duration),
--	LTV_DEC(0x03, pac_decode_channels),
--	LTV_DEC(0x04, pac_decode_frame_length),
--	LTV_DEC(0x05, pac_decode_sdu)
-+struct util_ltv_debugger pac_cap_table[] = {
-+	UTIL_LTV_DEBUG(0x01, pac_decode_freq),
-+	UTIL_LTV_DEBUG(0x02, pac_decode_duration),
-+	UTIL_LTV_DEBUG(0x03, pac_decode_channels),
-+	UTIL_LTV_DEBUG(0x04, pac_decode_frame_length),
-+	UTIL_LTV_DEBUG(0x05, pac_decode_sdu)
- };
- 
- static void print_pac(const struct l2cap_frame *frame)
-@@ -1117,7 +1135,8 @@ static bool print_ase_pd(const struct l2cap_frame *frame, const char *label)
- 	return true;
- }
- 
--static void ase_decode_freq(const uint8_t *data, uint8_t len)
-+static void ase_debug_freq(const uint8_t *data, uint8_t len,
-+				util_debug_func_t func, void *user_data)
- {
- 	struct l2cap_frame frame;
- 	uint8_t value;
-@@ -1179,7 +1198,8 @@ done:
- 		print_hex_field("    Data", frame.data, frame.size);
- }
- 
--static void ase_decode_duration(const uint8_t *data, uint8_t len)
-+static void ase_debug_duration(const uint8_t *data, uint8_t len,
-+				util_debug_func_t func, void *user_data)
- {
- 	struct l2cap_frame frame;
- 	uint8_t value;
-@@ -1266,7 +1286,8 @@ done:
- 		print_hex_field("  Data", frame->data, frame->size);
- }
- 
--static void ase_decode_location(const uint8_t *data, uint8_t len)
-+static void ase_debug_location(const uint8_t *data, uint8_t len,
-+				util_debug_func_t func, void *user_data)
- {
- 	struct l2cap_frame frame;
- 
-@@ -1275,7 +1296,8 @@ static void ase_decode_location(const uint8_t *data, uint8_t len)
- 	print_location(&frame);
- }
- 
--static void ase_decode_frame_length(const uint8_t *data, uint8_t len)
-+static void ase_debug_frame_length(const uint8_t *data, uint8_t len,
-+				util_debug_func_t func, void *user_data)
- {
- 	struct l2cap_frame frame;
- 	uint16_t value;
-@@ -1294,7 +1316,8 @@ done:
- 		print_hex_field("    Data", frame.data, frame.size);
- }
- 
--static void ase_decode_blocks(const uint8_t *data, uint8_t len)
-+static void ase_debug_blocks(const uint8_t *data, uint8_t len,
-+				util_debug_func_t func, void *user_data)
- {
- 	struct l2cap_frame frame;
- 	uint8_t value;
-@@ -1313,12 +1336,12 @@ done:
- 		print_hex_field("    Data", frame.data, frame.size);
- }
- 
--struct packet_ltv_decoder ase_cc_table[] = {
--	LTV_DEC(0x01, ase_decode_freq),
--	LTV_DEC(0x02, ase_decode_duration),
--	LTV_DEC(0x03, ase_decode_location),
--	LTV_DEC(0x04, ase_decode_frame_length),
--	LTV_DEC(0x05, ase_decode_blocks)
-+struct util_ltv_debugger ase_cc_table[] = {
-+	UTIL_LTV_DEBUG(0x01, ase_debug_freq),
-+	UTIL_LTV_DEBUG(0x02, ase_debug_duration),
-+	UTIL_LTV_DEBUG(0x03, ase_debug_location),
-+	UTIL_LTV_DEBUG(0x04, ase_debug_frame_length),
-+	UTIL_LTV_DEBUG(0x05, ase_debug_blocks)
- };
- 
- static void print_ase_config(const struct l2cap_frame *frame)
-@@ -2745,8 +2768,9 @@ static const struct big_enc_decoder {
- };
- 
- static bool print_subgroup_lv(const struct l2cap_frame *frame,
--		const char *label, struct packet_ltv_decoder *decoder,
--		size_t decoder_len)
-+				const char *label,
-+				struct util_ltv_debugger *debugger,
-+				size_t debugger_len)
- {
- 	struct bt_hci_lv_data *lv;
- 
-@@ -2761,7 +2785,8 @@ static bool print_subgroup_lv(const struct l2cap_frame *frame,
- 		return false;
- 	}
- 
--	packet_print_ltv(label, lv->data, lv->len, decoder, decoder_len);
-+	util_debug_ltv(lv->data, lv->len, debugger, debugger_len,
-+			       print_ltv, (void *)label);
- 
- 	return true;
- }
-diff --git a/monitor/packet.c b/monitor/packet.c
-index 30ffe79c6c09..87805be0122a 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -3419,72 +3419,11 @@ static void *iov_pull(struct iovec *iov, size_t len)
- 	return data;
- }
- 
--static struct packet_ltv_decoder*
--get_ltv_decoder(struct packet_ltv_decoder *decoder, size_t num, uint8_t type)
-+static void print_ltv(const char *str, void *user_data)
- {
--	size_t i;
-+	const char *label = user_data;
- 
--	if (!decoder || !num)
--		return NULL;
--
--	for (i = 0; i < num; i++) {
--		struct packet_ltv_decoder *dec = &decoder[i];
--
--		if (dec->type == type)
--			return dec;
--	}
--
--	return NULL;
--}
--
--static void print_ltv(const char *label, const uint8_t *data, uint8_t len,
--			struct packet_ltv_decoder *decoder, size_t num)
--{
--	struct iovec iov;
--	int i;
--
--	iov.iov_base = (void *) data;
--	iov.iov_len = len;
--
--	for (i = 0; iov.iov_len; i++) {
--		uint8_t l, t, *v;
--		struct packet_ltv_decoder *dec;
--
--		l = get_u8(iov_pull(&iov, sizeof(l)));
--		if (!l) {
--			print_field("%s #%d: len 0x%02x", label, i, l);
--			break;
--		}
--
--		v = iov_pull(&iov, sizeof(*v));
--		if (!v)
--			break;
--
--		t = get_u8(v);
--
--		print_field("%s #%d: len 0x%02x type 0x%02x", label, i, l, t);
--
--		l -= 1;
--
--		v = iov_pull(&iov, l);
--		if (!v)
--			break;
--
--		dec = get_ltv_decoder(decoder, num, t);
--		if (dec)
--			dec->func(v, l);
--		else
--			print_hex_field(label, v, l);
--	}
--
--	if (iov.iov_len)
--		print_hex_field(label, iov.iov_base, iov.iov_len);
--}
--
--void packet_print_ltv(const char *label, const uint8_t *data, uint8_t len,
--			struct packet_ltv_decoder *decoder, size_t decoder_len)
--{
--	print_ltv(label, data, len, decoder, decoder_len);
-+	print_field("%s: %s", label, str);
- }
- 
- static void print_base_annoucement(const uint8_t *data, uint8_t data_len)
-@@ -3510,6 +3449,7 @@ static void print_base_annoucement(const uint8_t *data, uint8_t data_len)
- 		struct bt_hci_lv_data *codec_cfg;
- 		struct bt_hci_lv_data *metadata;
- 		uint8_t j;
-+		const char *label;
- 
- 		print_field("    Subgroup #%u:", i);
- 
-@@ -3537,9 +3477,10 @@ static void print_base_annoucement(const uint8_t *data, uint8_t data_len)
- 		if (!iov_pull(&iov, codec_cfg->len))
- 			goto done;
- 
--		print_ltv("    Codec Specific Configuration",
--					codec_cfg->data, codec_cfg->len,
--					NULL, 0);
-+		label = "    Codec Specific Configuration";
++static void print_capabilities(GDBusProxy *proxy)
++{
++	DBusMessageIter iter, subiter;
++	uint8_t codec;
++	uint8_t *data;
++	int len;
 +
-+		util_debug_ltv(codec_cfg->data, codec_cfg->len, NULL, 0,
-+				print_ltv, (void *)label);
- 
- 		metadata = iov_pull(&iov, sizeof(*metadata));
- 		if (!metadata)
-@@ -3548,8 +3489,10 @@ static void print_base_annoucement(const uint8_t *data, uint8_t data_len)
- 		if (!iov_pull(&iov, metadata->len))
- 			goto done;
- 
--		print_ltv("    Metadata", metadata->data, metadata->len,
--					NULL, 0);
-+		label = "    Metadata";
++	if (!g_dbus_proxy_get_property(proxy, "Codec", &iter))
++		return;
 +
-+		util_debug_ltv(metadata->data, metadata->len, NULL, 0,
-+				print_ltv, (void *)label);
++	dbus_message_iter_get_basic(&iter, &codec);
++
++	if (codec != LC3_ID) {
++		print_property(proxy, "Capabilities");
++		return;
++	}
++
++	if (!g_dbus_proxy_get_property(proxy, "Capabilities", &iter))
++		return;
++
++	dbus_message_iter_recurse(&iter, &subiter);
++
++	dbus_message_iter_get_fixed_array(&subiter, &data, &len);
++
++	print_lc3_caps(data, len);
++
++	if (!g_dbus_proxy_get_property(proxy, "Metadata", &iter))
++		return;
++
++	dbus_message_iter_recurse(&iter, &subiter);
++
++	dbus_message_iter_get_fixed_array(&subiter, &data, &len);
++
++	print_lc3_meta(data, len);
++}
++
+ static void cmd_show_endpoint(int argc, char *argv[])
+ {
+ 	GDBusProxy *proxy;
+@@ -2139,7 +2213,7 @@ static void cmd_show_endpoint(int argc, char *argv[])
  
- 		/* Level 3 - BIS(s)*/
- 		for (j = 0; j < subgroup->num_bis; j++) {
-diff --git a/monitor/packet.h b/monitor/packet.h
-index 384f460d2f58..856f74f4db16 100644
---- a/monitor/packet.h
-+++ b/monitor/packet.h
-@@ -84,20 +84,6 @@ void packet_print_io_capability(uint8_t capability);
- void packet_print_io_authentication(uint8_t authentication);
- void packet_print_codec_id(const char *label, uint8_t codec);
+ 	print_property(proxy, "UUID");
+ 	print_property(proxy, "Codec");
+-	print_property(proxy, "Capabilities");
++	print_capabilities(proxy);
+ 	print_property(proxy, "Device");
+ 	print_property(proxy, "DelayReporting");
+ 	print_property(proxy, "Locations");
+@@ -3817,6 +3891,42 @@ static void cmd_list_transport(int argc, char *argv[])
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
  
--#define LTV_DEC(_type, _func) \
--{ \
--	.type = _type, \
--	.func = _func, \
--}
++static void print_configuration(GDBusProxy *proxy)
++{
++	DBusMessageIter iter, subiter;
++	uint8_t codec;
++	uint8_t *data;
++	int len;
++
++	if (!g_dbus_proxy_get_property(proxy, "Codec", &iter))
++		return;
++
++	dbus_message_iter_get_basic(&iter, &codec);
++
++	if (codec != LC3_ID) {
++		print_property(proxy, "Configuration");
++		return;
++	}
++
++	if (!g_dbus_proxy_get_property(proxy, "Configuration", &iter))
++		return;
++
++	dbus_message_iter_recurse(&iter, &subiter);
++
++	dbus_message_iter_get_fixed_array(&subiter, &data, &len);
++
++	print_lc3_cfg(data, len);
++
++	if (!g_dbus_proxy_get_property(proxy, "Metadata", &iter))
++		return;
++
++	dbus_message_iter_recurse(&iter, &subiter);
++
++	dbus_message_iter_get_fixed_array(&subiter, &data, &len);
++
++	print_lc3_meta(data, len);
++}
++
+ static void cmd_show_transport(int argc, char *argv[])
+ {
+ 	GDBusProxy *proxy;
+@@ -3832,16 +3942,14 @@ static void cmd_show_transport(int argc, char *argv[])
+ 
+ 	print_property(proxy, "UUID");
+ 	print_property(proxy, "Codec");
+-	print_property(proxy, "Configuration");
++	print_configuration(proxy);
+ 	print_property(proxy, "Device");
+ 	print_property(proxy, "State");
+ 	print_property(proxy, "Delay");
+ 	print_property(proxy, "Volume");
+ 	print_property(proxy, "Endpoint");
 -
--struct packet_ltv_decoder {
--	uint8_t  type;
--	void (*func)(const uint8_t *data, uint8_t len);
--};
--
--void packet_print_ltv(const char *label, const uint8_t *data, uint8_t len,
--			struct packet_ltv_decoder *decoder, size_t num);
--
- void packet_control(struct timeval *tv, struct ucred *cred,
- 					uint16_t index, uint16_t opcode,
- 					const void *data, uint16_t size);
+ 	print_property(proxy, "QoS");
+ 	print_property(proxy, "Location");
+-	print_property(proxy, "Metadata");
+ 	print_property(proxy, "Links");
+ 
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
 -- 
 2.41.0
 
