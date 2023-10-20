@@ -2,91 +2,83 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67313C00A98
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Oct 2023 14:13:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 801DAC0032E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Oct 2023 14:13:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377529AbjJTONo (ORCPT
+        id S1377531AbjJTONp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 20 Oct 2023 10:13:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42064 "EHLO
+        Fri, 20 Oct 2023 10:13:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377419AbjJTONn (ORCPT
+        with ESMTP id S1377530AbjJTONo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 20 Oct 2023 10:13:43 -0400
+        Fri, 20 Oct 2023 10:13:44 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 955EA1A8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Oct 2023 07:13:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B94B1A8
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Oct 2023 07:13:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697811221; x=1729347221;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=iUOfA+abYciVODA+PW1TPL5pUtyOvPBYkEvwRJEFPvY=;
-  b=PuN3nbvZpPwPlIhpjIpWvJLxtSw0FNRTlq/hWSgTGrEKKwamLvhbcuoe
-   KZwxEC7kSQ5hHYCWoT0eSXRYBniQWZ0yRbTaEPXs5wSmTv967COIqzOhG
-   MqYPBWwxVG0dc2joSenxJDXXmjvfLwSV/oGIFzEkPMrlhk8iKtfwQnQDL
-   0SWCvbrcRSg9Z/EbyALStwEEWIbkgOZy44p0TOy4fTWAzBf+SUE+cHkHg
-   MHWZ2nFEVuxZxrSxS1S73Y+5fYFzqSVc7x0XYxYR3URAxOZlg+7NrsQnq
-   IfDJBPpvM7gX3oyGFHhcwgu1XwHMsaR42gWTbsC5T41pwl/eOR3l8datj
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="365840850"
+  t=1697811223; x=1729347223;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=aBVfpb1kYIWESCE+iWgnY0qK9+sW7PPcGg7TBzMu0OA=;
+  b=RMgu5prW18gPLUD8oug2wZ1v1Woin56Orvvf0P2GhQDqFSilpKrjOYzQ
+   U/p5TbLnq35E7TpQMT0KBxKKe9lAd5egM+BdI8ij+tjIIBRjkG3x9tGcq
+   yDXHz8nWtoHmD6NGJ08OVgESSP1ZCGP6RvkBnOc/iA+rHfJesfzHoSKcc
+   l8ydBcVH7+5PWnCgwYJv8qcNk2oT5FjSp8+B4LM7DL1SwOC7Enm7ghGK0
+   apzwNxdN2u5c2Wa4goPRnh0XSIsPG0whTv7T49UP5r/NpkI2Zl9ctE5LZ
+   Fux/gq409neBymxWSjYMttSHkks9v4HdxBPBn4WjH/u0iNmLQsxVWGTMZ
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="365840862"
 X-IronPort-AV: E=Sophos;i="6.03,239,1694761200"; 
-   d="scan'208";a="365840850"
+   d="scan'208";a="365840862"
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2023 07:13:41 -0700
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2023 07:13:42 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="1088756470"
+X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="1088756485"
 X-IronPort-AV: E=Sophos;i="6.03,239,1694761200"; 
-   d="scan'208";a="1088756470"
+   d="scan'208";a="1088756485"
 Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by fmsmga005.fm.intel.com with ESMTP; 20 Oct 2023 07:13:40 -0700
+  by fmsmga005.fm.intel.com with ESMTP; 20 Oct 2023 07:13:41 -0700
 From:   Kiran K <kiran.k@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     ravishankar.srivatsa@intel.com, Kiran K <kiran.k@intel.com>
-Subject: [PATCH v1 1/5] media: Populate location to qos structure
-Date:   Fri, 20 Oct 2023 19:55:50 +0530
-Message-Id: <20231020142554.486629-1-kiran.k@intel.com>
+Subject: [PATCH v1 2/5] bap: Fix update of sink location value
+Date:   Fri, 20 Oct 2023 19:55:51 +0530
+Message-Id: <20231020142554.486629-2-kiran.k@intel.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20231020142554.486629-1-kiran.k@intel.com>
+References: <20231020142554.486629-1-kiran.k@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Allow clients to register Location for endpoint.
+pac->sink_loc needs to be updated only if there is a change.
 ---
- profiles/audio/media.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ src/shared/bap.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index 1d98ac5a1a70..d0520d3216c9 100644
---- a/profiles/audio/media.c
-+++ b/profiles/audio/media.c
-@@ -1609,6 +1609,10 @@ static int parse_properties(DBusMessageIter *props, const char **uuid,
- 			if (var != DBUS_TYPE_UINT16)
- 				return -EINVAL;
- 			dbus_message_iter_get_basic(&value, &qos->ppd_max);
-+		} else if (strcasecmp(key, "Location") == 0) {
-+			if (var != DBUS_TYPE_UINT32)
-+				return -EINVAL;
-+			dbus_message_iter_get_basic(&value, &qos->location);
- 		}
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index 925501c48d98..2fd21b81b72d 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -2491,13 +2491,11 @@ static void pacs_sink_location_changed(struct bt_pacs *pacs)
  
- 		dbus_message_iter_next(props);
-@@ -2799,6 +2803,13 @@ static void app_register_endpoint(void *data, void *user_data)
- 		dbus_message_iter_get_basic(&iter, &qos.ppd_min);
- 	}
+ static void pacs_add_sink_location(struct bt_pacs *pacs, uint32_t location)
+ {
+-	location |= pacs->sink_loc_value;
+-
+ 	/* Check if location value needs updating */
+ 	if (location == pacs->sink_loc_value)
+ 		return;
  
-+	if (g_dbus_proxy_get_property(proxy, "Location", &iter)) {
-+		if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_UINT32)
-+			goto fail;
-+
-+		dbus_message_iter_get_basic(&iter, &qos.location);
-+	}
-+
- 	endpoint = media_endpoint_create(app->adapter, app->sender, path, uuid,
- 						delay_reporting, codec,
- 						vendor.cid, vendor.vid, &qos,
+-	pacs->sink_loc_value = location;
++	pacs->sink_loc_value |= location;
+ 
+ 	pacs_sink_location_changed(pacs);
+ }
 -- 
 2.34.1
 
