@@ -2,133 +2,78 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E80BC0032E
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Oct 2023 20:12:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAC26C0032E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Oct 2023 20:50:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229603AbjJTUMW (ORCPT
+        id S230400AbjJTUu3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 20 Oct 2023 16:12:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45346 "EHLO
+        Fri, 20 Oct 2023 16:50:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229559AbjJTUMV (ORCPT
+        with ESMTP id S230114AbjJTUu1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 20 Oct 2023 16:12:21 -0400
-Received: from mail-vs1-xe32.google.com (mail-vs1-xe32.google.com [IPv6:2607:f8b0:4864:20::e32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB173D63
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Oct 2023 13:12:15 -0700 (PDT)
-Received: by mail-vs1-xe32.google.com with SMTP id ada2fe7eead31-457c057bdb5so498507137.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Oct 2023 13:12:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697832734; x=1698437534; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=rBM5TzpFi0HCqH8JqE+pbn4CeHzCghPd0dwJZ6obmxo=;
-        b=ACMFuAQBBSPVe3FX7T8MqU5RV6LX3YIp+PWreWxHuJ7dVZk6K9Fv4XSz+DIp+U/ZHa
-         nmiI6tiZCYdIa2vbJtLzPqFxLTgC6tv2lhaUiQYVENhX2pyqB+xY1YmtU+TH7B1uljnX
-         N3QkqvVwIRe50Hfi3mCO3X2QEuJ7Kg3hzCEeYc9CV+A9UqS3bQ5IMH0ufyYGkqJlyMwM
-         lBjJeUpjRTlgm5H0YMvyByV2EEhuzhcBQbIHdM5i51QRKv/lW1/XWjCxDy6xO/XkYhno
-         W+R5moEGYgoBRlTYRrcP5HEYV6VBIpza8JZoYT5VR8AtQPlKmqlsg/kLVNWvSGXiCQGn
-         gnTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697832734; x=1698437534;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rBM5TzpFi0HCqH8JqE+pbn4CeHzCghPd0dwJZ6obmxo=;
-        b=O6WpYyqzgoXsFJ5jgSc+CH7Tx+s5u42E2pGMBqpjpy5xwZIbvjjxAfF3SaiA8kc+q5
-         faRpX0wJha0BzzYeklVz5HzStvJEXmsCFI1YYV1l51GFXfnkcmx7ZZu25G26QqN0m618
-         fvBKRjrfhKI1XeanWZ/f+2pYuEUA37PGKxWK16vhHeQHI3F9QlDs5Vy1adE1uSwagOU7
-         v9Sfp3sMUx4lQTV8onF0RF0lwOST166mb6V3NFVAyTJDpuPk1B2aE+PlI+q+/EO3+4Od
-         0Jt4x3R4MVB7jvsErItrtTqblxvOAOVbluNtBMNSe9unQ5skf/WVmbf/3hC/f002rt2c
-         GORQ==
-X-Gm-Message-State: AOJu0YwTUR+NL5rk/dIGWpdwVltK5qmBeKrFOnKYdqtOoo/RZPTftCC6
-        arE710SJkEZYbckBtoIsgAWEawS/Nq8=
-X-Google-Smtp-Source: AGHT+IFZkefMpwhFV2hkWpY/xTT4pobXXloDNRyZX0tdJIsWRRRSS7JUrh+vWWLMJ95PQOjwmcXpjA==
-X-Received: by 2002:a67:c283:0:b0:457:bc46:8ba3 with SMTP id k3-20020a67c283000000b00457bc468ba3mr3043185vsj.9.1697832734552;
-        Fri, 20 Oct 2023 13:12:14 -0700 (PDT)
-Received: from [172.17.0.2] ([20.57.76.129])
-        by smtp.gmail.com with ESMTPSA id vv6-20020a05620a562600b007770d47c621sm860879qkn.66.2023.10.20.13.12.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Oct 2023 13:12:14 -0700 (PDT)
-Message-ID: <6532df1e.050a0220.351c3.42f2@mx.google.com>
-Date:   Fri, 20 Oct 2023 13:12:14 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3897125527613006995=="
+        Fri, 20 Oct 2023 16:50:27 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E90BDBF
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Oct 2023 13:50:25 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8BD22C433C9;
+        Fri, 20 Oct 2023 20:50:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1697835025;
+        bh=NJaztkj1X1dzva6vrdoltGnCY7zzPdJ+o0shAhoA2VQ=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=ubK8Lou+nzEBf4r2yWstWAIOADy5tkugysUzmMdR0kcm2tOP3HCBoPJowUyOAMjfv
+         uqjZ14/kP9NtQrHuScc9TiEE3/MP/lONAzt1w3TuJ866vq2FIRtkTdibJEgo8SeWug
+         /h456TnAIwRphkaN+OLiEQIMKQlUD0/J4Fiwb2h/FQJ7JwXS0096UDD/uLl0i7WjIV
+         nPTz6sQp5iGag9PZ6c2jdxk9dGfoCVuGcvObDRXwH+U3wtyxyxExT8Y3Fq2EC8wzcA
+         8hFJ4cH8DqnYtssJ+AxEHkV5iCJCCkE8d/2jye6xgAvuJKysFs/YFfv3m+brTjo9t0
+         QykFneARhl9QQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 70E34C691E1;
+        Fri, 20 Oct 2023 20:50:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v2,1/4] shared/util: Add util_debug_{tlv, bit} helpers
-In-Reply-To: <20231020180834.3010421-1-luiz.dentz@gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v2 1/4] shared/util: Add util_debug_{tlv, bit} helpers
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <169783502545.21183.11285080609527968095.git-patchwork-notify@kernel.org>
+Date:   Fri, 20 Oct 2023 20:50:25 +0000
 References: <20231020180834.3010421-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20231020180834.3010421-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3897125527613006995==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello:
 
-This is automated email and please do not reply to this email!
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Dear submitter,
+On Fri, 20 Oct 2023 11:08:31 -0700 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This adds util_debug_tlv and util_debug_bit which can help to print
+> debug information in their respective formats.
+> ---
+>  src/shared/util.c | 88 +++++++++++++++++++++++++++++++++++++++++++++++
+>  src/shared/util.h | 30 ++++++++++++++++
+>  2 files changed, 118 insertions(+)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=795210
+Here is the summary with links:
+  - [BlueZ,v2,1/4] shared/util: Add util_debug_{tlv, bit} helpers
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ffc5819ce412
+  - [BlueZ,v2,2/4] monitor: Make use of util_debug_tlv to decode TLV entries
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e1ec08661422
+  - [BlueZ,v2,3/4] shared/bap: Add debug helpers
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=6d4491649e06
+  - [BlueZ,v2,4/4] client: Make use of bap-debug functions
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=8a335099bc1b
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      2.89 seconds
-GitLint                       PASS      1.37 seconds
-BuildEll                      PASS      29.71 seconds
-BluezMake                     PASS      1085.10 seconds
-MakeCheck                     PASS      12.59 seconds
-MakeDistcheck                 PASS      185.35 seconds
-CheckValgrind                 PASS      284.84 seconds
-CheckSmatch                   WARNING   377.39 seconds
-bluezmakeextell               PASS      122.42 seconds
-IncrementalBuild              PASS      3643.09 seconds
-ScanBuild                     WARNING   1170.95 seconds
-
-Details
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-monitor/att.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c:1859:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3606:52: warning: array of flexible structuresmonitor/bt.h:3594:40: warning: array of flexible structures
-##############################
-Test: ScanBuild - WARNING
-Desc: Run Scan Build
-Output:
-In file included from tools/mesh-gatt/crypto.c:32:
-./src/shared/util.h:221:9: warning: 1st function call argument is an uninitialized value
-        return be32_to_cpu(get_unaligned((const uint32_t *) ptr));
-               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-./src/shared/util.h:33:26: note: expanded from macro 'be32_to_cpu'
-#define be32_to_cpu(val) bswap_32(val)
-                         ^~~~~~~~~~~~~
-/usr/include/byteswap.h:34:21: note: expanded from macro 'bswap_32'
-#define bswap_32(x) __bswap_32 (x)
-                    ^~~~~~~~~~~~~~
-In file included from tools/mesh-gatt/crypto.c:32:
-./src/shared/util.h:231:9: warning: 1st function call argument is an uninitialized value
-        return be64_to_cpu(get_unaligned((const uint64_t *) ptr));
-               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-./src/shared/util.h:34:26: note: expanded from macro 'be64_to_cpu'
-#define be64_to_cpu(val) bswap_64(val)
-                         ^~~~~~~~~~~~~
-/usr/include/byteswap.h:37:21: note: expanded from macro 'bswap_64'
-#define bswap_64(x) __bswap_64 (x)
-                    ^~~~~~~~~~~~~~
-2 warnings generated.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============3897125527613006995==--
