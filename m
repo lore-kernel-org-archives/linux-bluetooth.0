@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17104C001DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Oct 2023 23:07:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55AD3C0032E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Oct 2023 23:42:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229559AbjJTXHy (ORCPT
+        id S229603AbjJTXmW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 20 Oct 2023 19:07:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56142 "EHLO
+        Fri, 20 Oct 2023 19:42:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229473AbjJTXHx (ORCPT
+        with ESMTP id S229803AbjJTXmV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 20 Oct 2023 19:07:53 -0400
-Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C52641A8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Oct 2023 16:07:50 -0700 (PDT)
-Received: by mail-io1-xd2f.google.com with SMTP id ca18e2360f4ac-7a66aa8ebb7so48894739f.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Oct 2023 16:07:50 -0700 (PDT)
+        Fri, 20 Oct 2023 19:42:21 -0400
+Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AE33D79
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Oct 2023 16:42:16 -0700 (PDT)
+Received: by mail-io1-xd33.google.com with SMTP id ca18e2360f4ac-7a68d1698adso33183039f.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Oct 2023 16:42:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697843269; x=1698448069; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1697845335; x=1698450135; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:to
          :from:from:to:cc:subject:date:message-id:reply-to;
         bh=XWqBNAeX6A/2t7F/B2+AP6gAdJuZDGSc/q1r/hSrihM=;
-        b=hZESDWyI7S8P7DylkwWad+8+ovJONlcLQTp5SiLasGFZldsy5UwFF/36B/vNSnTyQ3
-         /7PKNuZTMjZ00LLQXVM80I2JzWb84bNirikFk2YTu0CXgCxFiR+fX2+DOLIaqHKoFfOz
-         QPthlJkccLILjikUmDHDLdn4CPWuXo2bKSGcFsL1jodUg/Su620DzW+eMxzGKDA6am06
-         0x0hDo14YoiCD/uEuFDUg2H7Tinq9ABB5yd5/JqmrliQNS2a5YSeZTCaqekIWBNNIxp5
-         PFNtHXqGi91suLybFFPqrbtfQkQcL4jw4DJnfRn857hiw53HV0FCoOuNWzVuvT+0X2ye
-         bYeA==
+        b=ODzzqybhSLqUwLUeSf60vxSglL3tPYdZ3ClrQXnac13D0zG7Fckm4Pbps2Iqg7+v8p
+         L+fH57aBsF1xYE8rm+EGhw/AAeJwFrljtT1uSSB6pMZh80CAe072jnn3ZY/k8em1UXDe
+         s84CMBBHyxFnV5VzlNX1upDiegFyjaN3uXVU0VoZvLBxVN0kF0eOBGjixR+oRc63v+Cx
+         9j/SJyieaF/9r/RN/7AJ4FqEOgyizeS5SFHyNA5R70fh6QcgfuSEMq/LHbJ8gVsEQobz
+         7DmSX8m79ZncR6LjRzzLw9xPj9zwvEsvDsniJAXNv1sb/F9Shw/WM8utipp8WWTek9rJ
+         ERDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697843269; x=1698448069;
+        d=1e100.net; s=20230601; t=1697845335; x=1698450135;
         h=content-transfer-encoding:mime-version:message-id:date:subject:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
         bh=XWqBNAeX6A/2t7F/B2+AP6gAdJuZDGSc/q1r/hSrihM=;
-        b=tlmumsvaPy42bQLwZcoU/D40xH5HvvQYaG0q9HrjaqVwIQCmINE6JQfI9+MHj3JRRI
-         A0c7GoofsENWYCNo+ID4aeU1FI7kl5g7vu8tyVu8xd2FxNaN2fqulMaYiB5O7vnR+JSv
-         Iu4TYZOYo5PbRKKpYsaAOAJ9xXJZUX38jJaNMCBOV/c73SIFctjZYE5oRgo9kt2etDcN
-         jOGegUspPj6AdZBM8jrepjXU90+EKq6DeV1kReo0Atw4dPtjc5n39hugfslh2vrtqrNj
-         SWjKGHjzGCknp1As53+WO9sPDZvg8dvQ019v+6eUTe7kTCA1rhCSUh6TIFaPJrSBf8+K
-         O0GA==
-X-Gm-Message-State: AOJu0YwwmNhW8BpHp79zlRd9t6lC86koid39tLgC/ts00+b6kZKrBv0L
-        krY1GvZr8XGrTuqh5pJ7fKdbGNv6Z24rOoBNDqk=
-X-Google-Smtp-Source: AGHT+IHxDFc5F3/0F4s6acLs6U5fWHJOl0gSUoPfxXzmMiX4jnDmRtxkz3xdPLUDpBFWnsvF0XjGMw==
-X-Received: by 2002:a05:6602:2c52:b0:791:2194:10a3 with SMTP id x18-20020a0566022c5200b00791219410a3mr3767615iov.14.1697843269093;
-        Fri, 20 Oct 2023 16:07:49 -0700 (PDT)
+        b=GS9uEL3olCApLtsCEJ7VjOR+NNgb+abg7QR4OQozWqO7vKRvMRUwV/cmaRzTIDoc7B
+         Angve3y8Cz3/1bFd5JeV4zJ/oe7g3n9uYCnsRH0XY95dOCt5N7WHiWUL5ZbjDWkusayx
+         GX/kkEBQGcF5iUJ0q4wp2/IcLsLpQ/CuOBS0ggAVn1XyCUGRwgtyeHmfkhS4zj/hO0s7
+         xBgsJ82uqxcDZWKABp5xndtiOtNEagzPB1+yAqJkyZJgDZFgPTJ9rCo4e2JKg6bcLM/1
+         hyimxKzhV501zlDQAvAcLISeG+h1pTB534LpfhCQ+1b2YhT0L7il+WvlS4URHvXncFy+
+         qqcQ==
+X-Gm-Message-State: AOJu0Yx1aupdPBEE4fyi74n9ZDvXaMhSqfWMjfSPTIIbgLlygE2RkkcP
+        tiaU03oDaK7RQmYeOfwnz2LQy0iLCPZDiZKzEwU=
+X-Google-Smtp-Source: AGHT+IHmNFO/kpHIxTFWFsleGdgKIY2ypifEmUJJwV7lK2M0SLW/5JBMhjH6wcXeUHdRcJ3+vXtP4Q==
+X-Received: by 2002:a6b:5904:0:b0:7a6:793d:2079 with SMTP id n4-20020a6b5904000000b007a6793d2079mr5780367iob.1.1697845334687;
+        Fri, 20 Oct 2023 16:42:14 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-98-232-221-87.hsd1.or.comcast.net. [98.232.221.87])
-        by smtp.gmail.com with ESMTPSA id a2-20020a5e8e02000000b0079216d6f219sm855785ion.14.2023.10.20.16.07.47
+        by smtp.gmail.com with ESMTPSA id br12-20020a05663846cc00b0043a1483abc9sm796376jab.74.2023.10.20.16.42.13
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Oct 2023 16:07:47 -0700 (PDT)
+        Fri, 20 Oct 2023 16:42:13 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 1/2] shared/bap: Remove Locations, Support Context and Context defines
-Date:   Fri, 20 Oct 2023 16:07:45 -0700
-Message-ID: <20231020230746.3084772-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 1/2] shared/bap: Remove Locations, Support Context and Context defines
+Date:   Fri, 20 Oct 2023 16:42:11 -0700
+Message-ID: <20231020234212.3190403-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
