@@ -2,29 +2,29 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 249BCC001E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Oct 2023 11:34:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92F7FC001E0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Oct 2023 11:42:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234024AbjJWLek (ORCPT
+        id S234284AbjJWLmU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 23 Oct 2023 07:34:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33190 "EHLO
+        Mon, 23 Oct 2023 07:42:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234013AbjJWLej (ORCPT
+        with ESMTP id S234281AbjJWLmS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 23 Oct 2023 07:34:39 -0400
+        Mon, 23 Oct 2023 07:42:18 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08DECE8;
-        Mon, 23 Oct 2023 04:34:37 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 183C7C433CA;
-        Mon, 23 Oct 2023 11:34:36 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D618198D;
+        Mon, 23 Oct 2023 04:41:55 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C5FBC43395;
+        Mon, 23 Oct 2023 11:41:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1698060876;
-        bh=1qN74NTpDOxA+hLJZqeG+tKDrGAFby2kDNk7aaej4aA=;
+        s=korg; t=1698061313;
+        bh=GGRNanOMwehvibyFuWKummVXRCevGq8X/wg5Jadc/cE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=pSmLVWu8/HFdg3Eei7NmE5uSXmFTooJDWPdlE3Fw5D+bVKU9raMzxgMs26bqSe3rD
-         fvWeQIMH4hp/+HHwRwMLpnNe8RdZRNM/QxciVm4o6DojmZYX/h4oMu+QY10646DAi6
-         KSUjgsYDdTFu/Nl9bj2oH/d+Teh/I8wGXKrh8ryU=
+        b=VYszL7YRnvRvAbYjmqfslZdXbgaF6RaMsgxMrQv5Hn/7fv4kOSfr1AEvLrTKn73IY
+         IGrPnmo3htVXF6n+g/zvXHIdNpUnIXCwcqqLwxpaSo/uFI0d0G5I7P7HSg2h0uuP2X
+         9oQyW9EtyvBHVny74qWEvFhlr3VhWXXOyZxCi830=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     stable@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -39,12 +39,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Paolo Abeni <pabeni@redhat.com>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
         Kees Cook <keescook@chromium.org>
-Subject: [PATCH 5.4 122/123] Bluetooth: hci_sock: Correctly bounds check and pad HCI_MON_NEW_INDEX name
-Date:   Mon, 23 Oct 2023 12:58:00 +0200
-Message-ID: <20231023104821.892882185@linuxfoundation.org>
+Subject: [PATCH 5.15 136/137] Bluetooth: hci_sock: Correctly bounds check and pad HCI_MON_NEW_INDEX name
+Date:   Mon, 23 Oct 2023 12:58:13 +0200
+Message-ID: <20231023104825.258229633@linuxfoundation.org>
 X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231023104817.691299567@linuxfoundation.org>
-References: <20231023104817.691299567@linuxfoundation.org>
+In-Reply-To: <20231023104820.849461819@linuxfoundation.org>
+References: <20231023104820.849461819@linuxfoundation.org>
 User-Agent: quilt/0.67
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -54,7 +54,7 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-5.4-stable review patch.  If anyone has any objections, please let me know.
+5.15-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -97,7 +97,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/include/net/bluetooth/hci_mon.h
 +++ b/include/net/bluetooth/hci_mon.h
-@@ -54,7 +54,7 @@ struct hci_mon_new_index {
+@@ -56,7 +56,7 @@ struct hci_mon_new_index {
  	__u8		type;
  	__u8		bus;
  	bdaddr_t	bdaddr;
@@ -108,7 +108,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  
 --- a/net/bluetooth/hci_sock.c
 +++ b/net/bluetooth/hci_sock.c
-@@ -430,7 +430,8 @@ static struct sk_buff *create_monitor_ev
+@@ -438,7 +438,8 @@ static struct sk_buff *create_monitor_ev
  		ni->type = hdev->dev_type;
  		ni->bus = hdev->bus;
  		bacpy(&ni->bdaddr, &hdev->bdaddr);
