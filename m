@@ -2,29 +2,29 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92F7FC001E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Oct 2023 11:42:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6837EC001E0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Oct 2023 11:51:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234284AbjJWLmU (ORCPT
+        id S234618AbjJWLvo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 23 Oct 2023 07:42:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46218 "EHLO
+        Mon, 23 Oct 2023 07:51:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234281AbjJWLmS (ORCPT
+        with ESMTP id S234606AbjJWLvo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 23 Oct 2023 07:42:18 -0400
+        Mon, 23 Oct 2023 07:51:44 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D618198D;
-        Mon, 23 Oct 2023 04:41:55 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C5FBC43395;
-        Mon, 23 Oct 2023 11:41:53 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D825D10F1;
+        Mon, 23 Oct 2023 04:51:37 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 981E7C433C8;
+        Mon, 23 Oct 2023 11:51:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1698061313;
-        bh=GGRNanOMwehvibyFuWKummVXRCevGq8X/wg5Jadc/cE=;
+        s=korg; t=1698061897;
+        bh=xM52sSkaFA0z/TYUcVV4TvzfMFXhRnUHTMwW0mCBX7U=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=VYszL7YRnvRvAbYjmqfslZdXbgaF6RaMsgxMrQv5Hn/7fv4kOSfr1AEvLrTKn73IY
-         IGrPnmo3htVXF6n+g/zvXHIdNpUnIXCwcqqLwxpaSo/uFI0d0G5I7P7HSg2h0uuP2X
-         9oQyW9EtyvBHVny74qWEvFhlr3VhWXXOyZxCi830=
+        b=hfAvDVnQ2DlA40O+IGjAvY5tAX1yl8qMfdnbbl8R8S3TrPVb3Lna/GX4LX3eiIQn/
+         hJ5LT41YAQ4dD636spIafwUqJxqbnlJS2zPU6vBLC/bh0ooPcco0dWtgL0FSlLv2yO
+         VLgh0rf7BRl5+tzqKz1CzT/fSe92S6XtJ+GGpAk8=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     stable@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -39,12 +39,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Paolo Abeni <pabeni@redhat.com>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
         Kees Cook <keescook@chromium.org>
-Subject: [PATCH 5.15 136/137] Bluetooth: hci_sock: Correctly bounds check and pad HCI_MON_NEW_INDEX name
-Date:   Mon, 23 Oct 2023 12:58:13 +0200
-Message-ID: <20231023104825.258229633@linuxfoundation.org>
+Subject: [PATCH 5.10 201/202] Bluetooth: hci_sock: Correctly bounds check and pad HCI_MON_NEW_INDEX name
+Date:   Mon, 23 Oct 2023 12:58:28 +0200
+Message-ID: <20231023104832.286999580@linuxfoundation.org>
 X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231023104820.849461819@linuxfoundation.org>
-References: <20231023104820.849461819@linuxfoundation.org>
+In-Reply-To: <20231023104826.569169691@linuxfoundation.org>
+References: <20231023104826.569169691@linuxfoundation.org>
 User-Agent: quilt/0.67
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -54,7 +54,7 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-5.15-stable review patch.  If anyone has any objections, please let me know.
+5.10-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
