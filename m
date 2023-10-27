@@ -2,128 +2,129 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23FA3C25B47
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Oct 2023 05:54:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B34DC25B47
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Oct 2023 07:29:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229633AbjJ0Fyd (ORCPT
+        id S1345443AbjJ0H3M (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 27 Oct 2023 01:54:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44752 "EHLO
+        Fri, 27 Oct 2023 03:29:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229590AbjJ0Fyc (ORCPT
+        with ESMTP id S1345351AbjJ0H3L (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 27 Oct 2023 01:54:32 -0400
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB2701A7
-        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Oct 2023 22:54:29 -0700 (PDT)
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com [209.85.208.69])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 36E2F3F67E
-        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Oct 2023 05:54:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1698386067;
-        bh=7qt60tzR0dp2LNxB7cAs92LC2Rjy+ydVBOnQqrAetiE=;
-        h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-         MIME-Version;
-        b=hzKx72aedfEh+TteDdC9CG2i8hxtMNkYQ0YT6NdD0/8Qj1GZnuWrgdV6V4EfYtAZ8
-         baxRFSDK6Kanugwsc3tZlCK1bfU8up3cMGfZxas0jQtZAyox07Ir6Wt3TKKFMCsqcd
-         4Hrq6xGn0Dev2WMTpY5qJwQOslWoHAbodgCpZAlbEznqOCk03JkbgOOjM2AExgSbbx
-         32I36l/ysFd7sXqtuZ7R5+Cu3kZtBKC5JhD61sWQg9qK/4uR1m9E03TUAOMJ3mLGKj
-         MQsJeoJ/l55v5ZmH7PLCvTCeGM4dCOwjT7Sfi92GKH8NXqM9FQg6krnCUQFi9wDlc7
-         h4impu98XPAxw==
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-53db0df5b7cso1286900a12.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Oct 2023 22:54:27 -0700 (PDT)
+        Fri, 27 Oct 2023 03:29:11 -0400
+Received: from mail-qk1-x72f.google.com (mail-qk1-x72f.google.com [IPv6:2607:f8b0:4864:20::72f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16AC5192
+        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Oct 2023 00:29:09 -0700 (PDT)
+Received: by mail-qk1-x72f.google.com with SMTP id af79cd13be357-7789a4c01easo135266685a.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Oct 2023 00:29:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698391748; x=1698996548; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=zwcIeM/NENdFh8N3Ybu9IPPxFayGb+rVRQTFKJYqzg8=;
+        b=KEQZhjjWCqQRtIguGV/aCyXOC75VVBbQofhzL6kUiTwvObEd3j1DVMOhoA62p+zXHe
+         dy1Y3OtF/vCJCP3k0alfeXoE43A7AcRgHKYJOQnI78o4DlAy4cWy1GwcgjCLSizwXcR0
+         618QhENO0nko3rRkSt4g6L6u8ORNuEK9hq0x5XGGgogx0Pua34a36DpwXW+TLOhv7PQs
+         6ptf9hKK+uQ45jeZ8GIPQOKuyUmF2ZBnH5t+Du6UOXSzCHW9Pt1z4FRGj1vjIqIJoajX
+         M48FnDV7pEgwKMETXeSvd7kgmRdURvfMv59G7pE9X1UNVsNUmZXdWfvlrkyhU/Y/K4MQ
+         hBtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698386067; x=1698990867;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7qt60tzR0dp2LNxB7cAs92LC2Rjy+ydVBOnQqrAetiE=;
-        b=oSZmfrvk/ZnMdPGiEzccPGPGn3TckYJ+ZrJ3Y+tjx0Vxob6WMWDXginYt84HmnvmcW
-         N1OyZXq+RI8l2lryRu7tdeCImUNH5ARoEZLCKw1ZSERyVo0nCXmxb+g36BDqqaQv8AlM
-         L3ZW+Lu+kghlan/3ofsNzTnON6+uxAHOJHXwxm0lWY/20eVFQs9OgBy4JoYVQopNOYWu
-         hsyTZZij+ucSi2cOa5oZw4ZDnnN4JHVCM0vbFrw6uS8hlCrrQSvUupkf3Bzg5fTA/Z3f
-         CGiDeRdKP705ONaG0IB9oNhtS6jSY5CL3ngq5rxXbs3iMSMhxtxdV+EsuXvnoupnBW0/
-         BtLw==
-X-Gm-Message-State: AOJu0YyLoxnveYvs1LyyhcvtF7vr321BDKILqbYesMuIF2oFtoVE2OgA
-        dLllpnB5+xuqhj+px25jyXFkMoV8+zQXiMX3D7A2cyFXKQ5uoxQD3z7CCP/hGpwD6GB67Cx/Zqq
-        753SObufIblxaFzK8z3DQ8ypKTEFMW8PATDgx83rNTHq37w==
-X-Received: by 2002:a17:907:78b:b0:9b2:ccd8:2d42 with SMTP id xd11-20020a170907078b00b009b2ccd82d42mr1267452ejb.32.1698386066912;
-        Thu, 26 Oct 2023 22:54:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHN5AIZiepHqcrh5VA9kwLckibjl2ZQtuMzUiao5z76/hQIeB4pBsBWds56zKwK5RbjoHC7TQ==
-X-Received: by 2002:a17:907:78b:b0:9b2:ccd8:2d42 with SMTP id xd11-20020a170907078b00b009b2ccd82d42mr1267436ejb.32.1698386066493;
-        Thu, 26 Oct 2023 22:54:26 -0700 (PDT)
-Received: from localhost ([194.191.244.86])
-        by smtp.gmail.com with ESMTPSA id kt12-20020a170906aacc00b009ad8acac02asm636089ejb.172.2023.10.26.22.54.26
+        d=1e100.net; s=20230601; t=1698391748; x=1698996548;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zwcIeM/NENdFh8N3Ybu9IPPxFayGb+rVRQTFKJYqzg8=;
+        b=eLLTuo6xW5znp19ij+jdY5sM8qCpjBx7hC6Se1mPKp5bdHsWImCPeguAvCeAyzRL6r
+         zrE3d7om1yYpDc5k2+hCachMpHg28ArbETqI/eqpJeNYf2SCYdaYwmgth6EbJUSxYrMp
+         kp2KUUNX9xdtetS3YHvD2jgYDoh5PbHQT4HDSRiddW7+xbpYvzyJBUN3JQh8/mwWtype
+         bdW9bniGaAWIyNhdctco+BEtWDTus/0/dwH7CSIl9sgQ+LJrjA/0PjsBeUIlzxbECAFM
+         rIcARQFegEdMj3qlhz95JW6LwcVHLwQE72P03+upMk7qMmLONMzlVI4aRPaUApnTuE6y
+         XfYw==
+X-Gm-Message-State: AOJu0YwbRkulbVesEOij+ACCazZH7UBDSfEwgVFD1FmllbTTFpgq9Lzn
+        TtG8Q5akhI6E0QmE/tc7qg/arxGEhqE=
+X-Google-Smtp-Source: AGHT+IFngPZO5U81eVshbHpCTDrssDO72QYAllKavpev19Aaxi43U+XkfOYPxkKuNIFJafXxvnlXbQ==
+X-Received: by 2002:a05:620a:1aa2:b0:76f:1268:9e26 with SMTP id bl34-20020a05620a1aa200b0076f12689e26mr2009105qkb.24.1698391747848;
+        Fri, 27 Oct 2023 00:29:07 -0700 (PDT)
+Received: from [172.17.0.2] ([20.57.43.171])
+        by smtp.gmail.com with ESMTPSA id p21-20020a05620a057500b0077a02b8b504sm341659qkp.52.2023.10.27.00.29.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Oct 2023 22:54:26 -0700 (PDT)
-From:   Juerg Haefliger <juerg.haefliger@canonical.com>
-To:     juerg.haefliger@canonical.com
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [BlueZ PATCH] shared/shell: Fix --init-script commandline option
-Date:   Fri, 27 Oct 2023 07:54:23 +0200
-Message-Id: <20231027055423.13617-1-juerg.haefliger@canonical.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231026182426.032a776d@gollum>
-References: <20231026182426.032a776d@gollum>
+        Fri, 27 Oct 2023 00:29:07 -0700 (PDT)
+Message-ID: <653b66c3.050a0220.d5d0e.22c2@mx.google.com>
+Date:   Fri, 27 Oct 2023 00:29:07 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7088141712524279297=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, juerg.haefliger@canonical.com
+Subject: RE: [BlueZ] shared/shell: Fix --init-script commandline option
+In-Reply-To: <20231027055423.13617-1-juerg.haefliger@canonical.com>
+References: <20231027055423.13617-1-juerg.haefliger@canonical.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The newly added option -i/--init-script introduced a short option
-namespace collision with btmgmt's --index, both of which use '-i'.
+--===============7088141712524279297==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-As a result, a provided --index is treated as a file name:
+This is automated email and please do not reply to this email!
 
-$ sudo btmgmt --index 0 info
-Unable to open 0: No such file or directory (2)
+Dear submitter,
 
-Fix this by using '-s' for --init-script.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=797007
 
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.75 seconds
+GitLint                       PASS      0.37 seconds
+BuildEll                      PASS      34.28 seconds
+BluezMake                     PASS      998.57 seconds
+MakeCheck                     PASS      13.63 seconds
+MakeDistcheck                 PASS      204.73 seconds
+CheckValgrind                 PASS      320.96 seconds
+CheckSmatch                   WARNING   423.94 seconds
+bluezmakeextell               PASS      141.24 seconds
+IncrementalBuild              PASS      838.70 seconds
+ScanBuild                     PASS      1271.33 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ] shared/shell: Fix --init-script commandline option
+WARNING:UNKNOWN_COMMIT_ID: Unknown commit id 'f2f7c742ad0b', maybe rebased or not pulled?
+#105: 
 Fixes: f2f7c742ad0b ("shared/shell: Add support for -i/--init-script")
-Signed-off-by: Juerg Haefliger <juerg.haefliger@canonical.com>
+
+/github/workspace/src/src/13438114.patch total: 0 errors, 1 warnings, 27 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13438114.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):
+
+
 ---
- src/shared/shell.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/shared/shell.c b/src/shared/shell.c
-index db79c882ca3a..fbccff5b54d9 100644
---- a/src/shared/shell.c
-+++ b/src/shared/shell.c
-@@ -1128,7 +1128,7 @@ static void rl_init(void)
- static const struct option main_options[] = {
- 	{ "version",	no_argument, 0, 'v' },
- 	{ "help",	no_argument, 0, 'h' },
--	{ "init-script", required_argument, 0, 'i' },
-+	{ "init-script", required_argument, 0, 's' },
- 	{ "timeout",	required_argument, 0, 't' },
- 	{ "monitor",	no_argument, 0, 'm' },
- 	{ "zsh-complete",	no_argument, 0, 'z' },
-@@ -1169,9 +1169,9 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
- 	if (opt) {
- 		memcpy(options + offset, opt->options,
- 				sizeof(struct option) * opt->optno);
--		snprintf(optstr, sizeof(optstr), "+mhvi:t:%s", opt->optstr);
-+		snprintf(optstr, sizeof(optstr), "+mhvs:t:%s", opt->optstr);
- 	} else
--		snprintf(optstr, sizeof(optstr), "+mhvi:t:");
-+		snprintf(optstr, sizeof(optstr), "+mhvs:t:");
- 
- 	data.name = strrchr(argv[0], '/');
- 	if (!data.name)
-@@ -1193,7 +1193,7 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
- 			data.argv = &cmplt;
- 			data.mode = 1;
- 			goto done;
--		case 'i':
-+		case 's':
- 			if (optarg)
- 				data.init_fd = open(optarg, O_RDONLY);
- 			if (data.init_fd < 0)
--- 
-2.39.2
 
+--===============7088141712524279297==--
