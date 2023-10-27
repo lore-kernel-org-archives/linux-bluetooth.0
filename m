@@ -2,39 +2,39 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B32BBC27C47
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Oct 2023 08:39:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0572EC25B67
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Oct 2023 08:40:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345609AbjJ0IjH (ORCPT
+        id S1345617AbjJ0Ik2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 27 Oct 2023 04:39:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49452 "EHLO
+        Fri, 27 Oct 2023 04:40:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345597AbjJ0IjC (ORCPT
+        with ESMTP id S235107AbjJ0IkI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 27 Oct 2023 04:39:02 -0400
+        Fri, 27 Oct 2023 04:40:08 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EECD81BF
-        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Oct 2023 01:39:00 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9804EC433A9
-        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Oct 2023 08:39:00 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FA4C172D
+        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Oct 2023 01:40:03 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CA4D6C433C7
+        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Oct 2023 08:40:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1698395940;
-        bh=ol7//XjYgYvbJBUKViX/+r5q3ScbxGW5DccQ1USE/As=;
+        s=k20201202; t=1698396002;
+        bh=N3hKsDV3F+YSe3Mlm7lagXijaDHRFU3DPnaEhX5lM5c=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=ORv1RbCDCZKUmReJPvJHUBwXK7wqIrl5TsULi944QNuksvm+bABzLpZA8zeesndQy
-         eQvnZcJy+wHexx3Dpgx0o1rZ0e/a+SPos57ANUYsneYIISqH4bkMgsVITC/TYe5hpO
-         GWNojmLxb3fSu9n/YsttKX9bSHDBiKvkk52OnmxokFDRWruDhcLny3Lu+h1Cp6L2Wb
-         bHNEOFD3t9LTCnNAONQOGrsUN2iB1pthBYzrkgB9Jqn5bO2/hbMADr8o3Q7UW11E2F
-         hiZNhCUp4e1LFOubEPKiHI//HAjsD2m3znFGW9T0SwCNjD+6IE5GpLecJRWWRK7Mu3
-         U2UDLtiNWUzgw==
+        b=iyxOX1ISOewmyMbf/u5DM0mRyYznv0gkqPnDm6I2j7YXH8TkcTaYe5xfmxR5gbk9z
+         zfgClQUqjR6SXdmB2MPVkxC48wLhIdMk8Z3JQMBpksTVPd/HjCC97/GvP6jAg7hnpv
+         tFL7pGcD7vmDudyG8K16dnnJw7JBQZSu5hskCoQqiUryl5tVxeyBb60CgoVXK0UziZ
+         2TUNwV09Bqd1oCqrgJyT7Ig7dpF9SsRIhVBKwzBD0IcdTVSgAXk9PyE8OTVpfYgIU/
+         o/KVsnikmp4ikepMKPjhoIvywzJw3kdLQYYILncknpjRu8uGwqia/SonVIgAmDUtUC
+         Co7oh29OPvMJA==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 88FC1C53BD3; Fri, 27 Oct 2023 08:39:00 +0000 (UTC)
+        id B5AFEC53BD0; Fri, 27 Oct 2023 08:40:02 +0000 (UTC)
 From:   bugzilla-daemon@kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 80791] "Bluetooth: hci0: ACL packet for unknown connection
  handle" must be hidden behind "debug"
-Date:   Fri, 27 Oct 2023 08:39:00 +0000
+Date:   Fri, 27 Oct 2023 08:40:02 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -50,7 +50,7 @@ X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-80791-62941-JiweH5aJrD@https.bugzilla.kernel.org/>
+Message-ID: <bug-80791-62941-R9RnJrztn6@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-80791-62941@https.bugzilla.kernel.org/>
 References: <bug-80791-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -64,8 +64,11 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D80791
 
---- Comment #9 from Artem S. Tashkinov (aros@gmx.com) ---
-The issue has now been known for close to a decade.
+--- Comment #10 from Artem S. Tashkinov (aros@gmx.com) ---
+Sorry for a flood of messages but I really want this issues to be attended.
+
+Otherwise multiple people have a flood of useless messages in their kernel =
+log.
 
 --=20
 You may reply to this email to add a comment.
