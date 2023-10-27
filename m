@@ -2,147 +2,128 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5B92C25B6E
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Oct 2023 22:02:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23FA3C25B47
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Oct 2023 05:54:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232094AbjJZWCW (ORCPT
+        id S229633AbjJ0Fyd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 26 Oct 2023 18:02:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36588 "EHLO
+        Fri, 27 Oct 2023 01:54:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229668AbjJZWCV (ORCPT
+        with ESMTP id S229590AbjJ0Fyc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 26 Oct 2023 18:02:21 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF647AB;
-        Thu, 26 Oct 2023 15:02:19 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA825C433C8;
-        Thu, 26 Oct 2023 22:02:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1698357739;
-        bh=v+OwCPCkufkei1OkZ0IK7OBnZIyQ/k2CAv18GMp5ECU=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=n78Q8MakmY6S/n69Ux03t5U9WUOopOaUt6nDKsoVSQ7EwfcRn4luVSqYv4gLpBVda
-         DrKIa1h7StitkkRiy4EE1uZV9ATfMIOdG1LH7fry+wsdgg7K0o8FZyDL0K8lk1O1cV
-         t8tCIDdZoIwRLbl3rrSWnJxwraxqaVw/Gir1EFKFtZzjPUiogtA2KbpA/GPnWVFE75
-         vFVT+iMPgWVgs1VDlgs/RGVAxhV9lLfl6E7IGtKj2DkZ2fYHoCBfSJQ4yR5Uj+vsRQ
-         d1R5iC/0IUud8PHKgG7cpchJEmznQsL2QPpfVhJQJ4HgyUhDYk2WkITTtzPLdgWmQ9
-         XkdZf2GExUM1w==
-Date:   Thu, 26 Oct 2023 17:02:16 -0500
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>
-Cc:     "Rafael J . Wysocki" <rafael@kernel.org>,
-        linux-pci@vger.kernel.org,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Rob Herring <robh@kernel.org>,
-        Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
-        Lukas Wunner <lukas@wunner.de>,
-        Heiner Kallweit <hkallweit1@gmail.com>,
-        Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        ath10k@lists.infradead.org, ath11k@lists.infradead.org,
-        ath12k@lists.infradead.org, intel-wired-lan@lists.osuosl.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-bluetooth@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-rdma@vger.kernel.org,
-        linux-wireless@vger.kernel.org, Netdev <netdev@vger.kernel.org>
-Subject: Re: [PATCH v2 03/13] PCI/ASPM: Disable ASPM when driver requests it
-Message-ID: <20231026220216.GA1752508@bhelgaas>
+        Fri, 27 Oct 2023 01:54:32 -0400
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB2701A7
+        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Oct 2023 22:54:29 -0700 (PDT)
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com [209.85.208.69])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 36E2F3F67E
+        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Oct 2023 05:54:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1698386067;
+        bh=7qt60tzR0dp2LNxB7cAs92LC2Rjy+ydVBOnQqrAetiE=;
+        h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+         MIME-Version;
+        b=hzKx72aedfEh+TteDdC9CG2i8hxtMNkYQ0YT6NdD0/8Qj1GZnuWrgdV6V4EfYtAZ8
+         baxRFSDK6Kanugwsc3tZlCK1bfU8up3cMGfZxas0jQtZAyox07Ir6Wt3TKKFMCsqcd
+         4Hrq6xGn0Dev2WMTpY5qJwQOslWoHAbodgCpZAlbEznqOCk03JkbgOOjM2AExgSbbx
+         32I36l/ysFd7sXqtuZ7R5+Cu3kZtBKC5JhD61sWQg9qK/4uR1m9E03TUAOMJ3mLGKj
+         MQsJeoJ/l55v5ZmH7PLCvTCeGM4dCOwjT7Sfi92GKH8NXqM9FQg6krnCUQFi9wDlc7
+         h4impu98XPAxw==
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-53db0df5b7cso1286900a12.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Oct 2023 22:54:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698386067; x=1698990867;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7qt60tzR0dp2LNxB7cAs92LC2Rjy+ydVBOnQqrAetiE=;
+        b=oSZmfrvk/ZnMdPGiEzccPGPGn3TckYJ+ZrJ3Y+tjx0Vxob6WMWDXginYt84HmnvmcW
+         N1OyZXq+RI8l2lryRu7tdeCImUNH5ARoEZLCKw1ZSERyVo0nCXmxb+g36BDqqaQv8AlM
+         L3ZW+Lu+kghlan/3ofsNzTnON6+uxAHOJHXwxm0lWY/20eVFQs9OgBy4JoYVQopNOYWu
+         hsyTZZij+ucSi2cOa5oZw4ZDnnN4JHVCM0vbFrw6uS8hlCrrQSvUupkf3Bzg5fTA/Z3f
+         CGiDeRdKP705ONaG0IB9oNhtS6jSY5CL3ngq5rxXbs3iMSMhxtxdV+EsuXvnoupnBW0/
+         BtLw==
+X-Gm-Message-State: AOJu0YyLoxnveYvs1LyyhcvtF7vr321BDKILqbYesMuIF2oFtoVE2OgA
+        dLllpnB5+xuqhj+px25jyXFkMoV8+zQXiMX3D7A2cyFXKQ5uoxQD3z7CCP/hGpwD6GB67Cx/Zqq
+        753SObufIblxaFzK8z3DQ8ypKTEFMW8PATDgx83rNTHq37w==
+X-Received: by 2002:a17:907:78b:b0:9b2:ccd8:2d42 with SMTP id xd11-20020a170907078b00b009b2ccd82d42mr1267452ejb.32.1698386066912;
+        Thu, 26 Oct 2023 22:54:26 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHN5AIZiepHqcrh5VA9kwLckibjl2ZQtuMzUiao5z76/hQIeB4pBsBWds56zKwK5RbjoHC7TQ==
+X-Received: by 2002:a17:907:78b:b0:9b2:ccd8:2d42 with SMTP id xd11-20020a170907078b00b009b2ccd82d42mr1267436ejb.32.1698386066493;
+        Thu, 26 Oct 2023 22:54:26 -0700 (PDT)
+Received: from localhost ([194.191.244.86])
+        by smtp.gmail.com with ESMTPSA id kt12-20020a170906aacc00b009ad8acac02asm636089ejb.172.2023.10.26.22.54.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Oct 2023 22:54:26 -0700 (PDT)
+From:   Juerg Haefliger <juerg.haefliger@canonical.com>
+To:     juerg.haefliger@canonical.com
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [BlueZ PATCH] shared/shell: Fix --init-script commandline option
+Date:   Fri, 27 Oct 2023 07:54:23 +0200
+Message-Id: <20231027055423.13617-1-juerg.haefliger@canonical.com>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20231026182426.032a776d@gollum>
+References: <20231026182426.032a776d@gollum>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <a434d9f-48ec-cfe5-900-8923361798a9@linux.intel.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Oct 16, 2023 at 05:27:37PM +0300, Ilpo Järvinen wrote:
-> On Fri, 13 Oct 2023, Bjorn Helgaas wrote:
-> > On Thu, Oct 12, 2023 at 01:56:16PM +0300, Ilpo Järvinen wrote:
-> > > On Wed, 11 Oct 2023, Bjorn Helgaas wrote:
-> > > > On Mon, Sep 18, 2023 at 04:10:53PM +0300, Ilpo Järvinen wrote:
-> > > > > PCI core/ASPM service driver allows controlling ASPM state
-> > > > > through pci_disable_link_state() and pci_enable_link_state()
-> > > > > API. It was decided earlier (see the Link below), to not
-> > > > > allow ASPM changes when OS does not have control over it but
-> > > > > only log a warning about the problem (commit 2add0ec14c25
-> > > > > ("PCI/ASPM: Warn when driver asks to disable ASPM, but we
-> > > > > can't do it")). Similarly, if ASPM is not enabled through
-> > > > > config, ASPM cannot be disabled.
-> > > ...
-> > 
-> > > > This disables *all* ASPM states, unlike the version when
-> > > > CONFIG_PCIEASPM is enabled.  I suppose there's a reason, and
-> > > > maybe a comment could elaborate on it?
-> > > >
-> > > > When CONFIG_PCIEASPM is not enabled, I don't think we actively
-> > > > *disable* ASPM in the hardware; we just leave it as-is, so
-> > > > firmware might have left it enabled.
-> > > 
-> > > This whole trickery is intended for drivers that do not want to
-> > > have ASPM because the devices are broken with it. So leaving it
-> > > as-is is not really an option (as demonstrated by the custom
-> > > workarounds).
-> > 
-> > Right.
-> > 
-> > > > Conceptually it seems like the LNKCTL updates here should be
-> > > > the same whether CONFIG_PCIEASPM is enabled or not (subject to
-> > > > the question above).
-> > > > 
-> > > > When CONFIG_PCIEASPM is enabled, we might need to do more
-> > > > stuff, but it seems like the core should be the same.
-> > > 
-> > > So you think it's safer to partially disable ASPM (as per
-> > > driver's request) rather than disable it completely? I got the
-> > > impression that the latter might be safer from what Rafael said
-> > > earlier but I suppose I might have misinterpreted him since he
-> > > didn't exactly say that it might be safer to _completely_
-> > > disable it.
-> > 
-> > My question is whether the state of the device should depend on
-> > CONFIG_PCIEASPM.  If the driver does this:
-> > 
-> >   pci_disable_link_state(PCIE_LINK_STATE_L0S)
-> > 
-> > do we want to leave L1 enabled when CONFIG_PCIEASPM=y but disable L1
-> > when CONFIG_PCIEASPM is unset?
-> > 
-> > I can see arguments both ways.  My thought was that it would be nice
-> > to end up with a single implementation of pci_disable_link_state()
-> > with an #ifdef around the CONFIG_PCIEASPM-enabled stuff because it
-> > makes the code easier to read.
+The newly added option -i/--init-script introduced a short option
+namespace collision with btmgmt's --index, both of which use '-i'.
 
-Responding to myself here, I think we should do the partial disables
-because it matches what the drivers did previously by hand, we can
-reduce the number of code paths, and the resulting device state will
-be the same regardless of CONFIG_PCIEASPM.
+As a result, a provided --index is treated as a file name:
 
-> I think there's still one important thing to discuss and none of the
-> comments have covered that area so far.
-> 
-> The drivers that have workaround are not going to turn more
-> dangerous than they're already without this change, so we're mostly
-> within charted waters there even with what you propose. However, I
-> think the bigger catch and potential source of problems, with both
-> this v2 and your alternative, are the drivers that do not have the
-> workarounds around CONFIG_PCIEASPM=n and/or _OSC permissions. Those
-> code paths just call pci_disable_link_state() and do nothing else.
-> 
-> Do you think it's okay to alter the behavior for those drivers too
-> (disable ASPM where it previously was a no-op)?
+$ sudo btmgmt --index 0 info
+Unable to open 0: No such file or directory (2)
 
-Yes.  I assume the reason those drivers call pci_disable_link_state()
-is because some hardware defect means ASPM doesn't work correctly.
+Fix this by using '-s' for --init-script.
 
-This change means pci_disable_link_state() will disable ASPM even when
-the OS doesn't own ASPM or CONFIG_PCIEASPM is unset.  I think those
-cases are unusual and probably not well tested, and I suspect that if
-we *did* test them, we'd find that ASPM doesn't work with the current
-kernel.
+Fixes: f2f7c742ad0b ("shared/shell: Add support for -i/--init-script")
+Signed-off-by: Juerg Haefliger <juerg.haefliger@canonical.com>
+---
+ src/shared/shell.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-So I think this is more likely to *fix* something than to break it.
+diff --git a/src/shared/shell.c b/src/shared/shell.c
+index db79c882ca3a..fbccff5b54d9 100644
+--- a/src/shared/shell.c
++++ b/src/shared/shell.c
+@@ -1128,7 +1128,7 @@ static void rl_init(void)
+ static const struct option main_options[] = {
+ 	{ "version",	no_argument, 0, 'v' },
+ 	{ "help",	no_argument, 0, 'h' },
+-	{ "init-script", required_argument, 0, 'i' },
++	{ "init-script", required_argument, 0, 's' },
+ 	{ "timeout",	required_argument, 0, 't' },
+ 	{ "monitor",	no_argument, 0, 'm' },
+ 	{ "zsh-complete",	no_argument, 0, 'z' },
+@@ -1169,9 +1169,9 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
+ 	if (opt) {
+ 		memcpy(options + offset, opt->options,
+ 				sizeof(struct option) * opt->optno);
+-		snprintf(optstr, sizeof(optstr), "+mhvi:t:%s", opt->optstr);
++		snprintf(optstr, sizeof(optstr), "+mhvs:t:%s", opt->optstr);
+ 	} else
+-		snprintf(optstr, sizeof(optstr), "+mhvi:t:");
++		snprintf(optstr, sizeof(optstr), "+mhvs:t:");
+ 
+ 	data.name = strrchr(argv[0], '/');
+ 	if (!data.name)
+@@ -1193,7 +1193,7 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
+ 			data.argv = &cmplt;
+ 			data.mode = 1;
+ 			goto done;
+-		case 'i':
++		case 's':
+ 			if (optarg)
+ 				data.init_fd = open(optarg, O_RDONLY);
+ 			if (data.init_fd < 0)
+-- 
+2.39.2
 
-Bjorn
