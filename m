@@ -2,225 +2,235 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 577E5C27C4A
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 28 Oct 2023 14:39:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2A3FC27C49
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 28 Oct 2023 14:39:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229502AbjJ1Ojl (ORCPT
+        id S229495AbjJ1Ojk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 28 Oct 2023 10:39:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45840 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229488AbjJ1Ojk (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
         Sat, 28 Oct 2023 10:39:40 -0400
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [IPv6:2a0b:5c81:1c1::37])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 181EDF0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 28 Oct 2023 07:39:37 -0700 (PDT)
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45838 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229454AbjJ1Ojj (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 28 Oct 2023 10:39:39 -0400
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2FE9EB
+        for <linux-bluetooth@vger.kernel.org>; Sat, 28 Oct 2023 07:39:36 -0700 (PDT)
 Received: from monolith.lan (unknown [185.77.218.2])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
         (Authenticated sender: pav)
-        by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4SHhxy4tWZz49Q4M;
-        Sat, 28 Oct 2023 17:39:34 +0300 (EEST)
+        by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4SHhxx6CdJz49Q1r;
+        Sat, 28 Oct 2023 17:39:30 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
         t=1698503974;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=82Pvx/CWmqLa+M7kmnpR+VTuTlcjdGYixQptc74mRdU=;
-        b=URVJ95tNWCvXW+5ag3BHIuVjQ38pwrWrTq69zgk+2lfHmA7cZu6OUdDPEb8h9O1tj1DpSn
-        Gn+McweMjJGC0ubF/IkpyA4iU0Lvuz1lULVSSJqxvCLjkDSPVS39WI+RjjCyqpcS2FhNyI
-        hxiIUY/4i/gn0u0Vpldvf5iqng0K4SzuLkh6lOWBDf9QyBRhjIIThJ4s6BTO4hlyJWrZ6k
-        eteizI3FiXxKlM5UsLJjN9bPFQdBp7X2GMHrGEQqT71MYz/Np64H3M2ciojWJd1EZja2Hh
-        Gp75YY52GvTqVKRxn6Cpi4MPjF4mqTv5qMUiJZIh3CjhsE/DauVVZnU8C3og/g==
+         content-transfer-encoding:content-transfer-encoding;
+        bh=1JoB0vBQeH9DHZhC/FVS19u5LaJyPeROD0zgzxDh1nc=;
+        b=VCgcUmX3NmqD3k48nTLj4qWDAcNceco61J7KjjKPHupI2vNtwkwordaSjD/eBg8xwRuSfv
+        PIn2BKrhK3KKGdwO5xSS6arBQMgktGqFSZGUPImdQkI8NVT9CGeK3+Bo367lmq+G29W0f+
+        UW3mWdQPx6iX7nW7AKGvgIpC8MLZIr9TM4+XQW8DgbeqcOvmp/3a2GUdx0L0nDEsPlETZX
+        SmxlrI8RHkRJ0y+EKHMS1KkI0SIstMj8JJ8h0oWh54oarHGdOSRSYEWuy0OU9Fk6GjtqRY
+        BZ8Zf2Bz7AdsbW+dedz1GOEGtcaSrgKLGe61Go1wx/rqfLJ1JMHFAEy7QL8r6w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
         s=lahtoruutu; t=1698503974;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=82Pvx/CWmqLa+M7kmnpR+VTuTlcjdGYixQptc74mRdU=;
-        b=Gyu1vecPlH6MXDhmNq7+TzNmkgU1cvlWmFy68KpLOmMsVLyCo86tc1DVPOh9e+0kvTeVVq
-        LJWNvTNj4IwimBUKhYKAFke8Y5kakqvtpOX3Sh/4cwPlrDdBgoZkdmvISqcZCzJ+LCZE3h
-        33HKtRvZsxTIABJ/ndgAGGyH48kQq9hKif7JL/kwe0bx2iYbJesbps1rTQiGioET/hdzIR
-        DCsrZjZjRNeDk02aXiG6rcm7KTI/tesO3JF5cCsw9UuE9uenegj7q/MA0z5TJjN0/mU2sn
-        X6ayVf0+lXOTd3c70E87cW2jX/s+jJVekoNWjhHcHuVywG7KedvQc5LAzlqHsg==
+         content-transfer-encoding:content-transfer-encoding;
+        bh=1JoB0vBQeH9DHZhC/FVS19u5LaJyPeROD0zgzxDh1nc=;
+        b=mu2AZTSS1jd2DazkvUJET3+YorA0AAlqeLaPDOwamZZz5+PEcrg+iNN7AOihQDO48adywT
+        ZVw9nOJl0rctVvKL2aHEFR+RrG8/2dWjvhnwewF+ohsHGKVevLHrr8uNDYIQMSWFbXN83e
+        2tpO1bWogfUov1c2kOMyuGUM0d6/6nUB+fLjaA9W5lS/yY7FaTaG9E9J+cUVPMf61xz1A6
+        T/2kp6wbCa+dJHr9e4jjjqeNErRPPYyB8NVsdEaVIzjgOuqJktu9BamNr2dH+dl+wyM5WO
+        HZaB7d0UzMmxKpCbxIDp+DihIs2md/OMNROsQQEmJOb5KS7LZK+PHgv/wXQRKw==
 ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1698503974; a=rsa-sha256;
         cv=none;
-        b=MsLxW2hjE4ZKUCHNlXciHC7rUSFG8VWp8AH5JvKFqbGeFCzANaYrIB3n9bjXsnNs9OEmQZ
-        dNunanRj8Vr6Pp6VVjzkIzqePYfaDNFkC6UNxt6XqNvUuRoy/BedORcALIfdftkKJ9SO8v
-        ijzWU7wLyVfHUc/4Ix6J2alozVZQQRZN/ZXoUodkCPGcvrDspdieKzcQ2plYN++UYKd/Ll
-        0JirbZ1s7vaG4vL+rmBRQO7xpxtg3F3CnkIBzAoTFhTbev5tHVsikF1tDJOjqzXoN7VSzS
-        4kzjvak4rAtFsCflF6HV6XHCi/BDrSJSFAgTRuCydRoviCXTWz6w8c9+z6VaJA==
+        b=J81bWAh04MB3FaiUU0MybGj18icyzjVrKZONqTFGYqrGjX/gZmE6OYPX+CapMkZhfQwMlp
+        6uv3p70JYWI7HeKPVSUz7EGH5ByFHlk0PeTSWsMDNvXPAp28tqriObH4DJZzN580uKRMFj
+        SwKRj1lhwHp/ZkaX9l3QNNtMoEHKYEZgw0DP82jEhHnSaSodHvAB2MinvSj7vceQ6y+1bA
+        UJFfCXf4E6wkt4Ka3Y08PZXUlij5Y9XnGUIB5+J0U+d3d4oHH+GFQt0faNT2n3KjV0qYqT
+        gQlYbkFzNk4nLZaYH9C3k77VsxPAuK1jWEWTZAKT9k9ZUakLUwvEOZhPiK+pMw==
 ARC-Authentication-Results: i=1;
         ORIGINATING;
         auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 From:   Pauli Virtanen <pav@iki.fi>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 2/4] shared/bap: rename PAC op select -> select_codec, add select_qos
-Date:   Sat, 28 Oct 2023 17:39:27 +0300
-Message-ID: <2cbda517f3818b68bc3e2e44328116e76b9bb3b7.1698503903.git.pav@iki.fi>
+Subject: [PATCH BlueZ 1/4] doc: extend MediaEndpoint1 API with SelectQoS
+Date:   Sat, 28 Oct 2023 17:39:26 +0300
+Message-ID: <6f03ad1eaaa00f84db8cd6a4a4b88ee83078951d.1698503903.git.pav@iki.fi>
 X-Mailer: git-send-email 2.41.0
-In-Reply-To: <6f03ad1eaaa00f84db8cd6a4a4b88ee83078951d.1698503903.git.pav@iki.fi>
-References: <6f03ad1eaaa00f84db8cd6a4a4b88ee83078951d.1698503903.git.pav@iki.fi>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The BAP Unicast Client stream configuration flow has two steps,
-Config Codec and Config QoS.
+Change unicast BAP configuration to proceed as:
 
-Previously both the ASE Codec & QoS configuration was obtained from the
-local PAC via bt_bap_pac_ops.select, but the information what the BAP
-Server supports becomes available only after Config Codec completes
-successfully.  So the single-step configuration doesn't work out
-correctly in the API.
+0. SelectProperties(endpoint)
+1. ASCS Config Codec
+2. ASCS Server notifies ASE
+3. SelectQoS(configuration)  [optional]
+4. ASCS Config QoS
+5. SetConfiguration(transport)
 
-Split out the QoS configuration to a separate PAC operation.
+Previously, SelectProperties had to return also the QoS
+configuration. However, it is impossible for it to provide it properly,
+because the values supported by the server are known only after ASCS
+Config Codec.
 
-Rename "select" to "select_codec", and add select_qos and
-bt_bap_stream_select_qos for the QoS configuration step.
+This resolves the issue by adding a new method call, which is supposed
+to return suitable QoS values.
 
-Also add bt_bap_stream_get_lpac/rpac, which will be needed in the QoS
-configuration callback.
+Remove the QoS input parameter from the SelectProperties() call, as the
+server supported QoS settings may depend on the codec configuration, and
+are not known yet at that point.
+
+For convenience, e.g. when mandatory QoS presets are used, the endpoint
+does not need to implement SelectQoS(). In this case the QoS values
+returned by SelectProperties are used.
 ---
- src/shared/bap.c | 37 ++++++++++++++++++++++++++++++++-----
- src/shared/bap.h | 23 +++++++++++++++++------
- 2 files changed, 49 insertions(+), 11 deletions(-)
 
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 13bbcf793..6155b8640 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -4617,17 +4617,34 @@ static bool match_pac(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
- 	return false;
- }
+Notes:
+    Alternative to this is calling SelectProperties() twice at the
+    two different stages of the ASE setup steps.
+    
+    However, if the second SelectProperties() call returns a different
+    Capabilities configuration, we'd need to either (i) do Config Codec again
+    or (ii) fail the configuration.
+    
+    Doing Config Codec again introduces a chance of getting stuck looping,
+    if client is not behaving correctly, which doesn't sound like good
+    design. Failing the configuration raises question why have the
+    Capabilities as return parameters at all. So instead, make it a separate
+    method.
+    
+    ***
+    
+    If two methods is too much, we could in principle get rid of the
+    SelectProperties() call and leave only SelectQoS.
+    
+    Instead, the sound server would call SetConfiguration() on a remote
+    endpoint it chooses, and provide the configuration parameters there.
+    IIUC, this is how it is supposed to work for BAP Broadcast currently.
+    This might need some sort of "Ready" property on the Device1 DBus object
+    or elsewhere (e.g. the endpoints), so that it's simple for the sound
+    server to wait until all endpoints have been exposed in DBus.
+    
+    This might also be preferable way to do it, since only the component
+    closer to the user i.e. the sound server knows which endpoint the user
+    wanted to use, and when BlueZ guesses wrong it avoids needing to tear
+    down the old configuration and reconfigure (which we have to do for
+    A2DP).
+    
+    ***
+    
+    This series was tested also vs. this
+    https://gitlab.freedesktop.org/pvir/pipewire/-/commits/bap-selectqos
+
+ doc/org.bluez.MediaEndpoint.rst | 66 +++++++++++++++++++++++++++++----
+ 1 file changed, 58 insertions(+), 8 deletions(-)
+
+diff --git a/doc/org.bluez.MediaEndpoint.rst b/doc/org.bluez.MediaEndpoint.rst
+index 6754d6e3b..4ffe6951c 100644
+--- a/doc/org.bluez.MediaEndpoint.rst
++++ b/doc/org.bluez.MediaEndpoint.rst
+@@ -66,6 +66,8 @@ array{byte} SelectConfiguration(array{byte} capabilities)
+ 	Note: There is no need to cache the selected configuration since on
+ 	success the configuration is send back as parameter of SetConfiguration.
  
--int bt_bap_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
--			bt_bap_pac_select_t func, void *user_data)
-+int bt_bap_select_codec(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
-+			bt_bap_pac_select_codec_t func, void *user_data)
- {
- 	if (!lpac || !rpac || !func)
- 		return -EINVAL;
- 
--	if (!lpac->ops || !lpac->ops->select)
-+	if (!lpac->ops || !lpac->ops->select_codec)
- 		return -EOPNOTSUPP;
- 
--	lpac->ops->select(lpac, rpac, &rpac->qos,
--					func, user_data, lpac->user_data);
-+	lpac->ops->select_codec(lpac, rpac, func, user_data, lpac->user_data);
++.. _SelectProperties:
 +
-+	return 0;
-+}
+ dict SelectProperties(dict capabilities)
+ ````````````````````````````````````````
+ 
+@@ -79,8 +81,58 @@ dict SelectProperties(dict capabilities)
+ 
+ 	:uint32 Locations:
+ 
++	See `MediaEndpoint Properties`_ for their possible values.
 +
-+int bt_bap_stream_select_qos(struct bt_bap_stream *stream,
-+				bt_bap_pac_select_qos_t func, void *user_data)
-+{
-+	struct bt_bap_pac *lpac = stream->lpac;
-+	struct bt_bap_pac *rpac = stream->rpac;
++	Returns a configuration which can be used to setup a transport:
 +
-+	if (!lpac || !rpac || !func)
-+		return -EINVAL;
++	:array{byte} Capabilities:
 +
-+	if (!lpac->ops || !lpac->ops->select_qos)
-+		return -EOPNOTSUPP;
++		See **org.bluez.MediaTransport(5)**.
 +
-+	lpac->ops->select_qos(stream, &rpac->qos, func, user_data,
-+							lpac->user_data);
- 
- 	return 0;
- }
-@@ -5124,6 +5141,16 @@ uint32_t bt_bap_stream_get_location(struct bt_bap_stream *stream)
- 		return stream->bap->ldb->pacs->source_loc_value;
- }
- 
-+struct bt_bap_pac *bt_bap_stream_get_lpac(struct bt_bap_stream *stream)
-+{
-+	return stream->lpac;
-+}
++	:array{byte} Metadata [optional]:
 +
-+struct bt_bap_pac *bt_bap_stream_get_rpac(struct bt_bap_stream *stream)
-+{
-+	return stream->rpac;
-+}
++		See **org.bluez.MediaTransport(5)**.
 +
- struct iovec *bt_bap_stream_get_config(struct bt_bap_stream *stream)
- {
- 	if (!stream)
-diff --git a/src/shared/bap.h b/src/shared/bap.h
-index 23edbf4c6..d8fae0ef8 100644
---- a/src/shared/bap.h
-+++ b/src/shared/bap.h
-@@ -104,12 +104,15 @@ typedef void (*bt_bap_pac_func_t)(struct bt_bap_pac *pac, void *user_data);
- typedef bool (*bt_bap_pac_foreach_t)(struct bt_bap_pac *lpac,
- 					struct bt_bap_pac *rpac,
- 					void *user_data);
--typedef void (*bt_bap_pac_select_t)(struct bt_bap_pac *pac, int err,
-+typedef void (*bt_bap_pac_select_codec_t)(struct bt_bap_pac *pac, int err,
- 					struct iovec *caps,
- 					struct iovec *metadata,
- 					struct bt_bap_qos *qos,
- 					void *user_data);
- typedef void (*bt_bap_pac_config_t)(struct bt_bap_stream *stream, int err);
-+typedef void (*bt_bap_pac_select_qos_t)(struct bt_bap_stream *stream,
-+					int err, struct bt_bap_qos *qos,
-+					void *user_data);
- typedef void (*bt_bap_state_func_t)(struct bt_bap_stream *stream,
- 					uint8_t old_state, uint8_t new_state,
- 					void *user_data);
-@@ -150,9 +153,12 @@ struct bt_bap_pac *bt_bap_add_pac(struct gatt_db *db, const char *name,
- 					struct iovec *metadata);
- 
- struct bt_bap_pac_ops {
--	int (*select)(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
--			struct bt_bap_pac_qos *qos,
--			bt_bap_pac_select_t cb, void *cb_data, void *user_data);
-+	int (*select_codec)(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
-+			bt_bap_pac_select_codec_t cb, void *cb_data,
-+			void *user_data);
-+	int (*select_qos)(struct bt_bap_stream *stream,
-+			struct bt_bap_pac_qos *qos, bt_bap_pac_select_qos_t cb,
-+			void *cb_data, void *user_data);
- 	int (*config)(struct bt_bap_stream *stream, struct iovec *cfg,
- 			struct bt_bap_qos *qos, bt_bap_pac_config_t cb,
- 			void *user_data);
-@@ -233,8 +239,8 @@ void bt_bap_pac_set_user_data(struct bt_bap_pac *pac, void *user_data);
- void *bt_bap_pac_get_user_data(struct bt_bap_pac *pac);
- 
- /* Stream related functions */
--int bt_bap_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
--			bt_bap_pac_select_t func, void *user_data);
-+int bt_bap_select_codec(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
-+			bt_bap_pac_select_codec_t func, void *user_data);
- 
- struct bt_bap_stream *bt_bap_stream_new(struct bt_bap *bap,
- 					struct bt_bap_pac *lpac,
-@@ -249,6 +255,9 @@ bool bt_bap_stream_set_user_data(struct bt_bap_stream *stream, void *user_data);
- 
- void *bt_bap_stream_get_user_data(struct bt_bap_stream *stream);
- 
-+int bt_bap_stream_select_qos(struct bt_bap_stream *stream,
-+				bt_bap_pac_select_qos_t func, void *user_data);
++	:dict QoS:
 +
- unsigned int bt_bap_stream_config(struct bt_bap_stream *stream,
- 					struct bt_bap_qos *pqos,
- 					struct iovec *data,
-@@ -293,6 +302,8 @@ uint32_t bt_bap_stream_get_location(struct bt_bap_stream *stream);
- struct iovec *bt_bap_stream_get_config(struct bt_bap_stream *stream);
- struct bt_bap_qos *bt_bap_stream_get_qos(struct bt_bap_stream *stream);
- struct iovec *bt_bap_stream_get_metadata(struct bt_bap_stream *stream);
-+struct bt_bap_pac *bt_bap_stream_get_lpac(struct bt_bap_stream *stream);
-+struct bt_bap_pac *bt_bap_stream_get_rpac(struct bt_bap_stream *stream);
++		See **org.bluez.MediaTransport(5)**.
++
++		The following fields shall be provided:
++
++		:byte TargetLatency:
++		:byte PHY:
++
++		If `SelectQoS`_ is not implemented, then values for
++		all other ``QoS`` fields are also determined by the
++		value returned here.
++
++	Note: There is no need to cache the selected properties since
++	on success the configuration is sent back as parameter of
++	`SetConfiguration`_ and `SelectQoS`_.
++
++.. _SelectQoS:
++
++dict SelectQoS(dict configuration)
++``````````````````````````````````
++
++	Select BAP unicast QoS to be used for a transport, based on
++	server capabilities and selected configuration.
++
++	:object Endpoint:
++
++	:array{byte} Capabilities:
++
++		The configuration, as returned by `SelectProperties`_.
++
++	:array{byte} Metadata [optional]:
++
++		The metadata, as returned by `SelectProperties`_.
++
+ 	:dict QoS:
  
- struct io *bt_bap_stream_get_io(struct bt_bap_stream *stream);
- bool bt_bap_match_bcast_sink_stream(const void *data, const void *user_data);
++		Server endpoint supported and preferred values.	 See
++		`MediaEndpoint Properties`_ for their possible values.
++
+ 		:byte Framing:
+ 		:byte PHY:
+ 		:uint16 MaximumLatency:
+@@ -89,18 +141,16 @@ dict SelectProperties(dict capabilities)
+ 		:uint32 PreferredMinimumDelay:
+ 		:uint32 PreferredMaximumDelay:
+ 
+-	See `MediaEndpoint Properties`_ for their possible values.
++	Returns a QoS configuration which can be used to setup a transport:
+ 
+-	Returns a configuration which can be used to setup a transport:
+-
+-	:array{byte} Capabilities:
+-	:array{byte} Metadata [optional]:
+ 	:dict QoS:
+ 
+-	See `SetConfiguration`_ for their possible values.
++		See **org.bluez.MediaTransport(5)** QoS property for
++		possible values.
+ 
+-	Note: There is no need to cache the selected properties since on
+-	success the configuration is send back as parameter of SetConfiguration.
++	Note: There is no need to cache the selected properties since
++	on success the configuration is sent back as parameter of
++	`SetConfiguration`_.
+ 
+ void ClearConfiguration(object transport)
+ `````````````````````````````````````````
 -- 
 2.41.0
 
