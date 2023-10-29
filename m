@@ -2,32 +2,32 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 883D9C41535
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 29 Oct 2023 23:17:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 015DBC4167B
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 29 Oct 2023 23:29:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231706AbjJ2XRl (ORCPT
+        id S232572AbjJ2X36 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 29 Oct 2023 19:17:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41062 "EHLO
+        Sun, 29 Oct 2023 19:29:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231508AbjJ2XRi (ORCPT
+        with ESMTP id S232559AbjJ2X30 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 29 Oct 2023 19:17:38 -0400
+        Sun, 29 Oct 2023 19:29:26 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 236D619153;
-        Sun, 29 Oct 2023 16:07:46 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 655A5C433CA;
-        Sun, 29 Oct 2023 23:01:43 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F3111727;
+        Sun, 29 Oct 2023 15:58:51 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACB11C43391;
+        Sun, 29 Oct 2023 22:58:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1698620504;
-        bh=jAUW7p1MYSZRKSld5HtOEGEEaR1c1hM/uM9tAKtX1Xw=;
+        s=k20201202; t=1698620284;
+        bh=qdO2V/6MvSUkqzBNZ9PUsvs75hWWdohJSvt4Lk0haqk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=PnuKP2IYtuRZzW9JAkQU7RbO49SsweeLSvNf/TTjKPX3iwD1QL1Gj5wcgz1UlTavl
-         MYItPPsbF6FAbBLEZVgOfdrWoybSJEXm50jZ411e4TK6CAMw4a2vM44lmMFV0JSzF7
-         J0X4c22OWAAgpSq/SbbGz3q3Yauf2AFpVYSrxKl0YIMgAOv8kMAidKO5cJYoxJI00i
-         B0f02loysnB9UnsV97O87zRAvdm/kNb4udFg4BEIrXnJs3b9TVpVmjELPqunOMJbuS
-         UusyLgrfE3ZeIhbTMj7tVUeN6v/ZA/fmJpXXeNd2gtPcQyqHkT52MxRhh/UUu03S7R
-         kFuRgdlLHCYfQ==
+        b=Xzv7zIItPq08lCtttDWbDA2W6ZdnCFiC4o0dU3vcM4RTWlgoqVPS/QzuzSDcH9521
+         sIEMNbJvc9dglnp25egBvCChYd7X5V/0G6LrLQzjmQhh6dJ7/tVIU0jkrpkr/p44bQ
+         5+uTZQNK/4g2kgQpAG9BDrgx57S3E8RFmGR5hxZ/g726PKNNryllrzW748SrCJ9SGp
+         4rhE0OdgsSarLeHXbqPGnuE15ze5i83R2B+kKze/59LdBy4DhoUDe21AItjZZs/zwp
+         ywpOhOQ1UrAkmiTqvlkZI74H5Y3m+BmRfws1hTyBO9Ap4xKnklXBVOqvmFmThp+l36
+         GTgVqT6/g3drQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>,
@@ -35,16 +35,16 @@ Cc:     Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>,
         Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
         johan.hedberg@gmail.com, luiz.dentz@gmail.com,
         linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 04/12] Bluetooth: vhci: Fix race when opening vhci device
-Date:   Sun, 29 Oct 2023 19:01:17 -0400
-Message-ID: <20231029230135.793281-4-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 17/39] Bluetooth: vhci: Fix race when opening vhci device
+Date:   Sun, 29 Oct 2023 18:56:49 -0400
+Message-ID: <20231029225740.790936-17-sashal@kernel.org>
 X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231029230135.793281-1-sashal@kernel.org>
-References: <20231029230135.793281-1-sashal@kernel.org>
+In-Reply-To: <20231029225740.790936-1-sashal@kernel.org>
+References: <20231029225740.790936-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 4.19.297
+X-stable-base: Linux 6.1.60
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -84,10 +84,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 3 insertions(+)
 
 diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
-index 22f9145a426fd..29d8b5896d6e4 100644
+index c443c3b0a4da5..4415d850d698b 100644
 --- a/drivers/bluetooth/hci_vhci.c
 +++ b/drivers/bluetooth/hci_vhci.c
-@@ -82,7 +82,10 @@ static int vhci_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -74,7 +74,10 @@ static int vhci_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
  	struct vhci_data *data = hci_get_drvdata(hdev);
  
  	memcpy(skb_push(skb, 1), &hci_skb_pkt_type(skb), 1);
