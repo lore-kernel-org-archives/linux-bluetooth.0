@@ -2,531 +2,323 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49970C00144
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Oct 2023 20:35:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59FA0C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Oct 2023 22:13:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230010AbjJ3Ufx (ORCPT
+        id S229776AbjJ3WNC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 30 Oct 2023 16:35:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58178 "EHLO
+        Mon, 30 Oct 2023 18:13:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231267AbjJ3Ufw (ORCPT
+        with ESMTP id S229682AbjJ3WNB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 30 Oct 2023 16:35:52 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3201FFF;
-        Mon, 30 Oct 2023 13:35:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698698147; x=1730234147;
-  h=date:from:to:cc:subject:message-id;
-  bh=J6IDuqW9c7NxU08fkaG/SOxz6ZaN37AGqfF/SrOEJdw=;
-  b=S84n5H8b0vid54Purfwrze0gAi8D/oNWvktAWjVdG4Urh3p/bamL+5O9
-   lZtDkbNlalbBBUvyY8ixWF0HgBvBk8g7nq80mCIaWqkjI36cuKR6LA+Q3
-   oG1T8dQW89rbYDBCqSWT+JkKWqlAYuvd54P0AuaN3moa0LVllSYU3Nk6H
-   y50KrlnfURHnzAFhHdpHckCiRqdc44HDydFHDwxvT1JZ86eN3e4ag4TUT
-   nvYX2Arzp0StmbqmBN7T0id+r4OwrZgyedUefIIMmf2g4ECMrUsEBuZW0
-   R/1M3C3wcjw2BXABeJk/LpPjYVQHw256hr8t9ZB2A8HT0GR88v9IAOQNK
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10879"; a="387978763"
-X-IronPort-AV: E=Sophos;i="6.03,264,1694761200"; 
-   d="scan'208";a="387978763"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2023 13:35:46 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10879"; a="830792546"
-X-IronPort-AV: E=Sophos;i="6.03,264,1694761200"; 
-   d="scan'208";a="830792546"
-Received: from lkp-server01.sh.intel.com (HELO 8917679a5d3e) ([10.239.97.150])
-  by fmsmga004.fm.intel.com with ESMTP; 30 Oct 2023 13:35:41 -0700
-Received: from kbuild by 8917679a5d3e with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qxYz4-000DY2-0T;
-        Mon, 30 Oct 2023 20:35:38 +0000
-Date:   Tue, 31 Oct 2023 04:35:23 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     Linux Memory Management List <linux-mm@kvack.org>,
-        amd-gfx@lists.freedesktop.org, bpf@vger.kernel.org,
-        coresight@lists.linaro.org, intel-gfx@lists.freedesktop.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-bluetooth@vger.kernel.org, linux-cxl@vger.kernel.org,
-        linux-gpio@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-renesas-soc@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-sh@vger.kernel.org, linux-sparse@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev,
-        netdev@vger.kernel.org, sparclinux@vger.kernel.org
-Subject: [linux-next:master] BUILD REGRESSION
- c503e3eec382ac708ee7adf874add37b77c5d312
-Message-ID: <202310310457.5LusQqF6-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+        Mon, 30 Oct 2023 18:13:01 -0400
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [IPv6:2a0b:5c81:1c1::37])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C45DCBD
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Oct 2023 15:12:58 -0700 (PDT)
+Received: from [192.168.1.195] (unknown [IPv6:2a0c:f040:0:2790::a01d])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pav@iki.fi)
+        by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4SK6w65VLlz49Q2k;
+        Tue, 31 Oct 2023 00:12:51 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+        t=1698703975;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=HAY+2R+nb0uhJrJgdOVDS2Hn1DR1bg6g5XTFOpx7jCI=;
+        b=dChe/xLg0iR0ggQpQWNURT74myChqodrSyPom8RdfEmsyPh0iBsEjXYlsva8lvoIS4iIS9
+        3F9NAmUO/AbO4gkqXG5wxJwpDCzcsPLSSgjuelgZwRakDYFDha9CrhqcWeV/YEeKMMoOpu
+        PazUAYyi6WSY52bu1b9WDFK3TaDHkWop/iTUKMLEQ3A+bKcPndSp9Dj2dRdovSuwIZWldW
+        E3oW7kAC+MTyvM1u/bV0iY5Cr9JT7X0XwpRcnim9eJUEP75jPWRS10ZTx55Fb997FGtCLK
+        I/VXJbKplsbCsOVZmeUclX+4tYKodYy7EsasRNLbylGa/9Wv8yy6GnHqPcSfFQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+        s=lahtoruutu; t=1698703975;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=HAY+2R+nb0uhJrJgdOVDS2Hn1DR1bg6g5XTFOpx7jCI=;
+        b=T16OHUiro4hguBAg7cSsk98XIgBVIB1wz7+F250iocDkVCiaBpJS9rtN5qCzi4LgGAV0G1
+        jZTZjXEX//b/ijT9mKCirVfdp9M0evHJwvMNDGoiVD3WjU6wxcSgH8IHcNbOWGvckqgy+e
+        dj92U3sEC53RYgs7Fqz3AYJ2CNCxJhg9f5FHlRYKkv4cszl5A3Uxdccqcc/bu5O2pSWW1j
+        zl5prgvzjB9mH9DP3xFtlOXkyyhij9fVWQPHgB6JseZ725Sk378VmNujALroKYp/iGqTRN
+        QMl8pTMdnE7y2Xmj521UNMqe6wlWn4eIfVfx7uF0anH7g8CMTcDYr9h0yj1x7Q==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1698703975; a=rsa-sha256;
+        cv=none;
+        b=DbTSrs5OxXms9gxrFFtodLwjuLhfkPrCbHkcZlDzwJKC/8wRjKhEneL1Op+kHQj5rIiAu3
+        atAm3OjEvs1WlIq9t96jAxc8PGU3xD2GPRzxY4qMXgUhhyp0u1HoFYSZeKGV76XxzQG5Wj
+        K3wACCIqgxcotr3ps36ePHZs2Tq7+z3UwdJgal9o9zSCh3KWurqFO9KtJ0vboqicfW4dCj
+        2sB7hhBkDFmE0/Y06FgGNIWt/nNAKcAmLwENBikvIbNHTt2FrlZEOFU3n3tAh1LM5zg0By
+        0+jM8Tk2ZGeiOWEvM7Dj6julWeiKE6mYYAxT9atiQuN9WgpzJGiISW1wMH9QUw==
+ARC-Authentication-Results: i=1;
+        ORIGINATING;
+        auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+Message-ID: <96560beaf696de7c21e70b9bf6cd53bdcc29f29f.camel@iki.fi>
+Subject: Re: [PATCH 1/1] Bluetooth: ISO: Reassociate a socket with an active
+ BIS
+From:   Pauli Virtanen <pav@iki.fi>
+To:     Iulia Tanasescu <iulia.tanasescu@nxp.com>,
+        linux-bluetooth@vger.kernel.org
+Date:   Tue, 31 Oct 2023 00:12:49 +0200
+In-Reply-To: <20231030154318.4339-2-iulia.tanasescu@nxp.com>
+References: <20231030154318.4339-1-iulia.tanasescu@nxp.com>
+         <20231030154318.4339-2-iulia.tanasescu@nxp.com>
+Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
+ keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.0 (3.50.0-1.fc39) 
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-branch HEAD: c503e3eec382ac708ee7adf874add37b77c5d312  Add linux-next specific files for 20231030
+Hi,
 
-Error/Warning reports:
+ma, 2023-10-30 kello 17:43 +0200, Iulia Tanasescu kirjoitti:
+> For ISO Broadcast, all BISes from a BIG have the same lifespan - they
+> cannot be created or terminated independently from each other.
+>
+> This links together all BIS hcons that are part of the same BIG, so all
+> hcons are kept alive as long as the BIG is active.
+>=20
+> If multiple BIS sockets are opened for a BIG handle, and only part of
+> them are closed at some point, the associated hcons will be marked as
+> open. If new sockets will later be opened for the same BIG, they will
+> be reassociated with the open BIS hcons.
 
-https://lore.kernel.org/oe-kbuild-all/202310052201.AnVbpgPr-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202310121157.aRky475m-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202310171905.azfrKoID-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202310261059.USL6VstF-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202310302025.Pokm9vEs-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202310302043.as36UFED-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202310302206.Pkr5eBDi-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202310302338.MpPQAr10-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202310310055.RDWloNPr-lkp@intel.com
+Can you explain here a bit the new BIS hci_conn refcounting scheme,
+it's not straightforward to follow? Who owns their refcounts?
 
-Error/Warning: (recently discovered and may have been fixed)
+>=20
+> All BIS hcons will be cleaned up and the BIG will be terminated when
+> the last BIS socket is closed from userspace.
+>=20
+> Signed-off-by: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+> ---
+>  include/net/bluetooth/hci_core.h | 24 +++++++++++++
+>  net/bluetooth/hci_conn.c         | 27 ++++++++++++++
+>  net/bluetooth/iso.c              | 60 ++++++++++++++++++++++++++++++++
+>  3 files changed, 111 insertions(+)
+>=20
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci=
+_core.h
+> index 20988623c5cc..201c0809540a 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -1292,6 +1292,30 @@ static inline struct hci_conn *hci_conn_hash_looku=
+p_big(struct hci_dev *hdev,
+>  	return NULL;
+>  }
+> =20
+> +static inline struct hci_conn *
+> +hci_conn_hash_lookup_big_state(struct hci_dev *hdev, __u8 handle,  __u16=
+ state)
+> +{
+> +	struct hci_conn_hash *h =3D &hdev->conn_hash;
+> +	struct hci_conn  *c;
+> +
+> +	rcu_read_lock();
+> +
+> +	list_for_each_entry_rcu(c, &h->list, list) {
+> +		if (bacmp(&c->dst, BDADDR_ANY) || c->type !=3D ISO_LINK ||
+> +			c->state !=3D state)
+> +			continue;
+> +
+> +		if (handle =3D=3D c->iso_qos.bcast.big) {
+> +			rcu_read_unlock();
+> +			return c;
+> +		}
+> +	}
+> +
+> +	rcu_read_unlock();
+> +
+> +	return NULL;
+> +}
+> +
+>  static inline struct hci_conn *
+>  hci_conn_hash_lookup_pa_sync_big_handle(struct hci_dev *hdev, __u8 big)
+>  {
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index 2cee330188ce..b8ab5c0cd48e 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -2228,7 +2228,17 @@ struct hci_conn *hci_bind_bis(struct hci_dev *hdev=
+, bdaddr_t *dst,
+>  			      __u8 base_len, __u8 *base)
+>  {
+>  	struct hci_conn *conn;
+> +	struct hci_conn *parent;
+>  	__u8 eir[HCI_MAX_PER_AD_LENGTH];
+> +	struct hci_link *link;
+> +
+> +	/* Look for any BIS that is open for rebinding */
+> +	conn =3D hci_conn_hash_lookup_big_state(hdev, qos->bcast.big, BT_OPEN);
+> +	if (conn) {
+> +		memcpy(qos, &conn->iso_qos, sizeof(*qos));
+> +		conn->state =3D BT_CONNECTED;
+> +		return conn;
+> +	}
+> =20
+>  	if (base_len && base)
+>  		base_len =3D eir_append_service_data(eir, 0,  0x1851,
+> @@ -2256,6 +2266,20 @@ struct hci_conn *hci_bind_bis(struct hci_dev *hdev=
+, bdaddr_t *dst,
+>  	conn->iso_qos =3D *qos;
+>  	conn->state =3D BT_BOUND;
+> =20
+> +	/* Link BISes together */
+> +	parent =3D hci_conn_hash_lookup_big(hdev,
+> +					  conn->iso_qos.bcast.big);
+> +	if (parent && parent !=3D conn) {
+> +		link =3D hci_conn_link(parent, conn);
+> +		if (!link) {
+> +			hci_conn_drop(conn);
+> +			return ERR_PTR(-ENOLINK);
+> +		}
+> +
+> +		/* Link takes the refcount */
+> +		hci_conn_drop(conn);
+> +	}
 
-Warning: MAINTAINERS references a file that doesn't exist: Documentation/devicetree/bindings/iio/imu/bosch,bma400.yaml
-aarch64-linux-ld: drivers/cxl/core/pci.c:921:(.text+0xbbc): undefined reference to `pci_print_aer'
-arch/loongarch/kvm/mmu.c:411:6: warning: no previous prototype for 'kvm_unmap_gfn_range' [-Wmissing-prototypes]
-arch/loongarch/kvm/mmu.c:420:48: error: invalid use of undefined type 'struct kvm_gfn_range'
-arch/loongarch/kvm/mmu.c:422:1: error: control reaches end of non-void function [-Werror=return-type]
-arch/loongarch/kvm/mmu.c:424:6: warning: no previous prototype for 'kvm_set_spte_gfn' [-Wmissing-prototypes]
-arch/loongarch/kvm/mmu.c:456:6: warning: no previous prototype for 'kvm_age_gfn' [-Wmissing-prototypes]
-arch/loongarch/kvm/mmu.c:468:6: warning: no previous prototype for 'kvm_test_age_gfn' [-Wmissing-prototypes]
-arch/loongarch/kvm/mmu.c:787:24: error: 'struct kvm' has no member named 'mmu_invalidate_seq'; did you mean 'mn_invalidate_lock'?
-arch/loongarch/kvm/mmu.c:810:13: error: implicit declaration of function 'mmu_invalidate_retry_hva' [-Werror=implicit-function-declaration]
-arch/riscv/include/asm/mmio.h:67:(.text+0xd66): undefined reference to `pci_print_aer'
-csky-linux-ld: pci.c:(.text+0x6e8): undefined reference to `pci_print_aer'
-drivers/cxl/core/pci.c:921: undefined reference to `pci_print_aer'
-drivers/cxl/core/pci.c:921:(.text+0xbc0): undefined reference to `pci_print_aer'
-drivers/gpu/drm/amd/amdgpu/../display/dc/clk_mgr/dcn35/dcn35_clk_mgr.c:1105 dcn35_clk_mgr_construct() warn: variable dereferenced before check 'ctx->dc_bios' (see line 1032)
-drivers/gpu/drm/amd/amdgpu/../display/dc/clk_mgr/dcn35/dcn35_clk_mgr.c:1105 dcn35_clk_mgr_construct() warn: variable dereferenced before check 'ctx->dc_bios->integrated_info' (see line 1032)
-drivers/gpu/drm/amd/amdgpu/../pm/swsmu/smu13/smu_v13_0_6_ppt.c:286:45: warning: '%s' directive output may be truncated writing up to 29 bytes into a region of size 23 [-Wformat-truncation=]
-drivers/gpu/drm/amd/amdgpu/../pm/swsmu/smu13/smu_v13_0_6_ppt.c:286:52: warning: '%s' directive output may be truncated writing up to 29 bytes into a region of size 23 [-Wformat-truncation=]
-drivers/gpu/drm/amd/amdgpu/../pm/swsmu/smu14/smu_v14_0.c:72:45: warning: '%s' directive output may be truncated writing up to 29 bytes into a region of size 23 [-Wformat-truncation=]
-drivers/gpu/drm/amd/amdgpu/../pm/swsmu/smu14/smu_v14_0.c:72:52: warning: '%s' directive output may be truncated writing up to 29 bytes into a region of size 23 [-Wformat-truncation=]
-drivers/hwtracing/coresight/coresight-etm4x-core.c:1183:24: warning: result of comparison of constant 256 with expression of type 'u8' (aka 'unsigned char') is always false [-Wtautological-constant-out-of-range-compare]
-include/linux/atomic/atomic-arch-fallback.h:384:27: error: implicit declaration of function 'arch_cmpxchg_local'; did you mean 'raw_cmpxchg_local'? [-Werror=implicit-function-declaration]
-include/linux/compiler.h:212:29: error: pasting "__addressable_" and "(" does not give a valid preprocessing token
-include/linux/export.h:47:9: error: pasting "__export_symbol_" and "(" does not give a valid preprocessing token
-include/linux/stddef.h:8:15: error: expected declaration specifiers or '...' before '(' token
-include/linux/stddef.h:8:16: error: expected identifier or '(' before 'void'
-include/linux/stddef.h:8:23: error: expected ')' before numeric constant
-include/linux/stddef.h:8:24: error: pasting ")" and "218" does not give a valid preprocessing token
-kernel/bpf/task_iter.c:917:29: error: use of undeclared identifier 'CSS_TASK_ITER_THREADED'
-kernel/bpf/task_iter.c:917:7: error: use of undeclared identifier 'CSS_TASK_ITER_PROCS'
-kernel/bpf/task_iter.c:919:14: error: 'CSS_TASK_ITER_PROCS' undeclared (first use in this function)
-kernel/bpf/task_iter.c:919:36: error: 'CSS_TASK_ITER_THREADED' undeclared (first use in this function)
-kernel/bpf/task_iter.c:925:46: error: invalid application of 'sizeof' to an incomplete type 'struct css_task_iter'
-kernel/bpf/task_iter.c:927:60: error: invalid application of 'sizeof' to incomplete type 'struct css_task_iter'
-kernel/bpf/task_iter.c:928:2: error: call to undeclared function 'css_task_iter_start'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-kernel/bpf/task_iter.c:930:9: error: implicit declaration of function 'css_task_iter_start'; did you mean 'task_seq_start'? [-Werror=implicit-function-declaration]
-kernel/bpf/task_iter.c:938:9: error: call to undeclared function 'css_task_iter_next'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-kernel/bpf/task_iter.c:938:9: error: incompatible integer to pointer conversion returning 'int' from a function with result type 'struct task_struct *' [-Wint-conversion]
-kernel/bpf/task_iter.c:940:16: error: implicit declaration of function 'css_task_iter_next'; did you mean 'class_dev_iter_next'? [-Werror=implicit-function-declaration]
-kernel/bpf/task_iter.c:947:2: error: call to undeclared function 'css_task_iter_end'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-kernel/bpf/task_iter.c:949:9: error: implicit declaration of function 'css_task_iter_end' [-Werror=implicit-function-declaration]
-ld: drivers/cxl/core/pci.c:921: undefined reference to `pci_print_aer'
-loongarch64-linux-ld: drivers/cxl/core/pci.c:921:(.text+0xa38): undefined reference to `pci_print_aer'
-pci.c:(.text+0x662): undefined reference to `pci_print_aer'
-powerpc-linux-ld: pci.c:(.text+0xf10): undefined reference to `pci_print_aer'
-riscv64-linux-ld: pci.c:(.text+0x11ec): undefined reference to `pci_print_aer'
+So the first hci_conn added in a BIG is assigned as "parent". How does
+the refcounting here work?
 
-Unverified Error/Warning (likely false positive, please contact us if interested):
+hci_conn_link takes refcount of the parent (cf. hci_conn_unlink), but
+it's not incremented here so I guess it may go negative.
 
-drivers/pci/controller/dwc/pcie-rcar-gen4.c:439:15: warning: cast to smaller integer type 'enum dw_pcie_device_mode' from 'const void *' [-Wvoid-pointer-to-enum-cast]
-net/bluetooth/hci_event.c:3274 hci_conn_request_evt() warn: variable dereferenced before check 'hdev' (see line 3264)
+hci_conn_unlink does not drop child connections, and they're not
+dropped by the socket closing below unless last, so I'm not sure if
+they are then cleaned up if closing sockets in any order.
 
-Error/Warning ids grouped by kconfigs:
+This change will also expose BIS hci_conns to hci_conn_cleanup_child,
+which was written only for unicast, and might not be right for the use
+case here.
 
-gcc_recent_errors
-|-- alpha-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- alpha-buildonly-randconfig-r002-20220223
-|   `-- include-linux-compiler_types.h:error:expression-in-static-assertion-is-not-an-integer
-|-- arc-randconfig-001-20231030
-|   `-- include-linux-atomic-atomic-arch-fallback.h:error:implicit-declaration-of-function-arch_cmpxchg_local
-|-- arc-randconfig-r043-20211006
-|   |-- include-linux-compiler_types.h:error:call-to-__compiletime_assert_NNN-declared-with-attribute-error:BUILD_BUG_ON-failed:
-|   `-- include-linux-compiler_types.h:error:call-to-__compiletime_assert_NNN-declared-with-attribute-error:BUILD_BUG_ON-failed:(PTRS_PER_PTE-sizeof(pte_t))-PAGE_SIZE
-|-- arm-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- arm-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- arm64-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- arm64-buildonly-randconfig-r003-20220511
-|   `-- aarch64-linux-ld:drivers-cxl-core-pci.c:(.text):undefined-reference-to-pci_print_aer
-|-- csky-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- csky-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- csky-randconfig-001-20231030
-|   |-- csky-linux-ld:pci.c:(.text):undefined-reference-to-pci_print_aer
-|   `-- pci.c:(.text):undefined-reference-to-pci_print_aer
-|-- csky-randconfig-002-20231030
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- csky-randconfig-r034-20230910
-|   `-- standard-input:Error:The-instruction-is-not-recognized.
-|-- i386-randconfig-141-20231030
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-clk_mgr-dcn35-dcn35_clk_mgr.c-dcn35_clk_mgr_construct()-warn:variable-dereferenced-before-check-ctx-dc_bios-(see-line-)
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-clk_mgr-dcn35-dcn35_clk_mgr.c-dcn35_clk_mgr_construct()-warn:variable-dereferenced-before-check-ctx-dc_bios-integrated_info-(see-line-)
-|   |-- drivers-gpu-drm-i915-display-intel_dsb.c-_intel_dsb_commit()-warn:always-true-condition-(dewake_scanline-)-(-u32max-)
-|   |-- ld:drivers-cxl-core-pci.c:undefined-reference-to-pci_print_aer
-|   `-- net-bluetooth-hci_event.c-hci_conn_request_evt()-warn:variable-dereferenced-before-check-hdev-(see-line-)
-|-- loongarch-allmodconfig
-|   |-- arch-loongarch-kvm-mmu.c:error:control-reaches-end-of-non-void-function
-|   |-- arch-loongarch-kvm-mmu.c:error:implicit-declaration-of-function-mmu_invalidate_retry_hva
-|   |-- arch-loongarch-kvm-mmu.c:error:invalid-use-of-undefined-type-struct-kvm_gfn_range
-|   |-- arch-loongarch-kvm-mmu.c:error:struct-kvm-has-no-member-named-mmu_invalidate_seq
-|   |-- arch-loongarch-kvm-mmu.c:warning:no-previous-prototype-for-kvm_age_gfn
-|   |-- arch-loongarch-kvm-mmu.c:warning:no-previous-prototype-for-kvm_set_spte_gfn
-|   |-- arch-loongarch-kvm-mmu.c:warning:no-previous-prototype-for-kvm_test_age_gfn
-|   |-- arch-loongarch-kvm-mmu.c:warning:no-previous-prototype-for-kvm_unmap_gfn_range
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- loongarch-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- loongarch-defconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- loongarch-randconfig-002-20231030
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- loongarch-randconfig-r014-20230225
-|   `-- drivers-cxl-core-pci.c:(.text):undefined-reference-to-pci_print_aer
-|-- loongarch-randconfig-r032-20220926
-|   `-- loongarch64-linux-ld:drivers-cxl-core-pci.c:(.text):undefined-reference-to-pci_print_aer
-|-- m68k-defconfig
-|   `-- kernel-bpf-task_iter.c:error:CSS_TASK_ITER_PROCS-undeclared-(first-use-in-this-function)
-|-- microblaze-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- microblaze-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- openrisc-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- openrisc-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- parisc-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- parisc-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- powerpc-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- powerpc-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- powerpc-buildonly-randconfig-r006-20221105
-|   |-- arch-powerpc-sysdev-udbg_memcons.c:error:no-previous-prototype-for-memcons_getc
-|   |-- arch-powerpc-sysdev-udbg_memcons.c:error:no-previous-prototype-for-memcons_getc_poll
-|   `-- arch-powerpc-sysdev-udbg_memcons.c:error:no-previous-prototype-for-memcons_putc
-|-- powerpc-randconfig-002-20231030
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- powerpc-randconfig-003-20231016
-|   `-- powerpc-linux-ld:pci.c:(.text):undefined-reference-to-pci_print_aer
-|-- powerpc64-buildonly-randconfig-r001-20220430
-|   |-- arch-powerpc-kernel-rtas_pci.c:error:no-previous-prototype-for-rtas_read_config
-|   `-- arch-powerpc-kernel-rtas_pci.c:error:no-previous-prototype-for-rtas_write_config
-|-- powerpc64-randconfig-003-20231030
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- powerpc64-randconfig-r001-20230910
-|   `-- ERROR:start_text-address-is-c000000000000d00-should-be-c000000000000200
-|-- riscv-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- riscv-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- riscv-randconfig-002-20231030
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- riscv-randconfig-r002-20220124
-|   `-- arch-riscv-include-asm-mmio.h:(.text):undefined-reference-to-pci_print_aer
-|-- riscv-randconfig-r011-20220606
-|   `-- riscv64-linux-ld:pci.c:(.text):undefined-reference-to-pci_print_aer
-|-- s390-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- s390-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- s390-randconfig-002-20231030
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- sh-randconfig-r022-20220318
-|   `-- standard-input:Error:offset-to-unaligned-destination
-|-- sh-randconfig-r023-20211018
-|   |-- standard-input:Warning:overflow-in-branch-to-.L63-converted-into-longer-instruction-sequence
-|   `-- standard-input:Warning:overflow-in-branch-to-.L72-converted-into-longer-instruction-sequence
-|-- sh-randconfig-r023-20221113
-|   |-- arch-sh-mm-cache-sh4.c:error:cached_to_uncached-undeclared-(first-use-in-this-function)
-|   |-- arch-sh-mm-cache-sh4.c:error:implicit-declaration-of-function-cpu_context
-|   |-- arch-sh-mm-cache-sh4.c:error:implicit-declaration-of-function-pmd_off
-|   `-- arch-sh-mm-cache-sh4.c:error:implicit-declaration-of-function-pte_offset_kernel
-|-- sparc-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- sparc-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- sparc-randconfig-002-20231030
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- sparc64-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- sparc64-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- sparc64-randconfig-002-20231030
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- sparc64-randconfig-r006-20230130
-|   `-- include-linux-compiler_types.h:error:call-to-__compiletime_assert_NNN-declared-with-attribute-error:BUILD_BUG_ON-failed:SECTIONS_WIDTH-NODES_WIDTH-ZONES_WIDTH-ilog2(roundup_pow_of_two(NR_CPUS))
-|-- sparc64-randconfig-r011-20230520
-|   `-- arch-sparc-mm-init_64.c:error:variable-pagecv_flag-set-but-not-used
-|-- sparc64-randconfig-r024-20220211
-|   |-- arch-sparc-kernel-adi_64.c:error:no-previous-prototype-for-alloc_tag_store
-|   |-- arch-sparc-kernel-adi_64.c:error:no-previous-prototype-for-find_tag_store
-|   |-- arch-sparc-kernel-module.c:error:variable-strtab-set-but-not-used
-|   |-- arch-sparc-kernel-pci_sun4v.c:error:no-previous-prototype-for-dma_4v_iotsb_bind
-|   `-- arch-sparc-kernel-traps_64.c:error:no-previous-prototype-for-trap_init
-|-- um-randconfig-r016-20230729
-|   `-- bin-sh::gcc:not-found
-|-- x86_64-allnoconfig
-|   `-- Warning:MAINTAINERS-references-a-file-that-doesn-t-exist:Documentation-devicetree-bindings-iio-imu-bosch-bma400.yaml
-|-- x86_64-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- x86_64-buildonly-randconfig-001-20231030
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- x86_64-buildonly-randconfig-003-20231030
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- x86_64-buildonly-randconfig-006-20231030
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- x86_64-randconfig-001-20231030
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- x86_64-randconfig-003-20231030
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- x86_64-randconfig-004-20231030
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- x86_64-randconfig-071-20231030
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- x86_64-randconfig-161-20231030
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- drivers-gpu-drm-i915-display-intel_dsb.c-_intel_dsb_commit()-warn:always-true-condition-(dewake_scanline-)-(-u32max-)
-|   |-- net-bluetooth-hci_event.c-hci_conn_request_evt()-warn:variable-dereferenced-before-check-hdev-(see-line-)
-|   `-- net-ipv4-tcp_ao.c-tcp_ao_del_cmd()-error:memcmp()-key-addr-too-small-(-vs-)
-|-- x86_64-randconfig-x052-20230810
-|   `-- drivers-cxl-core-pci.c:undefined-reference-to-pci_print_aer
-|-- xtensa-randconfig-001-20231030
-|   |-- kernel-bpf-task_iter.c:error:CSS_TASK_ITER_THREADED-undeclared-(first-use-in-this-function)
-|   |-- kernel-bpf-task_iter.c:error:implicit-declaration-of-function-css_task_iter_end
-|   |-- kernel-bpf-task_iter.c:error:implicit-declaration-of-function-css_task_iter_next
-|   |-- kernel-bpf-task_iter.c:error:implicit-declaration-of-function-css_task_iter_start
-|   `-- kernel-bpf-task_iter.c:error:invalid-application-of-sizeof-to-incomplete-type-struct-css_task_iter
-|-- xtensa-randconfig-r015-20221109
-|   |-- include-linux-compiler.h:error:pasting-__addressable_-and-(-does-not-give-a-valid-preprocessing-token
-|   |-- include-linux-export.h:error:pasting-__export_symbol_-and-(-does-not-give-a-valid-preprocessing-token
-|   |-- include-linux-stddef.h:error:expected-)-before-numeric-constant
-|   |-- include-linux-stddef.h:error:expected-declaration-specifiers-or-...-before-(-token
-|   |-- include-linux-stddef.h:error:expected-identifier-or-(-before-void
-|   `-- include-linux-stddef.h:error:pasting-)-and-does-not-give-a-valid-preprocessing-token
-`-- xtensa-randconfig-r133-20230821
-    |-- drivers-gpio-gpio-xtensa.c:Error:unknown-opcode-or-format-name-read_impwire
-    |-- drivers-gpio-gpio-xtensa.c:Error:unknown-opcode-or-format-name-rur.expstate
-    `-- drivers-gpio-gpio-xtensa.c:Error:unknown-opcode-or-format-name-wrmsk_expstate
-clang_recent_errors
-|-- arm64-allmodconfig
-|   `-- drivers-hwtracing-coresight-coresight-etm4x-core.c:warning:result-of-comparison-of-constant-with-expression-of-type-u8-(aka-unsigned-char-)-is-always-false
-|-- hexagon-randconfig-r045-20221230
-|   |-- kernel-bpf-task_iter.c:error:call-to-undeclared-function-css_task_iter_end-ISO-C99-and-later-do-not-support-implicit-function-declarations
-|   |-- kernel-bpf-task_iter.c:error:call-to-undeclared-function-css_task_iter_next-ISO-C99-and-later-do-not-support-implicit-function-declarations
-|   |-- kernel-bpf-task_iter.c:error:call-to-undeclared-function-css_task_iter_start-ISO-C99-and-later-do-not-support-implicit-function-declarations
-|   |-- kernel-bpf-task_iter.c:error:incompatible-integer-to-pointer-conversion-returning-int-from-a-function-with-result-type-struct-task_struct
-|   |-- kernel-bpf-task_iter.c:error:invalid-application-of-sizeof-to-an-incomplete-type-struct-css_task_iter
-|   |-- kernel-bpf-task_iter.c:error:use-of-undeclared-identifier-CSS_TASK_ITER_PROCS
-|   |-- kernel-bpf-task_iter.c:error:use-of-undeclared-identifier-CSS_TASK_ITER_THREADED
-|   `-- lib-objpool.c:error:call-to-undeclared-function-arch_cmpxchg_local-ISO-C99-and-later-do-not-support-implicit-function-declarations
-`-- powerpc64-allmodconfig
-    `-- drivers-pci-controller-dwc-pcie-rcar-gen4.c:warning:cast-to-smaller-integer-type-enum-dw_pcie_device_mode-from-const-void
+> +
+>  	return conn;
+>  }
+> =20
+> @@ -2287,6 +2311,9 @@ struct hci_conn *hci_connect_bis(struct hci_dev *hd=
+ev, bdaddr_t *dst,
+>  	if (IS_ERR(conn))
+>  		return conn;
+> =20
+> +	if (conn->state =3D=3D BT_CONNECTED)
+> +		return conn;
+> +
+>  	data.big =3D qos->bcast.big;
+>  	data.bis =3D qos->bcast.bis;
+> =20
+> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+> index e01b6abe36fb..13353d7dc4b1 100644
+> --- a/net/bluetooth/iso.c
+> +++ b/net/bluetooth/iso.c
+> @@ -587,6 +587,44 @@ static struct sock *iso_get_sock_listen(bdaddr_t *sr=
+c, bdaddr_t *dst,
+>  	return sk ? sk : sk1;
+>  }
+> =20
+> +static struct sock *iso_get_sock_big(struct sock *match_sk, bdaddr_t *sr=
+c,
+> +				     bdaddr_t *dst, uint8_t big)
+> +{
+> +	struct sock *sk =3D NULL;
+> +
+> +	read_lock(&iso_sk_list.lock);
+> +
+> +	sk_for_each(sk, &iso_sk_list.head) {
+> +		if (match_sk =3D=3D sk)
+> +			continue;
+> +
+> +		/* Look for sockets that have already been
+> +		 * connected to the BIG
+> +		 */
+> +		if (sk->sk_state !=3D BT_CONNECTED &&
+> +		    sk->sk_state !=3D BT_CONNECT)
+> +			continue;
+> +
+> +		/* Match Broadcast destination */
+> +		if (bacmp(&iso_pi(sk)->dst, dst))
+> +			continue;
+> +
+> +		/* Match BIG handle */
+> +		if (iso_pi(sk)->qos.bcast.big !=3D big)
+> +			continue;
+> +
+> +		/* Match source address */
+> +		if (bacmp(&iso_pi(sk)->src, src))
+> +			continue;
+> +
+> +		break;
+> +	}
+> +
+> +	read_unlock(&iso_sk_list.lock);
+> +
+> +	return sk;
 
-elapsed time: 823m
+What keeps sk alive?
 
-configs tested: 148
-configs skipped: 2
+This pattern is used also in iso_get_sock_listen, but I don't
+understand why it's OK. In unix/ & netrom/ & ax25/ I see sock_hold
+before lock release in similar constructs.
 
-tested configs:
-alpha                             allnoconfig   gcc  
-alpha                            allyesconfig   gcc  
-alpha                               defconfig   gcc  
-arc                              allmodconfig   gcc  
-arc                               allnoconfig   gcc  
-arc                              allyesconfig   gcc  
-arc                                 defconfig   gcc  
-arc                   randconfig-001-20231030   gcc  
-arm                              allmodconfig   gcc  
-arm                               allnoconfig   gcc  
-arm                              allyesconfig   gcc  
-arm                       aspeed_g4_defconfig   clang
-arm                                 defconfig   gcc  
-arm                            dove_defconfig   clang
-arm                         orion5x_defconfig   clang
-arm                   randconfig-001-20231030   gcc  
-arm                         wpcm450_defconfig   gcc  
-arm64                            allmodconfig   gcc  
-arm64                             allnoconfig   gcc  
-arm64                            allyesconfig   gcc  
-arm64                               defconfig   gcc  
-csky                             allmodconfig   gcc  
-csky                              allnoconfig   gcc  
-csky                             allyesconfig   gcc  
-csky                                defconfig   gcc  
-i386                             allmodconfig   gcc  
-i386                              allnoconfig   gcc  
-i386                             allyesconfig   gcc  
-i386         buildonly-randconfig-001-20231030   gcc  
-i386         buildonly-randconfig-002-20231030   gcc  
-i386         buildonly-randconfig-003-20231030   gcc  
-i386         buildonly-randconfig-005-20231030   gcc  
-i386                              debian-10.3   gcc  
-i386                                defconfig   gcc  
-i386                  randconfig-001-20231030   gcc  
-i386                  randconfig-002-20231030   gcc  
-i386                  randconfig-003-20231030   gcc  
-i386                  randconfig-004-20231030   gcc  
-i386                  randconfig-005-20231030   gcc  
-i386                  randconfig-006-20231030   gcc  
-i386                  randconfig-011-20231030   gcc  
-i386                  randconfig-012-20231030   gcc  
-i386                  randconfig-013-20231030   gcc  
-i386                  randconfig-014-20231030   gcc  
-i386                  randconfig-015-20231030   gcc  
-i386                  randconfig-016-20231030   gcc  
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch                        allyesconfig   gcc  
-loongarch                           defconfig   gcc  
-loongarch             randconfig-001-20231030   gcc  
-m68k                             allmodconfig   gcc  
-m68k                              allnoconfig   gcc  
-m68k                             allyesconfig   gcc  
-m68k                                defconfig   gcc  
-m68k                        mvme16x_defconfig   gcc  
-microblaze                       allmodconfig   gcc  
-microblaze                        allnoconfig   gcc  
-microblaze                       allyesconfig   gcc  
-microblaze                          defconfig   gcc  
-mips                             allmodconfig   gcc  
-mips                              allnoconfig   gcc  
-mips                             allyesconfig   gcc  
-mips                     cu1000-neo_defconfig   clang
-mips                        qi_lb60_defconfig   clang
-mips                          rm200_defconfig   clang
-nios2                            allmodconfig   gcc  
-nios2                             allnoconfig   gcc  
-nios2                            allyesconfig   gcc  
-nios2                               defconfig   gcc  
-openrisc                         allmodconfig   gcc  
-openrisc                          allnoconfig   gcc  
-openrisc                         allyesconfig   gcc  
-openrisc                            defconfig   gcc  
-parisc                           allmodconfig   gcc  
-parisc                            allnoconfig   gcc  
-parisc                           allyesconfig   gcc  
-parisc                              defconfig   gcc  
-parisc64                            defconfig   gcc  
-powerpc                          allmodconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc                          allyesconfig   gcc  
-powerpc                   bluestone_defconfig   clang
-powerpc                   currituck_defconfig   gcc  
-powerpc                  storcenter_defconfig   gcc  
-powerpc                         wii_defconfig   gcc  
-riscv                            allmodconfig   gcc  
-riscv                             allnoconfig   gcc  
-riscv                            allyesconfig   gcc  
-riscv                               defconfig   gcc  
-riscv                 randconfig-001-20231030   gcc  
-riscv                          rv32_defconfig   gcc  
-s390                             allmodconfig   gcc  
-s390                              allnoconfig   gcc  
-s390                             allyesconfig   gcc  
-s390                                defconfig   gcc  
-s390                  randconfig-001-20231030   gcc  
-sh                               allmodconfig   gcc  
-sh                                allnoconfig   gcc  
-sh                               allyesconfig   gcc  
-sh                                  defconfig   gcc  
-sh                            hp6xx_defconfig   gcc  
-sh                          polaris_defconfig   gcc  
-sparc                            allmodconfig   gcc  
-sparc                             allnoconfig   gcc  
-sparc                            allyesconfig   gcc  
-sparc                               defconfig   gcc  
-sparc                 randconfig-001-20231030   gcc  
-sparc                       sparc64_defconfig   gcc  
-sparc64                          allmodconfig   gcc  
-sparc64                          allyesconfig   gcc  
-sparc64                             defconfig   gcc  
-um                               allmodconfig   clang
-um                                allnoconfig   clang
-um                               allyesconfig   clang
-um                                  defconfig   gcc  
-um                             i386_defconfig   gcc  
-um                           x86_64_defconfig   gcc  
-x86_64                            allnoconfig   gcc  
-x86_64                           allyesconfig   gcc  
-x86_64       buildonly-randconfig-001-20231030   gcc  
-x86_64       buildonly-randconfig-002-20231030   gcc  
-x86_64       buildonly-randconfig-003-20231030   gcc  
-x86_64       buildonly-randconfig-004-20231030   gcc  
-x86_64       buildonly-randconfig-005-20231030   gcc  
-x86_64       buildonly-randconfig-006-20231030   gcc  
-x86_64                              defconfig   gcc  
-x86_64                randconfig-001-20231030   gcc  
-x86_64                randconfig-002-20231030   gcc  
-x86_64                randconfig-003-20231030   gcc  
-x86_64                randconfig-004-20231030   gcc  
-x86_64                randconfig-005-20231030   gcc  
-x86_64                randconfig-006-20231030   gcc  
-x86_64                randconfig-011-20231030   gcc  
-x86_64                randconfig-012-20231030   gcc  
-x86_64                randconfig-013-20231030   gcc  
-x86_64                randconfig-014-20231030   gcc  
-x86_64                randconfig-015-20231030   gcc  
-x86_64                randconfig-016-20231030   gcc  
-x86_64                randconfig-071-20231030   gcc  
-x86_64                randconfig-072-20231030   gcc  
-x86_64                randconfig-073-20231030   gcc  
-x86_64                randconfig-074-20231030   gcc  
-x86_64                randconfig-075-20231030   gcc  
-x86_64                randconfig-076-20231030   gcc  
-x86_64                          rhel-8.3-rust   clang
-x86_64                               rhel-8.3   gcc  
-xtensa                generic_kc705_defconfig   gcc  
+> +}
+> +
+>  static void iso_sock_destruct(struct sock *sk)
+>  {
+>  	BT_DBG("sk %p", sk);
+> @@ -639,6 +677,28 @@ static void iso_sock_kill(struct sock *sk)
+> =20
+>  static void iso_sock_disconn(struct sock *sk)
+>  {
+> +	struct sock *bis_sk;
+> +	struct hci_conn *hcon =3D iso_pi(sk)->conn->hcon;
+> +
+> +	if (test_bit(HCI_CONN_BIG_CREATED, &hcon->flags)) {
+> +		bis_sk =3D iso_get_sock_big(sk, &iso_pi(sk)->src,
+> +					  &iso_pi(sk)->dst,
+> +					  iso_pi(sk)->qos.bcast.big);
+> +
+> +		/* If there are any other connected sockets for the
+> +		 * same BIG, just delete the sk and leave the bis
+> +		 * hcon active, in case later rebinding is needed.
+> +		 */
+> +		if (bis_sk) {
+> +			hcon->state =3D BT_OPEN;
+> +			iso_pi(sk)->conn->hcon =3D NULL;
+> +			release_sock(sk);
+> +			iso_conn_del(hcon, bt_to_errno(hcon->abort_reason));
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+iso_conn_del must be called with hdev->lock held, that's assumed in
+iso_connect*.
+
+Locks must be taken in order hci_dev_lock > lock_sock > iso_conn_lock.
+
+Could this use iso_chan_del instead (plus maybe iso_sock_clear_timer)?
+Lifetime of iso_conn currently follows hcon, not sure if that needs to
+be changed?
+
+> +			lock_sock(sk);
+> +			return;
+> +		}
+> +	}
+> +
+>  	sk->sk_state =3D BT_DISCONN;
+>  	iso_sock_set_timer(sk, ISO_DISCONN_TIMEOUT);
+>  	iso_conn_lock(iso_pi(sk)->conn);
+
+Not related to this patch precisely, but I suspect the disconnect
+timeout is something that is not useful for ISO sockets and maybe we
+should remove it, since closing sockets is used for CIG/BIG management.
+
+--=20
+Pauli Virtanen
