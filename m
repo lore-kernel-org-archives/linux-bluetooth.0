@@ -2,102 +2,132 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEADEC41535
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 29 Oct 2023 23:35:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C466C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Oct 2023 06:53:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231289AbjJ2Xfy (ORCPT
+        id S231783AbjJ3Gxs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 29 Oct 2023 19:35:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35208 "EHLO
+        Mon, 30 Oct 2023 02:53:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232005AbjJ2XEF (ORCPT
+        with ESMTP id S231638AbjJ3Gxr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 29 Oct 2023 19:04:05 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 022007DA0;
-        Sun, 29 Oct 2023 16:02:19 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77D3CC116C8;
-        Sun, 29 Oct 2023 23:00:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1698620425;
-        bh=kmYEwctVNjlIao9AFHKGbKqV/mzm7hbC9f6dmckWLcc=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=jXBp474wQHKtTmmrRHeJOyA1yPap+Qhu13ortTNqE8y6qW6/wHBl8NNLBcY3R2Psq
-         SwSfDqj3EcpkQxovbCTi6YrfINasiMD9/IVD4wBX6s9OoOu8KLPwS0AlQmzEQxMSBj
-         +3Jzee0VfvHVv0E4oC4XkblPOokg8zwNvsqgbHLbf2ExDITm7p7VtmVUp+JICN1LmN
-         UQeRQ5nrCZUxqa8aqc27HFjeh3ZcGiizFO4YBZ/aZRuUa4aZjfmk7WFZZGVfp4Eq5s
-         H0ow+RiMor3GHmnS8hm5Cw9sHv9c6866oVF/CDejl0FvfMfqc2trVte9ro82q+Tl1J
-         6gM09Hcb7Llbg==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 06/16] Bluetooth: vhci: Fix race when opening vhci device
-Date:   Sun, 29 Oct 2023 18:59:52 -0400
-Message-ID: <20231029230014.792490-6-sashal@kernel.org>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231029230014.792490-1-sashal@kernel.org>
-References: <20231029230014.792490-1-sashal@kernel.org>
+        Mon, 30 Oct 2023 02:53:47 -0400
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20746AB
+        for <linux-bluetooth@vger.kernel.org>; Sun, 29 Oct 2023 23:53:45 -0700 (PDT)
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 196903F697
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Oct 2023 06:53:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1698648823;
+        bh=eIfjSyNTcNCMdu0BwcyBXoOOLvKerxJ6fISDsi512yM=;
+        h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+         MIME-Version;
+        b=Gx8mlgIsEUtET7GuDAQnrig6EQ6G8F+71Drju+T9MqNBBcxfqKpj2IMaWs5MuUeQD
+         zz1mRCwa4qUAEAf8Owe7MuO5f2c5ipAhXVN0NZMKFLUIv75TZIXPjT4JL0ftyX2ZSK
+         FoIYPfqxtk+Qk3tHajcxyzci3cq/nm71RGnkWnZ3RiZgtu8rOMz9948n99ELAf/VuG
+         vVTyy2Gmw8PqmZ83QuHKp85RFk+Mk4V3x+9rVG4fXzoZIck4CEj7/NrbvCIM88lzEg
+         Efr8mEp+t80qDDRjORX80tLtFe5vGJYcRG9e8usFz3bfkTWDcf9c7fXClGj6FN79OA
+         NhQTmQjeOys5g==
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-32f820c471fso631920f8f.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 29 Oct 2023 23:53:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698648822; x=1699253622;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eIfjSyNTcNCMdu0BwcyBXoOOLvKerxJ6fISDsi512yM=;
+        b=rSwCYwDIcwWdeprjdgnz0ob39QEVQynzqAnWViURGxMT5aSbzs3HdwvYFuNRbav5yi
+         eg5N1NVe09exV1elNb4Oo4xTDnUT5kN4ghvOzp2XCR6JQgFFwUcODeqD5ZsvhRo7D1zP
+         k+uC770pFaRXVPM9nuYC9s89g4YXYWYt1f+cIkb/2qg1zntlZmXhEdTN2FJTS3V0wb3Q
+         bBI7oveZEcCkQeYPYD3vElGp9UqKPC3ooAcQcJtWerrjDyWLKWkZa6unC18ALwPKzuL0
+         yVvva/QQf0AVEu7fMU5QdR5MDU0AM/dFsFMQ8HWXQU/mJL+JZgtDLFz6+wfAi6DgeI7R
+         /Azw==
+X-Gm-Message-State: AOJu0YyC5nURRm2MvzqSrgP6SOxP0SbT7nOq3kZlGiEFh5bxySszViUS
+        Bi4Jj4o2/Nee27L8iXe+YHcEX+WlDWO1aIgZdUQK10utxWOkOFXFV6vBFpd5IDfLfwSp29XTApH
+        CUkA8I549k4B9Lh5UkWsZB1GzBdusn60xGvqpn5J6YbVRSQ==
+X-Received: by 2002:adf:ec52:0:b0:32d:a405:b6b7 with SMTP id w18-20020adfec52000000b0032da405b6b7mr6933823wrn.32.1698648822810;
+        Sun, 29 Oct 2023 23:53:42 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHXlzd/q4bBQzJ6m7Xy9RrP/K4ZyD+qeNLrX98/G8cV0lDzvp2vx1eJIG04Pjh44/7w8FtIGw==
+X-Received: by 2002:adf:ec52:0:b0:32d:a405:b6b7 with SMTP id w18-20020adfec52000000b0032da405b6b7mr6933814wrn.32.1698648822517;
+        Sun, 29 Oct 2023 23:53:42 -0700 (PDT)
+Received: from localhost ([194.191.244.86])
+        by smtp.gmail.com with ESMTPSA id w16-20020adfcd10000000b0032da75af3easm7463377wrm.80.2023.10.29.23.53.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 29 Oct 2023 23:53:42 -0700 (PDT)
+From:   Juerg Haefliger <juerg.haefliger@canonical.com>
+To:     juerg.haefliger@canonical.com
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] shared/shell: Fix --init-script commandline option
+Date:   Mon, 30 Oct 2023 07:53:41 +0100
+Message-Id: <20231030065341.8998-1-juerg.haefliger@canonical.com>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20231027055423.13617-1-juerg.haefliger@canonical.com>
+References: <20231027055423.13617-1-juerg.haefliger@canonical.com>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.10.199
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+The newly added option -i/--init-script introduced a short option
+namespace collision with btmgmt's --index, both of which use '-i'.
 
-[ Upstream commit 92d4abd66f7080075793970fc8f241239e58a9e7 ]
+As a result, a provided --index is treated as a file name:
 
-When the vhci device is opened in the two-step way, i.e.: open device
-then write a vendor packet with requested controller type, the device
-shall respond with a vendor packet which includes HCI index of created
-interface.
+$ sudo btmgmt --index 0 info
+Unable to open 0: No such file or directory (2)
 
-When the virtual HCI is created, the host sends a reset request to the
-controller. This request is processed by the vhci_send_frame() function.
-However, this request is send by a different thread, so it might happen
-that this HCI request will be received before the vendor response is
-queued in the read queue. This results in the HCI vendor response and
-HCI reset request inversion in the read queue which leads to improper
-behavior of btvirt:
+Fix this by using '-s' for --init-script.
 
-> dmesg
-[1754256.640122] Bluetooth: MGMT ver 1.22
-[1754263.023806] Bluetooth: MGMT ver 1.22
-[1754265.043775] Bluetooth: hci1: Opcode 0x c03 failed: -110
+Fixes: https://github.com/bluez/bluez/issues/639
+Signed-off-by: Juerg Haefliger <juerg.haefliger@canonical.com>
 
-In order to synchronize vhci two-step open/setup process with virtual
-HCI initialization, this patch adds internal lock when queuing data in
-the vhci_send_frame() function.
-
-Signed-off-by: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/hci_vhci.c | 3 +++
- 1 file changed, 3 insertions(+)
+v2:
+  - Replace reference to broken commit with reference to github issue.
+---
+ src/shared/shell.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
-index 8469f9876dd26..31d70bad83d29 100644
---- a/drivers/bluetooth/hci_vhci.c
-+++ b/drivers/bluetooth/hci_vhci.c
-@@ -67,7 +67,10 @@ static int vhci_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
- 	struct vhci_data *data = hci_get_drvdata(hdev);
+diff --git a/src/shared/shell.c b/src/shared/shell.c
+index db79c882ca3a..fbccff5b54d9 100644
+--- a/src/shared/shell.c
++++ b/src/shared/shell.c
+@@ -1128,7 +1128,7 @@ static void rl_init(void)
+ static const struct option main_options[] = {
+ 	{ "version",	no_argument, 0, 'v' },
+ 	{ "help",	no_argument, 0, 'h' },
+-	{ "init-script", required_argument, 0, 'i' },
++	{ "init-script", required_argument, 0, 's' },
+ 	{ "timeout",	required_argument, 0, 't' },
+ 	{ "monitor",	no_argument, 0, 'm' },
+ 	{ "zsh-complete",	no_argument, 0, 'z' },
+@@ -1169,9 +1169,9 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
+ 	if (opt) {
+ 		memcpy(options + offset, opt->options,
+ 				sizeof(struct option) * opt->optno);
+-		snprintf(optstr, sizeof(optstr), "+mhvi:t:%s", opt->optstr);
++		snprintf(optstr, sizeof(optstr), "+mhvs:t:%s", opt->optstr);
+ 	} else
+-		snprintf(optstr, sizeof(optstr), "+mhvi:t:");
++		snprintf(optstr, sizeof(optstr), "+mhvs:t:");
  
- 	memcpy(skb_push(skb, 1), &hci_skb_pkt_type(skb), 1);
-+
-+	mutex_lock(&data->open_mutex);
- 	skb_queue_tail(&data->readq, skb);
-+	mutex_unlock(&data->open_mutex);
- 
- 	wake_up_interruptible(&data->read_wait);
- 	return 0;
+ 	data.name = strrchr(argv[0], '/');
+ 	if (!data.name)
+@@ -1193,7 +1193,7 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
+ 			data.argv = &cmplt;
+ 			data.mode = 1;
+ 			goto done;
+-		case 'i':
++		case 's':
+ 			if (optarg)
+ 				data.init_fd = open(optarg, O_RDONLY);
+ 			if (data.init_fd < 0)
 -- 
-2.42.0
+2.39.2
 
