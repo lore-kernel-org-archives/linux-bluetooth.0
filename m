@@ -2,173 +2,268 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F6C1C4167D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Oct 2023 12:10:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07C72C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Oct 2023 12:18:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344118AbjJaMKz (ORCPT
+        id S1344192AbjJaMSc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 31 Oct 2023 08:10:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50756 "EHLO
+        Tue, 31 Oct 2023 08:18:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344223AbjJaMKh (ORCPT
+        with ESMTP id S1344121AbjJaMSb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 31 Oct 2023 08:10:37 -0400
-Received: from EUR01-DB5-obe.outbound.protection.outlook.com (mail-db5eur01on2055.outbound.protection.outlook.com [40.107.15.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B78ED6E
-        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Oct 2023 05:10:20 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UVAFpVX3ifr3J7z7IZTyHutMkCqsqIPeJWbgCKaiUCUhZ4RLnqh9Ej1ufsntHU87dP3xWzs1qwRxuK0wTXXz05X+qaYIATKB9fu6SQPBBVzu/vRuvZ89uZIgfRdcYpExkvVrJlPeazH5SH2WWddG/Geh1QR8ATE5Mh2gdHjXD5/7SDns/whtwRMixR72lZtDzygFlHKB0moFb/8jBSw0Qw9fzGyA0P7px/8Sgjbd8sOJOApdgCBlkOgqU8iFGgWbAHJOoBquZIB+vnd7bv5REntLsKjB1RPzDoH6Ro4ezvPWRsWxH8a5LX7qngGqeKjv51+or7kWfDPsIX7t0s/qGA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=K+XW7UIo7rtG7oEoGDl12EgZbEOlEzDBUsv3inRg7TQ=;
- b=E4vEEiU+AQ3WtdyjD3UFidgNPSp/cGcXWloOBBHQsOzw8gtzaLQHLCAziNpgy/GQBED7MFWrWwPmO5zelMOuP2OhUOmeqGd2b6FbVrdnbbLl8Hn6LcAK9EkH1Tn9p0oK6ehOvA6Egu3JESN/SRLBlkCh2jUHG8yGhIHsmmXR9nDT3ElsO+6GzgOJuaE+dz9dYRa4th+RcRB7cLDHWZ33LesWnVb7AFRCo6AgSI0kinrq27IzB3+Hc9dvVEyoN55OEE59p4IgcKITWyF7NFU2G6FEFzVLE7x24GCHFJzB+Vj7V7/DvGdVZLRtmIHUxMA3//4nlHAWU6Qp/OubZEP9mQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=K+XW7UIo7rtG7oEoGDl12EgZbEOlEzDBUsv3inRg7TQ=;
- b=Jc4xKqig1cCDpg+fdoOo2AjapmQVq9tCqoChriLoTnxvz8y6n4oRbMtjF5O5LAJM847V70OLGfB7fQ5CvTXHgL2fNmNlzluBRylSNZcfNp+e3TLhNAykIrzAhi2XriEf8fSkV3ztz/WdOKeQrz/6YEf0/lxG8bO+pKyyGm+3+i4=
-Received: from PA4PR04MB8016.eurprd04.prod.outlook.com (2603:10a6:102:cb::10)
- by DB8PR04MB6986.eurprd04.prod.outlook.com (2603:10a6:10:116::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.11; Tue, 31 Oct
- 2023 12:10:17 +0000
-Received: from PA4PR04MB8016.eurprd04.prod.outlook.com
- ([fe80::f08f:9a04:3d33:7e49]) by PA4PR04MB8016.eurprd04.prod.outlook.com
- ([fe80::f08f:9a04:3d33:7e49%3]) with mapi id 15.20.6954.017; Tue, 31 Oct 2023
- 12:10:17 +0000
-From:   Purendra Singh <purendra.singh@nxp.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Paul Menzel <pmenzel@molgen.mpg.de>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Devyani Godbole <devyani.godbole@nxp.com>,
-        Nitin Jadhav <nitin.jadhav@nxp.com>
-Subject: RE: [EXT] Re: [PATCH BlueZ v2 1/1] gobex/gobex.c : Increase default
- obex timeout from 10 sec to 500 sec
-Thread-Topic: [EXT] Re: [PATCH BlueZ v2 1/1] gobex/gobex.c : Increase default
- obex timeout from 10 sec to 500 sec
-Thread-Index: AQHaAzkSicHPwNnXcEe3qgRIT0b3tLBSbY6AgACHgwCAEOmGQA==
-Date:   Tue, 31 Oct 2023 12:10:17 +0000
-Message-ID: <PA4PR04MB801647DD41F1D7222C9FD6518DA0A@PA4PR04MB8016.eurprd04.prod.outlook.com>
-References: <20231020093716.9654-1-purendra.singh@nxp.com>
- <20231020093716.9654-2-purendra.singh@nxp.com>
- <4cf2cb28-b334-487b-96d6-6318961035e1@molgen.mpg.de>
- <CABBYNZKhBp=qw9aB+0CVLu0U1YeYwt2qC80+2fqgwH-sgbWf3A@mail.gmail.com>
-In-Reply-To: <CABBYNZKhBp=qw9aB+0CVLu0U1YeYwt2qC80+2fqgwH-sgbWf3A@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PA4PR04MB8016:EE_|DB8PR04MB6986:EE_
-x-ms-office365-filtering-correlation-id: 91a4e825-54d7-4766-05d1-08dbda0a58a9
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: em/EmXvI2jLMOFtWarfl9GtLbIzc86UgFbsM7Hxj3OKv7eESS4ivDc8/tsdNDlWnYFU4hdw1rd1QGrUX/Y5xtf1KRVC7Rp+p0QUTk5diuIOMrZr5wV0DBNXm3lR+Ahxrx7B5T3x0wYEwWpVY9l5P+15yGe5VBk13wZ1bwpnTaNXU/XZv6M2nD4lhDUjanaEnZyhTK3ABUB5ZsOLB/R2dhzDo7l8tqjR6W9HhCkWEwJb3Ivf6F2VrtXcO7C36O39WlmqcvkE0gJG0voamiKWuRFTVggsfOHw/h8Q5aw8vMM+OegV8DuyeXoB6FvOJnShJsuMXusgZXGamIOMcN+spJzzZVflm2OoPp4VozkiBLIGxrlbw3tDXSk+CNLPl5VJaEDw5wndEsokTI+/lNiiNxk1a2K2VxnXgvbWCtkKqc5aQHONBFfAEHUquKJretkP5o1bwnEeAAP9C2g/TsEHmZUXJ6ltKg9vVBWQwupNMZYAnMkqWYQ57V9XKRwdsUvT4tMza3RZBi4kcfSSV2al4J3O4hOv7Y/DP5REG43lBezQ3ryRI8RgLHfVwvUVit9gfYKoMP6z+pQkCqKqfY2I8cwcYJvih+fcEkgRBS7nOZlAwdrEsklIzvaWXoX3x2zQYFNO34NDT7iBo7vD50tCoUeMRm9bAwe2JWrWApH14I7I=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR04MB8016.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(346002)(366004)(376002)(136003)(39860400002)(230273577357003)(230173577357003)(230922051799003)(451199024)(1800799009)(186009)(64100799003)(316002)(55016003)(86362001)(66946007)(44832011)(38100700002)(6506007)(110136005)(41300700001)(66556008)(66476007)(122000001)(64756008)(66446008)(7696005)(71200400001)(54906003)(478600001)(53546011)(9686003)(83380400001)(5660300002)(8676002)(33656002)(52536014)(4326008)(76116006)(8936002)(2906002)(38070700009)(26005);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?QkZobnAxSFVRRWhmSEtMa0ZtMHI4M1VvTm1vQzBpOWF6UE9GS08vaGswbm1o?=
- =?utf-8?B?clZZMFdxa1gxbmJGeWFwRjR1K1J5c1FyVUV4QzRJNk1SU2FrVTBRU0JTb0Ju?=
- =?utf-8?B?M3QwUzhjMnNnL3lCMldpck5Oa21RYnM1dmNPUGRoL1VGV0VBRnhhZkE4cGNj?=
- =?utf-8?B?UGtOR3NMb2x2Mi8yZHdHUnp3UDh1eUV4VERaZURoNWFBZ3ZMZFRKYkdIc3NR?=
- =?utf-8?B?eGpnd1pMZllBWkhCTEZqeWY5eUVOOW4zZ1Z5bXBWbFdaeGYyMjl5cVhlV0h2?=
- =?utf-8?B?Tmxnckdvc3RhYnh3dU1NVGtSQk1mS0h4TGY1MVNmTVBYSnVaSGE4VmdqYjQ0?=
- =?utf-8?B?eW0xN3dQUStQUjVsWnEvYVdyaWJuN3ZsUDRCb2Y1R3JINzd2Vjc0Mnh1MGl5?=
- =?utf-8?B?WjcvRmttVTBvTkJTNTJJNnVOZFk2Y1FPdU1oZGhVdmtXRU1WVVZERXh3NnJV?=
- =?utf-8?B?czdtWHFWWEpUVGNqcTRMYnBwb2FxQmJJd3c3eC9TRFg5WEhqeFRVeEhsT1ZK?=
- =?utf-8?B?ZnBIUC9KUm1VR21TcndSSXVVNzE3ZGE2cUdHc1pFeE5VUzY1RTkxVVlqOW5L?=
- =?utf-8?B?VkpZS3AxanBTcFFyblVmUkhIWW5XVTNNTzVCbUtGazRmeU9IdjMya2FkSy9O?=
- =?utf-8?B?Z3EyNWFucExDRXl2bWJDek02Y3FwQlhjYzZ2Y1JPeEtGelZoa2MzblptaGk1?=
- =?utf-8?B?eFUzOUxHaXU1a2czQ2ExZWgvQjh6eFhZcmRtaXJ2aEZFeVpiZDUzVGJteU96?=
- =?utf-8?B?U1BOL3lSVmw1bzRzYlZuNlJnRGtZQXQ4K1VLUHpsV3JRLzZzNkVHWHZJZE9H?=
- =?utf-8?B?ODlPaGljWkk4WE9ZUldwaUJ1RmRmR3BIUWc2Z3d2QVN5WFRmanlpZEFBZWx3?=
- =?utf-8?B?SytqSVlpQjd1T0gvdmozNFJqQXhYYTAzMHl2bFY0TjR3Qm4xakN4RlFDTkgz?=
- =?utf-8?B?alNwYlJiMlpUR2xGd25wVEtNWGR4aVVEeGVPTGNUUXVFSTB0YU5yZmttVmVZ?=
- =?utf-8?B?UEdiWU5yaWFCSUthZGQxdHVHMFVsQWNUK1Yzencwa080VGYxV0c1SHEyM2ZE?=
- =?utf-8?B?UURBZHpmWkJlS2hTbTZRb3RVWlNqNEdPUG8xTy9WSEs4TG5vUWhtQStYK0VS?=
- =?utf-8?B?bTdPbGUrYUdvTWY4a1NubWVsRTcxOTdjTS9lRk1mWmUzUUIzSGZWc0ZzYmcv?=
- =?utf-8?B?WjBETGt5akk4d3BFZVJudnBNYmJWR2hMYWNvOFd1NU1kNDNUazFsV0FYb2lq?=
- =?utf-8?B?V2lhSTlNREtqYzBpUit2NkRwaW9ac3BtYnBsYkllb0lXaVVnWHhWY09zbml0?=
- =?utf-8?B?bi9QME5MYTVQQ0p0NzVIdjlNaldaWGRlQ2Y3Y3NwRVNSekJzdlI2Y0ZJVnQx?=
- =?utf-8?B?OXhxQ2NINE8xWlR5Y3dVVlRnaGE3QkRxbyt4cGhOVCtab0gwN2ZKeUVIemF4?=
- =?utf-8?B?cWNSbXNmYmtHeWhGTlk5VGsyelNCUXVqVlJSQXIveXNSWEQ5NHNWaWhIUXlY?=
- =?utf-8?B?ODBOM0w3YTB5VlFLaitJaVJaSW1RS3FldFUrT3N6SVFpMlVVdWJJQ043OEhD?=
- =?utf-8?B?VGRyQ0dJU0lTRFBZRFMyS01jZnlod004M2xKOXd2VU9PSVlPQkhacEpYQ1pm?=
- =?utf-8?B?NUdoSkhZcitMM05mQXBPTXNPdlY3VEdOeTk0TUErc1BsZ3Rac1NLaGVIVG9R?=
- =?utf-8?B?SmFPcXlWc3dOaG5obGdTN3BERmVhalhVQzFnaGxaYTJCa1BLMGFVU0ZIQ0ND?=
- =?utf-8?B?bGFvSXhMUlpYK0xKNDNLR09HOXI3NFRxQ0xPaWZNanpvV04vRU5pMyt5UG9R?=
- =?utf-8?B?OWlZM0hRaXh0WDBrQ09xOWQ2TGE3bzg2TVlvM2hSMEVDTzJjWGpuZ3lUUHhL?=
- =?utf-8?B?RnpCM1NZWXZCZTVZS2h4WWRJV0VRdWp0Q1lQcFFFT3Q0OWc2YWxSOStHWXpw?=
- =?utf-8?B?NzZtNjYrb0ppd1BvZng4M3pSa2pPNkF4RGFkUkNBSUJ4Nmo2Y2cwZTA5dWU4?=
- =?utf-8?B?MndCMkFQVnNUZ1hSZUMyR2FzT2xDaUhxYjE5QUUrdllPajYyQ1VLWGZUU2Yy?=
- =?utf-8?B?MENyeEJ3RlJhNWJKU09EK2xNd2FrbXF3ekc5eFpQZTN5WHpuRy9GVUNvT3FU?=
- =?utf-8?Q?7IeIVEVvULryw+6rYEAF8VMFN?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Tue, 31 Oct 2023 08:18:31 -0400
+Received: from mail-oa1-f79.google.com (mail-oa1-f79.google.com [209.85.160.79])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D636A2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Oct 2023 05:18:28 -0700 (PDT)
+Received: by mail-oa1-f79.google.com with SMTP id 586e51a60fabf-1ea1c5774d2so7360639fac.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Oct 2023 05:18:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698754707; x=1699359507;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5YKsBhoI1sio+KQS7arIHpaTsMDI5v5cWKzvR/mKBVA=;
+        b=coLRJc/iDW/t6JFu8jDOoXON0LoRqwAdO2VosKgQ4WRLqanHfO5Lg3PBRrcnR7z8CI
+         IPGKpE8DDORMNo+AYKU7iB8gQhM1dsbvAwLRw15hKSsZX4Za9bT91k300rGbtgeMZ6tY
+         aR1tqCtC07bIW72WuM+MzkWHPDqkOLeIJ8v1QxXvXb5IcX9QPoRwL1SfVJA4PBzqI+H6
+         DRW0e6xWAMdxOdoJhAbUK+9ERkSibepVlWLfrQMamYhg/skBoKPNs71XgcwB2JWu2U2q
+         XUC5bGCXp/P0eYigFS0aCuIHKdt3TMYyPvAyPuazCpnghLSusHxWnk9GdWN2MyIq19mU
+         ZDHw==
+X-Gm-Message-State: AOJu0Yz89xMVeUQ0Ua24mZZ9Pb6wCaknX3oijSVNt89PP2vOzlQuPt3N
+        m1W1hNgXimxw0MbvuWnViIFwatM9jF/1aFnvSHlSTEG2OmaO
+X-Google-Smtp-Source: AGHT+IGTJlyrEt7/3/S707b6OY2WXW1sKwaVgPDQ221dE+bINEaaL1B9a1Gq0YwBrtH/hiHA/iR8q/qHvl5OhI/4z0eUnUWdx6Go
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PA4PR04MB8016.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 91a4e825-54d7-4766-05d1-08dbda0a58a9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Oct 2023 12:10:17.4519
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vmZ1YCTnKBUEEAehROeITzOsU1Z6f5j9rrPtaJN/Bkt+924N44214kxukxcHcvgxDaFyKHFIVfEvPTonBgpKzQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR04MB6986
+X-Received: by 2002:a05:6870:b523:b0:1dc:e729:66f7 with SMTP id
+ v35-20020a056870b52300b001dce72966f7mr6461190oap.8.1698754707758; Tue, 31 Oct
+ 2023 05:18:27 -0700 (PDT)
+Date:   Tue, 31 Oct 2023 05:18:27 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000eaa62d0609022600@google.com>
+Subject: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in sco_chan_del
+From:   syzbot <syzbot+8e6467fa0a1a160c9bbb@syzkaller.appspotmail.com>
+To:     johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
+        marcel@holtmann.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGVsbG8gTHVpeiBhbmQgUGF1bCwNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBG
-cm9tOiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IDxsdWl6LmRlbnR6QGdtYWlsLmNvbT4NCj4gU2Vu
-dDogRnJpZGF5LCBPY3RvYmVyIDIwLCAyMDIzIDExOjE5IFBNDQo+IFRvOiBQYXVsIE1lbnplbCA8
-cG1lbnplbEBtb2xnZW4ubXBnLmRlPg0KPiBDYzogUHVyZW5kcmEgU2luZ2ggPHB1cmVuZHJhLnNp
-bmdoQG54cC5jb20+OyBsaW51eC0NCj4gYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZzsgRGV2eWFu
-aSBHb2Rib2xlIDxkZXZ5YW5pLmdvZGJvbGVAbnhwLmNvbT47DQo+IE5pdGluIEphZGhhdiA8bml0
-aW4uamFkaGF2QG54cC5jb20+DQo+IFN1YmplY3Q6IFtFWFRdIFJlOiBbUEFUQ0ggQmx1ZVogdjIg
-MS8xXSBnb2JleC9nb2JleC5jIDogSW5jcmVhc2UgZGVmYXVsdA0KPiBvYmV4IHRpbWVvdXQgZnJv
-bSAxMCBzZWMgdG8gNTAwIHNlYw0KPiANCj4gQ2F1dGlvbjogVGhpcyBpcyBhbiBleHRlcm5hbCBl
-bWFpbC4gUGxlYXNlIHRha2UgY2FyZSB3aGVuIGNsaWNraW5nIGxpbmtzIG9yDQo+IG9wZW5pbmcg
-YXR0YWNobWVudHMuIFdoZW4gaW4gZG91YnQsIHJlcG9ydCB0aGUgbWVzc2FnZSB1c2luZyB0aGUg
-J1JlcG9ydA0KPiB0aGlzIGVtYWlsJyBidXR0b24NCj4gDQo+IA0KPiBIaSwNCj4gDQo+IE9uIEZy
-aSwgT2N0IDIwLCAyMDIzIGF0IDI6NDTigK9BTSBQYXVsIE1lbnplbCA8cG1lbnplbEBtb2xnZW4u
-bXBnLmRlPg0KPiB3cm90ZToNCj4gPg0KPiA+IERlYXIgUHVyZW5kcmEsDQo+ID4NCj4gPg0KPiA+
-IFRoYW5rIHlvdSBmb3Igc2VuZGluZyB2ZXJzaW9uIDIuIChObyBzcGFjZSBpcyBuZWNlc3Nhcnkg
-aW4gdGhlIHByZWZpeA0KPiA+IGJlZm9yZSB0aGUgY29sb24uKQ0KPiA+DQo+ID4NCj4gPiBBbSAy
-MC4xMC4yMyB1bSAxMTozNyBzY2hyaWViIFB1cmVuZHJhIFNpbmdoOg0KPiA+ID4gVGhpcyBpc3N1
-ZSBpcyBvYnNlcnZlZCB3aGVuIG11bHRpcGxlIHByb2ZpbGVzIGFyZSBhY3RpdmUgZnJvbQ0KPiA+
-ID4gbXVsdGlwbGUgY29ubmVjdGVkIGRldmljZXM6IEEyRFAgKyBISUQgKyBPQmV4IEZpbGUgdHJh
-bnNmZXINCj4gPiA+DQo+ID4gPiBGaWxlIHJlY2VpdmVkIHN0YXR1cyBvZiBzb21lIHJlZmVyZW5j
-ZSBkZXZpY2VzIGlzIGRlbGF5ZWQsIHRoYXQNCj4gPiA+IGNhdXNlcyB0aW1lb3V0IGFuZCBmaWxl
-IHRyYW5zZmVyIHN0YXR1cyBlcnJvciAoVmFyaWF0aW9uIG9mIHRpbWVvdXQNCj4gPiA+IGlzIGJl
-dHdlZW4gfjEwMCBzZWNvbmRzIHRvIH40NTAgc2Vjb25kcykuDQo+ID4gPg0KPiA+ID4gV2UgdGVz
-dGVkIHdpdGggTW90b3JvbGEgRWRnZSwgU2Ftc3VuZyBNMzMsIE9uZVBsdXMgNlQuDQo+ID4gPg0K
-PiA+ID4gRXhwZXJpbWVudGFseSB3ZSBpbmNyZWFzZWQgdGhlIHRpbWVvdXQgYW5kIGF0IDUwMCBz
-ZWNvbmRzIG5vIGlzc3VlDQo+ID4gPiB3YXMNCj4gPg0KPiA+IEV4cGVyaW1lbnRhbGx5DQo+ID4N
-Cj4gPiA+IG9ic2VydmVkLg0KPiA+DQo+ID4gT2gsIGl04oCZcyByZWFsbHkgc2Vjb25kcy4gSXNu
-4oCZdCBncmVhdGVyIHRoYW4gOCBtaW51dGUgdGltZW91dCAqbm90Kg0KPiA+IHZlcnkgdXNlciBm
-cmllbmRseT8NCj4gDQo+IFllYWgsIHNvbWV0aGluZyBsaWtlIHRoYXQgd291bGQgcHJvYmFibHkg
-Y2F1c2UgdGhlIHVzZXIgdG8gIGFzc3VtZSB0aGUNCj4gb3BlcmF0aW9uIGRpZG4ndCB3b3JrLg0K
-DQpUaGlzIGlzIHRoZSBtYXhpbXVtIHRpbWVvdXQgd2UgaGF2ZSBzZXQgYmFzZWQgb24gZXhwZXJp
-bWVudGluZw0KZGlmZmVyZW50IHJlZmVyZW5jZSBkZXZpY2VzIG1lbnRpb25lZCBpbiBlYXJsaWVy
-IGNvbW1lbnQuDQpUaGlzIHdpbGwgb25seSBjb21lIGludG8gcGljdHVyZSBpZiB0aGUgcmVmZXJl
-bmNlIGRldmljZXMgc2xvdyBpbiANCnJlc3BvbmRpbmcgdGhlIGZpbGUgcmVjZWl2ZWQgc3RhdHVz
-Lg0KPiANCj4gPiA+IC0tLQ0KPiA+ID4gICBnb2JleC9nb2JleC5jIHwgMiArLQ0KPiA+ID4gICAx
-IGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKyksIDEgZGVsZXRpb24oLSkNCj4gPiA+DQo+ID4g
-PiBkaWZmIC0tZ2l0IGEvZ29iZXgvZ29iZXguYyBiL2dvYmV4L2dvYmV4LmMgaW5kZXgNCj4gPiA+
-IGU5Yjg5Y2VhZC4uZjBlMWMyYzgzIDEwMDY0NA0KPiA+ID4gLS0tIGEvZ29iZXgvZ29iZXguYw0K
-PiA+ID4gKysrIGIvZ29iZXgvZ29iZXguYw0KPiA+ID4gQEAgLTIyLDcgKzIyLDcgQEANCj4gPiA+
-ICAgI2RlZmluZSBHX09CRVhfTUlOSU1VTV9NVFUgIDI1NQ0KPiA+ID4gICAjZGVmaW5lIEdfT0JF
-WF9NQVhJTVVNX01UVSAgNjU1MzUNCj4gPiA+DQo+ID4gPiAtI2RlZmluZSBHX09CRVhfREVGQVVM
-VF9USU1FT1VUICAgICAgIDEwDQo+ID4gPiArI2RlZmluZSBHX09CRVhfREVGQVVMVF9USU1FT1VU
-ICAgICAgIDUwMA0KPiA+ID4gICAjZGVmaW5lIEdfT0JFWF9BQk9SVF9USU1FT1VUICAgICAgICA1
-DQo+ID4gPg0KPiA+ID4gICAjZGVmaW5lIEdfT0JFWF9PUF9OT05FICAgICAgICAgICAgICAweGZm
-DQo+ID4NCj4gPg0KPiA+IEtpbmQgcmVnYXJkcywNCj4gPg0KPiA+IFBhdWwNCj4gDQo+IA0KPiAN
-Cj4gLS0NCj4gTHVpeiBBdWd1c3RvIHZvbiBEZW50eg0KDQpUaGFua3MgDQpQdXJlbmRyYQ0K
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    4f82870119a4 Merge tag 'mm-hotfixes-stable-2023-10-24-09-4..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=11b1b5a3680000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=7d1f30869bb78ec6
+dashboard link: https://syzkaller.appspot.com/bug?extid=8e6467fa0a1a160c9bbb
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/cb40650f0163/disk-4f828701.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/a1249f360a01/vmlinux-4f828701.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/9af85659ca91/bzImage-4f828701.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+8e6467fa0a1a160c9bbb@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: slab-use-after-free in hci_conn_drop include/net/bluetooth/hci_core.h:1549 [inline]
+BUG: KASAN: slab-use-after-free in hci_conn_drop include/net/bluetooth/hci_core.h:1519 [inline]
+BUG: KASAN: slab-use-after-free in sco_chan_del+0x4bf/0x4f0 net/bluetooth/sco.c:171
+Read of size 8 at addr ffff88807bd46a58 by task syz-executor.5/23800
+
+CPU: 1 PID: 23800 Comm: syz-executor.5 Not tainted 6.6.0-rc7-syzkaller-00039-g4f82870119a4 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/06/2023
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
+ print_address_description mm/kasan/report.c:364 [inline]
+ print_report+0xc4/0x620 mm/kasan/report.c:475
+ kasan_report+0xda/0x110 mm/kasan/report.c:588
+ hci_conn_drop include/net/bluetooth/hci_core.h:1549 [inline]
+ hci_conn_drop include/net/bluetooth/hci_core.h:1519 [inline]
+ sco_chan_del+0x4bf/0x4f0 net/bluetooth/sco.c:171
+ __sco_sock_close+0xf2/0x690 net/bluetooth/sco.c:454
+ sco_sock_close net/bluetooth/sco.c:469 [inline]
+ sco_sock_release+0x6f/0x2c0 net/bluetooth/sco.c:1246
+ __sock_release+0xae/0x260 net/socket.c:659
+ sock_close+0x1c/0x20 net/socket.c:1419
+ __fput+0x3f7/0xa70 fs/file_table.c:384
+ task_work_run+0x14d/0x240 kernel/task_work.c:180
+ get_signal+0x106f/0x2790 kernel/signal.c:2668
+ arch_do_signal_or_restart+0x90/0x7f0 arch/x86/kernel/signal.c:309
+ exit_to_user_mode_loop kernel/entry/common.c:168 [inline]
+ exit_to_user_mode_prepare+0x11f/0x240 kernel/entry/common.c:204
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:285 [inline]
+ syscall_exit_to_user_mode+0x1d/0x60 kernel/entry/common.c:296
+ do_syscall_64+0x44/0xb0 arch/x86/entry/common.c:86
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7f150d47cae9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f150e1ff0c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
+RAX: fffffffffffffffc RBX: 00007f150d59c050 RCX: 00007f150d47cae9
+RDX: 0000000000000008 RSI: 0000000020000000 RDI: 0000000000000004
+RBP: 00007f150d4c847a R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000006e R14: 00007f150d59c050 R15: 00007ffc409e1338
+ </TASK>
+
+Allocated by task 23800:
+ kasan_save_stack+0x33/0x50 mm/kasan/common.c:45
+ kasan_set_track+0x25/0x30 mm/kasan/common.c:52
+ ____kasan_kmalloc mm/kasan/common.c:374 [inline]
+ __kasan_kmalloc+0xa2/0xb0 mm/kasan/common.c:383
+ kmalloc include/linux/slab.h:599 [inline]
+ kzalloc include/linux/slab.h:720 [inline]
+ hci_conn_add+0xc2/0x17c0 net/bluetooth/hci_conn.c:957
+ hci_connect_sco+0x3a0/0xf80 net/bluetooth/hci_conn.c:1701
+ sco_connect net/bluetooth/sco.c:266 [inline]
+ sco_sock_connect+0x2c7/0xa80 net/bluetooth/sco.c:591
+ __sys_connect_file+0x15b/0x1a0 net/socket.c:2050
+ __sys_connect+0x145/0x170 net/socket.c:2067
+ __do_sys_connect net/socket.c:2077 [inline]
+ __se_sys_connect net/socket.c:2074 [inline]
+ __x64_sys_connect+0x72/0xb0 net/socket.c:2074
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+Freed by task 19887:
+ kasan_save_stack+0x33/0x50 mm/kasan/common.c:45
+ kasan_set_track+0x25/0x30 mm/kasan/common.c:52
+ kasan_save_free_info+0x2b/0x40 mm/kasan/generic.c:522
+ ____kasan_slab_free mm/kasan/common.c:236 [inline]
+ ____kasan_slab_free+0x15b/0x1b0 mm/kasan/common.c:200
+ kasan_slab_free include/linux/kasan.h:164 [inline]
+ slab_free_hook mm/slub.c:1800 [inline]
+ slab_free_freelist_hook+0x114/0x1e0 mm/slub.c:1826
+ slab_free mm/slub.c:3809 [inline]
+ __kmem_cache_free+0xb8/0x2f0 mm/slub.c:3822
+ device_release+0xa1/0x240 drivers/base/core.c:2484
+ kobject_cleanup lib/kobject.c:682 [inline]
+ kobject_release lib/kobject.c:716 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x1d0/0x440 lib/kobject.c:733
+ put_device+0x1f/0x30 drivers/base/core.c:3732
+ hci_conn_cleanup_child net/bluetooth/hci_conn.c:1065 [inline]
+ hci_conn_unlink+0x71b/0x9e0 net/bluetooth/hci_conn.c:1092
+ hci_conn_del+0x59/0xd80 net/bluetooth/hci_conn.c:1118
+ hci_abort_conn_sync+0x573/0xe10 net/bluetooth/hci_sync.c:5428
+ abort_conn_sync+0x187/0x390 net/bluetooth/hci_conn.c:2910
+ hci_cmd_sync_work+0x1a4/0x410 net/bluetooth/hci_sync.c:306
+ process_one_work+0x884/0x15c0 kernel/workqueue.c:2630
+ process_scheduled_works kernel/workqueue.c:2703 [inline]
+ worker_thread+0x8b9/0x1290 kernel/workqueue.c:2784
+ kthread+0x33c/0x440 kernel/kthread.c:388
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+
+The buggy address belongs to the object at ffff88807bd46000
+ which belongs to the cache kmalloc-4k of size 4096
+The buggy address is located 2648 bytes inside of
+ freed 4096-byte region [ffff88807bd46000, ffff88807bd47000)
+
+The buggy address belongs to the physical page:
+page:ffffea0001ef5000 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x7bd40
+head:ffffea0001ef5000 order:3 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+anon flags: 0xfff00000000840(slab|head|node=0|zone=1|lastcpupid=0x7ff)
+page_type: 0xffffffff()
+raw: 00fff00000000840 ffff888012c42140 0000000000000000 dead000000000001
+raw: 0000000000000000 0000000000040004 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 3, migratetype Unmovable, gfp_mask 0x1d2820(GFP_ATOMIC|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC|__GFP_HARDWALL), pid 21210, tgid 21210 (kworker/1:4), ts 1947372032238, free_ts 1947098144795
+ set_page_owner include/linux/page_owner.h:31 [inline]
+ post_alloc_hook+0x2cf/0x340 mm/page_alloc.c:1536
+ prep_new_page mm/page_alloc.c:1543 [inline]
+ get_page_from_freelist+0xee0/0x2f20 mm/page_alloc.c:3170
+ __alloc_pages+0x1d0/0x4a0 mm/page_alloc.c:4426
+ alloc_pages+0x1a9/0x270 mm/mempolicy.c:2299
+ alloc_slab_page mm/slub.c:1870 [inline]
+ allocate_slab+0x251/0x380 mm/slub.c:2017
+ new_slab mm/slub.c:2070 [inline]
+ ___slab_alloc+0x8c7/0x1580 mm/slub.c:3223
+ __slab_alloc.constprop.0+0x56/0xa0 mm/slub.c:3322
+ __slab_alloc_node mm/slub.c:3375 [inline]
+ slab_alloc_node mm/slub.c:3468 [inline]
+ __kmem_cache_alloc_node+0x131/0x340 mm/slub.c:3517
+ __do_kmalloc_node mm/slab_common.c:1025 [inline]
+ __kmalloc_node_track_caller+0x50/0x100 mm/slab_common.c:1046
+ kmalloc_reserve+0xef/0x260 net/core/skbuff.c:581
+ __alloc_skb+0x12b/0x330 net/core/skbuff.c:650
+ alloc_skb include/linux/skbuff.h:1286 [inline]
+ nsim_dev_trap_skb_build drivers/net/netdevsim/dev.c:748 [inline]
+ nsim_dev_trap_report drivers/net/netdevsim/dev.c:805 [inline]
+ nsim_dev_trap_report_work+0x29e/0xc70 drivers/net/netdevsim/dev.c:850
+ process_one_work+0x884/0x15c0 kernel/workqueue.c:2630
+ process_scheduled_works kernel/workqueue.c:2703 [inline]
+ worker_thread+0x8b9/0x1290 kernel/workqueue.c:2784
+ kthread+0x33c/0x440 kernel/kthread.c:388
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+page last free stack trace:
+ reset_page_owner include/linux/page_owner.h:24 [inline]
+ free_pages_prepare mm/page_alloc.c:1136 [inline]
+ free_unref_page_prepare+0x476/0xa40 mm/page_alloc.c:2312
+ free_unref_page+0x33/0x3b0 mm/page_alloc.c:2405
+ __unfreeze_partials+0x21d/0x240 mm/slub.c:2655
+ qlink_free mm/kasan/quarantine.c:166 [inline]
+ qlist_free_all+0x6a/0x170 mm/kasan/quarantine.c:185
+ kasan_quarantine_reduce+0x18e/0x1d0 mm/kasan/quarantine.c:292
+ __kasan_slab_alloc+0x65/0x90 mm/kasan/common.c:305
+ kasan_slab_alloc include/linux/kasan.h:188 [inline]
+ slab_post_alloc_hook mm/slab.h:762 [inline]
+ slab_alloc_node mm/slub.c:3478 [inline]
+ __kmem_cache_alloc_node+0x195/0x340 mm/slub.c:3517
+ __do_kmalloc_node mm/slab_common.c:1025 [inline]
+ __kmalloc+0x4f/0x100 mm/slab_common.c:1039
+ kmalloc_array include/linux/slab.h:636 [inline]
+ kcalloc include/linux/slab.h:667 [inline]
+ iter_file_splice_write+0x167/0xbf0 fs/splice.c:676
+ do_splice_from fs/splice.c:933 [inline]
+ direct_splice_actor+0x118/0x180 fs/splice.c:1142
+ splice_direct_to_actor+0x347/0xa30 fs/splice.c:1088
+ do_splice_direct+0x1af/0x280 fs/splice.c:1194
+ do_sendfile+0xb88/0x1390 fs/read_write.c:1254
+ __do_sys_sendfile64 fs/read_write.c:1316 [inline]
+ __se_sys_sendfile64 fs/read_write.c:1308 [inline]
+ __x64_sys_sendfile64+0x155/0x220 fs/read_write.c:1308
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+Memory state around the buggy address:
+ ffff88807bd46900: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88807bd46980: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff88807bd46a00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                                    ^
+ ffff88807bd46a80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88807bd46b00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
