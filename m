@@ -2,119 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDDB4C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Nov 2023 09:50:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CDBBC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Nov 2023 10:03:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345913AbjKBJuj (ORCPT
+        id S1345983AbjKBKDT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Nov 2023 05:50:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45148 "EHLO
+        Thu, 2 Nov 2023 06:03:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345746AbjKBJuf (ORCPT
+        with ESMTP id S1345944AbjKBKDS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Nov 2023 05:50:35 -0400
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 282BC111
-        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Nov 2023 02:50:30 -0700 (PDT)
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A29oJ3v026664;
-        Thu, 2 Nov 2023 09:50:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=JXWSk6Pn6NtotY8aFaBrBVyxr4qqNwRBPyCIBCVdBaE=;
- b=Qy1lwqJkJtPvvne5V49mw0bruEteFJhGUEa/gWpOwB1qyVOZjT9CXbVhWTwboAqxhKhq
- TfzZl65IrcTi4MmIGqG6J0Vk5bErPTVys2/yMruAq4u5oVy+TgwVlwekwOWTcKcxTkja
- UOf9dd8eOM1llQLEPjl1VIYb1hnWFgyxV2SXV0MWoh9VtNPfASYCruj7fONxrRICxDbw
- GdscFC9ozdVdl8hXPDa5bPkfOGjaUsWZlhQdXrCSIS7twkMGxDN3932nMVOysaSWiKX9
- QbX/pngIlWsCsYX15dTMtD/FpqguP6SOuljXYAeUITOlt5TzXgi1MWLUXa96IV9aiAQF lA== 
-Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3u477pr930-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 02 Nov 2023 09:50:25 +0000
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-        by NASANPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3A29oOmq025932
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 2 Nov 2023 09:50:24 GMT
-Received: from [10.253.10.80] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.39; Thu, 2 Nov
- 2023 02:50:22 -0700
-Message-ID: <ab123049-1272-9abb-87f7-e75015a55bf5@quicinc.com>
-Date:   Thu, 2 Nov 2023 17:50:00 +0800
+        Thu, 2 Nov 2023 06:03:18 -0400
+Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCAD0112
+        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Nov 2023 03:03:15 -0700 (PDT)
+Received: by mail-qt1-x82b.google.com with SMTP id d75a77b69052e-41b7ec4cceeso3781371cf.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Nov 2023 03:03:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698919394; x=1699524194; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=OtNOSrsolg1s5+juMPmzm/MYka0dWDEGGvbkcYKlFf8=;
+        b=kr30wx7UQ/7cv8T+0IvRR82xZ3TsVIqnjw6l94ujjMZ9Ar1TF3WmcCleN/gyb2Mv8o
+         bmWedgcfm20gLOroJzteTOVvVXB1etz7TgMexBh+wicUA1najfllF3jsA6VT+adT/bPY
+         4kVJndj9JFpJQCclozo/uVdkEwGU9sd4ticgLuMxSoCLsbclUp3etqvlBXchWMcstZkH
+         OBq9pCWoGqj1Z512oAX7uF+OS3PlusvQieARpDi7Y7kEWPUUtdCg7gtGyVEjUXn5+22L
+         /7qbYW2eOpcnKP0RWaJ+Da4ZjQRs7IfQL25sUplJsDVqaC5FAbhi/CO+OceaReIHYLMP
+         iJAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698919394; x=1699524194;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OtNOSrsolg1s5+juMPmzm/MYka0dWDEGGvbkcYKlFf8=;
+        b=KnI4M4MM88oGnJ69LAnqSQBSJ6sXBBYiBp+ivu3FLAMdGKMCqEvJjVoUKY654pXI3y
+         auDR/YeugVQX8KqYJ24XgMiZXVzavlrOogw6yim0hioR7TkBpgSAZ0RgQkM9Za7XzVQN
+         2Fi5S6AdXA56ZQkveNuL4vw6J8L53MQ4yhc6b5WnINDGHSQ3vpjzlI5AkLwwZRSQN3oz
+         l1PGe4gEA5s1PL0y+zjdtIQD9/nZ3fQpLN5APA34it92IY3+yakWtiUc5e+TXYUAmcQn
+         zFhEfgLhAKiztjKiV5rbPcuoTi2SiLa0V6ads0jIEDEq4hWwhemHyG/+4arDI0tZ0vqI
+         Tn8w==
+X-Gm-Message-State: AOJu0YxymJdc/d6S2j1QXkQ9jX7NRCc3L/UrqlTNR2URUnGAWqcgotMd
+        I77AV7m/YLTO7EVaJB6G4x1TXQBhKKE=
+X-Google-Smtp-Source: AGHT+IE6++E0w7bUuyU8nEfPX0UXaNfKW96EQGxe+ireIVq6QSBFN6wXJpFBi0OkCqlMlD/3WuUTSg==
+X-Received: by 2002:a05:622a:100e:b0:418:4e7:b82c with SMTP id d14-20020a05622a100e00b0041804e7b82cmr18891319qte.57.1698919394574;
+        Thu, 02 Nov 2023 03:03:14 -0700 (PDT)
+Received: from [172.17.0.2] ([20.57.44.141])
+        by smtp.gmail.com with ESMTPSA id ck14-20020a05622a230e00b00403ff38d855sm2160793qtb.4.2023.11.02.03.03.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Nov 2023 03:03:14 -0700 (PDT)
+Message-ID: <654373e2.050a0220.6d8dc.af42@mx.google.com>
+Date:   Thu, 02 Nov 2023 03:03:14 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2320778681868352789=="
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v1] Bluetooth: hci_sync: Fix logical error when enter
- active mode
-To:     <luiz.dentz@gmail.com>, <marcel@holtmann.org>,
-        <johan.hedberg@gmail.com>, <jaikumar@google.com>
-CC:     <linux-bluetooth@vger.kernel.org>
-References: <1698917302-28018-1-git-send-email-quic_zijuhu@quicinc.com>
-Content-Language: en-US
-From:   quic_zijuhu <quic_zijuhu@quicinc.com>
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, quic_zijuhu@quicinc.com
+Subject: RE: [v1] Bluetooth: hci_sync: Fix logical error when enter active mode
 In-Reply-To: <1698917302-28018-1-git-send-email-quic_zijuhu@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: mtqrOrwT9TpraCWdNB5BuvGlJm0tr-pr
-X-Proofpoint-ORIG-GUID: mtqrOrwT9TpraCWdNB5BuvGlJm0tr-pr
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-01_23,2023-11-01_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 malwarescore=0
- phishscore=0 adultscore=0 clxscore=1015 priorityscore=1501 mlxscore=0
- mlxlogscore=876 bulkscore=0 impostorscore=0 lowpriorityscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2310240000 definitions=main-2311020078
+References: <1698917302-28018-1-git-send-email-quic_zijuhu@quicinc.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 11/2/2023 5:28 PM, Zijun Hu wrote:
-> it seems HCI_CONN_POWER_SAVE stands for active mode based on
-> hci_mode_change_evt(), but hci_conn_enter_active_mode() does not take
-> this flag rightly and failed to exit sniff mode potentially, it is
-> fixed by this change.
-> 
-> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> ---
->  net/bluetooth/hci_conn.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 929d0e313db2..302fb5eaca55 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -2582,7 +2582,12 @@ void hci_conn_enter_active_mode(struct hci_conn *conn, __u8 force_active)
->  	if (conn->mode != HCI_CM_SNIFF)
->  		goto timer;
->  
-> -	if (!test_bit(HCI_CONN_POWER_SAVE, &conn->flags) && !force_active)
-> +	if (test_bit(HCI_CONN_POWER_SAVE, &conn->flags)) {
-> +		BT_DBG("%s: hcon %p is already active mode", __func__, conn);
-> +		goto timer;
-> +	}
-> +
-> +	if (!force_active)
->  		goto timer;
->  
->  	if (!test_and_set_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->flags)) {
+--===============2320778681868352789==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-not sure what HCI_CONN_POWER_SAVE stands for. or change as below ?
+This is automated email and please do not reply to this email!
 
-@@ -4596,9 +4596,9 @@ static void hci_mode_change_evt(struct hci_dev *hdev, void *data,
-                if (!test_and_clear_bit(HCI_CONN_MODE_CHANGE_PEND,
-                                        &conn->flags)) {
-                        if (conn->mode == HCI_CM_ACTIVE)
--                               set_bit(HCI_CONN_POWER_SAVE, &conn->flags);
--                       else
-                                clear_bit(HCI_CONN_POWER_SAVE, &conn->flags);
-+                       else
-+                               set_bit(HCI_CONN_POWER_SAVE, &conn->flags);
-                }
+Dear submitter,
 
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=798359
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.74 seconds
+GitLint                       PASS      0.37 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      35.71 seconds
+CheckAllWarning               PASS      38.60 seconds
+CheckSparse                   PASS      44.43 seconds
+CheckSmatch                   PASS      117.98 seconds
+BuildKernel32                 PASS      34.32 seconds
+TestRunnerSetup               PASS      534.12 seconds
+TestRunner_l2cap-tester       PASS      31.30 seconds
+TestRunner_iso-tester         PASS      54.92 seconds
+TestRunner_bnep-tester        PASS      10.59 seconds
+TestRunner_mgmt-tester        PASS      219.08 seconds
+TestRunner_rfcomm-tester      PASS      16.41 seconds
+TestRunner_sco-tester         PASS      19.58 seconds
+TestRunner_ioctl-tester       PASS      18.43 seconds
+TestRunner_mesh-tester        PASS      14.08 seconds
+TestRunner_smp-tester         PASS      14.42 seconds
+TestRunner_userchan-tester    PASS      11.14 seconds
+IncrementalBuild              PASS      33.39 seconds
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============2320778681868352789==--
