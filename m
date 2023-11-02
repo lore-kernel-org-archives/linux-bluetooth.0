@@ -2,134 +2,100 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0CD3C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Nov 2023 08:17:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8B7CC4167B
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Nov 2023 09:28:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234660AbjKBIRk (ORCPT
+        id S1345659AbjKBJ2k (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Nov 2023 04:17:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46832 "EHLO
+        Thu, 2 Nov 2023 05:28:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229602AbjKBIRj (ORCPT
+        with ESMTP id S1345701AbjKBJ2j (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Nov 2023 04:17:39 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8D08130
-        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Nov 2023 01:17:36 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 84996C433C8
-        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Nov 2023 08:17:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1698913056;
-        bh=vON+nt1CcautyKRMR6bGu8h4MwNC2LEzIOnxcx7zR/o=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=muyR/ryMyASd9HuXQ9/thX6tgl3hIJ6ICJYYb43VWbYndoV2o0y2FkfdqmsuJdJ0V
-         cR3c4AFnKVDrCXm9V/kZRmvu4NpsDk1glouVlQw8gEc9wBei2jqKE0mQ7Y++6S8scy
-         8mo6SPQyLSx4I/whfgR9EjPorVatoUY/r2DjUWJ6Zt+iHfYrtU8MryicGTwfPuHw9t
-         7uq7kcQfNAQ//qHivWb0DEiSmrAJXcawCDCap1UanI1Eya0YDjnglbP+UxMR1YkSE6
-         D4CXFe0JBrJWXAa9JDu1ncp9wyPXHZ+SLiU7GvwO75Ho7KAXto193Jx0D6jYJSEtMn
-         wYwPw7Bdobfuw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 6AC52C53BD3; Thu,  2 Nov 2023 08:17:36 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 204589] Bluetooth touchpad (Apple Magic Trackpad) disconnects
- every few minutes
-Date:   Thu, 02 Nov 2023 08:17:36 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: attila@lendvai.name
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-204589-62941-XY6aWKzB4a@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-204589-62941@https.bugzilla.kernel.org/>
-References: <bug-204589-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Thu, 2 Nov 2023 05:28:39 -0400
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5A54123
+        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Nov 2023 02:28:33 -0700 (PDT)
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A288p4q000939;
+        Thu, 2 Nov 2023 09:28:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=qcppdkim1;
+ bh=HywElSdgRpIV3IOF3qfdWFuuo0MQ+iaMCYrFMbx/pAo=;
+ b=TNJCgoUUL4n3Y2HRtnNwiKmQTYiTkwfjgYwcIvUMnNj/LAGqwJUj7QL1F42+Z0A2ZN1a
+ Vlk62aosbDkoNEruwGtSfCn/bd1MXQh8Z+zIy9+HmEBBTLmb2dKnr+cydRUaZ6ZCvAi8
+ uvJxT7+ZZM9rFPXST9KW9mX1RZGr45Cji87B/Vl4Ze03Ptc0YfZZEllW60KHKiQRC6l8
+ rm05wPGH/OztpiLG0xKDWDW2HFtyx4Q8zluremb7qV/0WfQ9cfW8g4ZUMeQq1PSAJLU5
+ oBaGuod+EYcm37bNMRMlmmZ34wAQxpJPEDzHyGCmCAWY5K3Cjpkb9lAKAFw/rKouHO+1 xQ== 
+Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3u3y5y12ky-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Nov 2023 09:28:28 +0000
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+        by NASANPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3A29SSGs019392
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 2 Nov 2023 09:28:28 GMT
+Received: from zijuhu-gv.qualcomm.com (10.80.80.8) by
+ nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.39; Thu, 2 Nov 2023 02:28:26 -0700
+From:   Zijun Hu <quic_zijuhu@quicinc.com>
+To:     <luiz.dentz@gmail.com>, <marcel@holtmann.org>,
+        <johan.hedberg@gmail.com>, <jaikumar@google.com>
+CC:     <linux-bluetooth@vger.kernel.org>, <quic_zijuhu@quicinc.com>
+Subject: [PATCH v1] Bluetooth: hci_sync: Fix logical error when enter active mode
+Date:   Thu, 2 Nov 2023 17:28:22 +0800
+Message-ID: <1698917302-28018-1-git-send-email-quic_zijuhu@quicinc.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: gotvY-IsVYuAWvpqn1uwQ9whWM0SuwcV
+X-Proofpoint-ORIG-GUID: gotvY-IsVYuAWvpqn1uwQ9whWM0SuwcV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-01_23,2023-11-01_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ impostorscore=0 lowpriorityscore=0 mlxscore=0 mlxlogscore=682 adultscore=0
+ phishscore=0 clxscore=1011 priorityscore=1501 spamscore=0 bulkscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2310240000 definitions=main-2311020074
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D204589
+it seems HCI_CONN_POWER_SAVE stands for active mode based on
+hci_mode_change_evt(), but hci_conn_enter_active_mode() does not take
+this flag rightly and failed to exit sniff mode potentially, it is
+fixed by this change.
 
-attila lendvai (attila@lendvai.name) changed:
+Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+---
+ net/bluetooth/hci_conn.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |attila@lendvai.name
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 929d0e313db2..302fb5eaca55 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -2582,7 +2582,12 @@ void hci_conn_enter_active_mode(struct hci_conn *conn, __u8 force_active)
+ 	if (conn->mode != HCI_CM_SNIFF)
+ 		goto timer;
+ 
+-	if (!test_bit(HCI_CONN_POWER_SAVE, &conn->flags) && !force_active)
++	if (test_bit(HCI_CONN_POWER_SAVE, &conn->flags)) {
++		BT_DBG("%s: hcon %p is already active mode", __func__, conn);
++		goto timer;
++	}
++
++	if (!force_active)
+ 		goto timer;
+ 
+ 	if (!test_and_set_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->flags)) {
+-- 
+The Qualcomm Innovation Center
 
---- Comment #16 from attila lendvai (attila@lendvai.name) ---
-i'm also affected by this for years, and it makes the touchpad rather annoy=
-ing
-to use.
-
-it's been happening on different laptops, but my current setup is:
-
-Thinkpad Carbon X1 gen6
-Linux 6.4.16
-x86_64
-running Guix
-
-$ lspci -nnk | grep 0280 -A3
-02:00.0 Network controller [0280]: Intel Corporation Wireless 8265 / 8275
-[8086:24fd] (rev 78)
-        Subsystem: Intel Corporation Dual Band Wireless-AC 8265 [8086:0010]
-        Kernel driver in use: iwlwifi
-        Kernel modules: iwlwifi
-
-$ lsusb -d 8087:
-Bus 001 Device 015: ID 8087:0a2b Intel Corp. Bluetooth wireless interface
-
-$ bluetoothctl info
-Device 28:37:37:2D:43:AD (public)
-        Alias: 28-37-37-2D-43-AD
-        Class: 0x00002594
-        Icon: input-tablet
-        Paired: yes
-        Bonded: yes
-        Trusted: yes
-        Blocked: no
-        Connected: yes
-        WakeAllowed: yes
-        LegacyPairing: no
-        UUID: Human Interface Device... (00001124-0000-1000-8000-00805f9b34=
-fb)
-        UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34=
-fb)
-        Modalias: usb:v05ACp030Ed0160
-
-dmesg at every dis-/reconnect:
-
-[364555.042486] input: Apple Wireless Trackpad as
-/devices/pci0000:00/0000:00:14.0/usb1/1-7/1-7:1.0/bluetooth/hci0/hci0:512/0=
-005:05AC:030E.009C/input/input166
-[364555.042732] magicmouse 0005:05AC:030E.009C: input,hidraw5: BLUETOOTH HID
-v1.60 Mouse [Apple Wireless Trackpad] on 84:fd:d1:8d:7a:e7
-[366309.985739] magicmouse 0005:05AC:030E.009D: unknown main item tag 0x0
-[366309.985887] input: Apple Wireless Trackpad as
-/devices/pci0000:00/0000:00:14.0/usb1/1-7/1-7:1.0/bluetooth/hci0/hci0:256/0=
-005:05AC:030E.009D/input/input167
-[366309.986256] magicmouse 0005:05AC:030E.009D: input,hidraw5: BLUETOOTH HID
-v1.60 Mouse [Apple Wireless Trackpad] on 84:fd:d1:8d:7a:e7
-[366513.879351] magicmouse 0005:05AC:030E.009E: unknown main item tag 0x0
-[366513.879540] input: Apple Wireless Trackpad as
-/devices/pci0000:00/0000:00:14.0/usb1/1-7/1-7:1.0/bluetooth/hci0/hci0:256/0=
-005:05AC:030E.009E/input/input168
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
