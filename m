@@ -2,101 +2,134 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32321C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Nov 2023 16:37:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0CD3C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Nov 2023 08:17:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231675AbjKAQhh (ORCPT
+        id S234660AbjKBIRk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 1 Nov 2023 12:37:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37918 "EHLO
+        Thu, 2 Nov 2023 04:17:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231345AbjKAQhf (ORCPT
+        with ESMTP id S229602AbjKBIRj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 1 Nov 2023 12:37:35 -0400
-Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C0FD101
-        for <linux-bluetooth@vger.kernel.org>; Wed,  1 Nov 2023 09:37:33 -0700 (PDT)
-Received: by mail-io1-xd31.google.com with SMTP id ca18e2360f4ac-7aca968a063so119655539f.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Nov 2023 09:37:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698856652; x=1699461452; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ivqwjvknf1Fb4FSlmFMPIWpbekSgD7k+xvMq3QYmWIg=;
-        b=ZDktKS11yCVTtsh5laRpiXSzd2M7fMlw/cvYkDdMu9DaqLCXH5LyP9Zka/Ri5bEQ8E
-         ARkX07nwOJto1bufZ8neX77ZoKvNny04b2QYIDR1cQW/bQof98haUxDUQHjJhWYe9nQg
-         X59QMCIdqHnpIzL+YHqqEatCReKD7lhIdXLG9o01bxH7Lr6OHPRPJiJBgaM+4npKYX4R
-         Ibz8H4TCDOGmf6sCP/YD8QjiqF782J4OYwGCr88v17s4NoK5uDt9/2WtLzt0/emuWFtH
-         OFQMEdTPXCArwc7p/RVZ568ZanYxxvf3+n2zRdLars2fKo/voQHgX/qlhJPaKzrA9sSD
-         vm9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698856652; x=1699461452;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ivqwjvknf1Fb4FSlmFMPIWpbekSgD7k+xvMq3QYmWIg=;
-        b=IOTZU8yvUF83vFucTNiysHwtBeKiD2r63HfGufA8Pn3I0ZnVbiSDtNxMoy6zEdVl8M
-         V0+QOqbTTF//iFErv8uOOb0xSDZ4pMnalPPF8FREHIuvrbrMkgchmp4WNvg1HHrvequQ
-         JAopBMihfnU1b7MLjWhh8vJ5hCaBqkv4Z+Dj6xWfNgsJgVji83T/jxP1GHqmYb1jymgN
-         TuzwtBnrVKU/vLZYDb05A0rH9EU4Fyi9bRZNGLK8Y+fqBk7gP0UwfLnELTp12EwOLOqC
-         vRFqjfiwiVhRca7aBBpBrU2/f546HHJUdJ2p8LA2OS+TkVA4zo3IFrToMfPEsleADg1z
-         mZ4w==
-X-Gm-Message-State: AOJu0YycDfN2i/0DbcWsTaGEjkaVKX+wY+z/3YCwpiJ5q/iNSv6LD+Je
-        KgdxqJl+7diRF1GVOVKQ/nUbVblboQ4=
-X-Google-Smtp-Source: AGHT+IHHmOycFEK/AJIaR4iqH1hX1AppWt2jkcXSbgTTuezjuUEIJqJkLaoXhffJHzPylIsMgQY49w==
-X-Received: by 2002:a05:6602:2e8f:b0:7a9:63ff:29ff with SMTP id m15-20020a0566022e8f00b007a963ff29ffmr22060247iow.7.1698856652283;
-        Wed, 01 Nov 2023 09:37:32 -0700 (PDT)
-Received: from [172.17.0.2] ([40.83.52.245])
-        by smtp.gmail.com with ESMTPSA id r9-20020a056638100900b0042ad887f705sm1055263jab.143.2023.11.01.09.37.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Nov 2023 09:37:31 -0700 (PDT)
-Message-ID: <65427ecb.050a0220.c362e.1b2f@mx.google.com>
-Date:   Wed, 01 Nov 2023 09:37:31 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5185216946255171299=="
+        Thu, 2 Nov 2023 04:17:39 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8D08130
+        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Nov 2023 01:17:36 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 84996C433C8
+        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Nov 2023 08:17:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1698913056;
+        bh=vON+nt1CcautyKRMR6bGu8h4MwNC2LEzIOnxcx7zR/o=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=muyR/ryMyASd9HuXQ9/thX6tgl3hIJ6ICJYYb43VWbYndoV2o0y2FkfdqmsuJdJ0V
+         cR3c4AFnKVDrCXm9V/kZRmvu4NpsDk1glouVlQw8gEc9wBei2jqKE0mQ7Y++6S8scy
+         8mo6SPQyLSx4I/whfgR9EjPorVatoUY/r2DjUWJ6Zt+iHfYrtU8MryicGTwfPuHw9t
+         7uq7kcQfNAQ//qHivWb0DEiSmrAJXcawCDCap1UanI1Eya0YDjnglbP+UxMR1YkSE6
+         D4CXFe0JBrJWXAa9JDu1ncp9wyPXHZ+SLiU7GvwO75Ho7KAXto193Jx0D6jYJSEtMn
+         wYwPw7Bdobfuw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 6AC52C53BD3; Thu,  2 Nov 2023 08:17:36 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 204589] Bluetooth touchpad (Apple Magic Trackpad) disconnects
+ every few minutes
+Date:   Thu, 02 Nov 2023 08:17:36 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: attila@lendvai.name
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-204589-62941-XY6aWKzB4a@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-204589-62941@https.bugzilla.kernel.org/>
+References: <bug-204589-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com
-Subject: RE: iso-tester: Add test for bcast AC 13 reconnect
-In-Reply-To: <20231101153122.5618-2-iulia.tanasescu@nxp.com>
-References: <20231101153122.5618-2-iulia.tanasescu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5185216946255171299==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+https://bugzilla.kernel.org/show_bug.cgi?id=3D204589
 
-This is automated email and please do not reply to this email!
+attila lendvai (attila@lendvai.name) changed:
 
-Dear submitter,
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |attila@lendvai.name
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=798194
+--- Comment #16 from attila lendvai (attila@lendvai.name) ---
+i'm also affected by this for years, and it makes the touchpad rather annoy=
+ing
+to use.
 
----Test result---
+it's been happening on different laptops, but my current setup is:
 
-Test Summary:
-CheckPatch                    PASS      0.45 seconds
-GitLint                       PASS      0.26 seconds
-BuildEll                      PASS      27.61 seconds
-BluezMake                     PASS      825.75 seconds
-MakeCheck                     PASS      12.35 seconds
-MakeDistcheck                 PASS      175.30 seconds
-CheckValgrind                 PASS      268.33 seconds
-CheckSmatch                   PASS      361.86 seconds
-bluezmakeextell               PASS      116.24 seconds
-IncrementalBuild              PASS      709.40 seconds
-ScanBuild                     PASS      1070.42 seconds
+Thinkpad Carbon X1 gen6
+Linux 6.4.16
+x86_64
+running Guix
 
+$ lspci -nnk | grep 0280 -A3
+02:00.0 Network controller [0280]: Intel Corporation Wireless 8265 / 8275
+[8086:24fd] (rev 78)
+        Subsystem: Intel Corporation Dual Band Wireless-AC 8265 [8086:0010]
+        Kernel driver in use: iwlwifi
+        Kernel modules: iwlwifi
 
+$ lsusb -d 8087:
+Bus 001 Device 015: ID 8087:0a2b Intel Corp. Bluetooth wireless interface
 
----
-Regards,
-Linux Bluetooth
+$ bluetoothctl info
+Device 28:37:37:2D:43:AD (public)
+        Alias: 28-37-37-2D-43-AD
+        Class: 0x00002594
+        Icon: input-tablet
+        Paired: yes
+        Bonded: yes
+        Trusted: yes
+        Blocked: no
+        Connected: yes
+        WakeAllowed: yes
+        LegacyPairing: no
+        UUID: Human Interface Device... (00001124-0000-1000-8000-00805f9b34=
+fb)
+        UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34=
+fb)
+        Modalias: usb:v05ACp030Ed0160
 
+dmesg at every dis-/reconnect:
 
---===============5185216946255171299==--
+[364555.042486] input: Apple Wireless Trackpad as
+/devices/pci0000:00/0000:00:14.0/usb1/1-7/1-7:1.0/bluetooth/hci0/hci0:512/0=
+005:05AC:030E.009C/input/input166
+[364555.042732] magicmouse 0005:05AC:030E.009C: input,hidraw5: BLUETOOTH HID
+v1.60 Mouse [Apple Wireless Trackpad] on 84:fd:d1:8d:7a:e7
+[366309.985739] magicmouse 0005:05AC:030E.009D: unknown main item tag 0x0
+[366309.985887] input: Apple Wireless Trackpad as
+/devices/pci0000:00/0000:00:14.0/usb1/1-7/1-7:1.0/bluetooth/hci0/hci0:256/0=
+005:05AC:030E.009D/input/input167
+[366309.986256] magicmouse 0005:05AC:030E.009D: input,hidraw5: BLUETOOTH HID
+v1.60 Mouse [Apple Wireless Trackpad] on 84:fd:d1:8d:7a:e7
+[366513.879351] magicmouse 0005:05AC:030E.009E: unknown main item tag 0x0
+[366513.879540] input: Apple Wireless Trackpad as
+/devices/pci0000:00/0000:00:14.0/usb1/1-7/1-7:1.0/bluetooth/hci0/hci0:256/0=
+005:05AC:030E.009E/input/input168
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
