@@ -2,76 +2,129 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71A10C4167D
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Nov 2023 18:22:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C3A9C0018C
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Nov 2023 18:22:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233947AbjKCSWI (ORCPT
+        id S233997AbjKCSWL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Nov 2023 14:22:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44866 "EHLO
+        Fri, 3 Nov 2023 14:22:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233756AbjKCSWH (ORCPT
+        with ESMTP id S233756AbjKCSWK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Nov 2023 14:22:07 -0400
-Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 204C6CF
-        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Nov 2023 11:22:05 -0700 (PDT)
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [10.196.197.1])
+        Fri, 3 Nov 2023 14:22:10 -0400
+Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48583D42
+        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Nov 2023 11:22:08 -0700 (PDT)
+Received: from smtp1.mailbox.org (smtp1.mailbox.org [IPv6:2001:67c:2050:b231:465::1])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4SMTbt0xmXz9t0M;
-        Fri,  3 Nov 2023 19:22:02 +0100 (CET)
+        by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4SMTbv6w9Kz9sqJ;
+        Fri,  3 Nov 2023 19:22:03 +0100 (CET)
 From:   =?UTF-8?q?Jonas=20Dre=C3=9Fler?= <verdre@v0yd.nl>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     zbrown@gnome.org, =?UTF-8?q?Jonas=20Dre=C3=9Fler?= <verdre@v0yd.nl>
-Subject: [PATCH BlueZ 3/4] lib/sdp: Use correct string length in sdp_copy_seq()
-Date:   Fri,  3 Nov 2023 19:21:49 +0100
-Message-ID: <20231103182150.60088-4-verdre@v0yd.nl>
+Subject: [PATCH BlueZ 4/4] lib/sdp: Pass size_t to sdp_get_string_attr()
+Date:   Fri,  3 Nov 2023 19:21:50 +0100
+Message-ID: <20231103182150.60088-5-verdre@v0yd.nl>
 In-Reply-To: <20231103182150.60088-1-verdre@v0yd.nl>
 References: <20231103182150.60088-1-verdre@v0yd.nl>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 4SMTbv6w9Kz9sqJ
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-sdp_data_t->unitSize for strings in the SDP record is
-`sizeof(uint8_t) + strlen(str)`.
+We're currently type-casting the output of strlen(sdpdata->val.str) into
+an int, which is somewhat problematic given that strlen() can return
+values larger than sizeof(int).
 
-The "length" argument of sdp_data_alloc_with_length() is expected to be
-only the length of the string (so `sdp_data_t->unitSize - sizeof(uint8_t)`).
+We can do better here and use size_t instead, so let's do that.
 
-Since the last commit, in sdp_copy_seq() we're allocating one byte too much
-for strings now, because the `sizeof(uint8_t)` is not subtracted from unitSize
-there.
-
-Fix this by making use of the length returned by sdp_data_value() and pass
-that on to sdp_data_alloc_with_length().
+While at it, also add a comment explaining why the check here is "smaller
+than" instead of "smaller than or equal".
 
 Co-developed-by: Zander Brown <zbrown@gnome.org>
 ---
- lib/sdp.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ lib/sdp.c     |  5 +++--
+ lib/sdp_lib.h | 14 +++++++-------
+ 2 files changed, 10 insertions(+), 9 deletions(-)
 
 diff --git a/lib/sdp.c b/lib/sdp.c
-index 006ab057a..4b10d8f67 100644
+index 4b10d8f67..cff7e09fb 100644
 --- a/lib/sdp.c
 +++ b/lib/sdp.c
-@@ -1527,10 +1527,10 @@ static sdp_data_t *sdp_copy_seq(sdp_data_t *data)
- 	for (tmp = data; tmp; tmp = tmp->next) {
- 		sdp_data_t *datatmp;
- 		void *value;
-+		uint32_t len = 0;
+@@ -2180,13 +2180,14 @@ int sdp_get_int_attr(const sdp_record_t *rec, uint16_t attrid, int *value)
+ }
  
--		value = sdp_data_value(tmp, NULL);
--		datatmp = sdp_data_alloc_with_length(tmp->dtd, value,
--								tmp->unitSize);
-+		value = sdp_data_value(tmp, &len);
-+		datatmp = sdp_data_alloc_with_length(tmp->dtd, value, len);
+ int sdp_get_string_attr(const sdp_record_t *rec, uint16_t attrid, char *value,
+-								int valuelen)
++								size_t valuelen)
+ {
+ 	sdp_data_t *sdpdata = sdp_data_get(rec, attrid);
+ 	if (sdpdata)
+ 		/* Verify that it is what the caller expects */
+ 		if (SDP_IS_TEXT_STR(sdpdata->dtd))
+-			if ((int) strlen(sdpdata->val.str) < valuelen) {
++			/* Have to copy the NULL terminator too, so check len < valuelen */
++			if (strlen(sdpdata->val.str) < valuelen) {
+ 				strcpy(value, sdpdata->val.str);
+ 				return 0;
+ 			}
+diff --git a/lib/sdp_lib.h b/lib/sdp_lib.h
+index 22776b678..91d46f59d 100644
+--- a/lib/sdp_lib.h
++++ b/lib/sdp_lib.h
+@@ -141,7 +141,7 @@ int sdp_general_inquiry(inquiry_info *ii, int dev_num, int duration, uint8_t *fo
  
- 		if (cur)
- 			cur->next = datatmp;
+ /* flexible extraction of basic attributes - Jean II */
+ int sdp_get_int_attr(const sdp_record_t *rec, uint16_t attr, int *value);
+-int sdp_get_string_attr(const sdp_record_t *rec, uint16_t attr, char *value, int valuelen);
++int sdp_get_string_attr(const sdp_record_t *rec, uint16_t attr, char *value, size_t valuelen);
+ 
+ /*
+  * Basic sdp data functions
+@@ -543,32 +543,32 @@ int sdp_get_service_avail(const sdp_record_t *rec, uint8_t *svcAvail);
+ int sdp_get_service_ttl(const sdp_record_t *rec, uint32_t *svcTTLInfo);
+ int sdp_get_database_state(const sdp_record_t *rec, uint32_t *svcDBState);
+ 
+-static inline int sdp_get_service_name(const sdp_record_t *rec, char *str, int len)
++static inline int sdp_get_service_name(const sdp_record_t *rec, char *str, size_t len)
+ {
+ 	return sdp_get_string_attr(rec, SDP_ATTR_SVCNAME_PRIMARY, str, len);
+ }
+ 
+-static inline int sdp_get_service_desc(const sdp_record_t *rec, char *str, int len)
++static inline int sdp_get_service_desc(const sdp_record_t *rec, char *str, size_t len)
+ {
+ 	return sdp_get_string_attr(rec, SDP_ATTR_SVCDESC_PRIMARY, str, len);
+ }
+ 
+-static inline int sdp_get_provider_name(const sdp_record_t *rec, char *str, int len)
++static inline int sdp_get_provider_name(const sdp_record_t *rec, char *str, size_t len)
+ {
+ 	return sdp_get_string_attr(rec, SDP_ATTR_PROVNAME_PRIMARY, str, len);
+ }
+ 
+-static inline int sdp_get_doc_url(const sdp_record_t *rec, char *str, int len)
++static inline int sdp_get_doc_url(const sdp_record_t *rec, char *str, size_t len)
+ {
+ 	return sdp_get_string_attr(rec, SDP_ATTR_DOC_URL, str, len);
+ }
+ 
+-static inline int sdp_get_clnt_exec_url(const sdp_record_t *rec, char *str, int len)
++static inline int sdp_get_clnt_exec_url(const sdp_record_t *rec, char *str, size_t len)
+ {
+ 	return sdp_get_string_attr(rec, SDP_ATTR_CLNT_EXEC_URL, str, len);
+ }
+ 
+-static inline int sdp_get_icon_url(const sdp_record_t *rec, char *str, int len)
++static inline int sdp_get_icon_url(const sdp_record_t *rec, char *str, size_t len)
+ {
+ 	return sdp_get_string_attr(rec, SDP_ATTR_ICON_URL, str, len);
+ }
 -- 
 2.41.0
 
