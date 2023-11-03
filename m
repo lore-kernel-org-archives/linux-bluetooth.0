@@ -2,100 +2,121 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E104BC4167D
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Nov 2023 07:05:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 759C3C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Nov 2023 07:36:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233253AbjKCHFa (ORCPT
+        id S233511AbjKCHgv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Nov 2023 03:05:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60828 "EHLO
+        Fri, 3 Nov 2023 03:36:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233216AbjKCHF2 (ORCPT
+        with ESMTP id S233216AbjKCHgu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Nov 2023 03:05:28 -0400
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C915E3
-        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Nov 2023 00:05:22 -0700 (PDT)
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A346UT1023225;
-        Fri, 3 Nov 2023 07:05:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-type; s=qcppdkim1;
- bh=UDBd+UsEoO/swDlHvRiqOaa5Ukou0ic4thdZTh51sZA=;
- b=MLayaTIF+/TezLXjZtebZ8qCgnbmf11Zixj9WaTeEyO2LLhdFrB/GKZU16EfdXtXqB9S
- VxjUoe4yQqC7hwldDtBHylLhAzPHH6LYR4UMsa1VNkf93Ep0UlbAY8bVd5p00WTrp1zJ
- NW9sWoS+2PNbO9S8Rwzg3EgTbMdoSo9ztt6V8ZejUmm36Z77dVjyos/VDiZpxujRLU2z
- ABuOiZgscUUXPaRv8j8yerVFIQk+XfrGeeO0Kiwq9T3OV4YuheztEphlm2HAP1u46000
- Zl3VKeJCu7bKxD9eTmQWb2I0BSEkUabmBelcTaJChfjXtaNpzSq4tkxPz4QYKzQJ8zhE Bg== 
-Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3u47d52h42-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Nov 2023 07:05:17 +0000
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-        by NASANPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3A375Ggh032732
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 3 Nov 2023 07:05:16 GMT
-Received: from zijuhu-gv.qualcomm.com (10.80.80.8) by
- nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Fri, 3 Nov 2023 00:05:14 -0700
-From:   Zijun Hu <quic_zijuhu@quicinc.com>
-To:     <luiz.dentz@gmail.com>, <marcel@holtmann.org>,
-        <johan.hedberg@gmail.com>, <jaikumar@google.com>
-CC:     <linux-bluetooth@vger.kernel.org>, <quic_zijuhu@quicinc.com>
-Subject: [PATCH v2 1/1] Bluetooth: hci_event: Correct power save marking logic
-Date:   Fri, 3 Nov 2023 15:05:03 +0800
-Message-ID: <1698995103-2273-1-git-send-email-quic_zijuhu@quicinc.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1698917302-28018-1-git-send-email-quic_zijuhu@quicinc.com>
-References: <1698917302-28018-1-git-send-email-quic_zijuhu@quicinc.com>
+        Fri, 3 Nov 2023 03:36:50 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E68D8134
+        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Nov 2023 00:36:47 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id 98e67ed59e1d1-2800f7c8125so2373023a91.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Nov 2023 00:36:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698997007; x=1699601807; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=y94mI20bOU+7az8Ag6EfNTgFeC9f1gCG6sViad1/7v4=;
+        b=Xn5GzmuTdZ0wZZn/yZ05gF8HqgBFjrBI/X4NAvRIx6OQTVmMRvf3vEZSln4GrQiUrg
+         pGQcMR0IfUT0Nca66/Z8+4/fmuxl77Edf7DEDDSOZk3Kdel7pi/eZNU3olq8oWjqQpJv
+         U+dy5vTRsdSppd+K+6/GDsYwYp343edltIdisDkCysAsOGfJAwcWwT/c1p+K7x3l1LiD
+         lCAKkkP7TO3LOrTRJfrvg3d4xXQDUjWxn8pPgz4mpaTEakXHjh9REgEaz8m17Cdq7Q3P
+         ulpg0BqGocO81MqTFrmdljbRaOvBKGLguvaWkDPfD1jPwK3XWF5AxD7NiqfsgZvNLfoJ
+         m/RA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698997007; x=1699601807;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=y94mI20bOU+7az8Ag6EfNTgFeC9f1gCG6sViad1/7v4=;
+        b=wwUxgPya2BkP4gfozrXxy3eU9OKzpGcUFmx3csCXnlEf7pV0Na2BjMdEnd7bW2DCLa
+         5MtIyUFij82///pIco80ZF6ouyuZtT4Zel1+8UJY4iNItfqH90GJPHTd23C0LRV7g5Ua
+         LFfu3HoS4zEyE0nQw7MX5q8iyFAHMPGiml4dDXWxgbXQe2GcQmjNozYDHGsRvBEeM//V
+         taiGn8LlBJHmC72wVPjFmVnK+R2KWWpPAWwrnnEt8TwwdS0FqIm1iaQ6Prd9Q47vuAmO
+         sEd9rNcZjkxqcRb3h3H+UI86U/722lRk/bRakhdxizUxMeAhu+T8GkVhM+79FmEX51d8
+         mF2w==
+X-Gm-Message-State: AOJu0Yxi4NJKEHQMekYwhdVwl9BkjmZ0WfU43rPGwIP71BAFF0qhmain
+        gu8EPaK1EwVVd6pNJ1hErIgzT+QmKKA=
+X-Google-Smtp-Source: AGHT+IFgjlK4sfLORFhEaOpDJOF+18V9ZsRTtmp6B9dW1UT/ztEDZNZtgJ0TkZQhF0l28kes3TkBxw==
+X-Received: by 2002:a17:90b:4d12:b0:280:2b48:f264 with SMTP id mw18-20020a17090b4d1200b002802b48f264mr2817968pjb.0.1698997007143;
+        Fri, 03 Nov 2023 00:36:47 -0700 (PDT)
+Received: from [172.17.0.2] ([4.227.0.225])
+        by smtp.gmail.com with ESMTPSA id 14-20020a17090a000e00b0027ced921e80sm980739pja.38.2023.11.03.00.36.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Nov 2023 00:36:46 -0700 (PDT)
+Message-ID: <6544a30e.170a0220.60100.2e23@mx.google.com>
+Date:   Fri, 03 Nov 2023 00:36:46 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5981098270388039184=="
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: hYu2vuA_0whFnVKmBhn-E3yXwnY_gyGt
-X-Proofpoint-ORIG-GUID: hYu2vuA_0whFnVKmBhn-E3yXwnY_gyGt
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-03_06,2023-11-02_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- impostorscore=0 mlxlogscore=932 bulkscore=0 adultscore=0 mlxscore=0
- suspectscore=0 phishscore=0 lowpriorityscore=0 spamscore=0 clxscore=1015
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2310240000 definitions=main-2311030056
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, quic_zijuhu@quicinc.com
+Subject: RE: [v2,1/1] Bluetooth: hci_event: Correct power save marking logic
+In-Reply-To: <1698995103-2273-1-git-send-email-quic_zijuhu@quicinc.com>
+References: <1698995103-2273-1-git-send-email-quic_zijuhu@quicinc.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-HCI_CONN_POWER_SAVE should stand for non active mode, but
-hci_mode_change_evt() wrongly set this flag, it is corrected
-by this change.
+--===============5981098270388039184==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=798561
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.54 seconds
+GitLint                       PASS      0.24 seconds
+SubjectPrefix                 PASS      0.07 seconds
+BuildKernel                   PASS      33.40 seconds
+CheckAllWarning               PASS      36.70 seconds
+CheckSparse                   WARNING   42.29 seconds
+CheckSmatch                   WARNING   117.28 seconds
+BuildKernel32                 PASS      33.35 seconds
+TestRunnerSetup               PASS      511.11 seconds
+TestRunner_l2cap-tester       PASS      29.59 seconds
+TestRunner_iso-tester         PASS      51.61 seconds
+TestRunner_bnep-tester        PASS      10.03 seconds
+TestRunner_mgmt-tester        PASS      211.20 seconds
+TestRunner_rfcomm-tester      PASS      15.13 seconds
+TestRunner_sco-tester         PASS      18.46 seconds
+TestRunner_ioctl-tester       PASS      17.30 seconds
+TestRunner_mesh-tester        PASS      12.58 seconds
+TestRunner_smp-tester         PASS      13.43 seconds
+TestRunner_userchan-tester    PASS      10.34 seconds
+IncrementalBuild              PASS      31.13 seconds
+
+Details
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+
+
 ---
- net/bluetooth/hci_event.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 5b6fd625fc09..95a582bffc32 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4590,9 +4590,9 @@ static void hci_mode_change_evt(struct hci_dev *hdev, void *data,
- 		if (!test_and_clear_bit(HCI_CONN_MODE_CHANGE_PEND,
- 					&conn->flags)) {
- 			if (conn->mode == HCI_CM_ACTIVE)
--				set_bit(HCI_CONN_POWER_SAVE, &conn->flags);
--			else
- 				clear_bit(HCI_CONN_POWER_SAVE, &conn->flags);
-+			else
-+				set_bit(HCI_CONN_POWER_SAVE, &conn->flags);
- 		}
- 
- 		if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND, &conn->flags))
--- 
-The Qualcomm Innovation Center
 
+--===============5981098270388039184==--
