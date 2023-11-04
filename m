@@ -2,63 +2,63 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86FF9C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Nov 2023 01:40:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3394C4167B
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Nov 2023 01:40:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232012AbjKDBkG (ORCPT
+        id S231911AbjKDBkI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Nov 2023 21:40:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49172 "EHLO
+        Fri, 3 Nov 2023 21:40:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231749AbjKDBkF (ORCPT
+        with ESMTP id S231749AbjKDBkH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Nov 2023 21:40:05 -0400
-Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00CD7D49
-        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Nov 2023 18:40:01 -0700 (PDT)
-Received: by mail-qk1-x733.google.com with SMTP id af79cd13be357-779d0c05959so43960585a.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Nov 2023 18:40:01 -0700 (PDT)
+        Fri, 3 Nov 2023 21:40:07 -0400
+Received: from mail-qv1-xf33.google.com (mail-qv1-xf33.google.com [IPv6:2607:f8b0:4864:20::f33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62543D49
+        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Nov 2023 18:40:04 -0700 (PDT)
+Received: by mail-qv1-xf33.google.com with SMTP id 6a1803df08f44-671188b2d44so5540976d6.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Nov 2023 18:40:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vt-edu.20230601.gappssmtp.com; s=20230601; t=1699062000; x=1699666800; darn=vger.kernel.org;
+        d=vt-edu.20230601.gappssmtp.com; s=20230601; t=1699062003; x=1699666803; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/GdiVLQENCpXVQxF1p4p75FAn4IaNPjZJJ2eYyHdYOY=;
-        b=Gu8XQmOugDa3lbSzZriO/sHXD9ID2L0UMcmAl/ig7hro7cR7PiWONMijWkhR2c8i69
-         cw/LNb75KYMMUJBtc3DXAtAnCMPS6uCqDJNnvHSgQ/+fK9YWho3rO6mDqW+ad0dL/U3l
-         964KDZH2ooIPS0vIHWIx+ajxMLtFNNxwBGulbPVbKwU6tulUGW1D8wloCotEVY8byJmj
-         65qkSw0StpBSXLqFONXrcHbfjPOSiG4BTXkuvkmrAeCaHD11wK617SDECWsXjD2BxGkB
-         L3OKkDY/RZKS+ONNdCWs3guNbVbmFkKvRG6qX63kE4j1D5mPx26ngPmrrJwx1GmK1LVM
-         DZrg==
+        bh=0kItXK8IfAw5zGkCx/+0mLlASj+bZH+aDao3uOHR3q8=;
+        b=V7a7/RW5lB7JH13TESlm4g01B/7+2eybWqhv/0R0ykj88qVYMOmQuIe34dmqaAOaJe
+         l516gxyg27+LiwMMLYGAD/+QZD7gcztuo69Er59vGhAYZZ51ttGmdQxZ5WHknATVg6Ac
+         V7IILQchqJvt7buv0bGRq2Anx6kjNIgQegGrK32Rf/KJSmV9Z+ydLLBevmJbVI+4fnRd
+         7+8c/85SSIr1JrYpwHcdKSXoSshr+k24X5JwLjcRo3I99G2qUEyFeSvxzT70ChsF4uKm
+         NBraG0csh2F52eecHk84HxZoKnTfkeHDeZ4RwJQBjK5FhLyzJn/JZgZX7XRzdHb03v7P
+         uLOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699062000; x=1699666800;
+        d=1e100.net; s=20230601; t=1699062003; x=1699666803;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=/GdiVLQENCpXVQxF1p4p75FAn4IaNPjZJJ2eYyHdYOY=;
-        b=FUl2TuaqpGzyRQLXKl1I1JrlLX27wp9fZn5Gccv8694h34KTmnaFQF3Ddzpr4UEErx
-         uUQc53fJtZ65s+DnyjDHN5DZpkP6C2yFwHeBe6NjJxBCqRd/FO/yKcC60RIWV/ANSakA
-         Lf1UWWrZsh8/24HEQNfP4+1fY2nwkXl1RU2Fr3S0AsH0hesiR5loBiT0OSN26DM5TYcY
-         gMiJEM6eMt8Fe945/8CvQlrWCm09MIQVR0wdvEMnW2yWpT/qunoXEL3/LCV7/efPOthp
-         fXa5K8l/sE/IOzz4vc3ChPWMK/+bLkWM/MW3j5woNyzGBShocvuGfoveaSG3XTiaE33P
-         FPCQ==
-X-Gm-Message-State: AOJu0YxgRzxx3RuIZGmtc7ZF02c0NBKagGOe3vOkxWh8vY9FI0tewErA
-        76ENMl12NBYUYB3ZnBnJyz6vz/XprEpfw7YLR7udoQUWbGjjCSoLvfxF9Mvwvl1f6h5VDvu/jbF
-        /RHOwmRgOMfuIHlVBlppDoHaAa9GSy2GvnPKKUHiEy1L8M5J5/exojib1EwJtDCu+BDhHwLvxSe
-        zh
-X-Google-Smtp-Source: AGHT+IEwCI43seHP/Ve/jmoJn3PbJWF7o1UQflxR9Mzg5k8fmWFpPrk6oShNC2o14BFF6oW5CWxXmQ==
-X-Received: by 2002:a05:620a:9041:b0:77a:69a1:b6a3 with SMTP id rl1-20020a05620a904100b0077a69a1b6a3mr3487516qkn.1.1699062000251;
-        Fri, 03 Nov 2023 18:40:00 -0700 (PDT)
+        bh=0kItXK8IfAw5zGkCx/+0mLlASj+bZH+aDao3uOHR3q8=;
+        b=bcarWBCQVeCCgKTYZZgbD6+W/KzKetWW60s1Yiu13IPJMZpBTr7E4kkMDUiL9iUnFQ
+         y7T3YgKawCRE/+g8xJgA7EBatSur/89OXvqpkFKPGqNsCxMvW54/fBSUC/J1B81KI0WD
+         1sJVDYDfs3SqWIwvmX6vYm4LpUlan47e6mPtf3Q2E8owcG1vee+/FC/gUqY7uqjTfjmV
+         ZpJqprHKFT7Xc/mZcbbzY2z1ARuHS87N5jZjC+0Egs7NimchmwlZ78r0H34xU38C6qXc
+         dNeu8GBcn8twubxWOep69iTbf+/G1DDjbHPA2XuP/JFlwUserwJJ4/2bJ2vSmaeBuLh1
+         X/vw==
+X-Gm-Message-State: AOJu0YxVRY0SPJT6JI/lpxmrZnkj8AY5LktmMaEIczETJY5ej7s7dvvj
+        gzTCR1yqV9su6YwOEJjbpg4LJRjIT9fnR4m5jaV4zHqdxsn6IR/deLPewtAh8mkj7fHp8YPr15g
+        ZdrDrtb1ivDFSNoJJkk0G6T+uDGlougucnmcKwTZoO5QNyyW1m8DP0SrriJJb406EAwb9yVMco8
+        wp
+X-Google-Smtp-Source: AGHT+IGmoAIGGXh1Fd9otrPi1kAh4K1vQm+1DWDENIgWsmaZJoUFqEMRrUwH/QXzgi0nS2poN8xsKg==
+X-Received: by 2002:a05:620a:470e:b0:775:82e2:dc19 with SMTP id bs14-20020a05620a470e00b0077582e2dc19mr26495730qkb.2.1699062002473;
+        Fri, 03 Nov 2023 18:40:02 -0700 (PDT)
 Received: from debian.localdomain (c-73-177-243-39.hsd1.va.comcast.net. [73.177.243.39])
-        by smtp.gmail.com with ESMTPSA id l17-20020a05620a28d100b007770d47c621sm1216955qkp.66.2023.11.03.18.39.59
+        by smtp.gmail.com with ESMTPSA id l17-20020a05620a28d100b007770d47c621sm1216955qkp.66.2023.11.03.18.40.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Nov 2023 18:39:59 -0700 (PDT)
+        Fri, 03 Nov 2023 18:40:02 -0700 (PDT)
 From:   Paul Otto <potto@vt.edu>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Paul Otto <potto@ieee.org>
-Subject: [PATCH BlueZ 5/7] update doc for bluetoothctl-player.rst
-Date:   Fri,  3 Nov 2023 21:38:48 -0400
-Message-Id: <20231104013850.24182-6-potto@vt.edu>
+Subject: [PATCH BlueZ 6/7] update doc for bluetoothctl-scan.rst
+Date:   Fri,  3 Nov 2023 21:38:49 -0400
+Message-Id: <20231104013850.24182-7-potto@vt.edu>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20231104013850.24182-1-potto@vt.edu>
 References: <20231104013850.24182-1-potto@vt.edu>
@@ -71,40 +71,35 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 From: Paul Otto <potto@ieee.org>
 
 ---
- client/bluetoothctl-player.rst | 200 +++++++++++++++++++++++++++++++++
- 1 file changed, 200 insertions(+)
- create mode 100644 client/bluetoothctl-player.rst
+ client/bluetoothctl-scan.rst | 146 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 146 insertions(+)
+ create mode 100644 client/bluetoothctl-scan.rst
 
-diff --git a/client/bluetoothctl-player.rst b/client/bluetoothctl-player.rst
+diff --git a/client/bluetoothctl-scan.rst b/client/bluetoothctl-scan.rst
 new file mode 100644
-index 000000000..96960c45b
+index 000000000..4bd06595d
 --- /dev/null
-+++ b/client/bluetoothctl-player.rst
-@@ -0,0 +1,200 @@
-+===================
-+bluetoothctl-player
-+===================   
++++ b/client/bluetoothctl-scan.rst
+@@ -0,0 +1,146 @@
++=================
++bluetoothctl-scan
++=================
 +
-+--------------------
-+Media Player Submenu
-+--------------------
++------------
++Scan Submenu
++------------
 +
 +:Version: BlueZ
 +:Copyright: Free use of this software is granted under ther terms of the GNU
 +            Lesser General Public Licenses (LGPL).
-+:Date: November 2022
++:Date: July 2023
 +:Manual section: 1
 +:Manual group: Linux System Administration
 +
 +SYNOPSIS
 +========
 +
-+**bluetoothctl** [**-a** *capability*] [**-e**] [**-m**] [**-t** *seconds*] [**-v**] [**-h**]
-+
-+DESCRIPTION
-+===========
-+
-+**bluetoothctl(1)** interactive bluetooth control tool. The tool works with Bluetooth Classic (BR/EDR) and Bluetooth Low Energy (LE) controllers.
++**bluetoothctl** [**-a** *capability*] [**-e**] [**-m**] [**-t** *seconds*] [**-v**] [**-h**] [scan.commands]
 +
 +OPTIONS
 +=======
@@ -116,128 +111,80 @@ index 000000000..96960c45b
 +-v, --version       Display version
 +-h, --help          Display help
 +
-+Media Player Commands
-+=====================
-+   We divide bluetoothctl into main menu commands and submenu commands. The submenu commands control options 
-+   numbers for the commands can be hex (0x0F) or decimal (10)
++Scan Commands
++=============
++   The scan commands control options numbers for the commands can be hex (0x0F) or decimal (10)
 +   
-+list
-+----
-+List available players
-+
-+:Usage: **# list**
-+
-+show
-+----
-+Show player information
-+
-+:Usage: **# show [player]**
-+
-+select
-+------
-+Select default player
-+
-+:Usage: **# select <player>**
-+
-+play
-+----
-+Start playback
-+
-+:Usage: **# play [item]**
-+
-+pause
++uuids
 +-----
-+Pause playback
++Set/Get UUIDs filter
 +
-+:Usage: **# pause**
++:Usage: **# uuids [all/uuid1 uuid2 ...]**
 +
-+stop
++rssi
 +----
-+Stop playback
++Set/Get RSSI filter, and clears pathloss
++This sets the minimum rssi value for reporting device advertisements. The value is in dBm.
++Example: To only show devices with rssi values greater than or equal to -60 dBm, use `scan.rssi -60`.
++If one or more discovery filters have been set, the RSSI delta-threshold imposed by starting discovery by default will not be applied.
 +
-+:Usage: **# stop**
++:Usage: **# rssi [rssi]**
 +
-+next
-+----
-+Jump to next item
-+
-+:Usage: **# next**
-+
-+previous
++pathloss
 +--------
-+Jump to previous item
++Set/Get Pathloss filter, and clears RSSI
++This sets the maximum pathloss value for reporting device advertisements. The value is in dB.
++Example: To only show devices with pathloss values less than or equal to 4 dB, use `scan.pathloss 4`.
++If one or more discovery filters have been set, the RSSI delta-threshold imposed by starting discovery by default will not be applied.
 +
-+:Usage: **# previous**
++:Usage: **# pathloss [pathloss]**
 +
-+fast-forward
++transport
++---------
++Set/Get transport filter
++Transport parameter determines the type of scan. The default is auto.
++
++Possible values:
++
++- "auto": interleaved scan
++- "bredr": BR/EDR inquiry
++- "le": LE scan only
++
++If "le" or "bredr" Transport is requested and the controller doesn't support it, an org.bluez.Error.Failed error will be returned. If "auto" transport is requested, the scan will use LE, BREDR, or both, depending on what's currently enabled on the controller. 
++
++duplicate-data
++--------------
++Set/Get duplicate data filter
++Disables duplicate detection of advertisement data. When enabled, PropertiesChanged signals will be generated for ManufacturerData and ServiceData every time they are discovered.
++
++:Usage: **# duplicate-data [on/off]**
++
++discoverable
 +------------
-+Fast forward playback
++Set/Get discoverable filter
++Makes the adapter discoverable while discovering. If the adapter is already discoverable, setting this filter won't have any effect.
 +
-+:Usage: **# fast-forward**
++:Usage: **# discoverable [on/off]**
 +
-+rewind
-+------
-+Rewind playback
-+
-+:Usage: **# rewind**
-+
-+equalizer
-+---------
-+Enable/Disable equalizer
-+
-+:Usage: **# equalizer <on/off>**
-+
-+repeat
-+------
-+Set repeat mode
-+
-+:Usage: **# repeat <singletrack/alltrack/group/off>**
-+
-+shuffle
++pattern
 +-------
-+Set shuffle mode
++Set/Get pattern filter
++Discover devices where the pattern matches either the prefix of the address or the device name, which is a convenient way to limit the number of device objects created during a discovery.
++When set, it disregards device discoverable flags.
++Note: The pattern matching is ignored if there are other clients that don't set any pattern, as it works as a logical OR. Also, setting an empty string "" pattern will match any device found.
 +
-+:Usage: **# shuffle <alltracks/group/off>**
++:Usage: **# pattern [value]**
 +
-+scan
-+----
-+Set scan mode
 +
-+:Usage: **# scan <alltracks/group/off>**
-+
-+change-folder
-+-------------
-+Change current folder
-+
-+:Usage: **# change-folder <item>**
-+
-+list-items
-+----------
-+List items of current folder
-+
-+:Usage: **# list-items [start] [end]**
-+
-+search
-+------
-+Search items containing string
-+
-+:Usage: **# search <string>**
-+
-+queue
++clear
 +-----
-+Add item to playlist queue
++Clears discovery filter
 +
-+:Usage: **# queue <item>**
-+
-+show-item
-+---------
-+Show item information
-+
-+:Usage: **# show-item <item>**
++:Usage: **# clear [uuids/rssi/pathloss/transport/duplicate-data/discoverable/pattern]**
 +
 +back
 +----
-+Return to main menu
++Return to the main menu
 +
 +:Usage: **# back**
 +
@@ -270,7 +217,6 @@ index 000000000..96960c45b
 +Print environment variables
 +
 +:Usage: **# export**
-+
 +
 +RESOURCES
 +=========
