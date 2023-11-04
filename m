@@ -2,95 +2,183 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EB45C4167B
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Nov 2023 01:39:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADDBAC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Nov 2023 01:39:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231934AbjKDBjo (ORCPT
+        id S231909AbjKDBjy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Nov 2023 21:39:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47062 "EHLO
+        Fri, 3 Nov 2023 21:39:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229557AbjKDBjl (ORCPT
+        with ESMTP id S231749AbjKDBjx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Nov 2023 21:39:41 -0400
-Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E2D1D42
-        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Nov 2023 18:39:37 -0700 (PDT)
-Received: by mail-qt1-x834.google.com with SMTP id d75a77b69052e-41cbcb392e5so3565691cf.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Nov 2023 18:39:37 -0700 (PDT)
+        Fri, 3 Nov 2023 21:39:53 -0400
+Received: from mail-qv1-xf31.google.com (mail-qv1-xf31.google.com [IPv6:2607:f8b0:4864:20::f31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63A7AD5F
+        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Nov 2023 18:39:50 -0700 (PDT)
+Received: by mail-qv1-xf31.google.com with SMTP id 6a1803df08f44-670237ba9b1so5713486d6.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Nov 2023 18:39:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vt-edu.20230601.gappssmtp.com; s=20230601; t=1699061976; x=1699666776; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=PeKTVVZEemBWoIOfwdb7oP+vFC9eEWZMQATwxLReVuM=;
-        b=kQHYCf/TPjOQC06lby+0YcB7zK8cNtOqJg4qRuN14LZ3CKjMQ1rWkqM9q9YjrUNagD
-         eQdw3HAI3Ff59IBwD9mMGyqkx15xMh0F6/CBOGr8PFBLjPk+1gEbLu/2edZ9cX9G42hF
-         gAU0KOuEPeW9tlNYDFx1W2CoXTB6skszvk8umnu1wxW2CcyBozUZTg3LbEKU0hQQ7KUc
-         ojcy3EBZO0U0G1eE1nL9gPkmo4y+6lYMDMhUCKIglOH7U0L/Z5ONT8hXPy6l+oUkIsWZ
-         Svjwg4CUJG4LdJM15r7s90qB301JTHbUlnxRqeQdwnbM5ZtzatQ8CVQe30snxghdaqVW
-         7dhw==
+        d=vt-edu.20230601.gappssmtp.com; s=20230601; t=1699061989; x=1699666789; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c3Yhy9Hf5+nnSUNmSBL33gHvI8iid5vFUHfOckgKkt8=;
+        b=XYBGqBcdjqxWKxQhRzZdm7F/jWdSrupHEcne3YsUywa+B7XWXPTTSrr+oY/hBnbBjW
+         1Rf+gCG5W6SaLRqePWKxnEc8AyAeoIOPeQgCtsCMo1Vg26473xAG3lB1CSytyOr3aux5
+         fwEpyMHRiZgDjU+1cXq3LAtVXp7zO7iEb30YoYrDTZzdlwkdF0xl3zxYz0J/RiIfcO2y
+         UXl6y3lKtdjJep50zjbPExyXywEkejazJugxJ3ZWO6ahIzJp1WioXgVv+Iuw5WA0+h83
+         c6FjsHUgdEmNaF976czqcCgTTLzPZ/THB3yIdrWHHhVtVnB/W1sx2EDKwKzHRnFJLA5i
+         0yMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699061976; x=1699666776;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PeKTVVZEemBWoIOfwdb7oP+vFC9eEWZMQATwxLReVuM=;
-        b=ly9/TIfW8oPewwpeXpyAINkuBRr+FGyXs6U5b8YnCeryHC/PH1hIPZVc94D7IJrulW
-         YUpqYBAz0Y1ST82aR9qW3hC1I0eonzRVSkYfZ8Ta2dB2v4fU1SuM4JDWLxQd6ym55zHb
-         7j2NkqBMVpo6EsOw3nKiZIk9fSQnBK+8TwHrjVdBb3JZUgYiKM9cXIam3OSGBjSMVNJ/
-         1IlWj+vkYISUQTLHB+hrJxStEmP+oMxKctwZfUm2n0xsMWUKMj3KOXjgDoSrIlOr0PER
-         WZOJxyPuCZ6X71n3eJliv/lds7zGzDx2aN4V0Yl+pAuiHLgbotMpWg2XQ7GMN1pUBXhA
-         bn3w==
-X-Gm-Message-State: AOJu0Yw1Hq8SFhkeg3RTBgwoAQHRUEpfzkPZ2aBvyuOPhZ9L3koI7yIc
-        WRcM4R8kyK+T1bqvv+9v9sh6jnJ+6+TVIKqzQw33oXlVnuR6rx9bsu8MOW4L/uG6msxiYbjlhRu
-        cjBnjTZhWY4HWM3isWdaohkwp19P74SNHHZoRZL5App0sfFaX+dVsrV2eQdWBuJDX4a5BN+zuoj
-        oZ
-X-Google-Smtp-Source: AGHT+IH/IrRlzfWLZwY8pKMbDY80JRfn/bNNrOHvA+jfySMHsEyQtwsmdw6ZIUg9KX8pcW7uruDP2w==
-X-Received: by 2002:a05:620a:2b43:b0:76d:95d3:800f with SMTP id dp3-20020a05620a2b4300b0076d95d3800fmr23319938qkb.3.1699061975629;
-        Fri, 03 Nov 2023 18:39:35 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1699061989; x=1699666789;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=c3Yhy9Hf5+nnSUNmSBL33gHvI8iid5vFUHfOckgKkt8=;
+        b=KMgR2GYZ05JsDFxw++v1eBfOHr9H+t8n0/SiIG4gLzqOuI2+wEsPnH5qcvlPybSJv5
+         M6ri+MAgHbAax7ZZj3gbEvwsZpKPU+gX/AeYB/cQa+UNrlCL0O6wZ9xY/P9q8+zScAKH
+         +/lcUiwyrXF7x+NP8NANNU4hxS3sPVTcNcfbbx2/712ByE/1iXNtDZeMKlk851/zJdRz
+         jexdZ0Oy9GT3JuNDjiRPtvHcgwk7t4inTQ7IXRNSENwb+4q2DDo4SpG7YVNXal4IeATf
+         FlutyMoL6EHGAnuzve++8i3BDOYC54Fose4I4QHn90wqBdRcuucA4ULT0YaVg5xB5sA5
+         zY4Q==
+X-Gm-Message-State: AOJu0Yx5W588Z+MafMXLN50Qcvv8B9yfnZyogZiDVu5Bu7hAYvJ1Iir9
+        r+jFc0XHkq4oZfbNRXOprKm3u2fJt+rwZdhwB8Kwar+BsqA7jcturm7of0XHVPWOTm0/4vJaKrr
+        abgYX7Owkgg6DDjfzX7va9ki9E9RgeuBV3IvZ16d6Yz+syuxp0O5Wv5JwISM0jlZI40q6KZdxc4
+        Rq
+X-Google-Smtp-Source: AGHT+IF4EVlBDx/Btmv1it3nFf9FZgDV/8FIUsZCNXZeRGVIQ3fLesJ/A/d68HUn+KyNldvgG3njwg==
+X-Received: by 2002:a05:620a:24c3:b0:76f:27af:2797 with SMTP id m3-20020a05620a24c300b0076f27af2797mr26864388qkn.0.1699061988678;
+        Fri, 03 Nov 2023 18:39:48 -0700 (PDT)
 Received: from debian.localdomain (c-73-177-243-39.hsd1.va.comcast.net. [73.177.243.39])
-        by smtp.gmail.com with ESMTPSA id l17-20020a05620a28d100b007770d47c621sm1216955qkp.66.2023.11.03.18.39.34
+        by smtp.gmail.com with ESMTPSA id l17-20020a05620a28d100b007770d47c621sm1216955qkp.66.2023.11.03.18.39.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Nov 2023 18:39:34 -0700 (PDT)
+        Fri, 03 Nov 2023 18:39:48 -0700 (PDT)
 From:   Paul Otto <potto@vt.edu>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     Paul Otto <potto@vt.edu>
-Subject: [PATCH BlueZ 0/7] Update bluetoothctl documentation 
-Date:   Fri,  3 Nov 2023 21:38:43 -0400
-Message-Id: <20231104013850.24182-1-potto@vt.edu>
+Cc:     Paul Otto <potto@ieee.org>
+Subject: [PATCH BlueZ 1/7] update doc for bluetoothctl-admin.rst
+Date:   Fri,  3 Nov 2023 21:38:44 -0400
+Message-Id: <20231104013850.24182-2-potto@vt.edu>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20231104013850.24182-1-potto@vt.edu>
+References: <20231104013850.24182-1-potto@vt.edu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+From: Paul Otto <potto@ieee.org>
 
-Paul Otto (7):
-  update doc for bluetoothctl-admin.rst
-  update doc for bluetoothctl-advertise.rst
-  update doc for bluetoothctl-endpoint.rst
-  update doc for bluetoothctl-gatt.rst
-  update doc for bluetoothctl-player.rst
-  update doc for bluetoothctl-scan.rst
-  update doc for bluetoothctl-transport.rst
-
- client/bluetoothctl-admin.rst     |  98 ++++++++++++
- client/bluetoothctl-advertise.rst | 243 ++++++++++++++++++++++++++++++
- client/bluetoothctl-endpoint.rst  | 121 +++++++++++++++
- client/bluetoothctl-gatt.rst      | 212 ++++++++++++++++++++++++++
- client/bluetoothctl-player.rst    | 200 ++++++++++++++++++++++++
- client/bluetoothctl-scan.rst      | 146 ++++++++++++++++++
- client/bluetoothctl-transport.rst | 128 ++++++++++++++++
- 7 files changed, 1148 insertions(+)
+---
+ client/bluetoothctl-admin.rst | 98 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 98 insertions(+)
  create mode 100644 client/bluetoothctl-admin.rst
- create mode 100644 client/bluetoothctl-advertise.rst
- create mode 100644 client/bluetoothctl-endpoint.rst
- create mode 100644 client/bluetoothctl-gatt.rst
- create mode 100644 client/bluetoothctl-player.rst
- create mode 100644 client/bluetoothctl-scan.rst
- create mode 100644 client/bluetoothctl-transport.rst
 
+diff --git a/client/bluetoothctl-admin.rst b/client/bluetoothctl-admin.rst
+new file mode 100644
+index 000000000..7084bdad0
+--- /dev/null
++++ b/client/bluetoothctl-admin.rst
+@@ -0,0 +1,98 @@
++==================
++bluetoothctl-admin
++==================
++
++--------------------
++Admin Policy Submenu
++--------------------
++
++:Version: BlueZ
++:Copyright: Free use of this software is granted under ther terms of the GNU
++            Lesser General Public Licenses (LGPL).
++:Date: November 2022
++:Manual section: 1
++:Manual group: Linux System Administration
++
++SYNOPSIS
++========
++
++**bluetoothctl** [**-a** *capability*] [**-e**] [**-m**] [**-t** *seconds*] [**-v**] [**-h**]
++
++DESCRIPTION
++===========
++
++**bluetoothctl(1)** interactive bluetooth control tool. The tool works with Bluetooth Classic (BR/EDR) and Bluetooth Low Energy (LE) controllers.
++
++OPTIONS
++=======
++
++-a capability, --agent capability        Register agent handler: <capability>
++-e, --endpoints                  Register Media endpoints
++-m, --monitor                    Enable monitor output
++-t seconds, --timeout seconds    Timeout in seconds for non-interactive mode
++-v, --version       Display version
++-h, --help          Display help
++
++Admin Policy Commands
++=====================
++   We divide bluetoothctl into main menu commands and submenu commands. The submenu commands control options 
++   numbers for the commands can be hex (0x0F) or decimal (10)
++   
++allow
++-----
++   Allow service UUIDs and block rest of them
++   Syntax: allow [clear/uuid1 uuid2 ...]
++   Example: allow 0x1101 0x1102 0x1103
++   Example: allow clear
++
++:Usage: **#allow [clear/uuid1 uuid2 ...]**
++
++back
++----
++   Return to main menu 
++
++:Usage: **#back**
++
++version
++-------
++   Display version
++
++:Usage: **#version**
++
++quit
++----
++   Quit program
++
++:Usage: **#quit**
++
++exit
++----
++   Quit program
++
++:Usage: **#exit**
++
++help
++----
++   Display help about this program
++
++:Usage: **#help**
++
++export
++------
++   Print environment variables
++
++:Usage: **#export**
++
++EXAMPLES
++========
++
++
++RESOURCES
++=========
++
++http://www.bluez.org
++
++REPORTING BUGS
++==============
++
++linux-bluetooth@vger.kernel.org
 -- 
 2.30.2
 
