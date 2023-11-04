@@ -2,63 +2,63 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67B40C4167D
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Nov 2023 01:40:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86FF9C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Nov 2023 01:40:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232024AbjKDBkD (ORCPT
+        id S232012AbjKDBkG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Nov 2023 21:40:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49126 "EHLO
+        Fri, 3 Nov 2023 21:40:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231961AbjKDBkC (ORCPT
+        with ESMTP id S231749AbjKDBkF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Nov 2023 21:40:02 -0400
-Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B79BBD54
-        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Nov 2023 18:39:59 -0700 (PDT)
-Received: by mail-qk1-x72c.google.com with SMTP id af79cd13be357-77891670417so44077885a.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Nov 2023 18:39:59 -0700 (PDT)
+        Fri, 3 Nov 2023 21:40:05 -0400
+Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00CD7D49
+        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Nov 2023 18:40:01 -0700 (PDT)
+Received: by mail-qk1-x733.google.com with SMTP id af79cd13be357-779d0c05959so43960585a.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Nov 2023 18:40:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vt-edu.20230601.gappssmtp.com; s=20230601; t=1699061998; x=1699666798; darn=vger.kernel.org;
+        d=vt-edu.20230601.gappssmtp.com; s=20230601; t=1699062000; x=1699666800; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4+XmwslSHI6aiYhUgryxeACv4fY557OUpCRJYsq9njk=;
-        b=jeS0w3II8o8DCiZyKieacvsUPXU6t6lcdCLAVeGgtyREWONCbh2wD6ZFHkkaku02Vm
-         Chf9X9gKm0w0xne3Pkcjk6YQDn0KggTOM5UAsKkWhtTULJjXVgN/9CJKptL6cAdqRi3O
-         y9IEl3Ui378vwgxiDxbDdFu14O01v+zyfmtbn2nADuqTaR1LGSTL5cVmAhakWs22K3Zs
-         flvd5nRjPoVuMOK26dTje91VjdzYnIs77R5vmnPNw3kpTu2ohuJtqls6KTpD24ltKoDX
-         dplR97Q4IqnO8atQzDadFLZ9XibXtgA8b30aeRn05BbkT7avw0nbqliLefoIK6LRwa0j
-         wQ6Q==
+        bh=/GdiVLQENCpXVQxF1p4p75FAn4IaNPjZJJ2eYyHdYOY=;
+        b=Gu8XQmOugDa3lbSzZriO/sHXD9ID2L0UMcmAl/ig7hro7cR7PiWONMijWkhR2c8i69
+         cw/LNb75KYMMUJBtc3DXAtAnCMPS6uCqDJNnvHSgQ/+fK9YWho3rO6mDqW+ad0dL/U3l
+         964KDZH2ooIPS0vIHWIx+ajxMLtFNNxwBGulbPVbKwU6tulUGW1D8wloCotEVY8byJmj
+         65qkSw0StpBSXLqFONXrcHbfjPOSiG4BTXkuvkmrAeCaHD11wK617SDECWsXjD2BxGkB
+         L3OKkDY/RZKS+ONNdCWs3guNbVbmFkKvRG6qX63kE4j1D5mPx26ngPmrrJwx1GmK1LVM
+         DZrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699061998; x=1699666798;
+        d=1e100.net; s=20230601; t=1699062000; x=1699666800;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4+XmwslSHI6aiYhUgryxeACv4fY557OUpCRJYsq9njk=;
-        b=Hveeo0KHNzAmj5A+KrZmJ45UNTN9tEHZfwUGRqrfiHbYqCHamBJt/e0fG4oUm5u/YR
-         DraxfbXaYsc2WhiLy0IcTXVCeAGKN1P8cZc4HoWUzLhMqUjfRXLpdBmsP+vBPLvzve+4
-         JwyrmVGdgpn9bIhC7t2iKOsWN2Htx5rPxbHXRoMQnceD2iOEoaeHa1m6x0hGV+tc6TO0
-         +JkcZvd2l28D0jbKOt13hHYz2xKHZgKgBdbdNm5qprEoh6pV+qYyypOppJuYGLeW3VES
-         bDzhuYteOl/C/ILEsaFhP1GlUUaJfvzIs4fXyr+XDh3WRMpv+o1J057+KXypq4lqvACH
-         aRJw==
-X-Gm-Message-State: AOJu0YzB0N+H3WT+51XDe2HvivjZD8sAh77jc6M6eGpQpB3nLuhhmELT
-        wmDxsk7gY14RVV8712p1C8+yADgmBi2xhAhQbLXEQhDX06vUlhE0ud2Z6LOCHpmgh4xOoqLGA8g
-        wK+FiHm+nKGLDx5+Y05UwjjIq70GM1ik4VpkBr7LNe77J1z+A7u0437716+c9YnNcUkuTbP4BdZ
-        gM
-X-Google-Smtp-Source: AGHT+IEZM4LabqFnBPLB6zwBu4WRWDSPGbdZjVOQh/eDvSYguFhne1a8uvZ2W3b1D33FV5S0FGIgEg==
-X-Received: by 2002:a05:620a:4052:b0:76e:f686:cacb with SMTP id i18-20020a05620a405200b0076ef686cacbmr26722275qko.3.1699061997960;
-        Fri, 03 Nov 2023 18:39:57 -0700 (PDT)
+        bh=/GdiVLQENCpXVQxF1p4p75FAn4IaNPjZJJ2eYyHdYOY=;
+        b=FUl2TuaqpGzyRQLXKl1I1JrlLX27wp9fZn5Gccv8694h34KTmnaFQF3Ddzpr4UEErx
+         uUQc53fJtZ65s+DnyjDHN5DZpkP6C2yFwHeBe6NjJxBCqRd/FO/yKcC60RIWV/ANSakA
+         Lf1UWWrZsh8/24HEQNfP4+1fY2nwkXl1RU2Fr3S0AsH0hesiR5loBiT0OSN26DM5TYcY
+         gMiJEM6eMt8Fe945/8CvQlrWCm09MIQVR0wdvEMnW2yWpT/qunoXEL3/LCV7/efPOthp
+         fXa5K8l/sE/IOzz4vc3ChPWMK/+bLkWM/MW3j5woNyzGBShocvuGfoveaSG3XTiaE33P
+         FPCQ==
+X-Gm-Message-State: AOJu0YxgRzxx3RuIZGmtc7ZF02c0NBKagGOe3vOkxWh8vY9FI0tewErA
+        76ENMl12NBYUYB3ZnBnJyz6vz/XprEpfw7YLR7udoQUWbGjjCSoLvfxF9Mvwvl1f6h5VDvu/jbF
+        /RHOwmRgOMfuIHlVBlppDoHaAa9GSy2GvnPKKUHiEy1L8M5J5/exojib1EwJtDCu+BDhHwLvxSe
+        zh
+X-Google-Smtp-Source: AGHT+IEwCI43seHP/Ve/jmoJn3PbJWF7o1UQflxR9Mzg5k8fmWFpPrk6oShNC2o14BFF6oW5CWxXmQ==
+X-Received: by 2002:a05:620a:9041:b0:77a:69a1:b6a3 with SMTP id rl1-20020a05620a904100b0077a69a1b6a3mr3487516qkn.1.1699062000251;
+        Fri, 03 Nov 2023 18:40:00 -0700 (PDT)
 Received: from debian.localdomain (c-73-177-243-39.hsd1.va.comcast.net. [73.177.243.39])
-        by smtp.gmail.com with ESMTPSA id l17-20020a05620a28d100b007770d47c621sm1216955qkp.66.2023.11.03.18.39.57
+        by smtp.gmail.com with ESMTPSA id l17-20020a05620a28d100b007770d47c621sm1216955qkp.66.2023.11.03.18.39.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Nov 2023 18:39:57 -0700 (PDT)
+        Fri, 03 Nov 2023 18:39:59 -0700 (PDT)
 From:   Paul Otto <potto@vt.edu>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Paul Otto <potto@ieee.org>
-Subject: [PATCH BlueZ 4/7] update doc for bluetoothctl-gatt.rst
-Date:   Fri,  3 Nov 2023 21:38:47 -0400
-Message-Id: <20231104013850.24182-5-potto@vt.edu>
+Subject: [PATCH BlueZ 5/7] update doc for bluetoothctl-player.rst
+Date:   Fri,  3 Nov 2023 21:38:48 -0400
+Message-Id: <20231104013850.24182-6-potto@vt.edu>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20231104013850.24182-1-potto@vt.edu>
 References: <20231104013850.24182-1-potto@vt.edu>
@@ -71,23 +71,23 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 From: Paul Otto <potto@ieee.org>
 
 ---
- client/bluetoothctl-gatt.rst | 212 +++++++++++++++++++++++++++++++++++
- 1 file changed, 212 insertions(+)
- create mode 100644 client/bluetoothctl-gatt.rst
+ client/bluetoothctl-player.rst | 200 +++++++++++++++++++++++++++++++++
+ 1 file changed, 200 insertions(+)
+ create mode 100644 client/bluetoothctl-player.rst
 
-diff --git a/client/bluetoothctl-gatt.rst b/client/bluetoothctl-gatt.rst
+diff --git a/client/bluetoothctl-player.rst b/client/bluetoothctl-player.rst
 new file mode 100644
-index 000000000..346e7f388
+index 000000000..96960c45b
 --- /dev/null
-+++ b/client/bluetoothctl-gatt.rst
-@@ -0,0 +1,212 @@
-+============
-+bluetoothctl
-+============
++++ b/client/bluetoothctl-player.rst
+@@ -0,0 +1,200 @@
++===================
++bluetoothctl-player
++===================   
 +
-+-------------------------
-+Generic Attribute Submenu
-+-------------------------
++--------------------
++Media Player Submenu
++--------------------
 +
 +:Version: BlueZ
 +:Copyright: Free use of this software is granted under ther terms of the GNU
@@ -101,6 +101,11 @@ index 000000000..346e7f388
 +
 +**bluetoothctl** [**-a** *capability*] [**-e**] [**-m**] [**-t** *seconds*] [**-v**] [**-h**]
 +
++DESCRIPTION
++===========
++
++**bluetoothctl(1)** interactive bluetooth control tool. The tool works with Bluetooth Classic (BR/EDR) and Bluetooth Low Energy (LE) controllers.
++
 +OPTIONS
 +=======
 +
@@ -111,141 +116,124 @@ index 000000000..346e7f388
 +-v, --version       Display version
 +-h, --help          Display help
 +
-+COMMANDS
-+========
++Media Player Commands
++=====================
 +   We divide bluetoothctl into main menu commands and submenu commands. The submenu commands control options 
 +   numbers for the commands can be hex (0x0F) or decimal (10)
 +   
-+
-+
-+Generic Attribute Commands
-+==========================
-+
-+list-attributes
-+---------------
-+List attributes
-+
-+:Usage: **# list-attributes <attribute/UUID>**
-+
-+select-attribute
-+----------------
-+Select attribute
-+
-+:Usage: **# select-attribute <attribute/UUID>**
-+
-+attribute-info
-+--------------
-+Select attribute
-+
-+:Usage: **# attribute-info [attribute/UUID]**
-+
-+read
++list
 +----
-+Read attribute value
++List available players
 +
-+:Usage: **# read [offset]**
++:Usage: **# list**
 +
-+write
-+-----
-+Write attribute value
++show
++----
++Show player information
 +
-+:Usage: **# write <data=xx xx ...> [offset] [type]**
++:Usage: **# show [player]**
 +
-+acquire-write
-+-------------
-+Acquire Write file descriptor
-+
-+:Usage: **# acquire-write**
-+
-+release-write
-+-------------
-+Release Write file descriptor
-+
-+:Usage: **# release-write**
-+
-+acquire-notify
-+--------------
-+Acquire Notify file descriptor
-+
-+:Usage: **# acquire-notify**
-+
-+release-notify
-+--------------
-+Release Notify file descriptor
-+
-+:Usage: **# release-notify**
-+
-+notify
++select
 +------
-+Notify attribute value
++Select default player
 +
-+:Usage: **# notify <on/off>**
++:Usage: **# select <player>**
 +
-+clone
++play
++----
++Start playback
++
++:Usage: **# play [item]**
++
++pause
 +-----
-+Clone a device or attribute
++Pause playback
 +
-+:Usage: **# clone [dev/attribute/UUID]**
++:Usage: **# pause**
 +
-+register-application
-+--------------------
-+Register profile to connect
++stop
++----
++Stop playback
 +
-+:Usage: **# register-application [UUID ...]**
++:Usage: **# stop**
 +
-+unregister-application
-+----------------------
-+Unregister profile
++next
++----
++Jump to next item
 +
-+:Usage: **# unregister-application**
++:Usage: **# next**
 +
-+register-service
-+----------------
-+Register application service.
++previous
++--------
++Jump to previous item
 +
-+:Usage: **# register-service <UUID> [handle]**
++:Usage: **# previous**
 +
-+unregister-service
-+------------------
-+Unregister application service
++fast-forward
++------------
++Fast forward playback
 +
-+:Usage: **# unregister-service <UUID/object>**
++:Usage: **# fast-forward**
 +
-+register-includes
-+-----------------
-+Register as Included service in.
++rewind
++------
++Rewind playback
 +
-+:Usage: **#r egister-includes <UUID> [handle]**
++:Usage: **# rewind**
 +
-+unregister-includes
-+-------------------
-+Unregister Included service.
++equalizer
++---------
++Enable/Disable equalizer
 +
-+:Usage: **# unregister-includes <Service-UUID><Inc-UUID>**
++:Usage: **# equalizer <on/off>**
 +
-+register-characteristic
-+-----------------------
-+Register application characteristic
++repeat
++------
++Set repeat mode
 +
-+:Usage: **# register-characteristic <UUID> <Flags=read,write,notify...> [handle]**
++:Usage: **# repeat <singletrack/alltrack/group/off>**
 +
-+unregister-characteristic
-+-------------------------
-+Unregister application characteristic
++shuffle
++-------
++Set shuffle mode
 +
-+:Usage: **# unregister-characteristic <UUID/object>**
++:Usage: **# shuffle <alltracks/group/off>**
 +
-+register-descriptor
-+-------------------
-+Register application descriptor
++scan
++----
++Set scan mode
 +
-+:Usage: **# register-descriptor <UUID> <Flags=read,write...> [handle]**
++:Usage: **# scan <alltracks/group/off>**
 +
-+unregister-descriptor
-+---------------------
-+Unregister application descriptor
++change-folder
++-------------
++Change current folder
 +
-+:Usage: **# unregister-descriptor <UUID/object>**
++:Usage: **# change-folder <item>**
++
++list-items
++----------
++List items of current folder
++
++:Usage: **# list-items [start] [end]**
++
++search
++------
++Search items containing string
++
++:Usage: **# search <string>**
++
++queue
++-----
++Add item to playlist queue
++
++:Usage: **# queue <item>**
++
++show-item
++---------
++Show item information
++
++:Usage: **# show-item <item>**
 +
 +back
 +----
