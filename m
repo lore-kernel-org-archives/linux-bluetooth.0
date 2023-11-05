@@ -2,213 +2,78 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C022EC4167D
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Nov 2023 01:40:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46AB2C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  5 Nov 2023 17:34:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232109AbjKDBkJ (ORCPT
+        id S229534AbjKEReM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Nov 2023 21:40:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53132 "EHLO
+        Sun, 5 Nov 2023 12:34:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232098AbjKDBkI (ORCPT
+        with ESMTP id S229468AbjKEReL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Nov 2023 21:40:08 -0400
-Received: from mail-qk1-x72f.google.com (mail-qk1-x72f.google.com [IPv6:2607:f8b0:4864:20::72f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E11AD42
-        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Nov 2023 18:40:06 -0700 (PDT)
-Received: by mail-qk1-x72f.google.com with SMTP id af79cd13be357-77891670417so44081585a.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Nov 2023 18:40:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vt-edu.20230601.gappssmtp.com; s=20230601; t=1699062004; x=1699666804; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9L/sMvot63NywAIROe67VDyVaO6P9By3Y5eBlsF9ET0=;
-        b=dlfSBmhu9o1nufBwuqYgobw6yyQdcvL39MTiU183ssLz5mdNuWUFCMbFZtVMFSOdQW
-         vBzcbsBj+mAfwvZtcJW4dYmGKCYcXuenjR+8IAkH3/JZoDjOc5iGczyl78y1FvA9gIm0
-         mR9mIs/6jOLP2y+cpUL4+mJKfSj5XA9ka8ZU6Dw7QadxnxXKBL3ONXcQC3vkgSJDv5MW
-         9bNsLRQGAJ7JLbj4Za37Q46P9k38WnPlCSi2Oi1UQUHQPP59lRoiwxQ37wJ6OhVmdUUg
-         E8kNA8VonaWo/jmETX1nePJbrSjegSk2xn39lJvTGg/bNQV/xfva7KuMhX1Gxlub6lyI
-         Yi5w==
+        Sun, 5 Nov 2023 12:34:11 -0500
+Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com [209.85.167.198])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4796C6
+        for <linux-bluetooth@vger.kernel.org>; Sun,  5 Nov 2023 09:34:05 -0800 (PST)
+Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-3b3f4ab1238so4565413b6e.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 05 Nov 2023 09:34:05 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699062004; x=1699666804;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9L/sMvot63NywAIROe67VDyVaO6P9By3Y5eBlsF9ET0=;
-        b=GefvqA0x30JRzxO5t7yt2tro7+rcf5O07qpnO+yrty13bY5uWWEcVJbyAuIaOXWS/7
-         r2iogASuzj84IkHB7dYUeQ1aMj2QzKZJGxpth5ZP9LgQDQavjlYjTkFDOUTbCXE3yKt1
-         4qGm8m4FnKInj1Vbe8Oysupb95mMj/85zp4ISmGOJyf055LM3nXZPP6SwWzh1Fzfm/+2
-         X0pHy/v0AOkckQ6UOvZNfVaGrENnsLP/163UX+Mef8t1KUMlLp6pByu89bCCnHx6fKvR
-         wOnI0dExMEn/YI6p+DwBghA4ZnFOcJqPAWJDk/GlTSql2lxgFHx13VmWK+leGFLDtVoX
-         qV5g==
-X-Gm-Message-State: AOJu0YxNy6PllhMmH+38PXj4GoeUNFpWJh2ZyzTf1BuCIlKicHZkB0pU
-        dOrmCdUtsHJnWiNkMArf9E+LqgpsxwByYC1M8aov7UteWBioQvitBzwzqiq7EA8TnXxASzwIjNO
-        C4D+qyyVjhkMoat75caC1xvcUGkgiJyBcLgWcH3/n7OyDKN49K8RLqJXWadYkV+vkCMTXV9Fne+
-        Uu
-X-Google-Smtp-Source: AGHT+IHWKD0P3O8pkriBxEu4wKOI8k4ojdurGsa2XCZuSsLuXQ49nPlbWkHMpNZpfLZxqTYWA39UkQ==
-X-Received: by 2002:ad4:4e8f:0:b0:668:e31b:5576 with SMTP id dy15-20020ad44e8f000000b00668e31b5576mr23753782qvb.1.1699062004325;
-        Fri, 03 Nov 2023 18:40:04 -0700 (PDT)
-Received: from debian.localdomain (c-73-177-243-39.hsd1.va.comcast.net. [73.177.243.39])
-        by smtp.gmail.com with ESMTPSA id l17-20020a05620a28d100b007770d47c621sm1216955qkp.66.2023.11.03.18.40.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Nov 2023 18:40:04 -0700 (PDT)
-From:   Paul Otto <potto@vt.edu>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Paul Otto <potto@ieee.org>
-Subject: [PATCH BlueZ 7/7] update doc for bluetoothctl-transport.rst
-Date:   Fri,  3 Nov 2023 21:38:50 -0400
-Message-Id: <20231104013850.24182-8-potto@vt.edu>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20231104013850.24182-1-potto@vt.edu>
-References: <20231104013850.24182-1-potto@vt.edu>
+        d=1e100.net; s=20230601; t=1699205645; x=1699810445;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=H4FvxRKbvCfMpMcLXPYkRNT3NM+7m0oeXuj/bJJZmv8=;
+        b=D6/fzZN4CmaWlewRahp07jRc3gyCb4XVDtvHAa8ytpGrYA5XjoOaerPO+BdV0PyRxm
+         1lD7IZ65olxzIQVqXKnF7QZfyHRSwXxj+CXDKBtxEsptcAksJa5JFwB/NiSiIBWK7X23
+         wvxbfKeoVuKhTX7b4Qc60uo8iOseOXpFGljtaPDpsqBptkU2yCmrZGnIKxIXgNj9s9VM
+         x1DGflrVUaP9ib1CXAur8bAf8nm6mpn20s6rFIEFFTmHzX9+3MVkCrAgSn22lUiLSx35
+         p98WQOOP5OT+D2hCpvq96Q5VlCHt+GDPXCdG/sb3JDlQUFnJAikAdWNK7kXk7f0kIiCe
+         Lg9w==
+X-Gm-Message-State: AOJu0Yyee89BUdni8QqDU4/cdbkhLF7krGPtMYufcWb89JVhnGo8gZvb
+        D+G3rImFNJJNANN27qyhbe3XdM/c83FQWsMKkNUcsJx1MtxX
+X-Google-Smtp-Source: AGHT+IHQGKy6Mfra4sf1/Fnaf3EC/D55G0NP35y8t1SN8GFVyNI7t9d57uCYzqPBwHjaKdaF7v3yTC+yAH7PGthgD35bnMd/I7bL
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6808:3083:b0:3ad:aeed:7eeb with SMTP id
+ bl3-20020a056808308300b003adaeed7eebmr10612059oib.6.1699205645177; Sun, 05
+ Nov 2023 09:34:05 -0800 (PST)
+Date:   Sun, 05 Nov 2023 09:34:05 -0800
+In-Reply-To: <0000000000006f759505ee84d8d7@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000e197ef06096b2454@google.com>
+Subject: Re: [syzbot] [nfc?] [net?] BUG: corrupted list in nfc_llcp_unregister_device
+From:   syzbot <syzbot+81232c4a81a886e2b580@syzkaller.appspotmail.com>
+To:     309386628@qq.com, davem@davemloft.net,
+        dominic.coppola@gatoradeadvert.com, dvyukov@google.com,
+        edumazet@google.com, hdanton@sina.com, johan.hedberg@gmail.com,
+        krzysztof.kozlowski@linaro.org, kuba@kernel.org, linma@zju.edu.cn,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        luiz.dentz@gmail.com, luiz.von.dentz@intel.com,
+        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
+        syzkaller-bugs@googlegroups.com, zahiabdelmalak0@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Paul Otto <potto@ieee.org>
+syzbot suspects this issue was fixed by commit:
 
----
- client/bluetoothctl-transport.rst | 128 ++++++++++++++++++++++++++++++
- 1 file changed, 128 insertions(+)
- create mode 100644 client/bluetoothctl-transport.rst
+commit b938790e70540bf4f2e653dcd74b232494d06c8f
+Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date:   Fri Sep 15 20:24:47 2023 +0000
 
-diff --git a/client/bluetoothctl-transport.rst b/client/bluetoothctl-transport.rst
-new file mode 100644
-index 000000000..3dd4d4a75
---- /dev/null
-+++ b/client/bluetoothctl-transport.rst
-@@ -0,0 +1,128 @@
-+============
-+bluetoothctl
-+============
-+
-+-----------------------
-+Media Transport Submenu
-+-----------------------
-+
-+:Version: BlueZ
-+:Copyright: Free use of this software is granted under ther terms of the GNU
-+            Lesser General Public Licenses (LGPL).
-+:Date: November 2022
-+:Manual section: 1
-+:Manual group: Linux System Administration
-+
-+SYNOPSIS
-+========
-+
-+**bluetoothctl** [**-a** *capability*] [**-e**] [**-m**] [**-t** *seconds*] [**-v**] [**-h**]
-+
-+DESCRIPTION
-+===========
-+
-+**bluetoothctl(1)** interactive bluetooth control tool. The tool works with Bluetooth Classic (BR/EDR) and Bluetooth Low Energy (LE) controllers.
-+
-+OPTIONS
-+=======
-+
-+-a capability, --agent capability        Register agent handler: <capability>
-+-e, --endpoints                  Register Media endpoints
-+-m, --monitor                    Enable monitor output
-+-t seconds, --timeout seconds    Timeout in seconds for non-interactive mode
-+-v, --version       Display version
-+-h, --help          Display help
-+
-+Media Transport Commands
-+=========================
-+   We divide bluetoothctl into main menu commands and submenu commands. The submenu commands control options 
-+   numbers for the commands can be hex (0x0F) or decimal (10)
-+
-+list
-+----
-+List available transports
-+
-+:Usage: **# list**
-+
-+show
-+----
-+Show transport information
-+
-+:Usage: **# show <transport>**
-+
-+acquire
-+-------
-+Acquire transport
-+
-+:Usage: **# acquire <transport> [transport1...]**
-+
-+release
-+-------
-+Release transport
-+
-+:Usage: **# release <transport> [transport1...]**
-+
-+send
-+----
-+Send contents of a file
-+
-+:Usage: **# send <transport> <filename>**
-+
-+receive
-+-------
-+Get/Set file to receive
-+
-+:Usage: **# receive <transport> [filename]**
-+
-+volume
-+------
-+Get/Set transport volume
-+
-+:Usage: **# volume <transport> [value]**
-+
-+back
-+----
-+Return to main menu
-+
-+:Usage: **# back**
-+
-+version
-+-------
-+Display version
-+
-+:Usage: **# version**
-+
-+quit
-+----
-+Quit program
-+
-+:Usage: **# quit**
-+
-+exit
-+----
-+Quit program
-+
-+:Usage: **# exit**
-+
-+help
-+----
-+Display help about this program
-+
-+:Usage: **# help**
-+
-+export
-+------
-+Print environment variables
-+
-+:Usage: **# export**
-+
-+
-+RESOURCES
-+=========
-+
-+http://www.bluez.org
-+
-+REPORTING BUGS
-+==============
-+
-+linux-bluetooth@vger.kernel.org
--- 
-2.30.2
+    Bluetooth: hci_codec: Fix leaking content of local_codecs
 
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15cb8f17680000
+start commit:   e1c04510f521 Merge tag 'pm-6.2-rc9' of git://git.kernel.or..
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=fe56f7d193926860
+dashboard link: https://syzkaller.appspot.com/bug?extid=81232c4a81a886e2b580
+userspace arch: i386
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14e90568c80000
+
+If the result looks correct, please mark the issue as fixed by replying with:
+
+#syz fix: Bluetooth: hci_codec: Fix leaking content of local_codecs
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
