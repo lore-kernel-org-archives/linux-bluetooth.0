@@ -2,78 +2,92 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46AB2C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  5 Nov 2023 17:34:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23C93C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Nov 2023 05:50:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229534AbjKEReM (ORCPT
+        id S230312AbjKFFuk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 5 Nov 2023 12:34:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50638 "EHLO
+        Mon, 6 Nov 2023 00:50:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229468AbjKEReL (ORCPT
+        with ESMTP id S229485AbjKFFuj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 5 Nov 2023 12:34:11 -0500
-Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com [209.85.167.198])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4796C6
-        for <linux-bluetooth@vger.kernel.org>; Sun,  5 Nov 2023 09:34:05 -0800 (PST)
-Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-3b3f4ab1238so4565413b6e.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 05 Nov 2023 09:34:05 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699205645; x=1699810445;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=H4FvxRKbvCfMpMcLXPYkRNT3NM+7m0oeXuj/bJJZmv8=;
-        b=D6/fzZN4CmaWlewRahp07jRc3gyCb4XVDtvHAa8ytpGrYA5XjoOaerPO+BdV0PyRxm
-         1lD7IZ65olxzIQVqXKnF7QZfyHRSwXxj+CXDKBtxEsptcAksJa5JFwB/NiSiIBWK7X23
-         wvxbfKeoVuKhTX7b4Qc60uo8iOseOXpFGljtaPDpsqBptkU2yCmrZGnIKxIXgNj9s9VM
-         x1DGflrVUaP9ib1CXAur8bAf8nm6mpn20s6rFIEFFTmHzX9+3MVkCrAgSn22lUiLSx35
-         p98WQOOP5OT+D2hCpvq96Q5VlCHt+GDPXCdG/sb3JDlQUFnJAikAdWNK7kXk7f0kIiCe
-         Lg9w==
-X-Gm-Message-State: AOJu0Yyee89BUdni8QqDU4/cdbkhLF7krGPtMYufcWb89JVhnGo8gZvb
-        D+G3rImFNJJNANN27qyhbe3XdM/c83FQWsMKkNUcsJx1MtxX
-X-Google-Smtp-Source: AGHT+IHQGKy6Mfra4sf1/Fnaf3EC/D55G0NP35y8t1SN8GFVyNI7t9d57uCYzqPBwHjaKdaF7v3yTC+yAH7PGthgD35bnMd/I7bL
+        Mon, 6 Nov 2023 00:50:39 -0500
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33997CC
+        for <linux-bluetooth@vger.kernel.org>; Sun,  5 Nov 2023 21:50:36 -0800 (PST)
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A65Zo2G006535;
+        Mon, 6 Nov 2023 05:50:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=qcppdkim1;
+ bh=zpxWTQQ7W1m1Sy6aD1OtEpK/k2ISpi/PGMjC1ik+q/Q=;
+ b=ee6gG0riV6awoe/2ShDiIiBmCNageibqAd8Rl8tnhqgxCQjrKO/4cTePwLCsra6ySoUA
+ TPjb/196xfUJZRVw3NlRwKFhRyyUAnpJTzZHLP2/Wl1StG+2BPKXlZxQ/pTHbBwrnac5
+ 43cveZTCNWX9Pmj7ACzpGp+TO2zEX4ucACnoslg/sw5+LT+fLd/C0h6qpaNMfAsTXRke
+ BLB2r9/hN55dnHrgtIZEXOxKLOZ/wUh3PeozcNHsePUFXVw5E/g+0Jh+IuCIPz3brAfS
+ 6hXw5IYY5z2vyxRxO9ZfAWeSljER8BZ1qX1iPNwvC1w3NiOD/+DzES0H5YP970Cm1fgW hw== 
+Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3u5f52338c-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 06 Nov 2023 05:50:32 +0000
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+        by NASANPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3A65oVBX028866
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 6 Nov 2023 05:50:31 GMT
+Received: from zijuhu-gv.qualcomm.com (10.80.80.8) by
+ nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.39; Sun, 5 Nov 2023 21:50:29 -0800
+From:   Zijun Hu <quic_zijuhu@quicinc.com>
+To:     <luiz.dentz@gmail.com>, <marcel@holtmann.org>,
+        <johan.hedberg@gmail.com>
+CC:     <linux-bluetooth@vger.kernel.org>, <quic_zijuhu@quicinc.com>
+Subject: [PATCH v1 1/3] Bluetooth: qca: Set both WIDEBAND_SPEECH and LE_STATES quirks for QCA2066
+Date:   Mon, 6 Nov 2023 13:50:24 +0800
+Message-ID: <1699249824-20358-1-git-send-email-quic_zijuhu@quicinc.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:3083:b0:3ad:aeed:7eeb with SMTP id
- bl3-20020a056808308300b003adaeed7eebmr10612059oib.6.1699205645177; Sun, 05
- Nov 2023 09:34:05 -0800 (PST)
-Date:   Sun, 05 Nov 2023 09:34:05 -0800
-In-Reply-To: <0000000000006f759505ee84d8d7@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000e197ef06096b2454@google.com>
-Subject: Re: [syzbot] [nfc?] [net?] BUG: corrupted list in nfc_llcp_unregister_device
-From:   syzbot <syzbot+81232c4a81a886e2b580@syzkaller.appspotmail.com>
-To:     309386628@qq.com, davem@davemloft.net,
-        dominic.coppola@gatoradeadvert.com, dvyukov@google.com,
-        edumazet@google.com, hdanton@sina.com, johan.hedberg@gmail.com,
-        krzysztof.kozlowski@linaro.org, kuba@kernel.org, linma@zju.edu.cn,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        luiz.dentz@gmail.com, luiz.von.dentz@intel.com,
-        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
-        syzkaller-bugs@googlegroups.com, zahiabdelmalak0@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: TjIhsOZV7qXjwVRpKklzVPhbPd5cbmzB
+X-Proofpoint-GUID: TjIhsOZV7qXjwVRpKklzVPhbPd5cbmzB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-06_03,2023-11-02_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 clxscore=1015
+ priorityscore=1501 bulkscore=0 mlxlogscore=999 phishscore=0
+ lowpriorityscore=0 mlxscore=0 suspectscore=0 spamscore=0 adultscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2310240000 definitions=main-2311060049
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzbot suspects this issue was fixed by commit:
+Set both WIDEBAND_SPEECH_SUPPORTED and VALID_LE_STATES quirks
+for QCA2066.
 
-commit b938790e70540bf4f2e653dcd74b232494d06c8f
-Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Date:   Fri Sep 15 20:24:47 2023 +0000
+Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+---
+ drivers/bluetooth/hci_qca.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-    Bluetooth: hci_codec: Fix leaking content of local_codecs
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 067e248e3599..35f74f209d1f 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -2039,6 +2039,7 @@ static const struct qca_device_data qca_soc_data_wcn3998 __maybe_unused = {
+ static const struct qca_device_data qca_soc_data_qca2066 __maybe_unused = {
+ 	.soc_type = QCA_QCA2066,
+ 	.num_vregs = 0,
++	.capabilities = QCA_CAP_WIDEBAND_SPEECH | QCA_CAP_VALID_LE_STATES,
+ };
+ 
+ static const struct qca_device_data qca_soc_data_qca6390 __maybe_unused = {
+-- 
+2.7.4
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15cb8f17680000
-start commit:   e1c04510f521 Merge tag 'pm-6.2-rc9' of git://git.kernel.or..
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=fe56f7d193926860
-dashboard link: https://syzkaller.appspot.com/bug?extid=81232c4a81a886e2b580
-userspace arch: i386
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14e90568c80000
-
-If the result looks correct, please mark the issue as fixed by replying with:
-
-#syz fix: Bluetooth: hci_codec: Fix leaking content of local_codecs
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
