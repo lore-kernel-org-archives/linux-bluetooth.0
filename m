@@ -2,96 +2,96 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 033DFC4332F
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Nov 2023 22:24:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7C15C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Nov 2023 22:26:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233132AbjKFWYs (ORCPT
+        id S233143AbjKFW0f (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Nov 2023 17:24:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50206 "EHLO
+        Mon, 6 Nov 2023 17:26:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232005AbjKFWYr (ORCPT
+        with ESMTP id S232005AbjKFW0d (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Nov 2023 17:24:47 -0500
-Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04olkn2024.outbound.protection.outlook.com [40.92.73.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 704121BC;
-        Mon,  6 Nov 2023 14:24:44 -0800 (PST)
+        Mon, 6 Nov 2023 17:26:33 -0500
+Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04olkn2010.outbound.protection.outlook.com [40.92.73.10])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5125F1BC;
+        Mon,  6 Nov 2023 14:26:30 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=k6lqkapVZ9n4K9NpFBzN9vtEaCYopp/6ZredONxa2PyhNZNdqWFucRj0hpsV5tQmsv43nknZQc41Ck+Nadgkdo5zm06OEqi56Q6OIJg0X5+JRzv/NCnq1C12MVsAZWrpSQErwugPgXHRHDXwrQiuJXYgx9lDCTMU8snlxcV4dTgbR2UG+dF771qtkl9iiFiNyqVVR3aihbpIm9RyjHk+Vveq5mK4ZE72vyK4WFm1OwG5H7PNS0WFhT65CqrG2xQaIvpxdjiMOQDJDKy+gqJ1t8FQmf8+FkUzbOFggAPYUCKIQiqAf36bZdmKQQK7uTrd81q9tP384Z3dTZxr8EODXw==
+ b=YD1/DCiQpfM+yZRIFbebTDAxDOC51TrTBf3BUdUZ58w6pLKHJglo9MjX/R3SZf96GHvEP85ioLBECYl2jMfSknQJRCfWqqUCGZv6fEi4IEzD8nkO5jGlXhgDEsU251MV0ci6GvflAm2PmERl8EXEmR/h7tJMZsbMBOX/79NcA0lUu2Y9ByW92VjaFWzyy073xpB4fKLxKfMVZd98xht8qLUkmZXhK8cBhNrfHZ51FX19VfsfUQuPF1QZGA/fH/h8iTgqyZNvLh2c9SH5tFT2gc0al/GiPSVDdkqCsv5a+Mct3jaCYjjt8/MrNScn/zYwC2Rz89LvavrPZuTf4Pp6JA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WfWyHV5ZD6rdAOuGjMtwvO4KZEEsuLhBprqVMtOFVOI=;
- b=NTSn89MexXglYXcdBYBqO0R9VqLV91c6nKuzVf3iBGU4tkm9ZMLKBbnPCSoOZoT6NV6tpAmHR2HDBnSpCLImTyt/jYkRTL1vTVzLWXgzOjHeZ+yunmbAl+xjCQVoBcUsjnyceXQNOV/h3GEqixwWvewKtIiiXbrDtZoHm9JowFn+3jGlfv9Fro3mI/fldH3+MTodwDnTKarzcjhTubr/BB2mRFcy+EgiXc0tMYccSYhjIGt+PjMSG059lmLE7s6yG0pOunIIYxEV9bIk3H91l6XN8KALHtAGlg25u/bv45tDf4H94nIy2KajVYabpZ4HjqMWDQCOHW+KXLR78AI/nw==
+ bh=GYerno5TqoWJ5H81zCz5xdfJQ4b134jDbbNHTizHyp4=;
+ b=apwyPz4FWGRq+dRmxFVtkD0HvucIjJgwl8N7skrSg5IQ7Kk+wbstMR6fQLEooIbcTDuQAUVsxbAz/GMqa2I5ef0m0Kwko6bYqf0WUNtbDEaLa0V3fX3SaqJpMCMuVcLJc5eZvYe/54nAWm10KIfhuCEG2oUfiEi0hbnQv3/J0uPdDBzHZo6/abTCuKU2qT/LP/Pu2a57zaX6SfkQbUNoNvC1Pxq40IXX4BgFeV1DQA32KvT0pAZQDDx7ncHJV88Sg19082DlYsuFbbqA6NXgC5jjW5cqB5AlLEfHV0/NDy+k3WbS2GEzMiUjdnvZc2xCRAnAzU/dMY1mZJDeBcUtEg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
  dkim=none; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WfWyHV5ZD6rdAOuGjMtwvO4KZEEsuLhBprqVMtOFVOI=;
- b=mwihL7bdeyAbqUf4G2qL6IWsslg8CIoJnJ1q3HeLkkg+hBjiIGKlm+mMC9bOX6gVmprUwRCsyUX8G4kx4Zy9cIiG7fffdc8QnmRqLmvQAlI/yeB5Mwt72eJ9EjQdCGJ5sqZPY3QSEdYptfAxh8VpmoShAiwziOQZNtVmewgsOj2bFYZGaa/fBOFOPu9xb2YGd+MFeWgcSViPHyif2JScE72fbHT801ILFnvTpqzJiH+ndLYvpDqs4pMosK3HOEzUo9z/w0tac48iG1vjfRmTIHnqTm6yx1x+mwg6ZccQqvKQEWbvC0u+6RbiOfwjEagyxbeiTaKpwIEKETKoGGj+Gw==
+ bh=GYerno5TqoWJ5H81zCz5xdfJQ4b134jDbbNHTizHyp4=;
+ b=bYxOIfz/VDOed/PGS6y97ZRlmEQyD4qaKQt8EjN+/8NYy09jeQVRiJirZxf+u4VXvPsFOERXeMJcQupafcIwg5bdkiODUB4tGF7/Gg1Is3lnMfSe0oJO4qszXoY7sDYhqXEKttG5S72UHABlqqjAbj3COBRj5YTdyqeiT82aoQt1cwM0wwkDi4em8gP4DMVYFKU+RQ9IGUn4g0YNnx+InURlMeJKUqFyOklh1ngPtIh7PUqAkG5s5wx792TAzN23YaAxcNf9A25L7P4H52FphXm/m9em+L/gHRKujMiAvME2zrU0GaHY8XQz5uCak5//VKn/g2QfWV/VGmMPB/wiaw==
 Received: from DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:10:42a::7)
  by AS1PR10MB5144.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:4aa::9) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.25; Mon, 6 Nov
- 2023 22:24:42 +0000
+ 2023 22:26:28 +0000
 Received: from DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM
  ([fe80::e2b0:8d7e:e293:bd97]) by DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM
  ([fe80::e2b0:8d7e:e293:bd97%7]) with mapi id 15.20.6954.028; Mon, 6 Nov 2023
- 22:24:42 +0000
+ 22:26:28 +0000
 From:   Yuran Pereira <yuran.pereira@hotmail.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Yuran Pereira <yuran.pereira@hotmail.com>, marcel@holtmann.org,
         johan.hedberg@gmail.com, luiz.dentz@gmail.com,
         linux-kernel@vger.kernel.org,
         linux-kernel-mentees@lists.linuxfoundation.org
-Subject: [PATCH 1/2] Bluetooth: Add documentation to exported functions in lib
-Date:   Tue,  7 Nov 2023 03:54:18 +0530
-Message-ID: <DB3PR10MB68355F5AE036ABD128F91535E8AAA@DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM>
+Subject: [PATCH 2/2] Bluetooth: Replaces printk with pr_debug in bt_dbg
+Date:   Tue,  7 Nov 2023 03:56:08 +0530
+Message-ID: <DB3PR10MB6835DE6D279B65EC040B92AEE8AAA@DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <DB3PR10MB6835C002EB4C5A05AD17610BE8AAA@DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM>
 References: <DB3PR10MB6835C002EB4C5A05AD17610BE8AAA@DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-TMN:  [vl4rtQFcbu+BM5+HB6vnCTEnW7K61V+9]
-X-ClientProxiedBy: JNXP275CA0008.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:19::20)
+X-TMN:  [M9Vs5nU69k1Ps+TS4XSpHpLyAzz7pMwF]
+X-ClientProxiedBy: JN2P275CA0014.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:3::26)
  To DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:10:42a::7)
-X-Microsoft-Original-Message-ID: <20231106222419.1793747-1-yuran.pereira@hotmail.com>
+X-Microsoft-Original-Message-ID: <20231106222608.1793859-1-yuran.pereira@hotmail.com>
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: DB3PR10MB6835:EE_|AS1PR10MB5144:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1a17e3a7-6ad9-40ce-fa7b-08dbdf172c07
+X-MS-Office365-Filtering-Correlation-Id: 22c9dc27-e238-465e-cfd1-08dbdf176b12
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: EgJUawaWDiEtJskrJBFcd0bU+iPTzHicHXxdDchsM2HFz8cGuftLKKbEH42N0lP/+MSL7FGI2zT8NCv6dykLZImbifJcqU80yRH+0CH60ZkpunwtO9JfFkHBwaMsYiIO5sVH0x5bsqJScBvc8f668G37ZNGAo3Hj2QsgEvlmoTZT9fHocBk4eedMHVbaidnWnyuwVG+j0S5wgrNsKOy2up3UWI4tur/In+D1S4wWUfI6u/CFTfyEkxfUGrKNOJDIjXxYwphWctcpn7pCJccySFqXy6zY+i0hrqrndscGP/B3EyLsD12LWzuzJ4p1GWszIAV42w6bnRUJ8MVPZRBxZQ4WSv0Na0zAlZSrz8OjxX+WQJwMtfOYE5ljBHIgOXvF2WeG+HbgZhUBwELcrh7fIWcoPVVM/OCxnNc8q40xIzt2qKHuBV72evmsBr7uTjwiK7IYG20ryuUOH/Z/RzcMDIq8bDo9hGKOVtOmiCGANy0Il3lAXVxJorhSsGmJGN0YaAxiW/p73CgcLYc8H5snJIWfQ17BSvApBNYqmjjRsKu2lfeeDUlumDQLxQav8DkBMgnjKwsmSN4XNX6lfrnL20lY/zxNkOvPoqACnLWzFQkwE1IcYpq9wD6sm02oPgdv
+X-Microsoft-Antispam-Message-Info: VmsH5lVWdfwVPwmeD8ZDDxNchkWduuI/qURpYP5h7m3qbK11ngpF3I8tnxw63H1ftn++xBzSxEQd74MXyMxkg3IOxQJIKTUt/2FVGN+xMkyZARKe1QT3csCDvltdBrpbDu2fYhaBpGF7zMfNy/0qY2J25SjiWiXm1aav8E2aNqmVO3clwcZiLfO/L2po1a9YfJ0w8sVrLyGBKn+ScSXhyxdkw9k51hoWUWm3Bdvb2NhvYwqNSdwS8sGmexZtLuCpNzjo6HdHz7vKhXnkeprX4WJU0YVNbvqHMu2nFnnISaYe+oLSRpljvV4dYasLoNifzx6s/6yhepthbtmJyhdMhZYUYzWX1pH1TgqIzGpWxjrShY3BVB3HH9BDDkf96IUbzrqKf+ZG+RGeaLs/YtoMfEsQrvdWJQlq4+dQm7oi+80TafzMSH4ypgF/OJB2WPy04Sr2i3YLQsaPGezM8IAILTw1+xTzhFWncjpwm5/wq9dS43TOvMr3nRGo6XzpZf6wQWY91RtHoRmeW7qwinoKN/lD899W4W655mMXaAvnUyRvhrT9vvWZvylrDnGH+BnMC72ek0TDAvqj6mp3Zsmv+JVNIuLjq/+zoNK1lBXOeIiswkxflw3Y1KwgsHnWUzCa
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Bk0nqJBmA3W/Qhr+Od2BLoY76MENrR+kQ9CrVpLXKOlzQpyMwtWfFelcFg7v?=
- =?us-ascii?Q?Fys6ioALk5+7PsUePV+/gqkkIprZXdEeSRmV9PPPaHu19NqYd1FEwqC9ppwT?=
- =?us-ascii?Q?KNILQsBgjiY0TUrfYM1JjXjqnp7ldsY3D7qWnwH1DIwxIS3e18orrW6qu9y3?=
- =?us-ascii?Q?0y9WQzpPLk/mhlEatSyAzZ8ftFL3+JElTfHjeflO4k+W0lmRa8r0bX6xSMVS?=
- =?us-ascii?Q?oCyjgXxcpJ6NZ4PhaJb/2q0395MWAa5mxlCRsh/Gp84+6abrmKadXM/Fmreq?=
- =?us-ascii?Q?HY+kM6D+vkb7Wjsg+H11BAptnGGDGspA7YLgiPb1VWhmIBDjLO6YxuKOa9up?=
- =?us-ascii?Q?QAkODvdy6kq6m1Zw0pVTLztyd+UBcLsba4YRqSOlHLo0DZDVFz26bXVmbgyP?=
- =?us-ascii?Q?RsdiIyoTMEmQQG29anJgY4WpgB73ft2e6Re+Tag6hCrz6NLWUrV+LmIxBJrD?=
- =?us-ascii?Q?lZggzErdB9lCgv1XEBmm5TBA0xSHXJ5Aqa4TJkk0otnPtTeWWSSuGxZ/sBzX?=
- =?us-ascii?Q?rnyL7leYS0tD/9i+A2z6RqfAiTw27g1PpihspdI+AlA4ccD8JJ0T3DN+9eCo?=
- =?us-ascii?Q?/HdaBgwhv2epJXd5R79PwM/2QI0dkz+N8Ur7kmM2CtNY0rzcJWTLXpDoUlb/?=
- =?us-ascii?Q?z1ePtgHpuAuIlU2+L/+Ib8RuLAV/m2MhQHOttXgIO99zYypnsBUeeMn96H9T?=
- =?us-ascii?Q?JYBshwmLtIRx1A7fEG84qwgyO2LAh7EkDekjgfFJkifclLiE/4cNGa/nL8PQ?=
- =?us-ascii?Q?veGoBncoqF3DlVsyTUwFYiVczJz6HuGw2LEzvJ/6CwhshE+/4K5fiCH92/sN?=
- =?us-ascii?Q?BdDJY0Fv6UVHZ6bd6H336zGqM/mb/ytQ7RnP7koEgWJ8UnMq0rb7t50mhMFz?=
- =?us-ascii?Q?KcFp4I4vNODX6XhuJPmURkZAFbwht6Ffa9TFfqQiG+rB0OTNPToPqyNMQysL?=
- =?us-ascii?Q?Rr4nwoNT0m2hKMuwitf488KyMwbx6Tsl6DYA8QkpUBkxPxRnEcuVGa9nW62t?=
- =?us-ascii?Q?0A0G/2yXOzJLCoHCFJfuUKvIStq+UihfueaJ2bHkkq5DZhd44fQrSmgzl/iE?=
- =?us-ascii?Q?UziqummHmEzY51GV03qqRacIx8M4By9oRrJz4LLS7mvCrJ7vq/JNBb7/OxEP?=
- =?us-ascii?Q?xTvimQbYOU+2KwHxLIGcTCImLCfqMb5VkwQbvrn2e3YpasaQIEtJOVhKxiEG?=
- =?us-ascii?Q?Rt0P6td5KV5C8oNM9YZtYlK9nxMZ6YbtRgaxhI4F4b1nbAhoUVK1hBuDA1A?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?hZiiX7pHWJrw+IMnlHLpyQa1sIWJYJ/6ADkD3ev3vvV0uaAzRpn8N+oLpGCv?=
+ =?us-ascii?Q?j72NeWoKcsGxsftwJSfGhNL93+eQmFEQMsgLh/2sZuEwssWKWDwucwWM0Xly?=
+ =?us-ascii?Q?w0UHTU9N4A8EJQdhR6apczsxkXKlfy6tSFS2S7JFcb76FTBtVVgariOvU8hj?=
+ =?us-ascii?Q?pQg7QSzU3RQLJB/j85j2Gc8E9br6ZizFv1S0dHNShliJXfAhl8B7cKEPr/vV?=
+ =?us-ascii?Q?ji0o2UJfEuXsLOfNwSbXwu8vfY0R0hvKg9fk0Xyr3Wjw8G9kKQda29F3tput?=
+ =?us-ascii?Q?q2dY9BidH8ql8CHxd88MKrByuj1ilHWLoSwfKYy8E0J4DonyOZS6joF1dEiz?=
+ =?us-ascii?Q?wZ9mhktfprbXNofJ/cU1zZJ+5YVYfH4UJbFM494qXk8tkrdoOhOQQibfgqUt?=
+ =?us-ascii?Q?OPhJF3rMIV2CyC2gV6F/Q/nGCYe/l0kTRzwfIpEGwiYAbDPEeF0Ul+mZpcGz?=
+ =?us-ascii?Q?5VLCq/xKk896osYrjTdQiV+1vMTODY+XIitvuXtl0o7VniqP4GqU03DWDbVo?=
+ =?us-ascii?Q?9LstP7TrUDwQ65aJVKnOIPuV3QkPIVJIJvGnYrRZTyuF40dD3kfuxk+4MYaz?=
+ =?us-ascii?Q?kFkwT9OLgs7wqxQGTj2ewIHUmBkmCz3fh5nIAhnKyMH5FiUklrJPg9n2CV5p?=
+ =?us-ascii?Q?BEok4fQmMI5UaBIz8x8lR6F6ErqqdZYjOLHLFRzNTqYDFhd2zhOweA5ESMPm?=
+ =?us-ascii?Q?/VTZGXtCp8y+2SsTz/UL9gSHOqFwCjeRC3bUOJgh7zJ1bv7izo5vaaqyFpTy?=
+ =?us-ascii?Q?a31cMkR6yNf6qHv5cnUB5UiAQJ0pB5408/YRBf7DGguFgEBGey7yP7Xj2rmj?=
+ =?us-ascii?Q?F7sTJXWIfaxE73fTv5ZP92a8Jd4Cw9oS3PhCuIZOsUWf1fLrc94JHtSGfEU2?=
+ =?us-ascii?Q?GbL3S1RMCSKqFcr9+tHr/hY00AEof8RtaacUAPBfBFjz6vCuhPgLI/B3d6rr?=
+ =?us-ascii?Q?Uk6AAa/oen2B9EUt58cwRnBXltIqrZ8YyHYWIcGW0lVPDZmhJI81ESQdOoW+?=
+ =?us-ascii?Q?TT/LxI/LeI48gajQmn7B+LoY5oHyXmdHlFHYKl+LOyuVf0nYY7Tic/61Cl46?=
+ =?us-ascii?Q?LOq96ZIK+kMvyn5v5f93zPduZGnPiqY+YnpZry+GrtTlb1nxVVf3CfWMiqPm?=
+ =?us-ascii?Q?izrVP3OVbtE7s8zu3sHl/ahMoPO0VGXEosB6gsiQZP2olaJpz9bcKngKGkUo?=
+ =?us-ascii?Q?44+iLe7kLAUN3zXaAgzqGS7g8lB48KyXMQg9lRy6YzbkAJoLA0SkLWaO9YA?=
  =?us-ascii?Q?=3D?=
 X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-6b909.templateTenant
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1a17e3a7-6ad9-40ce-fa7b-08dbdf172c07
+X-MS-Exchange-CrossTenant-Network-Message-Id: 22c9dc27-e238-465e-cfd1-08dbdf176b12
 X-MS-Exchange-CrossTenant-AuthSource: DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2023 22:24:42.2417
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2023 22:26:28.2617
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
@@ -101,157 +101,31 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Most functions in `net/bluetooth/lib.c` lack propper
-documentation.
+bt_dbg() uses printk, as opposed to other functions in this file
+which use pr_* family of logging functions.
 
-This patch adds documentation to all exported functions
-in `net/bluetooth/lib.c`.
-Unnecessary or redundant comments are also removed to
-ensure the file looks clean.
+This patch changes that by replacing `printk(KERN_DEBUG` with
+the equivalent pr_debug() call which makes the overall file
+look more uniform and cleaner.
 
 Signed-off-by: Yuran Pereira <yuran.pereira@hotmail.com>
 ---
- net/bluetooth/lib.c | 69 +++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 66 insertions(+), 3 deletions(-)
+ net/bluetooth/lib.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/lib.c b/net/bluetooth/lib.c
-index 53a796ac078c..063032fe9c68 100644
+index 063032fe9c68..96ba39f8b461 100644
 --- a/net/bluetooth/lib.c
 +++ b/net/bluetooth/lib.c
-@@ -30,6 +30,15 @@
+@@ -329,7 +329,7 @@ void bt_dbg(const char *format, ...)
+ 	vaf.fmt = format;
+ 	vaf.va = &args;
  
- #include <net/bluetooth/bluetooth.h>
+-	printk(KERN_DEBUG pr_fmt("%pV"), &vaf);
++	pr_debug("%pV", &vaf);
  
-+/**
-+ * baswap() - Swaps the order of a bd address
-+ * @dst: Pointer to a bdaddr_t struct that will store the swapped
-+ * 		 bd address.
-+ * @src: Pointer to the bdaddr_t struct to be swapped.
-+ *
-+ * This function reverses the byte order of a Bluetooth device
-+ * address.
-+ */
- void baswap(bdaddr_t *dst, const bdaddr_t *src)
- {
- 	const unsigned char *s = (const unsigned char *)src;
-@@ -41,7 +50,19 @@ void baswap(bdaddr_t *dst, const bdaddr_t *src)
+ 	va_end(args);
  }
- EXPORT_SYMBOL(baswap);
- 
--/* Bluetooth error codes to Unix errno mapping */
-+/**
-+ * bt_to_errno() - Bluetooth error codes to standard errno
-+ * @code: Bluetooth error code to be converted
-+ *
-+ * This function takes a Bluetooth error code as input and convets
-+ * it to an equivalent Unix/standard errno value.
-+ *
-+ * Return: 
-+ *
-+ * If the bt error code is known, an equivalent Unix errno value
-+ * is returned.
-+ * If the given bt error code is not known, ENOSYS is returned.
-+ */
- int bt_to_errno(__u16 code)
- {
- 	switch (code) {
-@@ -135,10 +156,22 @@ int bt_to_errno(__u16 code)
- }
- EXPORT_SYMBOL(bt_to_errno);
- 
--/* Unix errno to Bluetooth error codes mapping */
-+/**
-+ * bt_status() - Standard errno value to Bluetooth error code
-+ * @err: Unix/standard errno value to be converted
-+ *
-+ * This function converts a standard/Unix errno value to an
-+ * equivalent Bluetooth error code.
-+ *
-+ * Return: Bluetooth error code.
-+ *
-+ * If the given errno is not found, 0x1f is returned by default
-+ * which indicates an unspecified error.
-+ * For err >= 0, no conversion is performed, and the same value
-+ * is immediately returned.
-+ */
- __u8 bt_status(int err)
- {
--	/* Don't convert if already positive value */
- 	if (err >= 0)
- 		return err;
- 
-@@ -206,6 +239,10 @@ __u8 bt_status(int err)
- }
- EXPORT_SYMBOL(bt_status);
- 
-+/**
-+ * bt_info() - Log Bluetooth information message
-+ * @format: Message's format string
-+ */
- void bt_info(const char *format, ...)
- {
- 	struct va_format vaf;
-@@ -222,6 +259,10 @@ void bt_info(const char *format, ...)
- }
- EXPORT_SYMBOL(bt_info);
- 
-+/**
-+ * bt_warn() - Log Bluetooth warning message
-+ * @format: Message's format string
-+ */
- void bt_warn(const char *format, ...)
- {
- 	struct va_format vaf;
-@@ -238,6 +279,10 @@ void bt_warn(const char *format, ...)
- }
- EXPORT_SYMBOL(bt_warn);
- 
-+/**
-+ * bt_err() - Log Bluetooth error message
-+ * @format: Message's format string
-+ */
- void bt_err(const char *format, ...)
- {
- 	struct va_format vaf;
-@@ -267,6 +312,10 @@ bool bt_dbg_get(void)
- 	return debug_enable;
- }
- 
-+/**
-+ * bt_dbg() - Log Bluetooth debugging message
-+ * @format: Message's format string
-+ */
- void bt_dbg(const char *format, ...)
- {
- 	struct va_format vaf;
-@@ -287,6 +336,13 @@ void bt_dbg(const char *format, ...)
- EXPORT_SYMBOL(bt_dbg);
- #endif
- 
-+/**
-+ * bt_warn_ratelimited() - Log rate-limited Bluetooth warning message
-+ * @format: Message's format string
-+ *
-+ * This functions works like bt_warn, but it uses rate limiting
-+ * to prevent the message from being logged too often.
-+ */
- void bt_warn_ratelimited(const char *format, ...)
- {
- 	struct va_format vaf;
-@@ -303,6 +359,13 @@ void bt_warn_ratelimited(const char *format, ...)
- }
- EXPORT_SYMBOL(bt_warn_ratelimited);
- 
-+/**
-+ * bt_err_ratelimited() - Log rate-limited Bluetooth error message
-+ * @format: Message's format string
-+ *
-+ * This functions works like bt_err, but it uses rate limiting
-+ * to prevent the message from being logged too often.
-+ */
- void bt_err_ratelimited(const char *format, ...)
- {
- 	struct va_format vaf;
 -- 
 2.25.1
 
