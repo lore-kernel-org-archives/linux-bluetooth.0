@@ -2,139 +2,114 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2996DC4167B
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Nov 2023 16:26:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 712DBC4167B
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Nov 2023 22:22:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232814AbjKFQ0i (ORCPT
+        id S233166AbjKFWWP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Nov 2023 11:26:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48816 "EHLO
+        Mon, 6 Nov 2023 17:22:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232799AbjKFQ0g (ORCPT
+        with ESMTP id S232005AbjKFWWO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Nov 2023 11:26:36 -0500
-Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99B32D51
-        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Nov 2023 08:26:33 -0800 (PST)
-Received: by mail-lj1-x234.google.com with SMTP id 38308e7fff4ca-2c5056059e0so67371011fa.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Nov 2023 08:26:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699287992; x=1699892792; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M4vlVYMPfkiJdK9hdtcKI8OfdrUsbCVruswCBH2HGfw=;
-        b=mtPm68o1R9A2izwkjHr8XpSJsa3lDgJ44sLZgGYL59uhHcqe1oWNCNDHbH2Y7A4Rv8
-         t4h3YwcWJ4pepSN5YgY2afeF8EVzrQSsVRMnMrBGqZcoODGPU0YZGou+oOiLIMIYEv/M
-         k9I8x85cRrwsQGejOxNgyQrL6+sA7/0Rny7Um/gUh9kM7WkviVRfVGutAFgVqJ1jdesJ
-         xAvFz/RXySHj96sRrX+SHPwKq63kGObMjiup+yXNI3YnrxCxh31xl6VWgCQqU/XLxIFP
-         JOZp1oW2uxsxAOuIAWY/EYHkmQTi+o9G8WKsy+lY3TgaXwIRi6GyN8KGEgRmylfEvO7h
-         PKrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699287992; x=1699892792;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=M4vlVYMPfkiJdK9hdtcKI8OfdrUsbCVruswCBH2HGfw=;
-        b=ZNJGlirkdHWSBvi6F37BM+sEsfU+Re6egkC9uLA7kk1QfQ2BkAJtKfuf+P9b7VG/+S
-         EclBvQ39PhwBWh5LM6af2XVQYHX0a25e7Ks3XS0moOQSRTNzXGEsVtfNJ9JRJH6Umw84
-         jJvZVZZHvSYEaKa+/daOrxWXRw8OBqFh14QpN0lrW0XH6LyWbcdL8EAyvs9gBl3yU2ml
-         NvlL/AlYos8NoQmiiwsL72CxAREFW9chbYob0SpfTfpOuWP9g358kCiyXe8ne4YaSFds
-         FjI9CbuLAODzrpU5ybdzxvCkWosif2S+axHwl5iUlUiQR/Pu+ptcj6P2SXBuMPdx/B5w
-         vRjA==
-X-Gm-Message-State: AOJu0YypxuujhMqZ47sSnnb1c+iPFoOmYmz03jhk1cf9M9DXEutbeMqS
-        Rc2IZTtIT5SVpTcootTn2f2mXf8z0/628WoNdx0=
-X-Google-Smtp-Source: AGHT+IG3BFrKA08FjhsZ9ddXCP957d7+7cPmgInO554C26PDYDlG4fK9kjyIV5y9hNL8XXnVIQQcdVrwZ8SESzdoiLw=
-X-Received: by 2002:a2e:a4c9:0:b0:2c6:ed19:58a6 with SMTP id
- p9-20020a2ea4c9000000b002c6ed1958a6mr10311908ljm.33.1699287991388; Mon, 06
- Nov 2023 08:26:31 -0800 (PST)
+        Mon, 6 Nov 2023 17:22:14 -0500
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05olkn2092.outbound.protection.outlook.com [40.92.90.92])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D214ED57;
+        Mon,  6 Nov 2023 14:22:11 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VQwQen2eWBXacKp2g9IS6sLAtePUl34sFuXyQkGzESejwDQwbILrflCXjoQ2e6y5HmaGl21PAVQg280oLexewbA+qowYQKuzNr8y5xutW3ZOvbXR5x5ZssMiWTh1NdehH5c6mS8D3uiKnGc9WlEU4VPZ779sfu0UbbzhMik/UK6p+HGHsUTrJmRkrRTtBBRVdKMZ+4pa0Ppipx69WMeeEkoEm81XNtBnWckHaOOwwhv+jeJwBggK1GQLcrTD9FfThIcPa3/AEU7UPAc5+SefECrutPp+6utE93/Me2ZX14nYqxUiyrWSxeYEchz2gz03LFF6Aim3e106loQFVnY2qQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=KYgAhFYQrRNovxRm5bsWSiueE9LZzAsAZj+6d0TdFp8=;
+ b=csDwMw8Q5QpKI82LXofFoC0CchNwm9cvr4K3H5pQR8W1Ph726IDPT0VRwUov5QXDAco/kzve8i0VhDuUYiqplEA6XpZBJZFLJNbcF00JQRAJMQfYRa1ceWRZhPTuq7TN4wUpKw7LRjlSeMW7Z389hVEWSypO7Ao2omDl7zXFqKJij4Q054xJZ/4mKAdBN+bmWoa4siHngjbxeA75Tu4FuurXODOL0RSQRuyy78KzvklRbimvG2LmqMGbzrU1JCLe8D4f4leTFBMaEYZVK3RZR6KdNRv5wagFRIi1nA6MtKns2NeF3AqH+t2WxFKMhpCKv/doXo/jVtNIaUIS7rY5/Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KYgAhFYQrRNovxRm5bsWSiueE9LZzAsAZj+6d0TdFp8=;
+ b=t/k/8aZ0GwkJ+Uc+mwOmas7L7GSDd8A7DXKMTepTc7SxQhRK7iPjnDJgzY0HXr/fAa7sjC8oA9+zjg9uG955sbmc/2EcV4wYPuAAkuhD/yP5xXWB4UN5skPTh95rzNZJ/jppeTD2B/KLZ57CUAKk115fSsHWD8jOVRYKUwncpdl+rm8pMCZWU1xyqnPL6rAexAaZGlpOA/eB1OfxdbYriojor93Bpn0RxM8F9EYC4ezBYtGUr4ucshSSAzWHAeoa5LNDzL0WRaxa+jOAS6emIpnx+MLU3BZukbDf0+0/QEHarevoBVmJv5/lQPZriWs4CUVhxEqzk+9P5QUUR/P/mQ==
+Received: from DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:10:42a::7)
+ by AS8PR10MB6993.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:5a4::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.28; Mon, 6 Nov
+ 2023 22:22:09 +0000
+Received: from DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::e2b0:8d7e:e293:bd97]) by DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::e2b0:8d7e:e293:bd97%7]) with mapi id 15.20.6954.028; Mon, 6 Nov 2023
+ 22:22:09 +0000
+From:   Yuran Pereira <yuran.pereira@hotmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Yuran Pereira <yuran.pereira@hotmail.com>, marcel@holtmann.org,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-kernel@vger.kernel.org,
+        linux-kernel-mentees@lists.linuxfoundation.org
+Subject: [PATCH 0/2] Bluetooth: Add documentation and replace printk calls
+Date:   Tue,  7 Nov 2023 03:51:47 +0530
+Message-ID: <DB3PR10MB6835C002EB4C5A05AD17610BE8AAA@DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN:  [MAvBBO600D5xPui3UmRVquZ0wutlUJDq]
+X-ClientProxiedBy: JN2P275CA0018.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:3::30)
+ To DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:10:42a::7)
+X-Microsoft-Original-Message-ID: <20231106222147.1793535-1-yuran.pereira@hotmail.com>
 MIME-Version: 1.0
-References: <20231027055423.13617-1-juerg.haefliger@canonical.com> <20231030065341.8998-1-juerg.haefliger@canonical.com>
-In-Reply-To: <20231030065341.8998-1-juerg.haefliger@canonical.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 6 Nov 2023 11:26:20 -0500
-Message-ID: <CABBYNZKkRtuTfT002ehf1QVq_enbJn_MhBnnAkNgxsMy5MJu_w@mail.gmail.com>
-Subject: Re: [PATCH v2] shared/shell: Fix --init-script commandline option
-To:     Juerg Haefliger <juerg.haefliger@canonical.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB3PR10MB6835:EE_|AS8PR10MB6993:EE_
+X-MS-Office365-Filtering-Correlation-Id: f8194ab6-2933-4c55-32e5-08dbdf16d0df
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: kwRtveDDQb1w6KYZ45UYKRks5m5R3vJFWo3uFRR1n+wEZG5im/1GG3B3dZyXxV8/k5sCTJbUQzqvvLVuZURJHfxZPZQI4eoRB94oLmDeyydPfWoXcvSzcP7YveFgPIWzuJ9OCt8Dd66KdBLkBScuhOvfnQoBnsxB/j6KBr+QoUQH2+17Y41E+QBpXPhhyZjd8WMA45IH5J23TtCwEs/yQnR6eFZhq8AvB7GrFZjiTZm7m4ly12PTHYLp87uuNCPK9XwsLmGZrbIWef10lsJiH7cZKR/MOVzjcWb1Eycdbww42W0HRGoUaz2n/tFNbPXfuZvbDykNPv6NKUXQe1PVW6Nr7vdPQ+1ouDCZLdx25FesLpaR+D4eMZVRlvPpL4s4VnAheXr2Mcjq0Saw8UAHj8fRitf+BcbjA2jPiiEBuC5wkdCHkzZ6VydyuDs7L51j5KRwcmNi6GoCWUJpGjS3WEkhOS50K7m1jaMBWwgdqRe57HTqVx0igdkfringCA/+YAs5EHZ0b4q72L31JRuyuzzYTS6iXSDR4mgUk69fpwcGJyRQuh9/psfWGhKfzC2et/9OR3o/+9bQ6tbB8mWbGkFKH3rOlpQNkBqC0WKKQAo=
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?mW2HlB7/N3Ly1f3Hs4K+t4tA+VjMa5P76Sz6xGLFRQdsNHlQKaVF9Mkv/psW?=
+ =?us-ascii?Q?mJ1K+jLntYjv+GewSgU7upqJvYxQq/NzThaNPTCwmiiHCEJ3N4wBgIARdawV?=
+ =?us-ascii?Q?FpPZ1I2oU9mdCk3vUA+Ysk3zkq6FoyDb1zJ8RpdiNZ3M7J/9ujOwTSR1G9ac?=
+ =?us-ascii?Q?TOovAb8PJhAyrekUvlB327hCcbPb6CAJjZmGkE3WWXBF/mYPVEEV7F+OJQZD?=
+ =?us-ascii?Q?77uNBY4jEDpXythwNKWFwSZWS1JxBsk0GSW8U3aDQ15H9bR1qUhuyP8eFSXd?=
+ =?us-ascii?Q?uE7FfGtIrS/BTsCZp+Q5zleKpDnL/Qxgm1lCUwgUAR77U74Y25CLpDLFlWy/?=
+ =?us-ascii?Q?d1IsZAJMFYDmLCv0gJIr6z1ybL64nC7A/lGtfOj57oi+40SmtbqzVxb9l2zs?=
+ =?us-ascii?Q?C2ylhs1PkDfcS7gbTfbUD/7+ES/RjFDb5NugfPzkpo1mmGb2Jc++RA9RitAg?=
+ =?us-ascii?Q?ktIwUXFlsZkQFBvAAQiv6NK63bxxLYKPrR1WUmRMZ0ouqcxCuWB6qTqaMD5K?=
+ =?us-ascii?Q?p61iMh6+uCm/R6pj6bPcof9DMGvfZJWz6u0QeBJHOWvtX/YcyojWj8TPRG9E?=
+ =?us-ascii?Q?i7bSFfZS8vR4kGBOk6B1o4odRmVvpjweAh26/5RmiJUVYazf24mgzGOQh+CW?=
+ =?us-ascii?Q?vdKdImpBdKOWXhgZTRLeLXWwzW5Yg/5bXsoS3X7bMDOks4UUh8JnkUPQwpiI?=
+ =?us-ascii?Q?ZK36wgEkolEEzGUTWhu6SUnSrDAMoShGGaWKJz2/UC66SDyxq6WL9MXdFqR/?=
+ =?us-ascii?Q?geLzvkWq++sEtE+jYKfEJNeTWpw8wfzj+229+LH+ymfi4zHrnDFDDaRtR/pz?=
+ =?us-ascii?Q?eqqU4Fx+FKMVtdvIAGYRhnt2HMm/3JJNpxm7pqPaoCBTUW9g+MWaG/ZYstAZ?=
+ =?us-ascii?Q?vgXTabY2rVbfLuJFPxxAwJXdTKhI4SgD69OvGTbulkOAHnjQYGesqN1tiNlR?=
+ =?us-ascii?Q?uvUIE4IcU5B1ho/c1wZfrjurbLsCP5am2jcyhM3Ox0TwN0Lr8uiy4dp5h5xw?=
+ =?us-ascii?Q?jpJKQl9HbLQvfhWIbHImpOirVQGKn2+l2M7gJi4JXcw+VL4zrMzpNWclUkIh?=
+ =?us-ascii?Q?3ldAwoaehx5gSRV9J6r4gwHm7FSol+2V2H9E8Nk4afi4X773aj/cHtlbRB18?=
+ =?us-ascii?Q?dx3QkDXJuuvQ6YJellmNXMOD6+WH1ZBwHRpSmKfE/bN1colfjrWpvsSauuM2?=
+ =?us-ascii?Q?xrt191JlAmLTLiu4az7J6CbrKp5Xwi520/W1gnx0H+Bk7BbrFofvsnH3yqI?=
+ =?us-ascii?Q?=3D?=
+X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-6b909.templateTenant
+X-MS-Exchange-CrossTenant-Network-Message-Id: f8194ab6-2933-4c55-32e5-08dbdf16d0df
+X-MS-Exchange-CrossTenant-AuthSource: DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2023 22:22:09.5928
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR10MB6993
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Juerg,
+The following patchset adds documentation to exported functions in
+`net/bluetooth/lib.c` and ensures that `bt_*` logging functions are
+calling the correct pr_* function as opposed to `printk(KERN_*`.
 
-On Mon, Oct 30, 2023 at 2:54=E2=80=AFAM Juerg Haefliger
-<juerg.haefliger@canonical.com> wrote:
->
-> The newly added option -i/--init-script introduced a short option
-> namespace collision with btmgmt's --index, both of which use '-i'.
->
-> As a result, a provided --index is treated as a file name:
->
-> $ sudo btmgmt --index 0 info
+Yuran Pereira (2):
+  Bluetooth: Add documentation to exported functions in lib
+  Bluetooth: Replaces printk with pr_debug in bt_dbg
 
-Perhaps we could remove this --index since btmgmt supports setting the
-index via select command; it doesn't seem very useful to have 2
-different forms of selecting the index.
+ net/bluetooth/lib.c | 71 ++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 67 insertions(+), 4 deletions(-)
 
-> Unable to open 0: No such file or directory (2)
->
-> Fix this by using '-s' for --init-script.
->
-> Fixes: https://github.com/bluez/bluez/issues/639
-> Signed-off-by: Juerg Haefliger <juerg.haefliger@canonical.com>
->
-> ---
-> v2:
->   - Replace reference to broken commit with reference to github issue.
-> ---
->  src/shared/shell.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/src/shared/shell.c b/src/shared/shell.c
-> index db79c882ca3a..fbccff5b54d9 100644
-> --- a/src/shared/shell.c
-> +++ b/src/shared/shell.c
-> @@ -1128,7 +1128,7 @@ static void rl_init(void)
->  static const struct option main_options[] =3D {
->         { "version",    no_argument, 0, 'v' },
->         { "help",       no_argument, 0, 'h' },
-> -       { "init-script", required_argument, 0, 'i' },
-> +       { "init-script", required_argument, 0, 's' },
->         { "timeout",    required_argument, 0, 't' },
->         { "monitor",    no_argument, 0, 'm' },
->         { "zsh-complete",       no_argument, 0, 'z' },
-> @@ -1169,9 +1169,9 @@ void bt_shell_init(int argc, char **argv, const str=
-uct bt_shell_opt *opt)
->         if (opt) {
->                 memcpy(options + offset, opt->options,
->                                 sizeof(struct option) * opt->optno);
-> -               snprintf(optstr, sizeof(optstr), "+mhvi:t:%s", opt->optst=
-r);
-> +               snprintf(optstr, sizeof(optstr), "+mhvs:t:%s", opt->optst=
-r);
->         } else
-> -               snprintf(optstr, sizeof(optstr), "+mhvi:t:");
-> +               snprintf(optstr, sizeof(optstr), "+mhvs:t:");
->
->         data.name =3D strrchr(argv[0], '/');
->         if (!data.name)
-> @@ -1193,7 +1193,7 @@ void bt_shell_init(int argc, char **argv, const str=
-uct bt_shell_opt *opt)
->                         data.argv =3D &cmplt;
->                         data.mode =3D 1;
->                         goto done;
-> -               case 'i':
-> +               case 's':
->                         if (optarg)
->                                 data.init_fd =3D open(optarg, O_RDONLY);
->                         if (data.init_fd < 0)
-> --
-> 2.39.2
->
+-- 
+2.25.1
 
-
---=20
-Luiz Augusto von Dentz
