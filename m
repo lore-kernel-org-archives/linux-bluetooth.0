@@ -1,22 +1,22 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 951E42EB10
-	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Nov 2023 12:12:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C7232DF9A
+	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Nov 2023 12:13:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pizTXf8N"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00559C433D9;
-	Tue,  7 Nov 2023 12:12:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qjRuknh9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C71C8C433CC;
+	Tue,  7 Nov 2023 12:13:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699359170;
-	bh=5cZf+VEDr57V8sHYLQJNxpRjufE1uClcMABUaLZIGhE=;
+	s=k20201202; t=1699359192;
+	bh=ONKu+1hUHE6iUiTfpo41hmlCWh7FHNYE56f9pJzZE7g=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pizTXf8NzkJHeBqTilQQejuCQKcNg0Q5PvfbbfR1Luuql/M3KYjoEaoAb+Fy50XST
-	 Wndh9eC2gvxzVGdI5pRP8Dq7LapSzMnlArKBBJn6tdpWHp/RAHFuZxSi6UJQDJpbXd
-	 HMx18pa9AabvoZdE4kFa8wXW+t+rgPNrcKY9JmVbMuTItNbXMV4/uH3LlkNCmF7NWA
-	 TeqV3K94nz/E/IbqCurQIYMQdRs8vcwWQD8Mzna9MONDxmQY8W3euG7VPrx7rDCb6N
-	 EjFMLO5vf2FeC4iTZLSYJvUbmJwfQeDa6Oo21pLQ7sAtTEJsxRilqNOd/i44Kh7Fiu
-	 qIeYmxIkC6RSA==
+	b=qjRuknh9BlIhb7n0+hz8HYM923R3UpKEIZKn4M9GTMxcszj2dCNOE26/M0fiIb+Od
+	 8J9F7cUm2GFTy5swQp366D8fX3H9waguUZ5R4fli3zrFD2M20kiFanvNggUq+2I4A+
+	 Gn3eugI2fOV7NACKETsik4Uxz9XYJayaZVydgHEwUy7KAIi8y6BlLw0pXhAfiN2NnP
+	 7d0oEgpA22/TgHMdAqYPstJxoU1Cl2r3k6LAjqun5mzvLuBNFr70dZ/WRpRLom85/I
+	 vLQguQwu7JBjKxQXXjsJJNTI7i33s0ajPpR1fG/IoKSKZGPR84akaebin4zD5yFGx+
+	 4QC1cUX7z2BbA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -27,12 +27,12 @@ Cc: ZhengHan Wang <wzhmmmmm@gmail.com>,
 	johan.hedberg@gmail.com,
 	luiz.dentz@gmail.com,
 	linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 10/11] Bluetooth: Fix double free in hci_conn_cleanup
-Date: Tue,  7 Nov 2023 07:12:25 -0500
-Message-ID: <20231107121230.3758617-10-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 8/9] Bluetooth: Fix double free in hci_conn_cleanup
+Date: Tue,  7 Nov 2023 07:12:51 -0500
+Message-ID: <20231107121256.3758858-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231107121230.3758617-1-sashal@kernel.org>
-References: <20231107121230.3758617-1-sashal@kernel.org>
+In-Reply-To: <20231107121256.3758858-1-sashal@kernel.org>
+References: <20231107121256.3758858-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -41,7 +41,7 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.10.199
+X-stable-base: Linux 5.4.259
 Content-Transfer-Encoding: 8bit
 
 From: ZhengHan Wang <wzhmmmmm@gmail.com>
@@ -94,12 +94,12 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  2 files changed, 14 insertions(+), 15 deletions(-)
 
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index a9f6089a2ae2a..74721c3e49b34 100644
+index afdc0afa8ee7d..e129b7fb6540a 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -135,13 +135,11 @@ static void hci_conn_cleanup(struct hci_conn *conn)
- 			hdev->notify(hdev, HCI_NOTIFY_CONN_DEL);
- 	}
+@@ -125,13 +125,11 @@ static void hci_conn_cleanup(struct hci_conn *conn)
+ 	if (hdev->notify)
+ 		hdev->notify(hdev, HCI_NOTIFY_CONN_DEL);
  
 -	hci_conn_del_sysfs(conn);
 -
