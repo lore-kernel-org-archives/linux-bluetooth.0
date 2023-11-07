@@ -1,150 +1,235 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E0A52FE02
-	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Nov 2023 14:47:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::222])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F4ED101
-	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Nov 2023 06:47:07 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 1E5A340005;
-	Tue,  7 Nov 2023 14:47:05 +0000 (UTC)
-Message-ID: <31050102f726a4e89a9ef3d1719d6305de2ee61b.camel@hadess.net>
-Subject: Re: Using Laird Connectivity Bluetooth LE PTS dongle with Linux
-From: Bastien Nocera <hadess@hadess.net>
-To: Christoph Schweers <christoph.schweers@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 07 Nov 2023 15:47:05 +0100
-In-Reply-To: <CA+5PdQagTBRK09kMX=npZO9OawqtOp-CHGcYeVmQ5BpC+Uyi5A@mail.gmail.com>
-References: <c0df9d614f2a220bc93227eafcc68f73f1751528.camel@hadess.net>
-	 <CA+5PdQagTBRK09kMX=npZO9OawqtOp-CHGcYeVmQ5BpC+Uyi5A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40A7B31A64
+	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Nov 2023 15:05:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f7WBjnZ4"
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 422548843
+	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Nov 2023 07:04:32 -0800 (PST)
+Received: by mail-lj1-x231.google.com with SMTP id 38308e7fff4ca-2c5210a1515so79150771fa.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Nov 2023 07:04:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699369470; x=1699974270; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lYDnQdJGT/xF5HkXjdZy2PqDPtWcAWfBfGXDxo74eY0=;
+        b=f7WBjnZ45Eo4yVWFreSL69hQq6Fb/qiIkE9+dVCLmLRx4Rufsa9r3sO1h7JT1GEZy+
+         Enax0LFUBIwwf5SdPqL0zb+nVJfRPLolc4wGAHMsbdMYXU/GmOQpHhXUiQGonoOPv5Ct
+         wXvILtxlIyQSoObpWp/2reQeyM6LlYDA52yRiWJvaaCVkocMJArU1wV2GC1Ux9LDJfV3
+         ctHCAA6VUrNtTOfIhN+c4J1zHZt3aS1kNVc7m6dHonnDWBckfhGuIGA032IY/iROBlb/
+         RfRvgAqehtrybuZoGuR9nakj+H9APQPAX7v1lHCL7PL3S6nWXk2mc2RzBL+Sa61GRkAs
+         Il9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699369470; x=1699974270;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lYDnQdJGT/xF5HkXjdZy2PqDPtWcAWfBfGXDxo74eY0=;
+        b=mC3UEA2GOVTEecCKnu3UZuv7oP/srkfy+2kApA5rCWKfVdrwzCih+oA4Et5wAHYr2T
+         6z9Z3AiWVFLRB/Sqaw72ve761z6WRtTf2LcANBNht8tXUqtVxa9DcAzbmBie94RzlMDV
+         ORcuM1fD4K4cJ0JocQmQwSV6OoBUleNTWF/5skbPop6O6jVDbQiAS9zUZtSU32uChbFQ
+         g9BAm6iHqvakBNxjQaiOaZ19C2+mfMqSXvkElZUkXjSfAZ1dY6Mm0czSfhPeQMti1Xea
+         y+F3oAFkDWhHidmVfoLRhLVG0c9Iz639eESnjHHLCuPdsX/gC2bUsxJ/Mf1ZoX0NOlYk
+         ROuA==
+X-Gm-Message-State: AOJu0YyeB7VWXL04qKHbJU9rygpWjIePIew8KguL0BbNV4Y4JhkHSjeO
+	xvHDKpYFaXbuycR4rLJoi7ppMJG8m9GGhbu9Jm5a0hDwAKg=
+X-Google-Smtp-Source: AGHT+IG2vLA1gOyQdK08vcV2ccq0wtEmQ+aHrgCQ91U4m5diBV2eicTCvFDXVn5ypz03j2nqdgHSlykn8tALfZZlYCc=
+X-Received: by 2002:a05:651c:10a5:b0:2c6:f6b6:f8db with SMTP id
+ k5-20020a05651c10a500b002c6f6b6f8dbmr10822722ljn.16.1699369470052; Tue, 07
+ Nov 2023 07:04:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-GND-Sasl: hadess@hadess.net
+References: <c0df9d614f2a220bc93227eafcc68f73f1751528.camel@hadess.net>
+ <CA+5PdQagTBRK09kMX=npZO9OawqtOp-CHGcYeVmQ5BpC+Uyi5A@mail.gmail.com> <31050102f726a4e89a9ef3d1719d6305de2ee61b.camel@hadess.net>
+In-Reply-To: <31050102f726a4e89a9ef3d1719d6305de2ee61b.camel@hadess.net>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 7 Nov 2023 10:04:17 -0500
+Message-ID: <CABBYNZLCsBZ5eD+zRMC_YjSYU6C8FS5vw=DVHd947D+eiKY5Tg@mail.gmail.com>
+Subject: Re: Using Laird Connectivity Bluetooth LE PTS dongle with Linux
+To: Bastien Nocera <hadess@hadess.net>
+Cc: Christoph Schweers <christoph.schweers@gmail.com>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-T24gTW9uLCAyMDIzLTExLTA2IGF0IDE4OjA2ICswMTAwLCBDaHJpc3RvcGggU2Nod2VlcnMgd3Jv
-dGU6Cj4gCj4gQmFzdGllbiBOb2NlcmEgPGhhZGVzc0BoYWRlc3MubmV0PiBzY2hyaWViIGFtIE1v
-LiwgNi4gTm92LiAyMDIzLAo+IDE1OjM1Ogo+ID4gSGV5LAo+ID4gCj4gPiBJIGJvdWdodCB0aGUg
-TGFpcmQgQ29ubmVjdGl2aXR5IEJsdWV0b290aCBMRS1vbmx5IFBUUyBkb25nbGUgbGlzdGVkCj4g
-PiBvbjoKPiA+IGh0dHBzOi8vc3VwcG9ydC5ibHVldG9vdGguY29tL2hjL2VuLXVzL2FydGljbGVz
-LzM2MDA0OTAxODQ5Mi1XaGF0LWlzLXRoZS1kaWZmZXJlbmNlLWJldHdlZW4tdGhlLVByb2ZpbGUt
-VHVuaW5nLVN1aXRlLVBUUy1Eb25nbGVzCj4gPiAtCj4gPiBhcyBJIHdhcyBob3BpbmcgdG8gaGF2
-ZSBhbiBlYXN5IHRvIHVzZSBCbHVldG9vdGggTEUgb25seSBkZXZpY2UgZm9yCj4gPiB0ZXN0aW5n
-Lgo+ID4gCj4gPiBCdXQgdGhlIGRldmljZSBvbmx5IHNob3dzIHVwIGFzIGEgc2VyaWFsIGRldmlj
-ZSB1bmRlciBrZXJuZWwgNi41Cj4gPiBmcm9tCj4gPiBteSBkaXN0cmlidXRpb24uCj4gPiAKPiA+
-IElzIHRoZXJlIGFueXRoaW5nIHNwZWNpZmljIHRoYXQgbmVlZHMgdG8gYmUgZG9uZSBmb3IgdGhh
-dCBkZXZpY2UgdG8KPiA+IGJlCj4gPiB1c2FibGUgYXMgYSBCbHVldG9vdGggYWRhcHRlciB1bmRl
-ciBMaW51eD8gT3IgZG9lcyBpdCBvbmx5IHdvcmsKPiA+IHdpdGgKPiA+IHRoZSBQVFM/Cj4gPiAK
-PiA+IEkgc3BvdHRlZCB0aGUgYWJpbGl0eSB0byBydW4gc3BlY2lmaWMgc29mdHdhcmUgb24gdGhl
-IG1pY3JvLQo+ID4gY29udHJvbGxlcgo+ID4gaXRzZWxmIHdoZW4gcG93ZXJlZCBvbiwgYnV0IG5v
-dGhpbmcgc3BlY2lmaWMgdG8gdXNpbmcgaXQgYXMgYW4KPiA+IGFkYXB0ZXI6Cj4gPiBodHRwOi8v
-YXNzZXRzLmxhaXJkdGVjaC5jb20vaG9tZS9icmFuZHdvcmxkL2ZpbGVzL0JMNjU0JTIwVVNCJTIw
-RG9uZ2xlJTIwVXNlciUyMEd1aWRlJTIwdjFfMC5wZGYKPiA+IAo+ID4gRnVsbCBsc3VzYiBvdXRw
-dXQgZm9yIHRoYXQgZGV2aWNlOgo+ID4gQnVzIDAwMSBEZXZpY2UgMDE4OiBJRCAxOTE1OjUyMWYg
-Tm9yZGljIFNlbWljb25kdWN0b3IgQVNBIE5vcmRpYwo+ID4gT3Blbgo+ID4gREZVIEJvb3Rsb2Fk
-ZXIKPiA+IERldmljZSBEZXNjcmlwdG9yOgo+ID4gwqAgYkxlbmd0aMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIDE4Cj4gPiDCoCBiRGVzY3JpcHRvclR5cGXCoCDCoCDCoCDCoCDCoDEKPiA+IMKgIGJj
-ZFVTQsKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgMi4wMAo+ID4gwqAgYkRldmljZUNsYXNzwqAgwqAg
-wqAgwqAgwqAgwqAgMCAKPiA+IMKgIGJEZXZpY2VTdWJDbGFzc8KgIMKgIMKgIMKgIMKgMCAKPiA+
-IMKgIGJEZXZpY2VQcm90b2NvbMKgIMKgIMKgIMKgIMKgMCAKPiA+IMKgIGJNYXhQYWNrZXRTaXpl
-MMKgIMKgIMKgIMKgIDY0Cj4gPiDCoCBpZFZlbmRvcsKgIMKgIMKgIMKgIMKgIMKgMHgxOTE1IE5v
-cmRpYyBTZW1pY29uZHVjdG9yIEFTQQo+ID4gwqAgaWRQcm9kdWN0wqAgwqAgwqAgwqAgwqAgMHg1
-MjFmIAo+ID4gwqAgYmNkRGV2aWNlwqAgwqAgwqAgwqAgwqAgwqAgMS4wMAo+ID4gwqAgaU1hbnVm
-YWN0dXJlcsKgIMKgIMKgIMKgIMKgIMKgMSBMYWlyZCBDb25uZWN0aXZpdHkKPiA+IMKgIGlQcm9k
-dWN0wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgMiBOb3JkaWMgT3BlbiBERlUgQm9vdGxvYWRlcgo+
-ID4gwqAgaVNlcmlhbMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgMyBFMUJCOTIxMUZBNDEKPiA+
-IMKgIGJOdW1Db25maWd1cmF0aW9uc8KgIMKgIMKgIDEKPiA+IMKgIENvbmZpZ3VyYXRpb24gRGVz
-Y3JpcHRvcjoKPiA+IMKgIMKgIGJMZW5ndGjCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoDkKPiA+
-IMKgIMKgIGJEZXNjcmlwdG9yVHlwZcKgIMKgIMKgIMKgIMKgMgo+ID4gwqAgwqAgd1RvdGFsTGVu
-Z3RowqAgwqAgwqAgwqAweDAwNGIKPiA+IMKgIMKgIGJOdW1JbnRlcmZhY2VzwqAgwqAgwqAgwqAg
-wqAgMgo+ID4gwqAgwqAgYkNvbmZpZ3VyYXRpb25WYWx1ZcKgIMKgIMKgMQo+ID4gwqAgwqAgaUNv
-bmZpZ3VyYXRpb27CoCDCoCDCoCDCoCDCoCA0IERlZmF1bHQgY29uZmlndXJhdGlvbgo+ID4gwqAg
-wqAgYm1BdHRyaWJ1dGVzwqAgwqAgwqAgwqAgwqAweGMwCj4gPiDCoCDCoCDCoCBTZWxmIFBvd2Vy
-ZWQKPiA+IMKgIMKgIE1heFBvd2VywqAgwqAgwqAgwqAgwqAgwqAgwqAgMTAwbUEKPiA+IMKgIMKg
-IEludGVyZmFjZSBBc3NvY2lhdGlvbjoKPiA+IMKgIMKgIMKgIGJMZW5ndGjCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoDgKPiA+IMKgIMKgIMKgIGJEZXNjcmlwdG9yVHlwZcKgIMKgIMKgIMKgIDEx
-Cj4gPiDCoCDCoCDCoCBiRmlyc3RJbnRlcmZhY2XCoCDCoCDCoCDCoCDCoDAKPiA+IMKgIMKgIMKg
-IGJJbnRlcmZhY2VDb3VudMKgIMKgIMKgIMKgIMKgMgo+ID4gwqAgwqAgwqAgYkZ1bmN0aW9uQ2xh
-c3PCoCDCoCDCoCDCoCDCoCAyIENvbW11bmljYXRpb25zCj4gPiDCoCDCoCDCoCBiRnVuY3Rpb25T
-dWJDbGFzc8KgIMKgIMKgIMKgMiBBYnN0cmFjdCAobW9kZW0pCj4gPiDCoCDCoCDCoCBiRnVuY3Rp
-b25Qcm90b2NvbMKgIMKgIMKgIMKgMCAKPiA+IMKgIMKgIMKgIGlGdW5jdGlvbsKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgMCAKPiA+IMKgIMKgIEludGVyZmFjZSBEZXNjcmlwdG9yOgo+ID4gwqAgwqAg
-wqAgYkxlbmd0aMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgOQo+ID4gwqAgwqAgwqAgYkRlc2Ny
-aXB0b3JUeXBlwqAgwqAgwqAgwqAgwqA0Cj4gPiDCoCDCoCDCoCBiSW50ZXJmYWNlTnVtYmVywqAg
-wqAgwqAgwqAgMAo+ID4gwqAgwqAgwqAgYkFsdGVybmF0ZVNldHRpbmfCoCDCoCDCoCDCoDAKPiA+
-IMKgIMKgIMKgIGJOdW1FbmRwb2ludHPCoCDCoCDCoCDCoCDCoCDCoDEKPiA+IMKgIMKgIMKgIGJJ
-bnRlcmZhY2VDbGFzc8KgIMKgIMKgIMKgIMKgMiBDb21tdW5pY2F0aW9ucwo+ID4gwqAgwqAgwqAg
-YkludGVyZmFjZVN1YkNsYXNzwqAgwqAgwqAgMiBBYnN0cmFjdCAobW9kZW0pCj4gPiDCoCDCoCDC
-oCBiSW50ZXJmYWNlUHJvdG9jb2zCoCDCoCDCoCAwIAo+ID4gwqAgwqAgwqAgaUludGVyZmFjZcKg
-IMKgIMKgIMKgIMKgIMKgIMKgIDAgCj4gPiDCoCDCoCDCoCBDREMgSGVhZGVyOgo+ID4gwqAgwqAg
-wqAgwqAgYmNkQ0RDwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAxLjEwCj4gPiDCoCDCoCDCoCBDREMg
-Q2FsbCBNYW5hZ2VtZW50Ogo+ID4gwqAgwqAgwqAgwqAgYm1DYXBhYmlsaXRpZXPCoCDCoCDCoCDC
-oDB4MDMKPiA+IMKgIMKgIMKgIMKgIMKgIGNhbGwgbWFuYWdlbWVudAo+ID4gwqAgwqAgwqAgwqAg
-wqAgdXNlIERhdGFJbnRlcmZhY2UKPiA+IMKgIMKgIMKgIMKgIGJEYXRhSW50ZXJmYWNlwqAgwqAg
-wqAgwqAgwqAgMQo+ID4gwqAgwqAgwqAgQ0RDIEFDTToKPiA+IMKgIMKgIMKgIMKgIGJtQ2FwYWJp
-bGl0aWVzwqAgwqAgwqAgwqAweDAyCj4gPiDCoCDCoCDCoCDCoCDCoCBsaW5lIGNvZGluZyBhbmQg
-c2VyaWFsIHN0YXRlCj4gPiDCoCDCoCDCoCBDREMgVW5pb246Cj4gPiDCoCDCoCDCoCDCoCBiTWFz
-dGVySW50ZXJmYWNlwqAgwqAgwqAgwqAgMAo+ID4gwqAgwqAgwqAgwqAgYlNsYXZlSW50ZXJmYWNl
-wqAgwqAgwqAgwqAgwqAxIAo+ID4gwqAgwqAgwqAgRW5kcG9pbnQgRGVzY3JpcHRvcjoKPiA+IMKg
-IMKgIMKgIMKgIGJMZW5ndGjCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoDcKPiA+IMKgIMKgIMKg
-IMKgIGJEZXNjcmlwdG9yVHlwZcKgIMKgIMKgIMKgIMKgNQo+ID4gwqAgwqAgwqAgwqAgYkVuZHBv
-aW50QWRkcmVzc8KgIMKgIMKgMHg4MsKgIEVQIDIgSU4KPiA+IMKgIMKgIMKgIMKgIGJtQXR0cmli
-dXRlc8KgIMKgIMKgIMKgIMKgIMKgIDMKPiA+IMKgIMKgIMKgIMKgIMKgIFRyYW5zZmVyIFR5cGXC
-oCDCoCDCoCDCoCDCoCDCoCBJbnRlcnJ1cHQKPiA+IMKgIMKgIMKgIMKgIMKgIFN5bmNoIFR5cGXC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoE5vbmUKPiA+IMKgIMKgIMKgIMKgIMKgIFVzYWdlIFR5cGXC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoERhdGEKPiA+IMKgIMKgIMKgIMKgIHdNYXhQYWNrZXRTaXpl
-wqAgwqAgwqAweDAwNDDCoCAxeCA2NCBieXRlcwo+ID4gwqAgwqAgwqAgwqAgYkludGVydmFswqAg
-wqAgwqAgwqAgwqAgwqAgwqAgMTYKPiA+IMKgIMKgIEludGVyZmFjZSBEZXNjcmlwdG9yOgo+ID4g
-wqAgwqAgwqAgYkxlbmd0aMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgOQo+ID4gwqAgwqAgwqAg
-YkRlc2NyaXB0b3JUeXBlwqAgwqAgwqAgwqAgwqA0Cj4gPiDCoCDCoCDCoCBiSW50ZXJmYWNlTnVt
-YmVywqAgwqAgwqAgwqAgMQo+ID4gwqAgwqAgwqAgYkFsdGVybmF0ZVNldHRpbmfCoCDCoCDCoCDC
-oDAKPiA+IMKgIMKgIMKgIGJOdW1FbmRwb2ludHPCoCDCoCDCoCDCoCDCoCDCoDIKPiA+IMKgIMKg
-IMKgIGJJbnRlcmZhY2VDbGFzc8KgIMKgIMKgIMKgIDEwIENEQyBEYXRhCj4gPiDCoCDCoCDCoCBi
-SW50ZXJmYWNlU3ViQ2xhc3PCoCDCoCDCoCAwIAo+ID4gwqAgwqAgwqAgYkludGVyZmFjZVByb3Rv
-Y29swqAgwqAgwqAgMCAKPiA+IMKgIMKgIMKgIGlJbnRlcmZhY2XCoCDCoCDCoCDCoCDCoCDCoCDC
-oCAwIAo+ID4gwqAgwqAgwqAgRW5kcG9pbnQgRGVzY3JpcHRvcjoKPiA+IMKgIMKgIMKgIMKgIGJM
-ZW5ndGjCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoDcKPiA+IMKgIMKgIMKgIMKgIGJEZXNjcmlw
-dG9yVHlwZcKgIMKgIMKgIMKgIMKgNQo+ID4gwqAgwqAgwqAgwqAgYkVuZHBvaW50QWRkcmVzc8Kg
-IMKgIMKgMHg4McKgIEVQIDEgSU4KPiA+IMKgIMKgIMKgIMKgIGJtQXR0cmlidXRlc8KgIMKgIMKg
-IMKgIMKgIMKgIDIKPiA+IMKgIMKgIMKgIMKgIMKgIFRyYW5zZmVyIFR5cGXCoCDCoCDCoCDCoCDC
-oCDCoCBCdWxrCj4gPiDCoCDCoCDCoCDCoCDCoCBTeW5jaCBUeXBlwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqBOb25lCj4gPiDCoCDCoCDCoCDCoCDCoCBVc2FnZSBUeXBlwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqBEYXRhCj4gPiDCoCDCoCDCoCDCoCB3TWF4UGFja2V0U2l6ZcKgIMKgIMKgMHgwMDQwwqAg
-MXggNjQgYnl0ZXMKPiA+IMKgIMKgIMKgIMKgIGJJbnRlcnZhbMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgMAo+ID4gwqAgwqAgwqAgRW5kcG9pbnQgRGVzY3JpcHRvcjoKPiA+IMKgIMKgIMKgIMKgIGJM
-ZW5ndGjCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoDcKPiA+IMKgIMKgIMKgIMKgIGJEZXNjcmlw
-dG9yVHlwZcKgIMKgIMKgIMKgIMKgNQo+ID4gwqAgwqAgwqAgwqAgYkVuZHBvaW50QWRkcmVzc8Kg
-IMKgIMKgMHgwMcKgIEVQIDEgT1VUCj4gPiDCoCDCoCDCoCDCoCBibUF0dHJpYnV0ZXPCoCDCoCDC
-oCDCoCDCoCDCoCAyCj4gPiDCoCDCoCDCoCDCoCDCoCBUcmFuc2ZlciBUeXBlwqAgwqAgwqAgwqAg
-wqAgwqAgQnVsawo+ID4gwqAgwqAgwqAgwqAgwqAgU3luY2ggVHlwZcKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgTm9uZQo+ID4gwqAgwqAgwqAgwqAgwqAgVXNhZ2UgVHlwZcKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgRGF0YQo+ID4gwqAgwqAgwqAgwqAgd01heFBhY2tldFNpemXCoCDCoCDCoDB4MDA0MMKg
-IDF4IDY0IGJ5dGVzCj4gPiDCoCDCoCDCoCDCoCBiSW50ZXJ2YWzCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoDAKPiA+IERldmljZSBTdGF0dXM6wqAgwqAgwqAweDAwMDEKPiA+IMKgIFNlbGYgUG93ZXJl
-ZAo+ID4gCj4gPiBDaGVlcnMKPiAKPiBUaGlzIGRvbmdsZSBtdXN0IGJlIHByZS1wcm9ncmFtbWVk
-IHdpdGggYSBzcGVjaWFsIGZpcm13YXJlIHRvIHdvcmsgYXMKPiBhIFBUUyBkb25nbGUuCj4gaHR0
-cHM6Ly9zdXBwb3J0LmJsdWV0b290aC5jb20vaGMvZW4tdXMvYXJ0aWNsZXMvMzYwMDQ5MDE5NzMy
-LUhvdy10by11cGdyYWRlLXRoZS1maXJtd2FyZS1vZi15b3VyLVBUUy1Eb25nbGUKPiAtCj4gCgpJ
-IHVwZGF0ZWQgdGhlIGZpcm13YXJlIHVzaW5nIHRoZSBQVFMgZmlybXdhcmUgdXBncmFkZXIsIGFu
-ZCBpdCBzdGlsbApkb2Vzbid0IHNob3cgdXAgYXMgYSBCbHVldG9vdGggYWRhcHRlciB1bmRlciBM
-aW51eDoKCk5vdiAwNyAxNTo0NDoxMSBjbGFzc2ljIGtlcm5lbDogdXNiIDEtODogbmV3IGZ1bGwt
-c3BlZWQgVVNCIGRldmljZSBudW1iZXIgMjIgdXNpbmcgeGhjaV9oY2QKTm92IDA3IDE1OjQ0OjEx
-IGNsYXNzaWMga2VybmVsOiB1c2IgMS04OiBOZXcgVVNCIGRldmljZSBmb3VuZCwgaWRWZW5kb3I9
-MTkxNSwgaWRQcm9kdWN0PTUyMWYsIGJjZERldmljZT0gMS4wMApOb3YgMDcgMTU6NDQ6MTEgY2xh
-c3NpYyBrZXJuZWw6IHVzYiAxLTg6IE5ldyBVU0IgZGV2aWNlIHN0cmluZ3M6IE1mcj0xLCBQcm9k
-dWN0PTIsIFNlcmlhbE51bWJlcj0zCk5vdiAwNyAxNTo0NDoxMSBjbGFzc2ljIGtlcm5lbDogdXNi
-IDEtODogUHJvZHVjdDogblJGNTIgVVNCIFByb2R1Y3QKTm92IDA3IDE1OjQ0OjExIGNsYXNzaWMg
-a2VybmVsOiB1c2IgMS04OiBNYW51ZmFjdHVyZXI6IE5vcmRpYyBTZW1pY29uZHVjdG9yCk5vdiAw
-NyAxNTo0NDoxMSBjbGFzc2ljIGtlcm5lbDogdXNiIDEtODogU2VyaWFsTnVtYmVyOiBFMUJCOTIx
-MUZBNDEKTm92IDA3IDE1OjQ0OjExIGNsYXNzaWMga2VybmVsOiBjZGNfYWNtIDEtODoxLjA6IHR0
-eUFDTTA6IFVTQiBBQ00gZGV2aWNlCgpJdCBzaG93cyB1cCBhczoKQnVzIDAwMSBEZXZpY2UgMDIz
-OiBJRCAxOTE1OjUyMWYgTm9yZGljIFNlbWljb25kdWN0b3IgQVNBIG5SRjUyIFVTQiBQcm9kdWN0
-CmluIGxzdXNiLgo=
+Hi Bastien,
 
+On Tue, Nov 7, 2023 at 9:47=E2=80=AFAM Bastien Nocera <hadess@hadess.net> w=
+rote:
+>
+> On Mon, 2023-11-06 at 18:06 +0100, Christoph Schweers wrote:
+> >
+> > Bastien Nocera <hadess@hadess.net> schrieb am Mo., 6. Nov. 2023,
+> > 15:35:
+> > > Hey,
+> > >
+> > > I bought the Laird Connectivity Bluetooth LE-only PTS dongle listed
+> > > on:
+> > > https://support.bluetooth.com/hc/en-us/articles/360049018492-What-is-=
+the-difference-between-the-Profile-Tuning-Suite-PTS-Dongles
+> > > -
+> > > as I was hoping to have an easy to use Bluetooth LE only device for
+> > > testing.
+> > >
+> > > But the device only shows up as a serial device under kernel 6.5
+> > > from
+> > > my distribution.
+> > >
+> > > Is there anything specific that needs to be done for that device to
+> > > be
+> > > usable as a Bluetooth adapter under Linux? Or does it only work
+> > > with
+> > > the PTS?
+> > >
+> > > I spotted the ability to run specific software on the micro-
+> > > controller
+> > > itself when powered on, but nothing specific to using it as an
+> > > adapter:
+> > > http://assets.lairdtech.com/home/brandworld/files/BL654%20USB%20Dongl=
+e%20User%20Guide%20v1_0.pdf
+> > >
+> > > Full lsusb output for that device:
+> > > Bus 001 Device 018: ID 1915:521f Nordic Semiconductor ASA Nordic
+> > > Open
+> > > DFU Bootloader
+> > > Device Descriptor:
+> > >   bLength                18
+> > >   bDescriptorType         1
+> > >   bcdUSB               2.00
+> > >   bDeviceClass            0
+> > >   bDeviceSubClass         0
+> > >   bDeviceProtocol         0
+> > >   bMaxPacketSize0        64
+> > >   idVendor           0x1915 Nordic Semiconductor ASA
+> > >   idProduct          0x521f
+> > >   bcdDevice            1.00
+> > >   iManufacturer           1 Laird Connectivity
+> > >   iProduct                2 Nordic Open DFU Bootloader
+> > >   iSerial                 3 E1BB9211FA41
+> > >   bNumConfigurations      1
+> > >   Configuration Descriptor:
+> > >     bLength                 9
+> > >     bDescriptorType         2
+> > >     wTotalLength       0x004b
+> > >     bNumInterfaces          2
+> > >     bConfigurationValue     1
+> > >     iConfiguration          4 Default configuration
+> > >     bmAttributes         0xc0
+> > >       Self Powered
+> > >     MaxPower              100mA
+> > >     Interface Association:
+> > >       bLength                 8
+> > >       bDescriptorType        11
+> > >       bFirstInterface         0
+> > >       bInterfaceCount         2
+> > >       bFunctionClass          2 Communications
+> > >       bFunctionSubClass       2 Abstract (modem)
+> > >       bFunctionProtocol       0
+> > >       iFunction               0
+> > >     Interface Descriptor:
+> > >       bLength                 9
+> > >       bDescriptorType         4
+> > >       bInterfaceNumber        0
+> > >       bAlternateSetting       0
+> > >       bNumEndpoints           1
+> > >       bInterfaceClass         2 Communications
+> > >       bInterfaceSubClass      2 Abstract (modem)
+> > >       bInterfaceProtocol      0
+> > >       iInterface              0
+> > >       CDC Header:
+> > >         bcdCDC               1.10
+> > >       CDC Call Management:
+> > >         bmCapabilities       0x03
+> > >           call management
+> > >           use DataInterface
+> > >         bDataInterface          1
+> > >       CDC ACM:
+> > >         bmCapabilities       0x02
+> > >           line coding and serial state
+> > >       CDC Union:
+> > >         bMasterInterface        0
+> > >         bSlaveInterface         1
+> > >       Endpoint Descriptor:
+> > >         bLength                 7
+> > >         bDescriptorType         5
+> > >         bEndpointAddress     0x82  EP 2 IN
+> > >         bmAttributes            3
+> > >           Transfer Type            Interrupt
+> > >           Synch Type               None
+> > >           Usage Type               Data
+> > >         wMaxPacketSize     0x0040  1x 64 bytes
+> > >         bInterval              16
+> > >     Interface Descriptor:
+> > >       bLength                 9
+> > >       bDescriptorType         4
+> > >       bInterfaceNumber        1
+> > >       bAlternateSetting       0
+> > >       bNumEndpoints           2
+> > >       bInterfaceClass        10 CDC Data
+> > >       bInterfaceSubClass      0
+> > >       bInterfaceProtocol      0
+> > >       iInterface              0
+> > >       Endpoint Descriptor:
+> > >         bLength                 7
+> > >         bDescriptorType         5
+> > >         bEndpointAddress     0x81  EP 1 IN
+> > >         bmAttributes            2
+> > >           Transfer Type            Bulk
+> > >           Synch Type               None
+> > >           Usage Type               Data
+> > >         wMaxPacketSize     0x0040  1x 64 bytes
+> > >         bInterval               0
+> > >       Endpoint Descriptor:
+> > >         bLength                 7
+> > >         bDescriptorType         5
+> > >         bEndpointAddress     0x01  EP 1 OUT
+> > >         bmAttributes            2
+> > >           Transfer Type            Bulk
+> > >           Synch Type               None
+> > >           Usage Type               Data
+> > >         wMaxPacketSize     0x0040  1x 64 bytes
+> > >         bInterval               0
+> > > Device Status:     0x0001
+> > >   Self Powered
+> > >
+> > > Cheers
+> >
+> > This dongle must be pre-programmed with a special firmware to work as
+> > a PTS dongle.
+> > https://support.bluetooth.com/hc/en-us/articles/360049019732-How-to-upg=
+rade-the-firmware-of-your-PTS-Dongle
+> > -
+> >
+>
+> I updated the firmware using the PTS firmware upgrader, and it still
+> doesn't show up as a Bluetooth adapter under Linux:
+>
+> Nov 07 15:44:11 classic kernel: usb 1-8: new full-speed USB device number=
+ 22 using xhci_hcd
+> Nov 07 15:44:11 classic kernel: usb 1-8: New USB device found, idVendor=
+=3D1915, idProduct=3D521f, bcdDevice=3D 1.00
+> Nov 07 15:44:11 classic kernel: usb 1-8: New USB device strings: Mfr=3D1,=
+ Product=3D2, SerialNumber=3D3
+> Nov 07 15:44:11 classic kernel: usb 1-8: Product: nRF52 USB Product
+> Nov 07 15:44:11 classic kernel: usb 1-8: Manufacturer: Nordic Semiconduct=
+or
+> Nov 07 15:44:11 classic kernel: usb 1-8: SerialNumber: E1BB9211FA41
+> Nov 07 15:44:11 classic kernel: cdc_acm 1-8:1.0: ttyACM0: USB ACM device
+>
+> It shows up as:
+> Bus 001 Device 023: ID 1915:521f Nordic Semiconductor ASA nRF52 USB Produ=
+ct
+> in lsusb.
+
+Perhaps it needs to be added to be btusb if it does support a standard
+HCI interface. (I'm currently on vacation with limited time to assist
+everyone.)
+
+--=20
+Luiz Augusto von Dentz
