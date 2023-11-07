@@ -1,180 +1,96 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A6A92FE09
-	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Nov 2023 12:13:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA6F02FE30
+	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Nov 2023 12:33:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KRH4u/zh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0361FC433CA;
-	Tue,  7 Nov 2023 12:13:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699359212;
-	bh=f/zwZLniswJntw6ia7EIxHzVS3udMIRi1uEMdjIejkI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KRH4u/zhiKXIHHuEWZiC+9zESPfZ30iA6qhn3PSzpBlbztpxhi+CR4OG5c4oZP2j6
-	 QbeRgZXXiydW1pgJBo9mwujeHr3VF4yCAZYYt1ohN0kvQa/0tsEInkCemnyCMRzr6T
-	 9eEgTpoK7qfo4h3ZfDE4m5+DDi2LHeDHxWAoCFt8QxZz8oqMalPdnfd3VOpl6x9f78
-	 8hXshl+S2WEHc8t2rYwK9lo162Zd+J09rIHZXFZWtbbV+D5WiFjD71V4My7KciUjYk
-	 h5Vp4w5HlmQWXjgVWwfyE0bQcX/EIXEYacuk+m5dE8+Zp+q4lT2OY4/65yvDhmv0Vp
-	 4PWjdDIsMCnYA==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: ZhengHan Wang <wzhmmmmm@gmail.com>,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	Sasha Levin <sashal@kernel.org>,
-	marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 6/7] Bluetooth: Fix double free in hci_conn_cleanup
-Date: Tue,  7 Nov 2023 07:13:14 -0500
-Message-ID: <20231107121318.3759058-6-sashal@kernel.org>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231107121318.3759058-1-sashal@kernel.org>
-References: <20231107121318.3759058-1-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RGqrp66r"
+Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65E7F65A4
+	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Nov 2023 04:33:15 -0800 (PST)
+Received: by mail-oi1-x22f.google.com with SMTP id 5614622812f47-3b2ec9a79bdso3885690b6e.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Nov 2023 04:33:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699360394; x=1699965194; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=jwByr2yobN6WVFTvZ+XMkxY9CLoXKosQ9DdWg5J1UNM=;
+        b=RGqrp66rDngQ9dUCfQNpBnSbywpGPjJCJvhprFUvSvVhxuM+cwyHf8wkHepJ6Uu06t
+         357jJSWk5mfIIREvPk1Phy6FipgzICwfZy7bhkd/KxQyzOaumIV6QB+MxYAV8lJpZOZ8
+         yPVbnnVx+ReN9KbnmC9dQfqooWnu2/B8BmOXycrEdAvV7FGcpAjRgkaFHaj06F2iHqn2
+         oKnFreDgPF0en+G1ROnd1GFcv70QgGlPR/URDMJCvdPNyBa4AbTKGON1VmWQ7oYClk7J
+         MKRp3wJu6EKAGVAOywQmk6EFde7EUrP88Okqg4IHsYPqaLl2Ip1sOrXVRXz60v4Mlyns
+         gQkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699360394; x=1699965194;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jwByr2yobN6WVFTvZ+XMkxY9CLoXKosQ9DdWg5J1UNM=;
+        b=fMUD1NBymE+vkYZZW6qaiyGhzJClGWrXbiCScJa7VEa7ZKjhE3/HgAE3Qt5l1h4yjf
+         wHLmXjPKjOtHFg+8igxBJMTlVyWuMJw3qlf5hNJ5mYwSXiGwhoqBFcIG2szytF1xmRO7
+         kby6SOE9VJtBCCWmnta5FM8JCrAgBW9GvaeGHbX4Zv0nPyLYC+8q3wmWyD8GTadlAPh0
+         ziDTNwIpyW5k4hOcwz0NkZGf0EUj9ZMTPFgiNy2We2V9xlwnms/CAMZ1WUbYiq2gqwpU
+         mcGmIUklLjkbqzmYbNyrda8BCC0hxbkfMxjj9Wc0ftJ0gpbcHoVPp8po5ErF07WzeUng
+         LFFg==
+X-Gm-Message-State: AOJu0YybH05cqLyNwfootkW9iXW8oQWRCZAawCF1kuHCpMxAa0Kf5nye
+	G0z7ECsYil71Cy98qRaGN7etfuxeVK8=
+X-Google-Smtp-Source: AGHT+IGQVBEye1xjYhL5Bpx98/aCijMxvR3bKaFYw9GYpwoacOr2VXrJnpHAMzSkAdYDmlcN+FlGow==
+X-Received: by 2002:a05:6808:2024:b0:3a7:4509:ecc7 with SMTP id q36-20020a056808202400b003a74509ecc7mr41762774oiw.16.1699360394300;
+        Tue, 07 Nov 2023 04:33:14 -0800 (PST)
+Received: from [172.17.0.2] ([52.185.204.72])
+        by smtp.gmail.com with ESMTPSA id d1-20020a05680805c100b003afdc0f000esm1561350oij.9.2023.11.07.04.33.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Nov 2023 04:33:13 -0800 (PST)
+Message-ID: <654a2e89.050a0220.76e08.a315@mx.google.com>
+Date: Tue, 07 Nov 2023 04:33:13 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4053606539090330127=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 4.19.297
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, lukas.funke-oss@weidmueller.com
+Subject: RE: [BlueZ] adapter: fix heap corruption during discovery filter parsing
+In-Reply-To: <20231107103507.505581-1-lukas.funke-oss@weidmueller.com>
+References: <20231107103507.505581-1-lukas.funke-oss@weidmueller.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: ZhengHan Wang <wzhmmmmm@gmail.com>
+--===============4053606539090330127==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-[ Upstream commit a85fb91e3d728bdfc80833167e8162cce8bc7004 ]
+This is automated email and please do not reply to this email!
 
-syzbot reports a slab use-after-free in hci_conn_hash_flush [1].
-After releasing an object using hci_conn_del_sysfs in the
-hci_conn_cleanup function, releasing the same object again
-using the hci_dev_put and hci_conn_put functions causes a double free.
-Here's a simplified flow:
+Dear submitter,
 
-hci_conn_del_sysfs:
-  hci_dev_put
-    put_device
-      kobject_put
-        kref_put
-          kobject_release
-            kobject_cleanup
-              kfree_const
-                kfree(name)
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=799389
 
-hci_dev_put:
-  ...
-    kfree(name)
+---Test result---
 
-hci_conn_put:
-  put_device
-    ...
-      kfree(name)
+Test Summary:
+CheckPatch                    PASS      0.47 seconds
+GitLint                       PASS      0.31 seconds
+BuildEll                      PASS      35.00 seconds
+BluezMake                     PASS      1168.98 seconds
+MakeCheck                     PASS      13.18 seconds
+MakeDistcheck                 PASS      216.18 seconds
+CheckValgrind                 PASS      326.28 seconds
+CheckSmatch                   PASS      451.89 seconds
+bluezmakeextell               PASS      146.58 seconds
+IncrementalBuild              PASS      1034.35 seconds
+ScanBuild                     PASS      1419.95 seconds
 
-This patch drop the hci_dev_put and hci_conn_put function
-call in hci_conn_cleanup function, because the object is
-freed in hci_conn_del_sysfs function.
 
-This patch also fixes the refcounting in hci_conn_add_sysfs() and
-hci_conn_del_sysfs() to take into account device_add() failures.
 
-This fixes CVE-2023-28464.
-
-Link: https://syzkaller.appspot.com/bug?id=1bb51491ca5df96a5f724899d1dbb87afda61419 [1]
-
-Signed-off-by: ZhengHan Wang <wzhmmmmm@gmail.com>
-Co-developed-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/hci_conn.c  |  6 ++----
- net/bluetooth/hci_sysfs.c | 23 ++++++++++++-----------
- 2 files changed, 14 insertions(+), 15 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index b876e97b61c92..0e837feaa527e 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -125,13 +125,11 @@ static void hci_conn_cleanup(struct hci_conn *conn)
- 	if (hdev->notify)
- 		hdev->notify(hdev, HCI_NOTIFY_CONN_DEL);
- 
--	hci_conn_del_sysfs(conn);
--
- 	debugfs_remove_recursive(conn->debugfs);
- 
--	hci_dev_put(hdev);
-+	hci_conn_del_sysfs(conn);
- 
--	hci_conn_put(conn);
-+	hci_dev_put(hdev);
- }
- 
- static void le_scan_cleanup(struct work_struct *work)
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index ccd2c377bf83c..266112c960ee8 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -33,7 +33,7 @@ void hci_conn_init_sysfs(struct hci_conn *conn)
- {
- 	struct hci_dev *hdev = conn->hdev;
- 
--	BT_DBG("conn %p", conn);
-+	bt_dev_dbg(hdev, "conn %p", conn);
- 
- 	conn->dev.type = &bt_link;
- 	conn->dev.class = bt_class;
-@@ -46,27 +46,30 @@ void hci_conn_add_sysfs(struct hci_conn *conn)
- {
- 	struct hci_dev *hdev = conn->hdev;
- 
--	BT_DBG("conn %p", conn);
-+	bt_dev_dbg(hdev, "conn %p", conn);
- 
- 	if (device_is_registered(&conn->dev))
- 		return;
- 
- 	dev_set_name(&conn->dev, "%s:%d", hdev->name, conn->handle);
- 
--	if (device_add(&conn->dev) < 0) {
-+	if (device_add(&conn->dev) < 0)
- 		bt_dev_err(hdev, "failed to register connection device");
--		return;
--	}
--
--	hci_dev_hold(hdev);
- }
- 
- void hci_conn_del_sysfs(struct hci_conn *conn)
- {
- 	struct hci_dev *hdev = conn->hdev;
- 
--	if (!device_is_registered(&conn->dev))
-+	bt_dev_dbg(hdev, "conn %p", conn);
-+
-+	if (!device_is_registered(&conn->dev)) {
-+		/* If device_add() has *not* succeeded, use *only* put_device()
-+		 * to drop the reference count.
-+		 */
-+		put_device(&conn->dev);
- 		return;
-+	}
- 
- 	while (1) {
- 		struct device *dev;
-@@ -78,9 +81,7 @@ void hci_conn_del_sysfs(struct hci_conn *conn)
- 		put_device(dev);
- 	}
- 
--	device_del(&conn->dev);
--
--	hci_dev_put(hdev);
-+	device_unregister(&conn->dev);
- }
- 
- static void bt_host_release(struct device *dev)
--- 
-2.42.0
 
+--===============4053606539090330127==--
