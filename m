@@ -1,235 +1,243 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40A7B31A64
-	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Nov 2023 15:05:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B4A6DF72
+	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Nov 2023 15:10:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f7WBjnZ4"
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 422548843
-	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Nov 2023 07:04:32 -0800 (PST)
-Received: by mail-lj1-x231.google.com with SMTP id 38308e7fff4ca-2c5210a1515so79150771fa.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Nov 2023 07:04:32 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DhK2ybqB"
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 680F926B2
+	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Nov 2023 07:10:40 -0800 (PST)
+Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2c6cb4a79deso62305061fa.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Nov 2023 07:10:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699369470; x=1699974270; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1699369838; x=1699974638; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lYDnQdJGT/xF5HkXjdZy2PqDPtWcAWfBfGXDxo74eY0=;
-        b=f7WBjnZ45Eo4yVWFreSL69hQq6Fb/qiIkE9+dVCLmLRx4Rufsa9r3sO1h7JT1GEZy+
-         Enax0LFUBIwwf5SdPqL0zb+nVJfRPLolc4wGAHMsbdMYXU/GmOQpHhXUiQGonoOPv5Ct
-         wXvILtxlIyQSoObpWp/2reQeyM6LlYDA52yRiWJvaaCVkocMJArU1wV2GC1Ux9LDJfV3
-         ctHCAA6VUrNtTOfIhN+c4J1zHZt3aS1kNVc7m6dHonnDWBckfhGuIGA032IY/iROBlb/
-         RfRvgAqehtrybuZoGuR9nakj+H9APQPAX7v1lHCL7PL3S6nWXk2mc2RzBL+Sa61GRkAs
-         Il9A==
+        bh=UwCFDC+CuFqArMfm+eD49Q8l6abqD3QVMce5Gdl/OHs=;
+        b=DhK2ybqBYEBCVCBK6y4Qz5nmiCqwExbTR5+Hvm2RxE/hSzLsV3bGEDNWBZpAHCm72j
+         cn+f9n5yS0tNslluPkcfOm/2Ccv9gAwSZPfl1F+bTXm8VwQ7ZkYXvbtq38YGdTeG2Emk
+         b9TtFfZn0bP3PNTra5RMGjOCdwIN5RcF1SYOXw+SgaCGdI4YCxO1cQlbMD8+o+Y3/NMY
+         H+CZRg7hqvJ16xNiXkadwLOmw7AxVWouRjCIuzoUoCJnwZe1zwblazNYemhPsJHAqK8X
+         llYYZx6Uu9pOJHNbbXWciDoUI5p7RbTTCs32nUc32aBjGxdpez1Yu541BfIehs0K06a4
+         Y58g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699369470; x=1699974270;
+        d=1e100.net; s=20230601; t=1699369838; x=1699974638;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=lYDnQdJGT/xF5HkXjdZy2PqDPtWcAWfBfGXDxo74eY0=;
-        b=mC3UEA2GOVTEecCKnu3UZuv7oP/srkfy+2kApA5rCWKfVdrwzCih+oA4Et5wAHYr2T
-         6z9Z3AiWVFLRB/Sqaw72ve761z6WRtTf2LcANBNht8tXUqtVxa9DcAzbmBie94RzlMDV
-         ORcuM1fD4K4cJ0JocQmQwSV6OoBUleNTWF/5skbPop6O6jVDbQiAS9zUZtSU32uChbFQ
-         g9BAm6iHqvakBNxjQaiOaZ19C2+mfMqSXvkElZUkXjSfAZ1dY6Mm0czSfhPeQMti1Xea
-         y+F3oAFkDWhHidmVfoLRhLVG0c9Iz639eESnjHHLCuPdsX/gC2bUsxJ/Mf1ZoX0NOlYk
-         ROuA==
-X-Gm-Message-State: AOJu0YyeB7VWXL04qKHbJU9rygpWjIePIew8KguL0BbNV4Y4JhkHSjeO
-	xvHDKpYFaXbuycR4rLJoi7ppMJG8m9GGhbu9Jm5a0hDwAKg=
-X-Google-Smtp-Source: AGHT+IG2vLA1gOyQdK08vcV2ccq0wtEmQ+aHrgCQ91U4m5diBV2eicTCvFDXVn5ypz03j2nqdgHSlykn8tALfZZlYCc=
-X-Received: by 2002:a05:651c:10a5:b0:2c6:f6b6:f8db with SMTP id
- k5-20020a05651c10a500b002c6f6b6f8dbmr10822722ljn.16.1699369470052; Tue, 07
- Nov 2023 07:04:30 -0800 (PST)
+        bh=UwCFDC+CuFqArMfm+eD49Q8l6abqD3QVMce5Gdl/OHs=;
+        b=BIZgcqrzdrsTmXw7pAqPDkLeOrsB2yTgeVabXwDU88ixPxljlH04QpOOcQ6ZX1xX0N
+         jlLN+sVYs8T1l5BquIeBDWYhxOnSS7umxDwfZW6oKiNpCQu4+yvNgVzqfxgZ83Az1/OR
+         /lZXtvuzy0oU/opmZhDfEYYTS6Zr+5klR4EguODwMfJwiyFfjNpxOSxSvNEGdoQNVH/I
+         6+qGsh9E5uBLuU6Fs3FaJysix6l6Qb/fffrM00FSZ4XZYsZxOKL6XRJUuCqGM4FL81DO
+         GOvDJB6v0LVxTmQayixyKL0smv0E4TGnillp0W2Ad38ndGJIbtywCzU7x+iuTeDvKN3A
+         ul1w==
+X-Gm-Message-State: AOJu0YyHwVQJ9wj3jKFfVVTomyXwO1ZFzuyeinIyV40tFSGvB/e/1Jhw
+	UMs62NxuE3SP1o9+Ab6qwDTFzzuu0RntCuEKA50FJ0XlVCk=
+X-Google-Smtp-Source: AGHT+IEPWt+LBMsvVmTugtqb3w7k75NwCD2nuvc0x7uRnxIIF0zxVtuDft4awUB8/M16gTpgrcuPe3x4j/7+/2Zszkc=
+X-Received: by 2002:a2e:3a04:0:b0:2bf:f861:f523 with SMTP id
+ h4-20020a2e3a04000000b002bff861f523mr1050312lja.4.1699369838325; Tue, 07 Nov
+ 2023 07:10:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <c0df9d614f2a220bc93227eafcc68f73f1751528.camel@hadess.net>
- <CA+5PdQagTBRK09kMX=npZO9OawqtOp-CHGcYeVmQ5BpC+Uyi5A@mail.gmail.com> <31050102f726a4e89a9ef3d1719d6305de2ee61b.camel@hadess.net>
-In-Reply-To: <31050102f726a4e89a9ef3d1719d6305de2ee61b.camel@hadess.net>
+References: <20230904221158.35425-1-olivier.lheureux@mind.be>
+ <CABBYNZKRwLmio749-YqGsVaRiyfgfG4xFZWWY8Svt5rK1z4B6A@mail.gmail.com>
+ <7f4eab50-2532-4975-8bee-3f38bfaee3e1@mind.be> <CABBYNZ+LopfJdjzBocxKTzbA1Qq8A8Y-t182cvqLe5cH0mM2Wg@mail.gmail.com>
+ <8325a09c-c944-4a6a-a815-0407edb9baa0@mind.be>
+In-Reply-To: <8325a09c-c944-4a6a-a815-0407edb9baa0@mind.be>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 7 Nov 2023 10:04:17 -0500
-Message-ID: <CABBYNZLCsBZ5eD+zRMC_YjSYU6C8FS5vw=DVHd947D+eiKY5Tg@mail.gmail.com>
-Subject: Re: Using Laird Connectivity Bluetooth LE PTS dongle with Linux
-To: Bastien Nocera <hadess@hadess.net>
-Cc: Christoph Schweers <christoph.schweers@gmail.com>, linux-bluetooth@vger.kernel.org
+Date: Tue, 7 Nov 2023 10:10:25 -0500
+Message-ID: <CABBYNZK=x-rDp0=JO5KxQzO6nAuFSp6EfTW2VHssRGLSJVOoew@mail.gmail.com>
+Subject: Re: [PATCH RFC 0/7] Fix a memory leak in Bluetooth L2CAP
+To: Marleen Vos <marleen.vos@essensium.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	linux-bluetooth@vger.kernel.org, "Olivier L'Heureux" <olivier.lheureux@mind.be>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Bastien,
+Hi Marleen,
 
-On Tue, Nov 7, 2023 at 9:47=E2=80=AFAM Bastien Nocera <hadess@hadess.net> w=
-rote:
+On Tue, Nov 7, 2023 at 3:46=E2=80=AFAM Marleen Vos <marleen.vos@essensium.c=
+om> wrote:
 >
-> On Mon, 2023-11-06 at 18:06 +0100, Christoph Schweers wrote:
-> >
-> > Bastien Nocera <hadess@hadess.net> schrieb am Mo., 6. Nov. 2023,
-> > 15:35:
-> > > Hey,
-> > >
-> > > I bought the Laird Connectivity Bluetooth LE-only PTS dongle listed
-> > > on:
-> > > https://support.bluetooth.com/hc/en-us/articles/360049018492-What-is-=
-the-difference-between-the-Profile-Tuning-Suite-PTS-Dongles
-> > > -
-> > > as I was hoping to have an easy to use Bluetooth LE only device for
-> > > testing.
-> > >
-> > > But the device only shows up as a serial device under kernel 6.5
-> > > from
-> > > my distribution.
-> > >
-> > > Is there anything specific that needs to be done for that device to
-> > > be
-> > > usable as a Bluetooth adapter under Linux? Or does it only work
-> > > with
-> > > the PTS?
-> > >
-> > > I spotted the ability to run specific software on the micro-
-> > > controller
-> > > itself when powered on, but nothing specific to using it as an
-> > > adapter:
-> > > http://assets.lairdtech.com/home/brandworld/files/BL654%20USB%20Dongl=
-e%20User%20Guide%20v1_0.pdf
-> > >
-> > > Full lsusb output for that device:
-> > > Bus 001 Device 018: ID 1915:521f Nordic Semiconductor ASA Nordic
-> > > Open
-> > > DFU Bootloader
-> > > Device Descriptor:
-> > >   bLength                18
-> > >   bDescriptorType         1
-> > >   bcdUSB               2.00
-> > >   bDeviceClass            0
-> > >   bDeviceSubClass         0
-> > >   bDeviceProtocol         0
-> > >   bMaxPacketSize0        64
-> > >   idVendor           0x1915 Nordic Semiconductor ASA
-> > >   idProduct          0x521f
-> > >   bcdDevice            1.00
-> > >   iManufacturer           1 Laird Connectivity
-> > >   iProduct                2 Nordic Open DFU Bootloader
-> > >   iSerial                 3 E1BB9211FA41
-> > >   bNumConfigurations      1
-> > >   Configuration Descriptor:
-> > >     bLength                 9
-> > >     bDescriptorType         2
-> > >     wTotalLength       0x004b
-> > >     bNumInterfaces          2
-> > >     bConfigurationValue     1
-> > >     iConfiguration          4 Default configuration
-> > >     bmAttributes         0xc0
-> > >       Self Powered
-> > >     MaxPower              100mA
-> > >     Interface Association:
-> > >       bLength                 8
-> > >       bDescriptorType        11
-> > >       bFirstInterface         0
-> > >       bInterfaceCount         2
-> > >       bFunctionClass          2 Communications
-> > >       bFunctionSubClass       2 Abstract (modem)
-> > >       bFunctionProtocol       0
-> > >       iFunction               0
-> > >     Interface Descriptor:
-> > >       bLength                 9
-> > >       bDescriptorType         4
-> > >       bInterfaceNumber        0
-> > >       bAlternateSetting       0
-> > >       bNumEndpoints           1
-> > >       bInterfaceClass         2 Communications
-> > >       bInterfaceSubClass      2 Abstract (modem)
-> > >       bInterfaceProtocol      0
-> > >       iInterface              0
-> > >       CDC Header:
-> > >         bcdCDC               1.10
-> > >       CDC Call Management:
-> > >         bmCapabilities       0x03
-> > >           call management
-> > >           use DataInterface
-> > >         bDataInterface          1
-> > >       CDC ACM:
-> > >         bmCapabilities       0x02
-> > >           line coding and serial state
-> > >       CDC Union:
-> > >         bMasterInterface        0
-> > >         bSlaveInterface         1
-> > >       Endpoint Descriptor:
-> > >         bLength                 7
-> > >         bDescriptorType         5
-> > >         bEndpointAddress     0x82  EP 2 IN
-> > >         bmAttributes            3
-> > >           Transfer Type            Interrupt
-> > >           Synch Type               None
-> > >           Usage Type               Data
-> > >         wMaxPacketSize     0x0040  1x 64 bytes
-> > >         bInterval              16
-> > >     Interface Descriptor:
-> > >       bLength                 9
-> > >       bDescriptorType         4
-> > >       bInterfaceNumber        1
-> > >       bAlternateSetting       0
-> > >       bNumEndpoints           2
-> > >       bInterfaceClass        10 CDC Data
-> > >       bInterfaceSubClass      0
-> > >       bInterfaceProtocol      0
-> > >       iInterface              0
-> > >       Endpoint Descriptor:
-> > >         bLength                 7
-> > >         bDescriptorType         5
-> > >         bEndpointAddress     0x81  EP 1 IN
-> > >         bmAttributes            2
-> > >           Transfer Type            Bulk
-> > >           Synch Type               None
-> > >           Usage Type               Data
-> > >         wMaxPacketSize     0x0040  1x 64 bytes
-> > >         bInterval               0
-> > >       Endpoint Descriptor:
-> > >         bLength                 7
-> > >         bDescriptorType         5
-> > >         bEndpointAddress     0x01  EP 1 OUT
-> > >         bmAttributes            2
-> > >           Transfer Type            Bulk
-> > >           Synch Type               None
-> > >           Usage Type               Data
-> > >         wMaxPacketSize     0x0040  1x 64 bytes
-> > >         bInterval               0
-> > > Device Status:     0x0001
-> > >   Self Powered
-> > >
-> > > Cheers
-> >
-> > This dongle must be pre-programmed with a special firmware to work as
-> > a PTS dongle.
-> > https://support.bluetooth.com/hc/en-us/articles/360049019732-How-to-upg=
-rade-the-firmware-of-your-PTS-Dongle
-> > -
-> >
+> Hi Luiz,
 >
-> I updated the firmware using the PTS firmware upgrader, and it still
-> doesn't show up as a Bluetooth adapter under Linux:
+> Because Olivier has been and still is being swamped with other work, I'm
+> kind of trying to take over these patches. So far I can reproduce the
+> memleak on a recent kernel without the patches.
 >
-> Nov 07 15:44:11 classic kernel: usb 1-8: new full-speed USB device number=
- 22 using xhci_hcd
-> Nov 07 15:44:11 classic kernel: usb 1-8: New USB device found, idVendor=
-=3D1915, idProduct=3D521f, bcdDevice=3D 1.00
-> Nov 07 15:44:11 classic kernel: usb 1-8: New USB device strings: Mfr=3D1,=
- Product=3D2, SerialNumber=3D3
-> Nov 07 15:44:11 classic kernel: usb 1-8: Product: nRF52 USB Product
-> Nov 07 15:44:11 classic kernel: usb 1-8: Manufacturer: Nordic Semiconduct=
-or
-> Nov 07 15:44:11 classic kernel: usb 1-8: SerialNumber: E1BB9211FA41
-> Nov 07 15:44:11 classic kernel: cdc_acm 1-8:1.0: ttyACM0: USB ACM device
+> Olivier told me you added tests to check for the memleak in
+> l2cap-tester. Can you point me towards more info on how exactly you run
+> these tests, as the info I find on the web is rather minimal.
 >
-> It shows up as:
-> Bus 001 Device 023: ID 1915:521f Nordic Semiconductor ASA nRF52 USB Produ=
-ct
-> in lsusb.
+>  From what I read in the thread, it looks like your tests don't catch
+> the memleak?
 
-Perhaps it needs to be added to be btusb if it does support a standard
-HCI interface. (I'm currently on vacation with limited time to assist
-everyone.)
+I'm currently on vacation, I should be back next week, try checking
+l2cap-tester to emulate the leak as you said it was still
+reproducible.
+
+> Kind regards,
+>
+> Marleen
+>
+>
+> On 14/09/2023 23:17, Luiz Augusto von Dentz wrote:
+> > Hi Olivier,
+> >
+> > On Wed, Sep 13, 2023 at 3:25=E2=80=AFPM Olivier L'Heureux
+> > <olivier.lheureux@mind.be>  wrote:
+> >> Hello Luiz,
+> >>
+> >> Thanks for your review.
+> >>
+> >> On 05/09/2023 22:42, Luiz Augusto von Dentz wrote:
+> >>> Hi Olivier,
+> >>>
+> >>> On Mon, Sep 4, 2023 at 3:12=E2=80=AFPM Olivier L'Heureux
+> >>> <olivier.lheureux@mind.be>  wrote:
+> >>>> Request for Comments
+> >> [...]
+> >>>> The "ble-memleak-repro" program reproduces the memory leak, if the
+> >>>> kernel is not patched. Its source is in
+> >>>> "package/ble-memleak-repro/ble-memleak-repro.c" [18].
+> >>> We should probably create a test in l2cap-tester using SO_SNDTIMEO
+> >>> first, so we can make sure CI test such case and we are able to detec=
+t
+> >>> if the problem is reintroduced later:
+> >>>
+> >>> https://github.com/bluez/bluez/blob/master/tools/l2cap-tester.c
+> >> I didn't know about "l2cap-tester.c". Agree, it would be great to
+> >> integrate my test app into it. I could try, but I don't know the test
+> >> framework yet.
+> >>
+> >>>> Memory Leak Fix
+> >>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >>>>
+> >>>> We have fixed the memory leak, see the patch series in
+> >>>> "patches/linux/":
+> >>>>
+> >>>>    1. The first patch
+> >>>>       "0001-ARM-dts-stm32-Add-Bluetooth-usart2-feature-on-stm32m.pat=
+ch" [11]
+> >>>>       enables Bluetooth on the DK2.
+> >>> This above should probably be sent separately.
+> >>>
+> >>>>    2. The second patch
+> >>>>       "0002-Bluetooth-add-many-traces-for-allocation-free-refcou.pat=
+ch" [12]
+> >>>>       adds many dynamic debug traces that help understand the kernel
+> >>>>       behaviour and freeing problems.
+> >>> I'm fine with this change, but we better use the likes of bt_dev_dbg
+> >>> instead of BT_DBG.
+> >> This commit intended to increase the visibility during debugging, and
+> >> I was not intending it for a permanent presence in the kernel.
+> >> But if you find it useful, I can submit a patch RFC v2 with
+> >> "bt_dev_dbg()" instead of "BT_DBG()". Note that there is currently no
+> >> "bt_dev_dbg()" in "l2cap_core.c" yet.
+> >>
+> >>>>       "0003-Bluetooth-L2CAP-use-refcount-on-struct-l2cap_chan-co.pat=
+ch" [13]
+> >>>>       and
+> >>>>       "0004-Bluetooth-L2CAP-free-the-leaking-struct-l2cap_conn.patch=
+" [14]
+> >>>>       fix the memory leak.
+> >>>>    4. Patches
+> >>>>       "0005-Bluetooth-introduce-hci_conn_free-for-better-structu.pat=
+ch" [15],
+> >>>>       "0006-Bluetooth-L2CAP-inc-refcount-if-reuse-struct-l2cap_c.pat=
+ch" [16]
+> >>>>       and
+> >>>>       "0007-Bluetooth-unlink-objects-to-avoid-use-after-free.patch" =
+[17]
+> >>>>       fixes the use-after-free that appears when the "struct l2cap_c=
+onn"
+> >>>>       [5] and "struct hci_conn" [6] objects are freed.
+> >>> These I'm not very comfortable applying as they are, I'm afraid there
+> >>> could be regressions if they are not accompanied with proper tests,
+> >>> besides I think there are less intrusive ways to cleanup l2cap_conn,
+> >>> see below.
+> >>>
+> >>>> The commit messages explain why the commit is needed, which problem
+> >>>> the commit solves, and how.
+> >>>>
+> >>>> The first and second patches are present for the memory leak
+> >>>> reproduction only, they should not be part of a final fix.
+> >>>>
+> >>>> Patch Status
+> >>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >>>>
+> >>>> As of writing, the memory leak is fixed. The fix opened the door to
+> >>>> other problems, especially use-after-free, sometimes followed by
+> >>>> crashes due to NULL dereferences. We think there are weak references
+> >>>> (i.e. pointers that don't increment the refcounter) previously
+> >>>> pointing to memory that was never freed, but now is freed. On kernel=
+s
+> >>>> v5.13 and v5.15, patches 0005, 0006 and 0007 seem to fix the
+> >>>> use-after-free and NULL dereferences, but not on kernel v6.5 yet.
+> >>> I think the problem is that the lifetime of l2cap_conn shall be hooke=
+d
+> >>> with hci_chan, but the likes of hci_chan_list_flush -> hci_chan_del
+> >>> don't actually trigger l2cap_conn_del, which imo is the culprit here,
+> >>> because connect_cfm/disconnect_cfm is not called when the connection
+> >>> procedure has been aborted prematurely, so perhaps we shall get rid o=
+f
+> >>> the likes of l2cap_connect_cfm/l2cap_disconn_cfm and instead do the
+> >>> cleanup with in the following order:
+> >>> hci_conn_cleanup->hci_chan_list_flush->hci_chan_del->l2cap_conn_del,
+> >>> that way we avoid having multiple code paths attempting to cleanup
+> >>> objects associated with hci_conn/hci_chan.
+> >> I fully agree with your analysis, which correspond to mine: we should
+> >> call "l2cap_conn_del()", it would properly clean the allocations in
+> >> "l2cap_conn_add()".
+> >> I have tried but it was not obvious to find the right place to call
+> >> "l2cap_conn_del()" with the proper locking.
+> >> As you write, connect_cfm/disconnect_cfm is not called when the
+> >> connection is aborted, and that is the root cause of the memory leak.
+> > Btw, I was trying to reproduce it with the following test set, but at
+> > least kmemleak was not able to detect leaks of l2cap_conn:
+> >
+> > https://patchwork.kernel.org/project/bluetooth/list/?series=3D784343
+> >
+> >> Your proposal is most probably the best way to go.
+> >>
+> >>> I'd change hci_chan_create to take a del callback to avoid having
+> >>> circular dependencies on one another though.
+> >> Interesting, could you explain how you would do it? Perhaps point on
+> >> a callback example?
+> >>
+> >>>> Reproducing with Buildroot
+> >>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D
+> >>>>
+> >>>> We have reproduced and fixed the memory leak with Buildroot [7] and =
+a
+> >>>> "ble-memleak-repro" test application on an ST's Discovery Kit DK2 [4=
+].
+> >>>>
+> >>>> The "ble-memleak-repro" repository [1] contains the sources of a
+> >>>> complete external Buildroot customisation [8], with the patches, a
+> >>>> README, and more explanations to reproduce the problem with Buildroo=
+t
+> >>>> on a DK2.
+> >>>>
+> >>>> References:
+> >>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >>>>
+> >>>> - [1]:<https://gitlab.com/essensium-mind/ble-memleak-repro.git>
+> >>>>          "ble-memleak-repro repository"
+> >> [...]
+> >>
+> >> --
+> >> Olivier L'Heureux
+
+
 
 --=20
 Luiz Augusto von Dentz
