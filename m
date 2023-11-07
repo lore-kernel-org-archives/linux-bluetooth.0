@@ -1,220 +1,156 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8109D28F7
-	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Nov 2023 08:46:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0203828E33
+	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Nov 2023 10:35:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=essensium.com header.i=@essensium.com header.b="cGWxc2/W"
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C357BD
-	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Nov 2023 00:46:27 -0800 (PST)
-Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-542d654d03cso8903978a12.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Nov 2023 00:46:27 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=weidmueller.onmicrosoft.com header.i=@weidmueller.onmicrosoft.com header.b="EkIq3v5M"
+Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on2065.outbound.protection.outlook.com [40.107.6.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 522F5B0
+	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Nov 2023 02:35:17 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gJpuXed0jzT4ENIqH1iO24EbJkF1jnqYwz/idfSfR5p/zvNIW7W485+MPMr6XxQl20XbpVHD6Ig5Way7o2KiE9mNxCRY+0C2O/dbFCPnoA+wgY/M9js5ffOIr4aFBpKiV5uRha2PANWzFInPA+f87NMIk5QHL3C5NtzZVU2kIwVYDDkt3geXh3tw7mqWyly6YBkrFyRzEQGDodc3dARzSM2b8xci3AHKDryJvxjgPy+aFaDfdVQSlMBgPLYjmcxb95uWnvFbhHiugfhxClRFmyLXsAinkkXKcvQl31CDOnILHsAiqLXjpyfbr4923fS/zrhsGzDyEHzcwMsg4wIT6g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wpzFSPsa96Yi8oSaoMGYcAkUZl3lEwL4ZRsquhqYAyI=;
+ b=koFW+CFLKHd8qThqxA/te7YcDY1QSUFCEp5nxcz7ASe4Hnyo2J65+RGfOkzjVmcZ3BMwNYeiocGXmMwERmla2A6aIdEi1crdvnOhoveIciLqmtntT5dR2B51jx1gcULx7frNRuQ6M3w2nqkx/7RGZ/nBoZveSrrruBPWO6H0mng1eP684DT9fJhjPCUQf4aahvXolMouXZe/O3G4I3uG/qj6j+L0uPw2kKdBK8XpSsDtOL4LQnWBCqgwiNUPqcBAjJ3vzoXzoLeq3K5QBvzqo3TtwlSLYJJUW6852kXHSMYra+GKWllf4RHHnEmEIwhGhrV8a3KGJTHMRl3XQs7pjw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=weidmueller.com; dmarc=pass action=none
+ header.from=weidmueller.com; dkim=pass header.d=weidmueller.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=essensium.com; s=google; t=1699346786; x=1699951586; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=mxKyP2S9f1DOUxfY65N9kPb3WEuj9sAJfhvqSEmvD7c=;
-        b=cGWxc2/WslTzLBCzV46zqYnIpGn/I6YA9W+Ib0AkQWqrPll7rbxpj6Al9Sc8CJ6KSB
-         vhs92glKZQbJEemLEYn1wshF8gv3E4hoBAXT5X8IaUh5L04zS1aiN8JYiPE6Suz00zFz
-         aplIwcU/3KgtwP2o+4GEH5fRvcXuZLjghh75ChmFOM1KX75amDRKaxf5Ki4fcBs8IQon
-         52G/hCpmsYo+AKnePlZbaMktCi+Z3Njjm5kKUio1DbnoFK4yUnWS2qzYZt1VYpD/4mtZ
-         yarK8eDix5iAlb97TVQbOtk3it/1S+Tgk7R5g/VY75CuNasflGpFyLWpnxB6QILOVrqr
-         Bk1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699346786; x=1699951586;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mxKyP2S9f1DOUxfY65N9kPb3WEuj9sAJfhvqSEmvD7c=;
-        b=nEx/ugw5AwTMWJvherZKe4406Eg2Uxl+FH0u7o28duUCqDjNWDw9KIE3bL/JJxRmyR
-         ojHpQezNw4Zu6taASh+w2oC4TAsIGXXGiBwqFre/9uMYCAxWBa82TXAejwKrbY2Wmq+9
-         9CivO+hCBhgRgfRviD5HAn4pIQk9/5JEE5S3Dnezgsd0QNFuZZ8o2nqWhUi2t7L3nuSZ
-         9HUE7d/aJd7e1N1mJammcoJ04gy3ZFAI/DuHRq7TER4+XRnoAD363ADYjzzJ+quRcZOq
-         pL+tLpTEdwmqWWKtTFXn3opsHrKhHG2u1A1R1rBQnCJzVibxvdU8u/O3OFqgQPg7ijVS
-         pXTw==
-X-Gm-Message-State: AOJu0YyK6vaPpktrPjRLsGfig0FSkOePrbhqva7vq8jp34Lvzopucooj
-	wvVHFgu4n70NgVli7mu7IDecyJk2b5lNr6vFHPAeGw==
-X-Google-Smtp-Source: AGHT+IHwOsy76D8iLkAvngZoJin1GfioloX61UNmRRNEGrRaohVbVBAbSuM8xJ5kAjuEcR51oFawYA==
-X-Received: by 2002:a17:906:3010:b0:9e2:af47:54c9 with SMTP id 16-20020a170906301000b009e2af4754c9mr326613ejz.19.1699346785911;
-        Tue, 07 Nov 2023 00:46:25 -0800 (PST)
-Received: from [10.1.0.108] (ip-188-118-3-185.reverse.destiny.be. [188.118.3.185])
-        by smtp.gmail.com with ESMTPSA id f14-20020a05640214ce00b0053db0df6970sm5120663edx.54.2023.11.07.00.46.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Nov 2023 00:46:25 -0800 (PST)
-From: Marleen Vos <marleen.vos@essensium.com>
-X-Google-Original-From: Marleen Vos <marleen.vos@mind.be>
-Message-ID: <8325a09c-c944-4a6a-a815-0407edb9baa0@mind.be>
-Date: Tue, 7 Nov 2023 09:46:24 +0100
+ d=weidmueller.onmicrosoft.com; s=selector1-weidmueller-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wpzFSPsa96Yi8oSaoMGYcAkUZl3lEwL4ZRsquhqYAyI=;
+ b=EkIq3v5MwlARlOykHOP+dZpRC0LgWNDfLhfMGo7SDN87d1MbObIDoXNWiLAhlp6mX3KB7jouos0aDRwDymEjNWJDhWRSF9YikqA/0lI69x00h0bO2RV39rtC0/Xu0W63tTcWNuF63r4GlZqxeUR4OzxdIuNtgP3Lg7gnoFBbxzY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=weidmueller.com;
+Received: from AS2PR08MB8431.eurprd08.prod.outlook.com (2603:10a6:20b:55a::18)
+ by AM9PR08MB6033.eurprd08.prod.outlook.com (2603:10a6:20b:286::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.28; Tue, 7 Nov
+ 2023 10:35:14 +0000
+Received: from AS2PR08MB8431.eurprd08.prod.outlook.com
+ ([fe80::b914:d9b5:6462:13b6]) by AS2PR08MB8431.eurprd08.prod.outlook.com
+ ([fe80::b914:d9b5:6462:13b6%4]) with mapi id 15.20.6954.028; Tue, 7 Nov 2023
+ 10:35:14 +0000
+From: lukas.funke-oss@weidmueller.com
+To: linux-bluetooth@vger.kernel.org
+Cc: Lukas Funke <Lukas.Funke@weidmueller.com>,
+	Philipp Meyer <Philipp.Meyer@weidmueller.com>
+Subject: [PATCH BlueZ] adapter: fix heap corruption during discovery filter parsing
+Date: Tue,  7 Nov 2023 11:35:07 +0100
+Message-Id: <20231107103507.505581-1-lukas.funke-oss@weidmueller.com>
+X-Mailer: git-send-email 2.30.2
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: FR3P281CA0106.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a3::16) To AS2PR08MB8431.eurprd08.prod.outlook.com
+ (2603:10a6:20b:55a::18)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 0/7] Fix a memory leak in Bluetooth L2CAP
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
- Olivier L'Heureux <olivier.lheureux@mind.be>
-References: <20230904221158.35425-1-olivier.lheureux@mind.be>
- <CABBYNZKRwLmio749-YqGsVaRiyfgfG4xFZWWY8Svt5rK1z4B6A@mail.gmail.com>
- <7f4eab50-2532-4975-8bee-3f38bfaee3e1@mind.be>
- <CABBYNZ+LopfJdjzBocxKTzbA1Qq8A8Y-t182cvqLe5cH0mM2Wg@mail.gmail.com>
-Content-Language: en-US
-In-Reply-To: <CABBYNZ+LopfJdjzBocxKTzbA1Qq8A8Y-t182cvqLe5cH0mM2Wg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS2PR08MB8431:EE_|AM9PR08MB6033:EE_
+X-MS-Office365-Filtering-Correlation-Id: 97c840e1-a1e7-493a-0076-08dbdf7d3a49
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	1pN62UT2u1nxqeiEMMkqbxJ/ahHft9zIc9nDMq7CiSxzpK6oD+CRB7t6yowCXY3YNm4xFtz11uJ6judynKs/LSShu+qHL1zV4qh3Nz1AFqYJH/BnUCB8CJrNOri+H1gQ8Mj7wlY5c8K2R/BOcE339Pn2D6c+qnC6V54UaOnFAZfZOraaP7BrUdBxt9tSXkIUnqdMKeJB305L1xIP0vrOmRAjtbTycs7YjDC2BMsWHrjSyANumWmMXWxczX57ggTKUdNtCeGBTCInok6VTfwI65ok6l3DHzOtRshHFKAy3HHhO1ByzPcB8IXFak9Om55x7Mnyhb2+3F4bfRbyHZwK7uEK1+kfSvs0uRgnSbM26MfFoJ761O2ouBSvd1U6GpUZFDSwzFgKvFEwp4EAGWbBE+paAJ3dr7dlX6G0WjmGfIRKb9fmFaaY2ADcnmhicJvsQZJZMKcdw1KNZWFVFK8tFl17t4VTsA7ysYiTZwmclGEljf+jVg27Mie3mG5eCZDJ8cKox+qv3SryFtr0N1OeZJMBsZAFmorNOFMInPilz+yjNDblIEDk7ddwWsXYuJcT33UrKMIgi+KD0+exGZuXE6xOAM3GG4A1d3KpSyG7QUCvVqvwLjgq7kqcgSfBqysN
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS2PR08MB8431.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(366004)(376002)(346002)(396003)(39860400002)(230922051799003)(1800799009)(186009)(64100799003)(451199024)(38350700005)(36756003)(8936002)(83380400001)(316002)(4326008)(8676002)(26005)(66476007)(1076003)(54906003)(66946007)(6916009)(66556008)(5660300002)(478600001)(41300700001)(9686003)(107886003)(6512007)(6486002)(6666004)(6506007)(52116002)(2616005)(2906002)(86362001)(38100700002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?39Z8jHNG1PbIZZbs8JLtWnTGcTzwQW4M56P3hOjpeo9To7ebnk0mW2EgAeLR?=
+ =?us-ascii?Q?hxy1EvpiHW9I0qkUFz6mtGzEWMc+hctsDcyFTXST5MruLMKV0BtgghM7K9Fl?=
+ =?us-ascii?Q?43mlINN+kcllK9yJqOX2SVb58pA89ImV54zj6R5cIPWDZWrivpdGJa7iTVz/?=
+ =?us-ascii?Q?jSPa3vfKpug/1XaYL57MQ8eGg+ntBK/C1pgdmGOJqlD6H5nqvtYJDJuGHY4n?=
+ =?us-ascii?Q?C8c0yykaNeRKXp2AkWzymu6weesPmpcZlU77XDvE1eNLRx7hN4Qh488WOfr2?=
+ =?us-ascii?Q?e9XHTIUlAfXL47HJzNXfL2N/kTjLEVR9OMeM2ft+AY6ke+7O9yugMsv9Eo7k?=
+ =?us-ascii?Q?SKhgdogMA8IJ9WRj/YqWHWQPD6JPFakwKBDf9PkC0t5an/csbT/9LuDP1sb0?=
+ =?us-ascii?Q?jDgMs2E03qB14PZnOaQnork3WqotUZrv5XHhxQRzdBV4wIo42TyL5xUOKzFE?=
+ =?us-ascii?Q?U+7lxGwZH8NEBsyUUZ7NljJge9tUN3LrGVF5PP3GdJo0kdTb2jinQo0jnSUm?=
+ =?us-ascii?Q?0On4asGrr9N3Q+slYOdhwO7Qs8/BuHR7t7t61n3xHVudYpTdhx/RyYUs2F/c?=
+ =?us-ascii?Q?CcKXSkP7Ix9VIVCLjMnDf0eYWFFkShE6eaO5Z+YWvCZ4IbC+ux3I5+ZD6qvv?=
+ =?us-ascii?Q?xutfL6gvxZd3xWOgmOpkEUBPJ2vJ4N3Sxv179i78ddmEh8zD26TiB4ANMb/N?=
+ =?us-ascii?Q?38HKSeiKPrxjEBwDbelXZmo2eDjYCQ0wxJvA5M8FH7XlXowiM9V6TLxTxDE6?=
+ =?us-ascii?Q?3BGs/1acHwWiYyuvyvf7SSDfi/CGgeOR59wpmmhU8qg4GRLaqF9Iy8ZKKNyY?=
+ =?us-ascii?Q?GAhrTNm9j6j8T5gUb/NXzILdOU89MaCLTlezfEYM7Y0G21zrIult6+prmnQm?=
+ =?us-ascii?Q?2KvkNbUu4/4NO8shAbY4eQFji+2yy3N2mSfJCbQ4TDDbd45cOQvDwHSjajQL?=
+ =?us-ascii?Q?BGXyf4lJdVwa/RpaHKHaJdDbkknKRCLRGMA+MKTlVtqlvotQ/52malqw/ZF/?=
+ =?us-ascii?Q?2l5SJ0/58bs7d4v38yQT0m1wcUHZ1gZ18n5hn0QdAlVuRDRnEtK3QsEvgv+d?=
+ =?us-ascii?Q?a9FhrZOMhqE44yqD0URnG1oMeXqjHMeJo8+ojn0ncvDXOJC54YJPAzlYizs7?=
+ =?us-ascii?Q?htZXYWaCEbP3ZA+srNMcgQQB0nKd90bvWHkRSk9rldWLTjB628ciM9fHlz1b?=
+ =?us-ascii?Q?e0P3siWL/qxR42ryiJOSdCpH3Yxcg3jxPTUc6Gt1f+oltWzjBtFLqVPahuq1?=
+ =?us-ascii?Q?ip1qMjMmT9lxKco1rmuZl2voPAvLAEzVlcc3ncjeFdYo/iaXYu3I7Ks6+ykt?=
+ =?us-ascii?Q?RrCNhAOUcyZNiGcb0mXKQ/xEADPCLr5rNdsYprgCNazZxpPy2xybMqBvC5M/?=
+ =?us-ascii?Q?/qm4OhAvRCPKTkTPy0CUUkrVE4pe6kGJK0AdSEJjryAX8tHJozoYUAoszZXo?=
+ =?us-ascii?Q?79VulZGtoRFIVS2NDo13B1R7c3hTSaWU8mXfCX6Ttmh7eevgvLdmkdEYghsV?=
+ =?us-ascii?Q?KOrhLnhe6TEuQfx7pUr50aWG9CTGttk2JvAUtzCQedL1WvHV3DXa9MSgbWmx?=
+ =?us-ascii?Q?8oM3x5BSeOx4uHxL/1fKNTWJDxPwxNZ0ajFK1rOeTgYH+UHkf/k5aPavv456?=
+ =?us-ascii?Q?NQ=3D=3D?=
+X-OriginatorOrg: weidmueller.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 97c840e1-a1e7-493a-0076-08dbdf7d3a49
+X-MS-Exchange-CrossTenant-AuthSource: AS2PR08MB8431.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Nov 2023 10:35:14.5849
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: e4289438-1c5f-4c95-a51a-ee553b8b18ec
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: lgzq/ZajLpHE3O/jL3xIOQd2wddYZPRYjTwCSZNzx2lK4SIu23T0eYpUmKlY/ImQzbfaHifj6dYM4c+phl+EVg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR08MB6033
 
-Hi Luiz,
+From: Philipp Meyer <Philipp.Meyer@weidmueller.com>
 
-Because Olivier has been and still is being swamped with other work, I'm 
-kind of trying to take over these patches. So far I can reproduce the 
-memleak on a recent kernel without the patches.
+Must parse as dbus_bool_t, as booleans MUST be 4 bytes for dbus.
+stdbool from the filter only has 1 byte in many cases. This will crash
+dbus if parsing filter->duplicate directly in
+dbus_message_iter_get_basic.
+---
+ src/adapter.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-Olivier told me you added tests to check for the memleak in 
-l2cap-tester. Can you point me towards more info on how exactly you run 
-these tests, as the info I find on the web is rather minimal.
+diff --git a/src/adapter.c b/src/adapter.c
+index 6c539a81e..3655076c4 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2646,10 +2646,14 @@ static bool parse_transport(DBusMessageIter *value,
+ static bool parse_duplicate_data(DBusMessageIter *value,
+ 					struct discovery_filter *filter)
+ {
++	dbus_bool_t duplicate = false;
++
+ 	if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_BOOLEAN)
+ 		return false;
+ 
+-	dbus_message_iter_get_basic(value, &filter->duplicate);
++	DBG("Reading 'duplicate' flag from discovery filter...\n");
++	dbus_message_iter_get_basic(value, &duplicate);
++	filter->duplicate = duplicate;
+ 
+ 	return true;
+ }
+@@ -2657,10 +2661,14 @@ static bool parse_duplicate_data(DBusMessageIter *value,
+ static bool parse_discoverable(DBusMessageIter *value,
+ 					struct discovery_filter *filter)
+ {
++	dbus_bool_t discoverable = false;
++
+ 	if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_BOOLEAN)
+ 		return false;
+ 
+-	dbus_message_iter_get_basic(value, &filter->discoverable);
++	DBG("Reading 'discoverable' flag from discovery filter...\n");
++	dbus_message_iter_get_basic(value, &discoverable);
++	filter->discoverable = discoverable;
+ 
+ 	return true;
+ }
+-- 
+2.30.2
 
- From what I read in the thread, it looks like your tests don't catch 
-the memleak?
-
-Kind regards,
-
-Marleen
-
-
-On 14/09/2023 23:17, Luiz Augusto von Dentz wrote:
-> Hi Olivier,
->
-> On Wed, Sep 13, 2023 at 3:25 PM Olivier L'Heureux
-> <olivier.lheureux@mind.be>  wrote:
->> Hello Luiz,
->>
->> Thanks for your review.
->>
->> On 05/09/2023 22:42, Luiz Augusto von Dentz wrote:
->>> Hi Olivier,
->>>
->>> On Mon, Sep 4, 2023 at 3:12 PM Olivier L'Heureux
->>> <olivier.lheureux@mind.be>  wrote:
->>>> Request for Comments
->> [...]
->>>> The "ble-memleak-repro" program reproduces the memory leak, if the
->>>> kernel is not patched. Its source is in
->>>> "package/ble-memleak-repro/ble-memleak-repro.c" [18].
->>> We should probably create a test in l2cap-tester using SO_SNDTIMEO
->>> first, so we can make sure CI test such case and we are able to detect
->>> if the problem is reintroduced later:
->>>
->>> https://github.com/bluez/bluez/blob/master/tools/l2cap-tester.c
->> I didn't know about "l2cap-tester.c". Agree, it would be great to
->> integrate my test app into it. I could try, but I don't know the test
->> framework yet.
->>
->>>> Memory Leak Fix
->>>> ===============
->>>>
->>>> We have fixed the memory leak, see the patch series in
->>>> "patches/linux/":
->>>>
->>>>    1. The first patch
->>>>       "0001-ARM-dts-stm32-Add-Bluetooth-usart2-feature-on-stm32m.patch" [11]
->>>>       enables Bluetooth on the DK2.
->>> This above should probably be sent separately.
->>>
->>>>    2. The second patch
->>>>       "0002-Bluetooth-add-many-traces-for-allocation-free-refcou.patch" [12]
->>>>       adds many dynamic debug traces that help understand the kernel
->>>>       behaviour and freeing problems.
->>> I'm fine with this change, but we better use the likes of bt_dev_dbg
->>> instead of BT_DBG.
->> This commit intended to increase the visibility during debugging, and
->> I was not intending it for a permanent presence in the kernel.
->> But if you find it useful, I can submit a patch RFC v2 with
->> "bt_dev_dbg()" instead of "BT_DBG()". Note that there is currently no
->> "bt_dev_dbg()" in "l2cap_core.c" yet.
->>
->>>>       "0003-Bluetooth-L2CAP-use-refcount-on-struct-l2cap_chan-co.patch" [13]
->>>>       and
->>>>       "0004-Bluetooth-L2CAP-free-the-leaking-struct-l2cap_conn.patch" [14]
->>>>       fix the memory leak.
->>>>    4. Patches
->>>>       "0005-Bluetooth-introduce-hci_conn_free-for-better-structu.patch" [15],
->>>>       "0006-Bluetooth-L2CAP-inc-refcount-if-reuse-struct-l2cap_c.patch" [16]
->>>>       and
->>>>       "0007-Bluetooth-unlink-objects-to-avoid-use-after-free.patch" [17]
->>>>       fixes the use-after-free that appears when the "struct l2cap_conn"
->>>>       [5] and "struct hci_conn" [6] objects are freed.
->>> These I'm not very comfortable applying as they are, I'm afraid there
->>> could be regressions if they are not accompanied with proper tests,
->>> besides I think there are less intrusive ways to cleanup l2cap_conn,
->>> see below.
->>>
->>>> The commit messages explain why the commit is needed, which problem
->>>> the commit solves, and how.
->>>>
->>>> The first and second patches are present for the memory leak
->>>> reproduction only, they should not be part of a final fix.
->>>>
->>>> Patch Status
->>>> ============
->>>>
->>>> As of writing, the memory leak is fixed. The fix opened the door to
->>>> other problems, especially use-after-free, sometimes followed by
->>>> crashes due to NULL dereferences. We think there are weak references
->>>> (i.e. pointers that don't increment the refcounter) previously
->>>> pointing to memory that was never freed, but now is freed. On kernels
->>>> v5.13 and v5.15, patches 0005, 0006 and 0007 seem to fix the
->>>> use-after-free and NULL dereferences, but not on kernel v6.5 yet.
->>> I think the problem is that the lifetime of l2cap_conn shall be hooked
->>> with hci_chan, but the likes of hci_chan_list_flush -> hci_chan_del
->>> don't actually trigger l2cap_conn_del, which imo is the culprit here,
->>> because connect_cfm/disconnect_cfm is not called when the connection
->>> procedure has been aborted prematurely, so perhaps we shall get rid of
->>> the likes of l2cap_connect_cfm/l2cap_disconn_cfm and instead do the
->>> cleanup with in the following order:
->>> hci_conn_cleanup->hci_chan_list_flush->hci_chan_del->l2cap_conn_del,
->>> that way we avoid having multiple code paths attempting to cleanup
->>> objects associated with hci_conn/hci_chan.
->> I fully agree with your analysis, which correspond to mine: we should
->> call "l2cap_conn_del()", it would properly clean the allocations in
->> "l2cap_conn_add()".
->> I have tried but it was not obvious to find the right place to call
->> "l2cap_conn_del()" with the proper locking.
->> As you write, connect_cfm/disconnect_cfm is not called when the
->> connection is aborted, and that is the root cause of the memory leak.
-> Btw, I was trying to reproduce it with the following test set, but at
-> least kmemleak was not able to detect leaks of l2cap_conn:
->
-> https://patchwork.kernel.org/project/bluetooth/list/?series=784343
->
->> Your proposal is most probably the best way to go.
->>
->>> I'd change hci_chan_create to take a del callback to avoid having
->>> circular dependencies on one another though.
->> Interesting, could you explain how you would do it? Perhaps point on
->> a callback example?
->>
->>>> Reproducing with Buildroot
->>>> ==========================
->>>>
->>>> We have reproduced and fixed the memory leak with Buildroot [7] and a
->>>> "ble-memleak-repro" test application on an ST's Discovery Kit DK2 [4].
->>>>
->>>> The "ble-memleak-repro" repository [1] contains the sources of a
->>>> complete external Buildroot customisation [8], with the patches, a
->>>> README, and more explanations to reproduce the problem with Buildroot
->>>> on a DK2.
->>>>
->>>> References:
->>>> ===========
->>>>
->>>> - [1]:<https://gitlab.com/essensium-mind/ble-memleak-repro.git>
->>>>          "ble-memleak-repro repository"
->> [...]
->>
->> --
->> Olivier L'Heureux
