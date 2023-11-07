@@ -1,105 +1,150 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6729231584
-	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Nov 2023 14:33:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j2QeLcbV"
-Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55DD2FA
-	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Nov 2023 06:33:07 -0800 (PST)
-Received: by mail-qk1-x734.google.com with SMTP id af79cd13be357-77891c236fcso401350985a.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Nov 2023 06:33:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699367586; x=1699972386; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=UFNwBDjW9pPmG2wO5iFT5XzGGrMzUSR0ADsaFREk7JM=;
-        b=j2QeLcbVwMUM3oTO74O48K5tD0O0E3nCCaZZ+xijMM9fHFLuzjUcSGss+JTGW5YRoA
-         ROw4Cm8oQqJphGi/eEJxTQeneaMUa33k1tTjx7KLrnPomsOMVK8DqK9pK+yDLdK6Vuzx
-         M7oCpIemauEsgzj+I99tKmFCOAD4YD3qau12Y9d/KWGAYWENXv1aca36N7eL+dX4b2Cw
-         vKMOG5ix5Qbnajj8jFX7Zz77ktGSITbVlWwUahvaf9EmgUB6TOhllWeseC+YeqcXDI7s
-         IV8wEhfdUIsjMfoF7VPkzLSVRxdY3CwJm1RUR33ijbugpHKnOsVm+v9XrLKPwvHe7nFL
-         B2OQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699367586; x=1699972386;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UFNwBDjW9pPmG2wO5iFT5XzGGrMzUSR0ADsaFREk7JM=;
-        b=AH/KiDVywkz7a4BeBYDcFFANDY8BRCQm/GylaWb1LYfReam7XmKV96JXjwUhquORgv
-         Z/BputomgNWiZF/Cdl7pTMJYgW1MabPcTBI3ep7KU+sV5vhrNqWICbbSq/0dqv5TsPYz
-         +VQt60FxsK/gBAlgfQ7bG9Hmhm0c/yAu9DCNmnNR+MkNtnpNFhzz/9YqouQlociCat0d
-         gns4xOc7fH0fOmpbLigmg4avuf7871WFRn412DIVde9dYkkv8mPmWQFLYFF25glNiIGN
-         Hy9yzIXm9AxtWP+gfOsUzdz6gy/Rq8Q8sKHFtxc3VsTa/D+zDVR+sOTimfIpXo2DHwlG
-         1R1w==
-X-Gm-Message-State: AOJu0YwtEzbnj48mAhHMi2VUXz67aor0WsS+hx+QZaWwdB685ofGGsJ3
-	dx35PvruJFXmuIHpDHBGflAzZaMAkGZg/g==
-X-Google-Smtp-Source: AGHT+IHnRsF7JoVPknVHjO1x6CWsS+MFwhy+rxkLXxhwAyTfj7gWM3duNJ6QvGnAmCV9n5gpS/zNpA==
-X-Received: by 2002:a05:620a:2589:b0:778:94cc:723 with SMTP id x9-20020a05620a258900b0077894cc0723mr36260991qko.1.1699367586287;
-        Tue, 07 Nov 2023 06:33:06 -0800 (PST)
-Received: from [172.17.0.2] ([40.65.196.146])
-        by smtp.gmail.com with ESMTPSA id po2-20020a05620a384200b00774309d3e89sm4238748qkn.7.2023.11.07.06.33.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Nov 2023 06:33:06 -0800 (PST)
-Message-ID: <654a4aa2.050a0220.da763.307b@mx.google.com>
-Date: Tue, 07 Nov 2023 06:33:06 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2113754779430457715=="
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E0A52FE02
+	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Nov 2023 14:47:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::222])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F4ED101
+	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Nov 2023 06:47:07 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 1E5A340005;
+	Tue,  7 Nov 2023 14:47:05 +0000 (UTC)
+Message-ID: <31050102f726a4e89a9ef3d1719d6305de2ee61b.camel@hadess.net>
+Subject: Re: Using Laird Connectivity Bluetooth LE PTS dongle with Linux
+From: Bastien Nocera <hadess@hadess.net>
+To: Christoph Schweers <christoph.schweers@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Tue, 07 Nov 2023 15:47:05 +0100
+In-Reply-To: <CA+5PdQagTBRK09kMX=npZO9OawqtOp-CHGcYeVmQ5BpC+Uyi5A@mail.gmail.com>
+References: <c0df9d614f2a220bc93227eafcc68f73f1751528.camel@hadess.net>
+	 <CA+5PdQagTBRK09kMX=npZO9OawqtOp-CHGcYeVmQ5BpC+Uyi5A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, mmandlik@google.com
-Subject: RE: Bluetooth: btusb: Return when coredump trigger cmd fails
-In-Reply-To: <20231107054609.1.I4c7ab22148e168e3cde00f27b89748ff4bc651c2@changeid>
-References: <20231107054609.1.I4c7ab22148e168e3cde00f27b89748ff4bc651c2@changeid>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-GND-Sasl: hadess@hadess.net
 
---===============2113754779430457715==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+T24gTW9uLCAyMDIzLTExLTA2IGF0IDE4OjA2ICswMTAwLCBDaHJpc3RvcGggU2Nod2VlcnMgd3Jv
+dGU6Cj4gCj4gQmFzdGllbiBOb2NlcmEgPGhhZGVzc0BoYWRlc3MubmV0PiBzY2hyaWViIGFtIE1v
+LiwgNi4gTm92LiAyMDIzLAo+IDE1OjM1Ogo+ID4gSGV5LAo+ID4gCj4gPiBJIGJvdWdodCB0aGUg
+TGFpcmQgQ29ubmVjdGl2aXR5IEJsdWV0b290aCBMRS1vbmx5IFBUUyBkb25nbGUgbGlzdGVkCj4g
+PiBvbjoKPiA+IGh0dHBzOi8vc3VwcG9ydC5ibHVldG9vdGguY29tL2hjL2VuLXVzL2FydGljbGVz
+LzM2MDA0OTAxODQ5Mi1XaGF0LWlzLXRoZS1kaWZmZXJlbmNlLWJldHdlZW4tdGhlLVByb2ZpbGUt
+VHVuaW5nLVN1aXRlLVBUUy1Eb25nbGVzCj4gPiAtCj4gPiBhcyBJIHdhcyBob3BpbmcgdG8gaGF2
+ZSBhbiBlYXN5IHRvIHVzZSBCbHVldG9vdGggTEUgb25seSBkZXZpY2UgZm9yCj4gPiB0ZXN0aW5n
+Lgo+ID4gCj4gPiBCdXQgdGhlIGRldmljZSBvbmx5IHNob3dzIHVwIGFzIGEgc2VyaWFsIGRldmlj
+ZSB1bmRlciBrZXJuZWwgNi41Cj4gPiBmcm9tCj4gPiBteSBkaXN0cmlidXRpb24uCj4gPiAKPiA+
+IElzIHRoZXJlIGFueXRoaW5nIHNwZWNpZmljIHRoYXQgbmVlZHMgdG8gYmUgZG9uZSBmb3IgdGhh
+dCBkZXZpY2UgdG8KPiA+IGJlCj4gPiB1c2FibGUgYXMgYSBCbHVldG9vdGggYWRhcHRlciB1bmRl
+ciBMaW51eD8gT3IgZG9lcyBpdCBvbmx5IHdvcmsKPiA+IHdpdGgKPiA+IHRoZSBQVFM/Cj4gPiAK
+PiA+IEkgc3BvdHRlZCB0aGUgYWJpbGl0eSB0byBydW4gc3BlY2lmaWMgc29mdHdhcmUgb24gdGhl
+IG1pY3JvLQo+ID4gY29udHJvbGxlcgo+ID4gaXRzZWxmIHdoZW4gcG93ZXJlZCBvbiwgYnV0IG5v
+dGhpbmcgc3BlY2lmaWMgdG8gdXNpbmcgaXQgYXMgYW4KPiA+IGFkYXB0ZXI6Cj4gPiBodHRwOi8v
+YXNzZXRzLmxhaXJkdGVjaC5jb20vaG9tZS9icmFuZHdvcmxkL2ZpbGVzL0JMNjU0JTIwVVNCJTIw
+RG9uZ2xlJTIwVXNlciUyMEd1aWRlJTIwdjFfMC5wZGYKPiA+IAo+ID4gRnVsbCBsc3VzYiBvdXRw
+dXQgZm9yIHRoYXQgZGV2aWNlOgo+ID4gQnVzIDAwMSBEZXZpY2UgMDE4OiBJRCAxOTE1OjUyMWYg
+Tm9yZGljIFNlbWljb25kdWN0b3IgQVNBIE5vcmRpYwo+ID4gT3Blbgo+ID4gREZVIEJvb3Rsb2Fk
+ZXIKPiA+IERldmljZSBEZXNjcmlwdG9yOgo+ID4gwqAgYkxlbmd0aMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIDE4Cj4gPiDCoCBiRGVzY3JpcHRvclR5cGXCoCDCoCDCoCDCoCDCoDEKPiA+IMKgIGJj
+ZFVTQsKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgMi4wMAo+ID4gwqAgYkRldmljZUNsYXNzwqAgwqAg
+wqAgwqAgwqAgwqAgMCAKPiA+IMKgIGJEZXZpY2VTdWJDbGFzc8KgIMKgIMKgIMKgIMKgMCAKPiA+
+IMKgIGJEZXZpY2VQcm90b2NvbMKgIMKgIMKgIMKgIMKgMCAKPiA+IMKgIGJNYXhQYWNrZXRTaXpl
+MMKgIMKgIMKgIMKgIDY0Cj4gPiDCoCBpZFZlbmRvcsKgIMKgIMKgIMKgIMKgIMKgMHgxOTE1IE5v
+cmRpYyBTZW1pY29uZHVjdG9yIEFTQQo+ID4gwqAgaWRQcm9kdWN0wqAgwqAgwqAgwqAgwqAgMHg1
+MjFmIAo+ID4gwqAgYmNkRGV2aWNlwqAgwqAgwqAgwqAgwqAgwqAgMS4wMAo+ID4gwqAgaU1hbnVm
+YWN0dXJlcsKgIMKgIMKgIMKgIMKgIMKgMSBMYWlyZCBDb25uZWN0aXZpdHkKPiA+IMKgIGlQcm9k
+dWN0wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgMiBOb3JkaWMgT3BlbiBERlUgQm9vdGxvYWRlcgo+
+ID4gwqAgaVNlcmlhbMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgMyBFMUJCOTIxMUZBNDEKPiA+
+IMKgIGJOdW1Db25maWd1cmF0aW9uc8KgIMKgIMKgIDEKPiA+IMKgIENvbmZpZ3VyYXRpb24gRGVz
+Y3JpcHRvcjoKPiA+IMKgIMKgIGJMZW5ndGjCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoDkKPiA+
+IMKgIMKgIGJEZXNjcmlwdG9yVHlwZcKgIMKgIMKgIMKgIMKgMgo+ID4gwqAgwqAgd1RvdGFsTGVu
+Z3RowqAgwqAgwqAgwqAweDAwNGIKPiA+IMKgIMKgIGJOdW1JbnRlcmZhY2VzwqAgwqAgwqAgwqAg
+wqAgMgo+ID4gwqAgwqAgYkNvbmZpZ3VyYXRpb25WYWx1ZcKgIMKgIMKgMQo+ID4gwqAgwqAgaUNv
+bmZpZ3VyYXRpb27CoCDCoCDCoCDCoCDCoCA0IERlZmF1bHQgY29uZmlndXJhdGlvbgo+ID4gwqAg
+wqAgYm1BdHRyaWJ1dGVzwqAgwqAgwqAgwqAgwqAweGMwCj4gPiDCoCDCoCDCoCBTZWxmIFBvd2Vy
+ZWQKPiA+IMKgIMKgIE1heFBvd2VywqAgwqAgwqAgwqAgwqAgwqAgwqAgMTAwbUEKPiA+IMKgIMKg
+IEludGVyZmFjZSBBc3NvY2lhdGlvbjoKPiA+IMKgIMKgIMKgIGJMZW5ndGjCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoDgKPiA+IMKgIMKgIMKgIGJEZXNjcmlwdG9yVHlwZcKgIMKgIMKgIMKgIDEx
+Cj4gPiDCoCDCoCDCoCBiRmlyc3RJbnRlcmZhY2XCoCDCoCDCoCDCoCDCoDAKPiA+IMKgIMKgIMKg
+IGJJbnRlcmZhY2VDb3VudMKgIMKgIMKgIMKgIMKgMgo+ID4gwqAgwqAgwqAgYkZ1bmN0aW9uQ2xh
+c3PCoCDCoCDCoCDCoCDCoCAyIENvbW11bmljYXRpb25zCj4gPiDCoCDCoCDCoCBiRnVuY3Rpb25T
+dWJDbGFzc8KgIMKgIMKgIMKgMiBBYnN0cmFjdCAobW9kZW0pCj4gPiDCoCDCoCDCoCBiRnVuY3Rp
+b25Qcm90b2NvbMKgIMKgIMKgIMKgMCAKPiA+IMKgIMKgIMKgIGlGdW5jdGlvbsKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgMCAKPiA+IMKgIMKgIEludGVyZmFjZSBEZXNjcmlwdG9yOgo+ID4gwqAgwqAg
+wqAgYkxlbmd0aMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgOQo+ID4gwqAgwqAgwqAgYkRlc2Ny
+aXB0b3JUeXBlwqAgwqAgwqAgwqAgwqA0Cj4gPiDCoCDCoCDCoCBiSW50ZXJmYWNlTnVtYmVywqAg
+wqAgwqAgwqAgMAo+ID4gwqAgwqAgwqAgYkFsdGVybmF0ZVNldHRpbmfCoCDCoCDCoCDCoDAKPiA+
+IMKgIMKgIMKgIGJOdW1FbmRwb2ludHPCoCDCoCDCoCDCoCDCoCDCoDEKPiA+IMKgIMKgIMKgIGJJ
+bnRlcmZhY2VDbGFzc8KgIMKgIMKgIMKgIMKgMiBDb21tdW5pY2F0aW9ucwo+ID4gwqAgwqAgwqAg
+YkludGVyZmFjZVN1YkNsYXNzwqAgwqAgwqAgMiBBYnN0cmFjdCAobW9kZW0pCj4gPiDCoCDCoCDC
+oCBiSW50ZXJmYWNlUHJvdG9jb2zCoCDCoCDCoCAwIAo+ID4gwqAgwqAgwqAgaUludGVyZmFjZcKg
+IMKgIMKgIMKgIMKgIMKgIMKgIDAgCj4gPiDCoCDCoCDCoCBDREMgSGVhZGVyOgo+ID4gwqAgwqAg
+wqAgwqAgYmNkQ0RDwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAxLjEwCj4gPiDCoCDCoCDCoCBDREMg
+Q2FsbCBNYW5hZ2VtZW50Ogo+ID4gwqAgwqAgwqAgwqAgYm1DYXBhYmlsaXRpZXPCoCDCoCDCoCDC
+oDB4MDMKPiA+IMKgIMKgIMKgIMKgIMKgIGNhbGwgbWFuYWdlbWVudAo+ID4gwqAgwqAgwqAgwqAg
+wqAgdXNlIERhdGFJbnRlcmZhY2UKPiA+IMKgIMKgIMKgIMKgIGJEYXRhSW50ZXJmYWNlwqAgwqAg
+wqAgwqAgwqAgMQo+ID4gwqAgwqAgwqAgQ0RDIEFDTToKPiA+IMKgIMKgIMKgIMKgIGJtQ2FwYWJp
+bGl0aWVzwqAgwqAgwqAgwqAweDAyCj4gPiDCoCDCoCDCoCDCoCDCoCBsaW5lIGNvZGluZyBhbmQg
+c2VyaWFsIHN0YXRlCj4gPiDCoCDCoCDCoCBDREMgVW5pb246Cj4gPiDCoCDCoCDCoCDCoCBiTWFz
+dGVySW50ZXJmYWNlwqAgwqAgwqAgwqAgMAo+ID4gwqAgwqAgwqAgwqAgYlNsYXZlSW50ZXJmYWNl
+wqAgwqAgwqAgwqAgwqAxIAo+ID4gwqAgwqAgwqAgRW5kcG9pbnQgRGVzY3JpcHRvcjoKPiA+IMKg
+IMKgIMKgIMKgIGJMZW5ndGjCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoDcKPiA+IMKgIMKgIMKg
+IMKgIGJEZXNjcmlwdG9yVHlwZcKgIMKgIMKgIMKgIMKgNQo+ID4gwqAgwqAgwqAgwqAgYkVuZHBv
+aW50QWRkcmVzc8KgIMKgIMKgMHg4MsKgIEVQIDIgSU4KPiA+IMKgIMKgIMKgIMKgIGJtQXR0cmli
+dXRlc8KgIMKgIMKgIMKgIMKgIMKgIDMKPiA+IMKgIMKgIMKgIMKgIMKgIFRyYW5zZmVyIFR5cGXC
+oCDCoCDCoCDCoCDCoCDCoCBJbnRlcnJ1cHQKPiA+IMKgIMKgIMKgIMKgIMKgIFN5bmNoIFR5cGXC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoE5vbmUKPiA+IMKgIMKgIMKgIMKgIMKgIFVzYWdlIFR5cGXC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoERhdGEKPiA+IMKgIMKgIMKgIMKgIHdNYXhQYWNrZXRTaXpl
+wqAgwqAgwqAweDAwNDDCoCAxeCA2NCBieXRlcwo+ID4gwqAgwqAgwqAgwqAgYkludGVydmFswqAg
+wqAgwqAgwqAgwqAgwqAgwqAgMTYKPiA+IMKgIMKgIEludGVyZmFjZSBEZXNjcmlwdG9yOgo+ID4g
+wqAgwqAgwqAgYkxlbmd0aMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgOQo+ID4gwqAgwqAgwqAg
+YkRlc2NyaXB0b3JUeXBlwqAgwqAgwqAgwqAgwqA0Cj4gPiDCoCDCoCDCoCBiSW50ZXJmYWNlTnVt
+YmVywqAgwqAgwqAgwqAgMQo+ID4gwqAgwqAgwqAgYkFsdGVybmF0ZVNldHRpbmfCoCDCoCDCoCDC
+oDAKPiA+IMKgIMKgIMKgIGJOdW1FbmRwb2ludHPCoCDCoCDCoCDCoCDCoCDCoDIKPiA+IMKgIMKg
+IMKgIGJJbnRlcmZhY2VDbGFzc8KgIMKgIMKgIMKgIDEwIENEQyBEYXRhCj4gPiDCoCDCoCDCoCBi
+SW50ZXJmYWNlU3ViQ2xhc3PCoCDCoCDCoCAwIAo+ID4gwqAgwqAgwqAgYkludGVyZmFjZVByb3Rv
+Y29swqAgwqAgwqAgMCAKPiA+IMKgIMKgIMKgIGlJbnRlcmZhY2XCoCDCoCDCoCDCoCDCoCDCoCDC
+oCAwIAo+ID4gwqAgwqAgwqAgRW5kcG9pbnQgRGVzY3JpcHRvcjoKPiA+IMKgIMKgIMKgIMKgIGJM
+ZW5ndGjCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoDcKPiA+IMKgIMKgIMKgIMKgIGJEZXNjcmlw
+dG9yVHlwZcKgIMKgIMKgIMKgIMKgNQo+ID4gwqAgwqAgwqAgwqAgYkVuZHBvaW50QWRkcmVzc8Kg
+IMKgIMKgMHg4McKgIEVQIDEgSU4KPiA+IMKgIMKgIMKgIMKgIGJtQXR0cmlidXRlc8KgIMKgIMKg
+IMKgIMKgIMKgIDIKPiA+IMKgIMKgIMKgIMKgIMKgIFRyYW5zZmVyIFR5cGXCoCDCoCDCoCDCoCDC
+oCDCoCBCdWxrCj4gPiDCoCDCoCDCoCDCoCDCoCBTeW5jaCBUeXBlwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqBOb25lCj4gPiDCoCDCoCDCoCDCoCDCoCBVc2FnZSBUeXBlwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqBEYXRhCj4gPiDCoCDCoCDCoCDCoCB3TWF4UGFja2V0U2l6ZcKgIMKgIMKgMHgwMDQwwqAg
+MXggNjQgYnl0ZXMKPiA+IMKgIMKgIMKgIMKgIGJJbnRlcnZhbMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgMAo+ID4gwqAgwqAgwqAgRW5kcG9pbnQgRGVzY3JpcHRvcjoKPiA+IMKgIMKgIMKgIMKgIGJM
+ZW5ndGjCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoDcKPiA+IMKgIMKgIMKgIMKgIGJEZXNjcmlw
+dG9yVHlwZcKgIMKgIMKgIMKgIMKgNQo+ID4gwqAgwqAgwqAgwqAgYkVuZHBvaW50QWRkcmVzc8Kg
+IMKgIMKgMHgwMcKgIEVQIDEgT1VUCj4gPiDCoCDCoCDCoCDCoCBibUF0dHJpYnV0ZXPCoCDCoCDC
+oCDCoCDCoCDCoCAyCj4gPiDCoCDCoCDCoCDCoCDCoCBUcmFuc2ZlciBUeXBlwqAgwqAgwqAgwqAg
+wqAgwqAgQnVsawo+ID4gwqAgwqAgwqAgwqAgwqAgU3luY2ggVHlwZcKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgTm9uZQo+ID4gwqAgwqAgwqAgwqAgwqAgVXNhZ2UgVHlwZcKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgRGF0YQo+ID4gwqAgwqAgwqAgwqAgd01heFBhY2tldFNpemXCoCDCoCDCoDB4MDA0MMKg
+IDF4IDY0IGJ5dGVzCj4gPiDCoCDCoCDCoCDCoCBiSW50ZXJ2YWzCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoDAKPiA+IERldmljZSBTdGF0dXM6wqAgwqAgwqAweDAwMDEKPiA+IMKgIFNlbGYgUG93ZXJl
+ZAo+ID4gCj4gPiBDaGVlcnMKPiAKPiBUaGlzIGRvbmdsZSBtdXN0IGJlIHByZS1wcm9ncmFtbWVk
+IHdpdGggYSBzcGVjaWFsIGZpcm13YXJlIHRvIHdvcmsgYXMKPiBhIFBUUyBkb25nbGUuCj4gaHR0
+cHM6Ly9zdXBwb3J0LmJsdWV0b290aC5jb20vaGMvZW4tdXMvYXJ0aWNsZXMvMzYwMDQ5MDE5NzMy
+LUhvdy10by11cGdyYWRlLXRoZS1maXJtd2FyZS1vZi15b3VyLVBUUy1Eb25nbGUKPiAtCj4gCgpJ
+IHVwZGF0ZWQgdGhlIGZpcm13YXJlIHVzaW5nIHRoZSBQVFMgZmlybXdhcmUgdXBncmFkZXIsIGFu
+ZCBpdCBzdGlsbApkb2Vzbid0IHNob3cgdXAgYXMgYSBCbHVldG9vdGggYWRhcHRlciB1bmRlciBM
+aW51eDoKCk5vdiAwNyAxNTo0NDoxMSBjbGFzc2ljIGtlcm5lbDogdXNiIDEtODogbmV3IGZ1bGwt
+c3BlZWQgVVNCIGRldmljZSBudW1iZXIgMjIgdXNpbmcgeGhjaV9oY2QKTm92IDA3IDE1OjQ0OjEx
+IGNsYXNzaWMga2VybmVsOiB1c2IgMS04OiBOZXcgVVNCIGRldmljZSBmb3VuZCwgaWRWZW5kb3I9
+MTkxNSwgaWRQcm9kdWN0PTUyMWYsIGJjZERldmljZT0gMS4wMApOb3YgMDcgMTU6NDQ6MTEgY2xh
+c3NpYyBrZXJuZWw6IHVzYiAxLTg6IE5ldyBVU0IgZGV2aWNlIHN0cmluZ3M6IE1mcj0xLCBQcm9k
+dWN0PTIsIFNlcmlhbE51bWJlcj0zCk5vdiAwNyAxNTo0NDoxMSBjbGFzc2ljIGtlcm5lbDogdXNi
+IDEtODogUHJvZHVjdDogblJGNTIgVVNCIFByb2R1Y3QKTm92IDA3IDE1OjQ0OjExIGNsYXNzaWMg
+a2VybmVsOiB1c2IgMS04OiBNYW51ZmFjdHVyZXI6IE5vcmRpYyBTZW1pY29uZHVjdG9yCk5vdiAw
+NyAxNTo0NDoxMSBjbGFzc2ljIGtlcm5lbDogdXNiIDEtODogU2VyaWFsTnVtYmVyOiBFMUJCOTIx
+MUZBNDEKTm92IDA3IDE1OjQ0OjExIGNsYXNzaWMga2VybmVsOiBjZGNfYWNtIDEtODoxLjA6IHR0
+eUFDTTA6IFVTQiBBQ00gZGV2aWNlCgpJdCBzaG93cyB1cCBhczoKQnVzIDAwMSBEZXZpY2UgMDIz
+OiBJRCAxOTE1OjUyMWYgTm9yZGljIFNlbWljb25kdWN0b3IgQVNBIG5SRjUyIFVTQiBQcm9kdWN0
+CmluIGxzdXNiLgo=
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=799445
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.62 seconds
-GitLint                       PASS      0.31 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      27.97 seconds
-CheckAllWarning               PASS      31.30 seconds
-CheckSparse                   PASS      35.53 seconds
-CheckSmatch                   PASS      98.27 seconds
-BuildKernel32                 PASS      26.39 seconds
-TestRunnerSetup               PASS      414.20 seconds
-TestRunner_l2cap-tester       PASS      23.07 seconds
-TestRunner_iso-tester         PASS      44.26 seconds
-TestRunner_bnep-tester        PASS      7.05 seconds
-TestRunner_mgmt-tester        PASS      171.48 seconds
-TestRunner_rfcomm-tester      PASS      11.08 seconds
-TestRunner_sco-tester         PASS      14.66 seconds
-TestRunner_ioctl-tester       PASS      12.12 seconds
-TestRunner_mesh-tester        PASS      14.57 seconds
-TestRunner_smp-tester         PASS      10.12 seconds
-TestRunner_userchan-tester    PASS      7.48 seconds
-IncrementalBuild              PASS      25.79 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============2113754779430457715==--
