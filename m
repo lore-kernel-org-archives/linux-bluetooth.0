@@ -1,87 +1,121 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75665358AA
-	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Nov 2023 18:13:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="oOcX6UKm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71478C433CA;
-	Tue,  7 Nov 2023 18:13:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1699380802;
-	bh=gazaRc+aEiIyTzNinDjx0ki65vH/wKHbHk/6Ydw3L4E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oOcX6UKm4/PBOxQiHjHPNKhhHh8phKJLtEmQmdaIx/e2sKj7d2IAKTNYQvTivuHUn
-	 xraxU6y5AcfE409OESVyY5/VZ252r+5wV3YgMD5VkT6UM5y8QAwvaCTdgFFNrNTLBj
-	 EdtMiqBCv1CN+yhovvAYxyu4j+UAUaXDk8pJPQig=
-Date: Tue, 7 Nov 2023 19:13:13 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Yuran Pereira <yuran.pereira@hotmail.com>
-Cc: linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com,
-	marcel@holtmann.org, linux-kernel@vger.kernel.org,
-	luiz.dentz@gmail.com,
-	linux-kernel-mentees@lists.linuxfoundation.org
-Subject: Re: [PATCH 2/2] Bluetooth: Replaces printk with pr_debug in bt_dbg
-Message-ID: <2023110752-laundry-stiffness-9f34@gregkh>
-References: <DB3PR10MB6835C002EB4C5A05AD17610BE8AAA@DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM>
- <DB3PR10MB6835DE6D279B65EC040B92AEE8AAA@DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM>
- <2023110752-headset-gains-41a7@gregkh>
- <DB3PR10MB6835DDFE9086DAC4B01C7508E8A9A@DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27F6BD280
+	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Nov 2023 07:31:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from mail-oi1-f206.google.com (mail-oi1-f206.google.com [209.85.167.206])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F3CE1710
+	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Nov 2023 23:31:25 -0800 (PST)
+Received: by mail-oi1-f206.google.com with SMTP id 5614622812f47-3b2ef9a0756so9564049b6e.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Nov 2023 23:31:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699428685; x=1700033485;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iuwi9LoRNPTnGg3HnHKZq0zKA0LoMB0CPtFduQXuLnQ=;
+        b=oIbzL1/Nu+IJBaobbl3EsqSm7YaE8yVVVADC6UX7neQoNsNi2Av+IUEZ3MG3JjV4Eu
+         9C/oFuQBSXYLmVQgA4JDogpkCIf1UT1DbbCIXhPMj891COBT9D2h/Fr6yFfn67PSUBty
+         MXu2oFA3wAXACfg7a/pIbPfP/Txn0Anum2VI9/wsgxIJVKsoeJfFTLQx23QKWEYQXi+z
+         HFjDo3KlpdzcJ4qaJpKBARMJW6k6yxdL09QaX+kTXD6a/FlY7ujsiCHJ2cMBH5zkuWyT
+         GdGEv5W7OcBLnsQNwUK7+TEurcww1LUn5FWHIlr9UcFGkMUZTq6JP1rYjnloqW3G0i1F
+         Y0zA==
+X-Gm-Message-State: AOJu0Yw7abpqGmACgftZIFJijpykH3ANQWOTSBLxqILSUtZAZxySNnDM
+	IEBWineKJa4J6RPM5eo2FM37SkQDiG9IJpea1Wj82NO4vwcF
+X-Google-Smtp-Source: AGHT+IEJ7qbPqNyyendRvdsmZ95KHEi3UZN3+kxGz3GzpP7lUukkN3OUzXgY++/jrVX5SVi81Vr7omj7zSTjrlo8DLlTUWltytTS
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DB3PR10MB6835DDFE9086DAC4B01C7508E8A9A@DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM>
+X-Received: by 2002:a05:6808:21a2:b0:3a9:b964:820e with SMTP id
+ be34-20020a05680821a200b003a9b964820emr592188oib.3.1699428685033; Tue, 07 Nov
+ 2023 23:31:25 -0800 (PST)
+Date: Tue, 07 Nov 2023 23:31:24 -0800
+In-Reply-To: <00000000000057faf606067f1f32@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000017b74d06099f1375@google.com>
+Subject: Re: [syzbot] [bluetooth?] memory leak in prepare_creds (4)
+From: syzbot <syzbot+2a478080bd86d36bb5ea@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Nov 07, 2023 at 09:32:51PM +0530, Yuran Pereira wrote:
-> Hello Greg,
-> On Tue, Nov 07, 2023 at 07:31:27AM +0100, Greg KH wrote:
-> > 
-> > You might have just changed the functionality here, are you SURE this is
-> > identical to the original code?  How was it tested?
-> > 
-> > I'm not saying this is a bad idea to do, just be aware of the
-> > consequences for this change and document it properly (hint, the
-> > changelog does not document the user-visible change that just happened.)
-> > 
-> > Note, pr_debug() is NOT identical to printk(), look at the source for
-> > the full details.
-> > 
-> 
-> Thank you for the heads-up. 
-> Yes, you're right.
-> 
-> I just took another look and it seems that using pr_debug here
-> does defeat the purpose of bt_dbg which was created for situations
-> where `DYNAMIC_DEBUG` and `DEBUG` are disabled.
-> 
-> The likely equivalent would have been `pr_devel` but that also
-> depends on `DEBUG`.
-> 
-> Do you think that a new `pr_devel_uncond` like the one below
-> (only to be used in exceptional scenarios) would be a good idea?
-> 
-> ```
-> #define pr_devel_uncond(fmt, ...) \
->     printk(KERN_DEBUG pr_fmt(fmt), ##__VA_ARGS__)
-> ```
-> 
-> This would neither depend on `DYNAMIC_DEBUG` nor on `DEBUG`.
+syzbot has found a reproducer for the following issue on:
 
-No, not at all, the bluetooth subsystem should move to actually use the
-proper dynamic debug infrastructure and not have their own "special"
-subsystem loging macros/functions.  What you are doing here is the
-proper way forward, BUT you need to make everyone aware that it is going
-to change how things work from what they do today.
+HEAD commit:    13d88ac54ddd Merge tag 'vfs-6.7.fsid' of git://git.kernel...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=10740c7b680000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=ecfdf78a410c834
+dashboard link: https://syzkaller.appspot.com/bug?extid=2a478080bd86d36bb5ea
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12d8fd7f680000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=107b137f680000
 
-In other words, it's not just a "trivial" change, you need to get
-approval to change this type of functionality from the Bluetooth
-developers/maintainers.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/9bb27a01f17c/disk-13d88ac5.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/fb496feed171/vmlinux-13d88ac5.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/f4da22719ffa/bzImage-13d88ac5.xz
 
-thanks,
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+2a478080bd86d36bb5ea@syzkaller.appspotmail.com
 
-greg k-h
+Warning: Permanently added '10.128.0.113' (ED25519) to the list of known hosts.
+executing program
+executing program
+BUG: memory leak
+unreferenced object 0xffff888107c20600 (size 192):
+  comm "syz-executor418", pid 5027, jiffies 4294942544 (age 13.100s)
+  hex dump (first 32 bytes):
+    01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff81630798>] kmemleak_alloc_recursive include/linux/kmemleak.h:42 [inline]
+    [<ffffffff81630798>] slab_post_alloc_hook mm/slab.h:766 [inline]
+    [<ffffffff81630798>] slab_alloc_node mm/slub.c:3478 [inline]
+    [<ffffffff81630798>] slab_alloc mm/slub.c:3486 [inline]
+    [<ffffffff81630798>] __kmem_cache_alloc_lru mm/slub.c:3493 [inline]
+    [<ffffffff81630798>] kmem_cache_alloc+0x298/0x430 mm/slub.c:3502
+    [<ffffffff812e0d5b>] prepare_creds+0x2b/0x4e0 kernel/cred.c:269
+    [<ffffffff812e17c4>] copy_creds+0x44/0x280 kernel/cred.c:373
+    [<ffffffff812927ba>] copy_process+0x6aa/0x25c0 kernel/fork.c:2366
+    [<ffffffff8129487b>] kernel_clone+0x11b/0x690 kernel/fork.c:2907
+    [<ffffffff81294e6c>] __do_sys_clone+0x7c/0xb0 kernel/fork.c:3050
+    [<ffffffff84b67d8f>] do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+    [<ffffffff84b67d8f>] do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:82
+    [<ffffffff84c0008b>] entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+BUG: memory leak
+unreferenced object 0xffff888107470a80 (size 16):
+  comm "syz-executor418", pid 5027, jiffies 4294942544 (age 13.100s)
+  hex dump (first 16 bytes):
+    00 00 00 00 00 00 00 00 00 c3 87 00 81 88 ff ff  ................
+  backtrace:
+    [<ffffffff8163331d>] kmemleak_alloc_recursive include/linux/kmemleak.h:42 [inline]
+    [<ffffffff8163331d>] slab_post_alloc_hook mm/slab.h:766 [inline]
+    [<ffffffff8163331d>] slab_alloc_node mm/slub.c:3478 [inline]
+    [<ffffffff8163331d>] __kmem_cache_alloc_node+0x2dd/0x3f0 mm/slub.c:3517
+    [<ffffffff8157e81b>] __do_kmalloc_node mm/slab_common.c:1006 [inline]
+    [<ffffffff8157e81b>] __kmalloc+0x4b/0x150 mm/slab_common.c:1020
+    [<ffffffff82364631>] kmalloc include/linux/slab.h:604 [inline]
+    [<ffffffff82364631>] kzalloc include/linux/slab.h:721 [inline]
+    [<ffffffff82364631>] lsm_cred_alloc security/security.c:577 [inline]
+    [<ffffffff82364631>] security_prepare_creds+0x121/0x140 security/security.c:2950
+    [<ffffffff812e1059>] prepare_creds+0x329/0x4e0 kernel/cred.c:300
+    [<ffffffff812e17c4>] copy_creds+0x44/0x280 kernel/cred.c:373
+    [<ffffffff812927ba>] copy_process+0x6aa/0x25c0 kernel/fork.c:2366
+    [<ffffffff8129487b>] kernel_clone+0x11b/0x690 kernel/fork.c:2907
+    [<ffffffff81294e6c>] __do_sys_clone+0x7c/0xb0 kernel/fork.c:3050
+    [<ffffffff84b67d8f>] do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+    [<ffffffff84b67d8f>] do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:82
+    [<ffffffff84c0008b>] entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
