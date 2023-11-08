@@ -1,76 +1,61 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 735B5FC17
-	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Nov 2023 09:40:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OvMkOxDk"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EC2A3C433C9
-	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Nov 2023 09:40:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699436416;
-	bh=eaYcnwkGuxhvzDDhLx1ZoeAdmO9MoWUdlChticgGURQ=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=OvMkOxDk4YyPSU7t0lhOKXN2Jvn4Hn9oGlP3bLRVebysFt4AOwyNR1iB8JJge3yoC
-	 YcDlkQx1YA6gxhhSHrJt9IWNgAETddYjKVzWRGFgNlq5SAdvHahFroJVC8jj1b/cdZ
-	 xQ9b/zhGJVxBucFhZVGOOI08335fISlSMWnC+xlRhGFhW7DC0+1DJR8fAQ1m1/4fD7
-	 YVbSQuNUA5vt0/FWP61+ODkzyexABFTPVZBZKJzMEu20mvzGCyMNx3Y115hsLHzzci
-	 n6s78H/xIfAOzIiknNRjz35QmP3W9q4vpQZ1gwWe8P14xLms0ULDH6J/dBAjZUg7o/
-	 8aXDsKSk1Ci4Q==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id D7FDBC53BCD; Wed,  8 Nov 2023 09:40:15 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E49EB30D0C
+	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Nov 2023 16:20:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4285EC6
+	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Nov 2023 08:20:03 -0800 (PST)
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4SQVfh6DMlz9sT1;
+	Wed,  8 Nov 2023 17:19:56 +0100 (CET)
+From: =?UTF-8?q?Jonas=20Dre=C3=9Fler?= <verdre@v0yd.nl>
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 214823] RTL8821CE Bluetooth adapter randomly stopped working,
- only suspend then resume can reset it
-Date: Wed, 08 Nov 2023 09:40:15 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: murphyde835@gmail.com
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: WILL_NOT_FIX
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-214823-62941-6bzEhHCqCe@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-214823-62941@https.bugzilla.kernel.org/>
-References: <bug-214823-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Cc: =?UTF-8?q?Jonas=20Dre=C3=9Fler?= <verdre@v0yd.nl>
+Subject: [PATCH BlueZ] client: Invalidate scan filter on "scan" command
+Date: Wed,  8 Nov 2023 17:19:49 +0100
+Message-ID: <20231108161949.11276-1-verdre@v0yd.nl>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D214823
+The "scan bredr" and "scan le" commands are broken right now because the
+transport filter gets set, but not actually invalidated.
 
-Javier Crosby (murphyde835@gmail.com) changed:
+Invalidate the filter with `filter.set = false` so that it actually gets
+updated when set_discovery_filter() is called afterwards.
+---
+ client/main.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |murphyde835@gmail.com
+diff --git a/client/main.c b/client/main.c
+index 88b5d5d0c..51d08a67a 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -1325,9 +1325,14 @@ static void cmd_scan(int argc, char *argv[])
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 
+ 	if (enable == TRUE) {
+-		if (strcmp(mode, "")) {
++		if (!g_strcmp0(mode, "")) {
++			g_free(filter.transport);
++			filter.transport = NULL;
++			filter.set = false;
++		} else {
+ 			g_free(filter.transport);
+ 			filter.transport = g_strdup(mode);
++			filter.set = false;
+ 		}
+ 
+ 		set_discovery_filter(false);
+-- 
+2.41.0
 
---- Comment #7 from Javier Crosby (murphyde835@gmail.com) ---
-I will leave my workaround here:
-
-Add boycott rtw88_8821ce to/and so forth/modprobe.d/blacklist.conf
-
-Introduce https://github.com/tomaspinho/rtl8821ce
-https://basketballstarsgame.io
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
