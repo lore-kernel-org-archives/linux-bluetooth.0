@@ -1,30 +1,72 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B265B1DFE0
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Nov 2023 18:48:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.141])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32F1566001
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Nov 2023 10:48:05 -0800 (PST)
-Received: from submission (posteo.de [185.67.36.169]) 
-	by mout01.posteo.de (Postfix) with ESMTPS id 90818240027
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Nov 2023 19:48:02 +0100 (CET)
-Received: from customer (localhost [127.0.0.1])
-	by submission (posteo.de) with ESMTPSA id 4SRnrd6n2lz9rxL
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Nov 2023 19:48:01 +0100 (CET)
-Message-ID: <efaad61ec6bc258b66d9563194aacb0ce99212a6.camel@iki.fi>
-Subject: Re: [PATCH BlueZ 3/4] bap: obtain BAP ucast client QoS via calling
- endpoint SelectQoS()
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA1913AC2B
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Nov 2023 19:17:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="gs6r7lDX"
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 398226F8B
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Nov 2023 11:17:06 -0800 (PST)
+Received: from [192.168.1.195] (unknown [IPv6:2a02:ed04:3581:1::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4SRpV65X6gz49PwQ;
+	Fri, 10 Nov 2023 21:16:59 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1699643823;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=Ad89is8S4Xs44Impy7sOpGotzNRO+80w7ZhwphXWVjY=;
+	b=gs6r7lDX6RBFgQiUaBW/U8X2MhUs/sxgPwbyyoDa5YcjTm9l3A7KX9UqOhQM/Bu36sipxf
+	o/GQJHmm9XEVig9aQZPeqjldyb7AeK3TOBpW0kulQJ750wsomhOWrQgIYmSBPWMUpCwuwB
+	hTEDuLT8QzHytb5y+AqXgJdU8WczjWpdj1fHDKI95j4xr2n/CXv8TQDsc4a8j6AMnvp0Vk
+	Hw56YPeoNZiu8EuQMK7ViIZD9H5wI3eUG/CAZuVTNUqDqOofmtherXWQzA5LxpoE8OR45M
+	FZN+A5YguLUzzSNKfcByoiwvU9ZADbGHk92qJwVlwLn0GyhQm/3vqiad5gkhAw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1699643823;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=Ad89is8S4Xs44Impy7sOpGotzNRO+80w7ZhwphXWVjY=;
+	b=b5qoh6PDE21S1TxPV2Fl5ZLjltiJknEnL+vEEVvqwIe2Xhe290lmkycOFxRgyajIJS7yR5
+	V1Jiq/cp4sY49tiVwA2FxdTlbQtvyhExBBOfBnIjcCAdcg+WTeQfNlYBs+q/I7zZhTl1JC
+	nlRG4YbC2P1unF190DVHS4bP1QNgpPbJouFeVOSkMYwB2sabsA4Z8BTeDAqa6Uz6M3UJta
+	L4yVcj4GBUjHbwZfhQciBPEJNQ3IqJBDC52d/RaXqD73+V82m+Rhhyfa2KVCLTamXuS5sQ
+	KgjlMUXr9JYf4y9z3MNIJu4LMLZeI9Yyed9F+Vvth1xDf4hRw0VEvbCUKg0g0g==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1699643823; a=rsa-sha256;
+	cv=none;
+	b=DRJRM182SJhZExL26UqIYQMDPk+N9wVt8Fgfgaqvjxb3y6BcSv7RLjqqaoy/XASeTBEQGb
+	cgpx18ND24t7LUj9+xZKH3u0w3Z5seoU8k63LsmP2+skmgXmSa0sNIaPOmX+Qamehoux3N
+	bNuezyWY5luMw0ebq7Y/Dw960Wi6nmCFe7Iu8G3Qs3vj3cIKO0vrbNvyJQuFpTOj0t1H+f
+	gNeCigvPzjk2GcXN1Xf87nhUyAt7IU8J5CczOy7/BCv27ARiEcqxFe3/BCvo+KZkK0PD5C
+	K/S96vCD3lS/uENkmxo5z62wd8SLbR/LKzfJ7RPGYn52VnPvZ9hubB9AEA0FUw==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+Message-ID: <846df13370485318d1814b13656e483e09a6de35.camel@iki.fi>
+Subject: Re: a2dp delay reporting
 From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Date: Fri, 10 Nov 2023 18:48:01 +0000
-In-Reply-To: <f1d34641642d675a9e3259c91519a4caa7ffa3fe.1698503903.git.pav@iki.fi>
-References: 
-	<6f03ad1eaaa00f84db8cd6a4a4b88ee83078951d.1698503903.git.pav@iki.fi>
-	 <f1d34641642d675a9e3259c91519a4caa7ffa3fe.1698503903.git.pav@iki.fi>
+To: Ethan White <ethan@braneaudio.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Fri, 10 Nov 2023 21:16:59 +0200
+In-Reply-To: <94061775-df7e-4aa5-b760-94a28a13667f@braneaudio.com>
+References: <b7c90f4c-8868-42ea-86c0-3f9f2b0f27e0@braneaudio.com>
+	 <94061775-df7e-4aa5-b760-94a28a13667f@braneaudio.com>
+Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
+ keydata=mQGiBDuWdUoRBAD5TV1PNJbFxQRmG3moFyJT74l8/6ailvCjgIzwl6Umi4oaDsrogD+myums6lgYe+J2kmbe1Sk2MiOdWzRgY+HbrW5tr8UV+hmNg88gMz9gl2ygWHgG/CSa53Zn+R6TmXXL23KafCYOWH2NKaXxU31c/0Da+yEI+AgkrW8nCOMeFwCgzuJK2qqKtjLqh7Iukt1Urxdp1IUEAMFVHx9TPoFEk4OsuWJRunn7cylFsI/FQlXqXa4GHwhA5zKTMJHo6aX8ITQlnZfdZuxBWF2bmdK2/CRzp0dirJw+f4Qa163kaH2gTq5b+xZXF56xgYMO3wgANtDG1ZKBmYpnV7lFPYpbuNuR0JpksBL5G1Ml3WGblpb4EWtVNrWfA/91HylTGtZnNIxI8iJUjDN0uPHgPVM90C/bU2Ll3i3UpyuXwSFIJq00+bxGQh/wWa50G6GvrBStzhAXdQ1xQRusQBppFByjCpVpzkCyV6POe74pa4m88PRhXKlj2MKWbWjxZeU88sAWhFx5u79Cs6imTSckOCyg0eiO4ca1TLZOGbQbUGF1bGkgVmlydGFuZW4gPHBhdkBpa2kuZmk+iIEEExEKAEECGyMCHgECF4ACGQEFCwkIBwMFFQoJCAsFFgIDAQAWIQSfjAgX4lc0PoQd+D3oFDFvs7SlYAUCWZ8gRwUJHgn8fQAKCRDoFDFvs7SlYELXAJ47uNwB5yXTPDmAhIebcrlE0Ub0kgCdGAfxvoNmbwJwk1sAikf9H5FBBBC0I1BhdWxpIFZpcnRhbmVuIDxwdHZpcnRhbkBjYy5odXQuZmk+iEkEMBECAAkFAlIFBAACHSAACgkQ6BQxb7O0pWDfnACgrnO9z6UBQDTtzYqJzNhdO5p9ji4An2BS0BThXwtWTNfn7ZoZcTIW+wQ7tCZQYXVsaSBWaXJ0YW5lbiA8cGF1bGkudmlydGFuZW5AaHV0LmZpPohJBDARAgAJB
+	QJSBQQOAh0gAAoJEOgUMW+ztKVgZ3kAnRT88CSMune7hmpFgHYnZGvto6p6AJsH1V3wqODSn0c18aRHXy1XsSvh+bQmUGF1bGkgVmlydGFuZW4gPHBhdWxpLnZpcnRhbmVuQGlraS5maT6IfgQTEQoAPgIbIwIeAQIXgAULCQgHAwUVCgkICwUWAgMBABYhBJ+MCBfiVzQ+hB34PegUMW+ztKVgBQJZnyBHBQkeCfx9AAoJEOgUMW+ztKVgycwAoKg8QDz9HWOv/2N5e6qOCNhLuAtDAKDFZYfpefdj1YjkITIV9L8Pgy2UeLQmUGF1bGkgVmlydGFuZW4gPHBhdWxpLnZpcnRhbmVuQHRray5maT6ISQQwEQIACQUCUgUEFwIdIAAKCRDoFDFvs7SlYJ/NAJ0Vbzi14XXcR4nQoB5/4jtVYMnxDACeP5HzZj0fJ6jO1o6rLRC1jxdtWC+0LVBhdWxpIFZpcnRhbmVuIDxwYXVsaS52aXJ0YW5lbkBzYXVuYWxhaHRpLmZpPohJBDARAgAJBQJSBQQgAh0gAAoJEOgUMW+ztKVgM6kAn0mOV/EX8ptYEFEMpJpm0ZqlbM50AJ9fqg6GnP1EM1244sUfOu68000Dp5kBogRLOyfGEQQAsukDATfU5HB0Y+6Ub6PF0fDWXQ47RULV0AUDwJrmQSE4Xz3QXvZNVBEXz2CSpfT/MJFVwVxh10chNGaDOro6qgCdVMCFNunDgdwGtFrGvrVGT1sdSJNXM+mINIBm+i3MQv3FJQVZ+7LivleR5ZWOueQQJVSTH1Rf4ymbzBqc8fMAoMviiEI4NIRv2PZTgpOFLU5KaHznA/9cPcNkH8P1sllmDyDt9sVxEYj/1O+R/WaTalA3azQyCm19MVGouK/+Ku+RHON2S9/JibnemZhiqS+eDf63OGTbHMRhhwwObv3VY+8ftBnAX+IKQ5Y4ECWpnPeQHNmoJQ64ha7XYAPdSgSDvAlGCKmYLq
+	Q8Cw9mpY4Cq50cs9rT/QQAhbWuU2Ti3YR/mVStexyHhp5BIi9QvGeCvHePi/O771fW8kXjX+9uFXoP1yX2juNY86+cR5Vgy4flqZu24Rq+5Hd4RNztZXs1sqR5w6f1C8uo3L+dhqXD4Bo4BYIuL6tdoiyNEUemVtjvTa03rjY4JHAbNjci20k+v3P43oZ9M+K0K1BhdWxpIFZpcnRhbmVuIChNYWVtbyB1cGxvYWRzKSA8cGF2QGlraS5maT6IZgQTEQoAJgIbAwYLCQgHAwIEFQIIAwQWAgMBAh4BAheABQJWzk4PBQkLlFGaAAoJEBJBo7AePJIwgHIAn14IziSme6nI/rHtGgDtfPup8KDBAJ9dYxHDYDgiFfqDkDNJMliyJ7xr0JkCDQRVadGcARAAtl2T0BPQKIEV0S/RRUT+Nu96jc5Xk7F5gUUdu+FAuooBpCyRqwPwefxuv4HpEGG9VJ5AZpGjd1j9wqTuS3XrGe6s+LlVSYE4mSFes9mhnRiPK99zOy6DwNYO0CQiSFxhwqRGspAfzgoFncbd8oA2yYTPiS65vain+sxOF4tj1FdNMJR4IwpIeeqfLASfQwdOr2QWHwZRZ3iR7BV/XTzofrOgr0CkEAGxKLh+arRtfBz4Dl8zj+kOXHyi/Wd7TYhERYwipuejBSDW6z86CQllscjUyaqj7eTq9eg7tPFrGLV3dv4mtk5p9j1XSlZhu2BrKAcfnuZDKym+4Y7s/s5SDxqY05gv2DEBkWyz1xCld07Wlp0e4J54MctlzZNuZ/C3v/yLscj0mNGGX7Q1I5cZ/9JW7ZQ7a83HvIywhW+YUFkfriObX/RDDXMjwb5PKGl1obi4Z3abkjtxzcl18q/UqAtPPgUGoVlHeuprgOVQBojc52iB0kMomJo33aQPYwBW2sptu59nukQ73LOwG8jrk+KR7c3QktOarHYhhcbgNnO5cgkpe0fYRYrhHiqLsxgJFWNybKhFdGXT21Z
+	WNjPpAASFSfV7jOAJ/3xDTJXpuInIslloa8/+XohQ2NjuUItF5WaS7V0q31TtTcy5Tyks4etB3wINx38np3sUSZXRFisAEQEAAbQbUGF1bGkgVmlydGFuZW4gPHBhdkBpa2kuZmk+iQJXBBMBCgBBAhsDBQsJCAcDBRUKCQgLBRYCAwEAAh4BAheAAhkBFiEEiNDtwDFNJaodBiJZHOiglY3YpVcFAllP1OgFCQ1MBMwACgkQHOiglY3YpVeCCQ/+LHJXPgofheRxdcJ3e7f13w+5V3zQBFC6i3ZKedVHCSkwjOvvYcl7VV39EC7hKIRO/PUw9pDuuDkiiJ5sbz9cvGhXQ8rvD6RCV5ldqdHOHK8e17eI2MfoLVgg2P4/KmnbfTBeVwXtFl2nBS8zKQyLYPC1Pt/1RRIjah/nWkkN6CpsaTG2nopUTkIS/0BKeUamuif4dveiRqb8A01t4uuf79Xkn2L0XO92EizHrBmYwG8eyTZYcHctccSvRYgxYK2G2dAAZoqar4yPYDzQ5iLyi+UhpDvC2QSYDygZvk5rTU9k+MgeZta52NsHG+izlsff73Ep9EgUdiXn0QaF+50qdWbTDlbTPJubKlT5E7rNTFOUEx2kCJWXb1QtpkrpW6FyfzGceVqNd8+NTAkJ1E/AlbssC47WTJ3Az8CZkEwF1D+rMKmCDYLxrTH5yu0G0K/cQHAceV+OzhoqXeV2DMhjaVUNOtmLb+LNzzeIAuA4O7e7NuxH+uKIetzYRsHLg0nlPhziIk1sjkxEtYGCPj0G3m6eDHAdpAJ1MFV8KxKA5AXwR27he34MllcVlzLah+nHXidnYDP+gTk33GqH6EsC+werHekkqrPn6U7ge6h+mEFEW8IUIxSEm7ALDZTNbJO1fEe35tjTOIwkEUceyjqp6l6navgs5GFx1xyMBljldwe0JlBhdWxpIFZpcnRhbmVuIDxwYXVsaS52aXJ0YW5lbkBpa2kuZmk+iQJU
+	BBMBCgA+AhsDBQsJCAcDBRUKCQgLBRYCAwEAAh4BAheAFiEEiNDtwDFNJaodBiJZHOiglY3YpVcFAllP1OgFCQ1MBMwACgkQHOiglY3YpVfiOA//YLTyfBMolR5K/s2WV/mgwQEJZqhdwBT+L/0mxqhuFMWuDnvkUzzBxLTM5a66SB4/JZtyQt14VSnRCuxBUaw/IUftK0ru3zIZjWFfLgHwSUwJCSy6oYwm7x2MAiKQUtAzpSfFJnwyQG2wK1uy6EpSjBX7YphlpKKv6UGiL0QuwWtXALrbI4EVbnozes89CaZHeE6zx/aDQgKa4ajInkIIvtOBmRqbvTPkJjcH84o7b84rP10DSO2Q2ooP8WYQ85y9RkF00yndR01VwNnURt7XmjVuoy8el0WUMv0q7evGTWSmXDPtUMq8e5DKt1uHWdkjV3uhHXjUTlI2gdMrxzbzxPYIWVWg4eE9jEdQvvGaYhDfFpmqF/ZSQT9jUCuWXMMpscy8NrmHnJtTvHBEfmaSgOQPnI7D7AA62q6mAVWEjcfKpgEs0Z2SK75P5yHmD2yEdZy+wSD8zheY1YDqvL50rx+l3mqoONmBwiW7R5dkMInqgQ156Uf8yMc8vv5exARr8WhJV61R2mSeHfxTFMMXaFG//NTHNX7ZpP0tECyePbu+IB32oa7P45EoNRZnLDG2KDOFsoUuy+CzQYPku5Gz8aqcgP7k8wb4J3QPPfiaAYrRJ9XOoiLUDodnWnPW9zLA1yWMnarzilEFPVmBztx6JKxlbFxnOfO6u5ry+uXZC4w=
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.1 (3.50.1-1.fc39) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -32,495 +74,110 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-la, 2023-10-28 kello 17:39 +0300, Pauli Virtanen kirjoitti:
-> Enable the client endpoint to implement SelectQoS() to configure
-> the QoS as a second step in the configuration flow.
+Hi,
+
+to, 2023-11-09 kello 16:36 -0600, Ethan White kirjoitti:
+> On 10/17/23 13:10, Ethan White wrote:
+> > Hi,
+> >=20
+> > How do I inform Bluez of my a2dp transport delay?=C2=A0 The media-api=
+=20
+> > document shows a Delay property for the MediaTransport1 interface but=
+=20
+> > attempts at writing this property yield the following error:
+> >=20
+> > org.freedesktop.DBus.Error.PropertyReadOnly: Property 'Delay' is not=
+=20
+> > writable
+> >=20
+> >=20
+> > Reviewing profiles/audio/transport.c a2dp_properties (Bluez 5.70) I fin=
+d=20
+> > that the delay property does not have a set function:
+> >=20
+> > line 846: { "Delay", "q", get_delay_reporting, NULL,=20
+> > delay_reporting_exists },
+> >=20
+> >=20
+> > What am I missing here?=C2=A0 How an I supposed to inform the a2dp sour=
+ce of=20
+> > my playback delay?=C2=A0 Thanks for any help.
+> >=20
+> > Regards,
+> > Ethan
 >=20
-> Remove the QoS parameter from SelectProperties(), as the values
-> are not actually know at that point of the configuration flow.
+> I'm currently using org.bluez.Media1 RegisterEndpoint to expose my a2dp=
+=20
+> sink to a2dp sources.  I use org.bluez.MediaTransport1 Acquire to get=20
+> the transport.  I can write the 'Volume' property of=20
+> org.bluez.MediaTransport1 to change the audio source volume.  However,=
+=20
+> writing to the 'Delay' property of the org.bluez.MediaTransport1=20
+> interface yields only errors as this property appears to be read-only=20
+> despite bluez/docs/media-api.rst showing this property to be read/write.
+
+It looks to me updating the delay value for local A2DP sink endpoints
+is not implemented.
+
+The underlying parts in the AVDTP code for sending delay reports on the
+other hand seem to be in place, so it might not be too hard to make it
+work in the DBus interface. Maybe the DBus property set callback could
+just call `avdtp_delay_report` and it'd work.
+
+> When using busctl from the host running my a2dp sink to inspect the=20
+> transport I get a dash '-' in place of a numerical value:
+> host:~$ busctl introspect  org.bluez=20
+> /org/bluez/hci0/dev_xx_xx_xx_xx_xx_xx/fd0
+> NAME                                TYPE      SIGNATURE RESULT/VALUE=20
+>                         FLAGS
+> org.bluez.MediaTransport1           interface -         -=20
+>                         -
+> .Acquire                            method    -         hqq=20
+>                         -
+> .Release                            method    -         -=20
+>                         -
+> .TryAcquire                         method    -         hqq=20
+>                         -
+> .Codec                              property  y         2=20
+>                         emits-change
+> .Configuration                      property  ay        6 128 1 4 131=20
+> 232 0                     emits-change
+> .Delay                              property  q         -=20
+>                         emits-change
+> .Device                             property  o=20
+> "/org/bluez/hci0/dev_E8_78_65_F2_14_24" emits-change
+> .State                              property  s         "active"=20
+>                         emits-change
+> .UUID                               property  s=20
+> "0000110b-0000-1000-8000-00805f9b34fb"  emits-change
+> .Volume                             property  q         64=20
+>                         emits-change writable
+> org.freedesktop.DBus.Introspectable interface -         -=20
+>                         -
+> .Introspect                         method    -         s=20
+>                         -
+> org.freedesktop.DBus.Properties     interface -         -=20
+>                         -
+> .Get                                method    ss        v=20
+>                         -
+> .GetAll                             method    s         a{sv}=20
+>                         -
+> .Set                                method    ssv       -=20
+>                         -
+> .PropertiesChanged                  signal    sa{sv}as  -=20
+>                         -
 >=20
-> If the client does not implement SelectQoS() we will just use all the
-> QoS values returned by SelectProperties().  If they are one of the
-> mandatory configurations, then maybe devices will accept them.
-> ---
->  profiles/audio/bap.c   |  98 +++++++++++++-------
->  profiles/audio/media.c | 201 +++++++++++++++++++++++++++++++++--------
->  2 files changed, 225 insertions(+), 74 deletions(-)
+> Does Bluez allow an a2dp sink to report its playback delay to the a2dp=
+=20
+> source via the org.bluez.MediaTransport1 Delay property?  Is there some=
+=20
+> other way to communicate this delay back to the audio source for proper=
+=20
+> lip-sync with video?
 >=20
-> diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-> index b74498c4c..a289daf15 100644
-> --- a/profiles/audio/bap.c
-> +++ b/profiles/audio/bap.c
-> @@ -725,23 +725,17 @@ fail:
->  	return -EINVAL;
->  }
-> =20
-> -static void qos_cb(struct bt_bap_stream *stream, uint8_t code, uint8_t r=
-eason,
-> -					void *user_data)
-> +static void ep_reply_msg(struct bap_ep *ep, const char *error)
->  {
-> -	struct bap_ep *ep =3D user_data;
->  	DBusMessage *reply;
-> =20
-> -	DBG("stream %p code 0x%02x reason 0x%02x", stream, code, reason);
-> -
-> -	ep->id =3D 0;
-> -
->  	if (!ep->msg)
->  		return;
-> =20
-> -	if (!code)
-> +	if (!error)
->  		reply =3D dbus_message_new_method_return(ep->msg);
->  	else
-> -		reply =3D btd_error_failed(ep->msg, "Unable to configure");
-> +		reply =3D btd_error_failed(ep->msg, error);
-> =20
->  	g_dbus_send_message(btd_get_dbus_connection(), reply);
-> =20
-> @@ -749,28 +743,30 @@ static void qos_cb(struct bt_bap_stream *stream, ui=
-nt8_t code, uint8_t reason,
->  	ep->msg =3D NULL;
->  }
-> =20
-> -static void config_cb(struct bt_bap_stream *stream,
-> -					uint8_t code, uint8_t reason,
-> +static void qos_cb(struct bt_bap_stream *stream, uint8_t code, uint8_t r=
-eason,
->  					void *user_data)
->  {
->  	struct bap_ep *ep =3D user_data;
-> -	DBusMessage *reply;
-> =20
->  	DBG("stream %p code 0x%02x reason 0x%02x", stream, code, reason);
-> =20
->  	ep->id =3D 0;
-> =20
-> -	if (!code)
-> -		return;
-> +	ep_reply_msg(ep, code ? "Unable to configure" : NULL);
-> +}
-> =20
-> -	if (!ep->msg)
-> -		return;
-> +static void config_cb(struct bt_bap_stream *stream,
-> +					uint8_t code, uint8_t reason,
-> +					void *user_data)
-> +{
-> +	struct bap_ep *ep =3D user_data;
-> =20
-> -	reply =3D btd_error_failed(ep->msg, "Unable to configure");
-> -	g_dbus_send_message(btd_get_dbus_connection(), reply);
-> +	DBG("stream %p code 0x%02x reason 0x%02x", stream, code, reason);
-> =20
-> -	dbus_message_unref(ep->msg);
-> -	ep->msg =3D NULL;
-> +	ep->id =3D 0;
-> +
-> +	if (code)
-> +		ep_reply_msg(ep, "Unable to configure");
->  }
-> =20
->  static void bap_io_close(struct bap_ep *ep)
-> @@ -1202,7 +1198,7 @@ static void bap_config(void *data, void *user_data)
->  	bt_bap_stream_set_user_data(ep->stream, ep->path);
->  }
-> =20
-> -static void select_cb(struct bt_bap_pac *pac, int err, struct iovec *cap=
-s,
-> +static void select_codec_cb(struct bt_bap_pac *pac, int err, struct iove=
-c *caps,
->  				struct iovec *metadata, struct bt_bap_qos *qos,
->  				void *user_data)
->  {
-> @@ -1252,7 +1248,7 @@ static bool pac_found(struct bt_bap_pac *lpac, stru=
-ct bt_bap_pac *rpac,
-> =20
->  	/* TODO: Cache LRU? */
->  	if (btd_service_is_initiator(service)) {
-> -		if (!bt_bap_select(lpac, rpac, select_cb, ep))
-> +		if (!bt_bap_select_codec(lpac, rpac, select_codec_cb, ep))
->  			ep->data->selecting++;
->  	}
-> =20
-> @@ -1877,6 +1873,36 @@ static void bap_create_io(struct bap_data *data, s=
-truct bap_ep *ep,
->  	}
->  }
-> =20
-> +static void select_qos_cb(struct bt_bap_stream *stream, int err,
-> +					struct bt_bap_qos *qos, void *user_data)
-> +{
-> +	struct bap_ep *ep =3D user_data;
-> +
-> +	DBG("stream %p err %d qos %p", stream, err, qos);
-> +
-> +	if (err || ep->id)
-> +		goto fail;
-> +
-> +	if (qos)
-> +		ep->qos =3D *qos;
-> +
-> +	bap_create_io(ep->data, ep, stream, true);
+> Regards,
+> Ethan
+>=20
 
-This uses old QoS values, needs to be fixed.
-
-For v2.
-
-> +	if (!ep->io) {
-> +		error("Unable to create io");
-> +		goto fail;
-> +	}
-> +
-> +	ep->id =3D bt_bap_stream_qos(stream, &ep->qos, qos_cb, ep);
-> +	if (!ep->id)
-> +		goto fail;
-> +
-> +	return;
-> +
-> +fail:
-> +	error("Failed to Configure QoS");
-> +	ep_reply_msg(ep, "Unable to configure");
-> +}
-> +
->  static void bap_state(struct bt_bap_stream *stream, uint8_t old_state,
->  				uint8_t new_state, void *user_data)
->  {
-> @@ -1902,25 +1928,27 @@ static void bap_state(struct bt_bap_stream *strea=
-m, uint8_t old_state,
->  			queue_remove(data->streams, stream);
->  		break;
->  	case BT_BAP_STREAM_STATE_CONFIG:
-> -		if (ep && !ep->id) {
-> +		if (!ep || ep->id)
-> +			break;
-> +
-> +		switch (bt_bap_stream_get_type(stream)) {
-> +		case BT_BAP_STREAM_TYPE_UCAST:
-> +			if (bt_bap_stream_select_qos(stream,
-> +							select_qos_cb, ep)) {
-> +				error("Failed to Configure QoS");
-> +				bt_bap_stream_release(stream,
-> +						NULL, NULL);
-> +				return;
-> +			}
-> +			break;
-> +		case BT_BAP_STREAM_TYPE_BCAST:
->  			bap_create_io(data, ep, stream, true);
->  			if (!ep->io) {
->  				error("Unable to create io");
->  				bt_bap_stream_release(stream, NULL, NULL);
->  				return;
->  			}
-> -
-> -			if (bt_bap_stream_get_type(stream) =3D=3D
-> -					BT_BAP_STREAM_TYPE_UCAST) {
-> -				/* Wait QoS response to respond */
-> -				ep->id =3D bt_bap_stream_qos(stream, &ep->qos,
-> -								qos_cb,	ep);
-> -				if (!ep->id) {
-> -					error("Failed to Configure QoS");
-> -					bt_bap_stream_release(stream,
-> -								NULL, NULL);
-> -				}
-> -			}
-> +			break;
->  		}
->  		break;
->  	case BT_BAP_STREAM_STATE_QOS:
-> diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-> index 4d9a6aa03..42bc21386 100644
-> --- a/profiles/audio/media.c
-> +++ b/profiles/audio/media.c
-> @@ -318,6 +318,17 @@ static void endpoint_reply(DBusPendingCall *call, vo=
-id *user_data)
-> =20
->  	dbus_error_init(&err);
->  	if (dbus_set_error_from_message(&err, reply)) {
-> +		/* Endpoint is not required to implement SelectQoS */
-> +		if (dbus_error_has_name(&err, DBUS_ERROR_UNKNOWN_METHOD) &&
-> +		    dbus_message_is_method_call(request->msg,
-> +				    MEDIA_ENDPOINT_INTERFACE, "SelectQoS")) {
-> +			dbus_error_free(&err);
-> +			value =3D FALSE;
-> +			size =3D sizeof(value);
-> +			ret =3D &value;
-> +			goto done;
-> +		}
-> +
->  		error("Endpoint replied with an error: %s",
->  				err.name);
-> =20
-> @@ -358,6 +369,13 @@ static void endpoint_reply(DBusPendingCall *call, vo=
-id *user_data)
->  		dbus_message_iter_recurse(&args, &props);
->  		ret =3D &props;
->  		goto done;
-> +	} else if (dbus_message_is_method_call(request->msg,
-> +						MEDIA_ENDPOINT_INTERFACE,
-> +						"SelectQoS")) {
-> +		dbus_message_iter_init(reply, &args);
-> +		dbus_message_iter_recurse(&args, &props);
-> +		ret =3D &props;
-> +		goto done;
->  	} else if (!dbus_message_get_args(reply, &err, DBUS_TYPE_INVALID)) {
->  		error("Wrong reply signature: %s", err.message);
->  		dbus_error_free(&err);
-> @@ -725,9 +743,9 @@ static bool endpoint_init_a2dp_sink(struct media_endp=
-oint *endpoint, int *err)
->  	return true;
->  }
-> =20
-> -struct pac_select_data {
-> +struct pac_select_codec_data {
->  	struct bt_bap_pac *pac;
-> -	bt_bap_pac_select_t cb;
-> +	bt_bap_pac_select_codec_t cb;
->  	void *user_data;
->  };
-> =20
-> @@ -881,10 +899,10 @@ fail:
->  	return -EINVAL;
->  }
-> =20
-> -static void pac_select_cb(struct media_endpoint *endpoint, void *ret, in=
-t size,
-> -							void *user_data)
-> +static void pac_select_codec_cb(struct media_endpoint *endpoint, void *r=
-et,
-> +						int size, void *user_data)
->  {
-> -	struct pac_select_data *data =3D user_data;
-> +	struct pac_select_codec_data *data =3D user_data;
->  	DBusMessageIter *iter =3D ret;
->  	int err;
->  	struct iovec caps, meta;
-> @@ -920,15 +938,15 @@ done:
->  	data->cb(data->pac, err, &caps, &meta, &qos, data->user_data);
->  }
-> =20
-> -static int pac_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
-> -			struct bt_bap_pac_qos *qos,
-> -			bt_bap_pac_select_t cb, void *cb_data, void *user_data)
-> +static int pac_select_codec(struct bt_bap_pac *lpac, struct bt_bap_pac *=
-rpac,
-> +			bt_bap_pac_select_codec_t cb, void *cb_data,
-> +			void *user_data)
->  {
->  	struct media_endpoint *endpoint =3D user_data;
->  	struct iovec *caps;
->  	struct iovec *metadata;
->  	const char *endpoint_path;
-> -	struct pac_select_data *data;
-> +	struct pac_select_codec_data *data;
->  	DBusMessage *msg;
->  	DBusMessageIter iter, dict;
->  	const char *key =3D "Capabilities";
-> @@ -946,7 +964,7 @@ static int pac_select(struct bt_bap_pac *lpac, struct=
- bt_bap_pac *rpac,
->  		return -ENOMEM;
->  	}
-> =20
-> -	data =3D new0(struct pac_select_data, 1);
-> +	data =3D new0(struct pac_select_codec_data, 1);
->  	data->pac =3D lpac;
->  	data->cb =3D cb;
->  	data->user_data =3D cb_data;
-> @@ -977,47 +995,151 @@ static int pac_select(struct bt_bap_pac *lpac, str=
-uct bt_bap_pac *rpac,
->  						metadata->iov_len);
->  	}
-> =20
-> -	if (qos && qos->phy) {
-> -		DBusMessageIter entry, variant, qos_dict;
-> +	dbus_message_iter_close_container(&iter, &dict);
-> +
-> +	return media_endpoint_async_call(msg, endpoint, NULL,
-> +					pac_select_codec_cb, data, free);
-> +}
-> +
-> +struct pac_select_qos_data {
-> +	struct bt_bap_stream *stream;
-> +	bt_bap_pac_select_qos_t cb;
-> +	void *user_data;
-> +};
-> +
-> +static void pac_select_qos_cb(struct media_endpoint *endpoint, void *ret=
-,
-> +						int size, void *user_data)
-> +{
-> +	struct pac_select_qos_data *data =3D user_data;
-> +	DBusMessageIter *iter =3D ret;
-> +	int err;
-> +	struct bt_bap_qos qos;
-> +
-> +	if (!ret) {
-> +		data->cb(data->stream, -EPERM, NULL, data->user_data);
-> +		return;
-> +	} else if (size > 0) {
-> +		/* Endpoint doesn't implement the method, use old values */
-> +		data->cb(data->stream, 0, NULL, data->user_data);
-> +		return;
-> +	}
-> +
-> +	if (dbus_message_iter_get_arg_type(iter) !=3D DBUS_TYPE_DICT_ENTRY) {
-> +		DBG("Unexpected argument type: %c !=3D %c",
-> +			    dbus_message_iter_get_arg_type(iter),
-> +			    DBUS_TYPE_DICT_ENTRY);
-> +		data->cb(data->stream, -EINVAL, NULL, data->user_data);
-> +		return;
-> +	}
-> +
-> +	memset(&qos, 0, sizeof(qos));
-> +
-> +	/* Mark CIG and CIS to be auto assigned */
-> +	qos.ucast.cig_id =3D BT_ISO_QOS_CIG_UNSET;
-> +	qos.ucast.cis_id =3D BT_ISO_QOS_CIS_UNSET;
-> +
-> +	err =3D parse_select_properties(iter, NULL, NULL, &qos);
-> +	if (err < 0)
-> +		DBG("Unable to parse properties");
-> +
-> +	data->cb(data->stream, err, &qos, data->user_data);
-> +}
-> =20
-> -		key =3D "QoS";
-> -		dbus_message_iter_open_container(&dict, DBUS_TYPE_DICT_ENTRY,
-> -								NULL, &entry);
-> -		dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
-> -		dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT,
-> -							"a{sv}", &variant);
-> -		dbus_message_iter_open_container(&variant, DBUS_TYPE_ARRAY,
-> -							"{sv}", &qos_dict);
-> +static int pac_select_qos(struct bt_bap_stream *stream,
-> +			struct bt_bap_pac_qos *qos, bt_bap_pac_select_qos_t cb,
-> +			void *cb_data, void *user_data)
-> +{
-> +	struct media_endpoint *endpoint =3D user_data;
-> +	struct bt_bap_pac *rpac;
-> +	const char *endpoint_path;
-> +	struct pac_select_qos_data *data;
-> +	struct iovec *caps, *metadata;
-> +	DBusMessage *msg;
-> +	DBusMessageIter iter, dict;
-> +	DBusMessageIter entry, variant, qos_dict;
-> +	const char *key =3D "Capabilities";
-> +
-> +	rpac =3D bt_bap_stream_get_rpac(stream);
-> +	if (!rpac)
-> +		return -EINVAL;
-> =20
-> -		g_dbus_dict_append_entry(&qos_dict, "Framing", DBUS_TYPE_BYTE,
-> -							&qos->framing);
-> +	caps =3D bt_bap_stream_get_config(stream);
-> +	if (!caps)
-> +		return -EINVAL;
-> =20
-> -		g_dbus_dict_append_entry(&qos_dict, "PHY", DBUS_TYPE_BYTE,
-> -							&qos->phy);
-> +	msg =3D dbus_message_new_method_call(endpoint->sender, endpoint->path,
-> +						MEDIA_ENDPOINT_INTERFACE,
-> +						"SelectQoS");
-> +	if (msg =3D=3D NULL) {
-> +		error("Couldn't allocate D-Bus message");
-> +		return -ENOMEM;
-> +	}
-> =20
-> -		g_dbus_dict_append_entry(&qos_dict, "MaximumLatency",
-> -					DBUS_TYPE_UINT16, &qos->latency);
-> +	data =3D new0(struct pac_select_qos_data, 1);
-> +	data->stream =3D stream;
-> +	data->cb =3D cb;
-> +	data->user_data =3D cb_data;
-> =20
-> -		g_dbus_dict_append_entry(&qos_dict, "MinimumDelay",
-> -					DBUS_TYPE_UINT32, &qos->pd_min);
-> +	dbus_message_iter_init_append(msg, &iter);
-> =20
-> -		g_dbus_dict_append_entry(&qos_dict, "MaximumDelay",
-> -					DBUS_TYPE_UINT32, &qos->pd_max);
-> +	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY, "{sv}", &dict)=
-;
-> =20
-> -		g_dbus_dict_append_entry(&qos_dict, "PreferredMinimumDelay",
-> -					DBUS_TYPE_UINT32, &qos->ppd_min);
-> +	endpoint_path =3D bt_bap_pac_get_user_data(rpac);
-> +	if (endpoint_path)
-> +		g_dbus_dict_append_entry(&dict, "Endpoint",
-> +					DBUS_TYPE_OBJECT_PATH, &endpoint_path);
-> =20
-> -		g_dbus_dict_append_entry(&qos_dict, "PreferredMaximumDelay",
-> -					DBUS_TYPE_UINT32, &qos->ppd_max);
-> +	key =3D "Capabilities";
-> +	g_dbus_dict_append_basic_array(&dict, DBUS_TYPE_STRING, &key,
-> +						DBUS_TYPE_BYTE, &caps->iov_base,
-> +						caps->iov_len);
-> =20
-> -		dbus_message_iter_close_container(&variant, &qos_dict);
-> -		dbus_message_iter_close_container(&entry, &variant);
-> -		dbus_message_iter_close_container(&dict, &entry);
-> +	metadata =3D bt_bap_stream_get_metadata(stream);
-> +	if (metadata) {
-> +		key =3D "Metadata";
-> +		g_dbus_dict_append_basic_array(&dict, DBUS_TYPE_STRING, &key,
-> +						DBUS_TYPE_BYTE,
-> +						&metadata->iov_base,
-> +						metadata->iov_len);
->  	}
-> =20
-> +	key =3D "QoS";
-> +	dbus_message_iter_open_container(&dict, DBUS_TYPE_DICT_ENTRY,
-> +			NULL, &entry);
-> +	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
-> +	dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT,
-> +			"a{sv}", &variant);
-> +	dbus_message_iter_open_container(&variant, DBUS_TYPE_ARRAY,
-> +			"{sv}", &qos_dict);
-> +
-> +	g_dbus_dict_append_entry(&qos_dict, "Framing", DBUS_TYPE_BYTE,
-> +			&qos->framing);
-> +
-> +	g_dbus_dict_append_entry(&qos_dict, "PHY", DBUS_TYPE_BYTE,
-> +			&qos->phy);
-> +
-> +	g_dbus_dict_append_entry(&qos_dict, "MaximumLatency",
-> +			DBUS_TYPE_UINT16, &qos->latency);
-> +
-> +	g_dbus_dict_append_entry(&qos_dict, "MinimumDelay",
-> +			DBUS_TYPE_UINT32, &qos->pd_min);
-> +
-> +	g_dbus_dict_append_entry(&qos_dict, "MaximumDelay",
-> +			DBUS_TYPE_UINT32, &qos->pd_max);
-> +
-> +	g_dbus_dict_append_entry(&qos_dict, "PreferredMinimumDelay",
-> +			DBUS_TYPE_UINT32, &qos->ppd_min);
-> +
-> +	g_dbus_dict_append_entry(&qos_dict, "PreferredMaximumDelay",
-> +			DBUS_TYPE_UINT32, &qos->ppd_max);
-> +
-> +	dbus_message_iter_close_container(&variant, &qos_dict);
-> +	dbus_message_iter_close_container(&entry, &variant);
-> +	dbus_message_iter_close_container(&dict, &entry);
-> +
->  	dbus_message_iter_close_container(&iter, &dict);
-> =20
-> -	return media_endpoint_async_call(msg, endpoint, NULL, pac_select_cb,
-> +	return media_endpoint_async_call(msg, endpoint, NULL, pac_select_qos_cb=
-,
->  								data, free);
->  }
-> =20
-> @@ -1187,8 +1309,9 @@ static void pac_clear(struct bt_bap_stream *stream,=
- void *user_data)
->  }
-> =20
->  static struct bt_bap_pac_ops pac_ops =3D {
-> -	.select =3D pac_select,
-> +	.select_codec =3D pac_select_codec,
->  	.config =3D pac_config,
-> +	.select_qos =3D pac_select_qos,
->  	.clear =3D pac_clear,
->  };
-> =20
-
+--=20
+Pauli Virtanen
