@@ -1,160 +1,112 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 886783AC1E
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Nov 2023 19:49:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 814C33B28F
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Nov 2023 19:57:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VTRpU+2/"
-Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C4863AAE
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Nov 2023 11:49:14 -0800 (PST)
-Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2c6b5841f61so27008121fa.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Nov 2023 11:49:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699645753; x=1700250553; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bjU3eUt1btTmqETSk7rVg/q+7PaZxcnIJIyWmV+mZzQ=;
-        b=VTRpU+2/hTi/CaE153gAsbcEB8p7x3HNduD+bUn0vut06HRCU7z/GsaEIYKtsUjn1K
-         EXUn0sPm9cPRcSY1ZzUjYuRq6H3h4pewN9bDN6hAxbrXSRSA7pNjCCukauD8o+UxnbrB
-         cKpUdoZ4p+hBQjhRPPMdBltsN1VFLeXPnKeda89bI9bQbue1YcZEFbmjRrgnT3eKMOkN
-         I/SHstTOA6He5X3dumQl3YYFByPIzVDCrhRAIwz7iuF45hTVtV5qSaMSKMe7FoSOLyoS
-         9QJv+fUI5HBNk6UcPamryvTo8pGxzBmEtWlfUu7Ty6EraaZUVZjLCeAk06EQhcDTzZCj
-         4bSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699645753; x=1700250553;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bjU3eUt1btTmqETSk7rVg/q+7PaZxcnIJIyWmV+mZzQ=;
-        b=gvLcLSm+JIIQU1Xug+c39iMHg5uN9mhIGfFVKWDs6npHftQkBPiW4NAYPFpmDytOyJ
-         fJ2P2dTnX1MZiBPgjSSVvVfxPLqpG+KyxTgtlsJ6VQTJiyar9k2oLryPIlSYyQrV6SvI
-         1zsBxweipAjDj9ntvl3FAzF9RaR9TZYGD08L52nxvZ8rgr+hPAcsaiNzKjM5RUFjEJmC
-         8JyW7N8V1v0cHoThmRnPYHPvLtVH2hkkygwMHURBM6LnkaZOfkbyVDDBH156fxqUWLm3
-         hJjKiPkpFRHGLRZNaE0I9sn4nJaCN79TUn4v6Mr5T6qJMBrjw8xP3svvn4D1vp3iIqWe
-         nCaw==
-X-Gm-Message-State: AOJu0YzWPsCsjAzcQgYv1LmGOseZImSqG/AQVa3xKmg3mEWnMQPehb8t
-	uPei/WYRZW+c2M3DMNJ7k4GWIPWDr25lE7IGY20=
-X-Google-Smtp-Source: AGHT+IFoVsQknBnJ+kXdpTfhEGulVbDaRc0Q4ldH41wooVwH7ktHLMrislqefCVihIV/m+DyopPvOP0A43zqIjfWFiM=
-X-Received: by 2002:a2e:b60b:0:b0:2c0:c6a:8795 with SMTP id
- r11-20020a2eb60b000000b002c00c6a8795mr1238098ljn.24.1699645752435; Fri, 10
- Nov 2023 11:49:12 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="euMHhCPf"
+Received: from meesny.iki.fi (meesny.iki.fi [IPv6:2001:67c:2b0:1c1::201])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 059C3A9
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Nov 2023 11:57:56 -0800 (PST)
+Received: from monolith.lan (unknown [193.138.7.138])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4SRqPF6nwWzyQj;
+	Fri, 10 Nov 2023 21:57:51 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1699646274;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=tdyZHuLIhy866iHM7p6erjROQXYArwIjpy1RasqprSc=;
+	b=euMHhCPfQ/xMb/P2RTZ0Q/KEd421Q0AYkvh8FjB0b+hTdl1pYJjMABHUQYVPuSHPZT87Rm
+	yHFU6jv4GL99QCdbS4OyPmfuk+6CvAezBEynJUYVBa6+5PYu74SUvaXKcuA/FS9tZ9RrZ5
+	TZWUGeEKC8HK0IZD80BbZDwQ2QEzTA0=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1699646274;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=tdyZHuLIhy866iHM7p6erjROQXYArwIjpy1RasqprSc=;
+	b=d4KzlwVmGPPJacRbSaX6HT0QyG6r+VyZraOMzhK+Wma6tLF0HFEWX9I3Mpb7JZMUvmp1yh
+	a2Tn2VfPALzYYgp1HR7m/e6af19Bz9Jy8gmjTZ6Z5/ncFoqEVV2xT3nbuSixtYHKsofg0l
+	6kAcsQc7ZSTKOYD7qFwflaQJ/mj83xo=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1699646274; a=rsa-sha256; cv=none;
+	b=vKmvnYS1Qz0bw52EW7CsM9hZcknbCofNMHvIL4z1N4gSNpuctET3g4dQNaia48j0hJcqWV
+	4dYqJR/jU1D7uUzWXWJB7J3nuXZr3B2JezlKWMpJq3nqEc2ztdlLEDzIQ46/bHqee/Vs77
+	/YBmyonaldsE3gV8PBJpXbVKwkDe7H0=
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ] bap: handle state transitions with old_state == new_state
+Date: Fri, 10 Nov 2023 21:57:48 +0200
+Message-ID: <5c65fa8da174de15074310ec368f537c717ded43.1699646238.git.pav@iki.fi>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <b7c90f4c-8868-42ea-86c0-3f9f2b0f27e0@braneaudio.com> <94061775-df7e-4aa5-b760-94a28a13667f@braneaudio.com>
-In-Reply-To: <94061775-df7e-4aa5-b760-94a28a13667f@braneaudio.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 10 Nov 2023 14:48:59 -0500
-Message-ID: <CABBYNZJHz1x0zwxokOecD4Fq9BNxO4Dkx+RN=fXYjbxFbs6q+g@mail.gmail.com>
-Subject: Re: a2dp delay reporting
-To: Ethan White <ethan@braneaudio.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Ethan,
+ASCS allows transitions from Codec/QoS Configured back to the same
+state.
 
-On Thu, Nov 9, 2023 at 5:36=E2=80=AFPM Ethan White <ethan@braneaudio.com> w=
-rote:
->
-> On 10/17/23 13:10, Ethan White wrote:
-> > Hi,
-> >
-> > How do I inform Bluez of my a2dp transport delay?  The media-api
-> > document shows a Delay property for the MediaTransport1 interface but
-> > attempts at writing this property yield the following error:
-> >
-> > org.freedesktop.DBus.Error.PropertyReadOnly: Property 'Delay' is not
-> > writable
-> >
-> >
-> > Reviewing profiles/audio/transport.c a2dp_properties (Bluez 5.70) I fin=
-d
-> > that the delay property does not have a set function:
-> >
-> > line 846: { "Delay", "q", get_delay_reporting, NULL,
-> > delay_reporting_exists },
-> >
-> >
-> > What am I missing here?  How an I supposed to inform the a2dp source of
-> > my playback delay?  Thanks for any help.
-> >
-> > Regards,
-> > Ethan
->
-> I'm currently using org.bluez.Media1 RegisterEndpoint to expose my a2dp
-> sink to a2dp sources.  I use org.bluez.MediaTransport1 Acquire to get
-> the transport.  I can write the 'Volume' property of
-> org.bluez.MediaTransport1 to change the audio source volume.  However,
-> writing to the 'Delay' property of the org.bluez.MediaTransport1
-> interface yields only errors as this property appears to be read-only
-> despite bluez/docs/media-api.rst showing this property to be read/write.
->
-> When using busctl from the host running my a2dp sink to inspect the
-> transport I get a dash '-' in place of a numerical value:
-> host:~$ busctl introspect  org.bluez
-> /org/bluez/hci0/dev_xx_xx_xx_xx_xx_xx/fd0
-> NAME                                TYPE      SIGNATURE RESULT/VALUE
->                         FLAGS
-> org.bluez.MediaTransport1           interface -         -
->                         -
-> .Acquire                            method    -         hqq
->                         -
-> .Release                            method    -         -
->                         -
-> .TryAcquire                         method    -         hqq
->                         -
-> .Codec                              property  y         2
->                         emits-change
-> .Configuration                      property  ay        6 128 1 4 131
-> 232 0                     emits-change
-> .Delay                              property  q         -
->                         emits-change
-> .Device                             property  o
-> "/org/bluez/hci0/dev_E8_78_65_F2_14_24" emits-change
-> .State                              property  s         "active"
->                         emits-change
-> .UUID                               property  s
-> "0000110b-0000-1000-8000-00805f9b34fb"  emits-change
-> .Volume                             property  q         64
->                         emits-change writable
-> org.freedesktop.DBus.Introspectable interface -         -
->                         -
-> .Introspect                         method    -         s
->                         -
-> org.freedesktop.DBus.Properties     interface -         -
->                         -
-> .Get                                method    ss        v
->                         -
-> .GetAll                             method    s         a{sv}
->                         -
-> .Set                                method    ssv       -
->                         -
-> .PropertiesChanged                  signal    sa{sv}as  -
->                         -
->
-> Does Bluez allow an a2dp sink to report its playback delay to the a2dp
-> source via the org.bluez.MediaTransport1 Delay property?  Is there some
-> other way to communicate this delay back to the audio source for proper
-> lip-sync with video?
+E.g. NRF5340_AUDIO devkit starts in the config(1) state, which is
+allowed (only Config QoS, Release, Enable, Receiver Stop Ready
+transition are client-only). In this case, as client, we do Config Codec
+ourselves and end up with config(1)->config(1) transition.  We currently
+ignore that event, so QoS won't be setup and transports won't be
+created.
 
-Looks like setting the Delay was never implemented:
+Handle the config(1)->config(1) transition by continuing to Config QoS
+if it occurs.
 
-https://github.com/bluez/bluez/blob/master/profiles/audio/transport.c#L878
+Log:
 
-File an issue at github, I don't have time to resolve it right now but
-it should be relatively trivial to implement it.
+src/gatt-client.c:btd_gatt_client_connected() Device connected.
+src/shared/gatt-client.c:exchange_mtu_cb() MTU exchange complete, with MTU: 65
+src/shared/bap.c:bap_ep_set_status() ASE status: ep 0x604000039a90 id 0x01 handle 0x000f state config len 42
+src/shared/bap.c:ep_status_config() codec 0x06 framing 0x00 phy 0x02 rtn 2 latency 10 pd 4000 - 40000 ppd 4000 - 40000
+src/shared/bap.c:ep_status_config() Codec Config #0: type 0x01 len 2
+src/shared/bap.c:ep_status_config() Codec Config #1: type 0x02 len 2
+src/shared/bap.c:ep_status_config() Codec Config #2: type 0x03 len 5
+src/shared/bap.c:ep_status_config() Codec Config #3: type 0x04 len 3
+src/shared/bap.c:ep_status_config() Codec Config #4: type 0x05 len 2
+src/shared/bap.c:bap_stream_state_changed() stream 0x60c0000334c0 dir 0x01: idle -> config
+src/shared/bap.c:bap_stream_update_io_links() stream 0x60c0000334c0
+profiles/audio/bap.c:bap_state() stream 0x60c0000334c0: idle(0) -> config(1)
+profiles/audio/bap.c:bap_ready() bap 0x60e000001d20
+profiles/audio/bap.c:pac_found() lpac 0x608000017520 rpac 0x6080000183a0
+profiles/audio/bap.c:ep_register() ep 0x60d000006910 lpac 0x608000017520 rpac 0x6080000183a0 path /org/bluez/hci0/dev_C9_C9_76_21_08_4F/pac_sink0
+profiles/audio/media.c:media_endpoint_async_call() Calling SelectProperties: name = :1.604 path = /MediaEndpointLE/BAPSource/lc3
+...
+src/shared/bap.c:bap_stream_state_changed() stream 0x60c0000334c0 dir 0x01: config -> config
+src/shared/bap.c:bap_stream_update_io_links() stream 0x60c0000334c0
+profiles/audio/bap.c:bap_state() stream 0x60c0000334c0: config(1) -> config(1)
+---
+ profiles/audio/bap.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> Regards,
-> Ethan
->
->
+diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
+index b74498c4c..30a585ede 100644
+--- a/profiles/audio/bap.c
++++ b/profiles/audio/bap.c
+@@ -1887,7 +1887,7 @@ static void bap_state(struct bt_bap_stream *stream, uint8_t old_state,
+ 			bt_bap_stream_statestr(old_state), old_state,
+ 			bt_bap_stream_statestr(new_state), new_state);
+ 
+-	if (new_state == old_state)
++	if (old_state == new_state && new_state != BT_BAP_STREAM_STATE_CONFIG)
+ 		return;
+ 
+ 	ep = bap_find_ep_by_stream(data, stream);
+-- 
+2.41.0
 
-
---=20
-Luiz Augusto von Dentz
