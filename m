@@ -1,275 +1,105 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3822914ABC
-	for <linux-bluetooth@vger.kernel.org>; Sun, 12 Nov 2023 16:00:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EE7514F9F
+	for <linux-bluetooth@vger.kernel.org>; Sun, 12 Nov 2023 17:26:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="IAgkvRRn"
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [IPv6:2a0b:5c81:1c1::37])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA197270C
-	for <linux-bluetooth@vger.kernel.org>; Sun, 12 Nov 2023 08:00:15 -0800 (PST)
-Received: from monolith.lan (unknown [193.138.7.158])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4SSy260q5rz49Q7j;
-	Sun, 12 Nov 2023 18:00:14 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1699804814;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SboCuILEitsKKZv2da7stJZC84zQez3mCufNSw1yIVw=;
-	b=IAgkvRRnCI3pEbbU92EqnNk24J8M/L3k3I28wZ8e/EwKPK9LNnj21x9Q7Y/fi+KhmLZYEX
-	O2JFLcX6hX4eOjh3AZ2Misq0SjI7vDrXNudVnULkRWs172fn6UASwvC12VwjNzWkv3ZqBI
-	IyY0Gy7BujHwcSKscu24vQPYVkzIhBF27YRHJ+Y5QkznwGbaiNMpFgD+UTHiPkOHinJNfW
-	q6RX0ZscB0WesU+go5HwqU77fbboRlrGZPvbJqSs/45nOejhDvxIB2J4vqjkBx6XuscNbk
-	WetGVUbq5DarmyWD5GIElChui6/jjtXkJW/Z/Ty2+k462voMeKluJBQyD8FmdQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1699804814;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SboCuILEitsKKZv2da7stJZC84zQez3mCufNSw1yIVw=;
-	b=k2lHl+z4HMorqySrjDWeFrsptpEPvdeMGtGUAMyVnb9uyVmw/AeZ3jSzG3vTWmz8J6RpzJ
-	VKhliiyGj7xdOXQHCiQQ/dvlgmeAyCPRcx02KughWgeAZAPNndtZyZquA4EBKfEdLNMEz1
-	zPxA7Q6fW528hCc/OvSwICutxk0g23o4kj1QVSgoF+HxLaUe0thxFqcfinIu5p9vkxEAnj
-	FrH5vPfZuldP7pj8Kl2WFpigtGMcpWiZ/HIRFf1XTvWwiNp56NfcS3fNtJWsoL8NVD/VJt
-	M5lX5rqCMxPFgomeQBZHeOprvj8Mvai9WvylQJAO2rPyDGnFa//7p5fufn8ZTw==
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1699804814; a=rsa-sha256;
-	cv=none;
-	b=CqR4xg5a80dC6ljZMvXWl/vODrR3PN5vSuABlZu9TZO+OZNDdlBhfZR7tHe4Hx1FdimuOB
-	hBRLo5CcDO/y016+jUAc3R4oWn4ikHARQFrjcKLdjEtwH2hzT8Xk8BWlqpdW69GVbL6tUF
-	rpr0rKWNpinhMNISTlej73xBiAVAta0H6Y9vqKtpRc0YcEL2LXNbfV1PJvEUV4aEuI62bb
-	tAWUGZpohWr+aS665d045T9tz1cMpl8Z8FYJ4V1ShFqiQV3rOMup0jlPDvcj8SoB3gjNfk
-	pfE7ZI2CW4QSdy9SX/LkCYoySQz64JfqAwtlnO7b/Uq/mfIaXAsQZJPwrC9Asw==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 4/4] bap: skip Config Codec when it is not needed
-Date: Sun, 12 Nov 2023 18:00:05 +0200
-Message-ID: <d87d28773b298e80913df611eb446dcc2a7c9733.1699802164.git.pav@iki.fi>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <b48261aeab5a4f5927c9da5296b2ffb079bee375.1699802164.git.pav@iki.fi>
-References: <b48261aeab5a4f5927c9da5296b2ffb079bee375.1699802164.git.pav@iki.fi>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YZyQ9C5J"
+Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F573259A
+	for <linux-bluetooth@vger.kernel.org>; Sun, 12 Nov 2023 09:26:03 -0800 (PST)
+Received: by mail-qk1-x735.google.com with SMTP id af79cd13be357-77bac408851so393809185a.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 12 Nov 2023 09:26:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699809962; x=1700414762; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=OAhcLodK/B+bjinJGZZbbbEtJgFy/8USlkD053i0YLo=;
+        b=YZyQ9C5JvP4xQNYebYcU8dCec6T5uw5VsS8t+uTY42JdH8vJJbPzlw6ZoOT/NuJcci
+         4kPmJGr7WnubGdYuOKqqlI49pSwj+yX22zEJdZJyz+y9hUVehS0BAQT5U1kaVAa+7dIi
+         PfrR8MUoBa6nUYflkbERPyPqc0Yhe0/co6mj2A+GbZcmKPVUfeot1zyOV1VpSfsPyQFT
+         BrBPpXQF0Bm4IBs0GMvHPuj3fLD+9JyiKS7PXu1VOAk2aO+GYAiRwnoPUoI++gB5ZvL8
+         I+/U2D62Qt3x0DaLlLNOSv5ixZyQPMBfJO9yp0BS/rCc3zp2Q0V6TQmW8TZhCMAuh5oa
+         +opQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699809962; x=1700414762;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OAhcLodK/B+bjinJGZZbbbEtJgFy/8USlkD053i0YLo=;
+        b=fjBcVZsWCDkjgjE6530c43DRTj+4Vciyh1l0OmIT1n0w0h8iuKKijyUs45RIdPXVkn
+         kEeO+jfhpaFiu5dIaLqgUcXuraaZEctIotEKwHMwUHgAICrAlromgiv3JjByrU9E+YMI
+         2t1lZG2b2PRDa9wlG9iIceuxp+mDR1hMISMWCT8HDNec/k0OMtnH+5/MHpeG5S2tIk5P
+         7FYJVEx5kF8/yOS1AEkQMHEpspp83EsYLA66LVrx++v3gAASzrzCFwi4psxmYs6/0v8b
+         VPyTRB46cmD7sL11UO4GrAmHQAXHMZnWJ2xppeUlWNP9sRSxewrE+NOXGxsL3LrTUuah
+         tVVw==
+X-Gm-Message-State: AOJu0YwDYZ0gTdATDMzcljFJs1+hRFfCAQ1/xbtNACRjUjnzvEZpW1Lb
+	tx6cdv5mtyTRvPQNR+Ix3w3959+fvBw+ZA==
+X-Google-Smtp-Source: AGHT+IFLYxkyLzwiUHLPgOabOV9Zg/kyZu2CtHdcsXbW9gPfyFpVryrsPqHMEznay/UgZqPvijE8lQ==
+X-Received: by 2002:ad4:46d5:0:b0:671:560f:3306 with SMTP id pm21-20020ad446d5000000b00671560f3306mr8249599qvb.4.1699809962215;
+        Sun, 12 Nov 2023 09:26:02 -0800 (PST)
+Received: from [172.17.0.2] ([20.97.191.176])
+        by smtp.gmail.com with ESMTPSA id q11-20020a0cfa0b000000b0066d1e71e515sm1394121qvn.113.2023.11.12.09.26.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 12 Nov 2023 09:26:01 -0800 (PST)
+Message-ID: <65510aa9.0c0a0220.84fe5.38ae@mx.google.com>
+Date: Sun, 12 Nov 2023 09:26:01 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0964375655498957443=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: [BlueZ,1/4] shared/bap: add bt_bap_stream_config_update for updating QoS choice
+In-Reply-To: <b48261aeab5a4f5927c9da5296b2ffb079bee375.1699802164.git.pav@iki.fi>
+References: <b48261aeab5a4f5927c9da5296b2ffb079bee375.1699802164.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-If the ASE is in Codec Configured state and the configuration matches
-what we want, skip Config Codec and proceed directly to Config QoS.
+--===============0964375655498957443==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Combine the config setup in set_configuration with the one in
-bap_config.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=800489
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.97 seconds
+GitLint                       FAIL      1.46 seconds
+BuildEll                      PASS      23.84 seconds
+BluezMake                     PASS      544.63 seconds
+MakeCheck                     PASS      10.81 seconds
+MakeDistcheck                 PASS      146.51 seconds
+CheckValgrind                 PASS      207.82 seconds
+CheckSmatch                   PASS      311.76 seconds
+bluezmakeextell               PASS      95.34 seconds
+IncrementalBuild              PASS      1990.39 seconds
+ScanBuild                     PASS      886.44 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,2/4] shared/bap: move bcast configure finish out from set_user_data
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+14: B2 Line has trailing whitespace: "    "
+
+
 ---
- profiles/audio/bap.c | 137 +++++++++++++++++++++++++++----------------
- 1 file changed, 86 insertions(+), 51 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index 85532b1af..2c869e33c 100644
---- a/profiles/audio/bap.c
-+++ b/profiles/audio/bap.c
-@@ -99,6 +99,10 @@ struct bap_data {
- 
- static struct queue *sessions;
- 
-+static int ep_bap_config(struct bap_ep *ep);
-+static void bap_create_io(struct bap_data *data, struct bap_ep *ep,
-+				struct bt_bap_stream *stream, int defer);
-+
- static bool bap_data_set_user_data(struct bap_data *data, void *user_data)
- {
- 	if (!data)
-@@ -837,25 +841,11 @@ static DBusMessage *set_configuration(DBusConnection *conn, DBusMessage *msg,
- 		return btd_error_invalid_args(msg);
- 	}
- 
--	/* TODO: Check if stream capabilities match add support for Latency
--	 * and PHY.
--	 */
--	if (!ep->stream)
--		ep->stream = bt_bap_stream_new(ep->data->bap, ep->lpac,
--						ep->rpac, &ep->qos, ep->caps);
--
--	ep->id = bt_bap_stream_config(ep->stream, &ep->qos, ep->caps,
--						config_cb, ep);
--	if (!ep->id) {
-+	if (ep_bap_config(ep) < 0) {
- 		DBG("Unable to config stream");
--		free(ep->caps);
--		ep->caps = NULL;
- 		return btd_error_invalid_args(msg);
- 	}
- 
--	bt_bap_stream_set_user_data(ep->stream, ep->path);
--	bt_bap_stream_bcast_configured(ep->stream);
--
- 	if (ep->metadata && ep->metadata->iov_len)
- 		bt_bap_stream_metadata(ep->stream, ep->metadata, NULL, NULL);
- 
-@@ -1175,34 +1165,100 @@ static struct bap_ep *ep_register(struct btd_service *service,
- 	return ep;
- }
- 
--static void bap_config(void *data, void *user_data)
-+static int ep_bap_qos(struct bap_ep *ep)
- {
--	struct bap_ep *ep = data;
-+	struct bap_data *data = ep->data;
-+	struct bt_bap_stream *stream = ep->stream;
-+
-+	if (ep->id)
-+		return -EBUSY;
-+	if (!stream || !ep->caps)
-+		return -EINVAL;
-+
-+	bap_create_io(data, ep, stream, true);
-+	if (!ep->io) {
-+		error("Unable to create io");
-+		goto fail;
-+	}
-+
-+	switch (bt_bap_stream_get_type(stream)) {
-+	case BT_BAP_STREAM_TYPE_UCAST:
-+		/* Wait QoS response to respond */
-+		ep->id = bt_bap_stream_qos(stream, &ep->qos, qos_cb, ep);
-+		if (!ep->id) {
-+			error("Failed to Configure QoS");
-+			goto fail;
-+		}
-+		break;
-+	}
-+
-+	return 0;
-+
-+fail:
-+	bt_bap_stream_release(stream, NULL, NULL);
-+	return -EIO;
-+}
-+
-+static void ep_clear_config(struct bap_ep *ep)
-+{
-+	util_iov_free(ep->caps, 1);
-+	ep->caps = NULL;
-+	util_iov_free(ep->metadata, 1);
-+	ep->metadata = NULL;
-+	memset(&ep->qos, 0, sizeof(ep->qos));
-+}
-+
-+static int ep_bap_config(struct bap_ep *ep)
-+{
-+	struct iovec *caps;
- 
- 	DBG("ep %p caps %p metadata %p", ep, ep->caps, ep->metadata);
- 
- 	if (!ep->caps)
--		return;
-+		return -EINVAL;
-+	if (ep->id)
-+		return -EBUSY;
- 
- 	/* TODO: Check if stream capabilities match add support for Latency
- 	 * and PHY.
- 	 */
--	if (!ep->stream)
-+	if (!ep->stream) {
- 		ep->stream = bt_bap_stream_new(ep->data->bap, ep->lpac,
--						ep->rpac, &ep->qos, ep->caps);
-+						ep->rpac, NULL, NULL);
-+		if (!ep->stream)
-+			goto fail;
-+	}
-+
-+	bt_bap_stream_set_user_data(ep->stream, ep->path);
-+
-+	/* Skip to QoS if reconfiguration not needed */
-+	caps = bt_bap_stream_get_config(ep->stream);
-+	if (bt_bap_stream_get_type(ep->stream) == BT_BAP_STREAM_TYPE_UCAST &&
-+	    bt_bap_stream_get_state(ep->stream) == BT_BAP_STREAM_STATE_CONFIG &&
-+	    util_iov_memcmp(caps, ep->caps) == 0) {
-+		DBG("ep %p stream %p no reconfig needed", ep, ep->stream);
-+		bt_bap_stream_config_update(ep->stream, &ep->qos);
-+		return ep_bap_qos(ep);
-+	}
- 
- 	ep->id = bt_bap_stream_config(ep->stream, &ep->qos, ep->caps,
- 						config_cb, ep);
--	if (!ep->id) {
--		DBG("Unable to config stream");
--		util_iov_free(ep->caps, 1);
--		ep->caps = NULL;
--		util_iov_free(ep->metadata, 1);
--		ep->metadata = NULL;
--	}
-+	if (!ep->id)
-+		goto fail;
- 
--	bt_bap_stream_set_user_data(ep->stream, ep->path);
- 	bt_bap_stream_bcast_configured(ep->stream);
-+
-+	return 0;
-+
-+fail:
-+	DBG("Unable to config stream");
-+	ep_clear_config(ep);
-+	return -EIO;
-+}
-+
-+static void bap_config(void *data, void *user_data)
-+{
-+	ep_bap_config(data);
- }
- 
- static void select_cb(struct bt_bap_pac *pac, int err, struct iovec *caps,
-@@ -1513,9 +1569,6 @@ static bool is_cig_busy(struct bap_data *data, uint8_t cig)
- 	return queue_find(sessions, cig_busy_session, &info);
- }
- 
--static void bap_create_io(struct bap_data *data, struct bap_ep *ep,
--				struct bt_bap_stream *stream, int defer);
--
- static gboolean bap_io_recreate(void *user_data)
- {
- 	struct bap_ep *ep = user_data;
-@@ -1909,26 +1962,8 @@ static void bap_state(struct bt_bap_stream *stream, uint8_t old_state,
- 			queue_remove(data->streams, stream);
- 		break;
- 	case BT_BAP_STREAM_STATE_CONFIG:
--		if (ep && !ep->id) {
--			bap_create_io(data, ep, stream, true);
--			if (!ep->io) {
--				error("Unable to create io");
--				bt_bap_stream_release(stream, NULL, NULL);
--				return;
--			}
--
--			if (bt_bap_stream_get_type(stream) ==
--					BT_BAP_STREAM_TYPE_UCAST) {
--				/* Wait QoS response to respond */
--				ep->id = bt_bap_stream_qos(stream, &ep->qos,
--								qos_cb,	ep);
--				if (!ep->id) {
--					error("Failed to Configure QoS");
--					bt_bap_stream_release(stream,
--								NULL, NULL);
--				}
--			}
--		}
-+		if (ep)
-+			ep_bap_qos(ep);
- 		break;
- 	case BT_BAP_STREAM_STATE_QOS:
- 		if (bt_bap_stream_get_type(stream) ==
--- 
-2.41.0
 
+--===============0964375655498957443==--
