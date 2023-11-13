@@ -1,346 +1,141 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EC29210F8
-	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Nov 2023 15:01:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BD44323C
+	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Nov 2023 15:38:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=essensium.com header.i=@essensium.com header.b="ix1pftYo"
-Received: from mail-oa1-x29.google.com (mail-oa1-x29.google.com [IPv6:2001:4860:4864:20::29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6811A10FB
-	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Nov 2023 07:01:53 -0800 (PST)
-Received: by mail-oa1-x29.google.com with SMTP id 586e51a60fabf-1f06931e4f7so2964677fac.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Nov 2023 07:01:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=essensium.com; s=google; t=1699887712; x=1700492512; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tXRTaKo6j+tqF8f0KuNqtcbp0Qu6XSznJzofnpp1uYs=;
-        b=ix1pftYorUHhw+PsotR99D5zYQsUwNoSmBiLBWRXf7QaxpEpmOOVq1n404ykbPu6Zn
-         +EBeYa2r8GbuDADFSK+br1sXJe/DySiWtwcih966P2//C6ah+puR/Mr3ez/WqIgVv0Ny
-         bkW9/C6NXI9jZI2roY4GnguQFdDb45Qpy/fQT2AC/tzi5mQF4FpMEcYXRdjUSBDsECjt
-         lst5/5rdB17Uiz1OkOm0AkgxAgfoSoVDyFpPCptpEVyOg6w+soXDGc5i94StFk3UOcsu
-         3gHPjIoATs9MQyQoYt6uUUxx/Gs1sqBNpHOWb2tjGB50r5MeZFcYe6ncOMaN7KQ3Yqt8
-         a0tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699887712; x=1700492512;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tXRTaKo6j+tqF8f0KuNqtcbp0Qu6XSznJzofnpp1uYs=;
-        b=nk3lmB1nja7oca5gk1DIY8ojHsIzmrvhYsCHZpE2qAe4PWtE/Y2utUlq6ZPJgX/dFT
-         PPFtwvSPVx2Q6THDeoV/JsNQoBXi0svSlw9M3oXoc2lFfPIvURyvcvgSiT7KWQ4o1/68
-         0aUYpb2lvNXAJcVOTfTwn6PdQI4M8ppKJIn9vJplRfbf1aNy3DSOjMNNu+D4AG5fb1sL
-         jp9TJeZj1uxJjyjP4xO6bQj2YD1hwTeUibXbNSC4cuVttiPvBG58KmikW1eSG9Bnv6i0
-         Ui5mxNH0rrpJS6HF/vLHoN94OFvmuMLy/d30gQYTQY0dfa7D+rAjudCO+yQ/uiquYnRl
-         nP8g==
-X-Gm-Message-State: AOJu0YzZXtOZbXWIAqXBHztW8zMIfvGDyVfR51yJBAv5EnqzP4i/x1t2
-	j6Gl0+rDNbfGxUEyikvMxC9OYQrHPnjlIAcnNhH4uA==
-X-Google-Smtp-Source: AGHT+IHEu49gyevap1zMCfOxyiE6xoEgy3wbBm1SlVPwdi996K+k6XAI9gLtTEksh9qY0qvkKyn3Mv3Fj9tn57Ddhks=
-X-Received: by 2002:a05:6870:d0cc:b0:1ba:cc77:1d81 with SMTP id
- k12-20020a056870d0cc00b001bacc771d81mr9614071oaa.46.1699887712469; Mon, 13
- Nov 2023 07:01:52 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="XQUweUFW"
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2061.outbound.protection.outlook.com [40.107.20.61])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1740C2
+	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Nov 2023 07:38:05 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Y1a7cVy/zaner8phyBMYoEVqfSPz9khfegd95rmnRvcwEtSFG5eRPMVwBeUPeDCAqi+LcrbJfwy2vWKHzLar9BA6YrAVmJyyDw4ptRcY3FZlE9FSiBhK3Fe0kT3kze2VvUhKaqndfIe/uW8pYwJ2mIbTtYWW8XkIMIAR+f9BMXyO4VUa7JNmV7+b0qIX5nanFvgljuBjK9Od9bMy0XPF+Ev5omopbv/M7liAuUutAiLHlbumwt87jIjSbfiBiRWY4uGfBZqOhT2812+OfKAaPm2rvCN3rUZxBUJ1+kIEJAiX7+W40ohmXmOhoySYVoRrQAP+ZgmM3nv/JDyN/ABOqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=S7s1YoATqnbLkubnijMgOwJ07dVm+Aa8wrTTnrg6SSg=;
+ b=ETG+uVo290mJuP96mnQhhCiqvXTjiWl46B4F0zYD8VlN6t3eWCdfNeBWjb7cRu+IrwfXufcUyk0QcXtPZfsNldQcvrERZabkXZK2laPw2qSUtVdZQhba1h2PXrgmPEMw//8a1ZQba9wqBTHtnSz7sedK3O01Etk8V+mDVPWA7vaVEjl4RqTKIA5ZkY8mglTuHj+kfyC+aY55t7jGr7CSwxxbFHSxNCwnVv97oAc5joPHrecT2syZ0KS7fP9+Ipe/AHJvazBoQUQXKOBKj/Mc1uzz7aIdW4+Y1pfE+o3j/noYR+MKHFabgMBGSvxUDQmsUzwJNi5Ms3ujP3Dzn+klIA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=S7s1YoATqnbLkubnijMgOwJ07dVm+Aa8wrTTnrg6SSg=;
+ b=XQUweUFWOiBR6WQQJZ/W89EEaWCoKQCq8Pmsn8VyIfMK/I6FMy8GdgXotd143Pfw13FPl7YFx8kdoHrTvqSGisQVjvNWj9UVLFMvQqc740ftqo7bJxstQlEuU5S24oMMl4tnvXakKkX1jxprlDFiYdt79w4UpLdtobnOZZ/khkM=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
+ by AS8PR04MB8498.eurprd04.prod.outlook.com (2603:10a6:20b:341::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.15; Mon, 13 Nov
+ 2023 15:38:03 +0000
+Received: from AS8PR04MB8898.eurprd04.prod.outlook.com
+ ([fe80::25a:e1cd:f957:6e7d]) by AS8PR04MB8898.eurprd04.prod.outlook.com
+ ([fe80::25a:e1cd:f957:6e7d%3]) with mapi id 15.20.7002.015; Mon, 13 Nov 2023
+ 15:38:03 +0000
+From: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: claudia.rosu@nxp.com,
+	mihai-octavian.urzica@nxp.com,
+	silviu.barbulescu@nxp.com,
+	vlad.pruteanu@nxp.com,
+	andrei.istodorescu@nxp.com,
+	luiz.dentz@gmail.com,
+	Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Subject: [PATCH v2 0/1] Bluetooth: ISO: Reassociate a socket with an active BIS
+Date: Mon, 13 Nov 2023 17:37:59 +0200
+Message-Id: <20231113153800.3771-1-iulia.tanasescu@nxp.com>
+X-Mailer: git-send-email 2.39.2
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: VI1P195CA0080.EURP195.PROD.OUTLOOK.COM
+ (2603:10a6:802:59::33) To AS8PR04MB8898.eurprd04.prod.outlook.com
+ (2603:10a6:20b:42d::15)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230904221158.35425-1-olivier.lheureux@mind.be>
- <CABBYNZKRwLmio749-YqGsVaRiyfgfG4xFZWWY8Svt5rK1z4B6A@mail.gmail.com>
- <7f4eab50-2532-4975-8bee-3f38bfaee3e1@mind.be> <CABBYNZ+LopfJdjzBocxKTzbA1Qq8A8Y-t182cvqLe5cH0mM2Wg@mail.gmail.com>
- <8325a09c-c944-4a6a-a815-0407edb9baa0@mind.be> <CABBYNZK=x-rDp0=JO5KxQzO6nAuFSp6EfTW2VHssRGLSJVOoew@mail.gmail.com>
- <CAJav_R4Dp1rddk67vNDPvwS4208pk7-aORXM0KiwXPaOkXmGkw@mail.gmail.com> <CABBYNZLBv7ZWJq1R_z6os5dJe7j7FyTZLMAG4Vw=t4y4W4Fh5Q@mail.gmail.com>
-In-Reply-To: <CABBYNZLBv7ZWJq1R_z6os5dJe7j7FyTZLMAG4Vw=t4y4W4Fh5Q@mail.gmail.com>
-From: Marleen Vos <marleen.vos@essensium.com>
-Date: Mon, 13 Nov 2023 16:01:41 +0100
-Message-ID: <CAJav_R7tqwv4Q5DRmbNSnQK=oSy2dypSLTtXT+9g4UAODq6dgA@mail.gmail.com>
-Subject: Re: [PATCH RFC 0/7] Fix a memory leak in Bluetooth L2CAP
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	linux-bluetooth@vger.kernel.org, "Olivier L'Heureux" <olivier.lheureux@mind.be>, 
-	Arnout Vandecappelle <arnout@mind.be>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|AS8PR04MB8498:EE_
+X-MS-Office365-Filtering-Correlation-Id: adca67e7-d145-4e42-5e6e-08dbe45e864f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	q038mPMc0IlqPh70gCmAKDlCOJpSHj+HpTKnJnlx6bQdGWCbOr2cwzsUBcUZcjV0IjOjCyWfA04b9f6GupQzpeaqCUtAwszxGg9xgx7EFZO4LoTSGfmzmg/CD+d/VKTRv0db/ypt5zCee6So3wpGUE5/JAdgkc0klDtb0D+/eYM7QD86i8jLqcVSDbMvqlsKQH3TfNysLP9ZwGXrjGCQ+NknDFB1BH9nZOTxrkQJOFGpNfBAb0X5XBak2H3T3Ff0n1GjtZCbZhC3paMyiOV1rhKbdAzSu9FVXU7gC3H85hT6jt6EbmDkruY0Pd5nGURPwUlJM9nHC/+eORCAF4cjVb3u5mhll/qr+LH0xdAGrFnYPM0IsXIV2RIbN/wYSy7T2UHpd6vZkSoC0SzxgEWlRpqatL7kVDVo1oGWfkIqd72XJJIH6VfsbdY6vSmL/i02FLHD+Pa5BCxrKNUBfCHdVrOYPrwypJXkKr52QjxK+O6T1OAY6dq48yakaVLTrlHXi9WfddX1Lmm1ZgbI69e3Oun9BWBmU0bMuqQlo0ePZJS8RszoF+r143hSEwSx5wVG
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(39860400002)(136003)(376002)(346002)(230922051799003)(186009)(1800799009)(64100799003)(451199024)(6506007)(44832011)(41300700001)(6486002)(478600001)(8676002)(4326008)(8936002)(6666004)(2616005)(5660300002)(6512007)(26005)(1076003)(6916009)(316002)(66476007)(66946007)(66556008)(2906002)(83380400001)(38100700002)(86362001)(36756003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?tkv0uPdyOJbnVefFEmqowP5LtLiiBB16sLDt3ZcIa+ZBN8UvNCo+nM+ndypO?=
+ =?us-ascii?Q?spcrK/D80cVm9dp41p9I4sjcuN8etUxh5YYciBmrl/2TcHHuob9hX0Zl1WOr?=
+ =?us-ascii?Q?AlOMsUHxEF5rbJEsqE8uSv3vNtg11dkoI+mvd7JEOWZM+VoJH5l0thaofK4s?=
+ =?us-ascii?Q?dRdV+d+oo/psQOPMxHZHuxjGaC4okBfbHYDzqAc17Hvv1jS79wCHMJgRWHYS?=
+ =?us-ascii?Q?4TXP5HBKElHIM2Beg1GtHT8FgsQ6d0Baud4s1tUT1w6kfa2AOiBT5Ffs9YZa?=
+ =?us-ascii?Q?22ww+qfyBbBtjF6pPDUGS4RrmGKfwq+iIRFp6ih4OfSKQeIe/hihUjYzgNWM?=
+ =?us-ascii?Q?M7DOs4uTqzPmSflleY9hoPOgaJzSEAnXulg80giRWQf9wY34x1C/dgTBGVyf?=
+ =?us-ascii?Q?ejelIwH3f8DtxVXOwJyctC5iYHYkKBaaeTuQcRAHeRlCFQthNkjDgJUMCnWS?=
+ =?us-ascii?Q?GLFbfzKbUepkz2WsGIZbtgQoY5mzvqNtDa6s1ulEoKZKunFtJAZKV01QgNth?=
+ =?us-ascii?Q?lJ892ISjQf3As90WMcfCnAEaiqo43Zj4wosbHeX5wLhoEyjwfhJAOoON2PMO?=
+ =?us-ascii?Q?uNqKUW2bgC0r2OM5eHdfqJG0BorvhewK6Gk9XtChzhA6w9/ErJg01j/XHiHG?=
+ =?us-ascii?Q?IsA+umIHxNmtlLslsuQF0qt/Zgjw9azptNuuj2wj0RhwWkboSxO2ZwsHVJ75?=
+ =?us-ascii?Q?Sx/lpqrWpppzDH0K7Wsf23whO92eutVR+/GSl8dCV6Yl1hMrX6mUUgWfKIxR?=
+ =?us-ascii?Q?Sszf+oA622A67+T5ISV/ybD4/NnSwXtpNh6fOvsJTm7R2PtZ6RFBzmmT0BxH?=
+ =?us-ascii?Q?ovZoovp9Q9AvrCnPvRk8KLwBXp1ROPPyg6meuRH0m3SY3pBiwi64G8dBAOhc?=
+ =?us-ascii?Q?Go3qeb3BV8UpwgWhIqMaAJrO3twFdl13Di4v0gj88mF22Wu5QMTqjOK+hZDj?=
+ =?us-ascii?Q?WB+AOqvIUSjzcdcWrx72l+9o3/bfmTBzZXwqgN76bQwNpJRIVDLzsV14EUko?=
+ =?us-ascii?Q?pV3hoK0Z4qsmTRnBDRpvCAdP0CBJ5JnRfgiWkYcWK7ASKkEvFg49mu9yUNce?=
+ =?us-ascii?Q?fExGiGYCKodTYoG9UQQpxg+3CdlRdFiXrbkCL2rMTnBWnqZ2EQfL1FCKRxH2?=
+ =?us-ascii?Q?9EqUy5OSLRn5moDOw1twGB6+P3lihQtIgXcGzMS8uJ4lm9qhOGWXLXq3gqKy?=
+ =?us-ascii?Q?AKx32CCC+aEfnnfAb2SP8XZ4upttRyzbCw6joholpO+OaeMs8jcQJPtGcWEj?=
+ =?us-ascii?Q?yU1Gn0iI1wQeBTP2s44yYgXszIz0ebNz7oBqoJQwQbbmjeioA0g2QjJoZ6V7?=
+ =?us-ascii?Q?8Yb1qRXT6atdNkDtMTLCZ+GqAEnwWcbMKXzUz2TOApENch1CRJGaFozx7o1L?=
+ =?us-ascii?Q?0MR16dHWqEtUJIRWZlzzYOZOHHH4bBEfHkAus8bWTQGxeBT8NmvDnfRmMgFW?=
+ =?us-ascii?Q?9fR9Vry5plgwrTzExEjZokzsEAgd1SB/1Yss0zvqatzEBjYU5gJU2tzVP/Dp?=
+ =?us-ascii?Q?iF9qSgbXgwy85pNNVycyGpWcxdSOwaxZJ08uKwquXjWXSr7Mn53Oy5QWh4qD?=
+ =?us-ascii?Q?PRL6twWWLxBBAlDWj/GAlKJzZx2h2pIm/t/KHsrDJ9G+9MVT5Y1B/1ovk17K?=
+ =?us-ascii?Q?lA=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: adca67e7-d145-4e42-5e6e-08dbe45e864f
+X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8898.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Nov 2023 15:38:03.6771
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: S24ZOeC+onhjrsvQDnhnaqeijK6OQFYchJl5eEzymrlHuWR8GmHwvF3HmcxL9YmH9XdqTQDdqO66lVM6e683Yg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8498
 
-Hi Luiz,
+This patch implements a kernel improvement, to be able to reopen a BIS
+socket from userspace and reassociate it with an active BIS connection.
 
-On Mon, Nov 13, 2023 at 3:59=E2=80=AFPM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Marleen,
->
-> On Mon, Nov 13, 2023 at 9:23=E2=80=AFAM Marleen Vos <marleen.vos@essensiu=
-m.com> wrote:
-> >
-> > Hi Luiz,
-> >
-> > On Tue, Nov 7, 2023 at 4:10=E2=80=AFPM Luiz Augusto von Dentz <luiz.den=
-tz@gmail.com> wrote:
-> >>
-> >> Hi Marleen,
-> >>
-> >> On Tue, Nov 7, 2023 at 3:46=E2=80=AFAM Marleen Vos <marleen.vos@essens=
-ium.com> wrote:
-> >> >
-> >> > Hi Luiz,
-> >> >
-> >> > Because Olivier has been and still is being swamped with other work,=
- I'm
-> >> > kind of trying to take over these patches. So far I can reproduce th=
-e
-> >> > memleak on a recent kernel without the patches.
-> >> >
-> >> > Olivier told me you added tests to check for the memleak in
-> >> > l2cap-tester. Can you point me towards more info on how exactly you =
-run
-> >> > these tests, as the info I find on the web is rather minimal.
-> >> >
-> >> >  From what I read in the thread, it looks like your tests don't catc=
-h
-> >> > the memleak?
-> >>
-> >> I'm currently on vacation, I should be back next week, try checking
-> >> l2cap-tester to emulate the leak as you said it was still
-> >> reproducible.
-> >
-> >
-> > I hope you had a great vacation!
-> > Using git bisect, I found that commit 4ab81f16c68a602b2b69e333ae08d8748=
-a9398de is the one where the leaks stop being reproducable by the method we=
- use. At first sight the changes you made seem unrelated to the memleak, so=
- the main question for us is now: has the resolution been accidental or int=
-entional?
->
-> So it is not reproducible anymore?
+This is useful for a Broadcast Source with multiple BISes - since a BIS
+cannot be terminated independently from other BISes in the BIG, all BIS
+hcons should be linked and kept alive as long as the BIG is active.
 
-No, starting from the mentioned commit, we can no longer reproduce the leak=
-.
+If multiple BIS sockets are opened for a BIG handle, and only part of
+them are closed at some point, the associated hcons will be marked as
+open. If new sockets will later be opened for the same BIG, they will
+be reassociated with the open BIS hcons.
 
->
-> > The commit message says:
-> > commit 4ab81f16c68a602b2b69e333ae08d8748a9398de
-> > Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > Date:   Mon Jun 26 17:25:06 2023 -0700
-> >
-> >     Bluetooth: hci_conn: Consolidate code for aborting connections
-> >
-> >     [ Upstream commit a13f316e90fdb1fb6df6582e845aa9b3270f3581 ]
-> >
-> >     This consolidates code for aborting connections using
-> >     hci_cmd_sync_queue so it is synchronized with other threads, but
-> >     because of the fact that some commands may block the cmd_sync_queue
-> >     while waiting specific events this attempt to cancel those requests=
- by
-> >     using hci_cmd_sync_cancel.
-> >
-> >     Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> >     Stable-dep-of: 94d9ba9f9888 ("Bluetooth: hci_sync: Fix UAF in hci_d=
-isconnect_all_sync")
-> >     Signed-off-by: Sasha Levin <sashal@kernel.org>
-> >
-> > Maybe you can shed some light on why this commit seems to fix the leaks=
-?
->
-> Well I suppose it is due to the cleanup process freeing l2cap_conn in
-> the process, while perhaps the previous code didn't.
->
-> > Kind regards,
-> > Marleen
-> >
-> >>
-> >>
-> >> > Kind regards,
-> >> >
-> >> > Marleen
-> >> >
-> >> >
-> >> > On 14/09/2023 23:17, Luiz Augusto von Dentz wrote:
-> >> > > Hi Olivier,
-> >> > >
-> >> > > On Wed, Sep 13, 2023 at 3:25=E2=80=AFPM Olivier L'Heureux
-> >> > > <olivier.lheureux@mind.be>  wrote:
-> >> > >> Hello Luiz,
-> >> > >>
-> >> > >> Thanks for your review.
-> >> > >>
-> >> > >> On 05/09/2023 22:42, Luiz Augusto von Dentz wrote:
-> >> > >>> Hi Olivier,
-> >> > >>>
-> >> > >>> On Mon, Sep 4, 2023 at 3:12=E2=80=AFPM Olivier L'Heureux
-> >> > >>> <olivier.lheureux@mind.be>  wrote:
-> >> > >>>> Request for Comments
-> >> > >> [...]
-> >> > >>>> The "ble-memleak-repro" program reproduces the memory leak, if =
-the
-> >> > >>>> kernel is not patched. Its source is in
-> >> > >>>> "package/ble-memleak-repro/ble-memleak-repro.c" [18].
-> >> > >>> We should probably create a test in l2cap-tester using SO_SNDTIM=
-EO
-> >> > >>> first, so we can make sure CI test such case and we are able to =
-detect
-> >> > >>> if the problem is reintroduced later:
-> >> > >>>
-> >> > >>> https://github.com/bluez/bluez/blob/master/tools/l2cap-tester.c
-> >> > >> I didn't know about "l2cap-tester.c". Agree, it would be great to
-> >> > >> integrate my test app into it. I could try, but I don't know the =
-test
-> >> > >> framework yet.
-> >> > >>
-> >> > >>>> Memory Leak Fix
-> >> > >>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >> > >>>>
-> >> > >>>> We have fixed the memory leak, see the patch series in
-> >> > >>>> "patches/linux/":
-> >> > >>>>
-> >> > >>>>    1. The first patch
-> >> > >>>>       "0001-ARM-dts-stm32-Add-Bluetooth-usart2-feature-on-stm32=
-m.patch" [11]
-> >> > >>>>       enables Bluetooth on the DK2.
-> >> > >>> This above should probably be sent separately.
-> >> > >>>
-> >> > >>>>    2. The second patch
-> >> > >>>>       "0002-Bluetooth-add-many-traces-for-allocation-free-refco=
-u.patch" [12]
-> >> > >>>>       adds many dynamic debug traces that help understand the k=
-ernel
-> >> > >>>>       behaviour and freeing problems.
-> >> > >>> I'm fine with this change, but we better use the likes of bt_dev=
-_dbg
-> >> > >>> instead of BT_DBG.
-> >> > >> This commit intended to increase the visibility during debugging,=
- and
-> >> > >> I was not intending it for a permanent presence in the kernel.
-> >> > >> But if you find it useful, I can submit a patch RFC v2 with
-> >> > >> "bt_dev_dbg()" instead of "BT_DBG()". Note that there is currentl=
-y no
-> >> > >> "bt_dev_dbg()" in "l2cap_core.c" yet.
-> >> > >>
-> >> > >>>>       "0003-Bluetooth-L2CAP-use-refcount-on-struct-l2cap_chan-c=
-o.patch" [13]
-> >> > >>>>       and
-> >> > >>>>       "0004-Bluetooth-L2CAP-free-the-leaking-struct-l2cap_conn.=
-patch" [14]
-> >> > >>>>       fix the memory leak.
-> >> > >>>>    4. Patches
-> >> > >>>>       "0005-Bluetooth-introduce-hci_conn_free-for-better-struct=
-u.patch" [15],
-> >> > >>>>       "0006-Bluetooth-L2CAP-inc-refcount-if-reuse-struct-l2cap_=
-c.patch" [16]
-> >> > >>>>       and
-> >> > >>>>       "0007-Bluetooth-unlink-objects-to-avoid-use-after-free.pa=
-tch" [17]
-> >> > >>>>       fixes the use-after-free that appears when the "struct l2=
-cap_conn"
-> >> > >>>>       [5] and "struct hci_conn" [6] objects are freed.
-> >> > >>> These I'm not very comfortable applying as they are, I'm afraid =
-there
-> >> > >>> could be regressions if they are not accompanied with proper tes=
-ts,
-> >> > >>> besides I think there are less intrusive ways to cleanup l2cap_c=
-onn,
-> >> > >>> see below.
-> >> > >>>
-> >> > >>>> The commit messages explain why the commit is needed, which pro=
-blem
-> >> > >>>> the commit solves, and how.
-> >> > >>>>
-> >> > >>>> The first and second patches are present for the memory leak
-> >> > >>>> reproduction only, they should not be part of a final fix.
-> >> > >>>>
-> >> > >>>> Patch Status
-> >> > >>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >> > >>>>
-> >> > >>>> As of writing, the memory leak is fixed. The fix opened the doo=
-r to
-> >> > >>>> other problems, especially use-after-free, sometimes followed b=
-y
-> >> > >>>> crashes due to NULL dereferences. We think there are weak refer=
-ences
-> >> > >>>> (i.e. pointers that don't increment the refcounter) previously
-> >> > >>>> pointing to memory that was never freed, but now is freed. On k=
-ernels
-> >> > >>>> v5.13 and v5.15, patches 0005, 0006 and 0007 seem to fix the
-> >> > >>>> use-after-free and NULL dereferences, but not on kernel v6.5 ye=
-t.
-> >> > >>> I think the problem is that the lifetime of l2cap_conn shall be =
-hooked
-> >> > >>> with hci_chan, but the likes of hci_chan_list_flush -> hci_chan_=
-del
-> >> > >>> don't actually trigger l2cap_conn_del, which imo is the culprit =
-here,
-> >> > >>> because connect_cfm/disconnect_cfm is not called when the connec=
-tion
-> >> > >>> procedure has been aborted prematurely, so perhaps we shall get =
-rid of
-> >> > >>> the likes of l2cap_connect_cfm/l2cap_disconn_cfm and instead do =
-the
-> >> > >>> cleanup with in the following order:
-> >> > >>> hci_conn_cleanup->hci_chan_list_flush->hci_chan_del->l2cap_conn_=
-del,
-> >> > >>> that way we avoid having multiple code paths attempting to clean=
-up
-> >> > >>> objects associated with hci_conn/hci_chan.
-> >> > >> I fully agree with your analysis, which correspond to mine: we sh=
-ould
-> >> > >> call "l2cap_conn_del()", it would properly clean the allocations =
-in
-> >> > >> "l2cap_conn_add()".
-> >> > >> I have tried but it was not obvious to find the right place to ca=
-ll
-> >> > >> "l2cap_conn_del()" with the proper locking.
-> >> > >> As you write, connect_cfm/disconnect_cfm is not called when the
-> >> > >> connection is aborted, and that is the root cause of the memory l=
-eak.
-> >> > > Btw, I was trying to reproduce it with the following test set, but=
- at
-> >> > > least kmemleak was not able to detect leaks of l2cap_conn:
-> >> > >
-> >> > > https://patchwork.kernel.org/project/bluetooth/list/?series=3D7843=
-43
-> >> > >
-> >> > >> Your proposal is most probably the best way to go.
-> >> > >>
-> >> > >>> I'd change hci_chan_create to take a del callback to avoid havin=
-g
-> >> > >>> circular dependencies on one another though.
-> >> > >> Interesting, could you explain how you would do it? Perhaps point=
- on
-> >> > >> a callback example?
-> >> > >>
-> >> > >>>> Reproducing with Buildroot
-> >> > >>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
-> >> > >>>>
-> >> > >>>> We have reproduced and fixed the memory leak with Buildroot [7]=
- and a
-> >> > >>>> "ble-memleak-repro" test application on an ST's Discovery Kit D=
-K2 [4].
-> >> > >>>>
-> >> > >>>> The "ble-memleak-repro" repository [1] contains the sources of =
-a
-> >> > >>>> complete external Buildroot customisation [8], with the patches=
-, a
-> >> > >>>> README, and more explanations to reproduce the problem with Bui=
-ldroot
-> >> > >>>> on a DK2.
-> >> > >>>>
-> >> > >>>> References:
-> >> > >>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >> > >>>>
-> >> > >>>> - [1]:<https://gitlab.com/essensium-mind/ble-memleak-repro.git>
-> >> > >>>>          "ble-memleak-repro repository"
-> >> > >> [...]
-> >> > >>
-> >> > >> --
-> >> > >> Olivier L'Heureux
-> >>
-> >>
-> >>
-> >> --
-> >> Luiz Augusto von Dentz
->
->
->
-> --
-> Luiz Augusto von Dentz
+All BIS hcons will be cleaned up and the BIG will be terminated when the
+last BIS socket is closed from userspace.
+
+This patch version fixes review findings.
+
+Iulia Tanasescu (1):
+  Bluetooth: ISO: Reassociate a socket with an active BIS
+
+ include/net/bluetooth/hci_core.h | 24 ++++++++++
+ net/bluetooth/hci_conn.c         | 32 ++++++++++++-
+ net/bluetooth/iso.c              | 79 +++++++++++++++++++++++++++++++-
+ 3 files changed, 131 insertions(+), 4 deletions(-)
+
+
+base-commit: 0783375f2c56ca17719d5ec670e498dc661ea5c3
+-- 
+2.39.2
+
