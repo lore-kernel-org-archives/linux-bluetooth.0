@@ -1,153 +1,160 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F4DF2374B
-	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Nov 2023 20:57:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6602B22F0F
+	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Nov 2023 23:31:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=live.com header.i=@live.com header.b="ho2PBQi8"
-Received: from IND01-MAX-obe.outbound.protection.outlook.com (mail-maxind01olkn2087.outbound.protection.outlook.com [40.92.102.87])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B72B1189;
-	Mon, 13 Nov 2023 12:57:41 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XSQKwPDAUGqIAfT27m7hkl7XCvy7yRqIAu2MJfOatrKMqTgW2/RBQ6g1FLRcPwwZAVCdmndevNmcjj8SAY7IRo5i6Z2Wgyk3Zh1T2jP5RSDo8hOugvp9NlpN/NwaOfHAYpXWI50IWRgEmQGK6C5iDXcPpyuuUj/ck3Hd99mlmIm5cqf/ljEiXCvpQ/ZlE020tMH/hQKil25aOwidCOS7p1pOHPw1JtXajKYM4uslvdmCR0CnEzjW02BLiBMDdMDD4kFucLOS/7+q8f2VJizgZhKsjTuSwS2ZKbT9uIPM0vJI7mjXHyKh8uaFCxtVblt9+GGrrXcEreiVf9bPdPxjcQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0npqfrQsS8aEFQ7blMqD6BbxgF30OW3qISGQhdTSISc=;
- b=e5psXGp8cNSABSZRcjgoEZtc0uZUp/l6IHOuRl69Q49bBRIPOR22uvs18AyROa77gIZ2tvzoT4GwTDEdFZ3SkL7b0DzN+jJFmgbkqvuS+fRAc5y6VTYquw1FM8TH7mEtLD20LwXmBZXYZG5u39n0nEnhH9h697xCB4xab6BYa1px/AM1qFuhpu8PfsQy8vkiDrfg5l0hOXdabxmjSuXzGc5qncxYH/8sTZAOiWS9HautuCx+orZpOHj2tNVZt/0Li1g9NHwbGfrbwhPNerm9K8Rec/DDzfPDhXRCS2Ap1x+9RIx8Yj2IbvfbRT+lk7X7ABimE9OQmP3RN6UyFj5H7w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=live.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0npqfrQsS8aEFQ7blMqD6BbxgF30OW3qISGQhdTSISc=;
- b=ho2PBQi8IIJzsItGegfRBJpBdqAT6tTn+r8ORYbcoxDqIUmFDD6Q2+W2A/YhpgakAFIAukW73f+rf8OsBDc/rYmUlUgHFJ+hX9u7P7lwPxwvXFyZqKjD+U5OM0Clr4SMDyjfcw3LR3nQBzQqB1t5Mb0DGLCDiXYq6vnX9RwTsUi592y8jwvzyjMmLmFu9G44NvE04Q6fUaxh9o6okEs1KPbe85nU7guzgGXm0B6Bo+ymbdVVlEOqS/Htf9iQCzq1PpOgnGyqbECFKw6AnfFPmMdy8h9qQxT+tMQxRL/g1R3ud0Our+ncr+kDMz8qc6ODuJdlSfw+GbdB6j825m0IAw==
-Received: from PN0P287MB0216.INDP287.PROD.OUTLOOK.COM (2603:1096:c01:e7::9) by
- PN3P287MB1253.INDP287.PROD.OUTLOOK.COM (2603:1096:c01:196::9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6977.29; Mon, 13 Nov 2023 20:57:35 +0000
-Received: from PN0P287MB0216.INDP287.PROD.OUTLOOK.COM
- ([fe80::2be6:2e27:ab75:94d6]) by PN0P287MB0216.INDP287.PROD.OUTLOOK.COM
- ([fe80::2be6:2e27:ab75:94d6%6]) with mapi id 15.20.6977.029; Mon, 13 Nov 2023
- 20:57:35 +0000
-From: Aditya Garg <gargaditya08@live.com>
-To: Hector Martin <marcan@marcan.st>, Sven Peter <sven@svenpeter.dev>, Alyssa
- Rosenzweig <alyssa@rosenzweig.io>, "marcel@holtmann.org"
-	<marcel@holtmann.org>, "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
-	"luiz.dentz@gmail.com" <luiz.dentz@gmail.com>
-CC: Orlando Chamberlain <orlandoch.dev@gmail.com>, Kerem Karabay
-	<kekrby@gmail.com>, Aun-Ali Zaidi <admin@kodeit.net>, Asahi Linux
-	<asahi@lists.linux.dev>, LKML <linux-kernel@vger.kernel.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: [REGRESSION] Bluetooth is not working on Macs with BCM4377 chip
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fa1oxU7j"
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07B2F8F;
+	Mon, 13 Nov 2023 15:31:04 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id 98e67ed59e1d1-2800f7c8125so4640053a91.1;
+        Mon, 13 Nov 2023 15:31:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699918263; x=1700523063; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kDZ1cIdWgAZuXI5ozto7uEtbIC72lCm4PFb4eXmL6CE=;
+        b=fa1oxU7jZs5RgBytDCxGvCGAamOXa2hhU8qkOGYLLa7Ticp3RCsfwNS8YW/o5EG20d
+         iDX5iITAEaCbo1khFWWR67k+at0P8VMNHDDnsw5FMiLXVy+F/TSYPJihwS/V7wkNZpjk
+         tsAgMvtSnMYUpeoM/LxI0p89BhebTyEUb8wwbrUwHduPeEfsIybWv1SJq0LjI0SKJRLb
+         6UmmFAHlI+Cf7Tvm23591nxs3Gqm1BNohgtx0XUWn5ED6ROGN8bcLBvoI2cVm6GBmX8v
+         hSbc83loeAKO8W+J/nNZey1m6YwaQ77DOdo6Oho2PiLF1ettcmav9yi9GmLBtNpGKxgV
+         wTsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699918263; x=1700523063;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kDZ1cIdWgAZuXI5ozto7uEtbIC72lCm4PFb4eXmL6CE=;
+        b=C4+9+FOmbRLHM58MqQJkOCCwnULj4hEkrnOE8aJ9JovjjX6esh/k6NDMnmRKP7Q7Ga
+         xh5X/aVKfSz7gBHLBp2WJlazKj272xAvkNbzVeDYrEWI/14dI2r3QT9EH05vwiS2AwYC
+         OIcjRPH2Nonq+EHUpHhCuKcGXwUdwLBppsPDgBLLl3NDDfz0/TCuRiTpvqSSs0h/6qyT
+         KDJTDAwoJfCf0fgAoX8okabXBzxRV4Fyy66M+Nn/4x9H/PdPIqlQtMCidHlGwpN9FVBM
+         WSYNXFg+C6SxgwLCu8zstZKxsJk/n42mNEri9iMzPUsgKWLZw5He3a5Slaf5YZ8GBB55
+         GDhA==
+X-Gm-Message-State: AOJu0YyYzWnFUee8gNi3wodPPr0OqYb74J41Gt42XECLqnOG2vwIkpHa
+	pGi9cUMAdSnTSl43mhzubjQ=
+X-Google-Smtp-Source: AGHT+IHxx+SJCVs7SPPaBNARSsTIQL2a78Bq6VjpoYvEXoFTIZ8zIJb8O8RxQL5Rcvn7Bfimz39oGg==
+X-Received: by 2002:a17:90b:180f:b0:280:4af4:1a41 with SMTP id lw15-20020a17090b180f00b002804af41a41mr1507089pjb.15.1699918263286;
+        Mon, 13 Nov 2023 15:31:03 -0800 (PST)
+Received: from archie.me ([103.131.18.64])
+        by smtp.gmail.com with ESMTPSA id k9-20020a170902694900b001cc0e3a29a8sm4529918plt.89.2023.11.13.15.31.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Nov 2023 15:31:02 -0800 (PST)
+Received: by archie.me (Postfix, from userid 1000)
+	id 8131A101BF818; Tue, 14 Nov 2023 06:31:00 +0700 (WIB)
+Date: Tue, 14 Nov 2023 06:31:00 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Aditya Garg <gargaditya08@live.com>, Hector Martin <marcan@marcan.st>,
+	Sven Peter <sven@svenpeter.dev>,
+	Alyssa Rosenzweig <alyssa@rosenzweig.io>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Orlando Chamberlain <orlandoch.dev@gmail.com>,
+	Kerem Karabay <kekrby@gmail.com>, Aun-Ali Zaidi <admin@kodeit.net>,
+	Asahi Linux Mailing List <asahi@lists.linux.dev>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: [REGRESSION] Bluetooth is not working on Macs with BCM4377 chip
  starting from kernel 6.5
-Thread-Topic: [REGRESSION] Bluetooth is not working on Macs with BCM4377 chip
- starting from kernel 6.5
-Thread-Index: AQHaFnQHbfx65PIcfUeDQNMgO0n18w==
-Date: Mon, 13 Nov 2023 20:57:35 +0000
-Message-ID: <22582194-DE99-45E5-ABEE-C1C7900DA523@live.com>
-Accept-Language: en-IN, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tmn:
- [4CH2jFEsO6t0RwspeU/egfp+WU2qlgXyw/+qec1w3zELEga83PO0RHo4HdYquK5KA+dt/tdB8/w=]
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PN0P287MB0216:EE_|PN3P287MB1253:EE_
-x-ms-office365-filtering-correlation-id: ce0424b6-7156-4e83-7476-08dbe48b29f6
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- wwUSlU0YTAhbUCDjegvDBiRm+NXMqDALpZfqmCv6PGmAXm6TvFplpXsralyj3BYPbG41wnaaLT9a+1u9fj5Hxb81ljI0fKZCVzDbwHv3XqdL0pOatrvA94jz+qiPRoBkVyp04wRFQ8hEAzVwgAI8ojvcYlspORGiX2PrDzTZIiIKAeAJwv6u/4wGug+oiaWkB4e8mZNhOIXst8X1cVStRyHcDMmDTXDVqpQ0OjwCB7mg/3gMveNKVYXrJcuVfBiblZYr93rLJlKNNOMnD+/cQUyNUB70VZsUDTGoS28yDexwlr3N6QImZX9RKQg11XWnM7BYpRFfjYNk6SQx5tGw6IFklDLNkYyUXF40RHa8jlyqNy0kRjlx+O6cbPIn9RBN8RJxtMqtoAZ7wbu/ezkd7zKs99VsXIwXnRpeI6ZwLBPnV1X7B7J4aAqUYig3yMMvYchufCcFAOzWvEIzo6pIYhiTFkhRF6N9dH3Ftw+InAUUDqirbC97ukyI0FwG4Z7dgkH9pPoZe3vbks+kXc8rK+gvZlrJRC87rDGYlgoorC5s0FM/7CpSdU69wi6Mr71aV2r/l/620y4UW8a5BdKxPUgVIuSRLISQcIT430BRI1po2O261EeOakPNe/v5V9V3vd58sFtOl9nNavTNOWbUvQ==
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?bnY5clpHVDlwa0Q0WXpOaWhrelkvbGNWOENpcDE0TDNOOHlmQnI2Q2lYZ0lw?=
- =?utf-8?B?bjRXTlpOZTk0MXE1Wk1nb3Mwdlo0VEJtalFEdWUxRlZkMGJzQ0o2eFk1Qk9P?=
- =?utf-8?B?YVVySkFzNUxDaDdmcU5HSjcwRitDb21SSzBWbDZCcllTUHNBcHFlR08yMTdm?=
- =?utf-8?B?TjVJNXYxWS92aU04THpaQktEcHZJb093UzI5eFpLbGprdmVMNEVwQXRxTnZH?=
- =?utf-8?B?Ri9oTlMzaUVhMW85cGlBKzR5UktNcHM0bmdLWEQ1RVE0K3pac3QzTUUrNlc3?=
- =?utf-8?B?d201ZnQ2bVZ3YTArWG1najBlOWdQakVtQnNSQVZYTjJqakVPbGl4eFdycXVT?=
- =?utf-8?B?MDhYVm1rS3lKVk5LM1BTdFprZmNlN3NWaTh2Yk53YThBOTVqWk5JeFBwRUw5?=
- =?utf-8?B?R2c0dXVXMGxXYkFtTzR1MXA3NlNPOVo3bFQzRmhZUGFvcjZaTGVmZ2dIcVFU?=
- =?utf-8?B?QzRJSE1HeVlTb2tEaUtrMEJpczE1dnhOYTZobEF2OGkvRjNnUjlXYndaSHp4?=
- =?utf-8?B?WVc5aUV0aHhBYmJ5V3FrN29nOU5mZmowdnkydWVSOHAzRzRaUUIvOWxmQ0kr?=
- =?utf-8?B?SDlPUkZ5d3BjZHVjV3drRWhTV1l0TVhBYkZIOGtNNmRzWFc3RHg5WXg0dk50?=
- =?utf-8?B?WUtMMml0NDU1aXhVYXJuNXFOR1lRZHlCUTlZZDBIRUJzTVYxZW9kOVN0a0Yr?=
- =?utf-8?B?WlYvVXVoLzZGNzB3bXUyM2hxYlVldlRTdVBUQkFSUmNGdjZWTmN5NFpIMkl1?=
- =?utf-8?B?NXZzUFJ2RHZOeWdWQnh2eWJVTis1K2lmZWc5aVJ4NHhzdU5DRW5QK1oxZ1gy?=
- =?utf-8?B?UGdQOHJlbUhvblpyUGI2cURaTmNSVld2Skpxa1BFa3VIV2ZuTkEwdUk2S21p?=
- =?utf-8?B?djdBeFlXYnMvRDEraGFQdzJzT1VmMTV1RlVobmpqZ3krbEkzOFpoSEdMOEJ4?=
- =?utf-8?B?VUVKUk9qOTZ0KytQdnZ2K1BTZWV1aURLaEYyTjN6MG5sNTU4MFNBdVRQMHRD?=
- =?utf-8?B?ZWJHanMxczc0dElpZmN3QmtzY2xuSy9XdnlOdHgzdk9Ga3FjTkVRdW5XOWRE?=
- =?utf-8?B?SFZOVW54MmY3ZDFzU3hSUnYrTzc4blBiMGpvTXYxZGdCVW96TGNBNWk0WitO?=
- =?utf-8?B?TDNCd2V1K3luM2IvT3pteENLNCtaYzdwU3B2aGN5RFc0QnRzSFZwaEpOSHJv?=
- =?utf-8?B?OXo5K0l4M3lhUmFFc1hscXNkZGxsRDduaDhNMkZlUHBFQUJXdEZuSzRQTGg4?=
- =?utf-8?B?Q2dVL3ZPRG9MR25tSGloc0dwSnlTWnkzUEQ3dG0rbzBmQW9kdWNPNDA0Yzlp?=
- =?utf-8?B?anFEenl5eDI5bmx0TTE0dkZ6TDR2YzJMYXgrZFBXQjgwNUdiVmkrcTN1K2Nq?=
- =?utf-8?B?WXBZUzA1amk2V004S0VUdCt3SjhEbVVqdm5kY1VieURsZmFTWlFzVEZ5Rkhl?=
- =?utf-8?B?aVYvbGNIOUlVakd3WUU3TElxZllTc2pFbGpoV1c5SWRpTXllOUdHeGRGd3FY?=
- =?utf-8?B?ZlR4cWN6RXBpNXZXd3ROSEZaWFVxVVRuQzhwOVJWRE5EUjk4NGt6NEgxcmhs?=
- =?utf-8?B?MGF2aTQ3WmwyWmJ5ajF0dW1MVkxZNm9sNzQ5dmQ3VmIzUkNGeGRrNThndlZW?=
- =?utf-8?B?aS80YlNOVVVZang3Q0Y2WWpyTkVycGhnWFZZajl2SjQ3VHdjblVYRmRBbm1i?=
- =?utf-8?B?S1FKMFZtbUhmRXpTSVNGUWg3L1FBalZ5MFFDMnlrdldQVzFmdXQ2WUs0NTJs?=
- =?utf-8?Q?yUGYY5bfARffD0udPo=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <6CAF9392B1927846B787F21BAC5482BA@INDP287.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: base64
+Message-ID: <ZVKxtD2Mt_eVyttJ@archie.me>
+References: <22582194-DE99-45E5-ABEE-C1C7900DA523@live.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-bafef.templateTenant
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PN0P287MB0216.INDP287.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: ce0424b6-7156-4e83-7476-08dbe48b29f6
-X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Nov 2023 20:57:35.8497
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PN3P287MB1253
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="6D6G11eLM7jDJgCQ"
+Content-Disposition: inline
+In-Reply-To: <22582194-DE99-45E5-ABEE-C1C7900DA523@live.com>
 
-U3RhcnRpbmcgZnJvbSBrZXJuZWwgNi41LCBhIHJlZ3Jlc3Npb24gaW4gdGhlIGtlcm5lbCBpcyBj
-YXVzaW5nIEJsdWV0b290aCB0byBub3Qgd29yayBvbiBUMiBNYWNzIHdpdGggQkNNNDM3NyBjaGlw
-Lg0KDQpKb3VybmFsY3RsIG9mIGtlcm5lbCA2LjQuOCB3aGljaCBoYXMgQmx1ZXRvb3RoIHdvcmtp
-bmcgaXMgZ2l2ZW4gaGVyZTogaHR0cHM6Ly9wYXN0ZWJpbi5jb20vdTlVM2tiRkoNCg0KSm91cm5h
-bGN0bCBvZiBrZXJuZWwgNi41LjIsIHdoaWNoIGhhcyBCbHVldG9vdGggYnJva2VuIGlzIGdpdmVu
-IGhlcmU6IGh0dHBzOi8vcGFzdGViaW4uY29tL2FWSE5GTVJzDQoNCkFsc28sIHRoZSBidWcgaGFz
-buKAmXQgYmVlbiBmaXhlZCBldmVuIGluIDYuNi4xLCBhcyByZXBvcnRlZCBieSB1c2Vycy4NCg0K
-U29tZSByZWxldmFudCBiaXRzIGltbzoNCg0KICAgIOKAoiBTZXAgMTkgMjE6MjQ6MzYgUnVkeVVi
-dU1icCBrZXJuZWw6IGhjaV9iY200Mzc3IDAwMDA6NzM6MDAuMTogY2FuJ3QgZGlzYWJsZSBBU1BN
-OyBPUyBkb2Vzbid0IGhhdmUgQVNQTSBjb250cm9sDQoNCiAgICDigKIgTm92IDE0IDAxOjI5OjI4
-IFJ1ZHlVYnVNYnAga2VybmVsOiBDYWxsIFRyYWNlOg0KICAgIOKAoiBOb3YgMTQgMDE6Mjk6Mjgg
-UnVkeVVidU1icCBrZXJuZWw6IDxUQVNLPg0KICAgIOKAoiBOb3YgMTQgMDE6Mjk6MjggUnVkeVVi
-dU1icCBrZXJuZWw6IGR1bXBfc3RhY2tfbHZsKzB4NDgvMHg3MA0KICAgIOKAoiBOb3YgMTQgMDE6
-Mjk6MjggUnVkeVVidU1icCBrZXJuZWw6IGR1bXBfc3RhY2srMHgxMC8weDIwDQogICAg4oCiIE5v
-diAxNCAwMToyOToyOCBSdWR5VWJ1TWJwIGtlcm5lbDogX191YnNhbl9oYW5kbGVfc2hpZnRfb3V0
-X29mX2JvdW5kcysweDE1Ni8weDMxMA0KICAgIOKAoiBOb3YgMTQgMDE6Mjk6MjggUnVkeVVidU1i
-cCBrZXJuZWw6ID8gdHR3dV9kb19hY3RpdmF0ZSsweDgwLzB4MjkwDQogICAg4oCiIE5vdiAxNCAw
-MToyOToyOCBSdWR5VWJ1TWJwIGtlcm5lbDogPyByYXdfc3Bpbl9ycV91bmxvY2srMHgxMC8weDQw
-DQogICAg4oCiIE5vdiAxNCAwMToyOToyOCBSdWR5VWJ1TWJwIGtlcm5lbDogPyB0cnlfdG9fd2Fr
-ZV91cCsweDI5Mi8weDZjMA0KICAgIOKAoiBOb3YgMTQgMDE6Mjk6MjggUnVkeVVidU1icCBrZXJu
-ZWw6ID8gc2NoZWRfc2xpY2UrMHg3Ni8weDE0MA0KICAgIOKAoiBOb3YgMTQgMDE6Mjk6MjggUnVk
-eVVidU1icCBrZXJuZWw6ID8gcmV3ZWlnaHRfZW50aXR5KzB4MTVjLzB4MTcwDQogICAg4oCiIE5v
-diAxNCAwMToyOToyOCBSdWR5VWJ1TWJwIGtlcm5lbDogX19yZWdfb3AuY29sZCsweDE0LzB4MzgN
-CiAgICDigKIgTm92IDE0IDAxOjI5OjI4IFJ1ZHlVYnVNYnAga2VybmVsOiBiaXRtYXBfcmVsZWFz
-ZV9yZWdpb24rMHhlLzB4MjANCiAgICDigKIgTm92IDE0IDAxOjI5OjI4IFJ1ZHlVYnVNYnAga2Vy
-bmVsOiBiY200Mzc3X2hhbmRsZV9hY2srMHg4Yy8weDEzMCBbaGNpX2JjbTQzNzddDQogICAg4oCi
-IE5vdiAxNCAwMToyOToyOCBSdWR5VWJ1TWJwIGtlcm5lbDogYmNtNDM3N19wb2xsX2NvbXBsZXRp
-b25fcmluZysweDE5Ni8weDMzMCBbaGNpX2JjbTQzNzddDQogICAg4oCiIE5vdiAxNCAwMToyOToy
-OCBSdWR5VWJ1TWJwIGtlcm5lbDogPyByY3VfZ3Bfa3RocmVhZF93YWtlKzB4NTcvMHg5MA0KICAg
-IOKAoiBOb3YgMTQgMDE6Mjk6MjggUnVkeVVidU1icCBrZXJuZWw6IGJjbTQzNzdfaXJxKzB4Nzcv
-MHgxNDAgW2hjaV9iY200Mzc3XQ0KICAgIOKAoiBOb3YgMTQgMDE6Mjk6MjggUnVkeVVidU1icCBr
-ZXJuZWw6IF9faGFuZGxlX2lycV9ldmVudF9wZXJjcHUrMHg0Yy8weDFiMA0KICAgIOKAoiBOb3Yg
-MTQgMDE6Mjk6MjggUnVkeVVidU1icCBrZXJuZWw6IGhhbmRsZV9pcnFfZXZlbnQrMHgzOS8weDgw
-DQogICAg4oCiIE5vdiAxNCAwMToyOToyOCBSdWR5VWJ1TWJwIGtlcm5lbDogaGFuZGxlX2VkZ2Vf
-aXJxKzB4OGMvMHgyNTANCiAgICDigKIgTm92IDE0IDAxOjI5OjI4IFJ1ZHlVYnVNYnAga2VybmVs
-OiBfX2NvbW1vbl9pbnRlcnJ1cHQrMHg0Zi8weDExMA0KICAgIOKAoiBOb3YgMTQgMDE6Mjk6Mjgg
-UnVkeVVidU1icCBrZXJuZWw6IGNvbW1vbl9pbnRlcnJ1cHQrMHg0NS8weGIwDQogICAg4oCiIE5v
-diAxNCAwMToyOToyOCBSdWR5VWJ1TWJwIGtlcm5lbDogYXNtX2NvbW1vbl9pbnRlcnJ1cHQrMHgy
-Ny8weDQwDQogICAg4oCiIE5vdiAxNCAwMToyOToyOCBSdWR5VWJ1TWJwIGtlcm5lbDogUklQOiAw
-MDMzOjB4N2YxN2I1ZmQ4YmNh
+
+--6D6G11eLM7jDJgCQ
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Nov 13, 2023 at 08:57:35PM +0000, Aditya Garg wrote:
+> Starting from kernel 6.5, a regression in the kernel is causing Bluetooth=
+ to not work on T2 Macs with BCM4377 chip.
+>=20
+> Journalctl of kernel 6.4.8 which has Bluetooth working is given here: htt=
+ps://pastebin.com/u9U3kbFJ
+>=20
+> Journalctl of kernel 6.5.2, which has Bluetooth broken is given here: htt=
+ps://pastebin.com/aVHNFMRs
+>=20
+> Also, the bug hasn=E2=80=99t been fixed even in 6.6.1, as reported by use=
+rs.
+
+Can you bisect this regression please?
+
+>=20
+> Some relevant bits imo:
+>=20
+>     =E2=80=A2 Sep 19 21:24:36 RudyUbuMbp kernel: hci_bcm4377 0000:73:00.1=
+: can't disable ASPM; OS doesn't have ASPM control
+>=20
+>     =E2=80=A2 Nov 14 01:29:28 RudyUbuMbp kernel: Call Trace:
+>     =E2=80=A2 Nov 14 01:29:28 RudyUbuMbp kernel: <TASK>
+>     =E2=80=A2 Nov 14 01:29:28 RudyUbuMbp kernel: dump_stack_lvl+0x48/0x70
+>     =E2=80=A2 Nov 14 01:29:28 RudyUbuMbp kernel: dump_stack+0x10/0x20
+>     =E2=80=A2 Nov 14 01:29:28 RudyUbuMbp kernel: __ubsan_handle_shift_out=
+_of_bounds+0x156/0x310
+>     =E2=80=A2 Nov 14 01:29:28 RudyUbuMbp kernel: ? ttwu_do_activate+0x80/=
+0x290
+>     =E2=80=A2 Nov 14 01:29:28 RudyUbuMbp kernel: ? raw_spin_rq_unlock+0x1=
+0/0x40
+>     =E2=80=A2 Nov 14 01:29:28 RudyUbuMbp kernel: ? try_to_wake_up+0x292/0=
+x6c0
+>     =E2=80=A2 Nov 14 01:29:28 RudyUbuMbp kernel: ? sched_slice+0x76/0x140
+>     =E2=80=A2 Nov 14 01:29:28 RudyUbuMbp kernel: ? reweight_entity+0x15c/=
+0x170
+>     =E2=80=A2 Nov 14 01:29:28 RudyUbuMbp kernel: __reg_op.cold+0x14/0x38
+>     =E2=80=A2 Nov 14 01:29:28 RudyUbuMbp kernel: bitmap_release_region+0x=
+e/0x20
+>     =E2=80=A2 Nov 14 01:29:28 RudyUbuMbp kernel: bcm4377_handle_ack+0x8c/=
+0x130 [hci_bcm4377]
+>     =E2=80=A2 Nov 14 01:29:28 RudyUbuMbp kernel: bcm4377_poll_completion_=
+ring+0x196/0x330 [hci_bcm4377]
+>     =E2=80=A2 Nov 14 01:29:28 RudyUbuMbp kernel: ? rcu_gp_kthread_wake+0x=
+57/0x90
+>     =E2=80=A2 Nov 14 01:29:28 RudyUbuMbp kernel: bcm4377_irq+0x77/0x140 [=
+hci_bcm4377]
+>     =E2=80=A2 Nov 14 01:29:28 RudyUbuMbp kernel: __handle_irq_event_percp=
+u+0x4c/0x1b0
+>     =E2=80=A2 Nov 14 01:29:28 RudyUbuMbp kernel: handle_irq_event+0x39/0x=
+80
+>     =E2=80=A2 Nov 14 01:29:28 RudyUbuMbp kernel: handle_edge_irq+0x8c/0x2=
+50
+>     =E2=80=A2 Nov 14 01:29:28 RudyUbuMbp kernel: __common_interrupt+0x4f/=
+0x110
+>     =E2=80=A2 Nov 14 01:29:28 RudyUbuMbp kernel: common_interrupt+0x45/0x=
+b0
+>     =E2=80=A2 Nov 14 01:29:28 RudyUbuMbp kernel: asm_common_interrupt+0x2=
+7/0x40
+>     =E2=80=A2 Nov 14 01:29:28 RudyUbuMbp kernel: RIP: 0033:0x7f17b5fd8bca
+
+Anyway, thanks for the regression report. I'm adding it to regzbot:
+
+#regzbot ^introduced: v6.4..v6.5
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--6D6G11eLM7jDJgCQ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZVKxsQAKCRD2uYlJVVFO
+o7pdAQCnfRXRPTO65yNiy5w0iigPO8iwskixInYi/GKY5Njt/wD/Zkgd2bApc+JF
+H8fRsVcs7KNkBGy8IHSdCWeFO/IWLw4=
+=vFNS
+-----END PGP SIGNATURE-----
+
+--6D6G11eLM7jDJgCQ--
