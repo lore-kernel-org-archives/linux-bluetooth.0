@@ -1,121 +1,87 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A9BD26AF0
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Nov 2023 20:10:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from mail-pg1-f207.google.com (mail-pg1-f207.google.com [209.85.215.207])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2968F112
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Nov 2023 12:10:27 -0800 (PST)
-Received: by mail-pg1-f207.google.com with SMTP id 41be03b00d2f7-5c1b986082eso1106188a12.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Nov 2023 12:10:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699992626; x=1700597426;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8OmEtRgexLuao6rUTYjJiY3r0edSaCvPRTeIf9Q3x4Y=;
-        b=jEyzSbxF5GRAQugfvcKqjPoN9vdEJ2EpvTeZH59qK32XRypY+pcXdVN9tHVwLbWYm0
-         to/pZcBCf9OrthOI3EqvWVQqWkIcwUQKwQUMpQ3YhNwqZpA6H61Q37TsfX2TPSPDMwWM
-         WNNTFfAPVAwjsiHMlRbOfYTOmK54rocMqxXQn5KmCn6tUVqX9o7k9EJrloTj2l468ZB5
-         ugVK5EUBkXu0PhUMgGXx+KsAVbWAvc516WNcKxMsmdovNXqhHlStZvvRGc7pVFOwvZfJ
-         1KZx6+qX1GpJng1wE34NVFabnsdD6IlvrdzyPZ2rS0mTf7W0eS8iTUJxC4uCflBxIsVw
-         BeEw==
-X-Gm-Message-State: AOJu0YxT7jxUzam5AUL0oeAs2hmBI4zSkmngNr4Et2biIHTzk63uJoNH
-	F6thT3gYL4/YyjOv/U4a6uzw20I0H3obdBgymSrTWlFhymz4
-X-Google-Smtp-Source: AGHT+IETYdbtUIRvCyXXpYa3AFqr3GveSx+wlGUsWoZqM5BQf1q0ceXvYVfxWA/DSQfm4ey42OtxaYOEc06BLy+8Nm0V40d2HsgW
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B3E91CABB
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Nov 2023 20:12:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="NeD+QQKG"
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 160EE134
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Nov 2023 12:12:00 -0800 (PST)
+Received: from monolith.lan (unknown [193.138.7.178])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4SVHWd0TyVz49PwY;
+	Tue, 14 Nov 2023 22:11:53 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1699992717;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=6LRb2yWvSKnzv1ECaPDFsSSbZwIZtkWJdU7+VFnrWkY=;
+	b=NeD+QQKGy72Rmd52m9sK2WmWjkuquqzYSSTmBLYNsHN9yEcFA9dfAGgJhsv5uRms7E80ZI
+	fU7weqaCu8pHYW4sttw91hOJ7kS/6yIapWy5AH8x3gc4Sn0qlas7POzNIAfF2q5UkIDNYf
+	Zws3B1HmcargYQx64y7TSXMuje6VECJvDXuRQ2txEwjX5rv7Kh4IRNN0xnax2EbzLUH4NA
+	WF+c7JYk1Lp6cnESozsfwh5d3v/uheJbNnNiP5NNNoLKeFTF2TUpeJLjtsh/fVnDijND/z
+	s5tl1ejpqkrzso596MnDtx9EQBoVD5tdNT2InEna1a4SXYh9qk8UWEsAO9eoAA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1699992717;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=6LRb2yWvSKnzv1ECaPDFsSSbZwIZtkWJdU7+VFnrWkY=;
+	b=o69CShxyv/Mizm9bF9q62ld143u2/K0KMOniM+N9pajNH8Ll1kJW9uCgiwFeofcDhDKdSC
+	i6kKlV32G99UrUdtA09jk+drIpj7gPbovY5228x2ViLIrJRaT2uxHs5hRDsjHxcTR+o7hu
+	YzZG9+Fr+a2Gk8QjqKN3Ex9aiw9V7w5RA6DAGscCWbzuXg3lltkylJVkvjrhQKlrQag+83
+	at7j/hBH4XrfJmUeO22rb3YhAy2bjP1MS9m8Tp+Fed1T+VioDvz9mplzZo21TUlHCOY9mg
+	J+PY1AlsPBh3lidazdTB3lyEiL3aEFSJHyegRxQW60FR0VrU/WJnow0+ktB5pQ==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1699992717; a=rsa-sha256;
+	cv=none;
+	b=uatbWKt4T1wFJblEeAfW7y9J5w2EDm50xrUqCN/a7GYnErOBH8Ubctt2aZQqws8Vys+d7N
+	XdRuK0gDXOxuXA8UR7VqDI/vs9Y+ih78eV1FxYS+at8bUQ1qK4/6BssvdFg7wnHoRnv/PE
+	/dMkhxUEHkv2DIn6hiVhEHT4dpwri/XGqITjWkF4Cg/7UlEPHkYZXhCbhiQg6rTQ8dMbL7
+	GW3VzLlVe1Tt/52qmIrT5pXRjW9Ze+3Nx14cdxn0ulv7Z08VSUPiUVvjuFtZIFthD2/Q0I
+	Rv57000BhMlbScHIYtsB884tS6w3RnVJX+WDLGvu272aS51+rJhyhCR+OGEacQ==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ] media: add Retransmissions in SelectProperties QoS
+Date: Tue, 14 Nov 2023 22:11:52 +0200
+Message-ID: <f1ac6b52c30e002400c2a0dcb20ead18899695b5.1699992657.git.pav@iki.fi>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a65:6702:0:b0:5bd:579:c5bb with SMTP id
- u2-20020a656702000000b005bd0579c5bbmr893745pgf.4.1699992626605; Tue, 14 Nov
- 2023 12:10:26 -0800 (PST)
-Date: Tue, 14 Nov 2023 12:10:26 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000a135c0060a2260b3@google.com>
-Subject: [syzbot] [bluetooth?] KASAN: null-ptr-deref Read in ida_free (4)
-From: syzbot <syzbot+51baee846ddab52d5230@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    9bacdd8996c7 Merge tag 'for-6.7-rc1-tag' of git://git.kern..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1121f91f680000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=84217b7fc4acdc59
-dashboard link: https://syzkaller.appspot.com/bug?extid=51baee846ddab52d5230
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/8889f0a9f059/disk-9bacdd89.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/f78cb4c03467/vmlinux-9bacdd89.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/bb88d4b4f745/bzImage-9bacdd89.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+51baee846ddab52d5230@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: null-ptr-deref in instrument_atomic_read include/linux/instrumented.h:68 [inline]
-BUG: KASAN: null-ptr-deref in _test_bit include/asm-generic/bitops/instrumented-non-atomic.h:141 [inline]
-BUG: KASAN: null-ptr-deref in ida_free+0x218/0x2e0 lib/idr.c:511
-Read of size 8 at addr 0000000000000050 by task kworker/u5:2/5100
-
-CPU: 0 PID: 5100 Comm: kworker/u5:2 Not tainted 6.7.0-rc1-syzkaller-00012-g9bacdd8996c7 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
-Workqueue: hci4 hci_error_reset
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
- kasan_report+0xda/0x110 mm/kasan/report.c:588
- check_region_inline mm/kasan/generic.c:181 [inline]
- kasan_check_range+0xef/0x190 mm/kasan/generic.c:187
- instrument_atomic_read include/linux/instrumented.h:68 [inline]
- _test_bit include/asm-generic/bitops/instrumented-non-atomic.h:141 [inline]
- ida_free+0x218/0x2e0 lib/idr.c:511
- hci_conn_cleanup net/bluetooth/hci_conn.c:157 [inline]
- hci_conn_del+0x78c/0xe10 net/bluetooth/hci_conn.c:1182
- hci_conn_hash_flush+0x189/0x260 net/bluetooth/hci_conn.c:2615
- hci_dev_close_sync+0x5a7/0x1160 net/bluetooth/hci_sync.c:5021
- hci_dev_do_close+0x2e/0x90 net/bluetooth/hci_core.c:554
- hci_error_reset+0xa6/0x190 net/bluetooth/hci_core.c:1059
- process_one_work+0x886/0x15d0 kernel/workqueue.c:2630
- process_scheduled_works kernel/workqueue.c:2703 [inline]
- worker_thread+0x8b9/0x1290 kernel/workqueue.c:2784
- kthread+0x2c6/0x3a0 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
- </TASK>
-==================================================================
-
-
+The server preferred RTN is part of the server supported/preferred QoS
+values, and should be passed on to SelectProperties.
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ profiles/audio/media.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index 4d9a6aa03..62f53defa 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -995,6 +995,9 @@ static int pac_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
+ 		g_dbus_dict_append_entry(&qos_dict, "PHY", DBUS_TYPE_BYTE,
+ 							&qos->phy);
+ 
++		g_dbus_dict_append_entry(&qos_dict, "Retransmissions",
++					DBUS_TYPE_BYTE, &qos->rtn);
++
+ 		g_dbus_dict_append_entry(&qos_dict, "MaximumLatency",
+ 					DBUS_TYPE_UINT16, &qos->latency);
+ 
+-- 
+2.41.0
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
