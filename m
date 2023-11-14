@@ -1,159 +1,121 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3479333CF0
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Nov 2023 18:38:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Ru5XSyAA"
-Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D23F912A
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Nov 2023 10:38:02 -0800 (PST)
-Received: from github.com (hubbernetes-node-ba91505.va3-iad.github.net [10.48.135.41])
-	by smtp.github.com (Postfix) with ESMTPA id 16E1B8C0C31
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Nov 2023 10:38:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1699987082;
-	bh=/jvI3kgi4amoRniFns5jWgEN8vHQhE+SvooUYW+qlUc=;
-	h=Date:From:To:Subject:From;
-	b=Ru5XSyAAlL3tONfCayjYnFRGTT2sTA/6l0ZCGczy40qBReAZ3/SkaoKnLzCjSCnqa
-	 PC38SLNob2JLGvFjW9XrH8IbeV1pJvU2lUrj67E1/bXxXZj3Uf8uo5Lsb2ztUN/wwU
-	 KKw7MNYdXk6Exz5xfVra9Tb9jk1k6tmSFJPs7CNU=
-Date: Tue, 14 Nov 2023 10:38:02 -0800
-From: Paul Otto <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/7ef406-4b353a@github.com>
-Subject: [bluez/bluez] 0d65d6: client: Add bluetoothctl-admin.1 man page
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A9BD26AF0
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Nov 2023 20:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from mail-pg1-f207.google.com (mail-pg1-f207.google.com [209.85.215.207])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2968F112
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Nov 2023 12:10:27 -0800 (PST)
+Received: by mail-pg1-f207.google.com with SMTP id 41be03b00d2f7-5c1b986082eso1106188a12.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Nov 2023 12:10:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699992626; x=1700597426;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8OmEtRgexLuao6rUTYjJiY3r0edSaCvPRTeIf9Q3x4Y=;
+        b=jEyzSbxF5GRAQugfvcKqjPoN9vdEJ2EpvTeZH59qK32XRypY+pcXdVN9tHVwLbWYm0
+         to/pZcBCf9OrthOI3EqvWVQqWkIcwUQKwQUMpQ3YhNwqZpA6H61Q37TsfX2TPSPDMwWM
+         WNNTFfAPVAwjsiHMlRbOfYTOmK54rocMqxXQn5KmCn6tUVqX9o7k9EJrloTj2l468ZB5
+         ugVK5EUBkXu0PhUMgGXx+KsAVbWAvc516WNcKxMsmdovNXqhHlStZvvRGc7pVFOwvZfJ
+         1KZx6+qX1GpJng1wE34NVFabnsdD6IlvrdzyPZ2rS0mTf7W0eS8iTUJxC4uCflBxIsVw
+         BeEw==
+X-Gm-Message-State: AOJu0YxT7jxUzam5AUL0oeAs2hmBI4zSkmngNr4Et2biIHTzk63uJoNH
+	F6thT3gYL4/YyjOv/U4a6uzw20I0H3obdBgymSrTWlFhymz4
+X-Google-Smtp-Source: AGHT+IETYdbtUIRvCyXXpYa3AFqr3GveSx+wlGUsWoZqM5BQf1q0ceXvYVfxWA/DSQfm4ey42OtxaYOEc06BLy+8Nm0V40d2HsgW
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+X-Received: by 2002:a65:6702:0:b0:5bd:579:c5bb with SMTP id
+ u2-20020a656702000000b005bd0579c5bbmr893745pgf.4.1699992626605; Tue, 14 Nov
+ 2023 12:10:26 -0800 (PST)
+Date: Tue, 14 Nov 2023 12:10:26 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000a135c0060a2260b3@google.com>
+Subject: [syzbot] [bluetooth?] KASAN: null-ptr-deref Read in ida_free (4)
+From: syzbot <syzbot+51baee846ddab52d5230@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 0d65d6862a050dd0bbdc1984bf549086ce9d75c4
-      https://github.com/bluez/bluez/commit/0d65d6862a050dd0bbdc1984bf549086ce9d75c4
-  Author: Paul Otto <potto@ieee.org>
-  Date:   2023-11-13 (Mon, 13 Nov 2023)
+Hello,
 
-  Changed paths:
-    M Makefile.tools
-    A client/bluetoothctl-admin.rst
+syzbot found the following issue on:
 
-  Log Message:
-  -----------
-  client: Add bluetoothctl-admin.1 man page
+HEAD commit:    9bacdd8996c7 Merge tag 'for-6.7-rc1-tag' of git://git.kern..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1121f91f680000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=84217b7fc4acdc59
+dashboard link: https://syzkaller.appspot.com/bug?extid=51baee846ddab52d5230
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
-This adds bluetoothctl-admin.rst which is then converted to
-bluetoothctl-admin.1 using rst2man.
+Unfortunately, I don't have any reproducer for this issue yet.
 
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/8889f0a9f059/disk-9bacdd89.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/f78cb4c03467/vmlinux-9bacdd89.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/bb88d4b4f745/bzImage-9bacdd89.xz
 
-  Commit: 6c446bdd32a89afe2c5580f56940c31d826d9eb4
-      https://github.com/bluez/bluez/commit/6c446bdd32a89afe2c5580f56940c31d826d9eb4
-  Author: Paul Otto <potto@ieee.org>
-  Date:   2023-11-14 (Tue, 14 Nov 2023)
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+51baee846ddab52d5230@syzkaller.appspotmail.com
 
-  Changed paths:
-    M Makefile.tools
-    A client/bluetoothctl-advertise.rst
+==================================================================
+BUG: KASAN: null-ptr-deref in instrument_atomic_read include/linux/instrumented.h:68 [inline]
+BUG: KASAN: null-ptr-deref in _test_bit include/asm-generic/bitops/instrumented-non-atomic.h:141 [inline]
+BUG: KASAN: null-ptr-deref in ida_free+0x218/0x2e0 lib/idr.c:511
+Read of size 8 at addr 0000000000000050 by task kworker/u5:2/5100
 
-  Log Message:
-  -----------
-  client: Add bluetoothctl-advertise.1 man page
-
-This adds bluetoothctl-advertise.rst which is then converted to
-bluetoothctl-advertise.1 using rst2man.
-
-
-  Commit: face899cd83cbee9df42e72c8d6debea2c02bfaa
-      https://github.com/bluez/bluez/commit/face899cd83cbee9df42e72c8d6debea2c02bfaa
-  Author: Paul Otto <potto@ieee.org>
-  Date:   2023-11-14 (Tue, 14 Nov 2023)
-
-  Changed paths:
-    M Makefile.tools
-    A client/bluetoothctl-endpoint.rst
-
-  Log Message:
-  -----------
-  client: Add bluetoothctl-endpoint.1 man page
-
-This adds bluetoothctl-endpoint.rst which is then converted to
-bluetoothctl-endpoint.1 using rst2man.
-
-
-  Commit: fa5fb919a97ee62d271eeec4fc93ce7a880f9239
-      https://github.com/bluez/bluez/commit/fa5fb919a97ee62d271eeec4fc93ce7a880f9239
-  Author: Paul Otto <potto@ieee.org>
-  Date:   2023-11-14 (Tue, 14 Nov 2023)
-
-  Changed paths:
-    M Makefile.tools
-    A client/bluetoothctl-gatt.rst
-
-  Log Message:
-  -----------
-  client: Add bluetoothctl-gatt.1 man page
-
-This adds bluetoothctl-gatt.rst which is then converted to
-bluetoothctl-gatt.1 using rst2man.
+CPU: 0 PID: 5100 Comm: kworker/u5:2 Not tainted 6.7.0-rc1-syzkaller-00012-g9bacdd8996c7 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
+Workqueue: hci4 hci_error_reset
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
+ kasan_report+0xda/0x110 mm/kasan/report.c:588
+ check_region_inline mm/kasan/generic.c:181 [inline]
+ kasan_check_range+0xef/0x190 mm/kasan/generic.c:187
+ instrument_atomic_read include/linux/instrumented.h:68 [inline]
+ _test_bit include/asm-generic/bitops/instrumented-non-atomic.h:141 [inline]
+ ida_free+0x218/0x2e0 lib/idr.c:511
+ hci_conn_cleanup net/bluetooth/hci_conn.c:157 [inline]
+ hci_conn_del+0x78c/0xe10 net/bluetooth/hci_conn.c:1182
+ hci_conn_hash_flush+0x189/0x260 net/bluetooth/hci_conn.c:2615
+ hci_dev_close_sync+0x5a7/0x1160 net/bluetooth/hci_sync.c:5021
+ hci_dev_do_close+0x2e/0x90 net/bluetooth/hci_core.c:554
+ hci_error_reset+0xa6/0x190 net/bluetooth/hci_core.c:1059
+ process_one_work+0x886/0x15d0 kernel/workqueue.c:2630
+ process_scheduled_works kernel/workqueue.c:2703 [inline]
+ worker_thread+0x8b9/0x1290 kernel/workqueue.c:2784
+ kthread+0x2c6/0x3a0 kernel/kthread.c:388
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+ </TASK>
+==================================================================
 
 
-  Commit: 3797cedadb931d6e75a8636bab07163bcd122dd3
-      https://github.com/bluez/bluez/commit/3797cedadb931d6e75a8636bab07163bcd122dd3
-  Author: Paul Otto <potto@ieee.org>
-  Date:   2023-11-14 (Tue, 14 Nov 2023)
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-  Changed paths:
-    M Makefile.tools
-    A client/bluetoothctl-player.rst
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-  Log Message:
-  -----------
-  client: Add bluetoothctl-player.1 man page
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-This adds bluetoothctl-player.rst which is then converted to
-bluetoothctl-player.1 using rst2man.
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
-  Commit: c0678a4ddcc6befd697cbc6ae1c48036c63b9bca
-      https://github.com/bluez/bluez/commit/c0678a4ddcc6befd697cbc6ae1c48036c63b9bca
-  Author: Paul Otto <potto@ieee.org>
-  Date:   2023-11-14 (Tue, 14 Nov 2023)
-
-  Changed paths:
-    M Makefile.tools
-    A client/bluetoothctl-scan.rst
-
-  Log Message:
-  -----------
-  client: Add bluetoothctl-scan.1 man page
-
-This adds bluetoothctl-scan.rst which is then converted to
-bluetoothctl-scan.1 using rst2man.
-
-
-  Commit: 4b353ae99ab66390561730974d0c4fecc4f38d6a
-      https://github.com/bluez/bluez/commit/4b353ae99ab66390561730974d0c4fecc4f38d6a
-  Author: Paul Otto <potto@ieee.org>
-  Date:   2023-11-14 (Tue, 14 Nov 2023)
-
-  Changed paths:
-    M Makefile.tools
-    A client/bluetoothctl-transport.rst
-
-  Log Message:
-  -----------
-  client: Add bluetoothctl-transport.1 man page
-
-This adds bluetoothctl-transport.rst which is then converted to
-bluetoothctl-transport.1 using rst2man.
-
-
-Compare: https://github.com/bluez/bluez/compare/7ef40617a049...4b353ae99ab6
+If you want to undo deduplication, reply with:
+#syz undup
