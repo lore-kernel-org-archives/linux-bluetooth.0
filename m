@@ -1,112 +1,159 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D8424122A
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Nov 2023 15:14:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83341F9;
-	Tue, 14 Nov 2023 07:14:23 -0800 (PST)
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-9c603e2354fso1154706266b.1;
-        Tue, 14 Nov 2023 07:14:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699974861; x=1700579661;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yxz8QkUMUdK70UcIufkcCTFuHM/iFKukNXMBMippDVw=;
-        b=FIBpXliRegubGy+6t3SLZZwguEKbefm3L9aQ85WbDYkbvsfUqFNJ2xN3c0swfetd8n
-         k3GzwS2EFw0z3yde+Ct2F5umIHBEiEdDW2wHRJTS7iGyn9Oydi/zq66aVsb8Uc052PnV
-         HUA2MNawtAFk4T3pwr1xZLsPMVEXL2IAkss7TrIMHcD1RO99rZLbx1y24uYvXL46NJf+
-         W+ecnXIkNrj3Z5rZK/R/DEmNyiG5p84MZUqiFCgpANn4UbEWOYanWHeQnHvhqDg+0K+W
-         bjr/obiRu9qpAe5Kqq/wc28kp38DOwUB53GkkMckBkdar81XSIYqjb34nRaVn0g2AQPy
-         +PfA==
-X-Gm-Message-State: AOJu0YxkV6vet8vlyO/5s3wMSfLt4i3lSjgl4CcBWb7dbVvEDmOM2Wpp
-	77JKRGj4UYO29L8LVbPFsfaTwS2zdHY7iAkYjWo=
-X-Google-Smtp-Source: AGHT+IEgOIolvgTrfEjV0AmDGor4/vOucGkOxuTp6WsVbqYowytfw1cdybx6FVvSq9b7+MGpLatTlg==
-X-Received: by 2002:a17:906:68d6:b0:9a1:b528:d0f6 with SMTP id y22-20020a17090668d600b009a1b528d0f6mr2181514ejr.27.1699974861181;
-        Tue, 14 Nov 2023 07:14:21 -0800 (PST)
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com. [209.85.208.52])
-        by smtp.gmail.com with ESMTPSA id rp13-20020a170906d96d00b009ddb919e0aasm5664465ejb.138.2023.11.14.07.14.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Nov 2023 07:14:20 -0800 (PST)
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-540c54944c4so11571581a12.1;
-        Tue, 14 Nov 2023 07:14:20 -0800 (PST)
-X-Received: by 2002:a05:6402:440f:b0:531:14c4:ae30 with SMTP id
- y15-20020a056402440f00b0053114c4ae30mr3214229eda.0.1699974860727; Tue, 14 Nov
- 2023 07:14:20 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3479333CF0
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Nov 2023 18:38:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Ru5XSyAA"
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D23F912A
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Nov 2023 10:38:02 -0800 (PST)
+Received: from github.com (hubbernetes-node-ba91505.va3-iad.github.net [10.48.135.41])
+	by smtp.github.com (Postfix) with ESMTPA id 16E1B8C0C31
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Nov 2023 10:38:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1699987082;
+	bh=/jvI3kgi4amoRniFns5jWgEN8vHQhE+SvooUYW+qlUc=;
+	h=Date:From:To:Subject:From;
+	b=Ru5XSyAAlL3tONfCayjYnFRGTT2sTA/6l0ZCGczy40qBReAZ3/SkaoKnLzCjSCnqa
+	 PC38SLNob2JLGvFjW9XrH8IbeV1pJvU2lUrj67E1/bXxXZj3Uf8uo5Lsb2ztUN/wwU
+	 KKw7MNYdXk6Exz5xfVra9Tb9jk1k6tmSFJPs7CNU=
+Date: Tue, 14 Nov 2023 10:38:02 -0800
+From: Paul Otto <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/7ef406-4b353a@github.com>
+Subject: [bluez/bluez] 0d65d6: client: Add bluetoothctl-admin.1 man page
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231114-bluetooth-msgid-fix-v1-1-1d15394bf342@marcan.st>
-In-Reply-To: <20231114-bluetooth-msgid-fix-v1-1-1d15394bf342@marcan.st>
-From: Neal Gompa <neal@gompa.dev>
-Date: Tue, 14 Nov 2023 10:13:43 -0500
-X-Gmail-Original-Message-ID: <CAEg-Je-SvvMpAAqtOPgaKt1PuoZi37K0Tprf3KDts-SBTzNpUA@mail.gmail.com>
-Message-ID: <CAEg-Je-SvvMpAAqtOPgaKt1PuoZi37K0Tprf3KDts-SBTzNpUA@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_bcm4377: Fix msgid release
-To: Hector Martin <marcan@marcan.st>
-Cc: Sven Peter <sven@svenpeter.dev>, Alyssa Rosenzweig <alyssa@rosenzweig.io>, 
-	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Aditya Garg <gargaditya08@live.com>, 
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, asahi@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-On Tue, Nov 14, 2023 at 2:05=E2=80=AFAM Hector Martin <marcan@marcan.st> wr=
-ote:
->
-> We are releasing a single msgid, so the order argument to
-> bitmap_release_region must be zero.
->
-> In practice this was probably harmlessly masked to 0 anyway, which is
-> why it worked, but it trips ubsan.
->
-> Fixes: 8a06127602de ("Bluetooth: hci_bcm4377: Add new driver for BCM4377 =
-PCIe boards")
-> Reported-by: Aditya Garg <gargaditya08@live.com>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Hector Martin <marcan@marcan.st>
-> ---
->  drivers/bluetooth/hci_bcm4377.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/bluetooth/hci_bcm4377.c b/drivers/bluetooth/hci_bcm4=
-377.c
-> index 19ad0e788646..5e9f79235cde 100644
-> --- a/drivers/bluetooth/hci_bcm4377.c
-> +++ b/drivers/bluetooth/hci_bcm4377.c
-> @@ -715,7 +715,7 @@ static void bcm4377_handle_ack(struct bcm4377_data *b=
-cm4377,
->                 ring->events[msgid] =3D NULL;
->         }
->
-> -       bitmap_release_region(ring->msgids, msgid, ring->n_entries);
-> +       bitmap_release_region(ring->msgids, msgid, 0);
->
->  unlock:
->         spin_unlock_irqrestore(&ring->lock, flags);
->
-> ---
-> base-commit: ffc253263a1375a65fa6c9f62a893e9767fbebfa
-> change-id: 20231114-bluetooth-msgid-fix-29769be7e45b
->
-> Best regards,
-> --
-> Hector Martin <marcan@marcan.st>
->
->
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 0d65d6862a050dd0bbdc1984bf549086ce9d75c4
+      https://github.com/bluez/bluez/commit/0d65d6862a050dd0bbdc1984bf549086ce9d75c4
+  Author: Paul Otto <potto@ieee.org>
+  Date:   2023-11-13 (Mon, 13 Nov 2023)
 
-LGTM.
+  Changed paths:
+    M Makefile.tools
+    A client/bluetoothctl-admin.rst
 
-Reviewed-by: Neal Gompa <neal@gompa.dev>
+  Log Message:
+  -----------
+  client: Add bluetoothctl-admin.1 man page
+
+This adds bluetoothctl-admin.rst which is then converted to
+bluetoothctl-admin.1 using rst2man.
 
 
---=20
-=E7=9C=9F=E5=AE=9F=E3=81=AF=E3=81=84=E3=81=A4=E3=82=82=E4=B8=80=E3=81=A4=EF=
-=BC=81/ Always, there's only one truth!
+  Commit: 6c446bdd32a89afe2c5580f56940c31d826d9eb4
+      https://github.com/bluez/bluez/commit/6c446bdd32a89afe2c5580f56940c31d826d9eb4
+  Author: Paul Otto <potto@ieee.org>
+  Date:   2023-11-14 (Tue, 14 Nov 2023)
+
+  Changed paths:
+    M Makefile.tools
+    A client/bluetoothctl-advertise.rst
+
+  Log Message:
+  -----------
+  client: Add bluetoothctl-advertise.1 man page
+
+This adds bluetoothctl-advertise.rst which is then converted to
+bluetoothctl-advertise.1 using rst2man.
+
+
+  Commit: face899cd83cbee9df42e72c8d6debea2c02bfaa
+      https://github.com/bluez/bluez/commit/face899cd83cbee9df42e72c8d6debea2c02bfaa
+  Author: Paul Otto <potto@ieee.org>
+  Date:   2023-11-14 (Tue, 14 Nov 2023)
+
+  Changed paths:
+    M Makefile.tools
+    A client/bluetoothctl-endpoint.rst
+
+  Log Message:
+  -----------
+  client: Add bluetoothctl-endpoint.1 man page
+
+This adds bluetoothctl-endpoint.rst which is then converted to
+bluetoothctl-endpoint.1 using rst2man.
+
+
+  Commit: fa5fb919a97ee62d271eeec4fc93ce7a880f9239
+      https://github.com/bluez/bluez/commit/fa5fb919a97ee62d271eeec4fc93ce7a880f9239
+  Author: Paul Otto <potto@ieee.org>
+  Date:   2023-11-14 (Tue, 14 Nov 2023)
+
+  Changed paths:
+    M Makefile.tools
+    A client/bluetoothctl-gatt.rst
+
+  Log Message:
+  -----------
+  client: Add bluetoothctl-gatt.1 man page
+
+This adds bluetoothctl-gatt.rst which is then converted to
+bluetoothctl-gatt.1 using rst2man.
+
+
+  Commit: 3797cedadb931d6e75a8636bab07163bcd122dd3
+      https://github.com/bluez/bluez/commit/3797cedadb931d6e75a8636bab07163bcd122dd3
+  Author: Paul Otto <potto@ieee.org>
+  Date:   2023-11-14 (Tue, 14 Nov 2023)
+
+  Changed paths:
+    M Makefile.tools
+    A client/bluetoothctl-player.rst
+
+  Log Message:
+  -----------
+  client: Add bluetoothctl-player.1 man page
+
+This adds bluetoothctl-player.rst which is then converted to
+bluetoothctl-player.1 using rst2man.
+
+
+  Commit: c0678a4ddcc6befd697cbc6ae1c48036c63b9bca
+      https://github.com/bluez/bluez/commit/c0678a4ddcc6befd697cbc6ae1c48036c63b9bca
+  Author: Paul Otto <potto@ieee.org>
+  Date:   2023-11-14 (Tue, 14 Nov 2023)
+
+  Changed paths:
+    M Makefile.tools
+    A client/bluetoothctl-scan.rst
+
+  Log Message:
+  -----------
+  client: Add bluetoothctl-scan.1 man page
+
+This adds bluetoothctl-scan.rst which is then converted to
+bluetoothctl-scan.1 using rst2man.
+
+
+  Commit: 4b353ae99ab66390561730974d0c4fecc4f38d6a
+      https://github.com/bluez/bluez/commit/4b353ae99ab66390561730974d0c4fecc4f38d6a
+  Author: Paul Otto <potto@ieee.org>
+  Date:   2023-11-14 (Tue, 14 Nov 2023)
+
+  Changed paths:
+    M Makefile.tools
+    A client/bluetoothctl-transport.rst
+
+  Log Message:
+  -----------
+  client: Add bluetoothctl-transport.1 man page
+
+This adds bluetoothctl-transport.rst which is then converted to
+bluetoothctl-transport.1 using rst2man.
+
+
+Compare: https://github.com/bluez/bluez/compare/7ef40617a049...4b353ae99ab6
