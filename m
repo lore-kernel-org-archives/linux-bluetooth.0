@@ -1,153 +1,131 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 765DC13AF3
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Nov 2023 08:18:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F29EBE4A
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Nov 2023 08:35:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=live.com header.i=@live.com header.b="VwTwcT6e"
-Received: from IND01-BMX-obe.outbound.protection.outlook.com (mail-bmxind01olkn2048.outbound.protection.outlook.com [40.92.103.48])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7F471A5;
-	Tue, 14 Nov 2023 00:18:20 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mhxWTWrkx+ohBgeHwg2vli6yDTyeN8ao8d37ASgAEuVeoxrMMYEXbkgOu1ITI0vp8L2Kl4i1bEiOnfGs45ERLOPFzNAkghpzd2K9/hE1D6essSgtvdgB/eO/XtkRBmUKJUfcFlSRbGwu1tQHmvpTBGDrLMnuOTqNCK4s04znQtbt8nafmN2xSvCwHm9sNw4GmCvC5a9Z7J8BDMJV3NElE2+119Fuw2LSvSePupXH9IRyt8yb0CTfmwgWQ+D6PGs3WBqZ5sTDfON/IENlSAMyhNHBYTX15yjzsYGWlmyj1Zq5B256QEoTPzMTVzKl240prArHP8XM6nqQUYj2seUnhQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5uBIaZ0mI/O9rDDG8oLYq3CPNN3QET1/W8nf8oIp3fI=;
- b=lisLnuSk7aQIhd0okKu8AkAuqQ4fD0foqAYLAmwKxJAjITFLVjjDS0/2OWH0UJHvXWwVDSnPQyLMs8OWllql3Eb4vjIuHLOTPmO8833j2lA+AAYJp7hvLknu5PXzd3mXm71wGp/xuF1/t3qVeG2rM/MS4MB6u7uwFJRERZzackRUrDYFmGe3aQBt9i/rk8OQbpUQqviWvqlLFb1rmFEFB3eixoMulXFveh/kkS6xpFzqO/4DASKhsRlw+4h/CYJL0JCbeqG75iXeoHe21cLj5WO7NZ/2kokfDXqE1Bk8pFsOb6eCHo/tLHqHlpmGK2K3jK+r68wFpESXxCIcMWdTNg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=live.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5uBIaZ0mI/O9rDDG8oLYq3CPNN3QET1/W8nf8oIp3fI=;
- b=VwTwcT6el2Li0/2/yliY9Yu87qMaTPdxVHlKCxAAfxMuUCNbYBgercIz4hVn1JNtQhm2jlvMiQcTULMvnxy6OgIygoE/JUtLnQoUkjJeUDVE0TuAUR7IP11rynpmg6X5ZSSkgw0/2OBU2JJBB+5cOpc6GGBBITmk2Y3d1Odi/f9i3j/9wY/A0jxVSyPqngNhSjAmJZSub7uym51yEwMpcAVrwhlA9iQwJ5T7HkfR2si5of9NuQ4vwqflp5tCCSn81grMXzL5ZGbAuazVPK/FDibYn5SYK34KFMwmfXMaf9NFASci/Oo7nlbCOcWRiTHw0pyMhduhPbZ4DJJSf/ZnMA==
-Received: from MA0P287MB0217.INDP287.PROD.OUTLOOK.COM (2603:1096:a01:b3::9) by
- MA0P287MB1536.INDP287.PROD.OUTLOOK.COM (2603:1096:a01:fb::14) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6977.31; Tue, 14 Nov 2023 08:18:14 +0000
-Received: from MA0P287MB0217.INDP287.PROD.OUTLOOK.COM
- ([fe80::6037:db64:7000:119f]) by MA0P287MB0217.INDP287.PROD.OUTLOOK.COM
- ([fe80::6037:db64:7000:119f%6]) with mapi id 15.20.6977.029; Tue, 14 Nov 2023
- 08:18:14 +0000
-From: Aditya Garg <gargaditya08@live.com>
-To: Hector Martin <marcan@marcan.st>
-CC: Bagas Sanjaya <bagasdotme@gmail.com>, Sven Peter <sven@svenpeter.dev>,
-	Alyssa Rosenzweig <alyssa@rosenzweig.io>, Marcel Holtmann
-	<marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, Luiz Augusto
- von Dentz <luiz.dentz@gmail.com>, Orlando Chamberlain
-	<orlandoch.dev@gmail.com>, Kerem Karabay <kekrby@gmail.com>, Aun-Ali Zaidi
-	<admin@kodeit.net>, Asahi Linux Mailing List <asahi@lists.linux.dev>, Linux
- Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Bluetooth
-	<linux-bluetooth@vger.kernel.org>
-Subject: Re: [REGRESSION] Bluetooth is not working on Macs with BCM4377 chip
- starting from kernel 6.5
-Thread-Topic: [REGRESSION] Bluetooth is not working on Macs with BCM4377 chip
- starting from kernel 6.5
-Thread-Index: AQHaFnQHPuYl63BuYUeFaxX8dCI6lbB45gMAgABzQceAAAopgIAAEGgAgAAFaQA=
-Date: Tue, 14 Nov 2023 08:18:14 +0000
-Message-ID: <D8FD787C-BCBB-4C52-9666-8312E05531E1@live.com>
-References: <22582194-DE99-45E5-ABEE-C1C7900DA523@live.com>
- <ZVKxtD2Mt_eVyttJ@archie.me>
- <MA0P287MB021794BCCCFB5EA57C1C3B69B8B2A@MA0P287MB0217.INDP287.PROD.OUTLOOK.COM>
- <88fcc70e-9f4b-eeb9-d826-03fa4c40e7c3@marcan.st>
- <e2909986-34b5-3ae2-cf5c-a1f8c46a1e0a@marcan.st>
-In-Reply-To: <e2909986-34b5-3ae2-cf5c-a1f8c46a1e0a@marcan.st>
-Accept-Language: en-IN, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tmn:
- [gNzHA6UOuve+84RxIKXE+YI9gUCsuwQx9sKmhehWCgdE+tbPbaxlSUlkwOuTpQiBRFICCxr43RA=]
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MA0P287MB0217:EE_|MA0P287MB1536:EE_
-x-ms-office365-filtering-correlation-id: f440ca3a-e289-4051-4b04-08dbe4ea3f9e
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- 2w3I/vZS+fg8oVTJrOhz6fFETFEeGRaq/ldArFeWMNLUhljBbdsb5M9rfRsz7IcITuwt3MgBtzFAnFJavx92zlMqujZWgrrAChuG23c/R1i5VYaZlvpMBxBZkXcchUMMfttohRASWT398oksI9RQZkRyJx+1jxyymvMdroc2wUfUD5t29NIppGsitXZAmeYNi7j+MbtWQDY90ww9/GkKyaSrXPcDrSqHaxK9Zm1+cheXthAoRzBqVp3yQtO6HDABzYJWsn2/ySWsDAFVf4p34fAQtZ8jsmxzoHCwSR8iPNf3UwuGHXiRsJpyYKF3mEvM2a79G8BeO44xEuJwyYj50LRI3fA6O5491OP3vSKV+7amEoqXqr7TZKmzbhIuEui0epXz4lGbs3pdRQLFKowD96mLa/3ohzDBl7567nR2AeILz288xXdHMHHnMahlfivKXMOaQRov91oB0xxvmNA8Hxn8eHW+r7vrGCVg2rrsLnCANdqNAVTl6UZbwu5014lo8OA2sHsdP70+lH+IwseQpNHdUiX76+aXBXo15jA148iX+ax/cHP2Y9B6oLJ3KFuHOnXFUQrlJySE/dPAoGPiDubKe4H36agbcGveSUtpA40=
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?bVZSSi85SFlJWXRMYmNVS29BRDd0aWc0YmM1T1dRb2V4aytNOFZkU1pkOFlv?=
- =?utf-8?B?ZEJReVphQXphUGxzYmt4Nk80b2JydjBkRVlqMzBVUEZMaUlvVm4xZ3Y3YU5I?=
- =?utf-8?B?cXMrZWx4alpzSXFIeGpqYkxseU5KTVUyUmxJVHB6S3RTSEJxNUNqdm5ZRGtQ?=
- =?utf-8?B?cldoVWxLWnV2Z2ZPdEdFOXF3bncva3haSnNLUlYwVVZwdUVZMnlZd0FIbmJp?=
- =?utf-8?B?RXZnV1loK1RVcmt0Ty95MDBuWVhJdzNDb0VyVm9OeTI5WmQ4TVZDTDFzU0lN?=
- =?utf-8?B?dmtTcUJJMWRxM3MxTzQ2SUc5ZE9hWTFCYzlGbTI1cEVNSkhENlNhRXVhb2pE?=
- =?utf-8?B?bGwrcjB4ZDE5SmJkK0FPUWU2ZnJ2YXBiRHlZSDF5RDNIZTU5d1Izc3RHcUdU?=
- =?utf-8?B?cXBKR1VMM0RqL0l0UlBGUlBsWWkvOEtwOVJyUGNWWGtVYTRxVTRpMVZveTFQ?=
- =?utf-8?B?VjJQMGN4dGwrV2pMUk1WSWtWNXM0a0RUbFRjeC9wcnI4dXp0R3BVaVBoZG12?=
- =?utf-8?B?T3pkcVBKM0FFWVF2UExDVytFMU40d0hTL1llb0NadW9nWW5GUzJ2aDQyV3Iz?=
- =?utf-8?B?cFpiQ0c5eExPTGNCVVQycDB5Vi9uT240WmtraFR2VE96N3FxZFFHY2ZNVnNI?=
- =?utf-8?B?dUdINi9vdDI1K1RPa3hKRk9ReXhaUnc0LzU1aUJzMVBrcEdRUHdPM0t4THV5?=
- =?utf-8?B?dmFhc1ZacXJyTmk1bjZaRUx3a0NzSDN4U0dEYitLd0JlUzRLRTYxMHRpVlRU?=
- =?utf-8?B?MVFORXJzK2VNL3A1MElmOGduTnhvYmVXNHBxZU1jNGZrWmdJdEZESDRlck1H?=
- =?utf-8?B?dmQ4Q0ZpeXFmT0NxbmkrUkp4cW5IODIySlJHT1lHZVRQd1A3T0F0bW5HeDZE?=
- =?utf-8?B?dkVuN3VuOUxsNDlObTBNVW9VM0grQ3EwUUZZV1RaaUpLcjN6bjd1clczcExn?=
- =?utf-8?B?NlJZSXFBR0dyT3gxRndOaEtQdUp0WnlDeG95dWF4Q0J4aWpwbjJwdXpOSGdY?=
- =?utf-8?B?eFZLVnpxUjFkQWVaVHlWcVB0Q25iLzQ4WVN5N2RuWmNWK1lYVHdrTjF3MHdN?=
- =?utf-8?B?d0JiWTdld09TTjVPTkM0bnliKzFkY0s0aGM1a3prRU16aE1Cb1N2VDVyNDZj?=
- =?utf-8?B?L0s4NVdsVzN1TEZsMFFoYnNMOUhzTE81Q01qVHpiMHQrbVVmSG5LTWFraGxt?=
- =?utf-8?B?NWNoVmE5MUpqZHB0Ynp4RW9UYnJzQmpTSHllMVVyRjg4RUlGQnZPUjB0TThB?=
- =?utf-8?B?emtmOUNraVdsSnRMRVhlU3VXYWh3Rkx6SVVreTFOYjJYb2pjZFNLVFlzV2lO?=
- =?utf-8?B?KzllczNpUndwU3owa0ZXYmd4T1FpSDh1b1licmtNS0JteWhFWG9ZWXdieWxJ?=
- =?utf-8?B?cFBNWW1BYWNzSkNjRzJOUnpycks4bGRpdFduK2RHdmhKajNUcUdqTjBsSktw?=
- =?utf-8?B?QlY5QUhOMWxGWWJ6Y0RCNHhiYmlhV2ROMXRQV0l6dlRzVnRhc0wzckFNWmRU?=
- =?utf-8?B?Q2U5OVJaZVRVajBaK3JRQlA1OGx6V3VKL1NIWkduQ0o0MS9MdWlXTTVOT3ZU?=
- =?utf-8?B?NVZMb3ZYVGRhU1FndGF3RFBmSlE1YjZUbzdHUWxRTVY4WVJtQ1Y4QVhhRW9K?=
- =?utf-8?B?V3JuMWQxU1ZSYTJGTXY5Q2ZvOGdhSS9xNVhyc3dnZTFSaDJJZy9iTzVCU1g4?=
- =?utf-8?B?Ymloa3RKSnBRL3lEUkwvM1RoT3FOYTF4RnNrdkJXRjFjWXd2VUZ4MmFqb1RS?=
- =?utf-8?Q?MavIvjbQCAGoUHQL4I=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <1DA11935FFB6D84693A62AFF5198C1D6@INDP287.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=jannau.net header.i=@jannau.net header.b="PdWzvf2S";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="OlWZvFZi"
+Received: from wout2-smtp.messagingengine.com (wout2-smtp.messagingengine.com [64.147.123.25])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 764BC1AA;
+	Tue, 14 Nov 2023 00:35:53 -0800 (PST)
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+	by mailout.west.internal (Postfix) with ESMTP id 7DE443202312;
+	Tue, 14 Nov 2023 03:35:51 -0500 (EST)
+Received: from imap53 ([10.202.2.103])
+  by compute1.internal (MEProxy); Tue, 14 Nov 2023 03:35:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jannau.net; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:sender:subject:subject:to:to; s=fm2; t=
+	1699950951; x=1700037351; bh=3PkRuTsXewJgyFnJEAGNp7/muuh2dcfpARP
+	RahjPeaw=; b=PdWzvf2SLKlIYYQ9ONE4quixniTTDzYEAxHhStJYEupaNVYz8K1
+	/hEiUg5wRmMkTrKpLBYnioLpL4fbklCe/aBwGEkZ2uokAydgP4Yip47+1dQEvYjF
+	3OLmFG2EtB7MlMSaT3A4qoKGyjPUG9c/mUpwiL4fFuJ3mnMAl6TLJ/z9BRYc/kC2
+	Bnji+oyKpnjyuegrKOfk4B/O0nomt485jv7/M6pNlo7ADWZTHLB4kNOAHfNboZ/8
+	w6nN6Ts/q3cuUG/j2GAyQ9fixM0+jkWiuXUQJ6rGIe+ZQyPojRgz/AYE2BthklUD
+	POyZjgdvL7pLLHQUc/DPS015cfUiWLHpxWQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:sender:subject:subject:to:to:x-me-proxy
+	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1699950951; x=1700037351; bh=3PkRuTsXewJgyFnJEAGNp7/muuh2dcfpARP
+	RahjPeaw=; b=OlWZvFZiLN7EBGjXSJ4tCyaPDSBu7TVECV4GB9e4FVQ0g536vPB
+	WZK8C5gN0PV2CXJACLxmWHq/2m01bjqjrBk0brX0f5n51m8MZkkgQudAsY0ogSCI
+	nUU7LYtD2QfeCh5pTVNEMeQuGHpcen8hW9mGZPXuCjFNuMfxm+ur3xVrtfFvuDhU
+	Ia3xji1EsX0bSUjVRXO0xhKf1PmQrUd+CBEUkMyrvHgbj76iYCdfLnD2QGj4kd42
+	AC1ZfCZC+nNOadcrLKoyH6ittMx3Y6WYL4uCx5K7Uq133rbqxSX04SMrOhIVL1p5
+	/K17fz6QMtklA0Uvub5F2FC/kwKHU5vS+sA==
+X-ME-Sender: <xms:ZjFTZQVLEbUurlSP89IO4KzUFn_QWZRlJ_cZdwovjW2hM27SEZH83g>
+    <xme:ZjFTZUmLVWhRImv5RpBvvq9eXO_c2iiXeWxBGf1i_tzpcO8hpsECa6wma7HswE8HI
+    bf1ChJCWi7yepDDCro>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrudefuddguddvvdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpefofgggkfgjfhffhffvvefutgfgsehtqhertderreejnecuhfhrohhmpedf
+    lfgrnhhnvgcuifhruhhnrghufdcuoehjsehjrghnnhgruhdrnhgvtheqnecuggftrfgrth
+    htvghrnhephfegteevteejheetgfeutddvuefgvdehiedufeelfeettdejgefgveevhfev
+    feeinecuffhomhgrihhnpehprghsthgvsghinhdrtghomhenucevlhhushhtvghrufhiii
+    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehjsehjrghnnhgruhdrnhgvth
+X-ME-Proxy: <xmx:ZjFTZUY8PPS9igL6a7iU9arl6Z4PcY_b75XZA56lA4eGXMqJWcEe8g>
+    <xmx:ZjFTZfX5N6VTdRhhS6Y8_J1GlMR7F61SHk-MsHCfO_Tuofi1KwpemA>
+    <xmx:ZjFTZalPh8NtRi_DlJsePkNLnR1rI4bU5C3PLhXR2yf0qpXAwjOx4A>
+    <xmx:ZzFTZTce9bxTHb9L4Nc4KGukQH-1GMgojcojeDrQklAEgKcnMChOKQ>
+Feedback-ID: i47b949f6:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 0E5F83640069; Tue, 14 Nov 2023 03:35:50 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-1108-g3a29173c6d-fm-20231031.005-g3a29173c
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-bafef.templateTenant
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MA0P287MB0217.INDP287.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: f440ca3a-e289-4051-4b04-08dbe4ea3f9e
-X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Nov 2023 08:18:14.3659
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MA0P287MB1536
+Message-Id: <9308033b-971f-4cbf-9443-d41a3f09ac61@app.fastmail.com>
+In-Reply-To: <22582194-DE99-45E5-ABEE-C1C7900DA523@live.com>
+References: <22582194-DE99-45E5-ABEE-C1C7900DA523@live.com>
+Date: Tue, 14 Nov 2023 09:35:27 +0100
+From: "Janne Grunau" <j@jannau.net>
+To: "Aditya Garg" <gargaditya08@live.com>, "Hector Martin" <marcan@marcan.st>,
+ "Sven Peter" <sven@svenpeter.dev>,
+ "Alyssa Rosenzweig" <alyssa@rosenzweig.io>,
+ "marcel@holtmann.org" <marcel@holtmann.org>,
+ "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
+ "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>
+Cc: "Orlando Chamberlain" <orlandoch.dev@gmail.com>,
+ "Kerem Karabay" <kekrby@gmail.com>, "Aun-Ali Zaidi" <admin@kodeit.net>,
+ "Asahi Linux" <asahi@lists.linux.dev>, LKML <linux-kernel@vger.kernel.org>,
+ "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [REGRESSION] Bluetooth is not working on Macs with BCM4377 chip starting
+ from kernel 6.5
+Content-Type: text/plain;charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-DQoNCj4gT24gMTQtTm92LTIwMjMsIGF0IDE6MjjigK9QTSwgSGVjdG9yIE1hcnRpbiA8bWFyY2Fu
-QG1hcmNhbi5zdD4gd3JvdGU6DQo+IA0KPiBPbiAxNC8xMS8yMDIzIDE1LjU5LCBIZWN0b3IgTWFy
-dGluIHdyb3RlOg0KPj4gT24gMTQvMTEvMjAyMyAxNS4yMywgQWRpdHlhIEdhcmcgd3JvdGU6DQo+
-Pj4gDQo+Pj4gDQo+Pj4+IE9uIDE0LU5vdi0yMDIzLCBhdCA1OjAx4oCvQU0sIEJhZ2FzIFNhbmph
-eWEgPGJhZ2FzZG90bWVAZ21haWwuY29tPiB3cm90ZToNCj4+Pj4gDQo+Pj4+IO+7v09uIE1vbiwg
-Tm92IDEzLCAyMDIzIGF0IDA4OjU3OjM1UE0gKzAwMDAsIEFkaXR5YSBHYXJnIHdyb3RlOg0KPj4+
-Pj4gU3RhcnRpbmcgZnJvbSBrZXJuZWwgNi41LCBhIHJlZ3Jlc3Npb24gaW4gdGhlIGtlcm5lbCBp
-cyBjYXVzaW5nIEJsdWV0b290aCB0byBub3Qgd29yayBvbiBUMiBNYWNzIHdpdGggQkNNNDM3NyBj
-aGlwLg0KPj4+Pj4gDQo+Pj4+PiBKb3VybmFsY3RsIG9mIGtlcm5lbCA2LjQuOCB3aGljaCBoYXMg
-Qmx1ZXRvb3RoIHdvcmtpbmcgaXMgZ2l2ZW4gaGVyZTogaHR0cHM6Ly9wYXN0ZWJpbi5jb20vdTlV
-M2tiRkoNCj4+Pj4+IA0KPj4+Pj4gSm91cm5hbGN0bCBvZiBrZXJuZWwgNi41LjIsIHdoaWNoIGhh
-cyBCbHVldG9vdGggYnJva2VuIGlzIGdpdmVuIGhlcmU6IGh0dHBzOi8vcGFzdGViaW4uY29tL2FW
-SE5GTVJzDQo+Pj4+PiANCj4+Pj4+IEFsc28sIHRoZSBidWcgaGFzbuKAmXQgYmVlbiBmaXhlZCBl
-dmVuIGluIDYuNi4xLCBhcyByZXBvcnRlZCBieSB1c2Vycy4NCj4+Pj4gDQo+Pj4+IENhbiB5b3Ug
-YmlzZWN0IHRoaXMgcmVncmVzc2lvbiBwbGVhc2U/DQo+Pj4gDQo+Pj4gU2luY2UgSSBkb24ndCBo
-YXZlIGFjY2VzcyB0byB0aGlzIGhhcmR3YXJlLCBpdCdzIG5vdCBwb3NzaWJsZSBmb3IgbWUgdG8g
-YmlzZWN0IHRoaXMgcmVncmVzc2lvbi4gTGV0J3MgaG9wZSBzb21lb25lIGlzIGFibGUgdG8gZG8g
-c28gdGhvdWdoLg0KPj4gDQo+PiBJdCdzIG5vdCBhIHJlZ3Jlc3Npb24sIGl0IHdhcyBhbHdheXMg
-YnJva2VuLiBJJ20gc2VuZGluZyBhIHBhdGNoLg0KPj4gDQo+PiAtIEhlY3Rvcg0KPiANCj4gWW91
-IGFyZSBxdWl0ZSBsaWtlbHkgY29uZmxhdGluZyB0d28gcHJvYmxlbXMuIFRoZSB1YnNhbiBpc3N1
-ZSB5b3UgcXVvdGVkDQo+IHdhcyBhbHdheXMgdGhlcmUgYW5kIHRoZSBwYXRjaCBJIGp1c3Qgc2Vu
-dCBmaXhlcyBpdCwgYnV0IGl0IGFsbW9zdA0KPiBjZXJ0YWlubHkgYWx3YXlzIHdvcmtlZCBmaW5l
-IGluIHByYWN0aWNlIHdpdGhvdXQgdWJzYW4uDQo+IA0KPiBUaGUgQmx1ZXRvb3RoIHByb2JsZW0g
-eW91IGFyZSByZWZlcnJpbmcgdG8gaXMgbGlrZWx5ICpzcGVjaWZpYyB0bw0KPiBCbHVldG9vdGgg
-TEUgZGV2aWNlcyogYW5kIHRoZSByZWdyZXNzaW9uIHdhcyBpbnRyb2R1Y2VkIGJ5IDI4OGM5MDIy
-NGUNCj4gYW5kIGZpeGVkIGJ5IDQxZTljZGVhOWMsIHdoaWNoIGlzIGFsc28gaW4gNi41LjExIGFu
-ZCA2LjYuMS4NCj4gDQo+IElmIEJsdWV0b290aCBpcyBicm9rZW4gaW4gKnNvbWUgb3RoZXIgd2F5
-KiBpbiA2LjYuMSB0aGVuIHdlIG5lZWQgYQ0KPiBwcm9wZXIgcmVwb3J0IG9yIGEgYmlzZWN0LiBZ
-b3VyIGxvZ3MgZG9uJ3Qgc2hvdyBhbnkgaXNzdWVzIG90aGVyIHRoYW4NCj4gdGhlIHVic2FuIG5v
-aXNlLCB3aGljaCBpcyBub3QgYSByZWdyZXNzaW9uLg0KPiANCj4gLSBIZWN0b3INCknigJlsbCBy
-ZXF1ZXN0IHVzZXJzIHdpdGggdGhlIGhhcmR3YXJlIHRvIHRlc3QgdGhlIHBhdGNoIHlvdSBzZW50
-LiBUYWxraW5nIGFib3V0DQpMRSBkZXZpY2VzLCBJIGd1ZXNzIEkgY2FuIGdvIGFoZWFkIHRlc3Rp
-bmcgd2l0aCB0aGUgcXVpcmsgaWYgeW91ciBwYXRjaCBkb2Vzbid0DQpXb3JrLg0KPiANCg0K
+Hej,
+
+On Mon, Nov 13, 2023, at 21:57, Aditya Garg wrote:
+> Starting from kernel 6.5, a regression in the kernel is causing=20
+> Bluetooth to not work on T2 Macs with BCM4377 chip.
+>
+> Journalctl of kernel 6.4.8 which has Bluetooth working is given here:=20
+> https://pastebin.com/u9U3kbFJ
+>
+> Journalctl of kernel 6.5.2, which has Bluetooth broken is given here:=20
+> https://pastebin.com/aVHNFMRs
+>
+> Also, the bug hasn=E2=80=99t been fixed even in 6.6.1, as reported by =
+users.
+
+There could be a possible regression in kernel 6.4 and later affecting B=
+luetooth low energy on bcm4377 devices specifically.  288c90224eec ("Blu=
+etooth: Enable all supported LE PHY by default") broke BLE connections o=
+n bcm4378 and bcm4387. I did not find any reports about broken BLE on bc=
+m4377 so I marked only bcm4378 and bcm4387 as broken with Coded Phy in 4=
+1e9cdea9c4a ("Bluetooth: hci_bcm4377: Mark bcm4378/bcm4387 as BROKEN_LE_=
+CODED")
+
+If  BLE devices like Logitech keyboards/mice are affected (mostly during=
+ pairing) it would be worth testing the change below (against v6.7-rc or=
+ stable releases):
+
+diff --git a/drivers/bluetooth/hci_bcm4377.c b/drivers/bluetooth/hci_bcm=
+4377.c
+index a61757835695..bc8398cde3c3 100644
+--- a/drivers/bluetooth/hci_bcm4377.c
++++ b/drivers/bluetooth/hci_bcm4377.c
+@@ -2453,6 +2453,7 @@ static const struct bcm4377_hw bcm4377_hw_variants=
+[] =3D {
+                .bar0_window2 =3D 0x1810c000,
+                .disable_aspm =3D true,
+                .broken_ext_scan =3D true,
++               .broken_le_coded =3D true,
+                .send_ptb =3D bcm4377_send_ptb,
+        },
+=20
+This  should affect 6.4.8 as well so might be unrelated to the reported =
+issue.
+
+Janne
