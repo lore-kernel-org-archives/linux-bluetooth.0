@@ -1,96 +1,100 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v40S9pXS"
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2145DD4E
-	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Nov 2023 11:29:47 -0800 (PST)
-Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-5bdfc1bb3eeso3738843a12.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Nov 2023 11:29:47 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AcMB29Ay"
+Received: from mail-qv1-xf2f.google.com (mail-qv1-xf2f.google.com [IPv6:2607:f8b0:4864:20::f2f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1396AD
+	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Nov 2023 11:56:56 -0800 (PST)
+Received: by mail-qv1-xf2f.google.com with SMTP id 6a1803df08f44-66d0760cd20so20274226d6.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Nov 2023 11:56:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700249386; x=1700854186; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7BLtURhc1ohq6G7Ehb9fNj26PZtAiF6i6XyPfX0SmPQ=;
-        b=v40S9pXSOHQ6tKdCq7miQ1egRBEA72FQZnxTRJ1jtcOTjnOyKgTQUuN75Qzh3DF+eG
-         yzCBflI1AcAVzOtYcnUEsbScZTQo5cOiqUMT1rZWraE+jO9FepwduneKooLVF0mKAcdg
-         5M/57Lx99Ld34M8EY0cj7arxbbWOcX+ZCR2ZvO+k6LWAbcnyd5BVLSxptDV7De5YBD1x
-         U48B6iQx3bNyG1wOOOlHQghZCQPR1o7slfP++mBGM1HdfZJxL5qWPILPa+ly2+LoJUi0
-         3J9xTiyyM3jt/C89EPqqk4ahh64qa/wsSDXgUloi0AUu4ooingvJY5TbzjgukvFI08Od
-         Pq0A==
+        d=gmail.com; s=20230601; t=1700251016; x=1700855816; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=n1Tczk8PMJwDB4ckCoyIqXF+ijpl8sjxYxb3MQ+bqWU=;
+        b=AcMB29Ay2hcm4ScR50WYFr1pPfEr/ajdDCrW4SNsrwgm6bFhMLvDEIKi4BXOvIfyT/
+         AkfJM3VJ1EUvQtQ+EA5QEbC3Wis+axef0j4LbInoF2L3qyW2B87d9NDC3Gy+PhbURaGG
+         5pXkXOAuOEliNizdq7VQ6VrfSCgHUdb1PmFpdA/HY554T6rREZOV1JqtpxbJSSpBcGbH
+         XeaXAKNPSA0457tENJ7O+JFZLzvQ3J879MO8AOGytJppb+e3p+aTLOV4XNMG9v14nYII
+         wpRfx6QD2/yGqIzzmvo3H75XHq3uryhMX5pT+r9M3olCRGGhItWrvYhEZHlW/o1APTAe
+         F0Ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700249386; x=1700854186;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7BLtURhc1ohq6G7Ehb9fNj26PZtAiF6i6XyPfX0SmPQ=;
-        b=H3wpFQxjQjRTYW4oQDn780m29VMCnCOB0oEhFozFLfWbTzveKGRCeYq7JshbyS9t09
-         LeDv+zD/hvfv1YU3laBDR5XxawpUs1X+Mz65rBF7tWuj5x1s9UA/VkAZPgyEkASkZb10
-         XRR0ulldcLNM9V+EWo24T6VNHBSBqRaQ2SWTlHLuw0G+qNXmKRG8BEare/5i/xar6NDZ
-         UPeN1KlWid933DgTJLRRFv6rjCaDLa6Qe4w2RaLK9pwTZE95bIghcUiuI3Z3Y+SN9/MW
-         3KGx1so9kAEH45MM1vl94hXru3CI5IyIliqgIH7orJRjgjN4nzKvakNQvJ5kgjKYOH8J
-         3k4w==
-X-Gm-Message-State: AOJu0Yy+K3aQZrsL4LKR3sCAxSJJFBimf7GDgpL5H32YQLj0Y5OAONCy
-	fApfWnwmlmZJWLput3ZZdC7kcHxT5ZZ2Ag==
-X-Google-Smtp-Source: AGHT+IHPOmLYguT+8vb5GwUDrc+ZP4ecu7SsbJuI3BcLECKsyV3gfi+SPO2WAh3jllf3e2TWKANI9fc+O0t1hA==
-X-Received: from mmandlik-cloudtop.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:2893])
- (user=mmandlik job=sendgmr) by 2002:a17:90a:bd97:b0:280:c3df:e29f with SMTP
- id z23-20020a17090abd9700b00280c3dfe29fmr2081pjr.3.1700249386621; Fri, 17 Nov
- 2023 11:29:46 -0800 (PST)
-Date: Fri, 17 Nov 2023 11:28:34 -0800
-In-Reply-To: <20231117112833.v2.1.I4c7ab22148e168e3cde00f27b89748ff4bc651c2@changeid>
+        d=1e100.net; s=20230601; t=1700251016; x=1700855816;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=n1Tczk8PMJwDB4ckCoyIqXF+ijpl8sjxYxb3MQ+bqWU=;
+        b=dSUEuWNMMhsMTKqoU19YcWxFMgh0Y8voXX2HO1XgmC1yu8ldxtRzqzWkZekAaqEADc
+         CrVf0cKJzXc/rz6EeFYBu/TgIuERA0MMtZ0IKwBAEZrkZsSBCJZTvmZatJFOyie63jTH
+         38dxXqfGz7uQc0SSn1M8XqOzpcEjsCQTZ3EALrLmAJJ3oeVf39WV7cQ1znH9p7arn7Ou
+         uDG55/PlBEsrBRZ3ApLLgggxhbKhOkYp+AY/7SN70SlCm2IWTfUVqeYxe3vIp6We2hRQ
+         T8Cz11RRT23p6yLvx/Z3ETerxbzyyZWSj+d0mXoO7SZdSFZmmP38qjm097oq6TMzQKcl
+         6vUQ==
+X-Gm-Message-State: AOJu0YwKIcM+STR+m+6QU8tlMghdW67BWlTTztSYd6+N3KvnW2Cjv2PT
+	ZHTuaFp+8rnODvyCJS+kzDVm0lWaYCA+xA==
+X-Google-Smtp-Source: AGHT+IGrxhVa4SPo+TRTNSJk7haGf/JaOo01WltvOBILHAMZXAhklorSIswt0r5zML/mOivO0Boryw==
+X-Received: by 2002:a05:6214:310:b0:66d:327:bf8f with SMTP id i16-20020a056214031000b0066d0327bf8fmr8254382qvu.30.1700251015681;
+        Fri, 17 Nov 2023 11:56:55 -0800 (PST)
+Received: from [172.17.0.2] ([20.109.60.240])
+        by smtp.gmail.com with ESMTPSA id jh5-20020a0562141fc500b0065b13180892sm882113qvb.16.2023.11.17.11.56.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Nov 2023 11:56:55 -0800 (PST)
+Message-ID: <6557c587.050a0220.5ea5.5829@mx.google.com>
+Date: Fri, 17 Nov 2023 11:56:55 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4370012674940995667=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, mmandlik@google.com
+Subject: RE: [v2,1/2] Bluetooth: btusb: Return when coredump trigger cmd fails
+In-Reply-To: <20231117112833.v2.1.I4c7ab22148e168e3cde00f27b89748ff4bc651c2@changeid>
 References: <20231117112833.v2.1.I4c7ab22148e168e3cde00f27b89748ff4bc651c2@changeid>
-X-Mailer: git-send-email 2.43.0.rc0.421.g78406f8d94-goog
-Message-ID: <20231117112833.v2.2.I5f8211e201324f6d9f699e995fc59dda1e51f0ce@changeid>
-Subject: [PATCH v2 2/2] Bluetooth: btusb: Fix double free in handle_dump_pkt_qca()
-From: Manish Mandlik <mmandlik@google.com>
-To: marcel@holtmann.org, luiz.dentz@gmail.com
-Cc: chromeos-bluetooth-upstreaming@chromium.org, 
-	linux-bluetooth@vger.kernel.org, Manish Mandlik <mmandlik@google.com>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, Tim Jiang <quic_tjiang@quicinc.com>, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Reply-To: linux-bluetooth@vger.kernel.org
 
-The hci_devcd_init() returns 0 on success. Do not use this return value
-when eturning from handle_dump_pkt_qca() as it incorrectly indicates
-that it's not a dump packet.
+--===============4370012674940995667==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This causes the first dump skb to be processed by both hci_devcd_rx()
-and hci_recv_frame() leading to double free.
+This is automated email and please do not reply to this email!
 
-Fixes: 20981ce2d5a5 ("Bluetooth: btusb: Add WCN6855 devcoredump support")
+Dear submitter,
 
-Signed-off-by: Manish Mandlik <mmandlik@google.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=802039
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.25 seconds
+GitLint                       PASS      0.63 seconds
+SubjectPrefix                 PASS      0.27 seconds
+BuildKernel                   PASS      27.85 seconds
+CheckAllWarning               PASS      30.67 seconds
+CheckSparse                   PASS      36.17 seconds
+CheckSmatch                   PASS      99.43 seconds
+BuildKernel32                 PASS      27.06 seconds
+TestRunnerSetup               PASS      418.24 seconds
+TestRunner_l2cap-tester       PASS      22.99 seconds
+TestRunner_iso-tester         PASS      40.48 seconds
+TestRunner_bnep-tester        PASS      7.39 seconds
+TestRunner_mgmt-tester        PASS      166.09 seconds
+TestRunner_rfcomm-tester      PASS      11.09 seconds
+TestRunner_sco-tester         PASS      14.54 seconds
+TestRunner_ioctl-tester       PASS      12.09 seconds
+TestRunner_mesh-tester        PASS      8.94 seconds
+TestRunner_smp-tester         PASS      9.73 seconds
+TestRunner_userchan-tester    PASS      7.33 seconds
+IncrementalBuild              PASS      31.82 seconds
+
+
+
 ---
+Regards,
+Linux Bluetooth
 
-(no changes since v1)
 
- drivers/bluetooth/btusb.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 35a26440cabd..d23c992502c5 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -3531,10 +3531,11 @@ static int handle_dump_pkt_qca(struct hci_dev *hdev, struct sk_buff *skb)
- 			goto out;
- 		}
- 
--		ret = hci_devcd_init(hdev, dump_size);
--		if (ret < 0) {
--			bt_dev_err(hdev, "memdump init error(%d)", ret);
--			goto out;
-+		if (hci_devcd_init(hdev, dump_size) < 0) {
-+			bt_dev_err(hdev, "memdump init error");
-+			clear_bit(BTUSB_HW_SSR_ACTIVE, &btdata->flags);
-+			kfree_skb(skb);
-+			return ret;
- 		}
- 
- 		btdata->qca_dump.ram_dump_size = dump_size;
--- 
-2.43.0.rc0.421.g78406f8d94-goog
-
+--===============4370012674940995667==--
