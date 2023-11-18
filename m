@@ -1,103 +1,115 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XHFM6tKQ"
-Received: from mail-yw1-x1133.google.com (mail-yw1-x1133.google.com [IPv6:2607:f8b0:4864:20::1133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1500D1FEB;
-	Sat, 18 Nov 2023 07:51:52 -0800 (PST)
-Received: by mail-yw1-x1133.google.com with SMTP id 00721157ae682-5c9adcaf514so407127b3.2;
-        Sat, 18 Nov 2023 07:51:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700322710; x=1700927510; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5/FFRxNdIVmBtGkGik+eY+kvUwCYYAdIhZdGmVH5ny0=;
-        b=XHFM6tKQUtr+ERDMSFScqY8TpsnBRXCGYuutGO0nb1jrhv7VWiCmz8vSZpRl3H4EXu
-         NFFvC0GFb4qTtkyiEroiLv8JYpXsun4dWahd/cWc+aTR+916BWvMI7BLQCQuSJ6Fjx6s
-         090ZZr+pw0FC4Bq1GekOw4/eCTAka5QBvtAP78FJ61Ps42T/bDARzMy98D/iZfaF6UQy
-         a6d+X6NSxvFmKGCYr7Krt+yLnooXahSheZ5psFFQElE+6wVU/Qg4ImNxK3eZUs/xp/2G
-         6wYVpt4CIuhipxn2oo1Jcp08zqJr6C9XjNOupeVlIjjqab8ENkNrALLPhWq33QZFI0FB
-         GFNw==
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 620C9C0;
+	Sat, 18 Nov 2023 08:19:01 -0800 (PST)
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-6cb66fbc63dso146030b3a.0;
+        Sat, 18 Nov 2023 08:19:01 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700322710; x=1700927510;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5/FFRxNdIVmBtGkGik+eY+kvUwCYYAdIhZdGmVH5ny0=;
-        b=Ct4nzdt4mx15hxHbv9hsQAhX2ZtgICGYJzYRlqHiHPRHJa6oEGKJrH7qdylsNj3fTL
-         sJJSB0rcQCe5oR1diK6OgnhPWyDBnYIadr+BiR5o2D0ivbOPEBAC8lGnx02/6l+7ltgI
-         2IwAy4Gh1TEPeN9Cw9SejC0a5jb3BGCsPobEwVGuUyYcGKXzHeaBA7s0MBDEp5K3E0NK
-         y6OrDPCOWXEZkU63RC3GSf4EGndtCdoy3sI7N4OS/W3G9blvqoRYkHUwXD9+zoZ52iuQ
-         er4glkaX9oODEHOnf+qZmfVM2+uaDndlXBRNDZHMqxxZAOiaSvAhK/7aG0WEPc3kY2Vm
-         3dqw==
-X-Gm-Message-State: AOJu0YzJqz7WaDwT8PabL6YOTwuYEF3To1B16tJSGFBNFCnd9T2Ywmhw
-	wISDFCj8etrArWmi3LoI2uXtgy5vyjUKZmyU
-X-Google-Smtp-Source: AGHT+IGMZW2BXhTq6urOTFJBRfGUnn7sVaNNC8L1hFUdeATS2oy7Q8NxWcEEhUoAcnJ9H9mWRS92oA==
-X-Received: by 2002:a0d:d951:0:b0:5a7:d412:af32 with SMTP id b78-20020a0dd951000000b005a7d412af32mr2476093ywe.10.1700322710270;
-        Sat, 18 Nov 2023 07:51:50 -0800 (PST)
-Received: from localhost ([2601:344:8301:57f0:48a9:bd4c:868d:dc97])
-        by smtp.gmail.com with ESMTPSA id i205-20020a8154d6000000b0059bcadded9dsm1176063ywb.116.2023.11.18.07.51.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 18 Nov 2023 07:51:49 -0800 (PST)
-From: Yury Norov <yury.norov@gmail.com>
-To: linux-kernel@vger.kernel.org,
-	Karsten Keil <isdn@linux-pingi.de>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Yury Norov <yury.norov@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Cc: Jan Kara <jack@suse.cz>,
-	Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>,
-	Matthew Wilcox <willy@infradead.org>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>,
-	Alexey Klimov <klimov.linux@gmail.com>
-Subject: [PATCH 28/34] bluetooth: optimize cmtp_alloc_block_id()
-Date: Sat, 18 Nov 2023 07:50:59 -0800
-Message-Id: <20231118155105.25678-29-yury.norov@gmail.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20231118155105.25678-1-yury.norov@gmail.com>
-References: <20231118155105.25678-1-yury.norov@gmail.com>
+        d=1e100.net; s=20230601; t=1700324341; x=1700929141;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JpJ9j3Rgf+MmL1x+LnpZ5rIj3NB2ZwiexLJ0+/VPyNs=;
+        b=P6n9omzfO12+8okx3P3bDXbxiVhDTWKX4GGDeFE3W6UixUyNq4IxYXFm65lO/0p3up
+         fMQLJHMPMoJvoGchJN1cj1DTtwp9mJ6Cg4a6KVAPKkIwGsvZQYNshRez39deO5iu1DJE
+         Gj1cSzVdB39fedxcQ4h0bjxjnMXL5maLuciDf0uV2hWW0PFUUYuHHOW6x/sTU4ZzNgw3
+         WN+NmT6RDqx9M8Xmljx5MP/hYNIfqKsJ7REKFUfPk5tl+wSZnz6xcDqkp63SAhuZvm/r
+         VrBsDV/J9Dk0X51Ez5iPq4IgKl9kY/kqsGD7elYhc45thEM4A1nhRxOyrgz+nTMONzGG
+         XWhA==
+X-Gm-Message-State: AOJu0YyaUeMNukiAYy4UIP2R5t53tcvkprlBsRet8zdqVxCkgPQwQSdg
+	D818gJtCelE+SLuJk+O/hXgNu8K6KdnDAg==
+X-Google-Smtp-Source: AGHT+IF6DbzE+IGBVmgkkIXDBMasM05P7fXL7OHqGPwzqI5VVbby0wYg1pwoRaacJDugZHa97idotg==
+X-Received: by 2002:a05:6a20:4326:b0:187:e3a5:b35d with SMTP id h38-20020a056a20432600b00187e3a5b35dmr3138014pzk.13.1700324340672;
+        Sat, 18 Nov 2023 08:19:00 -0800 (PST)
+Received: from ?IPV6:2601:647:4d7e:54f3:667:4981:ffa1:7be1? ([2601:647:4d7e:54f3:667:4981:ffa1:7be1])
+        by smtp.gmail.com with ESMTPSA id b9-20020a056a000a8900b006c7c6ae3755sm3179469pfl.80.2023.11.18.08.18.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 18 Nov 2023 08:19:00 -0800 (PST)
+Message-ID: <792fc3d8-6834-48f8-9737-f1531459d245@acm.org>
+Date: Sat, 18 Nov 2023 08:18:46 -0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/34] biops: add atomig find_bit() operations
+Content-Language: en-US
+To: Yury Norov <yury.norov@gmail.com>, linux-kernel@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, "H. Peter Anvin" <hpa@zytor.com>,
+ "James E.J. Bottomley" <jejb@linux.ibm.com>,
+ "K. Y. Srinivasan" <kys@microsoft.com>,
+ "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+ Akinobu Mita <akinobu.mita@gmail.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Bjorn Andersson <andersson@kernel.org>, Borislav Petkov <bp@alien8.de>,
+ Chaitanya Kulkarni <kch@nvidia.com>, Christian Brauner <brauner@kernel.org>,
+ Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+ Dave Hansen <dave.hansen@linux.intel.com>, David Disseldorp <ddiss@suse.de>,
+ Edward Cree <ecree.xilinx@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ Fenghua Yu <fenghua.yu@intel.com>, Geert Uytterhoeven
+ <geert@linux-m68k.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Gregory Greenman <gregory.greenman@intel.com>,
+ Hans Verkuil <hverkuil@xs4all.nl>, Hans de Goede <hdegoede@redhat.com>,
+ Hugh Dickins <hughd@google.com>, Ingo Molnar <mingo@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+ Jiri Pirko <jiri@resnulli.us>, Jiri Slaby <jirislaby@kernel.org>,
+ Kalle Valo <kvalo@kernel.org>, Karsten Graul <kgraul@linux.ibm.com>,
+ Karsten Keil <isdn@linux-pingi.de>, Kees Cook <keescook@chromium.org>,
+ Leon Romanovsky <leon@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Martin Habets <habetsm.xilinx@gmail.com>,
+ Mauro Carvalho Chehab <mchehab@kernel.org>,
+ Michael Ellerman <mpe@ellerman.id.au>, Michal Simek <monstr@monstr.eu>,
+ Nicholas Piggin <npiggin@gmail.com>, Oliver Neukum <oneukum@suse.com>,
+ Paolo Abeni <pabeni@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Peter Zijlstra <peterz@infradead.org>, Ping-Ke Shih <pkshih@realtek.com>,
+ Rich Felker <dalias@libc.org>, Rob Herring <robh@kernel.org>,
+ Robin Murphy <robin.murphy@arm.com>,
+ Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
+ Sean Christopherson <seanjc@google.com>,
+ Shuai Xue <xueshuai@linux.alibaba.com>, Stanislaw Gruszka <stf_xl@wp.pl>,
+ Steven Rostedt <rostedt@goodmis.org>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Thomas Gleixner <tglx@linutronix.de>,
+ Valentin Schneider <vschneid@redhat.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
+ Will Deacon <will@kernel.org>, Yoshinori Sato <ysato@users.sourceforge.jp>,
+ GR-QLogic-Storage-Upstream@marvell.com, alsa-devel@alsa-project.org,
+ ath10k@lists.infradead.org, dmaengine@vger.kernel.org,
+ iommu@lists.linux.dev, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ linux-hyperv@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
+ linux-media@vger.kernel.org, linux-mips@vger.kernel.org,
+ linux-net-drivers@amd.com, linux-pci@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-serial@vger.kernel.org,
+ linux-sh@vger.kernel.org, linux-sound@vger.kernel.org,
+ linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, mpi3mr-linuxdrv.pdl@broadcom.com,
+ netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org
+Cc: Jan Kara <jack@suse.cz>, Mirsad Todorovac
+ <mirsad.todorovac@alu.unizg.hr>, Matthew Wilcox <willy@infradead.org>,
+ Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>,
+ Alexey Klimov <klimov.linux@gmail.com>
+References: <20231118155105.25678-1-yury.norov@gmail.com>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20231118155105.25678-1-yury.norov@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Instead of polling every bit in blockids, switch it to using a
-dedicated find_and_set_bit(), and make the function a simple one-liner.
+On 11/18/23 07:50, Yury Norov wrote:
+> Add helpers around test_and_{set,clear}_bit() that allow to search for
+> clear or set bits and flip them atomically.
 
-Signed-off-by: Yury Norov <yury.norov@gmail.com>
----
- net/bluetooth/cmtp/core.c | 10 ++--------
- 1 file changed, 2 insertions(+), 8 deletions(-)
+There is a typo in the subject: shouldn't "atomig" be changed
+into "atomic"?
 
-diff --git a/net/bluetooth/cmtp/core.c b/net/bluetooth/cmtp/core.c
-index 90d130588a3e..b1330acbbff3 100644
---- a/net/bluetooth/cmtp/core.c
-+++ b/net/bluetooth/cmtp/core.c
-@@ -88,15 +88,9 @@ static void __cmtp_copy_session(struct cmtp_session *session, struct cmtp_connin
- 
- static inline int cmtp_alloc_block_id(struct cmtp_session *session)
- {
--	int i, id = -1;
-+	int id = find_and_set_bit(&session->blockids, 16);
- 
--	for (i = 0; i < 16; i++)
--		if (!test_and_set_bit(i, &session->blockids)) {
--			id = i;
--			break;
--		}
--
--	return id;
-+	return id < 16 ? id : -1;
- }
- 
- static inline void cmtp_free_block_id(struct cmtp_session *session, int id)
--- 
-2.39.2
+Thanks,
+
+Bart.
 
