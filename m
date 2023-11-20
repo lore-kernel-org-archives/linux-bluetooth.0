@@ -1,72 +1,71 @@
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 450211CFBD
+	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Nov 2023 15:23:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="GiIzmGDN"
-Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4F4EC8
-	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Nov 2023 07:19:00 -0800 (PST)
-Received: from github.com (hubbernetes-node-968e6f3.va3-iad.github.net [10.48.200.69])
-	by smtp.github.com (Postfix) with ESMTPA id 2217D8C11F3
-	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Nov 2023 07:19:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1700493540;
-	bh=9y7+1SiAjqst519jVVGctwXxKDL014j1LAQ8wR8vzno=;
-	h=Date:From:To:Subject:From;
-	b=GiIzmGDNpnP98RU8WOj+YGSsWrtOB1CQsyuMQRDIOAje4X4iAV0A3fe5hsGgELCze
-	 K3DhlBROIJ5a1GMVlThJEgPUMaZtDPPWXY97TbB1YHjgUavp2AaDhP0uB5aAe0ImT7
-	 hkcASEwVlQAvLDpiu3hMxLhFqsNJGt1fVkoqFagE=
-Date: Mon, 20 Nov 2023 07:19:00 -0800
-From: iulia-tanasescu <noreply@github.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ASo6D4Fc"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B5C66C433C7
+	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Nov 2023 15:23:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700493819;
+	bh=hNjBxSY9vXLMCmSNFEwSLWUTq5euZmmlF3ZN9hXyZPs=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=ASo6D4FcOOTlqcAmRcn5FvXoiqBfDxQsZLOMzdtq+x13u3r05STdTwoMPLxJuQiA4
+	 VVNQaH4jHeTWk0ihQ1+p5un2W1h6FPBswOv8aDhO1uD4PCplZDJlbzVK+63+1xCkpa
+	 NgwOsKMpUiEhlEfTyXZY+JbA7L8sF1TgTW1nzPCqFGysIN2X+WgYLvDLYVvSfo+8qI
+	 SJjZBnAuTnfDE6TGxz38DMadY1P4d5Q1+m4NdjN4kh9oXpR+42sR84p1S9x1L7jY1R
+	 UihLyiO8llwmbG1LDocEJyfvatQhYOW1ysVonykLvpG7hlmcAvMFkv5ZwFk9OUtyJF
+	 Am8S/ubG2Vw4w==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id A1EEFC53BD1; Mon, 20 Nov 2023 15:23:39 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/8b035b-58e6ef@github.com>
-Subject: [bluez/bluez] d8fc0d: shared/shell: Remove readline color escapes
+Subject: [Bug 218151] Bluetooth: Erratic HCI_Command_Status without Inquiry
+Date: Mon, 20 Nov 2023 15:23:39 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: luiz.dentz@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-218151-62941-CN16Carlt6@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-218151-62941@https.bugzilla.kernel.org/>
+References: <bug-218151-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: d8fc0dd5942e6e7b95833ee47fc4a8821c0c3421
-      https://github.com/bluez/bluez/commit/d8fc0dd5942e6e7b95833ee47fc4a8821c0c3421
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-11-17 (Fri, 17 Nov 2023)
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218151
 
-  Changed paths:
-    M src/shared/shell.c
-    M src/shared/shell.h
+Luiz Von Dentz (luiz.dentz@gmail.com) changed:
 
-  Log Message:
-  -----------
-  shared/shell: Remove readline color escapes
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |luiz.dentz@gmail.com
 
-This removes readline color escapes from color defines and instead only
-used them with prompt since they are only really useful when readline
-is rendering the text, so it can calculate the prompt length properly.
+--- Comment #3 from Luiz Von Dentz (luiz.dentz@gmail.com) ---
+https://patchwork.kernel.org/project/bluetooth/patch/20231120151039.323068-=
+1-luiz.dentz@gmail.com/
 
-Fixes: https://github.com/bluez/bluez/issues/10
+--=20
+You may reply to this email to add a comment.
 
-
-  Commit: 58e6ef54e672798e2621cae87356c66de14d011f
-      https://github.com/bluez/bluez/commit/58e6ef54e672798e2621cae87356c66de14d011f
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2023-11-20 (Mon, 20 Nov 2023)
-
-  Changed paths:
-    M tools/iso-tester.c
-
-  Log Message:
-  -----------
-  iso-tester: Add test for bcast AC 13 reconnect
-
-This adds a test for Broadcast AC 13 reconnect:
-
-ISO Broadcaster AC 13 Reconnect - Success
-
-
-Compare: https://github.com/bluez/bluez/compare/8b035b70f379...58e6ef54e672
+You are receiving this mail because:
+You are the assignee for the bug.=
