@@ -1,33 +1,33 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="fQG0L9yJ"
-Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on2045.outbound.protection.outlook.com [40.107.6.45])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0E22F5
-	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Nov 2023 04:08:36 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="dB3s+K9U"
+Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on2076.outbound.protection.outlook.com [40.107.6.76])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39619D0
+	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Nov 2023 04:08:40 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BX5Zyzidm6x91hX0F7VaQ+TXkTX3A6PHP+7l3xUS7v1binrlVRzoGVMqDQKUZZLrP/6YpHlgWJgMFZ/5Pg8NxKqGU2vcmzKkLsLWO2Y9Tv/r3hJwLySmIipDqB9r4H3evIOMLVY2TDPdbczlYmA2dAr0wW9zlrKpfpCtctQAMqB219o+3WnVg2rGTIBunXDcQJ6q/gXbuvbnY8kLPQPp9jz5af/mehMgZ8vWIh9upUqMLZzRxFkpf0bsqR7CkgXIpuSp5i7iWwA/qD90A7A2hFgNM8LfX04AgS6pvYe5cp9uawwN6FoyEPts3e5QTAdKtLt/b+zKUwUp7PfL/yVSvg==
+ b=c0jyJ23oInf3hH/GeMqLqEESpU3+jGELgFUuM7rQCpdwtfzPA8ssnU1CqB6SvcGpRNYfI2+4v27lfMBfNfXsZuu1XK6CjV29rFIhubBDZR9kINzt5G7QLE5i/0sg55a1uLZqtP9mQ27BfFPhUsL9xqmZdlElWU+aeaXfTHOqjGoAKCLKh1FA4hHVqJVSxeI8R9hUfijRpy2dWjx0K7sZEEKSoztM56sIUFWFZuIjgS2eDnwozCKTnNEQwXTmYeOHRGaCfEiC29XY8dTBgSclROFqjiHKeHcTsx0a2fwdAz58kXmd5c6Xjp3DjD+ytR93+YnW5dqEsXcXdIgB0L4ERw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xXVeFzU10vgdYxjij9HnL1RA5lk5CYTOlzQ6NZtc7/8=;
- b=gJeZRc1qmrTu7/3IdNJegzOFOw7Se7rO9hQRMrQXF0kd1zvt5Q+xKwAvAlbu/V6NhRrk/rcDGa4cULuXBNRbhU7279gKZA2cRDYWOw9evVruYrLYq/b/Ocvt/dWSaq8eBl22ne3oWSGzBA7ZcSCHKiHcVMDufIRQGVqwC76kWgrdRCKKtOGIcGgAN6HzNQn0O+ZEVVx/hWCiU54SKYUmeEawwXBB+4rIiI5bU/ZvNW+zNtTgMckkJGknq72tXPh4TfnFgxCYUg4qHW+qhx++nKhMxnqtHN79cDSkaUkTdvIhzOD4s71mjt66m3PYtd2AY2GHM+D+10hTqVkug0OR1Q==
+ bh=hWM/uQZU9RxfJdKvLLiJrUcg9hwoKwESBKE1PIF6FLo=;
+ b=QvWkmU1hgI2dH3zN6uk/Hc5jJlBovTQzgFnJ46Dqcw5i6L2WeVj3/5U9WYT1zTRXXgo6u2Rn5J5uCMVQcYXh6+IDQ6q3kFKlWOby5HPv/RNptfmubWayzMd58FnkG2wj87jg8mx6NKwTZzyJ3hFDzNnlPpKMq6mD2Vjs5TNdIBqxYC70yW80lBmQJRhMskRT8HQOmOvnrbY0+S1mvwyE8mKDYKwUzyJXiRrVJytp5vf4rFYTn7GWm0ve5wD2qA1bj68Yvnou8pWgcPRcESk9oQyAMHbyRfoEkBEcYRdobJ/YdlrVdgtbXJVyoq2EHUNCEUDf5VOBSpfuOHMCtmo91A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xXVeFzU10vgdYxjij9HnL1RA5lk5CYTOlzQ6NZtc7/8=;
- b=fQG0L9yJHEFtZBu+vDGJFNUVmo4BLDWB87VTq0rKLP+LbIqPHinOZT+QQtz7ihqwARrStVvvmkv+KxgvMsY6AI2HQLzBdqIaol7wE7O6TMHltJyCtGNYA/4fU4GvqmCzf38ZCX3tahzJJR8IY8ZncWq/iK/S3TfuBDXVBMhzvys=
+ bh=hWM/uQZU9RxfJdKvLLiJrUcg9hwoKwESBKE1PIF6FLo=;
+ b=dB3s+K9UyRCYg3oT8gsI1XA0EQx2DwDoHpcus3r/Ged4z4JUw0jk61CX4kWSu1Nc6aUf+XXFngD7jYCy+E3RgA9Ow1wg+2o9C3fflm/BLhkEeRmWo499pnzszgTrTPWmSBt2zZpHxBLwY3LPCxDCGb5QmX0+dcgMN1vNq8hM/UE=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from VI1PR04MB10073.eurprd04.prod.outlook.com (2603:10a6:800:1dd::8)
  by PA4PR04MB7966.eurprd04.prod.outlook.com (2603:10a6:102:c1::7) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.16; Mon, 20 Nov
- 2023 12:08:34 +0000
+ 2023 12:08:38 +0000
 Received: from VI1PR04MB10073.eurprd04.prod.outlook.com
  ([fe80::c38d:98a0:a823:d88a]) by VI1PR04MB10073.eurprd04.prod.outlook.com
  ([fe80::c38d:98a0:a823:d88a%6]) with mapi id 15.20.7025.014; Mon, 20 Nov 2023
- 12:08:34 +0000
+ 12:08:38 +0000
 From: Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudia.rosu@nxp.com,
@@ -37,14 +37,16 @@ Cc: claudia.rosu@nxp.com,
 	andrei.istodorescu@nxp.com,
 	luiz.dentz@gmail.com,
 	iulia.tanasescu@nxp.com
-Subject: [PATCH BlueZ v4 0/5] Add support for bcast multiple BISes
-Date: Mon, 20 Nov 2023 14:08:26 +0200
-Message-Id: <20231120120831.5353-1-silviu.barbulescu@nxp.com>
+Subject: [PATCH BlueZ v4 1/5] shared/bap: Fix source+sink endpoint registration
+Date: Mon, 20 Nov 2023 14:08:27 +0200
+Message-Id: <20231120120831.5353-2-silviu.barbulescu@nxp.com>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20231120120831.5353-1-silviu.barbulescu@nxp.com>
+References: <20231120120831.5353-1-silviu.barbulescu@nxp.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: VI1PR09CA0180.eurprd09.prod.outlook.com
- (2603:10a6:800:120::34) To VI1PR04MB10073.eurprd04.prod.outlook.com
+X-ClientProxiedBy: VI1P189CA0022.EURP189.PROD.OUTLOOK.COM
+ (2603:10a6:802:2a::35) To VI1PR04MB10073.eurprd04.prod.outlook.com
  (2603:10a6:800:1dd::8)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -54,94 +56,241 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: VI1PR04MB10073:EE_|PA4PR04MB7966:EE_
-X-MS-Office365-Filtering-Correlation-Id: a5332526-a7ea-4a3b-0024-08dbe9c16b39
+X-MS-Office365-Filtering-Correlation-Id: 28014595-68f3-43c7-6ef4-08dbe9c16d8f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	kM0Sfk3vo4nTLdLhy/QENla3U0jHj9AJ8Qyz2r1dtG5UhOpUaJKXQNn+Ix160N3PQj9Z2pCpQUK6NRe5LRv73IA0EMOZANf91BVDSCuHwKleN89kFtx1EPmfWOJpcmOv0h4TIMr6KjGI+WPM2gAm+iGchJH3zyB4AQ1gc4IOH3uVXERt8j0Fwr1B8XN/7HIA4f3vpdVNvg5Hx+zeHqD35eHIzvDrvPbblxgfnm60EZPy1YnFEetc0Lhye63RvERbuQCmRbkEB+AnEsLnqnDr6eAeKzbD25HLILJh3+wNU22gfBtrm4hECzwpxR5ocJFoo/mlzFSSD0MwXUuZdkt1tnTh5yZ9EF6pDG8gCyGc07Wge8rOLo7EOqI3TmDaYId21juU5IBmLIoRG2twhWSrVnVVok2f8JsHzAS82BF1T7b8RL1BjHugPgnkFW+bVn4KP/PEkAV9KWfw6N5qNG6c5xSf8Uh9cXXqpQRdDjbh6HkqZ8JyzNDCRyAF6wC6OYBjuN8HEIcddfK87NnmmbrD3rjqZ1vaXb13T8VSY5upDDkNZ5AmM5R74ywoI3FeYons
+	KdAr9r4iKW7KGBTu43Do8SqM18C4D9qTGCrPqmGswvczKKFd8z//gM+xDh7kXIErOvAXpDL5WVCEEgMeKyYwm14pzIQom6fCn/yNXGn8gUBmc3j2J4GYz0p41ST6Lr8fIaFw0uwiTPmR9L4ejJjkvLSKYU80zKsvlepEAfERox5wCAGZAF0Dpjp4poR2hCOeHTBc52UT5MJ6rvIYGwpcs0hCPF7fF09TXkMD2wAYXZcfEERUId17dWr6rIC/h/TN+oBu8vawJAYKbgvCFnhaWd3VTCHeZ+iHRUVawUwQ+ZCaWxY1cyYe0LK5wwyi34dsXucRB/hTeCj1ClKXwnqKfsqpaq3b1A32xl9fT5ZeFSkTIjp/FzjlY/YkFDzOX2xP/PNjBqcOEHNqcsdBkwWNTvoHjsjX6mepplztOFEP4ClGvkVDuEL8gJPSXMmJmH3D8QicaLTiYVr6n2ZG1iiXgNkYHEx1NoXcO6gkl96IMLMTbdrMOYq49cA4HMw3CaAWBdC0KZWSDK/MUWYO4ttIiqOJAYGs2fN24KlLD1FF5RvXK1sWumKu7TQBEZU0PypE
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB10073.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(136003)(366004)(346002)(39860400002)(230922051799003)(64100799003)(451199024)(1800799012)(186009)(2906002)(41300700001)(8936002)(8676002)(4326008)(5660300002)(66476007)(66556008)(66946007)(316002)(6916009)(38100700002)(6512007)(36756003)(6506007)(6666004)(86362001)(6486002)(478600001)(83380400001)(26005)(2616005)(1076003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?egsBwrAYPVkLCNIqHeG/lwD+lHMku53Lxkh6xX1/1C957I/q0PXXFfoFQjLa?=
- =?us-ascii?Q?VQH8K+33l/ki1PEq28FnRIXi5GZQPwR2guFOhNQGMA7iswKdN5fQ1v09DhvO?=
- =?us-ascii?Q?c6zEusyTXecZ9EFaebdRdcfZKt4Cd+M0fOfjAsTH3RmkSFQ5419R2TNSdpz2?=
- =?us-ascii?Q?aDzdy4IFdCNdZlG9KZlqXCExOKgE29VAS4chM2YfsVcxs+0W1cgiT+xHtIlT?=
- =?us-ascii?Q?Ghi1Z9Hm5NyIlt5q4JBTPIC+YMaLlDrC4RjSfOy6a3BubHlVVfr/flcZl+0X?=
- =?us-ascii?Q?M/QnwcOI0Ws/ld+xu3kiRAu6C9b9pfW6Ww4Ooe3+Po8kdZxDZpDnA2KXDVxl?=
- =?us-ascii?Q?pNZTiwA8yee5VrkE+eyP/ld+m00ojOoCOMlm37LNYrrkLeqNyqIwjAmt0LAr?=
- =?us-ascii?Q?VJeC0O9aqUrbyR5vCWq4yXEEdl23duvsABD8lyJ8XVhoZLVbwRJbylGC/+qt?=
- =?us-ascii?Q?6R6jOQplbu/QhyShCZAOBKWqq0I4n7p7Xxvsfx6QC//n9fok/AECUy2mpRu5?=
- =?us-ascii?Q?rZ21mzgs7ISFf9MSSN5br1LamMXb0/tXfCxfZCWjId1M9Nwi0wKpPlAQE5ik?=
- =?us-ascii?Q?TlGU7GpABrMJuQ0JE951W6S2Alt/cISJuH6aKIK0tfHzBZyKSPEs6PZrjH5e?=
- =?us-ascii?Q?c5tKFAdS0oh03lBC710UZr1rZk9WJ+6BCTePgrNMPcir2X8tm1Z+zyQBuHqH?=
- =?us-ascii?Q?Vl/dk0JcpCYKrLFexizhjzJ09H50B8ML4b+ZJMZNM+MjeZkBK5C1wraGcjUU?=
- =?us-ascii?Q?7Se/MqgVpZT6RXeazF9pUv1g6uHTevpQZv4UlHb8kTAqFn0/t6Tz9bq3Z66o?=
- =?us-ascii?Q?xjpSifCdYz5aDTyqRZNKAwV6pIOdwZokANtGTLrFm9PJUNmNsPMigvXApAKO?=
- =?us-ascii?Q?qaeWhrnKtw5Y3G1Tiocz/xeXiGdgP1AWlQ97AzkqBVgd05pNdi2649ChyqtL?=
- =?us-ascii?Q?1rPOxJrE7UpDecZLWIsHZm16q7ezUX+J4y9rKt+wCkAqPgVcEqs+KdL8Lkci?=
- =?us-ascii?Q?l73sbq8JFykJoJQhGFVUIwr9YAqjBRMZ9Z9LFPNQjTzMsQXvNwnHuom1806k?=
- =?us-ascii?Q?jaHaWK6hFT0GRXD46SRkEnWM/h1ztxhstqYD6j4aYlqHGUpQ0l7egBB/Uso8?=
- =?us-ascii?Q?prtYhJwrV+K90I8EU7rhLp8l/9ymSJQcKtVXBMZw8hyDRI+/4B1KSiAM6Z1a?=
- =?us-ascii?Q?JhChiWmhkXBNLVQPheswe6ZYoEmRLYavtkUkntmSVzaVOyX6XV+NoT/aY1L/?=
- =?us-ascii?Q?s/yIe2DAeEu27o/k6Xk4QpE4mDXg8BLpwN3cqxG+aEJl39CLtR7D3vCs1W8I?=
- =?us-ascii?Q?ekmx+1Q7w3bdyRX40oKihOb4gZR3Bv1a1lQu5hGLfLjd4CMwn0pMmWouT3da?=
- =?us-ascii?Q?KSR9UUVr5FrwCyoAk1MOigxdPVaiGGTbi4EfsoV+yNntME/km6Jcl7UTbsn5?=
- =?us-ascii?Q?33x1DqAe+Qtcr8OxRje1qWhB5m/6rQlSg+DmqpltUGUSUyvN9RDHihBD7Ppy?=
- =?us-ascii?Q?t2ONBFRbZGYG5wOhcz1gpvDVHy2hQGzN8TvhUIp6SvaoTmUAJmoZuc3FkQv7?=
- =?us-ascii?Q?WS3HtuW8QWHDDwCFz0cn2UbQsLkHBwqC6adJ1h4nzee5mUn8rh4ACmaKmE/v?=
- =?us-ascii?Q?ZA=3D=3D?=
+	=?us-ascii?Q?3/v+TKU1DlXmtS/OR7t6d985/MaMclyrFcY47ExBbQJ14IhMO/sRjb+X5mzK?=
+ =?us-ascii?Q?pcXaxsHVyebmZqOKN0uRJJOKAGeJx2j2W2/0aXXY1CYrCBHM6Z+sRSiWhQbB?=
+ =?us-ascii?Q?iZSlirBnp+yNWFRoXdQAfKsemU88H52BYcG2WC9jXCmX2vjVT+9BrTEjdryK?=
+ =?us-ascii?Q?ObjTjjt5Z961sUbIx7VtOecUtYUJDBAWWfb2HGzWFwJHaWYoTxZLxafTajtt?=
+ =?us-ascii?Q?EbsIwzkslcwoIOPbOJwINcqKkAx5AMSsm+wCXLXAj0vUoGCVl58nLY5uZ4W/?=
+ =?us-ascii?Q?pnxe23rlFdWTVF7p3WeCFwo97zMqZrHsax9zrK28/WQcAMZeJhJaBa4d/qoK?=
+ =?us-ascii?Q?x4BuQbnZ05vnmCPSIe9aOx7fdEigvzpnOmFCaQYmCe10eX9YojNbQvU1ssRp?=
+ =?us-ascii?Q?9+BSAPSGn58dd7RJ/l/izqQ53ZdFpLEF06ONTVbuSfpKtp1vzug7KrCwQtMk?=
+ =?us-ascii?Q?uy9N1jxBNI4pzyBhU9SNRbf8XohPciblGrQjYyZcPDvC+vjLP4gOlptmJgbd?=
+ =?us-ascii?Q?aDNDTLmwUpk9Y8fISuc89jF8/1ufmwhEf1VVjaXpxKlIDhrhMB5S3wB8Ptwx?=
+ =?us-ascii?Q?vxCQUcfpIgArYbZRTxHg2CCDjdZu2sxTZNvMvC29PfUvwRZfXeP4Y8rE+O+k?=
+ =?us-ascii?Q?0qbC7fpMzeLZnCTs0BTzq/k2kG34zga9fFeopBqicIszkh2ikV+ORhM+3bLv?=
+ =?us-ascii?Q?jy8RzVvQb8m/QIA6wKpkUXmhPlG/TyL6aZXbMwELcdPusPlmdHnLfQlEmYgN?=
+ =?us-ascii?Q?llxO3sSyg2GuZs1CviAWfRke8Vy2yHkt8Tokqzkp5uGA/rHAqtTuNyfw1fnt?=
+ =?us-ascii?Q?EwZv4ho/+862Tj9iuRPhQo7AKhT5nqqv+7ws3yh+NRWCWYXjAd6MJs71rrxf?=
+ =?us-ascii?Q?sGAyqJycWN2oXIprmfywpqQOorH9MVp9Wdl+Krfh/mrTilYJRZE1GCMty1WS?=
+ =?us-ascii?Q?zM5rO3GUSPRyqSvJV7zN4/guiLsXgVk+brtBaFPwFk+nOdicNVPJpnXrHmSY?=
+ =?us-ascii?Q?NlfiRqoWFPCzu1l8fzxtL9Xp10yjmJ7o4CC4eeEbFNXx+s37HT3Sk6+hz3lM?=
+ =?us-ascii?Q?BLwBt7as674/G6urfzfbydhG5EmBdgF7ErRZBS1PrY4HJQSJ4o0NbL5VOElW?=
+ =?us-ascii?Q?wJ/FTVjBY9MUQBRlMfeuZH2pKophP2CF/we+MXAxnZOd7Fr6w/4GvyMeYXt9?=
+ =?us-ascii?Q?Y9l7E2CQXBJVt2NKLK+E0EuNVlBsIO0AofL3YYwtFUqqXlzGqtJ/4sT8kkuJ?=
+ =?us-ascii?Q?TPOCw9OpTvAiEpxZbfs7trsRCYnnfBKSXQ2YSotKwtdKyBO6ARKLUyALpxab?=
+ =?us-ascii?Q?nttf+X9fuOQdAI7RJyFOZt89oRSrcbEhTlLpT6bAQMpvbpJetjWl9kc+F6ZB?=
+ =?us-ascii?Q?OTTyV/SPoQa/BD6Gbv/khvekxcbgU9OOxjx8hso6H6YommhRdOtBxh4WQn2b?=
+ =?us-ascii?Q?/hdDQUP4W/m98q82J4OKxFMBCwinussJtAnhQNQhJZ2IoCdiu2kZXekFGg5F?=
+ =?us-ascii?Q?ixlQ7Jtf9wqg28sjeL7N+fApwCqSPvPpIamiFTPmbKhWnJ0Is95+QMZpEfyo?=
+ =?us-ascii?Q?0u6lTBHcgrPbqpU0J5fwY5P7DaTfVt9fdNCqb2KctcQxuC1c8ydRnqzuPtmw?=
+ =?us-ascii?Q?ig=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a5332526-a7ea-4a3b-0024-08dbe9c16b39
+X-MS-Exchange-CrossTenant-Network-Message-Id: 28014595-68f3-43c7-6ef4-08dbe9c16d8f
 X-MS-Exchange-CrossTenant-AuthSource: VI1PR04MB10073.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Nov 2023 12:08:34.1999
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Nov 2023 12:08:38.0141
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vxanKc9K1+GT0qktq9IMgbfL0/2paikMBYYOElWXIfGC6iT+E7eUKxq7MtitJnhFG6FFvKZcRXFSeVoYMZKvzLhJPxXAbJACf9bg9X7EuxA=
+X-MS-Exchange-CrossTenant-UserPrincipalName: XKhJors3PEVbRbLLpYQp2ZtmCG5Oo5n5h00rgN6Q6SUhttlqEztM164mY/f5Slqr6l+rZN0Ca2s/HEoQxvoJj3+71BrgNNpY98T6I+QsiQw=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB7966
 
-Add support for multiple BISes
-Register the broadcast source endpoint
-endpoint.register 00001852-0000-1000-8000-00805f9b34fb 0x06
-After registration a new remote endpoint is created
-Use the endpoint.config command to set the BIS codec configuration by
-specifying the BIS when prompted by the command
-endpoint.config /org/bluez/hci0/pac_bcast0 /local/endpoint/ep0 16_2_1
-[/local/endpoint/ep0] BIG (value): 0
-[/local/endpoint/ep0] BIS (value): 1
-Based on the number of BISes seted in the base_lc3_16_2_1 more
-remote endoints wil be created (If more then one bis is setted)
-Use the endpoint.config command to set the BIS codec configuration by
-specifying the BIS when prompted by the command
-endpoint.config /org/bluez/hci0/pac_bcast0 /local/endpoint/ep0 16_2_1
-[/local/endpoint/ep0] BIG (value): 0
-[/local/endpoint/ep0] BIS (value): 2
-Use the endpoint config command to configure all the BISes
-After all BISes are configured, use the transports to send data
+From: Claudia Draghicescu <claudia.rosu@nxp.com>
 
-Claudia Draghicescu (2):
-  shared/bap: Fix source+sink endpoint registration
-  audio/bap: Fix source+sink endpoint registration
+When registering both sink and source endpoints,
+the register endpoint method call results in 2 remote endpoints for each
+scanned broadcast source
 
-Silviu Florian Barbulescu (3):
-  Add support for multiple BISes
-  profiles/audio/transport.c: Add support for multiple BISes
-  client/player.c: Add support for multiple BISes
+---
+ src/shared/bap.c | 73 ++++++++++++++++++++++++------------------------
+ src/shared/bap.h |  3 ++
+ 2 files changed, 40 insertions(+), 36 deletions(-)
 
- client/player.c            |  46 ++-
- profiles/audio/bap.c       | 595 ++++++++++++++++++++++++++-----------
- profiles/audio/transport.c |  36 ++-
- src/shared/bap.c           | 290 +++++++++++++-----
- src/shared/bap.h           |  38 ++-
- unit/test-bap.c            |  12 +-
- 6 files changed, 754 insertions(+), 263 deletions(-)
-
-
-base-commit: 8b035b70f379e45a32c94579ec8d00e48070c21e
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index 13bbcf793..d8a3adde6 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -629,7 +629,7 @@ static struct bt_bap_endpoint *bap_endpoint_new_broadcast(struct bt_bap_db *bdb,
+ 	if (type == BT_BAP_BCAST_SINK)
+ 		ep->dir = BT_BAP_BCAST_SOURCE;
+ 	else
+-		ep->dir = BT_BAP_BCAST_SINK;
++		ep->dir = 0;
+ 
+ 	return ep;
+ }
+@@ -1485,12 +1485,12 @@ static void ep_config_cb(struct bt_bap_stream *stream, int err)
+ 		return;
+ 
+ 	if (bt_bap_stream_get_type(stream) == BT_BAP_STREAM_TYPE_BCAST) {
+-		if (bt_bap_stream_io_dir(stream) == BT_BAP_BCAST_SINK)
++		if (!bt_bap_stream_io_dir(stream))
+ 			stream_set_state_broadcast(stream,
+-						BT_BAP_STREAM_STATE_QOS);
++				BT_BAP_STREAM_STATE_QOS);
+ 		else if (bt_bap_stream_io_dir(stream) == BT_BAP_BCAST_SOURCE)
+ 			stream_set_state_broadcast(stream,
+-						BT_BAP_STREAM_STATE_CONFIG);
++				BT_BAP_STREAM_STATE_CONFIG);
+ 		return;
+ 	}
+ 
+@@ -2622,7 +2622,7 @@ struct bt_bap_pac *bt_bap_add_vendor_pac(struct gatt_db *db,
+ 					struct iovec *metadata)
+ {
+ 	struct bt_bap_db *bdb;
+-	struct bt_bap_pac *pac, *pac_broadcast_sink;
++	struct bt_bap_pac *pac;
+ 	struct bt_bap_codec codec;
+ 
+ 	if (!db)
+@@ -2650,15 +2650,6 @@ struct bt_bap_pac *bt_bap_add_vendor_pac(struct gatt_db *db,
+ 		break;
+ 	case BT_BAP_BCAST_SOURCE:
+ 		bap_add_broadcast_source(pac);
+-		if (queue_isempty(bdb->broadcast_sinks)) {
+-			/* When adding a local broadcast source, add also a
+-			 * local broadcast sink
+-			 */
+-			pac_broadcast_sink = bap_pac_new(bdb, name,
+-					BT_BAP_BCAST_SINK, &codec, qos,
+-					data, metadata);
+-			bap_add_broadcast_sink(pac_broadcast_sink);
+-		}
+ 		break;
+ 	case BT_BAP_BCAST_SINK:
+ 		bap_add_broadcast_sink(pac);
+@@ -4416,21 +4407,12 @@ void bt_bap_foreach_pac(struct bt_bap *bap, uint8_t type,
+ 							func, user_data);
+ 	case BT_BAP_SOURCE:
+ 		return bap_foreach_pac(bap->ldb->sinks, bap->rdb->sources,
+-							   func, user_data);
++							func, user_data);
+ 	case BT_BAP_BCAST_SOURCE:
+-		if (queue_isempty(bap->rdb->broadcast_sources)
+-			&& queue_isempty(bap->rdb->broadcast_sinks))
+-			return bap_foreach_pac(bap->ldb->broadcast_sources,
+-					bap->ldb->broadcast_sinks,
+-					func, user_data);
+-
+-		return bap_foreach_pac(bap->ldb->broadcast_sinks,
+-					bap->rdb->broadcast_sources,
+-					func, user_data);
+ 	case BT_BAP_BCAST_SINK:
+ 		return bap_foreach_pac(bap->ldb->broadcast_sinks,
+-					bap->rdb->broadcast_sources,
+-					func, user_data);
++						bap->rdb->broadcast_sources,
++						func, user_data);
+ 	}
+ }
+ 
+@@ -4475,6 +4457,20 @@ void *bt_bap_pac_get_user_data(struct bt_bap_pac *pac)
+ 	return pac->user_data;
+ }
+ 
++bool bt_bap_pac_bcast_is_local(struct bt_bap *bap, struct bt_bap_pac *pac)
++{
++	if (!bap->ldb)
++		return false;
++
++	if (queue_find(bap->ldb->broadcast_sinks, NULL, pac))
++		return true;
++
++	if (queue_find(bap->ldb->broadcast_sources, NULL, pac))
++		return true;
++
++	return false;
++}
++
+ static bool find_ep_unused(const void *data, const void *user_data)
+ {
+ 	const struct bt_bap_endpoint *ep = data;
+@@ -4483,7 +4479,10 @@ static bool find_ep_unused(const void *data, const void *user_data)
+ 	if (ep->stream)
+ 		return false;
+ 
+-	return ep->dir == match->rpac->type;
++	if (match->rpac)
++		return ep->dir == match->rpac->type;
++	else
++		return true;
+ }
+ 
+ static bool find_ep_pacs(const void *data, const void *user_data)
+@@ -4642,7 +4641,11 @@ struct bt_bap_stream *bt_bap_stream_new(struct bt_bap *bap,
+ 	struct bt_bap_endpoint *ep;
+ 	struct match_pac match;
+ 
+-	if (!bap || !bap->rdb || queue_isempty(bap->remote_eps))
++	if (!bap)
++		return NULL;
++
++	if (!rpac && (lpac->type != BT_BAP_BCAST_SOURCE)
++		&& queue_isempty(bap->remote_eps))
+ 		return NULL;
+ 
+ 	if (lpac && rpac) {
+@@ -4679,7 +4682,9 @@ struct bt_bap_stream *bt_bap_stream_new(struct bt_bap *bap,
+ 			return NULL;
+ 
+ 		bt_bap_foreach_pac(bap, type, match_pac, &match);
+-		if (!match.lpac || !match.rpac)
++		if (!match.lpac)
++			return NULL;
++		if (!match.rpac && (lpac->type != BT_BAP_BCAST_SOURCE))
+ 			return NULL;
+ 
+ 		lpac = match.lpac;
+@@ -4861,12 +4866,12 @@ unsigned int bt_bap_stream_enable(struct bt_bap_stream *stream,
+ 		queue_foreach(stream->links, bap_stream_enable_link, metadata);
+ 		break;
+ 	case BT_BAP_STREAM_TYPE_BCAST:
+-		if (bt_bap_stream_io_dir(stream) == BT_BAP_BCAST_SINK)
++		if (!bt_bap_stream_io_dir(stream))
+ 			stream_set_state_broadcast(stream,
+-						BT_BAP_STREAM_STATE_CONFIG);
++				BT_BAP_STREAM_STATE_CONFIG);
+ 		else if (bt_bap_stream_io_dir(stream) == BT_BAP_BCAST_SOURCE)
+ 			stream_set_state_broadcast(stream,
+-						BT_BAP_STREAM_STATE_STREAMING);
++				 BT_BAP_STREAM_STATE_STREAMING);
+ 
+ 		return 1;
+ 	}
+@@ -5399,10 +5404,6 @@ bool bt_bap_new_bcast_source(struct bt_bap *bap, const char *name)
+ 	struct bt_bap_endpoint *ep;
+ 	struct bt_bap_pac *pac_broadcast_source;
+ 
+-	/* Add the remote source only if a local sink endpoint was registered */
+-	if (queue_isempty(bap->ldb->broadcast_sinks))
+-		return false;
+-
+ 	/* Add the remote source only if a local sink endpoint was registered */
+ 	if (queue_isempty(bap->ldb->broadcast_sinks))
+ 		return false;
+diff --git a/src/shared/bap.h b/src/shared/bap.h
+index 23edbf4c6..2c8f9208e 100644
+--- a/src/shared/bap.h
++++ b/src/shared/bap.h
+@@ -317,3 +317,6 @@ void bt_bap_update_bcast_source(struct bt_bap_pac *pac,
+ 					struct bt_bap_codec *codec,
+ 					struct iovec *data,
+ 					struct iovec *metadata);
++
++bool bt_bap_pac_bcast_is_local(struct bt_bap *bap, struct bt_bap_pac *pac);
++
 -- 
 2.39.2
 
