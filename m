@@ -1,16 +1,26 @@
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2479EB5;
-	Sun, 19 Nov 2023 23:52:38 -0800 (PST)
-Received: from [192.168.0.183] (ip5f5af683.dynamic.kabel-deutschland.de [95.90.246.131])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=marcan.st header.i=@marcan.st header.b="BZKXe/i2"
+Received: from mail.marcansoft.com (marcansoft.com [212.63.210.85])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9A1AD4D;
+	Mon, 20 Nov 2023 03:07:40 -0800 (PST)
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 7D62961E5FE01;
-	Mon, 20 Nov 2023 08:52:20 +0100 (CET)
-Message-ID: <de236c7d-e265-452a-a60e-b10293a5b944@molgen.mpg.de>
-Date: Mon, 20 Nov 2023 08:52:19 +0100
+	(Authenticated sender: marcan@marcan.st)
+	by mail.marcansoft.com (Postfix) with ESMTPSA id 766F34195A;
+	Mon, 20 Nov 2023 11:07:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=marcan.st; s=default;
+	t=1700478458; bh=StbzyAS5+LLhtN73q/gFPznopbGCKLhwnROcQMkw3Hw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=BZKXe/i2Iu9fxFblxAq/aMYbruLvqE/BYFshIMAmLgr1icRClZBpLOmCVRcVZt+g5
+	 JTC2ZsCZGPCBOiJKKMQX7WeGvbRhWgKY7Qv2rxJHTNcUL2Gc357hnq38wwdU0bNqph
+	 suSgy0SSE/YK5UWxiz1rH7nwfxy64lAj/Zc/hjkWJYLId0UeE4vfmBRdeGtkgYZwIP
+	 IMvqBxg1s9vqRTUGTkxbgEHDZCxV+6vEqoJ5BDuGKQKu/NRWK7Sjp8nJi/P2/gLRdJ
+	 1u07INrpu/vgeDgPdF5UBq8J+s/AeeEF7lZvqRWONGtHBLJ9u40eiptteIxz5Rch3X
+	 hyC0kJlGOjSbQ==
+Message-ID: <3b5aedb4-da00-4ae2-a60f-685dba949223@marcan.st>
+Date: Mon, 20 Nov 2023 20:07:32 +0900
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -18,146 +28,128 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Qualcomm Atheros QCA61x4 keeps drawing 0.85 W despite Bluetooth
- being disable in GNOME
+Subject: Re: [REGRESSION] Bluetooth is not working on Macs with BCM4377 chip
+ starting from kernel 6.5
 Content-Language: en-US
-To: Alan Stern <stern@rowland.harvard.edu>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
+To: Aditya Garg <gargaditya08@live.com>
+Cc: Bagas Sanjaya <bagasdotme@gmail.com>, Sven Peter <sven@svenpeter.dev>,
+ Alyssa Rosenzweig <alyssa@rosenzweig.io>,
+ Marcel Holtmann <marcel@holtmann.org>,
  Johan Hedberg <johan.hedberg@gmail.com>,
  Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-usb@vger.kernel.org, linux-pm@vger.kernel.org,
- Hans de Goede <hdegoede@redhat.com>, Mike Jones <mike@mjones.io>
-References: <d994bd71-8d8b-4b6a-855e-8ea5bfede3ca@molgen.mpg.de>
- <22494842-a785-4151-915d-6f3a677d96cb@molgen.mpg.de>
- <1f3cb0cc-4bb0-471f-a785-a5d237cd46a3@rowland.harvard.edu>
- <d63ebc5f-9b72-4457-949b-3e90883bd3c0@molgen.mpg.de>
- <d61ae9a8-2228-4af1-a5f0-912e7763fbd1@rowland.harvard.edu>
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <d61ae9a8-2228-4af1-a5f0-912e7763fbd1@rowland.harvard.edu>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+ Orlando Chamberlain <orlandoch.dev@gmail.com>,
+ Kerem Karabay <kekrby@gmail.com>, Aun-Ali Zaidi <admin@kodeit.net>,
+ Asahi Linux Mailing List <asahi@lists.linux.dev>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
+ "j@jannau.net" <j@jannau.net>
+References: <22582194-DE99-45E5-ABEE-C1C7900DA523@live.com>
+ <ZVKxtD2Mt_eVyttJ@archie.me>
+ <MA0P287MB021794BCCCFB5EA57C1C3B69B8B2A@MA0P287MB0217.INDP287.PROD.OUTLOOK.COM>
+ <88fcc70e-9f4b-eeb9-d826-03fa4c40e7c3@marcan.st>
+ <e2909986-34b5-3ae2-cf5c-a1f8c46a1e0a@marcan.st>
+ <6574A65F-3C4D-4E26-8848-F12C38668478@live.com>
+ <03cdd06c-3991-dbf8-6068-e76384db8240@marcan.st>
+ <0900292C-5E74-471A-B789-A1D35D1BBBF7@live.com>
+From: Hector Martin <marcan@marcan.st>
+In-Reply-To: <0900292C-5E74-471A-B789-A1D35D1BBBF7@live.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Dear Alan,
 
 
-Than you again for your quick reply.
-
-Am 20.11.23 um 03:26 schrieb Alan Stern:
-> On Sun, Nov 19, 2023 at 11:09:32PM +0100, Paul Menzel wrote:
->> $ sudo modprobe btusb
+On 2023/11/19 4:31, Aditya Garg wrote:
 > 
->> $ grep . /sys/bus/usb/devices/1-3/power/*
->> /sys/bus/usb/devices/1-3/power/active_duration:119053224
->> /sys/bus/usb/devices/1-3/power/async:enabled
->> /sys/bus/usb/devices/1-3/power/autosuspend:2
->> /sys/bus/usb/devices/1-3/power/autosuspend_delay_ms:2000
->> /sys/bus/usb/devices/1-3/power/connected_duration:148065372
->> /sys/bus/usb/devices/1-3/power/control:auto
->> /sys/bus/usb/devices/1-3/power/level:auto
->> /sys/bus/usb/devices/1-3/power/persist:1
->> /sys/bus/usb/devices/1-3/power/runtime_active_kids:0
->> /sys/bus/usb/devices/1-3/power/runtime_active_time:119060567
->> /sys/bus/usb/devices/1-3/power/runtime_enabled:enabled
->> /sys/bus/usb/devices/1-3/power/runtime_status:active
->> /sys/bus/usb/devices/1-3/power/runtime_suspended_time:28831453
->> /sys/bus/usb/devices/1-3/power/runtime_usage:0
->> /sys/bus/usb/devices/1-3/power/wakeup:disabled
->> ```
 > 
-> Hmmm.  It's not immediately clear why the device isn't being suspended.
-> The btusb driver does support autosuspend.
+>> On 14-Nov-2023, at 3:14 PM, Hector Martin <marcan@marcan.st> wrote:
+>>
+>> On 14/11/2023 18.03, Aditya Garg wrote:
+>>>
+>>>
+>>>> On 14-Nov-2023, at 1:28 PM, Hector Martin <marcan@marcan.st> wrote:
+>>>>
+>>>> On 14/11/2023 15.59, Hector Martin wrote:
+>>>>> On 14/11/2023 15.23, Aditya Garg wrote:
+>>>>>>
+>>>>>>
+>>>>>>> On 14-Nov-2023, at 5:01 AM, Bagas Sanjaya <bagasdotme@gmail.com> wrote:
+>>>>>>>
+>>>>>>> ﻿On Mon, Nov 13, 2023 at 08:57:35PM +0000, Aditya Garg wrote:
+>>>>>>>> Starting from kernel 6.5, a regression in the kernel is causing Bluetooth to not work on T2 Macs with BCM4377 chip.
+>>>>>>>>
+>>>>>>>> Journalctl of kernel 6.4.8 which has Bluetooth working is given here: https://pastebin.com/u9U3kbFJ
+>>>>>>>>
+>>>>>>>> Journalctl of kernel 6.5.2, which has Bluetooth broken is given here: https://pastebin.com/aVHNFMRs
+>>>>>>>>
+>>>>>>>> Also, the bug hasn’t been fixed even in 6.6.1, as reported by users.
+>>>>>>>
+>>>>>>> Can you bisect this regression please?
+>>>>>>
+>>>>>> Since I don't have access to this hardware, it's not possible for me to bisect this regression. Let's hope someone is able to do so though.
+>>>>>
+>>>>> It's not a regression, it was always broken. I'm sending a patch.
+>>>>>
+>>>>> - Hector
+>>>>
+>>>> You are quite likely conflating two problems. The ubsan issue you quoted
+>>>> was always there and the patch I just sent fixes it, but it almost
+>>>> certainly always worked fine in practice without ubsan.
+>>>>
+>>>> The Bluetooth problem you are referring to is likely *specific to
+>>>> Bluetooth LE devices* and the regression was introduced by 288c90224e
+>>>> and fixed by 41e9cdea9c, which is also in 6.5.11 and 6.6.1.
+>>>>
+>>>> If Bluetooth is broken in *some other way* in 6.6.1 then we need a
+>>>> proper report or a bisect. Your logs don't show any issues other than
+>>>> the ubsan noise, which is not a regression.
+>>>>
+>>>> - Hector
+>>>>
+>>>
+>>> UBSAN noise seems to be fixed, Bluetooth not working though
+>>>
+>>> https://pastebin.com/HeVvMVk4
+>>>
+>>> Ill try setting .broken_le_coded = true,
+>>
+>> Now you have a probe timeout, which you didn't have before. That's a
+>> different problem.
+>>
+>> Please try this commit and see if it helps:
+>>
+>> https://github.com/AsahiLinux/linux/commit/8ec770b4f78fc14629705206e2db54d9d6439686
+>>
+>> If it's this then it's still not a regression, it's probably just random
+>> chance since I think the old timeout value was borderline for the older
+>> chips.
+>>
+>> - Hector
+>>
 > 
-> Can you also post the output from
 > 
-> 	grep . /sys/bus/usb/devices/1-3:*/power/*
+> Hi
 > 
-> with the driver module loaded?  I should have asked for it before.
-
-```
-$ sudo modprobe btusb
-$ sudo dmesg | tail -9
-[319747.390712] r8152 4-1.2:1.0 enx18dbf22dccf3: carrier on
-[320256.946094] bluetooth hci0: firmware: direct-loading firmware 
-qca/rampatch_usb_00000302.bin
-[320256.949333] Bluetooth: hci0: using rampatch file: 
-qca/rampatch_usb_00000302.bin
-[320256.949349] Bluetooth: hci0: QCA: patch rome 0x302 build 0x3e8, 
-firmware rome 0x302 build 0x111
-[320256.949643] usbcore: registered new interface driver btusb
-[320257.308935] bluetooth hci0: firmware: direct-loading firmware 
-qca/nvm_usb_00000302.bin
-[320257.309043] Bluetooth: hci0: using NVM file: qca/nvm_usb_00000302.bin
-[320257.336220] Bluetooth: hci0: HCI Enhanced Setup Synchronous 
-Connection command is advertised, but not supported.
-[320257.638188] Bluetooth: MGMT ver 1.22
-$ /sbin/rfkill
-ID TYPE      DEVICE    SOFT      HARD
-  1 wlan      phy0   blocked unblocked
-28 bluetooth hci0   blocked unblocked
-$ grep . /sys/bus/usb/devices/1-3:*/power/*
-/sys/bus/usb/devices/1-3:1.0/power/async:enabled
-/sys/bus/usb/devices/1-3:1.0/power/runtime_active_kids:0
-/sys/bus/usb/devices/1-3:1.0/power/runtime_enabled:enabled
-/sys/bus/usb/devices/1-3:1.0/power/runtime_status:suspended
-/sys/bus/usb/devices/1-3:1.0/power/runtime_usage:0
-/sys/bus/usb/devices/1-3:1.1/power/async:enabled
-/sys/bus/usb/devices/1-3:1.1/power/runtime_active_kids:0
-/sys/bus/usb/devices/1-3:1.1/power/runtime_enabled:enabled
-/sys/bus/usb/devices/1-3:1.1/power/runtime_status:suspended
-/sys/bus/usb/devices/1-3:1.1/power/runtime_usage:0
-```
-
-For completeness:
-
-```
-$ grep . /sys/bus/usb/devices/1-3/power/*
-/sys/bus/usb/devices/1-3/power/active_duration:120462288
-/sys/bus/usb/devices/1-3/power/async:enabled
-/sys/bus/usb/devices/1-3/power/autosuspend:2
-/sys/bus/usb/devices/1-3/power/autosuspend_delay_ms:2000
-/sys/bus/usb/devices/1-3/power/connected_duration:155617216
-/sys/bus/usb/devices/1-3/power/control:auto
-/sys/bus/usb/devices/1-3/power/level:auto
-/sys/bus/usb/devices/1-3/power/persist:1
-/sys/bus/usb/devices/1-3/power/runtime_active_kids:0
-/sys/bus/usb/devices/1-3/power/runtime_active_time:120468920
-/sys/bus/usb/devices/1-3/power/runtime_enabled:enabled
-/sys/bus/usb/devices/1-3/power/runtime_status:active
-/sys/bus/usb/devices/1-3/power/runtime_suspended_time:34969407
-/sys/bus/usb/devices/1-3/power/runtime_usage:0
-/sys/bus/usb/devices/1-3/power/wakeup:disabled
-```
-
->> ```
->> $ sudo modprobe -r btusb
->> $ sudo dmesg | tail -1
->> [314106.155163] usbcore: deregistering interface driver btusb
->> $ grep . /sys/bus/usb/devices/1-3/power/*
->> /sys/bus/usb/devices/1-3/power/active_duration:119072176
->> /sys/bus/usb/devices/1-3/power/async:enabled
->> /sys/bus/usb/devices/1-3/power/autosuspend:2
->> /sys/bus/usb/devices/1-3/power/autosuspend_delay_ms:2000
->> /sys/bus/usb/devices/1-3/power/connected_duration:148320980
->> /sys/bus/usb/devices/1-3/power/control:auto
->> /sys/bus/usb/devices/1-3/power/level:auto
->> /sys/bus/usb/devices/1-3/power/persist:1
->> /sys/bus/usb/devices/1-3/power/runtime_active_kids:0
->> /sys/bus/usb/devices/1-3/power/runtime_active_time:119079518
->> /sys/bus/usb/devices/1-3/power/runtime_enabled:enabled
->> /sys/bus/usb/devices/1-3/power/runtime_status:suspended
->> /sys/bus/usb/devices/1-3/power/runtime_suspended_time:29068110
->> /sys/bus/usb/devices/1-3/power/runtime_usage:0
->> /sys/bus/usb/devices/1-3/power/wakeup:disabled
->> ```
+> I recently got a kernel tested with this patch as well as with .broken_le_coded = true,
+> Here are the logs: https://pastebin.com/BpfJuJKY
 > 
-> Okay, and here we see that without the driver, the device does get
-> suspended.
+> Also, without .broken_le_coded = true, the bluetooth doesn't work, as specified in my previous email.
 
-Indeed. Thank you for pointing at `runtime_status:suspended` compared to 
-`runtime_status:active`.
+So are you saying everything works now? If not, what doesn't work?
+"Bluetooth doesn't work" isn't useful information, especially in the
+absence of any useful error messages. You can't just dump dmesg logs at
+us, you have to *describe* what the problem is.
 
+If broken_le_coded = true "fixed" it then "bluetooth doesn't work" was a
+terrible bug report. What that quirk does is make *connecting/pairing to
+Bluetooth LE devices* work. Non-BLE devices already worked, the
+controller worked, scanning worked, etc. All that is useful information
+if you want to get support for issues. We can't magically divine what's
+wrong if you just send us a dmesg and say "it's broken". We need
+detailed information about exactly what works and what doesn't (e.g. the
+controller not showing up at all is VERY different from it showing up
+but not finding your device). The only reason we guessed this here is
+that this was a known issue that affected other chips. If we ever run
+into a 4377-specific issue that only you can reproduce, "bluetooth
+doesn't work" and no error logs really isn't going to get it fixed.
 
-Kind regards,
-
-Paul
+- Hector
