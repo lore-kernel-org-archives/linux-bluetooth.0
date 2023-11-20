@@ -1,26 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D2C214A99
-	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Nov 2023 14:50:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UWPcv74p"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 07D8FC433CA;
-	Mon, 20 Nov 2023 14:50:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700491825;
-	bh=ixF67hFATj5SUbY8CWR6d8gGSjk/u3p3aDStqCWdbbQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=UWPcv74pxNzgWnuni3iBnS7xQ85Ohx/axgQ9ANbvJUdgC8kMD2YJZxBE5sxC53mKz
-	 8kqZoAeqWmPV3gfHePBTbk3FPQoiZD/+eJlXaQhkqDL+rd0eg+WAUc0Nj4XpyfCZTl
-	 Eie4g93wAqKGWJE8ZG5jAdG6+dn9YVPxdg0SnEExGGmMFKzpczFzxiodRZDn9HLeV4
-	 l2Cx6xwTIclmPLnPxDSUr7PXbBMl4rMYh4TxbNIrw1va+xtwGbWGg2JH/N48SS2r0G
-	 0w5DAXOKQBvAwEVkAx8/rfBmt1i+lrdU9ea+5v6CPll1SWX92gT184krWcNcKD8YFm
-	 yQ9RtmPtqxnqA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DD58CEAA958;
-	Mon, 20 Nov 2023 14:50:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T1pfLCxc"
+Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49327A4
+	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Nov 2023 07:10:44 -0800 (PST)
+Received: by mail-qt1-x833.google.com with SMTP id d75a77b69052e-41cda69486eso27021561cf.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Nov 2023 07:10:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700493042; x=1701097842; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wm8VDoPWPPH+5rDcEVesWVNNFTriBFrHhPfUd9g2+lU=;
+        b=T1pfLCxc9vwNmB++eAQVvnf6QqZawEjzCJ/FC2qhO8CVSBkAIw1RsAXZG5PvaRy8PP
+         59Z3q3QVeaqpjPkCcakpgy6/lDYbItfIsE1cvrUqeUJuW5BgVAWEmZZg6rSL95rDKnVx
+         Dh9LKjuTlFCVP3t8S8pL/Hrb9Jlg+LzFmbVhjE6nYT5cXa++5jeXx1XVeVpLUvxwgWzi
+         hYxn4K4F7gksFpgjiauk1IXdCNx+VcNY7LX0CCpw9EA84t+NOfhv8tHhgZjgWOURxJtm
+         SGB3gcDVsGpLtmEEu2Tsn6y+h0hyxo/k9bHFHZimyCfgmj7AxEgD6zPkVbdZOiN4bIDF
+         CKZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700493042; x=1701097842;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wm8VDoPWPPH+5rDcEVesWVNNFTriBFrHhPfUd9g2+lU=;
+        b=RHdgB9UeyVBpsAuzIIHjRmItg2Cx+MghcgIZYYrcThW/hEeyos0EEmWJufesmLMYnc
+         nTYKgGDgddTUaQ2RpAFP8NwdQx0cti4UvEIKEmj8x6XK/yu2mcwFwp815VZKGEPA8nC3
+         GlwPQaJuQJTOMxyVPQ37q8L11m5yhACfRqGMYyAy6XASwE2uH/flkQypQttqsGKsAsXI
+         HBnjPZmLJ9VOpu2zksotug3zRwBYc+w8Qctklox9j/CZOVxNMQPDAwDi2W6JmxpCW6I5
+         aeaiaW8m9x9zN0q0gcnLwuSFTDE1CfJ7USKKMH8j30cQwAWFwdk0u+r73N1uy5gCWbW0
+         jQaA==
+X-Gm-Message-State: AOJu0YwouyyzealviSoQ8Khb2kmDtX0wPN09WUxgRpn9szMu/Tq8O4m5
+	ZsWcbWddfTH9JuLbuFkaz/q8W5mn7Iu9XPLi
+X-Google-Smtp-Source: AGHT+IEqfnK8pkwS12I4Owf8ZI6lBzkibO0epXTYPn3+SXru942n5BoTSJIVAQXE8ymV12vVF5IGwg==
+X-Received: by 2002:ac8:5a45:0:b0:421:bc1d:409 with SMTP id o5-20020ac85a45000000b00421bc1d0409mr9106685qta.21.1700493042154;
+        Mon, 20 Nov 2023 07:10:42 -0800 (PST)
+Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
+        by smtp.gmail.com with ESMTPSA id j12-20020ac84f8c000000b0041b12d5fd91sm2701959qtw.55.2023.11.20.07.10.40
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Nov 2023 07:10:40 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v1] Bluetooth: hci_event: Fix not checking if HCI_OP_INQUIRY has been sent
+Date: Mon, 20 Nov 2023 10:10:39 -0500
+Message-ID: <20231120151039.323068-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -28,40 +50,34 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ 0/1] iso-tester: Add test for bcast AC 13 reconnect
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <170049182489.24101.6153640383647595323.git-patchwork-notify@kernel.org>
-Date: Mon, 20 Nov 2023 14:50:24 +0000
-References: <20231113153942.3875-1-iulia.tanasescu@nxp.com>
-In-Reply-To: <20231113153942.3875-1-iulia.tanasescu@nxp.com>
-To: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Cc: linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com,
- mihai-octavian.urzica@nxp.com, silviu.barbulescu@nxp.com,
- vlad.pruteanu@nxp.com, andrei.istodorescu@nxp.com, luiz.dentz@gmail.com
 
-Hello:
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+Before setting HCI_INQUIRY bit check if HCI_OP_INQUIRY was really sent
+otherwise the controller maybe be generating invalid events or, more
+likely, it is a result of fuzzing tools attempting to test the right
+behavior of the stack when unexpected events are generated.
 
-On Mon, 13 Nov 2023 17:39:41 +0200 you wrote:
-> This adds a test for the Broadcast AC 13 reconnect scenario: 2 BIS
-> sockets are connected, one of them is closed and then reopened, and
-> it is reassociated with the free BIS hcon inside the kernel space.
-> 
-> This depends on the kernel support added by patch
-> Bluetooth: ISO: Reassociate a socket with an active BIS.
-> 
-> [...]
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=218151
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/hci_event.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Here is the summary with links:
-  - [BlueZ,1/1] iso-tester: Add test for bcast AC 13 reconnect
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=58e6ef54e672
-
-You are awesome, thank you!
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 5b6fd625fc09..a94decff233e 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2302,7 +2302,8 @@ static void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
+ 		return;
+ 	}
+ 
+-	set_bit(HCI_INQUIRY, &hdev->flags);
++	if (hci_sent_cmd_data(hdev, HCI_OP_INQUIRY))
++		set_bit(HCI_INQUIRY, &hdev->flags);
+ }
+ 
+ static void hci_cs_create_conn(struct hci_dev *hdev, __u8 status)
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.42.0
 
