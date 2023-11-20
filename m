@@ -1,87 +1,93 @@
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from netrider.rowland.org (netrider.rowland.org [192.131.102.5])
-	by lindbergh.monkeyblade.net (Postfix) with SMTP id A9CEB133
-	for <linux-bluetooth@vger.kernel.org>; Sun, 19 Nov 2023 18:26:17 -0800 (PST)
-Received: (qmail 1432777 invoked by uid 1000); 19 Nov 2023 21:26:16 -0500
-Date: Sun, 19 Nov 2023 21:26:16 -0500
-From: Alan Stern <stern@rowland.harvard.edu>
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-  Johan Hedberg <johan.hedberg@gmail.com>,
-  Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-  linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-  linux-usb@vger.kernel.org, linux-pm@vger.kernel.org,
-  Hans de Goede <hdegoede@redhat.com>
-Subject: Re: Qualcomm Atheros QCA61x4 keeps drawing 0.85 W despite Bluetooth
- being disable in GNOME
-Message-ID: <d61ae9a8-2228-4af1-a5f0-912e7763fbd1@rowland.harvard.edu>
-References: <d994bd71-8d8b-4b6a-855e-8ea5bfede3ca@molgen.mpg.de>
- <22494842-a785-4151-915d-6f3a677d96cb@molgen.mpg.de>
- <1f3cb0cc-4bb0-471f-a785-a5d237cd46a3@rowland.harvard.edu>
- <d63ebc5f-9b72-4457-949b-3e90883bd3c0@molgen.mpg.de>
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94FB8B5;
+	Sun, 19 Nov 2023 23:46:13 -0800 (PST)
+Received: from [192.168.0.183] (ip5f5af683.dynamic.kabel-deutschland.de [95.90.246.131])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 0F43B61E5FE01;
+	Mon, 20 Nov 2023 08:45:10 +0100 (CET)
+Message-ID: <06e1b728-64f8-400b-8a2d-212d67992227@molgen.mpg.de>
+Date: Mon, 20 Nov 2023 08:45:08 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d63ebc5f-9b72-4457-949b-3e90883bd3c0@molgen.mpg.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] linux-firmware: update firmware for mediatek bluetooth
+ chip (MT7921)
+To: Chris Lu <chris.lu@mediatek.com>
+Cc: Josh Boyer <jwboyer@kernel.org>, David Woodhouse <dwmw2@infradead.org>,
+ Ben Hutchings <ben@decadent.org.uk>, Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
+ Deren Wu <deren.Wu@mediatek.com>, Aaron Hou <aaron.hou@mediatek.com>,
+ KM Lin <km.lin@mediatek.com>, Robin Chiu <robin.chiu@mediatek.com>,
+ Steve Lee <steve.lee@mediatek.com>, linux-bluetooth@vger.kernel.org,
+ linux-firmware@kernel.org, linux-kernel@vger.kernel.org,
+ linux-mediatek@lists.infradead.org
+References: <20231116081430.28211-1-chris.lu@mediatek.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20231116081430.28211-1-chris.lu@mediatek.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Sun, Nov 19, 2023 at 11:09:32PM +0100, Paul Menzel wrote:
-> $ sudo modprobe btusb
+Dear Chris,
 
-> $ grep . /sys/bus/usb/devices/1-3/power/*
-> /sys/bus/usb/devices/1-3/power/active_duration:119053224
-> /sys/bus/usb/devices/1-3/power/async:enabled
-> /sys/bus/usb/devices/1-3/power/autosuspend:2
-> /sys/bus/usb/devices/1-3/power/autosuspend_delay_ms:2000
-> /sys/bus/usb/devices/1-3/power/connected_duration:148065372
-> /sys/bus/usb/devices/1-3/power/control:auto
-> /sys/bus/usb/devices/1-3/power/level:auto
-> /sys/bus/usb/devices/1-3/power/persist:1
-> /sys/bus/usb/devices/1-3/power/runtime_active_kids:0
-> /sys/bus/usb/devices/1-3/power/runtime_active_time:119060567
-> /sys/bus/usb/devices/1-3/power/runtime_enabled:enabled
-> /sys/bus/usb/devices/1-3/power/runtime_status:active
-> /sys/bus/usb/devices/1-3/power/runtime_suspended_time:28831453
-> /sys/bus/usb/devices/1-3/power/runtime_usage:0
-> /sys/bus/usb/devices/1-3/power/wakeup:disabled
-> ```
 
-Hmmm.  It's not immediately clear why the device isn't being suspended.
-The btusb driver does support autosuspend.
+Thank you for the patch.
 
-Can you also post the output from
+Am 16.11.23 um 09:14 schrieb Chris Lu:
+> Update binary firmware for MT7921 BT devices.
+> 
+> File: mediatek/BT_RAM_CODE_MT7961_1_2_hdr.bin
+> Version: 20231109191416
 
-	grep . /sys/bus/usb/devices/1-3:*/power/*
+It’d be great if you added the version in the git commit message 
+summary/title too. The `linux-firmware` prefix is probably redundant. No 
+idea if a tag exists for it. So, maybe:
 
-with the driver module loaded?  I should have asked for it before.
+mediatek: Update BT MT7921 fw from 20230526131214 to 20231109191416
 
-> ```
-> $ sudo modprobe -r btusb
-> $ sudo dmesg | tail -1
-> [314106.155163] usbcore: deregistering interface driver btusb
-> $ grep . /sys/bus/usb/devices/1-3/power/*
-> /sys/bus/usb/devices/1-3/power/active_duration:119072176
-> /sys/bus/usb/devices/1-3/power/async:enabled
-> /sys/bus/usb/devices/1-3/power/autosuspend:2
-> /sys/bus/usb/devices/1-3/power/autosuspend_delay_ms:2000
-> /sys/bus/usb/devices/1-3/power/connected_duration:148320980
-> /sys/bus/usb/devices/1-3/power/control:auto
-> /sys/bus/usb/devices/1-3/power/level:auto
-> /sys/bus/usb/devices/1-3/power/persist:1
-> /sys/bus/usb/devices/1-3/power/runtime_active_kids:0
-> /sys/bus/usb/devices/1-3/power/runtime_active_time:119079518
-> /sys/bus/usb/devices/1-3/power/runtime_enabled:enabled
-> /sys/bus/usb/devices/1-3/power/runtime_status:suspended
-> /sys/bus/usb/devices/1-3/power/runtime_suspended_time:29068110
-> /sys/bus/usb/devices/1-3/power/runtime_usage:0
-> /sys/bus/usb/devices/1-3/power/wakeup:disabled
-> ```
+or
 
-Okay, and here we see that without the driver, the device does get 
-suspended.
+Update Mediatek BT MT7921 fw to 20231109191416
 
-Alan Stern
+
+Also, it would be great if you added the change-log to the commit 
+message, so people have an idea, what improved.
+
+> Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+> ---
+>   WHENCE                                  |   2 +-
+>   mediatek/BT_RAM_CODE_MT7961_1_2_hdr.bin | Bin 532846 -> 532206 bytes
+>   2 files changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/WHENCE b/WHENCE
+> index 571308be..eb6b21e9 100644
+> --- a/WHENCE
+> +++ b/WHENCE
+> @@ -5526,7 +5526,7 @@ Licence: Redistributable. See LICENCE.mediatek for details.
+>   Driver: mt7921 - MediaTek MT7921 bluetooth chipset
+>   
+>   File: mediatek/BT_RAM_CODE_MT7961_1_2_hdr.bin
+> -Version: 20230526131214
+> +Version: 20231109191416
+>   
+>   Licence: Redistributable. See LICENCE.mediatek for details.
+>   
+> diff --git a/mediatek/BT_RAM_CODE_MT7961_1_2_hdr.bin b/mediatek/BT_RAM_CODE_MT7961_1_2_hdr.bin
+> index 4b637d5156f2893ebed13d55e58c1e30e9eb1195..c7a96755b122ef7aa601eb40fbd7abb9ca85a545 100644
+> GIT binary patch
+> literal 532206
+
+[…]
+
+
+Kind regards,
+
+Paul
