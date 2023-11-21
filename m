@@ -1,140 +1,250 @@
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from netrider.rowland.org (netrider.rowland.org [192.131.102.5])
-	by lindbergh.monkeyblade.net (Postfix) with SMTP id 24155199
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Nov 2023 08:23:09 -0800 (PST)
-Received: (qmail 1493358 invoked by uid 1000); 21 Nov 2023 11:23:08 -0500
-Date: Tue, 21 Nov 2023 11:23:07 -0500
-From: Alan Stern <stern@rowland.harvard.edu>
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-  Johan Hedberg <johan.hedberg@gmail.com>,
-  Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-  linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-  linux-usb@vger.kernel.org, linux-pm@vger.kernel.org,
-  Hans de Goede <hdegoede@redhat.com>, Mike Jones <mike@mjones.io>,
-  Rocky Liao <quic_rjliao@quicinc.com>
-Subject: Re: Qualcomm Atheros QCA61x4 keeps drawing 0.85 W despite Bluetooth
- being disable in GNOME
-Message-ID: <fd84c14a-1866-4643-8ce9-0d6da5c4b82e@rowland.harvard.edu>
-References: <d994bd71-8d8b-4b6a-855e-8ea5bfede3ca@molgen.mpg.de>
- <22494842-a785-4151-915d-6f3a677d96cb@molgen.mpg.de>
- <1f3cb0cc-4bb0-471f-a785-a5d237cd46a3@rowland.harvard.edu>
- <d63ebc5f-9b72-4457-949b-3e90883bd3c0@molgen.mpg.de>
- <d61ae9a8-2228-4af1-a5f0-912e7763fbd1@rowland.harvard.edu>
- <de236c7d-e265-452a-a60e-b10293a5b944@molgen.mpg.de>
- <41253614-764e-4e95-b052-a46bf5587c29@rowland.harvard.edu>
- <3489df64-0f8f-43e1-a05f-ccb145ff6d59@molgen.mpg.de>
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b="n6xK9tfe"
+Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02olkn2061.outbound.protection.outlook.com [40.92.50.61])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 080F8E8;
+	Tue, 21 Nov 2023 08:37:13 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gTbkYYc+jTazXMmU7f16V17v8gXn02AQFedAVrfa8cd+WcFx5Y3KcHEPCcOyuSUR8z2YD52b2IIfMwEmmwm1iQ3+gL/a7X4pkXp9FRZXfY8cOUKrAviY5XyIMdBSaYrrq6zzkctaU1ckgEYPTwejvzPFyg6GbaMkuIktP5fiibbaXjUKsZt5nWEgerJQdiT4V6n9y//QYss58ed/W0bESfSQaomtGrvBAlq5QWUwTa9okLj8CJqcQenmpx/Yl4OOKINYmXCKfkj6O40Yr2nb9b6Yl25EOJ9GJ9xn9BXrqA8vGssci1Xtxf7d0n3Csrw/Bo6WWcKV1xA2snvxpGSxAg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=c9WexPYSxUUFbOsoLFpA5Agpr4GDWgHhnjckeuX3K0E=;
+ b=F9k2tcwk0afzNkVdDNgE8qWd/2Xe3ORCLRyLr60eQ9KTQ5gH7pYj3yvV1Ru+p9saodYiQtRAmU0smNYSCJYDHuxiyHsCDu24Ul+ZgsqLtI2EACEliYOdJu1cdAxjiH3NIMNB86Erp0reL83uk0CXFYYPJYKXdghGv1utEmwE4LnPjrEDFE9e0IE4TlSjwVfoG8GhajwzrgFURzZmfugS371ABeypctBtRKdeJ7xlX2gM3eY96BzyKiNLVhkShdRKbcbn6BjvFhuc4zx9ISvqszL/pDaUlYLgNhez+Cu826cil7k/rtLH/KQ4NhqbebUSZ2EUFec161uqdceadbS7Ww==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=c9WexPYSxUUFbOsoLFpA5Agpr4GDWgHhnjckeuX3K0E=;
+ b=n6xK9tfeDD0ZNjsMLvykhS2QWUp1MwpnxuIza6/YhcfE2k90Ovbld3V5D6Uh6OPwajD6kX5ESsdZ9CQY/oI2C2Z7UHvTYUh9fV9b78VMTh4RUd1AEM6ioq/y6QbyOMCzsEf/X2ROedqmLShk5yzVDlA2AW8i2v8xMcnSHRC7YJ/1+ek37zUdIq2Es3LepsqEGTG1iEddHDeDBWBe3W8OyRLeoofc0YVz+On/ofGBsorqkDjT2m/kC0YAvBQtwfEQgysi0KzEJKY2N3/PE2vgqg6k1/YHpCDR9y/2Kw243E+oPOQiuoeOQlQy6x3JJJh6eg0Ss5WWUVn3rpQEd3H2TQ==
+Received: from GV1PR10MB6563.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:150:83::20)
+ by PAVPR10MB7356.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:102:31f::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.28; Tue, 21 Nov
+ 2023 16:37:10 +0000
+Received: from GV1PR10MB6563.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::6c45:bfdf:a384:5450]) by GV1PR10MB6563.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::6c45:bfdf:a384:5450%7]) with mapi id 15.20.7002.028; Tue, 21 Nov 2023
+ 16:37:10 +0000
+From: Yuran Pereira <yuran.pereira@hotmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Yuran Pereira <yuran.pereira@hotmail.com>,
+	johan.hedberg@gmail.com,
+	linux-kernel@vger.kernel.org,
+	luiz.dentz@gmail.com,
+	marcel@holtmann.org
+Subject: [PATCH] Bluetooth: Add documentation to exported functions in lib
+Date: Tue, 21 Nov 2023 22:06:36 +0530
+Message-ID:
+ <GV1PR10MB6563B895FB2E3677DB984302E8BBA@GV1PR10MB6563.EURPRD10.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [FIzFFNt56uB3I3w9v7tqfLN0hH+ykClk]
+X-ClientProxiedBy: JNAP275CA0013.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:4c::18)
+ To GV1PR10MB6563.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:150:83::20)
+X-Microsoft-Original-Message-ID:
+ <20231121163636.450087-1-yuran.pereira@hotmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3489df64-0f8f-43e1-a05f-ccb145ff6d59@molgen.mpg.de>
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: GV1PR10MB6563:EE_|PAVPR10MB7356:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2b530bb9-189c-424a-ca96-08dbeab01b4d
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	hH8fv60eUjKgGJWZnTJL1OF/WfsdNChwMnuC831Tl7RT8JrgriCXadaNWqjcaDl32HpZFeto9rRZ7+JKWn8st2Dw5n9lv0ed+xXgF4SrrDRITH3agpBAvDo2d9ebAXI9omxvLrId3q1IDGNlRUdtY9/ghEpqfOmgW2NG5QlP1VlUBeGAVqP6Yz7fp0qK2IEveIUiAsMf5UtTWFUI7rac0GgOIhdApc84opsDyuErPlxKQCA2jiJ0/ArVCgBO+OqScWnNIJ/iJgQ8TV4CQk/st/BjbjyXWrBElTN9/7mLlPE4sDvrtmYZPtJd/XPDTf2Qp8GzDPmoebuVzgN+sMft5rmDg3nojhkxWvR8Erty8wus+eG4DM215+tG0/hhaOM1CjpC6+gY3VlmgpQSjairmprVWgfsGiOsbWqIQV2fhLP7n4qeAWPPM/VlMEjIltsuFW+ZE0dbygHvteDssLrTtAAyhTz5QAvHvBfuw+ZGX/Rof6nT3dAY+5O0OURs7iX9VhoCPa3aIDkkIgnX0PtpZOwpgxdqWc2pegup/361WMR55ytu8O32d7IH/KPsc1J4DNRql21HDJw66p1wSa+GwcOjEHuVEbn8EMdh+byb4C8Lq4+TaQJ06bvRBKQTNkvJ
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?5jqB3lAXwYy69K1qlamxsIoGjQEmraHvi3DT2nrpbazbY+tZrU7SaY54uxRG?=
+ =?us-ascii?Q?tRMSFWPQKtwNddOkvtWtiZosieQjwWMhgg9DKmIYIwUaqluNkSJR8o2cGeg4?=
+ =?us-ascii?Q?VhbOSZrONXQdE05greSbNaLOVTmO9jCv8LYSrNARibmd29lwVKI9VWQ4amCs?=
+ =?us-ascii?Q?RtBIAwN/FHenSng8yAVrFedtyLrEfJM7L17/99CHoGL5nbczdTAtz5O2yavB?=
+ =?us-ascii?Q?WhcPMe1IUWR+km+JfVJt1HHv91/njXaFxngc5nel4boZrDktPwAhLJvJsOoS?=
+ =?us-ascii?Q?XTArZ77CkQtrVo8auVCJIA6FmM5Bo0woBCi5bkzp9Ede682EX1E430vPOF7q?=
+ =?us-ascii?Q?5nVBrnCjmANu5OJf5s90zwhFRAe/+bg/BUK1qpozMzCMvDWrW46IOS1eUNGB?=
+ =?us-ascii?Q?hO+s74qZQcaE7JEBRY7PAGmjnQDIerk2wyn4KkjUvkDv1jjaABVPeL110UlP?=
+ =?us-ascii?Q?FzdJk4pKr/CvJVs1CFkOVBUUSF3ptHfE7jlMmxqK94//xxNGKthAjZePQT0P?=
+ =?us-ascii?Q?glMptcPB6iao0ST/7MaWo8Z9r2oaLv6SyQl6rChCsyHcrki6oiXGMXmvxwzt?=
+ =?us-ascii?Q?TyCBValS1FtKJ9YlawkbU27MtJe5KpZOveWoKOHo1zlIypv2m89mcUlHtEkg?=
+ =?us-ascii?Q?p6tDqJ1/ST5eEMNn80f/miQ9Qvkczm8UUq4K8yLNZQvzzD3QyHr68qY6cPvG?=
+ =?us-ascii?Q?hzMt1GMrmzvv7Pr10/qtyDdQhR11P4LsbXqvp4XWxY/OrXbLd9Ia6gLjBWHi?=
+ =?us-ascii?Q?p2L45kx+iiUkw0sMh946nbCJS/lvWw/oNRz0OJ2/hNyhEyY0odRPaXYVG4YU?=
+ =?us-ascii?Q?6kW+VYVZ8oxK13wnnCS1RGxZMdJgcbvTtdnwrq8CRDsK+lpGrnOylptnaMVh?=
+ =?us-ascii?Q?TgxgsokT27XbbsBtoKrdTp7mCsPtzHCEuOq2o+XXASf8ijxN3U0Je7Tf2rIp?=
+ =?us-ascii?Q?g36mFWB7US5rYTIJg1JnfkTA0e397JiRaM2JyljB73oGqGMvOFnaMSznRppy?=
+ =?us-ascii?Q?1VOwbAR5u6SZ5TrODLNb87l3EeKwYQmyodvfw+Ocwsix99xCHKTiUMWQAeu0?=
+ =?us-ascii?Q?3yO1nsMBVe/6mX0TzFOi7P0HRcOhlPTsu+e8aT2YyM4mF04ZFPoZN9z73Fqv?=
+ =?us-ascii?Q?18OwVOwjU4zIZndASojOHVJFxYkyKPbueahVr2x821pI2eTXuwTXaLaDzw9F?=
+ =?us-ascii?Q?ZF2g/yjyJMa2aWHjlQu193Tljq31fT2aTuepl6Kjt+pii7invBqj9/DNDaA?=
+ =?us-ascii?Q?=3D?=
+X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-6b909.templateTenant
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2b530bb9-189c-424a-ca96-08dbeab01b4d
+X-MS-Exchange-CrossTenant-AuthSource: GV1PR10MB6563.EURPRD10.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Nov 2023 16:37:10.2783
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAVPR10MB7356
 
-On Mon, Nov 20, 2023 at 11:05:04PM +0100, Paul Menzel wrote:
-> [Cc: +Rocky Liao as Qualcomm developer]
+Most functions in `net/bluetooth/lib.c` lack propper
+documentation.
 
-> Am 20.11.23 um 19:10 schrieb Alan Stern:
-> > Again, nothing out of the ordinary.  Maybe dynamic debugging will give
-> > us a clue.  Try doing this:
-> > 
-> > 	Unload the btusb module.
-> > 
-> > 	echo module usbcore +p >/sys/kernel/debug/dynamic_debug/control
-> > 
-> > 	Load the btusb module
-> > 
-> > 	Make sure that Bluetooth is turned off in Gnome
-> > 
-> > 	Wait a few seconds
-> > 
-> > 	echo module usbcore -p >/sys/kernel/debug/dynamic_debug/control
-> > 
-> > Then let's see what the dmesg log contains for that time period.
-> 
-> 
-> ```
-> $ sudo modprobe -r btusb
-> $ sudo dmesg | tail -1
-> [340309.272439] usbcore: deregistering interface driver btusb
-> $ echo module usbcore +p | sudo tee /sys/kernel/debug/dynamic_debug/control
-> module usbcore +p
-> $ sudo modprobe btusb
-> $ /sbin/rfkill
-> ID TYPE      DEVICE      SOFT      HARD
->  1 wlan      phy0   unblocked unblocked
-> 36 bluetooth hci0     blocked unblocked
-> $ echo module usbcore -p | sudo tee /sys/kernel/debug/dynamic_debug/control
-> module usbcore -p
-> $ sudo modprobe -r btusb
-> $ sudo dmesg | tail -1
-> [340608.761313] usbcore: deregistering interface driver btusb
-> $ sudo dmesg
-> […]
-> [340309.272439] usbcore: deregistering interface driver btusb
-> [340560.326182] xhci_hcd 0000:00:14.0: hcd_pci_runtime_resume: 0
-> [340560.326214] usb usb1: usb auto-resume
-> [340560.326258] hub 1-0:1.0: hub_resume
-> [340560.326381] usb usb1-port3: status 0107 change 0000
-> [340560.326418] usb usb1-port4: status 0107 change 0000
-> [340560.326451] usb usb1-port5: status 0507 change 0000
-> [340560.326650] hub 1-0:1.0: state 7 ports 12 chg 0000 evt 0000
-> [340560.326807] hub 1-0:1.0: state 7 ports 12 chg 0000 evt 0000
-> [340560.373988] usb 1-3: usb auto-resume
-> [340560.373998] hub 1-0:1.0: state 7 ports 12 chg 0000 evt 0008
-> [340560.441936] usb 1-3: Waited 0ms for CONNECT
-> [340560.441957] usb 1-3: finish reset-resume
-> [340560.570940] usb 1-3: reset full-speed USB device number 2 using xhci_hcd
+This patch adds documentation to all exported functions
+in `net/bluetooth/lib.c`.
+Unnecessary or redundant comments are also removed to
+ensure the file looks clean.
 
-Those two lines are unexpected.  Why does the device need to be reset?
-While the btusb module is loaded, does anything show up in
-/sys/bus/usb/devices/1-3/quirks?
+Signed-off-by: Yuran Pereira <yuran.pereira@hotmail.com>
+---
+ net/bluetooth/lib.c | 69 +++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 66 insertions(+), 3 deletions(-)
 
-> > Also, please post the output from "lsusb -v" for the Bluetooth device.
-> 
-> ```
-> $ sudo lsusb -d 0cf3:e300 -v
-> 
-> Bus 001 Device 002: ID 0cf3:e300 Qualcomm Atheros Communications QCA61x4
-> Bluetooth 4.0
-> Device Descriptor:
->   bLength                18
->   bDescriptorType         1
->   bcdUSB               2.01
->   bDeviceClass          224 Wireless
->   bDeviceSubClass         1 Radio Frequency
->   bDeviceProtocol         1 Bluetooth
->   bMaxPacketSize0        64
->   idVendor           0x0cf3 Qualcomm Atheros Communications
->   idProduct          0xe300 QCA61x4 Bluetooth 4.0
->   bcdDevice            0.01
->   iManufacturer           0
->   iProduct                0
->   iSerial                 0
->   bNumConfigurations      1
->   Configuration Descriptor:
->     bLength                 9
->     bDescriptorType         2
->     wTotalLength       0x00b1
->     bNumInterfaces          2
->     bConfigurationValue     1
->     iConfiguration          0
->     bmAttributes         0xe0
->       Self Powered
->       Remote Wakeup
+diff --git a/net/bluetooth/lib.c b/net/bluetooth/lib.c
+index 53a796ac078c..43aa01fd07b9 100644
+--- a/net/bluetooth/lib.c
++++ b/net/bluetooth/lib.c
+@@ -30,6 +30,15 @@
+ 
+ #include <net/bluetooth/bluetooth.h>
+ 
++/**
++ * baswap() - Swaps the order of a bd address
++ * @dst: Pointer to a bdaddr_t struct that will store the swapped
++ * 		 bd address.
++ * @src: Pointer to the bdaddr_t struct to be swapped.
++ *
++ * This function reverses the byte order of a Bluetooth device
++ * address.
++ */
+ void baswap(bdaddr_t *dst, const bdaddr_t *src)
+ {
+ 	const unsigned char *s = (const unsigned char *)src;
+@@ -41,7 +50,19 @@ void baswap(bdaddr_t *dst, const bdaddr_t *src)
+ }
+ EXPORT_SYMBOL(baswap);
+ 
+-/* Bluetooth error codes to Unix errno mapping */
++/**
++ * bt_to_errno() - Bluetooth error codes to standard errno
++ * @code: Bluetooth error code to be converted
++ *
++ * This function takes a Bluetooth error code as input and convets
++ * it to an equivalent Unix/standard errno value.
++ *
++ * Return:
++ *
++ * If the bt error code is known, an equivalent Unix errno value
++ * is returned.
++ * If the given bt error code is not known, ENOSYS is returned.
++ */
+ int bt_to_errno(__u16 code)
+ {
+ 	switch (code) {
+@@ -135,10 +156,22 @@ int bt_to_errno(__u16 code)
+ }
+ EXPORT_SYMBOL(bt_to_errno);
+ 
+-/* Unix errno to Bluetooth error codes mapping */
++/**
++ * bt_status() - Standard errno value to Bluetooth error code
++ * @err: Unix/standard errno value to be converted
++ *
++ * This function converts a standard/Unix errno value to an
++ * equivalent Bluetooth error code.
++ *
++ * Return: Bluetooth error code.
++ *
++ * If the given errno is not found, 0x1f is returned by default
++ * which indicates an unspecified error.
++ * For err >= 0, no conversion is performed, and the same value
++ * is immediately returned.
++ */
+ __u8 bt_status(int err)
+ {
+-	/* Don't convert if already positive value */
+ 	if (err >= 0)
+ 		return err;
+ 
+@@ -206,6 +239,10 @@ __u8 bt_status(int err)
+ }
+ EXPORT_SYMBOL(bt_status);
+ 
++/**
++ * bt_info() - Log Bluetooth information message
++ * @format: Message's format string
++ */
+ void bt_info(const char *format, ...)
+ {
+ 	struct va_format vaf;
+@@ -222,6 +259,10 @@ void bt_info(const char *format, ...)
+ }
+ EXPORT_SYMBOL(bt_info);
+ 
++/**
++ * bt_warn() - Log Bluetooth warning message
++ * @format: Message's format string
++ */
+ void bt_warn(const char *format, ...)
+ {
+ 	struct va_format vaf;
+@@ -238,6 +279,10 @@ void bt_warn(const char *format, ...)
+ }
+ EXPORT_SYMBOL(bt_warn);
+ 
++/**
++ * bt_err() - Log Bluetooth error message
++ * @format: Message's format string
++ */
+ void bt_err(const char *format, ...)
+ {
+ 	struct va_format vaf;
+@@ -267,6 +312,10 @@ bool bt_dbg_get(void)
+ 	return debug_enable;
+ }
+ 
++/**
++ * bt_dbg() - Log Bluetooth debugging message
++ * @format: Message's format string
++ */
+ void bt_dbg(const char *format, ...)
+ {
+ 	struct va_format vaf;
+@@ -287,6 +336,13 @@ void bt_dbg(const char *format, ...)
+ EXPORT_SYMBOL(bt_dbg);
+ #endif
+ 
++/**
++ * bt_warn_ratelimited() - Log rate-limited Bluetooth warning message
++ * @format: Message's format string
++ *
++ * This functions works like bt_warn, but it uses rate limiting
++ * to prevent the message from being logged too often.
++ */
+ void bt_warn_ratelimited(const char *format, ...)
+ {
+ 	struct va_format vaf;
+@@ -303,6 +359,13 @@ void bt_warn_ratelimited(const char *format, ...)
+ }
+ EXPORT_SYMBOL(bt_warn_ratelimited);
+ 
++/**
++ * bt_err_ratelimited() - Log rate-limited Bluetooth error message
++ * @format: Message's format string
++ *
++ * This functions works like bt_err, but it uses rate limiting
++ * to prevent the message from being logged too often.
++ */
+ void bt_err_ratelimited(const char *format, ...)
+ {
+ 	struct va_format vaf;
+-- 
+2.25.1
 
-That's what I was interested in.  The device does support remote wakeup.
-
-> PPS: Looking through the commit log/history for `drivers/bluetooth/btusb.c`,
-> I found commit 7ecacafc2406 (Bluetooth: btusb: Disable runtime suspend on
-> Realtek devices) [1] authored on December 5th, 2019. This is for Realtek
-> devices though, and not Qualcomm.
-
-Furthermore the driver has changed considerably since 2019.  See
-commits 8274db0776d1, 895915226a59, 7bd9fb058d77, and 34ec58b9fd1c.
-
-Alan Stern
