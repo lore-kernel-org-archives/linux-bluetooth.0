@@ -1,136 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B179D191;
-	Tue, 21 Nov 2023 12:03:22 -0800 (PST)
-Received: from [10.0.3.168] (unknown [93.240.169.83])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id A02FA61E5FE01;
-	Tue, 21 Nov 2023 21:02:54 +0100 (CET)
-Message-ID: <e679745a-6498-496c-8e0a-0d83cafbca27@molgen.mpg.de>
-Date: Tue, 21 Nov 2023 21:02:53 +0100
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XJUlC45o"
+Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 570611A1
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Nov 2023 12:14:06 -0800 (PST)
+Received: by mail-qk1-x736.google.com with SMTP id af79cd13be357-778a6c440faso300474385a.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Nov 2023 12:14:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700597645; x=1701202445; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=S9L3RVtYohgGGbQz/96kvey3bQHCTTJXpo42ThDVUdw=;
+        b=XJUlC45o/wIfUBm7zt8IESa0D/akcFJILpKrUlQk+0O76w9jyeWOI8D4LawLi/ikn8
+         OMVBjs5r4ke+smeb0reM1sy4xbluVWgq+yKsniPTK+En9s/zqbX8E6BtE1C5DDqNxTko
+         sqECKmqrXoz35Z6h2KilGig/zB8tMix517yDhIwoQPFhci6pPKlTtRg1FXDOpQqPO5qh
+         MHzeo0HJG9HyKBtqAmNjWmkaczHxFcDNF1gkgw+kLUZdyUXRTgJeaNRHYF2PuZm9jRSY
+         SpQUOkpd4sx6OO1ELgSzCz/4I3lqODbrfhE5BR9Rbp+ajYi2r7yhvLtkLaP+SpFqR1ZG
+         Btqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700597645; x=1701202445;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=S9L3RVtYohgGGbQz/96kvey3bQHCTTJXpo42ThDVUdw=;
+        b=kLVcVGDOJ7k514Q0bAYX3hm7g8ZkKjx8Novpq7+W9jexSXn9J8pZvv0xU7SuAaReYe
+         JJBtsQprA7AaSjJ2NVMS/Bgqq9wQOWxVAZm6tWgvk5mOfUF8K9YkPvm8kZ0ppQPDhV49
+         FNTTOj68lpBAsyhsG1Ez3FCXWeQFxZgHh10IipPzFEhvi/RBuGhXGul9BB+eWbCt/5Dh
+         1NIHUxZ0/7mdQo/1gztx1qB72V5s8V4SewTaW2DmX7BlGKbrLE8VvMbya5+fUYnZH9Qa
+         y4t3RZ0CIdd0ukXAS5CTg5Sd0TqghXM0sa0d4XLcD1xafRpxOzIyrrADJh7g/6yXMZwk
+         yE5A==
+X-Gm-Message-State: AOJu0YwmTUKukp1GwwgP43tymj5MxfXJg6wi9VGO+LKvmey1HgN0YrOD
+	WZxHd3WNVxS9udT3lOVOA04pZxzNpRK0kQ==
+X-Google-Smtp-Source: AGHT+IEB9JXZT96MN8sgSkPH4/2Trm/vK1Hd3dgK42GSq/CDcyDpIPfdSq9TgBHPLvI3KxMRrh/Aaw==
+X-Received: by 2002:a05:620a:2f0:b0:77a:148a:3d69 with SMTP id a16-20020a05620a02f000b0077a148a3d69mr125820qko.43.1700597644750;
+        Tue, 21 Nov 2023 12:14:04 -0800 (PST)
+Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
+        by smtp.gmail.com with ESMTPSA id v1-20020a05620a090100b0077d63ac6447sm40382qkv.109.2023.11.21.12.14.03
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Nov 2023 12:14:04 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1 1/2] shared/util: Add GMAP related UUIDs
+Date: Tue, 21 Nov 2023 15:14:01 -0500
+Message-ID: <20231121201402.617067-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Qualcomm Atheros QCA61x4 keeps drawing 0.85 W despite Bluetooth
- being disable in GNOME
-Content-Language: en-US
-To: Alan Stern <stern@rowland.harvard.edu>,
- Hans de Goede <hdegoede@redhat.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-usb@vger.kernel.org, linux-pm@vger.kernel.org,
- Mike Jones <mike@mjones.io>, Rocky Liao <quic_rjliao@quicinc.com>
-References: <d994bd71-8d8b-4b6a-855e-8ea5bfede3ca@molgen.mpg.de>
- <22494842-a785-4151-915d-6f3a677d96cb@molgen.mpg.de>
- <1f3cb0cc-4bb0-471f-a785-a5d237cd46a3@rowland.harvard.edu>
- <d63ebc5f-9b72-4457-949b-3e90883bd3c0@molgen.mpg.de>
- <d61ae9a8-2228-4af1-a5f0-912e7763fbd1@rowland.harvard.edu>
- <de236c7d-e265-452a-a60e-b10293a5b944@molgen.mpg.de>
- <41253614-764e-4e95-b052-a46bf5587c29@rowland.harvard.edu>
- <3489df64-0f8f-43e1-a05f-ccb145ff6d59@molgen.mpg.de>
- <fd84c14a-1866-4643-8ce9-0d6da5c4b82e@rowland.harvard.edu>
- <d8fba4f9-f868-4ef3-938b-f202e5bcc4ad@molgen.mpg.de>
- <b6c77dc7-04e6-424c-b3b6-f51f437a1671@rowland.harvard.edu>
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <b6c77dc7-04e6-424c-b3b6-f51f437a1671@rowland.harvard.edu>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Dear Alan, dear Hans,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+This adds GMAP 1.0[1] UUIDs following the assigned numbers[2].
 
-Am 21.11.23 um 18:40 schrieb Alan Stern:
-> On Tue, Nov 21, 2023 at 06:12:30PM +0100, Paul Menzel wrote:
+[1] https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=576496
+[2] https://www.bluetooth.com/wp-content/uploads/Files/Specification/Assigned_Numbers.pdf?id=3
+---
+ src/shared/util.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
->> Am 21.11.23 um 17:23 schrieb Alan Stern:
->>>> [340560.441957] usb 1-3: finish reset-resume
->>>> [340560.570940] usb 1-3: reset full-speed USB device number 2 using xhci_hcd
->>>
->>> Those two lines are unexpected.  Why does the device need to be reset?
->>> While the btusb module is loaded, does anything show up in
->>> /sys/bus/usb/devices/1-3/quirks?
->>
->>      $ more /sys/bus/usb/devices/1-3/quirks
->>      0x2
-> 
-> Ah.  0x2 is the RESET_RESUME quirk bit.  The fact that it is on explains
-> why the device gets reset when it is resumed.
-> 
-> It also explains why the device isn't getting suspended.  The USB core
-> will not autosuspend a device that has the RESET_RESUME quirk if its
-> driver wants remote-wakeup or does not support reset-resume.  The btusb
-> driver is like that.
-> 
-> Apparently the RESET_RESUME quirk bit is set by the btusb driver itself
-> (see the btusb_check_needs_reset_resume() routine in btusb.c), based on
-> the computing platform rather than on the Bluetooth device.  The
-> btusb_needs_reset_resume_table[] contains three entries: Dell OptiPlex
-> 3060, Dell XPS 9360, and Dell Inspiron 5565.
-> 
-> Since your system is an XPS 9360, it has this problem with suspending
-> the onboard Bluetooth device.  The only way the kernel can deal with it
-> is to avoid putting the device into runtime suspend while the driver
-> module is loaded.
-> 
-> So there's your answer.  If you rebuild the btusb driver after removing
-> the XPS 9360 entry from btusb_needs_reset_resume_table[], you should
-> find that the device does get runtime suspended.  (But then it might not
-> operate properly if you try to turn it on again after it has been
-> suspended.)
+diff --git a/src/shared/util.c b/src/shared/util.c
+index bf37fce364ed..47efff750e30 100644
+--- a/src/shared/util.c
++++ b/src/shared/util.c
+@@ -773,6 +773,7 @@ static const struct {
+ 	{ 0x1854, "Hearing Aid"					},
+ 	{ 0x1855, "Telephony and Media Audio"			},
+ 	{ 0x1856, "Public Broadcast Announcement"		},
++	{ 0x1858, "Gaming Audio"				},
+ 	/* 0x1857 to 0x27ff undefined */
+ 	{ 0x2800, "Primary Service"				},
+ 	{ 0x2801, "Secondary Service"				},
+@@ -1081,6 +1082,11 @@ static const struct {
+ 	{ 0x2bda, "Hearing Aid Features"			},
+ 	{ 0x2bdb, "Hearing Aid Preset Control Point"		},
+ 	{ 0x2bdc, "Active Preset Index"				},
++	{ 0x2c00, "GMAP Role"					},
++	{ 0x2c01, "UGG Features"				},
++	{ 0x2c02, "UGT Features"				},
++	{ 0x2c03, "BGS Features"				},
++	{ 0x2c03, "BGR Features"				},
+ 	/* vendor defined */
+ 	{ 0xfeff, "GN Netcom"					},
+ 	{ 0xfefe, "GN ReSound A/S"				},
+-- 
+2.42.0
 
-Thank you for finding this. This is commit 596b07a9a226 (Bluetooth: 
-btusb: Add Dell XPS 13 9360 to btusb_needs_reset_resume_table) from 
-April 2018 [1]. Hans, was it ever confirmed to be a platform limitation? 
-Does the Microsoft Windows driver do the same? Did the Dell engineers 
-verify it with the schematics? I was unable to see this in the bug 
-report [2].
-
-Also, it would be nice, if Linux logged, if quirks are applied that 
-affect power usage.
-
-As Alan wrote, that I’d need to rebuild the module to deactivate the 
-behavior, there is no switch to override the quirk table, right?
-
->>>>       bmAttributes         0xe0
->>>>         Self Powered
->>>>         Remote Wakeup
->>>
->>> That's what I was interested in.  The device does support remote wakeup.
->>
->> That would make sense so it can be resumed? (It does not necessarily mean
->> something like Wake-On-LAN, right?
-> 
-> It _does_ mean something like Wake-On-LAN: The device is capable of
-> asking the system to wake it up under some conditions while it or the
-> system is suspended.
-> 
->> Also, for this device it’s disabled?
->>
->>      $ grep . /sys/bus/usb/devices/1-3/power/wakeup
->>      disabled
-> 
-> Yes.  You can change that setting by writing "enabled" to the sysfs
-> file.  But I don't think this will make any difference to your runtime
-> suspend problem; the power/wakeup setting affects only system suspend,
-> not runtime suspend.
-
-Thank you again for the clarification.
-
-
-Kind regards,
-
-Paul
-
-
-[1]: 
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=596b07a9a22656493726edf1739569102bd3e136
-[2]: https://bugzilla.redhat.com/show_bug.cgi?id=1514836
