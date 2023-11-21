@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZqcwhxNb"
-Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F79BD40
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Nov 2023 13:32:40 -0800 (PST)
-Received: by mail-qk1-x734.google.com with SMTP id af79cd13be357-77891f362cfso18369585a.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Nov 2023 13:32:40 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DP6YoW4x"
+Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEE8F191
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Nov 2023 14:32:09 -0800 (PST)
+Received: by mail-qk1-x72b.google.com with SMTP id af79cd13be357-77bb668d941so383459585a.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Nov 2023 14:32:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700602359; x=1701207159; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1700605929; x=1701210729; darn=vger.kernel.org;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=e1y4C5lM+UmQpNeEFIoeJ5wa4Zz65p+KFUa7Sm1Icek=;
-        b=ZqcwhxNbmHr8HPWEtCAuRWDuC6tRyIwVF76g6ndH9qyHNhJgycS+ODU0QrO2/Dq3vv
-         WSxgEtRJTYDyon/0B18AyFyCQWdCpNceIFVvv4ymtjeTcXnuJplXqdLybHyzEachTnNf
-         39NEaAIwopbhcGn4PZ94xU7EtgQzNQEMuUYk14+fpcVQhh1VIOyIrdf8BGnv5jmFW8WG
-         sBUuemrIs42F5vfvag3RTDjIYfU36GnONF5XMhYz+KuKw73Eb2iEcl3PhMNqj1zhV59y
-         lyEFjmN3I2ufXSUlTuF0O5S3v7C3i9fmRZm4GGOtMvHS0aBhD3tWnh7+Jy4rmwsr1NQ/
-         J+ew==
+        bh=7a/CL+1nMN9TfMtfc0q2hpgnXD66J2jdEywkkc4ZQWU=;
+        b=DP6YoW4xGvoAOOxF4ttu0J1nRyzsFAwWXjfD8Xkili0nnTu71uv6Tldslc8L467Ogn
+         5tcc5UMtmdQfA+diORnUBHnEmI6+RSAAhfgW42XW+OXL8pHKo9XNEwDVzci533xousc1
+         MrnB1jv711MWZO6uSXNPFZz/bT9duSGIu4vVY07XWGKpwdfJze8QSC0vUHvvvcFCkYsd
+         +PmPqkOoQr4BD9jot6dkmJUvHR/zrxN04oKlm8xRvNmqoxQ+xohW5O6viNlnFfpHccWx
+         v+jBVB5V2wqDIivaehLXaawpQplXtB6fz1Td/o+glQAOzDSVER+FI/3orel0w2Fny1ES
+         rX0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700602359; x=1701207159;
+        d=1e100.net; s=20230601; t=1700605929; x=1701210729;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=e1y4C5lM+UmQpNeEFIoeJ5wa4Zz65p+KFUa7Sm1Icek=;
-        b=aOFJW3fdFCEdcgwu4gpN1IHMWVNjNw1L6JScRSjNJL12/gJFU4fbbVI6BLyscPWLRp
-         /BiQjfvxh0UtmtHf3OamkDxvsYasMYlhvHZwexGb2sZhvl3vuD2c1MnwNKnURd7wAC1D
-         aPT4EZYpWTukaYTH+mHa+ajAJHgM0+mE0iWx4KxGtm1wAZ96vED84Xap87wQoT1fVKWr
-         IXcabQ9icQ3GQvJ5XMzGfnqL3sBGLXq54VOEdGOUn4NBzyFhvv1wOmKQXpUy56S8tABN
-         Y+ZH1XHev4/fnvZ7mryvpvFtBh+CNA1bI+FSG4Qq/C5++CrM7HgiDcwQemK8UM1AI2J8
-         tE/w==
-X-Gm-Message-State: AOJu0YwbTzSYRIrqTqcirVp4PrSBT876qTk5iUUFrTQwijwZO9YZuHrf
-	oXfdMjQmOLp4w4cHRH1bbenyVhK+PdQ=
-X-Google-Smtp-Source: AGHT+IEQ7ZbCf8VE5073smbw0uKno6cM3xExCL7MFHW5+R0kKwiVxljAII57rAREQx3YWPUGIQcF3A==
-X-Received: by 2002:a05:620a:4629:b0:778:e431:3ef1 with SMTP id br41-20020a05620a462900b00778e4313ef1mr1056918qkb.32.1700602359088;
-        Tue, 21 Nov 2023 13:32:39 -0800 (PST)
-Received: from [172.17.0.2] ([20.51.206.102])
-        by smtp.gmail.com with ESMTPSA id pb10-20020a05620a838a00b0077703f31496sm3943814qkn.92.2023.11.21.13.32.38
+        bh=7a/CL+1nMN9TfMtfc0q2hpgnXD66J2jdEywkkc4ZQWU=;
+        b=ouKoAPZtqncETqOXbn0PWbs9N16cEJxvCM4EbhozEoBdU+NAjSDDovd5kLbQG/QOwP
+         U4i0H+F3FpL39LohmKT5IKvsBzjnfydm/Idh+LLOaoC/usDw53EohiFUH3DNUF+puCkc
+         YBEtjsYXNhf1IygzdFED9YaiyMnJgThvyzaY91CaQK2X6PiqvhbvXKaOz+jeZM+Kupnb
+         PsGewN9PHwvCfzQGbPG2bjho1eEW7npmVW9UwDaQzxEzaGGmpnDCPhGT8389SllkIhbX
+         HGu1ubwy1NUn9jouJLJLVe9kILHbF6GoiGZ2yzxILq0GvewjziG2BLwSsbLtJVUAueD7
+         axeg==
+X-Gm-Message-State: AOJu0Yz1YZ6aIn2mAjvvyehrd4hX7ZtPt//n0RobBv6RK+Bch1USZg8o
+	8gR4u93tIayU2feaXetgF3zCD464+pjnnQ==
+X-Google-Smtp-Source: AGHT+IHs6ZVhhflQDCN5LbddiOsDlPVMIBcLLi0l0NeUxJTJS70MLUkqfMZg7VvW0sIq+3iabExYWA==
+X-Received: by 2002:a05:620a:1d81:b0:77b:d90e:dd91 with SMTP id pj1-20020a05620a1d8100b0077bd90edd91mr427843qkn.46.1700605928718;
+        Tue, 21 Nov 2023 14:32:08 -0800 (PST)
+Received: from [172.17.0.2] ([40.67.141.241])
+        by smtp.gmail.com with ESMTPSA id q14-20020ae9e40e000000b0077407e3d68asm3957509qkc.111.2023.11.21.14.32.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Nov 2023 13:32:38 -0800 (PST)
-Message-ID: <655d21f6.050a0220.4da64.36e8@mx.google.com>
-Date: Tue, 21 Nov 2023 13:32:38 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4829238610572920190=="
+        Tue, 21 Nov 2023 14:32:08 -0800 (PST)
+Message-ID: <655d2fe8.e90a0220.49a03.34fd@mx.google.com>
+Date: Tue, 21 Nov 2023 14:32:08 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0354715202566846329=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -48,12 +48,12 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: bluez.test.bot@gmail.com
 To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1,1/2] shared/util: Add GMAP related UUIDs
-In-Reply-To: <20231121201402.617067-1-luiz.dentz@gmail.com>
-References: <20231121201402.617067-1-luiz.dentz@gmail.com>
+Subject: RE: [RESEND] Bluetooth: btusb: Don't suspend when there are connections
+In-Reply-To: <20231121213200.680095-1-luiz.dentz@gmail.com>
+References: <20231121213200.680095-1-luiz.dentz@gmail.com>
 Reply-To: linux-bluetooth@vger.kernel.org
 
---===============4829238610572920190==
+--===============0354715202566846329==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -64,59 +64,32 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=802985
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=803013
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    FAIL      1.23 seconds
-GitLint                       FAIL      0.88 seconds
-BuildEll                      PASS      23.95 seconds
-BluezMake                     PASS      576.11 seconds
-MakeCheck                     PASS      10.52 seconds
-MakeDistcheck                 PASS      150.93 seconds
-CheckValgrind                 PASS      210.30 seconds
-CheckSmatch                   WARNING   316.02 seconds
-bluezmakeextell               PASS      97.47 seconds
-IncrementalBuild              PASS      1035.37 seconds
-ScanBuild                     PASS      939.35 seconds
+CheckPatch                    PASS      0.60 seconds
+GitLint                       PASS      0.31 seconds
+SubjectPrefix                 PASS      0.11 seconds
+BuildKernel                   PASS      28.22 seconds
+CheckAllWarning               PASS      30.62 seconds
+CheckSparse                   PASS      36.15 seconds
+CheckSmatch                   PASS      100.30 seconds
+BuildKernel32                 PASS      27.14 seconds
+TestRunnerSetup               PASS      416.53 seconds
+TestRunner_l2cap-tester       PASS      23.34 seconds
+TestRunner_iso-tester         PASS      42.66 seconds
+TestRunner_bnep-tester        PASS      6.86 seconds
+TestRunner_mgmt-tester        PASS      165.18 seconds
+TestRunner_rfcomm-tester      PASS      10.83 seconds
+TestRunner_sco-tester         PASS      15.69 seconds
+TestRunner_ioctl-tester       PASS      12.07 seconds
+TestRunner_mesh-tester        PASS      9.04 seconds
+TestRunner_smp-tester         PASS      9.86 seconds
+TestRunner_userchan-tester    PASS      7.35 seconds
+IncrementalBuild              PASS      25.95 seconds
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,v1,1/2] shared/util: Add GMAP related UUIDs
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#72: 
-[1] https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=576496
-
-/github/workspace/src/src/13463536.patch total: 0 errors, 1 warnings, 18 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13463536.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ,v1,1/2] shared/util: Add GMAP related UUIDs
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-8: B1 Line exceeds max length (94>80): "[2] https://www.bluetooth.com/wp-content/uploads/Files/Specification/Assigned_Numbers.pdf?id=3"
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-monitor/att.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.
 
 
 ---
@@ -124,4 +97,4 @@ Regards,
 Linux Bluetooth
 
 
---===============4829238610572920190==--
+--===============0354715202566846329==--
