@@ -1,49 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h9zqJzls"
-Received: from mail-qv1-xf31.google.com (mail-qv1-xf31.google.com [IPv6:2607:f8b0:4864:20::f31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CB28112
-	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Nov 2023 13:07:34 -0800 (PST)
-Received: by mail-qv1-xf31.google.com with SMTP id 6a1803df08f44-66d76904928so1440756d6.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Nov 2023 13:07:34 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dvkvfh+m"
+Received: from mail-qv1-xf36.google.com (mail-qv1-xf36.google.com [IPv6:2607:f8b0:4864:20::f36])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EF161B9
+	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Nov 2023 13:07:36 -0800 (PST)
+Received: by mail-qv1-xf36.google.com with SMTP id 6a1803df08f44-6705379b835so1513216d6.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Nov 2023 13:07:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700687252; x=1701292052; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1700687254; x=1701292054; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=te9sdhX2UqCHf3FISEMe2Njr7WpzZXYgdE6tsK34ksk=;
-        b=h9zqJzlsB2IdMrXajDleCM/hhD8KdHUlXgzdultnlz16zVO1+x9kmw6ef0dybKJt9y
-         8bzbM68CbOW+jVMH9SuJTNrqB1l9vN4N2ZMa9aI0caB5PQObelPxYQDUOkiLAzdxxMVh
-         TnV3diLMokpJutrvLsgyiPT92EhYePT1raHW2dcpvo0SIBBs9MLtlLq1SC3uc0pBFO3v
-         pEk5c7kAUkmW9+PCAem/Hdqhaw3lf5Hbtiy6QYNAwCimyewBZKdnp/V+WdyRTIzlejFZ
-         hako+GA5ms3mhMaTokXTgG0Vmd607vMb0iosFQP2YteIMgyG0+fFBotljpRxTFM81xcz
-         l6PQ==
+        bh=qi3K7VQyUWa0lVFxz42Xy5Na8CHjuAIK7BaAEzLEHTA=;
+        b=dvkvfh+mODAExfyI2UNn6Bhqi98tMWL/58pohg1jqj/jejVWkJOQFfnT0lhzT4Ak27
+         tByw50OnRfMmbJ6wMhyVeDEZMrLqjY/wnrsAkhGgK+7Xh/T8QlZuFhSvY8KiyUP3HMRG
+         gagdO3nRTBEOah5cxBTt3rnCUiUtmg6ymq7LZ0sUJJ/QPO/AmJg0sujfBMXxxH1cZxEy
+         5aT8D3LzkGNVwxKxvySY/CuMTJopwM6KDQnweu4cEDaXXhoqzJwrNFDHUfrCHstJm/ke
+         9/TqDvkE5OIjdfE7SHD8mX9Uj8QHYCgcq0y4YOEniwho0oaRKEnUk5L16SorT1SOr1QH
+         mebg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700687252; x=1701292052;
+        d=1e100.net; s=20230601; t=1700687254; x=1701292054;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=te9sdhX2UqCHf3FISEMe2Njr7WpzZXYgdE6tsK34ksk=;
-        b=uftndZ11Hjqv+kr+zt5un66PCVwpBlro2sVfn9JjnO/Atb0XVjro9vZ06VSBYsA9b0
-         YJH4K3GLFyzD/Q4o9d1SQjQZdsARAgscbWk89DTWr9XjkZ3Y8jqN+N0HMuXTPDHIXmyK
-         mQU4wFrQO4CyJoGd88DpAe4NQ9u1f0AttvNCSQUz/no0CmdyeMFJDZAfEgYRjHpNzgCM
-         hB0X2roUsL+FtgGU8mUZLMwsxaO8R+7FSWfJvMARbE9g6YtneEGJVaXtNBVJiOj2GaET
-         c+15ScnpFbVUoETUEp0jIgXBs56C8XecKNT8DPKw9E0d3gaJmrYJS7oAiciULd0TvPTo
-         /uCA==
-X-Gm-Message-State: AOJu0YwYcOD5LIbvFJxILYTNsj3pWHtPCamCUIjk+6O2GfEXMbVJr6p1
-	WhvWHjdX5ZCexkGHSMgZ8SGUFWZ0d9DaJ1kB
-X-Google-Smtp-Source: AGHT+IE9UVKGPm1FdT+JLpkPweOpxIpcqF5lsgiKQcICf5zktWHhAAVyengiofMoDkGFt4gEltT/2g==
-X-Received: by 2002:ad4:5763:0:b0:677:f803:8183 with SMTP id r3-20020ad45763000000b00677f8038183mr3950965qvx.64.1700687252247;
-        Wed, 22 Nov 2023 13:07:32 -0800 (PST)
+        bh=qi3K7VQyUWa0lVFxz42Xy5Na8CHjuAIK7BaAEzLEHTA=;
+        b=Rqogd/Wj8ZSaDTy5HvDSojb3SqXGEfJaAe4WpWcKLNd+katcSCGRqGBLc4g24JYoJ7
+         Zl0ArBIaTN4pEZxpccVNQgFjNS9fK2BIOF7dFDO9szsW3KwRqpqOCQ6U4XCfL/gmLd4s
+         ZMOBAV0SxAsDRN0ADADxNRJVqJ6/O2/1EannE79tKNJAZmsPnZ8LmQb2MwK0rJuLR9wN
+         M6Ay4DfzNeTnjTXOTfv0MdHvHQhQ3AE1EkS23A7W9h0zHWJotHFunW9jqM1wsanBbCvG
+         0zyPiIxVUYCoLTFusBTMFUIbZc4TygWVkDXWrN3XjizP1Qrjh6ISsulYV1HpSd0JIjiu
+         mSpA==
+X-Gm-Message-State: AOJu0YzEpi0wNxOXufOvnJcFHc0d/HUQd9Zh+i4jBy0rzA7V9oVHzBxA
+	2HT3WWG+KTPf9TLqo9US9KotxAjuVBUUoHCd
+X-Google-Smtp-Source: AGHT+IHL2YeouxuvMfcLNpDUqVRHWgeBmqabZwYQGAqPNIaqt9iYui6DRHBZfFHT1LwFyRDByV2scQ==
+X-Received: by 2002:a05:6214:628:b0:66d:36fb:474d with SMTP id a8-20020a056214062800b0066d36fb474dmr4488758qvx.1.1700687254522;
+        Wed, 22 Nov 2023 13:07:34 -0800 (PST)
 Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
-        by smtp.gmail.com with ESMTPSA id w2-20020a0ca802000000b006781b67abaasm94384qva.109.2023.11.22.13.07.30
+        by smtp.gmail.com with ESMTPSA id w2-20020a0ca802000000b006781b67abaasm94384qva.109.2023.11.22.13.07.32
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Nov 2023 13:07:30 -0800 (PST)
+        Wed, 22 Nov 2023 13:07:33 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 2/5] monitor/att: Add GMAS attribute decoders
-Date: Wed, 22 Nov 2023 16:07:24 -0500
-Message-ID: <20231122210727.893872-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v3 3/5] iso-tester: Add presets from GMAP
+Date: Wed, 22 Nov 2023 16:07:25 -0500
+Message-ID: <20231122210727.893872-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231122210727.893872-1-luiz.dentz@gmail.com>
 References: <20231122210727.893872-1-luiz.dentz@gmail.com>
@@ -57,164 +57,152 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds GMAS attribute decoders.
----
- monitor/att.c | 135 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 135 insertions(+)
+This adds the following presets from GMAP:
 
-diff --git a/monitor/att.c b/monitor/att.c
-index 39ea5d6dac5a..9db273223352 100644
---- a/monitor/att.c
-+++ b/monitor/att.c
-@@ -3195,6 +3195,140 @@ static void bcast_audio_scan_cp_write(const struct l2cap_frame *frame)
- 	print_bcast_audio_scan_cp_cmd(frame);
- }
+ISO QoS 48_1_gc - Success                            Passed
+ISO QoS 48_2_gc - Success                            Passed
+ISO QoS 48_1_gr - Success                            Passed
+ISO QoS 48_2_gr - Success                            Passed
+ISO QoS 48_3_gr - Success                            Passed
+ISO QoS 48_4_gr - Success                            Passed
+---
+ tools/iso-tester.c | 109 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 109 insertions(+)
+
+diff --git a/tools/iso-tester.c b/tools/iso-tester.c
+index 9fccbaa809e4..4d47373e3290 100644
+--- a/tools/iso-tester.c
++++ b/tools/iso-tester.c
+@@ -154,6 +154,19 @@
+ #define QOS_48_4_2 QOS_OUT(10000, 100, 120, 0x02, 13)
+ #define QOS_48_5_2 QOS_OUT(7500, 75, 117, 0x02, 13)
+ #define QOS_48_6_2 QOS_OUT(10000, 100, 155, 0x02, 13)
++/* QoS configuration support setting requirements for the UGG and UGT */
++#define QOS_16_1_gs QOS(7500, 15, 30, 0x02, 1)
++#define QOS_16_2_gs QOS(10000, 20, 40, 0x02, 1)
++#define QOS_32_1_gs QOS(7500, 15, 60, 0x02, 1)
++#define QOS_32_2_gs QOS(10000, 20, 80, 0x02, 1)
++#define QOS_48_1_gs QOS(7500, 15, 75, 0x02, 1)
++#define QOS_48_2_gs QOS(10000, 20, 100, 0x02, 1)
++#define QOS_32_1_gr QOS(7500, 15, 60, 0x02, 1)
++#define QOS_32_2_gr QOS(10000, 20, 80, 0x02, 1)
++#define QOS_48_1_gr QOS(7500, 15, 75, 0x02, 1)
++#define QOS_48_2_gr QOS(10000, 20, 100, 0x02, 1)
++#define QOS_48_3_gr QOS(7500, 15, 90, 0x02, 1)
++#define QOS_48_4_gr QOS(10000, 20, 120, 0x02, 1)
  
-+static const struct bitfield_data gmap_role_table[] = {
-+	{  0, "Unicast Game Gateway (UGG) (0x0001)"	},
-+	{  1, "Unicast Game Terminal (UGT) (0x0002)"	},
-+	{  2, "Broadcast Game Sender (BGS) (0x0004)"	},
-+	{  3, "Broadcast Game Receiver (BGR) (0x0008)"	},
-+	{ }
-+};
-+
-+static void gmap_role_read(const struct l2cap_frame *frame)
-+{
-+	uint8_t role;
-+	uint8_t mask;
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &role)) {
-+		print_text(COLOR_ERROR, "    invalid size");
-+		return;
-+	}
-+
-+	print_field("    Role: 0x%2.2x", role);
-+
-+	mask = print_bitfield(6, role, gmap_role_table);
-+	if (mask)
-+		print_text(COLOR_WHITE_BG, "    Unknown fields (0x%2.2x)",
-+								mask);
-+}
-+
-+static const struct bitfield_data ugg_features_table[] = {
-+	{  0, "UGG Multiplex (0x0001)"	},
-+	{  1, "UGG 96 kbps Source (0x0002)"	},
-+	{  2, "UGG Multilink (0x0004)"	},
-+	{ }
-+};
-+
-+static void ugg_features_read(const struct l2cap_frame *frame)
-+{
-+	uint8_t value;
-+	uint8_t mask;
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &value)) {
-+		print_text(COLOR_ERROR, "    invalid size");
-+		return;
-+	}
-+
-+	print_field("    Value: 0x%2.2x", value);
-+
-+	mask = print_bitfield(6, value, ugg_features_table);
-+	if (mask)
-+		print_text(COLOR_WHITE_BG, "    Unknown fields (0x%2.2x)",
-+								mask);
-+}
-+
-+static const struct bitfield_data ugt_features_table[] = {
-+	{  0, "UGT Source (0x0001)"		},
-+	{  1, "UGT 80 kbps Source (0x0002)"	},
-+	{  2, "UGT Sink (0x0004)"		},
-+	{  3, "UGT 64 kbps Sink (0x0008)"	},
-+	{  4, "UGT Multiplex (0x0010)"		},
-+	{  5, "UGT Multisink (0x0020)"		},
-+	{  6, "UGT Multisource (0x0040)"	},
-+	{ }
-+};
-+
-+static void ugt_features_read(const struct l2cap_frame *frame)
-+{
-+	uint8_t value;
-+	uint8_t mask;
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &value)) {
-+		print_text(COLOR_ERROR, "    invalid size");
-+		return;
-+	}
-+
-+	print_field("    Value: 0x%2.2x", value);
-+
-+	mask = print_bitfield(6, value, ugt_features_table);
-+	if (mask)
-+		print_text(COLOR_WHITE_BG, "    Unknown fields (0x%2.2x)",
-+								mask);
-+}
-+
-+static const struct bitfield_data bgs_features_table[] = {
-+	{  0, "BGS 96 kbps (0x0001)"		},
-+	{ }
-+};
-+
-+static void bgs_features_read(const struct l2cap_frame *frame)
-+{
-+	uint8_t value;
-+	uint8_t mask;
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &value)) {
-+		print_text(COLOR_ERROR, "    invalid size");
-+		return;
-+	}
-+
-+	print_field("    Value: 0x%2.2x", value);
-+
-+	mask = print_bitfield(6, value, bgs_features_table);
-+	if (mask)
-+		print_text(COLOR_WHITE_BG, "    Unknown fields (0x%2.2x)",
-+								mask);
-+}
-+
-+static const struct bitfield_data bgr_features_table[] = {
-+	{  0, "BGR Multisink (0x0001)"		},
-+	{  1, "BGR Multiplex (0x0002)"		},
-+	{ }
-+};
-+
-+static void bgr_features_read(const struct l2cap_frame *frame)
-+{
-+	uint8_t value;
-+	uint8_t mask;
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &value)) {
-+		print_text(COLOR_ERROR, "    invalid size");
-+		return;
-+	}
-+
-+	print_field("    Value: 0x%2.2x", value);
-+
-+	mask = print_bitfield(6, value, bgr_features_table);
-+	if (mask)
-+		print_text(COLOR_WHITE_BG, "    Unknown fields (0x%2.2x)",
-+								mask);
-+}
-+
-+#define GMAS \
-+	GATT_HANDLER(0x2c00, gmap_role_read, NULL, NULL), \
-+	GATT_HANDLER(0x2c01, ugg_features_read, NULL, NULL), \
-+	GATT_HANDLER(0x2c02, ugt_features_read, NULL, NULL), \
-+	GATT_HANDLER(0x2c02, bgs_features_read, NULL, NULL), \
-+	GATT_HANDLER(0x2c03, bgr_features_read, NULL, NULL)
-+
- #define GATT_HANDLER(_uuid, _read, _write, _notify) \
- { \
- 	.uuid = { \
-@@ -3255,6 +3389,7 @@ struct gatt_handler {
- 	GATT_HANDLER(0x2bc7, NULL, bcast_audio_scan_cp_write, NULL),
- 	GATT_HANDLER(0x2bc8, bcast_recv_state_read, NULL,
- 					bcast_recv_state_notify),
-+	GMAS
+ /* One unidirectional CIS. Unicast Server is Audio Sink */
+ #define AC_1_4 QOS_OUT(10000, 10, 40, 0x02, 2)
+@@ -810,6 +823,66 @@ static const struct iso_client_data connect_48_6_2 = {
+ 	.expect_err = 0
  };
  
- static struct gatt_handler *get_handler_uuid(const bt_uuid_t *uuid)
++static const struct iso_client_data connect_16_1_gs = {
++	.qos = QOS_16_1_gs,
++	.expect_err = 0
++};
++
++static const struct iso_client_data connect_16_2_gs = {
++	.qos = QOS_16_2_gs,
++	.expect_err = 0
++};
++
++static const struct iso_client_data connect_32_1_gs = {
++	.qos = QOS_32_1_gs,
++	.expect_err = 0
++};
++
++static const struct iso_client_data connect_32_2_gs = {
++	.qos = QOS_32_2_gs,
++	.expect_err = 0
++};
++
++static const struct iso_client_data connect_48_1_gs = {
++	.qos = QOS_48_1_gs,
++	.expect_err = 0
++};
++
++static const struct iso_client_data connect_48_2_gs = {
++	.qos = QOS_48_2_gs,
++	.expect_err = 0
++};
++
++static const struct iso_client_data connect_32_1_gr = {
++	.qos = QOS_32_1_gr,
++	.expect_err = 0
++};
++
++static const struct iso_client_data connect_32_2_gr = {
++	.qos = QOS_32_2_gr,
++	.expect_err = 0
++};
++
++static const struct iso_client_data connect_48_1_gr = {
++	.qos = QOS_48_1_gr,
++	.expect_err = 0
++};
++
++static const struct iso_client_data connect_48_2_gr = {
++	.qos = QOS_48_2_gr,
++	.expect_err = 0
++};
++
++static const struct iso_client_data connect_48_3_gr = {
++	.qos = QOS_48_3_gr,
++	.expect_err = 0
++};
++
++static const struct iso_client_data connect_48_4_gr = {
++	.qos = QOS_48_4_gr,
++	.expect_err = 0
++};
++
+ static const struct iso_client_data connect_invalid = {
+ 	.qos = QOS(0, 0, 0, 0, 0),
+ 	.expect_err = -EINVAL
+@@ -2945,6 +3018,42 @@ int main(int argc, char *argv[])
+ 	test_iso("ISO QoS 48_6_2 - Success", &connect_48_6_2, setup_powered,
+ 							test_connect);
+ 
++	test_iso("ISO QoS 16_1_gs - Success", &connect_16_1_gs, setup_powered,
++							test_connect);
++
++	test_iso("ISO QoS 16_2_gs - Success", &connect_16_2_gs, setup_powered,
++							test_connect);
++
++	test_iso("ISO QoS 32_1_gs - Success", &connect_32_1_gs, setup_powered,
++							test_connect);
++
++	test_iso("ISO QoS 32_2_gs - Success", &connect_32_2_gs, setup_powered,
++							test_connect);
++
++	test_iso("ISO QoS 48_1_gs - Success", &connect_48_1_gs, setup_powered,
++							test_connect);
++
++	test_iso("ISO QoS 48_2_gs - Success", &connect_48_2_gs, setup_powered,
++							test_connect);
++
++	test_iso("ISO QoS 32_1_gr - Success", &connect_32_1_gr, setup_powered,
++							test_connect);
++
++	test_iso("ISO QoS 32_2_gr - Success", &connect_32_2_gr, setup_powered,
++							test_connect);
++
++	test_iso("ISO QoS 48_1_gr - Success", &connect_48_1_gr, setup_powered,
++							test_connect);
++
++	test_iso("ISO QoS 48_2_gr - Success", &connect_48_2_gr, setup_powered,
++							test_connect);
++
++	test_iso("ISO QoS 48_3_gr - Success", &connect_48_3_gr, setup_powered,
++							test_connect);
++
++	test_iso("ISO QoS 48_4_gr - Success", &connect_48_4_gr, setup_powered,
++							test_connect);
++
+ 	test_iso("ISO QoS - Invalid", &connect_invalid, setup_powered,
+ 							test_connect);
+ 
 -- 
 2.42.0
 
