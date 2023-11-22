@@ -1,151 +1,90 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lBGEJCli"
-Received: from mail-oo1-xc2c.google.com (mail-oo1-xc2c.google.com [IPv6:2607:f8b0:4864:20::c2c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E01C21B9
-	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Nov 2023 12:57:15 -0800 (PST)
-Received: by mail-oo1-xc2c.google.com with SMTP id 006d021491bc7-581ed744114so127193eaf.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Nov 2023 12:57:15 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JC7m2nTB"
+Received: from mail-ot1-x32d.google.com (mail-ot1-x32d.google.com [IPv6:2607:f8b0:4864:20::32d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDAEB1A4
+	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Nov 2023 13:07:31 -0800 (PST)
+Received: by mail-ot1-x32d.google.com with SMTP id 46e09a7af769-6d7e67c169cso138746a34.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Nov 2023 13:07:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700686635; x=1701291435; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vx1hq9eu3CUmxAqSvdIvm1XiA/Txf5ZvDVRovdLDyUo=;
-        b=lBGEJClid5tieka0ngiED71LYuiiUoX5wt1qEPpVtIe8AZzSExm3pNxu3jMNhnvaTH
-         vkW+ZqHizYDCK4TOE0QjvpeR8SHddOqEyO8EsmARdivn595xoydyJesGGDpknG2CNSW5
-         SgCZ8mM1lYj06wgO3UYSw3zEH3GIk/mBYQGQaZii3uahbB/2QNV9VCslVUBs3Pr5MWDL
-         cf69pGAu9FqoLdNXtVJANQb/28/RcGMa2HnTjypc9h/9bj+xBkaY/w0ygYSMJnCXkt0F
-         7u0t/Jj7pEh4sLaBDoZ3tFgb7UGXedY3SKcJnKt0z8X1fRVym4KENCcMKdwQGUcRurQT
-         ahQw==
+        d=gmail.com; s=20230601; t=1700687250; x=1701292050; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=S9L3RVtYohgGGbQz/96kvey3bQHCTTJXpo42ThDVUdw=;
+        b=JC7m2nTBiOSflfQpHjHts4svDA66MqFvcx7llMBa+xt1uFhNC1ZLIQmHL0f+cTwp1k
+         xB8T7wF8Dss+M36U30yA16ZEI452W4oKp+ZGRcu6/6d9n1T3CrEUMgGSabzkHAi5gzRx
+         5tAgFI+g3lbECCLyoeBSQu/pDMF+TL6I5OyerkkRCkKeIcjoSPjMxvafSeocoWhZC3Jm
+         4Fgh+dM2UIPpxvLfloSyD/ndGhz1Bv0oKoR5Z2RFj9P2mKjK01BD0SiFeXxrD+nwEnMu
+         Xy41MXlbkoQv0ZPfdu2GG61r+5ctlKdWevhtY5sQZU22EFLzrofhdntpg2R/43ESc4FU
+         TLkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700686635; x=1701291435;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Vx1hq9eu3CUmxAqSvdIvm1XiA/Txf5ZvDVRovdLDyUo=;
-        b=vVzt23R1hYMTPH3Tpx+ihjleyvK6yAVawVZS1VPrhl4J6BDdOSKDzWvtA/yywxihCt
-         VcCpqfBrr/5XqfhOBrFyqWnL4k7E1aTX4DWUDPvjxJewE7oXexCZvtXPsbVtctGeH3xA
-         CvfZ3FGW47U56GmpYAEX8khvxxPA0mADclxWwLwwnQYc2yofYS0eFWqZ0sOtNeE9T2tE
-         dFmPNfkxfFp4NY+EmEM+dM66j6t+ZyYA8ID5dSorK4evGRKGCvNUBDZq0wymbKzCOzTl
-         ZcrX/u8mn8S0D9pBFwXrFxDFPKGH6IBo0ABBJ+MR3E5v6D7j9BdGDlfwQTH8Ikh8H1CI
-         RCbQ==
-X-Gm-Message-State: AOJu0YxSamvKZOZAlr0fi7pE4VFfiZ7t5veFRn8/WlaltDbHcj/oOhRt
-	lrckg2xhxf277B1O1Wr9K/wVNY1FG1Q=
-X-Google-Smtp-Source: AGHT+IFHXgCLcaEI10ltIVS7UiKPDPo144gSr7eQpj8mkJcnGhEo3yTwjWe8QL4dhUwf9WeuNtFewA==
-X-Received: by 2002:a05:6358:9226:b0:16b:c6f5:5e3b with SMTP id d38-20020a056358922600b0016bc6f55e3bmr2995396rwb.26.1700686634698;
-        Wed, 22 Nov 2023 12:57:14 -0800 (PST)
-Received: from [172.17.0.2] ([172.183.122.247])
-        by smtp.gmail.com with ESMTPSA id w14-20020ac843ce000000b00419801b1094sm110290qtn.13.2023.11.22.12.57.14
+        d=1e100.net; s=20230601; t=1700687250; x=1701292050;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=S9L3RVtYohgGGbQz/96kvey3bQHCTTJXpo42ThDVUdw=;
+        b=ryVGfZc5yNrc4leqOS8RsX2yEUMfXu+e2Ccui+fURERywDMDDCwiG7RZZrLtpfXGGJ
+         G1IR7Cxn/CzCL0Wk3/weFDABZDsmN0Ilh5U2BI0PMYGNE+Hvb4axDk7e3nHZDrQfYchf
+         IcuNIIN/fdl5iNTmwIN7xeAHo/Fh4z5k0jRpePTRWaaaJmf7HUzr3FT0LgdVHOdny1Lf
+         qLg+qCnScBllyUCclrtSatG2/ep2PJHcO4UzQumHEEoHkT0ovmGA+CojnN2PgcYJW1eq
+         8a4BHkezA4knOMdnq8ah/gBRfiHWEmK4eA0GMQZJ2RDTCkFZxRYlC94RYi6v/RuoLrWq
+         vzlQ==
+X-Gm-Message-State: AOJu0YxXpqwx0/ZlWQu0o4/AImS5xWwuI8niUv/RJzBTB7OC8vhjNJEk
+	1F4ZCwtWfzQLVEnSni/S0pgca8UyP94487IM
+X-Google-Smtp-Source: AGHT+IF/3pCNTuaqh5gWtza5ciCvev2e1XTtz9HtEVsRp2drFx1hsYy1SFSCOV9fL/8wEDUv0Nu7JA==
+X-Received: by 2002:a9d:7855:0:b0:6d6:567a:c83d with SMTP id c21-20020a9d7855000000b006d6567ac83dmr4001922otm.9.1700687249923;
+        Wed, 22 Nov 2023 13:07:29 -0800 (PST)
+Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
+        by smtp.gmail.com with ESMTPSA id w2-20020a0ca802000000b006781b67abaasm94384qva.109.2023.11.22.13.07.28
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Nov 2023 12:57:14 -0800 (PST)
-Message-ID: <655e6b2a.c80a0220.718a1.0d5a@mx.google.com>
-Date: Wed, 22 Nov 2023 12:57:14 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4002755953550804480=="
+        Wed, 22 Nov 2023 13:07:29 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v3 1/5] shared/util: Add GMAP related UUIDs
+Date: Wed, 22 Nov 2023 16:07:23 -0500
+Message-ID: <20231122210727.893872-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v2,1/5] shared/util: Add GMAP related UUIDs
-In-Reply-To: <20231122190649.879386-1-luiz.dentz@gmail.com>
-References: <20231122190649.879386-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============4002755953550804480==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+This adds GMAP 1.0[1] UUIDs following the assigned numbers[2].
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=803411
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      2.19 seconds
-GitLint                       FAIL      1.61 seconds
-BuildEll                      PASS      24.11 seconds
-BluezMake                     PASS      556.69 seconds
-MakeCheck                     PASS      11.10 seconds
-MakeDistcheck                 PASS      149.71 seconds
-CheckValgrind                 PASS      209.27 seconds
-CheckSmatch                   WARNING   317.26 seconds
-bluezmakeextell               PASS      96.60 seconds
-IncrementalBuild              PASS      2527.23 seconds
-ScanBuild                     PASS      892.97 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,v2,1/5] shared/util: Add GMAP related UUIDs
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#72: 
 [1] https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=576496
-
-/github/workspace/src/src/13465382.patch total: 0 errors, 1 warnings, 18 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13465382.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[BlueZ,v2,5/5] client/player: Add presets from GMAP
-ERROR:SPACING: need consistent spacing around '*' (ctx:VxW)
-#194: FILE: client/player.c:1525:
-+			LC3_7_5_UNFRAMED(2* 75u, 1u, 15u, 10000u)),
- 			                  ^
-
-ERROR:SPACING: need consistent spacing around '*' (ctx:VxW)
-#198: FILE: client/player.c:1529:
-+			LC3_10_UNFRAMED(2* 100u, 1u, 20u, 10000u)),
- 			                 ^
-
-/github/workspace/src/src/13465386.patch total: 2 errors, 0 warnings, 105 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13465386.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ,v2,1/5] shared/util: Add GMAP related UUIDs
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-8: B1 Line exceeds max length (94>80): "[2] https://www.bluetooth.com/wp-content/uploads/Files/Specification/Assigned_Numbers.pdf?id=3"
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-monitor/att.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.
-
-
+[2] https://www.bluetooth.com/wp-content/uploads/Files/Specification/Assigned_Numbers.pdf?id=3
 ---
-Regards,
-Linux Bluetooth
+ src/shared/util.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
+diff --git a/src/shared/util.c b/src/shared/util.c
+index bf37fce364ed..47efff750e30 100644
+--- a/src/shared/util.c
++++ b/src/shared/util.c
+@@ -773,6 +773,7 @@ static const struct {
+ 	{ 0x1854, "Hearing Aid"					},
+ 	{ 0x1855, "Telephony and Media Audio"			},
+ 	{ 0x1856, "Public Broadcast Announcement"		},
++	{ 0x1858, "Gaming Audio"				},
+ 	/* 0x1857 to 0x27ff undefined */
+ 	{ 0x2800, "Primary Service"				},
+ 	{ 0x2801, "Secondary Service"				},
+@@ -1081,6 +1082,11 @@ static const struct {
+ 	{ 0x2bda, "Hearing Aid Features"			},
+ 	{ 0x2bdb, "Hearing Aid Preset Control Point"		},
+ 	{ 0x2bdc, "Active Preset Index"				},
++	{ 0x2c00, "GMAP Role"					},
++	{ 0x2c01, "UGG Features"				},
++	{ 0x2c02, "UGT Features"				},
++	{ 0x2c03, "BGS Features"				},
++	{ 0x2c03, "BGR Features"				},
+ 	/* vendor defined */
+ 	{ 0xfeff, "GN Netcom"					},
+ 	{ 0xfefe, "GN ReSound A/S"				},
+-- 
+2.42.0
 
---===============4002755953550804480==--
