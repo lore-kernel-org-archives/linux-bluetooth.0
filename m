@@ -1,49 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J447ar/k"
-Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7165493
-	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Nov 2023 11:06:57 -0800 (PST)
-Received: by mail-qk1-x734.google.com with SMTP id af79cd13be357-77a453eb01cso4595485a.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Nov 2023 11:06:57 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bFHQI3AQ"
+Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55373C1
+	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Nov 2023 11:06:59 -0800 (PST)
+Received: by mail-qk1-x72a.google.com with SMTP id af79cd13be357-77d60604cebso3251185a.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Nov 2023 11:06:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700680016; x=1701284816; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1700680017; x=1701284817; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=qi3K7VQyUWa0lVFxz42Xy5Na8CHjuAIK7BaAEzLEHTA=;
-        b=J447ar/k61C+dwEYjj/vGXcjbOoDE6jCgYRVpktWC3iJUzvODFHqdvykU2RW2gQ9aT
-         aGsAwaWUNyyn3wgPx+TC2K9bcsee81s3pCkAeLMUue4Vj0yrPsx+HaPQSlu82byQD2jR
-         uqMDV7EFCKmFircJKcBSvz8akAExsGhs5kyzkz6EIRLOYPCdf2wJMHWsEQUTF7dK3yUk
-         KMPsQKxh2wX0a74U4NsbzERNJIWJ8Mwdn56vp8fi6ChzZdkg9IX5c14t0jLJL+x+wtRL
-         ikcAY2u8yBRHnFJMnXEeoSb7wEwMj8vBW87wHRbbsjTG/lkc6N2Bn+DuJ7lfqAobrdBz
-         RLHA==
+        bh=jpjHUUmesT38WXvxFqXbZh63His/ipJlPqZEbY6lOS0=;
+        b=bFHQI3AQapodN95qEWTJhA89l98mGs1g6l2iMOi+YhHnC/AU5f/6U/bdBHTSZS8YM8
+         NXMI6NM2c/QPxsnLidaFmTGRmy4qhTizTGtP2Ga81hc652lSXA10TZ5sA3wPk0LbJdBb
+         NGke0fGG6YSAbn0ea7y3Z+z18gzvt57r7P3HO76aZ1Yb5eqFaWuKgyTAOFz7udN0AmSG
+         /Lf3TTOos/rE5QinfXo2e7b0Vb1TPp+y3LWpMZswfCmdg2NEr6MxHx234usbnv2ZTA0R
+         bdguRw5Xqghw4Oo0QNX0Rp0WPiexi5OgHFRYL/5X0RuwwCOGPoSvj/dfW8/jKI1y9RDg
+         1NNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700680016; x=1701284816;
+        d=1e100.net; s=20230601; t=1700680017; x=1701284817;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qi3K7VQyUWa0lVFxz42Xy5Na8CHjuAIK7BaAEzLEHTA=;
-        b=VHnwEGGNFfNw7PoK+m1RxqAAFB9MmS8afIbMjGic0OtQ/5nv0r0galQ3Gl4KExzWu3
-         0+bdDBxK9fuY/sq1k2cQwlVRYyTFLegTViPSmpnYr/aKbVqdEN5RYTgGHZ33PH1tKzcc
-         1oDgvzFrhU1egTN/aj2bBz04o798qRThABikEhM5bbwafPKDOa7RAW7tU011fONnoU8q
-         6fPMIR4Ip/IizFrWOGrtMLrRNRQwoy3JmSLBGbku1n9ktai8O9tV5sEhNN2V9lp2XaUW
-         +yvAEZ0wDAhZoZWfFkhdp/x9JemQW1gRn3+VL5vMG1qbt7OSYyLEkPkZIgJKxTspaEzD
-         lqjQ==
-X-Gm-Message-State: AOJu0YwBFyxDfA7GrkrF7LPVOdcPQQyIQAQZ6E4h+C4wYoQDG5ZprrZp
-	qkU43uX5Lhu55tM4FlKLgfGrS/BA0GL+OSrI
-X-Google-Smtp-Source: AGHT+IEgcDwq3GJLAOco0amDPb10U9rhxbo8KA6tR8ec6ahZQOOUtzFnItQElqHOAdxzvxRrJU+tEg==
-X-Received: by 2002:a37:e10d:0:b0:773:be2d:7cd2 with SMTP id c13-20020a37e10d000000b00773be2d7cd2mr2942634qkm.45.1700680015693;
-        Wed, 22 Nov 2023 11:06:55 -0800 (PST)
+        bh=jpjHUUmesT38WXvxFqXbZh63His/ipJlPqZEbY6lOS0=;
+        b=UB37BxUNYSSNkzH/NZsK+i58LqPojtkWhgwQTSfeDPDSW/UgBSCeKbhDoNhtUTXrTy
+         fbBg1cG4uN00wW4D7k1Spy2m77STPAmlxWVmRYzhU8IfGLe9chnMlOnV37i6Q0O6IdXT
+         C/BLciBmEro2m69kcOeVnFBjbVgDRO64YENw/ecUoEc8Gz/57JphnaoAu0zD//SnMQZC
+         QWtShKBRuaLl0JDxRgsE05y2wABHr0j/oUvv8UcG7g9JxLI+bkFQQ0dK1qQLScfQh+cy
+         GxW+FUrXp8x39Dw4Qrqe+NtkavTZfHxPE8+GGRS822xUX5Wwjg3GKY475znpjWMSAZf4
+         F2cA==
+X-Gm-Message-State: AOJu0Yz75AL9lo2XbbgBYYPkwEMJTJiweuUlBXPt7M7XPKBStPzC6U7I
+	EW0XUpEweYdj1BWEEkYsJJEaCdKBh7/eM45A
+X-Google-Smtp-Source: AGHT+IGIllRBHIEPqxaE9vHmx0wzCgbiax+kFNsIHyvcmmtlBWVL69Wr9fpnEQk4M0OvRgeUv6hQ2Q==
+X-Received: by 2002:a05:620a:910:b0:77a:2520:2793 with SMTP id v16-20020a05620a091000b0077a25202793mr3371497qkv.2.1700680017444;
+        Wed, 22 Nov 2023 11:06:57 -0800 (PST)
 Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
-        by smtp.gmail.com with ESMTPSA id b32-20020a05620a272000b0076d25b11b62sm97885qkp.38.2023.11.22.11.06.54
+        by smtp.gmail.com with ESMTPSA id b32-20020a05620a272000b0076d25b11b62sm97885qkp.38.2023.11.22.11.06.55
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Nov 2023 11:06:54 -0800 (PST)
+        Wed, 22 Nov 2023 11:06:56 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 3/5] iso-tester: Add presets from GMAP
-Date: Wed, 22 Nov 2023 14:06:47 -0500
-Message-ID: <20231122190649.879386-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 4/5] isotest: Add presets from GMAP
+Date: Wed, 22 Nov 2023 14:06:48 -0500
+Message-ID: <20231122190649.879386-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231122190649.879386-1-luiz.dentz@gmail.com>
 References: <20231122190649.879386-1-luiz.dentz@gmail.com>
@@ -59,150 +59,46 @@ From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 This adds the following presets from GMAP:
 
-ISO QoS 48_1_gc - Success                            Passed
-ISO QoS 48_2_gc - Success                            Passed
-ISO QoS 48_1_gr - Success                            Passed
-ISO QoS 48_2_gr - Success                            Passed
-ISO QoS 48_3_gr - Success                            Passed
-ISO QoS 48_4_gr - Success                            Passed
+16_1_gs
+16_2_gs
+32_1_gs
+32_2_gs
+48_1_gs
+48_2_gs
+32_1_gr
+32_2_gr
+48_1_gr
+48_2_gr
+48_3_gr
+48_4_gr
 ---
- tools/iso-tester.c | 109 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 109 insertions(+)
+ tools/isotest.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/tools/iso-tester.c b/tools/iso-tester.c
-index 9fccbaa809e4..4d47373e3290 100644
---- a/tools/iso-tester.c
-+++ b/tools/iso-tester.c
-@@ -154,6 +154,19 @@
- #define QOS_48_4_2 QOS_OUT(10000, 100, 120, 0x02, 13)
- #define QOS_48_5_2 QOS_OUT(7500, 75, 117, 0x02, 13)
- #define QOS_48_6_2 QOS_OUT(10000, 100, 155, 0x02, 13)
-+/* QoS configuration support setting requirements for the UGG and UGT */
-+#define QOS_16_1_gs QOS(7500, 15, 30, 0x02, 1)
-+#define QOS_16_2_gs QOS(10000, 20, 40, 0x02, 1)
-+#define QOS_32_1_gs QOS(7500, 15, 60, 0x02, 1)
-+#define QOS_32_2_gs QOS(10000, 20, 80, 0x02, 1)
-+#define QOS_48_1_gs QOS(7500, 15, 75, 0x02, 1)
-+#define QOS_48_2_gs QOS(10000, 20, 100, 0x02, 1)
-+#define QOS_32_1_gr QOS(7500, 15, 60, 0x02, 1)
-+#define QOS_32_2_gr QOS(10000, 20, 80, 0x02, 1)
-+#define QOS_48_1_gr QOS(7500, 15, 75, 0x02, 1)
-+#define QOS_48_2_gr QOS(10000, 20, 100, 0x02, 1)
-+#define QOS_48_3_gr QOS(7500, 15, 90, 0x02, 1)
-+#define QOS_48_4_gr QOS(10000, 20, 120, 0x02, 1)
- 
- /* One unidirectional CIS. Unicast Server is Audio Sink */
- #define AC_1_4 QOS_OUT(10000, 10, 40, 0x02, 2)
-@@ -810,6 +823,66 @@ static const struct iso_client_data connect_48_6_2 = {
- 	.expect_err = 0
+diff --git a/tools/isotest.c b/tools/isotest.c
+index 234e4f1b0453..2c682bc899fc 100644
+--- a/tools/isotest.c
++++ b/tools/isotest.c
+@@ -1089,6 +1089,19 @@ static struct qos_preset {
+ 	QOS_PRESET("48_4_2", false, 10000, 60, 120, 0x02, 23),
+ 	QOS_PRESET("48_5_2", false, 7500, 45, 117, 0x02, 23),
+ 	QOS_PRESET("44_6_2", false, 10000, 60, 155, 0x02, 23),
++	/* QoS configuration support setting requirements for the UGG and UGT */
++	QOS_PRESET("16_1_gs", true, 7500, 15, 30, 0x02, 1),
++	QOS_PRESET("16_2_gs", true, 10000, 20, 40, 0x02, 1),
++	QOS_PRESET("32_1_gs", true, 7500, 15, 60, 0x02, 1),
++	QOS_PRESET("32_2_gs", true, 10000, 20, 80, 0x02, 1),
++	QOS_PRESET("48_1_gs", true, 7500, 15, 75, 0x02, 1),
++	QOS_PRESET("48_2_gs", true, 10000, 20, 100, 0x02, 1),
++	QOS_PRESET("32_1_gr", true, 7500, 15, 60, 0x02, 1),
++	QOS_PRESET("32_2_gr", true, 10000, 20, 80, 0x02, 1),
++	QOS_PRESET("48_1_gr", true, 7500, 15, 75, 0x02, 1),
++	QOS_PRESET("48_2_gr", true, 10000, 20, 100, 0x02, 1),
++	QOS_PRESET("48_3_gr", true, 7500, 15, 90, 0x02, 1),
++	QOS_PRESET("48_4_gr", true, 10000, 20, 120, 0x02, 1),
  };
  
-+static const struct iso_client_data connect_16_1_gs = {
-+	.qos = QOS_16_1_gs,
-+	.expect_err = 0
-+};
-+
-+static const struct iso_client_data connect_16_2_gs = {
-+	.qos = QOS_16_2_gs,
-+	.expect_err = 0
-+};
-+
-+static const struct iso_client_data connect_32_1_gs = {
-+	.qos = QOS_32_1_gs,
-+	.expect_err = 0
-+};
-+
-+static const struct iso_client_data connect_32_2_gs = {
-+	.qos = QOS_32_2_gs,
-+	.expect_err = 0
-+};
-+
-+static const struct iso_client_data connect_48_1_gs = {
-+	.qos = QOS_48_1_gs,
-+	.expect_err = 0
-+};
-+
-+static const struct iso_client_data connect_48_2_gs = {
-+	.qos = QOS_48_2_gs,
-+	.expect_err = 0
-+};
-+
-+static const struct iso_client_data connect_32_1_gr = {
-+	.qos = QOS_32_1_gr,
-+	.expect_err = 0
-+};
-+
-+static const struct iso_client_data connect_32_2_gr = {
-+	.qos = QOS_32_2_gr,
-+	.expect_err = 0
-+};
-+
-+static const struct iso_client_data connect_48_1_gr = {
-+	.qos = QOS_48_1_gr,
-+	.expect_err = 0
-+};
-+
-+static const struct iso_client_data connect_48_2_gr = {
-+	.qos = QOS_48_2_gr,
-+	.expect_err = 0
-+};
-+
-+static const struct iso_client_data connect_48_3_gr = {
-+	.qos = QOS_48_3_gr,
-+	.expect_err = 0
-+};
-+
-+static const struct iso_client_data connect_48_4_gr = {
-+	.qos = QOS_48_4_gr,
-+	.expect_err = 0
-+};
-+
- static const struct iso_client_data connect_invalid = {
- 	.qos = QOS(0, 0, 0, 0, 0),
- 	.expect_err = -EINVAL
-@@ -2945,6 +3018,42 @@ int main(int argc, char *argv[])
- 	test_iso("ISO QoS 48_6_2 - Success", &connect_48_6_2, setup_powered,
- 							test_connect);
- 
-+	test_iso("ISO QoS 16_1_gs - Success", &connect_16_1_gs, setup_powered,
-+							test_connect);
-+
-+	test_iso("ISO QoS 16_2_gs - Success", &connect_16_2_gs, setup_powered,
-+							test_connect);
-+
-+	test_iso("ISO QoS 32_1_gs - Success", &connect_32_1_gs, setup_powered,
-+							test_connect);
-+
-+	test_iso("ISO QoS 32_2_gs - Success", &connect_32_2_gs, setup_powered,
-+							test_connect);
-+
-+	test_iso("ISO QoS 48_1_gs - Success", &connect_48_1_gs, setup_powered,
-+							test_connect);
-+
-+	test_iso("ISO QoS 48_2_gs - Success", &connect_48_2_gs, setup_powered,
-+							test_connect);
-+
-+	test_iso("ISO QoS 32_1_gr - Success", &connect_32_1_gr, setup_powered,
-+							test_connect);
-+
-+	test_iso("ISO QoS 32_2_gr - Success", &connect_32_2_gr, setup_powered,
-+							test_connect);
-+
-+	test_iso("ISO QoS 48_1_gr - Success", &connect_48_1_gr, setup_powered,
-+							test_connect);
-+
-+	test_iso("ISO QoS 48_2_gr - Success", &connect_48_2_gr, setup_powered,
-+							test_connect);
-+
-+	test_iso("ISO QoS 48_3_gr - Success", &connect_48_3_gr, setup_powered,
-+							test_connect);
-+
-+	test_iso("ISO QoS 48_4_gr - Success", &connect_48_4_gr, setup_powered,
-+							test_connect);
-+
- 	test_iso("ISO QoS - Invalid", &connect_invalid, setup_powered,
- 							test_connect);
- 
+ #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 -- 
 2.42.0
 
