@@ -1,100 +1,90 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KMEzFYzb"
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10053E7
-	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Nov 2023 10:45:14 -0800 (PST)
-Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-6bd0e1b1890so113840b3a.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Nov 2023 10:45:14 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LOnHzxFf"
+Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 881D4DD
+	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Nov 2023 11:06:53 -0800 (PST)
+Received: by mail-qk1-x736.google.com with SMTP id af79cd13be357-7788f513872so3570785a.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Nov 2023 11:06:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700678712; x=1701283512; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=+rXanb/3hZy7N0+x7T0NNcezUOUVXOjq2mHUQI46k4U=;
-        b=KMEzFYzbCawFUT8dcoC6sUeaarpCcvFzubtmJctLmlvaSVgaePsYzMX8oiCs4IcAy1
-         ezCbUfy4S/iDPtWc6Iq0VZCmWoupK/rR/Hffxulsk0EXkqnDwt/7xlWaE7yDTQ7XaLVj
-         7vNJsRZc6G+N43qi6+tsMaA7ViqCcgJm11GWXIzPjPiWdJ26Hf0y9ely30ISldV2db50
-         2i+8PLTiSGEKMsDOqZgG5ZbOxILwRBqrilhfFFIp84vuxhqpugg7Z8p1/MKXLTsCFtFc
-         +/OnuyTa65RrrW0HtZcgfxbegUsLaHslI5GLAtSKv9ktGrQdnnBW9VdrYgyF3inXSdKK
-         ushw==
+        d=gmail.com; s=20230601; t=1700680012; x=1701284812; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=S9L3RVtYohgGGbQz/96kvey3bQHCTTJXpo42ThDVUdw=;
+        b=LOnHzxFf65xs65bUmUmi3iCiKYwrOs8boqUM7ueOP6wVMSdI8N9Qo65NyKhuWMG4EZ
+         K7HQXimqkGVcf/MIeCvP4YQjQ0dt0KAZd/jiD2qbZct0aOIdxvBVy417NahLU3Y6YD+Z
+         cKEZWke0U9lkk6cunxtM4kOgN+UkS/t+U4KynOTzfNs/92+Nu9CUDJLybAOouXdrff6J
+         rzQkl+8GiS31Uv6oQfDDY0zpMGtl2LxjSlac0piRIqWS0wfml77gi5Yzoad/zXHlEHRR
+         X1DXk74rBDWj9hpR6v18y3L/JaCZ4whqQZrxGsSJSjv4t6P4KPNFMaYhC65Rrsvd/csL
+         wZ0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700678712; x=1701283512;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+rXanb/3hZy7N0+x7T0NNcezUOUVXOjq2mHUQI46k4U=;
-        b=Pnb+Aa3PIyHS+K2geIeF48j8qAnMGkdhyiW1M4qD2EezG5c7cR8p2OxTNTG+ICt8jt
-         +cOfye3NJ0yXXxsoUiMj5ExCLZAArsmYRZt54to39VLk3TQIulpXt9z5hJRr9RqITZod
-         CyxBLtA+0VIYSqDvn7uDcei7bt5xlraI1PpgQYfL/CvyT53DbMIvyR1w3H/KMtdpDvzI
-         FTpJKpRUW2RIoBm+OcvmAgTUWR9RW5NjjH4f8zD+5s3cKJrz/9/HbmoT2Xug4bF+zCD5
-         7RQJnh01uLC/K80rXhHQU9/dx5IVrDBy7ZaE9PzrHnmLSEDiNxWhG2meFuLYTH2i54Eh
-         z4cg==
-X-Gm-Message-State: AOJu0YyOWG3Nd7495P0z0Cob4GHewkuInnO31n50XrcSJSU9zmeGKBZX
-	uajBek0frVaSldL+Qs9IFcCQqAWdG8Q=
-X-Google-Smtp-Source: AGHT+IEPTgQjNRj3Mfaw+cGAq7BA6uxwrrxydeaj1NTjY7jjL3b6fQYCYrsPS1RLMQFM7zY8X2Gkrg==
-X-Received: by 2002:a05:6a21:338d:b0:187:d8d7:5f00 with SMTP id yy13-20020a056a21338d00b00187d8d75f00mr3509686pzb.12.1700678712246;
-        Wed, 22 Nov 2023 10:45:12 -0800 (PST)
-Received: from [172.17.0.2] ([13.83.123.116])
-        by smtp.gmail.com with ESMTPSA id p5-20020aa78605000000b006c31c0dfb69sm45274pfn.188.2023.11.22.10.45.11
+        d=1e100.net; s=20230601; t=1700680012; x=1701284812;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=S9L3RVtYohgGGbQz/96kvey3bQHCTTJXpo42ThDVUdw=;
+        b=hcTHsmPpLiGPUNMlHyz41O5QRDH4P84EJ30rSqgAxjA/b/DPLwIDYxdY1nz1ccTtng
+         EUfHFl7HHBvn1yjoMU+trUwLYSYTC/cksPPIkJUVPuZwfxBY82Kx0n7168ZQNte9GhSk
+         /r7ActTm+AM0kIhk67Cfjnu61BPkRdLChVwjnc3tEvK1PqY6n20MZsEdEqVlNg0aAuIe
+         zUKdEHoHiPa/sGbZUH9NiHMUCoJhHlb1StlHGKBecDFITznod4zaCIoJQv1cZRM4zv70
+         RoK3duGm9vPaRkj8JCR3fKhFcNhATHu5qrXJ41OhK9tE/vWHtkzczi1mSbHQFADoTTln
+         FVmw==
+X-Gm-Message-State: AOJu0YynlERfz4qfgu0uA6/3Z0nU/zhpfZL6G2qy/fuHzSf6gbHJNUiB
+	MQsvrTI6jEIMLEdPZu6rI4CHdhra047+PCHs
+X-Google-Smtp-Source: AGHT+IHDPCJxHl62mV5m93Enz9oKF9fzMiZYIfKB5P/p1aJfi7S3j0CmEPH4TlivtbYdSX/EMqXtOQ==
+X-Received: by 2002:a05:620a:25c8:b0:76f:14fc:6d2f with SMTP id y8-20020a05620a25c800b0076f14fc6d2fmr3699729qko.1.1700680011832;
+        Wed, 22 Nov 2023 11:06:51 -0800 (PST)
+Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
+        by smtp.gmail.com with ESMTPSA id b32-20020a05620a272000b0076d25b11b62sm97885qkp.38.2023.11.22.11.06.50
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Nov 2023 10:45:12 -0800 (PST)
-Message-ID: <655e4c38.a70a0220.2a0d8.0705@mx.google.com>
-Date: Wed, 22 Nov 2023 10:45:12 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8121461253188579452=="
+        Wed, 22 Nov 2023 11:06:51 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2 1/5] shared/util: Add GMAP related UUIDs
+Date: Wed, 22 Nov 2023 14:06:45 -0500
+Message-ID: <20231122190649.879386-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [RESEND] Bluetooth: hci_core: Remove le_restart_scan work
-In-Reply-To: <20231122175636.866900-1-luiz.dentz@gmail.com>
-References: <20231122175636.866900-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============8121461253188579452==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+This adds GMAP 1.0[1] UUIDs following the assigned numbers[2].
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=803389
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.03 seconds
-GitLint                       PASS      0.28 seconds
-SubjectPrefix                 PASS      0.06 seconds
-BuildKernel                   PASS      28.27 seconds
-CheckAllWarning               PASS      31.23 seconds
-CheckSparse                   PASS      36.70 seconds
-CheckSmatch                   PASS      101.34 seconds
-BuildKernel32                 PASS      27.83 seconds
-TestRunnerSetup               PASS      432.11 seconds
-TestRunner_l2cap-tester       PASS      23.97 seconds
-TestRunner_iso-tester         PASS      40.21 seconds
-TestRunner_bnep-tester        PASS      7.22 seconds
-TestRunner_mgmt-tester        PASS      166.49 seconds
-TestRunner_rfcomm-tester      PASS      13.10 seconds
-TestRunner_sco-tester         PASS      14.69 seconds
-TestRunner_ioctl-tester       PASS      12.21 seconds
-TestRunner_mesh-tester        PASS      8.93 seconds
-TestRunner_smp-tester         PASS      9.87 seconds
-TestRunner_userchan-tester    PASS      7.40 seconds
-IncrementalBuild              PASS      25.55 seconds
-
-
-
+[1] https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=576496
+[2] https://www.bluetooth.com/wp-content/uploads/Files/Specification/Assigned_Numbers.pdf?id=3
 ---
-Regards,
-Linux Bluetooth
+ src/shared/util.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
+diff --git a/src/shared/util.c b/src/shared/util.c
+index bf37fce364ed..47efff750e30 100644
+--- a/src/shared/util.c
++++ b/src/shared/util.c
+@@ -773,6 +773,7 @@ static const struct {
+ 	{ 0x1854, "Hearing Aid"					},
+ 	{ 0x1855, "Telephony and Media Audio"			},
+ 	{ 0x1856, "Public Broadcast Announcement"		},
++	{ 0x1858, "Gaming Audio"				},
+ 	/* 0x1857 to 0x27ff undefined */
+ 	{ 0x2800, "Primary Service"				},
+ 	{ 0x2801, "Secondary Service"				},
+@@ -1081,6 +1082,11 @@ static const struct {
+ 	{ 0x2bda, "Hearing Aid Features"			},
+ 	{ 0x2bdb, "Hearing Aid Preset Control Point"		},
+ 	{ 0x2bdc, "Active Preset Index"				},
++	{ 0x2c00, "GMAP Role"					},
++	{ 0x2c01, "UGG Features"				},
++	{ 0x2c02, "UGT Features"				},
++	{ 0x2c03, "BGS Features"				},
++	{ 0x2c03, "BGR Features"				},
+ 	/* vendor defined */
+ 	{ 0xfeff, "GN Netcom"					},
+ 	{ 0xfefe, "GN ReSound A/S"				},
+-- 
+2.42.0
 
---===============8121461253188579452==--
