@@ -1,100 +1,99 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c7FL/OWg"
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF8DA110
-	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Nov 2023 05:11:06 -0800 (PST)
-Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1cc2575dfc7so14381235ad.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Nov 2023 05:11:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700831466; x=1701436266; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=r0GJ2XlPTCfW9VJ8EmwYQipojEkxIKtSJWkc+Unhm1c=;
-        b=c7FL/OWgJde9gXaCLjLg8335B3gkBKGAvRU2e6V5xR09Vl6Tn24J2NgHLJeneVFyGL
-         uh3tfGSO/2M8yjMI3xoHqJGHYvZ4r7zMlFBoX0GaNYMS1bkcK1WzsVavGBoO591nHWnz
-         8LWLUZBW7daGtmN1Yzp4cCJ+DGip0Jm+/gcLKgLJF8Sl4f37hkvHlSgeTKahMDVRGfko
-         7on6OLA/F4yKzdniRTg0blItD35CeiDrMLqPIeMH2JJurfrheHdfxU+CjX6lqf/tt5B+
-         +rkYr9LTmD51QA/vKtqPCBUkFv+N8JXeGrLFLvA2qkKkOunx5MppfATCAXYF4t541PHM
-         fbYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700831466; x=1701436266;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=r0GJ2XlPTCfW9VJ8EmwYQipojEkxIKtSJWkc+Unhm1c=;
-        b=g+Eb7cBoxMdMl9TNiENdNaQ0RefSrjYW9zDULhDbk5+Ey/tsarTKNXOkhypr4XmTWT
-         KeDztdOiLlOYbF2gVBG6Hb7PZb73UXrRTeOIajJNxYBc9TPG/AwwviR+EAA3ls8p6OQb
-         /MRny3+7Y3NcBv4rKpW/pj5+gitxqYp6YBPBinRt9pMiNJo9n3fMj1Ac78GSjHqaF+kk
-         /nJwi4cV5nPQ8cvB8OU/8Lwrqs0vPiFv8HjgMBKYLTdASMcjtwEjbDT/OK5VORfUh0cJ
-         z8NQ+w4NhrGFG3a3ydDabVb9yCrGUVhG3c5tc5CoEMZVo89srI/LL2By034Af8hQT44+
-         vqGQ==
-X-Gm-Message-State: AOJu0YyM/hhGNVSwdp3k3GZE4Dj1BwRI0sDMqahQIrzSRe5aYu5jCkJu
-	qrlK1kej3dCPirCP5iVhWXW3+SwRuLk=
-X-Google-Smtp-Source: AGHT+IEXAilh4/53Ax9R9BkHWDfNasmlc7nsXNd8WTCpvEkH98M6HWgvZjtKEFw3aceOG8F3NANVFQ==
-X-Received: by 2002:a17:902:c3c1:b0:1cc:4a23:c5fc with SMTP id j1-20020a170902c3c100b001cc4a23c5fcmr2535627plj.2.1700831466005;
-        Fri, 24 Nov 2023 05:11:06 -0800 (PST)
-Received: from [172.17.0.2] ([52.238.27.192])
-        by smtp.gmail.com with ESMTPSA id g6-20020a170902740600b001cf9eac2d3asm1731135pll.118.2023.11.24.05.11.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Nov 2023 05:11:05 -0800 (PST)
-Message-ID: <6560a0e9.170a0220.fb436.42a1@mx.google.com>
-Date: Fri, 24 Nov 2023 05:11:05 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4248649556119886468=="
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from mail11.truemail.it (mail11.truemail.it [217.194.8.81])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5913E170B;
+	Fri, 24 Nov 2023 12:26:19 -0800 (PST)
+Received: from francesco-nb.int.toradex.com (93-49-2-63.ip317.fastwebnet.it [93.49.2.63])
+	by mail11.truemail.it (Postfix) with ESMTPA id ACF4A20718;
+	Fri, 24 Nov 2023 21:26:15 +0100 (CET)
+Date: Fri, 24 Nov 2023 21:26:11 +0100
+From: Francesco Dolcini <francesco@dolcini.it>
+To: linux-bluetooth@vger.kernel.org,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Sherry Sun <sherry.sun@nxp.com>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>,
+	linux-kernel@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
+	Marcel Ziswiler <marcel.ziswiler@toradex.com>,
+	Amitkumar Karwar <amitkumar.karwar@nxp.com>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Marcel Ziswiler <marcel@ziswiler.com>
+Subject: Re: [PATCH v1 1/2] Bluetooth: btnxpuart: Fix btnxpuart_close
+Message-ID: <ZWEG40nzRhm6oVEq@francesco-nb.int.toradex.com>
+References: <20231018145540.34014-1-marcel@ziswiler.com>
+ <20231018145540.34014-2-marcel@ziswiler.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, AKoskovich@pm.me
-Subject: RE: [1/1] Bluetooth: btintel: Demote DSM support error to info
-In-Reply-To: <20231124124248.7621-1-akoskovich@pm.me>
-References: <20231124124248.7621-1-akoskovich@pm.me>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231018145540.34014-2-marcel@ziswiler.com>
 
---===============4248649556119886468==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello all,
 
-This is automated email and please do not reply to this email!
+On Wed, Oct 18, 2023 at 04:55:39PM +0200, Marcel Ziswiler wrote:
+> From: Marcel Ziswiler <marcel.ziswiler@toradex.com>
+> 
+> Unfortunately, btnxpuart_close() may trigger a BUG: scheduling while
+> atomic. Fix this by properly purging the transmit queue and freeing the
+> receive skb.
+> 
+> Fixes: 689ca16e5232 ("Bluetooth: NXP: Add protocol support for NXP Bluetooth chipsets")
+> 
+> Signed-off-by: Marcel Ziswiler <marcel.ziswiler@toradex.com>
+> ---
+> This is the kernel trace this commit fixes:
+> [   29.270685] BUG: scheduling while atomic: kworker/u3:0/55/0x00000002
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=804016
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.42 seconds
-GitLint                       PASS      0.18 seconds
-SubjectPrefix                 PASS      0.06 seconds
-BuildKernel                   PASS      27.67 seconds
-CheckAllWarning               PASS      30.17 seconds
-CheckSparse                   PASS      35.59 seconds
-CheckSmatch                   PASS      98.64 seconds
-BuildKernel32                 PASS      26.65 seconds
-TestRunnerSetup               PASS      417.78 seconds
-TestRunner_l2cap-tester       PASS      23.32 seconds
-TestRunner_iso-tester         PASS      41.33 seconds
-TestRunner_bnep-tester        PASS      7.00 seconds
-TestRunner_mgmt-tester        PASS      165.46 seconds
-TestRunner_rfcomm-tester      PASS      11.12 seconds
-TestRunner_sco-tester         PASS      14.61 seconds
-TestRunner_ioctl-tester       PASS      12.39 seconds
-TestRunner_mesh-tester        PASS      8.79 seconds
-TestRunner_smp-tester         PASS      9.99 seconds
-TestRunner_userchan-tester    PASS      7.41 seconds
-IncrementalBuild              PASS      26.01 seconds
+I just hit this bug with 6.7-rc2, I think it would be worth to
+apply this fix.
 
 
+[   70.443965] BUG: scheduling while atomic: kworker/u5:0/65/0x00000002
+[   70.450649] Modules linked in: 8021q garp mrp stp llc usb_f_ncm u_ether spidev mwifiex_sdio mwifiex snd_soc_simple_card snd_soc_simple_card_utils crct10dif_ce cfg80211 k3_j72xx_bandgap rti_wdt rtc_ti_k3 btnxpuart bluetooth ecdh_generic ecc snd_soc_davinci_mcasp sa2ul sha256_generic rfkill snd_soc_ti_udma libsha256 snd_soc_ti_edma authenc tidss snd_soc_ti_sdma omap_mailbox drm_dma_helper ti_ads1015 industrialio_triggered_buffer lontium_lt8912b snd_soc_wm8904 kfifo_buf lm75 at24 tps65219_pwrbutton ina2xx m_can_platform rtc_ds1307 tc358768 m_can display_connector spi_omap2_mcspi pwm_tiehrpwm can_dev drm_kms_helper libcomposite fuse drm backlight ipv6
+[   70.509384] CPU: 0 PID: 65 Comm: kworker/u5:0 Not tainted 6.7.0-rc2-00147-gf1a09972a45a #1
+[   70.517747] Hardware name: Toradex Verdin AM62 WB on Dahlia Board (DT)
+[   70.524334] Workqueue: hci0 hci_power_on [bluetooth]
+[   70.529870] Call trace:
+[   70.532349]  dump_backtrace+0x94/0xec
+[   70.536103]  show_stack+0x18/0x24
+[   70.539491]  dump_stack_lvl+0x48/0x60
+[   70.543210]  dump_stack+0x18/0x24
+[   70.546575]  __schedule_bug+0x50/0x68
+[   70.550312]  __schedule+0x7c4/0xa64
+[   70.553874]  schedule+0x34/0xa0
+[   70.557083]  schedule_timeout+0x180/0x25c
+[   70.561151]  wait_for_completion_timeout+0x80/0x15c
+[   70.566101]  ti_sci_set_device_state+0x164/0x22c
+[   70.570790]  ti_sci_cmd_get_device_exclusive+0x18/0x24
+[   70.575991]  ti_sci_pd_power_on+0x28/0x48
+[   70.580073]  _genpd_power_on+0x94/0x154
+[   70.583964]  genpd_power_on.part.0+0xa4/0x174
+[   70.588383]  genpd_runtime_resume+0x118/0x294
+[   70.592800]  __rpm_callback+0x48/0x140
+[   70.596616]  rpm_callback+0x6c/0x78
+[   70.600165]  rpm_resume+0x3bc/0x59c
+[   70.603714]  __pm_runtime_resume+0x4c/0x90
+[   70.607870]  omap8250_set_mctrl+0x2c/0xc0
+[   70.611954]  serial8250_set_mctrl.part.0+0x18/0x34
+[   70.616801]  serial8250_set_mctrl+0x18/0x28
+[   70.621038]  uart_update_mctrl+0x58/0x78
+[   70.625024]  uart_dtr_rts+0x108/0x118
+[   70.628750]  tty_port_shutdown+0x88/0xd8
+[   70.632744]  tty_port_close+0x50/0xac
+[   70.636472]  uart_close+0x28/0x80
+[   70.639850]  ttyport_close+0x50/0x94
+[   70.643500]  serdev_device_close+0x40/0x50
+[   70.647664]  btnxpuart_close+0x24/0x84 [btnxpuart]
+[   70.652553]  hci_dev_open_sync+0x3f8/0x9dc [bluetooth]
+[   70.658144]  hci_dev_do_open+0x28/0x48 [bluetooth]
+[   70.663377]  hci_power_on+0x4c/0x2ac [bluetooth]
+[   70.668441]  process_scheduled_works+0x16c/0x28c
+[   70.673135]  worker_thread+0x16c/0x2e0
+[   70.676950]  kthread+0x11c/0x128
+[   70.680247]  ret_from_fork+0x10/0x20
 
----
-Regards,
-Linux Bluetooth
 
-
---===============4248649556119886468==--
+ 
