@@ -1,24 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from mail11.truemail.it (mail11.truemail.it [IPv6:2001:4b7e:0:8::81])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 457291987;
-	Fri, 24 Nov 2023 12:33:16 -0800 (PST)
-Received: from francesco-nb.int.toradex.com (93-49-2-63.ip317.fastwebnet.it [93.49.2.63])
-	by mail11.truemail.it (Postfix) with ESMTPA id 9678720718;
-	Fri, 24 Nov 2023 21:33:13 +0100 (CET)
-Date: Fri, 24 Nov 2023 21:33:09 +0100
-From: Francesco Dolcini <francesco@dolcini.it>
-To: linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	Amitkumar Karwar <amitkumar.karwar@nxp.com>,
-	Neeraj Kale <neeraj.sanjaykale@nxp.com>
-Cc: Rob Herring <robh@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jirislaby@kernel.org>,
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uouocdfe"
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B19519E
+	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Nov 2023 22:58:30 -0800 (PST)
+Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-40859dee28cso20449525e9.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Nov 2023 22:58:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1700895509; x=1701500309; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/uo5CibKeOkFUqJh16VzRlz/76V7/U2PLO3u/fe3CMk=;
+        b=uouocdfeQu2paqimLbIspwzqgC9YCWeMn4j8p7NX+1J4d5+PLSEj5ho9YoQHID7nv3
+         4Y1XiINfW4+Hsu2+EUjEVHMbKzjiaeIqmkM2GwVl5YkvfgE59UJqV/1I9Xqe9tXAV55k
+         zGumLjCTNZ7SuxMm0kRgwgOWTtHOM/dpXzbKkU9l2rOXOL98p2Hbgu570P1ygwjoEOf4
+         PDkWZRk08iWOhwxJOTs0otSst2+MhjKqKUQjB5QQIDj5NAgRaEykw0qNcxk7sR78XsO/
+         8vKcRVQFAIC4+TZrOkcUsNXvAyQO2zPfaqdhY5irm2asd66q5MB9kbY9oR9JKXYRYQ5w
+         8LCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700895509; x=1701500309;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/uo5CibKeOkFUqJh16VzRlz/76V7/U2PLO3u/fe3CMk=;
+        b=g/u2VOAt23fKqLXuLa/E/R9/ze10zBKu90p150ujajpQcUQsXC6xf6qyW52rCFPEIf
+         OAInoo/yFciEOeQAXb+ssU/G0ZSIs6TwgdF2vtUt8Kf00ZuijecHzD5K3Bs2j1FhiRl5
+         J1Q7Mn/YfurcBfc9GBUKjQtsHpAQAEUKc8LyD2CYd4NdkSwl2Co+mYunzF2WDQwGfdRo
+         He0DfRS50K40IY5iiST9vBMAcZ5plZ81+scqVFYATd8t/A9pbk7VYoekFQZaDlzic4bL
+         gYGNa0KCrAKVSYjsIjYaFz1v0mA+hN4imBWOtdMtgP3KsoJcub1t5f7K4H1bxlLIGbx3
+         Km5A==
+X-Gm-Message-State: AOJu0YyKuv8+crFfZ+2L2cgls+FT0CX54EhxLiCqaPCSV7OgUJRgDC7W
+	VrkhpIC+AP/T2SCEZFbGLygmsA==
+X-Google-Smtp-Source: AGHT+IHcl8uetpwlT1aQhBBy4T12VrQRvbvvD5MFmKhqnNwulmFELZnYn0ZzSJS+0YkIgBIw8ZLlag==
+X-Received: by 2002:a05:600c:31a9:b0:405:770b:e90a with SMTP id s41-20020a05600c31a900b00405770be90amr3938389wmp.34.1700895508601;
+        Fri, 24 Nov 2023 22:58:28 -0800 (PST)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id n44-20020a05600c502c00b004083a105f27sm7737838wmr.26.2023.11.24.22.58.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Nov 2023 22:58:28 -0800 (PST)
+From: kernel test robot <dan.carpenter@linaro.org>
+X-Google-Original-From: kernel test robot <lkp@intel.com>
+Date: Sat, 25 Nov 2023 09:58:24 +0300
+To: oe-kbuild@lists.linux.dev, Arnd Bergmann <arnd@kernel.org>,
 	Marcel Holtmann <marcel@holtmann.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: WARNING around serdev/bt/btnxpuart with 6.7-rc2
-Message-ID: <ZWEIhcUXfutb5SY6@francesco-nb.int.toradex.com>
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: lkp@intel.com, Dan Carpenter <error27@gmail.com>,
+	oe-kbuild-all@lists.linux.dev, Arnd Bergmann <arnd@arndb.de>,
+	Iulia Tanasescu <iulia.tanasescu@nxp.com>,
+	Pauli Virtanen <pav@iki.fi>, Jakub Kicinski <kuba@kernel.org>,
+	"Lee, Chun-Yi" <jlee@suse.com>,
+	Claudia Draghicescu <claudia.rosu@nxp.com>,
+	Ziyang Xuan <william.xuanziyang@huawei.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: hci_event: shut up a false-positive warning
+Message-ID: <ZWGbEMgAuyPVtUZS@suswa>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -27,56 +63,58 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20231122221805.3139482-1-arnd@kernel.org>
 
-Hello all,
-while doing some test with current [1] Linux mainline I randomly hit a
-warning. It is not systematic and I cannot really tell when
-it was introduced, posting here to collect some ideas.
+Hi Arnd,
 
-Amitkumar, Neeraj: to me the issue is around the bluetooth/btnxpuart
-driver, however I could also be plain wrong.
+kernel test robot noticed the following build warnings:
 
-The issue was reproduced on a Toradex Verdin AM62 [2] that is based on a TI
-AM625 SOC (arm64) running with a arm64 defconfig and built with GCC 9 [3].
+url:    https://github.com/intel-lab-lkp/linux/commits/Arnd-Bergmann/Bluetooth-hci_event-shut-up-a-false-positive-warning/20231123-112143
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+patch link:    https://lore.kernel.org/r/20231122221805.3139482-1-arnd%40kernel.org
+patch subject: [PATCH] Bluetooth: hci_event: shut up a false-positive warning
+config: i386-randconfig-141-20231123 (https://download.01.org/0day-ci/archive/20231124/202311241707.qytKwxbE-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20231124/202311241707.qytKwxbE-lkp@intel.com/reproduce)
 
-[    9.599027] Loaded X.509 cert 'sforshee: 00b28ddf47aef9cea7'
-[    9.962266] Bluetooth: hci0: Frame reassembly failed (-84)
-[    9.972939] ------------[ cut here ]------------
-[    9.977922] serial serial0: receive_buf returns -84 (count = 6)
-[    9.994857] WARNING: CPU: 0 PID: 37 at drivers/tty/serdev/serdev-ttyport.c:37 ttyport_receive_buf+0xd8/0xf8
-[   10.004840] Modules linked in: mwifiex_sdio(+) mwifiex snd_soc_simple_card crct10dif_ce cfg80211 snd_soc_simple_card_utils k3_j72xx_bandgap rti_wdt rtc_ti_k3 btnxpuart bluetooth sa2ul ecdh_generic ecc sha256_generic tidss rfkill libsha256 drm_dma_helper snd_soc_davinci_mcasp authenc omap_mailbox snd_soc_ti_udma snd_soc_ti_edma snd_soc_ti_sdma atmel_mxt_ts ina2xx snd_soc_nau8822 ti_sn65dsi83 tc358768 ti_ads1015 tps65219_pwrbutton at24 m_can_platform industrialio_triggered_buffer drm_kms_helper m_can kfifo_buf rtc_ds1307 lm75 pwm_tiehrpwm can_dev spi_omap2_mcspi panel_lvds pwm_bl libcomposite fuse drm backlight ipv6
-[   10.059984] CPU: 0 PID: 37 Comm: kworker/u4:2 Not tainted 6.7.0-rc2-00147-gf1a09972a45a #1
-[   10.071793] Hardware name: Toradex Verdin AM62 WB on Verdin Development Board (DT)
-[   10.082898] Workqueue: events_unbound flush_to_ldisc
-[   10.091345] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-[   10.101820] pc : ttyport_receive_buf+0xd8/0xf8
-[   10.109712] lr : ttyport_receive_buf+0xd8/0xf8
-[   10.117581] sp : ffff800082b9bd20
-[   10.124202] x29: ffff800082b9bd20 x28: ffff00000000ee05 x27: ffff0000002f21c0
-[   10.134735] x26: ffff000002931820 x25: 61c8864680b583eb x24: ffff0000002f21b8
-[   10.145209] x23: ffff00000026e740 x22: ffff0000002f21e0 x21: ffffffffffffffac
-[   10.155686] x20: ffff000000da5c00 x19: 0000000000000006 x18: 0000000000000000
-[   10.166178] x17: ffff7fffbe0e7000 x16: ffff800080000000 x15: 000039966db1c650
-[   10.176564] x14: 000000000000022c x13: 000000000000022c x12: 0000000000000000
-[   10.186979] x11: 000000000000000a x10: 0000000000000a60 x9 : ffff800082b9bb80
-[   10.197352] x8 : ffff00000026f200 x7 : ffff00003fd90080 x6 : 00000000000022e5
-[   10.207680] x5 : 00000000410fd030 x4 : 0000000000c0000e x3 : ffff7fffbe0e7000
-[   10.218051] x2 : 0000000000000002 x1 : 0000000000000000 x0 : 0000000000000000
-[   10.228393] Call trace:
-[   10.233989]  ttyport_receive_buf+0xd8/0xf8
-[   10.241224]  flush_to_ldisc+0xbc/0x1a4
-[   10.248117]  process_scheduled_works+0x16c/0x28c
-[   10.255851]  worker_thread+0x16c/0x2e0
-[   10.262673]  kthread+0x11c/0x128
-[   10.268953]  ret_from_fork+0x10/0x20
-[   10.275460] ---[ end trace 0000000000000000 ]---
-[   10.294674] Bluetooth: hci0: Frame reassembly failed (-84)
-[   10.461657] Bluetooth: hci0: Frame reassembly failed (-84)
-[   10.472025] Bluetooth: hci0: Frame reassembly failed (-84)
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Reported-by: Dan Carpenter <error27@gmail.com>
+| Closes: https://lore.kernel.org/r/202311241707.qytKwxbE-lkp@intel.com/
 
-Francesco
+New smatch warnings:
+net/bluetooth/hci_event.c:520 hci_cc_read_class_of_dev() warn: signedness bug returning '(-6)'
 
-[1] git sha f1a09972a45a
-[2] arch/arm64/boot/dts/ti/k3-am625-verdin-wifi-dev.dts
-[3] aarch64-linux-gnu-gcc (Ubuntu 9.4.0-1ubuntu1~20.04.2) 9.4.0
+Old smatch warnings:
+net/bluetooth/hci_event.c:3278 hci_conn_request_evt() warn: variable dereferenced before check 'hdev' (see line 3268)
 
+vim +520 net/bluetooth/hci_event.c
+
+c8992cffbe7411 Luiz Augusto von Dentz 2021-12-01  514  static u8 hci_cc_read_class_of_dev(struct hci_dev *hdev, void *data,
+c8992cffbe7411 Luiz Augusto von Dentz 2021-12-01  515  				   struct sk_buff *skb)
+a9de9248064bfc Marcel Holtmann        2007-10-20  516  {
+c8992cffbe7411 Luiz Augusto von Dentz 2021-12-01  517  	struct hci_rp_read_class_of_dev *rp = data;
+e3f3a1aea8719a Luiz Augusto von Dentz 2021-12-01  518  
+5f3aa66f201253 Arnd Bergmann          2023-11-22  519  	if (WARN_ON(!hdev))
+5f3aa66f201253 Arnd Bergmann          2023-11-22 @520  		return -ENXIO;
+
+This function returns u8.
+
+5f3aa66f201253 Arnd Bergmann          2023-11-22  521  
+e3f3a1aea8719a Luiz Augusto von Dentz 2021-12-01  522  	bt_dev_dbg(hdev, "status 0x%2.2x", rp->status);
+a9de9248064bfc Marcel Holtmann        2007-10-20  523  
+a9de9248064bfc Marcel Holtmann        2007-10-20  524  	if (rp->status)
+c8992cffbe7411 Luiz Augusto von Dentz 2021-12-01  525  		return rp->status;
+a9de9248064bfc Marcel Holtmann        2007-10-20  526  
+a9de9248064bfc Marcel Holtmann        2007-10-20  527  	memcpy(hdev->dev_class, rp->dev_class, 3);
+a9de9248064bfc Marcel Holtmann        2007-10-20  528  
+e3f3a1aea8719a Luiz Augusto von Dentz 2021-12-01  529  	bt_dev_dbg(hdev, "class 0x%.2x%.2x%.2x", hdev->dev_class[2],
+e3f3a1aea8719a Luiz Augusto von Dentz 2021-12-01  530  		   hdev->dev_class[1], hdev->dev_class[0]);
+c8992cffbe7411 Luiz Augusto von Dentz 2021-12-01  531  
+c8992cffbe7411 Luiz Augusto von Dentz 2021-12-01  532  	return rp->status;
+a9de9248064bfc Marcel Holtmann        2007-10-20  533  }
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
