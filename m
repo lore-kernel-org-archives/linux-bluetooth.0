@@ -1,100 +1,101 @@
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from mail-pl1-f205.google.com (mail-pl1-f205.google.com [209.85.214.205])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D53CB5
-	for <linux-bluetooth@vger.kernel.org>; Sat, 25 Nov 2023 05:18:23 -0800 (PST)
-Received: by mail-pl1-f205.google.com with SMTP id d9443c01a7336-1cfa28ab0f3so19155115ad.2
-        for <linux-bluetooth@vger.kernel.org>; Sat, 25 Nov 2023 05:18:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700918302; x=1701523102;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3woomzQ8vmDo/vvebKLz9E6d9x/Edw/g418bVAMqXbQ=;
-        b=bauyfB88yFr4xsgP6xjFJYlbgLUmePREPZ678mbvAhYd7/p+5SH7dFzn8xb+gaO4hd
-         vAHBi67EV4n8WZuMwhIuJ5jrXjmIHs0vwG06QbZHUMHr7xc6pbjhHc/VcLhqX1gndVO6
-         1T+7N+rLs6+Hy/UehJlFkPvGM3qcVA0atFgbXKICKkOj4OHx1yxhvLVx0EPOwO0Wljbl
-         KTTAKJwrR2cvd6Zhhanb0w6ELOpF+EKMM7Icyp++K52Zp4GTOt0bhGnFIvHmqMwOlChe
-         nBDcHe/9cXfpPa1t7sAFHZzxdzIzIMmlB8GJzDTy5y8LqAABSWa959XN4MZhOjFz4ge/
-         2psQ==
-X-Gm-Message-State: AOJu0Ywx2kYbGWUspgi5D4FJVXGrrUkCCZW9IfbgGmjFmYCFg+Ujf/X4
-	dHvB7o0UkGnF6X4LSHE7db9Vi/mgsXSYxP7hf7bPOmcuo20B
-X-Google-Smtp-Source: AGHT+IG8LZ7k7h+8r2sG0mhVtEMSGx26qqRGimpLrgciIkMVT0yRqeyoHVRYL0fHjfDmYGHgOqgl4c7zJjP9ZuMDMq8646rx92ye
+Received: from mail11.truemail.it (mail11.truemail.it [IPv6:2001:4b7e:0:8::81])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80AB612B;
+	Sat, 25 Nov 2023 10:10:12 -0800 (PST)
+Received: from gaggiata.pivistrello.it (93-49-2-63.ip317.fastwebnet.it [93.49.2.63])
+	by mail11.truemail.it (Postfix) with ESMTPA id 5C4622062B;
+	Sat, 25 Nov 2023 19:10:09 +0100 (CET)
+Received: from livingston (unknown [192.168.42.11])
+	by gaggiata.pivistrello.it (Postfix) with ESMTP id 135007F90D;
+	Sat, 25 Nov 2023 19:10:09 +0100 (CET)
+Received: from pivi by livingston with local (Exim 4.96)
+	(envelope-from <francesco@dolcini.it>)
+	id 1r6x6W-0003Cs-2z;
+	Sat, 25 Nov 2023 19:10:08 +0100
+Date: Sat, 25 Nov 2023 19:10:08 +0100
+From: Francesco Dolcini <francesco@dolcini.it>
+To: linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	Amitkumar Karwar <amitkumar.karwar@nxp.com>,
+	Neeraj Kale <neeraj.sanjaykale@nxp.com>
+Cc: Francesco Dolcini <francesco@dolcini.it>, Rob Herring <robh@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: Re: WARNING around serdev/bt/btnxpuart with 6.7-rc2
+Message-ID: <ZWI4gMCoY_YzcH7f@livingston.pivistrello.it>
+References: <ZWEIhcUXfutb5SY6@francesco-nb.int.toradex.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a17:903:2308:b0:1cf:75b0:42fc with SMTP id
- d8-20020a170903230800b001cf75b042fcmr1356608plh.4.1700918302598; Sat, 25 Nov
- 2023 05:18:22 -0800 (PST)
-Date: Sat, 25 Nov 2023 05:18:22 -0800
-In-Reply-To: <000000000000a135c0060a2260b3@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000037f0f3060af9e763@google.com>
-Subject: Re: [syzbot] [bluetooth?] KASAN: null-ptr-deref Read in ida_free (4)
-From: syzbot <syzbot+51baee846ddab52d5230@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZWEIhcUXfutb5SY6@francesco-nb.int.toradex.com>
 
-syzbot has found a reproducer for the following issue on:
+On Fri, Nov 24, 2023 at 09:33:09PM +0100, Francesco Dolcini wrote:
+> Hello all,
+> while doing some test with current [1] Linux mainline I randomly hit a
+> warning. It is not systematic and I cannot really tell when
+> it was introduced, posting here to collect some ideas.
+> 
+> Amitkumar, Neeraj: to me the issue is around the bluetooth/btnxpuart
+> driver, however I could also be plain wrong.
+> 
+> The issue was reproduced on a Toradex Verdin AM62 [2] that is based on a TI
+> AM625 SOC (arm64) running with a arm64 defconfig and built with GCC 9 [3].
+> 
+> [    9.599027] Loaded X.509 cert 'sforshee: 00b28ddf47aef9cea7'
+> [    9.962266] Bluetooth: hci0: Frame reassembly failed (-84)
+> [    9.972939] ------------[ cut here ]------------
+> [    9.977922] serial serial0: receive_buf returns -84 (count = 6)
+> [    9.994857] WARNING: CPU: 0 PID: 37 at drivers/tty/serdev/serdev-ttyport.c:37 ttyport_receive_buf+0xd8/0xf8
+> [   10.004840] Modules linked in: mwifiex_sdio(+) mwifiex snd_soc_simple_card crct10dif_ce cfg80211 snd_soc_simple_card_utils k3_j72xx_bandgap rti_wdt rtc_ti_k3 btnxpuart bluetooth sa2ul ecdh_generic ecc sha256_generic tidss rfkill libsha256 drm_dma_helper snd_soc_davinci_mcasp authenc omap_mailbox snd_soc_ti_udma snd_soc_ti_edma snd_soc_ti_sdma atmel_mxt_ts ina2xx snd_soc_nau8822 ti_sn65dsi83 tc358768 ti_ads1015 tps65219_pwrbutton at24 m_can_platform industrialio_triggered_buffer drm_kms_helper m_can kfifo_buf rtc_ds1307 lm75 pwm_tiehrpwm can_dev spi_omap2_mcspi panel_lvds pwm_bl libcomposite fuse drm backlight ipv6
+> [   10.059984] CPU: 0 PID: 37 Comm: kworker/u4:2 Not tainted 6.7.0-rc2-00147-gf1a09972a45a #1
+> [   10.071793] Hardware name: Toradex Verdin AM62 WB on Verdin Development Board (DT)
+> [   10.082898] Workqueue: events_unbound flush_to_ldisc
+> [   10.091345] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+> [   10.101820] pc : ttyport_receive_buf+0xd8/0xf8
+> [   10.109712] lr : ttyport_receive_buf+0xd8/0xf8
+> [   10.117581] sp : ffff800082b9bd20
+> [   10.124202] x29: ffff800082b9bd20 x28: ffff00000000ee05 x27: ffff0000002f21c0
+> [   10.134735] x26: ffff000002931820 x25: 61c8864680b583eb x24: ffff0000002f21b8
+> [   10.145209] x23: ffff00000026e740 x22: ffff0000002f21e0 x21: ffffffffffffffac
+> [   10.155686] x20: ffff000000da5c00 x19: 0000000000000006 x18: 0000000000000000
+> [   10.166178] x17: ffff7fffbe0e7000 x16: ffff800080000000 x15: 000039966db1c650
+> [   10.176564] x14: 000000000000022c x13: 000000000000022c x12: 0000000000000000
+> [   10.186979] x11: 000000000000000a x10: 0000000000000a60 x9 : ffff800082b9bb80
+> [   10.197352] x8 : ffff00000026f200 x7 : ffff00003fd90080 x6 : 00000000000022e5
+> [   10.207680] x5 : 00000000410fd030 x4 : 0000000000c0000e x3 : ffff7fffbe0e7000
+> [   10.218051] x2 : 0000000000000002 x1 : 0000000000000000 x0 : 0000000000000000
+> [   10.228393] Call trace:
+> [   10.233989]  ttyport_receive_buf+0xd8/0xf8
+> [   10.241224]  flush_to_ldisc+0xbc/0x1a4
+> [   10.248117]  process_scheduled_works+0x16c/0x28c
+> [   10.255851]  worker_thread+0x16c/0x2e0
+> [   10.262673]  kthread+0x11c/0x128
+> [   10.268953]  ret_from_fork+0x10/0x20
+> [   10.275460] ---[ end trace 0000000000000000 ]---
+> [   10.294674] Bluetooth: hci0: Frame reassembly failed (-84)
+> [   10.461657] Bluetooth: hci0: Frame reassembly failed (-84)
+> [   10.472025] Bluetooth: hci0: Frame reassembly failed (-84)
 
-HEAD commit:    8c9660f65153 Add linux-next specific files for 20231124
-git tree:       linux-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=1678a3cce80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ca1e8655505e280
-dashboard link: https://syzkaller.appspot.com/bug?extid=51baee846ddab52d5230
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10d54c08e80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=160ef1a4e80000
+I think that what is happening is the following:
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/345ed4af3a0d/disk-8c9660f6.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/191053c69d57/vmlinux-8c9660f6.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/aac7ee5e55e0/bzImage-8c9660f6.xz
+ -> serdev-ttyport.c:ttyport_receive_buf()
+   -> btnxpuart.c:btnxpuart_receive_buf()
+      -> h4_recv_buf() errors out
+      -> return -84
+   -> warn because ret is <0
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+51baee846ddab52d5230@syzkaller.appspotmail.com
+Is this the desired behavior? If I understand correct recv_buf() is supposed to
+return how many bytes it has consumed, e.g. something from 0 to count.
 
-Bluetooth: hci0: hardware error 0x00
-==================================================================
-BUG: KASAN: null-ptr-deref in instrument_atomic_read include/linux/instrumented.h:68 [inline]
-BUG: KASAN: null-ptr-deref in _test_bit include/asm-generic/bitops/instrumented-non-atomic.h:141 [inline]
-BUG: KASAN: null-ptr-deref in ida_free+0x218/0x2e0 lib/idr.c:511
-Read of size 8 at addr 0000000000000078 by task kworker/u5:1/4455
-
-CPU: 1 PID: 4455 Comm: kworker/u5:1 Not tainted 6.7.0-rc2-next-20231124-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
-Workqueue: hci0 hci_error_reset
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
- kasan_report+0xd9/0x110 mm/kasan/report.c:588
- check_region_inline mm/kasan/generic.c:182 [inline]
- kasan_check_range+0xef/0x190 mm/kasan/generic.c:188
- instrument_atomic_read include/linux/instrumented.h:68 [inline]
- _test_bit include/asm-generic/bitops/instrumented-non-atomic.h:141 [inline]
- ida_free+0x218/0x2e0 lib/idr.c:511
- hci_conn_cleanup net/bluetooth/hci_conn.c:157 [inline]
- hci_conn_del+0x78c/0xe10 net/bluetooth/hci_conn.c:1183
- hci_conn_hash_flush+0x189/0x260 net/bluetooth/hci_conn.c:2643
- hci_dev_close_sync+0x5a7/0x1160 net/bluetooth/hci_sync.c:5021
- hci_dev_do_close+0x2e/0x90 net/bluetooth/hci_core.c:554
- hci_error_reset+0xa6/0x190 net/bluetooth/hci_core.c:1059
- process_one_work+0x8a4/0x15f0 kernel/workqueue.c:2633
- process_scheduled_works kernel/workqueue.c:2706 [inline]
- worker_thread+0x8b6/0x1290 kernel/workqueue.c:2787
- kthread+0x2c1/0x3a0 kernel/kthread.c:389
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
- </TASK>
-==================================================================
+Francesco
 
 
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+
