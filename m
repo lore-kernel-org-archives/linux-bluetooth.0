@@ -1,251 +1,228 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TT/58SPd"
-Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 023721B5
-	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Nov 2023 13:20:58 -0800 (PST)
-Received: by mail-qk1-x72e.google.com with SMTP id af79cd13be357-77d6f853ba0so375480285a.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Nov 2023 13:20:57 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YNUwdQQl"
+Received: from mail-oa1-x31.google.com (mail-oa1-x31.google.com [IPv6:2001:4860:4864:20::31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A337C1AE
+	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Nov 2023 13:58:04 -0800 (PST)
+Received: by mail-oa1-x31.google.com with SMTP id 586e51a60fabf-1f9e0e44fecso2352291fac.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Nov 2023 13:58:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701120057; x=1701724857; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=cFEoDoEz4azVRn0GsMXJBxFNj+D4713UjbvKqCGPc4U=;
-        b=TT/58SPdCNOmuhCBiql5pUzvkYpjBdZnhJOlYmL0zM6BJLHRWlVw1GDXnHmT5yQG5m
-         dhN2oFRva5kQ6jehxlrZS6R5CFqHK/rDSKjyruBqjidQGmZX71VYtV5LVSTzLaf31ZxU
-         hnDPLe/W/aE/t3+gVg+8SLy/jjCYi3fNXfUWbphJC/witHMG7BZxCUUhKr3HI4fyFOx/
-         dT88mFqlMWoEKVAjhF/85Yru/YO7LBz24CD/Ggi0cf/jdFRm2hfszrwqInsuxeg69HAu
-         d1tEvR0bDaVnieDGAgcvhz8ZFHR/XEUjXUyB7qCkdXLZ1ws7zYtxEf3o1mzp574Zi/zW
-         qcfA==
+        d=gmail.com; s=20230601; t=1701122283; x=1701727083; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=SnJoMYhuAyjqvMMq10kjIp56Ax6kSyhP5HMlHYzp+0E=;
+        b=YNUwdQQlO3hdq9S0caEoeSF0iTqTrnMvfD1W2Zg46iZGSIFVBm4wyXAE224jGav94j
+         H+AbrdcJJj97KEKlvumuOSv4cnnvhrTFznG7piDliUK+HWfooVlWhjQ4V2cEzrOOUhJp
+         BfCOp8EKVOOfmP88RuvrxukNDulMcBYnb231or4qZOThyQRTw+T7wMUhEbCdceeKDp0p
+         TIfC+JePW6Z8sBgYzA7SwhMWtw1/QDedFM5RGRcfCGAp2jxTv3I+zm50bvhk0OmtqG0K
+         tsm7uNt20HkxoTZ1ElGGQF4OWbzpydzdJwoqTEy0sTffZ9Bw34fE6JQfCwOypAmdvFbR
+         gyqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701120057; x=1701724857;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cFEoDoEz4azVRn0GsMXJBxFNj+D4713UjbvKqCGPc4U=;
-        b=DRtRMTMm6lA5bASIFeyKpOuwnZWTrBJjO8hIgrDzNaUPFKIslQPPjsDrkOOJ8yLvZ+
-         oRni/w5Yy04fkhABLHp3vZH1GQ/SMGnuqalk9dK21xf4iL3telTcLF7zr7SLZ3t6W7sE
-         lzNgHJHHGSTBs4U3B9+baaUa4z6uZYKKNBqEycrXTSuxUWrMPyN+sIiessZq4OI3Y5mM
-         tzK6Wm65DFf89/PClhggFVQ4/ZDDlpGQB5HsJetNpz7M5QDr4amAL06dWTkhPyUiwvMa
-         ySqHcaYmwdnnQ6/6BhiIO1u6DYFnRRhhiCF1AT3k5DCB+pFjAHjvXFpU03XaDiGJH2Km
-         8/3Q==
-X-Gm-Message-State: AOJu0YxpNzbodKloUUNYL2OD4ELdm/SA6KuEzcIyzHmL7SIaBtCR6km2
-	gVAbxAiyA6VYURc8745cwZurcWTvlTQ=
-X-Google-Smtp-Source: AGHT+IFTnmbSxWyx7xBXU63bmwMu4ndY1W9UiDuglJ1WMqSBcD3wmcaOPO77Sq3n6YzJRxMgT+Zc7A==
-X-Received: by 2002:a05:620a:278a:b0:77a:5247:730a with SMTP id g10-20020a05620a278a00b0077a5247730amr18770524qkp.20.1701120056736;
-        Mon, 27 Nov 2023 13:20:56 -0800 (PST)
-Received: from [172.17.0.2] ([20.81.159.134])
-        by smtp.gmail.com with ESMTPSA id m16-20020ae9e710000000b00767d6ec578csm3994547qka.20.2023.11.27.13.20.56
+        d=1e100.net; s=20230601; t=1701122283; x=1701727083;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SnJoMYhuAyjqvMMq10kjIp56Ax6kSyhP5HMlHYzp+0E=;
+        b=W8wSnvVnNjY+ZP0LV5vh2Dd4UgfTrQ6MnsdkWEBr3hbvHCqQJS54rGNDI7y+gN4d82
+         shyO9w0+lKVMdICDSlKAN8ckim7aDbwLoCuAg1RzULDuTnE82SAxlx8wum4biDlHZWHJ
+         2cwerpGaWKxeZRu7E9LDwFiHebMYWys56KxVd7HjHUvxh9YTAK0LzvVlGPiDCay1dogW
+         HpKSZn4UgqHKxm25+qO+bQPnKdFw4lbkusSiy4+O+Rlw3i7AtHymGV7qk+I3G8q3d4Vt
+         Pjaj7fdrnkPVHvmfSUCrzBWfQhUpx8d1ozvt1/CDxyBXljRYoW+4WN+5nZacFDowRs+X
+         X0iQ==
+X-Gm-Message-State: AOJu0YyjfRXbPVCvE0jNtbjQhl4YyHdTgje2K/pNW0PHe7tkVsgJy3UT
+	9B9HUlADWOiCgthfGWlQYc0S/qyuISo/+w==
+X-Google-Smtp-Source: AGHT+IH4XfZpSJ3R21FwAdTqVEOnI8ceL7IdQZVd38MyDETAFtSVF8hm54pstJCABJDcH9OaC8AzkA==
+X-Received: by 2002:a05:6870:1601:b0:1e9:ddc5:99a3 with SMTP id b1-20020a056870160100b001e9ddc599a3mr16795546oae.16.1701122283256;
+        Mon, 27 Nov 2023 13:58:03 -0800 (PST)
+Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
+        by smtp.gmail.com with ESMTPSA id z12-20020ac87cac000000b00423c802e1dasm995541qtv.23.2023.11.27.13.58.02
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Nov 2023 13:20:56 -0800 (PST)
-Message-ID: <65650838.e90a0220.3a85b.e824@mx.google.com>
-Date: Mon, 27 Nov 2023 13:20:56 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7161989604790302220=="
+        Mon, 27 Nov 2023 13:58:02 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] iso-tester: Add tests for GMAP broadcast QoS presets
+Date: Mon, 27 Nov 2023 16:58:01 -0500
+Message-ID: <20231127215801.1531286-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, sebastian.david.forslund@gmail.com
-Subject: RE: [BlueZ,1/1] Pattern match on service- and manufacturer data
-In-Reply-To: <20231127195632.445-1-sebastif@axis.com>
-References: <20231127195632.445-1-sebastif@axis.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============7161989604790302220==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+This adds the following tests:
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=804640
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      0.67 seconds
-GitLint                       PASS      0.31 seconds
-BuildEll                      PASS      24.12 seconds
-BluezMake                     PASS      551.41 seconds
-MakeCheck                     PASS      10.52 seconds
-MakeDistcheck                 PASS      150.82 seconds
-CheckValgrind                 PASS      210.28 seconds
-CheckSmatch                   PASS      315.47 seconds
-bluezmakeextell               PASS      96.19 seconds
-IncrementalBuild              PASS      510.76 seconds
-ScanBuild                     PASS      906.21 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,1/1] Pattern match on service- and manufacturer data
-ERROR:OPEN_BRACE: open brace '{' following function definitions go on the next line
-#93: FILE: src/shared/ad.c:1327:
-+static void pattern_manufacturer_data_match(void *data, void *user_data) {
-
-ERROR:OPEN_BRACE: open brace '{' following function definitions go on the next line
-#123: FILE: src/shared/ad.c:1357:
-+static void pattern_service_data_match(void *data, void *user_data) {
-
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#124: FILE: src/shared/ad.c:1358:
-+  struct bt_ad_service_data *service_data = data;$
-
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#125: FILE: src/shared/ad.c:1359:
-+  struct pattern_match_info *info = user_data;$
-
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#126: FILE: src/shared/ad.c:1360:
-+  struct bt_ad_pattern *pattern;$
-
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#128: FILE: src/shared/ad.c:1362:
-+  if (!service_data || !info)$
-
-WARNING:SUSPECT_CODE_INDENT: suspect code indent for conditional statements (2, 4)
-#128: FILE: src/shared/ad.c:1362:
-+  if (!service_data || !info)
-+    return;
-
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#129: FILE: src/shared/ad.c:1363:
-+    return;$
-
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#131: FILE: src/shared/ad.c:1365:
-+  if (info->matched_pattern)$
-
-WARNING:SUSPECT_CODE_INDENT: suspect code indent for conditional statements (2, 4)
-#131: FILE: src/shared/ad.c:1365:
-+  if (info->matched_pattern)
-+    return;
-
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#132: FILE: src/shared/ad.c:1366:
-+    return;$
-
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#134: FILE: src/shared/ad.c:1368:
-+  pattern = info->current_pattern;$
-
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#136: FILE: src/shared/ad.c:1370:
-+  if (!pattern)$
-
-WARNING:SUSPECT_CODE_INDENT: suspect code indent for conditional statements (2, 4)
-#136: FILE: src/shared/ad.c:1370:
-+  if (!pattern)
-+    return;
-
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#137: FILE: src/shared/ad.c:1371:
-+    return;$
-
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#139: FILE: src/shared/ad.c:1373:
-+  switch (pattern->type) {$
-
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#140: FILE: src/shared/ad.c:1374:
-+  case BT_AD_SERVICE_DATA16:$
-
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#141: FILE: src/shared/ad.c:1375:
-+  case BT_AD_SERVICE_DATA32:$
-
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#142: FILE: src/shared/ad.c:1376:
-+  case BT_AD_SERVICE_DATA128:$
-
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#143: FILE: src/shared/ad.c:1377:
-+    break;$
-
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#145: FILE: src/shared/ad.c:1379:
-+    return;$
-
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#146: FILE: src/shared/ad.c:1380:
-+  }$
-
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#148: FILE: src/shared/ad.c:1382:
-+  if (service_data->len < pattern->offset + pattern->len)$
-
-WARNING:SUSPECT_CODE_INDENT: suspect code indent for conditional statements (2, 4)
-#148: FILE: src/shared/ad.c:1382:
-+  if (service_data->len < pattern->offset + pattern->len)
-+    return;
-
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#149: FILE: src/shared/ad.c:1383:
-+    return;$
-
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#151: FILE: src/shared/ad.c:1385:
-+  if (!memcmp(service_data->data + pattern->offset, pattern->data,$
-
-WARNING:SUSPECT_CODE_INDENT: suspect code indent for conditional statements (2, 4)
-#151: FILE: src/shared/ad.c:1385:
-+  if (!memcmp(service_data->data + pattern->offset, pattern->data,
-[...]
-+    info->matched_pattern = pattern;
-
-ERROR:CODE_INDENT: code indent should use tabs where possible
-#152: FILE: src/shared/ad.c:1386:
-+              pattern->len)) {$
-
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#152: FILE: src/shared/ad.c:1386:
-+              pattern->len)) {$
-
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#153: FILE: src/shared/ad.c:1387:
-+    info->matched_pattern = pattern;$
-
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#154: FILE: src/shared/ad.c:1388:
-+  }$
-
-WARNING:LONG_LINE: line length of 98 exceeds 80 columns
-#167: FILE: src/shared/ad.c:1432:
-+		queue_foreach(info->ad->manufacturer_data, pattern_manufacturer_data_match, info);
-
-WARNING:LONG_LINE: line length of 88 exceeds 80 columns
-#172: FILE: src/shared/ad.c:1437:
-+		queue_foreach(info->ad->service_data, pattern_service_data_match, info);
-
-/github/workspace/src/src/13470254.patch total: 3 errors, 30 warnings, 90 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-NOTE: Whitespace errors detected.
-      You may wish to use scripts/cleanpatch or scripts/cleanfile
-
-/github/workspace/src/src/13470254.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
+ISO QoS 48_1_g - Success
+ISO QoS 48_2_g - Success
+ISO QoS 48_3_g - Success
+ISO QoS 48_4_g - Success
 ---
-Regards,
-Linux Bluetooth
+ tools/iso-tester.c | 134 ++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 119 insertions(+), 15 deletions(-)
 
+diff --git a/tools/iso-tester.c b/tools/iso-tester.c
+index 4d47373e3290..bbc906b613e8 100644
+--- a/tools/iso-tester.c
++++ b/tools/iso-tester.c
+@@ -307,22 +307,82 @@
+ #define QOS_OUT_1_1_16_2_1 BCAST_QOS_OUT_1_1(10000, 10, 40, 0x02, 2)
+ #define QOS_IN_16_2_1 BCAST_QOS_IN(10000, 10, 40, 0x02, 2)
+ #define QOS_IN_ENC_16_2_1 BCAST_QOS_IN_ENC(10000, 10, 40, 0x02, 2)
++#define QOS_OUT_48_1_g BCAST_QOS_OUT(7500, 8, 75, 0x02, 1)
++#define QOS_OUT_48_2_g BCAST_QOS_OUT(10000, 10, 100, 0x02, 1)
++#define QOS_OUT_48_3_g BCAST_QOS_OUT(7500, 8, 90, 0x02, 1)
++#define QOS_OUT_48_4_g BCAST_QOS_OUT(10000, 10, 120, 0x02, 1)
+ 
+-static const uint8_t base_lc3_16_2_1[] = {
+-	0x28, 0x00, 0x00, /* Presentation Delay */
+-	0x01, /* Number of Subgroups */
+-	0x01, /* Number of BIS */
+-	0x06, 0x00, 0x00, 0x00, 0x00, /* Code ID = LC3 (0x06) */
+-	0x11, /* Codec Specific Configuration */
+-	0x02, 0x01, 0x03, /* 16 KHZ */
+-	0x02, 0x02, 0x01, /* 10 ms */
+-	0x05, 0x03, 0x01, 0x00, 0x00, 0x00,  /* Front Left */
+-	0x03, 0x04, 0x28, 0x00, /* Frame Length 40 bytes */
+-	0x04, /* Metadata */
+-	0x03, 0x02, 0x02, 0x00, /* Audio Context: Convertional */
+-	0x01, /* BIS */
+-	0x00, /* Codec Specific Configuration */
+-};
++#define BASE(_pd, _sgrp, _nbis, _cfg...) \
++{ \
++	_pd & 0xff, _pd >> 8, _pd >> 16, \
++	_sgrp, \
++	_nbis, \
++	_cfg \
++}
++
++#define LC3_BASE(_pd, _sgrp, _nbis, _cc...) \
++	BASE(_pd, _sgrp, _nbis, 0x06, 0x00, 0x00, 0x00, 0x00, _cc)
++
++/* 16 KHZ - 10 ms - Front Left - Frame Length 40 bytes */
++#define LC3_CONFIG_16_2_1 \
++	0x10, \
++	0x02, 0x01, 0x03, \
++	0x02, 0x02, 0x01, \
++	0x05, 0x03, 0x01, 0x00, 0x00, 0x00, \
++	0x03, 0x04, 0x28, 0x00
++
++/* Audio Context: Convertional */
++#define CTXT_CONVERSIONAL \
++	0x04, \
++	0x03, 0x02, 0x02, 0x00
++
++static const uint8_t base_lc3_16_2_1[] =
++	LC3_BASE(40000, 1, 1, LC3_CONFIG_16_2_1, CTXT_CONVERSIONAL,
++		0x01, /* BIS */
++		0x00  /* Codec Specific Configuration */);
++
++#define LC3_CONFIG_G(_freq, _dur, _len) \
++	0x10, \
++	0x02, 0x01, _freq, \
++	0x02, 0x02, _dur, \
++	0x05, 0x03, 0x01, 0x00, 0x00, 0x00, \
++	0x03, 0x04, _len, _len >> 8
++
++/* 48 KHZ - 7.5 ms - Front Left - Frame Length 75 bytes */
++#define LC3_CONFIG_48_1_G \
++	LC3_CONFIG_G(0x08, 0x00, 75)
++
++static const uint8_t base_lc3_48_1_g[] =
++	LC3_BASE(10000, 1, 1, LC3_CONFIG_48_1_G, CTXT_CONVERSIONAL,
++		0x01, /* BIS */
++		0x00  /* Codec Specific Configuration */);
++
++/* 48 KHZ - 10 ms - Front Left - Frame Length 100 bytes */
++#define LC3_CONFIG_48_2_G \
++	LC3_CONFIG_G(0x08, 0x01, 100)
++
++static const uint8_t base_lc3_48_2_g[] =
++	LC3_BASE(10000, 1, 1, LC3_CONFIG_48_2_G, CTXT_CONVERSIONAL,
++		0x01, /* BIS */
++		0x00  /* Codec Specific Configuration */);
++
++/* 48 KHZ - 7.5 ms - Front Left - Frame Length 90 bytes */
++#define LC3_CONFIG_48_3_G \
++	LC3_CONFIG_G(0x08, 0x00, 90)
++
++static const uint8_t base_lc3_48_3_g[] =
++	LC3_BASE(10000, 1, 1, LC3_CONFIG_48_3_G, CTXT_CONVERSIONAL,
++		0x01, /* BIS */
++		0x00  /* Codec Specific Configuration */);
++
++/* 48 KHZ - 7.5 ms - Front Left - Frame Length 90 bytes */
++#define LC3_CONFIG_48_4_G \
++	LC3_CONFIG_G(0x08, 0x00, 120)
++
++static const uint8_t base_lc3_48_4_g[] =
++	LC3_BASE(10000, 1, 1, LC3_CONFIG_48_3_G, CTXT_CONVERSIONAL,
++		0x01, /* BIS */
++		0x00  /* Codec Specific Configuration */);
+ 
+ /* Single Audio Channel. One BIS. */
+ #define BCAST_AC_12 BCAST_QOS_OUT_1_1(10000, 10, 40, 0x02, 2)
+@@ -1166,6 +1226,38 @@ static const struct iso_client_data connect_ac_1_2_cig_1_2 = {
+ 	.mconn = true,
+ };
+ 
++static const struct iso_client_data bcast_48_1_g = {
++	.qos = QOS_OUT_48_1_g,
++	.expect_err = 0,
++	.bcast = true,
++	.base = base_lc3_48_1_g,
++	.base_len = sizeof(base_lc3_48_1_g),
++};
++
++static const struct iso_client_data bcast_48_2_g = {
++	.qos = QOS_OUT_48_2_g,
++	.expect_err = 0,
++	.bcast = true,
++	.base = base_lc3_48_2_g,
++	.base_len = sizeof(base_lc3_48_2_g),
++};
++
++static const struct iso_client_data bcast_48_3_g = {
++	.qos = QOS_OUT_48_3_g,
++	.expect_err = 0,
++	.bcast = true,
++	.base = base_lc3_48_3_g,
++	.base_len = sizeof(base_lc3_48_3_g),
++};
++
++static const struct iso_client_data bcast_48_4_g = {
++	.qos = QOS_OUT_48_4_g,
++	.expect_err = 0,
++	.bcast = true,
++	.base = base_lc3_48_4_g,
++	.base_len = sizeof(base_lc3_48_4_g),
++};
++
+ static const struct iso_client_data bcast_16_2_1_send = {
+ 	.qos = QOS_OUT_16_2_1,
+ 	.expect_err = 0,
+@@ -3054,6 +3146,18 @@ int main(int argc, char *argv[])
+ 	test_iso("ISO QoS 48_4_gr - Success", &connect_48_4_gr, setup_powered,
+ 							test_connect);
+ 
++	test_iso("ISO QoS 48_1_g - Success", &bcast_48_1_g,
++						setup_powered, test_bcast);
++
++	test_iso("ISO QoS 48_2_g - Success", &bcast_48_2_g,
++						setup_powered, test_bcast);
++
++	test_iso("ISO QoS 48_3_g - Success", &bcast_48_3_g,
++						setup_powered, test_bcast);
++
++	test_iso("ISO QoS 48_4_g - Success", &bcast_48_4_g,
++						setup_powered, test_bcast);
++
+ 	test_iso("ISO QoS - Invalid", &connect_invalid, setup_powered,
+ 							test_connect);
+ 
+-- 
+2.42.0
 
---===============7161989604790302220==--
