@@ -1,124 +1,102 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bTtOKvC2"
-Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 839BE107
-	for <linux-bluetooth@vger.kernel.org>; Sun, 26 Nov 2023 12:32:29 -0800 (PST)
-Received: by mail-qk1-x736.google.com with SMTP id af79cd13be357-77a453eb01cso195199285a.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 26 Nov 2023 12:32:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701030748; x=1701635548; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=+mET1ExVVT3x4wjwZhRRyM2qgL5Vq6I82FgKd8ekMLo=;
-        b=bTtOKvC2LRDb2RARi9svJ1k0Z4mmfRddrLdkE79/SdYUyCSAxE4/nMsUqXHLn8kIq1
-         CZIG2IBT/M9JX3BJz8y0hOpk4zrQd3NEVG6VWHxZb+Szhrn78Oq+s8LwtfQnOmF77mYt
-         KUUbCZ9TKe1OIJWXslJatVsLqzOg8PNPkeONkx9E6ComLQj6QSzPc7gzTha6bP0PEk5W
-         m1iKmRkYxoJS8TK1eqd8xDpv/bpDQUEbgbEcSL6bACf51PYciGJDvuDZ2jEb4EuWTycr
-         aykmPCISA0V21dmUejGqqaO1ufVbZLwXsnwVRXlvXkv4SiKEBdvRj21yd/Un6h6+cYp8
-         g9FQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701030748; x=1701635548;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+mET1ExVVT3x4wjwZhRRyM2qgL5Vq6I82FgKd8ekMLo=;
-        b=YIjpvRrseZMeO73sfse6Qz/qwCdKdeWDg8PVioVYnUtyF8s65tz6aA6tu+Q9vsxfu/
-         lQB0R3o5Jdh2sYOYGMP1UbBL1Y662xul+Out6UP5DINfx7i12CALlDCuG2lUReQF1UlP
-         B5x+pLgtAHWUAb2uGhcAhLHYbvCrFHhZAmERbSI0B0COBRArzup25pDHM+p8yU7JLgGT
-         IPRiuAjXfn8LduZi1Qs6lRviGeh7vKSSL+NoVufOEzmhF7H4jIZVR3mX1ym1yt3+wViK
-         ZMqx7SFjEhTn9GuxkbhS9JWuFET1lGF2evPNuqym7FF6Y8aYiPEdUg7YR84o0sIPRJ2c
-         YmMQ==
-X-Gm-Message-State: AOJu0YxpiiAj48yjxnHbSnrnuyDNOax4MMeQ+C/KWL98I7T++rEQoJDw
-	RdctXdU497yOl7NGLSkWVtczAcO/X2E=
-X-Google-Smtp-Source: AGHT+IECEWpIfRPLXhusACrG0hMNKV5uMQFAfPcXN0+MBLWXVelMoDwU+kXJS/v8m7V4LV6xDqq+Kg==
-X-Received: by 2002:a05:620a:6014:b0:779:d143:c1a7 with SMTP id dw20-20020a05620a601400b00779d143c1a7mr11531311qkb.26.1701030748374;
-        Sun, 26 Nov 2023 12:32:28 -0800 (PST)
-Received: from [172.17.0.2] ([74.249.13.177])
-        by smtp.gmail.com with ESMTPSA id bi40-20020a05620a31a800b0077da68b8801sm492147qkb.65.2023.11.26.12.32.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 Nov 2023 12:32:28 -0800 (PST)
-Message-ID: <6563ab5c.050a0220.57cde.0eba@mx.google.com>
-Date: Sun, 26 Nov 2023 12:32:28 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8935369758536486680=="
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XEDEhp2I"
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4506E111
+	for <linux-bluetooth@vger.kernel.org>; Sun, 26 Nov 2023 20:29:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701059388; x=1732595388;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=jKQ6lQfoYwBKaCQURyeN612gsc+AHcMCKe4AlB11gYQ=;
+  b=XEDEhp2IdJaYXLA9WVmaWXs+JX+5Gac/smdLZtd0APGw/ow9FxvMQyP+
+   GQ8TzajNMsGA1MOJcuKSoJIwYsYrkcealBFvnrhf+nyaPO8jSlpbJvz48
+   TIdQtCVRGmzKzXJ1utsIs0luvqMdQPjfcuURLbgeJC6RnuKcnBQekCNg4
+   uzPPdX6+kW4eIL0JDg7ZFB55EIouA+ch0t63oqmbFhGVC26wdVMVMv1EQ
+   XG5C7mUi6k+9mtMJGg6tsKdC4h8N49MVyIiOldWuflZtf4e6MI8t/5kl8
+   VBp+egyFIvtesh9Bmuo6RXpJa4QTCQXTsL7sv3WFpEU7sr24IEMoDQKYg
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10906"; a="395451632"
+X-IronPort-AV: E=Sophos;i="6.04,229,1695711600"; 
+   d="scan'208";a="395451632"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2023 20:29:47 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10906"; a="834209747"
+X-IronPort-AV: E=Sophos;i="6.04,229,1695711600"; 
+   d="scan'208";a="834209747"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by fmsmga008.fm.intel.com with ESMTP; 26 Nov 2023 20:29:46 -0800
+From: Kiran K <kiran.k@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: ravishankar.srivatsa@intel.com,
+	Kiran K <kiran.k@intel.com>
+Subject: [PATCH] Bluetooth: btintel: Print firmware SHA1
+Date: Mon, 27 Nov 2023 10:12:02 +0530
+Message-Id: <20231127044202.2456465-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, andreas@kemnade.info
-Subject: RE: bluetooth/gnss: GNSS support for TiWi chips
-In-Reply-To: <20231126191840.110564-2-andreas@kemnade.info>
-References: <20231126191840.110564-2-andreas@kemnade.info>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============8935369758536486680==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Intel Read Version event contains a TLV(0x32) having firmware sha1 in
+operational image.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=804327
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.97 seconds
-GitLint                       FAIL      1.16 seconds
-SubjectPrefix                 FAIL      0.59 seconds
-BuildKernel                   PASS      27.72 seconds
-CheckAllWarning               PASS      30.52 seconds
-CheckSparse                   PASS      36.15 seconds
-CheckSmatch                   PASS      100.53 seconds
-BuildKernel32                 PASS      26.99 seconds
-TestRunnerSetup               PASS      419.70 seconds
-TestRunner_l2cap-tester       PASS      23.19 seconds
-TestRunner_iso-tester         PASS      41.07 seconds
-TestRunner_bnep-tester        PASS      7.19 seconds
-TestRunner_mgmt-tester        FAIL      168.76 seconds
-TestRunner_rfcomm-tester      PASS      11.13 seconds
-TestRunner_sco-tester         PASS      18.11 seconds
-TestRunner_ioctl-tester       PASS      12.20 seconds
-TestRunner_mesh-tester        PASS      9.08 seconds
-TestRunner_smp-tester         PASS      10.00 seconds
-TestRunner_userchan-tester    PASS      7.50 seconds
-IncrementalBuild              PASS      34.80 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[RFC,1/3] gnss: Add AI2 protocol used by some TI combo chips.
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T3 Title has trailing punctuation (.): "[RFC,1/3] gnss: Add AI2 protocol used by some TI combo chips."
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 497, Passed: 496 (99.8%), Failed: 1, Not Run: 0
-
-Failed Test Cases
-Pairing Acceptor - SMP over BR/EDR 1                 Timed out    2.260 seconds
-
-
+Signed-off-by: Kiran K <kiran.k@intel.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btintel.c | 5 +++++
+ drivers/bluetooth/btintel.h | 4 +++-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 2462796a512a..cdc5c08824a0 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -535,6 +535,8 @@ static int btintel_version_info_tlv(struct hci_dev *hdev,
+ 	bt_dev_info(hdev, "%s timestamp %u.%u buildtype %u build %u", variant,
+ 		    2000 + (version->timestamp >> 8), version->timestamp & 0xff,
+ 		    version->build_type, version->build_num);
++	if (version->img_type == 0x03)
++		bt_dev_info(hdev, "Firmware SHA1: 0x%8.8x", version->git_sha1);
+ 
+ 	return 0;
+ }
+@@ -630,6 +632,9 @@ static int btintel_parse_version_tlv(struct hci_dev *hdev,
+ 			memcpy(&version->otp_bd_addr, tlv->val,
+ 							sizeof(bdaddr_t));
+ 			break;
++		case INTEL_TLV_GIT_SHA1:
++			version->git_sha1 = get_unaligned_le32(tlv->val);
++			break;
+ 		default:
+ 			/* Ignore rest of information */
+ 			break;
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index 3a2d5b4219dd..d19fcdb9ff0b 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -41,7 +41,8 @@ enum {
+ 	INTEL_TLV_LIMITED_CCE,
+ 	INTEL_TLV_SBE_TYPE,
+ 	INTEL_TLV_OTP_BDADDR,
+-	INTEL_TLV_UNLOCKED_STATE
++	INTEL_TLV_UNLOCKED_STATE,
++	INTEL_TLV_GIT_SHA1
+ };
+ 
+ struct intel_tlv {
+@@ -69,6 +70,7 @@ struct intel_version_tlv {
+ 	u8	min_fw_build_yy;
+ 	u8	limited_cce;
+ 	u8	sbe_type;
++	u32	git_sha1;
+ 	bdaddr_t otp_bd_addr;
+ };
+ 
+-- 
+2.34.1
 
---===============8935369758536486680==--
