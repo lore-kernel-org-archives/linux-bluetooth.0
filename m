@@ -1,170 +1,65 @@
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8B3431A63
+	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Nov 2023 15:20:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Ll6w+p2f"
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA726C2
-	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Nov 2023 07:18:26 -0800 (PST)
-Received: from github.com (hubbernetes-node-5cc27f7.ash1-iad.github.net [10.56.146.37])
-	by smtp.github.com (Postfix) with ESMTPA id 0B6631012A8
-	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Nov 2023 07:18:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1701098306;
-	bh=Tvs8Ty/QldtOHST/05oiR3Chwo6NZWAd1ZQ2pQO4MU4=;
-	h=Date:From:To:Subject:From;
-	b=Ll6w+p2fPML1p5QWRSa71ZxXUcIPNeVKps9CWQUMQ1v2nM+vkBQ21u9FXiCzZlndy
-	 husj38IfnoxPjkU1D3i7v9IxNlD/W8B45IX0cYXgt5GvqqBx0EAgX49HedqggR/1R/
-	 4q+4noNDdYNT0BAPXGVVYl0xnW12FpxtVV44tE/8=
-Date: Mon, 27 Nov 2023 07:18:26 -0800
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/58e6ef-8b4484@github.com>
-Subject: [bluez/bluez] e94853: shared/util: Add GMAP related UUIDs
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RUZA3ch/"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 574DCC433CD;
+	Mon, 27 Nov 2023 15:20:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701098426;
+	bh=edqQ6vjpsHFl2V8k2+hzWDkTb5RL38DCu6vUOLvs5iE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=RUZA3ch/FoLfA4pXTq/YlMXqQKRKtM91HqiNs+0zKM5EZ+twAXeaazCJt9IvCai8O
+	 h5Jp8aAOLnHn5rDCAxcx55+RDiU519gYelW8vQ75Js68gjF4g7bYVpLPsA2kl4Lh4/
+	 DmWW4uvuaNTELZhdbMMlE9CHNK8iip1Xo3YOL5NUrnauNTBHzjC9tvioQ4W/hdLzf8
+	 MXd4Ub7Bb8sjc3VUw/lxizslTYtR5sLZgf/5sOMoaRylnypYzKehDL+GVf3/2l3xJv
+	 9IyKFutjOoaZVosW01c4KjNqEFaeNR7P339/GudCysgCYCVvMfHr6XWA2AubQOO7l0
+	 kGV6sJkWf4ccw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3E2DFC4166E;
+	Mon, 27 Nov 2023 15:20:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth:btintel: Print firmware SHA1
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <170109842624.13376.2218684253022426635.git-patchwork-notify@kernel.org>
+Date: Mon, 27 Nov 2023 15:20:26 +0000
+References: <20231123143550.2436697-1-kiran.k@intel.com>
+In-Reply-To: <20231123143550.2436697-1-kiran.k@intel.com>
+To: Kiran K <kiran.k@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: e94853608c8033c4c1cf2047981354484c0500cb
-      https://github.com/bluez/bluez/commit/e94853608c8033c4c1cf2047981354484c0500cb
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-11-21 (Tue, 21 Nov 2023)
+Hello:
 
-  Changed paths:
-    M src/shared/util.c
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  shared/util: Add GMAP related UUIDs
+On Thu, 23 Nov 2023 20:05:50 +0530 you wrote:
+> Intel Read Version event contains a TLV(0x32) having firmware sha1 in
+> operational image.
+> 
+> Signed-off-by: Kiran K <kiran.k@intel.com>
+> ---
+>  drivers/bluetooth/btintel.c | 5 +++++
+>  drivers/bluetooth/btintel.h | 4 +++-
+>  2 files changed, 8 insertions(+), 1 deletion(-)
 
-This adds GMAP 1.0[1] UUIDs following the assigned numbers[2].
+Here is the summary with links:
+  - Bluetooth:btintel: Print firmware SHA1
+    https://git.kernel.org/bluetooth/bluetooth-next/c/514525d3087c
 
-[1] https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=576496
-[2] https://www.bluetooth.com/wp-content/uploads/Files/Specification/Assigned_Numbers.pdf?id=3
-
-
-  Commit: 6af3b7290a3a36469f23e3eaaf6b2c0d09994efd
-      https://github.com/bluez/bluez/commit/6af3b7290a3a36469f23e3eaaf6b2c0d09994efd
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-11-21 (Tue, 21 Nov 2023)
-
-  Changed paths:
-    M monitor/att.c
-
-  Log Message:
-  -----------
-  monitor/att: Add GMAS attribute decoders
-
-This adds GMAS attribute decoders.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-  Commit: c9b48a6f84a803b6bad43be26a12c5ba6b7f5590
-      https://github.com/bluez/bluez/commit/c9b48a6f84a803b6bad43be26a12c5ba6b7f5590
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-11-22 (Wed, 22 Nov 2023)
-
-  Changed paths:
-    M tools/iso-tester.c
-
-  Log Message:
-  -----------
-  iso-tester: Add presets from GMAP
-
-This adds the following presets from GMAP:
-
-ISO QoS 48_1_gc - Success                            Passed
-ISO QoS 48_2_gc - Success                            Passed
-ISO QoS 48_1_gr - Success                            Passed
-ISO QoS 48_2_gr - Success                            Passed
-ISO QoS 48_3_gr - Success                            Passed
-ISO QoS 48_4_gr - Success                            Passed
-
-
-  Commit: 506413dba87230b1c579eb23901bd88e52ef6825
-      https://github.com/bluez/bluez/commit/506413dba87230b1c579eb23901bd88e52ef6825
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-11-22 (Wed, 22 Nov 2023)
-
-  Changed paths:
-    M tools/isotest.c
-
-  Log Message:
-  -----------
-  isotest: Add presets from GMAP
-
-This adds the following presets from GMAP:
-
-16_1_gs
-16_2_gs
-32_1_gs
-32_2_gs
-48_1_gs
-48_2_gs
-32_1_gr
-32_2_gr
-48_1_gr
-48_2_gr
-48_3_gr
-48_4_gr
-
-
-  Commit: 813e1ce1199345f633ffaeb0f218accecdf9ff83
-      https://github.com/bluez/bluez/commit/813e1ce1199345f633ffaeb0f218accecdf9ff83
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-11-22 (Wed, 22 Nov 2023)
-
-  Changed paths:
-    M client/player.c
-
-  Log Message:
-  -----------
-  client/player: Add presets from GMAP
-
-This adds the following presets from GMAP:
-
-16_1_gs
-16_2_gs
-32_1_gs
-32_2_gs
-48_1_gs
-48_2_gs
-32_1_gr
-32_2_gr
-48_1_gr
-48_2_gr
-48_3_gr
-48_4_gr
-32_1_gr_l+r
-32_2_gr_l+r
-48_1_gr_l+r
-48_2_gr_l+r
-48_3_gr_l+r
-48_4_gr_l+r
-
-
-  Commit: 8b448400ece60dd51d786367dddf25ab58cc7f4b
-      https://github.com/bluez/bluez/commit/8b448400ece60dd51d786367dddf25ab58cc7f4b
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-11-27 (Mon, 27 Nov 2023)
-
-  Changed paths:
-    M src/shared/bap-debug.c
-    M src/shared/util.c
-    M src/shared/util.h
-
-  Log Message:
-  -----------
-  shared/util: Enable passing a label to util_debug_bit
-
-This adds a label parameter to be passed to util_debug_bit instead of
-just prepending a '\t'.
-
-
-Compare: https://github.com/bluez/bluez/compare/58e6ef54e672...8b448400ece6
