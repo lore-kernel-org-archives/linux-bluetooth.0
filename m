@@ -1,75 +1,100 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="b9wqtFO9"
-Received: from m12.mail.163.com (m12.mail.163.com [220.181.12.199])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id B290D189;
-	Mon, 27 Nov 2023 01:06:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=npYZV
-	p1l2EsYQNhZNL9bBvpl1f+MnYqTy0c63AC36Dc=; b=b9wqtFO9hk8K6fEX3Kbz1
-	0wgpX883Y8IsiuwdtFyUI6KRl35OQHUlDYvYJFPwB/wN1i1qISeXgsCtR1nn3MOI
-	rAgRBqIqYwi7h+EI50Q2utlb6L4KXDtoyhuAhZqlHq0RTNmDK8tspQVrmXi+33H2
-	pYdZ7qyVI2W2JjAg2UB5F8=
-Received: from WH-D-007635B.QUECTEL.COM (unknown [223.76.229.213])
-	by zwqz-smtp-mta-g3-4 (Coremail) with SMTP id _____wA3f0DsW2RlvYB3BA--.3758S2;
-	Mon, 27 Nov 2023 17:05:49 +0800 (CST)
-From: 15013537245@163.com
-To: marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"clancy.shang" <clancy.shang@quectel.com>
-Subject: [PATCH] Bluetooth: hci_sync: fix BR/EDR wakeup bug
-Date: Mon, 27 Nov 2023 17:05:45 +0800
-Message-Id: <20231127090545.117162-1-15013537245@163.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ikInzQJx"
+Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31D51D2
+	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Nov 2023 01:33:50 -0800 (PST)
+Received: by mail-yb1-xb34.google.com with SMTP id 3f1490d57ef6-db35caa1749so3537429276.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Nov 2023 01:33:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701077629; x=1701682429; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=1uLoaM4gxkkRhNl5ftGqg+VaTL7M+XWtSa9IaZjpCRc=;
+        b=ikInzQJxmDCZmYLYHNX4GN6zajgm0LayMJq92/d8ARbE2w5W1h6O0LxFyRAuCkHsvP
+         YlkkV0ec3/MIVIXMGTwDER0jEURUQR0gAo28f8GA21IvyWdMiVCXbMiepnQMBWxbt3hj
+         YMZGXy3eLLnjUPhtO1aC9l1vZlyL0pW4DPcptXGlCDNSEpiMLn15pV+JPNGtIaRj0GZX
+         qJUy3lTo0Ehd/O4390R05ZQQOhSX1oKvE54LsgOYvxde3BJVJRwGaJni6Mv1k4fBY3Jl
+         owovFJfcov8/56fHra2Q6SPfB7Zx3iuLAnUtdRH80XWgfa2pBUBmaOj7Vc/PdKvwvcnz
+         TucQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701077629; x=1701682429;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1uLoaM4gxkkRhNl5ftGqg+VaTL7M+XWtSa9IaZjpCRc=;
+        b=mjaRFFlLN1OEARX7RezxuTk7Ajh3CyNaWlEJlp1shH3RGmyEK7OgEpOdo+gWL19zvh
+         FVHbRAuJ4Nyuae+Nfu4zGVeb+4Zhun07630GNxBOpOipMAC6qd82TGD8b5MATnE5zwmQ
+         bW6DChAZdYnDowyeHheNXsvpSnuhi7PkdTI1NceiT7LiRsVMDsWV5A7i28gTFBq+ynfl
+         36o/oXurpx2XxxzSsqG4qJzsuePE7fsnGhDQUQxJIciJGRlwON08GXnd5kDjlZMOp2Bt
+         ilbgR7UtXi1iC12hp1+VFiVYSROL+svSFP4rjdwUP02ioaYMSr2IFlJ/MwjLEriobItw
+         HVJA==
+X-Gm-Message-State: AOJu0Yzk5+qz50d05xtKQkUPbVGE2tY3icppDgghHmHVL+GfU6DZDoEi
+	6YCy1v9ZMAxvPlPPq6V+1Up1Gi7J3so=
+X-Google-Smtp-Source: AGHT+IFBNRW80XvHBZTvurODMbIVOgmqvN7aP3/uCtUOV4kn4/GMBkHZAuC3X8LGSEexpAEhBtxW7Q==
+X-Received: by 2002:a25:588b:0:b0:d9d:5e9:c65b with SMTP id m133-20020a25588b000000b00d9d05e9c65bmr9243882ybb.39.1701077629193;
+        Mon, 27 Nov 2023 01:33:49 -0800 (PST)
+Received: from [172.17.0.2] ([20.97.191.178])
+        by smtp.gmail.com with ESMTPSA id e14-20020ad442ae000000b0067a4513c739sm841664qvr.63.2023.11.27.01.33.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Nov 2023 01:33:48 -0800 (PST)
+Message-ID: <6564627c.d40a0220.28b2d.1d25@mx.google.com>
+Date: Mon, 27 Nov 2023 01:33:48 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0220692781296537692=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wA3f0DsW2RlvYB3BA--.3758S2
-X-Coremail-Antispam: 1Uf129KBjvdXoWruw1UZF48XrWDuF18AF1fZwb_yoWkCFXEvF
-	n3ua9rXrW7WryIvasFyFs5Zr1UZ395ua1xuwnFgFy0gF98Gr4DWrykXF15AF4xWan7AFW3
-	Crn8GFyFqw17ujkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUnH8BUUUUUU==
-X-CM-SenderInfo: rprviiitvtljiuv6il2tof0z/xtbBnBg111ghlpFu8gAAsE
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, 15013537245@163.com
+Subject: RE: Bluetooth: hci_sync: fix BR/EDR wakeup bug
+In-Reply-To: <20231127090545.117162-1-15013537245@163.com>
+References: <20231127090545.117162-1-15013537245@163.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: "clancy.shang" <clancy.shang@quectel.com>
+--===============0220692781296537692==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Steam deck in suspending state, but bt controller send hci
-mode change event to host. cause Steam Deck can't into sleep.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: clancy.shang <clancy.shang@quectel.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=804428
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.64 seconds
+GitLint                       PASS      0.45 seconds
+SubjectPrefix                 PASS      0.40 seconds
+BuildKernel                   PASS      29.36 seconds
+CheckAllWarning               PASS      32.36 seconds
+CheckSparse                   PASS      37.57 seconds
+CheckSmatch                   PASS      102.41 seconds
+BuildKernel32                 PASS      28.08 seconds
+TestRunnerSetup               PASS      429.08 seconds
+TestRunner_l2cap-tester       PASS      25.51 seconds
+TestRunner_iso-tester         PASS      37.95 seconds
+TestRunner_bnep-tester        PASS      7.16 seconds
+TestRunner_mgmt-tester        PASS      163.31 seconds
+TestRunner_rfcomm-tester      PASS      12.82 seconds
+TestRunner_sco-tester         PASS      14.72 seconds
+TestRunner_ioctl-tester       PASS      12.36 seconds
+TestRunner_mesh-tester        PASS      9.24 seconds
+TestRunner_smp-tester         PASS      10.01 seconds
+TestRunner_userchan-tester    PASS      7.53 seconds
+IncrementalBuild              PASS      26.32 seconds
+
+
+
 ---
- net/bluetooth/hci_sync.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index a15ab0b874a9..a26a58cb2c38 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -3800,12 +3800,14 @@ static int hci_set_event_mask_sync(struct hci_dev *hdev)
- 	if (lmp_bredr_capable(hdev)) {
- 		events[4] |= 0x01; /* Flow Specification Complete */
- 
--		/* Don't set Disconnect Complete when suspended as that
--		 * would wakeup the host when disconnecting due to
--		 * suspend.
-+		/* Don't set Disconnect Complete and mode change when
-+		 * suspended as that would wakeup the host when disconnecting
-+		 * due to suspend.
- 		 */
--		if (hdev->suspended)
-+		if (hdev->suspended) {
- 			events[0] &= 0xef;
-+			events[2] &= 0xf7;
-+		}
- 	} else {
- 		/* Use a different default for LE-only devices */
- 		memset(events, 0, sizeof(events));
--- 
-2.25.1
 
+--===============0220692781296537692==--
