@@ -1,114 +1,127 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Djz4nkXx"
-Received: from mail-ot1-x32f.google.com (mail-ot1-x32f.google.com [IPv6:2607:f8b0:4864:20::32f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EBE6D4F
-	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Nov 2023 07:33:07 -0800 (PST)
-Received: by mail-ot1-x32f.google.com with SMTP id 46e09a7af769-6d7f3a4bbc6so3221370a34.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Nov 2023 07:33:07 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S92I3gHs"
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DE20D4B
+	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Nov 2023 08:43:15 -0800 (PST)
+Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1cf5901b4c8so48770505ad.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Nov 2023 08:43:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701185586; x=1701790386; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=74mfR+dMyZy/NzcmTvsJTEzMeHyapPSMfQSrzcgRGkU=;
-        b=Djz4nkXxIBiuWOa6u05m8TptiP4UxMtlYq7kV8N9UgLcfRpHCFnB6UoL3iDPsPppOl
-         n4aszU5PAud7IHrStjxR7LSHCQsXh4yWUm/uUNwwlO9HZEiLb5FFF4d6MIZ79Yl3aavL
-         kRYsznkM9dhGSMy12B9IhwnNU7/oOPfVGRhS69Mp72s55/ouzod98tfJ1WTx41FdjMNT
-         a/R1DXEnPfBMGf9XsO/8RhjrE2BlTO9CfWkE+YLsIlAYQQGJDe3RHldg1BupS1HjA1SW
-         g0IysHLxMp6GZt8XZG5wVjbDafz0zC6tMFrgUu/zvtojhuiguhLA4OGS8QbIZo3cg3Hk
-         gvXQ==
+        d=gmail.com; s=20230601; t=1701189795; x=1701794595; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Mi4/L3hhYzy45Ithp4XD+k2IIjmo2OZm/ilzTTcNPsc=;
+        b=S92I3gHsK4fJco94q0X8gFAJAzXzZBGpYkYiVYGxqsIpEMzrmBJMNrp/VCLCVOhUrV
+         4dJiulH2ar8vfqXDxZ7wLchcZDKMrfrtll8jUg8eoTVRWiZdIT+Urc2BMqgyArJLPYp5
+         esciPQziEj/Xnvgj/eTPUkO2NP51/w6SIaxyV3GbkSeX/7WAmV1C/+GJG1h5ES/9QS5M
+         ENVPiiVCY3ZelP0aMKmdwmlt6uwiIJ+IxSRVa1QeDPRKVCvQ6ez5Ev3D1WJMrCNAL61r
+         Hj7O1V3/BNKGC1slNLrubmMPzqn8WLbRPDBvt/BUXzRSQCo2o33kng9VMZ1jAODLbtwb
+         W3nA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701185586; x=1701790386;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=74mfR+dMyZy/NzcmTvsJTEzMeHyapPSMfQSrzcgRGkU=;
-        b=oZ5qn8CunpES+zZCkyBZiYuQNeutCCQYciUDARvd9AnnIr5loIXy8xUR5Nd8JK8kYV
-         r8ABls5gcXz5b0oHA7Pj3xpURCf7Evxv5W7ZwhTXtXP0COTzePMnlZRLakLGWa4MUMrb
-         b41j7bPuGUfMU3b8WjuLpCz0kg1F0KXCAzyocgHjlWA3cD4eEuEtCZmo7s1+UbRTza9J
-         kVtGC9sCpgRnRSCPn9zCzlEivZSO4zYASF2s6pkNpC7WC9CqGAB8KPJZwg0ao/dZNnv3
-         b/ZzQVeuBx9m1WcJfnIQqCLkWI8Lyw/DVY4vBaqwIn269zm6kU1qAEpEzpXSxEF2NisO
-         gftQ==
-X-Gm-Message-State: AOJu0YzKu/uodUJmgOU/MvbGZNlfnwJu0EeweIpEt+HT5w6osuBhETcS
-	ZIYLLK5psfNzMag/4sPmShH30zGGe9pW4w==
-X-Google-Smtp-Source: AGHT+IE6GqY8U+LpO5OQ+eaQ+Fef/Mlgh5l5M+B5m+jQ2Nfu1Q6MCq7i1TM32+sXYm9Cq4YByInCBw==
-X-Received: by 2002:a05:6358:7205:b0:16d:fd30:6d14 with SMTP id h5-20020a056358720500b0016dfd306d14mr14369578rwa.17.1701185585713;
-        Tue, 28 Nov 2023 07:33:05 -0800 (PST)
-Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
-        by smtp.gmail.com with ESMTPSA id p60-20020a9f36c2000000b007c1814e4ee1sm2206295uap.6.2023.11.28.07.33.04
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1701189795; x=1701794595;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Mi4/L3hhYzy45Ithp4XD+k2IIjmo2OZm/ilzTTcNPsc=;
+        b=GUx8AOEQiX37YA/bQeZDoJ85BCW/1RWAelYjfdFT3FbCDd1yvjLndAmpAiF7HA9I4P
+         YaAVLwgn1vqfI1Emlu5MUWKGssiXv752e7htTmTx6+0BP48DK/3P83UonQ/Vm0tj1IBP
+         /svT4EAeXEFVvXyPqhFfhKxzVJu7wkmtgRL4XBN0SBBnL9hyjfTzJieAd7wjsUTzUHr/
+         O3JPH3587sPuHCWwpA/RHKCo7dGqHt2kehYT9pNA4GLVeo9K8WOZLf6KY8K4iSrf4QjC
+         LVOx9fJPy7+4Wk+AkGqrcqkgE0d3XtxrYcib8kLCgEAM5NK/pNlIVDEYwUvW7NEk82ka
+         uU3g==
+X-Gm-Message-State: AOJu0YwxJsM7m1LYBWMvs4VurGpFk72kmDiv97D4CyZxIS6JAIzrF4xD
+	GyRBNWHHWChUmkg+94hgPVpWPuNA85U=
+X-Google-Smtp-Source: AGHT+IHQc/wQoBmoF5FBnEFiAmNjyzAWAqRwTGtLzd8m/L1/uO9cvjuEHbedRWRBb9v1TvbfG+jizg==
+X-Received: by 2002:a17:903:22c1:b0:1cf:9902:66c5 with SMTP id y1-20020a17090322c100b001cf990266c5mr19842336plg.36.1701189794772;
+        Tue, 28 Nov 2023 08:43:14 -0800 (PST)
+Received: from [172.17.0.2] ([13.91.68.210])
+        by smtp.gmail.com with ESMTPSA id y5-20020a170902700500b001cfd35ec1d7sm3752768plk.243.2023.11.28.08.43.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Nov 2023 07:33:05 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1] isotest: Fix high-reliability QoS presets
-Date: Tue, 28 Nov 2023 10:33:03 -0500
-Message-ID: <20231128153303.1731575-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Tue, 28 Nov 2023 08:43:14 -0800 (PST)
+Message-ID: <656618a2.170a0220.21edc.a7a7@mx.google.com>
+Date: Tue, 28 Nov 2023 08:43:14 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3022462599315378653=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v2,1/3] iso-tester: Add tests for GMAP broadcast QoS presets
+In-Reply-To: <20231128152832.1730901-1-luiz.dentz@gmail.com>
+References: <20231128152832.1730901-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============3022462599315378653==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This changes the high-reliability QoS presets to be conformant to
-BAP[1] specification:
+This is automated email and please do not reply to this email!
 
-  Table 5.2: QoS configuration support setting requirements for the
-  Unicast Client and Unicast Server
+Dear submitter,
 
-[1] https://www.bluetooth.com/specifications/bap-1-0-1/
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=804915
 
-Fixes: https://github.com/bluez/bluez/issues/665
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      1.21 seconds
+GitLint                       FAIL      0.84 seconds
+BuildEll                      PASS      24.36 seconds
+BluezMake                     PASS      583.93 seconds
+MakeCheck                     PASS      11.02 seconds
+MakeDistcheck                 PASS      150.40 seconds
+CheckValgrind                 PASS      211.14 seconds
+CheckSmatch                   WARNING   324.86 seconds
+bluezmakeextell               PASS      98.70 seconds
+IncrementalBuild              PASS      1588.70 seconds
+ScanBuild                     PASS      952.09 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ,v2,3/3] monitor: Add proper decoding of TLV for BASE
+WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#100: 
+              Codec Specific Configuration: Location: Front Left (0x00000001)
+
+/github/workspace/src/src/13471360.patch total: 0 errors, 1 warnings, 116 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13471360.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,v2,3/3] monitor: Add proper decoding of TLV for BASE
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+26: B3 Line contains hard tab characters (\t): "            Metadata: Context	Conversational (0x0002)"
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+monitor/packet.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c:1860:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3606:52: warning: array of flexible structuresmonitor/bt.h:3594:40: warning: array of flexible structures
+
+
 ---
- tools/isotest.c | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/tools/isotest.c b/tools/isotest.c
-index 2c682bc899fc..771d24b6d2a6 100644
---- a/tools/isotest.c
-+++ b/tools/isotest.c
-@@ -1073,22 +1073,22 @@ static struct qos_preset {
- 	QOS_PRESET("48_5_1", false, 7500, 15, 117, 0x02, 5),
- 	QOS_PRESET("44_6_1", false, 10000, 20, 155, 0x02, 5),
- 	/* QoS Configuration settings for high reliability audio data */
--	QOS_PRESET("8_1_2", true, 7500, 45, 26, 0x02, 41),
--	QOS_PRESET("8_2_2", true, 10000, 60, 30, 0x02, 53),
--	QOS_PRESET("16_1_2", true, 7500, 45, 30, 0x02, 41),
--	QOS_PRESET("16_2_2", true, 10000, 60, 40, 0x02, 47),
--	QOS_PRESET("24_1_2", true, 7500, 45, 45, 0x02, 35),
--	QOS_PRESET("24_2_2", true, 10000, 60, 60, 0x02, 41),
--	QOS_PRESET("32_1_2", true, 7500, 45, 60, 0x02, 29),
--	QOS_PRESET("32_2_1", true, 10000, 60, 80, 0x02, 35),
--	QOS_PRESET("44_1_2", false, 8163, 54, 98, 0x02, 23),
--	QOS_PRESET("44_2_2", false, 10884, 71, 130, 0x02, 23),
--	QOS_PRESET("48_1_2", false, 7500, 45, 75, 0x02, 23),
--	QOS_PRESET("48_2_2", false, 10000, 60, 100, 0x02, 23),
--	QOS_PRESET("48_3_2", false, 7500, 45, 90, 0x02, 23),
--	QOS_PRESET("48_4_2", false, 10000, 60, 120, 0x02, 23),
--	QOS_PRESET("48_5_2", false, 7500, 45, 117, 0x02, 23),
--	QOS_PRESET("44_6_2", false, 10000, 60, 155, 0x02, 23),
-+	QOS_PRESET("8_1_2", true, 7500, 75, 26, 0x02, 13),
-+	QOS_PRESET("8_2_2", true, 10000, 95, 30, 0x02, 13),
-+	QOS_PRESET("16_1_2", true, 7500, 75, 30, 0x02, 13),
-+	QOS_PRESET("16_2_2", true, 10000, 95, 40, 0x02, 13),
-+	QOS_PRESET("24_1_2", true, 7500, 75, 45, 0x02, 13),
-+	QOS_PRESET("24_2_2", true, 10000, 95, 60, 0x02, 13),
-+	QOS_PRESET("32_1_2", true, 7500, 75, 60, 0x02, 13),
-+	QOS_PRESET("32_2_2", true, 10000, 95, 80, 0x02, 13),
-+	QOS_PRESET("44_1_2", false, 8163, 80, 97, 0x02, 13),
-+	QOS_PRESET("44_2_2", false, 10884, 85, 130, 0x02, 13),
-+	QOS_PRESET("48_1_2", false, 7500, 75, 75, 0x02, 13),
-+	QOS_PRESET("48_2_2", false, 10000, 95, 100, 0x02, 13),
-+	QOS_PRESET("48_3_2", false, 7500, 75, 90, 0x02, 13),
-+	QOS_PRESET("48_4_2", false, 10000, 100, 120, 0x02, 13),
-+	QOS_PRESET("48_5_2", false, 7500, 75, 117, 0x02, 13),
-+	QOS_PRESET("44_6_2", false, 10000, 100, 155, 0x02, 13),
- 	/* QoS configuration support setting requirements for the UGG and UGT */
- 	QOS_PRESET("16_1_gs", true, 7500, 15, 30, 0x02, 1),
- 	QOS_PRESET("16_2_gs", true, 10000, 20, 40, 0x02, 1),
--- 
-2.43.0
 
+--===============3022462599315378653==--
