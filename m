@@ -1,52 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UluTaLa/"
-Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2EB710D1
-	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Nov 2023 07:28:40 -0800 (PST)
-Received: by mail-ot1-x336.google.com with SMTP id 46e09a7af769-6d7eca548ccso3213745a34.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Nov 2023 07:28:40 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Djz4nkXx"
+Received: from mail-ot1-x32f.google.com (mail-ot1-x32f.google.com [IPv6:2607:f8b0:4864:20::32f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EBE6D4F
+	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Nov 2023 07:33:07 -0800 (PST)
+Received: by mail-ot1-x32f.google.com with SMTP id 46e09a7af769-6d7f3a4bbc6so3221370a34.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Nov 2023 07:33:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701185319; x=1701790119; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PMRcStEa6a1gBpdv3t70birwXww/qU1B666I/WHu554=;
-        b=UluTaLa/xfRQE/mX0ttJ1aMiT1z1i+t+zl0rtkz409lDkHoKJv4co0Ngw/vv3rBZzt
-         F/ouFOcjCiUeFyMkmVOW7jWmRiKPxupi2ES2AWWROvjCnc/xCOb6rFi3eT2sxTlQuUwi
-         1f4r2yPPlVhrGVAVvuV+R1HcIoV5XZZXZBLu8wputb3V3lEm+kescFvxbP+RcKacnoAZ
-         tAXyXMniEe5PzqM8gpUwHiMPZcvSpYsMGJJ0TCc+y6O9ZpAfL7R+N6i+gHr8pM7jWMB2
-         E2Qq+IJXnvG1HDjQBqdcz8Ws+QE4PAnLwYom1RxgHHB49CavElMXP/VlXLe8Klus5PiT
-         h+sA==
+        d=gmail.com; s=20230601; t=1701185586; x=1701790386; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=74mfR+dMyZy/NzcmTvsJTEzMeHyapPSMfQSrzcgRGkU=;
+        b=Djz4nkXxIBiuWOa6u05m8TptiP4UxMtlYq7kV8N9UgLcfRpHCFnB6UoL3iDPsPppOl
+         n4aszU5PAud7IHrStjxR7LSHCQsXh4yWUm/uUNwwlO9HZEiLb5FFF4d6MIZ79Yl3aavL
+         kRYsznkM9dhGSMy12B9IhwnNU7/oOPfVGRhS69Mp72s55/ouzod98tfJ1WTx41FdjMNT
+         a/R1DXEnPfBMGf9XsO/8RhjrE2BlTO9CfWkE+YLsIlAYQQGJDe3RHldg1BupS1HjA1SW
+         g0IysHLxMp6GZt8XZG5wVjbDafz0zC6tMFrgUu/zvtojhuiguhLA4OGS8QbIZo3cg3Hk
+         gvXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701185319; x=1701790119;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PMRcStEa6a1gBpdv3t70birwXww/qU1B666I/WHu554=;
-        b=OZViGswUW7F0nJe1XEa1CnhEwRkwldDvnWpHAHS/zw8CucpCq5pJskUJGqcOHFvxXk
-         KTS+amtWRyg8a+TQ08ZRX3DGgJUZl2suVzu++Se5IpYJ1iMH4KFLp2pxbUh48+bJZPGC
-         JhK7MbIUDSJbRI66VQneTfdmI/aeDRLrFSp9wdXVeDf6xdz2kZnL5r0o2TRWKgmlt70D
-         EsCIg4Cz7T/fssud92QCSzjKkwXwzuYaKS2WgVat3FtO8UTh7wdlpZzv4DbZ6v4RNlhO
-         9jrPQekFmGm18yqvgRwV7BpeWH/8TLx8DzkAV/j6IjAS7vKS3RIoA273K7hqaRp4HT9H
-         oEPQ==
-X-Gm-Message-State: AOJu0Yzbt1Cqcn26SBGhN8tIg3mlR8Avp2fExqteIynf3zkdKgo7S0VE
-	j534XdpBhECkOUeLbMODzqYkw9XIwKWQug==
-X-Google-Smtp-Source: AGHT+IGSrH2TaxydTGLw+KPw88/TqwrYyUYxlJL41FgSfLzdJOJZyvWfn0KcVi5vmHwucDpLGgjUPA==
-X-Received: by 2002:a05:6358:3423:b0:16b:f6ba:a03a with SMTP id h35-20020a056358342300b0016bf6baa03amr17743244rwd.8.1701185319294;
-        Tue, 28 Nov 2023 07:28:39 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701185586; x=1701790386;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=74mfR+dMyZy/NzcmTvsJTEzMeHyapPSMfQSrzcgRGkU=;
+        b=oZ5qn8CunpES+zZCkyBZiYuQNeutCCQYciUDARvd9AnnIr5loIXy8xUR5Nd8JK8kYV
+         r8ABls5gcXz5b0oHA7Pj3xpURCf7Evxv5W7ZwhTXtXP0COTzePMnlZRLakLGWa4MUMrb
+         b41j7bPuGUfMU3b8WjuLpCz0kg1F0KXCAzyocgHjlWA3cD4eEuEtCZmo7s1+UbRTza9J
+         kVtGC9sCpgRnRSCPn9zCzlEivZSO4zYASF2s6pkNpC7WC9CqGAB8KPJZwg0ao/dZNnv3
+         b/ZzQVeuBx9m1WcJfnIQqCLkWI8Lyw/DVY4vBaqwIn269zm6kU1qAEpEzpXSxEF2NisO
+         gftQ==
+X-Gm-Message-State: AOJu0YzKu/uodUJmgOU/MvbGZNlfnwJu0EeweIpEt+HT5w6osuBhETcS
+	ZIYLLK5psfNzMag/4sPmShH30zGGe9pW4w==
+X-Google-Smtp-Source: AGHT+IE6GqY8U+LpO5OQ+eaQ+Fef/Mlgh5l5M+B5m+jQ2Nfu1Q6MCq7i1TM32+sXYm9Cq4YByInCBw==
+X-Received: by 2002:a05:6358:7205:b0:16d:fd30:6d14 with SMTP id h5-20020a056358720500b0016dfd306d14mr14369578rwa.17.1701185585713;
+        Tue, 28 Nov 2023 07:33:05 -0800 (PST)
 Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
-        by smtp.gmail.com with ESMTPSA id bf9-20020a056130054900b0079a1018d185sm1660644uab.31.2023.11.28.07.28.37
+        by smtp.gmail.com with ESMTPSA id p60-20020a9f36c2000000b007c1814e4ee1sm2206295uap.6.2023.11.28.07.33.04
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Nov 2023 07:28:37 -0800 (PST)
+        Tue, 28 Nov 2023 07:33:05 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 3/3] monitor: Add proper decoding of TLV for BASE
-Date: Tue, 28 Nov 2023 10:28:32 -0500
-Message-ID: <20231128152832.1730901-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1] isotest: Fix high-reliability QoS presets
+Date: Tue, 28 Nov 2023 10:33:03 -0500
+Message-ID: <20231128153303.1731575-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20231128152832.1730901-1-luiz.dentz@gmail.com>
-References: <20231128152832.1730901-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -57,164 +53,62 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This uses bt_bap_debug_{config, metadata} to decode the TLV entries
-found in Basic Audio Announcement:
+This changes the high-reliability QoS presets to be conformant to
+BAP[1] specification:
 
-< HCI Command: LE Set Peri.. (0x08|0x003f) plen 41
-        Handle: 1
-        Operation: Complete ext advertising data (0x03)
-        Data length: 0x26
-        Service Data: Basic Audio Announcement (0x1851)
-          Presetation Delay: 10000
-          Number of Subgroups: 1
-            Subgroup #0:
-            Number of BIS(s): 1
-            Codec: LC3 (0x06)
-            Codec Specific Configuration: #0: len 0x02 type 0x01
-            Codec Specific Configuration: Sampling Frequency: 48 Khz (0x08)
-            Codec Specific Configuration: #1: len 0x02 type 0x02
-            Codec Specific Configuration: Frame Duration: 7.5 ms (0x00)
-            Codec Specific Configuration: #2: len 0x03 type 0x04
-            Codec Specific Configuration: Frame Length: 75 (0x004b)
-            Metadata: #0: len 0x03 type 0x02
-            Metadata: Context: 0x0002
-            Metadata: Context	Conversational (0x0002)
-              BIS #0:
-              Index: 1
-              Codec Specific Configuration: #0: len 0x05 type 0x03
-              Codec Specific Configuration: Location: 0x00000001
-              Codec Specific Configuration: Location: Front Left (0x00000001)
+  Table 5.2: QoS configuration support setting requirements for the
+  Unicast Client and Unicast Server
+
+[1] https://www.bluetooth.com/specifications/bap-1-0-1/
+
+Fixes: https://github.com/bluez/bluez/issues/665
 ---
- monitor/packet.c | 49 +++++++++++++++++++-----------------------------
- 1 file changed, 19 insertions(+), 30 deletions(-)
+ tools/isotest.c | 32 ++++++++++++++++----------------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index 87805be0122a..b06f8a5d3802 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -35,6 +35,7 @@
- #include "src/shared/util.h"
- #include "src/shared/btsnoop.h"
- #include "src/shared/queue.h"
-+#include "src/shared/bap-debug.h"
- #include "display.h"
- #include "bt.h"
- #include "ll.h"
-@@ -3405,20 +3406,6 @@ static void print_uuid128_list(const char *label, const void *data,
- 	}
- }
- 
--static void *iov_pull(struct iovec *iov, size_t len)
--{
--	void *data;
--
--	if (iov->iov_len < len)
--		return NULL;
--
--	data = iov->iov_base;
--	iov->iov_base += len;
--	iov->iov_len -= len;
--
--	return data;
--}
--
- static void print_ltv(const char *str, void *user_data)
- {
- 	const char *label = user_data;
-@@ -3435,7 +3422,7 @@ static void print_base_annoucement(const uint8_t *data, uint8_t data_len)
- 	iov.iov_base = (void *) data;
- 	iov.iov_len = data_len;
- 
--	base_data = iov_pull(&iov, sizeof(*base_data));
-+	base_data = util_iov_pull_mem(&iov, sizeof(*base_data));
- 	if (!base_data)
- 		goto done;
- 
-@@ -3453,7 +3440,7 @@ static void print_base_annoucement(const uint8_t *data, uint8_t data_len)
- 
- 		print_field("    Subgroup #%u:", i);
- 
--		subgroup = iov_pull(&iov, sizeof(*subgroup));
-+		subgroup = util_iov_pull_mem(&iov, sizeof(*subgroup));
- 		if (!subgroup)
- 			goto done;
- 
-@@ -3470,29 +3457,31 @@ static void print_base_annoucement(const uint8_t *data, uint8_t data_len)
- 						subgroup->codec.vid);
- 		}
- 
--		codec_cfg = iov_pull(&iov, sizeof(*codec_cfg));
-+		codec_cfg = util_iov_pull_mem(&iov, sizeof(*codec_cfg));
- 		if (!codec_cfg)
- 			goto done;
- 
--		if (!iov_pull(&iov, codec_cfg->len))
-+		if (!util_iov_pull_mem(&iov, codec_cfg->len))
- 			goto done;
- 
- 		label = "    Codec Specific Configuration";
- 
--		util_debug_ltv(codec_cfg->data, codec_cfg->len, NULL, 0,
--				print_ltv, (void *)label);
-+		bt_bap_debug_config(codec_cfg->data, codec_cfg->len,
-+					print_ltv, (void *)label);
- 
--		metadata = iov_pull(&iov, sizeof(*metadata));
-+		metadata = util_iov_pull_mem(&iov, sizeof(*metadata));
- 		if (!metadata)
- 			goto done;
- 
--		if (!iov_pull(&iov, metadata->len))
-+		if (!util_iov_pull(&iov, metadata->len))
- 			goto done;
- 
- 		label = "    Metadata";
- 
--		util_debug_ltv(metadata->data, metadata->len, NULL, 0,
--				print_ltv, (void *)label);
-+		bt_bap_debug_metadata(metadata->data, metadata->len,
-+					print_ltv, (void *)label);
-+
-+		label = "      Codec Specific Configuration";
- 
- 		/* Level 3 - BIS(s)*/
- 		for (j = 0; j < subgroup->num_bis; j++) {
-@@ -3500,21 +3489,21 @@ static void print_base_annoucement(const uint8_t *data, uint8_t data_len)
- 
- 			print_field("      BIS #%u:", j);
- 
--			bis = iov_pull(&iov, sizeof(*bis));
-+			bis = util_iov_pull_mem(&iov, sizeof(*bis));
- 			if (!bis)
- 				goto done;
- 
- 			print_field("      Index: %u", bis->index);
- 
--			codec_cfg = iov_pull(&iov, sizeof(*codec_cfg));
-+			codec_cfg = util_iov_pull_mem(&iov, sizeof(*codec_cfg));
- 			if (!codec_cfg)
- 				goto done;
- 
--			if (!iov_pull(&iov, codec_cfg->len))
-+			if (!util_iov_pull(&iov, codec_cfg->len))
- 				goto done;
- 
--			print_hex_field("      Codec Specific Configuration",
--					codec_cfg->data, codec_cfg->len);
-+			bt_bap_debug_config(codec_cfg->data, codec_cfg->len,
-+					print_ltv, (void *)label);
- 		}
- 	}
- 
-@@ -10443,7 +10432,7 @@ static void num_completed_packets_evt(struct timeval *tv, uint16_t index,
- 	const struct bt_hci_evt_num_completed_packets *evt = data;
- 	int i;
- 
--	iov_pull(&iov, 1);
-+	util_iov_pull(&iov, 1);
- 
- 	print_field("Num handles: %d", evt->num_handles);
- 
+diff --git a/tools/isotest.c b/tools/isotest.c
+index 2c682bc899fc..771d24b6d2a6 100644
+--- a/tools/isotest.c
++++ b/tools/isotest.c
+@@ -1073,22 +1073,22 @@ static struct qos_preset {
+ 	QOS_PRESET("48_5_1", false, 7500, 15, 117, 0x02, 5),
+ 	QOS_PRESET("44_6_1", false, 10000, 20, 155, 0x02, 5),
+ 	/* QoS Configuration settings for high reliability audio data */
+-	QOS_PRESET("8_1_2", true, 7500, 45, 26, 0x02, 41),
+-	QOS_PRESET("8_2_2", true, 10000, 60, 30, 0x02, 53),
+-	QOS_PRESET("16_1_2", true, 7500, 45, 30, 0x02, 41),
+-	QOS_PRESET("16_2_2", true, 10000, 60, 40, 0x02, 47),
+-	QOS_PRESET("24_1_2", true, 7500, 45, 45, 0x02, 35),
+-	QOS_PRESET("24_2_2", true, 10000, 60, 60, 0x02, 41),
+-	QOS_PRESET("32_1_2", true, 7500, 45, 60, 0x02, 29),
+-	QOS_PRESET("32_2_1", true, 10000, 60, 80, 0x02, 35),
+-	QOS_PRESET("44_1_2", false, 8163, 54, 98, 0x02, 23),
+-	QOS_PRESET("44_2_2", false, 10884, 71, 130, 0x02, 23),
+-	QOS_PRESET("48_1_2", false, 7500, 45, 75, 0x02, 23),
+-	QOS_PRESET("48_2_2", false, 10000, 60, 100, 0x02, 23),
+-	QOS_PRESET("48_3_2", false, 7500, 45, 90, 0x02, 23),
+-	QOS_PRESET("48_4_2", false, 10000, 60, 120, 0x02, 23),
+-	QOS_PRESET("48_5_2", false, 7500, 45, 117, 0x02, 23),
+-	QOS_PRESET("44_6_2", false, 10000, 60, 155, 0x02, 23),
++	QOS_PRESET("8_1_2", true, 7500, 75, 26, 0x02, 13),
++	QOS_PRESET("8_2_2", true, 10000, 95, 30, 0x02, 13),
++	QOS_PRESET("16_1_2", true, 7500, 75, 30, 0x02, 13),
++	QOS_PRESET("16_2_2", true, 10000, 95, 40, 0x02, 13),
++	QOS_PRESET("24_1_2", true, 7500, 75, 45, 0x02, 13),
++	QOS_PRESET("24_2_2", true, 10000, 95, 60, 0x02, 13),
++	QOS_PRESET("32_1_2", true, 7500, 75, 60, 0x02, 13),
++	QOS_PRESET("32_2_2", true, 10000, 95, 80, 0x02, 13),
++	QOS_PRESET("44_1_2", false, 8163, 80, 97, 0x02, 13),
++	QOS_PRESET("44_2_2", false, 10884, 85, 130, 0x02, 13),
++	QOS_PRESET("48_1_2", false, 7500, 75, 75, 0x02, 13),
++	QOS_PRESET("48_2_2", false, 10000, 95, 100, 0x02, 13),
++	QOS_PRESET("48_3_2", false, 7500, 75, 90, 0x02, 13),
++	QOS_PRESET("48_4_2", false, 10000, 100, 120, 0x02, 13),
++	QOS_PRESET("48_5_2", false, 7500, 75, 117, 0x02, 13),
++	QOS_PRESET("44_6_2", false, 10000, 100, 155, 0x02, 13),
+ 	/* QoS configuration support setting requirements for the UGG and UGT */
+ 	QOS_PRESET("16_1_gs", true, 7500, 15, 30, 0x02, 1),
+ 	QOS_PRESET("16_2_gs", true, 10000, 20, 40, 0x02, 1),
 -- 
 2.43.0
 
