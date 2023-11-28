@@ -1,88 +1,101 @@
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from mail11.truemail.it (mail11.truemail.it [217.194.8.81])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44928183;
-	Mon, 27 Nov 2023 23:40:24 -0800 (PST)
-Received: from francesco-nb.int.toradex.com (31-10-206-125.static.upc.ch [31.10.206.125])
-	by mail11.truemail.it (Postfix) with ESMTPA id 7B50D2074D;
-	Tue, 28 Nov 2023 08:40:22 +0100 (CET)
-Date: Tue, 28 Nov 2023 08:40:21 +0100
-From: Francesco Dolcini <francesco@dolcini.it>
-To: Jiri Slaby <jirislaby@kernel.org>
-Cc: Francesco Dolcini <francesco@dolcini.it>,
-	Amitkumar Karwar <amitkumar.karwar@nxp.com>,
-	Neeraj Kale <neeraj.sanjaykale@nxp.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Francesco Dolcini <francesco.dolcini@toradex.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-serial@vger.kernel.org
-Subject: Re: [PATCH v1 1/3] Bluetooth: btnxpuart: fix recv_buf() return value
-Message-ID: <ZWWZZQUzZpnTm4i5@francesco-nb.int.toradex.com>
-References: <20231127191409.151254-1-francesco@dolcini.it>
- <20231127191409.151254-2-francesco@dolcini.it>
- <5f2995d5-3c7c-4234-82ef-dd43bc73a730@kernel.org>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E686217731
+	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Nov 2023 08:19:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DizBxZPi"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BB5FDC433C8
+	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Nov 2023 08:19:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701159560;
+	bh=HwD6aiXHjteXBerQlR8ISjWiG09yxl9Y/RqrWwTXaqo=;
+	h=From:To:Subject:Date:From;
+	b=DizBxZPi3Y1hkf0FOySfAH+tAOixla0GAzOt1afAPgcBAHRPs5YjVJ7YP3IHGYRsu
+	 FmF8Q3OYlAVe90PG34esH1TTmVh5YHcm992QZZOTkc8/sIT1LtZHpnS93x4ZNOEqJD
+	 FHt81g4mE/EcoyozGkBZihiKHUfZGdlAaHC8HucgFhZm6sJNkd1k5ahgQld0vDRGKA
+	 N3Q8zGJASU6sgYmqPXFCbobyatuUsLboTCj/E9B0t5NBfhzPA7FU1EHQKhZe4uu1rp
+	 Q2lu+57T/03k7dtvT+LA/Y73mmipNT/ksyGnPo0i8sNtBWB9BD7ghmQwyb1xuYq8Nw
+	 JSM5WvQFxb5iA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id A107FC4332E; Tue, 28 Nov 2023 08:19:20 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 218199] New: Bluetooth: HCI_EV_REMOTE_EXT_FEATURES loss
+ prevents connection abort
+Date: Tue, 28 Nov 2023 08:19:20 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: sy2239101@buaa.edu.cn
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression
+Message-ID: <bug-218199-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5f2995d5-3c7c-4234-82ef-dd43bc73a730@kernel.org>
 
-On Tue, Nov 28, 2023 at 06:23:21AM +0100, Jiri Slaby wrote:
-> On 27. 11. 23, 20:14, Francesco Dolcini wrote:
-> > From: Francesco Dolcini <francesco.dolcini@toradex.com>
-> > 
-> > Serdev recv_buf() callback is supposed to return the amount of bytes
-> > consumed, therefore an int in between 0 and count.
-> > 
-> > Do not return negative number in case of issue, just print an error and
-> > return count.  This fixes a WARN in ttyport_receive_buf().
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218199
 
-...
+            Bug ID: 218199
+           Summary: Bluetooth: HCI_EV_REMOTE_EXT_FEATURES loss prevents
+                    connection abort
+           Product: Drivers
+           Version: 2.5
+          Hardware: Intel
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: sy2239101@buaa.edu.cn
+        Regression: No
 
-> >   drivers/bluetooth/btnxpuart.c | 7 +++----
-> >   1 file changed, 3 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
-> > index b7e66b7ac570..951fe3014a3f 100644
-> > --- a/drivers/bluetooth/btnxpuart.c
-> > +++ b/drivers/bluetooth/btnxpuart.c
-> > @@ -1276,11 +1276,10 @@ static int btnxpuart_receive_buf(struct serdev_device *serdev, const u8 *data,
-> >   	if (IS_ERR(nxpdev->rx_skb)) {
-> >   		int err = PTR_ERR(nxpdev->rx_skb);
-> >   		/* Safe to ignore out-of-sync bootloader signatures */
-> > -		if (is_fw_downloading(nxpdev))
-> > -			return count;
-> > -		bt_dev_err(nxpdev->hdev, "Frame reassembly failed (%d)", err);
-> > +		if (!is_fw_downloading(nxpdev))
-> > +			bt_dev_err(nxpdev->hdev, "Frame reassembly failed (%d)", err);
-> >   		nxpdev->rx_skb = NULL;
-> 
-> Is this NULLing not needed in the good case?
-NULLing in the good case would be a bug, in addition to that NULLing is
-not needed at all even in the bad case and it will be removed in the
-last patch, as a cleanup. Here I just maintained the existing logic.
+Our fuzzing tool finds a possible semantic bug in the Bluetooth system in L=
+inux
+6.7-rc2:
 
-> > -		return err;
-> > +		return count;
-> 
-> Should you return 0? I don't know, maybe not
-My reasoning is that we have some corrupted data, so we should just
-use it all and maybe we'll get something valid at a later point, this is
-what was already done before this change in the is_fw_downloading()
-branch.
+When establishing a connection, the loss of HCI_EV_CONN_COMPLETE results in=
+ a
+connection failure, and the controller sends HCI_EV_DISCONN_COMPLETE to abo=
+rt
+the connection.
 
-In my specific case it makes no difference, it will never recover from
-this state.
+Even if HCI_EV_DISCONN_COMPLETE is lost, functions such as hci_conn_timeout
+(/net/bluetooth/hci_conn.c: 612), hci_abort_conn (/net/bluetooth/hci_conn.c:
+2960), and hci_abort_conn_sync (/net/bluetooth/hci_sync.c: 5379) ensure that
+the connection is aborted.
 
-Any other opinion?
+However, in our testing, when both HCI_EV_REMOTE_EXT_FEATURES and
+HCI_EV_DISCONN_COMPLETE are lost, it seems that hci_conn_timeout,
+hci_abort_conn, and hci_abort_conn_sync are not invoked, leading to the
+connection remaining un-aborted.
 
-> but you should document it in the commit log.
-Ack
+We are not sure whether this is a semantic bug or an implementation feature=
+ in
+the Linux kernel. Any feedback would be appreciated, thanks!
 
-Francesco
+--=20
+You may reply to this email to add a comment.
 
+You are receiving this mail because:
+You are the assignee for the bug.=
