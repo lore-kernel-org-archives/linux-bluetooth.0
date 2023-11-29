@@ -1,87 +1,76 @@
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30C5E47A56
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Nov 2023 22:40:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="BqeEmrQu"
-Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0D48C4
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Nov 2023 14:38:03 -0800 (PST)
-Received: from github.com (hubbernetes-node-de53a38.ac4-iad.github.net [10.52.131.21])
-	by smtp.github.com (Postfix) with ESMTPA id 339641E0D9B
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Nov 2023 14:38:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1701297483;
-	bh=DD7kE/hDMyJkLWuhKOaW9YTLnJLYe7LlMHxOfQ5c2Tg=;
-	h=Date:From:To:Subject:From;
-	b=BqeEmrQuNIoFlYcQxlXHCNBsPQ+Zu8V3SMxDBK3sz7QeOcwkE2UaQRkqLcoq26/88
-	 JJMMOTVnbRPKF6qLWuE9RXYNDDu5Nc4oG70h0JnyZVd7bDWn53AqtUl4x9l3oeE7gC
-	 xZ+IH205pnEn/sGbUPUWoM8j3RrlhGZ+uIN9RiA4=
-Date: Wed, 29 Nov 2023 14:38:03 -0800
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/bd5342-4db4d5@github.com>
-Subject: [bluez/bluez] 3a2d3b: test-micp: Fix endianness error
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BUBiV3NW"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A394EC433C9;
+	Wed, 29 Nov 2023 22:40:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701297625;
+	bh=nsrnDNdh2wp/aULsATclzMbHDH3CWZ4maGPkbShzoPE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=BUBiV3NWkFeMTTmMuY1Fxz6pPQ4dHKdRJm0FYVIcsP9Mt0GSYvfXQUxIfaguhtopM
+	 KpEP/9Q4mJYhvvwzSzOod1Jpr5SrbSRG5JyVP1aB+IcHOQRNFMhxlSlUqwO/dtgN6E
+	 d/i2uqQ4Ol87xALFZDnU2AIRYTAzy/ynv84UTEfONfv3FeoZfCFOtx2teoo0W0MA/6
+	 H1TVpapsTy8qoNlE6qpbDOsbyWi6bvHpg+SwY2pJTO8toVhB636O0QKIdLF+2ofF0n
+	 GpCMxRUgwv0pKcG1zvtvsuacS1+9N41Lok7EUKYc/RV0uK5ByRiZ0JGx6e8/F/iLbY
+	 MMKWIixMyLrbQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 83DFFDFAA86;
+	Wed, 29 Nov 2023 22:40:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v1 1/2] test-micp: Fix endianess error
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <170129762553.11308.10417535236170396199.git-patchwork-notify@kernel.org>
+Date: Wed, 29 Nov 2023 22:40:25 +0000
+References: <20231129163041.2075184-1-luiz.dentz@gmail.com>
+In-Reply-To: <20231129163041.2075184-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 3a2d3b31a3b5a7eeb45952ce880ca58c93b985bb
-      https://github.com/bluez/bluez/commit/3a2d3b31a3b5a7eeb45952ce880ca58c93b985bb
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-11-29 (Wed, 29 Nov 2023)
+Hello:
 
-  Changed paths:
-    M unit/test-micp.c
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  test-micp: Fix endianness error
+On Wed, 29 Nov 2023 11:30:39 -0500 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> On big endian the followin error can be observed:
+> 
+> MICP/CL/CGGIT/SER/BV-01-C - init
+> MICP/CL/CGGIT/SER/BV-01-C - setup
+> MICP/CL/CGGIT/SER/BV-01-C - setup complete
+> MICP/CL/CGGIT/SER/BV-01-C - run
+> micp_write_value handle: 3
+> **
+> ERROR:src/shared/tester.c:954:test_io_recv: assertion failed:
+> (memcmp(buf, iov->iov_base, len) == 0)
+> Bail out! ERROR:src/shared/tester.c:954:test_io_recv: assertion failed:
+> (memcmp(buf, iov->iov_base, len) == 0)
+> Aborted
+> 
+> [...]
 
-On big endian the followin error can be observed:
+Here is the summary with links:
+  - [BlueZ,v1,1/2] test-micp: Fix endianess error
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3a2d3b31a3b5
+  - [BlueZ,v1,2/2] shared/vcp: Fix endianess errors
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=4db4d5fa1c4f
 
-MICP/CL/CGGIT/SER/BV-01-C - init
-MICP/CL/CGGIT/SER/BV-01-C - setup
-MICP/CL/CGGIT/SER/BV-01-C - setup complete
-MICP/CL/CGGIT/SER/BV-01-C - run
-micp_write_value handle: 3
-**
-ERROR:src/shared/tester.c:954:test_io_recv: assertion failed:
-(memcmp(buf, iov->iov_base, len) == 0)
-Bail out! ERROR:src/shared/tester.c:954:test_io_recv: assertion failed:
-(memcmp(buf, iov->iov_base, len) == 0)
-Aborted
-
-
-  Commit: 4db4d5fa1c4fefcf3ec7f161a4c7164df0195ed7
-      https://github.com/bluez/bluez/commit/4db4d5fa1c4fefcf3ec7f161a4c7164df0195ed7
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-11-29 (Wed, 29 Nov 2023)
-
-  Changed paths:
-    M src/shared/vcp.c
-
-  Log Message:
-  -----------
-  shared/vcp: Fix endianness errors
-
-On big endian the followin error can be observed:
-VOCS/SR/SGGIT/CHA/BV-02-C - init
-VOCS/SR/SGGIT/CHA/BV-02-C - setup
-VOCS/SR/SGGIT/CHA/BV-02-C - setup complete
-VOCS/SR/SGGIT/CHA/BV-02-C - run
-**
-ERROR:src/shared/tester.c:954:test_io_recv: assertion failed:
-(memcmp(buf, iov->iov_base, len) == 0)
-Bail out! ERROR:src/shared/tester.c:954:test_io_recv: assertion failed:
-(memcmp(buf, iov->iov_base, len) == 0)
-Aborted
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Compare: https://github.com/bluez/bluez/compare/bd5342fdf46a...4db4d5fa1c4f
