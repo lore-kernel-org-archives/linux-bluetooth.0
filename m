@@ -1,88 +1,91 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b="a4VzV1yk"
-X-Greylist: delayed 63 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 29 Nov 2023 02:17:47 PST
-Received: from aer-iport-2.cisco.com (aer-iport-2.cisco.com [173.38.203.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2AA619BB
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Nov 2023 02:17:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=cisco.com; i=@cisco.com; l=1673; q=dns/txt; s=iport;
-  t=1701253068; x=1702462668;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=azuRch+ty4GbnhjoW5vaRLF5YbSYGRYMJbc2P04cDqs=;
-  b=a4VzV1ykX+FGYSoPEZJEyR7N+/lx/SzUhD5X3Fy1zJLxo6Xqkd9VSq3t
-   5E7q/9JqUcTluhij60fz5kkmEPpWanZjDdtehXhWAHGj0FDA2bNUqluZt
-   ImEGuLny6yOfXizNS7t6rAxy0RcI61f0VYI3oZTKF68t3CMhKN5OzDSvi
-   E=;
-X-CSE-ConnectionGUID: cJ2fvtKGT+Gg7ZdfloZufA==
-X-CSE-MsgGUID: nwtWPhITR2+4UqRUMiZDvQ==
-X-IronPort-AV: E=Sophos;i="6.04,235,1695686400"; 
-   d="scan'208";a="9768502"
-Received: from aer-iport-nat.cisco.com (HELO aer-core-7.cisco.com) ([173.38.203.22])
-  by aer-iport-2.cisco.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 10:16:42 +0000
-Received: from pwaago-threadripper.rd.cisco.com ([10.47.29.164])
-	by aer-core-7.cisco.com (8.15.2/8.15.2) with ESMTP id 3ATAGgAp070729;
-	Wed, 29 Nov 2023 10:16:42 GMT
-From: =?UTF-8?q?Per=20Waag=C3=B8?= <pwaago@cisco.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Per=20Waag=C3=B8?= <pwaago@cisco.com>
-Subject: [PATCH BlueZ] adapter: Enable SSP after enabling BREDR
-Date: Wed, 29 Nov 2023 11:16:27 +0100
-Message-ID: <20231129101627.1742015-1-pwaago@cisco.com>
-X-Mailer: git-send-email 2.42.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gQ/NGj32"
+Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C25084
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Nov 2023 03:25:08 -0800 (PST)
+Received: by mail-qt1-x82e.google.com with SMTP id d75a77b69052e-423e7e0a619so4721751cf.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Nov 2023 03:25:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701257107; x=1701861907; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=rdJXtXnkET/w2NPWWjLepq014cL4qeczUI7+mv+psAE=;
+        b=gQ/NGj32Wq7VvG/4IJYuTSayMGNcvQ2sHPTK/kNcpGNGoece90H2dsmYRaEp6UE1f9
+         YJQF6XM0PESFeWfPqjcVEkQ5tN7eZoaPTCKA5TQW+U1YRueuRu9lYbHzixuzpPG0UHrp
+         PDA8iOqeF0yviQ22ieGpKpLpojv9ZdN4u1y3sriPg9UPHnnae11/b2B+UTfsbeSZ5S3O
+         GS7gdenp3hETOFRCKfcgBmKx5OzMuwB3i/a7eR6Chbx9jbxW5xI+jmKfjA8/8+3vZTZv
+         Wtz5Va3f6SCfI7UOzCkzfy5zaIaYk0yVTLcF6jcXPPoO+9iDh+fr/CGtdU/oxwwZvzRY
+         hg3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701257107; x=1701861907;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rdJXtXnkET/w2NPWWjLepq014cL4qeczUI7+mv+psAE=;
+        b=owi2PhVOuiRkQEf+QONzWlGQc5h7JEQLCH02U1P+v+g5UlSYIsoecfwfJVAqjiz0M/
+         +a7m7FlLdc957xumHW9JVHBcu6cEUdkmBsD3ee4WcCFqma2G/w0fDj3Q/194ZnxpN+j0
+         yx8qIWordtbAX4kws4ych63TlI8jJwAUKoD4U84n26S6vUwMd7gidSzNKSsY1rEq57eb
+         Z0h4vzf2AHDhs1qEPrKQSd8GtxYacZpEDT0xJyWI0JcSbdJ4fYeKgvyyrnvW6iBDL/0p
+         ESfSWLLZRz7G7EyYe+cE2P9Wimwmv/kt2eGtMlVreuHGwWrxf01q5cM9kVOBly15r/eD
+         EB0A==
+X-Gm-Message-State: AOJu0YwcTSWTPai4A5gKzvgGgh+AZR1aGf/V4Rantu2IsBcmfyVmcg54
+	0ZTfhOI6qyKbeU7QUJXNlnFkVQBhdMq8hw==
+X-Google-Smtp-Source: AGHT+IFs6PBD0/Vgixcxfx5RpeTW40MYnffaOK6A2XQRKfj25t5ksF3Bj10UoM/UruWwlfqUaG5EmA==
+X-Received: by 2002:ac8:1016:0:b0:423:a9a5:da99 with SMTP id z22-20020ac81016000000b00423a9a5da99mr14711040qti.13.1701257107249;
+        Wed, 29 Nov 2023 03:25:07 -0800 (PST)
+Received: from [172.17.0.2] ([20.109.39.22])
+        by smtp.gmail.com with ESMTPSA id fu26-20020a05622a5d9a00b004166905aa2asm5439980qtb.28.2023.11.29.03.25.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Nov 2023 03:25:07 -0800 (PST)
+Message-ID: <65671f93.050a0220.7e112.58fd@mx.google.com>
+Date: Wed, 29 Nov 2023 03:25:07 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============7277900391942956462=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Outbound-SMTP-Client: 10.47.29.164, [10.47.29.164]
-X-Outbound-Node: aer-core-7.cisco.com
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pwaago@cisco.com
+Subject: RE: [BlueZ] adapter: Enable SSP after enabling BREDR
+In-Reply-To: <20231129101627.1742015-1-pwaago@cisco.com>
+References: <20231129101627.1742015-1-pwaago@cisco.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-When enabling Secure Simple Pairing, the kernel first checks if
-BREDR is enabled. If it's not, enabling SSP fails. Therefore, it
-is necessary to make sure that BREDR is enabled before enabling
-SSP.
+--===============7277900391942956462==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Without this fix, bluetoothd would start without SSP enabled if
-started in dual or bredr mode after it had been run in le mode.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=805204
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.44 seconds
+GitLint                       PASS      0.30 seconds
+BuildEll                      PASS      23.91 seconds
+BluezMake                     PASS      557.52 seconds
+MakeCheck                     PASS      10.82 seconds
+MakeDistcheck                 PASS      152.48 seconds
+CheckValgrind                 PASS      210.35 seconds
+CheckSmatch                   PASS      312.14 seconds
+bluezmakeextell               PASS      96.32 seconds
+IncrementalBuild              PASS      510.60 seconds
+ScanBuild                     PASS      883.24 seconds
+
+
+
 ---
- src/adapter.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 2c3cf7600..86fff72bc 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -10229,12 +10229,12 @@ static void read_info_complete(uint8_t status, uint16_t length,
- 
- 	switch (btd_opts.mode) {
- 	case BT_MODE_DUAL:
--		if (missing_settings & MGMT_SETTING_SSP)
--			set_mode(adapter, MGMT_OP_SET_SSP, 0x01);
- 		if (missing_settings & MGMT_SETTING_LE)
- 			set_mode(adapter, MGMT_OP_SET_LE, 0x01);
- 		if (missing_settings & MGMT_SETTING_BREDR)
- 			set_mode(adapter, MGMT_OP_SET_BREDR, 0x01);
-+		if (missing_settings & MGMT_SETTING_SSP)
-+			set_mode(adapter, MGMT_OP_SET_SSP, 0x01);
- 		break;
- 	case BT_MODE_BREDR:
- 		if (!(adapter->supported_settings & MGMT_SETTING_BREDR)) {
-@@ -10243,10 +10243,10 @@ static void read_info_complete(uint8_t status, uint16_t length,
- 			goto failed;
- 		}
- 
--		if (missing_settings & MGMT_SETTING_SSP)
--			set_mode(adapter, MGMT_OP_SET_SSP, 0x01);
- 		if (missing_settings & MGMT_SETTING_BREDR)
- 			set_mode(adapter, MGMT_OP_SET_BREDR, 0x01);
-+		if (missing_settings & MGMT_SETTING_SSP)
-+			set_mode(adapter, MGMT_OP_SET_SSP, 0x01);
- 		if (adapter->current_settings & MGMT_SETTING_LE)
- 			set_mode(adapter, MGMT_OP_SET_LE, 0x00);
- 		break;
--- 
-2.42.1
 
+--===============7277900391942956462==--
