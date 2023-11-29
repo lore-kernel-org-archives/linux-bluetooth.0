@@ -1,134 +1,181 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EcbFTBN/"
-Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33516F4
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Nov 2023 09:37:44 -0800 (PST)
-Received: by mail-qt1-x832.google.com with SMTP id d75a77b69052e-42033328ad0so281621cf.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Nov 2023 09:37:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701279463; x=1701884263; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=FfOkgKNEqZq5/XSsVUr5ioDzr4DYK29AjLztrA8lPRo=;
-        b=EcbFTBN/vEGXqYkKOqIGief5UrDs2a3TgOD0KZZVajNKO0nqBlWt++mQBGIrnLtwMF
-         6IlT4qqWw8S7HU7OQ5rSGzm6OSaAMMsYbfYHmtYHuSvpZg5NNGKyIdPl4j7poQSiWRdC
-         dshytfSlYPDhCL5jExeJwl8/aZBGnfz0hbVDsh4f4ZOSr4zdX1nVZgOvm0CyC8699pyl
-         Nt8N1Yfd28AWZPwbOW5VB5wkMyuik8B2aTV91S3++8ZkiEZ5ubQ/MmOYdNfWliqlRqWj
-         wM1ZPiTpdD+6lMCRus9fUJr52rs9+4g7YbVHRLx/wNNNrJplk1FHdeNb41dL45EQ9FDJ
-         Jjwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701279463; x=1701884263;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FfOkgKNEqZq5/XSsVUr5ioDzr4DYK29AjLztrA8lPRo=;
-        b=w1DDZLF4YUPYIgzLz8GDJ7o38/5d7HXpsR+3v3D5qJYfFqDw+T1KTqewpM5ZHdd2ZL
-         spr0EddfuczUljyBScXfqHkkAjaiyJj5EFSZemXJhsnOJCnHg8mRsxJm8ZWkM4eqr/nA
-         LmfgX0LBBcrd5jReegMnLBFUAD6jQ9b4xM0wQk4Lv22q+HJh8rvw85aP2mglmjnhTwHH
-         2B3RRIjSIf3ZH79zvdNFpBDXnMqNGfj3agdVL0rcwY3anQL0VhymFtz7gXDQIEn08nWo
-         /6gp2iR+F+votb3XXaakpXthLd57tGDh8uu2IBVAL2ilPz08hSktb4Q3e5EaelpvOv0J
-         fvGg==
-X-Gm-Message-State: AOJu0YydMl/dcmTWjyzZH7YLqZCmz31PLAoSjrXpRDiRjRJuG4tK2Pzl
-	DlOS7agAMTH5Y8yUhOFrGjP13nABAVU=
-X-Google-Smtp-Source: AGHT+IG6s989R779S+IQ5dSeMc2E+29ETwOQurf0qngBAd/YNaL5rjK3HjUDRaA/JTNsDr4YvnGDVw==
-X-Received: by 2002:a05:622a:410c:b0:423:b92a:7fb5 with SMTP id cc12-20020a05622a410c00b00423b92a7fb5mr16442528qtb.12.1701279463022;
-        Wed, 29 Nov 2023 09:37:43 -0800 (PST)
-Received: from [172.17.0.2] ([172.183.91.41])
-        by smtp.gmail.com with ESMTPSA id ay30-20020a05622a229e00b00423a0d10d4csm4498106qtb.62.2023.11.29.09.37.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Nov 2023 09:37:42 -0800 (PST)
-Message-ID: <656776e6.050a0220.4ac15.59a8@mx.google.com>
-Date: Wed, 29 Nov 2023 09:37:42 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4996191637333534455=="
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MPer4PS3"
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E1ADC1
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Nov 2023 14:32:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701297167; x=1732833167;
+  h=date:from:to:cc:subject:message-id;
+  bh=4yiOQhaSv8wJhur+ZDnyNn4pRSC0F4xsiwaXB4FNLCI=;
+  b=MPer4PS3sCvM9YkxRBQJuU1RKo2MzicQiMuX9dZQFdPRCbd1BYDLOuqm
+   XYCJUpDVTf1ZPyNQF2+YpESCr2LAWVL2zg6jBpRN4OFYn5hTWXEpganzo
+   7TpCDk1jYv7zxgGPUSUqazYBSXl/wT/RwbaYYFAEJqGbS4CPPSUWJnxGT
+   yCrk2iojsXIA6BQqsr+BTICRFu6Yo/+vKpOJejcQseTvx1LeXtZzlUAHb
+   EeM7D2c2yoLv+KvzXs4CE7VIawkrW29g2c0CNrWreaq25DibUXmt+6UxT
+   QHbeQyZlfSuAvjPm+6uyGVyQ1As7e0qEspVcpZGFj39JsVwYJb0X8LZvO
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10909"; a="6508114"
+X-IronPort-AV: E=Sophos;i="6.04,237,1695711600"; 
+   d="scan'208";a="6508114"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 14:32:47 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.04,237,1695711600"; 
+   d="scan'208";a="17168536"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by orviesa001.jf.intel.com with ESMTP; 29 Nov 2023 14:32:47 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1r8T6p-0000ui-31;
+	Wed, 29 Nov 2023 22:32:43 +0000
+Date: Thu, 30 Nov 2023 06:32:11 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ ab3d463ded5dfd81227fc998910c40913ce17616
+Message-ID: <202311300609.cW5jb6q9-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1,1/2] test-micp: Fix endianess error
-In-Reply-To: <20231129163041.2075184-1-luiz.dentz@gmail.com>
-References: <20231129163041.2075184-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
 
---===============4996191637333534455==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: ab3d463ded5dfd81227fc998910c40913ce17616  Bluetooth: hci_event: shut up a false-positive warning
 
-This is automated email and please do not reply to this email!
+elapsed time: 1613m
 
-Dear submitter,
+configs tested: 120
+configs skipped: 2
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=805347
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
----Test result---
+tested configs:
+alpha                             allnoconfig   gcc  
+alpha                            allyesconfig   gcc  
+alpha                               defconfig   gcc  
+arc                              allmodconfig   gcc  
+arc                               allnoconfig   gcc  
+arc                              allyesconfig   gcc  
+arc                          axs101_defconfig   gcc  
+arc                                 defconfig   gcc  
+arm                              allmodconfig   gcc  
+arm                               allnoconfig   gcc  
+arm                              allyesconfig   gcc  
+arm                       aspeed_g5_defconfig   gcc  
+arm                                 defconfig   clang
+arm                        realview_defconfig   gcc  
+arm64                            allmodconfig   clang
+arm64                             allnoconfig   gcc  
+arm64                               defconfig   gcc  
+csky                             allmodconfig   gcc  
+csky                              allnoconfig   gcc  
+csky                             allyesconfig   gcc  
+csky                                defconfig   gcc  
+hexagon                          allmodconfig   clang
+hexagon                           allnoconfig   clang
+hexagon                          allyesconfig   clang
+hexagon                             defconfig   clang
+i386                             allmodconfig   clang
+i386                              allnoconfig   clang
+i386                             allyesconfig   clang
+i386                                defconfig   gcc  
+i386                  randconfig-011-20231130   clang
+i386                  randconfig-012-20231130   clang
+i386                  randconfig-013-20231130   clang
+i386                  randconfig-014-20231130   clang
+i386                  randconfig-015-20231130   clang
+i386                  randconfig-016-20231130   clang
+loongarch                        allmodconfig   gcc  
+loongarch                         allnoconfig   gcc  
+loongarch                           defconfig   gcc  
+m68k                             allmodconfig   gcc  
+m68k                              allnoconfig   gcc  
+m68k                             allyesconfig   gcc  
+m68k                         amcore_defconfig   gcc  
+m68k                       bvme6000_defconfig   gcc  
+m68k                                defconfig   gcc  
+m68k                        m5407c3_defconfig   gcc  
+microblaze                       allmodconfig   gcc  
+microblaze                        allnoconfig   gcc  
+microblaze                       allyesconfig   gcc  
+microblaze                          defconfig   gcc  
+mips                              allnoconfig   clang
+mips                             allyesconfig   gcc  
+mips                      loongson3_defconfig   gcc  
+nios2                            allmodconfig   gcc  
+nios2                             allnoconfig   gcc  
+nios2                            allyesconfig   gcc  
+nios2                               defconfig   gcc  
+openrisc                          allnoconfig   gcc  
+openrisc                         allyesconfig   gcc  
+openrisc                            defconfig   gcc  
+parisc                           allmodconfig   gcc  
+parisc                            allnoconfig   gcc  
+parisc                           allyesconfig   gcc  
+parisc                              defconfig   gcc  
+parisc64                            defconfig   gcc  
+powerpc                          allmodconfig   clang
+powerpc                           allnoconfig   gcc  
+powerpc                          allyesconfig   clang
+powerpc                     ep8248e_defconfig   gcc  
+powerpc                    klondike_defconfig   gcc  
+powerpc                     mpc83xx_defconfig   gcc  
+riscv                            allmodconfig   gcc  
+riscv                             allnoconfig   clang
+riscv                            allyesconfig   gcc  
+riscv                               defconfig   gcc  
+riscv                    nommu_k210_defconfig   gcc  
+riscv                          rv32_defconfig   clang
+s390                             allmodconfig   gcc  
+s390                              allnoconfig   gcc  
+s390                             allyesconfig   gcc  
+s390                                defconfig   gcc  
+sh                               allmodconfig   gcc  
+sh                                allnoconfig   gcc  
+sh                               allyesconfig   gcc  
+sh                                  defconfig   gcc  
+sparc                            allmodconfig   gcc  
+sparc64                          allmodconfig   gcc  
+sparc64                          allyesconfig   gcc  
+sparc64                             defconfig   gcc  
+um                               allmodconfig   clang
+um                                allnoconfig   clang
+um                               allyesconfig   clang
+um                                  defconfig   gcc  
+um                             i386_defconfig   gcc  
+um                           x86_64_defconfig   gcc  
+x86_64                            allnoconfig   gcc  
+x86_64                           allyesconfig   clang
+x86_64       buildonly-randconfig-001-20231130   gcc  
+x86_64       buildonly-randconfig-002-20231130   gcc  
+x86_64       buildonly-randconfig-003-20231130   gcc  
+x86_64       buildonly-randconfig-004-20231130   gcc  
+x86_64       buildonly-randconfig-005-20231130   gcc  
+x86_64       buildonly-randconfig-006-20231130   gcc  
+x86_64                              defconfig   gcc  
+x86_64                                  kexec   gcc  
+x86_64                randconfig-011-20231130   gcc  
+x86_64                randconfig-012-20231130   gcc  
+x86_64                randconfig-013-20231130   gcc  
+x86_64                randconfig-014-20231130   gcc  
+x86_64                randconfig-015-20231130   gcc  
+x86_64                randconfig-016-20231130   gcc  
+x86_64                randconfig-071-20231130   gcc  
+x86_64                randconfig-072-20231130   gcc  
+x86_64                randconfig-073-20231130   gcc  
+x86_64                randconfig-074-20231130   gcc  
+x86_64                randconfig-075-20231130   gcc  
+x86_64                randconfig-076-20231130   gcc  
+x86_64                          rhel-8.3-rust   clang
+x86_64                               rhel-8.3   gcc  
+xtensa                            allnoconfig   gcc  
+xtensa                  cadence_csp_defconfig   gcc  
 
-Test Summary:
-CheckPatch                    FAIL      1.04 seconds
-GitLint                       PASS      0.57 seconds
-BuildEll                      PASS      24.38 seconds
-BluezMake                     PASS      558.67 seconds
-MakeCheck                     PASS      10.92 seconds
-MakeDistcheck                 PASS      151.97 seconds
-CheckValgrind                 PASS      212.07 seconds
-CheckSmatch                   PASS      319.44 seconds
-bluezmakeextell               PASS      97.57 seconds
-IncrementalBuild              PASS      1026.37 seconds
-ScanBuild                     PASS      925.83 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,v1,1/2] test-micp: Fix endianess error
-WARNING:TYPO_SPELLING: 'endianess' may be misspelled - perhaps 'endianness'?
-#57: 
-Subject: [PATCH BlueZ v1 1/2] test-micp: Fix endianess error
-                                             ^^^^^^^^^
-
-/github/workspace/src/src/13473187.patch total: 0 errors, 1 warnings, 8 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13473187.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[BlueZ,v1,2/2] shared/vcp: Fix endianess errors
-WARNING:TYPO_SPELLING: 'endianess' may be misspelled - perhaps 'endianness'?
-#59: 
-Subject: [PATCH BlueZ v1 2/2] shared/vcp: Fix endianess errors
-                                              ^^^^^^^^^
-
-/github/workspace/src/src/13473188.patch total: 0 errors, 1 warnings, 68 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13473188.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4996191637333534455==--
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
