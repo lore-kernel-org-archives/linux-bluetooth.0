@@ -1,118 +1,109 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Ykxj63uN"
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A1B3268E
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Nov 2023 00:29:44 -0800 (PST)
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AT4rSuR017011;
-	Wed, 29 Nov 2023 08:29:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-type; s=qcppdkim1;
- bh=96kKdDSK2qP4aCK6j4CMWfy/CYikfN77AJe38L0cZLI=;
- b=Ykxj63uNQbTKa8FbsLwYGhfXC6d359Rqgf+oTiCrkX/wk4orjA2sjAgTHQZFC11CO8Bj
- FKGqOTEMBpbr3hAi7Jp9dNQ7iBVUrvfifjCICmhkRfi6+XI+CCuISn7ZGFCf7xVXQb/2
- wtyzNVNDTn25Aym0WQK6ZeYZ6KjZC6+gcUCGi53VFDalBIDdih+/UG6oO/AZSV8Q5QIx
- PnwfGsg4YAbpFWywq2KZW0b4NPue0MNYzmKESpOjXw1dIcH54QRHu4MjtZj1UiUK3GhN
- mmyzxPOS6NL0g82Wteuor/emivRkdCNA6nUyq1u6wBKuiPKmcoaGz9mOFGAqbHqi9rhP Nw== 
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3unnpesng7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 29 Nov 2023 08:29:42 +0000
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AT8TfoT029666
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 29 Nov 2023 08:29:41 GMT
-Received: from zijuhu-gv.qualcomm.com (10.80.80.8) by
- nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Wed, 29 Nov 2023 00:29:39 -0800
-From: Zijun Hu <quic_zijuhu@quicinc.com>
-To: <luiz.dentz@gmail.com>, <marcel@holtmann.org>, <johan.hedberg@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>, <quic_zijuhu@quicinc.com>,
-        Zijun Hu
-	<zijuhu@qti.qualcomm.com>
-Subject: [PATCH v3 2/2] Bluetooth: qca: Support SCO offload for QCA2066
-Date: Wed, 29 Nov 2023 16:29:30 +0800
-Message-ID: <1701246570-3564-3-git-send-email-quic_zijuhu@quicinc.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1701246570-3564-1-git-send-email-quic_zijuhu@quicinc.com>
-References: <1701245906-10660-1-git-send-email-quic_zijuhu@quicinc.com>
- <1701246570-3564-1-git-send-email-quic_zijuhu@quicinc.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bvxR6msV"
+Received: from mail-vs1-xe30.google.com (mail-vs1-xe30.google.com [IPv6:2607:f8b0:4864:20::e30])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BBC81BC1
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Nov 2023 00:35:37 -0800 (PST)
+Received: by mail-vs1-xe30.google.com with SMTP id ada2fe7eead31-4644564375eso253020137.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Nov 2023 00:35:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701246936; x=1701851736; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=FqbP6eNslyUTHB9UWxMcoN5y7W3LYhIeu+4J5+l/x64=;
+        b=bvxR6msVXxFkr6XcUuoZ++QNR5F7iekvZAdsB/kLcqZlOrIVJiM92dhOuVvZ1eGEDL
+         Pi7/9lTeDe7Bnog7lAluTaODmFAdwOT378bJU0OEMd/qxEKipJoq/I3Y7uRoYpyzMPZ8
+         Gcnh4tBvb7FKdQmnSPV5pUrkqcx2N3328A5ta35OgOe/O94I0JVHUBZ7RcG3yszMi1UX
+         Z6cnXyZhlu5ZYW14IvoeZzd5mk5VG7I4ST7+dF9TfPBB/87XsC7nKSH2Zdc4fSvtiH8i
+         GdgZT66NGxzxqXes1MetWGy9MKkzblE6a3oq0S+LDVm1eT+ZdzEUWgz7xHmGjptYvdgO
+         zaIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701246936; x=1701851736;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FqbP6eNslyUTHB9UWxMcoN5y7W3LYhIeu+4J5+l/x64=;
+        b=r6CdJy6FzqSPi1ompfGukQbSs61VbSgk1ETxFual8ts7TVvNIvZbBTZE8feZhUi63I
+         s/zA0gYbj9ZQss7EjP1oCMhPCvH2g7a3NjImqijh/KROOZ2Yv0W4BUEqZkTvDHnxf0Sr
+         nn1/TMyV52ixfQtTdoZjZk2qVHYraVpkcGeVDCiU6njq00sALRE+Xwx8Rtnvgb8fvQCn
+         dUywaeW8Dc/jiuLoxYDJthE+zYJfhOhyPhg7Ol92FTL/ib1FfIXkzTUQ7MKzYL/amvG4
+         JbuoecpYK3mJN/4Qy/qmQRK5z1SfcjCQiif7USoIq5tRyV3Ns6rTiC3Wf6mM11c/w5Xa
+         2h1g==
+X-Gm-Message-State: AOJu0YwcD0XDW2lJieWY1Pl/uflH6hhLYOByCXaqFAePB3+tSFwWj5bg
+	gXhiRMiSNYJcCcf56R15yVd+qkQCTrA=
+X-Google-Smtp-Source: AGHT+IHKMJtGUyCkiU4rriRhVds+xVp4/IxUVSo0rt2+SmpRuMkPUMJ7ZaxalE4kbuBeEqaDw4hNPg==
+X-Received: by 2002:a05:6102:3bc8:b0:464:4484:1de3 with SMTP id a8-20020a0561023bc800b0046444841de3mr2428824vsv.4.1701246936123;
+        Wed, 29 Nov 2023 00:35:36 -0800 (PST)
+Received: from [172.17.0.2] ([40.71.163.67])
+        by smtp.gmail.com with ESMTPSA id e12-20020a05620a12cc00b0077dca8ed9a4sm536513qkl.133.2023.11.29.00.35.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Nov 2023 00:35:36 -0800 (PST)
+Message-ID: <6566f7d8.050a0220.4655b.1c60@mx.google.com>
+Date: Wed, 29 Nov 2023 00:35:36 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============2379337752371647523=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: uVj9aWfeq8pyZNA_GZobOqoKtxKdbqFR
-X-Proofpoint-ORIG-GUID: uVj9aWfeq8pyZNA_GZobOqoKtxKdbqFR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-29_06,2023-11-27_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 impostorscore=0
- mlxscore=0 phishscore=0 mlxlogscore=999 priorityscore=1501 adultscore=0
- clxscore=1015 bulkscore=0 malwarescore=0 suspectscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311060000
- definitions=main-2311290062
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, quic_zijuhu@quicinc.com
+Subject: RE: Bluetooth: Support SCO offload for QCA2066
+In-Reply-To: <1701245255-12409-2-git-send-email-quic_zijuhu@quicinc.com>
+References: <1701245255-12409-2-git-send-email-quic_zijuhu@quicinc.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-In order to support SCO offload for QCA2066, ALL BTHOST needs to do
-is specifying both Input_Data_Path and Output_Data_Path as 0x01 for
-HCI_Enhanced_Setup_Synchronous_Connection, and it is implemented by
-this change.
+--===============2379337752371647523==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=805140
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.33 seconds
+GitLint                       FAIL      0.89 seconds
+SubjectPrefix                 PASS      0.24 seconds
+BuildKernel                   PASS      27.02 seconds
+CheckAllWarning               PASS      29.61 seconds
+CheckSparse                   PASS      34.81 seconds
+CheckSmatch                   PASS      97.72 seconds
+BuildKernel32                 PASS      26.45 seconds
+TestRunnerSetup               PASS      410.97 seconds
+TestRunner_l2cap-tester       PASS      22.93 seconds
+TestRunner_iso-tester         PASS      48.04 seconds
+TestRunner_bnep-tester        PASS      6.91 seconds
+TestRunner_mgmt-tester        PASS      166.21 seconds
+TestRunner_rfcomm-tester      PASS      14.04 seconds
+TestRunner_sco-tester         PASS      14.48 seconds
+TestRunner_ioctl-tester       PASS      12.16 seconds
+TestRunner_mesh-tester        PASS      8.81 seconds
+TestRunner_smp-tester         PASS      9.77 seconds
+TestRunner_userchan-tester    PASS      7.34 seconds
+IncrementalBuild              PASS      30.02 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v2,1/2] Bluetooth: hci_conn: Check non NULL before calling hdev->get_codec_config_data()
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (89>80): "[v2,1/2] Bluetooth: hci_conn: Check non NULL before calling hdev->get_codec_config_data()"
+
+
 ---
- drivers/bluetooth/hci_qca.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 35f74f209d1f..970b1bcf7dde 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1815,6 +1815,26 @@ static void hci_coredump_qca(struct hci_dev *hdev)
- 	kfree_skb(skb);
- }
- 
-+static int qca_get_data_path_id(struct hci_dev *hdev, __u8 *data_path_id)
-+{
-+	/* QCA uses 1 as non-HCI data path id for HFP */
-+	*data_path_id = 1;
-+	return 0;
-+}
-+
-+static int qca_configure_sco_offload(struct hci_dev *hdev)
-+{
-+	bt_dev_info(hdev, "HFP non-HCI data transport is supported");
-+	hdev->get_data_path_id = qca_get_data_path_id;
-+	/* Do not need to send HCI_Configure_Data_Path to configure QCA non-HCI
-+	 * data transport since HCI_Enhanced_Setup_Synchronous_Connection is
-+	 * enough for QCA controller to configure HFP data transport, so set
-+	 * below field as NULL.
-+	 */
-+	hdev->get_codec_config_data = NULL;
-+	return 0;
-+}
-+
- static int qca_setup(struct hci_uart *hu)
- {
- 	struct hci_dev *hdev = hu->hdev;
-@@ -1969,6 +1989,10 @@ static int qca_setup(struct hci_uart *hu)
- 		hu->hdev->set_bdaddr = qca_set_bdaddr_rome;
- 	else
- 		hu->hdev->set_bdaddr = qca_set_bdaddr;
-+
-+	if (soc_type == QCA_QCA2066)
-+		qca_configure_sco_offload(hdev);
-+
- 	qca->fw_version = le16_to_cpu(ver.patch_ver);
- 	qca->controller_id = le16_to_cpu(ver.rom_ver);
- 	hci_devcd_register(hdev, hci_coredump_qca, qca_dmp_hdr, NULL);
--- 
-The Qualcomm Innovation Center
 
+--===============2379337752371647523==--
