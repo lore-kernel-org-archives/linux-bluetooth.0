@@ -1,134 +1,132 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R5KN56ql"
-Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4687810E3
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Nov 2023 07:09:08 -0800 (PST)
-Received: by mail-qt1-x830.google.com with SMTP id d75a77b69052e-4219f89ee21so37946321cf.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Nov 2023 07:09:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701270547; x=1701875347; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZNBMPqnIAFgG4chgKIt/IAtltz919Toh1hIasjKqxw0=;
-        b=R5KN56qlQRjZznYVa/u7l+0OJQZYM8VjdbizKAzmB8+XF26D9ur36XNP25EccOhKVa
-         Ftifwtn/dMdH20xllT69IE/YbuRe3t5S4+1C6HbK2Z9dYSbl9PgZaMX98KsIu+sTcRSH
-         z8JWj/Jswiqsj50203SakJUlmI7UZLKGe2BWnJjpTaknea/y9XSx7fRb/gZS/7GBBFnJ
-         QtMzhdltk6A2NuA6VX/oLzUc1KbQnKPuStEmteicG+tFt4E386V4jIlU7DXtTThxKGq7
-         Abd0bFqT5MtjgEs+49sQclmqHpjOrBOxM9q2C+einfXVzA0luYtIGCby0HITXkm32UhS
-         uPKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701270547; x=1701875347;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZNBMPqnIAFgG4chgKIt/IAtltz919Toh1hIasjKqxw0=;
-        b=VAhs8lGb8lTUGwvP9iBbi7gyHWsDm+hrp2r1LUqhB/1IIbgRGSEuqcm2i1EYwXioKw
-         MpKz4vAci/+JDT1zTqcnEq2j5XjukCk0q/o6QxvsLQdmGB6aneQIlrEvX0titMeheiF2
-         g6btC1lEEBESR9QYWD9iicS8lSgYUmeysnv4yXM0UvJwHRziyPl0mTBVp32JgAxzKyuE
-         INFbOmHdUkTB7Ey1vdGMeBZIHVr6CLgskoXKkYU2H/IblrwUFApPCu3KxMKRe/j+sUw9
-         KCnCtLxPlqD4HrnLdp5y1kxHjgyT9gCEx88Y25c7IZziBNWraxciTYN/J5lLQED8JXVZ
-         bBAQ==
-X-Gm-Message-State: AOJu0YyPd9Gt925j8vk/m8yFw4gvLuuxp4Qi4ZtWuWZkOW999W3jh2nR
-	AlIEHn3KE74yVOttQpSJ7YIycGwStMQ=
-X-Google-Smtp-Source: AGHT+IE2r8N/YjmJdwqUinHDkhtl+bV/y+wQuq6uwp0XuT2HqkNhK5Ws2gf09XAkUCkakSI+nvlDKA==
-X-Received: by 2002:a05:622a:1055:b0:421:c349:73f6 with SMTP id f21-20020a05622a105500b00421c34973f6mr21513888qte.22.1701270547083;
-        Wed, 29 Nov 2023 07:09:07 -0800 (PST)
-Received: from [172.17.0.2] ([40.76.254.131])
-        by smtp.gmail.com with ESMTPSA id eq9-20020a05622a5e0900b00423f1f9a76esm295173qtb.38.2023.11.29.07.09.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Nov 2023 07:09:06 -0800 (PST)
-Message-ID: <65675412.050a0220.36254.22b2@mx.google.com>
-Date: Wed, 29 Nov 2023 07:09:06 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1218497108600694466=="
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="SkmqTOt+"
+Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2068.outbound.protection.outlook.com [40.107.105.68])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E9D610CE
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Nov 2023 08:28:49 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WH9Hxcs5n/KUGNo2aj8AOD1sICGKsKgBirFE5nu7/Am3IufYkxLUvaJBLqJI4zHun64/hObukU7MCiZXVZkf1VN8UoN82C89OFJeOKOQOqoJoZKzITlV6HEcKm9vQcPe9IsYrFmNN+AsWgqGmBaq2WKOpe6rfI3aZI/QXTScmDr3YWrCmugMkP7EXAPcM1y1XxOKgpuyj5gGrgmnH9i+8TYR26DaOVMeQADn/OL1+7ZzSuaOqRkykHEjpZsZuW40rnHHsE1P0R/TFQueSkUb3MSoKqpqMD/zowDT7OGTrNDDlQUl9dwZrxJoFZxbl4cTE4rd8Bfp6Ddai+lv46Jc2Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Ki/0l0YXHZj1ymn7SHBdxEPBP0HzW8tYpy+QlRkmtfw=;
+ b=UTg6Vw7cHPsomv6I769O11ZxGgl2uxIW4PI00Z/w8pYVRuUvzpP7QGJgz8/OH+43dV1Nx1hh+mOAfx1vIQxv8AyZOJJmZZ9jUiuWaZc/SSbW6ox9qERJ3zJXO5umaHZoQEmY99cmZdhgDyIXcsOwVzuYycvZrrrq3prviT4BR5Mgv+8wbtOeCYc4etBXn9MvGGbGUJrbQvw2qvF7VyoYD7BZZqWDI9Q49SLubH6V8qhIGg6uqXeGdjMSiCYuAG27zFBp0/+Bur/931vl5E2VySa0EdpUySQOJ9e0TFkeaoPTZEU9WqCqz6738LTHmekX69SbonkTsZPiWr4qYiGZtA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ki/0l0YXHZj1ymn7SHBdxEPBP0HzW8tYpy+QlRkmtfw=;
+ b=SkmqTOt+2oQNwj0xlqfAVPt1blUWjF4LbQFyH7tzlllC3Nu8oZ++jGPl/KUyF1NYTzEq+K+RUf1agNeYm0BiLi60NKBaIirmOWOAHuiIFcxdNRzkmwqXMqyna9PpwJLGtKco6NsPVrVmqlI2qc4dCLdSef5eTNdkkhQMhdJXyU0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
+ by PAXPR04MB8302.eurprd04.prod.outlook.com (2603:10a6:102:1ca::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.23; Wed, 29 Nov
+ 2023 16:28:46 +0000
+Received: from AS8PR04MB8898.eurprd04.prod.outlook.com
+ ([fe80::25a:e1cd:f957:6e7d]) by AS8PR04MB8898.eurprd04.prod.outlook.com
+ ([fe80::25a:e1cd:f957:6e7d%3]) with mapi id 15.20.7046.015; Wed, 29 Nov 2023
+ 16:28:46 +0000
+From: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: claudia.rosu@nxp.com,
+	mihai-octavian.urzica@nxp.com,
+	silviu.barbulescu@nxp.com,
+	vlad.pruteanu@nxp.com,
+	andrei.istodorescu@nxp.com,
+	luiz.dentz@gmail.com,
+	Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Subject: [PATCH 0/1] Bluetooth: ISO: Avoid creating child socket if PA sync is terminating
+Date: Wed, 29 Nov 2023 18:28:41 +0200
+Message-Id: <20231129162842.3596-1-iulia.tanasescu@nxp.com>
+X-Mailer: git-send-email 2.39.2
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BEXP281CA0016.DEUP281.PROD.OUTLOOK.COM (2603:10a6:b10::26)
+ To AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, mahesh.talewad@nxp.com
-Subject: RE: Implementation of AICS
-In-Reply-To: <20231129134058.70612-2-mahesh.talewad@nxp.com>
-References: <20231129134058.70612-2-mahesh.talewad@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|PAXPR04MB8302:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3f1f177c-96ec-43a1-3b43-08dbf0f842ce
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	Y9oHtDCVLEm7sRafFpvk+EybvkVbNdHRHZSSa3NNhwzqY1PzFjSa9ohUvAGLX0EE4/m0tgdb6+YYrLxSUcn+emdrHIwby1JwRTkvfzNpQuLYYjStoBEyQVes89VBOU7L+ab9Ige13ERTpEMnOzKG0fFUNl6xI7RVxPZHbb4fOuAhav01g5Tb6rFFt/J+kihfp8GH3jhMZqedsPqdW0KunP7wKOlcaU4Q+3jFozONfTtcoJGPDhaJJCozSzXQ/jzAPw0jNInxPGpFqabj9+zdNEJ6RKVaY2A0rcU45UUJwKq9v0LqfzNLBbjejXYMurQ53k/RP95DILo9YVrwXIFNmPNSmM9JzOpksxk6AReHJw1F+S4AC3UfrYkukp+49bZOhS/8fZbSlndeIUemsjBJYrRIKk86LB0Eim/1TG4wG8OkRSGegjnIWWBO6X+cz91IZr+22+jZj/faIJrwtlMV9PGQ7orQjwvSZePCPlSQ549IlBsGL3gJh7Qf4QV3TGo9gyeLBSlDjBYEnehj9pL48sxb/PnyGLlOLyc3T2mg2b2VaHEiY5a37Cfoqn4bSOXO
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(346002)(39860400002)(366004)(136003)(376002)(230922051799003)(64100799003)(451199024)(186009)(1800799012)(44832011)(6666004)(6506007)(86362001)(4744005)(2906002)(6512007)(36756003)(478600001)(6486002)(5660300002)(41300700001)(83380400001)(38100700002)(2616005)(1076003)(26005)(66556008)(66946007)(6916009)(316002)(66476007)(4326008)(8936002)(8676002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?aHpfKA8ZoFtjn+iQMI2eNRe8m0XnjrNkd/vbwrvZdWPZo1Y9p49V5OJat+2p?=
+ =?us-ascii?Q?Y6aE66zI6ED0WgRmxu/JPtzC4GwJzwamJ4U1ctwNJiEl3uGHDrWjQAFXyzoc?=
+ =?us-ascii?Q?lRMR2RsRKSq/c+MXyN37Ndw/Igrj0v3ToqksqE5tIU9du0YWyMIxfcdUkZ6P?=
+ =?us-ascii?Q?uaHNi3cRKY4+V7IHR6YiRP0eZUJHaIj9J9dpJ5t0wzLjqEo0XDVIucBh4QOk?=
+ =?us-ascii?Q?7OcmTO6na4PaC/0jiINq9rAplgt7C6YTca2raWhcrxoxHQZDxCF2xTIlB0LR?=
+ =?us-ascii?Q?/T14JPa7YktqI2HdgIW7IEJtP+GQjQrLhom+WDft/jwFvICBPw2dLt6kOD7D?=
+ =?us-ascii?Q?stmiDRzdHhe9G9VV5XZ+4ui5jP/LzNh67mtInX3ODYx7FD9ThjBX6lbgf+7d?=
+ =?us-ascii?Q?4yKVbyuEkot9oa+4LtOI1Njp7xA9c5P4zctXYqaBOyhN3LpNPV8dIk3JTSrT?=
+ =?us-ascii?Q?/m1Ie08pjCbGZG+fA2AlaUBcmgiNY1eXDsKI22zdiWscvuDNyFAvqnpSl3Yr?=
+ =?us-ascii?Q?NHaE2Zn3dRNagaAb7P6v9LynkzE9BvgUVhdBX9LL0plvmXzL1xvIhOs7AQ/M?=
+ =?us-ascii?Q?Ow+RXWFMlsjYOPzeHs3aCVHYearPctqXoaKMbrjnzyBvOuLoONHVjcHBZ8RR?=
+ =?us-ascii?Q?glGkojVQ0ZmkJwIk8GGxQfVegrxcZcOZhZ3cNA61MKD0SovR75CZQQwRlxTv?=
+ =?us-ascii?Q?GOTNHDvNH0auSFEkK9u69ruE+z7H+M6JgYoGmRhtjc8d8khLQUV8btV97plF?=
+ =?us-ascii?Q?MeZhNGqeeoG1/L5GlHIElIOAPPFueXCszjaqQbzj39wbxZG2fhZZn3dygUjd?=
+ =?us-ascii?Q?JM783bL250s9Z7/RlYFA7qEPgRb8ntsGBydqrJhYh4kpRwCrCDyCC1E/5XEV?=
+ =?us-ascii?Q?MxbmdTPZmMtonkIFB0uYCUAnNjCQL/s3NkNY0BizuAB6p50jU8zI5dIJBdA8?=
+ =?us-ascii?Q?GQd08yi21T3PwELhdPcBGHZTlaZJoRG4PowdnhlljRCt9OkC89M4e5AcH88j?=
+ =?us-ascii?Q?V/fsn0sAwXSQWMAxWwfCLVVbw6JKSUEDznpJQFCUiag2W8d1fweBJ9n77S42?=
+ =?us-ascii?Q?UVQTvjm2DbrSey8gUOaAlrO/fB0v5q8e+RHx3Tw0cQxfVST6lovtxE7gc+X4?=
+ =?us-ascii?Q?Rfg8hkqOGx063VL1LSrKGyVG7dJHD3DNL+NOBXMMDU1FroTYBPcvrJOxPfyk?=
+ =?us-ascii?Q?2aL/Fboqi73jHThh1waQ1U7Zs970WVIXl2nzQF7vWq5tkjSJq2YT5LMLpVwA?=
+ =?us-ascii?Q?0Zunwo3E6qEtbpiDr8asf8Kr8F7ybub5f2As9cgsUEGg0g7y5NXX2NUdXAPa?=
+ =?us-ascii?Q?epL/+iJwse7OiDPFsWMab2veW7oK2BVm/+YuwAx9p/DBP/ogDc+xk/+y+YYo?=
+ =?us-ascii?Q?dCO05OdI00ntabbzuD/MHGJcsSVCW2mrmlIewCJTcLqexTVPxGjXWheBtflG?=
+ =?us-ascii?Q?S/NPyRCqAoJXCH+WEv3MA7qotiR2N0Sx9j8zAeBW1KzBse44Biva+FzY2sjY?=
+ =?us-ascii?Q?A0Fr2LiflDqSSn8Iozj3BLlJvyrBbH4mEjWG/j3JFBGH3yTEqxsrrIL6T0ul?=
+ =?us-ascii?Q?5d3KT/Ut/hOCY0AdeeVrz/+I6bf6tB1mu5uHmNDoHln2FCHMJUl+RZxaUKg+?=
+ =?us-ascii?Q?yg=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3f1f177c-96ec-43a1-3b43-08dbf0f842ce
+X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8898.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Nov 2023 16:28:46.7726
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: aPyy0e9iw0q/fXneL57NlrDcmx5v7E8zrjWcuyrX08Xki6qJqe+fYxQVEMr7PMeGONmRVE2yOJwp7QkmtwfTew==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8302
 
---===============1218497108600694466==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+When a PA sync socket is closed, the associated hcon is also unlinked
+and cleaned up. If there are no other hcons marked with the
+HCI_CONN_PA_SYNC flag, HCI_OP_LE_PA_TERM_SYNC is sent to controller.
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9ODA1Mjg0CgotLS1U
-ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
-ICBQQVNTICAgICAgMS40NCBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIEZB
-SUwgICAgICAwLjgzIHNlY29uZHMKQnVpbGRFbGwgICAgICAgICAgICAgICAgICAgICAgUEFTUyAg
-ICAgIDI0LjEzIHNlY29uZHMKQmx1ZXpNYWtlICAgICAgICAgICAgICAgICAgICAgUEFTUyAgICAg
-IDU4My4yNyBzZWNvbmRzCk1ha2VDaGVjayAgICAgICAgICAgICAgICAgICAgIEZBSUwgICAgICAx
-MC42OSBzZWNvbmRzCk1ha2VEaXN0Y2hlY2sgICAgICAgICAgICAgICAgIEZBSUwgICAgICAxMzUu
-MDUgc2Vjb25kcwpDaGVja1ZhbGdyaW5kICAgICAgICAgICAgICAgICBGQUlMICAgICAgMjEwLjU1
-IHNlY29uZHMKQ2hlY2tTbWF0Y2ggICAgICAgICAgICAgICAgICAgUEFTUyAgICAgIDMxNi40NiBz
-ZWNvbmRzCmJsdWV6bWFrZWV4dGVsbCAgICAgICAgICAgICAgIFBBU1MgICAgICA5Ni40OSBzZWNv
-bmRzCkluY3JlbWVudGFsQnVpbGQgICAgICAgICAgICAgIFBBU1MgICAgICAxMDQ5LjE0IHNlY29u
-ZHMKU2NhbkJ1aWxkICAgICAgICAgICAgICAgICAgICAgUEFTUyAgICAgIDkxNC41MSBzZWNvbmRz
-CgpEZXRhaWxzCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBHaXRMaW50IC0g
-RkFJTApEZXNjOiBSdW4gZ2l0bGludApPdXRwdXQ6CltCbHVlWix2MSwxLzJdIC0gQWRkZWQgQUlD
-UyBDaGFyYWN0ZXJpc3RpY3MgVVVJRChzKS4KCldBUk5JTkc6IEkzIC0gaWdub3JlLWJvZHktbGlu
-ZXM6IGdpdGxpbnQgd2lsbCBiZSBzd2l0Y2hpbmcgZnJvbSB1c2luZyBQeXRob24gcmVnZXggJ21h
-dGNoJyAobWF0Y2ggYmVnaW5uaW5nKSB0byAnc2VhcmNoJyAobWF0Y2ggYW55d2hlcmUpIHNlbWFu
-dGljcy4gUGxlYXNlIHJldmlldyB5b3VyIGlnbm9yZS1ib2R5LWxpbmVzLnJlZ2V4IG9wdGlvbiBh
-Y2NvcmRpbmdseS4gVG8gcmVtb3ZlIHRoaXMgd2FybmluZywgc2V0IGdlbmVyYWwucmVnZXgtc3R5
-bGUtc2VhcmNoPVRydWUuIE1vcmUgZGV0YWlsczogaHR0cHM6Ly9qb3Jpc3Jvb3ZlcnMuZ2l0aHVi
-LmlvL2dpdGxpbnQvY29uZmlndXJhdGlvbi8jcmVnZXgtc3R5bGUtc2VhcmNoCjE6IFQzIFRpdGxl
-IGhhcyB0cmFpbGluZyBwdW5jdHVhdGlvbiAoLik6ICJbQmx1ZVosdjEsMS8yXSAtIEFkZGVkIEFJ
-Q1MgQ2hhcmFjdGVyaXN0aWNzIFVVSUQocykuIgpbQmx1ZVosdjEsMi8yXSAtIENvZGUgSW1wbGVt
-ZW50YXRpb24gcmVsYXRlZCBTZXJ2aWNlLSBBSUNTLiAtIFNwZWNpZmljYXRpb24gcmVmZXJyZWQg
-Zm9yIGltcGxlbWVudGF0aW9uOiBBSUNTX3YxLjAucGRmIC0gVmVyaWZpY2F0aW9uOiBUZXN0ZWQg
-YWxsIE1hbmRhdG9yeSBQVFMgdGVzdGNhc2VzIGFuZCBhbGwgbWFuZGF0b3J5IHRlc3RjYXNlcyBw
-YXNzZWQuCgpXQVJOSU5HOiBJMyAtIGlnbm9yZS1ib2R5LWxpbmVzOiBnaXRsaW50IHdpbGwgYmUg
-c3dpdGNoaW5nIGZyb20gdXNpbmcgUHl0aG9uIHJlZ2V4ICdtYXRjaCcgKG1hdGNoIGJlZ2lubmlu
-ZykgdG8gJ3NlYXJjaCcgKG1hdGNoIGFueXdoZXJlKSBzZW1hbnRpY3MuIFBsZWFzZSByZXZpZXcg
-eW91ciBpZ25vcmUtYm9keS1saW5lcy5yZWdleCBvcHRpb24gYWNjb3JkaW5nbHkuIFRvIHJlbW92
-ZSB0aGlzIHdhcm5pbmcsIHNldCBnZW5lcmFsLnJlZ2V4LXN0eWxlLXNlYXJjaD1UcnVlLiBNb3Jl
-IGRldGFpbHM6IGh0dHBzOi8vam9yaXNyb292ZXJzLmdpdGh1Yi5pby9naXRsaW50L2NvbmZpZ3Vy
-YXRpb24vI3JlZ2V4LXN0eWxlLXNlYXJjaAoxOiBUMSBUaXRsZSBleGNlZWRzIG1heCBsZW5ndGgg
-KDIwNT44MCk6ICJbQmx1ZVosdjEsMi8yXSAtIENvZGUgSW1wbGVtZW50YXRpb24gcmVsYXRlZCBT
-ZXJ2aWNlLSBBSUNTLiAtIFNwZWNpZmljYXRpb24gcmVmZXJyZWQgZm9yIGltcGxlbWVudGF0aW9u
-OiBBSUNTX3YxLjAucGRmIC0gVmVyaWZpY2F0aW9uOiBUZXN0ZWQgYWxsIE1hbmRhdG9yeSBQVFMg
-dGVzdGNhc2VzIGFuZCBhbGwgbWFuZGF0b3J5IHRlc3RjYXNlcyBwYXNzZWQuIgoxOiBUMyBUaXRs
-ZSBoYXMgdHJhaWxpbmcgcHVuY3R1YXRpb24gKC4pOiAiW0JsdWVaLHYxLDIvMl0gLSBDb2RlIElt
-cGxlbWVudGF0aW9uIHJlbGF0ZWQgU2VydmljZS0gQUlDUy4gLSBTcGVjaWZpY2F0aW9uIHJlZmVy
-cmVkIGZvciBpbXBsZW1lbnRhdGlvbjogQUlDU192MS4wLnBkZiAtIFZlcmlmaWNhdGlvbjogVGVz
-dGVkIGFsbCBNYW5kYXRvcnkgUFRTIHRlc3RjYXNlcyBhbmQgYWxsIG1hbmRhdG9yeSB0ZXN0Y2Fz
-ZXMgcGFzc2VkLiIKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IE1ha2VDaGVj
-ayAtIEZBSUwKRGVzYzogUnVuIEJsdWV6IE1ha2UgQ2hlY2sKT3V0cHV0OgoKLi90ZXN0LWRyaXZl
-cjogbGluZSAxMDc6IDMxOTAzIEFib3J0ZWQgICAgICAgICAgICAgICAgIChjb3JlIGR1bXBlZCkg
-IiRAIiA+ICRsb2dfZmlsZSAyPiYxCm1ha2VbM106ICoqKiBbTWFrZWZpbGU6MTE2MzM6IHRlc3Qt
-c3VpdGUubG9nXSBFcnJvciAxCm1ha2VbMl06ICoqKiBbTWFrZWZpbGU6MTE3NDE6IGNoZWNrLVRF
-U1RTXSBFcnJvciAyCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6MTIxNzA6IGNoZWNrLWFtXSBFcnJv
-ciAyCm1ha2U6ICoqKiBbTWFrZWZpbGU6MTIxNzI6IGNoZWNrXSBFcnJvciAyCiMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBNYWtlRGlzdGNoZWNrIC0gRkFJTApEZXNjOiBSdW4g
-Qmx1ZXogTWFrZSBEaXN0Y2hlY2sKT3V0cHV0OgoKLi4vLi4vdGVzdC1kcml2ZXI6IGxpbmUgMTA3
-OiA1NDExMyBBYm9ydGVkICAgICAgICAgICAgICAgICAoY29yZSBkdW1wZWQpICIkQCIgPiAkbG9n
-X2ZpbGUgMj4mMQptYWtlWzRdOiAqKiogW01ha2VmaWxlOjExNjMzOiB0ZXN0LXN1aXRlLmxvZ10g
-RXJyb3IgMQptYWtlWzNdOiAqKiogW01ha2VmaWxlOjExNzQxOiBjaGVjay1URVNUU10gRXJyb3Ig
-MgptYWtlWzJdOiAqKiogW01ha2VmaWxlOjEyMTcwOiBjaGVjay1hbV0gRXJyb3IgMgptYWtlWzFd
-OiAqKiogW01ha2VmaWxlOjEyMTcyOiBjaGVja10gRXJyb3IgMgptYWtlOiAqKiogW01ha2VmaWxl
-OjEyMDkzOiBkaXN0Y2hlY2tdIEVycm9yIDEKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-ClRlc3Q6IENoZWNrVmFsZ3JpbmQgLSBGQUlMCkRlc2M6IFJ1biBCbHVleiBNYWtlIENoZWNrIHdp
-dGggVmFsZ3JpbmQKT3V0cHV0OgoKdG9vbHMvbWdtdC10ZXN0ZXIuYzogSW4gZnVuY3Rpb24g4oCY
-bWFpbuKAmToKdG9vbHMvbWdtdC10ZXN0ZXIuYzoxMjc2Mzo1OiBub3RlOiB2YXJpYWJsZSB0cmFj
-a2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2YXItdHJhY2tpbmctYXNzaWdubWVu
-dHPigJksIHJldHJ5aW5nIHdpdGhvdXQKMTI3NjMgfCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAq
-YXJndltdKQogICAgICB8ICAgICBefn5+Ci4vdGVzdC1kcml2ZXI6IGxpbmUgMTA3OiA3MzgzMSBB
-Ym9ydGVkICAgICAgICAgICAgICAgICAoY29yZSBkdW1wZWQpICIkQCIgPiAkbG9nX2ZpbGUgMj4m
-MQptYWtlWzNdOiAqKiogW01ha2VmaWxlOjExNjMzOiB0ZXN0LXN1aXRlLmxvZ10gRXJyb3IgMQpt
-YWtlWzJdOiAqKiogW01ha2VmaWxlOjExNzQxOiBjaGVjay1URVNUU10gRXJyb3IgMgptYWtlWzFd
-OiAqKiogW01ha2VmaWxlOjEyMTcwOiBjaGVjay1hbV0gRXJyb3IgMgptYWtlOiAqKiogW01ha2Vm
-aWxlOjEyMTcyOiBjaGVja10gRXJyb3IgMgoKCi0tLQpSZWdhcmRzLApMaW51eCBCbHVldG9vdGgK
-Cg==
+Between the time of the command and the moment PA sync is terminated
+in controller, residual BIGInfo reports might continue to come.
+This causes a new PA sync hcon to be added, and a new socket to be
+notified to user space.
 
---===============1218497108600694466==--
+This commit fixs this by adding a flag on a Broadcast listening
+socket to mark when the PA sync child has been closed.
+
+This flag is checked when BIGInfo reports are indicated in
+iso_connect_ind, to avoid recreating a hcon and socket if
+residual reports arrive before PA sync is terminated.
+
+Iulia Tanasescu (1):
+  Bluetooth: ISO: Avoid creating child socket if PA sync is terminating
+
+ net/bluetooth/iso.c | 51 ++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 48 insertions(+), 3 deletions(-)
+
+
+base-commit: ab3d463ded5dfd81227fc998910c40913ce17616
+-- 
+2.39.2
+
