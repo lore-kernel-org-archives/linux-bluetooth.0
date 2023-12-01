@@ -1,121 +1,88 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mf7hjUPq"
-Received: from mail-qv1-xf31.google.com (mail-qv1-xf31.google.com [IPv6:2607:f8b0:4864:20::f31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6D82112
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Nov 2023 13:00:39 -0800 (PST)
-Received: by mail-qv1-xf31.google.com with SMTP id 6a1803df08f44-67a16594723so8381626d6.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Nov 2023 13:00:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701378039; x=1701982839; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=wWRLdOhsLCapYZx2DA2hn0dtm0FC+EqcbJqaUVWRYJc=;
-        b=Mf7hjUPqQ87jzyX6PWTFUNiJV/UECYRR5w4ow6+c1+QoJO3uA66cwuMUHyICiF9QYz
-         AA0F/+CUSa98AA/8EEATz9xPS8NhngxVWYg+tYnmi5yYECIxnYFq3RT2KmixOvpkK0mF
-         SG1ZxH9S21eh1ltBA6ILDSvNQ4mpdT+rXte8M/BHmmxoC80+luigJhYcJiuLE+DhbyXl
-         FbkkeDNBKimEnZUVPO8zGYYBhDVP2X4PI3YMqzPCN531YsQd6rLlSumKkOkoRe5WTqr3
-         AjMifRXt+Mk1BktC8WTYLXRZL5XFNOQJMr3VG0TkSmelsyJNgQmyvbWtXi3NjbyHpLOF
-         Dlxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701378039; x=1701982839;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wWRLdOhsLCapYZx2DA2hn0dtm0FC+EqcbJqaUVWRYJc=;
-        b=M0tPjGMrfezdPbf3654TKUUJ9JpoPl5aAT9UBlOPn2b1VkPTZ7zcdShcs80QSmpO9V
-         Ci36x46L2EcM8V4tiqReZYxaX49GZFXHpr9rxXkkgbvbRUIkLYYYAOUzkLWfjEPfWsGK
-         R65ziLcRKOFvD2Q/11HbPaZJt3S812A0CWdMxdTJpHYsELRPc68liZ/gzsgygxpAo8CF
-         YD+krKAUOoJOlqxhcGCdudpXM2AqupMKpuy7mWitypD5qT8wG+FOMGTxlPrHu8tRDLiL
-         HuBc/OK71vORvdA/5hqYuEb7IBBW+Vr/Gt1HJNup4s3LphKRadP3v7K8agi4oCwbEFmX
-         jm2Q==
-X-Gm-Message-State: AOJu0Yw4q/34ZAZr4mXfX4GflICesebIx/4/kcNYc7j/Avc5doqmclA5
-	KaGNSLMUMZr04zk9u71kUS4GLvNySxyrCg==
-X-Google-Smtp-Source: AGHT+IGxyP7ooBKGRZJf1wb34ZJa6wSlxNlkpqrCHa/KxcmEXmWQx6eDTk4B3F0wWRoxZ0ooFwGwQg==
-X-Received: by 2002:a05:6214:5603:b0:66d:1f11:8b85 with SMTP id mg3-20020a056214560300b0066d1f118b85mr23324191qvb.13.1701378038669;
-        Thu, 30 Nov 2023 13:00:38 -0800 (PST)
-Received: from [172.17.0.2] ([20.98.59.223])
-        by smtp.gmail.com with ESMTPSA id g9-20020a0cdf09000000b0067a4a2faa0bsm799539qvl.144.2023.11.30.13.00.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Nov 2023 13:00:38 -0800 (PST)
-Message-ID: <6568f7f6.0c0a0220.b6f23.4557@mx.google.com>
-Date: Thu, 30 Nov 2023 13:00:38 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1819082772171125047=="
+	dkim=pass (2048-bit key) header.d=moonlit-rail.com header.i=@moonlit-rail.com header.b="N4Io8k09";
+	dkim=permerror (0-bit key) header.d=moonlit-rail.com header.i=@moonlit-rail.com header.b="KKDN1LaU"
+X-Greylist: delayed 958 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 30 Nov 2023 18:10:09 PST
+Received: from hua.moonlit-rail.com (hua.moonlit-rail.com [45.79.167.250])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B60812A
+	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Nov 2023 18:10:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=moonlit-rail.com; s=rsa2021a; h=Content-Transfer-Encoding:Content-Type:
+	Subject:To:From:MIME-Version:Date:Message-ID:Sender:Reply-To:Cc:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=B98SRU3PtAJWZTRiFPrGF4tLQjv8NRANvvKuI4GzDB8=; t=1701395649; x=1703987649; 
+	b=N4Io8k09n9ODIxE/dbvsNaCJyyQKSqbEGHimYfyX3tpR2FlqD4fR0JMBhzDjXMtMas7qTZTLOgp
+	0KhK1COxM1HaqeM41tqMwsRWfJ9ph7Dwa5AhZg8YvTJmdLomVig+mApVtLl81248jgJ5Ge8eFTP5E
+	HWf9yW7sDwpLJITKtrSzpw5dEN3v0NFhiXSxagiP8s5VbILHhyI9Cq0S3LECRcsoStmSoPxonLLZ5
+	cC6vM9prj7pe6fG64LiNID4mntXq7PFKz9pcsE6eXs3qO6oY6g7Ty2a7xI/VsTFPT+0o93CI/8D9g
+	kbBjZ79Nfp2XHXBP07Mg/EuYnWRBH4ZOJ9Fw==;
+DKIM-Signature: v=1; a=ed25519-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=moonlit-rail.com; s=edd2021a; h=Content-Transfer-Encoding:Content-Type:
+	Subject:To:From:MIME-Version:Date:Message-ID:Sender:Reply-To:Cc:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=B98SRU3PtAJWZTRiFPrGF4tLQjv8NRANvvKuI4GzDB8=; t=1701395649; x=1703987649; 
+	b=KKDN1LaUqM45wkI1VY2bPRNI3WiNhR+FPwhDlcfL3frgjXDyYGmzXBAwIHitvWRQAJvarS0e9QW
+	4lp0xXrNzAw==;
+Message-ID: <ee109942-ef8e-45b9-8cb9-a98a787fe094@moonlit-rail.com>
+Date: Thu, 30 Nov 2023 20:54:09 -0500
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, sebastian.david.forslund@gmail.com
-Subject: RE: [BlueZ,1/1] Pattern match on service- and manufacturer data
-In-Reply-To: <20231130195750.1732-1-sebastif@axis.com>
-References: <20231130195750.1732-1-sebastif@axis.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============1819082772171125047==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US, en-GB
+From: "Kris Karas (Bug Reporting)" <bugs-a21@moonlit-rail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Regression: Inoperative bluetooth, Intel chipset, mainline kernel
+ 6.6.2+
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-This is automated email and please do not reply to this email!
+Greetings -
 
-Dear submitter,
+With mainline kernel 6.6.2+ (and 6.1.63, etc), bluetooth is inoperative 
+(reports "opcode 0x0c03 failed") on my motherboard's bluetooth adapter 
+(Intel chipset).  Details below.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=805736
+I reported this in a comment tacked onto bugzilla #218142, but got no 
+response, so posting here as a possibly new issue.
 
----Test result---
+Details, original email:
+----------------------------------------------------------------------
+I have a regression going from mainline kernel 6.1.62 to 6.1.63, and 
+also from kernel 6.6.1 to 6.6.2; I can bisect if patch authors can't 
+locate the relevant commit.  In the most recent kernels mentioned, 
+bluetooth won't function.
 
-Test Summary:
-CheckPatch                    FAIL      0.69 seconds
-GitLint                       PASS      0.27 seconds
-BuildEll                      PASS      24.02 seconds
-BluezMake                     PASS      547.23 seconds
-MakeCheck                     PASS      11.02 seconds
-MakeDistcheck                 PASS      150.22 seconds
-CheckValgrind                 PASS      208.72 seconds
-CheckSmatch                   PASS      313.95 seconds
-bluezmakeextell               PASS      95.20 seconds
-IncrementalBuild              PASS      498.95 seconds
-ScanBuild                     PASS      904.14 seconds
+Hardware: ASRock "X470 Taichi" motherboard - on board chipset.
+lsusb: ID 8087:0aa7 Intel Corp. Wireless-AC 3168 Bluetooth.
+dmesg: Bluetooth: hci0: Legacy ROM 2.x revision 5.0 build 25 week 20 2015
+        Bluetooth: hci0: Intel Bluetooth firmware file:
+          intel/ibt-hw-37.8.10-fw-22.50.19.14.f.bseq
+        Bluetooth: hci0: Intel BT fw patch 0x43 completed & activated
+bluez: Version 5.70, bluez firmware version 1.2
+Linux kernel firmware: 20231117_7124ce3
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,1/1] Pattern match on service- and manufacturer data
-ERROR:EXECUTE_PERMISSIONS: do not set execute permissions for source files
-#89: FILE: src/shared/ad.c
+On a working kernel (such as 6.6.1), in addition to the dmesg output 
+above, we have this:
+dmesg: Bluetooth: MGMT ver 1.22
+        Bluetooth: hci0: Bad flag given (0x1) vs supported (0x0)
 
-WARNING:LONG_LINE: line length of 91 exceeds 80 columns
-#173: FILE: src/shared/ad.c:1434:
-+		queue_foreach(info->ad->manufacturer_data, pattern_manufacturer_data_match,
+On a failed kernel (such as 6.6.2), instead of the good output above, we 
+have:
+dmesg: Bluetooth: hci0: Opcode 0x0c03 failed: -110
+        Bluetooth: hci0: Opcode 0x0c03 failed: -110
+        ...
+repeats several times as bluez attempts to communicate with hci0.
+----------------------------------------------------------------------
 
-WARNING:LONG_LINE: line length of 88 exceeds 80 columns
-#179: FILE: src/shared/ad.c:1440:
-+		queue_foreach(info->ad->service_data, pattern_service_data_match, info);
+Since that email was sent, kernel firmware has been updated to 
+20231128_aae6052, and kernels 6.1.64 and 6.6.3 have been tried with no 
+change observed.
 
-/github/workspace/src/src/13474975.patch total: 1 errors, 2 warnings, 93 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13474975.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============1819082772171125047==--
+Kris
