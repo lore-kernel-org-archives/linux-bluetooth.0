@@ -1,32 +1,15 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=moonlit-rail.com header.i=@moonlit-rail.com header.b="QrKoYOyM";
-	dkim=permerror (0-bit key) header.d=moonlit-rail.com header.i=@moonlit-rail.com header.b="XA/4VWr4"
-Received: from hua.moonlit-rail.com (hua.moonlit-rail.com [45.79.167.250])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AC16171F
-	for <linux-bluetooth@vger.kernel.org>; Fri,  1 Dec 2023 00:19:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=moonlit-rail.com; s=rsa2021a; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=8X/rG85tFwBMLr8RWEkzExxUAraV8iuIXZPdEh5RREQ=; t=1701418745; x=1704010745; 
-	b=QrKoYOyMpRlepv6O2Py0ELH2KVRnfkJha88ct1e68MnNmlAwwevSJ6rmVKSQonYLDXs9HVIEciF
-	EIMVGQAhgdLuK60lvkKWyaqSPfcuWvccTwWYI2rdvu4O68jIgijQJErUQilpgAx/0u2jtAZLZDvKw
-	p3yR/ZZ18A+onAPmajdrWf+of+8X7Mt/Tq6pxRLqrKobQrFxooBXgtf1AXCUAYiC9EKXPh1bvgxuv
-	m2jMEnumQzPITbI6UayknQ5paULaIREuOB7QEhYMKs7giCmOqvm5j0K3+c8BWvf2MXwh7SN78hGOh
-	VOcTzpL48DA/Me3Cl4NvlWNX96p8y426l3Mw==;
-DKIM-Signature: v=1; a=ed25519-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=moonlit-rail.com; s=edd2021a; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=8X/rG85tFwBMLr8RWEkzExxUAraV8iuIXZPdEh5RREQ=; t=1701418745; x=1704010745; 
-	b=XA/4VWr4M+GTJRKJX6gBmbxTeyMTLHVp+ASoSfl8upmAdNARAsGWlIA6QNtKdfGp1C5eXxV2rEZ
-	fC2g4PR0IAQ==;
-Message-ID: <115e819b-0271-403c-b034-ef3aebbb85cd@moonlit-rail.com>
-Date: Fri, 1 Dec 2023 03:19:04 -0500
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E48451717;
+	Fri,  1 Dec 2023 00:28:23 -0800 (PST)
+Received: from [192.168.0.183] (ip5f5af6e9.dynamic.kabel-deutschland.de [95.90.246.233])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 7DC3461E5FE01;
+	Fri,  1 Dec 2023 09:27:48 +0100 (CET)
+Message-ID: <d095bcbe-af0c-4eb3-99c8-32371136dd2c@molgen.mpg.de>
+Date: Fri, 1 Dec 2023 09:27:47 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -36,42 +19,63 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: Regression: Inoperative bluetooth, Intel chipset, mainline kernel
  6.6.2+
-To: Bagas Sanjaya <bagasdotme@gmail.com>,
- Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
- Linux Regressions <regressions@lists.linux.dev>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
+Content-Language: en-US
+To: "Kris Karas (Bug Reporting)" <bugs-a21@moonlit-rail.com>
+Cc: Bagas Sanjaya <bagasdotme@gmail.com>, linux-bluetooth@vger.kernel.org,
+ regressions@lists.linux.dev, linux-kernel@vger.kernel.org,
+ Marcel Holtmann <marcel@holtmann.org>,
  Johan Hedberg <johan.hedberg@gmail.com>,
  Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Zach <zacheryvig@outlook.com>
 References: <ee109942-ef8e-45b9-8cb9-a98a787fe094@moonlit-rail.com>
  <ZWl82n695TIC7nUO@archie.me>
-Content-Language: en-US, en-GB
-From: "Kris Karas (Bug Reporting)" <bugs-a21@moonlit-rail.com>
-In-Reply-To: <ZWl82n695TIC7nUO@archie.me>
+ <115e819b-0271-403c-b034-ef3aebbb85cd@moonlit-rail.com>
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <115e819b-0271-403c-b034-ef3aebbb85cd@moonlit-rail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Bagas Sanjaya wrote:
-> Kris Karas (Bug Reporting) wrote:
->> I have a regression going from mainline kernel 6.1.62 to 6.1.63, and also
->> from kernel 6.6.1 to 6.6.2; I can bisect if patch authors can't locate the
->> relevant commit.  In the most recent kernels mentioned, bluetooth won't
->> function.
+Dear Kris,
+
+
+Am 01.12.23 um 09:19 schrieb Kris Karas (Bug Reporting):
+> Bagas Sanjaya wrote:
+>> Kris Karas (Bug Reporting) wrote:
+>>> I have a regression going from mainline kernel 6.1.62 to 6.1.63, and 
+>>> also
+>>> from kernel 6.6.1 to 6.6.2; I can bisect if patch authors can't 
+>>> locate the
+>>> relevant commit.  In the most recent kernels mentioned, bluetooth won't
+>>> function.
+>>
+>> Then please do bisection; without it, nobody will look into this 
+>> properly.
 > 
-> Then please do bisection; without it, nobody will look into this properly.
+> As only a few people are reporting this, it must be pretty 
+> hardware-specific (or perhaps Kconfig/firmware specific).  I'll do a 
+> bisect.  A bit too late here in Boston (03:00), and kiddo's birthday 
+> "later today", so will probably get to this on the weekend.
+> 
+>> You may also want to check current mainline (v6.7-rc3) to see if this
+>> regression have already been fixed.
+> 
+> Just tried 6.7.0-rc3, and it is also affected.
+> 
+> I hadn't git-pulled my linux-stable since May, so that gave me a good 
+> chance to test the very latest.  :-)  And conveniently I'm now set for 
+> the bisect.
 
-As only a few people are reporting this, it must be pretty 
-hardware-specific (or perhaps Kconfig/firmware specific).  I'll do a 
-bisect.  A bit too late here in Boston (03:00), and kiddo's birthday 
-"later today", so will probably get to this on the weekend.
+Nice, that is often the fastest way to fix something.
 
-> You may also want to check current mainline (v6.7-rc3) to see if this
-> regression have already been fixed.
+To avoid the time rebooting the system, you could try to expose the 
+drive to a virtual machine [1].
 
-Just tried 6.7.0-rc3, and it is also affected.
 
-I hadn't git-pulled my linux-stable since May, so that gave me a good 
-chance to test the very latest.  :-)  And conveniently I'm now set for 
-the bisect.
+Kind regards,
 
-Kris
+Paul
+
+
+[1]: 
+https://lore.kernel.org/all/331ae35c-7d48-46fc-c4ae-1e60cb0f3378@molgen.mpg.de/
+      (The failure in the VM was due to another regression in the Linux 
+kernel, so the how-to actually worked for me.)
