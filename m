@@ -1,81 +1,66 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E48451717;
-	Fri,  1 Dec 2023 00:28:23 -0800 (PST)
-Received: from [192.168.0.183] (ip5f5af6e9.dynamic.kabel-deutschland.de [95.90.246.233])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 7DC3461E5FE01;
-	Fri,  1 Dec 2023 09:27:48 +0100 (CET)
-Message-ID: <d095bcbe-af0c-4eb3-99c8-32371136dd2c@molgen.mpg.de>
-Date: Fri, 1 Dec 2023 09:27:47 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AE0B24B24
+	for <linux-bluetooth@vger.kernel.org>; Fri,  1 Dec 2023 18:00:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GjFepkZL"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 98EC6C433C8;
+	Fri,  1 Dec 2023 18:00:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701453626;
+	bh=ryLJ45Q5HveYTXc9dEwCJh3D9NzLGZ3oTUwcCDqfxCY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=GjFepkZLJchiUyUdMRUJlS+GzEHxmNJG7OhRLlr7WtXx9z9i/c6O3xUtzA67XYJty
+	 z6ieutBiqKMPCiRoPrSfH1JuRWKr5kci1ALRyqrUM9qBaH5wfUIKDD9riE8Q1MtayE
+	 yWONAQ6sh6nYIq5z0tVP+Y3PYIdqAWp9100h/CLd4//lF0Vt0MNxxMP9MxakYu159c
+	 oxLCXFrqTBRS+DXn7ccbnqkRZrcexjGKvy5lJEjad57UFdZIOzHvUycUBJ7h7glvan
+	 2udjOeZ3Pl2mvvwJEUpGsb3LckWeZSw+Xngr2h0oLp+R90uBadhGV9uPs8WCEZ8bTV
+	 wLw4Al1w9Sw0g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 865AADFAA94;
+	Fri,  1 Dec 2023 18:00:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Regression: Inoperative bluetooth, Intel chipset, mainline kernel
- 6.6.2+
-Content-Language: en-US
-To: "Kris Karas (Bug Reporting)" <bugs-a21@moonlit-rail.com>
-Cc: Bagas Sanjaya <bagasdotme@gmail.com>, linux-bluetooth@vger.kernel.org,
- regressions@lists.linux.dev, linux-kernel@vger.kernel.org,
- Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Zach <zacheryvig@outlook.com>
-References: <ee109942-ef8e-45b9-8cb9-a98a787fe094@moonlit-rail.com>
- <ZWl82n695TIC7nUO@archie.me>
- <115e819b-0271-403c-b034-ef3aebbb85cd@moonlit-rail.com>
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <115e819b-0271-403c-b034-ef3aebbb85cd@moonlit-rail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v1] shared/vcp: Fix build error
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <170145362654.10933.12458674054288282324.git-patchwork-notify@kernel.org>
+Date: Fri, 01 Dec 2023 18:00:26 +0000
+References: <20231130141040.2243867-1-luiz.dentz@gmail.com>
+In-Reply-To: <20231130141040.2243867-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-Dear Kris,
+Hello:
 
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Am 01.12.23 um 09:19 schrieb Kris Karas (Bug Reporting):
-> Bagas Sanjaya wrote:
->> Kris Karas (Bug Reporting) wrote:
->>> I have a regression going from mainline kernel 6.1.62 to 6.1.63, and 
->>> also
->>> from kernel 6.6.1 to 6.6.2; I can bisect if patch authors can't 
->>> locate the
->>> relevant commit.  In the most recent kernels mentioned, bluetooth won't
->>> function.
->>
->> Then please do bisection; without it, nobody will look into this 
->> properly.
+On Thu, 30 Nov 2023 09:10:40 -0500 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> As only a few people are reporting this, it must be pretty 
-> hardware-specific (or perhaps Kconfig/firmware specific).  I'll do a 
-> bisect.  A bit too late here in Boston (03:00), and kiddo's birthday 
-> "later today", so will probably get to this on the weekend.
+> This fixes the following build error in some architectures:
 > 
->> You may also want to check current mainline (v6.7-rc3) to see if this
->> regression have already been fixed.
+> src/shared/vcp.c:961:24: error: lvalue required as unary ‘&’ operand
+>  961 |     iov.iov_base = &cpu_to_le32(vocs->vocs_audio_loc);
+>    |            ^
 > 
-> Just tried 6.7.0-rc3, and it is also affected.
-> 
-> I hadn't git-pulled my linux-stable since May, so that gave me a good 
-> chance to test the very latest.  :-)  And conveniently I'm now set for 
-> the bisect.
+> [...]
 
-Nice, that is often the fastest way to fix something.
+Here is the summary with links:
+  - [BlueZ,v1] shared/vcp: Fix build error
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=cb1a3fd96c48
 
-To avoid the time rebooting the system, you could try to expose the 
-drive to a virtual machine [1].
-
-
-Kind regards,
-
-Paul
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-[1]: 
-https://lore.kernel.org/all/331ae35c-7d48-46fc-c4ae-1e60cb0f3378@molgen.mpg.de/
-      (The failure in the VM was due to another regression in the Linux 
-kernel, so the how-to actually worked for me.)
