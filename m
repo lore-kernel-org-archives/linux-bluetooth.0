@@ -1,67 +1,82 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A75BBF4E5
-	for <linux-bluetooth@vger.kernel.org>; Sat,  2 Dec 2023 18:47:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EKtED/ez"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7CB0CC433CA
-	for <linux-bluetooth@vger.kernel.org>; Sat,  2 Dec 2023 18:47:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701542873;
-	bh=Qb9Sq/eeJKWLAqns33wLVAFS//61QkKsv3dbdZoibgo=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=EKtED/ezmA/q+0w2YAA4/XY/6BTkeilCwx4ICfwkrZ69v+RW1lXCESquqp61MxPAO
-	 HHKzCgH/B26ukAIXjLxPpROyZxBQjuduSIFfmRcNtsxOo0MAA+k0qR7T+YgF9XRtHr
-	 uthOOZfqkpwSuwvyz28uEwugoBsZyH+nTCsCZWlB5dBNiPuT9wz15l54qbJAGMLzZq
-	 D5x0CAtb9pPUMZAtm2VifiC2HvYH7Guc1b8/rSjWzGK/aAHtofOUfEtOeadveMe4Zf
-	 gcJJ24miYkpe6Fl9XCUb5FxZu+BIRXa1vQ+kLut/5nip4ET8tcfGZqkEORwbP6fxXj
-	 P2KZRtNj98Vkw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 6C302C53BD0; Sat,  2 Dec 2023 18:47:53 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 218142] Bluetooth adapter fails to recognize on kernel
- 5.15.0-88-generic
-Date: Sat, 02 Dec 2023 18:47:53 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: bugs-a21@moonlit-rail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: attachments.created
-Message-ID: <bug-218142-62941-PxZBnqi4Lo@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218142-62941@https.bugzilla.kernel.org/>
-References: <bug-218142-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=moonlit-rail.com header.i=@moonlit-rail.com header.b="QzjeqsxG";
+	dkim=permerror (0-bit key) header.d=moonlit-rail.com header.i=@moonlit-rail.com header.b="nLA56QDl"
+Received: from hua.moonlit-rail.com (hua.moonlit-rail.com [45.79.167.250])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC1C1107;
+	Sun,  3 Dec 2023 00:32:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=moonlit-rail.com; s=rsa2021a; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=XKLc7nsSut7asYOvPOSBF3sFLon6YMwbrrbjTMI2vZI=; t=1701592373; x=1704184373; 
+	b=QzjeqsxGm814if/mVNeJKXbUfXNIRBWy5uProtThQbOlun0xfcJI/q+Hkt1I4/8ucY+KTAcsAdY
+	K0qkglSWFiKuzhDKAz8flfFqHW8HKBM7gDTH3m8aEcyzYwyDVxv6c6pWHX3VU5WxUD/pYacMpBQ+k
+	atH9Wbe4m/KZkocJnPMFmH/oDztFRFlGRz30RZamrzCcroRFWt7/hLbKbMBWh3aUzf9YHHOIhvHkL
+	iHzprcdirSJLE9nqvGYU+ew/yLPgPDj45/ee+gY8f1NBYydiq45Fvmdt1YboMwXhre/nXyoJbaYiK
+	EeFWWEir2fbUrxu/zELbTK1Oeg/CaWP34l8A==;
+DKIM-Signature: v=1; a=ed25519-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=moonlit-rail.com; s=edd2021a; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=XKLc7nsSut7asYOvPOSBF3sFLon6YMwbrrbjTMI2vZI=; t=1701592373; x=1704184373; 
+	b=nLA56QDlWBSDtOFmACYQf2vsfPAOeymFkVc2XEKzmc39/EHoRyAcBuoMq+MInKaKwUNLwPKh+/7
+	gtNONFBGWDg==;
+Message-ID: <ef575387-4a52-49bd-9c26-3a03ac816b61@moonlit-rail.com>
+Date: Sun, 3 Dec 2023 03:32:52 -0500
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: Regression: Inoperative bluetooth, Intel chipset, mainline kernel
+ 6.6.2+
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: Paul Menzel <pmenzel@molgen.mpg.de>,
+ Basavaraj Natikar <Basavaraj.Natikar@amd.com>, stable@vger.kernel.org,
+ Thorsten Leemhuis <regressions@leemhuis.info>, regressions@lists.linux.dev,
+ linux-bluetooth@vger.kernel.org,
+ Mario Limonciello <mario.limonciello@amd.com>,
+ Mathias Nyman <mathias.nyman@intel.com>, linux-usb@vger.kernel.org
+References: <ee109942-ef8e-45b9-8cb9-a98a787fe094@moonlit-rail.com>
+ <8d6070c8-3f82-4a12-8c60-7f1862fef9d9@leemhuis.info>
+ <2023120119-bonus-judgingly-bf57@gregkh>
+ <6a710423-e76c-437e-ba59-b9cefbda3194@moonlit-rail.com>
+ <55c50bf5-bffb-454e-906e-4408c591cb63@molgen.mpg.de>
+ <2023120213-octagon-clarity-5be3@gregkh>
+ <f1e0a872-cd9a-4ef4-9ac9-cd13cf2d6ea4@moonlit-rail.com>
+ <2023120259-subject-lubricant-579f@gregkh>
+Content-Language: en-US, en-GB
+From: "Kris Karas (Bug Reporting)" <bugs-a21@moonlit-rail.com>
+In-Reply-To: <2023120259-subject-lubricant-579f@gregkh>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218142
+Greg KH wrote:
+> Thanks for testing, any chance you can try 6.6.4-rc1?  Or wait a few
+> hours for me to release 6.6.4 if you don't want to mess with a -rc
+> release.
 
---- Comment #6 from Kris Karas (bugs-a21@moonlit-rail.com) ---
-Created attachment 305530
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D305530&action=3Dedit
-Output of "lspci -tvnn" on the Asrock x470 Taichi motherboard.
+As I mentioned to Greg off-list (to save wasting other peoples' 
+bandwidth), I couldn't find 6.6.4-rc1.  Looking in wrong git tree?  But 
+6.6.4 is now out, which I have tested and am running at the moment, 
+albeit with the problem commit from 6.6.2 backed out.
 
---=20
-You may reply to this email to add a comment.
+There is no change with respect to this bug.  The problematic patch 
+introduced in 6.6.2 was neither reverted nor amended.  The "opcode 
+0x0c03 failed" lines to the kernel log continue to be present.
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+> Also, is this showing up in 6.7-rc3?  If so, that would be a big help in
+> tracking this down.
+
+The bug shows up in 6.7-rc3 as well, exactly as it does here in 6.6.2+ 
+and in 6.1.63+.  The problematic patch bisected earlier appears 
+identically (and seems to have been introduced simultaneously) in these 
+recent releases.
+
+Kris
