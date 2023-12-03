@@ -1,79 +1,73 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A966138C;
-	Sun,  3 Dec 2023 08:38:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93673BE60
+	for <linux-bluetooth@vger.kernel.org>; Sun,  3 Dec 2023 12:20:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="hH/CCIp+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CBAEC433C8;
-	Sun,  3 Dec 2023 08:38:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1701592716;
-	bh=WzZdUmGTrfTPnWx030hxSj02JaRqdt/tZ6wGGHUliS4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hH/CCIp+8VI0ux9jP5EMxYlCn25Yn4hVKfX7tKWzcAfp/2TxFPtgJv3Twk7pHHe2d
-	 uOFyqXrakEV4+hkupmSsgO/o4oVZp/Mr4auPrUiOYIwEWot14ZVX7SSeWHHM4vABIS
-	 35E3uPqyObpAcZyeOPvQy80vAOxqXPnMqeu2uhok=
-Date: Sun, 3 Dec 2023 09:38:33 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: "Kris Karas (Bug Reporting)" <bugs-a21@moonlit-rail.com>
-Cc: Paul Menzel <pmenzel@molgen.mpg.de>,
-	Basavaraj Natikar <Basavaraj.Natikar@amd.com>,
-	stable@vger.kernel.org,
-	Thorsten Leemhuis <regressions@leemhuis.info>,
-	regressions@lists.linux.dev, linux-bluetooth@vger.kernel.org,
-	Mario Limonciello <mario.limonciello@amd.com>,
-	Mathias Nyman <mathias.nyman@intel.com>, linux-usb@vger.kernel.org
-Subject: Re: Regression: Inoperative bluetooth, Intel chipset, mainline
- kernel 6.6.2+
-Message-ID: <2023120329-length-strum-9ee1@gregkh>
-References: <ee109942-ef8e-45b9-8cb9-a98a787fe094@moonlit-rail.com>
- <8d6070c8-3f82-4a12-8c60-7f1862fef9d9@leemhuis.info>
- <2023120119-bonus-judgingly-bf57@gregkh>
- <6a710423-e76c-437e-ba59-b9cefbda3194@moonlit-rail.com>
- <55c50bf5-bffb-454e-906e-4408c591cb63@molgen.mpg.de>
- <2023120213-octagon-clarity-5be3@gregkh>
- <f1e0a872-cd9a-4ef4-9ac9-cd13cf2d6ea4@moonlit-rail.com>
- <2023120259-subject-lubricant-579f@gregkh>
- <ef575387-4a52-49bd-9c26-3a03ac816b61@moonlit-rail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BBpFkG1U"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EA360C433CB
+	for <linux-bluetooth@vger.kernel.org>; Sun,  3 Dec 2023 12:20:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701606029;
+	bh=zjwP0ni+2hC951gsEE0P0/LoQRz+opreW+3NAJi5T0A=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=BBpFkG1UCxIgyHoE/CAWsWo3UfORULmuF+2FrgFZon8iBuhbnuLxz6ljpvHiaooOX
+	 CKwY6KouS5/HL/auaTGpK3Ogla1jXk9oSocEY06Lotmo0MesbS/pqka+G6Cx8D0x2e
+	 IfUWndlbeyK4U/zJc9E5zgFO/UaivNEsD0MF1OIYHGfpbhfThuYTCUeBR+y3W582QO
+	 mio8uGUTovWIFd2kywup+aOguq7UG+Iz97ScuPvWeLd3j+QZb6R87ZzEv+q1LXSVPm
+	 KVHGNoj4GIwWto92aG7WNOBJPYFj+YXH/gjJ5egzmQjgsASY4Z1Sm/FquRAkSkaLoZ
+	 yagqdhhj7Q0ag==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id D01BDC53BD3; Sun,  3 Dec 2023 12:20:28 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 218142] Bluetooth adapter fails to recognize on kernel
+ 5.15.0-88-generic
+Date: Sun, 03 Dec 2023 12:20:28 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: oleksandr@natalenko.name
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-218142-62941-UunsK360mH@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-218142-62941@https.bugzilla.kernel.org/>
+References: <bug-218142-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ef575387-4a52-49bd-9c26-3a03ac816b61@moonlit-rail.com>
 
-On Sun, Dec 03, 2023 at 03:32:52AM -0500, Kris Karas (Bug Reporting) wrote:
-> Greg KH wrote:
-> > Thanks for testing, any chance you can try 6.6.4-rc1?  Or wait a few
-> > hours for me to release 6.6.4 if you don't want to mess with a -rc
-> > release.
-> 
-> As I mentioned to Greg off-list (to save wasting other peoples' bandwidth),
-> I couldn't find 6.6.4-rc1.  Looking in wrong git tree?  But 6.6.4 is now
-> out, which I have tested and am running at the moment, albeit with the
-> problem commit from 6.6.2 backed out.
-> 
-> There is no change with respect to this bug.  The problematic patch
-> introduced in 6.6.2 was neither reverted nor amended.  The "opcode 0x0c03
-> failed" lines to the kernel log continue to be present.
-> 
-> > Also, is this showing up in 6.7-rc3?  If so, that would be a big help in
-> > tracking this down.
-> 
-> The bug shows up in 6.7-rc3 as well, exactly as it does here in 6.6.2+ and
-> in 6.1.63+.  The problematic patch bisected earlier appears identically (and
-> seems to have been introduced simultaneously) in these recent releases.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218142
 
-Ok, in a way, this is good as that means I haven't missed a fix, but bad
-in that this does affect everyone more.
+Oleksandr Natalenko (oleksandr@natalenko.name) changed:
 
-So let's start over, you found the offending commit, and nothing has
-fixed it, so what do we do?  xhci/amd developers, any ideas?
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |oleksandr@natalenko.name
 
-thanks,
+--- Comment #7 from Oleksandr Natalenko (oleksandr@natalenko.name) ---
+Does passing `btusb.enable_autosuspend=3DN` via a kernel cmdline help? [1]
 
-greg k-h
+[1] https://lore.kernel.org/lkml/5993222.lOV4Wx5bFT@natalenko.name/
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
