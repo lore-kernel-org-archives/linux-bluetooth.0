@@ -1,49 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NHAvW/Ra"
-Received: from mail-ua1-x92c.google.com (mail-ua1-x92c.google.com [IPv6:2607:f8b0:4864:20::92c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0402D199
-	for <linux-bluetooth@vger.kernel.org>; Mon,  4 Dec 2023 14:15:42 -0800 (PST)
-Received: by mail-ua1-x92c.google.com with SMTP id a1e0cc1a2514c-7c57aa2cce8so743809241.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 04 Dec 2023 14:15:42 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hEieu81S"
+Received: from mail-vs1-xe31.google.com (mail-vs1-xe31.google.com [IPv6:2607:f8b0:4864:20::e31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F46D138
+	for <linux-bluetooth@vger.kernel.org>; Mon,  4 Dec 2023 14:15:45 -0800 (PST)
+Received: by mail-vs1-xe31.google.com with SMTP id ada2fe7eead31-464752da340so629461137.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 04 Dec 2023 14:15:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701728141; x=1702332941; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1701728143; x=1702332943; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=KtIEJOo0bH7uN3S+paD2i9Xj09nYjIM1rX/qwhOf5xE=;
-        b=NHAvW/Ray7QSKq7tGInEUDJKChcp14ILTf76EV5EomKUowyWwb9apDbariPHXNmvUu
-         0z+nhnPb4evUxHTWz1vMjfZ9WNT8BLp51uVOcgU2D+p4ykQKU6wARsKJdPMmwaan78lX
-         MKBz5QqNiC49qtTmfteN6UxreVrNyp8DdduKecxJEp4NFLhnHjDN6fTFRrudQRpbscv0
-         KHaGDhP5JxzIcIHAWUvQdLtZdTYDiuxVxeYp9O+0HDefy2yj87VZwPnBgxCgoRQA1XXd
-         U2OeRjMd1I7DbJygph1bsrLOq2ZTCQ/3BBiKoTV6uOd/Gai616bJlqOxTPGZFvMlLWmI
-         7TJQ==
+        bh=R6VARjn0CWiByFx2DKSnsDI32pinxmI34vf9VNZr5tg=;
+        b=hEieu81S17cNSnuTBcAweFOPO7d03L+dlGXFMYlGrn6oZyDe6oRoqWaeBGJOXJx3p9
+         /c4tyCbwHtxfiEGiEL99mcDrK3dWSvKzhqsU05qAs5rsPMK4ntgxxx4cYGxBiHdh5F9y
+         cqJTVELlSQCAI93hGAdGPHBW6sjeXk4rhEUyIVcPgSHxU8YWWl74tyncNumkM2MnE98h
+         Du0ULXSupsjOKKPt3VfEIuiQKGrgZ+ifi7UKBb8O4EPF4zkI+dE/XgeIaa1rzb3y0e/A
+         h4Vwv7nJXeeNXQ9Quws0KXLUFPj83kOmEDqXsYXaQ5wMj8HgbXN153/jSqSTsQY5vTKp
+         ibVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701728141; x=1702332941;
+        d=1e100.net; s=20230601; t=1701728143; x=1702332943;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=KtIEJOo0bH7uN3S+paD2i9Xj09nYjIM1rX/qwhOf5xE=;
-        b=Y2AnpR0b2YM9dz9XdUE/KOYJTeqQ6ok8TSPWPNvermLqZ08EoFcKbx/OfrFqzY1MHk
-         vhzFGnzyuhvLhOChGtOMxLjScnnZbXy9BMNIgH7A4BRSDmW1Wt/JvWQvzPB4SbLkyoYM
-         ShLSEXtEkYWTt+SRpL62aOG6nLN6K/fHOSKL4A4JTRH73/sSPpdeaAY1q36KTPK6+GZm
-         SHUU+Mbqt8UcoGoVZCHkVnYw9klrCvW4WEQ/ltOs/rV79ZItF2gG9RTmH63d3jwCmAb4
-         CYzoRqeI74+9tXPIz0CpXyG64rtXk4NTJ5uHpfV220Dlk4a1PyhNKEYNYNkn8iIkPwB4
-         EWQQ==
-X-Gm-Message-State: AOJu0YxZcayOROuQjDae+LdZfgBl1rt+D1coJeKGVI3F2+AY9j8Ki9ZU
-	JxtPgJrSTcQlYiEyYEW0v73mpoLxHsA=
-X-Google-Smtp-Source: AGHT+IFtaxLla+xZ6YRzWBFP3uDmscugb7hwAPTOQvEpJgbhGnIGPbzoNVfe0Aicop6dM+Cc7K9+pA==
-X-Received: by 2002:a67:e8d5:0:b0:461:fb:1d6c with SMTP id y21-20020a67e8d5000000b0046100fb1d6cmr1995283vsn.5.1701728141334;
-        Mon, 04 Dec 2023 14:15:41 -0800 (PST)
+        bh=R6VARjn0CWiByFx2DKSnsDI32pinxmI34vf9VNZr5tg=;
+        b=gT6vTfOL5BG6dZ2WyLZH/GEMe7fbRD2YrcBVJkLMFtu4qiRqTXV1R1hHIMQd690gv1
+         CvDaXEDEBJ4B6HT14AluK7DkTTfuMk9NFtdlYlR7pmw1IRIvPnLrdRlrIkejyffiy+Nj
+         1ct82ZDiLvPIfOZprpLiE8qUulsRckdJjHmHHL/D0h4PKG4eVho+DBjZuEGbZlGig8RP
+         nhu93WcrzRO1rCB2lfJZQtqpKbwpjg1TrqPRDy4zo3DnYNz/AFd6UjTogKUgK9Ggzjb4
+         MmrfS98dwtQm5xTF9vmh8uMBP86kzkUS5dSL/lcmQLL+YjhzZNKy6g1A9NFpPNG9M9eN
+         ItGA==
+X-Gm-Message-State: AOJu0YwFEKVTM2OVVBc0Q7xaKKdHVexQX8IeLG6SqN9I9oCSiGL9n2lG
+	3vavrA1Oxbwb92q8S4EL4mXsard/G3o=
+X-Google-Smtp-Source: AGHT+IEUzrKwi4k7zWU+HJ3tCKyycGZCqwceofo30FVhb96x/iZS1rfWEPlyijL9bwdt0lfrzHaTSw==
+X-Received: by 2002:a67:f308:0:b0:464:5a0e:b62e with SMTP id p8-20020a67f308000000b004645a0eb62emr2907095vsf.14.1701728143008;
+        Mon, 04 Dec 2023 14:15:43 -0800 (PST)
 Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
-        by smtp.gmail.com with ESMTPSA id bl13-20020a056102508d00b0044d4e63aa03sm1136612vsb.25.2023.12.04.14.15.39
+        by smtp.gmail.com with ESMTPSA id bl13-20020a056102508d00b0044d4e63aa03sm1136612vsb.25.2023.12.04.14.15.41
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Dec 2023 14:15:40 -0800 (PST)
+        Mon, 04 Dec 2023 14:15:42 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 7/8] test-bap: Add SCC Release tests
-Date: Mon,  4 Dec 2023 17:15:26 -0500
-Message-ID: <20231204221527.2990674-7-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v3 8/8] test-bap: Add SCC Update Metadata tests
+Date: Mon,  4 Dec 2023 17:15:27 -0500
+Message-ID: <20231204221527.2990674-8-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20231204221527.2990674-1-luiz.dentz@gmail.com>
 References: <20231204221527.2990674-1-luiz.dentz@gmail.com>
@@ -57,117 +57,36 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-4.8.7 Unicast Client Initiates Release Operation (Page 51):
+4.8.8 Unicast Client Initiates Update Metadata Operation (Page 53):
 
   Test Purpose:
-  Verify that a Unicast Client IUT can release an ASE by initiating a Release
-  operation.
+  Verify that a Unicast Client IUT can update the Metadata of an ASE by
+  initiating an Update Metadata operation.
 
   Pass verdict:
   The IUT successfully writes to the ASE Control Point characteristic with the
-  opcode set to 0x08 (Release) and the specified parameters.
+  opcode set to 0x07 (Update Metadata) and the specified parameters.
 
 Test Summary
 ------------
-BAP/UCL/SCC/BV-106-C [UCL SNK Release in Codec Configured state] Passed
-BAP/UCL/SCC/BV-107-C [UCL SRC Release in Codec Configured state] Passed
-BAP/UCL/SCC/BV-108-C [UCL SNK Release in QoS Configured state] Passed
-BAP/UCL/SCC/BV-109-C [UCL SRC Release in QoS Configured state] Passed
-BAP/UCL/SCC/BV-110-C [UCL SNK Release in Enabling state] Passed
-BAP/UCL/SCC/BV-111-C [UCL SRC Release in Enabling or Streaming state] Passed
-BAP/UCL/SCC/BV-112-C [UCL SNK Release in Streaming state] Passed
-BAP/UCL/SCC/BV-113-C [UCL SNK Release in Disabling state] Passed
-Total: 8, Passed: 8 (100.0%), Failed: 0, Not Run: 0
+BAP/UCL/SCC/BV-115-C [UCL SNK Update Metadata in Enabling State] Passed
+BAP/UCL/SCC/BV-116-C [UCL SRC Update Metadata in Enabling or Streaming state]
+Passed
+BAP/UCL/SCC/BV-117-C [UCL SNK Update Metadata in Streaming State] Passed
+Total: 3, Passed: 3 (100.0%), Failed: 0, Not Run: 0
 ---
- unit/test-bap.c | 287 +++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 274 insertions(+), 13 deletions(-)
+ unit/test-bap.c | 139 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 139 insertions(+)
 
 diff --git a/unit/test-bap.c b/unit/test-bap.c
-index 4e518b010def..fa6e65219beb 100644
+index fa6e65219beb..ecd5e2897093 100644
 --- a/unit/test-bap.c
 +++ b/unit/test-bap.c
-@@ -40,6 +40,7 @@ struct test_config {
- 	bool src;
- 	bool vs;
- 	uint8_t state;
-+	bt_bap_state_func_t state_func;
- };
- 
- struct test_data {
-@@ -347,17 +348,8 @@ static void bap_start(struct bt_bap_stream *stream,
- 					uint8_t code, uint8_t reason,
- 					void *user_data)
- {
--	struct test_data *data = user_data;
--	unsigned int id;
--
--	if (code) {
-+	if (code)
- 		tester_test_failed();
--		return;
--	}
--
--	id = bt_bap_stream_disable(data->stream, true, bap_disable, data);
--
--	g_assert(id);
+@@ -2687,6 +2687,144 @@ static void test_scc_release(void)
+ 			SCC_SRC_DISABLE_RELEASE);
  }
  
- static void bap_enable(struct bt_bap_stream *stream,
-@@ -507,6 +499,10 @@ static void test_client(const void *user_data)
- 
- 	bt_bap_ready_register(data->bap, bap_ready, data, NULL);
- 
-+	if (data->cfg && data->cfg->state_func)
-+		bt_bap_state_register(data->bap, data->cfg->state_func, NULL,
-+						data, NULL);
-+
- 	bt_bap_attach(data->bap, data->client);
- }
- 
-@@ -2371,18 +2367,35 @@ static struct test_config cfg_src_disable = {
- 	IOV_DATA(0x52, 0x22, 0x00, 0x05, 0x01, 0x03), \
- 	IOV_DATA(0x1b, 0x22, 0x00, 0x05, 0x01, 0x03, 0x00, 0x00), \
- 	IOV_NULL, \
--	IOV_DATA(0x1b, 0x1c, 0x00, 0x03, 0x02, 0x00, 0x00, 0x4c, 0x1d, 0x00, \
--			0x00, 0x02, 0x1a, 0x00, 0x02, 0x08, 0x00, 0x40, 0x9c, \
-+	IOV_DATA(0x1b, 0x1c, 0x00, 0x03, 0x05, 0x00, 0x00, 0x4c, 0x1d, 0x00, \
-+			0x00, 0x02, 0x1a, 0x00, 0x04, 0x08, 0x00, 0x40, 0x9c, \
- 			0x00)
- #define SCC_SRC_DISABLE \
- 	SCC_SRC_ENABLE, \
- 	ASE_SRC_DISABLE
- 
-+static void state_start_disable(struct bt_bap_stream *stream,
-+					uint8_t old_state, uint8_t new_state,
-+					void *user_data)
-+{
-+	struct test_data *data = user_data;
-+	uint8_t id;
-+
-+	switch (new_state) {
-+	case BT_BAP_STREAM_STATE_STREAMING:
-+		id = bt_bap_stream_disable(data->stream, true, bap_disable,
-+						data);
-+		g_assert(id);
-+		break;
-+	}
-+}
-+
- static struct test_config cfg_src_disable_streaming = {
- 	.cc = LC3_CONFIG_16_2,
- 	.qos = LC3_QOS_16_2_1,
- 	.src = true,
--	.state = BT_BAP_STREAM_STATE_STREAMING
-+	.state = BT_BAP_STREAM_STATE_STREAMING,
-+	.state_func = state_start_disable
- };
- 
- /* ATT: Write Command (0x52) len 23
-@@ -2427,6 +2440,253 @@ static void test_scc_disable(void)
- 			SCC_SRC_DISABLE_STREAMING);
- }
- 
-+static void bap_release(struct bt_bap_stream *stream,
++static void bap_metadata(struct bt_bap_stream *stream,
 +					uint8_t code, uint8_t reason,
 +					void *user_data)
 +{
@@ -175,253 +94,144 @@ index 4e518b010def..fa6e65219beb 100644
 +		tester_test_failed();
 +}
 +
-+static void state_cc_release(struct bt_bap_stream *stream,
++static void state_enable_metadata(struct bt_bap_stream *stream,
 +					uint8_t old_state, uint8_t new_state,
 +					void *user_data)
 +{
 +	struct test_data *data = user_data;
-+	uint8_t id;
-+
-+	switch (new_state) {
-+	case BT_BAP_STREAM_STATE_CONFIG:
-+		id = bt_bap_stream_release(data->stream, bap_release, data);
-+		g_assert(id);
-+		break;
-+	}
-+}
-+
-+static struct test_config cfg_src_cc_release = {
-+	.cc = LC3_CONFIG_16_2,
-+	.qos = QOS_UCAST,
-+	.src = true,
-+	.state_func = state_cc_release,
-+};
-+
-+/* ATT: Write Command (0x52) len 23
-+ *  Handle: 0x0022
-+ *    Data: 080103
-+ * ATT: Handle Value Notification (0x1b) len 7
-+ *  Handle: 0x0022
-+ *    Data: 0801030000
-+ * ATT: Handle Value Notification (0x1b) len 37
-+ *   Handle: 0x001c
-+ *     Data: 0300
-+ */
-+#define ASE_SRC_RELEASE \
-+	IOV_DATA(0x52, 0x22, 0x00, 0x08, 0x01, 0x03), \
-+	IOV_DATA(0x1b, 0x22, 0x00, 0x08, 0x01, 0x03, 0x00, 0x00), \
-+	IOV_NULL, \
-+	IOV_DATA(0x1b, 0x1c, 0x00, 0x03, 0x00)
-+
-+#define SCC_SRC_CC_RELEASE \
-+	SCC_SRC_16_2, \
-+	ASE_SRC_RELEASE
-+
-+static struct test_config cfg_snk_cc_release = {
-+	.cc = LC3_CONFIG_16_2,
-+	.qos = QOS_UCAST,
-+	.snk = true,
-+	.state_func = state_cc_release,
-+};
-+
-+/* ATT: Write Command (0x52) len 23
-+ *  Handle: 0x0022
-+ *    Data: 080101
-+ * ATT: Handle Value Notification (0x1b) len 7
-+ *  Handle: 0x0022
-+ *    Data: 0801010000
-+ * ATT: Handle Value Notification (0x1b) len 37
-+ *   Handle: 0x0016
-+ *     Data: 0300
-+ */
-+#define ASE_SNK_RELEASE \
-+	IOV_DATA(0x52, 0x22, 0x00, 0x08, 0x01, 0x01), \
-+	IOV_DATA(0x1b, 0x22, 0x00, 0x08, 0x01, 0x01, 0x00, 0x00), \
-+	IOV_NULL, \
-+	IOV_DATA(0x1b, 0x16, 0x00, 0x03, 0x00)
-+
-+#define SCC_SNK_CC_RELEASE \
-+	SCC_SNK_16_2, \
-+	ASE_SNK_RELEASE
-+
-+static void state_qos_release(struct bt_bap_stream *stream,
-+					uint8_t old_state, uint8_t new_state,
-+					void *user_data)
-+{
-+	struct test_data *data = user_data;
-+	uint8_t id;
-+
-+	switch (new_state) {
-+	case BT_BAP_STREAM_STATE_QOS:
-+		id = bt_bap_stream_release(data->stream, bap_release, data);
-+		g_assert(id);
-+		break;
-+	}
-+}
-+
-+static struct test_config cfg_src_qos_release = {
-+	.cc = LC3_CONFIG_16_2,
-+	.qos = LC3_QOS_16_2_1,
-+	.src = true,
-+	.state = BT_BAP_STREAM_STATE_QOS,
-+	.state_func = state_qos_release,
-+};
-+
-+#define SCC_SRC_QOS_RELEASE \
-+	SCC_SRC_16_2_1, \
-+	ASE_SRC_RELEASE
-+
-+static struct test_config cfg_snk_qos_release = {
-+	.cc = LC3_CONFIG_16_2,
-+	.qos = LC3_QOS_16_2_1,
-+	.snk = true,
-+	.state = BT_BAP_STREAM_STATE_QOS,
-+	.state_func = state_qos_release,
-+};
-+
-+#define SCC_SNK_QOS_RELEASE \
-+	SCC_SNK_16_2_1, \
-+	ASE_SNK_RELEASE
-+
-+static void state_enable_release(struct bt_bap_stream *stream,
-+					uint8_t old_state, uint8_t new_state,
-+					void *user_data)
-+{
-+	struct test_data *data = user_data;
++	struct iovec iov = {};
 +	uint8_t id;
 +
 +	switch (new_state) {
 +	case BT_BAP_STREAM_STATE_ENABLING:
-+		id = bt_bap_stream_release(data->stream, bap_release, data);
++		id = bt_bap_stream_metadata(data->stream, &iov, bap_metadata,
++						data);
 +		g_assert(id);
 +		break;
 +	}
 +}
 +
-+static struct test_config cfg_src_enable_release = {
-+	.cc = LC3_CONFIG_16_2,
-+	.qos = LC3_QOS_16_2_1,
-+	.src = true,
-+	.state = BT_BAP_STREAM_STATE_ENABLING,
-+	.state_func = state_enable_release,
-+};
-+
-+#define SCC_SRC_ENABLE_RELEASE \
-+	SCC_SRC_ENABLE, \
-+	ASE_SRC_RELEASE
-+
-+static struct test_config cfg_snk_enable_release = {
++static struct test_config cfg_snk_metadata = {
 +	.cc = LC3_CONFIG_16_2,
 +	.qos = LC3_QOS_16_2_1,
 +	.snk = true,
 +	.state = BT_BAP_STREAM_STATE_ENABLING,
-+	.state_func = state_enable_release,
++	.state_func = state_enable_metadata
 +};
 +
-+#define SCC_SNK_ENABLE_RELEASE \
-+	SCC_SNK_ENABLE, \
-+	ASE_SNK_RELEASE
++/* ATT: Write Command (0x52) len 23
++ *  Handle: 0x0022
++ *    Data: 07010100
++ * ATT: Handle Value Notification (0x1b) len 7
++ *  Handle: 0x0022
++ *    Data: 0701010000
++ * ATT: Handle Value Notification (0x1b) len 37
++ *   Handle: 0x0016
++ *     Data: 01010102010a00204e00409c00204e00409c00_qos
++ */
++#define ASE_SNK_METADATA \
++	IOV_DATA(0x52, 0x22, 0x00, 0x07, 0x01, 0x01, 0x00), \
++	IOV_DATA(0x1b, 0x22, 0x00, 0x07, 0x01, 0x01, 0x00, 0x00), \
++	IOV_NULL, \
++	IOV_DATA(0x1b, 0x16, 0x00, 0x01, 0x05, 0x00, 0x00, 0x4c, 0x1d, 0x00, \
++			0x00, 0x02, 0x1a, 0x00, 0x02, 0x08, 0x00, 0x40, 0x9c, \
++			0x00)
 +
-+static void state_start_release(struct bt_bap_stream *stream,
++#define SCC_SNK_METADATA \
++	SCC_SNK_ENABLE, \
++	ASE_SNK_METADATA
++
++static struct test_config cfg_src_metadata = {
++	.cc = LC3_CONFIG_16_2,
++	.qos = LC3_QOS_16_2_1,
++	.src = true,
++	.state = BT_BAP_STREAM_STATE_ENABLING,
++	.state_func = state_enable_metadata
++};
++
++/* ATT: Write Command (0x52) len 23
++ *  Handle: 0x0022
++ *    Data: 07010300
++ * ATT: Handle Value Notification (0x1b) len 7
++ *  Handle: 0x0022
++ *    Data: 0701030000
++ * ATT: Handle Value Notification (0x1b) len 37
++ *   Handle: 0x001c
++ *     Data: 030300000403020100
++ */
++#define ASE_SRC_METADATA \
++	IOV_DATA(0x52, 0x22, 0x00, 0x07, 0x01, 0x03, 0x00), \
++	IOV_DATA(0x1b, 0x22, 0x00, 0x07, 0x01, 0x03, 0x00, 0x00), \
++	IOV_NULL, \
++	IOV_DATA(0x1b, 0x1c, 0x00, 0x03, 0x05, 0x00, 0x00, 0x4c, 0x1d, 0x00, \
++			0x00, 0x02, 0x1a, 0x00, 0x04, 0x08, 0x00, 0x40, 0x9c, \
++			0x00)
++#define SCC_SRC_METADATA \
++	SCC_SRC_ENABLE, \
++	ASE_SRC_METADATA
++
++static void state_start_metadata(struct bt_bap_stream *stream,
 +					uint8_t old_state, uint8_t new_state,
 +					void *user_data)
 +{
 +	struct test_data *data = user_data;
++	struct iovec iov = {};
 +	uint8_t id;
 +
 +	switch (new_state) {
 +	case BT_BAP_STREAM_STATE_STREAMING:
-+		id = bt_bap_stream_release(data->stream, bap_release, data);
++		id = bt_bap_stream_metadata(data->stream, &iov, bap_metadata,
++						data);
 +		g_assert(id);
 +		break;
 +	}
 +}
 +
-+static struct test_config cfg_src_start_release = {
++static struct test_config cfg_src_metadata_streaming = {
 +	.cc = LC3_CONFIG_16_2,
 +	.qos = LC3_QOS_16_2_1,
 +	.src = true,
 +	.state = BT_BAP_STREAM_STATE_STREAMING,
-+	.state_func = state_start_release,
++	.state_func = state_start_metadata
 +};
 +
-+#define SCC_SRC_START_RELEASE \
++#define SCC_SRC_METADATA_STREAMING \
 +	SCC_SRC_ENABLE, \
 +	ASE_SRC_START, \
-+	ASE_SRC_RELEASE
++	ASE_SRC_METADATA
 +
-+static void state_disable_release(struct bt_bap_stream *stream,
-+					uint8_t old_state, uint8_t new_state,
-+					void *user_data)
-+{
-+	struct test_data *data = user_data;
-+	uint8_t id;
-+
-+	switch (new_state) {
-+	case BT_BAP_STREAM_STATE_DISABLING:
-+		id = bt_bap_stream_release(data->stream, bap_release, data);
-+		g_assert(id);
-+		break;
-+	}
-+}
-+
-+static struct test_config cfg_src_disable_release = {
-+	.cc = LC3_CONFIG_16_2,
-+	.qos = LC3_QOS_16_2_1,
-+	.src = true,
-+	.state = BT_BAP_STREAM_STATE_DISABLING,
-+	.state_func = state_disable_release,
-+};
-+
-+#define SCC_SRC_DISABLE_RELEASE \
-+	SCC_SRC_DISABLE, \
-+	ASE_SRC_RELEASE
-+
-+/* Test Purpose:
-+ * Verify that a Unicast Client IUT can release an ASE by initiating a Release
-+ * operation.
++/* Unicast Client Initiates Update Metadata Operation
++ *
++ * Test Purpose:
++ * Verify that a Unicast Client IUT can update the Metadata of an ASE by
++ * initiating an Update Metadata operation.
 + *
 + * Pass verdict:
 + * The IUT successfully writes to the ASE Control Point characteristic with the
-+ * opcode set to 0x08 (Release) and the specified parameters.
++ * opcode set to 0x07 (Update Metadata) and the specified parameters.
 + */
-+static void test_scc_release(void)
++static void test_scc_metadata(void)
 +{
-+	define_test("BAP/UCL/SCC/BV-106-C [UCL SNK Release in Codec Configured"
-+			" state]",
-+			test_client, &cfg_src_cc_release, SCC_SRC_CC_RELEASE);
-+	define_test("BAP/UCL/SCC/BV-107-C [UCL SRC Release in Codec Configured"
-+			" state]",
-+			test_client, &cfg_snk_cc_release, SCC_SNK_CC_RELEASE);
-+	define_test("BAP/UCL/SCC/BV-108-C [UCL SNK Release in QoS Configured"
-+			" state]",
-+			test_client, &cfg_src_qos_release, SCC_SRC_QOS_RELEASE);
-+	define_test("BAP/UCL/SCC/BV-109-C [UCL SRC Release in QoS Configured"
-+			" state]",
-+			test_client, &cfg_snk_qos_release, SCC_SNK_QOS_RELEASE);
-+	define_test("BAP/UCL/SCC/BV-110-C [UCL SNK Release in Enabling state]",
-+			test_client, &cfg_src_enable_release,
-+			SCC_SRC_ENABLE_RELEASE);
-+	define_test("BAP/UCL/SCC/BV-111-C [UCL SRC Release in Enabling or"
-+			" Streaming state]",
-+			test_client, &cfg_snk_enable_release,
-+			SCC_SNK_ENABLE_RELEASE);
-+	define_test("BAP/UCL/SCC/BV-112-C [UCL SNK Release in Streaming state]",
-+			test_client, &cfg_src_start_release,
-+			SCC_SRC_START_RELEASE);
-+	define_test("BAP/UCL/SCC/BV-113-C [UCL SNK Release in Disabling state]",
-+			test_client, &cfg_src_disable_release,
-+			SCC_SRC_DISABLE_RELEASE);
++	define_test("BAP/UCL/SCC/BV-115-C [UCL SNK Update Metadata in Enabling "
++			"State]",
++			test_client, &cfg_src_metadata, SCC_SRC_METADATA);
++	define_test("BAP/UCL/SCC/BV-116-C [UCL SRC Update Metadata in Enabling "
++			"or Streaming state]",
++			test_client, &cfg_snk_metadata, SCC_SNK_METADATA);
++	define_test("BAP/UCL/SCC/BV-117-C [UCL SNK Update Metadata in Streaming"
++			" State]",
++			test_client, &cfg_src_metadata_streaming,
++			SCC_SRC_METADATA_STREAMING);
 +}
 +
  static void test_scc(void)
  {
  	test_scc_cc_lc3();
-@@ -2435,6 +2695,7 @@ static void test_scc(void)
- 	test_scc_qos_vs();
+@@ -2696,6 +2834,7 @@ static void test_scc(void)
  	test_scc_enable();
  	test_scc_disable();
-+	test_scc_release();
+ 	test_scc_release();
++	test_scc_metadata();
  }
  
  int main(int argc, char *argv[])
