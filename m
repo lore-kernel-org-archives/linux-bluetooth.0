@@ -1,101 +1,106 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=theori.io header.i=@theori.io header.b="FX6Nlydl"
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 682EAD5
-	for <linux-bluetooth@vger.kernel.org>; Sun,  3 Dec 2023 23:02:48 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id 98e67ed59e1d1-2868aeeb47dso482631a91.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 03 Dec 2023 23:02:48 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jzCMXwN9"
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBFDDCA
+	for <linux-bluetooth@vger.kernel.org>; Sun,  3 Dec 2023 23:32:29 -0800 (PST)
+Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-6ce3373be0cso1463164b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 03 Dec 2023 23:32:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=theori.io; s=google; t=1701673368; x=1702278168; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BbdWI3B3YH21k8Qw3umXOClHQvLtpy8oqAYW56A+gPE=;
-        b=FX6NlydlblORbw3ziRf2vRRsfC8ZwItb+TzjBSvIH/DqnVUmXo3pqT+4/U5j/omX5y
-         sLiOX0zedPdoGITCxyyNHOIpmMhdOz4HeEOaSxTqc6xvvZlXAiyxvxdxCCQboCIubvqE
-         veoH/A6794f+qCvrrQM72duxFThDoQTKN7d/Y=
+        d=gmail.com; s=20230601; t=1701675149; x=1702279949; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Dw8W3g1qocnebgGFdY09yIc4iOKAr+IJ8a9E+HDNrVM=;
+        b=jzCMXwN9dfWUSLICfcMoKhuxKNgVmaEk8RkIjtYAl8e4toQ6nNvGx2Tf1hEOYcunxZ
+         y0r2aLxALKeXn4BErqhMXEB556b14zRhrEMxfkmsec1/ruQmOK4tMruDhSe+GjIX11X3
+         B3/7O0uxLd+Ix2tgAvGEVv9l5r96dliEJs/lKEnJS6wR+3zw2aKxui25aPGRr+UfJCvN
+         Fqqgm/Kiinl3MyNYz6dZAReMXLyeDmL/VhNzv06ohzmUTYImE9gsyYy0j7JO+4ukkb4E
+         Db+gSYRYq995aaTMQLo3Jnjk+tZrFYlaLA8ljX/WWGBe8P3LZq9sBC71I151RS10oY/V
+         PS0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701673368; x=1702278168;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BbdWI3B3YH21k8Qw3umXOClHQvLtpy8oqAYW56A+gPE=;
-        b=FIqoHtF/YK6bfFBbfi0dt7ewSTdWEiRx6f7NXnryDH+dE88lhQpoJ7FjzIiHerTURd
-         urybfWUrHMilOm5tFuBqokKo2xKQ5MacI09wLly26fR0RSaSJvg3+COJNiK/KLBGVXSe
-         /Kje5hHWuvA7cE4UorvK3QXXv5XEs8EqMYYAD79mPpsxSrFdwLgB2fLcv3oe5af4Ks0w
-         j2vakjHRuX29rM/pvVllQhDiDn6LO5c7FHm9KRnGekEksCp+A5fls3c63+ZHat9cMm+8
-         U8hYV/EKoBGJRc5ngfXws262MQE07+RxefHqgVro/Ck1vjwvoqE5XtCi0g395kqG/mAn
-         OXrQ==
-X-Gm-Message-State: AOJu0YzkQyy4A96VIAyw+4VZZKeHef2ETwgeeBlwQAXE/VA6yuNm4fxa
-	b4AGxOA7vzBlOIyxCdzLzGfgeA==
-X-Google-Smtp-Source: AGHT+IGB9EqRfY5Ik5QEvpEhrS+ICih6lHse+5YC1ez8FjwdjRMKWWSd+XrMsKbEdHEve7fyF4jJnQ==
-X-Received: by 2002:a17:90b:17c9:b0:286:7c8d:fda1 with SMTP id me9-20020a17090b17c900b002867c8dfda1mr721651pjb.30.1701673367810;
-        Sun, 03 Dec 2023 23:02:47 -0800 (PST)
-Received: from ubuntu ([211.219.71.65])
-        by smtp.gmail.com with ESMTPSA id sf15-20020a17090b51cf00b00285994be9easm3321965pjb.1.2023.12.03.23.02.45
+        d=1e100.net; s=20230601; t=1701675149; x=1702279949;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Dw8W3g1qocnebgGFdY09yIc4iOKAr+IJ8a9E+HDNrVM=;
+        b=XdfJPbnpC8y7vAR47aj0kgvvU3BeD2adwqbTyDrmHC3y5sVRHelB7TCNjdo8Vp9VJ3
+         ZpA5ZcBPFlJHPQ2gznJqV0oxas5V8ybn0FhVUx4dHqLQ5NlIT3T0FOUBgnrvuLGgiSUw
+         jpY6bUNlbtmg35teeJMioSwCk3CuFiO1MWqwJrZUeDdQ6CLfu4xZNcJmbS6zh6i3VZzD
+         molLyHO0kUZvCsVmvUwPZ5aYmzrvQxHygvLlxTF57iv+p6pqujx124WRioi2eNrWKD9N
+         GDDrgGP61iWH8OllA8bXBp3ELPhW3I2EMwl+65qGO2aCrJXNhdfXn34hEOW7mxl/iYyw
+         33FA==
+X-Gm-Message-State: AOJu0YwYNlmfC8kOQQtZydOjc7iVEtE/t2a70SE5kbIiDyLTx49BBovj
+	JifPK52/PjBlLvv4+l9Wd+LIdilr0kg=
+X-Google-Smtp-Source: AGHT+IEuj3To/ijIbbGj5izGWYAZ6HTQuBn6TS1s/Z/2sGyJUQ6zRguKjbDsYG9HTaTSz3ovuZpjvQ==
+X-Received: by 2002:a05:6a21:998e:b0:18b:d207:d857 with SMTP id ve14-20020a056a21998e00b0018bd207d857mr5326970pzb.11.1701675148994;
+        Sun, 03 Dec 2023 23:32:28 -0800 (PST)
+Received: from [172.17.0.2] ([20.171.70.179])
+        by smtp.gmail.com with ESMTPSA id s16-20020a056a00179000b006c0316485f9sm2723726pfg.64.2023.12.03.23.32.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 Dec 2023 23:02:47 -0800 (PST)
-Date: Sun, 3 Dec 2023 23:02:43 -0800
-From: Hyunwoo Kim <v4bel@theori.io>
-To: marcel@holtmann.org
-Cc: v4bel@theori.io, imv4bel@gmail.com, johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: af_bluetooth: Fix Use-After-Free in
- bt_sock_recvmsg
-Message-ID: <20231204070243.GA16386@ubuntu>
+        Sun, 03 Dec 2023 23:32:28 -0800 (PST)
+Message-ID: <656d808c.050a0220.43db9.55a1@mx.google.com>
+Date: Sun, 03 Dec 2023 23:32:28 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5466038382790321284=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, v4bel@theori.io
+Subject: RE: Bluetooth: af_bluetooth: Fix Use-After-Free in bt_sock_recvmsg
+In-Reply-To: <20231204070243.GA16386@ubuntu>
+References: <20231204070243.GA16386@ubuntu>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-This can cause a race with bt_sock_ioctl() because
-bt_sock_recvmsg() gets the skb from sk->sk_receive_queue
-and then frees it without holding lock_sock.
-A use-after-free for a skb occurs with the following flow.
-```
-bt_sock_recvmsg() -> skb_recv_datagram() -> skb_free_datagram()
-bt_sock_ioctl() -> skb_peek()
-```
-Add lock_sock to bt_sock_recvmsg() to fix this issue.
+--===============5466038382790321284==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Hyunwoo Kim <v4bel@theori.io>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=806468
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.48 seconds
+GitLint                       PASS      0.22 seconds
+SubjectPrefix                 PASS      0.07 seconds
+BuildKernel                   PASS      28.01 seconds
+CheckAllWarning               PASS      31.13 seconds
+CheckSparse                   WARNING   36.27 seconds
+CheckSmatch                   PASS      100.31 seconds
+BuildKernel32                 PASS      27.37 seconds
+TestRunnerSetup               PASS      423.62 seconds
+TestRunner_l2cap-tester       PASS      23.57 seconds
+TestRunner_iso-tester         PASS      46.96 seconds
+TestRunner_bnep-tester        PASS      6.88 seconds
+TestRunner_mgmt-tester        PASS      164.14 seconds
+TestRunner_rfcomm-tester      PASS      11.08 seconds
+TestRunner_sco-tester         PASS      14.63 seconds
+TestRunner_ioctl-tester       PASS      12.31 seconds
+TestRunner_mesh-tester        PASS      9.04 seconds
+TestRunner_smp-tester         PASS      10.05 seconds
+TestRunner_userchan-tester    PASS      7.49 seconds
+IncrementalBuild              PASS      26.74 seconds
+
+Details
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/af_bluetooth.c:223:25: warning: context imbalance in 'bt_accept_enqueue' - different lock contexts for basic block
+
+
 ---
- net/bluetooth/af_bluetooth.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 336a76165454..9def13ac816e 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -309,11 +309,16 @@ int bt_sock_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
- 	if (flags & MSG_OOB)
- 		return -EOPNOTSUPP;
- 
-+	lock_sock(sk);
-+
- 	skb = skb_recv_datagram(sk, flags, &err);
- 	if (!skb) {
--		if (sk->sk_shutdown & RCV_SHUTDOWN)
-+		if (sk->sk_shutdown & RCV_SHUTDOWN) {
-+			release_sock(sk);
- 			return 0;
-+		}
- 
-+		release_sock(sk);
- 		return err;
- 	}
- 
-@@ -343,6 +348,8 @@ int bt_sock_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
- 
- 	skb_free_datagram(sk, skb);
- 
-+	release_sock(sk);
-+
- 	if (flags & MSG_TRUNC)
- 		copied = skblen;
- 
--- 
-2.25.1
 
+--===============5466038382790321284==--
