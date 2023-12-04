@@ -1,93 +1,82 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LjKQRKLb"
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7B78DF;
-	Mon,  4 Dec 2023 02:08:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701684482; x=1733220482;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=F+phs8HZ/XkWka0qWXx+b0LrCOTF26PluA67cnYvAcI=;
-  b=LjKQRKLb09EhfwirxsO3Wfsc9a93ovwpTWvx8piz16LlP6uCs+ex3UaV
-   0DOq4/tbBOUvlsLPptLhbWB6Qbe6psdPHwCmDiBQz5E7UeMi4y2wVD9jZ
-   NC86/HDuEXQ1MceVnwOPCX4RXHaEL743gvNWOBQl3ptBnR9yB5tIvuyj0
-   03THP5B7fgw24ApKgRN9lKM50lkho3gBTz2jH9/IDmVThIKo6T6RWuiyf
-   Vo+iOutpijiZ1pxvDHqDigsu61Go4v4I/O4AbK54IUx8pGuTJLQLPxSr/
-   pO7XB6TnWqTqwAU5ltImUuf/tlizGQl+MOARxdDGEvkYaQMVDDQ1aZZ9x
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10913"; a="373898286"
-X-IronPort-AV: E=Sophos;i="6.04,249,1695711600"; 
-   d="scan'208";a="373898286"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2023 02:08:02 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10913"; a="888481099"
-X-IronPort-AV: E=Sophos;i="6.04,249,1695711600"; 
-   d="scan'208";a="888481099"
-Received: from mattu-haswell.fi.intel.com ([10.237.72.199])
-  by fmsmga002.fm.intel.com with ESMTP; 04 Dec 2023 02:07:59 -0800
-From: Mathias Nyman <mathias.nyman@linux.intel.com>
-To: <gregkh@linuxfoundation.org>
-Cc: <linux-usb@vger.kernel.org>,
-	linux-bluetooth@vger.kernel.org,
-	mario.limonciello@amd.com,
-	regressions@lists.linux.dev,
-	regressions@leemhuis.info,
-	Basavaraj.Natikar@amd.com,
-	pmenzel@molgen.mpg.de,
-	bugs-a21@moonlit-rail.com,
-	Mathias Nyman <mathias.nyman@linux.intel.com>,
-	stable@vger.kernel.org
-Subject: [PATCH 2/2] Revert "xhci: Loosen RPM as default policy to cover for AMD xHC 1.1"
-Date: Mon,  4 Dec 2023 12:08:59 +0200
-Message-Id: <20231204100859.1332772-2-mathias.nyman@linux.intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231204100859.1332772-1-mathias.nyman@linux.intel.com>
-References: <3d3b8fd3-a1b9-9793-b709-eda447ebd1ab@linux.intel.com>
- <20231204100859.1332772-1-mathias.nyman@linux.intel.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UA8pT4Vb"
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9270AF0
+	for <linux-bluetooth@vger.kernel.org>; Mon,  4 Dec 2023 02:14:30 -0800 (PST)
+Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-6cb74a527ceso2927608b3a.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 04 Dec 2023 02:14:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701684870; x=1702289670; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=uMyndoK5QKkZvKmnW2pp/RNpWFdF79+6m22c26T8oUI=;
+        b=UA8pT4Vbvd1cAWExlMBE0LARmxOcpJQDS0cDcw80IbGHXjtaLDCukMVAjPH0aZADlT
+         cZ+KQwOZPp6zkPxVZgD2MiFSk9iSLAXvISL1C/tU6wy4a7gRNAqA61BaOc8AZr91Ztbw
+         74l4XPpIwj576669bEiprOusaig1SXnK126s/RPv0sOp/u/3513Nhrc4bDHxMCX37xVM
+         M3pPtkjT5ZF3c4vo0gwa4ITwi+dAE9FZ0orhZrcJjQLesekEKxwHCMsbrNLGxxdJbcGs
+         SBJtrztBTs/07upY1DaIakxXzqi7O3DrdzNAFa8FOgqeslW9O9c4Y8MFvWHFBqYeDjkF
+         Wy3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701684870; x=1702289670;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uMyndoK5QKkZvKmnW2pp/RNpWFdF79+6m22c26T8oUI=;
+        b=sezhaTvqdnjrvCVI/1a2Rp1uFw1Lmc7VlVn5XP7hi2rerSjwLEh2tOqhakaq4df2ZL
+         /pmmIPHEoASgTfB5E3N6zR5n4m81bNkhnXJY0dnEvGjWPL5kWmX8Fg7TBBw8B9yC8aSw
+         E1a7fWirV08fVzvdytpcFCCVdLURHo125z/7boTMawWV2hqQTUvkTSTMLW+FXKXvd+Xc
+         gE/Kcmj1y60YuWGEvfzWxpji6iXTeMvTewZzLgZ9ij6E2XqUbJIFKdYX1jj+0D9eqeQa
+         MWUQMp8yORlHK99LmAiIB9J1jrUIMfhN3q72xikfCj/rBMnqVCUIdILBOFo6bdeXOeh1
+         ckAw==
+X-Gm-Message-State: AOJu0Yw+VDxoOKBDmeYpBFaf/G33aD5PL5yWWaMf0l6KVa/v+efMD5X3
+	qUfsEkOGlwLtC5wejE7FsKwrD1Iisus=
+X-Google-Smtp-Source: AGHT+IEp37hepUU8/WlkOPPIMhHyCrP++aMZDpy/eXvNB//rfpWbkqxtA2X83CPXBgRxA6uydXu9hw==
+X-Received: by 2002:a05:6a00:e16:b0:6cb:a60c:14 with SMTP id bq22-20020a056a000e1600b006cba60c0014mr1810081pfb.18.1701684869771;
+        Mon, 04 Dec 2023 02:14:29 -0800 (PST)
+Received: from [172.17.0.2] ([13.91.68.145])
+        by smtp.gmail.com with ESMTPSA id bm16-20020a056a00321000b006ce202eb58csm3943867pfb.132.2023.12.04.02.14.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Dec 2023 02:14:29 -0800 (PST)
+Message-ID: <656da685.050a0220.200c8.81dc@mx.google.com>
+Date: Mon, 04 Dec 2023 02:14:29 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============2820309596871089407=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, mathias.nyman@linux.intel.com
+Subject: RE: [1/2] Revert "xhci: Enable RPM on controllers that support low-power states"
+In-Reply-To: <20231204100859.1332772-1-mathias.nyman@linux.intel.com>
+References: <20231204100859.1332772-1-mathias.nyman@linux.intel.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-This reverts commit 4baf1218150985ee3ab0a27220456a1f027ea0ac.
+--===============2820309596871089407==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Enabling runtime pm as default for all AMD xHC 1.1 controllers caused
-regression. An initial attempt to fix those was done in commit a5d6264b638e
-("xhci: Enable RPM on controllers that support low-power states") but new
-issues are still seen.
+This is an automated email and please do not reply to this email.
 
-Revert them both and start from a clean slate.
+Dear Submitter,
 
-This patch went to stable an needs to be reverted from there as well.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-Fixes: 4baf12181509 ("xhci: Loosen RPM as default policy to cover for AMD xHC 1.1")
-Link: https://lore.kernel.org/linux-usb/55c50bf5-bffb-454e-906e-4408c591cb63@molgen.mpg.de
-Cc: Mario Limonciello <mario.limonciello@amd.com>
-Cc: Basavaraj Natikar <Basavaraj.Natikar@amd.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Mathias Nyman <mathias.nyman@linux.intel.com>
+----- Output -----
+
+error: patch failed: drivers/usb/host/xhci-pci.c:695
+error: drivers/usb/host/xhci-pci.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- drivers/usb/host/xhci-pci.c | 2 --
- 1 file changed, 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/usb/host/xhci-pci.c b/drivers/usb/host/xhci-pci.c
-index bde43cef8846..b9ae5c2a2527 100644
---- a/drivers/usb/host/xhci-pci.c
-+++ b/drivers/usb/host/xhci-pci.c
-@@ -535,8 +535,6 @@ static void xhci_pci_quirks(struct device *dev, struct xhci_hcd *xhci)
- 	/* xHC spec requires PCI devices to support D3hot and D3cold */
- 	if (xhci->hci_version >= 0x120)
- 		xhci->quirks |= XHCI_DEFAULT_PM_RUNTIME_ALLOW;
--	else if (pdev->vendor == PCI_VENDOR_ID_AMD && xhci->hci_version >= 0x110)
--		xhci->quirks |= XHCI_DEFAULT_PM_RUNTIME_ALLOW;
- 
- 	if (xhci->quirks & XHCI_RESET_ON_RESUME)
- 		xhci_dbg_trace(xhci, trace_xhci_dbg_quirks,
--- 
-2.25.1
 
+--===============2820309596871089407==--
