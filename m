@@ -1,224 +1,141 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZPyCoU59"
-Received: from mail-vs1-xe2d.google.com (mail-vs1-xe2d.google.com [IPv6:2607:f8b0:4864:20::e2d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0C1A11F
-	for <linux-bluetooth@vger.kernel.org>; Mon,  4 Dec 2023 14:15:31 -0800 (PST)
-Received: by mail-vs1-xe2d.google.com with SMTP id ada2fe7eead31-4649299d0a0so452118137.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 04 Dec 2023 14:15:31 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TPLJV6xW"
+Received: from mail-vk1-xa2d.google.com (mail-vk1-xa2d.google.com [IPv6:2607:f8b0:4864:20::a2d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6456134
+	for <linux-bluetooth@vger.kernel.org>; Mon,  4 Dec 2023 14:15:35 -0800 (PST)
+Received: by mail-vk1-xa2d.google.com with SMTP id 71dfb90a1353d-4b2dc44d54aso437195e0c.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 04 Dec 2023 14:15:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701728130; x=1702332930; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4h6ikY50jNdfv+t4SGoqzVG8MtRln2TReTJFy2w9zG8=;
-        b=ZPyCoU59VEW5jOte+AxyorIl9PMtBjZZfKd5Bh+epsWsKJ39/u4j7EHF4EEZEZ3J4J
-         XUElAtJVJ7PvHtIkqxLHzU9tsVBJMf+A/HE7TzJ51+OiXxHf0kTsr95zV078z1oecPu8
-         fnhDv1NhEZvVcrfpiTu8BtH5UxJMD5oUAoh/skMMQDSVs5eg0o3n3YNn4wwEOFlp3Blj
-         3QvzzjIipYw5/fb+O5jI4kI4mTaYoxCcRFfDihXpyFvYAQL2nOpvw09X60b7TAo/NDIo
-         Pr7ItjrzUGrcliATAfkR8hJ8TQxrC+kMKs23bfo928ckcmxJkIGUGy/i2hZkS+tnXlxR
-         uGzw==
+        d=gmail.com; s=20230601; t=1701728133; x=1702332933; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nilNZRtTQifRr2NjZFoVre08KbRTer2dFroHFKuf5O4=;
+        b=TPLJV6xWWxhQATdsynfAiJW8XZGzqCSJNb6z8E1+zp61rqS9DiZOpHqGFEYE2B8nB7
+         EOabWFPwM/jV506RWKa8RgYjXfwYAoKy0WwSHP1GoMrD5vi/A6joYV12WTzG1a5xt8iU
+         fMys55HwY/vV4sG9vdUza6F590YNnoHaxb9Cc6dnx1EvZpJhDzpLAHLZd0qxAzJyWFtn
+         GnMg6YVYEO5jBBxBE/YE7xSTjNbCbibcu9CkZkaFSZzFcO3EK4XhWfapT7pYbfdgP7kv
+         9jQBfhcL4UzFPXJ5Jp5HfXTv3OcfKIw6J7AWrLP63y3vLDJ2OAEfItXCzL8KXD7v+P/c
+         wRsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701728130; x=1702332930;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4h6ikY50jNdfv+t4SGoqzVG8MtRln2TReTJFy2w9zG8=;
-        b=EU15Y2G29hOPdZflAxziNl43FTumlOUWCe/HqB6pP4591nIyC088Pg6met2jGRXmwZ
-         u7CLfzVzCqPQCUQxOueCrA6xKApoY5I/TsehfrVMaV5g4QT12WKCBbgTYzhQ8muO3gCi
-         GHu3AKNXIH5DrLUiDYQniw8PI2Dk6r9jjYpe9xvcS4c+hVL0bjjnqUtSw6UNNF4sFRFF
-         w4tUZHJhOdB4T9JfoA18e3kokru1JrrRvFgcRF31pPaEcJW+GDQWisCCGvc7wAq26SVi
-         qnFHG5fuPAhZQkQnoz6f9IknucCgTWepax4vg8SwA1kYVse+zZTGeR9VgT0HOVuXpNNa
-         g0PQ==
-X-Gm-Message-State: AOJu0YxUwiG0z66ALsYlT68H7LRZGoRNRi4+q1BMb1Bsrpx8Wyckv/GK
-	Zd+zbBhn+oGLgJIVi/SKvNY+JoBL8W4=
-X-Google-Smtp-Source: AGHT+IGG8FrrOFXGqqTrEIp1WDdxwIEtN+fcfde3uBta4J+eLnUOv9FM3olngFtdVO0LkRJPHzX3Bg==
-X-Received: by 2002:a05:6102:302e:b0:464:6793:7fd1 with SMTP id v14-20020a056102302e00b0046467937fd1mr2476464vsa.33.1701728129929;
-        Mon, 04 Dec 2023 14:15:29 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701728133; x=1702332933;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nilNZRtTQifRr2NjZFoVre08KbRTer2dFroHFKuf5O4=;
+        b=ddFfqCcgBymZ8/I48+A0aAftL6d4cluk68JXlObNHwjewabdeiyw2GDNIMrDE2BD3Z
+         bvpzrVfjoWi7RU3iP5hOVjdvPGRyhqX00ND99+5cjFj6czuRtIZBjWD0JHxAy4+4cb4u
+         ut6JyOQnFVXK4ZfsXeeYkeDkLdDJ9dJwssMVSDnqs0yMNds+gh6Onbgqkw9BHYUhIoFg
+         pkT/UrrdhOBAvFPKIkJABE7yQMgKQ7tBhieHEHPE0Mxh44bOO3yvT76fl5ZJa/p6rsc7
+         Vi9Vy8BWw/2E17bphjeOdBhFW1kjLDFqc3CklJ1o/4WeVHCkavaM6LveKtuR1yaW+Iqz
+         OqSw==
+X-Gm-Message-State: AOJu0Yx0GIHv+e2MTH/cTqM/5cRQnAXbnZm3Tb9tnwGwUU62bECXLo79
+	Vmgf2nO6hfcKOEuP0iogysUSK5AYW7U=
+X-Google-Smtp-Source: AGHT+IEi2ONZrbxPxfbrSjURjouv4lco3XPthQuxzipgk9LcYbLxcv9lJUeIRpgxcG5s8QbaX/f5Qg==
+X-Received: by 2002:a67:e9d7:0:b0:464:8402:70e5 with SMTP id q23-20020a67e9d7000000b00464840270e5mr1839940vso.54.1701728133480;
+        Mon, 04 Dec 2023 14:15:33 -0800 (PST)
 Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
-        by smtp.gmail.com with ESMTPSA id bl13-20020a056102508d00b0044d4e63aa03sm1136612vsb.25.2023.12.04.14.15.28
+        by smtp.gmail.com with ESMTPSA id bl13-20020a056102508d00b0044d4e63aa03sm1136612vsb.25.2023.12.04.14.15.32
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Dec 2023 14:15:29 -0800 (PST)
+        Mon, 04 Dec 2023 14:15:32 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 1/8] shared/lc3: Add QoS definitions
-Date: Mon,  4 Dec 2023 17:15:20 -0500
-Message-ID: <20231204221527.2990674-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v3 3/8] test-bap: Add SCC Config QoS, VS tests
+Date: Mon,  4 Dec 2023 17:15:22 -0500
+Message-ID: <20231204221527.2990674-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20231204221527.2990674-1-luiz.dentz@gmail.com>
+References: <20231204221527.2990674-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds the QoS preset definitions as per BAP specification.
----
- src/shared/lc3.h | 153 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 153 insertions(+)
+4.8.4 Unicast Client Initiates Config QoS – Vendor-Specific (Page 46)
 
-diff --git a/src/shared/lc3.h b/src/shared/lc3.h
-index ae193f9e2fa7..e6b043699bc1 100644
---- a/src/shared/lc3.h
-+++ b/src/shared/lc3.h
-@@ -155,3 +155,156 @@
+  Test Purpose:
+  Verify that a Unicast Client IUT can initiate a Config QoS operation for a
+  vendor-specific codec.
+
+  Pass verdict:
+  The IUT successfully writes to the ASE Control Point characteristic with the
+  opcode set to 0x02 (Config QoS) and the specified parameters.
+
+Test Summary
+------------
+BAP/UCL/SCC/BV-099-C [UCL SNK Config QoS, VS]        Passed
+BAP/UCL/SCC/BV-100-C [UCL SRC Config QoS, VS]        Passed
+Total: 2, Passed: 2 (100.0%), Failed: 0, Not Run: 0
+---
+ unit/test-bap.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
+
+diff --git a/unit/test-bap.c b/unit/test-bap.c
+index 303388e35c14..fdfedde6b965 100644
+--- a/unit/test-bap.c
++++ b/unit/test-bap.c
+@@ -2146,11 +2146,54 @@ static void test_scc_qos_lc3(void)
+ 			test_client, &cfg_src_48_6_2, SCC_SRC_48_6_2);
+ }
  
- #define LC3_CONFIG_48_6 \
- 	LC3_CONFIG_48(LC3_CONFIG_DURATION_10, 155u)
++static struct test_config cfg_snk_qos_vs = {
++	.cc = IOV_NULL,
++	.qos = QOS_UCAST,
++	.snk = true,
++	.vs = true,
++	.state = BT_BAP_STREAM_STATE_QOS
++};
 +
-+#define LC3_QOS_UNFRAMED	0x00
-+#define LC3_QOS_FRAMED		0x01
++#define SCC_SNK_QOS_VS \
++	SCC_SNK_VS, \
++	QOS_SNK(0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, \
++		0x00, 0x00, 0x00)
 +
-+#define LC3_QOS_UCAST(_frame, _pd, _t_lat, _interval, _lat, _sdu, _rtn) \
-+{ \
-+	.ucast.cig_id = 0x00, \
-+	.ucast.cis_id = 0x00, \
-+	.ucast.delay = _pd, \
-+	.ucast.target_latency = _t_lat, \
-+	.ucast.io_qos.interval = _interval, \
-+	.ucast.io_qos.latency = _lat, \
-+	.ucast.io_qos.sdu = _sdu, \
-+	.ucast.io_qos.phy = BT_BAP_CONFIG_PHY_2M, \
-+	.ucast.io_qos.rtn = _rtn, \
++static struct test_config cfg_src_qos_vs = {
++	.cc = IOV_NULL,
++	.qos = QOS_UCAST,
++	.src = true,
++	.vs = true,
++	.state = BT_BAP_STREAM_STATE_QOS
++};
++
++#define SCC_SRC_QOS_VS \
++	SCC_SRC_VS, \
++	QOS_SRC(0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, \
++		0x00, 0x00, 0x00)
++
++/* Test Purpose:
++ * Verify that a Unicast Client IUT can initiate a Config QoS operation for a
++ * vendor-specific codec.
++ *
++ * Pass verdict:
++ * The IUT successfully writes to the ASE Control Point characteristic with the
++ * opcode set to 0x02 (Config QoS) and the specified parameters.
++ */
++static void test_scc_qos_vs(void)
++{
++	define_test("BAP/UCL/SCC/BV-099-C [UCL SNK Config QoS, VS]",
++			test_client, &cfg_src_qos_vs, SCC_SRC_QOS_VS);
++	define_test("BAP/UCL/SCC/BV-100-C [UCL SRC QoS Codec, VS]",
++			test_client, &cfg_snk_qos_vs, SCC_SNK_QOS_VS);
 +}
 +
-+#define LC3_QOS_UCAST_7_5_UNFRAMED(_pd, _t_lat, _lat, _sdu, _rtn) \
-+	LC3_QOS_UCAST(LC3_QOS_UNFRAMED, _pd, _t_lat, 7500u, _lat, _sdu, _rtn)
-+
-+#define LC3_QOS_UCAST_10_UNFRAMED(_pd, _t_lat, _lat, _sdu, _rtn) \
-+	LC3_QOS_UCAST(LC3_QOS_UNFRAMED, _pd, _t_lat, 10000u, _lat, _sdu, _rtn)
-+
-+#define LC3_QOS_UCAST_FRAMED(_pd, _t_lat, _interval, _lat, _sdu, _rtn) \
-+	LC3_QOS_UCAST(LC3_QOS_FRAMED, _pd, _t_lat, _interval, _lat, _sdu, _rtn)
-+
-+#define LC3_QOS_8_1_1 \
-+	LC3_QOS_UCAST_7_5_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					8u, 26u, 2u)
-+
-+#define LC3_QOS_8_1_2 \
-+	LC3_QOS_UCAST_7_5_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					75u, 26u, 13u)
-+
-+#define LC3_QOS_8_2_1 \
-+	LC3_QOS_UCAST_10_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					10u, 30u, 2u)
-+
-+#define LC3_QOS_8_2_2 \
-+	LC3_QOS_UCAST_10_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					95u, 30u, 13u)
-+
-+#define LC3_QOS_16_1_1 \
-+	LC3_QOS_UCAST_7_5_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					8u, 30u, 2u)
-+
-+#define LC3_QOS_16_1_2 \
-+	LC3_QOS_UCAST_7_5_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					75u, 30u, 13u)
-+
-+#define LC3_QOS_16_2_1 \
-+	LC3_QOS_UCAST_10_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					10u, 40u, 2u)
-+
-+#define LC3_QOS_16_2_2 \
-+	LC3_QOS_UCAST_10_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					95u, 40u, 13u)
-+
-+#define LC3_QOS_24_1_1 \
-+	LC3_QOS_UCAST_7_5_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					8u, 45u, 2u)
-+
-+#define LC3_QOS_24_1_2 \
-+	LC3_QOS_UCAST_7_5_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					75u, 45u, 13u)
-+
-+#define LC3_QOS_24_2_1 \
-+	LC3_QOS_UCAST_10_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					10u, 60u, 2u)
-+
-+#define LC3_QOS_24_2_2 \
-+	LC3_QOS_UCAST_10_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					95u, 60u, 13u)
-+
-+#define LC3_QOS_32_1_1 \
-+	LC3_QOS_UCAST_7_5_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					8u, 60u, 2u)
-+
-+#define LC3_QOS_32_1_2 \
-+	LC3_QOS_UCAST_7_5_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					75u, 60u, 13u)
-+
-+#define LC3_QOS_32_2_1 \
-+	LC3_QOS_UCAST_10_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					10u, 80u, 2u)
-+
-+#define LC3_QOS_32_2_2 \
-+	LC3_QOS_UCAST_10_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					95u, 80u, 13u)
-+
-+#define LC3_QOS_44_1_1 \
-+	LC3_QOS_UCAST_FRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					8163u, 24u, 98u, 5u)
-+
-+#define LC3_QOS_44_1_2 \
-+	LC3_QOS_UCAST_FRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					8163u, 80u, 98u, 13u)
-+
-+#define LC3_QOS_44_2_1 \
-+	LC3_QOS_UCAST_FRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					10884u, 31u, 130u, 5u)
-+
-+#define LC3_QOS_44_2_2 \
-+	LC3_QOS_UCAST_FRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					10884u, 85u, 130u, 13u)
-+
-+#define LC3_QOS_48_1_1 \
-+	LC3_QOS_UCAST_7_5_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					15u, 75u, 5u)
-+
-+#define LC3_QOS_48_1_2 \
-+	LC3_QOS_UCAST_7_5_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					75u, 75u, 13u)
-+
-+#define LC3_QOS_48_2_1 \
-+	LC3_QOS_UCAST_10_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					20u, 100u, 5u)
-+
-+#define LC3_QOS_48_2_2 \
-+	LC3_QOS_UCAST_10_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					95u, 100u, 13u)
-+
-+#define LC3_QOS_48_3_1 \
-+	LC3_QOS_UCAST_7_5_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					15u, 90u, 5u)
-+
-+#define LC3_QOS_48_3_2 \
-+	LC3_QOS_UCAST_7_5_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					75u, 90u, 13u)
-+
-+#define LC3_QOS_48_4_1 \
-+	LC3_QOS_UCAST_10_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					20u, 120u, 5u)
-+
-+#define LC3_QOS_48_4_2 \
-+	LC3_QOS_UCAST_10_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					100u, 120u, 13u)
-+
-+#define LC3_QOS_48_5_1 \
-+	LC3_QOS_UCAST_7_5_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					15u, 117u, 5u)
-+
-+#define LC3_QOS_48_5_2 \
-+	LC3_QOS_UCAST_7_5_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					75u, 117u, 13u)
-+
-+#define LC3_QOS_48_6_1 \
-+	LC3_QOS_UCAST_10_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					20u, 155u, 5u)
-+
-+#define LC3_QOS_48_6_2 \
-+	LC3_QOS_UCAST_10_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
-+					100u, 155u, 13u)
+ static void test_scc(void)
+ {
+ 	test_scc_cc_lc3();
+ 	test_scc_cc_vs();
+ 	test_scc_qos_lc3();
++	test_scc_qos_vs();
+ }
+ 
+ int main(int argc, char *argv[])
 -- 
 2.43.0
 
