@@ -1,106 +1,110 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jzCMXwN9"
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBFDDCA
-	for <linux-bluetooth@vger.kernel.org>; Sun,  3 Dec 2023 23:32:29 -0800 (PST)
-Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-6ce3373be0cso1463164b3a.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 03 Dec 2023 23:32:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701675149; x=1702279949; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dw8W3g1qocnebgGFdY09yIc4iOKAr+IJ8a9E+HDNrVM=;
-        b=jzCMXwN9dfWUSLICfcMoKhuxKNgVmaEk8RkIjtYAl8e4toQ6nNvGx2Tf1hEOYcunxZ
-         y0r2aLxALKeXn4BErqhMXEB556b14zRhrEMxfkmsec1/ruQmOK4tMruDhSe+GjIX11X3
-         B3/7O0uxLd+Ix2tgAvGEVv9l5r96dliEJs/lKEnJS6wR+3zw2aKxui25aPGRr+UfJCvN
-         Fqqgm/Kiinl3MyNYz6dZAReMXLyeDmL/VhNzv06ohzmUTYImE9gsyYy0j7JO+4ukkb4E
-         Db+gSYRYq995aaTMQLo3Jnjk+tZrFYlaLA8ljX/WWGBe8P3LZq9sBC71I151RS10oY/V
-         PS0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701675149; x=1702279949;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Dw8W3g1qocnebgGFdY09yIc4iOKAr+IJ8a9E+HDNrVM=;
-        b=XdfJPbnpC8y7vAR47aj0kgvvU3BeD2adwqbTyDrmHC3y5sVRHelB7TCNjdo8Vp9VJ3
-         ZpA5ZcBPFlJHPQ2gznJqV0oxas5V8ybn0FhVUx4dHqLQ5NlIT3T0FOUBgnrvuLGgiSUw
-         jpY6bUNlbtmg35teeJMioSwCk3CuFiO1MWqwJrZUeDdQ6CLfu4xZNcJmbS6zh6i3VZzD
-         molLyHO0kUZvCsVmvUwPZ5aYmzrvQxHygvLlxTF57iv+p6pqujx124WRioi2eNrWKD9N
-         GDDrgGP61iWH8OllA8bXBp3ELPhW3I2EMwl+65qGO2aCrJXNhdfXn34hEOW7mxl/iYyw
-         33FA==
-X-Gm-Message-State: AOJu0YwYNlmfC8kOQQtZydOjc7iVEtE/t2a70SE5kbIiDyLTx49BBovj
-	JifPK52/PjBlLvv4+l9Wd+LIdilr0kg=
-X-Google-Smtp-Source: AGHT+IEuj3To/ijIbbGj5izGWYAZ6HTQuBn6TS1s/Z/2sGyJUQ6zRguKjbDsYG9HTaTSz3ovuZpjvQ==
-X-Received: by 2002:a05:6a21:998e:b0:18b:d207:d857 with SMTP id ve14-20020a056a21998e00b0018bd207d857mr5326970pzb.11.1701675148994;
-        Sun, 03 Dec 2023 23:32:28 -0800 (PST)
-Received: from [172.17.0.2] ([20.171.70.179])
-        by smtp.gmail.com with ESMTPSA id s16-20020a056a00179000b006c0316485f9sm2723726pfg.64.2023.12.03.23.32.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 Dec 2023 23:32:28 -0800 (PST)
-Message-ID: <656d808c.050a0220.43db9.55a1@mx.google.com>
-Date: Sun, 03 Dec 2023 23:32:28 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5466038382790321284=="
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f4bOH0QP"
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C2CECD;
+	Mon,  4 Dec 2023 01:11:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701681062; x=1733217062;
+  h=message-id:date:mime-version:to:cc:references:from:
+   subject:in-reply-to:content-transfer-encoding;
+  bh=HF7PazhEJaUGDhVtrd2okSZVq55CFcLcBkpdxxWUXIo=;
+  b=f4bOH0QPV64OldHGwH+Tc5dtE/PnCv4iyK2fLqiEBn46QP+XIbzda5v0
+   fib1wy8qAD3/FFbktT3ZYPEJhLwhmGE2F9FA6Xv4mIPkh35nnMBBgFPlP
+   Ry0270p/QV5GOJMGWxtOSA4EGHFwbklUio7lSQymGXptHU4n/8v0iVlvw
+   nls1F7KFDecs2aDDxa//mi0i5fZmNPloexv+c075c+7xFcpoAt21bxcFc
+   bFkkV+X55aOGD6756I/jT/omVw9Jj5F5EDFFfVXPakSg0F8ozB8LRog5+
+   VReemyB/g2OMs1l8xdByo5g0gq996M01mcU6ev8u5xEjjY818ASjxzZme
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10913"; a="7027004"
+X-IronPort-AV: E=Sophos;i="6.04,249,1695711600"; 
+   d="scan'208";a="7027004"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2023 01:11:01 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10913"; a="861314906"
+X-IronPort-AV: E=Sophos;i="6.04,249,1695711600"; 
+   d="scan'208";a="861314906"
+Received: from mattu-haswell.fi.intel.com (HELO [10.237.72.199]) ([10.237.72.199])
+  by FMSMGA003.fm.intel.com with ESMTP; 04 Dec 2023 01:10:57 -0800
+Message-ID: <3d3b8fd3-a1b9-9793-b709-eda447ebd1ab@linux.intel.com>
+Date: Mon, 4 Dec 2023 11:12:16 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, v4bel@theori.io
-Subject: RE: Bluetooth: af_bluetooth: Fix Use-After-Free in bt_sock_recvmsg
-In-Reply-To: <20231204070243.GA16386@ubuntu>
-References: <20231204070243.GA16386@ubuntu>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============5466038382790321284==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.13.0
+Content-Language: en-US
+To: Greg KH <gregkh@linuxfoundation.org>,
+ "Kris Karas (Bug Reporting)" <bugs-a21@moonlit-rail.com>
+Cc: Paul Menzel <pmenzel@molgen.mpg.de>,
+ Basavaraj Natikar <Basavaraj.Natikar@amd.com>, stable@vger.kernel.org,
+ Thorsten Leemhuis <regressions@leemhuis.info>, regressions@lists.linux.dev,
+ linux-bluetooth@vger.kernel.org,
+ Mario Limonciello <mario.limonciello@amd.com>,
+ Mathias Nyman <mathias.nyman@intel.com>, linux-usb@vger.kernel.org
+References: <ee109942-ef8e-45b9-8cb9-a98a787fe094@moonlit-rail.com>
+ <8d6070c8-3f82-4a12-8c60-7f1862fef9d9@leemhuis.info>
+ <2023120119-bonus-judgingly-bf57@gregkh>
+ <6a710423-e76c-437e-ba59-b9cefbda3194@moonlit-rail.com>
+ <55c50bf5-bffb-454e-906e-4408c591cb63@molgen.mpg.de>
+ <2023120213-octagon-clarity-5be3@gregkh>
+ <f1e0a872-cd9a-4ef4-9ac9-cd13cf2d6ea4@moonlit-rail.com>
+ <2023120259-subject-lubricant-579f@gregkh>
+ <ef575387-4a52-49bd-9c26-3a03ac816b61@moonlit-rail.com>
+ <2023120329-length-strum-9ee1@gregkh>
+From: Mathias Nyman <mathias.nyman@linux.intel.com>
+Subject: Re: Regression: Inoperative bluetooth, Intel chipset, mainline kernel
+ 6.6.2+
+In-Reply-To: <2023120329-length-strum-9ee1@gregkh>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-This is automated email and please do not reply to this email!
+On 3.12.2023 10.38, Greg KH wrote:
+> On Sun, Dec 03, 2023 at 03:32:52AM -0500, Kris Karas (Bug Reporting) wrote:
+>> Greg KH wrote:
+>>> Thanks for testing, any chance you can try 6.6.4-rc1?  Or wait a few
+>>> hours for me to release 6.6.4 if you don't want to mess with a -rc
+>>> release.
+>>
+>> As I mentioned to Greg off-list (to save wasting other peoples' bandwidth),
+>> I couldn't find 6.6.4-rc1.  Looking in wrong git tree?  But 6.6.4 is now
+>> out, which I have tested and am running at the moment, albeit with the
+>> problem commit from 6.6.2 backed out.
+>>
+>> There is no change with respect to this bug.  The problematic patch
+>> introduced in 6.6.2 was neither reverted nor amended.  The "opcode 0x0c03
+>> failed" lines to the kernel log continue to be present.
+>>
+>>> Also, is this showing up in 6.7-rc3?  If so, that would be a big help in
+>>> tracking this down.
+>>
+>> The bug shows up in 6.7-rc3 as well, exactly as it does here in 6.6.2+ and
+>> in 6.1.63+.  The problematic patch bisected earlier appears identically (and
+>> seems to have been introduced simultaneously) in these recent releases.
+> 
+> Ok, in a way, this is good as that means I haven't missed a fix, but bad
+> in that this does affect everyone more.
+> 
+> So let's start over, you found the offending commit, and nothing has
+> fixed it, so what do we do?  xhci/amd developers, any ideas?
+> thanks,
+> 
+> greg k-h
+> 
 
-Dear submitter,
+I suggest reverting these two patches from everywhere (all stable):
+a5d6264b638e xhci: Enable RPM on controllers that support low-power states
+4baf12181509 xhci: Loosen RPM as default policy to cover for AMD xHC 1.1
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=806468
+Then write a new well tested patch that adds default runtime pm to those AMD
+hosts that support it. And only add that to usb-next
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.48 seconds
-GitLint                       PASS      0.22 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      28.01 seconds
-CheckAllWarning               PASS      31.13 seconds
-CheckSparse                   WARNING   36.27 seconds
-CheckSmatch                   PASS      100.31 seconds
-BuildKernel32                 PASS      27.37 seconds
-TestRunnerSetup               PASS      423.62 seconds
-TestRunner_l2cap-tester       PASS      23.57 seconds
-TestRunner_iso-tester         PASS      46.96 seconds
-TestRunner_bnep-tester        PASS      6.88 seconds
-TestRunner_mgmt-tester        PASS      164.14 seconds
-TestRunner_rfcomm-tester      PASS      11.08 seconds
-TestRunner_sco-tester         PASS      14.63 seconds
-TestRunner_ioctl-tester       PASS      12.31 seconds
-TestRunner_mesh-tester        PASS      9.04 seconds
-TestRunner_smp-tester         PASS      10.05 seconds
-TestRunner_userchan-tester    PASS      7.49 seconds
-IncrementalBuild              PASS      26.74 seconds
-
-Details
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/af_bluetooth.c:223:25: warning: context imbalance in 'bt_accept_enqueue' - different lock contexts for basic block
-
-
----
-Regards,
-Linux Bluetooth
+-Mathias
 
 
---===============5466038382790321284==--
+
+
