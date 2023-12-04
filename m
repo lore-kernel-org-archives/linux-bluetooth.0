@@ -1,84 +1,240 @@
-Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com [209.85.210.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8D8FC0
-	for <linux-bluetooth@vger.kernel.org>; Mon,  4 Dec 2023 04:38:23 -0800 (PST)
-Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-6d88101a54cso1790781a34.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 04 Dec 2023 04:38:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701693503; x=1702298303;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=H9ex8njANx8xLMq+LleaHJO8Je9o1d+q9WnLUOEn/Fw=;
-        b=DHUs8RfvPDYC/+mCMOZ2B11o04HyOaBfBRm7wQSmc/TzTFPqD4xud1wD4OyKrCqK5w
-         eRc1ZPzRO/YlbtOFwnmiip5PYiSwAtDfAH3bGJDaFickXXwBUxy88XTztbO3cd8ivdRw
-         biUHv6infLLlxoBcsVdzw1o8qOKA+r1V7cs5lqgB6WWlwyCSnkwWcNP+3WqM81+/Rexo
-         HgoIwxakuznfaHrlfp5BIsjB9cmdABr9jrtI3xGHmAWfGnrzfvdPL6Xjp6p8oHO9qEBF
-         gpSe24v/hQAsEbXvYxI9XEgTFPY1QrjBmeNN0s4LgIdx3C/3B2gmzmCo5edwwatj4Nzo
-         IlpQ==
-X-Gm-Message-State: AOJu0Yy4MBHFkXgDhWqeQ6Nl7145rr2Pog4jucPm2nWrgH6JEtpxW6QC
-	DOOHcdhwkF2aFpgqwTuV3B3zSV1AysKQNpCyZet4A2kTPKdl
-X-Google-Smtp-Source: AGHT+IG4BnF6V3c1ra8kAveWVvbkMgZSTspVOuvZHNgnZzmDtNlqZOCBTlmHxRBZRU8peH0UXacGlKmq5DshwDWlwbGTz7Q3+kZw
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="glYuk8RX"
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A384A7;
+	Mon,  4 Dec 2023 05:07:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701695265; x=1733231265;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=UpKiTiLV03HLrMK8OyY7m+bGEMtR9L95NOiQzYClrhU=;
+  b=glYuk8RXPb0XnOqDmmVCjrF7jpJ9zshznGYsBwZnW6Lp6N9UB3wcJAfW
+   RcyKoR3vcNfNkawEw6PplM/CnnVsbAPCOO3ye8XRT4rN3XSwOLz9sb1hU
+   7C+6cD/D1sePV5R/GegF2Oygln5+FP4LpN8LETCbSj5emh7LU/EmbTFtR
+   dAUdaO++oeIOhU9+SvMmDwUTY7pfPCIkRyf2unXDWTJ2pYQAWOK2AA2Mv
+   93RpGe0s7/IwqU+loGPDWvrNJMvLWXNCZjdCDCe8Q32LqxnYlkjlPcodB
+   VrGEtbgUe6WUs5DZVI6UwsLf1e6rvg4sOZtvRq/3Q28morjoDvQUepAYu
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10913"; a="15275177"
+X-IronPort-AV: E=Sophos;i="6.04,249,1695711600"; 
+   d="scan'208";a="15275177"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2023 05:07:37 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10913"; a="763935696"
+X-IronPort-AV: E=Sophos;i="6.04,249,1695711600"; 
+   d="scan'208";a="763935696"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orsmga007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2023 05:07:13 -0800
+Received: from andy by smile.fi.intel.com with local (Exim 4.97)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1rA8fA-00000001kqj-2oCl;
+	Mon, 04 Dec 2023 15:07:04 +0200
+Date: Mon, 4 Dec 2023 15:07:04 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Yury Norov <yury.norov@gmail.com>
+Cc: linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"James E.J. Bottomley" <jejb@linux.ibm.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	"Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+	Akinobu Mita <akinobu.mita@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Borislav Petkov <bp@alien8.de>, Chaitanya Kulkarni <kch@nvidia.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	David Disseldorp <ddiss@suse.de>,
+	Edward Cree <ecree.xilinx@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Fenghua Yu <fenghua.yu@intel.com>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Gregory Greenman <gregory.greenman@intel.com>,
+	Hans Verkuil <hverkuil@xs4all.nl>,
+	Hans de Goede <hdegoede@redhat.com>,
+	Hugh Dickins <hughd@google.com>, Ingo Molnar <mingo@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+	Jiri Pirko <jiri@resnulli.us>, Jiri Slaby <jirislaby@kernel.org>,
+	Kalle Valo <kvalo@kernel.org>, Karsten Graul <kgraul@linux.ibm.com>,
+	Karsten Keil <isdn@linux-pingi.de>,
+	Kees Cook <keescook@chromium.org>,
+	Leon Romanovsky <leon@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Martin Habets <habetsm.xilinx@gmail.com>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Michal Simek <monstr@monstr.eu>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Oliver Neukum <oneukum@suse.com>, Paolo Abeni <pabeni@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ping-Ke Shih <pkshih@realtek.com>, Rich Felker <dalias@libc.org>,
+	Rob Herring <robh@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Shuai Xue <xueshuai@linux.alibaba.com>,
+	Stanislaw Gruszka <stf_xl@wp.pl>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Valentin Schneider <vschneid@redhat.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>, Will Deacon <will@kernel.org>,
+	Yoshinori Sato <ysato@users.sourceforge.jp>,
+	GR-QLogic-Storage-Upstream@marvell.com, alsa-devel@alsa-project.org,
+	ath10k@lists.infradead.org, dmaengine@vger.kernel.org,
+	iommu@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-hyperv@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
+	linux-media@vger.kernel.org, linux-mips@vger.kernel.org,
+	linux-net-drivers@amd.com, linux-pci@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-serial@vger.kernel.org,
+	linux-sh@vger.kernel.org, linux-sound@vger.kernel.org,
+	linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, mpi3mr-linuxdrv.pdl@broadcom.com,
+	netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org,
+	Jan Kara <jack@suse.cz>,
+	Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>,
+	Matthew Wilcox <willy@infradead.org>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>,
+	Alexey Klimov <klimov.linux@gmail.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Sergey Shtylyov <s.shtylyov@omp.ru>
+Subject: Re: [PATCH v2 00/35] bitops: add atomic find_bit() operations
+Message-ID: <ZW3O-P_98eubKxMU@smile.fi.intel.com>
+References: <20231203192422.539300-1-yury.norov@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6830:4682:b0:6d9:adfe:36ce with SMTP id
- ay2-20020a056830468200b006d9adfe36cemr51380otb.3.1701693503288; Mon, 04 Dec
- 2023 04:38:23 -0800 (PST)
-Date: Mon, 04 Dec 2023 04:38:23 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000c7bcce060bae642f@google.com>
-Subject: [syzbot] Monthly bluetooth report (Dec 2023)
-From: syzbot <syzbot+list5592d5c09aec7961e337@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231203192422.539300-1-yury.norov@gmail.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-Hello bluetooth maintainers/developers,
+On Sun, Dec 03, 2023 at 11:23:47AM -0800, Yury Norov wrote:
+> Add helpers around test_and_{set,clear}_bit() that allow to search for
+> clear or set bits and flip them atomically.
+> 
+> The target patterns may look like this:
+> 
+> 	for (idx = 0; idx < nbits; idx++)
+> 		if (test_and_clear_bit(idx, bitmap))
+> 			do_something(idx);
+> 
+> Or like this:
+> 
+> 	do {
+> 		bit = find_first_bit(bitmap, nbits);
+> 		if (bit >= nbits)
+> 			return nbits;
+> 	} while (!test_and_clear_bit(bit, bitmap));
+> 	return bit;
+> 
+> In both cases, the opencoded loop may be converted to a single function
+> or iterator call. Correspondingly:
+> 
+> 	for_each_test_and_clear_bit(idx, bitmap, nbits)
+> 		do_something(idx);
+> 
+> Or:
+> 	return find_and_clear_bit(bitmap, nbits);
+> 
+> Obviously, the less routine code people have to write themself, the
+> less probability to make a mistake.
+> 
+> Those are not only handy helpers but also resolve a non-trivial
+> issue of using non-atomic find_bit() together with atomic
+> test_and_{set,clear)_bit().
+> 
+> The trick is that find_bit() implies that the bitmap is a regular
+> non-volatile piece of memory, and compiler is allowed to use such
+> optimization techniques like re-fetching memory instead of caching it.
+> 
+> For example, find_first_bit() is implemented like this:
+> 
+>       for (idx = 0; idx * BITS_PER_LONG < sz; idx++) {
+>               val = addr[idx];
+>               if (val) {
+>                       sz = min(idx * BITS_PER_LONG + __ffs(val), sz);
+>                       break;
+>               }
+>       }
+> 
+> On register-memory architectures, like x86, compiler may decide to
+> access memory twice - first time to compare against 0, and second time
+> to fetch its value to pass it to __ffs().
+> 
+> When running find_first_bit() on volatile memory, the memory may get
+> changed in-between, and for instance, it may lead to passing 0 to
+> __ffs(), which is undefined. This is a potentially dangerous call.
+> 
+> find_and_clear_bit() as a wrapper around test_and_clear_bit()
+> naturally treats underlying bitmap as a volatile memory and prevents
+> compiler from such optimizations.
+> 
+> Now that KCSAN is catching exactly this type of situations and warns on
+> undercover memory modifications. We can use it to reveal improper usage
+> of find_bit(), and convert it to atomic find_and_*_bit() as appropriate.
+> 
+> The 1st patch of the series adds the following atomic primitives:
+> 
+> 	find_and_set_bit(addr, nbits);
+> 	find_and_set_next_bit(addr, nbits, start);
+> 	...
+> 
+> Here find_and_{set,clear} part refers to the corresponding
+> test_and_{set,clear}_bit function. Suffixes like _wrap or _lock
+> derive their semantics from corresponding find() or test() functions.
+> 
+> For brevity, the naming omits the fact that we search for zero bit in
+> find_and_set, and correspondingly search for set bit in find_and_clear
+> functions.
+> 
+> The patch also adds iterators with atomic semantics, like
+> for_each_test_and_set_bit(). Here, the naming rule is to simply prefix
+> corresponding atomic operation with 'for_each'.
+> 
+> This series is a result of discussion [1]. All find_bit() functions imply
+> exclusive access to the bitmaps. However, KCSAN reports quite a number
+> of warnings related to find_bit() API. Some of them are not pointing
+> to real bugs because in many situations people intentionally allow
+> concurrent bitmap operations.
+> 
+> If so, find_bit() can be annotated such that KCSAN will ignore it:
+> 
+>         bit = data_race(find_first_bit(bitmap, nbits));
+> 
+> This series addresses the other important case where people really need
+> atomic find ops. As the following patches show, the resulting code
+> looks safer and more verbose comparing to opencoded loops followed by
+> atomic bit flips.
+> 
+> In [1] Mirsad reported 2% slowdown in a single-thread search test when
+> switching find_bit() function to treat bitmaps as volatile arrays. On
+> the other hand, kernel robot in the same thread reported +3.7% to the
+> performance of will-it-scale.per_thread_ops test.
+> 
+> Assuming that our compilers are sane and generate better code against
+> properly annotated data, the above discrepancy doesn't look weird. When
+> running on non-volatile bitmaps, plain find_bit() outperforms atomic
+> find_and_bit(), and vice-versa.
 
-This is a 31-day syzbot report for the bluetooth subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/bluetooth
+...
 
-During the period, 6 new issues were detected and 0 were fixed.
-In total, 35 issues are still open and 58 have been fixed so far.
+In some cases the better improvements can be achieved by switching
+the (very) old code to utilise IDA framework.
 
-Some of the still happening issues:
+-- 
+With Best Regards,
+Andy Shevchenko
 
-Ref  Crashes Repro Title
-<1>  14730   Yes   possible deadlock in rfcomm_sk_state_change
-                   https://syzkaller.appspot.com/bug?extid=d7ce59b06b3eb14fd218
-<2>  7414    Yes   possible deadlock in rfcomm_dlc_exists
-                   https://syzkaller.appspot.com/bug?extid=b69a625d06e8ece26415
-<3>  4858    Yes   WARNING in hci_conn_timeout
-                   https://syzkaller.appspot.com/bug?extid=2446dd3cb07277388db6
-<4>  4864    Yes   possible deadlock in hci_dev_do_close
-                   https://syzkaller.appspot.com/bug?extid=4e3a76c5c505a3f49083
-<5>  2074    Yes   possible deadlock in hci_rfkill_set_block
-                   https://syzkaller.appspot.com/bug?extid=f93d183bc91522d90de9
-<6>  1321    Yes   KASAN: slab-use-after-free Read in hci_send_acl
-                   https://syzkaller.appspot.com/bug?extid=a0c80b06ae2cb8895bc4
-<7>  421     Yes   WARNING in call_timer_fn
-                   https://syzkaller.appspot.com/bug?extid=6fb78d577e89e69602f9
-<8>  170     No    possible deadlock in hci_unregister_dev
-                   https://syzkaller.appspot.com/bug?extid=c933391d8e4089f1f53e
-<9>  120     No    possible deadlock in discov_off
-                   https://syzkaller.appspot.com/bug?extid=f047480b1e906b46a3f4
-<10> 61      Yes   KASAN: slab-use-after-free Write in sco_sock_timeout
-                   https://syzkaller.appspot.com/bug?extid=4c0d0c4cde787116d465
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
