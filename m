@@ -1,198 +1,224 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P2TjxS1O"
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69560CB
-	for <linux-bluetooth@vger.kernel.org>; Mon,  4 Dec 2023 14:12:26 -0800 (PST)
-Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2ca0c36f5beso13700341fa.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 04 Dec 2023 14:12:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZPyCoU59"
+Received: from mail-vs1-xe2d.google.com (mail-vs1-xe2d.google.com [IPv6:2607:f8b0:4864:20::e2d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0C1A11F
+	for <linux-bluetooth@vger.kernel.org>; Mon,  4 Dec 2023 14:15:31 -0800 (PST)
+Received: by mail-vs1-xe2d.google.com with SMTP id ada2fe7eead31-4649299d0a0so452118137.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 04 Dec 2023 14:15:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701727944; x=1702332744; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0xVhVmrxuCJ/G4r+tPgWlTU9BM/7xdXt7jEBnmEO76Q=;
-        b=P2TjxS1O0T/k3Vej4+dd0Zyg302dA7v2W3/MpxsaI494drvxyL0L1xWkTn+0cUDL/o
-         /xzO/UZSqKhHR1JLN8rzvaaApFopkSbnPbDb2P4hI9OB+YFwBgMGFUgfNX+IulmaAC/1
-         0ilYHVbrRfwkUEVioCQJVSRgwwcCKNWTsUpyDbK3A57TeHd8QzPrYX90TlEbbji6pFgf
-         5AzJmoyTr8YeFeqpLWhYEtcQRQKUxdWBl5hL81590epmiTsA9ya5IP7zYQJxsaC2cF2O
-         OE2oUryfvn3FwxnxEOUK/eqhT2hnfUi2ow607MmuWIJxq8lHrbA784pvziGAmbLS7eTO
-         0Shg==
+        d=gmail.com; s=20230601; t=1701728130; x=1702332930; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4h6ikY50jNdfv+t4SGoqzVG8MtRln2TReTJFy2w9zG8=;
+        b=ZPyCoU59VEW5jOte+AxyorIl9PMtBjZZfKd5Bh+epsWsKJ39/u4j7EHF4EEZEZ3J4J
+         XUElAtJVJ7PvHtIkqxLHzU9tsVBJMf+A/HE7TzJ51+OiXxHf0kTsr95zV078z1oecPu8
+         fnhDv1NhEZvVcrfpiTu8BtH5UxJMD5oUAoh/skMMQDSVs5eg0o3n3YNn4wwEOFlp3Blj
+         3QvzzjIipYw5/fb+O5jI4kI4mTaYoxCcRFfDihXpyFvYAQL2nOpvw09X60b7TAo/NDIo
+         Pr7ItjrzUGrcliATAfkR8hJ8TQxrC+kMKs23bfo928ckcmxJkIGUGy/i2hZkS+tnXlxR
+         uGzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701727944; x=1702332744;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0xVhVmrxuCJ/G4r+tPgWlTU9BM/7xdXt7jEBnmEO76Q=;
-        b=dXsMozgg7blZOi0VEn5ZUCQQlc1VwPCy/gJ3W5HdWBSiXJbA+Pp9EFnotx1ibiheJ3
-         WqEO1ObE3vYRAd92oy++2bmfFfQfdH+78c1TYyeezco39IwlsPohVUso7hUErmW4GFAC
-         p/yhbL2SjhjTrHUbnxhQX5dfanahyj56Qe4i+xW8rQlmOhixQxCxhcUWI12ny6du1QxJ
-         34aCkiwZX5eEdj4fVedrWbwwDkoJlOjQQver2JZaxcbFwh7nqbKW/Lebo+pctRfEIp4n
-         E/C6dJQmE2JoU+tHMnntFpKTkkl29utPz4yFJjE54dIcPLaK3uBuyOUfFi+vbCfk1unP
-         7wLA==
-X-Gm-Message-State: AOJu0YwBCwuW1CiRiBftq2clRNyTgvpWgW+/TkyHmKnBMG/Y1A0rmdot
-	dnWUVRiRSjRNg7dA/qZVtMCqaDI5Ce501gZs/+o=
-X-Google-Smtp-Source: AGHT+IEoScHhmHhqkL4aXT6MqoWZKj4CglMDN07aQpVaXPN+vmF6UQVZsw7Jm8KgFhOko2MHschD2oAgYCV+VOhLM3o=
-X-Received: by 2002:a2e:9902:0:b0:2c9:f696:4510 with SMTP id
- v2-20020a2e9902000000b002c9f6964510mr1380009lji.43.1701727944321; Mon, 04 Dec
- 2023 14:12:24 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701728130; x=1702332930;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4h6ikY50jNdfv+t4SGoqzVG8MtRln2TReTJFy2w9zG8=;
+        b=EU15Y2G29hOPdZflAxziNl43FTumlOUWCe/HqB6pP4591nIyC088Pg6met2jGRXmwZ
+         u7CLfzVzCqPQCUQxOueCrA6xKApoY5I/TsehfrVMaV5g4QT12WKCBbgTYzhQ8muO3gCi
+         GHu3AKNXIH5DrLUiDYQniw8PI2Dk6r9jjYpe9xvcS4c+hVL0bjjnqUtSw6UNNF4sFRFF
+         w4tUZHJhOdB4T9JfoA18e3kokru1JrrRvFgcRF31pPaEcJW+GDQWisCCGvc7wAq26SVi
+         qnFHG5fuPAhZQkQnoz6f9IknucCgTWepax4vg8SwA1kYVse+zZTGeR9VgT0HOVuXpNNa
+         g0PQ==
+X-Gm-Message-State: AOJu0YxUwiG0z66ALsYlT68H7LRZGoRNRi4+q1BMb1Bsrpx8Wyckv/GK
+	Zd+zbBhn+oGLgJIVi/SKvNY+JoBL8W4=
+X-Google-Smtp-Source: AGHT+IGG8FrrOFXGqqTrEIp1WDdxwIEtN+fcfde3uBta4J+eLnUOv9FM3olngFtdVO0LkRJPHzX3Bg==
+X-Received: by 2002:a05:6102:302e:b0:464:6793:7fd1 with SMTP id v14-20020a056102302e00b0046467937fd1mr2476464vsa.33.1701728129929;
+        Mon, 04 Dec 2023 14:15:29 -0800 (PST)
+Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
+        by smtp.gmail.com with ESMTPSA id bl13-20020a056102508d00b0044d4e63aa03sm1136612vsb.25.2023.12.04.14.15.28
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Dec 2023 14:15:29 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v3 1/8] shared/lc3: Add QoS definitions
+Date: Mon,  4 Dec 2023 17:15:20 -0500
+Message-ID: <20231204221527.2990674-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231130195750.1732-1-sebastif@axis.com>
-In-Reply-To: <20231130195750.1732-1-sebastif@axis.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 4 Dec 2023 17:12:11 -0500
-Message-ID: <CABBYNZ+eZyQhqBePiG60xworabUKFoX8AmS+bA0R+vpucZhKhQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/1] Pattern match on service- and manufacturer data
-To: "sebastif@axis.com" <sebastian.david.forslund@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, Sebastian Forslund <sebastif@axis.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Sebastian,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Thu, Nov 30, 2023 at 2:58=E2=80=AFPM sebastif@axis.com
-<sebastian.david.forslund@gmail.com> wrote:
->
-> From: Sebastian Forslund <sebastif@axis.com>
->
-> When advertisement monitoring, manufacturer data and service data was
-> not being matched against. This made it so that advertisement monitoring
-> with or_patterns did not work that type of data.
->
-> We must start matching against the data in the manufacturer_data and
-> service_data queues. Run a different match-function depending on the
-> type of monitor that is being matched against.
->
-> Fixes: https://github.com/bluez/bluez/issues/652
-> ---
->  src/shared/ad.c | 81 ++++++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 80 insertions(+), 1 deletion(-)
->  mode change 100644 =3D> 100755 src/shared/ad.c
->
-> diff --git a/src/shared/ad.c b/src/shared/ad.c
-> old mode 100644
-> new mode 100755
-> index 951c56c60..a95079dc1
-> --- a/src/shared/ad.c
-> +++ b/src/shared/ad.c
-> @@ -1324,6 +1324,72 @@ struct bt_ad_pattern *bt_ad_pattern_new(uint8_t ty=
-pe, size_t offset, size_t len,
->         return pattern;
->  }
->
-> +static void pattern_manufacturer_data_match(void *data, void *user_data)
-> +{
-> +       struct bt_ad_manufacturer_data *manufacturer_data =3D data;
-> +       struct pattern_match_info *info =3D user_data;
-> +       struct bt_ad_pattern *pattern;
-> +       uint8_t all_data[BT_AD_MAX_DATA_LEN];
-> +
-> +       if (!manufacturer_data || !info)
-> +               return;
-> +
-> +       if (info->matched_pattern)
-> +               return;
-> +
-> +       pattern =3D info->current_pattern;
-> +
-> +       if (!pattern || pattern->type !=3D BT_AD_MANUFACTURER_DATA)
-> +               return;
-> +
-> +       /* Take the manufacturer ID into account */
-> +       if (manufacturer_data->len + 2 < pattern->offset + pattern->len)
-> +               return;
-> +
-> +       memcpy(&all_data[0], &manufacturer_data->manufacturer_id, 2);
-> +       memcpy(&all_data[2], manufacturer_data->data, manufacturer_data->=
-len);
-> +
-> +       if (!memcmp(all_data + pattern->offset, pattern->data,
-> +                                                       pattern->len)) {
-> +               info->matched_pattern =3D pattern;
-> +       }
-> +}
-> +
-> +static void pattern_service_data_match(void *data, void *user_data)
-> +{
-> +       struct bt_ad_service_data *service_data =3D data;
-> +       struct pattern_match_info *info =3D user_data;
-> +       struct bt_ad_pattern *pattern;
-> +
-> +       if (!service_data || !info)
-> +               return;
-> +
-> +       if (info->matched_pattern)
-> +               return;
-> +
-> +       pattern =3D info->current_pattern;
-> +
-> +       if (!pattern)
-> +               return;
-> +
-> +       switch (pattern->type) {
-> +       case BT_AD_SERVICE_DATA16:
-> +       case BT_AD_SERVICE_DATA32:
-> +       case BT_AD_SERVICE_DATA128:
-> +               break;
-> +       default:
-> +               return;
-> +       }
-> +
-> +       if (service_data->len < pattern->offset + pattern->len)
-> +               return;
-> +
-> +       if (!memcmp(service_data->data + pattern->offset, pattern->data,
-> +                                                       pattern->len)) {
-> +               info->matched_pattern =3D pattern;
-> +       }
-> +}
-> +
->  static void pattern_ad_data_match(void *data, void *user_data)
->  {
->         struct bt_ad_data *ad_data =3D data;
-> @@ -1363,7 +1429,20 @@ static void pattern_match(void *data, void *user_d=
-ata)
->
->         info->current_pattern =3D pattern;
->
-> -       bt_ad_foreach_data(info->ad, pattern_ad_data_match, info);
-> +       switch (pattern->type) {
-> +       case BT_AD_MANUFACTURER_DATA:
-> +               queue_foreach(info->ad->manufacturer_data, pattern_manufa=
-cturer_data_match,
-> +                                                       info);
+This adds the QoS preset definitions as per BAP specification.
+---
+ src/shared/lc3.h | 153 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 153 insertions(+)
 
-I'd use queue_find instead so you can stop the lookup earlier if there
-is a match, also for the match function you can use something like
-match_manufacturer.
+diff --git a/src/shared/lc3.h b/src/shared/lc3.h
+index ae193f9e2fa7..e6b043699bc1 100644
+--- a/src/shared/lc3.h
++++ b/src/shared/lc3.h
+@@ -155,3 +155,156 @@
+ 
+ #define LC3_CONFIG_48_6 \
+ 	LC3_CONFIG_48(LC3_CONFIG_DURATION_10, 155u)
++
++#define LC3_QOS_UNFRAMED	0x00
++#define LC3_QOS_FRAMED		0x01
++
++#define LC3_QOS_UCAST(_frame, _pd, _t_lat, _interval, _lat, _sdu, _rtn) \
++{ \
++	.ucast.cig_id = 0x00, \
++	.ucast.cis_id = 0x00, \
++	.ucast.delay = _pd, \
++	.ucast.target_latency = _t_lat, \
++	.ucast.io_qos.interval = _interval, \
++	.ucast.io_qos.latency = _lat, \
++	.ucast.io_qos.sdu = _sdu, \
++	.ucast.io_qos.phy = BT_BAP_CONFIG_PHY_2M, \
++	.ucast.io_qos.rtn = _rtn, \
++}
++
++#define LC3_QOS_UCAST_7_5_UNFRAMED(_pd, _t_lat, _lat, _sdu, _rtn) \
++	LC3_QOS_UCAST(LC3_QOS_UNFRAMED, _pd, _t_lat, 7500u, _lat, _sdu, _rtn)
++
++#define LC3_QOS_UCAST_10_UNFRAMED(_pd, _t_lat, _lat, _sdu, _rtn) \
++	LC3_QOS_UCAST(LC3_QOS_UNFRAMED, _pd, _t_lat, 10000u, _lat, _sdu, _rtn)
++
++#define LC3_QOS_UCAST_FRAMED(_pd, _t_lat, _interval, _lat, _sdu, _rtn) \
++	LC3_QOS_UCAST(LC3_QOS_FRAMED, _pd, _t_lat, _interval, _lat, _sdu, _rtn)
++
++#define LC3_QOS_8_1_1 \
++	LC3_QOS_UCAST_7_5_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					8u, 26u, 2u)
++
++#define LC3_QOS_8_1_2 \
++	LC3_QOS_UCAST_7_5_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					75u, 26u, 13u)
++
++#define LC3_QOS_8_2_1 \
++	LC3_QOS_UCAST_10_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					10u, 30u, 2u)
++
++#define LC3_QOS_8_2_2 \
++	LC3_QOS_UCAST_10_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					95u, 30u, 13u)
++
++#define LC3_QOS_16_1_1 \
++	LC3_QOS_UCAST_7_5_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					8u, 30u, 2u)
++
++#define LC3_QOS_16_1_2 \
++	LC3_QOS_UCAST_7_5_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					75u, 30u, 13u)
++
++#define LC3_QOS_16_2_1 \
++	LC3_QOS_UCAST_10_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					10u, 40u, 2u)
++
++#define LC3_QOS_16_2_2 \
++	LC3_QOS_UCAST_10_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					95u, 40u, 13u)
++
++#define LC3_QOS_24_1_1 \
++	LC3_QOS_UCAST_7_5_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					8u, 45u, 2u)
++
++#define LC3_QOS_24_1_2 \
++	LC3_QOS_UCAST_7_5_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					75u, 45u, 13u)
++
++#define LC3_QOS_24_2_1 \
++	LC3_QOS_UCAST_10_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					10u, 60u, 2u)
++
++#define LC3_QOS_24_2_2 \
++	LC3_QOS_UCAST_10_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					95u, 60u, 13u)
++
++#define LC3_QOS_32_1_1 \
++	LC3_QOS_UCAST_7_5_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					8u, 60u, 2u)
++
++#define LC3_QOS_32_1_2 \
++	LC3_QOS_UCAST_7_5_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					75u, 60u, 13u)
++
++#define LC3_QOS_32_2_1 \
++	LC3_QOS_UCAST_10_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					10u, 80u, 2u)
++
++#define LC3_QOS_32_2_2 \
++	LC3_QOS_UCAST_10_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					95u, 80u, 13u)
++
++#define LC3_QOS_44_1_1 \
++	LC3_QOS_UCAST_FRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					8163u, 24u, 98u, 5u)
++
++#define LC3_QOS_44_1_2 \
++	LC3_QOS_UCAST_FRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					8163u, 80u, 98u, 13u)
++
++#define LC3_QOS_44_2_1 \
++	LC3_QOS_UCAST_FRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					10884u, 31u, 130u, 5u)
++
++#define LC3_QOS_44_2_2 \
++	LC3_QOS_UCAST_FRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					10884u, 85u, 130u, 13u)
++
++#define LC3_QOS_48_1_1 \
++	LC3_QOS_UCAST_7_5_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					15u, 75u, 5u)
++
++#define LC3_QOS_48_1_2 \
++	LC3_QOS_UCAST_7_5_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					75u, 75u, 13u)
++
++#define LC3_QOS_48_2_1 \
++	LC3_QOS_UCAST_10_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					20u, 100u, 5u)
++
++#define LC3_QOS_48_2_2 \
++	LC3_QOS_UCAST_10_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					95u, 100u, 13u)
++
++#define LC3_QOS_48_3_1 \
++	LC3_QOS_UCAST_7_5_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					15u, 90u, 5u)
++
++#define LC3_QOS_48_3_2 \
++	LC3_QOS_UCAST_7_5_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					75u, 90u, 13u)
++
++#define LC3_QOS_48_4_1 \
++	LC3_QOS_UCAST_10_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					20u, 120u, 5u)
++
++#define LC3_QOS_48_4_2 \
++	LC3_QOS_UCAST_10_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					100u, 120u, 13u)
++
++#define LC3_QOS_48_5_1 \
++	LC3_QOS_UCAST_7_5_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					15u, 117u, 5u)
++
++#define LC3_QOS_48_5_2 \
++	LC3_QOS_UCAST_7_5_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					75u, 117u, 13u)
++
++#define LC3_QOS_48_6_1 \
++	LC3_QOS_UCAST_10_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					20u, 155u, 5u)
++
++#define LC3_QOS_48_6_2 \
++	LC3_QOS_UCAST_10_UNFRAMED(40000u, BT_BAP_CONFIG_LATENCY_BALANCED, \
++					100u, 155u, 13u)
+-- 
+2.43.0
 
-> +               break;
-> +       case BT_AD_SERVICE_DATA16:
-> +       case BT_AD_SERVICE_DATA32:
-> +       case BT_AD_SERVICE_DATA128:
-> +               queue_foreach(info->ad->service_data, pattern_service_dat=
-a_match, info);
-
-Ditto, Id also suggest to use something like match_service.
-
-> +               break;
-> +       default:
-> +               bt_ad_foreach_data(info->ad, pattern_ad_data_match, info)=
-;
-> +               break;
-> +       }
->  }
->
->  struct bt_ad_pattern *bt_ad_pattern_match(struct bt_ad *ad,
-> --
-> 2.39.2
->
->
-
-
---=20
-Luiz Augusto von Dentz
