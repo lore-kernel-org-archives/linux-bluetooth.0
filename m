@@ -1,118 +1,67 @@
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D69E883D
+	for <linux-bluetooth@vger.kernel.org>; Wed,  6 Dec 2023 14:50:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kZLUGhI1"
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30928D44
-	for <linux-bluetooth@vger.kernel.org>; Wed,  6 Dec 2023 06:49:15 -0800 (PST)
-Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2c9f57d9952so56132141fa.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 06 Dec 2023 06:49:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701874153; x=1702478953; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eQ0VIk/oR07oL4sjexz0vNJR+kU5X1BQPaQJo4zaTSk=;
-        b=kZLUGhI1NpuW8eZZ8IHuLqmRdJu1r8My9mePO/uMvvDb03o26x3xpLPqN0hTKXPsYI
-         JKN/8h+prcuwuq5++H61jte/jcZ+WUtg7nO6TILZBB1F/NR5U9iX1pSK9DWPS8YgGx51
-         bfpHP1U7VsZE8cJcDPUqirx4nxmvt8hvNaJbPrvYif92nLlKVznKS8T+w2MEPt/IfgxD
-         0NuKhoTblbURHF+71n01sHunNLewG9zDQf15ZadtyQH394/aHRJ8Y4SwIwdAoFFkIv61
-         AIN/dR8OaI101n4unj2fxjDxBDP/smFb5qO+fgds+rJ/mj/qU8kZNr2Aeg3GnhCSgAGY
-         ZbeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701874153; x=1702478953;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eQ0VIk/oR07oL4sjexz0vNJR+kU5X1BQPaQJo4zaTSk=;
-        b=hAwQ9v04OYw3+8UJWaIAKAO51Bgq+TIHANHRkt2YupKpbR3uXxu5FZwLjtcpRbyQM5
-         LoPFsSPKD4hNrz9hloyKQVBIfCfDCg1RWSSWazUn2j//kBGotCn8TJ9n0tY1I0W2qCe7
-         QBX8XDYKea4C7Lrh6qCty4deJ+m+jVKEn1dfnDwppci1pA0lv6RCAbHkvNOjA6zkEVVE
-         FIiCMt9h//enOtE5glyf80ew8S2iuCFxbtCSHw9OJm9DEMgoF5DzJeK33pbwZMGKPIkI
-         GRPI37PbvFeDvvxH5FzLWn/7265L3pWkevDLGhE8q1Xlg8U8FPdt2qx0L8j3XwpaeMNR
-         aQYQ==
-X-Gm-Message-State: AOJu0YwJ1yXYLwfPxcDvedadPbnJgwuOHNOqKFq/MQQzfvL2o5pEyJGe
-	uEP6tTC/NWTooxyxEeaygv9BmaZBxhSAdtBFWhU=
-X-Google-Smtp-Source: AGHT+IGIEa0WVkaXvmoZla8+ajPeOOU9CGKw6pbHhQAieHGNYtTdGG2opD55Krk8/TBoIKSVBAmAicOB52XNWx0zSiA=
-X-Received: by 2002:a2e:9991:0:b0:2ca:20ce:8391 with SMTP id
- w17-20020a2e9991000000b002ca20ce8391mr593765lji.32.1701874152963; Wed, 06 Dec
- 2023 06:49:12 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TsDITDgd"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C7A95C433CB;
+	Wed,  6 Dec 2023 14:50:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701874223;
+	bh=3iRnXnNQEgmmSIDtgGHOHyDTHcULYDpB/dihJFvCB8A=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=TsDITDgdg/yMyH+zBWONeMS2+OTibVJbkpGCugJlHA5UQrGD/2Kpftgrsy8EYRI3r
+	 72rlMtPUYt6i2oSMArBabB3POVvTqW0Wa5/QMOjORpIcZ2UOrcVRFINEch2si3FHTy
+	 jTGHUYkyubTlcexx2tq3ageznMgoGu08R026gIGhOxByLDRxLDYWoxzdVI9GzM5eM/
+	 NKamfFHSbCB/lwWtmemyds/cUr/F6NRnjjNgMpvdFe2SH9K3qMqxTa/qJDIqvOBUzB
+	 mjeUA2qViBrQG35mT3iTblZDwInJIFemB2I4i9VXLuUlXZL3c7cp7Bg61VnbJ1SQ/c
+	 e/0oc2og5Qw+g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A4737C395DC;
+	Wed,  6 Dec 2023 14:50:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231204070243.GA16386@ubuntu>
-In-Reply-To: <20231204070243.GA16386@ubuntu>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 6 Dec 2023 09:48:59 -0500
-Message-ID: <CABBYNZ+Bnva7CCz3ds25Qx4xnbduXTdSX_FgXAttWSmSuYJadQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: af_bluetooth: Fix Use-After-Free in bt_sock_recvmsg
-To: Hyunwoo Kim <v4bel@theori.io>
-Cc: marcel@holtmann.org, imv4bel@gmail.com, johan.hedberg@gmail.com, 
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [RESEND PATCH v2] Bluetooth: Fix bogus check for re-auth no supported
+ with non-ssp
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <170187422366.25010.16029122912094833108.git-patchwork-notify@kernel.org>
+Date: Wed, 06 Dec 2023 14:50:23 +0000
+References: <20231130135808.286908-1-hadess@hadess.net>
+In-Reply-To: <20231130135808.286908-1-hadess@hadess.net>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com
 
-Hi Kim,
+Hello:
 
-On Mon, Dec 4, 2023 at 2:02=E2=80=AFAM Hyunwoo Kim <v4bel@theori.io> wrote:
->
-> This can cause a race with bt_sock_ioctl() because
-> bt_sock_recvmsg() gets the skb from sk->sk_receive_queue
-> and then frees it without holding lock_sock.
-> A use-after-free for a skb occurs with the following flow.
-> ```
-> bt_sock_recvmsg() -> skb_recv_datagram() -> skb_free_datagram()
-> bt_sock_ioctl() -> skb_peek()
-> ```
-> Add lock_sock to bt_sock_recvmsg() to fix this issue.
->
-> Signed-off-by: Hyunwoo Kim <v4bel@theori.io>
-> ---
->  net/bluetooth/af_bluetooth.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
->
-> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-> index 336a76165454..9def13ac816e 100644
-> --- a/net/bluetooth/af_bluetooth.c
-> +++ b/net/bluetooth/af_bluetooth.c
-> @@ -309,11 +309,16 @@ int bt_sock_recvmsg(struct socket *sock, struct msg=
-hdr *msg, size_t len,
->         if (flags & MSG_OOB)
->                 return -EOPNOTSUPP;
->
-> +       lock_sock(sk);
-> +
->         skb =3D skb_recv_datagram(sk, flags, &err);
->         if (!skb) {
-> -               if (sk->sk_shutdown & RCV_SHUTDOWN)
-> +               if (sk->sk_shutdown & RCV_SHUTDOWN) {
-> +                       release_sock(sk);
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-We could just reset the with err =3D 0 then we don't need to duplicate
-the release_sock line.
+On Thu, 30 Nov 2023 14:58:03 +0100 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This reverts 19f8def031bfa50c579149b200bfeeb919727b27
+> "Bluetooth: Fix auth_complete_evt for legacy units" which seems to be
+> working around a bug on a broken controller rather then any limitation
+> imposed by the Bluetooth spec, in fact if there ws not possible to
+> re-auth the command shall fail not succeed.
+> 
+> [...]
 
->                         return 0;
-> +               }
->
-> +               release_sock(sk);
->                 return err;
->         }
->
-> @@ -343,6 +348,8 @@ int bt_sock_recvmsg(struct socket *sock, struct msghd=
-r *msg, size_t len,
->
->         skb_free_datagram(sk, skb);
->
-> +       release_sock(sk);
-> +
->         if (flags & MSG_TRUNC)
->                 copied =3D skblen;
->
-> --
-> 2.25.1
->
+Here is the summary with links:
+  - [RESEND,v2] Bluetooth: Fix bogus check for re-auth no supported with non-ssp
+    https://git.kernel.org/bluetooth/bluetooth-next/c/b640347284c0
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---=20
-Luiz Augusto von Dentz
