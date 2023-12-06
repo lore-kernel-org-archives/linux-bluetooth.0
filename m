@@ -1,231 +1,188 @@
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE7110A25;
+	Wed,  6 Dec 2023 07:37:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QGidZ4iR"
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06F7618F;
-	Tue,  5 Dec 2023 21:25:16 -0800 (PST)
-Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-6ce6dd83945so1359304b3a.3;
-        Tue, 05 Dec 2023 21:25:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701840315; x=1702445115; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6huBbZbAII0X6eZV6S+b7knvK6KuHJo8Bh0bkLgUxxE=;
-        b=QGidZ4iRu5/YncLQwNVlWgTHz7jez7T2YHYyySJDAUl1LybKELv67VrH6KN+e8TxRh
-         /s5VSFFVvQRiwkXNmKLJi/wEnIBiOGQwnngb6oYZMoG6eQc0QbJ/T0Ec0db6vzr1k+Dx
-         srQWLLbmQFs5EhWEp5zC/IaHKoTJiY8bXU5IS602EgbG9LYXq+G5ffcY+0jnsGCyRyAk
-         7+ZWoAymYRZSRJgPK/kil/e23SdlpEsI7jueZ//dM4yB7IHleHRJ+/PQQLHSiUNJ84tI
-         tOtIp+BHegPALNw4/RtwVHj2rBou199ZGUBCDO3mLTFwdzB+80PTnm4Fc0QdTZHYALAf
-         NEJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701840315; x=1702445115;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6huBbZbAII0X6eZV6S+b7knvK6KuHJo8Bh0bkLgUxxE=;
-        b=J2b0FKDZyCK+e5YG3hPYVqsm96iXFc1DuCjGft3nU29htWngmgXURBAKy6LSskvXsc
-         OlwaUaL+5EN/6u7FgAONCyt94/N94DvXh3D4HeMkqLpjiugMkbh9I8T/h8ecFBGT6oo+
-         bBF7PUATUXLdMVYFO7IvwjBNP0iu5NE6arIG4eYzZ8D+aFktqrYfj6JhEcs9DQMBWBDf
-         kbBFrkua9jujvMMFVH6lL8lpzV+nmnybr/z6ilzjRywIN/dJlnLy2pCqZ+YCTKLfpKDl
-         b87csaO4/TXV8CcKaJT3HFSgWjWds5g9kbrD67w6oNhQhjh5fZK0GbncA1Te8IJg3p16
-         SAoQ==
-X-Gm-Message-State: AOJu0YyH7TAIz+i+HfbrAQNnJb8M6GbmVheSEHS7vLvZsf7l4/8SFM7S
-	B7EPEUC20m7UnlvO5u56YqE=
-X-Google-Smtp-Source: AGHT+IFMxfqg8FxPkhbWeYw87iiXO3hRoVhFhH1xtCbWG3FZaVDEj9UfTpo1oYq4IqfLZ3ft2t7YHQ==
-X-Received: by 2002:a05:6a00:98e:b0:6ce:6420:e174 with SMTP id u14-20020a056a00098e00b006ce6420e174mr407397pfg.36.1701840315262;
-        Tue, 05 Dec 2023 21:25:15 -0800 (PST)
-Received: from localhost ([216.228.127.130])
-        by smtp.gmail.com with ESMTPSA id ka32-20020a056a0093a000b006ce455a7faasm5350125pfb.150.2023.12.05.21.25.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 21:25:14 -0800 (PST)
-Date: Tue, 5 Dec 2023 21:22:59 -0800
-From: Yury Norov <yury.norov@gmail.com>
-To: Jan Kara <jack@suse.cz>
-Cc: linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	"James E.J. Bottomley" <jejb@linux.ibm.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	"Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-	Akinobu Mita <akinobu.mita@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Borislav Petkov <bp@alien8.de>, Chaitanya Kulkarni <kch@nvidia.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	David Disseldorp <ddiss@suse.de>,
-	Edward Cree <ecree.xilinx@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Fenghua Yu <fenghua.yu@intel.com>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Gregory Greenman <gregory.greenman@intel.com>,
-	Hans Verkuil <hverkuil@xs4all.nl>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Hugh Dickins <hughd@google.com>, Ingo Molnar <mingo@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-	Jiri Pirko <jiri@resnulli.us>, Jiri Slaby <jirislaby@kernel.org>,
-	Kalle Valo <kvalo@kernel.org>, Karsten Graul <kgraul@linux.ibm.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eRlvlu/l"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAC18C433C7;
+	Wed,  6 Dec 2023 07:37:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701848249;
+	bh=YBWUFqOAhQYvAfOCxrjSoMu61oZulwiM8oxn+ueFF5E=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=eRlvlu/lJ4h/JFsaezO85sUEgvb7C+8piV61wdrD5QvERroxh3GYgVDDrvE8kOgxr
+	 BmhFaeDd5Xeni1GvMhA/yjqYbWtjNmYo4CkffRYRL/W9fQrRo4BzJJcPc4oIOQ5W/6
+	 frO8Iiv+js1PGz1ermFXBGZ+tC0rQ0W77OFDbamQycRCO5Vn3UuZ8X8nLv3ZYIyR3k
+	 wFqJ9ClH9IwPCft7PGEpDPuEqrOCkPWhubLeiLkoYLacjijazfboPzGZaxXLNqUvjy
+	 6FrFKxhfqQYv7voDp0miMVB+Yg80NlG0q8d+3+VbmyhjGhfdQcGkwpKLOJ0wCn7QAs
+	 b9vQVkyeAXICw==
+From: "Jiri Slaby (SUSE)" <jirislaby@kernel.org>
+To: gregkh@linuxfoundation.org
+Cc: linux-serial@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Jiri Slaby (SUSE)" <jirislaby@kernel.org>,
 	Karsten Keil <isdn@linux-pingi.de>,
-	Kees Cook <keescook@chromium.org>,
-	Leon Romanovsky <leon@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Martin Habets <habetsm.xilinx@gmail.com>,
-	Mauro Carvalho Chehab <mchehab@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Michal Simek <monstr@monstr.eu>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Oliver Neukum <oneukum@suse.com>, Paolo Abeni <pabeni@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ping-Ke Shih <pkshih@realtek.com>, Rich Felker <dalias@libc.org>,
-	Rob Herring <robh@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Shuai Xue <xueshuai@linux.alibaba.com>,
-	Stanislaw Gruszka <stf_xl@wp.pl>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Valentin Schneider <vschneid@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>, Will Deacon <will@kernel.org>,
-	Yoshinori Sato <ysato@users.sourceforge.jp>,
-	GR-QLogic-Storage-Upstream@marvell.com, alsa-devel@alsa-project.org,
-	ath10k@lists.infradead.org, dmaengine@vger.kernel.org,
-	iommu@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-hyperv@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
-	linux-media@vger.kernel.org, linux-mips@vger.kernel.org,
-	linux-net-drivers@amd.com, linux-pci@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-serial@vger.kernel.org,
-	linux-sh@vger.kernel.org, linux-sound@vger.kernel.org,
-	linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, mpi3mr-linuxdrv.pdl@broadcom.com,
-	netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org,
-	Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>,
-	Matthew Wilcox <willy@infradead.org>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>,
-	Alexey Klimov <klimov.linux@gmail.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>
-Subject: Re: [PATCH v2 00/35] bitops: add atomic find_bit() operations
-Message-ID: <ZXAFM2VZugdhM3oE@yury-ThinkPad>
-References: <20231203192422.539300-1-yury.norov@gmail.com>
- <20231204185101.ddmkvsr2xxsmoh2u@quack3>
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-mmc@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH 04/27] tty: make tty_operations::send_xchar accept u8 char
+Date: Wed,  6 Dec 2023 08:36:49 +0100
+Message-ID: <20231206073712.17776-5-jirislaby@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20231206073712.17776-1-jirislaby@kernel.org>
+References: <20231206073712.17776-1-jirislaby@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231204185101.ddmkvsr2xxsmoh2u@quack3>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Dec 04, 2023 at 07:51:01PM +0100, Jan Kara wrote:
-> Hello Yury!
-> 
-> On Sun 03-12-23 11:23:47, Yury Norov wrote:
-> > Add helpers around test_and_{set,clear}_bit() that allow to search for
-> > clear or set bits and flip them atomically.
-> > 
-> > The target patterns may look like this:
-> > 
-> > 	for (idx = 0; idx < nbits; idx++)
-> > 		if (test_and_clear_bit(idx, bitmap))
-> > 			do_something(idx);
-> > 
-> > Or like this:
-> > 
-> > 	do {
-> > 		bit = find_first_bit(bitmap, nbits);
-> > 		if (bit >= nbits)
-> > 			return nbits;
-> > 	} while (!test_and_clear_bit(bit, bitmap));
-> > 	return bit;
-> > 
-> > In both cases, the opencoded loop may be converted to a single function
-> > or iterator call. Correspondingly:
-> > 
-> > 	for_each_test_and_clear_bit(idx, bitmap, nbits)
-> > 		do_something(idx);
-> > 
-> > Or:
-> > 	return find_and_clear_bit(bitmap, nbits);
-> 
-> These are fine cleanups but they actually don't address the case that has
-> triggered all these changes - namely the xarray use of find_next_bit() in
-> xas_find_chunk().
-> 
-> ...
-> > This series is a result of discussion [1]. All find_bit() functions imply
-> > exclusive access to the bitmaps. However, KCSAN reports quite a number
-> > of warnings related to find_bit() API. Some of them are not pointing
-> > to real bugs because in many situations people intentionally allow
-> > concurrent bitmap operations.
-> > 
-> > If so, find_bit() can be annotated such that KCSAN will ignore it:
-> > 
-> >         bit = data_race(find_first_bit(bitmap, nbits));
-> 
-> No, this is not a correct thing to do. If concurrent bitmap changes can
-> happen, find_first_bit() as it is currently implemented isn't ever a safe
-> choice because it can call __ffs(0) which is dangerous as you properly note
-> above. I proposed adding READ_ONCE() into find_first_bit() / find_next_bit()
-> implementation to fix this issue but you disliked that. So other option we
-> have is adding find_first_bit() and find_next_bit() variants that take
-> volatile 'addr' and we have to use these in code like xas_find_chunk()
-> which cannot be converted to your new helpers.
+tty_operations::send_xchar is one of the last users of 'char' type for
+characters in the tty layer. Convert it to u8 now.
 
-Here is some examples when concurrent operations with plain find_bit()
-are acceptable:
+Signed-off-by: Jiri Slaby (SUSE) <jirislaby@kernel.org>
+Cc: Karsten Keil <isdn@linux-pingi.de>
+Cc: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: netdev@vger.kernel.org
+Cc: linux-mmc@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org
+---
+ drivers/isdn/capi/capi.c         | 4 ++--
+ drivers/mmc/core/sdio_uart.c     | 2 +-
+ drivers/tty/amiserial.c          | 2 +-
+ drivers/tty/serial/serial_core.c | 2 +-
+ drivers/tty/tty_io.c             | 2 +-
+ include/linux/tty.h              | 2 +-
+ include/linux/tty_driver.h       | 4 ++--
+ net/bluetooth/rfcomm/tty.c       | 2 +-
+ 8 files changed, 10 insertions(+), 10 deletions(-)
 
- - two threads running find_*_bit(): safe wrt ffs(0) and returns correct
-   value, because underlying bitmap is unchanged;
- - find_next_bit() in parallel with set or clear_bit(), when modifying
-   a bit prior to the start bit to search: safe and correct;
- - find_first_bit() in parallel with set_bit(): safe, but may return wrong
-   bit number;
- - find_first_zero_bit() in parallel with clear_bit(): same as above.
-
-In last 2 cases find_bit() may not return a correct bit number, but
-it may be OK if caller requires any (not exactly first) set or clear
-bit, correspondingly.
-
-In such cases, KCSAN may be safely silenced.
+diff --git a/drivers/isdn/capi/capi.c b/drivers/isdn/capi/capi.c
+index 2f3789515445..6e80d7bd3c4d 100644
+--- a/drivers/isdn/capi/capi.c
++++ b/drivers/isdn/capi/capi.c
+@@ -1231,9 +1231,9 @@ static void capinc_tty_hangup(struct tty_struct *tty)
+ 	tty_port_hangup(&mp->port);
+ }
  
-> > This series addresses the other important case where people really need
-> > atomic find ops. As the following patches show, the resulting code
-> > looks safer and more verbose comparing to opencoded loops followed by
-> > atomic bit flips.
-> > 
-> > In [1] Mirsad reported 2% slowdown in a single-thread search test when
-> > switching find_bit() function to treat bitmaps as volatile arrays. On
-> > the other hand, kernel robot in the same thread reported +3.7% to the
-> > performance of will-it-scale.per_thread_ops test.
-> 
-> It was actually me who reported the regression here [2] but whatever :)
-> 
-> [2] https://lore.kernel.org/all/20231011150252.32737-1-jack@suse.cz
+-static void capinc_tty_send_xchar(struct tty_struct *tty, char ch)
++static void capinc_tty_send_xchar(struct tty_struct *tty, u8 ch)
+ {
+-	pr_debug("capinc_tty_send_xchar(%d)\n", ch);
++	pr_debug("capinc_tty_send_xchar(%u)\n", ch);
+ }
+ 
+ static const struct tty_operations capinc_ops = {
+diff --git a/drivers/mmc/core/sdio_uart.c b/drivers/mmc/core/sdio_uart.c
+index a05322f15771..370fadf1d6d1 100644
+--- a/drivers/mmc/core/sdio_uart.c
++++ b/drivers/mmc/core/sdio_uart.c
+@@ -792,7 +792,7 @@ static unsigned int sdio_uart_chars_in_buffer(struct tty_struct *tty)
+ 	return kfifo_len(&port->xmit_fifo);
+ }
+ 
+-static void sdio_uart_send_xchar(struct tty_struct *tty, char ch)
++static void sdio_uart_send_xchar(struct tty_struct *tty, u8 ch)
+ {
+ 	struct sdio_uart_port *port = tty->driver_data;
+ 
+diff --git a/drivers/tty/amiserial.c b/drivers/tty/amiserial.c
+index a80f059f77bf..a30dc054ffbf 100644
+--- a/drivers/tty/amiserial.c
++++ b/drivers/tty/amiserial.c
+@@ -811,7 +811,7 @@ static void rs_flush_buffer(struct tty_struct *tty)
+  * This function is used to send a high-priority XON/XOFF character to
+  * the device
+  */
+-static void rs_send_xchar(struct tty_struct *tty, char ch)
++static void rs_send_xchar(struct tty_struct *tty, u8 ch)
+ {
+ 	struct serial_state *info = tty->driver_data;
+         unsigned long flags;
+diff --git a/drivers/tty/serial/serial_core.c b/drivers/tty/serial/serial_core.c
+index 0393853b9947..80085b151b34 100644
+--- a/drivers/tty/serial/serial_core.c
++++ b/drivers/tty/serial/serial_core.c
+@@ -687,7 +687,7 @@ EXPORT_SYMBOL_GPL(uart_xchar_out);
+  * This function is used to send a high-priority XON/XOFF character to
+  * the device
+  */
+-static void uart_send_xchar(struct tty_struct *tty, char ch)
++static void uart_send_xchar(struct tty_struct *tty, u8 ch)
+ {
+ 	struct uart_state *state = tty->driver_data;
+ 	struct uart_port *port;
+diff --git a/drivers/tty/tty_io.c b/drivers/tty/tty_io.c
+index 005d91c63707..6a502110da61 100644
+--- a/drivers/tty/tty_io.c
++++ b/drivers/tty/tty_io.c
+@@ -1149,7 +1149,7 @@ ssize_t redirected_tty_write(struct kiocb *iocb, struct iov_iter *iter)
+  *
+  * Locking: none for xchar method, write ordering for write method.
+  */
+-int tty_send_xchar(struct tty_struct *tty, char ch)
++int tty_send_xchar(struct tty_struct *tty, u8 ch)
+ {
+ 	bool was_stopped = tty->flow.stopped;
+ 
+diff --git a/include/linux/tty.h b/include/linux/tty.h
+index e96c85f4f91e..d3bedcc08738 100644
+--- a/include/linux/tty.h
++++ b/include/linux/tty.h
+@@ -410,7 +410,7 @@ void tty_wait_until_sent(struct tty_struct *tty, long timeout);
+ void stop_tty(struct tty_struct *tty);
+ void start_tty(struct tty_struct *tty);
+ void tty_write_message(struct tty_struct *tty, char *msg);
+-int tty_send_xchar(struct tty_struct *tty, char ch);
++int tty_send_xchar(struct tty_struct *tty, u8 ch);
+ int tty_put_char(struct tty_struct *tty, unsigned char c);
+ unsigned int tty_chars_in_buffer(struct tty_struct *tty);
+ unsigned int tty_write_room(struct tty_struct *tty);
+diff --git a/include/linux/tty_driver.h b/include/linux/tty_driver.h
+index f428c1b784a2..7372124fbf90 100644
+--- a/include/linux/tty_driver.h
++++ b/include/linux/tty_driver.h
+@@ -242,7 +242,7 @@ struct serial_struct;
+  *	Optional: If not provided, the device is assumed to have no FIFO.
+  *	Usually correct to invoke via tty_wait_until_sent(). May sleep.
+  *
+- * @send_xchar: ``void ()(struct tty_struct *tty, char ch)``
++ * @send_xchar: ``void ()(struct tty_struct *tty, u8 ch)``
+  *
+  *	This routine is used to send a high-priority XON/XOFF character (@ch)
+  *	to the @tty device.
+@@ -374,7 +374,7 @@ struct tty_operations {
+ 	void (*flush_buffer)(struct tty_struct *tty);
+ 	void (*set_ldisc)(struct tty_struct *tty);
+ 	void (*wait_until_sent)(struct tty_struct *tty, int timeout);
+-	void (*send_xchar)(struct tty_struct *tty, char ch);
++	void (*send_xchar)(struct tty_struct *tty, u8 ch);
+ 	int (*tiocmget)(struct tty_struct *tty);
+ 	int (*tiocmset)(struct tty_struct *tty,
+ 			unsigned int set, unsigned int clear);
+diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+index 94ec913dfb76..69c75c041fe1 100644
+--- a/net/bluetooth/rfcomm/tty.c
++++ b/net/bluetooth/rfcomm/tty.c
+@@ -1041,7 +1041,7 @@ static void rfcomm_tty_flush_buffer(struct tty_struct *tty)
+ 	tty_wakeup(tty);
+ }
+ 
+-static void rfcomm_tty_send_xchar(struct tty_struct *tty, char ch)
++static void rfcomm_tty_send_xchar(struct tty_struct *tty, u8 ch)
+ {
+ 	BT_DBG("tty %p ch %c", tty, ch);
+ }
+-- 
+2.43.0
 
-My apologize.
-
-> > Assuming that our compilers are sane and generate better code against
-> > properly annotated data, the above discrepancy doesn't look weird. When
-> > running on non-volatile bitmaps, plain find_bit() outperforms atomic
-> > find_and_bit(), and vice-versa.
-> > 
-> > So, all users of find_bit() API, where heavy concurrency is expected,
-> > are encouraged to switch to atomic find_and_bit() as appropriate.
-> 
-> Well, all users where any concurrency can happen should switch. Otherwise
-> they are prone to the (admittedly mostly theoretical) data race issue.
-> 
-> 								Honza
-> -- 
-> Jan Kara <jack@suse.com>
-> SUSE Labs, CR
