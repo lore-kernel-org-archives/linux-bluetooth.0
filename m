@@ -1,109 +1,118 @@
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF97718D;
-	Wed,  6 Dec 2023 00:27:50 -0800 (PST)
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-5d3758fdd2eso65829367b3.0;
-        Wed, 06 Dec 2023 00:27:50 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kZLUGhI1"
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30928D44
+	for <linux-bluetooth@vger.kernel.org>; Wed,  6 Dec 2023 06:49:15 -0800 (PST)
+Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2c9f57d9952so56132141fa.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 06 Dec 2023 06:49:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701874153; x=1702478953; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eQ0VIk/oR07oL4sjexz0vNJR+kU5X1BQPaQJo4zaTSk=;
+        b=kZLUGhI1NpuW8eZZ8IHuLqmRdJu1r8My9mePO/uMvvDb03o26x3xpLPqN0hTKXPsYI
+         JKN/8h+prcuwuq5++H61jte/jcZ+WUtg7nO6TILZBB1F/NR5U9iX1pSK9DWPS8YgGx51
+         bfpHP1U7VsZE8cJcDPUqirx4nxmvt8hvNaJbPrvYif92nLlKVznKS8T+w2MEPt/IfgxD
+         0NuKhoTblbURHF+71n01sHunNLewG9zDQf15ZadtyQH394/aHRJ8Y4SwIwdAoFFkIv61
+         AIN/dR8OaI101n4unj2fxjDxBDP/smFb5qO+fgds+rJ/mj/qU8kZNr2Aeg3GnhCSgAGY
+         ZbeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701851270; x=1702456070;
+        d=1e100.net; s=20230601; t=1701874153; x=1702478953;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=J96bjVl10/YZKpO0+pJdZW7wN1/H6wsxpMA2dwhuCto=;
-        b=XAynB3JCLszm0lxVYNuTjTlEcATT/a2lKcjWUIHgSh2fSrA1SLp6ZsCwPOqktu21Py
-         R78ahdnOX10qTPaB5LAZDlo4VQsvs6zwRCMVkSxb0BZoS6f8uyPZLShWImdPXEQDtzu3
-         zlWPzrw33NohyAWiRFxfHkYB8HlEkJoCMD8qu0DEuGG2ERMwVvYV0oUak7YP/bZkykxV
-         Y/LWEhJbbC64Nle/BVyJb4L8KmMdMgI2hpRym3/5Hx8vaLFta1SIZTIXfJVoYQm4qAvZ
-         cVmiNdwVBugOZqpF8sa5zHHGn3z0Ea6/vHAEdf+dWKXfeVZoT7N8JVmvnBVsQl8bDMmi
-         +5/g==
-X-Gm-Message-State: AOJu0YyXNilsgdZZY08iKrxGrJTBcuH8E5cYffJUqJCfIdp4RhOFzY8H
-	7RUsX9zPIPcudFBUnLIn2lSS9RPQy3C7EA==
-X-Google-Smtp-Source: AGHT+IHneFXRyXNRh2NBYGczFKqTsBrNrAOitW0M+o6QtQRxQ7aPsb+SxUOQZjh/m2xW36UHO2qnEg==
-X-Received: by 2002:a0d:eb0d:0:b0:5d7:1941:3576 with SMTP id u13-20020a0deb0d000000b005d719413576mr457636ywe.93.1701851269662;
-        Wed, 06 Dec 2023 00:27:49 -0800 (PST)
-Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com. [209.85.219.178])
-        by smtp.gmail.com with ESMTPSA id c6-20020a814e06000000b005d364adb887sm4689374ywb.26.2023.12.06.00.27.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Dec 2023 00:27:49 -0800 (PST)
-Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-da077db5145so4339070276.0;
-        Wed, 06 Dec 2023 00:27:48 -0800 (PST)
-X-Received: by 2002:a25:6607:0:b0:db7:dad0:76ac with SMTP id
- a7-20020a256607000000b00db7dad076acmr407887ybc.72.1701851268359; Wed, 06 Dec
- 2023 00:27:48 -0800 (PST)
+        bh=eQ0VIk/oR07oL4sjexz0vNJR+kU5X1BQPaQJo4zaTSk=;
+        b=hAwQ9v04OYw3+8UJWaIAKAO51Bgq+TIHANHRkt2YupKpbR3uXxu5FZwLjtcpRbyQM5
+         LoPFsSPKD4hNrz9hloyKQVBIfCfDCg1RWSSWazUn2j//kBGotCn8TJ9n0tY1I0W2qCe7
+         QBX8XDYKea4C7Lrh6qCty4deJ+m+jVKEn1dfnDwppci1pA0lv6RCAbHkvNOjA6zkEVVE
+         FIiCMt9h//enOtE5glyf80ew8S2iuCFxbtCSHw9OJm9DEMgoF5DzJeK33pbwZMGKPIkI
+         GRPI37PbvFeDvvxH5FzLWn/7265L3pWkevDLGhE8q1Xlg8U8FPdt2qx0L8j3XwpaeMNR
+         aQYQ==
+X-Gm-Message-State: AOJu0YwJ1yXYLwfPxcDvedadPbnJgwuOHNOqKFq/MQQzfvL2o5pEyJGe
+	uEP6tTC/NWTooxyxEeaygv9BmaZBxhSAdtBFWhU=
+X-Google-Smtp-Source: AGHT+IGIEa0WVkaXvmoZla8+ajPeOOU9CGKw6pbHhQAieHGNYtTdGG2opD55Krk8/TBoIKSVBAmAicOB52XNWx0zSiA=
+X-Received: by 2002:a2e:9991:0:b0:2ca:20ce:8391 with SMTP id
+ w17-20020a2e9991000000b002ca20ce8391mr593765lji.32.1701874152963; Wed, 06 Dec
+ 2023 06:49:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231206073712.17776-1-jirislaby@kernel.org> <20231206073712.17776-5-jirislaby@kernel.org>
-In-Reply-To: <20231206073712.17776-5-jirislaby@kernel.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Wed, 6 Dec 2023 09:27:36 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdU4_==x7efMMOmxm3L4vZeWGeeWNo2bQ8Pv1wWx7246gQ@mail.gmail.com>
-Message-ID: <CAMuHMdU4_==x7efMMOmxm3L4vZeWGeeWNo2bQ8Pv1wWx7246gQ@mail.gmail.com>
-Subject: Re: [PATCH 04/27] tty: make tty_operations::send_xchar accept u8 char
-To: "Jiri Slaby (SUSE)" <jirislaby@kernel.org>
-Cc: gregkh@linuxfoundation.org, linux-serial@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Karsten Keil <isdn@linux-pingi.de>, 
-	Ulf Hansson <ulf.hansson@linaro.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, netdev@vger.kernel.org, 
-	linux-mmc@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-m68k <linux-m68k@lists.linux-m68k.org>
+References: <20231204070243.GA16386@ubuntu>
+In-Reply-To: <20231204070243.GA16386@ubuntu>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 6 Dec 2023 09:48:59 -0500
+Message-ID: <CABBYNZ+Bnva7CCz3ds25Qx4xnbduXTdSX_FgXAttWSmSuYJadQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: af_bluetooth: Fix Use-After-Free in bt_sock_recvmsg
+To: Hyunwoo Kim <v4bel@theori.io>
+Cc: marcel@holtmann.org, imv4bel@gmail.com, johan.hedberg@gmail.com, 
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-CC linux-m68k
+Hi Kim,
 
-On Wed, Dec 6, 2023 at 8:37=E2=80=AFAM Jiri Slaby (SUSE) <jirislaby@kernel.=
-org> wrote:
-> tty_operations::send_xchar is one of the last users of 'char' type for
-> characters in the tty layer. Convert it to u8 now.
+On Mon, Dec 4, 2023 at 2:02=E2=80=AFAM Hyunwoo Kim <v4bel@theori.io> wrote:
 >
-> Signed-off-by: Jiri Slaby (SUSE) <jirislaby@kernel.org>
+> This can cause a race with bt_sock_ioctl() because
+> bt_sock_recvmsg() gets the skb from sk->sk_receive_queue
+> and then frees it without holding lock_sock.
+> A use-after-free for a skb occurs with the following flow.
+> ```
+> bt_sock_recvmsg() -> skb_recv_datagram() -> skb_free_datagram()
+> bt_sock_ioctl() -> skb_peek()
+> ```
+> Add lock_sock to bt_sock_recvmsg() to fix this issue.
+>
+> Signed-off-by: Hyunwoo Kim <v4bel@theori.io>
+> ---
+>  net/bluetooth/af_bluetooth.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+> index 336a76165454..9def13ac816e 100644
+> --- a/net/bluetooth/af_bluetooth.c
+> +++ b/net/bluetooth/af_bluetooth.c
+> @@ -309,11 +309,16 @@ int bt_sock_recvmsg(struct socket *sock, struct msg=
+hdr *msg, size_t len,
+>         if (flags & MSG_OOB)
+>                 return -EOPNOTSUPP;
+>
+> +       lock_sock(sk);
+> +
+>         skb =3D skb_recv_datagram(sk, flags, &err);
+>         if (!skb) {
+> -               if (sk->sk_shutdown & RCV_SHUTDOWN)
+> +               if (sk->sk_shutdown & RCV_SHUTDOWN) {
+> +                       release_sock(sk);
 
->  drivers/tty/amiserial.c          | 2 +-
+We could just reset the with err =3D 0 then we don't need to duplicate
+the release_sock line.
 
-Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
+>                         return 0;
+> +               }
+>
+> +               release_sock(sk);
+>                 return err;
+>         }
+>
+> @@ -343,6 +348,8 @@ int bt_sock_recvmsg(struct socket *sock, struct msghd=
+r *msg, size_t len,
+>
+>         skb_free_datagram(sk, skb);
+>
+> +       release_sock(sk);
+> +
+>         if (flags & MSG_TRUNC)
+>                 copied =3D skblen;
+>
+> --
+> 2.25.1
+>
 
-> --- a/drivers/tty/amiserial.c
-> +++ b/drivers/tty/amiserial.c
-> @@ -811,7 +811,7 @@ static void rs_flush_buffer(struct tty_struct *tty)
->   * This function is used to send a high-priority XON/XOFF character to
->   * the device
->   */
-> -static void rs_send_xchar(struct tty_struct *tty, char ch)
-> +static void rs_send_xchar(struct tty_struct *tty, u8 ch)
->  {
->         struct serial_state *info =3D tty->driver_data;
->          unsigned long flags;
-
-Looks like this might fix an actual (harmless?) bug, if anyone evers
-configures a VSTOP or VSTART character with bit 7 set?
-
-    info->x_char =3D ch; // x_char is int, hence sign-extended
-
-transmit_chars() does:
-
-    amiga_custom.serdat =3D info->x_char | 0x100;
-
-which will inadvertently have all high bits sets, including the bit
-9, which is only used if PARENB is enabled.  But as it looks like
-PARENB handling is broken in amiseral anyway, this doesn't matter
-much...
-
-include/linux/tty.h:#define STOP_CHAR(tty) ((tty)->termios.c_cc[VSTOP])
-include/linux/tty.h:#define START_CHAR(tty) ((tty)->termios.c_cc[VSTART])
-
-Gr{oetje,eeting}s,
-
-                        Geert
 
 --=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+Luiz Augusto von Dentz
