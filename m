@@ -1,188 +1,109 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE7110A25;
-	Wed,  6 Dec 2023 07:37:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eRlvlu/l"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAC18C433C7;
-	Wed,  6 Dec 2023 07:37:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701848249;
-	bh=YBWUFqOAhQYvAfOCxrjSoMu61oZulwiM8oxn+ueFF5E=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=eRlvlu/lJ4h/JFsaezO85sUEgvb7C+8piV61wdrD5QvERroxh3GYgVDDrvE8kOgxr
-	 BmhFaeDd5Xeni1GvMhA/yjqYbWtjNmYo4CkffRYRL/W9fQrRo4BzJJcPc4oIOQ5W/6
-	 frO8Iiv+js1PGz1ermFXBGZ+tC0rQ0W77OFDbamQycRCO5Vn3UuZ8X8nLv3ZYIyR3k
-	 wFqJ9ClH9IwPCft7PGEpDPuEqrOCkPWhubLeiLkoYLacjijazfboPzGZaxXLNqUvjy
-	 6FrFKxhfqQYv7voDp0miMVB+Yg80NlG0q8d+3+VbmyhjGhfdQcGkwpKLOJ0wCn7QAs
-	 b9vQVkyeAXICw==
-From: "Jiri Slaby (SUSE)" <jirislaby@kernel.org>
-To: gregkh@linuxfoundation.org
-Cc: linux-serial@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Jiri Slaby (SUSE)" <jirislaby@kernel.org>,
-	Karsten Keil <isdn@linux-pingi.de>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-mmc@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH 04/27] tty: make tty_operations::send_xchar accept u8 char
-Date: Wed,  6 Dec 2023 08:36:49 +0100
-Message-ID: <20231206073712.17776-5-jirislaby@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20231206073712.17776-1-jirislaby@kernel.org>
-References: <20231206073712.17776-1-jirislaby@kernel.org>
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF97718D;
+	Wed,  6 Dec 2023 00:27:50 -0800 (PST)
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-5d3758fdd2eso65829367b3.0;
+        Wed, 06 Dec 2023 00:27:50 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701851270; x=1702456070;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=J96bjVl10/YZKpO0+pJdZW7wN1/H6wsxpMA2dwhuCto=;
+        b=XAynB3JCLszm0lxVYNuTjTlEcATT/a2lKcjWUIHgSh2fSrA1SLp6ZsCwPOqktu21Py
+         R78ahdnOX10qTPaB5LAZDlo4VQsvs6zwRCMVkSxb0BZoS6f8uyPZLShWImdPXEQDtzu3
+         zlWPzrw33NohyAWiRFxfHkYB8HlEkJoCMD8qu0DEuGG2ERMwVvYV0oUak7YP/bZkykxV
+         Y/LWEhJbbC64Nle/BVyJb4L8KmMdMgI2hpRym3/5Hx8vaLFta1SIZTIXfJVoYQm4qAvZ
+         cVmiNdwVBugOZqpF8sa5zHHGn3z0Ea6/vHAEdf+dWKXfeVZoT7N8JVmvnBVsQl8bDMmi
+         +5/g==
+X-Gm-Message-State: AOJu0YyXNilsgdZZY08iKrxGrJTBcuH8E5cYffJUqJCfIdp4RhOFzY8H
+	7RUsX9zPIPcudFBUnLIn2lSS9RPQy3C7EA==
+X-Google-Smtp-Source: AGHT+IHneFXRyXNRh2NBYGczFKqTsBrNrAOitW0M+o6QtQRxQ7aPsb+SxUOQZjh/m2xW36UHO2qnEg==
+X-Received: by 2002:a0d:eb0d:0:b0:5d7:1941:3576 with SMTP id u13-20020a0deb0d000000b005d719413576mr457636ywe.93.1701851269662;
+        Wed, 06 Dec 2023 00:27:49 -0800 (PST)
+Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com. [209.85.219.178])
+        by smtp.gmail.com with ESMTPSA id c6-20020a814e06000000b005d364adb887sm4689374ywb.26.2023.12.06.00.27.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 Dec 2023 00:27:49 -0800 (PST)
+Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-da077db5145so4339070276.0;
+        Wed, 06 Dec 2023 00:27:48 -0800 (PST)
+X-Received: by 2002:a25:6607:0:b0:db7:dad0:76ac with SMTP id
+ a7-20020a256607000000b00db7dad076acmr407887ybc.72.1701851268359; Wed, 06 Dec
+ 2023 00:27:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20231206073712.17776-1-jirislaby@kernel.org> <20231206073712.17776-5-jirislaby@kernel.org>
+In-Reply-To: <20231206073712.17776-5-jirislaby@kernel.org>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Wed, 6 Dec 2023 09:27:36 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdU4_==x7efMMOmxm3L4vZeWGeeWNo2bQ8Pv1wWx7246gQ@mail.gmail.com>
+Message-ID: <CAMuHMdU4_==x7efMMOmxm3L4vZeWGeeWNo2bQ8Pv1wWx7246gQ@mail.gmail.com>
+Subject: Re: [PATCH 04/27] tty: make tty_operations::send_xchar accept u8 char
+To: "Jiri Slaby (SUSE)" <jirislaby@kernel.org>
+Cc: gregkh@linuxfoundation.org, linux-serial@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Karsten Keil <isdn@linux-pingi.de>, 
+	Ulf Hansson <ulf.hansson@linaro.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, netdev@vger.kernel.org, 
+	linux-mmc@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	linux-m68k <linux-m68k@lists.linux-m68k.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-tty_operations::send_xchar is one of the last users of 'char' type for
-characters in the tty layer. Convert it to u8 now.
+CC linux-m68k
 
-Signed-off-by: Jiri Slaby (SUSE) <jirislaby@kernel.org>
-Cc: Karsten Keil <isdn@linux-pingi.de>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: netdev@vger.kernel.org
-Cc: linux-mmc@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org
----
- drivers/isdn/capi/capi.c         | 4 ++--
- drivers/mmc/core/sdio_uart.c     | 2 +-
- drivers/tty/amiserial.c          | 2 +-
- drivers/tty/serial/serial_core.c | 2 +-
- drivers/tty/tty_io.c             | 2 +-
- include/linux/tty.h              | 2 +-
- include/linux/tty_driver.h       | 4 ++--
- net/bluetooth/rfcomm/tty.c       | 2 +-
- 8 files changed, 10 insertions(+), 10 deletions(-)
+On Wed, Dec 6, 2023 at 8:37=E2=80=AFAM Jiri Slaby (SUSE) <jirislaby@kernel.=
+org> wrote:
+> tty_operations::send_xchar is one of the last users of 'char' type for
+> characters in the tty layer. Convert it to u8 now.
+>
+> Signed-off-by: Jiri Slaby (SUSE) <jirislaby@kernel.org>
 
-diff --git a/drivers/isdn/capi/capi.c b/drivers/isdn/capi/capi.c
-index 2f3789515445..6e80d7bd3c4d 100644
---- a/drivers/isdn/capi/capi.c
-+++ b/drivers/isdn/capi/capi.c
-@@ -1231,9 +1231,9 @@ static void capinc_tty_hangup(struct tty_struct *tty)
- 	tty_port_hangup(&mp->port);
- }
- 
--static void capinc_tty_send_xchar(struct tty_struct *tty, char ch)
-+static void capinc_tty_send_xchar(struct tty_struct *tty, u8 ch)
- {
--	pr_debug("capinc_tty_send_xchar(%d)\n", ch);
-+	pr_debug("capinc_tty_send_xchar(%u)\n", ch);
- }
- 
- static const struct tty_operations capinc_ops = {
-diff --git a/drivers/mmc/core/sdio_uart.c b/drivers/mmc/core/sdio_uart.c
-index a05322f15771..370fadf1d6d1 100644
---- a/drivers/mmc/core/sdio_uart.c
-+++ b/drivers/mmc/core/sdio_uart.c
-@@ -792,7 +792,7 @@ static unsigned int sdio_uart_chars_in_buffer(struct tty_struct *tty)
- 	return kfifo_len(&port->xmit_fifo);
- }
- 
--static void sdio_uart_send_xchar(struct tty_struct *tty, char ch)
-+static void sdio_uart_send_xchar(struct tty_struct *tty, u8 ch)
- {
- 	struct sdio_uart_port *port = tty->driver_data;
- 
-diff --git a/drivers/tty/amiserial.c b/drivers/tty/amiserial.c
-index a80f059f77bf..a30dc054ffbf 100644
---- a/drivers/tty/amiserial.c
-+++ b/drivers/tty/amiserial.c
-@@ -811,7 +811,7 @@ static void rs_flush_buffer(struct tty_struct *tty)
-  * This function is used to send a high-priority XON/XOFF character to
-  * the device
-  */
--static void rs_send_xchar(struct tty_struct *tty, char ch)
-+static void rs_send_xchar(struct tty_struct *tty, u8 ch)
- {
- 	struct serial_state *info = tty->driver_data;
-         unsigned long flags;
-diff --git a/drivers/tty/serial/serial_core.c b/drivers/tty/serial/serial_core.c
-index 0393853b9947..80085b151b34 100644
---- a/drivers/tty/serial/serial_core.c
-+++ b/drivers/tty/serial/serial_core.c
-@@ -687,7 +687,7 @@ EXPORT_SYMBOL_GPL(uart_xchar_out);
-  * This function is used to send a high-priority XON/XOFF character to
-  * the device
-  */
--static void uart_send_xchar(struct tty_struct *tty, char ch)
-+static void uart_send_xchar(struct tty_struct *tty, u8 ch)
- {
- 	struct uart_state *state = tty->driver_data;
- 	struct uart_port *port;
-diff --git a/drivers/tty/tty_io.c b/drivers/tty/tty_io.c
-index 005d91c63707..6a502110da61 100644
---- a/drivers/tty/tty_io.c
-+++ b/drivers/tty/tty_io.c
-@@ -1149,7 +1149,7 @@ ssize_t redirected_tty_write(struct kiocb *iocb, struct iov_iter *iter)
-  *
-  * Locking: none for xchar method, write ordering for write method.
-  */
--int tty_send_xchar(struct tty_struct *tty, char ch)
-+int tty_send_xchar(struct tty_struct *tty, u8 ch)
- {
- 	bool was_stopped = tty->flow.stopped;
- 
-diff --git a/include/linux/tty.h b/include/linux/tty.h
-index e96c85f4f91e..d3bedcc08738 100644
---- a/include/linux/tty.h
-+++ b/include/linux/tty.h
-@@ -410,7 +410,7 @@ void tty_wait_until_sent(struct tty_struct *tty, long timeout);
- void stop_tty(struct tty_struct *tty);
- void start_tty(struct tty_struct *tty);
- void tty_write_message(struct tty_struct *tty, char *msg);
--int tty_send_xchar(struct tty_struct *tty, char ch);
-+int tty_send_xchar(struct tty_struct *tty, u8 ch);
- int tty_put_char(struct tty_struct *tty, unsigned char c);
- unsigned int tty_chars_in_buffer(struct tty_struct *tty);
- unsigned int tty_write_room(struct tty_struct *tty);
-diff --git a/include/linux/tty_driver.h b/include/linux/tty_driver.h
-index f428c1b784a2..7372124fbf90 100644
---- a/include/linux/tty_driver.h
-+++ b/include/linux/tty_driver.h
-@@ -242,7 +242,7 @@ struct serial_struct;
-  *	Optional: If not provided, the device is assumed to have no FIFO.
-  *	Usually correct to invoke via tty_wait_until_sent(). May sleep.
-  *
-- * @send_xchar: ``void ()(struct tty_struct *tty, char ch)``
-+ * @send_xchar: ``void ()(struct tty_struct *tty, u8 ch)``
-  *
-  *	This routine is used to send a high-priority XON/XOFF character (@ch)
-  *	to the @tty device.
-@@ -374,7 +374,7 @@ struct tty_operations {
- 	void (*flush_buffer)(struct tty_struct *tty);
- 	void (*set_ldisc)(struct tty_struct *tty);
- 	void (*wait_until_sent)(struct tty_struct *tty, int timeout);
--	void (*send_xchar)(struct tty_struct *tty, char ch);
-+	void (*send_xchar)(struct tty_struct *tty, u8 ch);
- 	int (*tiocmget)(struct tty_struct *tty);
- 	int (*tiocmset)(struct tty_struct *tty,
- 			unsigned int set, unsigned int clear);
-diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index 94ec913dfb76..69c75c041fe1 100644
---- a/net/bluetooth/rfcomm/tty.c
-+++ b/net/bluetooth/rfcomm/tty.c
-@@ -1041,7 +1041,7 @@ static void rfcomm_tty_flush_buffer(struct tty_struct *tty)
- 	tty_wakeup(tty);
- }
- 
--static void rfcomm_tty_send_xchar(struct tty_struct *tty, char ch)
-+static void rfcomm_tty_send_xchar(struct tty_struct *tty, u8 ch)
- {
- 	BT_DBG("tty %p ch %c", tty, ch);
- }
--- 
-2.43.0
+>  drivers/tty/amiserial.c          | 2 +-
 
+Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
+
+> --- a/drivers/tty/amiserial.c
+> +++ b/drivers/tty/amiserial.c
+> @@ -811,7 +811,7 @@ static void rs_flush_buffer(struct tty_struct *tty)
+>   * This function is used to send a high-priority XON/XOFF character to
+>   * the device
+>   */
+> -static void rs_send_xchar(struct tty_struct *tty, char ch)
+> +static void rs_send_xchar(struct tty_struct *tty, u8 ch)
+>  {
+>         struct serial_state *info =3D tty->driver_data;
+>          unsigned long flags;
+
+Looks like this might fix an actual (harmless?) bug, if anyone evers
+configures a VSTOP or VSTART character with bit 7 set?
+
+    info->x_char =3D ch; // x_char is int, hence sign-extended
+
+transmit_chars() does:
+
+    amiga_custom.serdat =3D info->x_char | 0x100;
+
+which will inadvertently have all high bits sets, including the bit
+9, which is only used if PARENB is enabled.  But as it looks like
+PARENB handling is broken in amiseral anyway, this doesn't matter
+much...
+
+include/linux/tty.h:#define STOP_CHAR(tty) ((tty)->termios.c_cc[VSTOP])
+include/linux/tty.h:#define START_CHAR(tty) ((tty)->termios.c_cc[VSTART])
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
