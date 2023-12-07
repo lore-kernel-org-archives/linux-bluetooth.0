@@ -1,133 +1,107 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="NUWxowhs"
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2563610EC
-	for <linux-bluetooth@vger.kernel.org>; Thu,  7 Dec 2023 01:12:15 -0800 (PST)
-Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-40b397793aaso3875995e9.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 07 Dec 2023 01:12:15 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CwNsYWNE"
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F21FFD53
+	for <linux-bluetooth@vger.kernel.org>; Thu,  7 Dec 2023 01:33:08 -0800 (PST)
+Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-6ce6caedce6so333371b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 07 Dec 2023 01:33:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1701940333; x=1702545133; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=abIGam56kSZ3DhSDuEO3BjQb5HXWW5MMfEQ3kw2b1bA=;
-        b=NUWxowhsMgLiuMreM/JfPoF26hF9hNWz1eKHez7UJrpbNzRFYPqmxs9o8vI9dOaO/7
-         lU7aSIjQH8z5bUabkqqE6rHOYOouLQiRtdFjEKgknz9Nef+2RimeEwBKf6nSyT6bbRPa
-         66gKuDlvx/ozQncRf1OFY8NmHY3cINfSv8C/LqClbTc2c5NGsk2nuLrQKSMnkvWSSmcK
-         PRaw1ufVLFi+qhoJQwRpmAz/4Tc0G1oQJV7fdwGitT9fm7XMqJczogIrdEXZArWPnWNR
-         nvGZCex9xmgU66Oxnu52SbB60nlC9FfRoRWRDousEuYcC0QL309Icmj8/iIOvL0uS4IA
-         LZTQ==
+        d=gmail.com; s=20230601; t=1701941588; x=1702546388; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=EAEi3yoLeJTHmPMIVvJeoXPUzp7nk7pomoDmo6VrgTM=;
+        b=CwNsYWNEf2d23bTv5viT1qfTrWieCGJgxAtVrmbtvfFB3on/xWOTlMyf9kaWoFURGX
+         JqLFhYZlBJcJgP8Wdvn45HPjGqDBVjUjiKV6JtOBLjHdggjCdj18Fh8EJlELdrFratCj
+         AH8ui5pVqiMDBSSc8pkMabezz9feH8ygd2Jb1/MpmwPHCmO+hNCv7mIXK2rrAoUAl3od
+         yV7/Lt+PDXFJpqLz98TlIm6Tf3wVfY1UMXgLpNp50IF7fdWU2bzd6B2YS7WUaidphYYN
+         l7qBorC60jYCRyViGvONEo63sgHfYvOkh726tB4jLhWu44qvd81DHiKessVGtRJCs3Gg
+         SRYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701940333; x=1702545133;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=abIGam56kSZ3DhSDuEO3BjQb5HXWW5MMfEQ3kw2b1bA=;
-        b=HJjPOeWsvREZ2uFZ20OoNWVbU0KF2E9WqXIRQF2paizEdFC06r6RNoaCFTfFfwau1M
-         SmSJdH9IIVB4rgJszQwKi2M3wnYafuzepikD1SREzxgi27rqQrRD3tGS3ED1d2ccRpdl
-         gMdPGXPCHQA0KR+hElUt7jaD30ZyvJz8E3CRw1VqOGjHYqK4gTwwzIUJYzPVc7Zo94HZ
-         dxrkvKslqMpBSYREAegEP/xMvD2OWNqAb5OAPSEuWALjxxEyE17JOKVlTqCxgCzp90GF
-         qk0YHgJ7EX1AWShtVGkjzyJpTMWWwhDfYtFerBlP5g8JwHS6zNSvPBl9dBtgZycpl+3F
-         uwbw==
-X-Gm-Message-State: AOJu0YzYROEwxONd0sqJoi5Br2TmHFJ65aiULRCQzi6lCcICf8+uPaA3
-	MuYlTfp/8obBK/Swh9CnfZ3S4w==
-X-Google-Smtp-Source: AGHT+IFPy6rDPC84jLuaSGV9bgwyFSV/vFR4KlGp8lebRYr+5pOBmJ32Bs+S3ip1jKFNvcx/lCuWyQ==
-X-Received: by 2002:a7b:ca4c:0:b0:40c:2c2d:78da with SMTP id m12-20020a7bca4c000000b0040c2c2d78damr154975wml.170.1701940333379;
-        Thu, 07 Dec 2023 01:12:13 -0800 (PST)
-Received: from brgl-uxlite.home ([2a01:cb1d:334:ac00:de32:8b0f:dc9a:4dce])
-        by smtp.gmail.com with ESMTPSA id y3-20020adff6c3000000b0033334c3acb6sm896009wrp.98.2023.12.07.01.12.12
+        d=1e100.net; s=20230601; t=1701941588; x=1702546388;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EAEi3yoLeJTHmPMIVvJeoXPUzp7nk7pomoDmo6VrgTM=;
+        b=vzsG+VLyScvv7DigVYveTksupfe7+gcxsOxzye6QW6njJvzwJ7eWmYXvw6raX3JLlW
+         JdgSPcKP0fI58bEqGn6vyIY3O1Z5CMSU4foI7HLOcVUdgIRQI8sSvDIFAa5myB69hlk1
+         uxUKKeURcxwCZ2EwrCoDMycpNmM8k2uJo33cnDDuQX8gMx/OZKtgfrQOulMHLkWRf0xm
+         bFXZTRQal8l0o27IPkVFUmlobYQlRUyLhGfyveNHnYzMWFZOHEbO2LHk1XtCY+4SPDye
+         8LayZFDuh5832fCsRnfIbf0e/vCXYUknHUENxefCbtX18dUSht0up1LUB/6/z3DE1FNx
+         JdpA==
+X-Gm-Message-State: AOJu0YwCKF4Xu+MBjkhdFVRsi0HoLQn+2RaULPrMZesn2yEX6V6RsV88
+	rA/oCKHPPJ+akrLGQ+76FvM0M4PXBRp6rQ==
+X-Google-Smtp-Source: AGHT+IEvrTVYwEppraalxuJhA9IDJilpp5NC4g/CqrW04O3pUNeOlfeSD7/mfunswQ+or6+MFOWpAA==
+X-Received: by 2002:a05:6a00:9387:b0:6ce:53f6:1eee with SMTP id ka7-20020a056a00938700b006ce53f61eeemr2078783pfb.31.1701941587896;
+        Thu, 07 Dec 2023 01:33:07 -0800 (PST)
+Received: from [172.17.0.2] ([20.172.28.128])
+        by smtp.gmail.com with ESMTPSA id du20-20020a056a002b5400b006cdda10bdafsm851983pfb.183.2023.12.07.01.33.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Dec 2023 01:12:12 -0800 (PST)
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Alex Elder <elder@linaro.org>,
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
-	Bjorn Andersson <andersson@kernel.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: [PATCH v2 3/3] Bluetooth: qca: run the power-on/off sequence for QCA6390 too
-Date: Thu,  7 Dec 2023 10:12:02 +0100
-Message-Id: <20231207091202.19231-4-brgl@bgdev.pl>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20231207091202.19231-1-brgl@bgdev.pl>
-References: <20231207091202.19231-1-brgl@bgdev.pl>
+        Thu, 07 Dec 2023 01:33:07 -0800 (PST)
+Message-ID: <65719153.050a0220.7ccbe.1e28@mx.google.com>
+Date: Thu, 07 Dec 2023 01:33:07 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6087882715523249690=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, brgl@bgdev.pl
+Subject: RE: Bluetooth: power-on QCA6390 correctly
+In-Reply-To: <20231207091202.19231-2-brgl@bgdev.pl>
+References: <20231207091202.19231-2-brgl@bgdev.pl>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+--===============6087882715523249690==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The Bluetooth module on QCA6390 needs to be powered-on by enabling the
-relevant regulators and driving the enable GPIO high. We can reuse the
-power sequence for the WNC models if we add the list of required
-regulators to the OF match data.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=807781
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.39 seconds
+GitLint                       PASS      0.70 seconds
+SubjectPrefix                 FAIL      0.53 seconds
+BuildKernel                   PASS      27.14 seconds
+CheckAllWarning               PASS      30.14 seconds
+CheckSparse                   PASS      38.64 seconds
+CheckSmatch                   PASS      97.95 seconds
+BuildKernel32                 PASS      26.25 seconds
+TestRunnerSetup               PASS      414.38 seconds
+TestRunner_l2cap-tester       PASS      23.75 seconds
+TestRunner_iso-tester         PASS      52.14 seconds
+TestRunner_bnep-tester        PASS      7.04 seconds
+TestRunner_mgmt-tester        PASS      159.16 seconds
+TestRunner_rfcomm-tester      PASS      11.00 seconds
+TestRunner_sco-tester         PASS      14.60 seconds
+TestRunner_ioctl-tester       PASS      12.05 seconds
+TestRunner_mesh-tester        PASS      8.82 seconds
+TestRunner_smp-tester         PASS      9.85 seconds
+TestRunner_userchan-tester    PASS      7.60 seconds
+IncrementalBuild              PASS      34.10 seconds
+
+Details
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+
+
 ---
- drivers/bluetooth/hci_qca.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 35f74f209d1f..b27be08a1f6f 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1788,6 +1788,7 @@ static int qca_power_on(struct hci_dev *hdev)
- 	case QCA_WCN6750:
- 	case QCA_WCN6855:
- 	case QCA_WCN7850:
-+	case QCA_QCA6390:
- 		ret = qca_regulator_init(hu);
- 		break;
- 
-@@ -2044,7 +2045,15 @@ static const struct qca_device_data qca_soc_data_qca2066 __maybe_unused = {
- 
- static const struct qca_device_data qca_soc_data_qca6390 __maybe_unused = {
- 	.soc_type = QCA_QCA6390,
--	.num_vregs = 0,
-+	.vregs = (struct qca_vreg []) {
-+		{ "vddio", 20000 },
-+		{ "vddaon", 100000 },
-+		{ "vddpmu", 1250000 },
-+		{ "vddrfa0p9", 200000 },
-+		{ "vddrfa1p3", 400000 },
-+		{ "vddrfa1p9", 400000 },
-+	},
-+	.num_vregs = 6,
- };
- 
- static const struct qca_device_data qca_soc_data_wcn6750 __maybe_unused = {
-@@ -2129,6 +2138,7 @@ static void qca_power_shutdown(struct hci_uart *hu)
- 
- 	case QCA_WCN6750:
- 	case QCA_WCN6855:
-+	case QCA_QCA6390:
- 		gpiod_set_value_cansleep(qcadev->bt_en, 0);
- 		msleep(100);
- 		qca_regulator_disable(qcadev);
-@@ -2276,6 +2286,7 @@ static int qca_serdev_probe(struct serdev_device *serdev)
- 	case QCA_WCN6750:
- 	case QCA_WCN6855:
- 	case QCA_WCN7850:
-+	case QCA_QCA6390:
- 		qcadev->bt_power = devm_kzalloc(&serdev->dev,
- 						sizeof(struct qca_power),
- 						GFP_KERNEL);
-@@ -2386,6 +2397,7 @@ static void qca_serdev_remove(struct serdev_device *serdev)
- 	case QCA_WCN6750:
- 	case QCA_WCN6855:
- 	case QCA_WCN7850:
-+	case QCA_QCA6390:
- 		if (power->vregs_on) {
- 			qca_power_shutdown(&qcadev->serdev_hu);
- 			break;
--- 
-2.40.1
 
+--===============6087882715523249690==--
