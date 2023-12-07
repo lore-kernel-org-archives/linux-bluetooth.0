@@ -1,206 +1,59 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fnZ4NFJ9"
-Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 883FE10F6
-	for <linux-bluetooth@vger.kernel.org>; Thu,  7 Dec 2023 06:09:57 -0800 (PST)
-Received: by mail-yb1-xb2d.google.com with SMTP id 3f1490d57ef6-db548da6e3bso1838467276.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 07 Dec 2023 06:09:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1701958197; x=1702562997; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=5qgF3sSIvHz1zfLicY+6TVgFqCZEC8QJz84mVPu4JT0=;
-        b=fnZ4NFJ9NmR/qCxRU79NGewBCmU7WI2JOWueNsfu/tGjssI98afaJBefSldy5rTbjA
-         I6dt3qLGEfi5JZJOHJvNhdjzYesH1X9AZqJ833az11x/7zhV0vVMFKu6TYogMeM50u9g
-         MdWDBLOkD58SigGjVLyno5hvFxq3wLLFOTf4O9CYd1WcqVwhYJvSvtZiDg3obQGjm7Pk
-         MzitHMFWByZOQNz7S278KiKOjmImUw+AmwYEeUd71kSNvnGLWTJBkXveNZRbeflhp17e
-         3QjW0g3dxQY905+3Ke3tC4qsoSHDQKPmUVSqSsY8WumxOzMxvT1OOgFbv/kxAI/QX6sm
-         /AHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701958197; x=1702562997;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5qgF3sSIvHz1zfLicY+6TVgFqCZEC8QJz84mVPu4JT0=;
-        b=oO/8BvAfXwzvswdyJfed2hiArcAWU3+JM/DT3R4xOtYsxsclLj/JQwG/SZFdfFZ3U+
-         1j7eYsjCMtEIA66yqDQ/BxI324Qt9/1TzARmapwtWv1Zz663C9K0Q/rh26mFS+y4nAxp
-         LGn/9aIaUVOG/5xfVoDDCX2Uc/lwR8Uzhy1oS0sM/IV2bDtKzMSjVh7BSPdeK7LF7gOU
-         zNP/oFC+oQcgZY7KTObPK+IfkBn+7n30TGelCkmB8gVxcbZ5J9gy9jQRzE8d+MI/RrWk
-         IuIcy0zcCtzVJpoWvmxlbn7eOsxA7g4qSjf1YhIp1wB9UmsJyqO9HhRDbVj0/rgDzL2o
-         yKjg==
-X-Gm-Message-State: AOJu0YyMnSCL1hIK6zNX9mO6uT7A5GIrLfJ2V6ZmuFpobpv+g8grEW2J
-	Dnew6/zL2C8NnJ+gUiKVqrfYDvkGhN4ecl1UcrDEfg==
-X-Google-Smtp-Source: AGHT+IHVRH9O+e/jlUGrQAx9xh4VLn2kxitHRh22/vDYDil0LX+cgDdw2m9RceCZ/RhFJs4fR36Mbayjmu8hE8wtVMY=
-X-Received: by 2002:a25:da49:0:b0:db4:5cdd:f6b4 with SMTP id
- n70-20020a25da49000000b00db45cddf6b4mr3336991ybf.14.1701958196710; Thu, 07
- Dec 2023 06:09:56 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=metanate.com header.i=@metanate.com header.b="AzTU2PFB"
+Received: from metanate.com (unknown [IPv6:2001:8b0:1628:5005::111])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D57F510E7
+	for <linux-bluetooth@vger.kernel.org>; Thu,  7 Dec 2023 07:45:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=metanate.com; s=stronger; h=To:Date:Message-Id:Subject:
+	Content-Transfer-Encoding:Content-Type:From:Reply-To:Cc:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=ye/tJeOtIYmEeSd8JLXj7cZatN232/Ir/pfSZvI06kM=; b=AzTU2PFB9LaPvzMNqqHfq9xKZo
+	b0Ek0tCUCT2pjPz/KY/i5OlSfbbb5ulOawu+/7lKJyEM3jPqRBS66ChaNlx4iDlS162Peh8Xkepos
+	EZpx+zvHauBrJKCVTIzsB4YR3xkgbLnz3s83RHR8SoK6MZYFkDJCRV+Ba8+faYFXLUuNDUbOkB2Xk
+	UJwqYwyv27xjb2pwwjGo2N6J1k9Bs4XKwfqdt49h0yK/LOVFr8IOnn5rN+R6COnFamiKgDX11l5Sb
+	6S+vcUJeaMTX0ckyH1QYhMVFZsQye/f33kZLJqiLk7V3DWqJWZjmXCiTpVIdoJwJqbNZaSiwR/AHz
+	8wADH4yg==;
+Received: from cpc159311-cmbg20-2-0-cust374.5-4.cable.virginm.net ([82.5.237.119] helo=smtpclient.apple)
+	by email.metanate.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <stu@metanate.com>)
+	id 1rBGYo-0005qL-1D
+	for linux-bluetooth@vger.kernel.org;
+	Thu, 07 Dec 2023 15:45:10 +0000
+From: Northfield Stuart <stu@metanate.com>
+Content-Type: text/plain;
+	charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231206073712.17776-1-jirislaby@kernel.org> <20231206073712.17776-5-jirislaby@kernel.org>
-In-Reply-To: <20231206073712.17776-5-jirislaby@kernel.org>
-From: Ulf Hansson <ulf.hansson@linaro.org>
-Date: Thu, 7 Dec 2023 15:09:21 +0100
-Message-ID: <CAPDyKFo=X+ESxuYov1TDvLEWk1XCSU2o98=+5Y8LvHWr2nKF6Q@mail.gmail.com>
-Subject: Re: [PATCH 04/27] tty: make tty_operations::send_xchar accept u8 char
-To: "Jiri Slaby (SUSE)" <jirislaby@kernel.org>
-Cc: gregkh@linuxfoundation.org, linux-serial@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Karsten Keil <isdn@linux-pingi.de>, 
-	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, netdev@vger.kernel.org, linux-mmc@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.700.6\))
+Subject: [PATCH BlueZ] Fix ad_clear_data() to clear correct structure
+Message-Id: <92D4BD44-91B2-4D0A-9A43-AEAE5DEAA963@metanate.com>
+Date: Thu, 7 Dec 2023 15:44:59 +0000
+To: linux-bluetooth@vger.kernel.org
+X-Mailer: Apple Mail (2.3731.700.6)
+X-Authenticated: YES
 
-On Wed, 6 Dec 2023 at 08:37, Jiri Slaby (SUSE) <jirislaby@kernel.org> wrote:
->
-> tty_operations::send_xchar is one of the last users of 'char' type for
-> characters in the tty layer. Convert it to u8 now.
->
-> Signed-off-by: Jiri Slaby (SUSE) <jirislaby@kernel.org>
-> Cc: Karsten Keil <isdn@linux-pingi.de>
-> Cc: Ulf Hansson <ulf.hansson@linaro.org>
-> Cc: Marcel Holtmann <marcel@holtmann.org>
-> Cc: Johan Hedberg <johan.hedberg@gmail.com>
-> Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> Cc: netdev@vger.kernel.org
-> Cc: linux-mmc@vger.kernel.org
-> Cc: linux-bluetooth@vger.kernel.org
+---
+ client/advertising.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Acked-by: Ulf Hansson <ulf.hansson@linaro.org> # For MMC
+diff --git a/client/advertising.c b/client/advertising.c
+index a7474d6a2..b8e3f4ab3 100644
+--- a/client/advertising.c
++++ b/client/advertising.c
+@@ -757,7 +757,7 @@ void ad_disable_manufacturer(DBusConnection *conn)
+ 
+ static void ad_clear_data(void)
+ {
+-       memset(&ad.manufacturer, 0, sizeof(ad.manufacturer));
++       memset(&ad.data, 0, sizeof(ad.data));
+ 
+        return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+-- 
+2.39.2 (Apple Git-143)
 
-Kind regards
-Uffe
-
-> ---
->  drivers/isdn/capi/capi.c         | 4 ++--
->  drivers/mmc/core/sdio_uart.c     | 2 +-
->  drivers/tty/amiserial.c          | 2 +-
->  drivers/tty/serial/serial_core.c | 2 +-
->  drivers/tty/tty_io.c             | 2 +-
->  include/linux/tty.h              | 2 +-
->  include/linux/tty_driver.h       | 4 ++--
->  net/bluetooth/rfcomm/tty.c       | 2 +-
->  8 files changed, 10 insertions(+), 10 deletions(-)
->
-> diff --git a/drivers/isdn/capi/capi.c b/drivers/isdn/capi/capi.c
-> index 2f3789515445..6e80d7bd3c4d 100644
-> --- a/drivers/isdn/capi/capi.c
-> +++ b/drivers/isdn/capi/capi.c
-> @@ -1231,9 +1231,9 @@ static void capinc_tty_hangup(struct tty_struct *tty)
->         tty_port_hangup(&mp->port);
->  }
->
-> -static void capinc_tty_send_xchar(struct tty_struct *tty, char ch)
-> +static void capinc_tty_send_xchar(struct tty_struct *tty, u8 ch)
->  {
-> -       pr_debug("capinc_tty_send_xchar(%d)\n", ch);
-> +       pr_debug("capinc_tty_send_xchar(%u)\n", ch);
->  }
->
->  static const struct tty_operations capinc_ops = {
-> diff --git a/drivers/mmc/core/sdio_uart.c b/drivers/mmc/core/sdio_uart.c
-> index a05322f15771..370fadf1d6d1 100644
-> --- a/drivers/mmc/core/sdio_uart.c
-> +++ b/drivers/mmc/core/sdio_uart.c
-> @@ -792,7 +792,7 @@ static unsigned int sdio_uart_chars_in_buffer(struct tty_struct *tty)
->         return kfifo_len(&port->xmit_fifo);
->  }
->
-> -static void sdio_uart_send_xchar(struct tty_struct *tty, char ch)
-> +static void sdio_uart_send_xchar(struct tty_struct *tty, u8 ch)
->  {
->         struct sdio_uart_port *port = tty->driver_data;
->
-> diff --git a/drivers/tty/amiserial.c b/drivers/tty/amiserial.c
-> index a80f059f77bf..a30dc054ffbf 100644
-> --- a/drivers/tty/amiserial.c
-> +++ b/drivers/tty/amiserial.c
-> @@ -811,7 +811,7 @@ static void rs_flush_buffer(struct tty_struct *tty)
->   * This function is used to send a high-priority XON/XOFF character to
->   * the device
->   */
-> -static void rs_send_xchar(struct tty_struct *tty, char ch)
-> +static void rs_send_xchar(struct tty_struct *tty, u8 ch)
->  {
->         struct serial_state *info = tty->driver_data;
->          unsigned long flags;
-> diff --git a/drivers/tty/serial/serial_core.c b/drivers/tty/serial/serial_core.c
-> index 0393853b9947..80085b151b34 100644
-> --- a/drivers/tty/serial/serial_core.c
-> +++ b/drivers/tty/serial/serial_core.c
-> @@ -687,7 +687,7 @@ EXPORT_SYMBOL_GPL(uart_xchar_out);
->   * This function is used to send a high-priority XON/XOFF character to
->   * the device
->   */
-> -static void uart_send_xchar(struct tty_struct *tty, char ch)
-> +static void uart_send_xchar(struct tty_struct *tty, u8 ch)
->  {
->         struct uart_state *state = tty->driver_data;
->         struct uart_port *port;
-> diff --git a/drivers/tty/tty_io.c b/drivers/tty/tty_io.c
-> index 005d91c63707..6a502110da61 100644
-> --- a/drivers/tty/tty_io.c
-> +++ b/drivers/tty/tty_io.c
-> @@ -1149,7 +1149,7 @@ ssize_t redirected_tty_write(struct kiocb *iocb, struct iov_iter *iter)
->   *
->   * Locking: none for xchar method, write ordering for write method.
->   */
-> -int tty_send_xchar(struct tty_struct *tty, char ch)
-> +int tty_send_xchar(struct tty_struct *tty, u8 ch)
->  {
->         bool was_stopped = tty->flow.stopped;
->
-> diff --git a/include/linux/tty.h b/include/linux/tty.h
-> index e96c85f4f91e..d3bedcc08738 100644
-> --- a/include/linux/tty.h
-> +++ b/include/linux/tty.h
-> @@ -410,7 +410,7 @@ void tty_wait_until_sent(struct tty_struct *tty, long timeout);
->  void stop_tty(struct tty_struct *tty);
->  void start_tty(struct tty_struct *tty);
->  void tty_write_message(struct tty_struct *tty, char *msg);
-> -int tty_send_xchar(struct tty_struct *tty, char ch);
-> +int tty_send_xchar(struct tty_struct *tty, u8 ch);
->  int tty_put_char(struct tty_struct *tty, unsigned char c);
->  unsigned int tty_chars_in_buffer(struct tty_struct *tty);
->  unsigned int tty_write_room(struct tty_struct *tty);
-> diff --git a/include/linux/tty_driver.h b/include/linux/tty_driver.h
-> index f428c1b784a2..7372124fbf90 100644
-> --- a/include/linux/tty_driver.h
-> +++ b/include/linux/tty_driver.h
-> @@ -242,7 +242,7 @@ struct serial_struct;
->   *     Optional: If not provided, the device is assumed to have no FIFO.
->   *     Usually correct to invoke via tty_wait_until_sent(). May sleep.
->   *
-> - * @send_xchar: ``void ()(struct tty_struct *tty, char ch)``
-> + * @send_xchar: ``void ()(struct tty_struct *tty, u8 ch)``
->   *
->   *     This routine is used to send a high-priority XON/XOFF character (@ch)
->   *     to the @tty device.
-> @@ -374,7 +374,7 @@ struct tty_operations {
->         void (*flush_buffer)(struct tty_struct *tty);
->         void (*set_ldisc)(struct tty_struct *tty);
->         void (*wait_until_sent)(struct tty_struct *tty, int timeout);
-> -       void (*send_xchar)(struct tty_struct *tty, char ch);
-> +       void (*send_xchar)(struct tty_struct *tty, u8 ch);
->         int (*tiocmget)(struct tty_struct *tty);
->         int (*tiocmset)(struct tty_struct *tty,
->                         unsigned int set, unsigned int clear);
-> diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-> index 94ec913dfb76..69c75c041fe1 100644
-> --- a/net/bluetooth/rfcomm/tty.c
-> +++ b/net/bluetooth/rfcomm/tty.c
-> @@ -1041,7 +1041,7 @@ static void rfcomm_tty_flush_buffer(struct tty_struct *tty)
->         tty_wakeup(tty);
->  }
->
-> -static void rfcomm_tty_send_xchar(struct tty_struct *tty, char ch)
-> +static void rfcomm_tty_send_xchar(struct tty_struct *tty, u8 ch)
->  {
->         BT_DBG("tty %p ch %c", tty, ch);
->  }
-> --
-> 2.43.0
->
