@@ -1,91 +1,156 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WKOthtoW"
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AF9410F8
-	for <linux-bluetooth@vger.kernel.org>; Thu,  7 Dec 2023 12:04:53 -0800 (PST)
-Received: by mail-pg1-x529.google.com with SMTP id 41be03b00d2f7-5c239897895so970701a12.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 07 Dec 2023 12:04:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701979493; x=1702584293; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=NpSyLXGavri3vu+DFc44YpE/jMZr16JZmDPW0pcXcQs=;
-        b=WKOthtoWZURAgE4dtU5RDmRUYcvOwzTFkyomNjLeCMFVO01eviUlgpo2tkmpXRu0ZI
-         oZ+H42xHrUb7fRsOfAohfK/lD/0vFSvXUdLbchZYfLvxld3qww094fMcHXn50zdTNd45
-         KODA474Zhz8XG8fx8zfj3gRUhmUAUPT1qTIo8q0epixACg4pwkK+Unjk6wcsII3w9lQS
-         gfZWlvF6dforDgjNHKE9fUTherSLI+sdQH/4t9Pb8/blk4EPulY6QWBax4mJW/fUnl/i
-         rpgKaLHia+cKhOAG3kL285I4kz1FT6YEPnpOeT65hiV/ccXb8mwWnUG2dhLPlp3d1TJT
-         +LrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701979493; x=1702584293;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NpSyLXGavri3vu+DFc44YpE/jMZr16JZmDPW0pcXcQs=;
-        b=rfvNCKp0UjDTUhwy55nK4pgtA/EW1iXplCpRgnFefCSFqVJtGuH12KkNpJBS4v9wIQ
-         uko3XdOF/8acvs5XTVqF+bgFx/LYROSMcza8xynidS+wQTbv12OkwX/c12+HyskdenAO
-         zOHhO7h+UZNgq9FJh86tGWfGhpRevQStqE4LQG8uKLaDr4lt7UiW+7D9q9Fc3OC64TG+
-         Mryz/lO05O9tVNrEVavxSqtsARfiyB4fy5YBdlF5LWHW8eZyl2VqNCxUpqxynyFdMWGO
-         HisWwXWDaZbkSbMT5kzGh7PEt5fSEB3IT5sK14mgtnpILGiKMAZkFlJiMkD4GDhoc7wt
-         0flg==
-X-Gm-Message-State: AOJu0YzwT/hR46r1AErw1q3bvHrZA3FuQCWagzaK0qSAEZHyuvrMhsSL
-	dLvApB0RT+qy5Tf5ok8QIDh7mH8JsZM=
-X-Google-Smtp-Source: AGHT+IHxDZXzOadx3QtCWNqEMNeBUCXwNaVE9i0KZ/MUnKI53nswk4SYTGrCGI9PV8dFejrzr6GT2g==
-X-Received: by 2002:a05:6a20:a11a:b0:18f:d784:e20e with SMTP id q26-20020a056a20a11a00b0018fd784e20emr3152790pzk.119.1701979492869;
-        Thu, 07 Dec 2023 12:04:52 -0800 (PST)
-Received: from [172.17.0.2] ([52.238.27.64])
-        by smtp.gmail.com with ESMTPSA id b16-20020aa78710000000b006cea1db00cbsm79474pfo.204.2023.12.07.12.04.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Dec 2023 12:04:52 -0800 (PST)
-Message-ID: <65722564.a70a0220.14c55.0748@mx.google.com>
-Date: Thu, 07 Dec 2023 12:04:52 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5157441392628034250=="
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="eLeGzfvD"
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD12498
+	for <linux-bluetooth@vger.kernel.org>; Thu,  7 Dec 2023 14:02:08 -0800 (PST)
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B7KdGTh001734;
+	Thu, 7 Dec 2023 22:02:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : from : to : cc : references : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=WCc6Jw1HoTWUvh/oEm9Kh/R5P3GOMLkDonC3gQUv4Cs=;
+ b=eLeGzfvDmXlzeCwEIJlyR6Uvvyc5ktjQzjhfM7w1ul6XHoD9V9aBXpetVb6ue0xFBfPz
+ pklU9ZkLJr0e2eMGeAwGpMrgCID2brX0PmrV4JvQApHWAPC659jCcui0nRxIEwt6HiBT
+ c+iAgQNzk6CLrWg5tVgdwFUoFvzUAjdMyEUJ2GOtaDCOwOckRJx8tyvAnjisic0JXNdb
+ P3jQ/7zOqOrkTLA4F0Wz9x9cfBoVEEhyA3mdygvGXbHYZ8cvSYJNuznSh0TTyt7gmf7T
+ cXs7KTYHk2jEoK/bm/65TYsZPsIlaPXVjK6qAXXMIXSP1JaqKoqAFCvMFNqIzHXMPiTq 4w== 
+Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uubdm1xe4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 Dec 2023 22:02:04 +0000
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3B7M24Vu009548
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 7 Dec 2023 22:02:04 GMT
+Received: from [10.253.39.17] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Thu, 7 Dec
+ 2023 13:59:08 -0800
+Message-ID: <0bb83c21-97f5-4588-a834-ddc433d82f00@quicinc.com>
+Date: Fri, 8 Dec 2023 05:59:05 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1] client/player: Fix not prompting all parameter on endpoint.register
-In-Reply-To: <20231207184723.3862261-1-luiz.dentz@gmail.com>
-References: <20231207184723.3862261-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 0/2] Bluetooth: Support SCO offload for QCA2066
+From: quic_zijuhu <quic_zijuhu@quicinc.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <linux-bluetooth@vger.kernel.org>
+References: <1699251565-28759-1-git-send-email-quic_zijuhu@quicinc.com>
+ <CABBYNZK6UNm9SWhmJtvp-bzObTk-UR7GhK2U16ffFEe-bdpOoA@mail.gmail.com>
+ <b767f792-912d-0386-c891-4f571217e846@quicinc.com>
+ <CABBYNZLrdX5pxWNL86NcE7DvSzvLN0xMTaMvJ265=CvKYmMMcw@mail.gmail.com>
+ <bdb15439-52cd-4727-843a-cf6250a5a984@quicinc.com>
+Content-Language: en-US
+In-Reply-To: <bdb15439-52cd-4727-843a-cf6250a5a984@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: QBnRsPWJayV2FeCuoQejqjiXCKyYm02t
+X-Proofpoint-GUID: QBnRsPWJayV2FeCuoQejqjiXCKyYm02t
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-07_17,2023-12-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 impostorscore=0 lowpriorityscore=0 priorityscore=1501
+ suspectscore=0 bulkscore=0 clxscore=1015 phishscore=0 spamscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2312070186
 
---===============5157441392628034250==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Luiz,
+FYI.
 
-This is automated email and please do not reply to this email!
+On 11/29/2023 11:29 AM, quic_zijuhu wrote:
+> On 11/18/2023 12:02 AM, Luiz Augusto von Dentz wrote:
+>> Hi,
+>>
+>> On Mon, Nov 6, 2023 at 9:47 PM quic_zijuhu <quic_zijuhu@quicinc.com> wrote:
+>>>
+>>> On 11/7/2023 12:16 AM, Luiz Augusto von Dentz wrote:
+>>>> Hi,
+>>>>
+>>>> On Mon, Nov 6, 2023 at 1:19 AM Zijun Hu <quic_zijuhu@quicinc.com> wrote:
+>>>>>
+>>>>> This patch series are to support SCO offload for QCA2066, ALL BTHOST
+>>>>> needs to do is specifying both Input_Data_Path and Output_Data_Path
+>>>>> as 0x01 for HCI_Enhanced_Setup_Synchronous_Connection, does NOT need
+>>>>> to configure data path by HCI_Configure_Data_Path at all.
+>>>>
+>>>> This part it doesn't need to use HCI_Configure_Data_Path seems to be
+>>>> non-standard, if so it needs to be handled by the driver, also it is
+>>>> probably a good idea to explain how it works, what are the commands
+>>>> used and the result traffic using btmon to collect the HCI trace.
+>>>>
+>>> My change does NOT touch current BT core driver logic at all. i just assign NULL to
+>>> hdev->get_codec_config_data within QCA device driver. so it follows current kernel
+>>> offload design.
+>>>
+>>> BTW, Core spec also does not specify standard procedures for SCO offload since it is
+>>> vendor specific.
+>>
+>> We should probably document the expectation so it is clearer to the
+>> driver what to expect, also the offload must be selected by the
+>> application via socket interface as the HCI routing is the default, so
+>> if the controller defaults to offload that needs fixing.
+>>
+> i will add comments within hci_qca.c to document QC offload usage as you suggested.
+> the controller(firmware) supports both offload or non-offload, if setup SCO/eSCO by
+> HCI_Enhanced_Setup_Synchronous_Connection with data path parameter as 0x00, then
+> controller will use HCI for audio data. if as 0x01, it will use non-HCI such as PCM.
+> 
+> From current kernel HFP offload design,if hdev->get_data_path_id() is implemented by
+> device driver. it means HFP offload is ALSO SUPPORTED. whether to use offload or not is
+> decided by user (upper BT application) as shown below:
+> 
+> if user wants to use offload, then they must include offload UUID in config option KernelExperimental
+> within /etc/bluetooth/main.conf and use setsockopt to config BT_CODEC.
+> 
+> if user does not want to use offload. then they just need to remove offload UUID from option
+> KernelExperimental
+> 
+> based on above understanding, i have below points even if out of discussion scope for this change.
+> 1) term data path selection is more suitable than offload for current design.
+> offload related to performing HFP coding/decoding within controller. data path selection related to
+> transferring audio data by HCI or non-HCI such as PCM.
+> 
+> 2) perhaps, use setsockopt to config BT_CODEC for offload AS DEFAULT within upper application or BLUEZ,
+>             and just ONLY use the config option KernelExperimental to controller if to use offload.
+> 
+>> As for this change in specific, the configure data path function can
+>> check if the driver does implement it, so we don't have to check it
+>> before calling avoiding duplicate code.
+>>
+> current checking is simpler and more suitable than below 2 alternatives to prevent 
+> send HCI_Configure_Data_Path since they need to take this scenario as error and return error code.
+> even if we indeed can't take vendor special design as error wrongly.
+> 
+> alternative 1): check and return error code within configure_datapath_sync().
+> alternative 2): implement hev->get_codec_config_data by returning error code within device driver hci_qca.c
+>                 besides, there are no suitable error code for this case.
+>>>>> Zijun Hu (2):
+>>>>>   Bluetooth: hci_conn: Check non NULL before calling
+>>>>>     hdev->get_codec_config_data()
+>>>>>   Bluetooth: qca: Support SCO offload for QCA2066
+>>>>>
+>>>>>  drivers/bluetooth/hci_qca.c | 19 +++++++++++++++++++
+>>>>>  net/bluetooth/hci_conn.c    |  2 +-
+>>>>>  2 files changed, 20 insertions(+), 1 deletion(-)
+>>>>>
+>>>>> --
+>>>>> The Qualcomm Innovation Center
+>>>>>
+>>>>
+>>>>
+>>>
+>>
+>>
+> 
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=807969
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      2.00 seconds
-GitLint                       PASS      0.51 seconds
-BuildEll                      PASS      24.16 seconds
-BluezMake                     PASS      732.65 seconds
-MakeCheck                     PASS      11.85 seconds
-MakeDistcheck                 PASS      159.63 seconds
-CheckValgrind                 PASS      217.54 seconds
-CheckSmatch                   PASS      321.99 seconds
-bluezmakeextell               PASS      103.06 seconds
-IncrementalBuild              PASS      681.09 seconds
-ScanBuild                     PASS      906.20 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============5157441392628034250==--
