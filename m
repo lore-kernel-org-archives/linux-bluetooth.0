@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WJOcK8tS"
-Received: from mail-qv1-xf32.google.com (mail-qv1-xf32.google.com [IPv6:2607:f8b0:4864:20::f32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 759CF1738
-	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Dec 2023 09:56:52 -0800 (PST)
-Received: by mail-qv1-xf32.google.com with SMTP id 6a1803df08f44-67a91a373edso13253826d6.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 08 Dec 2023 09:56:52 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f1d+fnpP"
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC1B910F1
+	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Dec 2023 10:35:21 -0800 (PST)
+Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-6ce33234fd7so1675466b3a.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 08 Dec 2023 10:35:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702058211; x=1702663011; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1702060521; x=1702665321; darn=vger.kernel.org;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=F/YGxFpdU2fngc2B2EXhkFzW71zVjVlPFgK9l3vVobM=;
-        b=WJOcK8tSRjlYt8gDODtd8oMK/JJ+OWIxFUez35JjIj6CKRNsOdtO7LU4eQrme3cdtJ
-         7pW5oSomqXX+c7WqTEZTJBJg/C/GEg7h60VD4LDJkTOGUtdS78rgnZ/Y5ruZNkbddiN4
-         1ZBj7XArDTsBrdKJ42l/9Mb/nXbAnTvDTQdJQAwB1A4irn1bhDk6oGmBjoEsE7hr8Ivf
-         d+0tNLoTvKpe64Ho+W9GTxRJcGql6pVi5mhg3N1KTBkC3rT5UbXEFdCyWJpG+qdnwSGF
-         yLFqHsbIfVzPEXkLnKHs3hAjivUBr+YDX0qeeEMpYfC2u5YIZYM1L/VWPZ0iT9jYEwzy
-         aZiQ==
+        bh=1tZ5fk9H19pu1F3O5k0RVjQpyVrbKu2IQIjQRSj/riI=;
+        b=f1d+fnpP3sE0lPnj98jRumTfS8xLWSKjYygJC8DwNng8PXPO/BJR0NLy4/ofjukUxR
+         /T3KtL7Pogkwna0mxRDZbp70TWvbNg1IdXE0sH4X1XBXID7ivRHaWTIl72m5v249Demz
+         b9KaU5rc27K4MCxDFvJ9HlcsP8yZiMcoRaPMfkNJOcYOxRXi2RcqvPcGHZhYwJTPLQVO
+         Gxosw6C2wrCPMjVJRAJwnmgGXZjogOemSRV/9yXid72yzNNVkMyEnyQdR7VwqX+1Vrua
+         0ZUYW9LKgGb3OwLFBtNjaVdPMkaI0eKepLPQiZNC6nZBEL5IUvRDKgksGPWZTDVcIFIZ
+         m8iA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702058211; x=1702663011;
+        d=1e100.net; s=20230601; t=1702060521; x=1702665321;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=F/YGxFpdU2fngc2B2EXhkFzW71zVjVlPFgK9l3vVobM=;
-        b=IU7dHpuiAMOxEKLVx00jxJ6fqIWklmqxVRZ88yi9/ysh24l/VlftjT5zXtShwEbP5i
-         pf2RTtkJ4f0PinWBpUkWM1UKTIKZThwSNOs4GZ6uWXrDuoKsxNPLgtYO36piFHPc+p7+
-         TKU7O4aGKGt5AWcvdn3BAboFS7/HMz92/znkty1l2iLaYERoPF5c9tg1l5VJ3BxCrqY/
-         SuktxbfJ5kSHTMaSxzUvlt59Bl2BrPcd6sOgoESqK0L9hLNPpvX+EtgkHPQldCYZMuZx
-         pZ+IaGe/hkNJtyrwXuYVi/3ReMd6CCT/thuA224v9SBRmY8VkrrIakk+9BQMDK4yDirj
-         hjiA==
-X-Gm-Message-State: AOJu0YzZtxwz1mbwh/yo3o2g21zUDM0gTBIOqF0cgiTuqE8eT1fIXMsV
-	TVNMhGgkQyAMK0jZKLTS9D/5s04nFes=
-X-Google-Smtp-Source: AGHT+IHuX8IPXpPWARvOrLGArEhRbmfUBcFJCIzdI3PilstFfnzQ8S5BxQoiAhN+JXjosUjYXa31mw==
-X-Received: by 2002:ad4:442a:0:b0:67a:b5cf:ff29 with SMTP id e10-20020ad4442a000000b0067ab5cfff29mr387778qvt.51.1702058211481;
-        Fri, 08 Dec 2023 09:56:51 -0800 (PST)
-Received: from [172.17.0.2] ([74.249.6.30])
-        by smtp.gmail.com with ESMTPSA id dj15-20020a056214090f00b0067abef04ce1sm957573qvb.107.2023.12.08.09.56.51
+        bh=1tZ5fk9H19pu1F3O5k0RVjQpyVrbKu2IQIjQRSj/riI=;
+        b=Go4uJhaVodCr1oTVU0rNk252AldICpXbZvjuQ9btOueKBvkurZI6+/USJEflx/SD/K
+         0qBrIKZiDDsZ1o8hGV1aP0W/VhqPScrbimYQwqMpTsPwyicYnalXzZYwn0ArAH9wSC1y
+         +hojVLaHwnyukDWKM9S4o1e9AmrM8NgzouRd/pHJywGJrFN3DPSF7PYMUBklXJvq8wrY
+         erKS8czhoVfQtqEkBAU/mVi0ZrVedLJ+j57asLV7Wf5HTiKtZO8+lt0Jqb8nWRPQBz3I
+         4Yxj49ddKS7NwWr0e8c4hGrzI0OomloYugZcukePOuPumMWV2UDT4jizlqGf8Hns93A5
+         11bw==
+X-Gm-Message-State: AOJu0YxJlwvebjCjOvOEIa5kgUP32TWD7cUpjOjF0JgSLNipzKoHzceq
+	/ynjuGxHW9LoN8Hc1Ax2Hywu8n2NXds=
+X-Google-Smtp-Source: AGHT+IGoV2szNB7h0y3FCaCipWrphdSEZWrRXQNUvM0hcXp9/ZlobvWDDpOG+o/8DKCgEYWeLxfPKA==
+X-Received: by 2002:a05:6a00:14c6:b0:6ce:57f2:45fa with SMTP id w6-20020a056a0014c600b006ce57f245famr475929pfu.49.1702060520924;
+        Fri, 08 Dec 2023 10:35:20 -0800 (PST)
+Received: from [172.17.0.2] ([52.225.76.18])
+        by smtp.gmail.com with ESMTPSA id fi29-20020a056a00399d00b006cbe1bb5e3asm1870215pfb.138.2023.12.08.10.35.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Dec 2023 09:56:51 -0800 (PST)
-Message-ID: <657358e3.050a0220.fc2ee.5fa0@mx.google.com>
-Date: Fri, 08 Dec 2023 09:56:51 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2885649012162638382=="
+        Fri, 08 Dec 2023 10:35:20 -0800 (PST)
+Message-ID: <657361e8.050a0220.ba8af.6730@mx.google.com>
+Date: Fri, 08 Dec 2023 10:35:20 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0493239457529575353=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -47,13 +47,13 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, quic_zijuhu@quicinc.com
-Subject: RE: [v1] Bluetooth: hci_conn: Remove a redundant check for HFP offload
-In-Reply-To: <1702055834-18008-1-git-send-email-quic_zijuhu@quicinc.com>
-References: <1702055834-18008-1-git-send-email-quic_zijuhu@quicinc.com>
+To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
+Subject: RE: Bluetooth: L2CAP: Send reject on command corrupted request
+In-Reply-To: <20231208174150.1313389-1-frederic.danis@collabora.com>
+References: <20231208174150.1313389-1-frederic.danis@collabora.com>
 Reply-To: linux-bluetooth@vger.kernel.org
 
---===============2885649012162638382==
+--===============0493239457529575353==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -64,31 +64,31 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=808336
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=808342
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    PASS      0.62 seconds
-GitLint                       PASS      0.32 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      27.52 seconds
-CheckAllWarning               PASS      30.56 seconds
-CheckSparse                   PASS      35.92 seconds
-CheckSmatch                   PASS      98.80 seconds
-BuildKernel32                 PASS      26.81 seconds
-TestRunnerSetup               PASS      422.30 seconds
-TestRunner_l2cap-tester       PASS      22.94 seconds
-TestRunner_iso-tester         PASS      45.47 seconds
-TestRunner_bnep-tester        PASS      6.99 seconds
-TestRunner_mgmt-tester        PASS      167.73 seconds
-TestRunner_rfcomm-tester      PASS      11.47 seconds
-TestRunner_sco-tester         PASS      14.60 seconds
-TestRunner_ioctl-tester       PASS      12.41 seconds
-TestRunner_mesh-tester        PASS      8.83 seconds
-TestRunner_smp-tester         PASS      10.05 seconds
-TestRunner_userchan-tester    PASS      7.31 seconds
-IncrementalBuild              PASS      25.60 seconds
+CheckPatch                    PASS      0.48 seconds
+GitLint                       PASS      6.39 seconds
+SubjectPrefix                 PASS      0.71 seconds
+BuildKernel                   PASS      28.55 seconds
+CheckAllWarning               PASS      31.37 seconds
+CheckSparse                   PASS      36.94 seconds
+CheckSmatch                   PASS      101.06 seconds
+BuildKernel32                 PASS      27.83 seconds
+TestRunnerSetup               PASS      428.07 seconds
+TestRunner_l2cap-tester       PASS      23.12 seconds
+TestRunner_iso-tester         PASS      48.36 seconds
+TestRunner_bnep-tester        PASS      6.85 seconds
+TestRunner_mgmt-tester        PASS      165.73 seconds
+TestRunner_rfcomm-tester      PASS      13.37 seconds
+TestRunner_sco-tester         PASS      14.52 seconds
+TestRunner_ioctl-tester       PASS      12.46 seconds
+TestRunner_mesh-tester        PASS      8.97 seconds
+TestRunner_smp-tester         PASS      9.92 seconds
+TestRunner_userchan-tester    PASS      7.43 seconds
+IncrementalBuild              PASS      26.37 seconds
 
 
 
@@ -97,4 +97,4 @@ Regards,
 Linux Bluetooth
 
 
---===============2885649012162638382==--
+--===============0493239457529575353==--
