@@ -1,26 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A83F1CAAC
-	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Dec 2023 22:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U7/rV89k"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 18ECBC433C9;
-	Fri,  8 Dec 2023 22:20:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702074025;
-	bh=5dYtSoA/F2xJI6Ob2zZPpDcY5xOUFbEnCn+Xd2vxAiE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=U7/rV89kWNzRyXMob2+DlrktacA0fNywcE1f2a+9plkvcDtJx5CkAYTje2VBzLSRF
-	 jih4sBiTUgjDOwWbymQoQUNF/qlE6KdYQd/fDnyKFroTNapMC9VIYHf7mLq/51bi41
-	 /jpFOl0kIzLT/VV2AsnoEYy5mzgX4kLVYR9/7ZI0hqVkqJPMExdRyHNDNzKPUGoneU
-	 1YR19tIpA3aSrF1i2fpdN3SAm9qrcDVoRyOFhLneA6XQJL+y8+wC40AhuJt+Xmdz4M
-	 zouIUXO7R2wrpAcQIPe3xm9mJHPBH3L96L9Uu9aa9cJG9IBBXubH81B0KmnguHU37/
-	 HK1FbCqKIyilw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F28A9C04E32;
-	Fri,  8 Dec 2023 22:20:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QoK14Qm4"
+Received: from mail-yw1-x1131.google.com (mail-yw1-x1131.google.com [IPv6:2607:f8b0:4864:20::1131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 995FA171F
+	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Dec 2023 14:28:47 -0800 (PST)
+Received: by mail-yw1-x1131.google.com with SMTP id 00721157ae682-5de93b677f4so10317317b3.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 08 Dec 2023 14:28:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702074526; x=1702679326; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hEyd8Ha/SX5TZcvP6e9MacgWygLSC9m/CuLfXZ3upD4=;
+        b=QoK14Qm4S5gtobowvH/Magx5PPML4DV6FyJglotbaPAek6Ci53p4Vty3e51Ttt1tMq
+         oapFybonKpiBDu8FqricPxVptiWHl+Zn8svQ74+2oe4Bd+PwPEtDUPj8ttxhdmeud3s/
+         1/LgMgzqxXLcUTs90sLLx6jJoKB049QJW/FXaa0ktJfWqH2TYYtwYEjW78TK/fP0hwdo
+         EFrX3StuaN18EZR6ycfSVTck5x8P1jYi6oawHn3SmXTRY50p+k1W495BAOI6MNJbig5H
+         cw/KGo/IaX9sC1DLfeRB94fJ2nbL+iZfy/GKYB5wr0YK89pZv6o0uAWxThAa+vgRXa/Z
+         XXEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702074526; x=1702679326;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hEyd8Ha/SX5TZcvP6e9MacgWygLSC9m/CuLfXZ3upD4=;
+        b=gHZJ6/p99MfWz4qtp3YfXzRx4qEotF3pY5hAjnC64mdiI7DdKJPZscm6gUrB8l0lCJ
+         TT4P4Zsz2yxyIXVmKw1WUxh8SWLin0BrVXL6M65a3i9/OwN+skUz1Su1Rod/j2dtNRqz
+         F+XW4o/an34bQNm/TeYebCcBIR8pHU5tE8/DFYvRwrJFBd6aKE+4BvwzeVzTkmCLSRXa
+         LFRdDHZHh2QbkL8goJhM43Mw4JqwO87352buO+cvi+I+j/HM+BG0xrTxvLr1rwIYtn2H
+         AfV5Y+7Bq2EEvvWSSgWyn+jCEBbajBkvMW+XswrKEbyYiINUKjHkwDBgwXoMut+Q5zit
+         Jw1Q==
+X-Gm-Message-State: AOJu0Ywk4FvCRwhFONHmW7txDBhXfr4gsEi0Hbh9qE6Yl4AIDNIZpn8e
+	uo9sganutI4JUcHkMlGJvfuoo2wA4n4=
+X-Google-Smtp-Source: AGHT+IEg1zZ40gWTz0xiExANnXKNbEqSO1hN0HeD97GQQhlsI8L0fpAJZYwKKPvRk0WGdvDpOkdQkQ==
+X-Received: by 2002:a81:7b05:0:b0:5d7:1940:7d87 with SMTP id w5-20020a817b05000000b005d719407d87mr606045ywc.94.1702074525637;
+        Fri, 08 Dec 2023 14:28:45 -0800 (PST)
+Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
+        by smtp.gmail.com with ESMTPSA id m9-20020a81d249000000b005d72c7c1241sm964145ywl.112.2023.12.08.14.28.44
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Dec 2023 14:28:44 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v1] Bluetooth: hci_core: Fix hci_conn_hash_lookup_cis
+Date: Fri,  8 Dec 2023 17:28:43 -0500
+Message-ID: <20231208222843.70028-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -28,37 +50,40 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1] client/player: Fix not prompting all parameter on
- endpoint.register
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <170207402498.26151.16003369888215600659.git-patchwork-notify@kernel.org>
-Date: Fri, 08 Dec 2023 22:20:24 +0000
-References: <20231207184723.3862261-1-luiz.dentz@gmail.com>
-In-Reply-To: <20231207184723.3862261-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
 
-Hello:
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+hci_conn_hash_lookup_cis shall always match the requested CIG and CIS
+ids even when they are unset as otherwise it result in not being able
+to bind/connect different sockets to the same address as that would
+result in having multiple sockets mapping to the same hci_conn which
+doesn't really work and prevents BAP audio configuration such as
+AC 6(i) when CIG and CIS are left unset.
 
-On Thu,  7 Dec 2023 13:47:23 -0500 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> When Auto Accept is not enable not all parameters are requested.
-> ---
->  client/player.c | 10 +++-------
->  1 file changed, 3 insertions(+), 7 deletions(-)
+Fixes: c14516faede3 ("Bluetooth: hci_conn: Fix not matching by CIS ID")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/hci_core.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Here is the summary with links:
-  - [BlueZ,v1] client/player: Fix not prompting all parameter on endpoint.register
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=477c41c683ea
-
-You are awesome, thank you!
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 0c1754f416bd..59105a3eaa16 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1225,11 +1225,11 @@ static inline struct hci_conn *hci_conn_hash_lookup_cis(struct hci_dev *hdev,
+ 			continue;
+ 
+ 		/* Match CIG ID if set */
+-		if (cig != BT_ISO_QOS_CIG_UNSET && cig != c->iso_qos.ucast.cig)
++		if (cig != c->iso_qos.ucast.cig)
+ 			continue;
+ 
+ 		/* Match CIS ID if set */
+-		if (id != BT_ISO_QOS_CIS_UNSET && id != c->iso_qos.ucast.cis)
++		if (id != c->iso_qos.ucast.cis)
+ 			continue;
+ 
+ 		/* Match destination address if set */
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
