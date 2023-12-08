@@ -1,194 +1,138 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J05mgJo+"
-Received: from mail-oa1-x31.google.com (mail-oa1-x31.google.com [IPv6:2001:4860:4864:20::31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B718A10D8
-	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Dec 2023 03:32:19 -0800 (PST)
-Received: by mail-oa1-x31.google.com with SMTP id 586e51a60fabf-1fb71880f12so1239956fac.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 08 Dec 2023 03:32:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702035139; x=1702639939; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=WceH6dZvtt558SBBj3b1I9ngGpa6TenxZzXLsOjTqmE=;
-        b=J05mgJo+1o+o58YrQrpj7KArOG/sFuo3GtJlsz8fYoFKuOEGltD4DPPYmS0SHHyU06
-         f+ciRSr3GWXw5ZR+OumniH91NldEivh8J6flhVq2uy5zD8hk1lKgdq20Zsk/rwo9pnAD
-         Y1l6Is7UCamQqouVhqyyJeIZlLG2tbxwPSSWsFaYpjhPTJzMi5Fik5EDJxrplGGls5Dq
-         U68CIF81Bk9b3RipYv2/SGlC+nMRnV+5ltgkRSE6AfDMCwMFTq732m87zOKLRawfQzq4
-         tnHp2f8HW1ZjknXpSrH2Fu1E47BQWuj0OgyU9v+A+hfnCSHJFWEp23jkhSx3+632u28N
-         KneQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702035139; x=1702639939;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WceH6dZvtt558SBBj3b1I9ngGpa6TenxZzXLsOjTqmE=;
-        b=kKlc/L3McvBWGcWNoJsoCsR9YIFeSOBU6mZQ2BmKeiMOuSDY/5vn362vXcN4wkMU8e
-         xDAzyiYUsD7Ra9XyuohMkRn8Sb95zzf1iPSQyM9S6j3r2v/oVY5pT8HYjk5r6G2j0Gyf
-         OuNVN1KNeb3y3AkyGBKCDpFZvVbAI8TNCQUUnov4Wk0WIJi0Elz4ixYOgXoCHkz2tEmK
-         usqtu9bwFH/kRtgIRau20f3QQrXD0NYbcA1pWopANadIHqZHoQKnTYzbfOw07UkAQjE8
-         /0jMae7/s9cqzRcMQh0CIPJavNLAV0NM5SmXpLUPSZ8uELWGOPTVPRBgsf2SnCqc1Qmy
-         CZxg==
-X-Gm-Message-State: AOJu0Yy7mJh5zYXLhE2pJkeDuLzjtNByuod68b68jFdTa5ObKsoFSVku
-	gTRgg4LYgCS4ndOO6qHpV15aELV6kdk=
-X-Google-Smtp-Source: AGHT+IEFX9B9VyFwkbXOKURGBaxK0pFABDL3xqINJ5F9HzOvvSZOt/HdEsGCIJTxOZqD1B0QXlbtIg==
-X-Received: by 2002:a05:6870:2189:b0:1fb:186d:7409 with SMTP id l9-20020a056870218900b001fb186d7409mr4178442oae.71.1702035138775;
-        Fri, 08 Dec 2023 03:32:18 -0800 (PST)
-Received: from [172.17.0.2] ([20.172.5.223])
-        by smtp.gmail.com with ESMTPSA id f7-20020a656287000000b005c66e25497dsm1168259pgv.83.2023.12.08.03.32.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Dec 2023 03:32:18 -0800 (PST)
-Message-ID: <6572fec2.650a0220.392ee.32a2@mx.google.com>
-Date: Fri, 08 Dec 2023 03:32:18 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0822033811619316929=="
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="V/ZZXqFl"
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2062.outbound.protection.outlook.com [40.107.20.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D6971720
+	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Dec 2023 03:43:32 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FnwsOfgK8gzXfKgHJWqQqY4Khs+yJxVJYQj3lHZZOlaG3jdRF41s/OKczUcRBk4xRI2Fl3q9IBIb+ZbObeX2YJXK+T5ymkormBcAZEqtn/Co6zxvZNon1NlwVD2rHwD/R2qpnCDWS4pxmcqWBDAWck662A2Y8n+J7W7jUGMlhcj3L0WqqBHeaJmuh2BDXiMgoleQwox5KQ9+h7qDCe+Jy1dWKIdt3SNtZvRBfARhKydl5dIAKH9EcpuRZrpRi288Qi8yQip3jU035VhOzo0GFhddkikUtuB1fsuREFYvNFZQ24OY3PwKIv2jaF3e91Fx2b68AfoNYsyPmab03xh7Xw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4TCH7d5MjfyXAvLolJRizH7/Hp9NAaw/LFCkqX1PMh8=;
+ b=J/qyNc3IHzTB1Q0ex6Qqbnf2UeBAvwIEIjA7ZRxYqP7LukYWEbbKooI0XSSborRb939opfPBuwpe78NI9XMj0I9QFiEP/kHEs8Loqket7oqObR6/HPqUOCBPqxStJbe/AMlXPu+O/KvX4+uc5AtAc+LmmIPeuDvYs05mrBJu1hEMJM2DYyfE7WEXvE5BtOBDOLRZj3FQ6DakKcXOT9/TOFcqEbQ9VnGzxDa5f2LHrBd+EJOe10j5nbd12rumzKE+qcci+gowDP3SEY34BOeZzeo5zXZEpNj/V8KdBj2yewuZZfOvanI4P1u0Y/Rya7wibrmezeGNZgDGkOEUFQIRAg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4TCH7d5MjfyXAvLolJRizH7/Hp9NAaw/LFCkqX1PMh8=;
+ b=V/ZZXqFlDCmYe0Cd61BwMNMpPe+uc0YGHtyoTu/Dk6tTa8W2BVVQ19dVc0SjdyYnDTHJ9KWb3wCgbYBXHa+688nreCbjNbuZA5dfqn52GuDGtGtQ31MC8f9/GSrCLHgSGjQCXKg/df8Jdud2XHVo6Dv2XGU8MPAAAmvvfJtHXF0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from VI1PR0402MB3952.eurprd04.prod.outlook.com
+ (2603:10a6:803:1c::10) by DBAPR04MB7237.eurprd04.prod.outlook.com
+ (2603:10a6:10:1a4::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.28; Fri, 8 Dec
+ 2023 11:43:29 +0000
+Received: from VI1PR0402MB3952.eurprd04.prod.outlook.com
+ ([fe80::b837:b0d8:1b75:9a5e]) by VI1PR0402MB3952.eurprd04.prod.outlook.com
+ ([fe80::b837:b0d8:1b75:9a5e%5]) with mapi id 15.20.7068.028; Fri, 8 Dec 2023
+ 11:43:29 +0000
+From: Mahesh Talewad <mahesh.talewad@nxp.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com,
+	devyani.godbole@nxp.com,
+	nitin.jadhav@nxp.com,
+	mahesh.talewad@nxp.com
+Subject: [PATCH BlueZ v2 0/3] Implementation of AICS service and Unit Test cases
+Date: Fri,  8 Dec 2023 13:42:55 +0200
+Message-Id: <20231208114258.133709-1-mahesh.talewad@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AS4P191CA0033.EURP191.PROD.OUTLOOK.COM
+ (2603:10a6:20b:657::20) To VI1PR0402MB3952.eurprd04.prod.outlook.com
+ (2603:10a6:803:1c::10)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
-Subject: RE: [BlueZ,v3] tools: avtest: Add reject-code option
-In-Reply-To: <20231208101711.624001-1-frederic.danis@collabora.com>
-References: <20231208101711.624001-1-frederic.danis@collabora.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: VI1PR0402MB3952:EE_|DBAPR04MB7237:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9547aff6-9454-4d9c-047f-08dbf7e2e588
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	K6J9eYdbIiRrcGqtGKFoOqhgx93GSPRgwM0rbUTHQj5cca97NF4uUdtNziv+iKfEUZ9Q6/CD7d0cJWALyXP/j3fP6s47oI3+mRp4uz4A+P6/LE0Ug93EiJTtfj/93LTHYlhpU7s1qRGMLHlytDKbLk5r5UEz2vHzEH2aTrFXvSmEUgIc/ZLrIoXvCJgmIlwFxU4WxvNASR+CrIavIeNl42yeTuO2nYGs8HKYBm3aGt5VWEe+ZxdERHcs5SXqCD68vPPXFZkh4LGvlyBktnRwFVh1hD0ItyCoNb4LmNcXAKv53pLEx127+4MGru8jd66SObxvQOTRVCSR03tAG1N9FQDekJOgM3D0i+kNVqPk6HeEwLROqQS6wK52AiN92e+UOcJdq0rT7Kbr7v269sxvhr+azbZchChpihjiowCXdRuSsixuX2qWuL2GmxhcbkwbGx7grddr4XEfbQi3myjMMait0TskYxWjKYEOdT/7+TZLwstgBGBqPOJGRc8j2lknFQ7ysikLV5s1ckOYZ463a6BvKFoV4s0aGe8cr/DmdIic9V1+nVCZcwh/HUFYGZOE0JpCZXEBgFjxK2U2iAvD0y7GE5TERQZYOEiR7wT7ByQ=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB3952.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(346002)(39860400002)(136003)(376002)(230922051799003)(186009)(1800799012)(451199024)(64100799003)(8676002)(8936002)(4326008)(44832011)(6666004)(6486002)(478600001)(316002)(6916009)(66946007)(66476007)(66556008)(41300700001)(38350700005)(5660300002)(4744005)(36756003)(2906002)(1076003)(26005)(2616005)(83380400001)(38100700002)(86362001)(52116002)(6512007)(6506007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?WBl1hhyy2JY5yuAo+YT6/WemYkXXlvyb0CGaZdLn7uBw6xrK9UyWw16LxFe5?=
+ =?us-ascii?Q?HsiW+58kkz48AzvVRI5Hao36COSv19O91X6m1Ncppjv5eAqZNXkDycaJ9e9L?=
+ =?us-ascii?Q?XXCOnNWJEEkoxCDTbAy/6ZGZTEektKwXL8uqM5Lx4k05moZKuGXtQ5XEc9UM?=
+ =?us-ascii?Q?Ea2q0jFJKoZishd5L0sZBYr+cX1WLrq/7dHPdaoKnj/6PQpCwhpC7H843iMr?=
+ =?us-ascii?Q?NL+FuaBUAvZJZh8MlqgnIyYuOw831jSJAPzqPlyB1o73TBu2h04pS0Z3kdPN?=
+ =?us-ascii?Q?U0im/hrdnfPQoaBbrvqVJ8cQ/RGUKKfEZPyzy1byrdRL2Lsxim14yfbm+1T4?=
+ =?us-ascii?Q?rfK+upoLMeX9td8Qi/6l6XZYG0bO+V9pc+vVMlHXs15Lwrgf9h/1y+iAGyO8?=
+ =?us-ascii?Q?tebXr44ykITw6KxXyz8goRIM1HE7DokQDLEeFPTodbF5D0IVWr70AtyU7uUg?=
+ =?us-ascii?Q?re+aKDskOyUe1gvyLZehr3nHgcKUHqfYRztAyTkIsxe7HXUvB0g7bdlU+jux?=
+ =?us-ascii?Q?G/tO3YuAxbx+A249sUPHVq+rE62EvQUr/5IMQIMDEi42v3Zbqs/aU0rBuvgB?=
+ =?us-ascii?Q?9TO8F3yHCINFIfyaIR1/B8cGyP3eTBxSs/mgpthYbV+y5nofstjiRP4KBfIv?=
+ =?us-ascii?Q?ZFJngUT1fskotiOz/lXygDK4dOtbpMSrcqxtaBpU4LMi6whfEFpt037F/5Cb?=
+ =?us-ascii?Q?bsdb/mSMLhFkbJrXniFbgqYRrPNNEjQgtE50QHPJ2zZp2zg8vJvI8PLBATHC?=
+ =?us-ascii?Q?WM6FHthrKBJgK/maRBBll4IhV4iYaEFMgcRvXenWhXsB65wnEd4pA9beq24N?=
+ =?us-ascii?Q?M9k6fzAdtFwrU+ysWYH3WwYoj5SSh/LRfQ4DEtFPkRbMxlswdSySRJwFZuYO?=
+ =?us-ascii?Q?bVhIyTbgqG7DKcNaZhzmeCreAnpBquA2B74T8/EUrXPC6AohBcK5udEhz9kH?=
+ =?us-ascii?Q?qIEGFSg4g/jQFHGroRCKhoymgnXcS6IbKha1x4+EvG4gJVsxeUwV05Khnt6B?=
+ =?us-ascii?Q?+Z9VE9DZxFfkH+DzSX6bkW6UHIkFW9cpT3bjsE9n3BO0Zj/wMmXHKu7b0/fX?=
+ =?us-ascii?Q?kQw5kRilp5XpWiYpc05E4pmfRHcaPLzj1paUoD89lWnwxqLqe12yomrwcjmO?=
+ =?us-ascii?Q?zrn1kotCu1JG1TQ0HhBWNSTT6NQQ5g5DqmTeC10Bo+QeztoJ7zMG8OzM/eM7?=
+ =?us-ascii?Q?vM4Y20fZr/ptS1AVU7f8400VBzzKIdFzNgvahNm885ubtDlKdAuWPVLors5n?=
+ =?us-ascii?Q?y/+r1U+BuwaaNwouz5SMsf0jSpr+d0JkNeukVpaPRAb7E1oY0Sj26UTAtx8z?=
+ =?us-ascii?Q?aHygwh3CyPduThL0iXJNOtmp+G8ALf34vLfAx0gqGAoL27IzcsGdc1o8Ha3r?=
+ =?us-ascii?Q?4wk5G2RribmVnQeQPMegTBPaowbka0xrLd+rlzMEP7u7MD8ZALNlR5w7ILpJ?=
+ =?us-ascii?Q?9ydCiZo7R/cKogfmqZEua8B8cUmdPXE6LGSnHucxnGP5DRru/D3Ze8E/1KEY?=
+ =?us-ascii?Q?rv9j6OVYQb8w1aTresm0wO90KHtTe2SBVG/rcV2kWPbc1uSDU3RFysHTmhx9?=
+ =?us-ascii?Q?UCR6mUvEP8cvEilb3/fRYMmKp+pDm33pc741+ZechjBsj6Fy5ktUb63WURf3?=
+ =?us-ascii?Q?YA=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9547aff6-9454-4d9c-047f-08dbf7e2e588
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3952.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Dec 2023 11:43:29.0968
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rxAikKxsGGBBmXaPDzygQHczS10ltTN+068kYUkew32ZBSs6NFHdOHNmCImzxczpJknUYhsFJYfFOxyJ2m8Myg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBAPR04MB7237
 
---===============0822033811619316929==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello Maintainers,
 
-This is automated email and please do not reply to this email!
+This Patch series contains following points:
 
-Dear submitter,
+- Implementation of Service - AICS.
+	- This code covers all mandatory features of AICS.
+ 	- Verification: All mandatory PTS testcases of AICS are passed.
+	- Specification referred for implementation:
+			AICS_v1.0.pdf
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=808201
+- Implementation of AICS Unit Test code.
+	- Implemented 15-Mandatory AICS Unit Test cases.
+	- Tested all these 15-Mandatory AICS Unit Testcases and all are passed.
+	- Specification referred for implementation:
+			AICS.TS.p0.pdf
 
----Test result---
+	  
+Thank you in advance for your review.
 
-Test Summary:
-CheckPatch                    PASS      0.34 seconds
-GitLint                       PASS      5.31 seconds
-BuildEll                      PASS      24.14 seconds
-BluezMake                     PASS      722.61 seconds
-MakeCheck                     PASS      11.68 seconds
-MakeDistcheck                 PASS      159.32 seconds
-CheckValgrind                 PASS      221.07 seconds
-CheckSmatch                   PASS      328.72 seconds
-bluezmakeextell               PASS      103.24 seconds
-IncrementalBuild              PASS      677.93 seconds
-ScanBuild                     WARNING   977.76 seconds
+Thanks and regards,
+Mahesh Vithal Talewad
 
-Details
-##############################
-Test: ScanBuild - WARNING
-Desc: Run Scan Build
-Output:
-tools/avtest.c:225:5: warning: Value stored to 'len' is never read
-                                len = write(sk, buf, 3);
-                                ^     ~~~~~~~~~~~~~~~~~
-tools/avtest.c:235:5: warning: Value stored to 'len' is never read
-                                len = write(sk, buf, 4);
-                                ^     ~~~~~~~~~~~~~~~~~
-tools/avtest.c:244:5: warning: Value stored to 'len' is never read
-                                len = write(sk, buf, 3);
-                                ^     ~~~~~~~~~~~~~~~~~
-tools/avtest.c:258:5: warning: Value stored to 'len' is never read
-                                len = write(sk, buf,
-                                ^     ~~~~~~~~~~~~~~
-tools/avtest.c:265:5: warning: Value stored to 'len' is never read
-                                len = write(sk, buf,
-                                ^     ~~~~~~~~~~~~~~
-tools/avtest.c:272:5: warning: Value stored to 'len' is never read
-                                len = write(sk, buf,
-                                ^     ~~~~~~~~~~~~~~
-tools/avtest.c:279:5: warning: Value stored to 'len' is never read
-                                len = write(sk, buf,
-                                ^     ~~~~~~~~~~~~~~
-tools/avtest.c:291:5: warning: Value stored to 'len' is never read
-                                len = write(sk, buf, 4);
-                                ^     ~~~~~~~~~~~~~~~~~
-tools/avtest.c:295:5: warning: Value stored to 'len' is never read
-                                len = write(sk, buf, 2);
-                                ^     ~~~~~~~~~~~~~~~~~
-tools/avtest.c:304:5: warning: Value stored to 'len' is never read
-                                len = write(sk, buf, 3);
-                                ^     ~~~~~~~~~~~~~~~~~
-tools/avtest.c:308:5: warning: Value stored to 'len' is never read
-                                len = write(sk, buf, 2);
-                                ^     ~~~~~~~~~~~~~~~~~
-tools/avtest.c:317:5: warning: Value stored to 'len' is never read
-                                len = write(sk, buf, 3);
-                                ^     ~~~~~~~~~~~~~~~~~
-tools/avtest.c:324:5: warning: Value stored to 'len' is never read
-                                len = write(sk, buf, 2);
-                                ^     ~~~~~~~~~~~~~~~~~
-tools/avtest.c:346:5: warning: Value stored to 'len' is never read
-                                len = write(sk, buf, 4);
-                                ^     ~~~~~~~~~~~~~~~~~
-tools/avtest.c:350:5: warning: Value stored to 'len' is never read
-                                len = write(sk, buf, 2);
-                                ^     ~~~~~~~~~~~~~~~~~
-tools/avtest.c:359:5: warning: Value stored to 'len' is never read
-                                len = write(sk, buf, 3);
-                                ^     ~~~~~~~~~~~~~~~~~
-tools/avtest.c:363:5: warning: Value stored to 'len' is never read
-                                len = write(sk, buf, 2);
-                                ^     ~~~~~~~~~~~~~~~~~
-tools/avtest.c:376:5: warning: Value stored to 'len' is never read
-                                len = write(sk, buf, 4);
-                                ^     ~~~~~~~~~~~~~~~~~
-tools/avtest.c:380:5: warning: Value stored to 'len' is never read
-                                len = write(sk, buf, 2);
-                                ^     ~~~~~~~~~~~~~~~~~
-tools/avtest.c:387:4: warning: Value stored to 'len' is never read
-                        len = write(sk, buf, 2);
-                        ^     ~~~~~~~~~~~~~~~~~
-tools/avtest.c:397:4: warning: Value stored to 'len' is never read
-                        len = write(sk, buf, 2);
-                        ^     ~~~~~~~~~~~~~~~~~
-tools/avtest.c:562:3: warning: Value stored to 'len' is never read
-                len = write(sk, buf, 2);
-                ^     ~~~~~~~~~~~~~~~~~
-tools/avtest.c:570:3: warning: Value stored to 'len' is never read
-                len = write(sk, buf, invalid ? 2 : 3);
-                ^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-tools/avtest.c:584:3: warning: Value stored to 'len' is never read
-                len = write(sk, buf, 4 + sizeof(media_transport));
-                ^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-tools/avtest.c:597:3: warning: Value stored to 'len' is never read
-                len = write(sk, buf, 3);
-                ^     ~~~~~~~~~~~~~~~~~
-tools/avtest.c:607:3: warning: Value stored to 'len' is never read
-                len = write(sk, buf, 3);
-                ^     ~~~~~~~~~~~~~~~~~
-tools/avtest.c:619:3: warning: Value stored to 'len' is never read
-                len = write(sk, buf, 3);
-                ^     ~~~~~~~~~~~~~~~~~
-tools/avtest.c:634:3: warning: Value stored to 'len' is never read
-                len = write(sk, buf, 3);
-                ^     ~~~~~~~~~~~~~~~~~
-tools/avtest.c:646:3: warning: Value stored to 'len' is never read
-                len = write(sk, buf, 3);
-                ^     ~~~~~~~~~~~~~~~~~
-tools/avtest.c:655:3: warning: Value stored to 'len' is never read
-                len = write(sk, buf, 3);
-                ^     ~~~~~~~~~~~~~~~~~
-tools/avtest.c:662:3: warning: Value stored to 'len' is never read
-                len = write(sk, buf, 2);
-                ^     ~~~~~~~~~~~~~~~~~
-tools/avtest.c:698:2: warning: Value stored to 'len' is never read
-        len = write(sk, buf, AVCTP_HEADER_LENGTH + sizeof(play_pressed));
-        ^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-32 warnings generated.
+Mahesh Talewad (3):
+  - Added AICS Characteristics UUID(s).
+  - Code Implementation related Service- AICS
+  unit/test-vcp.c: AICS unit test case implementation
 
+ lib/uuid.h       |    7 +
+ src/shared/vcp.c | 1011 ++++++++++++++++++++++++++++++-
+ unit/test-vcp.c  | 1473 +++++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 2459 insertions(+), 32 deletions(-)
 
+-- 
+2.34.1
 
----
-Regards,
-Linux Bluetooth
-
-
---===============0822033811619316929==--
