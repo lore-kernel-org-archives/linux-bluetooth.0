@@ -1,104 +1,89 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CBBA37173
-	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Dec 2023 16:24:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LC+BiU9K"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02C57C433C9;
-	Fri,  8 Dec 2023 16:24:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702052678;
-	bh=gykiqYtc4k3IIgq0rB2Qqi/i6sr8CFwAMkaTgwLZCaY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LC+BiU9KOsLc7DDJe/HQilCeW5KGpfwDI7EHKQbzrIu/+TQuJdIAalhad0VByrU3A
-	 0w6++h3e9aM0yPpmhhLL2g0ZoGxdBMwYtmllD6QVKB+R2oe4oPGzSs7+MQcfqlWZk9
-	 VcwBdwf2ab2MW310u+dlix4jGulx3l4ZzSfxNGTXVyWCFKdi5LQFWHwtlSwpVncR32
-	 nHntqJBVCyScpH9vwYA78Rmovru5AWX8OgkIUp9POW302tOsdjx1gDOwsj37QY3gk0
-	 xLMFELWl8xVCMMEK4UbRuWAvaofUUX9KlAh96d95qFDbarK3bT3rvNjZH1/Hl9SfPi
-	 jz8NcUvLUzpGw==
-Received: from johan by xi.lan with local (Exim 4.96.2)
-	(envelope-from <johan@kernel.org>)
-	id 1rBdfL-0004nG-2C;
-	Fri, 08 Dec 2023 17:25:28 +0100
-Date: Fri, 8 Dec 2023 17:25:27 +0100
-From: Johan Hovold <johan@kernel.org>
-To: Andreas Kemnade <andreas@kemnade.info>
-Cc: Tony Lindgren <tony@atomide.com>, marcel@holtmann.org,
-	johan.hedberg@gmail.com, luiz.dentz@gmail.com, arnd@arndb.de,
-	gregkh@linuxfoundation.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org, tomi.valkeinen@ideasonboard.com,
-	=?utf-8?B?UMOpdGVy?= Ujfalusi <peter.ujfalusi@gmail.com>,
-	robh@kernel.org
-Subject: Re: [RFC PATCH 0/3] bluetooth/gnss: GNSS support for TiWi chips
-Message-ID: <ZXNDd57ImXjelBf4@hovoldconsulting.com>
-References: <20231126191840.110564-1-andreas@kemnade.info>
- <20231127135424.GO5169@atomide.com>
- <20231127215108.6e985819@aktux>
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="VuYT4fJB"
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F7EC10F8
+	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Dec 2023 09:17:26 -0800 (PST)
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B8GikEO010703;
+	Fri, 8 Dec 2023 17:17:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=qcppdkim1;
+ bh=FRkzBWbsrgB6T/si1igAXNIYPaIomWSnuX0TYm3WwMo=;
+ b=VuYT4fJBe/u1s7Dm3XmWEZX66RgTkyjC7sz6zCjqkXwDeFl2JbybnBZjThDitXWsA7zB
+ 4KUTAzS6iogmfNqF7lk0crkVd6O7EvbORQAR3N8YpsKCLAGypr9QHp15HYtytMq1NlGd
+ UnAxIQC56JSRQJTTDFbWTAYfairNy5qsfvQ3/9cBlNx5n33ep3hYPUoUUqTtIS33XGa0
+ jbBKOJp0yw2OEzi2Matp7SCbPHnWoCvs5u6FYdrXYiWbnIHfA4b5pXA4yzR71imeWoYs
+ p8thNz8vw1CpoQkFRbwaX5IMzB1YZ58c4fZk23WCAFiEkY9wMGYoGo7JMo+1jrShpwPz Lg== 
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uv5wpg8wa-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 08 Dec 2023 17:17:22 +0000
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3B8HHLOl001037
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 8 Dec 2023 17:17:22 GMT
+Received: from zijuhu-gv.qualcomm.com (10.80.80.8) by
+ nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Fri, 8 Dec 2023 09:17:20 -0800
+From: Zijun Hu <quic_zijuhu@quicinc.com>
+To: <luiz.dentz@gmail.com>, <marcel@holtmann.org>, <johan.hedberg@gmail.com>
+CC: <linux-bluetooth@vger.kernel.org>, <quic_zijuhu@quicinc.com>
+Subject: [PATCH v1] Bluetooth: hci_conn: Remove a redundant check for HFP offload
+Date: Sat, 9 Dec 2023 01:17:14 +0800
+Message-ID: <1702055834-18008-1-git-send-email-quic_zijuhu@quicinc.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231127215108.6e985819@aktux>
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: hB3bI-LokqVT0L09Q--dTkUXOwe0uzSa
+X-Proofpoint-ORIG-GUID: hB3bI-LokqVT0L09Q--dTkUXOwe0uzSa
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-08_11,2023-12-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=827 impostorscore=0 adultscore=0 priorityscore=1501 mlxscore=0
+ clxscore=1015 malwarescore=0 phishscore=0 suspectscore=0 bulkscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2312080143
 
-On Mon, Nov 27, 2023 at 09:51:08PM +0100, Andreas Kemnade wrote:
-> On Mon, 27 Nov 2023 15:54:24 +0200
-> Tony Lindgren <tony@atomide.com> wrote:
+Remove a redundant check !hdev->get_codec_config_data.
 
-> > > - Output at /dev/gnssX:
-> > >   AI2 vs. NMEA
-> > >   The chip can be configured into sending AI2-encapsulated NMEA,
-> > >   or proving data in a binary format.
-> > >   Some research has to be done yet for the details.
-> > >   A pile of logs is waiting for further analysis...
+Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+---
+ net/bluetooth/hci_conn.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Can you say something more about what the protocol looks like? Is there
-some common framing that can/should be stripped by the driver in both
-modes?
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index a41d2693f4d8..a4c96bd202fd 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -300,13 +300,13 @@ static int configure_datapath_sync(struct hci_dev *hdev, struct bt_codec *codec)
+ 	__u8 vnd_len, *vnd_data = NULL;
+ 	struct hci_op_configure_data_path *cmd = NULL;
+ 
++	/* Do not take below 2 checks as error since the 1st means user do not
++	 * want to use HFP offload mode and the 2nd means the vendor controller
++	 * do not need to send below HCI command for offload mode.
++	 */
+ 	if (!codec->data_path || !hdev->get_codec_config_data)
+ 		return 0;
+ 
+-	/* Do not take me as error */
+-	if (!hdev->get_codec_config_data)
+-		return 0;
+-
+ 	err = hdev->get_codec_config_data(hdev, ESCO_LINK, codec, &vnd_len,
+ 					  &vnd_data);
+ 	if (err < 0)
+-- 
+The Qualcomm Innovation Center
 
-> > > 
-> > >   Arguments for/against NMEA:
-> > >   + Userspace is prepared to handle it
-> > >   + Power management can be easily done by the kernel
-> > >   - Less functionality can be used.  
-> > 
-> > I'd go with NMEA format as the default setting :)
-> > 
-> yes, that would also be my preference.
-> 
-> > >   Arguments for/against AI2:
-> > >   + Full functionality can be accessed from userspace (incl. A-GPS,
-> > >     maybe raw satellite data)
-> > >   - Userspace has to behave to have proper power management
-> > >   - No freely (not even as in beer) tool available to fully use AI2,
-> > >     so there will be only a real advantage after long "French Cafe"
-> > >     sessions.  
-> > 
-> > Seems AI2 could be optionally enabled as needed with some writes
-> > to /dev/gnss0 to change the mode?
-> 
-> Hmm, we have
-> /sys/class/gnss/gnss0/type to get the mode, maybe we add some file
-> to change the mode? Or having it hidden behing a module parameter
-> and implement something better accessible if any need arrives?
-
-The 'type' attribute is intended to reveal the GNSS receiver type
-(class) as a hint to user space to avoid having to detect it at runtime
-using heuristics.
-
-It does not reflect which mode is currently active for receivers that
-provide both a vendor specific protocol and NMEA (e.g. u-blox
-receivers).
-
-User space can currently switch modes at will by writing to /dev/gnss0
-as Tony mentioned.
-
-It may or may not make sense to make sure a particular mode is set
-during probe, for example, if there's no real use for the proprietary
-protocol and everyone would just switch away from it immediately.
-
-Johan
