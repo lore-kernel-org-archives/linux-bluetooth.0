@@ -1,104 +1,143 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cgupbazh"
-Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC62B1727
-	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Dec 2023 00:28:49 -0800 (PST)
-Received: by mail-qk1-x72c.google.com with SMTP id af79cd13be357-77f44cd99c6so85960085a.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 08 Dec 2023 00:28:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702024128; x=1702628928; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=OV3ZmSfhMqr7ucbpBmbHavne5avy8MkJLBKwmK0QaLo=;
-        b=cgupbazhZIYIr2aPbdjkhYSi4WNQ4gZSc8HNi5Nc9d/+LWs5nBjAqXskIr+hJFHj9a
-         AoF+hguhIYDD89XoPdHWCL/ovYIutv43FXcf3s5v4NSXnuCTUeG3+fNM2T0syFKVgR86
-         X60MKQsxjOgBoYQ/3zo8dMFY2tGH64HFL5FbZkk10Z3wi7pyJu4AUxSvbqD90/upXFO4
-         Tbm8FqtKtrM5B01BtGh9qGNokLPpuecT8i1rReRdVZqHIfhj3tWc9n4kPL2BCjxrlWfO
-         M4Vu7O2UlOtcsNQieBd8WmJAwXPRAopNPPX8HuiTdPeprq1Jrs5jZ7JExLneFgSDaOUv
-         t4oQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702024128; x=1702628928;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OV3ZmSfhMqr7ucbpBmbHavne5avy8MkJLBKwmK0QaLo=;
-        b=YBRz+mWW7HZWxtOlDJIgoOgLD3pn+9AKM7xawmRlWcTPVkjrPAyB4IxiLNItj79bgB
-         ZNaxrMqFs6J+nwGaA0ZAnRAbwJo9LPax48V/dxpl674ZQl7MzczhKwKN5SDLdvQbUlhX
-         sJmmRhwKp1tjIRQzjpFFE1UaAEqEBOwpqWhz6AAXKS0O2qlvVhxCM5ZyS0/CpnU15fh/
-         MPiVUx/M3f4DqD2+ZexryjV8CNPncj/ev9Q5a2Rv7ZmLlxp/aJKTnXBfekQpuuuVKD5I
-         6RHOQiIGDZy+AyoGasCoAob1wJLnhLy/WEXcVfTOzsu8eCu0EdM8c5HO4OFnXWWM5Ro4
-         6LGA==
-X-Gm-Message-State: AOJu0Yw6FekQnt7xVK48i7aXK/5d/NJ9lKwcbdIw9UXHulwzrAo0hJUn
-	DiNGd9/x6v/AUu9vfHljSHYRhxa23eo=
-X-Google-Smtp-Source: AGHT+IHrlfNtfweQdWpqKq+58S0kCGFYGhx5DtKcw60pXTedeOetgT92NPz1zt1Fx/epYyZ1Pt5vLA==
-X-Received: by 2002:a05:620a:2685:b0:779:e19b:64f5 with SMTP id c5-20020a05620a268500b00779e19b64f5mr767147qkp.21.1702024128565;
-        Fri, 08 Dec 2023 00:28:48 -0800 (PST)
-Received: from [172.17.0.2] ([20.55.15.17])
-        by smtp.gmail.com with ESMTPSA id br16-20020a05620a461000b007659935ce64sm531722qkb.71.2023.12.08.00.28.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Dec 2023 00:28:48 -0800 (PST)
-Message-ID: <6572d3c0.050a0220.77b7b.2b11@mx.google.com>
-Date: Fri, 08 Dec 2023 00:28:48 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8256662393085080879=="
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="Bhnv8eVi"
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFC2F10FC
+	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Dec 2023 01:00:21 -0800 (PST)
+Received: from fdanis-XPS-13-9370.. (cola.collaboradmins.com [195.201.22.229])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by madras.collabora.co.uk (Postfix) with ESMTPSA id 8B59266073B1
+	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Dec 2023 09:00:19 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1702026019;
+	bh=tWOGQqDUOc78/ccYPlTNaf3vYboujqW0aApax+aQWiQ=;
+	h=From:To:Subject:Date:From;
+	b=Bhnv8eViMmyWP86Ezw9GahXUwwK9IP2S/ONUicZ39XdpS2MOVU6pJfDde2va+XzzB
+	 w0CTvPnpkCiX9wjM9dVNP8rjvY0wgV/sc7xZuRL2f+qZblWY72G20fH9xGRvoqGpXi
+	 CuRoQTaL7cf0PIYaynfGTNG2JoDLtoKYct8Vwa1wMvU0SVmitnpfWJg2Fds3ZxeywF
+	 dqleeSzaZT8R72NKQ4F52YgMxTIsZSca3+C1KHI7PRSF4umFvraBuPQ3JrymKNiSrz
+	 HTgfLTasmTynPfunZqaAQXy5wteXExxXcZkjl6fAHp8+AXZqdaPZzTq9UMwEPmrc5k
+	 I+VwLicc8CdhQ==
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2] tools: avtest: Add reject-code option
+Date: Fri,  8 Dec 2023 10:00:13 +0100
+Message-Id: <20231208090013.620051-1-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
-Subject: RE: [BlueZ] tools: avtest: Add reject-code option
-In-Reply-To: <20231208070740.611032-1-frederic.danis@collabora.com>
-References: <20231208070740.611032-1-frederic.danis@collabora.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============8256662393085080879==
+Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 8bit
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9ODA4MTM3CgotLS1U
-ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
-ICBGQUlMICAgICAgMC43MSBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
-U1MgICAgICAwLjMzIHNlY29uZHMKQnVpbGRFbGwgICAgICAgICAgICAgICAgICAgICAgUEFTUyAg
-ICAgIDIzLjk3IHNlY29uZHMKQmx1ZXpNYWtlICAgICAgICAgICAgICAgICAgICAgUEFTUyAgICAg
-IDcyOS44OCBzZWNvbmRzCk1ha2VDaGVjayAgICAgICAgICAgICAgICAgICAgIFBBU1MgICAgICAx
-Mi4xNSBzZWNvbmRzCk1ha2VEaXN0Y2hlY2sgICAgICAgICAgICAgICAgIFBBU1MgICAgICAxNTMu
-NDEgc2Vjb25kcwpDaGVja1ZhbGdyaW5kICAgICAgICAgICAgICAgICBQQVNTICAgICAgMjE0LjUx
-IHNlY29uZHMKQ2hlY2tTbWF0Y2ggICAgICAgICAgICAgICAgICAgUEFTUyAgICAgIDMxOC45NiBz
-ZWNvbmRzCmJsdWV6bWFrZWV4dGVsbCAgICAgICAgICAgICAgIFBBU1MgICAgICAxMDAuMjAgc2Vj
-b25kcwpJbmNyZW1lbnRhbEJ1aWxkICAgICAgICAgICAgICBQQVNTICAgICAgNjU3LjUyIHNlY29u
-ZHMKU2NhbkJ1aWxkICAgICAgICAgICAgICAgICAgICAgUEFTUyAgICAgIDg5NS44OSBzZWNvbmRz
-CgpEZXRhaWxzCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBDaGVja1BhdGNo
-IC0gRkFJTApEZXNjOiBSdW4gY2hlY2twYXRjaC5wbCBzY3JpcHQKT3V0cHV0OgpbQmx1ZVpdIHRv
-b2xzOiBhdnRlc3Q6IEFkZCByZWplY3QtY29kZSBvcHRpb24KV0FSTklORzpDT01NSVRfTE9HX0xP
-TkdfTElORTogUG9zc2libGUgdW53cmFwcGVkIGNvbW1pdCBkZXNjcmlwdGlvbiAocHJlZmVyIGEg
-bWF4aW11bSA3NSBjaGFycyBwZXIgbGluZSkKIzQ2OiAKU29tZSBQVFMgdGVzdHMgbGlrZSBBMkRQ
-L1NOSy9BVlAvQkktMDMtQywgQTJEUC9TTksvQVZQL0JJLTA4LUMgLCDigKYgcmVxdWVzdAoKV0FS
-TklORzpMT05HX0xJTkU6IGxpbmUgbGVuZ3RoIG9mIDk0IGV4Y2VlZHMgODAgY29sdW1ucwojNjM6
-IEZJTEU6IHRvb2xzL2F2dGVzdC5jOjE5MToKKwkJCQkJCQkJaW50IGZyYWdtZW50LCBpbnQgcmVq
-ZWN0X2NvZGUpCgpXQVJOSU5HOkxPTkdfTElORV9DT01NRU5UOiBsaW5lIGxlbmd0aCBvZiA5MSBl
-eGNlZWRzIDgwIGNvbHVtbnMKIzcyOiBGSUxFOiB0b29scy9hdnRlc3QuYzoyODc6CisJCQkJYnVm
-WzNdID0gcmVqZWN0X2NvZGUgPyByZWplY3RfY29kZSA6IDB4MTM7IC8qIFNFUCBJbiBVc2UgKi8K
-CldBUk5JTkc6TE9OR19MSU5FOiBsaW5lIGxlbmd0aCBvZiA5NSBleGNlZWRzIDgwIGNvbHVtbnMK
-IzgxOiBGSUxFOiB0b29scy9hdnRlc3QuYzo0NDY6CitzdGF0aWMgdm9pZCBkb19saXN0ZW4oY29u
-c3QgYmRhZGRyX3QgKnNyYywgdW5zaWduZWQgY2hhciByZWplY3QsIGludCBmcmFnbWVudCwgaW50
-IHJlamVjdF9jb2RlKQoKL2dpdGh1Yi93b3Jrc3BhY2Uvc3JjL3NyYy8xMzQ4NDk1NS5wYXRjaCB0
-b3RhbDogMCBlcnJvcnMsIDQgd2FybmluZ3MsIDc4IGxpbmVzIGNoZWNrZWQKCk5PVEU6IEZvciBz
-b21lIG9mIHRoZSByZXBvcnRlZCBkZWZlY3RzLCBjaGVja3BhdGNoIG1heSBiZSBhYmxlIHRvCiAg
-ICAgIG1lY2hhbmljYWxseSBjb252ZXJ0IHRvIHRoZSB0eXBpY2FsIHN0eWxlIHVzaW5nIC0tZml4
-IG9yIC0tZml4LWlucGxhY2UuCgovZ2l0aHViL3dvcmtzcGFjZS9zcmMvc3JjLzEzNDg0OTU1LnBh
-dGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4KCk5PVEU6IElnbm9yZWQgbWVz
-c2FnZSB0eXBlczogQ09NTUlUX01FU1NBR0UgQ09NUExFWF9NQUNSTyBDT05TVF9TVFJVQ1QgRklM
-RV9QQVRIX0NIQU5HRVMgTUlTU0lOR19TSUdOX09GRiBQUkVGRVJfUEFDS0VEIFNQRFhfTElDRU5T
-RV9UQUcgU1BMSVRfU1RSSU5HIFNTQ0FORl9UT19LU1RSVE8KCk5PVEU6IElmIGFueSBvZiB0aGUg
-ZXJyb3JzIGFyZSBmYWxzZSBwb3NpdGl2ZXMsIHBsZWFzZSByZXBvcnQKICAgICAgdGhlbSB0byB0
-aGUgbWFpbnRhaW5lciwgc2VlIENIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoKCgotLS0KUmVn
-YXJkcywKTGludXggQmx1ZXRvb3RoCgo=
+Some PTS tests like A2DP/SNK/AVP/BI-03-C, A2DP/SNK/AVP/BI-08-C , …
+request some specific rejection code to pass.
+This commit add an option to specify the rejection code during
+AVDTP_SET_CONFIGURATION rejection.
+---
+ tools/avtest.c | 23 ++++++++++++++++-------
+ 1 file changed, 16 insertions(+), 7 deletions(-)
 
---===============8256662393085080879==--
+diff --git a/tools/avtest.c b/tools/avtest.c
+index ca37b3b46..5ac3418aa 100644
+--- a/tools/avtest.c
++++ b/tools/avtest.c
+@@ -188,7 +188,8 @@ static void dump_buffer(const unsigned char *buf, int len)
+ }
+ 
+ static void process_avdtp(int srv_sk, int sk, unsigned char reject,
+-								int fragment)
++								int fragment,
++								int reject_code)
+ {
+ 	unsigned char buf[672];
+ 	ssize_t len;
+@@ -284,7 +285,8 @@ static void process_avdtp(int srv_sk, int sk, unsigned char reject,
+ 			if (reject == AVDTP_SET_CONFIGURATION) {
+ 				hdr->message_type = AVDTP_MSG_TYPE_REJECT;
+ 				buf[2] = buf[4];
+-				buf[3] = 0x13; /* SEP In Use */
++				buf[3] = reject_code ? reject_code :
++							0x13; /* SEP In Use */
+ 				printf("Rejecting set configuration command\n");
+ 				len = write(sk, buf, 4);
+ 			} else {
+@@ -443,7 +445,8 @@ static int set_minimum_mtu(int sk)
+ 	return 0;
+ }
+ 
+-static void do_listen(const bdaddr_t *src, unsigned char reject, int fragment)
++static void do_listen(const bdaddr_t *src, unsigned char reject, int fragment,
++							int reject_code)
+ {
+ 	struct sockaddr_l2 addr;
+ 	socklen_t optlen;
+@@ -483,7 +486,7 @@ static void do_listen(const bdaddr_t *src, unsigned char reject, int fragment)
+ 			continue;
+ 		}
+ 
+-		process_avdtp(sk, nsk, reject, fragment);
++		process_avdtp(sk, nsk, reject, fragment, reject_code);
+ 
+ 		if (media_sock >= 0) {
+ 			close(media_sock);
+@@ -709,6 +712,7 @@ static void usage(void)
+ 	printf("Options:\n"
+ 		"\t--device <hcidev>    HCI device\n"
+ 		"\t--reject <command>   Reject command\n"
++		"\t--reject-code <code> Reject code to use\n"
+ 		"\t--send <command>     Send command\n"
+ 		"\t--preconf            Configure stream before actual command\n"
+ 		"\t--wait <N>           Wait N seconds before exiting\n"
+@@ -720,6 +724,7 @@ static struct option main_options[] = {
+ 	{ "help",	0, 0, 'h' },
+ 	{ "device",	1, 0, 'i' },
+ 	{ "reject",	1, 0, 'r' },
++	{ "reject-code",	1, 0, 'R' },
+ 	{ "send",	1, 0, 's' },
+ 	{ "invalid",	1, 0, 'f' },
+ 	{ "preconf",	0, 0, 'c' },
+@@ -764,12 +769,12 @@ int main(int argc, char *argv[])
+ 	unsigned char cmd = 0x00;
+ 	bdaddr_t src, dst;
+ 	int opt, mode = MODE_NONE, sk, invalid = 0, preconf = 0, fragment = 0;
+-	int avctp = 0, wait_before_exit = 0;
++	int avctp = 0, wait_before_exit = 0, reject_code = 0;
+ 
+ 	bacpy(&src, BDADDR_ANY);
+ 	bacpy(&dst, BDADDR_ANY);
+ 
+-	while ((opt = getopt_long(argc, argv, "+i:r:s:f:hcFCw:",
++	while ((opt = getopt_long(argc, argv, "+i:r:s:f:hcFCw:R:",
+ 						main_options, NULL)) != EOF) {
+ 		switch (opt) {
+ 		case 'i':
+@@ -809,6 +814,10 @@ int main(int argc, char *argv[])
+ 			wait_before_exit = atoi(optarg);
+ 			break;
+ 
++		case 'R':
++			reject_code = atoi(optarg);
++			break;
++
+ 		case 'h':
+ 		default:
+ 			usage();
+@@ -826,7 +835,7 @@ int main(int argc, char *argv[])
+ 
+ 	switch (mode) {
+ 	case MODE_REJECT:
+-		do_listen(&src, cmd, fragment);
++		do_listen(&src, cmd, fragment, reject_code);
+ 		break;
+ 	case MODE_SEND:
+ 		sk = do_connect(&src, &dst, avctp, fragment);
+-- 
+2.34.1
+
