@@ -1,109 +1,100 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b="V/oW7BdH"
-Received: from mail.andi.de1.cc (mail.andi.de1.cc [IPv6:2a02:c205:3004:2154::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D09F11738;
-	Fri,  8 Dec 2023 09:48:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=kemnade.info; s=20220719; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:References:In-Reply-To:Message-ID:Subject:Cc:To:From:Date:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=3u/9XNVPaXTvbYqc+nnnyMawNo/lMpvd3yOqY2JQ8xM=; b=V/oW7BdH++6JFKIA/92PKPthBD
-	Dq/lCvPvZ+OZJdrJpWOEQRVSHgXWEQrFa5A/E6TKp1OIn05/5FvE2ywRjlVsVIvO3qFpfbgxGkibl
-	GwfKpRA/jU/pOC9x1CM3ZOQ4bxSxUGDz7YHgWioXvTFe+2hAdxW98lMLQTyOsO+gZkMZluo/+jKto
-	LqF9bK/2jla6EZCxF8DvOxBi/PRhQdK1WJvau0SfWV1ej1RfAOu/RezbK+7oLZ8TVbkNVcog6cV9x
-	51hJGHQihGftnpOwg9ZqmY5wvk0x7AT8JuiFa9kNaxN9EyN4KSNlP4YbrS6eLJ20q2xlIIJl8HrQv
-	yJfO6G7w==;
-Received: from p200301077700c3001a3da2fffebfd33a.dip0.t-ipconnect.de ([2003:107:7700:c300:1a3d:a2ff:febf:d33a] helo=aktux)
-	by mail.andi.de1.cc with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <andreas@kemnade.info>)
-	id 1rBexA-007As3-Aq; Fri, 08 Dec 2023 18:47:56 +0100
-Date: Fri, 8 Dec 2023 18:47:53 +0100
-From: Andreas Kemnade <andreas@kemnade.info>
-To: Adam Ford <aford173@gmail.com>
-Cc: Tony Lindgren <tony@atomide.com>, marcel@holtmann.org,
- johan.hedberg@gmail.com, luiz.dentz@gmail.com, johan@kernel.org,
- arnd@arndb.de, gregkh@linuxfoundation.org, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, tomi.valkeinen@ideasonboard.com,
- =?UTF-8?B?UMOpdGVy?= Ujfalusi <peter.ujfalusi@gmail.com>, robh@kernel.org
-Subject: Re: [RFC PATCH 0/3] bluetooth/gnss: GNSS support for TiWi chips
-Message-ID: <20231208184753.6a88801b@aktux>
-In-Reply-To: <CAHCN7x+veM=izOVGEOvKpTFca53C0VhrLkscJqdcBX1riOOWbA@mail.gmail.com>
-References: <20231126191840.110564-1-andreas@kemnade.info>
-	<20231127135424.GO5169@atomide.com>
-	<20231127215108.6e985819@aktux>
-	<CAHCN7x+veM=izOVGEOvKpTFca53C0VhrLkscJqdcBX1riOOWbA@mail.gmail.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-pc-linux-gnu)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WJOcK8tS"
+Received: from mail-qv1-xf32.google.com (mail-qv1-xf32.google.com [IPv6:2607:f8b0:4864:20::f32])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 759CF1738
+	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Dec 2023 09:56:52 -0800 (PST)
+Received: by mail-qv1-xf32.google.com with SMTP id 6a1803df08f44-67a91a373edso13253826d6.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 08 Dec 2023 09:56:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702058211; x=1702663011; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=F/YGxFpdU2fngc2B2EXhkFzW71zVjVlPFgK9l3vVobM=;
+        b=WJOcK8tSRjlYt8gDODtd8oMK/JJ+OWIxFUez35JjIj6CKRNsOdtO7LU4eQrme3cdtJ
+         7pW5oSomqXX+c7WqTEZTJBJg/C/GEg7h60VD4LDJkTOGUtdS78rgnZ/Y5ruZNkbddiN4
+         1ZBj7XArDTsBrdKJ42l/9Mb/nXbAnTvDTQdJQAwB1A4irn1bhDk6oGmBjoEsE7hr8Ivf
+         d+0tNLoTvKpe64Ho+W9GTxRJcGql6pVi5mhg3N1KTBkC3rT5UbXEFdCyWJpG+qdnwSGF
+         yLFqHsbIfVzPEXkLnKHs3hAjivUBr+YDX0qeeEMpYfC2u5YIZYM1L/VWPZ0iT9jYEwzy
+         aZiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702058211; x=1702663011;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=F/YGxFpdU2fngc2B2EXhkFzW71zVjVlPFgK9l3vVobM=;
+        b=IU7dHpuiAMOxEKLVx00jxJ6fqIWklmqxVRZ88yi9/ysh24l/VlftjT5zXtShwEbP5i
+         pf2RTtkJ4f0PinWBpUkWM1UKTIKZThwSNOs4GZ6uWXrDuoKsxNPLgtYO36piFHPc+p7+
+         TKU7O4aGKGt5AWcvdn3BAboFS7/HMz92/znkty1l2iLaYERoPF5c9tg1l5VJ3BxCrqY/
+         SuktxbfJ5kSHTMaSxzUvlt59Bl2BrPcd6sOgoESqK0L9hLNPpvX+EtgkHPQldCYZMuZx
+         pZ+IaGe/hkNJtyrwXuYVi/3ReMd6CCT/thuA224v9SBRmY8VkrrIakk+9BQMDK4yDirj
+         hjiA==
+X-Gm-Message-State: AOJu0YzZtxwz1mbwh/yo3o2g21zUDM0gTBIOqF0cgiTuqE8eT1fIXMsV
+	TVNMhGgkQyAMK0jZKLTS9D/5s04nFes=
+X-Google-Smtp-Source: AGHT+IHuX8IPXpPWARvOrLGArEhRbmfUBcFJCIzdI3PilstFfnzQ8S5BxQoiAhN+JXjosUjYXa31mw==
+X-Received: by 2002:ad4:442a:0:b0:67a:b5cf:ff29 with SMTP id e10-20020ad4442a000000b0067ab5cfff29mr387778qvt.51.1702058211481;
+        Fri, 08 Dec 2023 09:56:51 -0800 (PST)
+Received: from [172.17.0.2] ([74.249.6.30])
+        by smtp.gmail.com with ESMTPSA id dj15-20020a056214090f00b0067abef04ce1sm957573qvb.107.2023.12.08.09.56.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Dec 2023 09:56:51 -0800 (PST)
+Message-ID: <657358e3.050a0220.fc2ee.5fa0@mx.google.com>
+Date: Fri, 08 Dec 2023 09:56:51 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============2885649012162638382=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, quic_zijuhu@quicinc.com
+Subject: RE: [v1] Bluetooth: hci_conn: Remove a redundant check for HFP offload
+In-Reply-To: <1702055834-18008-1-git-send-email-quic_zijuhu@quicinc.com>
+References: <1702055834-18008-1-git-send-email-quic_zijuhu@quicinc.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi,
+--===============2885649012162638382==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Fri, 8 Dec 2023 08:39:21 -0600
-Adam Ford <aford173@gmail.com> wrote:
+This is automated email and please do not reply to this email!
 
-> On Mon, Nov 27, 2023 at 2:51=E2=80=AFPM Andreas Kemnade <andreas@kemnade.=
-info> wrote:
-> >
-> > Hi,
-> >
-> > On Mon, 27 Nov 2023 15:54:24 +0200
-> > Tony Lindgren <tony@atomide.com> wrote:
-> >
-> > [...] =20
-> > > > - Output at /dev/gnssX:
-> > > >   AI2 vs. NMEA
-> > > >   The chip can be configured into sending AI2-encapsulated NMEA,
-> > > >   or proving data in a binary format.
-> > > >   Some research has to be done yet for the details.
-> > > >   A pile of logs is waiting for further analysis...
-> > > >
-> > > >   Arguments for/against NMEA:
-> > > >   + Userspace is prepared to handle it
-> > > >   + Power management can be easily done by the kernel
-> > > >   - Less functionality can be used. =20
-> > >
-> > > I'd go with NMEA format as the default setting :)
-> > > =20
-> > yes, that would also be my preference.
-> > =20
-> > > >   Arguments for/against AI2:
-> > > >   + Full functionality can be accessed from userspace (incl. A-GPS,
-> > > >     maybe raw satellite data)
-> > > >   - Userspace has to behave to have proper power management
-> > > >   - No freely (not even as in beer) tool available to fully use AI2,
-> > > >     so there will be only a real advantage after long "French Cafe"
-> > > >     sessions. =20
-> > >
-> > > Seems AI2 could be optionally enabled as needed with some writes
-> > > to /dev/gnss0 to change the mode? =20
-> >
-> > Hmm, we have
-> > /sys/class/gnss/gnss0/type to get the mode, maybe we add some file
-> > to change the mode? Or having it hidden behing a module parameter
-> > and implement something better accessible if any need arrives?
-> >
-> > If we want NMEA output, probably some init commands will be sent at
-> > open(), but userspace doing something with AI2 probably does not want
-> > the device touched, so it should probably be already be set before open=
-(). =20
->=20
-> Is there another revision coming or should I try to test this one?  I
-> am not very familiar with the GNSS part of the module, but it sounds
-> like there was some consensus as to which direction we should go.  I
-> should have a little time this weekend.
->=20
-Progress is only in my test program. No more checksum errors, I have
-made some progress in protocol reverse engineering. So make sure
-you do a git pull for https://github.com/akemnade/bt200tools
+Dear submitter,
 
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=808336
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.62 seconds
+GitLint                       PASS      0.32 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      27.52 seconds
+CheckAllWarning               PASS      30.56 seconds
+CheckSparse                   PASS      35.92 seconds
+CheckSmatch                   PASS      98.80 seconds
+BuildKernel32                 PASS      26.81 seconds
+TestRunnerSetup               PASS      422.30 seconds
+TestRunner_l2cap-tester       PASS      22.94 seconds
+TestRunner_iso-tester         PASS      45.47 seconds
+TestRunner_bnep-tester        PASS      6.99 seconds
+TestRunner_mgmt-tester        PASS      167.73 seconds
+TestRunner_rfcomm-tester      PASS      11.47 seconds
+TestRunner_sco-tester         PASS      14.60 seconds
+TestRunner_ioctl-tester       PASS      12.41 seconds
+TestRunner_mesh-tester        PASS      8.83 seconds
+TestRunner_smp-tester         PASS      10.05 seconds
+TestRunner_userchan-tester    PASS      7.31 seconds
+IncrementalBuild              PASS      25.60 seconds
+
+
+
+---
 Regards,
-Andreas
+Linux Bluetooth
+
+
+--===============2885649012162638382==--
