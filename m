@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SV+miMDs"
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E318C121
-	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Dec 2023 02:22:12 -0800 (PST)
-Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-a1d2f89ddabso232460166b.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 08 Dec 2023 02:22:12 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NPIC+PpF"
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C56DD172A
+	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Dec 2023 02:24:43 -0800 (PST)
+Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2c9f099cf3aso27165461fa.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 08 Dec 2023 02:24:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1702030931; x=1702635731; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1702031082; x=1702635882; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=+yvrt7W/d1SiBz3UL7ujd7zn3tqLECPBrn8dAOWmH0c=;
-        b=SV+miMDsNkI8s3I/bBcPM1qNCUamfAFOX6ea2NsX/IK+OFyO5jOftGGMkMuXlZYX7f
-         eQkvKW+CfPPdaFceAs8V6mVvujuOFXKdi3lJKrbYxjmIKFXAekRiQKD/az+V6QxxJjrW
-         3Hb6nfy2weZZvr1PXvs13yaWTAP2CDeGnxeEiqgWbbxCPDntMPF+AXXw1hR9mg5HyqSC
-         H8jl3VP7ljQLM4oHpIJE8gsPZGWyTnlWhxPYiJZOUNi5WSiMgOBlcDrQztbHT+FqRM8q
-         5IYjipyc0IRIYNZI3T4zT0nYs1YGNYjiXFiHehgcxvMhssFY0qVYpOEXPWt93VEogOz5
-         qjig==
+        bh=gmbhWKDjwhtppDpa84gh/Qt1+hokUPlKVrB+Nzqy+LY=;
+        b=NPIC+PpFpCLQCcXMOZc/zFyeyZSMl0QoPVySwoU1tm0oiX7cFnf7ACncVTu6phU2U2
+         drSaH6FaauWfbU08OttLYL6xs/fisUJau56UQciOpvO57jPdD6eoC9l7b1jk6Pw3MQSS
+         FCUlB/b8j+LoYsh8ljCtSacmjzMZsv+SlrY9/U1RoDa9qXqVnQ3jM46lDf6zqZ7sRAMo
+         I/eaNO5VUkow2gXlc+wQ/+3pnvYjKRukhjwPbsBEP/w03WFlsIcy+skosjsrwqSZBrCb
+         TbAuVfyquRr9BFSahIFombVG5SFpBTDYSn/gcFSWtk82qH8LzfS8w0tHksjdk39j4Ekw
+         MN1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702030931; x=1702635731;
+        d=1e100.net; s=20230601; t=1702031082; x=1702635882;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+yvrt7W/d1SiBz3UL7ujd7zn3tqLECPBrn8dAOWmH0c=;
-        b=T7+4V9vtIcE7rxFuv5e6AvsaBt3IYwo5TNIqnvMqW64C3RPTXTv0A5HK3yl1LRq2uh
-         2Zfmzmw0IIatu0dBg7Bi5hh90hHUE6KpgxCmUh6MNsnQ5CJCd6/IQD+qIDE3HF/aWKNk
-         a683NnTo86ZGdk2RXxxpBpV8Odq3/vbVpYzSqK5sVnRGTnEYYKq22GrAE7tamvb+c2/W
-         B8FBDGmh2GehVnkN2/RZTaZsx3E1Nq1eCacfYGxlP0CzMYjonvjGmnpUeCE6Hz2mE/tH
-         aS6JFrRQybWacFGcedrrlE2yvpitUttOxQ3Igj736Zp05kne2vWzGCAASlbBIr/IUPOE
-         MJMw==
-X-Gm-Message-State: AOJu0YzKKjzTxS9IF74S7SpT91N45gLZk46+QOFOfUo410AFeX9mKYOs
-	/VLf01AJAxVds3CLbDG9omxbFg==
-X-Google-Smtp-Source: AGHT+IEA1UEbJmtE49E+bfcwyM4iml2h+H/RfFF9l3cjsk+5c63pPIw6Mos/DvWFPLoJLcEglo3gpw==
-X-Received: by 2002:a17:906:103:b0:a1c:85bc:e9ca with SMTP id 3-20020a170906010300b00a1c85bce9camr2902465eje.13.1702030931279;
-        Fri, 08 Dec 2023 02:22:11 -0800 (PST)
+        bh=gmbhWKDjwhtppDpa84gh/Qt1+hokUPlKVrB+Nzqy+LY=;
+        b=oIakbpadWupFrZ2Pm78T88Ms1W4LbKjkWlSyiQflQ3Y8ngb5Yn06f+Xw4XJnmC5DAc
+         e5Ou2PGQR2z7s+94+Lcs+lZ0jF0fHLy5JHU2pWTg1Ar3n7S6q79Bxco2EIz5sLfEkmRT
+         BafT9PM/AGgNATQwXYv3ZxoUMvPKgNATMs3fDNwnQIQYb1bHVDtGavWbnwcomOg4LiHW
+         kBB4aN6YWOTEvC702h3N01lyeO4EmDSc1QeNvc1Yw8shgUcHP3adgkXXh+VzLo4gxxqU
+         jwQAGDH9e5UX0uH9t0HJkr6FBvT0+/+exyhZjaZFQD6LREgbuknbiYFeID3hPxe1rgKj
+         96xg==
+X-Gm-Message-State: AOJu0Yy7ZEEeNmCZMEUTOtj/nFFHhJN2MnC/6XvWj+81BC1272EoowY5
+	1yaFFtYLjFTAyBS7oS1IGgo4ng==
+X-Google-Smtp-Source: AGHT+IHB9Xf5lst27/MvBFeN3neZ0H14GrTD2fqVylvLb4/UgoghnYogLI44KfT4mWiTRk+Lja3kqA==
+X-Received: by 2002:a2e:301a:0:b0:2ca:1420:aaf with SMTP id w26-20020a2e301a000000b002ca14200aafmr2474875ljw.31.1702031081902;
+        Fri, 08 Dec 2023 02:24:41 -0800 (PST)
 Received: from [192.168.1.20] ([178.197.218.27])
-        by smtp.gmail.com with ESMTPSA id tm6-20020a170907c38600b00a1db955c809sm820179ejc.73.2023.12.08.02.22.08
+        by smtp.gmail.com with ESMTPSA id tz8-20020a170907c78800b009e5ce1acb01sm822463ejc.103.2023.12.08.02.24.39
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Dec 2023 02:22:10 -0800 (PST)
-Message-ID: <76db86d3-5e43-4d76-82fd-89c629f9d35c@linaro.org>
-Date: Fri, 8 Dec 2023 11:22:07 +0100
+        Fri, 08 Dec 2023 02:24:41 -0800 (PST)
+Message-ID: <15ace99e-1a5a-4e7e-b6c5-05c4e3210ff4@linaro.org>
+Date: Fri, 8 Dec 2023 11:24:39 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -47,8 +47,8 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RESEND PATCH v2 1/3] dt-bindings: net: bluetooth: qualcomm: fix
- a typo
+Subject: Re: [RESEND PATCH v2 2/3] dt-bindings: net: bluetooth: qualcomm: add
+ regulators for QCA6390
 Content-Language: en-US
 To: Bartosz Golaszewski <brgl@bgdev.pl>, Marcel Holtmann
  <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
@@ -66,7 +66,7 @@ Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
  linux-arm-msm@vger.kernel.org,
  Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 References: <20231208090936.27769-1-brgl@bgdev.pl>
- <20231208090936.27769-2-brgl@bgdev.pl>
+ <20231208090936.27769-3-brgl@bgdev.pl>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -112,19 +112,25 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20231208090936.27769-2-brgl@bgdev.pl>
+In-Reply-To: <20231208090936.27769-3-brgl@bgdev.pl>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 08/12/2023 10:09, Bartosz Golaszewski wrote:
 > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > 
-> Spell supply correctly.
+> Add regulator properties for QCA6390 that are missing from the bindings
+> and enforce required properties for this model as well.
 > 
 > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > ---
+>  .../net/bluetooth/qualcomm-bluetooth.yaml     | 24 +++++++++++++++++++
+>  1 file changed, 24 insertions(+)
 
-Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+
+Maybe we should split the binding... I'll take a look.
+
 
 Best regards,
 Krzysztof
