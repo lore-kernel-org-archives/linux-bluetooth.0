@@ -1,150 +1,131 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="JCcDbPiu"
-Received: from madras.collabora.co.uk (madras.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e5ab])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9409E1720
-	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Dec 2023 02:17:19 -0800 (PST)
-Received: from fdanis-XPS-13-9370.. (cola.collaboradmins.com [195.201.22.229])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by madras.collabora.co.uk (Postfix) with ESMTPSA id 457B4660739E
-	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Dec 2023 10:17:18 +0000 (GMT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1702030638;
-	bh=kM7O943Thov/g30dxW9Y+mZbj3gxNq+70yAStmUfGzY=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=JCcDbPiuUnS0dPrQmmfg00QZ/rgcEPiuh7y+Cexy1w+549XKDXfGk1jxOTWZ/Ud8b
-	 6gmZQjdLbgHQ9BEW9nA8I/8Js56mS7vCRIm6GUWYHFDygsQedG6Y/CFfCz7kAwztGj
-	 oZp/rNSviNrJXWRVSaoImxp7yspEaHFWVNcLROd6B3yNdxQatkRvw/hXKdBSLQ5bCS
-	 UDlmjtTYz0ou5GSOuaj16aa/FjPGwYt3pppBCMN9QKuV0pO7OAz57xsb/EIai4aEwb
-	 ze6fDEF4hocflbl7ZOrZfLPWqR2m3mrPHbdGoF7/XWZSP1Jao3ye42oD+aQMPqzupa
-	 yMS205SX500Tw==
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3] tools: avtest: Add reject-code option
-Date: Fri,  8 Dec 2023 11:17:11 +0100
-Message-Id: <20231208101711.624001-1-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231208090013.620051-1-frederic.danis@collabora.com>
-References: <20231208090013.620051-1-frederic.danis@collabora.com>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SV+miMDs"
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E318C121
+	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Dec 2023 02:22:12 -0800 (PST)
+Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-a1d2f89ddabso232460166b.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 08 Dec 2023 02:22:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1702030931; x=1702635731; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+yvrt7W/d1SiBz3UL7ujd7zn3tqLECPBrn8dAOWmH0c=;
+        b=SV+miMDsNkI8s3I/bBcPM1qNCUamfAFOX6ea2NsX/IK+OFyO5jOftGGMkMuXlZYX7f
+         eQkvKW+CfPPdaFceAs8V6mVvujuOFXKdi3lJKrbYxjmIKFXAekRiQKD/az+V6QxxJjrW
+         3Hb6nfy2weZZvr1PXvs13yaWTAP2CDeGnxeEiqgWbbxCPDntMPF+AXXw1hR9mg5HyqSC
+         H8jl3VP7ljQLM4oHpIJE8gsPZGWyTnlWhxPYiJZOUNi5WSiMgOBlcDrQztbHT+FqRM8q
+         5IYjipyc0IRIYNZI3T4zT0nYs1YGNYjiXFiHehgcxvMhssFY0qVYpOEXPWt93VEogOz5
+         qjig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702030931; x=1702635731;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+yvrt7W/d1SiBz3UL7ujd7zn3tqLECPBrn8dAOWmH0c=;
+        b=T7+4V9vtIcE7rxFuv5e6AvsaBt3IYwo5TNIqnvMqW64C3RPTXTv0A5HK3yl1LRq2uh
+         2Zfmzmw0IIatu0dBg7Bi5hh90hHUE6KpgxCmUh6MNsnQ5CJCd6/IQD+qIDE3HF/aWKNk
+         a683NnTo86ZGdk2RXxxpBpV8Odq3/vbVpYzSqK5sVnRGTnEYYKq22GrAE7tamvb+c2/W
+         B8FBDGmh2GehVnkN2/RZTaZsx3E1Nq1eCacfYGxlP0CzMYjonvjGmnpUeCE6Hz2mE/tH
+         aS6JFrRQybWacFGcedrrlE2yvpitUttOxQ3Igj736Zp05kne2vWzGCAASlbBIr/IUPOE
+         MJMw==
+X-Gm-Message-State: AOJu0YzKKjzTxS9IF74S7SpT91N45gLZk46+QOFOfUo410AFeX9mKYOs
+	/VLf01AJAxVds3CLbDG9omxbFg==
+X-Google-Smtp-Source: AGHT+IEA1UEbJmtE49E+bfcwyM4iml2h+H/RfFF9l3cjsk+5c63pPIw6Mos/DvWFPLoJLcEglo3gpw==
+X-Received: by 2002:a17:906:103:b0:a1c:85bc:e9ca with SMTP id 3-20020a170906010300b00a1c85bce9camr2902465eje.13.1702030931279;
+        Fri, 08 Dec 2023 02:22:11 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.218.27])
+        by smtp.gmail.com with ESMTPSA id tm6-20020a170907c38600b00a1db955c809sm820179ejc.73.2023.12.08.02.22.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 Dec 2023 02:22:10 -0800 (PST)
+Message-ID: <76db86d3-5e43-4d76-82fd-89c629f9d35c@linaro.org>
+Date: Fri, 8 Dec 2023 11:22:07 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RESEND PATCH v2 1/3] dt-bindings: net: bluetooth: qualcomm: fix
+ a typo
+Content-Language: en-US
+To: Bartosz Golaszewski <brgl@bgdev.pl>, Marcel Holtmann
+ <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+ Rocky Liao <quic_rjliao@quicinc.com>, Alex Elder <elder@linaro.org>,
+ Srini Kandagatla <srinivas.kandagatla@linaro.org>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+References: <20231208090936.27769-1-brgl@bgdev.pl>
+ <20231208090936.27769-2-brgl@bgdev.pl>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20231208090936.27769-2-brgl@bgdev.pl>
 Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Some PTS tests like A2DP/SNK/AVP/BI-03-C, A2DP/SNK/AVP/BI-08-C , …
-request some specific rejection code to pass.
-This commit adds an option to specify the rejection code during
-AVDTP_SET_CONFIGURATION rejection.
+On 08/12/2023 10:09, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> 
+> Spell supply correctly.
+> 
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> ---
 
-E.g. "avtest --reject setconf --reject-code 195" to reject setconf with
-INVALID_SAMPLING_FREQUENCY code.
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
----
- tools/avtest.c | 23 ++++++++++++++++-------
- 1 file changed, 16 insertions(+), 7 deletions(-)
-
-diff --git a/tools/avtest.c b/tools/avtest.c
-index ca37b3b46..5ac3418aa 100644
---- a/tools/avtest.c
-+++ b/tools/avtest.c
-@@ -188,7 +188,8 @@ static void dump_buffer(const unsigned char *buf, int len)
- }
- 
- static void process_avdtp(int srv_sk, int sk, unsigned char reject,
--								int fragment)
-+								int fragment,
-+								int reject_code)
- {
- 	unsigned char buf[672];
- 	ssize_t len;
-@@ -284,7 +285,8 @@ static void process_avdtp(int srv_sk, int sk, unsigned char reject,
- 			if (reject == AVDTP_SET_CONFIGURATION) {
- 				hdr->message_type = AVDTP_MSG_TYPE_REJECT;
- 				buf[2] = buf[4];
--				buf[3] = 0x13; /* SEP In Use */
-+				buf[3] = reject_code ? reject_code :
-+							0x13; /* SEP In Use */
- 				printf("Rejecting set configuration command\n");
- 				len = write(sk, buf, 4);
- 			} else {
-@@ -443,7 +445,8 @@ static int set_minimum_mtu(int sk)
- 	return 0;
- }
- 
--static void do_listen(const bdaddr_t *src, unsigned char reject, int fragment)
-+static void do_listen(const bdaddr_t *src, unsigned char reject, int fragment,
-+							int reject_code)
- {
- 	struct sockaddr_l2 addr;
- 	socklen_t optlen;
-@@ -483,7 +486,7 @@ static void do_listen(const bdaddr_t *src, unsigned char reject, int fragment)
- 			continue;
- 		}
- 
--		process_avdtp(sk, nsk, reject, fragment);
-+		process_avdtp(sk, nsk, reject, fragment, reject_code);
- 
- 		if (media_sock >= 0) {
- 			close(media_sock);
-@@ -709,6 +712,7 @@ static void usage(void)
- 	printf("Options:\n"
- 		"\t--device <hcidev>    HCI device\n"
- 		"\t--reject <command>   Reject command\n"
-+		"\t--reject-code <code> Reject code to use\n"
- 		"\t--send <command>     Send command\n"
- 		"\t--preconf            Configure stream before actual command\n"
- 		"\t--wait <N>           Wait N seconds before exiting\n"
-@@ -720,6 +724,7 @@ static struct option main_options[] = {
- 	{ "help",	0, 0, 'h' },
- 	{ "device",	1, 0, 'i' },
- 	{ "reject",	1, 0, 'r' },
-+	{ "reject-code",	1, 0, 'R' },
- 	{ "send",	1, 0, 's' },
- 	{ "invalid",	1, 0, 'f' },
- 	{ "preconf",	0, 0, 'c' },
-@@ -764,12 +769,12 @@ int main(int argc, char *argv[])
- 	unsigned char cmd = 0x00;
- 	bdaddr_t src, dst;
- 	int opt, mode = MODE_NONE, sk, invalid = 0, preconf = 0, fragment = 0;
--	int avctp = 0, wait_before_exit = 0;
-+	int avctp = 0, wait_before_exit = 0, reject_code = 0;
- 
- 	bacpy(&src, BDADDR_ANY);
- 	bacpy(&dst, BDADDR_ANY);
- 
--	while ((opt = getopt_long(argc, argv, "+i:r:s:f:hcFCw:",
-+	while ((opt = getopt_long(argc, argv, "+i:r:s:f:hcFCw:R:",
- 						main_options, NULL)) != EOF) {
- 		switch (opt) {
- 		case 'i':
-@@ -809,6 +814,10 @@ int main(int argc, char *argv[])
- 			wait_before_exit = atoi(optarg);
- 			break;
- 
-+		case 'R':
-+			reject_code = atoi(optarg);
-+			break;
-+
- 		case 'h':
- 		default:
- 			usage();
-@@ -826,7 +835,7 @@ int main(int argc, char *argv[])
- 
- 	switch (mode) {
- 	case MODE_REJECT:
--		do_listen(&src, cmd, fragment);
-+		do_listen(&src, cmd, fragment, reject_code);
- 		break;
- 	case MODE_SEND:
- 		sk = do_connect(&src, &dst, avctp, fragment);
--- 
-2.34.1
+Best regards,
+Krzysztof
 
