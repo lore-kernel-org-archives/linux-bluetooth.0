@@ -1,25 +1,25 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF66B2031A
-	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Dec 2023 15:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23811208C1
+	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Dec 2023 15:10:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CpCJNmDv"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 61E90C433D9;
-	Fri,  8 Dec 2023 15:00:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lTmKQNjW"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B7CEAC433CB;
+	Fri,  8 Dec 2023 15:10:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702047630;
-	bh=CuneD4C42Kb7Lq7eB1k6/vRQLJE57KCt6g1F2P7hZrc=;
+	s=k20201202; t=1702048224;
+	bh=UvKqfuV1L21PHkSTeE5c+4mB7kaNHtNPBik9i2ccAvs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=CpCJNmDvZNi1Vu16Cp0wQ2dbN1uGDw9UojVZMiW8wOgpHeMNOOe5K3/kFOEimX0AI
-	 kXKTZm4rrlSMMqtx3gidEoGeY+BPDj7Kjd6OC81c7Zg/MOE7HZ7H7KfFs4emGrCANr
-	 vW9lwzEYfscCemtq7mtR8TDZKuSr8GQl1616EnQbfLkSh0ICf6u5QeSNscIJXY+Biq
-	 KA7606hpgC6YtRz+W95ib0fc1bm/5A0iXOnPlT2wC+KMfdAKg2OsqMCFU8UqtMPTqZ
-	 M5U4RLhTrEAN4EtKfrPMn3ADdFq2wBDgVdSnpwS4eSFK/rOcgGEnzLXcKFaLmzrqA2
-	 kQ9lcYolOoepA==
+	b=lTmKQNjWXCEMgPgNE12THfK7DKRZnbW3VGIJVdYlbniBc4vjT2M5Gj6/crXIkCueG
+	 8Dq/Tl0O399I+u+I9PNz8lU1sRV8+vH+j9u2afSBE7pA2XcXH7J6XL2MQ7KKiOE4v8
+	 DlWPgyxoCZms9Y3ZcDndGyDohR97oq0EMTOw2MKE7sQoxJs0pnLY0x6z1aUxqy6Rqz
+	 fdqcAQYohRykIcCcvSNNjRvW0mAzGMt2NZXibStTvHqgzMUz8NXVDxeCD+e4qOWCpG
+	 Glx7xdcbTCgGBEkGOCJjMeDlsUMBSncoJHAVGUrNc8gXn7Wr07su0diQnXhJ/4Rw61
+	 n8fDYVYiTHeaA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 46A08C04E32;
-	Fri,  8 Dec 2023 15:00:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A0D94DD4F1E;
+	Fri,  8 Dec 2023 15:10:24 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -28,33 +28,38 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1] test-vcp: Fix CCC value endianness
+Subject: Re: [PATCH v4 0/2] Bluetooth: Support SCO offload for QCA2066
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <170204763028.28520.3588495372277409614.git-patchwork-notify@kernel.org>
-Date: Fri, 08 Dec 2023 15:00:30 +0000
-References: <20231206220430.3713081-1-luiz.dentz@gmail.com>
-In-Reply-To: <20231206220430.3713081-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+ <170204822465.3151.16308014426635349043.git-patchwork-notify@kernel.org>
+Date: Fri, 08 Dec 2023 15:10:24 +0000
+References: <1702000287-22538-1-git-send-email-quic_zijuhu@quicinc.com>
+In-Reply-To: <1702000287-22538-1-git-send-email-quic_zijuhu@quicinc.com>
+To: Zijun Hu <quic_zijuhu@quicinc.com>
+Cc: luiz.dentz@gmail.com, marcel@holtmann.org, johan.hedberg@gmail.com,
+ linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This patch was applied to bluetooth/bluez.git (master)
+This series was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed,  6 Dec 2023 17:04:30 -0500 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Fri, 8 Dec 2023 09:51:25 +0800 you wrote:
+> This patch series are to support HFP offload for QCA2066.
 > 
-> CCC value is 2 octects long so it needs to be converted using
-> cpu_to_le16 in order to not fail in Big Endian architectures.
-> ---
->  unit/test-vcp.c | 21 ++++++---------------
->  1 file changed, 6 insertions(+), 15 deletions(-)
+> Changes form V3->V4:
+> - Bluetooth: hci_conn:
+> - - Move non NULL checking into configure_datapath_sync()
+> - Bluetooth: qca:
+> - - Optimize commmit messages and comments and function names
+> 
+> [...]
 
 Here is the summary with links:
-  - [BlueZ,v1] test-vcp: Fix CCC value endianness
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=71188eb0e752
+  - [v4,1/2] Bluetooth: hci_conn: Check non NULL function before calling for HFP offload
+    (no matching commit)
+  - [v4,2/2] Bluetooth: qca: Support HFP offload for QCA2066
+    https://git.kernel.org/bluetooth/bluetooth-next/c/3d41844703fe
 
 You are awesome, thank you!
 -- 
