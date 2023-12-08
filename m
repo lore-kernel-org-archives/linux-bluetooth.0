@@ -1,154 +1,64 @@
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A83F1CAAC
+	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Dec 2023 22:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b="QsYAKXgx"
-Received: from mail.andi.de1.cc (mail.andi.de1.cc [IPv6:2a02:c205:3004:2154::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95893118;
-	Fri,  8 Dec 2023 14:13:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=kemnade.info; s=20220719; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:References:In-Reply-To:Message-ID:Subject:Cc:To:From:Date:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=RlxG7vjWqKyoHCmskEV8jhRRkavkqsM6KoNtZ7Hn0ss=; b=QsYAKXgxEwdVvic0OVQS2q1njD
-	KbrlmARUgUPeNq/fvlFmbLHMefvx8bjUUbb0/76kGmGb/Ar0fFT3VrPBNoMXSXCdIGgPYGf1EHla8
-	UJZM7Z2OKSCJJ7SdQP9qJ/8WpI350/ddOdwer1AaZ2eIyhwDV1b2iTrFvBvdzBTmYkA5NPzZySZwX
-	+6wF3rS6ZNxBi7538KUuxvMXwgtiZWQIU4Tx/7AsXtGFbd73+y6Y76mi0it7jargk86CbnRIE6jMM
-	IRGiP40J7DYEBlBtloTTedq8modobMGa15xzjEpvw9VYbZqFBkgEhXQ7TLOgqdRXwJYyxMHEbsYbF
-	+E6oPSYg==;
-Received: from p200301077700c3001a3da2fffebfd33a.dip0.t-ipconnect.de ([2003:107:7700:c300:1a3d:a2ff:febf:d33a] helo=aktux)
-	by mail.andi.de1.cc with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <andreas@kemnade.info>)
-	id 1rBj6G-007BDR-9G; Fri, 08 Dec 2023 23:13:36 +0100
-Date: Fri, 8 Dec 2023 23:13:32 +0100
-From: Andreas Kemnade <andreas@kemnade.info>
-To: Johan Hovold <johan@kernel.org>
-Cc: Tony Lindgren <tony@atomide.com>, marcel@holtmann.org,
- johan.hedberg@gmail.com, luiz.dentz@gmail.com, arnd@arndb.de,
- gregkh@linuxfoundation.org, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, tomi.valkeinen@ideasonboard.com,
- =?UTF-8?B?UMOpdGVy?= Ujfalusi <peter.ujfalusi@gmail.com>, robh@kernel.org
-Subject: Re: [RFC PATCH 0/3] bluetooth/gnss: GNSS support for TiWi chips
-Message-ID: <20231208231332.20f0b647@aktux>
-In-Reply-To: <ZXNDd57ImXjelBf4@hovoldconsulting.com>
-References: <20231126191840.110564-1-andreas@kemnade.info>
-	<20231127135424.GO5169@atomide.com>
-	<20231127215108.6e985819@aktux>
-	<ZXNDd57ImXjelBf4@hovoldconsulting.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-pc-linux-gnu)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U7/rV89k"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 18ECBC433C9;
+	Fri,  8 Dec 2023 22:20:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702074025;
+	bh=5dYtSoA/F2xJI6Ob2zZPpDcY5xOUFbEnCn+Xd2vxAiE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=U7/rV89kWNzRyXMob2+DlrktacA0fNywcE1f2a+9plkvcDtJx5CkAYTje2VBzLSRF
+	 jih4sBiTUgjDOwWbymQoQUNF/qlE6KdYQd/fDnyKFroTNapMC9VIYHf7mLq/51bi41
+	 /jpFOl0kIzLT/VV2AsnoEYy5mzgX4kLVYR9/7ZI0hqVkqJPMExdRyHNDNzKPUGoneU
+	 1YR19tIpA3aSrF1i2fpdN3SAm9qrcDVoRyOFhLneA6XQJL+y8+wC40AhuJt+Xmdz4M
+	 zouIUXO7R2wrpAcQIPe3xm9mJHPBH3L96L9Uu9aa9cJG9IBBXubH81B0KmnguHU37/
+	 HK1FbCqKIyilw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F28A9C04E32;
+	Fri,  8 Dec 2023 22:20:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v1] client/player: Fix not prompting all parameter on
+ endpoint.register
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <170207402498.26151.16003369888215600659.git-patchwork-notify@kernel.org>
+Date: Fri, 08 Dec 2023 22:20:24 +0000
+References: <20231207184723.3862261-1-luiz.dentz@gmail.com>
+In-Reply-To: <20231207184723.3862261-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-On Fri, 8 Dec 2023 17:25:27 +0100
-Johan Hovold <johan@kernel.org> wrote:
+Hello:
 
-> On Mon, Nov 27, 2023 at 09:51:08PM +0100, Andreas Kemnade wrote:
-> > On Mon, 27 Nov 2023 15:54:24 +0200
-> > Tony Lindgren <tony@atomide.com> wrote:  
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Thu,  7 Dec 2023 13:47:23 -0500 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> > > > - Output at /dev/gnssX:
-> > > >   AI2 vs. NMEA
-> > > >   The chip can be configured into sending AI2-encapsulated NMEA,
-> > > >   or proving data in a binary format.
-> > > >   Some research has to be done yet for the details.
-> > > >   A pile of logs is waiting for further analysis...  
-> 
-> Can you say something more about what the protocol looks like? Is there
-> some common framing that can/should be stripped by the driver in both
-> modes?
->
-The frames (which can be fragmented into multiple gnss_recv_frame() calls)
-consist of:
-- some kind of start marker
-- one or more tlv structures (start marker is escaped here)
-- checksum
-- end marker
+> When Auto Accept is not enable not all parameters are requested.
+> ---
+>  client/player.c | 10 +++-------
+>  1 file changed, 3 insertions(+), 7 deletions(-)
 
-In case of NMEA reporting we have with this patchset at /dev/gnssX or at /dev/tigps
-found in the bt200 vendor kernel e.g.
+Here is the summary with links:
+  - [BlueZ,v1] client/player: Fix not prompting all parameter on endpoint.register
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=477c41c683ea
 
-1000 d3 1800 82050000 244750474c4c2c2c2c2c2c2c562c4e2a36340d0a 9f05 1003
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-which is:
-1000 = start marker, d3 = NMEA report
-1800 = length (LE)
-82050000 = ms from turning on GPS (LE).
-244750474c4c2c2c2c2c2c2c562c4e2a36340d0a = NMEA sentence
-9f05 = checksum
-1003 = end marker.
 
-That is one report among others depending on what is enabled. So it
-is not like the situtation with Sirf where you send some magic to turn
-it into binary mode and some other magic turning it into NMEA mode
-and have no other stuff on the line.
-
-> > > > 
-> > > >   Arguments for/against NMEA:
-> > > >   + Userspace is prepared to handle it
-> > > >   + Power management can be easily done by the kernel
-> > > >   - Less functionality can be used.    
-> > > 
-> > > I'd go with NMEA format as the default setting :)
-> > >   
-> > yes, that would also be my preference.
-> >   
-> > > >   Arguments for/against AI2:
-> > > >   + Full functionality can be accessed from userspace (incl. A-GPS,
-> > > >     maybe raw satellite data)
-> > > >   - Userspace has to behave to have proper power management
-> > > >   - No freely (not even as in beer) tool available to fully use AI2,
-> > > >     so there will be only a real advantage after long "French Cafe"
-> > > >     sessions.    
-> > > 
-> > > Seems AI2 could be optionally enabled as needed with some writes
-> > > to /dev/gnss0 to change the mode?  
-> > 
-> > Hmm, we have
-> > /sys/class/gnss/gnss0/type to get the mode, maybe we add some file
-> > to change the mode? Or having it hidden behing a module parameter
-> > and implement something better accessible if any need arrives?  
-> 
-> The 'type' attribute is intended to reveal the GNSS receiver type
-> (class) as a hint to user space to avoid having to detect it at runtime
-> using heuristics.
-> 
-> It does not reflect which mode is currently active for receivers that
-> provide both a vendor specific protocol and NMEA (e.g. u-blox
-> receivers).
-> 
-> User space can currently switch modes at will by writing to /dev/gnss0
-> as Tony mentioned.
-> 
-Well, switching mode would in this case also mean configuring something
-in the driver to do something different as it would mean sending commands
-to enable NMEA reports and strip away the AI2 encapsulation in the driver.
-You usually do not configure drivers through write() but through some
-out-of-band means like ioctl(), sysfs, kernel compile options,
-module parameters.
-
-> It may or may not make sense to make sure a particular mode is set
-> during probe, for example, if there's no real use for the proprietary
-> protocol and everyone would just switch away from it immediately.
-> 
-I would probably not do anything at probe time but turning on GPS and enable
-NMEA reports at open() time.
-
-With a lot of effort you can probably do interesting things with the
-proprietary mode. But given the fact that apparently nobody has done 
-publicly so in the past years, I would not expect that anything arises
-suddenly.
-
-So in practice only NMEA would IMHO be useful and having raw AI2
-might be something behind a module option or compile option to avoid
-introducing some new API before a real need is seen.
-Also as not everybody is using gpsd anymore, implementing any support
-for AI2 in userspace would not be at a single place.
-
-Regards,
-Andreas
