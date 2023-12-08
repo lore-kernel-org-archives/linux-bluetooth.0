@@ -1,100 +1,81 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KLBLbMWB"
-Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AD451BCE
-	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Dec 2023 13:58:59 -0800 (PST)
-Received: by mail-qv1-xf2e.google.com with SMTP id 6a1803df08f44-67abd020f40so28607706d6.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 08 Dec 2023 13:58:59 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WA4Esl6j"
+Received: from mail-oo1-xc2b.google.com (mail-oo1-xc2b.google.com [IPv6:2607:f8b0:4864:20::c2b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7309D1723
+	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Dec 2023 14:12:23 -0800 (PST)
+Received: by mail-oo1-xc2b.google.com with SMTP id 006d021491bc7-589d4033e84so1316251eaf.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 08 Dec 2023 14:12:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702072738; x=1702677538; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=g0oJEVELrX2o4NmIvqur+yyI5q7gq5Awb+KL7TESRBc=;
-        b=KLBLbMWBD8CFkqYOxQADSR17Eh7ZML51u4lVWBwXZq9RO1wjm0kg5iwHwy6xJ6zR8A
-         E9NI/E6mzVmeETyBzFOQqpjRDSbz4k+TPTdsYonxmY+wYVnmCKQLWRJJCSSyNd87ghMF
-         xRhxXVW6z5oyultItNQaKB2xXSW8uqEpx9CqxpNWWUP15Q1o8UfECCexzZgL8iT/YsTT
-         33IZD8FWtiGTjC5v8P5T7fOdfaD6pku/oaUm8U5JQDQiIhRJW9MDA4o2OP2BQXLm7AMP
-         vv9pTmx0WXyFm/+MUOAQCzv80gEj2FQdMzrX3yDcAwnd2CPireHBMozzNlWQ3Ru3SluJ
-         w6mA==
+        d=gmail.com; s=20230601; t=1702073541; x=1702678341; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=aKrCIqNtifZgEzmFWurZkUt24Tu0FBrpZVFeJEQSHNE=;
+        b=WA4Esl6j/cm4lAG4Z9mNij5kbbijdvXlzUzlqHIL/I+3U9xy3nm4gHfuwClP4PWbds
+         dCCSLgBdUn9mT3vhkhNcKWqFp/sm+zeNG70mNnOlMtib+A3utsWEbYSDDfKjrIyuJSBo
+         Dby7b6epqLiD2NXECJmgyZBA159NQ6nuKElKav0DOr7cIlBIuo3GnkEmDZeoexgnFotf
+         NJwhDjuPrts9MBOzMm4tcYjMKR4gHJCHKZNTVu8IlafIBZXNKR7gt/3SdIfdUMthRrDF
+         MuR0hdYUkxBCLpJBQV+tG3LfFsoNgf6257oMUhlKcIU2Elqx3rst7ZE450sHySCuV3eZ
+         25gA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702072738; x=1702677538;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=g0oJEVELrX2o4NmIvqur+yyI5q7gq5Awb+KL7TESRBc=;
-        b=MHt5dEyQdqZPHZP06VQMvJYBRMFzsqwc/GhS7KXzUhf3lkeFOXEVRsla0/YMjMmyhQ
-         0bgdYVINQ7ErWa4bRgdEvsgQV3ifEf5UGxzUqHWkDrZ02pU8fw4e7x5fuRsgxXN/RCqX
-         H14SIlv+9eTH6gz4BjwJg999HsllUfAQevOrBeQ9sAvU9WLuJsZjK5XA8vQI+9/sCrM4
-         kiN7qOddSlfMskUqZv1AEsBtnOUMPZSBM+YIL54dq8DBDVy1THHc9FkUgifybJ7o4/ni
-         FuahCQiEBSdmM0WU3ZdwmGqQLlsubA13adyKPrkcvdOBGvAoPgWF1XOWdOKoxzHBxceL
-         fYjQ==
-X-Gm-Message-State: AOJu0YwHyMp8MK2yeR2l0rzl2ZhVzeAShSFbDZbZMpaSvUjcvxOogjK0
-	bNycNbv6JJGMY8T5Fzg8dHhRiMwRMPE=
-X-Google-Smtp-Source: AGHT+IGfriDfMKzcsA8OFD6XH1Plh71oDpkzfI23zuRFGAAkjxYcNjQHqk4C5PCJWg4ShZjXy9aXoA==
-X-Received: by 2002:a05:6214:301a:b0:67a:d96a:d6f9 with SMTP id ke26-20020a056214301a00b0067ad96ad6f9mr1963178qvb.33.1702072738514;
-        Fri, 08 Dec 2023 13:58:58 -0800 (PST)
-Received: from [172.17.0.2] ([20.51.207.133])
-        by smtp.gmail.com with ESMTPSA id pp17-20020a056214139100b0067adf6ccd77sm1109530qvb.118.2023.12.08.13.58.58
+        d=1e100.net; s=20230601; t=1702073541; x=1702678341;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aKrCIqNtifZgEzmFWurZkUt24Tu0FBrpZVFeJEQSHNE=;
+        b=OIJIl+IFpg2uL5m8J6B+1mQ1Fr18WslusjTXiPw37uHtgmwk5/Zx7uRGqVljMxYC07
+         QrpmfRPSJ7IXW8RPnK3Ymm4hcou5ygIFp3XE5etza9kPCQUv7NmlP9/KNiVh+RIPZYJL
+         BC7bX6Cm5zpELfE3JT5FAsrc94AUxosPy4U0Avl5yHapibboLKjr8OhJWIlvymCwy2UU
+         vMQ7Kn4gjWi2GLfncyZcTwF0FVW/dazDgwmrLH/Z94jxaUxGutQngUfapqRg3xvf2RUE
+         TQDk2LTTvPQp+bpSUQwXRC3NEcMB+POb2LL3vKi+SgEbl4gtMTYdTtDWwYwE4FqU9O8Z
+         hnsg==
+X-Gm-Message-State: AOJu0YyIvlbIuml0jhSNqySIWQamiwtLKgvmiFaIXvC42cBOYbHoEC8Y
+	5NxNljSHyEQviGdiC5c3LmBJGaWBTvE=
+X-Google-Smtp-Source: AGHT+IFY4d+xdMOgWlH54jRm6ak6XjkRFU7YjPbvaq9HkEgx/9BhA0WCDqFzSKqK9PNhEbCy5fWi1w==
+X-Received: by 2002:a05:6820:820:b0:58d:7171:c27 with SMTP id bg32-20020a056820082000b0058d71710c27mr989740oob.8.1702073541537;
+        Fri, 08 Dec 2023 14:12:21 -0800 (PST)
+Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
+        by smtp.gmail.com with ESMTPSA id a44-20020a4a98af000000b0058df21de4fasm378195ooj.10.2023.12.08.14.12.20
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Dec 2023 13:58:58 -0800 (PST)
-Message-ID: <657391a2.050a0220.f993b.69e7@mx.google.com>
-Date: Fri, 08 Dec 2023 13:58:58 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============6244073008454183715=="
+        Fri, 08 Dec 2023 14:12:20 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] bap: Don't attempt to release if old state was releasing
+Date: Fri,  8 Dec 2023 17:12:13 -0500
+Message-ID: <20231208221219.54529-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, jiangzp@google.com
-Subject: RE: [kernel,v1] Bluetooth: btmtksdio: clear BTMTKSDIO_BT_WAKE_ENABLED after resume
-In-Reply-To: <20231208130705.kernel.v1.1.Ic5024b3da99b11e39c247a5b8ba44876c18880a0@changeid>
-References: <20231208130705.kernel.v1.1.Ic5024b3da99b11e39c247a5b8ba44876c18880a0@changeid>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============6244073008454183715==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=808392
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.05 seconds
-GitLint                       PASS      0.36 seconds
-SubjectPrefix                 PASS      0.16 seconds
-BuildKernel                   PASS      31.33 seconds
-CheckAllWarning               PASS      34.58 seconds
-CheckSparse                   PASS      41.02 seconds
-CheckSmatch                   PASS      112.13 seconds
-BuildKernel32                 PASS      30.70 seconds
-TestRunnerSetup               PASS      473.45 seconds
-TestRunner_l2cap-tester       PASS      24.56 seconds
-TestRunner_iso-tester         PASS      47.06 seconds
-TestRunner_bnep-tester        PASS      7.56 seconds
-TestRunner_mgmt-tester        PASS      171.85 seconds
-TestRunner_rfcomm-tester      PASS      11.66 seconds
-TestRunner_sco-tester         PASS      15.22 seconds
-TestRunner_ioctl-tester       PASS      13.18 seconds
-TestRunner_mesh-tester        PASS      10.50 seconds
-TestRunner_smp-tester         PASS      11.30 seconds
-TestRunner_userchan-tester    PASS      8.04 seconds
-IncrementalBuild              PASS      29.36 seconds
-
-
-
+If the old state was releasing there is no reason to call
+bt_bap_stream_release yet again when IO could not be created as that
+will likely create a loop situation when the remote stack caches the
+codec configuration.
 ---
-Regards,
-Linux Bluetooth
+ profiles/audio/bap.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
+diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
+index c279b5b0e133..c530799915f3 100644
+--- a/profiles/audio/bap.c
++++ b/profiles/audio/bap.c
+@@ -1918,7 +1918,9 @@ static void bap_state(struct bt_bap_stream *stream, uint8_t old_state,
+ 			bap_create_io(data, ep, stream, true);
+ 			if (!ep->io) {
+ 				error("Unable to create io");
+-				bt_bap_stream_release(stream, NULL, NULL);
++				if (old_state != BT_BAP_STREAM_STATE_RELEASING)
++					bt_bap_stream_release(stream, NULL,
++								NULL);
+ 				return;
+ 			}
+ 
+-- 
+2.43.0
 
---===============6244073008454183715==--
