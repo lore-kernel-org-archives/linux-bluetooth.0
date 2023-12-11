@@ -1,127 +1,91 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W6V2EUf3"
-Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88BBA1723
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Dec 2023 09:53:00 -0800 (PST)
-Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2c9ea37ac87so65555461fa.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Dec 2023 09:53:00 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a9MNs2V7"
+Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B7919D
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Dec 2023 10:17:57 -0800 (PST)
+Received: by mail-oi1-x235.google.com with SMTP id 5614622812f47-3b9dd6886e2so1811968b6e.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Dec 2023 10:17:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702317178; x=1702921978; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=i3ufnXGidcOnmQQt6XNrIUZLzoxqF+duuoKjMVgCFx0=;
-        b=W6V2EUf3xek/kbKi26Wrx1JCWBuYDQux5Imrx+JOoyBpCPLuSjW+YR3TGi+9TkvGHc
-         so4oKD0GuTChQkNgsxs+muLFecohfME12x/AZssUmgvcv38lWT3A0GxtkTrHUIhhbHvA
-         jJhA/7AMymp4Sttl/q6vJVPkrKeAzux86XpA9GWVVjVxSxwTynIhIGTDvd4aOTGUD7Bb
-         VKpnJOx7GACu4BXvUhfCnlFDA1puyq3Ec00en28eKqXcF4vw6ASD14n415dbY0AhTCr5
-         X9b4vMeXpocB6ywMsrbJJhUsMCrqAW7B/HTIJOyh0Kw/4m8BATuIytJ3fZNJv0M7ErjL
-         +5+w==
+        d=gmail.com; s=20230601; t=1702318676; x=1702923476; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=zbqh3BqSklCQzgQjYtXJj14fj8qINvbD6FYASnOtRQg=;
+        b=a9MNs2V7YRR/vXVrl3srm3SQcW+DEthrkwvTUgJx/N6TDBce2UuUqgleJ31f62Syj8
+         ZhDhhI9w5mv0WuU7nahkahvWas4ZzrOXVMIz/M5WZ+DQ2jqhsoVBwDuaR2yL8JFCjlGg
+         /rADGOxm+SXugLMpcc1QS+0w1rMV3utQA1n0PTmolvBEcY9cSEYkfzhtQP5+WMehRxle
+         ohomii2cqbQjx6C17BGZ8+hxlDcTE/Xbuamh+XuwpqBmgniZg7uekDxo5d4rWlPJDpHH
+         PEHlt4EuIrk1o6BK4fg72attVpWfvAs9u+94bIy2Soqc1lxgF5dbr3CM0mQPlQsRi4UW
+         2B3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702317178; x=1702921978;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=i3ufnXGidcOnmQQt6XNrIUZLzoxqF+duuoKjMVgCFx0=;
-        b=ecTPCyK008x7uE0p15RRBZGHmdxhtvTPh9gHm7AyUc2cruk6Vm11KnS9qqgZUveX9H
-         latu6EXZIPQA+scuj8TeKd20gvQ/vOLnPq9VWgEougpSf1ubsETg8XrQu4+grGnf9xoG
-         OYXr9IkIICoELuq3MW8OYBDjm5uor/tdRtjI4w8lYiJcie68QQhNowGN5hGWvc31fu0X
-         4FDm7GOtqpX1BWQBcWfp+hpmLHAHSFPRMc5I8ntoTWBFZDr14DTByNmnalhdynyGULp6
-         rz7nudrDTA7uFVNwibsBo2G+Qn/jXav7wX6E5DE8NnH6Sr/RKMO/rCahtp04n+N39o+5
-         6rGw==
-X-Gm-Message-State: AOJu0YyUziawUlrgUhSDmIJPwXfBFbpzKykwYs2swW8rvI6kwu9bsVXs
-	q50vEUuGLhcAKsNk3zch9yNFoNO7p3MvMwxizbNuELZHk+8=
-X-Google-Smtp-Source: AGHT+IFprDBfMuEkTOnVdUX9utBDfq+tc1cxte52gLED7mkyRXjsjxYwiI1CCl9o0Qyp9ZfjmKBjZ8TcNrRHMKzTMg4=
-X-Received: by 2002:a2e:ab18:0:b0:2cc:1e99:3f50 with SMTP id
- ce24-20020a2eab18000000b002cc1e993f50mr1845995ljb.43.1702317177712; Mon, 11
- Dec 2023 09:52:57 -0800 (PST)
+        d=1e100.net; s=20230601; t=1702318676; x=1702923476;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zbqh3BqSklCQzgQjYtXJj14fj8qINvbD6FYASnOtRQg=;
+        b=PDkXJqK0UJkzGtIy9M4j6ocgE1IDymoLd8rXMVZRZFWMomdcXIUZy9gPSBFg3s3ZU2
+         I82xiXxhPBZBrPtUDyvwtAyGH5c74dqDGFJt5zLMhJGonjgBhuRXV49b49Sexa3EtqIN
+         lhDEgyzw93FeM693SlJ0Yn/2jIGdD8xEi5s5IATkNuQfZJ/dL8FxJ1DfNQ4rbcb6kPnx
+         ZiMciJY6f7N6AqRcM1JySWHpcqolVxjt+eS9tlGGJ8yeWsNXLjXT90tPvy9N1jH/F2bg
+         Tu5AMg6aQory/O74lTxBEtyW41zBAH964nJYvyDCXR48hULA1BgR8unhIveZ4tATP4TE
+         bOuw==
+X-Gm-Message-State: AOJu0Yx7Utv5p91Ez2w/qqQrGv1hdjpL7tGa+tk+iWr2WIqJ9TIzpK8i
+	EKZKUWs/7srcUDCROJ/7y87Ri6ebhDA=
+X-Google-Smtp-Source: AGHT+IGT5fPwjW6i/aFatSzJti0oOpZdbcA1gEnWPIFxUybNXSd4LFO639eYAg4lMjV2tp0qBd53ZA==
+X-Received: by 2002:a05:6870:b520:b0:1fa:c97:220a with SMTP id v32-20020a056870b52000b001fa0c97220amr2599769oap.10.1702318676431;
+        Mon, 11 Dec 2023 10:17:56 -0800 (PST)
+Received: from [172.17.0.2] ([74.249.14.163])
+        by smtp.gmail.com with ESMTPSA id bs36-20020a05620a472400b0077d8a162babsm3095044qkb.13.2023.12.11.10.17.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Dec 2023 10:17:56 -0800 (PST)
+Message-ID: <65775254.050a0220.258a.dbf2@mx.google.com>
+Date: Mon, 11 Dec 2023 10:17:56 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5888769026504583879=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ZXbWcZPq_2zIbqEO@alexlu> <6576dd12.170a0220.262f6.400c@mx.google.com>
-In-Reply-To: <6576dd12.170a0220.262f6.400c@mx.google.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 11 Dec 2023 12:52:45 -0500
-Message-ID: <CABBYNZL0eonsTFL-_DkXw_B=pRHz9QyeHubbRzpBD3dF-oWiRQ@mail.gmail.com>
-Subject: Re: [v2] Bluetooth: Add more enc key size check
-To: linux-bluetooth@vger.kernel.org
-Cc: alex_lu@realsil.com.cn
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, xiaokeqinhealth@126.com
+Subject: RE: [1/2] adapter: Fix addr_type for smp_irk/ltk_info/link_key
+In-Reply-To: <20231211162729.1183207-1-xiaokeqinhealth@126.com>
+References: <20231211162729.1183207-1-xiaokeqinhealth@126.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Alex,
+--===============5888769026504583879==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Mon, Dec 11, 2023 at 4:57=E2=80=AFAM <bluez.test.bot@gmail.com> wrote:
->
-> This is automated email and please do not reply to this email!
->
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=3D808=
-718
->
-> ---Test result---
->
-> Test Summary:
-> CheckPatch                    PASS      0.48 seconds
-> GitLint                       PASS      0.21 seconds
-> SubjectPrefix                 PASS      0.07 seconds
-> BuildKernel                   PASS      27.52 seconds
-> CheckAllWarning               PASS      30.74 seconds
-> CheckSparse                   PASS      36.91 seconds
-> CheckSmatch                   PASS      99.35 seconds
-> BuildKernel32                 PASS      27.19 seconds
-> TestRunnerSetup               PASS      430.58 seconds
-> TestRunner_l2cap-tester       PASS      24.23 seconds
-> TestRunner_iso-tester         PASS      45.04 seconds
-> TestRunner_bnep-tester        PASS      7.09 seconds
-> TestRunner_mgmt-tester        PASS      160.98 seconds
-> TestRunner_rfcomm-tester      PASS      11.03 seconds
-> TestRunner_sco-tester         PASS      14.59 seconds
-> TestRunner_ioctl-tester       PASS      12.19 seconds
-> TestRunner_mesh-tester        PASS      8.72 seconds
-> TestRunner_smp-tester         PASS      9.77 seconds
-> TestRunner_userchan-tester    PASS      7.32 seconds
-> IncrementalBuild              PASS      25.72 seconds
->
+This is automated email and please do not reply to this email!
 
-How about doing the following:
+Dear submitter,
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 2ad7b9f86f74..f9a8fb9fcce2 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -750,9 +750,12 @@ static u8 hci_cc_read_enc_key_size(struct hci_dev
-*hdev, void *data,
-        } else {
-                conn->enc_key_size =3D rp->key_size;
-                status =3D 0;
-+
-+               if (conn->enc_key_size < hdev->min_enc_key_size)
-+                       status =3D HCI_ERROR_AUTH_FAILURE;
-        }
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=808867
 
--       hci_encrypt_cfm(conn, 0);
-+       hci_encrypt_cfm(conn, status);
+---Test result---
 
- done:
-        hci_dev_unlock(hdev);
-
-That way we don't have to proliferate the checks over to L2CAP, etc,
-so we consider that the encryption itself fails if the
-conn->enc_key_size < hdev->min_enc_key_size.
-
->
-> ---
-> Regards,
-> Linux Bluetooth
->
+Test Summary:
+CheckPatch                    PASS      0.98 seconds
+GitLint                       PASS      0.64 seconds
+BuildEll                      PASS      24.31 seconds
+BluezMake                     PASS      717.35 seconds
+MakeCheck                     PASS      11.35 seconds
+MakeDistcheck                 PASS      157.03 seconds
+CheckValgrind                 PASS      220.60 seconds
+CheckSmatch                   PASS      329.27 seconds
+bluezmakeextell               PASS      103.85 seconds
+IncrementalBuild              PASS      1351.13 seconds
+ScanBuild                     PASS      930.85 seconds
 
 
---=20
-Luiz Augusto von Dentz
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============5888769026504583879==--
