@@ -1,74 +1,148 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F/shY9Mg"
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BCEBB6
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Dec 2023 00:22:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702282976; x=1733818976;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=i86niv1nqiMIApRSykL6cnQkSDRcfNNPYZ2lRUuTGfU=;
-  b=F/shY9Mgn0Ei1IbhaQCr4QuGkjSUWE/gLRjbaicxTXsKm3fTrsvz4J7l
-   thw4CLpXfYuVIJN791t9Xs+eCe8F/Pairlx8rFRF6F+GrBHWZQZZPUmIY
-   SQTdtWcHI3UGUQjUlMzO2mJ4vb2BLJpI4voOWtwr8KikhoEvP9X9zntFE
-   hLvXVWYig2rjVy447VQcMTsRXawEGvyzbprrSN/mP38aSPvbym96aECnX
-   3HLPid/Co5571UfFveB6QnKffrCo/XMxJXHwdk7HbgJ/Wah7WiavYfmLj
-   lebcNIQdMJ8LQKY6UnXP8OZzHiHPBVtpmbNR8Y+41/hW/MqLaZauPNC8J
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10920"; a="1422652"
-X-IronPort-AV: E=Sophos;i="6.04,267,1695711600"; 
-   d="scan'208";a="1422652"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2023 00:22:55 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10920"; a="776582596"
-X-IronPort-AV: E=Sophos;i="6.04,267,1695711600"; 
-   d="scan'208";a="776582596"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by fmsmga007.fm.intel.com with ESMTP; 11 Dec 2023 00:22:54 -0800
-From: Kiran K <kiran.k@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: ravishankar.srivatsa@intel.com,
-	Kiran K <kiran.k@intel.com>
-Subject: [PATCH] shared/bap: Update Available context for source
-Date: Mon, 11 Dec 2023 14:05:07 +0530
-Message-Id: <20231211083507.3363494-1-kiran.k@intel.com>
-X-Mailer: git-send-email 2.34.1
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F221FE5;
+	Mon, 11 Dec 2023 00:29:39 -0800 (PST)
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 3BB8TPNC02597530, This message is accepted by code: ctloc85258
+Received: from RSEXMBS01.realsil.com.cn ([172.29.17.195])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 3BB8TPNC02597530
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=FAIL);
+	Mon, 11 Dec 2023 16:29:31 +0800
+Received: from alexlu (172.29.36.158) by RSEXMBS01.realsil.com.cn
+ (172.29.17.195) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 11 Dec
+ 2023 16:29:25 +0800
+Date: Mon, 11 Dec 2023 16:29:12 +0800
+From: Alex Lu <alex_lu@realsil.com.cn>
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg
+	<johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: Max Chou <max.chou@realtek.com>, Karen Hsu <karenhsu@realtek.com>
+Subject: [PATCH] Bluetooth: Add more enc key size check
+Message-ID: <ZXbIWMZyZIYyetff@alexlu>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+X-ClientProxiedBy: RSEXH36502.realsil.com.cn (172.29.17.3) To
+ RSEXMBS01.realsil.com.cn (172.29.17.195)
 
-Available Context of sink was getting updated instead of source.
+From: Alex Lu <alex_lu@realsil.com.cn>
+
+When we are slave role and receives l2cap conn req when encryption has
+started, we should check the enc key size to avoid KNOB attack or BLUFFS
+attack.
+From SIG recommendation, implementations are advised to reject
+service-level connections on an encrypted baseband link with key
+strengths below 7 octets.
+
+The btmon log below shows the case that lacks enc key size check.
+
+> HCI Event: Connect Request (0x04) plen 10
+        Address: BB:22:33:44:55:99 (OUI BB-22-33)
+        Class: 0x480104
+          Major class: Computer (desktop, notebook, PDA, organizers)
+          Minor class: Desktop workstation
+          Capturing (Scanner, Microphone)
+          Telephony (Cordless telephony, Modem, Headset)
+        Link type: ACL (0x01)
+< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
+        Address: BB:22:33:44:55:99 (OUI BB-22-33)
+        Role: Peripheral (0x01)
+> HCI Event: Command Status (0x0f) plen 4
+      Accept Connection Request (0x01|0x0009) ncmd 2
+        Status: Success (0x00)
+> HCI Event: Connect Complete (0x03) plen 11
+        Status: Success (0x00)
+        Handle: 1
+        Address: BB:22:33:44:55:99 (OUI BB-22-33)
+        Link type: ACL (0x01)
+        Encryption: Disabled (0x00)
+...
+
+> HCI Event: Encryption Change (0x08) plen 4
+        Status: Success (0x00)
+        Handle: 1 Address: BB:22:33:44:55:99 (OUI BB-22-33)
+        Encryption: Enabled with E0 (0x01)
+< HCI Command: Read Encryption Key Size (0x05|0x0008) plen 2
+        Handle: 1 Address: BB:22:33:44:55:99 (OUI BB-22-33)
+> HCI Event: Command Complete (0x0e) plen 7
+      Read Encryption Key Size (0x05|0x0008) ncmd 2
+        Status: Success (0x00)
+        Handle: 1 Address: BB:22:33:44:55:99 (OUI BB-22-33)
+        Key size: 6
+...
+
+// We should check the enc key size
+> ACL Data RX: Handle 1 flags 0x02 dlen 12
+      L2CAP: Connection Request (0x02) ident 3 len 4
+        PSM: 25 (0x0019)
+        Source CID: 64
+< ACL Data TX: Handle 1 flags 0x00 dlen 16
+      L2CAP: Connection Response (0x03) ident 3 len 8
+        Destination CID: 64
+        Source CID: 64
+        Result: Connection pending (0x0001)
+        Status: Authorization pending (0x0002)
+> HCI Event: Number of Completed Packets (0x13) plen 5
+        Num handles: 1
+        Handle: 1 Address: BB:22:33:44:55:99 (OUI BB-22-33)
+        Count: 1
+        #35: len 16 (25 Kb/s)
+        Latency: 5 msec (2-7 msec ~4 msec)
+< ACL Data TX: Handle 1 flags 0x00 dlen 16
+      L2CAP: Connection Response (0x03) ident 3 len 8
+        Destination CID: 64
+        Source CID: 64
+        Result: Connection successful (0x0000)
+        Status: No further information available (0x0000)
+
+Signed-off-by: Alex Lu <alex_lu@realsil.com.cn>
+Signed-off-by: Max Chou <max.chou@realtek.com>
 ---
- src/shared/bap.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ net/bluetooth/l2cap_core.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index a1495ca84bcc..e9d7072ef3be 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -2599,13 +2599,13 @@ static void pacs_add_source_supported_context(struct bt_pacs *pacs,
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 17ca13e8c044..b0f31d798132 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1669,7 +1669,13 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 			rsp.dcid = cpu_to_le16(chan->scid);
  
- static void pacs_add_source_context(struct bt_pacs *pacs, uint16_t context)
- {
--	context |= pacs->supported_sink_context_value;
-+	context |= pacs->supported_source_context_value;
+ 			if (l2cap_chan_check_security(chan, false)) {
+-				if (test_bit(FLAG_DEFER_SETUP, &chan->flags)) {
++				if (!l2cap_check_enc_key_size(conn->hcon)) {
++					l2cap_state_change(chan, BT_DISCONN);
++					__set_chan_timer(chan,
++							 L2CAP_DISC_TIMEOUT);
++					rsp.result = L2CAP_CR_SEC_BLOCK;
++					rsp.status = L2CAP_CS_NO_INFO;
++				} else if (test_bit(FLAG_DEFER_SETUP, &chan->flags)) {
+ 					rsp.result = cpu_to_le16(L2CAP_CR_PEND);
+ 					rsp.status = cpu_to_le16(L2CAP_CS_AUTHOR_PEND);
+ 					chan->ops->defer(chan);
+@@ -4202,7 +4208,15 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
  
- 	/* Check if context value needs updating */
--	if (context == pacs->sink_context_value)
-+	if (context == pacs->source_context_value)
- 		return;
- 
--	pacs->sink_context_value = context;
-+	pacs->source_context_value = context;
- 
- 	pacs_context_changed(pacs);
- }
+ 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE) {
+ 		if (l2cap_chan_check_security(chan, false)) {
+-			if (test_bit(FLAG_DEFER_SETUP, &chan->flags)) {
++			/* As slave role, we should check the enc key size when
++			 * l2cap conn req is received.
++			 */
++			if (!l2cap_check_enc_key_size(conn->hcon)) {
++				l2cap_state_change(chan, BT_DISCONN);
++				__set_chan_timer(chan, L2CAP_DISC_TIMEOUT);
++				result = L2CAP_CR_SEC_BLOCK;
++				status = L2CAP_CS_NO_INFO;
++			} else if (test_bit(FLAG_DEFER_SETUP, &chan->flags)) {
+ 				l2cap_state_change(chan, BT_CONNECT2);
+ 				result = L2CAP_CR_PEND;
+ 				status = L2CAP_CS_AUTHOR_PEND;
 -- 
-2.34.1
+2.39.2
 
