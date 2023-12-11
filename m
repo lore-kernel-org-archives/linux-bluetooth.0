@@ -1,27 +1,24 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="IpGQlHWl"
-X-Greylist: delayed 904 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 11 Dec 2023 08:42:42 PST
+	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="HlOGJ+JA"
 Received: from m15.mail.126.com (m15.mail.126.com [45.254.50.223])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9986198
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Dec 2023 08:42:42 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 29A5CC2
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Dec 2023 08:42:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=34RTL
-	E4latA1ndwKWr6wBHgOPTLPG/f2WMiFpqc09jo=; b=IpGQlHWlQocdLvpmSltcg
-	SzQ/oJm4D6Qa/GqhAHHSorEW+sdWTmW8df9tx6cW+TxIesKCWeZvrBgj5bnw+hir
-	wwrFteb5NgOReU0jUWlPWpI+BznuVZfRqKrH+VjJ2u6wR3RvMyYpv2m14ZeDr2Av
-	SWrlBffFw4D+x6yUyiCEt0=
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=EgMX7
+	aJ5wP++AIAgtJNtqNEPrWFEsm33mKMW+rFekDA=; b=HlOGJ+JA2mFqbm4MwDlUO
+	yaNFL5LT9l246jhKHC9TkckKaS8sB7ppn3PrUxaWvIoasKtotGaxgaDLB18YFu6e
+	JFXb+TabGyTUmp+rOOhoQR+BwNnJV8PBiTa1egtfE4p4+8yyfT6Ohzcon0Buio9c
+	MvjbI4JbFyBa+jqp7lGK8I=
 Received: from localhost.localdomain (unknown [58.22.7.114])
-	by zwqz-smtp-mta-g1-0 (Coremail) with SMTP id _____wDnT5NyOHdllbAiDw--.21285S3;
-	Tue, 12 Dec 2023 00:27:32 +0800 (CST)
+	by zwqz-smtp-mta-g1-0 (Coremail) with SMTP id _____wDnT5NyOHdllbAiDw--.21285S2;
+	Tue, 12 Dec 2023 00:27:31 +0800 (CST)
 From: Xiao Yao <xiaokeqinhealth@126.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Xiao Yao <xiaoyao@rock-chips.com>
-Subject: [PATCH 2/2] device: Add notifications when the bdaddr_type changes
-Date: Tue, 12 Dec 2023 00:27:29 +0800
-Message-Id: <20231211162729.1183207-2-xiaokeqinhealth@126.com>
+Subject: [PATCH 1/2] adapter: Fix addr_type for smp_irk/ltk_info/link_key
+Date: Tue, 12 Dec 2023 00:27:28 +0800
+Message-Id: <20231211162729.1183207-1-xiaokeqinhealth@126.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231211162729.1183207-1-xiaokeqinhealth@126.com>
-References: <20231211162729.1183207-1-xiaokeqinhealth@126.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -29,31 +26,97 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDnT5NyOHdllbAiDw--.21285S3
-X-Coremail-Antispam: 1Uf129KBjDUn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7v73
-	VFW2AGmfu7bjvjm3AaLaJ3UbIYCTnIWIevJa73UjIFyTuYvj4RN18BDUUUU
-X-CM-SenderInfo: 50ld0yhhtl0xhhdo3xa6rslhhfrp/1tbi6BhD1WVLY0IN1AAAsw
+X-CM-TRANSID:_____wDnT5NyOHdllbAiDw--.21285S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxZr4rGr47uryxWry5Cw4rXwb_yoW5WFykpr
+	W3GFy3GrW8Xr1Igr43JrWY93Wavw4vkry2qr92934SkF4UXrWkZr45KrWS9rW5urykXrna
+	qF4kXa4UWa17GrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zEJKs5UUUUU=
+X-CM-SenderInfo: 50ld0yhhtl0xhhdo3xa6rslhhfrp/1tbiEBZD1WVLY0IMQQAAsS
 
 From: Xiao Yao <xiaoyao@rock-chips.com>
 
+According to BLUETOOTH CORE SPECIFICATION Version 5.4 | Vol 3,
+Part H, 2.4.24/2.4.25, The LE LTK and BR/EDR link keys can be
+converted between each other, so the addr type can be either
+BREDR or LE, so fix it.
+
 Signed-off-by: Xiao Yao <xiaoyao@rock-chips.com>
 ---
- src/device.c | 3 +++
- 1 file changed, 3 insertions(+)
+ src/adapter.c | 20 ++++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index a734fff0d..17bcfbc49 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -4472,6 +4472,9 @@ void device_set_le_support(struct btd_device *device, uint8_t bdaddr_type)
- 	device->le = true;
- 	device->bdaddr_type = bdaddr_type;
+diff --git a/src/adapter.c b/src/adapter.c
+index 86fff72bc..ee70b00d2 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -170,6 +170,7 @@ static GSList *conn_fail_list = NULL;
  
-+	g_dbus_emit_property_changed(dbus_conn, device->path,
-+					DEVICE_INTERFACE, "AddressType");
-+
- 	store_device_info(device);
+ struct link_key_info {
+ 	bdaddr_t bdaddr;
++	uint8_t bdaddr_type;
+ 	unsigned char key[16];
+ 	uint8_t type;
+ 	uint8_t pin_len;
+@@ -3964,7 +3965,9 @@ static bool is_blocked_key(uint8_t key_type, uint8_t *key_value)
+ 	return false;
  }
+ 
+-static struct link_key_info *get_key_info(GKeyFile *key_file, const char *peer)
++static struct link_key_info *get_key_info(GKeyFile *key_file, const char *peer,
++					uint8_t bdaddr_type)
++
+ {
+ 	struct link_key_info *info = NULL;
+ 	char *str;
+@@ -3976,6 +3979,7 @@ static struct link_key_info *get_key_info(GKeyFile *key_file, const char *peer)
+ 	info = g_new0(struct link_key_info, 1);
+ 
+ 	str2ba(peer, &info->bdaddr);
++	info->bdaddr_type = bdaddr_type;
+ 
+ 	if (!strncmp(str, "0x", 2))
+ 		str2buf(&str[2], info->key, sizeof(info->key));
+@@ -4343,7 +4347,7 @@ static void load_link_keys(struct btd_adapter *adapter, GSList *keys,
+ 		struct link_key_info *info = l->data;
+ 
+ 		bacpy(&key->addr.bdaddr, &info->bdaddr);
+-		key->addr.type = BDADDR_BREDR;
++		key->addr.type = info->bdaddr_type;
+ 		key->type = info->type;
+ 		memcpy(key->val, info->key, 16);
+ 		key->pin_len = info->pin_len;
+@@ -4598,14 +4602,18 @@ static void load_conn_params(struct btd_adapter *adapter, GSList *params)
+ 		btd_error(adapter->dev_id, "Load connection parameters failed");
+ }
+ 
+-static uint8_t get_le_addr_type(GKeyFile *keyfile)
++static uint8_t get_addr_type(GKeyFile *keyfile)
+ {
+ 	uint8_t addr_type;
+ 	char *type;
+ 
++	/* The AddressType is written to file only When dev->le is
++	 * set to true, as referenced in the update_technologies().
++	 * Therefore, When type is NULL, it default to BDADDR_BREDR.
++	 */
+ 	type = g_key_file_get_string(keyfile, "General", "AddressType", NULL);
+ 	if (!type)
+-		return BDADDR_LE_PUBLIC;
++		return BDADDR_BREDR;
+ 
+ 	if (g_str_equal(type, "public"))
+ 		addr_type = BDADDR_LE_PUBLIC;
+@@ -4914,9 +4922,9 @@ static void load_devices(struct btd_adapter *adapter)
+ 			g_clear_error(&gerr);
+ 		}
+ 
+-		key_info = get_key_info(key_file, entry->d_name);
++		bdaddr_type = get_addr_type(key_file);
+ 
+-		bdaddr_type = get_le_addr_type(key_file);
++		key_info = get_key_info(key_file, entry->d_name, bdaddr_type);
+ 
+ 		ltk_info = get_ltk_info(key_file, entry->d_name, bdaddr_type);
  
 -- 
 2.34.1
