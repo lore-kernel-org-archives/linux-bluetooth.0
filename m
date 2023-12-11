@@ -1,82 +1,381 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I8Zrfx2C"
-Received: from mail-qv1-xf34.google.com (mail-qv1-xf34.google.com [IPv6:2607:f8b0:4864:20::f34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53E69BE
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Dec 2023 13:12:27 -0800 (PST)
-Received: by mail-qv1-xf34.google.com with SMTP id 6a1803df08f44-67ac8e5566cso35967666d6.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Dec 2023 13:12:27 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PTkIDe5B"
+Received: from mail-ot1-x32d.google.com (mail-ot1-x32d.google.com [IPv6:2607:f8b0:4864:20::32d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D32BCE
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Dec 2023 13:25:24 -0800 (PST)
+Received: by mail-ot1-x32d.google.com with SMTP id 46e09a7af769-6da1b71a085so621708a34.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Dec 2023 13:25:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702329146; x=1702933946; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=DZ/ONtyhmRxhI7zxUdA6+jajdmdO3TIpJG9k80JOTMs=;
-        b=I8Zrfx2CFOEohbG/uV2G5Sty3uPp6sgDHnXEBCftH5G3GgxClNnuLW+RGbOrD9S16g
-         J9EuMCgbmm4eCodOjYAF+WjG/WghQ+r538ufp9X5/xB+2vm3jzL/P+/7y3utSsIq/Ogl
-         Fh+LQu3WfygD/a1S2UHwp3lhJprFSHatg2oL6XbN+MzjEr92BIzN0ROIS0onyoVYQxiZ
-         J81f4Oh4jYj+rq6Pxilisgxa+UZ0ZWRIxBE8Egi3GbcWUqTrMDyfVopYCCu+TGG25GO/
-         Xdd6btDJu5zrmjQod9HEc3hQCW2AQ6E62lDmTDedBhEDCgkFfy6NtCZUOQLaYUMMZ+TU
-         dilw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702329146; x=1702933946;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20230601; t=1702329922; x=1702934722; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=DZ/ONtyhmRxhI7zxUdA6+jajdmdO3TIpJG9k80JOTMs=;
-        b=BPxpMchzMub9mFxzsFsTyD54bcCVRbLv9+morR5XN9pi1ifcShN3Py3bSa0v7AFkAv
-         r2Rsghaoag8RJmd8gIaFjg6QovgVZmQvdZbKn3aK3k+qbUGnse/QqhUJXOTqeYULVCQU
-         FG0tLkkggneldDWhDWmjkvAdwm8FlsJmE4eezB+vP4ZzTr7GUmV6tAohGI5zcVNBVlWP
-         Ct0Ou8oHXVKClMF1z1BNTGEsmyn/aruZ1TbiCi4733+J1yuSsOSeEmF+JGo50CqvOzbl
-         Alw2NyxWo/YVLHIkkebThlE5TjcMrRJ91TBla1GhMouu16ghIrZ41mdq2Og0b+pyxgZv
-         YsVw==
-X-Gm-Message-State: AOJu0YweWSqazT0AdAVao0arTNHxJnjK99J3JQ/E7xqJBHk6iD+ZXrSo
-	UHgw4X3AToJYASzvs2f2coWEQgsCDbA=
-X-Google-Smtp-Source: AGHT+IHaAgtZxzW++XkmpVwPww1Mibrxno5PmDDD8tQxLs/VgjmKwFJc83AhBG90HZ8G/98pxyyl4g==
-X-Received: by 2002:a0c:e58e:0:b0:67a:8ff2:34de with SMTP id t14-20020a0ce58e000000b0067a8ff234demr5662174qvm.6.1702329146291;
-        Mon, 11 Dec 2023 13:12:26 -0800 (PST)
-Received: from [172.17.0.2] ([20.55.14.244])
-        by smtp.gmail.com with ESMTPSA id d17-20020a0cea91000000b0067eabe0116dsm3335705qvp.72.2023.12.11.13.12.25
+        bh=MU9Bl/ROmFqzncJfrTjS7LjxsoZjf0OcynIXY+eLH3s=;
+        b=PTkIDe5BuzIwOH8uEF6F+4SdtnI7vE60tKVZ3mbIhxUeuU/CAnDdf7+iiUUcjr+XoN
+         Z5bf3DVRqdFxKXZ4Se6sAl7ZOKS/ZUMOnCMSDz/tHVY77IccLVLhgy1pcGdC8DQ6Ll7b
+         EyOwO2kNaF5Y2JTKm/FNNMiJA1zEuDL3znB9u0YFcM4aSQk6e64sXYk5T88zKtU53XtR
+         8IrfJoTPrrhf6k9VhYVK/yYpZiUc2yIQ1zQZHnSLmD/wflXqEHqnbzN+EbRYUoenmyYd
+         nZBL6kua/BeZfBzAAh2SG/j92gpXXilERXAfO/CaJuzhljj8HY7zFEfS3fO9r8VHA+vw
+         pKTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702329922; x=1702934722;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MU9Bl/ROmFqzncJfrTjS7LjxsoZjf0OcynIXY+eLH3s=;
+        b=P0NLCFRPv3busU+JYZhHcaJqfv5/vUa10yJ0uOujGtCdYXoLxxgJlH4ULeDNd76sjo
+         FjfaY2qVoAP1oAkFC7FhL4SgQ3qaohs5ZbP11vy8gdq4pHf9LgCd/WmHK9tLwwf5DXzD
+         QNn/h7N3+MweFagjBh1kTS3Qd5sUh/g4jL/z4vSBMRDI33hMYBPbXGyov2uwhEdlSL5V
+         2nCbb40i+hGwuadgIiKjef2bhOkLUYtTCMzBv2PNFlWm/d4ZGtLPYynGJZPrXd7HZOSN
+         ptZ8EZzKShR1Qzbpo+WfTY8ci0/WMzurQDEB2lLgpztFyIynNkDPLLirZ9FMcPZyRFgW
+         pcZA==
+X-Gm-Message-State: AOJu0YxAv0ucOCCtsX4SUH41eH94lIfRtZ7obppRH8XaPmmTVhfrmtJL
+	OMDwy8bq5s6NjjnQA2mfFcGLoZ8XoI0=
+X-Google-Smtp-Source: AGHT+IHmMfPwqdveqA02vZO+MiksZtI6PYbx4cLNGlH9TRazsGhteYU+e8FVT7tUV5wUu9GlpNs+BQ==
+X-Received: by 2002:a9d:67c6:0:b0:6d9:efff:529d with SMTP id c6-20020a9d67c6000000b006d9efff529dmr2918484otn.28.1702329922056;
+        Mon, 11 Dec 2023 13:25:22 -0800 (PST)
+Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
+        by smtp.gmail.com with ESMTPSA id s38-20020a0568302aa600b006da11489f70sm873757otu.44.2023.12.11.13.25.19
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Dec 2023 13:12:25 -0800 (PST)
-Message-ID: <65777b39.0c0a0220.fe537.dcf3@mx.google.com>
-Date: Mon, 11 Dec 2023 13:12:25 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7824269921563304361=="
+        Mon, 11 Dec 2023 13:25:20 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v4 2/6] shared/bap: Make bt_bap_select match the channel map
+Date: Mon, 11 Dec 2023 16:25:12 -0500
+Message-ID: <20231211212516.577426-2-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20231211212516.577426-1-luiz.dentz@gmail.com>
+References: <20231211212516.577426-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v3,1/6] bap: Allow setup of multiple stream per endpoint
-In-Reply-To: <20231211210429.530964-1-luiz.dentz@gmail.com>
-References: <20231211210429.530964-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============7824269921563304361==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is an automated email and please do not reply to this email.
+bt_bap_pac may actually map to multiple PAC records and each may have a
+different channel count that needs to be matched separately, for
+instance when trying with EarFun Air Pro:
 
-Dear Submitter,
+< ACL Data TX: Handle 2048 flags 0x00 dlen 85
+      ATT: Write Command (0x52) len 80
+        Handle: 0x0098 Type: ASE Control Point (0x2bc6)
+          Data: 010405020206000000000a020103020201030428000602020600000
+	  0000a0201030202010304280001020206000000000a020103020201030428
+	  0002020206000000000a02010302020103042800
+            Opcode: Codec Configuration (0x01)
+            Number of ASE(s): 4
+            ASE: #0
+            ASE ID: 0x05
+            Target Latency: Balance Latency/Reliability (0x02)
+            PHY: 0x02
+            LE 2M PHY (0x02)
+            Codec: LC3 (0x06)
+            Codec Specific Configuration: #0: len 0x02 type 0x01
+              Sampling Frequency: 16 Khz (0x03)
+            Codec Specific Configuration: #1: len 0x02 type 0x02
+              Frame Duration: 10 ms (0x01)
+            Codec Specific Configuration: #2: len 0x03 type 0x04
+              Frame Length: 40 (0x0028)
+            ASE: #1
+            ASE ID: 0x06
+            Target Latency: Balance Latency/Reliability (0x02)
+            PHY: 0x02
+            LE 2M PHY (0x02)
+            Codec: LC3 (0x06)
+            Codec Specific Configuration: #0: len 0x02 type 0x01
+              Sampling Frequency: 16 Khz (0x03)
+            Codec Specific Configuration: #1: len 0x02 type 0x02
+              Frame Duration: 10 ms (0x01)
+            Codec Specific Configuration: #2: len 0x03 type 0x04
+              Frame Length: 40 (0x0028)
+            ASE: #2
+            ASE ID: 0x01
+            Target Latency: Balance Latency/Reliability (0x02)
+            PHY: 0x02
+            LE 2M PHY (0x02)
+            Codec: LC3 (0x06)
+            Codec Specific Configuration: #0: len 0x02 type 0x01
+              Sampling Frequency: 16 Khz (0x03)
+            Codec Specific Configuration: #1: len 0x02 type 0x02
+              Frame Duration: 10 ms (0x01)
+            Codec Specific Configuration: #2: len 0x03 type 0x04
+              Frame Length: 40 (0x0028)
+            ASE: #3
+            ASE ID: 0x02
+            Target Latency: Balance Latency/Reliability (0x02)
+            PHY: 0x02
+            LE 2M PHY (0x02)
+            Codec: LC3 (0x06)
+            Codec Specific Configuration: #0: len 0x02 type 0x01
+              Sampling Frequency: 16 Khz (0x03)
+            Codec Specific Configuration: #1: len 0x02 type 0x02
+              Frame Duration: 10 ms (0x01)
+            Codec Specific Configuration: #2: len 0x03 type 0x04
+              Frame Length: 40 (0x0028)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-
-error: patch failed: profiles/audio/bap.c:1902
-error: profiles/audio/bap.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
+Fixes: https://github.com/bluez/bluez/issues/612
 ---
-Regards,
-Linux Bluetooth
+ profiles/audio/bap.c |  6 +--
+ src/shared/bap.c     | 87 ++++++++++++++++++++++++++++++++++++++++----
+ src/shared/bap.h     |  3 +-
+ src/shared/util.c    | 43 ++++++++++++++++++++++
+ src/shared/util.h    |  6 +++
+ 5 files changed, 132 insertions(+), 13 deletions(-)
 
+diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
+index 38eaea055ed2..6fe45281150f 100644
+--- a/profiles/audio/bap.c
++++ b/profiles/audio/bap.c
+@@ -1290,10 +1290,8 @@ static bool pac_found(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
+ 	}
+ 
+ 	/* TODO: Cache LRU? */
+-	if (btd_service_is_initiator(service)) {
+-		if (!bt_bap_select(lpac, rpac, select_cb, ep))
+-			ep->data->selecting++;
+-	}
++	if (btd_service_is_initiator(service))
++		bt_bap_select(lpac, rpac, &ep->data->selecting, select_cb, ep);
+ 
+ 	return true;
+ }
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index e9d7072ef3be..cb505d1564d6 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -185,6 +185,7 @@ struct bt_bap_pac {
+ 	struct bt_bap_pac_qos qos;
+ 	struct iovec *data;
+ 	struct iovec *metadata;
++	struct queue *chan_map;
+ 	struct bt_bap_pac_ops *ops;
+ 	void *user_data;
+ };
+@@ -2417,6 +2418,33 @@ static void *ltv_merge(struct iovec *data, struct iovec *cont)
+ 	return iov_append(data, cont->iov_len, cont->iov_base);
+ }
+ 
++static void bap_pac_foreach_channel(size_t i, uint8_t l, uint8_t t, uint8_t *v,
++					void *user_data)
++{
++	struct bt_bap_pac *pac = user_data;
++
++	if (!v)
++		return;
++
++	if (!pac->chan_map)
++		pac->chan_map = queue_new();
++
++	printf("PAC %p chan_map 0x%02x\n", pac, *v);
++
++	queue_push_tail(pac->chan_map, UINT_TO_PTR(*v));
++}
++
++static void bap_pac_update_chan_map(struct bt_bap_pac *pac, struct iovec *data)
++{
++	uint8_t type = 0x03;
++
++	if (!data)
++		return;
++
++	util_ltv_foreach(data->iov_base, data->iov_len, &type,
++				bap_pac_foreach_channel, pac);
++}
++
+ static void bap_pac_merge(struct bt_bap_pac *pac, struct iovec *data,
+ 					struct iovec *metadata)
+ {
+@@ -2426,6 +2454,9 @@ static void bap_pac_merge(struct bt_bap_pac *pac, struct iovec *data,
+ 	else
+ 		pac->data = util_iov_dup(data, 1);
+ 
++	/* Update channel map */
++	bap_pac_update_chan_map(pac, data);
++
+ 	/* Merge metadata into existing record */
+ 	if (pac->metadata)
+ 		ltv_merge(pac->metadata, metadata);
+@@ -2448,10 +2479,9 @@ static struct bt_bap_pac *bap_pac_new(struct bt_bap_db *bdb, const char *name,
+ 	pac->type = type;
+ 	if (codec)
+ 		pac->codec = *codec;
+-	if (data)
+-		pac->data = util_iov_dup(data, 1);
+-	if (metadata)
+-		pac->metadata = util_iov_dup(metadata, 1);
++
++	bap_pac_merge(pac, data, metadata);
++
+ 	if (qos)
+ 		pac->qos = *qos;
+ 
+@@ -2465,6 +2495,7 @@ static void bap_pac_free(void *data)
+ 	free(pac->name);
+ 	util_iov_free(pac->metadata, 1);
+ 	util_iov_free(pac->data, 1);
++	queue_destroy(pac->chan_map, NULL);
+ 	free(pac);
+ }
+ 
+@@ -4505,7 +4536,16 @@ static bool find_ep_pacs(const void *data, const void *user_data)
+ 	if (ep->stream->lpac != match->lpac)
+ 		return false;
+ 
+-	return ep->stream->rpac == match->rpac;
++	if (ep->stream->rpac != match->rpac)
++		return false;
++
++	switch (ep->state) {
++	case BT_BAP_STREAM_STATE_CONFIG:
++	case BT_BAP_STREAM_STATE_QOS:
++		return true;
++	}
++
++	return false;
+ }
+ 
+ static struct bt_bap_req *bap_req_new(struct bt_bap_stream *stream,
+@@ -4626,16 +4666,47 @@ static bool match_pac(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
+ }
+ 
+ int bt_bap_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
+-			bt_bap_pac_select_t func, void *user_data)
++			int *count, bt_bap_pac_select_t func,
++			void *user_data)
+ {
++	const struct queue_entry *lchan, *rchan;
++
+ 	if (!lpac || !rpac || !func)
+ 		return -EINVAL;
+ 
+ 	if (!lpac->ops || !lpac->ops->select)
+ 		return -EOPNOTSUPP;
+ 
+-	lpac->ops->select(lpac, rpac, &rpac->qos,
+-					func, user_data, lpac->user_data);
++	for (lchan = queue_get_entries(lpac->chan_map); lchan;
++					lchan = lchan->next) {
++		uint8_t lmap = PTR_TO_UINT(lchan->data);
++
++		for (rchan = queue_get_entries(rpac->chan_map); rchan;
++					rchan = rchan->next) {
++			uint8_t rmap = PTR_TO_UINT(rchan->data);
++
++			printf("lmap 0x%02x rmap 0x%02x\n", lmap, rmap);
++
++			/* Try matching the channel mapping */
++			if (lmap & rmap) {
++				lpac->ops->select(lpac, rpac, &rpac->qos,
++							func, user_data,
++							lpac->user_data);
++				if (count)
++					(*count)++;
++
++				/* Check if there are any channels left */
++				lmap &= ~(lmap & rmap);
++				if (!lmap)
++					break;
++
++				/* Check if device require AC*(i) settings */
++				if (rmap == 0x01)
++					lmap = lmap >> 1;
++			} else
++				break;
++		}
++	}
+ 
+ 	return 0;
+ }
+diff --git a/src/shared/bap.h b/src/shared/bap.h
+index 2c8f9208e6ba..470313e66fc0 100644
+--- a/src/shared/bap.h
++++ b/src/shared/bap.h
+@@ -234,7 +234,8 @@ void *bt_bap_pac_get_user_data(struct bt_bap_pac *pac);
+ 
+ /* Stream related functions */
+ int bt_bap_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
+-			bt_bap_pac_select_t func, void *user_data);
++			int *count, bt_bap_pac_select_t func,
++			void *user_data);
+ 
+ struct bt_bap_stream *bt_bap_stream_new(struct bt_bap *bap,
+ 					struct bt_bap_pac *lpac,
+diff --git a/src/shared/util.c b/src/shared/util.c
+index 34491f4e5a56..c0c2c4a17f12 100644
+--- a/src/shared/util.c
++++ b/src/shared/util.c
+@@ -175,6 +175,49 @@ ltv_debugger(const struct util_ltv_debugger *debugger, size_t num, uint8_t type)
+ 	return NULL;
+ }
+ 
++/* Helper to itertate over LTV entries */
++bool util_ltv_foreach(const uint8_t *data, uint8_t len, uint8_t *type,
++			util_ltv_func_t func, void *user_data)
++{
++	struct iovec iov;
++	int i;
++
++	if (!func)
++		return false;
++
++	iov.iov_base = (void *) data;
++	iov.iov_len = len;
++
++	for (i = 0; iov.iov_len; i++) {
++		uint8_t l, t, *v;
++
++		if (!util_iov_pull_u8(&iov, &l))
++			return false;
++
++		if (!l) {
++			func(i, l, 0, NULL, user_data);
++			continue;
++		}
++
++		if (!util_iov_pull_u8(&iov, &t))
++			return false;
++
++		l--;
++
++		if (l) {
++			v = util_iov_pull_mem(&iov, l);
++			if (!v)
++				return false;
++		} else
++			v = NULL;
++
++		if (!type || *type == t)
++			func(i, l, t, v, user_data);
++	}
++
++	return true;
++}
++
+ /* Helper to print debug information of LTV entries */
+ bool util_debug_ltv(const uint8_t *data, uint8_t len,
+ 			const struct util_ltv_debugger *debugger, size_t num,
+diff --git a/src/shared/util.h b/src/shared/util.h
+index 6698d00415de..596663b8519c 100644
+--- a/src/shared/util.h
++++ b/src/shared/util.h
+@@ -138,6 +138,12 @@ bool util_debug_ltv(const uint8_t *data, uint8_t len,
+ 			const struct util_ltv_debugger *debugger, size_t num,
+ 			util_debug_func_t function, void *user_data);
+ 
++typedef void (*util_ltv_func_t)(size_t i, uint8_t l, uint8_t t, uint8_t *v,
++					void *user_data);
++
++bool util_ltv_foreach(const uint8_t *data, uint8_t len, uint8_t *type,
++			util_ltv_func_t func, void *user_data);
++
+ unsigned char util_get_dt(const char *parent, const char *name);
+ 
+ ssize_t util_getrandom(void *buf, size_t buflen, unsigned int flags);
+-- 
+2.43.0
 
---===============7824269921563304361==--
