@@ -1,100 +1,98 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LLC4iAX1"
-Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EEE08E
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Dec 2023 09:03:33 -0800 (PST)
-Received: by mail-qk1-x736.google.com with SMTP id af79cd13be357-77f3159d822so260787585a.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Dec 2023 09:03:33 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NnDjTWJ0"
+Received: from mail-oo1-xc32.google.com (mail-oo1-xc32.google.com [IPv6:2607:f8b0:4864:20::c32])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9902ACD
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Dec 2023 09:11:39 -0800 (PST)
+Received: by mail-oo1-xc32.google.com with SMTP id 006d021491bc7-59067f03282so2672457eaf.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Dec 2023 09:11:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702314212; x=1702919012; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=1NAdkTY1wBGLLv3GA3+K61JIb3FG3uvaXO2cShHAGP8=;
-        b=LLC4iAX1czbMzcb677ygw586NZFC8UqrmkKy5vwygZwKLPZW5cxaGs0kzVhbYr+Jt6
-         OJxwiTkQsRRtLe+Vgu/Ho+6pinpfGUpUBxkxKDGuqOLkWSgYqdKROgSkLEgwLnZTH27A
-         St5Kbo3lbINn61Z6ictCdeUhlOb8LMsGQ70xtY5ycIWRsaV5ptSYo5SrPglKztMKt2Mq
-         33pvnKdS6tPEXAAAcQp3EjeM7HJtHo31ZsgMT4TkzUw+9wuZFp0uEUVETSxY7ZBJaiXC
-         dr80bY8ZJTTdPrBmz1hf+gruDFaPzwrmmtlPclckLve+8O8nImRS27SM7wmcn5NO4U6M
-         0h8g==
+        d=gmail.com; s=20230601; t=1702314698; x=1702919498; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0VYsxF8iendFvCfB30+cNtqoKLEuvblDibwWIJ47MoI=;
+        b=NnDjTWJ0KRP/Dvo4cipwNlSFrNYVH25OM2Y0axxpeLb8ZWz4Zq11iKelcyYX/AK1SQ
+         db5C8kkE0RgVxoonvWf/WRpylz4lKLedfrmD8MnwXjBrAlUliqbQbGVg200If7VQmS9j
+         Y06MeyPKmzJHpGpQeoEkBT85+cP/PhcaQf63GmQ8LI5rh3OHDFYFOXLcQe/0zhJlnEZq
+         /i8No416ancD2WS1vgheNWSVtRJTq1XIRh4v/MOcmmx5EBn6O+6hFL9c/Z3+Gmc/dDQr
+         O465Ts6aUHGYwWBcBK3dvcgE5KpJzgXhwyIKd7UoiRmLl84n+Awcf9N0rLM+/c9OIcAg
+         zzOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702314212; x=1702919012;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1NAdkTY1wBGLLv3GA3+K61JIb3FG3uvaXO2cShHAGP8=;
-        b=Vm+bQLwinHxGZlDQBMnEMcJmsdh2I67QxOfnX8P9HOGi4b7apGu7odRCgjW9AVOZdL
-         Ye9v845/nWxvIQ+hMei07x/bf7KONXp04KiyaMuuZck0WYwuNG39MR3hWGCZsrJEJS2c
-         Ck2hwwcfZDU0LLw6hXoQTu8a+R0Z2Ozq8M+2BILldX1rIVxs5H+Aom2IlX8mTQntTJBX
-         2W6Ya9MbG/SNz8jYx+HFSZhExIE+gt5pSuqO0JXk53ej6mPxKvdVdaxf98EG5Pax66r0
-         G8kZWoObGOl/N9uf0VEJkM/DXblApT75BmriWHRnNErnIlzK5Jr7c4ouVIwKepbkzCoE
-         7RyA==
-X-Gm-Message-State: AOJu0Yx7Sg5cFVmZe/y5vsytI+RqRD8Ij3HLpNSczWN5r5Hxykaa4BI3
-	hfLaItGZ9BeGqvhjE1bUozFtV8B8s9Q=
-X-Google-Smtp-Source: AGHT+IGFJi/Ns8jL+CILdp2CVx5/C4YLDHgtZvbg89DXrE28LkckUpEpfv/Zy5sFMyoXLY8ouxrXvA==
-X-Received: by 2002:ac8:7dc6:0:b0:425:4043:1d93 with SMTP id c6-20020ac87dc6000000b0042540431d93mr7570767qte.102.1702314212542;
-        Mon, 11 Dec 2023 09:03:32 -0800 (PST)
-Received: from [172.17.0.2] ([20.55.118.241])
-        by smtp.gmail.com with ESMTPSA id fj26-20020a05622a551a00b004181e5a724csm3161218qtb.88.2023.12.11.09.03.32
+        d=1e100.net; s=20230601; t=1702314698; x=1702919498;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0VYsxF8iendFvCfB30+cNtqoKLEuvblDibwWIJ47MoI=;
+        b=JSilgnHIjnNNLtJMV9xzY68yq/Xb/NugDtCSfOPXH3P++9hQrrxg8/CrMByv0gkEQw
+         hFzqM70t8L5G/LVBu0A7/sdkrtK9189i8Ps0LmM+5/GVpxkOTtI0LDKvBcFZCizEWiWn
+         nsbswGg97S38qnKGqg6jnUYerP077StsqlBWw60NOLgitbVOXPSRfYBtAZMx2/XwxOQo
+         cRdBB3hqNOIui3mO9xmoGC2uM/u1y/lG8mB2LrtcQQJ+25zbWTEO4bNENaBdGlRJoL/t
+         bjqyKdOTh21CPjFUywmQTJ9wmSe+Zs94/n+Efei+j0BZYqUq/OkxPCPH7FTUbV30GGtW
+         ehJQ==
+X-Gm-Message-State: AOJu0YzGX9a+yOc6ALSYtqGA2WS6zKzNHFFj2unmn955ln11zP+ngiw5
+	ixAskuHN8bHr1pCBEB/7en7/NWb5OC4=
+X-Google-Smtp-Source: AGHT+IEC+gPHMqizTQr04z1omq4RcaWiDDLQ1Rjz3hnazJLPgsaA/HvQvu7UxBAuOs7mds7UgNC68g==
+X-Received: by 2002:a05:6820:1501:b0:58e:1c48:1edb with SMTP id ay1-20020a056820150100b0058e1c481edbmr3075263oob.13.1702314698137;
+        Mon, 11 Dec 2023 09:11:38 -0800 (PST)
+Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
+        by smtp.gmail.com with ESMTPSA id z20-20020a4a6554000000b0059089f2e461sm1913779oog.0.2023.12.11.09.11.36
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Dec 2023 09:03:32 -0800 (PST)
-Message-ID: <657740e4.050a0220.21090.c704@mx.google.com>
-Date: Mon, 11 Dec 2023 09:03:32 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7710129492109795894=="
+        Mon, 11 Dec 2023 09:11:37 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] shared/vcp: Fix notification endianness
+Date: Mon, 11 Dec 2023 12:11:35 -0500
+Message-ID: <20231211171135.437354-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, xiaokeqinhealth@126.com
-Subject: RE: [v2] Bluetooth: MGMT/SMP: Fix address type when using SMP over BREDR/LE
-In-Reply-To: <20231211162718.1183182-1-xiaokeqinhealth@126.com>
-References: <20231211162718.1183182-1-xiaokeqinhealth@126.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============7710129492109795894==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=808857
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.97 seconds
-GitLint                       PASS      0.32 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      28.32 seconds
-CheckAllWarning               PASS      30.46 seconds
-CheckSparse                   PASS      35.55 seconds
-CheckSmatch                   PASS      99.32 seconds
-BuildKernel32                 PASS      27.28 seconds
-TestRunnerSetup               PASS      425.70 seconds
-TestRunner_l2cap-tester       PASS      21.55 seconds
-TestRunner_iso-tester         PASS      46.09 seconds
-TestRunner_bnep-tester        PASS      7.20 seconds
-TestRunner_mgmt-tester        PASS      166.94 seconds
-TestRunner_rfcomm-tester      PASS      11.28 seconds
-TestRunner_sco-tester         PASS      15.01 seconds
-TestRunner_ioctl-tester       PASS      12.73 seconds
-TestRunner_mesh-tester        PASS      9.13 seconds
-TestRunner_smp-tester         PASS      12.90 seconds
-TestRunner_userchan-tester    PASS      7.51 seconds
-IncrementalBuild              PASS      26.36 seconds
-
-
-
+4db4d5fa1c4f ("shared/vcp: Fix endianness errors") does attempt to fix
+the endianness of stored volume offset but in the process it broke the
+notification since the value is no longer stored in the Bluetooth byte
+order (Little Endian) but instead in the cpu byte order which is then
+used in the notification as is, to fix this instead of notifying using
+the stored value it now uses a dedicated variable which does use the
+value from the request itself.
 ---
-Regards,
-Linux Bluetooth
+ src/shared/vcp.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
+diff --git a/src/shared/vcp.c b/src/shared/vcp.c
+index 5d163266b480..e3451fa2a095 100644
+--- a/src/shared/vcp.c
++++ b/src/shared/vcp.c
+@@ -683,7 +683,7 @@ static uint8_t vocs_set_vol_offset(struct bt_vocs *vocs, struct bt_vcp *vcp,
+ 				struct iovec *iov)
+ {
+ 	struct bt_vcp_db *vdb;
+-	struct vol_offset_state *vstate;
++	struct vol_offset_state *vstate, state;
+ 	struct bt_vocs_set_vol_off *req;
+ 
+ 	DBG(vcp, "Set Volume Offset");
+@@ -720,9 +720,13 @@ static uint8_t vocs_set_vol_offset(struct bt_vocs *vocs, struct bt_vcp *vcp,
+ 	/* Increment Change Counter */
+ 	vstate->counter = -~vstate->counter;
+ 
+-	gatt_db_attribute_notify(vdb->vocs->vos, (void *)vstate,
+-				 sizeof(struct vol_offset_state),
++	/* Notify change */
++	state.vol_offset = req->set_vol_offset;
++	state.counter = vstate->counter;
++
++	gatt_db_attribute_notify(vdb->vocs->vos, (void *)&state, sizeof(state),
+ 				 bt_vcp_get_att(vcp));
++
+ 	return 0;
+ }
+ 
+-- 
+2.43.0
 
---===============7710129492109795894==--
