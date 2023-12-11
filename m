@@ -1,95 +1,74 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b="6WiLE4GA"
-Received: from mail.andi.de1.cc (mail.andi.de1.cc [IPv6:2a02:c205:3004:2154::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4444CF;
-	Sun, 10 Dec 2023 13:50:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=kemnade.info; s=20220719; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:References:In-Reply-To:Message-ID:Subject:Cc:To:From:Date:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=FewMH2e65vLlSlAlvvNbXt8MICx3KL/gTD+zmuCLG/M=; b=6WiLE4GA5TFbCooHIYnga01kqi
-	C9hC0tViHv8oP/IZ6ouEkJOJNTTBo9p9fDtohOZQrmuQE/sn1LhQYcz9RrtbjbA5scS17WxgpJB/a
-	19cH/bH7JhQX0j/yQulhoVdzdL+vzgT5afCQLKFQj9NeoWKOn6HfgLJaZn4eI4oU63nyIIhh62cDk
-	7i8TvxqJnsgft3IGV+iWvvS95Drk1+D6redXYCChqM8SemB515nFbJ+AO0wPJeotDuI9rMqyZtd/f
-	8XZjfOXNs4lSWIyfbTjYIwi7emWjZAgwvn7KnzznksExdl8fythfBpONpgD1ooTCCyqp6bRJvJdR3
-	1zALeNZw==;
-Received: from p200301077700c3001a3da2fffebfd33a.dip0.t-ipconnect.de ([2003:107:7700:c300:1a3d:a2ff:febf:d33a] helo=aktux)
-	by mail.andi.de1.cc with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <andreas@kemnade.info>)
-	id 1rCRh5-007FGn-Fp; Sun, 10 Dec 2023 22:50:35 +0100
-Date: Sun, 10 Dec 2023 22:50:32 +0100
-From: Andreas Kemnade <andreas@kemnade.info>
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
- johan@kernel.org, arnd@arndb.de, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, tomi.valkeinen@ideasonboard.com, Tony
- Lindgren <tony@atomide.com>, =?UTF-8?B?UMOpdGVy?= Ujfalusi
- <peter.ujfalusi@gmail.com>, robh@kernel.org
-Subject: Re: [RFC PATCH 3/3] drivers: misc: ti-st: begin to deorbit
-Message-ID: <20231210225032.38d8c36f@aktux>
-In-Reply-To: <2023112729-qualify-relearn-6a72@gregkh>
-References: <20231126191840.110564-1-andreas@kemnade.info>
-	<20231126191840.110564-4-andreas@kemnade.info>
-	<2023112729-qualify-relearn-6a72@gregkh>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-pc-linux-gnu)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F/shY9Mg"
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BCEBB6
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Dec 2023 00:22:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702282976; x=1733818976;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=i86niv1nqiMIApRSykL6cnQkSDRcfNNPYZ2lRUuTGfU=;
+  b=F/shY9Mgn0Ei1IbhaQCr4QuGkjSUWE/gLRjbaicxTXsKm3fTrsvz4J7l
+   thw4CLpXfYuVIJN791t9Xs+eCe8F/Pairlx8rFRF6F+GrBHWZQZZPUmIY
+   SQTdtWcHI3UGUQjUlMzO2mJ4vb2BLJpI4voOWtwr8KikhoEvP9X9zntFE
+   hLvXVWYig2rjVy447VQcMTsRXawEGvyzbprrSN/mP38aSPvbym96aECnX
+   3HLPid/Co5571UfFveB6QnKffrCo/XMxJXHwdk7HbgJ/Wah7WiavYfmLj
+   lebcNIQdMJ8LQKY6UnXP8OZzHiHPBVtpmbNR8Y+41/hW/MqLaZauPNC8J
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10920"; a="1422652"
+X-IronPort-AV: E=Sophos;i="6.04,267,1695711600"; 
+   d="scan'208";a="1422652"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2023 00:22:55 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10920"; a="776582596"
+X-IronPort-AV: E=Sophos;i="6.04,267,1695711600"; 
+   d="scan'208";a="776582596"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by fmsmga007.fm.intel.com with ESMTP; 11 Dec 2023 00:22:54 -0800
+From: Kiran K <kiran.k@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: ravishankar.srivatsa@intel.com,
+	Kiran K <kiran.k@intel.com>
+Subject: [PATCH] shared/bap: Update Available context for source
+Date: Mon, 11 Dec 2023 14:05:07 +0530
+Message-Id: <20231211083507.3363494-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Greg,
+Available Context of sink was getting updated instead of source.
+---
+ src/shared/bap.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-On Mon, 27 Nov 2023 08:25:46 +0000
-Greg KH <gregkh@linuxfoundation.org> wrote:
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index a1495ca84bcc..e9d7072ef3be 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -2599,13 +2599,13 @@ static void pacs_add_source_supported_context(struct bt_pacs *pacs,
+ 
+ static void pacs_add_source_context(struct bt_pacs *pacs, uint16_t context)
+ {
+-	context |= pacs->supported_sink_context_value;
++	context |= pacs->supported_source_context_value;
+ 
+ 	/* Check if context value needs updating */
+-	if (context == pacs->sink_context_value)
++	if (context == pacs->source_context_value)
+ 		return;
+ 
+-	pacs->sink_context_value = context;
++	pacs->source_context_value = context;
+ 
+ 	pacs_context_changed(pacs);
+ }
+-- 
+2.34.1
 
-> On Sun, Nov 26, 2023 at 08:18:40PM +0100, Andreas Kemnade wrote:
-> > The TI-ST driver seems not to be used anymore. For bluetooth needs
-> > there is hci_ll.c which has device tree support and can work without
-> > this one. Also firmware download support is there, so it is also not needed
-> > here. GPS can also reuse parts of the framework in hci_ll
-> > 
-> > Contrary from this driver, device tree support has been removed.
-> > 
-> > So start deorbiting it by marking it as broken.
-> > 
-> > Signed-off-by: Andreas Kemnade <andreas@kemnade.info>
-> > ---
-> >  drivers/misc/ti-st/Kconfig | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/misc/ti-st/Kconfig b/drivers/misc/ti-st/Kconfig
-> > index 1503a6496f632..6bf9cc845745c 100644
-> > --- a/drivers/misc/ti-st/Kconfig
-> > +++ b/drivers/misc/ti-st/Kconfig
-> > @@ -7,7 +7,7 @@ menu "Texas Instruments shared transport line discipline"
-> >  config TI_ST
-> >  	tristate "Shared transport core driver"
-> >  	depends on NET && TTY
-> > -	depends on GPIOLIB || COMPILE_TEST
-> > +	depends on GPIOLIB || COMPILE_TEST || BROKEN  
-> 
-> Why not just delete it?  Why have it stick around any longer?
-> 
-Well, I just thought that marking something as broken and then deleting
-it if no one complains would be the standard procedure. So we can
-delete it now since there are obviously no users (no board files, no
-device tree support)?
-
-The logical connection between the other patches of this series is given
-only by the fact that patches 1+2 are for me the proof that we do not
-need that ti-st driver. 
-I think since there are no in-tree users, having that proof in lkml is
-enough, so we can probably remove the driver now?
-
-I will send a separate remove patch including going with a brush through
-include/linux/ti_wilink_st.h
-
-Regards,
-Andreas
