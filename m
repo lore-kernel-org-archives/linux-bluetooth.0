@@ -1,114 +1,151 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FH+YRpxL"
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE8B5A0
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Dec 2023 00:59:35 -0800 (PST)
-Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1d319a7a35bso6501835ad.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Dec 2023 00:59:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702285175; x=1702889975; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=qKZsj4ztesGgExG4wQG/JFmnNpoIiLPqhLh9K1hKS9I=;
-        b=FH+YRpxLZuHzxKoeqxG2ILazPmaxuZNlBo6HPPvfm4Ha448gTEBWoMZTX99R4zdRqs
-         0FWeYmG2ylUihMr4EWWpQc+g5SzcljVo6f9K/0cqZMe3yIgqed26dONzCDu1GkHsiuK0
-         +iYRPh6O2zT8tRAUEmyL3Wf0Ird7QBuVPTmb7pBdcAtUP1wnPteOKcOCOFbZ20HOtz7R
-         ZxJe0gHdXfAOStAJ6bZs04AZmrgIKoG874TtAoj+osWrS4+IuWYbzQGTmCZK0dEqPJBs
-         TEhG/zlGB2gY86d0u0IiR+yuCp3WIEtXEH2/3VtdiwoPgPOXNWDto3C8NKV0M1yzyAqH
-         +deQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702285175; x=1702889975;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qKZsj4ztesGgExG4wQG/JFmnNpoIiLPqhLh9K1hKS9I=;
-        b=tiNcM+OMNB2Wm4pZrp0YZTwxLbBfHk9gyI1h8JY7BewMmI6P/5vlQKSP882YaAbK3V
-         BqDhpHuCMJGTbdh43NPoAtYLY5QMW9bQoDXsa01HdebxIvm5NM09CsTnCTqwmNe+zDf7
-         Rzuy320CJenOV2spAnUQGjtrwIRUVcetz0HUl5Jchz5tgPOEYGISBYPi3KZgvaFMGvcc
-         dOuPRDuBr9Rw77m9VZViEmwJxYGhRaqucYYafipaTd/r4h+E7m+MIw5J+qxIX09My31E
-         02tEQ96qlZku8lxuh+/D19qJ4VPF/5kxTPrLNNWULGJHd+BZQSCFt6a3c1Y+LKijPeZQ
-         aRfQ==
-X-Gm-Message-State: AOJu0YzbhPUntL0Kc78GAeaTKquiGS0/E66HdF8F+0GCvmZVR4+MItRF
-	0gKLna5rYnL9UQR8NqrCVojD8FzUfqM=
-X-Google-Smtp-Source: AGHT+IEHT6GQA94bVt4s32oW4fE52//B1pQlYCi3E9Dzx16nsW5MJ9/CCYsiQuIu3ZuWVHZyi9hZxg==
-X-Received: by 2002:a17:902:db0b:b0:1d0:bc5f:ce62 with SMTP id m11-20020a170902db0b00b001d0bc5fce62mr4138284plx.107.1702285174944;
-        Mon, 11 Dec 2023 00:59:34 -0800 (PST)
-Received: from [172.17.0.2] ([20.171.122.189])
-        by smtp.gmail.com with ESMTPSA id v4-20020a17090331c400b001d0c5037ed3sm6168195ple.46.2023.12.11.00.59.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Dec 2023 00:59:34 -0800 (PST)
-Message-ID: <6576cf76.170a0220.a1291.0caa@mx.google.com>
-Date: Mon, 11 Dec 2023 00:59:34 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4435674666118046501=="
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C998AF5;
+	Mon, 11 Dec 2023 01:29:40 -0800 (PST)
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 3BB9TUX902633390, This message is accepted by code: ctloc85258
+Received: from RSEXMBS01.realsil.com.cn ([172.29.17.195])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 3BB9TUX902633390
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=FAIL);
+	Mon, 11 Dec 2023 17:29:32 +0800
+Received: from alexlu (172.29.36.158) by RSEXMBS01.realsil.com.cn
+ (172.29.17.195) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 11 Dec
+ 2023 17:29:30 +0800
+Date: Mon, 11 Dec 2023 17:29:21 +0800
+From: Alex Lu <alex_lu@realsil.com.cn>
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg
+	<johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: Max Chou <max.chou@realtek.com>, Karen Hsu <karenhsu@realtek.com>
+Subject: [PATCH v2] Bluetooth: Add more enc key size check
+Message-ID: <ZXbWcZPq_2zIbqEO@alexlu>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, alex_lu@realsil.com.cn
-Subject: RE: Bluetooth: Add more enc key size check
-In-Reply-To: <ZXbIWMZyZIYyetff@alexlu>
-References: <ZXbIWMZyZIYyetff@alexlu>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============4435674666118046501==
 Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+X-ClientProxiedBy: RSEXH36502.realsil.com.cn (172.29.17.3) To
+ RSEXMBS01.realsil.com.cn (172.29.17.195)
 
-This is automated email and please do not reply to this email!
+From: Alex Lu <alex_lu@realsil.com.cn>
 
-Dear submitter,
+When we are slave role and receives l2cap conn req when encryption has
+started, we should check the enc key size to avoid KNOB attack or BLUFFS
+attack.
+From SIG recommendation, implementations are advised to reject
+service-level connections on an encrypted baseband link with key
+strengths below 7 octets.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=808696
+The btmon log below shows the case that lacks enc key size check.
 
----Test result---
+> HCI Event: Connect Request (0x04) plen 10
+        Address: BB:22:33:44:55:99 (OUI BB-22-33)
+        Class: 0x480104
+          Major class: Computer (desktop, notebook, PDA, organizers)
+          Minor class: Desktop workstation
+          Capturing (Scanner, Microphone)
+          Telephony (Cordless telephony, Modem, Headset)
+        Link type: ACL (0x01)
+< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
+        Address: BB:22:33:44:55:99 (OUI BB-22-33)
+        Role: Peripheral (0x01)
+> HCI Event: Command Status (0x0f) plen 4
+      Accept Connection Request (0x01|0x0009) ncmd 2
+        Status: Success (0x00)
+> HCI Event: Connect Complete (0x03) plen 11
+        Status: Success (0x00)
+        Handle: 1
+        Address: BB:22:33:44:55:99 (OUI BB-22-33)
+        Link type: ACL (0x01)
+        Encryption: Disabled (0x00)
+...
 
-Test Summary:
-CheckPatch                    PASS      0.52 seconds
-GitLint                       PASS      0.24 seconds
-SubjectPrefix                 PASS      0.19 seconds
-BuildKernel                   PASS      27.94 seconds
-CheckAllWarning               PASS      30.11 seconds
-CheckSparse                   WARNING   36.38 seconds
-CheckSmatch                   PASS      98.37 seconds
-BuildKernel32                 PASS      26.50 seconds
-TestRunnerSetup               PASS      425.18 seconds
-TestRunner_l2cap-tester       PASS      23.09 seconds
-TestRunner_iso-tester         PASS      44.69 seconds
-TestRunner_bnep-tester        PASS      6.99 seconds
-TestRunner_mgmt-tester        FAIL      168.41 seconds
-TestRunner_rfcomm-tester      PASS      10.96 seconds
-TestRunner_sco-tester         PASS      14.52 seconds
-TestRunner_ioctl-tester       PASS      12.26 seconds
-TestRunner_mesh-tester        PASS      8.79 seconds
-TestRunner_smp-tester         PASS      10.18 seconds
-TestRunner_userchan-tester    PASS      7.36 seconds
-IncrementalBuild              PASS      25.61 seconds
+> HCI Event: Encryption Change (0x08) plen 4
+        Status: Success (0x00)
+        Handle: 1 Address: BB:22:33:44:55:99 (OUI BB-22-33)
+        Encryption: Enabled with E0 (0x01)
+< HCI Command: Read Encryption Key Size (0x05|0x0008) plen 2
+        Handle: 1 Address: BB:22:33:44:55:99 (OUI BB-22-33)
+> HCI Event: Command Complete (0x0e) plen 7
+      Read Encryption Key Size (0x05|0x0008) ncmd 2
+        Status: Success (0x00)
+        Handle: 1 Address: BB:22:33:44:55:99 (OUI BB-22-33)
+        Key size: 6
+...
 
-Details
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/l2cap_core.c:1676:52: warning: incorrect type in assignment (different base types)net/bluetooth/l2cap_core.c:1676:52:    expected restricted __le16 [assigned] [usertype] resultnet/bluetooth/l2cap_core.c:1676:52:    got int
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 497, Passed: 496 (99.8%), Failed: 1, Not Run: 0
+// We should check the enc key size
+> ACL Data RX: Handle 1 flags 0x02 dlen 12
+      L2CAP: Connection Request (0x02) ident 3 len 4
+        PSM: 25 (0x0019)
+        Source CID: 64
+< ACL Data TX: Handle 1 flags 0x00 dlen 16
+      L2CAP: Connection Response (0x03) ident 3 len 8
+        Destination CID: 64
+        Source CID: 64
+        Result: Connection pending (0x0001)
+        Status: Authorization pending (0x0002)
+> HCI Event: Number of Completed Packets (0x13) plen 5
+        Num handles: 1
+        Handle: 1 Address: BB:22:33:44:55:99 (OUI BB-22-33)
+        Count: 1
+        #35: len 16 (25 Kb/s)
+        Latency: 5 msec (2-7 msec ~4 msec)
+< ACL Data TX: Handle 1 flags 0x00 dlen 16
+      L2CAP: Connection Response (0x03) ident 3 len 8
+        Destination CID: 64
+        Source CID: 64
+        Result: Connection successful (0x0000)
+        Status: No further information available (0x0000)
 
-Failed Test Cases
-LL Privacy - Start Discovery 2 (Disable RL)          Failed       0.289 seconds
-
-
+Signed-off-by: Alex Lu <alex_lu@realsil.com.cn>
+Signed-off-by: Max Chou <max.chou@realtek.com>
 ---
-Regards,
-Linux Bluetooth
+Changes in v2:
+  - Fix compiling issue reported by sparse
 
+ net/bluetooth/l2cap_core.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
---===============4435674666118046501==--
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 17ca13e8c044..a9809fbe6b00 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1669,7 +1669,13 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 			rsp.dcid = cpu_to_le16(chan->scid);
+ 
+ 			if (l2cap_chan_check_security(chan, false)) {
+-				if (test_bit(FLAG_DEFER_SETUP, &chan->flags)) {
++				if (!l2cap_check_enc_key_size(conn->hcon)) {
++					l2cap_state_change(chan, BT_DISCONN);
++					__set_chan_timer(chan,
++							 L2CAP_DISC_TIMEOUT);
++					rsp.result = cpu_to_le16(L2CAP_CR_SEC_BLOCK);
++					rsp.status = cpu_to_le16(L2CAP_CS_NO_INFO);
++				} else if (test_bit(FLAG_DEFER_SETUP, &chan->flags)) {
+ 					rsp.result = cpu_to_le16(L2CAP_CR_PEND);
+ 					rsp.status = cpu_to_le16(L2CAP_CS_AUTHOR_PEND);
+ 					chan->ops->defer(chan);
+@@ -4202,7 +4208,15 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
+ 
+ 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE) {
+ 		if (l2cap_chan_check_security(chan, false)) {
+-			if (test_bit(FLAG_DEFER_SETUP, &chan->flags)) {
++			/* As slave role, we should check the enc key size when
++			 * l2cap conn req is received.
++			 */
++			if (!l2cap_check_enc_key_size(conn->hcon)) {
++				l2cap_state_change(chan, BT_DISCONN);
++				__set_chan_timer(chan, L2CAP_DISC_TIMEOUT);
++				result = L2CAP_CR_SEC_BLOCK;
++				status = L2CAP_CS_NO_INFO;
++			} else if (test_bit(FLAG_DEFER_SETUP, &chan->flags)) {
+ 				l2cap_state_change(chan, BT_CONNECT2);
+ 				result = L2CAP_CR_PEND;
+ 				status = L2CAP_CS_AUTHOR_PEND;
+-- 
+2.39.2
+
