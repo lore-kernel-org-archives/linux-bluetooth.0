@@ -1,105 +1,148 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CA+8/nLn"
-Received: from mail-yw1-x1132.google.com (mail-yw1-x1132.google.com [IPv6:2607:f8b0:4864:20::1132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F797E5;
-	Mon, 11 Dec 2023 18:28:39 -0800 (PST)
-Received: by mail-yw1-x1132.google.com with SMTP id 00721157ae682-5c08c47c055so50953537b3.1;
-        Mon, 11 Dec 2023 18:28:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702348118; x=1702952918; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6wHqKQ4J5MWfkES8HBul/HTYQa0latLedvfZPgLN9zs=;
-        b=CA+8/nLn7qwjjhRUs0p+i20R/fxU3WAFskgA0B5Hed7Fo+S0+u3Q2oZcjCgBoiU+wC
-         gXBgADrZSr8NVvmzx6qXpUu8QRLiE0Fno2qg0dgykS6elyJBnmDmHX1/y3Aj/TMyLjEc
-         wpdAhNSr0r7+VveEGAAf8Nn4+BKfvk9h3f/tN/9vkDprCVkkOP7F4tVVjPmxAv9mXiaT
-         6AJx+2Cl5hxwtfh6d92OATvzQWurimfbp7JmIMD5y4oCzA0huJEfaGkwZ+ockFJBkJdV
-         mACRRAgG0tLN4Qg3Gt7pEIs2tD/g8yrnFm3PtO2hopoWuyaBYX5RJGzZLeND77q6gMIL
-         oyrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702348118; x=1702952918;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6wHqKQ4J5MWfkES8HBul/HTYQa0latLedvfZPgLN9zs=;
-        b=HVUJaCQHf8U8eZIXUNS14i8rWKLCDph/5ChEuRTTFazHwdfV8cUkXe1RIAyNst4mEZ
-         XjdbBwIB6wOFXx2olQ71e3ZY0gREE9yHx4xMBlvvh3IlakX4KSeB4kvHnST6pv6ldQwL
-         LKB7zKu/ihzai4X/tA7aCMgxeT2k+kzdvFc6Bjh2p8UkgFL9wZXHj1MPDMTgsnE8X2rq
-         9AofpjHFuyXQZhJEmI+BnfdaXMQHqUh23iAfM5Rwvj+7DYhw4qZw2NgV/cXn2EoHubiQ
-         44ysm3f0OoAP86JCZK1QfMFDp4KG2wxVOt2hdFwmmOSDVfpPGAQXT0+kNMjmWFPnpsUc
-         n9/g==
-X-Gm-Message-State: AOJu0YyXpigCPMJofzOcCetI4/bBbYoNEjQA2RZpQytHg7NwonimZe82
-	hrM3fws5N/WbehnGM02lEt4+kbKRAghogg==
-X-Google-Smtp-Source: AGHT+IFDkzjQxovvwSCVNmXa4FTMKe00DpcwyrrEysKmRBTHueuZeEqxsuWThC/dBoTprqgokMUJUw==
-X-Received: by 2002:a05:690c:4605:b0:5e1:7129:7cc3 with SMTP id gw5-20020a05690c460500b005e171297cc3mr1173065ywb.26.1702348118353;
-        Mon, 11 Dec 2023 18:28:38 -0800 (PST)
-Received: from localhost ([2601:344:8301:57f0:38aa:1c88:df05:9b73])
-        by smtp.gmail.com with ESMTPSA id b138-20020a0dd990000000b005e1ed51ea27sm89835ywe.98.2023.12.11.18.28.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Dec 2023 18:28:37 -0800 (PST)
-From: Yury Norov <yury.norov@gmail.com>
-To: linux-kernel@vger.kernel.org,
-	Karsten Keil <isdn@linux-pingi.de>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Yury Norov <yury.norov@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Cc: Jan Kara <jack@suse.cz>,
-	Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>,
-	Matthew Wilcox <willy@infradead.org>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>,
-	Alexey Klimov <klimov.linux@gmail.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>
-Subject: [PATCH v3 30/35] bluetooth: optimize cmtp_alloc_block_id()
-Date: Mon, 11 Dec 2023 18:27:44 -0800
-Message-Id: <20231212022749.625238-31-yury.norov@gmail.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20231212022749.625238-1-yury.norov@gmail.com>
-References: <20231212022749.625238-1-yury.norov@gmail.com>
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A44358E;
+	Mon, 11 Dec 2023 18:38:42 -0800 (PST)
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 3BC2Uhc763147471, This message is accepted by code: ctloc85258
+Received: from RSEXMBS01.realsil.com.cn ([172.29.17.195])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 3BC2Uhc763147471
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=FAIL);
+	Tue, 12 Dec 2023 10:30:45 +0800
+Received: from alexlu (172.29.36.158) by RSEXMBS01.realsil.com.cn
+ (172.29.17.195) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 12 Dec
+ 2023 10:30:43 +0800
+Date: Tue, 12 Dec 2023 10:30:34 +0800
+From: Alex Lu <alex_lu@realsil.com.cn>
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg
+	<johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: Max Chou <max.chou@realtek.com>, Karen Hsu <karenhsu@realtek.com>
+Subject: [PATCH v3] Bluetooth: Add more enc key size check
+Message-ID: <ZXfFyoEhCj_S70qp@alexlu>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+X-ClientProxiedBy: RSEXH36502.realsil.com.cn (172.29.17.3) To
+ RSEXMBS01.realsil.com.cn (172.29.17.195)
 
-Instead of polling every bit in blockids, use a dedicated
-find_and_set_bit(), and make the function a simple one-liner.
+From: Alex Lu <alex_lu@realsil.com.cn>
 
-Signed-off-by: Yury Norov <yury.norov@gmail.com>
+When we are slave role and receives l2cap conn req when encryption has
+started, we should check the enc key size to avoid KNOB attack or BLUFFS
+attack.
+From SIG recommendation, implementations are advised to reject
+service-level connections on an encrypted baseband link with key
+strengths below 7 octets.
+A simple and clear way to achieve this is to place the enc key size
+check in hci_cc_read_enc_key_size()
+
+The btmon log below shows the case that lacks enc key size check.
+
+> HCI Event: Connect Request (0x04) plen 10
+        Address: BB:22:33:44:55:99 (OUI BB-22-33)
+        Class: 0x480104
+          Major class: Computer (desktop, notebook, PDA, organizers)
+          Minor class: Desktop workstation
+          Capturing (Scanner, Microphone)
+          Telephony (Cordless telephony, Modem, Headset)
+        Link type: ACL (0x01)
+< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
+        Address: BB:22:33:44:55:99 (OUI BB-22-33)
+        Role: Peripheral (0x01)
+> HCI Event: Command Status (0x0f) plen 4
+      Accept Connection Request (0x01|0x0009) ncmd 2
+        Status: Success (0x00)
+> HCI Event: Connect Complete (0x03) plen 11
+        Status: Success (0x00)
+        Handle: 1
+        Address: BB:22:33:44:55:99 (OUI BB-22-33)
+        Link type: ACL (0x01)
+        Encryption: Disabled (0x00)
+...
+
+> HCI Event: Encryption Change (0x08) plen 4
+        Status: Success (0x00)
+        Handle: 1 Address: BB:22:33:44:55:99 (OUI BB-22-33)
+        Encryption: Enabled with E0 (0x01)
+< HCI Command: Read Encryption Key Size (0x05|0x0008) plen 2
+        Handle: 1 Address: BB:22:33:44:55:99 (OUI BB-22-33)
+> HCI Event: Command Complete (0x0e) plen 7
+      Read Encryption Key Size (0x05|0x0008) ncmd 2
+        Status: Success (0x00)
+        Handle: 1 Address: BB:22:33:44:55:99 (OUI BB-22-33)
+        Key size: 6
+// We should check the enc key size
+...
+
+> ACL Data RX: Handle 1 flags 0x02 dlen 12
+      L2CAP: Connection Request (0x02) ident 3 len 4
+        PSM: 25 (0x0019)
+        Source CID: 64
+< ACL Data TX: Handle 1 flags 0x00 dlen 16
+      L2CAP: Connection Response (0x03) ident 3 len 8
+        Destination CID: 64
+        Source CID: 64
+        Result: Connection pending (0x0001)
+        Status: Authorization pending (0x0002)
+> HCI Event: Number of Completed Packets (0x13) plen 5
+        Num handles: 1
+        Handle: 1 Address: BB:22:33:44:55:99 (OUI BB-22-33)
+        Count: 1
+        #35: len 16 (25 Kb/s)
+        Latency: 5 msec (2-7 msec ~4 msec)
+< ACL Data TX: Handle 1 flags 0x00 dlen 16
+      L2CAP: Connection Response (0x03) ident 3 len 8
+        Destination CID: 64
+        Source CID: 64
+        Result: Connection successful (0x0000)
+        Status: No further information available (0x0000)
+
+Signed-off-by: Alex Lu <alex_lu@realsil.com.cn>
+Signed-off-by: Max Chou <max.chou@realtek.com>
 ---
- net/bluetooth/cmtp/core.c | 10 ++--------
- 1 file changed, 2 insertions(+), 8 deletions(-)
+Changes in v3:
+  - Use a simple and clear approach according to maintainer's suggestion
+Changes in v2:
+  - Fix compiling issue reported by sparse
 
-diff --git a/net/bluetooth/cmtp/core.c b/net/bluetooth/cmtp/core.c
-index 90d130588a3e..b1330acbbff3 100644
---- a/net/bluetooth/cmtp/core.c
-+++ b/net/bluetooth/cmtp/core.c
-@@ -88,15 +88,9 @@ static void __cmtp_copy_session(struct cmtp_session *session, struct cmtp_connin
+ net/bluetooth/hci_event.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 2ad7b9f86f74..ef8c3bed7361 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -750,9 +750,23 @@ static u8 hci_cc_read_enc_key_size(struct hci_dev *hdev, void *data,
+ 	} else {
+ 		conn->enc_key_size = rp->key_size;
+ 		status = 0;
++
++		if (conn->enc_key_size < hdev->min_enc_key_size) {
++			/* As slave role, the conn->state has been set to
++			 * BT_CONNECTED and l2cap conn req might not be received
++			 * yet, at this moment the l2cap layer almost does
++			 * nothing with the non-zero status.
++			 * So we also clear encrypt related bits, and then the
++			 * handler of l2cap conn req will get the right secure
++			 * state at a later time.
++			 */
++			status = HCI_ERROR_AUTH_FAILURE;
++			clear_bit(HCI_CONN_ENCRYPT, &conn->flags);
++			clear_bit(HCI_CONN_AES_CCM, &conn->flags);
++		}
+ 	}
  
- static inline int cmtp_alloc_block_id(struct cmtp_session *session)
- {
--	int i, id = -1;
-+	int id = find_and_set_bit(&session->blockids, 16);
+-	hci_encrypt_cfm(conn, 0);
++	hci_encrypt_cfm(conn, status);
  
--	for (i = 0; i < 16; i++)
--		if (!test_and_set_bit(i, &session->blockids)) {
--			id = i;
--			break;
--		}
--
--	return id;
-+	return id < 16 ? id : -1;
- }
- 
- static inline void cmtp_free_block_id(struct cmtp_session *session, int id)
+ done:
+ 	hci_dev_unlock(hdev);
 -- 
-2.40.1
+2.39.2
 
