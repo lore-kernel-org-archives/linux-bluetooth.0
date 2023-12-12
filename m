@@ -1,113 +1,97 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3WJcCUD9"
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19CA1CE
-	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Dec 2023 03:06:20 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5d064f9e2a1so62855137b3.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Dec 2023 03:06:20 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AklFlHXi"
+Received: from mail-oo1-xc31.google.com (mail-oo1-xc31.google.com [IPv6:2607:f8b0:4864:20::c31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E377E9F
+	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Dec 2023 04:04:09 -0800 (PST)
+Received: by mail-oo1-xc31.google.com with SMTP id 006d021491bc7-5913b73b53eso204261eaf.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Dec 2023 04:04:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702379179; x=1702983979; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=6MWd+a3oSvTRyqPTXg6u2wnuEIU0sLzdumg8H9kynqA=;
-        b=3WJcCUD9Mwgi4gnK3vDkIIgpvXpfEwcbDxWJFYzuVjiQaVYaaJZMELC9yNuQiJ+TBu
-         g9oUrk0nDLTF3QrSsYA4Aho3ugFWZ43hD23hAdRVDqCVL1ylEIn2/AL7RAg3sQcxKuuF
-         ppCunqYz8LqU5b2OoVReAACLmkdnpahy3kHy025U5VfkeduglAYvXEXHl4mjualzT4LK
-         Gfzw7cRyK1kQPTLaL4wH/7P3Ep/oeHJHglDYOW0jDmpgN7HgbX7IgioPLUkCU43mDGV6
-         lGOVUPW5QIz08OX5q8rsG1nFKNPL8Xe3foCAD3JlT4upC1o5/qZoR7eWekpy3jy8aiAC
-         B39Q==
+        d=gmail.com; s=20230601; t=1702382649; x=1702987449; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ipf5mTS7rL4nPpv0SBJdHIiqRoPavoHxtqxLkKqI5Jo=;
+        b=AklFlHXiriW4AH7/QkOephUcQ/GI8xPMIxQnKPddPbtjuLZiOuEOyiExzby/b8vyZx
+         dsZsLDe/KeuoUdoiE+S7ZUE1u0EaWc7TDW+6tMNxA6JDtHI4Rt0s2z/+vF3rJHQ7y4Tc
+         igs4F9ggUYng2MMcteoTtJe1V49WX+FCDrUcqQDul4heeXxVF++3p17WV5eVc79mgbkw
+         qDtopV4/15uaO0Dghl5fRo/SFTF5IwTSAEGm0OhDVNMmf0wh3SXVPVVrX2wXODeO0KUN
+         2lhdbry/VFGMSAz7SF7ILf5AeNvw+7ZlAZbNBRXRPO5yFlracXsJ47Hn+7h25kVkvJ30
+         FW1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702379179; x=1702983979;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6MWd+a3oSvTRyqPTXg6u2wnuEIU0sLzdumg8H9kynqA=;
-        b=Pxunq21jN9eXvhEW6ZckBX69csFbtlAeTEaJRF4CMm8E4WgB1cdbGLZKVuXLNdYK1U
-         jY2TiL0QlCeSZFAzNbGWacN/8EzgvB7opTPujo/e85beoyTXakIZk2Ei5MzVMLpgrGgn
-         1UsJMCumqAoNDIJhNlEsDPhb72MPkZ63PEUZ0eUu56CmqUKBQeDH/0x5B2vgBwXMjJ5t
-         eBXt/tVpsb24opbhbtQKsWN0X+IsyLssWcwP1rMIihUWjsKX3r1Q1yWVFIxJJiiGoLzr
-         nSEKnpsluJQRck0sNjc/UGG1xl1kpKKAWa9ahJGi2CSXvLyTJpyMaeD6qFtaYhf7DgfA
-         tyDg==
-X-Gm-Message-State: AOJu0YyCCCYWnWRVIIGIN+4g+Hud1byflOQUAVGxhfs/1SSreR47hBU6
-	NyERCoRO2KiMpydmrWM49eviah0fL6ujRMZqP3XcOl01Os2k1NgcZfebRMvvs6PWHd+a+yzWipT
-	h8XWAgp3f1VexUqtHyENiI1hR0tHLvQGHrWs+Os/W4A505auSyxTqQ8WtMLDDr6oAlS2KAh3vNT
-	gq
-X-Google-Smtp-Source: AGHT+IFJ4NbPy0dSu+8/sEof8TY3BUvGgwEkdzWO3Zd0KM/J1jMZTxGcEUKojDwB9ci+I8ERevgyqvyN/7vB
-X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:17:554d:7ebb:c4c9:f004])
- (user=apusaka job=sendgmr) by 2002:a05:690c:d0e:b0:5d3:9222:a83e with SMTP id
- cn14-20020a05690c0d0e00b005d39222a83emr62568ywb.10.1702379178697; Tue, 12 Dec
- 2023 03:06:18 -0800 (PST)
-Date: Tue, 12 Dec 2023 19:05:31 +0800
+        d=1e100.net; s=20230601; t=1702382649; x=1702987449;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ipf5mTS7rL4nPpv0SBJdHIiqRoPavoHxtqxLkKqI5Jo=;
+        b=Fm0HDo6eHJalSmpCxwG44DPbWlt2Su4lwn5LcrbjH21ImfoyNoxdfVXjdwHs+nCmWE
+         xz2AquAlbXghhu1owYyPc+MrNyYou2Uy6zFJDJNxGkFjPfF2Z35Rd8xzmmH+wdte1ePi
+         S7x9M7hvv71vwnwfGTtj20lpUJ4iCryoVFR3EskswAa0YFEnJw/8Z9/GU3KGctYP3TU1
+         gccbclpKSWjCA6YMFv8yYKUsjV0rLqwk2EfpeN83RDO080/CKx7ZqXE9vi71648CKAom
+         kvDNF2JoE10+Ck2VwcdmKYmGFewvcn3q42KH40BCNpPtaqbvpUwHsKTXjfdtNUXkxI+/
+         BGbg==
+X-Gm-Message-State: AOJu0YyETZTf/2A9cUtUEYzsJbmwh3CcA1jVqc27yW8e5F1d3I4DB8uz
+	xdfA/q3kAe2h4Mh+wQP3HalAzS6biXA=
+X-Google-Smtp-Source: AGHT+IEBvGUNAKrSP9HokmrxVh7YQDbSWTFGmyT5Tux8OD4ZCIeXfmYyv3euYxNLQ62USTcaR+oxbQ==
+X-Received: by 2002:a05:6359:458e:b0:170:7e3f:c260 with SMTP id no14-20020a056359458e00b001707e3fc260mr6530439rwb.62.1702382648814;
+        Tue, 12 Dec 2023 04:04:08 -0800 (PST)
+Received: from [172.17.0.2] ([74.249.13.191])
+        by smtp.gmail.com with ESMTPSA id j11-20020a0ceb0b000000b0067ae405e0a8sm4152164qvp.57.2023.12.12.04.04.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Dec 2023 04:04:08 -0800 (PST)
+Message-ID: <65784c38.0c0a0220.5908c.290e@mx.google.com>
+Date: Tue, 12 Dec 2023 04:04:08 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1690137445604999488=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
-Message-ID: <20231212190531.BlueZ.1.Ia938c97b56083995e9f6bbba445a01b4cb4de0c9@changeid>
-Subject: [BlueZ PATCH] monitor: add Qualcomm and Mediatek MSFT opcodes
-From: Archie Pusaka <apusaka@google.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	Marcel Holtmann <marcel@holtmann.org>
-Cc: CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>, 
-	Archie Pusaka <apusaka@chromium.org>, Hsin-chen Chuang <chharry@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, apusaka@google.com
+Subject: RE: [BlueZ] monitor: add Qualcomm and Mediatek MSFT opcodes
+In-Reply-To: <20231212190531.BlueZ.1.Ia938c97b56083995e9f6bbba445a01b4cb4de0c9@changeid>
+References: <20231212190531.BlueZ.1.Ia938c97b56083995e9f6bbba445a01b4cb4de0c9@changeid>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Archie Pusaka <apusaka@chromium.org>
+--===============1690137445604999488==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Qualcomm and Mediatek has 0xfd70 and 0xfd30 for their MSFT opcodes,
-respectively.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-Reviewed-by: Hsin-chen Chuang <chharry@google.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=809171
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.48 seconds
+GitLint                       PASS      0.35 seconds
+BuildEll                      PASS      23.74 seconds
+BluezMake                     PASS      706.11 seconds
+MakeCheck                     PASS      11.87 seconds
+MakeDistcheck                 PASS      156.79 seconds
+CheckValgrind                 PASS      215.04 seconds
+CheckSmatch                   WARNING   319.08 seconds
+bluezmakeextell               PASS      100.50 seconds
+IncrementalBuild              PASS      645.16 seconds
+ScanBuild                     PASS      913.01 seconds
+
+Details
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+monitor/packet.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c:1860:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3606:52: warning: array of flexible structuresmonitor/bt.h:3594:40: warning: array of flexible structures
+
 
 ---
+Regards,
+Linux Bluetooth
 
- monitor/packet.c | 20 ++++++++++++++++++--
- 1 file changed, 18 insertions(+), 2 deletions(-)
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index b06f8a5d38..42e711cafa 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -4286,10 +4286,26 @@ void packet_monitor(struct timeval *tv, struct ucred *cred,
- 				 */
- 				index_list[index].msft_opcode = 0xFC1E;
- 				break;
-+			case 29:
-+				/*
-+				 * Qualcomm controllers that support the
-+				 * Microsoft vendor extensions are using
-+				 * 0xFD70 for VsMsftOpCode.
-+				 */
-+				index_list[index].msft_opcode = 0xFD70;
-+				break;
-+			case 70:
-+				/*
-+				 * Mediatek controllers that support the
-+				 * Microsoft vendor extensions are using
-+				 * 0xFD30 for VsMsftOpCode.
-+				 */
-+				index_list[index].msft_opcode = 0xFD30;
-+				break;
- 			case 93:
- 				/*
- 				 * Realtek controllers that support the
--				 * Microsoft vendor extenions are using
-+				 * Microsoft vendor extensions are using
- 				 * 0xFCF0 for VsMsftOpCode.
- 				 */
- 				index_list[index].msft_opcode = 0xFCF0;
-@@ -4298,7 +4314,7 @@ void packet_monitor(struct timeval *tv, struct ucred *cred,
- 				/*
- 				 * Emulator controllers use Linux Foundation as
- 				 * manufacturer and support the
--				 * Microsoft vendor extenions using
-+				 * Microsoft vendor extensions using
- 				 * 0xFC1E for VsMsftOpCode.
- 				 */
- 				index_list[index].msft_opcode = 0xFC1E;
--- 
-2.43.0.472.g3155946c3a-goog
-
+--===============1690137445604999488==--
