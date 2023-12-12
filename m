@@ -1,25 +1,25 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22B6177F0F
-	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Dec 2023 16:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D42B78E60
+	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Dec 2023 16:30:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WpH97Akq"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id AE0C9C433C7;
-	Tue, 12 Dec 2023 16:20:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sy3gH3l+"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7514CC433C8;
+	Tue, 12 Dec 2023 16:30:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702398025;
-	bh=RVdCPjlQlsj2Dh9vDQXJmPs96w6GEO8Xnr5r0yTUcqc=;
+	s=k20201202; t=1702398623;
+	bh=lpmDF6zAIM5bqqgCYV8D+XdmoofBH2Wltv752FmDLoI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WpH97Akq1U9B/7pZUqgU9kIndZGpEynDNhz3v3uGJcj7WaP5/cb1f4EZJRuPhQYR/
-	 XO68pmk9kQhpFa+xv2qlqRiiD13bFv1DazrDKZL3nC+v4CDzrkUM/Yr7MqAzs09N/Q
-	 dhbcyQFikWqfFXlzLTHlIefKu3Nw671mzeD21KkE6F+yuV0SVuu1jOZk2of/I6Kenw
-	 Ljtb3cVQ0nIYMN3CQ25Yvz7B6ML5JZSyaU/nxh6u+wCwEgUuOz9OuwO7YPSlRDhFk7
-	 MlOLD63dQ2h3DigvwALqMFB2ggQZGTsyi4R++D29niiHMR81O+85jp4GfU/VrsMYZY
-	 RA8gMlTQUvong==
+	b=sy3gH3l+8DjXccvUxS4znhpBWQ94TTMKOFifBdZgVso4EFwRWuf2bcJT3cDj82gk0
+	 2ZCO2oPyoRWc1CLrCTQ+NsNxjeecNfylw5zoudcXvy5GkUUdQ/qLVBUqm9p/BpaF8v
+	 oPOO+AuZXVFtmefNzqNWN0POiDSVDq3ve/bUSrpI3n28uVgAMxOFpnd5s+HcL5ICJX
+	 Z5tio4/Ude3gVSe6inK0QrFzpfQ6/pPO4UcS+whRvo3+bolIxC8MkFM1ZWaxJs42vE
+	 X6Uwaq78feQNu7FVe5UM+VZnRY5SpKZC/0lItngFwZkbHBv2SUmzcSf16e6NefRCgD
+	 +MTFlx2a6u0qg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 97BAFDD4F01;
-	Tue, 12 Dec 2023 16:20:25 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5B431C4314C;
+	Tue, 12 Dec 2023 16:30:23 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -28,36 +28,40 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1] Bluetooth: hci_core: Fix hci_conn_hash_lookup_cis
+Subject: Re: [PATCH v3] Bluetooth: Add more enc key size check
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <170239802561.22444.2733058726592486366.git-patchwork-notify@kernel.org>
-Date: Tue, 12 Dec 2023 16:20:25 +0000
-References: <20231208222843.70028-1-luiz.dentz@gmail.com>
-In-Reply-To: <20231208222843.70028-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+ <170239862337.27856.15531627573114071096.git-patchwork-notify@kernel.org>
+Date: Tue, 12 Dec 2023 16:30:23 +0000
+References: <ZXfFyoEhCj_S70qp@alexlu>
+In-Reply-To: <ZXfFyoEhCj_S70qp@alexlu>
+To: Alex Lu <alex_lu@realsil.com.cn>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ max.chou@realtek.com, karenhsu@realtek.com
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Fri,  8 Dec 2023 17:28:43 -0500 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Tue, 12 Dec 2023 10:30:34 +0800 you wrote:
+> From: Alex Lu <alex_lu@realsil.com.cn>
 > 
-> hci_conn_hash_lookup_cis shall always match the requested CIG and CIS
-> ids even when they are unset as otherwise it result in not being able
-> to bind/connect different sockets to the same address as that would
-> result in having multiple sockets mapping to the same hci_conn which
-> doesn't really work and prevents BAP audio configuration such as
-> AC 6(i) when CIG and CIS are left unset.
+> When we are slave role and receives l2cap conn req when encryption has
+> started, we should check the enc key size to avoid KNOB attack or BLUFFS
+> attack.
+> From SIG recommendation, implementations are advised to reject
+> service-level connections on an encrypted baseband link with key
+> strengths below 7 octets.
+> A simple and clear way to achieve this is to place the enc key size
+> check in hci_cc_read_enc_key_size()
 > 
 > [...]
 
 Here is the summary with links:
-  - [v1] Bluetooth: hci_core: Fix hci_conn_hash_lookup_cis
-    https://git.kernel.org/bluetooth/bluetooth-next/c/ce168429c3b6
+  - [v3] Bluetooth: Add more enc key size check
+    https://git.kernel.org/bluetooth/bluetooth-next/c/19921189d442
 
 You are awesome, thank you!
 -- 
