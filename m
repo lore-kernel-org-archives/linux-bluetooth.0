@@ -1,24 +1,24 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22B1C77F0D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22B6177F0F
 	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Dec 2023 16:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qEqswQd8"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C4BE0C433CC;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WpH97Akq"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id AE0C9C433C7;
 	Tue, 12 Dec 2023 16:20:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1702398025;
-	bh=ZL9A822sK+ot0+7LIqNl5Xq0dOOhCY16KdFNGm+GEOk=;
+	bh=RVdCPjlQlsj2Dh9vDQXJmPs96w6GEO8Xnr5r0yTUcqc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qEqswQd89hZoWZTLbrx8c7Jb8pMEOpf992Mw7kb5urQJaG4Hp40w8kTgk0nclrJrQ
-	 hHYD57uQZWulw2DK1ir5oesUcPzGmma9xpVLdDYS6OaJApgd3kLdVrgOl352U4IIM6
-	 6y4q7V6tnZ0J8t89FKRElWDTEpLISWGBSY0zMWJGSKauc1/G1SBDNz62Q/F1cZ/h1q
-	 +KgNVVqIvEvjFHGguj4+tH83/zDVI/Y+Na2FJtpzKgdFKz5rhU4AH2eml8Vn0cB43x
-	 Lb7HwfBm2p07zp8oAAUOLO1JVW2e0+UAg3eblMPltzbI0lje0BNU264TT89vOalG+A
-	 uPjCKLL2vb69A==
+	b=WpH97Akq1U9B/7pZUqgU9kIndZGpEynDNhz3v3uGJcj7WaP5/cb1f4EZJRuPhQYR/
+	 XO68pmk9kQhpFa+xv2qlqRiiD13bFv1DazrDKZL3nC+v4CDzrkUM/Yr7MqAzs09N/Q
+	 dhbcyQFikWqfFXlzLTHlIefKu3Nw671mzeD21KkE6F+yuV0SVuu1jOZk2of/I6Kenw
+	 Ljtb3cVQ0nIYMN3CQ25Yvz7B6ML5JZSyaU/nxh6u+wCwEgUuOz9OuwO7YPSlRDhFk7
+	 MlOLD63dQ2h3DigvwALqMFB2ggQZGTsyi4R++D29niiHMR81O+85jp4GfU/VrsMYZY
+	 RA8gMlTQUvong==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AA0DEDD4F03;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 97BAFDD4F01;
 	Tue, 12 Dec 2023 16:20:25 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -28,14 +28,14 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: L2CAP: Send reject on command corrupted request
+Subject: Re: [PATCH v1] Bluetooth: hci_core: Fix hci_conn_hash_lookup_cis
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <170239802569.22444.11101954474016641561.git-patchwork-notify@kernel.org>
+ <170239802561.22444.2733058726592486366.git-patchwork-notify@kernel.org>
 Date: Tue, 12 Dec 2023 16:20:25 +0000
-References: <20231208174150.1313389-1-frederic.danis@collabora.com>
-In-Reply-To: <20231208174150.1313389-1-frederic.danis@collabora.com>
-To: =?utf-8?b?RnLDqWTDqXJpYyBEYW5pcyA8ZnJlZGVyaWMuZGFuaXNAY29sbGFib3JhLmNvbT4=?=@ci.codeaurora.org
+References: <20231208222843.70028-1-luiz.dentz@gmail.com>
+In-Reply-To: <20231208222843.70028-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
@@ -43,19 +43,21 @@ Hello:
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Fri,  8 Dec 2023 18:41:50 +0100 you wrote:
-> L2CAP/COS/CED/BI-02-C PTS test send a malformed L2CAP signaling packet
-> with 2 commands in it (a connection request and an unknown command) and
-> expect to get a connection response packet and a command reject packet.
-> The second is currently not sent.
+On Fri,  8 Dec 2023 17:28:43 -0500 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> Signed-off-by: Frédéric Danis <frederic.danis@collabora.com>
+> hci_conn_hash_lookup_cis shall always match the requested CIG and CIS
+> ids even when they are unset as otherwise it result in not being able
+> to bind/connect different sockets to the same address as that would
+> result in having multiple sockets mapping to the same hci_conn which
+> doesn't really work and prevents BAP audio configuration such as
+> AC 6(i) when CIG and CIS are left unset.
 > 
 > [...]
 
 Here is the summary with links:
-  - Bluetooth: L2CAP: Send reject on command corrupted request
-    https://git.kernel.org/bluetooth/bluetooth-next/c/37b85190ca1e
+  - [v1] Bluetooth: hci_core: Fix hci_conn_hash_lookup_cis
+    https://git.kernel.org/bluetooth/bluetooth-next/c/ce168429c3b6
 
 You are awesome, thank you!
 -- 
