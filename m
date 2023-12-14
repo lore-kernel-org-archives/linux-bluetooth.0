@@ -1,53 +1,53 @@
-Received: from mail-oo1-f45.google.com (mail-oo1-f45.google.com [209.85.161.45])
+Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12D7E6ABBE
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Dec 2023 20:56:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DBE86ABA4
+	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Dec 2023 20:56:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eeFELZ7z"
-Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-590bb31ccf5so4050093eaf.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Dec 2023 12:56:06 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NpLBLiRx"
+Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-58d06bfadf8so4231eaf.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Dec 2023 12:56:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702587365; x=1703192165; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1702587369; x=1703192169; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=uujfn7iiFS8v3L+hrQnUGuHxUzCMZBZ+4Uxi8SEmPS0=;
-        b=eeFELZ7zJgyvhdelK7eNagKwQYkgUFKfJ9ZHBXhUVXHZVEiH19XqpXfft+UpWLG/jf
-         //EjMPPUdEL9b7ZbjzUT6AmIlrkznihAvgO+ylfTUM9PDMZfHqJf//oPJLwikqxHmgpD
-         +GPyJBtRn1YnhL6YzcUeG4Mc+dMMJufMjN9T+v946I8HjcMylbIGcfbEAFQzuVqVza0L
-         osIGJHicjHYzdq3C56O593bKDmMxEOslAKMufpKpSTnrrsVqWjbd3GzaNJpiTPEv6YEZ
-         iRER7MhrYHwT6gYTBsizlre4cHWM6kIHMwCQ0EJoV2wP0ybPkfJ7yCmMqwptLUc08rjY
-         o0Ww==
+        bh=pfJH2vBFvTk3Ec7zxskcSmGRALcmbhg3NKo1nMNN3hI=;
+        b=NpLBLiRxS5f6zifCkhy2MyG+BTyxqTzLoFT6tn6XyKgfiT2Fk75o523Z6jrK15yoqO
+         wQ1lM1Uq6vFU4oqca0N36WpFGyXg+cQPy2HbMSfc12rmujal3qq+NBpdAkUkNzR9kuha
+         KSULNEeBeAaoFjLZaw5wf2CJBP66VVPmSm/aPcmZVp+Pd87OvFRLNEDglbk43DR6lyPU
+         smzaL/xNSv28ey8FYq9zqEX2o6x1923SA8RCe6Zt9BVPeeBJzLshV8yvExa2M6+a7FQj
+         n5lUAuPJvg9amsLRoHQ21ZtaRpeLr/w/WTWgpvnbZACCG1A1BpGWDFjNTihqVWD5X+xV
+         gIJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702587365; x=1703192165;
+        d=1e100.net; s=20230601; t=1702587369; x=1703192169;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=uujfn7iiFS8v3L+hrQnUGuHxUzCMZBZ+4Uxi8SEmPS0=;
-        b=IGgit23+PN33rrzpaGZy1GZkbztTGWZ+nfiHlXbhhsNrx5dGzNQDS9sEC4CBb9z05P
-         97EsNmRbXJ3G989MQx0RdMTcPOLbXb3Rh/HbDQwWOB1eaM7fTo3LADyqa7SxYYt7B1kg
-         OMLbEaXfUTrA2oNTjxJ/iP9otLCk0Y7LD9zjoXim3pF2rfNXCK2qmZqNmqr1LBFVMc+i
-         gAC+OwZNzcD0Dp9Ao65J8G3z66J3+5BV/qlzcMTKxcsk2xFNJT74wqtgleCNpTkLngKz
-         3RFHyQi/KGXRhm+r5BROL1R+gFxHEOFRX0ieFsmHx36ZJieC/idDaWasGjPsK7tNw79N
-         hqfg==
-X-Gm-Message-State: AOJu0YySkH97s04l0aVkblSpmkBU2dGIjnxp7bNEl4QTelSLpR+iPJKn
-	TCNEhHyX1c77gC50B1Z64dJ9teyfxrY=
-X-Google-Smtp-Source: AGHT+IFeHR0XEpkKlDIKEjd3R2AZfhGqUU4pZZ+l3g0hxPct6Q6vu0typ9muTrjocQA9ml5AiFknIg==
-X-Received: by 2002:a05:6820:551:b0:58d:9776:2313 with SMTP id n17-20020a056820055100b0058d97762313mr8733075ooj.7.1702587365146;
-        Thu, 14 Dec 2023 12:56:05 -0800 (PST)
+        bh=pfJH2vBFvTk3Ec7zxskcSmGRALcmbhg3NKo1nMNN3hI=;
+        b=cj7xFIPFlW2BW/AFlopkZAU4aEYmlVbloWf4nrQHFJZUnatPJfT7enjLVcUB3Xb8qG
+         l7b9gZGoWHhnMtjUViZFa8lN3NajgY56NOeb0vwEzuNXqIddhud/gKuqu726YsIkgLVD
+         V7J69o0UIGG7q/MGh+5W5VeY7V928+BBMrvdlCmMHFGUNMqc5A0K6UMHr93B+Wzi+T1W
+         ZEYuzlFB+7mvt9WXgG+8rqtX9+IDKrMXPSAO/IvXj4xNdCT9R9ZJs25YeaRuu7wUx0nb
+         CB9pFfkfUFJODae7M+durifLgBqqlvbYW46cqUyvbrwDIq4YtAknG5SblT5gJwRmds8u
+         TisQ==
+X-Gm-Message-State: AOJu0YyrenOLFuZjNpSbG25EhWT8JPUjxLBCwWvU6mCde9Z4VfoPcgb5
+	AoGo4WkvrVRG9eK4a0fGu7KgO/qUvxA=
+X-Google-Smtp-Source: AGHT+IGSqjxcK2wXdGm52QsLQBai7/3mRcIXmWdwFIIinxQO2JevmSooi/9I29cY8PsKB6k2xvir7A==
+X-Received: by 2002:a4a:9891:0:b0:590:f911:42ef with SMTP id a17-20020a4a9891000000b00590f91142efmr4863566ooj.18.1702587369576;
+        Thu, 14 Dec 2023 12:56:09 -0800 (PST)
 Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
-        by smtp.gmail.com with ESMTPSA id m20-20020a4a2414000000b005902a5bc3easm3658057oof.22.2023.12.14.12.56.03
+        by smtp.gmail.com with ESMTPSA id m20-20020a4a2414000000b005902a5bc3easm3658057oof.22.2023.12.14.12.56.07
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Dec 2023 12:56:03 -0800 (PST)
+        Thu, 14 Dec 2023 12:56:07 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v6 4/6] shared/bap: Make bt_bap_select select a location
-Date: Thu, 14 Dec 2023 15:55:54 -0500
-Message-ID: <20231214205556.1320286-4-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v6 6/6] client/player: Use ChannelAllocation given on SelectProperties
+Date: Thu, 14 Dec 2023 15:55:56 -0500
+Message-ID: <20231214205556.1320286-6-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20231214205556.1320286-1-luiz.dentz@gmail.com>
 References: <20231214205556.1320286-1-luiz.dentz@gmail.com>
@@ -61,207 +61,159 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This makes bt_bap_select select a location based on the PAC channel
-count and PACS locations, this is then passed to the Endpoint as a
-recommended ChannelAllocation.
----
- profiles/audio/media.c |  6 ++-
- src/shared/bap.c       | 97 ++++++++++++++++++++++++++++--------------
- src/shared/bap.h       |  2 +-
- 3 files changed, 70 insertions(+), 35 deletions(-)
+This makes use of ChannelAllocation when present on SelectProperties
+dictionary which is then passed on to bluetoothd and send over as part
+of Codec Configuration:
 
-diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index 62f53defa7af..b17c555b63e4 100644
---- a/profiles/audio/media.c
-+++ b/profiles/audio/media.c
-@@ -921,7 +921,7 @@ done:
+< ACL Data TX: Handle 2048 flags 0x00 dlen 109
+      ATT: Write Command (0x52) len 104
+        Handle: 0x0098 Type: ASE Control Point (0x2bc6)
+          Data: 0104050202060000000010020103020201030428000503010000000
+	  6020206000000001002010302020103042800050302000000010202060000
+	  0000100201030202010304280005030100000002020206000000001002010
+	  302020103042800050302000000
+            Opcode: Codec Configuration (0x01)
+            Number of ASE(s): 4
+            ASE: #0
+            ASE ID: 0x05
+            Target Latency: Balance Latency/Reliability (0x02)
+            PHY: 0x02
+            LE 2M PHY (0x02)
+            Codec: LC3 (0x06)
+            Codec Specific Configuration: #0: len 0x02 type 0x01
+              Sampling Frequency: 16 Khz (0x03)
+            Codec Specific Configuration: #1: len 0x02 type 0x02
+              Frame Duration: 10 ms (0x01)
+            Codec Specific Configuration: #2: len 0x03 type 0x04
+              Frame Length: 40 (0x0028)
+            Codec Specific Configuration: #3: len 0x05 type 0x03
+           Location: 0x00000001
+              Front Left (0x00000001)
+            ASE: #1
+            ASE ID: 0x06
+            Target Latency: Balance Latency/Reliability (0x02)
+            PHY: 0x02
+            LE 2M PHY (0x02)
+            Codec: LC3 (0x06)
+            Codec Specific Configuration: #0: len 0x02 type 0x01
+              Sampling Frequency: 16 Khz (0x03)
+            Codec Specific Configuration: #1: len 0x02 type 0x02
+              Frame Duration: 10 ms (0x01)
+            Codec Specific Configuration: #2: len 0x03 type 0x04
+              Frame Length: 40 (0x0028)
+            Codec Specific Configuration: #3: len 0x05 type 0x03
+           Location: 0x00000002
+              Front Right (0x00000002)
+            ASE: #2
+            ASE ID: 0x01
+            Target Latency: Balance Latency/Reliability (0x02)
+            PHY: 0x02
+            LE 2M PHY (0x02)
+            Codec: LC3 (0x06)
+            Codec Specific Configuration: #0: len 0x02 type 0x01
+              Sampling Frequency: 16 Khz (0x03)
+            Codec Specific Configuration: #1: len 0x02 type 0x02
+              Frame Duration: 10 ms (0x01)
+            Codec Specific Configuration: #2: len 0x03 type 0x04
+              Frame Length: 40 (0x0028)
+            Codec Specific Configuration: #3: len 0x05 type 0x03
+           Location: 0x00000001
+              Front Left (0x00000001)
+            ASE: #3
+            ASE ID: 0x02
+            Target Latency: Balance Latency/Reliability (0x02)
+            PHY: 0x02
+            LE 2M PHY (0x02)
+            Codec: LC3 (0x06)
+            Codec Specific Configuration: #0: len 0x02 type 0x01
+              Sampling Frequency: 16 Khz (0x03)
+            Codec Specific Configuration: #1: len 0x02 type 0x02
+              Frame Duration: 10 ms (0x01)
+            Codec Specific Configuration: #2: len 0x03 type 0x04
+              Frame Length: 40 (0x0028)
+            Codec Specific Configuration: #3: len 0x05 type 0x03
+           Location: 0x00000002
+              Front Right (0x00000002)
+---
+ client/player.c | 45 +++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 43 insertions(+), 2 deletions(-)
+
+diff --git a/client/player.c b/client/player.c
+index 4d49602c70d7..92fc91f920f3 100644
+--- a/client/player.c
++++ b/client/player.c
+@@ -64,7 +64,7 @@
+ #define SEC_USEC(_t)  (_t  * 1000000L)
+ #define TS_USEC(_ts)  (SEC_USEC((_ts)->tv_sec) + NSEC_USEC((_ts)->tv_nsec))
+ 
+-#define EP_SRC_LOCATIONS 0x00000001
++#define EP_SRC_LOCATIONS 0x00000003
+ #define EP_SNK_LOCATIONS 0x00000003
+ 
+ #define EP_SRC_CTXT 0x000f
+@@ -2104,13 +2104,42 @@ static struct iovec *iov_append(struct iovec **iov, const void *data,
+ 	return *iov;
  }
  
- static int pac_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
--			struct bt_bap_pac_qos *qos,
-+			uint32_t chan_alloc, struct bt_bap_pac_qos *qos,
- 			bt_bap_pac_select_t cb, void *cb_data, void *user_data)
++static int parse_chan_alloc(DBusMessageIter *iter, uint32_t *location)
++{
++	while (dbus_message_iter_get_arg_type(iter) == DBUS_TYPE_DICT_ENTRY) {
++		const char *key;
++		DBusMessageIter value, entry;
++		int var;
++
++		dbus_message_iter_recurse(iter, &entry);
++		dbus_message_iter_get_basic(&entry, &key);
++
++		dbus_message_iter_next(&entry);
++		dbus_message_iter_recurse(&entry, &value);
++
++		var = dbus_message_iter_get_arg_type(&value);
++
++		if (!strcasecmp(key, "ChannelAllocation")) {
++			if (var != DBUS_TYPE_UINT32)
++				return -EINVAL;
++			dbus_message_iter_get_basic(&value, location);
++			return 0;
++		}
++
++		dbus_message_iter_next(iter);
++	}
++
++	return -EINVAL;
++}
++
+ static DBusMessage *endpoint_select_properties_reply(struct endpoint *ep,
+ 						DBusMessage *msg,
+ 						struct codec_preset *preset)
  {
- 	struct media_endpoint *endpoint = user_data;
-@@ -969,6 +969,10 @@ static int pac_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
- 		g_dbus_dict_append_entry(&dict, "Locations", DBUS_TYPE_UINT32,
- 									&loc);
+ 	DBusMessage *reply;
+-	DBusMessageIter iter;
++	DBusMessageIter iter, props;
+ 	struct endpoint_config *cfg;
++	uint32_t location = 0;
  
-+	if (chan_alloc)
-+		g_dbus_dict_append_entry(&dict, "ChannelAllocation",
-+					 DBUS_TYPE_UINT32, &chan_alloc);
+ 	if (!preset)
+ 		return NULL;
+@@ -2126,6 +2155,18 @@ static DBusMessage *endpoint_select_properties_reply(struct endpoint *ep,
+ 	iov_append(&cfg->caps, preset->data.iov_base, preset->data.iov_len);
+ 	cfg->target_latency = preset->target_latency;
+ 
++	dbus_message_iter_init(msg, &iter);
++	dbus_message_iter_recurse(&iter, &props);
 +
- 	if (metadata) {
- 		key = "Metadata";
- 		g_dbus_dict_append_basic_array(&dict, DBUS_TYPE_STRING, &key,
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index cb505d1564d6..af2cc1ef1eb0 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -177,6 +177,11 @@ struct bt_bap {
- 	void *user_data;
- };
- 
-+struct bt_bap_chan {
-+	uint8_t count;
-+	uint32_t location;
-+};
++	if (!parse_chan_alloc(&props, &location)) {
++		uint8_t chan_alloc_ltv[] = {
++			0x05, LC3_CONFIG_CHAN_ALLOC, location & 0xff,
++			location >> 8, location >> 16, location >> 24
++		};
 +
- struct bt_bap_pac {
- 	struct bt_bap_db *bdb;
- 	char *name;
-@@ -185,7 +190,7 @@ struct bt_bap_pac {
- 	struct bt_bap_pac_qos qos;
- 	struct iovec *data;
- 	struct iovec *metadata;
--	struct queue *chan_map;
-+	struct queue *channels;
- 	struct bt_bap_pac_ops *ops;
- 	void *user_data;
- };
-@@ -2422,19 +2427,22 @@ static void bap_pac_foreach_channel(size_t i, uint8_t l, uint8_t t, uint8_t *v,
- 					void *user_data)
- {
- 	struct bt_bap_pac *pac = user_data;
-+	struct bt_bap_chan *chan;
- 
- 	if (!v)
- 		return;
- 
--	if (!pac->chan_map)
--		pac->chan_map = queue_new();
-+	if (!pac->channels)
-+		pac->channels = queue_new();
- 
--	printf("PAC %p chan_map 0x%02x\n", pac, *v);
-+	chan = new0(struct bt_bap_chan, 1);
-+	chan->count = *v;
-+	chan->location = bt_bap_pac_get_locations(pac) ? : pac->qos.location;
- 
--	queue_push_tail(pac->chan_map, UINT_TO_PTR(*v));
-+	queue_push_tail(pac->channels, chan);
- }
- 
--static void bap_pac_update_chan_map(struct bt_bap_pac *pac, struct iovec *data)
-+static void bap_pac_update_channels(struct bt_bap_pac *pac, struct iovec *data)
- {
- 	uint8_t type = 0x03;
- 
-@@ -2454,8 +2462,8 @@ static void bap_pac_merge(struct bt_bap_pac *pac, struct iovec *data,
- 	else
- 		pac->data = util_iov_dup(data, 1);
- 
--	/* Update channel map */
--	bap_pac_update_chan_map(pac, data);
-+	/* Update channels */
-+	bap_pac_update_channels(pac, data);
- 
- 	/* Merge metadata into existing record */
- 	if (pac->metadata)
-@@ -2495,7 +2503,7 @@ static void bap_pac_free(void *data)
- 	free(pac->name);
- 	util_iov_free(pac->metadata, 1);
- 	util_iov_free(pac->data, 1);
--	queue_destroy(pac->chan_map, NULL);
-+	queue_destroy(pac->channels, free);
- 	free(pac);
- }
- 
-@@ -4677,34 +4685,57 @@ int bt_bap_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
- 	if (!lpac->ops || !lpac->ops->select)
- 		return -EOPNOTSUPP;
- 
--	for (lchan = queue_get_entries(lpac->chan_map); lchan;
-+	for (lchan = queue_get_entries(lpac->channels); lchan;
- 					lchan = lchan->next) {
--		uint8_t lmap = PTR_TO_UINT(lchan->data);
-+		struct bt_bap_chan *lc = lchan->data;
-+		struct bt_bap_chan map = *lc;
-+		int i;
- 
--		for (rchan = queue_get_entries(rpac->chan_map); rchan;
--					rchan = rchan->next) {
--			uint8_t rmap = PTR_TO_UINT(rchan->data);
-+		for (i = 0, rchan = queue_get_entries(rpac->channels); rchan;
-+					rchan = rchan->next, i++) {
-+			struct bt_bap_chan *rc = rchan->data;
- 
--			printf("lmap 0x%02x rmap 0x%02x\n", lmap, rmap);
--
--			/* Try matching the channel mapping */
--			if (lmap & rmap) {
--				lpac->ops->select(lpac, rpac, &rpac->qos,
--							func, user_data,
--							lpac->user_data);
--				if (count)
--					(*count)++;
--
--				/* Check if there are any channels left */
--				lmap &= ~(lmap & rmap);
--				if (!lmap)
--					break;
--
--				/* Check if device require AC*(i) settings */
--				if (rmap == 0x01)
--					lmap = lmap >> 1;
--			} else
-+			/* Try matching the channel count */
-+			if (!(map.count & rc->count))
- 				break;
++		iov_append(&cfg->caps, &chan_alloc_ltv, sizeof(chan_alloc_ltv));
++	}
 +
-+			/* Check if location was set otherwise attempt to
-+			 * assign one based on the number of channels it
-+			 * supports.
-+			 */
-+			if (!rc->location) {
-+				rc->location = bt_bap_pac_get_locations(rpac);
-+				/* If channel count is 1 use a single
-+				 * location
-+				 */
-+				if (rc->count == 0x01)
-+					rc->location &= BIT(i);
-+			}
-+
-+			/* Try matching the channel location */
-+			if (!(map.location & rc->location))
-+				break;
-+
-+			lpac->ops->select(lpac, rpac, map.location &
-+						rc->location, &rpac->qos,
-+						func, user_data,
-+						lpac->user_data);
-+			if (count)
-+				(*count)++;
-+
-+			/* Check if there are any channels left to select */
-+			map.count &= ~(map.count & rc->count);
-+			if (!map.count)
-+				break;
-+
-+			/* Check if there are any locations left to select */
-+			map.location &= ~(map.location & rc->location);
-+			if (!map.location)
-+				break;
-+
-+			/* Check if device require AC*(i) settings */
-+			if (rc->count == 0x01)
-+				map.count = map.count >> 1;
- 		}
- 	}
- 
-diff --git a/src/shared/bap.h b/src/shared/bap.h
-index 470313e66fc0..9be198cec72c 100644
---- a/src/shared/bap.h
-+++ b/src/shared/bap.h
-@@ -151,7 +151,7 @@ struct bt_bap_pac *bt_bap_add_pac(struct gatt_db *db, const char *name,
- 
- struct bt_bap_pac_ops {
- 	int (*select)(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
--			struct bt_bap_pac_qos *qos,
-+			uint32_t chan_alloc, struct bt_bap_pac_qos *qos,
- 			bt_bap_pac_select_t cb, void *cb_data, void *user_data);
- 	int (*config)(struct bt_bap_stream *stream, struct iovec *cfg,
- 			struct bt_bap_qos *qos, bt_bap_pac_config_t cb,
+ 	/* Copy metadata */
+ 	if (ep->meta)
+ 		iov_append(&cfg->meta, ep->meta->iov_base, ep->meta->iov_len);
 -- 
 2.43.0
 
