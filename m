@@ -1,116 +1,113 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="x/OY8l3h"
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E2CFAF
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Dec 2023 02:22:27 -0800 (PST)
-Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-40c3f68b69aso49623035e9.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Dec 2023 02:22:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1702549346; x=1703154146; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fp1d+CKyQPNoIjDNbR+ewORGkHeCCmM/B8Rn1Q/unhg=;
-        b=x/OY8l3hWgTzbgSF9DZkun016kxaWvfpKkEJFfRmzgJf5wDJ3WQWtzmljTEkm6eED4
-         /ZV1UloZZKhzuDSiYDczAC8xfclltsryt1wV2D/V0iEOdS8K3v97sX9yK9M9Xnl63mfN
-         6yq6lVReRZblevsot5/ywa2Njdjkv5QYpQIuqnzXz7OnC1kQT2PzJrE3/HbogiRebMhw
-         hbMX9RSKml1kGwqPqHCLqN7ujlLooqnQ7ml475n7RIEB6V727+HzGlwe628WSXsWOHMy
-         wf4h0zkJwU2opBvUBW5OC7+rGZ+NsrJrkyElwAeDCcYC9ycNKBECXJ+X3VTSlRP8Cuuk
-         JIhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702549346; x=1703154146;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fp1d+CKyQPNoIjDNbR+ewORGkHeCCmM/B8Rn1Q/unhg=;
-        b=er7XUqliHdZ4G9d+l4trgvG0sOuye4N2WuMRRLrNpFPAjulCLh7SKDsMGAbOqcu19I
-         9UUX9lL8My8N5EgzLL27QompmZD286sGl9VPax7UdDS7Teu7hGIyCThz79Bi+LZLKTCC
-         aEre/qfIRA0Y5H3UrsgJiIYosbqQpfZuthX2xfLsPKpCvM3j2xP3ZRD0mjumP+XqrmX2
-         X3NfN0IewZg1IM91HSHQ2AeuL2bhzgR5lK9+klYfuOMysmKucT5CgTvqdGseNGVt8HJu
-         1biE9lrgVDM8GIZDHMdPvhBnfURIP0PT6+HEAqTu9iqy16tnbh8l7bMGCu0ogBiseByn
-         zXYw==
-X-Gm-Message-State: AOJu0Yz/V0dk+UtLuc9ACHh69AK41Tx3zDflKTNKAYZ+lTlnr2gaNRBG
-	j1lZe5g8Nl1fzGFurtP/BU9gRA==
-X-Google-Smtp-Source: AGHT+IGzq9LLPmSNCTgriJpxqSqtep05s898zngmo1cC+R8cZnekkhe4Hua33rmwUJhqwgbzXz1hHw==
-X-Received: by 2002:a05:600c:3ca2:b0:40c:50d5:f7a6 with SMTP id bg34-20020a05600c3ca200b0040c50d5f7a6mr2639429wmb.121.1702549345750;
-        Thu, 14 Dec 2023 02:22:25 -0800 (PST)
-Received: from localhost ([102.140.209.237])
-        by smtp.gmail.com with ESMTPSA id fm21-20020a05600c0c1500b0040c03c3289bsm24239700wmb.37.2023.12.14.02.22.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Dec 2023 02:22:25 -0800 (PST)
-Date: Thu, 14 Dec 2023 13:22:21 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: jing.cai@mediatek.com
-Cc: linux-mediatek@lists.infradead.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [bug report] Bluetooth: btusb: mediatek: add MediaTek
- devcoredump support
-Message-ID: <7c2608ea-1637-40f7-a84b-2e20245c00fc@moroto.mountain>
-References: <b915ddee-25fb-4072-b714-e1c97460cefd@moroto.mountain>
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="g0c3TMZc"
+X-Greylist: delayed 93235 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 14 Dec 2023 02:44:13 PST
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22730BD
+	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Dec 2023 02:44:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1702550651;
+	bh=197OT/NR6dODFsg/RL2+h0idtrOmFpUUcyfHIWUZauI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=g0c3TMZcAShLGfnjcWym/1kMp8SEOshcT06X9HhOwm/y9WRsRhBH/zn/5aUnRhgK2
+	 XpyJdHsSVoa/VXLdMWTH4Hngdit26ePx43eHYAWfYByc+nRle+t1FvECQxv6XnB6a9
+	 05oEBSlm4qAoDDjMYBmQDAuFKhh459gSkSyjzEmiN21u7/Nt/AyYjRXhug+tzYJaT/
+	 FmW7ApaFrTVPgEkeVKouc1O5WvP6kbzLpvEmFytqW32eBFVL0IfV+L1bEkqX4G2H/V
+	 QRIDo3QsXzn89Z/VdLrZa9BjQS9S8/jMsEIV83H5kerFc1qSNEfJbfSWApV4l4tLV0
+	 YcArdPAa8xNkw==
+Received: from [100.72.96.248] (cola.collaboradmins.com [195.201.22.229])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 8FA12378000B;
+	Thu, 14 Dec 2023 10:44:11 +0000 (UTC)
+Message-ID: <08015729-1917-4d0f-be93-a26b5bd966ed@collabora.com>
+Date: Thu, 14 Dec 2023 11:44:10 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b915ddee-25fb-4072-b714-e1c97460cefd@moroto.mountain>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH BlueZ] hog-lib: Fix HoG discovering characteristics order
+Content-Language: en-US
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+References: <20231213085011.1152912-1-frederic.danis@collabora.com>
+ <CABBYNZK8u1iuHA8FRXO9HL-kbYrL8jngo=UJG71+HHXJuSNSFw@mail.gmail.com>
+From: =?UTF-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis@collabora.com>
+In-Reply-To: <CABBYNZK8u1iuHA8FRXO9HL-kbYrL8jngo=UJG71+HHXJuSNSFw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Ping.  Let me add the bluetooth mailing list as well to see if anyone
-knows.
+Hi Luiz,
 
-regards,
-dan carpenter
+On 13/12/2023 18:27, Luiz Augusto von Dentz wrote:
+> Hi Frédéric,
+>
+> On Wed, Dec 13, 2023 at 3:50 AM Frédéric Danis
+> <frederic.danis@collabora.com> wrote:
+>> PTS test HOGP/RH/HGRF/BV-01-I fails as inconclusive after waiting for
+>> second report map read request with message 'Please send ReadRequest to
+>> read Report Map characteristic with handle = 0x00E7'.
+>> Handle which has already been read, as it can be seen in btmon traces.
+>>
+>> This commit change the recursion order to read instance characteristics
+>> before recurring to next instances.
+>>
+>> Closes: https://github.com/bluez/bluez/issues/657
+>> ---
+>>   profiles/input/hog-lib.c | 12 ++++++------
+>>   1 file changed, 6 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
+>> index 7ff1ede3d..db62a3c9f 100644
+>> --- a/profiles/input/hog-lib.c
+>> +++ b/profiles/input/hog-lib.c
+>> @@ -1780,12 +1780,6 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt)
+>>
+>>          queue_foreach(hog->bas, (void *) bt_bas_attach, gatt);
+>>
+>> -       for (l = hog->instances; l; l = l->next) {
+>> -               struct bt_hog *instance = l->data;
+>> -
+>> -               bt_hog_attach(instance, gatt);
+>> -       }
+>> -
+>>          if (!hog->uhid_created) {
+>>                  DBG("HoG discovering characteristics");
+>>                  if (hog->attr)
+>> @@ -1798,6 +1792,12 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt)
+>>                                          char_discovered_cb, hog);
+>>          }
+>>
+>> +       for (l = hog->instances; l; l = l->next) {
+>> +               struct bt_hog *instance = l->data;
+>> +
+>> +               bt_hog_attach(instance, gatt);
+>> +       }
+>> +
+>>          if (!hog->uhid_created)
+>>                  return true;
+> While I don't oppose this change, but this seems to be a limitation on
+> the PTS side which expects a certain order of the operation which
+> doesn't seem to be a requirement coming from the spec, so perhaps we
+> should file an issue to PTS.
 
-On Mon, Jul 03, 2023 at 04:21:32PM +0300, Dan Carpenter wrote:
-> Hello Jing Cai,
-> 
-> The patch 872f8c253cb9: "Bluetooth: btusb: mediatek: add MediaTek
-> devcoredump support" from Jun 29, 2023, leads to the following Smatch
-> static checker warning:
-> 
-> 	drivers/bluetooth/btmtk.c:409 btmtk_process_coredump()
-> 	error: double free of 'skb'
-> 
-> drivers/bluetooth/btmtk.c
->    381                  if (err < 0)
->    382                          break;
->    383                  data->cd_info.cnt = 0;
->    384  
->    385                  /* It is supposed coredump can be done within 5 seconds */
->    386                  schedule_delayed_work(&hdev->dump.dump_timeout,
->    387                                        msecs_to_jiffies(5000));
->    388                  fallthrough;
->    389          case HCI_DEVCOREDUMP_ACTIVE:
->    390          default:
->    391                  err = hci_devcd_append(hdev, skb);
-> 
-> hci_devcd_append() free skb on error
-> 
->    392                  if (err < 0)
->    393                          break;
->    394                  data->cd_info.cnt++;
->    395  
->    396                  /* Mediatek coredump data would be more than MTK_COREDUMP_NUM */
->    397                  if (data->cd_info.cnt > MTK_COREDUMP_NUM &&
->    398                      skb->len > sizeof(MTK_COREDUMP_END) &&
->    399                      !memcmp((char *)&skb->data[skb->len - sizeof(MTK_COREDUMP_END)],
->    400                              MTK_COREDUMP_END, sizeof(MTK_COREDUMP_END) - 1)) {
->    401                          bt_dev_info(hdev, "Mediatek coredump end");
->    402                          hci_devcd_complete(hdev);
->    403                  }
->    404  
->    405                  break;
->    406          }
->    407  
->    408          if (err < 0)
->    409                  kfree_skb(skb);
-> 
-> double free
-> 
->    410  
->    411          return err;
->    412  }
-> 
-> regards,
-> dan carpenter
-> 
+Yes, I opened an issue to PTS.
+Let's see what they will reply.
+
+Regards,
+
+Fred
+
+-- 
+
+Frédéric Danis
+Senior Software Engineer
+
+Collabora Ltd.
+Platinum Building, St John's Innovation Park, Cambridge CB4 0DS, United Kingdom
+Registered in England & Wales, no. 5513718
+
