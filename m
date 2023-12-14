@@ -1,83 +1,87 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E660B6E2C2
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Dec 2023 20:54:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B9D56A35B
+	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Dec 2023 20:56:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U9OJj3qF"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 26D91C433D9
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Dec 2023 20:54:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702587260;
-	bh=neUluy4zwVXl8ewxvCA5xlcu4F5jPWsene8Z8lenrC8=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=U9OJj3qFEJrxWTYMZyK3seW2ekYEmBVtFz8CZHGHLeOnfpvMa75QMo3SRbxN0BIMM
-	 ezUHNlz/5WBv69OumEu6EpUkIwlP9yKqDxn7yCVNU9Q1E9d3smiuANIluKyGTGgYN6
-	 Q3itlm7ynuLt6b6c+QxU9rdVZGe2st67hvqs1sVasCaYk4HeI071EKx4bjgSnBvZMc
-	 vfm8p3Z4VxaQktQKFUUo2vy3lY4WLn6HEj4tHpcZ09Djm/MwH7DuHGODbLVSauDere
-	 swmoOoI3iCtmJhiWr2/zKQTddxZgVHxBbPoVb5OZV/pfJlfUjnfIfvLjA7W0CLmA2A
-	 AT/c9YGp1G94w==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 12DD2C53BD1; Thu, 14 Dec 2023 20:54:20 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IE3LbSKS"
+Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-5906c569a1fso472486eaf.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Dec 2023 12:56:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702587363; x=1703192163; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+vzaXJZMWcqXVLM/38ZU1rhtJvEz/oxxRs4GNt9sjWQ=;
+        b=IE3LbSKSoy9/K7yDpgZK5A09FuMJGKyHssJQC2c9w2kvcjZYe5usI7AVGHB+0tiGXo
+         GMxEhOeR176GWnUFB/4gJZu303/MVovmUWVNBenrZv4wqTWtaGMPYXhoJ+Vgcua0TKqo
+         U+wo9vjajC4nR13vnQeb9qoWUBn9DQ8+zJD7PZBq8pUd/vIBfOE03IkwaA5UgBTwBPTt
+         o7lm0oq3KnRr+RPz3l2WwlonJ1JqbFww/T63yJGlKTUHK8FmP0rj7Mb9HZ4nU/Jc64d6
+         wBle7r9+hlMShRViDifzPUVjrz1bshQpg3g4SuIcII/nOX4vaJgNJHRKMwpKjWgiOiG9
+         dlWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702587363; x=1703192163;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+vzaXJZMWcqXVLM/38ZU1rhtJvEz/oxxRs4GNt9sjWQ=;
+        b=hi+HzFwN0wEJspTNA6o2HQ+854UVEZ78e2j2XnRnO9PIHzENq3hPq0En5vHLsjvwjV
+         siccvLuyxLOdLJ2yQt24Ao6FoO+Wol6PorfitMBgTfr7CrN5oF0tZMx7YKDBmFGn20oC
+         DfBHiMu9nEKMZW1C8+tthsJf7l4aFRtiuiZjkTk35BDaMox9t2A1ZJZYpR5eCEI9KnHg
+         7wtuXGoTIv3s2+mi07Dtnmn14kR/n5fORCmdLpOPW5Yg6ZpVfmqmLaSF0rzLqMZKZj/o
+         uCxZ/x05Xju25ci5nqPzZ/HcwKgbuTnu8q1ur+pv2yJnlOeo2Rtz5zhERtau5FZb/JEM
+         liYA==
+X-Gm-Message-State: AOJu0YxnsJfIwohtEVP3078AjgvIp/Q/70+mX4zBuWwOOeHqcpxE0UM1
+	PDrkwdTdhmED7Wt0PdQKWq4z2HjY+hM=
+X-Google-Smtp-Source: AGHT+IEjXYfltJEPvycCc09+5O+/98V6vwFFsynmw1qeJnRM5AvJgYsSFSD16qib8cKWBry043iG6Q==
+X-Received: by 2002:a4a:304a:0:b0:590:2190:93de with SMTP id z10-20020a4a304a000000b00590219093demr4539411ooz.9.1702587363000;
+        Thu, 14 Dec 2023 12:56:03 -0800 (PST)
+Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
+        by smtp.gmail.com with ESMTPSA id m20-20020a4a2414000000b005902a5bc3easm3658057oof.22.2023.12.14.12.56.01
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Dec 2023 12:56:01 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 204589] Bluetooth touchpad (Apple Magic Trackpad) disconnects
- every few minutes
-Date: Thu, 14 Dec 2023 20:54:19 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: queeup@zoho.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-204589-62941-UqgDCBEare@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-204589-62941@https.bugzilla.kernel.org/>
-References: <bug-204589-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Subject: [PATCH BlueZ v6 3/6] org.bluez.MediaEndpoint: Add ChannelAllocation to SelectProperties
+Date: Thu, 14 Dec 2023 15:55:53 -0500
+Message-ID: <20231214205556.1320286-3-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20231214205556.1320286-1-luiz.dentz@gmail.com>
+References: <20231214205556.1320286-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D204589
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
---- Comment #17 from queeup (queeup@zoho.com) ---
-Happy to report, my problem solved with Gnome 45.1 & Fedora 39. No disconne=
-ct
-or freeze with apple trackpad.
+This adds ChannelAllocation to SelectProperties which when set can be
+used by Endpoint implementation in the response as part of
+Capabilities, note that it is not mandatory to use it so the Endpoint
+may have its on logic to allocate channels.
+---
+ doc/org.bluez.MediaEndpoint.rst | 2 ++
+ 1 file changed, 2 insertions(+)
 
+diff --git a/doc/org.bluez.MediaEndpoint.rst b/doc/org.bluez.MediaEndpoint.rst
+index 6754d6e3b7eb..f2b830ab0949 100644
+--- a/doc/org.bluez.MediaEndpoint.rst
++++ b/doc/org.bluez.MediaEndpoint.rst
+@@ -79,6 +79,8 @@ dict SelectProperties(dict capabilities)
+ 
+ 	:uint32 Locations:
+ 
++	:uint32_t ChannelAllocation:
++
+ 	:dict QoS:
+ 
+ 		:byte Framing:
+-- 
+2.43.0
 
-
-Fedora 39 Silverblue
-Intel AX200 bluetooth
-Apple Magic Trackpad V1 (05AC:030E)
-
-```
-$ uname -r
-6.6.3-200.fc39.x86_64
-
-$ rpm -qa iwlwifi*
-iwlwifi-dvm-firmware-20231111-1.fc39.noarch
-iwlwifi-mvm-firmware-20231111-1.fc39.noarch
-
-```
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
