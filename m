@@ -1,111 +1,93 @@
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DFFE41776
+	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Dec 2023 15:35:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X18J4CEu"
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8095E10F
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Dec 2023 07:33:40 -0800 (PST)
-Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1d36a6cec69so2462385ad.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Dec 2023 07:33:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702568020; x=1703172820; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=CsTJiUHB6EqX1aDZ4pfOIgHhEpiY7UzyEMHxt/ZudKI=;
-        b=X18J4CEuhltPo+X5qSd9z4/hUKWNhs5gLm2ayeE5CHbont6EiZJS62B+dfZPP8NEPV
-         PA/z1c6gVqSP7IXEuDw56PyrT2hEp7P7p/kxbBJvMTjP/eWbtk07ZkLRZvRaalYb8ul4
-         H1QMjPci64IO/gv8wgA+zCQKsPFI6zXsTezXgWMuxg2l8znIjibZGrHCJM6rVUQWBnyK
-         fi27mrhDysFm5OmEdok85f52BsBdrLpHz1fgpiFBIXgqv2Lz5Qy6pYljWBP8H0PcrcN/
-         /BP33FMeTU0o7SQfxic9EIvqzxwdBP8JO6nxoXbtsDtjAxSKbqBvcwvHZ2D6vpzenhVZ
-         c9tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702568020; x=1703172820;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CsTJiUHB6EqX1aDZ4pfOIgHhEpiY7UzyEMHxt/ZudKI=;
-        b=uhqmDX8r+ZFh3Pa8f1CiyW2xhUDc0h/TNDhgq/uzdIYv5BaWv+t/L8wudTQnvg6N51
-         s3Q6u2/owrsa4DU+zDtfeb6Wx5b2BbBlu07ylYea8TWmrfOwEYd/b36tEjiLXUcuPW3y
-         eNW7EPorA3wI1gyHVJ0ZdtmKkIcTfZicHnHjcX8le/mliG1YEXGbXDvoWUB/FAF6BzF/
-         jaQ7HlsMfO3fm5m/DlQflwbBt+GJUSniB3Dkkyj9qmflPW+vteNeNCLRZZPWUQQ8qRHk
-         VlG1gePPVfsxGQ7DZymXrydM7bK7tfuU/wDqUX/AlTUZN1zVN52V+gSO1ZMGCOV5JqnW
-         arCQ==
-X-Gm-Message-State: AOJu0YwnoTj0/kBuz8QZIQm+E3cfNbFfZJUnV0cLD6rvkLL2k8SeZda4
-	Eb/C22HvnOfVpR/diM5mRXwglm/Rz6Y=
-X-Google-Smtp-Source: AGHT+IH6Ipyaa+wX75KLZDPwYFmOG5bL57uyiZyhJFnKtKf3tAiBdXZwta/zgmj0nsZaNhHiHhU/nw==
-X-Received: by 2002:a17:903:11cd:b0:1d3:2a94:cb24 with SMTP id q13-20020a17090311cd00b001d32a94cb24mr4129492plh.9.1702568019687;
-        Thu, 14 Dec 2023 07:33:39 -0800 (PST)
-Received: from [172.17.0.2] ([52.238.27.199])
-        by smtp.gmail.com with ESMTPSA id ju10-20020a170903428a00b001d0c4869725sm540400plb.97.2023.12.14.07.33.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Dec 2023 07:33:39 -0800 (PST)
-Message-ID: <657b2053.170a0220.d825d.2614@mx.google.com>
-Date: Thu, 14 Dec 2023 07:33:39 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1164967921502833161=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EMDgAh1o"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 37D16C433C8
+	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Dec 2023 15:35:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702568127;
+	bh=Clj3R2LTWdfjRiwfpu+vxfaph/m6t8r1fCpnF/LY2u4=;
+	h=From:To:Subject:Date:From;
+	b=EMDgAh1o6ST9FTqrmjxDzRCVLra9A6pAly7EJE63r/vPVTGPs8yGduKCB622pQ+XL
+	 PUUFuVAPxz0c+PtdFQzxgXXo6gfN3flyZe4sj1HnjDG+RMRV+eW72bXOxrkQZUIcj9
+	 pwVzjcX4gh9SwKStNUYaFo/4hnFvrttc7iTgCsCccvmR7GKlkiJoUb1RY4lXA2XxrD
+	 OrNM49wdtiIgfSvrMIK76vuNgcUoLvAGU0vVI1wIMr8N4TdfEu5p8/qtKxGS7IIQzY
+	 jeURdBornNGIIaHJepPR7YM553XghYe9YYLWAOE+EKQAzJCWE8ksljUlN4UHEXjDOl
+	 KhEeqEk0QgNJg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 21D20C4332E; Thu, 14 Dec 2023 15:35:27 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 218264] New: Potential kernel regression with bluetooth pairing
+ on specific radios
+Date: Thu, 14 Dec 2023 15:35:26 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: marco.rodolfi@tuta.io
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression
+Message-ID: <bug-218264-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, quic_zijuhu@quicinc.com
-Subject: RE: [v1,1/1] Bluetooth: hci_event: Fix power save marking logic
-In-Reply-To: <1702564598-3034-1-git-send-email-quic_zijuhu@quicinc.com>
-References: <1702564598-3034-1-git-send-email-quic_zijuhu@quicinc.com>
-Reply-To: linux-bluetooth@vger.kernel.org
 
---===============1164967921502833161==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218264
 
-This is automated email and please do not reply to this email!
+            Bug ID: 218264
+           Summary: Potential kernel regression with bluetooth pairing on
+                    specific radios
+           Product: Drivers
+           Version: 2.5
+          Hardware: All
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: marco.rodolfi@tuta.io
+        Regression: No
 
-Dear submitter,
+I had a Logitech K480 paired with my Steam Deck (RTL8822CE) from a previous
+successful pair on Linux 6.4.x/6.5.x, not sure on the specific version. Sin=
+ce
+Fedora updated to 6.6.x and I accidentally lost the pairing key I can't in =
+no
+way be able to associate. It connects fine but just fails with
+bluez.authenticationfailure. I've opened a bug report in the bluez issues p=
+age
+https://github.com/bluez/bluez/issues/654 and after testing on another comp=
+uter
+with a different bluetooth radio (RTL8771) + kernel 6.6.5 and bluez 5.70 the
+keyboard connected immediately and requiring me to insert the passcode
+correctly. I'm writing this from this specific keyboard.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=810094
+I'm still not sure if it's the kernel driver fault or bluez fault.
 
----Test result---
+--=20
+You may reply to this email to add a comment.
 
-Test Summary:
-CheckPatch                    PASS      0.47 seconds
-GitLint                       PASS      0.22 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      27.62 seconds
-CheckAllWarning               PASS      31.20 seconds
-CheckSparse                   WARNING   38.14 seconds
-CheckSmatch                   WARNING   100.22 seconds
-BuildKernel32                 PASS      27.91 seconds
-TestRunnerSetup               PASS      432.22 seconds
-TestRunner_l2cap-tester       PASS      23.62 seconds
-TestRunner_iso-tester         PASS      48.32 seconds
-TestRunner_bnep-tester        PASS      7.07 seconds
-TestRunner_mgmt-tester        PASS      167.01 seconds
-TestRunner_rfcomm-tester      PASS      10.94 seconds
-TestRunner_sco-tester         PASS      14.59 seconds
-TestRunner_ioctl-tester       PASS      12.25 seconds
-TestRunner_mesh-tester        PASS      8.83 seconds
-TestRunner_smp-tester         PASS      9.93 seconds
-TestRunner_userchan-tester    PASS      7.36 seconds
-IncrementalBuild              PASS      25.83 seconds
-
-Details
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============1164967921502833161==--
+You are receiving this mail because:
+You are the assignee for the bug.=
