@@ -1,100 +1,83 @@
-Received: from mail11.truemail.it (mail11.truemail.it [217.194.8.81])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E5ACA7;
-	Thu, 14 Dec 2023 09:39:48 -0800 (PST)
-Received: from francesco-nb.int.toradex.com (93-49-2-63.ip317.fastwebnet.it [93.49.2.63])
-	by mail11.truemail.it (Postfix) with ESMTPA id BD29721454;
-	Thu, 14 Dec 2023 18:39:45 +0100 (CET)
-Date: Thu, 14 Dec 2023 18:39:44 +0100
-From: Francesco Dolcini <francesco@dolcini.it>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jirislaby@kernel.org>
-Cc: Francesco Dolcini <francesco@dolcini.it>,
-	linux-bluetooth@vger.kernel.org, linux-mediatek@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	greybus-dev@lists.linaro.org, linux-iio@vger.kernel.org,
-	netdev@vger.kernel.org, chrome-platform@lists.linux.dev,
-	platform-driver-x86@vger.kernel.org, linux-serial@vger.kernel.org,
-	linux-sound@vger.kernel.org,
-	Francesco Dolcini <francesco.dolcini@toradex.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Johan Hovold <johan@kernel.org>, Alex Elder <elder@kernel.org>,
-	Jonathan Cameron <jic23@kernel.org>, Lee Jones <lee@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Benson Leung <bleung@chromium.org>,
-	Tzung-Bi Shih <tzungbi@kernel.org>, Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH v1] treewide, serdev: change receive_buf() return type to
- size_t
-Message-ID: <ZXs94Mf1eOMCmGpT@francesco-nb.int.toradex.com>
-References: <20231214170146.641783-1-francesco@dolcini.it>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E660B6E2C2
+	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Dec 2023 20:54:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U9OJj3qF"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 26D91C433D9
+	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Dec 2023 20:54:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702587260;
+	bh=neUluy4zwVXl8ewxvCA5xlcu4F5jPWsene8Z8lenrC8=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=U9OJj3qFEJrxWTYMZyK3seW2ekYEmBVtFz8CZHGHLeOnfpvMa75QMo3SRbxN0BIMM
+	 ezUHNlz/5WBv69OumEu6EpUkIwlP9yKqDxn7yCVNU9Q1E9d3smiuANIluKyGTGgYN6
+	 Q3itlm7ynuLt6b6c+QxU9rdVZGe2st67hvqs1sVasCaYk4HeI071EKx4bjgSnBvZMc
+	 vfm8p3Z4VxaQktQKFUUo2vy3lY4WLn6HEj4tHpcZ09Djm/MwH7DuHGODbLVSauDere
+	 swmoOoI3iCtmJhiWr2/zKQTddxZgVHxBbPoVb5OZV/pfJlfUjnfIfvLjA7W0CLmA2A
+	 AT/c9YGp1G94w==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 12DD2C53BD1; Thu, 14 Dec 2023 20:54:20 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 204589] Bluetooth touchpad (Apple Magic Trackpad) disconnects
+ every few minutes
+Date: Thu, 14 Dec 2023 20:54:19 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: queeup@zoho.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-204589-62941-UqgDCBEare@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-204589-62941@https.bugzilla.kernel.org/>
+References: <bug-204589-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231214170146.641783-1-francesco@dolcini.it>
 
-On Thu, Dec 14, 2023 at 06:01:46PM +0100, Francesco Dolcini wrote:
-> From: Francesco Dolcini <francesco.dolcini@toradex.com>
-> 
-> receive_buf() is called from ttyport_receive_buf() that expects values
-> ">= 0" from serdev_controller_receive_buf(), change its return type from
-> ssize_t to size_t.
-> 
-> Suggested-by: Jiri Slaby <jirislaby@kernel.org>
-> Link: https://lore.kernel.org/all/087be419-ec6b-47ad-851a-5e1e3ea5cfcc@kernel.org/
-> Signed-off-by: Francesco Dolcini <francesco.dolcini@toradex.com>
-> ---
-> hello,
-> patch is based on current linux next.
-> 
-> It has an obvious problem, it touches files from multiple subsystem in a single
-> patch that is complicated to review and eventually merge, just splitting this
-> would however not work, it will break bisectability and the build.
-> 
-> I am looking for advise on the best way to move forward.
-> 
-> I see the following options:
->  - keep it as it is
->  - break it down with a patch with each subsystem, and squash before applying
->    from a single (tty?) subsystem
->  - go for a multi stage approach, defining a new callback, move to it and in
->    the end remove the original one, likewise it was done for i2c lately
+https://bugzilla.kernel.org/show_bug.cgi?id=3D204589
 
-whoops. I just noticed Greg applied commit 475fc6e2de6f ("tty: serdev:
-convert to u8 and size_t") that touch the exact same files without much
-of an issue.
+--- Comment #17 from queeup (queeup@zoho.com) ---
+Happy to report, my problem solved with Gnome 45.1 & Fedora 39. No disconne=
+ct
+or freeze with apple trackpad.
 
-Probably the "keep it as it is" is just the way to go.
 
-> 
-> ---
->  drivers/bluetooth/btmtkuart.c              |  4 ++--
->  drivers/bluetooth/btnxpuart.c              |  4 ++--
->  drivers/bluetooth/hci_serdev.c             |  4 ++--
->  drivers/gnss/core.c                        |  6 +++---
->  drivers/gnss/serial.c                      |  4 ++--
->  drivers/gnss/sirf.c                        |  6 +++---
->  drivers/greybus/gb-beagleplay.c            |  6 +++---
->  drivers/iio/chemical/pms7003.c             |  4 ++--
->  drivers/iio/chemical/scd30_serial.c        |  4 ++--
->  drivers/iio/chemical/sps30_serial.c        |  4 ++--
->  drivers/iio/imu/bno055/bno055_ser_core.c   |  4 ++--
->  drivers/mfd/rave-sp.c                      |  4 ++--
->  drivers/net/ethernet/qualcomm/qca_uart.c   |  2 +-
->  drivers/nfc/pn533/uart.c                   |  4 ++--
->  drivers/nfc/s3fwrn5/uart.c                 |  4 ++--
->  drivers/platform/chrome/cros_ec_uart.c     |  4 ++--
->  drivers/platform/surface/aggregator/core.c |  4 ++--
->  drivers/tty/serdev/serdev-ttyport.c        | 10 ++++------
->  include/linux/gnss.h                       |  4 ++--
->  include/linux/serdev.h                     |  8 ++++----
->  sound/drivers/serial-generic.c             |  4 ++--
->  21 files changed, 48 insertions(+), 50 deletions(-)
+
+Fedora 39 Silverblue
+Intel AX200 bluetooth
+Apple Magic Trackpad V1 (05AC:030E)
+
+```
+$ uname -r
+6.6.3-200.fc39.x86_64
+
+$ rpm -qa iwlwifi*
+iwlwifi-dvm-firmware-20231111-1.fc39.noarch
+iwlwifi-mvm-firmware-20231111-1.fc39.noarch
+
+```
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
