@@ -1,145 +1,188 @@
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC06F671E0
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Dec 2023 23:04:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD1ECA68;
+	Fri, 15 Dec 2023 06:40:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FLVVhIrZ"
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-42542b1ed5dso412901cf.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Dec 2023 15:04:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702595056; x=1703199856; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=URek9GBkoq692pqcoAGRzykh3SUL3AZ0iWvX2IPDt68=;
-        b=FLVVhIrZGT1p7VMllumeYjYXIpSy9AaTpiNEM7CzVSOKiFlF2PVyJn/JO9b8CmYWOc
-         KA4ondXYYRflQHqfZiqP3JTSVwyvzjFCL7oHrrpUv+ZA0n67gh6kLRAdNw90hVJI/0md
-         EyQGHyIGWGzQZ5SnPLHeAqmII2kBc7Pls6y2Fuj9x+nO6T8jRCTqZFrHbK8NFNgq3kON
-         71FrDnCaFt8CmQd2Mi19kChRsTtiveRa0EBiixE+XOaKYBOnnQtWAM+gYZLZNvSda2EL
-         xm1SIBeFVK6n5kDC8SpawdYCYWvJl9W6/pQwc+Vx+p/5yp8IwFF6j/AtsNLiP6PRVIx5
-         lUEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702595056; x=1703199856;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=URek9GBkoq692pqcoAGRzykh3SUL3AZ0iWvX2IPDt68=;
-        b=plbSZLxi4LKRClmAg+7szH1Hz24dMxCTzf4EIEoWugwbpyE+K0QUWWh0FB9UATw+WM
-         40kWxae/tiZBl4IFr982jPa6WCg+DFVFmX/3bxIXFkcQLjDR3MzHkgFFdbPXHZ5DZma/
-         ufPw3Dgkv6HlxcTSaC4SL2JMG2K4zCp+7VnyaCe7R6DogfvhSF5ItzlPA4r1soseszH6
-         EveveqmNhAhQ+dwIXdwASdEDKT3o8rmfPs4dz4fwtgp874dkSVwpRe1UG6wkdXQYE8As
-         U8n6cXn/eqKzjAvxEvJM4daMcxyqmhzxb3DhC/lSsfs8A3Hl05c4UljuO6XQEdKrfPJW
-         +2Jg==
-X-Gm-Message-State: AOJu0YxXROaB7hF/2RQid+YxFwmJYSAQRqkMYzONpuSqw7qmV/MuqRZv
-	s7CYIVsLG8UuSIOhCQqfTXHxVSEPtNJoOw==
-X-Google-Smtp-Source: AGHT+IGyGyHDJGE5VM3wOMvaLhp7jsPx097DaVHzJazeUsF2g7tZJihsASFcIpRmU5LJTgLBOilc/g==
-X-Received: by 2002:a05:622a:1006:b0:425:4043:96f0 with SMTP id d6-20020a05622a100600b00425404396f0mr15199701qte.125.1702595055649;
-        Thu, 14 Dec 2023 15:04:15 -0800 (PST)
-Received: from [172.17.0.2] ([172.183.51.126])
-        by smtp.gmail.com with ESMTPSA id m26-20020ac8445a000000b00423e1b606bbsm6112869qtn.69.2023.12.14.15.04.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Dec 2023 15:04:15 -0800 (PST)
-Message-ID: <657b89ef.c80a0220.4c2dc.40af@mx.google.com>
-Date: Thu, 14 Dec 2023 15:04:15 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7593030763093027179=="
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="cEqYxVbK"
+X-UUID: c5d81fb69b1411eea5db2bebc7c28f94-20231215
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=BTCqKfdwdR9v46nV62z59E3sFP0odYPdEQLNmh4+llU=;
+	b=cEqYxVbKs3VPo4AxOjw3XAhJSwoby8Xb4LO9qNx3TRORAGykptMjEOTR/puo2KmVKPuz3xJLInxtvADBMrjeJ4kpdTNAmczVbLphMph+chaV9uJfrdUSsG3jllR/Y2S82ioHy6YcgGYGOr51RrFVWn0fXWYBKd4aA7SKpH2+UIU=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.35,REQID:68d2a743-a06a-49f2-bfb6-3b8bd3ae02c9,IP:0,U
+	RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-5
+X-CID-META: VersionHash:5d391d7,CLOUDID:0b79d273-1bd3-4f48-b671-ada88705968c,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+	RL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,
+	DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: c5d81fb69b1411eea5db2bebc7c28f94-20231215
+Received: from mtkmbs14n1.mediatek.inc [(172.21.101.75)] by mailgw01.mediatek.com
+	(envelope-from <hao.qin@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1908214513; Fri, 15 Dec 2023 14:40:01 +0800
+Received: from mtkmbs13n2.mediatek.inc (172.21.101.108) by
+ mtkmbs13n2.mediatek.inc (172.21.101.108) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Fri, 15 Dec 2023 14:40:00 +0800
+Received: from mhfsdcap04.gcn.mediatek.inc (10.17.3.154) by
+ mtkmbs13n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Fri, 15 Dec 2023 14:39:59 +0800
+From: Hao Qin <hao.qin@mediatek.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
+CC: Sean Wang <sean.wang@mediatek.com>, Deren Wu <deren.Wu@mediatek.com>,
+	Aaron Hou <aaron.hou@mediatek.com>, Chris Lu <chris.lu@mediatek.com>, Steve
+ Lee <steve.lee@mediatek.com>, linux-bluetooth
+	<linux-bluetooth@vger.kernel.org>, linux-kernel
+	<linux-kernel@vger.kernel.org>, linux-mediatek
+	<linux-mediatek@lists.infradead.org>, hao.qin <hao.qin@mediatek.com>
+Subject: [PATCH 1/1] Bluetooth: btusb: mediatek: add a recovery method for MT7922
+Date: Fri, 15 Dec 2023 14:37:14 +0800
+Message-ID: <20231215063714.7684-1-hao.qin@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v6,1/6] bap: Allow setup of multiple stream per endpoint
-In-Reply-To: <20231214205556.1320286-1-luiz.dentz@gmail.com>
-References: <20231214205556.1320286-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain
 
---===============7593030763093027179==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: "hao.qin" <hao.qin@mediatek.com>
 
-This is automated email and please do not reply to this email!
+For MT7922, perform a reset before patch download to avoid
+unexpected problems caused by inconsistency between upper layer
+status and dongle status. Add USB reset retry to recover from
+unexpected patch download failure.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=810225
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      3.44 seconds
-GitLint                       FAIL      2.20 seconds
-BuildEll                      PASS      25.97 seconds
-BluezMake                     PASS      745.88 seconds
-MakeCheck                     PASS      11.63 seconds
-MakeDistcheck                 PASS      164.18 seconds
-CheckValgrind                 PASS      223.44 seconds
-CheckSmatch                   PASS      330.07 seconds
-bluezmakeextell               PASS      104.38 seconds
-IncrementalBuild              PASS      4102.15 seconds
-ScanBuild                     WARNING   964.27 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ,v6,2/6] shared/bap: Make bt_bap_select match the channel map
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-13: B3 Line contains hard tab characters (\t): "	  0000a0201030202010304280001020206000000000a020103020201030428"
-14: B3 Line contains hard tab characters (\t): "	  0002020206000000000a02010302020103042800"
-[BlueZ,v6,3/6] org.bluez.MediaEndpoint: Add ChannelAllocation to SelectProperties
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T1 Title exceeds max length (81>80): "[BlueZ,v6,3/6] org.bluez.MediaEndpoint: Add ChannelAllocation to SelectProperties"
-[BlueZ,v6,6/6] client/player: Use ChannelAllocation given on SelectProperties
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-13: B3 Line contains hard tab characters (\t): "	  6020206000000001002010302020103042800050302000000010202060000"
-14: B3 Line contains hard tab characters (\t): "	  0000100201030202010304280005030100000002020206000000001002010"
-15: B3 Line contains hard tab characters (\t): "	  302020103042800050302000000"
-##############################
-Test: ScanBuild - WARNING
-Desc: Run Scan Build
-Output:
-src/shared/bap.c:4768:23: warning: Access to field 'type' results in a dereference of a null pointer (loaded from variable 'lpac')
-                if (!match.rpac && (lpac->type != BT_BAP_BCAST_SOURCE))
-                                    ^~~~~~~~~~
-1 warning generated.
-In file included from tools/mesh-gatt/crypto.c:32:
-./src/shared/util.h:228:9: warning: 1st function call argument is an uninitialized value
-        return be32_to_cpu(get_unaligned((const uint32_t *) ptr));
-               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-./src/shared/util.h:33:26: note: expanded from macro 'be32_to_cpu'
-#define be32_to_cpu(val) bswap_32(val)
-                         ^~~~~~~~~~~~~
-/usr/include/byteswap.h:34:21: note: expanded from macro 'bswap_32'
-#define bswap_32(x) __bswap_32 (x)
-                    ^~~~~~~~~~~~~~
-In file included from tools/mesh-gatt/crypto.c:32:
-./src/shared/util.h:238:9: warning: 1st function call argument is an uninitialized value
-        return be64_to_cpu(get_unaligned((const uint64_t *) ptr));
-               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-./src/shared/util.h:34:26: note: expanded from macro 'be64_to_cpu'
-#define be64_to_cpu(val) bswap_64(val)
-                         ^~~~~~~~~~~~~
-/usr/include/byteswap.h:37:21: note: expanded from macro 'bswap_64'
-#define bswap_64(x) __bswap_64 (x)
-                    ^~~~~~~~~~~~~~
-2 warnings generated.
-
-
-
+Signed-off-by: hao.qin <hao.qin@mediatek.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btusb.c | 66 +++++++++++++++++++++++++++------------
+ 1 file changed, 46 insertions(+), 20 deletions(-)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 0926e4451802..778e1a0d9cae 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2812,7 +2812,7 @@ static int btusb_mtk_hci_wmt_sync(struct hci_dev *hdev,
+ 	 * WMT command.
+ 	 */
+ 	err = wait_on_bit_timeout(&data->flags, BTUSB_TX_WAIT_VND_EVT,
+-				  TASK_INTERRUPTIBLE, HCI_INIT_TIMEOUT);
++				  TASK_INTERRUPTIBLE, HCI_CMD_TIMEOUT);
+ 	if (err == -EINTR) {
+ 		bt_dev_err(hdev, "Execution of wmt command interrupted");
+ 		clear_bit(BTUSB_TX_WAIT_VND_EVT, &data->flags);
+@@ -2994,28 +2994,22 @@ static u32 btusb_mtk_reset_done(struct hci_dev *hdev)
+ 	return val & MTK_BT_RST_DONE;
+ }
+ 
+-static int btusb_mtk_reset(struct hci_dev *hdev, void *rst_data)
++static int btusb_mtk_subsys_reset(struct hci_dev *hdev, u32 dev_id)
+ {
+ 	struct btusb_data *data = hci_get_drvdata(hdev);
+-	struct btmediatek_data *mediatek;
+ 	u32 val;
+ 	int err;
+ 
+-	/* It's MediaTek specific bluetooth reset mechanism via USB */
+-	if (test_and_set_bit(BTUSB_HW_RESET_ACTIVE, &data->flags)) {
+-		bt_dev_err(hdev, "last reset failed? Not resetting again");
+-		return -EBUSY;
+-	}
+-
+-	err = usb_autopm_get_interface(data->intf);
+-	if (err < 0)
+-		return err;
+-
+-	btusb_stop_traffic(data);
+-	usb_kill_anchored_urbs(&data->tx_anchor);
+-	mediatek = hci_get_priv(hdev);
+-
+-	if (mediatek->dev_id == 0x7925) {
++	if (dev_id == 0x7922) {
++		btusb_mtk_uhw_reg_read(data, MTK_BT_SUBSYS_RST, &val);
++		val |= 0x00002020;
++		btusb_mtk_uhw_reg_write(data, MTK_BT_SUBSYS_RST, val);
++		btusb_mtk_uhw_reg_write(data, MTK_EP_RST_OPT, 0x00010001);
++		btusb_mtk_uhw_reg_read(data, MTK_BT_SUBSYS_RST, &val);
++		val |= (1 << 0);
++		btusb_mtk_uhw_reg_write(data, MTK_BT_SUBSYS_RST, val);
++		msleep(100);
++	} else if (dev_id == 0x7925) {
+ 		btusb_mtk_uhw_reg_read(data, MTK_BT_RESET_REG_CONNV3, &val);
+ 		val |= (1 << 5);
+ 		btusb_mtk_uhw_reg_write(data, MTK_BT_RESET_REG_CONNV3, val);
+@@ -3053,14 +3047,41 @@ static int btusb_mtk_reset(struct hci_dev *hdev, void *rst_data)
+ 	err = readx_poll_timeout(btusb_mtk_reset_done, hdev, val,
+ 				 val & MTK_BT_RST_DONE, 20000, 1000000);
+ 	if (err < 0)
+-		bt_dev_err(hdev, "Reset timeout");
++		bt_dev_err(hdev, "Subsys reset timeout");
++
++	if (dev_id == 0x7922)
++		btusb_mtk_uhw_reg_write(data, MTK_UDMA_INT_STA_BT, 0x000000FF);
+ 
+ 	btusb_mtk_id_get(data, 0x70010200, &val);
+ 	if (!val)
+ 		bt_dev_err(hdev, "Can't get device id, subsys reset fail.");
+ 
+-	usb_queue_reset_device(data->intf);
++	return err;
++}
++
++static int btusb_mtk_reset(struct hci_dev *hdev, void *rst_data)
++{
++	struct btusb_data *data = hci_get_drvdata(hdev);
++	struct btmediatek_data *mediatek;
++	int err;
++
++	/* It's MediaTek specific bluetooth reset mechanism via USB */
++	if (test_and_set_bit(BTUSB_HW_RESET_ACTIVE, &data->flags)) {
++		bt_dev_err(hdev, "last reset failed? Not resetting again");
++		return -EBUSY;
++	}
++
++	err = usb_autopm_get_interface(data->intf);
++	if (err < 0)
++		return err;
++
++	btusb_stop_traffic(data);
++	usb_kill_anchored_urbs(&data->tx_anchor);
++	mediatek = hci_get_priv(hdev);
+ 
++	err = btusb_mtk_subsys_reset(hdev, mediatek->dev_id);
++
++	usb_queue_reset_device(data->intf);
+ 	clear_bit(BTUSB_HW_RESET_ACTIVE, &data->flags);
+ 
+ 	return err;
+@@ -3119,6 +3140,8 @@ static int btusb_mtk_setup(struct hci_dev *hdev)
+ 		fwname = FIRMWARE_MT7668;
+ 		break;
+ 	case 0x7922:
++		btusb_mtk_subsys_reset(hdev, dev_id);
++		fallthrough;
+ 	case 0x7961:
+ 	case 0x7925:
+ 		if (dev_id == 0x7925)
+@@ -3134,6 +3157,9 @@ static int btusb_mtk_setup(struct hci_dev *hdev)
+ 						btusb_mtk_hci_wmt_sync);
+ 		if (err < 0) {
+ 			bt_dev_err(hdev, "Failed to set up firmware (%d)", err);
++			btusb_stop_traffic(data);
++			usb_kill_anchored_urbs(&data->tx_anchor);
++			usb_queue_reset_device(data->intf);
+ 			return err;
+ 		}
+ 
+-- 
+2.18.0
 
---===============7593030763093027179==--
