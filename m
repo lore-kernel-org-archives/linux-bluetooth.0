@@ -1,188 +1,113 @@
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD1ECA68;
-	Fri, 15 Dec 2023 06:40:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C591910A27
+	for <linux-bluetooth@vger.kernel.org>; Fri, 15 Dec 2023 07:32:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="cEqYxVbK"
-X-UUID: c5d81fb69b1411eea5db2bebc7c28f94-20231215
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=BTCqKfdwdR9v46nV62z59E3sFP0odYPdEQLNmh4+llU=;
-	b=cEqYxVbKs3VPo4AxOjw3XAhJSwoby8Xb4LO9qNx3TRORAGykptMjEOTR/puo2KmVKPuz3xJLInxtvADBMrjeJ4kpdTNAmczVbLphMph+chaV9uJfrdUSsG3jllR/Y2S82ioHy6YcgGYGOr51RrFVWn0fXWYBKd4aA7SKpH2+UIU=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.35,REQID:68d2a743-a06a-49f2-bfb6-3b8bd3ae02c9,IP:0,U
-	RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:-5
-X-CID-META: VersionHash:5d391d7,CLOUDID:0b79d273-1bd3-4f48-b671-ada88705968c,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
-	RL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,
-	DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-UUID: c5d81fb69b1411eea5db2bebc7c28f94-20231215
-Received: from mtkmbs14n1.mediatek.inc [(172.21.101.75)] by mailgw01.mediatek.com
-	(envelope-from <hao.qin@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 1908214513; Fri, 15 Dec 2023 14:40:01 +0800
-Received: from mtkmbs13n2.mediatek.inc (172.21.101.108) by
- mtkmbs13n2.mediatek.inc (172.21.101.108) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Fri, 15 Dec 2023 14:40:00 +0800
-Received: from mhfsdcap04.gcn.mediatek.inc (10.17.3.154) by
- mtkmbs13n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Fri, 15 Dec 2023 14:39:59 +0800
-From: Hao Qin <hao.qin@mediatek.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
-CC: Sean Wang <sean.wang@mediatek.com>, Deren Wu <deren.Wu@mediatek.com>,
-	Aaron Hou <aaron.hou@mediatek.com>, Chris Lu <chris.lu@mediatek.com>, Steve
- Lee <steve.lee@mediatek.com>, linux-bluetooth
-	<linux-bluetooth@vger.kernel.org>, linux-kernel
-	<linux-kernel@vger.kernel.org>, linux-mediatek
-	<linux-mediatek@lists.infradead.org>, hao.qin <hao.qin@mediatek.com>
-Subject: [PATCH 1/1] Bluetooth: btusb: mediatek: add a recovery method for MT7922
-Date: Fri, 15 Dec 2023 14:37:14 +0800
-Message-ID: <20231215063714.7684-1-hao.qin@mediatek.com>
-X-Mailer: git-send-email 2.18.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FuKS8+/w"
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-67f11ccd8e7so3242586d6.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Dec 2023 23:32:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702625560; x=1703230360; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ih50dbo6w3HeFusU6Ct//RKDJY0qMQCzLCjO5//AIeI=;
+        b=FuKS8+/wSfQcPMutf5YQBmLFondKc9fd3Bn7vFYokPxnNfcTyZJWkRW/Y1K1qIj50k
+         am4Dn36RN25ikIShgruMWpDL7wRptz10YBZ5T84KA5TIXYKyXvoTZc9afGldp5gC1ZKO
+         EYpWlSeNETl5Xc8G5nE0/vZ1F+ef9Klj4wpR4d7cbGPvOARc5GXfF1rGv9Vmkc9K/YzG
+         hewpvyMK2rL1w/y5bOxgWCxaFlnUjIUdM3PWoeq1i/OH6mzxkz2T0qP/DLdKh8iqSaQb
+         /ebPQM91BuCFjIf5KWD+6W33PpVAUSULDLhYqHK3cu4iLf0Ts10EBm/GB1iMkoH/iFXj
+         WYdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702625560; x=1703230360;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ih50dbo6w3HeFusU6Ct//RKDJY0qMQCzLCjO5//AIeI=;
+        b=MlfJpi6zZheg5I1HYLbk/MrgQepW5uF8/8UUmgdnOBmMQvQhHxjaG5fELG9XldgSyE
+         408g/RBMvPk1Y+hv0u504oi8nkYFZyx9xTDH8Nuu3uFe5vqG+V4KPiApnADDGxxQ+92S
+         xiMyYt4C6Q/rSe0CfgCpgO54dmOS3Udll2gxuIqFRIRIKSnNKHTZtLxK8DCyT9fOohAI
+         s5hRIJNdSVH4/0bMJoRLsjS02evxD0unxBPY5htpe6VL4palGPfMw//ROgvXxgUXwiM3
+         U93Qh/pDgf3hpdOblzk9KIck09qUmkmCVqXlrRY7zX9i3eS+OK+OfP1pZc7yYr58g5R5
+         Zjvw==
+X-Gm-Message-State: AOJu0Yx/OCUgKQz3Xn97eJHHLiW31mOfe0Sp47uGvHa/+wjRYrJlLc3U
+	uHRMNmbJAfQLGoAq7J0CYLYQLJcLjPs=
+X-Google-Smtp-Source: AGHT+IGaOmEdbwV056eg/HAkP64gtJzFl5OzmIFmTtrJqWnKHuXYda1gYq0fIlRCbBSWHkhPtgp8/A==
+X-Received: by 2002:a0c:e74f:0:b0:67a:a24d:e58a with SMTP id g15-20020a0ce74f000000b0067aa24de58amr9878071qvn.7.1702625560362;
+        Thu, 14 Dec 2023 23:32:40 -0800 (PST)
+Received: from [172.17.0.2] ([40.76.106.50])
+        by smtp.gmail.com with ESMTPSA id w12-20020a0cc24c000000b0067f056e121csm1453548qvh.97.2023.12.14.23.32.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Dec 2023 23:32:40 -0800 (PST)
+Message-ID: <657c0118.0c0a0220.35d81.a98f@mx.google.com>
+Date: Thu, 14 Dec 2023 23:32:40 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5437881207541240385=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, hao.qin@mediatek.com
+Subject: RE: [1/1] Bluetooth: btusb: mediatek: add a recovery method for MT7922
+In-Reply-To: <20231215063714.7684-1-hao.qin@mediatek.com>
+References: <20231215063714.7684-1-hao.qin@mediatek.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: "hao.qin" <hao.qin@mediatek.com>
+--===============5437881207541240385==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-For MT7922, perform a reset before patch download to avoid
-unexpected problems caused by inconsistency between upper layer
-status and dongle status. Add USB reset retry to recover from
-unexpected patch download failure.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: hao.qin <hao.qin@mediatek.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=810339
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.68 seconds
+GitLint                       PASS      0.68 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      27.89 seconds
+CheckAllWarning               PASS      30.45 seconds
+CheckSparse                   PASS      35.75 seconds
+CheckSmatch                   PASS      99.39 seconds
+BuildKernel32                 PASS      27.14 seconds
+TestRunnerSetup               PASS      424.70 seconds
+TestRunner_l2cap-tester       PASS      23.16 seconds
+TestRunner_iso-tester         PASS      51.26 seconds
+TestRunner_bnep-tester        PASS      6.98 seconds
+TestRunner_mgmt-tester        FAIL      164.58 seconds
+TestRunner_rfcomm-tester      PASS      10.89 seconds
+TestRunner_sco-tester         PASS      14.40 seconds
+TestRunner_ioctl-tester       PASS      11.99 seconds
+TestRunner_mesh-tester        PASS      8.82 seconds
+TestRunner_smp-tester         PASS      9.79 seconds
+TestRunner_userchan-tester    PASS      7.40 seconds
+IncrementalBuild              PASS      25.50 seconds
+
+Details
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 497, Passed: 495 (99.6%), Failed: 1, Not Run: 1
+
+Failed Test Cases
+LL Privacy - Remove Device 4 (Disable Adv)           Timed out    2.189 seconds
+
+
 ---
- drivers/bluetooth/btusb.c | 66 +++++++++++++++++++++++++++------------
- 1 file changed, 46 insertions(+), 20 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 0926e4451802..778e1a0d9cae 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2812,7 +2812,7 @@ static int btusb_mtk_hci_wmt_sync(struct hci_dev *hdev,
- 	 * WMT command.
- 	 */
- 	err = wait_on_bit_timeout(&data->flags, BTUSB_TX_WAIT_VND_EVT,
--				  TASK_INTERRUPTIBLE, HCI_INIT_TIMEOUT);
-+				  TASK_INTERRUPTIBLE, HCI_CMD_TIMEOUT);
- 	if (err == -EINTR) {
- 		bt_dev_err(hdev, "Execution of wmt command interrupted");
- 		clear_bit(BTUSB_TX_WAIT_VND_EVT, &data->flags);
-@@ -2994,28 +2994,22 @@ static u32 btusb_mtk_reset_done(struct hci_dev *hdev)
- 	return val & MTK_BT_RST_DONE;
- }
- 
--static int btusb_mtk_reset(struct hci_dev *hdev, void *rst_data)
-+static int btusb_mtk_subsys_reset(struct hci_dev *hdev, u32 dev_id)
- {
- 	struct btusb_data *data = hci_get_drvdata(hdev);
--	struct btmediatek_data *mediatek;
- 	u32 val;
- 	int err;
- 
--	/* It's MediaTek specific bluetooth reset mechanism via USB */
--	if (test_and_set_bit(BTUSB_HW_RESET_ACTIVE, &data->flags)) {
--		bt_dev_err(hdev, "last reset failed? Not resetting again");
--		return -EBUSY;
--	}
--
--	err = usb_autopm_get_interface(data->intf);
--	if (err < 0)
--		return err;
--
--	btusb_stop_traffic(data);
--	usb_kill_anchored_urbs(&data->tx_anchor);
--	mediatek = hci_get_priv(hdev);
--
--	if (mediatek->dev_id == 0x7925) {
-+	if (dev_id == 0x7922) {
-+		btusb_mtk_uhw_reg_read(data, MTK_BT_SUBSYS_RST, &val);
-+		val |= 0x00002020;
-+		btusb_mtk_uhw_reg_write(data, MTK_BT_SUBSYS_RST, val);
-+		btusb_mtk_uhw_reg_write(data, MTK_EP_RST_OPT, 0x00010001);
-+		btusb_mtk_uhw_reg_read(data, MTK_BT_SUBSYS_RST, &val);
-+		val |= (1 << 0);
-+		btusb_mtk_uhw_reg_write(data, MTK_BT_SUBSYS_RST, val);
-+		msleep(100);
-+	} else if (dev_id == 0x7925) {
- 		btusb_mtk_uhw_reg_read(data, MTK_BT_RESET_REG_CONNV3, &val);
- 		val |= (1 << 5);
- 		btusb_mtk_uhw_reg_write(data, MTK_BT_RESET_REG_CONNV3, val);
-@@ -3053,14 +3047,41 @@ static int btusb_mtk_reset(struct hci_dev *hdev, void *rst_data)
- 	err = readx_poll_timeout(btusb_mtk_reset_done, hdev, val,
- 				 val & MTK_BT_RST_DONE, 20000, 1000000);
- 	if (err < 0)
--		bt_dev_err(hdev, "Reset timeout");
-+		bt_dev_err(hdev, "Subsys reset timeout");
-+
-+	if (dev_id == 0x7922)
-+		btusb_mtk_uhw_reg_write(data, MTK_UDMA_INT_STA_BT, 0x000000FF);
- 
- 	btusb_mtk_id_get(data, 0x70010200, &val);
- 	if (!val)
- 		bt_dev_err(hdev, "Can't get device id, subsys reset fail.");
- 
--	usb_queue_reset_device(data->intf);
-+	return err;
-+}
-+
-+static int btusb_mtk_reset(struct hci_dev *hdev, void *rst_data)
-+{
-+	struct btusb_data *data = hci_get_drvdata(hdev);
-+	struct btmediatek_data *mediatek;
-+	int err;
-+
-+	/* It's MediaTek specific bluetooth reset mechanism via USB */
-+	if (test_and_set_bit(BTUSB_HW_RESET_ACTIVE, &data->flags)) {
-+		bt_dev_err(hdev, "last reset failed? Not resetting again");
-+		return -EBUSY;
-+	}
-+
-+	err = usb_autopm_get_interface(data->intf);
-+	if (err < 0)
-+		return err;
-+
-+	btusb_stop_traffic(data);
-+	usb_kill_anchored_urbs(&data->tx_anchor);
-+	mediatek = hci_get_priv(hdev);
- 
-+	err = btusb_mtk_subsys_reset(hdev, mediatek->dev_id);
-+
-+	usb_queue_reset_device(data->intf);
- 	clear_bit(BTUSB_HW_RESET_ACTIVE, &data->flags);
- 
- 	return err;
-@@ -3119,6 +3140,8 @@ static int btusb_mtk_setup(struct hci_dev *hdev)
- 		fwname = FIRMWARE_MT7668;
- 		break;
- 	case 0x7922:
-+		btusb_mtk_subsys_reset(hdev, dev_id);
-+		fallthrough;
- 	case 0x7961:
- 	case 0x7925:
- 		if (dev_id == 0x7925)
-@@ -3134,6 +3157,9 @@ static int btusb_mtk_setup(struct hci_dev *hdev)
- 						btusb_mtk_hci_wmt_sync);
- 		if (err < 0) {
- 			bt_dev_err(hdev, "Failed to set up firmware (%d)", err);
-+			btusb_stop_traffic(data);
-+			usb_kill_anchored_urbs(&data->tx_anchor);
-+			usb_queue_reset_device(data->intf);
- 			return err;
- 		}
- 
--- 
-2.18.0
 
+--===============5437881207541240385==--
