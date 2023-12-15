@@ -1,70 +1,125 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 670033A8D5
-	for <linux-bluetooth@vger.kernel.org>; Fri, 15 Dec 2023 16:00:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3E853BB25;
+	Fri, 15 Dec 2023 16:18:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sZaQGjR9"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F2360C433C8;
-	Fri, 15 Dec 2023 16:00:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K7dm0Ddl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46FC0C433C7;
+	Fri, 15 Dec 2023 16:18:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702656026;
-	bh=9sVGji5Epvw1S7eapYLpbTwoM5al5bNEOTgtt4SOvO4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=sZaQGjR9c19TdkTCnv0APKaXz+aNXo1egGCrRP7PaLlFtS/yNUuuC7uUtiLzPISea
-	 ZYTRnWNS32VuCDe57So0v5RHvOYzpMn/qiu3nEqDZTxZFg3LQIE4qquNZBt58SmRpj
-	 7dp9GH+j+i8D/5FbgjqUJse4bYhjOVup+vuQ1ubrJluk3CJbvRbkpNXJJoxWKKAwH8
-	 wBSqWuFaaHFbrGrjDSp+A0ie71kaF6RppZv6HTIynoQRBL+puTtRx2/4wB67+vRXBS
-	 B41ZfAFv0e/SPJx/qJsYC8cZ/C7+0XehuDRDLZyHCWt5ubJp2YBLkipGXeZj1Z7ZgP
-	 Hy58XOrL+8RFQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DC0FDC4166E;
-	Fri, 15 Dec 2023 16:00:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1702657137;
+	bh=YlcNrdt+0bdBjEoeknJhdd+iUZGMaHxrfBZN/74+PSM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=K7dm0Ddli65bXnpIe+H/ttDbslFE9q2kMgBadq97OkKtouXQIbEiyY2q9JXScuDsv
+	 C1TjFxiht6mfl4VICqLkzK7PUWl+CGRGnU6fYOYPcX8M4yYc9TnjF9ZXpkWsSySLmw
+	 CyyhNm54GFYsWjy2rItDi4vwFE9/ZhlLtsFlUG5+pOmeb3j63lrLaKJ7ABlRzd4YHf
+	 FIPEL5mBy+6x1p0RKnf9kDaMW13b61pXy/Df0JjpQnoeYrO6LSmIPopfjK9+e6we66
+	 XhmZW3p8qy6Nb89ngBM4O2Sk//rED3kWw0q23oLG3uetyunnmSGJbQZLPq0L+Kbm4x
+	 OaRnvmY/t7uxg==
+Received: from johan by xi.lan with local (Exim 4.96.2)
+	(envelope-from <johan@kernel.org>)
+	id 1rEAto-0000VW-1C;
+	Fri, 15 Dec 2023 17:18:52 +0100
+Date: Fri, 15 Dec 2023 17:18:52 +0100
+From: Johan Hovold <johan@kernel.org>
+To: Francesco Dolcini <francesco@dolcini.it>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jirislaby@kernel.org>, linux-bluetooth@vger.kernel.org,
+	linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, greybus-dev@lists.linaro.org,
+	linux-iio@vger.kernel.org, netdev@vger.kernel.org,
+	chrome-platform@lists.linux.dev,
+	platform-driver-x86@vger.kernel.org, linux-serial@vger.kernel.org,
+	linux-sound@vger.kernel.org,
+	Francesco Dolcini <francesco.dolcini@toradex.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Alex Elder <elder@kernel.org>, Jonathan Cameron <jic23@kernel.org>,
+	Lee Jones <lee@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Hans de Goede <hdegoede@redhat.com>,
+	Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>,
+	Benson Leung <bleung@chromium.org>,
+	Tzung-Bi Shih <tzungbi@kernel.org>, Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH v1] treewide, serdev: change receive_buf() return type to
+ size_t
+Message-ID: <ZXx8bCVyxJ9Ddvqm@hovoldconsulting.com>
+References: <20231214170146.641783-1-francesco@dolcini.it>
+ <ZXxWX-Fw1InID2ax@hovoldconsulting.com>
+ <ZXxa7yzKzG6048vw@francesco-nb.int.toradex.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: af_bluetooth: Fix Use-After-Free in
- bt_sock_recvmsg
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <170265602589.22720.8309217075489314107.git-patchwork-notify@kernel.org>
-Date: Fri, 15 Dec 2023 16:00:25 +0000
-References: <20231209105518.GA408904@v4bel-B760M-AORUS-ELITE-AX>
-In-Reply-To: <20231209105518.GA408904@v4bel-B760M-AORUS-ELITE-AX>
-To: Hyunwoo Kim <v4bel@theori.io>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, imv4bel@gmail.com,
- johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZXxa7yzKzG6048vw@francesco-nb.int.toradex.com>
 
-Hello:
+On Fri, Dec 15, 2023 at 02:55:59PM +0100, Francesco Dolcini wrote:
+> On Fri, Dec 15, 2023 at 02:36:31PM +0100, Johan Hovold wrote:
+> > On Thu, Dec 14, 2023 at 06:01:46PM +0100, Francesco Dolcini wrote:
+> > > From: Francesco Dolcini <francesco.dolcini@toradex.com>
+> > > 
+> > > receive_buf() is called from ttyport_receive_buf() that expects values
+> > > ">= 0" from serdev_controller_receive_buf(), change its return type from
+> > > ssize_t to size_t.
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Sat, 9 Dec 2023 05:55:18 -0500 you wrote:
-> This can cause a race with bt_sock_ioctl() because
-> bt_sock_recvmsg() gets the skb from sk->sk_receive_queue
-> and then frees it without holding lock_sock.
-> A use-after-free for a skb occurs with the following flow.
-> ```
-> bt_sock_recvmsg() -> skb_recv_datagram() -> skb_free_datagram()
-> bt_sock_ioctl() -> skb_peek()
-> ```
-> Add lock_sock to bt_sock_recvmsg() to fix this issue.
+> > > -int gnss_insert_raw(struct gnss_device *gdev, const unsigned char *buf,
+> > > -				size_t count)
+> > > +size_t gnss_insert_raw(struct gnss_device *gdev, const unsigned char *buf,
+> > > +		       size_t count)
+> > >  {
+> > > -	int ret;
+> > > +	size_t ret;
+> > >  
+> > >  	ret = kfifo_in(&gdev->read_fifo, buf, count);
+> > >  
+> > 
+> > Why are you changing this function? This is part of the GNSS interface
+> > and has nothing to do with the rest of this patch.
 > 
-> [...]
+> good point, thanks for looking into that.
+> 
+> from my understanding kfifo_in() already return an unsigned, both
+> __kfifo_in and __kfifo_in_r return unsigned.
 
-Here is the summary with links:
-  - [v2] Bluetooth: af_bluetooth: Fix Use-After-Free in bt_sock_recvmsg
-    https://git.kernel.org/bluetooth/bluetooth-next/c/63b55655d30b
+Correct.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> With that said this is used by 3 drivers:
+> 
+> = drivers/gnss/sirf.c:
+> = drivers/gnss/serial.c:
+> 
+> The driver just use it into the actual receive_buf callback.
+> 
+> = drivers/gnss/usb.c
+> 
+> This driver does nothing with a negative return value (that is never the
+> less not possible), it just check that the whole buffer was inserted.
 
+That driver also knows it will never be negative.
 
+And you forgot about
+
+	drivers/net/ethernet/intel/ice/ice_gnss.c
+
+> To me the change is correct, with that said probably this should have
+> been explicitly mentioned in the commit message or a separate
+> preparation patch.
+
+It's a separate change and should not be hidden away in a tree-wide
+change that goes through a different maintainer.
+
+Please drop this change from this patch and resubmit it separately to me
+if you want and I'll review when I have the time.
+
+And when doing tree-wide changes, please try to follow the style of the
+driver you are changing (e.g. do not introduce inconsistencies by
+changing to open parenthesis alignment of continuation lines in code
+that do not use it).
+
+Johan
