@@ -1,120 +1,117 @@
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5FD141846
-	for <linux-bluetooth@vger.kernel.org>; Fri, 15 Dec 2023 17:12:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E7A13C46B;
+	Fri, 15 Dec 2023 18:32:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P5o3TWdq"
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-77f43042268so153595585a.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Dec 2023 09:12:06 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hQCnieUb"
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-5e4dc41ab59so3938287b3.3;
+        Fri, 15 Dec 2023 10:32:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702660325; x=1703265125; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=3ri5NHi1+q36wzH4gCKsY2IR9JrbZmuUCDOeTb6DHY0=;
-        b=P5o3TWdqJn46IprV9vQU9eQv8cLzAYSDgCmk96LJJs5jtaotZ4SNIkkqA35FylaWIe
-         +u5+1dxzVwte/LzkK0NDWoUG3+9txb6YZcY3g53mDzV2XpXEUcds5TSvE5XSCUoZ3nkK
-         icvNPUiHG9Wjh8l2z1JhV5EObrnHGWKDAoq766Bff+aYAva2WbPpjJ10h4HZ4hhjlo4Q
-         l3k/dl8vFNxwiNoE8Gw1CS3R+gAl7dF8/Ub84bn6aE1erHToDU9rRyNiACCCq5wMVbn6
-         lSp0J9WvkJTvSECW2OI427sU7sWq+Wd9h07TJFsSFWFiPkvTt1LKATTv4Sfg65EyaPif
-         Zvwg==
+        d=gmail.com; s=20230601; t=1702665137; x=1703269937; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YRjwpVZkDiYveLBU3alcmnlTla2B39gK/IQD+D9ndaI=;
+        b=hQCnieUb6IgP3+chWdZPxqkMlTAAbGO+fFTtx9WkEWdwCoisg4vhmgPZIE23BfEyj7
+         Ch/RolZqCgvYptPyQr8QWanJcryjwcCkS/SlaW+5+6Ph8SKly6HPLd2kvPtUEA4mM9lU
+         CJ/mJOtQzV3jk9g4nNfkWVz68aRyFtgVtWIky8jM1QwYvmW953wpzpUAuMMBz5dDCJZS
+         8lZPAjdnbLS6ScgoXMMYxkXba11eP2ULsH91pxKpQhJMbWVjt+lHNcReXYtdOGirtNCW
+         oQ7oPjicbPNsSq7QeIkqwZElJ2XOxPcaSXdQJo4QTdpX1ja+ka+xOI1UyEsV51wxvJ2a
+         NRSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702660325; x=1703265125;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1702665137; x=1703269937;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=3ri5NHi1+q36wzH4gCKsY2IR9JrbZmuUCDOeTb6DHY0=;
-        b=cbg0E8js9mh2qj1/AZOyvzUUhJDJOC4mqEJ7RQVblmcLDkeQlePJ7u3gjrYBOUtfrW
-         pVwSz1hGoWeNvaaVsTnUedV77gQhQUonOGml6dModVhCrMQLT53xfU6vqTdrYDqPkWF2
-         aPAFo+LPwRZ8wtb/h+aA5XZ+tiuy58cUlluNLOSTtbgcfMCVd/qW4/5BFvga70dVhVbg
-         TtzblSaBlo7RKdVc9XHkjYSyifyiKfAsJTyzaGRJ4DsHfd3RirH36KOSg2JqAPUIxhWA
-         wpbTaWSwABz1YLsPCtlSWnEX/9gDnBTElvxl7pYdRoICVNDSUbRiSptLO/eKWrgyMtXA
-         ONaA==
-X-Gm-Message-State: AOJu0YywemfKjUrJxjzVx+zwnZO42AFuPfKGPjwi/XEjXV30fO7/xrpE
-	iFnsRCMwjrEe8zeT3gLwqOibmz107JQ=
-X-Google-Smtp-Source: AGHT+IH/+K+dlZf3o/lEM2rVWvsSCkwjZ5jv4074DlJWj765VzbxYA0hNKHAkcwelht/3hdS3POuaQ==
-X-Received: by 2002:a05:620a:1a23:b0:77d:7ace:4a6 with SMTP id bk35-20020a05620a1a2300b0077d7ace04a6mr21265751qkb.2.1702660324965;
-        Fri, 15 Dec 2023 09:12:04 -0800 (PST)
-Received: from [172.17.0.2] ([20.109.36.213])
-        by smtp.gmail.com with ESMTPSA id v16-20020a0cf910000000b0067a53aa6df2sm6997104qvn.46.2023.12.15.09.12.04
+        bh=YRjwpVZkDiYveLBU3alcmnlTla2B39gK/IQD+D9ndaI=;
+        b=WDWEfXorKm5RmonUWSbNAZaHdILQhVt02UmfGuhsnaHSAuGw9bXa3sgd8WRKPVcMTc
+         rgcL5IDKwpc2rC3LhemH9X/ffS66YciTwHA+vU6A+0cstxmxstBq/m8NB0410DffkqfE
+         Ygig3n6SAIswZfqW4axT42vUqKrRKrLDM+ubzV7B+/cUPou34gWtpPHnWDvYabzz1dA3
+         Ia2dcnaPzHBiZxBkWVptyWtbghDzpQVSFmEHF/AB6tLuHdbwhe3RvxMjOxneR+wGYayf
+         J1IvuweJvYmiLzljp4QePayCBCXiMTzk9/vSgcshxXvHmSmXoLeO7bbyKDSkmrZMB7iw
+         dEMA==
+X-Gm-Message-State: AOJu0YyhpgIYa8BVWDjK6LB62NJpst49h8VUIOTgmNOvnfJtpQLVBGkg
+	EZvQ9lLKcYdcMc4veeuVaQOQZ1fJJCc=
+X-Google-Smtp-Source: AGHT+IHKUjhYfgy4WnqxJaIjG+2dOjbeva/k+mBe1XbCy0N0JxHX6kCxrLP2lRVVudzA5DUZbBHSlQ==
+X-Received: by 2002:a81:84c8:0:b0:5d3:9f4d:dae0 with SMTP id u191-20020a8184c8000000b005d39f4ddae0mr9421226ywf.24.1702665137249;
+        Fri, 15 Dec 2023 10:32:17 -0800 (PST)
+Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
+        by smtp.gmail.com with ESMTPSA id h4-20020a816c04000000b005e2dff985d5sm2206289ywc.33.2023.12.15.10.32.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Dec 2023 09:12:04 -0800 (PST)
-Message-ID: <657c88e4.0c0a0220.8d5c5.8b51@mx.google.com>
-Date: Fri, 15 Dec 2023 09:12:04 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5985261266693022255=="
+        Fri, 15 Dec 2023 10:32:16 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: pull-request: bluetooth 2023-12-15
+Date: Fri, 15 Dec 2023 13:32:13 -0500
+Message-ID: <20231215183214.1563754-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, francesco@dolcini.it
-Subject: RE: [v1] treewide, serdev: change receive_buf() return type to size_t
-In-Reply-To: <20231214170146.641783-1-francesco@dolcini.it>
-References: <20231214170146.641783-1-francesco@dolcini.it>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
---===============5985261266693022255==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+The following changes since commit 64b8bc7d5f1434c636a40bdcfcd42b278d1714be:
 
-This is an automated email and please do not reply to this email.
+  net/rose: fix races in rose_kill_by_device() (2023-12-15 11:59:53 +0000)
 
-Dear Submitter,
+are available in the Git repository at:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2023-12-15
 
------ Output -----
+for you to fetch changes up to 2e07e8348ea454615e268222ae3fc240421be768:
 
-error: patch failed: drivers/bluetooth/btmtkuart.c:383
-error: drivers/bluetooth/btmtkuart.c: patch does not apply
-error: patch failed: drivers/bluetooth/btnxpuart.c:1264
-error: drivers/bluetooth/btnxpuart.c: patch does not apply
-error: patch failed: drivers/bluetooth/hci_serdev.c:271
-error: drivers/bluetooth/hci_serdev.c: patch does not apply
-error: patch failed: drivers/gnss/serial.c:80
-error: drivers/gnss/serial.c: patch does not apply
-error: patch failed: drivers/gnss/sirf.c:160
-error: drivers/gnss/sirf.c: patch does not apply
-error: patch failed: drivers/greybus/gb-beagleplay.c:257
-error: drivers/greybus/gb-beagleplay.c: patch does not apply
-error: patch failed: drivers/iio/chemical/pms7003.c:211
-error: drivers/iio/chemical/pms7003.c: patch does not apply
-error: patch failed: drivers/iio/chemical/scd30_serial.c:174
-error: drivers/iio/chemical/scd30_serial.c: patch does not apply
-error: patch failed: drivers/iio/chemical/sps30_serial.c:210
-error: drivers/iio/chemical/sps30_serial.c: patch does not apply
-error: patch failed: drivers/iio/imu/bno055/bno055_ser_core.c:378
-error: drivers/iio/imu/bno055/bno055_ser_core.c: patch does not apply
-error: patch failed: drivers/mfd/rave-sp.c:471
-error: drivers/mfd/rave-sp.c: patch does not apply
-error: patch failed: drivers/net/ethernet/qualcomm/qca_uart.c:58
-error: drivers/net/ethernet/qualcomm/qca_uart.c: patch does not apply
-error: patch failed: drivers/nfc/pn533/uart.c:203
-error: drivers/nfc/pn533/uart.c: patch does not apply
-error: patch failed: drivers/nfc/s3fwrn5/uart.c:51
-error: drivers/nfc/s3fwrn5/uart.c: patch does not apply
-error: patch failed: drivers/platform/chrome/cros_ec_uart.c:81
-error: drivers/platform/chrome/cros_ec_uart.c: patch does not apply
-error: patch failed: drivers/platform/surface/aggregator/core.c:227
-error: drivers/platform/surface/aggregator/core.c: patch does not apply
-error: patch failed: include/linux/serdev.h:27
-error: include/linux/serdev.h: patch does not apply
-error: patch failed: sound/drivers/serial-generic.c:100
-error: sound/drivers/serial-generic.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
+  Bluetooth: af_bluetooth: Fix Use-After-Free in bt_sock_recvmsg (2023-12-15 11:54:18 -0500)
 
-Please resolve the issue and submit the patches again.
+----------------------------------------------------------------
+bluetooth pull request for net:
 
+ - Add encryption key size check when acting as peripheral
+ - Shut up false-positive build warning
+ - Send reject if L2CAP command request is corrupted
+ - Fix Use-After-Free in bt_sock_recvmsg
+ - Fix not notifying when connection encryption changes
+ - Fix not checking if HCI_OP_INQUIRY has been sent
+ - Fix address type send over to the MGMT interface
+ - Fix deadlock in vhci_send_frame
 
----
-Regards,
-Linux Bluetooth
+----------------------------------------------------------------
+Alex Lu (1):
+      Bluetooth: Add more enc key size check
 
+Arnd Bergmann (1):
+      Bluetooth: hci_event: shut up a false-positive warning
 
---===============5985261266693022255==--
+Frédéric Danis (1):
+      Bluetooth: L2CAP: Send reject on command corrupted request
+
+Hyunwoo Kim (1):
+      Bluetooth: af_bluetooth: Fix Use-After-Free in bt_sock_recvmsg
+
+Luiz Augusto von Dentz (3):
+      Bluetooth: Fix not notifying when connection encryption changes
+      Bluetooth: hci_event: Fix not checking if HCI_OP_INQUIRY has been sent
+      Bluetooth: hci_core: Fix hci_conn_hash_lookup_cis
+
+Xiao Yao (1):
+      Bluetooth: MGMT/SMP: Fix address type when using SMP over BREDR/LE
+
+Ying Hsu (1):
+      Bluetooth: Fix deadlock in vhci_send_frame
+
+ drivers/bluetooth/hci_vhci.c     | 10 ++++++----
+ include/net/bluetooth/hci_core.h |  9 +++++++--
+ net/bluetooth/af_bluetooth.c     |  7 ++++++-
+ net/bluetooth/hci_event.c        | 30 +++++++++++++++++++++---------
+ net/bluetooth/l2cap_core.c       | 21 +++++++++++++++------
+ net/bluetooth/mgmt.c             | 25 ++++++++++++++++++-------
+ net/bluetooth/smp.c              |  7 +++++++
+ 7 files changed, 80 insertions(+), 29 deletions(-)
