@@ -1,117 +1,76 @@
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E7A13C46B;
-	Fri, 15 Dec 2023 18:32:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CB234644F
+	for <linux-bluetooth@vger.kernel.org>; Fri, 15 Dec 2023 20:50:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hQCnieUb"
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-5e4dc41ab59so3938287b3.3;
-        Fri, 15 Dec 2023 10:32:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702665137; x=1703269937; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YRjwpVZkDiYveLBU3alcmnlTla2B39gK/IQD+D9ndaI=;
-        b=hQCnieUb6IgP3+chWdZPxqkMlTAAbGO+fFTtx9WkEWdwCoisg4vhmgPZIE23BfEyj7
-         Ch/RolZqCgvYptPyQr8QWanJcryjwcCkS/SlaW+5+6Ph8SKly6HPLd2kvPtUEA4mM9lU
-         CJ/mJOtQzV3jk9g4nNfkWVz68aRyFtgVtWIky8jM1QwYvmW953wpzpUAuMMBz5dDCJZS
-         8lZPAjdnbLS6ScgoXMMYxkXba11eP2ULsH91pxKpQhJMbWVjt+lHNcReXYtdOGirtNCW
-         oQ7oPjicbPNsSq7QeIkqwZElJ2XOxPcaSXdQJo4QTdpX1ja+ka+xOI1UyEsV51wxvJ2a
-         NRSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702665137; x=1703269937;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YRjwpVZkDiYveLBU3alcmnlTla2B39gK/IQD+D9ndaI=;
-        b=WDWEfXorKm5RmonUWSbNAZaHdILQhVt02UmfGuhsnaHSAuGw9bXa3sgd8WRKPVcMTc
-         rgcL5IDKwpc2rC3LhemH9X/ffS66YciTwHA+vU6A+0cstxmxstBq/m8NB0410DffkqfE
-         Ygig3n6SAIswZfqW4axT42vUqKrRKrLDM+ubzV7B+/cUPou34gWtpPHnWDvYabzz1dA3
-         Ia2dcnaPzHBiZxBkWVptyWtbghDzpQVSFmEHF/AB6tLuHdbwhe3RvxMjOxneR+wGYayf
-         J1IvuweJvYmiLzljp4QePayCBCXiMTzk9/vSgcshxXvHmSmXoLeO7bbyKDSkmrZMB7iw
-         dEMA==
-X-Gm-Message-State: AOJu0YyhpgIYa8BVWDjK6LB62NJpst49h8VUIOTgmNOvnfJtpQLVBGkg
-	EZvQ9lLKcYdcMc4veeuVaQOQZ1fJJCc=
-X-Google-Smtp-Source: AGHT+IHKUjhYfgy4WnqxJaIjG+2dOjbeva/k+mBe1XbCy0N0JxHX6kCxrLP2lRVVudzA5DUZbBHSlQ==
-X-Received: by 2002:a81:84c8:0:b0:5d3:9f4d:dae0 with SMTP id u191-20020a8184c8000000b005d39f4ddae0mr9421226ywf.24.1702665137249;
-        Fri, 15 Dec 2023 10:32:17 -0800 (PST)
-Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
-        by smtp.gmail.com with ESMTPSA id h4-20020a816c04000000b005e2dff985d5sm2206289ywc.33.2023.12.15.10.32.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Dec 2023 10:32:16 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: pull-request: bluetooth 2023-12-15
-Date: Fri, 15 Dec 2023 13:32:13 -0500
-Message-ID: <20231215183214.1563754-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="msL87mrn"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 03340C433CA;
+	Fri, 15 Dec 2023 20:50:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702673426;
+	bh=HRFkC5olybEq1TbLjcAIK+TSeb01ryYmg3SFMn7VuT8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=msL87mrndBsyeXPrbjdNrDae5qfLIzuNV0S8UtIR8Oz9INGKsmdJgdMw3Aqs/DjYz
+	 TIPkgvQwzsPOR8/z6RwYvURL8WfMcikAzCDiuIVoEZyxtLqwm0gN/hKRNwZHHwKQsE
+	 aC6y36myDeYeyqWv9Gd7/6EOOpsPWdzaF9KyX7fzKhYWTJDX4KiXdPwh9oM1f812Tc
+	 9RTjThRCewIn7dwCDrCOdbCQtVAWugc6EdTMj3pTr/gdL2YH4qZi28XUqXnWc/Yq/8
+	 F2I0BZ0drkJtma5VSrwAirsgHHAT0hS2zR8/uWPan6bsrV2Ek3x8HALi239kGXYlKb
+	 JzON4Ca5g2eGg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DDC25DD4EF7;
+	Fri, 15 Dec 2023 20:50:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v1] bap: Don't attempt to release if old state was
+ releasing
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <170267342590.29572.16538751872537097543.git-patchwork-notify@kernel.org>
+Date: Fri, 15 Dec 2023 20:50:25 +0000
+References: <20231208221219.54529-1-luiz.dentz@gmail.com>
+In-Reply-To: <20231208221219.54529-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-The following changes since commit 64b8bc7d5f1434c636a40bdcfcd42b278d1714be:
+Hello:
 
-  net/rose: fix races in rose_kill_by_device() (2023-12-15 11:59:53 +0000)
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-are available in the Git repository at:
+On Fri,  8 Dec 2023 17:12:13 -0500 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> If the old state was releasing there is no reason to call
+> bt_bap_stream_release yet again when IO could not be created as that
+> will likely create a loop situation when the remote stack caches the
+> codec configuration.
+> 
+> [...]
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2023-12-15
+Here is the summary with links:
+  - [BlueZ,v1] bap: Don't attempt to release if old state was releasing
+    (no matching commit)
+  - [BlueZ,v2,2/6] shared/bap: Make bt_bap_select match the channel map
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e7e8b2a3d7ca
+  - [BlueZ,v2,3/6] org.bluez.MediaEndpoint: Add ChannelAllocation to SelectProperties
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=07efa6d35b26
+  - [BlueZ,v2,4/6] shared/bap: Make bt_bap_select select a location
+    (no matching commit)
+  - [BlueZ,v2,5/6] shared/bap: Fix stream IO linking
+    (no matching commit)
+  - [BlueZ,v2,6/6] client/player: Use ChannelAllocation given on SelectProperties
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e01208dac67f
 
-for you to fetch changes up to 2e07e8348ea454615e268222ae3fc240421be768:
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-  Bluetooth: af_bluetooth: Fix Use-After-Free in bt_sock_recvmsg (2023-12-15 11:54:18 -0500)
 
-----------------------------------------------------------------
-bluetooth pull request for net:
-
- - Add encryption key size check when acting as peripheral
- - Shut up false-positive build warning
- - Send reject if L2CAP command request is corrupted
- - Fix Use-After-Free in bt_sock_recvmsg
- - Fix not notifying when connection encryption changes
- - Fix not checking if HCI_OP_INQUIRY has been sent
- - Fix address type send over to the MGMT interface
- - Fix deadlock in vhci_send_frame
-
-----------------------------------------------------------------
-Alex Lu (1):
-      Bluetooth: Add more enc key size check
-
-Arnd Bergmann (1):
-      Bluetooth: hci_event: shut up a false-positive warning
-
-Frédéric Danis (1):
-      Bluetooth: L2CAP: Send reject on command corrupted request
-
-Hyunwoo Kim (1):
-      Bluetooth: af_bluetooth: Fix Use-After-Free in bt_sock_recvmsg
-
-Luiz Augusto von Dentz (3):
-      Bluetooth: Fix not notifying when connection encryption changes
-      Bluetooth: hci_event: Fix not checking if HCI_OP_INQUIRY has been sent
-      Bluetooth: hci_core: Fix hci_conn_hash_lookup_cis
-
-Xiao Yao (1):
-      Bluetooth: MGMT/SMP: Fix address type when using SMP over BREDR/LE
-
-Ying Hsu (1):
-      Bluetooth: Fix deadlock in vhci_send_frame
-
- drivers/bluetooth/hci_vhci.c     | 10 ++++++----
- include/net/bluetooth/hci_core.h |  9 +++++++--
- net/bluetooth/af_bluetooth.c     |  7 ++++++-
- net/bluetooth/hci_event.c        | 30 +++++++++++++++++++++---------
- net/bluetooth/l2cap_core.c       | 21 +++++++++++++++------
- net/bluetooth/mgmt.c             | 25 ++++++++++++++++++-------
- net/bluetooth/smp.c              |  7 +++++++
- 7 files changed, 80 insertions(+), 29 deletions(-)
