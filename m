@@ -1,74 +1,95 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail11.truemail.it (mail11.truemail.it [217.194.8.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08DB83FB0F;
-	Fri, 15 Dec 2023 16:53:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TV6FdQbJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9E85CC433C8;
-	Fri, 15 Dec 2023 16:53:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702659190;
-	bh=H/n0IAG/cynjDEVrZj84z7sndMgNHo04Ohh/G1RtAtU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TV6FdQbJdiC6wFLg0cT8RPHZ/MTWZJMrBpnS3aeU5NZ5fZ7RZa1a1kiuH6qyosV0a
-	 bAn/wUMkWCdUMKgQllZNfVHHCYBq2TxM/M4QMvT2y9uirhknWFAsB9qRCMHA/b8MHT
-	 J7D1E5GlnPylXCeyF2uq3UEkpIqWiZ7I0CV3GQ1R5wtCYal9Q0uzkCFal43zXEP1ex
-	 Ekw2pwD9MhrXnSKJm6OR1lEf7DnNmruw+gfVSkFcuhqHE/v2nlfBvQoi1teoX6sBXK
-	 xxjaezGzTOU6vm+NGdDEvDqNEEcW2nBYJ+39Q3MWVjJXZIs1QtVpP9KveVARf9edMa
-	 SZ7swzfK1NaxQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8232ADD4EF1;
-	Fri, 15 Dec 2023 16:53:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 437B63FE55;
+	Fri, 15 Dec 2023 17:07:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dolcini.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dolcini.it
+Received: from francesco-nb.int.toradex.com (93-49-2-63.ip317.fastwebnet.it [93.49.2.63])
+	by mail11.truemail.it (Postfix) with ESMTPA id ADB5C20640;
+	Fri, 15 Dec 2023 18:07:37 +0100 (CET)
+Date: Fri, 15 Dec 2023 18:07:33 +0100
+From: Francesco Dolcini <francesco@dolcini.it>
+To: Johan Hovold <johan@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Francesco Dolcini <francesco@dolcini.it>,
+	Jiri Slaby <jirislaby@kernel.org>, linux-bluetooth@vger.kernel.org,
+	linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, greybus-dev@lists.linaro.org,
+	linux-iio@vger.kernel.org, netdev@vger.kernel.org,
+	chrome-platform@lists.linux.dev,
+	platform-driver-x86@vger.kernel.org, linux-serial@vger.kernel.org,
+	linux-sound@vger.kernel.org,
+	Francesco Dolcini <francesco.dolcini@toradex.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Alex Elder <elder@kernel.org>, Jonathan Cameron <jic23@kernel.org>,
+	Lee Jones <lee@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Hans de Goede <hdegoede@redhat.com>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Benson Leung <bleung@chromium.org>,
+	Tzung-Bi Shih <tzungbi@kernel.org>, Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH v1] treewide, serdev: change receive_buf() return type to
+ size_t
+Message-ID: <ZXyH1Zv3Pxd6S3ag@francesco-nb.int.toradex.com>
+References: <20231214170146.641783-1-francesco@dolcini.it>
+ <ZXxWX-Fw1InID2ax@hovoldconsulting.com>
+ <ZXxa7yzKzG6048vw@francesco-nb.int.toradex.com>
+ <ZXx8bCVyxJ9Ddvqm@hovoldconsulting.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 1/2] Revert "xhci: Enable RPM on controllers that support
- low-power states"
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <170265919052.3838.9262588716198159739.git-patchwork-notify@kernel.org>
-Date: Fri, 15 Dec 2023 16:53:10 +0000
-References: <20231204100859.1332772-1-mathias.nyman@linux.intel.com>
-In-Reply-To: <20231204100859.1332772-1-mathias.nyman@linux.intel.com>
-To: Mathias Nyman <mathias.nyman@linux.intel.com>
-Cc: gregkh@linuxfoundation.org, linux-usb@vger.kernel.org,
- linux-bluetooth@vger.kernel.org, mario.limonciello@amd.com,
- regressions@lists.linux.dev, regressions@leemhuis.info,
- Basavaraj.Natikar@amd.com, pmenzel@molgen.mpg.de, bugs-a21@moonlit-rail.com,
- stable@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZXx8bCVyxJ9Ddvqm@hovoldconsulting.com>
 
-Hello:
+Hello Johan, Greg
 
-This series was applied to bluetooth/bluetooth-next.git (master)
-by Greg Kroah-Hartman <gregkh@linuxfoundation.org>:
-
-On Mon,  4 Dec 2023 12:08:58 +0200 you wrote:
-> This reverts commit a5d6264b638efeca35eff72177fd28d149e0764b.
+On Fri, Dec 15, 2023 at 05:18:52PM +0100, Johan Hovold wrote:
+> On Fri, Dec 15, 2023 at 02:55:59PM +0100, Francesco Dolcini wrote:
+> > To me the change is correct, with that said probably this should have
+> > been explicitly mentioned in the commit message or a separate
+> > preparation patch.
 > 
-> This patch was an attempt to solve issues seen when enabling runtime PM
-> as default for all AMD 1.1 xHC hosts. see commit 4baf12181509
-> ("xhci: Loosen RPM as default policy to cover for AMD xHC 1.1")
+> It's a separate change and should not be hidden away in a tree-wide
+> change that goes through a different maintainer.
 > 
-> This was not enough, regressions are still seen, so start from a clean
-> slate and revert both of them.
-> 
-> [...]
+> Please drop this change from this patch and resubmit it separately to me
+> if you want and I'll review when I have the time.
 
-Here is the summary with links:
-  - [1/2] Revert "xhci: Enable RPM on controllers that support low-power states"
-    (no matching commit)
-  - [2/2] Revert "xhci: Loosen RPM as default policy to cover for AMD xHC 1.1"
-    https://git.kernel.org/bluetooth/bluetooth-next/c/24be0b3c4059
+Fine, I agree.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+I see those options (let me know if you see other options I have not
+mentioned):
 
+1. I add this change (taking into account also intel ice) as a separate
+   patch in this series and you may just ack it and Greg could merge
+   together with the serdev one.
+2. I prepare an independent patch for the GNSS change and only once this
+   is merged I'll send a rebased v2 of this one.
+3. I update this patch without this GNSS API change, that mean I will
+   have to cast away the signed type from a few GNSS drivers.
+
+1 is my preferred option, 2 is fine, but it seems a little bit of overdoing,
+3 I would avoid, we are doing this cleanup to be a little bit more
+strongly typed and to prevent the kind of bugs that is the original trigger
+for this patch.
+
+What would you Greg and Johan prefer?
+
+
+> And when doing tree-wide changes, please try to follow the style of the
+> driver you are changing (e.g. do not introduce inconsistencies by
+> changing to open parenthesis alignment of continuation lines in code
+> that do not use it).
+
+ack, sorry about that, looking back at the archive is seems a recent
+pain point, also Jiri fell in this trap.
+
+Francesco
 
