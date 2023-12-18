@@ -1,70 +1,106 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1570A481A2
-	for <linux-bluetooth@vger.kernel.org>; Sun, 17 Dec 2023 18:32:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D471101E8;
+	Mon, 18 Dec 2023 08:35:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H8qaeu6s"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6AF3CC433C8
-	for <linux-bluetooth@vger.kernel.org>; Sun, 17 Dec 2023 18:32:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cqKR6jTw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14FCAC433C8;
+	Mon, 18 Dec 2023 08:35:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702837921;
-	bh=VUB01ZtHOQpwFrGxR/7IAlHzDIvBBfNK8p7Hrfws400=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=H8qaeu6sPWoakhpkpF53IPWiMbA5erh5imj6ZeACZWL3NnBHYTKmcOVx/LJ2NNIWL
-	 Wy3Qw2tf4JIta68QIXn410EkucthEplzRYWzwirUySyJKQeoIeTymFmzjTpi5DVPgF
-	 9V6Q92vtp0m3z2BnUAM6oVZp+Yw6tWo9JKxg1FQEiIO94WqoqRgJTvBGbA2c2IB6tT
-	 4TX52Qb8+alw+9CUACOjtaq4LC/ml3ok1R4+QNw9mMVlIeWNeS4HwWvRBFyzXT/0pe
-	 ete0sKGILVXXD6Tm2rTBdXe1PnA3zzpV93iSsnKY91ld+O8K0CQWtE2CB9FzptjtfB
-	 27m0pfOSuV9ZQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 4AD43C4332E; Sun, 17 Dec 2023 18:32:01 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 218264] Potential kernel regression with bluetooth pairing on
- specific radios
-Date: Sun, 17 Dec 2023 18:32:01 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: marco.rodolfi@tuta.io
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-218264-62941-EY7YHJL3ZJ@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218264-62941@https.bugzilla.kernel.org/>
-References: <bug-218264-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=k20201202; t=1702888506;
+	bh=PvieyW9kHU+3JjdvRizTuAsBF+M7+DN21zt8QD6huP8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cqKR6jTwpmCKyTFqiDsud8Ud91Y2vl0XnJ70WkUUWsejg3N21krgNOC2hGTW6Sr//
+	 PkugwCVTKDJbZBbTAjn2pZOtgeXLfIt4KhVQdagYFnoBeWEVHdgSDchIq1/IEoOYgz
+	 UPhMPfMZofuUfwXr9yS3PhKhC0IHJypA2VlCOfPMF5X3opuQwu7Tnyq59gPlfhE2L7
+	 BMOT1Z09reyctvlBiTybBEDPjQ60FLqs31RXDW6RG7gr4O0un4ilMkg7Cgrs/fszps
+	 ppFsjdnc33uZ69wLfbVJFyRfIMVBseNo/FtnnrcNqwp53jB9iKEBeFsADcFruxnW5a
+	 /8S2G6GLNLRGw==
+Received: from johan by xi.lan with local (Exim 4.96.2)
+	(envelope-from <johan@kernel.org>)
+	id 1rF95c-0003FH-0v;
+	Mon, 18 Dec 2023 09:35:05 +0100
+Date: Mon, 18 Dec 2023 09:35:04 +0100
+From: Johan Hovold <johan@kernel.org>
+To: Francesco Dolcini <francesco@dolcini.it>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jirislaby@kernel.org>, linux-bluetooth@vger.kernel.org,
+	linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, greybus-dev@lists.linaro.org,
+	linux-iio@vger.kernel.org, netdev@vger.kernel.org,
+	chrome-platform@lists.linux.dev,
+	platform-driver-x86@vger.kernel.org, linux-serial@vger.kernel.org,
+	linux-sound@vger.kernel.org,
+	Francesco Dolcini <francesco.dolcini@toradex.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Alex Elder <elder@kernel.org>, Jonathan Cameron <jic23@kernel.org>,
+	Lee Jones <lee@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Hans de Goede <hdegoede@redhat.com>,
+	Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>,
+	Benson Leung <bleung@chromium.org>,
+	Tzung-Bi Shih <tzungbi@kernel.org>, Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH v1] treewide, serdev: change receive_buf() return type to
+ size_t
+Message-ID: <ZYAEOCMwZGMNvpNX@hovoldconsulting.com>
+References: <20231214170146.641783-1-francesco@dolcini.it>
+ <ZXxWX-Fw1InID2ax@hovoldconsulting.com>
+ <ZXxa7yzKzG6048vw@francesco-nb.int.toradex.com>
+ <ZXx8bCVyxJ9Ddvqm@hovoldconsulting.com>
+ <ZXyH1Zv3Pxd6S3ag@francesco-nb.int.toradex.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZXyH1Zv3Pxd6S3ag@francesco-nb.int.toradex.com>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218264
+On Fri, Dec 15, 2023 at 06:07:33PM +0100, Francesco Dolcini wrote:
 
---- Comment #4 from Marco (marco.rodolfi@tuta.io) ---
-Oddly even the copied keys make it fails on connect with
-br-connection-create-socket.
+> On Fri, Dec 15, 2023 at 05:18:52PM +0100, Johan Hovold wrote:
+> > On Fri, Dec 15, 2023 at 02:55:59PM +0100, Francesco Dolcini wrote:
+> > > To me the change is correct, with that said probably this should have
+> > > been explicitly mentioned in the commit message or a separate
+> > > preparation patch.
+> > 
+> > It's a separate change and should not be hidden away in a tree-wide
+> > change that goes through a different maintainer.
+> > 
+> > Please drop this change from this patch and resubmit it separately to me
+> > if you want and I'll review when I have the time.
+> 
+> Fine, I agree.
+> 
+> I see those options (let me know if you see other options I have not
+> mentioned):
+> 
+> 1. I add this change (taking into account also intel ice) as a separate
+>    patch in this series and you may just ack it and Greg could merge
+>    together with the serdev one.
+> 2. I prepare an independent patch for the GNSS change and only once this
+>    is merged I'll send a rebased v2 of this one.
+> 3. I update this patch without this GNSS API change, that mean I will
+>    have to cast away the signed type from a few GNSS drivers.
+> 
+> 1 is my preferred option, 2 is fine, but it seems a little bit of overdoing,
+> 3 I would avoid, we are doing this cleanup to be a little bit more
+> strongly typed and to prevent the kind of bugs that is the original trigger
+> for this patch.
 
-I have no clue what is screwed up at this point, sadly even this workaround=
- is
-not doable.
+Changing the return type of gnss_insert_raw() is going to be a bit more
+involved and should be done in a separate patch (e.g. you need to look
+at gnss_usb_rx_complete() and ice_gnss_read() to avoid introducing new
+warnings there).
 
---=20
-You may reply to this email to add a comment.
+And both option 2 and 3 will introduce conversion warnings (W=3, which
+we have plenty of anyway) unless you add casts.
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+I suggest you go with 3, unless you insist on 2.
+
+Johan
