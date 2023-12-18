@@ -1,112 +1,74 @@
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 635B94237E
-	for <linux-bluetooth@vger.kernel.org>; Mon, 18 Dec 2023 17:18:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 877961DA29
+	for <linux-bluetooth@vger.kernel.org>; Mon, 18 Dec 2023 20:50:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GTg5KNjp"
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2cc7b9281d1so2512191fa.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Dec 2023 09:18:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702919936; x=1703524736; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CWGHhBD0WYd/cyCepEQ4R1KKPnNd5l8ZQ4xdlTL5+uA=;
-        b=GTg5KNjpTy5fiooRROZQI133hjV5BfcNfMojMXpz/n767RqFv1OFy1HC2JKkw3evfm
-         HHJasa/kO17Z73MlF9qr00sPAPzY4+583PATjc6OQT4GElIz7LE1G1BgNJGyGTKzTc5Z
-         YULB+fc445ZJGe2ZHIbzGr++vHjpRfcs/SaQzuETuwcQKIA0YKK1CrLLr5+EAHlhoULy
-         Vtv2OXaZEh28HR0ngJs3nXh4Ws8U2Wdj1dYbBPGUNgfSXjdVAONl1OiagvlDgXg+nFWR
-         3JsC0VX32K8ifQdZCAUAuqXPXJBSl05TzHllr3WVhUoZdu1ykgL3HZBC01mwNc9vOaLF
-         Va4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702919936; x=1703524736;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CWGHhBD0WYd/cyCepEQ4R1KKPnNd5l8ZQ4xdlTL5+uA=;
-        b=o0EKLHO5HchBRBGlu8+TJkQCjumH4DUP6cY5GKBP9blOcTBYA9OL0kJAx6UKp3QF3V
-         kZaRBs5S50ueQ2gao44vPYx9x/lEHd5yl4dclf+wcbTznkxoUFr5CjnkPXpDmiP61XSH
-         c/Jk5ikG6zhEi26v+JTiEEsYCyQDyIEoshP+q9PMNipk55Z9YM+pyGbQXCP7pLOwqJEG
-         ZV25epyWjwPEJx9AYgTMszSJtVZKrjLDgP8o3gi8/xCeyqFk5yvOvPjNpTBAzPNqNkZT
-         qjzwStcZxJEfSNVXa3nJD1FNz+Tyi0UGQZblRVrvbHcJIe9J2wRhxIoWgmtKObkGdn4T
-         Jxlg==
-X-Gm-Message-State: AOJu0Ywj+38+5Ue8ZnlKLa3vbDuU6bx49jfACqGDRM1hw1HsrwewVp8D
-	fih3Nxx8XNg9GkkDp7EGUq+PGGe4sphDUjviDZo=
-X-Google-Smtp-Source: AGHT+IH3Df+mJX4f/sCJfMOtSS18BWM7bdPKu6D4Hefa3FBeK6rnXvRGUY1Hu2JwEjG9iRf9A3RmK8xmqrS9O3bPSiA=
-X-Received: by 2002:a2e:bcc9:0:b0:2cc:2b1a:57e3 with SMTP id
- z9-20020a2ebcc9000000b002cc2b1a57e3mr8646309ljp.88.1702919936163; Mon, 18 Dec
- 2023 09:18:56 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ro2OxLIF"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1E808C433C8;
+	Mon, 18 Dec 2023 20:50:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702932624;
+	bh=j5DYB9/uEctRO5pJZcf3KSIXtWNXbhx8+gpknahPviM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Ro2OxLIFXtf/wfJXSS3J5UHjVonxYkC1vqIebDK23LM2iR7AbkeHSMEPOitxQg2Ha
+	 vzp4VAjZmrQOuo4AzwSh2AcsS8gdBW9h0XUnJ+w1s+ynHyyw5rfvctCTXPn29wpoSA
+	 r5ZAjes20HLU6zAUIjb6/bRqEyNodFJ4spN55aKvMjdCyQ7R7Zp+WYw6OegV3MlwyZ
+	 BEDy3/2aBJ1bj9hGqK/6s4TxTKD2bCIZJR1BfwZERXhqSxaCDUSMzXZiE7nn6USFn3
+	 EI+TfoxejBKOutKtCIEIujsyRnoPCHmt5RWo40fs2q1oZCv+WhbTQDihMxQ3wGf6wM
+	 yVCpgEt+FBuCw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 08C0AC595D1;
+	Mon, 18 Dec 2023 20:50:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231217135012.1476534-1-xiaokeqinhealth@126.com>
-In-Reply-To: <20231217135012.1476534-1-xiaokeqinhealth@126.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 18 Dec 2023 12:18:44 -0500
-Message-ID: <CABBYNZL=Vi6jaum5B5y8P2sLUF+FkcdTPJ-WU07GbG5B6YtHJw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] adapter: Fix link key address type for old kernels
-To: Xiao Yao <xiaokeqinhealth@126.com>
-Cc: linux-bluetooth@vger.kernel.org, antiz@archlinux.org, 
-	Xiao Yao <xiaoyao@rock-chips.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v2 0/3] Implementation of AICS service and Unit Test
+ cases
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <170293262403.10818.8523452444804777040.git-patchwork-notify@kernel.org>
+Date: Mon, 18 Dec 2023 20:50:24 +0000
+References: <20231208114258.133709-1-mahesh.talewad@nxp.com>
+In-Reply-To: <20231208114258.133709-1-mahesh.talewad@nxp.com>
+To: Mahesh Talewad <mahesh.talewad@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
+ devyani.godbole@nxp.com, nitin.jadhav@nxp.com
 
-Hi Xiao,
+Hello:
 
-On Sun, Dec 17, 2023 at 11:21=E2=80=AFAM Xiao Yao <xiaokeqinhealth@126.com>=
- wrote:
->
-> From: Xiao Yao <xiaoyao@rock-chips.com>
->
-> Fixes: https://github.com/bluez/bluez/issues/686
->
-> Signed-off-by: Xiao Yao <xiaoyao@rock-chips.com>
-> ---
->  src/adapter.c | 12 +++++++++++-
->  1 file changed, 11 insertions(+), 1 deletion(-)
->
-> diff --git a/src/adapter.c b/src/adapter.c
-> index ee70b00d2..b4628a411 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -4347,7 +4347,17 @@ static void load_link_keys(struct btd_adapter *ada=
-pter, GSList *keys,
->                 struct link_key_info *info =3D l->data;
->
->                 bacpy(&key->addr.bdaddr, &info->bdaddr);
-> -               key->addr.type =3D info->bdaddr_type;
-> +
-> +               /*
-> +                * According to the Bluetooth specification, the address
-> +                * type of the link key is not fixed. However, the
-> +                * load_link_keys function in the old kernel code require=
-s
-> +                * that the address type must be BREDR. Since the address
-> +                * type is not actually used by the link key, to maintain
-> +                * compatibility with older kernel versions, the addr.typ=
-e
-> +                * of the link key is set to BDADDR_BREDR.
-> +                */
-> +               key->addr.type =3D BDADDR_BREDR;
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-We probably want to find a way to detect if the kernel is capable of
-handling the addr type or not, maybe attempt to load with it set and
-in case it doesn't work then use BREDR.
+On Fri,  8 Dec 2023 13:42:55 +0200 you wrote:
+> Hello Maintainers,
+> 
+> This Patch series contains following points:
+> 
+> - Implementation of Service - AICS.
+> 	- This code covers all mandatory features of AICS.
+>  	- Verification: All mandatory PTS testcases of AICS are passed.
+> 	- Specification referred for implementation:
+> 			AICS_v1.0.pdf
+> 
+> [...]
 
->                 key->type =3D info->type;
->                 memcpy(key->val, info->key, 16);
->                 key->pin_len =3D info->pin_len;
-> --
-> 2.34.1
->
->
+Here is the summary with links:
+  - [BlueZ,v2,1/3] - Added AICS Characteristics UUID(s).
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c89ebba80f27
+  - [BlueZ,v2,2/3] - Code Implementation related Service- AICS
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=172948d0d6f6
+  - [BlueZ,v2,3/3] unit/test-vcp.c: AICS unit test case implementation
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=eb07ec1f6ffb
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---=20
-Luiz Augusto von Dentz
