@@ -1,104 +1,112 @@
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D41A218E00
-	for <linux-bluetooth@vger.kernel.org>; Mon, 18 Dec 2023 11:00:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 635B94237E
+	for <linux-bluetooth@vger.kernel.org>; Mon, 18 Dec 2023 17:18:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="El5aJ/xa"
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-77f552d4179so224623285a.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Dec 2023 03:00:54 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GTg5KNjp"
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2cc7b9281d1so2512191fa.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Dec 2023 09:18:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702897253; x=1703502053; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=73Ek6uCYCjM36z7FmqZmv5v7XAXqGIXAyHkwRzSv29Y=;
-        b=El5aJ/xalEP/7n9909tyffeNAZ9W4dPnAzp3n2a34kucSAMT1cuBuFwvEsQvlzNJvF
-         dGh1ne6mWKxSnM28Zuj05mRPG1JDnd6zi8CAElO9roT61bFsre8vhCWiaKFCIJpG/iCF
-         3jbXNCZCvH8rzeHKEdPL3Wb7Mfe4xBnqOt2Yz5is1x399uKpMXTlSnusiTKoD53/QfhO
-         JPdkimGJpRgSjNuM2+EwHMpAdIkAy6sCQ3SuYpZUBwnkPLp3qiAFYhYZDZLHibKJ8l+z
-         uSxzsFS7Ctu5LHAC3hezDUZ34J6uhjE+c8E6q7zyI+M7Ih8Yuiwka2YFQ4XRXrHMmeae
-         bsAQ==
+        d=gmail.com; s=20230601; t=1702919936; x=1703524736; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CWGHhBD0WYd/cyCepEQ4R1KKPnNd5l8ZQ4xdlTL5+uA=;
+        b=GTg5KNjpTy5fiooRROZQI133hjV5BfcNfMojMXpz/n767RqFv1OFy1HC2JKkw3evfm
+         HHJasa/kO17Z73MlF9qr00sPAPzY4+583PATjc6OQT4GElIz7LE1G1BgNJGyGTKzTc5Z
+         YULB+fc445ZJGe2ZHIbzGr++vHjpRfcs/SaQzuETuwcQKIA0YKK1CrLLr5+EAHlhoULy
+         Vtv2OXaZEh28HR0ngJs3nXh4Ws8U2Wdj1dYbBPGUNgfSXjdVAONl1OiagvlDgXg+nFWR
+         3JsC0VX32K8ifQdZCAUAuqXPXJBSl05TzHllr3WVhUoZdu1ykgL3HZBC01mwNc9vOaLF
+         Va4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702897253; x=1703502053;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=73Ek6uCYCjM36z7FmqZmv5v7XAXqGIXAyHkwRzSv29Y=;
-        b=mK3RHOO966r4HDxUuP7jJ5U5v6w2gnmCV42UCfr4l6HJbIJy+VFUhEHUugJQiwvrK7
-         7A2Wf4DwYL9hqax8zKgFneiAyM/qnV6gltcYM2iP4fzS7trAmbDvV8pVW00K5kQK8zGl
-         YsZeOHa11596OUP5OOVWOf7SaiQK0I6niVpDJrniRNDh/bMd26hdFnn0X55f5gA6eVsU
-         AJlKP7oapvZ8lUwdk23N08qjEPJjDTqJbNa/ASAokthbhf9r/ZgRtufZRmHVorLc0WQb
-         RgRe50Ur0FirjqXO0ZsUUcm9jKAt+ypVliO8Hdexk1gTyEpgAoUrXyMzize6GuFevd4f
-         WxSA==
-X-Gm-Message-State: AOJu0Yyec6qvcJ/oXJwFHzmuPbDNyIv8+uNeNcDD8q4mmJAb5xxZzmFv
-	2Wv8fBrCiVGZxfb7MbP2kVABhDXZPTM=
-X-Google-Smtp-Source: AGHT+IGk2uCfLUU4y4Nay2NiE/0sUNY5TQhGvxMxqjvrNhBPh3pTS/jc8oQfZoFV+zc2p1CEwqXlsg==
-X-Received: by 2002:a05:620a:84c5:b0:77f:32b0:eac5 with SMTP id pq5-20020a05620a84c500b0077f32b0eac5mr19240145qkn.78.1702897253663;
-        Mon, 18 Dec 2023 03:00:53 -0800 (PST)
-Received: from [172.17.0.2] ([74.249.14.222])
-        by smtp.gmail.com with ESMTPSA id ud11-20020a05620a6a8b00b0077d90497738sm8217599qkn.102.2023.12.18.03.00.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Dec 2023 03:00:53 -0800 (PST)
-Message-ID: <65802665.050a0220.239f2.a8ed@mx.google.com>
-Date: Mon, 18 Dec 2023 03:00:53 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0138003963218561068=="
+        d=1e100.net; s=20230601; t=1702919936; x=1703524736;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CWGHhBD0WYd/cyCepEQ4R1KKPnNd5l8ZQ4xdlTL5+uA=;
+        b=o0EKLHO5HchBRBGlu8+TJkQCjumH4DUP6cY5GKBP9blOcTBYA9OL0kJAx6UKp3QF3V
+         kZaRBs5S50ueQ2gao44vPYx9x/lEHd5yl4dclf+wcbTznkxoUFr5CjnkPXpDmiP61XSH
+         c/Jk5ikG6zhEi26v+JTiEEsYCyQDyIEoshP+q9PMNipk55Z9YM+pyGbQXCP7pLOwqJEG
+         ZV25epyWjwPEJx9AYgTMszSJtVZKrjLDgP8o3gi8/xCeyqFk5yvOvPjNpTBAzPNqNkZT
+         qjzwStcZxJEfSNVXa3nJD1FNz+Tyi0UGQZblRVrvbHcJIe9J2wRhxIoWgmtKObkGdn4T
+         Jxlg==
+X-Gm-Message-State: AOJu0Ywj+38+5Ue8ZnlKLa3vbDuU6bx49jfACqGDRM1hw1HsrwewVp8D
+	fih3Nxx8XNg9GkkDp7EGUq+PGGe4sphDUjviDZo=
+X-Google-Smtp-Source: AGHT+IH3Df+mJX4f/sCJfMOtSS18BWM7bdPKu6D4Hefa3FBeK6rnXvRGUY1Hu2JwEjG9iRf9A3RmK8xmqrS9O3bPSiA=
+X-Received: by 2002:a2e:bcc9:0:b0:2cc:2b1a:57e3 with SMTP id
+ z9-20020a2ebcc9000000b002cc2b1a57e3mr8646309ljp.88.1702919936163; Mon, 18 Dec
+ 2023 09:18:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, neeraj.sanjaykale@nxp.com
-Subject: RE: [v1] Bluetooth: btnxpuart: Resolve TX timeout error in power save stress test
-In-Reply-To: <20231218102720.3816166-1-neeraj.sanjaykale@nxp.com>
-References: <20231218102720.3816166-1-neeraj.sanjaykale@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20231217135012.1476534-1-xiaokeqinhealth@126.com>
+In-Reply-To: <20231217135012.1476534-1-xiaokeqinhealth@126.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 18 Dec 2023 12:18:44 -0500
+Message-ID: <CABBYNZL=Vi6jaum5B5y8P2sLUF+FkcdTPJ-WU07GbG5B6YtHJw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] adapter: Fix link key address type for old kernels
+To: Xiao Yao <xiaokeqinhealth@126.com>
+Cc: linux-bluetooth@vger.kernel.org, antiz@archlinux.org, 
+	Xiao Yao <xiaoyao@rock-chips.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============0138003963218561068==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Xiao,
 
-This is automated email and please do not reply to this email!
+On Sun, Dec 17, 2023 at 11:21=E2=80=AFAM Xiao Yao <xiaokeqinhealth@126.com>=
+ wrote:
+>
+> From: Xiao Yao <xiaoyao@rock-chips.com>
+>
+> Fixes: https://github.com/bluez/bluez/issues/686
+>
+> Signed-off-by: Xiao Yao <xiaoyao@rock-chips.com>
+> ---
+>  src/adapter.c | 12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
+>
+> diff --git a/src/adapter.c b/src/adapter.c
+> index ee70b00d2..b4628a411 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -4347,7 +4347,17 @@ static void load_link_keys(struct btd_adapter *ada=
+pter, GSList *keys,
+>                 struct link_key_info *info =3D l->data;
+>
+>                 bacpy(&key->addr.bdaddr, &info->bdaddr);
+> -               key->addr.type =3D info->bdaddr_type;
+> +
+> +               /*
+> +                * According to the Bluetooth specification, the address
+> +                * type of the link key is not fixed. However, the
+> +                * load_link_keys function in the old kernel code require=
+s
+> +                * that the address type must be BREDR. Since the address
+> +                * type is not actually used by the link key, to maintain
+> +                * compatibility with older kernel versions, the addr.typ=
+e
+> +                * of the link key is set to BDADDR_BREDR.
+> +                */
+> +               key->addr.type =3D BDADDR_BREDR;
 
-Dear submitter,
+We probably want to find a way to detect if the kernel is capable of
+handling the addr type or not, maybe attempt to load with it set and
+in case it doesn't work then use BREDR.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=810985
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.66 seconds
-GitLint                       PASS      0.34 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      27.91 seconds
-CheckAllWarning               PASS      30.83 seconds
-CheckSparse                   PASS      36.35 seconds
-CheckSmatch                   PASS      99.39 seconds
-BuildKernel32                 PASS      27.18 seconds
-TestRunnerSetup               PASS      430.21 seconds
-TestRunner_l2cap-tester       PASS      23.55 seconds
-TestRunner_iso-tester         PASS      44.31 seconds
-TestRunner_bnep-tester        PASS      6.84 seconds
-TestRunner_mgmt-tester        PASS      161.68 seconds
-TestRunner_rfcomm-tester      PASS      10.83 seconds
-TestRunner_sco-tester         PASS      14.42 seconds
-TestRunner_ioctl-tester       PASS      12.24 seconds
-TestRunner_mesh-tester        PASS      8.92 seconds
-TestRunner_smp-tester         PASS      9.73 seconds
-TestRunner_userchan-tester    PASS      7.15 seconds
-IncrementalBuild              PASS      26.19 seconds
+>                 key->type =3D info->type;
+>                 memcpy(key->val, info->key, 16);
+>                 key->pin_len =3D info->pin_len;
+> --
+> 2.34.1
+>
+>
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0138003963218561068==--
+--=20
+Luiz Augusto von Dentz
