@@ -1,76 +1,85 @@
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EF053984A
-	for <linux-bluetooth@vger.kernel.org>; Tue, 19 Dec 2023 19:52:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37A1139AC4
+	for <linux-bluetooth@vger.kernel.org>; Tue, 19 Dec 2023 20:44:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QM/hWDAr"
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-425a3cdbda9so236981cf.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Dec 2023 11:52:53 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jz/VGThJ"
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2cc6acf5e3dso37850041fa.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Dec 2023 12:44:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703015572; x=1703620372; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:to:content-language:reply-to
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1703018667; x=1703623467; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UvjRjK/crBU8Z/z/3pDUmXaaKRR/02XeH/BuAoLaCyU=;
-        b=QM/hWDArp7GKZApXhuoK0fmVe71spn09uCl2V5saNLyY299ZwvbKFzLM0xkZPGi2hj
-         THrBSxRfRh713q+Bpxp1yAl2gvXpMQ4e7sSaWYQykb9ue82kls76bLs1etDhc+R4n6It
-         NlWkLwYBtodjgtGoNkBvbbYId/+2AHT5yAEtYcR20kE6szpLfvtCSTM3Cz9DKc6esDBz
-         sgyr/QCL/QoeCpPwAEZmSnreVsq58gssEDzgwvskiNjoDAVB4Q8E5UbLdr8Fm37SiKLY
-         OpHL2ax24VmzQcjELlzlxe61lqXIwa+vunFzoPgV3xyaWb+BG+siwJ/PNPhGpimf9AbU
-         PTvA==
+        bh=dfln8sVYZuJrSKK4xNrYYTObJduJpBORGY3Thk/bZm4=;
+        b=Jz/VGThJYWTWQOR9p0Ef59XGXuncrDuSA9JVMzXqbxtWltvbVrmPK+6uN7wFyrEW1V
+         UA1n0Ns3Egto8GeZ1FBaFMXpvgeqt0Q6H5VMvyPJZ1k1yoP+SJKzMWzaGzmQo8n11uCx
+         atl6sjRvFPMqvn+syMIvNDw1bCgmpFU1B6UGn0BS2VlVtyBdR3OM6IOwlENAes95bS4N
+         PfFbK+HnFzn5UwVeU4qqHZUDnaM3oO0mqrW3Nh+3oKs6V5wkp/zWnE7WVt3Af0hmwplE
+         oGRcziRdqwkhA6jXGKlCSDtLokCq2wJVROF5VOL6k9t0FgYYiGhiTqwUQFtOGCs7ziik
+         GcSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703015572; x=1703620372;
-        h=content-transfer-encoding:subject:from:to:content-language:reply-to
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=UvjRjK/crBU8Z/z/3pDUmXaaKRR/02XeH/BuAoLaCyU=;
-        b=AQkxjfSJdMRLip1f9MQ/+cAG2iy3TPJQn3UQSA6QlxK2zfYr6Pd9FNezXbFfuwBCn2
-         Rvd1BzBctXBzMiPX6qJnoZjpK1+V3RXmJb/V0qjw2DlOaZicujVDV2q7xEiWkRo4qc+1
-         p52cpOXJvyQc1uUjSzhws/m2/ZWxgUbE+szr1qc8ZwfQx4YdyULzHhdXuMQLLmH/2ixe
-         XkiNg+yF35xJwbqf/RcVMoJoNCIP9921WEhmintZPfqyNa9aYil7iztP/FcOKWKkSyN5
-         Ro6SksxO82lfev5Jhu/OHsblOArMaiY/aWXUk7q12j2iW5M2vCFNnRpH2ZGvfp00Wm7s
-         urSg==
-X-Gm-Message-State: AOJu0YzrBnzOAqGSYjc0gcw94obnr63gS/UrkWVMo5ul8PFrMlj3adX1
-	Pg6x9gf/lgbb8tEwbMl+2nWgn50gM2Q9iw==
-X-Google-Smtp-Source: AGHT+IF2lL+gDUSI9K17z5Uar7SSzRR5TYP8+K8wI+BSI9Y2RGAOdj40f7nty0nxk7+xkcOz5JEQcw==
-X-Received: by 2002:ac8:7f08:0:b0:425:4054:bc5e with SMTP id f8-20020ac87f08000000b004254054bc5emr2258686qtk.58.1703015571863;
-        Tue, 19 Dec 2023 11:52:51 -0800 (PST)
-Received: from [192.168.0.101] (pool-100-2-46-216.nycmny.fios.verizon.net. [100.2.46.216])
-        by smtp.gmail.com with ESMTPSA id fh3-20020a05622a588300b00425b356b919sm9358095qtb.55.2023.12.19.11.52.51
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Dec 2023 11:52:51 -0800 (PST)
-Message-ID: <976f20f9-d711-49a6-abde-12a25088d795@gmail.com>
-Date: Tue, 19 Dec 2023 14:52:51 -0500
+        d=1e100.net; s=20230601; t=1703018667; x=1703623467;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dfln8sVYZuJrSKK4xNrYYTObJduJpBORGY3Thk/bZm4=;
+        b=khR+K5VLYCnPFD7vGr0CERPey1GBNDrdRwum6+Qp+h1Y9JyDWmsQIlrpTjzJiauVdA
+         40Lt9JyC2HMz6qGtdlYiv669vc69TTd/D0HvX58vhuAG0Y7RQVquQlV1o7sa03Xac8ff
+         uNrg5elAGUWRlxq1t2QGlM86bhP6N3WgQMeU2X9cta9Rj+PrzU2JJRuxf1nCtOdwAuhE
+         VrMPfi/bqUVXyRa4DdamzYGewlKIeBMRUfx3QAVBdfkEJt50cz4jls/hAIB8/xoD5eBA
+         j5ym1TvEYzhI3vI2WJfv8ad9T9VRXSIp7QMQy7qNtXLpQIbR5q6Ku5CLZRvylUXlRlbn
+         mcMg==
+X-Gm-Message-State: AOJu0Yz8VlRWZTqolGa6IkLfYbIJHmqs2z7tjnjbJAG20ZH43TcogSgk
+	itmU36FJBrJZEAYPgKPTUHDW1jWa/0cuQA3a61srVbke
+X-Google-Smtp-Source: AGHT+IHaess5E2kp38RnEryxYvpCMZdPSES0MzX5wefItDexlQouW8t7NeW+5XRT6yGXe22Lw+EZw4cOm4QqBmvakZQ=
+X-Received: by 2002:a2e:b8c3:0:b0:2cc:2043:43cf with SMTP id
+ s3-20020a2eb8c3000000b002cc204343cfmr3930168ljp.214.1703018666913; Tue, 19
+ Dec 2023 12:44:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: polinsky@acm.org
-Content-Language: en-US
-To: linux-bluetooth@vger.kernel.org
-From: Alan Polinsky <alan.polinsky@gmail.com>
-Subject: the setup of Grado GW100x has failed
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <976f20f9-d711-49a6-abde-12a25088d795@gmail.com>
+In-Reply-To: <976f20f9-d711-49a6-abde-12a25088d795@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 19 Dec 2023 15:44:12 -0500
+Message-ID: <CABBYNZ+A9LYVf5pgbCuebFGosdKc8EvHPo-Z=47DqwRQmR2Ozw@mail.gmail.com>
+Subject: Re: the setup of Grado GW100x has failed
+To: polinsky@acm.org
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi there. I am a retired computer programmer who has recently purchased 
-a Grado GW100x pair of bluetooth headphones. I have an older Dell XPS13 
-computer dual booting between Windows 10 (rarely) and 64 bit 
-Slackware15. If I boot into Windows 10 the headphones connect perfectly, 
-but under Slackware I get the message: "the setup of Grado GW100x has 
-failed". About a week ago I installed a new version of Bluez from 
-Slackware but the problem remains. I don't know how to even debug the 
-problem. People at the LinuxQuestions forum suggested switching from 
-Pulseaudio to Pipewire, which made no sense to me, but I gave it a try. 
-I get the same result. Perhaps you can help.
+Hi Alan,
+
+On Tue, Dec 19, 2023 at 2:53=E2=80=AFPM Alan Polinsky <alan.polinsky@gmail.=
+com> wrote:
+>
+> Hi there. I am a retired computer programmer who has recently purchased
+> a Grado GW100x pair of bluetooth headphones. I have an older Dell XPS13
+> computer dual booting between Windows 10 (rarely) and 64 bit
+> Slackware15. If I boot into Windows 10 the headphones connect perfectly,
+> but under Slackware I get the message: "the setup of Grado GW100x has
+> failed". About a week ago I installed a new version of Bluez from
+> Slackware but the problem remains. I don't know how to even debug the
+> problem. People at the LinuxQuestions forum suggested switching from
+> Pulseaudio to Pipewire, which made no sense to me, but I gave it a try.
+> I get the same result. Perhaps you can help.
+
+Try checking what is going on with btmon, what kernel version are you using=
+?
+
+>
+> Alan Polinsky
+>
+>
 
 
-Alan Polinsky
-
+--=20
+Luiz Augusto von Dentz
