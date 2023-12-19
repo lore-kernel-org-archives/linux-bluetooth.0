@@ -1,104 +1,158 @@
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA963321B7
-	for <linux-bluetooth@vger.kernel.org>; Tue, 19 Dec 2023 17:50:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55A5D37D21;
+	Tue, 19 Dec 2023 18:07:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y/qB1ySV"
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-50bf2d9b3fdso6544435e87.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Dec 2023 09:50:11 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AGNyDIKy"
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2cb21afa6c1so67644811fa.0;
+        Tue, 19 Dec 2023 10:07:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703008210; x=1703613010; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1703009230; x=1703614030; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HPZgZftZPMCR/U8Z4jTEHFWpxoolhOxzvH3+CLdiPIc=;
-        b=Y/qB1ySV2IdEcMTsXNUzUMYYJQuE+pyQh/Nt/4Njhsegjsb3EbOZOZP3IdWt32EkDH
-         6TBRQ1vSIgzG+ZrOVachqR4P21W1Zy3xFSutRl5iT5tQNy21bb4ZRkTwHhSjG2wVvneh
-         8mfMUh2suZO8jvavrwEBgTJdaHvJpBTv+4EVuI/B1IAoBulwoe6pbELfmX7wXo2eAQtv
-         YKWt0jDIGetoIt5It1P8Wooboqdf9fzuqwOwmyLcGt24WK6fjdSeu67NSQmfEQMU6tC0
-         LXTOiLkfNeE5Ii6Z6y+YSIVJBNasr2VTEeMa6B6X3JYmuUz2k+vfAKvwxzv3dPBdjLCo
-         jUJw==
+        bh=m1ZwhJRZ+N/d+fVkkOSiSnflGiueYMOvsJ8Gh3pY+IU=;
+        b=AGNyDIKyj8U/cb68cytRNvA6qP8BT2drBNahHGjI4Q1JmXEES1l4js7XoAkMGCfXSs
+         BoArn8jLLoLvTFLHoNeqPG/pEc1cqE1UlOPi3HMPi1aCevbCCm2/NiU5XGSzFp6g3yWV
+         MAKAV/WUeJRj34BIOkl935xVKP47qDKqZchm/P53y2jrtO9Ld2i2jumCr6ioNKL90qPj
+         w1eV3DRh2AWes2/vHDVTywsYnV3/0J2rwVCIbii6+m1mwsjx7tcoOCDCjpqo29Un5mRY
+         ttDEV6zJ7uklFZwiRH5/wtAaL/pXp8lxpLg+u8rnBWp1tSpRJfhEZxDexxfyfeT/gxAc
+         6+wA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703008210; x=1703613010;
+        d=1e100.net; s=20230601; t=1703009230; x=1703614030;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HPZgZftZPMCR/U8Z4jTEHFWpxoolhOxzvH3+CLdiPIc=;
-        b=b4FJc6j787405P6AoqejxDxWJ7Kc5+qRIugOoYH56nmvyEKlmTWs0XpISVYpG650Zw
-         eSyO04mHAX4elzVvhPdSxG7p/A7AWVx2mPPcYea1HyIcj56obr6V30wjzGCswBA67DM1
-         IPj2DC5nw4MLZLzrSRN8fg9IXL+584lIxDe1Qmli4TlUQUMxE0cKk5Qu8iW+NGaoFM+t
-         wtTzY/EafysVLQYzNfYMenjUH2x17sg8CiYeQUeiFb+tOeWocOhr979P4FUsROZalC2l
-         iglXRFt+5LKo2HsYh+dzRIWISfVV4Poj4AhUEFwGz4SJWAkWQzUM/dIov8+SdUR5FqUS
-         SjMQ==
-X-Gm-Message-State: AOJu0YzRxX1AkpkdMl3Dxn00bC2md+OejI7TbxviGBHITt/GUPNznTK2
-	Z+t6fvfqUVQL74syZ0izQqh9+7pvSoDhBa+Q4rHJnNE1
-X-Google-Smtp-Source: AGHT+IGtkSr2Nv85Wmc6GuQCz6oUIwpWhthJ6rE5HUfTivaMISJgdAT6PKsP00AV1UGvmf7bXuOLZYEkHCPjoY+pLG0=
-X-Received: by 2002:a2e:be11:0:b0:2cc:7744:971f with SMTP id
- z17-20020a2ebe11000000b002cc7744971fmr2068703ljq.92.1703008209455; Tue, 19
- Dec 2023 09:50:09 -0800 (PST)
+        bh=m1ZwhJRZ+N/d+fVkkOSiSnflGiueYMOvsJ8Gh3pY+IU=;
+        b=g5JpnU9cAH9lngE5sGv0e48qhBCdIbEAkOU+WqUG9SbqeLyu/tsByzQtLJg/K81pIn
+         Zky10VyZYtzWwiaALUeDtOcQdFd6zxSROO911D2VqeCJERrhDaVttxUzeiXBiU+5kniU
+         BMO610fh5+p65BSgwSOCnkyj1wJmBIBfKYCzU9G8LHLJzsmg9xxsbgMOjIPfSkqhYS9l
+         X6tp2tuOawzrmWKnfnbELwTyPFjhMCXib3AJb/6G9Dt1mwBT7pZzwiKTGV4gVDnv0Cb1
+         K6wRU52Ish6RS5xEqGtMZ1t+eBtNxGijs9R3VQVIHRIqP7egLE1EGrRN4S4ugrVhgmko
+         RvLQ==
+X-Gm-Message-State: AOJu0Yy8sg9tY0lxi3Qr6+XtVI2A/q85ykQ6zIUz2oSM5wjH0PlAj9Tz
+	HX3HDbqq13BeC5VG4ZB44ZS4nJS5oE8O+v0DNbo=
+X-Google-Smtp-Source: AGHT+IHgrHf2vtd9/nC2WuK81Zvn8uEeNd7HMPJmvdMP//OocIojGSo3xSvxYEcEm60tX4XNcioe2quihSJ1O8WT8pA=
+X-Received: by 2002:a2e:b606:0:b0:2cc:87b4:3f9f with SMTP id
+ r6-20020a2eb606000000b002cc87b43f9fmr498039ljn.22.1703009229969; Tue, 19 Dec
+ 2023 10:07:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <6ce4dab33868db0a8c7b93bf58c20aa876d50f21.camel@interlinx.bc.ca>
-In-Reply-To: <6ce4dab33868db0a8c7b93bf58c20aa876d50f21.camel@interlinx.bc.ca>
+References: <20231208130705.kernel.v1.1.Ic5024b3da99b11e39c247a5b8ba44876c18880a0@changeid>
+In-Reply-To: <20231208130705.kernel.v1.1.Ic5024b3da99b11e39c247a5b8ba44876c18880a0@changeid>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 19 Dec 2023 12:49:57 -0500
-Message-ID: <CABBYNZLbyCkg+heU5gNDooo2w7Uf+P1To0pVnrhS_z7Be3bTYw@mail.gmail.com>
-Subject: Re: chrome passkey communication timing out
-To: "Brian J. Murrell" <brian@interlinx.bc.ca>
-Cc: linux-bluetooth@vger.kernel.org
+Date: Tue, 19 Dec 2023 13:06:57 -0500
+Message-ID: <CABBYNZKOKOCzLkggM1PRXuFjsaU9-0=6WmdTxaF-s3v7WSzvhg@mail.gmail.com>
+Subject: Re: [kernel PATCH v1] Bluetooth: btmtksdio: clear BTMTKSDIO_BT_WAKE_ENABLED
+ after resume
+To: Zhengping Jiang <jiangzp@google.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, 
+	chromeos-bluetooth-upstreaming@chromium.org, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, Paolo Abeni <pabeni@redhat.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Brian,
+Hi Zhengping,
 
-On Tue, Dec 19, 2023 at 12:35=E2=80=AFPM Brian J. Murrell <brian@interlinx.=
-bc.ca> wrote:
+On Fri, Dec 8, 2023 at 4:07=E2=80=AFPM Zhengping Jiang <jiangzp@google.com>=
+ wrote:
 >
-> I am trying to utilize the facility in Chrome to be able to use
-> passkeys stored on an Android phone with the demo site at passkeys.io.
+> Always clear BTMTKSDIO_BT_WAKE_ENABLED bit after resume. When Bluetooth
+> does not generate interrupts, the bit will not be cleared and causes
+> premature wakeup.
 >
-> I have tried this on 3 computers I have access to and it only seems to
-> work on one of them and the Bluetooth operation fails on two of them.
+> Fixes: 4ed924fc122f ("Bluetooth: btmtksdio: enable bluetooth wakeup in sy=
+stem suspend")
+> Signed-off-by: Zhengping Jiang <jiangzp@google.com>
+> ---
 >
-> The one that works is running Fedora 38 with bluez-5.70-5.fc38.x86_64
-> on a:
+> Changes in v1:
+> - Clear BTMTKSDIO_BT_WAKE_ENABLED flag on resume
 >
-> Bus 001 Device 005: ID 8087:0026 Intel Corp. AX201 Bluetooth
+>  drivers/bluetooth/btmtksdio.c    | 10 ++++++++++
+>  include/net/bluetooth/hci_core.h |  1 +
+>  net/bluetooth/hci_sync.c         |  2 ++
+>  3 files changed, 13 insertions(+)
 >
-> BT adapter.
+> diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.=
+c
+> index ff4868c83cd8..8f00b71573c8 100644
+> --- a/drivers/bluetooth/btmtksdio.c
+> +++ b/drivers/bluetooth/btmtksdio.c
+> @@ -1296,6 +1296,15 @@ static bool btmtksdio_sdio_inband_wakeup(struct hc=
+i_dev *hdev)
+>         return device_may_wakeup(bdev->dev);
+>  }
 >
-> One that is not working is running Fedora 39 with bluez-5.71-
-> 1.fc39.x86_64 on a:
->
-> Bus 003 Device 004: ID 0a5c:2121 Broadcom Corp. BCM2210 Bluetooth
->
-> BT adapter.
->
-> The other one that is not working is also Fedora 39 with bluez-5.71-
-> 1.fc39.x86_64 but I cannot seem to see a BT adapter in the output of
-> either lspci or lsusb.  But I can see that it has a BT adapter:
->
-> $ bluetoothctl
-> Waiting to connect to bluetoothd...[bluetooth]# hci0 new_settings: powere=
-d bondable ssp br/edr
-> [bluetooth]# Agent registered
-> [bluetooth]# [CHG] Controller 70:F3:95:3E:92:34 Pairable: yes
->
-> Any clues or hints on how to further debug why these two non-working
-> systems are non-working given that this does work on the third system?
+> +static void btmtksdio_disable_bt_wakeup(struct hci_dev *hdev)
+> +{
+> +       struct btmtksdio_dev *bdev =3D hci_get_drvdata(hdev);
+> +
+> +       if (!bdev)
+> +               return;
+> +       clear_bit(BTMTKSDIO_BT_WAKE_ENABLED, &bdev->tx_state);
+> +}
+> +
+>  static bool btmtksdio_sdio_wakeup(struct hci_dev *hdev)
+>  {
+>         struct btmtksdio_dev *bdev =3D hci_get_drvdata(hdev);
+> @@ -1363,6 +1372,7 @@ static int btmtksdio_probe(struct sdio_func *func,
+>         hdev->shutdown =3D btmtksdio_shutdown;
+>         hdev->send     =3D btmtksdio_send_frame;
+>         hdev->wakeup   =3D btmtksdio_sdio_wakeup;
+> +       hdev->clear_wakeup =3D btmtksdio_disable_bt_wakeup;
+>         /*
+>          * If SDIO controller supports wake on Bluetooth, sending a wakeo=
+n
+>          * command is not necessary.
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci=
+_core.h
+> index 0c1754f416bd..4bbd55335269 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -672,6 +672,7 @@ struct hci_dev {
+>         int (*get_codec_config_data)(struct hci_dev *hdev, __u8 type,
+>                                      struct bt_codec *codec, __u8 *vnd_le=
+n,
+>                                      __u8 **vnd_data);
+> +       void (*clear_wakeup)(struct hci_dev *hdev);
 
-Check with btmon what if that is generating any traffic.
+I wonder if it wouldn't be a better idea to add something like suspend
+and resume callbacks to notify the about these hdev states, that way
+we can synchronize the states better and avoid having to clear the
+wakeup state when it shouldn't be active to begin with since the hdev
+is not suspended.
 
-> Cheers,
-> b.
+>  };
 >
+>  #define HCI_PHY_HANDLE(handle) (handle & 0xff)
+> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> index 3563a90ed2ac..6c4d5ce40524 100644
+> --- a/net/bluetooth/hci_sync.c
+> +++ b/net/bluetooth/hci_sync.c
+> @@ -5947,6 +5947,8 @@ int hci_resume_sync(struct hci_dev *hdev)
+>                 return 0;
+>
+>         hdev->suspended =3D false;
+> +       if (hdev->clear_wakeup)
+> +               hdev->clear_wakeup(hdev);
+>
+>         /* Restore event mask */
+>         hci_set_event_mask_sync(hdev);
+> --
+> 2.43.0.472.g3155946c3a-goog
 >
 
 
