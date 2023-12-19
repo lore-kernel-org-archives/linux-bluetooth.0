@@ -1,118 +1,106 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1765B225D9
-	for <linux-bluetooth@vger.kernel.org>; Tue, 19 Dec 2023 17:35:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=edgeble.ai
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=edgeble.ai
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA963321B7
+	for <linux-bluetooth@vger.kernel.org>; Tue, 19 Dec 2023 17:50:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=edgeble-ai.20230601.gappssmtp.com header.i=@edgeble-ai.20230601.gappssmtp.com header.b="BNOV7vYW"
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-6d939e2f594so591832b3a.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Dec 2023 09:35:59 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y/qB1ySV"
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-50bf2d9b3fdso6544435e87.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Dec 2023 09:50:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=edgeble-ai.20230601.gappssmtp.com; s=20230601; t=1703007359; x=1703612159; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=e6xt47F6+JMYpd47p3WKPJhNZy2Q7x7jTZWa1cFTuXk=;
-        b=BNOV7vYWwrC0yEzLevvV0VFxy+oP0P3m3UjVu28FpzADsOLHqj9MfUW9qjS/Pvzhod
-         Tdht/tTUV9xfvinVNrASjWL0US8z+gv3VQIXadaB5AR6JuMZ8p7llMEnhClEBW2TDbC/
-         EsKmQ0GFVKbFmA1e9xozADTH4EwSeb84DnGuccIa10IuS8rO+um7KZt2uSmt1ldxNsLu
-         Er33ICC0hbhmwcayxbGmdBMaMV82zV2NaKZ72Ht2lb8KBa9tc/BZBzdGbSFXS/cZHQBv
-         oVtP3brE2/OTiZQJYPEVzZZgMZ5SGJdRc4MlHUQoC1YOsp+AiHzDhO7qOxm1aNEeIS5x
-         glGw==
+        d=gmail.com; s=20230601; t=1703008210; x=1703613010; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HPZgZftZPMCR/U8Z4jTEHFWpxoolhOxzvH3+CLdiPIc=;
+        b=Y/qB1ySV2IdEcMTsXNUzUMYYJQuE+pyQh/Nt/4Njhsegjsb3EbOZOZP3IdWt32EkDH
+         6TBRQ1vSIgzG+ZrOVachqR4P21W1Zy3xFSutRl5iT5tQNy21bb4ZRkTwHhSjG2wVvneh
+         8mfMUh2suZO8jvavrwEBgTJdaHvJpBTv+4EVuI/B1IAoBulwoe6pbELfmX7wXo2eAQtv
+         YKWt0jDIGetoIt5It1P8Wooboqdf9fzuqwOwmyLcGt24WK6fjdSeu67NSQmfEQMU6tC0
+         LXTOiLkfNeE5Ii6Z6y+YSIVJBNasr2VTEeMa6B6X3JYmuUz2k+vfAKvwxzv3dPBdjLCo
+         jUJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703007359; x=1703612159;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=e6xt47F6+JMYpd47p3WKPJhNZy2Q7x7jTZWa1cFTuXk=;
-        b=EkAKvjCYRp9nCC0yjJHV/TWyafSAHA/bjtquX222P9gi+8Dk4Jabzjz2hXDg3MQjHf
-         jiklUj5SMfYVnr0uEGpVQmAj4kW2QgK67qA+lmAdLMB0R9EoPWiHedHvUX1NSCgZK0YM
-         au0jQXhPT2nT1kMf0f34qx5jhxUFpzqJXoVfTvJcJZUrQLzgbTGz5YNTu6LMRw4wMnyk
-         U9u2ZITrc6nUivRcGd/bQXF9F68vEG3ASnFo79eRToTn83PZB6EWbIlJqMsW+5D9hBn9
-         ydU6OTSFN26o/A4dRvyrz6RrqsBkf8Or50nWg12CZkmB4LUPfHjVZGRs5Whg3KY801yl
-         xrjA==
-X-Gm-Message-State: AOJu0YxTq+EwhpQ2vk4p3oEWwnQb0dx7+6/sodMQx7tZWElyb/oL1F5s
-	TJgT5asaJXH9X7P7Mq9tteAHQg==
-X-Google-Smtp-Source: AGHT+IFuIjfPPhUgNG20nv+lrGIptqD32HCiqbY2/e0VfxtoijefGrGDm4/4REVh7jdUYPgRAlqYAA==
-X-Received: by 2002:aa7:93c4:0:b0:6d6:aa3d:b44 with SMTP id y4-20020aa793c4000000b006d6aa3d0b44mr3951067pff.53.1703007359399;
-        Tue, 19 Dec 2023 09:35:59 -0800 (PST)
-Received: from localhost.localdomain ([2405:201:c00a:a208:b4aa:2f82:a5a:52d7])
-        by smtp.gmail.com with ESMTPSA id o11-20020a056a001b4b00b006d926329cd3sm2238479pfv.212.2023.12.19.09.35.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Dec 2023 09:35:59 -0800 (PST)
-From: Jagan Teki <jagan@edgeble.ai>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Jagan Teki <jagan@edgeble.ai>
-Subject: [PATCH v2] Bluetooth: Add device 13d3:3572 IMC Networks Bluetooth Radio
-Date: Tue, 19 Dec 2023 23:05:47 +0530
-Message-Id: <20231219173547.337962-1-jagan@edgeble.ai>
-X-Mailer: git-send-email 2.25.1
+        d=1e100.net; s=20230601; t=1703008210; x=1703613010;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HPZgZftZPMCR/U8Z4jTEHFWpxoolhOxzvH3+CLdiPIc=;
+        b=b4FJc6j787405P6AoqejxDxWJ7Kc5+qRIugOoYH56nmvyEKlmTWs0XpISVYpG650Zw
+         eSyO04mHAX4elzVvhPdSxG7p/A7AWVx2mPPcYea1HyIcj56obr6V30wjzGCswBA67DM1
+         IPj2DC5nw4MLZLzrSRN8fg9IXL+584lIxDe1Qmli4TlUQUMxE0cKk5Qu8iW+NGaoFM+t
+         wtTzY/EafysVLQYzNfYMenjUH2x17sg8CiYeQUeiFb+tOeWocOhr979P4FUsROZalC2l
+         iglXRFt+5LKo2HsYh+dzRIWISfVV4Poj4AhUEFwGz4SJWAkWQzUM/dIov8+SdUR5FqUS
+         SjMQ==
+X-Gm-Message-State: AOJu0YzRxX1AkpkdMl3Dxn00bC2md+OejI7TbxviGBHITt/GUPNznTK2
+	Z+t6fvfqUVQL74syZ0izQqh9+7pvSoDhBa+Q4rHJnNE1
+X-Google-Smtp-Source: AGHT+IGtkSr2Nv85Wmc6GuQCz6oUIwpWhthJ6rE5HUfTivaMISJgdAT6PKsP00AV1UGvmf7bXuOLZYEkHCPjoY+pLG0=
+X-Received: by 2002:a2e:be11:0:b0:2cc:7744:971f with SMTP id
+ z17-20020a2ebe11000000b002cc7744971fmr2068703ljq.92.1703008209455; Tue, 19
+ Dec 2023 09:50:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <6ce4dab33868db0a8c7b93bf58c20aa876d50f21.camel@interlinx.bc.ca>
+In-Reply-To: <6ce4dab33868db0a8c7b93bf58c20aa876d50f21.camel@interlinx.bc.ca>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 19 Dec 2023 12:49:57 -0500
+Message-ID: <CABBYNZLbyCkg+heU5gNDooo2w7Uf+P1To0pVnrhS_z7Be3bTYw@mail.gmail.com>
+Subject: Re: chrome passkey communication timing out
+To: "Brian J. Murrell" <brian@interlinx.bc.ca>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This 13d3:3572 is part of  Realtek RTW8852BE chip.
+Hi Brian,
 
-The device table is:
-T:  Bus=04 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
-D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=13d3 ProdID=3572 Rev= 0.00
-S:  Manufacturer=Realtek
-S:  Product=Bluetooth Radio
-S:  SerialNumber=00e04c000001
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+On Tue, Dec 19, 2023 at 12:35=E2=80=AFPM Brian J. Murrell <brian@interlinx.=
+bc.ca> wrote:
+>
+> I am trying to utilize the facility in Chrome to be able to use
+> passkeys stored on an Android phone with the demo site at passkeys.io.
+>
+> I have tried this on 3 computers I have access to and it only seems to
+> work on one of them and the Bluetooth operation fails on two of them.
+>
+> The one that works is running Fedora 38 with bluez-5.70-5.fc38.x86_64
+> on a:
+>
+> Bus 001 Device 005: ID 8087:0026 Intel Corp. AX201 Bluetooth
+>
+> BT adapter.
+>
+> One that is not working is running Fedora 39 with bluez-5.71-
+> 1.fc39.x86_64 on a:
+>
+> Bus 003 Device 004: ID 0a5c:2121 Broadcom Corp. BCM2210 Bluetooth
+>
+> BT adapter.
+>
+> The other one that is not working is also Fedora 39 with bluez-5.71-
+> 1.fc39.x86_64 but I cannot seem to see a BT adapter in the output of
+> either lspci or lsusb.  But I can see that it has a BT adapter:
+>
+> $ bluetoothctl
+> Waiting to connect to bluetoothd...[bluetooth]# hci0 new_settings: powere=
+d bondable ssp br/edr
+> [bluetooth]# Agent registered
+> [bluetooth]# [CHG] Controller 70:F3:95:3E:92:34 Pairable: yes
+>
+> Any clues or hints on how to further debug why these two non-working
+> systems are non-working given that this does work on the third system?
 
-Signed-off-by: Jagan Teki <jagan@edgeble.ai>
----
-Changes for v2:
-- Change commit prefix from bluetooth to Bluetooth
+Check with btmon what if that is generating any traffic.
 
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+> Cheers,
+> b.
+>
+>
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index b8e9de887b5d..cf976a54dc20 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -550,6 +550,8 @@ static const struct usb_device_id quirks_table[] = {
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x13d3, 0x3571), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x13d3, 0x3572), .driver_info = BTUSB_REALTEK |
-+						     BTUSB_WIDEBAND_SPEECH },
- 
- 	/* Realtek Bluetooth devices */
- 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0bda, 0xe0, 0x01, 0x01),
--- 
-2.25.1
 
+--=20
+Luiz Augusto von Dentz
