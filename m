@@ -1,51 +1,51 @@
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
+Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com [209.85.219.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E00247A41
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Dec 2023 17:40:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BA2A47A61
+	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Dec 2023 17:40:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HKf6w++S"
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-5e78d94855fso20727267b3.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Dec 2023 09:40:36 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JPQG/Yqu"
+Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-dbdb2433800so600361276.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Dec 2023 09:40:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703094035; x=1703698835; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1703094044; x=1703698844; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=WUE5JXhNlUdgsxLzu60ERwCx3F8tYCxFrHjJnROl240=;
-        b=HKf6w++Sh2A71PGRmtpUmjqDJcg+OPPU2LeoZLwqqAZDsaLQOrLzbVvdkygLzJUZ1c
-         +JKJLg00Xk1PM7lflkyE4/7WcVlF5Xt0Mk/8053PjLstRk0wh3W8IObEHgu9WHYpF39R
-         FqYmvvGG0aaEDF4HHQf++8MFuCLuhtNL32PGNnmtfaB2d1R5zdz2lzWrny8PEl0rcrVK
-         tLTT/rgeZkonq6se/6zw+nkCXA15WzO9N7ygcCqLE/XaeNTeW19XtWY4Pen7mcXTEfBv
-         gO4GIcR/4DQfSS34YwXnOOYfzoFiRaNZhLaAEVrdYqBkBkcY+mQlQPtEc/7aShWjkxOt
-         vDFA==
+        bh=KAcv0cJEoeqOXt6CURKXaYpKKYBk0AkiyzCATDp7kRQ=;
+        b=JPQG/Yquin0zt7UQi0j5tLWPki5mFSkndVISZjMCiWEwczWByn0UK93nLhlWgK8DIH
+         mbSSp3WruNrvDXWFyAno+BO7ypLE4sXV2yIqeRK/sDZLo42a33M3gX3aiGZTJ8ttMdU/
+         V8qHR1YqAO8iFOLMh0siYKDYLBIAxGT89DzOrZXC4DGR3gu/XUjVPhCoS0uaBIF9WYAz
+         iTHxEpjRZHtlSfnT3s/XD7bLHGUq1Xfq0OevJ89ltt2/+YXkeYImOq356vPBSUhYtsE8
+         cADGZqEp1CjMbkNv6E0kH31pIEFD/9mzZGb7ct5SHJ6kNu7nNrOYhnBHsNPl8c9GThEw
+         EBMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703094035; x=1703698835;
+        d=1e100.net; s=20230601; t=1703094044; x=1703698844;
         h=content-transfer-encoding:mime-version:message-id:date:subject:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WUE5JXhNlUdgsxLzu60ERwCx3F8tYCxFrHjJnROl240=;
-        b=DVhLeUHwGn1gdcgRFxaOcEUdQtxtIQ8tZn/yfHbTegqRe4tJmQH+RwdN2C3OWQmJ/f
-         eeYXz0ZWx2EWR/bJmq9hj8A0amupnlQ7p1T/gWkg9mFb4Gd1ASGu79IluCJI33aVkUhC
-         Ve+Ctbu/qWuq+K3yrH//uL9DBWGleCf73H9HQYX/n0BWthLv5r+Shw0rvT7wvFiZqPje
-         6rvs+H1r24KVw4OlC9mv0a5LE9rjQEod/cNHYU+DbyZ1tvlWjcQFOHmJ34tjKkyaDGmM
-         QPvKX2hOM7glsaEbIi3KM2AS//biVx5RMdplSf186bcNr2l+vZj6qJP7YwiVdRnFXF8c
-         PJWg==
-X-Gm-Message-State: AOJu0Yy5bhxATYoF0vORRJghQQnzPf1n3/ah1qomSfH1DiXULDg83PE9
-	jse1ehsFI6n4sEU8UzZcmLq6CZTwmyM=
-X-Google-Smtp-Source: AGHT+IG/jS8hcLQtmyW1APFeTzzlvWZaC582vu3VoYfR+ML9Nn2l1yHdlTzNt03AybaLtvSa/FkY+Q==
-X-Received: by 2002:a0d:ffc2:0:b0:5d7:1940:7d7a with SMTP id p185-20020a0dffc2000000b005d719407d7amr70346ywf.81.1703094034670;
-        Wed, 20 Dec 2023 09:40:34 -0800 (PST)
+        bh=KAcv0cJEoeqOXt6CURKXaYpKKYBk0AkiyzCATDp7kRQ=;
+        b=S+NpxqgRyRQadhKoaI07Nw05s/Pz1k8EeFU2yrJdXmUg9V7LZPvZw6Q/YKz5RuQs6D
+         56BaY+01q6lXXHvdBLHLX6hC8LP2xP6efy/ssA+oNjhtI/s2PFYmEe0C04EF4a3Delln
+         wN5GUXW9DAjk7mMiVJzMXKkqUvJ16pNYl/owhRzvLlngrGq9D78Z+pwoCACCiDndyg/O
+         P6PsapH5oO/W6iSpSwTFdKcstAFCo5LD/46GYQPy20pK7MvpU1S7Kvt9BpL8fNM/iwkX
+         2IdeyJPuR2cCy3mDbi23t7KRwHwbJfsYYrm0VhHrNQqd+Qczs2s+s+KnUg42AcYKwOCo
+         3S1Q==
+X-Gm-Message-State: AOJu0YyEGIN3X52fJDj1UFuwuhN4V+H4mTzjQ2pC7SHmkJtLUdIRjAoE
+	qtCkbg2e0/lHNPm4fq11o/P1eNL1CNU=
+X-Google-Smtp-Source: AGHT+IE3xNTsTEgM3ZpE5ZAl0ZYrYqR0uqtNVfKHNglYZQoa0DRom7Lzv2q0ZDQ1uu23Z9z949Uhrg==
+X-Received: by 2002:a25:c789:0:b0:db7:dacf:622f with SMTP id w131-20020a25c789000000b00db7dacf622fmr44806ybe.129.1703094044230;
+        Wed, 20 Dec 2023 09:40:44 -0800 (PST)
 Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
-        by smtp.gmail.com with ESMTPSA id y17-20020a0dd611000000b005e86cbd566esm78882ywd.35.2023.12.20.09.40.33
+        by smtp.gmail.com with ESMTPSA id t12-20020a25838c000000b00dbd15c3b753sm92583ybk.46.2023.12.20.09.40.43
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Dec 2023 09:40:33 -0800 (PST)
+        Wed, 20 Dec 2023 09:40:43 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1] adapter: Fix link key address type for old kernels
-Date: Wed, 20 Dec 2023 12:40:31 -0500
-Message-ID: <20231220174032.2335731-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2] adapter: Fix link key address type for old kernels
+Date: Wed, 20 Dec 2023 12:40:42 -0500
+Message-ID: <20231220174042.2335819-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -62,18 +62,18 @@ that and retry.
 
 Fixes: https://github.com/bluez/bluez/issues/686
 ---
- src/adapter.c | 55 +++++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 40 insertions(+), 15 deletions(-)
+ src/adapter.c | 59 ++++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 44 insertions(+), 15 deletions(-)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index ee70b00d249e..b8ded4c0e649 100644
+index ee70b00d249e..022390f0d95d 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
 @@ -311,6 +311,7 @@ struct btd_adapter {
  	bool pincode_requested;		/* PIN requested during last bonding */
  	GSList *connections;		/* Connected devices */
  	GSList *devices;		/* Devices structure pointers */
-+	GSList *keys;			/* Devices keys to be loaded */
++	GSList *load_keys;		/* Devices keys to be loaded */
  	GSList *connect_list;		/* Devices to connect when found */
  	struct btd_device *connect_le;	/* LE device waiting to be connected */
  	sdp_list_t *services;		/* Services associated to adapter */
@@ -106,8 +106,8 @@ index ee70b00d249e..b8ded4c0e649 100644
  	DBG("link keys loaded for hci%u", adapter->dev_id);
 +
 +done:
-+	g_slist_free_full(adapter->keys, g_free);
-+	adapter->keys = NULL;
++	g_slist_free_full(adapter->load_keys, g_free);
++	adapter->load_keys = NULL;
  }
  
 -static void load_link_keys(struct btd_adapter *adapter, GSList *keys,
@@ -127,14 +127,14 @@ index ee70b00d249e..b8ded4c0e649 100644
  		return;
  
 -	key_count = g_slist_length(keys);
-+	count = g_slist_length(adapter->keys);
++	count = g_slist_length(adapter->load_keys);
 +	if (!count)
 +		return;
  
 -	DBG("hci%u keys %zu debug_keys %d", adapter->dev_id, key_count,
 -								debug_keys);
 +	DBG("hci%u keys %zu debug_keys %d retry %s", adapter->dev_id, count,
-+				debug_keys, retry);
++				debug_keys, retry ? "true" : "false");
  
 -	cp_size = sizeof(*cp) + (key_count * sizeof(*key));
 +	cp_size = sizeof(*cp) + (count * sizeof(*key));
@@ -149,8 +149,8 @@ index ee70b00d249e..b8ded4c0e649 100644
 +	cp->key_count = htobs(count);
  
 -	for (l = keys, key = cp->keys; l != NULL; l = g_slist_next(l), key++) {
-+	for (l = adapter->keys, key = cp->keys; l != NULL; l = g_slist_next(l),
-+							key++) {
++	for (l = adapter->load_keys, key = cp->keys; l != NULL;
++					l = g_slist_next(l), key++) {
  		struct link_key_info *info = l->data;
  
  		bacpy(&key->addr.bdaddr, &info->bdaddr);
@@ -171,8 +171,8 @@ index ee70b00d249e..b8ded4c0e649 100644
 +	if (id == 0) {
  		btd_error(adapter->dev_id, "Failed to load link keys for hci%u",
  							adapter->dev_id);
-+		g_slist_free_full(adapter->keys, g_free);
-+		adapter->keys = NULL;
++		g_slist_free_full(adapter->load_keys, g_free);
++		adapter->load_keys = NULL;
 +	}
  }
  
@@ -185,25 +185,36 @@ index ee70b00d249e..b8ded4c0e649 100644
  	GSList *ltks = NULL;
  	GSList *irks = NULL;
  	GSList *params = NULL;
-@@ -4964,7 +4990,7 @@ static void load_devices(struct btd_adapter *adapter)
+@@ -4964,7 +4990,8 @@ static void load_devices(struct btd_adapter *adapter)
  		}
  
  		if (key_info)
 -			keys = g_slist_append(keys, key_info);
-+			adapter->keys = g_slist_append(adapter->keys, key_info);
++			adapter->load_keys = g_slist_append(adapter->load_keys,
++								key_info);
  
  		if (ltk_info)
  			ltks = g_slist_append(ltks, ltk_info);
-@@ -5013,8 +5039,7 @@ free:
+@@ -5013,8 +5040,7 @@ free:
  
  	closedir(dir);
  
 -	load_link_keys(adapter, keys, btd_opts.debug_keys);
 -	g_slist_free_full(keys, g_free);
-+	load_link_keys(adapter, btd_opts.debug_keys);
++	load_link_keys(adapter, btd_opts.debug_keys, false);
  
  	load_ltks(adapter, ltks);
  	g_slist_free_full(ltks, g_free);
+@@ -6930,6 +6956,9 @@ static void adapter_remove(struct btd_adapter *adapter)
+ 	g_slist_free(adapter->devices);
+ 	adapter->devices = NULL;
+ 
++	g_slist_free(adapter->load_keys);
++	adapter->load_keys = NULL;
++
+ 	discovery_cleanup(adapter, 0);
+ 
+ 	unload_drivers(adapter);
 -- 
 2.43.0
 
