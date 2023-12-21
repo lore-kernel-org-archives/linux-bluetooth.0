@@ -1,104 +1,90 @@
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD9ED156E4
-	for <linux-bluetooth@vger.kernel.org>; Thu, 21 Dec 2023 07:57:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ma0rcnZK"
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7810917125bso30082985a.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Dec 2023 23:57:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703145423; x=1703750223; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=wtEKxIo8hPjxILMUyEPg6LpJ1i89fHe6Ugnxp8RAufY=;
-        b=ma0rcnZKKZzo8QO1mUaMe3aSUsLSW/T7bv+NXJkGWS1ZvqJK2HozfNDFN2HD0033Q3
-         GyR2tYWwF00kBcQ4TXcvmcgVVQnYrVn7yU0lbFA12LanAPVkGkwHN9QSU1Jf83Mhs3IG
-         0cp4msK+xm69govVwqxgcCwMe37cuaxSNs5oZoyRrn+RPfRnBcBdMVuUoIqo3Mg5y3f0
-         N2ZJ+9dMQAsS2n93n2smVJM80K3MmrId+lol3qMoYjzJcYxmOl7ATqBGwtoOzs8kgfL9
-         ML+nKk6pk+NxArzvIYZqwKkDQVfwPNnQs2lBA5roJxnkiU0YCZIWbH5XN9gIHcT7G6QC
-         PIwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703145423; x=1703750223;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wtEKxIo8hPjxILMUyEPg6LpJ1i89fHe6Ugnxp8RAufY=;
-        b=IrXGJHHwZuD/Re5AXGq7KTnWB+5lRjxysmuZzZu4RvSFY+acfWxVYgu1hCeFWYZaNr
-         P6EqqF5ckelCHiXpCbsM0yK5DfjhPwZgp5JqJmolVv/wkzszEoTky890qoMWVuJyE9l/
-         iryq7tnxQXxnFtV/t5q1xUU6GDwWRVPQSye9baaoWV5WwcBP21inwnZPaGDfLbSUeGM3
-         rh9Kr3nd5ytSmT3OLCDhalcnf7wgE4KZASjtCIhQoymydADxBcc8T6hGhFsF55IZrhWx
-         m+0xboOF2x6K3yUFNfPY5CUKn3v7f2kMkYzz0QphzAi2D3treO6P187QM23Otd9liw5K
-         G0xg==
-X-Gm-Message-State: AOJu0YxTPUhx8bLwvicLkSEnwNtOrvkbpR3dm3vua6kg/715x+O6JYSI
-	Jp9nI3Lt6shSkTW1pMH/M9379dYPSNY=
-X-Google-Smtp-Source: AGHT+IHAYTgHn1iA7EVdFt/vxX0aztHVQuHSjYZUMokNqY8qSQALNzQCbHcrZWDKqiYA/6qC5jqWXQ==
-X-Received: by 2002:a05:620a:640e:b0:77e:fba3:4f0d with SMTP id pz14-20020a05620a640e00b0077efba34f0dmr23086511qkn.99.1703145423506;
-        Wed, 20 Dec 2023 23:57:03 -0800 (PST)
-Received: from [172.17.0.2] ([20.55.15.33])
-        by smtp.gmail.com with ESMTPSA id s21-20020a05620a081500b00781211b97f0sm130034qks.24.2023.12.20.23.57.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Dec 2023 23:57:03 -0800 (PST)
-Message-ID: <6583efcf.050a0220.38ae4.043e@mx.google.com>
-Date: Wed, 20 Dec 2023 23:57:03 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5714325775717098747=="
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D965D4E60F;
+	Thu, 21 Dec 2023 09:06:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.4] (ip5f5af5c1.dynamic.kabel-deutschland.de [95.90.245.193])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id B47F161E5FE3B;
+	Thu, 21 Dec 2023 10:05:19 +0100 (CET)
+Message-ID: <f7bf2cbf-0ff4-4d97-8d50-024ad1c9efec@molgen.mpg.de>
+Date: Thu, 21 Dec 2023 10:05:18 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, 15013537245@163.com
-Subject: RE: Bluetooth: hci_sync: fix hogp device suspend bug
-In-Reply-To: <20231221071621.1154462-1-15013537245@163.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: hci_sync: fix hogp device suspend bug
+To: 15013537245@163.com
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ zhongjun.yu@quectel.com, Clancy Shang <clancy.shang@quectel.com>
 References: <20231221071621.1154462-1-15013537245@163.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20231221071621.1154462-1-15013537245@163.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
---===============5714325775717098747==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=812044
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.60 seconds
-GitLint                       PASS      0.31 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      27.78 seconds
-CheckAllWarning               PASS      31.72 seconds
-CheckSparse                   PASS      36.19 seconds
-CheckSmatch                   PASS      99.56 seconds
-BuildKernel32                 PASS      26.97 seconds
-TestRunnerSetup               PASS      434.45 seconds
-TestRunner_l2cap-tester       PASS      23.27 seconds
-TestRunner_iso-tester         PASS      49.50 seconds
-TestRunner_bnep-tester        PASS      7.21 seconds
-TestRunner_mgmt-tester        PASS      163.68 seconds
-TestRunner_rfcomm-tester      PASS      11.03 seconds
-TestRunner_sco-tester         PASS      14.72 seconds
-TestRunner_ioctl-tester       PASS      12.25 seconds
-TestRunner_mesh-tester        PASS      8.94 seconds
-TestRunner_smp-tester         PASS      9.87 seconds
-TestRunner_userchan-tester    PASS      7.44 seconds
-IncrementalBuild              PASS      26.14 seconds
+Dear Clancy,
 
 
-
----
-Regards,
-Linux Bluetooth
+Thank you for your patch.
 
 
---===============5714325775717098747==--
+Am 21.12.23 um 08:16 schrieb 15013537245@163.com:
+> From: clancy shang <clancy.shang@quectel.com>
+
+Not important, but you might want to start your name with a capital letter.
+
+> when Bluetooth enter suspend, and disconnect everything with the diconnect
+
+1.  enter*s*
+2.  disconnect*s*
+3.  … the di*s*connect …
+
+> reason code of 0x15,the hogp device could not into sleep and continued
+
+Please add a space after the comma.
+
+> advertizing. when use the diconnect reason code of 0x13, the hogp device
+
+1.  adverti*s*ing
+2.  di*s*connect
+
+> into sleep succeeded.
+
+going into
+
+What device is it exactly?
+
+> Signed-off-by: clancy shang <clancy.shang@quectel.com>
+> ---
+>   net/bluetooth/hci_sync.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> index d85a7091a116..16b5420c32d0 100644
+> --- a/net/bluetooth/hci_sync.c
+> +++ b/net/bluetooth/hci_sync.c
+> @@ -5927,7 +5927,7 @@ int hci_suspend_sync(struct hci_dev *hdev)
+>   
+>   	if (hci_conn_count(hdev)) {
+>   		/* Soft disconnect everything (power off) */
+> -		err = hci_disconnect_all_sync(hdev, HCI_ERROR_REMOTE_POWER_OFF);
+> +		err = hci_disconnect_all_sync(hdev, HCI_ERROR_REMOTE_USER_TERM);
+>   		if (err) {
+>   			/* Set state to BT_RUNNING so resume doesn't notify */
+>   			hdev->suspend_state = BT_RUNNING;
+
+
+Kind regards,
+
+Paul
