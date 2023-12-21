@@ -1,51 +1,29 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from server.interlinx.bc.ca (mail.interlinx.bc.ca [69.165.217.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 422B155E72
-	for <linux-bluetooth@vger.kernel.org>; Thu, 21 Dec 2023 15:27:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="elSrJQQa"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C7626C433C9
-	for <linux-bluetooth@vger.kernel.org>; Thu, 21 Dec 2023 15:27:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703172446;
-	bh=PAm8a6EbPux5nNkTjDef3qwkSw+ZnkVv20rE6p0YO2c=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=elSrJQQaSBrRvIWeGraxW2/PWQHVBPNJNsJ4gFhQzArJxt1B/rLouqUJBnrWnRmGj
-	 kWRnBomrGNEX7f9se2mbIDmL3fbCANs9N8U+AskO0Ek+VgSyWj2h2Fxk5GH0rjDv0R
-	 xZ+F8u5+c6PhAvRpfxnrjCI9Ql7NXone8ITFoSK4LC6YYrqRaZIAMW1iFyVa2jUvuG
-	 DrXZ4TbnUGQuYue8lPWAUsabznph+Qwbm5SrRMoBVjKg4pk3cJuVh/yCGZmuAERzTC
-	 2fdFQ2KIPKOqajryp351M4FNNPSGpjVi6EPmqKphAyk4yrxcKnG0du1IzsHtH1IZfG
-	 3gn6oYKVBmM8A==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id AC804C53BCD; Thu, 21 Dec 2023 15:27:26 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BDD655E41
+	for <linux-bluetooth@vger.kernel.org>; Thu, 21 Dec 2023 16:01:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=interlinx.bc.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=interlinx.bc.ca
+Received: from brian-laptop.interlinx.bc.ca (unknown [IPv6:fd0c:685d:4db3:4ba7:23ab:92fe:41d5:f62b])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by server.interlinx.bc.ca (Postfix) with ESMTPSA id 91A522F748
+	for <linux-bluetooth@vger.kernel.org>; Thu, 21 Dec 2023 11:01:56 -0500 (EST)
+Message-ID: <cf70cde95a93eb7c9ff87a8c5650f00558c5c213.camel@interlinx.bc.ca>
+Subject: Re: chrome passkey communication timing out
+From: "Brian J. Murrell" <brian@interlinx.bc.ca>
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 218299] kernel BUG at mm/slub.c:440! (6.5.0-5-amd64)
-Date: Thu, 21 Dec 2023 15:27:26 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: aros@gmx.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: component cf_kernel_version version assigned_to
- product
-Message-ID: <bug-218299-62941-gPSTChPIrW@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218299-62941@https.bugzilla.kernel.org/>
-References: <bug-218299-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 21 Dec 2023 11:01:56 -0500
+In-Reply-To: <CABBYNZJJgYJcswhLcR49H5AE-z7C74HeguwsvHq_BqWr8e3wtw@mail.gmail.com>
+References: <6ce4dab33868db0a8c7b93bf58c20aa876d50f21.camel@interlinx.bc.ca>
+	 <CABBYNZLbyCkg+heU5gNDooo2w7Uf+P1To0pVnrhS_z7Be3bTYw@mail.gmail.com>
+	 <da55cd171a7055f3438447947f36723e9e539547.camel@interlinx.bc.ca>
+	 <CABBYNZJJgYJcswhLcR49H5AE-z7C74HeguwsvHq_BqWr8e3wtw@mail.gmail.com>
+Content-Type: text/plain; charset="ISO-8859-15"
 Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+User-Agent: Evolution 3.50.2 (3.50.2-1.fc39) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -53,22 +31,22 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218299
+On Thu, 2023-12-21 at 10:27 -0500, Luiz Augusto von Dentz wrote:
+> Hi Brian,
 
-Artem S. Tashkinov (aros@gmx.com) changed:
+Hi again Luiz.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-          Component|Kernel                      |Bluetooth
-     Kernel Version|                            |6.5.0-5-amd64 #1  Debian
-                   |                            |6.5.13-1
-            Version|unspecified                 |2.5
-           Assignee|linux-kernel@kernel-bugs.ke |linux-bluetooth@vger.kernel
-                   |rnel.org                    |.org
-            Product|Linux                       |Drivers
+> I think it doesn't support LE thus why it can't discover.
 
---=20
-You may reply to this email to add a comment.
+Damn.  I was wondering if BLE was the problem.  That means needing to
+replace or add dongles to some older machines.  :-(
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+But this is where it generally sucks.  Trying to figure out which
+"brand/model"s of BT adapters out there available to purchase that are
+actually supported by Bluez.  Is there any guidance available on how to
+successfully do this, other than the trial-and-error of buying and
+(hopefully) returning products until one finds one that works?
+
+Cheers,
+b.
+
