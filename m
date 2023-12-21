@@ -1,51 +1,27 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from server.interlinx.bc.ca (mail.interlinx.bc.ca [69.165.217.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BB0236081
-	for <linux-bluetooth@vger.kernel.org>; Thu, 21 Dec 2023 14:13:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z1v91v7q"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E1A53C433C7
-	for <linux-bluetooth@vger.kernel.org>; Thu, 21 Dec 2023 14:12:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703167979;
-	bh=K/FJXkTjIedUDrOAfPpQwlxJ5X8+k4aM2lLsNu+lhpc=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=Z1v91v7qai9gmgVxUgMpQZjMH+v8ArJUfPAEhr2Lryea3uuUPrCeMFgKKkK3jsG80
-	 lyod4GUzWdcPWBjQHCgkQJ5lsQvp7tYW8iU9/wLpVxGzDU04IfJe7/OhQh5iBSa4H8
-	 9dbZUavSB9iNqvcI/6LJuzynRcbDhbBBrdlajUF3uccNmMsjzTzjpRORqES+1UznrM
-	 MaXjQDK0c3bcDabnq7Uu24jGenEdFAM2SfdD1+f/ZWlc/FC+uVywLwFGZRX8bkL2Q1
-	 iTjQ6RJqqND3/ggq974yJRY792mu8yzxCwTg9CxtTY5Qxq93Awbien8WieSsYsTvwH
-	 lrT1dr3uoDvmw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id D1918C53BC6; Thu, 21 Dec 2023 14:12:59 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 908F936084
+	for <linux-bluetooth@vger.kernel.org>; Thu, 21 Dec 2023 14:12:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=interlinx.bc.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=interlinx.bc.ca
+Received: from brian-laptop.interlinx.bc.ca (unknown [IPv6:fd0c:685d:4db3:4ba7:23ab:92fe:41d5:f62b])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by server.interlinx.bc.ca (Postfix) with ESMTPSA id CBD2E2F748
+	for <linux-bluetooth@vger.kernel.org>; Thu, 21 Dec 2023 09:12:50 -0500 (EST)
+Message-ID: <da55cd171a7055f3438447947f36723e9e539547.camel@interlinx.bc.ca>
+Subject: Re: chrome passkey communication timing out
+From: "Brian J. Murrell" <brian@interlinx.bc.ca>
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 218264] Potential kernel regression with bluetooth pairing on
- specific radios
-Date: Thu, 21 Dec 2023 14:12:59 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: regressions@leemhuis.info
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-218264-62941-x7wDDMcxWB@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218264-62941@https.bugzilla.kernel.org/>
-References: <bug-218264-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 21 Dec 2023 09:12:50 -0500
+In-Reply-To: <CABBYNZLbyCkg+heU5gNDooo2w7Uf+P1To0pVnrhS_z7Be3bTYw@mail.gmail.com>
+References: <6ce4dab33868db0a8c7b93bf58c20aa876d50f21.camel@interlinx.bc.ca>
+	 <CABBYNZLbyCkg+heU5gNDooo2w7Uf+P1To0pVnrhS_z7Be3bTYw@mail.gmail.com>
+Content-Type: text/plain; charset="ISO-8859-15"
 Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+User-Agent: Evolution 3.50.2 (3.50.2-1.fc39) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -53,31 +29,53 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218264
+On Tue, 2023-12-19 at 12:49 -0500, Luiz Augusto von Dentz wrote:
+> Hi Brian,
 
---- Comment #6 from The Linux kernel's regression tracker (Thorsten Leemhui=
-s) (regressions@leemhuis.info) ---
-(In reply to Marco from comment #5)
+Hi Luiz.
 
-> Bluetooth regression AND hid regression or this can be caused only by
-> bluetooth driver shenanigans?
+> Check with btmon what if that is generating any traffic.
 
-Hard to tell. But I fear that no developer will look into this unless you
-perform a bisection. But before you do so you likely want to test mainline =
-and
-a working kernel on the same installation (e.g. not with live linux or anyt=
-hing
-where more than the kernel changed)
+Ah, yes.  btmon.  Forgot all about that.
 
-Side note, FWIW: I have no idea if the bluetooth devs are even listening he=
-re.
-To udnerstand why, search for "bugzilla" in
-https://docs.kernel.org/admin-guide/reporting-issues.html and
-https://linux-regtracking.leemhuis.info/post/frequent-reasons-why-linux-ker=
-nel-bug-reports-are-ignored/
+Bluetooth monitor ver 5.71
+=3D Note: Linux version 6.5.11-300.fc39.x86_64 (x86_64)                    =
+                                                                           =
+                         0.208407
+=3D Note: Bluetooth subsystem version 2.22                                 =
+                                                                           =
+                         0.208411
+=3D New Index: 70:F3:95:3E:92:34 (Primary,USB,hci0)                        =
+                                                                           =
+                  [hci0] 0.208412
+=3D Open Index: 70:F3:95:3E:92:34                                          =
+                                                                           =
+                  [hci0] 0.208413
+=3D Index Info: 70:F3:95:3E:92:34 (Broadcom Corporation)                   =
+                                                                           =
+                  [hci0] 0.208414
+@ MGMT Open: bluetoothd (privileged) version 1.22                          =
+                                                                           =
+              {0x0001} 0.208415
+@ MGMT Command: Start Service Discovery (0x003a) plen 4                    =
+                                                                           =
+      {0x0001} [hci0] 24.471901
+        Address type: 0x06
+          LE Public
+          LE Random
+        RSSI: invalid (0x7f)
+        UUIDs: 0
+@ MGMT Event: Command Complete (0x0001) plen 4                             =
+                                                                           =
+      {0x0001} [hci0] 24.471919
+      Start Service Discovery (0x003a) plen 1
+        Status: Not Supported (0x0c)
+        Address type: 0x06
+          LE Public
+          LE Rando
+The "Not Supported" is not entirely lost on me.  But what exactly is
+not supported?
 
---=20
-You may reply to this email to add a comment.
+Cheers,
+b.
 
-You are receiving this mail because:
-You are the assignee for the bug.=
