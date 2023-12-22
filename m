@@ -1,117 +1,157 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67F0918026
-	for <linux-bluetooth@vger.kernel.org>; Fri, 22 Dec 2023 12:26:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.40] (g40.guest.molgen.mpg.de [141.14.220.40])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 34D3761E5FE01;
-	Fri, 22 Dec 2023 13:25:58 +0100 (CET)
-Message-ID: <57815c6d-829b-4075-9d14-f9cfc9036017@molgen.mpg.de>
-Date: Fri, 22 Dec 2023 13:25:56 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30CC828DBE;
+	Fri, 22 Dec 2023 15:12:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i+92oErG"
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-28c1e079b20so151984a91.1;
+        Fri, 22 Dec 2023 07:12:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703257971; x=1703862771; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=mG5yQh5BmZ/+SdEVtHHTaLKN3jITKnFSk1eVPrGgKM0=;
+        b=i+92oErG7BUf8YyMKD2pcuF4HgC/A1uevv2lIInkJySYQzbom0tr1lFXHzJWkVnpuP
+         wb5YKZb5+yCYrGHUCJ4NN2j+r/1xUEH9YFu5nPdCRlVadeFX0e+FK+xXQnIlwLYHa8y+
+         px+iMM6H2bF+Bjar0ega0n3MZBpi4ByXuuG5d8ypXzhAzZfxCKAP4kK6pi613H48ZGQu
+         fiYUTkPnqp6u9vX/7gXrBC5A2XzbytwehTbt672inygHtlLkSUVdLG9r8Fezr5n60nK/
+         +z4EXPpndQO5bOAGaOsIlaAf5d2N8HBfaMANLY3t8uyXsa5ho23V2tNTkwMcNEM+3BGx
+         AcpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703257971; x=1703862771;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mG5yQh5BmZ/+SdEVtHHTaLKN3jITKnFSk1eVPrGgKM0=;
+        b=k4fbyWreSAn/Oz+FSsrTuru/O+fBaWwpFNhfg9bSJnnbx3z+lYTDZe9udp11KAF5QT
+         k+lQXMPp9drOAO8VDjOnZYgI8zt+321g+zse/Nb2xFYkWqCH++ILkQl2+q43wh/PkZP7
+         8wSKUAIYVxJqB9XtYbZ4+xjpdkszYB2+bMmqT92DtRpk8zrABokyBx/cWIEgcZQgW4y/
+         jCOVvXc3T3ovAG98V4cuhxsUhITYGmaN1TRKeGTGwO/Rk16hpRxkgTlUOGqb0ala8vd+
+         b/ATdQ2NdLSEHX4Vu0Lrsm6Lgt9CJkw/D+HTRHyNWMyen72lUOWAWOwl+7JVTwiy0fth
+         N70Q==
+X-Gm-Message-State: AOJu0YwAIRLt9SgVHUCh2dOZAaC0j/6Sg+74ja5vs9lLwhvn3OSDt9X0
+	VJSLSFI+3Zc8Cd8t+8mpLBE=
+X-Google-Smtp-Source: AGHT+IEn6GnyGhoNKzdzJqZBh3Pzoaoc5HSi7iJzx80sJF+LA+cDrpsnrGtG92Oxvse40S35Oow6gw==
+X-Received: by 2002:a17:90a:2dcf:b0:28c:4a7:b0da with SMTP id q15-20020a17090a2dcf00b0028c04a7b0damr846479pjm.86.1703257971300;
+        Fri, 22 Dec 2023 07:12:51 -0800 (PST)
+Received: from g2039B650.. ([106.39.42.144])
+        by smtp.gmail.com with ESMTPSA id go18-20020a17090b03d200b0028c1807cbf0sm889333pjb.54.2023.12.22.07.12.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Dec 2023 07:12:51 -0800 (PST)
+From: Gui-Dong Han <2045gemini@gmail.com>
+To: marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	baijiaju1990@outlook.com,
+	Gui-Dong Han <2045gemini@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: Fix atomicity violation in {min,max}_key_size_set
+Date: Fri, 22 Dec 2023 23:12:41 +0800
+Message-Id: <20231222151241.4331-1-2045gemini@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] [BlueZ] adapter: Fix airpod device pair fail
-Content-Language: en-US
-To: 15013537245@163.com
-Cc: linux-bluetooth@vger.kernel.org, zhongjun.yu@quectel.com,
- Clancy Shang <clancy.shang@quectel.com>
-References: <20231222054515.1266741-1-15013537245@163.com>
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20231222054515.1266741-1-15013537245@163.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Dear Clancy,
+In min_key_size_set():
+    if (val > hdev->le_max_key_size || val < SMP_MIN_ENC_KEY_SIZE)
+        return -EINVAL;
+    hci_dev_lock(hdev);
+    hdev->le_min_key_size = val;
+    hci_dev_unlock(hdev);
 
+In max_key_size_set():
+    if (val > SMP_MAX_ENC_KEY_SIZE || val < hdev->le_min_key_size)
+        return -EINVAL;
+    hci_dev_lock(hdev);
+    hdev->le_max_key_size = val;
+    hci_dev_unlock(hdev);
 
-Thank you for your patch. Some nits below.
+The atomicity violation occurs due to concurrent execution of set_min and
+set_max funcs.Consider a scenario where setmin writes a new, valid 'min'
+value, and concurrently, setmax writes a value that is greater than the
+old 'min' but smaller than the new 'min'. In this case, setmax might check
+against the old 'min' value (before acquiring the lock) but write its
+value after the 'min' has been updated by setmin. This leads to a
+situation where the 'max' value ends up being smaller than the 'min'
+value, which is an inconsistency.
 
-Am 22.12.23 um 06:45 schrieb 15013537245@163.com:
-> From: Clancy Shang <clancy.shang@quectel.com>
-> 
-> Airpod is performing inquiry scans in BR/EDR and advertising in a
-> unconnectabl mode whit the same public address at the same time.
+This possible bug is found by an experimental static analysis tool
+developed by our team, BassCheck[1]. This tool analyzes the locking APIs
+to extract function pairs that can be concurrently executed, and then
+analyzes the instructions in the paired functions to identify possible
+concurrency bugs including data races and atomicity violations. The above
+possible bug is reported when our tool analyzes the source code of
+Linux 5.17.
 
-a*n* unconnectabl*e* mode w*ith*
+To resolve this issue, it is suggested to encompass the validity checks
+within the locked sections in both set_min and set_max funcs. The
+modification ensures that the validation of 'val' against the
+current min/max values is atomic, thus maintaining the integrity of the
+settings. With this patch applied, our tool no longer reports the bug,
+with the kernel configuration allyesconfig for x86_64. Due to the lack of
+associated hardware, we cannot test the patch in runtime testing, and just
+verify it according to the code logic.
 
-> with this featrue, when found airpod device, set the bredr support,
+[1] https://sites.google.com/view/basscheck/
 
-feat*ur*e
+Fixes: 18f81241b74f ("Bluetooth: Move {min,max}_key_size debugfs ...")
+Cc: stable@vger.kernel.org
+Signed-off-by: Gui-Dong Han <2045gemini@gmail.com>
+---
+v2:
+* Adjust the format to pass the CI.
+---
+ net/bluetooth/hci_debugfs.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
-> fix it pair fail bug.
+diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
+index 6b7741f6e95b..3ffbf3f25363 100644
+--- a/net/bluetooth/hci_debugfs.c
++++ b/net/bluetooth/hci_debugfs.c
+@@ -1045,11 +1045,13 @@ DEFINE_DEBUGFS_ATTRIBUTE(adv_max_interval_fops, adv_max_interval_get,
+ static int min_key_size_set(void *data, u64 val)
+ {
+ 	struct hci_dev *hdev = data;
+-
+-	if (val > hdev->le_max_key_size || val < SMP_MIN_ENC_KEY_SIZE)
++
++	hci_dev_lock(hdev);
++	if (val > hdev->le_max_key_size || val < SMP_MIN_ENC_KEY_SIZE) {
++		hci_dev_unlock(hdev);
+ 		return -EINVAL;
++	}
+ 
+-	hci_dev_lock(hdev);
+ 	hdev->le_min_key_size = val;
+ 	hci_dev_unlock(hdev);
+ 
+@@ -1073,11 +1075,13 @@ DEFINE_DEBUGFS_ATTRIBUTE(min_key_size_fops, min_key_size_get,
+ static int max_key_size_set(void *data, u64 val)
+ {
+ 	struct hci_dev *hdev = data;
+-
+-	if (val > SMP_MAX_ENC_KEY_SIZE || val < hdev->le_min_key_size)
++
++	hci_dev_lock(hdev);
++	if (val > SMP_MAX_ENC_KEY_SIZE || val < hdev->le_min_key_size) {
++		hci_dev_unlock(hdev);
+ 		return -EINVAL;
++	}
+ 
+-	hci_dev_lock(hdev);
+ 	hdev->le_max_key_size = val;
+ 	hci_dev_unlock(hdev);
+ 
+-- 
+2.34.1
 
-Do the Airpods follow the Bluetooth specification, or do they violate 
-it, and need a workaround?
-
-> 
-> Signed-off-by: Clancy Shang <clancy.shang@quectel.com>
-> ---
->   src/adapter.c | 25 +++++++++++++++++++++++++
->   1 file changed, 25 insertions(+)
-> 
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 022390f0d..488355e9c 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -7066,6 +7066,25 @@ static void adapter_msd_notify(struct btd_adapter *adapter,
->   	}
->   }
->   
-> +#define APPLE_INC_VENDOR_ID 0x004c
-> +
-> +static bool eir_msd_is_apple_inc(GSList *msd_list)
-> +{
-> +	GSList *msd_l, *msd_next;
-> +
-> +	for (msd_l = msd_list; msd_l != NULL; msd_l = msd_next) {
-> +
-
-The blank line seems unnecessary.
-
-> +		const struct eir_msd *msd = msd_l->data;
-> +
-> +		msd_next = g_slist_next(msd_l);
-> +
-> +		if (msd->company == APPLE_INC_VENDOR_ID)
-> +			return true;
-> +	}
-> +
-> +	return false;
-> +}
-> +
->   static bool is_filter_match(GSList *discovery_filter, struct eir_data *eir_data,
->   								int8_t rssi)
->   {
-> @@ -7281,6 +7300,12 @@ void btd_adapter_device_found(struct btd_adapter *adapter,
->   		device_update_last_seen(dev, BDADDR_BREDR, !not_connectable);
->   	}
->   
-> +	if (eir_msd_is_apple_inc(eir_data.msd_list) && (not_connectable == true)
-> +		&& (bdaddr_type == BDADDR_LE_PUBLIC)) {
-
-No idea, if there is a rule, but other instances put the && on the line 
-above, and align the condition with the one in the first line.
-
-> +		device_set_bredr_support(dev);
-> +		device_update_last_seen(dev, BDADDR_BREDR, true);
-> +	}
-> +
->   	if (eir_data.name != NULL && eir_data.name_complete)
->   		device_store_cached_name(dev, eir_data.name);
->   
-
-
-Kind regards,
-
-Paul
