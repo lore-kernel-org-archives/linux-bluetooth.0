@@ -1,46 +1,46 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D38A14A86;
-	Fri, 22 Dec 2023 10:55:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 108B617730;
+	Fri, 22 Dec 2023 10:59:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z2vcC4p0"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1d3eabe9321so11837855ad.2;
-        Fri, 22 Dec 2023 02:55:37 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kPtrCmhq"
+Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-3b86f3cdca0so1250200b6e.3;
+        Fri, 22 Dec 2023 02:59:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703242537; x=1703847337; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1703242760; x=1703847560; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=PCFzo++LI2ZwW1picHi8lLKPMVx69Hfp8vT3r27uSLU=;
-        b=Z2vcC4p0iN9YhUXwmEOEAXciYXu5OxPmfonMorliOWZ3iuOQHmeNEU74leuVez+rXD
-         qcNSw4R91D9ym1stU3WviPRnKP5Cs77uwA1PegNEClFYCcYArBr97iwDxX8dPK66OVoz
-         JYjiwnSbFZjUWwksoWT5m1MWXUsoGL8V/idH6945Ei7CgdvgcVZ6Tt+uTviy2SFu4Dog
-         JtquLv3hI1oyx1CAIhx+q0wr72K2WLJV9SolJDWaF8qd9m72qZnCYUl05dphTDz/agax
-         uwr214CyT62+sai7mcSnG9VymAtNmGzZoD9WEN7iwrB/fQT6WEnAUygWhAqDWs1kcbZ9
-         QsjQ==
+        bh=NpmaJRutT2X0CphAnurM2d5NRf7Tv9tPXlI+dm5PHac=;
+        b=kPtrCmhqWU0+2AS4xPlKkAbKa3z/3Wg4+O3bUCOfgNk54/kojbu2AXWv/D83cTPD7z
+         N0VadvkOcvTdaEgxQO1fdInDZMdslC1ZAk+2WJGYLfxHtWcoqlyn6PrVLu7q7Tvqfo6n
+         TUib9eZecCdWW++JK2bPN2PqDlVM4NYMRqyOjD3nUQnxgWLMrFu3pgaA83GZSRjlmfIf
+         CjbiFrXxaOtpsMRzbx+winJi9yYg5B4OBjRQrH12z38/MK+N0cobFiBh5xyF8UkzcWhD
+         7ihYkTMlMhyyaA/Bjwl5rVoiQ0tp/SYo5Aw0bPg7tEYams/ozIIeNRg55GEwnxmv8KIV
+         DjMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703242537; x=1703847337;
+        d=1e100.net; s=20230601; t=1703242760; x=1703847560;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=PCFzo++LI2ZwW1picHi8lLKPMVx69Hfp8vT3r27uSLU=;
-        b=wowr/ieKlQfPL8950avRtW6q8qxnERS3QnVDxPQ6KNpQ2hpqT3fmCQSxbjrUYb/Yjr
-         PKRTF4HVz+kZ/T19PGxOlZ0v/7op71zisv2gR6l8BCfKH7EKMjyJdEBAj70iUFz/wNp7
-         79djITocSyFBqMNBxItZgiBOvSLB2aU8IIuWY3vcDQnjv968RsgzeqUpdde77qJ/EuXn
-         /Ls2pVHRcmS8m5OMmQoiYTet8WRFKddf2I12xKK2A5FMLZK3lVrFNIBsvWMZmBAGkf1y
-         GaNDaSQEa2ASAQTk/2Ztfuzv7UHNmtsvC7RnHdXIzwUtf6lAQeJ2aPn5ZPGOArsRQO05
-         e7XQ==
-X-Gm-Message-State: AOJu0YzOGdDtLkgT+YEH14J5o2ZkpDfNKDzwoFA3yOBYAcSn8kwL0uwo
-	qC/LCkDtVmp6nBYzOJpXF74=
-X-Google-Smtp-Source: AGHT+IHe/yw5h2GBRC0KOMQhoptWluh7P/8lB+AswpdPVFaFzGQTpTtUHnCgGULxsphbiJG7LbPimg==
-X-Received: by 2002:a17:902:680a:b0:1d4:19c8:582b with SMTP id h10-20020a170902680a00b001d419c8582bmr722741plk.121.1703242537386;
-        Fri, 22 Dec 2023 02:55:37 -0800 (PST)
+        bh=NpmaJRutT2X0CphAnurM2d5NRf7Tv9tPXlI+dm5PHac=;
+        b=sFof91GwyRBxHNoLy/IiQMpRkVZogcbgIdSNsBiYU6Nr5DtjnvOfpHuAyKNWCBN+uf
+         wjXOGHSSdYq0Yx63tJzcK0RvHddr1eL/nLZTuNGFoKUo8NTNmNUvqW7Wu7iwYvDOoZZS
+         EXx/RI/Alk45FlUoRDaUq4Z9LGGbSQMLXLuEH4HmUpJgKyTstCI5hhSZCwY+Xkf2zNHi
+         6oPdOq/6QSVIpMjEY2YiQCHnlJMp3xXbfsbv4TLFdw6k+T1U45/DhGhTCv99SARdwYRK
+         q2i/tgThDZjfPEm7NN76svu9U5oDbEAcMFlchCOD6KbWBnLKJmvUbwPzKNtwtsSK4D6K
+         /rZg==
+X-Gm-Message-State: AOJu0YyT0KVj/sATDLDCr+8O1BN4+HPLK0MfLHnNShH5PVCxIMILa8r1
+	WE2DWQk7n0qSMY6hj0kKYGI=
+X-Google-Smtp-Source: AGHT+IGmoLx1hmp5eCag91kzrpqnxuTSLmQwlz6Yx32yVP+m8Rti93EKdN+VQU8F7fZhMUk6fdd7Kg==
+X-Received: by 2002:a05:6808:20a0:b0:3b8:b063:8243 with SMTP id s32-20020a05680820a000b003b8b0638243mr1368877oiw.69.1703242760003;
+        Fri, 22 Dec 2023 02:59:20 -0800 (PST)
 Received: from g2039B650.. ([106.39.42.144])
-        by smtp.gmail.com with ESMTPSA id jg11-20020a17090326cb00b001d3ef9edfa7sm3188497plb.58.2023.12.22.02.55.32
+        by smtp.gmail.com with ESMTPSA id x27-20020a056a000bdb00b006d9926b93dasm317437pfu.17.2023.12.22.02.59.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Dec 2023 02:55:36 -0800 (PST)
+        Fri, 22 Dec 2023 02:59:19 -0800 (PST)
 From: Gui-Dong Han <2045gemini@gmail.com>
 To: marcel@holtmann.org,
 	johan.hedberg@gmail.com,
@@ -51,9 +51,9 @@ Cc: linux-bluetooth@vger.kernel.org,
 	Gui-Dong Han <2045gemini@gmail.com>,
 	stable@vger.kernel.org,
 	BassCheck <bass@buaa.edu.cn>
-Subject: [PATCH] Bluetooth: Fix atomicity violation in {conn,adv}_{min,max}_interval_set
-Date: Fri, 22 Dec 2023 18:55:26 +0800
-Message-Id: <20231222105526.9208-1-2045gemini@gmail.com>
+Subject: [PATCH] Bluetooth: Fix atomicity violation in {min,max}_key_size_set
+Date: Fri, 22 Dec 2023 18:58:13 +0800
+Message-Id: <20231222105813.9245-1-2045gemini@gmail.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -63,18 +63,18 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In {conn,adv}_min_interval_set():
-	if (val < ... || val > ... || val > hdev->le_{conn,adv}_max_interval)
+In min_key_size_set():
+	if (val > hdev->le_max_key_size || val < SMP_MIN_ENC_KEY_SIZE)
 		return -EINVAL;
 	hci_dev_lock(hdev);
-	hdev->le_{conn,adv}_min_interval = val;
+	hdev->le_min_key_size = val;
 	hci_dev_unlock(hdev);
 
-In {conn,adv}_max_interval_set():
-	if (val < ... || val > ... || val < hdev->le_{conn,adv}_min_interval)
+In max_key_size_set():
+	if (val > SMP_MAX_ENC_KEY_SIZE || val < hdev->le_min_key_size)
 		return -EINVAL;
 	hci_dev_lock(hdev);
-	hdev->le_{conn,adv}_max_interval
+	hdev->le_max_key_size = val;
 	hci_dev_unlock(hdev);
 
 The atomicity violation occurs due to concurrent execution of set_min and
@@ -103,82 +103,50 @@ verify it according to the code logic.
 
 [1] https://sites.google.com/view/basscheck/
 
-Fixes: 3a5c82b78fd28 ("Bluetooth: Move LE debugfs file creation into ...")
+Fixes: 18f81241b74fb ("Bluetooth: Move {min,max}_key_size debugfs ...")
 Cc: stable@vger.kernel.org
 Reported-by: BassCheck <bass@buaa.edu.cn>
 Signed-off-by: Gui-Dong Han <2045gemini@gmail.com>
 ---
- net/bluetooth/hci_debugfs.c | 30 +++++++++++++++++++-----------
- 1 file changed, 19 insertions(+), 11 deletions(-)
+ net/bluetooth/hci_debugfs.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
 diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-index 6b7741f6e95b..6fdda807f2cf 100644
+index 6b7741f6e95b..3ffbf3f25363 100644
 --- a/net/bluetooth/hci_debugfs.c
 +++ b/net/bluetooth/hci_debugfs.c
-@@ -849,11 +849,13 @@ DEFINE_SHOW_ATTRIBUTE(long_term_keys);
- static int conn_min_interval_set(void *data, u64 val)
+@@ -1045,11 +1045,13 @@ DEFINE_DEBUGFS_ATTRIBUTE(adv_max_interval_fops, adv_max_interval_get,
+ static int min_key_size_set(void *data, u64 val)
  {
  	struct hci_dev *hdev = data;
 -
--	if (val < 0x0006 || val > 0x0c80 || val > hdev->le_conn_max_interval)
+-	if (val > hdev->le_max_key_size || val < SMP_MIN_ENC_KEY_SIZE)
 +	
 +	hci_dev_lock(hdev);
-+	if (val < 0x0006 || val > 0x0c80 || val > hdev->le_conn_max_interval) {
-+		hci_dev_unlock(hdev);	
- 		return -EINVAL;
-+	}
- 
--	hci_dev_lock(hdev);
- 	hdev->le_conn_min_interval = val;
- 	hci_dev_unlock(hdev);
- 
-@@ -877,11 +879,13 @@ DEFINE_DEBUGFS_ATTRIBUTE(conn_min_interval_fops, conn_min_interval_get,
- static int conn_max_interval_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
--
--	if (val < 0x0006 || val > 0x0c80 || val < hdev->le_conn_min_interval)
-+	
-+	hci_dev_lock(hdev);
-+	if (val < 0x0006 || val > 0x0c80 || val < hdev->le_conn_min_interval) {
++	if (val > hdev->le_max_key_size || val < SMP_MIN_ENC_KEY_SIZE) {
 +		hci_dev_unlock(hdev);
  		return -EINVAL;
 +	}
  
 -	hci_dev_lock(hdev);
- 	hdev->le_conn_max_interval = val;
+ 	hdev->le_min_key_size = val;
  	hci_dev_unlock(hdev);
  
-@@ -989,11 +993,13 @@ DEFINE_DEBUGFS_ATTRIBUTE(adv_channel_map_fops, adv_channel_map_get,
- static int adv_min_interval_set(void *data, u64 val)
+@@ -1073,11 +1075,13 @@ DEFINE_DEBUGFS_ATTRIBUTE(min_key_size_fops, min_key_size_get,
+ static int max_key_size_set(void *data, u64 val)
  {
  	struct hci_dev *hdev = data;
 -
--	if (val < 0x0020 || val > 0x4000 || val > hdev->le_adv_max_interval)
+-	if (val > SMP_MAX_ENC_KEY_SIZE || val < hdev->le_min_key_size)
 +	
 +	hci_dev_lock(hdev);
-+	if (val < 0x0020 || val > 0x4000 || val > hdev->le_adv_max_interval) {
-+		hci_dev_unlock(hdev);	
- 		return -EINVAL;
-+	}
- 
--	hci_dev_lock(hdev);
- 	hdev->le_adv_min_interval = val;
- 	hci_dev_unlock(hdev);
- 
-@@ -1018,10 +1024,12 @@ static int adv_max_interval_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
- 
--	if (val < 0x0020 || val > 0x4000 || val < hdev->le_adv_min_interval)
-+	hci_dev_lock(hdev);
-+	if (val < 0x0020 || val > 0x4000 || val < hdev->le_adv_min_interval) {
++	if (val > SMP_MAX_ENC_KEY_SIZE || val < hdev->le_min_key_size) {
 +		hci_dev_unlock(hdev);
  		return -EINVAL;
 +	}
  
 -	hci_dev_lock(hdev);
- 	hdev->le_adv_max_interval = val;
+ 	hdev->le_max_key_size = val;
  	hci_dev_unlock(hdev);
  
 -- 
