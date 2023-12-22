@@ -1,52 +1,94 @@
-Received: from server.interlinx.bc.ca (mail.interlinx.bc.ca [69.165.217.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BDD655E41
-	for <linux-bluetooth@vger.kernel.org>; Thu, 21 Dec 2023 16:01:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=interlinx.bc.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=interlinx.bc.ca
-Received: from brian-laptop.interlinx.bc.ca (unknown [IPv6:fd0c:685d:4db3:4ba7:23ab:92fe:41d5:f62b])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by server.interlinx.bc.ca (Postfix) with ESMTPSA id 91A522F748
-	for <linux-bluetooth@vger.kernel.org>; Thu, 21 Dec 2023 11:01:56 -0500 (EST)
-Message-ID: <cf70cde95a93eb7c9ff87a8c5650f00558c5c213.camel@interlinx.bc.ca>
-Subject: Re: chrome passkey communication timing out
-From: "Brian J. Murrell" <brian@interlinx.bc.ca>
+Received: from m15.mail.163.com (m15.mail.163.com [45.254.50.219])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C0ED1C01
+	for <linux-bluetooth@vger.kernel.org>; Fri, 22 Dec 2023 03:11:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="fSjfIsgy"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=vLPf6
+	T49GKFwVGt2SiqhaydYhz9ZN+LYaF5OJXcT55s=; b=fSjfIsgyXcmqG0x7OR7W9
+	tKYHAcgTeVQrG7NXtragim4xg4zwUvZB6L7OTNdfBFzpuZDCa22RcOZFS/43fDZ6
+	C9T9TfmkV13nsNT/nwUhLmXZuEKSk6D9a3zkw2v/1xF6sZkgOuBJj2wwCwB4yU9u
+	0A9tSJPUNJOxfN3mWrEhGc=
+Received: from WH-D-007635B.QUECTEL.COM (unknown [223.76.229.213])
+	by zwqz-smtp-mta-g2-3 (Coremail) with SMTP id _____wBXH7xC_oRlkVJwGQ--.33717S2;
+	Fri, 22 Dec 2023 11:10:59 +0800 (CST)
+From: 15013537245@163.com
 To: linux-bluetooth@vger.kernel.org
-Date: Thu, 21 Dec 2023 11:01:56 -0500
-In-Reply-To: <CABBYNZJJgYJcswhLcR49H5AE-z7C74HeguwsvHq_BqWr8e3wtw@mail.gmail.com>
-References: <6ce4dab33868db0a8c7b93bf58c20aa876d50f21.camel@interlinx.bc.ca>
-	 <CABBYNZLbyCkg+heU5gNDooo2w7Uf+P1To0pVnrhS_z7Be3bTYw@mail.gmail.com>
-	 <da55cd171a7055f3438447947f36723e9e539547.camel@interlinx.bc.ca>
-	 <CABBYNZJJgYJcswhLcR49H5AE-z7C74HeguwsvHq_BqWr8e3wtw@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.2 (3.50.2-1.fc39) 
+Cc: zhongjun.yu@quectel.com,
+	clancy shang <clancy.shang@quectel.com>
+Subject: [PATCH] [BlueZ] adapter: Fix airpod device pair fail
+Date: Fri, 22 Dec 2023 11:10:56 +0800
+Message-Id: <20231222031056.1253528-1-15013537245@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wBXH7xC_oRlkVJwGQ--.33717S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7WrykKFWfKrWftF1kurWxZwb_yoW8WryDpr
+	Z8Was5Gr4jg3Wag3ZxWFy7Wr13Cw4ku34jqFWSyan5CFy7XrWkX3y3tw18ta1UJFyDXa47
+	JF1DXa4DGw4UGaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jkzVbUUUUU=
+X-CM-SenderInfo: rprviiitvtljiuv6il2tof0z/xtbBEAdO12VOBGd65QAAsZ
 
-On Thu, 2023-12-21 at 10:27 -0500, Luiz Augusto von Dentz wrote:
-> Hi Brian,
+From: clancy shang <clancy.shang@quectel.com>
 
-Hi again Luiz.
+Airpod is performing inquiry scans in BR/EDR and advertising in a unconnectabl
+mode whit the same public address at the same time. with this featrue, when
+found airpod device, set the bredr support, fix it pair fail bug.
 
-> I think it doesn't support LE thus why it can't discover.
+Signed-off-by: clancy shang <clancy.shang@quectel.com>
+---
+ src/adapter.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-Damn.  I was wondering if BLE was the problem.  That means needing to
-replace or add dongles to some older machines.  :-(
-
-But this is where it generally sucks.  Trying to figure out which
-"brand/model"s of BT adapters out there available to purchase that are
-actually supported by Bluez.  Is there any guidance available on how to
-successfully do this, other than the trial-and-error of buying and
-(hopefully) returning products until one finds one that works?
-
-Cheers,
-b.
+diff --git a/src/adapter.c b/src/adapter.c
+index 022390f0d..79ca75315 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -7066,6 +7066,24 @@ static void adapter_msd_notify(struct btd_adapter *adapter,
+ 	}
+ }
+ 
++#define APPLE_INC_VENDOR_ID 0x004c
++static bool eir_msd_is_apple_inc(GSList *msd_list)
++{
++	GSList *msd_l, *msd_next;
++
++	for (msd_l = msd_list; msd_l != NULL; msd_l = msd_next) 
++	{
++		const struct eir_msd *msd = msd_l->data;
++
++		msd_next = g_slist_next(msd_l);
++
++		if(msd->company == APPLE_INC_VENDOR_ID)
++			return true;
++	}
++
++	return false;
++}
++
+ static bool is_filter_match(GSList *discovery_filter, struct eir_data *eir_data,
+ 								int8_t rssi)
+ {
+@@ -7281,6 +7299,12 @@ void btd_adapter_device_found(struct btd_adapter *adapter,
+ 		device_update_last_seen(dev, BDADDR_BREDR, !not_connectable);
+ 	}
+ 
++	if(eir_msd_is_apple_inc(eir_data.msd_list) && 
++		(not_connectable == true) && (bdaddr_type == BDADDR_LE_PUBLIC)){
++		device_set_bredr_support(dev);
++		device_update_last_seen(dev, BDADDR_BREDR, true);
++	}
++
+ 	if (eir_data.name != NULL && eir_data.name_complete)
+ 		device_store_cached_name(dev, eir_data.name);
+ 
+-- 
+2.25.1
 
