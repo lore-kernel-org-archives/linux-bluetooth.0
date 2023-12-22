@@ -1,157 +1,104 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30CC828DBE;
-	Fri, 22 Dec 2023 15:12:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D83A241E0
+	for <linux-bluetooth@vger.kernel.org>; Fri, 22 Dec 2023 15:58:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i+92oErG"
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-28c1e079b20so151984a91.1;
-        Fri, 22 Dec 2023 07:12:51 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OIxYbLFe"
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-5cd8667c59eso1520847a12.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Dec 2023 07:58:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703257971; x=1703862771; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=mG5yQh5BmZ/+SdEVtHHTaLKN3jITKnFSk1eVPrGgKM0=;
-        b=i+92oErG7BUf8YyMKD2pcuF4HgC/A1uevv2lIInkJySYQzbom0tr1lFXHzJWkVnpuP
-         wb5YKZb5+yCYrGHUCJ4NN2j+r/1xUEH9YFu5nPdCRlVadeFX0e+FK+xXQnIlwLYHa8y+
-         px+iMM6H2bF+Bjar0ega0n3MZBpi4ByXuuG5d8ypXzhAzZfxCKAP4kK6pi613H48ZGQu
-         fiYUTkPnqp6u9vX/7gXrBC5A2XzbytwehTbt672inygHtlLkSUVdLG9r8Fezr5n60nK/
-         +z4EXPpndQO5bOAGaOsIlaAf5d2N8HBfaMANLY3t8uyXsa5ho23V2tNTkwMcNEM+3BGx
-         AcpA==
+        d=gmail.com; s=20230601; t=1703260695; x=1703865495; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=QRMTNK0HC/UvhVsLFQA0Xx60uwTHU9HFPdaHPcOlqwc=;
+        b=OIxYbLFe3WHoQAszy1gNfVMSyPlefSBSe98iN9AY7dxWnHFF4sJFNlngc6ABe5vwIS
+         CKzLOVY0l8qy9GBIVqLC2LSku6azcHYXfHeg9en+70t2a8MdGP4GwWmK1dVoK1i+4bsv
+         hQVtykmXSAieF6c05+6ZF9C2Wppbg8dxMnM1Nn6K+viL9/GL+t3ye3wttyDlTna60hqH
+         HQX7J0qt1unqVeddoWco1K9Bgm1PyZW4AIoUkQ9zFY8uYxBOKzM2/5EF9A+E9U+ro8xv
+         puWtDUPOXShxw7M30wiMICVSRwFKxECpDFjYNbzuJy9AfTgPmisE9PEk99l48VCVVO2U
+         x5xg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703257971; x=1703862771;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1703260695; x=1703865495;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=mG5yQh5BmZ/+SdEVtHHTaLKN3jITKnFSk1eVPrGgKM0=;
-        b=k4fbyWreSAn/Oz+FSsrTuru/O+fBaWwpFNhfg9bSJnnbx3z+lYTDZe9udp11KAF5QT
-         k+lQXMPp9drOAO8VDjOnZYgI8zt+321g+zse/Nb2xFYkWqCH++ILkQl2+q43wh/PkZP7
-         8wSKUAIYVxJqB9XtYbZ4+xjpdkszYB2+bMmqT92DtRpk8zrABokyBx/cWIEgcZQgW4y/
-         jCOVvXc3T3ovAG98V4cuhxsUhITYGmaN1TRKeGTGwO/Rk16hpRxkgTlUOGqb0ala8vd+
-         b/ATdQ2NdLSEHX4Vu0Lrsm6Lgt9CJkw/D+HTRHyNWMyen72lUOWAWOwl+7JVTwiy0fth
-         N70Q==
-X-Gm-Message-State: AOJu0YwAIRLt9SgVHUCh2dOZAaC0j/6Sg+74ja5vs9lLwhvn3OSDt9X0
-	VJSLSFI+3Zc8Cd8t+8mpLBE=
-X-Google-Smtp-Source: AGHT+IEn6GnyGhoNKzdzJqZBh3Pzoaoc5HSi7iJzx80sJF+LA+cDrpsnrGtG92Oxvse40S35Oow6gw==
-X-Received: by 2002:a17:90a:2dcf:b0:28c:4a7:b0da with SMTP id q15-20020a17090a2dcf00b0028c04a7b0damr846479pjm.86.1703257971300;
-        Fri, 22 Dec 2023 07:12:51 -0800 (PST)
-Received: from g2039B650.. ([106.39.42.144])
-        by smtp.gmail.com with ESMTPSA id go18-20020a17090b03d200b0028c1807cbf0sm889333pjb.54.2023.12.22.07.12.47
+        bh=QRMTNK0HC/UvhVsLFQA0Xx60uwTHU9HFPdaHPcOlqwc=;
+        b=LYM9UDZdX+EjxAZwwlteCsgcSD2x5uTIa9eOHJ47Q4tD1r3WDAnsI7WRSOiUoEfxxQ
+         7+QDGqeNTgaJZt40eLqdkoQ5N23VsuygZYd6BmjZDih2pFGvfq7wr1SSD2zY0F33p9P+
+         s4z8aWZbq3VckeQbzTP4Q5qa1nBIWlsKYXqQlwaGQLhS6tdUGIDIHF+DTnm8/ojHkD1O
+         aQRu7c9NSINlz18eHQnKy1E4DzCDGHhmqpRkuxedI01aHQ/Od/vNZ4Ms7kzby0W/GAkk
+         iUUL1/1M3rzaoARFzijUG+9QqPOH9s2WmbYs7hpXN5mC67Etg4+3oCiHRHarXUKleJC9
+         MDQw==
+X-Gm-Message-State: AOJu0YwAXPJLXi9PQAXF3qrAIZwEiH2iRNzPSC2pWEbWAa+qNPM3oxud
+	wJFK/8mfvqbvXn6iI9azXIV8JcI3PyQ=
+X-Google-Smtp-Source: AGHT+IH3VAywvd91IoDHYEQYWPmB8j2LFGTWxQqEHk5LZRibv9MH9BJ5OtzE5NjUwNOREB26/O4kNA==
+X-Received: by 2002:a17:903:486:b0:1d3:b651:5e8 with SMTP id jj6-20020a170903048600b001d3b65105e8mr1318939plb.96.1703260695270;
+        Fri, 22 Dec 2023 07:58:15 -0800 (PST)
+Received: from [172.17.0.2] ([20.171.46.101])
+        by smtp.gmail.com with ESMTPSA id p8-20020a1709027ec800b001d403969bf4sm3569134plb.309.2023.12.22.07.58.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Dec 2023 07:12:51 -0800 (PST)
-From: Gui-Dong Han <2045gemini@gmail.com>
-To: marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	baijiaju1990@outlook.com,
-	Gui-Dong Han <2045gemini@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Fix atomicity violation in {min,max}_key_size_set
-Date: Fri, 22 Dec 2023 23:12:41 +0800
-Message-Id: <20231222151241.4331-1-2045gemini@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Fri, 22 Dec 2023 07:58:14 -0800 (PST)
+Message-ID: <6585b216.170a0220.17cd6.b6be@mx.google.com>
+Date: Fri, 22 Dec 2023 07:58:14 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============2592624952049428156=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, 2045gemini@gmail.com
+Subject: RE: [v2] Bluetooth: Fix atomicity violation in {min,max}_key_size_set
+In-Reply-To: <20231222151241.4331-1-2045gemini@gmail.com>
+References: <20231222151241.4331-1-2045gemini@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-In min_key_size_set():
-    if (val > hdev->le_max_key_size || val < SMP_MIN_ENC_KEY_SIZE)
-        return -EINVAL;
-    hci_dev_lock(hdev);
-    hdev->le_min_key_size = val;
-    hci_dev_unlock(hdev);
+--===============2592624952049428156==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-In max_key_size_set():
-    if (val > SMP_MAX_ENC_KEY_SIZE || val < hdev->le_min_key_size)
-        return -EINVAL;
-    hci_dev_lock(hdev);
-    hdev->le_max_key_size = val;
-    hci_dev_unlock(hdev);
+This is automated email and please do not reply to this email!
 
-The atomicity violation occurs due to concurrent execution of set_min and
-set_max funcs.Consider a scenario where setmin writes a new, valid 'min'
-value, and concurrently, setmax writes a value that is greater than the
-old 'min' but smaller than the new 'min'. In this case, setmax might check
-against the old 'min' value (before acquiring the lock) but write its
-value after the 'min' has been updated by setmin. This leads to a
-situation where the 'max' value ends up being smaller than the 'min'
-value, which is an inconsistency.
+Dear submitter,
 
-This possible bug is found by an experimental static analysis tool
-developed by our team, BassCheck[1]. This tool analyzes the locking APIs
-to extract function pairs that can be concurrently executed, and then
-analyzes the instructions in the paired functions to identify possible
-concurrency bugs including data races and atomicity violations. The above
-possible bug is reported when our tool analyzes the source code of
-Linux 5.17.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=812520
 
-To resolve this issue, it is suggested to encompass the validity checks
-within the locked sections in both set_min and set_max funcs. The
-modification ensures that the validation of 'val' against the
-current min/max values is atomic, thus maintaining the integrity of the
-settings. With this patch applied, our tool no longer reports the bug,
-with the kernel configuration allyesconfig for x86_64. Due to the lack of
-associated hardware, we cannot test the patch in runtime testing, and just
-verify it according to the code logic.
+---Test result---
 
-[1] https://sites.google.com/view/basscheck/
+Test Summary:
+CheckPatch                    PASS      1.55 seconds
+GitLint                       PASS      0.54 seconds
+SubjectPrefix                 PASS      0.07 seconds
+BuildKernel                   PASS      29.23 seconds
+CheckAllWarning               PASS      31.03 seconds
+CheckSparse                   PASS      36.97 seconds
+CheckSmatch                   PASS      101.71 seconds
+BuildKernel32                 PASS      27.72 seconds
+TestRunnerSetup               PASS      447.68 seconds
+TestRunner_l2cap-tester       PASS      23.94 seconds
+TestRunner_iso-tester         PASS      46.71 seconds
+TestRunner_bnep-tester        PASS      6.99 seconds
+TestRunner_mgmt-tester        PASS      161.13 seconds
+TestRunner_rfcomm-tester      PASS      10.85 seconds
+TestRunner_sco-tester         PASS      14.50 seconds
+TestRunner_ioctl-tester       PASS      12.27 seconds
+TestRunner_mesh-tester        PASS      8.83 seconds
+TestRunner_smp-tester         PASS      9.77 seconds
+TestRunner_userchan-tester    PASS      7.22 seconds
+IncrementalBuild              PASS      25.57 seconds
 
-Fixes: 18f81241b74f ("Bluetooth: Move {min,max}_key_size debugfs ...")
-Cc: stable@vger.kernel.org
-Signed-off-by: Gui-Dong Han <2045gemini@gmail.com>
+
+
 ---
-v2:
-* Adjust the format to pass the CI.
----
- net/bluetooth/hci_debugfs.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-index 6b7741f6e95b..3ffbf3f25363 100644
---- a/net/bluetooth/hci_debugfs.c
-+++ b/net/bluetooth/hci_debugfs.c
-@@ -1045,11 +1045,13 @@ DEFINE_DEBUGFS_ATTRIBUTE(adv_max_interval_fops, adv_max_interval_get,
- static int min_key_size_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
--
--	if (val > hdev->le_max_key_size || val < SMP_MIN_ENC_KEY_SIZE)
-+
-+	hci_dev_lock(hdev);
-+	if (val > hdev->le_max_key_size || val < SMP_MIN_ENC_KEY_SIZE) {
-+		hci_dev_unlock(hdev);
- 		return -EINVAL;
-+	}
- 
--	hci_dev_lock(hdev);
- 	hdev->le_min_key_size = val;
- 	hci_dev_unlock(hdev);
- 
-@@ -1073,11 +1075,13 @@ DEFINE_DEBUGFS_ATTRIBUTE(min_key_size_fops, min_key_size_get,
- static int max_key_size_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
--
--	if (val > SMP_MAX_ENC_KEY_SIZE || val < hdev->le_min_key_size)
-+
-+	hci_dev_lock(hdev);
-+	if (val > SMP_MAX_ENC_KEY_SIZE || val < hdev->le_min_key_size) {
-+		hci_dev_unlock(hdev);
- 		return -EINVAL;
-+	}
- 
--	hci_dev_lock(hdev);
- 	hdev->le_max_key_size = val;
- 	hci_dev_unlock(hdev);
- 
--- 
-2.34.1
 
+--===============2592624952049428156==--
