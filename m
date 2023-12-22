@@ -1,70 +1,186 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2927D2F4
-	for <linux-bluetooth@vger.kernel.org>; Fri, 22 Dec 2023 09:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D38A14A86;
+	Fri, 22 Dec 2023 10:55:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="ccIz1vAW"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=EuWi+yY2Z8xBr9ic5ln/17FBqtrn4ZdFYnxEBIvlBZg=; b=c
-	cIz1vAWXzy8vtZ9ft+nrB1RZbCoj6mi0DidpZUCl2m1ud1IxdaGhPgnZ6S3Vw9Sy
-	5cycgMs6xDZ2Cl0SHck6em0gYTQyum2Xf0dfE2j4fQoFWk/O1sE6WSPifiG3c8mS
-	+BxN7XsTyY4cVct7Ej6hI6IW7ZFkJ5o2nbjevlz/gQ=
-Received: from wendy_vs$163.com ( [218.82.140.144] ) by
- ajax-webmail-wmsvr-40-103 (Coremail) ; Fri, 22 Dec 2023 17:07:17 +0800
- (CST)
-Date: Fri, 22 Dec 2023 17:07:17 +0800 (CST)
-From: =?UTF-8?B?5pyx5rW35Lic?= <wendy_vs@163.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: wendy_vs <wendy_vs@163.com>
-Subject: Can't setup cis with bluez5.70
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20230109(dcb5de15)
- Copyright (c) 2002-2023 www.mailtech.cn 163com
-In-Reply-To: <60d0200b.4fc3.18c90909e2a.Coremail.wendy_vs@163.com>
-References: <e3e3a0f.48b3.18c90760c43.Coremail.wendy_vs@163.com>
- <60d0200b.4fc3.18c90909e2a.Coremail.wendy_vs@163.com>
-X-NTES-SC: AL_Qu2bAf6YuUgo4SSdYukfm04Qj+44WcG1svQu2oJQPpt4jC3p2xo+enRIFmv57tuGDz6zjBOcYjlp4PZcX6p9QZ0Wz5co4v4cwaREwINHk4CVTQ==
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z2vcC4p0"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1d3eabe9321so11837855ad.2;
+        Fri, 22 Dec 2023 02:55:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703242537; x=1703847337; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=PCFzo++LI2ZwW1picHi8lLKPMVx69Hfp8vT3r27uSLU=;
+        b=Z2vcC4p0iN9YhUXwmEOEAXciYXu5OxPmfonMorliOWZ3iuOQHmeNEU74leuVez+rXD
+         qcNSw4R91D9ym1stU3WviPRnKP5Cs77uwA1PegNEClFYCcYArBr97iwDxX8dPK66OVoz
+         JYjiwnSbFZjUWwksoWT5m1MWXUsoGL8V/idH6945Ei7CgdvgcVZ6Tt+uTviy2SFu4Dog
+         JtquLv3hI1oyx1CAIhx+q0wr72K2WLJV9SolJDWaF8qd9m72qZnCYUl05dphTDz/agax
+         uwr214CyT62+sai7mcSnG9VymAtNmGzZoD9WEN7iwrB/fQT6WEnAUygWhAqDWs1kcbZ9
+         QsjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703242537; x=1703847337;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PCFzo++LI2ZwW1picHi8lLKPMVx69Hfp8vT3r27uSLU=;
+        b=wowr/ieKlQfPL8950avRtW6q8qxnERS3QnVDxPQ6KNpQ2hpqT3fmCQSxbjrUYb/Yjr
+         PKRTF4HVz+kZ/T19PGxOlZ0v/7op71zisv2gR6l8BCfKH7EKMjyJdEBAj70iUFz/wNp7
+         79djITocSyFBqMNBxItZgiBOvSLB2aU8IIuWY3vcDQnjv968RsgzeqUpdde77qJ/EuXn
+         /Ls2pVHRcmS8m5OMmQoiYTet8WRFKddf2I12xKK2A5FMLZK3lVrFNIBsvWMZmBAGkf1y
+         GaNDaSQEa2ASAQTk/2Ztfuzv7UHNmtsvC7RnHdXIzwUtf6lAQeJ2aPn5ZPGOArsRQO05
+         e7XQ==
+X-Gm-Message-State: AOJu0YzOGdDtLkgT+YEH14J5o2ZkpDfNKDzwoFA3yOBYAcSn8kwL0uwo
+	qC/LCkDtVmp6nBYzOJpXF74=
+X-Google-Smtp-Source: AGHT+IHe/yw5h2GBRC0KOMQhoptWluh7P/8lB+AswpdPVFaFzGQTpTtUHnCgGULxsphbiJG7LbPimg==
+X-Received: by 2002:a17:902:680a:b0:1d4:19c8:582b with SMTP id h10-20020a170902680a00b001d419c8582bmr722741plk.121.1703242537386;
+        Fri, 22 Dec 2023 02:55:37 -0800 (PST)
+Received: from g2039B650.. ([106.39.42.144])
+        by smtp.gmail.com with ESMTPSA id jg11-20020a17090326cb00b001d3ef9edfa7sm3188497plb.58.2023.12.22.02.55.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Dec 2023 02:55:36 -0800 (PST)
+From: Gui-Dong Han <2045gemini@gmail.com>
+To: marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	baijiaju1990@outlook.com,
+	Gui-Dong Han <2045gemini@gmail.com>,
+	stable@vger.kernel.org,
+	BassCheck <bass@buaa.edu.cn>
+Subject: [PATCH] Bluetooth: Fix atomicity violation in {conn,adv}_{min,max}_interval_set
+Date: Fri, 22 Dec 2023 18:55:26 +0800
+Message-Id: <20231222105526.9208-1-2045gemini@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <48d28ce2.6114.18c90c76b54.Coremail.wendy_vs@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:_____wD33zPFUYVlhFhGAA--.62192W
-X-CM-SenderInfo: xzhqv5xbyvqiywtou0bp/1tbiJRNO5WVN+14xDwABsv
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+Content-Transfer-Encoding: 8bit
 
-CkhpLApJIGhhdmUgYSBBWDIxMCwgd2hpY2ggaGFzIEJUNS4yIGZlYXR1cmVzLCBzbyBJIHdhbnQg
-dG8gcGxheSBtdXNpYyBieSBsZSBhdWRpbyBjaXMsIGJ1dCB3aGVuIEkgcmVnaXN0ZXIgZW5kcG9p
-bnRzLCBpdCBmYWlscy4KCmxvZyBpcyBsaWtlIHRoaXM6CgoKcm9vdEB6ei1IUC1Qcm9Cb29rLTY1
-MC1HMTovaG9tZS96ei9wcm9qZWN0L2JsdWV6LTUuNzAjIGhjaWNvbmZpZwpoY2kwOsKgwqDCoCBU
-eXBlOiBQcmltYXJ5wqAgQnVzOiBVU0IKwqDCoCDCoEJEIEFkZHJlc3M6IEY0OjdCOjA5OkY4Ojc0
-OjRCwqAgQUNMIE1UVTogMTAyMTo0wqAgU0NPIE1UVTogOTY6NgrCoMKgIMKgVVAgUlVOTklORyAK
-wqDCoCDCoFJYIGJ5dGVzOjIwMDM2IGFjbDowIHNjbzowIGV2ZW50czoyOTM0IGVycm9yczowCsKg
-wqAgwqBUWCBieXRlczo2OTgwMjYgYWNsOjAgc2NvOjAgY29tbWFuZHM6MjkxMiBlcnJvcnM6MAoK
-cm9vdEB6ei1IUC1Qcm9Cb29rLTY1MC1HMTovaG9tZS96ei9wcm9qZWN0L2JsdWV6LTUuNzAjIGhj
-aWNvbmZpZyBoY2kwIHVwCnJvb3RAenotSFAtUHJvQm9vay02NTAtRzE6L2hvbWUvenovcHJvamVj
-dC9ibHVlei01LjcwIyBibHVldG9vdGhjdGwgCkFnZW50IHJlZ2lzdGVyZWQKW2JsdWV0b290aF0j
-IHBvd2VyIG9uIApDaGFuZ2luZyBwb3dlciBvbiBzdWNjZWVkZWQKW2JsdWV0b290aF0jIGFkdmVy
-dGlzZSBvbgpoY2kwIGFkdmVydGlzaW5nX2FkZGVkOiBpbnN0YW5jZSAxCltDSEddIENvbnRyb2xs
-ZXIgRjQ6N0I6MDk6Rjg6NzQ6NEIgU3VwcG9ydGVkSW5zdGFuY2VzOiAweDA3ICg3KQpbQ0hHXSBD
-b250cm9sbGVyIEY0OjdCOjA5OkY4Ojc0OjRCIEFjdGl2ZUluc3RhbmNlczogMHgwMSAoMSkKQWR2
-ZXJ0aXNpbmcgb2JqZWN0IHJlZ2lzdGVyZWQKVHggUG93ZXI6IG9mZgpOYW1lOiBvZmYKQXBwZWFy
-YW5jZTogb2ZmCkRpc2NvdmVyYWJsZTogb24KUlNJOiBvbgpbYmx1ZXRvb3RoXSMgZW5kcG9pbnQu
-cmVnaXN0ZXIgMDAwMDJiYzktMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiIDB4MDYKWy9sb2Nh
-bC9lbmRwb2ludC9lcDBdIEF1dG8gQWNjZXB0ICh5ZXMvbm8pOiB5ClsvbG9jYWwvZW5kcG9pbnQv
-ZXAwXSBNYXggVHJhbnNwb3J0cyAoYXV0by92YWx1ZSk6IGEKWy9sb2NhbC9lbmRwb2ludC9lcDBd
-IENJRyAoYXV0by92YWx1ZSk6IGEKWy9sb2NhbC9lbmRwb2ludC9lcDBdIENJUyAoYXV0by92YWx1
-ZSk6IGEKRmFpbGVkIHJlZ2lzdGVyIGVuZHBvaW50CgoKSGVyZSBpcyBteSBjb21waWxlIG1ldGhv
-ZDoKCjEuIGNoYW5nZSBtYWluLmNvbmYgZm9sbG93ZWQgaHR0cHM6Ly93d3cuYmx1ZXoub3JnL2xl
-LWF1ZGlvLXN1cHBvcnQvCgoyLiAuL2NvbmZpZ3VyZSAtLXByZWZpeD0vdXNyIC0tbWFuZGlyPS91
-c3Ivc2hhcmUvbWFuIC0tc3lzY29uZmRpcj0vZXRjIC0tbG9jYWxzdGF0ZWRpcj0vdmFyCjMuIG1h
-a2UgJiYgbWFrZSBpbnN0YWxsCgoKU28sIHdvdWxkIHlvdSBwbGVhc2UgZ2l2ZSBtZSBzb21lIGhp
-bnRzIHRvIHNvbHZlIHRoaXMgcHJvYmxlbT8gVGhhbmtzLgoKCkJlc3QgcmVnYXJkcywKCldlbmR5
-CgoKCgoKCgoKCgoKCgoKCgoKCg==
+In {conn,adv}_min_interval_set():
+	if (val < ... || val > ... || val > hdev->le_{conn,adv}_max_interval)
+		return -EINVAL;
+	hci_dev_lock(hdev);
+	hdev->le_{conn,adv}_min_interval = val;
+	hci_dev_unlock(hdev);
+
+In {conn,adv}_max_interval_set():
+	if (val < ... || val > ... || val < hdev->le_{conn,adv}_min_interval)
+		return -EINVAL;
+	hci_dev_lock(hdev);
+	hdev->le_{conn,adv}_max_interval
+	hci_dev_unlock(hdev);
+
+The atomicity violation occurs due to concurrent execution of set_min and
+set_max funcs which may lead to inconsistent reads and writes of the min
+value and the max value. The checks for value validity are ineffective as
+the min/max values could change immediately after being checked, raising
+the risk of the min value being greater than the max value and causing
+invalid settings.
+
+This possible bug is found by an experimental static analysis tool
+developed by our team, BassCheck[1]. This tool analyzes the locking APIs
+to extract function pairs that can be concurrently executed, and then
+analyzes the instructions in the paired functions to identify possible
+concurrency bugs including data races and atomicity violations. The above
+possible bug is reported when our tool analyzes the source code of
+Linux 5.17.
+
+To resolve this issue, it is suggested to encompass the validity checks
+within the locked sections in both set_min and set_max funcs. The
+modification ensures that the validation of 'val' against the
+current min/max values is atomic, thus maintaining the integrity of the
+settings. With this patch applied, our tool no longer reports the bug,
+with the kernel configuration allyesconfig for x86_64. Due to the lack of
+associated hardware, we cannot test the patch in runtime testing, and just
+verify it according to the code logic.
+
+[1] https://sites.google.com/view/basscheck/
+
+Fixes: 3a5c82b78fd28 ("Bluetooth: Move LE debugfs file creation into ...")
+Cc: stable@vger.kernel.org
+Reported-by: BassCheck <bass@buaa.edu.cn>
+Signed-off-by: Gui-Dong Han <2045gemini@gmail.com>
+---
+ net/bluetooth/hci_debugfs.c | 30 +++++++++++++++++++-----------
+ 1 file changed, 19 insertions(+), 11 deletions(-)
+
+diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
+index 6b7741f6e95b..6fdda807f2cf 100644
+--- a/net/bluetooth/hci_debugfs.c
++++ b/net/bluetooth/hci_debugfs.c
+@@ -849,11 +849,13 @@ DEFINE_SHOW_ATTRIBUTE(long_term_keys);
+ static int conn_min_interval_set(void *data, u64 val)
+ {
+ 	struct hci_dev *hdev = data;
+-
+-	if (val < 0x0006 || val > 0x0c80 || val > hdev->le_conn_max_interval)
++	
++	hci_dev_lock(hdev);
++	if (val < 0x0006 || val > 0x0c80 || val > hdev->le_conn_max_interval) {
++		hci_dev_unlock(hdev);	
+ 		return -EINVAL;
++	}
+ 
+-	hci_dev_lock(hdev);
+ 	hdev->le_conn_min_interval = val;
+ 	hci_dev_unlock(hdev);
+ 
+@@ -877,11 +879,13 @@ DEFINE_DEBUGFS_ATTRIBUTE(conn_min_interval_fops, conn_min_interval_get,
+ static int conn_max_interval_set(void *data, u64 val)
+ {
+ 	struct hci_dev *hdev = data;
+-
+-	if (val < 0x0006 || val > 0x0c80 || val < hdev->le_conn_min_interval)
++	
++	hci_dev_lock(hdev);
++	if (val < 0x0006 || val > 0x0c80 || val < hdev->le_conn_min_interval) {
++		hci_dev_unlock(hdev);
+ 		return -EINVAL;
++	}
+ 
+-	hci_dev_lock(hdev);
+ 	hdev->le_conn_max_interval = val;
+ 	hci_dev_unlock(hdev);
+ 
+@@ -989,11 +993,13 @@ DEFINE_DEBUGFS_ATTRIBUTE(adv_channel_map_fops, adv_channel_map_get,
+ static int adv_min_interval_set(void *data, u64 val)
+ {
+ 	struct hci_dev *hdev = data;
+-
+-	if (val < 0x0020 || val > 0x4000 || val > hdev->le_adv_max_interval)
++	
++	hci_dev_lock(hdev);
++	if (val < 0x0020 || val > 0x4000 || val > hdev->le_adv_max_interval) {
++		hci_dev_unlock(hdev);	
+ 		return -EINVAL;
++	}
+ 
+-	hci_dev_lock(hdev);
+ 	hdev->le_adv_min_interval = val;
+ 	hci_dev_unlock(hdev);
+ 
+@@ -1018,10 +1024,12 @@ static int adv_max_interval_set(void *data, u64 val)
+ {
+ 	struct hci_dev *hdev = data;
+ 
+-	if (val < 0x0020 || val > 0x4000 || val < hdev->le_adv_min_interval)
++	hci_dev_lock(hdev);
++	if (val < 0x0020 || val > 0x4000 || val < hdev->le_adv_min_interval) {
++		hci_dev_unlock(hdev);
+ 		return -EINVAL;
++	}
+ 
+-	hci_dev_lock(hdev);
+ 	hdev->le_adv_max_interval = val;
+ 	hci_dev_unlock(hdev);
+ 
+-- 
+2.34.1
+
