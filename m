@@ -1,129 +1,85 @@
-Received: from mx.mrman314.tech (unknown [135.0.77.242])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C24CEFBEB;
-	Sun, 24 Dec 2023 21:01:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mrman314.tech
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mrman314.tech
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC948DF53
+	for <linux-bluetooth@vger.kernel.org>; Sun, 24 Dec 2023 21:11:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mrman314.tech header.i=@mrman314.tech header.b="nahUWYag"
-Received: from mail.mrman314.tech (localhost [127.0.0.1])
-	by mx.mrman314.tech (Postfix) with ESMTPSA id 637B42F495E8;
-	Sun, 24 Dec 2023 16:01:43 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=mrman314.tech;
-	s=default; t=1703451703;
-	bh=HLhCanTpi2kJGYS9gLHHc1vwS5SyQPA78Qz2/DkYtL0=;
-	h=Date:From:To:Cc:Subject;
-	b=nahUWYagZEO75ibnYsFagbI1Zrnk7Azi5EdZa3YjC16jC3r8z9whaXRe6HV8Xw1VO
-	 O/q4oah/PqQNbj3FU/axnKZ20vB6DjgguUv1iUvfo5kVZNZd5zDyJUvWpRNJtlqkcn
-	 4DYUp48GKBiKEaLFhd7EF6vIfFyvaxS4u6RGlorM=
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YOK4MPgj"
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-35fe456b94cso11691835ab.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 24 Dec 2023 13:11:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703452307; x=1704057107; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=5tvRFmlXtj9goxnpYQWLbG68v4f47f8rANaAP6Stjcg=;
+        b=YOK4MPgjE+wyTKC2TGBEwgGf8rZgAmE3GvmzjSKbT3WD1MnwZhtwuEMSn42O7SHR80
+         Zi4VI8miQfHVV0+YHpnJ9fBBnme3agbdCyxUssd4eigE771lZMQyQ6yE0F/JIiw2RD8H
+         9hA2VJW1Ac9dhCtI8mdKo1At8KjP6mOwEFAwlhszUD61cKBAuSRJhBUwCHF/5WkcBb0/
+         IOj94bArXe3Kpg/ynMEzpFiAv2/ednk9z18FPQ+ovfg0hnaCN+NdQiQatsdH7In4FCZI
+         uaedSndIbexZMrGi8WBZqv6RVX9b0K6sVQLgJAtjsvbdpw6O2whufBHv1aBqpuDhAy4f
+         HT2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703452307; x=1704057107;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5tvRFmlXtj9goxnpYQWLbG68v4f47f8rANaAP6Stjcg=;
+        b=faVs6Lvl0DhQsiNS/Src++dqhM0NB2XLP8bx9NK2AMbvqxs+Kc1udVgoRgTPshkIpt
+         x7/xnmnFQqlGWl3J+vFWzCMYV3LiOfMb8dt7XxpnZ66/mnsvv/s3+FO+dnKKuVncuj1j
+         AETU1vmsFdLT+UsrpqSw/0T36Dv49m35vJYcxAlZ/xQQd87WjpLA9Dm1wVRTMlqKQ034
+         XFdgzpm6iS42KUFUh1uHsOP1idotUev19jIcMS2BfTEH0+n1MWCboTf2cN9Urg9TkT7h
+         oOr4aq1AoJta8KRtunVtble9sHRgxOw6EZp1Rt2XkiEHrAx9YEPjuZCXFvgkYbimN32e
+         ND9g==
+X-Gm-Message-State: AOJu0YxtvsVbxgwmESH7BGcP60Eiop0jQJZoJP6y3tcNGbSC+2wxIEVF
+	P3cdsWhouTh0BcFUumipnP0NwpJLX90=
+X-Google-Smtp-Source: AGHT+IEJlkIuWFcD64gmrTdL7RpYfC0ox8tWhIzP412PJbPaY/6BoUdQ0tOXGMOdwZzUS1+NA1OFwA==
+X-Received: by 2002:a05:6e02:388d:b0:35f:e7f9:ba9e with SMTP id cn13-20020a056e02388d00b0035fe7f9ba9emr6287430ilb.6.1703452306715;
+        Sun, 24 Dec 2023 13:11:46 -0800 (PST)
+Received: from [172.17.0.2] ([20.172.6.170])
+        by smtp.gmail.com with ESMTPSA id bn13-20020a056a02030d00b005cde84ab215sm2035019pgb.38.2023.12.24.13.11.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 24 Dec 2023 13:11:46 -0800 (PST)
+Message-ID: <65889e92.050a0220.30fad.339d@mx.google.com>
+Date: Sun, 24 Dec 2023 13:11:46 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6917658322995700730=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Sun, 24 Dec 2023 16:01:43 -0500
-From: Felix Zhang <mrman@mrman314.tech>
-To: stable@vger.kernel.org
-Cc: marcan@marcan.st, bagasdotme@gmail.com, sven@svenpeter.dev,
- alyssa@rosenzweig.io, marcel@holtmann.org, johan.hedberg@gmail.com,
- luiz.dentz@gmail.com, orlandoch.dev@gmail.com, kekrby@gmail.com,
- admin@kodeit.net, j@jannau.net, gargaditya08@live.com,
- asahi@lists.linux.dev, linux-kernel@vger.kernel.org, Linux Bluetooth
- <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH v2] Bluetooth: Fix Bluetooth for BCM4377 on T2 Intel MacBooks
-Message-ID: <05aa1755970796d5a250660e42ee85ad@mrman314.tech>
-X-Sender: mrman@mrman314.tech
-Organization: MrMan
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, mrman@mrman314.tech
+Subject: RE: [v2] Bluetooth: Fix Bluetooth for BCM4377 on T2 Intel MacBooks
+In-Reply-To: <05aa1755970796d5a250660e42ee85ad@mrman314.tech>
+References: <05aa1755970796d5a250660e42ee85ad@mrman314.tech>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============6917658322995700730==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-Starting v6.5, Bluetooth does not work at all on my T2 MacBookAir9,1 
-with
-the BCM4377 chip.  When I boot up the computer, go into bluetoothctl, 
-and
-then try to run commands like scan on, show, list, it returns "No 
-default
-controller available."  I have tried reloading the kernel module, in 
-which
-the log outputs "{Added,Removed} hci0 (unconfigured)."  With this patch, 
-I
-am able to use Bluetooth as normal without any errors regarding hci0 
-being
-unconfigured.  However, an issue is still present where sometimes
-hci_bcm4377 will have to be reloaded in order to get bluetooth to work.  
-I
-believe this was still present before the previously mentioned commit.
+This is an automated email and please do not reply to this email.
 
-Due to the bit HCI_QUIRK_USE_BDADDR_PROPERTY being always set in
-drivers/bluetooth/hci_bcm4377.c(line 2371), the chip would be left
-unconfigured on kernels compiled after commit 6945795bc81a ("Bluetooth:
-fix use-bdaddr-property quirk") due to a change in its logic.  On the M1
-Macs, the device would be configured in the devicetree.  However, that 
-is
-not the case on T2 Macs.  Because the bluetooth adapter is left
-unconfigured, it is not usable in the operating system.  In order to
-circumvent this issue, a flag is added to prevent the bit from being set 
-on
-the BCM4377, while setting it on the other devices.
+Dear Submitter,
 
-Because I do not have an M1 device to test this patch on, I am not sure
-whether the patch breaks anything for said devices.  I would be very
-grateful if anyone is willing to test this patch on their M1 device.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-I would also like to thank Kerem Karabay <kekrby@gmail.com> for 
-assisting
-me with this patch.
+----- Output -----
 
-Fixes: 6945795bc81a ("Bluetooth: fix use-bdaddr-property quirk")
-Signed-off-by: Felix Zhang <mrman@mrman314.tech>
+error: patch fragment without header at line 6: @@ -2465,6 +2467,7 @@ static const struct bcm4377_hw 
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
-  drivers/bluetooth/hci_bcm4377.c | 6 +++++-
-  1 file changed, 5 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/hci_bcm4377.c 
-b/drivers/bluetooth/hci_bcm4377.c
-index a61757835695..5c6fef1aa0f6 100644
---- a/drivers/bluetooth/hci_bcm4377.c
-+++ b/drivers/bluetooth/hci_bcm4377.c
-@@ -513,6 +513,7 @@ struct bcm4377_hw {
-  	unsigned long broken_ext_scan : 1;
-  	unsigned long broken_mws_transport_config : 1;
-  	unsigned long broken_le_coded : 1;
-+	unsigned long use_bdaddr_property : 1;
 
-  	int (*send_calibration)(struct bcm4377_data *bcm4377);
-  	int (*send_ptb)(struct bcm4377_data *bcm4377,
-@@ -2368,7 +2369,8 @@ static int bcm4377_probe(struct pci_dev *pdev, 
-const struct pci_device_id *id)
-  	hdev->set_bdaddr = bcm4377_hci_set_bdaddr;
-  	hdev->setup = bcm4377_hci_setup;
-
--	set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
-+	if (bcm4377->hw->use_bdaddr_property)
-+		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
-  	if (bcm4377->hw->broken_mws_transport_config)
-  		set_bit(HCI_QUIRK_BROKEN_MWS_TRANSPORT_CONFIG, &hdev->quirks);
-  	if (bcm4377->hw->broken_ext_scan)
-@@ -2465,6 +2467,7 @@ static const struct bcm4377_hw 
-bcm4377_hw_variants[] = {
-  		.has_bar0_core2_window2 = true,
-  		.broken_mws_transport_config = true,
-  		.broken_le_coded = true,
-+		.use_bdaddr_property = true,
-  		.send_calibration = bcm4378_send_calibration,
-  		.send_ptb = bcm4378_send_ptb,
-  	},
-@@ -2479,6 +2482,7 @@ static const struct bcm4377_hw 
-bcm4377_hw_variants[] = {
-  		.clear_pciecfg_subsystem_ctrl_bit19 = true,
-  		.broken_mws_transport_config = true,
-  		.broken_le_coded = true,
-+		.use_bdaddr_property = true,
-  		.send_calibration = bcm4387_send_calibration,
-  		.send_ptb = bcm4378_send_ptb,
-  	},
---
-2.43.0
+--===============6917658322995700730==--
