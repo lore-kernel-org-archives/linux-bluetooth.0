@@ -1,109 +1,159 @@
-Received: from mx.mrman314.tech (unknown [135.0.77.242])
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AEF7D2F1;
-	Sun, 24 Dec 2023 18:13:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mrman314.tech
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mrman314.tech
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E97BED2E2
+	for <linux-bluetooth@vger.kernel.org>; Sun, 24 Dec 2023 19:01:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mrman314.tech header.i=@mrman314.tech header.b="isElspyB"
-Received: from mail.mrman314.tech (localhost [127.0.0.1])
-	by mx.mrman314.tech (Postfix) with ESMTPSA id 177872F406D0;
-	Sun, 24 Dec 2023 13:04:34 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=mrman314.tech;
-	s=default; t=1703441075;
-	bh=R0Ct9LAMRoC93PP14kNc4aB4j0kJN4qE7SAVSIp+0no=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=isElspyBcHBK12K9W1c/zyGQSPfY4sZMH2Rrjb+1JEE7SIEeGSy3V9Ku5R/75T6vy
-	 hElhmYBoRmVgGc8AV3gAIXEALU4MeXURiUNROuBWRCuaawPB6qyooycpvJI5cjgCDo
-	 +usDtlj2PWPPlme8qtGmMXadjFBqRXMmZhztYxdw=
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="m/voCozC"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1703444487; x=1734980487;
+  h=date:from:to:cc:subject:message-id;
+  bh=RiRPEq9BQmgKuRE+wyq6mfMYPq3lpadzlR/sQI7SpkE=;
+  b=m/voCozCkpJDfypdep617co3aMB+xasTAlnQtPsWVQU+pdmBKS+lucQ1
+   IpYDxm3TyITUw7Kk53q+fVw8y4Nup7dPETLVrTxz2Rl4THgqmyUstELkT
+   HLrEq/qNfbe+77gTUzkBMvQ6uH4ibF07OY6fEwqsXZCBkdMKOcBuhTtnM
+   auSGRPqohcjKozM951xGUPvtpW5QR2s8qurmwbmBjoiQm/lPmr5P9F6Pd
+   dUY1jbdapw17jOHrWeaAQdT56IwRsp+abh4U9sGDw0V19rsVtWfJzwxcA
+   dHKsqGUKu2hY/0Kizst6XQ20C4isRLa/7ZEdcK11ZAnO/M1rDwWuUARgP
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10934"; a="381227134"
+X-IronPort-AV: E=Sophos;i="6.04,301,1695711600"; 
+   d="scan'208";a="381227134"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Dec 2023 11:01:27 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10934"; a="727359275"
+X-IronPort-AV: E=Sophos;i="6.04,301,1695711600"; 
+   d="scan'208";a="727359275"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by orsmga003.jf.intel.com with ESMTP; 24 Dec 2023 11:01:26 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rHTi5-000CXT-2N;
+	Sun, 24 Dec 2023 19:00:45 +0000
+Date: Mon, 25 Dec 2023 02:58:07 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ da9065caa594d19b26e1a030fd0cc27bd365d685
+Message-ID: <202312250203.NisfMECz-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Date: Sun, 24 Dec 2023 13:04:33 -0500
-From: Felix Zhang <mrman@mrman314.tech>
-To: Aditya Garg <gargaditya08@live.com>
-Cc: Hector Martin <marcan@marcan.st>, Sven Peter <sven@svenpeter.dev>,
- Alyssa Rosenzweig <alyssa@rosenzweig.io>, marcel@holtmann.org,
- johan.hedberg@gmail.com, luiz.dentz@gmail.com, Orlando Chamberlain
- <orlandoch.dev@gmail.com>, Kerem Karabay <kekrby@gmail.com>, Aun-Ali Zaidi
- <admin@kodeit.net>, Asahi Linux <asahi@lists.linux.dev>, LKML
- <linux-kernel@vger.kernel.org>, linux-bluetooth@vger.kernel.org
-Subject: Re: [REGRESSION] Bluetooth is not working on Macs with BCM4377 chip
- starting from kernel 6.5
-In-Reply-To: <22582194-DE99-45E5-ABEE-C1C7900DA523@live.com>
-References: <22582194-DE99-45E5-ABEE-C1C7900DA523@live.com>
-Message-ID: <956280a5c2e931b13d784ec5fca38156@mrman314.tech>
-X-Sender: mrman@mrman314.tech
-Organization: MrMan
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
 
-On 2023-11-13 15:57, Aditya Garg wrote:
-> Starting from kernel 6.5, a regression in the kernel is causing 
-> Bluetooth to not work on T2 Macs with BCM4377 chip.
-> 
-> Journalctl of kernel 6.4.8 which has Bluetooth working is given here: 
-> https://pastebin.com/u9U3kbFJ
-> 
-> Journalctl of kernel 6.5.2, which has Bluetooth broken is given here: 
-> https://pastebin.com/aVHNFMRs
-> 
-> Also, the bug hasn’t been fixed even in 6.6.1, as reported by users.
-> 
-> Some relevant bits imo:
-> 
->     • Sep 19 21:24:36 RudyUbuMbp kernel: hci_bcm4377 0000:73:00.1: 
-> can't disable ASPM; OS doesn't have ASPM control
-> 
->     • Nov 14 01:29:28 RudyUbuMbp kernel: Call Trace:
->     • Nov 14 01:29:28 RudyUbuMbp kernel: <TASK>
->     • Nov 14 01:29:28 RudyUbuMbp kernel: dump_stack_lvl+0x48/0x70
->     • Nov 14 01:29:28 RudyUbuMbp kernel: dump_stack+0x10/0x20
->     • Nov 14 01:29:28 RudyUbuMbp kernel: 
-> __ubsan_handle_shift_out_of_bounds+0x156/0x310
->     • Nov 14 01:29:28 RudyUbuMbp kernel: ? ttwu_do_activate+0x80/0x290
->     • Nov 14 01:29:28 RudyUbuMbp kernel: ? raw_spin_rq_unlock+0x10/0x40
->     • Nov 14 01:29:28 RudyUbuMbp kernel: ? try_to_wake_up+0x292/0x6c0
->     • Nov 14 01:29:28 RudyUbuMbp kernel: ? sched_slice+0x76/0x140
->     • Nov 14 01:29:28 RudyUbuMbp kernel: ? reweight_entity+0x15c/0x170
->     • Nov 14 01:29:28 RudyUbuMbp kernel: __reg_op.cold+0x14/0x38
->     • Nov 14 01:29:28 RudyUbuMbp kernel: bitmap_release_region+0xe/0x20
->     • Nov 14 01:29:28 RudyUbuMbp kernel: bcm4377_handle_ack+0x8c/0x130 
-> [hci_bcm4377]
->     • Nov 14 01:29:28 RudyUbuMbp kernel: 
-> bcm4377_poll_completion_ring+0x196/0x330 [hci_bcm4377]
->     • Nov 14 01:29:28 RudyUbuMbp kernel: ? 
-> rcu_gp_kthread_wake+0x57/0x90
->     • Nov 14 01:29:28 RudyUbuMbp kernel: bcm4377_irq+0x77/0x140 
-> [hci_bcm4377]
->     • Nov 14 01:29:28 RudyUbuMbp kernel: 
-> __handle_irq_event_percpu+0x4c/0x1b0
->     • Nov 14 01:29:28 RudyUbuMbp kernel: handle_irq_event+0x39/0x80
->     • Nov 14 01:29:28 RudyUbuMbp kernel: handle_edge_irq+0x8c/0x250
->     • Nov 14 01:29:28 RudyUbuMbp kernel: __common_interrupt+0x4f/0x110
->     • Nov 14 01:29:28 RudyUbuMbp kernel: common_interrupt+0x45/0xb0
->     • Nov 14 01:29:28 RudyUbuMbp kernel: asm_common_interrupt+0x27/0x40
->     • Nov 14 01:29:28 RudyUbuMbp kernel: RIP: 0033:0x7f17b5fd8bca
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: da9065caa594d19b26e1a030fd0cc27bd365d685  Bluetooth: Fix atomicity violation in {min,max}_key_size_set
 
-It seems that the BCM4377 chip stopped working on my MacBookAir9,1 (and 
-possibly other T2 devices with the BCM4377) after the logic in the 
-Bluetooth core was changed in this commit: 
-https://github.com/torvalds/linux/commit/6945795bc81ab7be22750ecfb365056688f2fada
+elapsed time: 2874m
 
-Due to the HCI_QUIRK_USE_BDADDR_PROPERTY being always set in 
-drivers/bluetooth/hci_bcm4377.c, the chip would be left unconfigured, as 
-per the commit mentioned prior.  On the M1 Macs, it seems that the 
-device would be configured in the devicetree.  However, that is not the 
-case on T2 Macs.  In order to circumvent this issue, a flag can be added 
-to prevent the bit from being set on the BCM4377, while setting it on 
-the other devices.  I have not submitted a patch yet, but you can view 
-and use the patch with the latest kernel source here: 
-https://github.com/MrMan314/linux-t2-patches/blob/main/9004-bcm4377-fix-bdaddr-property.patch
+configs tested: 93
+configs skipped: 0
 
-I would also like to thank kekrby (https://github.com/kekrby) for 
-helping me with the patch.
+The following configs have been built successfully.
+More configs may be tested in the coming days.
+
+tested configs:
+arc                   randconfig-001-20231224   gcc  
+arc                   randconfig-002-20231224   gcc  
+arm                   randconfig-001-20231224   gcc  
+arm                   randconfig-002-20231224   gcc  
+arm                   randconfig-003-20231224   gcc  
+arm                   randconfig-004-20231224   gcc  
+arm64                 randconfig-001-20231224   gcc  
+arm64                 randconfig-002-20231224   gcc  
+arm64                 randconfig-003-20231224   gcc  
+arm64                 randconfig-004-20231224   gcc  
+csky                  randconfig-001-20231224   gcc  
+csky                  randconfig-002-20231224   gcc  
+hexagon               randconfig-001-20231224   clang
+hexagon               randconfig-002-20231224   clang
+i386                             allmodconfig   clang
+i386                              allnoconfig   clang
+i386                             allyesconfig   clang
+i386         buildonly-randconfig-001-20231224   gcc  
+i386         buildonly-randconfig-002-20231224   gcc  
+i386         buildonly-randconfig-003-20231224   gcc  
+i386         buildonly-randconfig-004-20231224   gcc  
+i386         buildonly-randconfig-005-20231224   gcc  
+i386         buildonly-randconfig-006-20231224   gcc  
+i386                                defconfig   gcc  
+i386                  randconfig-001-20231224   gcc  
+i386                  randconfig-002-20231224   gcc  
+i386                  randconfig-003-20231224   gcc  
+i386                  randconfig-004-20231224   gcc  
+i386                  randconfig-005-20231224   gcc  
+i386                  randconfig-006-20231224   gcc  
+i386                  randconfig-011-20231224   clang
+i386                  randconfig-012-20231224   clang
+i386                  randconfig-013-20231224   clang
+i386                  randconfig-014-20231224   clang
+i386                  randconfig-015-20231224   clang
+i386                  randconfig-016-20231224   clang
+loongarch                        allmodconfig   gcc  
+loongarch             randconfig-001-20231224   gcc  
+loongarch             randconfig-002-20231224   gcc  
+m68k                             allmodconfig   gcc  
+m68k                             allyesconfig   gcc  
+microblaze                       allmodconfig   gcc  
+microblaze                       allyesconfig   gcc  
+nios2                            allyesconfig   gcc  
+nios2                 randconfig-001-20231224   gcc  
+nios2                 randconfig-002-20231224   gcc  
+parisc                randconfig-001-20231224   gcc  
+parisc                randconfig-002-20231224   gcc  
+powerpc               randconfig-001-20231224   gcc  
+powerpc               randconfig-002-20231224   gcc  
+powerpc               randconfig-003-20231224   gcc  
+powerpc64             randconfig-001-20231224   gcc  
+powerpc64             randconfig-002-20231224   gcc  
+powerpc64             randconfig-003-20231224   gcc  
+riscv                 randconfig-001-20231224   gcc  
+riscv                 randconfig-002-20231224   gcc  
+s390                             allmodconfig   gcc  
+s390                             allyesconfig   gcc  
+s390                  randconfig-001-20231224   clang
+s390                  randconfig-002-20231224   clang
+sh                               allmodconfig   gcc  
+sh                               allyesconfig   gcc  
+sh                    randconfig-001-20231224   gcc  
+sh                    randconfig-002-20231224   gcc  
+sparc                            allmodconfig   gcc  
+sparc64                          allmodconfig   gcc  
+sparc64                          allyesconfig   gcc  
+sparc64               randconfig-001-20231224   gcc  
+sparc64               randconfig-002-20231224   gcc  
+um                               allmodconfig   clang
+um                               allyesconfig   clang
+um                    randconfig-001-20231224   gcc  
+um                    randconfig-002-20231224   gcc  
+x86_64                            allnoconfig   gcc  
+x86_64                           allyesconfig   clang
+x86_64       buildonly-randconfig-001-20231224   gcc  
+x86_64       buildonly-randconfig-002-20231224   gcc  
+x86_64       buildonly-randconfig-003-20231224   gcc  
+x86_64       buildonly-randconfig-004-20231224   gcc  
+x86_64       buildonly-randconfig-005-20231224   gcc  
+x86_64       buildonly-randconfig-006-20231224   gcc  
+x86_64                              defconfig   gcc  
+x86_64                randconfig-001-20231224   clang
+x86_64                randconfig-002-20231224   clang
+x86_64                randconfig-003-20231224   clang
+x86_64                randconfig-004-20231224   clang
+x86_64                randconfig-005-20231224   clang
+x86_64                randconfig-006-20231224   clang
+x86_64                randconfig-011-20231224   gcc  
+x86_64                randconfig-012-20231224   gcc  
+x86_64                          rhel-8.3-rust   clang
+xtensa                randconfig-001-20231224   gcc  
+xtensa                randconfig-002-20231224   gcc  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
