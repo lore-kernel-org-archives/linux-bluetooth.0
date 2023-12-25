@@ -1,143 +1,85 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 543A21B26E;
-	Mon, 25 Dec 2023 20:27:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.6] (ip5f5af7b1.dynamic.kabel-deutschland.de [95.90.247.177])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id A9F2661E5FE01;
-	Mon, 25 Dec 2023 21:26:06 +0100 (CET)
-Message-ID: <b0d94116-1fa0-4c1f-8a3e-2919fd75b635@molgen.mpg.de>
-Date: Mon, 25 Dec 2023 21:26:05 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7465B5380C
+	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Dec 2023 20:37:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FVSlJ/4j"
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-67f8d9fe99fso30004116d6.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Dec 2023 12:37:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703536627; x=1704141427; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=DirA1YIfXcstUBHJ626Ibb2RK7ufIb3fCfKhViaNXfQ=;
+        b=FVSlJ/4jwxZnGbxl3E2qPR4NQUkJTbruQfugU+OpWHn/y9+obEVuTwwDMDRPFuGkG9
+         Ans93j7Mkoj1XrQWASdc04r49NUTjUBAFlznIvPx8W2PJdKe6aanOdE4WZJcDXEPUuEj
+         W+dnqQP2/eIB3SUWyEtnpIZVhlhqyZUCMGfBwBvKh7zSudziLLe9NlL4Pen9amuNudev
+         BzUtzZk4rJwAsqFBgoku7Rq3dONkDNSQqM+GfDxtIeUO65QjZIG+IwTk8vx3odua4niu
+         rBmbinuFrwudNLILNKih67NUPHA9KIS6PzIL7gAtF24C05i8shU16z8wC8Fxx47QDJRM
+         wn3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703536627; x=1704141427;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DirA1YIfXcstUBHJ626Ibb2RK7ufIb3fCfKhViaNXfQ=;
+        b=PfFw7aL8JmZwvoLSmwjdbuX9F/QU4HTU9FfKrdNb/gPeOxCJROlN1IpuXxevxCT0te
+         i/VAVSh0Up1nkc4E0OBZZoxqCEK9FyXYP8stpyp659m/xvqUEf6t7hPUe4uanxvew2BA
+         NcB+Hhq39+tkaIbxtyVLuOfS7FvWzhSG4cuytCszlBQLef2aABE40exMpnlGiz2JTX2q
+         eQlt813cfXceo/mbXPCBHsl8RP66YpAYYGKs6V7Vj4r23tJgnyAG7QdkYVlZXvOrvsKT
+         +K89BUaXT3gGOhFGGpReyUMc/2xfsbLw6axl08gYP6nzrpA8Aus3XSnmQsv2wzc6zOob
+         2WgA==
+X-Gm-Message-State: AOJu0YzRg/tr3s7UyEhhGOd3vII8S1vi5KFYWrwpXh9QVx3A2EeSmwW5
+	yiac8VFbhw7/EkWKLqgkaGO9/6vyksQ=
+X-Google-Smtp-Source: AGHT+IHCKFoG0hYz7I942MgKXtho5CNwLVwaVebQbqL7Lxf6ODRzWvIfL0L3uCYsxiTAY3GqvKaLZg==
+X-Received: by 2002:ad4:5963:0:b0:67f:5bc7:a310 with SMTP id eq3-20020ad45963000000b0067f5bc7a310mr11710488qvb.49.1703536627206;
+        Mon, 25 Dec 2023 12:37:07 -0800 (PST)
+Received: from [172.17.0.2] ([20.109.60.243])
+        by smtp.gmail.com with ESMTPSA id bo14-20020a05621414ae00b0067f9bdf31f2sm2950922qvb.86.2023.12.25.12.37.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Dec 2023 12:37:06 -0800 (PST)
+Message-ID: <6589e7f2.050a0220.c1042.7fa7@mx.google.com>
+Date: Mon, 25 Dec 2023 12:37:06 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3153979443485604890=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] Bluetooth: Fix Bluetooth for BCM4377 on T2 Intel
- MacBooks
-Content-Language: en-US
-To: Felix Zhang <mrman@mrman314.tech>
-Cc: linux-bluetooth@vger.kernel.org, stable@vger.kernel.org,
- Johan Hovold <johan+linaro@kernel.org>, marcan@marcan.st,
- bagasdotme@gmail.com, sven@svenpeter.dev, alyssa@rosenzweig.io,
- marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
- orlandoch.dev@gmail.com, kekrby@gmail.com, admin@kodeit.net, j@jannau.net,
- gargaditya08@live.com, asahi@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <77419ffacc5b4875e920e038332575a2a5bff29f.camel@mrman314.tech>
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <77419ffacc5b4875e920e038332575a2a5bff29f.camel@mrman314.tech>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, mrman@mrman314.tech
+Subject: RE: [v4] Bluetooth: Fix Bluetooth for BCM4377 on T2 Intel MacBooks
+In-Reply-To: <aaa107865f4cbd61f8f9006fd3e7ac43b5d1bdad.camel@mrman314.tech>
+References: <aaa107865f4cbd61f8f9006fd3e7ac43b5d1bdad.camel@mrman314.tech>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Dear Felix,
+--===============3153979443485604890==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
+This is an automated email and please do not reply to this email.
 
-Thank you very much for the patch. I am adding Johan to Cc field.
+Dear Submitter,
 
-Am 25.12.23 um 21:01 schrieb Felix Zhang:
-> Starting v6.5, Bluetooth does not work at all on my T2 MacBookAir9,1
-> 
-> with the BCM4377 chip.  When I boot up the computer, go into
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-Somehow a blank line snug in above.
+----- Output -----
 
-> bluetoothctl, and then try to run commands like scan on, show, list,
-> it returns "No default controller available."  I have tried reloading
-> the
+error: patch fragment without header at line 10: @@ -2465,6 +2467,7 @@ static const struct bcm4377_hw
+hint: Use 'git am --show-current-patch' to see the failed patch
 
-It’d be great if you reflowed for 75 characters per line (also below).
-
-> kernel module, in which the log outputs "{Added,Removed} hci0
-> (unconfigured)."  With this patch, I am able to use Bluetooth as
-> normal
-> without any errors regarding hci0 being unconfigured.  However, an
-> issue is still present where sometimes hci_bcm4377 will have to be
-> reloaded in order to get bluetooth to work.  I believe this was still
-> present before the previously mentioned commit.
-> 
-> Due to the bit HCI_QUIRK_USE_BDADDR_PROPERTY being always set in
-> drivers/bluetooth/hci_bcm4377.c (line 2371), the chip would be left
-> unconfigured on kernels compiled after commit 6945795bc81a
-> ("Bluetooth:
-> fix use-bdaddr-property quirk") due to a change in its logic.  On the
-> M1 Macs, the device would be configured in the devicetree.  However,
-> that is not the case on T2 Macs.  Because the bluetooth adapter is
-> left
-> unconfigured, it is not usable in the operating system.  In order to
-> circumvent this issue, a flag is added to prevent the bit from being
-> set on the BCM4377, while setting it on the other devices.
-> 
-> Because I do not have an M1 device to test this patch on, I am not sure
-> whether the patch breaks anything for said devices.  I would be very
-> grateful if anyone is willing to test this patch on their M1 device.
-> 
-> I would also like to thank Kerem Karabay <kekrby@gmail.com> for
-> assisting me with this patch.
-> 
-> Fixes: 6945795bc81a ("Bluetooth: fix use-bdaddr-property quirk")
-> Signed-off-by: Felix Zhang <mrman@mrman314.tech>
-> ---
-> v3:
-> * Adjust the format to pass the CI (again).
-> ---
->   drivers/bluetooth/hci_bcm4377.c | 6 +++++-
->   1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/bluetooth/hci_bcm4377.c
-> b/drivers/bluetooth/hci_bcm4377.c
-> index a61757835695..5c6fef1aa0f6 100644
-> --- a/drivers/bluetooth/hci_bcm4377.c
-> +++ b/drivers/bluetooth/hci_bcm4377.c
-> @@ -513,6 +513,7 @@ struct bcm4377_hw {
->   	unsigned long broken_ext_scan : 1;
->   	unsigned long broken_mws_transport_config : 1;
->   	unsigned long broken_le_coded : 1;
-> +	unsigned long use_bdaddr_property : 1;
->   
->   	int (*send_calibration)(struct bcm4377_data *bcm4377);
->   	int (*send_ptb)(struct bcm4377_data *bcm4377,
-> @@ -2368,7 +2369,8 @@ static int bcm4377_probe(struct pci_dev *pdev,
-> const struct pci_device_id *id)
->   	hdev->set_bdaddr = bcm4377_hci_set_bdaddr;
->   	hdev->setup = bcm4377_hci_setup;
->   
-> -	set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
-> +	if (bcm4377->hw->use_bdaddr_property)
-> +		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
->   	if (bcm4377->hw->broken_mws_transport_config)
->   		set_bit(HCI_QUIRK_BROKEN_MWS_TRANSPORT_CONFIG, &hdev-
->> quirks);
->   	if (bcm4377->hw->broken_ext_scan)
-> @@ -2465,6 +2467,7 @@ static const struct bcm4377_hw
-> bcm4377_hw_variants[] = {
->   		.has_bar0_core2_window2 = true,
->   		.broken_mws_transport_config = true,
->   		.broken_le_coded = true,
-> +		.use_bdaddr_property = true,
->   		.send_calibration = bcm4378_send_calibration,
->   		.send_ptb = bcm4378_send_ptb,
->   	},
-> @@ -2479,6 +2482,7 @@ static const struct bcm4377_hw
-> bcm4377_hw_variants[] = {
->   		.clear_pciecfg_subsystem_ctrl_bit19 = true,
->   		.broken_mws_transport_config = true,
->   		.broken_le_coded = true,
-> +		.use_bdaddr_property = true,
->   		.send_calibration = bcm4387_send_calibration,
->   		.send_ptb = bcm4378_send_ptb,
->   	},
-
-The diff looks good, and it works for you.
+Please resolve the issue and submit the patches again.
 
 
-Kind regards,
+---
+Regards,
+Linux Bluetooth
 
-Paul
+
+--===============3153979443485604890==--
