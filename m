@@ -1,85 +1,112 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.mrman314.tech (unknown [135.0.77.242])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4F0A537FD
-	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Dec 2023 20:12:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 906E052F93;
+	Mon, 25 Dec 2023 20:21:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mrman314.tech
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mrman314.tech
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Madnk2ML"
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-28bf27be6c4so1306998a91.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Dec 2023 12:12:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703535178; x=1704139978; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Uvuj14nj7DC1LuVQWk1CZPahpERwP2wc6z84szm3TCw=;
-        b=Madnk2MLrBRrpzTSUULXwqLsnyHFKGdp3gFd8mjhWn98WoELEyrjWefPGZsahvhHkx
-         CMjJgiHxMxV6Iyzn7CVIj0tJM+r3JxhhULUeKsfr9j9y4+/xzum+/qpmx3DLa26EnWzb
-         wYZg0Lbs/yNWzz2xX8Eq870FDlM1dptXI8wMUrPH/CzPsArWfORpQfNwXNHIpH8jfruV
-         5uYbKqJ/jS+0jno4ZGmo19pLd32MaDeNzaY2u7KsUTODsyuSVITptEl0Y6/BNk7HwM8a
-         BT9XZc1FUHO5DUyCpuo/6zFhUBp3kNbpWckFQnA4N4XpvJL07MNRMSTovUxSUQEvXNmp
-         Kc6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703535178; x=1704139978;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Uvuj14nj7DC1LuVQWk1CZPahpERwP2wc6z84szm3TCw=;
-        b=be4QHJkXrT9itUbQ5BryLlqgss99i2TwTz9km7UuPcZqML8CpBVWCsUqTb6F/dFUVe
-         EIIoVGpI1tulrHGf3rdJq1Tk+eWbkaKth5WJr8/9s8aCSv8j6OIFgMBVh4uVYDNtm/K2
-         ukqIsa//1x32VzyC+sT0RrOXxkuzX3o+AX4tXFDeuoUNe0TiEHAtG7N9XpnBQPunG7Wh
-         /bRGU4o3NYgU5ZvSzD/zYuvWIURtaDATt9fnKT+lV6yNYfuGTKY8HcXLHX8F74hcxb+L
-         p8TtGNACGbjLmkCPJWaMQx1BhffAQmB7WZcbUFdzNzLlaiC3pCr5hJ+Nadg6ATpOPwc5
-         SYwQ==
-X-Gm-Message-State: AOJu0YxNJlTfKf5mvKAuJys8XyjD8MnO1yvClXt0LdgoDIVOC5u5LukI
-	LTH//mGyrQ72Gjm3bMTkJ1NDWzzRLE8=
-X-Google-Smtp-Source: AGHT+IGJx17LqwE60DmBd3sAED7z3F6aymnIUMXh5J+bKuULm8s5SmYQE1VHX9ocooaKh9iVDAasBQ==
-X-Received: by 2002:a17:90a:dc03:b0:28b:e576:3aae with SMTP id i3-20020a17090adc0300b0028be5763aaemr1801939pjv.45.1703535178460;
-        Mon, 25 Dec 2023 12:12:58 -0800 (PST)
-Received: from [172.17.0.2] ([52.238.27.195])
-        by smtp.gmail.com with ESMTPSA id 28-20020a17090a1a1c00b0028b3539cd97sm12279671pjk.20.2023.12.25.12.12.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Dec 2023 12:12:58 -0800 (PST)
-Message-ID: <6589e24a.170a0220.e9e91.1e58@mx.google.com>
-Date: Mon, 25 Dec 2023 12:12:58 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8559601745295245564=="
+	dkim=pass (1024-bit key) header.d=mrman314.tech header.i=@mrman314.tech header.b="LM/63485"
+Received: from [192.168.6.27] (unknown [160.32.192.137])
+	by mx.mrman314.tech (Postfix) with ESMTPSA id BCBCB2F491D8;
+	Mon, 25 Dec 2023 15:21:04 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=mrman314.tech;
+	s=default; t=1703535665;
+	bh=yauFSrZ35qZveVfrCHmJZPgq1pMyNFwrF76x3pw4ntY=;
+	h=Subject:From:To:Cc:Date;
+	b=LM/63485/ppUMvKkHXbaHXSgTFr9quhNmfd7vHAbg4xOme4Wh9TcLwcmgDbvTf4GX
+	 wQEcfarwbaVXxnkLSJSY9yUMd2ES+sq9TPhsR4nDVi2LJAdqv1v1t0yz9JRRF+voBT
+	 koRTiG+gA2kzJNVOFMLkbMge70mVv5s+si8NPtwU=
+Message-ID: <aaa107865f4cbd61f8f9006fd3e7ac43b5d1bdad.camel@mrman314.tech>
+Subject: [PATCH v4] Bluetooth: Fix Bluetooth for BCM4377 on T2 Intel MacBooks
+From: Felix Zhang <mrman@mrman314.tech>
+To: linux-bluetooth@vger.kernel.org
+Cc: stable@vger.kernel.org, marcan@marcan.st, bagasdotme@gmail.com, 
+	sven@svenpeter.dev, alyssa@rosenzweig.io, marcel@holtmann.org, 
+	johan.hedberg@gmail.com, luiz.dentz@gmail.com, orlandoch.dev@gmail.com, 
+	kekrby@gmail.com, admin@kodeit.net, j@jannau.net, gargaditya08@live.com, 
+	asahi@lists.linux.dev, linux-kernel@vger.kernel.org
+Date: Mon, 25 Dec 2023 15:21:04 -0500
+Autocrypt: addr=mrman@mrman314.tech; prefer-encrypt=mutual;
+ keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.2 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, mrman@mrman314.tech
-Subject: RE: [v3] Bluetooth: Fix Bluetooth for BCM4377 on T2 Intel MacBooks
-In-Reply-To: <77419ffacc5b4875e920e038332575a2a5bff29f.camel@mrman314.tech>
-References: <77419ffacc5b4875e920e038332575a2a5bff29f.camel@mrman314.tech>
-Reply-To: linux-bluetooth@vger.kernel.org
 
---===============8559601745295245564==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Starting v6.5, Bluetooth does not work at all on my T2
+MacBookAir9,1 with the BCM4377 chip.=C2=A0 When I boot up the computer,
+go into bluetoothctl, and then try to run commands like scan on,
+show, list, it=C2=A0returns "No default controller available."=C2=A0 I have
+tried reloading the kernel module, in which the log outputs
+"{Added,Removed} hci0 (unconfigured)."=C2=A0 With this patch, I
+am able to use Bluetooth as normal without any errors regarding
+hci0 being unconfigured.=C2=A0 However, an issue is still present
+where sometimes hci_bcm4377 will have to be reloaded in order to
+get bluetooth to work.=C2=A0 I believe this was still present before
+the previously mentioned commit.
 
-This is an automated email and please do not reply to this email.
+I would also like to thank Kerem Karabay <kekrby@gmail.com> for
+assisting me with this patch.
 
-Dear Submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-
-error: patch fragment without header at line 10: @@ -2465,6 +2467,7 @@ static const struct bcm4377_hw
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
+Fixes: 6945795bc81a ("Bluetooth: fix use-bdaddr-property quirk")
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Felix Zhang <mrman@mrman314.tech>
 ---
-Regards,
-Linux Bluetooth
+v4:
+* Adjust the format to pass the CI (again).
+* Shorten description
+---
+=C2=A0drivers/bluetooth/hci_bcm4377.c | 6 +++++-
+=C2=A01 file changed, 5 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/bluetooth/hci_bcm4377.c
+b/drivers/bluetooth/hci_bcm4377.c
+index a61757835695..5c6fef1aa0f6 100644
+--- a/drivers/bluetooth/hci_bcm4377.c
++++ b/drivers/bluetooth/hci_bcm4377.c
+@@ -513,6 +513,7 @@ struct bcm4377_hw {
+=C2=A0	unsigned long broken_ext_scan : 1;
+=C2=A0	unsigned long broken_mws_transport_config : 1;
+=C2=A0	unsigned long broken_le_coded : 1;
++	unsigned long use_bdaddr_property : 1;
+=C2=A0
+=C2=A0	int (*send_calibration)(struct bcm4377_data *bcm4377);
+=C2=A0	int (*send_ptb)(struct bcm4377_data *bcm4377,
+@@ -2368,5 +2369,6 @@ static int bcm4377_probe(struct pci_dev *pdev,
+const struct pci_device_id *id)
+=C2=A0	hdev->set_bdaddr =3D bcm4377_hci_set_bdaddr;
+=C2=A0	hdev->setup =3D bcm4377_hci_setup;
+=C2=A0
+-	set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
++	if (bcm4377->hw->use_bdaddr_property)
++		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
+=C2=A0	if (bcm4377->hw->broken_mws_transport_config)
+@@ -2465,6 +2467,7 @@ static const struct bcm4377_hw
+bcm4377_hw_variants[] =3D {
+=C2=A0		.has_bar0_core2_window2 =3D true,
+=C2=A0		.broken_mws_transport_config =3D true,
+=C2=A0		.broken_le_coded =3D true,
++		.use_bdaddr_property =3D true,
+=C2=A0		.send_calibration =3D bcm4378_send_calibration,
+=C2=A0		.send_ptb =3D bcm4378_send_ptb,
+=C2=A0	},
+@@ -2479,6 +2482,7 @@ static const struct bcm4377_hw
+bcm4377_hw_variants[] =3D {
+=C2=A0		.clear_pciecfg_subsystem_ctrl_bit19 =3D true,
+=C2=A0		.broken_mws_transport_config =3D true,
+=C2=A0		.broken_le_coded =3D true,
++		.use_bdaddr_property =3D true,
+=C2=A0		.send_calibration =3D bcm4387_send_calibration,
+=C2=A0		.send_ptb =3D bcm4378_send_ptb,
+=C2=A0	},
+--=20
+2.43.0
 
---===============8559601745295245564==--
