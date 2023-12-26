@@ -1,113 +1,199 @@
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C225DF54
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Dec 2023 02:42:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF63C2C86E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Dec 2023 03:33:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vrv0raoc"
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-78132affa95so186801185a.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Dec 2023 18:42:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703558524; x=1704163324; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=TNWLFyrd6RwibBSkvzllU0i/M4y2iMmoY5TModtQnyw=;
-        b=Vrv0raoc8PXhZ5jtHhiBecUimQvqmW9zZwIOSQt2aSqAhci15hyp+smCj+h17qqnAM
-         tLogpy+em9yVIuHk5qSYjBjZwMI/SALWPpzQOHRkGm9s0oLJYDk5Nrs+uPz/L9zfB3db
-         Pk6g2iJwhzzoz6MzKpjtUi7/pYFwTx60xcfB+Uh+c79prTc6C9R3Iy8inKiLexg+AePD
-         kGe6Q6LNryzK3CIh+IaDPpPP8nS0JjphLyKA8pO0B+/BG6o935cBvqcCsJoNmNK23QPI
-         223khAnHtwuQm5h6YL2JxMfZrBoPrGj1j1UQAimsiXKR2OuEaBuRyu8poUGg4vvxELEu
-         acew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703558524; x=1704163324;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TNWLFyrd6RwibBSkvzllU0i/M4y2iMmoY5TModtQnyw=;
-        b=QgolIDiFjVi0OHAMr4NPoogidFEfmMAi15R4PYXAImh3cE7IIbnjgs6pBsGnbNpHnM
-         28WDHnpslJaGoyd2whR9zr6XfQV+NNOFGFjXcyuIqiLNTfntJj0vXtc2Y8HmkR8W2ZST
-         IkSeWxG+LFTcX5bqjb698EKtLMxceK1DhUaiHwlFEoYL8w0k0N/QLFv0LhjlkD9Kn/0p
-         SPpX+PXPRXuHAvR/pcan66f/D5yD81hRQ3yNPWrxWwu2pPcVnl+hc8XTDGNDljaS5Kyf
-         LKl+yMJbywb5SnzNlQyNPhwDxW69bADpx+ysK/GoR+3pilYt17ov2gnSZPZJeTK5bDld
-         t/eQ==
-X-Gm-Message-State: AOJu0Ywd+SiAplFy6AUVHYZvAdJvbskkewUT0O10CXczmNwv/Ls7BW+m
-	8j6U/FBULQ1qNMKwVB2cySSt0vjo52E=
-X-Google-Smtp-Source: AGHT+IFTf0GWbFhy3m5uaBM4t3oh5hMFju1P0n4rCZyXVyfS/8oOI9vzxxH6lNw51AV2H8k43cdHjA==
-X-Received: by 2002:a05:620a:a99:b0:781:17de:80d with SMTP id v25-20020a05620a0a9900b0078117de080dmr6726217qkg.80.1703558524278;
-        Mon, 25 Dec 2023 18:42:04 -0800 (PST)
-Received: from [172.17.0.2] ([74.249.6.16])
-        by smtp.gmail.com with ESMTPSA id bl15-20020a05622a244f00b004255fd32eeasm4904655qtb.7.2023.12.25.18.42.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Dec 2023 18:42:04 -0800 (PST)
-Message-ID: <658a3d7c.050a0220.ccba2.ee96@mx.google.com>
-Date: Mon, 25 Dec 2023 18:42:04 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7071866373105472283=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WPZ9FBKu"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7CF1AC433C7
+	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Dec 2023 03:33:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703561598;
+	bh=Ht46TEEoIEOuuz6wCeRE0bQh/sdDpzSIF2MJZLo9pF0=;
+	h=From:To:Subject:Date:From;
+	b=WPZ9FBKuuFTRMbkBc9uh6MbQuWiHSmypwJkAavoJ8/EE+tzr2fRmZYAffS89TDhx7
+	 qAZr2Aosjixok/kvVTbAm+Ciq3IgiZgU9rOLtDtYpHXvXKoNBSjG1HoldiuI4UU4le
+	 nd1F7tJM/KW2cKNrX4ChsZXbhSQZacgVrOjgwR7npgH33kF994QIMKG0dn+WaLI0qC
+	 85e05nPMcGji6fVNLFxCzjV/enNzWPVflPXEHj80AH5wDRtEF5fNuye8maDSa59RxR
+	 Ceg6rxA2HN7Wg4V+O0uuXI81Q6l1prC3HdzjG1ieLR9GpDG8bQh48n6BFaAvOVrt5m
+	 7YtlFAn9EeSFg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 5DCFDC4332E; Tue, 26 Dec 2023 03:33:18 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 218323] New: KASAN: null-ptr-deref in rfcomm_check_security in
+ Kernel 6.7-rc2
+Date: Tue, 26 Dec 2023 03:33:18 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: 20373622@buaa.edu.cn
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression attachments.created
+Message-ID: <bug-218323-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, max.chou@realtek.com
-Subject: RE: Bluetooth: btrtl: Add the support for RTL8852BT/RTL8852BE-VT
-In-Reply-To: <20231226015713.13673-1-max.chou@realtek.com>
-References: <20231226015713.13673-1-max.chou@realtek.com>
-Reply-To: linux-bluetooth@vger.kernel.org
 
---===============7071866373105472283==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218323
 
-This is automated email and please do not reply to this email!
+            Bug ID: 218323
+           Summary: KASAN: null-ptr-deref in rfcomm_check_security in
+                    Kernel 6.7-rc2
+           Product: Drivers
+           Version: 2.5
+          Hardware: All
+                OS: Linux
+            Status: NEW
+          Severity: high
+          Priority: P3
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: 20373622@buaa.edu.cn
+        Regression: No
 
-Dear submitter,
+Created attachment 305656
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D305656&action=3Dedit
+terminal log
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=812846
+Hello All,
 
----Test result---
+Our fuzzing tool find a null-ptr-deref in rfcomm_check_security in Linux
+6.7-rc2.
 
-Test Summary:
-CheckPatch                    PASS      0.61 seconds
-GitLint                       PASS      0.30 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      27.43 seconds
-CheckAllWarning               PASS      30.16 seconds
-CheckSparse                   PASS      35.62 seconds
-CheckSmatch                   PASS      98.11 seconds
-BuildKernel32                 PASS      26.74 seconds
-TestRunnerSetup               PASS      428.83 seconds
-TestRunner_l2cap-tester       PASS      22.68 seconds
-TestRunner_iso-tester         PASS      47.01 seconds
-TestRunner_bnep-tester        PASS      6.89 seconds
-TestRunner_mgmt-tester        FAIL      162.68 seconds
-TestRunner_rfcomm-tester      PASS      10.62 seconds
-TestRunner_sco-tester         PASS      14.45 seconds
-TestRunner_ioctl-tester       PASS      11.93 seconds
-TestRunner_mesh-tester        PASS      8.58 seconds
-TestRunner_smp-tester         PASS      9.56 seconds
-TestRunner_userchan-tester    PASS      7.14 seconds
-IncrementalBuild              PASS      25.84 seconds
+During our fuzz testing of the connection and disconnection process at the
+RFCOMM layer, we discovered this bug. By comparing the packets from a normal
+connection and disconnection process with the testcase that triggered a KAS=
+AN
+report, we analyzed the cause of this bug as follows:
 
-Details
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 497, Passed: 495 (99.6%), Failed: 1, Not Run: 1
+1. In the packets captured during a normal connection, the host sends a `Re=
+ad
+Encryption Key Size` type of `HCI_CMD` packet (Command Opcode: 0x1408) to t=
+he
+controller to inquire the length of encryption key. After receiving this
+packet, the controller immediately replies with a Command Complete packet
+(Event Code: 0x0e) to return the Encryption Key Size. (See Attachment 2)
 
-Failed Test Cases
-LL Privacy - Start Discovery 2 (Disable RL)          Failed       0.284 seconds
+2. In our fuzz test case, the timing of the controller's response to this
+packet was delayed to an unexpected point: after the RFCOMM and L2CAP layers
+had disconnected but before the HCI layer had disconnected. (See Attachment=
+ 3)
+
+3. After receiving the Encryption Key Size Response at the time described in
+point 2, the host still called the rfcomm_check_security function. However,=
+ by
+this time `struct l2cap_conn *conn =3D l2cap_pi(sk)->chan->conn;` had alrea=
+dy
+been released, and when the function executed `return
+hci_conn_security(conn->hcon, d->sec_level, auth_type, d->out);`, specifica=
+lly
+when accessing `conn->hcon`, a null-ptr-deref error occurred.
+
+Attachment 1(vm.log) is the complete terminal log when this bug was trigger=
+ed,
+including the KASAN report and the HCI layer packets. The HCI packets excha=
+nged
+between host and controller were printed by the HCI driver. For example:
+[H->D:CMD] indicates an HCI_CMD packet sent from the host to the controller.
+
+This bug can be reproduced with a relatively high level of consistency. We
+conducted 10 tests using the same sequence of packets, and out of those, the
+bug triggered the KASAN report 7 times.
+
+Here is the KASAN report:
+
+general protection fault, probably for non-canonical address
+0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN PTI
+KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+CPU: 0 PID: 539 Comm: krfcommd Tainted: G           O       6.7.0-rc2 #1
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1=
+.1
+04/01/2014
+RIP: 0010:rfcomm_check_security+0x142/0x230 [rfcomm]
+Code: 00 00 48 89 e8 48 c1 e8 03 42 8a 1c 20 84 db 0f 85 9a 00 00 00 bf ea =
+04
+20 50 e8 c9 3c d9 ff 44 8a 6d 00 4c 89 f8 48 c1 e8 03 <42> 80 3c 20 00 74 1=
+2 bf
+1b 2f 83 28 e8 ad 3c d9 ff 4c 89 ff e8 f5
+RSP: 0018:ffff88800b797c20 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: ffff88800559f000 RCX: 00000000c0249000
+RDX: dffffc0000000000 RSI: 0000000000000246 RDI: ffffffffc0249000
+RBP: ffff8880072f9893 R08: ffff88800b797b73 R09: 1ffff110016f2f6e
+R10: dffffc0000000000 R11: ffffed10016f2f6f R12: dffffc0000000000
+R13: ffff8880072f9801 R14: ffff8880072f9800 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff88806d200000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fd235665000 CR3: 0000000004784000 CR4: 00000000000006f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ ? __die_body+0x62/0xb0=20
+ ? die_addr+0xbe/0xf0=20
+ ? exc_general_protection+0x2a7/0x3c0
+ ? asm_exc_general_protection+0x22/0x30
+ ? rfcomm_check_security+0x142/0x230 [rfcomm]
+ rfcomm_process_connect+0x1ad/0x280 [rfcomm]
+ rfcomm_process_rx+0x1064/0x1b80 [rfcomm]
+ ? __mfuzz_coverage__+0x16/0x140 [mfuzz_monitor]
+ rfcomm_process_sessions+0x758/0x1d20 [rfcomm]
+ ? _raw_spin_lock_irqsave+0x8d/0x130
+ ? __mfuzz_coverage__+0x16/0x140 [mfuzz_monitor]
+ rfcomm_run+0x49f/0x6d0 [rfcomm]
+ ? wait_woken+0xf0/0xf0
+ ? skb_tail_pointer+0xc0/0xc0 [rfcomm]
+ kthread+0x275/0x300
+ ? skb_tail_pointer+0xc0/0xc0 [rfcomm]
+ ? kthread_blkcg+0xa0/0xa0
+ ret_from_fork+0x30/0x60
+ ? kthread_blkcg+0xa0/0xa0
+ ret_from_fork_asm+0x11/0x20
+ </TASK>
+Modules linked in: btvirt(O) rfcomm(O) bnep(O) btintel bluetooth(O)
+mfuzz_monitor(O) ecdh_generic ecc [last unloaded: btvirt(O)]
+---[ end trace 0000000000000000 ]---
+RIP: 0010:rfcomm_check_security+0x142/0x230 [rfcomm]
+Code: 00 00 48 89 e8 48 c1 e8 03 42 8a 1c 20 84 db 0f 85 9a 00 00 00 bf ea =
+04
+20 50 e8 c9 3c d9 ff 44 8a 6d 00 4c 89 f8 48 c1 e8 03 <42> 80 3c 20 00 74 1=
+2 bf
+1b 2f 83 28 e8 ad 3c d9 ff 4c 89 ff e8 f5
+RSP: 0018:ffff88800b797c20 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: ffff88800559f000 RCX: 00000000c0249000
+RDX: dffffc0000000000 RSI: 0000000000000246 RDI: ffffffffc0249000
+RBP: ffff8880072f9893 R08: ffff88800b797b73 R09: 1ffff110016f2f6e
+R10: dffffc0000000000 R11: ffffed10016f2f6f R12: dffffc0000000000
+R13: ffff8880072f9801 R14: ffff8880072f9800 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff88806d200000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fd235665000 CR3: 0000000004784000 CR4: 00000000000006f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 
 
----
-Regards,
-Linux Bluetooth
+Any feedback would be appreciated, thanks!
 
+--=20
+You may reply to this email to add a comment.
 
---===============7071866373105472283==--
+You are receiving this mail because:
+You are the assignee for the bug.=
