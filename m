@@ -1,85 +1,147 @@
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7465B5380C
-	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Dec 2023 20:37:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FVSlJ/4j"
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-67f8d9fe99fso30004116d6.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Dec 2023 12:37:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703536627; x=1704141427; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=DirA1YIfXcstUBHJ626Ibb2RK7ufIb3fCfKhViaNXfQ=;
-        b=FVSlJ/4jwxZnGbxl3E2qPR4NQUkJTbruQfugU+OpWHn/y9+obEVuTwwDMDRPFuGkG9
-         Ans93j7Mkoj1XrQWASdc04r49NUTjUBAFlznIvPx8W2PJdKe6aanOdE4WZJcDXEPUuEj
-         W+dnqQP2/eIB3SUWyEtnpIZVhlhqyZUCMGfBwBvKh7zSudziLLe9NlL4Pen9amuNudev
-         BzUtzZk4rJwAsqFBgoku7Rq3dONkDNSQqM+GfDxtIeUO65QjZIG+IwTk8vx3odua4niu
-         rBmbinuFrwudNLILNKih67NUPHA9KIS6PzIL7gAtF24C05i8shU16z8wC8Fxx47QDJRM
-         wn3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703536627; x=1704141427;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DirA1YIfXcstUBHJ626Ibb2RK7ufIb3fCfKhViaNXfQ=;
-        b=PfFw7aL8JmZwvoLSmwjdbuX9F/QU4HTU9FfKrdNb/gPeOxCJROlN1IpuXxevxCT0te
-         i/VAVSh0Up1nkc4E0OBZZoxqCEK9FyXYP8stpyp659m/xvqUEf6t7hPUe4uanxvew2BA
-         NcB+Hhq39+tkaIbxtyVLuOfS7FvWzhSG4cuytCszlBQLef2aABE40exMpnlGiz2JTX2q
-         eQlt813cfXceo/mbXPCBHsl8RP66YpAYYGKs6V7Vj4r23tJgnyAG7QdkYVlZXvOrvsKT
-         +K89BUaXT3gGOhFGGpReyUMc/2xfsbLw6axl08gYP6nzrpA8Aus3XSnmQsv2wzc6zOob
-         2WgA==
-X-Gm-Message-State: AOJu0YzRg/tr3s7UyEhhGOd3vII8S1vi5KFYWrwpXh9QVx3A2EeSmwW5
-	yiac8VFbhw7/EkWKLqgkaGO9/6vyksQ=
-X-Google-Smtp-Source: AGHT+IHCKFoG0hYz7I942MgKXtho5CNwLVwaVebQbqL7Lxf6ODRzWvIfL0L3uCYsxiTAY3GqvKaLZg==
-X-Received: by 2002:ad4:5963:0:b0:67f:5bc7:a310 with SMTP id eq3-20020ad45963000000b0067f5bc7a310mr11710488qvb.49.1703536627206;
-        Mon, 25 Dec 2023 12:37:07 -0800 (PST)
-Received: from [172.17.0.2] ([20.109.60.243])
-        by smtp.gmail.com with ESMTPSA id bo14-20020a05621414ae00b0067f9bdf31f2sm2950922qvb.86.2023.12.25.12.37.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Dec 2023 12:37:06 -0800 (PST)
-Message-ID: <6589e7f2.050a0220.c1042.7fa7@mx.google.com>
-Date: Mon, 25 Dec 2023 12:37:06 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============3153979443485604890=="
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B675EA28;
+	Tue, 26 Dec 2023 01:57:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 3BQ1vKRH1144807, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 3BQ1vKRH1144807
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 26 Dec 2023 09:57:21 +0800
+Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.32; Tue, 26 Dec 2023 09:57:20 +0800
+Received: from localhost.localhost (172.21.132.123) by
+ RTEXMBS03.realtek.com.tw (172.21.6.96) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 26 Dec 2023 09:57:19 +0800
+From: <max.chou@realtek.com>
+To: <marcel@holtmann.org>
+CC: <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
+        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <alex_lu@realsil.com.cn>, <hildawu@realtek.com>,
+        <karenhsu@realtek.com>, <max.chou@realtek.com>
+Subject: [PATCH] Bluetooth: btrtl: Add the support for RTL8852BT/RTL8852BE-VT
+Date: Tue, 26 Dec 2023 09:57:13 +0800
+Message-ID: <20231226015713.13673-1-max.chou@realtek.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, mrman@mrman314.tech
-Subject: RE: [v4] Bluetooth: Fix Bluetooth for BCM4377 on T2 Intel MacBooks
-In-Reply-To: <aaa107865f4cbd61f8f9006fd3e7ac43b5d1bdad.camel@mrman314.tech>
-References: <aaa107865f4cbd61f8f9006fd3e7ac43b5d1bdad.camel@mrman314.tech>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
+ RTEXMBS03.realtek.com.tw (172.21.6.96)
+X-KSE-ServerInfo: RTEXMBS03.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
---===============3153979443485604890==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Max Chou <max.chou@realtek.com>
 
-This is an automated email and please do not reply to this email.
+Add the support for RTL8852BT/RTL8852BE-VT BT controller on USB interface.
+The necessary firmware will be submitted to linux-firmware project.
 
-Dear Submitter,
+The device info from /sys/kernel/debug/usb/devices as below.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+T:  Bus=02 Lev=02 Prnt=02 Port=05 Cnt=01 Dev#=  8 Spd=12   MxCh= 0
+D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0bda ProdID=8520 Rev= 0.00
+S:  Manufacturer=Realtek
+S:  Product=Bluetooth Radio
+S:  SerialNumber=00e04c000001
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 
------ Output -----
-
-error: patch fragment without header at line 10: @@ -2465,6 +2467,7 @@ static const struct bcm4377_hw
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
+Signed-off-by: Max Chou <max.chou@realtek.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btrtl.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index 277d039ecbb4..cc50de69e8dc 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -69,6 +69,7 @@ enum btrtl_chip_id {
+ 	CHIP_ID_8852B = 20,
+ 	CHIP_ID_8852C = 25,
+ 	CHIP_ID_8851B = 36,
++	CHIP_ID_8852BT = 47,
+ };
+ 
+ struct id_table {
+@@ -307,6 +308,15 @@ static const struct id_table ic_id_table[] = {
+ 	  .fw_name  = "rtl_bt/rtl8851bu_fw",
+ 	  .cfg_name = "rtl_bt/rtl8851bu_config",
+ 	  .hw_info  = "rtl8851bu" },
++
++	/* 8852BT/8852BE-VT */
++	{ IC_INFO(RTL_ROM_LMP_8852A, 0x87, 0xc, HCI_USB),
++	  .config_needed = false,
++	  .has_rom_version = true,
++	  .has_msft_ext = true,
++	  .fw_name  = "rtl_bt/rtl8852btu_fw",
++	  .cfg_name = "rtl_bt/rtl8852btu_config",
++	  .hw_info  = "rtl8852btu" },
+ 	};
+ 
+ static const struct id_table *btrtl_match_ic(u16 lmp_subver, u16 hci_rev,
+@@ -645,6 +655,7 @@ static int rtlbt_parse_firmware(struct hci_dev *hdev,
+ 		{ RTL_ROM_LMP_8852A, 20 },	/* 8852B */
+ 		{ RTL_ROM_LMP_8852A, 25 },	/* 8852C */
+ 		{ RTL_ROM_LMP_8851B, 36 },	/* 8851B */
++		{ RTL_ROM_LMP_8852A, 47 },	/* 8852BT */
+ 	};
+ 
+ 	if (btrtl_dev->fw_len <= 8)
+@@ -1275,6 +1286,7 @@ void btrtl_set_quirks(struct hci_dev *hdev, struct btrtl_device_info *btrtl_dev)
+ 	case CHIP_ID_8852B:
+ 	case CHIP_ID_8852C:
+ 	case CHIP_ID_8851B:
++	case CHIP_ID_8852BT:
+ 		set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
+ 		set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
+ 
+@@ -1505,6 +1517,8 @@ MODULE_FIRMWARE("rtl_bt/rtl8852bs_fw.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8852bs_config.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8852bu_fw.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8852bu_config.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8852btu_fw.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8852btu_config.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8852cu_fw.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8852cu_fw_v2.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8852cu_config.bin");
+-- 
+2.25.1
 
---===============3153979443485604890==--
