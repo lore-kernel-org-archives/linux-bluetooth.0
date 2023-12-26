@@ -1,71 +1,70 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D0E2C851
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Dec 2023 03:57:56 +0000 (UTC)
+Received: from m15.mail.163.com (m15.mail.163.com [45.254.50.220])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 580E84BA80;
+	Tue, 26 Dec 2023 06:08:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KQH3Jogp"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E1610C433CA
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Dec 2023 03:57:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703563075;
-	bh=2CvOktXqdJkIBQVf95QAiEq16aWFGdF/Dz/Wg9uObXY=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=KQH3JogpDVStMEPVnv8VhtdxPoaas52MvqZXM7GIBqqlCWkpBZes5qP14o6D3eDKo
-	 vKvyfGLjQmR4oiC+OfJnUxx5F/yHnNVACpOeI7rCxwTMBX1/JfmX65Edt6ENceGKqg
-	 6mFpEl1d8q3pKgiELXfQLyjcF63GJdCAam8HixQynG/bVZMl+YIM6gCKcYXXlTuwGo
-	 RucKvCVI5Q87mSxIN+tWmDI2WhYWJTlCQXe8Em0+hC/W6vI71KONnqIpOZ1T/3i09i
-	 wHi9ppZjWcsxBWyyBuMWD36J3R93rBKnH0IHQ/YP0gAbHQeXgzQ9AdIX7lFj+JFpbP
-	 X3/lkP+8LjYGg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id C47FDC53BC6; Tue, 26 Dec 2023 03:57:55 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 218323] KASAN: null-ptr-deref in rfcomm_check_security in
- Kernel 6.7-rc2
-Date: Tue, 26 Dec 2023 03:57:55 +0000
-X-Bugzilla-Reason: CC AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: 20373622@buaa.edu.cn
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-218323-62941-s9CcIJJWrs@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218323-62941@https.bugzilla.kernel.org/>
-References: <bug-218323-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="ODUQi5Br"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=chNQa
+	qyjmqQSTbtOWxsw9RHKFvBwS7P46pvgdz+FY1w=; b=ODUQi5BresLvK49W10rFw
+	aNe4hGmb6fNeneTVS8PDTKK1piRdY99Y4TR2LJELnRMVcxQzhrpryax+OD+tvA6h
+	SESO93eeTlOJiUV/9mzUGCrIVTVk7GtAIC4lpCvjTNSMN/AwHuPimZbDLo8EV2d2
+	inTfJTzMWTSJtts6zPqNFA=
+Received: from WH-D-007635B.QUECTEL.COM (unknown [223.76.229.213])
+	by zwqz-smtp-mta-g0-0 (Coremail) with SMTP id _____wD3HzDTbYplT_rKGg--.60729S2;
+	Tue, 26 Dec 2023 14:08:20 +0800 (CST)
+From: clancy_shang@163.com
+To: marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	zhongjun.yu@quectel.com,
+	Clancy Shang <clancy.shang@quectel.com>
+Subject: [PATCH] Bluetooth: hci_sync: fix hogp device suspend bug
+Date: Tue, 26 Dec 2023 14:08:18 +0800
+Message-Id: <20231226060818.2446327-1-clancy_shang@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3HzDTbYplT_rKGg--.60729S2
+X-Coremail-Antispam: 1Uf129KBjvdXoW7Xw13CF1rKFWfCr45uF4UJwb_yoWDZwbE93
+	ZFyay29w1UGrWxZw4qyr4kCr4xZw4rWF4kur93Z34jgF98Wr18GryDXF90kr1xWa95Arsx
+	Ar15WFWSqrW8GjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUeNVy3UUUUU==
+X-CM-SenderInfo: xfod0ux1bvxtlqj6il2tof0z/1tbisBhSuGV4HA0B-gAAsx
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218323
+From: Clancy Shang <clancy.shang@quectel.com>
 
-Yuxuan Hu (20373622@buaa.edu.cn) changed:
+when Bluetooth enters suspend, and disconnects everything with the
+disconnect reason code of 0x15, the hogp device could not into sleep
+and continued advertising. when use the disconnect reason code of 0x13,
+the hogp device going into sleep succeeded.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |johan.hedberg@gmail.com,
-                   |                            |linux-bluetooth@vger.kernel
-                   |                            |.org, marcel@holtmann.org
+Signed-off-by: Clancy Shang <clancy.shang@quectel.com>
+---
+ net/bluetooth/hci_sync.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
---=20
-You may reply to this email to add a comment.
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index d85a7091a116..16b5420c32d0 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -5927,7 +5927,7 @@ int hci_suspend_sync(struct hci_dev *hdev)
+ 
+ 	if (hci_conn_count(hdev)) {
+ 		/* Soft disconnect everything (power off) */
+-		err = hci_disconnect_all_sync(hdev, HCI_ERROR_REMOTE_POWER_OFF);
++		err = hci_disconnect_all_sync(hdev, HCI_ERROR_REMOTE_USER_TERM);
+ 		if (err) {
+ 			/* Set state to BT_RUNNING so resume doesn't notify */
+ 			hdev->suspend_state = BT_RUNNING;
+-- 
+2.25.1
 
-You are receiving this mail because:
-You are on the CC list for the bug.
-You are the assignee for the bug.=
