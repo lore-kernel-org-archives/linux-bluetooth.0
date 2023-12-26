@@ -1,49 +1,49 @@
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3AF34E603
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Dec 2023 11:57:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 021344E623
+	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Dec 2023 12:39:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XJi79hIJ"
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-67f6729a57fso41733086d6.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Dec 2023 03:57:12 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YeHlGC5S"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1d44200b976so4972545ad.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Dec 2023 04:39:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703591831; x=1704196631; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1703594343; x=1704199143; darn=vger.kernel.org;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=2osmJIQFm4v7AQW1pXV7vcrKz1tg0MbX8Riq0YFR/oA=;
-        b=XJi79hIJIma02Zbq6N+DQQsp57e+Ob0VE4ByifWq1wka7J8V2hG24iMPs3IvHuHD+W
-         LdKpqffbf0lBTHuDomZ/rymA/QVFfbiFGSWeLhXGBJLY7vMFrZnYbMlrXWnRWV14E8Nk
-         tU3dbUUqQakR5Fx6bhCWBBPUVVMVC0MCkEFBzk9hO+1ZDEJVr5Gji69yammbZsxrWAf9
-         usikhhY1+TJRt5hpSk4+rzB/KVLPYByhwRv+gGWWrF5m7j9pobnASIjfkVbtOD/cr7Zr
-         f0ghDMb1ElmUIwCy/B+CbBrHN9ma2W+Wc/N5jIBNA7178WJ0zUJJ67yqseIOEh4W++Lb
-         +3Nw==
+        bh=PWtNUJtnPIuhT3eMeiS7QmVsvjNWvYaI7XcM0HhW5QY=;
+        b=YeHlGC5Sn6uOkOdkmO6ZMeM/oBPJciG4EW6B48v7gRmdZxKcA8u8cGOSyQhU2aIad1
+         qtdKTmSAAq8gBSfUMi1YpbPcu/9tqaOuNWV9ie2fnj5ATIPBi7adWssKvEJtIZ/F6v9D
+         GemnZuvb6GazpfsR3w/9Q3hvG8Yw3X0WddZv+3+Bo5HtsNddF9yNBwP/UeBMQeQgtdn6
+         UQvWa6I+zi2YWjrsIX2xL9xK9K420nZ6Jtfs8KWHuK1XIp+emlR5Lo7Ao8rsbB+xFUFJ
+         hxQhpKJNkKdu8D++ruYDGeg9MXPqQ+PiKoHMThfHKasV+1ugSYEgRoG14H9ToiKRPPlc
+         JW8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703591831; x=1704196631;
+        d=1e100.net; s=20230601; t=1703594343; x=1704199143;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=2osmJIQFm4v7AQW1pXV7vcrKz1tg0MbX8Riq0YFR/oA=;
-        b=gIcVMYBy7oL2tt7Npd+hSUeFndIMdV9AN+EHnINL857YdK7c/KG2RS/sLZxIKiB5a5
-         z5CDsws8U0C31esSyzB/6mA5Fv6sk7R3fyN3pL9FMv+OSFUeRofjdIyABikTrJUye2Q+
-         f3Idu3eNnHsKTxBHJsA/VLqm+a6F5eYTppiWuoS/CkWQOeqR9Zom3HQEpDbpbXL1KdMr
-         HWGX5Qr9jvFa2K8LPO0TV/IorXTa4fTNSq5KpurSWOInwxUjIOsPjBFCWipt86i9Q5Rk
-         aeqGR3UchTm4QqkKnWGbQ1/UuX7Zb1eb9ZViBMG0/VEt5mvukZrwgMRZI0WgHDro0Akj
-         QbLw==
-X-Gm-Message-State: AOJu0YwDs9eglKYIGao1oGyXgLGiGGtodJc5hYlgmmxInpJHRBxXtajy
-	xcWlwNJtGD6PrSsR4GjzLttRV30MlVE=
-X-Google-Smtp-Source: AGHT+IGczq7EW4mR++ZUoqeLj3JgCmNROMXY8CgeU1nzpDnhQ8xckU556gECP+pTYSdZUkUl4E2Jlg==
-X-Received: by 2002:a05:6214:da1:b0:67f:2f9e:5184 with SMTP id h1-20020a0562140da100b0067f2f9e5184mr12382135qvh.15.1703591831328;
-        Tue, 26 Dec 2023 03:57:11 -0800 (PST)
-Received: from [172.17.0.2] ([20.102.46.212])
-        by smtp.gmail.com with ESMTPSA id hf8-20020a0562140e8800b0067f6f8c2a66sm4533564qvb.126.2023.12.26.03.57.11
+        bh=PWtNUJtnPIuhT3eMeiS7QmVsvjNWvYaI7XcM0HhW5QY=;
+        b=mmz/0Qv8ZwDE+8QwDFQA8N/kxgiRdKt+kPiBrkJdFERsW5HJWDsOLl/dV3VyohvpgX
+         uv/7S2M/fhKnRy+6ZpYfcZ+AvqxPe+HCU3Qux0gdzIblHpQUvKses1ywZSFjs+PHAv7z
+         ExienxbPre8PGTicanbzsrllcIUfMherGR1ys1Ljub3eCwevZIdBSdrNbdlHhnEJ0og2
+         ZbNuIC44Wf4zKMdsebJoAi4/V3r6pk+e0hEGMLPAwZdBIefpAFjzx9oSjKE6mS7nbTBo
+         LGAXG92U7Cg2/aOjHwSMYpZLo2tBpLHfFZYS3zG68OyWy4AJ3ELcQaz+vtxxC/Wc7U9b
+         1cFQ==
+X-Gm-Message-State: AOJu0YxCKgmTKLGISqCUofWQPrOeqlwbHm59P5d/hM9EWAvZ5KqmdzkX
+	32IiAW8G0ZUCFAdywOqvmidQSrg3rcg=
+X-Google-Smtp-Source: AGHT+IEONMuImshMYMQnEkXytl7kmSAmCljfZPeM7h5fM89SMzjvhkpnFJj7MsDBEVPX3VmLHQP4Fw==
+X-Received: by 2002:a17:902:ce92:b0:1d4:e0f:e4f3 with SMTP id f18-20020a170902ce9200b001d40e0fe4f3mr3456988plg.101.1703594342939;
+        Tue, 26 Dec 2023 04:39:02 -0800 (PST)
+Received: from [172.17.0.2] ([138.91.70.190])
+        by smtp.gmail.com with ESMTPSA id h9-20020a170902f7c900b001d4752f5403sm955074plw.206.2023.12.26.04.39.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Dec 2023 03:57:11 -0800 (PST)
-Message-ID: <658abf97.050a0220.68fd6.e39d@mx.google.com>
-Date: Tue, 26 Dec 2023 03:57:11 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0377712980559736037=="
+        Tue, 26 Dec 2023 04:39:02 -0800 (PST)
+Message-ID: <658ac966.170a0220.2135e.1614@mx.google.com>
+Date: Tue, 26 Dec 2023 04:39:02 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6360375066605549883=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -51,13 +51,13 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, neeraj.sanjaykale@nxp.com
-Subject: RE: [v2] Bluetooth: btnxpuart: Resolve TX timeout error in power save stress test
-In-Reply-To: <20231226113110.3923962-1-neeraj.sanjaykale@nxp.com>
-References: <20231226113110.3923962-1-neeraj.sanjaykale@nxp.com>
+To: linux-bluetooth@vger.kernel.org, max.chou@realtek.com
+Subject: RE: [v2] Bluetooth: btrtl: Add the support for RTL8852BT/RTL8852BE-VT
+In-Reply-To: <20231226114518.5395-1-max.chou@realtek.com>
+References: <20231226114518.5395-1-max.chou@realtek.com>
 Reply-To: linux-bluetooth@vger.kernel.org
 
---===============0377712980559736037==
+--===============6360375066605549883==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -68,31 +68,31 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=812886
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=812888
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    PASS      0.63 seconds
-GitLint                       PASS      0.31 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      28.90 seconds
-CheckAllWarning               PASS      31.18 seconds
-CheckSparse                   PASS      37.96 seconds
-CheckSmatch                   PASS      100.66 seconds
-BuildKernel32                 PASS      27.66 seconds
-TestRunnerSetup               PASS      442.29 seconds
-TestRunner_l2cap-tester       PASS      23.08 seconds
-TestRunner_iso-tester         PASS      46.32 seconds
-TestRunner_bnep-tester        PASS      7.15 seconds
-TestRunner_mgmt-tester        PASS      165.35 seconds
-TestRunner_rfcomm-tester      PASS      10.98 seconds
-TestRunner_sco-tester         PASS      14.47 seconds
-TestRunner_ioctl-tester       PASS      12.20 seconds
-TestRunner_mesh-tester        PASS      8.82 seconds
-TestRunner_smp-tester         PASS      9.70 seconds
-TestRunner_userchan-tester    PASS      7.32 seconds
-IncrementalBuild              PASS      26.95 seconds
+CheckPatch                    PASS      0.58 seconds
+GitLint                       PASS      0.19 seconds
+SubjectPrefix                 PASS      0.06 seconds
+BuildKernel                   PASS      27.79 seconds
+CheckAllWarning               PASS      30.53 seconds
+CheckSparse                   PASS      35.69 seconds
+CheckSmatch                   PASS      99.10 seconds
+BuildKernel32                 PASS      26.90 seconds
+TestRunnerSetup               PASS      433.16 seconds
+TestRunner_l2cap-tester       PASS      22.92 seconds
+TestRunner_iso-tester         PASS      44.56 seconds
+TestRunner_bnep-tester        PASS      6.77 seconds
+TestRunner_mgmt-tester        PASS      164.29 seconds
+TestRunner_rfcomm-tester      PASS      10.70 seconds
+TestRunner_sco-tester         PASS      14.26 seconds
+TestRunner_ioctl-tester       PASS      11.73 seconds
+TestRunner_mesh-tester        PASS      8.70 seconds
+TestRunner_smp-tester         PASS      9.57 seconds
+TestRunner_userchan-tester    PASS      7.26 seconds
+IncrementalBuild              PASS      25.65 seconds
 
 
 
@@ -101,4 +101,4 @@ Regards,
 Linux Bluetooth
 
 
---===============0377712980559736037==--
+--===============6360375066605549883==--
