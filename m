@@ -1,89 +1,133 @@
-Received: from server.interlinx.bc.ca (mail.interlinx.bc.ca [69.165.217.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DEF54F88B
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Dec 2023 17:06:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=interlinx.bc.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=interlinx.bc.ca
-Received: from pc.interlinx.bc.ca (pc.interlinx.bc.ca [IPv6:fd31:aeb1:48df:0:3b14:e643:83d8:7017])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by server.interlinx.bc.ca (Postfix) with ESMTPSA id AB3E025B77
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Dec 2023 12:06:10 -0500 (EST)
-Message-ID: <c54f7005da70d19893168acc1060a777b7ddaefe.camel@interlinx.bc.ca>
-Subject: Re: chrome passkey communication timing out
-From: "Brian J. Murrell" <brian@interlinx.bc.ca>
-To: linux-bluetooth@vger.kernel.org
-Date: Tue, 26 Dec 2023 12:06:10 -0500
-In-Reply-To: <6139bf22f150476acf13a86dc130c5be5749cec1.camel@interlinx.bc.ca>
-References: <6ce4dab33868db0a8c7b93bf58c20aa876d50f21.camel@interlinx.bc.ca>
-	 <CABBYNZLbyCkg+heU5gNDooo2w7Uf+P1To0pVnrhS_z7Be3bTYw@mail.gmail.com>
-	 <da55cd171a7055f3438447947f36723e9e539547.camel@interlinx.bc.ca>
-	 <CABBYNZJJgYJcswhLcR49H5AE-z7C74HeguwsvHq_BqWr8e3wtw@mail.gmail.com>
-	 <6139bf22f150476acf13a86dc130c5be5749cec1.camel@interlinx.bc.ca>
-Autocrypt: addr=brian@interlinx.bc.ca; prefer-encrypt=mutual;
- keydata=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
-Content-Type: multipart/signed; micalg="pgp-sha256";
-	protocol="application/pgp-signature"; boundary="=-GnCuGuT/YX36KAfeMYUw"
-User-Agent: Evolution 3.50.2 (3.50.2-1.fc39) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08B485684
+	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Dec 2023 22:54:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7b71b4b179aso308883139f.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Dec 2023 14:54:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703631267; x=1704236067;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=w/49tPwndT0MjBlfvIRwPEDmfil03+0jhTGku1dMJu0=;
+        b=MYqoeDM/k0sSqx0OTKOe/s8Hq5TY003PFWf1ogvQ9wxU1C58Bd6VoMHncwcwou6toq
+         PqdCMHzj5vnMu/+ISDbz1aNaoY9+y7nqLzblGRTxmYCyfs91nrgO0wyhJlh08XausyHv
+         yxB3ncM/XZYEe/tVqCY7NoMxyc74Zana8toO18JFjYB0EV4/m39Tk31odaSXXn0nqqU9
+         OehXwT0uOl7wWMvfknkwFYbza9d4vMHoKBN6ya/eO4IpAXNA7BVflq7UYaSfv1ZtIcgb
+         9zp6IPYpxv0mNp0pP4Z+aVasDfCgvt4bMXitIF814LhNcOl7j4Fiu1CxpHNi+TF+jSgl
+         tjPg==
+X-Gm-Message-State: AOJu0YxvClCiY8VDWGl76K3jc5d3gexwYPd7TN7g+1mJBFyQxnH/WXii
+	z001RuBP6hw/Wp+jKjD3PgFHu5j2MbcQ5de2J2YicEAZhOhQ
+X-Google-Smtp-Source: AGHT+IGzMJDzPanOQOpl7sFEgQNjDsGW0Cw+M0op3qzqY2mdozbtaxFyL3a8jndaXZrXzuUcGqJF9bFr+uYer7YKzZvnh6BXYc9/
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-
-
---=-GnCuGuT/YX36KAfeMYUw
+X-Received: by 2002:a05:6e02:1a6c:b0:360:134:535e with SMTP id
+ w12-20020a056e021a6c00b003600134535emr627956ilv.1.1703631267141; Tue, 26 Dec
+ 2023 14:54:27 -0800 (PST)
+Date: Tue, 26 Dec 2023 14:54:27 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000081a088060d7190cb@google.com>
+Subject: [syzbot] [bluetooth?] WARNING in l2cap_do_send (2)
+From: syzbot <syzbot+d6cd076b385aefcb6b16@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2023-12-22 at 12:05 -0500, Brian J. Murrell wrote:
->=20
-> I got a new BT adapter.=C2=A0 btmon looks better, but still does not
-> complete and times out:
+Hello,
 
-Seems to be working now.  Yay.
+syzbot found the following issue on:
 
-Although this morning I had to unplug/replug the USB adapter as my
-mouse was not being seen as connected.  The journal had such messages
-in it:
+HEAD commit:    fbafc3e621c3 Merge tag 'for_linus' of git://git.kernel.org..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=15557616e80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e1e118a9228c45d7
+dashboard link: https://syzkaller.appspot.com/bug?extid=d6cd076b385aefcb6b16
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14125c81e80000
 
-Dec 26 09:26:44 pc.interlinx.bc.ca bluetoothd[3754244]: profiles/input/devi=
-ce.c:ioctl_is_connected() Can't get HIDP connection info
-Dec 26 09:26:50 pc.interlinx.bc.ca bluetoothd[3754244]: profiles/input/devi=
-ce.c:control_connect_cb() connect to 34:88:5D:56:A8:C1: Host is down (112)
-Dec 26 09:27:42 pc.interlinx.bc.ca bluetoothd[3754244]: profiles/input/devi=
-ce.c:ioctl_is_connected() Can't get HIDP connection info
-Dec 26 09:27:47 pc.interlinx.bc.ca bluetoothd[3754244]: profiles/input/devi=
-ce.c:control_connect_cb() connect to 34:88:5D:56:A8:C1: Host is down (112)
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-fbafc3e6.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/d7e8a358761e/vmlinux-fbafc3e6.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/dd1f54334d87/bzImage-fbafc3e6.xz
 
-I'll start a new thread if it repeats this behaviour.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+d6cd076b385aefcb6b16@syzkaller.appspotmail.com
 
-Cheers,
-b.
+------------[ cut here ]------------
+WARNING: CPU: 2 PID: 6232 at kernel/workqueue.c:1722 __queue_work+0xdc6/0x11d0 kernel/workqueue.c:1721
+Modules linked in:
+CPU: 2 PID: 6232 Comm: syz-executor.2 Not tainted 6.7.0-rc7-syzkaller-00003-gfbafc3e621c3 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:__queue_work+0xdc6/0x11d0 kernel/workqueue.c:1721
+Code: 07 83 c0 03 38 d0 7c 09 84 d2 74 05 e8 a3 92 87 00 8b 5b 2c 31 ff 83 e3 20 89 de e8 e4 a6 31 00 85 db 75 56 e8 6b ab 31 00 90 <0f> 0b 90 e9 ac f8 ff ff e8 5d ab 31 00 90 0f 0b 90 e9 5b f8 ff ff
+RSP: 0018:ffffc90003bf7748 EFLAGS: 00010093
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffffff8154b90c
+RDX: ffff88801bf21280 RSI: ffffffff8154b915 RDI: 0000000000000005
+RBP: 0000000000000200 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000001 R12: ffff88803fe4cdf0
+R13: 0000000000000000 R14: ffff8880374f3000 R15: ffff8880374f3000
+FS:  000055555556e480(0000) GS:ffff88806b800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020000400 CR3: 000000001d1ad000 CR4: 0000000000350ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ queue_work_on+0xed/0x110 kernel/workqueue.c:1831
+ l2cap_do_send+0x318/0x470 net/bluetooth/l2cap_core.c:1015
+ l2cap_chan_send+0xb7d/0x2ae0 net/bluetooth/l2cap_core.c:2726
+ l2cap_sock_sendmsg+0x218/0x2e0 net/bluetooth/l2cap_sock.c:1154
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0xd5/0x180 net/socket.c:745
+ ____sys_sendmsg+0x2ac/0x940 net/socket.c:2584
+ ___sys_sendmsg+0x135/0x1d0 net/socket.c:2638
+ __sys_sendmmsg+0x1a1/0x450 net/socket.c:2724
+ __do_sys_sendmmsg net/socket.c:2753 [inline]
+ __se_sys_sendmmsg net/socket.c:2750 [inline]
+ __x64_sys_sendmmsg+0x9c/0x100 net/socket.c:2750
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x40/0x110 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+RIP: 0033:0x7fa77e47cce9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffc101fb238 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
+RAX: ffffffffffffffda RBX: 00007fa77e59bf80 RCX: 00007fa77e47cce9
+RDX: 0000000000000735 RSI: 0000000020000b80 RDI: 0000000000000004
+RBP: 00007fa77e4c947a R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000024044840 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000bf7 R14: 00007fa77e59bf80 R15: 00007fa77e59bf80
+ </TASK>
 
 
---=-GnCuGuT/YX36KAfeMYUw
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
------BEGIN PGP SIGNATURE-----
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-iQEzBAABCAAdFiEE8B/A+mOVz5cTNBuZ2sHQNBbLyKAFAmWLCAIACgkQ2sHQNBbL
-yKAhJwf/dR8zT/UyLMCYfMfRDQgkInrHRl3G2x36U9Dt8q2CXAP64tMLe4YiZkHi
-cdoFlr47DwoJakwz+HL+B7NfqBSvLYrBFt67xaxPWnw4WbX1GEfUtJenqGNnTwD/
-g9SHxvkEpA1YIpumdsUpj/eC7mV61aNtGz35lkf8bJOSKo6QRkNKRsmZDxP4rxKz
-TOcaNYCbimLPrz/e6K9MhsE6oeR7mE8XPs3ll2MfXuIgHvwPcQQZPxHJfWrHv21C
-PmgE1WRocCWo7KpzxRpuH6iYVpiWYzAmx6sKWYbAWIALIwO0mG9ctfVT+Z8A4ttb
-ij0hiXcx6rv9HR0Cw9YfqLKilHJZoA==
-=XMAv
------END PGP SIGNATURE-----
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
---=-GnCuGuT/YX36KAfeMYUw--
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
