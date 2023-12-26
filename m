@@ -1,30 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B98BA18EC3
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Dec 2023 03:42:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D0E2C851
+	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Dec 2023 03:57:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PvF1r3Wo"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 38DB4C433C7
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Dec 2023 03:42:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KQH3Jogp"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E1610C433CA
+	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Dec 2023 03:57:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703562134;
-	bh=5oxIcBhCnTTV6WZBdsMW3uESKOc8ngB+TQzrvB9lSjs=;
+	s=k20201202; t=1703563075;
+	bh=2CvOktXqdJkIBQVf95QAiEq16aWFGdF/Dz/Wg9uObXY=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=PvF1r3WoxklSdwbwhicRtNlWP8eF65IsJ6WdGuXU9SOfLxwqb/eMVPHSNUD0h/WgX
-	 GS3I0PC14Pwi5tm8m6sJLqEeqmynAH+Q2BaKIxv0KpDIRMcfups0FzLmQ0P/M8Wo4m
-	 SGQbUr9dzsEyCza2MlGem3J71GTjgsidoicu3upEt2pFT4InY27dqDoseRbsMydCTS
-	 IrnpAi/lXaNiFn1ynyUPhqHTiK2ZCM4WlMEhiW2GiEH9fEw1t/zT+UtGrNCOWaXEOG
-	 C/24vkjR77k9I8x5bbO+ug9e7D66nF4HG+5gVLaXdJSILxFZf3grhs8cjmwSjDPElU
-	 m4WspygEaZ67w==
+	b=KQH3JogpDVStMEPVnv8VhtdxPoaas52MvqZXM7GIBqqlCWkpBZes5qP14o6D3eDKo
+	 vKvyfGLjQmR4oiC+OfJnUxx5F/yHnNVACpOeI7rCxwTMBX1/JfmX65Edt6ENceGKqg
+	 6mFpEl1d8q3pKgiELXfQLyjcF63GJdCAam8HixQynG/bVZMl+YIM6gCKcYXXlTuwGo
+	 RucKvCVI5Q87mSxIN+tWmDI2WhYWJTlCQXe8Em0+hC/W6vI71KONnqIpOZ1T/3i09i
+	 wHi9ppZjWcsxBWyyBuMWD36J3R93rBKnH0IHQ/YP0gAbHQeXgzQ9AdIX7lFj+JFpbP
+	 X3/lkP+8LjYGg==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 18C18C53BD0; Tue, 26 Dec 2023 03:42:14 +0000 (UTC)
+	id C47FDC53BC6; Tue, 26 Dec 2023 03:57:55 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 218323] KASAN: null-ptr-deref in rfcomm_check_security in
  Kernel 6.7-rc2
-Date: Tue, 26 Dec 2023 03:42:13 +0000
-X-Bugzilla-Reason: AssignedTo
+Date: Tue, 26 Dec 2023 03:57:55 +0000
+X-Bugzilla-Reason: CC AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
 X-Bugzilla-Product: Drivers
@@ -38,8 +38,8 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc cf_kernel_version
-Message-ID: <bug-218323-62941-cS9PAX2dIv@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-218323-62941-s9CcIJJWrs@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-218323-62941@https.bugzilla.kernel.org/>
 References: <bug-218323-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -59,12 +59,13 @@ Yuxuan Hu (20373622@buaa.edu.cn) changed:
 
            What    |Removed                     |Added
 ----------------------------------------------------------------------------
-                 CC|                            |20373622@buaa.edu.cn,
-                   |                            |baijiaju1990@gmail.com
-     Kernel Version|                            |6.7-rc2
+                 CC|                            |johan.hedberg@gmail.com,
+                   |                            |linux-bluetooth@vger.kernel
+                   |                            |.org, marcel@holtmann.org
 
 --=20
 You may reply to this email to add a comment.
 
 You are receiving this mail because:
+You are on the CC list for the bug.
 You are the assignee for the bug.=
