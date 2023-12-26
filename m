@@ -1,104 +1,149 @@
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89A594CB4A
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Dec 2023 08:35:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KVJt8rcF"
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-78117c8b6ccso380955985a.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Dec 2023 00:35:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703579702; x=1704184502; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=yon8A6EmLUkmP1rZ/b1T1WcE7c9AyGDvvV09lOYpaUM=;
-        b=KVJt8rcFDAD3MmxcuR4zkPuMNDpReIW0exMYXVY3jUqLFa0QAAcMpwX7V3vm/2Pl4E
-         CjfNG7iru0XDRXvpIRKPAlkySAXjiiDgw56864mUHJJoAEJoPXM4WQeLaxhRDtqzrQi8
-         TtVN8bPctP/MFeqhOt52Tf3jCDSiQUYX+PyTiT50fzIhOvVD0lEwbFKgEEivnY0AaEtX
-         62/bW9rseVhnE3DmNYmJb+bsimp0jPBL/iOhfSGnWzPRO59IdtXD4IvEhEX4lTN4BBCp
-         HKsnND2936e1fbKcm/Svofm46TrMoMP3AlzwTrjMmRXoY/shRQQJ31sh9oMlxyrCB5qh
-         eU4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703579702; x=1704184502;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yon8A6EmLUkmP1rZ/b1T1WcE7c9AyGDvvV09lOYpaUM=;
-        b=rXuWXB/m2M3uFXE8p3CEmyf5mq+Svny4KlC9Cz7fGu7NAzJvJ2+ThsxyYGBLTyM64+
-         bqVX1XLomsRzPqJZwchH7XtZ7oG9KYAE1paSngIT7GgDGKeIcbm3OZ1M5ykVj0EcIxFi
-         ZNlJ9VmeiydG3ed+9EYRgMUbJcuby1aCC9WAJccreAN4CqC4pw4jM5zd7NSku1/5SBSh
-         1sE0WeRHRqCggzACwEC3Poxt4YkdOmV4c4xySPvOFEiHnEJZT5wDoBP8xwsnG9yLtCZS
-         mHAWasovqu1o0bsPieW8qpH4bWDiXu+9uLa4suoITGPpm1Efj64KGvK9ui1LPpRq9BuE
-         t8bA==
-X-Gm-Message-State: AOJu0YxZ99GSrsxXi8i1do7lZVbipBeFL2t23ovjfWEyvsFF5xZ1HXr/
-	npOf332kQ48SyVY1XjgDC3ZpLbUgKjj1NA==
-X-Google-Smtp-Source: AGHT+IFAGe7ML2tMUfbutlWSwE859aI0//5Mi+CJFtWsE1jd7iVtNT4F5igh0zDiYlMy8JTaac30OQ==
-X-Received: by 2002:a05:620a:388f:b0:781:45db:8121 with SMTP id qp15-20020a05620a388f00b0078145db8121mr4163595qkn.52.1703579702161;
-        Tue, 26 Dec 2023 00:35:02 -0800 (PST)
-Received: from [172.17.0.2] ([13.90.174.194])
-        by smtp.gmail.com with ESMTPSA id e28-20020a05620a12dc00b0078130871568sm3059087qkl.31.2023.12.26.00.35.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Dec 2023 00:35:02 -0800 (PST)
-Message-ID: <658a9036.050a0220.80074.782d@mx.google.com>
-Date: Tue, 26 Dec 2023 00:35:02 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1013149875901730714=="
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4388925778;
+	Tue, 26 Dec 2023 08:39:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.6] (ip5f5af7f4.dynamic.kabel-deutschland.de [95.90.247.244])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id F2B0461E5FE01;
+	Tue, 26 Dec 2023 09:38:53 +0100 (CET)
+Message-ID: <e9586bad-0101-415e-ba34-390fd34bf252@molgen.mpg.de>
+Date: Tue, 26 Dec 2023 09:38:53 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, 20373622@buaa.edu.cn
-Subject: RE: Bluetooth: rfcomm: Fix null-ptr-deref in rfcomm_check_security
-In-Reply-To: <20231226074355.328940-1-20373622@buaa.edu.cn>
-References: <20231226074355.328940-1-20373622@buaa.edu.cn>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: btrtl: Add the support for
+ RTL8852BT/RTL8852BE-VT
+To: Max Chou <max.chou@realtek.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ alex_lu@realsil.com.cn, hildawu@realtek.com, karenhsu@realtek.com
+References: <20231226015713.13673-1-max.chou@realtek.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20231226015713.13673-1-max.chou@realtek.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
---===============1013149875901730714==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=812867
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.56 seconds
-GitLint                       PASS      0.50 seconds
-SubjectPrefix                 PASS      0.19 seconds
-BuildKernel                   PASS      27.98 seconds
-CheckAllWarning               PASS      30.69 seconds
-CheckSparse                   PASS      36.00 seconds
-CheckSmatch                   PASS      99.34 seconds
-BuildKernel32                 PASS      27.17 seconds
-TestRunnerSetup               PASS      432.08 seconds
-TestRunner_l2cap-tester       PASS      22.88 seconds
-TestRunner_iso-tester         PASS      47.44 seconds
-TestRunner_bnep-tester        PASS      6.75 seconds
-TestRunner_mgmt-tester        PASS      158.34 seconds
-TestRunner_rfcomm-tester      PASS      10.73 seconds
-TestRunner_sco-tester         PASS      14.20 seconds
-TestRunner_ioctl-tester       PASS      11.96 seconds
-TestRunner_mesh-tester        PASS      8.70 seconds
-TestRunner_smp-tester         PASS      9.57 seconds
-TestRunner_userchan-tester    PASS      7.16 seconds
-IncrementalBuild              PASS      26.35 seconds
+Dear Max,
 
 
+Thank you for your patch.
 
----
-Regards,
-Linux Bluetooth
+Am 26.12.23 um 02:57 schrieb max.chou@realtek.com:
+> From: Max Chou <max.chou@realtek.com>
+> 
+> Add the support for RTL8852BT/RTL8852BE-VT BT controller on USB interface.
+
+It’d be great if you stated, how it differs from the existing devices. 
+Judging from your diff, only the ids need to be added.
+
+> The necessary firmware will be submitted to linux-firmware project.
+> 
+> The device info from /sys/kernel/debug/usb/devices as below.
+> 
+> T:  Bus=02 Lev=02 Prnt=02 Port=05 Cnt=01 Dev#=  8 Spd=12   MxCh= 0
+> D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0bda ProdID=8520 Rev= 0.00
+> S:  Manufacturer=Realtek
+> S:  Product=Bluetooth Radio
+> S:  SerialNumber=00e04c000001
+> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> 
+> Signed-off-by: Max Chou <max.chou@realtek.com>
+> ---
+>   drivers/bluetooth/btrtl.c | 14 ++++++++++++++
+>   1 file changed, 14 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+> index 277d039ecbb4..cc50de69e8dc 100644
+> --- a/drivers/bluetooth/btrtl.c
+> +++ b/drivers/bluetooth/btrtl.c
+> @@ -69,6 +69,7 @@ enum btrtl_chip_id {
+>   	CHIP_ID_8852B = 20,
+>   	CHIP_ID_8852C = 25,
+>   	CHIP_ID_8851B = 36,
+> +	CHIP_ID_8852BT = 47,
+>   };
+>   
+>   struct id_table {
+> @@ -307,6 +308,15 @@ static const struct id_table ic_id_table[] = {
+>   	  .fw_name  = "rtl_bt/rtl8851bu_fw",
+>   	  .cfg_name = "rtl_bt/rtl8851bu_config",
+>   	  .hw_info  = "rtl8851bu" },
+> +
+> +	/* 8852BT/8852BE-VT */
+> +	{ IC_INFO(RTL_ROM_LMP_8852A, 0x87, 0xc, HCI_USB),
+> +	  .config_needed = false,
+> +	  .has_rom_version = true,
+> +	  .has_msft_ext = true,
+> +	  .fw_name  = "rtl_bt/rtl8852btu_fw",
+> +	  .cfg_name = "rtl_bt/rtl8852btu_config",
+> +	  .hw_info  = "rtl8852btu" },
+>   	};
+>   
+>   static const struct id_table *btrtl_match_ic(u16 lmp_subver, u16 hci_rev,
+> @@ -645,6 +655,7 @@ static int rtlbt_parse_firmware(struct hci_dev *hdev,
+>   		{ RTL_ROM_LMP_8852A, 20 },	/* 8852B */
+>   		{ RTL_ROM_LMP_8852A, 25 },	/* 8852C */
+>   		{ RTL_ROM_LMP_8851B, 36 },	/* 8851B */
+> +		{ RTL_ROM_LMP_8852A, 47 },	/* 8852BT */
+>   	};
+>   
+>   	if (btrtl_dev->fw_len <= 8)
+> @@ -1275,6 +1286,7 @@ void btrtl_set_quirks(struct hci_dev *hdev, struct btrtl_device_info *btrtl_dev)
+>   	case CHIP_ID_8852B:
+>   	case CHIP_ID_8852C:
+>   	case CHIP_ID_8851B:
+> +	case CHIP_ID_8852BT:
+>   		set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
+>   		set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
+>   
+> @@ -1505,6 +1517,8 @@ MODULE_FIRMWARE("rtl_bt/rtl8852bs_fw.bin");
+>   MODULE_FIRMWARE("rtl_bt/rtl8852bs_config.bin");
+>   MODULE_FIRMWARE("rtl_bt/rtl8852bu_fw.bin");
+>   MODULE_FIRMWARE("rtl_bt/rtl8852bu_config.bin");
+> +MODULE_FIRMWARE("rtl_bt/rtl8852btu_fw.bin");
+> +MODULE_FIRMWARE("rtl_bt/rtl8852btu_config.bin");
+
+Should btu be ordered before bu?
+
+>   MODULE_FIRMWARE("rtl_bt/rtl8852cu_fw.bin");
+>   MODULE_FIRMWARE("rtl_bt/rtl8852cu_fw_v2.bin");
+>   MODULE_FIRMWARE("rtl_bt/rtl8852cu_config.bin");
 
 
---===============1013149875901730714==--
+Kind regards,
+
+Paul
