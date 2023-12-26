@@ -1,30 +1,26 @@
 Received: from m15.mail.163.com (m15.mail.163.com [45.254.50.220])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 580E84BA80;
-	Tue, 26 Dec 2023 06:08:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 355FD28361
+	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Dec 2023 06:30:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="ODUQi5Br"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="bOOD+KrU"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=chNQa
-	qyjmqQSTbtOWxsw9RHKFvBwS7P46pvgdz+FY1w=; b=ODUQi5BresLvK49W10rFw
-	aNe4hGmb6fNeneTVS8PDTKK1piRdY99Y4TR2LJELnRMVcxQzhrpryax+OD+tvA6h
-	SESO93eeTlOJiUV/9mzUGCrIVTVk7GtAIC4lpCvjTNSMN/AwHuPimZbDLo8EV2d2
-	inTfJTzMWTSJtts6zPqNFA=
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=1+wOy
+	CxuFdRwkRbseg89dpr/73zEQYpQG6NBYdROfvY=; b=bOOD+KrUlstkg133Z87Tl
+	1nCzu0PHrTxr0v+SkFqt9wr12/hZCQ96amloIvi79kXWPSOrdzhZ8uAfDYBjwGvD
+	a7W2za9/b08imAWtCQ2XUoAOZh9oalY631SgfPYxf+kjsrFGxwu/W5URB9ysGSFD
+	SFSZaPTWsxESGSFsUpXzLg=
 Received: from WH-D-007635B.QUECTEL.COM (unknown [223.76.229.213])
-	by zwqz-smtp-mta-g0-0 (Coremail) with SMTP id _____wD3HzDTbYplT_rKGg--.60729S2;
-	Tue, 26 Dec 2023 14:08:20 +0800 (CST)
+	by zwqz-smtp-mta-g2-4 (Coremail) with SMTP id _____wD3_xIFc4plKn8gAQ--.50646S2;
+	Tue, 26 Dec 2023 14:30:30 +0800 (CST)
 From: clancy_shang@163.com
-To: marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	zhongjun.yu@quectel.com,
+To: linux-bluetooth@vger.kernel.org
+Cc: zhongjun.yu@quectel.com,
 	Clancy Shang <clancy.shang@quectel.com>
-Subject: [PATCH] Bluetooth: hci_sync: fix hogp device suspend bug
-Date: Tue, 26 Dec 2023 14:08:18 +0800
-Message-Id: <20231226060818.2446327-1-clancy_shang@163.com>
+Subject: [PATCH] [BlueZ] adapter: Fix airpod device pair fail
+Date: Tue, 26 Dec 2023 14:30:28 +0800
+Message-Id: <20231226063028.2457072-1-clancy_shang@163.com>
 X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -33,38 +29,68 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3HzDTbYplT_rKGg--.60729S2
-X-Coremail-Antispam: 1Uf129KBjvdXoW7Xw13CF1rKFWfCr45uF4UJwb_yoWDZwbE93
-	ZFyay29w1UGrWxZw4qyr4kCr4xZw4rWF4kur93Z34jgF98Wr18GryDXF90kr1xWa95Arsx
-	Ar15WFWSqrW8GjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUeNVy3UUUUU==
-X-CM-SenderInfo: xfod0ux1bvxtlqj6il2tof0z/1tbisBhSuGV4HA0B-gAAsx
+X-CM-TRANSID:_____wD3_xIFc4plKn8gAQ--.50646S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7ZF47Kw4UtFykWF1rCFykKrg_yoW8WrWrpr
+	Z8Ka95Gr4jg3W2gw13Wa47Wr13Cw4kury0qFWSy3ZYkFW7XrWkX3y3tw18ta1UJF9rXa47
+	JF1DX3WDGw4UKaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jQNVkUUUUU=
+X-CM-SenderInfo: xfod0ux1bvxtlqj6il2tof0z/xtbBzQxSuGVOBDA1LgAAsv
 
 From: Clancy Shang <clancy.shang@quectel.com>
 
-when Bluetooth enters suspend, and disconnects everything with the
-disconnect reason code of 0x15, the hogp device could not into sleep
-and continued advertising. when use the disconnect reason code of 0x13,
-the hogp device going into sleep succeeded.
+Airpod is performing inquiry scans in BR/EDR and advertising in an
+unconnectable mode with the same public address at the same time.
+with this feature, when found airpod device, set the bredr support,
+fix it pairs fail bug.
 
 Signed-off-by: Clancy Shang <clancy.shang@quectel.com>
 ---
- net/bluetooth/hci_sync.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/adapter.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index d85a7091a116..16b5420c32d0 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -5927,7 +5927,7 @@ int hci_suspend_sync(struct hci_dev *hdev)
+diff --git a/src/adapter.c b/src/adapter.c
+index 022390f0d..71f7ed86d 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -7066,6 +7066,24 @@ static void adapter_msd_notify(struct btd_adapter *adapter,
+ 	}
+ }
  
- 	if (hci_conn_count(hdev)) {
- 		/* Soft disconnect everything (power off) */
--		err = hci_disconnect_all_sync(hdev, HCI_ERROR_REMOTE_POWER_OFF);
-+		err = hci_disconnect_all_sync(hdev, HCI_ERROR_REMOTE_USER_TERM);
- 		if (err) {
- 			/* Set state to BT_RUNNING so resume doesn't notify */
- 			hdev->suspend_state = BT_RUNNING;
++#define APPLE_INC_VENDOR_ID 0x004c
++
++static bool eir_msd_is_apple_inc(GSList *msd_list)
++{
++	GSList *msd_l, *msd_next;
++
++	for (msd_l = msd_list; msd_l != NULL; msd_l = msd_next) {
++		const struct eir_msd *msd = msd_l->data;
++
++		msd_next = g_slist_next(msd_l);
++
++		if (msd->company == APPLE_INC_VENDOR_ID)
++			return true;
++	}
++
++	return false;
++}
++
+ static bool is_filter_match(GSList *discovery_filter, struct eir_data *eir_data,
+ 								int8_t rssi)
+ {
+@@ -7281,6 +7299,13 @@ void btd_adapter_device_found(struct btd_adapter *adapter,
+ 		device_update_last_seen(dev, BDADDR_BREDR, !not_connectable);
+ 	}
+ 
++	if (eir_msd_is_apple_inc(eir_data.msd_list) &&
++					(not_connectable == true) &&
++					(bdaddr_type == BDADDR_LE_PUBLIC)) {
++		device_set_bredr_support(dev);
++		device_update_last_seen(dev, BDADDR_BREDR, true);
++	}
++
+ 	if (eir_data.name != NULL && eir_data.name_complete)
+ 		device_store_cached_name(dev, eir_data.name);
+ 
 -- 
 2.25.1
 
