@@ -1,135 +1,96 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 620C020EE;
-	Wed, 27 Dec 2023 02:36:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 731F42D602;
+	Wed, 27 Dec 2023 10:10:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="E0chSsRq"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703644571; x=1735180571;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=eOJDRRxQCcECcUtLbWLmwY+VO9XB6AP8zj/voHh5AJw=;
-  b=E0chSsRqssc4H3gbMZhYDLm9puBweowsqNyYMnvIjvXybr98/oCc6wB/
-   zbmkF1dPEJ3CSAoKVBLJ3njlf3zG3Gv+THLV61nVOru62WF1p6Yu1MY9S
-   CCZAOCx+VWkREcsA66fKtMGgj1LdcFPbMMJgcv929hOiyk/b2pFFAHPZt
-   gjDTboBKhxkui+IYz8YwcXs/EP8BzKcKpcF+l/gN2LGsAezi7Y4oWZBlw
-   J9mEvObILhPo8tosWDc6VqVYTUEE4GHwzuUtzMhvPyyLwq4gt+WvXmAg3
-   VQeDzev8r2hs2z/Sv64uxbOh/jWIcBBgYNL8ssIUW5gNTDnpT3IwgDi81
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10935"; a="393558222"
-X-IronPort-AV: E=Sophos;i="6.04,307,1695711600"; 
-   d="scan'208";a="393558222"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Dec 2023 18:36:10 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10935"; a="1109512652"
-X-IronPort-AV: E=Sophos;i="6.04,307,1695711600"; 
-   d="scan'208";a="1109512652"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by fmsmga005.fm.intel.com with ESMTP; 26 Dec 2023 18:36:07 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rIJm9-000EyZ-1z;
-	Wed, 27 Dec 2023 02:36:05 +0000
-Date: Wed, 27 Dec 2023 10:35:56 +0800
-From: kernel test robot <lkp@intel.com>
-To: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>, marcel@holtmann.org,
-	johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	amitkumar.karwar@nxp.com, neeraj.sanjaykale@nxp.com,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	sherry.sun@nxp.com, rohit.fule@nxp.com
-Subject: Re: [PATCH v2] Bluetooth: btnxpuart: Resolve TX timeout error in
- power save stress test
-Message-ID: <202312271021.m0of6rmb-lkp@intel.com>
-References: <20231226113110.3923962-1-neeraj.sanjaykale@nxp.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OE5gY3Rg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1F71C433C8;
+	Wed, 27 Dec 2023 10:10:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703671849;
+	bh=HNX2qe5wIUjgAOE0bih0cYXbYbw77i5qRYAGTFhWf8Q=;
+	h=From:To:Cc:Subject:Date:From;
+	b=OE5gY3RgSNMMNpr/DemitpLvv8B5KUxkea+huKa97KhEilNAbl/OG/gZPSswoI3kl
+	 ifwN2LiGgFt8jyQh8hVsCoIrrOOGgiqeJ9ivyZI86fxAmaICglCBVc65vzpPozQdYn
+	 YsryqO/D6A6i3egHRr7G52DifE/DihYN9uZqhAIHTY+ESsr/mJvwodvV8HNt60TaF9
+	 dFeWSj4rAgt/QaclFNs1wznkamzzJ3UloOq2NJbzC3F6ILEsWfuPRm8iKBlgwdNTZ+
+	 bn4JmN3Zh0Mr2uaTVg902uWeLcZ93sY9BmqH1AOBDEXTlUvPd7n6xVrSnOLfdlTR5k
+	 O5JKLTyyjvyTQ==
+Received: from johan by xi.lan with local (Exim 4.96.2)
+	(envelope-from <johan+linaro@kernel.org>)
+	id 1rIQs7-0002kc-0u;
+	Wed, 27 Dec 2023 11:10:44 +0100
+From: Johan Hovold <johan+linaro@kernel.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Hector Martin <marcan@marcan.st>,
+	Sven Peter <sven@svenpeter.dev>,
+	Alyssa Rosenzweig <alyssa@rosenzweig.io>,
+	asahi@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Johan Hovold <johan+linaro@kernel.org>,
+	stable@vger.kernel.org,
+	Felix Zhang <mrman@mrman314.tech>
+Subject: [PATCH] Bluetooth: hci_bcm4377: do not mark valid bd_addr as invalid
+Date: Wed, 27 Dec 2023 11:10:03 +0100
+Message-ID: <20231227101003.10534-1-johan+linaro@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231226113110.3923962-1-neeraj.sanjaykale@nxp.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Neeraj,
+A recent commit restored the original (and still documented) semantics
+for the HCI_QUIRK_USE_BDADDR_PROPERTY quirk so that the device address
+is considered invalid unless an address is provided by firmware.
 
-kernel test robot noticed the following build errors:
+This specifically means that this flag must only be set for devices with
+invalid addresses, but the Broadcom BCM4377 driver has so far been
+setting this flag unconditionally.
 
-[auto build test ERROR on bluetooth/master]
-[also build test ERROR on bluetooth-next/master linus/master v6.7-rc7 next-20231222]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Fortunately the driver already checks for invalid addresses during setup
+and sets the HCI_QUIRK_INVALID_BDADDR flag, which can simply be replaced
+with HCI_QUIRK_USE_BDADDR_PROPERTY to indicate that the default address
+is invalid but can be overridden by firmware (long term, this should
+probably just always be allowed).
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Neeraj-Sanjay-Kale/Bluetooth-btnxpuart-Resolve-TX-timeout-error-in-power-save-stress-test/20231226-193718
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
-patch link:    https://lore.kernel.org/r/20231226113110.3923962-1-neeraj.sanjaykale%40nxp.com
-patch subject: [PATCH v2] Bluetooth: btnxpuart: Resolve TX timeout error in power save stress test
-config: arm-randconfig-003-20231227 (https://download.01.org/0day-ci/archive/20231227/202312271021.m0of6rmb-lkp@intel.com/config)
-compiler: clang version 18.0.0git (https://github.com/llvm/llvm-project d3ef86708241a3bee902615c190dead1638c4e09)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231227/202312271021.m0of6rmb-lkp@intel.com/reproduce)
+Fixes: 6945795bc81a ("Bluetooth: fix use-bdaddr-property quirk")
+Cc: stable@vger.kernel.org      # 6.5
+Reported-by: Felix Zhang <mrman@mrman314.tech>
+Link: https://lore.kernel.org/r/77419ffacc5b4875e920e038332575a2a5bff29f.camel@mrman314.tech/
+Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
+---
+ drivers/bluetooth/hci_bcm4377.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202312271021.m0of6rmb-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> drivers/bluetooth/btnxpuart.c:356:4: error: call to undeclared function 'usleep'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-     356 |                         usleep(2000); /* Allow chip to detect UART-break and enter sleep */
-         |                         ^
-   1 error generated.
-
-
-vim +/usleep +356 drivers/bluetooth/btnxpuart.c
-
-   333	
-   334	static void ps_control(struct hci_dev *hdev, u8 ps_state)
-   335	{
-   336		struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
-   337		struct ps_data *psdata = &nxpdev->psdata;
-   338		int status;
-   339	
-   340		if (psdata->ps_state == ps_state ||
-   341		    !test_bit(BTNXPUART_SERDEV_OPEN, &nxpdev->tx_state))
-   342			return;
-   343	
-   344		mutex_lock(&psdata->ps_lock);
-   345		switch (psdata->cur_h2c_wakeupmode) {
-   346		case WAKEUP_METHOD_DTR:
-   347			if (ps_state == PS_STATE_AWAKE)
-   348				status = serdev_device_set_tiocm(nxpdev->serdev, TIOCM_DTR, 0);
-   349			else
-   350				status = serdev_device_set_tiocm(nxpdev->serdev, 0, TIOCM_DTR);
-   351			break;
-   352		case WAKEUP_METHOD_BREAK:
-   353		default:
-   354			if (ps_state == PS_STATE_AWAKE) {
-   355				status = serdev_device_break_ctl(nxpdev->serdev, 0);
- > 356				usleep(2000); /* Allow chip to detect UART-break and enter sleep */
-   357			} else {
-   358				status = serdev_device_break_ctl(nxpdev->serdev, -1);
-   359			}
-   360			bt_dev_dbg(hdev, "Set UART break: %s, status=%d",
-   361				   str_on_off(ps_state == PS_STATE_SLEEP), status);
-   362			break;
-   363		}
-   364		if (!status)
-   365			psdata->ps_state = ps_state;
-   366		mutex_unlock(&psdata->ps_lock);
-   367	
-   368		if (ps_state == PS_STATE_AWAKE)
-   369			btnxpuart_tx_wakeup(nxpdev);
-   370	}
-   371	
-
+diff --git a/drivers/bluetooth/hci_bcm4377.c b/drivers/bluetooth/hci_bcm4377.c
+index a61757835695..9a7243d5db71 100644
+--- a/drivers/bluetooth/hci_bcm4377.c
++++ b/drivers/bluetooth/hci_bcm4377.c
+@@ -1417,7 +1417,7 @@ static int bcm4377_check_bdaddr(struct bcm4377_data *bcm4377)
+ 
+ 	bda = (struct hci_rp_read_bd_addr *)skb->data;
+ 	if (!bcm4377_is_valid_bdaddr(bcm4377, &bda->bdaddr))
+-		set_bit(HCI_QUIRK_INVALID_BDADDR, &bcm4377->hdev->quirks);
++		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &bcm4377->hdev->quirks);
+ 
+ 	kfree_skb(skb);
+ 	return 0;
+@@ -2368,7 +2368,6 @@ static int bcm4377_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	hdev->set_bdaddr = bcm4377_hci_set_bdaddr;
+ 	hdev->setup = bcm4377_hci_setup;
+ 
+-	set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
+ 	if (bcm4377->hw->broken_mws_transport_config)
+ 		set_bit(HCI_QUIRK_BROKEN_MWS_TRANSPORT_CONFIG, &hdev->quirks);
+ 	if (bcm4377->hw->broken_ext_scan)
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.41.0
+
