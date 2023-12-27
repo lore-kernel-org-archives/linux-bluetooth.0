@@ -1,85 +1,136 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFFAB43179;
-	Wed, 27 Dec 2023 10:35:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5C7F44376
+	for <linux-bluetooth@vger.kernel.org>; Wed, 27 Dec 2023 10:57:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CSe30+oL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E423C433C7;
-	Wed, 27 Dec 2023 10:35:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703673322;
-	bh=CLApfWGlPigge9o3aRXGuWQYw9nh9nmKCHBY6z1XJXE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CSe30+oLZFgsf5gy58cS+JuPIOHfXK1FNnKMt8yZaGgjyuk1PJaruqVAPuT3cUTnn
-	 fcCur28tApDHwHXYCdB73W5b7gnOhQ4YfpZRgY4zPKuQQ3LdBc7+WkIm+5vGnNI3Q8
-	 e5iMyqRUifybvINZxNWHvqPgxyIzcDZxA/YEFSNrTojSFkBAFTamNI4REEFr3Vm6kX
-	 ITE+Gl7/mWKxYeWQ6JtuDZCS+t/QACbimdEYj8/CPoJAVaZmVBPtmg9UBASc/reVGi
-	 Q1XcQhi/Sul+fOVTqtu8ogNOswgfPdwFrEqYGNjnFGo+Kqwi2gQli9ziRdw5DauMtY
-	 QL1oFm7C+aS7w==
-Received: from johan by xi.lan with local (Exim 4.96.2)
-	(envelope-from <johan@kernel.org>)
-	id 1rIRFs-0002tg-2p;
-	Wed, 27 Dec 2023 11:35:16 +0100
-Date: Wed, 27 Dec 2023 11:35:16 +0100
-From: Johan Hovold <johan@kernel.org>
-To: Felix Zhang <mrman@mrman314.tech>
-Cc: linux-bluetooth@vger.kernel.org, stable@vger.kernel.org,
-	marcan@marcan.st, bagasdotme@gmail.com, sven@svenpeter.dev,
-	alyssa@rosenzweig.io, marcel@holtmann.org, johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com, orlandoch.dev@gmail.com, kekrby@gmail.com,
-	admin@kodeit.net, j@jannau.net, gargaditya08@live.com,
-	asahi@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4] Bluetooth: Fix Bluetooth for BCM4377 on T2 Intel
- MacBooks
-Message-ID: <ZYv95BOowY38NesX@hovoldconsulting.com>
-References: <aaa107865f4cbd61f8f9006fd3e7ac43b5d1bdad.camel@mrman314.tech>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TuAPskTZ"
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-427e9ba503fso4157111cf.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Dec 2023 02:57:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703674634; x=1704279434; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=x1elz+KJ7iBRtawEfnBv4LQHM4yHHnwT1VQ6cxZbQ4Y=;
+        b=TuAPskTZcOjkhUms8uyGRrenRViHH/iIhSuSavdsG6u1XXFoXilK5J5+AaOldj3ORF
+         s1M2WsQ9buB01VAHqsN/sIAfu6jt4p1CyKZwoSuoaasNWJwMdC4G7K6bsZcdEG5f51Zd
+         FKlnLphCIiJR7TLovVVe3GfNY3jDD9ppYH2dIGMzK55DzspDt6WsluJuF23Dw93tcGdO
+         reYyj0Zbbu1ly/P8FgUzRayIMi14okvoV3AFoxMY1IX+gO+JafOCbUv82egoFGPQn9FD
+         TWlCkLd3wpJpn/RGlS6ewG5xqKfDhr/0rzjGOsL83zvdGmR6UoJHmr06jEMMgi/8Svte
+         xZBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703674634; x=1704279434;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=x1elz+KJ7iBRtawEfnBv4LQHM4yHHnwT1VQ6cxZbQ4Y=;
+        b=CoqQUNgoIi3f5/8ELS9iOq3FUVJPLabuB0+aTHx05r3rBoLbZbEArss+mVcFfoqkI3
+         WE40XTkKvpzpxl1q8/7fMEXjpBWj4G+Jz7t77AjGP1vj7M3qWRaMVSvOox3D+1L3CIO0
+         fo9LOhaQwAoveNIDIZdjtAMM6dqfkp+asu9clIFOnvgrSaD8d+vpU7fOEf4tywVduNE4
+         kboByghN8ENn+FFXIYTzCspdYIjqW7Fy99DKWXxVoLtXTbFh0C5uJaX00ek9BJf3FJh+
+         7RlOHxCwJZ5U/3I/shVAGFrICFhgaT3FvyuReG+XVKo9pkCuFSTE//zf2yF0gyrewS04
+         lkRQ==
+X-Gm-Message-State: AOJu0YxS4ucVWDTBrLv0peZ4YE6MqRsJ/IYfZi/ezNH4roPl2MOknCDK
+	5nsGupLsxrJmw0pY8Xwf1KWW4y7huSI=
+X-Google-Smtp-Source: AGHT+IF4V4tmgm4H8v7+70PBsrFwAuK3FmYzHHF74BmjtGzkD3uo+3lQHZ6FzWKB2eDxOy6d10qkKw==
+X-Received: by 2002:ac8:59cb:0:b0:427:ec41:36ee with SMTP id f11-20020ac859cb000000b00427ec4136eemr1009125qtf.106.1703674634414;
+        Wed, 27 Dec 2023 02:57:14 -0800 (PST)
+Received: from [172.17.0.2] ([20.81.159.65])
+        by smtp.gmail.com with ESMTPSA id cn10-20020a05622a248a00b00427a4875c14sm6230090qtb.86.2023.12.27.02.57.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Dec 2023 02:57:14 -0800 (PST)
+Message-ID: <658c030a.050a0220.9b0ec.232c@mx.google.com>
+Date: Wed, 27 Dec 2023 02:57:14 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0383076714137925071=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aaa107865f4cbd61f8f9006fd3e7ac43b5d1bdad.camel@mrman314.tech>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, johan+linaro@kernel.org
+Subject: RE: Bluetooth: hci_bcm4377: do not mark valid bd_addr as invalid
+In-Reply-To: <20231227101003.10534-1-johan+linaro@kernel.org>
+References: <20231227101003.10534-1-johan+linaro@kernel.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Mon, Dec 25, 2023 at 03:21:04PM -0500, Felix Zhang wrote:
-> Starting v6.5, Bluetooth does not work at all on my T2
-> MacBookAir9,1 with the BCM4377 chip.  When I boot up the computer,
-> go into bluetoothctl, and then try to run commands like scan on,
-> show, list, it returns "No default controller available."  I have
-> tried reloading the kernel module, in which the log outputs
-> "{Added,Removed} hci0 (unconfigured)."  With this patch, I
-> am able to use Bluetooth as normal without any errors regarding
-> hci0 being unconfigured.  However, an issue is still present
-> where sometimes hci_bcm4377 will have to be reloaded in order to
-> get bluetooth to work.  I believe this was still present before
-> the previously mentioned commit.
-> 
-> I would also like to thank Kerem Karabay <kekrby@gmail.com> for
-> assisting me with this patch.
-> 
-> Fixes: 6945795bc81a ("Bluetooth: fix use-bdaddr-property quirk")
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Felix Zhang <mrman@mrman314.tech>
-> ---
-> v4:
-> * Adjust the format to pass the CI (again).
-> * Shorten description
+--===============0383076714137925071==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-As explained here:
+This is automated email and please do not reply to this email!
 
-	https://lore.kernel.org/all/ZYv8tp3fMiAqK8OI@hovoldconsulting.com/
+Dear submitter,
 
-I don't this is necessarily the right fix. The BD_ADDR quirk property
-should not be set unconditionally but it is still needed for devices
-that lack storage for a unique device address.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=813030
 
-So the following fix is needed either way and is probably all that is
-needed here:
+---Test result---
 
-	https://lore.kernel.org/lkml/20231227101003.10534-1-johan+linaro@kernel.org/
+Test Summary:
+CheckPatch                    FAIL      1.51 seconds
+GitLint                       FAIL      0.56 seconds
+SubjectPrefix                 PASS      2.35 seconds
+BuildKernel                   PASS      27.82 seconds
+CheckAllWarning               PASS      30.14 seconds
+CheckSparse                   PASS      35.81 seconds
+CheckSmatch                   PASS      98.18 seconds
+BuildKernel32                 PASS      27.09 seconds
+TestRunnerSetup               PASS      429.15 seconds
+TestRunner_l2cap-tester       PASS      22.65 seconds
+TestRunner_iso-tester         PASS      44.40 seconds
+TestRunner_bnep-tester        PASS      6.80 seconds
+TestRunner_mgmt-tester        PASS      165.38 seconds
+TestRunner_rfcomm-tester      PASS      10.63 seconds
+TestRunner_sco-tester         PASS      14.27 seconds
+TestRunner_ioctl-tester       PASS      11.72 seconds
+TestRunner_mesh-tester        PASS      8.70 seconds
+TestRunner_smp-tester         PASS      9.71 seconds
+TestRunner_userchan-tester    PASS      7.34 seconds
+IncrementalBuild              PASS      25.58 seconds
 
-Johan
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+Bluetooth: hci_bcm4377: do not mark valid bd_addr as invalid
+WARNING: Reported-by: should be immediately followed by Closes: with a URL to the report
+#73: 
+Reported-by: Felix Zhang <mrman@mrman314.tech>
+Link: https://lore.kernel.org/r/77419ffacc5b4875e920e038332575a2a5bff29f.camel@mrman314.tech/
+
+total: 0 errors, 1 warnings, 15 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13505281.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+Bluetooth: hci_bcm4377: do not mark valid bd_addr as invalid
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+19: B1 Line exceeds max length (93>80): "Link: https://lore.kernel.org/r/77419ffacc5b4875e920e038332575a2a5bff29f.camel@mrman314.tech/"
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0383076714137925071==--
