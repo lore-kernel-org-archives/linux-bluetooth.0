@@ -1,136 +1,136 @@
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5C7F44376
-	for <linux-bluetooth@vger.kernel.org>; Wed, 27 Dec 2023 10:57:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A917C1E534;
+	Wed, 27 Dec 2023 11:41:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TuAPskTZ"
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-427e9ba503fso4157111cf.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Dec 2023 02:57:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703674634; x=1704279434; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=x1elz+KJ7iBRtawEfnBv4LQHM4yHHnwT1VQ6cxZbQ4Y=;
-        b=TuAPskTZcOjkhUms8uyGRrenRViHH/iIhSuSavdsG6u1XXFoXilK5J5+AaOldj3ORF
-         s1M2WsQ9buB01VAHqsN/sIAfu6jt4p1CyKZwoSuoaasNWJwMdC4G7K6bsZcdEG5f51Zd
-         FKlnLphCIiJR7TLovVVe3GfNY3jDD9ppYH2dIGMzK55DzspDt6WsluJuF23Dw93tcGdO
-         reYyj0Zbbu1ly/P8FgUzRayIMi14okvoV3AFoxMY1IX+gO+JafOCbUv82egoFGPQn9FD
-         TWlCkLd3wpJpn/RGlS6ewG5xqKfDhr/0rzjGOsL83zvdGmR6UoJHmr06jEMMgi/8Svte
-         xZBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703674634; x=1704279434;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=x1elz+KJ7iBRtawEfnBv4LQHM4yHHnwT1VQ6cxZbQ4Y=;
-        b=CoqQUNgoIi3f5/8ELS9iOq3FUVJPLabuB0+aTHx05r3rBoLbZbEArss+mVcFfoqkI3
-         WE40XTkKvpzpxl1q8/7fMEXjpBWj4G+Jz7t77AjGP1vj7M3qWRaMVSvOox3D+1L3CIO0
-         fo9LOhaQwAoveNIDIZdjtAMM6dqfkp+asu9clIFOnvgrSaD8d+vpU7fOEf4tywVduNE4
-         kboByghN8ENn+FFXIYTzCspdYIjqW7Fy99DKWXxVoLtXTbFh0C5uJaX00ek9BJf3FJh+
-         7RlOHxCwJZ5U/3I/shVAGFrICFhgaT3FvyuReG+XVKo9pkCuFSTE//zf2yF0gyrewS04
-         lkRQ==
-X-Gm-Message-State: AOJu0YxS4ucVWDTBrLv0peZ4YE6MqRsJ/IYfZi/ezNH4roPl2MOknCDK
-	5nsGupLsxrJmw0pY8Xwf1KWW4y7huSI=
-X-Google-Smtp-Source: AGHT+IF4V4tmgm4H8v7+70PBsrFwAuK3FmYzHHF74BmjtGzkD3uo+3lQHZ6FzWKB2eDxOy6d10qkKw==
-X-Received: by 2002:ac8:59cb:0:b0:427:ec41:36ee with SMTP id f11-20020ac859cb000000b00427ec4136eemr1009125qtf.106.1703674634414;
-        Wed, 27 Dec 2023 02:57:14 -0800 (PST)
-Received: from [172.17.0.2] ([20.81.159.65])
-        by smtp.gmail.com with ESMTPSA id cn10-20020a05622a248a00b00427a4875c14sm6230090qtb.86.2023.12.27.02.57.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Dec 2023 02:57:14 -0800 (PST)
-Message-ID: <658c030a.050a0220.9b0ec.232c@mx.google.com>
-Date: Wed, 27 Dec 2023 02:57:14 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0383076714137925071=="
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Cbza8hMy"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1703677301; x=1735213301;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=3r/1e3HL0Ph6NuiSGOA5oAHEsDBmqySS8+0n+CnOMJQ=;
+  b=Cbza8hMyso+PebbSYaEg8ExGbhY2C6L04iwrwKlzSeuBygPOkRvX/RDy
+   Rk7QEfFdLOTdSpWAUsEF4RPVD3GWPCI6AzAR5wpjdLO6GF8F+E+eT48zW
+   +kNbuNnOiXiYEaT4BwXf5lJisnZAvZVt2EBK3SJ/09mZxzk+lH8B44bte
+   2iYRhwCnIAMkwoYmt7Bhx4JoN7cKm4MAclnTG4dtQRsYWzDumL8iXywV2
+   e1br3734etAyVbQ/m1XR+l1DNXevAuoBJhJ2HWlk2oHyX64FxPnDTOX3u
+   anhB9ce760AwAeaFQfOiqJTzHp64zxIlpXsEq+VsxvImpf5XoMDeOwqR5
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10935"; a="3242949"
+X-IronPort-AV: E=Sophos;i="6.04,309,1695711600"; 
+   d="scan'208";a="3242949"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Dec 2023 03:41:40 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.04,309,1695711600"; 
+   d="scan'208";a="19939496"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by orviesa002.jf.intel.com with ESMTP; 27 Dec 2023 03:41:38 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rISI2-000FL7-2L;
+	Wed, 27 Dec 2023 11:41:34 +0000
+Date: Wed, 27 Dec 2023 19:41:20 +0800
+From: kernel test robot <lkp@intel.com>
+To: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>, marcel@holtmann.org,
+	johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc: oe-kbuild-all@lists.linux.dev, amitkumar.karwar@nxp.com,
+	neeraj.sanjaykale@nxp.com, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org, sherry.sun@nxp.com,
+	rohit.fule@nxp.com
+Subject: Re: [PATCH v2] Bluetooth: btnxpuart: Resolve TX timeout error in
+ power save stress test
+Message-ID: <202312271920.D4X4fO6I-lkp@intel.com>
+References: <20231226113110.3923962-1-neeraj.sanjaykale@nxp.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, johan+linaro@kernel.org
-Subject: RE: Bluetooth: hci_bcm4377: do not mark valid bd_addr as invalid
-In-Reply-To: <20231227101003.10534-1-johan+linaro@kernel.org>
-References: <20231227101003.10534-1-johan+linaro@kernel.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231226113110.3923962-1-neeraj.sanjaykale@nxp.com>
 
---===============0383076714137925071==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Neeraj,
 
-This is automated email and please do not reply to this email!
+kernel test robot noticed the following build errors:
 
-Dear submitter,
+[auto build test ERROR on bluetooth/master]
+[also build test ERROR on bluetooth-next/master linus/master v6.7-rc7 next-20231222]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=813030
+url:    https://github.com/intel-lab-lkp/linux/commits/Neeraj-Sanjay-Kale/Bluetooth-btnxpuart-Resolve-TX-timeout-error-in-power-save-stress-test/20231226-193718
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
+patch link:    https://lore.kernel.org/r/20231226113110.3923962-1-neeraj.sanjaykale%40nxp.com
+patch subject: [PATCH v2] Bluetooth: btnxpuart: Resolve TX timeout error in power save stress test
+config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20231227/202312271920.D4X4fO6I-lkp@intel.com/config)
+compiler: alpha-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231227/202312271920.D4X4fO6I-lkp@intel.com/reproduce)
 
----Test result---
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202312271920.D4X4fO6I-lkp@intel.com/
 
-Test Summary:
-CheckPatch                    FAIL      1.51 seconds
-GitLint                       FAIL      0.56 seconds
-SubjectPrefix                 PASS      2.35 seconds
-BuildKernel                   PASS      27.82 seconds
-CheckAllWarning               PASS      30.14 seconds
-CheckSparse                   PASS      35.81 seconds
-CheckSmatch                   PASS      98.18 seconds
-BuildKernel32                 PASS      27.09 seconds
-TestRunnerSetup               PASS      429.15 seconds
-TestRunner_l2cap-tester       PASS      22.65 seconds
-TestRunner_iso-tester         PASS      44.40 seconds
-TestRunner_bnep-tester        PASS      6.80 seconds
-TestRunner_mgmt-tester        PASS      165.38 seconds
-TestRunner_rfcomm-tester      PASS      10.63 seconds
-TestRunner_sco-tester         PASS      14.27 seconds
-TestRunner_ioctl-tester       PASS      11.72 seconds
-TestRunner_mesh-tester        PASS      8.70 seconds
-TestRunner_smp-tester         PASS      9.71 seconds
-TestRunner_userchan-tester    PASS      7.34 seconds
-IncrementalBuild              PASS      25.58 seconds
+All errors (new ones prefixed by >>):
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-Bluetooth: hci_bcm4377: do not mark valid bd_addr as invalid
-WARNING: Reported-by: should be immediately followed by Closes: with a URL to the report
-#73: 
-Reported-by: Felix Zhang <mrman@mrman314.tech>
-Link: https://lore.kernel.org/r/77419ffacc5b4875e920e038332575a2a5bff29f.camel@mrman314.tech/
-
-total: 0 errors, 1 warnings, 15 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13505281.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+   drivers/bluetooth/btnxpuart.c: In function 'ps_control':
+>> drivers/bluetooth/btnxpuart.c:356:25: error: implicit declaration of function 'usleep'; did you mean 'fsleep'? [-Werror=implicit-function-declaration]
+     356 |                         usleep(2000); /* Allow chip to detect UART-break and enter sleep */
+         |                         ^~~~~~
+         |                         fsleep
+   cc1: some warnings being treated as errors
 
 
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-Bluetooth: hci_bcm4377: do not mark valid bd_addr as invalid
+vim +356 drivers/bluetooth/btnxpuart.c
 
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-19: B1 Line exceeds max length (93>80): "Link: https://lore.kernel.org/r/77419ffacc5b4875e920e038332575a2a5bff29f.camel@mrman314.tech/"
+   333	
+   334	static void ps_control(struct hci_dev *hdev, u8 ps_state)
+   335	{
+   336		struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
+   337		struct ps_data *psdata = &nxpdev->psdata;
+   338		int status;
+   339	
+   340		if (psdata->ps_state == ps_state ||
+   341		    !test_bit(BTNXPUART_SERDEV_OPEN, &nxpdev->tx_state))
+   342			return;
+   343	
+   344		mutex_lock(&psdata->ps_lock);
+   345		switch (psdata->cur_h2c_wakeupmode) {
+   346		case WAKEUP_METHOD_DTR:
+   347			if (ps_state == PS_STATE_AWAKE)
+   348				status = serdev_device_set_tiocm(nxpdev->serdev, TIOCM_DTR, 0);
+   349			else
+   350				status = serdev_device_set_tiocm(nxpdev->serdev, 0, TIOCM_DTR);
+   351			break;
+   352		case WAKEUP_METHOD_BREAK:
+   353		default:
+   354			if (ps_state == PS_STATE_AWAKE) {
+   355				status = serdev_device_break_ctl(nxpdev->serdev, 0);
+ > 356				usleep(2000); /* Allow chip to detect UART-break and enter sleep */
+   357			} else {
+   358				status = serdev_device_break_ctl(nxpdev->serdev, -1);
+   359			}
+   360			bt_dev_dbg(hdev, "Set UART break: %s, status=%d",
+   361				   str_on_off(ps_state == PS_STATE_SLEEP), status);
+   362			break;
+   363		}
+   364		if (!status)
+   365			psdata->ps_state = ps_state;
+   366		mutex_unlock(&psdata->ps_lock);
+   367	
+   368		if (ps_state == PS_STATE_AWAKE)
+   369			btnxpuart_tx_wakeup(nxpdev);
+   370	}
+   371	
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0383076714137925071==--
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
