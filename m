@@ -1,116 +1,104 @@
-Received: from mx.mrman314.tech (unknown [135.0.77.242])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DFE246540;
-	Wed, 27 Dec 2023 18:19:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mrman314.tech
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mrman314.tech
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FE6E1E48A
+	for <linux-bluetooth@vger.kernel.org>; Wed, 27 Dec 2023 18:34:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mrman314.tech header.i=@mrman314.tech header.b="p6fZmmjC"
-Received: from [192.168.6.27] (unknown [160.32.192.137])
-	by mx.mrman314.tech (Postfix) with ESMTPSA id 932FA2F495C8;
-	Wed, 27 Dec 2023 13:19:39 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=mrman314.tech;
-	s=default; t=1703701181;
-	bh=fZGcy7BZG167S+RHVKq7QB3BPpO7PaALkaYFRUu07bM=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=p6fZmmjC343uIjMBvq+O6NtS88LEuhi9sIZ+7gsu9i7kfsRI1zp4ilC3pK80XuAuM
-	 67ZWDoCT+93cH3pOygIx/O8iF1rVzhLzb5hNI3PGHXkfm33sn3yuVB20VlFyXJiLsF
-	 XiBXJAQN5iG2gPCuJAbpO/G2nRygDNL3oMKqjwjU=
-Message-ID: <f06dbc4d10ff5eb038228e9c7abb75c85514cf36.camel@mrman314.tech>
-Subject: Re: [PATCH] Bluetooth: hci_bcm4377: do not mark valid bd_addr as
- invalid
-From: Felix Zhang <mrman@mrman314.tech>
-To: Johan Hovold <johan+linaro@kernel.org>, Luiz Augusto von Dentz
- <luiz.dentz@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, Johan
- Hedberg <johan.hedberg@gmail.com>
-Cc: Hector Martin <marcan@marcan.st>, Sven Peter <sven@svenpeter.dev>, 
- Alyssa Rosenzweig <alyssa@rosenzweig.io>, asahi@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org,  linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org,  stable@vger.kernel.org
-Date: Wed, 27 Dec 2023 13:19:39 -0500
-In-Reply-To: <20231227101003.10534-1-johan+linaro@kernel.org>
-References: <20231227101003.10534-1-johan+linaro@kernel.org>
-Autocrypt: addr=mrman@mrman314.tech; prefer-encrypt=mutual;
- keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.2 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NIedLinh"
+Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-3bbc648bed4so594672b6e.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Dec 2023 10:34:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703702070; x=1704306870; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=81u3azZJySIBJRm1SM3IShRi6dubXWK3D35FZ7Xj6os=;
+        b=NIedLinhLpqMSMZacU+ATDd5t7dlGGJHKQgIT9sijkXtAaiqXcoTB2YzLUgwzq00Lr
+         RB3KDPaPfgOFfBRf0GK0jGuEUjpiLRaZ9C6ecyPNjAVfixc0y9SSW9N/jm7SkYPRV4qx
+         QmzTclxhibLrlAl4clffi5N6KSAsGQlRgNQ6e7DeNIXorHfs0WcohjLhwYjrTefMDhoe
+         r9DPOKMJH7jHWrREVqtv2Rbmic1mNwh3HjEBHJviTasgh17mxngo4WsK3wIe2JpomoUm
+         K8bTXaaELxQoixbRORSvhxTJYRvkTJXyMKI5wtVMr+uYHGAriWY904UmLpu6s9NHhqqt
+         KaQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703702070; x=1704306870;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=81u3azZJySIBJRm1SM3IShRi6dubXWK3D35FZ7Xj6os=;
+        b=VXnKR2KZLX0sXR8nGBncJz7G0PvnwqXWSk1RWdH+HPaspswcWdWUyHvaPJERPI4/nF
+         Jak9Fp+Gl7A54rxFLVifOD26Y7Csz5fkpwwmL1905BEiJxe6QNz38pcEbQRwc06fuKYp
+         vANiVLGE/Ff09Q9dd8tMmkSAxD5auQTke2pVMUKY3zuf0WD4v/YmmJ3am0/R0+ox+xhC
+         enWEHC54O7rdRa8k5stYfU8lciRP5LuFDdFHrhvd0Y5Us1v0bKxoLUbcJhDP6R72/zJd
+         FARo3+ZdlXHOSLPVgmKlmPfpEdxwUMENvHjZLwq1ICeldZude0qFJogq5pcEa4wOB/VG
+         zjjg==
+X-Gm-Message-State: AOJu0YzFmhFb/6MAFpPi4JV3yhah1Tzq3/OyXII2S0rumK17Up2nf8GQ
+	4dax1/SG2mnG0vNZwtlz21ObJSCFyKc=
+X-Google-Smtp-Source: AGHT+IE/Vjl/Za2CDCjI0FRMNeZ5D9BmSTa/SqjBIGBkmtd/j6YBu4N2IyN34c5G8fgUzqb7CybXRw==
+X-Received: by 2002:a05:6808:d4b:b0:3b8:b063:5046 with SMTP id w11-20020a0568080d4b00b003b8b0635046mr11145804oik.71.1703702069827;
+        Wed, 27 Dec 2023 10:34:29 -0800 (PST)
+Received: from [172.17.0.2] ([20.55.118.218])
+        by smtp.gmail.com with ESMTPSA id pm12-20020ad446cc000000b0067f82678cebsm5506582qvb.12.2023.12.27.10.34.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Dec 2023 10:34:29 -0800 (PST)
+Message-ID: <658c6e35.d40a0220.5e611.02da@mx.google.com>
+Date: Wed, 27 Dec 2023 10:34:29 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============2329784217225988214=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, johan+linaro@kernel.org
+Subject: RE: Bluetooth: qca: fix device-address endianness
+In-Reply-To: <20231227180306.6319-1-johan+linaro@kernel.org>
+References: <20231227180306.6319-1-johan+linaro@kernel.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Wed, 2023-12-27 at 11:10 +0100, Johan Hovold wrote:
-> A recent commit restored the original (and still documented)
-> semantics
-> for the HCI_QUIRK_USE_BDADDR_PROPERTY quirk so that the device
-> address
-> is considered invalid unless an address is provided by firmware.
->=20
-> This specifically means that this flag must only be set for devices
-> with
-> invalid addresses, but the Broadcom BCM4377 driver has so far been
-> setting this flag unconditionally.
->=20
-> Fortunately the driver already checks for invalid addresses during
-> setup
-> and sets the HCI_QUIRK_INVALID_BDADDR flag, which can simply be
-> replaced
-> with HCI_QUIRK_USE_BDADDR_PROPERTY to indicate that the default
-> address
-> is invalid but can be overridden by firmware (long term, this should
-> probably just always be allowed).
->=20
-> Fixes: 6945795bc81a ("Bluetooth: fix use-bdaddr-property quirk")
-> Cc: stable@vger.kernel.org=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # 6.5
-> Reported-by: Felix Zhang <mrman@mrman314.tech>
-> Link:
-> https://lore.kernel.org/r/77419ffacc5b4875e920e038332575a2a5bff29f.camel@=
-mrman314.tech/
-> Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
-> ---
-> =C2=A0drivers/bluetooth/hci_bcm4377.c | 3 +--
-> =C2=A01 file changed, 1 insertion(+), 2 deletions(-)
->=20
-> diff --git a/drivers/bluetooth/hci_bcm4377.c
-> b/drivers/bluetooth/hci_bcm4377.c
-> index a61757835695..9a7243d5db71 100644
-> --- a/drivers/bluetooth/hci_bcm4377.c
-> +++ b/drivers/bluetooth/hci_bcm4377.c
-> @@ -1417,7 +1417,7 @@ static int bcm4377_check_bdaddr(struct
-> bcm4377_data *bcm4377)
-> =C2=A0
-> =C2=A0	bda =3D (struct hci_rp_read_bd_addr *)skb->data;
-> =C2=A0	if (!bcm4377_is_valid_bdaddr(bcm4377, &bda->bdaddr))
-> -		set_bit(HCI_QUIRK_INVALID_BDADDR, &bcm4377->hdev-
-> >quirks);
-> +		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &bcm4377-
-> >hdev->quirks);
-> =C2=A0
-> =C2=A0	kfree_skb(skb);
-> =C2=A0	return 0;
-> @@ -2368,7 +2368,6 @@ static int bcm4377_probe(struct pci_dev *pdev,
-> const struct pci_device_id *id)
-> =C2=A0	hdev->set_bdaddr =3D bcm4377_hci_set_bdaddr;
-> =C2=A0	hdev->setup =3D bcm4377_hci_setup;
-> =C2=A0
-> -	set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
-> =C2=A0	if (bcm4377->hw->broken_mws_transport_config)
-> =C2=A0		set_bit(HCI_QUIRK_BROKEN_MWS_TRANSPORT_CONFIG,
-> &hdev->quirks);
-> =C2=A0	if (bcm4377->hw->broken_ext_scan)
-Hi,
+--===============2329784217225988214==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Thanks for the patch!  I have just tested the patch on my MacBookAir9,1
-with some modifications to make it patch with the master branch of the
-Linux kernel, and it works great!  The device is recognized by the
-system; and I can scan, pair, connect, and play audio just fine.  If
-you want me to send over the modified patch that I have used, please
-let me know.
+This is automated email and please do not reply to this email!
 
-Thanks!
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=813083
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.62 seconds
+GitLint                       PASS      0.37 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      27.83 seconds
+CheckAllWarning               PASS      30.66 seconds
+CheckSparse                   PASS      37.40 seconds
+CheckSmatch                   PASS      99.70 seconds
+BuildKernel32                 PASS      27.34 seconds
+TestRunnerSetup               PASS      434.37 seconds
+TestRunner_l2cap-tester       PASS      22.76 seconds
+TestRunner_iso-tester         PASS      48.67 seconds
+TestRunner_bnep-tester        PASS      6.93 seconds
+TestRunner_mgmt-tester        PASS      159.41 seconds
+TestRunner_rfcomm-tester      PASS      11.22 seconds
+TestRunner_sco-tester         PASS      14.91 seconds
+TestRunner_ioctl-tester       PASS      12.03 seconds
+TestRunner_mesh-tester        PASS      8.75 seconds
+TestRunner_smp-tester         PASS      11.73 seconds
+TestRunner_userchan-tester    PASS      7.16 seconds
+IncrementalBuild              PASS      26.43 seconds
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============2329784217225988214==--
