@@ -1,142 +1,153 @@
-Received: from m15.mail.126.com (m15.mail.126.com [45.254.50.223])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D12F88820
-	for <linux-bluetooth@vger.kernel.org>; Thu, 28 Dec 2023 14:07:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
+Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E650E54E
+	for <linux-bluetooth@vger.kernel.org>; Thu, 28 Dec 2023 15:29:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="bijqmVw/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=Vt98F
-	lcQJdlSrsJn65B4IGw+nUBAITHZChm2vymooqY=; b=bijqmVw/rBu6SsZ9Enppo
-	i8jJPeRqbOt2iIUguxRPXArhEGukgA4z1FeYXHiJ0t94/XhozbdEsVRSGGIg2sCq
-	iFsTk/dtYjOab3VrEX4ODz8S3JT+RdqX5YHokdPCoCw+a8Y5+ygzSuCDi842ljmh
-	pdbM9qeBWoQ5wBtpVd9N1o=
-Received: from localhost.localdomain (unknown [58.22.7.114])
-	by zwqz-smtp-mta-g2-1 (Coremail) with SMTP id _____wCnb5mJfY1lYo5VDw--.49824S2;
-	Thu, 28 Dec 2023 21:52:10 +0800 (CST)
-From: Xiao Yao <xiaokeqinhealth@126.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Xiao Yao <xiaoyao@rock-chips.com>
-Subject: [PATCH BlueZ 1/1] avdtp: fix incorrect transaction label in setconf phase
-Date: Thu, 28 Dec 2023 21:52:06 +0800
-Message-Id: <20231228135206.1949453-1-xiaokeqinhealth@126.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ERM4Y7HR"
+Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-6dc025dd9a9so1233005a34.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Dec 2023 07:29:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703777361; x=1704382161; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=O8mb0bgpB6LeTciedX2cDff/TsIcn/L4z53jF746fWk=;
+        b=ERM4Y7HRNSzIfFs4ea27Zvjt+6mpNTgsdAY6vPItMs3uqZ7NsPGPUB8lZk3nCTIrK+
+         lU+r5YKosEVmOLAifgHuQ0ijUi5PtvyYgDRhhHmSj1gEx55JRiAFi9KfhvCc/rXjavQu
+         tz9ndw9wq/jEHvBKEqVuTsPbWrEmS6gy86kG6PGKnKjsQ1dDa3k0aK4tZkEDz6quV/ac
+         I6Z6B7W5j7Iu2JrMEKT1mIzO76etihXV1jK3XLtzjzbDWWJZ9QWli3pkhKgnXyZnffC2
+         Xv8AMsbXgUbQ9a94jcunjuHkdCM357AttSuTVQggqNSVgbbuspmMcsK4jaEzo1QYEQsj
+         1szg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703777361; x=1704382161;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=O8mb0bgpB6LeTciedX2cDff/TsIcn/L4z53jF746fWk=;
+        b=KSQHGGLpooeliUPI7YjeGPW7KPdbuE/GvQNmRMEJZcseV1JsBCDgGG4krAelxeAW2X
+         ZrB4U+56URr3nyOQtoGVaMlIPuSCQudeJW7QKpgva5EqAdPKHVVIJZ4H2zM0jLZh/pDW
+         chzT162WSFP2HKNELF44HJFj/Ajr/s6E1Ulid8kPlIeMjC2v9yx60QXTDCpo2gOT8zV9
+         dMkB95ME75ODXzE12jkvdFQaw//LoRG6W8mp+X7lZtUxDRyDmOoPggqRPD2MVBE7z7Lc
+         hAkOfbYj+rZA0XVSBx09Ix7GpAkmYdLZTZ97VUvpYyrPEVuEv7P6xXXLx1IIr3WM/uZq
+         oL6w==
+X-Gm-Message-State: AOJu0YxawN0Ui+OpQettnIYVbyiv1DT5/OfD2UzkjgRHOdhH1CcAmWhD
+	hRC3TgLrH5E/xTLQ7Tk6PCEcIBWK15M=
+X-Google-Smtp-Source: AGHT+IFew9bBGqZXoDDEgL2lX+iYMYkSyqk7aW88XLCgSmM8kz/eJOFc5qCUSZqlubuh/axRd1T/Uw==
+X-Received: by 2002:a9d:6acf:0:b0:6dc:a35:33b2 with SMTP id m15-20020a9d6acf000000b006dc0a3533b2mr1800086otq.36.1703777360983;
+        Thu, 28 Dec 2023 07:29:20 -0800 (PST)
+Received: from [172.17.0.2] ([172.183.107.250])
+        by smtp.gmail.com with ESMTPSA id l8-20020ac84cc8000000b004257bf9a394sm8131191qtv.14.2023.12.28.07.29.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Dec 2023 07:29:20 -0800 (PST)
+Message-ID: <658d9450.c80a0220.a8893.8ff4@mx.google.com>
+Date: Thu, 28 Dec 2023 07:29:20 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0710867026313901671=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wCnb5mJfY1lYo5VDw--.49824S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxXw4kAr15Jr1fXFyDWr1rWFg_yoWrAFWDpF
-	ySgr18JFykXr15AFsaq3y7ur45tayvyrZ8WryYv3sIy3WSka4Yyr9Yyryjka90vrn5Ww1Y
-	vryDKF9aqw4q93DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07USeHgUUUUU=
-X-CM-SenderInfo: 50ld0yhhtl0xhhdo3xa6rslhhfrp/1tbimgxU1WVLZG6cWwAAs0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, xiaokeqinhealth@126.com
+Subject: RE: [BlueZ,1/1] avdtp: fix incorrect transaction label in setconf phase
+In-Reply-To: <20231228135206.1949453-1-xiaokeqinhealth@126.com>
+References: <20231228135206.1949453-1-xiaokeqinhealth@126.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Xiao Yao <xiaoyao@rock-chips.com>
+--===============0710867026313901671==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-BLUETOOTH SPECIFICATION Page 61 of 140
-Audio/Video Distribution Transport Protocol Specification (V13)
-8.4.6 Message integrity verification at receiver side
+This is automated email and please do not reply to this email!
 
-- The receiver of an AVDTP signaling message shall not interpret corrupted
-messages. Those messages are discarded and no signaling message is returned
-to the sender if no error code is applicable. Possible corrupted messages
-are:
+Dear submitter,
 
-  * Response messages where the transaction label cannot match a previous
-    command sent to the remote device
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=813236
 
-Consider the following scenario:
-btmon log:
-... ...
-AVDTP: Discover (0x01) Command (0x00) type 0x00 label 5 nosp 0
-AVDTP: Discover (0x01) Response Accept (0x02) type 0x00 label 5 nosp 0
-AVDTP: Get All Capabilities (0x0c) Command (0x00) type 0x00 label 6 nosp 0
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.66 seconds
+GitLint                       FAIL      0.51 seconds
+BuildEll                      PASS      23.65 seconds
+BluezMake                     PASS      713.42 seconds
+MakeCheck                     PASS      11.68 seconds
+MakeDistcheck                 PASS      158.89 seconds
+CheckValgrind                 PASS      221.11 seconds
+CheckSmatch                   PASS      325.32 seconds
+bluezmakeextell               PASS      105.56 seconds
+IncrementalBuild              PASS      664.10 seconds
+ScanBuild                     WARNING   919.77 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ,1/1] avdtp: fix incorrect transaction label in setconf phase
+WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#68: 
 AVDTP: Get All Capabilities (0x0c) Response Accept (0x02) type 0x00 label 6 nosp 0
-AVDTP: Get All Capabilities (0x0c) Command (0x00) type 0x00 label 7 nosp 0
-AVDTP: Get All Capabilities (0x0c) Response Accept (0x02) type 0x00 label 7 nosp 0
 
-< AVDTP: Set Configuration (0x03) Command (0x00) type 0x00 label 8 nosp 0
-//Currently, a 'set configuration' message has been received from the
-//sender, which contains a transaction label valued at 8. This message
-//was then relayed to A2DP backend(PulseAudio/PipeWire) using the dbus
-//interface.
-    ---
-    set_configuration()(media.c)
-        msg = dbus_message_new_method_call(endpoint->sender, endpoint->path,
-						MEDIA_ENDPOINT_INTERFACE,
-						"SetConfiguration");
-	media_endpoint_async_call()
-	//dbus send
-	g_dbus_send_message_with_reply(btd_get_dbus_connection(),
-						msg, &request->call,
-						REQUEST_TIMEOUT(3 seconds))
-	dbus_pending_call_set_notify(request->call, endpoint_reply, request,NULL);
-	...
+/github/workspace/src/src/13506075.patch total: 0 errors, 1 warnings, 23 lines checked
 
-> AVDTP: Discover (0x01) Command (0x00) type 0x00 label 0 nosp 0
-//At this time, the A2DP reverse discovery issued an A2DP discover command.
-< AVDTP: Discover (0x01) Response Accept (0x02) type 0x00 label 0 nosp 0
-//After receiving the discover reply, the session->in.transaction is
-//changed to 0
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
-> AVDTP: Set Configuration (0x03) Response Accept (0x02) type 0x00 label 0 nosp 0
-//The audio backend reply the dbus message
-    endpoint_reply (media.c)
-        setconf_cb (avdtp.c)
-            //Here avdtp_send sends an incorrect transaction value, causing
-	    //the sender to discard the message. (The correct transaction
-	    //value is 8)
-            avdtp_send(session, session->in.transaction, AVDTP_MSG_TYPE_ACCEPT,
-					AVDTP_SET_CONFIGURATION, NULL, 0)
+/github/workspace/src/src/13506075.patch has style problems, please review.
 
-AVDTP: Delay Report (0x0d) Command (0x00) type 0x00 label 1 nosp 0
-AVDTP: Delay Report (0x0d) Response Accept (0x02) type 0x00 label 1 nosp 0
-AVDTP: Get All Capabilities (0x0c) Command (0x00) type 0x00 label 2 nosp 0
-AVDTP: Get All Capabilities (0x0c) Response Accept (0x02) type 0x00 label 2 nosp 0
-... ...
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
 
-Therefore, a async_transaction that requires asynchronous return is
-recorded to prevent it from being incorrectly modified.
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
-Signed-off-by: Xiao Yao <xiaoyao@rock-chips.com>
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,1/1] avdtp: fix incorrect transaction label in setconf phase
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+23: B1 Line exceeds max length (82>80): "AVDTP: Get All Capabilities (0x0c) Response Accept (0x02) type 0x00 label 6 nosp 0"
+25: B1 Line exceeds max length (82>80): "AVDTP: Get All Capabilities (0x0c) Response Accept (0x02) type 0x00 label 7 nosp 0"
+35: B3 Line contains hard tab characters (\t): "						MEDIA_ENDPOINT_INTERFACE,"
+36: B3 Line contains hard tab characters (\t): "						"SetConfiguration");"
+37: B3 Line contains hard tab characters (\t): "	media_endpoint_async_call()"
+38: B3 Line contains hard tab characters (\t): "	//dbus send"
+39: B3 Line contains hard tab characters (\t): "	g_dbus_send_message_with_reply(btd_get_dbus_connection(),"
+40: B3 Line contains hard tab characters (\t): "						msg, &request->call,"
+41: B3 Line contains hard tab characters (\t): "						REQUEST_TIMEOUT(3 seconds))"
+42: B3 Line contains hard tab characters (\t): "	dbus_pending_call_set_notify(request->call, endpoint_reply, request,NULL);"
+43: B3 Line contains hard tab characters (\t): "	..."
+51: B1 Line exceeds max length (81>80): "> AVDTP: Set Configuration (0x03) Response Accept (0x02) type 0x00 label 0 nosp 0"
+56: B3 Line contains hard tab characters (\t): "	    //the sender to discard the message. (The correct transaction"
+57: B3 Line contains hard tab characters (\t): "	    //value is 8)"
+59: B3 Line contains hard tab characters (\t): "					AVDTP_SET_CONFIGURATION, NULL, 0)"
+64: B1 Line exceeds max length (82>80): "AVDTP: Get All Capabilities (0x0c) Response Accept (0x02) type 0x00 label 2 nosp 0"
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+profiles/audio/avdtp.c:896:25: warning: Use of memory after it is freed
+                session->prio_queue = g_slist_remove(session->prio_queue, req);
+                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+profiles/audio/avdtp.c:903:24: warning: Use of memory after it is freed
+                session->req_queue = g_slist_remove(session->req_queue, req);
+                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2 warnings generated.
+
+
+
 ---
- profiles/audio/avdtp.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index 10ef380d4..2171e7723 100644
---- a/profiles/audio/avdtp.c
-+++ b/profiles/audio/avdtp.c
-@@ -286,6 +286,7 @@ struct in_buf {
- 	gboolean active;
- 	int no_of_packets;
- 	uint8_t transaction;
-+	uint8_t async_transaction;
- 	uint8_t message_type;
- 	uint8_t signal_id;
- 	uint8_t buf[1024];
-@@ -1459,6 +1460,9 @@ static void setconf_cb(struct avdtp *session, struct avdtp_stream *stream,
- 	struct conf_rej rej;
- 	struct avdtp_local_sep *sep;
- 
-+	if (session->in.transaction != session->in.async_transaction)
-+		session->in.transaction = session->in.async_transaction;
-+
- 	if (err != NULL) {
- 		rej.error = AVDTP_UNSUPPORTED_CONFIGURATION;
- 		rej.category = err->err.error_code;
-@@ -1569,6 +1573,7 @@ static gboolean avdtp_setconf_cmd(struct avdtp *session, uint8_t transaction,
- 		session->version = 0x0103;
- 
- 	if (sep->ind && sep->ind->set_configuration) {
-+		session->in.async_transaction = transaction;
- 		if (!sep->ind->set_configuration(session, sep, stream,
- 							stream->caps,
- 							setconf_cb,
--- 
-2.34.1
 
+--===============0710867026313901671==--
