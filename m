@@ -1,163 +1,293 @@
-Received: from m126.mail.126.com (m126.mail.126.com [220.181.12.28])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 414DD399
-	for <linux-bluetooth@vger.kernel.org>; Fri, 29 Dec 2023 00:38:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93B621385;
+	Fri, 29 Dec 2023 00:45:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="InKlNAaN"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
-	s=s110527; h=Message-ID:Date:MIME-Version:Subject:From:
-	Content-Type; bh=DnJxDhvv2WZyysfvKOCjgrze8pIlMzSwn5P3iw1y374=;
-	b=InKlNAaNSGr9/QsfktDvwPmAfBzsvVTu2dvspnAxl3f6VPxhgkpB6HXoMDm0Ue
-	HAxnlmJuUjZSFdynCla0HD0mLBbahoKv99Tn0mrptvMCh7wtCAWpg86e5C6pBO+V
-	t18+fo8k8+UG4q3QF9w1jQfAaeSeUG/0JzyIntxJtruzo=
-Received: from [192.168.50.76] (unknown [58.22.7.114])
-	by zwqz-smtp-mta-g3-1 (Coremail) with SMTP id _____wD3f6tpEY5lqmNoEg--.55896S2;
-	Fri, 29 Dec 2023 08:23:08 +0800 (CST)
-Message-ID: <0e4b35f8-1b40-4f9c-b600-ff9e2a5e74a8@126.com>
-Date: Fri, 29 Dec 2023 08:23:06 +0800
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YAP2H1bO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1703810759; x=1735346759;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=h0d7MyfanjVVQK9qj4fu4bv00Y+gJQB03toFTcpEIak=;
+  b=YAP2H1bOvDCGqC0zopqFPphWRXxhKqbyAgeYw/gpxto1A32LU266Y7oJ
+   7uvSHrzkp035n1hUuqdTzNUdzN7DyE2561GL/0jRq/691zYYdcgd3VVHh
+   2kyDwsRL4htzEhkTVuCpQdmfIUAdJzAW1ysaxM4EJBb0Q36MvvSS81zHo
+   L91iSI0kLOIPjzIUR0NIuDL5mPl/ZxNnybwh3NU0MK+skLZLNW61ZI95e
+   NXDkDPiLN+4F8aSgESIuQPzgktVu+JtmVE4ZFWIkRHiHjB9RKc3mktoxU
+   jNruhh1rxyoL0MMN9Z+vq+Gpe20kyz22I2iT9fMMOFEyZk0qk0cQJZdgn
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10937"; a="381578338"
+X-IronPort-AV: E=Sophos;i="6.04,313,1695711600"; 
+   d="scan'208";a="381578338"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Dec 2023 16:45:50 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10937"; a="869261577"
+X-IronPort-AV: E=Sophos;i="6.04,313,1695711600"; 
+   d="scan'208";a="869261577"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by FMSMGA003.fm.intel.com with ESMTP; 28 Dec 2023 16:45:46 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rJ10S-000Gxl-0Y;
+	Fri, 29 Dec 2023 00:45:44 +0000
+Date: Fri, 29 Dec 2023 08:44:49 +0800
+From: kernel test robot <lkp@intel.com>
+To: Peter Tsao <peter.tsao@mediatek.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Von Dentz <luiz.dentz@gmail.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Sean Wang <sean.wang@mediatek.com>,
+	Deren Wu <deren.Wu@mediatek.com>, Chris Lu <chris.lu@mediatek.com>,
+	Aaron Hou <aaron.hou@mediatek.com>,
+	Steve Lee <steve.lee@mediatek.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-mediatek <linux-mediatek@lists.infradead.org>,
+	Peter Tsao <peter.tsao@mediatek.com>
+Subject: Re: [PATCH] Bluetooth: btusb: Fix MT7925 fail to send download patch
+ command
+Message-ID: <202312290838.c0zcBoUz-lkp@intel.com>
+References: <20231228092014.23184-1-peter.tsao@mediatek.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH BlueZ 1/1] avdtp: fix incorrect transaction label in
- setconf phase
-Content-Language: en-GB
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, Xiao Yao <xiaoyao@rock-chips.com>
-References: <20231228135206.1949453-1-xiaokeqinhealth@126.com>
- <CABBYNZLVZOJ6uAJdu876S5=jb1CeAX_ajn7jAUCurWdDOcKotQ@mail.gmail.com>
-From: Yao Xiao <xiaokeqinhealth@126.com>
-In-Reply-To: <CABBYNZLVZOJ6uAJdu876S5=jb1CeAX_ajn7jAUCurWdDOcKotQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3f6tpEY5lqmNoEg--.55896S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxAr18ZF13Kw4fZw48uFWrAFb_yoW7Gr1xpF
-	WI9F18JFWkXr15AFn2q3y5uF12q39YyrZ8WryYv3sIy3ZIk3Z8tryvyry0ka90vr1ruw1Y
-	vryqg3saqw4q93DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UZ4SwUUUUU=
-X-CM-SenderInfo: 50ld0yhhtl0xhhdo3xa6rslhhfrp/1tbimgxV1WVLZHWpDAAAsM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231228092014.23184-1-peter.tsao@mediatek.com>
 
-Hi,
-On 2023/12/29 0:05, Luiz Augusto von Dentz wrote:
-> Hi,
->
-> On Thu, Dec 28, 2023 at 9:07 AM Xiao Yao <xiaokeqinhealth@126.com> wrote:
->> From: Xiao Yao <xiaoyao@rock-chips.com>
->>
->> BLUETOOTH SPECIFICATION Page 61 of 140
->> Audio/Video Distribution Transport Protocol Specification (V13)
->> 8.4.6 Message integrity verification at receiver side
->>
->> - The receiver of an AVDTP signaling message shall not interpret corrupted
->> messages. Those messages are discarded and no signaling message is returned
->> to the sender if no error code is applicable. Possible corrupted messages
->> are:
->>
->>    * Response messages where the transaction label cannot match a previous
->>      command sent to the remote device
->>
->> Consider the following scenario:
->> btmon log:
->> ... ...
->> AVDTP: Discover (0x01) Command (0x00) type 0x00 label 5 nosp 0
->> AVDTP: Discover (0x01) Response Accept (0x02) type 0x00 label 5 nosp 0
->> AVDTP: Get All Capabilities (0x0c) Command (0x00) type 0x00 label 6 nosp 0
->> AVDTP: Get All Capabilities (0x0c) Response Accept (0x02) type 0x00 label 6 nosp 0
->> AVDTP: Get All Capabilities (0x0c) Command (0x00) type 0x00 label 7 nosp 0
->> AVDTP: Get All Capabilities (0x0c) Response Accept (0x02) type 0x00 label 7 nosp 0
->>
->> < AVDTP: Set Configuration (0x03) Command (0x00) type 0x00 label 8 nosp 0
->> //Currently, a 'set configuration' message has been received from the
->> //sender, which contains a transaction label valued at 8. This message
->> //was then relayed to A2DP backend(PulseAudio/PipeWire) using the dbus
->> //interface.
->>      ---
->>      set_configuration()(media.c)
->>          msg = dbus_message_new_method_call(endpoint->sender, endpoint->path,
->>                                                  MEDIA_ENDPOINT_INTERFACE,
->>                                                  "SetConfiguration");
->>          media_endpoint_async_call()
->>          //dbus send
->>          g_dbus_send_message_with_reply(btd_get_dbus_connection(),
->>                                                  msg, &request->call,
->>                                                  REQUEST_TIMEOUT(3 seconds))
->>          dbus_pending_call_set_notify(request->call, endpoint_reply, request,NULL);
->>          ...
->>
->>> AVDTP: Discover (0x01) Command (0x00) type 0x00 label 0 nosp 0
->> //At this time, the A2DP reverse discovery issued an A2DP discover command.
->> < AVDTP: Discover (0x01) Response Accept (0x02) type 0x00 label 0 nosp 0
->> //After receiving the discover reply, the session->in.transaction is
->> //changed to 0
->>
->>> AVDTP: Set Configuration (0x03) Response Accept (0x02) type 0x00 label 0 nosp 0
->> //The audio backend reply the dbus message
->>      endpoint_reply (media.c)
->>          setconf_cb (avdtp.c)
->>              //Here avdtp_send sends an incorrect transaction value, causing
->>              //the sender to discard the message. (The correct transaction
->>              //value is 8)
->>              avdtp_send(session, session->in.transaction, AVDTP_MSG_TYPE_ACCEPT,
->>                                          AVDTP_SET_CONFIGURATION, NULL, 0)
->>
->> AVDTP: Delay Report (0x0d) Command (0x00) type 0x00 label 1 nosp 0
->> AVDTP: Delay Report (0x0d) Response Accept (0x02) type 0x00 label 1 nosp 0
->> AVDTP: Get All Capabilities (0x0c) Command (0x00) type 0x00 label 2 nosp 0
->> AVDTP: Get All Capabilities (0x0c) Response Accept (0x02) type 0x00 label 2 nosp 0
->> ... ...
->>
->> Therefore, a async_transaction that requires asynchronous return is
->> recorded to prevent it from being incorrectly modified.
->>
->> Signed-off-by: Xiao Yao <xiaoyao@rock-chips.com>
->> ---
->>   profiles/audio/avdtp.c | 5 +++++
->>   1 file changed, 5 insertions(+)
->>
->> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
->> index 10ef380d4..2171e7723 100644
->> --- a/profiles/audio/avdtp.c
->> +++ b/profiles/audio/avdtp.c
->> @@ -286,6 +286,7 @@ struct in_buf {
->>          gboolean active;
->>          int no_of_packets;
->>          uint8_t transaction;
->> +       uint8_t async_transaction;
-> You can only have one transaction in each direction, so this doesn't
-> look right at all. What perhaps is the problem is that we are changing
-> the transaction ID also in case of responses in which case we need to
-> fix that.
-I committed an error during the patch optimization process by altering
-the original label, which was incorrect.I will be sending a v2 patch.
->
->>          uint8_t message_type;
->>          uint8_t signal_id;
->>          uint8_t buf[1024];
->> @@ -1459,6 +1460,9 @@ static void setconf_cb(struct avdtp *session, struct avdtp_stream *stream,
->>          struct conf_rej rej;
->>          struct avdtp_local_sep *sep;
->>
->> +       if (session->in.transaction != session->in.async_transaction)
->> +               session->in.transaction = session->in.async_transaction;
->> +
->>          if (err != NULL) {
->>                  rej.error = AVDTP_UNSUPPORTED_CONFIGURATION;
->>                  rej.category = err->err.error_code;
->> @@ -1569,6 +1573,7 @@ static gboolean avdtp_setconf_cmd(struct avdtp *session, uint8_t transaction,
->>                  session->version = 0x0103;
->>
->>          if (sep->ind && sep->ind->set_configuration) {
->> +               session->in.async_transaction = transaction;
->>                  if (!sep->ind->set_configuration(session, sep, stream,
->>                                                          stream->caps,
->>                                                          setconf_cb,
->> --
->> 2.34.1
->>
->>
->
+Hi Peter,
 
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on bluetooth/master]
+[also build test ERROR on bluetooth-next/master linus/master v6.7-rc7 next-20231222]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Peter-Tsao/Bluetooth-btusb-Fix-MT7925-fail-to-send-download-patch-command/20231228-172328
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
+patch link:    https://lore.kernel.org/r/20231228092014.23184-1-peter.tsao%40mediatek.com
+patch subject: [PATCH] Bluetooth: btusb: Fix MT7925 fail to send download patch command
+config: i386-buildonly-randconfig-002-20231229 (https://download.01.org/0day-ci/archive/20231229/202312290838.c0zcBoUz-lkp@intel.com/config)
+compiler: ClangBuiltLinux clang version 17.0.6 (https://github.com/llvm/llvm-project 6009708b4367171ccdbf4b5905cb6a803753fe18)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231229/202312290838.c0zcBoUz-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202312290838.c0zcBoUz-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> drivers/bluetooth/btusb.c:3122:49: error: use of undeclared identifier 'val'
+    3122 |                 btusb_mtk_uhw_reg_read(data, MT7925_SLPPROT, &val);
+         |                                                               ^
+   drivers/bluetooth/btusb.c:3123:3: error: use of undeclared identifier 'val'
+    3123 |                 val |= SLPPROT_BYPASS;
+         |                 ^
+   drivers/bluetooth/btusb.c:3124:49: error: use of undeclared identifier 'val'
+    3124 |                 btusb_mtk_uhw_reg_write(data, MT7925_SLPPROT, val);
+         |                                                               ^
+   3 errors generated.
+
+
+vim +/val +3122 drivers/bluetooth/btusb.c
+
+  3068	
+  3069	static int btusb_mtk_setup(struct hci_dev *hdev)
+  3070	{
+  3071		struct btusb_data *data = hci_get_drvdata(hdev);
+  3072		struct btmtk_hci_wmt_params wmt_params;
+  3073		ktime_t calltime, delta, rettime;
+  3074		struct btmtk_tci_sleep tci_sleep;
+  3075		unsigned long long duration;
+  3076		struct sk_buff *skb;
+  3077		const char *fwname;
+  3078		int err, status;
+  3079		u32 dev_id = 0;
+  3080		char fw_bin_name[64];
+  3081		u32 fw_version = 0;
+  3082		u8 param;
+  3083		struct btmediatek_data *mediatek;
+  3084	
+  3085		calltime = ktime_get();
+  3086	
+  3087		err = btusb_mtk_id_get(data, 0x80000008, &dev_id);
+  3088		if (err < 0) {
+  3089			bt_dev_err(hdev, "Failed to get device id (%d)", err);
+  3090			return err;
+  3091		}
+  3092	
+  3093		if (!dev_id || dev_id != 0x7663) {
+  3094			err = btusb_mtk_id_get(data, 0x70010200, &dev_id);
+  3095			if (err < 0) {
+  3096				bt_dev_err(hdev, "Failed to get device id (%d)", err);
+  3097				return err;
+  3098			}
+  3099			err = btusb_mtk_id_get(data, 0x80021004, &fw_version);
+  3100			if (err < 0) {
+  3101				bt_dev_err(hdev, "Failed to get fw version (%d)", err);
+  3102				return err;
+  3103			}
+  3104		}
+  3105	
+  3106		mediatek = hci_get_priv(hdev);
+  3107		mediatek->dev_id = dev_id;
+  3108		mediatek->reset_sync = btusb_mtk_reset;
+  3109	
+  3110		err = btmtk_register_coredump(hdev, btusb_driver.name, fw_version);
+  3111		if (err < 0)
+  3112			bt_dev_err(hdev, "Failed to register coredump (%d)", err);
+  3113	
+  3114		switch (dev_id) {
+  3115		case 0x7663:
+  3116			fwname = FIRMWARE_MT7663;
+  3117			break;
+  3118		case 0x7668:
+  3119			fwname = FIRMWARE_MT7668;
+  3120			break;
+  3121		case 0x7925:
+> 3122			btusb_mtk_uhw_reg_read(data, MT7925_SLPPROT, &val);
+  3123			val |= SLPPROT_BYPASS;
+  3124			btusb_mtk_uhw_reg_write(data, MT7925_SLPPROT, val);
+  3125			fallthrough;
+  3126		case 0x7922:
+  3127		case 0x7961:
+  3128			if (dev_id == 0x7925)
+  3129				snprintf(fw_bin_name, sizeof(fw_bin_name),
+  3130					 "mediatek/mt%04x/BT_RAM_CODE_MT%04x_1_%x_hdr.bin",
+  3131					 dev_id & 0xffff, dev_id & 0xffff, (fw_version & 0xff) + 1);
+  3132			else
+  3133				snprintf(fw_bin_name, sizeof(fw_bin_name),
+  3134					 "mediatek/BT_RAM_CODE_MT%04x_1_%x_hdr.bin",
+  3135					 dev_id & 0xffff, (fw_version & 0xff) + 1);
+  3136	
+  3137			err = btmtk_setup_firmware_79xx(hdev, fw_bin_name,
+  3138							btusb_mtk_hci_wmt_sync);
+  3139			if (err < 0) {
+  3140				bt_dev_err(hdev, "Failed to set up firmware (%d)", err);
+  3141				return err;
+  3142			}
+  3143	
+  3144			/* It's Device EndPoint Reset Option Register */
+  3145			btusb_mtk_uhw_reg_write(data, MTK_EP_RST_OPT, MTK_EP_RST_IN_OUT_OPT);
+  3146	
+  3147			/* Enable Bluetooth protocol */
+  3148			param = 1;
+  3149			wmt_params.op = BTMTK_WMT_FUNC_CTRL;
+  3150			wmt_params.flag = 0;
+  3151			wmt_params.dlen = sizeof(param);
+  3152			wmt_params.data = &param;
+  3153			wmt_params.status = NULL;
+  3154	
+  3155			err = btusb_mtk_hci_wmt_sync(hdev, &wmt_params);
+  3156			if (err < 0) {
+  3157				bt_dev_err(hdev, "Failed to send wmt func ctrl (%d)", err);
+  3158				return err;
+  3159			}
+  3160	
+  3161			hci_set_msft_opcode(hdev, 0xFD30);
+  3162			hci_set_aosp_capable(hdev);
+  3163			goto done;
+  3164		default:
+  3165			bt_dev_err(hdev, "Unsupported hardware variant (%08x)",
+  3166				   dev_id);
+  3167			return -ENODEV;
+  3168		}
+  3169	
+  3170		/* Query whether the firmware is already download */
+  3171		wmt_params.op = BTMTK_WMT_SEMAPHORE;
+  3172		wmt_params.flag = 1;
+  3173		wmt_params.dlen = 0;
+  3174		wmt_params.data = NULL;
+  3175		wmt_params.status = &status;
+  3176	
+  3177		err = btusb_mtk_hci_wmt_sync(hdev, &wmt_params);
+  3178		if (err < 0) {
+  3179			bt_dev_err(hdev, "Failed to query firmware status (%d)", err);
+  3180			return err;
+  3181		}
+  3182	
+  3183		if (status == BTMTK_WMT_PATCH_DONE) {
+  3184			bt_dev_info(hdev, "firmware already downloaded");
+  3185			goto ignore_setup_fw;
+  3186		}
+  3187	
+  3188		/* Setup a firmware which the device definitely requires */
+  3189		err = btmtk_setup_firmware(hdev, fwname,
+  3190					   btusb_mtk_hci_wmt_sync);
+  3191		if (err < 0)
+  3192			return err;
+  3193	
+  3194	ignore_setup_fw:
+  3195		err = readx_poll_timeout(btusb_mtk_func_query, hdev, status,
+  3196					 status < 0 || status != BTMTK_WMT_ON_PROGRESS,
+  3197					 2000, 5000000);
+  3198		/* -ETIMEDOUT happens */
+  3199		if (err < 0)
+  3200			return err;
+  3201	
+  3202		/* The other errors happen in btusb_mtk_func_query */
+  3203		if (status < 0)
+  3204			return status;
+  3205	
+  3206		if (status == BTMTK_WMT_ON_DONE) {
+  3207			bt_dev_info(hdev, "function already on");
+  3208			goto ignore_func_on;
+  3209		}
+  3210	
+  3211		/* Enable Bluetooth protocol */
+  3212		param = 1;
+  3213		wmt_params.op = BTMTK_WMT_FUNC_CTRL;
+  3214		wmt_params.flag = 0;
+  3215		wmt_params.dlen = sizeof(param);
+  3216		wmt_params.data = &param;
+  3217		wmt_params.status = NULL;
+  3218	
+  3219		err = btusb_mtk_hci_wmt_sync(hdev, &wmt_params);
+  3220		if (err < 0) {
+  3221			bt_dev_err(hdev, "Failed to send wmt func ctrl (%d)", err);
+  3222			return err;
+  3223		}
+  3224	
+  3225	ignore_func_on:
+  3226		/* Apply the low power environment setup */
+  3227		tci_sleep.mode = 0x5;
+  3228		tci_sleep.duration = cpu_to_le16(0x640);
+  3229		tci_sleep.host_duration = cpu_to_le16(0x640);
+  3230		tci_sleep.host_wakeup_pin = 0;
+  3231		tci_sleep.time_compensation = 0;
+  3232	
+  3233		skb = __hci_cmd_sync(hdev, 0xfc7a, sizeof(tci_sleep), &tci_sleep,
+  3234				     HCI_INIT_TIMEOUT);
+  3235		if (IS_ERR(skb)) {
+  3236			err = PTR_ERR(skb);
+  3237			bt_dev_err(hdev, "Failed to apply low power setting (%d)", err);
+  3238			return err;
+  3239		}
+  3240		kfree_skb(skb);
+  3241	
+  3242	done:
+  3243		rettime = ktime_get();
+  3244		delta = ktime_sub(rettime, calltime);
+  3245		duration = (unsigned long long)ktime_to_ns(delta) >> 10;
+  3246	
+  3247		bt_dev_info(hdev, "Device setup in %llu usecs", duration);
+  3248	
+  3249		return 0;
+  3250	}
+  3251	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
