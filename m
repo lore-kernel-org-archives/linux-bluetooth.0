@@ -1,89 +1,134 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E62125DC;
-	Fri, 29 Dec 2023 15:51:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rv8Pia6H"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12719C43391;
-	Fri, 29 Dec 2023 15:51:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703865092;
-	bh=7O3tlE/TnK1/XnaVJFlVImIMjHjO4tOg8Bzzxg1t2QA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Rv8Pia6HyhjgKIdp3aIC9TJ8IMuQkjU+xFoZYQHFVi3bYo0W7bq/M6eSRHSG9DCQ5
-	 h+MlW7AW8pcTqylL0C2uuHXrOHgUX5YcbK1+5CMcYs5U2OXFGiJGialB+38u4IClI3
-	 jPql9i4xdDjDokz2etKcR9gm7w0V+U3Nmp7cVYOkiIyL7n1RHKAU6wcHqJEGjUl3bX
-	 QLmWQyhV9aLtxgYzafd9FOkdlyWr13sY2BEzw76VfSq+SqCxTJXVGGx1XpIibiXcvY
-	 247PLrOXNl0gEp6P8BdWKcWTtTFzibE/m5QX67quu/JDl3zAeG1aD3Orx4IPnsSsQH
-	 mr72NXNFs1p2A==
-Received: from johan by xi.lan with local (Exim 4.96.2)
-	(envelope-from <johan@kernel.org>)
-	id 1rJF8v-0005m6-1i;
-	Fri, 29 Dec 2023 16:51:25 +0100
-Date: Fri, 29 Dec 2023 16:51:25 +0100
-From: Johan Hovold <johan@kernel.org>
-To: Neal Gompa <neal@gompa.dev>
-Cc: Johan Hovold <johan+linaro@kernel.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Hector Martin <marcan@marcan.st>, Sven Peter <sven@svenpeter.dev>,
-	Alyssa Rosenzweig <alyssa@rosenzweig.io>, asahi@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org, Felix Zhang <mrman@mrman314.tech>
-Subject: Re: [PATCH] Bluetooth: hci_bcm4377: do not mark valid bd_addr as
- invalid
-Message-ID: <ZY7q_XOKya1MjH9h@hovoldconsulting.com>
-References: <20231227101003.10534-1-johan+linaro@kernel.org>
- <CAEg-Je-WJZGMgurcQY3p9wQffEJmN3OsiK_9ictsFV3uTGdS9g@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32FD446AD
+	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Jan 2024 10:44:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3601c1b80d3so49381655ab.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Jan 2024 02:44:18 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704105858; x=1704710658;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ewnDTV1LOwNpnc7vIBEVefJx70mwTgZPcLpGjs0H0Ik=;
+        b=V0/TyC2Q5uedbSCcwFIygLU0LJHpcYZlMp6zIS4BcoYyT3+RPMQ/F/5Lib/nhfxurJ
+         Q5K64FZTTp8gUGMQrjZNQEMKzdbAooqU6I7lYgj6g05v8M6JNObkwh8k8Xfcs/hudb1L
+         nyV4OkqqNnMBWAKzzVy55cVKPoqXhBrrGHCW+o2RrbTyC0gFE3UTBHnLt7/VO2/rZLeH
+         V4PMFHWJuhU/6O7kDfRd1rfu41ip8x0PUd7h3CiCwabmPnjYVYXjhv5F1zS7CTXWYecC
+         K4uNE0u0NbomHoR9OK4gqDH4PojMyGeF3humZ/RQm0R7DKUrHzD9l6YgpZMeeZmGbQrp
+         IVRA==
+X-Gm-Message-State: AOJu0YyaMAMCy/LrMCGq58KAHws7r5XuvmiZTFR67o8fipzO2AljFbY2
+	qlBm3p2WXc1ZtZELXFZW0d/CWZvfyz9LLWRHPYHakcxeu6eq
+X-Google-Smtp-Source: AGHT+IEaL9Ga2y5QBuKhMeZ3BqnKFxwtyqFQMCxid1IpoCpdkF4+3FncGX6KSQ2i2qudlPL6imUhsWp9DwT6v4lfwKAdHo59PBrM
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAEg-Je-WJZGMgurcQY3p9wQffEJmN3OsiK_9ictsFV3uTGdS9g@mail.gmail.com>
+X-Received: by 2002:a05:6e02:1d0c:b0:35f:d4dc:1b1e with SMTP id
+ i12-20020a056e021d0c00b0035fd4dc1b1emr2892753ila.5.1704105858448; Mon, 01 Jan
+ 2024 02:44:18 -0800 (PST)
+Date: Mon, 01 Jan 2024 02:44:18 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000005a4548060de01081@google.com>
+Subject: [syzbot] [bluetooth?] KMSAN: uninit-value in eir_get_service_data
+From: syzbot <syzbot+5e132fbe94a9ede456ad@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Dec 29, 2023 at 10:11:32AM -0500, Neal Gompa wrote:
-> On Wed, Dec 27, 2023 at 5:10 AM Johan Hovold <johan+linaro@kernel.org> wrote:
-> >
-> > A recent commit restored the original (and still documented) semantics
-> > for the HCI_QUIRK_USE_BDADDR_PROPERTY quirk so that the device address
-> > is considered invalid unless an address is provided by firmware.
-> >
-> > This specifically means that this flag must only be set for devices with
-> > invalid addresses, but the Broadcom BCM4377 driver has so far been
-> > setting this flag unconditionally.
-> >
-> > Fortunately the driver already checks for invalid addresses during setup
-> > and sets the HCI_QUIRK_INVALID_BDADDR flag, which can simply be replaced
-> > with HCI_QUIRK_USE_BDADDR_PROPERTY to indicate that the default address
-> > is invalid but can be overridden by firmware (long term, this should
-> > probably just always be allowed).
-> >
-> > Fixes: 6945795bc81a ("Bluetooth: fix use-bdaddr-property quirk")
-> > Cc: stable@vger.kernel.org      # 6.5
-> > Reported-by: Felix Zhang <mrman@mrman314.tech>
-> > Link: https://lore.kernel.org/r/77419ffacc5b4875e920e038332575a2a5bff29f.camel@mrman314.tech/
-> > Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
+Hello,
 
-> Looks good to me. This replaces the other patch[1], I take it?
+syzbot found the following issue on:
 
-Yes, but as Sven explained here, that patch is also correct even though
-that wasn't obvious from just reading the commit message (which should
-be amended in my opinion):
+HEAD commit:    c42d9eeef8e5 Merge tag 'hardening-v6.7-rc2' of git://git.k..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=16867338e80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=fdfc68946ad7a215
+dashboard link: https://syzkaller.appspot.com/bug?extid=5e132fbe94a9ede456ad
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=178f3388e80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13341388e80000
 
-	https://lore.kernel.org/asahi/AB87C916-9CF9-4B8C-AFF5-74CA4151C4FC@svenpeter.dev/
- 
-> Reviewed-by: Neal Gompa <neal@gompa.dev>
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/8c25bb76d765/disk-c42d9eee.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/80d9450a6b6a/vmlinux-c42d9eee.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/4b1a54cf685f/bzImage-c42d9eee.xz
 
-Thanks for reviewing.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+5e132fbe94a9ede456ad@syzkaller.appspotmail.com
 
-> [1]: https://lore.kernel.org/asahi/aaa107865f4cbd61f8f9006fd3e7ac43b5d1bdad.camel@mrman314.tech/
+=====================================================
+BUG: KMSAN: uninit-value in eir_get_data net/bluetooth/eir.h:73 [inline]
+BUG: KMSAN: uninit-value in eir_get_service_data+0x25c/0x570 net/bluetooth/eir.c:384
+ eir_get_data net/bluetooth/eir.h:73 [inline]
+ eir_get_service_data+0x25c/0x570 net/bluetooth/eir.c:384
+ iso_connect_ind+0x2004/0x2330 net/bluetooth/iso.c:1794
+ hci_proto_connect_ind include/net/bluetooth/hci_core.h:1922 [inline]
+ hci_le_per_adv_report_evt+0xc0/0x1e0 net/bluetooth/hci_event.c:6645
+ hci_le_meta_evt+0x608/0x860 net/bluetooth/hci_event.c:7344
+ hci_event_func net/bluetooth/hci_event.c:7674 [inline]
+ hci_event_packet+0x1183/0x1be0 net/bluetooth/hci_event.c:7729
+ hci_rx_work+0x687/0x1120 net/bluetooth/hci_core.c:4105
+ process_one_work kernel/workqueue.c:2630 [inline]
+ process_scheduled_works+0x104e/0x1e70 kernel/workqueue.c:2703
+ worker_thread+0xf45/0x1490 kernel/workqueue.c:2784
+ kthread+0x3ed/0x540 kernel/kthread.c:388
+ ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
 
-Johan
+Uninit was created at:
+ slab_post_alloc_hook+0x129/0xa70 mm/slab.h:768
+ slab_alloc_node mm/slub.c:3478 [inline]
+ kmem_cache_alloc_node+0x5e9/0xb10 mm/slub.c:3523
+ kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:560
+ __alloc_skb+0x318/0x740 net/core/skbuff.c:651
+ alloc_skb include/linux/skbuff.h:1286 [inline]
+ bt_skb_alloc include/net/bluetooth/bluetooth.h:487 [inline]
+ vhci_get_user drivers/bluetooth/hci_vhci.c:495 [inline]
+ vhci_write+0x126/0x8f0 drivers/bluetooth/hci_vhci.c:615
+ call_write_iter include/linux/fs.h:2020 [inline]
+ new_sync_write fs/read_write.c:491 [inline]
+ vfs_write+0x8ef/0x1490 fs/read_write.c:584
+ ksys_write+0x20f/0x4c0 fs/read_write.c:637
+ __do_sys_write fs/read_write.c:649 [inline]
+ __se_sys_write fs/read_write.c:646 [inline]
+ __x64_sys_write+0x93/0xd0 fs/read_write.c:646
+ do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+ do_syscall_64+0x44/0x110 arch/x86/entry/common.c:82
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+CPU: 1 PID: 4386 Comm: kworker/u5:1 Not tainted 6.7.0-rc1-syzkaller-00019-gc42d9eeef8e5 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
+Workqueue: hci0 hci_rx_work
+=====================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
