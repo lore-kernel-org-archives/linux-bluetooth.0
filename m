@@ -1,61 +1,67 @@
-Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7ED311CB8;
-	Tue,  2 Jan 2024 13:42:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=v0yd.nl
-Received: from smtp2.mailbox.org (smtp2.mailbox.org [IPv6:2001:67c:2050:b231:465::2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4T4DM34RLKz9sWY;
-	Tue,  2 Jan 2024 14:33:19 +0100 (CET)
-From: =?UTF-8?q?Jonas=20Dre=C3=9Fler?= <verdre@v0yd.nl>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: =?UTF-8?q?Jonas=20Dre=C3=9Fler?= <verdre@v0yd.nl>,
-	asahi@lists.linux.dev,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH 1/4] Bluetooth: HCI: Remove HCI_POWER_OFF_TIMEOUT
-Date: Tue,  2 Jan 2024 14:33:07 +0100
-Message-ID: <20240102133311.6712-2-verdre@v0yd.nl>
-In-Reply-To: <20240102133311.6712-1-verdre@v0yd.nl>
-References: <20240102133311.6712-1-verdre@v0yd.nl>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 565C5125D5;
+	Tue,  2 Jan 2024 13:50:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q+LnktMn"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EB85EC433D9;
+	Tue,  2 Jan 2024 13:50:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704203431;
+	bh=6IqGUwbS5Nj/uWqmnYGoibvQ3Ou6BAF8Helju32xKJE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Q+LnktMnTeoTuuIWDLDAHotGPVU3pCZSwVKS0/wR/qgt/dN3Ux6GY59oQ6q+I/C8X
+	 aW1jg8kNoJv4ZFAXlwxA8so3uzxpVABmZ6F9Y0nhZtcm05gtmLdxbZgo6N3jiQm6hq
+	 qEWkq3p49LhfsrJ8M9p27nTr1gOfa1wHrp6tkp9ZIXEmRDF24FQ0jr+lE96FKX62xH
+	 goBR2XsrVZSBdp9hB1N0EXu15H+3+lEYZQcA+8ksdjW13+IszwuvQFCHgfxKvKMmX5
+	 xv9Rbfx0eNSftRz10fm51I7s14t8GfP83oarrpB8KdStiz580545cXUw0Yoepdqf3T
+	 ZGHq5XFucbWgA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CD406DCB6D0;
+	Tue,  2 Jan 2024 13:50:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4T4DM34RLKz9sWY
+Subject: Re: pull request: bluetooth-next 2023-12-22
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170420343083.29739.6967311595901529200.git-patchwork-notify@kernel.org>
+Date: Tue, 02 Jan 2024 13:50:30 +0000
+References: <20231222184625.2813676-1-luiz.dentz@gmail.com>
+In-Reply-To: <20231222184625.2813676-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
 
-With commit cf75ad8b41d2aa06f98f365d42a3ae8b059daddd, the power off
-sequence got refactored so that this was no longer necessary, let's
-remove the leftover define from the header too.
+Hello:
 
-Signed-off-by: Jonas Dreßler <verdre@v0yd.nl>
----
- include/net/bluetooth/hci.h | 1 -
- 1 file changed, 1 deletion(-)
+This pull request was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 111e8f8e5..cf5d6230c 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -426,7 +426,6 @@ enum {
- #define HCI_NCMD_TIMEOUT	msecs_to_jiffies(4000)	/* 4 seconds */
- #define HCI_ACL_TX_TIMEOUT	msecs_to_jiffies(45000)	/* 45 seconds */
- #define HCI_AUTO_OFF_TIMEOUT	msecs_to_jiffies(2000)	/* 2 seconds */
--#define HCI_POWER_OFF_TIMEOUT	msecs_to_jiffies(5000)	/* 5 seconds */
- #define HCI_LE_CONN_TIMEOUT	msecs_to_jiffies(20000)	/* 20 seconds */
- #define HCI_LE_AUTOCONN_TIMEOUT	msecs_to_jiffies(4000)	/* 4 seconds */
- 
+On Fri, 22 Dec 2023 13:46:24 -0500 you wrote:
+> The following changes since commit 27c346a22f816b1d02e9303c572b4b8e31b75f98:
+> 
+>   octeontx2-af: Fix a double free issue (2023-12-22 13:31:54 +0000)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2023-12-22
+> 
+> [...]
+
+Here is the summary with links:
+  - pull request: bluetooth-next 2023-12-22
+    https://git.kernel.org/netdev/net-next/c/8a48a2dc24f8
+
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
