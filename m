@@ -1,24 +1,24 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3EA5154B1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3E4A154AC;
 	Tue,  2 Jan 2024 17:40:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ct11qgvk"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 85997C433C9;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KaQDTxtU"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 90048C433CA;
 	Tue,  2 Jan 2024 17:40:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1704217253;
-	bh=p6ZDM8xETWz/WD37I2S+OM5z0ce2aPFxnW9wU1Avuzs=;
+	bh=VxMdNNMyuaTRdjeIZFjpLo8mLdtWd29apFbxWK+iGZ8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ct11qgvkbDRYSPlD1JBzMJYclKiypSF4iJGv+edh1xbd7HzVY89f+1T8PsZmFzfAk
-	 HhVFrk7/zgdMWc1uakD+yhzdaJyvvcQhUNWOon4KkIgRy+OWPTfaY2pQBfRi6sg9iT
-	 44V2iAvFSYpxFeQ1Q8FuB4GbNljHL9mF8C7uzEsvUs5HN/30qW6nm+B+tAcr3z+eMg
-	 fvsclFmYBnmin7H6BrSO5XqTrw0ll6WJSLicNtHjZwIpntxylAusWDdy/9vw4wTZ0C
-	 ZcBTrH1izTHlhmr+KgP7LGrQNI1c5sWK8h9faOb/VCYL+JTTUrdCu+tCPh557jM8Zq
-	 uglkQ62JhnZMw==
+	b=KaQDTxtU4W5zlUE8qXxhIYqROI2R47Kg47jVO7aPUkQ7tk474W66F8xHPwNq3dZf+
+	 Yw2KriWTxJgheWNW2W/0FAiqqakdJ37XB4s3CDTdLzx2E4Xz+tIQV+bZealKQUb/t9
+	 IyYpNFcLj5yNidlo+75jMj8PBA0zQprEWStsp4rOVNuavNf+j+Y7OQ3lUVvsTdejY/
+	 adhiVdkPJkgyBE1ttG9ffPBk6inMfv8dY5G1hPtl/TFqpatyYu0zhqib+oQk7+4GUH
+	 zeflEWJwvSyP8iTVmjwd6Dd277h8POoBmC0w7HS2ar2iJtIMPoz3+RmL79ttFZPQoJ
+	 uP+ZkIQPdoeWQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 63908C395C5;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6EAAADCB6D0;
 	Tue,  2 Jan 2024 17:40:53 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -28,36 +28,37 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: pull request: bluetooth-next 2023-12-22
+Subject: Re: [PATCH v2] Bluetooth: btrtl: Add the support for
+ RTL8852BT/RTL8852BE-VT
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <170421725340.27590.4291986758945353702.git-patchwork-notify@kernel.org>
+ <170421725344.27590.6759141188493326496.git-patchwork-notify@kernel.org>
 Date: Tue, 02 Jan 2024 17:40:53 +0000
-References: <20231222184625.2813676-1-luiz.dentz@gmail.com>
-In-Reply-To: <20231222184625.2813676-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
+References: <20231226114518.5395-1-max.chou@realtek.com>
+In-Reply-To: <20231226114518.5395-1-max.chou@realtek.com>
+To: Max Chou <max.chou@realtek.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ alex_lu@realsil.com.cn, hildawu@realtek.com, karenhsu@realtek.com
 
 Hello:
 
-This pull request was applied to bluetooth/bluetooth-next.git (master)
-by David S. Miller <davem@davemloft.net>:
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Fri, 22 Dec 2023 13:46:24 -0500 you wrote:
-> The following changes since commit 27c346a22f816b1d02e9303c572b4b8e31b75f98:
+On Tue, 26 Dec 2023 19:45:17 +0800 you wrote:
+> From: Max Chou <max.chou@realtek.com>
 > 
->   octeontx2-af: Fix a double free issue (2023-12-22 13:31:54 +0000)
+> Add the support for RTL8852BT/RTL8852BE-VT BT controller on USB interface.
+> The necessary firmware will be submitted to linux-firmware project.
 > 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2023-12-22
+> The device info from /sys/kernel/debug/usb/devices as below.
 > 
 > [...]
 
 Here is the summary with links:
-  - pull request: bluetooth-next 2023-12-22
-    https://git.kernel.org/bluetooth/bluetooth-next/c/8a48a2dc24f8
+  - [v2] Bluetooth: btrtl: Add the support for RTL8852BT/RTL8852BE-VT
+    https://git.kernel.org/bluetooth/bluetooth-next/c/8f9bb7a1b81b
 
 You are awesome, thank you!
 -- 
