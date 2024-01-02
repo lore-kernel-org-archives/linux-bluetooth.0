@@ -1,67 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 565C5125D5;
-	Tue,  2 Jan 2024 13:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8955111A5
+	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jan 2024 14:32:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q+LnktMn"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EB85EC433D9;
-	Tue,  2 Jan 2024 13:50:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704203431;
-	bh=6IqGUwbS5Nj/uWqmnYGoibvQ3Ou6BAF8Helju32xKJE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Q+LnktMnTeoTuuIWDLDAHotGPVU3pCZSwVKS0/wR/qgt/dN3Ux6GY59oQ6q+I/C8X
-	 aW1jg8kNoJv4ZFAXlwxA8so3uzxpVABmZ6F9Y0nhZtcm05gtmLdxbZgo6N3jiQm6hq
-	 qEWkq3p49LhfsrJ8M9p27nTr1gOfa1wHrp6tkp9ZIXEmRDF24FQ0jr+lE96FKX62xH
-	 goBR2XsrVZSBdp9hB1N0EXu15H+3+lEYZQcA+8ksdjW13+IszwuvQFCHgfxKvKMmX5
-	 xv9Rbfx0eNSftRz10fm51I7s14t8GfP83oarrpB8KdStiz580545cXUw0Yoepdqf3T
-	 ZGHq5XFucbWgA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CD406DCB6D0;
-	Tue,  2 Jan 2024 13:50:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ns/uSzMu"
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-427e59202ceso43699361cf.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jan 2024 06:32:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704205950; x=1704810750; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=qy2kgR+oXJzDC2YiOHeUDdgImZKfkUh2gGzSznGaz+E=;
+        b=ns/uSzMuxWkKhmzulXHFAqMjJr22zTx2u6xKPzpUVNM9ldICOK55Ed+orwxzzKxjL0
+         i5yHOzTOZaN7OkJPCvbeCDg000JYMk+i8LrRJHnZsx1UquTd1lHToI9h/gumy3Z+LZK9
+         ZCpQg8piDg9pJ1wTPYyIQlDNKajQvH4P6Qmq4jqfbyuBKiZBj+R+Xjl4LwBuO47PHXfg
+         nRRZdT0x3kqEQWqS1++G7KNK1PqNeitiSDAs6sx6yu5hmFT5DxdeRJ3orU32BDdFG6xd
+         jW2gG4hqZAwYAj+rZa2xEmvDIASpbW+FgZ2eiOJV4+cOCd/X/6d/yt+Z4r6yhujxwLkD
+         387A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704205950; x=1704810750;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qy2kgR+oXJzDC2YiOHeUDdgImZKfkUh2gGzSznGaz+E=;
+        b=luyPrIJkhFqxW4XMo1UTi1q5rO88Sulahx6+5ixaWhqz+8ICNE6NTLvDviIPGbua/H
+         2Al1U9drZAUktMw4EfeGyn0zb2bHBSuMSWPYLiwBq8+mrRKpqdMnRRavHUU2At9iCudh
+         Ed8kO4rv0TXt27HI8teMrTaJC/Wq+Hmh1FDqzOndq01Q/USj5e6HG0brN4xMt+iWZD0Y
+         uXha+LEHEIiIljlbYvovS3l9l3A31SltYhahDFhWDM9agZUpKcQaNdG4WtgmpMqMc2QJ
+         zbrt9QqJqyIUM/NVTLmJ4FjWTTnR4WbsFFw6+NvUjL3ZDKPFPSUdigM63plO49pxpYcN
+         KYjQ==
+X-Gm-Message-State: AOJu0YzcwciCfO2BBdTTOJZnh5jVKdLLTnAJmcfmHGxSHOIgQAEiZJus
+	Ej5YJ9MkSfAT4AQNzaWE9B5zJ2kaOzI=
+X-Google-Smtp-Source: AGHT+IGuq9N46PPgLQ0TWv5tc+4TMsyZ7Iu+Hox9qOaDd9KrDDhx7KVIyfTdRzvCXwzy1O/s+71luw==
+X-Received: by 2002:ac8:5a44:0:b0:428:19de:e631 with SMTP id o4-20020ac85a44000000b0042819dee631mr6334150qta.26.1704205950556;
+        Tue, 02 Jan 2024 06:32:30 -0800 (PST)
+Received: from [172.17.0.2] ([20.51.206.1])
+        by smtp.gmail.com with ESMTPSA id he30-20020a05622a601e00b004181138e0c0sm12992949qtb.31.2024.01.02.06.32.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jan 2024 06:32:30 -0800 (PST)
+Message-ID: <65941e7e.050a0220.bae9f.536a@mx.google.com>
+Date: Tue, 02 Jan 2024 06:32:30 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6056772975378347364=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull request: bluetooth-next 2023-12-22
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170420343083.29739.6967311595901529200.git-patchwork-notify@kernel.org>
-Date: Tue, 02 Jan 2024 13:50:30 +0000
-References: <20231222184625.2813676-1-luiz.dentz@gmail.com>
-In-Reply-To: <20231222184625.2813676-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, verdre@v0yd.nl
+Subject: RE: Power off HCI devices before rfkilling them
+In-Reply-To: <20240102133311.6712-2-verdre@v0yd.nl>
+References: <20240102133311.6712-2-verdre@v0yd.nl>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hello:
+--===============6056772975378347364==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This pull request was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+This is automated email and please do not reply to this email!
 
-On Fri, 22 Dec 2023 13:46:24 -0500 you wrote:
-> The following changes since commit 27c346a22f816b1d02e9303c572b4b8e31b75f98:
-> 
->   octeontx2-af: Fix a double free issue (2023-12-22 13:31:54 +0000)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2023-12-22
-> 
-> [...]
+Dear submitter,
 
-Here is the summary with links:
-  - pull request: bluetooth-next 2023-12-22
-    https://git.kernel.org/netdev/net-next/c/8a48a2dc24f8
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=813840
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      5.24 seconds
+GitLint                       PASS      1.32 seconds
+SubjectPrefix                 FAIL      0.75 seconds
+BuildKernel                   PASS      27.69 seconds
+CheckAllWarning               PASS      30.59 seconds
+CheckSparse                   PASS      36.30 seconds
+CheckSmatch                   PASS      99.67 seconds
+BuildKernel32                 PASS      26.96 seconds
+TestRunnerSetup               PASS      432.67 seconds
+TestRunner_l2cap-tester       PASS      22.79 seconds
+TestRunner_iso-tester         PASS      40.66 seconds
+TestRunner_bnep-tester        PASS      6.78 seconds
+TestRunner_mgmt-tester        PASS      160.29 seconds
+TestRunner_rfcomm-tester      PASS      10.76 seconds
+TestRunner_sco-tester         PASS      14.47 seconds
+TestRunner_ioctl-tester       PASS      11.93 seconds
+TestRunner_mesh-tester        PASS      8.73 seconds
+TestRunner_smp-tester         PASS      9.68 seconds
+TestRunner_userchan-tester    PASS      7.19 seconds
+IncrementalBuild              PASS      60.21 seconds
+
+Details
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
 
 
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6056772975378347364==--
