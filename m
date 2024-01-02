@@ -1,134 +1,146 @@
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32FD446AD
-	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Jan 2024 10:44:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3601c1b80d3so49381655ab.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Jan 2024 02:44:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704105858; x=1704710658;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ewnDTV1LOwNpnc7vIBEVefJx70mwTgZPcLpGjs0H0Ik=;
-        b=V0/TyC2Q5uedbSCcwFIygLU0LJHpcYZlMp6zIS4BcoYyT3+RPMQ/F/5Lib/nhfxurJ
-         Q5K64FZTTp8gUGMQrjZNQEMKzdbAooqU6I7lYgj6g05v8M6JNObkwh8k8Xfcs/hudb1L
-         nyV4OkqqNnMBWAKzzVy55cVKPoqXhBrrGHCW+o2RrbTyC0gFE3UTBHnLt7/VO2/rZLeH
-         V4PMFHWJuhU/6O7kDfRd1rfu41ip8x0PUd7h3CiCwabmPnjYVYXjhv5F1zS7CTXWYecC
-         K4uNE0u0NbomHoR9OK4gqDH4PojMyGeF3humZ/RQm0R7DKUrHzD9l6YgpZMeeZmGbQrp
-         IVRA==
-X-Gm-Message-State: AOJu0YyaMAMCy/LrMCGq58KAHws7r5XuvmiZTFR67o8fipzO2AljFbY2
-	qlBm3p2WXc1ZtZELXFZW0d/CWZvfyz9LLWRHPYHakcxeu6eq
-X-Google-Smtp-Source: AGHT+IEaL9Ga2y5QBuKhMeZ3BqnKFxwtyqFQMCxid1IpoCpdkF4+3FncGX6KSQ2i2qudlPL6imUhsWp9DwT6v4lfwKAdHo59PBrM
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CDF8F9C3;
+	Tue,  2 Jan 2024 12:48:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="Zxvd2YOa"
+X-UUID: 41ad12e8a96d11ee9e680517dc993faa-20240102
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=BuK7s7sV/d/zocOp9WyQc4jOUhufFxVHx+kxKOinkOM=;
+	b=Zxvd2YOakbMLVXW22ta99OLR0U+DOPShbO4uv1QTsvfqXsbArgWI2ItF6jr6tjQwxftTPtElyS95QvVkfFNvpCDdBp9raCTwvGsT+fGNQzBQIewGb8HwaA9nazUt/5TLxCSUqWAeNkdD8++TBUQqSihGNTYMJ6BlRdJ2ClANiPc=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.35,REQID:142c3af2-e436-4317-9cf2-1d4ce734d3e2,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:5d391d7,CLOUDID:b724b92e-1ab8-4133-9780-81938111c800,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+	RL:1,File:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,
+	DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULS
+X-UUID: 41ad12e8a96d11ee9e680517dc993faa-20240102
+Received: from mtkmbs10n2.mediatek.inc [(172.21.101.183)] by mailgw01.mediatek.com
+	(envelope-from <hao.qin@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 881740024; Tue, 02 Jan 2024 20:48:41 +0800
+Received: from mtkmbs13n2.mediatek.inc (172.21.101.108) by
+ mtkmbs11n1.mediatek.inc (172.21.101.185) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Tue, 2 Jan 2024 20:48:40 +0800
+Received: from mhfsdcap04.gcn.mediatek.inc (10.17.3.154) by
+ mtkmbs13n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Tue, 2 Jan 2024 20:48:39 +0800
+From: Hao Qin <hao.qin@mediatek.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
+CC: Sean Wang <sean.wang@mediatek.com>, Deren Wu <deren.Wu@mediatek.com>,
+	Aaron Hou <aaron.hou@mediatek.com>, Chris Lu <chris.lu@mediatek.com>, Steve
+ Lee <steve.lee@mediatek.com>, linux-bluetooth
+	<linux-bluetooth@vger.kernel.org>, linux-kernel
+	<linux-kernel@vger.kernel.org>, linux-mediatek
+	<linux-mediatek@lists.infradead.org>, hao.qin <hao.qin@mediatek.com>
+Subject: [PATCH v2 1/2] Bluetooth: btusb: mediatek: refactor btusb_mtk_reset function
+Date: Tue, 2 Jan 2024 20:47:46 +0800
+Message-ID: <20240102124747.21644-1-hao.qin@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d0c:b0:35f:d4dc:1b1e with SMTP id
- i12-20020a056e021d0c00b0035fd4dc1b1emr2892753ila.5.1704105858448; Mon, 01 Jan
- 2024 02:44:18 -0800 (PST)
-Date: Mon, 01 Jan 2024 02:44:18 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000005a4548060de01081@google.com>
-Subject: [syzbot] [bluetooth?] KMSAN: uninit-value in eir_get_service_data
-From: syzbot <syzbot+5e132fbe94a9ede456ad@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 
-Hello,
+From: "hao.qin" <hao.qin@mediatek.com>
 
-syzbot found the following issue on:
+Extract function btusb_mtk_subsys_reset from btusb_mtk_reset
+for future handling of resetting bluetooth controller without
+USB reset.
 
-HEAD commit:    c42d9eeef8e5 Merge tag 'hardening-v6.7-rc2' of git://git.k..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=16867338e80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=fdfc68946ad7a215
-dashboard link: https://syzkaller.appspot.com/bug?extid=5e132fbe94a9ede456ad
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=178f3388e80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13341388e80000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/8c25bb76d765/disk-c42d9eee.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/80d9450a6b6a/vmlinux-c42d9eee.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/4b1a54cf685f/bzImage-c42d9eee.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+5e132fbe94a9ede456ad@syzkaller.appspotmail.com
-
-=====================================================
-BUG: KMSAN: uninit-value in eir_get_data net/bluetooth/eir.h:73 [inline]
-BUG: KMSAN: uninit-value in eir_get_service_data+0x25c/0x570 net/bluetooth/eir.c:384
- eir_get_data net/bluetooth/eir.h:73 [inline]
- eir_get_service_data+0x25c/0x570 net/bluetooth/eir.c:384
- iso_connect_ind+0x2004/0x2330 net/bluetooth/iso.c:1794
- hci_proto_connect_ind include/net/bluetooth/hci_core.h:1922 [inline]
- hci_le_per_adv_report_evt+0xc0/0x1e0 net/bluetooth/hci_event.c:6645
- hci_le_meta_evt+0x608/0x860 net/bluetooth/hci_event.c:7344
- hci_event_func net/bluetooth/hci_event.c:7674 [inline]
- hci_event_packet+0x1183/0x1be0 net/bluetooth/hci_event.c:7729
- hci_rx_work+0x687/0x1120 net/bluetooth/hci_core.c:4105
- process_one_work kernel/workqueue.c:2630 [inline]
- process_scheduled_works+0x104e/0x1e70 kernel/workqueue.c:2703
- worker_thread+0xf45/0x1490 kernel/workqueue.c:2784
- kthread+0x3ed/0x540 kernel/kthread.c:388
- ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
-
-Uninit was created at:
- slab_post_alloc_hook+0x129/0xa70 mm/slab.h:768
- slab_alloc_node mm/slub.c:3478 [inline]
- kmem_cache_alloc_node+0x5e9/0xb10 mm/slub.c:3523
- kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:560
- __alloc_skb+0x318/0x740 net/core/skbuff.c:651
- alloc_skb include/linux/skbuff.h:1286 [inline]
- bt_skb_alloc include/net/bluetooth/bluetooth.h:487 [inline]
- vhci_get_user drivers/bluetooth/hci_vhci.c:495 [inline]
- vhci_write+0x126/0x8f0 drivers/bluetooth/hci_vhci.c:615
- call_write_iter include/linux/fs.h:2020 [inline]
- new_sync_write fs/read_write.c:491 [inline]
- vfs_write+0x8ef/0x1490 fs/read_write.c:584
- ksys_write+0x20f/0x4c0 fs/read_write.c:637
- __do_sys_write fs/read_write.c:649 [inline]
- __se_sys_write fs/read_write.c:646 [inline]
- __x64_sys_write+0x93/0xd0 fs/read_write.c:646
- do_syscall_x64 arch/x86/entry/common.c:51 [inline]
- do_syscall_64+0x44/0x110 arch/x86/entry/common.c:82
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-
-CPU: 1 PID: 4386 Comm: kworker/u5:1 Not tainted 6.7.0-rc1-syzkaller-00019-gc42d9eeef8e5 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
-Workqueue: hci0 hci_rx_work
-=====================================================
-
+Signed-off-by: hao.qin <hao.qin@mediatek.com>
 
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+V1 -> V2: refactor btusb_mtk_reset function
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Link:
+  https://lore.kernel.org/all/20231215063714.7684-1-hao.qin@mediatek.com/
+---
+ drivers/bluetooth/btusb.c | 45 +++++++++++++++++++++++----------------
+ 1 file changed, 27 insertions(+), 18 deletions(-)
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 0926e4451802..abefcd1a089d 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2994,28 +2994,13 @@ static u32 btusb_mtk_reset_done(struct hci_dev *hdev)
+ 	return val & MTK_BT_RST_DONE;
+ }
+ 
+-static int btusb_mtk_reset(struct hci_dev *hdev, void *rst_data)
++static int btusb_mtk_subsys_reset(struct hci_dev *hdev, u32 dev_id)
+ {
+ 	struct btusb_data *data = hci_get_drvdata(hdev);
+-	struct btmediatek_data *mediatek;
+ 	u32 val;
+ 	int err;
+ 
+-	/* It's MediaTek specific bluetooth reset mechanism via USB */
+-	if (test_and_set_bit(BTUSB_HW_RESET_ACTIVE, &data->flags)) {
+-		bt_dev_err(hdev, "last reset failed? Not resetting again");
+-		return -EBUSY;
+-	}
+-
+-	err = usb_autopm_get_interface(data->intf);
+-	if (err < 0)
+-		return err;
+-
+-	btusb_stop_traffic(data);
+-	usb_kill_anchored_urbs(&data->tx_anchor);
+-	mediatek = hci_get_priv(hdev);
+-
+-	if (mediatek->dev_id == 0x7925) {
++	if (dev_id == 0x7925) {
+ 		btusb_mtk_uhw_reg_read(data, MTK_BT_RESET_REG_CONNV3, &val);
+ 		val |= (1 << 5);
+ 		btusb_mtk_uhw_reg_write(data, MTK_BT_RESET_REG_CONNV3, val);
+@@ -3059,8 +3044,32 @@ static int btusb_mtk_reset(struct hci_dev *hdev, void *rst_data)
+ 	if (!val)
+ 		bt_dev_err(hdev, "Can't get device id, subsys reset fail.");
+ 
+-	usb_queue_reset_device(data->intf);
++	return err;
++}
+ 
++static int btusb_mtk_reset(struct hci_dev *hdev, void *rst_data)
++{
++	struct btusb_data *data = hci_get_drvdata(hdev);
++	struct btmediatek_data *mediatek;
++	int err;
++
++	/* It's MediaTek specific bluetooth reset mechanism via USB */
++	if (test_and_set_bit(BTUSB_HW_RESET_ACTIVE, &data->flags)) {
++		bt_dev_err(hdev, "last reset failed? Not resetting again");
++		return -EBUSY;
++	}
++
++	err = usb_autopm_get_interface(data->intf);
++	if (err < 0)
++		return err;
++
++	btusb_stop_traffic(data);
++	usb_kill_anchored_urbs(&data->tx_anchor);
++	mediatek = hci_get_priv(hdev);
++
++	err = btusb_mtk_subsys_reset(hdev, mediatek->dev_id);
++
++	usb_queue_reset_device(data->intf);
+ 	clear_bit(BTUSB_HW_RESET_ACTIVE, &data->flags);
+ 
+ 	return err;
+-- 
+2.18.0
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
