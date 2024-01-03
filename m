@@ -1,57 +1,105 @@
-Received: from cstnet.cn (smtp87.cstnet.cn [159.226.251.87])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B623F10EE;
-	Wed,  3 Jan 2024 01:37:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iie.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iie.ac.cn
-Received: from mengjingzi$iie.ac.cn ( [121.195.114.118] ) by
- ajax-webmail-APP-17 (Coremail) ; Wed, 3 Jan 2024 09:32:17 +0800 (GMT+08:00)
-Date: Wed, 3 Jan 2024 09:32:17 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: =?UTF-8?B?5a2f5pWs5ae/?= <mengjingzi@iie.ac.cn>
-To: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: missing capability check in __rfcomm_release_dev()
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.15 build 20230921(8ad33efc)
- Copyright (c) 2002-2024 www.mailtech.cn cnic.cn
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8F6F4A16;
+	Wed,  3 Jan 2024 03:08:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=buaa.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=buaa.edu.cn
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=buaa.edu.cn header.i=@buaa.edu.cn header.b="dA6ithPX"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=buaa.edu.cn; s=buaa; h=Received:From:To:Cc:Subject:Date:
+	Message-Id:MIME-Version:Content-Transfer-Encoding; bh=ZT4f7RGcP8
+	9s2PD4GqbxF1IDMNpMzEJiOuxSzUjnO2Q=; b=dA6ithPX3RoxBMBMXvTC20wydI
+	acNkrx/qyZOqznT3A5E/5xG6pQ9OtTxE/087wnw0zBM7NsYr1S582Q5A5MTKjfms
+	iLksuDZsAYB+6/FFkEopK0hUOKOqRklB6D76AzN3++yUVD9DsUJB5XK2mqnZUhoe
+	/m6biKRlPNjK7INqc=
+Received: from localhost.localdomain (unknown [10.130.147.18])
+	by coremail-app1 (Coremail) with SMTP id OCz+CgBnl1miz5RlIYGiAA--.46504S2;
+	Wed, 03 Jan 2024 11:08:18 +0800 (CST)
+From: Yuxuan Hu <20373622@buaa.edu.cn>
+To: marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	baijiaju1990@gmail.com,
+	sy2239101@buaa.edu.cn,
+	20373622@buaa.edu.cn,
+	buaazhr@buaa.edu.cn
+Subject: [PATCHv2] Bluetooth: rfcomm: Fix null-ptr-deref in rfcomm_check_security
+Date: Wed,  3 Jan 2024 11:07:47 +0800
+Message-Id: <20240103030747.3260374-1-20373622@buaa.edu.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <20dc58ee.bf74.18cccf32c62.Coremail.mengjingzi@iie.ac.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:qgCowADXOuoiuZRlrAkDAA--.32362W
-X-CM-SenderInfo: pphqwyxlqj6xo6llvhldfou0/1tbiDAgFE2WUJeXn3AABsZ
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:OCz+CgBnl1miz5RlIYGiAA--.46504S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7WFyDGF1xXr18Aw4UCw4rXwb_yoW8tFyfpF
+	ZFya4xGFn7ur15Arn7AF4kuFyrZr1v9r15Kw4ku3yY93s5Wwn7trWSyr1jvay5CFs0y343
+	ZF18Xw4DGrnru37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9j1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2
+	z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2vYz4IE04k24V
+	AvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xf
+	McIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7
+	v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkIecxEwVCm
+	-wCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6cx26F1DJr1UJwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
+	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvf
+	C2KfnxnUUI43ZEXa7VUbHa0DUUUUU==
+X-CM-SenderInfo: ysqtljawssquxxddhvlgxou0/
 
-SGkhCgpXZSBvYnNlcnZlZCBhIHBvdGVudGlhbCBlbmhhbmNlbWVudCBpbiB0aGUgX19yZmNvbW1f
-cmVsZWFzZV9kZXYoKSBmdW5jdGlvbi4gQ3VycmVudGx5LCB0aGUgZnVuY3Rpb24gY2hlY2tzIENB
-UF9ORVRfQURNSU4gYXQgbGluZSA0NTIsIHByaW1hcmlseSBzYWZlZ3VhcmRpbmcgcmZjb21tX2Rs
-Y19jbG9zZSgpIGZvciBjbG9zaW5nIGEgZGF0YSBsaW5rIGNvbm5lY3Rpb24uCldlIGNvbnNpZGVy
-IGFuIGV4dHJhIENBUF9TWVNfVFRZX0NPTkZJRyBtYXliZSBuZWVkZWQgZm9yIGhhbmdpbmcgdXAg
-YSB0dHkgYXQgbGluZSA0NjkodHR5X3ZoYW5ndXAoKSkuIAoKT24gdGhlIG9uZSBoYW5kLCB0aGUg
-ZGVmaW5pdGlvbiBvZiBDQVBfU1lTX1RUWV9DT05GSUcgaW5jbHVkZXMgImVtcGxveSB2YXJpb3Vz
-IHByaXZpbGVnZWQgaW9jdGwgb3BlcmF0aW9ucyBvbiB2aXJ0dWFsIHRlcm1pbmFscyIoY2hlY2sg
-Y2FwYWJpbGl0eSBtYW51YWwgcGFnZSBodHRwczovL3d3dy5tYW43Lm9yZy9saW51eC9tYW4tcGFn
-ZXMvbWFuNy9jYXBhYmlsaXRpZXMuNy5odG1sKTsgb24gdGhlIG90aGVyIGhhbmQsIHRoZSBzaW1p
-bGFyIGZ1bmN0aW9uYWxpdHkgaXMgYWxyZWFkeSBwcm90ZWN0ZWQgYnkgQ0FQX1NZU19UVFlfQ09O
-RklHIGluIGZzL29wZW4uYy4KClRoZSBjYWxscGF0aCBpbiBuZXQvYmx1ZXRvb3RoL3JmY29tbS90
-dHkuYyBpczoKcmZjb21tX2Rldl9pb2N0bCgpIC0mZ3Q7IHJmY29tbV9yZWxlYXNlX2RldigpIC0m
-Z3Q7IF9fcmZjb21tX3JlbGVhc2VfZGV2KCkgLSZndDsgdHR5X3ZoYW5ndXAoKQoKVGhlIGNhbGxw
-YXRoIGluIGZzL29wZW4uYyBpczogClNZU0NBTExfREVGSU5FMCh2aGFuZ3VwKSAtJmd0OyBjYXBh
-YmxlKENBUF9TWVNfVFRZX0NPTkZJRyktJmd0OyB0dHlfdmhhbmd1cF9zZWxmKCkgLSZndDsgdHR5
-X3ZoYW5ndXAoKS4KClRoaXMgaXNzdWUgZXhpc3RzIGluIHNldmVyYWwga2VybmVsIHZlcnNpb25z
-IGFuZCB3ZSBoYXZlIGNoZWNrZWQgaXQgb24gdGhlIGxhdGVzdCBzdGFibGUgcmVsZWFzZShMaW51
-eCA2LjYuOSkuIAoKV2Ugd291bGQgbGlrZSB0byBwcm9tb3RlIHRoZSBwcm9wZXIgdXNlIG9mIGNh
-cGFiaWxpdHkgdG8gZW5oYW5jZSB0aGUgcHJvdGVjdGlvbiBvZiBrZXJuZWwgcmVzb3VyY2VzLiBZ
-b3VyIGluc2lnaHRzIGFuZCBmZWVkYmFjayBvbiB0aGlzIHByb3Bvc2VkIGFkanVzdG1lbnQgd291
-bGQgYmUgaW52YWx1YWJsZS4gVGhhbmsgeW91IGZvciB0YWtpbmcgdGhlIHRpbWUgdG8gY29uc2lk
-ZXIgdGhpcyByZXF1ZXN0LgoKQmVzdCByZWdhcmRzLApKaW5nemkK
+During our fuzz testing of the connection and disconnection process at the
+RFCOMM layer,we discovered this bug.By comparing the packetsfrom a normal
+connection and disconnection process with the testcase that triggered a
+KASAN report, we analyzed the cause of this bug as follows:
+
+1. In the packets captured during a normal connection, the host sends a
+`Read Encryption Key Size` type of `HCI_CMD` packet(Command Opcode: 0x1408)
+to the controller to inquire the length of encryption key.After receiving
+this packet, the controller immediately replies with a Command Complete
+packet (Event Code: 0x0e) to return the Encryption Key Size.
+
+2. In our fuzz test case, the timing of the controller's response to this
+packet was delayed to an unexpected point: after the RFCOMM and L2CAP
+layers had disconnected but before the HCI layer had disconnected.
+
+3. After receiving the Encryption Key Size Response at the time described
+in point 2, the host still called the rfcomm_check_security function.
+However, by this time `struct l2cap_conn *conn = l2cap_pi(sk)->chan->conn;`
+had already been released, and when the function executed
+`return hci_conn_security(conn->hcon, d->sec_level, auth_type, d->out);`,
+specifically when accessing `conn->hcon`, a null-ptr-deref error occurred.
+
+To fix this bug, check if `sk->sk_state` is BT_CLOSED before calling
+rfcomm_recv_frame in rfcomm_process_rx.
+
+Signed-off-by: Yuxuan Hu <20373622@buaa.edu.cn>
+---
+V1 -> V2: Removed the direct check for `conn` being null in rfcomm_check_security
+
+ net/bluetooth/rfcomm/core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index 053ef8f25fae..1d34d8497033 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -1941,7 +1941,7 @@ static struct rfcomm_session *rfcomm_process_rx(struct rfcomm_session *s)
+ 	/* Get data directly from socket receive queue without copying it. */
+ 	while ((skb = skb_dequeue(&sk->sk_receive_queue))) {
+ 		skb_orphan(skb);
+-		if (!skb_linearize(skb)) {
++		if (!skb_linearize(skb) && sk->sk_state != BT_CLOSED) {
+ 			s = rfcomm_recv_frame(s, skb);
+ 			if (!s)
+ 				break;
+-- 
+2.25.1
+
