@@ -1,133 +1,133 @@
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BEB51B281;
-	Wed,  3 Jan 2024 16:05:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C15CA1B272
+	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jan 2024 16:08:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gzqvguKC"
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2cce6bb9b48so53708711fa.1;
-        Wed, 03 Jan 2024 08:05:21 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dqCPlJwx"
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-28cba988d6bso1449063a91.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jan 2024 08:08:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704297919; x=1704902719; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1704298121; x=1704902921; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+xSmaxNNRur6EQbpLrc86FJLNqnjCzsSA88jkGjqdDk=;
-        b=gzqvguKCU/DDtJNq0POQ03fdIaM7xLYUqjdovhnDX/Op5x/YhQz54e2g1lAp/AIDXO
-         yMO63unfQzYz9v3FPU4VF5GiNk89y4FLsDRoSq3FzuApCuYEHd5OIB8TL8ky3AC4ZlX6
-         EEvdU0VQxsHd1R0wFBBEVTuVgJ6nFd2jZhp4mn9XPL4sW9KLzZxVtLjgC4EFxr/SXAMz
-         TqXdwX24dapAdoTeU5iS+lGaa/SUSTZ55XOqOM/jd6DRHrUlIfOUpxcjd2GlrB1aQjn8
-         ZbalrFg/50u/HJTz77ljjM0DZWg9UJTk7y209XscHHnWIxw/M7d+as2Rpps1Ln/RMqjP
-         4XeQ==
+        bh=YrrG9TEgcVtYhVJwHCIKYyhMwKw9zp2+lWynoAo3BJg=;
+        b=dqCPlJwxAqtj7cP4A5V7IC9MlTFC9aPwZ1Zerrw5Thxvv6eaBa6oP47eEQFQGS1OUb
+         V5VjOFSO3Yi/2YwDFV5Yh0TwfnxPgikoGFmTcfQ5Wc1L+1GjvtrHBVY22npIg8cITKDT
+         bZq+Go7l7dMZnTNmuRC8xwa3rL3GhbhMD5s+IRDKAzzQAp3aopFj5xFeQORPobb+ZIzl
+         mK/4KY0PWeEoubDmcyc4n+gw7F+MsmixyR09sGghY9bJC7+jxIZvTurKKYFxrzpfR1Ew
+         A9SO1skrM/7P/200+1crlWY/mmpTgzaWQG3PF7gvA3wPvLP3g7cTN9AfuczPp2WuLKrG
+         Zs8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704297919; x=1704902719;
+        d=1e100.net; s=20230601; t=1704298121; x=1704902921;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+xSmaxNNRur6EQbpLrc86FJLNqnjCzsSA88jkGjqdDk=;
-        b=GRShHbQKSqas2AZ/JiWbp+VLLK8Hp9VItI4fB1q0yyIJoz8K7OCTe/MzTbGv6wYo1f
-         Sb2OqKq//h2a4Xfmar1OdqvTdxi+PZPh4aNrg0m6uumMUJ16UDl4brc7UAl+q/GwKYgj
-         tLaIFuX1pZo40OT7hHrqZBJzFVPuY4y5Dk3lbgdG07VTs0av63YUXi4XD0wSkHdsrDqu
-         6g7MqHuwV8Zm3uLbn53GYy9cXWNh1m2tjjcDtYJgoi0GC/5D0+WiTMpjpcab81BEML0e
-         GuQb0jjMOjFPIrBJV8RuxoMnf0yY5ZA1CCYRXI4v9cY7Gg56bP79odWLktLybOg0IsBR
-         xVSg==
-X-Gm-Message-State: AOJu0Yw2Uf1vCihU8FAHcYU3qOQ5J1r8IfsTOKMiA/Se8gh3ypAcQrIn
-	oEdkO58gSvWkSuKYL86fDefZZB8KX1ZgbuAeWM28rrA7Am8=
-X-Google-Smtp-Source: AGHT+IFeXbNfc9PPeUFuM6/SEH6Mga7ci/PhjUGshLV+ygtgPd78rKp7oZmKPWKx3n84n1GtUKOkND5h70UMCiYlB9U=
-X-Received: by 2002:a2e:9b95:0:b0:2cc:d45a:48ea with SMTP id
- z21-20020a2e9b95000000b002ccd45a48eamr2671783lji.56.1704297919417; Wed, 03
- Jan 2024 08:05:19 -0800 (PST)
+        bh=YrrG9TEgcVtYhVJwHCIKYyhMwKw9zp2+lWynoAo3BJg=;
+        b=kytAaQXdKAIqitUG4OrXke8mXrHgr5ol0cb1mQWqE+o8nG/ucPPp0T8/p+Rj5kJ0UD
+         kIO4qDRGO0vFpM9Rx6oNZSToXE6GJEEgts+PYsG0f2hE5eASjUilS2wnfhiY8I3ee4GE
+         G7FOMY1gvVrKnlT5mHMvPmeZEFB0lsRbV+AaPG0vqSFwF+CY0T952l0BH5ybN0iz5oY7
+         HGGKWRnFwgZ36g2yfaqtj7qI5qM/PJFPo4TYSUXRQfsIh5VdlvLn/2EnYx5eBsjv1wDN
+         lk/PDxm+MA0rIdKCw+QNSBmTHlR88uF2QEqxX8TsW3QbGfL+9rZq1ceLVxJ7FUBR6w/2
+         zJ1w==
+X-Gm-Message-State: AOJu0Yw/I6PLQi8L5elWjG4tSq4zUV9hR9fXQVXwZ9wy2EnMqV4QV+WZ
+	xfuTcx8RQmrB8UfAqMQVidg/bGSrHRbmtUPlRr6o1fga
+X-Google-Smtp-Source: AGHT+IHRfMsM/iQCNdfJoxUAqsgwfyvSVvBrH1hKCyiiEVXtYsOMyv9xztOa8eCROmWRIbQ9taOJOdGamJb+ZIJLNFE=
+X-Received: by 2002:a17:90a:da04:b0:28c:3b9c:13ab with SMTP id
+ e4-20020a17090ada0400b0028c3b9c13abmr4875071pjv.31.1704298120682; Wed, 03 Jan
+ 2024 08:08:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240102185933.64179-1-verdre@v0yd.nl> <20240102185933.64179-4-verdre@v0yd.nl>
-In-Reply-To: <20240102185933.64179-4-verdre@v0yd.nl>
+References: <85bf602dac47b63cfc5ec772fddcedbce29c13df.camel@interlinx.bc.ca> <548cbe00abc60f0506dbc47802bddd276c192205.camel@interlinx.bc.ca>
+In-Reply-To: <548cbe00abc60f0506dbc47802bddd276c192205.camel@interlinx.bc.ca>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 3 Jan 2024 11:05:05 -0500
-Message-ID: <CABBYNZLoivEW=yrDtTbu5SjGauESH0zHb7NXs0YaSKSKqre5GQ@mail.gmail.com>
-Subject: Re: [PATCH 3/5] Bluetooth: hci_event: Remove limit of 2 reconnection attempts
-To: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
+Date: Wed, 3 Jan 2024 11:08:23 -0500
+Message-ID: <CABBYNZKS0BZGRZ8NMjue91i_P3mtQSL=ctLDcHDiZ+BBcXL2Aw@mail.gmail.com>
+Subject: Re: Unable to connect BT mouse after it drops: Failed to connect:
+ org.bluez.Error.Failed br-connection-create-socket
+To: "Brian J. Murrell" <brian@interlinx.bc.ca>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Jonas,
+Hi Brian,
 
-On Tue, Jan 2, 2024 at 1:59=E2=80=AFPM Jonas Dre=C3=9Fler <verdre@v0yd.nl> =
-wrote:
+On Wed, Jan 3, 2024 at 9:17=E2=80=AFAM Brian J. Murrell <brian@interlinx.bc=
+.ca> wrote:
 >
-> Since commit 4c67bc74f016b0d360b8573e18969c0ff7926974, we retry connectin=
-g
-> later when we get a "Command Disallowed" error returned by "Create
-> Connection".
+> Does anyone have any idea how I can supply enough info to resolve this?
 >
-> In this commit the intention was to retry only once, and give up if we se=
-e
-> "Command Disallowed" again on the second try.
+> Every morning I have to unplug/replug my USB dongle and then open the
+> BT settings an reconnect my mouse.  It's getting very old and tiring.
 >
-> This made sense back then when the retry was initiated *only* from the
-> "Connect Complete" event. If we received that event, we knew that now the
-> card now must have a "free slot" for a new connection request again. Thes=
-e
-> days we call hci_conn_check_pending() from a few more places though, and
-> in these places we can't really be sure that there's a "free slot" on the
-> card, so the second try to "Create Connection" might fail again.
+> I'd be more than happy to supply whatever kind of debug info is
+> necessary to get to a resolution on this.
 >
-> Deal with this by being less strict about these retries and try again
-> every time we get "Command Disallowed" errors, removing the limitation to
-> only two attempts.
+> My previous USB BT dongle did not have this problem at all.  But it
+> also didn't have BLE support which I now need.
 >
-> Since this can potentially cause us to enter an endless cycle of
-> reconnection attempts, we'll add some guarding against that with the next
-> commit.
+> Is btmon output useful here or some kind of driver or userspace debug
+> enabled, etc.
+>
+> Any ideas?
+>
+> Cheers,
+> b.
+>
+> On Wed, 2023-12-27 at 16:02 -0500, Brian J. Murrell wrote:
+> > I have a:
+> >
+> > Bus 003 Device 029: ID 0bda:8771 Realtek Semiconductor Corp.
+> > [unknown]
+> >
+> > BT adapter.  When I first plug it in I am able to connect my:
+> >
+> > Device 34:88:5D:56:A8:C1 Bluetooth Mouse M557
+> >
+> > But after some yet unknown amount of time, on the order of a day or
+> > so,
+> > the mouse becomes disconnected and won't reconnect:
+> >
+> > [bluetooth]# connect 34:88:5D:56:A8:C1
+> > Attempting to connect to 34:88:5D:56:A8:C1
+> > [bluetooth]# Failed to connect: org.bluez.Error.Failed br-connection-
+> > create-socket
+> >
+> > When the above happens the journal logs:
+> >
+> > Dec 27 15:47:17 pc.interlinx.bc.ca bluetoothd[3754244]:
+> > profiles/input/device.c:ioctl_is_connected() Can't get HIDP
+> > connection info
+> > Dec 27 15:47:22 pc.interlinx.bc.ca bluetoothd[3754244]:
+> > profiles/input/device.c:control_connect_cb() connect to
+> > 34:88:5D:56:A8:C1: Host is down (112)
 
-Don't see where you are doing such guarding, besides you seem to
-assume HCI_ERROR_COMMAND_DISALLOWED would always means the controller
-is busy, or something like that, but it could perform the connection
-later, but that may not always be the case, thus why I think
-reconnecting just a few number of times is better, if you really need
-to keep retrying then this needs to be controlled by a policy in
-userspace not hardcoded in the kernel, well I can even argument that
-perhaps the initial number of reconnection shall be configurable so
-one don't have to recompile the kernel if that needs changing.
+This usually means the device cannot be found, we receive a page
+timeout, so Im not really sure why replugging would have fixed it,
+could you please collect the HCI trace using btmon when that happens
+so we can inspect the error it is returning.
 
-> Signed-off-by: Jonas Dre=C3=9Fler <verdre@v0yd.nl>
-> ---
->  net/bluetooth/hci_event.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
->
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index e8b4a0126..e1f5b6f90 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -2323,12 +2323,13 @@ static void hci_cs_create_conn(struct hci_dev *hd=
-ev, __u8 status)
->
->         if (status) {
->                 if (conn && conn->state =3D=3D BT_CONNECT) {
-> -                       if (status !=3D HCI_ERROR_COMMAND_DISALLOWED || c=
-onn->attempt > 2) {
-> +                       if (status =3D=3D HCI_ERROR_COMMAND_DISALLOWED) {
-> +                               conn->state =3D BT_CONNECT2;
-> +                       } else {
->                                 conn->state =3D BT_CLOSED;
->                                 hci_connect_cfm(conn, status);
->                                 hci_conn_del(conn);
-> -                       } else
-> -                               conn->state =3D BT_CONNECT2;
-> +                       }
->                 }
->         } else {
->                 if (!conn) {
-> --
-> 2.43.0
+> > If I simply unplug/plug-in the adapter then try to connect using the
+> > GNOME Bluetooth control it will reconnect.
+> >
+> > It will stay connected for a period of time when it will drop and
+> > then
+> > I have to start this palaver all over again.
+> >
+> > The question is what is needed to be able to debug why bluez gets
+> > into
+> > this state with this adapter?
+> >
+> > Cheers,
+> > b.
+> >
 >
 
 
