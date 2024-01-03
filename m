@@ -1,206 +1,184 @@
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 553C21C2A9
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jan 2024 17:54:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+Received: from m15.mail.126.com (m15.mail.126.com [45.254.50.223])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E17B41C6AB
+	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jan 2024 18:41:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IayKygPe"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704304487; x=1735840487;
-  h=date:from:to:cc:subject:message-id;
-  bh=XRGlZJigVh6nxlZSoxbCe+rxftBNQXiN84DKiNMXuO4=;
-  b=IayKygPehoIZc+qpLLE/5hLLu3PCWEBTuJSdddUE3HZPXxun5RbWTRjZ
-   f33xhWa17Z1/VmrcZwcpdH3RlGYlYRlMXLR5+GuNZzCurN1EygFGZPg6j
-   JKoK7dEWMeRLycQ7pfMKHWw86mGBFTtGg/+lG3Utmfz94Fs0miudkOPZO
-   Cw0zH4+TWsFzrC+Scy4bg/xeFZnrp8ZMWysyF303MC7TTkOp26qCLtcQQ
-   FF7CK1bSqocp+k7oO+2jYr4zj5F72/9Ysc0m5itR+NLWEQYItTzU+eqS+
-   3DgDWmuCVUYByYIZXO9AE8J10OEjl8bCypmvk8jQYx4tme3WaVrTSJabT
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10942"; a="387495444"
-X-IronPort-AV: E=Sophos;i="6.04,328,1695711600"; 
-   d="scan'208";a="387495444"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jan 2024 09:54:45 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10942"; a="953288895"
-X-IronPort-AV: E=Sophos;i="6.04,328,1695711600"; 
-   d="scan'208";a="953288895"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by orsmga005.jf.intel.com with ESMTP; 03 Jan 2024 09:54:44 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rL5Ry-000MOQ-0q;
-	Wed, 03 Jan 2024 17:54:42 +0000
-Date: Thu, 04 Jan 2024 01:54:27 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- c7ee0bc8db325ec829bbe2cd0114071489ed915f
-Message-ID: <202401040123.lSJuDdcJ-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="OeJeSTHb"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
+	s=s110527; h=Message-ID:Date:MIME-Version:Subject:From:
+	Content-Type; bh=wiazpNLm5W9rnpxJszNVCXoQPVF4gm9Q3w5EGebJyhM=;
+	b=OeJeSTHb3rYcvwZTsPIZCBbUBd2fDiiOL3p6968C9gl2+oNJ/WGpuc4IIvaOPV
+	ZMJdhZG3S6Stgoh7q56UryZxQoTyQjCJHUqrNf7j5/NhniJ3/CWAnNXnvQMrEgho
+	3XtM+rGqgoco4mxfM1x6SKorSgpviD3mbLPknUh4hTgwY=
+Received: from [192.168.50.76] (unknown [58.22.7.114])
+	by zwqz-smtp-mta-g0-0 (Coremail) with SMTP id _____wDHz39CqpVlE8FHAA--.59328S2;
+	Thu, 04 Jan 2024 02:41:08 +0800 (CST)
+Message-ID: <5df7515e-5785-400c-8e29-42fc88cef0c6@126.com>
+Date: Thu, 4 Jan 2024 02:41:06 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH BlueZ v3 1/2] avdtp: fix incorrect transaction label in
+ setconf phase
+Content-Language: en-GB
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, Xiao Yao <xiaoyao@rock-chips.com>
+References: <20240103143904.77146-1-xiaokeqinhealth@126.com>
+ <CABBYNZLo9CVZsjvzjKsGKFyhOkrWoyWYL8bQoSfvTDf=PAQ-iw@mail.gmail.com>
+From: Yao Xiao <xiaokeqinhealth@126.com>
+In-Reply-To: <CABBYNZLo9CVZsjvzjKsGKFyhOkrWoyWYL8bQoSfvTDf=PAQ-iw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wDHz39CqpVlE8FHAA--.59328S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW3GF17Cr17Kw4xZr17Ww1UGFg_yoW7tF48pF
+	WIgF18JFykXr15AFsaq3909F4Iqrs3trZ8GrWYqr9IyanxCa4UtFy0yrWjka90vr1fCw1Y
+	vFyqg3sagw4qk3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jwXo7UUUUU=
+X-CM-SenderInfo: 50ld0yhhtl0xhhdo3xa6rslhhfrp/1tbimgVa1WVLZNthOAABsZ
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: c7ee0bc8db325ec829bbe2cd0114071489ed915f  Bluetooth: btnxpuart: Resolve TX timeout error in power save stress test
+Hi,
+On 2024/1/3 23:38, Luiz Augusto von Dentz wrote:
+> Hi,
+>
+> On Wed, Jan 3, 2024 at 9:40 AM Xiao Yao <xiaokeqinhealth@126.com> wrote:
+>> From: Xiao Yao <xiaoyao@rock-chips.com>
+>>
+>> BLUETOOTH SPECIFICATION Page 61 of 140
+>> Audio/Video Distribution Transport Protocol Specification (V13)
+>> 8.4.6 Message integrity verification at receiver side
+>>
+>> - The receiver of an AVDTP signaling message shall not interpret corrupted
+>> messages. Those messages are discarded and no signaling message is returned
+>> to the sender if no error code is applicable. Possible corrupted messages
+>> are:
+>>
+>>    * Response messages where the transaction label cannot match a previous
+>>      command sent to the remote device
+>>
+>> Consider the following scenario:
+>> btmon log:
+>> ... ...
+>> AVDTP: Discover (0x01) Command (0x00) type 0x00 label 5 nosp 0
+>> AVDTP: Discover (0x01) Response Accept (0x02) type 0x00 label 5 nosp 0
+>> AVDTP: Get All Capabilities (0x0c) Command (0x00) type 0x00 label 6 nosp 0
+>> AVDTP: Get All Capabilities (0x0c) Resp Accept (0x02) type 0 label 6 nosp 0
+>> AVDTP: Get All Capabilities (0x0c) Command (0x00) type 0x00 label 7 nosp 0
+>> AVDTP: Get All Capabilities (0x0c) Resp Accept (0x02) type 0 label 7 nosp 0
+>>
+>> < AVDTP: Set Configuration (0x03) Command (0x00) type 0x00 label 8 nosp 0
+>> //Currently, a 'set configuration' message has been received from the
+>> //sender, which contains a transaction label valued at 8. This message
+>> //was then relayed to A2DP backend(PulseAudio/PipeWire) using the dbus
+>> //interface.
+>>    set_configuration()(media.c)
+>>      dbus_message_new_method_call(..., "SetConfiguration", ...);
+>>      g_dbus_send_message_with_reply(btd_get_dbus_connection(), ...);
+>>      dbus_pending_call_set_notify(request->call, endpoint_reply, ...);
+>>      ...
+>>
+>>> AVDTP: Discover (0x01) Command (0x00) type 0x00 label 0 nosp 0
+>> //At this time, the A2DP reverse discovery issued an A2DP discover command.
+>> < AVDTP: Discover (0x01) Response Accept (0x02) type 0x00 label 0 nosp 0
+>> //After receiving the discover reply, the session->in.transaction is
+>> //changed to 0
+>>
+>>> AVDTP: Set Configuration (0x03) Resp Accept (0x02) type 0 label 0 nosp 0
+>> //The audio backend reply the dbus message
+>>    endpoint_reply (media.c)
+>>      setconf_cb (avdtp.c)
+>>        //Here avdtp_send sends an incorrect transaction value, causing
+>>        //the sender to discard the message. (The correct transaction
+>>        //value is 8)
+>>        avdtp_send(session, session->in.transaction, AVDTP_MSG_TYPE_ACCEPT,
+>>                   AVDTP_SET_CONFIGURATION, NULL, 0)
+>>
+>> AVDTP: Delay Report (0x0d) Command (0x00) type 0x00 label 1 nosp 0
+>> AVDTP: Delay Report (0x0d) Response Accept (0x02) type 0x00 label 1 nosp 0
+>> AVDTP: Get All Capabilities (0x0c) Command (0x00) type 0x00 label 2 nosp 0
+>> AVDTP: Get All Capabilities (0x0c) Resp Accept (0x02) type 0 label 2 nosp 0
+>> ... ...
+>>
+>> Therefore, a async_transaction that requires asynchronous return is
+>> recorded to prevent it from being incorrectly modified.
+>>
+>> Signed-off-by: Xiao Yao <xiaoyao@rock-chips.com>
+>> ---
+>> v1 -> v2: Fixed "session->in.transaction" logic err.
+>> v2 -> v3: Fixed some compile warnings
+>> ---
+>>   profiles/audio/avdtp.c | 19 ++++++++++++++-----
+>>   1 file changed, 14 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+>> index 10ef380d4..386c7f67c 100644
+>> --- a/profiles/audio/avdtp.c
+>> +++ b/profiles/audio/avdtp.c
+>> @@ -286,6 +286,7 @@ struct in_buf {
+>>          gboolean active;
+>>          int no_of_packets;
+>>          uint8_t transaction;
+>> +       uint8_t async_transaction;
+> Didn't I already explain it already that we are not supposed to have 2
+> outstanding transactions?
+Apologies for the misunderstanding earlier. When you mentioned 
+'outstanding transactions',
+were you referring to a complete configuration process, rather than a 
+single command?
+Can I understand it this way: An a2dp discovery command should not be 
+sent before responding
+to the AVDTP_MSG_TYPE_ACCEPT message? Is it only after sending the 
+AVDTP_MSG_TYPE_ACCEPT
+response to the remote device that I can proceed with the a2dp discovery?
+>
+>>          uint8_t message_type;
+>>          uint8_t signal_id;
+>>          uint8_t buf[1024];
+>> @@ -1462,15 +1463,16 @@ static void setconf_cb(struct avdtp *session, struct avdtp_stream *stream,
+>>          if (err != NULL) {
+>>                  rej.error = AVDTP_UNSUPPORTED_CONFIGURATION;
+>>                  rej.category = err->err.error_code;
+>> -               avdtp_send(session, session->in.transaction,
+>> -                               AVDTP_MSG_TYPE_REJECT, AVDTP_SET_CONFIGURATION,
+>> -                               &rej, sizeof(rej));
+>> +               avdtp_send(session, session->in.async_transaction,
+>> +                          AVDTP_MSG_TYPE_REJECT, AVDTP_SET_CONFIGURATION,
+>> +                          &rej, sizeof(rej));
+>>                  stream_free(stream);
+>>                  return;
+>>          }
+>>
+>> -       if (!avdtp_send(session, session->in.transaction, AVDTP_MSG_TYPE_ACCEPT,
+>> -                                       AVDTP_SET_CONFIGURATION, NULL, 0)) {
+>> +       if (!avdtp_send(session, session->in.async_transaction,
+>> +                       AVDTP_MSG_TYPE_ACCEPT,
+>> +                       AVDTP_SET_CONFIGURATION, NULL, 0)) {
+>>                  stream_free(stream);
+>>                  return;
+>>          }
+>> @@ -1569,6 +1571,13 @@ static gboolean avdtp_setconf_cmd(struct avdtp *session, uint8_t transaction,
+>>                  session->version = 0x0103;
+>>
+>>          if (sep->ind && sep->ind->set_configuration) {
+>> +               /* The setconfig configuration stage is asynchronous;
+>> +                * high CPU load or other factors can delay dbus message
+>> +                * responses, potentially altering the transaction value.
+>> +                * It's essential to record the received transaction value
+>> +                * for use in the final accept command.
+>> +                */
+>> +               session->in.async_transaction = transaction;
+>>                  if (!sep->ind->set_configuration(session, sep, stream,
+>>                                                          stream->caps,
+>>                                                          setconf_cb,
+>>
+>> base-commit: 7ad5669402c9acff8e4cc808edc12a41df36654e
+>> --
+>> 2.34.1
+>>
+>>
+>
 
-elapsed time: 1456m
-
-configs tested: 140
-configs skipped: 0
-
-The following configs have been built successfully.
-More configs may be tested in the coming days.
-
-tested configs:
-alpha                            allyesconfig   gcc  
-arc                              alldefconfig   gcc  
-arc                              allmodconfig   gcc  
-arc                              allyesconfig   gcc  
-arc                   randconfig-001-20240103   gcc  
-arc                   randconfig-002-20240103   gcc  
-arm                              allmodconfig   gcc  
-arm                              allyesconfig   gcc  
-arm                         lpc32xx_defconfig   clang
-arm                   randconfig-001-20240103   clang
-arm                   randconfig-002-20240103   clang
-arm                   randconfig-003-20240103   clang
-arm                   randconfig-004-20240103   clang
-arm64                            allmodconfig   clang
-arm64                 randconfig-001-20240103   clang
-arm64                 randconfig-002-20240103   clang
-arm64                 randconfig-003-20240103   clang
-arm64                 randconfig-004-20240103   clang
-csky                             allmodconfig   gcc  
-csky                             allyesconfig   gcc  
-csky                  randconfig-001-20240103   gcc  
-csky                  randconfig-002-20240103   gcc  
-hexagon                          allmodconfig   clang
-hexagon                          allyesconfig   clang
-hexagon               randconfig-001-20240103   clang
-hexagon               randconfig-002-20240103   clang
-i386                             allmodconfig   clang
-i386                              allnoconfig   clang
-i386                             allyesconfig   clang
-i386         buildonly-randconfig-001-20240103   clang
-i386         buildonly-randconfig-002-20240103   clang
-i386         buildonly-randconfig-003-20240103   clang
-i386         buildonly-randconfig-004-20240103   clang
-i386         buildonly-randconfig-005-20240103   clang
-i386         buildonly-randconfig-006-20240103   clang
-i386                                defconfig   gcc  
-i386                  randconfig-001-20240103   clang
-i386                  randconfig-002-20240103   clang
-i386                  randconfig-003-20240103   clang
-i386                  randconfig-004-20240103   clang
-i386                  randconfig-005-20240103   clang
-i386                  randconfig-006-20240103   clang
-i386                  randconfig-011-20240103   gcc  
-i386                  randconfig-012-20240103   gcc  
-i386                  randconfig-013-20240103   gcc  
-i386                  randconfig-014-20240103   gcc  
-i386                  randconfig-015-20240103   gcc  
-i386                  randconfig-016-20240103   gcc  
-loongarch                        allmodconfig   gcc  
-loongarch             randconfig-001-20240103   gcc  
-loongarch             randconfig-002-20240103   gcc  
-m68k                             allmodconfig   gcc  
-m68k                             allyesconfig   gcc  
-m68k                          hp300_defconfig   gcc  
-m68k                       m5208evb_defconfig   gcc  
-m68k                          sun3x_defconfig   gcc  
-microblaze                       allmodconfig   gcc  
-microblaze                       allyesconfig   gcc  
-mips                             allyesconfig   gcc  
-mips                           ip27_defconfig   gcc  
-mips                       lemote2f_defconfig   gcc  
-mips                           xway_defconfig   gcc  
-nios2                            allmodconfig   gcc  
-nios2                            allyesconfig   gcc  
-nios2                 randconfig-001-20240103   gcc  
-nios2                 randconfig-002-20240103   gcc  
-openrisc                         allyesconfig   gcc  
-parisc                           allmodconfig   gcc  
-parisc                           allyesconfig   gcc  
-parisc                randconfig-001-20240103   gcc  
-parisc                randconfig-002-20240103   gcc  
-powerpc                          allmodconfig   clang
-powerpc                          allyesconfig   clang
-powerpc                    amigaone_defconfig   gcc  
-powerpc                       eiger_defconfig   gcc  
-powerpc                     ksi8560_defconfig   gcc  
-powerpc               randconfig-001-20240103   clang
-powerpc               randconfig-002-20240103   clang
-powerpc               randconfig-003-20240103   clang
-powerpc64             randconfig-001-20240103   clang
-powerpc64             randconfig-002-20240103   clang
-powerpc64             randconfig-003-20240103   clang
-riscv                            allmodconfig   gcc  
-riscv                            allyesconfig   gcc  
-riscv                    nommu_k210_defconfig   gcc  
-riscv                 randconfig-001-20240103   clang
-riscv                 randconfig-002-20240103   clang
-riscv                          rv32_defconfig   clang
-s390                             allmodconfig   gcc  
-s390                             allyesconfig   gcc  
-s390                  randconfig-001-20240103   gcc  
-s390                  randconfig-002-20240103   gcc  
-sh                               allmodconfig   gcc  
-sh                               allyesconfig   gcc  
-sh                            hp6xx_defconfig   gcc  
-sh                    randconfig-001-20240103   gcc  
-sh                    randconfig-002-20240103   gcc  
-sh                          sdk7780_defconfig   gcc  
-sh                            titan_defconfig   gcc  
-sparc                            allmodconfig   gcc  
-sparc64                          allmodconfig   gcc  
-sparc64                          allyesconfig   gcc  
-sparc64               randconfig-001-20240103   gcc  
-sparc64               randconfig-002-20240103   gcc  
-um                               allmodconfig   clang
-um                               allyesconfig   clang
-um                    randconfig-001-20240103   clang
-um                    randconfig-002-20240103   clang
-x86_64                            allnoconfig   gcc  
-x86_64                           allyesconfig   clang
-x86_64       buildonly-randconfig-001-20240103   clang
-x86_64       buildonly-randconfig-002-20240103   clang
-x86_64       buildonly-randconfig-003-20240103   clang
-x86_64       buildonly-randconfig-004-20240103   clang
-x86_64       buildonly-randconfig-005-20240103   clang
-x86_64       buildonly-randconfig-006-20240103   clang
-x86_64                              defconfig   gcc  
-x86_64                randconfig-001-20240103   gcc  
-x86_64                randconfig-002-20240103   gcc  
-x86_64                randconfig-003-20240103   gcc  
-x86_64                randconfig-004-20240103   gcc  
-x86_64                randconfig-005-20240103   gcc  
-x86_64                randconfig-006-20240103   gcc  
-x86_64                randconfig-011-20240103   clang
-x86_64                randconfig-012-20240103   clang
-x86_64                randconfig-013-20240103   clang
-x86_64                randconfig-014-20240103   clang
-x86_64                randconfig-015-20240103   clang
-x86_64                randconfig-016-20240103   clang
-x86_64                randconfig-071-20240103   clang
-x86_64                randconfig-072-20240103   clang
-x86_64                randconfig-073-20240103   clang
-x86_64                randconfig-074-20240103   clang
-x86_64                randconfig-075-20240103   clang
-x86_64                randconfig-076-20240103   clang
-x86_64                          rhel-8.3-rust   clang
-xtensa                  nommu_kc705_defconfig   gcc  
-xtensa                randconfig-001-20240103   gcc  
-xtensa                randconfig-002-20240103   gcc  
-xtensa                    xip_kc705_defconfig   gcc  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
