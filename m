@@ -1,113 +1,105 @@
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20CF9171C4
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jan 2024 03:56:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.237.72.81])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30E3E17980;
+	Wed,  3 Jan 2024 04:06:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=buaa.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=buaa.edu.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TPrOzrjY"
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7811db57cb4so6952185a.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jan 2024 19:56:30 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=buaa.edu.cn header.i=@buaa.edu.cn header.b="09dKia/m"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704254189; x=1704858989; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=bHjOdd7+o9sSVlbCFJZu25EzEfHl8jywBXEsPklfM4c=;
-        b=TPrOzrjY6rQAj8MciLvUM9E/ewVCVMiUBHFmze/NAletuvw3zhUE+RHKlWJZPzhfTe
-         JIxVwGX2fiICXd355bQvIExMtJOKKs0e347LDPEO58NojOUA8EH66vjn2WPAMMzq16za
-         q79n9mf49ls366Y6Bm4j9GVxuRkue1aeRdRx5nQpGSkBYeaIeGaGCVeMmtSQ5MpgfYUo
-         PLIUGSR3lgr9j9LBHI75UBhcY/FiOiYhKE5X5YZWNDQbdYH7V2robpY1npynhw75MdnX
-         7j+TAI0po9h6moeRFh4bJvSNVQr4TksDwDhY63Y+RMzttwjEb9Q5GrvgPGAAjjrPimzE
-         tspA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704254189; x=1704858989;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bHjOdd7+o9sSVlbCFJZu25EzEfHl8jywBXEsPklfM4c=;
-        b=cexdGnYA9qlOWcoc+BvKuZiqCZcg9DZzwyzdCK6+F5GOtwRiSClGAw8n/fExPX1Teo
-         j+FwYSEbBWfp51vJqbDWbw1ADam4LP9bMwH0uKagB467JOCTkQAkd1YalmSIvXjXLZJ0
-         e3new+frl1eHr+HiAlZrfttjJC9Vs+HKxtf4G8SMKMXyBpuGriw7G0iaYnkkwgUq10qK
-         XU7CU+DqgRfLDSTnpzNfclRnr4hPcsVo/fSM/caRP7TcZ8pXBmNeEO9pupo2YfCyHvU4
-         BsUlxaT63coS6DKfiLWU8mYEMPLgySEOXHVXSpsl71QzwMSvICWdHFTRrg+icEnW0Crl
-         lQDg==
-X-Gm-Message-State: AOJu0YxXSCQsZo7R5zEjSHRq/TFM2CXIZ2I3xQcpzKLIUKCGoxoz+Uqa
-	79MgnbaXxufgBbY3/RnZMcAxiLgvZh0=
-X-Google-Smtp-Source: AGHT+IGTPXYx9k2KHLFGMIbadh+zQLncqiHRoBR1kJlAQK3URo+vhQXsWzlNz3Y0p2LfEOII1q2unA==
-X-Received: by 2002:a05:620a:31a6:b0:781:b188:c7ec with SMTP id bi38-20020a05620a31a600b00781b188c7ecmr836587qkb.74.1704254189181;
-        Tue, 02 Jan 2024 19:56:29 -0800 (PST)
-Received: from [172.17.0.2] ([20.109.39.177])
-        by smtp.gmail.com with ESMTPSA id v2-20020ae9e302000000b00781d4c771c2sm1262701qkf.60.2024.01.02.19.56.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jan 2024 19:56:29 -0800 (PST)
-Message-ID: <6594daed.e90a0220.d653e.363c@mx.google.com>
-Date: Tue, 02 Jan 2024 19:56:29 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7281901975595815956=="
+	d=buaa.edu.cn; s=buaa; h=Received:From:To:Cc:Subject:Date:
+	Message-Id:MIME-Version:Content-Transfer-Encoding; bh=UBDlzz6Wsf
+	vPV73RH7b/bcn+16PBcKw0N4bCbDc+87o=; b=09dKia/mTaKW0HG1EnmPWWcEgo
+	nAI/wYbKIB37OzKox+E22TDDx8qGvgsN24bUYG+iR2wg1z7pz8Q7osECF0zDrFJl
+	EZWiTzE65TLQoaWVIIFbJ8EzKwS2bd/UmbDNapr6RjD06+ep8eI9tIn2I3ES1lRq
+	MS4mRSGfg6bF8pSlo=
+Received: from localhost.localdomain (unknown [10.130.147.18])
+	by coremail-app1 (Coremail) with SMTP id OCz+CgC35Vc43ZRlU5uiAA--.46624S2;
+	Wed, 03 Jan 2024 12:06:16 +0800 (CST)
+From: Yuxuan Hu <20373622@buaa.edu.cn>
+To: marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	baijiaju1990@gmail.com,
+	sy2239101@buaa.edu.cn,
+	20373622@buaa.edu.cn,
+	buaazhr@buaa.edu.cn
+Subject: [PATCH V2] Bluetooth: rfcomm: Fix null-ptr-deref in rfcomm_check_security
+Date: Wed,  3 Jan 2024 12:06:11 +0800
+Message-Id: <20240103040611.3279681-1-20373622@buaa.edu.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, 20373622@buaa.edu.cn
-Subject: RE: [V2] Bluetooth: rfcomm: Fix null-ptr-deref in rfcomm_check_security
-In-Reply-To: <20240103031410.3262524-1-20373622@buaa.edu.cn>
-References: <20240103031410.3262524-1-20373622@buaa.edu.cn>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:OCz+CgC35Vc43ZRlU5uiAA--.46624S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7WFyDGF1xXr18Aw4UCw4rXwb_yoW8trW3pF
+	W2ya4xGFn7ur15Ar97AF4kAFyrZw1v9r15Kw4ku3yY93s5Wwn7trWSyr1jyay5CF4qk343
+	AF10qw4DGrnru37anT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBY1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E
+	87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1lnxkEFVAIw20F6c
+	xK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2Wl
+	Yx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbV
+	WUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AF
+	wI0_GFv_Wrylc2xSY4AK6svPMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY20_Aw
+	1UJr1UMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
+	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6x
+	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAI
+	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
+	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sRiL0e3UUUUU==
+X-CM-SenderInfo: ysqtljawssquxxddhvlgxou0/
 
---===============7281901975595815956==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+During our fuzz testing of the connection and disconnection process at the
+RFCOMM layer,we discovered this bug.By comparing the packetsfrom a normal
+connection and disconnection process with the testcase that triggered a
+KASAN report, we analyzed the cause of this bug as follows:
 
-This is automated email and please do not reply to this email!
+1. In the packets captured during a normal connection, the host sends a
+`Read Encryption Key Size` type of `HCI_CMD` packet(Command Opcode: 0x1408)
+to the controller to inquire the length of encryption key.After receiving
+this packet, the controller immediately replies with a Command Complete
+packet (Event Code: 0x0e) to return the Encryption Key Size.
 
-Dear submitter,
+2. In our fuzz test case, the timing of the controller's response to this
+packet was delayed to an unexpected point: after the RFCOMM and L2CAP
+layers had disconnected but before the HCI layer had disconnected.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=813991
+3. After receiving the Encryption Key Size Response at the time described
+in point 2, the host still called the rfcomm_check_security function.
+However, by this time `struct l2cap_conn *conn = l2cap_pi(sk)->chan->conn;`
+had already been released, and when the function executed
+`return hci_conn_security(conn->hcon, d->sec_level, auth_type, d->out);`,
+specifically when accessing `conn->hcon`, a null-ptr-deref error occurred.
 
----Test result---
+To fix this bug, check if `sk->sk_state` is BT_CLOSED before calling
+rfcomm_recv_frame in rfcomm_process_rx.
 
-Test Summary:
-CheckPatch                    PASS      0.62 seconds
-GitLint                       FAIL      0.53 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      28.06 seconds
-CheckAllWarning               PASS      30.63 seconds
-CheckSparse                   PASS      36.02 seconds
-CheckSmatch                   PASS      99.18 seconds
-BuildKernel32                 PASS      27.78 seconds
-TestRunnerSetup               PASS      435.47 seconds
-TestRunner_l2cap-tester       PASS      22.88 seconds
-TestRunner_iso-tester         PASS      47.18 seconds
-TestRunner_bnep-tester        PASS      6.86 seconds
-TestRunner_mgmt-tester        PASS      159.08 seconds
-TestRunner_rfcomm-tester      PASS      10.80 seconds
-TestRunner_sco-tester         PASS      14.49 seconds
-TestRunner_ioctl-tester       PASS      12.05 seconds
-TestRunner_mesh-tester        PASS      8.67 seconds
-TestRunner_smp-tester         PASS      10.14 seconds
-TestRunner_userchan-tester    PASS      7.25 seconds
-IncrementalBuild              PASS      26.16 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[V2] Bluetooth: rfcomm: Fix null-ptr-deref in rfcomm_check_security
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-30: B1 Line exceeds max length (81>80): "V1 -> V2: Removed the direct check for `conn` being null in rfcomm_check_security"
-
-
+Signed-off-by: Yuxuan Hu <20373622@buaa.edu.cn>
 ---
-Regards,
-Linux Bluetooth
+V1 -> V2: Check earlier on rfcomm_process_rx
 
+ net/bluetooth/rfcomm/core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
---===============7281901975595815956==--
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index 053ef8f25fae..1d34d8497033 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -1941,7 +1941,7 @@ static struct rfcomm_session *rfcomm_process_rx(struct rfcomm_session *s)
+ 	/* Get data directly from socket receive queue without copying it. */
+ 	while ((skb = skb_dequeue(&sk->sk_receive_queue))) {
+ 		skb_orphan(skb);
+-		if (!skb_linearize(skb)) {
++		if (!skb_linearize(skb) && sk->sk_state != BT_CLOSED) {
+ 			s = rfcomm_recv_frame(s, skb);
+ 			if (!s)
+ 				break;
+-- 
+2.25.1
+
