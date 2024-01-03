@@ -1,104 +1,133 @@
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECD4E1BDC2;
-	Wed,  3 Jan 2024 15:55:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BEB51B281;
+	Wed,  3 Jan 2024 16:05:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Apn/sAvO"
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2cd053d5683so26877771fa.2;
-        Wed, 03 Jan 2024 07:55:21 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gzqvguKC"
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2cce6bb9b48so53708711fa.1;
+        Wed, 03 Jan 2024 08:05:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704297320; x=1704902120; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1704297919; x=1704902719; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JBL9Qlw0s9HFYXJhGaaKeiT1PrvQ2SXf3tpTJ4/9DV8=;
-        b=Apn/sAvOwHkQEwx+qyZYiLV6CdzxiKwwwPCng8d/kV0wJ/XYP3Iv+IQaxFP2WAbj58
-         E7A4Zl7tYYbmfRWA7vZk77pZixFRy9J0Cf0YxyHPAhFlH7U8JHdppu5oed1TN5TIbSdp
-         ROP3zgws6plkvSXgPh0zUcZPk47l7vgGmU9bP42mBaKqo8hkeCPw25BvOD/Ue1sgtpr6
-         zZdG7pZDVdBNYqyTbAGQ87lPK1iSnoNlj6lM+2hiT53RiBg5VO8yvrjIq42CmVuPKTGs
-         np8AvRPAunGWDZVJ7gqIHhkeTaxV94vJ6oFVkID7qTHi/WQibR5yIjZuxY0jPzfEujYC
-         ZiVQ==
+        bh=+xSmaxNNRur6EQbpLrc86FJLNqnjCzsSA88jkGjqdDk=;
+        b=gzqvguKCU/DDtJNq0POQ03fdIaM7xLYUqjdovhnDX/Op5x/YhQz54e2g1lAp/AIDXO
+         yMO63unfQzYz9v3FPU4VF5GiNk89y4FLsDRoSq3FzuApCuYEHd5OIB8TL8ky3AC4ZlX6
+         EEvdU0VQxsHd1R0wFBBEVTuVgJ6nFd2jZhp4mn9XPL4sW9KLzZxVtLjgC4EFxr/SXAMz
+         TqXdwX24dapAdoTeU5iS+lGaa/SUSTZ55XOqOM/jd6DRHrUlIfOUpxcjd2GlrB1aQjn8
+         ZbalrFg/50u/HJTz77ljjM0DZWg9UJTk7y209XscHHnWIxw/M7d+as2Rpps1Ln/RMqjP
+         4XeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704297320; x=1704902120;
+        d=1e100.net; s=20230601; t=1704297919; x=1704902719;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=JBL9Qlw0s9HFYXJhGaaKeiT1PrvQ2SXf3tpTJ4/9DV8=;
-        b=Pggj0TYCk+U8vvZX1ZdgWxpNa4Hj3c6sFSWZ0aTkESovYUbhEQxQRWLjcyIrdIBGrl
-         xCgcKFb3220YSNvC4tyOFqusC8bvqm9fvTip3CCq3UteP44DOTTSQVYJn9HSJnBFBncg
-         fGi5wdSggGRoRHGCTv7LpwEJ11vkFoJr4Qw/yP+/+YGuJrjC73z6o9nlNEgMiO++ccHT
-         uPVs3tYzmDwTtUA7E6dA/zkPaJU6pkNcukWOxMPoxzDMheSaTLPl4WeJcNjFEcluFHlf
-         A9/i5v3fTXl6ksx929Rv9T74DXkLP/c/98qeLjgXwtBo7Tkkw/TQgM58TP3nIeYaBNP6
-         2P3w==
-X-Gm-Message-State: AOJu0Ywm8Bo3HwbGplbY8iXIOMrm1gFIsq4qmwz28R+i5QEHEmICm4Jh
-	gwkOcSg0GFRAFHRyqq1yaYoDT+8mDrlZFxpJack=
-X-Google-Smtp-Source: AGHT+IF5Wm64hVkZ2r/6KR3R9lcK/6o4Q8H5mbV6WqP5Q66wa4IPcHzCETBSF0Bv/lJDOVVHMJNNANgPOdHUJnIF+DU=
-X-Received: by 2002:a2e:9643:0:b0:2cc:ea26:38d1 with SMTP id
- z3-20020a2e9643000000b002ccea2638d1mr3842952ljh.45.1704297319902; Wed, 03 Jan
- 2024 07:55:19 -0800 (PST)
+        bh=+xSmaxNNRur6EQbpLrc86FJLNqnjCzsSA88jkGjqdDk=;
+        b=GRShHbQKSqas2AZ/JiWbp+VLLK8Hp9VItI4fB1q0yyIJoz8K7OCTe/MzTbGv6wYo1f
+         Sb2OqKq//h2a4Xfmar1OdqvTdxi+PZPh4aNrg0m6uumMUJ16UDl4brc7UAl+q/GwKYgj
+         tLaIFuX1pZo40OT7hHrqZBJzFVPuY4y5Dk3lbgdG07VTs0av63YUXi4XD0wSkHdsrDqu
+         6g7MqHuwV8Zm3uLbn53GYy9cXWNh1m2tjjcDtYJgoi0GC/5D0+WiTMpjpcab81BEML0e
+         GuQb0jjMOjFPIrBJV8RuxoMnf0yY5ZA1CCYRXI4v9cY7Gg56bP79odWLktLybOg0IsBR
+         xVSg==
+X-Gm-Message-State: AOJu0Yw2Uf1vCihU8FAHcYU3qOQ5J1r8IfsTOKMiA/Se8gh3ypAcQrIn
+	oEdkO58gSvWkSuKYL86fDefZZB8KX1ZgbuAeWM28rrA7Am8=
+X-Google-Smtp-Source: AGHT+IFeXbNfc9PPeUFuM6/SEH6Mga7ci/PhjUGshLV+ygtgPd78rKp7oZmKPWKx3n84n1GtUKOkND5h70UMCiYlB9U=
+X-Received: by 2002:a2e:9b95:0:b0:2cc:d45a:48ea with SMTP id
+ z21-20020a2e9b95000000b002ccd45a48eamr2671783lji.56.1704297919417; Wed, 03
+ Jan 2024 08:05:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240103101201.1812679-1-clancy_shang@163.com>
-In-Reply-To: <20240103101201.1812679-1-clancy_shang@163.com>
+References: <20240102185933.64179-1-verdre@v0yd.nl> <20240102185933.64179-4-verdre@v0yd.nl>
+In-Reply-To: <20240102185933.64179-4-verdre@v0yd.nl>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 3 Jan 2024 10:55:06 -0500
-Message-ID: <CABBYNZL=Tfe=Psg+JEjVqZBFv=vrbyhYa-5HzZJAOSe5aOAtgQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_sync: fix hogp device suspend bug
-To: clancy_shang@163.com
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, 
+Date: Wed, 3 Jan 2024 11:05:05 -0500
+Message-ID: <CABBYNZLoivEW=yrDtTbu5SjGauESH0zHb7NXs0YaSKSKqre5GQ@mail.gmail.com>
+Subject: Re: [PATCH 3/5] Bluetooth: hci_event: Remove limit of 2 reconnection attempts
+To: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
 	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	zhongjun.yu@quectel.com, Clancy Shang <clancy.shang@quectel.com>
+	netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Clancy,
+Hi Jonas,
 
-On Wed, Jan 3, 2024 at 5:12=E2=80=AFAM <clancy_shang@163.com> wrote:
+On Tue, Jan 2, 2024 at 1:59=E2=80=AFPM Jonas Dre=C3=9Fler <verdre@v0yd.nl> =
+wrote:
 >
-> From: Clancy Shang <clancy.shang@quectel.com>
+> Since commit 4c67bc74f016b0d360b8573e18969c0ff7926974, we retry connectin=
+g
+> later when we get a "Command Disallowed" error returned by "Create
+> Connection".
 >
-> when Bluetooth enters suspend, and disconnects everything with the
-> disconnect reason code of 0x15, the hogp device could not into sleep
-> and continued advertising. when use the disconnect reason code of 0x13,
-> the hogp device going into sleep succeeded.
+> In this commit the intention was to retry only once, and give up if we se=
+e
+> "Command Disallowed" again on the second try.
 >
-> Signed-off-by: Clancy Shang <clancy.shang@quectel.com>
+> This made sense back then when the retry was initiated *only* from the
+> "Connect Complete" event. If we received that event, we knew that now the
+> card now must have a "free slot" for a new connection request again. Thes=
+e
+> days we call hci_conn_check_pending() from a few more places though, and
+> in these places we can't really be sure that there's a "free slot" on the
+> card, so the second try to "Create Connection" might fail again.
+>
+> Deal with this by being less strict about these retries and try again
+> every time we get "Command Disallowed" errors, removing the limitation to
+> only two attempts.
+>
+> Since this can potentially cause us to enter an endless cycle of
+> reconnection attempts, we'll add some guarding against that with the next
+> commit.
+
+Don't see where you are doing such guarding, besides you seem to
+assume HCI_ERROR_COMMAND_DISALLOWED would always means the controller
+is busy, or something like that, but it could perform the connection
+later, but that may not always be the case, thus why I think
+reconnecting just a few number of times is better, if you really need
+to keep retrying then this needs to be controlled by a policy in
+userspace not hardcoded in the kernel, well I can even argument that
+perhaps the initial number of reconnection shall be configurable so
+one don't have to recompile the kernel if that needs changing.
+
+> Signed-off-by: Jonas Dre=C3=9Fler <verdre@v0yd.nl>
 > ---
->  net/bluetooth/hci_sync.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  net/bluetooth/hci_event.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
 >
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index d85a7091a116..16b5420c32d0 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -5927,7 +5927,7 @@ int hci_suspend_sync(struct hci_dev *hdev)
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index e8b4a0126..e1f5b6f90 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -2323,12 +2323,13 @@ static void hci_cs_create_conn(struct hci_dev *hd=
+ev, __u8 status)
 >
->         if (hci_conn_count(hdev)) {
->                 /* Soft disconnect everything (power off) */
-> -               err =3D hci_disconnect_all_sync(hdev, HCI_ERROR_REMOTE_PO=
-WER_OFF);
-> +               err =3D hci_disconnect_all_sync(hdev, HCI_ERROR_REMOTE_US=
-ER_TERM);
-
-Are you actually paying attention to my responses? I did nak this
-change before, so we need to find some way to detect the device is
-handling HCI_ERROR_REMOTE_POWER_OFF as link loss, which is wrong, and
-only then use HCI_ERROR_REMOTE_USER_TERM, so please don't keep sending
-the same patch over and over until you make these changes.
-
->                 if (err) {
->                         /* Set state to BT_RUNNING so resume doesn't noti=
-fy */
->                         hdev->suspend_state =3D BT_RUNNING;
+>         if (status) {
+>                 if (conn && conn->state =3D=3D BT_CONNECT) {
+> -                       if (status !=3D HCI_ERROR_COMMAND_DISALLOWED || c=
+onn->attempt > 2) {
+> +                       if (status =3D=3D HCI_ERROR_COMMAND_DISALLOWED) {
+> +                               conn->state =3D BT_CONNECT2;
+> +                       } else {
+>                                 conn->state =3D BT_CLOSED;
+>                                 hci_connect_cfm(conn, status);
+>                                 hci_conn_del(conn);
+> -                       } else
+> -                               conn->state =3D BT_CONNECT2;
+> +                       }
+>                 }
+>         } else {
+>                 if (!conn) {
 > --
-> 2.25.1
+> 2.43.0
 >
 
 
