@@ -1,72 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBF501D557
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jan 2024 21:10:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86E291DA21
+	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jan 2024 21:12:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hOkAh8Qp"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6EF97C433C9;
-	Wed,  3 Jan 2024 21:10:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704316226;
-	bh=TxomDpCN7o6xDLvYseJWsP3NmONb5TZ3RDGU25n/XmA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hOkAh8QpZ5qIG5DcDqeIiRMdKBR8N/QYfp0thFpnJhFDygMJk9ZBREt8DBrnuA2Nw
-	 7f31dIeukOxAmFbis5X0y1fPY+FYyAGHshGxc1MmgwTdazMbIz99WRbXmz9vsR30WJ
-	 bZ2HRe4vo9wj2fMudKVeWLhexT55SwOk8Sgts/tmqeMLePUoelKTPId/H/4SwBZuZp
-	 S9iwYE7iX9VRYp1dD7TjynqeuzDtY4mIvH8ygMqzpY70PER/EuxkTuq5Cd/P/+aGaL
-	 eGrLkBORCjNgQpsHXmGgxjkWEEgpfUWxFu4A7pQanhvAcLZI1Xwe7Sepko2CEuZJfl
-	 Hwf0lwHg6xPUA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4C7D9C43168;
-	Wed,  3 Jan 2024 21:10:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="jzEv7B7s"
+Received: from github.com (hubbernetes-node-413e5a9.va3-iad.github.net [10.48.141.38])
+	by smtp.github.com (Postfix) with ESMTPA id 70A638C05C9
+	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jan 2024 13:12:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1704316354;
+	bh=xJwxRz24ChFnQNa0JZe1qoXnV+sTSquAqpLw+aVaYtU=;
+	h=Date:From:To:Subject:From;
+	b=jzEv7B7sgqopyguSOFhTbquYQeT4Ax3mDUjD4NfHziRrvcP+Mr7+vHQEnQaC+XBwV
+	 yNf9bkcwBygC/cpBi4ZMGFnX2Z/TtNF46yUi04jsMSEO8y9PGHwfIGb/zRevLYOddA
+	 cO++rjGWAogoMAc1ed8OUsoVqBIHIhx7JxTQ4pm4=
+Date: Wed, 03 Jan 2024 13:12:34 -0800
+From: VinitMehta-NXP <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/7ad566-60d601@github.com>
+Subject: [bluez/bluez] d206ab: monitor: add Qualcomm and Mediatek MSFT opcodes
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v2 0/1] mgmt: Fix crash after pair command
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <170431622630.16433.863044364192870086.git-patchwork-notify@kernel.org>
-Date: Wed, 03 Jan 2024 21:10:26 +0000
-References: <20231219062801.307-1-vinit.mehta@nxp.com>
-In-Reply-To: <20231219062801.307-1-vinit.mehta@nxp.com>
-To: Vinit Mehta <vinit.mehta@nxp.com>
-Cc: linux-bluetooth@vger.kernel.org, devyani.godbole@nxp.com,
- nitin.jadhav@nxp.com
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: d206ab94a79e0c6c96265fca1155caea18405a73
+      https://github.com/bluez/bluez/commit/d206ab94a79e0c6c96265fca1155caea18405a73
+  Author: Archie Pusaka <apusaka@chromium.org>
+  Date:   2024-01-03 (Wed, 03 Jan 2024)
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M monitor/packet.c
 
-On Tue, 19 Dec 2023 11:58:00 +0530 you wrote:
-> Hello Maintainers
-> 
-> This patch fixes assertion in bluetoothctl client process
-> 
-> After pair command, if the user doesn't provide any input on bluetoothctl
-> CLI interface after receiving the prompt(yes/no), than subsequent CLI
-> command will trigger a call to DBUS library function
-> (dbus_message_get_no_reply) with a NULL message pointer which triggers
-> assertion in DBUS library causing the bluetoothctl process to crash.
-> The change is done in confirm_response callback to trigger a DBUS
-> API error call only if the pending_message pointer is not NULL so
-> as to avoid the assertion.
-> 
-> [...]
+  Log Message:
+  -----------
+  monitor: add Qualcomm and Mediatek MSFT opcodes
 
-Here is the summary with links:
-  - [BlueZ,v2,1/1] mgmt: Fix crash after pair command
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=60d60166e4bf
+Qualcomm and Mediatek has 0xfd70 and 0xfd30 for their MSFT opcodes,
+respectively.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Signed-off-by: Archie Pusaka <apusaka@chromium.org>
+Reviewed-by: Hsin-chen Chuang <chharry@google.com>
 
 
+  Commit: 60d60166e4bfae8555fb671e5a99952586cc6b56
+      https://github.com/bluez/bluez/commit/60d60166e4bfae8555fb671e5a99952586cc6b56
+  Author: Vinit Mehta <vinit.mehta@nxp.com>
+  Date:   2024-01-03 (Wed, 03 Jan 2024)
+
+  Changed paths:
+    M client/agent.c
+    M client/mgmt.c
+
+  Log Message:
+  -----------
+  mgmt: Fix crash after pair command
+
+After pair command, if the user doesn't provide any input on bluetoothctl
+CLI interface after receiving the prompt(yes/no) below crash is observed:
+
+dbus[782]: arguments to dbus_message_get_no_reply() were incorrect,
+assertion "message != NULL" failed in file
+/usr/src/debug/dbus/1.14.10-r0/dbus/dbus-message.c line 3250.
+This is normally a bug in some application using the D-Bus library.
+/usr/lib/libc.so.6(+0x27534) [0xffffa1b67534]
+/usr/lib/libc.so.6(__libc_start_main+0x9c) [0xffffa1b6760c]
+bluetoothctl(+0x188f0) [0xaaaac9c088f0]
+Aborted (core dumped)
+
+
+Compare: https://github.com/bluez/bluez/compare/7ad5669402c9...60d60166e4bf
