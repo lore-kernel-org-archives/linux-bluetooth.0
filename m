@@ -1,216 +1,57 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp87.cstnet.cn [159.226.251.87])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6064215AF9
-	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jan 2024 19:32:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gQB9O7Gd"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1d40eec5e12so68058055ad.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jan 2024 11:32:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704223955; x=1704828755; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=LbViYqgZmDtuhRpK/l1QdS42yHshjyxFX9FJUTABhEU=;
-        b=gQB9O7Gd++oat8tnEZyPLCRjAqtiWy9M6KrOhjWc2bOIihnBV49/IpmIOCRWD9NnWs
-         CXboQYnIOaB0XGH+La46R9fsuoLiFyKZrJLbONKw+1DTsLHljIixIfsSepcGa0Z/RGSh
-         2HMI4D9eqIORl2+1OPALT+zzMakcPM669U9VkVlldRelZ0GHiXtfj7UWmSxRpoAyy9XL
-         23sGfzAXPoIlZABkz7MzL538aAkvZguw9nn8oyKvUGWbdsIKV+UHz+X1UB7+cwQpdR/T
-         YwZYhTwLKoX7Apq/mfWF/MSIViaFnnLYmk0RXCDV09Z/HqGeNHSCFTNhZLeRCWucT7kx
-         6pNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704223955; x=1704828755;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LbViYqgZmDtuhRpK/l1QdS42yHshjyxFX9FJUTABhEU=;
-        b=JX8AJza1LKBqp502ZUCFwSMG95blxMVk0+Yn3u0q6wCVCxUF/w9qNDWRwKcBtRXTgZ
-         wk2HFy4dDlaoGWsAECZMTHpvAKw888WOERaLERlTnDzmbVrJWyLYUFjXGyueYNjdzdvy
-         C+kpMOgpHZjlu/b5hloekjAZxo+5FVRpR1v6XjIVRohVRQGhW/gb5IF5fTQBPuSJ4XUB
-         svOj4QR0ZoSknIXkCSglbfBKDaSg8NoHb2hjbsXDT4BbnHyo27lud1/gHFez2c5I4Vi8
-         pggbNHcMGWYYgtINFkj0309kmw1tmkU6++8VKAKoJO8cxHFbRdy4DtIG4HL+yhy7I7+O
-         iZBA==
-X-Gm-Message-State: AOJu0Yxk9flJUzmWACp9+UUBCHexdfVvOUPG89o74s/rLSE+rxMKREtz
-	lAHcZeaQve7vHOpHTiC8Xi/mlhG59KQ=
-X-Google-Smtp-Source: AGHT+IGKzmnHe+x+dqxKYhc8/T0RvaTcwbeP/v0YCvMW7xlzFlN2NJNeMz+PjljBRYoqN5qWbYUPyg==
-X-Received: by 2002:a17:902:b214:b0:1d4:3dfd:7e45 with SMTP id t20-20020a170902b21400b001d43dfd7e45mr16494516plr.122.1704223955192;
-        Tue, 02 Jan 2024 11:32:35 -0800 (PST)
-Received: from [172.17.0.2] ([52.225.76.180])
-        by smtp.gmail.com with ESMTPSA id e12-20020a170902784c00b001d1d27259cesm22949541pln.180.2024.01.02.11.32.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jan 2024 11:32:34 -0800 (PST)
-Message-ID: <659464d2.170a0220.410ee.2ee9@mx.google.com>
-Date: Tue, 02 Jan 2024 11:32:34 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4432186124604478660=="
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B623F10EE;
+	Wed,  3 Jan 2024 01:37:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iie.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iie.ac.cn
+Received: from mengjingzi$iie.ac.cn ( [121.195.114.118] ) by
+ ajax-webmail-APP-17 (Coremail) ; Wed, 3 Jan 2024 09:32:17 +0800 (GMT+08:00)
+Date: Wed, 3 Jan 2024 09:32:17 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: =?UTF-8?B?5a2f5pWs5ae/?= <mengjingzi@iie.ac.cn>
+To: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: missing capability check in __rfcomm_release_dev()
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT5.0.15 build 20230921(8ad33efc)
+ Copyright (c) 2002-2024 www.mailtech.cn cnic.cn
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, verdre@v0yd.nl
-Subject: RE: Bluetooth: Improve retrying of connection attempts
-In-Reply-To: <20240102185933.64179-2-verdre@v0yd.nl>
-References: <20240102185933.64179-2-verdre@v0yd.nl>
-Reply-To: linux-bluetooth@vger.kernel.org
+Message-ID: <20dc58ee.bf74.18cccf32c62.Coremail.mengjingzi@iie.ac.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:qgCowADXOuoiuZRlrAkDAA--.32362W
+X-CM-SenderInfo: pphqwyxlqj6xo6llvhldfou0/1tbiDAgFE2WUJeXn3AABsZ
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
 
---===============4432186124604478660==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=813906
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      2.87 seconds
-GitLint                       PASS      0.99 seconds
-SubjectPrefix                 PASS      0.33 seconds
-BuildKernel                   PASS      28.06 seconds
-CheckAllWarning               PASS      30.64 seconds
-CheckSparse                   WARNING   36.43 seconds
-CheckSmatch                   WARNING   99.91 seconds
-BuildKernel32                 PASS      27.22 seconds
-TestRunnerSetup               PASS      435.07 seconds
-TestRunner_l2cap-tester       PASS      22.98 seconds
-TestRunner_iso-tester         PASS      94.14 seconds
-TestRunner_bnep-tester        PASS      6.96 seconds
-TestRunner_mgmt-tester        PASS      161.32 seconds
-TestRunner_rfcomm-tester      PASS      10.76 seconds
-TestRunner_sco-tester         PASS      14.49 seconds
-TestRunner_ioctl-tester       PASS      12.02 seconds
-TestRunner_mesh-tester        PASS      8.73 seconds
-TestRunner_smp-tester         PASS      9.75 seconds
-TestRunner_userchan-tester    PASS      7.32 seconds
-IncrementalBuild              PASS      83.71 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[1/5] Bluetooth: Remove superfluous call to hci_conn_check_pending()
-WARNING: Please use correct Fixes: style 'Fixes: <12 chars of sha1> ("<title line>")' - ie: 'Fixes: 198fc841b667 ("Merge 33ba02027f8092a3b79e82372598867aac9f54ee into ef3a59b4541dfc255a914dc47880a3a28097dc7b")'
-#70: 
-Fixes: a9de9248064bfc8eb0a183a6a951a4e7b5ca10a4
-
-total: 0 errors, 1 warnings, 0 checks, 8 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13509297.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[2/5] Bluetooth: hci_event: Use HCI error defines instead of magic values
-WARNING: Missing commit description - Add an appropriate one
-
-total: 0 errors, 1 warnings, 0 checks, 43 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13509298.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[4/5] Bluetooth: hci_event: Do sanity checks before retrying to connect
-WARNING: quoted string split across lines
-#79: FILE: net/bluetooth/hci_event.c:2339:
-+						   "\"Create Connection\" returned error "
-+						   "(0x%2.2x) indicating to try again, but "
-
-WARNING: quoted string split across lines
-#80: FILE: net/bluetooth/hci_event.c:2340:
-+						   "(0x%2.2x) indicating to try again, but "
-+						   "there's no concurrent \"Create "
-
-WARNING: quoted string split across lines
-#81: FILE: net/bluetooth/hci_event.c:2341:
-+						   "there's no concurrent \"Create "
-+						   "Connection\" nor an ongoing inquiry",
-
-total: 0 errors, 3 warnings, 0 checks, 28 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13509300.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[5/5] Bluetooth: hci_event: Try reconnecting on more kinds of errors
-WARNING: quoted string split across lines
-#109: FILE: net/bluetooth/hci_event.c:3265:
-+					   "\"Connect Complete\" event with error "
-+					   "(0x%2.2x) indicating to try again, but "
-
-WARNING: quoted string split across lines
-#110: FILE: net/bluetooth/hci_event.c:3266:
-+					   "(0x%2.2x) indicating to try again, but "
-+					   "there's no concurrent \"Create "
-
-WARNING: quoted string split across lines
-#111: FILE: net/bluetooth/hci_event.c:3267:
-+					   "there's no concurrent \"Create "
-+					   "Connection\" nor an ongoing inquiry",
-
-WARNING: else is not generally useful after a break or return
-#119: FILE: net/bluetooth/hci_event.c:3275:
-+			return;
-+		} else {
-
-total: 0 errors, 4 warnings, 0 checks, 50 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13509301.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4432186124604478660==--
+SGkhCgpXZSBvYnNlcnZlZCBhIHBvdGVudGlhbCBlbmhhbmNlbWVudCBpbiB0aGUgX19yZmNvbW1f
+cmVsZWFzZV9kZXYoKSBmdW5jdGlvbi4gQ3VycmVudGx5LCB0aGUgZnVuY3Rpb24gY2hlY2tzIENB
+UF9ORVRfQURNSU4gYXQgbGluZSA0NTIsIHByaW1hcmlseSBzYWZlZ3VhcmRpbmcgcmZjb21tX2Rs
+Y19jbG9zZSgpIGZvciBjbG9zaW5nIGEgZGF0YSBsaW5rIGNvbm5lY3Rpb24uCldlIGNvbnNpZGVy
+IGFuIGV4dHJhIENBUF9TWVNfVFRZX0NPTkZJRyBtYXliZSBuZWVkZWQgZm9yIGhhbmdpbmcgdXAg
+YSB0dHkgYXQgbGluZSA0NjkodHR5X3ZoYW5ndXAoKSkuIAoKT24gdGhlIG9uZSBoYW5kLCB0aGUg
+ZGVmaW5pdGlvbiBvZiBDQVBfU1lTX1RUWV9DT05GSUcgaW5jbHVkZXMgImVtcGxveSB2YXJpb3Vz
+IHByaXZpbGVnZWQgaW9jdGwgb3BlcmF0aW9ucyBvbiB2aXJ0dWFsIHRlcm1pbmFscyIoY2hlY2sg
+Y2FwYWJpbGl0eSBtYW51YWwgcGFnZSBodHRwczovL3d3dy5tYW43Lm9yZy9saW51eC9tYW4tcGFn
+ZXMvbWFuNy9jYXBhYmlsaXRpZXMuNy5odG1sKTsgb24gdGhlIG90aGVyIGhhbmQsIHRoZSBzaW1p
+bGFyIGZ1bmN0aW9uYWxpdHkgaXMgYWxyZWFkeSBwcm90ZWN0ZWQgYnkgQ0FQX1NZU19UVFlfQ09O
+RklHIGluIGZzL29wZW4uYy4KClRoZSBjYWxscGF0aCBpbiBuZXQvYmx1ZXRvb3RoL3JmY29tbS90
+dHkuYyBpczoKcmZjb21tX2Rldl9pb2N0bCgpIC0mZ3Q7IHJmY29tbV9yZWxlYXNlX2RldigpIC0m
+Z3Q7IF9fcmZjb21tX3JlbGVhc2VfZGV2KCkgLSZndDsgdHR5X3ZoYW5ndXAoKQoKVGhlIGNhbGxw
+YXRoIGluIGZzL29wZW4uYyBpczogClNZU0NBTExfREVGSU5FMCh2aGFuZ3VwKSAtJmd0OyBjYXBh
+YmxlKENBUF9TWVNfVFRZX0NPTkZJRyktJmd0OyB0dHlfdmhhbmd1cF9zZWxmKCkgLSZndDsgdHR5
+X3ZoYW5ndXAoKS4KClRoaXMgaXNzdWUgZXhpc3RzIGluIHNldmVyYWwga2VybmVsIHZlcnNpb25z
+IGFuZCB3ZSBoYXZlIGNoZWNrZWQgaXQgb24gdGhlIGxhdGVzdCBzdGFibGUgcmVsZWFzZShMaW51
+eCA2LjYuOSkuIAoKV2Ugd291bGQgbGlrZSB0byBwcm9tb3RlIHRoZSBwcm9wZXIgdXNlIG9mIGNh
+cGFiaWxpdHkgdG8gZW5oYW5jZSB0aGUgcHJvdGVjdGlvbiBvZiBrZXJuZWwgcmVzb3VyY2VzLiBZ
+b3VyIGluc2lnaHRzIGFuZCBmZWVkYmFjayBvbiB0aGlzIHByb3Bvc2VkIGFkanVzdG1lbnQgd291
+bGQgYmUgaW52YWx1YWJsZS4gVGhhbmsgeW91IGZvciB0YWtpbmcgdGhlIHRpbWUgdG8gY29uc2lk
+ZXIgdGhpcyByZXF1ZXN0LgoKQmVzdCByZWdhcmRzLApKaW5nemkK
