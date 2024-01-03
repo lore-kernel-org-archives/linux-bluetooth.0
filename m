@@ -1,20 +1,22 @@
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8F6F4A16;
-	Wed,  3 Jan 2024 03:08:28 +0000 (UTC)
+Received: from buaa.edu.cn (unknown [202.112.128.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCA084A1C;
+	Wed,  3 Jan 2024 03:17:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=buaa.edu.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=buaa.edu.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=buaa.edu.cn header.i=@buaa.edu.cn header.b="dA6ithPX"
+	dkim=pass (1024-bit key) header.d=buaa.edu.cn header.i=@buaa.edu.cn header.b="vDboQI1M"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=buaa.edu.cn; s=buaa; h=Received:From:To:Cc:Subject:Date:
 	Message-Id:MIME-Version:Content-Transfer-Encoding; bh=ZT4f7RGcP8
-	9s2PD4GqbxF1IDMNpMzEJiOuxSzUjnO2Q=; b=dA6ithPX3RoxBMBMXvTC20wydI
-	acNkrx/qyZOqznT3A5E/5xG6pQ9OtTxE/087wnw0zBM7NsYr1S582Q5A5MTKjfms
-	iLksuDZsAYB+6/FFkEopK0hUOKOqRklB6D76AzN3++yUVD9DsUJB5XK2mqnZUhoe
-	/m6biKRlPNjK7INqc=
+	9s2PD4GqbxF1IDMNpMzEJiOuxSzUjnO2Q=; b=vDboQI1MjVVPsWBhP8xgQM8D60
+	3axFhSUn9Z7AGSybcRhaQTvRNWYKfaJBOrMAAVvm/HBmpsW5xWTQZqfWputqsun1
+	mTlT+f/9f/9b8XYL3RNbVJ3E3AUTSK+4fva7dwsz7VR4S+ppFf9hBZpqTtskXZBI
+	rowjW0Lrf69bZthIo=
 Received: from localhost.localdomain (unknown [10.130.147.18])
-	by coremail-app1 (Coremail) with SMTP id OCz+CgBnl1miz5RlIYGiAA--.46504S2;
-	Wed, 03 Jan 2024 11:08:18 +0800 (CST)
+	by coremail-app1 (Coremail) with SMTP id OCz+CgAnVlgh0ZRlzISiAA--.48024S2;
+	Wed, 03 Jan 2024 11:14:41 +0800 (CST)
 From: Yuxuan Hu <20373622@buaa.edu.cn>
 To: marcel@holtmann.org,
 	johan.hedberg@gmail.com,
@@ -25,9 +27,9 @@ Cc: linux-bluetooth@vger.kernel.org,
 	sy2239101@buaa.edu.cn,
 	20373622@buaa.edu.cn,
 	buaazhr@buaa.edu.cn
-Subject: [PATCHv2] Bluetooth: rfcomm: Fix null-ptr-deref in rfcomm_check_security
-Date: Wed,  3 Jan 2024 11:07:47 +0800
-Message-Id: <20240103030747.3260374-1-20373622@buaa.edu.cn>
+Subject: [PATCH V2] Bluetooth: rfcomm: Fix null-ptr-deref in rfcomm_check_security
+Date: Wed,  3 Jan 2024 11:14:10 +0800
+Message-Id: <20240103031410.3262524-1-20373622@buaa.edu.cn>
 X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -36,23 +38,23 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:OCz+CgBnl1miz5RlIYGiAA--.46504S2
+X-CM-TRANSID:OCz+CgAnVlgh0ZRlzISiAA--.48024S2
 X-Coremail-Antispam: 1UD129KBjvJXoW7WFyDGF1xXr18Aw4UCw4rXwb_yoW8tFyfpF
 	ZFya4xGFn7ur15Arn7AF4kuFyrZr1v9r15Kw4ku3yY93s5Wwn7trWSyr1jvay5CFs0y343
-	ZF18Xw4DGrnru37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9j1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
+	ZF18Xw4DGrnru37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBF1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
 	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
 	IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2
 	z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2vYz4IE04k24V
 	AvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xf
-	McIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7
-	v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkIecxEwVCm
-	-wCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6cx26F1DJr1UJwCFx2IqxVCFs4IE7x
-	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
-	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvf
-	C2KfnxnUUI43ZEXa7VUbHa0DUUUUU==
+	McIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7
+	v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS
+	14v26r1q6r43MxkIecxEwVCm-wCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6cx26F
+	1DJr1UJwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
+	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
+	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
+	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
+	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUAxhLUUUUU=
 X-CM-SenderInfo: ysqtljawssquxxddhvlgxou0/
 
 During our fuzz testing of the connection and disconnection process at the
