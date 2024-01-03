@@ -1,52 +1,56 @@
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48C521D54B
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jan 2024 20:51:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95AC41D54C
+	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jan 2024 20:51:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dy1/qKC+"
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-5e6c8b70766so92570997b3.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jan 2024 12:51:28 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PmAX5Beb"
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-5e778e484dbso95436957b3.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jan 2024 12:51:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704315086; x=1704919886; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=CHn3fv0dSrcRp385CccshSU/CT10sO6+J+wQmntFtxc=;
-        b=Dy1/qKC+3FOwunwjq20IiROv9dcZKtgGO9WKGrweumq50ruwIrwlyemP0N6aP+Nk4J
-         gsuNHVOazaWPY4ZHJbY126+sb99Jt4ZBHEIjRI88njxOWdntF+VRXiIWUlf04gJEz9kn
-         yP5G0baRpLUwEdFABDHPmAUwL0tnFg78YRiXLI3kpkk++5u21vofEj+q9rKtWJMKrzDy
-         P1tSb1LxXU8E4BprvCb46pD1z1WfFACIOQo9wDLtAyCo8+Vm0m7OHoniCEmZ9mgz+ir4
-         2mlRkmvWBt91jNnzkwxV2QfCjpPDY3rLGg4noUWNJ5uzXPSMIJoBN8LOrJkZpEUuJut6
-         yRzQ==
+        d=gmail.com; s=20230601; t=1704315089; x=1704919889; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lc3ziiYCttAcyDckxBNiuK5nDA3dA+wlrReYUUzx4S4=;
+        b=PmAX5Bebex2b6G0ywDdUnOYbzwA/ToLM+FRDWqDodM2hIL0KwC8xITijtG5Jvl0CN0
+         fVZCn3lcl5Ugh+Abva0qti9WWKxo2Mjd5HUgCYZ5+wr7hZzklDJvZx04QIW/Hgd8XiMe
+         xSGX05JlOIrhCghxMe8EXE3knYBnNwNFShp3sSHo7KsmWrcf7ahEl0UPRPtrUVQCjoYv
+         055wzv9PJPcBSsSkRXoP+4jjb/xqNGXS788I0IBuCyirkV0VHWG4g6k8VaGVGPFIzFii
+         DC6Ma94btUdmAWLndzSPQhSE0KzPSXSRlUzv2WqBzkZYkEZrdFAIqIroJXBA5AWP5Y0D
+         Dz+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704315086; x=1704919886;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CHn3fv0dSrcRp385CccshSU/CT10sO6+J+wQmntFtxc=;
-        b=c85R5renWQ8RQA+BB8GzhJlJ1bq0SZ7qnVznsGeJwyWbb+PCGapxcgshXp5pzpdLmZ
-         52oVUiXWpt0c3X95Phd+9T1Umx02gMralQx6kdIrNZY/DhvsHFcXnEKifU2U7rbaj32F
-         QPRWWHcVCfluBTgsgo6enIhaG8QhfO4DS+V+WaP7Z8Bkgqx941K/Swd365qOy7ouYhiB
-         eKy2V+ol8s0gCngFmqfD27m6k/Xbr/vtoz6izSm2z5AZwtrxTja41tCFqCb7kg7PR5S3
-         m3al7c0zcKBBq/ooR+Xfeqczz9z5VONPp0XhPYuHSuiN5l54u0aG3LhkjUZBPkrxiX0C
-         /sNQ==
-X-Gm-Message-State: AOJu0YzOKuOZ0LFodDDEnec5FHTOfPUVKiRaMmI5ceDLDWh+U6ZN7VI9
-	9jO0uy+AFj+LKDbKG9GV9F+Xa1axF7w=
-X-Google-Smtp-Source: AGHT+IGrvajLemj5QCnRyOl85kMEJ2so/St+8IkOHb1NC/ySW58CLZQwDzs/ChvoMqK2DcJW9pp0IA==
-X-Received: by 2002:a05:690c:4047:b0:5ef:6f5c:c693 with SMTP id ga7-20020a05690c404700b005ef6f5cc693mr4561262ywb.28.1704315086158;
-        Wed, 03 Jan 2024 12:51:26 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704315089; x=1704919889;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lc3ziiYCttAcyDckxBNiuK5nDA3dA+wlrReYUUzx4S4=;
+        b=Sp3YSE1X9ka0iYRb9ctsgep/KcUqCAYG+Uqw7t3ezoUhhyM4cm4iYcCkPTbx0ccQC3
+         h8C2dnTmJFZqk+V2NyFopZXJmgY0Faw4SDMF5onCc0s8yek9azowCAbckY8K6goka2HB
+         zVfJWlOLetCnBeqynw5n7+WShaJQJ1VegiMAs+b3eUVirx+4Y7fGbOEgz2PeFPj+nPz5
+         Z6qpaDGFIpjFIQGlyb27mT0/s3sQ+GEcJA5MUs+2usVEpcHKts219LxujJsySN3mRVtL
+         TZPUAg7Jwrs5W1rjt4Co0u9ig+xr7QBVRmkAvdLg3dAxXoHPItExcgfTyeHBmE93AFQd
+         MKWw==
+X-Gm-Message-State: AOJu0YyxIXPNtOWM0HqfOByXiKXg97vtLayHp08eR36ysM1ntdSVg0+g
+	LacuKyco2USeinaFTbS5qqqP2CcM2os=
+X-Google-Smtp-Source: AGHT+IFxVAGxvOtehIBjKUuaVU9tYaFA/4N8/dY9RpmtDmgOniC8xMiInWJqVvPT2mfMX3c9GbqYBg==
+X-Received: by 2002:a81:b718:0:b0:5eb:bfac:69c with SMTP id v24-20020a81b718000000b005ebbfac069cmr10221358ywh.45.1704315089296;
+        Wed, 03 Jan 2024 12:51:29 -0800 (PST)
 Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
-        by smtp.gmail.com with ESMTPSA id d13-20020a81ab4d000000b005e71fbbc661sm12997084ywk.143.2024.01.03.12.51.25
+        by smtp.gmail.com with ESMTPSA id d13-20020a81ab4d000000b005e71fbbc661sm12997084ywk.143.2024.01.03.12.51.28
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jan 2024 12:51:25 -0800 (PST)
+        Wed, 03 Jan 2024 12:51:28 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 1/3] audio: transport: Fix crash on A2DP suspend
-Date: Wed,  3 Jan 2024 15:51:22 -0500
-Message-ID: <20240103205124.3839768-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 3/3] audio/transport: Fix runtime error
+Date: Wed,  3 Jan 2024 15:51:24 -0500
+Message-ID: <20240103205124.3839768-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240103205124.3839768-1-luiz.dentz@gmail.com>
+References: <20240103205124.3839768-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -57,64 +61,152 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Commit 052534ae07b8 ("transport: Update transport release flow for
-bcast src") introduced a crash where it assumes transport->data always
-refers to struct bap_transport which causes a crash when the transport
-is in fact A2DP.
+This fixes the following error cause by assuming transport->data would
+also be a struct bap_transport:
 
-Fixes: https://github.com/bluez/bluez/issues/701
+profiles/audio/transport.c:328:16: runtime error: load of value 2, which
+is not a valid value for type '_Bool'
 ---
- profiles/audio/transport.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+ profiles/audio/transport.c | 62 ++++++++++++++++++++++++++------------
+ 1 file changed, 43 insertions(+), 19 deletions(-)
 
 diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index e2073451cc7a..0c60f06eef36 100644
+index 64b6ec694eb8..a4696154aba5 100644
 --- a/profiles/audio/transport.c
 +++ b/profiles/audio/transport.c
-@@ -643,7 +643,6 @@ static DBusMessage *release(DBusConnection *conn, DBusMessage *msg,
+@@ -93,6 +93,10 @@ struct bap_transport {
+ struct media_transport_ops {
+ 	const char *uuid;
+ 	const GDBusPropertyTable *properties;
++	void (*set_owner)(struct media_transport *transport,
++				struct media_owner *owner);
++	void (*remove_owner)(struct media_transport *transport,
++				struct media_owner *owner);
+ 	void *(*init)(struct media_transport *transport, void *stream);
+ 	guint (*resume)(struct media_transport *transport,
+ 				struct media_owner *owner);
+@@ -310,10 +314,22 @@ static guint media_transport_suspend(struct media_transport *transport,
+ 	return 0;
+ }
+ 
++static void transport_bap_remove_owner(struct media_transport *transport,
++					struct media_owner *owner)
++{
++	struct bap_transport *bap = transport->data;
++
++	if (bap && bap->linked) {
++		struct bt_bap_stream *link;
++
++		link = bt_bap_stream_io_get_link(bap->stream);
++		linked_transport_remove_owner(link, owner);
++	}
++}
++
+ static void media_transport_remove_owner(struct media_transport *transport)
  {
- 	struct media_transport *transport = data;
  	struct media_owner *owner = transport->owner;
 -	struct bap_transport *bap = transport->data;
- 	const char *sender;
- 	struct media_request *req;
- 	guint id;
-@@ -675,11 +674,6 @@ static DBusMessage *release(DBusConnection *conn, DBusMessage *msg,
- 	req = media_request_create(msg, id);
- 	media_owner_add(owner, req);
  
--	if (bt_bap_stream_get_type(bap->stream) ==
--			BT_BAP_STREAM_TYPE_BCAST) {
--		bap_disable_complete(bap->stream, 0x00, 0x00, owner);
+ 	if (!transport->owner)
+ 		return;
+@@ -325,12 +341,9 @@ static void media_transport_remove_owner(struct media_transport *transport)
+ 		media_request_reply(owner->pending, EIO);
+ 
+ 	transport->owner = NULL;
+-	if (bap && bap->linked) {
+-		struct bt_bap_stream *link;
+ 
+-		link = bt_bap_stream_io_get_link(bap->stream);
+-		linked_transport_remove_owner(link, owner);
 -	}
--
- 	return NULL;
++	if (transport->ops && transport->ops->remove_owner)
++		transport->ops->remove_owner(transport, owner);
+ 
+ 	if (owner->watch)
+ 		g_dbus_remove_watch(btd_get_dbus_connection(), owner->watch);
+@@ -541,20 +554,27 @@ static void linked_transport_set_owner(void *data, void *user_data)
+ 	transport->owner = owner;
  }
  
-@@ -1416,6 +1410,7 @@ static guint suspend_bap(struct media_transport *transport,
+-static void media_transport_set_owner(struct media_transport *transport,
++static void transport_bap_set_owner(struct media_transport *transport,
+ 					struct media_owner *owner)
  {
  	struct bap_transport *bap = transport->data;
- 	bt_bap_stream_func_t func = NULL;
-+	guint id;
  
- 	if (!bap->stream)
- 		return 0;
-@@ -1427,7 +1422,14 @@ static guint suspend_bap(struct media_transport *transport,
+-	DBG("Transport %s Owner %s", transport->path, owner->name);
+-	transport->owner = owner;
+-
+-	if (bap->linked) {
++	if (bap && bap->linked) {
+ 		struct bt_bap_stream *link;
  
- 	bap_update_links(transport);
- 
--	return bt_bap_stream_disable(bap->stream, bap->linked, func, owner);
-+	id = bt_bap_stream_disable(bap->stream, bap->linked, func, owner);
+ 		link = bt_bap_stream_io_get_link(bap->stream);
+ 		linked_transport_set_owner(link, owner);
+ 	}
++}
 +
-+	if (bt_bap_stream_get_type(bap->stream) == BT_BAP_STREAM_TYPE_BCAST) {
-+		bap_disable_complete(bap->stream, 0x00, 0x00, owner);
-+		return 0;
-+	}
++static void media_transport_set_owner(struct media_transport *transport,
++					struct media_owner *owner)
++{
++	DBG("Transport %s Owner %s", transport->path, owner->name);
++	transport->owner = owner;
 +
-+	return id;
++	if (transport->ops && transport->ops->set_owner)
++		transport->ops->set_owner(transport, owner);
+ 
+ 	owner->transport = transport;
+ 	owner->watch = g_dbus_add_disconnect_watch(btd_get_dbus_connection(),
+@@ -1688,12 +1708,14 @@ static void *transport_bap_init(struct media_transport *transport, void *stream)
+ 	return bap;
  }
  
- static void cancel_bap(struct media_transport *transport, guint id)
+-#define TRANSPORT_OPS(_uuid, _props, _init, _resume, _suspend, _cancel, \
+-		      _set_state, _get_stream, _get_volume, _set_volume, \
+-		      _destroy) \
++#define TRANSPORT_OPS(_uuid, _props, _set_owner, _remove_owner, _init, \
++		      _resume, _suspend, _cancel, _set_state, _get_stream, \
++		      _get_volume, _set_volume, _destroy) \
+ { \
+ 	.uuid = _uuid, \
+ 	.properties = _props, \
++	.set_owner = _set_owner, \
++	.remove_owner = _remove_owner, \
+ 	.init = _init, \
+ 	.resume = _resume, \
+ 	.suspend = _suspend, \
+@@ -1706,24 +1728,26 @@ static void *transport_bap_init(struct media_transport *transport, void *stream)
+ }
+ 
+ #define A2DP_OPS(_uuid, _init, _set_volume, _destroy) \
+-	TRANSPORT_OPS(_uuid, transport_a2dp_properties, _init, \
++	TRANSPORT_OPS(_uuid, transport_a2dp_properties, NULL, NULL, _init, \
+ 			transport_a2dp_resume, transport_a2dp_suspend, \
+ 			transport_a2dp_cancel, NULL, NULL, \
+ 			transport_a2dp_get_volume, _set_volume, \
+ 			_destroy)
+ 
+-#define BAP_OPS(_uuid, _props) \
+-	TRANSPORT_OPS(_uuid, _props, transport_bap_init, \
++#define BAP_OPS(_uuid, _props, _set_owner, _remove_owner) \
++	TRANSPORT_OPS(_uuid, _props, _set_owner, _remove_owner,\
++			transport_bap_init, \
+ 			transport_bap_resume, transport_bap_suspend, \
+ 			transport_bap_cancel, transport_bap_set_state, \
+ 			transport_bap_get_stream, NULL, NULL, \
+ 			transport_bap_destroy)
+ 
+ #define BAP_UC_OPS(_uuid) \
+-	BAP_OPS(_uuid, transport_bap_uc_properties)
++	BAP_OPS(_uuid, transport_bap_uc_properties, \
++			transport_bap_set_owner, transport_bap_remove_owner)
+ 
+ #define BAP_BC_OPS(_uuid) \
+-	BAP_OPS(_uuid, transport_bap_bc_properties)
++	BAP_OPS(_uuid, transport_bap_bc_properties, NULL, NULL)
+ 
+ static struct media_transport_ops transport_ops[] = {
+ 	A2DP_OPS(A2DP_SOURCE_UUID, transport_a2dp_src_init,
 -- 
 2.43.0
 
