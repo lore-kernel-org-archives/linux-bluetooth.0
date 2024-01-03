@@ -1,89 +1,206 @@
-Received: from server.interlinx.bc.ca (mail.interlinx.bc.ca [69.165.217.196])
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8C741BDEC
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jan 2024 16:55:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=interlinx.bc.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=interlinx.bc.ca
-Received: from pc.interlinx.bc.ca (pc.interlinx.bc.ca [IPv6:fd31:aeb1:48df:0:3b14:e643:83d8:7017])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by server.interlinx.bc.ca (Postfix) with ESMTPSA id 1E87A226D4
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jan 2024 11:55:26 -0500 (EST)
-Message-ID: <ffd93120280257f554bd3e013278b7d8d0e93e5c.camel@interlinx.bc.ca>
-Subject: Re: Unable to connect BT mouse after it drops: Failed to connect:
- org.bluez.Error.Failed br-connection-create-socket
-From: "Brian J. Murrell" <brian@interlinx.bc.ca>
-To: linux-bluetooth@vger.kernel.org
-Date: Wed, 03 Jan 2024 11:55:25 -0500
-In-Reply-To: <CABBYNZKS0BZGRZ8NMjue91i_P3mtQSL=ctLDcHDiZ+BBcXL2Aw@mail.gmail.com>
-References: <85bf602dac47b63cfc5ec772fddcedbce29c13df.camel@interlinx.bc.ca>
-	 <548cbe00abc60f0506dbc47802bddd276c192205.camel@interlinx.bc.ca>
-	 <CABBYNZKS0BZGRZ8NMjue91i_P3mtQSL=ctLDcHDiZ+BBcXL2Aw@mail.gmail.com>
-Autocrypt: addr=brian@interlinx.bc.ca; prefer-encrypt=mutual;
- keydata=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
-Content-Type: multipart/signed; micalg="pgp-sha256";
-	protocol="application/pgp-signature"; boundary="=-wCEW1hpuN72pqFNnnkZj"
-User-Agent: Evolution 3.50.2 (3.50.2-1.fc39) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 553C21C2A9
+	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jan 2024 17:54:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IayKygPe"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1704304487; x=1735840487;
+  h=date:from:to:cc:subject:message-id;
+  bh=XRGlZJigVh6nxlZSoxbCe+rxftBNQXiN84DKiNMXuO4=;
+  b=IayKygPehoIZc+qpLLE/5hLLu3PCWEBTuJSdddUE3HZPXxun5RbWTRjZ
+   f33xhWa17Z1/VmrcZwcpdH3RlGYlYRlMXLR5+GuNZzCurN1EygFGZPg6j
+   JKoK7dEWMeRLycQ7pfMKHWw86mGBFTtGg/+lG3Utmfz94Fs0miudkOPZO
+   Cw0zH4+TWsFzrC+Scy4bg/xeFZnrp8ZMWysyF303MC7TTkOp26qCLtcQQ
+   FF7CK1bSqocp+k7oO+2jYr4zj5F72/9Ysc0m5itR+NLWEQYItTzU+eqS+
+   3DgDWmuCVUYByYIZXO9AE8J10OEjl8bCypmvk8jQYx4tme3WaVrTSJabT
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10942"; a="387495444"
+X-IronPort-AV: E=Sophos;i="6.04,328,1695711600"; 
+   d="scan'208";a="387495444"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jan 2024 09:54:45 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10942"; a="953288895"
+X-IronPort-AV: E=Sophos;i="6.04,328,1695711600"; 
+   d="scan'208";a="953288895"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by orsmga005.jf.intel.com with ESMTP; 03 Jan 2024 09:54:44 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rL5Ry-000MOQ-0q;
+	Wed, 03 Jan 2024 17:54:42 +0000
+Date: Thu, 04 Jan 2024 01:54:27 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ c7ee0bc8db325ec829bbe2cd0114071489ed915f
+Message-ID: <202401040123.lSJuDdcJ-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
 
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: c7ee0bc8db325ec829bbe2cd0114071489ed915f  Bluetooth: btnxpuart: Resolve TX timeout error in power save stress test
 
---=-wCEW1hpuN72pqFNnnkZj
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+elapsed time: 1456m
 
-On Wed, 2024-01-03 at 11:08 -0500, Luiz Augusto von Dentz wrote:
-> Hi Brian,
+configs tested: 140
+configs skipped: 0
 
-Hi Luiz,
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-> This usually means the device cannot be found, we receive a page
-> timeout, so Im not really sure why replugging would have fixed it,
-> could you please collect the HCI trace using btmon
+tested configs:
+alpha                            allyesconfig   gcc  
+arc                              alldefconfig   gcc  
+arc                              allmodconfig   gcc  
+arc                              allyesconfig   gcc  
+arc                   randconfig-001-20240103   gcc  
+arc                   randconfig-002-20240103   gcc  
+arm                              allmodconfig   gcc  
+arm                              allyesconfig   gcc  
+arm                         lpc32xx_defconfig   clang
+arm                   randconfig-001-20240103   clang
+arm                   randconfig-002-20240103   clang
+arm                   randconfig-003-20240103   clang
+arm                   randconfig-004-20240103   clang
+arm64                            allmodconfig   clang
+arm64                 randconfig-001-20240103   clang
+arm64                 randconfig-002-20240103   clang
+arm64                 randconfig-003-20240103   clang
+arm64                 randconfig-004-20240103   clang
+csky                             allmodconfig   gcc  
+csky                             allyesconfig   gcc  
+csky                  randconfig-001-20240103   gcc  
+csky                  randconfig-002-20240103   gcc  
+hexagon                          allmodconfig   clang
+hexagon                          allyesconfig   clang
+hexagon               randconfig-001-20240103   clang
+hexagon               randconfig-002-20240103   clang
+i386                             allmodconfig   clang
+i386                              allnoconfig   clang
+i386                             allyesconfig   clang
+i386         buildonly-randconfig-001-20240103   clang
+i386         buildonly-randconfig-002-20240103   clang
+i386         buildonly-randconfig-003-20240103   clang
+i386         buildonly-randconfig-004-20240103   clang
+i386         buildonly-randconfig-005-20240103   clang
+i386         buildonly-randconfig-006-20240103   clang
+i386                                defconfig   gcc  
+i386                  randconfig-001-20240103   clang
+i386                  randconfig-002-20240103   clang
+i386                  randconfig-003-20240103   clang
+i386                  randconfig-004-20240103   clang
+i386                  randconfig-005-20240103   clang
+i386                  randconfig-006-20240103   clang
+i386                  randconfig-011-20240103   gcc  
+i386                  randconfig-012-20240103   gcc  
+i386                  randconfig-013-20240103   gcc  
+i386                  randconfig-014-20240103   gcc  
+i386                  randconfig-015-20240103   gcc  
+i386                  randconfig-016-20240103   gcc  
+loongarch                        allmodconfig   gcc  
+loongarch             randconfig-001-20240103   gcc  
+loongarch             randconfig-002-20240103   gcc  
+m68k                             allmodconfig   gcc  
+m68k                             allyesconfig   gcc  
+m68k                          hp300_defconfig   gcc  
+m68k                       m5208evb_defconfig   gcc  
+m68k                          sun3x_defconfig   gcc  
+microblaze                       allmodconfig   gcc  
+microblaze                       allyesconfig   gcc  
+mips                             allyesconfig   gcc  
+mips                           ip27_defconfig   gcc  
+mips                       lemote2f_defconfig   gcc  
+mips                           xway_defconfig   gcc  
+nios2                            allmodconfig   gcc  
+nios2                            allyesconfig   gcc  
+nios2                 randconfig-001-20240103   gcc  
+nios2                 randconfig-002-20240103   gcc  
+openrisc                         allyesconfig   gcc  
+parisc                           allmodconfig   gcc  
+parisc                           allyesconfig   gcc  
+parisc                randconfig-001-20240103   gcc  
+parisc                randconfig-002-20240103   gcc  
+powerpc                          allmodconfig   clang
+powerpc                          allyesconfig   clang
+powerpc                    amigaone_defconfig   gcc  
+powerpc                       eiger_defconfig   gcc  
+powerpc                     ksi8560_defconfig   gcc  
+powerpc               randconfig-001-20240103   clang
+powerpc               randconfig-002-20240103   clang
+powerpc               randconfig-003-20240103   clang
+powerpc64             randconfig-001-20240103   clang
+powerpc64             randconfig-002-20240103   clang
+powerpc64             randconfig-003-20240103   clang
+riscv                            allmodconfig   gcc  
+riscv                            allyesconfig   gcc  
+riscv                    nommu_k210_defconfig   gcc  
+riscv                 randconfig-001-20240103   clang
+riscv                 randconfig-002-20240103   clang
+riscv                          rv32_defconfig   clang
+s390                             allmodconfig   gcc  
+s390                             allyesconfig   gcc  
+s390                  randconfig-001-20240103   gcc  
+s390                  randconfig-002-20240103   gcc  
+sh                               allmodconfig   gcc  
+sh                               allyesconfig   gcc  
+sh                            hp6xx_defconfig   gcc  
+sh                    randconfig-001-20240103   gcc  
+sh                    randconfig-002-20240103   gcc  
+sh                          sdk7780_defconfig   gcc  
+sh                            titan_defconfig   gcc  
+sparc                            allmodconfig   gcc  
+sparc64                          allmodconfig   gcc  
+sparc64                          allyesconfig   gcc  
+sparc64               randconfig-001-20240103   gcc  
+sparc64               randconfig-002-20240103   gcc  
+um                               allmodconfig   clang
+um                               allyesconfig   clang
+um                    randconfig-001-20240103   clang
+um                    randconfig-002-20240103   clang
+x86_64                            allnoconfig   gcc  
+x86_64                           allyesconfig   clang
+x86_64       buildonly-randconfig-001-20240103   clang
+x86_64       buildonly-randconfig-002-20240103   clang
+x86_64       buildonly-randconfig-003-20240103   clang
+x86_64       buildonly-randconfig-004-20240103   clang
+x86_64       buildonly-randconfig-005-20240103   clang
+x86_64       buildonly-randconfig-006-20240103   clang
+x86_64                              defconfig   gcc  
+x86_64                randconfig-001-20240103   gcc  
+x86_64                randconfig-002-20240103   gcc  
+x86_64                randconfig-003-20240103   gcc  
+x86_64                randconfig-004-20240103   gcc  
+x86_64                randconfig-005-20240103   gcc  
+x86_64                randconfig-006-20240103   gcc  
+x86_64                randconfig-011-20240103   clang
+x86_64                randconfig-012-20240103   clang
+x86_64                randconfig-013-20240103   clang
+x86_64                randconfig-014-20240103   clang
+x86_64                randconfig-015-20240103   clang
+x86_64                randconfig-016-20240103   clang
+x86_64                randconfig-071-20240103   clang
+x86_64                randconfig-072-20240103   clang
+x86_64                randconfig-073-20240103   clang
+x86_64                randconfig-074-20240103   clang
+x86_64                randconfig-075-20240103   clang
+x86_64                randconfig-076-20240103   clang
+x86_64                          rhel-8.3-rust   clang
+xtensa                  nommu_kc705_defconfig   gcc  
+xtensa                randconfig-001-20240103   gcc  
+xtensa                randconfig-002-20240103   gcc  
+xtensa                    xip_kc705_defconfig   gcc  
 
-Just btmon, with no arguments, correct?
-
-> when that happens
-
-As in have btmon running when it happens or start btmon after it's
-happened?
-
-If the former, I can see that it's pretty chatty when it's working.  Do
-we expect that it will go silent once it gets into it's broken
-condition or should I be running this btmon into a log of some sorts?=20
-If it's not going to stop being so verbose once it does break, will we
-be able to find the place in the log where it did break easily enough?
-
-
-Cheers,
-b.
-
-
---=-wCEW1hpuN72pqFNnnkZj
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEE8B/A+mOVz5cTNBuZ2sHQNBbLyKAFAmWVkX0ACgkQ2sHQNBbL
-yKAVMAf+Ni3g/WklYeuONV6a7NvvIN3SRjsZCBNuwDeP6HVjIRtUTdjNVWr8//ZR
-5h5nYMU9m8JTDl1+25UwNaKHAU1mNZzj5isLAy3Sq4EX+iM7oS8lrPVm1FNLdkfM
-UDPkyGeGGpXdJpW0RV49O5LwvHxgXhpGvvxOjc0BflkC/17yGnvsUSj15dtuCxLf
-J4TupM9KlUyVn2kmiGR6gfl492zxHwOAE3a1b4Ppr9C83EJyb/9eYNxZFVBouxsX
-tu6Wu1nLa/797ZFYZ50jW50s+AEDzPKVl2PlsaclczDoVPb/G/yvaSFV9tlL3cSP
-LOt78WRP8JmKaQngdMvtfXe4g7J87A==
-=a9Cc
------END PGP SIGNATURE-----
-
---=-wCEW1hpuN72pqFNnnkZj--
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
