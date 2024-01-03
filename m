@@ -1,104 +1,96 @@
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12D5318631
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jan 2024 09:33:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: from m15.mail.163.com (m15.mail.163.com [45.254.50.220])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 963051864E
+	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jan 2024 10:13:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YO69ktbn"
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6d98f6e8de1so3242213b3a.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jan 2024 01:33:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704274418; x=1704879218; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=iNhDsCLx3NnLNHyjHIvlccgHh0Ow1W6eRqcAVzYeyaM=;
-        b=YO69ktbncVfCQCk0eZ2u55aRP84iDFtPAFWWe9f5fo8g4UCZSIoiYdbWOfK0kPgbDk
-         gQYJqqpYXpxFPLhdYiGWwK65bVOkDDk6u34v9j9PMNP+umgp1zhKCODBTPqrFdKlDWRg
-         hgWCMzVELaGY5CXSs/tCt30rcuYwiGII/PNJB9l0KjSbXcgKdPOE/4fk2Y7DbZdP+sgA
-         q3owG8iSV5/SRKeUrwtJNeIrJSnmosoLooae5YMHS/dpxUnoNQQ/GgNWRwwvxKiAheYk
-         StOBwJBAPnmPBIpWoS7IkeJk58poWFEzV8/7sNVEe8jloa0UetDXHZ40kQ/MNIPB6f4Z
-         tyIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704274418; x=1704879218;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iNhDsCLx3NnLNHyjHIvlccgHh0Ow1W6eRqcAVzYeyaM=;
-        b=HULfDDtZNaj7/AMn67/R1fxWw3XrZ6Too6CcbXsi7ADuOdGZSCkMY/kFpuuwHTH1yI
-         VVlYy9mweP5c+Fg+JrRWMU4Kvr178QRkVeEi1Ab1LmttxkNZMSg+JfT6L2dFcN9kWnOM
-         9xcBLbKSSFIwR+U0a8rgFSWFVEBfwIiJmXC62mm6XyYk+/Yq7C9sTJ/2+tVaQikHAFBu
-         t8sUA7j1J7DaeYhC95jjVn3AqI9jfie1uGPD/Oj22u4uJwUZc+5Eo/yAP/HaXbMcg1zv
-         Pc3m+3yCQypynNmlBIOq2MaWmFTKkQPOuh5cj2g01vpCVn5xVAcEofE5mB6b9KqvwcSR
-         gm3A==
-X-Gm-Message-State: AOJu0Yz4NrDvW6t0Fpm4JC75kJmu1jvG9zSeaNXBph/UFSvJRsiF3ELY
-	Ed/HycaIKE/DzOvzgsJBZtOIs+QQXyk=
-X-Google-Smtp-Source: AGHT+IEUlO6AfjQ3huvGvX1kmSnZzXJ2Cskocf+uyHYJkmZdzFa8B3Q4QIaieplnre9IC35bqGQghg==
-X-Received: by 2002:a05:6a20:e10f:b0:197:6a98:169b with SMTP id kr15-20020a056a20e10f00b001976a98169bmr692507pzb.32.1704274417992;
-        Wed, 03 Jan 2024 01:33:37 -0800 (PST)
-Received: from [172.17.0.2] ([52.159.137.233])
-        by smtp.gmail.com with ESMTPSA id ck4-20020a17090afe0400b0028ce12f8cdasm1147774pjb.10.2024.01.03.01.33.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jan 2024 01:33:37 -0800 (PST)
-Message-ID: <659529f1.170a0220.90b51.294d@mx.google.com>
-Date: Wed, 03 Jan 2024 01:33:37 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0471621532136957887=="
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="XdRakjkP"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=1+wOy
+	CxuFdRwkRbseg89dpr/73zEQYpQG6NBYdROfvY=; b=XdRakjkPhmg2o8AavgH0Y
+	Vg3NuNGfstwsF84xmWwfydFCNtK+ybR38d9vqFzlBOauINwbpOxOwp42nNpIgr5a
+	9iuHCaF0Lad87QOOUimgY8Aeram0gfJ3AZkmhybZzwN9u80TRAPgKvVH8LpuW/iN
+	aS+s/jNrEhTL2JwUjHuvxE=
+Received: from WH-D-007635B.QUECTEL.COM (unknown [223.76.229.213])
+	by zwqz-smtp-mta-g1-0 (Coremail) with SMTP id _____wD3f8BKM5VlEtudAA--.40145S2;
+	Wed, 03 Jan 2024 18:13:31 +0800 (CST)
+From: clancy_shang@163.com
+To: linux-bluetooth@vger.kernel.org
+Cc: zhongjun.yu@quectel.com,
+	Clancy Shang <clancy.shang@quectel.com>
+Subject: [PATCH] [BlueZ] adapter: Fix airpod device pair fail
+Date: Wed,  3 Jan 2024 18:13:28 +0800
+Message-Id: <20240103101328.1812899-1-clancy_shang@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, 20373622@buaa.edu.cn
-Subject: RE: [V3] Bluetooth: rfcomm: Fix null-ptr-deref in rfcomm_check_security
-In-Reply-To: <20240103091043.3379363-1-20373622@buaa.edu.cn>
-References: <20240103091043.3379363-1-20373622@buaa.edu.cn>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3f8BKM5VlEtudAA--.40145S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7ZF47Kw4UtFykWF1rCFykKrg_yoW8WrWrpr
+	Z8Ka95Gr4jg3W2gw13Wa47Wr13Cw4kury0qFWSy3ZYkFW7XrWkX3y3tw18ta1UJF9rXa47
+	JF1DX3WDGw4UKaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jyT5dUUUUU=
+X-CM-SenderInfo: xfod0ux1bvxtlqj6il2tof0z/1tbisRFauGVOA17rbgAAsx
 
---===============0471621532136957887==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Clancy Shang <clancy.shang@quectel.com>
 
-This is automated email and please do not reply to this email!
+Airpod is performing inquiry scans in BR/EDR and advertising in an
+unconnectable mode with the same public address at the same time.
+with this feature, when found airpod device, set the bredr support,
+fix it pairs fail bug.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=814026
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.48 seconds
-GitLint                       PASS      0.25 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      27.35 seconds
-CheckAllWarning               PASS      30.21 seconds
-CheckSparse                   PASS      35.87 seconds
-CheckSmatch                   PASS      98.79 seconds
-BuildKernel32                 PASS      26.56 seconds
-TestRunnerSetup               PASS      428.00 seconds
-TestRunner_l2cap-tester       PASS      22.86 seconds
-TestRunner_iso-tester         PASS      44.57 seconds
-TestRunner_bnep-tester        PASS      6.83 seconds
-TestRunner_mgmt-tester        PASS      161.35 seconds
-TestRunner_rfcomm-tester      PASS      10.88 seconds
-TestRunner_sco-tester         PASS      14.36 seconds
-TestRunner_ioctl-tester       PASS      11.83 seconds
-TestRunner_mesh-tester        PASS      8.58 seconds
-TestRunner_smp-tester         PASS      9.62 seconds
-TestRunner_userchan-tester    PASS      7.58 seconds
-IncrementalBuild              PASS      25.43 seconds
-
-
-
+Signed-off-by: Clancy Shang <clancy.shang@quectel.com>
 ---
-Regards,
-Linux Bluetooth
+ src/adapter.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
+diff --git a/src/adapter.c b/src/adapter.c
+index 022390f0d..71f7ed86d 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -7066,6 +7066,24 @@ static void adapter_msd_notify(struct btd_adapter *adapter,
+ 	}
+ }
+ 
++#define APPLE_INC_VENDOR_ID 0x004c
++
++static bool eir_msd_is_apple_inc(GSList *msd_list)
++{
++	GSList *msd_l, *msd_next;
++
++	for (msd_l = msd_list; msd_l != NULL; msd_l = msd_next) {
++		const struct eir_msd *msd = msd_l->data;
++
++		msd_next = g_slist_next(msd_l);
++
++		if (msd->company == APPLE_INC_VENDOR_ID)
++			return true;
++	}
++
++	return false;
++}
++
+ static bool is_filter_match(GSList *discovery_filter, struct eir_data *eir_data,
+ 								int8_t rssi)
+ {
+@@ -7281,6 +7299,13 @@ void btd_adapter_device_found(struct btd_adapter *adapter,
+ 		device_update_last_seen(dev, BDADDR_BREDR, !not_connectable);
+ 	}
+ 
++	if (eir_msd_is_apple_inc(eir_data.msd_list) &&
++					(not_connectable == true) &&
++					(bdaddr_type == BDADDR_LE_PUBLIC)) {
++		device_set_bredr_support(dev);
++		device_update_last_seen(dev, BDADDR_BREDR, true);
++	}
++
+ 	if (eir_data.name != NULL && eir_data.name_complete)
+ 		device_store_cached_name(dev, eir_data.name);
+ 
+-- 
+2.25.1
 
---===============0471621532136957887==--
