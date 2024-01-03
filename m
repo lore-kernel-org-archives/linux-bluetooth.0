@@ -1,232 +1,138 @@
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 655A11B267
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jan 2024 15:40:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 817CA1B268
+	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jan 2024 15:44:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CkXSXorN"
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2ccea11b6bbso5446991fa.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jan 2024 07:40:16 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YprjqkNR"
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2cd1232a2c7so17319501fa.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jan 2024 07:44:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704296414; x=1704901214; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1704296638; x=1704901438; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=CbIkeJHGkkXVu+FzC/s25r1tjnav2jYDvWv1eJoS8fY=;
-        b=CkXSXorNRhj4KW0nCdrJWUG9HMg20qRp/NIUhWy8OIAB3WWp9Mdpxi+akKvzb86f0j
-         OEeTZk/4nODmqq+yrsu2pE+FFmbSPnIydFBJSunq8x/yoIHVx6f40qbaVgyDmI9x3tV8
-         c3rfzihzKqQ/11IvALsZOjCqPTxuB9HOJ/fWn7sS/chNKQddivPBwWSj1vY238cR0/p7
-         PfDH3WEc1jbk8GPE5yOJ+hKdacna8+Uwdpbkvre6HAjilwKWlnhsiSYu2UVWvBFQwg+N
-         kmdROXQ4N96JM/rZ2fxMyj4xULVXpHvZBIjqvuWngeo0ThnZ9TKo9n0kBNcSOX2w5ZvQ
-         vN5w==
+        bh=n0tn/Z0KMjnrbEx6LkTYHGyleOf6au7PDpneLCTAYEY=;
+        b=YprjqkNROnwcVxfIvaDOtFHVmuIh8BGS1yd7OAcV7565gtvgKdkd2znB4jrc6pr8SR
+         y4B3YsH1F1bG3ciyqQfbEmxHgiesW3takVZxnBGmIbCLbPBpwkzCTmlvdVkRxHIOCxoi
+         7c7vYqVNUDovRmQZ//+tVtpuPdDe++afAYE6weaJF/2Lk/IXMcWro36gQ9En4z7vWptv
+         iFejORQiNyLc/Hjj0OLBEFjy+UWzUfhoGcf61wUwKSE4i4QLaOql8wsM3Vofdpd+Nq1R
+         c/CQnesyeBejfNUS0I0m1awv4O6gOPPHQ2WhvOV4umtYNrEfkpn/g6UHGQXbbDqg7+Cd
+         uAUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704296414; x=1704901214;
+        d=1e100.net; s=20230601; t=1704296638; x=1704901438;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CbIkeJHGkkXVu+FzC/s25r1tjnav2jYDvWv1eJoS8fY=;
-        b=g1X2pMen9KgkeOXFllgdTtHLSVX4iPvFs3zquq9BvJ48tPcUoRjNqGDBtMpYINHOGp
-         zF99PPIACs/wBK3bIGnqWEUONvZAOA3LnP0Rfn7C6p7BZ/Y2OXQB6YXsdHmyDgU4ZhhJ
-         A3rODgtMng9Wy63qOIry4Hbfvx+MM0jaRgTvGomS9udbmm68IAN/qSUV8ZbZpj0Hxdrq
-         kWOdNm4zyvjwmyNCcQnSIf5DNmEHPNCw70kf/Cf+38CvjGlpxAEuuZ9o3JXgS0NIoUjc
-         ONxxy8hb05WfbrNLqW2q1E/s12iepqdYYdRLLFC8gnSBsLtdghI4HucLNkzVKi9qYpBH
-         HQ6A==
-X-Gm-Message-State: AOJu0YyQIcpU9NqPrNQGsp+5lukK7h+sxkl+/akfcT5Nbz3xn4NWCqbH
-	SinbDhQLLfQQwhgo9knRYUbWjL4ot/YD9kKQ3bw=
-X-Google-Smtp-Source: AGHT+IHrO6oRn9YVmJsbuiRmXXzmI+wjZVJ+3oSvOwpsusu/WZu5SDR6N6Vl8qRlSK5wLIPSM2yMITz9gDUT1gw+8cc=
-X-Received: by 2002:a05:651c:b06:b0:2cd:178e:ad88 with SMTP id
- b6-20020a05651c0b0600b002cd178ead88mr749427ljr.15.1704296414141; Wed, 03 Jan
- 2024 07:40:14 -0800 (PST)
+        bh=n0tn/Z0KMjnrbEx6LkTYHGyleOf6au7PDpneLCTAYEY=;
+        b=jFBZYWvhfjhYgIAwVMNjucZvPfqfT02RnHS/zKu2dE63i2tmFlI8bKHSsjvN45yF66
+         GBSlRczBJFNCaOWQKDkweydTIRLqBkxeBh7H+VijNm+tkzH/Ho4sv2rXHZzYoRSbYsbD
+         qxdveagZzv5xnD6X1tiAhPnBfdmdjgtOef4HLQYmRosH+pWZyKyJ16RVBCTE0GyJrgOO
+         JI4LSS7fkpLagqxyTYGD68LHwNwjH8J/TQBi8J4TgzFTfLcke8T/et7tt4WeNtsPE2SG
+         lJ78DLnEQlvWomkrcabwkAtlCMhaikkXgoVVq4w+OJ9cB357mkEwMAUgqlLiO4ONUBrR
+         O/XA==
+X-Gm-Message-State: AOJu0Yxkw08r5bfA7tEbBPuK2ywcJgdGl/ze24c27kaVIYttaN1fz2/i
+	MMB58Wxa1KMGsHyivfXmUNxRyLX85qyXHNRqNS0=
+X-Google-Smtp-Source: AGHT+IE51DC5H5TqEo2Pz7bzD40MXG6hfYa3qooEJ5mK1FQyDKt4MqglRuyHgC4pqGUCzOjhHcA0cwQ4apPnZqS1p/8=
+X-Received: by 2002:a2e:3017:0:b0:2cd:129b:2c07 with SMTP id
+ w23-20020a2e3017000000b002cd129b2c07mr1052900ljw.37.1704296638089; Wed, 03
+ Jan 2024 07:43:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240103143904.77146-1-xiaokeqinhealth@126.com> <CABBYNZLo9CVZsjvzjKsGKFyhOkrWoyWYL8bQoSfvTDf=PAQ-iw@mail.gmail.com>
-In-Reply-To: <CABBYNZLo9CVZsjvzjKsGKFyhOkrWoyWYL8bQoSfvTDf=PAQ-iw@mail.gmail.com>
+References: <20240103101328.1812899-1-clancy_shang@163.com>
+In-Reply-To: <20240103101328.1812899-1-clancy_shang@163.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 3 Jan 2024 10:40:00 -0500
-Message-ID: <CABBYNZL0Szd768KCSAYXQ4q-4+a-eapYsBwJUxUw-byFzF76jw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v3 1/2] avdtp: fix incorrect transaction label in
- setconf phase
-To: Xiao Yao <xiaokeqinhealth@126.com>
-Cc: linux-bluetooth@vger.kernel.org, Xiao Yao <xiaoyao@rock-chips.com>
+Date: Wed, 3 Jan 2024 10:43:43 -0500
+Message-ID: <CABBYNZJj6gG1kbmFSON+PrjpLuswdOiqt8AkfmYN5jzpwc1+Lg@mail.gmail.com>
+Subject: Re: [PATCH] [BlueZ] adapter: Fix airpod device pair fail
+To: clancy_shang@163.com
+Cc: linux-bluetooth@vger.kernel.org, zhongjun.yu@quectel.com, 
+	Clancy Shang <clancy.shang@quectel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 Hi,
 
-On Wed, Jan 3, 2024 at 10:38=E2=80=AFAM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
+On Wed, Jan 3, 2024 at 5:14=E2=80=AFAM <clancy_shang@163.com> wrote:
 >
-> Hi,
+> From: Clancy Shang <clancy.shang@quectel.com>
 >
-> On Wed, Jan 3, 2024 at 9:40=E2=80=AFAM Xiao Yao <xiaokeqinhealth@126.com>=
- wrote:
-> >
-> > From: Xiao Yao <xiaoyao@rock-chips.com>
-> >
-> > BLUETOOTH SPECIFICATION Page 61 of 140
-> > Audio/Video Distribution Transport Protocol Specification (V13)
-> > 8.4.6 Message integrity verification at receiver side
-> >
-> > - The receiver of an AVDTP signaling message shall not interpret corrup=
-ted
-> > messages. Those messages are discarded and no signaling message is retu=
-rned
-> > to the sender if no error code is applicable. Possible corrupted messag=
-es
-> > are:
-> >
-> >   * Response messages where the transaction label cannot match a previo=
-us
-> >     command sent to the remote device
-> >
-> > Consider the following scenario:
-> > btmon log:
-> > ... ...
-> > AVDTP: Discover (0x01) Command (0x00) type 0x00 label 5 nosp 0
-> > AVDTP: Discover (0x01) Response Accept (0x02) type 0x00 label 5 nosp 0
-> > AVDTP: Get All Capabilities (0x0c) Command (0x00) type 0x00 label 6 nos=
-p 0
-> > AVDTP: Get All Capabilities (0x0c) Resp Accept (0x02) type 0 label 6 no=
-sp 0
-> > AVDTP: Get All Capabilities (0x0c) Command (0x00) type 0x00 label 7 nos=
-p 0
-> > AVDTP: Get All Capabilities (0x0c) Resp Accept (0x02) type 0 label 7 no=
-sp 0
-> >
-> > < AVDTP: Set Configuration (0x03) Command (0x00) type 0x00 label 8 nosp=
- 0
-> > //Currently, a 'set configuration' message has been received from the
-> > //sender, which contains a transaction label valued at 8. This message
-> > //was then relayed to A2DP backend(PulseAudio/PipeWire) using the dbus
-> > //interface.
-> >   set_configuration()(media.c)
-> >     dbus_message_new_method_call(..., "SetConfiguration", ...);
-> >     g_dbus_send_message_with_reply(btd_get_dbus_connection(), ...);
-> >     dbus_pending_call_set_notify(request->call, endpoint_reply, ...);
-> >     ...
-> >
-> > > AVDTP: Discover (0x01) Command (0x00) type 0x00 label 0 nosp 0
-> > //At this time, the A2DP reverse discovery issued an A2DP discover comm=
-and.
-> > < AVDTP: Discover (0x01) Response Accept (0x02) type 0x00 label 0 nosp =
-0
-> > //After receiving the discover reply, the session->in.transaction is
-> > //changed to 0
-> >
-> > > AVDTP: Set Configuration (0x03) Resp Accept (0x02) type 0 label 0 nos=
-p 0
-> > //The audio backend reply the dbus message
-> >   endpoint_reply (media.c)
-> >     setconf_cb (avdtp.c)
-> >       //Here avdtp_send sends an incorrect transaction value, causing
-> >       //the sender to discard the message. (The correct transaction
-> >       //value is 8)
-> >       avdtp_send(session, session->in.transaction, AVDTP_MSG_TYPE_ACCEP=
-T,
-> >                  AVDTP_SET_CONFIGURATION, NULL, 0)
-> >
-> > AVDTP: Delay Report (0x0d) Command (0x00) type 0x00 label 1 nosp 0
-> > AVDTP: Delay Report (0x0d) Response Accept (0x02) type 0x00 label 1 nos=
-p 0
-> > AVDTP: Get All Capabilities (0x0c) Command (0x00) type 0x00 label 2 nos=
-p 0
-> > AVDTP: Get All Capabilities (0x0c) Resp Accept (0x02) type 0 label 2 no=
-sp 0
-> > ... ...
-> >
-> > Therefore, a async_transaction that requires asynchronous return is
-> > recorded to prevent it from being incorrectly modified.
+> Airpod is performing inquiry scans in BR/EDR and advertising in an
+> unconnectable mode with the same public address at the same time.
+> with this feature, when found airpod device, set the bredr support,
+> fix it pairs fail bug.
+>
+> Signed-off-by: Clancy Shang <clancy.shang@quectel.com>
+> ---
+>  src/adapter.c | 25 +++++++++++++++++++++++++
+>  1 file changed, 25 insertions(+)
+>
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 022390f0d..71f7ed86d 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -7066,6 +7066,24 @@ static void adapter_msd_notify(struct btd_adapter =
+*adapter,
+>         }
+>  }
+>
+> +#define APPLE_INC_VENDOR_ID 0x004c
+> +
+> +static bool eir_msd_is_apple_inc(GSList *msd_list)
+> +{
+> +       GSList *msd_l, *msd_next;
+> +
+> +       for (msd_l =3D msd_list; msd_l !=3D NULL; msd_l =3D msd_next) {
+> +               const struct eir_msd *msd =3D msd_l->data;
+> +
+> +               msd_next =3D g_slist_next(msd_l);
+> +
+> +               if (msd->company =3D=3D APPLE_INC_VENDOR_ID)
+> +                       return true;
+> +       }
+> +
+> +       return false;
+> +}
+> +
+>  static bool is_filter_match(GSList *discovery_filter, struct eir_data *e=
+ir_data,
+>                                                                 int8_t rs=
+si)
+>  {
+> @@ -7281,6 +7299,13 @@ void btd_adapter_device_found(struct btd_adapter *=
+adapter,
+>                 device_update_last_seen(dev, BDADDR_BREDR, !not_connectab=
+le);
+>         }
+>
+> +       if (eir_msd_is_apple_inc(eir_data.msd_list) &&
+> +                                       (not_connectable =3D=3D true) &&
+> +                                       (bdaddr_type =3D=3D BDADDR_LE_PUB=
+LIC)) {
+> +               device_set_bredr_support(dev);
+> +               device_update_last_seen(dev, BDADDR_BREDR, true);
+> +       }
 
-Btw, we can probably come up with a test for this on unit/test-avdtp
-to ensure we cover it.
+NAK, we are not going to introduce device specific policy hardcoded in
+the code like this, if you really want to update last seen then you
+either need a dedicated driver that handles Apple UUID on its own
+plugin, or make the policy plugin register a driver for it, that said
+there is a flag for that indicates BR/EDR is supported not sure why
+apple it no advertising using it?
 
-> >
-> > Signed-off-by: Xiao Yao <xiaoyao@rock-chips.com>
-> > ---
-> > v1 -> v2: Fixed "session->in.transaction" logic err.
-> > v2 -> v3: Fixed some compile warnings
-> > ---
-> >  profiles/audio/avdtp.c | 19 ++++++++++++++-----
-> >  1 file changed, 14 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-> > index 10ef380d4..386c7f67c 100644
-> > --- a/profiles/audio/avdtp.c
-> > +++ b/profiles/audio/avdtp.c
-> > @@ -286,6 +286,7 @@ struct in_buf {
-> >         gboolean active;
-> >         int no_of_packets;
-> >         uint8_t transaction;
-> > +       uint8_t async_transaction;
->
-> Didn't I already explain it already that we are not supposed to have 2
-> outstanding transactions?
->
-> >         uint8_t message_type;
-> >         uint8_t signal_id;
-> >         uint8_t buf[1024];
-> > @@ -1462,15 +1463,16 @@ static void setconf_cb(struct avdtp *session, s=
-truct avdtp_stream *stream,
-> >         if (err !=3D NULL) {
-> >                 rej.error =3D AVDTP_UNSUPPORTED_CONFIGURATION;
-> >                 rej.category =3D err->err.error_code;
-> > -               avdtp_send(session, session->in.transaction,
-> > -                               AVDTP_MSG_TYPE_REJECT, AVDTP_SET_CONFIG=
-URATION,
-> > -                               &rej, sizeof(rej));
-> > +               avdtp_send(session, session->in.async_transaction,
-> > +                          AVDTP_MSG_TYPE_REJECT, AVDTP_SET_CONFIGURATI=
-ON,
-> > +                          &rej, sizeof(rej));
-> >                 stream_free(stream);
-> >                 return;
-> >         }
-> >
-> > -       if (!avdtp_send(session, session->in.transaction, AVDTP_MSG_TYP=
-E_ACCEPT,
-> > -                                       AVDTP_SET_CONFIGURATION, NULL, =
-0)) {
-> > +       if (!avdtp_send(session, session->in.async_transaction,
-> > +                       AVDTP_MSG_TYPE_ACCEPT,
-> > +                       AVDTP_SET_CONFIGURATION, NULL, 0)) {
-> >                 stream_free(stream);
-> >                 return;
-> >         }
-> > @@ -1569,6 +1571,13 @@ static gboolean avdtp_setconf_cmd(struct avdtp *=
-session, uint8_t transaction,
-> >                 session->version =3D 0x0103;
-> >
-> >         if (sep->ind && sep->ind->set_configuration) {
-> > +               /* The setconfig configuration stage is asynchronous;
-> > +                * high CPU load or other factors can delay dbus messag=
-e
-> > +                * responses, potentially altering the transaction valu=
-e.
-> > +                * It's essential to record the received transaction va=
-lue
-> > +                * for use in the final accept command.
-> > +                */
-> > +               session->in.async_transaction =3D transaction;
-> >                 if (!sep->ind->set_configuration(session, sep, stream,
-> >                                                         stream->caps,
-> >                                                         setconf_cb,
-> >
-> > base-commit: 7ad5669402c9acff8e4cc808edc12a41df36654e
-> > --
-> > 2.34.1
-> >
-> >
->
+>         if (eir_data.name !=3D NULL && eir_data.name_complete)
+>                 device_store_cached_name(dev, eir_data.name);
 >
 > --
-> Luiz Augusto von Dentz
-
+> 2.25.1
+>
+>
 
 
 --=20
