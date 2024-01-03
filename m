@@ -1,95 +1,99 @@
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DFEF18EA0
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jan 2024 11:29:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jcIP/tmQ"
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-781e947b1aeso18842385a.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jan 2024 03:29:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704281382; x=1704886182; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=jdx0K9zhkd6G6N+7aygh8PVbzVzpwHXo2T/NY2uUWIc=;
-        b=jcIP/tmQ93UgHSEGHFOV38dyYAlgM6mbcniVS/jXwJd7qrrh6T0j8j0HH1L4DfKwnr
-         lf4hC1FmXzhLRNJq3GcW4EL/Z+CfmK2Ox/c6aJAiUnCt4bmily16BTu8uT0rHeNSZH6J
-         DonBKjx78/TWjqDyXfDbkSbql8bPudkg27cuEUsGK9DegX0jF4M3JiQtgjuBTNhUwkEb
-         KqS9lI5MITWzXAOwfeMYHlqkxFATMAolTxj2LaMKfJB3Bo2ruU7nFnoZPwLYFFnZCn9x
-         jZzYO1YNPG9KvMJOPqZVRdET3uK7utSPFdTZrLONXgHHLUr2z6c+ZKGHtUOpwUBTT5ZC
-         1BYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704281382; x=1704886182;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jdx0K9zhkd6G6N+7aygh8PVbzVzpwHXo2T/NY2uUWIc=;
-        b=Sjt+DgM5goKqRK3lxMGKh1skKTPjwvJwd/j7JV+m+FWG9Y78Iy8AJAPisnysB6kogL
-         96P3UJu1POlbPIDip5CLVouvREd+kjdMlby86doeAYzEI0JJVvReqKaZuBu6gHT7mOkt
-         2qmmxWZLcQxemyKrNVx9s+JM016hVovKB0nT56cevB5rDcNHrahn9V4y9/dxsbuN0+6k
-         FiBkeLyjsCefuBWGfJyXGsT6jo4+LJkGPdZWGSsh9HCVHxVeiEjaWhowWwKFtkGi58cS
-         /hrYl9RmNipSjFzmCh7YFOC/EVEt1IuTgJHnQwCdbUeN2UKED0ZkWCTdgawpvNaP5PkZ
-         a6gQ==
-X-Gm-Message-State: AOJu0YwLdy47ftyA/kuBwDtBeJ9UR49GTm05RbwT7ZP01Y/defvMRZ3Y
-	5uEtyjwgjogv3Wh2w/k5ZG9AilXNjx0=
-X-Google-Smtp-Source: AGHT+IEf02g5kMkrV8tYyYug96BpdXTI9W17C313HBo/3zwhmhCHmvtjkQpOnOfTKPvWYcKwGFgE5A==
-X-Received: by 2002:a05:620a:6221:b0:781:5532:efc1 with SMTP id ou33-20020a05620a622100b007815532efc1mr9487206qkn.106.1704281381716;
-        Wed, 03 Jan 2024 03:29:41 -0800 (PST)
-Received: from [172.17.0.2] ([20.75.95.47])
-        by smtp.gmail.com with ESMTPSA id f21-20020ae9ea15000000b00781706e2f7asm4880556qkg.67.2024.01.03.03.29.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jan 2024 03:29:41 -0800 (PST)
-Message-ID: <65954525.e90a0220.47e58.cfec@mx.google.com>
-Date: Wed, 03 Jan 2024 03:29:41 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5841978930414361080=="
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CAA218EB0;
+	Wed,  3 Jan 2024 12:15:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=v0yd.nl
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4T4pbH31vgz9snN;
+	Wed,  3 Jan 2024 13:15:55 +0100 (CET)
+Message-ID: <548fb407-ef57-4108-aa26-52deafdca55c@v0yd.nl>
+Date: Wed, 3 Jan 2024 13:15:52 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, clancy_shang@163.com
-Subject: RE: [BlueZ] adapter: Fix airpod device pair fail
-In-Reply-To: <20240103101328.1812899-1-clancy_shang@163.com>
-References: <20240103101328.1812899-1-clancy_shang@163.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 0/4] Power off HCI devices before rfkilling them
+Content-Language: en-US
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>, asahi@lists.linux.dev,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, verdre@v0yd.nl
+References: <20240102181946.57288-1-verdre@v0yd.nl>
+ <CABBYNZ+sTko6reoJO43W2LHGW58f0kK_8Zgc3mep7xki355=iA@mail.gmail.com>
+From: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
+In-Reply-To: <CABBYNZ+sTko6reoJO43W2LHGW58f0kK_8Zgc3mep7xki355=iA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 4T4pbH31vgz9snN
 
---===============5841978930414361080==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Luiz,
 
-This is automated email and please do not reply to this email!
+On 1/2/24 19:39, Luiz Augusto von Dentz wrote:
+> Hi Jonas,
+> 
+> On Tue, Jan 2, 2024 at 1:19 PM Jonas Dreßler <verdre@v0yd.nl> wrote:
+>>
+>> In theory the firmware is supposed to power off the bluetooth card
+>> when we use rfkill to block it. This doesn't work on a lot of laptops
+>> though, leading to weird issues after turning off bluetooth, like the
+>> connection timing out on the peripherals which were connected, and
+>> bluetooth not connecting properly when the adapter is turned on again
+>> quickly after rfkilling.
+>>
+>> This series hooks into the rfkill driver from the bluetooth subsystem
+>> to send a HCI_POWER_OFF command to the adapter before actually submitting
+>> the rfkill to the firmware and killing the HCI connection.
+>>
+>> ---
+>>
+>> v1 -> v2: Fixed commit message title to make CI happy
+>>
+>> Jonas Dreßler (4):
+>>    Bluetooth: Remove HCI_POWER_OFF_TIMEOUT
+>>    Bluetooth: mgmt: Remove leftover queuing of power_off work
+>>    Bluetooth: Add new state HCI_POWERING_DOWN
+>>    Bluetooth: Queue a HCI power-off command before rfkilling adapters
+> 
+> Apart from the assumption of RFKILL actually killing the RF
+> immediately or not, I'm fine with these changes, that said it would be
+> great if we can have some proper way to test the behavior of rfkill,
+> perhaps via mgmt-tester, since it should behave like the
+> MGMT_OP_SET_POWERED.
 
-Dear submitter,
+Testing this sounds like a good idea, I guess we'd have to teach 
+mgmt-tester to write to rfkill. The bigger problem seems to be that 
+there's no MGMT event for power changes and also no MGMT_OP_GET_POWERED, 
+so that's a bit concerning, could userspace even be notified about 
+changes to adapter power?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=814046
+Another thing I'm thinking about now is that queuing the HCI command 
+using hci_cmd_sync_queue() might not be enough: The command is still 
+executed async in a thread, and we won't actually block until it has 
+been sent, so this might be introducing a race (rfkill could kill the 
+adapter before we actually send the HCI command). The proper way might 
+be to use a completion and wait until the 
+set_powered_off_sync_complete() callback is invoked?
 
----Test result---
+> 
+>>   include/net/bluetooth/hci.h |  2 +-
+>>   net/bluetooth/hci_core.c    | 33 ++++++++++++++++++++++++++++++---
+>>   net/bluetooth/hci_sync.c    | 16 +++++++++++-----
+>>   net/bluetooth/mgmt.c        | 30 ++++++++++++++----------------
+>>   4 files changed, 56 insertions(+), 25 deletions(-)
+>>
+>> --
+>> 2.43.0
+>>
+> 
+> 
 
-Test Summary:
-CheckPatch                    PASS      0.50 seconds
-GitLint                       PASS      0.33 seconds
-BuildEll                      PASS      23.76 seconds
-BluezMake                     PASS      687.48 seconds
-MakeCheck                     PASS      12.14 seconds
-MakeDistcheck                 PASS      158.97 seconds
-CheckValgrind                 PASS      221.26 seconds
-CheckSmatch                   PASS      325.52 seconds
-bluezmakeextell               PASS      105.98 seconds
-IncrementalBuild              PASS      643.72 seconds
-ScanBuild                     PASS      933.53 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============5841978930414361080==--
+Cheers,
+Jonas
