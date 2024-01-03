@@ -1,99 +1,70 @@
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CAA218EB0;
-	Wed,  3 Jan 2024 12:15:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=v0yd.nl
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4T4pbH31vgz9snN;
-	Wed,  3 Jan 2024 13:15:55 +0100 (CET)
-Message-ID: <548fb407-ef57-4108-aa26-52deafdca55c@v0yd.nl>
-Date: Wed, 3 Jan 2024 13:15:52 +0100
+Received: from m12.mail.163.com (m12.mail.163.com [220.181.12.197])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C8AE19442;
+	Wed,  3 Jan 2024 12:43:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="UkbQnUrm"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=chNQa
+	qyjmqQSTbtOWxsw9RHKFvBwS7P46pvgdz+FY1w=; b=UkbQnUrmk4B1bUUWoQHSk
+	4vFpgPyfBnMSpsTiX7PNJHc+PT4Ow4ZEvxHbiVDbxlYN5baFyYl4yBI4342Pa/j+
+	0pDUw81DO/ckZ8z6MaqEX3kYFAdKq4e8CbHxFRnZcqZX5NEeyqaNZxha2hfi9F0I
+	0oSLpx7RrxTMjR/eCkc+UU=
+Received: from WH-D-007635B.QUECTEL.COM (unknown [223.76.229.213])
+	by zwqz-smtp-mta-g4-2 (Coremail) with SMTP id _____wDXP4r7MpVlGNmfAA--.162S2;
+	Wed, 03 Jan 2024 18:12:12 +0800 (CST)
+From: clancy_shang@163.com
+To: marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	zhongjun.yu@quectel.com,
+	Clancy Shang <clancy.shang@quectel.com>
+Subject: [PATCH] Bluetooth: hci_sync: fix hogp device suspend bug
+Date: Wed,  3 Jan 2024 18:12:01 +0800
+Message-Id: <20240103101201.1812679-1-clancy_shang@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 0/4] Power off HCI devices before rfkilling them
-Content-Language: en-US
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>, asahi@lists.linux.dev,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, verdre@v0yd.nl
-References: <20240102181946.57288-1-verdre@v0yd.nl>
- <CABBYNZ+sTko6reoJO43W2LHGW58f0kK_8Zgc3mep7xki355=iA@mail.gmail.com>
-From: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
-In-Reply-To: <CABBYNZ+sTko6reoJO43W2LHGW58f0kK_8Zgc3mep7xki355=iA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4T4pbH31vgz9snN
+X-CM-TRANSID:_____wDXP4r7MpVlGNmfAA--.162S2
+X-Coremail-Antispam: 1Uf129KBjvdXoW7Xw13CF1rKFWfCr45uF4UJwb_yoWDZwbE93
+	ZFyay29w1UGrWxZw4qyr4kCr4xZw4rWF4kur93Z34jgF98Wr18GryDXF90kr1xWa95Arsx
+	Ar15WFWSqrW8GjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUeiNVPUUUUU==
+X-CM-SenderInfo: xfod0ux1bvxtlqj6il2tof0z/xtbBzQBauGVOBNCX7gAAsp
 
-Hi Luiz,
+From: Clancy Shang <clancy.shang@quectel.com>
 
-On 1/2/24 19:39, Luiz Augusto von Dentz wrote:
-> Hi Jonas,
-> 
-> On Tue, Jan 2, 2024 at 1:19 PM Jonas Dreßler <verdre@v0yd.nl> wrote:
->>
->> In theory the firmware is supposed to power off the bluetooth card
->> when we use rfkill to block it. This doesn't work on a lot of laptops
->> though, leading to weird issues after turning off bluetooth, like the
->> connection timing out on the peripherals which were connected, and
->> bluetooth not connecting properly when the adapter is turned on again
->> quickly after rfkilling.
->>
->> This series hooks into the rfkill driver from the bluetooth subsystem
->> to send a HCI_POWER_OFF command to the adapter before actually submitting
->> the rfkill to the firmware and killing the HCI connection.
->>
->> ---
->>
->> v1 -> v2: Fixed commit message title to make CI happy
->>
->> Jonas Dreßler (4):
->>    Bluetooth: Remove HCI_POWER_OFF_TIMEOUT
->>    Bluetooth: mgmt: Remove leftover queuing of power_off work
->>    Bluetooth: Add new state HCI_POWERING_DOWN
->>    Bluetooth: Queue a HCI power-off command before rfkilling adapters
-> 
-> Apart from the assumption of RFKILL actually killing the RF
-> immediately or not, I'm fine with these changes, that said it would be
-> great if we can have some proper way to test the behavior of rfkill,
-> perhaps via mgmt-tester, since it should behave like the
-> MGMT_OP_SET_POWERED.
+when Bluetooth enters suspend, and disconnects everything with the
+disconnect reason code of 0x15, the hogp device could not into sleep
+and continued advertising. when use the disconnect reason code of 0x13,
+the hogp device going into sleep succeeded.
 
-Testing this sounds like a good idea, I guess we'd have to teach 
-mgmt-tester to write to rfkill. The bigger problem seems to be that 
-there's no MGMT event for power changes and also no MGMT_OP_GET_POWERED, 
-so that's a bit concerning, could userspace even be notified about 
-changes to adapter power?
+Signed-off-by: Clancy Shang <clancy.shang@quectel.com>
+---
+ net/bluetooth/hci_sync.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Another thing I'm thinking about now is that queuing the HCI command 
-using hci_cmd_sync_queue() might not be enough: The command is still 
-executed async in a thread, and we won't actually block until it has 
-been sent, so this might be introducing a race (rfkill could kill the 
-adapter before we actually send the HCI command). The proper way might 
-be to use a completion and wait until the 
-set_powered_off_sync_complete() callback is invoked?
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index d85a7091a116..16b5420c32d0 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -5927,7 +5927,7 @@ int hci_suspend_sync(struct hci_dev *hdev)
+ 
+ 	if (hci_conn_count(hdev)) {
+ 		/* Soft disconnect everything (power off) */
+-		err = hci_disconnect_all_sync(hdev, HCI_ERROR_REMOTE_POWER_OFF);
++		err = hci_disconnect_all_sync(hdev, HCI_ERROR_REMOTE_USER_TERM);
+ 		if (err) {
+ 			/* Set state to BT_RUNNING so resume doesn't notify */
+ 			hdev->suspend_state = BT_RUNNING;
+-- 
+2.25.1
 
-> 
->>   include/net/bluetooth/hci.h |  2 +-
->>   net/bluetooth/hci_core.c    | 33 ++++++++++++++++++++++++++++++---
->>   net/bluetooth/hci_sync.c    | 16 +++++++++++-----
->>   net/bluetooth/mgmt.c        | 30 ++++++++++++++----------------
->>   4 files changed, 56 insertions(+), 25 deletions(-)
->>
->> --
->> 2.43.0
->>
-> 
-> 
-
-Cheers,
-Jonas
