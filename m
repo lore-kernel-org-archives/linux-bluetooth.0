@@ -1,96 +1,95 @@
-Received: from m15.mail.163.com (m15.mail.163.com [45.254.50.220])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 963051864E
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jan 2024 10:13:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7B1718C01
+	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jan 2024 10:30:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="XdRakjkP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=1+wOy
-	CxuFdRwkRbseg89dpr/73zEQYpQG6NBYdROfvY=; b=XdRakjkPhmg2o8AavgH0Y
-	Vg3NuNGfstwsF84xmWwfydFCNtK+ybR38d9vqFzlBOauINwbpOxOwp42nNpIgr5a
-	9iuHCaF0Lad87QOOUimgY8Aeram0gfJ3AZkmhybZzwN9u80TRAPgKvVH8LpuW/iN
-	aS+s/jNrEhTL2JwUjHuvxE=
-Received: from WH-D-007635B.QUECTEL.COM (unknown [223.76.229.213])
-	by zwqz-smtp-mta-g1-0 (Coremail) with SMTP id _____wD3f8BKM5VlEtudAA--.40145S2;
-	Wed, 03 Jan 2024 18:13:31 +0800 (CST)
-From: clancy_shang@163.com
-To: linux-bluetooth@vger.kernel.org
-Cc: zhongjun.yu@quectel.com,
-	Clancy Shang <clancy.shang@quectel.com>
-Subject: [PATCH] [BlueZ] adapter: Fix airpod device pair fail
-Date: Wed,  3 Jan 2024 18:13:28 +0800
-Message-Id: <20240103101328.1812899-1-clancy_shang@163.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HiVPm846"
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-6806914dba7so41509516d6.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jan 2024 02:30:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704277847; x=1704882647; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=0Nr/algtGqejn2ldrjnBXGaTP2gZTOuuCqre3uNcup4=;
+        b=HiVPm8462snfFZm6AegpbxHUkZAU56nyxG/4SecvGx3wGWRbw0SKsjfZQjdH+JMw77
+         k/2oyIMJCKCstCh5E+XxDCT2AwKfPet8oMvhhjh7HwQCB9bQZPfQX6CjGB/A4CU2B+Rs
+         wU0vNvsAqy7fgZOwDtUoHWb2OrCYRYiy39asNN3yMoPPfgW84roegWKei/XTUeenZ0le
+         fNX2hYg2zDwyYoj5sLSra+BET+sgHQSIPcb1uVDctI9rRoULM84LzMD1AWMhUs2SOeum
+         FCEJo97FL2fWStR/yuZV8SU4fRH9FFOnd5pSkliL3oGSjcnazvl80GP9XFymNpawATTz
+         2OTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704277847; x=1704882647;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0Nr/algtGqejn2ldrjnBXGaTP2gZTOuuCqre3uNcup4=;
+        b=tvJZRFWuTp1VQQtIEBTIApacN/CkTDg3iwLDEbmX94tC6B31Txm+DKbxw13/FYS+kE
+         l1BDcVz3vuDSpIfsDxILuc2yYOhMBWoJiMoIkyD/zujAkC9OwjjYdhIa4zA92kt8uIef
+         Fr01qCFTf+OwtOppYVCTGBcAGuk3xbFaW8vYXoyXlZz209KIGXUPoLy8KDIk9Bx0Q4dw
+         fLNv0U/uaxVfoVUzQs4u6SzwKl2SLiN2TaIRWSHQhmhV8DS7bEFc8Qk4tCCi6EmRHhqT
+         fvK6mj1Z7rFmRUmdZiTXIq6g8tfm9kajVumjF8nPcOktvNamca6/UCOHjA8W9Mn57NHq
+         bnow==
+X-Gm-Message-State: AOJu0YzkOkj4vaL4VbOP5UwGPXtDDG+8S8/0xzoimMscQ/+D1lY9pP1h
+	5LiHdHLHV+qNSgPDDKDhmnZ3OxjqaP8=
+X-Google-Smtp-Source: AGHT+IE60icL21NDELXXH0WqJnog5hga5D+6TxpyRRmLMeFkBFSlrRbG3wzbW7TICf9xTvsVAoiY4g==
+X-Received: by 2002:ad4:5aa4:0:b0:67a:a739:afb3 with SMTP id u4-20020ad45aa4000000b0067aa739afb3mr33027162qvg.27.1704277847530;
+        Wed, 03 Jan 2024 02:30:47 -0800 (PST)
+Received: from [172.17.0.2] ([20.55.118.243])
+        by smtp.gmail.com with ESMTPSA id e14-20020a0cf74e000000b0067f0071e3a9sm10740252qvo.29.2024.01.03.02.30.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Jan 2024 02:30:47 -0800 (PST)
+Message-ID: <65953757.0c0a0220.3d656.fe57@mx.google.com>
+Date: Wed, 03 Jan 2024 02:30:47 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============8970930945133105244=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3f8BKM5VlEtudAA--.40145S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7ZF47Kw4UtFykWF1rCFykKrg_yoW8WrWrpr
-	Z8Ka95Gr4jg3W2gw13Wa47Wr13Cw4kury0qFWSy3ZYkFW7XrWkX3y3tw18ta1UJF9rXa47
-	JF1DX3WDGw4UKaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jyT5dUUUUU=
-X-CM-SenderInfo: xfod0ux1bvxtlqj6il2tof0z/1tbisRFauGVOA17rbgAAsx
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
+Subject: RE: [BlueZ] shared/gatt-db: Fix munmap_chunk invalid pointer
+In-Reply-To: <20240103092816.22952-1-frederic.danis@collabora.com>
+References: <20240103092816.22952-1-frederic.danis@collabora.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Clancy Shang <clancy.shang@quectel.com>
+--===============8970930945133105244==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Airpod is performing inquiry scans in BR/EDR and advertising in an
-unconnectable mode with the same public address at the same time.
-with this feature, when found airpod device, set the bredr support,
-fix it pairs fail bug.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Clancy Shang <clancy.shang@quectel.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=814034
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.48 seconds
+GitLint                       PASS      0.33 seconds
+BuildEll                      PASS      24.35 seconds
+BluezMake                     PASS      736.35 seconds
+MakeCheck                     PASS      12.28 seconds
+MakeDistcheck                 PASS      161.49 seconds
+CheckValgrind                 PASS      223.98 seconds
+CheckSmatch                   PASS      328.92 seconds
+bluezmakeextell               PASS      107.46 seconds
+IncrementalBuild              PASS      688.48 seconds
+ScanBuild                     PASS      934.60 seconds
+
+
+
 ---
- src/adapter.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 022390f0d..71f7ed86d 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -7066,6 +7066,24 @@ static void adapter_msd_notify(struct btd_adapter *adapter,
- 	}
- }
- 
-+#define APPLE_INC_VENDOR_ID 0x004c
-+
-+static bool eir_msd_is_apple_inc(GSList *msd_list)
-+{
-+	GSList *msd_l, *msd_next;
-+
-+	for (msd_l = msd_list; msd_l != NULL; msd_l = msd_next) {
-+		const struct eir_msd *msd = msd_l->data;
-+
-+		msd_next = g_slist_next(msd_l);
-+
-+		if (msd->company == APPLE_INC_VENDOR_ID)
-+			return true;
-+	}
-+
-+	return false;
-+}
-+
- static bool is_filter_match(GSList *discovery_filter, struct eir_data *eir_data,
- 								int8_t rssi)
- {
-@@ -7281,6 +7299,13 @@ void btd_adapter_device_found(struct btd_adapter *adapter,
- 		device_update_last_seen(dev, BDADDR_BREDR, !not_connectable);
- 	}
- 
-+	if (eir_msd_is_apple_inc(eir_data.msd_list) &&
-+					(not_connectable == true) &&
-+					(bdaddr_type == BDADDR_LE_PUBLIC)) {
-+		device_set_bredr_support(dev);
-+		device_update_last_seen(dev, BDADDR_BREDR, true);
-+	}
-+
- 	if (eir_data.name != NULL && eir_data.name_complete)
- 		device_store_cached_name(dev, eir_data.name);
- 
--- 
-2.25.1
 
+--===============8970930945133105244==--
