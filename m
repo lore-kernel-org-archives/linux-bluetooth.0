@@ -1,108 +1,104 @@
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E47B22135B
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jan 2024 11:57:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 161CB2137C
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jan 2024 12:40:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="DsunAFqk"
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-5ce10b5ee01so255468a12.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jan 2024 03:57:13 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="msT5iWr8"
+Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-6dbcc5d78eeso256332a34.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jan 2024 04:40:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1704369433; x=1704974233; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=AaeihiujCSNV/IpYyiqh1GWzfHkk93j+fBxfYGSZUOs=;
-        b=DsunAFqkdVuIlLhHUHLGKF2imFxqdZhNXhfkQ57iaq+AFbsPjHVdoWq3TtB0YhOTVG
-         6PFVEqjvtzF3DrDVjTrVduIem5q3cesAEgb9yBXlaHDnUWLsHleu6wlKXEc+tjykIgZg
-         9DKFp3LQ/M+HiMrGZ0ISK56z1K2mOD4MfRKV4=
+        d=gmail.com; s=20230601; t=1704372026; x=1704976826; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=LpZIzDpPBL8JaPvbb76IoQCo8vyX3VR432pT+wINv1M=;
+        b=msT5iWr8RfJDvjAogjzpOi23bZ6AZOT4PcFSHvdi/boVeG0qL5Uhm0v8eGFGe3Ev1u
+         MY4+yZwp3OpIehowI6kdcSXJ1bFwWc3ogP+JMK4kTF1JAaTgtK+/dQ7jnPDfAh0rN/8e
+         H0KaPK5WwYoSk80nnGaS1BSZ1JfwYzw1iHmj2mg8RNePa3bWBV29JVACbV5T0LGZsyIS
+         Vjua1AuAEUMLcC/Y+QTbQWsqJ2LKdT89foVcJVBwyEzsSKtHRiBHgOuUkm3ft9xA9zWV
+         BPoRuAsrc4Jg1Xuuf9tSb+XOZ7C+vszTkVAKGoyqGG2k7QtAZlS5bvjeK6ftAH6dJv0B
+         EGxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704369433; x=1704974233;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1704372026; x=1704976826;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=AaeihiujCSNV/IpYyiqh1GWzfHkk93j+fBxfYGSZUOs=;
-        b=UDzeN3DXz23ktIz4xJu+uU/9kIFPv/SLOoQdJrVVaFE74FztGV0P7GsCn6v77xrUND
-         bzme3EvxGYk+/q+K+IIsvfFByYIHn5/BO4QvzVq8jIECIL5RctxRgE3qIihegOeM6pnQ
-         dotLfesmWBwwIqf6sM2yWd57sHrL+Y3HPYG+Tg4Ubn9o+ni4M3gmDrh3k3OvAXRnd9ks
-         gupyVFZhWEXurGf37KaShAD3PMFyPeJRSHVVTu36mKDUEvaEZTFFVQ8KxSxcMvWVnPRN
-         80utCaZu5hokc4KYBbuhRrhrWCaSNxLHQhQXGgTyA5SWNRoPVCXVF6Fx8zefyWzgVnGo
-         tGJg==
-X-Gm-Message-State: AOJu0YwW4Fmbu/UjiSeUJXuuqU627iMKxzl099WCA76IX7LoVglhHPWR
-	BgkWLgSNYTBhpbykOm62UIvWp9cRCaZSwOE2h341RG3U1A==
-X-Google-Smtp-Source: AGHT+IHXkr/lgGawhP6uKQwmf9t+Yv57Xaq8+wG8HiAtDS/7poRekELI+OR7MUJW3fS+iC7hR4Rn2g==
-X-Received: by 2002:a05:6a20:be1f:b0:197:33ea:f45 with SMTP id ge31-20020a056a20be1f00b0019733ea0f45mr423598pzb.60.1704369432702;
-        Thu, 04 Jan 2024 03:57:12 -0800 (PST)
-Received: from localhost (231.137.80.34.bc.googleusercontent.com. [34.80.137.231])
-        by smtp.gmail.com with UTF8SMTPSA id fn1-20020a056a002fc100b006d9a0902934sm20668062pfb.70.2024.01.04.03.57.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Jan 2024 03:57:12 -0800 (PST)
-From: Ying Hsu <yinghsu@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com,
-	linux-kernel@vger.kernel.org,
-	chromeos-bluetooth-upstreaming@chromium.org,
-	Ying Hsu <yinghsu@chromium.org>
-Subject: [PATCH] Bluetooth: Avoid potential use-after-free in hci_error_reset
-Date: Thu,  4 Jan 2024 11:56:32 +0000
-Message-ID: <20240104115453.1.Iaa08c695d3dcf819910ea723c3eb502935638172@changeid>
-X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
+        bh=LpZIzDpPBL8JaPvbb76IoQCo8vyX3VR432pT+wINv1M=;
+        b=VoI/VbaosXJR7wqu/fjOfZ2uzjMOSG8ANIVmo0BudqghbkioN7bLsXMaMapZPQA0xL
+         A4eJzXa82tGCABijot/21LhxHOlEmdPU1OwHF9A+PErRqNuWRAz8IQcGfRLI0a8vIBv4
+         MMYWzPW7qEz48hfXcbv0R5LP8+h4LiiM6VrKKIOHQWhZPrZYw0cC3xEbVn+dIMd1qs6+
+         TEH0nZesaEGs0Or2ZmurGv5JFo3hzLHjuf2kFzE2xygpy3SJmzxFpZ+6UxMvl5fnLUAz
+         NiTsEJdEirStvLChGseS4lwzJ00dTiBQG57xBwBGk4NfBF+zh7/GJlM6Ehcn6lWwlTjz
+         b3cQ==
+X-Gm-Message-State: AOJu0YycIyGEQhkmf+R4pipB84zFzvn222GSyH98QN5RHPeW64Axhjdh
+	Np4vEVrvvW1aP1RuPN0azqRu7Pj1AYAQ1A==
+X-Google-Smtp-Source: AGHT+IF2oWdBx5JQkFBYQGCSQq0h9Q+SbeOpLcDvp+mZskBOSt3/f1aw+ZpFnRkobTOmCIkbrq6zBQ==
+X-Received: by 2002:a05:6358:c60f:b0:173:8b3:71c2 with SMTP id fd15-20020a056358c60f00b0017308b371c2mr324079rwb.45.1704372025764;
+        Thu, 04 Jan 2024 04:40:25 -0800 (PST)
+Received: from [172.17.0.2] ([52.225.77.223])
+        by smtp.gmail.com with ESMTPSA id f17-20020a056a00239100b006d9723bf48dsm25052149pfc.10.2024.01.04.04.40.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Jan 2024 04:40:25 -0800 (PST)
+Message-ID: <6596a739.050a0220.f0ec8.70c7@mx.google.com>
+Date: Thu, 04 Jan 2024 04:40:25 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4273290193979658421=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, yinghsu@chromium.org
+Subject: RE: Bluetooth: Avoid potential use-after-free in hci_error_reset
+In-Reply-To: <20240104115453.1.Iaa08c695d3dcf819910ea723c3eb502935638172@changeid>
+References: <20240104115453.1.Iaa08c695d3dcf819910ea723c3eb502935638172@changeid>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-While handling the HCI_EV_HARDWARE_ERROR event, if the underlying
-BT controller is not responding, the GPIO reset mechanism would
-free the hci_dev and lead to a use-after-free in hci_error_reset.
+--===============4273290193979658421==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Here's the call trace observed on a ChromeOS device with Intel AX201:
-   queue_work_on+0x3e/0x6c
-   __hci_cmd_sync_sk+0x2ee/0x4c0 [bluetooth <HASH:3b4a6>]
-   ? init_wait_entry+0x31/0x31
-   __hci_cmd_sync+0x16/0x20 [bluetooth <HASH:3b4a 6>]
-   hci_error_reset+0x4f/0xa4 [bluetooth <HASH:3b4a 6>]
-   process_one_work+0x1d8/0x33f
-   worker_thread+0x21b/0x373
-   kthread+0x13a/0x152
-   ? pr_cont_work+0x54/0x54
-   ? kthread_blkcg+0x31/0x31
-    ret_from_fork+0x1f/0x30
+This is automated email and please do not reply to this email!
 
-This patch holds the reference count on the hci_dev while processing
-a HCI_EV_HARDWARE_ERROR event to avoid potential crash.
+Dear submitter,
 
-Signed-off-by: Ying Hsu <yinghsu@chromium.org>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=814331
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.46 seconds
+GitLint                       PASS      0.21 seconds
+SubjectPrefix                 PASS      0.07 seconds
+BuildKernel                   PASS      28.16 seconds
+CheckAllWarning               PASS      30.93 seconds
+CheckSparse                   PASS      37.00 seconds
+CheckSmatch                   PASS      103.01 seconds
+BuildKernel32                 PASS      28.80 seconds
+TestRunnerSetup               PASS      454.51 seconds
+TestRunner_l2cap-tester       PASS      23.83 seconds
+TestRunner_iso-tester         PASS      46.40 seconds
+TestRunner_bnep-tester        PASS      6.87 seconds
+TestRunner_mgmt-tester        PASS      166.66 seconds
+TestRunner_rfcomm-tester      PASS      10.79 seconds
+TestRunner_sco-tester         PASS      14.23 seconds
+TestRunner_ioctl-tester       PASS      12.28 seconds
+TestRunner_mesh-tester        PASS      8.78 seconds
+TestRunner_smp-tester         PASS      9.67 seconds
+TestRunner_userchan-tester    PASS      7.24 seconds
+IncrementalBuild              PASS      25.97 seconds
+
+
+
 ---
-Tested this commit on a chromebook with Intel BT controller.
+Regards,
+Linux Bluetooth
 
- net/bluetooth/hci_core.c | 2 ++
- 1 file changed, 2 insertions(+)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 65601aa52e0d..a42417926028 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1049,6 +1049,7 @@ static void hci_error_reset(struct work_struct *work)
- {
- 	struct hci_dev *hdev = container_of(work, struct hci_dev, error_reset);
- 
-+	hci_dev_hold(hdev);
- 	BT_DBG("%s", hdev->name);
- 
- 	if (hdev->hw_error)
-@@ -1060,6 +1061,7 @@ static void hci_error_reset(struct work_struct *work)
- 		return;
- 
- 	hci_dev_do_open(hdev);
-+	hci_dev_put(hdev);
- }
- 
- void hci_uuids_clear(struct hci_dev *hdev)
--- 
-2.43.0.472.g3155946c3a-goog
-
+--===============4273290193979658421==--
