@@ -1,69 +1,98 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-22.smtp.github.com (out-22.smtp.github.com [192.30.252.205])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AAE620DFF
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jan 2024 16:10:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67BBF24B20
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jan 2024 16:18:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VoY2EdOy"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E2342C433CA;
-	Thu,  4 Jan 2024 16:10:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704384626;
-	bh=1OG7w1gpUF3QXO4AW/JTowDm5jQS7iB8T/95W2oQQ4U=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=VoY2EdOynrwzT2evr5N/m2HBxfCUqJLrQGwzzSOKNTVeIV8zGdeLJkfn+mMpm/Dl6
-	 /vcN6WJ6y+JIp1qa+2awJToweSW1rUAqacFI67uvnI5w8iIOl00fXPAF0ZG4Sk71ei
-	 7W+uUknEf9bLiaV2yQLTmJWQ3rTSiuOc108GH19A9Vj2PMbAcTjRzs8zBa+O4iORVS
-	 KxzZByN+4O+Bdf3+jWSUoZvxk0Uqp+I0cWvbxxLxMOU5wqM8VYRP9GgG1V/zRDA1CK
-	 gLxu7D3oFBbN8gDrIQ9Y9jC1BbC5EV7tINBx1m5bmth9biOO/BnEB4gE6bCVNJhcg8
-	 +a1V8YqYN36XA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C1A5CC3959F;
-	Thu,  4 Jan 2024 16:10:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="KZB47CkM"
+Received: from github.com (hubbernetes-node-0fd4e2a.ac4-iad.github.net [10.52.200.26])
+	by smtp.github.com (Postfix) with ESMTPA id 6C3FB5E10EC
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jan 2024 08:18:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1704385128;
+	bh=bkTTXBdz/xphGxWyYT6WSNNp0p+/28wgy1wGwoZ3OJU=;
+	h=Date:From:To:Subject:From;
+	b=KZB47CkMJCFBCHl2+fUH3NSMU2ExQdFfvnim2HQvfVT6ZVTG0c9HtqqpzvnW6R/4s
+	 OLpf7quuVjaDvknIk8F9du+wpAbJ30xIjcGPsox5cguOTUNoa2ULejGPascrBt52Fw
+	 LS7Yh6hswVygMi33H3ukuZ4LozICR3A9jtLl6k+k=
+Date: Thu, 04 Jan 2024 08:18:48 -0800
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/60d601-1c321b@github.com>
+Subject: [bluez/bluez] 36f057: audio: transport: Fix crash on A2DP suspend
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v2 1/3] audio: transport: Fix crash on A2DP suspend
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <170438462677.32236.8083382052140471903.git-patchwork-notify@kernel.org>
-Date: Thu, 04 Jan 2024 16:10:26 +0000
-References: <20240103205124.3839768-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240103205124.3839768-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 36f057d7f66c62fd01e0cf27cfe816bfd5be5d21
+      https://github.com/bluez/bluez/commit/36f057d7f66c62fd01e0cf27cfe816bfd5be5d21
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-01-04 (Thu, 04 Jan 2024)
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M profiles/audio/transport.c
 
-On Wed,  3 Jan 2024 15:51:22 -0500 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> Commit 052534ae07b8 ("transport: Update transport release flow for
-> bcast src") introduced a crash where it assumes transport->data always
-> refers to struct bap_transport which causes a crash when the transport
-> is in fact A2DP.
-> 
-> [...]
+  Log Message:
+  -----------
+  audio: transport: Fix crash on A2DP suspend
 
-Here is the summary with links:
-  - [BlueZ,v2,1/3] audio: transport: Fix crash on A2DP suspend
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=36f057d7f66c
-  - [BlueZ,v2,2/3] audio/transport: Refactor transport operations
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e4764af76228
-  - [BlueZ,v2,3/3] audio/transport: Fix runtime error
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=1c321baca781
+Commit 052534ae07b8 ("transport: Update transport release flow for
+bcast src") introduced a crash where it assumes transport->data always
+refers to struct bap_transport which causes a crash when the transport
+is in fact A2DP.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Fixes: https://github.com/bluez/bluez/issues/701
 
 
+  Commit: e4764af7622825a9d7dfd4ecc2066733b03f5dbf
+      https://github.com/bluez/bluez/commit/e4764af7622825a9d7dfd4ecc2066733b03f5dbf
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-01-04 (Thu, 04 Jan 2024)
+
+  Changed paths:
+    M profiles/audio/transport.c
+    M profiles/audio/transport.h
+
+  Log Message:
+  -----------
+  audio/transport: Refactor transport operations
+
+This creates a struct to hold the profile specific operations to avoid
+having to check UUID, etc, to determine how to proceed with each
+operation, it also attempts to decouple volume logic from A2DP
+transports since it should be possible to support it on devices
+implementing LE Audio as well.
+
+
+  Commit: 1c321baca7815cd7727eff89b2307d27d328fdbe
+      https://github.com/bluez/bluez/commit/1c321baca7815cd7727eff89b2307d27d328fdbe
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-01-04 (Thu, 04 Jan 2024)
+
+  Changed paths:
+    M profiles/audio/transport.c
+
+  Log Message:
+  -----------
+  audio/transport: Fix runtime error
+
+This fixes the following error cause by assuming transport->data would
+also be a struct bap_transport:
+
+profiles/audio/transport.c:328:16: runtime error: load of value 2, which
+is not a valid value for type '_Bool'
+
+
+Compare: https://github.com/bluez/bluez/compare/60d60166e4bf...1c321baca781
