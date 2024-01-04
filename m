@@ -1,121 +1,69 @@
-Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77818224C0
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jan 2024 14:11:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AAE620DFF
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jan 2024 16:10:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="FkKNTtkH"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1704377466;
-	bh=xDJ4S9zr6hgLYmzym7hNAHKIxkgNSHlznCnPMMsQ458=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=FkKNTtkHEVjwiv1u46jMMzt1RPEKydyYvX6wFpWLW887y95iYEpaZYmMmUGYsxAyM
-	 lVvZkQC1qXheQTHFEsNWgMmD+dK4QiLNUfqG0H0LLF91SSzhc3EfS34wBizzm+Luxq
-	 9+Pwcfstdud7PWTvK15JreMtVjio/IYDDokiXYiOWD4g/MUvrlzZArkh3ddxfB2gn1
-	 AQECkJkYiST5unXiStOIIIweDTL2m2yYiA0kanM36wuqhZdHE/7EYNXiKJh8AHXZnj
-	 v0d76+ossSbAC4e0PdBnfqm3iWe/vHvHYLtVMiGIm5zEUTFFvs2n8D+8hMGK8S2jGB
-	 steknk7LPI33w==
-Received: from [100.72.96.248] (cola.collaboradmins.com [195.201.22.229])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 508F73782006;
-	Thu,  4 Jan 2024 14:11:06 +0000 (UTC)
-Message-ID: <3e6cf301-a869-4799-a869-af45cdb6635f@collabora.com>
-Date: Thu, 4 Jan 2024 15:11:05 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VoY2EdOy"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E2342C433CA;
+	Thu,  4 Jan 2024 16:10:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704384626;
+	bh=1OG7w1gpUF3QXO4AW/JTowDm5jQS7iB8T/95W2oQQ4U=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=VoY2EdOynrwzT2evr5N/m2HBxfCUqJLrQGwzzSOKNTVeIV8zGdeLJkfn+mMpm/Dl6
+	 /vcN6WJ6y+JIp1qa+2awJToweSW1rUAqacFI67uvnI5w8iIOl00fXPAF0ZG4Sk71ei
+	 7W+uUknEf9bLiaV2yQLTmJWQ3rTSiuOc108GH19A9Vj2PMbAcTjRzs8zBa+O4iORVS
+	 KxzZByN+4O+Bdf3+jWSUoZvxk0Uqp+I0cWvbxxLxMOU5wqM8VYRP9GgG1V/zRDA1CK
+	 gLxu7D3oFBbN8gDrIQ9Y9jC1BbC5EV7tINBx1m5bmth9biOO/BnEB4gE6bCVNJhcg8
+	 +a1V8YqYN36XA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C1A5CC3959F;
+	Thu,  4 Jan 2024 16:10:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH BlueZ] shared/gatt-db: Fix munmap_chunk invalid pointer
-Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v2 1/3] audio: transport: Fix crash on A2DP suspend
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <170438462677.32236.8083382052140471903.git-patchwork-notify@kernel.org>
+Date: Thu, 04 Jan 2024 16:10:26 +0000
+References: <20240103205124.3839768-1-luiz.dentz@gmail.com>
+In-Reply-To: <20240103205124.3839768-1-luiz.dentz@gmail.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-References: <20240103092816.22952-1-frederic.danis@collabora.com>
- <CABBYNZJ-pPU=3jFWK8dDWrqPMG_8Uzow5XTxEP7mKnV7OhdajA@mail.gmail.com>
-From: =?UTF-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis@collabora.com>
-In-Reply-To: <CABBYNZJ-pPU=3jFWK8dDWrqPMG_8Uzow5XTxEP7mKnV7OhdajA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
 
-Hi Luiz,
+Hello:
 
-On 03/01/2024 16:50, Luiz Augusto von Dentz wrote:
-> Hi Frédéric,
->
-> On Wed, Jan 3, 2024 at 4:28 AM Frédéric Danis
-> <frederic.danis@collabora.com> wrote:
->> PTS test GATT/CL/GAD/BV-03-C published a service starting at handle 0xfffd
->> and ending at 0xffff.
-> Don't we have a test for it under unit/test-gatt.c? Perhaps it would
-> be a good idea to add one while doing this change.
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Yes
-My idea should be to add a new unordered database and run 
-gatt_db_get_hash() on it.
+On Wed,  3 Jan 2024 15:51:22 -0500 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> Commit 052534ae07b8 ("transport: Update transport release flow for
+> bcast src") introduced a crash where it assumes transport->data always
+> refers to struct bap_transport which causes a crash when the transport
+> is in fact A2DP.
+> 
+> [...]
 
->
->> This resets the next_handle to 0 in gatt_db_insert_service() instead of
->> setting it to 0x10000. Other services are added later.
->> This could end-up by a crash in db_hash_update() if not enough space has
->> been allocated for hash.iov and some entries are overwritten.
-> I understand we don't want to loop around but handle 0x10000 is not
-> valid either.
+Here is the summary with links:
+  - [BlueZ,v2,1/3] audio: transport: Fix crash on A2DP suspend
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=36f057d7f66c
+  - [BlueZ,v2,2/3] audio/transport: Refactor transport operations
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e4764af76228
+  - [BlueZ,v2,3/3] audio/transport: Fix runtime error
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=1c321baca781
 
-Afaiu the next_handle is used as:
-- the next available handle, with special value 0 to define an empty db
-- and the maximum size to allocate during db_hash_update()
-
-So, 0x10000 is not a valid handle but is a valid size.
-
-gatt_db_insert_service() is already protected to not use handle > 0xFFFF.
-
->
->> ---
->>   src/shared/gatt-db.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
->> index 676f963ec..d32c9a70f 100644
->> --- a/src/shared/gatt-db.c
->> +++ b/src/shared/gatt-db.c
->> @@ -58,7 +58,7 @@ struct gatt_db {
->>          struct bt_crypto *crypto;
->>          uint8_t hash[16];
->>          unsigned int hash_id;
->> -       uint16_t next_handle;
->> +       uint32_t next_handle;
-> I wonder if we can just set the next_handle to 0 and then check it
-> when using it, that way it indicates that it had looped around and
-> handle 0 is invalid already so we shouldn't allocate anything on it.
-
-Not sure this can work as 0 can mean it's an empty db or a db requesting 
-UINT16_MAX+1 elements.
-
-During this test case, it loops to 0, but as other services are added 
-setting next_handle to another value, ending up to allocate less memory 
-than expected (i.e. UINT16_MAX+1 elements).
-
-We may replace the next_handle by last_handle, use gatt_db_isempty() 
-instead of the handle 0 to check for empty db, and allocate 
-last_handle+1 in db_hash_update().
-Does it seems better?
-
-Regards,
-
-Fred
-
+You are awesome, thank you!
 -- 
-Frédéric Danis
-Senior Software Engineer
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Collabora Ltd.
-Platinum Building, St John's Innovation Park, Cambridge CB4 0DS, United Kingdom
-Registered in England & Wales, no. 5513718
 
