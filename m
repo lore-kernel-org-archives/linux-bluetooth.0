@@ -1,95 +1,86 @@
-Received: from mail-oa1-f53.google.com (mail-oa1-f53.google.com [209.85.160.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3C262C190
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jan 2024 19:10:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE8B72C681;
+	Thu,  4 Jan 2024 20:52:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A/NnvHE3"
-Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-204301f2934so450643fac.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jan 2024 11:10:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704395409; x=1705000209; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=bBBO5ukmRxbAQarSWfqZdnjerdKwBbJAlScFyBjMbJI=;
-        b=A/NnvHE3ktQgkKdq6AjXxTK8/2dB2uSEuWMsX32v2zsL8OQhqdtEtILSkfsWIPTOq/
-         jY5Z7gprXKc8qOk/ZJlYV7d3ON/FifLhsmANdY7QaHqCZ4BUner5kFqYBsuJyRaFCKqt
-         TT2tEUUMO8vDfcuOcDldtWekmcU1eAQOUVqQJWXWmaRsIm2g2cQmfaqIo0zZR/vMMdHl
-         4Xf2hv6kcUSrA0q5uz+4j6ZGoDCj7B6hJ7F/sqhcK2J4K/g5BbRzn6ZDZWsRg1aDrAfY
-         lRv/+RJySO6ErzyoFWErvKjGSeBKvGrroCeuCymcagCNyh+v7hEcF4/1LtkZcQp6GV/i
-         KtBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704395409; x=1705000209;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bBBO5ukmRxbAQarSWfqZdnjerdKwBbJAlScFyBjMbJI=;
-        b=E5GY1ML3UGak20WmNXm8869/r3+hNt63NEkrYdwe+Z7TSsMxv0P934Bs8iAJxFzQFV
-         0d/uHu9o5Mc13QreiEvKMz4rpOlUcZx7BIsdrTg50pttBtFOPlAa6ZddI4bg8004SaGo
-         aNQrjFYVpZACA0Yj3Ie0uFXHRz2nJdULhK0Y3S3flyeKOn162E3YXFeslghm+i+bjPDX
-         xQstbQXmMn+aqcE6d1PzvDGR4GStTLosj53tZJNLM+Xy+S31HKgoKmCcbai9dy4KQbE7
-         YUDqZn6hrGdrQdQnCgdrO2W/8YMwfIKbNamlkOxX7Ca3Hk9t1BlvHXfR0Y5ldVIBjZt/
-         gkWg==
-X-Gm-Message-State: AOJu0YzCBEztpPGBycc5PjFjqxfn2uiT4LaOiSifw5+c9lijQelh+C0i
-	8x4fbi0rSw7kuiOQ+pO0AFqvoxoJ9ZY=
-X-Google-Smtp-Source: AGHT+IF94EP6ms3fJ/+QB8wuH/UWnJQKHqP5vU0ngC5Ux37lIYhJCZZo8pwpR8IMLvG7yRnbxwTz4A==
-X-Received: by 2002:a05:6871:d284:b0:203:d501:bd4d with SMTP id pl4-20020a056871d28400b00203d501bd4dmr999909oac.103.1704395408773;
-        Thu, 04 Jan 2024 11:10:08 -0800 (PST)
-Received: from [172.17.0.2] ([20.75.95.102])
-        by smtp.gmail.com with ESMTPSA id ph9-20020a0562144a4900b006809d4ed09esm21308qvb.54.2024.01.04.11.10.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jan 2024 11:10:08 -0800 (PST)
-Message-ID: <65970290.050a0220.eb45.0198@mx.google.com>
-Date: Thu, 04 Jan 2024 11:10:08 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2073899093570314521=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mDNpwU21"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A531BC433C8;
+	Thu,  4 Jan 2024 20:52:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704401576;
+	bh=UeDLFPp+VrbxKGWywntQSZVNGTOQs09CcRcFafJG0IU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mDNpwU218VdVH3edCbpysDNbCm9m6ohm5gbiNbwa87RS2DpvVRlpf//dhb0Rtw9di
+	 aT8UOxdjMOsnPiENb5lm23TI93nZMo4ee4vDObX/ihGbksr01FKJlFPJdmQMQGgSeb
+	 dAOuOtDfu9BWfB+V8vCc2WIg4vlJMGhN0xiN0hASyCGog5oHvIcVhRO6fwR8KBCSuC
+	 2HboKMRcDKtB2YreBd5ICadRcawPE2O6i6EVmW1F5NDp3enO43fGY09gA/YyjrJSgB
+	 7ixeF1Pph/2N57kx8VBnG5H9rx3dw2QUg1o37duUUuVH/nNjLdUV3rs/6MnK9Poh5H
+	 +h80VrTf2Kqmw==
+Date: Thu, 4 Jan 2024 20:52:51 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jonas =?utf-8?Q?Dre=C3=9Fler?= <verdre@v0yd.nl>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 1/5] Bluetooth: Remove superfluous call to
+ hci_conn_check_pending()
+Message-ID: <20240104205251.GO31813@kernel.org>
+References: <20240102185933.64179-1-verdre@v0yd.nl>
+ <20240102185933.64179-2-verdre@v0yd.nl>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1] client/player: Adjust the SDU size based on the number of locations
-In-Reply-To: <20240104175530.4011031-1-luiz.dentz@gmail.com>
-References: <20240104175530.4011031-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240102185933.64179-2-verdre@v0yd.nl>
 
---===============2073899093570314521==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Tue, Jan 02, 2024 at 07:59:28PM +0100, Jonas Dreßler wrote:
+> The "pending connections" feature was originally introduced with commit
+> 4c67bc74f016b0d360b8573e18969c0ff7926974 and
+> 6bd57416127e92d35e6798925502c84e14a3a966 to handle controllers supporting
+> only a single connection request at a time. Later things were extended to
+> also cancel ongoing inquiries on connect() with commit
+> 89e65975fea5c25706e8cc3a89f9f97b20fc45ad.
+> 
+> With commit a9de9248064bfc8eb0a183a6a951a4e7b5ca10a4,
+> hci_conn_check_pending() was introduced as a helper to consolidate a few
+> places where we check for pending connections (indicated by the
+> BT_CONNECT2 flag) and then try to connect.
+> 
+> This refactoring commit also snuck in two more calls to
+> hci_conn_check_pending():
+> 
+> - One is in the failure callback of hci_cs_inquiry(), this one probably
+> makes sense: If we send an "HCI Inquiry" command and then immediately
+> after a "Create Connection" command, the "Create Connection" command might
+> fail before the "HCI Inquiry" command, and then we want to retry the
+> "Create Connection" on failure of the "HCI Inquiry".
+> 
+> - The other added call to hci_conn_check_pending() is in the event handler
+> for the "Remote Name" event, this seems unrelated and is possibly a
+> copy-paste error, so remove that one.
+> 
+> Fixes: a9de9248064bfc8eb0a183a6a951a4e7b5ca10a4
+> Signed-off-by: Jonas Dreßler <verdre@v0yd.nl>
 
-This is automated email and please do not reply to this email!
+Nit: a correct format for the fixes tag is
 
-Dear submitter,
+Fixes: a9de9248064b ("[Bluetooth] Switch from OGF+OCF to using only opcodes")
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=814446
+Likewise, in the patch description, it is usual to cite patches
+using a similar format.
 
----Test result---
+e.g. introduced in commit
+     4c67bc74f016 ("[Bluetooth] Support concurrent connect requests")
 
-Test Summary:
-CheckPatch                    PASS      0.51 seconds
-GitLint                       PASS      0.32 seconds
-BuildEll                      PASS      23.90 seconds
-BluezMake                     PASS      721.98 seconds
-MakeCheck                     PASS      11.94 seconds
-MakeDistcheck                 PASS      161.30 seconds
-CheckValgrind                 PASS      222.79 seconds
-CheckSmatch                   PASS      325.75 seconds
-bluezmakeextell               PASS      106.08 seconds
-IncrementalBuild              PASS      659.91 seconds
-ScanBuild                     PASS      926.85 seconds
+Note it is usual to use a hash of at least 12 characters
+(and not much more than that).
 
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============2073899093570314521==--
+...
