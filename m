@@ -1,125 +1,88 @@
-Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFF0B2030A;
-	Thu,  4 Jan 2024 08:23:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=svenpeter.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=svenpeter.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=svenpeter.dev header.i=@svenpeter.dev header.b="CuxMj0Yh";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="cQByYA58"
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-	by mailout.west.internal (Postfix) with ESMTP id 7E7363200B6C;
-	Thu,  4 Jan 2024 03:23:21 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute6.internal (MEProxy); Thu, 04 Jan 2024 03:23:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=svenpeter.dev;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm2;
-	 t=1704356601; x=1704443001; bh=rz7t4L7SKYLUwAKIGyc8115AY3LogDAT
-	d1ChHOD/0oc=; b=CuxMj0YhgZgVN9nQlbqv3g8O25QP8c+q1hw0w+1UCP7cRpON
-	tAgmiiyEt9adMomTbE6qKlpNGA4nzSLuSj755y6s/OFFL85a70r/wCB/4Sm9PQcl
-	HZSLArZJq077/V4pagBmFPhw0EmD+3aGmgp6W6xh/5pFTk04ZV1wKCNzK3VahFm0
-	ZbolZjpMQdkGPWNtctCeDQaodfzTme20DCxO+93RnfAN+3QgC3p9JXh8vC1fHBwY
-	M6/bks/2MOJMhNdmoZkX+02J0zTHILTQPBdcGRu8aTK7gPjMClNEuLCCBXY9Okk8
-	Y6ir2gZCE8XTVemZZ5jhh/94V6z16MHFwrogLA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1704356601; x=
-	1704443001; bh=rz7t4L7SKYLUwAKIGyc8115AY3LogDATd1ChHOD/0oc=; b=c
-	QByYA58xbiVKL++txKhgK+9GfySSwu7RVubvk6l00OXBzK6Sb7a4SwhHnq23vbee
-	8d/JYJ5Y/Mh8wkHdRsNv8/NY3Fi/58OS+g7Qoc9JV2O8Miz3eRSPVyOZQuLhekFM
-	xj7/D41hgOBi7k0JS1sCAM9zn0Krg1XpSg51EBkuhEYZVti1Uhy0nV6c40yL7O4N
-	gX2jkJVFPFqpS43BKHOKX30zb1+f+OKWNJ6HbEWiT3jXZE1I8A/6dCNnj3mZ0Dgz
-	Glp8dOwHFFiD7AIx7nR7qqkLEN6N/xJzxIpo+a3LkvZof37ddtpvCUMy6yjpkwil
-	vmYvllIHwpKpqhitnzG9A==
-X-ME-Sender: <xms:-GqWZZJNDhyFrMjBDOd86NgueDtUTeYByGjd6jv-jlhAUuZMuJklwA>
-    <xme:-GqWZVJPVjJJpBog9Azkzewkeea5MFuBByWv7oOmgFRtZmb-3_X1lAOP8DuBe1vyp
-    J1CLicfc1eHuWIn1cE>
-X-ME-Received: <xmr:-GqWZRvK-yx9eQF_Lbtl7fGe4RaG7yrBpvFWk-spIkEtzOYqmpe1Mxn6gH2i_BrUj7MdXdQdryJCWYHuW66yzFjYqoyYt9DJAMGgOxPkS2vy6RIyAs9J44z_>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdegiedgudduiecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpegtgffhggfufffkfhevjgfvofesthhqmhdthhdtjeenucfhrhhomhepufhv
-    vghnucfrvghtvghruceoshhvvghnsehsvhgvnhhpvghtvghrrdguvghvqeenucggtffrrg
-    htthgvrhhnpedvhfdtudduvdeujeeufffgudekvdefvefgueeiiedvledtheegieevffdt
-    teekudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    hsvhgvnhesshhvvghnphgvthgvrhdruggvvh
-X-ME-Proxy: <xmx:-GqWZaa7kF7AmepnONSOQJp4Sj4bpHiQbV1Nv7qBQriNTEJOxg0LJA>
-    <xmx:-GqWZQbOgnkVDRMyDiaF4VIFK0jjKZ7NCA5L6h8yBKZ4CjXtOCEYsA>
-    <xmx:-GqWZeC4OeQsNCJDyYb5YzxH0KEv3RjV3FmVv58-8d_mZMR4A_VxCw>
-    <xmx:-WqWZath5Qm2XCq50Kn2MYIhOhKECOUNQa2_bGp7cFf8jkvgM9srCA>
-Feedback-ID: i51094778:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 4 Jan 2024 03:23:20 -0500 (EST)
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From: Sven Peter <sven@svenpeter.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46194210FF
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jan 2024 11:26:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-360671f08a3so1638645ab.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jan 2024 03:26:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704367584; x=1704972384;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zf4xGckuuGU+O0q7ocjta7VYftbovTunKuMZtmBVoZw=;
+        b=StzXoBI05KOb5MXdDWFGIB8zexvlXGOnbDWrE7LHJ6dA6Q6lhEtk2iLOrDBQ886cVh
+         DcFd8eYmB+Dr0EJJIEXE/xrEarD3HTJbke2yxsgnhJj8XYsIzSUt2xkxTH1bPCkZfPfu
+         ME97kviwBhfiNV2jM6vP74M8cZGIu5FxWZx2ILwtxND55RKABEwSO4+DDH2ZNOuxdKMG
+         i/iLNSlAhUvx+uafHDnBMlAqinhRJqSEfPMMwqxrsPHbc58P8fyUmawuhpJlZIVLlvbb
+         N5nloxgjlgJyBDtKrzQvH/k6BZESZfurCN+PQ2EckSqdCitjkpYNbDWs+qfdqxb5Dbhw
+         1oUg==
+X-Gm-Message-State: AOJu0Yxqa6dzT4NhpoDDocgSExrv5aB/X+uDs/IkW0zfc8QcaUh5A20l
+	pbvri6LHpuvEB9q/7DWR9bzDPNSdIzmhmd1diuRn+xFGEvLB
+X-Google-Smtp-Source: AGHT+IHl6WIB2IxLCvxfXYcXCvwD+l+V1PRl/AEUZ0Q6cdbARj/L27Pw2qSKFMJ9L6HdqWDwjLG0jmmdgFaticIinQ9dk4Bbdy9k
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH v3] Bluetooth: Fix Bluetooth for BCM4377 on T2 Intel MacBooks
-Date: Thu, 4 Jan 2024 09:23:08 +0100
-Message-Id: <4D53181A-F6AC-4571-9E84-3B19AB37ADFE@svenpeter.dev>
-References: <ZZZqgsjeY3R4YlVG@hovoldconsulting.com>
-Cc: Aditya Garg <gargaditya08@live.com>,
- Paul Menzel <pmenzel@molgen.mpg.de>, Felix Zhang <mrman@mrman314.tech>,
- linux-bluetooth@vger.kernel.org, stable@vger.kernel.org,
- Johan Hovold <johan+linaro@kernel.org>, Hector Martin <marcan@marcan.st>,
- Bagas Sanjaya <bagasdotme@gmail.com>,
- Alyssa Rosenzweig <alyssa@rosenzweig.io>,
- Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Orlando Chamberlain <orlandoch.dev@gmail.com>, kekrby@gmail.com,
- admin@kodeit.net, Janne Grunau <j@jannau.net>, asahi@lists.linux.dev,
- linux-kernel@vger.kernel.org
-In-Reply-To: <ZZZqgsjeY3R4YlVG@hovoldconsulting.com>
-To: Johan Hovold <johan@kernel.org>
-X-Mailer: iPhone Mail (21C66)
+MIME-Version: 1.0
+X-Received: by 2002:a05:6e02:1d19:b0:35f:d4dc:1b1e with SMTP id
+ i25-20020a056e021d1900b0035fd4dc1b1emr54343ila.5.1704367584559; Thu, 04 Jan
+ 2024 03:26:24 -0800 (PST)
+Date: Thu, 04 Jan 2024 03:26:24 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000071caa7060e1d0087@google.com>
+Subject: [syzbot] Monthly bluetooth report (Jan 2024)
+From: syzbot <syzbot+list440a8a51f30afd02cbea@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
+Hello bluetooth maintainers/developers,
 
->=20
-> On 4. Jan 2024, at 09:21, Johan Hovold <johan@kernel.org> wrote:
->=20
-> =EF=BB=BFOn Thu, Jan 04, 2024 at 08:50:19AM +0100, Sven Peter wrote:
->>> On 4. Jan 2024, at 08:47, Aditya Garg <gargaditya08@live.com> wrote:
->>>> On 28-Dec-2023, at 5:41=E2=80=AFPM, Johan Hovold <johan@kernel.org> wro=
-te:
->=20
->>>> Ok, good, then this patch and the one I posted are mostly equivalent
->>>> assuming that the BCM4378/4387 return an invalid address during setup.
->>>>=20
->>>> This patch may be preferred as it does not need to rely on such
->>>> assumptions, though.
->=20
->>> So what's the final take on this? Which one is gonna be merged upstream?=
+This is a 31-day syzbot report for the bluetooth subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/bluetooth
 
->>=20
->> I would=E2=80=99ve preferred this one (possibly with a better commit mess=
-age)
->> since it=E2=80=99s more explicit and doesn=E2=80=99t rely on additional a=
-ssumptions
->> but it looks like Johan=E2=80=99s version was already merged.
->=20
-> Which addresses do BCM4378/4387 return before they are configured?
-> Should be easy enough to verify that the current check for invalid
-> addresses catches those or otherwise add them to the list.
->=20
-> Johan
+During the period, 1 new issues were detected and 0 were fixed.
+In total, 32 issues are still open and 58 have been fixed so far.
 
-I think the check used to work for BRCM4378 when I originally wrote the driv=
-er but I don=E2=80=99t have any BRCM4387 hardware so can=E2=80=99t test that=
- myself.
+Some of the still happening issues:
 
+Ref  Crashes Repro Title
+<1>  17084   Yes   possible deadlock in rfcomm_sk_state_change
+                   https://syzkaller.appspot.com/bug?extid=d7ce59b06b3eb14fd218
+<2>  9083    Yes   possible deadlock in rfcomm_dlc_exists
+                   https://syzkaller.appspot.com/bug?extid=b69a625d06e8ece26415
+<3>  6476    Yes   possible deadlock in hci_dev_do_close
+                   https://syzkaller.appspot.com/bug?extid=4e3a76c5c505a3f49083
+<4>  4881    Yes   WARNING in hci_conn_timeout
+                   https://syzkaller.appspot.com/bug?extid=2446dd3cb07277388db6
+<5>  3386    Yes   possible deadlock in hci_rfkill_set_block
+                   https://syzkaller.appspot.com/bug?extid=f93d183bc91522d90de9
+<6>  500     Yes   WARNING in call_timer_fn
+                   https://syzkaller.appspot.com/bug?extid=6fb78d577e89e69602f9
+<7>  175     No    possible deadlock in hci_unregister_dev
+                   https://syzkaller.appspot.com/bug?extid=c933391d8e4089f1f53e
+<8>  127     No    possible deadlock in discov_off
+                   https://syzkaller.appspot.com/bug?extid=f047480b1e906b46a3f4
+<9>  101     Yes   KASAN: slab-use-after-free Write in sco_sock_timeout
+                   https://syzkaller.appspot.com/bug?extid=4c0d0c4cde787116d465
+<10> 33      Yes   KASAN: slab-use-after-free Write in sco_conn_del
+                   https://syzkaller.appspot.com/bug?extid=6b9277cad941daf126a2
 
-Sven
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
