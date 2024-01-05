@@ -1,138 +1,129 @@
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3128328B3;
-	Fri,  5 Jan 2024 15:22:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62DBD2E631;
+	Fri,  5 Jan 2024 15:36:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I81dc2fj"
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2cc9fa5e8e1so21232771fa.3;
-        Fri, 05 Jan 2024 07:22:14 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kc4nxtF9"
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2cd37c0b8e5so3795481fa.3;
+        Fri, 05 Jan 2024 07:36:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704468133; x=1705072933; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1704469011; x=1705073811; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=eAsrQIjxQMwzjAX4MlmzebgjZ3WSzdCGhy6tyRE0rKw=;
-        b=I81dc2fjvTXi9Qf8U1oUGMVEZ0l5/X6eZmSX1VjQVpDa/ORfMIZB3+Cam4XZZMCUsE
-         B3KwA9h3WEY63eXznVBLfdtp85A8FoUmEi1tHVIglFii9sGU2w962DWijO3FM+hRRP/B
-         AQ52MbuaCRpV+qUKap7oV/0qy+kUz8UME2wGq2b0JzmL6m3aWrkfzpWnLIRgULvqQ4Bx
-         evu+6qP9MVTt/kl9B7A2yb4j8Yv9sG2E7Rq2U1cyBVzLkcHOodnZzCLeI+IIzipgJC9+
-         WNhexjNgjlKA5Zt34kaslrH6ubymxthfAKoZFtGaf3A7XSrdjzo+8ElVrFg+URcu9vKG
-         AhRg==
+        bh=Eap6Bv7UqsiZ31u/Bbi6NwynETu5hHY2qpNTg74+3d4=;
+        b=Kc4nxtF9xb1ENTb1SiB2MbyxlpMycpuJr9KWN7U6dnxvT1TATB4ti1+YIgLZ4jQuyt
+         9BnnRKN5wD9A91OWn3PgUxeDt7bM2WMeT+mEsYEHb2tmv4GLTXcN9IT1FB4EAGtOUrt/
+         Ne4+TbKRlVE+Q9P+Ly+Jt91MjiccEEVrnxvfMXqYb+j+41LpuoYc4tUEB0wUA52KVzkw
+         7ryhj3wakHPee/A/gvIS2yBJPrtoNScgP1ihGiSmDqK+DmYWj/OBol1kkSMFm3JbbF5m
+         kEccfZOkg56F+oGaSGin+ZBChMMTb2FmEbu+f+RmQkAh/yBmx9Z3qp1KVjrv1oBJ68V5
+         g1NQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704468133; x=1705072933;
+        d=1e100.net; s=20230601; t=1704469011; x=1705073811;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=eAsrQIjxQMwzjAX4MlmzebgjZ3WSzdCGhy6tyRE0rKw=;
-        b=ICAX5vRU95rrEWeW2QfdMLENLG5DBRZsiLYuOx8tx9Dge+pi6cHgvk79RJkKopq16t
-         CQHOwD+dArQk8BJ/QIuUovroOlImSROI/sCV4qWzmVqHAkLURjwBLjrT0Csuk1pPt3At
-         NsrKHawmM2slrZ6cGY+nu4wR6LNRDlw7lGVTBt3nFFCgfELp/DTvLfQGCe6/OQKNSy24
-         sWUAxs9qWwoE5JCmjQyB5bx0jRpBTh3KMWFNhfZ27xjSwj3OgtxXSsTgYppupi2VQX4L
-         ShOLvnaaGzwAqhIHrqFh9gykYrLizTEQQ6rCVEoP6vf4Hb2CNthlz0N2SXSattMlorVc
-         C9VQ==
-X-Gm-Message-State: AOJu0YzXMhf/xwPtEQKn4niSkO00CHnUlxaNOnmvCWr78+13YfQcrew8
-	qBu6UayMsdmNw259DeNLJCXSWaNxh4dz8R47CekWu669PBo=
-X-Google-Smtp-Source: AGHT+IHohJ7DdOCL0br8xfbhkXEAecRiduLqQXhdZLb7+bERm65KyWqjkuG6Sx6xCYEgVNlXWk1ELkBsCzRvJdN72bI=
-X-Received: by 2002:a2e:a481:0:b0:2cc:effb:cbd0 with SMTP id
- h1-20020a2ea481000000b002cceffbcbd0mr1072384lji.55.1704468132560; Fri, 05 Jan
- 2024 07:22:12 -0800 (PST)
+        bh=Eap6Bv7UqsiZ31u/Bbi6NwynETu5hHY2qpNTg74+3d4=;
+        b=tTOh4LQ/0Ulae9/sAvJouIr35pr5LNAVOD8MFHrCmrl3u+QSvRHd7e/4o2nJG9EiTC
+         95hM7iz6i2uWXMXkBsoNUTVaukYHyDxiPN8RtZYSdmcXjZk9sD1b4PobqCoYTd1hy9fj
+         0XLc7QzIKloJ+bCF7A248LOtdk7qDQjenZUMysmVF/3ASc9KxYy63RyS6NDK2tfwApmI
+         mPPJGTLOYmOYfjUy9EXQk393ayeySSreyrrlhNfZz57cfdE5eFw3vOTTIZcxrooMEr+h
+         NQ7fPGCt8oCHrnaf9plBg39s8SKTL3of61pAI8VihutbfTP4x8MOI17vEI8yJhLOT/mg
+         8+Ow==
+X-Gm-Message-State: AOJu0YzIVewkjik5WdU2ivAdK44jl04/ztCFcDuUnkyxpxL6y9DHEZgt
+	HuQCiXsuEjgT4zjk/2VdIIlXczLRdvmo+IvN+u5LTjWL
+X-Google-Smtp-Source: AGHT+IHnBz59liJzs+MSy25Igle+CBetQ9tSFPPk+7JK285pupqmpXvdofpFsLeyyrsvX7WhWMNIv4k5uXcfWHOP+lg=
+X-Received: by 2002:a05:651c:1992:b0:2cc:8e9d:1769 with SMTP id
+ bx18-20020a05651c199200b002cc8e9d1769mr1382307ljb.95.1704469011248; Fri, 05
+ Jan 2024 07:36:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240105025625.125895-1-clancy_shang@163.com>
-In-Reply-To: <20240105025625.125895-1-clancy_shang@163.com>
+References: <20240104115453.1.Iaa08c695d3dcf819910ea723c3eb502935638172@changeid>
+ <63d2b52d-8f0b-4456-896c-ecdaf835c65a@wanadoo.fr>
+In-Reply-To: <63d2b52d-8f0b-4456-896c-ecdaf835c65a@wanadoo.fr>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 5 Jan 2024 10:21:59 -0500
-Message-ID: <CABBYNZJRTfDUizZ=+JDGT3rZDRJ1HCvYBssrCfgrxOm4U8d-Qw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_sync: Fix BLE devices were unable to
- disable the wakeup function
-To: clancy_shang@163.com
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	zhongjun.yu@quectel.com, Clancy Shang <clancy.shang@quectel.com>
+Date: Fri, 5 Jan 2024 10:36:39 -0500
+Message-ID: <CABBYNZKo7sFQxE6cE=KTH6-DpL2NzpW7Yybdr49dhdih6+8dcg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Avoid potential use-after-free in hci_error_reset
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: yinghsu@chromium.org, chromeos-bluetooth-upstreaming@chromium.org, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Clancy,
+Hi Christophe,
 
-On Thu, Jan 4, 2024 at 9:56=E2=80=AFPM <clancy_shang@163.com> wrote:
+On Fri, Jan 5, 2024 at 2:15=E2=80=AFAM Christophe JAILLET
+<christophe.jaillet@wanadoo.fr> wrote:
 >
-> From: Clancy Shang <clancy.shang@quectel.com>
+> Le 04/01/2024 =C3=A0 12:56, Ying Hsu a =C3=A9crit :
+> > While handling the HCI_EV_HARDWARE_ERROR event, if the underlying
+> > BT controller is not responding, the GPIO reset mechanism would
+> > free the hci_dev and lead to a use-after-free in hci_error_reset.
+> >
+> > Here's the call trace observed on a ChromeOS device with Intel AX201:
+> >     queue_work_on+0x3e/0x6c
+> >     __hci_cmd_sync_sk+0x2ee/0x4c0 [bluetooth <HASH:3b4a6>]
+> >     ? init_wait_entry+0x31/0x31
+> >     __hci_cmd_sync+0x16/0x20 [bluetooth <HASH:3b4a 6>]
+> >     hci_error_reset+0x4f/0xa4 [bluetooth <HASH:3b4a 6>]
+> >     process_one_work+0x1d8/0x33f
+> >     worker_thread+0x21b/0x373
+> >     kthread+0x13a/0x152
+> >     ? pr_cont_work+0x54/0x54
+> >     ? kthread_blkcg+0x31/0x31
+> >      ret_from_fork+0x1f/0x30
+> >
+> > This patch holds the reference count on the hci_dev while processing
+> > a HCI_EV_HARDWARE_ERROR event to avoid potential crash.
+> >
+> > Signed-off-by: Ying Hsu <yinghsu-F7+t8E8rja9g9hUCZPvPmw@public.gmane.or=
+g>
+> > ---
+> > Tested this commit on a chromebook with Intel BT controller.
+> >
+> >   net/bluetooth/hci_core.c | 2 ++
+> >   1 file changed, 2 insertions(+)
+> >
+> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> > index 65601aa52e0d..a42417926028 100644
+> > --- a/net/bluetooth/hci_core.c
+> > +++ b/net/bluetooth/hci_core.c
+> > @@ -1049,6 +1049,7 @@ static void hci_error_reset(struct work_struct *w=
+ork)
+> >   {
+> >       struct hci_dev *hdev =3D container_of(work, struct hci_dev, error=
+_reset);
+> >
+> > +     hci_dev_hold(hdev);
+> >       BT_DBG("%s", hdev->name);
+> >
+> >       if (hdev->hw_error)
+> > @@ -1060,6 +1061,7 @@ static void hci_error_reset(struct work_struct *w=
+ork)
+> >               return;
 >
-> when BLE master enter suspend,  it does not delete the peripheral that
-> in acceptlist. so if disable the wakeup function, the BLE master scans wi=
-th
-> basic filter next time, the peripheral can be scanned which is unexpected
->
-> Signed-off-by: Clancy Shang <clancy.shang@quectel.com>
-> ---
->  net/bluetooth/hci_sync.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
->
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index d85a7091a116..abc7f614da5f 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -2533,6 +2533,7 @@ static u8 hci_update_accept_list_sync(struct hci_de=
-v *hdev)
->         struct bdaddr_list *b, *t;
->         u8 num_entries =3D 0;
->         bool pend_conn, pend_report;
-> +       struct hci_conn_params *conn_params;
->         u8 filter_policy;
->         size_t i, n;
->         int err;
-> @@ -2585,6 +2586,15 @@ static u8 hci_update_accept_list_sync(struct hci_d=
-ev *hdev)
->                         continue;
->                 }
->
-> +               conn_params =3D hci_conn_params_lookup(hdev, &b->bdaddr, =
-b->bdaddr_type);
-> +               /* During suspend, only wakeable devices can be in accept=
-list */
-> +               if (conn_params && hdev->suspended &&
-> +                   !(conn_params->flags & HCI_CONN_FLAG_REMOTE_WAKEUP)) =
-{
-> +                       hci_le_del_accept_list_sync(hdev, &b->bdaddr,
-> +                                                   b->bdaddr_type);
-> +                       continue;
-> +               }
+>                  ^^^^^
+> Should we also call hci_dev_put() if we hit this return?
 
-This might require a lock since that is not a copy of the conn_params
-which can be updated concurrently, so perhaps something like the
-following is might be safer:
+Yep, I will fix that since Ive already pushed to bluetooth-next.
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index b3141e3f9cf6..eeb73a54fd26 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -2206,8 +2206,11 @@ static int hci_le_add_accept_list_sync(struct
-hci_dev *hdev,
-
-        /* During suspend, only wakeable devices can be in acceptlist */
-        if (hdev->suspended &&
--           !(params->flags & HCI_CONN_FLAG_REMOTE_WAKEUP))
-+           !(params->flags & HCI_CONN_FLAG_REMOTE_WAKEUP)) {
-+               hci_le_del_accept_list_sync(hdev, &params->bdaddr,
-+                                           params->bdaddr_type);
-                return 0;
-+       }
-
-        /* Select filter policy to accept all advertising */
-        if (*num_entries >=3D hdev->le_accept_list_size)
-
->                 num_entries++;
->         }
 >
-> --
-> 2.25.1
+> CJ
+>
+> >
+> >       hci_dev_do_open(hdev);
+> > +     hci_dev_put(hdev);
+> >   }
+> >
+> >   void hci_uuids_clear(struct hci_dev *hdev)
 >
 
 
