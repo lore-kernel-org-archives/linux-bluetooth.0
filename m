@@ -1,31 +1,19 @@
-Received: from smtp.smtpout.orange.fr (smtp-28.smtpout.orange.fr [80.12.242.28])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBB1E200AC;
-	Fri,  5 Jan 2024 07:15:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="RgjONDf5"
-Received: from [192.168.1.18] ([92.140.202.140])
-	by smtp.orange.fr with ESMTPA
-	id LePzrOnjwt8aXLePzrQwGC; Fri, 05 Jan 2024 08:15:00 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1704438900;
-	bh=vTHb4fsbw49n+cHEAzUAl+mW7b7a6gshLZ8DtNPyYCU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=RgjONDf5Bjjrcbs7ci13Gik0ej3zZDIChqvov4AerFaov14WFKjEdPwg2x8I9O7GC
-	 YSCr4ztbjySHqLveMmw7YhxzT+uXQmDNlD6uTAHWCqEuEH+Yp+v/xiQMFwmNeKYW+C
-	 xbzJxFqXzzgYwBjnDzXlsfLLA8+ACz621QUPXWMF/8JMwlYioJYCbf5gZmRRtA687a
-	 AQazUN/HbaRyr8AGcJycpchw60dnFfS3Fm+YbJrweCj75zV2VADH79r58fh9hfN2Gl
-	 cRNB5G66ip187ZGsOl5ArjafSsoaXfljKKrC6JUdNqU1CdHllTcWcXr7E/vvFIauAb
-	 aN/sMoD8pT0aQ==
-X-ME-Helo: [192.168.1.18]
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Fri, 05 Jan 2024 08:15:00 +0100
-X-ME-IP: 92.140.202.140
-Message-ID: <63d2b52d-8f0b-4456-896c-ecdaf835c65a@wanadoo.fr>
-Date: Fri, 5 Jan 2024 08:14:59 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1557A200AE;
+	Fri,  5 Jan 2024 08:03:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.224] (unknown [95.90.233.223])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 6568A61E5FE01;
+	Fri,  5 Jan 2024 09:03:13 +0100 (CET)
+Message-ID: <1a3a481b-db1f-4325-8ca7-03f2bc44b2a2@molgen.mpg.de>
+Date: Fri, 5 Jan 2024 09:03:12 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -33,71 +21,54 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: Avoid potential use-after-free in
- hci_error_reset
-To: yinghsu@chromium.org
-Cc: chromeos-bluetooth-upstreaming@chromium.org,
+Subject: Re: [PATCH] Bluetooth: mgmt: Fix wrong param be used
+Content-Language: en-US
+To: Clancy Shang <clancy_shang@163.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
  linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- luiz.dentz@gmail.com
-References: <20240104115453.1.Iaa08c695d3dcf819910ea723c3eb502935638172@changeid>
-Content-Language: fr
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <20240104115453.1.Iaa08c695d3dcf819910ea723c3eb502935638172@changeid>
+ zhongjun.yu@quectel.com, Clancy Shang <clancy.shang@quectel.com>
+References: <20240105031111.132851-1-clancy_shang@163.com>
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20240105031111.132851-1-clancy_shang@163.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Le 04/01/2024 à 12:56, Ying Hsu a écrit :
-> While handling the HCI_EV_HARDWARE_ERROR event, if the underlying
-> BT controller is not responding, the GPIO reset mechanism would
-> free the hci_dev and lead to a use-after-free in hci_error_reset.
+Dear Clancy,
+
+
+Thank you for your patch.
+
+Am 05.01.24 um 04:11 schrieb clancy_shang@163.com:
+> From: Clancy Shang <clancy.shang@quectel.com>
 > 
-> Here's the call trace observed on a ChromeOS device with Intel AX201:
->     queue_work_on+0x3e/0x6c
->     __hci_cmd_sync_sk+0x2ee/0x4c0 [bluetooth <HASH:3b4a6>]
->     ? init_wait_entry+0x31/0x31
->     __hci_cmd_sync+0x16/0x20 [bluetooth <HASH:3b4a 6>]
->     hci_error_reset+0x4f/0xa4 [bluetooth <HASH:3b4a 6>]
->     process_one_work+0x1d8/0x33f
->     worker_thread+0x21b/0x373
->     kthread+0x13a/0x152
->     ? pr_cont_work+0x54/0x54
->     ? kthread_blkcg+0x31/0x31
->      ret_from_fork+0x1f/0x30
-> 
-> This patch holds the reference count on the hci_dev while processing
-> a HCI_EV_HARDWARE_ERROR event to avoid potential crash.
-> 
-> Signed-off-by: Ying Hsu <yinghsu-F7+t8E8rja9g9hUCZPvPmw@public.gmane.org>
+> bluez lib could not receive MGMT_EV_DEVICE_FLAGS_CHANGED notifications
+> after sending MGMT_OP_SET_DEVICE_FLAGS
+
+Please add a dot/period at the end of sentences.
+
+Please extend the commit message to describe your fix, and why it fixes 
+the problem.
+
+> Signed-off-by: Clancy Shang <clancy.shang@quectel.com>
 > ---
-> Tested this commit on a chromebook with Intel BT controller.
+>   net/bluetooth/mgmt.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
->   net/bluetooth/hci_core.c | 2 ++
->   1 file changed, 2 insertions(+)
-> 
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 65601aa52e0d..a42417926028 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1049,6 +1049,7 @@ static void hci_error_reset(struct work_struct *work)
->   {
->   	struct hci_dev *hdev = container_of(work, struct hci_dev, error_reset);
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 9dd815b6603f..c74abdf3618f 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -5177,7 +5177,7 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
 >   
-> +	hci_dev_hold(hdev);
->   	BT_DBG("%s", hdev->name);
+>   done:
+>   	if (status == MGMT_STATUS_SUCCESS)
+> -		device_flags_changed(sk, hdev, &cp->addr.bdaddr, cp->addr.type,
+> +		device_flags_changed(NULL, hdev, &cp->addr.bdaddr, cp->addr.type,
+>   				     supported_flags, current_flags);
 >   
->   	if (hdev->hw_error)
-> @@ -1060,6 +1061,7 @@ static void hci_error_reset(struct work_struct *work)
->   		return;
+>   	return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_SET_DEVICE_FLAGS, status,
 
-                 ^^^^^
-Should we also call hci_dev_put() if we hit this return?
 
-CJ
+Kind regards,
 
->   
->   	hci_dev_do_open(hdev);
-> +	hci_dev_put(hdev);
->   }
->   
->   void hci_uuids_clear(struct hci_dev *hdev)
-
+Paul
