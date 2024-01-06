@@ -1,77 +1,95 @@
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C44BF9D1
-	for <linux-bluetooth@vger.kernel.org>; Sat,  6 Jan 2024 22:16:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willowbarraco.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willowbarraco.fr
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB5E21078A
+	for <linux-bluetooth@vger.kernel.org>; Sat,  6 Jan 2024 23:29:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=willowbarraco.fr header.i=@willowbarraco.fr header.b="hV/FbFdh"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willowbarraco.fr;
-	s=key1; t=1704579388;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=JAc7QQqhNz5Zj4cb12lhuRYai8jctwBOa1xN96v+y/0=;
-	b=hV/FbFdhohMWQOxdH17Riryy77P3Tks2K5L+hx+RvSusPZWJRJt55WfpjOcqXcsrDxJxi9
-	cBU2oR2FOxYq092yfd1EEfV9ZsoqE5UI5VZViuumba2Sjyfyx5LiAofbm/wocMw4IaNbwx
-	GX7BMnF8wjhN70Tp19Gu3jv2BW1kZIyp9/XQ1R1EbF5L4+k1EtW0ZtYf3DqrhTi2wiqLUK
-	mnxJ1lAV9ZqBgxqaxTjXmI4Gws2ENTZ8lc3+2QuKX5HD9J5VBMPUruzkorTcFNQJx3W/8+
-	1xkyuO29/21oT32AuoFGUAAxX222lcNR2rxxpR3UOpaOB9SQVpNfmoRydSY74w==
-From: Willow Barraco <contact@willowbarraco.fr>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] mpris-proxy: add --target to target a specific player
-Date: Sat,  6 Jan 2024 23:15:47 +0100
-Message-ID: <20240106221626.8140-2-contact@willowbarraco.fr>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IOLpXfLE"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1d3ef33e68dso4671675ad.1
+        for <linux-bluetooth@vger.kernel.org>; Sat, 06 Jan 2024 15:29:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704583767; x=1705188567; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=CVkVh046vzJWhjvQiXxcb9ZF67OFGOD7PWI7x6DwPYE=;
+        b=IOLpXfLEbne9ZLzc0xuPH4jKKbTK0GzpR9UutnxtJnGFJ+/St2oqfdgBCVKbI2EUoq
+         whRJlIqon2iIrLik/2C/RUnCS5nQe2X22selqu7dhRU+deIYWm5aJlh7yDqxvwRnUSHk
+         RviHTF9Zh2wfxknuhQtZ6eW0R35VDJF5udrSIBeSwY89TuIuOis54FeJTSSAS/ighj4J
+         OFONK4jlBH/BS7/avQLNCIiIDpzrV2w9HRXRGL8b3D21PSud0bv9EvGOOupOoBgv10r3
+         tb8HvvaVSzZhtI9ZgWnNDxR9PlJc5x4j4cLVhPWW9zaMkLQZ8r5LzPeJUOmCL2AE+BBE
+         5ptA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704583767; x=1705188567;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CVkVh046vzJWhjvQiXxcb9ZF67OFGOD7PWI7x6DwPYE=;
+        b=LRxQvycL/CPrNcawyuZLIqF0KIpQw1bcZbMnjvEMdJNEX/qO28CLBPlEW1PxuIFAY0
+         9C4gPXu4ZclKNQqlIdNkg0+tD2ynilLNXH1nVeHUSODfCzBKZCx4H8AIImztvP4P6e/6
+         zjPtVcTZA74efScu9m0MbGu0naeNAn9K4e8Pny46iMHIYcJIESu0X9UH35PvSoqknVon
+         TVtznyfVWP2BFyXR+VHFXx3+HpMZG7nK02pzUIxHZeLfuuVzH74c4I4rC6uNTGtXh8GA
+         YYjk3Z0MFHiqNVHdqvryJkqjdK5623VxJUCncQnwFS5hNN7N/Jy5LSkCyMW4x8OYJpgQ
+         RiCg==
+X-Gm-Message-State: AOJu0YzBLCEsn5Fh5YFZv6KiLrLxElytsBMNol2AAKiaJiiqKZgkoW0S
+	avnMZBjGyovuHkegbXUqhicffN0Nl7Q=
+X-Google-Smtp-Source: AGHT+IHJUR0pGvOdTpwzWlps/pE6/mQ6Ew2yFWsDDtdyZLGmaKxKp3oYGYEMCU4s4XTXGUkuBGh2HA==
+X-Received: by 2002:a17:902:e881:b0:1d4:e6d0:34db with SMTP id w1-20020a170902e88100b001d4e6d034dbmr4284702plg.19.1704583766745;
+        Sat, 06 Jan 2024 15:29:26 -0800 (PST)
+Received: from [172.17.0.2] ([4.227.114.177])
+        by smtp.gmail.com with ESMTPSA id u2-20020a170902a60200b001d4c316e3a4sm3530203plq.189.2024.01.06.15.29.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 06 Jan 2024 15:29:26 -0800 (PST)
+Message-ID: <6599e256.170a0220.9b6ef.7b1a@mx.google.com>
+Date: Sat, 06 Jan 2024 15:29:26 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============7080393785968522112=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, contact@willowbarraco.fr
+Subject: RE: [v2] mpris-proxy: add --target to target a specific player
+In-Reply-To: <20240106221626.8140-2-contact@willowbarraco.fr>
+References: <20240106221626.8140-2-contact@willowbarraco.fr>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Signed-off-by: Willow Barraco <contact@willowbarraco.fr>
+--===============7080393785968522112==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=814873
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.32 seconds
+GitLint                       PASS      0.21 seconds
+BuildEll                      PASS      23.60 seconds
+BluezMake                     PASS      706.83 seconds
+MakeCheck                     PASS      12.02 seconds
+MakeDistcheck                 PASS      157.79 seconds
+CheckValgrind                 PASS      220.22 seconds
+CheckSmatch                   PASS      323.93 seconds
+bluezmakeextell               PASS      105.13 seconds
+IncrementalBuild              PASS      667.43 seconds
+ScanBuild                     PASS      918.76 seconds
+
+
+
 ---
-v2: Fix CI warning
- tools/mpris-proxy.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/tools/mpris-proxy.c b/tools/mpris-proxy.c
-index e5fc91fdb..dc328031b 100644
---- a/tools/mpris-proxy.c
-+++ b/tools/mpris-proxy.c
-@@ -53,6 +53,7 @@ static GSList *transports = NULL;
- 
- static gboolean option_version = FALSE;
- static gboolean option_export = FALSE;
-+static gchar *option_target = "";
- 
- struct tracklist {
- 	GDBusProxy *proxy;
-@@ -428,6 +429,11 @@ static void add_player(DBusConnection *conn, const char *name,
- 	if (!adapter)
- 		return;
- 
-+	if (strcmp(option_target, "") && strcmp(name, option_target)) {
-+		printf("Not the target player, skipped\n");
-+		return;
-+	}
-+
- 	player = find_player_by_bus_name(name);
- 	if (player == NULL) {
- 		reply = get_all(conn, name);
-@@ -733,6 +739,8 @@ static GOptionEntry options[] = {
- 				"Show version information and exit" },
- 	{ "export", 'e', 0, G_OPTION_ARG_NONE, &option_export,
- 				"Export remote players" },
-+	{ "target", 't', 0, G_OPTION_ARG_STRING, &option_target,
-+				"Target a specific player" },
- 	{ NULL },
- };
- 
--- 
-2.43.0
 
+--===============7080393785968522112==--
