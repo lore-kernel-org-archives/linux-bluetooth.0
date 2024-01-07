@@ -1,177 +1,104 @@
-Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B17D813FE7;
-	Sun,  7 Jan 2024 18:11:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=v0yd.nl
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [10.196.197.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4T7QHB0m0mz9sp6;
-	Sun,  7 Jan 2024 19:11:02 +0100 (CET)
-Message-ID: <f9f638bf-676e-43bf-8d83-256cae8f7bfe@v0yd.nl>
-Date: Sun, 7 Jan 2024 19:10:58 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C252F10A17
+	for <linux-bluetooth@vger.kernel.org>; Sun,  7 Jan 2024 18:34:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OXOM5ZKw"
+Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-5955a4a9b23so751646eaf.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 07 Jan 2024 10:34:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704652497; x=1705257297; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ryx7hKQ75lME+uU4/hrICvcL9DvVJmhRTQzE0XreO6s=;
+        b=OXOM5ZKwZF57BBSvJXi1Twx2Nip7zokhrwxif/hVQhIUrHGehMt0qVZ4SEcyYuX6Gz
+         HTw/ITW7qxskeq2DhBvsrikYdR/gl25Nw+OJbcI50HiKdnBSk+VfhiUr9NMc0U5fCeq9
+         3dsWoZjQSelPVjsgtQzD52TgO7ja8wjvQ1IlTqTgyUZDV2nYULWy80sFFnRAj7dD7+5z
+         I7VB6LqzYFx6+97XrfUHQ59/s7I/fJBR7q+Xt6dN3gSGRklO7jFzG3dsMCnX+qlnCEJJ
+         nwU7VsfgCnWgdYIorP+o9AqKlTaRRheL4GVAMJKIqhAz/FEVurDB2GqJZe+CCN/VJ8dN
+         p2Bg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704652497; x=1705257297;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ryx7hKQ75lME+uU4/hrICvcL9DvVJmhRTQzE0XreO6s=;
+        b=pEGy/49JeGkrMJYjmyh+LJ+NPCmS5gVyj5fWpZr4rv34fEkNaoRKhFl3IVtYnY0knF
+         eJXj956D34vZNRFltHXXVTOE2S3oDfSxrlkI0DbvBH3dotLt9dlxpr6UYs5WDAvudhI9
+         A0Fd8kVmIzeneWUgdd5I8DiEd2VMkZApzOZLEEkVayPmC1w/yAYPXQTSFGprkkIcgTVO
+         79hKUEMLU9vdPQHzFxevfQAKvUbtEygjHwtKJuJXJloVO7zEKml8GGJ+6nXaj/7KBM3+
+         qoAOCaxJc7OTX3vA1sC4gJ2+Dnn2CfrmgvCnqz5TmKH+1hCSlInbd4tOvjBW4DKPL3uN
+         Qb7Q==
+X-Gm-Message-State: AOJu0YxUbi3RmP/Dll3SxEpve2RoSICfbvPhgd17elUODIb+aoeRsci2
+	3KSDVT9el6uaj1KvA010pjG9I5QxXp8=
+X-Google-Smtp-Source: AGHT+IHjBXM+FnX1Mcm9IrtPFYgd0YbTcU5jcqrj7j7Ih+0KMRjiTylem2mtwiy4TNpbbzNJKH7Tyg==
+X-Received: by 2002:a05:6358:7e56:b0:175:73aa:c9f4 with SMTP id p22-20020a0563587e5600b0017573aac9f4mr1206999rwm.29.1704652495817;
+        Sun, 07 Jan 2024 10:34:55 -0800 (PST)
+Received: from [172.17.0.2] ([13.91.68.82])
+        by smtp.gmail.com with ESMTPSA id cz8-20020a17090ad44800b0028afd8b1e0bsm4791974pjb.57.2024.01.07.10.34.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 07 Jan 2024 10:34:55 -0800 (PST)
+Message-ID: <659aeecf.170a0220.d53e7.9307@mx.google.com>
+Date: Sun, 07 Jan 2024 10:34:55 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============8637555365289576782=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 0/4] Power off HCI devices before rfkilling them
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>, asahi@lists.linux.dev,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, verdre@v0yd.nl
-References: <20240102181946.57288-1-verdre@v0yd.nl>
- <CABBYNZ+sTko6reoJO43W2LHGW58f0kK_8Zgc3mep7xki355=iA@mail.gmail.com>
- <548fb407-ef57-4108-aa26-52deafdca55c@v0yd.nl>
-Content-Language: en-US
-From: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
-In-Reply-To: <548fb407-ef57-4108-aa26-52deafdca55c@v0yd.nl>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, verdre@v0yd.nl
+Subject: RE: Disconnect devices before rfkilling adapter
+In-Reply-To: <20240107180252.73436-2-verdre@v0yd.nl>
+References: <20240107180252.73436-2-verdre@v0yd.nl>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On 1/3/24 13:15, Jonas Dreßler wrote:
-> Hi Luiz,
-> 
-> On 1/2/24 19:39, Luiz Augusto von Dentz wrote:
->> Hi Jonas,
->>
->> On Tue, Jan 2, 2024 at 1:19 PM Jonas Dreßler <verdre@v0yd.nl> wrote:
->>>
->>> In theory the firmware is supposed to power off the bluetooth card
->>> when we use rfkill to block it. This doesn't work on a lot of laptops
->>> though, leading to weird issues after turning off bluetooth, like the
->>> connection timing out on the peripherals which were connected, and
->>> bluetooth not connecting properly when the adapter is turned on again
->>> quickly after rfkilling.
->>>
->>> This series hooks into the rfkill driver from the bluetooth subsystem
->>> to send a HCI_POWER_OFF command to the adapter before actually 
->>> submitting
->>> the rfkill to the firmware and killing the HCI connection.
->>>
->>> ---
->>>
->>> v1 -> v2: Fixed commit message title to make CI happy
->>>
->>> Jonas Dreßler (4):
->>>    Bluetooth: Remove HCI_POWER_OFF_TIMEOUT
->>>    Bluetooth: mgmt: Remove leftover queuing of power_off work
->>>    Bluetooth: Add new state HCI_POWERING_DOWN
->>>    Bluetooth: Queue a HCI power-off command before rfkilling adapters
->>
->> Apart from the assumption of RFKILL actually killing the RF
->> immediately or not, I'm fine with these changes, that said it would be
->> great if we can have some proper way to test the behavior of rfkill,
->> perhaps via mgmt-tester, since it should behave like the
->> MGMT_OP_SET_POWERED.
-> 
-> Testing this sounds like a good idea, I guess we'd have to teach 
-> mgmt-tester to write to rfkill. The bigger problem seems to be that 
-> there's no MGMT event for power changes and also no MGMT_OP_GET_POWERED, 
-> so that's a bit concerning, could userspace even be notified about 
-> changes to adapter power?
+--===============8637555365289576782==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Sent v3 of the patchset now, I didn't add a test to mgmt-tester because 
-it's actually quite tricky to notice the full shutdown sequence happened 
-rather than just closing the device. As long as no devices are 
-connected, the difference is mostly in a few (faily random) events:
+This is automated email and please do not reply to this email!
 
-btmon without the patch:
+Dear submitter,
 
-@ MGMT Event: Class Of Device Changed (0x0007) plen 3 
- 
-        {0x0001} [hci0] 169.101804
-         Class: 0x000000
-           Major class: Miscellaneous
-           Minor class: 0x00
-@ MGMT Event: New Settings (0x0006) plen 4 
- 
-        {0x0001} [hci0] 169.101820
-         Current settings: 0x00000ac0
-           Secure Simple Pairing
-           BR/EDR
-           Low Energy
-           Secure Connections
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=814930
 
-btmon with the patch:
+---Test result---
 
-< HCI Command: Write Scan Enable (0x03|0x001a) plen 1 
- 
-              #109 [hci0] 7.031852
-         Scan enable: No Scans (0x00)
- > HCI Event: Command Complete (0x0e) plen 4 
- 
-               #110 [hci0] 7.033026
-       Write Scan Enable (0x03|0x001a) ncmd 1
-         Status: Success (0x00)
-< HCI Command: LE Set Extended Advertising Enable (0x08|0x0039) plen 2 
- 
-              #111 [hci0] 7.033055
-         Extended advertising: Disabled (0x00)
-         Number of sets: Disable all sets (0x00)
- > HCI Event: Command Complete (0x0e) plen 4 
- 
-               #112 [hci0] 7.034202
-       LE Set Extended Advertising Enable (0x08|0x0039) ncmd 1
-         Status: Success (0x00)
-< HCI Command: LE Clear Advertising Sets (0x08|0x003d) plen 0 
- 
-              #113 [hci0] 7.034233
- > HCI Event: Command Complete (0x0e) plen 4 
- 
-               #114 [hci0] 7.035527
-       LE Clear Advertising Sets (0x08|0x003d) ncmd 1
-         Status: Success (0x00)
-@ MGMT Event: Class Of Device Changed (0x0007) plen 3 
- 
-          {0x0001} [hci0] 7.035554
-         Class: 0x000000
-           Major class: Miscellaneous
-           Minor class: 0x00
-@ MGMT Event: New Settings (0x0006) plen 4 
- 
-          {0x0001} [hci0] 7.035568
-         Current settings: 0x00000ac0
-           Secure Simple Pairing
-           BR/EDR
-           Low Energy
-           Secure Connections
+Test Summary:
+CheckPatch                    PASS      1.97 seconds
+GitLint                       PASS      0.76 seconds
+SubjectPrefix                 PASS      0.26 seconds
+BuildKernel                   PASS      28.64 seconds
+CheckAllWarning               PASS      31.16 seconds
+CheckSparse                   PASS      37.44 seconds
+CheckSmatch                   PASS      99.20 seconds
+BuildKernel32                 PASS      27.28 seconds
+TestRunnerSetup               PASS      436.83 seconds
+TestRunner_l2cap-tester       PASS      22.96 seconds
+TestRunner_iso-tester         PASS      45.40 seconds
+TestRunner_bnep-tester        PASS      6.80 seconds
+TestRunner_mgmt-tester        PASS      168.15 seconds
+TestRunner_rfcomm-tester      PASS      10.99 seconds
+TestRunner_sco-tester         PASS      14.78 seconds
+TestRunner_ioctl-tester       PASS      12.60 seconds
+TestRunner_mesh-tester        PASS      8.83 seconds
+TestRunner_smp-tester         PASS      9.72 seconds
+TestRunner_userchan-tester    PASS      7.23 seconds
+IncrementalBuild              PASS      61.99 seconds
 
-Maybe we could add a fake connection and check whether that is 
-disconnected on the rfkill, but I don't think mgmt-tester supports that..
 
-Fwiw, I don't think having a test for this is super important, this is a 
-regression a lot of people would notice very quickly I think.
 
-> 
-> Another thing I'm thinking about now is that queuing the HCI command 
-> using hci_cmd_sync_queue() might not be enough: The command is still 
-> executed async in a thread, and we won't actually block until it has 
-> been sent, so this might be introducing a race (rfkill could kill the 
-> adapter before we actually send the HCI command). The proper way might 
-> be to use a completion and wait until the 
-> set_powered_off_sync_complete() callback is invoked?
-> 
->>
->>>   include/net/bluetooth/hci.h |  2 +-
->>>   net/bluetooth/hci_core.c    | 33 ++++++++++++++++++++++++++++++---
->>>   net/bluetooth/hci_sync.c    | 16 +++++++++++-----
->>>   net/bluetooth/mgmt.c        | 30 ++++++++++++++----------------
->>>   4 files changed, 56 insertions(+), 25 deletions(-)
->>>
->>> -- 
->>> 2.43.0
->>>
->>
->>
-> 
-> Cheers,
-> Jonas
+---
+Regards,
+Linux Bluetooth
 
-Cheers,
-Jonas
+
+--===============8637555365289576782==--
