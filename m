@@ -1,56 +1,57 @@
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A7A654F85;
-	Mon,  8 Jan 2024 19:11:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C13CA54F8D;
+	Mon,  8 Jan 2024 19:14:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ERZO7pm5"
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2ccbf8cbf3aso27887461fa.3;
-        Mon, 08 Jan 2024 11:11:29 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EqtF3I10"
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2cce6c719caso23626391fa.2;
+        Mon, 08 Jan 2024 11:14:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704741087; x=1705345887; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1704741283; x=1705346083; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Jov3ZKLRkU/twhQr/eXss79u9EeE0119uscHNpJ6qlg=;
-        b=ERZO7pm5i+Bp9qicZW5ROYapLCX4EccBWx5pQSYqUY+iLT4UOhhTL8IW9FZqH8PJl/
-         omq/kl7dyPPTatCCysn1Xf4xH43By+5TMP8CvSWi6+Tkjht2KNJJL74e+qSAxm2OdaWI
-         Fg6ZNwIUYtuHrUzglbXNWR0DTvJmVNWd8yP2pEoiuvEYGRTQHxHK8YHxl1TG7dz+Bs/R
-         0tcRopXhSuOuvlID+usyOHpzVzmNdXISqyAF8ZZ9rkcUdyv5YS2gx9kF1t2m//s4FhYz
-         PBDLNr4Fdz10GwY12PKW1zcM++0r1VhQBTofNPCX11n9KK7+bKBzHE2C7deJtceY7pFB
-         UoZw==
+        bh=XNaXoD9prw+TMf7vR3/H5SQrElCx5I5cZfXaOBoOuIs=;
+        b=EqtF3I101xaku751kQycUYruR8v0SRrCFfosA8eip8M2iQ+KuA1zLTt0yocgIIinBt
+         whXMLaKDL1SQI7Mbc3T3MZweR/a7q43/iQ7rE/yefImQrSYPuQXO3uJRkeXi2k8/U9iO
+         kDMP4YqutovCMn8+E794uHBxN8cPkXdN5kCsmrMfufy01kEe84MyVUhbZeBZO2V8TIui
+         XlF19wVE5gocvAmVBLrbs2A9BkjkBaIURL1axSClRGHI+RdI82KXpESWdCVDcpa09twC
+         wKYbnrf2nCZXG3/ymToxYnmXAORGbkabW4Rg9L9a7x2wH6DZDMdnIA8+w0l2ULm8lWed
+         HzAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704741087; x=1705345887;
+        d=1e100.net; s=20230601; t=1704741283; x=1705346083;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Jov3ZKLRkU/twhQr/eXss79u9EeE0119uscHNpJ6qlg=;
-        b=HRiYcLAHuragfFS7gn2X5YVS2BF29Sm4edzn+KKIetyGBiPe/d7FhIOfukIsaAmBXe
-         BMzmZpBNM/ob1EqVzOrrp7SYYYhtCeq5EKdMWJ66AUTKQW00I3SAXAOuf2rb9Bju6uV6
-         8RoPOGWwu3O1zLSGPExtV05f5UbrxKbZ2dP37GTAKsRYv6Pg9VhPQikvDdXUjcG5PUls
-         NuSg3S0oxqn+j5Hidr5Sx0+doFKqb4FWJXbci1x3OPVLCBHCDj7lrf9fjgw+wVvYQGIW
-         shpH0goBUooh84bGNhq5v7/TOY4ZcR0pfheZKxhjP42Q1h94eJUgUtROkxpROyIzH0xQ
-         /nyA==
-X-Gm-Message-State: AOJu0YyvY7nn+yKceiwF70jdbeqVb07VKPxPHsZvySGiZ/UkvJFbh0JU
-	PLOAI6p9US0aPJKSMaUMJQyVkSJJ8yAVaj0lumUlj18v
-X-Google-Smtp-Source: AGHT+IGezgB3ZFieBoJfIZ2MA8SalePWRGnb2hFRUYFQbJSl6GQIgj86yvDhg7KLjrt3AEQC1IyZvSsTGOlOl4ASXzY=
-X-Received: by 2002:a2e:9e84:0:b0:2cc:88ad:dd6b with SMTP id
- f4-20020a2e9e84000000b002cc88addd6bmr1766149ljk.76.1704741087091; Mon, 08 Jan
- 2024 11:11:27 -0800 (PST)
+        bh=XNaXoD9prw+TMf7vR3/H5SQrElCx5I5cZfXaOBoOuIs=;
+        b=KVJVCHSUGEulXQrqwGoVVcRQtN7raf8RGxDV8tIGizGfSo1rc6qpT2a42durU++Y8B
+         RtcCRfS7F1HbEzPwR0n+jxfJrzNSLJmU4QC+a7Xmg6mANW+28r5UB8BLg3tIUcjjNQr5
+         yEpIHIG5CMkAHPBYmYLXHkq1+LUWEXbXK1iMIoaqKCZxM3D02nIUtvTkQbeCkg7vXbfw
+         mkFOUSUqsVo+aIsXkcR2qwcYOrCLvYJLjFB9r97u9BBXh4tk/059ITN41K3mxDjWUpAa
+         3QGX/T+Dui2mj67LZ1pikJB8FTrLFr+CwZRQLd/NQW2+j9FVWEEI5NhqtoF/78Jpm+s/
+         wKKA==
+X-Gm-Message-State: AOJu0YwcFA06w6OJFjeSDz5j6TUhW1ocv2Jux/D7f1nQI2WZERY7+5vW
+	zoici1382/89cgtp8Yei+pNWZPR0PI2NcKkDFiQ=
+X-Google-Smtp-Source: AGHT+IFPGxJimeRpzJMd95o6QI8rggtAvEJYoUJJgYP/Mw1L/pgo4qp5I8El6GOtn2hJoGU8wIaydZdRmuDOrEWS49c=
+X-Received: by 2002:a2e:b17c:0:b0:2cc:3f55:a4c1 with SMTP id
+ a28-20020a2eb17c000000b002cc3f55a4c1mr1852426ljm.100.1704741282404; Mon, 08
+ Jan 2024 11:14:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240108183938.468426-1-verdre@v0yd.nl> <20240108183938.468426-4-verdre@v0yd.nl>
-In-Reply-To: <20240108183938.468426-4-verdre@v0yd.nl>
+References: <20240108183938.468426-1-verdre@v0yd.nl> <20240108183938.468426-5-verdre@v0yd.nl>
+ <5d1f2013-5758-4d6c-8d01-e96a76bb2686@v0yd.nl> <40550fc1-3b5b-438c-891d-2da0f30874f3@v0yd.nl>
+In-Reply-To: <40550fc1-3b5b-438c-891d-2da0f30874f3@v0yd.nl>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 8 Jan 2024 14:11:14 -0500
-Message-ID: <CABBYNZJ7yUiQjvwjVnuSM79ZRiXU-KY7zoCNny1F6UBwJofk6Q@mail.gmail.com>
-Subject: Re: [PATCH v2 3/4] Bluetooth: hci_conn: Only do ACL connections sequentially
+Date: Mon, 8 Jan 2024 14:14:29 -0500
+Message-ID: <CABBYNZKV8SujJ7GFUqTMXUskE=yK0q=opmwvTZNEpPb=JkiQbA@mail.gmail.com>
+Subject: Re: [PATCH v2 4/4] Bluetooth: Remove pending ACL connection attempts
 To: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
 Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
 	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -60,151 +61,174 @@ Content-Transfer-Encoding: quoted-printable
 
 Hi Jonas,
 
-On Mon, Jan 8, 2024 at 1:39=E2=80=AFPM Jonas Dre=C3=9Fler <verdre@v0yd.nl> =
+On Mon, Jan 8, 2024 at 1:55=E2=80=AFPM Jonas Dre=C3=9Fler <verdre@v0yd.nl> =
 wrote:
 >
-> Pretty much all bluetooth chipsets only support paging a single device at
-> a time, and if they don't reject a secondary "Create Connection" request
-> while another is still ongoing, they'll most likely serialize those
-> requests in the firware.
->
-> With commit 4c67bc74f016 ("[Bluetooth] Support concurrent connect
-> requests") we started adding some serialization of our own in case the
-> adapter returns "Command Disallowed" HCI error.
->
-> This commit was using the BT_CONNECT2 state for the serialization, this
-> state is also used for a few more things (most notably to indicate we're
-> waiting for an inquiry to cancel) and therefore a bit unreliable. Also
-> not all BT firwares would respond with "Command Disallowed" on too many
-> connection requests, some will also respond with "Hardware Failure"
-> (BCM4378), and others will error out later and send a "Connect Complete"
-> event with error "Rejected Limited Resources" (Marvell 88W8897).
->
-> We can clean things up a bit and also make the serialization more reliabl=
+> On 1/8/24 19:44, Jonas Dre=C3=9Fler wrote:
+> > On 1/8/24 19:39, Jonas Dre=C3=9Fler wrote:
+> >> With the last commit we moved to using the hci_sync queue for "Create
+> >> Connection" requests, removing the need for retrying the paging after
+> >> finished/failed "Create Connection" requests and after the end of
+> >> inquiries.
+> >>
+> >> hci_conn_check_pending() was used to trigger this retry, we can remove=
+ it
+> >> now.
+> >>
+> >> Note that we can also remove the special handling for COMMAND_DISALLOW=
+ED
+> >> errors in the completion handler of "Create Connection", because "Crea=
+te
+> >> Connection" requests are now always serialized.
+> >>
+> >> This is somewhat reverting commit 4c67bc74f016 ("[Bluetooth] Support
+> >> concurrent connect requests").
+> >>
+> >> With this, the BT_CONNECT2 state of ACL hci_conn objects should now be
+> >> back to meaning only one thing: That we received a connection request
+> >> from another device (see hci_conn_request_evt), but the actual connect
+> >> should be deferred.
+> >> ---
+> >>   include/net/bluetooth/hci_core.h |  1 -
+> >>   net/bluetooth/hci_conn.c         | 16 ----------------
+> >>   net/bluetooth/hci_event.c        | 21 ++++-----------------
+> >>   3 files changed, 4 insertions(+), 34 deletions(-)
+> >>
+> >> diff --git a/include/net/bluetooth/hci_core.h
+> >> b/include/net/bluetooth/hci_core.h
+> >> index 2c30834c1..d7483958d 100644
+> >> --- a/include/net/bluetooth/hci_core.h
+> >> +++ b/include/net/bluetooth/hci_core.h
+> >> @@ -1330,7 +1330,6 @@ struct hci_conn *hci_conn_add(struct hci_dev
+> >> *hdev, int type, bdaddr_t *dst,
+> >>                     u8 role);
+> >>   void hci_conn_del(struct hci_conn *conn);
+> >>   void hci_conn_hash_flush(struct hci_dev *hdev);
+> >> -void hci_conn_check_pending(struct hci_dev *hdev);
+> >>   struct hci_chan *hci_chan_create(struct hci_conn *conn);
+> >>   void hci_chan_del(struct hci_chan *chan);
+> >> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> >> index 541d55301..22033057b 100644
+> >> --- a/net/bluetooth/hci_conn.c
+> >> +++ b/net/bluetooth/hci_conn.c
+> >> @@ -2534,22 +2534,6 @@ void hci_conn_hash_flush(struct hci_dev *hdev)
+> >>       }
+> >>   }
+> >> -/* Check pending connect attempts */
+> >> -void hci_conn_check_pending(struct hci_dev *hdev)
+> >> -{
+> >> -    struct hci_conn *conn;
+> >> -
+> >> -    BT_DBG("hdev %s", hdev->name);
+> >> -
+> >> -    hci_dev_lock(hdev);
+> >> -
+> >> -    conn =3D hci_conn_hash_lookup_state(hdev, ACL_LINK, BT_CONNECT2);
+> >> -    if (conn)
+> >> -        hci_cmd_sync_queue(hdev, hci_acl_create_connection_sync,
+> >> conn, NULL);
+> >> -
+> >> -    hci_dev_unlock(hdev);
+> >> -}
+> >> -
+> >>   static u32 get_link_mode(struct hci_conn *conn)
+> >>   {
+> >>       u32 link_mode =3D 0;
+> >> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> >> index e8b4a0126..91973d6d1 100644
+> >> --- a/net/bluetooth/hci_event.c
+> >> +++ b/net/bluetooth/hci_event.c
+> >> @@ -117,8 +117,6 @@ static u8 hci_cc_inquiry_cancel(struct hci_dev
+> >> *hdev, void *data,
+> >>           hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+> >>       hci_dev_unlock(hdev);
+> >> -    hci_conn_check_pending(hdev);
+> >> -
+> >>       return rp->status;
+> >>   }
+> >> @@ -149,8 +147,6 @@ static u8 hci_cc_exit_periodic_inq(struct hci_dev
+> >> *hdev, void *data,
+> >>       hci_dev_clear_flag(hdev, HCI_PERIODIC_INQ);
+> >> -    hci_conn_check_pending(hdev);
+> >> -
+> >>       return rp->status;
+> >>   }
+> >> @@ -2296,10 +2292,8 @@ static void hci_cs_inquiry(struct hci_dev
+> >> *hdev, __u8 status)
+> >>   {
+> >>       bt_dev_dbg(hdev, "status 0x%2.2x", status);
+> >> -    if (status) {
+> >> -        hci_conn_check_pending(hdev);
+> >> +    if (status)
+> >>           return;
+> >> -    }
+> >>       set_bit(HCI_INQUIRY, &hdev->flags);
+> >>   }
+> >> @@ -2323,12 +2317,9 @@ static void hci_cs_create_conn(struct hci_dev
+> >> *hdev, __u8 status)
+> >>       if (status) {
+> >>           if (conn && conn->state =3D=3D BT_CONNECT) {
+> >> -            if (status !=3D HCI_ERROR_COMMAND_DISALLOWED ||
+> >> conn->attempt > 2) {
+> >> -                conn->state =3D BT_CLOSED;
+> >> -                hci_connect_cfm(conn, status);
+> >> -                hci_conn_del(conn);
+> >> -            } else
+> >> -                conn->state =3D BT_CONNECT2;
+> >> +            conn->state =3D BT_CLOSED;
+> >> +            hci_connect_cfm(conn, status);
+> >> +            hci_conn_del(conn);
+> >>           }
+> >>       } else {
+> >>           if (!conn) {
+> >> @@ -3020,8 +3011,6 @@ static void hci_inquiry_complete_evt(struct
+> >> hci_dev *hdev, void *data,
+> >>       bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
+> >> -    hci_conn_check_pending(hdev);
+> >> -
+> >>       if (!test_and_clear_bit(HCI_INQUIRY, &hdev->flags))
+> >>           return;
+> >> @@ -3247,8 +3236,6 @@ static void hci_conn_complete_evt(struct hci_dev
+> >> *hdev, void *data,
+> >>   unlock:
+> >>       hci_dev_unlock(hdev);
+> >> -
+> >> -    hci_conn_check_pending(hdev);
+> >>   }
+> >>   static void hci_reject_conn(struct hci_dev *hdev, bdaddr_t *bdaddr)
+> >
+> > Please take a special look at this one: I'm not sure if I'm breaking th=
 e
-> by using our hci_sync machinery to always do "Create Connection" requests
-> in a sequential manner.
+> > functionality of deferred connecting using BT_CONNECT2 in
+> > hci_conn_request_evt() here, as I don't see anywhere where we check for
+> > this state and establish a connection later.
+> >
+> > It seems that this is how hci_conn_request_evt() was initially written
+> > though, hci_conn_check_pending() only got introduced later and seems
+> > unrelated.
 >
-> This is very similar to what we're already doing for establishing LE
-> connections, and it works well there.
-> ---
->  include/net/bluetooth/hci.h |  1 +
->  net/bluetooth/hci_conn.c    | 37 ++++++++++++++++++++++++++-----------
->  2 files changed, 27 insertions(+), 11 deletions(-)
+> Ahh nevermind... The check for BT_CONNECT2 on "Conn Complete event" got
+> introduced with 4c67bc74f01 ([Bluetooth] Support concurrent connect
+> requests). And later the deferred connection setup on "Conn Request
+> event" got introduced with 20714bfef8 ("Bluetooth: Implement deferred
+> sco socket setup").
 >
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index fef723afd..f2bbc0a14 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -427,6 +427,7 @@ enum {
->  #define HCI_ACL_TX_TIMEOUT     msecs_to_jiffies(45000) /* 45 seconds */
->  #define HCI_AUTO_OFF_TIMEOUT   msecs_to_jiffies(2000)  /* 2 seconds */
->  #define HCI_POWER_OFF_TIMEOUT  msecs_to_jiffies(5000)  /* 5 seconds */
-> +#define HCI_ACL_CONN_TIMEOUT   msecs_to_jiffies(20000) /* 20 seconds */
->  #define HCI_LE_CONN_TIMEOUT    msecs_to_jiffies(20000) /* 20 seconds */
->  #define HCI_LE_AUTOCONN_TIMEOUT        msecs_to_jiffies(4000)  /* 4 seco=
-nds */
->
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 76222565e..541d55301 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -229,11 +229,12 @@ static void hci_connect_le_scan_remove(struct hci_c=
-onn *conn)
->         schedule_work(&conn->le_scan_cleanup);
->  }
->
-> -static void hci_acl_create_connection(struct hci_conn *conn)
-> +static int hci_acl_create_connection_sync(struct hci_dev *hdev, void *da=
-ta)
+> I assume the latter commit was relying on the "Create Connection"
+> request "Conn Complete event" that got introduced with the former commit
+> then? That would imply that we use BT_CONNECT2 if there's already a
+> "Create Connection" going on when the "Conn Request event" happens, and
+> we must wait for that existing request to finish.. Is that how those
+> deferred connections are supposed to work?
 
-Move the above function to hci_sync.c so it is simpler to reuse it in
-the future.
+Well if you are not sure that works we better make sure we have tests
+that cover this, for LE I know for sure it works because we have the
+likes of iso-tester that do connect 2 peers simultaneously, but for
+classic I don't recall having any test that does multiple connections.
 
->  {
-> -       struct hci_dev *hdev =3D conn->hdev;
-> +       struct hci_conn *conn =3D data;
->         struct inquiry_entry *ie;
->         struct hci_cp_create_conn cp;
-> +       int err;
->
->         BT_DBG("hcon %p", conn);
->
-> @@ -246,12 +247,10 @@ static void hci_acl_create_connection(struct hci_co=
-nn *conn)
->          * request for discovery again when this flag becomes false.
->          */
->         if (test_bit(HCI_INQUIRY, &hdev->flags)) {
-> -               /* Put this connection to "pending" state so that it will=
- be
-> -                * executed after the inquiry cancel command complete eve=
-nt.
-> -                */
-> -               conn->state =3D BT_CONNECT2;
-> -               hci_send_cmd(hdev, HCI_OP_INQUIRY_CANCEL, 0, NULL);
-> -               return;
-> +               err =3D __hci_cmd_sync_status(hdev, HCI_OP_INQUIRY_CANCEL=
-, 0,
-> +                                           NULL, HCI_CMD_TIMEOUT);
-> +               if (err)
-> +                       bt_dev_warn(hdev, "Failed to cancel inquiry %d", =
-err);
->         }
->
->         conn->state =3D BT_CONNECT;
-> @@ -284,7 +283,15 @@ static void hci_acl_create_connection(struct hci_con=
-n *conn)
->         else
->                 cp.role_switch =3D 0x00;
->
-> -       hci_send_cmd(hdev, HCI_OP_CREATE_CONN, sizeof(cp), &cp);
-> +       err =3D __hci_cmd_sync_status_sk(hdev, HCI_OP_CREATE_CONN,
-> +                                      sizeof(cp), &cp,
-> +                                      HCI_EV_CONN_COMPLETE,
-> +                                      HCI_ACL_CONN_TIMEOUT, NULL);
-> +
-> +       if (err =3D=3D -ETIMEDOUT)
-> +               hci_abort_conn(conn, HCI_ERROR_LOCAL_HOST_TERM);
-> +
-> +       return err;
->  }
->
->  int hci_disconnect(struct hci_conn *conn, __u8 reason)
-> @@ -1622,10 +1629,18 @@ struct hci_conn *hci_connect_acl(struct hci_dev *=
-hdev, bdaddr_t *dst,
->
->         acl->conn_reason =3D conn_reason;
->         if (acl->state =3D=3D BT_OPEN || acl->state =3D=3D BT_CLOSED) {
-> +               int err;
-> +
->                 acl->sec_level =3D BT_SECURITY_LOW;
->                 acl->pending_sec_level =3D sec_level;
->                 acl->auth_type =3D auth_type;
-> -               hci_acl_create_connection(acl);
-> +
-> +               err =3D hci_cmd_sync_queue(hdev, hci_acl_create_connectio=
-n_sync,
-> +                                        acl, NULL);
-> +               if (err) {
-> +                       hci_conn_del(acl);
-> +                       return ERR_PTR(err);
-> +               }
->         }
->
->         return acl;
-> @@ -2530,7 +2545,7 @@ void hci_conn_check_pending(struct hci_dev *hdev)
->
->         conn =3D hci_conn_hash_lookup_state(hdev, ACL_LINK, BT_CONNECT2);
->         if (conn)
-> -               hci_acl_create_connection(conn);
-> +               hci_cmd_sync_queue(hdev, hci_acl_create_connection_sync, =
-conn, NULL);
->
->         hci_dev_unlock(hdev);
->  }
-> --
-> 2.43.0
->
+> >
+> > Thanks,
+> > Jonas
+
 
 
 --=20
