@@ -1,76 +1,95 @@
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9496C55E76;
-	Mon,  8 Jan 2024 18:16:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87BF154BD7
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jan 2024 18:29:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-50e7c6e3c63so2023279e87.3;
-        Mon, 08 Jan 2024 10:16:58 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dIHduy8D"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1d45f182fa2so18613545ad.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Jan 2024 10:29:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704738546; x=1705343346; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=2Yex3Ib8X+In+IqonO/+vb6TEwFCe+ccBsm7Q/O1QXU=;
+        b=dIHduy8DeQF9IZk+6kZmLN6PNX/C0SLlA6M7zGCIHHmFGpifcu0tW1hvDbMJ5+suEj
+         2Au7igMJvsEtkH0KRUFo9rveMbmAGJtb/Ce9KJKFcogZ9zRafzP2G4viCCAZrfDdmD7D
+         yk4fBOU3gAkqNOQGc7YAcdXl4XI9OPMJ/jddqZ+aZKrXydJE+8QaooUelwgbsbv2JOHj
+         TqSBty+SrD7KRaONH+1TKzryYE+pdfjmrz/e90OkvKZjWNgbJX59F5R5Wr1VuQPIUB3/
+         lk+22pv+301rtjW3CnWS1DDyCPM1Vk44qdcG++KUs1hMsCWxJ8wJckVHELicELoD7tp1
+         DIaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704737817; x=1705342617;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YiHTO+vMR9qnsdbgTZyf9dtHyg1qTnThJCI4YmGdW6U=;
-        b=KRjr0/N9bPExwkbNDT8QbqjiVvdE7pBYVUliadEXUaTSAmqWsx/OcgoAlGor7Bljn5
-         Elg6mSRAC1/mk3q/7qHtq0suzsnnl60I+vHvC9pZLbuXzWRI3TZEICqllMrJesV418zW
-         lKPf3MHxPPzGP0xFhdMlsTNZA8xSHroMZSs+2tp+jnUZk9t9xo16gFPGwMKCiu812h/S
-         x/PA+LD7wrWjFIPtv70WDakhd4Mxpv0HXp1CVP76to9UMwOLv24/i7ogA9ciNtGhHLjk
-         nnNGLwJ/lQRJFJbRxgk0qSn359EYWJS7i/8l1lZ5KfHBouhZma88Mr0Dr3PnZcL16hsR
-         zwSw==
-X-Gm-Message-State: AOJu0YzFzNRSxZgf9L4WMW58RoxoKOm8qWCnsSn2RBCawyOje+awANcD
-	xZJhP84zYvIw7/oK9Oaolqo=
-X-Google-Smtp-Source: AGHT+IF+F25Qmeh6335I+1JKl7zO64FInNZ+6zgj9dIV3yC7V1s4wbUCwngpLIm6oSvboG79MM8Cjg==
-X-Received: by 2002:a05:6512:2351:b0:50e:b2f0:3daa with SMTP id p17-20020a056512235100b0050eb2f03daamr1048297lfu.239.1704737816711;
-        Mon, 08 Jan 2024 10:16:56 -0800 (PST)
-Received: from localhost (fwdproxy-lla-000.fbsv.net. [2a03:2880:30ff::face:b00c])
-        by smtp.gmail.com with ESMTPSA id i22-20020a170906091600b00a28148beabdsm127836ejd.102.2024.01.08.10.16.56
+        d=1e100.net; s=20230601; t=1704738546; x=1705343346;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2Yex3Ib8X+In+IqonO/+vb6TEwFCe+ccBsm7Q/O1QXU=;
+        b=w+pZj0D1qn9Pb3lFsQ0SU1asHQKlglWJZozGvXHSNxqppHHqFCYiDalX9XiON6lZVM
+         DDXLxWzcboSdS/3ywhYnfWXOa+1fV2YV1yE3YDj/+YYZvPe/ml9HvM9mPeduroBUAQQ+
+         n8YLLX4OuX1fAvrQoIZb/GKX8cR+i2VB14JyncoXHmOlOEErnlwxMAGFjTAaFn27S8vI
+         0dZEkGjokA5qSJWRCVdN01qw6+zAK27mLpTpoonwgfpd29dxjHL8jfNXAEbxA0FksIgK
+         PxPv/lQrU8RM3ZCVGJrQXvNnGXYYSBYcrZH4Wab5Xa1RS6cPZAWO3+cgAOJxl+A/gqWu
+         aUyA==
+X-Gm-Message-State: AOJu0Yx/nINb62hDn3p/s5Ecv5WBqmgLRJ+7DO4+8MVprL5oOubM6TVI
+	9jV9MMUxSCngv86o8dzAkOiazA9aRJc=
+X-Google-Smtp-Source: AGHT+IHyc/G/noOn+fyZDyKUuU3chdYdj38mEe1VGBluS8+91n749MmdHhjH9L2KDJRT5N2+hQa6Cw==
+X-Received: by 2002:a17:903:1249:b0:1d4:54cc:d89e with SMTP id u9-20020a170903124900b001d454ccd89emr5925510plh.62.1704738546609;
+        Mon, 08 Jan 2024 10:29:06 -0800 (PST)
+Received: from [172.17.0.2] ([52.159.137.229])
+        by smtp.gmail.com with ESMTPSA id p5-20020a170902b08500b001d49d07eb10sm194460plr.218.2024.01.08.10.29.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jan 2024 10:16:56 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	Alexander Aring <alex.aring@gmail.com>
-Cc: netdev@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org (open list:6LOWPAN GENERIC (BTLE/IEEE 802.15.4)),
-	linux-wpan@vger.kernel.org (open list:6LOWPAN GENERIC (BTLE/IEEE 802.15.4)),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next 07/10] net: fill in MODULE_DESCRIPTION()s for 6LoWPAN
-Date: Mon,  8 Jan 2024 10:16:07 -0800
-Message-Id: <20240108181610.2697017-8-leitao@debian.org>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20240108181610.2697017-1-leitao@debian.org>
-References: <20240108181610.2697017-1-leitao@debian.org>
+        Mon, 08 Jan 2024 10:29:06 -0800 (PST)
+Message-ID: <659c3ef2.170a0220.51b9e.15f3@mx.google.com>
+Date: Mon, 08 Jan 2024 10:29:06 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1149285925734582140=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, silviu.barbulescu@nxp.com
+Subject: RE: Add support for multiple BISes
+In-Reply-To: <20240108164258.77332-2-silviu.barbulescu@nxp.com>
+References: <20240108164258.77332-2-silviu.barbulescu@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
-Add descriptions to IPv6 over Low power Wireless Personal Area Network.
+--===============1149285925734582140==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=815144
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      2.19 seconds
+GitLint                       PASS      0.65 seconds
+BuildEll                      PASS      23.75 seconds
+BluezMake                     PASS      712.69 seconds
+MakeCheck                     PASS      11.42 seconds
+MakeDistcheck                 PASS      161.34 seconds
+CheckValgrind                 PASS      221.40 seconds
+CheckSmatch                   PASS      326.86 seconds
+bluezmakeextell               PASS      106.26 seconds
+IncrementalBuild              PASS      2021.18 seconds
+ScanBuild                     PASS      941.29 seconds
+
+
+
 ---
- net/6lowpan/core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
-index 7b3341cef926..80d83151ef29 100644
---- a/net/6lowpan/core.c
-+++ b/net/6lowpan/core.c
-@@ -178,5 +178,5 @@ static void __exit lowpan_module_exit(void)
- 
- module_init(lowpan_module_init);
- module_exit(lowpan_module_exit);
--
-+MODULE_DESCRIPTION("IPv6 over Low power Wireless Personal Area Network module");
- MODULE_LICENSE("GPL");
--- 
-2.39.3
 
+--===============1149285925734582140==--
