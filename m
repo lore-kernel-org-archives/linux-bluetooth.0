@@ -1,122 +1,76 @@
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6958555E5A;
-	Mon,  8 Jan 2024 18:05:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9496C55E76;
+	Mon,  8 Jan 2024 18:16:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iqa5JyBj"
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2cd0f4f306fso24236581fa.0;
-        Mon, 08 Jan 2024 10:05:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704737114; x=1705341914; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=m3UVrTC07ELqxg07etwEf6qXVGPgDZ/12FKTrGxeD48=;
-        b=iqa5JyBj/NyspgcXT0prOt6utH2AET+vn/GX9dWhQbQlZ49J5Nzb8pjLGsCjW0flo/
-         2VlGiLqiLUuqDU8KoyrXFKWpmzifK1vijJB/DTlhyctwWpMe+VrkO4Yp6MQsmOy59s+h
-         o2TeI7xNSvSDSOPzk6F6pu3sCe2TxYi/P0xoHqk05x/Ci27iF8LVu8kaBP8z2Y1OhZnF
-         56YD0NkRBm02Rs5oGvFq8jxi+6ctU/FB2iCGKtubCcx6IujxHj2V1RLk4W6BQSX1H5+p
-         V7cMG1Li7KvdmtXqrDL44OBJDmuuR9xAf62vgmidYJWEmdy4R7V0VtZHDMcBdg6dRTPt
-         MjlQ==
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-50e7c6e3c63so2023279e87.3;
+        Mon, 08 Jan 2024 10:16:58 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704737114; x=1705341914;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1704737817; x=1705342617;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=m3UVrTC07ELqxg07etwEf6qXVGPgDZ/12FKTrGxeD48=;
-        b=IOaTt3vLPIX//reiFZSzAjiR9Md/zzEuPwmeAehDw61vX3g/r6gBjAsWmxTSF6DeTD
-         xogqvDYto+CHSLj+yror4vddRJ9oP48VuEgtm6OgLIBTA3mkEQuyXihL2004Qhm3CJ7r
-         2KbVSweq0/w68Ze2NoeCMzsLkFy4YX5eg0lbdvigRnX4Yl8uudAmrWquPmE7ZA2pFgV6
-         rGkscY6wjsA2XAlJl99tqumP2jz3qppyFV+aSk84XfLgB1NUuSpw8YB7eAI7aPif6awn
-         Z0V+1FTj23fSIyJ4+ofiRxWFz8Ih92RnJseQRRUAVu6zsxk8jVKPRhMkHQXlAfmmXJFY
-         AQTQ==
-X-Gm-Message-State: AOJu0YynxOUkauT3V4Z5gihy0wHotc1AyptmeZyrl0R7i2TZwIDcxv7L
-	yEfGJ+omENYLKaRwck5q1qirMh9yOZ8ajbpek60=
-X-Google-Smtp-Source: AGHT+IErJFChwpJeDSy4snncmEsk8rrbMMy7EVL/VN0pAXMi36cdPn2kfH83cxAhZU2KXGm06wd2Xo52ajIW0EozX3A=
-X-Received: by 2002:a2e:b7d5:0:b0:2cc:e68b:ee5e with SMTP id
- p21-20020a2eb7d5000000b002cce68bee5emr1708726ljo.1.1704737114025; Mon, 08 Jan
- 2024 10:05:14 -0800 (PST)
+        bh=YiHTO+vMR9qnsdbgTZyf9dtHyg1qTnThJCI4YmGdW6U=;
+        b=KRjr0/N9bPExwkbNDT8QbqjiVvdE7pBYVUliadEXUaTSAmqWsx/OcgoAlGor7Bljn5
+         Elg6mSRAC1/mk3q/7qHtq0suzsnnl60I+vHvC9pZLbuXzWRI3TZEICqllMrJesV418zW
+         lKPf3MHxPPzGP0xFhdMlsTNZA8xSHroMZSs+2tp+jnUZk9t9xo16gFPGwMKCiu812h/S
+         x/PA+LD7wrWjFIPtv70WDakhd4Mxpv0HXp1CVP76to9UMwOLv24/i7ogA9ciNtGhHLjk
+         nnNGLwJ/lQRJFJbRxgk0qSn359EYWJS7i/8l1lZ5KfHBouhZma88Mr0Dr3PnZcL16hsR
+         zwSw==
+X-Gm-Message-State: AOJu0YzFzNRSxZgf9L4WMW58RoxoKOm8qWCnsSn2RBCawyOje+awANcD
+	xZJhP84zYvIw7/oK9Oaolqo=
+X-Google-Smtp-Source: AGHT+IF+F25Qmeh6335I+1JKl7zO64FInNZ+6zgj9dIV3yC7V1s4wbUCwngpLIm6oSvboG79MM8Cjg==
+X-Received: by 2002:a05:6512:2351:b0:50e:b2f0:3daa with SMTP id p17-20020a056512235100b0050eb2f03daamr1048297lfu.239.1704737816711;
+        Mon, 08 Jan 2024 10:16:56 -0800 (PST)
+Received: from localhost (fwdproxy-lla-000.fbsv.net. [2a03:2880:30ff::face:b00c])
+        by smtp.gmail.com with ESMTPSA id i22-20020a170906091600b00a28148beabdsm127836ejd.102.2024.01.08.10.16.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Jan 2024 10:16:56 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	Alexander Aring <alex.aring@gmail.com>
+Cc: netdev@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org (open list:6LOWPAN GENERIC (BTLE/IEEE 802.15.4)),
+	linux-wpan@vger.kernel.org (open list:6LOWPAN GENERIC (BTLE/IEEE 802.15.4)),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net-next 07/10] net: fill in MODULE_DESCRIPTION()s for 6LoWPAN
+Date: Mon,  8 Jan 2024 10:16:07 -0800
+Message-Id: <20240108181610.2697017-8-leitao@debian.org>
+X-Mailer: git-send-email 2.39.3
+In-Reply-To: <20240108181610.2697017-1-leitao@debian.org>
+References: <20240108181610.2697017-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240107180252.73436-1-verdre@v0yd.nl>
-In-Reply-To: <20240107180252.73436-1-verdre@v0yd.nl>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 8 Jan 2024 13:05:01 -0500
-Message-ID: <CABBYNZ+rDo6ftN1+HdeWm6gij14YF_19WGRP7LM4Vjw-UWOTng@mail.gmail.com>
-Subject: Re: [PATCH v3 0/4] Disconnect devices before rfkilling adapter
-To: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, asahi@lists.linux.dev, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Jonas,
+W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
+Add descriptions to IPv6 over Low power Wireless Personal Area Network.
 
-On Sun, Jan 7, 2024 at 1:03=E2=80=AFPM Jonas Dre=C3=9Fler <verdre@v0yd.nl> =
-wrote:
->
-> Apparently the firmware is supposed to power off the bluetooth card
-> properly, including disconnecting devices, when we use rfkill to block
-> bluetooth. This doesn't work on a lot of laptops though, leading to weird
-> issues after turning off bluetooth, like the connection timing out on the
-> peripherals which were connected, and bluetooth not connecting properly
-> when the adapter is turned on again after rfkilling.
->
-> This series uses the rfkill hook in the bluetooth subsystem
-> to execute a few more shutdown commands and make sure that all
-> devices get disconnected before we close the HCI connection to the adapte=
-r.
->
-> ---
->
-> v1: https://lore.kernel.org/linux-bluetooth/20240102133311.6712-1-verdre@=
-v0yd.nl/
-> v2: https://lore.kernel.org/linux-bluetooth/20240102181946.57288-1-verdre=
-@v0yd.nl/
-> v3:
->  - Update commit message titles to reflect what's actually happening
->    (disconnecting devices, not sending a power-off command).
->  - Doing the shutdown sequence synchronously instead of async now.
->  - Move HCI_RFKILLED flag back again to be set before shutdown.
->  - Added a "fallback" hci_dev_do_close() to the error path because
->    hci_set_powered_sync() might bail-out early on error.
->
-> Jonas Dre=C3=9Fler (4):
->   Bluetooth: Remove HCI_POWER_OFF_TIMEOUT
->   Bluetooth: mgmt: Remove leftover queuing of power_off work
->   Bluetooth: Add new state HCI_POWERING_DOWN
->   Bluetooth: Disconnect connected devices before rfkilling adapter
->
->  include/net/bluetooth/hci.h |  2 +-
->  net/bluetooth/hci_core.c    | 35 +++++++++++++++++++++++++++++++++--
->  net/bluetooth/hci_sync.c    | 16 +++++++++++-----
->  net/bluetooth/mgmt.c        | 30 ++++++++++++++----------------
->  4 files changed, 59 insertions(+), 24 deletions(-)
->
-> --
-> 2.43.0
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+ net/6lowpan/core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I will probably be applying this sortly, but let's try to add tests to
-mgmt-tester just to make sure we don't introduce regressions later,
-btw it seems there are a few suspend test that do connect, for
-example:
+diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
+index 7b3341cef926..80d83151ef29 100644
+--- a/net/6lowpan/core.c
++++ b/net/6lowpan/core.c
+@@ -178,5 +178,5 @@ static void __exit lowpan_module_exit(void)
+ 
+ module_init(lowpan_module_init);
+ module_exit(lowpan_module_exit);
+-
++MODULE_DESCRIPTION("IPv6 over Low power Wireless Personal Area Network module");
+ MODULE_LICENSE("GPL");
+-- 
+2.39.3
 
-Suspend - Success 5 (Pairing - Legacy) - waiting 1 seconds
-random: crng init done
-  New connection with handle 0x002a
-  Test condition complete, 1 left
-Suspend - Success 5 (Pairing - Legacy) - waiting done
-  Set the system into Suspend via force_suspend
-  New Controller Suspend event received
-  Test condition complete, 0 left
-
---=20
-Luiz Augusto von Dentz
