@@ -1,170 +1,88 @@
-Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44C1E56B87;
-	Mon,  8 Jan 2024 22:46:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=v0yd.nl
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4T88LZ21cwz9sQp;
-	Mon,  8 Jan 2024 23:46:30 +0100 (CET)
-From: =?UTF-8?q?Jonas=20Dre=C3=9Fler?= <verdre@v0yd.nl>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: =?UTF-8?q?Jonas=20Dre=C3=9Fler?= <verdre@v0yd.nl>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v3 4/4] Bluetooth: Remove pending ACL connection attempts
-Date: Mon,  8 Jan 2024 23:46:09 +0100
-Message-ID: <20240108224614.56900-5-verdre@v0yd.nl>
-In-Reply-To: <20240108224614.56900-1-verdre@v0yd.nl>
-References: <20240108224614.56900-1-verdre@v0yd.nl>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2805F2EB12
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jan 2024 23:13:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gFCaZTmM"
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-5bdbe2de25fso1823411a12.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Jan 2024 15:13:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704755585; x=1705360385; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=dA1LlVcElJ+6skV07iOOGkwgYrV00Mmu2mijbtB9ADc=;
+        b=gFCaZTmM52ZAASqvl0vNEo0aKeaE9NN6vzc51RWjXnFx/No/opgMspyy931UBm0J0u
+         ANOxWEKEBswSyDJheBQ1pqTSMbsByDPycqnQajolrnwibLqIQZv5O8BIFSv2WLna/WK4
+         oTY+8SbYnvtKzYXPRyo+w/6aCI8HVrvxyDOLbwCJ4ljfNs1E7aRvXdU8gK5Tj0M5gmI3
+         iYpzcWq9SDaScEUSJzQD2KvVqAQg16a7sUIgX/zDpiKpeOKgEbMNRvw0Y3oZhmOvVD66
+         ovb+g/V7MTZ7ZIaxIkpKch8fpvdxBhjTuyArBxtvVrZxNiPIrLD1liFeZl3f43BpJRrM
+         cL2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704755585; x=1705360385;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dA1LlVcElJ+6skV07iOOGkwgYrV00Mmu2mijbtB9ADc=;
+        b=LBoKDrVuacAD3eL4/nKmaKMweqLcn40+t052tVN8e1/TFg2KNUiGWPquHhkq2kQyGv
+         5THH6wt/qoiH0RG+IorWQPgUV5pgXlnx3o5kMYJvpf803ZmZ7UL0tdYOQia3Cdk+UFK7
+         WAlTwxSlrwn6Ef9fm3WWC+ptvR5MY06uqZeJsoK/5gm7AYFZKYCMnyV9g0OuMubKURKb
+         FUqhbTdaBZkN8cwJRgToqJl+jQqcDijpxevSFFcEQ+T8kpxQyotWYggISCYDOEg1FedK
+         ojrD7lFNva+NCelQhYOvaX3+HPj/dFkLhkWFoGhcRTjgsTmg9TWM3ysAWvJdXTzB9v45
+         uCqw==
+X-Gm-Message-State: AOJu0YzJEg0ar+Ne+oj5FSP8hdgnMCoNbTowv6xIiqS/7qTQwlzkkqmR
+	rjZeTUsvgLyoF2tTahQWzU74kBcLydI=
+X-Google-Smtp-Source: AGHT+IEyUFEh4bCHaVH1e5eGR7M9hDUZ+McVV4Dmj7Oc6nMh1KB55JBSu61WNFRzcovsqD1FKmQGqg==
+X-Received: by 2002:a05:6a20:3a84:b0:199:9a0b:ab2f with SMTP id d4-20020a056a203a8400b001999a0bab2fmr3424283pzh.4.1704755585002;
+        Mon, 08 Jan 2024 15:13:05 -0800 (PST)
+Received: from [172.17.0.2] ([20.172.5.211])
+        by smtp.gmail.com with ESMTPSA id v66-20020a626145000000b006d9ac70682bsm409574pfb.167.2024.01.08.15.13.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Jan 2024 15:13:04 -0800 (PST)
+Message-ID: <659c8180.620a0220.1d787.323c@mx.google.com>
+Date: Mon, 08 Jan 2024 15:13:04 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1936266157436193971=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4T88LZ21cwz9sQp
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, verdre@v0yd.nl
+Subject: RE: Bluetooth: Improve retrying of connection attempts
+In-Reply-To: <20240108224614.56900-2-verdre@v0yd.nl>
+References: <20240108224614.56900-2-verdre@v0yd.nl>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-With the last commit we moved to using the hci_sync queue for "Create
-Connection" requests, removing the need for retrying the paging after
-finished/failed "Create Connection" requests and after the end of
-inquiries.
+--===============1936266157436193971==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-hci_conn_check_pending() was used to trigger this retry, we can remove it
-now.
+This is an automated email and please do not reply to this email.
 
-Note that we can also remove the special handling for COMMAND_DISALLOWED
-errors in the completion handler of "Create Connection", because "Create
-Connection" requests are now always serialized.
+Dear Submitter,
 
-This is somewhat reverting commit 4c67bc74f016 ("[Bluetooth] Support
-concurrent connect requests").
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-With this, the BT_CONNECT2 state of ACL hci_conn objects should now be
-back to meaning only one thing: That we received a "Connection Request"
-from another device (see hci_conn_request_evt), but the response to that
-is going to be deferred.
+----- Output -----
+
+error: patch failed: include/net/bluetooth/hci.h:437
+error: include/net/bluetooth/hci.h: patch does not apply
+error: patch failed: net/bluetooth/hci_conn.c:178
+error: net/bluetooth/hci_conn.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- include/net/bluetooth/hci_core.h |  1 -
- net/bluetooth/hci_conn.c         | 16 ----------------
- net/bluetooth/hci_event.c        | 21 ++++-----------------
- 3 files changed, 4 insertions(+), 34 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index c33348ba1..7a922767d 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1429,7 +1429,6 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 			      u8 role);
- void hci_conn_del(struct hci_conn *conn);
- void hci_conn_hash_flush(struct hci_dev *hdev);
--void hci_conn_check_pending(struct hci_dev *hdev);
- 
- struct hci_chan *hci_chan_create(struct hci_conn *conn);
- void hci_chan_del(struct hci_chan *chan);
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index c9a5734fc..123a3f82f 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -2518,22 +2518,6 @@ void hci_conn_hash_flush(struct hci_dev *hdev)
- 	}
- }
- 
--/* Check pending connect attempts */
--void hci_conn_check_pending(struct hci_dev *hdev)
--{
--	struct hci_conn *conn;
--
--	BT_DBG("hdev %s", hdev->name);
--
--	hci_dev_lock(hdev);
--
--	conn = hci_conn_hash_lookup_state(hdev, ACL_LINK, BT_CONNECT2);
--	if (conn)
--		hci_acl_create_connection_sync(hdev, conn);
--
--	hci_dev_unlock(hdev);
--}
--
- static u32 get_link_mode(struct hci_conn *conn)
- {
- 	u32 link_mode = 0;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index dcbba1521..5e13b8d54 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -120,8 +120,6 @@ static u8 hci_cc_inquiry_cancel(struct hci_dev *hdev, void *data,
- 		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
- 	hci_dev_unlock(hdev);
- 
--	hci_conn_check_pending(hdev);
--
- 	return rp->status;
- }
- 
-@@ -152,8 +150,6 @@ static u8 hci_cc_exit_periodic_inq(struct hci_dev *hdev, void *data,
- 
- 	hci_dev_clear_flag(hdev, HCI_PERIODIC_INQ);
- 
--	hci_conn_check_pending(hdev);
--
- 	return rp->status;
- }
- 
-@@ -2299,10 +2295,8 @@ static void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
- {
- 	bt_dev_dbg(hdev, "status 0x%2.2x", status);
- 
--	if (status) {
--		hci_conn_check_pending(hdev);
-+	if (status)
- 		return;
--	}
- 
- 	set_bit(HCI_INQUIRY, &hdev->flags);
- }
-@@ -2326,12 +2320,9 @@ static void hci_cs_create_conn(struct hci_dev *hdev, __u8 status)
- 
- 	if (status) {
- 		if (conn && conn->state == BT_CONNECT) {
--			if (status != HCI_ERROR_COMMAND_DISALLOWED || conn->attempt > 2) {
--				conn->state = BT_CLOSED;
--				hci_connect_cfm(conn, status);
--				hci_conn_del(conn);
--			} else
--				conn->state = BT_CONNECT2;
-+			conn->state = BT_CLOSED;
-+			hci_connect_cfm(conn, status);
-+			hci_conn_del(conn);
- 		}
- 	} else {
- 		if (!conn) {
-@@ -3023,8 +3014,6 @@ static void hci_inquiry_complete_evt(struct hci_dev *hdev, void *data,
- 
- 	bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
- 
--	hci_conn_check_pending(hdev);
--
- 	if (!test_and_clear_bit(HCI_INQUIRY, &hdev->flags))
- 		return;
- 
-@@ -3246,8 +3235,6 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
- 
- unlock:
- 	hci_dev_unlock(hdev);
--
--	hci_conn_check_pending(hdev);
- }
- 
- static void hci_reject_conn(struct hci_dev *hdev, bdaddr_t *bdaddr)
--- 
-2.43.0
 
+--===============1936266157436193971==--
