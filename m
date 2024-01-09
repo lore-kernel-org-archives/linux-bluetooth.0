@@ -1,159 +1,115 @@
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E1AF3BB53;
-	Tue,  9 Jan 2024 17:54:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34E593BB24
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jan 2024 17:55:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XMT42gRL"
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2ccea11b6bbso30559701fa.0;
-        Tue, 09 Jan 2024 09:54:11 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bDePQSSc"
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-783269124a8so130819285a.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jan 2024 09:55:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704822849; x=1705427649; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gIbyrPSKsQbDcDQfXkpDHHC7/9eaZRTzW2YiXQnsBHA=;
-        b=XMT42gRLyyTFYpjM96K12626QWAiAgXekewyZ2Jogf88gRAu9OYhWNTyK3aocMFiU1
-         T1tqYO9cUXBq0LrtsSG97sqhw62W9HROwsvdATzbLzAZkdJDpTnGf1Hn7iQ0YNx6B/DB
-         9sjASChdO0ra8pXyOhQrwSOChdgCVzbyylzGNKv4aOZDdMw9bDRYQhzyYKYvQbEYxE3o
-         VZmDvISrYNtoLCXPPMdKGJg8uMMBe7KVRHYjlyYd6tGrf/UJmvyaJy8dMknEZO1FVF+h
-         TwBtD+C4+xD7JX591zgqwnH5OYiHQQ0oeJjQdHsKVR8k7SB9q2uPU7YyfDUseu1Kf/6m
-         1nXQ==
+        d=gmail.com; s=20230601; t=1704822948; x=1705427748; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=VCMtQgC1AT5Ci2r2xuX0GcJco4v3mVtSHTcmD5JFgM4=;
+        b=bDePQSSc0JkBF1SwNMe0d7cAloTYBrVs3T2If1YHA7ddBTdwBeu01Fo1hsSatZN0uH
+         LNLd/kybZ7yHUIDBjeL+2P2vavhhVU9f6dO6/VIntUgv+Qv+FbFuxp7QmYWRON/617Qi
+         +hmcq2iJeRqNQLS9qBAjwSkxzq+zAzWnN8xQm79E6rZy8cOqRWyG89QTZqirYE6XEKiE
+         TSax6dGd8nInNW9UOGFrTICRdZuPUgsydEjFPdSbdkdf/mnibyBt2QvF8ln2jCasTgm5
+         /H/0VP0+z+RCGAiJKFDbXcWWOahdZK0Xs+xrW+HOX5n7/37/IPA9MG5qpVg9RnyemKtB
+         PNKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704822849; x=1705427649;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gIbyrPSKsQbDcDQfXkpDHHC7/9eaZRTzW2YiXQnsBHA=;
-        b=OwkjTJv90kQbpFiX+a6dYAMwPBoCcbsbVey4r7yn0rh8pDhq1XrT2OLOquNmZRVVg1
-         EJ9Le1naKUmRqRpW2xqP4wyAdm7ivA3HTvRmccyCfueZYEw5xmEICvUZtbeJNnraR5Wn
-         pwXwZnzojOQKyzH82OP0zfaBLaqfKMrqb1AexD+uQInK6Ja9wDbi1Pa8+6xHMEeaWfvj
-         wVcMrZTf2F9BXb0f3jfo1qFs7meEiSmkpz8MzzcvUq9YgPLEUtdypePYNPOYEK9qCe4g
-         uuMXHDJqCkDFhydOshLTATlynKTdDO1KIiEEP43o8zQhtD5l7EWyE4z3PvKFuMzEvNIQ
-         d/7g==
-X-Gm-Message-State: AOJu0YztWfbquwU8kwdOa6ivSTG3CptSKAmL/SlkE3Rcl9EiLTEM3DLo
-	fVwtcUcYIRXFUIaV8N2lcRx/EKwbBppilV5yXhs=
-X-Google-Smtp-Source: AGHT+IEAquitmm4I7dlVh6YzzaFvZ4MIqaJQdk5o3aYdijgf7VIyZgpHMCQj8qGGmTYobON22fBPCxUBWMEY6+X144o=
-X-Received: by 2002:a2e:9606:0:b0:2cc:78b7:1ef0 with SMTP id
- v6-20020a2e9606000000b002cc78b71ef0mr738949ljh.4.1704822849013; Tue, 09 Jan
- 2024 09:54:09 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704822948; x=1705427748;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VCMtQgC1AT5Ci2r2xuX0GcJco4v3mVtSHTcmD5JFgM4=;
+        b=NTGW3aNh3YRZnr7bD2xkMWSDH0jHzFkZBvhcTSylKTQYFRWnUdVKEea4ZlbPhdjGJ4
+         U/LAQVF7SuqOeMUXMKo1tDtE/BSzFO4ngoxRtd+9dQqsWrXWZ0YJJEXy9zeVrIL3ryEH
+         LCWFz9f0wMqO38s3Z5G7mjIcqIi7AU49U69euBbKo50v9qNoNmoGpQHEmUQiCaWorSpm
+         GOB8e4+zflcFuxxR0KAUqRxkyZyBZ5BeWa7dcGQH4E6XDBURpVg5za2kZEexLnbjHKng
+         LzBPN8BcKXut5HjSjBEufGCWjWCSv1bmR95BcRibnzGlZi54OjVq/BXlvz6LfeWY0sA6
+         gl8A==
+X-Gm-Message-State: AOJu0YwW7Z2GLXpXLyCGq+1eTS1lXNkG1/H0NXoARHYFbIkQDTiMx76J
+	kqJ/Y9GlxGOG44cub7pWRYuPhC2E/Ik=
+X-Google-Smtp-Source: AGHT+IGRV5++D0/WJq+ZiFlGFtoXWsCa8wb2jLu6hQzL3Fsaf9VW1kGSDFv5clKhRkwdHc+3CJvYcQ==
+X-Received: by 2002:a05:620a:b06:b0:783:3237:f779 with SMTP id t6-20020a05620a0b0600b007833237f779mr710748qkg.78.1704822947976;
+        Tue, 09 Jan 2024 09:55:47 -0800 (PST)
+Received: from [172.17.0.2] ([74.249.14.209])
+        by smtp.gmail.com with ESMTPSA id g12-20020a37e20c000000b0078327d52206sm970154qki.63.2024.01.09.09.55.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Jan 2024 09:55:47 -0800 (PST)
+Message-ID: <659d88a3.370a0220.f2f4b.553a@mx.google.com>
+Date: Tue, 09 Jan 2024 09:55:47 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5932456328982867859=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240108224614.56900-1-verdre@v0yd.nl>
-In-Reply-To: <20240108224614.56900-1-verdre@v0yd.nl>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 9 Jan 2024 12:53:56 -0500
-Message-ID: <CABBYNZKV176teECGnGKTCNNo45ZYbCRs=YddETOUMUsJQX5PdA@mail.gmail.com>
-Subject: Re: [PATCH v3 0/4] Bluetooth: Improve retrying of connection attempts
-To: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [RFC] Bluetooth: hci_event: Rework hci_store_wake_reason
+In-Reply-To: <20240109153041.403337-1-luiz.dentz@gmail.com>
+References: <20240109153041.403337-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Jonas,
+--===============5932456328982867859==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 8, 2024 at 5:46=E2=80=AFPM Jonas Dre=C3=9Fler <verdre@v0yd.nl> =
-wrote:
->
-> Since commit 4c67bc74f016 ("[Bluetooth] Support concurrent connect
-> requests"), the kernel supports trying to connect again in case the
-> bluetooth card is busy and fails to connect.
->
-> The logic that should handle this became a bit spotty over time, and also
-> cards these days appear to fail with more errors than just "Command
-> Disallowed".
->
-> This series refactores the handling of concurrent connection requests
-> by serializing all "Create Connection" commands for ACL connections
-> similar to how we do it for LE connections.
->
-> ---
->
-> v1: https://lore.kernel.org/linux-bluetooth/20240102185933.64179-1-verdre=
-@v0yd.nl/
-> v2: https://lore.kernel.org/linux-bluetooth/20240108183938.468426-1-verdr=
-e@v0yd.nl/
-> v3:
->   - Move the new sync function to hci_sync.c as requested by review
->   - Abort connection on failure using hci_abort_conn_sync() instead of
->     hci_abort_conn()
->   - Make the last commit message a bit more precise regarding the meaning
->     of BT_CONNECT2 state
->
-> Jonas Dre=C3=9Fler (4):
->   Bluetooth: Remove superfluous call to hci_conn_check_pending()
->   Bluetooth: hci_event: Use HCI error defines instead of magic values
->   Bluetooth: hci_conn: Only do ACL connections sequentially
->   Bluetooth: Remove pending ACL connection attempts
->
->  include/net/bluetooth/hci.h      |  3 ++
->  include/net/bluetooth/hci_core.h |  1 -
->  include/net/bluetooth/hci_sync.h |  3 ++
->  net/bluetooth/hci_conn.c         | 83 +++-----------------------------
->  net/bluetooth/hci_event.c        | 29 +++--------
->  net/bluetooth/hci_sync.c         | 72 +++++++++++++++++++++++++++
->  6 files changed, 93 insertions(+), 98 deletions(-)
->
-> --
-> 2.43.0
+This is automated email and please do not reply to this email!
 
-After rebasing and fixing a little bit here and there, see v4, looks
-like this changes is affecting the following mgmt-tester -s "Pair
-Device - Power off 1":
+Dear submitter,
 
-Pair Device - Power off 1 - init
-  Read Version callback
-    Status: Success (0x00)
-    Version 1.22
-  Read Commands callback
-    Status: Success (0x00)
-  Read Index List callback
-    Status: Success (0x00)
-  Index Added callback
-    Index: 0x0000
-  Enable management Mesh interface
-  Enabling Mesh feature
-  Read Info callback
-    Status: Success (0x00)
-    Address: 00:AA:01:00:00:00
-    Version: 0x09
-    Manufacturer: 0x05f1
-    Supported settings: 0x0001bfff
-    Current settings: 0x00000080
-    Class: 0x000000
-    Name:
-    Short name:
-  Mesh feature is enabled
-Pair Device - Power off 1 - setup
-  Setup sending Set Bondable (0x0009)
-  Setup sending Set Powered (0x0005)
-  Initial settings completed
-  Test setup condition added, total 1
-  Client set connectable: Success (0x00)
-  Test setup condition complete, 0 left
-Pair Device - Power off 1 - setup complete
-Pair Device - Power off 1 - run
-  Sending Pair Device (0x0019)
-Bluetooth: hci0: command 0x0405 tx timeout
-Bluetooth: hci0: command 0x0408 tx timeout
-  Test condition added, total 1
-Pair Device - Power off 1 - test timed out
-  Pair Device (0x0019): Disconnected (0x0e)
-Pair Device - Power off 1 - test not run
-Pair Device - Power off 1 - teardown
-Pair Device - Power off 1 - teardown
-  Index Removed callback
-    Index: 0x0000
-Pair Device - Power off 1 - teardown complete
-Pair Device - Power off 1 - done
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=815440
 
---=20
-Luiz Augusto von Dentz
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.67 seconds
+GitLint                       PASS      0.34 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      27.86 seconds
+CheckAllWarning               PASS      30.76 seconds
+CheckSparse                   WARNING   36.03 seconds
+CheckSmatch                   WARNING   99.10 seconds
+BuildKernel32                 PASS      27.23 seconds
+TestRunnerSetup               PASS      431.79 seconds
+TestRunner_l2cap-tester       PASS      22.75 seconds
+TestRunner_iso-tester         PASS      46.87 seconds
+TestRunner_bnep-tester        PASS      6.84 seconds
+TestRunner_mgmt-tester        PASS      161.82 seconds
+TestRunner_rfcomm-tester      PASS      10.68 seconds
+TestRunner_sco-tester         PASS      14.35 seconds
+TestRunner_ioctl-tester       PASS      12.01 seconds
+TestRunner_mesh-tester        PASS      8.81 seconds
+TestRunner_smp-tester         PASS      9.60 seconds
+TestRunner_userchan-tester    PASS      7.18 seconds
+IncrementalBuild              PASS      25.99 seconds
+
+Details
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============5932456328982867859==--
