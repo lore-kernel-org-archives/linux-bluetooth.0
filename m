@@ -1,24 +1,24 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95DDB3D0AB
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jan 2024 19:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95D903C694;
+	Tue,  9 Jan 2024 19:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gBiHI+rW"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2C2FDC433F1;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uaxuR2uH"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 27AF8C43390;
 	Tue,  9 Jan 2024 19:20:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1704828025;
-	bh=yzSvpNxULUN4HhNVTu2M8cVZH0J49Xg2rsBYcpmJpRk=;
+	bh=t3QNkdfJLG6lYFIiv569+bzNw/2O3SyoMY/KgOsqdU8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=gBiHI+rWjEaEU7xrIEmiBI2EG0MV59KyKk/PZyFoTFJtoiOUKC9z6X48PM/60Idvf
-	 qyzlmU2Y6S18WYtt6KHa+22QBmLpFJ8ymYTEMQbNd7aqF93EEAjeOIz0QqpOiPgoj9
-	 U/v8Fs4CqXjlkVe7e5l684UoujayRwi//sczaHYcre1F20IGSwQXtvNxR2eQKquVJy
-	 2PMnPlezjEKKwjxaQh1EDgjnq/CHST3Z0892mPNRqlem7syCdvYUKoaAPehljViaPK
-	 d8NRNGRe9UX5YHpkP2+UHGJ3SIT4tWmG9+ws2aIESBad1T2mKn+3k8PCRzP7i+lLZH
-	 m6nmPc55BsLSw==
+	b=uaxuR2uHKRM4tmJlizXx07h1RyuXLw8p1qI2OoNlb9kespMuLdh6Jpq8F5R08LfBe
+	 1bn9oo3q5zyinKqsAxOLw9tsaEE3sbRkMtqfVJ65YlVQ13VtBtjNRWmEPhBhJrFMY5
+	 09DRxOSqyI4DR0VyVTpna1rqFJo2DBxW+sTQs0osOUujxDf9mInr1E5x+UGGexTy2V
+	 2Mo2frA3iALyp2Bik0GZgVGCHBZkKBpapUbLoUl4VcIYIBaIlH7+NFnPKL/xs9ja/E
+	 ViF7R/SXGlJhiliiQ6e0vj/SMgnPmLEniPh4+6GuMsDUKdmnqTs+dt3JRMT67ssd5A
+	 owLkk3iZ8tW+A==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 15A95D8C970;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 09C89C4166F;
 	Tue,  9 Jan 2024 19:20:25 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -28,43 +28,42 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v4 1/4] Bluetooth: Remove superfluous call to
- hci_conn_check_pending()
+Subject: Re: [PATCH v3 0/4] Bluetooth: Improve retrying of connection attempts
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <170482802508.21245.5348672714363905301.git-patchwork-notify@kernel.org>
+ <170482802503.21245.5004430777144462822.git-patchwork-notify@kernel.org>
 Date: Tue, 09 Jan 2024 19:20:25 +0000
-References: <20240109174928.488595-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240109174928.488595-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+References: <20240108224614.56900-1-verdre@v0yd.nl>
+In-Reply-To: <20240108224614.56900-1-verdre@v0yd.nl>
+To: =?utf-8?q?Jonas_Dre=C3=9Fler_=3Cverdre=40v0yd=2Enl=3E?=@ci.codeaurora.org
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
 
 Hello:
 
 This series was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue,  9 Jan 2024 12:49:25 -0500 you wrote:
-> From: Jonas Dreßler <verdre@v0yd.nl>
+On Mon,  8 Jan 2024 23:46:05 +0100 you wrote:
+> Since commit 4c67bc74f016 ("[Bluetooth] Support concurrent connect
+> requests"), the kernel supports trying to connect again in case the
+> bluetooth card is busy and fails to connect.
 > 
-> The "pending connections" feature was originally introduced with commit
-> 4c67bc74f016 ("[Bluetooth] Support concurrent connect requests") and
-> 6bd57416127e ("[Bluetooth] Handling pending connect attempts after
-> inquiry") to handle controllers supporting only a single connection request
-> at a time. Later things were extended to also cancel ongoing inquiries on
-> connect() with commit 89e65975fea5 ("Bluetooth: Cancel Inquiry before
-> Create Connection").
+> The logic that should handle this became a bit spotty over time, and also
+> cards these days appear to fail with more errors than just "Command
+> Disallowed".
 > 
 > [...]
 
 Here is the summary with links:
-  - [v4,1/4] Bluetooth: Remove superfluous call to hci_conn_check_pending()
+  - [v3,1/4] Bluetooth: Remove superfluous call to hci_conn_check_pending()
     https://git.kernel.org/bluetooth/bluetooth-next/c/a7ee39bea315
-  - [v4,2/4] Bluetooth: hci_event: Use HCI error defines instead of magic values
+  - [v3,2/4] Bluetooth: hci_event: Use HCI error defines instead of magic values
     https://git.kernel.org/bluetooth/bluetooth-next/c/f8c47ee39e6d
-  - [v4,3/4] Bluetooth: hci_conn: Only do ACL connections sequentially
+  - [v3,3/4] Bluetooth: hci_conn: Only do ACL connections sequentially
     (no matching commit)
-  - [v4,4/4] Bluetooth: Remove pending ACL connection attempts
+  - [v3,4/4] Bluetooth: Remove pending ACL connection attempts
     (no matching commit)
 
 You are awesome, thank you!
