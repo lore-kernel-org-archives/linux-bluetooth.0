@@ -1,108 +1,146 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 792D63AC24;
-	Tue,  9 Jan 2024 16:45:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1BE439FFC
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jan 2024 16:51:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ix9Y77Z6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4571C433B1;
-	Tue,  9 Jan 2024 16:45:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704818726;
-	bh=ng8hG7XvXxuBXqWkTVtckgnpL1hNaS8M8BBMxELykF0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ix9Y77Z6oJ80/ZCA/7vON8O9Fv9tjqqPS1f6f14rcowhFxdxipFrbz6DT1TrCWX0e
-	 h8FpGiPxIm0/6JQVsY8VtRcNgeL/uXeXOPLqUoRIEnpRY4qbxLp8Y3NwUlRPMDsXS7
-	 fARXW95G3OcPAzWFAfQ/aJYdfYHk/y+xOgLGmkzcQmJWFTqnhymyWSgfL9VUnG2m1v
-	 meriOz9TxzzTVyFWD7PAIjoBAm6g+x//m/0d6iQtcPhd0im0S+B5O/jN2bmpWUtJzE
-	 9dsC980W0lc9t+eyeMQr8g1Jfw1Fbx+fiC2/MTWiW8p2q8dGBqWLBSVrQZDu2oYfAs
-	 oOmdEyhVzCTPQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="d98OVYiv"
+Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3608cfa5ce6so12158805ab.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jan 2024 08:51:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1704819060; x=1705423860; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uV5MEnsTPvblCSpnlyxwVtt9fk763n7/MDrWTIfZnok=;
+        b=d98OVYivllbnDuKnYQ2IRawOBiPUDUUCI8BkXAlC0/zoODQ46L+sHVPO4eUZo4wpAK
+         HRuKsEvnSPerUfpNfnToo47LtHj9b2Ad6KtimED8MdzJ49eYnvl6rTNR2vyOARaKf9D9
+         6vp+kWqvUUj3PiFJ7/SMYPKrqVVE/a6KuVkAg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704819060; x=1705423860;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uV5MEnsTPvblCSpnlyxwVtt9fk763n7/MDrWTIfZnok=;
+        b=j97KOHsO1vjJHoO/ESsaVA3HkmqqZEKxC0avx0lp/bewKzpuRgUC8u37Wzk8iGAthH
+         rOSVx2djwTfdCIV/ItN4l8PAsKbHYsQDdtue6kPwHpG5MLpZUYqlhemRreTB+UAKzSky
+         LhUlikOnQZAL6utbC3obphnk9iFVvp2qExKdPMw+b6bVzKpUIC2ogFB7PnEYWeUPhEuo
+         RbezR66J/Dzoonmo6Lz0MDBysNfiA4i1E7dkKj6cgzXltoJIxW4x3bkL1oSYMlFfOISA
+         9x0lc13e1P+T8TfJK5oiM4Km1yV+wOj01aLl1D1xGb1FmXPL4fSrFw3JQjJHoO3Kc6T0
+         yeaQ==
+X-Gm-Message-State: AOJu0Yxn/5nAxvHS08l1EPcPjf3OSJ4Q+K59uJ8p5oUmNNBpKsOkb3B9
+	gF3DJpl6oNakLvMQDEVWqlS7OuaSKcWz
+X-Google-Smtp-Source: AGHT+IHlU8waFtg4YB7aQ65CXpn+4z/PCbvQeBpftavO899tUFqMDX2wxm5vCuDdVh2D10JRxrXaZA==
+X-Received: by 2002:a92:ca09:0:b0:360:7c05:e479 with SMTP id j9-20020a92ca09000000b003607c05e479mr9251232ils.47.1704819059849;
+        Tue, 09 Jan 2024 08:50:59 -0800 (PST)
+Received: from localhost (110.41.72.34.bc.googleusercontent.com. [34.72.41.110])
+        by smtp.gmail.com with UTF8SMTPSA id t12-20020a92c90c000000b003607ff64574sm689592ilp.64.2024.01.09.08.50.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Jan 2024 08:50:59 -0800 (PST)
+Date: Tue, 9 Jan 2024 16:50:59 +0000
+From: Matthias Kaehlcke <mka@chromium.org>
+To: Johan Hovold <johan+linaro@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH net 5/7] MAINTAINERS: Bluetooth: retire Johan (for now?)
-Date: Tue,  9 Jan 2024 08:45:15 -0800
-Message-ID: <20240109164517.3063131-6-kuba@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240109164517.3063131-1-kuba@kernel.org>
-References: <20240109164517.3063131-1-kuba@kernel.org>
+	Bjorn Andersson <quic_bjorande@quicinc.com>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+	Doug Anderson <dianders@google.com>,
+	Stephen Boyd <swboyd@google.com>
+Subject: Re: [PATCH] Bluetooth: qca: fix device-address endianness
+Message-ID: <ZZ15c1HUQIH2cY5o@google.com>
+References: <20231227180306.6319-1-johan+linaro@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20231227180306.6319-1-johan+linaro@kernel.org>
 
-Johan moved to maintaining the Zephyr Bluetooth stack,
-and we haven't heard from him on the ML in 3 years
-(according to lore), and seen any tags in git in 4 years.
-Trade the MAINTAINER entry for CREDITS, we can revert
-whenever Johan comes back to Linux hacking :)
+Hi Johan,
 
-Subsystem BLUETOOTH SUBSYSTEM
-  Changes 173 / 986 (17%)
-  Last activity: 2023-12-22
-  Marcel Holtmann <marcel@holtmann.org>:
-    Author 91cb4c19118a 2022-01-27 00:00:00 52
-    Committer edcb185fa9c4 2022-05-23 00:00:00 446
-    Tags 000c2fa2c144 2023-04-23 00:00:00 523
-  Johan Hedberg <johan.hedberg@gmail.com>:
-  Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
-    Author d03376c18592 2023-12-22 00:00:00 241
-    Committer da9065caa594 2023-12-22 00:00:00 341
-    Tags da9065caa594 2023-12-22 00:00:00 493
-  Top reviewers:
-    [33]: alainm@chromium.org
-    [31]: mcchou@chromium.org
-    [27]: abhishekpandit@chromium.org
-  INACTIVE MAINTAINER Johan Hedberg <johan.hedberg@gmail.com>
+On Wed, Dec 27, 2023 at 07:03:06PM +0100, Johan Hovold wrote:
+> The WCN6855 firmware on the Lenovo ThinkPad X13s expects the Bluetooth
+> device address in MSB order when setting it using the
+> EDL_WRITE_BD_ADDR_OPCODE command.
+> 
+> Presumably, this is the case for all non-ROME devices which all use the
+> EDL_WRITE_BD_ADDR_OPCODE command for this (unlike the ROME devices which
+> use a different command and expect the address in LSB order).
+> 
+> Reverse the little-endian address before setting it to make sure that
+> the address can be configured using tools like btmgmt or using the
+> 'local-bd-address' devicetree property.
+> 
+> Note that this can potentially break systems with boot firmware which
+> has started relying on the broken behaviour and is incorrectly passing
+> the address via devicetree in MSB order.
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: Marcel Holtmann <marcel@holtmann.org>
-CC: Johan Hedberg <johan.hedberg@gmail.com>
-CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: linux-bluetooth@vger.kernel.org
----
- CREDITS     | 4 ++++
- MAINTAINERS | 1 -
- 2 files changed, 4 insertions(+), 1 deletion(-)
+We should not break existing devices. Their byte order for
+'local-bd-address' may not adhere to the 'spec', however in practice
+it is the correct format for existing kernels.
 
-diff --git a/CREDITS b/CREDITS
-index 18ce75d81234..1228f96110c4 100644
---- a/CREDITS
-+++ b/CREDITS
-@@ -1543,6 +1543,10 @@ N: Andrew Haylett
- E: ajh@primag.co.uk
- D: Selection mechanism
- 
-+N: Johan Hedberg
-+E: johan.hedberg@gmail.com
-+D: Bluetooth subsystem maintainer
-+
- N: Andre Hedrick
- E: andre@linux-ide.org
- E: andre@linuxdiskcert.org
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 1e375699ebb7..388fe7baf89a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3595,7 +3595,6 @@ F:	drivers/mtd/devices/block2mtd.c
- 
- BLUETOOTH DRIVERS
- M:	Marcel Holtmann <marcel@holtmann.org>
--M:	Johan Hedberg <johan.hedberg@gmail.com>
- M:	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
- L:	linux-bluetooth@vger.kernel.org
- S:	Supported
--- 
-2.43.0
+I suggest adding a quirk like 'local-bd-address-msb-quirk' or
+'qcom,local-bd-address-msb-quirk' to make sure existing devices keep
+working properly.
 
+Thanks
+
+Matthias
+
+> 
+> Fixes: 5c0a1001c8be ("Bluetooth: hci_qca: Add helper to set device address")
+> Cc: stable@vger.kernel.org      # 5.1
+> Cc: Balakrishna Godavarthi <quic_bgodavar@quicinc.com>
+> Cc: Matthias Kaehlcke <mka@chromium.org>
+> Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
+> ---
+> 
+> Hi Qualcomm people,
+> 
+> Could you please verify with your documentation that all non-ROME
+> devices expect the address provided in the EDL_WRITE_BD_ADDR_OPCODE
+> command in MSB order?
+> 
+> I assume this is not something that anyone would change between firmware
+> revisions, but if that turns out to be the case, we'd need to reverse
+> the address based on firmware revision or similar.
+> 
+> Johan
+> 
+> 
+>  drivers/bluetooth/btqca.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+> index fdb0fae88d1c..29035daf21bc 100644
+> --- a/drivers/bluetooth/btqca.c
+> +++ b/drivers/bluetooth/btqca.c
+> @@ -826,11 +826,15 @@ EXPORT_SYMBOL_GPL(qca_uart_setup);
+>  
+>  int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+>  {
+> +	bdaddr_t bdaddr_swapped;
+>  	struct sk_buff *skb;
+>  	int err;
+>  
+> -	skb = __hci_cmd_sync_ev(hdev, EDL_WRITE_BD_ADDR_OPCODE, 6, bdaddr,
+> -				HCI_EV_VENDOR, HCI_INIT_TIMEOUT);
+> +	baswap(&bdaddr_swapped, bdaddr);
+> +
+> +	skb = __hci_cmd_sync_ev(hdev, EDL_WRITE_BD_ADDR_OPCODE, 6,
+> +				&bdaddr_swapped, HCI_EV_VENDOR,
+> +				HCI_INIT_TIMEOUT);
+>  	if (IS_ERR(skb)) {
+>  		err = PTR_ERR(skb);
+>  		bt_dev_err(hdev, "QCA Change address cmd failed (%d)", err);
+> -- 
+> 2.41.0
+> 
