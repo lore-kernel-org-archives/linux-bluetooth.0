@@ -1,74 +1,104 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95D903C694;
-	Tue,  9 Jan 2024 19:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B9D23D553
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jan 2024 20:09:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uaxuR2uH"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 27AF8C43390;
-	Tue,  9 Jan 2024 19:20:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704828025;
-	bh=t3QNkdfJLG6lYFIiv569+bzNw/2O3SyoMY/KgOsqdU8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=uaxuR2uHKRM4tmJlizXx07h1RyuXLw8p1qI2OoNlb9kespMuLdh6Jpq8F5R08LfBe
-	 1bn9oo3q5zyinKqsAxOLw9tsaEE3sbRkMtqfVJ65YlVQ13VtBtjNRWmEPhBhJrFMY5
-	 09DRxOSqyI4DR0VyVTpna1rqFJo2DBxW+sTQs0osOUujxDf9mInr1E5x+UGGexTy2V
-	 2Mo2frA3iALyp2Bik0GZgVGCHBZkKBpapUbLoUl4VcIYIBaIlH7+NFnPKL/xs9ja/E
-	 ViF7R/SXGlJhiliiQ6e0vj/SMgnPmLEniPh4+6GuMsDUKdmnqTs+dt3JRMT67ssd5A
-	 owLkk3iZ8tW+A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 09C89C4166F;
-	Tue,  9 Jan 2024 19:20:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LiylZwLQ"
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-5ec7a5a4b34so34862247b3.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jan 2024 12:09:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704830948; x=1705435748; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=jseom0tHGDoR0y0iCwlI91YE/rjyF4hnnBSRPEBX6No=;
+        b=LiylZwLQhHPMiqx30641yyTGU8IFSjdYUPUaHCNnhALNb47cSaFtLrDUDImGqVtxR2
+         AXR+qFPwLEKmCn2Hkn9XsO89tAGfq8ChnU8yG1W6aCjcs3ZaOKnqhJKKdumg1G9mnv+m
+         R7IHGwtTqnTZOkH1GVW4zmao1aDzd88YCmEvxj4XgTX3h2coIudt4kUycJjzmVVSuqhc
+         eEbVSl3tjDsLysKbbnV4E3a23Cyt6E2cMxqhNhmFnSV4pF/KuFHf5bJyJ9b0FcH3LOVP
+         CpVxYvfj34stuSMggRlWYqtZ5s2l1o8VPEG3jrzrIzbZWN2mIVOTX+Q2tf/qukjcd2CA
+         vtPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704830948; x=1705435748;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jseom0tHGDoR0y0iCwlI91YE/rjyF4hnnBSRPEBX6No=;
+        b=fQA0vX/3vtDeWFMrPkQsYSQQEEMNwo0iktyNYwMemkLyYWGlJ3yF1g183CznJg5vZb
+         AFcmlVeejFUa0Hhx3IKRwka32XVfBZ1VzxKe8uH1U2HUMde9/tUn4txRNTdFsPfJTAOj
+         WLru4945c1jcd3pIkXtvzSlaI1ITvrrLicEm+oNbxBWyYqy+Cpw5AoJchg/EkCk0W7UL
+         ITU7hCPY+3WUEMWt4JsNL/9pNo6osbdaGkDsdJ6Bnm24vyKxsx/Pa/+KTySTmAPMeG7g
+         DNCbvV85c+WspVMhJdFUXa4mjet+vgiBXaysx321Cot4hSp1SMe0psRDhxx0w5zKgSa2
+         A/fw==
+X-Gm-Message-State: AOJu0YygfVo/h4VbWka47h7ngDbfStsT+ymoHRS5GfpoEY8c78qw2kbD
+	FWLAluZB0D9kBpxG8/7Pade05Jsw7Cc=
+X-Google-Smtp-Source: AGHT+IFYC2iiipH5nvjPGzQM7xVR5PM4Dm1Au3PVV8eYC8N5EvVh+sL6KrFo4YiGLVDEIdIbW5WIxg==
+X-Received: by 2002:a25:800f:0:b0:da0:7d1e:6e0 with SMTP id m15-20020a25800f000000b00da07d1e06e0mr3434054ybk.20.1704830947940;
+        Tue, 09 Jan 2024 12:09:07 -0800 (PST)
+Received: from [172.17.0.2] ([20.97.191.179])
+        by smtp.gmail.com with ESMTPSA id s22-20020ac85ed6000000b004298c9d0ba8sm1167344qtx.22.2024.01.09.12.09.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Jan 2024 12:09:07 -0800 (PST)
+Message-ID: <659da7e3.c80a0220.5734b.62df@mx.google.com>
+Date: Tue, 09 Jan 2024 12:09:07 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6206559479259755507=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 0/4] Bluetooth: Improve retrying of connection attempts
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <170482802503.21245.5004430777144462822.git-patchwork-notify@kernel.org>
-Date: Tue, 09 Jan 2024 19:20:25 +0000
-References: <20240108224614.56900-1-verdre@v0yd.nl>
-In-Reply-To: <20240108224614.56900-1-verdre@v0yd.nl>
-To: =?utf-8?q?Jonas_Dre=C3=9Fler_=3Cverdre=40v0yd=2Enl=3E?=@ci.codeaurora.org
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v1] Bluetooth: hci_core: Complete request if command timeout
+In-Reply-To: <20240109190905.546266-1-luiz.dentz@gmail.com>
+References: <20240109190905.546266-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hello:
+--===============6206559479259755507==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This series was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+This is automated email and please do not reply to this email!
 
-On Mon,  8 Jan 2024 23:46:05 +0100 you wrote:
-> Since commit 4c67bc74f016 ("[Bluetooth] Support concurrent connect
-> requests"), the kernel supports trying to connect again in case the
-> bluetooth card is busy and fails to connect.
-> 
-> The logic that should handle this became a bit spotty over time, and also
-> cards these days appear to fail with more errors than just "Command
-> Disallowed".
-> 
-> [...]
+Dear submitter,
 
-Here is the summary with links:
-  - [v3,1/4] Bluetooth: Remove superfluous call to hci_conn_check_pending()
-    https://git.kernel.org/bluetooth/bluetooth-next/c/a7ee39bea315
-  - [v3,2/4] Bluetooth: hci_event: Use HCI error defines instead of magic values
-    https://git.kernel.org/bluetooth/bluetooth-next/c/f8c47ee39e6d
-  - [v3,3/4] Bluetooth: hci_conn: Only do ACL connections sequentially
-    (no matching commit)
-  - [v3,4/4] Bluetooth: Remove pending ACL connection attempts
-    (no matching commit)
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=815513
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.14 seconds
+GitLint                       PASS      0.39 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      27.98 seconds
+CheckAllWarning               PASS      30.95 seconds
+CheckSparse                   PASS      36.68 seconds
+CheckSmatch                   PASS      99.46 seconds
+BuildKernel32                 PASS      27.37 seconds
+TestRunnerSetup               PASS      435.66 seconds
+TestRunner_l2cap-tester       PASS      23.00 seconds
+TestRunner_iso-tester         PASS      45.38 seconds
+TestRunner_bnep-tester        PASS      6.89 seconds
+TestRunner_mgmt-tester        PASS      158.89 seconds
+TestRunner_rfcomm-tester      PASS      11.31 seconds
+TestRunner_sco-tester         PASS      14.51 seconds
+TestRunner_ioctl-tester       PASS      11.97 seconds
+TestRunner_mesh-tester        PASS      8.69 seconds
+TestRunner_smp-tester         PASS      9.79 seconds
+TestRunner_userchan-tester    PASS      7.22 seconds
+IncrementalBuild              PASS      26.62 seconds
 
 
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6206559479259755507==--
