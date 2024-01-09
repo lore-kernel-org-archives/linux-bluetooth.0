@@ -1,86 +1,109 @@
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFFC53BB3B
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jan 2024 17:22:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 818DC3BB3D
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jan 2024 17:49:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tr06ey7K"
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-28bc8540299so1906818a91.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jan 2024 09:22:06 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FETrJKWU"
+Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-595d24ad466so1902619eaf.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jan 2024 09:49:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704820926; x=1705425726; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fvdv6R8yXoXsbZyPwsbqgZ3h+TqbNBxS+Mm9fVGkYWU=;
-        b=Tr06ey7KTDUblpSWYRLstTBE3luoCpySMbkiGB/+10e1CXoCbwO0TjLy1vRhHHlnLO
-         6TKq7JgCuB5A1XzaxccYuT5N4ieFMuHEditxom0uPcrif4jQ2OT5JMFd6H6VwlqjHAZt
-         6pIdxxPqweKPFWPcfm/zMkcpC1F2yGzNeE3Wq30vGYek8z87XwCcALBKBy5e/kmEneM+
-         6DoTBxBfhlDi+bDBU8aXcIrMLH+Vgp7ki5xuKPQeLvYZOVmqPrkxg2LA8/XXO/grolPW
-         4/OtpQ2nV0R2wx2zp36/rpmlNEx6ay8ORq96qn7jmX3htI8pr//UucVgfEyPphS84/LH
-         hMuw==
+        d=gmail.com; s=20230601; t=1704822571; x=1705427371; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=O9VWxaOqAp8yt9/GjSW4V6FFOkCfgXsvX1IU679pRv4=;
+        b=FETrJKWUS6PP32QshfX6pw/8CPOjFvbMPV5nCp6aHB50vi34WEwi/b3N6a0h8Besy2
+         y2V2qpdoDnMvkmAM6mzNqa4N8X3T85A8kO5BnmMcTm3ND3xnebXAvOFI3QTQ06ARGDNa
+         YBDtBzjHGtXikF9f7T2Ryjs7bD3lvV2NkP8PatndrCtCqrg/23+doiQf2eOPIaPdNjXY
+         n5QW5pBTbaIwM8r8yEI/M8KpjrvNnVqim44SK/xhTrlFwIeZieTd2QnQjLEBygP3Hetp
+         Vad1+GIeA2Rpsj27wiFrcYMF0aSu6V/cckDT/COewkgneRiwoPjbEft17DBQGdb13MaC
+         Y8PA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704820926; x=1705425726;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Fvdv6R8yXoXsbZyPwsbqgZ3h+TqbNBxS+Mm9fVGkYWU=;
-        b=QXs74/l38R8Omv2OJINuhtJHzwZ9QfU9ILc6CASTwzCK9Wm62bVm183r3VX05TZD22
-         y9alNmwsUnrnSabzg5Vb8rf9VYIGhUw0PzCL7FmpYxi0ntdpSM4WeIHTJ2y0LSrzZ+OP
-         MajzirfjFUMdnexYWrGrpA+29UIplrQEYKKjgchfH98aC0wg1ZQGe6qao8Umjt4WCGFd
-         T3eA8+KyNjKlU8qOcBumfwxTgOGH2rHsEUkuI9ceD1XBuYAQHB/6EQKFYgJlcCjSiyVF
-         NU7vWtVhfxB2kZ4fRW2fuFHUUrR3IquL9LsSOWp1nfYkQ2MZKxfZT43C4KmE7YvL0kTb
-         Od9g==
-X-Gm-Message-State: AOJu0YxwtawqtAWDk4lLgd1SAFwf/qwgA6i+m9GuzrWj7PQO/d/4woXF
-	RCAdHiH6lWKWBybImIHFG8X8XXQva3w=
-X-Google-Smtp-Source: AGHT+IHgtc6l/h/cgJ3VXYIoI9kb4nMi7blUV1NKZM8OZ1Z1IFseP/4/3VXA4P8nXO+3CB6DzRPopg==
-X-Received: by 2002:a17:90a:dd95:b0:28c:be8e:ac7c with SMTP id l21-20020a17090add9500b0028cbe8eac7cmr2573935pjv.16.1704820925582;
-        Tue, 09 Jan 2024 09:22:05 -0800 (PST)
-Received: from [172.17.0.2] ([52.238.28.66])
-        by smtp.gmail.com with ESMTPSA id s4-20020a17090a5d0400b0028cad653d05sm2229156pji.47.2024.01.09.09.22.04
+        d=1e100.net; s=20230601; t=1704822571; x=1705427371;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=O9VWxaOqAp8yt9/GjSW4V6FFOkCfgXsvX1IU679pRv4=;
+        b=IGeVNPsKN/y1M+Py130T7tbaWeTDY5S/tn4OsHn4Sw5qR+TTEJ3A+v7eW3VTeXpve1
+         BYaHauarJc8OuTon/g7oYzLabb0jj0gjkIQJSfTFmINmBigtQB0MPJ3IMAyIIBUMDMbo
+         IwAnAQlfiLHA4RgWE//gvWG2V/zavVJUBZtSVkEc4bnRXctFO086Mo7vFcObqhTZhzaE
+         v1pFWcbokmbNxz+qfhyt+uqDZkLmuf0hmAskfsxNshq14Uc7pZxX4MS4IFnpapG+uu6b
+         q1/Pjd+bLu8LppBCuPwJj0aEE7Lqw3R+w2XUfAoZB7wYGItG8kLjFXHrQ29AXwgLYtXz
+         fhqg==
+X-Gm-Message-State: AOJu0YzP9EQzTqp/RneUZqgMaVRKev3eUvCWGQlb/c9ipHDqLHbrQKKV
+	Q2E8zXx2OaFisHeT1rWQGbcuX+KDG/w=
+X-Google-Smtp-Source: AGHT+IGNHgP08B+N7FR1pqY2r/HHg70TsdiH3Eyz0bqwR7Y/VljRYZxr/t3UMD17gcBiho5SRir0uQ==
+X-Received: by 2002:a4a:ac49:0:b0:595:d85:260a with SMTP id q9-20020a4aac49000000b005950d85260amr3853472oon.2.1704822570920;
+        Tue, 09 Jan 2024 09:49:30 -0800 (PST)
+Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
+        by smtp.gmail.com with ESMTPSA id o184-20020a4a44c1000000b00595e66557e6sm476814ooa.6.2024.01.09.09.49.29
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jan 2024 09:22:05 -0800 (PST)
-Message-ID: <659d80bd.170a0220.3610f.8df2@mx.google.com>
-Date: Tue, 09 Jan 2024 09:22:05 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============3222836142103931588=="
+        Tue, 09 Jan 2024 09:49:30 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v4 1/4] Bluetooth: Remove superfluous call to hci_conn_check_pending()
+Date: Tue,  9 Jan 2024 12:49:25 -0500
+Message-ID: <20240109174928.488595-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [RFC] Bluetooth: hci_event: Rework hci_store_wake_reason
-In-Reply-To: <20240109165552.430359-1-luiz.dentz@gmail.com>
-References: <20240109165552.430359-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
---===============3222836142103931588==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Jonas Dreßler <verdre@v0yd.nl>
 
-This is an automated email and please do not reply to this email.
+The "pending connections" feature was originally introduced with commit
+4c67bc74f016 ("[Bluetooth] Support concurrent connect requests") and
+6bd57416127e ("[Bluetooth] Handling pending connect attempts after
+inquiry") to handle controllers supporting only a single connection request
+at a time. Later things were extended to also cancel ongoing inquiries on
+connect() with commit 89e65975fea5 ("Bluetooth: Cancel Inquiry before
+Create Connection").
 
-Dear Submitter,
+With commit a9de9248064b ("[Bluetooth] Switch from OGF+OCF to using only
+opcodes"), hci_conn_check_pending() was introduced as a helper to
+consolidate a few places where we check for pending connections (indicated
+by the BT_CONNECT2 flag) and then try to connect.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+This refactoring commit also snuck in two more calls to
+hci_conn_check_pending():
 
------ Output -----
+- One is in the failure callback of hci_cs_inquiry(), this one probably
+makes sense: If we send an "HCI Inquiry" command and then immediately
+after a "Create Connection" command, the "Create Connection" command might
+fail before the "HCI Inquiry" command, and then we want to retry the
+"Create Connection" on failure of the "HCI Inquiry".
 
-error: patch failed: net/bluetooth/hci_event.c:7393
-error: net/bluetooth/hci_event.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
+- The other added call to hci_conn_check_pending() is in the event handler
+for the "Remote Name" event, this seems unrelated and is possibly a
+copy-paste error, so remove that one.
 
-Please resolve the issue and submit the patches again.
-
-
+Fixes: a9de9248064b ("[Bluetooth] Switch from OGF+OCF to using only opcodes")
+Signed-off-by: Jonas Dreßler <verdre@v0yd.nl>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hci_event.c | 2 --
+ 1 file changed, 2 deletions(-)
 
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 22b22c264c2a..23e0e63ac312 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3556,8 +3556,6 @@ static void hci_remote_name_evt(struct hci_dev *hdev, void *data,
+ 
+ 	bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
+ 
+-	hci_conn_check_pending(hdev);
+-
+ 	hci_dev_lock(hdev);
+ 
+ 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
+-- 
+2.43.0
 
---===============3222836142103931588==--
