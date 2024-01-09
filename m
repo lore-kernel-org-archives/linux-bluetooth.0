@@ -1,52 +1,56 @@
-Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
+Received: from mail-oo1-f45.google.com (mail-oo1-f45.google.com [209.85.161.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 818DC3BB3D
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jan 2024 17:49:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 324823BB3E
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jan 2024 17:49:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FETrJKWU"
-Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-595d24ad466so1902619eaf.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jan 2024 09:49:33 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BMCWilw1"
+Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-5988e55ede0so160519eaf.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jan 2024 09:49:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704822571; x=1705427371; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=O9VWxaOqAp8yt9/GjSW4V6FFOkCfgXsvX1IU679pRv4=;
-        b=FETrJKWUS6PP32QshfX6pw/8CPOjFvbMPV5nCp6aHB50vi34WEwi/b3N6a0h8Besy2
-         y2V2qpdoDnMvkmAM6mzNqa4N8X3T85A8kO5BnmMcTm3ND3xnebXAvOFI3QTQ06ARGDNa
-         YBDtBzjHGtXikF9f7T2Ryjs7bD3lvV2NkP8PatndrCtCqrg/23+doiQf2eOPIaPdNjXY
-         n5QW5pBTbaIwM8r8yEI/M8KpjrvNnVqim44SK/xhTrlFwIeZieTd2QnQjLEBygP3Hetp
-         Vad1+GIeA2Rpsj27wiFrcYMF0aSu6V/cckDT/COewkgneRiwoPjbEft17DBQGdb13MaC
-         Y8PA==
+        d=gmail.com; s=20230601; t=1704822573; x=1705427373; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CALQPjgbYuWBGZQs8nNVBq5T/HxB3E5FfujH1TM+1jA=;
+        b=BMCWilw1UgOdrfSBRpzrxWYOPLpkmmqq/0U4a3bMl6NQ1/sGtvXpzwnpKuO9NLCdG+
+         UO5C8kHntmWyc02Fa9uhD25EGxi912ZPftdoSCzcPn+uPC1fxtCbP30o1/THk6MGLgSf
+         LOn/Hn3sYcs7fqcUdIbYZoTy00vu/k2Km3aPAgsLR8j6Glc0EkGzRkIxXnf8mSs1sCz6
+         YN3SrzkvH6xgaIwoKmovbtT+VMfqMt745JVnxKJ2UjhtjaXYZt1INT3M7SPmiq3ygXM+
+         HJbKEf7CFwXgPUunYiZs3bjaShAP9vBOic2kYCipnCHHNTC4OPWTsatZhwzm+qF+JadO
+         CT/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704822571; x=1705427371;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=O9VWxaOqAp8yt9/GjSW4V6FFOkCfgXsvX1IU679pRv4=;
-        b=IGeVNPsKN/y1M+Py130T7tbaWeTDY5S/tn4OsHn4Sw5qR+TTEJ3A+v7eW3VTeXpve1
-         BYaHauarJc8OuTon/g7oYzLabb0jj0gjkIQJSfTFmINmBigtQB0MPJ3IMAyIIBUMDMbo
-         IwAnAQlfiLHA4RgWE//gvWG2V/zavVJUBZtSVkEc4bnRXctFO086Mo7vFcObqhTZhzaE
-         v1pFWcbokmbNxz+qfhyt+uqDZkLmuf0hmAskfsxNshq14Uc7pZxX4MS4IFnpapG+uu6b
-         q1/Pjd+bLu8LppBCuPwJj0aEE7Lqw3R+w2XUfAoZB7wYGItG8kLjFXHrQ29AXwgLYtXz
-         fhqg==
-X-Gm-Message-State: AOJu0YzP9EQzTqp/RneUZqgMaVRKev3eUvCWGQlb/c9ipHDqLHbrQKKV
-	Q2E8zXx2OaFisHeT1rWQGbcuX+KDG/w=
-X-Google-Smtp-Source: AGHT+IGNHgP08B+N7FR1pqY2r/HHg70TsdiH3Eyz0bqwR7Y/VljRYZxr/t3UMD17gcBiho5SRir0uQ==
-X-Received: by 2002:a4a:ac49:0:b0:595:d85:260a with SMTP id q9-20020a4aac49000000b005950d85260amr3853472oon.2.1704822570920;
-        Tue, 09 Jan 2024 09:49:30 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704822573; x=1705427373;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CALQPjgbYuWBGZQs8nNVBq5T/HxB3E5FfujH1TM+1jA=;
+        b=uHdASh1Lh0vlWWl2TGvaP4bacAG/ceE/jra/u8lTsfuxR8ZjkSMhfkdoSXQuD+1KJJ
+         xsivOlEU3a+6NhC1o6Cxp/cQfe5UifpDoOZ7ZWJkFr3JyQxHmfSgx0vNvBamDoiljitj
+         0a5JgbONQQY4BJP/V8vz2eMhbvpp2zfq9tTtMpAi8GvGdTkFo5Ua483vmfvE2QMOmLvJ
+         iCsXtGJTYXk1fNLZS4xR0cPgZj9j7leH9YkvRwfHO6ZMnPQgm/NQB+JvA0GZS16SdAdM
+         d7nzYbxQYhyy6Css55DEmidcjT9iVBGqzkKeVyCDdnNlOVJmbQ9wpKd7yDeyEqRzCUPt
+         h1xA==
+X-Gm-Message-State: AOJu0Yy8v6pXp73r64onrmDuc47lO4UpPeVG9F73Co2agsTV9W0muee2
+	6jJo6jw8ZYcF9kkVd3oNyhuSaerMugo=
+X-Google-Smtp-Source: AGHT+IEumfhwxdHQ1WAOIlMiOk1visc+fTqyry55qvdXqarAFzqW8zszLoYs+OcswYB/OchMGmH4Vw==
+X-Received: by 2002:a05:6820:240c:b0:593:fb56:1206 with SMTP id cp12-20020a056820240c00b00593fb561206mr4171858oob.17.1704822573507;
+        Tue, 09 Jan 2024 09:49:33 -0800 (PST)
 Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
-        by smtp.gmail.com with ESMTPSA id o184-20020a4a44c1000000b00595e66557e6sm476814ooa.6.2024.01.09.09.49.29
+        by smtp.gmail.com with ESMTPSA id o184-20020a4a44c1000000b00595e66557e6sm476814ooa.6.2024.01.09.09.49.31
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jan 2024 09:49:30 -0800 (PST)
+        Tue, 09 Jan 2024 09:49:31 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 1/4] Bluetooth: Remove superfluous call to hci_conn_check_pending()
-Date: Tue,  9 Jan 2024 12:49:25 -0500
-Message-ID: <20240109174928.488595-1-luiz.dentz@gmail.com>
+Subject: [PATCH v4 2/4] Bluetooth: hci_event: Use HCI error defines instead of magic values
+Date: Tue,  9 Jan 2024 12:49:26 -0500
+Message-ID: <20240109174928.488595-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240109174928.488595-1-luiz.dentz@gmail.com>
+References: <20240109174928.488595-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -58,52 +62,71 @@ Content-Transfer-Encoding: 8bit
 
 From: Jonas Dreßler <verdre@v0yd.nl>
 
-The "pending connections" feature was originally introduced with commit
-4c67bc74f016 ("[Bluetooth] Support concurrent connect requests") and
-6bd57416127e ("[Bluetooth] Handling pending connect attempts after
-inquiry") to handle controllers supporting only a single connection request
-at a time. Later things were extended to also cancel ongoing inquiries on
-connect() with commit 89e65975fea5 ("Bluetooth: Cancel Inquiry before
-Create Connection").
+We have error defines already, so let's use them.
 
-With commit a9de9248064b ("[Bluetooth] Switch from OGF+OCF to using only
-opcodes"), hci_conn_check_pending() was introduced as a helper to
-consolidate a few places where we check for pending connections (indicated
-by the BT_CONNECT2 flag) and then try to connect.
-
-This refactoring commit also snuck in two more calls to
-hci_conn_check_pending():
-
-- One is in the failure callback of hci_cs_inquiry(), this one probably
-makes sense: If we send an "HCI Inquiry" command and then immediately
-after a "Create Connection" command, the "Create Connection" command might
-fail before the "HCI Inquiry" command, and then we want to retry the
-"Create Connection" on failure of the "HCI Inquiry".
-
-- The other added call to hci_conn_check_pending() is in the event handler
-for the "Remote Name" event, this seems unrelated and is possibly a
-copy-paste error, so remove that one.
-
-Fixes: a9de9248064b ("[Bluetooth] Switch from OGF+OCF to using only opcodes")
 Signed-off-by: Jonas Dreßler <verdre@v0yd.nl>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/hci_event.c | 2 --
- 1 file changed, 2 deletions(-)
+ include/net/bluetooth/hci.h | 2 ++
+ net/bluetooth/hci_event.c   | 8 ++++----
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index a94a8491ec7a..1cd212bb3789 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -653,6 +653,7 @@ enum {
+ #define HCI_ERROR_PIN_OR_KEY_MISSING	0x06
+ #define HCI_ERROR_MEMORY_EXCEEDED	0x07
+ #define HCI_ERROR_CONNECTION_TIMEOUT	0x08
++#define HCI_ERROR_COMMAND_DISALLOWED	0x0c
+ #define HCI_ERROR_REJ_LIMITED_RESOURCES	0x0d
+ #define HCI_ERROR_REJ_BAD_ADDR		0x0f
+ #define HCI_ERROR_INVALID_PARAMETERS	0x12
+@@ -661,6 +662,7 @@ enum {
+ #define HCI_ERROR_REMOTE_POWER_OFF	0x15
+ #define HCI_ERROR_LOCAL_HOST_TERM	0x16
+ #define HCI_ERROR_PAIRING_NOT_ALLOWED	0x18
++#define HCI_ERROR_UNSUPPORTED_REMOTE_FEATURE	0x1e
+ #define HCI_ERROR_INVALID_LL_PARAMS	0x1e
+ #define HCI_ERROR_UNSPECIFIED		0x1f
+ #define HCI_ERROR_ADVERTISING_TIMEOUT	0x3c
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 22b22c264c2a..23e0e63ac312 100644
+index 23e0e63ac312..6130c969f361 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -3556,8 +3556,6 @@ static void hci_remote_name_evt(struct hci_dev *hdev, void *data,
+@@ -95,11 +95,11 @@ static u8 hci_cc_inquiry_cancel(struct hci_dev *hdev, void *data,
+ 	/* It is possible that we receive Inquiry Complete event right
+ 	 * before we receive Inquiry Cancel Command Complete event, in
+ 	 * which case the latter event should have status of Command
+-	 * Disallowed (0x0c). This should not be treated as error, since
++	 * Disallowed. This should not be treated as error, since
+ 	 * we actually achieve what Inquiry Cancel wants to achieve,
+ 	 * which is to end the last Inquiry session.
+ 	 */
+-	if (rp->status == 0x0c && !test_bit(HCI_INQUIRY, &hdev->flags)) {
++	if (rp->status == HCI_ERROR_COMMAND_DISALLOWED && !test_bit(HCI_INQUIRY, &hdev->flags)) {
+ 		bt_dev_warn(hdev, "Ignoring error of Inquiry Cancel command");
+ 		rp->status = 0x00;
+ 	}
+@@ -2342,7 +2342,7 @@ static void hci_cs_create_conn(struct hci_dev *hdev, __u8 status)
  
- 	bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
- 
--	hci_conn_check_pending(hdev);
--
- 	hci_dev_lock(hdev);
- 
- 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
+ 	if (status) {
+ 		if (conn && conn->state == BT_CONNECT) {
+-			if (status != 0x0c || conn->attempt > 2) {
++			if (status != HCI_ERROR_COMMAND_DISALLOWED || conn->attempt > 2) {
+ 				conn->state = BT_CLOSED;
+ 				hci_connect_cfm(conn, status);
+ 				hci_conn_del(conn);
+@@ -6679,7 +6679,7 @@ static void hci_le_remote_feat_complete_evt(struct hci_dev *hdev, void *data,
+ 			 * transition into connected state and mark it as
+ 			 * successful.
+ 			 */
+-			if (!conn->out && ev->status == 0x1a &&
++			if (!conn->out && ev->status == HCI_ERROR_UNSUPPORTED_REMOTE_FEATURE &&
+ 			    (hdev->le_features[0] & HCI_LE_PERIPHERAL_FEATURES))
+ 				status = 0x00;
+ 			else
 -- 
 2.43.0
 
