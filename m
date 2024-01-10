@@ -1,84 +1,133 @@
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA6123EA6D;
-	Wed, 10 Jan 2024 09:19:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a2a1a584e8bso387532266b.1;
-        Wed, 10 Jan 2024 01:19:11 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704878350; x=1705483150;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=d54gLTRIUhxQmAyd3Y0D+5lpnbD9pU1y8y4VXzOVS+I=;
-        b=etbj9V6H6Y5smMl1rryfFQhGw2xKBjya2Tu1h/DDCp0+uLU9RDU2dhtGp1zMkpuuNL
-         rFICrmgd8phKfB7bzyJ9VyOuTHYcrXzpTVgC4AFzx0OE5QCWZfWQ9jcXBnpEWxSjBCFf
-         TsxaJUAv0+eyvfrr44dMCLsoxOz8+VQ8M0hdjo6VJ/ff+KOfOYttZfl9AjDp0SAEZe3H
-         bZgc0pN+n1WJ4IWf0n2kS/owTgKRe0b4Y8+7W8UKnvbIglnOEwAPFSCLsIL1+sgjZfkd
-         0EIFWvIxZdTPZot8hszr01U/0a47/FYZ27lVFBXadjAUjloFJwMMgs8WGwbIcSjYeJQu
-         OtGQ==
-X-Gm-Message-State: AOJu0Yxt0SllZwg8iF1MBEe6xeiGCeaReBsIMKJOsvatvbrQQFmRw4T+
-	0MDig2sauedIPNdSESNE2/g=
-X-Google-Smtp-Source: AGHT+IEzsF8UjIovugDbKuXSrbkdmWWxQOLjiU1IVWHL5k0JilfiUilfpm6ulNaIWqvJIXUXctTuLw==
-X-Received: by 2002:a17:907:96a2:b0:a23:49d9:7e9e with SMTP id hd34-20020a17090796a200b00a2349d97e9emr451172ejc.12.1704878349869;
-        Wed, 10 Jan 2024 01:19:09 -0800 (PST)
-Received: from gmail.com (fwdproxy-cln-020.fbsv.net. [2a03:2880:31ff:14::face:b00c])
-        by smtp.gmail.com with ESMTPSA id mf25-20020a170906cb9900b00a28fa7838a1sm1924229ejb.172.2024.01.10.01.19.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jan 2024 01:19:09 -0800 (PST)
-Date: Wed, 10 Jan 2024 01:19:07 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Alexander Aring <aahringo@redhat.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, Alexander Aring <alex.aring@gmail.com>,
-	netdev@vger.kernel.org,
-	"open list:6LOWPAN GENERIC (BTLE/IEEE 802.15.4)" <linux-bluetooth@vger.kernel.org>,
-	"open list:6LOWPAN GENERIC (BTLE/IEEE 802.15.4)" <linux-wpan@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 07/10] net: fill in MODULE_DESCRIPTION()s for
- 6LoWPAN
-Message-ID: <ZZ5hC5SGiUIEZPdm@gmail.com>
-References: <20240108181610.2697017-1-leitao@debian.org>
- <20240108181610.2697017-8-leitao@debian.org>
- <CAK-6q+jy-0+bZRUKhRsB2RMtpJ=Sw1A5qHk+rpnYaOzV8WFD5A@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303F74BA9C;
+	Wed, 10 Jan 2024 15:13:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kk0GddLR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71C4CC433C7;
+	Wed, 10 Jan 2024 15:13:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704899594;
+	bh=h/wkeQzQubqlHTiNWTxVSJJKg568Kr4VZtWWQzSRtbg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kk0GddLRhL37FgX4OrjYqvgc+JlY/qAp9OOILqun1IqIEwpLh0+iq6f2Duh6NzYDE
+	 mn5miGZqEGcjs2ZjKsm72SDYNM5ZCcr1k21ivIHzY+IyjII8uxOQQ5zzdMRkVKSzl1
+	 N/YI49QJZzvmXPGyrmOpHh6/3NOl3jxQBC4R7KHxgMc7kkaG3qpt0WIqoJSReu2adP
+	 e3Yi8Rlp26pbeKvRlK+VklC4bwWibi7Dipa9/+yCKy2b9KxteoaMjY0hdkTO2QRxVc
+	 tkb3777SdTdwUbwhXQ9nh+9WAV9wsOaiudHQDBticdESiWAln8juWOwQmTyzhUBu3K
+	 kbaLuOQ2fiE/w==
+Date: Wed, 10 Jan 2024 15:13:09 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@intel.com>
+Subject: Re: [PATCH net 5/7] MAINTAINERS: Bluetooth: retire Johan (for now?)
+Message-ID: <20240110151309.GD9296@kernel.org>
+References: <20240109164517.3063131-1-kuba@kernel.org>
+ <20240109164517.3063131-6-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAK-6q+jy-0+bZRUKhRsB2RMtpJ=Sw1A5qHk+rpnYaOzV8WFD5A@mail.gmail.com>
+In-Reply-To: <20240109164517.3063131-6-kuba@kernel.org>
 
-On Tue, Jan 09, 2024 at 08:04:47PM -0500, Alexander Aring wrote:
-> Hi,
-> 
-> On Mon, Jan 8, 2024 at 1:21 PM Breno Leitao <leitao@debian.org> wrote:
-> >
-> > W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
-> > Add descriptions to IPv6 over Low power Wireless Personal Area Network.
-> >
-> > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > ---
-> >  net/6lowpan/core.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
-> > index 7b3341cef926..80d83151ef29 100644
-> > --- a/net/6lowpan/core.c
-> > +++ b/net/6lowpan/core.c
-> > @@ -178,5 +178,5 @@ static void __exit lowpan_module_exit(void)
-> >
-> >  module_init(lowpan_module_init);
-> >  module_exit(lowpan_module_exit);
-> > -
-> > +MODULE_DESCRIPTION("IPv6 over Low power Wireless Personal Area Network module");
-> 
-> Here is a nitpick as well. The correct acronym [0] is "IPv6 over
-> Low-Power Wireless Personal Area Network", otherwise it is okay.
++ Johan Hedberg <johan.hedberg@intel.com>
 
-Thanks. I will update.
+On Tue, Jan 09, 2024 at 08:45:15AM -0800, Jakub Kicinski wrote:
+> Johan moved to maintaining the Zephyr Bluetooth stack,
+> and we haven't heard from him on the ML in 3 years
+> (according to lore), and seen any tags in git in 4 years.
+> Trade the MAINTAINER entry for CREDITS, we can revert
+> whenever Johan comes back to Linux hacking :)
+> 
+> Subsystem BLUETOOTH SUBSYSTEM
+>   Changes 173 / 986 (17%)
+>   Last activity: 2023-12-22
+>   Marcel Holtmann <marcel@holtmann.org>:
+>     Author 91cb4c19118a 2022-01-27 00:00:00 52
+>     Committer edcb185fa9c4 2022-05-23 00:00:00 446
+>     Tags 000c2fa2c144 2023-04-23 00:00:00 523
+>   Johan Hedberg <johan.hedberg@gmail.com>:
+
+I'm not arguing that this change isn't appropriate.
+But, nit picking the description above,
+I do think there has been some git activity within
+the last 4 years, albeit from a different email address.
+
+The most recent Bluetooth Drivers patch I found committed by Johan is:
+
+commit 0671c0662383eefc272e107364cba7fe229dee44
+Author:     Hans de Goede <hdegoede@redhat.com>
+AuthorDate: Sat Dec 5 16:02:01 2020 +0100
+Commit:     Johan Hedberg <johan.hedberg@intel.com>
+CommitDate: Mon Dec 7 17:01:54 2020 +0200
+
+For reference, the most recent patched that I could
+find authored by Johan for Bluetooth Drivers is:
+
+commit 6c3711ec64fd23a9abc8aaf59a9429569a6282df
+Author:     Johan Hedberg <johan.hedberg@intel.com>
+AuthorDate: Sat Aug 4 23:40:26 2018 +0300
+Commit:     Marcel Holtmann <marcel@holtmann.org>
+CommitDate: Sat Aug 4 23:23:32 2018 +0200
+
+>   Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
+>     Author d03376c18592 2023-12-22 00:00:00 241
+>     Committer da9065caa594 2023-12-22 00:00:00 341
+>     Tags da9065caa594 2023-12-22 00:00:00 493
+>   Top reviewers:
+>     [33]: alainm@chromium.org
+>     [31]: mcchou@chromium.org
+>     [27]: abhishekpandit@chromium.org
+>   INACTIVE MAINTAINER Johan Hedberg <johan.hedberg@gmail.com>
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: Marcel Holtmann <marcel@holtmann.org>
+> CC: Johan Hedberg <johan.hedberg@gmail.com>
+> CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+> CC: linux-bluetooth@vger.kernel.org
+> ---
+>  CREDITS     | 4 ++++
+>  MAINTAINERS | 1 -
+>  2 files changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/CREDITS b/CREDITS
+> index 18ce75d81234..1228f96110c4 100644
+> --- a/CREDITS
+> +++ b/CREDITS
+> @@ -1543,6 +1543,10 @@ N: Andrew Haylett
+>  E: ajh@primag.co.uk
+>  D: Selection mechanism
+>  
+> +N: Johan Hedberg
+> +E: johan.hedberg@gmail.com
+> +D: Bluetooth subsystem maintainer
+> +
+>  N: Andre Hedrick
+>  E: andre@linux-ide.org
+>  E: andre@linuxdiskcert.org
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 1e375699ebb7..388fe7baf89a 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -3595,7 +3595,6 @@ F:	drivers/mtd/devices/block2mtd.c
+>  
+>  BLUETOOTH DRIVERS
+>  M:	Marcel Holtmann <marcel@holtmann.org>
+> -M:	Johan Hedberg <johan.hedberg@gmail.com>
+>  M:	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+>  L:	linux-bluetooth@vger.kernel.org
+>  S:	Supported
+> -- 
+> 2.43.0
+> 
