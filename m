@@ -1,145 +1,99 @@
-Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25E0D3DB84;
-	Tue,  9 Jan 2024 21:57:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=v0yd.nl
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4T8lCw6nPKz9sd0;
-	Tue,  9 Jan 2024 22:57:48 +0100 (CET)
-Message-ID: <efcc7b97-6bfc-4e5d-8e73-78f2b190fa02@v0yd.nl>
-Date: Tue, 9 Jan 2024 22:57:47 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6075B63D
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jan 2024 01:05:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G8pUQUww"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1704848702;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XDAJkCct0QqlJ2J1QN5K4XkP3EqrDChHOlqcjsZZ3Ok=;
+	b=G8pUQUwwlaZYOUQEtI0WYclxDEP1aM9ELZqvS4vdlIET8fYI/8/WJnM5Fa5Cc6yH1AYKxl
+	PqYE5oKUOlcLgnlO7l430RiiB9LJwhGmuCTtqg4LzT+TUjikknHScSxo+TAR+R+FKW2su4
+	K4aNVBmjS24kvwoOVvxrenJnUCgk3GQ=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-325-UHcy0oj2OT2bKxRx1q1WhA-1; Tue, 09 Jan 2024 20:05:00 -0500
+X-MC-Unique: UHcy0oj2OT2bKxRx1q1WhA-1
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2ccc360edc4so30015871fa.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jan 2024 17:05:00 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704848699; x=1705453499;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XDAJkCct0QqlJ2J1QN5K4XkP3EqrDChHOlqcjsZZ3Ok=;
+        b=cC/V5hQyYrZ72ZBQefF2OmJj/5exX3AH/YIn4puqgiC8SklekrQ7EsWy1ZbXiJtvit
+         2YqdsQ0c49g5vrX+KVvj7SEwz+ev+qCH8ccqUDI9HVdAzR4xxVZye5VLRqpy+UPw0/W2
+         6VUy7/o0D0jaADiyeTFBBBLxjjiNXUXnDL96UqvYD8OC+eUeVwYEeaYjZ4fPCIT4/hFh
+         FHRge3+kR/FZF2l5iQpFlG5XK52OAlePIGD9N2ZF5RwHsqZ/rBIz2c3Li+fWOC5tZ+1T
+         17oxhzqLNhhRf9Qa4oHgQVG+bJBdKUw/eChNBKqS9kWbB3L5M8qox+DKwBdxxwOMV0au
+         Sbhg==
+X-Gm-Message-State: AOJu0YwdIBt0B11qHn9+LIq/8vfcAqCZqAtZwqiTuAxJqmqEjxLAsR/5
+	pGSbX/cphSaGotqm4zKb8gfMOSQXjOxuwuLMHUacLIZYLOhO+Wr5fdt0wNsLEU8k1/+rRxY0cMv
+	mkR5JLMdO2W/7ovjSVngOHqblyyDv59BRC8LxPu4nfQw6N7AImVyE
+X-Received: by 2002:a05:651c:1047:b0:2cd:3487:9a05 with SMTP id x7-20020a05651c104700b002cd34879a05mr98280ljm.88.1704848699513;
+        Tue, 09 Jan 2024 17:04:59 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGKqSK/YybrS4hqOkpNnDVEZbPGMecxKjNnfERUMKoTvZqBP1EhGdJBrkbTbH5Ki7NxC6cHcaGGQZdKcc7uVcA=
+X-Received: by 2002:a05:651c:1047:b0:2cd:3487:9a05 with SMTP id
+ x7-20020a05651c104700b002cd34879a05mr98276ljm.88.1704848699158; Tue, 09 Jan
+ 2024 17:04:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
-Subject: Re: [PATCH v3 0/4] Bluetooth: Improve retrying of connection attempts
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, verdre@v0yd.nl
-References: <20240108224614.56900-1-verdre@v0yd.nl>
- <CABBYNZKV176teECGnGKTCNNo45ZYbCRs=YddETOUMUsJQX5PdA@mail.gmail.com>
-Content-Language: en-US
-In-Reply-To: <CABBYNZKV176teECGnGKTCNNo45ZYbCRs=YddETOUMUsJQX5PdA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4T8lCw6nPKz9sd0
+References: <20240108181610.2697017-1-leitao@debian.org> <20240108181610.2697017-8-leitao@debian.org>
+In-Reply-To: <20240108181610.2697017-8-leitao@debian.org>
+From: Alexander Aring <aahringo@redhat.com>
+Date: Tue, 9 Jan 2024 20:04:47 -0500
+Message-ID: <CAK-6q+jy-0+bZRUKhRsB2RMtpJ=Sw1A5qHk+rpnYaOzV8WFD5A@mail.gmail.com>
+Subject: Re: [PATCH net-next 07/10] net: fill in MODULE_DESCRIPTION()s for 6LoWPAN
+To: Breno Leitao <leitao@debian.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, Alexander Aring <alex.aring@gmail.com>, netdev@vger.kernel.org, 
+	"open list:6LOWPAN GENERIC (BTLE/IEEE 802.15.4)" <linux-bluetooth@vger.kernel.org>, 
+	"open list:6LOWPAN GENERIC (BTLE/IEEE 802.15.4)" <linux-wpan@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Luiz,
+Hi,
 
-On 1/9/24 18:53, Luiz Augusto von Dentz wrote:
-> Hi Jonas,
-> 
-> On Mon, Jan 8, 2024 at 5:46 PM Jonas Dreßler <verdre@v0yd.nl> wrote:
->>
->> Since commit 4c67bc74f016 ("[Bluetooth] Support concurrent connect
->> requests"), the kernel supports trying to connect again in case the
->> bluetooth card is busy and fails to connect.
->>
->> The logic that should handle this became a bit spotty over time, and also
->> cards these days appear to fail with more errors than just "Command
->> Disallowed".
->>
->> This series refactores the handling of concurrent connection requests
->> by serializing all "Create Connection" commands for ACL connections
->> similar to how we do it for LE connections.
->>
->> ---
->>
->> v1: https://lore.kernel.org/linux-bluetooth/20240102185933.64179-1-verdre@v0yd.nl/
->> v2: https://lore.kernel.org/linux-bluetooth/20240108183938.468426-1-verdre@v0yd.nl/
->> v3:
->>    - Move the new sync function to hci_sync.c as requested by review
->>    - Abort connection on failure using hci_abort_conn_sync() instead of
->>      hci_abort_conn()
->>    - Make the last commit message a bit more precise regarding the meaning
->>      of BT_CONNECT2 state
->>
->> Jonas Dreßler (4):
->>    Bluetooth: Remove superfluous call to hci_conn_check_pending()
->>    Bluetooth: hci_event: Use HCI error defines instead of magic values
->>    Bluetooth: hci_conn: Only do ACL connections sequentially
->>    Bluetooth: Remove pending ACL connection attempts
->>
->>   include/net/bluetooth/hci.h      |  3 ++
->>   include/net/bluetooth/hci_core.h |  1 -
->>   include/net/bluetooth/hci_sync.h |  3 ++
->>   net/bluetooth/hci_conn.c         | 83 +++-----------------------------
->>   net/bluetooth/hci_event.c        | 29 +++--------
->>   net/bluetooth/hci_sync.c         | 72 +++++++++++++++++++++++++++
->>   6 files changed, 93 insertions(+), 98 deletions(-)
->>
->> --
->> 2.43.0
-> 
-> After rebasing and fixing a little bit here and there, see v4, looks
-> like this changes is affecting the following mgmt-tester -s "Pair
-> Device - Power off 1":
-> 
-> Pair Device - Power off 1 - init
->    Read Version callback
->      Status: Success (0x00)
->      Version 1.22
->    Read Commands callback
->      Status: Success (0x00)
->    Read Index List callback
->      Status: Success (0x00)
->    Index Added callback
->      Index: 0x0000
->    Enable management Mesh interface
->    Enabling Mesh feature
->    Read Info callback
->      Status: Success (0x00)
->      Address: 00:AA:01:00:00:00
->      Version: 0x09
->      Manufacturer: 0x05f1
->      Supported settings: 0x0001bfff
->      Current settings: 0x00000080
->      Class: 0x000000
->      Name:
->      Short name:
->    Mesh feature is enabled
-> Pair Device - Power off 1 - setup
->    Setup sending Set Bondable (0x0009)
->    Setup sending Set Powered (0x0005)
->    Initial settings completed
->    Test setup condition added, total 1
->    Client set connectable: Success (0x00)
->    Test setup condition complete, 0 left
-> Pair Device - Power off 1 - setup complete
-> Pair Device - Power off 1 - run
->    Sending Pair Device (0x0019)
-> Bluetooth: hci0: command 0x0405 tx timeout
-> Bluetooth: hci0: command 0x0408 tx timeout
->    Test condition added, total 1
-> Pair Device - Power off 1 - test timed out
->    Pair Device (0x0019): Disconnected (0x0e)
-> Pair Device - Power off 1 - test not run
-> Pair Device - Power off 1 - teardown
-> Pair Device - Power off 1 - teardown
->    Index Removed callback
->      Index: 0x0000
-> Pair Device - Power off 1 - teardown complete
-> Pair Device - Power off 1 - done
-> 
+On Mon, Jan 8, 2024 at 1:21=E2=80=AFPM Breno Leitao <leitao@debian.org> wro=
+te:
+>
+> W=3D1 builds now warn if module is built without a MODULE_DESCRIPTION().
+> Add descriptions to IPv6 over Low power Wireless Personal Area Network.
+>
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> ---
+>  net/6lowpan/core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
+> index 7b3341cef926..80d83151ef29 100644
+> --- a/net/6lowpan/core.c
+> +++ b/net/6lowpan/core.c
+> @@ -178,5 +178,5 @@ static void __exit lowpan_module_exit(void)
+>
+>  module_init(lowpan_module_init);
+>  module_exit(lowpan_module_exit);
+> -
+> +MODULE_DESCRIPTION("IPv6 over Low power Wireless Personal Area Network m=
+odule");
 
-Thanks for landing the first two commits!
+Here is a nitpick as well. The correct acronym [0] is "IPv6 over
+Low-Power Wireless Personal Area Network", otherwise it is okay.
 
-I think this is actually the same issue causing the test failure
-as in the other issue I had:
-https://lore.kernel.org/linux-bluetooth/7cee4e74-3a0c-4b7c-9984-696e646160f8@v0yd.nl/
+Acked-by: Alexander Aring <aahringo@redhat.com>
 
-It seems that the emulator is unable to reply to HCI commands sent
-from the hci_sync machinery, possibly because that is sending things
-on a separate thread?
+- Alex
 
-Cheers,
-Jonas
