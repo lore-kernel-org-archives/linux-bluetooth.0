@@ -1,95 +1,211 @@
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7D3A4CDEF
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jan 2024 15:17:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: from m16.mail.126.com (m16.mail.126.com [220.197.31.8])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5E325100A
+	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jan 2024 17:08:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pc80+ljg"
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-680a13af19bso34483036d6.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jan 2024 07:17:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704986278; x=1705591078; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=7SzMTiZbjSUu/Bn1u4K4MPvYNDuqEAcrZ9o8DXkcj1c=;
-        b=Pc80+ljghaxOTkVNgLVwEA5G+gD5G6IHpAvjLAYF/fRoxum0ymD7X7vA9limN82ax9
-         jpdXW1rG4oYLl2lwhyV5CawAEKia0jcZrzLdh6fcfxNkvW/JLhokEGJikXvKmM4W3mWm
-         j/lIhlBGGfTCg/vDCgrHR/bKous4wEntOYkLBjr6djphim6g93wdPdesLvuXP/fsYTxc
-         ZA9nJ5bCM7nJPCGZ7aNXQTUyAifg6e43xEtqfClY/wWyCpm/HtNocNU1u9tCzi4ITyD5
-         tWk8+3gDH4AtWZwCUhIEzzw4IGFyZaQDd8gBVdCXf9LQyOPRHIgM75UOj7AL9eZqWdor
-         5FdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704986278; x=1705591078;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7SzMTiZbjSUu/Bn1u4K4MPvYNDuqEAcrZ9o8DXkcj1c=;
-        b=NiLUIpDm+lfjPBdK3TW6yiP+KmC55AsbA21sOSxSJVJnElwhax5sVimkDGLCtD4Uxt
-         apUbf1elNuM9qDgC0qL4B5Enmm2KkCUTIRjAeufGJaBIiH8Td1s51hhl8X3D7MNdF0O9
-         3ybnX8V8qxm4s9qjQ1hiCyy8dTAHu4vsMgXxY+x1YahAr5IWFcDZvpU2Kz+gReDTKY68
-         UIwqkmX+VdBpfFXA4goqglk1jpM0iYBzaXUYwsXZ4BZqmTYeAtYRJZXxyEYNdu9vfNRf
-         d0Ue9HdzJNAI4O/2e7NrT5McZvhDMMSaK0X8aIyPpE6G5cVANtpLYRXJewJZevAAv1KC
-         Qa6Q==
-X-Gm-Message-State: AOJu0YzApM0o3wdoXd3PrOz69bNA9XvllurFgbKBetwUJ7Xbfhcujiwo
-	E5bugrn6HJvou77HRZ4jJy68JExQqWE=
-X-Google-Smtp-Source: AGHT+IEk6hl60EgQU3fP/jOQaiKekxFNNs0FWHpMsZU5I9yypYH6Ke8da094Lgi+p/rPHftUSUKUTw==
-X-Received: by 2002:a05:6214:c67:b0:67f:7ef9:4a09 with SMTP id t7-20020a0562140c6700b0067f7ef94a09mr1309814qvj.43.1704986278626;
-        Thu, 11 Jan 2024 07:17:58 -0800 (PST)
-Received: from [172.17.0.2] ([40.65.196.150])
-        by smtp.gmail.com with ESMTPSA id y10-20020a0cec0a000000b0067eff6713a8sm356486qvo.87.2024.01.11.07.17.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jan 2024 07:17:58 -0800 (PST)
-Message-ID: <65a006a6.0c0a0220.c56e6.1ac4@mx.google.com>
-Date: Thu, 11 Jan 2024 07:17:58 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0218106959128281231=="
+	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="goB9pV01"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
+	s=s110527; h=Message-ID:Date:MIME-Version:Subject:From:
+	Content-Type; bh=VLNnZ77FwV1Z+gRyeZYyZ7hTqyr2mPiPelSIvtCsVEM=;
+	b=goB9pV01ezGz4sJsILuTd60XvDqhB4oc+k/UiAHttt7aoDLdwTxc34wCxLbndh
+	Fm0Be7vyuuIVuekGzn5zwQXpffRCq2S8XCnqdIKO8TEaPO1a26r8NYkU+b6Krpj4
+	nXygs9uc9s2dLSH4yqHkFUQXW3/B4GkiOpIewpExf+D3E=
+Received: from [192.168.50.76] (unknown [58.22.7.114])
+	by gzga-smtp-mta-g1-0 (Coremail) with SMTP id _____wD3_6OXIKBlXWUyAA--.64902S2;
+	Fri, 12 Jan 2024 01:08:43 +0800 (CST)
+Message-ID: <c91cd086-4fff-45f4-9f6a-8fdee602f981@126.com>
+Date: Fri, 12 Jan 2024 01:08:39 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
-Subject: RE: Fix gatt-db munmap_chunk invalid pointer
-In-Reply-To: <20240111133955.65686-2-frederic.danis@collabora.com>
-References: <20240111133955.65686-2-frederic.danis@collabora.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH BlueZ v4 1/2] a2dp: fix incorrect transaction label in
+ setconf phase
+Content-Language: en-GB
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+References: <20240104171400.124128-1-xiaokeqinhealth@126.com>
+ <CABBYNZJJdZTWBaq1KakyDpg67nx8peyzLgb29+UBd9UEsd5CaQ@mail.gmail.com>
+From: Yao Xiao <xiaokeqinhealth@126.com>
+In-Reply-To: <CABBYNZJJdZTWBaq1KakyDpg67nx8peyzLgb29+UBd9UEsd5CaQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3_6OXIKBlXWUyAA--.64902S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW3GF17Cr1rGF48GF1fKFyDJrb_yoWxGryxpF
+	WfuF1UJFWDJr1UAFZ2q398uF40q393tr1rGryYqrnIvwsIkFy3tFykt3yj9398CrWI9w4Y
+	v3Wvg393Xr4qkFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UdKs8UUUUU=
+X-CM-SenderInfo: 50ld0yhhtl0xhhdo3xa6rslhhfrp/1tbimh1i1WVLZXTeKAAAs5
 
---===============0218106959128281231==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Luiz,
+On 2024/1/5 3:08, Luiz Augusto von Dentz wrote:
+> Hi Xiao,
+> On Thu, Jan 4, 2024 at 12:16 PM Xiao Yao <xiaokeqinhealth@126.com> wrote:
+>> From: Xiao Yao <xiaoyao@rock-chips.com>
+>>
+>> BLUETOOTH SPECIFICATION Page 61 of 140
+>> Audio/Video Distribution Transport Protocol Specification (V13)
+>> 8.4.6 Message integrity verification at receiver side
+>>
+>> - The receiver of an AVDTP signaling message shall not interpret corrupted
+>> messages. Those messages are discarded and no signaling message is returned
+>> to the sender if no error code is applicable. Possible corrupted messages
+>> are:
+>>
+>>    * Response messages where the transaction label cannot match a previous
+>>      command sent to the remote device
+>>
+>> Consider the following scenario:
+>> btmon log:
+>> AVDTP: Discover (0x01) Command (0x00) type 0x00 label 5 nosp 0
+>> ... ...
+>> < AVDTP: Set Configuration (0x03) Command (0x00) type 0x00 label 8 nosp 0
+>> //Currently, a 'set configuration' message has been received from the
+>> //sender, which contains a transaction label valued at 8. This message
+>> //was then relayed to A2DP backend(PulseAudio/PipeWire) using the dbus
+>> //interface.
+>>    set_configuration()(media.c)
+>>      dbus_message_new_method_call(..., "SetConfiguration", ...);
+>>      g_dbus_send_message_with_reply(btd_get_dbus_connection(), ...);
+>>      dbus_pending_call_set_notify(request->call, endpoint_reply, ...);
+>>      ...
+>>
+>> //The commit "02877c5e9" introduces a reverse discovery logic, resulting
+>> //in a small probability that the discovery command is issued before the
+>> //setconfig accept command.
+>> //Tip: If an artificial delay is added to the audio backend, this issue
+>> //will invariably occur."
+>>> AVDTP: Discover (0x01) Command (0x00) type 0x00 label 0 nosp 0
+>> //After receiving the discover reply, the session->in.transaction is
+>> //changed to 0
+>> < AVDTP: Discover (0x01) Response Accept (0x02) type 0x00 label 0 nosp 0
+>>
+>>> AVDTP: Set Configuration (0x03) Resp Accept (0x02) type 0 label 0 nosp 0
+>> //The audio backend reply the dbus message
+>>    endpoint_reply (media.c)
+>>      setconf_cb (avdtp.c)
+>>        //Here avdtp_send sends an incorrect transaction value, causing
+>>        //the sender to discard the message. (The correct transaction
+>>        //value is 8)
+>>        avdtp_send(session, session->in.transaction, AVDTP_MSG_TYPE_ACCEPT,
+>>                   AVDTP_SET_CONFIGURATION, NULL, 0)
+>>
+>> AVDTP: Delay Report (0x0d) Command (0x00) type 0x00 label 1 nosp 0
+>> ... ...
+>>
+>> Therefore, the reverse discovery logic was adjusted to the back of
+>> setconfig accept to avoid two transmission transactions at the same
+>> time and fixed the problem.
+>>
+>> Signed-off-by: Xiao Yao <xiaoyao@rock-chips.com>
+>> ---
+>> v1 -> v2: Fixed "session->in.transaction" logic err.
+>> v2 -> v3: Fixed some compile warnings
+>> v3 -> v4: Adjust the timing of reverse discovery logic
+>> ---
+>>   profiles/audio/a2dp.c | 27 ++++++++++++++-------------
+>>   1 file changed, 14 insertions(+), 13 deletions(-)
+>>
+>> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+>> index b43161a13..f4ef8aec2 100644
+>> --- a/profiles/audio/a2dp.c
+>> +++ b/profiles/audio/a2dp.c
+>> @@ -586,6 +586,12 @@ done:
+>>          return FALSE;
+>>   }
+>>
+>> +static void reverse_discover(struct avdtp *session, GSList *seps, int err,
+>> +                            void *user_data)
+>> +{
+>> +       DBG("err %d", err);
+>> +}
+>> +
+>>   static void endpoint_setconf_cb(struct a2dp_setup *setup, gboolean ret)
+>>   {
+>>          if (ret == FALSE) {
+>> @@ -595,6 +601,13 @@ static void endpoint_setconf_cb(struct a2dp_setup *setup, gboolean ret)
+>>          }
+>>
+>>          auto_config(setup);
+>> +
+>> +       /* Attempt to reverse discover if there are no remote
+>> +        * SEPs.
+>> +        */
+>> +       if (queue_isempty(setup->chan->seps))
+>> +               a2dp_discover(setup->session, reverse_discover, NULL);
+>> +
+>>          setup_unref(setup);
+>>   }
+>>
+>> @@ -634,12 +647,6 @@ static gboolean endpoint_match_codec_ind(struct avdtp *session,
+>>          return TRUE;
+>>   }
+>>
+>> -static void reverse_discover(struct avdtp *session, GSList *seps, int err,
+>> -                                                       void *user_data)
+>> -{
+>> -       DBG("err %d", err);
+>> -}
+>> -
+>>   static gboolean endpoint_setconf_ind(struct avdtp *session,
+>>                                                  struct avdtp_local_sep *sep,
+>>                                                  struct avdtp_stream *stream,
+>> @@ -695,14 +702,8 @@ static gboolean endpoint_setconf_ind(struct avdtp *session,
+>>                                                  setup_ref(setup),
+>>                                                  endpoint_setconf_cb,
+>>                                                  a2dp_sep->user_data);
+>> -               if (ret == 0) {
+>> -                       /* Attempt to reverse discover if there are no remote
+>> -                        * SEPs.
+>> -                        */
+>> -                       if (queue_isempty(setup->chan->seps))
+>> -                               a2dp_discover(session, reverse_discover, NULL);
+> Have you actually test these changes with read devices? I would be
+> really surprised if this works because you are essentially changing
+> the reverse discover to when we do initiate AVDTP_SetConfiguration
+> rather when we receive, which shall never need a reverse discover to
+> begin with since we are initiating we always perform a discover
+> anyway, so that most likely is dead code that will never going to
+> executed.
+Apologies for my delayed response due to other commitments.
+Here is the original logic:
+  < AVDTP_SetConfiguration_Ind
+ > AVDTP_Discover(reverse)
+  < AVDTP_SetConfiguration_Rsp
 
-This is automated email and please do not reply to this email!
+Here is the modified logic:
+  < AVDTP_SetConfiguration_Ind
+  > AVDTP_SetConfiguration_Rsp
+  < AVDTP_Discover (reverse)
+The endpoint_setconf_cb above is called after AVDTP_SetConfiguration_Rsp
 
-Dear submitter,
+My test scenario is that my device acts as a sink, and when the
+mobile phone connects to my device, a2dp reverse discover will
+be triggered on the first connection (subsequent reconnections
+will not send the reverse process due to caching) and they work
+very well.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=816181
+If there are any errors in the description above, please point them out.
+I would greatly appreciate it.
+> The real culprit here is that both commands and responses are stored
+> in the session.in while we should probably have a session.cmd and
+> session.rsp to be able to handle outstanding requests in each
+> direction.
+Very good suggestion, I will send new patch.
+>
+>> +               if (ret == 0)
+>>                          return TRUE;
+>> -               }
+>>
+>>                  setup_unref(setup);
+>>                  setup->err = g_new(struct avdtp_error, 1);
+>> --
+>> 2.34.1
+>>
+>>
+>
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.10 seconds
-GitLint                       PASS      0.83 seconds
-BuildEll                      PASS      23.87 seconds
-BluezMake                     PASS      727.83 seconds
-MakeCheck                     PASS      11.38 seconds
-MakeDistcheck                 PASS      159.36 seconds
-CheckValgrind                 PASS      221.84 seconds
-CheckSmatch                   PASS      327.53 seconds
-bluezmakeextell               PASS      105.96 seconds
-IncrementalBuild              PASS      1352.37 seconds
-ScanBuild                     PASS      930.29 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0218106959128281231==--
