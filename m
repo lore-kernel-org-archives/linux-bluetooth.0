@@ -1,88 +1,123 @@
-Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD3014F209
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jan 2024 20:47:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0B32F9D2;
+	Thu, 11 Jan 2024 08:16:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bYy1vbn6"
-Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-59612e4a21eso1565426eaf.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jan 2024 12:47:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704919656; x=1705524456; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=zj++l+mf3FDa72zdeI87pU80V590WTDaa275VKlcuWo=;
-        b=bYy1vbn6JgCV1LLIl7bNhBKq26caQpi53faHXPdEJGBo00L6U4TPjBU3bNEpRbvYjD
-         q7vDsr/09DtCH92prbMHbUdOp2bWR9f/DJE6FsF9D2t3ICpwhquFBvw/gQAIJ06AAEqD
-         PqK3mwlhX1N7BQu/3shAxi5C1tJm8iJ5gfwlRLK3VtTyYsGZIVBzkKIUJeE0Jm54UpCU
-         qrbtCZGtYj16ytDh3J2dK31ILJt8ZiZm6SIDXpHgOS+giGGpNA1lDZHZagp6UN4AwJ/g
-         e8t2eOA/R8X5cige+PrG1yIg2hfQCLNnKfxUa0yeolTxGpJ4rFw+hFmCzmfNK58f2hmI
-         1Ujw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704919656; x=1705524456;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zj++l+mf3FDa72zdeI87pU80V590WTDaa275VKlcuWo=;
-        b=kcQRKLZ9uv9Pv5EFRfQ/MoPul9v6+hnBE3E7hrX5L6G/zvRVvks1t2/PleF1KYmeux
-         HZ3kNovky1hkz0JQ1cUfj6P00i+UlCNnVmcGGSpm6Ddw57yM4F6AwIVu3qPMc9YGn1fS
-         761MWrelIbclRzsVC9TqAurOHrJLxZySxP72gQmjJRSxzRC9D3zYmgOXZR7gBEdZH+ON
-         jv/TRBF5bITtytmOe1vwknYxNmPznz4UK+b4AAtUoFBaBQYnKpaHLlnLY1l4AjI4ELQy
-         h6Pts6efDa3bTOQEYNsNE1E+v+OBdC9XQjlxt8BeVFZ61oHBhAx+Cq8otq01zWjNcIHq
-         Abzg==
-X-Gm-Message-State: AOJu0Yy0HYU1jI72laIGHpTAb5/XJXyqjcAiGw/8bY1OEhCb02mNLdaO
-	vYGEtWC4KVOOtAAEanWPxpEpfrxBR9o=
-X-Google-Smtp-Source: AGHT+IEw1baCPatdNdpgfZndXo10zB8U/VOxsefmSHkBtd2lJu7ruNBzxNuBTW8ksbSne9B83WxJzw==
-X-Received: by 2002:a05:6820:22a0:b0:594:6f:f6d6 with SMTP id ck32-20020a05682022a000b00594006ff6d6mr205603oob.8.1704919655802;
-        Wed, 10 Jan 2024 12:47:35 -0800 (PST)
-Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
-        by smtp.gmail.com with ESMTPSA id e12-20020a4ae0cc000000b00591cdc0f2f3sm913732oot.19.2024.01.10.12.47.34
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jan 2024 12:47:35 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: hci_core: Cancel request on command timeout
-Date: Wed, 10 Jan 2024 15:47:33 -0500
-Message-ID: <20240110204733.685963-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Uwu1Q7XX"
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40B7TYrl003904;
+	Thu, 11 Jan 2024 08:16:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	from:to:cc:subject:date:message-id:mime-version:content-type; s=
+	qcppdkim1; bh=ZoOpTDkO3PZHFU5dQRmU3J9Ylc/ozw3QutY0nMOReec=; b=Uw
+	u1Q7XX/4351c6TZfTAn0jKRaFDGJeH2FohuiGDeUzqXBLI8dWJUObveH3PYJKr/A
+	zRPYMXuBq9uK5oJmwQagJgXeXEqgSsYyPQTXWHzJVFzGEZHwiO7lxsAjvTPbvU8k
+	PgnVq7fz4q17rXHXJ3I6iq5jr9glBv7Vnt2b4eGbqjJe2Dz/+P5nCkXnjnSp7+pm
+	meSCut7eOudJTHuLSAygoKw/RYz94PfQnts4cg/Wt9HYcOSXDHTSNEy8Z1uVIyZ0
+	v/Ek2ydGKkfeFPRFWkPt2SH7+hTFdM/R1TwbSHJ9Qxr36Zn7x1Dw9cq1KRHkKh1O
+	y8lxV/GDhxbGcRGMGE6w==
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3vhsqytp96-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 11 Jan 2024 08:16:26 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 40B8GOMC015570
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 11 Jan 2024 08:16:24 GMT
+Received: from zijuhu-gv.qualcomm.com (10.80.80.8) by
+ nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Thu, 11 Jan 2024 00:16:23 -0800
+From: Zijun Hu <quic_zijuhu@quicinc.com>
+To: <luiz.dentz@gmail.com>, <marcel@holtmann.org>, <jiangzp@google.com>
+CC: <linux-bluetooth@vger.kernel.org>, <quic_zijuhu@quicinc.com>,
+        <stable@vger.kernel.org>
+Subject: [PATCH v1] Bluetooth: qca: Fix crash when btattach controller ROME
+Date: Thu, 11 Jan 2024 16:16:18 +0800
+Message-ID: <1704960978-5437-1-git-send-email-quic_zijuhu@quicinc.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: sMbQPrTlxl-qBcTzGDJhAYj39sy80rSu
+X-Proofpoint-ORIG-GUID: sMbQPrTlxl-qBcTzGDJhAYj39sy80rSu
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ lowpriorityscore=0 bulkscore=0 clxscore=1011 phishscore=0 adultscore=0
+ mlxlogscore=846 spamscore=0 priorityscore=1501 impostorscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2311290000 definitions=main-2401110065
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+A crash will happen when btattach controller ROME, and it is caused by
+dereferring nullptr hu->serdev, fixed by null check before access.
 
-If command has timed out call __hci_cmd_sync_cancel to notify the
-hci_req since it will inevitably cause a timeout.
+sudo btattach -B /dev/ttyUSB0 -P qca
+Bluetooth: hci1: QCA setup on UART is completed
+BUG: kernel NULL pointer dereference, address: 00000000000002f0
+......
+Workqueue: hci1 hci_power_on [bluetooth]
+RIP: 0010:qca_setup+0x7c1/0xe30 [hci_uart]
+......
+Call Trace:
+ <TASK>
+ ? show_regs+0x72/0x90
+ ? __die+0x25/0x80
+ ? page_fault_oops+0x154/0x4c0
+ ? srso_alias_return_thunk+0x5/0xfbef5
+ ? kmem_cache_alloc+0x16b/0x310
+ ? do_user_addr_fault+0x330/0x6e0
+ ? srso_alias_return_thunk+0x5/0xfbef5
+ ? exc_page_fault+0x84/0x1b0
+ ? asm_exc_page_fault+0x27/0x30
+ ? qca_setup+0x7c1/0xe30 [hci_uart]
+ hci_uart_setup+0x5c/0x1a0 [hci_uart]
+ hci_dev_open_sync+0xee/0xca0 [bluetooth]
+ hci_dev_do_open+0x2a/0x70 [bluetooth]
+ hci_power_on+0x46/0x210 [bluetooth]
+ process_one_work+0x17b/0x360
+ worker_thread+0x307/0x430
+ ? __pfx_worker_thread+0x10/0x10
+ kthread+0xf7/0x130
+ ? __pfx_kthread+0x10/0x10
+ ret_from_fork+0x46/0x70
+ ? __pfx_kthread+0x10/0x10
+ ret_from_fork_asm+0x1b/0x30
+ </TASK>
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Fixes: 03b0093f7b31 ("Bluetooth: hci_qca: get wakeup status from serdev device handle")
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+Tested-by: Zijun Hu <quic_zijuhu@quicinc.com>
 ---
- net/bluetooth/hci_core.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/bluetooth/hci_qca.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index e5cb618fa6d3..af82f903163e 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1523,10 +1523,11 @@ static void hci_cmd_timeout(struct work_struct *work)
- 					    cmd_timer.work);
- 
- 	if (hdev->sent_cmd) {
--		struct hci_command_hdr *sent = (void *) hdev->sent_cmd->data;
--		u16 opcode = __le16_to_cpu(sent->opcode);
-+		u16 opcode = hci_skb_opcode(hdev->sent_cmd);
- 
- 		bt_dev_err(hdev, "command 0x%4.4x tx timeout", opcode);
-+
-+		__hci_cmd_sync_cancel(hdev, -ETIMEDOUT);
- 	} else {
- 		bt_dev_err(hdev, "command tx timeout");
- 	}
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 94b8c406f0c0..6fcfc1f7bb12 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1951,7 +1951,7 @@ static int qca_setup(struct hci_uart *hu)
+ 		qca_debugfs_init(hdev);
+ 		hu->hdev->hw_error = qca_hw_error;
+ 		hu->hdev->cmd_timeout = qca_cmd_timeout;
+-		if (device_can_wakeup(hu->serdev->ctrl->dev.parent))
++		if (hu->serdev && device_can_wakeup(hu->serdev->ctrl->dev.parent))
+ 			hu->hdev->wakeup = qca_wakeup;
+ 	} else if (ret == -ENOENT) {
+ 		/* No patch/nvm-config found, run with original fw/config */
 -- 
-2.43.0
+2.7.4
 
