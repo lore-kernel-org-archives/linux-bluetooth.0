@@ -1,211 +1,297 @@
-Received: from m16.mail.126.com (m16.mail.126.com [220.197.31.8])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5E325100A
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jan 2024 17:08:47 +0000 (UTC)
+Received: from m16.mail.126.com (m16.mail.126.com [220.197.31.7])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02DDE5674E
+	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jan 2024 17:16:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="goB9pV01"
+	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="PBDImyul"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
-	s=s110527; h=Message-ID:Date:MIME-Version:Subject:From:
-	Content-Type; bh=VLNnZ77FwV1Z+gRyeZYyZ7hTqyr2mPiPelSIvtCsVEM=;
-	b=goB9pV01ezGz4sJsILuTd60XvDqhB4oc+k/UiAHttt7aoDLdwTxc34wCxLbndh
-	Fm0Be7vyuuIVuekGzn5zwQXpffRCq2S8XCnqdIKO8TEaPO1a26r8NYkU+b6Krpj4
-	nXygs9uc9s2dLSH4yqHkFUQXW3/B4GkiOpIewpExf+D3E=
-Received: from [192.168.50.76] (unknown [58.22.7.114])
-	by gzga-smtp-mta-g1-0 (Coremail) with SMTP id _____wD3_6OXIKBlXWUyAA--.64902S2;
-	Fri, 12 Jan 2024 01:08:43 +0800 (CST)
-Message-ID: <c91cd086-4fff-45f4-9f6a-8fdee602f981@126.com>
-Date: Fri, 12 Jan 2024 01:08:39 +0800
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=g77bv
+	5aMkQxNLvG2YHbIoHLHKIq2v0VwzzR4QCKJCvI=; b=PBDImyulakaBJqAVp44v9
+	WHwyWvhqnJatzwFkn6aBRXC9R+mlg6S2nQbAc6z7cgBFgeJVaW26FEuSfWHolUCQ
+	qqRcttmvh+2u3CoWSQV9ay+hz1A01m+GpX2U9VMlMvhakW3B1ENI6vL3uoWcVO3u
+	ot7nFWEMZMJH/kAY/5oOuw=
+Received: from localhost.localdomain (unknown [58.22.7.114])
+	by gzga-smtp-mta-g1-0 (Coremail) with SMTP id _____wDnj6R1IqBlb44yAA--.65429S2;
+	Fri, 12 Jan 2024 01:16:37 +0800 (CST)
+From: Xiao Yao <xiaokeqinhealth@126.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Xiao Yao <xiaoyao@rock-chips.com>
+Subject: [PATCH BlueZ v1] avdtp: Fix potential incorrect transaction label
+Date: Fri, 12 Jan 2024 01:16:35 +0800
+Message-Id: <20240111171635.144825-1-xiaokeqinhealth@126.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH BlueZ v4 1/2] a2dp: fix incorrect transaction label in
- setconf phase
-Content-Language: en-GB
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-References: <20240104171400.124128-1-xiaokeqinhealth@126.com>
- <CABBYNZJJdZTWBaq1KakyDpg67nx8peyzLgb29+UBd9UEsd5CaQ@mail.gmail.com>
-From: Yao Xiao <xiaokeqinhealth@126.com>
-In-Reply-To: <CABBYNZJJdZTWBaq1KakyDpg67nx8peyzLgb29+UBd9UEsd5CaQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3_6OXIKBlXWUyAA--.64902S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW3GF17Cr1rGF48GF1fKFyDJrb_yoWxGryxpF
-	WfuF1UJFWDJr1UAFZ2q398uF40q393tr1rGryYqrnIvwsIkFy3tFykt3yj9398CrWI9w4Y
-	v3Wvg393Xr4qkFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UdKs8UUUUU=
-X-CM-SenderInfo: 50ld0yhhtl0xhhdo3xa6rslhhfrp/1tbimh1i1WVLZXTeKAAAs5
+X-CM-TRANSID:_____wDnj6R1IqBlb44yAA--.65429S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW3WrW8XFW3tFy3Jry3ury3Arb_yoW3KF1xpF
+	y7Gr97tryxJF18ArWxXr98XrWYyrn3GrW8GryUtanaya17C3Z5t3W0yry0k34DKr9xX3y5
+	ur1Ygw4kGw42krDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UMv38UUUUU=
+X-CM-SenderInfo: 50ld0yhhtl0xhhdo3xa6rslhhfrp/1tbiEBdi1WVLZXU4jwAAs5
 
-Hi Luiz,
-On 2024/1/5 3:08, Luiz Augusto von Dentz wrote:
-> Hi Xiao,
-> On Thu, Jan 4, 2024 at 12:16 PM Xiao Yao <xiaokeqinhealth@126.com> wrote:
->> From: Xiao Yao <xiaoyao@rock-chips.com>
->>
->> BLUETOOTH SPECIFICATION Page 61 of 140
->> Audio/Video Distribution Transport Protocol Specification (V13)
->> 8.4.6 Message integrity verification at receiver side
->>
->> - The receiver of an AVDTP signaling message shall not interpret corrupted
->> messages. Those messages are discarded and no signaling message is returned
->> to the sender if no error code is applicable. Possible corrupted messages
->> are:
->>
->>    * Response messages where the transaction label cannot match a previous
->>      command sent to the remote device
->>
->> Consider the following scenario:
->> btmon log:
->> AVDTP: Discover (0x01) Command (0x00) type 0x00 label 5 nosp 0
->> ... ...
->> < AVDTP: Set Configuration (0x03) Command (0x00) type 0x00 label 8 nosp 0
->> //Currently, a 'set configuration' message has been received from the
->> //sender, which contains a transaction label valued at 8. This message
->> //was then relayed to A2DP backend(PulseAudio/PipeWire) using the dbus
->> //interface.
->>    set_configuration()(media.c)
->>      dbus_message_new_method_call(..., "SetConfiguration", ...);
->>      g_dbus_send_message_with_reply(btd_get_dbus_connection(), ...);
->>      dbus_pending_call_set_notify(request->call, endpoint_reply, ...);
->>      ...
->>
->> //The commit "02877c5e9" introduces a reverse discovery logic, resulting
->> //in a small probability that the discovery command is issued before the
->> //setconfig accept command.
->> //Tip: If an artificial delay is added to the audio backend, this issue
->> //will invariably occur."
->>> AVDTP: Discover (0x01) Command (0x00) type 0x00 label 0 nosp 0
->> //After receiving the discover reply, the session->in.transaction is
->> //changed to 0
->> < AVDTP: Discover (0x01) Response Accept (0x02) type 0x00 label 0 nosp 0
->>
->>> AVDTP: Set Configuration (0x03) Resp Accept (0x02) type 0 label 0 nosp 0
->> //The audio backend reply the dbus message
->>    endpoint_reply (media.c)
->>      setconf_cb (avdtp.c)
->>        //Here avdtp_send sends an incorrect transaction value, causing
->>        //the sender to discard the message. (The correct transaction
->>        //value is 8)
->>        avdtp_send(session, session->in.transaction, AVDTP_MSG_TYPE_ACCEPT,
->>                   AVDTP_SET_CONFIGURATION, NULL, 0)
->>
->> AVDTP: Delay Report (0x0d) Command (0x00) type 0x00 label 1 nosp 0
->> ... ...
->>
->> Therefore, the reverse discovery logic was adjusted to the back of
->> setconfig accept to avoid two transmission transactions at the same
->> time and fixed the problem.
->>
->> Signed-off-by: Xiao Yao <xiaoyao@rock-chips.com>
->> ---
->> v1 -> v2: Fixed "session->in.transaction" logic err.
->> v2 -> v3: Fixed some compile warnings
->> v3 -> v4: Adjust the timing of reverse discovery logic
->> ---
->>   profiles/audio/a2dp.c | 27 ++++++++++++++-------------
->>   1 file changed, 14 insertions(+), 13 deletions(-)
->>
->> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
->> index b43161a13..f4ef8aec2 100644
->> --- a/profiles/audio/a2dp.c
->> +++ b/profiles/audio/a2dp.c
->> @@ -586,6 +586,12 @@ done:
->>          return FALSE;
->>   }
->>
->> +static void reverse_discover(struct avdtp *session, GSList *seps, int err,
->> +                            void *user_data)
->> +{
->> +       DBG("err %d", err);
->> +}
->> +
->>   static void endpoint_setconf_cb(struct a2dp_setup *setup, gboolean ret)
->>   {
->>          if (ret == FALSE) {
->> @@ -595,6 +601,13 @@ static void endpoint_setconf_cb(struct a2dp_setup *setup, gboolean ret)
->>          }
->>
->>          auto_config(setup);
->> +
->> +       /* Attempt to reverse discover if there are no remote
->> +        * SEPs.
->> +        */
->> +       if (queue_isempty(setup->chan->seps))
->> +               a2dp_discover(setup->session, reverse_discover, NULL);
->> +
->>          setup_unref(setup);
->>   }
->>
->> @@ -634,12 +647,6 @@ static gboolean endpoint_match_codec_ind(struct avdtp *session,
->>          return TRUE;
->>   }
->>
->> -static void reverse_discover(struct avdtp *session, GSList *seps, int err,
->> -                                                       void *user_data)
->> -{
->> -       DBG("err %d", err);
->> -}
->> -
->>   static gboolean endpoint_setconf_ind(struct avdtp *session,
->>                                                  struct avdtp_local_sep *sep,
->>                                                  struct avdtp_stream *stream,
->> @@ -695,14 +702,8 @@ static gboolean endpoint_setconf_ind(struct avdtp *session,
->>                                                  setup_ref(setup),
->>                                                  endpoint_setconf_cb,
->>                                                  a2dp_sep->user_data);
->> -               if (ret == 0) {
->> -                       /* Attempt to reverse discover if there are no remote
->> -                        * SEPs.
->> -                        */
->> -                       if (queue_isempty(setup->chan->seps))
->> -                               a2dp_discover(session, reverse_discover, NULL);
-> Have you actually test these changes with read devices? I would be
-> really surprised if this works because you are essentially changing
-> the reverse discover to when we do initiate AVDTP_SetConfiguration
-> rather when we receive, which shall never need a reverse discover to
-> begin with since we are initiating we always perform a discover
-> anyway, so that most likely is dead code that will never going to
-> executed.
-Apologies for my delayed response due to other commitments.
-Here is the original logic:
-  < AVDTP_SetConfiguration_Ind
- > AVDTP_Discover(reverse)
-  < AVDTP_SetConfiguration_Rsp
+From: Xiao Yao <xiaoyao@rock-chips.com>
 
-Here is the modified logic:
-  < AVDTP_SetConfiguration_Ind
-  > AVDTP_SetConfiguration_Rsp
-  < AVDTP_Discover (reverse)
-The endpoint_setconf_cb above is called after AVDTP_SetConfiguration_Rsp
+Currently, AVDTP commands and responses from remote devices are all
+stored in session.in. When one end has an ongoing transaction and
+immediately starting another transaction, it may cause the session.
+in.transaction to be incorrectly modified, so we need session.in_cmd
+and session.in_rsp to be able to handle outstanding requests in each
+direction.
 
-My test scenario is that my device acts as a sink, and when the
-mobile phone connects to my device, a2dp reverse discover will
-be triggered on the first connection (subsequent reconnections
-will not send the reverse process due to caching) and they work
-very well.
+After applying this patch, the problem no longer recurs. Apply this
+patch to android/avdtp.c and run: unit/test-avdtp
+Test Summary
+------------
+/TP/SIG/SMG/BV-06-C-SEID-1                Passed       0.004 seconds
+... ...
+/TP/SIG/SYN/BV-06-C                       Passed       0.001 seconds
+Total: 62, Passed: 62 (100.0%), Failed: 0, Not Run: 0
+Overall execution time: 1.76 seconds
 
-If there are any errors in the description above, please point them out.
-I would greatly appreciate it.
-> The real culprit here is that both commands and responses are stored
-> in the session.in while we should probably have a session.cmd and
-> session.rsp to be able to handle outstanding requests in each
-> direction.
-Very good suggestion, I will send new patch.
->
->> +               if (ret == 0)
->>                          return TRUE;
->> -               }
->>
->>                  setup_unref(setup);
->>                  setup->err = g_new(struct avdtp_error, 1);
->> --
->> 2.34.1
->>
->>
->
+Signed-off-by: Xiao Yao <xiaoyao@rock-chips.com>
+---
+ profiles/audio/avdtp.c | 103 +++++++++++++++++++++--------------------
+ 1 file changed, 54 insertions(+), 49 deletions(-)
+
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+index 10ef380d4..3667e0840 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -286,7 +286,6 @@ struct in_buf {
+ 	gboolean active;
+ 	int no_of_packets;
+ 	uint8_t transaction;
+-	uint8_t message_type;
+ 	uint8_t signal_id;
+ 	uint8_t buf[1024];
+ 	uint8_t data_size;
+@@ -397,7 +396,8 @@ struct avdtp {
+ 	uint16_t imtu;
+ 	uint16_t omtu;
+ 
+-	struct in_buf in;
++	struct in_buf in_resp;
++	struct in_buf in_cmd;
+ 
+ 	char *buf;
+ 
+@@ -1462,15 +1462,16 @@ static void setconf_cb(struct avdtp *session, struct avdtp_stream *stream,
+ 	if (err != NULL) {
+ 		rej.error = AVDTP_UNSUPPORTED_CONFIGURATION;
+ 		rej.category = err->err.error_code;
+-		avdtp_send(session, session->in.transaction,
+-				AVDTP_MSG_TYPE_REJECT, AVDTP_SET_CONFIGURATION,
+-				&rej, sizeof(rej));
++		avdtp_send(session, session->in_cmd.transaction,
++			   AVDTP_MSG_TYPE_REJECT, AVDTP_SET_CONFIGURATION,
++			   &rej, sizeof(rej));
+ 		stream_free(stream);
+ 		return;
+ 	}
+ 
+-	if (!avdtp_send(session, session->in.transaction, AVDTP_MSG_TYPE_ACCEPT,
+-					AVDTP_SET_CONFIGURATION, NULL, 0)) {
++	if (!avdtp_send(session, session->in_cmd.transaction,
++			AVDTP_MSG_TYPE_ACCEPT,
++			AVDTP_SET_CONFIGURATION, NULL, 0)) {
+ 		stream_free(stream);
+ 		return;
+ 	}
+@@ -2092,6 +2093,12 @@ static enum avdtp_parse_result avdtp_parse_data(struct avdtp *session,
+ 	struct avdtp_start_header *start = (void *) session->buf;
+ 	void *payload;
+ 	gsize payload_size;
++	struct in_buf *in;
++
++	if (header->message_type == AVDTP_MSG_TYPE_COMMAND)
++		in = &session->in_cmd;
++	else
++		in = &session->in_resp;
+ 
+ 	switch (header->packet_type) {
+ 	case AVDTP_PKT_TYPE_SINGLE:
+@@ -2099,7 +2106,7 @@ static enum avdtp_parse_result avdtp_parse_data(struct avdtp *session,
+ 			error("Received too small single packet (%zu bytes)", size);
+ 			return PARSE_ERROR;
+ 		}
+-		if (session->in.active) {
++		if (in->active) {
+ 			error("SINGLE: Invalid AVDTP packet fragmentation");
+ 			return PARSE_ERROR;
+ 		}
+@@ -2107,12 +2114,11 @@ static enum avdtp_parse_result avdtp_parse_data(struct avdtp *session,
+ 		payload = session->buf + sizeof(*single);
+ 		payload_size = size - sizeof(*single);
+ 
+-		session->in.active = TRUE;
+-		session->in.data_size = 0;
+-		session->in.no_of_packets = 1;
+-		session->in.transaction = header->transaction;
+-		session->in.message_type = header->message_type;
+-		session->in.signal_id = single->signal_id;
++		in->active = TRUE;
++		in->data_size = 0;
++		in->no_of_packets = 1;
++		in->transaction = header->transaction;
++		in->signal_id = single->signal_id;
+ 
+ 		break;
+ 	case AVDTP_PKT_TYPE_START:
+@@ -2120,17 +2126,16 @@ static enum avdtp_parse_result avdtp_parse_data(struct avdtp *session,
+ 			error("Received too small start packet (%zu bytes)", size);
+ 			return PARSE_ERROR;
+ 		}
+-		if (session->in.active) {
++		if (in->active) {
+ 			error("START: Invalid AVDTP packet fragmentation");
+ 			return PARSE_ERROR;
+ 		}
+ 
+-		session->in.active = TRUE;
+-		session->in.data_size = 0;
+-		session->in.transaction = header->transaction;
+-		session->in.message_type = header->message_type;
+-		session->in.no_of_packets = start->no_of_packets;
+-		session->in.signal_id = start->signal_id;
++		in->active = TRUE;
++		in->data_size = 0;
++		in->transaction = header->transaction;
++		in->no_of_packets = start->no_of_packets;
++		in->signal_id = start->signal_id;
+ 
+ 		payload = session->buf + sizeof(*start);
+ 		payload_size = size - sizeof(*start);
+@@ -2142,15 +2147,15 @@ static enum avdtp_parse_result avdtp_parse_data(struct avdtp *session,
+ 									size);
+ 			return PARSE_ERROR;
+ 		}
+-		if (!session->in.active) {
++		if (!in->active) {
+ 			error("CONTINUE: Invalid AVDTP packet fragmentation");
+ 			return PARSE_ERROR;
+ 		}
+-		if (session->in.transaction != header->transaction) {
++		if (in->transaction != header->transaction) {
+ 			error("Continue transaction id doesn't match");
+ 			return PARSE_ERROR;
+ 		}
+-		if (session->in.no_of_packets <= 1) {
++		if (in->no_of_packets <= 1) {
+ 			error("Too few continue packets");
+ 			return PARSE_ERROR;
+ 		}
+@@ -2164,15 +2169,15 @@ static enum avdtp_parse_result avdtp_parse_data(struct avdtp *session,
+ 			error("Received too small end packet (%zu bytes)", size);
+ 			return PARSE_ERROR;
+ 		}
+-		if (!session->in.active) {
++		if (!in->active) {
+ 			error("END: Invalid AVDTP packet fragmentation");
+ 			return PARSE_ERROR;
+ 		}
+-		if (session->in.transaction != header->transaction) {
++		if (in->transaction != header->transaction) {
+ 			error("End transaction id doesn't match");
+ 			return PARSE_ERROR;
+ 		}
+-		if (session->in.no_of_packets > 1) {
++		if (in->no_of_packets > 1) {
+ 			error("Got an end packet too early");
+ 			return PARSE_ERROR;
+ 		}
+@@ -2186,23 +2191,23 @@ static enum avdtp_parse_result avdtp_parse_data(struct avdtp *session,
+ 		return PARSE_ERROR;
+ 	}
+ 
+-	if (session->in.data_size + payload_size >
+-					sizeof(session->in.buf)) {
++	if (in->data_size + payload_size >
++					sizeof(in->buf)) {
+ 		error("Not enough incoming buffer space!");
+ 		return PARSE_ERROR;
+ 	}
+ 
+-	memcpy(session->in.buf + session->in.data_size, payload, payload_size);
+-	session->in.data_size += payload_size;
++	memcpy(in->buf + in->data_size, payload, payload_size);
++	in->data_size += payload_size;
+ 
+-	if (session->in.no_of_packets > 1) {
+-		session->in.no_of_packets--;
++	if (in->no_of_packets > 1) {
++		in->no_of_packets--;
+ 		DBG("Received AVDTP fragment. %d to go",
+-						session->in.no_of_packets);
++						in->no_of_packets);
+ 		return PARSE_FRAGMENT;
+ 	}
+ 
+-	session->in.active = FALSE;
++	in->active = FALSE;
+ 
+ 	return PARSE_SUCCESS;
+ }
+@@ -2246,11 +2251,11 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
+ 		break;
+ 	}
+ 
+-	if (session->in.message_type == AVDTP_MSG_TYPE_COMMAND) {
+-		if (!avdtp_parse_cmd(session, session->in.transaction,
+-					session->in.signal_id,
+-					session->in.buf,
+-					session->in.data_size)) {
++	if (header->message_type == AVDTP_MSG_TYPE_COMMAND) {
++		if (!avdtp_parse_cmd(session, session->in_cmd.transaction,
++				     session->in_cmd.signal_id,
++				     session->in_cmd.buf,
++				     session->in_cmd.data_size)) {
+ 			error("Unable to handle command. Disconnecting");
+ 			goto failed;
+ 		}
+@@ -2273,7 +2278,7 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
+ 		return TRUE;
+ 	}
+ 
+-	if (session->in.signal_id != session->req->signal_id) {
++	if (session->in_resp.signal_id != session->req->signal_id) {
+ 		error("Response signal doesn't match");
+ 		return TRUE;
+ 	}
+@@ -2284,20 +2289,20 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
+ 	switch (header->message_type) {
+ 	case AVDTP_MSG_TYPE_ACCEPT:
+ 		if (!avdtp_parse_resp(session, session->req->stream,
+-						session->in.transaction,
+-						session->in.signal_id,
+-						session->in.buf,
+-						session->in.data_size)) {
++						session->in_resp.transaction,
++						session->in_resp.signal_id,
++						session->in_resp.buf,
++						session->in_resp.data_size)) {
+ 			error("Unable to parse accept response");
+ 			goto failed;
+ 		}
+ 		break;
+ 	case AVDTP_MSG_TYPE_REJECT:
+ 		if (!avdtp_parse_rej(session, session->req->stream,
+-						session->in.transaction,
+-						session->in.signal_id,
+-						session->in.buf,
+-						session->in.data_size)) {
++						session->in_resp.transaction,
++						session->in_resp.signal_id,
++						session->in_resp.buf,
++						session->in_resp.data_size)) {
+ 			error("Unable to parse reject response");
+ 			goto failed;
+ 		}
+-- 
+2.34.1
 
