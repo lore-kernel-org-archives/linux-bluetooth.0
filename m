@@ -1,141 +1,191 @@
-Received: from EUR01-VE1-obe.outbound.protection.outlook.com (mail-ve1eur01on2041.outbound.protection.outlook.com [40.107.14.41])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51A2E14F77;
-	Thu, 11 Jan 2024 10:06:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 686FF14F60;
+	Thu, 11 Jan 2024 10:14:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="BUF/gbU8"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WQFGYfmis2os9dCgJU3rgzQUphy5fOQ1is5yBCZ2J3Y2KyUpz/BV7SRWmB5VIzya4/zIXeoRs+Ekz8gTq1TwSjuJ2t0i8irTmDTx2dCuFeCzdFP+DAiu9l7Th3nBqUFv0TVlSlku+uLFXsFmLZvAqytZx0PQJQIdeNOMmzbtQFluBcglFpdbJUH0k0UL4V3Bzip0JOaRPxhCgnSjIRNkDAk7KphK9M+xMlEorLaT6BsUvXijnrplME+CNX+s9UGdhUi0DhbXrU9D6OQgX42aEQKVw9kMEvBUExMcu2Xpn7yZ/ffmfihG5jMBHuwN5gBrZxfCAtiQbRADDkXCuEPiIA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=R+UOmuq+dXxEMBTg9eyqsqDZtdAlik+J3SWCbQ0MQFM=;
- b=STaJiFAIULYUL+ebbpRXsRIsSzyS5+MF3/ZlaeL9UCG9U8aA4YMeMy8YwOLcQGRuKne8hf1OZ6eV/w3ShsWHlEEqHHBWVWYpkSJ7XxxivjS1XQW6FRnavZQVF8eLViDl5X+KCD/gh0d8OiOKpovAcugoxmTiU490RqP+VbfITebWzbJvt2HMjsJxte133Tl7d/ey8RPXXIRID+ykc1Lf6PnLp7napUE7pBvzi8sw4S4qxdgcuCS5GXXk+dksKh1eZh/XRmVnrnS98koGTbyvxU2A5+DE+zSpgoKzALqvd6DqPaYW/RIX5tViO8jJvdrNGXUOV4Bp6tpjPeJjUWCdBg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=R+UOmuq+dXxEMBTg9eyqsqDZtdAlik+J3SWCbQ0MQFM=;
- b=BUF/gbU8hMXRzQuBRY5o00nNJ+7oNa1baGR+TwHAvpRgfOZwRQ/h4P0COwqQFBKw/jQVqvwxP3vkFhV23KfzEZxcJCmWaSvuiUKqQ3mq1N5RvNHrZC5nG0CGFEXPnPNa21mmSET4tGz4/1R/51YMRY2j+SdVGRRlSMWexF7f3oE=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AS4PR04MB9692.eurprd04.prod.outlook.com (2603:10a6:20b:4fe::20)
- by AS8PR04MB8197.eurprd04.prod.outlook.com (2603:10a6:20b:3fd::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.17; Thu, 11 Jan
- 2024 10:06:53 +0000
-Received: from AS4PR04MB9692.eurprd04.prod.outlook.com
- ([fe80::748a:98f4:59fa:f206]) by AS4PR04MB9692.eurprd04.prod.outlook.com
- ([fe80::748a:98f4:59fa:f206%7]) with mapi id 15.20.7181.015; Thu, 11 Jan 2024
- 10:06:53 +0000
-From: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-To: marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com
-Cc: amitkumar.karwar@nxp.com,
-	neeraj.sanjaykale@nxp.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	sherry.sun@nxp.com,
-	rohit.fule@nxp.com
-Subject: [PATCH v1] Bluetooth: btnxpuart: Disable Power Save feature on startup
-Date: Thu, 11 Jan 2024 13:36:42 +0530
-Message-Id: <20240111080642.270123-1-neeraj.sanjaykale@nxp.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM8P251CA0002.EURP251.PROD.OUTLOOK.COM
- (2603:10a6:20b:21b::7) To AS4PR04MB9692.eurprd04.prod.outlook.com
- (2603:10a6:20b:4fe::20)
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="cgl3/fIT"
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40B2ogpQ010118;
+	Thu, 11 Jan 2024 10:14:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=h/DbbzHoNkxnGW4L2L75cbtUpAz/S+Y5/h6ZMK3OrJk=; b=cg
+	l3/fIT9N+aKNDm215gnsQQN+s9+izMv0Pb0qUKlLA4NH3U+3VFxzmPK6yexWblp3
+	v0U5dWPNdVnxBa/CiUNZWTEcbuxX0aU2LFTBmXqhy7RBfVnP7zd3aiCKfuF9dguO
+	aUXWNarJQx/iKHn1IgmSxDYqB55QSkVIqPLgmZze7gXfCxUIGyaO41LeK5rDg7KG
+	vBzBiGWE0uvi8OIcyUjqT+n3FSgiw0OVOHbyO9ulTvMNSWu9mKOzz3dyGPj/r4yp
+	T711K7pl0ukOaIgy7seK1i5wpylsexGvJ0twjC0pJgZFZ+FaPJCv4qRSq4teZc4u
+	WwkZJ5zjGHzwOqulVjbA==
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3vj7w58w6s-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 11 Jan 2024 10:14:32 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 40BAEVvl007213
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 11 Jan 2024 10:14:31 GMT
+Received: from [10.253.76.230] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Thu, 11 Jan
+ 2024 02:14:29 -0800
+Message-ID: <7975f7af-3369-4590-b943-ad10da247bac@quicinc.com>
+Date: Thu, 11 Jan 2024 18:14:27 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS4PR04MB9692:EE_|AS8PR04MB8197:EE_
-X-MS-Office365-Filtering-Correlation-Id: bf3ef3f6-e6a0-4c0b-68ab-08dc128d08f0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	dEbg7M4DrEKu/3K04j6yacUXjrNxJtlCqY4wXI6T4vm2R+kkUyVUj5Ah2iwpLIJYbIWBATSuql7Zuv/Cki54gZVSjlgFQqXrz6nYpLpbW6p6E4yIwfcxA+gUborztrn8yRwZFKsgJuEraRlLAoStUlKmzYlS39FxBYgiUeTPX+bLuRqrvA1hvnT+ORwoWhjsvk+WVIZtcTC+VI/he2wt7jxjVE3gNPeDtqZTG5nJlUW/w/QEWJGavVCHl6JYRZ7KNFsulDy6dKc5KnOR8+Loc8QlSfCSvJmbT1AHFmWzjUILhSNeLk9elBHk9PiudNVpj63N/frYxRwTrlSbc0aMTaWK5bWC/SES5Lok3Ie9L5xBdDtP2jDUq4H2HJjJDb7eqlRuhL/GaWitA+O8QPqOBUdcVfoCUuc1CrM+S7tetK7l4BwUB5RaBY2WnlRhZtl3ikHhlbeDPKnu6y6MUThmL011nNjCADU7eI3SfMg3w9pspQSinLp29P+zT8hZfQChHRJFeYeQr4t18CLW1ds+MSl1gM2PH83OpUnaDJiTTmfsMRhJva64Vq9F69bCW9TqRDlrFJw6qpEpTrignSuKiK/HGTdtb36iJgVDOjUacHE18F3L2chcUrV76CjkoJVK
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS4PR04MB9692.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(346002)(366004)(376002)(136003)(39860400002)(230922051799003)(1800799012)(64100799003)(451199024)(186009)(66556008)(66946007)(66476007)(316002)(478600001)(6506007)(52116002)(6666004)(26005)(4326008)(2616005)(1076003)(6486002)(2906002)(5660300002)(83380400001)(6512007)(8676002)(8936002)(38100700002)(41300700001)(38350700005)(36756003)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?5xHdIZy4FTraxRi6GtcmpWwyHwZbhYW/yx8BLA0oldWxRdqEAkCFR3gGqo33?=
- =?us-ascii?Q?J7vJImWdmbznk/2nUpAWnFN6DTw+pMmTt1OZ/bEBTFObMtUWB6vBC9DXrxXR?=
- =?us-ascii?Q?Qs04DMjQ5q2HlCID5oHH2Xl8IurPLko4t+Zjyg2qAsSbsHR6DCmEhpsL29jp?=
- =?us-ascii?Q?PDsQT+MRUaI8Og/zGz2HWqpm2lbHAqCzz9xdL4HbmCrFajwTpTYysqCql0Ws?=
- =?us-ascii?Q?Wdfnz4r1W/5JiNWfe6W8gSqY3R9RX5YUXrKg+t4P5sx4+F/4KoebzBuU9Z+2?=
- =?us-ascii?Q?URnhwv13Nw1WtCC0QPaZ2R3SE3MIOXw0spgs+lnUhEahTHhaihE9rsmCbrdY?=
- =?us-ascii?Q?nkEKlwfw+sBcwNowmBRfkMZoHtch7E0y3/LTyb08OfMDQFoMhVDn/Xi7eetR?=
- =?us-ascii?Q?Ry2BGUsKQxK0DrYlvnRhERaoap0bMptvMt4wWBaZDkjD9sMjvhzN26sA7NP+?=
- =?us-ascii?Q?WUk7WfaxnbFTf+it174s4FcHR0l95w+IL46IS2r1/cVSdFxv9nIEYxd6zcXo?=
- =?us-ascii?Q?a+D1pq40gNLbAvSF20+EMhn17Bhb/0tEcKCIJIN36P+CKjk5Wj8Gn1IL1CIo?=
- =?us-ascii?Q?Uc7BTdShWg1j4woyzJHFJ8RGz0cZSnckfQX5oubeEumhRhEnWPZBJGtdmZbx?=
- =?us-ascii?Q?zdSbvHU2n/15FiWrC4wZaBoV0EYeII46AQ1uCI2iQbDnG46dKJwQx0wDxbrU?=
- =?us-ascii?Q?5qYhcmxkNErX3zYW5aim6CysqNFiT5L9+MjQbYaRARXwxd6RD4tLlgdclkl9?=
- =?us-ascii?Q?LEgtWTCRsd1wpWlpj7xPNHi5FKLx0Ea3Nvguqa50gkhmTs/yD67mDMHVJxdX?=
- =?us-ascii?Q?XPbu76gGKbuT2xEGlwcYc7AkxyyMBFLDSYa/DYb9i4Cux2jTa0NhoEDbWtyk?=
- =?us-ascii?Q?IgKUMT/Wiu/gmfehqnZWWhYzHN8ONfLNwzM5rVkGnRXpa8lLC5F3jxYm0hI6?=
- =?us-ascii?Q?wqHarhs5IdH5ZoFPu91WOMw2uOAiwPivDyKRH4OLF4GHajJn0eM3KEeu2gBO?=
- =?us-ascii?Q?RfLimrfT8DwEPst+V5f9tjUSTkvm/PsLJFidZi5eLY1utG5RpZDrkFtyTjnS?=
- =?us-ascii?Q?JuZcupz2mB6sZjwMUnR8KGbShaADC8ooxycZ5otd/Gmpyyax3YArNmKivUFx?=
- =?us-ascii?Q?Ikie+HoiN3a3AqNV4y+pNtL+C1pHeEqQ1bS2Um6a2mJ78v0yxgIlD0zW/eqn?=
- =?us-ascii?Q?b6pkzFahYAC+1VvFKrbe78i6BMBfNCE1ursJQYEyhimHCDs7zQYXn2PAEF3q?=
- =?us-ascii?Q?vy+5sESpKH3tM1ofpHdMddZbF6+w0UJf86HchCpUFvY44BjwWFm7j6U0Iafl?=
- =?us-ascii?Q?5eqaO2rz8oeUtdY5AJe0FwK4OPLN9x8luW/DjkGXlDwQqVlTWhHpN7Qup+pe?=
- =?us-ascii?Q?WrQ9HSk1iENUBgMMp+MqjKPczzRacfNLiQRY9vOhl9V/y1DpvEwlu2d3YRVB?=
- =?us-ascii?Q?4Im24MHNsm1G7PwQgpesXDeImK+KZa7CBWFJHFmd9oGapFObceGWXTqHEThs?=
- =?us-ascii?Q?+3bvY/S85mbik7OC+OS4JuL0g8h1OasUkz3g980qLBJmBfDmKWuotsXSsBdN?=
- =?us-ascii?Q?YOLuzdCsGmVqYuGFOFJUmmcjM3LSZvikAlti3RpYpRLv9w/ZKtJj769quILt?=
- =?us-ascii?Q?GQ=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bf3ef3f6-e6a0-4c0b-68ab-08dc128d08f0
-X-MS-Exchange-CrossTenant-AuthSource: AS4PR04MB9692.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jan 2024 10:06:53.2962
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YHXgjnAqZAdv7Wodh+Go6C3wq2U9hqaOcvq9kAZtufkzaBfR1CnSqaQfMrE6hXZbDlNe0eC8WLJbyh9tU6cL3k/nf4sOQFBAA1t1amZSpl4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8197
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] Bluetooth: qca: Fix crash when btattach controller
+ ROME
+Content-Language: en-US
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+CC: <luiz.dentz@gmail.com>, <marcel@holtmann.org>, <jiangzp@google.com>,
+        <linux-bluetooth@vger.kernel.org>, <stable@vger.kernel.org>
+References: <1704960978-5437-1-git-send-email-quic_zijuhu@quicinc.com>
+ <bf74d533-c0ff-42c6-966f-b4b28c5e0f60@molgen.mpg.de>
+From: quic_zijuhu <quic_zijuhu@quicinc.com>
+In-Reply-To: <bf74d533-c0ff-42c6-966f-b4b28c5e0f60@molgen.mpg.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: YD99fuqPA7JUPIH5Nr1xjLKy8CDa55d3
+X-Proofpoint-GUID: YD99fuqPA7JUPIH5Nr1xjLKy8CDa55d3
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ suspectscore=0 bulkscore=0 lowpriorityscore=0 phishscore=0 adultscore=0
+ spamscore=0 clxscore=1015 malwarescore=0 priorityscore=1501
+ mlxlogscore=865 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2311290000 definitions=main-2401110083
 
-This sets the default power save mode setting to enabled.
-The power save feature is now stable and stress test issues,
-such as the TX timeout error, has been resolved.
-With this setting, the driver will send the vendor command
-to FW at startup, to enable power save feature.
-User can disable this feature using the following vendor
-command:
-hcitool cmd 3f 23 03 00 00 (HCI_NXP_AUTO_SLEEP_MODE)
+On 1/11/2024 5:46 PM, Paul Menzel wrote:
+> Dear Zijun,
+> 
+> 
+> Thank you for your patch.
+> 
+> Am 11.01.24 um 09:16 schrieb Zijun Hu:
+>> A crash will happen when btattach controller ROME, and it is caused by
+> 
+> What does “btattach controller ROME” mean? Is ROME a platform? If so, should it be *on ROME* or similar?
+> 
+ROME is a type of BT controller name, and refer to QCA_ROME of below defination:
+drivers/bluetooth/btqca.h:
+enum qca_btsoc_type {
+	QCA_INVALID = -1,
+	QCA_AR3002,
+	QCA_ROME,
+	QCA_WCN3988,
+	QCA_WCN3990,
+	QCA_WCN3998,
+	QCA_WCN3991,
+	QCA_QCA2066,
+	QCA_QCA6390,
+	QCA_WCN6750,
+	QCA_WCN6855,
+	QCA_WCN7850,
+};
 
-Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
----
- drivers/bluetooth/btnxpuart.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Connect a external ROME module to ubuntu machine by BT UART to USB cable,  then run
+"sudo btattach -B /dev/ttyUSB0 -P qca" within ubuntu.
 
-diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
-index 7f88b6f52f26..42e929f0d141 100644
---- a/drivers/bluetooth/btnxpuart.c
-+++ b/drivers/bluetooth/btnxpuart.c
-@@ -281,7 +281,7 @@ static u8 crc8_table[CRC8_TABLE_SIZE];
- 
- /* Default configurations */
- #define DEFAULT_H2C_WAKEUP_MODE	WAKEUP_METHOD_BREAK
--#define DEFAULT_PS_MODE		PS_MODE_DISABLE
-+#define DEFAULT_PS_MODE		PS_MODE_ENABLE
- #define FW_INIT_BAUDRATE	HCI_NXP_PRI_BAUDRATE
- 
- static struct sk_buff *nxp_drv_send_cmd(struct hci_dev *hdev, u16 opcode,
--- 
-2.34.1
+will optimize description.
+
+>> dereferring nullptr hu->serdev, fixed by null check before access.
+> 
+> dereferring → dereferencing
+>
+will correct it.
+>>
+>> sudo btattach -B /dev/ttyUSB0 -P qca
+>> Bluetooth: hci1: QCA setup on UART is completed
+>> BUG: kernel NULL pointer dereference, address: 00000000000002f0
+>> ......
+>> Workqueue: hci1 hci_power_on [bluetooth]
+>> RIP: 0010:qca_setup+0x7c1/0xe30 [hci_uart]
+>> ......
+>> Call Trace:
+>>   <TASK>
+>>   ? show_regs+0x72/0x90
+>>   ? __die+0x25/0x80
+>>   ? page_fault_oops+0x154/0x4c0
+>>   ? srso_alias_return_thunk+0x5/0xfbef5
+>>   ? kmem_cache_alloc+0x16b/0x310
+>>   ? do_user_addr_fault+0x330/0x6e0
+>>   ? srso_alias_return_thunk+0x5/0xfbef5
+>>   ? exc_page_fault+0x84/0x1b0
+>>   ? asm_exc_page_fault+0x27/0x30
+>>   ? qca_setup+0x7c1/0xe30 [hci_uart]
+>>   hci_uart_setup+0x5c/0x1a0 [hci_uart]
+>>   hci_dev_open_sync+0xee/0xca0 [bluetooth]
+>>   hci_dev_do_open+0x2a/0x70 [bluetooth]
+>>   hci_power_on+0x46/0x210 [bluetooth]
+>>   process_one_work+0x17b/0x360
+>>   worker_thread+0x307/0x430
+>>   ? __pfx_worker_thread+0x10/0x10
+>>   kthread+0xf7/0x130
+>>   ? __pfx_kthread+0x10/0x10
+>>   ret_from_fork+0x46/0x70
+>>   ? __pfx_kthread+0x10/0x10
+>>   ret_from_fork_asm+0x1b/0x30
+>>   </TASK>
+>>
+>> Fixes: 03b0093f7b31 ("Bluetooth: hci_qca: get wakeup status from serdev device handle")
+>> Cc: <stable@vger.kernel.org>
+>> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+>> Tested-by: Zijun Hu <quic_zijuhu@quicinc.com>
+> 
+> On what device?
+> 
+this crash will happens on any generic linux machine, for example,
+
+lsb_release -a
+No LSB modules are available.
+Distributor ID: Ubuntu
+Description:    Ubuntu 22.04.3 LTS
+Release:        22.04
+Codename:       jammy
+
+>> ---
+>>   drivers/bluetooth/hci_qca.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>> index 94b8c406f0c0..6fcfc1f7bb12 100644
+>> --- a/drivers/bluetooth/hci_qca.c
+>> +++ b/drivers/bluetooth/hci_qca.c
+>> @@ -1951,7 +1951,7 @@ static int qca_setup(struct hci_uart *hu)
+>>           qca_debugfs_init(hdev);
+>>           hu->hdev->hw_error = qca_hw_error;
+>>           hu->hdev->cmd_timeout = qca_cmd_timeout;
+>> -        if (device_can_wakeup(hu->serdev->ctrl->dev.parent))
+>> +        if (hu->serdev && device_can_wakeup(hu->serdev->ctrl->dev.parent))
+>>               hu->hdev->wakeup = qca_wakeup;
+> 
+> Why is `hu->serdev` not set on the device?
+> 
+actually, hu->serdev ONLY exists for BT controller which is embedded within machine's board,
+and it will be probed by serdev driver and also don't have available device node for user to btattach.
+also don't need to btattach.
+
+for external BT module, it is tty instead of serdev. so hu->serdev is nullptr.
+
+
+>>       } else if (ret == -ENOENT) {
+>>           /* No patch/nvm-config found, run with original fw/config */
+> 
+> 
+> Kind regards,
+> 
+> Paul
 
