@@ -1,104 +1,116 @@
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 255F2156EF
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jan 2024 08:59:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bfI8xjXZ"
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4298b23abffso22920141cf.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jan 2024 00:59:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704963550; x=1705568350; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=HWEWFFjadeELLaTseogAODWnQi3uP+mvS2fNSc44z+4=;
-        b=bfI8xjXZ7qtCQE5ZaKzrD/QYcXkDhyhzHOu2ArynmovVky/sZdJHkSJCIKDgWIr67w
-         J78CbshE06iMIivZUEwar4PxJzaXbo5jCnwY5jrHwS6O9dVEQ1Krpa3KQuQB3yPJRQEx
-         XSzgCOXqIiG25Tii9pkr4wADclOb2vYfgxPy6rEU4/FbB+AUgORDo7kT+ff3N6PAkwgE
-         95ifR+7EtTqDrfBIIbtfSjQtJQh8j0JgyxKKAmIFOPwG0j5XtNtSxENQUeqWAhL8Y5ny
-         JVTKOznoq3j0OKmk66Gz7NTEzVXHU7Agu60HKGbdQPut60tMLBm2blCsKn8cqo5LdRY7
-         6how==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704963550; x=1705568350;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HWEWFFjadeELLaTseogAODWnQi3uP+mvS2fNSc44z+4=;
-        b=t+kqelenXCcpy+JzMMDQMxsgipZCqarf5kDkl1a0YIYZyzfapN5yoNFPRwT7egFKA2
-         G1ITWOitN46V9l1gSVMOMS28SLmUR0ByBFDEthf2ciohMIO6xgu7kEIcwjBoI/kXn6Ej
-         3wjj6tcIEzK+TRaYmVJ3mUrFzKQ2SFWj7JcW+6rCIQV+sFKL+j+Bnuojx+UmtoXog3lk
-         tQCjwleDrrT7zNrfarnS9DEv/TsFgtUkT5v3otOfRIiBXw8A2szhfaEoVB6kZXvb3JqT
-         8H8hep4kzIymeSStNCo9WbRRa7tN1XifVb3q9j+NO8CSnQa14g0M0mfnxoqk/o+fCJFr
-         V9gA==
-X-Gm-Message-State: AOJu0Yx+tAqfLtbbjjCxvjily4+8z2iaUZqoz3L4M4611Ur+uSW/yLSY
-	inrAFoL9tfpcim1T8VCBYqaCAPYxCAM=
-X-Google-Smtp-Source: AGHT+IHS+t0uDRy5UDezOAChoKD+KOEmPFELiVabeJNpIrx+4MH5I3qskiPZuN0AwlM/Gdk/ky+rlA==
-X-Received: by 2002:a05:622a:c8:b0:429:b5da:10f9 with SMTP id p8-20020a05622a00c800b00429b5da10f9mr311514qtw.51.1704963549864;
-        Thu, 11 Jan 2024 00:59:09 -0800 (PST)
-Received: from [172.17.0.2] ([172.183.162.32])
-        by smtp.gmail.com with ESMTPSA id t5-20020ac865c5000000b00427fabefe3bsm270002qto.52.2024.01.11.00.59.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jan 2024 00:59:09 -0800 (PST)
-Message-ID: <659faddd.c80a0220.0978.0924@mx.google.com>
-Date: Thu, 11 Jan 2024 00:59:09 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============9153976987038882038=="
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0960912E52;
+	Thu, 11 Jan 2024 09:47:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.6] (unknown [95.90.244.42])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id F1CF661E5FE06;
+	Thu, 11 Jan 2024 10:46:34 +0100 (CET)
+Message-ID: <bf74d533-c0ff-42c6-966f-b4b28c5e0f60@molgen.mpg.de>
+Date: Thu, 11 Jan 2024 10:46:34 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, quic_zijuhu@quicinc.com
-Subject: RE: [v1] Bluetooth: qca: Fix crash when btattach controller ROME
-In-Reply-To: <1704960978-5437-1-git-send-email-quic_zijuhu@quicinc.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] Bluetooth: qca: Fix crash when btattach controller
+ ROME
+Content-Language: en-US
+To: Zijun Hu <quic_zijuhu@quicinc.com>
+Cc: luiz.dentz@gmail.com, marcel@holtmann.org, jiangzp@google.com,
+ linux-bluetooth@vger.kernel.org, stable@vger.kernel.org
 References: <1704960978-5437-1-git-send-email-quic_zijuhu@quicinc.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <1704960978-5437-1-git-send-email-quic_zijuhu@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
---===============9153976987038882038==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=815958
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.60 seconds
-GitLint                       PASS      0.30 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      28.60 seconds
-CheckAllWarning               PASS      30.69 seconds
-CheckSparse                   PASS      36.51 seconds
-CheckSmatch                   PASS      101.21 seconds
-BuildKernel32                 PASS      27.98 seconds
-TestRunnerSetup               PASS      437.67 seconds
-TestRunner_l2cap-tester       PASS      23.08 seconds
-TestRunner_iso-tester         PASS      44.91 seconds
-TestRunner_bnep-tester        PASS      7.51 seconds
-TestRunner_mgmt-tester        PASS      165.10 seconds
-TestRunner_rfcomm-tester      PASS      11.03 seconds
-TestRunner_sco-tester         PASS      14.68 seconds
-TestRunner_ioctl-tester       PASS      12.23 seconds
-TestRunner_mesh-tester        PASS      8.85 seconds
-TestRunner_smp-tester         PASS      9.85 seconds
-TestRunner_userchan-tester    PASS      7.33 seconds
-IncrementalBuild              PASS      26.42 seconds
+Dear Zijun,
 
 
+Thank you for your patch.
 
----
-Regards,
-Linux Bluetooth
+Am 11.01.24 um 09:16 schrieb Zijun Hu:
+> A crash will happen when btattach controller ROME, and it is caused by
+
+What does “btattach controller ROME” mean? Is ROME a platform? If so, 
+should it be *on ROME* or similar?
+
+> dereferring nullptr hu->serdev, fixed by null check before access.
+
+dereferring → dereferencing
+
+> 
+> sudo btattach -B /dev/ttyUSB0 -P qca
+> Bluetooth: hci1: QCA setup on UART is completed
+> BUG: kernel NULL pointer dereference, address: 00000000000002f0
+> ......
+> Workqueue: hci1 hci_power_on [bluetooth]
+> RIP: 0010:qca_setup+0x7c1/0xe30 [hci_uart]
+> ......
+> Call Trace:
+>   <TASK>
+>   ? show_regs+0x72/0x90
+>   ? __die+0x25/0x80
+>   ? page_fault_oops+0x154/0x4c0
+>   ? srso_alias_return_thunk+0x5/0xfbef5
+>   ? kmem_cache_alloc+0x16b/0x310
+>   ? do_user_addr_fault+0x330/0x6e0
+>   ? srso_alias_return_thunk+0x5/0xfbef5
+>   ? exc_page_fault+0x84/0x1b0
+>   ? asm_exc_page_fault+0x27/0x30
+>   ? qca_setup+0x7c1/0xe30 [hci_uart]
+>   hci_uart_setup+0x5c/0x1a0 [hci_uart]
+>   hci_dev_open_sync+0xee/0xca0 [bluetooth]
+>   hci_dev_do_open+0x2a/0x70 [bluetooth]
+>   hci_power_on+0x46/0x210 [bluetooth]
+>   process_one_work+0x17b/0x360
+>   worker_thread+0x307/0x430
+>   ? __pfx_worker_thread+0x10/0x10
+>   kthread+0xf7/0x130
+>   ? __pfx_kthread+0x10/0x10
+>   ret_from_fork+0x46/0x70
+>   ? __pfx_kthread+0x10/0x10
+>   ret_from_fork_asm+0x1b/0x30
+>   </TASK>
+> 
+> Fixes: 03b0093f7b31 ("Bluetooth: hci_qca: get wakeup status from serdev device handle")
+> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+> Tested-by: Zijun Hu <quic_zijuhu@quicinc.com>
+
+On what device?
+
+> ---
+>   drivers/bluetooth/hci_qca.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index 94b8c406f0c0..6fcfc1f7bb12 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -1951,7 +1951,7 @@ static int qca_setup(struct hci_uart *hu)
+>   		qca_debugfs_init(hdev);
+>   		hu->hdev->hw_error = qca_hw_error;
+>   		hu->hdev->cmd_timeout = qca_cmd_timeout;
+> -		if (device_can_wakeup(hu->serdev->ctrl->dev.parent))
+> +		if (hu->serdev && device_can_wakeup(hu->serdev->ctrl->dev.parent))
+>   			hu->hdev->wakeup = qca_wakeup;
+
+Why is `hu->serdev` not set on the device?
+
+>   	} else if (ret == -ENOENT) {
+>   		/* No patch/nvm-config found, run with original fw/config */
 
 
---===============9153976987038882038==--
+Kind regards,
+
+Paul
