@@ -1,104 +1,76 @@
-Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A2BB15AD1
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jan 2024 12:41:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC2EA2837F
+	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jan 2024 13:40:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k4z2cLDF"
-Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-6dc36e501e1so3546434a34.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jan 2024 04:41:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704976918; x=1705581718; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=eq/qxyPHhfvMdVwlA3Pj3KHcFBI4thohRD8j53KNVCQ=;
-        b=k4z2cLDFjp/QTcGAo2E5D8xLXcv6MwrYBamAQ2ZSFtYxH7Ox+EljAEwvt0YLm+b1kZ
-         ThLdF9PfKM5fD4GSmmYZYMMq4v0FnxynUTfoCKAsPyf9VGPp7/80gS1QbxP1N+RqHz17
-         EgYgRGvWScordPbkM2P49/aAvz5dlyp364QP1ZRjWhCLI9KFGp1lQP+qF2d8zLyEEsQC
-         V9a7vrwqR+xdI6o+q4xiCTD9JO37G2kwPyrRyTXcdSGy9UxWnLloSPx1cmWuArgkMy4q
-         WHjFDiY7O6T6awhL1FADZXN2g/laq/JIyaEy20IzBoZVsNBBcjrjyKkJEC0ZoBYMW+BF
-         8dHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704976918; x=1705581718;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=eq/qxyPHhfvMdVwlA3Pj3KHcFBI4thohRD8j53KNVCQ=;
-        b=geM1CvY3I2J+1lU1ydVaGq5654I66OnqNDS1aN5353Kcs0haM002hqxvfI8sewVksd
-         KsfNzYDwtw8ZDGIxSo9We3VWN7DHMlZh1m5ADpRk7ZfYikjIigSlzunGKS8YnJtcNKgG
-         ZeoAHYnb6hTF7X8Z1Kh+/xAziZBS3zsAPZdCC//15r3Hy/MR0/SGFF3FMRMxaD+o04JJ
-         wOojVZcw1skLqGkFYA0kTvH6eaTeoBFlHkD4q7nzQTcGVuT8j1BzEinvhng/XNiLCibF
-         0UBZRbXWzbDlfwDH2Y64SSnqp9lEOhJlYqzR94zlj6NV0/hrdzwYOwVNy/le6MKH28Rd
-         hKbA==
-X-Gm-Message-State: AOJu0Yz49HcV0FqGv1xno8tD3kIfoKMehi0MpBX4jlfiMSCO6ThIbrvb
-	RGSz6IFMJdP+hA/nPrAUhltYAr4Hkm8=
-X-Google-Smtp-Source: AGHT+IFI4MP57x1Q4YsuL6JV48uc3kNjkGcyoHxrDYMbRwD/2GqwCSP/aSwMB3AFlpWgh16H1Zx6Hg==
-X-Received: by 2002:a05:6871:4704:b0:204:1022:f751 with SMTP id py4-20020a056871470400b002041022f751mr1361221oab.111.1704976918060;
-        Thu, 11 Jan 2024 04:41:58 -0800 (PST)
-Received: from [172.17.0.2] ([20.172.29.181])
-        by smtp.gmail.com with ESMTPSA id e3-20020a636903000000b005aa800c149bsm1104517pgc.39.2024.01.11.04.41.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jan 2024 04:41:57 -0800 (PST)
-Message-ID: <659fe215.630a0220.4bbd5.231a@mx.google.com>
-Date: Thu, 11 Jan 2024 04:41:57 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============6702118613203391888=="
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="HVMUdvQ0"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1704980404;
+	bh=jV1P8haOArA3cYjyOSXuH6XfZyVAAIyJr8yPYrWPBh0=;
+	h=From:To:Subject:Date:From;
+	b=HVMUdvQ0cQP4dV8FMWvePZ3wqYH8hpVQtNEtVt1alnAslH05SLYvwA+Uinqmvh1ax
+	 53KnpeD8xe+iaSZVglzlfp0pBZxOUKXXCPpBPJWg+Vqzzw3xbJn90clJOT0ZbBhhgA
+	 v2sGl/ZSRWAzbygPRmf4XvS7cZjvjUBrAxXhG5ZXOoxhCZ6vP+/yh1cmT6lWXAFjD/
+	 0xbjktZj/ZZn2ZNLBSe8vS7BjlrGjy4efgCxMFBQO3/9Z7TKhT4wDDdFQuTa2kcRpa
+	 WKvfpuY4pDPFwlQxN/BoHz1ot290O4kRtb6wJmUF+QKyG4ZVCEil7UWBg+KvNdHOji
+	 whjteucDZyVvg==
+Received: from fdanis-XPS-13-9370.. (cola.collaboradmins.com [195.201.22.229])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id F30CC3780894
+	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jan 2024 13:40:03 +0000 (UTC)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v4 0/2] Fix gatt-db munmap_chunk invalid pointer
+Date: Thu, 11 Jan 2024 14:39:53 +0100
+Message-Id: <20240111133955.65686-1-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, neeraj.sanjaykale@nxp.com
-Subject: RE: [v2] Bluetooth: btnxpuart: Enable Power Save feature on startup
-In-Reply-To: <20240111101135.272065-1-neeraj.sanjaykale@nxp.com>
-References: <20240111101135.272065-1-neeraj.sanjaykale@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
---===============6702118613203391888==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+PTS test GATT/CL/GAD/BV-03-C published a service starting at handle 0xfffd
+and ending at 0xffff.
+This resets the next_handle to 0 in gatt_db_insert_service() instead of
+setting it to 0x10000. Other services are added later.
+This could end-up by a crash in db_hash_update() if not enough space has
+been allocated for hash.iov and some entries are overwritten.
 
-This is automated email and please do not reply to this email!
+Next_handle can be replaced by a last_handle variable which will not loop
+over. This can be replaced by queue_peek_tail() and computing the value,
+but keeping last_handle will avoid this sort of lookup.
 
-Dear submitter,
+Add a unit test to check regression.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=816155
+v1 -> v2: Replace next_handle by last_handle
+          Check empty db using gatt_db_isempty(db) instead of
+            next_handle == 0
+          Add robustness unit test to check that gatt_db_get_hash()
+            doesn't crash
+v2 -> v3: Fix line length checkpatch errors
+v3 -> v4: Update commit comment to explain reason for keeping last_handle
+          Split unit test to its own commit
+          Rephrase db setup comment in unit test
 
----Test result---
+Frédéric Danis (2):
+  shared/gatt-db: Fix munmap_chunk invalid pointer
+  unit/test-gatt: Add unordered setup db test
 
-Test Summary:
-CheckPatch                    PASS      0.52 seconds
-GitLint                       PASS      0.25 seconds
-SubjectPrefix                 PASS      0.09 seconds
-BuildKernel                   PASS      29.45 seconds
-CheckAllWarning               PASS      31.94 seconds
-CheckSparse                   PASS      38.45 seconds
-CheckSmatch                   PASS      102.87 seconds
-BuildKernel32                 PASS      28.02 seconds
-TestRunnerSetup               PASS      440.13 seconds
-TestRunner_l2cap-tester       PASS      23.18 seconds
-TestRunner_iso-tester         PASS      45.80 seconds
-TestRunner_bnep-tester        PASS      6.97 seconds
-TestRunner_mgmt-tester        PASS      165.97 seconds
-TestRunner_rfcomm-tester      PASS      10.82 seconds
-TestRunner_sco-tester         PASS      14.60 seconds
-TestRunner_ioctl-tester       PASS      12.11 seconds
-TestRunner_mesh-tester        PASS      11.16 seconds
-TestRunner_smp-tester         PASS      9.94 seconds
-TestRunner_userchan-tester    PASS      7.18 seconds
-IncrementalBuild              PASS      26.61 seconds
+ src/shared/gatt-db.c | 19 ++++++------
+ unit/test-gatt.c     | 73 +++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 82 insertions(+), 10 deletions(-)
 
+-- 
+2.34.1
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6702118613203391888==--
