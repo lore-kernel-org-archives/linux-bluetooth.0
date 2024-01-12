@@ -1,71 +1,67 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C17915AD8
-	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Jan 2024 18:37:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2418014F82
+	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Jan 2024 18:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="GqA9qmZe"
-Received: from github.com (hubbernetes-node-99988c4.ac4-iad.github.net [10.52.149.31])
-	by smtp.github.com (Postfix) with ESMTPA id A9CAE70116E
-	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Jan 2024 10:37:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1705084661;
-	bh=iL9jcl9vzi22kjcERtuUCukj8/VkDm/aBeOzKst43fw=;
-	h=Date:From:To:Subject:From;
-	b=GqA9qmZeRnBUmot3kABTdKFg7LlRvfm7WpzJdHrXCWt4xYNkPS2Z1kwYsculiCe5s
-	 /zPczLBQehIF4adc71RHprotSndlSktsr4I/Tuu3b28QtuDJ61+CiHVDA5SeZbDjky
-	 i0zINs7JGdp4gepPE8KVy5OoilOYfxUZpfZA+mUg=
-Date: Fri, 12 Jan 2024 10:37:41 -0800
-From: xiaoyao <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/ba5a1d-1f9ff8@github.com>
-Subject: [bluez/bluez] 1f9ff8: avdtp: Fix potential incorrect transaction
- label
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M1iVK5Fy"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E9B13C43390;
+	Fri, 12 Jan 2024 18:40:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705084826;
+	bh=QPbkLw6SerIsl+sdqYuS4ZIEiEK7UAVlV1pu6qUOVb4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=M1iVK5Fydj31Gt+6RVKM5sQLYMpWLg1UrXU8AeDdH/2cj3hxk5j8ShubpJV7ihkNY
+	 zbIpyPgeqld9WErtvJ+eJif2Vp4Wa3xOipR6jFRMxX8jMJf2V7xyiCYq1++Ulyr2Oi
+	 zfp+BOICTJsvzzLKJKN10WB2k3LbYCuvry7FzWebcyWqvkBXjagnwiCBeUq42vtFqr
+	 wqvg5iQnNGfq1uNA7L0AF9GZpSL0YU7wyiPuqqcWWaHh55snhujWZlxp4imylGOYUL
+	 35R8NCM81oAzIlOvmRmnX1uRcaB+T0qvhVL7O7XtjiXLXVXfLT0fuYEBRcpplmTD0T
+	 bEsim8PxWZw+A==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CE8B3D8C96D;
+	Fri, 12 Jan 2024 18:40:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v1] avdtp: Fix potential incorrect transaction label
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <170508482684.21011.9547197241854864913.git-patchwork-notify@kernel.org>
+Date: Fri, 12 Jan 2024 18:40:26 +0000
+References: <20240111171635.144825-1-xiaokeqinhealth@126.com>
+In-Reply-To: <20240111171635.144825-1-xiaokeqinhealth@126.com>
+To: Xiao Yao <xiaokeqinhealth@126.com>
+Cc: linux-bluetooth@vger.kernel.org, xiaoyao@rock-chips.com
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 1f9ff8fb4048189c762ff83fa20b1cf3ab2973ad
-      https://github.com/bluez/bluez/commit/1f9ff8fb4048189c762ff83fa20b1cf3ab2973ad
-  Author: Xiao Yao <xiaoyao@rock-chips.com>
-  Date:   2024-01-12 (Fri, 12 Jan 2024)
+Hello:
 
-  Changed paths:
-    M profiles/audio/avdtp.c
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  avdtp: Fix potential incorrect transaction label
+On Fri, 12 Jan 2024 01:16:35 +0800 you wrote:
+> From: Xiao Yao <xiaoyao@rock-chips.com>
+> 
+> Currently, AVDTP commands and responses from remote devices are all
+> stored in session.in. When one end has an ongoing transaction and
+> immediately starting another transaction, it may cause the session.
+> in.transaction to be incorrectly modified, so we need session.in_cmd
+> and session.in_rsp to be able to handle outstanding requests in each
+> direction.
+> 
+> [...]
 
-Currently, AVDTP commands and responses from remote devices are all
-stored in session.in. When one end has an ongoing transaction and
-immediately starting another transaction, it may cause the session.
-in.transaction to be incorrectly modified, so we need session.in_cmd
-and session.in_rsp to be able to handle outstanding requests in each
-direction.
+Here is the summary with links:
+  - [BlueZ,v1] avdtp: Fix potential incorrect transaction label
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=1f9ff8fb4048
 
-After applying this patch, the problem no longer recurs. Apply this
-patch to android/avdtp.c and run:
-
-> unit/test-avdtp
-Test Summary
-------------
-/TP/SIG/SMG/BV-06-C-SEID-1                Passed       0.004 seconds
-... ...
-/TP/SIG/SYN/BV-06-C                       Passed       0.001 seconds
-Total: 62, Passed: 62 (100.0%), Failed: 0, Not Run: 0
-Overall execution time: 1.76 seconds
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
