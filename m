@@ -1,126 +1,104 @@
-Received: from smtp.smtpout.orange.fr (smtp-20.smtpout.orange.fr [80.12.242.20])
+Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0A4219BCD
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jan 2024 20:12:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 290F118EB0
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jan 2024 20:57:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="Fvt/V/E3"
-Received: from fedora.home ([92.140.202.140])
-	by smtp.orange.fr with ESMTPA
-	id PTJsreNfxZ1tSPTJsr3DED; Mon, 15 Jan 2024 21:12:29 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1705349550;
-	bh=Zag1tyR6DZ8o6qntEb3YzGjDPt9iK1tzSJavyfJS+3c=;
-	h=From:To:Cc:Subject:Date;
-	b=Fvt/V/E3sZtxVJf+mQhWHRGR9UNENrZh+TtJZiiT94FKJKCLoKfIhOWzFRNOlOL6S
-	 2ANyEWnTwBUJwHzg7yqtS8/Xj28GYXpAbsuMBZ4KvDMCExUgkmLwovLs5DAyNJQEV/
-	 a1/OQUCeh+xlIvp7U8OCVkTZn45UOszSqr4K7PpP48W1IC618W+VxNlTKP/S5qw3rk
-	 kI9zZtbWY1rK3KDRybgAhVZEZp4l59LGeF3AtEKkLVHe3oT8CcURsphSxQ5v/fscFG
-	 rWyhFzmmaGJrXZ6lGL4yimXGK0QUDdGGRI5LZH8xIuWkj1kH6Hs0KMCO4rr5velLWT
-	 VD28KI6E4UjJA==
-X-ME-Helo: fedora.home
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Mon, 15 Jan 2024 21:12:30 +0100
-X-ME-IP: 92.140.202.140
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Remove usage of the deprecated ida_simple_xx() API
-Date: Mon, 15 Jan 2024 21:12:19 +0100
-Message-ID: <3b3523b475d0f5cadf81b3131bb1a38b7476b020.1705349526.git.christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LN9F2H9G"
+Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-4b71b86ef81so1644933e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jan 2024 12:57:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705352231; x=1705957031; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=CBrvomtL8B3nbzAKZ1JDN0n+R4+p5m9nXf2IC08pFlo=;
+        b=LN9F2H9GhGwggpOcFllTZw4Dwevjfb4OIQVSOZIXAt6VxLV3tTlc8Wa3ipeeZdEBfK
+         AjKVr5RFGQyEC1YdCtiPHoHLJGv4FDtLwv//g4y/cGEIYjW9rCkPQYWGSqXuF/gLQzvb
+         ZSbzms03igrA2AkdQ35H77yelIGH2dnhMKRhvOFPBLvi3OoMnhpAUQWhjKrzj5YqdWDS
+         3RSUfJDvNVIZ+LmMRKP6AxhS9f0Z+Dzt0GsUOWiRO3swnH/EKUD+7X56N+CDBaII3Huw
+         ZXaAP/24g7eDWt2lJpemJB7XV8RApYV5J9DzYBZ2hd8CuNNRrW2PxLudiCBtrIaEnYsc
+         ocGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705352231; x=1705957031;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CBrvomtL8B3nbzAKZ1JDN0n+R4+p5m9nXf2IC08pFlo=;
+        b=g7Zqndj+bexLmpv3tCheEHyOM1CV9XHsVn16350SVYW/5NilCErs9cN/EjRp283nZF
+         NWvquicZIiiOkPuU6Y73EG8JtFXafe8B8FYK8cAk29L9SMz9cgn31dBoG9DkWSbpUqA7
+         7GFxPGZfyl8sh+JjhR2vxy6TiCchbQG2Y5V/fe0WrkSAQuFYJbFtiNNFjbJEqWLS3gM6
+         mU/RuineF96X23siA/B5kIse/agxu1rV9fHpzMgSCCV040gnnriZSOBnXI0X2a1IjJnr
+         mOtfODZe0oe4PhCi6SyYUG7XLsWH5Q2lYd5FsdtgXriDPHFPqIO/MVb84mR7LIr/mPao
+         tXmw==
+X-Gm-Message-State: AOJu0YxtOwkiccmUG/E3EzRyPU5hyu0wsWvVdMnGEKc1TZDCff5d2z3j
+	Lfvh1O0/e9tHw0QUSKHMLekGW+i1qSg=
+X-Google-Smtp-Source: AGHT+IHs6hAR+kj0ftWJOJLjselRTCH6x7ayrqHXOIjQMRwMnCeAjVCLE4S09HgK18EIMlGVfgsm7A==
+X-Received: by 2002:a05:6122:1988:b0:4b6:e467:ec9a with SMTP id bv8-20020a056122198800b004b6e467ec9amr2979394vkb.16.1705352230795;
+        Mon, 15 Jan 2024 12:57:10 -0800 (PST)
+Received: from [172.17.0.2] ([20.75.95.36])
+        by smtp.gmail.com with ESMTPSA id w12-20020a0ce10c000000b0067f70cc986asm3611106qvk.92.2024.01.15.12.57.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Jan 2024 12:57:10 -0800 (PST)
+Message-ID: <65a59c26.0c0a0220.49363.ec20@mx.google.com>
+Date: Mon, 15 Jan 2024 12:57:10 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1726580431904341237=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, christophe.jaillet@wanadoo.fr
+Subject: RE: Bluetooth: Remove usage of the deprecated ida_simple_xx() API
+In-Reply-To: <3b3523b475d0f5cadf81b3131bb1a38b7476b020.1705349526.git.christophe.jaillet@wanadoo.fr>
+References: <3b3523b475d0f5cadf81b3131bb1a38b7476b020.1705349526.git.christophe.jaillet@wanadoo.fr>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-ida_alloc() and ida_free() should be preferred to the deprecated
-ida_simple_get() and ida_simple_remove().
+--===============1726580431904341237==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Note that the upper limit of ida_simple_get() is exclusive, but the one of
-ida_alloc_max() is inclusive. So a -1 has been added when needed.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=817021
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.78 seconds
+GitLint                       PASS      0.99 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      27.82 seconds
+CheckAllWarning               PASS      30.32 seconds
+CheckSparse                   PASS      35.92 seconds
+CheckSmatch                   PASS      99.05 seconds
+BuildKernel32                 PASS      27.00 seconds
+TestRunnerSetup               PASS      433.53 seconds
+TestRunner_l2cap-tester       PASS      23.07 seconds
+TestRunner_iso-tester         PASS      50.97 seconds
+TestRunner_bnep-tester        PASS      6.89 seconds
+TestRunner_mgmt-tester        PASS      164.42 seconds
+TestRunner_rfcomm-tester      PASS      10.71 seconds
+TestRunner_sco-tester         PASS      14.35 seconds
+TestRunner_ioctl-tester       PASS      12.36 seconds
+TestRunner_mesh-tester        PASS      8.78 seconds
+TestRunner_smp-tester         PASS      9.76 seconds
+TestRunner_userchan-tester    PASS      7.35 seconds
+IncrementalBuild              PASS      25.77 seconds
+
+
+
 ---
-I've not been able to find the rational for the HCI_MAX_ID value (i.e.
-10000) is the BT spec I've found.
+Regards,
+Linux Bluetooth
 
-Instead of having these HCI_MAX_ID-1 in the code, we could also change
-the value of HCI_MAX_ID to 9999.
-I don't know what makes the more sense.
----
- net/bluetooth/hci_core.c | 9 +++++----
- net/bluetooth/hci_sock.c | 4 ++--
- 2 files changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index e5cb618fa6d3..41d2d1956527 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2639,10 +2639,11 @@ int hci_register_dev(struct hci_dev *hdev)
- 	 */
- 	switch (hdev->dev_type) {
- 	case HCI_PRIMARY:
--		id = ida_simple_get(&hci_index_ida, 0, HCI_MAX_ID, GFP_KERNEL);
-+		id = ida_alloc_max(&hci_index_ida, HCI_MAX_ID - 1, GFP_KERNEL);
- 		break;
- 	case HCI_AMP:
--		id = ida_simple_get(&hci_index_ida, 1, HCI_MAX_ID, GFP_KERNEL);
-+		id = ida_alloc_range(&hci_index_ida, 1, HCI_MAX_ID - 1,
-+				     GFP_KERNEL);
- 		break;
- 	default:
- 		return -EINVAL;
-@@ -2741,7 +2742,7 @@ int hci_register_dev(struct hci_dev *hdev)
- 	destroy_workqueue(hdev->workqueue);
- 	destroy_workqueue(hdev->req_workqueue);
- err:
--	ida_simple_remove(&hci_index_ida, hdev->id);
-+	ida_free(&hci_index_ida, hdev->id);
- 
- 	return error;
- }
-@@ -2824,7 +2825,7 @@ void hci_release_dev(struct hci_dev *hdev)
- 	hci_dev_unlock(hdev);
- 
- 	ida_destroy(&hdev->unset_handle_ida);
--	ida_simple_remove(&hci_index_ida, hdev->id);
-+	ida_free(&hci_index_ida, hdev->id);
- 	kfree_skb(hdev->sent_cmd);
- 	kfree_skb(hdev->recv_event);
- 	kfree(hdev);
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 3e7cd330d731..4ee1b976678b 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -101,7 +101,7 @@ static bool hci_sock_gen_cookie(struct sock *sk)
- 	int id = hci_pi(sk)->cookie;
- 
- 	if (!id) {
--		id = ida_simple_get(&sock_cookie_ida, 1, 0, GFP_KERNEL);
-+		id = ida_alloc_min(&sock_cookie_ida, 1, GFP_KERNEL);
- 		if (id < 0)
- 			id = 0xffffffff;
- 
-@@ -119,7 +119,7 @@ static void hci_sock_free_cookie(struct sock *sk)
- 
- 	if (id) {
- 		hci_pi(sk)->cookie = 0xffffffff;
--		ida_simple_remove(&sock_cookie_ida, id);
-+		ida_free(&sock_cookie_ida, id);
- 	}
- }
- 
--- 
-2.43.0
-
+--===============1726580431904341237==--
