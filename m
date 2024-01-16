@@ -1,103 +1,85 @@
-Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ADC61DA24
-	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jan 2024 19:12:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3858764A8A;
+	Tue, 16 Jan 2024 19:46:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705432334; cv=none; b=VDdSxXf4xCQEOcJqPVxPuzdFsM1WcE0+4mOujXfb4SIvYHTeqOODasKAZ3NllAx8IINYW3rXZoKW++2ykqgVtL6JcbmlIUgdB90BOWQAJYVYjOpRXg66hXDeAWdejp3gd0poooIG/Yu+ZFIoVfxMq8Aza0QHTOPToeOgiXvRXyw=
+	t=1705434403; cv=none; b=ZOv2aFiYWUAWucxmH50WP7JLEkWnnb+Sl6RC7ly1yVx+JonkcCT0e7Vse1O+bYCkEsC/8SveDdztQ9MXOZ5f8ULQ+YhJFnAcgCX9ims7lbScS/lfTiV5S7Vu0k+MBLRLZxvnZG8MQcguDc+S46QkttDkmbd7hj3XEk8ehGOr560=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705432334; c=relaxed/simple;
-	bh=35ULWa5SYpSNQZQkL8y9vDTO5oRwlUuDRNWTP6w4KAw=;
-	h=Received:DKIM-Signature:Date:From:To:Message-ID:Subject:
-	 Mime-Version:Content-Type:Content-Transfer-Encoding:
-	 X-GitHub-Recipient-Address:X-Auto-Response-Suppress; b=e/Hpp+MYAKWlGhYGnFPpTjJz0yFGx1bOwMlFH4RWHREK20IXBp3cvVQoc+3U6sh3bMJ8Nppe0R6QYllUtMYzh3TipMgFfMmT/ehoaCF/LGfwOfDMnk4eU7hj1Lq5MmkSQe3U4vqmIZ0w9ev5l030aKNO6KlQ0e/P7wm5+w8TfOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=eoRvRnSt; arc=none smtp.client-ip=192.30.252.203
+	s=arc-20240116; t=1705434403; c=relaxed/simple;
+	bh=Js9xP661sytzzDg+w+9PCz+Wc4f7lJG3dTxFfi+cwpA=;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:In-Reply-To:References:MIME-Version:X-stable:
+	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=DLrQGGMaqGCTO7EG0RQF3pm8S12d+s5rCh+gwMaH2WaBZiCvQyrUn/mC6S8ufDufZxBdomSDHalE5H3Ej6LM414p7CVYIrg7u97+eSb0f3c0wrjqnmYNzs3CcB8CVuMNZJvuJzGu36aGKTkN9IC21OZl/NsIZXAgg6Rrtm+mVwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QugY+xxw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="eoRvRnSt"
-Received: from github.com (hubbernetes-node-47a3d5f.va3-iad.github.net [10.48.134.44])
-	by smtp.github.com (Postfix) with ESMTPA id 33F4F8C118A
-	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jan 2024 11:12:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1705432332;
-	bh=dHNJuyMTJMat+s6mlLL/C5IOFcBhnXpI+9JDCHfDpBU=;
-	h=Date:From:To:Subject:From;
-	b=eoRvRnStHoMYEgxZK9QL9aEHQ9/126Y5BCoxj/vQMqra2ke4m3+sakgtaeSY7p9bv
-	 W6lCd0fkmgHlIIKmq9fNcMupjUERcdTlF7LxUH8ACd6rQ9F/4rHp1BPOZ5mS0fgw/M
-	 cc8cm+XTHyNsv+UhZHx2cXIeUUSa2cg3XEy+lJVg=
-Date: Tue, 16 Jan 2024 11:12:12 -0800
-From: Emil Velikov <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/2a3e93-3f490a@github.com>
-Subject: [bluez/bluez] 6d6294: build: remove unused AM_CONDITIONAL
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QugY+xxw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C5BCC433A6;
+	Tue, 16 Jan 2024 19:46:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705434403;
+	bh=Js9xP661sytzzDg+w+9PCz+Wc4f7lJG3dTxFfi+cwpA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=QugY+xxw29vbMgVckgGQKWmGIiDxxwKS9Uehnqof5mP2R0q5O8FiR1DiH99PTnGhI
+	 CgTPNAwDhAm3KiAMPk/Yle9hmP9qs+scYojM2YhCG4ZHhho+EcwfaEFhc3iryesc1R
+	 YqHNqNXbUp7VbfZcQxka3Q46YXM16KC5qTqCRB2HV0fDGFuHc2ol4fW+2rdQF4ppXa
+	 /nQsIW6md7XX1nq1DOJV7iAO5gbwfiO+BZH8B37lE4JRMOASAWrgMC7q/o6kGFWI77
+	 TtJijyMo8feJjlfJxZwxNQSGj1ieUbgJjjgOiNa4+xboZIHp0YDVALIX67plVWvDiH
+	 Lv0z5xY+Wj+ew==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Zijun Hu <quic_zijuhu@quicinc.com>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Sasha Levin <sashal@kernel.org>,
+	marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	luiz.dentz@gmail.com,
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.7 096/108] Bluetooth: qca: Set both WIDEBAND_SPEECH and LE_STATES quirks for QCA2066
+Date: Tue, 16 Jan 2024 14:40:02 -0500
+Message-ID: <20240116194225.250921-96-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240116194225.250921-1-sashal@kernel.org>
+References: <20240116194225.250921-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.7
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 6d6294036c398d2c0e7aef7e86b9f012e1ea4555
-      https://github.com/bluez/bluez/commit/6d6294036c398d2c0e7aef7e86b9f012e1ea4555
-  Author: Emil Velikov <emil.velikov@collabora.com>
-  Date:   2024-01-16 (Tue, 16 Jan 2024)
+From: Zijun Hu <quic_zijuhu@quicinc.com>
 
-  Changed paths:
-    M configure.ac
+[ Upstream commit 5d192b697c7417254cdd9edc3d5e9e0364eb9045 ]
 
-  Log Message:
-  -----------
-  build: remove unused AM_CONDITIONAL
+Set both WIDEBAND_SPEECH_SUPPORTED and VALID_LE_STATES quirks
+for QCA2066.
 
+Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/bluetooth/hci_qca.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-  Commit: c07fb1fcddadeb51c36b6adfbcb8cf0122766348
-      https://github.com/bluez/bluez/commit/c07fb1fcddadeb51c36b6adfbcb8cf0122766348
-  Author: Emil Velikov <emil.velikov@collabora.com>
-  Date:   2024-01-16 (Tue, 16 Jan 2024)
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 067e248e3599..35f74f209d1f 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -2039,6 +2039,7 @@ static const struct qca_device_data qca_soc_data_wcn3998 __maybe_unused = {
+ static const struct qca_device_data qca_soc_data_qca2066 __maybe_unused = {
+ 	.soc_type = QCA_QCA2066,
+ 	.num_vregs = 0,
++	.capabilities = QCA_CAP_WIDEBAND_SPEECH | QCA_CAP_VALID_LE_STATES,
+ };
+ 
+ static const struct qca_device_data qca_soc_data_qca6390 __maybe_unused = {
+-- 
+2.43.0
 
-  Changed paths:
-    M configure.ac
-
-  Log Message:
-  -----------
-  build: tweak PKG_CHECK_MODULES calls
-
-There's no need to call AC_SUBST after a PKG_CHECK_MODULES call, since
-the variables are always set. As an example: the produced Makefile.in
-and Makefile are identical before/after this change.
-
-Similarly, we don't need the "dummy=yes" and manual AC_MSG_ERROR() call
-- pkg-config (or pkgconf) will produce the same and in some cases better
-  error messages.
-
-
-  Commit: 3f490a69cb55a4bcea1f4cb51a053d7f9f8237e5
-      https://github.com/bluez/bluez/commit/3f490a69cb55a4bcea1f4cb51a053d7f9f8237e5
-  Author: Emil Velikov <emil.velikov@collabora.com>
-  Date:   2024-01-16 (Tue, 16 Jan 2024)
-
-  Changed paths:
-    M configure.ac
-    M monitor/hwdb.c
-    M src/oui.c
-
-  Log Message:
-  -----------
-  build: require libudev 196, circa 2012
-
-libudev 196 (systemd really) was released back in 2012, which introduces
-the hwdb API. Bump the requirement, since even long retired
-distributions like Debian oldold stable (aka Buster) include newer
-versions.
-
-
-Compare: https://github.com/bluez/bluez/compare/2a3e935f3f65...3f490a69cb55
