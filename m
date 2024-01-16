@@ -1,69 +1,95 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEC131C686;
-	Tue, 16 Jan 2024 16:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 931B0749F
+	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jan 2024 16:47:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aJTgUX3e"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6C670C433B1;
-	Tue, 16 Jan 2024 16:00:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705420829;
-	bh=VR0zelLUhCaJCX6Q+iJZSRg5efDI4Ll3fVjKY9C1snQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=aJTgUX3e6/A0yIlhhnIzOStguN5+R3jHPTRwWftJgervl+iM1z2yHGabqqGT1j2Mv
-	 2P6SmQjA051ZSnNdrioIU3vevkkKIgEqy/iCojZ9L5Rkp/Yhbt5PvPK1Do2f1IbNNS
-	 flX5Iu78NYp86thTPRzU55uTeEq6IG6mwgxGGV7WrSSavmlyXsrJGJsJgwbRBQdRBz
-	 PcZ9A36paB2fGPTblj4Dz0KZdVL+jID2szHxSPqqweV1ipt6CURIHcTbn4KKDFUX+O
-	 76XDwNwpk6qIW0b1aKfvKWiD8Tyj5MoEG6v923rtEb3My7HNZmYGPk66BSYhoBI7w0
-	 Q2ZaYsB0+3COg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 53407D8C987;
-	Tue, 16 Jan 2024 16:00:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pmn0apc4"
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-781753f52afso744010885a.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jan 2024 08:47:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705423646; x=1706028446; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=2iKubBPCH9iLG/wMzfOCzFiCCUf00lBKvGX3Nd/r33o=;
+        b=Pmn0apc4fLTY8fzHYfRVuoA5k2megIfI9jJQwmAQ5GDwNTF5BpgTHfTHE70SLAclFV
+         TIsxBS5wgFcFhbsIHzlXc9JYvZBe/T+/PGXayYI616rBSplK4T8dSICowecRevWBKSFF
+         pwTK+pXutiYSssh0Szh9/Ma8jfWM12PzSpKK0lW5/rrZjEui7Ja85GdAEXkNbTUlYD7F
+         jYoggt6tRFalWwinxhJp49IE0qiJUlUFXDIniDQ7O1ARlUi1UfYg1ibiBNqLVuc6xdjE
+         zCJMj6rMjrmdBEqNSgdKhbqy+AkDQglsER137fGNGFRIu7KyzdSShATHL9PZ2TjAyS2p
+         wvHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705423646; x=1706028446;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2iKubBPCH9iLG/wMzfOCzFiCCUf00lBKvGX3Nd/r33o=;
+        b=r7NHPmptUOncR78UrpLdPJEB3YTIGF6geaMZa+/D0SAW8xWH2s68VjClpkxVbnXm1S
+         CLLR0FH/s8Ww7Yrvhba/F8kC1lho6urDS068WCH/suqXgmNtPven0kiMF1JVSHFuc4aI
+         dbV+ZCVALzzP73lm+bNNoux6jYgGOJaOeFfalbxi48ymmKsukCZ2B8FpyYm2Ns3BMHiT
+         yk7zSPJJp6BSyECzfzWrI+8p2mO4fthtk8hv9yCH0h7aOVFYRayDPLez70QXOODz9XP6
+         hApvD4PELTx9P7e+nwvCcTzVSgucMHyILlG6oH6cH+VyKMIMznPDLYliYKLvmjdMEv2A
+         SQaQ==
+X-Gm-Message-State: AOJu0YwKIQ3vozAAUHsCdoOFbTOz1d3UQ9+OoshOTRZTvlX7yj8MwRSz
+	NCVzAJY7w+kHZpw4gw8fr6xiOMI3ruk=
+X-Google-Smtp-Source: AGHT+IEMMSe2GKtkgjAy06TpoXvquDdJr5USVc2VooKRkbNE7qcFGdGBVQKrZ5HDZQ/Ag4uoTDx58g==
+X-Received: by 2002:a05:620a:470b:b0:783:4fa5:e313 with SMTP id bs11-20020a05620a470b00b007834fa5e313mr6985669qkb.23.1705423646474;
+        Tue, 16 Jan 2024 08:47:26 -0800 (PST)
+Received: from [172.17.0.2] ([20.55.223.239])
+        by smtp.gmail.com with ESMTPSA id g14-20020ae9e10e000000b007836e78512asm281339qkm.61.2024.01.16.08.47.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Jan 2024 08:47:26 -0800 (PST)
+Message-ID: <65a6b31e.e90a0220.dd83a.2519@mx.google.com>
+Date: Tue, 16 Jan 2024 08:47:26 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============2081563692041376406=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: btusb: Add new VID/PID 13d3/3602 for MT7925
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <170542082933.25552.3927828232982053152.git-patchwork-notify@kernel.org>
-Date: Tue, 16 Jan 2024 16:00:29 +0000
-References: <800469f157c862bcdef7213793004d2de977791f.1705129502.git.deren.wu@mediatek.com>
-In-Reply-To: <800469f157c862bcdef7213793004d2de977791f.1705129502.git.deren.wu@mediatek.com>
-To: =?utf-8?b?RGVyZW4gV3UgKOatpuW+t+S7gSkgPERlcmVuLld1QG1lZGlhdGVrLmNvbT4=?=@ci.codeaurora.org
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
- sean.wang@mediatek.com, chris.lu@mediatek.com, aaron.hou@mediatek.com,
- steve.lee@mediatek.com, linux-bluetooth@vger.kernel.org,
- linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
- ulrik@strid.tech, deren.wu@mediatek.com
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, devnull+emil.l.velikov.gmail.com@kernel.org
+Subject: RE: Remove support for external plugins
+In-Reply-To: <20240116-rm-ext-plugins-v1-1-62990fb07369@gmail.com>
+References: <20240116-rm-ext-plugins-v1-1-62990fb07369@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hello:
+--===============2081563692041376406==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+This is automated email and please do not reply to this email!
 
-On Sat, 13 Jan 2024 15:27:38 +0800 you wrote:
-> From: Ulrik Strid <ulrik@strid.tech>
-> 
-> Add VID 13d3 & PID 3602 for MediaTek MT7925 USB Bluetooth chip.
-> 
-> The information in /sys/kernel/debug/usb/devices about the Bluetooth
-> device is listed as the below.
-> 
-> [...]
+Dear submitter,
 
-Here is the summary with links:
-  - Bluetooth: btusb: Add new VID/PID 13d3/3602 for MT7925
-    https://git.kernel.org/bluetooth/bluetooth-next/c/eaab5c300eab
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=817230
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      3.87 seconds
+GitLint                       PASS      2.60 seconds
+BuildEll                      PASS      23.85 seconds
+BluezMake                     PASS      702.42 seconds
+MakeCheck                     PASS      11.69 seconds
+MakeDistcheck                 PASS      159.11 seconds
+CheckValgrind                 PASS      221.12 seconds
+CheckSmatch                   PASS      326.34 seconds
+bluezmakeextell               PASS      106.35 seconds
+IncrementalBuild              PASS      5304.46 seconds
+ScanBuild                     PASS      928.69 seconds
 
 
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============2081563692041376406==--
