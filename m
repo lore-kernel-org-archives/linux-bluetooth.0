@@ -1,91 +1,85 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DA275C21F;
-	Tue, 16 Jan 2024 19:53:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0650E14C5B0;
+	Tue, 16 Jan 2024 19:57:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705434826; cv=none; b=JF9FfXJUEPkvtHDpuK4CnaAaBoAIfEfSBh9hyo3IIdmT81FNuOYBpK5Fz6b6B4BeTcglLcTy6pcAIKFR6SvfDDPe52ygo+7RZg428DzIh3agWfvka09ZAOl9GQt0ZE2IJxGRwaUbduFGtzLMuZgFjcwr+dnVhSrkodEG7QVaoFM=
+	t=1705435054; cv=none; b=TMYh2O6eh13nqHWl4Tw4QZpPLOQH0bhDdtEMX7NzX93pgH8IRnsiex8OgesldipuKiwnLPUBDVjXXuicfyICed3DMeRscm7O9uC4piLRYu5wBKBNuZv8/4m9XsaAl9tOWRHWyk10oW6EQS1DaEyiSey8zZY7QQ7mxK5JaIAjzis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705434826; c=relaxed/simple;
-	bh=+uc5dm6FdgtmXDioMFgkPdTlCQCatlLrmqOaGPqkTQI=;
+	s=arc-20240116; t=1705435054; c=relaxed/simple;
+	bh=+se2qFPpWzEahE8QqWVQzfI3NLv5TzlfAvQtlA8+bI4=;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:X-stable:
-	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=Ip9Q9lQalwxfa+sME+1GOd22LDwXCycUsmitaZIA1oaSxePBY7k0LQCqnRAJGOff0YT3DnS7q5HMuBSB1ynMcbt4CHUYww2L9r2gqHq7tSYeCMlbWoWS1cKrLJkHPemTWe6e7YNXKDFEuH4xI3AAiaYEWdVjUs0tRhlPyBja1yE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gQxLXWWi; arc=none smtp.client-ip=10.30.226.201
+	 X-Mailer:In-Reply-To:References:MIME-Version:X-stable:
+	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=d9rC5GtGGPYaBKeiR5jOusBg3Ve+PzsSwhGTllveWTkKKJyLuoUBAo4htzyC6N9y0pRh/5nCCNVamMt7rXwhqRv98bZssaUHGDwXIzV2WDUFqWIlxrhnxzx2n5tsUs/oMDJXrAFWVTdusChrotCUnnrxXSh04gqkyKcps1OCy4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rDW0uXlL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gQxLXWWi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42663C433F1;
-	Tue, 16 Jan 2024 19:53:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rDW0uXlL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 991CAC433F1;
+	Tue, 16 Jan 2024 19:57:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705434826;
-	bh=+uc5dm6FdgtmXDioMFgkPdTlCQCatlLrmqOaGPqkTQI=;
+	s=k20201202; t=1705435053;
+	bh=+se2qFPpWzEahE8QqWVQzfI3NLv5TzlfAvQtlA8+bI4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gQxLXWWiPBCDNECS5um43iwhu2lRMWE3F8ymYdQm8YDIsb4rZdjT5Xrkoy/5Uk1Hn
-	 qNjWFuNy8PeZ3nmAOPxbZFhpNireISl863EfC70Yqloc17/9b++Iwavezt3pCn7S2p
-	 iRW4Kw7PvZpXiM8PMM2T6QcDl1L9VJeE3CQm1ZDTnrLsg9HSl6Mahn3kw8R8FV6gII
-	 YGZhP3NixNo17JGErVUpkwKNPqb/BFiwQ4FK5SV82Z4L0TPW+tj+8QTaW+YARwgnAK
-	 nbkrjbVAQM1zyG/yic9wq10F5PzmwVKAp07ryeS/jSXItV8VHrBtqAFV3n+MNpEL/U
-	 2uCAaHTrHEO7w==
+	b=rDW0uXlLwZSs26z8+Doy9W91TLnZDWTSlDRlFeWjA0rJTOyqvhZtHv4coVy6Hu8BE
+	 yjvHTqgQf+hygPnBbetENOUa8N1fsxM64HCzDxInpruViwzshMcRLcBUTo8S12gz0D
+	 GCgRT3lsC0030Uxt+zLmvorAmyfzCMJQuUGKtZ98wPvHBNFzgYAmdb8E5HMyjrLikP
+	 sktc0rgzC2TapsN9oBGjog6Oit/NEg2F8tGhQ4bnSBeu9syGc0+Wv1f6ztxfWfWth2
+	 lpVi2kvkhOIrRR05q+MMK5c+V0+0xLYBn8CFBHPMjxlQXK/IOOG9BcnzIdXjbaSApD
+	 RcQWPCf7snBRw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>,
+Cc: Zijun Hu <quic_zijuhu@quicinc.com>,
 	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
 	marcel@holtmann.org,
 	johan.hedberg@gmail.com,
 	luiz.dentz@gmail.com,
 	linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 096/104] Bluetooth: L2CAP: Fix possible multiple reject send
-Date: Tue, 16 Jan 2024 14:47:02 -0500
-Message-ID: <20240116194908.253437-96-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 61/68] Bluetooth: qca: Set both WIDEBAND_SPEECH and LE_STATES quirks for QCA2066
+Date: Tue, 16 Jan 2024 14:54:00 -0500
+Message-ID: <20240116195511.255854-61-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240116194908.253437-1-sashal@kernel.org>
-References: <20240116194908.253437-1-sashal@kernel.org>
+In-Reply-To: <20240116195511.255854-1-sashal@kernel.org>
+References: <20240116195511.255854-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.12
+X-stable-base: Linux 6.1.73
 Content-Transfer-Encoding: 8bit
 
-From: Frédéric Danis <frederic.danis@collabora.com>
+From: Zijun Hu <quic_zijuhu@quicinc.com>
 
-[ Upstream commit 96a3398b467ab8aada3df2f3a79f4b7835d068b8 ]
+[ Upstream commit 5d192b697c7417254cdd9edc3d5e9e0364eb9045 ]
 
-In case of an incomplete command or a command with a null identifier 2
-reject packets will be sent, one with the identifier and one with 0.
-Consuming the data of the command will prevent it.
-This allows to send a reject packet for each corrupted command in a
-multi-command packet.
+Set both WIDEBAND_SPEECH_SUPPORTED and VALID_LE_STATES quirks
+for QCA2066.
 
-Signed-off-by: Frédéric Danis <frederic.danis@collabora.com>
+Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/l2cap_core.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/bluetooth/hci_qca.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index baeebee41cd9..60298975d5c4 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -6526,7 +6526,8 @@ static inline void l2cap_sig_channel(struct l2cap_conn *conn,
- 		if (len > skb->len || !cmd->ident) {
- 			BT_DBG("corrupted command");
- 			l2cap_sig_send_rej(conn, cmd->ident);
--			break;
-+			skb_pull(skb, len > skb->len ? skb->len : len);
-+			continue;
- 		}
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 45dffd2cbc71..76ceb8a0183d 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1861,6 +1861,7 @@ static const struct qca_device_data qca_soc_data_wcn3998 = {
+ static const struct qca_device_data qca_soc_data_qca6390 = {
+ 	.soc_type = QCA_QCA6390,
+ 	.num_vregs = 0,
++	.capabilities = QCA_CAP_WIDEBAND_SPEECH | QCA_CAP_VALID_LE_STATES,
+ };
  
- 		err = l2cap_bredr_sig_cmd(conn, cmd, len, skb->data);
+ static const struct qca_device_data qca_soc_data_wcn6750 = {
 -- 
 2.43.0
 
