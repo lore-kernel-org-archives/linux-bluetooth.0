@@ -1,29 +1,29 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 308F51BDF1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BD5F1BDFB
 	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jan 2024 14:00:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GWAz+XD5"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 150D0C4166D;
-	Tue, 16 Jan 2024 14:00:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WRTZP9JX"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D68EAC43143;
+	Tue, 16 Jan 2024 14:00:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705413640;
-	bh=+R4T9QSIXlHs4bM3MouqH7eBByUgfKx42G8CxrQ62u4=;
+	s=k20201202; t=1705413639;
+	bh=/kkyCayW86QPB7bv2KKkQj8ka4jKmnUp4RSzD3PbMBI=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=GWAz+XD57X7ZZ1orfSNdfHwcCbHl433xmP/3QtQeBUQfh4PN9wEmmnRt9Fz5DySIJ
-	 zV7HuY78FpZ6A4jXDsu5KvbbaSEFIUqfFBl+un892I3ZhKf5qOSsgNM+GmobWiRCXt
-	 vU85UUfopJOHxzUun5YGe2UYkYQ0wr5slAEIGrqXbPXPgSuqIZ71CGfvOC/6P9TLGw
-	 seX3kzItPz5CT1ACLIhZVlCVyGREpuMAx/urnLOHC7CN0j7O5IzAyul/U5IfNQTASe
-	 Nk5iv/sUEFS5c/YBjXEWVknumpOYGphTeD6ykq8wR1wLZg1odcNluCl4WRh6RCjKZq
-	 JdVnYPYgpw2fQ==
+	b=WRTZP9JXP/zhswap8dH8BBAYHGv2+HQo4BJhSfAIGgkDu6QJ/Sv3jLHnvsweI6x7a
+	 84Y+4FRA5/iyzQ5zey05ebyr+wrOeaMh1PRnxkOlIFXP3rm4dTxcZLDGxavwNdvCO9
+	 zr1zSAE8UUKZvhU0SizGLypOD5qjlW9e1edjDreLCuLxfatftrg9cnD0q1BkvwT5ck
+	 YPfVL0lNbFqwuxaCpAP/T8RvLaJOrWtgD9iC0fShYSvd2wRna7y74NGAgHLFZCKszD
+	 OkmrApxam7GOxwL2L1Nw0uL3rbtnZqQST/jW9UOzpfFFrbGCWdSqhZwD+R+t4fZFub
+	 1/I9rhmKix3Iw==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06D66C47DA6;
-	Tue, 16 Jan 2024 14:00:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C49BBC47DA2;
+	Tue, 16 Jan 2024 14:00:39 +0000 (UTC)
 From: Emil Velikov via B4 Relay <devnull+emil.l.velikov.gmail.com@kernel.org>
-Date: Tue, 16 Jan 2024 14:00:42 +0000
-Subject: [PATCH BlueZ 17/20] obexd: const obex_service_driver instances and
- API
+Date: Tue, 16 Jan 2024 14:00:37 +0000
+Subject: [PATCH BlueZ 12/20] lib: const annotate hci_map instances and
+ related API
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -32,17 +32,17 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240116-const-v1-17-17c87978f40b@gmail.com>
+Message-Id: <20240116-const-v1-12-17c87978f40b@gmail.com>
 References: <20240116-const-v1-0-17c87978f40b@gmail.com>
 In-Reply-To: <20240116-const-v1-0-17c87978f40b@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Emil Velikov <emil.velikov@collabora.com>
 X-Mailer: b4 0.12.4
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1705413636; l=9315;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1705413636; l=6405;
  i=emil.l.velikov@gmail.com; s=20230301; h=from:subject:message-id;
- bh=PLJ5Voc0l/2l/ZQxlBtjyCuSLocbfz1q4Ph0208Vyz0=;
- b=YhPEyfLP2GbmdSEVORIMVCnzP4Iwf/iAA8ZKSCko8DHpG1+u/Ybzf+em2HmevlddcV5dbWAWE
- VE13HVAL1exBrhBC7iw+AKF9d4r5TT5KtNNgNH6wTVU4Lx0fNsez+HE
+ bh=G1T1BpY+ViXL5Nqm153cSzTMq0Gn6gXun3Ula2nPawc=;
+ b=Elld4fq5Oyb9/L/sc946Ajt+HH/VyXPxr5oX80RiYGtIQrdE9QDJxAonB6VxBMeY5ExMvAk8d
+ 7ykQs7iAeYLBPGEsSkQF3HS0lx4SZDlzzlhfS2bM6LeJvfVzdwc+jkY
 X-Developer-Key: i=emil.l.velikov@gmail.com; a=ed25519;
  pk=qeUTVTNyI3rcR2CfNNWsloTihgzmtbZo98GdxwZKCkY=
 X-Endpoint-Received:
@@ -53,266 +53,223 @@ Reply-To: <emil.l.velikov@gmail.com>
 From: Emil Velikov <emil.velikov@collabora.com>
 
 ---
- obexd/client/mns.c            |  2 +-
- obexd/plugins/bluetooth.c     |  4 ++--
- obexd/plugins/ftp.c           |  2 +-
- obexd/plugins/irmc.c          |  2 +-
- obexd/plugins/mas.c           |  2 +-
- obexd/plugins/opp.c           |  2 +-
- obexd/plugins/pbap.c          |  2 +-
- obexd/plugins/pcsuite.c       |  2 +-
- obexd/plugins/syncevolution.c |  2 +-
- obexd/src/obex-priv.h         |  2 +-
- obexd/src/server.c            |  2 +-
- obexd/src/service.c           | 20 ++++++++++----------
- obexd/src/service.h           |  6 +++---
- 13 files changed, 25 insertions(+), 25 deletions(-)
+ client/mgmt.c |  2 +-
+ lib/hci.c     | 42 +++++++++++++++++++++---------------------
+ lib/hci_lib.h |  4 ++--
+ 3 files changed, 24 insertions(+), 24 deletions(-)
 
-diff --git a/obexd/client/mns.c b/obexd/client/mns.c
-index 3b2ae1076..702cf0367 100644
---- a/obexd/client/mns.c
-+++ b/obexd/client/mns.c
-@@ -346,7 +346,7 @@ static ssize_t event_report_write(void *obj, const void *buf, size_t count)
- 	return count;
+diff --git a/client/mgmt.c b/client/mgmt.c
+index 6fd43887d..62167727c 100644
+--- a/client/mgmt.c
++++ b/client/mgmt.c
+@@ -1484,7 +1484,7 @@ static void ext_index_rsp(uint8_t status, uint16_t len, const void *param,
+ 
+ 	for (i = 0; i < count; i++) {
+ 		uint16_t index = le16_to_cpu(rp->entry[i].index);
+-		char *busstr = hci_bustostr(rp->entry[i].bus);
++		const char *busstr = hci_bustostr(rp->entry[i].bus);
+ 
+ 		switch (rp->entry[i].type) {
+ 		case 0x00:
+diff --git a/lib/hci.c b/lib/hci.c
+index bd735a440..937e65d48 100644
+--- a/lib/hci.c
++++ b/lib/hci.c
+@@ -42,7 +42,7 @@ typedef struct {
+ 	unsigned int val;
+ } hci_map;
+ 
+-static char *hci_bit2str(hci_map *m, unsigned int val)
++static char *hci_bit2str(const hci_map *m, unsigned int val)
+ {
+ 	char *str = malloc(120);
+ 	char *ptr = str;
+@@ -59,10 +59,10 @@ static char *hci_bit2str(hci_map *m, unsigned int val)
+ 	return str;
  }
  
--static struct obex_service_driver mns = {
-+static const struct obex_service_driver mns = {
- 	.name = "Message Notification server",
- 	.service = OBEX_MNS,
- 	.target = MNS_TARGET,
-diff --git a/obexd/plugins/bluetooth.c b/obexd/plugins/bluetooth.c
-index d232d3fd5..bcf6e1998 100644
---- a/obexd/plugins/bluetooth.c
-+++ b/obexd/plugins/bluetooth.c
-@@ -41,7 +41,7 @@
+-static int hci_str2bit(hci_map *map, char *str, unsigned int *val)
++static int hci_str2bit(const hci_map *map, char *str, unsigned int *val)
+ {
+ 	char *t, *ptr;
+-	hci_map *m;
++	const hci_map *m;
+ 	int set;
  
- struct bluetooth_profile {
- 	struct obex_server *server;
--	struct obex_service_driver *driver;
-+	const struct obex_service_driver *driver;
- 	char *uuid;
- 	char *path;
- };
-@@ -355,7 +355,7 @@ static void *bluetooth_start(struct obex_server *server, int *err)
- 	const GSList *l;
- 
- 	for (l = server->drivers; l; l = l->next) {
--		struct obex_service_driver *driver = l->data;
-+		const struct obex_service_driver *driver = l->data;
- 		struct bluetooth_profile *profile;
- 		const char *uuid;
- 
-diff --git a/obexd/plugins/ftp.c b/obexd/plugins/ftp.c
-index 4b04bab06..874fe2b8b 100644
---- a/obexd/plugins/ftp.c
-+++ b/obexd/plugins/ftp.c
-@@ -494,7 +494,7 @@ static void ftp_reset(struct obex_session *os, void *user_data)
- 	manager_emit_transfer_completed(ftp->transfer);
+ 	if (!str || !(str = ptr = strdup(str)))
+@@ -83,7 +83,7 @@ static int hci_str2bit(hci_map *map, char *str, unsigned int *val)
+ 	return set;
  }
  
--static struct obex_service_driver ftp = {
-+static const struct obex_service_driver ftp = {
- 	.name = "File Transfer server",
- 	.service = OBEX_FTP,
- 	.target = FTP_TARGET,
-diff --git a/obexd/plugins/irmc.c b/obexd/plugins/irmc.c
-index e85cf70a1..cab97b620 100644
---- a/obexd/plugins/irmc.c
-+++ b/obexd/plugins/irmc.c
-@@ -427,7 +427,7 @@ static const struct obex_mime_type_driver irmc_driver = {
- 	.read = irmc_read,
- };
- 
--static struct obex_service_driver irmc = {
-+static const struct obex_service_driver irmc = {
- 	.name = "IRMC Sync server",
- 	.service = OBEX_IRMC,
- 	.target = IRMC_TARGET,
-diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c
-index f0eaf6d82..10b972d65 100644
---- a/obexd/plugins/mas.c
-+++ b/obexd/plugins/mas.c
-@@ -781,7 +781,7 @@ static void *notification_registration_open(const char *name, int oflag,
- 	return mas;
+-static char *hci_uint2str(hci_map *m, unsigned int val)
++static char *hci_uint2str(const hci_map *m, unsigned int val)
+ {
+ 	char *str = malloc(50);
+ 	char *ptr = str;
+@@ -102,10 +102,10 @@ static char *hci_uint2str(hci_map *m, unsigned int val)
+ 	return str;
  }
  
--static struct obex_service_driver mas = {
-+static const struct obex_service_driver mas = {
- 	.name = "Message Access server",
- 	.service = OBEX_MAS,
- 	.target = MAS_TARGET,
-diff --git a/obexd/plugins/opp.c b/obexd/plugins/opp.c
-index 860161303..777f5f8ed 100644
---- a/obexd/plugins/opp.c
-+++ b/obexd/plugins/opp.c
-@@ -155,7 +155,7 @@ static void opp_reset(struct obex_session *os, void *user_data)
- 	manager_emit_transfer_completed(user_data);
+-static int hci_str2uint(hci_map *map, char *str, unsigned int *val)
++static int hci_str2uint(const hci_map *map, char *str, unsigned int *val)
+ {
+ 	char *t, *ptr;
+-	hci_map *m;
++	const hci_map *m;
+ 	int set = 0;
+ 
+ 	if (!str)
+@@ -127,7 +127,7 @@ static int hci_str2uint(hci_map *map, char *str, unsigned int *val)
+ 	return set;
  }
  
--static struct obex_service_driver driver = {
-+static const struct obex_service_driver driver = {
- 	.name = "Object Push server",
- 	.service = OBEX_OPP,
- 	.connect = opp_connect,
-diff --git a/obexd/plugins/pbap.c b/obexd/plugins/pbap.c
-index b363c673b..4175f9de8 100644
---- a/obexd/plugins/pbap.c
-+++ b/obexd/plugins/pbap.c
-@@ -634,7 +634,7 @@ static int pbap_chkput(struct obex_session *os, void *user_data)
- 	return -EBADR;
- }
- 
--static struct obex_service_driver pbap = {
-+static const struct obex_service_driver pbap = {
- 	.name = "Phonebook Access server",
- 	.service = OBEX_PBAP,
- 	.target = PBAP_TARGET,
-diff --git a/obexd/plugins/pcsuite.c b/obexd/plugins/pcsuite.c
-index d4a0394af..752074c08 100644
---- a/obexd/plugins/pcsuite.c
-+++ b/obexd/plugins/pcsuite.c
-@@ -231,7 +231,7 @@ static void pcsuite_disconnect(struct obex_session *os, void *user_data)
- 	g_free(pcsuite);
- }
- 
--static struct obex_service_driver pcsuite = {
-+static const struct obex_service_driver pcsuite = {
- 	.name = "Nokia OBEX PC Suite Services",
- 	.service = OBEX_PCSUITE,
- 	.channel = PCSUITE_CHANNEL,
-diff --git a/obexd/plugins/syncevolution.c b/obexd/plugins/syncevolution.c
-index f0387b986..ae3dc48c4 100644
---- a/obexd/plugins/syncevolution.c
-+++ b/obexd/plugins/syncevolution.c
-@@ -436,7 +436,7 @@ static const struct obex_mime_type_driver synce_driver = {
- 	.write = synce_write,
- };
- 
--static struct obex_service_driver synce = {
-+static const struct obex_service_driver synce = {
- 	.name = "OBEX server for SyncML, using SyncEvolution",
- 	.service = OBEX_SYNCEVOLUTION,
- 	.channel = SYNCEVOLUTION_CHANNEL,
-diff --git a/obexd/src/obex-priv.h b/obexd/src/obex-priv.h
-index 994144678..d2c62a596 100644
---- a/obexd/src/obex-priv.h
-+++ b/obexd/src/obex-priv.h
-@@ -33,7 +33,7 @@ struct obex_session {
- 	void *object;
- 	gboolean aborted;
- 	int err;
--	struct obex_service_driver *service;
-+	const struct obex_service_driver *service;
- 	void *service_data;
- 	struct obex_server *server;
- 	gboolean checked;
-diff --git a/obexd/src/server.c b/obexd/src/server.c
-index a8fc45092..eef149272 100644
---- a/obexd/src/server.c
-+++ b/obexd/src/server.c
-@@ -82,7 +82,7 @@ int obex_server_init(void)
+-char *hci_bustostr(int bus)
++const char *hci_bustostr(int bus)
+ {
+ 	switch (bus) {
+ 	case HCI_VIRTUAL:
+@@ -157,7 +157,7 @@ char *hci_bustostr(int bus)
  	}
- 
- 	for (l = drivers; l; l = l->next) {
--		struct obex_service_driver *driver = l->data;
-+		const struct obex_service_driver *driver = l->data;
- 
- 		init_server(driver->service, transports);
- 	}
-diff --git a/obexd/src/service.c b/obexd/src/service.c
-index 0f4e420e8..332d61939 100644
---- a/obexd/src/service.c
-+++ b/obexd/src/service.c
-@@ -26,14 +26,14 @@
- 
- static GSList *drivers = NULL;
- 
--struct obex_service_driver *obex_service_driver_find(GSList *drivers,
-+const struct obex_service_driver *obex_service_driver_find(GSList *drivers,
- 			const uint8_t *target, unsigned int target_size,
- 			const uint8_t *who, unsigned int who_size)
- {
- 	GSList *l;
- 
- 	for (l = drivers; l; l = l->next) {
--		struct obex_service_driver *driver = l->data;
-+		const struct obex_service_driver *driver = l->data;
- 
- 		/* who is optional, so only check for it if not NULL */
- 		if (who != NULL && memncmp0(who, who_size, driver->who,
-@@ -57,10 +57,10 @@ GSList *obex_service_driver_list(uint16_t services)
- 		return drivers;
- 
- 	for (l = drivers; l && services; l = l->next) {
--		struct obex_service_driver *driver = l->data;
-+		const struct obex_service_driver *driver = l->data;
- 
- 		if (driver->service & services) {
--			list = g_slist_append(list, driver);
-+			list = g_slist_append(list, (gpointer)driver);
- 			services &= ~driver->service;
- 		}
- 	}
-@@ -68,12 +68,12 @@ GSList *obex_service_driver_list(uint16_t services)
- 	return list;
  }
  
--static struct obex_service_driver *find_driver(uint16_t service)
-+static const struct obex_service_driver *find_driver(uint16_t service)
+-char *hci_dtypetostr(int type)
++const char *hci_dtypetostr(int type)
  {
- 	GSList *l;
- 
- 	for (l = drivers; l; l = l->next) {
--		struct obex_service_driver *driver = l->data;
-+		const struct obex_service_driver *driver = l->data;
- 
- 		if (driver->service == service)
- 			return driver;
-@@ -82,7 +82,7 @@ static struct obex_service_driver *find_driver(uint16_t service)
- 	return NULL;
+ 	return hci_bustostr(type & 0x0f);
+ }
+@@ -175,7 +175,7 @@ char *hci_typetostr(int type)
  }
  
--int obex_service_driver_register(struct obex_service_driver *driver)
-+int obex_service_driver_register(const struct obex_service_driver *driver)
+ /* HCI dev flags mapping */
+-static hci_map dev_flags_map[] = {
++static const hci_map dev_flags_map[] = {
+ 	{ "UP",      HCI_UP      },
+ 	{ "INIT",    HCI_INIT    },
+ 	{ "RUNNING", HCI_RUNNING },
+@@ -192,7 +192,7 @@ char *hci_dflagstostr(uint32_t flags)
  {
- 	if (!driver) {
- 		error("Invalid driver");
-@@ -99,14 +99,14 @@ int obex_service_driver_register(struct obex_service_driver *driver)
+ 	char *str = bt_malloc(50);
+ 	char *ptr = str;
+-	hci_map *m = dev_flags_map;
++	const hci_map *m = dev_flags_map;
  
- 	/* Drivers that support who has priority */
- 	if (driver->who)
--		drivers = g_slist_prepend(drivers, driver);
-+		drivers = g_slist_prepend(drivers, (gpointer)driver);
- 	else
--		drivers = g_slist_append(drivers, driver);
-+		drivers = g_slist_append(drivers, (gpointer)driver);
- 
- 	return 0;
+ 	if (!str)
+ 		return NULL;
+@@ -211,7 +211,7 @@ char *hci_dflagstostr(uint32_t flags)
  }
  
--void obex_service_driver_unregister(struct obex_service_driver *driver)
-+void obex_service_driver_unregister(const struct obex_service_driver *driver)
- {
- 	if (!g_slist_find(drivers, driver)) {
- 		error("Unable to unregister: No such driver %p", driver);
-diff --git a/obexd/src/service.h b/obexd/src/service.h
-index e3aee3bf3..8d9f70558 100644
---- a/obexd/src/service.h
-+++ b/obexd/src/service.h
-@@ -32,9 +32,9 @@ struct obex_service_driver {
- 	void (*reset) (struct obex_session *os, void *user_data);
+ /* HCI packet type mapping */
+-static hci_map pkt_type_map[] = {
++static const hci_map pkt_type_map[] = {
+ 	{ "DM1",   HCI_DM1  },
+ 	{ "DM3",   HCI_DM3  },
+ 	{ "DM5",   HCI_DM5  },
+@@ -230,7 +230,7 @@ static hci_map pkt_type_map[] = {
+ 	{ NULL }
  };
  
--int obex_service_driver_register(struct obex_service_driver *driver);
--void obex_service_driver_unregister(struct obex_service_driver *driver);
-+int obex_service_driver_register(const struct obex_service_driver *driver);
-+void obex_service_driver_unregister(const struct obex_service_driver *driver);
- GSList *obex_service_driver_list(uint16_t services);
--struct obex_service_driver *obex_service_driver_find(GSList *drivers,
-+const struct obex_service_driver *obex_service_driver_find(GSList *drivers,
- 			const uint8_t *target, unsigned int target_size,
- 			const uint8_t *who, unsigned int who_size);
+-static hci_map sco_ptype_map[] = {
++static const hci_map sco_ptype_map[] = {
+ 	{ "HV1",   0x0001   },
+ 	{ "HV2",   0x0002   },
+ 	{ "HV3",   0x0004   },
+@@ -265,7 +265,7 @@ int hci_strtoscoptype(char *str, unsigned int *val)
+ }
+ 
+ /* Link policy mapping */
+-static hci_map link_policy_map[] = {
++static const hci_map link_policy_map[] = {
+ 	{ "NONE",	0		},
+ 	{ "RSWITCH",	HCI_LP_RSWITCH	},
+ 	{ "HOLD",	HCI_LP_HOLD	},
+@@ -285,7 +285,7 @@ int hci_strtolp(char *str, unsigned int *val)
+ }
+ 
+ /* Link mode mapping */
+-static hci_map link_mode_map[] = {
++static const hci_map link_mode_map[] = {
+ 	{ "NONE",	0		},
+ 	{ "ACCEPT",	HCI_LM_ACCEPT	},
+ 	{ "CENTRAL",	HCI_LM_MASTER	},
+@@ -332,7 +332,7 @@ int hci_strtolm(char *str, unsigned int *val)
+ }
+ 
+ /* Command mapping */
+-static hci_map commands_map[] = {
++static const hci_map commands_map[] = {
+ 	{ "Inquiry",					0   },
+ 	{ "Inquiry Cancel",				1   },
+ 	{ "Periodic Inquiry Mode",			2   },
+@@ -605,7 +605,7 @@ char *hci_cmdtostr(unsigned int cmd)
+ char *hci_commandstostr(uint8_t *commands, char *pref, int width)
+ {
+ 	unsigned int maxwidth = width - 3;
+-	hci_map *m;
++	const hci_map *m;
+ 	char *off, *ptr, *str;
+ 	int size = 10;
+ 
+@@ -645,7 +645,7 @@ char *hci_commandstostr(uint8_t *commands, char *pref, int width)
+ }
+ 
+ /* Version mapping */
+-static hci_map ver_map[] = {
++static const hci_map ver_map[] = {
+ 	{ "1.0b",	0x00 },
+ 	{ "1.1",	0x01 },
+ 	{ "1.2",	0x02 },
+@@ -683,7 +683,7 @@ int lmp_strtover(char *str, unsigned int *ver)
+ 	return hci_str2uint(ver_map, str, ver);
+ }
+ 
+-static hci_map pal_map[] = {
++static const hci_map pal_map[] = {
+ 	{ "3.0",	0x01 },
+ 	{ NULL }
+ };
+@@ -699,7 +699,7 @@ int pal_strtover(char *str, unsigned int *ver)
+ }
+ 
+ /* LMP features mapping */
+-static hci_map lmp_features_map[8][9] = {
++static const hci_map lmp_features_map[8][9] = {
+ 	{	/* Byte 0 */
+ 		{ "<3-slot packets>",	LMP_3SLOT	},	/* Bit 0 */
+ 		{ "<5-slot packets>",	LMP_5SLOT	},	/* Bit 1 */
+@@ -794,7 +794,7 @@ char *lmp_featurestostr(uint8_t *features, char *pref, int width)
+ 	int i, size = 10;
+ 
+ 	for (i = 0; i < 8; i++) {
+-		hci_map *m = lmp_features_map[i];
++		const hci_map *m = lmp_features_map[i];
+ 
+ 		while (m->str) {
+ 			if (m->val & features[i])
+@@ -816,7 +816,7 @@ char *lmp_featurestostr(uint8_t *features, char *pref, int width)
+ 	off = ptr;
+ 
+ 	for (i = 0; i < 8; i++) {
+-		hci_map *m = lmp_features_map[i];
++		const hci_map *m = lmp_features_map[i];
+ 
+ 		while (m->str) {
+ 			if (m->val & features[i]) {
+diff --git a/lib/hci_lib.h b/lib/hci_lib.h
+index 6b1a548b5..baf3d3e12 100644
+--- a/lib/hci_lib.h
++++ b/lib/hci_lib.h
+@@ -132,9 +132,9 @@ int hci_le_read_remote_features(int dd, uint16_t handle, uint8_t *features, int
+ int hci_for_each_dev(int flag, int(*func)(int dd, int dev_id, long arg), long arg);
+ int hci_get_route(bdaddr_t *bdaddr);
+ 
+-char *hci_bustostr(int bus);
++const char *hci_bustostr(int bus);
+ char *hci_typetostr(int type);
+-char *hci_dtypetostr(int type);
++const char *hci_dtypetostr(int type);
+ char *hci_dflagstostr(uint32_t flags);
+ char *hci_ptypetostr(unsigned int ptype);
+ int hci_strtoptype(char *str, unsigned int *val);
 
 -- 
 2.43.0
