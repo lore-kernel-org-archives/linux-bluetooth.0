@@ -1,83 +1,63 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-18.smtp.github.com (out-18.smtp.github.com [192.30.252.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5621F1C6A4
-	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jan 2024 17:20:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 657C41CAA3
+	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jan 2024 17:36:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705425625; cv=none; b=AZbOsiLNEQoFLoKiH9TAayeFtoQqjeOSU8PzXNn2RacjP4NM7JVCJUieiF72YPNzgh1ts/nOjeBfTi7DTGk2nBw1VPIdYv+OAUqjRtbKPOEI/SGrBEqD8yj4gaoNREIut8G24hGdkLSGE+WIoii8uKPPDsu2gBr7tgGz9ArjJTA=
+	t=1705426600; cv=none; b=lu5snr+Xgpm0b/g0L8OzSJ6QaptUXbi206v9D92+WBVwNZa5N7me265qj/tjX4peqJqSRLxdmWNf0HinKO3ErDFhkx8e4Prz3J7npzTLupUOwOPwjCuYeKEReZRSafu7cA7fzh0kMQV7NcVXizJGfYO5NHPAhtP65DfaJi/ZA1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705425625; c=relaxed/simple;
-	bh=v2ZGgtcq2WMExr/XEI4a9kBERNn52izAR6t2QNMiN+0=;
-	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
-	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=vEywAMnWn1Y6zabhm+FzVMRhKowCv7f4ZbibTglMZ89cUD6HA0+/9lwvl8cdAKfJUuIDnKQjy1bgquinnaxDRft9OaOtMv5u2ppEHDCh1hKFtaau4jJrG0gcEoo5H2S6IcAv7hIFByBK0XlwCgJHgOxmK/WTe6lCr1ojf1jiCL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PV7Gxt9n; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1705426600; c=relaxed/simple;
+	bh=4esLXVNTthFQuLoh5ogEhkDOA3uIIoeEkBqEladOPe4=;
+	h=Received:DKIM-Signature:Date:From:To:Message-ID:Subject:
+	 Mime-Version:Content-Type:Content-Transfer-Encoding:
+	 X-GitHub-Recipient-Address:X-Auto-Response-Suppress; b=YtMegU3A6TYa6CZZiQlmMKFKmlopE+TeaGlzFLpphr8xcSaTjiDqKKBnYRhkvOSP6SM1AIPqyOjEKairCEchnup334ftbpZi3VwAzRXqjbzrA8jxdtIcTlUFjgHEW3M5XBSU2qyvBRlgE8jhDma4YQ40DIQ3Wic5D/ZrB21JwVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=iqO4Fz8k; arc=none smtp.client-ip=192.30.252.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PV7Gxt9n"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 15988C433C7;
-	Tue, 16 Jan 2024 17:20:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705425625;
-	bh=v2ZGgtcq2WMExr/XEI4a9kBERNn52izAR6t2QNMiN+0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=PV7Gxt9nEK/Aqx5iyjoqqu7VPytJZM9ltUwrQ2w4xnfwYijV6C5u2rWgBH+AEdiQI
-	 E3xQwI8fp/lM0OBE4SUaCk5wjoysxjEN2Mtr8Rzt7L+lnjO/qtQhX6B1ql93fVQLre
-	 H5fj0RKTwy18KPC5NsoRsrqxcFAfuKHjNgGeAW5yDTYtMlVb2Uh5LyEa5RWrer5EiF
-	 9UhJpHFQ7W2KTyRJSnxF48m7UYMEgzftD76xvZOLCfQkd7GkNVD746CFn5kvuG9RET
-	 Z6EQDkD+Xhc3gn91LwxMKO1ZnDjQje4hSAt6+BHEN58CfhG3vzHeexFdNFCk889JMI
-	 c0LySvLOpfubQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id ED975D8C987;
-	Tue, 16 Jan 2024 17:20:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="iqO4Fz8k"
+Received: from github.com (hubbernetes-node-413e5a9.va3-iad.github.net [10.48.141.38])
+	by smtp.github.com (Postfix) with ESMTPA id 639F4E1082
+	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jan 2024 09:36:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1705426598;
+	bh=jPMAby0Tb2mYkUbZXwvkDLMbnJmYwW3NOZX+62/wptc=;
+	h=Date:From:To:Subject:From;
+	b=iqO4Fz8k6aXg6Z+UKSawGKO0iwGBqMp5q+CyO0lMmXUqtL8UwUtmgUvX+z/7kS1JY
+	 0OFIGNf/OeWcA7ppAYJX2cWM3xIt4B6d+1PF6edGTmHDuYVuamm+WkMQI3v/iT82T6
+	 4ITH38jdPHC8r92DPAxUFMAGrLsUrTBhh6Klb34s=
+Date: Tue, 16 Jan 2024 09:36:38 -0800
+From: silviubarbulescu <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/770ad5-2a3e93@github.com>
+Subject: [bluez/bluez] 2a3e93: shared/bap: Fix dereference of null pointer
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 0/2] Add code to support dynamically generated BASE
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <170542562496.8089.4325846636458566898.git-patchwork-notify@kernel.org>
-Date: Tue, 16 Jan 2024 17:20:24 +0000
-References: <20240114224104.37716-1-silviu.barbulescu@nxp.com>
-In-Reply-To: <20240114224104.37716-1-silviu.barbulescu@nxp.com>
-To: Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
-Cc: linux-bluetooth@vger.kernel.org, mihai-octavian.urzica@nxp.com,
- vlad.pruteanu@nxp.com, andrei.istodorescu@nxp.com, luiz.dentz@gmail.com,
- iulia.tanasescu@nxp.com
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 2a3e935f3f652f2b625af72d2c9abda64d742c28
+      https://github.com/bluez/bluez/commit/2a3e935f3f652f2b625af72d2c9abda64d742c28
+  Author: Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
+  Date:   2024-01-16 (Tue, 16 Jan 2024)
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M src/shared/bap.c
 
-On Mon, 15 Jan 2024 00:41:02 +0200 you wrote:
-> Added code that will be used to generate the BASE dynamically in Bluez.
-> This code will help when will remove the base_lc3_16_2_1 from player.c
-> so we can use the preset from the endpoint.config command.
-> 
-> Added fix for ScanBuild error: Dereference of null pointer
-> 
-> Silviu Florian Barbulescu (2):
->   shared/bap: Fix ScanBuild error: Dereference of null pointer
->   shared/bap: Add code to support dynamically generated BASE from
->     presets
-> 
-> [...]
+  Log Message:
+  -----------
+  shared/bap: Fix dereference of null pointer
 
-Here is the summary with links:
-  - [v3,1/2] shared/bap: Fix dereference of null pointer
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2a3e935f3f65
-  - [v3,2/2] shared/bap: Code for dynamically generated BASE
-    (no matching commit)
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Fix ScanBuild error: Dereference of null pointer
 
 
