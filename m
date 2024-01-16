@@ -1,29 +1,29 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BD341BDFA
-	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jan 2024 14:00:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 308F51BDF1
+	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jan 2024 14:00:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EssZOpOX"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C8C35C43141;
-	Tue, 16 Jan 2024 14:00:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GWAz+XD5"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 150D0C4166D;
+	Tue, 16 Jan 2024 14:00:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705413639;
-	bh=NvolrZ1r/y7wWC9D7JKhSSVI2sMbcjnlzO+Cd5rTv/I=;
+	s=k20201202; t=1705413640;
+	bh=+R4T9QSIXlHs4bM3MouqH7eBByUgfKx42G8CxrQ62u4=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=EssZOpOXZXZxPTlnV+WEkxHnCo+IOyvS8xvHu+wO51Lb1iOB3TqBokUYIc13hXXmc
-	 xDNAOfsZyBJc3z535VM78QS/FY64nXDRBy+ee5PX37xraHGwAgFgYvcdEUORf/fksK
-	 nHKZ2sykjN7giOeaHackeJ0roOMc8cjGWfsW3OYUzQ/P+bPFxyWwZOTx15AXjh/Uig
-	 Kg4W997iBiEspFRFeeLDm587UDqwuwbarowjK4HYC7Kp/W2mcJepoAWHgLJKHwZdnA
-	 NNh6Hi7vS+57YaWY+dmr4097IBMWhSHhVAktW8twtGlw1uloezAsIzwPlE2+U+pPLk
-	 TZfmZn1uo14PA==
+	b=GWAz+XD57X7ZZ1orfSNdfHwcCbHl433xmP/3QtQeBUQfh4PN9wEmmnRt9Fz5DySIJ
+	 zV7HuY78FpZ6A4jXDsu5KvbbaSEFIUqfFBl+un892I3ZhKf5qOSsgNM+GmobWiRCXt
+	 vU85UUfopJOHxzUun5YGe2UYkYQ0wr5slAEIGrqXbPXPgSuqIZ71CGfvOC/6P9TLGw
+	 seX3kzItPz5CT1ACLIhZVlCVyGREpuMAx/urnLOHC7CN0j7O5IzAyul/U5IfNQTASe
+	 Nk5iv/sUEFS5c/YBjXEWVknumpOYGphTeD6ykq8wR1wLZg1odcNluCl4WRh6RCjKZq
+	 JdVnYPYgpw2fQ==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B80B2C47DAF;
-	Tue, 16 Jan 2024 14:00:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06D66C47DA6;
+	Tue, 16 Jan 2024 14:00:40 +0000 (UTC)
 From: Emil Velikov via B4 Relay <devnull+emil.l.velikov.gmail.com@kernel.org>
-Date: Tue, 16 Jan 2024 14:00:36 +0000
-Subject: [PATCH BlueZ 11/20] gobex: const annotate RO arrays, use
- G_N_ELEMENTS
+Date: Tue, 16 Jan 2024 14:00:42 +0000
+Subject: [PATCH BlueZ 17/20] obexd: const obex_service_driver instances and
+ API
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -32,17 +32,17 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240116-const-v1-11-17c87978f40b@gmail.com>
+Message-Id: <20240116-const-v1-17-17c87978f40b@gmail.com>
 References: <20240116-const-v1-0-17c87978f40b@gmail.com>
 In-Reply-To: <20240116-const-v1-0-17c87978f40b@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Emil Velikov <emil.velikov@collabora.com>
 X-Mailer: b4 0.12.4
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1705413636; l=1328;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1705413636; l=9315;
  i=emil.l.velikov@gmail.com; s=20230301; h=from:subject:message-id;
- bh=fKEuOSVKg0zguPSlbGmjQMiLNTaWi6zZrrBTQ9MTicY=;
- b=0OUt50pFkhUCXUGGFl5FRDpNCvoyOOEqLLNQNxqu1qafyrRwAGipXGI30lQSczquLxIwZZGYu
- FL5ynJpKvwYDlAD42F5dtJcDo8NiyUJt2WB5MEa+s7VAwqXWknO3tCX
+ bh=PLJ5Voc0l/2l/ZQxlBtjyCuSLocbfz1q4Ph0208Vyz0=;
+ b=YhPEyfLP2GbmdSEVORIMVCnzP4Iwf/iAA8ZKSCko8DHpG1+u/Ybzf+em2HmevlddcV5dbWAWE
+ VE13HVAL1exBrhBC7iw+AKF9d4r5TT5KtNNgNH6wTVU4Lx0fNsez+HE
 X-Developer-Key: i=emil.l.velikov@gmail.com; a=ed25519;
  pk=qeUTVTNyI3rcR2CfNNWsloTihgzmtbZo98GdxwZKCkY=
 X-Endpoint-Received:
@@ -53,49 +53,266 @@ Reply-To: <emil.l.velikov@gmail.com>
 From: Emil Velikov <emil.velikov@collabora.com>
 
 ---
- gobex/gobex.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ obexd/client/mns.c            |  2 +-
+ obexd/plugins/bluetooth.c     |  4 ++--
+ obexd/plugins/ftp.c           |  2 +-
+ obexd/plugins/irmc.c          |  2 +-
+ obexd/plugins/mas.c           |  2 +-
+ obexd/plugins/opp.c           |  2 +-
+ obexd/plugins/pbap.c          |  2 +-
+ obexd/plugins/pcsuite.c       |  2 +-
+ obexd/plugins/syncevolution.c |  2 +-
+ obexd/src/obex-priv.h         |  2 +-
+ obexd/src/server.c            |  2 +-
+ obexd/src/service.c           | 20 ++++++++++----------
+ obexd/src/service.h           |  6 +++---
+ 13 files changed, 25 insertions(+), 25 deletions(-)
 
-diff --git a/gobex/gobex.c b/gobex/gobex.c
-index e9b89cead..8924e059f 100644
---- a/gobex/gobex.c
-+++ b/gobex/gobex.c
-@@ -122,7 +122,7 @@ struct setpath_data {
- 	guint8 constants;
- } __attribute__ ((packed));
- 
--static struct error_code {
-+static const struct error_code {
- 	guint8 code;
- 	const char *name;
- } obex_errors[] = {
-@@ -169,7 +169,7 @@ static struct error_code {
- 
- const char *g_obex_strerror(guint8 err_code)
- {
--	struct error_code *error;
-+	const struct error_code *error;
- 
- 	for (error = obex_errors; error->name != NULL; error++) {
- 		if (error->code == err_code)
-@@ -1423,7 +1423,7 @@ failed:
- 	return FALSE;
+diff --git a/obexd/client/mns.c b/obexd/client/mns.c
+index 3b2ae1076..702cf0367 100644
+--- a/obexd/client/mns.c
++++ b/obexd/client/mns.c
+@@ -346,7 +346,7 @@ static ssize_t event_report_write(void *obj, const void *buf, size_t count)
+ 	return count;
  }
  
--static GDebugKey keys[] = {
-+static const GDebugKey keys[] = {
- 	{ "error",	G_OBEX_DEBUG_ERROR },
- 	{ "command",	G_OBEX_DEBUG_COMMAND },
- 	{ "transfer",	G_OBEX_DEBUG_TRANSFER },
-@@ -1443,7 +1443,7 @@ GObex *g_obex_new(GIOChannel *io, GObexTransportType transport_type,
- 		const char *env = g_getenv("GOBEX_DEBUG");
+-static struct obex_service_driver mns = {
++static const struct obex_service_driver mns = {
+ 	.name = "Message Notification server",
+ 	.service = OBEX_MNS,
+ 	.target = MNS_TARGET,
+diff --git a/obexd/plugins/bluetooth.c b/obexd/plugins/bluetooth.c
+index d232d3fd5..bcf6e1998 100644
+--- a/obexd/plugins/bluetooth.c
++++ b/obexd/plugins/bluetooth.c
+@@ -41,7 +41,7 @@
  
- 		if (env) {
--			gobex_debug = g_parse_debug_string(env, keys, 7);
-+			gobex_debug = g_parse_debug_string(env, keys, G_N_ELEMENTS(keys));
- 			g_setenv("G_MESSAGES_DEBUG", "gobex", FALSE);
- 		} else
- 			gobex_debug = G_OBEX_DEBUG_NONE;
+ struct bluetooth_profile {
+ 	struct obex_server *server;
+-	struct obex_service_driver *driver;
++	const struct obex_service_driver *driver;
+ 	char *uuid;
+ 	char *path;
+ };
+@@ -355,7 +355,7 @@ static void *bluetooth_start(struct obex_server *server, int *err)
+ 	const GSList *l;
+ 
+ 	for (l = server->drivers; l; l = l->next) {
+-		struct obex_service_driver *driver = l->data;
++		const struct obex_service_driver *driver = l->data;
+ 		struct bluetooth_profile *profile;
+ 		const char *uuid;
+ 
+diff --git a/obexd/plugins/ftp.c b/obexd/plugins/ftp.c
+index 4b04bab06..874fe2b8b 100644
+--- a/obexd/plugins/ftp.c
++++ b/obexd/plugins/ftp.c
+@@ -494,7 +494,7 @@ static void ftp_reset(struct obex_session *os, void *user_data)
+ 	manager_emit_transfer_completed(ftp->transfer);
+ }
+ 
+-static struct obex_service_driver ftp = {
++static const struct obex_service_driver ftp = {
+ 	.name = "File Transfer server",
+ 	.service = OBEX_FTP,
+ 	.target = FTP_TARGET,
+diff --git a/obexd/plugins/irmc.c b/obexd/plugins/irmc.c
+index e85cf70a1..cab97b620 100644
+--- a/obexd/plugins/irmc.c
++++ b/obexd/plugins/irmc.c
+@@ -427,7 +427,7 @@ static const struct obex_mime_type_driver irmc_driver = {
+ 	.read = irmc_read,
+ };
+ 
+-static struct obex_service_driver irmc = {
++static const struct obex_service_driver irmc = {
+ 	.name = "IRMC Sync server",
+ 	.service = OBEX_IRMC,
+ 	.target = IRMC_TARGET,
+diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c
+index f0eaf6d82..10b972d65 100644
+--- a/obexd/plugins/mas.c
++++ b/obexd/plugins/mas.c
+@@ -781,7 +781,7 @@ static void *notification_registration_open(const char *name, int oflag,
+ 	return mas;
+ }
+ 
+-static struct obex_service_driver mas = {
++static const struct obex_service_driver mas = {
+ 	.name = "Message Access server",
+ 	.service = OBEX_MAS,
+ 	.target = MAS_TARGET,
+diff --git a/obexd/plugins/opp.c b/obexd/plugins/opp.c
+index 860161303..777f5f8ed 100644
+--- a/obexd/plugins/opp.c
++++ b/obexd/plugins/opp.c
+@@ -155,7 +155,7 @@ static void opp_reset(struct obex_session *os, void *user_data)
+ 	manager_emit_transfer_completed(user_data);
+ }
+ 
+-static struct obex_service_driver driver = {
++static const struct obex_service_driver driver = {
+ 	.name = "Object Push server",
+ 	.service = OBEX_OPP,
+ 	.connect = opp_connect,
+diff --git a/obexd/plugins/pbap.c b/obexd/plugins/pbap.c
+index b363c673b..4175f9de8 100644
+--- a/obexd/plugins/pbap.c
++++ b/obexd/plugins/pbap.c
+@@ -634,7 +634,7 @@ static int pbap_chkput(struct obex_session *os, void *user_data)
+ 	return -EBADR;
+ }
+ 
+-static struct obex_service_driver pbap = {
++static const struct obex_service_driver pbap = {
+ 	.name = "Phonebook Access server",
+ 	.service = OBEX_PBAP,
+ 	.target = PBAP_TARGET,
+diff --git a/obexd/plugins/pcsuite.c b/obexd/plugins/pcsuite.c
+index d4a0394af..752074c08 100644
+--- a/obexd/plugins/pcsuite.c
++++ b/obexd/plugins/pcsuite.c
+@@ -231,7 +231,7 @@ static void pcsuite_disconnect(struct obex_session *os, void *user_data)
+ 	g_free(pcsuite);
+ }
+ 
+-static struct obex_service_driver pcsuite = {
++static const struct obex_service_driver pcsuite = {
+ 	.name = "Nokia OBEX PC Suite Services",
+ 	.service = OBEX_PCSUITE,
+ 	.channel = PCSUITE_CHANNEL,
+diff --git a/obexd/plugins/syncevolution.c b/obexd/plugins/syncevolution.c
+index f0387b986..ae3dc48c4 100644
+--- a/obexd/plugins/syncevolution.c
++++ b/obexd/plugins/syncevolution.c
+@@ -436,7 +436,7 @@ static const struct obex_mime_type_driver synce_driver = {
+ 	.write = synce_write,
+ };
+ 
+-static struct obex_service_driver synce = {
++static const struct obex_service_driver synce = {
+ 	.name = "OBEX server for SyncML, using SyncEvolution",
+ 	.service = OBEX_SYNCEVOLUTION,
+ 	.channel = SYNCEVOLUTION_CHANNEL,
+diff --git a/obexd/src/obex-priv.h b/obexd/src/obex-priv.h
+index 994144678..d2c62a596 100644
+--- a/obexd/src/obex-priv.h
++++ b/obexd/src/obex-priv.h
+@@ -33,7 +33,7 @@ struct obex_session {
+ 	void *object;
+ 	gboolean aborted;
+ 	int err;
+-	struct obex_service_driver *service;
++	const struct obex_service_driver *service;
+ 	void *service_data;
+ 	struct obex_server *server;
+ 	gboolean checked;
+diff --git a/obexd/src/server.c b/obexd/src/server.c
+index a8fc45092..eef149272 100644
+--- a/obexd/src/server.c
++++ b/obexd/src/server.c
+@@ -82,7 +82,7 @@ int obex_server_init(void)
+ 	}
+ 
+ 	for (l = drivers; l; l = l->next) {
+-		struct obex_service_driver *driver = l->data;
++		const struct obex_service_driver *driver = l->data;
+ 
+ 		init_server(driver->service, transports);
+ 	}
+diff --git a/obexd/src/service.c b/obexd/src/service.c
+index 0f4e420e8..332d61939 100644
+--- a/obexd/src/service.c
++++ b/obexd/src/service.c
+@@ -26,14 +26,14 @@
+ 
+ static GSList *drivers = NULL;
+ 
+-struct obex_service_driver *obex_service_driver_find(GSList *drivers,
++const struct obex_service_driver *obex_service_driver_find(GSList *drivers,
+ 			const uint8_t *target, unsigned int target_size,
+ 			const uint8_t *who, unsigned int who_size)
+ {
+ 	GSList *l;
+ 
+ 	for (l = drivers; l; l = l->next) {
+-		struct obex_service_driver *driver = l->data;
++		const struct obex_service_driver *driver = l->data;
+ 
+ 		/* who is optional, so only check for it if not NULL */
+ 		if (who != NULL && memncmp0(who, who_size, driver->who,
+@@ -57,10 +57,10 @@ GSList *obex_service_driver_list(uint16_t services)
+ 		return drivers;
+ 
+ 	for (l = drivers; l && services; l = l->next) {
+-		struct obex_service_driver *driver = l->data;
++		const struct obex_service_driver *driver = l->data;
+ 
+ 		if (driver->service & services) {
+-			list = g_slist_append(list, driver);
++			list = g_slist_append(list, (gpointer)driver);
+ 			services &= ~driver->service;
+ 		}
+ 	}
+@@ -68,12 +68,12 @@ GSList *obex_service_driver_list(uint16_t services)
+ 	return list;
+ }
+ 
+-static struct obex_service_driver *find_driver(uint16_t service)
++static const struct obex_service_driver *find_driver(uint16_t service)
+ {
+ 	GSList *l;
+ 
+ 	for (l = drivers; l; l = l->next) {
+-		struct obex_service_driver *driver = l->data;
++		const struct obex_service_driver *driver = l->data;
+ 
+ 		if (driver->service == service)
+ 			return driver;
+@@ -82,7 +82,7 @@ static struct obex_service_driver *find_driver(uint16_t service)
+ 	return NULL;
+ }
+ 
+-int obex_service_driver_register(struct obex_service_driver *driver)
++int obex_service_driver_register(const struct obex_service_driver *driver)
+ {
+ 	if (!driver) {
+ 		error("Invalid driver");
+@@ -99,14 +99,14 @@ int obex_service_driver_register(struct obex_service_driver *driver)
+ 
+ 	/* Drivers that support who has priority */
+ 	if (driver->who)
+-		drivers = g_slist_prepend(drivers, driver);
++		drivers = g_slist_prepend(drivers, (gpointer)driver);
+ 	else
+-		drivers = g_slist_append(drivers, driver);
++		drivers = g_slist_append(drivers, (gpointer)driver);
+ 
+ 	return 0;
+ }
+ 
+-void obex_service_driver_unregister(struct obex_service_driver *driver)
++void obex_service_driver_unregister(const struct obex_service_driver *driver)
+ {
+ 	if (!g_slist_find(drivers, driver)) {
+ 		error("Unable to unregister: No such driver %p", driver);
+diff --git a/obexd/src/service.h b/obexd/src/service.h
+index e3aee3bf3..8d9f70558 100644
+--- a/obexd/src/service.h
++++ b/obexd/src/service.h
+@@ -32,9 +32,9 @@ struct obex_service_driver {
+ 	void (*reset) (struct obex_session *os, void *user_data);
+ };
+ 
+-int obex_service_driver_register(struct obex_service_driver *driver);
+-void obex_service_driver_unregister(struct obex_service_driver *driver);
++int obex_service_driver_register(const struct obex_service_driver *driver);
++void obex_service_driver_unregister(const struct obex_service_driver *driver);
+ GSList *obex_service_driver_list(uint16_t services);
+-struct obex_service_driver *obex_service_driver_find(GSList *drivers,
++const struct obex_service_driver *obex_service_driver_find(GSList *drivers,
+ 			const uint8_t *target, unsigned int target_size,
+ 			const uint8_t *who, unsigned int who_size);
 
 -- 
 2.43.0
