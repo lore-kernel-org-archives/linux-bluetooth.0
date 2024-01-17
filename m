@@ -1,196 +1,155 @@
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2049.outbound.protection.outlook.com [40.107.8.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4EDC13FFA;
-	Wed, 17 Jan 2024 09:38:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.8.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705484328; cv=fail; b=HWp7MPrjesFVCaeqwD+jrEryd5Q//xd2YGK7oUPoYWyDNtgmX9RHS1DX9kuQxEwmRaoPXFbjDUS060/kqvxJDa+VjI6YIWDDalsBSoVx5KAgFn393fp/3ihqJbGHTH5qn/tsqFdW8y+CEdOXw8fGW4xrGpyDgh0lNc6vZc9cCN4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705484328; c=relaxed/simple;
-	bh=hSWagL5dcx/5OT6R/IWxsNi1gwkL61YE9bkgAs2UJ6g=;
-	h=ARC-Message-Signature:ARC-Authentication-Results:DKIM-Signature:
-	 Received:Received:From:To:CC:Subject:Thread-Topic:Thread-Index:
-	 Date:Message-ID:References:In-Reply-To:Accept-Language:
-	 Content-Language:X-MS-Has-Attach:X-MS-TNEF-Correlator:
-	 x-ms-publictraffictype:x-ms-traffictypediagnostic:
-	 x-ms-office365-filtering-correlation-id:x-ld-processed:
-	 x-ms-exchange-senderadcheck:x-ms-exchange-antispam-relay:
-	 x-microsoft-antispam:x-microsoft-antispam-message-info:
-	 x-forefront-antispam-report:
-	 x-ms-exchange-antispam-messagedata-chunkcount:
-	 x-ms-exchange-antispam-messagedata-0:Content-Type:
-	 Content-Transfer-Encoding:MIME-Version:X-OriginatorOrg:
-	 X-MS-Exchange-CrossTenant-AuthAs:
-	 X-MS-Exchange-CrossTenant-AuthSource:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-originalarrivaltime:
-	 X-MS-Exchange-CrossTenant-fromentityheader:
-	 X-MS-Exchange-CrossTenant-id:X-MS-Exchange-CrossTenant-mailboxtype:
-	 X-MS-Exchange-CrossTenant-userprincipalname:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped; b=er6l07SQxQT7TynG5rM06TME6cpsqBlgShwjGvyi23oeXHnPcFpB+GcdfKS1crUW9eFzhWQ9yY829f5Ef4FB2sZHE9cK22pGOuNpzhkdNA5KC5KT64ZuJX/xA4rOXTbZDqKENh1JVw+AwlAmPsbsl+yPUFEFwfNCa5Zm01q4fuQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=MKlhaZku; arc=fail smtp.client-ip=40.107.8.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="MKlhaZku"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PdHaVjpG2LEtNYMhWv27yofDBpyQdLRwckifI/4ppZPUxVtU1KHF7/3/mf0fUjsF3sfRMq3mHr1ExRSW4KXBwUC+yxQcZ8OaOXqLWa7dMqvXB8xD2qp9/8wS+sECdsEsFmWnJ1rSX8u9jyIFNkFbU+DgIu9QtFPO7jmvIwwpcV1pXhu86ubWKO8kgHF48I714OBz1c3igdFQKrXhCO6pTjCxs1wMAkYf/L9Ojy2+6DsVJOdQshzO41CGNDWDOGUBHJuuykLXyMTNcglgnlPYOEfr8UzS7Mrl340zJf0vLL11qZT3c+PgxgmcH3J1zCIxJzcAFdX0pU3IZ6f9vQ5BmQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IwnMclvjhftzISEw0rNhZQrRIofxZkPsSL1wqhtOzdE=;
- b=kVJKWEIpl9ceqzJHFTxYJJmNMK+gC/7C64NZU1pTHAQOjq7/5Mu+rFkMdX/9lcSRJbeZjdGM0uaSFk7g+2ztHrEihO/SmA3KrzxdZj2ZVss+afXU4QMcXB3OWDzjj0fXTF29MSPR5mf2uiR9CDD9OBEaHkIN4nWd7K6Ng1jERGZzhqXpunbmmjX0nx408j4TJkzrSulCuLzehwANFREKvm7JCbcrxhYUHYxSZSzsGf5jaWJeIjlqzGoTCrubIKPQ2byrOZHGoTYnZgZcrQc/aqtiX8a5y56D1wkOvkS2ji9rWVUx9Y8R9cpX+7Es2yYK/zVe5npAGfkTv2dfr/IEPA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IwnMclvjhftzISEw0rNhZQrRIofxZkPsSL1wqhtOzdE=;
- b=MKlhaZkuHHxnTQI0cZawbNjZgQo6fRuL/UFnGMeGMqQBp1rSUCdhO8wIfwNsOk2Y5nfBOz2DYLryp8jhPfU9oK+izRzpikTNKxe1IVRhB+nA2qB9CL0OP9Darwq/VLP5n7vslBkMb7scnsoqvcbVKWkwiVpQ2ptlY8HXm+DUlAs=
-Received: from AS4PR04MB9692.eurprd04.prod.outlook.com (2603:10a6:20b:4fe::20)
- by AM0PR04MB7010.eurprd04.prod.outlook.com (2603:10a6:208:199::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.23; Wed, 17 Jan
- 2024 09:38:43 +0000
-Received: from AS4PR04MB9692.eurprd04.prod.outlook.com
- ([fe80::748a:98f4:59fa:f206]) by AS4PR04MB9692.eurprd04.prod.outlook.com
- ([fe80::748a:98f4:59fa:f206%7]) with mapi id 15.20.7181.022; Wed, 17 Jan 2024
- 09:38:43 +0000
-From: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-To: Francesco Dolcini <francesco@dolcini.it>
-CC: "marcel@holtmann.org" <marcel@holtmann.org>, "johan.hedberg@gmail.com"
-	<johan.hedberg@gmail.com>, "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
-	Marcel Ziswiler <marcel.ziswiler@toradex.com>, Amitkumar Karwar
-	<amitkumar.karwar@nxp.com>, "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, Sherry Sun <sherry.sun@nxp.com>, Rohit Fule
-	<rohit.fule@nxp.com>
-Subject: Re: [RFC PATCH] Bluetooth: btnxpuart: Fix nxp_setup in case chip is
- powered on late
-Thread-Topic: [RFC PATCH] Bluetooth: btnxpuart: Fix nxp_setup in case chip is
- powered on late
-Thread-Index: AQHaSSj19sN+8TuMTk2XZIqniCJI4Q==
-Date: Wed, 17 Jan 2024 09:38:43 +0000
-Message-ID:
- <AS4PR04MB9692991FC87A8FF21E455BC8E7722@AS4PR04MB9692.eurprd04.prod.outlook.com>
-References: <20240117030501.149114-1-neeraj.sanjaykale@nxp.com>
- <20240117090932.GA3787@francesco-nb>
-In-Reply-To: <20240117090932.GA3787@francesco-nb>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AS4PR04MB9692:EE_|AM0PR04MB7010:EE_
-x-ms-office365-filtering-correlation-id: f4f7fcee-348f-4802-1022-08dc17401862
-x-ld-processed: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- qTJPtMGJt0PuEcxfn+jBaKCw/E6SCTN+O5tYTMoZeltz0OFj1/uB/sNxuJaVWAm2WKbKvWDReDiBOwONG83YoiE05UoAb7ydfOKc3dwuuY471jxqUW56Ju2u+Wv2rpGNU/HxbYWJ+g2wUAyw+aSLRVYf/cFYRAjLN4sbWRcACollLWTSwgkcoxgEVqrufwASFIqtpyJO1eU0N0z13ibDozmnEYtDO33ZtoyD41IhIdUu42KtQdjqKYqCx3dw9l16I92zh6cKiNohKx43yfhbYrcJTtKFzfCOGtYm78dUMtz1FBPHDYNHqp7p8yMeiqRnf5ASQRFlngT0BFtQM2tn10LZfrbEYmGWN9Ej+RKWG43Quytmi3n9SkyuczSn6xg0OopSDbyhdNcE4kTFRKMKTI8Wv1gPpIBOeMl04MqJA5tALO6AXcPRb27GCcPkUBHB3v1DEXRYEykqNcdkAQi2FOI3V89+wd5O05VVqdrnDVkCc1QjL5BgrT2+4WPrhmt5YdapFwXxqqf0huudlvZLP3CakJGb4tG0JZFlkPcgnwhPRzNs8Lzwx50tQqiWmvB49FOZ7V+aAhJ4xG6VwKtkx701/XMed1ua8SD0gOKqDUAZORzgr62B0EOYqTUfIjql
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS4PR04MB9692.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(39860400002)(376002)(136003)(396003)(366004)(230922051799003)(64100799003)(186009)(451199024)(1800799012)(66946007)(66556008)(64756008)(66446008)(66476007)(76116006)(4326008)(52536014)(122000001)(8676002)(8936002)(54906003)(6916009)(38100700002)(316002)(9686003)(478600001)(41300700001)(7696005)(6506007)(71200400001)(83380400001)(26005)(38070700009)(2906002)(33656002)(5660300002)(86362001)(55016003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?Io5qTITzwNIWkaL5ZltV5ozkPmFIKJofaUKd4RU5Hs1RA35bWysXAl5Vs7+/?=
- =?us-ascii?Q?Zg/m+t1hvKCHbGryYulZW+8hkqPe3xcYByKcBcUiPpulSA2/9jPoC02ulItc?=
- =?us-ascii?Q?dVRoKro5f03hjAZ81micE1tq9J2HW2pcgiZ/cWuixYeVf1P/qBjy2H4k6Tq3?=
- =?us-ascii?Q?56Rag/kgE6DhQNkztD3tw6sFaOPSrxq7P0y0QCIKLG+Fkn2qs7fnGfji5CId?=
- =?us-ascii?Q?tMZx5t1ObuJAZpY/ByD9dWeEjaJ8rO2Y7Vs+BtqrdeCYWpXBuNyQ8+MXyPSb?=
- =?us-ascii?Q?VY8uSiDBXH72ELQ0OFsribqy5u86S1OyDU+U1cKF7nDisoVnw6vR3dTu8541?=
- =?us-ascii?Q?uS+jzMdmt9C3DgiKuNN9IcL5Jbhbo6uiDsSGkrk6AW1oFu/OlushDgae2Ory?=
- =?us-ascii?Q?wq2inU3ZrI59GOK4OgeqpOkJzuZadas/ftBPp/J5vw6luDrzm00HD7cQSUff?=
- =?us-ascii?Q?UV6jZqOxZKFX8+DCfgbHAqbfGXOhpUiEylDC/CkNHxgVykPEmvLa3bHrrLyX?=
- =?us-ascii?Q?uL3a5c8rRQum93jA+V4byqUmnhcgvgoy3iueyZ805CrfOorFVvOpGLIKy2IQ?=
- =?us-ascii?Q?q4lizbbt8IAo8T9PClSBb7FCFnvnBp+ajyNSlVdZgKU2+f8OEa/xe5QKDzMD?=
- =?us-ascii?Q?gxNjaWYMw6rvzxvalo8AKXNjqdeQ36qxPztpOReyamwiDWkf7WTYWNgIJgkJ?=
- =?us-ascii?Q?z79YKAfsxOIajIITT0nVNyuEFpqWoBH23L3p1wEQv8dd8OaLGcYaixDXFLei?=
- =?us-ascii?Q?ZUwYztanDxr0mhDCcM0KSgK7r/xBfgyCfKnTum/GchzA5EbmQZ8fqzMX3P6t?=
- =?us-ascii?Q?/j3GhFfq2pmhARd3RLtXuxtNUI2NJre2NvIokb5VHp+s1QKSsKzdmEu+nbk4?=
- =?us-ascii?Q?Kg4PyiRhbPPcVnt6XFw35W+Ubgf2wGsoxtwBk6dKTRXyHSwMtCPmj8HCCJ0W?=
- =?us-ascii?Q?nz7m/Cf4Mzag/j7i9aVNXbaBDbOtGt+Pu/U6/8gfCitpki+3XSpbJvh242RU?=
- =?us-ascii?Q?IqrYv5uaf5tsJmZG6QGfdn1gHBFPTjnpBqNP33Goz8+ez/hPIqMn5/Z4R8DV?=
- =?us-ascii?Q?rKk4NQjVXiTqc6fFO3ogh5/tdycy/mjKhldIaWA0txfKRh/VKFM9ABgCmx0+?=
- =?us-ascii?Q?EQSjsQexl0JJLXRypQuDj6ahA3KKJ0dWbDf6d9Y63WT3/YpgOhNfQObWqmOR?=
- =?us-ascii?Q?/Vx9man7Ws04THLGp13bXQhXqmOvpHceF2x0yvwwGbtDdyUSDMjdo+NHujX7?=
- =?us-ascii?Q?GjirPqLfb5cyQzfakD+MsnnU5d4VNioFuBeH4ujh8Ih1EiEhWbmemnI6bUBi?=
- =?us-ascii?Q?nET+m84J/YV9ZQ2lPR0BXPg6rgsd3KX3MJ06eWksRM1j/JQZO5b9f5w5DIBW?=
- =?us-ascii?Q?1Ym/2hnfpfhhD+oUoygl5jz/g07u4Arm9i8p3GWZRaEftGbjJdkHKrouCa3/?=
- =?us-ascii?Q?Cnt4eWtoPCxS8FFvVNwwzcvO065WIpT9q1Fc0jgQgGnPAjt80JTpwfkVXAgt?=
- =?us-ascii?Q?K++SeQ1w4NNJvzm2NtFAUZnP8tcJr9mOuE9WJnClo0hRT4e/KtpE/jeilrXy?=
- =?us-ascii?Q?VUsW6W6jsaYe4xEZxSqX6BpewhFhU4t02x2o35Qe?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11FD51428D
+	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jan 2024 10:03:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705485807; cv=none; b=OSXSo45ECAAAHL99vmeC6Gt1+ISHlWPbIpdAKcpkhGx2T6vIQtSwkQH7pept1poMgiRozH6TGIPUqiw9mzJgmhiPUaj+X2i4CsRUksDc5AgnVO7OWh0BCazvlju6POrJ1F7V5P9GODztb2LsGrkCOvMdpXwcFBtjNVfj3NrcB/8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705485807; c=relaxed/simple;
+	bh=6Ba35sjl5j77N2GQR5J5Qza9P7y57/tDDptoGf9OcXI=;
+	h=Received:X-Google-DKIM-Signature:X-Gm-Message-State:
+	 X-Google-Smtp-Source:MIME-Version:X-Received:Date:
+	 X-Google-Appengine-App-Id:X-Google-Appengine-App-Id-Alias:
+	 Message-ID:Subject:From:To:Content-Type; b=dOefEPLCj3xja5TByNGo0H4TLG13kr30ceJ7dQwYTh8SrvPJVhgWf4JTtE+BU2Sy8M8tayqscBJWUnDsMeL9uzBxunngzNhYknR/Ro4+UbhpfTxxT7Gg57V8k3d4fyDEiU/IG7OOXpebdQne59eiKFS8fYPwihYMIXhfRn1whzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-35fc6976630so88200735ab.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jan 2024 02:03:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705485805; x=1706090605;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XnlLyvOefL1ydIX1ocF93Tqp6b+HX/ZrHqzQLe9vBGQ=;
+        b=FqtNNblxLtTa4Mxu8WTLcZMKyI8qgFMkAAnFsTqSUxkf43Em6tXAYAAQzta4KFkl7r
+         Z4tpYcN7h5NRz1dRnD+EJiGxs8d3vbaN8ZmUdawPrTko+p7MLi7MV+Dh0NrcL3rp1NAn
+         4uNvCGzKBOwRi25uJQRmxduVTOJjlG5M2hSe1QWOiCpdOCRlz0vmff9JoNR4KpUJRQAs
+         LGn0ji8egaKF7bKXtXaltjUVaEi782Vboy9ychCrbwRDIYRtgUVNgTFYQxIWS2npRaqg
+         eAtwr3oRKL+Mq30Bb7XXPwFMqU9+4YxjLYdojDNzIFK4VGtyJCdXpj4NBugWtv6CXkHm
+         Gwew==
+X-Gm-Message-State: AOJu0YzytHICNnb30HPPncVmn20gldY3kairK9JaTJ/WOFP2MWNf3nfa
+	dSnuIhMbZK550WaNXCdf5E8x6Dj1BOnhJ+HW44G6Sr88Le2w
+X-Google-Smtp-Source: AGHT+IGvV1agZFiqt/a//m5HZbLHbz1/WZWfpE0D+BlA/d5KlOxjXPWsR2fYtwiSR0/K9fKYRy4Y+8tEhqSYGeXfTim+0tv4CjwG
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AS4PR04MB9692.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f4f7fcee-348f-4802-1022-08dc17401862
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jan 2024 09:38:43.4081
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: +KEhh2IiqXkJSRAAYtAdsBtp7DiwjyY9Lmwq64NS3Bdirr1MFFxaCz2798rui/LfBSpoLmKBhomgW3PLtSN+TWFdElpLMEpwiwqntNf74nY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR04MB7010
+X-Received: by 2002:a92:c565:0:b0:360:134:54b1 with SMTP id
+ b5-20020a92c565000000b00360013454b1mr1232890ilj.0.1705485805272; Wed, 17 Jan
+ 2024 02:03:25 -0800 (PST)
+Date: Wed, 17 Jan 2024 02:03:25 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000097c554060f215b50@google.com>
+Subject: [syzbot] [bluetooth?] possible deadlock in __flush_workqueue
+From: syzbot <syzbot+da0a9c9721e36db712e8@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Francesco,
+Hello,
 
-Thankyou for the review comment.
+syzbot found the following issue on:
 
-> > diff --git a/drivers/bluetooth/btnxpuart.c
-> > b/drivers/bluetooth/btnxpuart.c index 7f88b6f52f26..20a3a5bd5529
-> > 100644
-> > --- a/drivers/bluetooth/btnxpuart.c
-> > +++ b/drivers/bluetooth/btnxpuart.c
-> > @@ -1036,6 +1048,13 @@ static int nxp_setup(struct hci_dev *hdev)
-> >               err =3D nxp_download_firmware(hdev);
-> >               if (err < 0)
-> >                       return err;
-> > +     } else if (!serdev_device_get_cts(nxpdev->serdev)) {
-> > +             /* CTS is high and no bootloader signatures detected */
-> > +             bt_dev_dbg(hdev, "Controller not detected. Will check aga=
-in in %d
-> msec",
-> > +                        NXP_SETUP_RETRY_TIME_MS);
-> > +             schedule_delayed_work(&nxpdev->setup_retry_work,
-> > +                                   msecs_to_jiffies(NXP_SETUP_RETRY_TI=
-ME_MS));
-> > +             return -ENODEV;
-> why not just
->=20
-> return -EPROBE_DEFER;
->=20
-> and remove everything else, no need for any kind of retry or delayed work=
- if
-> the driver core takes care of it.
->=20
-Wouldn't returning -EPROBE_DEFER make more sense in driver probe context?
+HEAD commit:    943b9f0ab2cf Add linux-next specific files for 20240117
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=121de2fbe80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=12af1d067b6a6d19
+dashboard link: https://syzkaller.appspot.com/bug?extid=da0a9c9721e36db712e8
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
-Here, the driver probe registers an hci interface (hci_register_dev()), and=
- returns success to kernel.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-The hci_register_dev() queues hdev->power_on work at the end, which opens t=
-he hci dev, and ultimately calls this setup function.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/9c032ce79e0f/disk-943b9f0a.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/93163e287878/vmlinux-943b9f0a.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/512cc2e14a4b/bzImage-943b9f0a.xz
 
-In this patch, we are queueing the same work from the delayed setup_retry_w=
-ork().
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+da0a9c9721e36db712e8@syzkaller.appspotmail.com
 
-Returning -ENODEV (or -EPROBE_DEFER) would only affect hci_dev_open(), whic=
-h is in power_on work context, and not driver probe context.
+Bluetooth: hci2: Opcode 0x0c03 failed: -110
+============================================
+WARNING: possible recursive locking detected
+6.7.0-next-20240117-syzkaller #0 Not tainted
+--------------------------------------------
+kworker/u5:1/21244 is trying to acquire lock:
+ffff88802e0a2538 ((wq_completion)hci2){+.+.}-{0:0}, at: __flush_workqueue+0x141/0x1340 kernel/workqueue.c:3147
 
-Perhaps, we should call it hci_retry_power_on() work or something similar?
+but task is already holding lock:
+ffff88802e0a2538 ((wq_completion)hci2){+.+.}-{0:0}, at: process_one_work+0x7ba/0x16e0 kernel/workqueue.c:2608
 
-Please let me know your thoughts on this.
+other info that might help us debug this:
+ Possible unsafe locking scenario:
 
-Thanks,
-Neeraj
+       CPU0
+       ----
+  lock((wq_completion)hci2);
+  lock((wq_completion)hci2);
+
+ *** DEADLOCK ***
+
+ May be due to missing lock nesting notation
+
+2 locks held by kworker/u5:1/21244:
+ #0: ffff88802e0a2538 ((wq_completion)hci2){+.+.}-{0:0}, at: process_one_work+0x7ba/0x16e0 kernel/workqueue.c:2608
+ #1: ffffc9000dc27d80 ((work_completion)(&hdev->error_reset)){+.+.}-{0:0}, at: process_one_work+0x824/0x16e0 kernel/workqueue.c:2609
+
+stack backtrace:
+CPU: 1 PID: 21244 Comm: kworker/u5:1 Not tainted 6.7.0-next-20240117-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+Workqueue: hci2 hci_error_reset
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
+ check_deadlock kernel/locking/lockdep.c:3062 [inline]
+ validate_chain kernel/locking/lockdep.c:3856 [inline]
+ __lock_acquire+0x20e6/0x3b30 kernel/locking/lockdep.c:5137
+ lock_acquire kernel/locking/lockdep.c:5754 [inline]
+ lock_acquire+0x1b1/0x540 kernel/locking/lockdep.c:5719
+ __flush_workqueue+0x14b/0x1340 kernel/workqueue.c:3147
+ drain_workqueue+0x18f/0x3d0 kernel/workqueue.c:3312
+ destroy_workqueue+0xc3/0xb10 kernel/workqueue.c:4801
+ hci_release_dev+0x14e/0x620 net/bluetooth/hci_core.c:2808
+ bt_host_release+0x6a/0xb0 net/bluetooth/hci_sysfs.c:94
+ device_release+0xa1/0x240 drivers/base/core.c:2485
+ kobject_cleanup lib/kobject.c:682 [inline]
+ kobject_release lib/kobject.c:716 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x1d0/0x440 lib/kobject.c:733
+ put_device+0x1f/0x30 drivers/base/core.c:3733
+ process_one_work+0x8d5/0x16e0 kernel/workqueue.c:2633
+ process_scheduled_works kernel/workqueue.c:2707 [inline]
+ worker_thread+0x8b6/0x1290 kernel/workqueue.c:2788
+ kthread+0x2c1/0x3a0 kernel/kthread.c:388
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:242
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
