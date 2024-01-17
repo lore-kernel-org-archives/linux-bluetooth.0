@@ -1,94 +1,122 @@
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+Received: from mail11.truemail.it (mail11.truemail.it [217.194.8.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D69E111BD
-	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jan 2024 08:39:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8B6C7499;
+	Wed, 17 Jan 2024 09:09:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.194.8.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705480782; cv=none; b=bxB3V5DRdvCA7crxk8syEDgeGF3eOyUldh+kif1rCAdrl+EyvyHEGtfdifh3HNVRmLHrKU7S5QzK+RHeKXs0X1RmmZz0wxLnGYHtaDECnwH58Th168GT5DRUkPFoy9ON/T7auZYqZ1d3S8EbnwkiXMjoZQyWR1bzyPJB78wTTnU=
+	t=1705482592; cv=none; b=ZccBX1qrmEfrM5sRZ+3senPl4pe9pxIbbKeJKat0MhWznEDdx8MrN6Il2icxCRRVRHcLdszzLp2ozv+HOPdI/9fcI2pbqTQULPfq5MoDiy+2J0f2J6zgQP+riYBr3iWh1dhsD4kZrYM+kLSbqXauJS8XqmhBe1eHhO8qVN+sZAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705480782; c=relaxed/simple;
-	bh=ayfLP2wL2uQNK/PNSUeCthQGxI7VLeoTLz0rJyiTwnM=;
-	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:MIME-Version:
-	 References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:
-	 Content-Type; b=OVFZ/JVZ5nL3eSr7/OqB3MlLE90rweN4pevHBy8nORlKJanwMW0ETZNQfvkqFFznj3zuiihPBZo2NWPHj+nTlOVjgdJelRGSpa98VTOIeddFW4h8j9EO+cZGLQsbe4cuA+A4rAlFV3sWsd3PQJLZNxcHn9XvKGwHgZNkLKhABZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CzBt9JHf; arc=none smtp.client-ip=209.85.128.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1705482592; c=relaxed/simple;
+	bh=5j17r/xB4xQ5o1f6tq7hA/Wkesyo2d/N9aaESNmk4Fk=;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To; b=MMJ5PfphHzoT3FLm9PQ7+tqsKNbnltTDQiNJXUHHjBI+MstbiD9JJyQDtq/sXkqg9B0HvxevKiCs+1myhh+35YoDJSt8yQ/VErVqq6NVhwodthJqYM1JYvHc8wwi7454IOGosJf9KAtMQnnELCKqIA64ylC8WT7tN2XLp7RI5HE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it; spf=pass smtp.mailfrom=dolcini.it; dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b=CBxsKsqr; arc=none smtp.client-ip=217.194.8.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dolcini.it
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CzBt9JHf"
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-5e54d40cca2so82368117b3.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jan 2024 00:39:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705480780; x=1706085580; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ayfLP2wL2uQNK/PNSUeCthQGxI7VLeoTLz0rJyiTwnM=;
-        b=CzBt9JHfE8fjptn45Y8K1ZNssnhEPHqiX55lbHGv1Fs7YxlnU/QBXbfbMcNJC59dZg
-         EnLkj0IMvn9zvMt3N2T3Q1DiwmigrfoYlTga7g0UVHrky4cWrDE6+h5qlh0PWkID/TkW
-         H88d8LR1GTZUFVy1UWt/U7W//e4IL+3wPSrgcL+btD6MjFLE5gbB161gTBmPUGgYnyhE
-         OrpUEsHudPxg/Dx9rBHO2em0ixfXgwEIaUm/y4KYgDutXcZt2CwKyADpnqhvC1FZIdS1
-         wPjOXXVmxXsHl7q2nILAEzuf/11ZwRp2uckYwLBYe7i61yeIKzwmQuAPzLPuNRlhX6Dl
-         HE1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705480780; x=1706085580;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ayfLP2wL2uQNK/PNSUeCthQGxI7VLeoTLz0rJyiTwnM=;
-        b=aZcLWP9T11FCA3KogflMagQzDzNJheG0Y4RFlIaPY1IPDdsO1flGbauOAjNJjhLP1i
-         DbKvny+/eDdodh17DOGF5hFPTNrjVSWXvdnQqXIV5xAjeGdQgK+gsdv1jkXKYHYWw9I4
-         EY6DxMRLNYbImmH/lS4rZCYOgfSz0sbkfhFgnGQJpYw3WQxZy8HRxkx5tNZDhajXsHkU
-         b/178txKAU8keQXy2cZcXqRlatF/Q0oA93uvahYkmDu3TjcuYOWICsBdbxK9xDs0CFUk
-         356xyNASZJ7Xva9KE8VpNI0s0G65JaZSk5BbaXaU9SdETsv6x6frVDX2sZucSc0BgDiT
-         FCHw==
-X-Gm-Message-State: AOJu0Yx9UKdqptT9CoNq2IHEmq/H0vKbjXZkL4W78nZ5jk+EnqyeamE1
-	dqmPRgPfucdreXVbVKdLfMytcRH/UIk4BBtlOOPqTLsKXT98pQ==
-X-Google-Smtp-Source: AGHT+IGoAE+v4cP8Mt0xa6/yXsrSq5QPLtgy/DNf1ORECpZYJc7dY+aQaPWa3ATIUNt7Stn09SnPLToAwrlNNUbn+k8=
-X-Received: by 2002:a0d:df54:0:b0:5ff:4bfa:d74c with SMTP id
- i81-20020a0ddf54000000b005ff4bfad74cmr1703625ywe.6.1705480780472; Wed, 17 Jan
- 2024 00:39:40 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b="CBxsKsqr"
+Received: from francesco-nb (93-49-2-63.ip317.fastwebnet.it [93.49.2.63])
+	by mail11.truemail.it (Postfix) with ESMTPA id 4325A1F843;
+	Wed, 17 Jan 2024 10:09:37 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dolcini.it;
+	s=default; t=1705482577;
+	bh=xqdaqTIn4+SF6ajFUYVQd9+gVC9/BmOTEwCQ1+uuJhQ=; h=From:To:Subject;
+	b=CBxsKsqrjVcFRzkI7EGKuI881iaY8ffoWeKcT0Hp6R1/myBTkWUyu+m2tspnQsJix
+	 BX07hsOd0rxnPsO9gkXNxdIH2CxBC7iWiUHc4nb0Kbc0w2CCohIQGkJRNVrE1aYD/J
+	 Hlqj8Eb3CNic4LsAf9DDZ+gSuLWa3/h79ttl7V8d8TCWgjGGt67/BO1Vfjun4ldmeN
+	 r15Ie3gkIvoFrVwyKGT8fEbFVZailWsRoELPjLaRVepMiCGBw+j63Z+QrH66Yp5mQv
+	 RPUSQj3jEX4BxO/NcN3MFk9/bnnwD0ceP+isw1L304DOpAksB6nT/OKkI+/rwvp7TY
+	 4LbA1DwsM7zVQ==
+Date: Wed, 17 Jan 2024 10:09:32 +0100
+From: Francesco Dolcini <francesco@dolcini.it>
+To: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+	marcel.ziswiler@toradex.com, amitkumar.karwar@nxp.com,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	sherry.sun@nxp.com, rohit.fule@nxp.com
+Subject: Re: [RFC PATCH] Bluetooth: btnxpuart: Fix nxp_setup in case chip is
+ powered on late
+Message-ID: <20240117090932.GA3787@francesco-nb>
+References: <20240117030501.149114-1-neeraj.sanjaykale@nxp.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240116-autofoo-v1-0-626f6b54bd06@gmail.com> <20240116-autofoo-v1-4-626f6b54bd06@gmail.com>
- <CABBYNZJUhmVUNGTsqspc3S802pDwikFf2YOPupESD1m5T-GsJw@mail.gmail.com>
-In-Reply-To: <CABBYNZJUhmVUNGTsqspc3S802pDwikFf2YOPupESD1m5T-GsJw@mail.gmail.com>
-From: Emil Velikov <emil.l.velikov@gmail.com>
-Date: Wed, 17 Jan 2024 08:39:28 +0000
-Message-ID: <CACvgo505kkEr+SZV587XCGoaFKYo=17zgbvHLrv=UJLp5JRLiQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 04/10] build: remove dummy {conf,state}{dir,_DATA}
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, Emil Velikov <emil.velikov@collabora.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240117030501.149114-1-neeraj.sanjaykale@nxp.com>
 
-On Tue, 16 Jan 2024 at 18:40, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
+On Wed, Jan 17, 2024 at 08:35:01AM +0530, Neeraj Sanjay Kale wrote:
+> This adds a setup retry mechanism in case the chip is powered on after the
+> btnxpuart driver is loaded.
+> 
+> The NXP chipsets have a common PDn pin shared between Wi-Fi and Bluetooth.
+> 
+> When customers use mwifiex_sdio drivers for Wi-Fi, the pwrseq tied to the
+> driver toggles the GPIO connected to the chip's PDn pin, powering it on.
+> 
+> The btnxpuart driver is loaded before mwifiex, and the setup function does
+> not receive any bootloader signature, as PDn is held low at this moment.
+> The driver inadvertently assumes that FW is already running on the chip.
+> 
+> The nxp_setup exits with a success, and BT subsystem proceeds with sending
+> initialization commands, which result in a timeout.
+> [  284.588177] Bluetooth: hci0: Opcode 0x0c03 failed: -110
+> [  286.636167] Bluetooth: hci0: Setting wake-up method failed (-110)
+> 
+> Later when mwifiex is loaded, the pwrseq makes PDn pin high, and downloads
+> either WiFi or combo FW.
+> 
+> However, the btnxpuart is in a bad state, and re-loading btnxpuart module
+> does not help.
+> 
+> This fix adds a check for CTS pin, in case no bootloader signatures are
+> received. If CTS is high, it means that the chip is currently powered off,
+> and nxp_setup will return an error, preventing any HCI initialization
+> commands to be sent by the BT subsystem.
+> 
+> The driver attempts to check for bootloader signatures and CTS again, by
+> scheduling the hci power_on work after every 5 seconds, as long as the
+> btnxpuart module is inserted in the kernel.
+> 
+> This fix attempts to improvise the fix provided my Marcel Ziswiler and
+> handle this scenario gracefully.
+> https://patchwork.kernel.org/project/bluetooth/patch/20231018145540.34014-3-marcel@ziswiler.com/
+> 
+> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+> Reported-by: Marcel Ziswiler <marcel.ziswiler@toradex.com>
+> Closes: https://patchwork.kernel.org/project/bluetooth/patch/20231018145540.34014-3-marcel@ziswiler.com/
+> ---
+>  drivers/bluetooth/btnxpuart.c | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
+> index 7f88b6f52f26..20a3a5bd5529 100644
+> --- a/drivers/bluetooth/btnxpuart.c
+> +++ b/drivers/bluetooth/btnxpuart.c
+> @@ -1036,6 +1048,13 @@ static int nxp_setup(struct hci_dev *hdev)
+>  		err = nxp_download_firmware(hdev);
+>  		if (err < 0)
+>  			return err;
+> +	} else if (!serdev_device_get_cts(nxpdev->serdev)) {
+> +		/* CTS is high and no bootloader signatures detected */
+> +		bt_dev_dbg(hdev, "Controller not detected. Will check again in %d msec",
+> +			   NXP_SETUP_RETRY_TIME_MS);
+> +		schedule_delayed_work(&nxpdev->setup_retry_work,
+> +				      msecs_to_jiffies(NXP_SETUP_RETRY_TIME_MS));
+> +		return -ENODEV;
+why not just
 
->
-> This one seems to be causing some build regression, when trying to
-> apply it breaks the builds.
->
+return -EPROBE_DEFER;
 
-Thanks for the quick feedback Luiz.
+and remove everything else, no need for any kind of retry or delayed work
+if the driver core takes care of it.
 
-Would be happy to help but need some details:
- - configure options used
- - autoconf, make, gcc(?) version
- - the error log
 
-I did run all my patches through `git rebase -x "./bootstrap-config &&
-make -j8 distcheck" origin/master` so any regressions are alarming.
+Francesco
 
-OOC: Where is the code for the test bot that reports on the ML? I've
-noticed that it flagged some unrelated issues [1], while not honouring
-the "Reply-to:" header.
 
-Thanks
-Emil
-
-[1] https://lore.kernel.org/linux-bluetooth/65a6a3a4.170a0220.86c5e.e719@mx.google.com/T/#m21808760ae29dae03e415e67c47b045daa461a6a
