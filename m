@@ -1,106 +1,170 @@
-Received: from mail11.truemail.it (mail11.truemail.it [217.194.8.81])
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B030314009;
-	Wed, 17 Jan 2024 11:19:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.194.8.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71E951DFFA
+	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jan 2024 12:05:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705490378; cv=none; b=d0sWoRSBWJVe3AkelyKytK26Is7XOoVGUcfH1k8844x7EPUqQmmhUC+HuHCJnRbnMnPYqVgUc4beIw5AcNa60PFxU6HxY5wKbQwsCVTK5tS3K2Ti2e35ttPdOOA4EkqDaHwvFElqOcnPBcg6jVj6DANhXVce6Utfqhg6pF3FAo8=
+	t=1705493126; cv=none; b=IeBOJOAv2ofn87+ulaaa6z0jQ+KvQU9Uz9woDIw7jmlERgn4gO+jxw8/3AWwdU2hhcSdryMmAbSf4FYMvWyEbVCNffjSfa2YyTuE/B5OMNLwXzoL3lQtj9+PXRBjn+DCXbp7NImJLpFunVLz64OGINNaubPwjWt8HKSqZxgZ4LA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705490378; c=relaxed/simple;
-	bh=DFR5q08xfazOTnbgRWb+uSdJGoNugFRnE0ltvreNM8I=;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To; b=lSvSCCABy1hy2TrmAqqk+hXD3ezMEkmXFXqrOzmCcgZOrVZ5DQng0VVS+VhXRzgtDm6XM1hcOXL6oKXnlHRPuYWAPBSXvUssRNZ1Q5J34ZbpfX8DWIFXVVATDd/DdW0cmGg0rHN89LU/6m+p4HrLU3JS9abJb/84PFy6ZR9QEdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it; spf=pass smtp.mailfrom=dolcini.it; dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b=yLzhjQc6; arc=none smtp.client-ip=217.194.8.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dolcini.it
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b="yLzhjQc6"
-Received: from francesco-nb (93-49-2-63.ip317.fastwebnet.it [93.49.2.63])
-	by mail11.truemail.it (Postfix) with ESMTPA id 493CB2033B;
-	Wed, 17 Jan 2024 12:19:32 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dolcini.it;
-	s=default; t=1705490372;
-	bh=OaVpQxU9tuOaCurGuNd34rO9GrjjPTEuMDV5HDmI4uI=; h=From:To:Subject;
-	b=yLzhjQc6AlHnKFBwuXI8+/2I56RJjxUp9P3H4clkgSJrEHOyzbyRlrMZ/WVP2ih+V
-	 CNG7IQF3HswUZNZAqAmFUOX6zOBCbsQh0rMJOxkmFen3XDzQBkkgKH0ZoKeohzyztk
-	 4jIcyHUcSg4QTtmtzw1qZrIrJ2Fb7KMPWrus0qdGBYSAW8gbxGynYkVFU4fLqqB9y4
-	 XZBtNo8hc5i34koCK6ZRF7G5lTbb8LtnhqN3DwqTkwmbR/7a1SktrdRKiW1bAGe/LW
-	 vWSCXDX8NivPnubWa3oNX1aWXsB1eR5IxeYpfdszmn5grclUdmRPp9rHf6xH+wFAyp
-	 EKfM0fCuK1qwg==
-Date: Wed, 17 Jan 2024 12:19:27 +0100
-From: Francesco Dolcini <francesco@dolcini.it>
-To: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-Cc: Francesco Dolcini <francesco@dolcini.it>,
-	"marcel@holtmann.org" <marcel@holtmann.org>,
-	"johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
-	"luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
-	Marcel Ziswiler <marcel.ziswiler@toradex.com>,
-	Amitkumar Karwar <amitkumar.karwar@nxp.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Sherry Sun <sherry.sun@nxp.com>, Rohit Fule <rohit.fule@nxp.com>
-Subject: Re: [RFC PATCH] Bluetooth: btnxpuart: Fix nxp_setup in case chip is
- powered on late
-Message-ID: <20240117111927.GA8616@francesco-nb>
-References: <20240117030501.149114-1-neeraj.sanjaykale@nxp.com>
- <20240117090932.GA3787@francesco-nb>
- <AS4PR04MB9692991FC87A8FF21E455BC8E7722@AS4PR04MB9692.eurprd04.prod.outlook.com>
- <20240117104917.GA6138@francesco-nb>
- <AS4PR04MB969292D8951C3C93FD23099AE7722@AS4PR04MB9692.eurprd04.prod.outlook.com>
+	s=arc-20240116; t=1705493126; c=relaxed/simple;
+	bh=Htpnjpopgo+UT36jOkfOoUZI58Uin8aBBsFJbXd6D1U=;
+	h=Received:X-Google-DKIM-Signature:X-Gm-Message-State:
+	 X-Google-Smtp-Source:MIME-Version:X-Received:Date:
+	 X-Google-Appengine-App-Id:X-Google-Appengine-App-Id-Alias:
+	 Message-ID:Subject:From:To:Content-Type; b=ZTiGFYgP10vgurgnTdsCrMmYOaC0LjM8X7+sz1zRNNz5XX4ELmH8iKYskUUTZlIc5+qIvB4d5exHCKmGW7WHIWXH85ZYJzzN+bTBRI69tr3KKzsjjXF+/oQU7UIykNytFjmsSCot/BYo4v3z4XIuinPOBHT20Xxy80bERYJUnFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7bc3dd97ddaso1037714039f.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jan 2024 04:05:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705493123; x=1706097923;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3lhNILptHbsq/4lP5rKvgZKkGfpg+tGnMSlQFHzZqi4=;
+        b=pfH5xh727uo0LX+CMknxNnT8+r1wcsD5gTntHvvPJiQFuMcRvonwdG7YG9KQ4GorT3
+         u/2AKcBahrcoRRn9E4zEr11tsqw9rayS/b8ms87pVwBuEVtefRBImJFCCvgAy1UwYIKE
+         cjf+PgsGqYfULbj8q8UCRsmApjMNp1AvbgpxCihvjVTay3X8Ncc8i1hIybLMym/ys7tW
+         67Sp4fRybJXAMDqXkkKdQVDZVcmdB+SG/wvBx54JTfOCAlE5z24b6hASv+bb+wIbL7du
+         K2shQxdg8oGxoDJWAD66MyBIHcsIey3eDdcq/4KB+BcswuEySfe0JZti9t+M3sUKwGyK
+         BX/w==
+X-Gm-Message-State: AOJu0Yx7EhqaIcZJ/B5VjvMkimf1AAFua+Jhkbv1NXoggosY7qImCS+6
+	wiins8bQSGMMiXta1iXTPTpej7D1hsiNiWUdjGmfsCceSCHl
+X-Google-Smtp-Source: AGHT+IEiH/8+e08FEWJXRsqVD8FJRcRsRpTY/mRLhrp2FrFAeqF9faiihqEqKr15+rdY514eEn+7hQQp6GxM1SZIt5kA+WyKUE5S
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AS4PR04MB969292D8951C3C93FD23099AE7722@AS4PR04MB9692.eurprd04.prod.outlook.com>
+X-Received: by 2002:a05:6638:130a:b0:46d:1c7:3b12 with SMTP id
+ r10-20020a056638130a00b0046d01c73b12mr455316jad.5.1705493123684; Wed, 17 Jan
+ 2024 04:05:23 -0800 (PST)
+Date: Wed, 17 Jan 2024 04:05:23 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000cde441060f230f4f@google.com>
+Subject: [syzbot] [bluetooth?] general protection fault in btintel_read_version
+From: syzbot <syzbot+830d9e3fa61968246abd@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Jan 17, 2024 at 11:11:44AM +0000, Neeraj Sanjay Kale wrote:
-> > > Here, the driver probe registers an hci interface
-> > > (hci_register_dev()), and returns success to kernel.
-> > >
-> > > The hci_register_dev() queues hdev->power_on work at the end, which
-> > > opens the hci dev, and ultimately calls this setup function.
-> > >
-> > > In this patch, we are queueing the same work from the delayed
-> > > setup_retry_work().
-> > >
-> > > Returning -ENODEV (or -EPROBE_DEFER) would only affect hci_dev_open(),
-> > > which is in power_on work context, and not driver probe context.
-> > >
-> > > Perhaps, we should call it hci_retry_power_on() work or something
-> > > similar?
-> > >
-> > > Please let me know your thoughts on this.
-> > 
-> > Do you see any way to get rid of this complexity? Maybe having this check
-> > done during probe, deferring there till we know the device is in a suitable
-> > state (e.g. either you received the bootloader signature, you know the device
-> > is powered or that the firmware is loaded and ready?).
-> > 
-> > In other words returning EPROBE_DEFER before calling hci_register_dev()?
-> > 
-> Unfortunately no. To read any bootloader signatures, or read CTS line,
-> we need serdev device opened, which is done only after
-> hci_register_dev() -> power_on work -> hci_dev_open()->serdev_open().
+Hello,
 
-Ok, thanks, it makes sense and it's clear.
+syzbot found the following issue on:
 
-> We could simplify this by only returning -ENODEV, without the
-> delayed_work handling, but then user would have to remove and
-> re-insert the btnxpuart driver after mwifiex driver is loaded
-> successfully.
->
-> This may not seam like a user-friendly approach.
+HEAD commit:    943b9f0ab2cf Add linux-next specific files for 20240117
+git tree:       linux-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=17c60debe80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=12af1d067b6a6d19
+dashboard link: https://syzkaller.appspot.com/bug?extid=830d9e3fa61968246abd
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1151c2a3e80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=110f7913e80000
 
-I think that something like that is pretty much useless, manual
-reloading is already possible, and this can also be solved
-"artificially" serializing loading the wifi driver and the bt one (the
-latter is what we are currently doing to overcome this limitation).
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/9c032ce79e0f/disk-943b9f0a.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/93163e287878/vmlinux-943b9f0a.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/512cc2e14a4b/bzImage-943b9f0a.xz
 
-Francesco
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+830d9e3fa61968246abd@syzkaller.appspotmail.com
 
+general protection fault, probably for non-canonical address 0xdffffc000000000e: 0000 [#1] PREEMPT SMP KASAN PTI
+KASAN: null-ptr-deref in range [0x0000000000000070-0x0000000000000077]
+CPU: 0 PID: 4455 Comm: kworker/u5:1 Not tainted 6.7.0-next-20240117-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+Workqueue: hci0 hci_power_on
+RIP: 0010:btintel_read_version+0x65/0x1e0 drivers/bluetooth/btintel.c:444
+Code: 08 c5 f9 48 81 fb 00 f0 ff ff 0f 87 9e 00 00 00 e8 c0 0d c5 f9 48 8d 7b 70 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <0f> b6 04 02 84 c0 74 08 3c 03 0f 8e de 00 00 00 8b 6b 70 bf 0a 00
+RSP: 0018:ffffc9000e057958 EFLAGS: 00010202
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffffff87c7146e
+RDX: 000000000000000e RSI: ffffffff87c71480 RDI: 0000000000000070
+RBP: ffffc9000e057a10 R08: 0000000000000007 R09: fffffffffffff000
+R10: 0000000000000000 R11: 0000000000000003 R12: ffff888030f74000
+R13: ffffc9000e0579f0 R14: ffff888030f74000 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f27722fa1d0 CR3: 000000007ff6a000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ ag6xx_setup+0x1b0/0xc10 drivers/bluetooth/hci_ag6xx.c:169
+ hci_uart_setup+0x224/0x4d0 drivers/bluetooth/hci_ldisc.c:423
+ hci_dev_setup_sync net/bluetooth/hci_sync.c:4631 [inline]
+ hci_dev_init_sync net/bluetooth/hci_sync.c:4699 [inline]
+ hci_dev_open_sync+0x35b/0x2650 net/bluetooth/hci_sync.c:4799
+ hci_dev_do_open+0x2a/0x90 net/bluetooth/hci_core.c:483
+ hci_power_on+0x132/0x670 net/bluetooth/hci_core.c:1015
+ process_one_work+0x8d5/0x16e0 kernel/workqueue.c:2633
+ process_scheduled_works kernel/workqueue.c:2707 [inline]
+ worker_thread+0x8b6/0x1290 kernel/workqueue.c:2788
+ kthread+0x2c1/0x3a0 kernel/kthread.c:388
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:242
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:btintel_read_version+0x65/0x1e0 drivers/bluetooth/btintel.c:444
+Code: 08 c5 f9 48 81 fb 00 f0 ff ff 0f 87 9e 00 00 00 e8 c0 0d c5 f9 48 8d 7b 70 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <0f> b6 04 02 84 c0 74 08 3c 03 0f 8e de 00 00 00 8b 6b 70 bf 0a 00
+RSP: 0018:ffffc9000e057958 EFLAGS: 00010202
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffffff87c7146e
+RDX: 000000000000000e RSI: ffffffff87c71480 RDI: 0000000000000070
+RBP: ffffc9000e057a10 R08: 0000000000000007 R09: fffffffffffff000
+R10: 0000000000000000 R11: 0000000000000003 R12: ffff888030f74000
+R13: ffffc9000e0579f0 R14: ffff888030f74000 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f27722fa1d0 CR3: 000000007ff6a000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	08 c5                	or     %al,%ch
+   2:	f9                   	stc
+   3:	48 81 fb 00 f0 ff ff 	cmp    $0xfffffffffffff000,%rbx
+   a:	0f 87 9e 00 00 00    	ja     0xae
+  10:	e8 c0 0d c5 f9       	call   0xf9c50dd5
+  15:	48 8d 7b 70          	lea    0x70(%rbx),%rdi
+  19:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+  20:	fc ff df
+  23:	48 89 fa             	mov    %rdi,%rdx
+  26:	48 c1 ea 03          	shr    $0x3,%rdx
+* 2a:	0f b6 04 02          	movzbl (%rdx,%rax,1),%eax <-- trapping instruction
+  2e:	84 c0                	test   %al,%al
+  30:	74 08                	je     0x3a
+  32:	3c 03                	cmp    $0x3,%al
+  34:	0f 8e de 00 00 00    	jle    0x118
+  3a:	8b 6b 70             	mov    0x70(%rbx),%ebp
+  3d:	bf                   	.byte 0xbf
+  3e:	0a 00                	or     (%rax),%al
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
