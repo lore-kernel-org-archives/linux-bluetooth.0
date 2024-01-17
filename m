@@ -1,148 +1,157 @@
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F331E515
-	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jan 2024 22:36:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F3B928DC1
+	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jan 2024 22:42:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705530988; cv=none; b=JJL7fiYvt3q2oOFshsC9NrgjdbjUfZLTawoQGy9q1Pe1aUdoQGYrOjNvqPS2bIONXaYJWKUkdpnuP0kmk0YDyKTKYUlct3NVbzENZH8iU2RR09JRZOfD/9rt0Kxj5Ux6+IT4+zx1j8G7dgn9wsyKuziavJdIYxAe/vCdiSINeiw=
+	t=1705531340; cv=none; b=Rlj8UgVMFLw8c7/mjbk4FO9Y4MQix6USipF755IroaHs/9fV/dYEwpqnDhTnLtZNDyiG7k7kWu7W5mILULHlCAnH9nsJ3Yll/ehB1p6qr5UNX/hY4UYRz2O0hp4MSUOFgwJtE82E98HwsWkHvpScl4qYcNi8N94jTKo5DInzmVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705530988; c=relaxed/simple;
-	bh=CH0y8MAAhRY687UfeoUG/V6ShK8dqvQ8T0G1nzAYAwM=;
+	s=arc-20240116; t=1705531340; c=relaxed/simple;
+	bh=YZFLLGGrYHRoJBKXhch9Oo3BhZ1NVR9M0U+14BLm3MU=;
 	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:MIME-Version:
-	 References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:
-	 Content-Type:Content-Transfer-Encoding; b=hYaA+kw4NiXUpMY813sw7sh5iX4k0fntCSDnJAMiEXZ6GnfjCbJj+IgM9+rL9MbCQUH6unXy/iWTDstcIfhZNll1z9z01A/6TPnxY4edq6Q7bLPc/D/vS/LBNpD7KLmPjboLRuUR9Fgt42YYJvwXxGvf9kePSbcSCUqV7OS0wVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bkkyDs7P; arc=none smtp.client-ip=209.85.208.177
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:
+	 Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References:Reply-To; b=UF8O0yybbxfQ7ngxMj9wHiAwbo0TpwfZdyBjmaS0xvVzOogtg38YZiKxX+CQ6rtgvyghtWwNQDP4O36lIsLwKx/TDNnOY+dHPA3/hubhTO+LZAm7QC/oCFcqI1iZK4fEo+N7ByIoY4oIO6sjHk+7tA9aUBsf5E2VBl3QazUG85w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hc2/msVe; arc=none smtp.client-ip=209.85.222.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bkkyDs7P"
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2cdeb80fdfdso17929891fa.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jan 2024 14:36:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hc2/msVe"
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7831386ee01so1173967985a.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jan 2024 14:42:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705530984; x=1706135784; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JD7nSd70H8VrCsbOxz33MNZjCfpuaR5tZywEFEiClNw=;
-        b=bkkyDs7Pwk3zNJV2DlBovltPcYpM5/lgVr/G8g/12eVmu3RUnsiwX7mlRaj6wPXw2y
-         V3ztBsNoS1cnPm+tAKL7qxqm6c7g/mnQAsCncCR7IGS3/Y6i7+MspJfkALMeo9wo9ytU
-         hzxWwyY2cb+fe/sluyJmly1g6t8ZYK5mwB4r2jI9+OSkVD9afQLVlwJJydQtKqTohssK
-         ViJcMJkZkSVTKQk+aiVi88cX28kZkeY8DIcRtFImn3+HYhtLFrwLM9SOGnDXdQGYz3Em
-         1R/QZvyPyOHiIvYpOSV46kVPyPDwWpy0EU6xxCsNmxFEWabMsjkOUVBNMzJmmoApNv8G
-         XYVQ==
+        d=gmail.com; s=20230601; t=1705531337; x=1706136137; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=tQI2FfXMw+KVxgKLvy5YS0eu+cuvjWmROORmATw7EJI=;
+        b=Hc2/msVeT4W+dV8y7xJP4kntUOXDRFtsFOyLw1cKM9rfuxJHITZuI4S6hPEku/Ba3e
+         02kM1ZiV2W8nvLEjmBTX9RrDVek8aIVsGkVyno7aUpiLSFW9zOdTUpIXIlfCQNiFuzsO
+         jyu4S6JUqb4v29BeNeK2BjbLVYc1YeE/wXOI6eT8kHLFTUi3pTVB/K8j264L8rGlAZ4O
+         FTOONcnfdcsqYZvNzJtmyjD8/Vgq9HVEis4HQNY94kYr/4egDI7iDh8WMAaVREwcDOUA
+         S1KLTK4lV9dl2Tuw/ygXcNuf6+15XtGdbIOwEtN/yXd+CZfPbIrFtIg9VwaKC0TXSijR
+         osmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705530984; x=1706135784;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JD7nSd70H8VrCsbOxz33MNZjCfpuaR5tZywEFEiClNw=;
-        b=eLuRrj8rH1XzBVRhavhZsfncgMGWCA+FNvffC6fyHpXvFz7NL7nySq60sfSLeyq7+C
-         VoI/8YZjVInNIrBf7s90hitiWwEueiR43h1HOMU9HFnatpIZAakZO64XN43GCZMAWCu5
-         s/jcXcyj1QvDn6fU4lAN3crMvzRcdapSZYmavrDEEu4s1JNfA6qqhz/jFttbv5UyQfzR
-         MjC+op8utAm7ew9hdcFPvB2joOf/PuHM8zEisKE4I3JUyQptalbwLxhLzOGO06Tb/o6s
-         aiQxoNIDQXrM2Ht8aJVjO94yGNiX76tiLBLPb98TBrb2pdWvfUOkKgARwCNf4VkEFxBx
-         X9UA==
-X-Gm-Message-State: AOJu0YxuWbujTpn3A9/M3qhWXD9HMXB2aahTtWnB7WXeI4ve3K2Mp28M
-	yHjMXK3Jhl87xR8M4HzG9yHVzwTG9kmEw9MjRJyWOy2POvI=
-X-Google-Smtp-Source: AGHT+IFCTG+ptuvEPf4Kh5X9bEEY52D0NztR65W6yC8+XtuxHkmRQ5d43Hoxn5jDJ5Gz00dde5yH/+rneEqnqblB9tM=
-X-Received: by 2002:a2e:b166:0:b0:2cc:6666:168d with SMTP id
- a6-20020a2eb166000000b002cc6666168dmr2573312ljm.69.1705530983745; Wed, 17 Jan
- 2024 14:36:23 -0800 (PST)
+        d=1e100.net; s=20230601; t=1705531337; x=1706136137;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tQI2FfXMw+KVxgKLvy5YS0eu+cuvjWmROORmATw7EJI=;
+        b=ibD+lcAKrA+IIihxEO3Lf+BIlmAZEl1VbO0ylYHewhMmU9EDQrSRuh/F2rhRxp9Ld9
+         5XbQCd3cHRj9VfMskjKP6tSBJbno+p2z3QhDxuqT+EQo5ZfyBFInw7mjc4GHaJxsJc3n
+         2HM1PcSmFiIUwe6mOBHAPRE3Fk6DkWL2NpAs9z0+KCIDppUzxeUl6+IMCCSCYL+D/HBw
+         plBe4h/39HLmOzul9OryAYbFMCgyfHhEZmqYUw2LTrVnduzEMSawjS7DM2Fx7dLS4I58
+         wTdXWCfYRo6hHTLPsznB5R55pVH94nu428bivNa+4tEOojO/uHqJV5dY6vSAUzKGfpT0
+         716A==
+X-Gm-Message-State: AOJu0Yy3TUgU0eVmHg+7T9A3kWYEQwabggbHvg3eAMqU3UiKWol7le6C
+	mvcqHqSVsakLfmD7kxKJy9g9ctxhedQ=
+X-Google-Smtp-Source: AGHT+IGdjLL3T4+OKHGrtfIsvCAkmcCa/b0thO/Nyinvx2U3GLC766iv6DpX+CV7iWy+4ixNGcHDfQ==
+X-Received: by 2002:a05:620a:19a0:b0:783:71fa:5366 with SMTP id bm32-20020a05620a19a000b0078371fa5366mr2266814qkb.92.1705531337308;
+        Wed, 17 Jan 2024 14:42:17 -0800 (PST)
+Received: from [172.17.0.2] ([20.97.189.21])
+        by smtp.gmail.com with ESMTPSA id c6-20020a05620a200600b0078314a8190dsm4836698qka.25.2024.01.17.14.42.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Jan 2024 14:42:17 -0800 (PST)
+Message-ID: <65a857c9.050a0220.32c0c.804d@mx.google.com>
+Date: Wed, 17 Jan 2024 14:42:17 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0949948692663669988=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240117222317.1792594-1-luiz.dentz@gmail.com> <20240117222317.1792594-2-luiz.dentz@gmail.com>
-In-Reply-To: <20240117222317.1792594-2-luiz.dentz@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 17 Jan 2024 17:36:10 -0500
-Message-ID: <CABBYNZK4ODoPDy20jk48tPW8rnAgLdOMrhdkgMPeanSLz-x-mA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1 2/2] transport: Print owner information when it
- exit or release
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1,1/2] client/player: Add support for printing A2DP codec details
+In-Reply-To: <20240117212811.1784326-1-luiz.dentz@gmail.com>
+References: <20240117212811.1784326-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Pauli,
+--===============0949948692663669988==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 17, 2024 at 5:23=E2=80=AFPM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This prints the owner name when it exits/quits/crash or releases a
-> transport.
-> ---
-> - Looks like there is a bug/race on codec switch it appears the likes of
->   pipewire attempts to call Release in the process which stops the
->   acquire/resume:
->
->   bluetoothd[1774429]: profiles/audio/transport.c:transport_set_state() S=
-tate
->   changed /org/bluez/hci0/dev_94_DB_56_F7_F2_88/sep1/fd8: TRANSPORT_G
->   bluetoothd[1774429]: profiles/audio/transport.c:media_request_create()
->   Request created: method=3DAcquire id=3D50
->   bluetoothd[1774429]: profiles/audio/transport.c:media_owner_add() Owner
->   :1.133105 Request Acquire
->   bluetoothd[1774429]: profiles/audio/transport.c:media_transport_set_own=
-er()
->   Transport /org/bluez/hci0/dev_94_DB_56_F7_F2_88/sep1/fd8 Owner :1.5
->   bluetoothd[1774429]: profiles/audio/transport.c:release() Owner :1.1331=
-05
->   bluetoothd[1774429]: profiles/audio/transport.c:media_owner_remove() Ow=
-ner
->   :1.133105 Request Acquire
+This is automated email and please do not reply to this email!
 
-I wonder if we have a regression on BlueZ or PW for A2DP, since I
-recall this used to work just fine while switching codecs back and
-forth, but today it didn't work at all for me and I had to reconnect a
-couple of times to get it working:
+Dear submitter,
 
->pipewire --version
-pipewire
-Compiled with libpipewire 1.0.0
-Linked with libpipewire 1.0.0
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=817650
 
-pw.node: (bluez_output.94_DB_56_F7_F2_88.1-70) running -> error
-(Received error event)
+---Test result---
 
->  profiles/audio/transport.c | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-> index a4696154aba5..5395985b990f 100644
-> --- a/profiles/audio/transport.c
-> +++ b/profiles/audio/transport.c
-> @@ -531,6 +531,8 @@ static void media_owner_exit(DBusConnection *connecti=
-on, void *user_data)
->  {
->         struct media_owner *owner =3D user_data;
->
-> +       DBG("Owner %s", owner->name);
-> +
->         owner->watch =3D 0;
->
->         media_owner_remove(owner);
-> @@ -742,6 +744,8 @@ static DBusMessage *release(DBusConnection *conn, DBu=
-sMessage *msg,
->         if (owner =3D=3D NULL || g_strcmp0(owner->name, sender) !=3D 0)
->                 return btd_error_not_authorized(msg);
->
-> +       DBG("Owner %s", owner->name);
-> +
->         if (owner->pending) {
->                 const char *member;
->
-> --
-> 2.43.0
+Test Summary:
+CheckPatch                    FAIL      1.53 seconds
+GitLint                       FAIL      0.89 seconds
+BuildEll                      PASS      24.06 seconds
+BluezMake                     PASS      731.70 seconds
+MakeCheck                     PASS      12.04 seconds
+MakeDistcheck                 PASS      161.08 seconds
+CheckValgrind                 PASS      222.98 seconds
+CheckSmatch                   PASS      326.67 seconds
+bluezmakeextell               PASS      106.27 seconds
+IncrementalBuild              PASS      1370.09 seconds
+ScanBuild                     PASS      936.51 seconds
 
-It seems you PW calls Release after Acquire, not sure if it didn't
-like our response to Acquire or something.
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ,v1,1/2] client/player: Add support for printing A2DP codec details
+WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
+#139: FILE: client/player.c:82:
++} __attribute__ ((packed));
 
---=20
-Luiz Augusto von Dentz
+WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
+#148: FILE: client/player.c:91:
++} __attribute__ ((packed));
+
+/github/workspace/src/src/13522175.patch total: 0 errors, 2 warnings, 599 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13522175.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,v1,1/2] client/player: Add support for printing A2DP codec details
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+10: B3 Line contains hard tab characters (\t): "	UUID: 0000110b-0000-1000-8000-00805f9b34fb"
+11: B3 Line contains hard tab characters (\t): "	Codec: 0x00 (0)"
+12: B3 Line contains hard tab characters (\t): "	Media Codec: SBC"
+13: B3 Line contains hard tab characters (\t): "	Channel Modes: Mono DualChannel Stereo JointStereo"
+14: B3 Line contains hard tab characters (\t): "	Frequencies: 44.1Khz 48Khz"
+15: B3 Line contains hard tab characters (\t): "	Subbands: 4 8"
+16: B3 Line contains hard tab characters (\t): "	Blocks: 4 8 12 16"
+17: B3 Line contains hard tab characters (\t): "	Bitpool Range: 2-53"
+18: B3 Line contains hard tab characters (\t): "	..."
+22: B3 Line contains hard tab characters (\t): "	UUID: 0000110a-0000-1000-8000-00805f9b34fb"
+23: B3 Line contains hard tab characters (\t): "	Codec: 0x00 (0)"
+24: B3 Line contains hard tab characters (\t): "	Media Codec: SBC"
+25: B3 Line contains hard tab characters (\t): "	Channel Modes: JointStereo"
+26: B3 Line contains hard tab characters (\t): "	Frequencies: 48Khz"
+27: B3 Line contains hard tab characters (\t): "	Subbands: 8"
+28: B3 Line contains hard tab characters (\t): "	Blocks: 16"
+29: B3 Line contains hard tab characters (\t): "	Bitpool Range: 2-53"
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0949948692663669988==--
