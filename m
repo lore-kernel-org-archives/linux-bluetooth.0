@@ -1,170 +1,163 @@
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71E951DFFA
-	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jan 2024 12:05:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 158EF241F8
+	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jan 2024 18:52:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.134.136.31
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705493126; cv=none; b=IeBOJOAv2ofn87+ulaaa6z0jQ+KvQU9Uz9woDIw7jmlERgn4gO+jxw8/3AWwdU2hhcSdryMmAbSf4FYMvWyEbVCNffjSfa2YyTuE/B5OMNLwXzoL3lQtj9+PXRBjn+DCXbp7NImJLpFunVLz64OGINNaubPwjWt8HKSqZxgZ4LA=
+	t=1705517536; cv=none; b=qQeiJKzrG9/JneauwvuLGuttH/hC8djzk99jQA9xlhPrkuaoFM+JRcYj6grdmsHndSLFFp1QtlJW3leNafrNq8Y35GP/SqdF4spGkUoWBJ03+nOX8j017gHnH8C6mklQxSrplb0aiiOkdF5wRAFfmQchrelHC1nReVnQbeaUNhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705493126; c=relaxed/simple;
-	bh=Htpnjpopgo+UT36jOkfOoUZI58Uin8aBBsFJbXd6D1U=;
-	h=Received:X-Google-DKIM-Signature:X-Gm-Message-State:
-	 X-Google-Smtp-Source:MIME-Version:X-Received:Date:
-	 X-Google-Appengine-App-Id:X-Google-Appengine-App-Id-Alias:
-	 Message-ID:Subject:From:To:Content-Type; b=ZTiGFYgP10vgurgnTdsCrMmYOaC0LjM8X7+sz1zRNNz5XX4ELmH8iKYskUUTZlIc5+qIvB4d5exHCKmGW7WHIWXH85ZYJzzN+bTBRI69tr3KKzsjjXF+/oQU7UIykNytFjmsSCot/BYo4v3z4XIuinPOBHT20Xxy80bERYJUnFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7bc3dd97ddaso1037714039f.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jan 2024 04:05:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705493123; x=1706097923;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3lhNILptHbsq/4lP5rKvgZKkGfpg+tGnMSlQFHzZqi4=;
-        b=pfH5xh727uo0LX+CMknxNnT8+r1wcsD5gTntHvvPJiQFuMcRvonwdG7YG9KQ4GorT3
-         u/2AKcBahrcoRRn9E4zEr11tsqw9rayS/b8ms87pVwBuEVtefRBImJFCCvgAy1UwYIKE
-         cjf+PgsGqYfULbj8q8UCRsmApjMNp1AvbgpxCihvjVTay3X8Ncc8i1hIybLMym/ys7tW
-         67Sp4fRybJXAMDqXkkKdQVDZVcmdB+SG/wvBx54JTfOCAlE5z24b6hASv+bb+wIbL7du
-         K2shQxdg8oGxoDJWAD66MyBIHcsIey3eDdcq/4KB+BcswuEySfe0JZti9t+M3sUKwGyK
-         BX/w==
-X-Gm-Message-State: AOJu0Yx7EhqaIcZJ/B5VjvMkimf1AAFua+Jhkbv1NXoggosY7qImCS+6
-	wiins8bQSGMMiXta1iXTPTpej7D1hsiNiWUdjGmfsCceSCHl
-X-Google-Smtp-Source: AGHT+IEiH/8+e08FEWJXRsqVD8FJRcRsRpTY/mRLhrp2FrFAeqF9faiihqEqKr15+rdY514eEn+7hQQp6GxM1SZIt5kA+WyKUE5S
+	s=arc-20240116; t=1705517536; c=relaxed/simple;
+	bh=9hmikyydxSTTuQuDlGYBHURXgaqvgMr1XoQUBf3h+yw=;
+	h=DKIM-Signature:X-IronPort-AV:X-IronPort-AV:Received:X-ExtLoop1:
+	 X-IronPort-AV:X-IronPort-AV:Received:Received:Date:From:To:Cc:
+	 Subject:Message-ID:User-Agent; b=i6YiPehw6ihLZU18OdxMOVeF9Klw7IbZ7Ciu/8uX1BR/htTnq22psspNsDBjEBxbaOMe3m8mg0NgOwZeWteCj1IP9qfBYGPIFNLZ2NvR0rQ04lcxOe2DtJ4BtsrZRr1DE3pnM57C1FRDK62ll4MDbX3FYhduigBIfjWR9pP4BWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=C+8ttyao; arc=none smtp.client-ip=134.134.136.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="C+8ttyao"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1705517535; x=1737053535;
+  h=date:from:to:cc:subject:message-id;
+  bh=9hmikyydxSTTuQuDlGYBHURXgaqvgMr1XoQUBf3h+yw=;
+  b=C+8ttyaoivE3ELapieeIqdlQ8tUdDdLrQ7xA7FS4eNDB7E9V5dlSk+K2
+   gluJWSBosCo4g+uRNf3TtVi/qeBW29tOMs2hEYGbUz/jvVYAVSEH77MKG
+   8bgSmSS6glvo2FqYr4PApwvLQj8BoZ5ZxZ1/fZBJEfRVRFdk87marhwPZ
+   uc/rnKaPXWi0TgCbhZoRwBFHgTI55ceAcNKCIelmAhlKoMRs9I/8bTwip
+   PhW2B0yHswnO/tOVnx7dRxEzqQZASWm0cyyHLfgPVrwHRvQ9KBoBdbhJV
+   DFj0AxIBYljmD6jCgUfHUsFFiC6nPUdFuKV6ZWYV1WXxPS/z4AOr8i15W
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10956"; a="464530662"
+X-IronPort-AV: E=Sophos;i="6.05,200,1701158400"; 
+   d="scan'208";a="464530662"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jan 2024 10:52:14 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10956"; a="1115748154"
+X-IronPort-AV: E=Sophos;i="6.05,200,1701158400"; 
+   d="scan'208";a="1115748154"
+Received: from lkp-server01.sh.intel.com (HELO 961aaaa5b03c) ([10.239.97.150])
+  by fmsmga005.fm.intel.com with ESMTP; 17 Jan 2024 10:52:13 -0800
+Received: from kbuild by 961aaaa5b03c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rQB1G-0002G2-1d;
+	Wed, 17 Jan 2024 18:52:10 +0000
+Date: Thu, 18 Jan 2024 02:51:48 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 6061d66bd0e5ac1eca2858356cd8d7c12f415176
+Message-ID: <202401180246.kYKeEqHp-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6638:130a:b0:46d:1c7:3b12 with SMTP id
- r10-20020a056638130a00b0046d01c73b12mr455316jad.5.1705493123684; Wed, 17 Jan
- 2024 04:05:23 -0800 (PST)
-Date: Wed, 17 Jan 2024 04:05:23 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000cde441060f230f4f@google.com>
-Subject: [syzbot] [bluetooth?] general protection fault in btintel_read_version
-From: syzbot <syzbot+830d9e3fa61968246abd@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 6061d66bd0e5ac1eca2858356cd8d7c12f415176  Bluetooth: Remove usage of the deprecated ida_simple_xx() API
 
-syzbot found the following issue on:
+elapsed time: 1554m
 
-HEAD commit:    943b9f0ab2cf Add linux-next specific files for 20240117
-git tree:       linux-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=17c60debe80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=12af1d067b6a6d19
-dashboard link: https://syzkaller.appspot.com/bug?extid=830d9e3fa61968246abd
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1151c2a3e80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=110f7913e80000
+configs tested: 87
+configs skipped: 2
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/9c032ce79e0f/disk-943b9f0a.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/93163e287878/vmlinux-943b9f0a.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/512cc2e14a4b/bzImage-943b9f0a.xz
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+830d9e3fa61968246abd@syzkaller.appspotmail.com
+tested configs:
+alpha                             allnoconfig   gcc  
+alpha                               defconfig   gcc  
+arc                               allnoconfig   gcc  
+arc                                 defconfig   gcc  
+arc                   randconfig-001-20240117   gcc  
+arc                   randconfig-002-20240117   gcc  
+arm                               allnoconfig   gcc  
+arm                                 defconfig   clang
+arm                   randconfig-001-20240117   gcc  
+arm                   randconfig-002-20240117   gcc  
+arm                   randconfig-003-20240117   gcc  
+arm                   randconfig-004-20240117   gcc  
+arm64                             allnoconfig   gcc  
+arm64                               defconfig   gcc  
+arm64                 randconfig-001-20240117   gcc  
+arm64                 randconfig-002-20240117   gcc  
+arm64                 randconfig-003-20240117   gcc  
+arm64                 randconfig-004-20240117   gcc  
+csky                              allnoconfig   gcc  
+csky                                defconfig   gcc  
+csky                  randconfig-001-20240117   gcc  
+csky                  randconfig-002-20240117   gcc  
+hexagon                           allnoconfig   clang
+hexagon                             defconfig   clang
+hexagon               randconfig-001-20240117   clang
+hexagon               randconfig-002-20240117   clang
+i386                             allmodconfig   clang
+i386                              allnoconfig   clang
+i386                             allyesconfig   clang
+i386                                defconfig   gcc  
+loongarch                         allnoconfig   gcc  
+loongarch                           defconfig   gcc  
+loongarch             randconfig-001-20240117   gcc  
+loongarch             randconfig-002-20240117   gcc  
+m68k                              allnoconfig   gcc  
+m68k                                defconfig   gcc  
+microblaze                        allnoconfig   gcc  
+microblaze                          defconfig   gcc  
+mips                              allnoconfig   clang
+nios2                             allnoconfig   gcc  
+nios2                               defconfig   gcc  
+nios2                 randconfig-001-20240117   gcc  
+nios2                 randconfig-002-20240117   gcc  
+openrisc                          allnoconfig   gcc  
+openrisc                            defconfig   gcc  
+parisc                            allnoconfig   gcc  
+parisc                              defconfig   gcc  
+parisc                randconfig-001-20240117   gcc  
+parisc                randconfig-002-20240117   gcc  
+parisc64                            defconfig   gcc  
+powerpc                           allnoconfig   gcc  
+powerpc               randconfig-001-20240117   gcc  
+powerpc               randconfig-002-20240117   gcc  
+powerpc               randconfig-003-20240117   gcc  
+powerpc64             randconfig-001-20240117   gcc  
+powerpc64             randconfig-002-20240117   gcc  
+powerpc64             randconfig-003-20240117   gcc  
+riscv                             allnoconfig   clang
+riscv                               defconfig   gcc  
+riscv                 randconfig-001-20240117   gcc  
+riscv                 randconfig-002-20240117   gcc  
+s390                              allnoconfig   gcc  
+s390                             allyesconfig   gcc  
+s390                                defconfig   gcc  
+s390                  randconfig-001-20240117   clang
+s390                  randconfig-002-20240117   clang
+sh                               allmodconfig   gcc  
+sh                                allnoconfig   gcc  
+sh                               allyesconfig   gcc  
+sh                                  defconfig   gcc  
+sh                    randconfig-001-20240117   gcc  
+sparc64                             defconfig   gcc  
+um                                allnoconfig   clang
+um                                  defconfig   gcc  
+um                             i386_defconfig   gcc  
+x86_64                            allnoconfig   gcc  
+x86_64                           allyesconfig   clang
+x86_64       buildonly-randconfig-001-20240117   gcc  
+x86_64       buildonly-randconfig-002-20240117   gcc  
+x86_64       buildonly-randconfig-003-20240117   gcc  
+x86_64       buildonly-randconfig-004-20240117   gcc  
+x86_64       buildonly-randconfig-005-20240117   gcc  
+x86_64       buildonly-randconfig-006-20240117   gcc  
+x86_64                              defconfig   gcc  
+x86_64                randconfig-001-20240117   clang
+x86_64                randconfig-003-20240117   clang
+x86_64                          rhel-8.3-rust   clang
 
-general protection fault, probably for non-canonical address 0xdffffc000000000e: 0000 [#1] PREEMPT SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000070-0x0000000000000077]
-CPU: 0 PID: 4455 Comm: kworker/u5:1 Not tainted 6.7.0-next-20240117-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-Workqueue: hci0 hci_power_on
-RIP: 0010:btintel_read_version+0x65/0x1e0 drivers/bluetooth/btintel.c:444
-Code: 08 c5 f9 48 81 fb 00 f0 ff ff 0f 87 9e 00 00 00 e8 c0 0d c5 f9 48 8d 7b 70 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <0f> b6 04 02 84 c0 74 08 3c 03 0f 8e de 00 00 00 8b 6b 70 bf 0a 00
-RSP: 0018:ffffc9000e057958 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffffff87c7146e
-RDX: 000000000000000e RSI: ffffffff87c71480 RDI: 0000000000000070
-RBP: ffffc9000e057a10 R08: 0000000000000007 R09: fffffffffffff000
-R10: 0000000000000000 R11: 0000000000000003 R12: ffff888030f74000
-R13: ffffc9000e0579f0 R14: ffff888030f74000 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f27722fa1d0 CR3: 000000007ff6a000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- ag6xx_setup+0x1b0/0xc10 drivers/bluetooth/hci_ag6xx.c:169
- hci_uart_setup+0x224/0x4d0 drivers/bluetooth/hci_ldisc.c:423
- hci_dev_setup_sync net/bluetooth/hci_sync.c:4631 [inline]
- hci_dev_init_sync net/bluetooth/hci_sync.c:4699 [inline]
- hci_dev_open_sync+0x35b/0x2650 net/bluetooth/hci_sync.c:4799
- hci_dev_do_open+0x2a/0x90 net/bluetooth/hci_core.c:483
- hci_power_on+0x132/0x670 net/bluetooth/hci_core.c:1015
- process_one_work+0x8d5/0x16e0 kernel/workqueue.c:2633
- process_scheduled_works kernel/workqueue.c:2707 [inline]
- worker_thread+0x8b6/0x1290 kernel/workqueue.c:2788
- kthread+0x2c1/0x3a0 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:242
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:btintel_read_version+0x65/0x1e0 drivers/bluetooth/btintel.c:444
-Code: 08 c5 f9 48 81 fb 00 f0 ff ff 0f 87 9e 00 00 00 e8 c0 0d c5 f9 48 8d 7b 70 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <0f> b6 04 02 84 c0 74 08 3c 03 0f 8e de 00 00 00 8b 6b 70 bf 0a 00
-RSP: 0018:ffffc9000e057958 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffffff87c7146e
-RDX: 000000000000000e RSI: ffffffff87c71480 RDI: 0000000000000070
-RBP: ffffc9000e057a10 R08: 0000000000000007 R09: fffffffffffff000
-R10: 0000000000000000 R11: 0000000000000003 R12: ffff888030f74000
-R13: ffffc9000e0579f0 R14: ffff888030f74000 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f27722fa1d0 CR3: 000000007ff6a000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	08 c5                	or     %al,%ch
-   2:	f9                   	stc
-   3:	48 81 fb 00 f0 ff ff 	cmp    $0xfffffffffffff000,%rbx
-   a:	0f 87 9e 00 00 00    	ja     0xae
-  10:	e8 c0 0d c5 f9       	call   0xf9c50dd5
-  15:	48 8d 7b 70          	lea    0x70(%rbx),%rdi
-  19:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
-  20:	fc ff df
-  23:	48 89 fa             	mov    %rdi,%rdx
-  26:	48 c1 ea 03          	shr    $0x3,%rdx
-* 2a:	0f b6 04 02          	movzbl (%rdx,%rax,1),%eax <-- trapping instruction
-  2e:	84 c0                	test   %al,%al
-  30:	74 08                	je     0x3a
-  32:	3c 03                	cmp    $0x3,%al
-  34:	0f 8e de 00 00 00    	jle    0x118
-  3a:	8b 6b 70             	mov    0x70(%rbx),%ebp
-  3d:	bf                   	.byte 0xbf
-  3e:	0a 00                	or     (%rax),%al
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
