@@ -1,135 +1,158 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8555325639;
-	Thu, 18 Jan 2024 14:02:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 726C51DDC6;
+	Thu, 18 Jan 2024 15:31:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705586577; cv=none; b=HDkpsM8wzftoFipfJ3iDfB6OYotDiYRlqVSC97AyYmxaupj0fCTC4qV7R6vHJg8PxGJ0fwtST42aqvKcuhAt/s+jtDUbA6kY0NugqVNn6gg8gY8eCDiF/sZcHGoxqFglXsqb4zm3v28cUjYUZRYomaD1CyQvIB/X9iED4mg0ZMg=
+	t=1705591869; cv=none; b=TGQRdajfSEklpld05RcSDhEynvvnz26hznAWIrk4QhR5PEaXYYqgHFMqPaYNIBHJp1ONUzbVmuMGWUaoxXaPEdQOY7BECRS0hU5jGN3GwRwD8JYhiIYrEqq8suXzQVzxy1Gz2Rz34mLJgPG2lgflmk4dltdC+L2Xo/sYb5UAnms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705586577; c=relaxed/simple;
-	bh=pu8uQu3Y4QnGdmhJ528b0uJK+cTzVQ4kRYVKyPEqQVA=;
-	h=DKIM-Signature:Received:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To; b=inn1/xk3txAQVul1+sOL0uGOZAWb62WfxQWYIcWdnsPvc6tX17uXDZAjW1xceRBhFdV3K64uxgv+KDhy4M3a/NJyhYrHykFhMy0e7wvNJLKErcItz6IXsvMqn7YCf7jjCuPn0xWLWk+JF4XXBLNJ5F1U4/ggMPNoBQL8EVkq/9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=UhfCKUBK; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1705591869; c=relaxed/simple;
+	bh=l79NY2dKBoF9XTkQ1wdRVseM0jwGQtTbZVF6sXmEHUg=;
+	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:MIME-Version:
+	 References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:
+	 Content-Type:Content-Transfer-Encoding; b=q2qSJMRE5NlRR53JEtuPLbVcWEK03vn7iTpKmwGeT9VRvP6P7Z+UzNc04Yj7dsTgZ104UM0Tn73l4OI2NiRzqLRfhbRt/EfbfO3gqrXVYMrXCf+8L/JW/191EfbWJNUjbcgvl9y/ovZKMI+9XTPv+I141JLvapSBfEpUseYRwZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gmp1uWa1; arc=none smtp.client-ip=209.85.208.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UhfCKUBK"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=n48Z2k8UvQPTHeoA5BfUaJdkDjBjCutOjxNZxxGyZt4=; b=UhfCKUBKI3W/ojueUMXBr/ODPf
-	dwHSRPhv/qYUasktJz62ugOn41F1G3OSgCi3u+B51ADF6TchvGsBPVxdffqtWNjY3ddSCXgWtTbki
-	wck9wexfFJX5rBw5IMOfs5V6s1zJzZK06yNPqIzsjni74X0owVMDK4Ptfxnt8/9MJYnpFzjnb+y0Z
-	pVKbI/rQJDoaP3ZXEWmcTJHywiAGxH0B4QtKYSRQNKzCCSAaSJYHijOzLqmAv0gvtU85JPwkYx5Sk
-	J8xqoXbiJ/L43sU2SR+kJutXGKhkq96FjA6nEpLMYgD9TJHzA5Sny55s/LePHK5Zq1KyOM3d28rjt
-	lDFhtW6A==;
-Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rQSyq-00000002KSu-437J;
-	Thu, 18 Jan 2024 14:02:52 +0000
-Date: Thu, 18 Jan 2024 14:02:52 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Dmitry Vyukov <dvyukov@google.com>
-Cc: syzbot <syzbot+51baee846ddab52d5230@syzkaller.appspotmail.com>,
-	wzhmmmmm@gmail.com, johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	luiz.dentz@gmail.com, marcel@holtmann.org,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [bluetooth?] KASAN: null-ptr-deref Read in ida_free (4)
-Message-ID: <ZakvjMjMYK1HtYGt@casper.infradead.org>
-References: <000000000000a135c0060a2260b3@google.com>
- <00000000000037f0f3060af9e763@google.com>
- <CACT4Y+YBGDYbhXvpEAo6iXS--QOSsUxXqkGZxOpUCuCd3CM3aQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gmp1uWa1"
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2cddb0ee311so38235121fa.0;
+        Thu, 18 Jan 2024 07:31:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705591865; x=1706196665; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ClAFFQl72AYBcbeJb8sfymN7hdNir4YEOmgS30D5baQ=;
+        b=Gmp1uWa1C/YZ/Zbt2WvqJtKhJQLxijsxmx8hYfHqPYvsvjBmIcqOMOF/71MEz0YHNp
+         EPucKN0HtwS5oLowmGEuuljlBlo1P3YIk/TWktm8khco6IfSQl/NQp6O39ctP4a6+75I
+         rHAzr3/I09TMExRbKrc1E0kbcHvS4Ofh+QZBKJAEbvk9ZOeGvgOp7QAeST5PBhAS/IJt
+         uZdcme7E8NhUTRvUkkNxuceF6i+lHDIR/G4+n5WWzIq0ziPugpnoYNfmg6kQEz/bFYAi
+         cFNSZNqY7Q/BzsoobOoLYz6UzsBnZC/H7vj/JQeBdwbsKplEOGeHcWZLhmco3TPQs1Bd
+         Q23A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705591865; x=1706196665;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ClAFFQl72AYBcbeJb8sfymN7hdNir4YEOmgS30D5baQ=;
+        b=LtYU/pNS611HcZCGvj+kkeAwwSbv7jPAH3bJ1YxVHu2eLE/FdZ4I4/GXqFn5FPW/Xz
+         16xtVUN3oxNgMiiK0Z11dNR5qQlErQlLV9c2sNFtP1mmxTOzw6FDoeThoFtc2PPLdvv/
+         yo/EXe94ct85i0hNyPNraznT6SD8ODSPi5TLF7jxPlVI8Zw/o0jIgnOqO5bnlBoD14Cz
+         SRpqIqmxT+sM9EfEHZDdz9AZl8sYF9b3s6JCUVmcp06ee6W1VOloP4usO9cHHnCFLW88
+         X9Je9N/hP0PvkmJuQMbo2kmzVKuqKLh/e0IvLK8L7JntK4eKcZ1nH3aaPF9oIf05cJXd
+         SBrA==
+X-Gm-Message-State: AOJu0YzWUNhdA70iporOcYaE+UGUQF6tdSwLinPLWDZzRYS8xH3aD+kS
+	33w8Lj9EjGu+6xl0ucAsGCf0q2cu3vMFjAIC2OryDqw5C8Zo7G5zIJrZwpaszADotPdDs4buv74
+	Z01qVjnFeEVZWNZ/Mi50AI005Z238ctWrAbM=
+X-Google-Smtp-Source: AGHT+IGsbx3wnyrWjOXm3YY25A2iEm2aIDxpxx8+OisUG8gtw4CKBY18wsSvaREIQJhkNkfjUX4WeruJYPCN39awfzE=
+X-Received: by 2002:a2e:6e06:0:b0:2cd:df43:9539 with SMTP id
+ j6-20020a2e6e06000000b002cddf439539mr247922ljc.193.1705591865219; Thu, 18 Jan
+ 2024 07:31:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACT4Y+YBGDYbhXvpEAo6iXS--QOSsUxXqkGZxOpUCuCd3CM3aQ@mail.gmail.com>
+References: <20231227180306.6319-1-johan+linaro@kernel.org>
+ <ZZ15c1HUQIH2cY5o@google.com> <ZZ1-ehpU-g6i9Qem@hovoldconsulting.com>
+ <ZZ2IOQEekFffJoHQ@google.com> <ZZ5RVpL88XNbgKIy@hovoldconsulting.com>
+ <CABBYNZJ_EAuGEdeW+vZzXu20nVqLkLwiQbYQ9XzoABxQ5rAzdQ@mail.gmail.com> <ZajkA6oxtMcxKY4X@hovoldconsulting.com>
+In-Reply-To: <ZajkA6oxtMcxKY4X@hovoldconsulting.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 18 Jan 2024 10:30:50 -0500
+Message-ID: <CABBYNZLV9o9hsYGVTGA7dPby-j1P_a35yNrDy4d9PMJq=TaRsQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: qca: fix device-address endianness
+To: Johan Hovold <johan@kernel.org>
+Cc: Matthias Kaehlcke <mka@chromium.org>, Johan Hovold <johan+linaro@kernel.org>, 
+	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Bjorn Andersson <quic_bjorande@quicinc.com>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
+	linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Doug Anderson <dianders@google.com>, 
+	Stephen Boyd <swboyd@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 18, 2024 at 11:21:34AM +0100, Dmitry Vyukov wrote:
-> On Sat, 25 Nov 2023 at 14:18, syzbot
-> <syzbot+51baee846ddab52d5230@syzkaller.appspotmail.com> wrote:
-> >
-> > syzbot has found a reproducer for the following issue on:
-> >
-> > HEAD commit:    8c9660f65153 Add linux-next specific files for 20231124
-> > git tree:       linux-next
-> > console+strace: https://syzkaller.appspot.com/x/log.txt?x=1678a3cce80000
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=ca1e8655505e280
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=51baee846ddab52d5230
-> > compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-> > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10d54c08e80000
-> > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=160ef1a4e80000
-> >
-> > Downloadable assets:
-> > disk image: https://storage.googleapis.com/syzbot-assets/345ed4af3a0d/disk-8c9660f6.raw.xz
-> > vmlinux: https://storage.googleapis.com/syzbot-assets/191053c69d57/vmlinux-8c9660f6.xz
-> > kernel image: https://storage.googleapis.com/syzbot-assets/aac7ee5e55e0/bzImage-8c9660f6.xz
-> >
-> > IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> > Reported-by: syzbot+51baee846ddab52d5230@syzkaller.appspotmail.com
-> >
-> > Bluetooth: hci0: hardware error 0x00
-> > ==================================================================
-> > BUG: KASAN: null-ptr-deref in instrument_atomic_read include/linux/instrumented.h:68 [inline]
-> > BUG: KASAN: null-ptr-deref in _test_bit include/asm-generic/bitops/instrumented-non-atomic.h:141 [inline]
-> > BUG: KASAN: null-ptr-deref in ida_free+0x218/0x2e0 lib/idr.c:511
-> > Read of size 8 at addr 0000000000000078 by task kworker/u5:1/4455
-> >
-> > CPU: 1 PID: 4455 Comm: kworker/u5:1 Not tainted 6.7.0-rc2-next-20231124-syzkaller #0
-> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
-> > Workqueue: hci0 hci_error_reset
-> > Call Trace:
-> >  <TASK>
-> >  __dump_stack lib/dump_stack.c:88 [inline]
-> >  dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
-> >  kasan_report+0xd9/0x110 mm/kasan/report.c:588
-> >  check_region_inline mm/kasan/generic.c:182 [inline]
-> >  kasan_check_range+0xef/0x190 mm/kasan/generic.c:188
-> >  instrument_atomic_read include/linux/instrumented.h:68 [inline]
-> >  _test_bit include/asm-generic/bitops/instrumented-non-atomic.h:141 [inline]
-> 
-> Wonder if this is fixed with:
-> 
-> ida: Fix crash in ida_free when the bitmap is empty
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=af73483f4e8b6f5c68c9aa63257bdd929a9c194a
-> 
-> ?
+Hi Johan,
 
-Should be.  The backtrace below looks like it's the same bug that got
-reported 3-4 weeks ago.
+On Thu, Jan 18, 2024 at 3:40=E2=80=AFAM Johan Hovold <johan@kernel.org> wro=
+te:
+>
+> On Wed, Jan 17, 2024 at 05:49:07PM -0500, Luiz Augusto von Dentz wrote:
+> > On Wed, Jan 10, 2024 at 3:12=E2=80=AFAM Johan Hovold <johan@kernel.org>=
+ wrote:
+> > > On Tue, Jan 09, 2024 at 05:54:01PM +0000, Matthias Kaehlcke wrote:
+>
+> > > > hciconfig
+> > > > hci0:   Type: Primary  Bus: UART
+> > > >         BD Address: 8C:FD:F0:40:15:DC  ACL MTU: 1024:8  SCO MTU: 24=
+0:8
+> > > >         UP RUNNING
+> > > >         RX bytes:1700 acl:0 sco:0 events:95 errors:0
+> > > >         TX bytes:128949 acl:0 sco:0 commands:578 errors:0
+> > >
+> > > And any user space tool overriding the address would currently need t=
+o
+> > > provide the address in reverse order on Qualcomm platforms like this
+> > > one (e.g. if generating the address for privacy reasons).
+> >
+> > Perhaps we could attempt to resolve the address byteorder, in
+> > userspace we use hwdb_get_company to resolve the company but since
+> > this shall only really care about Qualcomm range(s) perhaps we can
+> > hardcode them check in which order the address is, that said if the
+> > device is configured with a Static Random Address then that would not
+> > work, but that is only really possible for BLE only devices.
+>
+> It's not just Qualcomm ranges; The Lenovo ThinkPad X13s that I noticed
+> this on has been assigned a Wistron OUI, for example.
 
-> >  ida_free+0x218/0x2e0 lib/idr.c:511
-> >  hci_conn_cleanup net/bluetooth/hci_conn.c:157 [inline]
-> >  hci_conn_del+0x78c/0xe10 net/bluetooth/hci_conn.c:1183
-> >  hci_conn_hash_flush+0x189/0x260 net/bluetooth/hci_conn.c:2643
-> >  hci_dev_close_sync+0x5a7/0x1160 net/bluetooth/hci_sync.c:5021
-> >  hci_dev_do_close+0x2e/0x90 net/bluetooth/hci_core.c:554
-> >  hci_error_reset+0xa6/0x190 net/bluetooth/hci_core.c:1059
-> >  process_one_work+0x8a4/0x15f0 kernel/workqueue.c:2633
-> >  process_scheduled_works kernel/workqueue.c:2706 [inline]
-> >  worker_thread+0x8b6/0x1290 kernel/workqueue.c:2787
-> >  kthread+0x2c1/0x3a0 kernel/kthread.c:389
-> >  ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
-> >  ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
-> >  </TASK>
-> > ==================================================================
-> >
-> >
-> > ---
-> > If you want syzbot to run the reproducer, reply with:
-> > #syz test: git://repo/address.git branch-or-commit-hash
-> > If you attach or paste a git patch, syzbot will apply it before testing.
-> >
-> > --
-> > You received this message because you are subscribed to the Google Groups "syzkaller-bugs" group.
-> > To unsubscribe from this group and stop receiving emails from it, send an email to syzkaller-bugs+unsubscribe@googlegroups.com.
-> > To view this discussion on the web visit https://groups.google.com/d/msgid/syzkaller-bugs/00000000000037f0f3060af9e763%40google.com.
+Well we could still attempt to check if it has a valid OUI and then it
+fail swap and check again.
+
+> We're still hoping to learn how to retrieve this address (from the
+> secure world firmware) so that we can set it directly from the driver,
+> but for now it needs to be set using btmgmt (or the local-bd-address
+> devicetree property).
+>
+> As was discussed here:
+>
+>         https://github.com/bluez/bluez/issues/107
+>
+> it would be useful to teach bluetoothd to (generate and) set an address
+> for devices that lack (accessible) persistent storage. And any such
+> generic tool would need to work using the standard interfaces and the
+> address endianness that those interfaces expect.
+
+Yep, patches are welcome in this regard, note that we do something like thi=
+s:
+
+https://github.com/bluez/bluez/blob/master/src/adapter.c#L9847
+
+But the first thing it checks is if the controller supports BR/EDR, so
+if you want to extend that we need at least the OUI portion to be able
+to allocate a valid public address, we could perhaps attempt to fetch
+the manufacturer somehow or use the controller manufacturer
+(adapter->manufacturer) in case there is nothing else to use.
+
+> And from skimming the Bluetooth spec, I was under the impression that
+> random addresses applied also to non-BLE devices (e.g. requiring the two
+> most-significants bits to be 1).
+
+Not really, BR/EDR/classic addresses are always considered public
+addresses, the HCI interface doesn't even have an address type to be
+able to handle something like a random address or privacy for the same
+reason.
+
+> But to summarise, I don't really see any way around fixing the Qualcomm
+> driver.
+>
+> Johan
+
+
+
+--=20
+Luiz Augusto von Dentz
