@@ -1,103 +1,87 @@
-Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDCC63172E
-	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jan 2024 21:36:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C92F32181
+	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jan 2024 22:00:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705613792; cv=none; b=imN9j2huBCaqrq9oCFftMOOKtMDynPKJbe2rDGCcjXKaJYIt3NFJZ8gfKNzFQwmL5nSWXaHTuFPBDDI+2vFOC1PyPD9wTVe9RHm0VOSlGOaifpwUKJ+8hE1C0OSlfjwpHPWthPFj01fOC8c8KMxfwqK4b1jKdmexTHTwsxZB0Rg=
+	t=1705615228; cv=none; b=E3UafxBilV+KxEhHdXDTSVDLdfS4kzYNTBmUt41ky1xyrYLLPydCPn250iBXNigyoiFkAmjgyAEJ+5mvTI1KV3VpnVgg+DPCl9mVr3ved+eC6cxFa9NhsnnGsKa08ZK1FYx+YPUmZ3oZ1d3F9m47VwBB6qqUZRCVP8P5GX21M1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705613792; c=relaxed/simple;
-	bh=bMEqRWuD7urM3WHeW0G+LaEFG9byxNr0+Ryh9CXghYM=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=oDrRTf0vTjpGTf0ZOHNpBYDcELh6NNLNerHk8rVo0BU9gan3Gq/bV0VEtjV3PXbA907FnM8ksF5zdko3Vc0mIl+jTB4K4g4cA+/48bPr77PR5RI8QA5GLwuAGV6FJkvfIwXbnsweJYzh+Wp9ATX/gauzxgDyVfNIX2z0+luLF5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=CIDh1vxb; arc=none smtp.client-ip=192.30.252.203
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1705615228; c=relaxed/simple;
+	bh=tMC8KP3DZ6YOmo6od5rrWm11HC8kpx0OGL501CNEgOA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=FyMDKDLTf9xSQTS5wVOf6U81jv5tNL92FR6pLv+5Qk/IJJEDyC8ndiweq2bpvzQvg3uKZaKkuFXiNfvOid4Uu0pjINnAKeKF7ZzSkeYmy2MywN0V3w6o2VKNSO2L7UxpCWzmYrklCcWtR3VtPDRQTx2Vx6VWgGKsJ+wk7uH1QAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VcPZ7Fye; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="CIDh1vxb"
-Received: from github.com (hubbernetes-node-ad4181a.va3-iad.github.net [10.48.147.33])
-	by smtp.github.com (Postfix) with ESMTPA id 0DACF8C1112
-	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jan 2024 13:36:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1705613790;
-	bh=09rfP5zY5UHHH1DpVUHGH1QocYP+V/aEB1D5+hc6XvQ=;
-	h=Date:From:To:Subject:From;
-	b=CIDh1vxbKZn3jaMpx3zjlPGbnqC//CyJ+n2ScbKAkU13rE6hbGMVXXMXapzlhEDoR
-	 idoJAI6llgb0FBwEP4VkJJ6w+guBwu5Th3y5PuLXOoi3EdBGmo0Fq5S7pBF0WBqY/Y
-	 B+Y7miWSgNgL6Ivo9t5JoTZVo9sMqUGnc6/mjEio=
-Date: Thu, 18 Jan 2024 13:36:30 -0800
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/3f490a-e108c7@github.com>
-Subject: [bluez/bluez] 62cf4a: client/player: Add support for printing A2DP
- codec...
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VcPZ7Fye"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8CD79C433F1;
+	Thu, 18 Jan 2024 22:00:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705615227;
+	bh=tMC8KP3DZ6YOmo6od5rrWm11HC8kpx0OGL501CNEgOA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=VcPZ7Fye6Fr3R6b6sfWl9ZkLWv7IkIB6Y2SLArElWLCSBP8G0Kk3bEfLpw1R5eMXw
+	 PCU+0euHpynH1dgxi8kt7lLEI/P6am7vGa1bU0Jz8xvrBgYG5YFVCQSZOtM7DuMgOA
+	 wrQ3YhGmG9f0vaiC0aEy2RgVdlS4QKLHyH84iAJ1x9DcBzmunpdf/bvLgUUoIx5o4B
+	 ussT2vn7zgraUNwfDZCo0oRy/Kv2tS5gd2knevsmJFm8mouH+EqtSwMgpGS3NxFGFw
+	 rdbswT7uSSNQwqAGro+fYo13x7FqzoJfjNFPVsyEDErobSXS/2DmjWMRSrkaPgF62c
+	 LQ6SRr9SoBBqg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 75DB7D8C97A;
+	Thu, 18 Jan 2024 22:00:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v1 1/2] client/player: Add support for printing A2DP
+ codec details
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <170561522747.11670.10487203213285609655.git-patchwork-notify@kernel.org>
+Date: Thu, 18 Jan 2024 22:00:27 +0000
+References: <20240117222317.1792594-1-luiz.dentz@gmail.com>
+In-Reply-To: <20240117222317.1792594-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 62cf4a2ab52ef829ec50c68b5fb9438ecb383dbd
-      https://github.com/bluez/bluez/commit/62cf4a2ab52ef829ec50c68b5fb9438ecb383dbd
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-01-17 (Wed, 17 Jan 2024)
+Hello:
 
-  Changed paths:
-    M client/player.c
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  client/player: Add support for printing A2DP codec details
+On Wed, 17 Jan 2024 17:23:16 -0500 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This adds support for printing Capabilities and Configuration of A2DP
+> endpoints and transports:
+> 
+> bluetoothctl> endpoint.show /org/bluez/hci0/dev_94_DB_56_F7_F2_88/sep1
+> Endpoint /org/bluez/hci0/dev_94_DB_56_F7_F2_88/sep1
+> 	UUID: 0000110b-0000-1000-8000-00805f9b34fb
+> 	Codec: 0x00 (0)
+> 	Media Codec: SBC
+> 	Channel Modes: Mono DualChannel Stereo JointStereo
+> 	Frequencies: 44.1Khz 48Khz
+> 	Subbands: 4 8
+> 	Blocks: 4 8 12 16
+> 	Bitpool Range: 2-53
+> 	...
+> 
+> [...]
 
-This adds support for printing Capabilities and Configuration of A2DP
-endpoints and transports:
+Here is the summary with links:
+  - [BlueZ,v1,1/2] client/player: Add support for printing A2DP codec details
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=62cf4a2ab52e
+  - [BlueZ,v1,2/2] transport: Print owner information when it exit or release
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e108c744fa8d
 
-bluetoothctl> endpoint.show /org/bluez/hci0/dev_94_DB_56_F7_F2_88/sep1
-Endpoint /org/bluez/hci0/dev_94_DB_56_F7_F2_88/sep1
-	UUID: 0000110b-0000-1000-8000-00805f9b34fb
-	Codec: 0x00 (0)
-	Media Codec: SBC
-	Channel Modes: Mono DualChannel Stereo JointStereo
-	Frequencies: 44.1Khz 48Khz
-	Subbands: 4 8
-	Blocks: 4 8 12 16
-	Bitpool Range: 2-53
-	...
-
-bluetoothctl> transport.show /org/bluez/hci0/dev_94_DB_56_F7_F2_88/sep1/fd7
-Transport /org/bluez/hci0/dev_94_DB_56_F7_F2_88/sep1/fd7
-	UUID: 0000110a-0000-1000-8000-00805f9b34fb
-	Codec: 0x00 (0)
-	Media Codec: SBC
-	Channel Modes: JointStereo
-	Frequencies: 48Khz
-	Subbands: 8
-	Blocks: 16
-	Bitpool Range: 2-53
-
-
-  Commit: e108c744fa8dfa1c4f54257532f3433a47179869
-      https://github.com/bluez/bluez/commit/e108c744fa8dfa1c4f54257532f3433a47179869
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-01-17 (Wed, 17 Jan 2024)
-
-  Changed paths:
-    M profiles/audio/transport.c
-
-  Log Message:
-  -----------
-  transport: Print owner information when it exit or release
-
-This prints the owner name when it exits/quits/crash or releases a
-transport.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Compare: https://github.com/bluez/bluez/compare/3f490a69cb55...e108c744fa8d
