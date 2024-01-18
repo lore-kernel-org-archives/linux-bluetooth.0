@@ -1,98 +1,150 @@
-Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
+Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE09525601
-	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jan 2024 16:12:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E821B2C6B2
+	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jan 2024 17:00:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705594354; cv=none; b=JTr/G+72keP2Gsa/aW171qUV4xtB7wB4zdFohH5y+S/BGaAGXya5+8RpH3T8q6tLWmU4ajezMoZaWCTVUktsXrsit6Uvq+xQvIeQUTWUljuadyGHridaNRGRst930Dw96Lt5EHtUiRGIaV+nGv84GY77lIxTZRrURTURgl//5gs=
+	t=1705597222; cv=none; b=EW2z/7myGv19jCv3hfIWP6SZJCtQkkTqaFx3TceYdozVXLPpo7WaLOchBPaGI72hy9EkQN+ublmirHXYbfPwdkARvGKWjQ0TdZ5SWat0PWc3anRQVpYsZeVd/nwdAG0+14pB/KQ1EAiKL63P0lxejtzBBcvWTqnEVWUP/LQDlSg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705594354; c=relaxed/simple;
-	bh=7hOvvhgjDxFU+7YBIHu18SdAKyTDVjfMXAV4GRXEhf0=;
+	s=arc-20240116; t=1705597222; c=relaxed/simple;
+	bh=jJcGC7PYeYZymBre9WhvQFOrvBahXyYIzZb/v+QgWKg=;
 	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:MIME-Version:
-	 References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:
-	 Content-Type; b=vAahGBdtavSQeMRTA1FiiMFdYGRrnJresGxhJUl431p+O6ixim5V62KHArXM01FKU1+LjBpq2nDRExej2ZWLvWO7MYZYntNXQVR2PniEHeaVBCBSESMVGf5MuzdUK5kSnZe0LeErOWXYLNCfxgpFZJDMlxVTee6oet81vLv7tQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aGgrJ60O; arc=none smtp.client-ip=209.85.219.180
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:From:
+	 To:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding; b=EpcS01QnmKkrtIjrb1Vudzta1Kr0rbU2WQ4bCW4AeQBvcLxCRzxs6aKO0p8VoxIeWjf9z1vLqncpde/IgNNxapSve8SJjGs4U/lf2UNW3ZV96FRt/tDQKAWB00dT/O8rRK6hjzyy6h6y6/RzQoArwfVI1gc809u4W8dlIAiqEgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Esr2ID/J; arc=none smtp.client-ip=209.85.210.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aGgrJ60O"
-Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-db3fa47c2f7so10727184276.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jan 2024 08:12:32 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Esr2ID/J"
+Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-6dddb927d02so6333512a34.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jan 2024 09:00:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705594352; x=1706199152; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=P9hZ00FuvjomAxbCz5iGFgtTUw8XjHFqA+smlgd1q2M=;
-        b=aGgrJ60ORy9BdlBQQikUK2QNme2Na++MfKf2+o1ngCo8yGF3rkmkPFg0vuZN34Rfjd
-         4P7ZVpWYYdHRak636FppY7cqKFmj6ViLcPAs7G8b357/6yESlohkYI4SkeIpWScq1XOV
-         mnX0FwqyrgV2krVK8aUiGOILp3NMmZ93SNZc9OYf8M9pObHrp4T3tLueaJ8h0/xKIx9Q
-         UFEydpCQ3mRGwGsDNtz8U1Mluozhz+pdbhbomzPfBDUZWxkHu7N6u8p0f7OAtBJBJYyT
-         hpp10rYJ6oDvA1Rq7dzAxwAw8xB73SxKhUWBxNVgdZr0tZj716A/L0hnEbFth44jmAN4
-         SwoQ==
+        d=gmail.com; s=20230601; t=1705597219; x=1706202019; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5ekUVIXIJBA9FebOAZiiq7ihTlpKtY2z7/oQDbELgHg=;
+        b=Esr2ID/JKGTARe5YKfQPDyl2sEA2mIC6qxAf3DqvY0G1YgbqhgzxEVPsbS3hPcCFrC
+         GOxw1KeifXLw6xsq4Yeww8q698jkZWFTSzDVvmK2XMUx3edP+7BDvU46AhNi3NVhUm3r
+         bMTW/aSxKh5eNYgPQDUxjj+DjWVaZqQ7Nt9x8XrPVGt33mYyMJPpa9CtMvibI4rygIqr
+         l9dOp7Jgff5jbzzbZAoEbR5S4/TYls2WoBTODbne5iPANIKQ3X9YES+k0Gs/aFS9IuRS
+         J34/cKU3Xl0r57Nypno8ew3I/sifeHXQyvOg2PJVtiazN17g6kVtH6XrwOe6H+2mQBhE
+         nZOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705594352; x=1706199152;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=P9hZ00FuvjomAxbCz5iGFgtTUw8XjHFqA+smlgd1q2M=;
-        b=JPe/cXLs0Z36a15eKuYpPZmsBrVETAEvSYQlRC/QqzIibG63QqiJfMxfb/IpBAExjA
-         tfgkRdCn0V42+82J4ceQJ2J5aqB7q8jy4qlH8cvmf3/xjTqzp1i2IYjXU6VgeFI60Pd1
-         ASsjeLj7vqoXTbZSkUiG9n2mb3SySR2+I8cNVe/t3/yCNuYhhj9gcJpLpwup/Zh2qGmL
-         x/OuRpHwqExM9IGAbWen8xr0yYk8rcFntOB6/TuE0qS1wLiWZnWO2wuzeMlzzfXfC/TZ
-         ajLoexCyex75ZdQR9+3GssEGZP8pt2RDUS9K0IXM06PBlGzENcEY1SXdFYfsXOYBfPow
-         C7rQ==
-X-Gm-Message-State: AOJu0YyVCMrEZ9ixlAfAqzcuQikBmhYmfLvn1ElZdQeLc9BmppYdMgbx
-	6QFhMN8jhflSDnJuCmEsjQtzpSVb3MXFe+0MNXkn8n1UkyA8T1aj8PosRcS7Nezyf7IBr60elrB
-	1wHG0Wi/g+MGIj5Nj219+c42LHtAHIF/eF0o=
-X-Google-Smtp-Source: AGHT+IHMFspci5xJi196WPYYnEp7XcBUFXoLYsEx1qLdXvnP8AtxRLPUj9Z8myzIYeAWI5yaeyKLO+k8tlg4dFSxYyI=
-X-Received: by 2002:a25:ab32:0:b0:dbe:d3ef:d54b with SMTP id
- u47-20020a25ab32000000b00dbed3efd54bmr800340ybi.93.1705594351899; Thu, 18 Jan
- 2024 08:12:31 -0800 (PST)
+        d=1e100.net; s=20230601; t=1705597219; x=1706202019;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5ekUVIXIJBA9FebOAZiiq7ihTlpKtY2z7/oQDbELgHg=;
+        b=MaHpHMtM4eCI0wFpPULGDDS75GknL+ui7LWk5qKMbL5TvFb9+8eBqh+SqspcV5Fb8t
+         9IYWbBehOUNzdI2D96uoIphs8VRuFhtC3FdJ3QmGz28i9Gubs9Wz4VgE9kWyVNsgPo1v
+         vRKlh2xWIKHxyLuWAQrRqXJ2LHvhz9+fQn46CyF+AjWc31LpFaIKq/2HfQ0YU6u/Ghqx
+         87zhL+EGx09tAqhGr+CifbXi5wB/tSUkYKVuKjnVd5ocofyKauLuTGSqWdWPHWUGD1Dx
+         JPM6hrk9LC1jfoCzl/Uz9FZ0HHfwlTO5gSfe7EOifbuU61UGXEhf0P+yFLoIerCzsozO
+         RqiA==
+X-Gm-Message-State: AOJu0YxDIC1QoxH5dxW8fi6stPpS3S5K3773kZY1XvocCL18n4g8G+vY
+	5nCXDHgEygVK1to6BzrVpI0U+UyX7zUjRUMW63oA490px7a0NDkRv85RfkDM
+X-Google-Smtp-Source: AGHT+IHh8gzY26igQKgkMF02B9OxvTk2oI2xt+D4wqhYUNEXs2M0JPUZTZke2QAxPtBrToleqTUSKg==
+X-Received: by 2002:a9d:4f09:0:b0:6e0:d870:9fe9 with SMTP id d9-20020a9d4f09000000b006e0d8709fe9mr377772otl.43.1705597218990;
+        Thu, 18 Jan 2024 09:00:18 -0800 (PST)
+Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
+        by smtp.gmail.com with ESMTPSA id bg12-20020a056830360c00b006ddc277db46sm281302otb.34.2024.01.18.09.00.17
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Jan 2024 09:00:18 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] player: Fix endpoint.config for broadcast
+Date: Thu, 18 Jan 2024 12:00:16 -0500
+Message-ID: <20240118170016.2001865-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240116-autofoo-v1-0-626f6b54bd06@gmail.com> <20240116-autofoo-v1-4-626f6b54bd06@gmail.com>
- <CABBYNZJUhmVUNGTsqspc3S802pDwikFf2YOPupESD1m5T-GsJw@mail.gmail.com> <CACvgo505kkEr+SZV587XCGoaFKYo=17zgbvHLrv=UJLp5JRLiQ@mail.gmail.com>
-In-Reply-To: <CACvgo505kkEr+SZV587XCGoaFKYo=17zgbvHLrv=UJLp5JRLiQ@mail.gmail.com>
-From: Emil Velikov <emil.l.velikov@gmail.com>
-Date: Thu, 18 Jan 2024 16:12:20 +0000
-Message-ID: <CACvgo5064TQ5qwNiBgpc5BcdnHWoD7xEc45ZyR_PcexKwubR2A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 04/10] build: remove dummy {conf,state}{dir,_DATA}
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, Emil Velikov <emil.velikov@collabora.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Wed, 17 Jan 2024 at 08:39, Emil Velikov <emil.l.velikov@gmail.com> wrote:
->
-> On Tue, 16 Jan 2024 at 18:40, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->
-> >
-> > This one seems to be causing some build regression, when trying to
-> > apply it breaks the builds.
-> >
->
-> Thanks for the quick feedback Luiz.
->
-> Would be happy to help but need some details:
->  - configure options used
->  - autoconf, make, gcc(?) version
->  - the error log
->
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Just went through all the patches and they apply and build just fine.
-Both in terms of "./bootstrap-configure && make distcheck" as well as
-the Arch specific configure options as seen here [1].
+endpoint.config where taking different arguments for broadcast which is
+not recommended with shell as it doesn't support such a thing.
 
-Any pointers about the issue you're seeing and the platform in
-question would be appreciated.
+So instead of taking different arguments for broadcast both remote and
+local endpoints shall be passed but in case of broadcast sync both the
+remote and the local endpoint actually refer to the same endpoint
+registered by bluetoothctl:
 
-Thanks again,
-Emil
+endpoint.config /org/bluez/hci0/pac_bcast0 /local/endpoint/ep2 16_2_1
+---
+ client/player.c | 36 ++++++------------------------------
+ 1 file changed, 6 insertions(+), 30 deletions(-)
 
-[1] https://gitlab.archlinux.org/archlinux/packaging/packages/bluez/-/blob/main/PKGBUILD?ref_type=heads
+diff --git a/client/player.c b/client/player.c
+index cd06ffd41c82..eff35ff87a00 100644
+--- a/client/player.c
++++ b/client/player.c
+@@ -3972,10 +3972,6 @@ static void cmd_config_endpoint(int argc, char *argv[])
+ {
+ 	struct endpoint_config *cfg;
+ 	const struct codec_preset *preset;
+-	const struct capabilities *cap;
+-	char *uuid;
+-	uint8_t codec_id;
+-	bool broadcast = false;
+ 
+ 	cfg = new0(struct endpoint_config, 1);
+ 
+@@ -3990,33 +3986,14 @@ static void cmd_config_endpoint(int argc, char *argv[])
+ 	/* Search for the local endpoint */
+ 	cfg->ep = endpoint_find(argv[2]);
+ 	if (!cfg->ep) {
+-
+-		/* When the local endpoint was not found either we received
+-		 * UUID, or the provided local endpoint is not available
+-		 */
+-		uuid = argv[2];
+-		codec_id = strtol(argv[3], NULL, 0);
+-		cap = find_capabilities(uuid, codec_id);
+-		if (cap) {
+-			broadcast = true;
+-			cfg->ep = endpoint_new(cap);
+-			cfg->ep->preset = find_presets_name(uuid, argv[3]);
+-			if (!cfg->ep->preset)
+-				bt_shell_printf("Preset not found\n");
+-		} else {
+-			bt_shell_printf("Local Endpoint %s,"
+-				"or capabilities not found\n", uuid);
+-			goto fail;
+-		}
++		bt_shell_printf("Local Endpoint %s not found\n", argv[2]);
++		goto fail;
+ 	}
+ 
+-	if (((broadcast == false) && (argc > 3)) ||
+-		((broadcast == true) && (argc > 4))) {
+-		char *preset_name = (broadcast == false)?argv[3]:argv[4];
+-
+-		preset = preset_find_name(cfg->ep->preset, preset_name);
++	if (argc > 3) {
++		preset = preset_find_name(cfg->ep->preset, argv[3]);
+ 		if (!preset) {
+-			bt_shell_printf("Preset %s not found\n", preset_name);
++			bt_shell_printf("Preset %s not found\n", argv[3]);
+ 			goto fail;
+ 		}
+ 
+@@ -4435,8 +4412,7 @@ static const struct bt_shell_menu endpoint_menu = {
+ 	{ "unregister",   "<UUID/object>", cmd_unregister_endpoint,
+ 						"Register Endpoint",
+ 						local_endpoint_generator },
+-	{ "config",
+-		"<endpoint> [local endpoint/UUID] [preset/codec id] [preset]",
++	{ "config",       "<endpoint> [local endpoint] [preset]",
+ 						cmd_config_endpoint,
+ 						"Configure Endpoint",
+ 						endpoint_generator },
+-- 
+2.43.0
+
