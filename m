@@ -1,91 +1,156 @@
-Received: from out203-205-221-221.mail.qq.com (out203-205-221-221.mail.qq.com [203.205.221.221])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA4F03D6C;
-	Thu, 18 Jan 2024 04:58:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.221
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EB6363B5
+	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jan 2024 05:32:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705553896; cv=none; b=Rq+Eeg9he5ZUNJM1KwLAQqmMMT7gNkJgz6PxGCmeUBCefdXeAyEzTuTTB1towGwh5y9CGtjCzt9Zn13LktKHpW5bZzowHS/L1+3H35ZTifw33Cp9EmkEGdWu/ty0oBH6e5B0WpSbtbNwflk68LhZLffdF3AjU3LmqzQtkLphvLc=
+	t=1705555970; cv=none; b=REu7Adw6D+0GVoF5Lf6iPbbCQlO3uqQAyyzhOdjrAplzg9hfFynXYZXD2Kt8gpYIeilW8gt1nrZd9wKtJtMVU6u6qgQpsWt31+ZECvXU9GK696g4QcoHAudnbvyhgv1bUZXGMkpmuSA+egb5s4ZaMYRChplDfYlnLHqa2Ohg3jQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705553896; c=relaxed/simple;
-	bh=Enl4F/akVXu5Cq2ueP176UiXDsjrybD4PWXMg0yfJ4Y=;
-	h=DKIM-Signature:Received:X-QQ-mid:Message-ID:X-QQ-XMAILINFO:
-	 X-QQ-XMRINFO:From:To:Cc:Subject:Date:X-OQ-MSGID:X-Mailer:
-	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding; b=YYFZmAALzgJ3TW4LY2AmGR/oYQ3RXi6ccVILQ+PEuXeFNcNxezKYXyo2yST9vuv0ahruJTYNRzbz9tB7b2XoiNDmhASNzdov0KbUdYagzLMgX+pcfELqXy8mhVg2WPNK1EiFwhli2OQlIFMJOIHdKuKFVfzNnnv7+CfMiK0egaw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=a8hAjkVp; arc=none smtp.client-ip=203.205.221.221
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+	s=arc-20240116; t=1705555970; c=relaxed/simple;
+	bh=yjAUoPhEIso6F+wueJbfiUo9Fg/KjbRwTP6GKcfPxYM=;
+	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:
+	 Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References:Reply-To; b=FNvIDZH51cpsBjaTR7ojBRj0o3ChII3/nmqXMac12zYfhXnnAKdF0uUdF3UPP/dCidHLEQTyeBrbFe+MPEjfyaMsHrZvpu4JPLAbP9PI46tnltpl1CXXOrctGvEwg9eotZ1V79cpATrfbU+egu1G5xcqEKDSHcTYuvnUUYz5IDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kmL1o4xz; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="a8hAjkVp"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1705553884; bh=RAcCICA1Zz6E2TBNavQSqyXxNAe1IfYeVh+Uvv0M0Ig=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=a8hAjkVpw7muk2ucVJs65RnTdWM6kqFuMUDeJJIWlpeYh8Cr3BfOT1aK/oQ7JWDl4
-	 eVsseptnVue1csEz8ECyrKTmzzZUNoFIY/MxJD2qOK43FmvpTJ2md41hHfN4xfnFpk
-	 XzXCMwMtdfIT3i8bNZxufKI6gZRFeCdJEKoFIp/w=
-Received: from pek-lxu-l1.wrs.com ([111.198.225.215])
-	by newxmesmtplogicsvrszc5-2.qq.com (NewEsmtp) with SMTP
-	id A218DC1C; Thu, 18 Jan 2024 12:40:33 +0800
-X-QQ-mid: xmsmtpt1705552833tcwpxxo9g
-Message-ID: <tencent_E60894D8E85AEEF2CD9C787A6CA82F656C0A@qq.com>
-X-QQ-XMAILINFO: MZ4XH1L85f1rlctwBaD/nu/jdJXs1x///trxCnpkc7YEFIa28ZB3LXM8oQfCay
-	 XAPeHFddTXlV4E+UD+92hGm2/h0GNdeHJ3zsZd12OLWYU+QU8A78QHyrN53pRMq4ND3GvtNcbRoS
-	 YfvTH8+nsvKLo3Y3kFTYRnYOk6xQl8vxfjf41nqmWPIUALgkus5noCMBULsdM6a3flnQgepzqgIm
-	 Nf5g0/j0aRRkTKN1sdrJ8/VREgoqvx2ckWxziXGMNvlnVH+F5DB914IdGoYqt7fkonXU4FBwaMle
-	 1YU6AZR3fpng+ABhmB1TcEd0UTTTXE+PymvnKX4vAjTECvd6ww1Xe9hRHnMEcF/MhHIIjoJ4GiSn
-	 Cady/+i4CmeakJ0gMmvpK/0b02XF0bJfNIU5IcwSQJbuNeS2ksiZtLW35vfwFhi27Nf4vapddic3
-	 7c4JuUAtEJFteul1T1Bit40MqUihg/JKGvf+D8ahhtjJTQt2mxlwOtE5VDbtG2laGYh/2w8OaC4N
-	 Hm+zJbJuR529UQInC1aVdUCZ4zp26KL5QulSscURrc72MtEoeKZrAt8Nw+bBlB/ML5/jHi5UYDzp
-	 uRZxEb3BX+GiW1O/gv6njz927vAriNHCihL84HaW74pnSXIb4Y6rMAakwrV5bNrDTq//kuCo7hsC
-	 22AMz/d5YYKfnjLadRg+0krJhDxzx1JbzOnkEzIjpnBtku8o5EQ3bgnvoXvZ16c4+s/G+ngXsD4c
-	 qD5opnOurJ8A6Buo7JnnlpONvntGwzHejB2iuHxlRAlArssrdJcFuaOZphhd3qKBQZWRCiWELkTV
-	 bh/3TIQBg0kRQnUiyw59wKz4LdRmM0tbzNPRTpnc+e3DMOUpPeP8FITzYC0vKWYyc8RvvYbOuofB
-	 8UbISZAGUTUj8ECWEB3uKUoasX7MbVZvEWBsh9w93GdVz60p98B5enWKo3C12vSRtU7Fs5fZk5
-X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
-From: Edward Adam Davis <eadavis@qq.com>
-To: syzbot+830d9e3fa61968246abd@syzkaller.appspotmail.com
-Cc: johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	luiz.dentz@gmail.com,
-	marcel@holtmann.org,
-	syzkaller-bugs@googlegroups.com
-Subject: [PATCH next] bluetooth/btintel: fix null ptr deref in btintel_read_version
-Date: Thu, 18 Jan 2024 12:40:34 +0800
-X-OQ-MSGID: <20240118044033.2908229-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <000000000000cde441060f230f4f@google.com>
-References: <000000000000cde441060f230f4f@google.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kmL1o4xz"
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-429b76f129eso42412231cf.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jan 2024 21:32:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705555968; x=1706160768; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=IWTM0Kj8dkhDI0fAVDiDDraUX/SLIgacD876qLOEK3M=;
+        b=kmL1o4xzZCfvEz/SpCBq960ya3JVmFhC91eUL7BKnev4tfnylVNKGTwP6srySUYe2V
+         aYBIN1eUqM6WrLp0YwIB0IWLNI4LTST454sXqT1FA7J5t0h1+l4l1MnFg4DF4y+5MOf+
+         Xhmgiqg0hwGzBgNJpVlLQbcriXC72S31PUptx5y2UhYJRqHTFcltnSKlTn3Sc1MjJotS
+         RFtdM4tKLdz38b8aww3gAm6xHTUhvMS4hQpPuH5c146gJCOsCD8KFqYUAEuehjSZh7cr
+         +Mb6wLIaGibWw29tXJVB2sojJ3zEDKDTvest+0NIMqijyxyQ3sdZ49AGI0+VjE8dD6ka
+         gpbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705555968; x=1706160768;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IWTM0Kj8dkhDI0fAVDiDDraUX/SLIgacD876qLOEK3M=;
+        b=YvuBIxcktDymWaWbBNTExvazcaruDkcpeC0MSFsuDETbBMMx2A6q3p9O9P2TaWi9PV
+         OuXq2BkqAmkYWLV4s2HGmLRntyLD5QEqWjBFXtePsWRPmT7I3xT6WvWARkNAM9myz/g1
+         BRzaBexWqdodExNHX4w7ztt3h3fOF8gZa8XqxXvPQtHoWSmXkp1VKWjNrMd/SIfHIrR3
+         2n9G2DDKwLnol8FN7NvTcnYSA+9VgZ+DkpP+7A45emxpoT2u8uqSOcIB3mdTyze5U877
+         auLIOOp9SHXeHIULoyuFaHi39190aWbsfazvV8i/V1J2Pkv83y6H5B4kHrZ5x8S7bs/i
+         Xpxw==
+X-Gm-Message-State: AOJu0YwXzM7VcBPX2r6R5/2QWUEv40nCNvq8UEwoT9IgGpmQ3Tev/fTE
+	mWRH9m0H5KV3UqsVgbru672cmDTqR+vfa6u3iv2sae6o/DaDwuMYSWUiza+f
+X-Google-Smtp-Source: AGHT+IFsdq2CcDSrNmOGgdxzDgYfsO/CqKnCjLO/A6OwGqmLz/yhDWxwEgBj5ASYVhev+6kqIieQSQ==
+X-Received: by 2002:ac8:5c81:0:b0:42a:a7:7b40 with SMTP id r1-20020ac85c81000000b0042a00a77b40mr329007qta.30.1705555967918;
+        Wed, 17 Jan 2024 21:32:47 -0800 (PST)
+Received: from [172.17.0.2] ([172.183.161.204])
+        by smtp.gmail.com with ESMTPSA id f10-20020a05620a20ca00b007832961ff29sm5039634qka.4.2024.01.17.21.32.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Jan 2024 21:32:47 -0800 (PST)
+Message-ID: <65a8b7ff.050a0220.1220f.8571@mx.google.com>
+Date: Wed, 17 Jan 2024 21:32:47 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3234152954063464470=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, eadavis@qq.com
+Subject: RE: [next] bluetooth/btintel: fix null ptr deref in btintel_read_version
+In-Reply-To: <tencent_E60894D8E85AEEF2CD9C787A6CA82F656C0A@qq.com>
+References: <tencent_E60894D8E85AEEF2CD9C787A6CA82F656C0A@qq.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
+--===============3234152954063464470==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=817714
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.93 seconds
+GitLint                       FAIL      0.92 seconds
+SubjectPrefix                 FAIL      0.35 seconds
+BuildKernel                   PASS      27.62 seconds
+CheckAllWarning               PASS      30.64 seconds
+CheckSparse                   PASS      35.85 seconds
+CheckSmatch                   PASS      98.80 seconds
+BuildKernel32                 PASS      27.17 seconds
+TestRunnerSetup               PASS      434.34 seconds
+TestRunner_l2cap-tester       PASS      22.86 seconds
+TestRunner_iso-tester         PASS      47.19 seconds
+TestRunner_bnep-tester        PASS      6.79 seconds
+TestRunner_mgmt-tester        PASS      155.13 seconds
+TestRunner_rfcomm-tester      PASS      10.67 seconds
+TestRunner_sco-tester         PASS      14.34 seconds
+TestRunner_ioctl-tester       PASS      12.04 seconds
+TestRunner_mesh-tester        PASS      8.75 seconds
+TestRunner_smp-tester         PASS      9.62 seconds
+TestRunner_userchan-tester    PASS      8.21 seconds
+IncrementalBuild              PASS      25.88 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[next] bluetooth/btintel: fix null ptr deref in btintel_read_version
+WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
+#83: 
 If hci_cmd_sync_complete() is triggered and skb is NULL, then hdev->req_skb is NULL,
-which will cause this issue.
 
+WARNING: Reported-by: should be immediately followed by Closes: with a URL to the report
+#86: 
 Reported-and-tested-by: syzbot+830d9e3fa61968246abd@syzkaller.appspotmail.com
 Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+
+total: 0 errors, 2 warnings, 8 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13522361.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[next] bluetooth/btintel: fix null ptr deref in btintel_read_version
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+3: B1 Line exceeds max length (84>80): "If hci_cmd_sync_complete() is triggered and skb is NULL, then hdev->req_skb is NULL,"
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
+
+
 ---
- drivers/bluetooth/btintel.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index cdc5c08824a0..e5b043d96207 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -435,7 +435,7 @@ int btintel_read_version(struct hci_dev *hdev, struct intel_version *ver)
- 	struct sk_buff *skb;
- 
- 	skb = __hci_cmd_sync(hdev, 0xfc05, 0, NULL, HCI_CMD_TIMEOUT);
--	if (IS_ERR(skb)) {
-+	if (IS_ERR_OR_NULL(skb)) {
- 		bt_dev_err(hdev, "Reading Intel version information failed (%ld)",
- 			   PTR_ERR(skb));
- 		return PTR_ERR(skb);
--- 
-2.43.0
 
+--===============3234152954063464470==--
