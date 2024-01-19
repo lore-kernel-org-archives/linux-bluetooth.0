@@ -1,104 +1,90 @@
-Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 835E654667
-	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Jan 2024 16:08:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6D04374E0
+	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Jan 2024 20:36:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705680494; cv=none; b=DtESxnRgOyYI0ydQmpqbjCSosj7a0mt7XFcir7nHOSgFKNbuXFtuR0Ng+LRk9aa6RtYJEORLLVyX0sY3EgsZ5ueP1upIR2O1NWDkoFpFz8fgM5dy0yfz3iApvKjyyn/TTEIS4hX1MHnr7oMgiW9U4CYOEdEvLp2b9qSjvUPcG2c=
+	t=1705696607; cv=none; b=IMe4BWzCBkFeChLAZRl7wasAP/h0opyrwxYLB+/5X3VBDISpM3kMvSRdTN6cB+1txSp78FblrZ30Gz9b0nKwKeNygl0Pj6bvBhIO+nnuk9e5HEvxNX2afDhWKEN+bVV8KdPHT3q1hgZF300JkNRqsRuazldZSc+o2bLm/6YhTQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705680494; c=relaxed/simple;
-	bh=VXpkTIh/yAbV4ah5j5h2sVRpL2Nx4CHVkR9Wsaj/ph0=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=UnBLX8CfZqqBYNcodWifLNZzh/bODQyeM4g8yk2IauL+fCcWs6qLR//SFZkjvk/LrqmmOshgXIhy8SQoX4r6bU+yKn9ArRWHp80aHmWlXKyElFqiQh+fL+2LuhPLSGdokn2xv7Pe5Tjq0kK81Eq5WvbotX932Upw/uMg6Hr+n5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MWGpBQhx; arc=none smtp.client-ip=209.85.160.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1705696607; c=relaxed/simple;
+	bh=qxBf3Iba6sMjaYQKCG6GEjxB1gRUXL4TS0Sx1MdnIL8=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=dzLV98XIKn8R6yYOs7tcgf81t5sufhcJ8mfkaQW4TfJ+Ky0e0HXKB2D8imcpLo7PCKxtFVa5FVo8N1L9qBY/3E4Umw28h5ny9NOmnxLa7h7yLWGzshb3KowKodkIasTNmpXmjizD9oY/vdBeIXbz1BCd4VCuQZnz3gvEXK6XimA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=lsbY/pO+; arc=none smtp.client-ip=192.30.252.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MWGpBQhx"
-Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-210dec2442eso288094fac.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Jan 2024 08:08:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705680492; x=1706285292; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=q+h/f5yVfrt/abEQLpLlmJSJH7DasxWkEPuqh9PQ1Vs=;
-        b=MWGpBQhxpNO15fRQ/H0UHczI7Yb7HzzVy+35Rl1DA6MvB9KriozN/uqxpHq9zQE4+M
-         /xAaXghfzoYjCG99qyOrs05VmvGNb7H8XcKtqFhjygOSOS4qZ63OOyb7l8jcjZHeeUuu
-         60+YLJR4sIlRDmS2bw50pZ8PtsEF6fZWGgTB0OjZ2OiDqjR6Up/oA0rS+6fALJi9R4K3
-         40z8hkt435CobiwgK3QVZzeQOF5aEY8o6PXeByR2Lx7FtpqW0kgaqr1ABdYxK4JxrsZZ
-         avYIfECogyOW4giIqfkjRDSNY8xNylh+zDZ5Y6drk/lbeHnGrCQDu/H4yDS4VvD9Hvzw
-         whHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705680492; x=1706285292;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=q+h/f5yVfrt/abEQLpLlmJSJH7DasxWkEPuqh9PQ1Vs=;
-        b=Fvgjw+3tP3Sm+ekUgmCUbFxkEpWdyNrHlwueoQSuySInGl9Fv+8clsUe4X6Io7kRW6
-         slxZQ+xtBwphkgi8YpvmztG1t8pmuJLE08vhAMY6hZimzuoIAxuOQF8cQIhDWweNS8C0
-         CPhkzft+PVXLSk8roYlamCjTSbg01dsCdcvsKRDKGLVdptFPA2ssE8HqsOV2KsJDjM8r
-         iO1EH/JMvjNbOBUjl4mf0EGVefLfW9lJd6DK86rWlD7rsxeQMkC9l4+Wo0b0x+WfFdsD
-         Fb6H9EIF4RLiCrpuey4AMBzhKKOo6UveGJadA2latGcmHvk1+Anbf/RLadM5O1um1cqz
-         Epdw==
-X-Gm-Message-State: AOJu0YyNKImpG84OxgnLliCAK9S0jQzyd7SY5Kc6EiVnozXpv0FxdtZ2
-	mYUlEWnFtD4ItrufZIZ14dhTIlB6PxtHwEzBcxHqX8lkL0GEPZEDk+eitzVr
-X-Google-Smtp-Source: AGHT+IGGk1xESvcrnJX49JL+DtpbYiW0/dMlzZKRNAo+zpa0LYtWJ/qWcUKizDhMdWjJAp6baffJZw==
-X-Received: by 2002:a05:6870:2110:b0:210:ac52:bc08 with SMTP id f16-20020a056870211000b00210ac52bc08mr2703068oae.75.1705680492215;
-        Fri, 19 Jan 2024 08:08:12 -0800 (PST)
-Received: from [172.17.0.2] ([20.75.95.37])
-        by smtp.gmail.com with ESMTPSA id od19-20020a0562142f1300b00681841da1casm1218259qvb.50.2024.01.19.08.08.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Jan 2024 08:08:12 -0800 (PST)
-Message-ID: <65aa9e6c.050a0220.2c465.7a4a@mx.google.com>
-Date: Fri, 19 Jan 2024 08:08:12 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4160558022338064379=="
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="lsbY/pO+"
+Received: from github.com (hubbernetes-node-b6b8be6.ac4-iad.github.net [10.52.130.35])
+	by smtp.github.com (Postfix) with ESMTPA id C25AD6411BD
+	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Jan 2024 12:36:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1705696605;
+	bh=I/FE7R9kZH7J33/EgkGgZZOxqS6KD5y0GsD27nm23tY=;
+	h=Date:From:To:Subject:From;
+	b=lsbY/pO+gYLScFTdcssVji3B2mmh6sQG3zxXwdxjcv393Qbt/AYSmBN2oJkIEMBoA
+	 /9vFCWVFuD1Qh+R5R/KvRpWwS83bpPz4DAB+YudIh1QtAMctUtuppis2vsaL1fjFuA
+	 3Xl6y3bAI/HNDVd11zeuroPFTU/WbFxYFqBbImzk=
+Date: Fri, 19 Jan 2024 12:36:45 -0800
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/e108c7-2ef2f1@github.com>
+Subject: [bluez/bluez] 4908e5: player: Fix endpoint.config for broadcast
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com
-Subject: RE: bap: Fix bcast endpoint config
-In-Reply-To: <20240119150443.3163-2-iulia.tanasescu@nxp.com>
-References: <20240119150443.3163-2-iulia.tanasescu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============4160558022338064379==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-This is automated email and please do not reply to this email!
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 4908e58bd1a953d2a48c543d15b246b9f69fddf6
+      https://github.com/bluez/bluez/commit/4908e58bd1a953d2a48c543d15b246b9f69fddf6
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-01-19 (Fri, 19 Jan 2024)
 
-Dear submitter,
+  Changed paths:
+    M client/player.c
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=818149
+  Log Message:
+  -----------
+  player: Fix endpoint.config for broadcast
 
----Test result---
+endpoint.config where taking different arguments for broadcast which is
+not recommended with shell as it doesn't support such a thing.
 
-Test Summary:
-CheckPatch                    PASS      0.48 seconds
-GitLint                       PASS      0.32 seconds
-BuildEll                      PASS      23.89 seconds
-BluezMake                     PASS      714.74 seconds
-MakeCheck                     PASS      11.55 seconds
-MakeDistcheck                 PASS      160.56 seconds
-CheckValgrind                 PASS      222.97 seconds
-CheckSmatch                   PASS      326.48 seconds
-bluezmakeextell               PASS      106.23 seconds
-IncrementalBuild              PASS      670.06 seconds
-ScanBuild                     PASS      937.69 seconds
+So instead of taking different arguments for broadcast both remote and
+local endpoints shall be passed but in case of broadcast source both the
+remote and the local endpoint actually refer to the same endpoint
+registered by bluetoothctl:
 
-
-
----
-Regards,
-Linux Bluetooth
+endpoint.config /org/bluez/hci0/pac_bcast0 /local/endpoint/ep2 16_2_1
 
 
---===============4160558022338064379==--
+  Commit: 2ef2f122e60826ee3f4acff150bbce4cb262eeb3
+      https://github.com/bluez/bluez/commit/2ef2f122e60826ee3f4acff150bbce4cb262eeb3
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-01-19 (Fri, 19 Jan 2024)
+
+  Changed paths:
+    M profiles/audio/bap.c
+    M profiles/audio/transport.c
+
+  Log Message:
+  -----------
+  bap: Fix crash when attempting to setup a broadcast source
+
+This fixes a crash which could be observed with the following commands:
+
+Run bluetoothctl -e:
+> endpoint.config /org/bluez/hci0/pac_bcast0 /local/endpoint/ep2 16_2_1
+> transport.acquire /org/bluez/hci0/pac_bcast0/fd0
+
+
+Compare: https://github.com/bluez/bluez/compare/e108c744fa8d...2ef2f122e608
