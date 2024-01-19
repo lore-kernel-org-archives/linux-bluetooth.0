@@ -1,151 +1,204 @@
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18B8352F94
-	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Jan 2024 15:09:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 276B75467F
+	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Jan 2024 15:12:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705676980; cv=none; b=Vk9j0PrrokOUEM8fiAr+ft1uvnsXGBu5WxKt1q0Is04UqNyIQ3mU/mpbfqDmeNe3DNsXhBBGvitrn7XVKXc/A8ue02Uc1/hdCfdn9nUwINkgY8l2yvjMrYZGGiN72dA1FG7KvKSlgjT98hmqkFOq8iOEYCZsdmjt9zZUio0s4js=
+	t=1705677134; cv=none; b=t1i8eaRU6fIjxR3QFj2d6DWr10m7h8LjKC8yrjNgyGbsVW/ASrDav7zgoGWnG9250dakUT0FU9mE0ZtVgAism8eZB4IDpyb/z+RZ9YKWo2rBzvr227ByljuvATls7qZBkQVdMyBU8ZFF5QDRIA8CrosBMCq1uYoy+knz/g2qlGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705676980; c=relaxed/simple;
-	bh=9UzN+URzc/p2guU7t2PTCqFgXfSU3TYfuJEigfBoJ1o=;
+	s=arc-20240116; t=1705677134; c=relaxed/simple;
+	bh=VeWYgV1pyEyf7jAmLV16uzlDQc1jrQac+asXwi+/gIU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MdhFpgz+bSx9ESKHC+OAZks7e46siI/3YVXrZbOzjR6izNjccLgrT/siWZYPWe5pTK51IgW/ZhXdgILtXhuBofx3klXOGpqRv+l2kVHiKJt0k3HZDe8Z1gedAMvTpMwf43E0i1HskDmJNvTZi4q/bcHaqJwN7oHMh58qODwKAkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PeGmnjPe; arc=none smtp.client-ip=209.85.208.176
+	 To:Cc:Content-Type; b=Ak7H1EPs1flhpWRwM3nF6BhUJFZfFnx1k1sFGvIsPh46VoM2jIglMCcpQqOoXRj4NVmTNBGhQXB6EIu1cgmS9mk7VEA/TOKvbnnjb7AqvuWVd58qEKyNjmIrIS4H0eGGSGGHw3adbLFWlmtXpKw/i6tGT8yReSbSaGa7qQqxMn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jQVGDSHi; arc=none smtp.client-ip=209.85.208.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PeGmnjPe"
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2cda523725bso9900321fa.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Jan 2024 07:09:38 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jQVGDSHi"
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2ccea11b6bbso9041151fa.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Jan 2024 07:12:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705676977; x=1706281777; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1705677131; x=1706281931; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8u40MVN77TrRqeuHpMfY0Z4iNomAP7WhGrTHvLu95Xk=;
-        b=PeGmnjPeKYWTUmXMXgwMvNapSQ0SMg7bsS9WR5BtnnCJVk/FJLRsrlQFQJApa/ARl7
-         dx5yltq4upkMGsAcBGgOxR3bvmeY9eE7ixko2aZtTloR1H/VFtXjs9cPN3h8pbJbYQZV
-         UqbhnHA+HFi+82qAMTOh0yDUodaB/5JyEY4Q9XNZrNsAWPzvTLlrDMvDF7/WXy8TOFFc
-         95Znr82nHQOagMS1z84tAPufzz+pCyDDtDfCjMJvLFIcRoCu8cug2z8aO7q6ahyFI2We
-         18WDqn6KPxG+LHobLs5k2inpUGgEaXazMqR1rrBEq0szF88Hm8BCh/pNtfo9Q3ih0GyL
-         EJqA==
+        bh=dypkvvb1rjZx1eTM7p7HScF6sNLIWiTPsbmKYQYD3Rg=;
+        b=jQVGDSHiMvBTOLZLz+vByRgWSbUEiOgoUYg/zRLe5/1/0uyy1S0BmyIFAdN6HsCdx6
+         yBZUemnFkZ/RPbXd09OwC2fJhOSS9lphQ3/eER1GH1OGLnpovv2bq8h+rsmDzOJvPIqh
+         tw7U8IjKgNOpNuP5SFpo3om98YhvQVsQTFMwfctytZP0R0ncksUg0nvXxO/fiDvIWU85
+         6TGKKUGAY+u3mERAQTIgk3QfhoLXRMWjqdS3UO+vTlCW2OmeQYMTACWtd8xIzvYcmW6w
+         DraSf/a9kAyE1teQdti9ac4z4wBTzLyQuuxJjoAX/OpAhzCYbWTovdoyL9yNj8GkC21i
+         igKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705676977; x=1706281777;
+        d=1e100.net; s=20230601; t=1705677131; x=1706281931;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8u40MVN77TrRqeuHpMfY0Z4iNomAP7WhGrTHvLu95Xk=;
-        b=xO8fFp0Vr/2ZfguF7ucY8RJX2XKxSFanBpATDO4dBRwjr2/tKaLpX+Xn8rh+F/boOQ
-         ExUj2m5y19e7wLCcOTqeafPaWBT28/URGl4Ni396mRo30yLkpXc2Mg0Y7lOdty14r8Hd
-         mbF5I6rfEr+/aaHgIveqrhLIxyrXnhKsqejyJzlUfS78B/F6/RdQ/gIhthJs5OBz7Z4L
-         atNk6+/walACYQ9Z9Da3c/zYV2CwbSGubN1/gkNj3LbQADoT+lESGhffJVtaRspx4AWr
-         uqdoXjQMcNCrVsx1RY1DLhHytOLG/UDOaOEY77NYyClEIxcuSeH0yM82/zF0hTcibmR5
-         Zxzg==
-X-Gm-Message-State: AOJu0Yy5bDVVYFWKwC+/MipX6DxZ82SmVeo8ESUWFdBLPJAsCILxBsYn
-	1PM+D/4lteUNKArEtdimvuv+ah7W4I5cz2uNGYjeP/C0pD/1FAdmGFvifnELRhUbVri9BlVD4n4
-	aMp9vodaf9XIXnGKY/8D6T6SLczVcCcPd
-X-Google-Smtp-Source: AGHT+IEUJzoEGkcEvUB6DWJciGQ3uku6yuQLvlM8cEO0iXHMGgmzm6tl6c1sNRigvZ+4CDQvK5rZGda+i9IFXCQ51cY=
-X-Received: by 2002:a2e:8682:0:b0:2cd:eee1:292 with SMTP id
- l2-20020a2e8682000000b002cdeee10292mr941880lji.44.1705676976724; Fri, 19 Jan
- 2024 07:09:36 -0800 (PST)
+        bh=dypkvvb1rjZx1eTM7p7HScF6sNLIWiTPsbmKYQYD3Rg=;
+        b=K/hjXgx9LIWIg+ild2uDin9EQWpC3tmvCizEZP6R5+3IuijI+tETKbxUfg4exmsD3b
+         3/U+Tx5Gss+1rLquTzCGlw3RzBTKyQUqBKSGuELzaQDM4Ka3h6TKLvwayRep/N+2MQ+x
+         NfbQcalkmRP81Vh+Zu0ONmHRiVnoH4YQlJG55MF0+qhlzwa729x/t7pAIW1vWKkerUQJ
+         Y3jz1zlMJxSgCM02oVxjo0/+Hv9y9bNJTsQa4ONVjXbdJ8T74ABog9eWrBBKJjVHzxtR
+         khFgJFiYxFBMDqGhm4SbaRqrmJ6jJzhLr9UGHgzp9iXO6mzxOls7lUxlXKBS9FrT2XEi
+         tjnA==
+X-Gm-Message-State: AOJu0YzbL4ohqfNSfDy4SVxLMpovYN9GAIngro+27iDJXjAmqfHuZfzH
+	iHbeZcj+lTfyvUeTKDxyTIAQGU0U6yOtIXz7hU9Sy4/3VqYWMn6PVpNMH57bDtjjzGSCprxiV7l
+	xsrEnGWtPA/bR+TnvEv9UoNg2U14K03Cgcak=
+X-Google-Smtp-Source: AGHT+IFz+TUvBreiPegxHvCNXo/OLPbpimufLyLoKnWu3zeU509LMyBUvWFri85oqBUmh1+/0a/E+gmcdGUJJz3IIn8=
+X-Received: by 2002:a2e:bcc2:0:b0:2cd:8ec5:87d2 with SMTP id
+ z2-20020a2ebcc2000000b002cd8ec587d2mr31238ljp.0.1705677131081; Fri, 19 Jan
+ 2024 07:12:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240116-autofoo-v1-0-626f6b54bd06@gmail.com> <20240116-autofoo-v1-4-626f6b54bd06@gmail.com>
- <CABBYNZJUhmVUNGTsqspc3S802pDwikFf2YOPupESD1m5T-GsJw@mail.gmail.com>
- <CACvgo505kkEr+SZV587XCGoaFKYo=17zgbvHLrv=UJLp5JRLiQ@mail.gmail.com>
- <CACvgo5064TQ5qwNiBgpc5BcdnHWoD7xEc45ZyR_PcexKwubR2A@mail.gmail.com>
- <CABBYNZJckSdAfMziUsMTmjnoGDj+9GOxsn29XPpZ5+ikrNUd4Q@mail.gmail.com> <CACvgo53grTEzKyTudZbRiHAc6c4DM99v7pCKs8rHZg1P3BUrvw@mail.gmail.com>
-In-Reply-To: <CACvgo53grTEzKyTudZbRiHAc6c4DM99v7pCKs8rHZg1P3BUrvw@mail.gmail.com>
+References: <20240119150443.3163-1-iulia.tanasescu@nxp.com> <20240119150443.3163-2-iulia.tanasescu@nxp.com>
+In-Reply-To: <20240119150443.3163-2-iulia.tanasescu@nxp.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 19 Jan 2024 10:09:23 -0500
-Message-ID: <CABBYNZJ248tr43rSp6jHD4ZwCvJsWbQ+irT9Cpx_+MB5r0iC_w@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 04/10] build: remove dummy {conf,state}{dir,_DATA}
-To: Emil Velikov <emil.l.velikov@gmail.com>, Tedd Ho-Jeong An <tedd.an@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org, Emil Velikov <emil.velikov@collabora.com>
+Date: Fri, 19 Jan 2024 10:11:58 -0500
+Message-ID: <CABBYNZJduvCkv3F5VNJDmUn1sBDAvV5uXFaTOskc0Feg0xU14w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/1] bap: Fix bcast endpoint config
+To: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com, 
+	mihai-octavian.urzica@nxp.com, silviu.barbulescu@nxp.com, 
+	vlad.pruteanu@nxp.com, andrei.istodorescu@nxp.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Emil, Tedd,
+Hi Iulia,
 
-On Fri, Jan 19, 2024 at 6:09=E2=80=AFAM Emil Velikov <emil.l.velikov@gmail.=
-com> wrote:
+On Fri, Jan 19, 2024 at 10:04=E2=80=AFAM Iulia Tanasescu
+<iulia.tanasescu@nxp.com> wrote:
 >
-> On Thu, 18 Jan 2024 at 17:05, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Emil,
-> >
-> > On Thu, Jan 18, 2024 at 11:12=E2=80=AFAM Emil Velikov <emil.l.velikov@g=
-mail.com> wrote:
-> > >
-> > > On Wed, 17 Jan 2024 at 08:39, Emil Velikov <emil.l.velikov@gmail.com>=
- wrote:
-> > > >
-> > > > On Tue, 16 Jan 2024 at 18:40, Luiz Augusto von Dentz
-> > > > <luiz.dentz@gmail.com> wrote:
-> > > >
-> > > > >
-> > > > > This one seems to be causing some build regression, when trying t=
-o
-> > > > > apply it breaks the builds.
-> > > > >
-> > > >
-> > > > Thanks for the quick feedback Luiz.
-> > > >
-> > > > Would be happy to help but need some details:
-> > > >  - configure options used
-> > > >  - autoconf, make, gcc(?) version
-> > > >  - the error log
-> > > >
-> > >
-> > > Just went through all the patches and they apply and build just fine.
-> > > Both in terms of "./bootstrap-configure && make distcheck" as well as
-> > > the Arch specific configure options as seen here [1].
-> > >
-> > > Any pointers about the issue you're seeing and the platform in
-> > > question would be appreciated.
-> > >
-> > > Thanks again,
-> > > Emil
-> > >
-> > > [1] https://gitlab.archlinux.org/archlinux/packaging/packages/bluez/-=
-/blob/main/PKGBUILD?ref_type=3Dheads
-> >
-> > /usr/bin/ld: /usr/lib/gcc/x86_64-linux-gnu/
-> > 9/../../../x86_64-linux-gnu/Scrt1.o: in function `_start':
-> > (.text+0x24): undefined reference to `main'
-> > collect2: error: ld returned 1 exit status
-> > make[1]: *** [Makefile:5864: mesh/bluetooth-meshd] Error 1
-> > make[1]: *** Waiting for unfinished jobs....
-> > make: *** [Makefile:4674: all] Error 2
-> >
-> > This might be due to using scan-build, anyway CI also run into the same=
- problem:
-> >
+> This updates the way broadcast is differentiated from unicast
+> at endpoint configuration: Instead of checking if setup->base
+> is allocated, check lpac type.
 >
-> Might be version/platform specific - `scan-build make -j2` works just
-> fine here. What are you using - distro, autoconf, clang/scan-build
-> version?
+> ---
+>  profiles/audio/bap.c | 39 ++++++++++++++++++---------------------
+>  1 file changed, 18 insertions(+), 21 deletions(-)
 >
-> > https://github.com/BluezTestBot/bluez/pull/2010#issuecomment-1893971347
-> >
+> diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
+> index b88876485..137ed7d39 100644
+> --- a/profiles/audio/bap.c
+> +++ b/profiles/audio/bap.c
+> @@ -4,7 +4,7 @@
+>   *  BlueZ - Bluetooth protocol stack for Linux
+>   *
+>   *  Copyright (C) 2022  Intel Corporation. All rights reserved.
+> - *  Copyright 2023 NXP
+> + *  Copyright 2023-2024 NXP
+>   *
+>   *
+>   */
+> @@ -617,15 +617,16 @@ static int parse_bcast_qos(const char *key, int var=
+, DBusMessageIter *iter,
+>         return 0;
+>  }
 >
-> Hmm, I was wondering where the bot lives. Will take a closer look.
+> -static int parse_qos(DBusMessageIter *iter, struct bt_bap_qos *qos,
+> -                       struct iovec **base)
+> +static int parse_qos(DBusMessageIter *iter, uint8_t pac_type,
+> +                               struct bt_bap_qos *qos)
+>  {
+>         DBusMessageIter array;
+>         const char *key;
+>         int (*parser)(const char *key, int var, DBusMessageIter *iter,
+>                         struct bt_bap_qos *qos);
+>
+> -       if (*base)
+> +       if ((pac_type =3D=3D BT_BAP_BCAST_SOURCE) ||
+> +               (pac_type =3D=3D BT_BAP_BCAST_SINK))
+>                 parser =3D parse_bcast_qos;
+>         else
+>                 parser =3D parse_ucast_qos;
+> @@ -656,9 +657,9 @@ static int parse_qos(DBusMessageIter *iter, struct bt=
+_bap_qos *qos,
+>         return 0;
+>  }
+>
+> -static int parse_configuration(DBusMessageIter *props, struct iovec **ca=
+ps,
+> -                               struct iovec **metadata, struct iovec **b=
+ase,
+> -                               struct bt_bap_qos *qos)
+> +static int parse_configuration(DBusMessageIter *props, uint8_t pac_type,
+> +                               struct iovec **caps, struct iovec **metad=
+ata,
+> +                               struct iovec **base, struct bt_bap_qos *q=
+os)
+>  {
+>         const char *key;
+>         struct iovec iov;
+> @@ -686,6 +687,12 @@ static int parse_configuration(DBusMessageIter *prop=
+s, struct iovec **caps,
+>
+>                         util_iov_free(*caps, 1);
+>                         *caps =3D util_iov_dup(&iov, 1);
+> +
+> +                       /* Currently, the base iovec only duplicates
+> +                        * setup->caps. TODO: Dynamically generate
+> +                        * base using received caps.
+> +                        */
+> +                       *base =3D util_iov_dup(*caps, 1);
+>                 } else if (!strcasecmp(key, "Metadata")) {
+>                         if (var !=3D DBUS_TYPE_ARRAY)
+>                                 goto fail;
+> @@ -699,24 +706,13 @@ static int parse_configuration(DBusMessageIter *pro=
+ps, struct iovec **caps,
+>                         if (var !=3D DBUS_TYPE_ARRAY)
+>                                 goto fail;
+>
+> -                       if (parse_qos(&value, qos, base))
+> +                       if (parse_qos(&value, pac_type, qos))
+>                                 goto fail;
+>                 }
+>
+>                 dbus_message_iter_next(props);
+>         }
+>
+> -       if (*base) {
+> -               uint32_t presDelay;
+> -               uint8_t numSubgroups, numBis;
+> -               struct bt_bap_codec codec;
+> -
+> -               util_iov_memcpy(*base, (*caps)->iov_base, (*caps)->iov_le=
+n);
+> -               parse_base((*caps)->iov_base, (*caps)->iov_len, bap_debug=
+,
+> -                       &presDelay, &numSubgroups, &numBis, &codec,
+> -                       caps, NULL);
+> -       }
+> -
+>         return 0;
+>
+>  fail:
+> @@ -882,8 +878,9 @@ static DBusMessage *set_configuration(DBusConnection =
+*conn, DBusMessage *msg,
+>                 setup->qos.ucast.cis_id =3D BT_ISO_QOS_CIS_UNSET;
+>         }
+>
+> -       if (parse_configuration(&props, &setup->caps, &setup->metadata,
+> -                               &setup->base, &setup->qos) < 0) {
+> +       if (parse_configuration(&props, bt_bap_pac_get_type(ep->lpac),
+> +                               &setup->caps, &setup->metadata, &setup->b=
+ase,
+> +                               &setup->qos) < 0) {
+>                 DBG("Unable to parse configuration");
+>                 setup_free(setup);
+>                 return btd_error_invalid_args(msg);
+> --
+> 2.39.2
 
-If I'm not mistaken it runs under a ubuntu VM under a github action,
-@Tedd Ho-Jeong An can probably explain it better since he wrote the CI
-integration, which btw we intend to move to BlueZ organization at some
-point.
+I sort of did the same thing but end up refactoring the code in the process=
+:
 
-> Thanks
-> Emil
+https://patchwork.kernel.org/project/bluetooth/list/?series=3D817943
 
-
+So it's worth checking if I didn't break it further.
 
 --=20
 Luiz Augusto von Dentz
