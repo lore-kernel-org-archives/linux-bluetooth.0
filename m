@@ -1,151 +1,295 @@
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 907054F1E8
-	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Jan 2024 11:58:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D8BB41A8F;
+	Fri, 19 Jan 2024 13:45:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705665517; cv=none; b=WcvPqbzNG1HtPvl5s9UU0jJ6is1JoUj45pJlJMnW2+/c9Uh25z0rIo1PpbS5Qe15sSoLcW866NkNDzbEuZeUUa+ya2gpfxeBopHRjKMipzYao/DOAA9an8Gf9YFTmg0edyL36vFYdXej3si/W4XeGhsYDBO02dOPQmH4vSJqPkc=
+	t=1705671945; cv=none; b=aSb/5XFU3Ucs7OVYjhqPB2ZLo981p9BvwfD4RjnUSovxyJ64gEIKByM9vlyvUo2tNxOZ8pLq0yCrBZ5+pQM3i5eYvAzg6WyDdMwPHP0rJpUfQfwX7GWN3ui8RzWpDwnoKPo16lv0J7pyranxbkyoEfgwzXK7mdNRMyCtDdwBmvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705665517; c=relaxed/simple;
-	bh=YF/9VGqCR3NnRq2qiSBkKzD4drsN36p29YQjpDwOOF0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MWibSe4LuovNEHrESFCcV2L9dZoDOHPCk2MoDVcQhpR4BPI8Ro9IfFis2TIbrjLGL9pm5xZJ0Dzp1Km9kGKmKvz09aTv7BCscambUmGhQRAIR5PsWXNYNqJROlED3IYe88nK4tVI+B3lZImuta9RQ5cNJWlQ80errqcW2PZwoNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KKWp8tsq; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KKWp8tsq"
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-50eb9d41d57so2044e87.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Jan 2024 03:58:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1705665513; x=1706270313; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=cAlbKavRuOVyWI1tc7ET/JPkNgvFzUd+Nd5ZfFEBLDM=;
-        b=KKWp8tsqbPFBTH9W1XevhpWpJZOoa12zOLjWccmVpFMwJNom4SAv2oF8PGttISiLn1
-         wnMarZre/DK4aEGdd7DHOP4MNZHyQoU5FXUHQktVg+eCm1gAifVxVDYaAJx/27oo4XcQ
-         OQYLt7w4We15KZ/POC/epmlDxgylQ2QNymt2Pl7F1n3V7qMRTxp2kz/GVgCsNcfKHK0K
-         QQY+sRjMx+sgnPM9bl7RBVN2Izv1KPuF+hGjgnXkXsuvdQh7GrHCzF6Cvn46NQmbnfTP
-         naO/rIVmyut3avzoI2e3WbcIPcaNKOdswfifpxsjp9rhJcH/nzLtfQDmMCizzi2yzRqw
-         a5qQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705665513; x=1706270313;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cAlbKavRuOVyWI1tc7ET/JPkNgvFzUd+Nd5ZfFEBLDM=;
-        b=oxUGA5tYJrX4u47GLm2dd+odOXIdCM8g3uTbVyZthZDfGe5oNXWfuWU39pTIGvr5wR
-         uK1xr/pOSfhIokjfOYCodYRkqmIjaSn4iIm6iFKEIWRoOzV/hSDXKfwAU6Xf0UHHNK4F
-         ZcF7HxxbsJWHXg6tnf4X2IZ/S66HwSDBUD5lj7LSQq6I0tS6shXbr2UPGdFk7IDhvWTu
-         z9k4PCKbWyeWxLAo3Dn4zIIEEVGMqP1WI9HYzVs3FCWJuAARTLY3iGnyIGobOOFwjQjC
-         Vdv1cJcL3vZ9SKHRcN3j/AZrtFcaHBru4XUfZW3muHyjzshTyZ8IUgl/qKd8QcugYmqG
-         fFOg==
-X-Gm-Message-State: AOJu0YwleIKbWNdjLkrB0vWPxJr/vOxQV2WENVF2N8X1x6/uptIey7CR
-	0hZS7dPA21cVHZJT7ygJsMNB4hB0IxrtKtRv3COAXLUcwcdyZeVpr6TeWsRgEp9Czf5T8/gxQyY
-	/3VrONzxbF/dNPrN6cKYlahNucXWjLsVYM9C9FmYv1Fb99CByAI4y
-X-Google-Smtp-Source: AGHT+IE+W2bcGytYq3XHpcl6zjaKwTL9fIYI9UTl4iqdV2PFW01+WLopAd2AorYGVBNhKOduK2b5DhCUZBwwbUL5g2M=
-X-Received: by 2002:a19:e005:0:b0:50e:3828:d29d with SMTP id
- x5-20020a19e005000000b0050e3828d29dmr116990lfg.0.1705665513222; Fri, 19 Jan
- 2024 03:58:33 -0800 (PST)
+	s=arc-20240116; t=1705671945; c=relaxed/simple;
+	bh=F0kCq/EQXrub5I4+t5Qsu2HZ7JV8GDxo7h9+Ffv6U24=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=VAB4DLmUpL3S5OPdj3R3cFTllGART/5y84neXnd5EpS7ifmz6jOUjMSAkhD/mLh4tKwa9rbbszePayBYDSB2ZIp8XGSeLDrpnJ8pdpPqXVef6uLdaPjyaFpN+vZsQEc0On3oVEBSdOhA7HL7umqzUPD9D3zY6beA4IrDoGz5yyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; arc=none smtp.client-ip=80.237.130.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+	id 1rQpBk-0002c8-2u; Fri, 19 Jan 2024 14:45:40 +0100
+Message-ID: <d3accff8-b66b-4aa3-9b9d-bd2eeb8aaf09@leemhuis.info>
+Date: Fri, 19 Jan 2024 14:45:39 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <000000000000a135c0060a2260b3@google.com> <00000000000037f0f3060af9e763@google.com>
- <CACT4Y+YBGDYbhXvpEAo6iXS--QOSsUxXqkGZxOpUCuCd3CM3aQ@mail.gmail.com> <ZakvjMjMYK1HtYGt@casper.infradead.org>
-In-Reply-To: <ZakvjMjMYK1HtYGt@casper.infradead.org>
-From: Dmitry Vyukov <dvyukov@google.com>
-Date: Fri, 19 Jan 2024 12:58:21 +0100
-Message-ID: <CACT4Y+YT-Y=b_oSFNCQgTeh8igSqfYQ40JHGTad9w2+uZ_JvNg@mail.gmail.com>
-Subject: Re: [syzbot] [bluetooth?] KASAN: null-ptr-deref Read in ida_free (4)
-To: Matthew Wilcox <willy@infradead.org>
-Cc: syzbot <syzbot+51baee846ddab52d5230@syzkaller.appspotmail.com>, 
-	wzhmmmmm@gmail.com, johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: Built-in Intel Bluetooth device disappeared after booting Linux
+ 6.7
+Content-Language: en-US, de-DE
+To: Ramses <ramses@well-founded.dev>,
+ Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
+ Stable <stable@vger.kernel.org>,
+ Linux Regressions <regressions@lists.linux.dev>
+References: <No21xeV--3-9@well-founded.dev> <No28BcQ--3-9@well-founded.dev>
+From: Thorsten Leemhuis <regressions@leemhuis.info>
+In-Reply-To: <No28BcQ--3-9@well-founded.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1705671942;e45edfd1;
+X-HE-SMSGID: 1rQpBk-0002c8-2u
 
-On Thu, 18 Jan 2024 at 15:02, Matthew Wilcox <willy@infradead.org> wrote:
->
-> On Thu, Jan 18, 2024 at 11:21:34AM +0100, Dmitry Vyukov wrote:
-> > On Sat, 25 Nov 2023 at 14:18, syzbot
-> > <syzbot+51baee846ddab52d5230@syzkaller.appspotmail.com> wrote:
-> > >
-> > > syzbot has found a reproducer for the following issue on:
-> > >
-> > > HEAD commit:    8c9660f65153 Add linux-next specific files for 20231124
-> > > git tree:       linux-next
-> > > console+strace: https://syzkaller.appspot.com/x/log.txt?x=1678a3cce80000
-> > > kernel config:  https://syzkaller.appspot.com/x/.config?x=ca1e8655505e280
-> > > dashboard link: https://syzkaller.appspot.com/bug?extid=51baee846ddab52d5230
-> > > compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-> > > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10d54c08e80000
-> > > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=160ef1a4e80000
-> > >
-> > > Downloadable assets:
-> > > disk image: https://storage.googleapis.com/syzbot-assets/345ed4af3a0d/disk-8c9660f6.raw.xz
-> > > vmlinux: https://storage.googleapis.com/syzbot-assets/191053c69d57/vmlinux-8c9660f6.xz
-> > > kernel image: https://storage.googleapis.com/syzbot-assets/aac7ee5e55e0/bzImage-8c9660f6.xz
-> > >
-> > > IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> > > Reported-by: syzbot+51baee846ddab52d5230@syzkaller.appspotmail.com
-> > >
-> > > Bluetooth: hci0: hardware error 0x00
-> > > ==================================================================
-> > > BUG: KASAN: null-ptr-deref in instrument_atomic_read include/linux/instrumented.h:68 [inline]
-> > > BUG: KASAN: null-ptr-deref in _test_bit include/asm-generic/bitops/instrumented-non-atomic.h:141 [inline]
-> > > BUG: KASAN: null-ptr-deref in ida_free+0x218/0x2e0 lib/idr.c:511
-> > > Read of size 8 at addr 0000000000000078 by task kworker/u5:1/4455
-> > >
-> > > CPU: 1 PID: 4455 Comm: kworker/u5:1 Not tainted 6.7.0-rc2-next-20231124-syzkaller #0
-> > > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
-> > > Workqueue: hci0 hci_error_reset
-> > > Call Trace:
-> > >  <TASK>
-> > >  __dump_stack lib/dump_stack.c:88 [inline]
-> > >  dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
-> > >  kasan_report+0xd9/0x110 mm/kasan/report.c:588
-> > >  check_region_inline mm/kasan/generic.c:182 [inline]
-> > >  kasan_check_range+0xef/0x190 mm/kasan/generic.c:188
-> > >  instrument_atomic_read include/linux/instrumented.h:68 [inline]
-> > >  _test_bit include/asm-generic/bitops/instrumented-non-atomic.h:141 [inline]
-> >
-> > Wonder if this is fixed with:
-> >
-> > ida: Fix crash in ida_free when the bitmap is empty
-> >
-> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=af73483f4e8b6f5c68c9aa63257bdd929a9c194a
-> >
-> > ?
->
-> Should be.  The backtrace below looks like it's the same bug that got
-> reported 3-4 weeks ago.
+On 13.01.24 15:05, Ramses wrote:
+> I forgot to add the full kernel logs, attached the logs of 6.6.10 with working bluetooth and 6.7 where bluetooth is not working.
 
-On second thought, perhaps the bluetooth stack shouldn't free invalid
-ids in the first place.
-It may even take these bogus ids from the wire, which would be pretty bad.
+Hi! This is not my area of expertise, but as it seems nobody answered
+let me give it a shot:
 
-> > >  ida_free+0x218/0x2e0 lib/idr.c:511
-> > >  hci_conn_cleanup net/bluetooth/hci_conn.c:157 [inline]
-> > >  hci_conn_del+0x78c/0xe10 net/bluetooth/hci_conn.c:1183
-> > >  hci_conn_hash_flush+0x189/0x260 net/bluetooth/hci_conn.c:2643
-> > >  hci_dev_close_sync+0x5a7/0x1160 net/bluetooth/hci_sync.c:5021
-> > >  hci_dev_do_close+0x2e/0x90 net/bluetooth/hci_core.c:554
-> > >  hci_error_reset+0xa6/0x190 net/bluetooth/hci_core.c:1059
-> > >  process_one_work+0x8a4/0x15f0 kernel/workqueue.c:2633
-> > >  process_scheduled_works kernel/workqueue.c:2706 [inline]
-> > >  worker_thread+0x8b6/0x1290 kernel/workqueue.c:2787
-> > >  kthread+0x2c1/0x3a0 kernel/kthread.c:389
-> > >  ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
-> > >  ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
-> > >  </TASK>
-> > > ==================================================================
-> > >
-> > >
-> > > ---
-> > > If you want syzbot to run the reproducer, reply with:
-> > > #syz test: git://repo/address.git branch-or-commit-hash
-> > > If you attach or paste a git patch, syzbot will apply it before testing.
+It seems you are using different firmware files for you Wifi device
+(compare the lines "iwlwifi 0000:01:00.0: loaded firmware version...");
+could you maybe temporarily remove the newer one to rule out it causes
+your BT problem?
+
+There are a few other differences in the dmesg that look odd; the older
+one has lines like "input: Kensington Eagle Trackball", the newer one
+does not. Did you disconnect that device in between? If not it sounds
+like there is something fishy somewhere, maybe with USB or your kernel
+config.
+
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+--
+Everything you wanna know about Linux kernel regression tracking:
+https://linux-regtracking.leemhuis.info/about/#tldr
+If I did something stupid, please tell me, as explained on that page.
+
+> I am also including a recent boot with 6.6.9 (after having booted with 6.7) where bluetooth is also not showing up, even though it did work before on the same kernel build.
+> 
+> Thanks,
+> Ramses
+> 
+> 
+> Jan 13, 2024, 14:38 by ramses@well-founded.dev:
+> 
+>> I am running an alder lake i7 1260P with built-in bluetooth.
+>> This adapter always worked fine with no special config, but since I booted Linux 6.7, the device completely disappeared. There's no mention of bluetooth in the kernel or system logs, there's no device node, and there's no entry in lspci.
+>> When I boot the last working kernel again (6.6.10), the device also doesn't appear (even though it did before, see logs below).
+>>
+>> I also tried booting a ubuntu live ISO to exclude any configuration issues with my distro's (NixOS) kernel or such, and also there the device did not show up.
+>>
+>> I am not sure at all that this is related to the kernel, but I wouldn't know where else to look. I am including below my system logs (journalctl -g 'blue|Blue|Linux') showing the kernel version and the bluetooth related entries. As you can see, on 6.6.10 the bluetooth module got loaded, /dev/hci0 gets created, and user space sets up the bluetooth stack.
+>>
+>> The next boot entry is the first time I booted 6.7, and there's no mention of bluetooth at all in the logs. I tried to load the bluetooth module manually, which succeeds but doesn't create a device node.
+>>
+>> When I boot 6.6.10 again now, I get exactly the same as on 6.7. I don't know if the kernel could have done anything persistent to the device that makes that it doesn't get initialised anymore?
+>>
+>> I'm not sure how to debug this further, let me know if there's a way to get more detailed info in the kernel logs or such.
+>>
+>> Thanks,
+>> Ramses
+>>
+>>
+>> Logs with 6.6.10:
+>>
+>> -- Boot 7847b5595e1d40a8bf2624542e5fff74 --
+>> jan 09 02:03:50 localhost kernel: Linux version 6.6.10 (nixbld@localhost) (gcc (GCC) 12.3.0, GNU ld (GNU Binutils) 2.40) #1-NixOS SMP PREEMPT_DYNAMIC Fri Jan  5 14:19:45 UTC 2024
+>> jan 09 02:03:50 localhost kernel: SELinux:  Initializing.
+>> jan 09 02:03:50 localhost kernel: usb usb1: Manufacturer: Linux 6.6.10 xhci-hcd
+>> jan 09 02:03:50 localhost kernel: usb usb2: Manufacturer: Linux 6.6.10 xhci-hcd
+>> jan 09 02:04:02 starbook kernel: Linux agpgart interface v0.103
+>> jan 09 02:04:02 starbook kernel: mc: Linux media interface: v0.10
+>> jan 09 02:04:02 starbook kernel: Bluetooth: Core ver 2.22
+>> jan 09 02:04:02 starbook kernel: Bluetooth: HCI device and connection manager initialized
+>> jan 09 02:04:02 starbook kernel: Bluetooth: HCI socket layer initialized
+>> jan 09 02:04:02 starbook kernel: Bluetooth: L2CAP socket layer initialized
+>> jan 09 02:04:02 starbook kernel: Bluetooth: SCO socket layer initialized
+>> jan 09 02:04:03 starbook kernel: videodev: Linux video capture interface: v2.00
+>> jan 09 02:04:03 starbook kernel: Intel(R) Wireless WiFi driver for Linux
+>> jan 09 02:04:03 starbook kernel: Bluetooth: hci0: Firmware timestamp 2023.42 buildtype 1 build 73111
+>> jan 09 02:04:03 starbook kernel: Bluetooth: hci0: No support for _PRR ACPI method
+>> jan 09 02:04:03 starbook kernel: Bluetooth: hci0: Found device firmware: intel/ibt-0041-0041.sfi
+>> jan 09 02:04:03 starbook kernel: Bluetooth: hci0: Boot Address: 0x100800
+>> jan 09 02:04:03 starbook kernel: Bluetooth: hci0: Firmware Version: 151-42.23
+>> jan 09 02:04:03 starbook kernel: Bluetooth: hci0: Firmware already loaded
+>> jan 09 02:04:03 starbook kernel: pps_core: LinuxPPS API ver. 1 registered
+>> jan 09 02:04:04 starbook dbus-broker-launch[1265]: Ignoring duplicate name 'org.bluez.mesh' in service file '/nix/store/6dln0pmd1zb9xg4c81l3k08igxh98j0w-bluez-5.70/share/dbus-1/system-services/org.bluez.>
+>> jan 09 02:04:04 starbook dbus-broker-launch[1265]: Ignoring duplicate name 'org.bluez' in service file '/nix/store/6dln0pmd1zb9xg4c81l3k08igxh98j0w-bluez-5.70/share/dbus-1/system-services/org.bluez.servi>
+>> jan 09 02:04:04 starbook systemd[1]: Starting Bluetooth service...
+>> jan 09 02:04:04 starbook (uetoothd)[1275]: bluetooth.service: ConfigurationDirectory 'bluetooth' already exists but the mode is different. (File system: 755 ConfigurationDirectoryMode: 555)
+>> jan 09 02:04:04 starbook kernel: Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+>> jan 09 02:04:04 starbook kernel: Bluetooth: BNEP socket layer initialized
+>> jan 09 02:04:04 starbook kernel: Bluetooth: MGMT ver 1.22
+>> jan 09 02:04:04 starbook bluetoothd[1275]: Bluetooth daemon 5.70
+>> jan 09 02:04:04 starbook bluetoothd[1275]: Bluetooth management interface 1.22 initialized
+>> jan 09 02:04:04 starbook systemd[1]: Started Bluetooth service.
+>> jan 09 02:04:04 starbook systemd[1]: Reached target Bluetooth Support.
+>> jan 09 02:04:05 starbook dbus-broker-launch[1774]: Ignoring duplicate name 'org.bluez.obex' in service file '/nix/store/hkws1iw1422s6jifkv2n6xc3iwad5pyg-system-path/share/dbus-1/services/org.bluez.obex.s>
+>> jan 09 02:04:05 starbook dbus-broker-launch[1774]: Ignoring duplicate name 'org.bluez.obex' in service file '/nix/store/6dln0pmd1zb9xg4c81l3k08igxh98j0w-bluez-5.70/share/dbus-1/services/org.bluez.obex.se>
+>> jan 09 02:04:08 starbook kernel: Bluetooth: RFCOMM TTY layer initialized
+>> jan 09 02:04:08 starbook kernel: Bluetooth: RFCOMM socket layer initialized
+>> jan 09 02:04:08 starbook kernel: Bluetooth: RFCOMM ver 1.11
+>> jan 09 02:04:15 starbook dbus-broker-launch[2343]: Ignoring duplicate name 'org.bluez.obex' in service file '/nix/store/hkws1iw1422s6jifkv2n6xc3iwad5pyg-system-path/share/dbus-1/services/org.bluez.obex.s>
+>> jan 09 02:04:15 starbook dbus-broker-launch[2343]: Ignoring duplicate name 'org.bluez.obex' in service file '/nix/store/6dln0pmd1zb9xg4c81l3k08igxh98j0w-bluez-5.70/share/dbus-1/services/org.bluez.obex.se>
+>> jan 09 09:22:05 starbook systemd[1]: Stopped target Bluetooth Support.
+>> jan 09 09:22:05 starbook systemd[1]: Stopping Bluetooth service...
+>> jan 09 09:22:05 starbook systemd[1]: bluetooth.service: Deactivated successfully.
+>> jan 09 09:22:05 starbook systemd[1]: Stopped Bluetooth service.
+>>
+>>
+>>
+>> With 6.7
+>>
+>> -- Boot 7840f56ab2434c9fb1b899e7abea32cc --
+>> jan 09 09:26:07 localhost kernel: Linux version 6.7.0 (nixbld@localhost) (gcc (GCC) 12.3.0, GNU ld (GNU Binutils) 2.40) #1-NixOS SMP PREEMPT_DYNAMIC Sun Jan  7 20:18:38 UTC 2024
+>> jan 09 09:26:07 localhost kernel: SELinux:  Initializing.
+>> jan 09 09:26:07 localhost kernel: usb usb1: Manufacturer: Linux 6.7.0 xhci-hcd
+>> jan 09 09:26:07 localhost kernel: usb usb2: Manufacturer: Linux 6.7.0 xhci-hcd
+>> jan 09 09:26:17 starbook kernel: mc: Linux media interface: v0.10
+>> jan 09 09:26:17 starbook kernel: Linux agpgart interface v0.103
+>> jan 09 09:26:17 starbook kernel: videodev: Linux video capture interface: v2.00
+>> jan 09 09:26:17 starbook kernel: Intel(R) Wireless WiFi driver for Linux
+>> jan 09 09:26:17 starbook kernel: pps_core: LinuxPPS API ver. 1 registered
+>> jan 09 09:26:18 starbook dbus-broker-launch[1198]: Ignoring duplicate name 'org.bluez.mesh' in service file '/nix/store/6dln0pmd1zb9xg4c81l3k08igxh98j0w-bluez-5.70/share/dbus-1/system-services/org.bluez.>
+>> jan 09 09:26:18 starbook dbus-broker-launch[1198]: Ignoring duplicate name 'org.bluez' in service file '/nix/store/6dln0pmd1zb9xg4c81l3k08igxh98j0w-bluez-5.70/share/dbus-1/system-services/org.bluez.servi>
+>> jan 09 09:26:20 starbook dbus-broker-launch[1691]: Ignoring duplicate name 'org.bluez.obex' in service file '/nix/store/faz2vqhyjls6xvblgv959qpsj33bclwa-system-path/share/dbus-1/services/org.bluez.obex.s>
+>> jan 09 09:26:20 starbook dbus-broker-launch[1691]: Ignoring duplicate name 'org.bluez.obex' in service file '/nix/store/6dln0pmd1zb9xg4c81l3k08igxh98j0w-bluez-5.70/share/dbus-1/services/org.bluez.obex.se>
+>> jan 09 09:26:39 starbook dbus-broker-launch[2309]: Ignoring duplicate name 'org.bluez.obex' in service file '/nix/store/faz2vqhyjls6xvblgv959qpsj33bclwa-system-path/share/dbus-1/services/org.bluez.obex.s>
+>> jan 09 09:26:39 starbook dbus-broker-launch[2309]: Ignoring duplicate name 'org.bluez.obex' in service file '/nix/store/6dln0pmd1zb9xg4c81l3k08igxh98j0w-bluez-5.70/share/dbus-1/services/org.bluez.obex.se>
+>> jan 09 09:26:43 starbook systemd[1]: Bluetooth service was skipped because of an unmet condition check (ConditionPathIsDirectory=/sys/class/bluetooth).
+>>
+>>
+>> lspci output (on 6.7):
+>>
+>> ➜ lspci -v
+>> 00:00.0 Host bridge: Intel Corporation Device 4621 (rev 02)
+>>         Subsystem: Intel Corporation Device 7270
+>>         Flags: bus master, fast devsel, latency 0
+>>         Capabilities: <access denied>
+>>         Kernel driver in use: igen6_edac
+>>         Kernel modules: igen6_edac
+>>
+>> 00:02.0 VGA compatible controller: Intel Corporation Alder Lake-P GT2 [Iris Xe Graphics] (rev 0c) (prog-if 00 [VGA controller])
+>>         DeviceName: VGA compatible controller
+>>         Subsystem: Intel Corporation Alder Lake-P GT2 [Iris Xe Graphics]
+>>         Flags: bus master, fast devsel, latency 0, IRQ 158
+>>         Memory at 81000000 (64-bit, non-prefetchable) [size=16M]
+>>         Memory at 90000000 (64-bit, prefetchable) [size=256M]
+>>         I/O ports at 1000 [size=64]
+>>         Expansion ROM at 000c0000 [virtual] [disabled] [size=128K]
+>>         Capabilities: <access denied>
+>>         Kernel driver in use: i915
+>>         Kernel modules: i915
+>>
+>> 00:08.0 System peripheral: Intel Corporation 12th Gen Core Processor Gaussian & Neural Accelerator (rev 02)
+>>         Subsystem: Intel Corporation Device 7270
+>>         Flags: bus master, fast devsel, latency 0, IRQ 255
+>>         Memory at 80720000 (64-bit, non-prefetchable) [size=4K]
+>>         Capabilities: <access denied>
+>>
+>> 00:0a.0 Signal processing controller: Intel Corporation Platform Monitoring Technology (rev 01)
+>>         Subsystem: Intel Corporation Device 7270
+>>         Flags: fast devsel
+>>         Memory at 80710000 (64-bit, non-prefetchable) [size=32K]
+>>         Capabilities: <access denied>
+>>         Kernel driver in use: intel_vsec
+>>         Kernel modules: intel_vsec
+>>
+>> 00:14.0 USB controller: Intel Corporation Alder Lake PCH USB 3.2 xHCI Host Controller (rev 01) (prog-if 30 [XHCI])
+>>         Flags: bus master, medium devsel, latency 0, IRQ 124
+>>         Memory at 80700000 (64-bit, non-prefetchable) [size=64K]
+>>         Capabilities: <access denied>
+>>         Kernel driver in use: xhci_hcd
+>>         Kernel modules: xhci_pci
+>>
+>> 00:14.2 RAM memory: Intel Corporation Alder Lake PCH Shared SRAM (rev 01)
+>>         Subsystem: Intel Corporation Device 7270
+>>         Flags: bus master, fast devsel, latency 0
+>>         Memory at 80718000 (64-bit, non-prefetchable) [size=16K]
+>>         Memory at 80721000 (64-bit, non-prefetchable) [size=4K]
+>>         Capabilities: <access denied>
+>>
+>> 00:15.0 Serial bus controller: Intel Corporation Alder Lake PCH Serial IO I2C Controller #0 (rev 01)
+>>         Subsystem: Intel Corporation Device 7270
+>>         Flags: bus master, fast devsel, latency 0, IRQ 37
+>>         Memory at 80722000 (64-bit, non-prefetchable) [size=4K]
+>>         Capabilities: <access denied>
+>>         Kernel driver in use: intel-lpss
+>>         Kernel modules: intel_lpss_pci
+>>
+>> 00:1c.0 PCI bridge: Intel Corporation Device 51bc (rev 01) (prog-if 00 [Normal decode])
+>>         Subsystem: Intel Corporation Device 7270
+>>         Flags: bus master, fast devsel, latency 0, IRQ 122
+>>         Bus: primary=00, secondary=01, subordinate=01, sec-latency=0
+>>         I/O behind bridge: [disabled] [16-bit]
+>>         Memory behind bridge: 80400000-804fffff [size=1M] [32-bit]
+>>         Prefetchable memory behind bridge: [disabled] [64-bit]
+>>         Capabilities: <access denied>
+>>         Kernel driver in use: pcieport
+>>
+>> 00:1d.0 PCI bridge: Intel Corporation Alder Lake PCI Express Root Port #9 (rev 01) (prog-if 00 [Normal decode])
+>>         Subsystem: Intel Corporation Device 7270
+>>         Flags: bus master, fast devsel, latency 0, IRQ 123
+>>         Bus: primary=00, secondary=02, subordinate=02, sec-latency=0
+>>         I/O behind bridge: 2000-2fff [size=4K] [16-bit]
+>>         Memory behind bridge: 80500000-805fffff [size=1M] [32-bit]
+>>         Prefetchable memory behind bridge: 87fc00000-87fdfffff [size=2M] [32-bit]
+>>         Capabilities: <access denied>
+>>         Kernel driver in use: pcieport
+>>
+>> 00:1e.0 Communication controller: Intel Corporation Alder Lake PCH UART #0 (rev 01)
+>>         Subsystem: Intel Corporation Device 7270
+>>         Flags: bus master, fast devsel, latency 0, IRQ 23
+>>         Memory at fe03e000 (64-bit, non-prefetchable) [size=4K]
+>>         Memory at 80724000 (64-bit, non-prefetchable) [size=4K]
+>>         Capabilities: <access denied>
+>>         Kernel driver in use: intel-lpss
+>>         Kernel modules: intel_lpss_pci
+>>
+>> 00:1f.0 ISA bridge: Intel Corporation Alder Lake PCH eSPI Controller (rev 01)
+>>         Subsystem: Intel Corporation Device 7270
+>>         Flags: bus master, fast devsel, latency 0
+>>
+>> 00:1f.3 Audio device: Intel Corporation Alder Lake PCH-P High Definition Audio Controller (rev 01)
+>>         Flags: bus master, fast devsel, latency 64, IRQ 159
+>>         Memory at 8071c000 (64-bit, non-prefetchable) [size=16K]
+>>         Memory at 80600000 (64-bit, non-prefetchable) [size=1M]
+>>         Capabilities: <access denied>
+>>         Kernel driver in use: snd_hda_intel
+>>         Kernel modules: snd_hda_intel, snd_sof_pci_intel_tgl
+>>
+>> 00:1f.4 SMBus: Intel Corporation Alder Lake PCH-P SMBus Host Controller (rev 01)
+>>         Subsystem: Intel Corporation Device 7270
+>>         Flags: medium devsel, IRQ 23
+>>         Memory at 80726000 (64-bit, non-prefetchable) [size=256]
+>>         I/O ports at efa0 [size=32]
+>>         Kernel driver in use: i801_smbus
+>>         Kernel modules: i2c_i801
+>>
+>> 00:1f.5 Serial bus controller: Intel Corporation Alder Lake-P PCH SPI Controller (rev 01)
+>>         Subsystem: Intel Corporation Device 7270
+>>         Flags: bus master, fast devsel, latency 0
+>>         Memory at 80725000 (32-bit, non-prefetchable) [size=4K]
+>>         Kernel driver in use: intel-spi
+>>         Kernel modules: spi_intel_pci
+>>
+>> 01:00.0 Network controller: Intel Corporation Wi-Fi 6 AX210/AX211/AX411 160MHz (rev 1a)
+>>         Subsystem: Intel Corporation Wi-Fi 6 AX210 160MHz
+>>         Flags: bus master, fast devsel, latency 0, IRQ 16
+>>         Memory at 80400000 (64-bit, non-prefetchable) [size=16K]
+>>         Capabilities: <access denied>
+>>         Kernel driver in use: iwlwifi
+>>         Kernel modules: iwlwifi
+>>
+>> 02:00.0 Non-Volatile memory controller: Samsung Electronics Co Ltd NVMe SSD Controller S4LV008[Pascal] (prog-if 02 [NVM Express])
+>>         Subsystem: Samsung Electronics Co Ltd Device a801
+>>         Physical Slot: 8
+>>         Flags: bus master, fast devsel, latency 0, IRQ 16
+>>         Memory at 80500000 (64-bit, non-prefetchable) [size=16K]
+>>         Capabilities: <access denied>
+>>         Kernel driver in use: nvme
+>>         Kernel modules: nvme
+>>
+>>
+>>
+> 
