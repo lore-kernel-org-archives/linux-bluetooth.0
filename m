@@ -1,497 +1,190 @@
-Received: from w4.tutanota.de (w4.tutanota.de [81.3.6.165])
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D82C739C;
-	Sat, 20 Jan 2024 00:43:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.3.6.165
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705711387; cv=none; b=YXi4RFhlgs4bfLAReqcSXxNLgZzsUdKOpeml/wmn/obG554NE2sDAkoVuZpK0ndIx3NZWwItE6u71CRw7JRC5aYclKH75N66eRDN2E2JtQIz4E/Mc0dc8X+bK0IhjlriUUg8J7n7DtUGcaVeTw4RyBDKdzQqV7sRxyJVqGR4New=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705711387; c=relaxed/simple;
-	bh=rb18dRLOP/NAZC/Se2KTF2clnM92fKZ3P0ZM32RhZ0c=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=fE0wezsXzUMZ7KELXKLUdbJ1b/zV7LJbkaLn2HEeWLn8bKzEAYDYENQAkomor8I6EEP9kgKSNGEta8JwjqJl5xoS/rUz4UHTYNXI6HRN9HlXQKCxYIWgvnW+DKHoPxYVOSznijStO7Jq40BiZw8zXPKQV3hm8EyUWdv/WErHz/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=well-founded.dev; spf=pass smtp.mailfrom=well-founded.dev; dkim=pass (2048-bit key) header.d=well-founded.dev header.i=@well-founded.dev header.b=o6nkUCj4; arc=none smtp.client-ip=81.3.6.165
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=well-founded.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=well-founded.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8865EC9
+	for <linux-bluetooth@vger.kernel.org>; Sat, 20 Jan 2024 18:40:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705776064; cv=pass; b=AUzb/f53W0yRxzCcx357jEn5VSwmdhQb2WTDRKq6BZK9ddMp8RaWATwbEw/JlJBT2hURG3s0sb/cDvGD7KoANHiHqQIKhvgj5rLwbS/TrNajadACt4FWqFsbr5TIr0FoG9DoCpp9MbndMIaRagJrQAqbvlXLysnlKPWY6XQAZYY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705776064; c=relaxed/simple;
+	bh=5dfIVHITivj2b72q8/Zn+UIhLXP4yOiofiaC9j8cqDw=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Rt94Eo5Wah8+z/3t6TxE50o6mdDsSNkJR1FYDFjPIFbYBMhn1uilkzHQplVoN7L1Uj2IAw7VVuXDXBZSeU0IqsFD0kL1HOLB5I9trwbVIUeCFfStK/itpjlwKcvUuF3SGQNpc1UBP9Ypz55yG995rNKO+JLBz7XzFKDKXmk56X0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=S4PbCXuV; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=well-founded.dev header.i=@well-founded.dev header.b="o6nkUCj4"
-Received: from tutadb.w10.tutanota.de (unknown [192.168.1.10])
-	by w4.tutanota.de (Postfix) with ESMTP id 74EAD10600E8;
-	Sat, 20 Jan 2024 00:42:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1705711377;
-	s=s1; d=well-founded.dev;
-	h=From:From:To:To:Subject:Subject:Content-Description:Content-ID:Content-Type:Content-Type:Content-Transfer-Encoding:Content-Transfer-Encoding:Cc:Cc:Date:Date:In-Reply-To:In-Reply-To:MIME-Version:MIME-Version:Message-ID:Message-ID:Reply-To:References:References:Sender;
-	bh=rb18dRLOP/NAZC/Se2KTF2clnM92fKZ3P0ZM32RhZ0c=;
-	b=o6nkUCj4hnHQj5zTL/E7bUEBxcFF3W1nyEkcMzbv1nMLuR6Bunb0i4a6oq0xfQ1V
-	fOqXtykkgwWgHv2TltRBMN81W/3Mjx2ES5Ss8AtkzSJcdeUFYWGxPU7mjwg36xvcSwY
-	uJNAKdWCV/ZwNzWW9gy//6UMwtuzYhx5SsvBKiPPcRPGN4KqDFr8KbXjmX/eBf8u/7I
-	jPEUg5AwQXNTdNB6qPuDVz4VWLzumclF96HyZHrj8UfmZvxPtUPfFcrbfg8u2aBYdgJ
-	a8fQMpb3BZmRoZqmkRSahuI00j/RAHG/p7EEDL5nZG7PWJF2Q0VjNDo7Srg6BF+xWvv
-	angZ9AWzmA==
-Date: Sat, 20 Jan 2024 01:42:57 +0100 (CET)
-From: Ramses <ramses@well-founded.dev>
-To: Thorsten Leemhuis <regressions@leemhuis.info>
-Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
-	Stable <stable@vger.kernel.org>,
-	Linux Regressions <regressions@lists.linux.dev>
-Message-ID: <NoZJWbP--3-9@well-founded.dev>
-In-Reply-To: <d3accff8-b66b-4aa3-9b9d-bd2eeb8aaf09@leemhuis.info>
-References: <No21xeV--3-9@well-founded.dev> <No28BcQ--3-9@well-founded.dev> <d3accff8-b66b-4aa3-9b9d-bd2eeb8aaf09@leemhuis.info>
-Subject: Re: Built-in Intel Bluetooth device disappeared after booting
- Linux
- 6.7
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="S4PbCXuV"
+Received: from [192.168.1.195] (unknown [IPv6:2a0c:f040:0:2790::a02d])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4THQKX5HlCz49Ptk;
+	Sat, 20 Jan 2024 20:40:48 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1705776050;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=5DvUIU2X3HaVycy5a2n0BoMwX6+yRH0EV/RXb6CBGKg=;
+	b=S4PbCXuV46nGCj6F8PJP7DwxMgm4tUOOKZVdk820XcyWh7YC+tYXGuGg2lOVtHryChroFG
+	IWZ/F8tDaMSNwbARkKIs2zsGUZcQvGYhwnbdluAS6WMlGlvVra7g81NtjhfkVRpvyqZNu8
+	5dBoX/SunQo/7PMqFYmljdWcu2noK4jMgbfMj4BROVe//RVZ/g1/KwodhRIH4cv84hqWC8
+	5hQeOsdn+NvUmmod99/6HRgJGoRcuZtrdMR9guKemsvvQnA3180WexGb+gFhVMa21J40nZ
+	2jD3GMirdmMGUlasRvZcAHAl4UXnmsw+QlA1BEe+O1e6YTJmx3M5Disv/WNL3Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1705776050;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=5DvUIU2X3HaVycy5a2n0BoMwX6+yRH0EV/RXb6CBGKg=;
+	b=NZrvC+7SYeSY1q3J/thxk4DeS/6YZxse4Ic1yzQ7z43FtD3YUK1DwZu4Uyo2AlvYmpgYFH
+	WWfi60cRFAZulhNt18IqnxtqCZhOHMlyzyIy9YWJqtqGj5xM29+r2WjlwDoJdJc58ksgTf
+	u0M5wreK9f8V0pIaNmCMK32kHHXFkqZpX+1ptiWkGf147elVLGsekCli83+0JeQ42KyyCA
+	TiurXrtCsCSo1zEZVgIKz0AUtgeeMLnhmCm63SpG+jNxX88yKbA+Yv1KUbT+M/dAHKRgvW
+	9qqsUCqM1vELQ9FHtGEXWXM2tOqgQsIGmP57BeeFL1SQfa7VvGEQ51Sa10JmGQ==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1705776050; a=rsa-sha256;
+	cv=none;
+	b=EsnbWceUELLN9as0qMxyEov+GegUPz4FNxTog2gGoToaZKR8sokPLJBVZ29Kxwisw9CZUJ
+	kY3USCipEPllp6gqvbzo43CK/k+9ilAEuMKYPCs/YUeuGihZJ9HNUdJ2r28ym71VLbfw4b
+	4adtb7CH6b5VwdOSaIh4Wcg1kX9bdQ2gnWJ9wQQiWE/WeLkoHFNBqdvZL3EGTySth1xc9q
+	k3hn5Q6EfXWPtO8wd05K9kUOzg+PdkEnxN2uEHhxdQLOPF5BI9Fi7ko+zdLJqdj6+ldjtz
+	ITFlwaV7n5m8a/aJAIju3oIDyI5+WXNbWKYzaKqsn3qoFaLbvNW1Vef1kXBqQA==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+Message-ID: <e5e90163396ecd6091616274cbe08e7d613df32f.camel@iki.fi>
+Subject: Re: [PATCH BlueZ v1 2/2] transport: Print owner information when it
+ exit or release
+From: Pauli Virtanen <pav@iki.fi>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	linux-bluetooth@vger.kernel.org
+Date: Sat, 20 Jan 2024 20:40:45 +0200
+In-Reply-To: <CABBYNZK4ODoPDy20jk48tPW8rnAgLdOMrhdkgMPeanSLz-x-mA@mail.gmail.com>
+References: <20240117222317.1792594-1-luiz.dentz@gmail.com>
+	 <20240117222317.1792594-2-luiz.dentz@gmail.com>
+	 <CABBYNZK4ODoPDy20jk48tPW8rnAgLdOMrhdkgMPeanSLz-x-mA@mail.gmail.com>
+Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
+ keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
 
-19 janv. 2024, 14:45 de regressions@leemhuis.info:
+Hi,
 
-> On 13.01.24 15:05, Ramses wrote:
->
->> I forgot to add the full kernel logs, attached the logs of 6.6.10 with w=
-orking bluetooth and 6.7 where bluetooth is not working.
->>
->
-> Hi! This is not my area of expertise, but as it seems nobody answered
-> let me give it a shot:
->
-> It seems you are using different firmware files for you Wifi device
-> (compare the lines "iwlwifi 0000:01:00.0: loaded firmware version...");
-> could you maybe temporarily remove the newer one to rule out it causes
-> your BT problem?
->
-> There are a few other differences in the dmesg that look odd; the older
-> one has lines like "input: Kensington Eagle Trackball", the newer one
-> does not. Did you disconnect that device in between? If not it sounds
-> like there is something fishy somewhere, maybe with USB or your kernel
-> config.
->
-> Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
-> --
-> Everything you wanna know about Linux kernel regression tracking:
-> https://linux-regtracking.leemhuis.info/about/#tldr
-> If I did something stupid, please tell me, as explained on that page.
->
->> I am also including a recent boot with 6.6.9 (after having booted with 6=
-.7) where bluetooth is also not showing up, even though it did work before =
-on the same kernel build.
->>
->> Thanks,
->> Ramses
->>
->>
->> Jan 13, 2024, 14:38 by ramses@well-founded.dev:
->>
->>> I am running an alder lake i7 1260P with built-in bluetooth.
->>> This adapter always worked fine with no special config, but since I boo=
-ted Linux 6.7, the device completely disappeared. There's no mention of blu=
-etooth in the kernel or system logs, there's no device node, and there's no=
- entry in lspci.
->>> When I boot the last working kernel again (6.6.10), the device also doe=
-sn't appear (even though it did before, see logs below).
->>>
->>> I also tried booting a ubuntu live ISO to exclude any configuration iss=
-ues with my distro's (NixOS) kernel or such, and also there the device did =
-not show up.
->>>
->>> I am not sure at all that this is related to the kernel, but I wouldn't=
- know where else to look. I am including below my system logs (journalctl -=
-g 'blue|Blue|Linux') showing the kernel version and the bluetooth related e=
-ntries. As you can see, on 6.6.10 the bluetooth module got loaded, /dev/hci=
-0 gets created, and user space sets up the bluetooth stack.
->>>
->>> The next boot entry is the first time I booted 6.7, and there's no ment=
-ion of bluetooth at all in the logs. I tried to load the bluetooth module m=
-anually, which succeeds but doesn't create a device node.
->>>
->>> When I boot 6.6.10 again now, I get exactly the same as on 6.7. I don't=
- know if the kernel could have done anything persistent to the device that =
-makes that it doesn't get initialised anymore?
->>>
->>> I'm not sure how to debug this further, let me know if there's a way to=
- get more detailed info in the kernel logs or such.
->>>
->>> Thanks,
->>> Ramses
->>>
->>>
->>> Logs with 6.6.10:
->>>
->>> -- Boot 7847b5595e1d40a8bf2624542e5fff74 --
->>> jan 09 02:03:50 localhost kernel: Linux version 6.6.10 (nixbld@localhos=
-t) (gcc (GCC) 12.3.0, GNU ld (GNU Binutils) 2.40) #1-NixOS SMP PREEMPT_DYNA=
-MIC Fri Jan=C2=A0 5 14:19:45 UTC 2024
->>> jan 09 02:03:50 localhost kernel: SELinux:=C2=A0 Initializing.
->>> jan 09 02:03:50 localhost kernel: usb usb1: Manufacturer: Linux 6.6.10 =
-xhci-hcd
->>> jan 09 02:03:50 localhost kernel: usb usb2: Manufacturer: Linux 6.6.10 =
-xhci-hcd
->>> jan 09 02:04:02 starbook kernel: Linux agpgart interface v0.103
->>> jan 09 02:04:02 starbook kernel: mc: Linux media interface: v0.10
->>> jan 09 02:04:02 starbook kernel: Bluetooth: Core ver 2.22
->>> jan 09 02:04:02 starbook kernel: Bluetooth: HCI device and connection m=
-anager initialized
->>> jan 09 02:04:02 starbook kernel: Bluetooth: HCI socket layer initialize=
-d
->>> jan 09 02:04:02 starbook kernel: Bluetooth: L2CAP socket layer initiali=
-zed
->>> jan 09 02:04:02 starbook kernel: Bluetooth: SCO socket layer initialize=
-d
->>> jan 09 02:04:03 starbook kernel: videodev: Linux video capture interfac=
-e: v2.00
->>> jan 09 02:04:03 starbook kernel: Intel(R) Wireless WiFi driver for Linu=
-x
->>> jan 09 02:04:03 starbook kernel: Bluetooth: hci0: Firmware timestamp 20=
-23.42 buildtype 1 build 73111
->>> jan 09 02:04:03 starbook kernel: Bluetooth: hci0: No support for _PRR A=
-CPI method
->>> jan 09 02:04:03 starbook kernel: Bluetooth: hci0: Found device firmware=
-: intel/ibt-0041-0041.sfi
->>> jan 09 02:04:03 starbook kernel: Bluetooth: hci0: Boot Address: 0x10080=
-0
->>> jan 09 02:04:03 starbook kernel: Bluetooth: hci0: Firmware Version: 151=
--42.23
->>> jan 09 02:04:03 starbook kernel: Bluetooth: hci0: Firmware already load=
-ed
->>> jan 09 02:04:03 starbook kernel: pps_core: LinuxPPS API ver. 1 register=
-ed
->>> jan 09 02:04:04 starbook dbus-broker-launch[1265]: Ignoring duplicate n=
-ame 'org.bluez.mesh' in service file '/nix/store/6dln0pmd1zb9xg4c81l3k08igx=
-h98j0w-bluez-5.70/share/dbus-1/system-services/org.bluez.>
->>> jan 09 02:04:04 starbook dbus-broker-launch[1265]: Ignoring duplicate n=
-ame 'org.bluez' in service file '/nix/store/6dln0pmd1zb9xg4c81l3k08igxh98j0=
-w-bluez-5.70/share/dbus-1/system-services/org.bluez.servi>
->>> jan 09 02:04:04 starbook systemd[1]: Starting Bluetooth service...
->>> jan 09 02:04:04 starbook (uetoothd)[1275]: bluetooth.service: Configura=
-tionDirectory 'bluetooth' already exists but the mode is different. (File s=
-ystem: 755 ConfigurationDirectoryMode: 555)
->>> jan 09 02:04:04 starbook kernel: Bluetooth: BNEP (Ethernet Emulation) v=
-er 1.3
->>> jan 09 02:04:04 starbook kernel: Bluetooth: BNEP socket layer initializ=
-ed
->>> jan 09 02:04:04 starbook kernel: Bluetooth: MGMT ver 1.22
->>> jan 09 02:04:04 starbook bluetoothd[1275]: Bluetooth daemon 5.70
->>> jan 09 02:04:04 starbook bluetoothd[1275]: Bluetooth management interfa=
-ce 1.22 initialized
->>> jan 09 02:04:04 starbook systemd[1]: Started Bluetooth service.
->>> jan 09 02:04:04 starbook systemd[1]: Reached target Bluetooth Support.
->>> jan 09 02:04:05 starbook dbus-broker-launch[1774]: Ignoring duplicate n=
-ame 'org.bluez.obex' in service file '/nix/store/hkws1iw1422s6jifkv2n6xc3iw=
-ad5pyg-system-path/share/dbus-1/services/org.bluez.obex.s>
->>> jan 09 02:04:05 starbook dbus-broker-launch[1774]: Ignoring duplicate n=
-ame 'org.bluez.obex' in service file '/nix/store/6dln0pmd1zb9xg4c81l3k08igx=
-h98j0w-bluez-5.70/share/dbus-1/services/org.bluez.obex.se>
->>> jan 09 02:04:08 starbook kernel: Bluetooth: RFCOMM TTY layer initialize=
-d
->>> jan 09 02:04:08 starbook kernel: Bluetooth: RFCOMM socket layer initial=
-ized
->>> jan 09 02:04:08 starbook kernel: Bluetooth: RFCOMM ver 1.11
->>> jan 09 02:04:15 starbook dbus-broker-launch[2343]: Ignoring duplicate n=
-ame 'org.bluez.obex' in service file '/nix/store/hkws1iw1422s6jifkv2n6xc3iw=
-ad5pyg-system-path/share/dbus-1/services/org.bluez.obex.s>
->>> jan 09 02:04:15 starbook dbus-broker-launch[2343]: Ignoring duplicate n=
-ame 'org.bluez.obex' in service file '/nix/store/6dln0pmd1zb9xg4c81l3k08igx=
-h98j0w-bluez-5.70/share/dbus-1/services/org.bluez.obex.se>
->>> jan 09 09:22:05 starbook systemd[1]: Stopped target Bluetooth Support.
->>> jan 09 09:22:05 starbook systemd[1]: Stopping Bluetooth service...
->>> jan 09 09:22:05 starbook systemd[1]: bluetooth.service: Deactivated suc=
-cessfully.
->>> jan 09 09:22:05 starbook systemd[1]: Stopped Bluetooth service.
->>>
->>>
->>>
->>> With 6.7
->>>
->>> -- Boot 7840f56ab2434c9fb1b899e7abea32cc --
->>> jan 09 09:26:07 localhost kernel: Linux version 6.7.0 (nixbld@localhost=
-) (gcc (GCC) 12.3.0, GNU ld (GNU Binutils) 2.40) #1-NixOS SMP PREEMPT_DYNAM=
-IC Sun Jan=C2=A0 7 20:18:38 UTC 2024
->>> jan 09 09:26:07 localhost kernel: SELinux:=C2=A0 Initializing.
->>> jan 09 09:26:07 localhost kernel: usb usb1: Manufacturer: Linux 6.7.0 x=
-hci-hcd
->>> jan 09 09:26:07 localhost kernel: usb usb2: Manufacturer: Linux 6.7.0 x=
-hci-hcd
->>> jan 09 09:26:17 starbook kernel: mc: Linux media interface: v0.10
->>> jan 09 09:26:17 starbook kernel: Linux agpgart interface v0.103
->>> jan 09 09:26:17 starbook kernel: videodev: Linux video capture interfac=
-e: v2.00
->>> jan 09 09:26:17 starbook kernel: Intel(R) Wireless WiFi driver for Linu=
-x
->>> jan 09 09:26:17 starbook kernel: pps_core: LinuxPPS API ver. 1 register=
-ed
->>> jan 09 09:26:18 starbook dbus-broker-launch[1198]: Ignoring duplicate n=
-ame 'org.bluez.mesh' in service file '/nix/store/6dln0pmd1zb9xg4c81l3k08igx=
-h98j0w-bluez-5.70/share/dbus-1/system-services/org.bluez.>
->>> jan 09 09:26:18 starbook dbus-broker-launch[1198]: Ignoring duplicate n=
-ame 'org.bluez' in service file '/nix/store/6dln0pmd1zb9xg4c81l3k08igxh98j0=
-w-bluez-5.70/share/dbus-1/system-services/org.bluez.servi>
->>> jan 09 09:26:20 starbook dbus-broker-launch[1691]: Ignoring duplicate n=
-ame 'org.bluez.obex' in service file '/nix/store/faz2vqhyjls6xvblgv959qpsj3=
-3bclwa-system-path/share/dbus-1/services/org.bluez.obex.s>
->>> jan 09 09:26:20 starbook dbus-broker-launch[1691]: Ignoring duplicate n=
-ame 'org.bluez.obex' in service file '/nix/store/6dln0pmd1zb9xg4c81l3k08igx=
-h98j0w-bluez-5.70/share/dbus-1/services/org.bluez.obex.se>
->>> jan 09 09:26:39 starbook dbus-broker-launch[2309]: Ignoring duplicate n=
-ame 'org.bluez.obex' in service file '/nix/store/faz2vqhyjls6xvblgv959qpsj3=
-3bclwa-system-path/share/dbus-1/services/org.bluez.obex.s>
->>> jan 09 09:26:39 starbook dbus-broker-launch[2309]: Ignoring duplicate n=
-ame 'org.bluez.obex' in service file '/nix/store/6dln0pmd1zb9xg4c81l3k08igx=
-h98j0w-bluez-5.70/share/dbus-1/services/org.bluez.obex.se>
->>> jan 09 09:26:43 starbook systemd[1]: Bluetooth service was skipped beca=
-use of an unmet condition check (ConditionPathIsDirectory=3D/sys/class/blue=
-tooth).
->>>
->>>
->>> lspci output (on 6.7):
->>>
->>> =E2=9E=9C lspci -v
->>> 00:00.0 Host bridge: Intel Corporation Device 4621 (rev 02)
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Subsystem: Intel Corporation=
- Device 7270
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Flags: bus master, fast devs=
-el, latency 0
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Capabilities: <access denied=
->
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Kernel driver in use: igen6_=
-edac
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Kernel modules: igen6_edac
->>>
->>> 00:02.0 VGA compatible controller: Intel Corporation Alder Lake-P GT2 [=
-Iris Xe Graphics] (rev 0c) (prog-if 00 [VGA controller])
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 DeviceName: VGA compatible c=
-ontroller
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Subsystem: Intel Corporation=
- Alder Lake-P GT2 [Iris Xe Graphics]
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Flags: bus master, fast devs=
-el, latency 0, IRQ 158
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Memory at 81000000 (64-bit, =
-non-prefetchable) [size=3D16M]
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Memory at 90000000 (64-bit, =
-prefetchable) [size=3D256M]
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 I/O ports at 1000 [size=3D64=
-]
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Expansion ROM at 000c0000 [v=
-irtual] [disabled] [size=3D128K]
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Capabilities: <access denied=
->
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Kernel driver in use: i915
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Kernel modules: i915
->>>
->>> 00:08.0 System peripheral: Intel Corporation 12th Gen Core Processor Ga=
-ussian & Neural Accelerator (rev 02)
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Subsystem: Intel Corporation=
- Device 7270
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Flags: bus master, fast devs=
-el, latency 0, IRQ 255
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Memory at 80720000 (64-bit, =
-non-prefetchable) [size=3D4K]
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Capabilities: <access denied=
->
->>>
->>> 00:0a.0 Signal processing controller: Intel Corporation Platform Monito=
-ring Technology (rev 01)
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Subsystem: Intel Corporation=
- Device 7270
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Flags: fast devsel
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Memory at 80710000 (64-bit, =
-non-prefetchable) [size=3D32K]
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Capabilities: <access denied=
->
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Kernel driver in use: intel_=
-vsec
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Kernel modules: intel_vsec
->>>
->>> 00:14.0 USB controller: Intel Corporation Alder Lake PCH USB 3.2 xHCI H=
-ost Controller (rev 01) (prog-if 30 [XHCI])
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Flags: bus master, medium de=
-vsel, latency 0, IRQ 124
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Memory at 80700000 (64-bit, =
-non-prefetchable) [size=3D64K]
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Capabilities: <access denied=
->
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Kernel driver in use: xhci_h=
-cd
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Kernel modules: xhci_pci
->>>
->>> 00:14.2 RAM memory: Intel Corporation Alder Lake PCH Shared SRAM (rev 0=
-1)
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Subsystem: Intel Corporation=
- Device 7270
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Flags: bus master, fast devs=
-el, latency 0
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Memory at 80718000 (64-bit, =
-non-prefetchable) [size=3D16K]
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Memory at 80721000 (64-bit, =
-non-prefetchable) [size=3D4K]
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Capabilities: <access denied=
->
->>>
->>> 00:15.0 Serial bus controller: Intel Corporation Alder Lake PCH Serial =
-IO I2C Controller #0 (rev 01)
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Subsystem: Intel Corporation=
- Device 7270
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Flags: bus master, fast devs=
-el, latency 0, IRQ 37
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Memory at 80722000 (64-bit, =
-non-prefetchable) [size=3D4K]
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Capabilities: <access denied=
->
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Kernel driver in use: intel-=
-lpss
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Kernel modules: intel_lpss_p=
-ci
->>>
->>> 00:1c.0 PCI bridge: Intel Corporation Device 51bc (rev 01) (prog-if 00 =
-[Normal decode])
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Subsystem: Intel Corporation=
- Device 7270
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Flags: bus master, fast devs=
-el, latency 0, IRQ 122
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Bus: primary=3D00, secondary=
-=3D01, subordinate=3D01, sec-latency=3D0
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 I/O behind bridge: [disabled=
-] [16-bit]
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Memory behind bridge: 804000=
-00-804fffff [size=3D1M] [32-bit]
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Prefetchable memory behind b=
-ridge: [disabled] [64-bit]
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Capabilities: <access denied=
->
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Kernel driver in use: pciepo=
-rt
->>>
->>> 00:1d.0 PCI bridge: Intel Corporation Alder Lake PCI Express Root Port =
-#9 (rev 01) (prog-if 00 [Normal decode])
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Subsystem: Intel Corporation=
- Device 7270
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Flags: bus master, fast devs=
-el, latency 0, IRQ 123
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Bus: primary=3D00, secondary=
-=3D02, subordinate=3D02, sec-latency=3D0
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 I/O behind bridge: 2000-2fff=
- [size=3D4K] [16-bit]
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Memory behind bridge: 805000=
-00-805fffff [size=3D1M] [32-bit]
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Prefetchable memory behind b=
-ridge: 87fc00000-87fdfffff [size=3D2M] [32-bit]
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Capabilities: <access denied=
->
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Kernel driver in use: pciepo=
-rt
->>>
->>> 00:1e.0 Communication controller: Intel Corporation Alder Lake PCH UART=
- #0 (rev 01)
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Subsystem: Intel Corporation=
- Device 7270
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Flags: bus master, fast devs=
-el, latency 0, IRQ 23
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Memory at fe03e000 (64-bit, =
-non-prefetchable) [size=3D4K]
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Memory at 80724000 (64-bit, =
-non-prefetchable) [size=3D4K]
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Capabilities: <access denied=
->
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Kernel driver in use: intel-=
-lpss
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Kernel modules: intel_lpss_p=
-ci
->>>
->>> 00:1f.0 ISA bridge: Intel Corporation Alder Lake PCH eSPI Controller (r=
-ev 01)
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Subsystem: Intel Corporation=
- Device 7270
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Flags: bus master, fast devs=
-el, latency 0
->>>
->>> 00:1f.3 Audio device: Intel Corporation Alder Lake PCH-P High Definitio=
-n Audio Controller (rev 01)
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Flags: bus master, fast devs=
-el, latency 64, IRQ 159
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Memory at 8071c000 (64-bit, =
-non-prefetchable) [size=3D16K]
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Memory at 80600000 (64-bit, =
-non-prefetchable) [size=3D1M]
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Capabilities: <access denied=
->
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Kernel driver in use: snd_hd=
-a_intel
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Kernel modules: snd_hda_inte=
-l, snd_sof_pci_intel_tgl
->>>
->>> 00:1f.4 SMBus: Intel Corporation Alder Lake PCH-P SMBus Host Controller=
- (rev 01)
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Subsystem: Intel Corporation=
- Device 7270
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Flags: medium devsel, IRQ 23
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Memory at 80726000 (64-bit, =
-non-prefetchable) [size=3D256]
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 I/O ports at efa0 [size=3D32=
-]
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Kernel driver in use: i801_s=
-mbus
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Kernel modules: i2c_i801
->>>
->>> 00:1f.5 Serial bus controller: Intel Corporation Alder Lake-P PCH SPI C=
-ontroller (rev 01)
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Subsystem: Intel Corporation=
- Device 7270
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Flags: bus master, fast devs=
-el, latency 0
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Memory at 80725000 (32-bit, =
-non-prefetchable) [size=3D4K]
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Kernel driver in use: intel-=
-spi
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Kernel modules: spi_intel_pc=
-i
->>>
->>> 01:00.0 Network controller: Intel Corporation Wi-Fi 6 AX210/AX211/AX411=
- 160MHz (rev 1a)
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Subsystem: Intel Corporation=
- Wi-Fi 6 AX210 160MHz
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Flags: bus master, fast devs=
-el, latency 0, IRQ 16
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Memory at 80400000 (64-bit, =
-non-prefetchable) [size=3D16K]
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Capabilities: <access denied=
->
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Kernel driver in use: iwlwif=
-i
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Kernel modules: iwlwifi
->>>
->>> 02:00.0 Non-Volatile memory controller: Samsung Electronics Co Ltd NVMe=
- SSD Controller S4LV008[Pascal] (prog-if 02 [NVM Express])
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Subsystem: Samsung Electroni=
-cs Co Ltd Device a801
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Physical Slot: 8
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Flags: bus master, fast devs=
-el, latency 0, IRQ 16
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Memory at 80500000 (64-bit, =
-non-prefetchable) [size=3D16K]
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Capabilities: <access denied=
->
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Kernel driver in use: nvme
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Kernel modules: nvme
->>>
+ke, 2024-01-17 kello 17:36 -0500, Luiz Augusto von Dentz kirjoitti:
+> On Wed, Jan 17, 2024 at 5:23=E2=80=AFPM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> >=20
+> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >=20
+> > This prints the owner name when it exits/quits/crash or releases a
+> > transport.
+> > ---
+> > - Looks like there is a bug/race on codec switch it appears the likes o=
+f
+> >   pipewire attempts to call Release in the process which stops the
+> >   acquire/resume:
+> >=20
+> >   bluetoothd[1774429]: profiles/audio/transport.c:transport_set_state()=
+ State
+> >   changed /org/bluez/hci0/dev_94_DB_56_F7_F2_88/sep1/fd8: TRANSPORT_G
+> >   bluetoothd[1774429]: profiles/audio/transport.c:media_request_create(=
+)
+> >   Request created: method=3DAcquire id=3D50
+> >   bluetoothd[1774429]: profiles/audio/transport.c:media_owner_add() Own=
+er
+> >   :1.133105 Request Acquire
+> >   bluetoothd[1774429]: profiles/audio/transport.c:media_transport_set_o=
+wner()
+> >   Transport /org/bluez/hci0/dev_94_DB_56_F7_F2_88/sep1/fd8 Owner :1.5
+> >   bluetoothd[1774429]: profiles/audio/transport.c:release() Owner :1.13=
+3105
+> >   bluetoothd[1774429]: profiles/audio/transport.c:media_owner_remove() =
+Owner
+> >   :1.133105 Request Acquire
+>=20
+> I wonder if we have a regression on BlueZ or PW for A2DP, since I
+> recall this used to work just fine while switching codecs back and
+> forth, but today it didn't work at all for me and I had to reconnect a
+> couple of times to get it working:
+>=20
+> > pipewire --version
+> pipewire
+> Compiled with libpipewire 1.0.0
+> Linked with libpipewire 1.0.0
 
-Hi Thorsten
+I don't think there are any recent related changes on Pipewire side
+recently. I've also not been able to reproduce the above (w/ bluez 5.72
+or current master) or seen other similar reports. Maybe there is some
+old bug that surfaces only in some cases.
 
-Thanks a lot for your reply!
+From the above log I don't get what is going wrong, maybe if you have
+the full bluetoothd log that shows what happened after connect with
+timestamps that could help.
 
-I was initially hoping that it was simply a version issue, but when I compi=
-led and booted 6.6.9, with the same iwlwifi driver version that I had befor=
-e, Bluetooth was still not working (the dmesg for that boot was attached to=
- the original email).
+> pw.node: (bluez_output.94_DB_56_F7_F2_88.1-70) running -> error
+> (Received error event)
 
-So I was hoping that there's maybe some microcode or other persistent state=
- or such that may explain why the Bluetooth suddenly disappeared, as the on=
-ly other option that I can think of, would be sudden hardware failure (not =
-sure if that happens, I haven't heard of that with integrated chips).
+This should only appear if:
 
-Thanks again for your reply, I appreciate it!
-Ramses
+1. Acquire DBus call returns error
+
+2. Acquire DBus call results to NoReply timeout error
+
+3. BlueZ initiates a transition back to inactive state for a transport
+that was previously acquired
+
+Due to the last one, the full log would be useful.
+
+>=20
+> >  profiles/audio/transport.c | 4 ++++
+> >  1 file changed, 4 insertions(+)
+> >=20
+> > diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
+> > index a4696154aba5..5395985b990f 100644
+> > --- a/profiles/audio/transport.c
+> > +++ b/profiles/audio/transport.c
+> > @@ -531,6 +531,8 @@ static void media_owner_exit(DBusConnection *connec=
+tion, void *user_data)
+> >  {
+> >         struct media_owner *owner =3D user_data;
+> >=20
+> > +       DBG("Owner %s", owner->name);
+> > +
+> >         owner->watch =3D 0;
+> >=20
+> >         media_owner_remove(owner);
+> > @@ -742,6 +744,8 @@ static DBusMessage *release(DBusConnection *conn, D=
+BusMessage *msg,
+> >         if (owner =3D=3D NULL || g_strcmp0(owner->name, sender) !=3D 0)
+> >                 return btd_error_not_authorized(msg);
+> >=20
+> > +       DBG("Owner %s", owner->name);
+> > +
+> >         if (owner->pending) {
+> >                 const char *member;
+> >=20
+> > --
+> > 2.43.0
+>=20
+> It seems you PW calls Release after Acquire, not sure if it didn't
+> like our response to Acquire or something.
+>=20
+
+--=20
+Pauli Virtanen
