@@ -1,160 +1,110 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C35838DE2
-	for <linux-bluetooth@vger.kernel.org>; Sun, 21 Jan 2024 20:27:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705868849; cv=pass; b=LlCgYoB72dCHc71tl1AEDIWvMDt0z+w9o9aDN1hMnTZqQjA4Qv3Pb65yJsFSmnozH0CVt3/+J0hrJPSakBV6ndd/ET1mHH0cDqPyMGkPf+sN2YXQjxtaxq+kS7LFJ4gPaBOudh5+Ov+J3ivdVFdapVpK+xOahJ2wfeWN326zZAI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705868849; c=relaxed/simple;
-	bh=4fWVwnWG/4Tavpeco9/zAQJAzLZpa6iP5Sn2kHmw4m8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=X3L1AsoWcOmmsBMJq1BAQdiVqkzD6nrjWdHISL1t2vGG0S7WAAfHM2FgNMXcwDjpUpZZqCtI6sHysoVIqp0U6tCjbzWQCmDEPjpeClyJ899I98YrsceuU97CzeI8sBbKjMgMCf7akFO3KKw9bVstd+3S0f85L1bIDTLIOFunGq0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=fail (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=lnr+rKWH reason="signature verification failed"; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CE74374FA
+	for <linux-bluetooth@vger.kernel.org>; Sun, 21 Jan 2024 21:31:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705872671; cv=none; b=Dis6xwbHaL2ia4QXW/LPTnNVX5IZldbacMwsQeqee4RHpRnTxGoLO6WLt+FvNvfkpl1+PwK/C/xkHAvvkusq2AlmCREZZGBplq9d7aZxk7szRRXO53RP5vYkATTZt+ldj0ixah0WUjAlvzvD1mzLBCfrarT1FOg2xf7sDObG0Ng=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705872671; c=relaxed/simple;
+	bh=qGjbQcl+7JyeVergWuVgwx/mVpApkQ1kPPniha7M75c=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=uC0mYRzxgIqj9Vth3HCDwgDQQ+nXUt5SYNTNWLBjOLey/zjsntOYXcHG1omwO2qZaV1eKvAobY+RSNeKNi6Ff6jdbpT8fyXa9f4xX5MzRbEiBnQepGIau948eH3KLMTlXALuH5KXwFlqJUF8SmBCZmntPNFKnt1j8LczQviQwqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dI2tovGT; arc=none smtp.client-ip=209.85.219.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="lnr+rKWH"
-Received: from monolith.lan (unknown [193.138.7.178])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4TJ4dt3gcRzyNX;
-	Sun, 21 Jan 2024 22:27:14 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1705868835; h=from:from:from:from:from:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=i1c5Zrs0aoB4BTBRuJnjGsTLsmWcJnKOcaUe7WoUgUM=;
-	b=lnr+rKWHrOgy4uh24RdR31PCHivYRc+7MuP919dzy6IJRVPqOJ0qiwRe0YjoIE79/LBkmI
-	9YWaVP4quB7bDgqeZNLbxmTPCs2eQ+jKFD6xdo4d3qRTW3weH9C2fSGMGmInIAu48GSash
-	dQ+oM6Ba3O+w+iI/nX/u2DfISJ5dMCE=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1705868835;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=i1c5Zrs0aoB4BTBRuJnjGsTLsmWcJnKOcaUe7WoUgUM=;
-	b=Nlx6wHzH48wopBt4QmE7tDT5cLOpm3qCeD3fmNn7dK91kzfoRBkLL+6pEOEKbJvQceh4z7
-	loJ2bPjQ9utqJwLcbxT8HIJNhBxkCmQ8EpgZQ3L4U/owUMR72X3sHOOjA23zXiisGk8lCq
-	/NqTxreloivNwX/+SoRbUXhnLhQbGZ4=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1705868835; a=rsa-sha256; cv=none;
-	b=hSwtq7gXmck8xu3w9t9/gW8WYMn8M74xC3tWeeD2FmQtwue6f32EM0zC3SQcSfymjjUxN7
-	DMKxA+iZFRau9VxcRkaX88qdncRCHHXAC5WKsXlKZWUUvv3Dc7XWmW9ZkNIpjBIAjNNWX0
-	dq9+aQdo93WdJHrWXEtsuuT0IOyekEs=
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ] bap: register all endpoints before starting config select
-Date: Sun, 21 Jan 2024 22:27:06 +0200
-Message-ID: <447a1b2f472b1c0c83de357e1c8094eec73308f0.1705868192.git.pav@iki.fi>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dI2tovGT"
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-6806914dba7so21169806d6.2
+        for <linux-bluetooth@vger.kernel.org>; Sun, 21 Jan 2024 13:31:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705872669; x=1706477469; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=d9OG3n0+FFh12EeiCWhFmLg2r2Ub7+8oiHJ7GG1fufw=;
+        b=dI2tovGT0eDAUlj5v4wIhNuBbFUpLi60j/XmyF/faYgNUGHS4olD/Mip5zGpM0JC4g
+         g+HaAW4+34aRpZDJYeslvqlJj7YHqPtK/89jRgDxXfSh1xBBpUioeq7w3Xf+lapPQD4A
+         Nxu0XCa88YeCR6QAd7Jzjy8n/6Z0tNjnVZL/FUzXFO17VlPJi1SI3dxnfDhxCN5kgOCt
+         0VOlmu/x9VVEnYEyjcQ/CNTunmAmyyNRvheu2FfOrrIFAQfaPojYCEb6Tfjg7BHobvb7
+         1PnyS2uHlj8Uawbm5j107DgqNAEtWIw+Yk/beZU/YleDYPM9/ia7+FF44TN5bRLGOcFz
+         lC+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705872669; x=1706477469;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=d9OG3n0+FFh12EeiCWhFmLg2r2Ub7+8oiHJ7GG1fufw=;
+        b=Qj4HLkxEUFhW+Rv1HTfaQBqN6QykS6+aCdzs939XaAIWYGxfgmsJo7tRDNNdhyic6x
+         Z2tknTrksoD4upRb+mTYWzeNsJJq8oEoBmtkfs9SQgP7IB+Jog7W1tiyLs4CwvE4tkR/
+         HWi+oKDaG8E8nhmy+GK16TxDccyx5otNZrIVdXczg//gPF/thuOLtjCAX92Sq6aZTsKx
+         hhflNmope+d8WhVZhHketv1MYzL326g1a3VURFW0oLXSH9ndK2dvCcFsh4cZboxe1uvH
+         91KZb9FtuOTO7j/VE4wG5xIVAIH1plfqxkpf1A0R0y4tEKJPmG3diYgyPu18QqfKhRuL
+         BrJg==
+X-Gm-Message-State: AOJu0YzM/cF+wyJomjC3dEojvfdeXQ5RRykmqjVKfS8zrPtAClfJzoPr
+	BVJ4vImN1++ersdURESXGlUYDvdU7615g+Lbjra+di0CHRz0Tbij0cfDZWlx
+X-Google-Smtp-Source: AGHT+IFUCwBilr4k9YtMXDTt98riYchy4/Tabs8Ti7+1KALcaUhihrWQNOJP2lVf5xPsy6r4M/eydA==
+X-Received: by 2002:a05:6214:20c3:b0:681:5567:5750 with SMTP id 3-20020a05621420c300b0068155675750mr5526242qve.87.1705872669131;
+        Sun, 21 Jan 2024 13:31:09 -0800 (PST)
+Received: from [172.17.0.2] ([172.183.74.5])
+        by smtp.gmail.com with ESMTPSA id kf6-20020a056214524600b006867683a3f3sm760499qvb.125.2024.01.21.13.31.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 21 Jan 2024 13:31:08 -0800 (PST)
+Message-ID: <65ad8d1c.050a0220.3582a.1612@mx.google.com>
+Date: Sun, 21 Jan 2024 13:31:08 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4547482385014450265=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: [BlueZ] bap: register all endpoints before starting config select
+In-Reply-To: <447a1b2f472b1c0c83de357e1c8094eec73308f0.1705868192.git.pav@iki.fi>
+References: <447a1b2f472b1c0c83de357e1c8094eec73308f0.1705868192.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Register all BAP endpoints first, so that they all become visible in
-DBus before we start calling SelectProperties() on them.
+--===============4547482385014450265==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This allows sound servers to know ahead of time what capabilities the
-device has, and plan the configuration.
+This is automated email and please do not reply to this email!
 
-For example, a sound server might select different configuration for
-sink+source configurations as opposed to sink or source only, due to
-bandwidth etc. concerns.
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=818402
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.44 seconds
+GitLint                       PASS      0.29 seconds
+BuildEll                      PASS      23.77 seconds
+BluezMake                     PASS      731.33 seconds
+MakeCheck                     PASS      12.37 seconds
+MakeDistcheck                 PASS      159.12 seconds
+CheckValgrind                 PASS      220.08 seconds
+CheckSmatch                   PASS      324.50 seconds
+bluezmakeextell               PASS      105.64 seconds
+IncrementalBuild              PASS      689.90 seconds
+ScanBuild                     PENDING   951.99 seconds
+
+Details
+##############################
+Test: ScanBuild - PENDING
+Desc: Run Scan Build
+Output:
+
+
+
 ---
- profiles/audio/bap.c | 48 ++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 42 insertions(+), 6 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index 69e982832..8d44e48fe 100644
---- a/profiles/audio/bap.c
-+++ b/profiles/audio/bap.c
-@@ -1285,7 +1285,7 @@ done:
- 	queue_foreach(ep->data->bcast, bap_config, NULL);
- }
- 
--static bool pac_found(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
-+static bool pac_register(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
- 							void *user_data)
- {
- 	struct btd_service *service = user_data;
-@@ -1294,8 +1294,35 @@ static bool pac_found(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
- 	DBG("lpac %p rpac %p", lpac, rpac);
- 
- 	ep = ep_register(service, lpac, rpac);
--	if (!ep) {
-+	if (!ep)
- 		error("Unable to register endpoint for pac %p", rpac);
-+
-+	return true;
-+}
-+
-+static bool pac_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
-+							void *user_data)
-+{
-+	struct btd_service *service = user_data;
-+	struct bap_data *data = btd_service_get_user_data(service);
-+	struct match_ep match = { lpac, rpac };
-+	struct queue *queue;
-+	struct bap_ep *ep;
-+
-+	switch (bt_bap_pac_get_type(rpac)) {
-+	case BT_BAP_SINK:
-+		queue = data->snks;
-+		break;
-+	case BT_BAP_SOURCE:
-+		queue = data->srcs;
-+		break;
-+	default:
-+		return true;
-+	}
-+
-+	ep = queue_find(queue, match_ep, &match);
-+	if (!ep) {
-+		error("Unable to find endpoint for pac %p", rpac);
- 		return true;
- 	}
- 
-@@ -1328,8 +1355,14 @@ static void bap_ready(struct bt_bap *bap, void *user_data)
- 
- 	DBG("bap %p", bap);
- 
--	bt_bap_foreach_pac(bap, BT_BAP_SOURCE, pac_found, service);
--	bt_bap_foreach_pac(bap, BT_BAP_SINK, pac_found, service);
-+	/* Register all ep before selecting, so that sound server
-+	 * knows all.
-+	 */
-+	bt_bap_foreach_pac(bap, BT_BAP_SOURCE, pac_register, service);
-+	bt_bap_foreach_pac(bap, BT_BAP_SINK, pac_register, service);
-+
-+	bt_bap_foreach_pac(bap, BT_BAP_SOURCE, pac_select, service);
-+	bt_bap_foreach_pac(bap, BT_BAP_SINK, pac_select, service);
- }
- 
- static bool match_setup_stream(const void *data, const void *user_data)
-@@ -2044,8 +2077,11 @@ static void pac_added(struct bt_bap_pac *pac, void *user_data)
- 
- 	data = btd_service_get_user_data(service);
- 
--	bt_bap_foreach_pac(data->bap, BT_BAP_SOURCE, pac_found, service);
--	bt_bap_foreach_pac(data->bap, BT_BAP_SINK, pac_found, service);
-+	bt_bap_foreach_pac(data->bap, BT_BAP_SOURCE, pac_register, service);
-+	bt_bap_foreach_pac(data->bap, BT_BAP_SINK, pac_register, service);
-+
-+	bt_bap_foreach_pac(data->bap, BT_BAP_SOURCE, pac_select, service);
-+	bt_bap_foreach_pac(data->bap, BT_BAP_SINK, pac_select, service);
- }
- 
- static void pac_added_broadcast(struct bt_bap_pac *pac, void *user_data)
--- 
-2.43.0
 
+--===============4547482385014450265==--
