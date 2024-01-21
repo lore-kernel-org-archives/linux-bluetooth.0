@@ -1,70 +1,101 @@
-Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-of-o52.zoho.com (sender4-of-o52.zoho.com [136.143.188.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B37114A92
-	for <linux-bluetooth@vger.kernel.org>; Sun, 21 Jan 2024 06:55:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705820128; cv=none; b=QKjXaYM2HWz9s8XCnzwsmDPgSxOIsA39UqoyJZcEzNuMVB2OI3SZNxFEyyLR1zFUjiS2qQit872f3ZM7FqotIwJmWozLAPWoNo+RIV4JIxHBupnzeSxVGxeG8xJFzJulxhfsAQsdk5Az3s1PM8vB34qpQNgEKfFG+UinixZ0n0A=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705820128; c=relaxed/simple;
-	bh=oQVrm4JM1X0wDCMXvmOHv4D9tQl39pOLC72bTquZ9bE=;
-	h=Content-Type:From:Mime-Version:Date:Subject:Message-Id:Cc:To; b=aM58EwPRyRn3SLzc1c0JAS8Fh7iO18D87kb/lvMRIkCyUYq3x2CchgHPHfBkaNKwfpFzspJ3aCFQY6ey0CfSZ5DGi3UKLmh8KP1w0MqpmH9snHB672a4O4gLEY+z8Eq295V0A4NTDF3nKlBHedcm2191bWQ24k2SJaKGBKQgz+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DqyaGSL9; arc=none smtp.client-ip=209.85.210.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6E9E364B5
+	for <linux-bluetooth@vger.kernel.org>; Sun, 21 Jan 2024 10:04:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705831469; cv=pass; b=d5J+Zuzi2NozIETAZHdH9rMtNeT8dvJROVlPiKKTXFSauxwsucPaZfMCXP/oCJSJ5dNOPIWRM5BjicJtveE86F7Xe2VY8gI2d+kFxscSAwix1k5tlHj1WM64DVtKRx8ZA5pyeb5iwORdypGhu37uSXzx2MG/f8h3Tl9h3ykTg1o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705831469; c=relaxed/simple;
+	bh=hEDMmARFMwo8nd4gZMvYeFJzn7xmZ3PgRXRkOeLMksk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Z5+NMCKIlo8a+4tR78LCT50XGgNRjKjiFdowvV13K/36KLwiUxuqQueFDcBXXjrKO1aWuikCUO7QYGaGPfc18xVUZnhs5D1XXRJUbGDhcNzTByxviw2ZBP/BssTx8hyNrtoKJCwn9gxCZSCOy888NhsOWNgwrzZBqehoxfhrZ5o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lab.zgora.pl; spf=pass smtp.mailfrom=lab.zgora.pl; dkim=pass (2048-bit key) header.d=lab.zgora.pl header.i=mk@lab.zgora.pl header.b=XR1BpVzI; arc=pass smtp.client-ip=136.143.188.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lab.zgora.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lab.zgora.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DqyaGSL9"
-Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-6dddc655a60so1678110a34.2
-        for <linux-bluetooth@vger.kernel.org>; Sat, 20 Jan 2024 22:55:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705820126; x=1706424926; darn=vger.kernel.org;
-        h=to:cc:message-id:subject:date:mime-version:from
-         :content-transfer-encoding:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oQVrm4JM1X0wDCMXvmOHv4D9tQl39pOLC72bTquZ9bE=;
-        b=DqyaGSL99PFXyEnkNwcdTjLKBoUp4egYnXTNCYMgI64PK0CxX5LIg/iCm/8dYHKQ0e
-         2NT+79qbK0zIFZAsRBca3knnwDGL0Irs7Jq/edifAMs64J481FchifE55X7B3kRCwImt
-         +LLmWjnsy/5SZXomd1twasndd+cGbiUbyBwfE4AMFhiAflRFKJWXx9amCEeDVmKcmk2h
-         sPgzaOw7UWSh9FRKrzC2swYKTEdSnWuZbcCURdZ0KVyRocqqb083jeKqhTxstVFKK+BO
-         Njf/HWPLoigkuZ9/1ZtQwUodBrovyOMdLjgXEfR9la+IT3Yu3tsfSnyMKPBcEorhnxY2
-         jWfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705820126; x=1706424926;
-        h=to:cc:message-id:subject:date:mime-version:from
-         :content-transfer-encoding:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=oQVrm4JM1X0wDCMXvmOHv4D9tQl39pOLC72bTquZ9bE=;
-        b=lD/QgV8znuw6kc9GTUFoqLM326CDmLgV4dH2m87ykQ6l3n2iaBkB8cSkYyZQqDaPJo
-         DtGMAR6AAVTmAso0/dwmFVxIq7H447QbK/NeKi4/CH549JBOYi2wYacOD3uFoMWIC+A6
-         VhFUzhyuK48dDuADbHVGTF3ZSClf2Wr0DRkOowdPEa2JbPg61Kv67n1GWAo0RXRAYmuM
-         x7cfQvRYdYcc2AA9M3My91hll3TNtI3BSXmVjOVfpYI1fXkYtDG9dZXJb6Ilc5fhA0RJ
-         pvx+9A9OxomnNdGXPbqm2AS0s1eueWpjvG2C6OODTncwl/HdhtDYAZMZTWREJgKk4DbD
-         YXCQ==
-X-Gm-Message-State: AOJu0YwJjlydtvDDHEaLrKpUaoPIhCs3BcpfK15rdcKLuUsC+JGKgl0L
-	vWyVdt0BMcWopQoW5i06p3iJ1SiOOOJp8ONYFLw8Jiohwup7PY/Yb+TWpNkp
-X-Google-Smtp-Source: AGHT+IFxImqkeExj++gVACQfSRmYCkE5aP2OvkPFdrVt6z6Ns54yQGKdUUuBIn+fNrgBf1M1eQR09Q==
-X-Received: by 2002:a9d:6acb:0:b0:6d9:d8e3:b2ce with SMTP id m11-20020a9d6acb000000b006d9d8e3b2cemr3327368otq.77.1705820125827;
-        Sat, 20 Jan 2024 22:55:25 -0800 (PST)
-Received: from smtpclient.apple (2603-8080-6500-979d-b11e-200c-b859-4620.res6.spectrum.com. [2603:8080:6500:979d:b11e:200c:b859:4620])
-        by smtp.gmail.com with ESMTPSA id g19-20020a056830161300b006ddd897c37bsm1167605otr.37.2024.01.20.22.55.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 20 Jan 2024 22:55:25 -0800 (PST)
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-From: senca Wilson <sencawilson@gmail.com>
+	dkim=pass (2048-bit key) header.d=lab.zgora.pl header.i=mk@lab.zgora.pl header.b="XR1BpVzI"
+ARC-Seal: i=1; a=rsa-sha256; t=1705831464; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=h875/isVzX3TwegLCvzy2MoKAKxkIscjLtvEdBqW19cyRIyc9PDN1NbbAxYWm4m/jYzpFKHKtrAXeSSFstD2o1CTNilkMGkr5x36f3vKokZ1lqPkvAYmbH/7msqivABb7sLfJ6iKF6Hd99MmhCY2eAa6opJEcpxlubbrp5CiNcI=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1705831464; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=/hrJzDrd9QMRCUeKIcsVEMQ97JS2VY0Ht8lJtSJdjlo=; 
+	b=HKqQ1V7VG0n/FoQPEgO5mvFmOt1NeZDzQ8Le+I/4wjbBTtF4vDHyKPYLrEp6u82V+OwEkZy1qS46wsnhdabHXaQlWJVCRTulEPyPl04joP9rX0lBRbeVAbtWDCGrljZEcGMqInzQYSDNQXIcU/whK2czsaebIeaUtUpx4ssICAw=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=lab.zgora.pl;
+	spf=pass  smtp.mailfrom=mk@lab.zgora.pl;
+	dmarc=pass header.from=<mk@lab.zgora.pl>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1705831464;
+	s=mail; d=lab.zgora.pl; i=mk@lab.zgora.pl;
+	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-Id:Message-Id:MIME-Version:Content-Transfer-Encoding:Reply-To;
+	bh=/hrJzDrd9QMRCUeKIcsVEMQ97JS2VY0Ht8lJtSJdjlo=;
+	b=XR1BpVzI+R2HergKuy3+iNdpi11fDMwTLe2373Hwfj5PTXU+gOih3l4aQWK/n+qQ
+	uZ0u+xSvZ/GzNM0NqFqaf2GgaeDCMvzyznEtspgc8ZVCb27RK91jts/TaBmXQC8eUnF
+	w+io5IwbnonKSFDzwoTI+nupiC5WcdYTJJtv/hJVgXjsb+Yrq4S6c1Rbh+gRRMgclSF
+	ABBMCRA6RyF39hBAaf/TjSNp1UtHLNZ9CRyMJSYvOouhNRWC++5S6cxsbdASfIF8gZ2
+	zFuse/83rsk8LsGqNk+0tAGvX+h8rdIp+TM3ILbwrqw6dOiXmqcmwpo0FKDDcfydZoM
+	P3ZU4dFoqg==
+Received: from box.. (77-254-108-42.dynamic.inetia.pl [77.254.108.42]) by mx.zohomail.com
+	with SMTPS id 1705831463019240.5137268587515; Sun, 21 Jan 2024 02:04:23 -0800 (PST)
+From: =?UTF-8?q?Mariusz=20Koz=C5=82owski?= <mk@lab.zgora.pl>
+To: linux-bluetooth@vger.kernel.org
+Cc: =?UTF-8?q?Mariusz=20Koz=C5=82owski?= <mk@lab.zgora.pl>
+Subject: [PATCH BlueZ] btmon-logger: Fix stack corruption
+Date: Sun, 21 Jan 2024 11:03:28 +0100
+Message-Id: <20240121100328.1200839-1-mk@lab.zgora.pl>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (1.0)
-Date: Sun, 21 Jan 2024 00:55:12 -0600
-Subject: Re: [PATCH BlueZ 0/9] Initial BAP support
-Message-Id: <5C178573-FEF4-470A-8797-AF96E35E8578@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-To: luiz.dentz@gmail.com
-X-Mailer: iPhone Mail (21D5044a)
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
+Version 3 capability masks are 64 bits in size.
+---
+ tools/btmon-logger.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-Sent from my iPhone
+diff --git a/tools/btmon-logger.c b/tools/btmon-logger.c
+index a770ad575..1f6db3751 100644
+--- a/tools/btmon-logger.c
++++ b/tools/btmon-logger.c
+@@ -161,14 +161,14 @@ extern int capset(struct __user_cap_header_struct *header,
+ static void drop_capabilities(void)
+ {
+ 	struct __user_cap_header_struct header;
+-	struct __user_cap_data_struct cap;
++	struct __user_cap_data_struct cap[_LINUX_CAPABILITY_U32S_3];
+ 	unsigned int mask;
+ 	int err;
+ 
+ 	header.version = _LINUX_CAPABILITY_VERSION_3;
+ 	header.pid = 0;
+ 
+-	err = capget(&header, &cap);
++	err = capget(&header, cap);
+ 	if (err) {
+ 		perror("Unable to get current capabilities");
+ 		return;
+@@ -177,11 +177,11 @@ static void drop_capabilities(void)
+ 	/* not needed anymore since monitor socket is already open */
+ 	mask = ~CAP_TO_MASK(CAP_NET_RAW);
+ 
+-	cap.effective &= mask;
+-	cap.permitted &= mask;
+-	cap.inheritable &= mask;
++	cap[0].effective &= mask;
++	cap[0].permitted &= mask;
++	cap[0].inheritable &= mask;
+ 
+-	err = capset(&header, &cap);
++	err = capset(&header, cap);
+ 	if (err)
+ 		perror("Failed to set capabilities");
+ }
+-- 
+2.34.1
+
