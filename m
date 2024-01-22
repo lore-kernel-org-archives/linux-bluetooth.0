@@ -1,129 +1,134 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 743E446553
-	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jan 2024 18:17:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5495F4D100
+	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jan 2024 18:28:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705947447; cv=none; b=Q//bardBl8OzgPR1RXbsMUjRFzraO5GJKUalniDPTNbEuUSeXSEiGkDWJugZyFLt7YjxJZHoJ4MG9r6j+uygoinebKrISWtkfG5rBXiwFw6P1EvAxBoTbcpGrFN5VnNI7rteRRA4kT0o5XlAwycj++42xXDz1ad7FupnEl4qb3g=
+	t=1705948084; cv=none; b=a9g68pEzdALcZwnFioHOEMHo1ibFN4jDowFn1RICTUbGB6ddbSdRUF9SCl4PMQBIkOD8+twYRyVpLT0US0+onrpi4p6/3eJrkjR9//kP75gIayzJ96w2FjwiwFlCxNlTprBIbhnRIpSGRkB3mNOExiybaL3odt5vCUvh1Fukn+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705947447; c=relaxed/simple;
-	bh=8WP4F1/iqnQozfvR6MwyaTUwTNNzxBrfyOx9I4RD/08=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=F1zsfqzpJXKeeLal/jQ6gra25r57iJ//JAeNMciEo6HquBDitxOrwkYSbn8Nrc/lUvBSq3N+TOHznluZYwra7uqIfXllNFxY39As0Xj/OzieFLXIrD2ntzYAeA1WOh9LKzT4Gs69Und6gF5vr/UlugKf8aUBweikeXReZU+ASII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KUqbQnxs; arc=none smtp.client-ip=209.85.210.172
+	s=arc-20240116; t=1705948084; c=relaxed/simple;
+	bh=dQiMwhl+idwmMWmIqdzjqVhMNczlI1duAUZ6+6zL6pQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=avPPIA5gVqanLh4aaRINIbPQPJSuQ4n0W26hOT63TGUR53kacRJ+AGbXrnX8KiEg3KmyPIqrD+FC8lVTCOICj7vAheiH74qpYWdbK6zx1LaybxvDeE/JoASTDu2FshDY1pterVwjTi0dv2zdM24k8meO9vkeKjN1kIwagcBYJys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rm/egwQX; arc=none smtp.client-ip=209.85.208.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KUqbQnxs"
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-6dbebe4938bso542475b3a.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jan 2024 10:17:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rm/egwQX"
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2cddf596321so36573911fa.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jan 2024 10:28:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705947445; x=1706552245; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=8WP4F1/iqnQozfvR6MwyaTUwTNNzxBrfyOx9I4RD/08=;
-        b=KUqbQnxst+ReEPMb7Kbp3lKdRDEC/6f+EzUaaKKUWyihjJXJueeW4G1gIUjGDOnDgl
-         l2IkiL4ktGkLPNr7zSjOCp73c1wdgklCeoIgKoRsyXVqw3I1H2F4IOHNl7HfEwaeLGh4
-         LU0emxJa/yzjqoGKz5krNI4s9ByriaHMSeVZ/Q+iyB2Q6dtEmDG2ueo6jWloUI6wl1B9
-         nT/vRVHdH5eUBdgfybr9367FkczYAMzU4IlFhzggBIisDqNGSZOsab+n/vpfzrIMKe3k
-         4xpajbK7h3I13mzznaL+5YJfvkAWbqYQBeH/tEGg1VTjCSkZo2z+xuX+hvb3uy4Ds5Mt
-         OUjQ==
+        d=gmail.com; s=20230601; t=1705948080; x=1706552880; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NsmdGPbk5hVPNZGgiNPviYhBh/lVBr6yp4EloryPXQM=;
+        b=Rm/egwQXxkLmppZIU9nCfAp/YTf1x7fDbThFq6V2QVXx8vxXOMxkv81j/R8+s38UGj
+         WDorfT6MAPtMrkp6bFCm6vdEVPTsNdfhmcjLzVvMmHg7p7mZQnjI5yFN2Bx8Tku5ZZuO
+         VcISE/hTxNQ5/ILFcMImUUnIhQscRwslOBseSR3Y21ow2e4WZWPBl+SvKXMv/8+p5Zv0
+         lh72xyXLXqwEhI7/pRB7+QnoGPEw39y80QAdBIpLYIREaX/ZQmgFbhOyICXaHgTj87BV
+         i99STfkOD8Gc5YDwWmhf88sG4UnUFYUYe4sPaooQOMoOSmhCb8xAGAAlJJ8g51OTXRBt
+         U3iQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705947445; x=1706552245;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8WP4F1/iqnQozfvR6MwyaTUwTNNzxBrfyOx9I4RD/08=;
-        b=mzKBsdupLyUui5vsIKJByIl+Iq16bWkJYV9Myic5OO6PL2RNieSPyukuaMgpZr9xhZ
-         9RhiFJfe2S/ndZHqxurp/Vl4zYOO15qVE6TySL0UGwHlqHZKYJz83Dnd+dPaPK+DBW9Y
-         4isE0bj154TXoayG2F6hmVKv/wwTu1N2nE8LWfgrYfEXfgvcSCYz7LXqCHFncfAlX6mT
-         hwXgHFJ9mFrLQAYd9D4feAjHK+lNDj70dePgPI7CMHEE17rSB7qIl9kK+C4wxwot6GU0
-         lPQQmbYWfEWvopGgOIxL9RJxBxsW6sN5dS0WBzLsNeHXh7LnavHio+tFkjZLcURNCDGQ
-         etpQ==
-X-Gm-Message-State: AOJu0YzXc2CD5uhMWLZlmRY6mzzcJkHWkL+mDe8Z+Mfr6uv/MoPtfCcE
-	L7ZNYD9qsRkd4PqMOkJm+wgLz4UU/wlLbFMiwBFhvRR9NvHkbLxcqD0aDV7C
-X-Google-Smtp-Source: AGHT+IFeyayaTqNn+izljIgY3iKPi6i2J4Z819TQTJgTX5wSpRkA9lI69nf3GpA1rSTD0dg8NJo3TQ==
-X-Received: by 2002:a05:6a20:d386:b0:19b:fb9a:286a with SMTP id iq6-20020a056a20d38600b0019bfb9a286amr2790947pzb.66.1705947445457;
-        Mon, 22 Jan 2024 10:17:25 -0800 (PST)
-Received: from [172.17.0.2] ([13.91.68.164])
-        by smtp.gmail.com with ESMTPSA id z8-20020a056a00240800b006daa809584csm9793364pfh.182.2024.01.22.10.17.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jan 2024 10:17:25 -0800 (PST)
-Message-ID: <65aeb135.050a0220.27468.357a@mx.google.com>
-Date: Mon, 22 Jan 2024 10:17:25 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1849114615159234014=="
+        d=1e100.net; s=20230601; t=1705948080; x=1706552880;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NsmdGPbk5hVPNZGgiNPviYhBh/lVBr6yp4EloryPXQM=;
+        b=o/RDNGc4zZ9xYQ4h78U1CTYKIhKRon/5O2f7kR3DEXEnYbf+ON3bZk56w9/LVaksXQ
+         6eBwX+HwdShEPNxvAzgIqYr2PsXPKdKFueZ5BbSVmz/tdXyhBeCVw8Q5X3zDCk4B/8Mi
+         DsbTgX+6RFOgwbqx876grrsFusj4TClkSORX5ICTHL80F+GCYs5HqnN7bGVbXlxh0D4L
+         ngNRQn0M+QaF3MCUuKXKWd83wzU6n9n82lWlgbuKz4ovapNNqG9xJYCKhZttTRsSuIS7
+         lvEQa/lSAOSRp6Wyhw13EAwBZHfLFoCeu8TLhdrw2Wosr0nwiYZ0ziuQOLW6fVdkJGdX
+         cZNA==
+X-Gm-Message-State: AOJu0Yz/gIncF82S/4qsDHQPEnQuanEES0EoHScIJrXdhM6cfKmD2a+7
+	arCGqJx817R1+Y89xBCT9cZF3PAUgAXgnxYOQa/YcaM8DCW04XuV5MKkkBFllVvvWhXg535NyhA
+	akz4+9myMeroETFMaMHkdpawZOJ+e1CAx6X0=
+X-Google-Smtp-Source: AGHT+IFk1QT2BO8Dp/2tKr+pK9hbJDjDvi9xn0UxH0W9UdQndTaTGB0Pin4VWZPSpF7uNMMxqS7L/4R8rKdJbXFPJIo=
+X-Received: by 2002:a2e:7a05:0:b0:2cd:8e9f:9b91 with SMTP id
+ v5-20020a2e7a05000000b002cd8e9f9b91mr1929098ljc.83.1705948080087; Mon, 22 Jan
+ 2024 10:28:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, francesco@dolcini.it
-Subject: RE: [v2] treewide, serdev: change receive_buf() return type to size_t
-In-Reply-To: <20240122180551.34429-1-francesco@dolcini.it>
-References: <20240122180551.34429-1-francesco@dolcini.it>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20240121100328.1200839-1-mk@lab.zgora.pl>
+In-Reply-To: <20240121100328.1200839-1-mk@lab.zgora.pl>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 22 Jan 2024 13:27:46 -0500
+Message-ID: <CABBYNZKW8odyLb_BQcXXpjAKjPzHRhXVCbxvcg54VkoeULeHnw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] btmon-logger: Fix stack corruption
+To: =?UTF-8?Q?Mariusz_Koz=C5=82owski?= <mk@lab.zgora.pl>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============1849114615159234014==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Mariusz,
 
-This is an automated email and please do not reply to this email.
+On Sun, Jan 21, 2024 at 5:04=E2=80=AFAM Mariusz Koz=C5=82owski <mk@lab.zgor=
+a.pl> wrote:
+>
+> Version 3 capability masks are 64 bits in size.
+> ---
+>  tools/btmon-logger.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+>
+> diff --git a/tools/btmon-logger.c b/tools/btmon-logger.c
+> index a770ad575..1f6db3751 100644
+> --- a/tools/btmon-logger.c
+> +++ b/tools/btmon-logger.c
+> @@ -161,14 +161,14 @@ extern int capset(struct __user_cap_header_struct *=
+header,
+>  static void drop_capabilities(void)
+>  {
+>         struct __user_cap_header_struct header;
+> -       struct __user_cap_data_struct cap;
+> +       struct __user_cap_data_struct cap[_LINUX_CAPABILITY_U32S_3];
 
-Dear Submitter,
+Ok, but this doesn't change the field, it makes it an array, or are
+you talking about the following note:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+Note that 64-bit capabilities use datap[0] and datap[1], whereas
+32-bit capabilities use only datap[0].
 
------ Output -----
+In that case Ive just pointed out to this note to explain why this is neede=
+d.
 
-error: patch failed: drivers/bluetooth/btmtkuart.c:383
-error: drivers/bluetooth/btmtkuart.c: patch does not apply
-error: patch failed: drivers/bluetooth/btnxpuart.c:1264
-error: drivers/bluetooth/btnxpuart.c: patch does not apply
-error: patch failed: drivers/bluetooth/hci_serdev.c:271
-error: drivers/bluetooth/hci_serdev.c: patch does not apply
-error: patch failed: drivers/gnss/serial.c:80
-error: drivers/gnss/serial.c: patch does not apply
-error: patch failed: drivers/gnss/sirf.c:160
-error: drivers/gnss/sirf.c: patch does not apply
-error: patch failed: drivers/greybus/gb-beagleplay.c:271
-error: drivers/greybus/gb-beagleplay.c: patch does not apply
-error: patch failed: drivers/iio/chemical/pms7003.c:211
-error: drivers/iio/chemical/pms7003.c: patch does not apply
-error: patch failed: drivers/iio/chemical/scd30_serial.c:174
-error: drivers/iio/chemical/scd30_serial.c: patch does not apply
-error: patch failed: drivers/iio/chemical/sps30_serial.c:210
-error: drivers/iio/chemical/sps30_serial.c: patch does not apply
-error: patch failed: drivers/iio/imu/bno055/bno055_ser_core.c:378
-error: drivers/iio/imu/bno055/bno055_ser_core.c: patch does not apply
-error: patch failed: drivers/mfd/rave-sp.c:471
-error: drivers/mfd/rave-sp.c: patch does not apply
-error: patch failed: drivers/net/ethernet/qualcomm/qca_uart.c:58
-error: drivers/net/ethernet/qualcomm/qca_uart.c: patch does not apply
-error: patch failed: drivers/nfc/pn533/uart.c:203
-error: drivers/nfc/pn533/uart.c: patch does not apply
-error: patch failed: drivers/nfc/s3fwrn5/uart.c:51
-error: drivers/nfc/s3fwrn5/uart.c: patch does not apply
-error: patch failed: drivers/platform/chrome/cros_ec_uart.c:81
-error: drivers/platform/chrome/cros_ec_uart.c: patch does not apply
-error: patch failed: drivers/platform/surface/aggregator/core.c:227
-error: drivers/platform/surface/aggregator/core.c: patch does not apply
-error: patch failed: include/linux/serdev.h:27
-error: include/linux/serdev.h: patch does not apply
-error: patch failed: sound/drivers/serial-generic.c:100
-error: sound/drivers/serial-generic.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
+>         unsigned int mask;
+>         int err;
+>
+>         header.version =3D _LINUX_CAPABILITY_VERSION_3;
+>         header.pid =3D 0;
+>
+> -       err =3D capget(&header, &cap);
+> +       err =3D capget(&header, cap);
+>         if (err) {
+>                 perror("Unable to get current capabilities");
+>                 return;
+> @@ -177,11 +177,11 @@ static void drop_capabilities(void)
+>         /* not needed anymore since monitor socket is already open */
+>         mask =3D ~CAP_TO_MASK(CAP_NET_RAW);
+>
+> -       cap.effective &=3D mask;
+> -       cap.permitted &=3D mask;
+> -       cap.inheritable &=3D mask;
+> +       cap[0].effective &=3D mask;
+> +       cap[0].permitted &=3D mask;
+> +       cap[0].inheritable &=3D mask;
+>
+> -       err =3D capset(&header, &cap);
+> +       err =3D capset(&header, cap);
+>         if (err)
+>                 perror("Failed to set capabilities");
+>  }
+> --
+> 2.34.1
+>
+>
 
 
----
-Regards,
-Linux Bluetooth
-
-
---===============1849114615159234014==--
+--=20
+Luiz Augusto von Dentz
