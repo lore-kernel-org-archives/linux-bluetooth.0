@@ -1,191 +1,129 @@
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2BF83DBAC
-	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jan 2024 18:16:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 743E446553
+	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jan 2024 18:17:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705947373; cv=none; b=IUgfExzvqhNt7UwepHZFKCjECmxHEABB0ojlk0V09C7xmm9LZ5DmHq6h6Lpe4IyFvShabtKoMDc0qgDu7ARHU9K6sHrvHPLZ6Q4XZsb3N/agNwRC5FZrda4/MicRO54GLEPDFrIVkaEUDNzBeVZzpBhnyr8Pxf9Gmz0TpFvGklw=
+	t=1705947447; cv=none; b=Q//bardBl8OzgPR1RXbsMUjRFzraO5GJKUalniDPTNbEuUSeXSEiGkDWJugZyFLt7YjxJZHoJ4MG9r6j+uygoinebKrISWtkfG5rBXiwFw6P1EvAxBoTbcpGrFN5VnNI7rteRRA4kT0o5XlAwycj++42xXDz1ad7FupnEl4qb3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705947373; c=relaxed/simple;
-	bh=CgvBRR+jChvee4h4sPhrhzRXxu9VmH2uaboa1J+z5Hw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GTkm+iLmFeSV7fJ0b9NpCd0rOMl0nc75IreMVisbpVRCGigRt9RSM/FhJovW1SVDIOIkaOFK41lTqJArWSRbHF9SwjVv+l7tG5nNgY3v7JXHuNXK62XNn/6Z72bg7IC1HltN2kau17zT9Drl/JTWEzHMFYT3m2qFf1Ar/z3MjgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FqKqgkF3; arc=none smtp.client-ip=209.85.208.181
+	s=arc-20240116; t=1705947447; c=relaxed/simple;
+	bh=8WP4F1/iqnQozfvR6MwyaTUwTNNzxBrfyOx9I4RD/08=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=F1zsfqzpJXKeeLal/jQ6gra25r57iJ//JAeNMciEo6HquBDitxOrwkYSbn8Nrc/lUvBSq3N+TOHznluZYwra7uqIfXllNFxY39As0Xj/OzieFLXIrD2ntzYAeA1WOh9LKzT4Gs69Und6gF5vr/UlugKf8aUBweikeXReZU+ASII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KUqbQnxs; arc=none smtp.client-ip=209.85.210.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FqKqgkF3"
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2cddb0ee311so35325721fa.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jan 2024 10:16:11 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KUqbQnxs"
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-6dbebe4938bso542475b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jan 2024 10:17:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705947370; x=1706552170; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=U1kZdGJTCHivmthHndoBG6ngHJY3feLsgZ+JIjWRhRY=;
-        b=FqKqgkF3ONm2+JoPwx+p9AiOPV8tAMWrG9rFa/JSWGO1iVxLTYCF/Aed7rxsVDSVT1
-         zlt1o/aO8xqPjvBwEHOea166bet2BIQwpwsqKNq1Vz5BfCk8TvWvFOTOe5y0O+T2F8N/
-         LeQpsX9iBYNzcq2+Fr2ksDVzsB8dx3Q1lYbIcXnpZWRuOwH9PS6fSsBy3el/sF2c4P16
-         yIw2CuHe2NrcZXleRd1eNoKfMow9KuH2FDepAUY8MCb+gKPQPI/JUxM9fGnhQyzqKt3Z
-         /KK1z/gfYhGp5rYbDP2BUxdpthbpN3UZT0zg8xOctZ4BqWj1tedbs+HzSZ2kqiO/+h+t
-         k7gw==
+        d=gmail.com; s=20230601; t=1705947445; x=1706552245; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=8WP4F1/iqnQozfvR6MwyaTUwTNNzxBrfyOx9I4RD/08=;
+        b=KUqbQnxst+ReEPMb7Kbp3lKdRDEC/6f+EzUaaKKUWyihjJXJueeW4G1gIUjGDOnDgl
+         l2IkiL4ktGkLPNr7zSjOCp73c1wdgklCeoIgKoRsyXVqw3I1H2F4IOHNl7HfEwaeLGh4
+         LU0emxJa/yzjqoGKz5krNI4s9ByriaHMSeVZ/Q+iyB2Q6dtEmDG2ueo6jWloUI6wl1B9
+         nT/vRVHdH5eUBdgfybr9367FkczYAMzU4IlFhzggBIisDqNGSZOsab+n/vpfzrIMKe3k
+         4xpajbK7h3I13mzznaL+5YJfvkAWbqYQBeH/tEGg1VTjCSkZo2z+xuX+hvb3uy4Ds5Mt
+         OUjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705947370; x=1706552170;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=U1kZdGJTCHivmthHndoBG6ngHJY3feLsgZ+JIjWRhRY=;
-        b=ME+tH14P44J626z9slTjRCU/eP8cbkZ6/7WVuZ/oDrxZPo7Os6R4irIDSK5/lg9LzX
-         tPAKwQ1ArJb+qWE5NNCwk17GjBbnYl0VXzTRTXHPv9nxCFfuszTpTQf6iUS//kuzOMWY
-         BWzCivIJgryV20COp8pWfxoFxvxYwa2LiCSwKPdMeVsootD+4Gez0o49sHZZ/l6D8Tk2
-         1i8itZl/AgoQgCN0Xg0RbGGSTvhN0SCv1oioQcUeAaY12CA+Zgq6Sloj40mOsZGkk+MQ
-         pFCtXssYhLeTZyy5N+ngpPG2c5ZNMQV5BZ0WQVrCoPLKQeS9LqvOWY3Y9MpjDaqlGEDl
-         pz2w==
-X-Gm-Message-State: AOJu0YzbYPsPTTrP+wBAWmqR42NwrxM6zD9XjEIbYWX9wc0DX/uiAi84
-	o7pSDobv7xkN0bIxQBHoPs+HQ/P1r9zEdOE+LNgkGET4S1/Kn+EW6PzPHU5KuRBQgLPZfRHITUv
-	L5lO3jws87tCeWAeJBNeje+hlXs/SXAjr
-X-Google-Smtp-Source: AGHT+IFQiZoGUBwMhVu9IlzHYq6f6URzykkzShlHVLJ3WHwhZw9JTLb1AQs1q7Enk780LCfNHyG/uFBImBmpAyJTZq8=
-X-Received: by 2002:a05:651c:1049:b0:2cd:3141:5d4f with SMTP id
- x9-20020a05651c104900b002cd31415d4fmr886667ljm.109.1705947369445; Mon, 22 Jan
- 2024 10:16:09 -0800 (PST)
+        d=1e100.net; s=20230601; t=1705947445; x=1706552245;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8WP4F1/iqnQozfvR6MwyaTUwTNNzxBrfyOx9I4RD/08=;
+        b=mzKBsdupLyUui5vsIKJByIl+Iq16bWkJYV9Myic5OO6PL2RNieSPyukuaMgpZr9xhZ
+         9RhiFJfe2S/ndZHqxurp/Vl4zYOO15qVE6TySL0UGwHlqHZKYJz83Dnd+dPaPK+DBW9Y
+         4isE0bj154TXoayG2F6hmVKv/wwTu1N2nE8LWfgrYfEXfgvcSCYz7LXqCHFncfAlX6mT
+         hwXgHFJ9mFrLQAYd9D4feAjHK+lNDj70dePgPI7CMHEE17rSB7qIl9kK+C4wxwot6GU0
+         lPQQmbYWfEWvopGgOIxL9RJxBxsW6sN5dS0WBzLsNeHXh7LnavHio+tFkjZLcURNCDGQ
+         etpQ==
+X-Gm-Message-State: AOJu0YzXc2CD5uhMWLZlmRY6mzzcJkHWkL+mDe8Z+Mfr6uv/MoPtfCcE
+	L7ZNYD9qsRkd4PqMOkJm+wgLz4UU/wlLbFMiwBFhvRR9NvHkbLxcqD0aDV7C
+X-Google-Smtp-Source: AGHT+IFeyayaTqNn+izljIgY3iKPi6i2J4Z819TQTJgTX5wSpRkA9lI69nf3GpA1rSTD0dg8NJo3TQ==
+X-Received: by 2002:a05:6a20:d386:b0:19b:fb9a:286a with SMTP id iq6-20020a056a20d38600b0019bfb9a286amr2790947pzb.66.1705947445457;
+        Mon, 22 Jan 2024 10:17:25 -0800 (PST)
+Received: from [172.17.0.2] ([13.91.68.164])
+        by smtp.gmail.com with ESMTPSA id z8-20020a056a00240800b006daa809584csm9793364pfh.182.2024.01.22.10.17.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jan 2024 10:17:25 -0800 (PST)
+Message-ID: <65aeb135.050a0220.27468.357a@mx.google.com>
+Date: Mon, 22 Jan 2024 10:17:25 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1849114615159234014=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240122165000.279381-1-frederic.danis@collabora.com> <20240122165000.279381-5-frederic.danis@collabora.com>
-In-Reply-To: <20240122165000.279381-5-frederic.danis@collabora.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 22 Jan 2024 13:15:56 -0500
-Message-ID: <CABBYNZL-uiQyss17OWRrgdpf2KdVLKmVdunO-Kd5WD1KepKw0A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 4/5] btgatt-client: Add function to search descriptors
-To: =?UTF-8?B?RnLDqWTDqXJpYyBEYW5pcw==?= <frederic.danis@collabora.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, francesco@dolcini.it
+Subject: RE: [v2] treewide, serdev: change receive_buf() return type to size_t
+In-Reply-To: <20240122180551.34429-1-francesco@dolcini.it>
+References: <20240122180551.34429-1-francesco@dolcini.it>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Fr=C3=A9d=C3=A9ric,
+--===============1849114615159234014==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 22, 2024 at 12:43=E2=80=AFPM Fr=C3=A9d=C3=A9ric Danis
-<frederic.danis@collabora.com> wrote:
->
-> This is requested to pass PTS GATT/CL/GAD/BV-06-C test.
-> This search descriptors based on start and end handles.
+This is an automated email and please do not reply to this email.
 
-Is this test mandatory though? Afaik if we do support the discovery of
-all procedure this becomes useless, because the stack can perform
-these operations locally by using its cache.
+Dear Submitter,
 
-> ---
->  tools/btgatt-client.c | 79 +++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 79 insertions(+)
->
-> diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-> index bb0822658..a7d5d76ba 100644
-> --- a/tools/btgatt-client.c
-> +++ b/tools/btgatt-client.c
-> @@ -1490,6 +1490,83 @@ static void cmd_search_characteristics(struct clie=
-nt *cli, char *cmd_str)
->                                                 NULL);
->  }
->
-> +static void search_descriptors_usage(void)
-> +{
-> +       printf("Usage: search-descriptors <start_hanlde> <end_handle>\n"
-> +               "e.g.:\n"
-> +               "\tsearch-descriptors 0x0001 0xFFFF\n");
-> +}
-> +
-> +static void search_descriptors_cb(bool success, uint8_t att_ecode,
-> +                                       struct bt_gatt_result *result,
-> +                                       void *user_data)
-> +{
-> +       struct bt_gatt_iter iter;
-> +       uint16_t handle;
-> +       uint128_t u128;
-> +       bt_uuid_t uuid;
-> +       char uuid_str[MAX_LEN_UUID_STR];
-> +
-> +       if (!success) {
-> +               PRLOG("\nDescriptors discovery failed: %s (0x%02x)\n",
-> +                               ecode_to_string(att_ecode), att_ecode);
-> +               return;
-> +       }
-> +
-> +       if (!result || !bt_gatt_iter_init(&iter, result))
-> +               return;
-> +
-> +       printf("\n");
-> +       while (bt_gatt_iter_next_descriptor(&iter, &handle, u128.data)) {
-> +               bt_uuid128_create(&uuid, u128);
-> +               bt_uuid_to_string(&uuid, uuid_str, sizeof(uuid_str));
-> +               printf("Found handle: 0x%04x UUID: %s\n", handle, uuid_st=
-r);
-> +       }
-> +       PRLOG("\n");
-> +}
-> +
-> +static void cmd_search_descriptors(struct client *cli, char *cmd_str)
-> +{
-> +       char *argv[3];
-> +       int argc =3D 0;
-> +       uint16_t start_handle, end_handle;
-> +       char *endptr =3D NULL;
-> +
-> +       if (!bt_gatt_client_is_ready(cli->gatt)) {
-> +               printf("GATT client not initialized\n");
-> +               return;
-> +       }
-> +
-> +       if (!parse_args(cmd_str, 2, argv, &argc)) {
-> +               printf("Too many arguments\n");
-> +               search_descriptors_usage();
-> +               return;
-> +       }
-> +
-> +       if (argc < 1) {
-> +               search_descriptors_usage();
-> +               return;
-> +       }
-> +
-> +       start_handle =3D strtol(argv[0], &endptr, 0);
-> +       if (!endptr || *endptr !=3D '\0') {
-> +               printf("Invalid start handle: %s\n", argv[0]);
-> +               return;
-> +       }
-> +
-> +       end_handle =3D strtol(argv[1], &endptr, 0);
-> +       if (!endptr || *endptr !=3D '\0') {
-> +               printf("Invalid end handle: %s\n", argv[1]);
-> +               return;
-> +       }
-> +
-> +       bt_gatt_discover_descriptors(bt_gatt_client_get_att(cli->gatt),
-> +                                               start_handle, end_handle,
-> +                                               search_descriptors_cb,
-> +                                               NULL,
-> +                                               NULL);
-> +}
-> +
->  static void cmd_help(struct client *cli, char *cmd_str);
->
->  typedef void (*command_func_t)(struct client *cli, char *cmd_str);
-> @@ -1530,6 +1607,8 @@ static struct {
->                                 "\tSearch service"},
->         { "search-characteristics", cmd_search_characteristics,
->                                 "\tSearch characteristics"},
-> +       { "search-descriptors", cmd_search_descriptors,
-> +                               "\tSearch descriptors"},
->         { }
->  };
->
-> --
-> 2.34.1
->
->
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: drivers/bluetooth/btmtkuart.c:383
+error: drivers/bluetooth/btmtkuart.c: patch does not apply
+error: patch failed: drivers/bluetooth/btnxpuart.c:1264
+error: drivers/bluetooth/btnxpuart.c: patch does not apply
+error: patch failed: drivers/bluetooth/hci_serdev.c:271
+error: drivers/bluetooth/hci_serdev.c: patch does not apply
+error: patch failed: drivers/gnss/serial.c:80
+error: drivers/gnss/serial.c: patch does not apply
+error: patch failed: drivers/gnss/sirf.c:160
+error: drivers/gnss/sirf.c: patch does not apply
+error: patch failed: drivers/greybus/gb-beagleplay.c:271
+error: drivers/greybus/gb-beagleplay.c: patch does not apply
+error: patch failed: drivers/iio/chemical/pms7003.c:211
+error: drivers/iio/chemical/pms7003.c: patch does not apply
+error: patch failed: drivers/iio/chemical/scd30_serial.c:174
+error: drivers/iio/chemical/scd30_serial.c: patch does not apply
+error: patch failed: drivers/iio/chemical/sps30_serial.c:210
+error: drivers/iio/chemical/sps30_serial.c: patch does not apply
+error: patch failed: drivers/iio/imu/bno055/bno055_ser_core.c:378
+error: drivers/iio/imu/bno055/bno055_ser_core.c: patch does not apply
+error: patch failed: drivers/mfd/rave-sp.c:471
+error: drivers/mfd/rave-sp.c: patch does not apply
+error: patch failed: drivers/net/ethernet/qualcomm/qca_uart.c:58
+error: drivers/net/ethernet/qualcomm/qca_uart.c: patch does not apply
+error: patch failed: drivers/nfc/pn533/uart.c:203
+error: drivers/nfc/pn533/uart.c: patch does not apply
+error: patch failed: drivers/nfc/s3fwrn5/uart.c:51
+error: drivers/nfc/s3fwrn5/uart.c: patch does not apply
+error: patch failed: drivers/platform/chrome/cros_ec_uart.c:81
+error: drivers/platform/chrome/cros_ec_uart.c: patch does not apply
+error: patch failed: drivers/platform/surface/aggregator/core.c:227
+error: drivers/platform/surface/aggregator/core.c: patch does not apply
+error: patch failed: include/linux/serdev.h:27
+error: include/linux/serdev.h: patch does not apply
+error: patch failed: sound/drivers/serial-generic.c:100
+error: sound/drivers/serial-generic.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
 
 
---=20
-Luiz Augusto von Dentz
+---
+Regards,
+Linux Bluetooth
+
+
+--===============1849114615159234014==--
