@@ -1,113 +1,442 @@
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+Received: from mail11.truemail.it (mail11.truemail.it [217.194.8.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE3E155769
-	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jan 2024 18:03:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D33F5DF0D;
+	Mon, 22 Jan 2024 18:06:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.194.8.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705946628; cv=none; b=QqievSdtK3+Se2dwM4VxDoQY9iqnu63gGbxnyPLKHm6xhStAgyFn2M3YaMbx902zMz9hnu/UGeE2f7cCTnx7ncn3eSaBSGYz8Jbs+wjJbUF41LefCbznE/S/2ByRwDNWxfK2DOZ+QOqoRu1vEI3e8MhvbfHq9XVZeOptqK1oM4s=
+	t=1705946769; cv=none; b=nvitdKjeUIZbxLO42y5vt542Z/8wWNuDAWcVDwflBw73ogg3sQf4CA07RLrtsDkbSwMvesEg0luI8FQvqh4Lr8extFYGTfUjqJOzfyEKV0JAP6UE0TTD0wO/a/N8rG/B8l2cz13srE0lKgXmgPcXhdi+487SVJIGYBBD/XQKKsI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705946628; c=relaxed/simple;
-	bh=qvZVka/lZSY8HCaPvOs5Fwsd7CCyvxghVYrHf1qCzoM=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=lSkwrWpt0kpQNfPvGDdb4X1nnkcJaxnl2IroR17GPTc1Vg6ma4VF0dTCSN6QI+tu9yv9pE2XuYiN2WVDO6YALid1lyFUj0HeW099xi6GAPMNfn8vXEqK2EMG7an5A41Lmf66ZMxgmGIpVmc/eRPUYfOa/9i2cdq0P2Qo5YaXURQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LhaeIgLS; arc=none smtp.client-ip=209.85.219.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1705946769; c=relaxed/simple;
+	bh=R8wFJSgKv4cL4hZ+bT5oKSrtD2Kp2dnn26l8p06FkBQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RvZ6oxDEVgHrCifbtRSWT7B8FOlBgATlxysL3JdTw6dMWx8lBj76PetxIPCXE+70d43ZFskApD9tXG/oXN8PjU1O/amPyPdeOIbYS2MXyID0hnijj1oNaAQpSZTXqrqIPfGt67RHDLlZlhdcDaZDsKsuQJ1edoOjTOjsJnAd+8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it; spf=pass smtp.mailfrom=dolcini.it; dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b=Zi6Myr57; arc=none smtp.client-ip=217.194.8.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dolcini.it
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LhaeIgLS"
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-686980d9a9bso3036166d6.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jan 2024 10:03:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705946625; x=1706551425; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=oWth6/nP//pBTcSmzxZt72ucXoQTz+PXRCHye8YrB/Y=;
-        b=LhaeIgLSudCaknX4lc41sAgdDvPBRa71g8jDOJZqplrLXT9wdrRH9tblIWNFqWxv/o
-         YveAkatr/tHh3NtA325LkAbOyUSTFINdBvNw8R9ZG/wCFe2ktYMeXzfTt9gPaQK62BNJ
-         rlz6K72YsL+HweFGNuLG34b7wESFkiLW/pbrSp1P9tYOinO4LhxdvmHv44LueD88cPSb
-         053pn8HFUUwmCBLLalVIGe9Gi+EnWjZ7tbIz3cM//IEPvfZVqOZrLvVWKFA4JbDzHJhR
-         ONLTFJ7XXWmdeN+SJKh/w1Vh6lWFN/dZErquvc9mWamhv9kJCm4T73tEPwhcwbSgpfFf
-         TVBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705946625; x=1706551425;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oWth6/nP//pBTcSmzxZt72ucXoQTz+PXRCHye8YrB/Y=;
-        b=nPBtBiARuFSF3Eku23QMlM8J+GPdJP2hfLchr+ai0OMZNMSzERzloWnzejq4+NE4BH
-         pWsdJNKlp4j3RbsroZS2niYE/9+fi5LJ1OyQQEaqTxu17lw7xFGJFL7lF86tjaCuozRi
-         IJifivU4tdrW36OfIQrUFXiQDQ4CSxjf08c3d8Qu2A1wDRxtpJaIvj3l/7KONzfSusY6
-         OBZ6XffAmEYi35JrwSFwMzjCFh+oRP1Pte6ySrcCzCkQitdgzhjJR1PwhrNk5yQMZ0Ps
-         Uu/mi+fXjjD/xaVN3pqOM1Y2jVQpUnzJOVlPyhnqhCoxPAHaKw8lL9RAuNvOGQEvQ0oD
-         oe2A==
-X-Gm-Message-State: AOJu0YzwRT4eze7gY1Bx0lLQM9HK3WT2dvadSZhI3mPnyb8O1YFSle0J
-	ALCYEeEnD6L4cMcc2owaj46czfLQ/jBD80IuAM8OcTmzQiOPA4AcrFVJnIT3
-X-Google-Smtp-Source: AGHT+IHqs13BV8qL+TFKQKgFKZA89IoScybrKA8JCbHgvWXfefllvhFTq/UnZF4SD0qVu8FwaQok3w==
-X-Received: by 2002:a05:6214:5292:b0:685:6715:9693 with SMTP id kj18-20020a056214529200b0068567159693mr5405188qvb.8.1705946625548;
-        Mon, 22 Jan 2024 10:03:45 -0800 (PST)
-Received: from [172.17.0.2] ([172.183.154.245])
-        by smtp.gmail.com with ESMTPSA id ly4-20020a0562145c0400b0068688a2964asm1571054qvb.113.2024.01.22.10.03.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jan 2024 10:03:45 -0800 (PST)
-Message-ID: <65aeae01.050a0220.502c3.5805@mx.google.com>
-Date: Mon, 22 Jan 2024 10:03:45 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============6931538898725619884=="
+	dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b="Zi6Myr57"
+Received: from francesco-nb.corp.toradex.com (31-10-206-125.static.upc.ch [31.10.206.125])
+	by mail11.truemail.it (Postfix) with ESMTPA id 67CE622DCC;
+	Mon, 22 Jan 2024 19:06:02 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dolcini.it;
+	s=default; t=1705946763;
+	bh=6vmspUlyFF0tv6FWxmPxRZWMIp1WG5lqggaZecdXjLc=; h=From:To:Subject;
+	b=Zi6Myr576mJnMleI46qoBR89eX16nrcL+uex4pAEtqdDrpvTVltKVXle2ClHxvnV0
+	 DV3B5A6Y1t5AiqCYirVIedAoq3iYD3ad99dFGE3ugNpRQkndGhvct7V4/e3WikwgfP
+	 Q2fuo1coIJDHa4FdSDO78qkTE37N9pDwZ4R2uaSpv/mw5YhpTk06x1kREn6SIpOFYU
+	 37kXI3jbvnhfD/MI148/z5CCtC8iKMjGGdg9NrjL98jvDj6yH1pFDEFmOK0RVbSyIU
+	 D/ZfU6dCDgXVT/6FBtEVfBIu2DIEf5CHeYs3t0/HM1Zivbuqwvi9L0dFA2itdZhYxh
+	 Wd9mZHuMQrV3A==
+From: Francesco Dolcini <francesco@dolcini.it>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	linux-bluetooth@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	greybus-dev@lists.linaro.org,
+	linux-iio@vger.kernel.org,
+	netdev@vger.kernel.org,
+	chrome-platform@lists.linux.dev,
+	platform-driver-x86@vger.kernel.org,
+	linux-serial@vger.kernel.org,
+	linux-sound@vger.kernel.org
+Cc: Francesco Dolcini <francesco.dolcini@toradex.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Johan Hovold <johan@kernel.org>,
+	Alex Elder <elder@kernel.org>,
+	Jonathan Cameron <jic23@kernel.org>,
+	Lee Jones <lee@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Hans de Goede <hdegoede@redhat.com>,
+	=?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Benson Leung <bleung@chromium.org>,
+	Tzung-Bi Shih <tzungbi@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Subject: [PATCH v2] treewide, serdev: change receive_buf() return type to size_t
+Date: Mon, 22 Jan 2024 19:05:51 +0100
+Message-Id: <20240122180551.34429-1-francesco@dolcini.it>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
-Subject: RE: Bluetooth: mgmt: Fix limited discoverable off timeout
-In-Reply-To: <20240122165955.280126-1-frederic.danis@collabora.com>
-References: <20240122165955.280126-1-frederic.danis@collabora.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============6931538898725619884==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Francesco Dolcini <francesco.dolcini@toradex.com>
 
-This is automated email and please do not reply to this email!
+receive_buf() is called from ttyport_receive_buf() that expects values
+">= 0" from serdev_controller_receive_buf(), change its return type from
+ssize_t to size_t.
 
-Dear submitter,
+The need for this clean-up was noticed while fixing a warning, see
+commit 94d053942544 ("Bluetooth: btnxpuart: fix recv_buf() return value").
+Changing the callback prototype to return an unsigned seems the best way
+to document the API and ensure that is properly used.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=818709
+GNSS drivers implementation of serdev receive_buf() callback return
+directly the return value of gnss_insert_raw(). gnss_insert_raw()
+returns a signed int, however this is not an issue since the value
+returned is always positive, because of the kfifo_in() implementation.
+gnss_insert_raw() could be changed to return also an unsigned, however
+this is not implemented here as request by the GNSS maintainer Johan
+Hovold.
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      43.26 seconds
-GitLint                       PASS      40.68 seconds
-SubjectPrefix                 PASS      39.07 seconds
-BuildKernel                   PASS      27.86 seconds
-CheckAllWarning               PASS      38.74 seconds
-CheckSparse                   PASS      76.42 seconds
-CheckSmatch                   PASS      119.42 seconds
-BuildKernel32                 PASS      40.00 seconds
-TestRunnerSetup               PASS      437.18 seconds
-TestRunner_l2cap-tester       PASS      26.76 seconds
-TestRunner_iso-tester         PASS      47.64 seconds
-TestRunner_bnep-tester        PASS      7.90 seconds
-TestRunner_mgmt-tester        PASS      159.16 seconds
-TestRunner_rfcomm-tester      PASS      10.99 seconds
-TestRunner_sco-tester         PASS      14.43 seconds
-TestRunner_ioctl-tester       PASS      12.50 seconds
-TestRunner_mesh-tester        PASS      10.90 seconds
-TestRunner_smp-tester         PASS      23.59 seconds
-TestRunner_userchan-tester    PASS      7.29 seconds
-IncrementalBuild              PASS      29.75 seconds
-
-
-
+Suggested-by: Jiri Slaby <jirislaby@kernel.org>
+Link: https://lore.kernel.org/all/087be419-ec6b-47ad-851a-5e1e3ea5cfcc@kernel.org/
+Signed-off-by: Francesco Dolcini <francesco.dolcini@toradex.com>
+Acked-by: Jonathan Cameron <Jonathan.Cameron@huawei.com> #for-iio
 ---
-Regards,
-Linux Bluetooth
+v1:
+ - https://lore.kernel.org/all/20231214170146.641783-1-francesco@dolcini.it/
+v2:
+ - rebased on 6.8-rc1
+ - add acked-by Jonathan
+ - do not change gnss_insert_raw()
+ - do not change the code style of the gnss code
+ - commit message improvements, explain the reasons for doing only minimal
+   changes on the GNSS part
+---
+ drivers/bluetooth/btmtkuart.c              |  4 ++--
+ drivers/bluetooth/btnxpuart.c              |  4 ++--
+ drivers/bluetooth/hci_serdev.c             |  4 ++--
+ drivers/gnss/serial.c                      |  2 +-
+ drivers/gnss/sirf.c                        |  2 +-
+ drivers/greybus/gb-beagleplay.c            |  6 +++---
+ drivers/iio/chemical/pms7003.c             |  4 ++--
+ drivers/iio/chemical/scd30_serial.c        |  4 ++--
+ drivers/iio/chemical/sps30_serial.c        |  4 ++--
+ drivers/iio/imu/bno055/bno055_ser_core.c   |  4 ++--
+ drivers/mfd/rave-sp.c                      |  4 ++--
+ drivers/net/ethernet/qualcomm/qca_uart.c   |  2 +-
+ drivers/nfc/pn533/uart.c                   |  4 ++--
+ drivers/nfc/s3fwrn5/uart.c                 |  4 ++--
+ drivers/platform/chrome/cros_ec_uart.c     |  4 ++--
+ drivers/platform/surface/aggregator/core.c |  4 ++--
+ drivers/tty/serdev/serdev-ttyport.c        | 10 ++++------
+ include/linux/serdev.h                     |  8 ++++----
+ sound/drivers/serial-generic.c             |  4 ++--
+ 19 files changed, 40 insertions(+), 42 deletions(-)
 
+diff --git a/drivers/bluetooth/btmtkuart.c b/drivers/bluetooth/btmtkuart.c
+index 3c84fcbda01a..e6bc4a73c9fc 100644
+--- a/drivers/bluetooth/btmtkuart.c
++++ b/drivers/bluetooth/btmtkuart.c
+@@ -383,8 +383,8 @@ static void btmtkuart_recv(struct hci_dev *hdev, const u8 *data, size_t count)
+ 	}
+ }
+ 
+-static ssize_t btmtkuart_receive_buf(struct serdev_device *serdev,
+-				     const u8 *data, size_t count)
++static size_t btmtkuart_receive_buf(struct serdev_device *serdev,
++				    const u8 *data, size_t count)
+ {
+ 	struct btmtkuart_dev *bdev = serdev_device_get_drvdata(serdev);
+ 
+diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
+index 1d592ac413d1..056bef5b2919 100644
+--- a/drivers/bluetooth/btnxpuart.c
++++ b/drivers/bluetooth/btnxpuart.c
+@@ -1264,8 +1264,8 @@ static const struct h4_recv_pkt nxp_recv_pkts[] = {
+ 	{ NXP_RECV_FW_REQ_V3,   .recv = nxp_recv_fw_req_v3 },
+ };
+ 
+-static ssize_t btnxpuart_receive_buf(struct serdev_device *serdev,
+-				     const u8 *data, size_t count)
++static size_t btnxpuart_receive_buf(struct serdev_device *serdev,
++				    const u8 *data, size_t count)
+ {
+ 	struct btnxpuart_dev *nxpdev = serdev_device_get_drvdata(serdev);
+ 
+diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
+index 39c8b567da3c..a3c3beb2806d 100644
+--- a/drivers/bluetooth/hci_serdev.c
++++ b/drivers/bluetooth/hci_serdev.c
+@@ -271,8 +271,8 @@ static void hci_uart_write_wakeup(struct serdev_device *serdev)
+  *
+  * Return: number of processed bytes
+  */
+-static ssize_t hci_uart_receive_buf(struct serdev_device *serdev,
+-				    const u8 *data, size_t count)
++static size_t hci_uart_receive_buf(struct serdev_device *serdev,
++				   const u8 *data, size_t count)
+ {
+ 	struct hci_uart *hu = serdev_device_get_drvdata(serdev);
+ 
+diff --git a/drivers/gnss/serial.c b/drivers/gnss/serial.c
+index baa956494e79..0e43bf6294f8 100644
+--- a/drivers/gnss/serial.c
++++ b/drivers/gnss/serial.c
+@@ -80,7 +80,7 @@ static const struct gnss_operations gnss_serial_gnss_ops = {
+ 	.write_raw	= gnss_serial_write_raw,
+ };
+ 
+-static ssize_t gnss_serial_receive_buf(struct serdev_device *serdev,
++static size_t gnss_serial_receive_buf(struct serdev_device *serdev,
+ 				       const u8 *buf, size_t count)
+ {
+ 	struct gnss_serial *gserial = serdev_device_get_drvdata(serdev);
+diff --git a/drivers/gnss/sirf.c b/drivers/gnss/sirf.c
+index 6801a8fb2040..79375d14bbb6 100644
+--- a/drivers/gnss/sirf.c
++++ b/drivers/gnss/sirf.c
+@@ -160,7 +160,7 @@ static const struct gnss_operations sirf_gnss_ops = {
+ 	.write_raw	= sirf_write_raw,
+ };
+ 
+-static ssize_t sirf_receive_buf(struct serdev_device *serdev,
++static size_t sirf_receive_buf(struct serdev_device *serdev,
+ 				const u8 *buf, size_t count)
+ {
+ 	struct sirf_data *data = serdev_device_get_drvdata(serdev);
+diff --git a/drivers/greybus/gb-beagleplay.c b/drivers/greybus/gb-beagleplay.c
+index c3e90025064b..33f8fad70260 100644
+--- a/drivers/greybus/gb-beagleplay.c
++++ b/drivers/greybus/gb-beagleplay.c
+@@ -271,7 +271,7 @@ static void hdlc_rx_frame(struct gb_beagleplay *bg)
+ 	}
+ }
+ 
+-static ssize_t hdlc_rx(struct gb_beagleplay *bg, const u8 *data, size_t count)
++static size_t hdlc_rx(struct gb_beagleplay *bg, const u8 *data, size_t count)
+ {
+ 	size_t i;
+ 	u8 c;
+@@ -331,8 +331,8 @@ static void hdlc_deinit(struct gb_beagleplay *bg)
+ 	flush_work(&bg->tx_work);
+ }
+ 
+-static ssize_t gb_tty_receive(struct serdev_device *sd, const u8 *data,
+-			      size_t count)
++static size_t gb_tty_receive(struct serdev_device *sd, const u8 *data,
++			     size_t count)
+ {
+ 	struct gb_beagleplay *bg = serdev_device_get_drvdata(sd);
+ 
+diff --git a/drivers/iio/chemical/pms7003.c b/drivers/iio/chemical/pms7003.c
+index b5cf15a515d2..43025866d5b7 100644
+--- a/drivers/iio/chemical/pms7003.c
++++ b/drivers/iio/chemical/pms7003.c
+@@ -211,8 +211,8 @@ static bool pms7003_frame_is_okay(struct pms7003_frame *frame)
+ 	return checksum == pms7003_calc_checksum(frame);
+ }
+ 
+-static ssize_t pms7003_receive_buf(struct serdev_device *serdev, const u8 *buf,
+-				   size_t size)
++static size_t pms7003_receive_buf(struct serdev_device *serdev, const u8 *buf,
++				  size_t size)
+ {
+ 	struct iio_dev *indio_dev = serdev_device_get_drvdata(serdev);
+ 	struct pms7003_state *state = iio_priv(indio_dev);
+diff --git a/drivers/iio/chemical/scd30_serial.c b/drivers/iio/chemical/scd30_serial.c
+index a47654591e55..2adb76dbb020 100644
+--- a/drivers/iio/chemical/scd30_serial.c
++++ b/drivers/iio/chemical/scd30_serial.c
+@@ -174,8 +174,8 @@ static int scd30_serdev_command(struct scd30_state *state, enum scd30_cmd cmd, u
+ 	return 0;
+ }
+ 
+-static ssize_t scd30_serdev_receive_buf(struct serdev_device *serdev,
+-					const u8 *buf, size_t size)
++static size_t scd30_serdev_receive_buf(struct serdev_device *serdev,
++				       const u8 *buf, size_t size)
+ {
+ 	struct iio_dev *indio_dev = serdev_device_get_drvdata(serdev);
+ 	struct scd30_serdev_priv *priv;
+diff --git a/drivers/iio/chemical/sps30_serial.c b/drivers/iio/chemical/sps30_serial.c
+index 3afa89f8acc3..a6dfbe28c914 100644
+--- a/drivers/iio/chemical/sps30_serial.c
++++ b/drivers/iio/chemical/sps30_serial.c
+@@ -210,8 +210,8 @@ static int sps30_serial_command(struct sps30_state *state, unsigned char cmd,
+ 	return rsp_size;
+ }
+ 
+-static ssize_t sps30_serial_receive_buf(struct serdev_device *serdev,
+-					const u8 *buf, size_t size)
++static size_t sps30_serial_receive_buf(struct serdev_device *serdev,
++				       const u8 *buf, size_t size)
+ {
+ 	struct iio_dev *indio_dev = dev_get_drvdata(&serdev->dev);
+ 	struct sps30_serial_priv *priv;
+diff --git a/drivers/iio/imu/bno055/bno055_ser_core.c b/drivers/iio/imu/bno055/bno055_ser_core.c
+index 5677bdf4f846..694ff14a3aa2 100644
+--- a/drivers/iio/imu/bno055/bno055_ser_core.c
++++ b/drivers/iio/imu/bno055/bno055_ser_core.c
+@@ -378,8 +378,8 @@ static void bno055_ser_handle_rx(struct bno055_ser_priv *priv, int status)
+  * Also, we assume to RX one pkt per time (i.e. the HW doesn't send anything
+  * unless we require to AND we don't queue more than one request per time).
+  */
+-static ssize_t bno055_ser_receive_buf(struct serdev_device *serdev,
+-				      const u8 *buf, size_t size)
++static size_t bno055_ser_receive_buf(struct serdev_device *serdev,
++				     const u8 *buf, size_t size)
+ {
+ 	int status;
+ 	struct bno055_ser_priv *priv = serdev_device_get_drvdata(serdev);
+diff --git a/drivers/mfd/rave-sp.c b/drivers/mfd/rave-sp.c
+index 6ff84b2600c5..62a6613fb070 100644
+--- a/drivers/mfd/rave-sp.c
++++ b/drivers/mfd/rave-sp.c
+@@ -471,8 +471,8 @@ static void rave_sp_receive_frame(struct rave_sp *sp,
+ 		rave_sp_receive_reply(sp, data, length);
+ }
+ 
+-static ssize_t rave_sp_receive_buf(struct serdev_device *serdev,
+-				   const u8 *buf, size_t size)
++static size_t rave_sp_receive_buf(struct serdev_device *serdev,
++				  const u8 *buf, size_t size)
+ {
+ 	struct device *dev = &serdev->dev;
+ 	struct rave_sp *sp = dev_get_drvdata(dev);
+diff --git a/drivers/net/ethernet/qualcomm/qca_uart.c b/drivers/net/ethernet/qualcomm/qca_uart.c
+index 223321897b96..20f50bde82ac 100644
+--- a/drivers/net/ethernet/qualcomm/qca_uart.c
++++ b/drivers/net/ethernet/qualcomm/qca_uart.c
+@@ -58,7 +58,7 @@ struct qcauart {
+ 	unsigned char *tx_buffer;
+ };
+ 
+-static ssize_t
++static size_t
+ qca_tty_receive(struct serdev_device *serdev, const u8 *data, size_t count)
+ {
+ 	struct qcauart *qca = serdev_device_get_drvdata(serdev);
+diff --git a/drivers/nfc/pn533/uart.c b/drivers/nfc/pn533/uart.c
+index 2eb5978bd79e..cfbbe0713317 100644
+--- a/drivers/nfc/pn533/uart.c
++++ b/drivers/nfc/pn533/uart.c
+@@ -203,8 +203,8 @@ static int pn532_uart_rx_is_frame(struct sk_buff *skb)
+ 	return 0;
+ }
+ 
+-static ssize_t pn532_receive_buf(struct serdev_device *serdev,
+-				 const u8 *data, size_t count)
++static size_t pn532_receive_buf(struct serdev_device *serdev,
++				const u8 *data, size_t count)
+ {
+ 	struct pn532_uart_phy *dev = serdev_device_get_drvdata(serdev);
+ 	size_t i;
+diff --git a/drivers/nfc/s3fwrn5/uart.c b/drivers/nfc/s3fwrn5/uart.c
+index 456d3947116c..9c09c10c2a46 100644
+--- a/drivers/nfc/s3fwrn5/uart.c
++++ b/drivers/nfc/s3fwrn5/uart.c
+@@ -51,8 +51,8 @@ static const struct s3fwrn5_phy_ops uart_phy_ops = {
+ 	.write = s3fwrn82_uart_write,
+ };
+ 
+-static ssize_t s3fwrn82_uart_read(struct serdev_device *serdev,
+-				  const u8 *data, size_t count)
++static size_t s3fwrn82_uart_read(struct serdev_device *serdev,
++				 const u8 *data, size_t count)
+ {
+ 	struct s3fwrn82_uart_phy *phy = serdev_device_get_drvdata(serdev);
+ 	size_t i;
+diff --git a/drivers/platform/chrome/cros_ec_uart.c b/drivers/platform/chrome/cros_ec_uart.c
+index 68d80559fddc..8ea867c2a01a 100644
+--- a/drivers/platform/chrome/cros_ec_uart.c
++++ b/drivers/platform/chrome/cros_ec_uart.c
+@@ -81,8 +81,8 @@ struct cros_ec_uart {
+ 	struct response_info response;
+ };
+ 
+-static ssize_t cros_ec_uart_rx_bytes(struct serdev_device *serdev,
+-				     const u8 *data, size_t count)
++static size_t cros_ec_uart_rx_bytes(struct serdev_device *serdev,
++				    const u8 *data, size_t count)
+ {
+ 	struct ec_host_response *host_response;
+ 	struct cros_ec_device *ec_dev = serdev_device_get_drvdata(serdev);
+diff --git a/drivers/platform/surface/aggregator/core.c b/drivers/platform/surface/aggregator/core.c
+index 9591a28bc38a..ba550eaa06fc 100644
+--- a/drivers/platform/surface/aggregator/core.c
++++ b/drivers/platform/surface/aggregator/core.c
+@@ -227,8 +227,8 @@ EXPORT_SYMBOL_GPL(ssam_client_bind);
+ 
+ /* -- Glue layer (serdev_device -> ssam_controller). ------------------------ */
+ 
+-static ssize_t ssam_receive_buf(struct serdev_device *dev, const u8 *buf,
+-				size_t n)
++static size_t ssam_receive_buf(struct serdev_device *dev, const u8 *buf,
++			       size_t n)
+ {
+ 	struct ssam_controller *ctrl;
+ 	int ret;
+diff --git a/drivers/tty/serdev/serdev-ttyport.c b/drivers/tty/serdev/serdev-ttyport.c
+index e94e090cf0a1..3d7ae7fa5018 100644
+--- a/drivers/tty/serdev/serdev-ttyport.c
++++ b/drivers/tty/serdev/serdev-ttyport.c
+@@ -27,19 +27,17 @@ static size_t ttyport_receive_buf(struct tty_port *port, const u8 *cp,
+ {
+ 	struct serdev_controller *ctrl = port->client_data;
+ 	struct serport *serport = serdev_controller_get_drvdata(ctrl);
+-	int ret;
++	size_t ret;
+ 
+ 	if (!test_bit(SERPORT_ACTIVE, &serport->flags))
+ 		return 0;
+ 
+ 	ret = serdev_controller_receive_buf(ctrl, cp, count);
+ 
+-	dev_WARN_ONCE(&ctrl->dev, ret < 0 || ret > count,
+-				"receive_buf returns %d (count = %zu)\n",
++	dev_WARN_ONCE(&ctrl->dev, ret > count,
++				"receive_buf returns %zu (count = %zu)\n",
+ 				ret, count);
+-	if (ret < 0)
+-		return 0;
+-	else if (ret > count)
++	if (ret > count)
+ 		return count;
+ 
+ 	return ret;
+diff --git a/include/linux/serdev.h b/include/linux/serdev.h
+index 3fab88ba265e..ff78efc1f60d 100644
+--- a/include/linux/serdev.h
++++ b/include/linux/serdev.h
+@@ -27,7 +27,7 @@ struct serdev_device;
+  *			not sleep.
+  */
+ struct serdev_device_ops {
+-	ssize_t (*receive_buf)(struct serdev_device *, const u8 *, size_t);
++	size_t (*receive_buf)(struct serdev_device *, const u8 *, size_t);
+ 	void (*write_wakeup)(struct serdev_device *);
+ };
+ 
+@@ -185,9 +185,9 @@ static inline void serdev_controller_write_wakeup(struct serdev_controller *ctrl
+ 	serdev->ops->write_wakeup(serdev);
+ }
+ 
+-static inline ssize_t serdev_controller_receive_buf(struct serdev_controller *ctrl,
+-						    const u8 *data,
+-						    size_t count)
++static inline size_t serdev_controller_receive_buf(struct serdev_controller *ctrl,
++						   const u8 *data,
++						   size_t count)
+ {
+ 	struct serdev_device *serdev = ctrl->serdev;
+ 
+diff --git a/sound/drivers/serial-generic.c b/sound/drivers/serial-generic.c
+index d6e5aafd697c..36409a56c675 100644
+--- a/sound/drivers/serial-generic.c
++++ b/sound/drivers/serial-generic.c
+@@ -100,8 +100,8 @@ static void snd_serial_generic_write_wakeup(struct serdev_device *serdev)
+ 	snd_serial_generic_tx_wakeup(drvdata);
+ }
+ 
+-static ssize_t snd_serial_generic_receive_buf(struct serdev_device *serdev,
+-					      const u8 *buf, size_t count)
++static size_t snd_serial_generic_receive_buf(struct serdev_device *serdev,
++					     const u8 *buf, size_t count)
+ {
+ 	int ret;
+ 	struct snd_serial_generic *drvdata = serdev_device_get_drvdata(serdev);
+-- 
+2.39.2
 
---===============6931538898725619884==--
