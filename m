@@ -1,94 +1,146 @@
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9DD53A1CF
-	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jan 2024 12:54:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C74BD3D99E
+	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jan 2024 14:02:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705928049; cv=none; b=XLmeO8Ih62ndNR7cJPUqcVZbbtcqopxXSEqtxoElXNvV3VAWtLAn5DlZLNmdq/bF9/GvkKXHxPLFXew2WFpaQECll3QSd9/kKZ+Z5SD6Ffu/3aytdZsFkNFx5RyUHin3IDbURmSokE9kEqDPvdiSXHT7LKU52aa0BnZGajO55OY=
+	t=1705932148; cv=none; b=QHHpKffTI429gaMtMZA5XNqfOTFfAz6VMiuoFXZjAVCaeHdPwGcf2+psT/sZzZlwKI9ndOHw5JnJoOdwoseCQqleulLoTsfzTkgSHCs29pNLRU+VDdEPQ8taQJBrKt6gG5CfhZU6nQM6exsrvmXvVkC/849bW+A9Xt0ZUhkIEmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705928049; c=relaxed/simple;
-	bh=pCJI1SFxIC3zwEo0KhXmUJfDfsjED2/R8b7L3p1qCoE=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=cLGKpZx/ebM1iGnXcuqHNM3wVJvrLmU0S5VVJys0i5A67MOSIEAB1v6e8eGBU3Ur33KZNlsBcb3vVkHN0O/9rArLvdQ2eLjdvMpx8cBBDoJeBCTHOg3cGzV1dKOmHdSclj/vwXDJUxQ5/JtHU8kKZhewvRkbzz3LMI+B4Kh3CeY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZB0+ja94; arc=none smtp.client-ip=209.85.128.177
+	s=arc-20240116; t=1705932148; c=relaxed/simple;
+	bh=VTUDh5llQyTP88F+MNbFo0TqNam+c7DrJIXvizHLOqs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mQpRKNNYTfGer/kINIiuVmushh2KB4jGl/4Lk/bYJ1piGlfEChH3xse82aFAGjejmsT+E2CPZCsm0/+jWkrRNNfbQfC/6QZTgjMlMB2tKv21T3+MChyFQgY6VHBEmdmcaExKKhVVgC2XvgFJHuWrf36j3GNrnMAucX2S99l5dpw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H8CzSiJd; arc=none smtp.client-ip=209.85.208.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZB0+ja94"
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-5fc2e997804so26161757b3.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jan 2024 04:54:07 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H8CzSiJd"
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2cd1a1c5addso36431821fa.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jan 2024 06:02:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705928046; x=1706532846; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=pCJI1SFxIC3zwEo0KhXmUJfDfsjED2/R8b7L3p1qCoE=;
-        b=ZB0+ja94pLN6jWXC12qZRJQswFji1Cn+0mRIbrvYJurz2y5kkME74Hs/1A/OtxbANh
-         oLIi7hIHdd0FU8+No33N3jrRiHlKyMYHcMQ17KrqFhG73+pz6K1QkeerBDSBxvFapHv+
-         4LfbrpKO88XLBGJJlV7RW1mT4JmGTcHR+VWc77KLtX1YJpSxb69AWBER40UkBx6CSkMy
-         IbzDyfGTmFLCvBtPHl15Wka+m9CM3y51Jncn1L4y3xFSAc8QwhYRASRw5ZojuWfdLV+E
-         t/e5dOtgGHC/jNlkiX2G7iE/19RdraE9jXhqhu2BaiXr7L6RI/9vKPEdT6W/hDmXUpVo
-         9pYg==
+        d=gmail.com; s=20230601; t=1705932145; x=1706536945; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iIUzhVrNcd2fIcbxhqP54PRrItxXJ6aTZXRHQHA/0ws=;
+        b=H8CzSiJdplrpvXb5JBKN2nKKhEnBAEYBZGgGswXFzTCM9nEOy/XmoL6WekvkI1NtMD
+         I09+PAD63k+MlodnRAZxRTyJaqXNLq6N/dNiXDN23Guc1D6kEuhvSZVnRPIl9zcAFSV7
+         wWDqwckfzHqXyiCyhF5AzJBgILejR+B07TrbQGmJXrlImPispj+LD9ki+14YYGoMU5U2
+         bnLe5+O3g3zZMhGomfeOG/ALJvGlrqdaFsZaMOid3nnFEaKf29gT87IzmoEjRoFYLcVs
+         bTltqBC3/RnDzF8/bd1ct2oJ+yVN/DB14xs7I5jym5BCPVbSSjSqmm6GXZmTTeD/veZ0
+         22ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705928046; x=1706532846;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pCJI1SFxIC3zwEo0KhXmUJfDfsjED2/R8b7L3p1qCoE=;
-        b=JtblfYaEiE7lZNDfArmfwmBlgs8uARrDlSkTeVSwCTAaHTtwFGgm74EUJag+d5XAPZ
-         Pl+QnX3a1yKGyOwX1snxVMAP1Rn5cPoGzEV2Xl9MZZxP1Rv5cvSnOUMHkqcw42QNruxB
-         ndKP4C3ORhT+2U34SlAUJDfI8gqSAOXGvYHLUBv/F79XfJJkew/ungR84EtdL6tz7mDu
-         gMAqZJvSEuve4y6QX4v/MsK9ZszpdW/8fU5FmOQgDXxj4Cg4aVXgP8DxWpAv7zouuFtr
-         jcWanej8jQ8bVsOfF92zBSXTYuAyqis2Mb0Tz/fPHoplTWWCXzSKcEAcxO0itL2ZULgu
-         bk0g==
-X-Gm-Message-State: AOJu0Yw0kMnwQSZdz9zLYRBhKVID2r0uhVfpNBiV0n/wiHt4icuFYGnQ
-	/TTfnE3anV/l+Eau5dANhLFUcDjuyAQxDUCh7ZwwFOFzpk86a80xp4JKT+ZM
-X-Google-Smtp-Source: AGHT+IECVorh0Zvxry1ahJfH9FBn7z93AUpvwaS9dgA854ILmhf7kPqDokx0faIQlkTFXX2xjjTShw==
-X-Received: by 2002:a81:9113:0:b0:5ff:5135:f754 with SMTP id i19-20020a819113000000b005ff5135f754mr2997687ywg.2.1705928046642;
-        Mon, 22 Jan 2024 04:54:06 -0800 (PST)
-Received: from [172.17.0.2] ([74.249.14.160])
-        by smtp.gmail.com with ESMTPSA id fb15-20020a05622a480f00b0042796ee2fb4sm2472923qtb.30.2024.01.22.04.54.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jan 2024 04:54:06 -0800 (PST)
-Message-ID: <65ae656e.050a0220.a8e50.6879@mx.google.com>
-Date: Mon, 22 Jan 2024 04:54:06 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============3807624440796301626=="
+        d=1e100.net; s=20230601; t=1705932145; x=1706536945;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iIUzhVrNcd2fIcbxhqP54PRrItxXJ6aTZXRHQHA/0ws=;
+        b=fnUJvW2MvWp5YJlFRUf362FJWKeLvhDipbp70SJEtumYrCdUTuRe0KRzQS4f3/6RtI
+         d6Lkdixs9hk3dALMaR0lVNQPQ5A3wjkNQPGWL4Xmg+uvtrOh5MgjLbpEyGxPJlow5dD2
+         TuXCMpENhepwLJTNcDHv7fyN5TyVnM3+9wWTai3liekKoSQwetwTN/IqndytR4Uj0Fc8
+         5rh07g4TKPX9Cdbp2mcM+FEirXB3XN2iAj8sjQ6XKd5EnbIQf4ZpRTrq26Adk8Mb7rr4
+         nq/snyIRK372FUwoqja4l3Fb/eCb4ssKzQiratHy8IQimBtXzL+qZw1dBWdJVPQgq0SY
+         iGjA==
+X-Gm-Message-State: AOJu0Yz6YBDa9wDsjcobKJYSNq8FZt4T4TBguxVwMGBPSK3dfpouVb1i
+	2Og3AgAx1xI7EPgMCtIRAYCvz+YBcpbDFtX0sC8jMxDLzMfuVsUUJNT2UjqUlixwsJdOOmHxOEz
+	Uu3Gndrse9gdE6iRZOLeRJdsB2oAT7KoZtzM=
+X-Google-Smtp-Source: AGHT+IHBMORG3qlSwv1uQ6fjg/QtdQm2qHmAi9VKTIYwIlnWHUEh1TT6cUgCa/QWqvIcvZOW0N12pqplaE1NjxYwVx4=
+X-Received: by 2002:a2e:940c:0:b0:2cd:46d8:12a8 with SMTP id
+ i12-20020a2e940c000000b002cd46d812a8mr1717421ljh.95.1705932144398; Mon, 22
+ Jan 2024 06:02:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, andrey.volkov@mobile-devices.fr
-Subject: RE: regression in c7f59461f5a78: Bluetooth: Fix a refcnt underflow problem for hci_conn
-In-Reply-To: <a3a31b2d-6039-4b50-af81-47f7ea1a0461@munic.io>
 References: <a3a31b2d-6039-4b50-af81-47f7ea1a0461@munic.io>
-Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <a3a31b2d-6039-4b50-af81-47f7ea1a0461@munic.io>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 22 Jan 2024 09:02:11 -0500
+Message-ID: <CABBYNZ+9UdG1cMZVmdtN3U2aS16AKMCyTARZZyFX7xTEDWcMOw@mail.gmail.com>
+Subject: Re: regression in c7f59461f5a78: Bluetooth: Fix a refcnt underflow
+ problem for hci_conn
+To: Andrei Volkov <andrey.volkov@mobile-devices.fr>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============3807624440796301626==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Andrei,
 
-This is an automated email and please do not reply to this email.
+On Mon, Jan 22, 2024 at 7:18=E2=80=AFAM Andrei Volkov
+<andrey.volkov@mobile-devices.fr> wrote:
+>
+> Hello,
+>
+> Lately we've bumped with regression introduced by commit:
+>
+>   c7f59461f5a78 ("Bluetooth: Fix a refcnt underflow problem for
+> hci_conn", 2023-10-04)
+>
+> The regression related with adding "hci_conn_ssp_enabled()" check in
+> "hci_io_capa_request_evt()" handler, and broke pairing process initiated
+> by the external device.
+>
+> Precisely, some ext. devices, like any phone equipped with Android ver <
+> 14 (we have not latest one, so we didn't check), always send "IO
+> Capability Request" before "Read Remote Extended Features" command, as
+> consequence the flag "HCI_CONN_SSP_ENABLED" not yet activated at the
+> time of "hci_io_capa_request_evt()" execution  and
+> "hci_conn_ssp_enabled()" always returns false in time of the pairing.
+>
+> As a result, pairing always fails. The quick and dirty fix is revert the
+> ssp check introduced in the subj. commit, like below:
+>
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -5329,7 +5329,7 @@ static void hci_io_capa_request_evt(struct hci_dev
+> *hdev, void *data,
+>          hci_dev_lock(hdev);
+>
+>          conn =3D hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
+> -       if (!conn || !hci_conn_ssp_enabled(conn))
+> +       if (!conn)
+>                  goto unlock;
+>
+>          hci_conn_hold(conn);
+>
+>
+> However, a more thorough and correct fix requires discussion and
+> testing. Therefore, I would like to get any comments/suggestion from the
+> community before doing this.
 
-Dear Submitter,
+I think we need to do something like this, so we consider only the
+local SSP flag when evaluating if we should proceed to respond or just
+drop:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 6130c969f361..a15924db83d9 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -5327,9 +5327,12 @@ static void hci_io_capa_request_evt(struct
+hci_dev *hdev, void *data,
+        hci_dev_lock(hdev);
 
------ Output -----
+        conn =3D hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
+-       if (!conn || !hci_conn_ssp_enabled(conn))
++       if (!conn || !hci_dev_test_flag(hdev, HCI_SSP_ENABLED))
+                goto unlock;
 
-error: corrupt patch at line 4
-hint: Use 'git am --show-current-patch' to see the failed patch
++       /* Assume remote supports SSP since it has triggered this event */
++       set_bit(HCI_CONN_SSP_ENABLED, &conn->flags);
++
+        hci_conn_hold(conn);
 
-Please resolve the issue and submit the patches again.
-
-
----
-Regards,
-Linux Bluetooth
+        if (!hci_dev_test_flag(hdev, HCI_MGMT))
 
 
---===============3807624440796301626==--
+> Regards
+> Andrey VOLKOV
+>
+>
+
+
+--=20
+Luiz Augusto von Dentz
