@@ -1,60 +1,35 @@
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DD9D5FDB9
-	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jan 2024 15:28:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7C985FDB9
+	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jan 2024 15:30:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706023734; cv=none; b=Xv7ApuA4nNA/6ptOu04cSnE8FrHefS+5SaNerV/ZptL9sEbF13st/hkdlurIXaWK0ewpAFJD5IW0R+ufaNg8cLIajToX/xi+NNzbJ4Pp3bZctsVF7cK5kh1+n1topk488NsfiAFuLeaKLLTt5uer4zXoaG7WYRIr7jsiiGmkGoA=
+	t=1706023828; cv=none; b=gf7dh2ATxbDcyj98Of0oFSdtJdU/GwNp0a+nHrdY6RXiJbu+3i0Vmz+x/a2Wr6iFUTQwD+p3L8VqRSwP+OuhOX55F4ElNV8fJFIPDxvMWiXq9EcTen8XuG+ue+7AJ1TPJ0c4ZxcaVBH3ebaN4wmRvemPmswDcQhywqd5sNjUz2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706023734; c=relaxed/simple;
-	bh=Hz/sQTkal72CIicSJ3PgwnCpkwcm7R8/SSPoezeooQA=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=JQ+I8fy4VVjy9fH44/5M6tHM5bGtuK7G5G77WSdYVyl6cF4RRNHtKFLNc3DTFID6b3jEFgeIsdaOGWjRkUcSm8AxCyjjOvsVETm213FvGWLS1EJknDXSJ2nPyKZ4PIyAlz4wqwv+HzzHLy8FVkjph4yvZ6VYR6FBnI2ZmEVV0jg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SoBcDfFR; arc=none smtp.client-ip=209.85.128.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1706023828; c=relaxed/simple;
+	bh=UIYyioXStdzRXEcymKCpAdnKNrUjDnYTX0dPptcj9a0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=bufSMlJNygOZIIgmYpJUki22Tq7Y/cp135WMAcNa9JBFO9abLbCT3VuJ/C8j1EArxamqs2Qx0vfWQSzTQ/FwJSs54YpXvMv9Iu6vmxg69s2KwvfCOb2DIL6scEU1Z/OvzQA4r3HAzBHWPRyYDPHPdn4hWChF31aTWLa3qgv+zxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dRfp/icw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SoBcDfFR"
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-5ffa694d8e5so30508037b3.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jan 2024 07:28:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706023732; x=1706628532; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qs/2ZF6jfLSaibnI8JVEJM3hBakFXvbs64Vo+kN0Wno=;
-        b=SoBcDfFRTTkd0X4nCuckMa8mKgHZoX9J9iXbc0DxoGKMWMVCOXGTx/CQlU5l3ScgcR
-         qZnHhI1+7vPSAzCNwVkIcJLNCirPqmYL3mJ3H4XywgR6ErieyqNVKgdSp0u4MEs0g1Vc
-         /2F7ZEykPXY7Sg/2wCINewyNNP5tyrxjH18DlPiBXQYydzBTJncFsOLly5qQnHsz0gok
-         ApV2vhF1TWY1QHVjMl5WPmurKn6mJwCmsj2R1u//IHX7vzhRnXzwGz5K5OFIG3/ugwuP
-         vcXscosu0OhViYGzEJ5tYqbqK3cM3F9NQWhuh5x1GIvOcNZn24j2E2VSXM2LRK9FkbZV
-         ARyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706023732; x=1706628532;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qs/2ZF6jfLSaibnI8JVEJM3hBakFXvbs64Vo+kN0Wno=;
-        b=a85Enn5jeAvMcisUCu/NMGEwaf7WBm+GoXXyQU33iRPdoVhLj7CPvWC8kTcGrRaZVh
-         pTuLhKNIDmRhC5E7fK9j0tv8G3TjrrYJTUiyukSwQjEq0egwKzRJK3Avntkvekmdwbbg
-         Rq+LhLu1kBOgUscuottDjwhJg27yXAvWHP08DjJ6S+h+qQjQ3v6xfFJAVmLpeSXHCMt8
-         /IMiHJ2wvNnXPpPvS1+Kzos1bgNlyqkhf+KrNJo6HdeVWVgKnWTf2MZw86awJcHm0Goi
-         aH5PgzD0PeatYMDWvdGCQDGTeQXI5rYQGc9L+V/TCpuZKyig0ZUQgOUgh6wqjFWMTBps
-         N0UQ==
-X-Gm-Message-State: AOJu0Yy6joBiuqG5FmWAlbAg17cEou57DyEStQkF970iSDNdBbg2rHIs
-	MaAic7vi3RA1Tig2Bjl39DIMXgIdWVXv3NHunZv6ssffCgY520wbgzshFHgQ
-X-Google-Smtp-Source: AGHT+IF6dmOkmtEdJGi0LpeHvxzFbrE6pfjvl2D7ofv03Sv1VdZ650fQO9ool9KP6jbKPU4TNjmw0A==
-X-Received: by 2002:a0d:d606:0:b0:5ff:ceed:10c7 with SMTP id y6-20020a0dd606000000b005ffceed10c7mr2387996ywd.0.1706023731860;
-        Tue, 23 Jan 2024 07:28:51 -0800 (PST)
-Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
-        by smtp.gmail.com with ESMTPSA id l191-20020a0de2c8000000b005ff9d3ca38fsm3203108ywe.1.2024.01.23.07.28.50
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jan 2024 07:28:50 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1] isotest: Fix not handling 0 length packets
-Date: Tue, 23 Jan 2024 10:28:50 -0500
-Message-ID: <20240123152850.2880226-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dRfp/icw"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 67C34C43394;
+	Tue, 23 Jan 2024 15:30:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706023828;
+	bh=UIYyioXStdzRXEcymKCpAdnKNrUjDnYTX0dPptcj9a0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=dRfp/icwiVeBms8rETe4hxnIXRiWpNxwnb5V3ObgyLs1zVH7prDG8CdVWQ8GoCHNY
+	 xcH9xIIgtpE13I++N1r4x35isJufPRYY9RKPnczI0QodUsao1EF+5pyb0Cy3y3l7+f
+	 91M3Nq716lNlA/rvoIjAebmQFFTyRQaJ9ykM0GInCqRJJmK0ESLabxFca2uQaP1xaI
+	 s24FB3MdXEKcGlQFC3fyu5gL5v5/wyPXjEaddlm1l8QJKg/jGzuMAHr5lHLxE+srSU
+	 Uusfsdo+r//X10QnXp4WREP0dUn5kpxdps9xiV00hms+CZoU7p6BZ5PkAqa2g0hYWx
+	 +HDdjr1l3HJxQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4E03ADFF762;
+	Tue, 23 Jan 2024 15:30:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -62,37 +37,38 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth: mgmt: Fix limited discoverable off timeout
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <170602382831.6570.11756683923966827620.git-patchwork-notify@kernel.org>
+Date: Tue, 23 Jan 2024 15:30:28 +0000
+References: <20240122165955.280126-1-frederic.danis@collabora.com>
+In-Reply-To: <20240122165955.280126-1-frederic.danis@collabora.com>
+To: =?utf-8?b?RnLDqWTDqXJpYyBEYW5pcyA8ZnJlZGVyaWMuZGFuaXNAY29sbGFib3JhLmNvbT4=?=@ci.codeaurora.org
+Cc: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hello:
 
-It is in fact possible to receive 0 length packets since that probably
-means their status is not sucess.
----
- tools/isotest.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-diff --git a/tools/isotest.c b/tools/isotest.c
-index 771d24b6d2a6..7e875fa58b15 100644
---- a/tools/isotest.c
-+++ b/tools/isotest.c
-@@ -642,7 +642,7 @@ static void dump_mode(int fd, int sk, char *peer)
- 	}
- 
- 	syslog(LOG_INFO, "Receiving ...");
--	while ((len = read(sk, buf, data_size)) > 0) {
-+	while ((len = read(sk, buf, data_size)) >= 0) {
- 		if (fd >= 0) {
- 			len = write(fd, buf, len);
- 			if (len < 0) {
-@@ -680,7 +680,7 @@ static void recv_mode(int fd, int sk, char *peer)
- 			int r;
- 
- 			r = recv(sk, buf, data_size, 0);
--			if (r <= 0) {
-+			if (r < 0) {
- 				if (r < 0)
- 					syslog(LOG_ERR, "Read failed: %s (%d)",
- 							strerror(errno), errno);
+On Mon, 22 Jan 2024 17:59:55 +0100 you wrote:
+> LIMITED_DISCOVERABLE flag is not reset from Class of Device and
+> advertisement on limited discoverable timeout. This prevents to pass PTS
+> test GAP/DISC/LIMM/BV-02-C
+> 
+> Calling set_discoverable_sync as when the limited discovery is set
+> correctly update the Class of Device and advertisement.
+> 
+> [...]
+
+Here is the summary with links:
+  - Bluetooth: mgmt: Fix limited discoverable off timeout
+    https://git.kernel.org/bluetooth/bluetooth-next/c/53ddef135d3a
+
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
