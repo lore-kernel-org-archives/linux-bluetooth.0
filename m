@@ -1,139 +1,137 @@
-Received: from sender4-of-o52.zoho.com (sender4-of-o52.zoho.com [136.143.188.52])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C08C056466
-	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jan 2024 08:12:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705997578; cv=pass; b=DmmZpEnwdTLcnFKG7BodBygk+tntLH95mivRnqxxxYqNM6BdUBFfqGuyjwMxyFxYYrADTsz7It59N8+esNLkOvQJT0B4OVPwiFcnbgES0MuQrnxyCXruT3/BK95We/DNIH5YO47IXiYo0ReNX7YzpmeH5pk8LuUZk2jXL2Ip5Uo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705997578; c=relaxed/simple;
-	bh=5rp2riqkvsGJPhdIbBrmLgw2ga/G0F68ZHqxU9AIxVY=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=mPo48kgEBaqeb20RBhCBGelkUjK8wqjqVYqCI+Rbs0cpp26LcT4Q8uz2ZWCbNLQeFlxD4rkxRwHFIiDXrmE1sY1vgNdpJCaMbV1UWwrjaokOPRKVRQ8c/t+x8nE0q3x/6es628XeXYUJSkC4jaZCkqLromjiQeGX0eti03nzIYY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lab.zgora.pl; spf=pass smtp.mailfrom=lab.zgora.pl; dkim=pass (2048-bit key) header.d=lab.zgora.pl header.i=mk@lab.zgora.pl header.b=QO5+SNH5; arc=pass smtp.client-ip=136.143.188.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lab.zgora.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lab.zgora.pl
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=lab.zgora.pl header.i=mk@lab.zgora.pl header.b="QO5+SNH5"
-ARC-Seal: i=1; a=rsa-sha256; t=1705997571; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=lGGgiuvLz+bsXNiEEe6eQCdS5LdCDC77W94ZYkk3czL5jMXxVXMOKOeRSDTDXDm+H1X8e2XgXF2CrBb/dcuBxzLSrhOBMSSqsaASC9yLCbhXX/HB1z/CLvDJ7oW7vNMywMW7EVitCGBp/HZ1/cyM5EkKPFTDI5TJ27nUolbB+TQ=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1705997571; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=u0hGewnMe8MiZjaczX5Y4JoMyC/+nvPp4QlA4aMsrFE=; 
-	b=IRG1FmCH6Qt4PcfIlfYzJMyZjnRaNe930EdVk7W836n3Yee2OC/bUNPZmRiV8fY2qss+XzIOzKTg5KKhYLpFZJyCXS9zf8wY+LkbquZ+BZtXEWo9FYMdxebtcgj6XwQMDBqv4NdEFNdL61DB38YAcMa53iIucLVYOZbdsIEMlxw=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=lab.zgora.pl;
-	spf=pass  smtp.mailfrom=mk@lab.zgora.pl;
-	dmarc=pass header.from=<mk@lab.zgora.pl>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1705997571;
-	s=mail; d=lab.zgora.pl; i=mk@lab.zgora.pl;
-	h=Date:Date:From:From:To:To:Cc:Cc:Message-ID:In-Reply-To:References:Subject:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=u0hGewnMe8MiZjaczX5Y4JoMyC/+nvPp4QlA4aMsrFE=;
-	b=QO5+SNH5eN1/RTtmz7Mhdg0QoWh7Qad1wWULN6RbaFDFyEpBB3gQpAeEE+KcoeDe
-	+mOvuvMwfD1s5NQvgNE+06nCFoJHVAYYQghSTutZRem4nfGU1PGaJgOOKR1La8ZqfVx
-	EFlAYUmJkZ7cPGeksELIhPAPsG9kRLAQoT4oFeKds51rKtbCxrmu7P0WByNBlWYWu81
-	YHg6VnCZEtFCrmSaoL2jWtxvXpnZkb49phSRqXuG5pbAcpd73uThx0nr9kWdslnyxfY
-	VOyvMVexyCfwAJXTU+HzQpgy77ugg9n4LlihVuf5W8wZEz8Bp4+vaPn/EbjgnJ3YUa/
-	xzLhOrQQ8w==
-Received: from mail.zoho.com by mx.zohomail.com
-	with SMTP id 1705997570309264.1077689101212; Tue, 23 Jan 2024 00:12:50 -0800 (PST)
-Date: Tue, 23 Jan 2024 09:12:50 +0100
-From: Mariusz Kozlowski <mk@lab.zgora.pl>
-To: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth" <linux-bluetooth@vger.kernel.org>
-Message-ID: <18d356110eb.1120f313b408792.7694888926917426249@lab.zgora.pl>
-In-Reply-To: <CABBYNZKW8odyLb_BQcXXpjAKjPzHRhXVCbxvcg54VkoeULeHnw@mail.gmail.com>
-References: <20240121100328.1200839-1-mk@lab.zgora.pl> <CABBYNZKW8odyLb_BQcXXpjAKjPzHRhXVCbxvcg54VkoeULeHnw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] btmon-logger: Fix stack corruption
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB7D59B5C;
+	Tue, 23 Jan 2024 09:38:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706002708; cv=none; b=Qrk+wKCfQ0Cd99crTuF3K2r0oM9a2pzbmnShupzi+f0SS7VnZ17RkC7SXe5CG4n70OaKOhAI/LbdMfn2tt6lG4RikTrgSpJe2vi57gUREFCkJnGz/6u+NZgLlY+/c8mTrCFUd9kIj3vIi262PRA+cJqYPj7a2DeicKKposHluNs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706002708; c=relaxed/simple;
+	bh=FxLlvg48cPCI0xTuEsv4CQppE6mL1x/n5kLFPEffL/U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ibflw5FF+nGfVZjj1yhtzI7wCFmKUAWEyoqwOtJ+iBmCYrVAX7HivKCzqlPMO7rckrH7tRoJJ5Nae4WW7OOD0H6dWHNTYeMUGIatu7lfYGOrqwcnu5+gdnIFy9Hndhcq4oOh9/VDl5P6iMyPcHWkReWJ5A8HeTviDjIoO8OK8+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.34] (g34.guest.molgen.mpg.de [141.14.220.34])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 8586861E5FE36;
+	Tue, 23 Jan 2024 10:38:10 +0100 (CET)
+Message-ID: <48fb7356-506f-40c1-ac2e-4f43c2cbebea@molgen.mpg.de>
+Date: Tue, 23 Jan 2024 10:38:09 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Importance: Medium
-User-Agent: Zoho Mail
-X-Mailer: Zoho Mail
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: hci_qca: Set BDA quirk bit if fwnode exists in
+ DT
+Content-Language: en-US
+To: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, quic_mohamull@quicinc.com,
+ quic_hbandi@quicinc.com, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240123071523.23480-1-quic_janathot@quicinc.com>
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20240123071523.23480-1-quic_janathot@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Luiz,
+Dear Janaki,
 
- > Hi Mariusz,=20
- > =20
- > On Sun, Jan 21, 2024 at 5:04=E2=80=AFAM Mariusz Koz=C5=82owski mk@lab.zg=
-ora.pl> wrote:=20
- > >=20
- > > Version 3 capability masks are 64 bits in size.=20
- > > ---=20
- > >  tools/btmon-logger.c | 12 ++++++------=20
- > >  1 file changed, 6 insertions(+), 6 deletions(-)=20
- > >=20
- > > diff --git a/tools/btmon-logger.c b/tools/btmon-logger.c=20
- > > index a770ad575..1f6db3751 100644=20
- > > --- a/tools/btmon-logger.c=20
- > > +++ b/tools/btmon-logger.c=20
- > > @@ -161,14 +161,14 @@ extern int capset(struct __user_cap_header_struc=
-t *header,=20
- > >  static void drop_capabilities(void)=20
- > >  {=20
- > >         struct __user_cap_header_struct header;=20
- > > -       struct __user_cap_data_struct cap;=20
- > > +       struct __user_cap_data_struct cap[_LINUX_CAPABILITY_U32S_3];=
-=20
- > =20
- > Ok, but this doesn't change the field, it makes it an array, or are=20
- > you talking about the following note:=20
- > =20
- > Note that 64-bit capabilities use datap[0] and datap[1], whereas=20
- > 32-bit capabilities use only datap[0].=20
- > =20
- > In that case Ive just pointed out to this note to explain why this is ne=
-eded.=20
-=20
-For version 3 caps (64 bit masks) a single struct __user_cap_data_struct is=
- not
-big enough and capget() writes past the end of cap structure on the stack. =
-To
-accomodate version 3 cap masks the cap structure needs to be 2x bigger.
 
- > >         unsigned int mask;=20
- > >         int err;=20
- > >=20
- > >         header.version =3D _LINUX_CAPABILITY_VERSION_3;=20
- > >         header.pid =3D 0;=20
- > >=20
- > > -       err =3D capget(&header, &cap);=20
- > > +       err =3D capget(&header, cap);=20
- > >         if (err) {=20
- > >                 perror("Unable to get current capabilities");=20
- > >                 return;=20
- > > @@ -177,11 +177,11 @@ static void drop_capabilities(void)=20
- > >         /* not needed anymore since monitor socket is already open */=
-=20
- > >         mask =3D ~CAP_TO_MASK(CAP_NET_RAW);=20
- > >=20
- > > -       cap.effective &=3D mask;=20
- > > -       cap.permitted &=3D mask;=20
- > > -       cap.inheritable &=3D mask;=20
- > > +       cap[0].effective &=3D mask;=20
- > > +       cap[0].permitted &=3D mask;=20
- > > +       cap[0].inheritable &=3D mask;=20
- > >=20
- > > -       err =3D capset(&header, &cap);=20
- > > +       err =3D capset(&header, cap);=20
- > >         if (err)=20
- > >                 perror("Failed to set capabilities");=20
- > >  }=20
- > > --=20
- > > 2.34.1=20
- > >=20
- > >=20
- > =20
- > =20
- > --=20
- > Luiz Augusto von Dentz=20
- > =20
- >=20
+Thank you for your patch.
+
+
+Am 23.01.24 um 08:15 schrieb Janaki Ramaiah Thota:
+> This change is done to avoid BT not to go UNCONFIGURED state when BDA
+
+“This change is done to” is redundant, and can be left out.
+
+> fwnode is not available in DT for QTI SOCs.
+
+It’d be great if you documented the test setup exactly, on how to 
+reproduce this.
+
+Please also add a Fixes: tag.
+
+> Signed-off-by: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+> ---
+>   drivers/bluetooth/hci_qca.c | 13 ++++++++++++-
+>   1 file changed, 12 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index 94b8c406f0c0..11d66f3e5f3f 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -7,6 +7,7 @@
+>    *
+>    *  Copyright (C) 2007 Texas Instruments, Inc.
+>    *  Copyright (c) 2010, 2012, 2018 The Linux Foundation. All rights reserved.
+> + *  Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+>    *
+>    *  Acknowledgements:
+>    *  This file is based on hci_ll.c, which was...
+> @@ -1904,7 +1905,17 @@ static int qca_setup(struct hci_uart *hu)
+>   	case QCA_WCN6750:
+>   	case QCA_WCN6855:
+>   	case QCA_WCN7850:
+> -		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
+> +
+> +		/* Set BDA quirk bit for reading BDA value from fwnode property
+> +		 * only if that property exist in DT.
+> +		 */
+> +		if (fwnode_property_present(dev_fwnode(hdev->dev.parent), "local-bd-address")) {
+> +			set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
+> +			bt_dev_info(hdev, "setting quirk bit to read BDA from fwnode later");
+> +		} else {
+> +			bt_dev_info(hdev, "Not setting quirk bit for BDA");
+
+In my opinion, the message in the else branch, should be a debug 
+message, and should also contain that `local-bd-address` is not present 
+in the devicetree..
+
+> +		}
+> +
+>   		hci_set_aosp_capable(hdev);
+>   
+>   		ret = qca_read_soc_version(hdev, &ver, soc_type);
+> 
+> base-commit: 6613476e225e090cc9aad49be7fa504e290dd33d
+> prerequisite-patch-id: de5460a6c886a233feff19313b545ee6569369fb
+> prerequisite-patch-id: e18252a26d0f289afcbec18113b7f636a46a9aed
+> prerequisite-patch-id: 26e607ac96dc6d0d295793a0449a5b4c0f7ddc92
+> prerequisite-patch-id: c8d7f229399fc8075722ffe05260675ece93f691
+> prerequisite-patch-id: 554cc93ba4899eabe31585bf9591052058609d96
+> prerequisite-patch-id: 99c00a3d8d98a880c0d3a5545def0ca9ade0f903
+> prerequisite-patch-id: b1ef1add471677d1e1b60eaaab3e109abf7c7b2b
+> prerequisite-patch-id: 96131754c09914f327f353dee4daabb7ab5e6f29
+> prerequisite-patch-id: 610b5ec4a338d15cf8dba0459d5a1bfd28dccb4d
+> prerequisite-patch-id: 5172cd9d99462e123f264f0fd9a9768f2cae5498
+> prerequisite-patch-id: f57b8285516730da78089325d53f6125daaf2e6a
+> prerequisite-patch-id: 69dc26e36476660935070261f0e11cdd55c35688
+> prerequisite-patch-id: 8087dd28f6ef90fc3ad847b4bcde8a096ff721b5
+> prerequisite-patch-id: 8640fbfd7e5dcbdb4eacf5b748ea49678a2e6675
+> prerequisite-patch-id: b3613c0002cfd9cc77923f6ce781cec90a2f0cd1
+> prerequisite-patch-id: dc4f4077bfa02a5d5128bb39ef3a36dfc3db27bc
+> prerequisite-patch-id: 9c9aa8de9b4c50252d451a2dd76717c287fe1848
+> prerequisite-patch-id: 3c4a931debe7e8aa7d0b70870456421a17ff86a5
+> prerequisite-patch-id: df500031c7b6de9320021d52b060338b71340d91
+> prerequisite-patch-id: 14758d2fb4b6151aa9c27ab7e3cb8c742988f1d7
+> prerequisite-patch-id: 1c28faa0d8a4e294752229611ade87a216da0ce6
+> prerequisite-patch-id: 03680549373d9a5b0ab0e4c94260e8aaea04ef25
+> prerequisite-patch-id: cfcc27083466c9c87801628fe9c0f2131fc22dae
+
+What to do about these lines?
+
+
+Kind regards,
+
+PPaul
