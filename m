@@ -1,113 +1,139 @@
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-of-o52.zoho.com (sender4-of-o52.zoho.com [136.143.188.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ED7756741
-	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jan 2024 07:57:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705996635; cv=none; b=u+j+UWZiQgth870OO4SomQEm6yXIRPxIBmq1wAgjls0GQSLdexnxwjGhesNrUmyuGtxyQ5bEnvQPSSyKDrrSgUh2OMYzevRspS0QyVsibKtMmonBvsC6TxynjhgTsBgDJTa5PpJ4qwFIp0XZlj51zxXs5QnYuepgEyO+ESRCsYc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705996635; c=relaxed/simple;
-	bh=nrj6JNcaKplPqXxNMFRuazyc06LdJV2xyFaDU5BfOOk=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=alskd4/WisiFzsXERznURWnx2RC2omo/Sgliqqskx9Oz6s9bOW/GJ2fzGXZeHc2p9yTBwp/1yzLBMWivBd/plCCWFqml/QAZ8Jj96ihMFtEk+Use9T/lWPQYDDtyOervQQRO790RfNFTrxKgb+kgKWaMDdiq8WjTR1TvZ0w5IWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HA3yESdc; arc=none smtp.client-ip=209.85.222.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C08C056466
+	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jan 2024 08:12:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705997578; cv=pass; b=DmmZpEnwdTLcnFKG7BodBygk+tntLH95mivRnqxxxYqNM6BdUBFfqGuyjwMxyFxYYrADTsz7It59N8+esNLkOvQJT0B4OVPwiFcnbgES0MuQrnxyCXruT3/BK95We/DNIH5YO47IXiYo0ReNX7YzpmeH5pk8LuUZk2jXL2Ip5Uo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705997578; c=relaxed/simple;
+	bh=5rp2riqkvsGJPhdIbBrmLgw2ga/G0F68ZHqxU9AIxVY=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=mPo48kgEBaqeb20RBhCBGelkUjK8wqjqVYqCI+Rbs0cpp26LcT4Q8uz2ZWCbNLQeFlxD4rkxRwHFIiDXrmE1sY1vgNdpJCaMbV1UWwrjaokOPRKVRQ8c/t+x8nE0q3x/6es628XeXYUJSkC4jaZCkqLromjiQeGX0eti03nzIYY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lab.zgora.pl; spf=pass smtp.mailfrom=lab.zgora.pl; dkim=pass (2048-bit key) header.d=lab.zgora.pl header.i=mk@lab.zgora.pl header.b=QO5+SNH5; arc=pass smtp.client-ip=136.143.188.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lab.zgora.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lab.zgora.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HA3yESdc"
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-783182d4a0aso321609185a.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jan 2024 23:57:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705996633; x=1706601433; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=EvX3vbn+mqtFQHFPju7kfIQWXC5HJXPyV5mOzwSEj8Y=;
-        b=HA3yESdcTBCX2bWIg3Jd2goeS98Zqrz76WoatoAMA+3P4QIOMqSXZrIfubX8Ufc4il
-         HNjoAuvhjELBh++ch32JqJQPv80HNSGHeJNUFYR7xqKnUdDCiL0vqA/A90iOUiXVDo/M
-         9Pm6ZkxqJNQOLowVgGsL1CB+FoHMQZEIChk7BY7P+F466nadiaa91wXouOejyHnaTWn9
-         IJq8pYXvxYuPV02dAfRptaMuq2y/pYlz+EEICfvnF06TY2XcdPgNiWwkDst6sII1Vfmr
-         ji8/L5I3Tvx023EnCtsg/8H/6Cb5JAtGB2cmH3eEBqlTJWHsHzppvnij6LRUwiU3Tjz9
-         zcyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705996633; x=1706601433;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=EvX3vbn+mqtFQHFPju7kfIQWXC5HJXPyV5mOzwSEj8Y=;
-        b=ou10VoPSkEnu2ro4SgNp/6BiRKYN6z2Z1Lj4P9wFc4RrVFd7ntFQo7o5NJf7GQJNIZ
-         L2lR2Kq0p7bN8d1KtALhch/FKP1XU52wRj6daut1nAR2tOp30UgVGA6SM4F8yYcjkpM/
-         Bi/tfZ+MbEqMNb9UOM4JqFJRfUe/3z9U8/APt1JIFK3Fsbz4CiUkvZ911wGXgMPtVXPn
-         b1n2zUMHFNJsoCFWRyKxgeAbhIvREEuwh39PcqafHg1J3z3DwVdXYLRztV04bnXZhfVa
-         9J4mMbcFi05l/Qw8+c8z7gf3uEjZ9eoNlP8MHBEAUPiNy1oKMp14P5/KfFezziWZBjI4
-         fJEg==
-X-Gm-Message-State: AOJu0Yz93feSHvTg75TqL1buWHVHhbNksfs9BibXUgj8F1BQ2nQByiHT
-	cdcw8EFqRtlOe9ftjSoRRURnC321VCbeJeoUotsTrYDkNWEMiYOJGhU72+Vk
-X-Google-Smtp-Source: AGHT+IFOqy+8iUCzjrX22+Rw2ilMadxhe/rjQqpYa8iZMXNG1kIIxErpVQPFcuIc4fwz/+SZ0bVqVA==
-X-Received: by 2002:a05:6214:230e:b0:685:7125:67e6 with SMTP id gc14-20020a056214230e00b00685712567e6mr692691qvb.1.1705996632856;
-        Mon, 22 Jan 2024 23:57:12 -0800 (PST)
-Received: from [172.17.0.2] ([20.102.46.180])
-        by smtp.gmail.com with ESMTPSA id f15-20020a0cc30f000000b006817089c8f5sm3200654qvi.10.2024.01.22.23.57.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jan 2024 23:57:12 -0800 (PST)
-Message-ID: <65af7158.0c0a0220.818bb.ba95@mx.google.com>
-Date: Mon, 22 Jan 2024 23:57:12 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0449467732140671832=="
+	dkim=pass (2048-bit key) header.d=lab.zgora.pl header.i=mk@lab.zgora.pl header.b="QO5+SNH5"
+ARC-Seal: i=1; a=rsa-sha256; t=1705997571; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=lGGgiuvLz+bsXNiEEe6eQCdS5LdCDC77W94ZYkk3czL5jMXxVXMOKOeRSDTDXDm+H1X8e2XgXF2CrBb/dcuBxzLSrhOBMSSqsaASC9yLCbhXX/HB1z/CLvDJ7oW7vNMywMW7EVitCGBp/HZ1/cyM5EkKPFTDI5TJ27nUolbB+TQ=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1705997571; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=u0hGewnMe8MiZjaczX5Y4JoMyC/+nvPp4QlA4aMsrFE=; 
+	b=IRG1FmCH6Qt4PcfIlfYzJMyZjnRaNe930EdVk7W836n3Yee2OC/bUNPZmRiV8fY2qss+XzIOzKTg5KKhYLpFZJyCXS9zf8wY+LkbquZ+BZtXEWo9FYMdxebtcgj6XwQMDBqv4NdEFNdL61DB38YAcMa53iIucLVYOZbdsIEMlxw=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=lab.zgora.pl;
+	spf=pass  smtp.mailfrom=mk@lab.zgora.pl;
+	dmarc=pass header.from=<mk@lab.zgora.pl>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1705997571;
+	s=mail; d=lab.zgora.pl; i=mk@lab.zgora.pl;
+	h=Date:Date:From:From:To:To:Cc:Cc:Message-ID:In-Reply-To:References:Subject:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=u0hGewnMe8MiZjaczX5Y4JoMyC/+nvPp4QlA4aMsrFE=;
+	b=QO5+SNH5eN1/RTtmz7Mhdg0QoWh7Qad1wWULN6RbaFDFyEpBB3gQpAeEE+KcoeDe
+	+mOvuvMwfD1s5NQvgNE+06nCFoJHVAYYQghSTutZRem4nfGU1PGaJgOOKR1La8ZqfVx
+	EFlAYUmJkZ7cPGeksELIhPAPsG9kRLAQoT4oFeKds51rKtbCxrmu7P0WByNBlWYWu81
+	YHg6VnCZEtFCrmSaoL2jWtxvXpnZkb49phSRqXuG5pbAcpd73uThx0nr9kWdslnyxfY
+	VOyvMVexyCfwAJXTU+HzQpgy77ugg9n4LlihVuf5W8wZEz8Bp4+vaPn/EbjgnJ3YUa/
+	xzLhOrQQ8w==
+Received: from mail.zoho.com by mx.zohomail.com
+	with SMTP id 1705997570309264.1077689101212; Tue, 23 Jan 2024 00:12:50 -0800 (PST)
+Date: Tue, 23 Jan 2024 09:12:50 +0100
+From: Mariusz Kozlowski <mk@lab.zgora.pl>
+To: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth" <linux-bluetooth@vger.kernel.org>
+Message-ID: <18d356110eb.1120f313b408792.7694888926917426249@lab.zgora.pl>
+In-Reply-To: <CABBYNZKW8odyLb_BQcXXpjAKjPzHRhXVCbxvcg54VkoeULeHnw@mail.gmail.com>
+References: <20240121100328.1200839-1-mk@lab.zgora.pl> <CABBYNZKW8odyLb_BQcXXpjAKjPzHRhXVCbxvcg54VkoeULeHnw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] btmon-logger: Fix stack corruption
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, quic_janathot@quicinc.com
-Subject: RE: Bluetooth: hci_qca: Set BDA quirk bit if fwnode exists in DT
-In-Reply-To: <20240123071523.23480-1-quic_janathot@quicinc.com>
-References: <20240123071523.23480-1-quic_janathot@quicinc.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Importance: Medium
+User-Agent: Zoho Mail
+X-Mailer: Zoho Mail
 
---===============0449467732140671832==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Luiz,
 
-This is automated email and please do not reply to this email!
+ > Hi Mariusz,=20
+ > =20
+ > On Sun, Jan 21, 2024 at 5:04=E2=80=AFAM Mariusz Koz=C5=82owski mk@lab.zg=
+ora.pl> wrote:=20
+ > >=20
+ > > Version 3 capability masks are 64 bits in size.=20
+ > > ---=20
+ > >  tools/btmon-logger.c | 12 ++++++------=20
+ > >  1 file changed, 6 insertions(+), 6 deletions(-)=20
+ > >=20
+ > > diff --git a/tools/btmon-logger.c b/tools/btmon-logger.c=20
+ > > index a770ad575..1f6db3751 100644=20
+ > > --- a/tools/btmon-logger.c=20
+ > > +++ b/tools/btmon-logger.c=20
+ > > @@ -161,14 +161,14 @@ extern int capset(struct __user_cap_header_struc=
+t *header,=20
+ > >  static void drop_capabilities(void)=20
+ > >  {=20
+ > >         struct __user_cap_header_struct header;=20
+ > > -       struct __user_cap_data_struct cap;=20
+ > > +       struct __user_cap_data_struct cap[_LINUX_CAPABILITY_U32S_3];=
+=20
+ > =20
+ > Ok, but this doesn't change the field, it makes it an array, or are=20
+ > you talking about the following note:=20
+ > =20
+ > Note that 64-bit capabilities use datap[0] and datap[1], whereas=20
+ > 32-bit capabilities use only datap[0].=20
+ > =20
+ > In that case Ive just pointed out to this note to explain why this is ne=
+eded.=20
+=20
+For version 3 caps (64 bit masks) a single struct __user_cap_data_struct is=
+ not
+big enough and capget() writes past the end of cap structure on the stack. =
+To
+accomodate version 3 cap masks the cap structure needs to be 2x bigger.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=818971
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      5.45 seconds
-GitLint                       PASS      0.37 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      28.58 seconds
-CheckAllWarning               PASS      31.20 seconds
-CheckSparse                   PASS      36.95 seconds
-CheckSmatch                   PASS      100.82 seconds
-BuildKernel32                 PASS      27.48 seconds
-TestRunnerSetup               PASS      439.03 seconds
-TestRunner_l2cap-tester       PASS      23.45 seconds
-TestRunner_iso-tester         PASS      46.07 seconds
-TestRunner_bnep-tester        PASS      6.88 seconds
-TestRunner_mgmt-tester        PASS      155.01 seconds
-TestRunner_rfcomm-tester      PASS      12.97 seconds
-TestRunner_sco-tester         PASS      14.94 seconds
-TestRunner_ioctl-tester       PASS      11.99 seconds
-TestRunner_mesh-tester        PASS      8.71 seconds
-TestRunner_smp-tester         PASS      9.75 seconds
-TestRunner_userchan-tester    PASS      7.21 seconds
-IncrementalBuild              PASS      26.67 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0449467732140671832==--
+ > >         unsigned int mask;=20
+ > >         int err;=20
+ > >=20
+ > >         header.version =3D _LINUX_CAPABILITY_VERSION_3;=20
+ > >         header.pid =3D 0;=20
+ > >=20
+ > > -       err =3D capget(&header, &cap);=20
+ > > +       err =3D capget(&header, cap);=20
+ > >         if (err) {=20
+ > >                 perror("Unable to get current capabilities");=20
+ > >                 return;=20
+ > > @@ -177,11 +177,11 @@ static void drop_capabilities(void)=20
+ > >         /* not needed anymore since monitor socket is already open */=
+=20
+ > >         mask =3D ~CAP_TO_MASK(CAP_NET_RAW);=20
+ > >=20
+ > > -       cap.effective &=3D mask;=20
+ > > -       cap.permitted &=3D mask;=20
+ > > -       cap.inheritable &=3D mask;=20
+ > > +       cap[0].effective &=3D mask;=20
+ > > +       cap[0].permitted &=3D mask;=20
+ > > +       cap[0].inheritable &=3D mask;=20
+ > >=20
+ > > -       err =3D capset(&header, &cap);=20
+ > > +       err =3D capset(&header, cap);=20
+ > >         if (err)=20
+ > >                 perror("Failed to set capabilities");=20
+ > >  }=20
+ > > --=20
+ > > 2.34.1=20
+ > >=20
+ > >=20
+ > =20
+ > =20
+ > --=20
+ > Luiz Augusto von Dentz=20
+ > =20
+ >=20
