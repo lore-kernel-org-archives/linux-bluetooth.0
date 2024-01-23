@@ -1,154 +1,104 @@
-Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFC2E1FA4
-	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jan 2024 14:32:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69DBE5026C
+	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jan 2024 14:34:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706020323; cv=none; b=V7NEPeO4022YWc5fDaskoHg/iHRPskcQ6hLawDu8xfwrMXQrWD2THsU4YgayeO9dIfKVLg/MX8ph3Mchh7FBrELEmWpb2byIK3FP8X5PbaB/egYiY7F5rcm9z1vyzO+iPmReBcP4JBLB3gZpBv3xFKDXLiPfISO9nKPwar4kQvs=
+	t=1706020487; cv=none; b=N2eeg9Yd9HQL6jzipakQ+l12/x4MdZi+92QtWWdzsA7+YKvcP2TqppT5oZwUtNFtzRVsaadXSqhMt8Xdu1G5OWdQDaavFbSyvj/9sY0IkcTjlq3Sp6DZdB0Rl8BwG9BIQje6UCp8iv/tvxH4iO95Y/32mgVuqSquK6qN/CSyP2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706020323; c=relaxed/simple;
-	bh=LmNYPxbyewhVFnClXjrGP4+mfa7j8oKqiQCqFrnbb40=;
-	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WvtDjK1JlFAx3ruyWHaVwNdrvbrYAaNoX2XTnPzrX8mvhRfzeN9C/eM/2r5R3mMu4sgsJvVHIo0zDklqLPiXcOuHckM2Kk+YpyUwtS0v3K5j9T76F5sIlpxbckVr8T/1Itr5hDakEMepQQnouAOauvOe7tA9gTf03KhmdGISn2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=OxgjZKeg; arc=none smtp.client-ip=46.235.227.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1706020487; c=relaxed/simple;
+	bh=uJBp+FlK6WKnQgc2vS75pS2aZzn/nd5DS/pX35tApNc=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=FUZgVbQ4e+UptNtpuaSKzFV0DRRaE5cRwWYvgg5z+NXs+gbkUBaTqP88MJTpplG1lOdwKH7mmyUHd0tK6LnlN8k/uyYNDGwUl8JFGuVUc5zEo6ZGDasAwgUD8Lthy9iq+DVMF0OI3ePq193k3QtGtjUqjIB+YdHy5RyLJ7nAs+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SKe16+MO; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="OxgjZKeg"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1706020318;
-	bh=LmNYPxbyewhVFnClXjrGP4+mfa7j8oKqiQCqFrnbb40=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=OxgjZKegOxepZ3pCV8tgK4Fl/T001hzW+tP4WUJCennnGIvi3slLeX+Z+l8ITdbbB
-	 FYXLL/xK6I0iO0SgUZggIOtLysnZdYrrN8+iXn8TxUPpNA7KMngm/EfhrR+ewxic9J
-	 Rx67QwKQ/82DzLFl6yzQ3ncHSXTfDfVTTr12andRWeJVFI3fUO9YEqM9H9JLtSHBsE
-	 1LqxEkbo5IE39LEuthlLMWDv570hGXQ/sDegOTUhbJV/OAXiFe2bXu+SmIgSFMYvql
-	 FnMi7p5UAcGclEju+RealGTitDu3I3dIYaZgxmfI6ecw4+Q3p6BCFP9oOiPVW3ND8n
-	 fuan/Fx7d6CYw==
-Received: from fdanis-XPS-13-9370.. (cola.collaboradmins.com [195.201.22.229])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by madrid.collaboradmins.com (Postfix) with ESMTPSA id A92C537820AE
-	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jan 2024 14:31:58 +0000 (UTC)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 2/4] btgatt-client: Add function to search service based on UUID
-Date: Tue, 23 Jan 2024 15:31:49 +0100
-Message-Id: <20240123143151.541787-3-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240123143151.541787-1-frederic.danis@collabora.com>
-References: <20240123143151.541787-1-frederic.danis@collabora.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SKe16+MO"
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1d746856d85so12648675ad.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jan 2024 06:34:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706020485; x=1706625285; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=KwnQx9Kn/FKr2Y9Yi0CcIfHQ5OkgMS/k8zSzEehgg1Y=;
+        b=SKe16+MOxnZT2Jw3l1XsijJ+CK+k28pxXu1ZyPG3WrRwmjhb25uITCq8+gOIaG8fAw
+         xps7Z2FvMuiVpsD50eaCn2PwpYE+dLBG7wjyvUZSg+Kt4I5R5U1y8bfhauvaonlkeijW
+         HFRvnRRNz81U5vCZhYV5sHyHSC83XK9bsUMcuse45SuNaNy5IyUDgmSPYmzAQ/yzAXWG
+         tqrUs149Si6O4YNk0Oe00CgreGQd/SeYBpkAGv6fcWSPnIxXSeuqrsiFmZVJQuU2Sbqy
+         QRNql7bzMe3DzM7K7u/ig5FtXeCHtDNRKre1762cFMegw6qSUwOThPEpHiU9SGWa2em1
+         f3bA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706020485; x=1706625285;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KwnQx9Kn/FKr2Y9Yi0CcIfHQ5OkgMS/k8zSzEehgg1Y=;
+        b=iaxGKO86p+yXVTehiOA7vaW+uTuUq8jhsmgeqtE03mbnDGd4PBewlbZOAjV/uFJelx
+         b0FngOsu8pf1/PaXhoDNuEqvPJxfs6gJ0+/CBfmgFU6JyZMuVzjRaxxKm/z1jNeFBu5b
+         6jMRM+GfrwIku3EtADi1mXxCaULdXM5FXZA3WB1xNNbF3+LLgylW0IhbG3A5NGFTGkTD
+         6etujdP/nyVyWgnHjaMVpW9ZWtlwtxp8SujLjxXGOr8g0tTTxadvcStLoVgkJMcp/w5B
+         p7gWq+YwQt0Z482TKtv6Npf83FNqokO8Expz4Hy71bn/oJnJpBfOxxUcA868FUEjAGLi
+         aAoQ==
+X-Gm-Message-State: AOJu0YxgV6GPTmCPIk5z6GE+nXjDJ8n3vyKcv+XM5hRFk9BbbJ0nFwyb
+	1OHvjHdWuse+RiGj1qHSlv/D4PAVQ3wo6NN65xOPB8q7SJb1zcO6WEbqqRFL
+X-Google-Smtp-Source: AGHT+IGZDr0ldCcpTI3NJVjDamE1s9+GYfMrgRZy16nHh0KRj1KDKoKWevcZWJKkPOv6z2cyrC59Pw==
+X-Received: by 2002:a17:902:f68f:b0:1d5:8a6e:925d with SMTP id l15-20020a170902f68f00b001d58a6e925dmr4329134plg.3.1706020485514;
+        Tue, 23 Jan 2024 06:34:45 -0800 (PST)
+Received: from [172.17.0.2] ([52.238.27.209])
+        by smtp.gmail.com with ESMTPSA id j17-20020a170902f25100b001d70e83f9c3sm8406931plc.242.2024.01.23.06.34.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Jan 2024 06:34:45 -0800 (PST)
+Message-ID: <65afce85.170a0220.d78ec.b696@mx.google.com>
+Date: Tue, 23 Jan 2024 06:34:45 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3498986564507348079=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, silviu.barbulescu@nxp.com
+Subject: RE: Add code to support dynamically generated BASE
+In-Reply-To: <20240123125145.70371-2-silviu.barbulescu@nxp.com>
+References: <20240123125145.70371-2-silviu.barbulescu@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-This is requested to pass PTS GATT/CL/GAD/BV-02-C test.
+--===============3498986564507348079==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=819102
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.57 seconds
+GitLint                       PASS      0.74 seconds
+BuildEll                      PASS      23.90 seconds
+BluezMake                     PASS      714.78 seconds
+MakeCheck                     PASS      11.36 seconds
+MakeDistcheck                 PASS      163.74 seconds
+CheckValgrind                 PASS      223.96 seconds
+CheckSmatch                   PASS      326.28 seconds
+bluezmakeextell               PASS      105.60 seconds
+IncrementalBuild              PASS      2063.35 seconds
+ScanBuild                     PASS      965.19 seconds
+
+
+
 ---
- tools/btgatt-client.c | 69 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 69 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-index 3bcb7e1cf..99a123697 100644
---- a/tools/btgatt-client.c
-+++ b/tools/btgatt-client.c
-@@ -33,6 +33,7 @@
- #include "src/shared/queue.h"
- #include "src/shared/gatt-db.h"
- #include "src/shared/gatt-client.h"
-+#include "src/shared/gatt-helpers.h"
- 
- #define ATT_CID 4
- 
-@@ -1353,6 +1354,72 @@ static void cmd_set_sign_key(struct client *cli, char *cmd_str)
- 		set_sign_key_usage();
- }
- 
-+static void search_service_usage(void)
-+{
-+	printf("Usage: search-service <uuid>\n"
-+		"e.g.:\n"
-+		"\tsearch-service 1800\n");
-+}
-+
-+static void search_service_cb(bool success, uint8_t att_ecode,
-+					struct bt_gatt_result *result,
-+					void *user_data)
-+{
-+	struct bt_gatt_iter iter;
-+	uint16_t start_handle, end_handle;
-+	uint128_t u128;
-+	bt_uuid_t uuid;
-+	char uuid_str[MAX_LEN_UUID_STR];
-+
-+	if (!success) {
-+		PRLOG("\nService discovery failed: %s (0x%02x)\n",
-+				ecode_to_string(att_ecode), att_ecode);
-+		return;
-+	}
-+
-+	if (!result || !bt_gatt_iter_init(&iter, result))
-+		return;
-+
-+	printf("\n");
-+	while (bt_gatt_iter_next_service(&iter, &start_handle, &end_handle,
-+						u128.data)) {
-+		bt_uuid128_create(&uuid, u128);
-+		bt_uuid_to_string(&uuid, uuid_str, sizeof(uuid_str));
-+		printf("Found start handle: 0x%04x, end handle: 0x%04x, "
-+			"UUID: %s\n",
-+			start_handle, end_handle, uuid_str);
-+	}
-+	PRLOG("\n");
-+}
-+
-+static void cmd_search_service(struct client *cli, char *cmd_str)
-+{
-+	char *argv[2];
-+	int argc = 0;
-+	bt_uuid_t uuid;
-+
-+	if (!bt_gatt_client_is_ready(cli->gatt)) {
-+		printf("GATT client not initialized\n");
-+		return;
-+	}
-+
-+	if (!parse_args(cmd_str, 1, argv, &argc) || argc != 1) {
-+		search_service_usage();
-+		return;
-+	}
-+
-+	if (bt_string_to_uuid(&uuid, argv[0]) < 0) {
-+		printf("Invalid UUID: %s\n", argv[0]);
-+		return;
-+	}
-+
-+	bt_gatt_discover_primary_services(bt_gatt_client_get_att(cli->gatt),
-+						&uuid, 0x0001, 0xFFFF,
-+						search_service_cb,
-+						NULL,
-+						NULL);
-+}
-+
- static void cmd_help(struct client *cli, char *cmd_str);
- 
- typedef void (*command_func_t)(struct client *cli, char *cmd_str);
-@@ -1389,6 +1456,8 @@ static struct {
- 			"\tSet retry on security error by elevating security"},
- 	{ "set-sign-key", cmd_set_sign_key,
- 				"\tSet signing key for signed write command"},
-+	{ "search-service", cmd_search_service,
-+				"\tSearch service"},
- 	{ }
- };
- 
--- 
-2.34.1
 
+--===============3498986564507348079==--
