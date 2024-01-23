@@ -1,112 +1,83 @@
-Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 354075FDA8
-	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jan 2024 18:18:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4057F81ACC
+	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jan 2024 18:41:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706033925; cv=none; b=ug3SMPybhEpksxcmg8Zgwdc5K06x1QJjppHtqOsLG/SW/3qc74SEB+hEOUZhZrCdTJqOqJkadESdcl0HplbCI7TdmmP0+tbgoy83c3h0fdqlzsJcm2XP+ts0ebBJEEvvL9NnjAjBzqsHIUy10eDZV1GTOtDAVAeUdpgceC+hijo=
+	t=1706035285; cv=none; b=M2X1jmtWyHeeJG3BYFdiHC97EkQwZZ5d3RTm8NY9JwjHjngJyVLNZB97ScKUE1UJDvyqz4V9cE0n2RIF0zNjL4zvNDenJvradlFLtHMAWjQ3pT3+GInGTq1C35sFhJyb93AVVf5RzbLg+IhzAs0vnWmCyr5B+TrX0oA7zaqWY6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706033925; c=relaxed/simple;
-	bh=I+NWPdYhapuu6FJOGl4H3CmXvmXKG8ckEat5E0f9jKQ=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=H7+U06q1GpMZkiId1kM1THXsvokqWmmnjr1eASAgLuIffsHLPEVGHgXihrlBu+AjVaZxR74o4P+hibIunRU8dg8IJKU21Js2Ubg/YHns+KjXandTtfUy59UV7W57WL1w1cuj2upiUPnD6RlGqLLOt2iC7v0rCcv+sDjt547r3YI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=OmDapD6l; arc=none smtp.client-ip=192.30.252.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1706035285; c=relaxed/simple;
+	bh=Nt31G/wavNp6AJFlBRL3O7s/21fty7hWfESZv5OdV9w=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=CYm5BW3XOlgP+XxnwNMHVb6aVc9vS9LH0p2RVPfnooOEUlVoSPFTEPTzIqGMULjAQehzZJ0WJ1IAUU8Bc3PVKE4W+t+6UR4RIxOWwFBWSI7Pt8Zsi+gZu1WwP7YjJh9y/ZZlJgAC3jxx8uWCyufRCRMu12Vtk6GtcTlZtH6/KJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZPeWMawJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="OmDapD6l"
-Received: from github.com (hubbernetes-node-e5f515e.ash1-iad.github.net [10.56.161.41])
-	by smtp.github.com (Postfix) with ESMTPA id 3770E34076A
-	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jan 2024 10:18:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1706033923;
-	bh=hX9PCoiplEDaFFrKf6KERlI9miw3FK3nb2KUVUogt0s=;
-	h=Date:From:To:Subject:From;
-	b=OmDapD6lyHupJDysojkJM0XZBLWRtXEKV+qgaZ4v+6558Sj25TYJrC8QMBYh/C2F5
-	 2PSStKqabi4IOa8R3/HrmzA7xJvaPX8GaKqRU4kHdFwYuTIKoxGG5NzDvqLJC6pinA
-	 6FEop9kUJw9UEkQ5i+Ty5vinWTo6enBEP/13LWIM=
-Date: Tue, 23 Jan 2024 10:18:43 -0800
-From: silviubarbulescu <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/a9d1f6-15e7d5@github.com>
-Subject: [bluez/bluez] eb0578: isotest: Fix not handling 0 length packets
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZPeWMawJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BAA9CC433C7;
+	Tue, 23 Jan 2024 18:41:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706035284;
+	bh=Nt31G/wavNp6AJFlBRL3O7s/21fty7hWfESZv5OdV9w=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ZPeWMawJrDjsfabfwBLDlWg0KmUw44SyvsYHuVVYxLgVRysJ8DDyMAesyo8hPxmdN
+	 IFXjPQMhxTTHwZqXS5QzcUlDi/2dvXIOjGFwbPESnN1EHIrDhvY3rkCLUrdJ1tTvgW
+	 Cf7ZOyJElUw9B6v21/QyXKMCJ3OfOamuS1s7cwaTxZq/2TgeHa4Ps2y/OoGt/aBAZw
+	 t3r9RPx6qY1bsbnaFbGIvprR1fugKAY0PJkJjKDsVPswc+FzTdhsB/N94dL+KB1RWY
+	 xbQNsGxhu5HH0QTkUxZmYX4TfQnbUS+kXmdjCvR+IXlRx2nVt53Xu+cBC3KhLaPfoX
+	 mqVaBa0UpLPJg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A0455DFF762;
+	Tue, 23 Jan 2024 18:41:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v4 0/3] Add code to support dynamically generated BASE
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <170603528465.29536.14545199730796417084.git-patchwork-notify@kernel.org>
+Date: Tue, 23 Jan 2024 18:41:24 +0000
+References: <20240123125145.70371-1-silviu.barbulescu@nxp.com>
+In-Reply-To: <20240123125145.70371-1-silviu.barbulescu@nxp.com>
+To: Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org, mihai-octavian.urzica@nxp.com,
+ vlad.pruteanu@nxp.com, andrei.istodorescu@nxp.com, luiz.dentz@gmail.com,
+ iulia.tanasescu@nxp.com
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: eb057846cf0304c5faec30f510965f9071d45e57
-      https://github.com/bluez/bluez/commit/eb057846cf0304c5faec30f510965f9071d45e57
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-01-23 (Tue, 23 Jan 2024)
+Hello:
 
-  Changed paths:
-    M tools/isotest.c
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  isotest: Fix not handling 0 length packets
+On Tue, 23 Jan 2024 14:51:42 +0200 you wrote:
+> This removes hardcoded BASE from client/player and adds support to
+> dynamically generate BASE from preset provided when configuring
+> a broadcast source endpoint.
+> 
+> Silviu Florian Barbulescu (3):
+>   shared/bap: Add code to support dynamically generated BASE from
+>     presets
+>   client/player:Remove hardcoded BASE for broadcast to use presets
+>   bap: Use the information in SetConfiguration to generate BASE
+> 
+> [...]
 
-It is in fact possible to receive 0 length packets since that probably
-means their status is not sucess.
+Here is the summary with links:
+  - [BlueZ,v4,1/3] shared/bap: Code to generate bcast source BASE
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e4a35bc1e2cd
+  - [BlueZ,v4,2/3] client/player: Remove hardcoded BASE from player
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ba943aadd0e2
+  - [BlueZ,v4,3/3] bap: Use SetConfiguration info to generate BASE
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=15e7d5a4d24a
 
-
-  Commit: e4a35bc1e2cdf5a57ab24c08d36412154603ff52
-      https://github.com/bluez/bluez/commit/e4a35bc1e2cdf5a57ab24c08d36412154603ff52
-  Author: Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
-  Date:   2024-01-23 (Tue, 23 Jan 2024)
-
-  Changed paths:
-    M src/shared/bap.c
-    M src/shared/bap.h
-
-  Log Message:
-  -----------
-  shared/bap: Code to generate bcast source BASE
-
-Add code to support dynamically generated BASE from
-endpoint configuration.
-
-
-  Commit: ba943aadd0e27db720a0e0848542b675c01de899
-      https://github.com/bluez/bluez/commit/ba943aadd0e27db720a0e0848542b675c01de899
-  Author: Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
-  Date:   2024-01-23 (Tue, 23 Jan 2024)
-
-  Changed paths:
-    M client/player.c
-
-  Log Message:
-  -----------
-  client/player: Remove hardcoded BASE from player
-
-Remove hardcoded BASE and QoS for broadcast and use the information
-from the preset instead.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-  Commit: 15e7d5a4d24a22c9a3e3d317ee45c39f482991d3
-      https://github.com/bluez/bluez/commit/15e7d5a4d24a22c9a3e3d317ee45c39f482991d3
-  Author: Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
-  Date:   2024-01-23 (Tue, 23 Jan 2024)
-
-  Changed paths:
-    M profiles/audio/bap.c
-
-  Log Message:
-  -----------
-  bap: Use SetConfiguration info to generate BASE
-
-Use the preset information provided by SetConfiguration to generate
-the source's BASE and not receive the BASE over D-BUS.
-
-
-Compare: https://github.com/bluez/bluez/compare/a9d1f6f6a625...15e7d5a4d24a
