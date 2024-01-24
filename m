@@ -1,37 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89AE27CF05
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89B237E560
 	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jan 2024 16:08:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706112484; cv=none; b=fG9VYmQtiTsMd3m11FADqPfS2u1yY16IBr9gvhHgv+B46/SwUWYkU/sCZX9Oa7RCWJEQhWmMMxX8UbjxFwtThu1113cPjRw6o16uY8flTxGry4s6FN0sOVuLoxwjinjMK/j6L7wKDxNUD5zSYwry1AkxvlYg5AYZe3ygNjGJugA=
+	t=1706112484; cv=none; b=Jc1FFsj3igY58YZ1lkHJqIfDycyWbrxaAg3g6PW3FS6BryIAAMEnAuv2K4ePylJ1c1qLSDZPlyUbeOKeGj/vonMWz6jLYOA5t/SU3xULlTb2sPHzvvcozI2fPNzFlk1TSIHe32sxGzKUW+yRij2XyQexYTiMAne6rP0NQk8VaHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1706112484; c=relaxed/simple;
-	bh=R3HFcVBoJszTJuASrnzBJqv6UFv6WlatH6rNlebl+0Y=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ec7bSaltDnD+NAHqy9oP88CdA6BiXctrpyxkyd1bIE+MkdAAvqm6Wc+ANdRP2PK04vl7gsJHgTwbHZT6X0ZvRkdg76PRrVW/dvVgm1kGTdUI6jS0nMGFrzixv8KTlTC4yMDB7cCEynZIfyJqb1P1sSJMXWwuEcC8H3Ofv0/I1do=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SfNCeV7i; arc=none smtp.client-ip=10.30.226.201
+	bh=F/HbVo4A4RjQZ+vKiPn5ElqvSWqMFTAmzzmaMvmbiz8=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=BinmluiXQyQK5Og6kaBhOCd01Zxop5EC1CUurei+qOOxhVux41I2WPaHv//8jkj/xyy4O2K3zRuasmfECdF5N3prZ4exHA6cgSPw4l/uldbezyF/S0ZYhP1TPH1ZWfzcLAUuRoDTmjRfLXJmKSdI4KIsR/M7L79ykXnpqoK+v2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QKsE25AT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SfNCeV7i"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 231BBC43394;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QKsE25AT"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2D016C433B1;
 	Wed, 24 Jan 2024 16:08:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1706112484;
-	bh=R3HFcVBoJszTJuASrnzBJqv6UFv6WlatH6rNlebl+0Y=;
-	h=From:Subject:Date:To:Cc:Reply-To:From;
-	b=SfNCeV7ikjVnI68nbXUDD5BlfIbkfLyi5ey2QFvInrbNYshKX/dDlGC5EYlf6PJRd
-	 vx1ILu9Yp9phm6k/frAVi7EGyKAGqqcbfPNFdsAg+1qoG95YbenYLeDofsDc/qYmxr
-	 NFTx/DZItJGS9Wo5dd+kbK7J7eJMF6nkBtxahoosO6XVAFm6dT3gJwv6e52AcYElpe
-	 TWlO83vVP4Qdn8KK5/UDAwigknDJbadin6ibDixI/VQdqE9TgVT5HNG/jujipZvCaj
-	 SSwK4VY90ONO/QfFXc0zVaZIjFlY4eOhcouPXWAlfdlzgRYV2asrwFs3Z+R28l2i8S
-	 CKcq6umPade5w==
+	bh=F/HbVo4A4RjQZ+vKiPn5ElqvSWqMFTAmzzmaMvmbiz8=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=QKsE25ATD28CMFTxE1a+ivL2GMrOjyKDo5J4mutGK3dfLiqKxY4uUpxF/jrQUXmKc
+	 anYGWZiqhbKiHh4ZOSiRHinUe9yoRcMm4yXWlPqC+ClOffJEZvJz4AAEEg34NUP7B2
+	 xNlt+GnyGoMQNOl5FH12vqfaYYvt7xPXsNouxxCKoC9kLiARzS+1MJ7xxBt5ScBAy4
+	 dAj79VrgwKsBlKhnRzS2Lc69XmjSmIfvgYRyHw8zdnl5CSpzXT4wlUimCQwaDtD6Y3
+	 VGIDWG7ZuaIsFBN3lq3wLwEmL8w2lMf/uKYesvRMDESv9xkE17PSb8gnsG8/b9Paj5
+	 zzLTleFdnMC5w==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E10AC47DDC;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 184DCC46CD2;
 	Wed, 24 Jan 2024 16:08:04 +0000 (UTC)
 From: Emil Velikov via B4 Relay <devnull+emil.l.velikov.gmail.com@kernel.org>
-Subject: [PATCH BlueZ v2 0/8] Remove support for external plugins
-Date: Wed, 24 Jan 2024 16:07:56 +0000
-Message-Id: <20240124-rm-ext-plugins-v2-0-5244906f05ff@gmail.com>
+Date: Wed, 24 Jan 2024 16:07:57 +0000
+Subject: [PATCH BlueZ v2 1/8] configure, README: introduce
+ --enable-external-plugins
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -40,17 +41,17 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIANw1sWUC/3XMQQ6CMBCF4auQWTumHREtK+9hWLRYYBKgpMUGQ
- 3p3K3uX/0vet0Ownm2AutjB28iB3ZyDTgW0g557i/zKDSSoFFJW6Ce024rL+O55Dmi0MPcr6VK
- RgXxavO14O8Bnk3vgsDr/Ofwof+tfKkoUWJFSojPidqnUo580j+fWTdCklL6bZ16lrAAAAA==
+Message-Id: <20240124-rm-ext-plugins-v2-1-5244906f05ff@gmail.com>
+References: <20240124-rm-ext-plugins-v2-0-5244906f05ff@gmail.com>
+In-Reply-To: <20240124-rm-ext-plugins-v2-0-5244906f05ff@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Emil Velikov <emil.velikov@collabora.com>
 X-Mailer: b4 0.12.4
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1706112482; l=1947;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1706112482; l=2129;
  i=emil.l.velikov@gmail.com; s=20230301; h=from:subject:message-id;
- bh=R3HFcVBoJszTJuASrnzBJqv6UFv6WlatH6rNlebl+0Y=;
- b=+sNzy8QaySNon+vpbiLaXjePBK3GYevtafRdkPxnZ6ZklOjHpWz3++HIfJ7dDv4Ca4wWwwKpc
- BJHZTBqI6wWDTh+4e53BB5TTaMwlzUIYWPK390ZWMVidwIFP6VtF3GF
+ bh=e1EdDSyciHHAaX9NsOJkW3suqFVoEXcg0Cnn7chU+j0=;
+ b=wZYVhXk4d+d1zkJHhssGBaY6vQuhV8G7N+2hDdjZ4AbMKP4XBklm6/NB0S+YGw4naiNCcfYp1
+ 9iEoJaO+Q4dAXGqgVsncGI6PhasTNvUJVlUoT8B35gtqTmUOWvxodpa
 X-Developer-Key: i=emil.l.velikov@gmail.com; a=ed25519;
  pk=qeUTVTNyI3rcR2CfNNWsloTihgzmtbZo98GdxwZKCkY=
 X-Endpoint-Received:
@@ -58,58 +59,64 @@ X-Endpoint-Received:
 X-Original-From: Emil Velikov <emil.l.velikov@gmail.com>
 Reply-To: <emil.l.velikov@gmail.com>
 
-Greetings one and all,
+From: Emil Velikov <emil.velikov@collabora.com>
 
-This is v2 of my earlier series.
+As the README chunk says, disabled by default, since they rely on
+internal API/ABI and can break at any point.
 
-In v1 support for external plugins was completely removed, while now it
-is preserved but compiled out by default.
-
-An extra --enable-external-plugins is introduced alongside a note in the
-README and a one-off runtime warning. The latter two pointing people
-towards integrating their plugin into the upstream BlueZ repo.
-
-For more details, see the link below to the original v1 cover letter and
-patches.
-
-Thanks
-Emil
-
-- Link to v1: https://lore.kernel.org/r/20240116-rm-ext-plugins-v1-0-62990fb07369@gmail.com
-
+Instead everyone affected should work and upstream their plugin into the
+bluez project.
 ---
-Emil Velikov (8):
-      configure, README: introduce --enable-external-plugins
-      obexd: factor out external plugin support
-      bluetoothd: remove external-dummy plugin
-      bluetoothd: convert external sixaxis plugin to builtin
-      bluetoothd: factor out external plugin support
-      bluetoothd: don't export internal API
-      bluetoothd: change plugin loading alike obexd
-      android: export only (android) entrypoint from the modules
+ README       | 13 +++++++++++++
+ configure.ac | 10 ++++++++++
+ 2 files changed, 23 insertions(+)
 
- Makefile.am              |  17 ++----
- Makefile.obexd           |   2 +
- Makefile.plugins         |   8 +--
- README                   |  13 +++++
- android/Makefile.am      |   3 +
- android/hal-audio.c      |   1 +
- android/hal-bluetooth.c  |   1 +
- android/hal-sco.c        |   1 +
- configure.ac             |  10 ++++
- obexd/src/obexd.h        |   2 +-
- obexd/src/plugin.c       |  93 +++++++++++++++++++++----------
- obexd/src/plugin.h       |   4 ++
- plugins/external-dummy.c |  28 ----------
- src/btd.h                |   2 +-
- src/plugin.c             | 139 +++++++++++++++++++++++++++++------------------
- src/plugin.h             |  16 ++++++
- 16 files changed, 208 insertions(+), 132 deletions(-)
----
-base-commit: a9d1f6f6a625607de6c3f5b7a40a3aac5f36c02b
-change-id: 20240116-rm-ext-plugins-ba0b852a492b
+diff --git a/README b/README
+index 7de7045a8..6c0777046 100644
+--- a/README
++++ b/README
+@@ -249,6 +249,19 @@ For a working system, certain configuration options need to be enabled:
+ 		systems. The behavior of the deprecated tools may be unstable
+ 		or simply don't work anymore.
+ 
++	--enable-external-plugins
++
++		Enable support for external plugins
++
++		By default external plugins for bluetoothd and obexd are not
++		supported and thus disabled.
++
++		External plugins require access to internal, undocumented and
++		unversioned API in said daemons. As such they can break at any
++		time. If you have such plugins, enable this option and work
++		actively with the community to make said plugin part of the
++		upstream bluez project.
++
+ 	--enable-nfc
+ 
+ 		This option enable NFC pairing support.
+diff --git a/configure.ac b/configure.ac
+index cab5da581..5e353a1d6 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -364,6 +364,16 @@ AC_ARG_ENABLE(deprecated, AS_HELP_STRING([--enable-deprecated],
+ 					[enable_deprecated=${enableval}])
+ AM_CONDITIONAL(DEPRECATED, test "${enable_deprecated}" = "yes")
+ 
++AC_ARG_ENABLE(external-plugsin, AS_HELP_STRING([--enable-external-plugins],
++			[enable support for external plugins]),
++					[enable_external_plugins=${enableval}])
++AM_CONDITIONAL(EXTERNAL_PLUGINS, test "${enable_external_plugins}" = "yes")
++if (test "${enable_external_plugins}" = "yes"); then
++	AC_DEFINE(EXTERNAL_PLUGINS, 1, [Define if external plugin support is required])
++else
++	AC_DEFINE(EXTERNAL_PLUGINS, 0, [Define if external plugin support is required])
++fi
++
+ AC_ARG_ENABLE(sixaxis, AS_HELP_STRING([--enable-sixaxis],
+ 		[enable sixaxis plugin]), [enable_sixaxis=${enableval}])
+ AM_CONDITIONAL(SIXAXIS, test "${enable_sixaxis}" = "yes" &&
 
-Best regards,
 -- 
-Emil Velikov <emil.l.velikov@gmail.com>
+2.43.0
 
