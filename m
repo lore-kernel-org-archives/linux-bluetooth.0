@@ -1,37 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6403136666
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB933136668
 	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jan 2024 23:44:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706139866; cv=none; b=ZsV8w5yyFTl+L/APbbFycpDxcNHuUpt9jvWofFgTkvTqn+9Uu870RMDe/oUsIqwZSzyPwBHRFFhfJncAmOyTt6mlyPO7Z1qo4iottKL3vymK6zcLpDgqmOkODRXKi/I0IT3Jk/Cp/ahZ4GvSWYJQFLrphcslUTXRO5KpwRe5PXg=
+	t=1706139866; cv=none; b=AyOX9ctcHlxnOKCx7CFTXRWxEbp7Yxh9KEIbsTiK+A7oHJ4mUSLb7xitiszKOdUf/4LaHqwE1BjPgMUHRYUfOMNEtqj/flaFwTk/c8icDKLcl/pNxDAzLDyhozMQaA/gCrCIOWzSG1LbkLhJa7P5ODAMtdOjfvyMSKTRWYCNQ2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1706139866; c=relaxed/simple;
-	bh=AOOg0dl+uZW4GfWAD/DTVkausWiBx0RPHyv4va2otSk=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=mie+JvvoMx7xTsNrLTBpS+cOhWvjeuy+O7xDpUkhLXjZzhNwDdPsCCLLEtfZJzfXeuw6teobuCkzzLocbATykuARFdWhai+/JD6ncEhhK91f3KzfVR6Y8FRpV+o9aU758y0lX+d92dJOOeKPBiKAXYgq/hWXyUE4Hd2nJZSs8A0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rGotN99d; arc=none smtp.client-ip=10.30.226.201
+	bh=1OPZ/5XW++En0wH5bNH3Z2ADx3hGwLDcweiaE+aUSsQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=gao9Ilitb6oOh0uB3As6VrujF4q+3oLhAywUv1S8RzoazAxa1PS3eAchIDKuPt5GruS1ZYgL0+M3ExlqqGCjblJQvbqhWE0nego/pTuXojF9tSB/6u/qAFC6uILqqIZeO2UWlKygWJ4QEHfvk06/VWaKyYRc3cj00XBKZXHgD88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nXeFi2bS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rGotN99d"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 63264C433F1;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nXeFi2bS"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 88441C433A6;
 	Wed, 24 Jan 2024 23:44:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1706139866;
-	bh=AOOg0dl+uZW4GfWAD/DTVkausWiBx0RPHyv4va2otSk=;
-	h=From:Subject:Date:To:Cc:Reply-To:From;
-	b=rGotN99dRyYI0iSESWs/JqrvBNO+UR4s+ZmQSnOIj5zOtNk+iqYn6BwYG1sEPoqBG
-	 gpFcLabQoIzFZSSr/4j8d0DGb7WySP6RTIEK4l4BQTXRWyQBgPUjfMPVWI2blIX3R6
-	 ZOev/QW5gyWv1U8gZdH5sPQZqm6g/Mg6vYKd9b6R2kT73KSQySQgtCVmkvsKsntYQz
-	 rs1RkJB5XrEZRLkt93o01x0ToIKTxcuFMzJNnI0COHjRTi+lLARsCSGtCX+UJkOGXG
-	 5shbMqWGyhFWsLYPp1J8Ydj1t/0W02SAvS4dFpl/OD4/RzSPDKUYosQeHbgbNrWHRd
-	 kaypEZ+kqwKeA==
+	bh=1OPZ/5XW++En0wH5bNH3Z2ADx3hGwLDcweiaE+aUSsQ=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=nXeFi2bSWZx5jqbwEZgizBLDp4DmNd9ADk93C/mkfN0mEiKuPhk3iN7EHwHAq5lub
+	 th+phrX/fGGsoNWvG5e/Amxxcrhp+1GZb+QtHc7xJSkRYjplvW5rE26H3iwpMMWRzD
+	 8snXFQZuv1kxLJujJgZU2itix43ttQT9djHU94aRNBtxGlteHVFdi4+2ws/NvJgwuG
+	 K0BhybRtUhnmZyJPVklmNh0D0Kid1Cpjt80SLF3F649RmML1HkglCzCEM456GozzIf
+	 qXi7UvcVTy+nSmnAcG48kldaykgvBySHbR2mSuA3HG5tvZD76qWRHg4Rd6igTtvx64
+	 OqYk7QEJg4Bag==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48B02C46CD2;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D354C47E49;
 	Wed, 24 Jan 2024 23:44:26 +0000 (UTC)
 From: Emil Velikov via B4 Relay <devnull+emil.l.velikov.gmail.com@kernel.org>
-Subject: [PATCH BlueZ 0/9] Distribution inspired fixes
-Date: Wed, 24 Jan 2024 23:43:54 +0000
-Message-Id: <20240124-disto-patches-v1-0-97e0eb5625a3@gmail.com>
+Date: Wed, 24 Jan 2024 23:43:58 +0000
+Subject: [PATCH BlueZ 4/9] test: consistently use /usr/bin/env python3
+ shebang
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -40,21 +41,18 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIALqgsWUC/x3MQQqAIBBA0avErBN0EIOuEi1Kx5yNhSMRhHdPW
- r7F/y8IFSaBeXih0M3CZ+4w4wA+bfkgxaEbUKPVBq0KLPVU11Z9IlEUg9sndE5jhN5chSI//29
- ZW/sAvKb5lV8AAAA=
+Message-Id: <20240124-disto-patches-v1-4-97e0eb5625a3@gmail.com>
+References: <20240124-disto-patches-v1-0-97e0eb5625a3@gmail.com>
+In-Reply-To: <20240124-disto-patches-v1-0-97e0eb5625a3@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Vicki Pfau <vi@endrift.com>, 
- Rachel Blackman <rachel.blackman@synapse.com>, 
- Sam Lantinga <slouken@libsdl.org>, Bastien Nocera <hadess@hadess.net>, 
- Emil Velikov <emil.velikov@collabora.com>, 
+Cc: Emil Velikov <emil.velikov@collabora.com>, 
  Nobuhiro Iwamatsu <iwamatsu@debian.org>
 X-Mailer: b4 0.12.4
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1706139864; l=3925;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1706139864; l=11465;
  i=emil.l.velikov@gmail.com; s=20230301; h=from:subject:message-id;
- bh=AOOg0dl+uZW4GfWAD/DTVkausWiBx0RPHyv4va2otSk=;
- b=QY8O+HQf+nEZmTZ6m0rsjlXngZgOwgKMRBsgdGQqPhofE2MMMcy5tWzYmfmSgV5LTGW01I87l
- Ua5BRs6/01EA3fLAMGloaIvU6DIARcS6jWnstIEqo6P9paiZhxj5wfn
+ bh=+WWRygO/gm5zKypQF1yrIhTAW2dn4f6SmY7sNODBkm4=;
+ b=bvncJCE2j7XBvJd/4xF+BrgwXIoBeNTdfyjcpz1yVW4N7bkCr/QyNQeskFb1RY+PcI+/VMbfK
+ wfGTo65eSYhAl0LEbs7ZSrf1qXJcE9HamMkHCwXbb06Dg6vLmhUNHH7
 X-Developer-Key: i=emil.l.velikov@gmail.com; a=ed25519;
  pk=qeUTVTNyI3rcR2CfNNWsloTihgzmtbZo98GdxwZKCkY=
 X-Endpoint-Received:
@@ -62,100 +60,361 @@ X-Endpoint-Received:
 X-Original-From: Emil Velikov <emil.l.velikov@gmail.com>
 Reply-To: <emil.l.velikov@gmail.com>
 
-Hello team,
+From: Emil Velikov <emil.velikov@collabora.com>
 
-This series picks (directly where possible) distro shipped fixes, for
-upstream inclusion.
+Currently we have a mix of /usr/bin/python, /usr/bin/python3 and
+/usr/bin/env python3. Use the latter since is the more common way of
+handling this, plus it allows people to override the system python (for
+what ever reason).
 
-In particular we have:
- - first two patches have been in SteamOS 3 for about 1 year
- - adapter: Remove experimental flag for PowerState - has been shipping
-   in Gentoo and Fedora since Dec 2022, at least
- - use /usr/bin/env python3 sheband - Debian inspired
- - remove unused suspend-dummy.c - Debian inspired
- - remove three unused obex plugins/backends - inspired by ^^ removal
- - ship all conf files with --enable-datafiles - Arch, Gentoo, Fedora
+Inspired by a Debian patch, doing a mass /usr/bin/python{,3} conversion.
 
-Everything apart from the first two, should be dead trivial. I have
-little knowledge about the SteamOS inspired fixes, so hopefully
-maintainers won't have too many questions there ;-)
-
-As the comment in the last commit says - there's one final batch
-(planned) of patches. Allowing for more flexible conf management, akin
-to `man sysctl.d`.
-
-Although I will send those out, once most of the existing patches have
-landed.
-
+Cc: Nobuhiro Iwamatsu <iwamatsu@debian.org>
 ---
-Bastien Nocera (1):
-      adapter: Remove experimental flag for PowerState
+ test/agent.py                | 2 +-
+ test/example-adv-monitor     | 2 +-
+ test/example-advertisement   | 2 +-
+ test/example-endpoint        | 2 +-
+ test/example-player          | 2 +-
+ test/exchange-business-cards | 2 +-
+ test/ftp-client              | 2 +-
+ test/get-managed-objects     | 2 +-
+ test/get-obex-capabilities   | 2 +-
+ test/list-devices            | 2 +-
+ test/list-folders            | 2 +-
+ test/map-client              | 2 +-
+ test/monitor-bluetooth       | 2 +-
+ test/opp-client              | 2 +-
+ test/pbap-client             | 2 +-
+ test/simple-agent            | 2 +-
+ test/simple-endpoint         | 2 +-
+ test/simple-obex-agent       | 2 +-
+ test/simple-player           | 2 +-
+ test/test-adapter            | 2 +-
+ test/test-device             | 2 +-
+ test/test-discovery          | 2 +-
+ test/test-gatt-profile       | 2 +-
+ test/test-health             | 2 +-
+ test/test-health-sink        | 2 +-
+ test/test-hfp                | 2 +-
+ test/test-manager            | 2 +-
+ test/test-nap                | 2 +-
+ test/test-network            | 2 +-
+ test/test-profile            | 2 +-
+ test/test-sap-server         | 2 +-
+ 31 files changed, 31 insertions(+), 31 deletions(-)
 
-Emil Velikov (6):
-      test: consistently use /usr/bin/env python3 shebang
-      profiles: remove unused suspend-dummy.c
-      obex: remove unused syncevolution plugin
-      obex: remove unused mas/messages-tracker impl
-      obex: remove phonebook tracker backend
-      build: ship all config files with --enable-datafiles
+diff --git a/test/agent.py b/test/agent.py
+index 57a74183d..450fb20a3 100755
+--- a/test/agent.py
++++ b/test/agent.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ import sys
+diff --git a/test/example-adv-monitor b/test/example-adv-monitor
+index a405fc7b0..09888a973 100644
+--- a/test/example-adv-monitor
++++ b/test/example-adv-monitor
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ import argparse
+diff --git a/test/example-advertisement b/test/example-advertisement
+index 5f022ee67..910701220 100755
+--- a/test/example-advertisement
++++ b/test/example-advertisement
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import print_function
+diff --git a/test/example-endpoint b/test/example-endpoint
+index 16651c683..cb5ac2ae9 100644
+--- a/test/example-endpoint
++++ b/test/example-endpoint
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import absolute_import, print_function, unicode_literals
+diff --git a/test/example-player b/test/example-player
+index 167460bad..9d56b4a13 100644
+--- a/test/example-player
++++ b/test/example-player
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import print_function
+diff --git a/test/exchange-business-cards b/test/exchange-business-cards
+index 9a3aa29fb..12d513362 100755
+--- a/test/exchange-business-cards
++++ b/test/exchange-business-cards
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ import sys
+diff --git a/test/ftp-client b/test/ftp-client
+index ef756ab2b..e37c027f4 100755
+--- a/test/ftp-client
++++ b/test/ftp-client
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import absolute_import, print_function, unicode_literals
+diff --git a/test/get-managed-objects b/test/get-managed-objects
+index 5125ee524..7ad359db4 100755
+--- a/test/get-managed-objects
++++ b/test/get-managed-objects
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import absolute_import, print_function, unicode_literals
+diff --git a/test/get-obex-capabilities b/test/get-obex-capabilities
+index a7980a442..25a996e18 100755
+--- a/test/get-obex-capabilities
++++ b/test/get-obex-capabilities
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ import sys
+diff --git a/test/list-devices b/test/list-devices
+index 618d2867b..a24c31c7d 100755
+--- a/test/list-devices
++++ b/test/list-devices
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import absolute_import, print_function, unicode_literals
+diff --git a/test/list-folders b/test/list-folders
+index b4e3f100b..414bb367b 100755
+--- a/test/list-folders
++++ b/test/list-folders
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ import sys
+diff --git a/test/map-client b/test/map-client
+index f44f512bd..b7369b068 100755
+--- a/test/map-client
++++ b/test/map-client
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import absolute_import, print_function, unicode_literals
+diff --git a/test/monitor-bluetooth b/test/monitor-bluetooth
+index 99f3c857c..347c91ac3 100755
+--- a/test/monitor-bluetooth
++++ b/test/monitor-bluetooth
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import absolute_import, print_function, unicode_literals
+diff --git a/test/opp-client b/test/opp-client
+index 4f00a41c0..deb02c77c 100755
+--- a/test/opp-client
++++ b/test/opp-client
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import absolute_import, print_function, unicode_literals
+diff --git a/test/pbap-client b/test/pbap-client
+index e6cafdd30..6dada4a11 100755
+--- a/test/pbap-client
++++ b/test/pbap-client
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import absolute_import, print_function, unicode_literals
+diff --git a/test/simple-agent b/test/simple-agent
+index 4fdaff1eb..09437eb22 100755
+--- a/test/simple-agent
++++ b/test/simple-agent
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import absolute_import, print_function, unicode_literals
+diff --git a/test/simple-endpoint b/test/simple-endpoint
+index 463f124d1..eace4286d 100755
+--- a/test/simple-endpoint
++++ b/test/simple-endpoint
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import absolute_import, print_function, unicode_literals
+diff --git a/test/simple-obex-agent b/test/simple-obex-agent
+index 064f6d30b..65807bff3 100755
+--- a/test/simple-obex-agent
++++ b/test/simple-obex-agent
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import absolute_import, print_function, unicode_literals
+diff --git a/test/simple-player b/test/simple-player
+index 7bad3d14f..190e047e2 100755
+--- a/test/simple-player
++++ b/test/simple-player
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import print_function
+diff --git a/test/test-adapter b/test/test-adapter
+index c56ba9577..27aff27b5 100755
+--- a/test/test-adapter
++++ b/test/test-adapter
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import absolute_import, print_function, unicode_literals
+diff --git a/test/test-device b/test/test-device
+index c840f0565..8b1eb86d1 100755
+--- a/test/test-device
++++ b/test/test-device
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import absolute_import, print_function, unicode_literals
+diff --git a/test/test-discovery b/test/test-discovery
+index 54fc51403..6959e7be9 100755
+--- a/test/test-discovery
++++ b/test/test-discovery
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import absolute_import, print_function, unicode_literals
+diff --git a/test/test-gatt-profile b/test/test-gatt-profile
+index a973ae14e..64ff3e5f9 100755
+--- a/test/test-gatt-profile
++++ b/test/test-gatt-profile
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import absolute_import, print_function, unicode_literals
+diff --git a/test/test-health b/test/test-health
+index 3e16c415d..f26def906 100755
+--- a/test/test-health
++++ b/test/test-health
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import absolute_import, print_function, unicode_literals
+diff --git a/test/test-health-sink b/test/test-health-sink
+index 13b9a6b04..fcdc58e3d 100755
+--- a/test/test-health-sink
++++ b/test/test-health-sink
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import absolute_import, print_function, unicode_literals
+diff --git a/test/test-hfp b/test/test-hfp
+index 11e328e54..e1edac0aa 100755
+--- a/test/test-hfp
++++ b/test/test-hfp
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import absolute_import, print_function, unicode_literals
+diff --git a/test/test-manager b/test/test-manager
+index 3fa7205a0..a93819e27 100755
+--- a/test/test-manager
++++ b/test/test-manager
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import absolute_import, print_function, unicode_literals
+diff --git a/test/test-nap b/test/test-nap
+index d5c757b79..76cde74d4 100755
+--- a/test/test-nap
++++ b/test/test-nap
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import absolute_import, print_function, unicode_literals
+diff --git a/test/test-network b/test/test-network
+index acc7dff65..67be86106 100755
+--- a/test/test-network
++++ b/test/test-network
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import absolute_import, print_function, unicode_literals
+diff --git a/test/test-profile b/test/test-profile
+index af1e23f76..7d92f390e 100755
+--- a/test/test-profile
++++ b/test/test-profile
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import absolute_import, print_function, unicode_literals
+diff --git a/test/test-sap-server b/test/test-sap-server
+index ddb1efe9b..161a4bfec 100755
+--- a/test/test-sap-server
++++ b/test/test-sap-server
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import absolute_import, print_function, unicode_literals
 
-Sam Lantinga (1):
-      Return at least the title attribute from player_list_metadata()
-
-Vicki Pfau (1):
-      Enable alternate Bluetooth connection modes
-
- Makefile.am                       |    8 +-
- Makefile.mesh                     |    1 +
- Makefile.obexd                    |    3 +-
- Makefile.plugins                  |    2 -
- configure.ac                      |    6 +-
- obexd/plugins/messages-tracker.c  |  332 --------
- obexd/plugins/phonebook-tracker.c | 1704 -------------------------------------
- obexd/plugins/syncevolution.c     |  470 ----------
- profiles/audio/avrcp.c            |    4 +
- profiles/input/suspend-dummy.c    |  149 ----
- src/adapter.c                     |   49 +-
- src/btd.h                         |    2 +
- src/main.c                        |   66 ++
- src/main.conf                     |    5 +
- test/agent.py                     |    2 +-
- test/example-adv-monitor          |    2 +-
- test/example-advertisement        |    2 +-
- test/example-endpoint             |    2 +-
- test/example-player               |    2 +-
- test/exchange-business-cards      |    2 +-
- test/ftp-client                   |    2 +-
- test/get-managed-objects          |    2 +-
- test/get-obex-capabilities        |    2 +-
- test/list-devices                 |    2 +-
- test/list-folders                 |    2 +-
- test/map-client                   |    2 +-
- test/monitor-bluetooth            |    2 +-
- test/opp-client                   |    2 +-
- test/pbap-client                  |    2 +-
- test/simple-agent                 |    2 +-
- test/simple-endpoint              |    2 +-
- test/simple-obex-agent            |    2 +-
- test/simple-player                |    2 +-
- test/test-adapter                 |    2 +-
- test/test-device                  |    2 +-
- test/test-discovery               |    2 +-
- test/test-gatt-profile            |    2 +-
- test/test-health                  |    2 +-
- test/test-health-sink             |    2 +-
- test/test-hfp                     |    2 +-
- test/test-manager                 |    2 +-
- test/test-nap                     |    2 +-
- test/test-network                 |    2 +-
- test/test-profile                 |    2 +-
- test/test-sap-server              |    2 +-
- 45 files changed, 167 insertions(+), 2696 deletions(-)
----
-base-commit: a9d1f6f6a625607de6c3f5b7a40a3aac5f36c02b
-change-id: 20240124-disto-patches-efd6b726602f
-
-Best regards,
 -- 
-Emil Velikov <emil.l.velikov@gmail.com>
+2.43.0
 
