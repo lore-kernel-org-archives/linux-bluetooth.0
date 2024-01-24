@@ -1,118 +1,87 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7961E128385
-	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jan 2024 14:29:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3E23131759;
+	Wed, 24 Jan 2024 14:31:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706106569; cv=none; b=aTy7fmy26Oj02LsycMyMGmKbyhXYIQ26r9yzms7Sf+NY0dmXFvNAaG1w176yB4FdTFdEOCzj4tpUJkFAMn0WsDCT/DKlgGfwrKcGezbZ7bY9PiKGpikv8m1Fl3E73+pVjU0gp4XOLRQfF8jK708bA6v779BiyEFV6sMh5exfkAQ=
+	t=1706106665; cv=none; b=XitZI8rqlQ10sStbkPfYr2Fyzh+LRti4q+hmsxGFGQb4ZMscu+aKUtoJQP2n/BGunvT5BzPPPD6fHXgB9QnguSeW/lm2Zq2LXhvfF2adG9npEO699hK3wx5Gh9SJsWKcwIkT1fOs2dXaaobyq2HuCtCRj1Rr1VNDcxh1uKYPQgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706106569; c=relaxed/simple;
-	bh=tqp9J7GOMGaTufFoUfg8JugUWD3/Kf85AUkjG5qUPm4=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=LaAbkRbvKEsZ2nV/27OnKIKStQLOHasPtA+E0anKHERvBG9AXJOh/OC1pShBdSjeUp9e99KqQlP1iFJjERCZ/kS6Wccwf/q0sz6os964x2jZUvOKcuqSQ/2dzAqKB2vaVRhBdeSiGHOmrncTCOz24setGlWIJHJwAkEXcD/+164=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b3KWQ1mh; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1706106665; c=relaxed/simple;
+	bh=hg0MXJRhPeSBicHzTjU/WJs4RhrbZBMcJt82j7UVrlI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TzY0sEDb9Lb8AzjusY+DrgOEOfNbhOsxZIpEWfGtJGDzS1APVK9zyC0wmbfkRRplU+W+WOfJWbGCXi0gqrm2aP4ATBFGv87c7b/QNT99RtkB0euG/g46/pvmiZFC8Nz5QjC4+P3pRK0OzfCsfdEW5KbkDgIkYMjljmIaPHbBYfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=nBqjHoxp; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b3KWQ1mh"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 51874C43141
-	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jan 2024 14:29:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706106569;
-	bh=tqp9J7GOMGaTufFoUfg8JugUWD3/Kf85AUkjG5qUPm4=;
-	h=From:To:Subject:Date:From;
-	b=b3KWQ1mhu1rzbIrFPPRsaiVSd4JitLhGw3Kts53QAeIblmUT/WzeQGVCfrGt+4gqS
-	 uaoqRRVXamMWTtfm4hzUNjNXM/F+ElXS1X5p6dZ/BCjqlvFRHbYFN6mx2q/enHvDsL
-	 HgInSTHmYPWnWcLyJ/oupPRUsJqicZasItSQH2qKFQn3pX9T6BeA+LpdjDDHPByEzN
-	 CVGEiP7sDaMxWtmc9dwIcGNtLH0ZkjmIxMa+klp8QCYekaW+PUiuwvHGbxB5nTap3T
-	 FJpZDOZeYqjTFNDJRWygztKobdxmQ/D8z4+4bB0zJlSf1BGVLXE2UEQnP2WiDov3Hu
-	 P6Q1EjTis86Jg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 2EB98C4332E; Wed, 24 Jan 2024 14:29:29 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 218416] New: hci0: command 0xfc05 tx timeout in kernel 6.7.1
-Date: Wed, 24 Jan 2024 14:29:28 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: nickolas@gupton.xyz
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
- op_sys bug_status bug_severity priority component assigned_to reporter
- cf_regression
-Message-ID: <bug-218416-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="nBqjHoxp"
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40OCYgfh013998;
+	Wed, 24 Jan 2024 14:30:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	from:to:cc:subject:date:message-id:mime-version:content-type; s=
+	qcppdkim1; bh=IpU6UPD3KNop00t3GRLzLFXqFcvzqVzyP4FgU48nRLY=; b=nB
+	qjHoxpqJBo4hI29imrM1jjywRyb8drp3hCnVUHvol56+cy0IViFg8+O81XrJP3n9
+	qHldHnalfQ4SZ2dQZYaDe+BzI9h0LoP7VSdFlWbxjx7vvrpgT8KsxCTjDY/Alh1y
+	htb8hfZozrXMq5eQNzLr+f6hIQDlO522c1GyMwvnAXgep4pd4jLxPlZcS15l7Y//
+	Urj2batYFpF4DonoJSFSR6x+4a2YLCPn7z6T91USBSDW7s8/4+UhGtPHPxCD4b9A
+	a3AtwcaxuAVqjU8BgFSHCrSZhTOS+Dja48Pq0OYHklP+bGRGjLiPSp0mDddTft9P
+	8uL6W8SrtsUoY5X4Evkw==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3vtykw8msq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 24 Jan 2024 14:30:59 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 40OEUwnB013622
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 24 Jan 2024 14:30:58 GMT
+Received: from hu-janathot-hyd.qualcomm.com (10.80.80.8) by
+ nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Wed, 24 Jan 2024 06:30:56 -0800
+From: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz
+	<luiz.dentz@gmail.com>,
+        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>
+CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
+        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH v2 0/1] Bluetooth: hci_qca: add check to set HCI_QUIRK_USE_BDADDR_PROPERTY
+Date: Wed, 24 Jan 2024 20:00:41 +0530
+Message-ID: <20240124143042.27790-1-quic_janathot@quicinc.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: E0usJxkWjOI7s_nilFUFEfp_dG4lcx7l
+X-Proofpoint-ORIG-GUID: E0usJxkWjOI7s_nilFUFEfp_dG4lcx7l
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-24_06,2024-01-24_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ adultscore=0 bulkscore=0 phishscore=0 mlxscore=0 malwarescore=0
+ clxscore=1015 mlxlogscore=484 suspectscore=0 impostorscore=0
+ lowpriorityscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2401190000 definitions=main-2401240105
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218416
+Changes in v2:
+  - Addressing comments from Paul Menzel
 
-            Bug ID: 218416
-           Summary: hci0: command 0xfc05 tx timeout in kernel 6.7.1
-           Product: Drivers
-           Version: 2.5
-          Hardware: All
-                OS: Linux
-            Status: NEW
-          Severity: normal
-          Priority: P3
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: nickolas@gupton.xyz
-        Regression: No
+Janaki Ramaiah Thota (1):
+  Bluetooth: hci_qca: Set BDA quirk bit if fwnode exists in DT
 
-This issue is still present on kernel 6.7.1 and firmware 20240115.=20
-Opening a new bug for this as directed in this old bug:
-https://bugzilla.kernel.org/show_bug.cgi?id=3D215167
+ drivers/bluetooth/hci_qca.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-$ uname -a
-Linux andromeda 6.7.1-arch1-1 #1 SMP PREEMPT_DYNAMIC Sun, 21 Jan 2024 22:14=
-:10
-+0000 x86_64 GNU/Linux
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project
 
-$ lsusb | grep -i bluetooth
-Bus 001 Device 006: ID 8087:0029 Intel Corp. AX200 Bluetooth
-
-$ journalctl -b | egrep -i bluetooth
-egrep: warning: egrep is obsolescent; using grep -E
-Jan 24 00:20:24 andromeda kernel: Bluetooth: Core ver 2.22
-Jan 24 00:20:24 andromeda kernel: NET: Registered PF_BLUETOOTH protocol fam=
-ily
-Jan 24 00:20:24 andromeda kernel: Bluetooth: HCI device and connection mana=
-ger
-initialized
-Jan 24 00:20:24 andromeda kernel: Bluetooth: HCI socket layer initialized
-Jan 24 00:20:24 andromeda kernel: Bluetooth: L2CAP socket layer initialized
-Jan 24 00:20:24 andromeda kernel: Bluetooth: SCO socket layer initialized
-Jan 24 00:20:25 andromeda systemd[1]: Reached target Bluetooth Support.
-Jan 24 00:20:25 andromeda NetworkManager[790]: <info>  [1706077225.3441] Lo=
-aded
-device plugin: NMBluezManager
-(/usr/lib/NetworkManager/1.44.2-3/libnm-device-plugin-bluetooth.so)
-Jan 24 00:20:27 andromeda kernel: Bluetooth: hci0: command 0xfc05 tx timeout
-Jan 24 00:20:27 andromeda kernel: Bluetooth: hci0: Reading Intel version
-command failed (-110)
-
-Not sure what other logs or info you need, but just let me know if it would
-help.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
