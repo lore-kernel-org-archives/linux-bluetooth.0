@@ -1,37 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E5387E566
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AACFF7E56C
 	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jan 2024 16:08:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706112484; cv=none; b=XeBJRLJVrIMn/cohyDNC0hE0zRjBQd6fH+37HPVxy73LB870WJPo5j7hlIU8/pfxXqOW/sd7O2nIlN+pQxxrXtAJVvsDriTIq75K7ZJjQKQd4lguIL8mbYtAIj1MjlGw070c9iJLFxtivrVEMOZrPMmWBRRCOfIcRSSSNjQamPk=
+	t=1706112484; cv=none; b=Wt9Q2Q6WEnQ/jkt7ldLY/DPbbDjAcY45oxsqqLHwCg8viNb+eXymjDSY9zNXvBzdEFPe+dxJZjr2IcobewjfC8BbAJs28EU+uPaRCGgHKxFHeyI4/FAFp49KpYShKlyG03ftx2QoaJYpm0QIsWYJzxbSBpuKOi6O8D+V3NC6KoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1706112484; c=relaxed/simple;
-	bh=l4M0CYae6sACNUXdM/RsB3Lv49E/9xZZDseXRMJSHq8=;
+	bh=OzzMlvRUPsVuxo2uwdVZjdw1XvEQcNHqU3yi1nNQhrA=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=pOWCV2a7mx4yZjxs45PyvLNOQnNrl+1njBPeJI9jTZmV3ZgQf8ZBBiRbB/rK0tQTtml6exKuMtBXTuKLZZlmVbjJMRZ/fkLSLcbew/z+JBbgJbAawpILSRrMa+93glL7EDYJouIw2oMSG1q+Kd7ixM2y+IZ5NOmdmtop9Hob3V8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hrIg8Hn9; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=GRmmtb3DQ3uYlTYceSQGcL+FdCNVG3qhtp5/F2zMSvG6l7Tl+y2SxANXbOnAKyyS21ujpcVlu8wDUhUzow4tS6grUpH+ckVdZvdw3xN3q1oU02yJpxvB3dliyD2F5fTJCY9RVkOoPlI9VW7z4w0Q1ItiUIZWvMBkzaeC7ZUmncA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rZ6dzOII; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hrIg8Hn9"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 437D4C433B2;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rZ6dzOII"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 48E04C43330;
 	Wed, 24 Jan 2024 16:08:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1706112484;
-	bh=l4M0CYae6sACNUXdM/RsB3Lv49E/9xZZDseXRMJSHq8=;
+	bh=OzzMlvRUPsVuxo2uwdVZjdw1XvEQcNHqU3yi1nNQhrA=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=hrIg8Hn9vlUaR9SYp+vjr2aPx3EdQFfz2GziULUwA38wLc31stLHN0CR7/o+pIJz4
-	 IVmRmqkDx/4yzZSlwGqDyudE0V5kyo0RmjMIZGU24zgLprmQWwvZN4JlB4NTHdve1v
-	 u+6NNMUWfIOs2eU7aQFG2sfAWnDW8oX+8MhqHToOYhp6O3zF3YNoAZ7mgQzdl5aisk
-	 SZ9X+8bQRQtn58oBVdL3HCe3ln0BaFYsKuS/GkSe02S9GHxwxNUhLr8HwASWhAC3LM
-	 jxvQAeROQmBSUbrH0pPG67fnGFonqPT87W9STfrvfPbxGyjERXINIUai72E5d6xs/d
-	 Wkp9KJIt8E3sg==
+	b=rZ6dzOIItjlHhvAGBn52iczO8/L92oPOtkDfgNJUpMCY+Vz77b3jd258ZBolNytMH
+	 cXQuAA7gz+liIiVGnuYuaAHHHpj+j/V9S0mrevQSal2MJE5zeLDiiUhMebSDDx4Z2R
+	 bAqIiT6k2C3leXMeyTrYlIcmThNEsrDNFWD1+jZXQF5GwaPte0LVD/9nH9SqAcEwGl
+	 Tc2tEXXCePXSbNLAzmQYXpFao5FCvCkvhl81q7kbpZZwWhlttyEn/iFXIw6fhuJOFi
+	 Whh1SIqNpkjdiimKKWBLCMG8ihv9hA4hiV7v0bvexd2Gle775SbLPl8t57a9eT2QGX
+	 tMXdE3JLo8XrA==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AB0BC47E49;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3973BC48285;
 	Wed, 24 Jan 2024 16:08:04 +0000 (UTC)
 From: Emil Velikov via B4 Relay <devnull+emil.l.velikov.gmail.com@kernel.org>
-Date: Wed, 24 Jan 2024 16:07:59 +0000
-Subject: [PATCH BlueZ v2 3/8] bluetoothd: remove external-dummy plugin
+Date: Wed, 24 Jan 2024 16:08:00 +0000
+Subject: [PATCH BlueZ v2 4/8] bluetoothd: convert external sixaxis plugin
+ to builtin
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -40,17 +41,17 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240124-rm-ext-plugins-v2-3-5244906f05ff@gmail.com>
+Message-Id: <20240124-rm-ext-plugins-v2-4-5244906f05ff@gmail.com>
 References: <20240124-rm-ext-plugins-v2-0-5244906f05ff@gmail.com>
 In-Reply-To: <20240124-rm-ext-plugins-v2-0-5244906f05ff@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Emil Velikov <emil.velikov@collabora.com>
 X-Mailer: b4 0.12.4
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1706112482; l=1499;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1706112482; l=1169;
  i=emil.l.velikov@gmail.com; s=20230301; h=from:subject:message-id;
- bh=EjARRPevchGHDkRRE9GXFlLSL06rTs7sjbEgjh12uig=;
- b=ZIHZDeCR9elO3hjmYcxf38mHEk89NHJwIeNS1CjQ0qMq0osCQhYPhZbpbQZdvd4A5IdK5yhdm
- WCWyDkf94aBDXrws2HdDq834pFZ5gJqasqnc111rEf6kFGGjsaHbIkp
+ bh=rf/DV6bb4eocv72jDKDqDG7KvOMIubc6ZBWpK2UcaNg=;
+ b=Py3+JdBHRaqUbOQT2T1Ril4VYqW538IlZ7V5wm902vr4KnNz0UAsfVnImc5t860VfUbGcLQ8o
+ 8MWuUwsJrUVAko0r9mrSAQlsd1VTLKQxFR5pNhLZGwaiGe1D+CJoT8K
 X-Developer-Key: i=emil.l.velikov@gmail.com; a=ed25519;
  pk=qeUTVTNyI3rcR2CfNNWsloTihgzmtbZo98GdxwZKCkY=
 X-Endpoint-Received:
@@ -60,66 +61,38 @@ Reply-To: <emil.l.velikov@gmail.com>
 
 From: Emil Velikov <emil.velikov@collabora.com>
 
-The external plugins infra is getting deprecated and disabled by
-default. Remove this dummy plugin.
----
- Makefile.am              |  8 --------
- plugins/external-dummy.c | 28 ----------------------------
- 2 files changed, 36 deletions(-)
+Convert the only known external plugin to built-in. It's a tiny 20K
+binary that distros ship a separate package for.
 
-diff --git a/Makefile.am b/Makefile.am
-index e738eb3a5..ea51b25cc 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -293,14 +293,6 @@ builtin_ldadd =
+Make it a builtin, which allows distros to drop the separate package, it
+also enables us to compile out support for external modules - both in
+terms of extra code and hide the internal bluetoothd API.
+
+This means that libudev.so is pulled in, which is fine since its ABI has
+been stable for over a decade.
+---
+ Makefile.plugins | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile.plugins b/Makefile.plugins
+index 5880ed0df..7cf66fd59 100644
+--- a/Makefile.plugins
++++ b/Makefile.plugins
+@@ -110,11 +110,9 @@ builtin_modules += battery
+ builtin_sources += profiles/battery/battery.c
  
- include Makefile.plugins
+ if SIXAXIS
+-plugin_LTLIBRARIES += plugins/sixaxis.la
+-plugins_sixaxis_la_SOURCES = plugins/sixaxis.c
+-plugins_sixaxis_la_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version
+-plugins_sixaxis_la_LIBADD = $(UDEV_LIBS)
+-plugins_sixaxis_la_CFLAGS = $(AM_CFLAGS) -fvisibility=hidden
++builtin_modules += sixaxis
++builtin_sources += plugins/sixaxis.c
++builtin_ldadd += $(UDEV_LIBS)
+ endif
  
--if MAINTAINER_MODE
--plugin_LTLIBRARIES += plugins/external-dummy.la
--plugins_external_dummy_la_SOURCES = plugins/external-dummy.c
--plugins_external_dummy_la_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version \
--				    -no-undefined
--plugins_external_dummy_la_CFLAGS = $(AM_CFLAGS) -fvisibility=hidden
--endif
--
- pkglibexec_PROGRAMS += src/bluetoothd
- 
- src_bluetoothd_SOURCES = $(builtin_sources) \
-diff --git a/plugins/external-dummy.c b/plugins/external-dummy.c
-deleted file mode 100644
-index 1c209e8b7..000000000
---- a/plugins/external-dummy.c
-+++ /dev/null
-@@ -1,28 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-or-later
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#include "src/plugin.h"
--#include "src/log.h"
--
--static int dummy_init(void)
--{
--	DBG("");
--
--	return 0;
--}
--
--static void dummy_exit(void)
--{
--	DBG("");
--}
--
--BLUETOOTH_PLUGIN_DEFINE(external_dummy, VERSION,
--		BLUETOOTH_PLUGIN_PRIORITY_LOW, dummy_init, dummy_exit)
+ if BAP
 
 -- 
 2.43.0
