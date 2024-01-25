@@ -1,95 +1,130 @@
-Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C2E51CA82
-	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 10:13:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83B3C2C68A;
+	Thu, 25 Jan 2024 10:42:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706177630; cv=none; b=FFXdo9XhnkPGZV//xzgv51INI1PkKDG9FPbz3x2CELgH08iu3aM5eGfUU7gM03mTMai/akCZa/ZptK6SadH0n59KfhKnoXjHsPvnHTQRAJFgUYatOEczkjOm9gK1lUU3fGwLsR48HdDY5eXl/6yYs90PMX4+e8Oqn0TeT7J/LTQ=
+	t=1706179353; cv=none; b=nw81h/hgHNL90AU6RqcHY4DE3qbLeLM72nMH5i0q3G2ydnHTAcHxPT6fY0akjC9jkrQ/fthYBs/Yd6MZ2bitnzhAl60LnKnhsqvtFbIPFmcnVtAZZtuBD++8u4EvDrquNRpv0tcc8cb3tGj6gi5uD+zX+sQRNrn9UndRwklmnzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706177630; c=relaxed/simple;
-	bh=TNqGeh0kBAqW63IW0wq60AGbg+Xpausg6BD7LytSREo=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=eFGbIz35C0i1/P+rEdXM8Cu0cYlT9Bmn1hyKsbFNrS8x7O0Jyz9XhnQbKpRRGBVeACarn+iHejAbZR1EFL/ScVfSgq5zEdqkGjuJ/o6HcMgEP4HjPB563vHJ0K1eiJpkjRO9qK9LV1ailqo3MDlAWoMrX6TYM4QG32OPmdddEew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E8h1mgHY; arc=none smtp.client-ip=209.85.210.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1706179353; c=relaxed/simple;
+	bh=1/AQZg5NNw9HG13KiYI6HfNvwqZ4xcS6GaNad1Jmb/I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sObF5GHc+SYeKQleyaV+2r+GlSNgaqOv9UMB/CT6fvKecMkzEoGKYSpK3BB2T42hIfWrQEh1nGO5FatnE1Qjb5kV1i6swH9LG/iRCkV/EP8W41yg4hqtQo39QSYzSV8SMIStHSNOfCKySUcXcFAsAskPo//+zaJOP58AdfPIZC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z+WC6q/p; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E8h1mgHY"
-Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-6e0a64d94d1so3900788a34.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 02:13:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706177628; x=1706782428; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=TNqGeh0kBAqW63IW0wq60AGbg+Xpausg6BD7LytSREo=;
-        b=E8h1mgHYeDWhmgZ05UDWnDCT8tQaV+PkV/PrQQSJFGQ8IjrmRa5mgIT7Mz3yi8YvB0
-         u551r3wrtLsz9nVKQs7Nccrsm5RLlSs2qstQRQXSvNH4JuL/gkM0VdZpCW0aDD16IBp/
-         5bElAa/3R/UMsrJNGZkdM3DXxzBJNgcWcAb+o0CLUyUwTYeAF9Rr3zJxOIaHOSbiTMIt
-         +b/0M96rJhVYKLsa9XwX56Kg5xYlfcDMux84gfTQ3uhXLmDi6sZLX7yUCA+6Be8Hfaeh
-         gq4+NkUI/Ijt5yYKpypS/JFtWxYIsaWHnCooOcvqy2j4iLdTeUVbDJVZ8FgBDIUzSMJA
-         m8Rw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706177628; x=1706782428;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TNqGeh0kBAqW63IW0wq60AGbg+Xpausg6BD7LytSREo=;
-        b=pThF8OE2T7sVg4R/2MqdQdnTw9k2RKxDVS/OcOtiaxPKbybgKtA4OHS2INdtxrwZo5
-         AWU3bfcC0cb6pRIpcbzBbRF6FaCNDPWVDY5+Z9MedICVJeQmd4mn7H7Opez663/T3U9X
-         N0KWvtSiUATSSSljKQJcQlR9XbTaQxzAiguaHmltpeLJljstU+IaZ8/z6H5E1Ea2T0HB
-         PpwSitarFwfo4GiLk1NOENJ3rBUQwOa6x1SHmSDt/7+IxB5jwG6JLozXKqpKVuwIA4eI
-         h6V/Js9htwRhOBZD3JaGXJA6Vsp1M72ljLbjw6Q34PHDQ5aJ3+ZW4y+6X9wrV/gUjuL8
-         DTiA==
-X-Gm-Message-State: AOJu0YyMbl/RJtDHisJQokLGY28ehevdZgx1NwQJslVLUvEruR/Zc5UH
-	zir/fjJQ1Re6uzZ/MqDXRnTPxiooI7rEbEmVqHCN7tEOluHZvijwYJL9/DJU
-X-Google-Smtp-Source: AGHT+IH5fQ1zfbGlK3qOgVm07g0o+hGT7uORQt+B0/hM983l5K1mSewqgWtxwO7jeHDRmNQMCvWIjg==
-X-Received: by 2002:a05:6358:889:b0:175:67e3:cb28 with SMTP id m9-20020a056358088900b0017567e3cb28mr597935rwj.12.1706177628315;
-        Thu, 25 Jan 2024 02:13:48 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVZaLOQqrJnDbB0GaZFkjhr1TYm1cRVxSEZRG+PXgjwE52SFt5VmB0YXbWTA3/d+hLAWRok/R2hldim2MA6GuHqvHE=
-Received: from [172.17.0.2] ([13.86.227.253])
-        by smtp.gmail.com with ESMTPSA id f11-20020a056a00238b00b006ddd182bf1csm870960pfc.46.2024.01.25.02.13.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jan 2024 02:13:47 -0800 (PST)
-Message-ID: <65b2345b.050a0220.a9278.18c6@mx.google.com>
-Date: Thu, 25 Jan 2024 02:13:47 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5430442705292337591=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z+WC6q/p"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25A8EC433C7;
+	Thu, 25 Jan 2024 10:42:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706179353;
+	bh=1/AQZg5NNw9HG13KiYI6HfNvwqZ4xcS6GaNad1Jmb/I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Z+WC6q/pwbwzH6zhMdWS153JB6VUWqmZcSDN5fViUQMl+zNnFkr+L5iCIZC4Lmv2j
+	 bS4xt+Jc+fIKPiuc/kJRIJ6TAeALxfXs7+VoI8ancJ7e9QSMZf9u8wlf8juOT449Gm
+	 dGuxdVykXP+YbuK9da+3YP4AGDYrHkdmnPt65LdsuIx8gGLD4hTB/s1rjqbkVCKiUD
+	 oli8l8eXT1ku4I2e/jROQgRMNh1cOo8JM8FSB0c1qy9mR6qP4bCyS6fEZ4sW83WE4H
+	 dvME2O/MBNNvzFmFBAQf8Pqk3H35BFWj4WMW1H3tXE6hY7SpsHA0xe4mZ94kyccwIt
+	 HEVRnGIIo3ahQ==
+Date: Thu, 25 Jan 2024 10:42:23 +0000
+From: Lee Jones <lee@kernel.org>
+To: Francesco Dolcini <francesco@dolcini.it>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jirislaby@kernel.org>, linux-bluetooth@vger.kernel.org,
+	linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, greybus-dev@lists.linaro.org,
+	linux-iio@vger.kernel.org, netdev@vger.kernel.org,
+	chrome-platform@lists.linux.dev,
+	platform-driver-x86@vger.kernel.org, linux-serial@vger.kernel.org,
+	linux-sound@vger.kernel.org,
+	Francesco Dolcini <francesco.dolcini@toradex.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Johan Hovold <johan@kernel.org>, Alex Elder <elder@kernel.org>,
+	Jonathan Cameron <jic23@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Hans de Goede <hdegoede@redhat.com>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Benson Leung <bleung@chromium.org>,
+	Tzung-Bi Shih <tzungbi@kernel.org>, Rob Herring <robh@kernel.org>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Subject: Re: [PATCH v2] treewide, serdev: change receive_buf() return type to
+ size_t
+Message-ID: <20240125104223.GD74950@google.com>
+References: <20240122180551.34429-1-francesco@dolcini.it>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, wenst@chromium.org
-Subject: RE: bluetooth: mt7921s: Add binding and fixup existing dts
-In-Reply-To: <20240125095240.2308340-2-wenst@chromium.org>
-References: <20240125095240.2308340-2-wenst@chromium.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240122180551.34429-1-francesco@dolcini.it>
 
---===============5430442705292337591==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Mon, 22 Jan 2024, Francesco Dolcini wrote:
 
-This is an automated email and please do not reply to this email.
+> From: Francesco Dolcini <francesco.dolcini@toradex.com>
+> 
+> receive_buf() is called from ttyport_receive_buf() that expects values
+> ">= 0" from serdev_controller_receive_buf(), change its return type from
+> ssize_t to size_t.
+> 
+> The need for this clean-up was noticed while fixing a warning, see
+> commit 94d053942544 ("Bluetooth: btnxpuart: fix recv_buf() return value").
+> Changing the callback prototype to return an unsigned seems the best way
+> to document the API and ensure that is properly used.
+> 
+> GNSS drivers implementation of serdev receive_buf() callback return
+> directly the return value of gnss_insert_raw(). gnss_insert_raw()
+> returns a signed int, however this is not an issue since the value
+> returned is always positive, because of the kfifo_in() implementation.
+> gnss_insert_raw() could be changed to return also an unsigned, however
+> this is not implemented here as request by the GNSS maintainer Johan
+> Hovold.
+> 
+> Suggested-by: Jiri Slaby <jirislaby@kernel.org>
+> Link: https://lore.kernel.org/all/087be419-ec6b-47ad-851a-5e1e3ea5cfcc@kernel.org/
+> Signed-off-by: Francesco Dolcini <francesco.dolcini@toradex.com>
+> Acked-by: Jonathan Cameron <Jonathan.Cameron@huawei.com> #for-iio
+> ---
+> v1:
+>  - https://lore.kernel.org/all/20231214170146.641783-1-francesco@dolcini.it/
+> v2:
+>  - rebased on 6.8-rc1
+>  - add acked-by Jonathan
+>  - do not change gnss_insert_raw()
+>  - do not change the code style of the gnss code
+>  - commit message improvements, explain the reasons for doing only minimal
+>    changes on the GNSS part
+> ---
+>  drivers/bluetooth/btmtkuart.c              |  4 ++--
+>  drivers/bluetooth/btnxpuart.c              |  4 ++--
+>  drivers/bluetooth/hci_serdev.c             |  4 ++--
+>  drivers/gnss/serial.c                      |  2 +-
+>  drivers/gnss/sirf.c                        |  2 +-
+>  drivers/greybus/gb-beagleplay.c            |  6 +++---
+>  drivers/iio/chemical/pms7003.c             |  4 ++--
+>  drivers/iio/chemical/scd30_serial.c        |  4 ++--
+>  drivers/iio/chemical/sps30_serial.c        |  4 ++--
+>  drivers/iio/imu/bno055/bno055_ser_core.c   |  4 ++--
 
-Dear Submitter,
+>  drivers/mfd/rave-sp.c                      |  4 ++--
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+Acked-by: Lee Jones <lee@kernel.org>
 
------ Output -----
+>  drivers/net/ethernet/qualcomm/qca_uart.c   |  2 +-
+>  drivers/nfc/pn533/uart.c                   |  4 ++--
+>  drivers/nfc/s3fwrn5/uart.c                 |  4 ++--
+>  drivers/platform/chrome/cros_ec_uart.c     |  4 ++--
+>  drivers/platform/surface/aggregator/core.c |  4 ++--
+>  drivers/tty/serdev/serdev-ttyport.c        | 10 ++++------
+>  include/linux/serdev.h                     |  8 ++++----
+>  sound/drivers/serial-generic.c             |  4 ++--
+>  19 files changed, 40 insertions(+), 42 deletions(-)
 
-error: arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi-pico6.dts: does not exist in index
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============5430442705292337591==--
+-- 
+Lee Jones [李琼斯]
