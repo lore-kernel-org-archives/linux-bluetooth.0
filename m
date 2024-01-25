@@ -1,37 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05700136669
-	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jan 2024 23:44:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78AE3193
+	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 00:07:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706139867; cv=none; b=iQLMc4rHV2C9FqNVSvm7SJxqe2DlIfTgEEcSj6+X5f3VMvzJ9UncSuhkqXREc/j2gIpJG1AeyWhmXNOHnLiJZJc8GBRpJ+nydhTd7A08Zm4dYf1Ssftb6s8SG0hGltq2AUtQRS+nmi5hHKHWLvMN1UpWEzl1+HXLguRqvkOv/Yo=
+	t=1706141249; cv=none; b=mIB8Rm3IMc92H//8kItCUbt2eoaEaaO+t6YiHMiI/tnb0aBOYIdwpBauSmyWvDpIxu1Mh4A49rYhnY3JduaQpzNyxrW0HmOYGVPIYNalHXLw0z6ziyTnVe6jxCzUdi2S9ZQD/uEvQwamdy/p08IoZ5lvUhamYWXPI+a4MkCDAe4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706139867; c=relaxed/simple;
-	bh=Fkl57YFn8lsz3HEw63pTmgFfOYszadNcuW8g0Jd0abE=;
+	s=arc-20240116; t=1706141249; c=relaxed/simple;
+	bh=F/HbVo4A4RjQZ+vKiPn5ElqvSWqMFTAmzzmaMvmbiz8=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Rq0Pb2agooRw9sjkW+p29eedmKs8xGgvsQm6OyFlG2aJZBbqlW7UEYaP9zRHiU5Q6gHZEm7r6AGhhQDzrg30Tk+iH0vF7PDQvRIvS+y54c0JxFgpSeUsAa4doKimT+TxcoKtNT+04rjvm8i9ni7u+Yh4kRE457LSQhc74Xr6X+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iQZE81z0; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=lEIL0LTxRnibgZcZY4BY2TIuaNJxK/G3jx41syuf0r9KGbqoAupZNA7EycP8kIiL6s2AA0HLUkmfiI9d6R7Yerm6ChVtK2a5A8Z+TZjt47ZNGoxSE+YQuYqRrS5xFfFzyZxQ1xuiRzq70fDLiYqmP1SM3WH+pUqc9r0b4SXoSgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sv2UYyvQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iQZE81z0"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 938ABC43399;
-	Wed, 24 Jan 2024 23:44:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sv2UYyvQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 230E9C433C7;
+	Thu, 25 Jan 2024 00:07:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706139866;
-	bh=Fkl57YFn8lsz3HEw63pTmgFfOYszadNcuW8g0Jd0abE=;
+	s=k20201202; t=1706141249;
+	bh=F/HbVo4A4RjQZ+vKiPn5ElqvSWqMFTAmzzmaMvmbiz8=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=iQZE81z0+OJO0iYuRpNtgqliefpm/96tgQJ97wcIzr7pSOKeKmvsqSB3lFqrFCuk4
-	 gaqZZo+udWxVNWkJvUNLP3XSPghOpzY39DptzOan8Vee02VFevmDs7nNWbu4/faltw
-	 7UqwbI3p8o9aYLUWnpYSRa17DPC5p9JKWFYNfUZUWvm8+FTGQBsnkmS2BGdxe/OUKX
-	 ilXb8Fi/2KKJHInHry7cpXXau25q53j6bXGTrGIE/mXmT6ry1qv48wDGiRts4BmCdY
-	 YBtDl5T2Zxb0wFNDojE5F4oAludl0xt7oSrDD7sgMk5j24Q67O87xmgx69gBFzoCMj
-	 whatf3b4/2OUQ==
+	b=Sv2UYyvQz/nf0WtlQzINAoyW8/q+HHTxUSOotCUVoAVe216KofhA/nq/lH6N9c3WX
+	 dGWN4YLGzag3/ggh2praBez1CYs+/0gKV97CfuaHF/CLrWZHzsHrdR6cCQrLeSoBYx
+	 DQI0AG0/hatImfpKzUyp05xWK7SMFxwzMhLNQwC0uu/gr9r78SnRaLJThgLUKDWXIu
+	 BqcQb3oXD2GkeHBhLork3zOgTMDbq8/UFea3LVfYlpGKD1rUrGKpzcRqwbIrEs8z5L
+	 NSIZszvoT4ZzAUrcqqXQ00BYBOXB+g3HQq+DJQlwofGgVERpQFgxr6ifWTlG5meKVO
+	 aLRf++bwgh0KQ==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80B99C48286;
-	Wed, 24 Jan 2024 23:44:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C05BC47E49;
+	Thu, 25 Jan 2024 00:07:29 +0000 (UTC)
 From: Emil Velikov via B4 Relay <devnull+emil.l.velikov.gmail.com@kernel.org>
-Date: Wed, 24 Jan 2024 23:44:00 +0000
-Subject: [PATCH BlueZ 6/9] obex: remove unused syncevolution plugin
+Date: Thu, 25 Jan 2024 00:07:26 +0000
+Subject: [PATCH BlueZ v3 1/8] configure, README: introduce
+ --enable-external-plugins
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -40,17 +41,17 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240124-disto-patches-v1-6-97e0eb5625a3@gmail.com>
-References: <20240124-disto-patches-v1-0-97e0eb5625a3@gmail.com>
-In-Reply-To: <20240124-disto-patches-v1-0-97e0eb5625a3@gmail.com>
+Message-Id: <20240125-rm-ext-plugins-v3-1-d141f7870bb6@gmail.com>
+References: <20240125-rm-ext-plugins-v3-0-d141f7870bb6@gmail.com>
+In-Reply-To: <20240125-rm-ext-plugins-v3-0-d141f7870bb6@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Emil Velikov <emil.velikov@collabora.com>
 X-Mailer: b4 0.12.4
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1706139864; l=13112;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1706141247; l=2129;
  i=emil.l.velikov@gmail.com; s=20230301; h=from:subject:message-id;
- bh=3jSLi5/GJDSS3GOWoTxgwGDBznwfplAZJG6CthgZjic=;
- b=cIkUobrBlhiNI1aVFEGjDW/0qdz2jlrgKysfdk5Wq0tcnSxxHbRwSDLQZyoOIqIsS4nJCNiJ+
- Xhfh7z+ivhcBd75nhIH+k5O7+DNwnm+ZN3JYfxNrqj2Rg1yVH0xhSsZ
+ bh=e1EdDSyciHHAaX9NsOJkW3suqFVoEXcg0Cnn7chU+j0=;
+ b=ArEUScUswXs1Jus2LYZ/6mJV+xYFIIB+RTKcI7RvIw8Q5PeY08L3U/7Lzzq1xAX4tniFMSytA
+ YdLYfnQ56IODVG764Q5VTO6lO0PZpJkS3B61zbIdLO6bLMhugXhDuhF
 X-Developer-Key: i=emil.l.velikov@gmail.com; a=ed25519;
  pk=qeUTVTNyI3rcR2CfNNWsloTihgzmtbZo98GdxwZKCkY=
 X-Endpoint-Received:
@@ -60,495 +61,61 @@ Reply-To: <emil.l.velikov@gmail.com>
 
 From: Emil Velikov <emil.velikov@collabora.com>
 
-Based on my git log archaeology, the plugin was never built despite
-receiving multiple updates across the years. It's possible that the git
-history is lost when (if?) obexd code was imported.
+As the README chunk says, disabled by default, since they rely on
+internal API/ABI and can break at any point.
 
-The file isn't in the official tarball, so end users cannot enable if
-even if they wanted to. So let's remove the dead/unused plugin.
-
-There is some existing infra around OBEX_SYNCEVOLUTION which can be
-checked/removed as follow-up.
+Instead everyone affected should work and upstream their plugin into the
+bluez project.
 ---
- obexd/plugins/syncevolution.c | 470 ------------------------------------------
- 1 file changed, 470 deletions(-)
+ README       | 13 +++++++++++++
+ configure.ac | 10 ++++++++++
+ 2 files changed, 23 insertions(+)
 
-diff --git a/obexd/plugins/syncevolution.c b/obexd/plugins/syncevolution.c
-deleted file mode 100644
-index ae3dc48c4..000000000
---- a/obexd/plugins/syncevolution.c
-+++ /dev/null
-@@ -1,470 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-or-later
--/*
-- *
-- *  OBEX Server
-- *
-- *  Copyright (C) 2007-2010  Intel Corporation
-- *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
-- *
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#include <string.h>
--#include <stdio.h>
--#include <errno.h>
--#include <sys/types.h>
--
--#include <glib.h>
--#include <dbus/dbus.h>
--
--#include "lib/bluetooth.h"
--
--#include "gdbus/gdbus.h"
--
--#include "btio/btio.h"
--#include "obexd/src/plugin.h"
--#include "obexd/src/obex.h"
--#include "obexd/src/service.h"
--#include "obexd/src/mimetype.h"
--#include "obexd/src/log.h"
--#include "obexd/src/manager.h"
--#include "obexd/src/obexd.h"
--#include "filesystem.h"
--
--#define SYNCML_TARGET_SIZE 11
--
--static const uint8_t SYNCML_TARGET[SYNCML_TARGET_SIZE] = {
--			0x53, 0x59, 0x4E, 0x43, 0x4D, 0x4C, 0x2D, 0x53,
--			0x59, 0x4E, 0x43 };
--
--#define SYNCEVOLUTION_CHANNEL  19
--
--#define SYNCEVOLUTION_RECORD "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\
--<record>								\
-- <attribute id=\"0x0001\">						\
--    <sequence>								\
--      <uuid value=\"00000002-0000-1000-8000-0002ee000002\"/>		\
--    </sequence>							\
-- </attribute>								\
--									\
-- <attribute id=\"0x0004\">						\
--    <sequence>								\
--      <sequence>							\
--        <uuid value=\"0x0100\"/>					\
--      </sequence>							\
--      <sequence>							\
--        <uuid value=\"0x0003\"/>					\
--        <uint8 value=\"%u\" name=\"channel\"/>				\
--      </sequence>							\
--      <sequence>							\
--        <uuid value=\"0x0008\"/>					\
--      </sequence>							\
--    </sequence>							\
-- </attribute>								\
--									\
-- <attribute id=\"0x0100\">						\
--    <text value=\"%s\" name=\"name\"/>					\
-- </attribute>								\
--</record>"
--
--#define SYNCE_BUS_NAME	"org.syncevolution"
--#define SYNCE_PATH	"/org/syncevolution/Server"
--#define SYNCE_SERVER_INTERFACE	"org.syncevolution.Server"
--#define SYNCE_CONN_INTERFACE	"org.syncevolution.Connection"
--
--struct synce_context {
--	struct obex_session *os;
--	DBusConnection *dbus_conn;
--	char *conn_obj;
--	unsigned int reply_watch;
--	unsigned int abort_watch;
--	GString *buffer;
--	int lasterr;
--	char *id;
--};
--
--static void append_dict_entry(DBusMessageIter *dict, const char *key,
--							int type, void *val)
--{
--	DBusMessageIter entry;
--
--	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY,
--							NULL, &entry);
--	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
--	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &val);
--	dbus_message_iter_close_container(dict, &entry);
--}
--
--static gboolean reply_signal(DBusConnection *conn, DBusMessage *msg,
--								void *data)
--{
--	struct synce_context *context = data;
--	const char *path = dbus_message_get_path(msg);
--	DBusMessageIter iter, array_iter;
--	char *value;
--	int length;
--
--	if (strcmp(context->conn_obj, path) != 0) {
--		obex_object_set_io_flags(context, G_IO_ERR, -EPERM);
--		context->lasterr = -EPERM;
--		return FALSE;
--	}
--
--	dbus_message_iter_init(msg, &iter);
--
--	dbus_message_iter_recurse(&iter, &array_iter);
--	dbus_message_iter_get_fixed_array(&array_iter, &value, &length);
--
--	context->buffer = g_string_new_len(value, length);
--	obex_object_set_io_flags(context, G_IO_IN, 0);
--	context->lasterr = 0;
--
--	return TRUE;
--}
--
--static gboolean abort_signal(DBusConnection *conn, DBusMessage *msg,
--								void *data)
--{
--	struct synce_context *context = data;
--
--	obex_object_set_io_flags(context, G_IO_ERR, -EPERM);
--	context->lasterr = -EPERM;
--
--	return TRUE;
--}
--
--static void connect_cb(DBusPendingCall *call, void *user_data)
--{
--	struct synce_context *context = user_data;
--	DBusConnection *conn;
--	DBusMessage *reply;
--	DBusError err;
--	char *path;
--
--	conn = context->dbus_conn;
--
--	reply = dbus_pending_call_steal_reply(call);
--
--	dbus_error_init(&err);
--	if (dbus_message_get_args(reply, &err, DBUS_TYPE_OBJECT_PATH, &path,
--						DBUS_TYPE_INVALID) == FALSE) {
--		error("%s", err.message);
--		dbus_error_free(&err);
--		goto failed;
--	}
--
--	DBG("Got conn object %s from syncevolution", path);
--	context->conn_obj = g_strdup(path);
--
--	context->reply_watch = g_dbus_add_signal_watch(conn, NULL, path,
--						SYNCE_CONN_INTERFACE, "Reply",
--						reply_signal, context, NULL);
--
--	context->abort_watch = g_dbus_add_signal_watch(conn, NULL, path,
--						SYNCE_CONN_INTERFACE, "Abort",
--						abort_signal, context, NULL);
--
--	dbus_message_unref(reply);
--
--	return;
--
--failed:
--	obex_object_set_io_flags(context, G_IO_ERR, -EPERM);
--	context->lasterr = -EPERM;
--}
--
--static void process_cb(DBusPendingCall *call, void *user_data)
--{
--	struct synce_context *context = user_data;
--	DBusMessage *reply;
--	DBusError derr;
--
--	reply = dbus_pending_call_steal_reply(call);
--	dbus_error_init(&derr);
--	if (dbus_set_error_from_message(&derr, reply)) {
--		error("process_cb(): syncevolution replied with an error:"
--					" %s, %s", derr.name, derr.message);
--		dbus_error_free(&derr);
--
--		obex_object_set_io_flags(context, G_IO_ERR, -EPERM);
--		context->lasterr = -EPERM;
--		goto done;
--	}
--
--	obex_object_set_io_flags(context, G_IO_OUT, 0);
--	context->lasterr = 0;
--
--done:
--	dbus_message_unref(reply);
--}
--
--static void *synce_connect(struct obex_session *os, int *err)
--{
--	DBusConnection *conn;
--	struct synce_context *context;
--	char *address;
--
--	manager_register_session(os);
--
--	conn = manager_dbus_get_connection();
--	if (!conn)
--		goto failed;
--
--	context = g_new0(struct synce_context, 1);
--	context->dbus_conn = conn;
--	context->lasterr = -EAGAIN;
--	context->os = os;
--
--	if (obex_getpeername(os, &address) == 0) {
--		context->id = g_strdup_printf("%s+%d", address,
--							SYNCEVOLUTION_CHANNEL);
--		g_free(address);
--	}
--
--	if (err)
--		*err = 0;
--
--	return context;
--
--failed:
--	if (err)
--		*err = -EPERM;
--
--	return NULL;
--}
--
--static int synce_put(struct obex_session *os, void *user_data)
--{
--	return 0;
--}
--
--static int synce_get(struct obex_session *os, void *user_data)
--{
--	return obex_get_stream_start(os, NULL);
--}
--
--static void close_cb(DBusPendingCall *call, void *user_data)
--{
--	DBusMessage *reply;
--	DBusError derr;
--
--	reply = dbus_pending_call_steal_reply(call);
--	dbus_error_init(&derr);
--	if (dbus_set_error_from_message(&derr, reply)) {
--		error("close_cb(): syncevolution replied with an error:"
--					" %s, %s", derr.name, derr.message);
--		dbus_error_free(&derr);
--	}
--
--	dbus_message_unref(reply);
--}
--
--static void synce_disconnect(struct obex_session *os, void *user_data)
--{
--	struct synce_context *context = user_data;
--
--	g_free(context);
--}
--
--static void *synce_open(const char *name, int oflag, mode_t mode,
--				void *user_data, size_t *size, int *err)
--{
--	struct synce_context *context = user_data;
--
--	if (err)
--		*err = context ? 0 : -EFAULT;
--
--	return user_data;
--}
--
--static int synce_close(void *object)
--{
--	struct synce_context *context = object;
--	DBusMessage *msg;
--	const char *error;
--	gboolean normal;
--	DBusPendingCall *call;
--
--	if (!context->conn_obj)
--		goto done;
--
--	msg = dbus_message_new_method_call(SYNCE_BUS_NAME, context->conn_obj,
--						SYNCE_CONN_INTERFACE, "Close");
--	if (!msg)
--		goto failed;
--
--	normal = TRUE;
--	error = "none";
--	dbus_message_append_args(msg, DBUS_TYPE_BOOLEAN, &normal,
--				DBUS_TYPE_STRING, &error, DBUS_TYPE_INVALID);
--
--	g_dbus_send_message_with_reply(context->dbus_conn, msg, &call, -1);
--	dbus_pending_call_set_notify(call, close_cb, NULL, NULL);
--	dbus_message_unref(msg);
--	dbus_pending_call_unref(call);
--
--failed:
--	g_dbus_remove_watch(context->dbus_conn, context->reply_watch);
--	context->reply_watch = 0;
--	g_dbus_remove_watch(context->dbus_conn, context->abort_watch);
--	context->abort_watch = 0;
--
--	g_free(context->conn_obj);
--	context->conn_obj = NULL;
--
--done:
--	dbus_connection_unref(context->dbus_conn);
--	g_free(context);
--	return 0;
--}
--
--static ssize_t synce_read(void *object, void *buf, size_t count)
--{
--	struct synce_context *context = object;
--	DBusConnection *conn;
--	char transport[36], transport_description[24];
--	const char *session;
--	DBusMessage *msg;
--	DBusMessageIter iter, dict;
--	gboolean authenticate;
--	DBusPendingCall *call;
--
--	if (context->buffer)
--		return string_read(context->buffer, buf, count);
--
--	conn = manager_dbus_get_connection();
--	if (conn == NULL)
--		return -EPERM;
--
--	msg = dbus_message_new_method_call(SYNCE_BUS_NAME, SYNCE_PATH,
--				SYNCE_SERVER_INTERFACE, "Connect");
--	if (!msg)
--		return -EPERM;
--
--	dbus_message_iter_init_append(msg, &iter);
--	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
--		DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
--		DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_STRING_AS_STRING
--		DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
--
--	append_dict_entry(&dict, "id", DBUS_TYPE_STRING, context->id);
--
--	snprintf(transport, sizeof(transport), "%s.obexd", OBEXD_SERVICE);
--	append_dict_entry(&dict, "transport", DBUS_TYPE_STRING, transport);
--
--	snprintf(transport_description, sizeof(transport_description),
--						"version %s", VERSION);
--	append_dict_entry(&dict, "transport_description", DBUS_TYPE_STRING,
--							transport_description);
--
--	dbus_message_iter_close_container(&iter, &dict);
--
--	authenticate = FALSE;
--	session = "";
--	dbus_message_append_args(msg, DBUS_TYPE_BOOLEAN, &authenticate,
--			DBUS_TYPE_STRING, &session, DBUS_TYPE_INVALID);
--
--	if (!g_dbus_send_message_with_reply(conn, msg, &call, -1)) {
--		error("D-Bus call to %s failed.", SYNCE_SERVER_INTERFACE);
--		dbus_message_unref(msg);
--		return -EPERM;
--	}
--
--	dbus_pending_call_set_notify(call, connect_cb, context, NULL);
--
--	dbus_pending_call_unref(call);
--	dbus_message_unref(msg);
--
--	return -EAGAIN;
--}
--
--static ssize_t synce_write(void *object, const void *buf, size_t count)
--{
--	struct synce_context *context = object;
--	DBusMessage *msg;
--	DBusMessageIter iter, array_iter;
--	DBusPendingCall *call;
--	const char *type = obex_get_type(context->os);
--
--	if (context->lasterr == 0)
--		return count;
--
--	if (!context->conn_obj)
--		return -EFAULT;
--
--	msg = dbus_message_new_method_call(SYNCE_BUS_NAME, context->conn_obj,
--					SYNCE_CONN_INTERFACE, "Process");
--	if (!msg)
--		return -EFAULT;
--
--	dbus_message_iter_init_append(msg, &iter);
--	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
--				DBUS_TYPE_BYTE_AS_STRING, &array_iter);
--
--	dbus_message_iter_append_fixed_array(&array_iter, DBUS_TYPE_BYTE,
--						&buf, count);
--	dbus_message_iter_close_container(&iter, &array_iter);
--
--	dbus_message_append_args(msg, DBUS_TYPE_STRING, &type,
--						DBUS_TYPE_INVALID);
--
--	if (!g_dbus_send_message_with_reply(context->dbus_conn, msg,
--								&call, -1)) {
--		error("D-Bus call to %s failed.", SYNCE_CONN_INTERFACE);
--		dbus_message_unref(msg);
--		return -EPERM;
--	}
--
--	dbus_pending_call_set_notify(call, process_cb, context, NULL);
--
--	dbus_message_unref(msg);
--	dbus_pending_call_unref(call);
--
--	return -EAGAIN;
--}
--
--static const struct obex_mime_type_driver synce_driver = {
--	.target = SYNCML_TARGET,
--	.target_size = SYNCML_TARGET_SIZE,
--	.open = synce_open,
--	.close = synce_close,
--	.read = synce_read,
--	.write = synce_write,
--};
--
--static const struct obex_service_driver synce = {
--	.name = "OBEX server for SyncML, using SyncEvolution",
--	.service = OBEX_SYNCEVOLUTION,
--	.channel = SYNCEVOLUTION_CHANNEL,
--	.secure = TRUE,
--	.record = SYNCEVOLUTION_RECORD,
--	.target = SYNCML_TARGET,
--	.target_size = SYNCML_TARGET_SIZE,
--	.get = synce_get,
--	.put = synce_put,
--	.connect = synce_connect,
--	.disconnect = synce_disconnect,
--};
--
--static int synce_init(void)
--{
--	int err;
--
--	err = obex_mime_type_driver_register(&synce_driver);
--	if (err < 0)
--		return err;
--
--	return obex_service_driver_register(&synce);
--}
--
--static void synce_exit(void)
--{
--	obex_service_driver_unregister(&synce);
--	obex_mime_type_driver_unregister(&synce_driver);
--}
--
--OBEX_PLUGIN_DEFINE(syncevolution, synce_init, synce_exit)
+diff --git a/README b/README
+index 7de7045a8..6c0777046 100644
+--- a/README
++++ b/README
+@@ -249,6 +249,19 @@ For a working system, certain configuration options need to be enabled:
+ 		systems. The behavior of the deprecated tools may be unstable
+ 		or simply don't work anymore.
+ 
++	--enable-external-plugins
++
++		Enable support for external plugins
++
++		By default external plugins for bluetoothd and obexd are not
++		supported and thus disabled.
++
++		External plugins require access to internal, undocumented and
++		unversioned API in said daemons. As such they can break at any
++		time. If you have such plugins, enable this option and work
++		actively with the community to make said plugin part of the
++		upstream bluez project.
++
+ 	--enable-nfc
+ 
+ 		This option enable NFC pairing support.
+diff --git a/configure.ac b/configure.ac
+index cab5da581..5e353a1d6 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -364,6 +364,16 @@ AC_ARG_ENABLE(deprecated, AS_HELP_STRING([--enable-deprecated],
+ 					[enable_deprecated=${enableval}])
+ AM_CONDITIONAL(DEPRECATED, test "${enable_deprecated}" = "yes")
+ 
++AC_ARG_ENABLE(external-plugsin, AS_HELP_STRING([--enable-external-plugins],
++			[enable support for external plugins]),
++					[enable_external_plugins=${enableval}])
++AM_CONDITIONAL(EXTERNAL_PLUGINS, test "${enable_external_plugins}" = "yes")
++if (test "${enable_external_plugins}" = "yes"); then
++	AC_DEFINE(EXTERNAL_PLUGINS, 1, [Define if external plugin support is required])
++else
++	AC_DEFINE(EXTERNAL_PLUGINS, 0, [Define if external plugin support is required])
++fi
++
+ AC_ARG_ENABLE(sixaxis, AS_HELP_STRING([--enable-sixaxis],
+ 		[enable sixaxis plugin]), [enable_sixaxis=${enableval}])
+ AM_CONDITIONAL(SIXAXIS, test "${enable_sixaxis}" = "yes" &&
 
 -- 
 2.43.0
