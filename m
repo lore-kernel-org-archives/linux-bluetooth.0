@@ -1,62 +1,62 @@
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D3AE634E0
-	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 14:29:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FBC9634E0
+	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 14:29:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706192985; cv=none; b=maIjsP2FKdn7kMNDefgAwZW3sKM8G0MQ62dafjhAGAiv4Pw9ACf/XrVSv4KOHiKuKmoYYyAIfEGP0uJJO+Hch4UzluDd5Yz4o5zifJrnUcDW9JjaMibWuEV3MtYoQADAYMF6sfhl3Io+cnd1CSgzjZhWhaCmS4f+mSZoX+Fa2VE=
+	t=1706192988; cv=none; b=eiaXex5gaQ2+Xn+NeCEuW4o9u5gmpCfPUZT3OrjbJqX6Ox1fmqxeipJhunSKuC6tca6J9l0FnOE/P+NsOu9XOfXmEe5GZCKSPCA5I46KN2ihAZkzi0F7raEC5PxIIFtHkXPcvv2bB9ngM/4qUJSetRQ7voou10to4yOftr/pClI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706192985; c=relaxed/simple;
-	bh=aGcQl5YucAS7cfUthUZs2NS4a4pZSD8txWtQLm5FBK8=;
+	s=arc-20240116; t=1706192988; c=relaxed/simple;
+	bh=JUfr0p07h+Ewp/sLbyEq7IYa0JlWiyZ8irZXMLhZqqs=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HiH/n1MqPNyuWeycv7COx0VreU4EoVom7QLsgtqEVgmoiPDAc2wwj3q/AycZItJyG5pPIQl8PwqC77/Qgh2OQ1tKwTbgqPCkQuMCN+1z1jvb5quJAylUfCS7MwFgsaBaiZSWaBU/r3FVdRpJeqKonh2jBGlesHjnbyyiNwA7rQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KDhRXGo9; arc=none smtp.client-ip=209.85.215.171
+	 MIME-Version; b=bTp6DzeBMSMh5sWOTC/sL/PUbu/a0O5NlPRW7kXxrv5gPX+FiKiLAEVkiOBmnkiZuGbO0nmKglEx0Ny7YTpXuusa7M/T6CXKcOopEw1vCp4Tm6l/TMJ49UTtfD3MJllug8gghgQG7vD04bxSHGGPmwicVTuwjLUUoAkgqGntjAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LgoMee/U; arc=none smtp.client-ip=209.85.210.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KDhRXGo9"
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-5ce74ea4bf2so555517a12.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 06:29:43 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LgoMee/U"
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6ddd1fc67d2so397810b3a.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 06:29:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706192983; x=1706797783; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706192985; x=1706797785; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=iMsr4C6WqfvlF846yaoxqKRE+wO5gFKn3y/R17Su3B4=;
-        b=KDhRXGo9q6ql8XFFumwg7eh35q2qAX1RBsvPAo/7zOm7HCOClEuPuTZWTgao8fn5t3
-         TqlTQE1zENdpKjnGbMji+OluNImTTr5x1O1uIOMxoqUlaOd2b7Xlxg/NlhM10cdM+2Pt
-         e7z/fQdudv9XuGVZcf+UqBzBsXroFRJPMYgEFvl7wF6PhEblq9LXJwpolTW+d4TT78za
-         Sv/uWY+3tZNoHgT/Vp3AkX+HGSEhqAj9Fm5T3aBPZrjwBRnZ+BlU7Mqw2PFHmkkWFg69
-         l66LzgqUKA7fU2OmECt0cc1oWqc0fOiZdCzpcSaQ3SgiDEAMA+NN7Pz1uNQrUqJ/O2K6
-         lpog==
+        bh=dklMvlN+hkfw7f1s4bwiZ+J+3zXS8Ln0cXYFoGxDekw=;
+        b=LgoMee/UjiGwD3bQGs/q9sMlfmR2qgHBm6qKXdmcVra7I8lPFTWxOgEDhjXvFAiMnf
+         CZMR1GPiHY/zqGCkO/O3W4bvnTPDEZQ45PsEM128DrL9LyToSLgIpJdP7EommNlI8KmR
+         af+imNQSFCsLAzwzF18MvnMze4Oi9zyntvKRUnDrRKCeaawngR3xfma+WIsNhxw+bscL
+         W2J2OiW1hkHrv0s5ZS67B1Lr2qD+7Umjtmx4Yv0Nm9ZLCc1RoXRVNNmaZ6k08tDbQTDp
+         FXUhCwlyLJ8pBZ8UCydEMlGWqSPZ+GElwY4Gvs49P5KOMta9byQ4wITYG3qiDmT5zvL+
+         KF6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706192983; x=1706797783;
+        d=1e100.net; s=20230601; t=1706192985; x=1706797785;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=iMsr4C6WqfvlF846yaoxqKRE+wO5gFKn3y/R17Su3B4=;
-        b=SSluDLPIlOnGx9O9ScQcghWR3wiBhDduLudZJh7UGpkwEp8rRVVB6uJDGj2CII2prD
-         jEbkdFu4w45P5/Iug9cZNKgx2JsSIca+jX0fxKH0ZZOUBa/0HR7g9jABA+OcjaLCLU2L
-         GtkZTzVS/r1ZbV896G7yl9dT/K5xfybiG2ETjSPYNl6Dmf8MlFjLAhPOEG/BIWmFaCvc
-         g1OXdIw0KA5M60R9zGIiPM/jtVuPlyyylvWK30EZB28MHUCim6q/Y/ujCSRXq57NkChY
-         fP74p9Wv6vxPg5msSK+VW96nsHS1IJuJonFeephZKZzfW5AkmIjV72796Lk2EbH37KuW
-         y7Sw==
-X-Gm-Message-State: AOJu0YwIEBGVmCfCxN6H4EGcMKoMmMfnEqKTbQ/tPAljqN3b661MCFEd
-	Imc7PkRlzwpg1Z26pPoiFbsBU10VHogOqoPrWS0WzKPZHt6UMKEEJvw+FSmj
-X-Google-Smtp-Source: AGHT+IFe0phz35e0ScZhvEV/jBB3bdOIquRHNFwjf1AH68B19bDQ5dAaRAPd5Sk6iVWe+pbGE9u62A==
-X-Received: by 2002:a05:6a20:9585:b0:19c:75e6:c095 with SMTP id iu5-20020a056a20958500b0019c75e6c095mr1429071pzb.62.1706192982648;
-        Thu, 25 Jan 2024 06:29:42 -0800 (PST)
+        bh=dklMvlN+hkfw7f1s4bwiZ+J+3zXS8Ln0cXYFoGxDekw=;
+        b=mp2BdoC6myKFA4LzAjPjEdWwMbxIOVDWfciG0WNvpTRWKrmg86yIenzq652xv0LIpU
+         D7/DnT5f7/wPgd67cJSrDYM9JGkPsw6E43TnD+6jxJtuHXb3eSlNXDHTtuVsIHZJggVm
+         jDsaHHWpj1XVVs0We0KfEZHfo6F7Fw2oIOp1LMxiGsHm/BaNKkDWyC81D/if2h0gZ4bu
+         MLhEWrUjFAYTXiinW3xejFJBY+wWWAR/c5o1htK63QwN052BXnwpjq5lvalzWdImIF4M
+         UztNl41YgKPagwBVICYl1EXEemtozUnIVU0zfgixKSK4KreqvDkUrc+kBN+XY5Q15Oe9
+         gdVA==
+X-Gm-Message-State: AOJu0YxbLkP9KDvCU+S+x7WzSC7oWKJjMHpWpYSLApro9EsHY2FlnvCg
+	MG620oZEUnDvNtm8pfmqzvyWRxBU15fvsVwtf1X3UCqOHnVpbfReijGt4GSb
+X-Google-Smtp-Source: AGHT+IEhclc+0uWvjWxXXU71S+p+ySwx/3QvVyWleCJotd2Z9fQDAfsi4yZ7RpUNGyKUEvP1P3XN3w==
+X-Received: by 2002:a62:cdcd:0:b0:6d9:b5ba:3ddb with SMTP id o196-20020a62cdcd000000b006d9b5ba3ddbmr741211pfg.11.1706192984724;
+        Thu, 25 Jan 2024 06:29:44 -0800 (PST)
 Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
-        by smtp.gmail.com with ESMTPSA id x33-20020a631721000000b005ceac534e47sm13646143pgl.51.2024.01.25.06.29.39
+        by smtp.gmail.com with ESMTPSA id x33-20020a631721000000b005ceac534e47sm13646143pgl.51.2024.01.25.06.29.42
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jan 2024 06:29:40 -0800 (PST)
+        Thu, 25 Jan 2024 06:29:43 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 2/3] device: Add btd_device_set_connectable
-Date: Thu, 25 Jan 2024 09:29:35 -0500
-Message-ID: <20240125142936.3373953-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 3/3] bap: Mark device as connectable if a broadcast Endpoint is found
+Date: Thu, 25 Jan 2024 09:29:36 -0500
+Message-ID: <20240125142936.3373953-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240125142936.3373953-1-luiz.dentz@gmail.com>
 References: <20240125142936.3373953-1-luiz.dentz@gmail.com>
@@ -70,44 +70,44 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-In case of devices advertising BCAA, aka. Broadcast Source, it shall be
-possible to connect to them using something LE Audio Broadcast
-procedures so this introduces btd_device_set_connectable so driver can
-inform the core when the device is connectable even when it is
-advertising using GAP broadcaster role for example.
+If a broadcast Endpoint is found this uses btd_device_set_connectable to
+make it as connectable since the Endpoint can be used to setup a
+broadcast stream which requires the device object.
 ---
- src/device.c | 5 +++++
- src/device.h | 1 +
- 2 files changed, 6 insertions(+)
+ profiles/audio/bap.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/src/device.c b/src/device.c
-index 17bcfbc499aa..afd073c6c2a5 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -4495,6 +4495,11 @@ void device_update_last_seen(struct btd_device *device, uint8_t bdaddr_type,
- 	set_temporary_timer(device, btd_opts.tmpto);
+diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
+index a4036bbbdfa8..864761dfd919 100644
+--- a/profiles/audio/bap.c
++++ b/profiles/audio/bap.c
+@@ -1378,6 +1378,7 @@ static bool pac_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
+ static bool pac_found_bcast(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
+ 							void *user_data)
+ {
++	struct bap_data *data = user_data;
+ 	struct bap_ep *ep;
+ 
+ 	DBG("lpac %p rpac %p", lpac, rpac);
+@@ -1388,6 +1389,9 @@ static bool pac_found_bcast(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
+ 		return true;
+ 	}
+ 
++	/* Mark the device as connetable if an Endpoint is registered */
++	btd_device_set_connectable(data->device, true);
++
+ 	return true;
  }
  
-+void btd_device_set_connectable(struct btd_device *device, bool connectable)
-+{
-+	device_update_last_seen(device, device->bdaddr_type, connectable);
-+}
+@@ -2456,6 +2460,8 @@ static void bap_bcast_remove(struct btd_service *service)
+ 		error("BAP service not handled by profile");
+ 		return;
+ 	}
 +
- /* It is possible that we have two device objects for the same device in
-  * case it has first been discovered over BR/EDR and has a private
-  * address when discovered over LE for the first time. In such a case we
-diff --git a/src/device.h b/src/device.h
-index 8bb38669d457..96f41d47971d 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -95,6 +95,7 @@ void device_set_paired(struct btd_device *dev, uint8_t bdaddr_type);
- void device_set_unpaired(struct btd_device *dev, uint8_t bdaddr_type);
- void btd_device_set_temporary(struct btd_device *device, bool temporary);
- void btd_device_set_trusted(struct btd_device *device, gboolean trusted);
-+void btd_device_set_connectable(struct btd_device *device, bool connectable);
- void device_set_bonded(struct btd_device *device, uint8_t bdaddr_type);
- void device_set_legacy(struct btd_device *device, bool legacy);
- void device_set_rssi_with_delta(struct btd_device *device, int8_t rssi,
++	bap_data_remove(data);
+ }
+ 
+ static int bap_probe(struct btd_service *service)
 -- 
 2.43.0
 
