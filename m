@@ -1,250 +1,289 @@
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from endrift.com (endrift.com [173.255.198.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDF3B67C61
-	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 02:29:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A986C1FB2
+	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 03:05:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.255.198.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706149747; cv=none; b=jtqyiNxpx0IYay4AMsW5PQFx7lBBuUKF9OrK2hhAz2+0y6vsQMl1w6oGkZV8/WlivUYsxVxfkUnU7C6iqczq6A/bhN83Ma/QWNzKte2K2ecw71DubjKl6Mu3JMfYbOGgHvOfKZfKjZ6D+Y0QfveYhDcOfa5rU7Qc9miXA3+fEm8=
+	t=1706151912; cv=none; b=PtRYkkajYOHDHapl79g03zv/fHKOZSkVG8u/CcWfVrZZ4ztmhbCf/E0YxAScKsBuX+raubA1IVVqiKWCgqz4G6Lmyr2gHcKMvCLz6Xv7GG3VIbaEBZpOgy0a2PCQARsuIU2IoWQy8LVYgO1EnjyqyQf24EGlNLKcyQGPWRr/7tY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706149747; c=relaxed/simple;
-	bh=LrP97k2WlDYwsAhHUwV/tSAyfddGHMl9+3Y+5V+DBiE=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=nDJgdNaOQLgiYGDxHWsCjsjN9iIDjCNtsy17KNNsQXm/5f29yaPeCExP3YIt/hncDrpQJ4d/utvVIFCZGMdpIfrv7PlHOfS1VZmlHM5EC8t+6Vt92Bzy7CR/gMhGoWwJy7nfXhG681zbZZkZ7fJMHE27l7U+hZEcjuBobrWLNNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OlTGtncB; arc=none smtp.client-ip=209.85.219.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1706151912; c=relaxed/simple;
+	bh=FYZ2YXoSgcxEgiS4JTJqTskhdLh/HWMVBv6wwA53zLs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XrYrRPtBu38J0erkINlCuboOM89XB4fsVxYV8qJyBfgwMo3k+BhiIsl7PLqp7Hi42m2WiMhZ7HlIM3q1HeWywfId8W3VSLjGg8v1kLbIVzGgwDeHJSr7RShhLUvfx8LsWMVHXyc3cdi67/HDt316GHPxIsJQ3zComE804a+YO/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=endrift.com; spf=pass smtp.mailfrom=endrift.com; dkim=pass (2048-bit key) header.d=endrift.com header.i=@endrift.com header.b=ox0r3ObZ; arc=none smtp.client-ip=173.255.198.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=endrift.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=endrift.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OlTGtncB"
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-6818aa08a33so2167246d6.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jan 2024 18:29:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706149744; x=1706754544; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=PCCvGATzt1VhH82nozRrzxkQurL3aAQ50vtCjXYMPd0=;
-        b=OlTGtncBO3nrSiTqIKuOZPGCqxueDrSx5SDxrAf5RiebqjlrWVFEkZNmJIP2KtAusd
-         4UwAWQyU/qighmjajvm+pOgHiXZXo4BqbEn6aTsJKEVy5icL3RCRdFj1HsRBhtIeF0Wn
-         pAOo6hcOGk8j1pVGWmJ0BHKoBFisvdajarrtF1Bo6mLNb2J/FHJ2T//tktQnh0OmCSAV
-         HeKp5CCYaF2ktS+KZ0qLRrPclUW7BGEi8a9QQengCzCIbe5jc/q7lO8JeENMGHFb+4/d
-         f3YtdyDTL7eP5fnLp6WwHDqdNFlIJ1bGK+VJ1SmK7TsoZFGvqf9YBtQKkAIgWZTTV3bB
-         asYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706149744; x=1706754544;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PCCvGATzt1VhH82nozRrzxkQurL3aAQ50vtCjXYMPd0=;
-        b=I+Nmzku+Yw4uzluLjYb8dnrCCmuR5b8VXRCBp3uVdJeCseoTq4D6rImoqvvjceCMbw
-         MAKeTF9wVezsibAslmb84sQgDOsWqL1jKj37hXEj4l9CwFYgweULjkQiTQpp2nleIGWv
-         GxahfdwFLHNICsYwT9RuKo/aypDujPu5tZYlb2Fppzhqgbhve1sxo6efjofprzF0VUEP
-         pc1uxPE7Me7UIsGU7uTvNo9b0wBwL521c6t4QqwnGLVKMAtcAMlFCE6t/KgVRmdhJf3l
-         xefMi39LLH3qdqxbvqUDjV9p7BOWhNju7l2fDPceAubewkFBWiCONzxTNHHSTs9TFHXQ
-         gAKA==
-X-Gm-Message-State: AOJu0YySOBOoz2PASYP5xjQdYK6AhfWnRm64RYtVXPEzOuyO0GOm2lBD
-	+MIKDQUMHn/Y1J2pbk3MxHGG0kOFfyp1Fr62F6NIjKNtLeXIJ16nFzfQ+1eN
-X-Google-Smtp-Source: AGHT+IEwBl3bvkXDjIemCNykVIZJCQNoQPz37opqWRIvrlCGDwM2ICoNDXdE1qCoLJEhsqKPbMsheQ==
-X-Received: by 2002:a05:6214:f22:b0:681:35b:ff6f with SMTP id iw2-20020a0562140f2200b00681035bff6fmr482589qvb.29.1706149744469;
-        Wed, 24 Jan 2024 18:29:04 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCWAFrC2w5/NhBIKF65DF36i2EJ9g2lhn1F171QnA95o1FQtlneh8E4GSxuKnmDEpsmd3aZvw+O+GJj+/9MqD4IGT2ubAHDVBK9pvLOQ96BAGT4Bk0b3CNjaSysA
-Received: from [172.17.0.2] ([172.183.88.181])
-        by smtp.gmail.com with ESMTPSA id kr10-20020a0562142b8a00b006862b537412sm4568758qvb.123.2024.01.24.18.29.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jan 2024 18:29:04 -0800 (PST)
-Message-ID: <65b1c770.050a0220.5db35.6b77@mx.google.com>
-Date: Wed, 24 Jan 2024 18:29:04 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8986247116691463970=="
+	dkim=pass (2048-bit key) header.d=endrift.com header.i=@endrift.com header.b="ox0r3ObZ"
+Received: from [192.168.0.138] (71-212-26-68.tukw.qwest.net [71.212.26.68])
+	by endrift.com (Postfix) with ESMTPSA id DFD30A25D;
+	Wed, 24 Jan 2024 19:05:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=endrift.com; s=2020;
+	t=1706151901; bh=FYZ2YXoSgcxEgiS4JTJqTskhdLh/HWMVBv6wwA53zLs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ox0r3ObZ6b/b2Y0aVkXksmZ89kaKR3XW09MTUe6qj6/j9R3BIAR5CTimh2xpC4ClM
+	 5Lr1DKeOuDQF2LY4ERyw1rEtVrOu2UjTC0E5oqYWZJuMbQMXLpSkX4h2rZ9Sb1dpbn
+	 bYCxGOBYm3vqDB6AGDzgELmZiW+O4B9H6L10krT1FG7msyPuGiJPz09f55ViuW+KjW
+	 CUXwDA6L1Nc06BmOwvWDUywc4l/Namc1IHfvNJm+15jP2fBTd0kwrxRCTKUcuAigzo
+	 aZ1+hrhFcbIB578w6gdyZl3MGY0xkKp+tpfPBKvnMNrLBWAEIJWkKZOUA1fkB9wQnD
+	 LZaCoZ6BihaVA==
+Message-ID: <94235415-0001-4bba-a27f-519533a4a0ce@endrift.com>
+Date: Wed, 24 Jan 2024 19:05:00 -0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, devnull+emil.l.velikov.gmail.com@kernel.org
-Subject: RE: Distribution inspired fixes
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH BlueZ 1/9] Enable alternate Bluetooth connection modes
+Content-Language: en-US
+To: emil.l.velikov@gmail.com, linux-bluetooth@vger.kernel.org
+Cc: Rachel Blackman <rachel.blackman@synapse.com>
+References: <20240124-disto-patches-v1-0-97e0eb5625a3@gmail.com>
+ <20240124-disto-patches-v1-1-97e0eb5625a3@gmail.com>
+From: Vicki Pfau <vi@endrift.com>
 In-Reply-To: <20240124-disto-patches-v1-1-97e0eb5625a3@gmail.com>
-References: <20240124-disto-patches-v1-1-97e0eb5625a3@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============8986247116691463970==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-This is automated email and please do not reply to this email!
+Hi Emil,
 
-Dear submitter,
+I didn't write this patch. It was written by Rachel Blackman, and I believe I just rebased it onto our local tree with the expectation that it was just our local tree. It would be better attributed to her, potentially with a Co-Authored-By for me.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=819667
+Vicki
 
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      4.59 seconds
-GitLint                       PASS      2.64 seconds
-BuildEll                      PASS      24.25 seconds
-BluezMake                     FAIL      4.89 seconds
-MakeCheck                     FAIL      0.12 seconds
-MakeDistcheck                 FAIL      4.40 seconds
-CheckValgrind                 FAIL      4.38 seconds
-CheckSmatch                   FAIL      4.52 seconds
-bluezmakeextell               FAIL      4.42 seconds
-IncrementalBuild              FAIL      4731.57 seconds
-ScanBuild                     FAIL      480.27 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,1/9] Enable alternate Bluetooth connection modes
-WARNING:BAD_SIGN_OFF: Non-standard signature: Co-Authored-By:
-#87: 
-Co-Authored-By: Rachel Blackman <rachel.blackman@synapse.com>
-
-WARNING:BAD_SIGN_OFF: 'Co-authored-by:' is the preferred signature form
-#87: 
-Co-Authored-By: Rachel Blackman <rachel.blackman@synapse.com>
-
-WARNING:LONG_LINE: line length of 102 exceeds 80 columns
-#133: FILE: src/adapter.c:869:
-+								adapter->dev_id, mgmt_errstr(status));
-
-WARNING:LONG_LINE: line length of 84 exceeds 80 columns
-#146: FILE: src/adapter.c:882:
-+				set_phy_support_complete, (void*)adapter, NULL) > 0)
-
-ERROR:POINTER_LOCATION: "(foo*)" should be "(foo *)"
-#146: FILE: src/adapter.c:882:
-+				set_phy_support_complete, (void*)adapter, NULL) > 0)
-
-WARNING:LONG_LINE_COMMENT: line length of 81 exceeds 80 columns
-#163: FILE: src/adapter.c:10503:
-+	// Some adapters do not want to accept this before being started/powered.
-
-WARNING:STATIC_CONST_CHAR_ARRAY: static const char * array should probably be static const char * const
-#199: FILE: src/main.c:186:
-+static const char *conf_phys_str[] = {
-
-/github/workspace/src/src/13529758.patch total: 1 errors, 6 warnings, 182 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13529758.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[BlueZ,5/9] profiles: remove unused suspend-dummy.c
-WARNING:UNKNOWN_COMMIT_ID: Unknown commit id 'fb55b7a6a', maybe rebased or not pulled?
-#77: 
-The file has been used for about 8 years now - see commit fb55b7a6a
-
-/github/workspace/src/src/13529762.patch total: 0 errors, 1 warnings, 8 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13529762.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: BluezMake - FAIL
-Desc: Build BlueZ
-Output:
-
-configure.ac:21: installing './compile'
-configure.ac:36: installing './config.guess'
-configure.ac:36: installing './config.sub'
-configure.ac:5: installing './install-sh'
-configure.ac:5: installing './missing'
-Makefile.am: installing './depcomp'
-parallel-tests: installing './test-driver'
-./configure: line 15145: syntax error: unexpected end of file
-##############################
-Test: MakeCheck - FAIL
-Desc: Run Bluez Make Check
-Output:
-
-make: *** No rule to make target 'check'.  Stop.
-##############################
-Test: MakeDistcheck - FAIL
-Desc: Run Bluez Make Distcheck
-Output:
-
-configure.ac:21: installing './compile'
-configure.ac:5: installing './missing'
-Makefile.am: installing './depcomp'
-./configure: line 15145: syntax error: unexpected end of file
-##############################
-Test: CheckValgrind - FAIL
-Desc: Run Bluez Make Check with Valgrind
-Output:
-
-configure.ac:21: installing './compile'
-configure.ac:5: installing './missing'
-Makefile.am: installing './depcomp'
-./configure: line 15145: syntax error: unexpected end of file
-##############################
-Test: CheckSmatch - FAIL
-Desc: Run smatch tool with source
-Output:
-
-configure.ac:21: installing './compile'
-configure.ac:5: installing './missing'
-Makefile.am: installing './depcomp'
-./configure: line 15145: syntax error: unexpected end of file
-##############################
-Test: bluezmakeextell - FAIL
-Desc: Build Bluez with External ELL
-Output:
-
-configure.ac:21: installing './compile'
-configure.ac:5: installing './missing'
-Makefile.am: installing './depcomp'
-./configure: line 15145: syntax error: unexpected end of file
-##############################
-Test: IncrementalBuild - FAIL
-Desc: Incremental build with the patches in the series
-Output:
-[BlueZ,8/9] obex: remove phonebook tracker backend
-
-./configure: line 15145: syntax error: unexpected end of file
-make: *** [Makefile:4713: config.status] Error 2
-configure.ac:21: installing './compile'
-configure.ac:5: installing './missing'
-Makefile.am: installing './depcomp'
-./configure: line 15145: syntax error: unexpected end of file
-##############################
-Test: ScanBuild - FAIL
-Desc: Run Scan Build
-Output:
-
-configure.ac:21: installing './compile'
-configure.ac:36: installing './config.guess'
-configure.ac:36: installing './config.sub'
-configure.ac:5: installing './install-sh'
-configure.ac:5: installing './missing'
-Makefile.am: installing './depcomp'
-parallel-tests: installing './test-driver'
-./configure: line 15145: syntax error: unexpected end of file
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8986247116691463970==--
+On 1/24/24 15:43, Emil Velikov via B4 Relay wrote:
+> From: Vicki Pfau <vi@endrift.com>
+> 
+> This patch improves Bluetooth connectivity, especially with multiple
+> controllers and while docked.
+> 
+> Testing:
+> $ btmgmt
+> [mgmt]# phy
+> 
+> Verify the SupportedPHYs in main.conf are listed.
+> Verify that multiple controllers can connect and work well.
+> 
+> Co-Authored-By: Rachel Blackman <rachel.blackman@synapse.com>
+> 
+> [Emil Velikov]
+> Remove unused function, add default entries into parser, keep only
+> default entries in main.conf - commented out, like the other options.
+> ---
+>  src/adapter.c | 46 +++++++++++++++++++++++++++++++++++++++++
+>  src/btd.h     |  2 ++
+>  src/main.c    | 66 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  src/main.conf |  5 +++++
+>  4 files changed, 119 insertions(+)
+> 
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 022390f0d..4c6b8f40f 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -86,6 +86,18 @@
+>  #define DISTANCE_VAL_INVALID	0x7FFF
+>  #define PATHLOSS_MAX		137
+>  
+> +#define LE_PHY_1M 0x01
+> +#define LE_PHY_2M 0x02
+> +#define LE_PHY_CODED 0x04
+> +
+> +#define PHYVAL_REQUIRED 0x07ff
+> +#define PHYVAL_1M_TX (1<<9)
+> +#define PHYVAL_1M_RX (1<<10)
+> +#define PHYVAL_2M_TX (1<<11)
+> +#define PHYVAL_2M_RX (1<<12)
+> +#define PHYVAL_CODED_TX (1<<13)
+> +#define PHYVAL_CODED_RX (1<<14)
+> +
+>  /*
+>   * These are known security keys that have been compromised.
+>   * If this grows or there are needs to be platform specific, it is
+> @@ -847,6 +859,36 @@ static bool set_discoverable(struct btd_adapter *adapter, uint8_t mode,
+>  	return false;
+>  }
+>  
+> +static void set_phy_support_complete(uint8_t status, uint16_t length,
+> +					const void *param, void *user_data)
+> +{
+> +	if (status != 0) {
+> +		struct btd_adapter *adapter = (struct btd_adapter *)user_data;
+> +
+> +		btd_error(adapter->dev_id, "PHY setting rejected for %u: %s",
+> +								adapter->dev_id, mgmt_errstr(status));
+> +	}
+> +}
+> +
+> +static bool set_phy_support(struct btd_adapter *adapter, uint32_t phy_mask)
+> +{
+> +	struct mgmt_cp_set_phy_confguration cp;
+> +
+> +	memset(&cp, 0, sizeof(cp));
+> +	cp.selected_phys = cpu_to_le32(phy_mask | PHYVAL_REQUIRED);
+> +
+> +	if (mgmt_send(adapter->mgmt, MGMT_OP_SET_PHY_CONFIGURATION,
+> +				adapter->dev_id, sizeof(cp), &cp,
+> +				set_phy_support_complete, (void*)adapter, NULL) > 0)
+> +		return true;
+> +
+> +	btd_error(adapter->dev_id, "Failed to set PHY for index %u",
+> +							adapter->dev_id);
+> +
+> +	return false;
+> +
+> +}
+> +
+>  static bool pairable_timeout_handler(gpointer user_data)
+>  {
+>  	struct btd_adapter *adapter = user_data;
+> @@ -10458,6 +10500,10 @@ static void read_info_complete(uint8_t status, uint16_t length,
+>  	if (btd_adapter_get_powered(adapter))
+>  		adapter_start(adapter);
+>  
+> +	// Some adapters do not want to accept this before being started/powered.
+> +	if (btd_opts.phys > 0)
+> +		set_phy_support(adapter, btd_opts.phys);
+> +
+>  	return;
+>  
+>  failed:
+> diff --git a/src/btd.h b/src/btd.h
+> index b7e7ebd61..2b84f7a51 100644
+> --- a/src/btd.h
+> +++ b/src/btd.h
+> @@ -151,6 +151,8 @@ struct btd_opts {
+>  	struct btd_advmon_opts	advmon;
+>  
+>  	struct btd_csis csis;
+> +
+> +	uint32_t	phys;
+>  };
+>  
+>  extern struct btd_opts btd_opts;
+> diff --git a/src/main.c b/src/main.c
+> index b1339c230..faedb853c 100644
+> --- a/src/main.c
+> +++ b/src/main.c
+> @@ -128,6 +128,7 @@ static const char *le_options[] = {
+>  	"AdvMonAllowlistScanDuration",
+>  	"AdvMonNoFilterScanDuration",
+>  	"EnableAdvMonInterleaveScan",
+> +	"SupportedPHYs",
+>  	NULL
+>  };
+>  
+> @@ -182,10 +183,32 @@ static const struct group_table {
+>  	{ }
+>  };
+>  
+> +static const char *conf_phys_str[] = {
+> +	"BR1M1SLOT",
+> +	"BR1M3SLOT",
+> +	"BR1M5SLOT",
+> +	"EDR2M1SLOT",
+> +	"EDR2M3SLOT",
+> +	"EDR2M5SLOT",
+> +	"EDR3M1SLOT",
+> +	"EDR3M3SLOT",
+> +	"EDR3M5SLOT",
+> +	"LE1MTX",
+> +	"LE1MRX",
+> +	"LE2MTX",
+> +	"LE2MRX",
+> +	"LECODEDTX",
+> +	"LECODEDRX",
+> +};
+> +
+>  #ifndef MIN
+>  #define MIN(x, y) ((x) < (y) ? (x) : (y))
+>  #endif
+>  
+> +#ifndef NELEM
+> +#define NELEM(x) (sizeof(x) / sizeof((x)[0]))
+> +#endif
+> +
+>  static int8_t check_sirk_alpha_numeric(char *str)
+>  {
+>  	int8_t val = 0;
+> @@ -226,6 +249,36 @@ static size_t hex2bin(const char *hexstr, uint8_t *buf, size_t buflen)
+>  	return len;
+>  }
+>  
+> +static bool str2phy(const char *phy_str, uint32_t *phy_val)
+> +{
+> +	unsigned int i;
+> +
+> +	for (i = 0; i < NELEM(conf_phys_str); i++) {
+> +		if (strcasecmp(conf_phys_str[i], phy_str) == 0) {
+> +			*phy_val = (1 << i);
+> +			return true;
+> +		}
+> +	}
+> +
+> +	return false;
+> +}
+> +
+> +static void btd_parse_phy_list(char **list)
+> +{
+> +	uint32_t phys = 0;
+> +
+> +	for (int i = 0; list[i]; i++) {
+> +		uint32_t phy_val;
+> +
+> +		info("Enabling PHY option: %s", list[i]);
+> +
+> +		if (str2phy(list[i], &phy_val))
+> +			phys |= phy_val;
+> +	}
+> +
+> +	btd_opts.phys = phys;
+> +}
+> +
+>  GKeyFile *btd_get_main_conf(void)
+>  {
+>  	return main_conf;
+> @@ -673,11 +726,24 @@ static void parse_le_config(GKeyFile *config)
+>  		  0,
+>  		  1},
+>  	};
+> +	char **strlist;
+> +	GError *err = NULL;
+>  
+>  	if (btd_opts.mode == BT_MODE_BREDR)
+>  		return;
+>  
+>  	parse_mode_config(config, "LE", params, ARRAY_SIZE(params));
+> +
+> +	strlist = g_key_file_get_string_list(config, "LE", "SupportedPHYs",
+> +						NULL, &err);
+> +	if (err) {
+> +		g_clear_error(&err);
+> +		strlist = g_new0(char *, 3);
+> +		strlist[0] = g_strdup("LE1MTX");
+> +		strlist[1] = g_strdup("LE1MRX");
+> +	}
+> +	btd_parse_phy_list(strlist);
+> +	g_strfreev(strlist);
+>  }
+>  
+>  static bool match_experimental(const void *data, const void *match_data)
+> diff --git a/src/main.conf b/src/main.conf
+> index 085c81a46..59d31e494 100644
+> --- a/src/main.conf
+> +++ b/src/main.conf
+> @@ -231,6 +231,11 @@
+>  # Defaults to 1
+>  #EnableAdvMonInterleaveScan=
+>  
+> +# Which Bluetooth LE PHYs should be enabled/supported?
+> +# Options are LE1MTX LE1MRX LE2MTX LE2MRX LECODEDTX LECODEDRX
+> +# Defaults to LE1MTX,LE1MRX
+> +#SupportedPHYs=LE1MTX,LE1MRX
+> +
+>  [GATT]
+>  # GATT attribute cache.
+>  # Possible values:
+> 
