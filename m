@@ -1,130 +1,78 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83B3C2C68A;
-	Thu, 25 Jan 2024 10:42:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 316C61CA83;
+	Thu, 25 Jan 2024 10:58:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706179353; cv=none; b=nw81h/hgHNL90AU6RqcHY4DE3qbLeLM72nMH5i0q3G2ydnHTAcHxPT6fY0akjC9jkrQ/fthYBs/Yd6MZ2bitnzhAl60LnKnhsqvtFbIPFmcnVtAZZtuBD++8u4EvDrquNRpv0tcc8cb3tGj6gi5uD+zX+sQRNrn9UndRwklmnzQ=
+	t=1706180296; cv=none; b=GGQXEDJwXZ2HP3GP2pA1wo8btDR5Uh7Lw1SnoWX0lH0izg4g2vC4QXHQ3jta1hM6TL8t0aMv8RcUHC03AqxTeXtRWkRzKl8m4iPBeuB+bUm3s0QwVebFQDA/uko9jffP6azQ10JeWRvxZra/DY6FacSucKWTZKWIEnmf4Y/Tn8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706179353; c=relaxed/simple;
-	bh=1/AQZg5NNw9HG13KiYI6HfNvwqZ4xcS6GaNad1Jmb/I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sObF5GHc+SYeKQleyaV+2r+GlSNgaqOv9UMB/CT6fvKecMkzEoGKYSpK3BB2T42hIfWrQEh1nGO5FatnE1Qjb5kV1i6swH9LG/iRCkV/EP8W41yg4hqtQo39QSYzSV8SMIStHSNOfCKySUcXcFAsAskPo//+zaJOP58AdfPIZC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z+WC6q/p; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1706180296; c=relaxed/simple;
+	bh=03KT88bs5CPFUzGWiSf0JoK4aabPHEcPRG/J8ct3YMs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=URJ8BD8tTwwK84ZqiegRninQNh8pLfHbGJ9SHKUatIOEpuUeUwxUy7EK6TE97a5BcdRssc+boXAD9CUk1Uk1uv6uob/f4KXucFHkOH6elpCHT96EVDinPIiAw1g0txbQV0nKfIyalH2BsUFg8qBPammJmt6g1ZEhiDVh5e0rtPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=P5diZh7v; arc=none smtp.client-ip=220.197.31.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z+WC6q/p"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25A8EC433C7;
-	Thu, 25 Jan 2024 10:42:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706179353;
-	bh=1/AQZg5NNw9HG13KiYI6HfNvwqZ4xcS6GaNad1Jmb/I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Z+WC6q/pwbwzH6zhMdWS153JB6VUWqmZcSDN5fViUQMl+zNnFkr+L5iCIZC4Lmv2j
-	 bS4xt+Jc+fIKPiuc/kJRIJ6TAeALxfXs7+VoI8ancJ7e9QSMZf9u8wlf8juOT449Gm
-	 dGuxdVykXP+YbuK9da+3YP4AGDYrHkdmnPt65LdsuIx8gGLD4hTB/s1rjqbkVCKiUD
-	 oli8l8eXT1ku4I2e/jROQgRMNh1cOo8JM8FSB0c1qy9mR6qP4bCyS6fEZ4sW83WE4H
-	 dvME2O/MBNNvzFmFBAQf8Pqk3H35BFWj4WMW1H3tXE6hY7SpsHA0xe4mZ94kyccwIt
-	 HEVRnGIIo3ahQ==
-Date: Thu, 25 Jan 2024 10:42:23 +0000
-From: Lee Jones <lee@kernel.org>
-To: Francesco Dolcini <francesco@dolcini.it>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jirislaby@kernel.org>, linux-bluetooth@vger.kernel.org,
-	linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, greybus-dev@lists.linaro.org,
-	linux-iio@vger.kernel.org, netdev@vger.kernel.org,
-	chrome-platform@lists.linux.dev,
-	platform-driver-x86@vger.kernel.org, linux-serial@vger.kernel.org,
-	linux-sound@vger.kernel.org,
-	Francesco Dolcini <francesco.dolcini@toradex.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Johan Hovold <johan@kernel.org>, Alex Elder <elder@kernel.org>,
-	Jonathan Cameron <jic23@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Benson Leung <bleung@chromium.org>,
-	Tzung-Bi Shih <tzungbi@kernel.org>, Rob Herring <robh@kernel.org>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Subject: Re: [PATCH v2] treewide, serdev: change receive_buf() return type to
- size_t
-Message-ID: <20240125104223.GD74950@google.com>
-References: <20240122180551.34429-1-francesco@dolcini.it>
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="P5diZh7v"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=hyAxN
+	nJEjaEeWu++V1hIX4/hQ1ibrMzym3D/Hwm9ZGQ=; b=P5diZh7vy2qXQbww/HXV/
+	w3rzLHnWp8Y7oK0bEnV5UBzYj95y9gN7BTUa/I26WThTm+uUpD7HhufvfC/hclrt
+	Zkdc+CZAxBHPw9q+d8blwk9mFeceMaXZML5RXQufn3AVUAAaeVdNERTNfH0X4ecD
+	BUoblUi9Ww5flj9XSb6ZLc=
+Received: from WH-D-007635B.QUECTEL.COM (unknown [223.76.229.213])
+	by gzga-smtp-mta-g0-0 (Coremail) with SMTP id _____wD3X06yPrJlPkoiAw--.19557S2;
+	Thu, 25 Jan 2024 18:57:56 +0800 (CST)
+From: clancy_shang@163.com
+To: marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	zhongjun.yu@quectel.com,
+	Clancy Shang <clancy.shang@quectel.com>
+Subject: [PATCH] Bluetooth: mgmt: Fix wrong param be used
+Date: Thu, 25 Jan 2024 18:57:52 +0800
+Message-Id: <20240125105752.3144840-1-clancy_shang@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240122180551.34429-1-francesco@dolcini.it>
+X-CM-TRANSID:_____wD3X06yPrJlPkoiAw--.19557S2
+X-Coremail-Antispam: 1Uf129KBjvdXoWrKrW7WF4rWw1UWF1rXFWUArb_yoWDZFXEgF
+	409ay7uF4UXryvyF4Y93WrWr1Sya4a9Fs7Xr9xKrWxAr98Gr1UuFn7AF9xJFn3uanxZrn7
+	Zr4DXF4F9w409jkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU8RpB3UUUUU==
+X-CM-SenderInfo: xfod0ux1bvxtlqj6il2tof0z/xtbBzRRwuGVOBrWrwwAAsh
 
-On Mon, 22 Jan 2024, Francesco Dolcini wrote:
+From: Clancy Shang <clancy.shang@quectel.com>
 
-> From: Francesco Dolcini <francesco.dolcini@toradex.com>
-> 
-> receive_buf() is called from ttyport_receive_buf() that expects values
-> ">= 0" from serdev_controller_receive_buf(), change its return type from
-> ssize_t to size_t.
-> 
-> The need for this clean-up was noticed while fixing a warning, see
-> commit 94d053942544 ("Bluetooth: btnxpuart: fix recv_buf() return value").
-> Changing the callback prototype to return an unsigned seems the best way
-> to document the API and ensure that is properly used.
-> 
-> GNSS drivers implementation of serdev receive_buf() callback return
-> directly the return value of gnss_insert_raw(). gnss_insert_raw()
-> returns a signed int, however this is not an issue since the value
-> returned is always positive, because of the kfifo_in() implementation.
-> gnss_insert_raw() could be changed to return also an unsigned, however
-> this is not implemented here as request by the GNSS maintainer Johan
-> Hovold.
-> 
-> Suggested-by: Jiri Slaby <jirislaby@kernel.org>
-> Link: https://lore.kernel.org/all/087be419-ec6b-47ad-851a-5e1e3ea5cfcc@kernel.org/
-> Signed-off-by: Francesco Dolcini <francesco.dolcini@toradex.com>
-> Acked-by: Jonathan Cameron <Jonathan.Cameron@huawei.com> #for-iio
-> ---
-> v1:
->  - https://lore.kernel.org/all/20231214170146.641783-1-francesco@dolcini.it/
-> v2:
->  - rebased on 6.8-rc1
->  - add acked-by Jonathan
->  - do not change gnss_insert_raw()
->  - do not change the code style of the gnss code
->  - commit message improvements, explain the reasons for doing only minimal
->    changes on the GNSS part
-> ---
->  drivers/bluetooth/btmtkuart.c              |  4 ++--
->  drivers/bluetooth/btnxpuart.c              |  4 ++--
->  drivers/bluetooth/hci_serdev.c             |  4 ++--
->  drivers/gnss/serial.c                      |  2 +-
->  drivers/gnss/sirf.c                        |  2 +-
->  drivers/greybus/gb-beagleplay.c            |  6 +++---
->  drivers/iio/chemical/pms7003.c             |  4 ++--
->  drivers/iio/chemical/scd30_serial.c        |  4 ++--
->  drivers/iio/chemical/sps30_serial.c        |  4 ++--
->  drivers/iio/imu/bno055/bno055_ser_core.c   |  4 ++--
+if the BlueZ library calls the API interface "adapter_set_device_flags",
+which sends the "MGMT_OP_SET_DEVICE_FLAGS" opcode to the kernel, but
+does not receive the callback message "MGMT_EV_DEVICE_FLAGS_CHANGED"
+from the kernel. it fixs this bug.
 
->  drivers/mfd/rave-sp.c                      |  4 ++--
+Signed-off-by: Clancy Shang <clancy.shang@quectel.com>
+---
+ net/bluetooth/mgmt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Acked-by: Lee Jones <lee@kernel.org>
-
->  drivers/net/ethernet/qualcomm/qca_uart.c   |  2 +-
->  drivers/nfc/pn533/uart.c                   |  4 ++--
->  drivers/nfc/s3fwrn5/uart.c                 |  4 ++--
->  drivers/platform/chrome/cros_ec_uart.c     |  4 ++--
->  drivers/platform/surface/aggregator/core.c |  4 ++--
->  drivers/tty/serdev/serdev-ttyport.c        | 10 ++++------
->  include/linux/serdev.h                     |  8 ++++----
->  sound/drivers/serial-generic.c             |  4 ++--
->  19 files changed, 40 insertions(+), 42 deletions(-)
-
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 9dd815b6603f..c74abdf3618f 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -5177,7 +5177,7 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ done:
+ 	if (status == MGMT_STATUS_SUCCESS)
+-		device_flags_changed(sk, hdev, &cp->addr.bdaddr, cp->addr.type,
++		device_flags_changed(NULL, hdev, &cp->addr.bdaddr, cp->addr.type,
+ 				     supported_flags, current_flags);
+ 
+ 	return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_SET_DEVICE_FLAGS, status,
 -- 
-Lee Jones [李琼斯]
+2.25.1
+
