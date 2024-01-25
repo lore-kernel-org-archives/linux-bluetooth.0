@@ -1,62 +1,78 @@
-Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B92FD745F9
-	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 20:36:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BBCB135A5E
+	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 20:50:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706215008; cv=none; b=AnkEi9KYSmZTQZ/lSpi89SLZ2EoiV+cm1TWdyfnHhTE2P6GT5FltxHaAQ1KarWu4Ng7oTmhdrXy61myCzz/gEv1ErgOK86VqEOoblwAJjG7i9kowemYgEU5g6GYvTNQmYrwZ4uIysBHbw2KcTB6FgA5jiuBsecdmP9OvP3RkFC4=
+	t=1706215826; cv=none; b=Aon/z6tesydInpERsViuPVb75zjZF/XnUjPh7zXIMb8ux+YSDL6EReEXN16bdPTZauRIYPf4cgoYLX+31d//KcD1bUTtVdOOTNv26PhSc8dBdCiUrg3fJDONrt5PSicJcxevO+LUiUTsfIy8E6JALlThFrqttfv2KrLnnC8/T3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706215008; c=relaxed/simple;
-	bh=fJKjvCw/7Q+cwzG4Za/p5eDjYfUOppyiMQFxQwc+SIA=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=uRAtsUZk025VW4SuxYAAzEAbKqY8wHY0DYzuQXQEw825ETU+iiTgi7D4lKU8/G15aFZ1sFqEZCxSp79Au/PIoDhQERJWkIU2U3yNMtz6PU09VX+lY5q73gLhwAZMkFdIWTgubRq/bAPi90bxkhNE1hQy76ghN/e6mvBlPeUfyaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=TV0sS55a; arc=none smtp.client-ip=192.30.252.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1706215826; c=relaxed/simple;
+	bh=inRM3ksETguj58F4fI6R0tgJA1R8Q24ZVyDe5285uaA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=gskbvR3leB0M36d4xb6l8NGylOEValY4tVWn8ZbMEaUS4+aUtwt+CihMrtg2d+s525Xfp18zrFfyzgRgkcxYLhi+/navGW4Uou7s6yVZOxqeNBtHYY6LV5YZEbxj1g/iYr1Q3iCPoQvoyFX4kRqM0dK6yRia7R7SnspB9xipwVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AzBA8s2k; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="TV0sS55a"
-Received: from github.com (hubbernetes-node-50bb8f4.ac4-iad.github.net [10.52.138.36])
-	by smtp.github.com (Postfix) with ESMTPA id C32776410F2
-	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 12:36:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1706215005;
-	bh=XY/zle35mwwkzRfzWhiP0cuB7y+PuY7xf23mjj2Jjco=;
-	h=Date:From:To:Subject:From;
-	b=TV0sS55arAHNQqdtpivIHK3mseUWeTD08wNOD1m3SWa6Cn+SLisXZ3NL6Cv9X3FD1
-	 cxxx/BuM1uWhON6VTkA6uByYjDtP7/OkZPZRUk3r9/nl0vBtpcALGHafHgbfa7nBRC
-	 cMbBKp4eXUEvVvjuZ1/JZoENE9mtXGvqbI3mMj9w=
-Date: Thu, 25 Jan 2024 12:36:45 -0800
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/1cd6c8-d39719@github.com>
-Subject: [bluez/bluez] d39719: bap: Fix crash when attempting to set device as
- co...
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AzBA8s2k"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D508FC433C7;
+	Thu, 25 Jan 2024 20:50:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706215825;
+	bh=inRM3ksETguj58F4fI6R0tgJA1R8Q24ZVyDe5285uaA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=AzBA8s2kWCIxw5PaTGMmzFmELtLPJlWrij/TyWAzN7mxB4w4OoeEku9boYI0HgI8d
+	 KgtJLvszSCvRwvFrQEiO7X0JRaqo3FiEUlgCHUEZi9+iFOXfG1hNWvBc//WQnpk7KT
+	 NCouvPR9K3wVBv89hNhPwS+aYzzee3Dp+Te6+VlwaFhAGAkxcoSe/tAnq0k4vfvWhJ
+	 Yhm+ntFDpXa45zV/n3SEE12fDGDV0Znw3f1APq0TC7Tu/nBPCRZv0R7K2gWoKEXu0G
+	 CKvRgF+qXQ/UsjSMl5s2+na5mMdA45nocCS1QQBmdbxdzwFpsaydRa4iNHK/uMfzSJ
+	 vCzE8imStpH6Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B70BDDFF765;
+	Thu, 25 Jan 2024 20:50:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v1] Bluetooth: hci_event: Fix handling of
+ HCI_EV_IO_CAPA_REQUEST
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <170621582574.16174.15450598739287006126.git-patchwork-notify@kernel.org>
+Date: Thu, 25 Jan 2024 20:50:25 +0000
+References: <20240122161521.2650805-1-luiz.dentz@gmail.com>
+In-Reply-To: <20240122161521.2650805-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: d3971990d9268afd3628996876c756bf15849c56
-      https://github.com/bluez/bluez/commit/d3971990d9268afd3628996876c756bf15849c56
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-01-25 (Thu, 25 Jan 2024)
+Hello:
 
-  Changed paths:
-    M profiles/audio/bap.c
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  bap: Fix crash when attempting to set device as connectable
+On Mon, 22 Jan 2024 11:15:21 -0500 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> If we received HCI_EV_IO_CAPA_REQUEST while
+> HCI_OP_READ_REMOTE_EXT_FEATURES is yet to be responded assume the remote
+> does support SSP since otherwise this event shouldn't be generated.
+> 
+> Link: https://lore.kernel.org/linux-bluetooth/CABBYNZ+9UdG1cMZVmdtN3U2aS16AKMCyTARZZyFX7xTEDWcMOw@mail.gmail.com/T/#t
+> Fixes: c7f59461f5a7 ("Bluetooth: Fix a refcnt underflow problem for hci_conn")
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> [...]
 
-Broadcast source endpoints don't have a device object.
+Here is the summary with links:
+  - [v1] Bluetooth: hci_event: Fix handling of HCI_EV_IO_CAPA_REQUEST
+    https://git.kernel.org/bluetooth/bluetooth-next/c/c931eafc5a82
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
