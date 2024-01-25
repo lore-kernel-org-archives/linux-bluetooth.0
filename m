@@ -1,148 +1,126 @@
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20D607CF08
-	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 14:59:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3EFF63417
+	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 15:55:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706194786; cv=none; b=s2rdZ63R8cadLklJcfj4YEcorUWioPWvCdQZaAm8AYhAzc/hI5m9QOEazp+WkTGKJ4WzmwMBioC0xfXhab3Z49oS9DHBuazXOhE3UBbSmSuOLKmsYVetiCmc6/nCw2nyzP/SqlX+a7LhW0bnXcs6ID+s4dUjBTfyIWb/VSHiIYc=
+	t=1706198123; cv=none; b=AUc1mGlI3ehQQXAnWKhUIE8sr0K6BXSywYjUaVc1UM19Bhq3nO1NYf9jFf6Mb8IPEOjbWJt07futhT7OVds8e+uKGZrSDIc7PaqfMvI6pwfbKWRm874SA3YN+9Wj8XbsxSykOInYWHm3a79iTQvRg99nJqFZAqxk19AQJ2f9xJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706194786; c=relaxed/simple;
-	bh=fQMsFbffobH7sY0ujWHwa3BRDcHYqDJHFGh9j0+9Vzo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sZCf8GM9lCKGdb018YnR2wSvWDeKO616zlfM7GVSXjWakai6HliaB02sDimdQG6ZdkobSnqhF6Hx38a4GLZ3awKE4OWarjPoaQpzd4tgC0ivp2Apju6Gfni623AJDXAmi1fSBGxK/Iugz7KW8BP0s9CFUObWsodv0cssTlDgS/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WUHYKMWe; arc=none smtp.client-ip=209.85.208.172
+	s=arc-20240116; t=1706198123; c=relaxed/simple;
+	bh=FrfMxYNhy9U+2smg5dwYOl2w+QLWiXDfMt0YwUVwV1Q=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Xcz2HreC5XtzQrpYMTGXp5w7884S0ACfPHRLLRPxPsCgE8apeMi6unZvywFtOpdiBDXeyB5kR3sKuxTGv9TbvB7jKVxA4MbfQmRj53ee5dzgeor61fcQ/DOwCZNPfKtFBPuTmayMGOrj8kZBqzA/4wS4EgVp1j/M33d2BSdIai8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IhvMUbyl; arc=none smtp.client-ip=209.85.216.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WUHYKMWe"
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2cdeb954640so84446461fa.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 06:59:44 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IhvMUbyl"
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2903498ae21so3978888a91.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 07:55:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706194783; x=1706799583; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=okA/VMwmkUEdsJA0QdoRfqToMESDFSQVgY6ovwH0aSQ=;
-        b=WUHYKMWe07r+hARtsx0KM7GsekP/yAjowJkWh9fISyhKeOeYB+0DjcQEHV9jwNZLCq
-         reu6hAqgTQIpZebJ2Mt9ysQEvhpugZ4su8SdcQoK8jCFYjyDPcFV9p+l3oxfo5OBXWsy
-         s6DpgEQrBph+9aATD6BvNJK4TJ1JqTgKe1AvpRLS4cew4pu3cZZhL9950cvTiYZ08s95
-         hnmzKP7PAghvujWEDhYJ5ub0+A92o4OCSWQydJhv4hoC/muaWAFy0CeUpN+jMJF+JoNx
-         c/3ONJ7iKc2QRAjQpXz2JK5rpqsTxZ9B5q+I0tU8XVY3IhbBjFJrkA3LP2BMvcrt97HN
-         oBwQ==
+        d=gmail.com; s=20230601; t=1706198121; x=1706802921; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=XwAdTtDm+YtcavjznpFDZhPx6U2BX9iYJHhyxzWxAw4=;
+        b=IhvMUbylULXnwGSWc8n+xGQuGKegIo+VFlJDipfp6qhW4B2qxZCpXQO6Xdy4GipdnJ
+         2qgi8QPaUE8UBpmiwEFWkLl+2gQedYctktBV8MZvubQMagDi88t+OL8lXSQRuhKXdxO5
+         U1l7fhLfN9H7VM7n+khfLKo1KOIGNeRB0sUQnZwaFnTxTWcH5bqvkj/Hv4TKlAKMysKj
+         b0zFtIU2kL5g7ynBDjsb5gs2AXbNnNwNPNJsWcqF3oGzcWfSpn3NQGRdmHND20zICz4m
+         TVx0R8JpoajBSorwGT+34KxmpClNMHmNrfrYFZpA1M4YPcBJIP7qJGYWgH7bSlk12jYb
+         oThw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706194783; x=1706799583;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=okA/VMwmkUEdsJA0QdoRfqToMESDFSQVgY6ovwH0aSQ=;
-        b=ZQR9q7x+5OOprPdjfE3j1Qa9rlJ6iLhU6lTrxziNj0Mj6solgEVuIxM1kPV2MmzrRw
-         XI5BCu8OnT31a3yIQ5YDYswG+7u3k/H1UYpoaqeEEZiTS5OF6J7+yD0i1+rGqew2a94l
-         3iJNDnNmee63Iw0dDbs4RgyKw3T73OBrKmbR2Toepkprae5Y4JPl4HhkNI41H98WHmUs
-         lowBSV8Yi4Vlfl2G7tdwg7Tl8oKzUeekda0OvNM3wNr4zBA4UCH87mifVd1y4gFlGW8F
-         EXVfynYpLlW8kzGLf6r9eAALpHhUb6jvhF7QC9r36KQcFdVuV/ODz3HiQIb9dhiEtpA5
-         435A==
-X-Gm-Message-State: AOJu0YxPWoJkonk8MN9MJPtCwzcrt2Hif1bxTmGhHfqn/v81snAADOtw
-	/1fQ4c3VYTEIXGjO+CIGG8bWsmujweLnixScap1KUTC6FHtqArhIPat/Hf4nf28vt1Id9XVosFY
-	708HBZf1NzQm+Wxm6NSM55wpBMAHxWIwtmJ8=
-X-Google-Smtp-Source: AGHT+IGMIOW1hyarfOOLjiuKxWO2uxezkL9/1VwU5QZ8I5ovRRWy6VXX6HEfBS6QO/znk4u5PIiR1zyRX/CBd5o0Q4g=
-X-Received: by 2002:a2e:9442:0:b0:2cc:eb95:684d with SMTP id
- o2-20020a2e9442000000b002cceb95684dmr662833ljh.76.1706194782755; Thu, 25 Jan
- 2024 06:59:42 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706198121; x=1706802921;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XwAdTtDm+YtcavjznpFDZhPx6U2BX9iYJHhyxzWxAw4=;
+        b=rV912SHtNccb3bqtRrmVjY51bbllo/MGeRgXhmlcHHqjiumfgPLP6R9XY1sglgXOg0
+         b+9iN3Lpb0sXfF8HoOZiIyuX5jz/7MDgcc7CLyc23E6oBN8Wrs4di7qTELSOV4wt/SXl
+         DnVPw0jz/DcL8lj+FmpYKG5rRx+4ylB39MjMIAR5dOGtMePJ4go9LuZnBBEJVlANaKm1
+         tE33EHH/rOvu0eiVIQ08GIRGa+3IV5P0+bTYMkaRIMfph2M3srnSmT7gCNy/CnJQ8Izh
+         BcBu75iH0j01nZj+Pf0Zr1ve9rlM28CO0q7p2i5OHlLed7A4JipaBaGsQdx8zLx+HeZW
+         ZQpA==
+X-Gm-Message-State: AOJu0YwCGifGpmgA6zjWfxHCrP89/Ji+TtaXryR3qW21GbKpkV06x6yq
+	OSXTq7WBorDH787oCXU6hdj7a5NruL2VtC5D18+pAAkyHwda7SmWlDAgrCvF
+X-Google-Smtp-Source: AGHT+IHzA2A6LsK5Wkr/qY8ZdWjOWwxNGI3+ZRYD6hH6V6y0+nDAIU8IlES632GwTOSt6OOGmQZzeg==
+X-Received: by 2002:a17:90a:1c90:b0:290:85a:dba1 with SMTP id t16-20020a17090a1c9000b00290085adba1mr721546pjt.5.1706198121080;
+        Thu, 25 Jan 2024 07:55:21 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUU/2TxOiOQGhntphoL8CCy5ZvhYyF4JSBo8HBexv/Lr3nrPpOszktDftoNILAHsC0JH4rPckofbuCZ9hQ727ItTDczYA==
+Received: from [172.17.0.2] ([52.238.28.65])
+        by smtp.gmail.com with ESMTPSA id d22-20020a17090ad99600b0028df5c748e4sm1700710pjv.44.2024.01.25.07.55.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Jan 2024 07:55:20 -0800 (PST)
+Message-ID: <65b28468.170a0220.15fed.66cd@mx.google.com>
+Date: Thu, 25 Jan 2024 07:55:20 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3694183762375746415=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240124-disto-patches-v1-0-97e0eb5625a3@gmail.com>
- <20240124-disto-patches-v1-1-97e0eb5625a3@gmail.com> <CABBYNZLibBw-_SJ4wpzF-r5cDPSds99kShO9C3v2FVNJ2Um9vg@mail.gmail.com>
- <CACvgo51BHdhdzhPifJjuz66Dc2vJ1QEvCrkxQwQnC8dNWC8nZA@mail.gmail.com>
-In-Reply-To: <CACvgo51BHdhdzhPifJjuz66Dc2vJ1QEvCrkxQwQnC8dNWC8nZA@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 25 Jan 2024 09:59:30 -0500
-Message-ID: <CABBYNZKmRsr=i4zQcqw8ofs-yrb488FVm8pu5XcpZerudcBGag@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/9] Enable alternate Bluetooth connection modes
-To: Emil Velikov <emil.l.velikov@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, Vicki Pfau <vi@endrift.com>, 
-	Rachel Blackman <rachel.blackman@synapse.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1,1/3] btdev: Fix not clearing le_pa_sync_handle on reset
+In-Reply-To: <20240125142936.3373953-1-luiz.dentz@gmail.com>
+References: <20240125142936.3373953-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Emil,
+--===============3694183762375746415==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jan 25, 2024 at 8:39=E2=80=AFAM Emil Velikov <emil.l.velikov@gmail.=
-com> wrote:
->
-> Hi Luiz,
->
-> On Thu, 25 Jan 2024 at 03:54, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Emil,
-> >
->
-> >
-> > I'm sort of surprised by this, we do only use the PHYs listed as
-> > supported by the controller, so is there a bug or is this really a way
-> > to disable PHYs that the controllers report as supported but in
-> > reality don't really work properly? In case of the latter I think we
-> > would be better off having a quirk added in the kernel so it can be
-> > marked to the controllers we know misbehaves rather than limiting all
-> > controllers to 1M PHY by default.
-> >
->
-> Using pristine bluez, bluetoothctl/mgmt/phy lists (omitting the slot phys=
-):
->
-> Supported phys:     LE1MTX LE1MRX LE2MTX LE2MRX LECODEDTX LECODEDRX
-> Configurable phys:                LE2MTX LE2MRX LECODEDTX LECODEDRX
-> Selected phys:      LE1MTX LE1MRX
->
-> With this patch + the LE/SupportedPHY config set to "LE1MTX LE1MRX
-> LE2MTX LE2MRX LECODEDTX LECODEDRX", as per the original patch we get.
-> Note: I've intentionally dropped the override for submission, happy to
-> bring it back if you prefer.
->
-> Supported phys:     LE1MTX LE1MRX LE2MTX LE2MRX LECODEDTX LECODEDRX
-> Configurable phys:                LE2MTX LE2MRX LECODEDTX LECODEDRX
-> Selected phys:      LE1MTX LE1MRX LE2MTX LE2MRX LECODEDTX LECODEDRX
->
-> Note: I've intentionally dropped the override for upstreaming, happy
-> to bring it back if you prefer.
->
-> So from what I can tell, the controller reports that all (as far as
-> we're concerned) PHYs are supported. Yet the selected and configurable
-> PHYs are mutually exclusive, which doesn't quite compute here.
-> Mind you, my bluetooth knowledge is a bit limited - I'm just going by the=
- code.
->
-> What would you say is the best way to move forward with this? It
-> doesn't seem like a kernel quirk is needed IMHO.
-> Generally, if you feel that a different name and/or semantics for the
-> toggle would help, I'm all ears.
+This is automated email and please do not reply to this email!
 
-Hmm, are you sure you are not missing something like:
+Dear submitter,
 
-commit 288c90224eec55d13e786844b7954ef060752089
-Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Date:   Mon Dec 19 13:37:02 2022 -0800
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=819897
 
-    Bluetooth: Enable all supported LE PHY by default
+---Test result---
 
-    This enables 2M and Coded PHY by default if they are marked as supporte=
-d
-    in the LE features bits.
+Test Summary:
+CheckPatch                    PASS      0.93 seconds
+GitLint                       PASS      0.67 seconds
+BuildEll                      PASS      24.08 seconds
+BluezMake                     PASS      724.48 seconds
+MakeCheck                     PASS      11.50 seconds
+MakeDistcheck                 PASS      160.61 seconds
+CheckValgrind                 PASS      226.22 seconds
+CheckSmatch                   WARNING   334.66 seconds
+bluezmakeextell               PASS      112.05 seconds
+IncrementalBuild              PASS      2072.65 seconds
+ScanBuild                     WARNING   943.15 seconds
 
-    Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-Later one we had to introduce HCI_QUIRK_BROKEN_LE_CODED because of it,
-but so far that was the only drawback.
-
-> Thanks in advance,
-> Emil
+Details
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+emulator/btdev.c:420:29: warning: Variable length array is used.
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+emulator/btdev.c:1084:10: warning: Although the value stored to 'conn' is used in the enclosing expression, the value is never actually read from 'conn'
+        while ((conn = queue_find(dev->conns, match_handle,
+                ^      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+emulator/btdev.c:1335:24: warning: Access to field 'link' results in a dereference of a null pointer (loaded from variable 'conn')
+        pending_conn_del(dev, conn->link->dev);
+                              ^~~~~~~~~~
+emulator/btdev.c:1457:13: warning: Access to field 'dev' results in a dereference of a null pointer (loaded from variable 'conn')
+        send_event(conn->dev, BT_HCI_EVT_AUTH_COMPLETE, &ev, sizeof(ev));
+                   ^~~~~~~~~
+3 warnings generated.
 
 
 
---=20
-Luiz Augusto von Dentz
+---
+Regards,
+Linux Bluetooth
+
+
+--===============3694183762375746415==--
