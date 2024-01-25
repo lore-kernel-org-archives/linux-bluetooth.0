@@ -1,115 +1,86 @@
-Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A5A51353F5
-	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 19:08:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F1DC1339B5
+	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 19:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706209700; cv=none; b=Nl6/ewGSaitJEibbNVFBGf9z5YP24oiOumWA83QymURbEY8GF7dYco0GrquzswAiq2R8T0PYWkdXDGa64vod2lvBYqth7fURBopeKp49sDy7Z5hw1L2/zUdrWaA0ZEfeDjmPks98XhhK+tcIgjz+ngyvL5u08j0nBvd8wWZ30q8=
+	t=1706209828; cv=none; b=MZWHBogTK6tX769tz6rQbCmm6E2lRFDeDyGHsOpG+0Cxg6G13pqfDhfessDwLcInHLprrYD/7dh2rctJjWZ2MxHZTJNSPvl17M9QcR29LDsJRx/vxNmRaS7e2MiwxU5xwGcfhb5uLUbQGpz/MznEfIDJykq1xDL2p/hsj+2hyd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706209700; c=relaxed/simple;
-	bh=TR9FeCKfGpogbwWXGekAInfxeqoCMmoY+xr575x32gE=;
-	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eXNoIoT8QECO0B4kz9bhI0R5pMefwrdTc7o8TVGlkbU6jgRpWr2SIHOek3o04rnEKlWPpvH20xSpvQCSGPuOr9/F0ixh1P3sCZTBPpXYk7nXZBQnr4Nbf0qtskSwMXMdzNOG/IkaQC2g6vaev+IlpLcwbtXVRF53CYNYU0KUA/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=myg7jpfg; arc=none smtp.client-ip=46.235.227.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1706209828; c=relaxed/simple;
+	bh=ZOuS1GaI5meOk7plDU5/px3AUrt2MhtXvWQQw7lroqc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=CX3rWyxN5JK1eesD/5aaisUG/ezr3DDMdkKZDAH2+kmWEeNyGPCKfc03GUPbHsQINDIROa2ZP33XoIssZD2+7HfzX0mZI5EfJQ/uL8syA0UUgaSMg7wqPJYHwGTVTEZe66KdHXq80koLPPeBA5dUboTFfrQJUiw9i/Yc+cIde2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gqi/ji7s; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="myg7jpfg"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1706209695;
-	bh=TR9FeCKfGpogbwWXGekAInfxeqoCMmoY+xr575x32gE=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=myg7jpfgsSeC8eWD9hb/H5AC73/jdYAAhaDkGGpnAJDTXnA/t4Nowad49kK4cX12f
-	 dTYq3rgBFkfL7bPOR0y89rG57lzFLkLp+PEmKqrQcV/Qh/DlT4H+zzI5u2HvVyoCny
-	 KIjdRWHS9IOy+FJSyhAMw96vgd4YpY7Koo8dFvMe1KP6sPuhCj8Ypx9/c6fSYeAjU9
-	 b8+C7Ix+Ve3q5VseO7de7eCQjBJQsV+F+1HnyCI2R4CJoGhsWNjbsC/5yM/iQ5ncC6
-	 AyDKJeog8Ld7A6dmenrqVIIAKBk0zbft8yR61BMLyQSD+rFcTlLUtYVZ6LOZMc2R2Z
-	 r/sNxbN002ItA==
-Received: from fdanis-XPS-13-9370.. (cola.collaboradmins.com [195.201.22.229])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by madrid.collaboradmins.com (Postfix) with ESMTPSA id ABC003782053
-	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 19:08:15 +0000 (UTC)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 5/5] btgatt-client: Add function to search all primary services
-Date: Thu, 25 Jan 2024 20:08:05 +0100
-Message-Id: <20240125190805.1244787-6-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240125190805.1244787-1-frederic.danis@collabora.com>
-References: <20240125190805.1244787-1-frederic.danis@collabora.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gqi/ji7s"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EB4BCC433F1;
+	Thu, 25 Jan 2024 19:10:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706209828;
+	bh=ZOuS1GaI5meOk7plDU5/px3AUrt2MhtXvWQQw7lroqc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=gqi/ji7so/Z4Ne/v4CguIYb/Ln7hDp7bB0zdcsc9ze5lJvimIGkrs/fe91LTYewhR
+	 6NZjJnsA63zwbfcIorcEqRLEUspd1bAAuXsb/iUYee22K/ImM92uv0l9KeGm/jAhxX
+	 rCyXYQspMkqjSRubcqxRwzHZqcUyA1opv1nVFtCwo0h/1Bza/0GKGc4zCenjIIlMW2
+	 8IJpZNf6421pPlbRtcQqtfnq5h5T9SqmDwu9V9EaCe2O5plvSfci7kQt+YdWbaLjOb
+	 V5V5rbqaES9awLSChHI4qV0TjpvjO3n7UssnqsJRYAEWmJ5iCyEB3tyd3yPQ2lcTZT
+	 NNqEg7PYh1klg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D5C94D8C961;
+	Thu, 25 Jan 2024 19:10:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v2 0/6] Autotools papercuts, linker GC, symlink
+ dbus-org.bluez.obex.service
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <170620982787.23941.6481888174452761774.git-patchwork-notify@kernel.org>
+Date: Thu, 25 Jan 2024 19:10:27 +0000
+References: <20240124-autofoo-v2-0-a210f20aa2f7@gmail.com>
+In-Reply-To: <20240124-autofoo-v2-0-a210f20aa2f7@gmail.com>
+To: Emil Velikov via B4 Relay <devnull+emil.l.velikov.gmail.com@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org, emil.velikov@collabora.com
 
-This is requested to pass PTS GATT/CL/GAD/BV-01-C test.
----
- tools/btgatt-client.c | 30 +++++++++++++++++++++++-------
- 1 file changed, 23 insertions(+), 7 deletions(-)
+Hello:
 
-diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-index 04fd3ce0f..b47914da3 100644
---- a/tools/btgatt-client.c
-+++ b/tools/btgatt-client.c
-@@ -1354,13 +1354,6 @@ static void cmd_set_sign_key(struct client *cli, char *cmd_str)
- 		set_sign_key_usage();
- }
- 
--static void search_service_usage(void)
--{
--	printf("Usage: search-service <uuid>\n"
--		"e.g.:\n"
--		"\tsearch-service 1800\n");
--}
--
- static void search_service_cb(bool success, uint8_t att_ecode,
- 					struct bt_gatt_result *result,
- 					void *user_data)
-@@ -1392,6 +1385,27 @@ static void search_service_cb(bool success, uint8_t att_ecode,
- 	PRLOG("\n");
- }
- 
-+static void cmd_search_all_primary_services(struct client *cli, char *cmd_str)
-+{
-+	if (!bt_gatt_client_is_ready(cli->gatt)) {
-+		printf("GATT client not initialized\n");
-+		return;
-+	}
-+
-+	bt_gatt_discover_all_primary_services(bt_gatt_client_get_att(cli->gatt),
-+						NULL,
-+						search_service_cb,
-+						NULL,
-+						NULL);
-+}
-+
-+static void search_service_usage(void)
-+{
-+	printf("Usage: search-service <uuid>\n"
-+		"e.g.:\n"
-+		"\tsearch-service 1800\n");
-+}
-+
- static void cmd_search_service(struct client *cli, char *cmd_str)
- {
- 	char *argv[2];
-@@ -1536,6 +1550,8 @@ static struct {
- 			"\tSet retry on security error by elevating security"},
- 	{ "set-sign-key", cmd_set_sign_key,
- 				"\tSet signing key for signed write command"},
-+	{ "search-all-primary-services", cmd_search_all_primary_services,
-+				"\tSearch all primary services"},
- 	{ "search-service", cmd_search_service,
- 				"\tSearch service"},
- 	{ "search-characteristics", cmd_search_characteristics,
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Wed, 24 Jan 2024 16:20:05 +0000 you wrote:
+> Hello everyone,
+> 
+> Here is v2 of the autotoo papercuts.
+> 
+> Changes in this revision:
+>  - dropped already merged patches - thanks o/
+>  - drop "build: remove dummy {conf,state}{dir,_DATA}" patch
+> 
+> [...]
+
+Here is the summary with links:
+  - [BlueZ,v2,1/6] build: remove unused variable builtin_nodist
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=215e6c7083da
+  - [BlueZ,v2,2/6] build: remove .service files from DEPENDENCIES lists
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=14c7f21292b1
+  - [BlueZ,v2,3/6] build: remove explicit DEPENDENCIES handling
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=808d008aace3
+  - [BlueZ,v2,4/6] build: manage .service.in files via configure.ac
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=116524c01de4
+  - [BlueZ,v2,5/6] build: enable gc/dead code removal
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=10d6d908b5fe
+  - [BlueZ,v2,6/6] build: install dbus-org.bluez.obex.service symlink
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=1cd6c874c271
+
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
