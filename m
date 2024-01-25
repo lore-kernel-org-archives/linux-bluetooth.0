@@ -1,190 +1,148 @@
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61B9667A17
-	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 14:31:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20D607CF08
+	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 14:59:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706193069; cv=none; b=TXkD5mdlyFE8pMbFoIywNAJIEcSdu17WYnBkbZN6n7Sqy0o0PX/5lar0XXG4B6SYEFQozT/rMleMcSlpkM1HnpkLLYUUubKoJIrYxhgKFdvAFdJ5pd4HVxUvQsV57tMdIKIlZ30lpV2xGHXDGJIImLCDMoF7uyG5mwRZpgH/lFA=
+	t=1706194786; cv=none; b=s2rdZ63R8cadLklJcfj4YEcorUWioPWvCdQZaAm8AYhAzc/hI5m9QOEazp+WkTGKJ4WzmwMBioC0xfXhab3Z49oS9DHBuazXOhE3UBbSmSuOLKmsYVetiCmc6/nCw2nyzP/SqlX+a7LhW0bnXcs6ID+s4dUjBTfyIWb/VSHiIYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706193069; c=relaxed/simple;
-	bh=6G3wLYmPlT9gPDy1pV7AGAtrUy/t2qA82IE4QoskQWY=;
+	s=arc-20240116; t=1706194786; c=relaxed/simple;
+	bh=fQMsFbffobH7sY0ujWHwa3BRDcHYqDJHFGh9j0+9Vzo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=D4WeM8yVgCHmaN+2cFvMptx4VaJMz/I0Kvl7YeN6b7Qllmuu4ftWdmePkMrUrHXmJrfKfc8c7jLCDT00QJ6PRdoYjurZMFg7ydbDOEn1lCdH6ZNQCIWky6D0GVUKRnStqOSXoqUD9wz/VYkLypm03n/cDV5VQ9TsQrRd9cwfO0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UzVSrAk3; arc=none smtp.client-ip=209.85.221.48
+	 To:Cc:Content-Type; b=sZCf8GM9lCKGdb018YnR2wSvWDeKO616zlfM7GVSXjWakai6HliaB02sDimdQG6ZdkobSnqhF6Hx38a4GLZ3awKE4OWarjPoaQpzd4tgC0ivp2Apju6Gfni623AJDXAmi1fSBGxK/Iugz7KW8BP0s9CFUObWsodv0cssTlDgS/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WUHYKMWe; arc=none smtp.client-ip=209.85.208.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UzVSrAk3"
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-33926ccbc80so4361812f8f.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 06:31:07 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WUHYKMWe"
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2cdeb954640so84446461fa.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 06:59:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706193065; x=1706797865; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706194783; x=1706799583; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=sFPaXhTHCFOuwEindCMvIJ/B6iM55ZV6WYswliZCmCE=;
-        b=UzVSrAk3DfEJMxMYFSXuQNkHmavE9t7tpO1XZPxRUdu2rVvmjsC30cY3YXKziIp0Oy
-         Owy20YsH3naF8qf2AOVfm7F6WHE4TT6tQGEAWDL1dSnKZ4IrjgkFydmqg+CVwfScqmFt
-         /yKiulhgag2gSEIt9wg1qttc7M7Sg3BiN+TtlraSWi6O2+XPgww7c6rDB47TezbHaDgl
-         FdRzUYa/DGnZj2s1ZB4XMFdg+zEXjIcWGogRZkfnKBDG1DCKn66STJXkakzYrvbXwxL3
-         iOcc3LBLzj3QcU1/FU4SL9Duqn72L189qtA+qazzW63etmBl5op/QSBdjwM1jLt6/xRk
-         pEWw==
+        bh=okA/VMwmkUEdsJA0QdoRfqToMESDFSQVgY6ovwH0aSQ=;
+        b=WUHYKMWe07r+hARtsx0KM7GsekP/yAjowJkWh9fISyhKeOeYB+0DjcQEHV9jwNZLCq
+         reu6hAqgTQIpZebJ2Mt9ysQEvhpugZ4su8SdcQoK8jCFYjyDPcFV9p+l3oxfo5OBXWsy
+         s6DpgEQrBph+9aATD6BvNJK4TJ1JqTgKe1AvpRLS4cew4pu3cZZhL9950cvTiYZ08s95
+         hnmzKP7PAghvujWEDhYJ5ub0+A92o4OCSWQydJhv4hoC/muaWAFy0CeUpN+jMJF+JoNx
+         c/3ONJ7iKc2QRAjQpXz2JK5rpqsTxZ9B5q+I0tU8XVY3IhbBjFJrkA3LP2BMvcrt97HN
+         oBwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706193065; x=1706797865;
+        d=1e100.net; s=20230601; t=1706194783; x=1706799583;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=sFPaXhTHCFOuwEindCMvIJ/B6iM55ZV6WYswliZCmCE=;
-        b=GpBgeKVl5rfEtR0/KbW56CTxcEOrAs6U78nHmD1zFGp7fHl2QTmDxUPWp9uPFYXTbn
-         KPWV4lUAB6/U4znwCwFToCK+VTle/W4/XMkbSjBMYl5LPrluY2rnzlUGZ4XFiYDR1YAH
-         gISAsRUX9LeWQC6g5+NGjObEaZeX70tvTcdHIIpc4/3AXCP2PD6GSLT45mZ/AdMnVogF
-         ZCP2q8Gitr0J2+Iu/pxxIvfuQu9c5FiRfz+gKSsk2zgsxbPD33UGbAQu4dAFlVsPcveS
-         msgRTBvHi8wAy2nLgGGG3haq3XH16G0lEUYPKrPnrMD3jbYmLsYgr9b9c7ETASHPtLxq
-         H5jg==
-X-Gm-Message-State: AOJu0YzFw/3OcPrj9Nu7F62k4r0toqx3hdvC7390YyQMy8ZK97Iiyw3n
-	pvfT1vEECn0g4D45qZYeY+yPJAfdWDzNLE7ct6Vh/OHs1W8tpK0apKAKKYnyGydMUWXnUcJ6VTT
-	qI2TyGqqyrUlfYoX1NeGWizeAIow=
-X-Google-Smtp-Source: AGHT+IHpQ4UcdYWWQvwutnO/x4ylvYw9WAGoijyH6c4rFNLWG6Z4GhsuvUBQKfFkoHHHtIzbDOLpZDT3UFylKmrdxk8=
-X-Received: by 2002:a5d:624b:0:b0:337:c595:88f5 with SMTP id
- m11-20020a5d624b000000b00337c59588f5mr1015090wrv.16.1706193065455; Thu, 25
- Jan 2024 06:31:05 -0800 (PST)
+        bh=okA/VMwmkUEdsJA0QdoRfqToMESDFSQVgY6ovwH0aSQ=;
+        b=ZQR9q7x+5OOprPdjfE3j1Qa9rlJ6iLhU6lTrxziNj0Mj6solgEVuIxM1kPV2MmzrRw
+         XI5BCu8OnT31a3yIQ5YDYswG+7u3k/H1UYpoaqeEEZiTS5OF6J7+yD0i1+rGqew2a94l
+         3iJNDnNmee63Iw0dDbs4RgyKw3T73OBrKmbR2Toepkprae5Y4JPl4HhkNI41H98WHmUs
+         lowBSV8Yi4Vlfl2G7tdwg7Tl8oKzUeekda0OvNM3wNr4zBA4UCH87mifVd1y4gFlGW8F
+         EXVfynYpLlW8kzGLf6r9eAALpHhUb6jvhF7QC9r36KQcFdVuV/ODz3HiQIb9dhiEtpA5
+         435A==
+X-Gm-Message-State: AOJu0YxPWoJkonk8MN9MJPtCwzcrt2Hif1bxTmGhHfqn/v81snAADOtw
+	/1fQ4c3VYTEIXGjO+CIGG8bWsmujweLnixScap1KUTC6FHtqArhIPat/Hf4nf28vt1Id9XVosFY
+	708HBZf1NzQm+Wxm6NSM55wpBMAHxWIwtmJ8=
+X-Google-Smtp-Source: AGHT+IGMIOW1hyarfOOLjiuKxWO2uxezkL9/1VwU5QZ8I5ovRRWy6VXX6HEfBS6QO/znk4u5PIiR1zyRX/CBd5o0Q4g=
+X-Received: by 2002:a2e:9442:0:b0:2cc:eb95:684d with SMTP id
+ o2-20020a2e9442000000b002cceb95684dmr662833ljh.76.1706194782755; Thu, 25 Jan
+ 2024 06:59:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAO1O6sdTVEH-qHxWEPX3E2ia1yQ_HNTfZFEQck4144hO0iX5AA@mail.gmail.com>
- <CABBYNZJucRWbun3hJAcjA0EZOFVWn1vPZXvfgb-4SsC8r_pO8Q@mail.gmail.com>
-In-Reply-To: <CABBYNZJucRWbun3hJAcjA0EZOFVWn1vPZXvfgb-4SsC8r_pO8Q@mail.gmail.com>
-From: Emil Lenngren <emil.lenngren@gmail.com>
-Date: Thu, 25 Jan 2024 15:30:53 +0100
-Message-ID: <CAO1O6sdyiVZrVhhD+pAnjbtdYoGyTqTjaVnO0qBJLjxk21NxDQ@mail.gmail.com>
-Subject: Re: Wrong order of ACL Data and HCI Event packets for HCI over USB
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>
+References: <20240124-disto-patches-v1-0-97e0eb5625a3@gmail.com>
+ <20240124-disto-patches-v1-1-97e0eb5625a3@gmail.com> <CABBYNZLibBw-_SJ4wpzF-r5cDPSds99kShO9C3v2FVNJ2Um9vg@mail.gmail.com>
+ <CACvgo51BHdhdzhPifJjuz66Dc2vJ1QEvCrkxQwQnC8dNWC8nZA@mail.gmail.com>
+In-Reply-To: <CACvgo51BHdhdzhPifJjuz66Dc2vJ1QEvCrkxQwQnC8dNWC8nZA@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 25 Jan 2024 09:59:30 -0500
+Message-ID: <CABBYNZKmRsr=i4zQcqw8ofs-yrb488FVm8pu5XcpZerudcBGag@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/9] Enable alternate Bluetooth connection modes
+To: Emil Velikov <emil.l.velikov@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, Vicki Pfau <vi@endrift.com>, 
+	Rachel Blackman <rachel.blackman@synapse.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Luiz and thanks for the quick answer!
+Hi Emil,
 
-In the meantime I modified the remote device's code to add a short
-delay after connection establishment that also seems to work around
-the issue.
-
-Do you have any idea if this design flaw will be fixed in the
-specification? Seems like a pretty bad one to me...
-
-/Emil
-
-Den tors 25 jan. 2024 kl 15:25 skrev Luiz Augusto von Dentz
-<luiz.dentz@gmail.com>:
+On Thu, Jan 25, 2024 at 8:39=E2=80=AFAM Emil Velikov <emil.l.velikov@gmail.=
+com> wrote:
 >
-> Hi Emil,
+> Hi Luiz,
 >
-> On Thu, Jan 25, 2024 at 8:51=E2=80=AFAM Emil Lenngren <emil.lenngren@gmai=
-l.com> wrote:
+> On Thu, 25 Jan 2024 at 03:54, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
 > >
-> > Hi. I have a quite annoying issue on my Ubuntu 22.04 computer with an
-> > Intel Bluetooth controller (8087:0033, Intel Wi-Fi 6E (6GHz) AX211 2x2
-> > Bluetooth 5.2 Wireless Card).
-> > Very often BLE connections to a particular device behaves incorrectly
-> > (ATT timeout by remote device) because the initial ATT Exchange MTU
-> > Request arrives to the host (BlueZ) just before the LE Enhanced
-> > Connection Complete event arrives, and is therefore dropped. I guess
-> > this is due to separate endpoints and therefore separate flows are
-> > used in the HCI USB protocol, but have no idea how/if this can be
-> > fixed?
+> > Hi Emil,
 > >
-> > See btmon log:
+>
 > >
-> > < HCI Command: LE Set Extended Advertising En.. (0x08|0x0039) plen 6
-> > #11 [hci0] 8.102056
-> >        Extended advertising: Enabled (0x01)
-> >        Number of sets: 1 (0x01)
-> >        Entry 0
-> >          Handle: 0x01
-> >          Duration: 0 ms (0x00)
-> >          Max ext adv events: 0
-> > > HCI Event: Command Complete (0x0e) plen 4                           #=
-12 [hci0] 8.104041
-> >      LE Set Extended Advertising Enable (0x08|0x0039) ncmd 2
-> >        Status: Success (0x00)
-> > @ MGMT Event: Command Complete (0x0001) plen 4
-> > {0x0001} [hci0] 8.104053
-> >      Add Extended Advertising Data (0x0055) plen 1
-> >        Status: Success (0x00)
-> >        Instance: 1
-> > > ACL Data RX: Handle 3585 flags 0x02 dlen 7                         #1=
-3 [hci0] 21.049023
-> >      ATT: Exchange MTU Request (0x02) len 2
-> >        Client RX MTU: 247
-> > > HCI Event: LE Meta Event (0x3e) plen 31                            #1=
-4 [hci0] 21.049304
-> >      LE Enhanced Connection Complete (0x0a)
-> >        Status: Success (0x00)
-> >        Handle: 3585
-> >        Role: Peripheral (0x01)
-> >        Peer address type: Public (0x00)
-> >        Peer address: (removed)
-> >        Local resolvable private address: 00:00:00:00:00:00 (Non-Resolva=
-ble)
-> >        Peer resolvable private address: 00:00:00:00:00:00 (Non-Resolvab=
-le)
-> >        Connection interval: 25.00 msec (0x0014)
-> >        Connection latency: 0 (0x0000)
-> >        Supervision timeout: 700 msec (0x0046)
-> >        Central clock accuracy: 0x00
-> > @ MGMT Event: Device Connected (0x000b) plen 13
-> > {0x0001} [hci0] 21.049366
-> >        LE Address: (removed)
-> >        Flags: 0x00000000
-> >        Data length: 0
-> > < HCI Command: LE Read Remote Used Features (0x08|0x0016) plen 2
-> > #15 [hci0] 21.049405
-> >        Handle: 3585
-> > > HCI Event: LE Meta Event (0x3e) plen 4                             #1=
-6 [hci0] 21.050229
-> >      LE Channel Selection Algorithm (0x14)
-> >        Handle: 3585
-> >        Algorithm: #2 (0x01)
-> > > HCI Event: LE Meta Event (0x3e) plen 6                             #1=
-7 [hci0] 21.051290
-> >      LE Advertising Set Terminated (0x12)
-> >        Status: Success (0x00)
-> >        Handle: 1
-> >        Connection handle: 3585
-> >        Number of completed extended advertising events: 0
-> > > HCI Event: LE Meta Event (0x3e) plen 11                            #1=
-8 [hci0] 21.052293
-> >      LE Data Length Change (0x07)
-> >        Handle: 3585
-> >        Max TX octets: 251
-> >        Max TX time: 2120
-> >        Max RX octets: 251
-> >        Max RX time: 2120
-> > > HCI Event: Command Status (0x0f) plen 4                            #1=
-9 [hci0] 21.053228
-> >      LE Read Remote Used Features (0x08|0x0016) ncmd 1
-> >        Status: Success (0x00)
+> > I'm sort of surprised by this, we do only use the PHYs listed as
+> > supported by the controller, so is there a bug or is this really a way
+> > to disable PHYs that the controllers report as supported but in
+> > reality don't really work properly? In case of the latter I think we
+> > would be better off having a quirk added in the kernel so it can be
+> > marked to the controllers we know misbehaves rather than limiting all
+> > controllers to 1M PHY by default.
+> >
 >
-> This is a design flaw in the Bluetooth Core Specification, it defines
-> different USB endpoints for data and events but since they don't come
-> with any timestamp from the controller the host has no idea about
-> their order. That said we do provide a workaround that can be enabled
-> with the use of the following config option:
+> Using pristine bluez, bluetoothctl/mgmt/phy lists (omitting the slot phys=
+):
 >
-> config BT_HCIBTUSB_POLL_SYNC
->     bool "Enable USB poll_sync for Bluetooth USB devices by default"
->     depends on BT_HCIBTUSB
->     default y
->     help
->       poll_sync synchronizes the USB data and event endpoints by
->       prioritizing the later.
+> Supported phys:     LE1MTX LE1MRX LE2MTX LE2MRX LECODEDTX LECODEDRX
+> Configurable phys:                LE2MTX LE2MRX LECODEDTX LECODEDRX
+> Selected phys:      LE1MTX LE1MRX
 >
->       Say Y here to enable USB poll_sync for Bluetooth USB devices by
->       default.
+> With this patch + the LE/SupportedPHY config set to "LE1MTX LE1MRX
+> LE2MTX LE2MRX LECODEDTX LECODEDRX", as per the original patch we get.
+> Note: I've intentionally dropped the override for submission, happy to
+> bring it back if you prefer.
 >
-> --
-> Luiz Augusto von Dentz
+> Supported phys:     LE1MTX LE1MRX LE2MTX LE2MRX LECODEDTX LECODEDRX
+> Configurable phys:                LE2MTX LE2MRX LECODEDTX LECODEDRX
+> Selected phys:      LE1MTX LE1MRX LE2MTX LE2MRX LECODEDTX LECODEDRX
+>
+> Note: I've intentionally dropped the override for upstreaming, happy
+> to bring it back if you prefer.
+>
+> So from what I can tell, the controller reports that all (as far as
+> we're concerned) PHYs are supported. Yet the selected and configurable
+> PHYs are mutually exclusive, which doesn't quite compute here.
+> Mind you, my bluetooth knowledge is a bit limited - I'm just going by the=
+ code.
+>
+> What would you say is the best way to move forward with this? It
+> doesn't seem like a kernel quirk is needed IMHO.
+> Generally, if you feel that a different name and/or semantics for the
+> toggle would help, I'm all ears.
+
+Hmm, are you sure you are not missing something like:
+
+commit 288c90224eec55d13e786844b7954ef060752089
+Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date:   Mon Dec 19 13:37:02 2022 -0800
+
+    Bluetooth: Enable all supported LE PHY by default
+
+    This enables 2M and Coded PHY by default if they are marked as supporte=
+d
+    in the LE features bits.
+
+    Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+
+Later one we had to introduce HCI_QUIRK_BROKEN_LE_CODED because of it,
+but so far that was the only drawback.
+
+> Thanks in advance,
+> Emil
+
+
+
+--=20
+Luiz Augusto von Dentz
