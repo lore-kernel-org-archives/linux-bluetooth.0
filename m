@@ -1,126 +1,99 @@
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3EFF63417
-	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 15:55:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A237212FF82
+	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 16:32:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706198123; cv=none; b=AUc1mGlI3ehQQXAnWKhUIE8sr0K6BXSywYjUaVc1UM19Bhq3nO1NYf9jFf6Mb8IPEOjbWJt07futhT7OVds8e+uKGZrSDIc7PaqfMvI6pwfbKWRm874SA3YN+9Wj8XbsxSykOInYWHm3a79iTQvRg99nJqFZAqxk19AQJ2f9xJ4=
+	t=1706200336; cv=none; b=JEl+ynrf9w1tbH5iEk1aYXuuojW2/CasSpWjXUMzWvI4YywypMjlIfT2XL+9G66dEmFZj55X3/iPNETZ/YVNsxFtRzOmdS2Bxv+y6UdJ52vx/H7FxVJWGKw+bF8HsoWfyLVuX1Qngk1dlu4xhDqiXeIEBGdlmuxH3YIh+LKDfao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706198123; c=relaxed/simple;
-	bh=FrfMxYNhy9U+2smg5dwYOl2w+QLWiXDfMt0YwUVwV1Q=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Xcz2HreC5XtzQrpYMTGXp5w7884S0ACfPHRLLRPxPsCgE8apeMi6unZvywFtOpdiBDXeyB5kR3sKuxTGv9TbvB7jKVxA4MbfQmRj53ee5dzgeor61fcQ/DOwCZNPfKtFBPuTmayMGOrj8kZBqzA/4wS4EgVp1j/M33d2BSdIai8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IhvMUbyl; arc=none smtp.client-ip=209.85.216.46
+	s=arc-20240116; t=1706200336; c=relaxed/simple;
+	bh=vi17eGlYGK5gxBXDaGOakSoGN5OSnwCEMnpIRleq39E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Wo4t4gWefrTQVPa4PhCimwEo7jjmaCs2OyFmJfxN1rUgABbM/X1lZSWs2QU2udirJbCyW9rH6fwRq9cV8leuf3q0pfTG+DQbLLha88uuuivvu467i5ino4LN98tFXONm9hmP48G2UB7OY4se7timyJc7aYVvsy3eKTpLCoZBBFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OPRqLsj6; arc=none smtp.client-ip=209.85.219.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IhvMUbyl"
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2903498ae21so3978888a91.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 07:55:21 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OPRqLsj6"
+Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-dc2308fe275so5963570276.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 08:32:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706198121; x=1706802921; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=XwAdTtDm+YtcavjznpFDZhPx6U2BX9iYJHhyxzWxAw4=;
-        b=IhvMUbylULXnwGSWc8n+xGQuGKegIo+VFlJDipfp6qhW4B2qxZCpXQO6Xdy4GipdnJ
-         2qgi8QPaUE8UBpmiwEFWkLl+2gQedYctktBV8MZvubQMagDi88t+OL8lXSQRuhKXdxO5
-         U1l7fhLfN9H7VM7n+khfLKo1KOIGNeRB0sUQnZwaFnTxTWcH5bqvkj/Hv4TKlAKMysKj
-         b0zFtIU2kL5g7ynBDjsb5gs2AXbNnNwNPNJsWcqF3oGzcWfSpn3NQGRdmHND20zICz4m
-         TVx0R8JpoajBSorwGT+34KxmpClNMHmNrfrYFZpA1M4YPcBJIP7qJGYWgH7bSlk12jYb
-         oThw==
+        d=gmail.com; s=20230601; t=1706200333; x=1706805133; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=fkxbe4mj6NsVXRxk9k5LnWCXRoB7FiLVu/033WSZin8=;
+        b=OPRqLsj6mY93x1rIwPAaJRCohu7tMPppQRoU6ajeCyzJ99NXwHheBYxD73zRrgjR6o
+         pJx2SQDjWUIsuaGfMGeMHm1shnSeg+wWUQX2scvp/1HEhDswV/ncZrRuRmutNqMifOAw
+         hHxrzX6unC2UDL2Q/Mun32HYCJXsPzU2uFAZU8EEZKJZG/aVnKinDV0HgUQaUQtjXQnY
+         EWWuidP4e2Dvsg1Ju/txda9mTpQZyB/6t/Si19zC0PchWEg2scQyhjp6znqbzmbFlxbp
+         VR/qy9Jy7XulaOeV92hR2RYeC3Ib9CQRQI8aXn+XkVGcClkwpsNr1JAcb4p3c4bJ+mkP
+         FiLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706198121; x=1706802921;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1706200333; x=1706805133;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=XwAdTtDm+YtcavjznpFDZhPx6U2BX9iYJHhyxzWxAw4=;
-        b=rV912SHtNccb3bqtRrmVjY51bbllo/MGeRgXhmlcHHqjiumfgPLP6R9XY1sglgXOg0
-         b+9iN3Lpb0sXfF8HoOZiIyuX5jz/7MDgcc7CLyc23E6oBN8Wrs4di7qTELSOV4wt/SXl
-         DnVPw0jz/DcL8lj+FmpYKG5rRx+4ylB39MjMIAR5dOGtMePJ4go9LuZnBBEJVlANaKm1
-         tE33EHH/rOvu0eiVIQ08GIRGa+3IV5P0+bTYMkaRIMfph2M3srnSmT7gCNy/CnJQ8Izh
-         BcBu75iH0j01nZj+Pf0Zr1ve9rlM28CO0q7p2i5OHlLed7A4JipaBaGsQdx8zLx+HeZW
-         ZQpA==
-X-Gm-Message-State: AOJu0YwCGifGpmgA6zjWfxHCrP89/Ji+TtaXryR3qW21GbKpkV06x6yq
-	OSXTq7WBorDH787oCXU6hdj7a5NruL2VtC5D18+pAAkyHwda7SmWlDAgrCvF
-X-Google-Smtp-Source: AGHT+IHzA2A6LsK5Wkr/qY8ZdWjOWwxNGI3+ZRYD6hH6V6y0+nDAIU8IlES632GwTOSt6OOGmQZzeg==
-X-Received: by 2002:a17:90a:1c90:b0:290:85a:dba1 with SMTP id t16-20020a17090a1c9000b00290085adba1mr721546pjt.5.1706198121080;
-        Thu, 25 Jan 2024 07:55:21 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCUU/2TxOiOQGhntphoL8CCy5ZvhYyF4JSBo8HBexv/Lr3nrPpOszktDftoNILAHsC0JH4rPckofbuCZ9hQ727ItTDczYA==
-Received: from [172.17.0.2] ([52.238.28.65])
-        by smtp.gmail.com with ESMTPSA id d22-20020a17090ad99600b0028df5c748e4sm1700710pjv.44.2024.01.25.07.55.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jan 2024 07:55:20 -0800 (PST)
-Message-ID: <65b28468.170a0220.15fed.66cd@mx.google.com>
-Date: Thu, 25 Jan 2024 07:55:20 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============3694183762375746415=="
+        bh=fkxbe4mj6NsVXRxk9k5LnWCXRoB7FiLVu/033WSZin8=;
+        b=E8NOIZLOF2CTjN8e+9zaNPmU8iT6Bbm9OIXzW4y+K+GW/HTME1dpkiVI8VkSZFsIGb
+         Wce2pxNaszVoVkzbgZduHYbbv3BWEnaJF6egWKDRmgVgUWFcKtWiSMwYbJuuzJHn/nP9
+         UOqJra7EyM0bmsPfdG4bhgK7OzlbKQAC8vf/mIoGENnB/0rZki0aJzyUPP22hCaGLhZf
+         Uh9u0LGwb+MGoKmIoBo4uwRMh4yL8ou2y543VyKoXU+LcpdujmcGhw4vPN9HVGNgIfhN
+         JxCPwhcMhWx81O4pq3oO7+08VwyYFVxNwyVjy+l5Ma6TVKrxBHIAR7QhiTJf1ISsG4Jo
+         jJwA==
+X-Gm-Message-State: AOJu0Yz/7hfgHUfg0pLZfhhuCtmPT5MLzgKGuTLIUBj9au/irdKyt+qV
+	p16i2eMxjLe9yo2CD9sjXsNR/Pm0Tdk5xBp/TubbNoQ8gzWU8Skv3xPvKvY4d4oAD2IKf9WV7TB
+	AEun9xf3791r1qsG0snuawyoFMfg=
+X-Google-Smtp-Source: AGHT+IGX3kvQ2gtvK/hRHLSLW0TEf6hywUYUkJK/JGRIsg89eVUu4H+ufHf4lrZdZ9sEwuoUlmt4RGQSyTDLGvXab/M=
+X-Received: by 2002:a25:bcd2:0:b0:dbd:5a5e:b1cb with SMTP id
+ l18-20020a25bcd2000000b00dbd5a5eb1cbmr47709ybm.89.1706200333616; Thu, 25 Jan
+ 2024 08:32:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1,1/3] btdev: Fix not clearing le_pa_sync_handle on reset
-In-Reply-To: <20240125142936.3373953-1-luiz.dentz@gmail.com>
-References: <20240125142936.3373953-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20240124-disto-patches-v1-0-97e0eb5625a3@gmail.com>
+ <20240124-disto-patches-v1-1-97e0eb5625a3@gmail.com> <CABBYNZLibBw-_SJ4wpzF-r5cDPSds99kShO9C3v2FVNJ2Um9vg@mail.gmail.com>
+ <CACvgo51BHdhdzhPifJjuz66Dc2vJ1QEvCrkxQwQnC8dNWC8nZA@mail.gmail.com> <CABBYNZKmRsr=i4zQcqw8ofs-yrb488FVm8pu5XcpZerudcBGag@mail.gmail.com>
+In-Reply-To: <CABBYNZKmRsr=i4zQcqw8ofs-yrb488FVm8pu5XcpZerudcBGag@mail.gmail.com>
+From: Emil Velikov <emil.l.velikov@gmail.com>
+Date: Thu, 25 Jan 2024 16:32:02 +0000
+Message-ID: <CACvgo5120w03bgn8ZYeVPVcXh-mU1KWSJYJSTPN-6PfDb2zJzg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/9] Enable alternate Bluetooth connection modes
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, Vicki Pfau <vi@endrift.com>, 
+	Rachel Blackman <rachel.blackman@synapse.com>
+Content-Type: text/plain; charset="UTF-8"
 
---===============3694183762375746415==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Luiz,
 
-This is automated email and please do not reply to this email!
+On Thu, 25 Jan 2024 at 14:59, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
 
-Dear submitter,
+[snip]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=819897
+> Hmm, are you sure you are not missing something like:
+>
+> commit 288c90224eec55d13e786844b7954ef060752089
+> Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> Date:   Mon Dec 19 13:37:02 2022 -0800
+>
+>     Bluetooth: Enable all supported LE PHY by default
+>
+>     This enables 2M and Coded PHY by default if they are marked as supported
+>     in the LE features bits.
+>
+>     Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> Later one we had to introduce HCI_QUIRK_BROKEN_LE_CODED because of it,
+> but so far that was the only drawback.
+>
 
----Test result---
+Hell yeah, that commit should fix our problem. Fwiw we were on the 6.1
+stable tree where the above landed in 6.4. Glancing around it was not
+picked for any(?) stable branches, which is why we're missing it.
 
-Test Summary:
-CheckPatch                    PASS      0.93 seconds
-GitLint                       PASS      0.67 seconds
-BuildEll                      PASS      24.08 seconds
-BluezMake                     PASS      724.48 seconds
-MakeCheck                     PASS      11.50 seconds
-MakeDistcheck                 PASS      160.61 seconds
-CheckValgrind                 PASS      226.22 seconds
-CheckSmatch                   WARNING   334.66 seconds
-bluezmakeextell               PASS      112.05 seconds
-IncrementalBuild              PASS      2072.65 seconds
-ScanBuild                     WARNING   943.15 seconds
-
-Details
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-emulator/btdev.c:420:29: warning: Variable length array is used.
-##############################
-Test: ScanBuild - WARNING
-Desc: Run Scan Build
-Output:
-emulator/btdev.c:1084:10: warning: Although the value stored to 'conn' is used in the enclosing expression, the value is never actually read from 'conn'
-        while ((conn = queue_find(dev->conns, match_handle,
-                ^      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-emulator/btdev.c:1335:24: warning: Access to field 'link' results in a dereference of a null pointer (loaded from variable 'conn')
-        pending_conn_del(dev, conn->link->dev);
-                              ^~~~~~~~~~
-emulator/btdev.c:1457:13: warning: Access to field 'dev' results in a dereference of a null pointer (loaded from variable 'conn')
-        send_event(conn->dev, BT_HCI_EVT_AUTH_COMPLETE, &ev, sizeof(ev));
-                   ^~~~~~~~~
-3 warnings generated.
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============3694183762375746415==--
+Thanks a million,
+Emil
