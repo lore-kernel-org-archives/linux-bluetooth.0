@@ -1,38 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D443D7FB
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE64F399
 	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 00:07:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706141249; cv=none; b=hggfsj0ry/WjBkBvoODEteVp+QQwYvK0kUSVbSky7MSVl22wEAChx7O2XRRuI4MTEzJgeQ3RhhaXY/yytjsFxCR0g8IxteJHAEgPWdTUq+YDPDuGb9DkTEOG0fWwVpq3BfRJyo6NCgN8STR7hOxOGe4NdD+xJfmUbwGygTg8KWY=
+	t=1706141249; cv=none; b=UHPDcsgyFWk8Ic1aLX/7JrpL9OfPGpCwSHZI7KEVMKP31IxMEcY329oyZG4xCco9VeIuDtPY3lxe5/DGlDC9K/HuyH/bVbuyY9kOHOKf3NA1LwNAJdRiT3MOwUtCl6NwpQdBngdF8QD+9qwPtax/gXA+oIYKvU8hUjoZKfMX+Dg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1706141249; c=relaxed/simple;
-	bh=mb3vibSeCho7dxgk/hsygvpcHcp9zzLKyD4RpuB1Dx8=;
+	bh=G9genvZ+XzEEPgL5CU4jnpFYI5JsJj4sQ/6exI14zAQ=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=WbpxzUyxsw+LFrNidmoTI8frNAvdoCRhDKYthnvFtcDJYnhZCScs/VwDC6Rup41wY0GcQZyjMhC2l5qLzm0ddt2cDHZMFh+Edu2eEWxBf+gyu2ZI88vlSUBQ+EtHPvZ9VAh/C7NOhJg1IHsSIrhjC3XmDBqg73ZOJZ7RS1Q6pvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rJFb358M; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=oxZUItQDIOw7E+QEF/ojyqGPdP8LYwjyGKfRwZOfNUwXOLs3tvPwrXYLSFyN5Zu33/W2i/vG72anS2B7YJLHhUifxF/ITAgRCQalTGsJ2saSQwHekcUw5DYilOIKmflIVn9Z2sSa6tGSJpQqcpgeCjwCAoouQdbBtfZ99kV7oCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=io/b2CsC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rJFb358M"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8F90BC433B2;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="io/b2CsC"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 819D7C43330;
 	Thu, 25 Jan 2024 00:07:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1706141249;
-	bh=mb3vibSeCho7dxgk/hsygvpcHcp9zzLKyD4RpuB1Dx8=;
+	bh=G9genvZ+XzEEPgL5CU4jnpFYI5JsJj4sQ/6exI14zAQ=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=rJFb358MzAw5LZ67Gm+tYneIvcCoDvCRCRy/QdV+iJTsfe0YaUQLvZa7YloIuEQXL
-	 V3CJcfhNWZTbDcMwfQIZRAhnpIO0Qjv9hLyqFuL7ZECdwQowoBWoKAPH9DlygdBqz/
-	 suxCr5wp9PVkpTx1UAVPtL9akZUUFhK5gAt5VDwpNTbWJ/3Aa5p6/IIcjDIvBVlxaH
-	 gqKKRo111rGm4iBmQEcWuLiQCzXsi4olReWBzRz7KcpK9UpGijsKRg6X4sHifbJokA
-	 thXEyLGuf881VhoW234eP3smjdcSZ1Ymz8atAkqBm6p1jprXVdDYQ7Nj5Q1EOtLJom
-	 n5V0UCjPEBzsQ==
+	b=io/b2CsC/KZ8uTVFakQaMkU/Dwj/JMPeFaHsYX5ootxTkqqhfM0p/jQ0W6kBC132D
+	 HM7AGSdnYTnaxh/eoHtqoJrzrgEq/x9QuE9uxEkhAcuYpgsu7uVGzfJEdSrfyp9o4x
+	 ekyhfWPSw42IU2YI62h2OvQq/9ouV20sk0S07U9Txbu2/DlgAA/tpPS9jN6xMxDEFI
+	 TmqjPCdcO1/LrUBN767CGjZR7PQhgt7efcPOorNXcoAtY4KVBW/Z6XuQ0hf3zjXYrc
+	 SwpVAQvvX5Ye/MjwjbAP3QJLYrYCSbDe03ULkbdaE4rs2QJX8UkMHb05kUQy5ju4sz
+	 UrketYFwc/m5Q==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 808A1C47E49;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71AFEC47422;
 	Thu, 25 Jan 2024 00:07:29 +0000 (UTC)
 From: Emil Velikov via B4 Relay <devnull+emil.l.velikov.gmail.com@kernel.org>
-Date: Thu, 25 Jan 2024 00:07:33 +0000
-Subject: [PATCH BlueZ v3 8/8] android: export only (android) entrypoint
- from the modules
+Date: Thu, 25 Jan 2024 00:07:32 +0000
+Subject: [PATCH BlueZ v3 7/8] bluetoothd: change plugin loading alike obexd
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -41,17 +40,17 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240125-rm-ext-plugins-v3-8-d141f7870bb6@gmail.com>
+Message-Id: <20240125-rm-ext-plugins-v3-7-d141f7870bb6@gmail.com>
 References: <20240125-rm-ext-plugins-v3-0-d141f7870bb6@gmail.com>
 In-Reply-To: <20240125-rm-ext-plugins-v3-0-d141f7870bb6@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Emil Velikov <emil.velikov@collabora.com>
 X-Mailer: b4 0.12.4
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1706141247; l=3016;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1706141247; l=3470;
  i=emil.l.velikov@gmail.com; s=20230301; h=from:subject:message-id;
- bh=A9wt+5pbCxd+p0NIbARFNH3H5ujiQXTs0z8giNMkb3Y=;
- b=/aEvjGs3MbYixjLOan9wWHGqwyPZWWCZK59mBHKklNkQ5PYGLAlkoCB4NKv7P+fayVcjuXLYp
- PAWOS9I/kbvBH54JomfS9UfDqU1y7LBVAgRtWiLL4eDfiWL/x3R/AXH
+ bh=6yElFux7++NnGhXn3yTR7PlLXi4XViEHuKoqMgyFigw=;
+ b=lXobeEKJxrFM52Kbj5OKm+XlDLerbaNjVpH6BHJ+gVI6v9prO3Dq3yf8MN1lpY74DOfrslXio
+ 9dmelYX4Up5DokHJDjLYU6/lUlWsrR7KgtmfxLmtqeRLBWvN5yx4WFB
 X-Developer-Key: i=emil.l.velikov@gmail.com; a=ed25519;
  pk=qeUTVTNyI3rcR2CfNNWsloTihgzmtbZo98GdxwZKCkY=
 X-Endpoint-Received:
@@ -61,79 +60,133 @@ Reply-To: <emil.l.velikov@gmail.com>
 
 From: Emil Velikov <emil.velikov@collabora.com>
 
-The android specific modules, have a designated HMI entrypoint. Hide
-everything else with -fvisibility=hidden.
----
- android/Makefile.am     | 3 +++
- android/hal-audio.c     | 1 +
- android/hal-bluetooth.c | 1 +
- android/hal-sco.c       | 1 +
- 4 files changed, 6 insertions(+)
+Currently, we print "Loading foobar" for every plugin, before we try the
+respective init() callback. Instead we handle the latter in a bunch, at
+the end of the process.
 
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 309910147..e3756e89c 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -96,6 +96,7 @@ android_bluetooth_default_la_SOURCES = android/hal.h android/hal-bluetooth.c \
- 					android/hal-log.h \
- 					android/hal-ipc.h android/hal-ipc.c \
- 					android/hal-utils.h android/hal-utils.c
-+android_bluetooth_default_la_CFLAGS = $(AM_CFLAGS) -fvisibility=hidden
- android_bluetooth_default_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/android
- android_bluetooth_default_la_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version \
- 					-no-undefined
-@@ -195,6 +196,7 @@ android_audio_a2dp_default_la_SOURCES = android/audio-msg.h \
- 					android/hardware/audio_effect.h \
- 					android/hardware/hardware.h \
- 					android/system/audio.h
-+android_audio_a2dp_default_la_CFLAGS = $(AM_CFLAGS) -fvisibility=hidden
- android_audio_a2dp_default_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/android \
- 					$(SBC_CFLAGS)
- android_audio_a2dp_default_la_LIBADD = $(SBC_LIBS) -lrt
-@@ -212,6 +214,7 @@ android_audio_sco_default_la_SOURCES = android/hal-log.h \
- 					android/audio_utils/resampler.c \
- 					android/audio_utils/resampler.h \
- 					android/system/audio.h
-+android_audio_sco_default_la_CFLAGS = $(AM_CFLAGS) -fvisibility=hidden
- android_audio_sco_default_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/android
- android_audio_sco_default_la_LIBADD = $(SPEEXDSP_LIBS) -lrt
- android_audio_sco_default_la_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version \
-diff --git a/android/hal-audio.c b/android/hal-audio.c
-index d37d6098c..f3d9b40a6 100644
---- a/android/hal-audio.c
-+++ b/android/hal-audio.c
-@@ -1618,6 +1618,7 @@ static struct hw_module_methods_t hal_module_methods = {
- 	.open = audio_open,
+Do the init() call early, print "Loaded" once it's actually successful
+and drop the no-longer "active" tracking.
+---
+ src/plugin.c | 53 +++++++++++++++++++++++++++++------------------------
+ 1 file changed, 29 insertions(+), 24 deletions(-)
+
+diff --git a/src/plugin.c b/src/plugin.c
+index ae9406375..3895792bc 100644
+--- a/src/plugin.c
++++ b/src/plugin.c
+@@ -32,7 +32,6 @@ struct bluetooth_plugin {
+ #if EXTERNAL_PLUGINS
+ 	void *handle;
+ #endif
+-	gboolean active;
+ 	const struct bluetooth_plugin_desc *desc;
  };
  
-+__attribute__ ((visibility("default")))
- struct audio_module HAL_MODULE_INFO_SYM = {
- 	.common = {
- 		.tag = HARDWARE_MODULE_TAG,
-diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index d4442e620..7d1e5ac63 100644
---- a/android/hal-bluetooth.c
-+++ b/android/hal-bluetooth.c
-@@ -1117,6 +1117,7 @@ static struct hw_module_methods_t bluetooth_module_methods = {
- 	.open = open_bluetooth,
- };
+@@ -44,6 +43,22 @@ static int compare_priority(gconstpointer a, gconstpointer b)
+ 	return plugin2->desc->priority - plugin1->desc->priority;
+ }
  
-+__attribute__ ((visibility("default")))
- struct hw_module_t HAL_MODULE_INFO_SYM = {
- 	.tag = HARDWARE_MODULE_TAG,
- 	.version_major = 1,
-diff --git a/android/hal-sco.c b/android/hal-sco.c
-index d7c08a68b..3d66ad357 100644
---- a/android/hal-sco.c
-+++ b/android/hal-sco.c
-@@ -1507,6 +1507,7 @@ static struct hw_module_methods_t hal_module_methods = {
- 	.open = sco_open,
- };
++static int init_plugin(const struct bluetooth_plugin_desc *desc)
++{
++	int err;
++
++	err = desc->init();
++	if (err < 0) {
++		if (err == -ENOSYS || err == -ENOTSUP)
++			warn("System does not support %s plugin",
++						desc->name);
++		else
++			error("Failed to init %s plugin",
++						desc->name);
++	}
++	return err;
++}
++
+ #if EXTERNAL_PLUGINS
+ static gboolean add_external_plugin(void *handle,
+ 				const struct bluetooth_plugin_desc *desc)
+@@ -58,19 +73,22 @@ static gboolean add_external_plugin(void *handle,
+ 		return FALSE;
+ 	}
  
-+__attribute__ ((visibility("default")))
- struct audio_module HAL_MODULE_INFO_SYM = {
- 	.common = {
- 		.tag = HARDWARE_MODULE_TAG,
+-	DBG("Loading %s plugin", desc->name);
+-
+ 	plugin = g_try_new0(struct bluetooth_plugin, 1);
+ 	if (plugin == NULL)
+ 		return FALSE;
+ 
+ 	plugin->handle = handle;
+-	plugin->active = FALSE;
+ 	plugin->desc = desc;
+ 
++	if (init_plugin(desc) < 0) {
++		g_free(plugin);
++		return FALSE;
++	}
++
+ 	__btd_enable_debug(desc->debug_start, desc->debug_stop);
+ 
+ 	plugins = g_slist_insert_sorted(plugins, plugin, compare_priority);
++	DBG("Plugin %s loaded", desc->name);
+ 
+ 	return TRUE;
+ }
+@@ -88,7 +106,13 @@ static void add_plugin(const struct bluetooth_plugin_desc *desc)
+ 
+ 	plugin->desc = desc;
+ 
++	if (init_plugin(desc) < 0) {
++		g_free(plugin);
++		return;
++	}
++
+ 	plugins = g_slist_insert_sorted(plugins, plugin, compare_priority);
++	DBG("Plugin %s loaded", desc->name);
+ }
+ 
+ static gboolean enable_plugin(const char *name, char **cli_enable,
+@@ -181,7 +205,6 @@ static void external_plugin_init(char **cli_disabled, char **cli_enabled)
+ 
+ void plugin_init(const char *enable, const char *disable)
+ {
+-	GSList *list;
+ 	char **cli_disabled = NULL;
+ 	char **cli_enabled = NULL;
+ 	unsigned int i;
+@@ -208,24 +231,6 @@ void plugin_init(const char *enable, const char *disable)
+ 
+ 	external_plugin_init(cli_enabled, cli_disabled);
+ 
+-	for (list = plugins; list; list = list->next) {
+-		struct bluetooth_plugin *plugin = list->data;
+-		int err;
+-
+-		err = plugin->desc->init();
+-		if (err < 0) {
+-			if (err == -ENOSYS || err == -ENOTSUP)
+-				warn("System does not support %s plugin",
+-							plugin->desc->name);
+-			else
+-				error("Failed to init %s plugin",
+-							plugin->desc->name);
+-			continue;
+-		}
+-
+-		plugin->active = TRUE;
+-	}
+-
+ 	g_strfreev(cli_enabled);
+ 	g_strfreev(cli_disabled);
+ }
+@@ -239,7 +244,7 @@ void plugin_cleanup(void)
+ 	for (list = plugins; list; list = list->next) {
+ 		struct bluetooth_plugin *plugin = list->data;
+ 
+-		if (plugin->active == TRUE && plugin->desc->exit)
++		if (plugin->desc->exit)
+ 			plugin->desc->exit();
+ 
+ #if EXTERNAL_PLUGINS
 
 -- 
 2.43.0
