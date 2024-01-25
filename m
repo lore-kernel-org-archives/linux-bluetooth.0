@@ -1,109 +1,95 @@
-Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
+Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D3731CD0A
-	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 09:52:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C2E51CA82
+	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 10:13:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706176382; cv=none; b=QjEgo+tf4Lo+wdVj30bO9dhn8FTxI3vN5Miu9UtJhLndQaovYI/5oMJ+bbrPKdVbC4FvG7mykfRd4pSILNEFZWHqAvdf1NY2ol4T5x5S0HSKG2ppF0SL4LsBOidAX0yFVIC8TtPsSxW7G5KBtAm4sW/AczgHTijLOHDre1W+bws=
+	t=1706177630; cv=none; b=FFXdo9XhnkPGZV//xzgv51INI1PkKDG9FPbz3x2CELgH08iu3aM5eGfUU7gM03mTMai/akCZa/ZptK6SadH0n59KfhKnoXjHsPvnHTQRAJFgUYatOEczkjOm9gK1lUU3fGwLsR48HdDY5eXl/6yYs90PMX4+e8Oqn0TeT7J/LTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706176382; c=relaxed/simple;
-	bh=u25TQi/eCQzC6TkwHDavOWDYLYRf4oNMi+35yG2C16I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Xnv7JrH4SBe/MWmwPUQQ/1bjI1e7tNX50WjuE/n3Th+7B6I2nPHyGY672tGnnqdhUpVK4a1qgKnbQKXs4ZVoHKoI51Iv9MyQMO2VTjmER6z25YBhSTFdIYj46X0xTgpdvEXb3XXPO9LXb/5s9IOfXlHs3IPQ0QPUWoQ7IdPM6fs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=UozhGrAK; arc=none smtp.client-ip=209.85.167.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1706177630; c=relaxed/simple;
+	bh=TNqGeh0kBAqW63IW0wq60AGbg+Xpausg6BD7LytSREo=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=eFGbIz35C0i1/P+rEdXM8Cu0cYlT9Bmn1hyKsbFNrS8x7O0Jyz9XhnQbKpRRGBVeACarn+iHejAbZR1EFL/ScVfSgq5zEdqkGjuJ/o6HcMgEP4HjPB563vHJ0K1eiJpkjRO9qK9LV1ailqo3MDlAWoMrX6TYM4QG32OPmdddEew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E8h1mgHY; arc=none smtp.client-ip=209.85.210.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="UozhGrAK"
-Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-3bbbc6bcc78so5032992b6e.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 01:52:59 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E8h1mgHY"
+Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-6e0a64d94d1so3900788a34.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 02:13:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1706176379; x=1706781179; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vwHQQ3y8mRIC5l7GJR/3O2cr3VUs7tVDE1ZJ0OPgKKc=;
-        b=UozhGrAK9gJVtTbSEPb//zh8wAFymQqVEBy7InQ12SzZc5ARf5Eb7M93dmLIhki/EA
-         JhDC5fXgqPlWipQJ9aUvmj2pKBSj1Hidi9NzJtMbgPsJkciPTrf6s8Jh3alfhr2NDq3D
-         T4tu3plSujc4TxrUEVIqpZsbk81cQGX65wQVk=
+        d=gmail.com; s=20230601; t=1706177628; x=1706782428; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=TNqGeh0kBAqW63IW0wq60AGbg+Xpausg6BD7LytSREo=;
+        b=E8h1mgHYeDWhmgZ05UDWnDCT8tQaV+PkV/PrQQSJFGQ8IjrmRa5mgIT7Mz3yi8YvB0
+         u551r3wrtLsz9nVKQs7Nccrsm5RLlSs2qstQRQXSvNH4JuL/gkM0VdZpCW0aDD16IBp/
+         5bElAa/3R/UMsrJNGZkdM3DXxzBJNgcWcAb+o0CLUyUwTYeAF9Rr3zJxOIaHOSbiTMIt
+         +b/0M96rJhVYKLsa9XwX56Kg5xYlfcDMux84gfTQ3uhXLmDi6sZLX7yUCA+6Be8Hfaeh
+         gq4+NkUI/Ijt5yYKpypS/JFtWxYIsaWHnCooOcvqy2j4iLdTeUVbDJVZ8FgBDIUzSMJA
+         m8Rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706176379; x=1706781179;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vwHQQ3y8mRIC5l7GJR/3O2cr3VUs7tVDE1ZJ0OPgKKc=;
-        b=W1VPZ8KJDQf/YuS0UHtylHET5Ky8NiZW/5efu+7K8K2TY7e8oUWPFFstl3d1IUObbr
-         hW1UyJyqkFybcLceNAHpIBDxNtZbgihe1RWTboeM3GCYW44TbiYCDqRiRhxZZF5uSsIa
-         1381UEJmtmiU5SHQzde9HtbkNmngKF1xfTRT79p0cAZfWamcz5HiWb2BoTGH5j+F4lsp
-         /MBt92hBxfENGgODNE7HzjdT8lfK8D6MXvY9JhEerbZVjgPJuDNFKlpRLK5f+//TC4Ov
-         8lr4Wt0xT5LbL2w6AFl8xCpyZz+sSSGNtbDciPThQcyhCN+67HUaryyD+Dag4Nav8he0
-         3OJQ==
-X-Gm-Message-State: AOJu0Yy9pYcpPJaaHxh8d+/w8Y1LBWq8mAC/fyElCgaeqzXX/2cFgnDK
-	fxx8H2drDCdHTKVxwDAFq5fvMuW/XQWHcThtB0gz7jgbMk9n7IUl/dAgH42amQ==
-X-Google-Smtp-Source: AGHT+IF9ouqrxuN/kDRByMxn/PlL63gtfiQf6zEmcMi2K5+Vu4orKTJyiaEsZI9CeowBst0wk6XIzQ==
-X-Received: by 2002:a05:6808:1911:b0:3bd:c038:b71a with SMTP id bf17-20020a056808191100b003bdc038b71amr770409oib.25.1706176379179;
-        Thu, 25 Jan 2024 01:52:59 -0800 (PST)
-Received: from wenstp920.tpe.corp.google.com ([2401:fa00:1:10:7fb6:ed02:1c59:9f9c])
-        by smtp.gmail.com with ESMTPSA id gu15-20020a056a004e4f00b006dd8a4bbbc7sm3228275pfb.101.2024.01.25.01.52.56
+        d=1e100.net; s=20230601; t=1706177628; x=1706782428;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TNqGeh0kBAqW63IW0wq60AGbg+Xpausg6BD7LytSREo=;
+        b=pThF8OE2T7sVg4R/2MqdQdnTw9k2RKxDVS/OcOtiaxPKbybgKtA4OHS2INdtxrwZo5
+         AWU3bfcC0cb6pRIpcbzBbRF6FaCNDPWVDY5+Z9MedICVJeQmd4mn7H7Opez663/T3U9X
+         N0KWvtSiUATSSSljKQJcQlR9XbTaQxzAiguaHmltpeLJljstU+IaZ8/z6H5E1Ea2T0HB
+         PpwSitarFwfo4GiLk1NOENJ3rBUQwOa6x1SHmSDt/7+IxB5jwG6JLozXKqpKVuwIA4eI
+         h6V/Js9htwRhOBZD3JaGXJA6Vsp1M72ljLbjw6Q34PHDQ5aJ3+ZW4y+6X9wrV/gUjuL8
+         DTiA==
+X-Gm-Message-State: AOJu0YyMbl/RJtDHisJQokLGY28ehevdZgx1NwQJslVLUvEruR/Zc5UH
+	zir/fjJQ1Re6uzZ/MqDXRnTPxiooI7rEbEmVqHCN7tEOluHZvijwYJL9/DJU
+X-Google-Smtp-Source: AGHT+IH5fQ1zfbGlK3qOgVm07g0o+hGT7uORQt+B0/hM983l5K1mSewqgWtxwO7jeHDRmNQMCvWIjg==
+X-Received: by 2002:a05:6358:889:b0:175:67e3:cb28 with SMTP id m9-20020a056358088900b0017567e3cb28mr597935rwj.12.1706177628315;
+        Thu, 25 Jan 2024 02:13:48 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCVZaLOQqrJnDbB0GaZFkjhr1TYm1cRVxSEZRG+PXgjwE52SFt5VmB0YXbWTA3/d+hLAWRok/R2hldim2MA6GuHqvHE=
+Received: from [172.17.0.2] ([13.86.227.253])
+        by smtp.gmail.com with ESMTPSA id f11-20020a056a00238b00b006ddd182bf1csm870960pfc.46.2024.01.25.02.13.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jan 2024 01:52:58 -0800 (PST)
-From: Chen-Yu Tsai <wenst@chromium.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: Chen-Yu Tsai <wenst@chromium.org>,
-	Sean Wang <sean.wang@mediatek.com>,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-mediatek@lists.infradead.org,
-	devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] arm64: dts: mediatek: mt8183-pico6: Fix bluetooth node
-Date: Thu, 25 Jan 2024 17:52:38 +0800
-Message-ID: <20240125095240.2308340-3-wenst@chromium.org>
-X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
-In-Reply-To: <20240125095240.2308340-1-wenst@chromium.org>
-References: <20240125095240.2308340-1-wenst@chromium.org>
+        Thu, 25 Jan 2024 02:13:47 -0800 (PST)
+Message-ID: <65b2345b.050a0220.a9278.18c6@mx.google.com>
+Date: Thu, 25 Jan 2024 02:13:47 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5430442705292337591=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, wenst@chromium.org
+Subject: RE: bluetooth: mt7921s: Add binding and fixup existing dts
+In-Reply-To: <20240125095240.2308340-2-wenst@chromium.org>
+References: <20240125095240.2308340-2-wenst@chromium.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Bluetooth is not a random device connected to the MMC/SD controller. It
-is function 2 of the SDIO device.
+--===============5430442705292337591==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Fix the address of the bluetooth node. Also fix the node name and drop
-the label.
+This is an automated email and please do not reply to this email.
 
-Fixes: 055ef10ccdd4 ("arm64: dts: mt8183: Add jacuzzi pico/pico6 board")
-Signed-off-by: Chen-Yu Tsai <wenst@chromium.org>
+Dear Submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi-pico6.dts: does not exist in index
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi-pico6.dts | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi-pico6.dts b/arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi-pico6.dts
-index a2e74b829320..6a7ae616512d 100644
---- a/arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi-pico6.dts
-+++ b/arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi-pico6.dts
-@@ -82,7 +82,8 @@ pins-clk {
- };
- 
- &mmc1 {
--	bt_reset: bt-reset {
-+	bluetooth@2 {
-+		reg = <2>;
- 		compatible = "mediatek,mt7921s-bluetooth";
- 		pinctrl-names = "default";
- 		pinctrl-0 = <&bt_pins_reset>;
--- 
-2.43.0.429.g432eaa2c6b-goog
 
+--===============5430442705292337591==--
