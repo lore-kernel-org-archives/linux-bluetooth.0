@@ -1,78 +1,114 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 316C61CA83;
-	Thu, 25 Jan 2024 10:58:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80C3F23774
+	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 11:32:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706180296; cv=none; b=GGQXEDJwXZ2HP3GP2pA1wo8btDR5Uh7Lw1SnoWX0lH0izg4g2vC4QXHQ3jta1hM6TL8t0aMv8RcUHC03AqxTeXtRWkRzKl8m4iPBeuB+bUm3s0QwVebFQDA/uko9jffP6azQ10JeWRvxZra/DY6FacSucKWTZKWIEnmf4Y/Tn8s=
+	t=1706182322; cv=none; b=Amy/j79iEoXr/zwRHvXpejvJkDIW/gLZJBPdUdNwi/kXozFQOTFoGDieluR185rTV75YBFR0ljUzZZIJYftw8wojvRbUxzPRZCWAJ3krLjjKCCObF1okXKJlz620YoghU4X0iObM2hlPS/eigoT8Css9MXqTgPasMNDkY+i+7Ig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706180296; c=relaxed/simple;
-	bh=03KT88bs5CPFUzGWiSf0JoK4aabPHEcPRG/J8ct3YMs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=URJ8BD8tTwwK84ZqiegRninQNh8pLfHbGJ9SHKUatIOEpuUeUwxUy7EK6TE97a5BcdRssc+boXAD9CUk1Uk1uv6uob/f4KXucFHkOH6elpCHT96EVDinPIiAw1g0txbQV0nKfIyalH2BsUFg8qBPammJmt6g1ZEhiDVh5e0rtPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=P5diZh7v; arc=none smtp.client-ip=220.197.31.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1706182322; c=relaxed/simple;
+	bh=WAvXLU+mW0Ngr/dM7aCoMRK7MdE97ebYdg/UuxpP0SY=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=LwbT/PmOSHbg0ejcrtVT9TCIu43PTzE6Kz6BWxujnCW7JukGPzxAUsjuXiFp8J1r+RMMtuzdbBb8jLHLc/EdnQwhJHVBZz4DqrEUrs4xpHioGWD3TwoDLm8P6LY3MOR9KK3RFNmAgL05+LU2b9W3QlwIVTePHz1hWe36MjBG/mc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Eh0e5H/C; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="P5diZh7v"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=hyAxN
-	nJEjaEeWu++V1hIX4/hQ1ibrMzym3D/Hwm9ZGQ=; b=P5diZh7vy2qXQbww/HXV/
-	w3rzLHnWp8Y7oK0bEnV5UBzYj95y9gN7BTUa/I26WThTm+uUpD7HhufvfC/hclrt
-	Zkdc+CZAxBHPw9q+d8blwk9mFeceMaXZML5RXQufn3AVUAAaeVdNERTNfH0X4ecD
-	BUoblUi9Ww5flj9XSb6ZLc=
-Received: from WH-D-007635B.QUECTEL.COM (unknown [223.76.229.213])
-	by gzga-smtp-mta-g0-0 (Coremail) with SMTP id _____wD3X06yPrJlPkoiAw--.19557S2;
-	Thu, 25 Jan 2024 18:57:56 +0800 (CST)
-From: clancy_shang@163.com
-To: marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	zhongjun.yu@quectel.com,
-	Clancy Shang <clancy.shang@quectel.com>
-Subject: [PATCH] Bluetooth: mgmt: Fix wrong param be used
-Date: Thu, 25 Jan 2024 18:57:52 +0800
-Message-Id: <20240125105752.3144840-1-clancy_shang@163.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Eh0e5H/C"
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-42a49d42d17so20533131cf.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 03:32:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706182320; x=1706787120; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=U3MN/+80E+rBvJoTWDCsezbWhK6PkzPcBQfL5NC+6BU=;
+        b=Eh0e5H/CAdpjySuyvzR6EalDZV6VAhz3YSEgM8U5MHOrO9MVmCLkFBDSlYOcOd4DG+
+         g0TnG624h/Py+zzjjTZQM+UKRXQI0mYPBoUDFZ+fwc9UOykipxhLNvOe0aTiiTmJnl/K
+         /SfKqakEu1kyC0QsoR3RBjEvvLxIj9T0u/nKcuMks4+tVqs8wg1tD9tHB4qM8zHz6URL
+         +8+WFBOX7D/qL4zGFkhtRKs39T592LayoLAI0730do5EarPpczoIAYt1rLOdSQV5v2+k
+         O8//KFLM/j79S6hc7CUqtxBrnUGDTVjPEigvrXDp/i7s+ujR5LVxEpvVtCnMu5OFfgLa
+         6auw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706182320; x=1706787120;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=U3MN/+80E+rBvJoTWDCsezbWhK6PkzPcBQfL5NC+6BU=;
+        b=q7wnR5MlS54vfdeB/HVPFM32nLJcY8z8EPVxKPo+ko91d6fmkByN9Z12CsELbDBS/z
+         S/pAySCqoJq+1++emfO6MzsZJw+CaBYG6EDlasEaeud0vK/oAzikxcVSgRsLZXc/EP/6
+         AiSMZEOJOT7wlYI0TglIn5BEITixwzoDNeCRwR5R91hQvLs9H/H6GEOtaoSzDuPoN3Xj
+         ocHKJx6WTW1/uuTYfbdYO/VQj/UZ8eVjJQvIlcwd70HvpAI+LUGgSR9tfj/6D/tE8e14
+         EdxSGkdDBgHQBos0XCh3SVobjkJ5v0rM2PWn710Dbr9bVfRc+BCu9DFdfySc3f+GrSbC
+         qkFQ==
+X-Gm-Message-State: AOJu0Ywkmzojodma8CmVkXTrS/H4P9p1lbYWj3DQtSGH4SbNNU2OHP3C
+	Oscb0AozJD5Zw1w8F0oWGhMWaTX0sYjEtWb4B+i1crFnq+spLVLQW/Z4WaFs
+X-Google-Smtp-Source: AGHT+IHHFRJyLhbU7D33OgmFMNSMhzXmOG81YoS+PnUxxlD9BPE2u73B2DASwHFAJ/Hlyqf52VZf6g==
+X-Received: by 2002:ac8:5e47:0:b0:42a:3227:7f73 with SMTP id i7-20020ac85e47000000b0042a32277f73mr875099qtx.33.1706182320212;
+        Thu, 25 Jan 2024 03:32:00 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUvC0NYqEetshglZeBBVUwWOwgqOLlNd8doglJAjYejNftb4viA2ow0w8kP4uczez7xgWoYvjAgXN/9PuxOC06uSCnKJg==
+Received: from [172.17.0.2] ([20.185.156.197])
+        by smtp.gmail.com with ESMTPSA id cf12-20020a05622a400c00b00427f375c329sm5277324qtb.26.2024.01.25.03.31.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Jan 2024 03:32:00 -0800 (PST)
+Message-ID: <65b246b0.050a0220.c1958.6661@mx.google.com>
+Date: Thu, 25 Jan 2024 03:32:00 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5766577973965773494=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3X06yPrJlPkoiAw--.19557S2
-X-Coremail-Antispam: 1Uf129KBjvdXoWrKrW7WF4rWw1UWF1rXFWUArb_yoWDZFXEgF
-	409ay7uF4UXryvyF4Y93WrWr1Sya4a9Fs7Xr9xKrWxAr98Gr1UuFn7AF9xJFn3uanxZrn7
-	Zr4DXF4F9w409jkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU8RpB3UUUUU==
-X-CM-SenderInfo: xfod0ux1bvxtlqj6il2tof0z/xtbBzRRwuGVOBrWrwwAAsh
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, clancy_shang@163.com
+Subject: RE: Bluetooth: mgmt: Fix wrong param be used
+In-Reply-To: <20240125105752.3144840-1-clancy_shang@163.com>
+References: <20240125105752.3144840-1-clancy_shang@163.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Clancy Shang <clancy.shang@quectel.com>
+--===============5766577973965773494==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-if the BlueZ library calls the API interface "adapter_set_device_flags",
-which sends the "MGMT_OP_SET_DEVICE_FLAGS" opcode to the kernel, but
-does not receive the callback message "MGMT_EV_DEVICE_FLAGS_CHANGED"
-from the kernel. it fixs this bug.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Clancy Shang <clancy.shang@quectel.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=819819
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.63 seconds
+GitLint                       PASS      0.33 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      28.33 seconds
+CheckAllWarning               PASS      31.01 seconds
+CheckSparse                   PASS      36.94 seconds
+CheckSmatch                   PASS      101.71 seconds
+BuildKernel32                 PASS      27.53 seconds
+TestRunnerSetup               PASS      447.28 seconds
+TestRunner_l2cap-tester       PASS      23.03 seconds
+TestRunner_iso-tester         PASS      41.21 seconds
+TestRunner_bnep-tester        PASS      6.94 seconds
+TestRunner_mgmt-tester        PASS      155.34 seconds
+TestRunner_rfcomm-tester      PASS      11.01 seconds
+TestRunner_sco-tester         PASS      14.51 seconds
+TestRunner_ioctl-tester       PASS      12.28 seconds
+TestRunner_mesh-tester        PASS      9.04 seconds
+TestRunner_smp-tester         PASS      9.94 seconds
+TestRunner_userchan-tester    PASS      7.37 seconds
+IncrementalBuild              PASS      26.91 seconds
+
+
+
 ---
- net/bluetooth/mgmt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 9dd815b6603f..c74abdf3618f 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -5177,7 +5177,7 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- done:
- 	if (status == MGMT_STATUS_SUCCESS)
--		device_flags_changed(sk, hdev, &cp->addr.bdaddr, cp->addr.type,
-+		device_flags_changed(NULL, hdev, &cp->addr.bdaddr, cp->addr.type,
- 				     supported_flags, current_flags);
- 
- 	return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_SET_DEVICE_FLAGS, status,
--- 
-2.25.1
 
+--===============5766577973965773494==--
