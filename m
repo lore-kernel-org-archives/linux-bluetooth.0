@@ -1,157 +1,105 @@
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4439C134B4
-	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 22:36:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 043628F77;
+	Fri, 26 Jan 2024 03:02:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706222179; cv=none; b=liQLHMKKw/OT5j4GWhI8GFEP8oKhq6GGrfJHYLzxFbbQUWT5uA5zWxzh+cPBytUqI0Ld4WsJ1GNPAn1p4C/vpwhXjJbauqrc9yZDDv/n5TqFGb5azWBl9HwMpCbbTVl3KZK/88bA65Zm6DEHKPY6sp9Gl8LA0C81agv4A7s+Ivw=
+	t=1706238136; cv=none; b=rbTqdNbDboKykWGpK/I9vcgPZyXqMdx28w4uOzL4BmcRjdXrT8+AhQA6wn2AY2hqLa/Y7wz5tzaNoA7SuQZOyWpwTMKO5vlYqqrW94Ypl8b8OXBxc7hn9OYjagleTSKNMbq4k7HOxZ1JFY9C6hibBtfkf5yImmyra+n4Pc1IykE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706222179; c=relaxed/simple;
-	bh=jGspU/RKIYq6fNpFJwTOUvtzdh8FGE5OfPt0Et4rIOw=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Cyeh7ss3mLjvOoToTWIYifxA4RJ7K2wNH3BPusMWv+3ff8+8hy2lN4CmR1/WZODSFbIgLyydh9kg2xV4sM7kgxYqILF/OC9GmzSrCfIAdxq1uTDQSpNOVlL67lkoXfUtR4IS69d574h/puqCQqdyv7okP0pK18QR4GpNXLF0HU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=FfBxwOo+; arc=none smtp.client-ip=192.30.252.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1706238136; c=relaxed/simple;
+	bh=GJ7CkH9DB4f6yRUN3yKrBTO9cZaC2If9JB2hPEvgamI=;
+	h=Date:Content-Type:MIME-Version:From:To:Cc:In-Reply-To:References:
+	 Message-Id:Subject; b=oEZJ+rh1rs2vT0d0W5zJj9SsN5oOuB0C0c8z0mupnhXynfe+UEh2KBdGhfyTBs5l3IK97l1ghHDVEby/sNwnAD7p3P1FmcacvAEivt235cuwDHx+RrwyZ3LzWskEBMIYr71O8SNKrAh/TF3Hh6QmdYAXTLspjWwunRiv9JI5WS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nZzlezDa; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="FfBxwOo+"
-Received: from github.com (hubbernetes-node-331f118.ash1-iad.github.net [10.56.159.32])
-	by smtp.github.com (Postfix) with ESMTPA id 5F388100294
-	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 14:36:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1706222174;
-	bh=NSPnA4XU/uXwoXVvkgm4tbNSnepgt8bMOgsDCC7uaqY=;
-	h=Date:From:To:Subject:From;
-	b=FfBxwOo+sNUPMHYUOY0QHkHJN7j+Y/fYq68o1+cYuJYJRCjc8h5Vgvu97hGfTdK5B
-	 dDFsGg99+1rlWfsqU55VqymUw4mMDqiSzJSl70qUxj7hKfeHBm+ptdwaMa+tq0/QLa
-	 mzaBsB/57dOfC77QUrA/p3HrfY5w4q9miwGqceu4=
-Date: Thu, 25 Jan 2024 14:36:14 -0800
-From: fdanis-oss <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/d39719-0de32f@github.com>
-Subject: [bluez/bluez] 2e2e50: bap: Fix update of context
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nZzlezDa"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18393C433F1;
+	Fri, 26 Jan 2024 03:02:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706238135;
+	bh=GJ7CkH9DB4f6yRUN3yKrBTO9cZaC2If9JB2hPEvgamI=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=nZzlezDaaMQOd65G0n3/0b1XsyY/gxUNwjTF53/nLwWnRaTLL9X01V8bs/FmW8T8s
+	 3iO915tzSuO8FAkhWUfLHfrb13vEX+ILVW7LpvZLAk6HTLe7W5O50H+sBqvjwuUpBH
+	 8EbKqO/Tw3/5/MCZuW1SoxmamgCfCspm5vmkJxusAhMELsQt2UlQ3hZBj6IP1E1Qq0
+	 Wtbxg/d0CxGdzy4ypCiPWHf/pPESyjms6/5kkWaYoWy3lLOx7dOwgv2RFmCsK7G6we
+	 W9A4LMOdXRGwDF4uayDaSl7pW0SvVbpfc7CylnoaxOHGLLtFZYGNhdNdZy+y5tepEm
+	 NGvgSUQqXgJLg==
+Date: Thu, 25 Jan 2024 21:02:13 -0600
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
-
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 2e2e50011d0c6685a7e2f3dc1d777a19fb4b11e6
-      https://github.com/bluez/bluez/commit/2e2e50011d0c6685a7e2f3dc1d777=
-a19fb4b11e6
-  Author: Kiran K <kiran.k@intel.com>
-  Date:   2024-01-25 (Thu, 25 Jan 2024)
-
-  Changed paths:
-    M src/shared/bap.c
-
-  Log Message:
-  -----------
-  bap: Fix update of context
-
-Fix context getting updated with support_context.
+MIME-Version: 1.0
+From: Rob Herring <robh@kernel.org>
+To: Chen-Yu Tsai <wenst@chromium.org>
+Cc: Sean Wang <sean.wang@mediatek.com>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+ devicetree@vger.kernel.org, Matthias Brugger <matthias.bgg@gmail.com>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Marcel Holtmann <marcel@holtmann.org>, netdev@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+ linux-kernel@vger.kernel.org, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+ Rob Herring <robh+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+ linux-bluetooth@vger.kernel.org
+In-Reply-To: <20240125095240.2308340-2-wenst@chromium.org>
+References: <20240125095240.2308340-1-wenst@chromium.org>
+ <20240125095240.2308340-2-wenst@chromium.org>
+Message-Id: <170623813065.6681.12186645553031730572.robh@kernel.org>
+Subject: Re: [PATCH 1/2] dt-bindings: net: bluetooth: Add MediaTek MT7921S
+ SDIO Bluetooth
 
 
-  Commit: 6c15afefcd7187cab0b299fb49f67def2254d9ac
-      https://github.com/bluez/bluez/commit/6c15afefcd7187cab0b299fb49f67=
-def2254d9ac
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2024-01-25 (Thu, 25 Jan 2024)
+On Thu, 25 Jan 2024 17:52:37 +0800, Chen-Yu Tsai wrote:
+> The MediaTek MT7921S is a WiFi/Bluetooth combo chip that works over
+> SDIO. While the Bluetooth function is fully discoverable, the chip
+> has a pin that can reset just the Bluetooth side, as opposed to the
+> full chip. This needs to be described in the device tree.
+> 
+> Add a device tree binding for MT7921S Bluetooth over SDIO specifically
+> ot document the reset line.
+> 
+> Cc: Sean Wang <sean.wang@mediatek.com>
+> Signed-off-by: Chen-Yu Tsai <wenst@chromium.org>
+> ---
+>  .../bluetooth/mediatek,mt7921s-bluetooth.yaml | 49 +++++++++++++++++++
+>  MAINTAINERS                                   |  1 +
+>  2 files changed, 50 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml
+> 
 
-  Changed paths:
-    M src/shared/att.c
-    M src/shared/att.h
-    M src/shared/gatt-client.c
-    M src/shared/gatt-client.h
+My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
+on your patch (DT_CHECKER_FLAGS is new in v5.13):
 
-  Log Message:
-  -----------
-  shared/gatt: Prevent security level change for PTS GATT tests
+yamllint warnings/errors:
 
-Some PTS GATT tests like GATT/CL/GAR/BI-04-C request to be able to get th=
-e
-security error and do not try to change the security level.
+dtschema/dtc warnings/errors:
+Error: Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.example.dts:25.39-40 syntax error
+FATAL ERROR: Unable to parse input tree
+make[2]: *** [scripts/Makefile.lib:419: Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.example.dtb] Error 1
+make[2]: *** Waiting for unfinished jobs....
+make[1]: *** [/builds/robherring/dt-review-ci/linux/Makefile:1428: dt_binding_check] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
 
-This commit adds the ability to prevent to change the security level for
-an operation.
+doc reference errors (make refcheckdocs):
 
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20240125095240.2308340-2-wenst@chromium.org
 
-  Commit: f0cef854f9637bcb16b5cf04c2720c8edc81b200
-      https://github.com/bluez/bluez/commit/f0cef854f9637bcb16b5cf04c2720=
-c8edc81b200
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2024-01-25 (Thu, 25 Jan 2024)
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
 
-  Changed paths:
-    M tools/btgatt-client.c
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
 
-  Log Message:
-  -----------
-  btgatt-client: Add command to prevent security level change
+pip3 install dtschema --upgrade
 
-Some PTS GATT tests like GATT/CL/GAR/BI-04-C request to be able to get th=
-e
-security error and do not try to change the security level.
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
 
-This commit adds the ability to prevent to change the security level.
-
-
-  Commit: 68cd2ae6f5134888b6285d20f3b6232c5bf641f0
-      https://github.com/bluez/bluez/commit/68cd2ae6f5134888b6285d20f3b62=
-32c5bf641f0
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2024-01-25 (Thu, 25 Jan 2024)
-
-  Changed paths:
-    M tools/btgatt-client.c
-
-  Log Message:
-  -----------
-  btgatt-client: Add function to search service based on UUID
-
-This is requested to pass PTS GATT/CL/GAD/BV-02-C test.
-
-
-  Commit: 647adf9260ff554a5b2907ce2c327a9d8b5bd258
-      https://github.com/bluez/bluez/commit/647adf9260ff554a5b2907ce2c327=
-a9d8b5bd258
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2024-01-25 (Thu, 25 Jan 2024)
-
-  Changed paths:
-    M tools/btgatt-client.c
-
-  Log Message:
-  -----------
-  btgatt-client: Add function to search characteristics
-
-This is requested to pass PTS GATT/CL/GAD/BV-05-C test.
-This search characteristics based on UUID, start and end handles.
-
-
-  Commit: 0de32f67f685b95c35a5c2f1206081af89bd88b6
-      https://github.com/bluez/bluez/commit/0de32f67f685b95c35a5c2f120608=
-1af89bd88b6
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2024-01-25 (Thu, 25 Jan 2024)
-
-  Changed paths:
-    M tools/btgatt-client.c
-
-  Log Message:
-  -----------
-  btgatt-client: Add function to search all primary services
-
-This is requested to pass PTS GATT/CL/GAD/BV-01-C test.
-
-
-Compare: https://github.com/bluez/bluez/compare/d3971990d926...0de32f67f6=
-85
