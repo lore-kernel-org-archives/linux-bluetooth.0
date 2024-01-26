@@ -1,324 +1,214 @@
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF8A81DFF9
-	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jan 2024 18:50:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E98412232D
+	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jan 2024 19:01:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706295025; cv=none; b=Yllow2BJvNKik0t4T96knYTxBNVS6nvrEe7HqHFTZ/U45l7xulHebp67MI3JeD7xx7OBXiBFcfcKd0/mTB8M9i5ScNL5/fQbIhqok796u0LhW2RW1ELSn+rQaCx26OxeXEiUtmi04VfG5THRaR1rMjCkgecgnqUWEdXSYs6bwgE=
+	t=1706295711; cv=none; b=eDWbiz4WWJczBmC2SHjd7kN0uTJxh0Y3KjW/Bx9KZN7NcfmWguO6GmVTxcy2BmUU2LBmsEzuqSL54hqnU8Hq4dM+8lBoq37YtjAOXPgdR9fFyfaNdA+uX5Rnu6/d7bSm/aRAD4nki2unWf+UTMoL8RAZxKuiQcUvRBFZPiEhZes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706295025; c=relaxed/simple;
-	bh=Rzeki7Pq8UsUZZ7ZHdtygdqBkyKIomoQVPamcq4xviI=;
+	s=arc-20240116; t=1706295711; c=relaxed/simple;
+	bh=2dtJAE3olhfnRYzBSWBO4VL2i9+7eXcCBnEg/aVMOCA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gYYkzt/xd52mdIXhNQatXkPloLEZA79+igKE84n/GZYltaUJYgO3eM9+ziTTFpuqLX51udKJkT4U6e313GYcrp4DSf1sIaMpGz9BDaxthcquIJzN90gNibCVmR6KBgEhi5gSJQGB+VzjA3qhoIzwPr/4mpIHjokaVhsaa3L1BVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FfRODCJM; arc=none smtp.client-ip=209.85.208.176
+	 To:Cc:Content-Type; b=OLPJCD1RuBiPZnYRhbG5X4vtNhZjrsa+z5wCMnlZY0aALw6pNn5oh5deF7GVUEa1A/APinupua8TJKaaLhcGqcEfoQ38SUd+cwzwgOoP/RY4Tbcq0IxAG3ZV83thZx4Jn7mcL/hANwFAGrNrBlHj0XCW2xGJ83H3TNUBCvKL//Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S1pR4MSS; arc=none smtp.client-ip=209.85.208.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FfRODCJM"
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2cf4696b90fso6901391fa.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jan 2024 10:50:23 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S1pR4MSS"
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2cf338e1438so7482621fa.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jan 2024 11:01:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706295022; x=1706899822; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706295708; x=1706900508; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7f0TZI1bnhvGPt5FmyNmDOJ+gyLsazsxmetAf8DGpzQ=;
-        b=FfRODCJMMXiszwuyY5POlChEFoio1MrFeQp6GtzQC4xywKNoKms4IDsToeWr7xH3Xb
-         NWj+r9feVeRV5skSB77kmC1UA2qeZUupFpjArh2TXd/dM7dQS9CX7F6L8YPhlsyAEuqz
-         h+fSEM/+VO4Yp6tKAlNwv5IKOI7vGKE6hA0jNHNeIMdX1Pqojp6xK5gTNtQ4hfmvqrqK
-         u1hC2BMyPTBucOOKDn49hZTDY/VsvnTeJN2BSKVz7zwbqz2BGZyvNGF1nu6gQ6tXKJG1
-         SmgNpypiMu9YQDrkMSK5N4t0PTJT6Pbu+hY38yWhB8xHfzS4RjGghcUVFsAPEa46Eo3J
-         275A==
+        bh=fyGrxJ9MwUPYz33bGO4oXV3lXOtlIo5dJXVcqmBysYU=;
+        b=S1pR4MSSamoH3e33+5oUCm6RgSzOW109ImS/ITArhBNHyZViCSoITg97IYsIC3m5i9
+         wpo3pKOWWZoo2JQqQP+wXcG2q2KL7bCDOhfp0tZb+iaYZsjfCex2p1q2bZL7tB7IO08X
+         MzVA8ulWjywsFnDidkEewsTjwAGpDpikEvHSmPIV4By78M2foKwKK8BUx5CO32dzPNuD
+         1DGT735WJw+dq90geNYTkb00Kuu392iSx1KNnKaVw7F2FoLIxxKvmvz0uHHk4vHqC0vJ
+         rMvL/Bg5XEbzus4LibHuRW6pv3BdheNsNuCmanPEOL0A7odvyNC9IpzL248BRL+iNUwx
+         KVxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706295022; x=1706899822;
+        d=1e100.net; s=20230601; t=1706295708; x=1706900508;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7f0TZI1bnhvGPt5FmyNmDOJ+gyLsazsxmetAf8DGpzQ=;
-        b=m652JW4hE9kmTSBLHlkgz386tI5uVEkdu+FP/t5dBVydmcRYHzcgOHv//rsvtmwAlf
-         L4d2r0nBV8cTkR/BsnXr4ecf2pGpNU9SheddTFgLSQEKehKT8m7WUmeRD9XAkmi5yDhf
-         qJnhCF0ECkc+h3EZMUw4XuojJTep/E4Cq/sNsYrHUir85dDii94ZACJHCQRagBJetEgj
-         l2u13PduEyxAXBJkqBqacQyoRr2Qmhk0dHAKQLV32OFh48MMw+yTG3BOH3ZtduUHQgPu
-         eq2fsFqp8JMLGs4glbJSqA70sw/VH8Kx5wkWgcPPvHVW5F/d9vy90+Ne21qVUxbc9ouC
-         1OPQ==
-X-Gm-Message-State: AOJu0YyJocMqxFR08RShzfeZfee4ZiE1C1DXxtBwF9+YvMN5jeoBqXs5
-	K04pYg+gv8z1uOpWhq7JMZKa+lkApgM8upo4nLm6lwJCFobSp/lkP6UKEqgYnDCXr5WW05H5lnq
-	5J5hSnC5ED4agqy2b5gE+UiU3BWo=
-X-Google-Smtp-Source: AGHT+IEfq4DOBS1kDziQ8wnBvZg1RZEUsK53UtovCvOzDTxs8yvTXMtxl0L4EsTTu5UiSQ8ILr/u6cYOoSxFxh2E3Gw=
-X-Received: by 2002:a2e:3305:0:b0:2cf:121:3ccb with SMTP id
- d5-20020a2e3305000000b002cf01213ccbmr143472ljc.55.1706295021628; Fri, 26 Jan
- 2024 10:50:21 -0800 (PST)
+        bh=fyGrxJ9MwUPYz33bGO4oXV3lXOtlIo5dJXVcqmBysYU=;
+        b=clVhLTIMiMTYX19nkwizXBVOotYDXHCJ42OcTneUDWD9qRv0IXPdzuH3LAd/MGXPh2
+         bXKRAEIRd5bwntemnZfSUoJP1BI9rrcjkuR85C6yahpl+MKQJOqdj9ujRqrBHzaeDkxh
+         NWmBIGiYXhS6tFF06OL5qV0RSlaCJp5AdJPLJoQdS6Fzxqh9jRTMid7cPY3ldyK769gR
+         aTO3QBRqsFJWpKzhf5x8jSbX9hW8GrnrsOsppkA8h7tEKiYEqCPeDXfDDVwyXOTTWKak
+         PMtUxbGeEvwB0MQl8NEQLxpxsPcvBPZI7Q62DhfezKO2Kadq500SbNwRjAay6PZZ2SV/
+         hR5g==
+X-Gm-Message-State: AOJu0YyPXsLQSj7RL3aBsE3k8Kagaz7vGh5VBoAT5MwJNgQWgLxcNJxx
+	9zdtBEX41PGZUF5lKn+Ah2ZkbyfTsHGBTExI6fcRzVP7z4KD6zx4BkTxSPTJq3WJWsQFAzFAEvC
+	FappqAF16/7AFSgHsZvyKUOaB4tFQifA/
+X-Google-Smtp-Source: AGHT+IH1zpgEBP9/hwQKH8sEpTdRxsYXZSeBl/I0UUA/BNvBJxxT2DTclLpd+1VjYZbqGi73qK4zDF78w3jgLXSpYeU=
+X-Received: by 2002:a2e:91d2:0:b0:2cd:2771:a2fb with SMTP id
+ u18-20020a2e91d2000000b002cd2771a2fbmr995438ljg.2.1706295707551; Fri, 26 Jan
+ 2024 11:01:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240125-rm-ext-plugins-v3-0-d141f7870bb6@gmail.com> <20240125-rm-ext-plugins-v3-2-d141f7870bb6@gmail.com>
-In-Reply-To: <20240125-rm-ext-plugins-v3-2-d141f7870bb6@gmail.com>
+References: <20240126144120.Bluez.1.If74ccbca4d541c5f576765a3a78cb8923b5f85b1@changeid>
+In-Reply-To: <20240126144120.Bluez.1.If74ccbca4d541c5f576765a3a78cb8923b5f85b1@changeid>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 26 Jan 2024 13:50:08 -0500
-Message-ID: <CABBYNZKafK6LRauk4RMVeE8PpsazFd75nxSA+a0-v2iHqsYQcQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v3 2/8] obexd: factor out external plugin support
-To: emil.l.velikov@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, Emil Velikov <emil.velikov@collabora.com>
+Date: Fri, 26 Jan 2024 14:01:35 -0500
+Message-ID: <CABBYNZL3yZ1_7wVyGg6fMZ=a3thqia2i+WSBFFyvBxTt4KPEgA@mail.gmail.com>
+Subject: Re: [Bluez PATCH] Monitor: Remove handle before assigning
+To: Archie Pusaka <apusaka@google.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
+	CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>, 
+	Archie Pusaka <apusaka@chromium.org>, Zhengping Jiang <jiangzp@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Emil,
+Hi Archie,
 
-On Wed, Jan 24, 2024 at 7:08=E2=80=AFPM Emil Velikov via B4 Relay
-<devnull+emil.l.velikov.gmail.com@kernel.org> wrote:
+On Fri, Jan 26, 2024 at 1:42=E2=80=AFAM Archie Pusaka <apusaka@google.com> =
+wrote:
 >
-> From: Emil Velikov <emil.velikov@collabora.com>
+> From: Archie Pusaka <apusaka@chromium.org>
 >
-> As a whole all plugins should be built-in, otherwise they would be using
-> internal, undocumented, unversioned, unstable API.
+> It is possible to have some handles not removed, for example the host
+> may decide not to wait for disconnection complete event when it is
+> suspending. In this case, when the peer device reconnected, we might
+> have two of the same handle assigned and create problem down the road.
 >
-> Flesh out the external plugin support into a few pre-processor blocks
-> and simplify the normal path.
+> This patch solves the issue by always removing any previous handles
+> when assigning a new handle if they are the same.
 >
-> Hide the internal API (omit export-dynamic) when built without external
-> plugins.
+> Reviewed-by: Zhengping Jiang <jiangzp@google.com>
+>
 > ---
->  Makefile.obexd     |  2 ++
->  obexd/src/obexd.h  |  2 +-
->  obexd/src/plugin.c | 93 ++++++++++++++++++++++++++++++++++++------------=
-------
->  obexd/src/plugin.h |  4 +++
->  4 files changed, 70 insertions(+), 31 deletions(-)
 >
-> diff --git a/Makefile.obexd b/Makefile.obexd
-> index 5d1a4ff65..9175de2a4 100644
-> --- a/Makefile.obexd
-> +++ b/Makefile.obexd
-> @@ -86,7 +86,9 @@ obexd_src_obexd_LDADD =3D lib/libbluetooth-internal.la =
-\
->                         $(ICAL_LIBS) $(DBUS_LIBS) $(LIBEBOOK_LIBS) \
->                         $(LIBEDATASERVER_LIBS) $(GLIB_LIBS) -ldl
+>  monitor/packet.c | 50 +++++++++++++++++++++++++-----------------------
+>  1 file changed, 26 insertions(+), 24 deletions(-)
 >
-> +if EXTERNAL_PLUGINS
->  obexd_src_obexd_LDFLAGS =3D $(AM_LDFLAGS) -Wl,--export-dynamic
-> +endif
->
->  obexd_src_obexd_CPPFLAGS =3D $(AM_CPPFLAGS) $(GLIB_CFLAGS) $(DBUS_CFLAGS=
-) \
->                                 $(ICAL_CFLAGS) -DOBEX_PLUGIN_BUILTIN \
-> diff --git a/obexd/src/obexd.h b/obexd/src/obexd.h
-> index fe312a65b..af5265da5 100644
-> --- a/obexd/src/obexd.h
-> +++ b/obexd/src/obexd.h
-> @@ -18,7 +18,7 @@
->  #define OBEX_MAS       (1 << 8)
->  #define OBEX_MNS       (1 << 9)
->
-> -gboolean plugin_init(const char *pattern, const char *exclude);
-> +void plugin_init(const char *pattern, const char *exclude);
->  void plugin_cleanup(void);
->
->  gboolean manager_init(void);
-> diff --git a/obexd/src/plugin.c b/obexd/src/plugin.c
-> index a3eb24753..212299fa5 100644
-> --- a/obexd/src/plugin.c
-> +++ b/obexd/src/plugin.c
-> @@ -37,11 +37,14 @@
->  static GSList *plugins =3D NULL;
->
->  struct obex_plugin {
-> +#if EXTERNAL_PLUGINS
->         void *handle;
-> +#endif
->         const struct obex_plugin_desc *desc;
->  };
->
-> -static gboolean add_plugin(void *handle, const struct obex_plugin_desc *=
-desc)
-> +#if EXTERNAL_PLUGINS
-> +static gboolean add_external_plugin(void *handle, const struct obex_plug=
-in_desc *desc)
->  {
->         struct obex_plugin *plugin;
->
-> @@ -65,6 +68,26 @@ static gboolean add_plugin(void *handle, const struct =
-obex_plugin_desc *desc)
->
->         return TRUE;
+> diff --git a/monitor/packet.c b/monitor/packet.c
+> index 42e711cafa..b5dea6384a 100644
+> --- a/monitor/packet.c
+> +++ b/monitor/packet.c
+> @@ -189,11 +189,33 @@ static struct packet_conn_data *lookup_parent(uint1=
+6_t handle)
+>         return NULL;
 >  }
-> +#endif
-> +
-> +static void add_plugin(const struct obex_plugin_desc *desc)
+>
+> +static void release_handle(uint16_t handle)
 > +{
-> +       struct obex_plugin *plugin;
+> +       int i;
 > +
-> +       plugin =3D g_try_new0(struct obex_plugin, 1);
-> +       if (plugin =3D=3D NULL)
-> +               return;
+> +       for (i =3D 0; i < MAX_CONN; i++) {
+> +               struct packet_conn_data *conn =3D &conn_list[i];
 > +
-> +       plugin->desc =3D desc;
+> +               if (conn->handle =3D=3D handle) {
+> +                       if (conn->destroy)
+> +                               conn->destroy(conn->data);
 > +
-> +       if (desc->init() < 0) {
-> +               g_free(plugin);
-> +               return;
+> +                       queue_destroy(conn->tx_q, free);
+> +                       queue_destroy(conn->chan_q, free);
+> +                       memset(conn, 0, sizeof(*conn));
+> +                       conn->handle =3D 0xffff;
+> +                       break;
+> +               }
 > +       }
-> +
-> +       plugins =3D g_slist_append(plugins, plugin);
-> +       DBG("Plugin %s loaded", desc->name);
 > +}
+
+We might as well return if we find out there is a packet_conn_data,
+that way we don't need to do 2 lookups in a row.
+
+>  static void assign_handle(uint16_t index, uint16_t handle, uint8_t type,
+>                                         uint8_t *dst, uint8_t dst_type)
+>  {
+>         int i;
 >
->  static gboolean check_plugin(const struct obex_plugin_desc *desc,
->                                 char **patterns, char **excludes)
-> @@ -93,42 +116,23 @@ static gboolean check_plugin(const struct obex_plugi=
-n_desc *desc,
+> +       release_handle(handle);
+> +
+>         for (i =3D 0; i < MAX_CONN; i++) {
+>                 if (conn_list[i].handle =3D=3D 0xffff) {
+>                         hci_devba(index, (bdaddr_t *)conn_list[i].src);
+> @@ -225,26 +247,6 @@ static void assign_handle(uint16_t index, uint16_t h=
+andle, uint8_t type,
+>         }
 >  }
 >
->
-> -#include "builtin.h"
+> -static void release_handle(uint16_t handle)
+> -{
+> -       int i;
 > -
-> -gboolean plugin_init(const char *pattern, const char *exclude)
-> +static void external_plugin_init(char **patterns, char **excludes)
->  {
-> -       char **patterns =3D NULL;
-> -       char **excludes =3D NULL;
-> +#if EXTERNAL_PLUGINS
->         GDir *dir;
->         const char *file;
-> -       unsigned int i;
->
-> -       if (strlen(PLUGINDIR) =3D=3D 0)
-> -               return FALSE;
+> -       for (i =3D 0; i < MAX_CONN; i++) {
+> -               struct packet_conn_data *conn =3D &conn_list[i];
 > -
-> -       if (pattern)
-> -               patterns =3D g_strsplit_set(pattern, ":, ", -1);
+> -               if (conn->handle =3D=3D handle) {
+> -                       if (conn->destroy)
+> -                               conn->destroy(conn->data);
 > -
-> -       if (exclude)
-> -               excludes =3D g_strsplit_set(exclude, ":, ", -1);
-> -
-> -       DBG("Loading builtin plugins");
-> -
-> -       for (i =3D 0; __obex_builtin[i]; i++) {
-> -               if (check_plugin(__obex_builtin[i],
-> -                                       patterns, excludes) =3D=3D FALSE)
-> -                       continue;
-> +       warn("Using external plugins is not officially supported.\n");
-> +       warn("Consider upstreaming your plugins into the BlueZ project.")=
-;
->
-> -               add_plugin(NULL,  __obex_builtin[i]);
+> -                       queue_destroy(conn->tx_q, free);
+> -                       queue_destroy(conn->chan_q, free);
+> -                       memset(conn, 0, sizeof(*conn));
+> -                       conn->handle =3D 0xffff;
+> -                       break;
+> -               }
 > -       }
-> +       if (strlen(PLUGINDIR) =3D=3D 0)
-> +               return;
->
->         DBG("Loading plugins %s", PLUGINDIR);
->
->         dir =3D g_dir_open(PLUGINDIR, 0, NULL);
->         if (!dir) {
-> -               g_strfreev(patterns);
-> -               g_strfreev(excludes);
-> -               return FALSE;
-> +               return;
->         }
->
->         while ((file =3D g_dir_read_name(dir)) !=3D NULL) {
-> @@ -164,15 +168,42 @@ gboolean plugin_init(const char *pattern, const cha=
-r *exclude)
->                         continue;
->                 }
->
-> -               if (add_plugin(handle, desc) =3D=3D FALSE)
-> +               if (add_external_plugin(handle, desc) =3D=3D FALSE)
->                         dlclose(handle);
->         }
->
->         g_dir_close(dir);
-> +#endif
-> +}
-> +
-> +#include "builtin.h"
-> +
-> +void plugin_init(const char *pattern, const char *exclude)
-> +{
-> +       char **patterns =3D NULL;
-> +       char **excludes =3D NULL;
-> +       unsigned int i;
-> +
-> +       if (pattern)
-> +               patterns =3D g_strsplit_set(pattern, ":, ", -1);
-> +
-> +       if (exclude)
-> +               excludes =3D g_strsplit_set(exclude, ":, ", -1);
-> +
-> +       DBG("Loading builtin plugins");
-> +
-> +       for (i =3D 0; __obex_builtin[i]; i++) {
-> +               if (check_plugin(__obex_builtin[i],
-> +                                       patterns, excludes) =3D=3D FALSE)
-> +                       continue;
-> +
-> +               add_plugin(__obex_builtin[i]);
-> +       }
-> +
-> +       external_plugin_init(patterns, excludes);
-> +
->         g_strfreev(patterns);
->         g_strfreev(excludes);
+> -}
 > -
-> -       return TRUE;
->  }
+>  struct packet_conn_data *packet_get_conn_data(uint16_t handle)
+>  {
+>         int i;
+> @@ -10076,7 +10078,7 @@ static void conn_complete_evt(struct timeval *tv,=
+ uint16_t index,
+>         const struct bt_hci_evt_conn_complete *evt =3D data;
 >
->  void plugin_cleanup(void)
-> @@ -187,8 +218,10 @@ void plugin_cleanup(void)
->                 if (plugin->desc->exit)
->                         plugin->desc->exit();
+>         print_status(evt->status);
+> -       print_handle(evt->handle);
+> +       print_field("Handle: %d", le16_to_cpu(evt->handle));
+>         print_bdaddr(evt->bdaddr);
+>         print_link_type(evt->link_type);
+>         print_enable("Encryption", evt->encr_mode);
+> @@ -10648,7 +10650,7 @@ static void sync_conn_complete_evt(struct timeval=
+ *tv, uint16_t index,
+>         const struct bt_hci_evt_sync_conn_complete *evt =3D data;
 >
-> +#if EXTERNAL_PLUGINS
->                 if (plugin->handle !=3D NULL)
->                         dlclose(plugin->handle);
-> +#endif
+>         print_status(evt->status);
+> -       print_handle(evt->handle);
+> +       print_field("Handle: %d", le16_to_cpu(evt->handle));
+>         print_bdaddr(evt->bdaddr);
+>         print_link_type(evt->link_type);
+>         print_field("Transmission interval: 0x%2.2x", evt->tx_interval);
+> @@ -11077,7 +11079,7 @@ static void le_conn_complete_evt(struct timeval *=
+tv, uint16_t index,
+>         const struct bt_hci_evt_le_conn_complete *evt =3D data;
 >
->                 g_free(plugin);
->         }
-> diff --git a/obexd/src/plugin.h b/obexd/src/plugin.h
-> index a91746cbc..e1756b9bf 100644
-> --- a/obexd/src/plugin.h
-> +++ b/obexd/src/plugin.h
-> @@ -20,10 +20,14 @@ struct obex_plugin_desc {
->                         #name, init, exit \
->                 };
->  #else
-> +#if EXTERNAL_PLUGINS
->  #define OBEX_PLUGIN_DEFINE(name,init,exit) \
->                 extern struct obex_plugin_desc obex_plugin_desc \
->                                 __attribute__ ((visibility("default"))); =
-\
->                 const struct obex_plugin_desc obex_plugin_desc =3D { \
->                         #name, init, exit \
->                 };
-> +#else
-> +#error "Requested non built-in plugin, while external plugins is disable=
-d"
-> +#endif
->  #endif
+>         print_status(evt->status);
+> -       print_handle(evt->handle);
+> +       print_field("Handle: %d", le16_to_cpu(evt->handle));
+>         print_role(evt->role);
+>         print_peer_addr_type("Peer address type", evt->peer_addr_type);
+>         print_addr("Peer address", evt->peer_addr, evt->peer_addr_type);
+> @@ -11206,7 +11208,7 @@ static void le_enhanced_conn_complete_evt(struct =
+timeval *tv, uint16_t index,
+>         const struct bt_hci_evt_le_enhanced_conn_complete *evt =3D data;
 >
+>         print_status(evt->status);
+> -       print_handle(evt->handle);
+> +       print_field("Handle: %d", le16_to_cpu(evt->handle));
+>         print_role(evt->role);
+>         print_peer_addr_type("Peer address type", evt->peer_addr_type);
+>         print_addr("Peer address", evt->peer_addr, evt->peer_addr_type);
+
+Are these changes really intentional? Or perhaps we don't want to
+attempt to resolve the address since these are the event that would
+assign them in the first place? In that case I had these fixed
+separately with a proper patch description.
+
 > --
-> 2.43.0
-
-How about we do something like:
-
-https://gist.github.com/Vudentz/0b8bcb78a8898614fc4848cbf44a0a9f
-
-That way we leave it to the compiler to remove the dead code when
-linking but it still build checks which catches errors such as:
-
-make --no-print-directory all-am
-  CC       obexd/src/obexd-plugin.o
-obexd/src/plugin.c: In function =E2=80=98external_plugin_init=E2=80=99:
-obexd/src/plugin.c:123:9: error: implicit declaration of function
-=E2=80=98warn=E2=80=99 [-Werror=3Dimplicit-function-declaration]
-  123 |         warn("Using external plugins is not officially supported.\n=
-");
-      |         ^~~~
-
+> 2.43.0.429.g432eaa2c6b-goog
 >
 
 
