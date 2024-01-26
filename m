@@ -1,221 +1,120 @@
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54313A94F
-	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jan 2024 03:26:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58B5C1D54D
+	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jan 2024 06:35:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706239600; cv=none; b=mzWJ8Wh6EbhnZJxCft5hcKvYRN1bRRJ+e7xuFtXjdP92i5aLK8Xymy3Oc+v8953tfprGpy24xkWSO9qMDMCMU33rrG2mO7fjEJiSc3HMwubZFc0NaafnnEV86TuvMvCjTZOg7eBhLOh8WXjFvXTtB7bfV05W0SebcXashj0k8Qc=
+	t=1706250908; cv=none; b=PaTktZ9zqn3id7ao3nOpxfdm5EARR3G/OS+5QPzQJNhvoj7D82CmQ6L2Gnp+jgWlaAuDbyFNDozbkM4RSFbOBNSbcc+JunxOGPAf+NhUYdJM7S5HwsDDq3cxqs+580gwLnokoyWcBMOWiaxgj2Jo1ZgEZ7JvNpFEi9P2f/UYTFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706239600; c=relaxed/simple;
-	bh=g4i+w63+sy9yYZPW+kGZdrOYodleOa12DosNrHLn0ww=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=f9MihumT5toNLV25rib+3Df+B6RDqhuTJ4/72xV3dubGWC9NKThGN7ZpmLfPRsgjvmnlmJ5CW9sAMOdA3/bimZuWvee65M7/WHNdgnu2ODVpHZIgcc3GCbwj60rsrfZDm+rQMyi1L7aPlTSpH79OJIbyFo1JCPwXIkUK5hqtbvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=KvuGBhh+; arc=none smtp.client-ip=209.85.208.172
+	s=arc-20240116; t=1706250908; c=relaxed/simple;
+	bh=NH2euUCqwPzQ8EOeRcSGE0TtlrdDDvu0F19oCXj/2VM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ngRI9VPqfZ+STPpw8D51+pjkrs/Y26fY/ZjWdFh43wGrcMLaUTDGCJpHi5JBANFXhZwkNuluvLASzOrladA0qOTs8qBU4qSGt0Ld/qmC5Bs2oBF8wMApCrl42HzXqCFtd61djKnCOP5ZhrHo6CHwW5FIK5MUVfWdtb8Qh0lxk30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=bxpTrb+M; arc=none smtp.client-ip=209.85.210.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="KvuGBhh+"
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2cf3ed3b917so12270761fa.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 19:26:38 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="bxpTrb+M"
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6d9b37f4804so1012597b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 22:35:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1706239596; x=1706844396; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9WyUC6MmB08/BiaNWVTf9K2ZnTvIR5FpF1Gb9asD+uw=;
-        b=KvuGBhh+zU0JKA19AEukbWG8KwvsdTj+hxPNAe3MX67kOBoX/+UQLmq0/N36s3XB6v
-         f54yUKT7P3+avfVhCQj6yLZRfiFNNVDPHl244RJUtuM5qRLA+RMYoSXF98Pg7oI6wTzK
-         q4uUbAUvTsF3XpTiADM6w9cgFXm4Bic4DZ9hc=
+        d=chromium.org; s=google; t=1706250905; x=1706855705; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ySgp2UiszzMfNCnD6O5mfCcxxHNvIaL6WmT8mRfAk0M=;
+        b=bxpTrb+MRMOYJIzkdauCkxaRZKK01HcEuQMG3e070C9PhDFEutxkdCGlJK8NSYYFcc
+         8vx0bH2a/ZrlIG/rdsbLbIwEhWHY9XZkwA5o9+LvuIc/H8rgRluf5iDRk6Dkovr7gnFH
+         xWjfxdQiW1+Om+itQt9LKXpd6ld3gNTjBLfok=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706239596; x=1706844396;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9WyUC6MmB08/BiaNWVTf9K2ZnTvIR5FpF1Gb9asD+uw=;
-        b=BFDZuwK8UrHhbijuML45BLxqCfUE4S0ahGyHvw6y7be9jl0E/zjmE83sIbd2GwLrZh
-         etCTQg208ShMsgEAdMtBj8OKssiLokK/TMbUWzT6M4oLbiseduxIIQXjqraLWDhNGXrO
-         PvfcE7jCM27ZrcekwX2OfABgeAViizLocB7mCPNni8dWDTHiMnNUO8ej8rjpVTjiMYz6
-         kY6XN7FuUM85BvbHfCpnimBjxSVzvDgkZThv/pM4DgcC+tJn2yN2Tknu+xBT582RnZun
-         WKkkEYlVrFhvtLxj8EekhsY2uEift6B3juC9XwcXo0Mc1tiF4ojBzslfsnm4MQACt1e5
-         LxGA==
-X-Gm-Message-State: AOJu0Ywv7WbihPZwRHfzD5/H/gaAXsZHtOqJOdFNK8gQh0OTWiB9Ejdb
-	mXZdDe3lu567QF4Eif1UG8geEXKQWCxCqs89NRMCyUflssgz1YYk0YXjFWCgAD3obPrXjko41wU
-	i5ml4+7F1aKgK5Fhl3L5rRSJJK3D1MM/UrNpd
-X-Google-Smtp-Source: AGHT+IEDjNQzwVaWPwAv+h5mtaVgEfszPvfXWHkJHOd/8GLlNf7ga0naC1J+rIBTXRI404s6h2BKMm+4EmCTd7dMJ8I=
-X-Received: by 2002:a05:651c:b1f:b0:2cc:a569:48d with SMTP id
- b31-20020a05651c0b1f00b002cca569048dmr210919ljr.44.1706239596392; Thu, 25 Jan
- 2024 19:26:36 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706250905; x=1706855705;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ySgp2UiszzMfNCnD6O5mfCcxxHNvIaL6WmT8mRfAk0M=;
+        b=SO37a4+RT6Fetlds0A7DkNSgaS68PnWf7XMmXHORFV0vBbLgplEaPmOKD34WBhjshQ
+         arfaNZHQRQKm6OtWo+5iGkbzlNCPmfmaOOqKy2nQ2PoZgCIa4fvkRzmC+5ds3Uw/UVvh
+         yQawI+tFJN0I/HSwF6I1pB9rItd4lmAIXG+mef4UBy+etd7ciDmkYBGBF398Ng0SPpRt
+         9p6SMw+uPgwNCsMQKKM7J7B395S/orZ/6GPdVnHdiQK6oge2mh4Wb5bY/scSA/Njp0y/
+         MMWQQxvDJwrzkfIsV2DCi8u+cwJFzSvbXH/6XLTl87yi8dfyTSUl1kVuL6jkoOJqJWR6
+         pO3g==
+X-Gm-Message-State: AOJu0Yw7Q6VzKAdlBo45PJehGN8U39Who7Ek+LPCPsPsf2l6KVUy9Oyn
+	HzxZmNf+dHIfD6vSdoqBA1HK07ySqG0pEL3qT9TfpclOpOF+BOPukVgnwXStww==
+X-Google-Smtp-Source: AGHT+IF1szoUbF1JDZy6toVdzGRAw8HhVOL8J8FWhgQ/IhKqWQPq084VnvUGMXytbOdxbOyYMcX4MA==
+X-Received: by 2002:a05:6a21:3987:b0:19c:53ab:d7d0 with SMTP id ad7-20020a056a21398700b0019c53abd7d0mr684905pzc.50.1706250905647;
+        Thu, 25 Jan 2024 22:35:05 -0800 (PST)
+Received: from wenstp920.tpe.corp.google.com ([2401:fa00:1:10:2614:bbbd:8db2:1f54])
+        by smtp.gmail.com with ESMTPSA id ka3-20020a056a00938300b006db13a02921sm488735pfb.183.2024.01.25.22.35.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Jan 2024 22:35:05 -0800 (PST)
+From: Chen-Yu Tsai <wenst@chromium.org>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: Chen-Yu Tsai <wenst@chromium.org>,
+	Sean Wang <sean.wang@mediatek.com>,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
+	devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/2] bluetooth: mt7921s: Add binding and fixup existing dts
+Date: Fri, 26 Jan 2024 14:34:56 +0800
+Message-ID: <20240126063500.2684087-1-wenst@chromium.org>
+X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240125095240.2308340-1-wenst@chromium.org> <20240125095240.2308340-2-wenst@chromium.org>
- <68249675-4081-48d9-abbb-1b2e49894fae@collabora.com>
-In-Reply-To: <68249675-4081-48d9-abbb-1b2e49894fae@collabora.com>
-From: Chen-Yu Tsai <wenst@chromium.org>
-Date: Fri, 26 Jan 2024 11:26:25 +0800
-Message-ID: <CAGXv+5GG+Ko4nZKCvpQ2TnjeHDKWi5qS_SWAgLcrZ6fn_ySiug@mail.gmail.com>
-Subject: Re: [PATCH 1/2] dt-bindings: net: bluetooth: Add MediaTek MT7921S
- SDIO Bluetooth
-To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, Sean Wang <sean.wang@mediatek.com>, 
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-mediatek@lists.infradead.org, devicetree@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jan 25, 2024 at 7:39=E2=80=AFPM AngeloGioacchino Del Regno
-<angelogioacchino.delregno@collabora.com> wrote:
->
-> Il 25/01/24 10:52, Chen-Yu Tsai ha scritto:
-> > The MediaTek MT7921S is a WiFi/Bluetooth combo chip that works over
-> > SDIO. While the Bluetooth function is fully discoverable, the chip
-> > has a pin that can reset just the Bluetooth side, as opposed to the
-> > full chip. This needs to be described in the device tree.
-> >
-> > Add a device tree binding for MT7921S Bluetooth over SDIO specifically
-> > ot document the reset line.
-> >
-> > Cc: Sean Wang <sean.wang@mediatek.com>
-> > Signed-off-by: Chen-Yu Tsai <wenst@chromium.org>
-> > ---
-> >   .../bluetooth/mediatek,mt7921s-bluetooth.yaml | 49 ++++++++++++++++++=
-+
-> >   MAINTAINERS                                   |  1 +
-> >   2 files changed, 50 insertions(+)
-> >   create mode 100644 Documentation/devicetree/bindings/net/bluetooth/me=
-diatek,mt7921s-bluetooth.yaml
-> >
-> > diff --git a/Documentation/devicetree/bindings/net/bluetooth/mediatek,m=
-t7921s-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/med=
-iatek,mt7921s-bluetooth.yaml
-> > new file mode 100644
-> > index 000000000000..bbe240e7cc40
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-=
-bluetooth.yaml
-> > @@ -0,0 +1,49 @@
-> > +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/net/bluetooth/mediatek,mt7921s-blue=
-tooth.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: MediaTek MT7921S Bluetooth
-> > +
->
-> title:
->
-> maintainers:
->
-> description:
->
-> ... and then, you missed
->
-> allOf:
->    - $ref: bluetooth-controller.yaml#
+Hi everyone,
 
-(facepalm)
+This is v2 of my MT7921S Bluetooth binding series.
 
-> Everything else looks good.
->
-> Cheers,
-> Angelo
->
-> > +description:
->
-> MT7921S is a (dual?) SDIO-attached dual-radio WiFi+Bluetooth combo chip;
-> this chip has two dedicated reset lines, one of which is used to reset
-> the Bluetooth core.
-> The WiFi part of this chip is described in ....where? :-)
+Changes since v1:
+- Reworded descriptions in binding
+- Moved binding maintainer section before binding description
+- Added missing reference to bluetooth-controller.yaml
+- Added missing GPIO header to example
 
-The function itself is fully probable and the implementation doesn't make
-use of the WiFi's reset line, so I don't see any reason to describe it?
-I don't actually know what the reset line does in the chip hardware.
-This patch is just described what is already used.
+This short series adds a binding document for the MT7921S SDIO Bluetooth
+controller. The MT7921S is a SDIO-based WiFi/Bluetooth combo. WiFi and
+Bluetooth are separate SDIO functions. The chip has extra per-subsystem
+reset lines that can reset only WiFi or Bluetooth cores.
 
-> > +  This binding describes the Bluetooth side of the SDIO-attached MT792=
-1S
-> > +  WiFi+Bluetooth combo chips. These chips are dual-radio chips support=
-ing
-> > +  WiFi and Bluetooth. Bluetooth works over SDIO just like WiFi. Blueto=
-oth
-> > +  has its own reset line, separate from WiFi, which can be used to res=
-et
-> > +  the Bluetooth core.
-> > +
-> > +maintainers:
-> > +  - Sean Wang <sean.wang@mediatek.com>
-> > +
-> > +properties:
-> > +  compatible:
-> > +    enum:
-> > +      - mediatek,mt7921s-bluetooth
-> > +  reg:
-> > +    const: 2
-> > +
-> > +  reset-gpios:
-> > +    maxItems: 1
-> > +    description: A GPIO line connected to the Bluetooth subsystem rese=
-t line.
-> > +      Typically the W_DISABLE2# pin on M.2 E-key modules. If present t=
-his
-> > +      shall be flagged as active low.
->
-> description:
->    An active-low reset line connected for the Bluetooth core;
+Patch 1 documents the SDIO function and the reset line, based on
+existing device tree and driver usage. I listed Sean Wang, the original
+driver author and maintainer, as the maintainer of the binding.
 
-connected to?
+Patch 2 fixes up the sole existing usage of the compatible string by
+making it a proper SDIO function node.
 
->    on typical M.2 Key-E modules this is the W_DISABLE2# pin.
-
-Otherwise this looks better. Thanks.
+Please take a look. Not sure which tree patch 1 should be merged
+through? I suppose with proper acks it could go through the soc/mediatek
+tree together with patch 2.
 
 
+Regards
 ChenYu
 
-> Cheers,
-> Angelo
->
-> > +
-> > +required:
-> > +  - compatible
-> > +  - reg
-> > +
-> > +additionalProperties: false
-> > +
-> > +examples:
-> > +  - |
-> > +    mmc {
-> > +        #address-cells =3D <1>;
-> > +        #size-cells =3D <0>;
-> > +
-> > +        bluetooth@2 {
-> > +            compatible =3D "mediatek,mt7921s-bluetooth";
-> > +            reg =3D <2>;
-> > +            reset-gpios =3D <&pio 8 GPIO_ACTIVE_LOW>;
-> > +        };
-> > +    };
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index b64a64ca7916..662957146852 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -13657,6 +13657,7 @@ M:    Sean Wang <sean.wang@mediatek.com>
-> >   L:  linux-bluetooth@vger.kernel.org
-> >   L:  linux-mediatek@lists.infradead.org (moderated for non-subscribers=
-)
-> >   S:  Maintained
-> > +F:   Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-=
-bluetooth.yaml
-> >   F:  Documentation/devicetree/bindings/net/mediatek-bluetooth.txt
-> >   F:  drivers/bluetooth/btmtkuart.c
-> >
->
+
+Chen-Yu Tsai (2):
+  dt-bindings: net: bluetooth: Add MediaTek MT7921S SDIO Bluetooth
+  arm64: dts: mediatek: mt8183-pico6: Fix bluetooth node
+
+ .../bluetooth/mediatek,mt7921s-bluetooth.yaml | 53 +++++++++++++++++++
+ MAINTAINERS                                   |  1 +
+ .../mediatek/mt8183-kukui-jacuzzi-pico6.dts   |  3 +-
+ 3 files changed, 56 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml
+
+-- 
+2.43.0.429.g432eaa2c6b-goog
+
