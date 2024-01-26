@@ -1,189 +1,95 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6500917BAE
-	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jan 2024 06:42:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 756E211CBC
+	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jan 2024 07:11:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706251360; cv=none; b=QipxH9g71uu7SqEgCcpRAVFdD5gTJH+qy6ryBCfLomfmk9SLiVrAwOZs0Vz8QYK3pplDQMoR03WKOEQT4/zwYemY5XrX/tNdZB07rcXJYPJ+Vl13LK395a54y9UnbBHksH84dtbLVK6B77LC5ht+UgdeH/Dn8MTFiaul0HaorWY=
+	t=1706253111; cv=none; b=DVUED1QVHmmFTP3GFVcT36XHbq4SRXbIIcAJEvqNmA50qUcrUtjyjEjDuEU7PqrWLyI19L/zkJA0p2f+OMPNGsonhELG2stMDmaJ3p+Lotss4DZOUK0Ku21J3j/3refqyV43lTwlKJK05KI6z1vqyeWn1ZGeu6E5ExgjA7okVpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706251360; c=relaxed/simple;
-	bh=lvVhfTreY0kg1t8ABLNmkd4izh/oGy3dNOuXjNBtD28=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=bI/ABi0+w3kC2VgZMyU5idPkCODlfncEGLbvAEsgxusVCtQwhrMZz8vkyb1I5lfAIp+zjqeeqNAN/ecK5OurFNuiL1xMbmoPCSfbNDz3kmt06MGJuj0uGA6BBSYuqot2YQCLEQQbvgt8/daxonTuCmHhsUjpM+rqb9Q7Q+khRA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--apusaka.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U3r+7TT/; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--apusaka.bounces.google.com
+	s=arc-20240116; t=1706253111; c=relaxed/simple;
+	bh=SaGWrZWvltV0gdiUj50TJE0/utgFVAQ5Z2h3i2E1YG8=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=UFuA13LDNm9z624o+kU316i72M3djNs+YmXwQFbfUrxI5g6zgIiZB1g5tG7jpj3C6cCcHrT2vXnZhQQ4n/utl0vdOWWSD8i4GhtaYdqcSynYqlMSeHRlnTGpAtz/irz7OBkm3W4helPwm+0f2tA9645P0tyAkOb2hnO4VZOe4ZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EycZNIkc; arc=none smtp.client-ip=209.85.219.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U3r+7TT/"
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc2629d180fso797991276.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 22:42:38 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EycZNIkc"
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-68873473ce6so2280136d6.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jan 2024 23:11:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706251357; x=1706856157; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=p99EHBRZllVQ+I/UFUuFLhuTfAlCNeiDolSEaa7EKwk=;
-        b=U3r+7TT/HS7SGV4zcCGDvGTK9rBeNODkJ0MmMYHp1trpVI8BlXA0c831FkQ6QZfMe7
-         CJsqbblZLrw9A9uacn82Y/XuVozP3YZN928gRIECoNSQ1J/awL8jnfDesMXcuO/NTc33
-         M/C38mVLzq+s/TQyKz8gJuEAGukolHBt4OMC7pieLdl7XzJS1a/Phch+0ejiHtd0SLiR
-         FLARN3wOkhwDDKLxPpm5XqvVeKu9ew/+skjnu+tP8j8LMnSscqLmLc4IyWZ+oxldKLL8
-         +8feXjUty2RNaqc8/RaODd13lUGbsnVbf/N/R2cTwMtYUgp9UXIozITotiTjoqlBYCUm
-         cI7A==
+        d=gmail.com; s=20230601; t=1706253109; x=1706857909; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=SaGWrZWvltV0gdiUj50TJE0/utgFVAQ5Z2h3i2E1YG8=;
+        b=EycZNIkcNRCZvcCAYZNdqjkXwUldImr4JHNIt0LIdx5e4/ShyW5K4m68Hr5/Gen53L
+         dDMzInhhx6zoeywqzqnYEOkx7yy5AmvR8wY9KCCzVtXeZ7CMz6ozLI2JiIGQfYK4F2kz
+         Rrds8jrPkYr5wcO6W6QqmsrNJhgSAkiI0JfHJGiQVMdxF1bZVS1CTmulHig+dBDeBBe0
+         IQRBobPrMkhvIf9xj+3uKenNhUCzO7VHL6AD0jp2bkFl95AMLc1ACMee78Uz0z/EIyVW
+         anRR4TwkeDEbiUaterra4OYxSiedyTbJ+oVs7dXtEC3Q7jwyvsiMY/+meY8ppbTb/crW
+         5LWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706251357; x=1706856157;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=p99EHBRZllVQ+I/UFUuFLhuTfAlCNeiDolSEaa7EKwk=;
-        b=eOuSxZFMXcQGNKTukHyog/Rmpjy+TLYwEYxozS/289vEWae4XIU5bLHtQXzTiBZVay
-         ORHK4KxfDbmW6hEJhT/aKGlRwLeOwwv+FhwFG3WQhuS0SAiH9Wd+wI9HWxVSC+8xUUgg
-         X3tBKlulClPVlIkRlogYcOgYTxCfRUACHxXf7CwPP/2mvA8MmuAXihKgBcHjzWKK63y0
-         nFdsEcoAmRtKZbjGf1go9jexoYDGxgJvFq3y5yGj124wnesy6QH0K2Nougo1syTvgIFZ
-         wQhfWP5V5D6jxR/8zuGQU6+Ll1dFQKWq5w65Z1wKq/f8k39Lee6bLSFd6pTyRUiQ1+by
-         rTeQ==
-X-Gm-Message-State: AOJu0YyhSjXHj9IIFmRX/O7NrjUf5P4uucSHeZZyhZIQ7XOMKgcZJ7kO
-	sX3jj8awGS02v5guPTXPoXXgVz9bZZFRb/lz/AaCvmWvHJOOT4HkF7OBb/I61oGz8H3yrOkjPsz
-	GeCruULecY+/Kzgd/s4ct1c2iIbDvC7DDWSS7OLT9Ptaom62/Jq4mQgW3ATplHc20No6cNw1+e9
-	qKCQzYch7aYE6bI/AFlkyZAer9040aulzmLyXgsj0pzbf+vFHSYQ==
-X-Google-Smtp-Source: AGHT+IGDZ/gyBNCdLlDRoTyIGm/ix19v7rOtSFV/9OZJOyCecR5FgOvBSMB6wv2vOTn1EasUZVHOXWEP/W70
-X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:17:b27f:9766:7459:4899])
- (user=apusaka job=sendgmr) by 2002:a05:6902:e09:b0:dc2:550b:a4f4 with SMTP id
- df9-20020a0569020e0900b00dc2550ba4f4mr520080ybb.1.1706251357244; Thu, 25 Jan
- 2024 22:42:37 -0800 (PST)
-Date: Fri, 26 Jan 2024 14:41:21 +0800
+        d=1e100.net; s=20230601; t=1706253109; x=1706857909;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SaGWrZWvltV0gdiUj50TJE0/utgFVAQ5Z2h3i2E1YG8=;
+        b=Tnm25/PWKOHnYTy8N4SKhg5wjQhzp6heE2ZemrRy1Q4+LCGCCrbLa9CnCea29ZIk5G
+         XKPU2g0jViHghRp89WwU8S2qBO8FnjGFivq69z9WMC8JFt+Fuo+SB9mJB7oGd5jgk/jP
+         fnVfCQJLgjG+TwHNAsm5b2fAS1YWVUCYgvcAhybRBt6Zp8sigHMW0x3tCFhOfefskxpk
+         +zB4RXr39lMY1SGUGh5n1jMSaHyU7gUJ+nA9US1cReMIWOrO4jFravdtA1U2Xca+uQb5
+         M9v3qxCrQHz19/r9wBw4lyHrV7RlngwgaWAe35FyvAriqf4QlnGw6ubtbhuOlkm/qyEQ
+         r43Q==
+X-Gm-Message-State: AOJu0YxTEAoL6bBQ/jKJgMaj6itWxUunnG7nlS2anFMVKweRUYSXhSEL
+	w896J15xzJv4snK10eyfwJhyLN5LySrEUkJ4PELUGzdb3AkCSeMyH6Se/v/1
+X-Google-Smtp-Source: AGHT+IF26faSys13ztux3UFaTnfu99t0MieyMVHv6LmE9APWLRZk+Cs7p8fL+RqpVu1kp9ZJem9D/A==
+X-Received: by 2002:a05:6214:e48:b0:681:59c7:7b5e with SMTP id o8-20020a0562140e4800b0068159c77b5emr932983qvc.113.1706253108993;
+        Thu, 25 Jan 2024 23:11:48 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUgkAaAZbZJOP0O0u5KkLT6WR45ZiL9DU9jyzJBRx8yWjb7iCXK4TgXefDduykTptKXr4ORNHK0O8hppkpy44wRvSk=
+Received: from [172.17.0.2] ([172.183.50.147])
+        by smtp.gmail.com with ESMTPSA id nf6-20020a0562143b8600b0067cd5c86936sm285803qvb.79.2024.01.25.23.11.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Jan 2024 23:11:48 -0800 (PST)
+Message-ID: <65b35b34.050a0220.92543.0d9c@mx.google.com>
+Date: Thu, 25 Jan 2024 23:11:48 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6349227954728531265=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
-Message-ID: <20240126144120.Bluez.1.If74ccbca4d541c5f576765a3a78cb8923b5f85b1@changeid>
-Subject: [Bluez PATCH] Monitor: Remove handle before assigning
-From: Archie Pusaka <apusaka@google.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	Marcel Holtmann <marcel@holtmann.org>
-Cc: CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>, 
-	Archie Pusaka <apusaka@chromium.org>, Zhengping Jiang <jiangzp@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, wenst@chromium.org
+Subject: RE: bluetooth: mt7921s: Add binding and fixup existing dts
+In-Reply-To: <20240126063500.2684087-2-wenst@chromium.org>
+References: <20240126063500.2684087-2-wenst@chromium.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Archie Pusaka <apusaka@chromium.org>
+--===============6349227954728531265==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-It is possible to have some handles not removed, for example the host
-may decide not to wait for disconnection complete event when it is
-suspending. In this case, when the peer device reconnected, we might
-have two of the same handle assigned and create problem down the road.
+This is an automated email and please do not reply to this email.
 
-This patch solves the issue by always removing any previous handles
-when assigning a new handle if they are the same.
+Dear Submitter,
 
-Reviewed-by: Zhengping Jiang <jiangzp@google.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi-pico6.dts: does not exist in index
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
 
 ---
+Regards,
+Linux Bluetooth
 
- monitor/packet.c | 50 +++++++++++++++++++++++++-----------------------
- 1 file changed, 26 insertions(+), 24 deletions(-)
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index 42e711cafa..b5dea6384a 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -189,11 +189,33 @@ static struct packet_conn_data *lookup_parent(uint16_t handle)
- 	return NULL;
- }
- 
-+static void release_handle(uint16_t handle)
-+{
-+	int i;
-+
-+	for (i = 0; i < MAX_CONN; i++) {
-+		struct packet_conn_data *conn = &conn_list[i];
-+
-+		if (conn->handle == handle) {
-+			if (conn->destroy)
-+				conn->destroy(conn->data);
-+
-+			queue_destroy(conn->tx_q, free);
-+			queue_destroy(conn->chan_q, free);
-+			memset(conn, 0, sizeof(*conn));
-+			conn->handle = 0xffff;
-+			break;
-+		}
-+	}
-+}
-+
- static void assign_handle(uint16_t index, uint16_t handle, uint8_t type,
- 					uint8_t *dst, uint8_t dst_type)
- {
- 	int i;
- 
-+	release_handle(handle);
-+
- 	for (i = 0; i < MAX_CONN; i++) {
- 		if (conn_list[i].handle == 0xffff) {
- 			hci_devba(index, (bdaddr_t *)conn_list[i].src);
-@@ -225,26 +247,6 @@ static void assign_handle(uint16_t index, uint16_t handle, uint8_t type,
- 	}
- }
- 
--static void release_handle(uint16_t handle)
--{
--	int i;
--
--	for (i = 0; i < MAX_CONN; i++) {
--		struct packet_conn_data *conn = &conn_list[i];
--
--		if (conn->handle == handle) {
--			if (conn->destroy)
--				conn->destroy(conn->data);
--
--			queue_destroy(conn->tx_q, free);
--			queue_destroy(conn->chan_q, free);
--			memset(conn, 0, sizeof(*conn));
--			conn->handle = 0xffff;
--			break;
--		}
--	}
--}
--
- struct packet_conn_data *packet_get_conn_data(uint16_t handle)
- {
- 	int i;
-@@ -10076,7 +10078,7 @@ static void conn_complete_evt(struct timeval *tv, uint16_t index,
- 	const struct bt_hci_evt_conn_complete *evt = data;
- 
- 	print_status(evt->status);
--	print_handle(evt->handle);
-+	print_field("Handle: %d", le16_to_cpu(evt->handle));
- 	print_bdaddr(evt->bdaddr);
- 	print_link_type(evt->link_type);
- 	print_enable("Encryption", evt->encr_mode);
-@@ -10648,7 +10650,7 @@ static void sync_conn_complete_evt(struct timeval *tv, uint16_t index,
- 	const struct bt_hci_evt_sync_conn_complete *evt = data;
- 
- 	print_status(evt->status);
--	print_handle(evt->handle);
-+	print_field("Handle: %d", le16_to_cpu(evt->handle));
- 	print_bdaddr(evt->bdaddr);
- 	print_link_type(evt->link_type);
- 	print_field("Transmission interval: 0x%2.2x", evt->tx_interval);
-@@ -11077,7 +11079,7 @@ static void le_conn_complete_evt(struct timeval *tv, uint16_t index,
- 	const struct bt_hci_evt_le_conn_complete *evt = data;
- 
- 	print_status(evt->status);
--	print_handle(evt->handle);
-+	print_field("Handle: %d", le16_to_cpu(evt->handle));
- 	print_role(evt->role);
- 	print_peer_addr_type("Peer address type", evt->peer_addr_type);
- 	print_addr("Peer address", evt->peer_addr, evt->peer_addr_type);
-@@ -11206,7 +11208,7 @@ static void le_enhanced_conn_complete_evt(struct timeval *tv, uint16_t index,
- 	const struct bt_hci_evt_le_enhanced_conn_complete *evt = data;
- 
- 	print_status(evt->status);
--	print_handle(evt->handle);
-+	print_field("Handle: %d", le16_to_cpu(evt->handle));
- 	print_role(evt->role);
- 	print_peer_addr_type("Peer address type", evt->peer_addr_type);
- 	print_addr("Peer address", evt->peer_addr, evt->peer_addr_type);
--- 
-2.43.0.429.g432eaa2c6b-goog
-
+--===============6349227954728531265==--
