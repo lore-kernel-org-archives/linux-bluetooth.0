@@ -1,107 +1,212 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C31275579B
-	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jan 2024 09:00:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24CCC65BBB;
+	Fri, 26 Jan 2024 09:12:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706259657; cv=none; b=fx3zyIgmZdY1wbUWzRQTCsnD733VdcvhFfwYq7FaFAB9FBHpqn2oXPXk++Ua8szzclVX/+LnGgme8H9HzVAcI7wKuulWUtY/aRxIElHnuRtiCwJPdfUmrXR6jrOg+DLV1akMdDIeqe805zdl7aINkfWdPonqX2y8/U1pkzJz3pI=
+	t=1706260373; cv=none; b=kpRRRBQ87m5DPN80MHQG5yUUhz6c33z3w3KyQmAJkcZ3CqM61YpO1XOVDwqMC6mWwXSr5oili88wrD3DFRjQQfccqM8SFT9kHex/aYoHDFM995yIhE9GvgGhNvBM038T5prrbv9utpwsA2ozoZtwBfM5GKwkLJTHTixWmyJK9Lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706259657; c=relaxed/simple;
-	bh=LfxsHEyFIqcJCBenDpuiLEW4WgeyR25DIBqxNnB2f9U=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=izT1Efc7vIFZclYsCAteXpc8Dsmue2ODd3jCrHgOcwKbikJSxfx1izJckg/HnZZ/NaLFgitJ/p31rs8NzKxH2DK5n1SU6mh/Z0gm/4es77q4uihbA3C+RRpU8XlOdTMDn2zU2MRUWV0yNl4h6iK9XD3A+IMlUTYBJhH6mcbJaRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=hSJotDoC; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1706260373; c=relaxed/simple;
+	bh=ZoRSJvoWqKga1SG2FFzE2w6OD+wWH46tFmixAACobBI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NymuNqwF7EIStNPPzfo6ysjo0T1xChGXF+nYUOmVutnwSMROdmOVyMwtMBQUIGpKEaZZQsBZ0XRcKcboqmjPMpVxkPNsPta6Tt1qfYCjRIqxq5A+3s8HWc8vCWgMB/aj/R+i4tglXTvWGI8MCMNrxFbiq9gCWWGojur7mf6usSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=CFE0E9XX; arc=none smtp.client-ip=46.235.227.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="hSJotDoC"
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40Q7ZnHu011008;
-	Fri, 26 Jan 2024 09:00:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	from:to:cc:subject:date:message-id:mime-version:content-type; s=
-	qcppdkim1; bh=Yabe2tqyDBNl8oCzo3vSM19degE87lfvtFbklLGTMaY=; b=hS
-	JotDoClTf27r/chDouQURoAnQ6w7zGaIiK+8/RuuyKzMOFo4Kyr9c4+3FXF3I8Wz
-	hhb5d379gDkf/9a40yfRoq4IgbRrbhpK5perItGa5p2fkAzvjNPV4c96U1Edd2Ef
-	kaJOs777yRlq16G5HZfH75zzwu4xEzVvMAFhW6qkOdyK/tcahFyGGuS3iEN7xMGT
-	eoX589SuEdn8v5L22Mhh/WOcpzl2/zwSRRyPY5dMHH7b/FHdwb9R1RCWa96YtjRZ
-	riCI8sdIAwRYTCdwLvnFNDA3/fp4xfSZY9FFOPFvHtf5L8t7fmb5FBvKMNoN0TAJ
-	YOHrn2YNh5g5minfadXA==
-Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3vv101935b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 26 Jan 2024 09:00:44 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 40Q90i53021701
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 26 Jan 2024 09:00:44 GMT
-Received: from zijuhu-gv.qualcomm.com (10.80.80.8) by
- nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 26 Jan 2024 01:00:42 -0800
-From: Zijun Hu <quic_zijuhu@quicinc.com>
-To: <luiz.dentz@gmail.com>, <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-        <mmandlik@google.com>, <quic_saluvala@quicinc.com>
-CC: <linux-bluetooth@vger.kernel.org>, Zijun Hu <quic_zijuhu@quicinc.com>
-Subject: [PATCH v1] Bluetooth: qca: Fix triggering coredump implementation
-Date: Fri, 26 Jan 2024 17:00:24 +0800
-Message-ID: <1706259624-12518-1-git-send-email-quic_zijuhu@quicinc.com>
-X-Mailer: git-send-email 2.7.4
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="CFE0E9XX"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1706260370;
+	bh=ZoRSJvoWqKga1SG2FFzE2w6OD+wWH46tFmixAACobBI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=CFE0E9XXR9BWxs45HlGn7FRIOAj7TxaAi78vLgkJJbntjVkegYxIJ2ZIByVPlrRCM
+	 8UGtochIV68ovE5QoG+zzAS0OIzy5Kbj86EiqA3NgXQL8Bt9hjnLyPzg0o7Cin8+ot
+	 VNWTOx9qO16+aPEHIFL0TJ+vwHh2wqdSGeS9SbNWL+hGZbR1n1E5nHZyKl11AVd7zZ
+	 hadui7C8Gv4rcFkeidmOzxTqKO3asz/XZUm2zjYqpguY5Cr5UYMCcl8voFmLn9G6CE
+	 GEn/BBbP/HhwypxMtQPK+qtDEHfPos50OH1vm3tHZGt4VnqiQK0oqol4voiNP6yGQF
+	 ExZYWNJedohGQ==
+Received: from [100.113.186.2] (cola.collaboradmins.com [195.201.22.229])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: kholk11)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 7EB853782072;
+	Fri, 26 Jan 2024 09:12:49 +0000 (UTC)
+Message-ID: <dc6f77bd-6671-43eb-8658-626b2591415d@collabora.com>
+Date: Fri, 26 Jan 2024 10:12:48 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: ew2HOGmfvGtMuvC2CY3wL1U8eM1LY3fh
-X-Proofpoint-GUID: ew2HOGmfvGtMuvC2CY3wL1U8eM1LY3fh
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-25_14,2024-01-25_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
- mlxlogscore=999 adultscore=0 spamscore=0 clxscore=1011 phishscore=0
- malwarescore=0 priorityscore=1501 mlxscore=0 lowpriorityscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2401190000 definitions=main-2401260064
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] dt-bindings: net: bluetooth: Add MediaTek MT7921S
+ SDIO Bluetooth
+Content-Language: en-US
+To: Chen-Yu Tsai <wenst@chromium.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
+ <matthias.bgg@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ linux-mediatek@lists.infradead.org, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20240125095240.2308340-1-wenst@chromium.org>
+ <20240125095240.2308340-2-wenst@chromium.org>
+ <68249675-4081-48d9-abbb-1b2e49894fae@collabora.com>
+ <CAGXv+5GG+Ko4nZKCvpQ2TnjeHDKWi5qS_SWAgLcrZ6fn_ySiug@mail.gmail.com>
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+In-Reply-To: <CAGXv+5GG+Ko4nZKCvpQ2TnjeHDKWi5qS_SWAgLcrZ6fn_ySiug@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-hci_coredump_qca() uses __hci_cmd_sync() to send a vendor-specific command
-to trigger firmware coredump, but the command does not have any event as
-its sync response, so it is not suitable to use __hci_cmd_sync(), fixed by
-using __hci_cmd_send().
+Il 26/01/24 04:26, Chen-Yu Tsai ha scritto:
+> On Thu, Jan 25, 2024 at 7:39 PM AngeloGioacchino Del Regno
+> <angelogioacchino.delregno@collabora.com> wrote:
+>>
+>> Il 25/01/24 10:52, Chen-Yu Tsai ha scritto:
+>>> The MediaTek MT7921S is a WiFi/Bluetooth combo chip that works over
+>>> SDIO. While the Bluetooth function is fully discoverable, the chip
+>>> has a pin that can reset just the Bluetooth side, as opposed to the
+>>> full chip. This needs to be described in the device tree.
+>>>
+>>> Add a device tree binding for MT7921S Bluetooth over SDIO specifically
+>>> ot document the reset line.
+>>>
+>>> Cc: Sean Wang <sean.wang@mediatek.com>
+>>> Signed-off-by: Chen-Yu Tsai <wenst@chromium.org>
+>>> ---
+>>>    .../bluetooth/mediatek,mt7921s-bluetooth.yaml | 49 +++++++++++++++++++
+>>>    MAINTAINERS                                   |  1 +
+>>>    2 files changed, 50 insertions(+)
+>>>    create mode 100644 Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml
+>>>
+>>> diff --git a/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml
+>>> new file mode 100644
+>>> index 000000000000..bbe240e7cc40
+>>> --- /dev/null
+>>> +++ b/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml
+>>> @@ -0,0 +1,49 @@
+>>> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+>>> +%YAML 1.2
+>>> +---
+>>> +$id: http://devicetree.org/schemas/net/bluetooth/mediatek,mt7921s-bluetooth.yaml#
+>>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>>> +
+>>> +title: MediaTek MT7921S Bluetooth
+>>> +
+>>
+>> title:
+>>
+>> maintainers:
+>>
+>> description:
+>>
+>> ... and then, you missed
+>>
+>> allOf:
+>>     - $ref: bluetooth-controller.yaml#
+> 
+> (facepalm)
+> 
+>> Everything else looks good.
+>>
+>> Cheers,
+>> Angelo
+>>
+>>> +description:
+>>
+>> MT7921S is a (dual?) SDIO-attached dual-radio WiFi+Bluetooth combo chip;
+>> this chip has two dedicated reset lines, one of which is used to reset
+>> the Bluetooth core.
+>> The WiFi part of this chip is described in ....where? :-)
+> 
+> The function itself is fully probable and the implementation doesn't make
+> use of the WiFi's reset line, so I don't see any reason to describe it?
+> I don't actually know what the reset line does in the chip hardware.
+> This patch is just described what is already used.
+> 
+>>> +  This binding describes the Bluetooth side of the SDIO-attached MT7921S
+>>> +  WiFi+Bluetooth combo chips. These chips are dual-radio chips supporting
+>>> +  WiFi and Bluetooth. Bluetooth works over SDIO just like WiFi. Bluetooth
+>>> +  has its own reset line, separate from WiFi, which can be used to reset
+>>> +  the Bluetooth core.
+>>> +
+>>> +maintainers:
+>>> +  - Sean Wang <sean.wang@mediatek.com>
+>>> +
+>>> +properties:
+>>> +  compatible:
+>>> +    enum:
+>>> +      - mediatek,mt7921s-bluetooth
+>>> +  reg:
+>>> +    const: 2
+>>> +
+>>> +  reset-gpios:
+>>> +    maxItems: 1
+>>> +    description: A GPIO line connected to the Bluetooth subsystem reset line.
+>>> +      Typically the W_DISABLE2# pin on M.2 E-key modules. If present this
+>>> +      shall be flagged as active low.
+>>
+>> description:
+>>     An active-low reset line connected for the Bluetooth core;
+> 
+> connected to?
 
-Fixes: 06d3fdfcdf5c ("Bluetooth: hci_qca: Add qcom devcoredump support")
-Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
----
- drivers/bluetooth/hci_qca.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+Eh yes, sorry - I edited that statement multiple times and that "for" stuck
+there for reasons :-)
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 94b8c406f0c0..f989c05f8177 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1806,13 +1806,12 @@ static int qca_power_on(struct hci_dev *hdev)
- 
- static void hci_coredump_qca(struct hci_dev *hdev)
- {
-+	int err;
- 	static const u8 param[] = { 0x26 };
--	struct sk_buff *skb;
- 
--	skb = __hci_cmd_sync(hdev, 0xfc0c, 1, param, HCI_CMD_TIMEOUT);
--	if (IS_ERR(skb))
--		bt_dev_err(hdev, "%s: trigger crash failed (%ld)", __func__, PTR_ERR(skb));
--	kfree_skb(skb);
-+	err = __hci_cmd_send(hdev, 0xfc0c, 1, param);
-+	if (err < 0)
-+		bt_dev_err(hdev, "%s: trigger crash failed (%d)", __func__, err);
- }
- 
- static int qca_get_data_path_id(struct hci_dev *hdev, __u8 *data_path_id)
--- 
-2.7.4
+> 
+>>     on typical M.2 Key-E modules this is the W_DISABLE2# pin.
+> 
+> Otherwise this looks better. Thanks.
+
+You're welcome!
+
+Cheers!
+
+> 
+> 
+> ChenYu
+> 
+>> Cheers,
+>> Angelo
+>>
+>>> +
+>>> +required:
+>>> +  - compatible
+>>> +  - reg
+>>> +
+>>> +additionalProperties: false
+>>> +
+>>> +examples:
+>>> +  - |
+>>> +    mmc {
+>>> +        #address-cells = <1>;
+>>> +        #size-cells = <0>;
+>>> +
+>>> +        bluetooth@2 {
+>>> +            compatible = "mediatek,mt7921s-bluetooth";
+>>> +            reg = <2>;
+>>> +            reset-gpios = <&pio 8 GPIO_ACTIVE_LOW>;
+>>> +        };
+>>> +    };
+>>> diff --git a/MAINTAINERS b/MAINTAINERS
+>>> index b64a64ca7916..662957146852 100644
+>>> --- a/MAINTAINERS
+>>> +++ b/MAINTAINERS
+>>> @@ -13657,6 +13657,7 @@ M:    Sean Wang <sean.wang@mediatek.com>
+>>>    L:  linux-bluetooth@vger.kernel.org
+>>>    L:  linux-mediatek@lists.infradead.org (moderated for non-subscribers)
+>>>    S:  Maintained
+>>> +F:   Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml
+>>>    F:  Documentation/devicetree/bindings/net/mediatek-bluetooth.txt
+>>>    F:  drivers/bluetooth/btmtkuart.c
+>>>
+>>
+
 
