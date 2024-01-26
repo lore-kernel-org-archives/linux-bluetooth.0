@@ -1,114 +1,211 @@
-Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com [209.85.222.41])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E4C621A01
-	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jan 2024 09:33:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DC5A10A30
+	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jan 2024 10:40:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706261616; cv=none; b=bE5AyNToTBfRzUpxcklXriyeZo6UPxf9OlJhMQDgEave35L3W7RaZDnleEeOS13DC3sXehgDwXVefM99bkg0P6Muf9SH8aUPhDBKo2fv4XQc9S6afmFWI5D6bFT2oCAbXABQ5fAUA5QwZcZI2mYbi5vTutPD4JOXRihaQ+nifvo=
+	t=1706265639; cv=none; b=SZAJ1E2JcX4/UsDLzOaJlMl4NfQl6FiXKuegT2710iP58EGQzkvExMZDqhJfh8xaL2MhvtpQSXpfjSur4UatFZNc/2LIiWI1a0jwrVxGHYZhA2UNeemRXtJWL/Miu6uYDg5QaF2Vi2LVid0/eAUOJ4sEIft+GBPDr2dHW4ftbVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706261616; c=relaxed/simple;
-	bh=URPTw1ljq+GRk1DpompXPfbz6tL0v/rX2qOLorNPqs8=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Ox9dMav80B/uUGSe+tZ56XTySt67tQa4QdOcQcr6aOtKjtbxW0b9C+Whn7weD5eGjuz1fev16EYWjcWm6EYcs+F4LG3FlF4S4HVJSkvIVaxutsc0HvmGUq7L9ie54hDKQLEavDtU3h1J8uqssj/al7xDxfDnU2lie+Aeqzo3qNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mWeifMxu; arc=none smtp.client-ip=209.85.222.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1706265639; c=relaxed/simple;
+	bh=gl1zEWtHpPeGeDv2YH2Awyz9rES2JmI4GPlsLZI4GRE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cEoM5SkqTaE/m5/z2LraP19OSX0mvStYA0ENzKY/sa8oFTJRWTDFYJF08JuIgecKwmkOFS7q5wpV4A3o4es1PnSqjE0ElriFLulk7TgdhKp6zrHVg66hVGSlUPA+YHnDGkqEGQM55J1ETQVDLdhWpswT6DLa9bkwQSC0t4/tLqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=JN/9v/b6; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mWeifMxu"
-Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-7d317aafbd1so97946241.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jan 2024 01:33:34 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JN/9v/b6"
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a310409589aso15270966b.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jan 2024 02:40:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706261614; x=1706866414; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=HeDYYWnWC/Y5ccoYQI3Hz3pIvsbkCEMfnD0OTY0HcQo=;
-        b=mWeifMxuxdMaDpj0+C8q3USjeb1tRXi0+bZ9Pxag20RFmafPtxK8rF5ypV7WNI/tmE
-         NHphmehXUCE3RNxZGHfI6pq8O001nRMl19te4JlYL070uqUizUSF24C0lx5qMSbHWBeF
-         giw5fqhD+18HHHkR8CuYyrjEnzQQsmacJQi1S4ivnTFXKwIOqo4r+5n9EUEf4AUY7yDF
-         7pIAaZC6Zsyvs7MERzHsxA+1/KjiIqObUeL+bRl7xUicODZs84W1om5bfwKBv5pSUtKW
-         B0DuwKiIV1vKkfcCitL7b60kHvaD8/p6kRlOtuRFfhQ4DGf21/tyS8djv0zwqADEtW6T
-         4BvQ==
+        d=linaro.org; s=google; t=1706265635; x=1706870435; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+rxdOPY25LMe3+An1qLrkEz9HXwYecZgDaBwRDQOLTk=;
+        b=JN/9v/b6bfhRv+ad8z2W0EecINVR7cuoqgaGxpLq90C/WQ996qMjvsrlDV2eGq0zVI
+         zYQuDa1P7oWCf5LEK2rZxAtCxxNhllTGe2+hqYA1yj11UXN+yxUwwmpxaTuDVZ71YGoT
+         4eEAfkQ0CxMlyKziAuq3nMBrIIgDWO2dMl/4ApRIIyHVqRyZI4zcQ1qv2q44FlVT7zp5
+         SYrO4C40QAS4U+KEkJ0tbeu8gMXIShlpA902AkAQ1baYvD0yeDxfREVOHcDP/ljcuPx4
+         ChrAHLYkYFtGKGOepuM52YIQONquspZXH962YqD/l0lV4q+yIcKbidaRm/dcbILNU98x
+         UxGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706261614; x=1706866414;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HeDYYWnWC/Y5ccoYQI3Hz3pIvsbkCEMfnD0OTY0HcQo=;
-        b=aNPN0frpZ3gVF5n0L9z5cOmx54P+cp900Z0icAsqRr5kZJgobMdJh74HBrwmFmS96L
-         P5aP8g+WwfwWqKSl260jb6pBfKfpQEsHu85cHkEB19aEchDHgN9TyHswckq8icet/M77
-         +C2QejGBIgzRPLR965w/Y860ROqNhYCQyeNmCHzJNsxYMFWVF3ZYA6FJqFLyWvyAo7v9
-         7W6VA6JnZcCo1YlT+lxcESGE77qH0marcg7CkYBHJzPZJjMsAztsJqOOQ0aiE4jDuu8a
-         YbnZ+V8W/mVZNW759yh6MAXB6tr2Sg8DGmwqbqUvJu1fityfrs3ZTRFI8hbdi7o3LKBK
-         +uTg==
-X-Gm-Message-State: AOJu0Yy6pDlcUtW5S0Lf2NL6QGwPulrBJJRq4DHzmxCmQwdN2dVuBHzZ
-	YqW+vH+IhzJzxQ0mQAG2eR5Qp7HUOgqVocpnHtqVbl0OPAZC1yQfr/hpV/lr
-X-Google-Smtp-Source: AGHT+IH5MdXgod7Cy3fmhRN6tH5/J3mHtcmxrC31f2dt8A9EYHBuj/9+v/r0xkZgZFB2Apb/8eHdMQ==
-X-Received: by 2002:a67:f9d0:0:b0:469:ad01:edbe with SMTP id c16-20020a67f9d0000000b00469ad01edbemr784473vsq.9.1706261613836;
-        Fri, 26 Jan 2024 01:33:33 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCUX9m/Q4UUBaTqlHjVMIOkPc+7gH3pRxns5k1/2lkk1+X6IfPXRc/LzSlgRxeg34ZWdFQQuHqOkQybcBB2PC+GVwvG6QOLfHQ==
-Received: from [172.17.0.2] ([20.109.38.199])
-        by smtp.gmail.com with ESMTPSA id na1-20020a0562142d4100b00686aa6dbcbfsm367642qvb.81.2024.01.26.01.33.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jan 2024 01:33:33 -0800 (PST)
-Message-ID: <65b37c6d.050a0220.83910.126f@mx.google.com>
-Date: Fri, 26 Jan 2024 01:33:33 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2225596253719945091=="
+        d=1e100.net; s=20230601; t=1706265635; x=1706870435;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+rxdOPY25LMe3+An1qLrkEz9HXwYecZgDaBwRDQOLTk=;
+        b=Rn+J3LommMMebGfoZS1R6SCK0oiOWTugfU25ccWC5uIrK94+wYYfTFe5HRpkoZgt9u
+         PqlT+a0UUh6uipZfQzjx6UtLJzL1Ddi8WuKd+UkSbxDEdsau5x5xBPTguw/neJyM/uAM
+         3Kha6UNvZBAiKfwX3X8AihYFNr0py811W8k4SohvvXtfU1yOjz8/4PorO2PYTrzPGzyx
+         DdJ/pZJrdBerxVgy33S1UEAcpe+NM5b50C3rOXlP/Y3+sN7j2DIxJ4Mg2j4LOn557jtu
+         LK9BR6d1n7pwaa5z2wVqGAi2tTZtkFmlgGV6sO02epggQd69YxlJ86M48KafH1L9Lr0j
+         8TOQ==
+X-Gm-Message-State: AOJu0YyxkYLBwwIRE9uQBCDsZSVDK8BxZDvIVm6vFwvxKfnmVWouhxGT
+	srxZqfpCoAVgxYxfYubgicP8VvMzyXXrVnLvn5L5ps+z8J68Tlx/yqkP1zBlY4w=
+X-Google-Smtp-Source: AGHT+IHBN1TTtd9Ev4I2l2QrNfpfRANY5sgU8gNdV3XTN7GgSafm/gXyF9GHt26emVq30MO7rwBqzQ==
+X-Received: by 2002:a17:906:37d0:b0:a31:8008:cece with SMTP id o16-20020a17090637d000b00a318008cecemr416174ejc.6.1706265635415;
+        Fri, 26 Jan 2024 02:40:35 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.215.66])
+        by smtp.gmail.com with ESMTPSA id un8-20020a170907cb8800b00a2fb9c0337esm476980ejc.112.2024.01.26.02.40.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 26 Jan 2024 02:40:34 -0800 (PST)
+Message-ID: <74b9f249-fcb4-4338-bf7b-8477de6c935c@linaro.org>
+Date: Fri, 26 Jan 2024 11:40:32 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, quic_zijuhu@quicinc.com
-Subject: RE: [v1] Bluetooth: qca: Fix triggering coredump implementation
-In-Reply-To: <1706259624-12518-1-git-send-email-quic_zijuhu@quicinc.com>
-References: <1706259624-12518-1-git-send-email-quic_zijuhu@quicinc.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============2225596253719945091==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/2] dt-bindings: net: bluetooth: Add MediaTek MT7921S
+ SDIO Bluetooth
+Content-Language: en-US
+To: Chen-Yu Tsai <wenst@chromium.org>, Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
+ <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: Sean Wang <sean.wang@mediatek.com>, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org, linux-mediatek@lists.infradead.org,
+ devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+References: <20240126063500.2684087-1-wenst@chromium.org>
+ <20240126063500.2684087-2-wenst@chromium.org>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20240126063500.2684087-2-wenst@chromium.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-This is automated email and please do not reply to this email!
+On 26/01/2024 07:34, Chen-Yu Tsai wrote:
+> The MediaTek MT7921S is a WiFi/Bluetooth combo chip that works over
+> SDIO. While the Bluetooth function is fully discoverable, the chip
+> has a pin that can reset just the Bluetooth side, as opposed to the
+> full chip. This needs to be described in the device tree.
+> 
+> Add a device tree binding for MT7921S Bluetooth over SDIO specifically
+> ot document the reset line.
 
-Dear submitter,
+s/ot/to/
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=820176
+> 
+> Cc: Sean Wang <sean.wang@mediatek.com>
+> Signed-off-by: Chen-Yu Tsai <wenst@chromium.org>
+> ---
+> Changes since v1:
+> - Reworded descriptions
+> - Moved binding maintainer section before description
+> - Added missing reference to bluetooth-controller.yaml
+> - Added missing GPIO header to example
+> 
+>  .../bluetooth/mediatek,mt7921s-bluetooth.yaml | 53 +++++++++++++++++++
+>  MAINTAINERS                                   |  1 +
+>  2 files changed, 54 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml
+> new file mode 100644
+> index 000000000000..ff11c95c816c
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml
+> @@ -0,0 +1,53 @@
+> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/bluetooth/mediatek,mt7921s-bluetooth.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: MediaTek MT7921S Bluetooth
+> +
+> +maintainers:
+> +  - Sean Wang <sean.wang@mediatek.com>
+> +
+> +description:
+> +  MT7921S is an SDIO-attached dual-radio WiFi+Bluetooth Combo chip; each
+> +  function is its own SDIO function on a shared SDIO interface. The chip
+> +  has two dedicated reset lines, one for each function core.
+> +  This binding only covers the Bluetooth part of the chip.
+> +
+> +allOf:
+> +  - $ref: bluetooth-controller.yaml#
+> +
+> +properties:
+> +  compatible:
+> +    enum:
+> +      - mediatek,mt7921s-bluetooth
 
----Test result---
+Can it be also WiFi on separate bus? How many device nodes do you need
+for this device?
 
-Test Summary:
-CheckPatch                    PASS      0.63 seconds
-GitLint                       PASS      0.31 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      28.79 seconds
-CheckAllWarning               PASS      31.41 seconds
-CheckSparse                   PASS      37.45 seconds
-CheckSmatch                   PASS      100.85 seconds
-BuildKernel32                 PASS      27.83 seconds
-TestRunnerSetup               PASS      446.56 seconds
-TestRunner_l2cap-tester       PASS      23.27 seconds
-TestRunner_iso-tester         PASS      42.48 seconds
-TestRunner_bnep-tester        PASS      6.86 seconds
-TestRunner_mgmt-tester        PASS      159.17 seconds
-TestRunner_rfcomm-tester      PASS      10.84 seconds
-TestRunner_sco-tester         PASS      14.46 seconds
-TestRunner_ioctl-tester       PASS      12.13 seconds
-TestRunner_mesh-tester        PASS      8.75 seconds
-TestRunner_smp-tester         PASS      9.79 seconds
-TestRunner_userchan-tester    PASS      7.26 seconds
-IncrementalBuild              PASS      26.58 seconds
+Missing blank line.
 
 
+> +  reg:
+> +    const: 2
+> +
+> +  reset-gpios:
+> +    maxItems: 1
+> +    description:
+> +      An active-low reset line for the Bluetooth core; on typical M.2
+> +      key E modules this is the W_DISABLE2# pin.
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +
+> +additionalProperties: false
 
----
-Regards,
-Linux Bluetooth
+Instead 'unevaluatedProperties: false'
 
 
---===============2225596253719945091==--
+Best regards,
+Krzysztof
+
