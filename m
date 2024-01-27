@@ -1,216 +1,218 @@
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E98412232D
-	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jan 2024 19:01:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72C8720B1C
+	for <linux-bluetooth@vger.kernel.org>; Sat, 27 Jan 2024 23:34:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706295711; cv=none; b=eDWbiz4WWJczBmC2SHjd7kN0uTJxh0Y3KjW/Bx9KZN7NcfmWguO6GmVTxcy2BmUU2LBmsEzuqSL54hqnU8Hq4dM+8lBoq37YtjAOXPgdR9fFyfaNdA+uX5Rnu6/d7bSm/aRAD4nki2unWf+UTMoL8RAZxKuiQcUvRBFZPiEhZes=
+	t=1706398477; cv=none; b=iIvoG+E9rGZoOc5Xo3xsQVLF3SVMlaf5C3GXhpSf+qwdBVtY9e4RKq3Jpkq57y+XETliohCeu+37ucFbKTt/FZbzkIxui/hw8YHf+Oph4BIC9/r5Fw/G4DXH3f9jG9+9MW7CVzkilHqN+5OW0/S0+Jv+7nTi7cjYGHl9T6qMthw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706295711; c=relaxed/simple;
-	bh=2dtJAE3olhfnRYzBSWBO4VL2i9+7eXcCBnEg/aVMOCA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OLPJCD1RuBiPZnYRhbG5X4vtNhZjrsa+z5wCMnlZY0aALw6pNn5oh5deF7GVUEa1A/APinupua8TJKaaLhcGqcEfoQ38SUd+cwzwgOoP/RY4Tbcq0IxAG3ZV83thZx4Jn7mcL/hANwFAGrNrBlHj0XCW2xGJ83H3TNUBCvKL//Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S1pR4MSS; arc=none smtp.client-ip=209.85.208.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S1pR4MSS"
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2cf338e1438so7482621fa.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jan 2024 11:01:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706295708; x=1706900508; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fyGrxJ9MwUPYz33bGO4oXV3lXOtlIo5dJXVcqmBysYU=;
-        b=S1pR4MSSamoH3e33+5oUCm6RgSzOW109ImS/ITArhBNHyZViCSoITg97IYsIC3m5i9
-         wpo3pKOWWZoo2JQqQP+wXcG2q2KL7bCDOhfp0tZb+iaYZsjfCex2p1q2bZL7tB7IO08X
-         MzVA8ulWjywsFnDidkEewsTjwAGpDpikEvHSmPIV4By78M2foKwKK8BUx5CO32dzPNuD
-         1DGT735WJw+dq90geNYTkb00Kuu392iSx1KNnKaVw7F2FoLIxxKvmvz0uHHk4vHqC0vJ
-         rMvL/Bg5XEbzus4LibHuRW6pv3BdheNsNuCmanPEOL0A7odvyNC9IpzL248BRL+iNUwx
-         KVxw==
+	s=arc-20240116; t=1706398477; c=relaxed/simple;
+	bh=7sbqOsOdDpvvuOUNSdaA2ehO6PkPRuvkoWBBpTUVmfk=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ToTstEpkLFmg6ObGpj04ny8sWZug7aTein8K2DBonblcnuoNO5TatxcQABpsQNhAKkRG35teklJv98y9j46ty4hoIFxvWEcIrcv34o1O5mvBxPOLcztAaqyB77rcwsdvNngXbC5AqxAfPWG9WXzf0o4k0sZX2x6pn3C+qU/4+QY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3627a593d76so8239805ab.2
+        for <linux-bluetooth@vger.kernel.org>; Sat, 27 Jan 2024 15:34:33 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706295708; x=1706900508;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fyGrxJ9MwUPYz33bGO4oXV3lXOtlIo5dJXVcqmBysYU=;
-        b=clVhLTIMiMTYX19nkwizXBVOotYDXHCJ42OcTneUDWD9qRv0IXPdzuH3LAd/MGXPh2
-         bXKRAEIRd5bwntemnZfSUoJP1BI9rrcjkuR85C6yahpl+MKQJOqdj9ujRqrBHzaeDkxh
-         NWmBIGiYXhS6tFF06OL5qV0RSlaCJp5AdJPLJoQdS6Fzxqh9jRTMid7cPY3ldyK769gR
-         aTO3QBRqsFJWpKzhf5x8jSbX9hW8GrnrsOsppkA8h7tEKiYEqCPeDXfDDVwyXOTTWKak
-         PMtUxbGeEvwB0MQl8NEQLxpxsPcvBPZI7Q62DhfezKO2Kadq500SbNwRjAay6PZZ2SV/
-         hR5g==
-X-Gm-Message-State: AOJu0YyPXsLQSj7RL3aBsE3k8Kagaz7vGh5VBoAT5MwJNgQWgLxcNJxx
-	9zdtBEX41PGZUF5lKn+Ah2ZkbyfTsHGBTExI6fcRzVP7z4KD6zx4BkTxSPTJq3WJWsQFAzFAEvC
-	FappqAF16/7AFSgHsZvyKUOaB4tFQifA/
-X-Google-Smtp-Source: AGHT+IH1zpgEBP9/hwQKH8sEpTdRxsYXZSeBl/I0UUA/BNvBJxxT2DTclLpd+1VjYZbqGi73qK4zDF78w3jgLXSpYeU=
-X-Received: by 2002:a2e:91d2:0:b0:2cd:2771:a2fb with SMTP id
- u18-20020a2e91d2000000b002cd2771a2fbmr995438ljg.2.1706295707551; Fri, 26 Jan
- 2024 11:01:47 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706398471; x=1707003271;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WQCNOmrykklYyLumEVVjuqrDyVUK+crEJnf7k0UZNBU=;
+        b=D33WkksiFjpSyTJGFdCTQwumRUS3/5mxtugUD3Kg9bGcBoG34v3qj5HYE+ko1XzBlj
+         UtiPj9k4yTSOfFl6cM77PW7T8mTIokk9prUreZ0E30kJgsa37gXaTP6rqfWtLsB9Ox/A
+         1FJQ9nwrXRAYrqh3be0TkR6+MUq6H8qRK5oh5KpAEofYf4F3FDZgQuo/+VSFYZTaNOxq
+         zLkgoIdkC2rkFuGW30E5upfGr7u8l0NrVGk5dmdP/SXnNRWibGgsz/urIkc210Otq0Hw
+         3nwjzaVX/o0tKt8rS24hfHnkuAW3AHxHjwCPQ+1Ul6Dhr4GfE+writdHRUQfkMfqRFTx
+         nlgQ==
+X-Gm-Message-State: AOJu0Yy7WBwSQnr+verhdUBqSjMVKYXA4rD1GxR6/r9vU1u7GyOtzySD
+	5ZLgDLGyifK4qXTyd1pd0HiLL0K5EhgQ7LJ9i427phYRl8Mwo+trkP81GyP23ucY+KctI4jQHoO
+	vIAnnjBInuMGKdxXXHHbIyz0uMPc3jC9ukbbrCxFld944dRAkL93jQ4U=
+X-Google-Smtp-Source: AGHT+IEuXs/csxgZUDT681sW9abDqPR3ywzZlABcObc40mbfOZv7T5ELbHx3Mf3yluxM6GEx33qrCt2YOAoEjgSnMJNYW0NnDlp3
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240126144120.Bluez.1.If74ccbca4d541c5f576765a3a78cb8923b5f85b1@changeid>
-In-Reply-To: <20240126144120.Bluez.1.If74ccbca4d541c5f576765a3a78cb8923b5f85b1@changeid>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 26 Jan 2024 14:01:35 -0500
-Message-ID: <CABBYNZL3yZ1_7wVyGg6fMZ=a3thqia2i+WSBFFyvBxTt4KPEgA@mail.gmail.com>
-Subject: Re: [Bluez PATCH] Monitor: Remove handle before assigning
-To: Archie Pusaka <apusaka@google.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
-	CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>, 
-	Archie Pusaka <apusaka@chromium.org>, Zhengping Jiang <jiangzp@google.com>
+X-Received: by 2002:a05:6e02:b2c:b0:361:8d02:f37d with SMTP id
+ e12-20020a056e020b2c00b003618d02f37dmr336098ilu.4.1706398471317; Sat, 27 Jan
+ 2024 15:34:31 -0800 (PST)
+Date: Sat, 27 Jan 2024 15:34:31 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000ba736b060ff5da23@google.com>
+Subject: [syzbot] [bluetooth?] INFO: task hung in hci_conn_failed
+From: syzbot <syzbot+a984066a63e9c1e62662@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, luiz.von.dentz@intel.com, 
+	marcel@holtmann.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Archie,
+Hello,
 
-On Fri, Jan 26, 2024 at 1:42=E2=80=AFAM Archie Pusaka <apusaka@google.com> =
-wrote:
->
-> From: Archie Pusaka <apusaka@chromium.org>
->
-> It is possible to have some handles not removed, for example the host
-> may decide not to wait for disconnection complete event when it is
-> suspending. In this case, when the peer device reconnected, we might
-> have two of the same handle assigned and create problem down the road.
->
-> This patch solves the issue by always removing any previous handles
-> when assigning a new handle if they are the same.
->
-> Reviewed-by: Zhengping Jiang <jiangzp@google.com>
->
-> ---
->
->  monitor/packet.c | 50 +++++++++++++++++++++++++-----------------------
->  1 file changed, 26 insertions(+), 24 deletions(-)
->
-> diff --git a/monitor/packet.c b/monitor/packet.c
-> index 42e711cafa..b5dea6384a 100644
-> --- a/monitor/packet.c
-> +++ b/monitor/packet.c
-> @@ -189,11 +189,33 @@ static struct packet_conn_data *lookup_parent(uint1=
-6_t handle)
->         return NULL;
->  }
->
-> +static void release_handle(uint16_t handle)
-> +{
-> +       int i;
-> +
-> +       for (i =3D 0; i < MAX_CONN; i++) {
-> +               struct packet_conn_data *conn =3D &conn_list[i];
-> +
-> +               if (conn->handle =3D=3D handle) {
-> +                       if (conn->destroy)
-> +                               conn->destroy(conn->data);
-> +
-> +                       queue_destroy(conn->tx_q, free);
-> +                       queue_destroy(conn->chan_q, free);
-> +                       memset(conn, 0, sizeof(*conn));
-> +                       conn->handle =3D 0xffff;
-> +                       break;
-> +               }
-> +       }
-> +}
+syzbot found the following issue on:
 
-We might as well return if we find out there is a packet_conn_data,
-that way we don't need to do 2 lookups in a row.
+HEAD commit:    7ed2632ec7d7 drm/ttm: fix ttm pool initialization for no-d..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=10768b3be80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=bc36d99546fe9035
+dashboard link: https://syzkaller.appspot.com/bug?extid=a984066a63e9c1e62662
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11b8c217e80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=116e5bbfe80000
 
->  static void assign_handle(uint16_t index, uint16_t handle, uint8_t type,
->                                         uint8_t *dst, uint8_t dst_type)
->  {
->         int i;
->
-> +       release_handle(handle);
-> +
->         for (i =3D 0; i < MAX_CONN; i++) {
->                 if (conn_list[i].handle =3D=3D 0xffff) {
->                         hci_devba(index, (bdaddr_t *)conn_list[i].src);
-> @@ -225,26 +247,6 @@ static void assign_handle(uint16_t index, uint16_t h=
-andle, uint8_t type,
->         }
->  }
->
-> -static void release_handle(uint16_t handle)
-> -{
-> -       int i;
-> -
-> -       for (i =3D 0; i < MAX_CONN; i++) {
-> -               struct packet_conn_data *conn =3D &conn_list[i];
-> -
-> -               if (conn->handle =3D=3D handle) {
-> -                       if (conn->destroy)
-> -                               conn->destroy(conn->data);
-> -
-> -                       queue_destroy(conn->tx_q, free);
-> -                       queue_destroy(conn->chan_q, free);
-> -                       memset(conn, 0, sizeof(*conn));
-> -                       conn->handle =3D 0xffff;
-> -                       break;
-> -               }
-> -       }
-> -}
-> -
->  struct packet_conn_data *packet_get_conn_data(uint16_t handle)
->  {
->         int i;
-> @@ -10076,7 +10078,7 @@ static void conn_complete_evt(struct timeval *tv,=
- uint16_t index,
->         const struct bt_hci_evt_conn_complete *evt =3D data;
->
->         print_status(evt->status);
-> -       print_handle(evt->handle);
-> +       print_field("Handle: %d", le16_to_cpu(evt->handle));
->         print_bdaddr(evt->bdaddr);
->         print_link_type(evt->link_type);
->         print_enable("Encryption", evt->encr_mode);
-> @@ -10648,7 +10650,7 @@ static void sync_conn_complete_evt(struct timeval=
- *tv, uint16_t index,
->         const struct bt_hci_evt_sync_conn_complete *evt =3D data;
->
->         print_status(evt->status);
-> -       print_handle(evt->handle);
-> +       print_field("Handle: %d", le16_to_cpu(evt->handle));
->         print_bdaddr(evt->bdaddr);
->         print_link_type(evt->link_type);
->         print_field("Transmission interval: 0x%2.2x", evt->tx_interval);
-> @@ -11077,7 +11079,7 @@ static void le_conn_complete_evt(struct timeval *=
-tv, uint16_t index,
->         const struct bt_hci_evt_le_conn_complete *evt =3D data;
->
->         print_status(evt->status);
-> -       print_handle(evt->handle);
-> +       print_field("Handle: %d", le16_to_cpu(evt->handle));
->         print_role(evt->role);
->         print_peer_addr_type("Peer address type", evt->peer_addr_type);
->         print_addr("Peer address", evt->peer_addr, evt->peer_addr_type);
-> @@ -11206,7 +11208,7 @@ static void le_enhanced_conn_complete_evt(struct =
-timeval *tv, uint16_t index,
->         const struct bt_hci_evt_le_enhanced_conn_complete *evt =3D data;
->
->         print_status(evt->status);
-> -       print_handle(evt->handle);
-> +       print_field("Handle: %d", le16_to_cpu(evt->handle));
->         print_role(evt->role);
->         print_peer_addr_type("Peer address type", evt->peer_addr_type);
->         print_addr("Peer address", evt->peer_addr, evt->peer_addr_type);
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/86560603f270/disk-7ed2632e.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/364bc921d8bf/vmlinux-7ed2632e.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/1d78f4f3ec9b/bzImage-7ed2632e.xz
 
-Are these changes really intentional? Or perhaps we don't want to
-attempt to resolve the address since these are the event that would
-assign them in the first place? In that case I had these fixed
-separately with a proper patch description.
+The issue was bisected to:
 
-> --
-> 2.43.0.429.g432eaa2c6b-goog
->
+commit 5af1f84ed13a416297ab9ced7537f4d5ae7f329a
+Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date:   Thu Aug 3 18:04:51 2023 +0000
+
+    Bluetooth: hci_sync: Fix UAF on hci_abort_conn_sync
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=11218f6be80000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=13218f6be80000
+console output: https://syzkaller.appspot.com/x/log.txt?x=15218f6be80000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+a984066a63e9c1e62662@syzkaller.appspotmail.com
+Fixes: 5af1f84ed13a ("Bluetooth: hci_sync: Fix UAF on hci_abort_conn_sync")
+
+INFO: task kworker/u5:3:5119 blocked for more than 143 seconds.
+      Not tainted 6.8.0-rc1-syzkaller-00026-g7ed2632ec7d7 #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:kworker/u5:3    state:D stack:27264 pid:5119  tgid:5119  ppid:2      flags:0x00004000
+Workqueue: hci5 hci_cmd_sync_work
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5400 [inline]
+ __schedule+0xf12/0x5c00 kernel/sched/core.c:6727
+ __schedule_loop kernel/sched/core.c:6802 [inline]
+ schedule+0xe9/0x270 kernel/sched/core.c:6817
+ schedule_preempt_disabled+0x13/0x20 kernel/sched/core.c:6874
+ __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+ __mutex_lock+0x5b9/0x9d0 kernel/locking/mutex.c:752
+ hci_connect_cfm include/net/bluetooth/hci_core.h:1983 [inline]
+ hci_conn_failed+0x158/0x370 net/bluetooth/hci_conn.c:1289
+ hci_abort_conn_sync+0x758/0xb50 net/bluetooth/hci_sync.c:5356
+ abort_conn_sync+0x187/0x390 net/bluetooth/hci_conn.c:2988
+ hci_cmd_sync_work+0x1a4/0x410 net/bluetooth/hci_sync.c:306
+ process_one_work+0x886/0x15d0 kernel/workqueue.c:2633
+ process_scheduled_works kernel/workqueue.c:2706 [inline]
+ worker_thread+0x8b9/0x1290 kernel/workqueue.c:2787
+ kthread+0x2c6/0x3a0 kernel/kthread.c:388
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+ </TASK>
+INFO: task kworker/u5:5:5122 blocked for more than 146 seconds.
+      Not tainted 6.8.0-rc1-syzkaller-00026-g7ed2632ec7d7 #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:kworker/u5:5    state:D stack:27536 pid:5122  tgid:5122  ppid:2      flags:0x00004000
+Workqueue: hci1 hci_cmd_sync_work
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5400 [inline]
+ __schedule+0xf12/0x5c00 kernel/sched/core.c:6727
+ __schedule_loop kernel/sched/core.c:6802 [inline]
+ schedule+0xe9/0x270 kernel/sched/core.c:6817
+ schedule_preempt_disabled+0x13/0x20 kernel/sched/core.c:6874
+ __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+ __mutex_lock+0x5b9/0x9d0 kernel/locking/mutex.c:752
+ hci_connect_cfm include/net/bluetooth/hci_core.h:1983 [inline]
+ hci_conn_failed+0x158/0x370 net/bluetooth/hci_conn.c:1289
+ hci_abort_conn_sync+0x758/0xb50 net/bluetooth/hci_sync.c:5356
+ abort_conn_sync+0x187/0x390 net/bluetooth/hci_conn.c:2988
+ hci_cmd_sync_work+0x1a4/0x410 net/bluetooth/hci_sync.c:306
+ process_one_work+0x886/0x15d0 kernel/workqueue.c:2633
+ process_scheduled_works kernel/workqueue.c:2706 [inline]
+ worker_thread+0x8b9/0x1290 kernel/workqueue.c:2787
+ kthread+0x2c6/0x3a0 kernel/kthread.c:388
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+ </TASK>
+INFO: task kworker/u5:8:5131 blocked for more than 148 seconds.
+      Not tainted 6.8.0-rc1-syzkaller-00026-g7ed2632ec7d7 #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:kworker/u5:8    state:D stack:27808 pid:5131  tgid:5131  ppid:2      flags:0x00004000
+Workqueue: hci4 hci_cmd_sync_work
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5400 [inline]
+ __schedule+0xf12/0x5c00 kernel/sched/core.c:6727
+ __schedule_loop kernel/sched/core.c:6802 [inline]
+ schedule+0xe9/0x270 kernel/sched/core.c:6817
+ schedule_preempt_disabled+0x13/0x20 kernel/sched/core.c:6874
+ __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+ __mutex_lock+0x5b9/0x9d0 kernel/locking/mutex.c:752
+ hci_connect_cfm include/net/bluetooth/hci_core.h:1983 [inline]
+ hci_conn_failed+0x158/0x370 net/bluetooth/hci_conn.c:1289
+ hci_abort_conn_sync+0x758/0xb50 net/bluetooth/hci_sync.c:5356
+ abort_conn_sync+0x187/0x390 net/bluetooth/hci_conn.c:2988
+ hci_cmd_sync_work+0x1a4/0x410 net/bluetooth/hci_sync.c:306
+ process_one_work+0x886/0x15d0 kernel/workqueue.c:2633
+ process_scheduled_works kernel/workqueue.c:2706 [inline]
+ worker_thread+0x8b9/0x1290 kernel/workqueue.c:2787
+ kthread+0x2c6/0x3a0 kernel/kthread.c:388
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+ </TASK>
+
+Showing all locks held in the system:
+2 locks held by kworker/0:1/9:
+3 locks held by kworker/1:0/23:
+1 lock held by khungtaskd/29:
+ #0: ffffffff8d1acba0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
+ #0: ffffffff8d1acba0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
+ #0: ffffffff8d1acba0 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x75/0x340 kernel/locking/lockdep.c:6614
+2 locks held by kswapd0/87:
+2 locks held by kswapd1/88:
+3 locks held by kworker/1:2/925:
+2 locks held by syslogd/4496:
+ #0: ffff8880b993ccd8 (&rq->__lock){-.-.}-{2:2}, at: raw_spin_rq_lock_nested+0x29/0x130 kernel/sched/core.c:559
+ #1: ffff8880b9928a08 (&per_cpu_ptr(group->pcpu, cpu)->seq){-.-.}-{0:0}, at: psi_task_switch+0x2d9/0x900 kernel/sched/psi.c:988
+2 locks held by getty/4812:
+ #0: ffff88802908b0a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x24/0x80 drivers/tty/tty_ldisc.c:243
+ #1: ffffc900031232f0 (&ldata->atomic_read_lock){+.+.}-{3:3}, at: n_tty_read+0xfc6/0x1490 drivers/tty/n_tty.c:2201
+2 locks held by kworker/0:0/5077:
+1 lock held by sshd/5100:
+2 locks held by kworker/1:1/5116:
+5 locks held by kworker/u5:3/5119:
+ #0: ffff88801d8b3938 ((wq_completion)hci5){+.+.}-{0:0}, at: process_one_work+0x789/0x15d0 kernel/workqueue.c:2608
+ #1: ffffc900046efd80 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: process_one_work+0x7eb/0x15d0 kernel/workqueue.c:2609
+ #2: ffff888021019060 (&hdev->req_lock){+.+.}-{3:3}, at: hci_cmd_sync_work+0x170/0x410 net/bluetooth/hci_sync.c:305
+ #3: ffff888021018078 (&hdev->lock){+.+.}-{3:3}, at: hci_abort_conn_sync+0x150/0xb50 net/bluetooth/hci_sync.c:5337
+ #4: ffffffff8ef22548 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_connect_cfm include/net/bluetooth/hci_core.h:1983 [inline]
+ #4: ffffffff8ef22548 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_conn_failed+0x158/0x370 net/bluetooth/hci_conn.c:1289
 
 
---=20
-Luiz Augusto von Dentz
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
