@@ -1,62 +1,62 @@
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F62157E87
-	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jan 2024 21:20:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B51EB1586CF
+	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jan 2024 21:20:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706563243; cv=none; b=dZsawOEPDcvHuDfQ8NSS5F+p8z/HiJfgDwZBma21P4PZO352aJWpWgLbr+N1aZf74x8ycBcaBdi2/2pcH/2Dc+9ejF2DVsddc3E0ejUNxfHc0sowfeRDUN4aaBTtWCyxJRIIkvA9xx3aVCdavqEY3dq2hlrZVSVp+/gqSrXlbHE=
+	t=1706563245; cv=none; b=nnkaCpRPKa+YIvTbmY6wuZhb6ZJTww+Jbl7I+dmF/JkQZDJAvs+basAF2uaCtqGxGo7NU3vJ7fxB1HonMf2plUMEn6HL65/BTcn+YHi7Qe2qfBEsQgf5cgz70L2fZNrpmV1kDe9XlR8kbtnq95v7Uv+3Y53UoRZmi4bBCCVsNJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706563243; c=relaxed/simple;
-	bh=HScspj2KBEM4z2LFd52QvW2BWvmC2lfzDO8Pg9gmxXQ=;
+	s=arc-20240116; t=1706563245; c=relaxed/simple;
+	bh=RWpqGRSkRSWk4lEGJPCW6tyR94TT26E8WeuDofH4bmU=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rw/PUlkX8RNEWW7YA2UnMX2ThaSDcBUulzm8MtO7Mm+hdA6fyQh6ePMou5Ju4h4kEm91o07Ur3YBsQia6S6cuWYvKAYepcyWca/NcmvfZrZsBO/LlQjpXGEfkwKCXRv7dq83Coq0rZE2HDpyK/I3xSsYh4N7W5QtTdGLeL05otk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TSxRqP5V; arc=none smtp.client-ip=209.85.128.180
+	 MIME-Version; b=NoMZYSir7eEF3AZehyKhzwr0Yu1nlBqmhyHsNsdvZniGQv17Xkugv57txvvamWfTogIAbDPCXxrYCmROy/k2jYcs/lfN8KJEzYW8BCjI8CeNds8svZLCrJHCBAb8ZqVKUv3UDHfdA1sDWrMa/IKxxKWI6I8VLPkv+iixkLsNOlI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GYiUlGBr; arc=none smtp.client-ip=209.85.128.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TSxRqP5V"
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-603e7d19725so10015387b3.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jan 2024 13:20:41 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GYiUlGBr"
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-5ffb07bed9bso28359357b3.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jan 2024 13:20:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706563240; x=1707168040; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706563242; x=1707168042; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=JkqRF+mC8DuzEovf7kGj9+XXGT1P8SVx4xHS/zSUU2U=;
-        b=TSxRqP5VL38eSYrxaneql9qXU6Zxe318IGnbxj5xp5GBfEqso0JN+Bba5vzOlpjPWp
-         ziXqCGr8Rn5y7KgkXpepJ46V5jkqAPmUv0dq3mQBCzcfJHeT0zaN14xi3jmsmRyEL4Ni
-         w/t/8i4L6O24W8Ga0/zFGeeYKhClTU5w/j4bFhstrHSKpXvJhHg/bc5UgECmfZA2YKHe
-         zdq7ksNZ2EWBtObgeBw318U64CpLANZ7KTTUl1c3jvcD5qpR1fMzslP9ByTvrup4MeEv
-         XS6K3DS/Q6ytrfMOEkWPQa9WzUcEhzJFSZ4cmiYwym9EFCaY+YfqRiStcfVMfwn9Epmj
-         SdHw==
+        bh=GdjgSjuG0kj725tEWVKb219DZuYi5FEEepM+fHB8AJI=;
+        b=GYiUlGBr5jSX6qvFloDSk5Yqx+NIryCN0U6y6lqywLvl3sv/Bf0FnQDFLLHAtwSzbb
+         jCgkiF29+bLjTz/p1c6sAJliOzebS7Zwde0BE5G1N6fGKN5Pl9FKSbi8HLEqmdnXpSNm
+         NTee3oBqpBbVc4+HqYdCpzTu0ManWpRpbB+rTcKgq7tos7mgK/1pYftVCk5cXT4m13RV
+         QA4gMjadlR0j+LRZsXoSDlm5Mz5Rhhks+P6yW+ZREVvxpUYQXCCRzU2EcgM+3gLJrArk
+         jDnkWrWNMaX0XaYhV3duwlu1kYBcIbL8OrAwksQji8l7Q9ScdPjn2IEqBpc9Pxk56O0U
+         gm4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706563240; x=1707168040;
+        d=1e100.net; s=20230601; t=1706563242; x=1707168042;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=JkqRF+mC8DuzEovf7kGj9+XXGT1P8SVx4xHS/zSUU2U=;
-        b=dIpfeLJWHEWlqULM6e5YnFZEU8Nvi/a6iXndpV8XJujtAYJ4QA7WAqJZ9KLnW2BfYI
-         IIN2G5fXFD5SauD/0xJ6ojcQyu44n5kCutBxJbOzJfTjT215QJL37Qz619/bgRbm9SFf
-         O+JO7kNIrUkvKcGFRKZSmSlthRXbJvAigWJESxdn6iFXtfB2yL+2iG6ud5oVOld2+IDr
-         Vq0tHhkWzvxFtGfp8DGtAbDKioj9e+TF6nZkGjRqYSCx+mAKT+smQmBsRIXbgViXMkL1
-         CLxttSyd1osRZ9xsWJDgEVeO7S28tb7Pk8CuCYMZPakKIlZU0dLfvKM410H9jNb+8H67
-         +V8g==
-X-Gm-Message-State: AOJu0YyRLRTe0ZeI5l/nlCTtX5+5iKlAfPCkk0EcfjQm3J2QHAYlRSw8
-	NsLgWWoIXfHGgq5R7IP8LGTQpokOIHY00buzWKMBcciy1b0Nbgxf5EKLwyR3
-X-Google-Smtp-Source: AGHT+IFoDwEL0zm65HoBAwpDAYHezlA2E6FnhjevNE/BfivkddsSSNS5whdL1K4mzo2yGU4mGSglVQ==
-X-Received: by 2002:a05:690c:3508:b0:5ff:cbab:2625 with SMTP id fq8-20020a05690c350800b005ffcbab2625mr7690499ywb.36.1706563239913;
-        Mon, 29 Jan 2024 13:20:39 -0800 (PST)
+        bh=GdjgSjuG0kj725tEWVKb219DZuYi5FEEepM+fHB8AJI=;
+        b=U21ZmMR4W/KJSOG1KVSJgqicLrZW1WFkrbVGGb5FvXsX1ZdBzHbjh/Bv5bh5DQWJq/
+         zhQFGI/MFLXJcMr7bQGs2qp+CGZRH5x7WqOxNiEbbkmmmkK3fhFERHEeVyiGwj+6RsXu
+         M/0l1NydOHMoOjLBOZHssTHPbsG/bpWR1tHQIn1E0FzvwDSpGHqwPDGZduhx6HUEZ3nF
+         4QV1W24tsk/FCbHgNyt78FX6Q73X5o8gcuAT+r3cgiKRsLMHMykjli5FGbcyPZc+jCTf
+         0WV/ig84LFMEzrOWjUV3rTxgwG/BCI/+4JyrvTSPvhGLwrFItrpU+NgJ5nH8CaW65LH4
+         Igpw==
+X-Gm-Message-State: AOJu0YzaAzGYBH9/0kndHNyTjSEjaOMYPosJyDQt+iP963Q5+JWYkT19
+	2TadXGRC7QP9cJXaZm+chJfa72wfPg4vpFunevKUuhZSIXkFGRrz7PAAE23B
+X-Google-Smtp-Source: AGHT+IGnOIVJNgr+eycqg/F2g1ceLRf26hD07ZmK+j/Y7ZJiWe3vLlpsP2Nu4GuF6Qq8KJnzDRt0tw==
+X-Received: by 2002:a81:9104:0:b0:5ff:b07b:9a57 with SMTP id i4-20020a819104000000b005ffb07b9a57mr4143024ywg.72.1706563241850;
+        Mon, 29 Jan 2024 13:20:41 -0800 (PST)
 Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
-        by smtp.gmail.com with ESMTPSA id l198-20020a0de2cf000000b005fff75780f3sm2704904ywe.66.2024.01.29.13.20.38
+        by smtp.gmail.com with ESMTPSA id l198-20020a0de2cf000000b005fff75780f3sm2704904ywe.66.2024.01.29.13.20.40
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jan 2024 13:20:38 -0800 (PST)
+        Mon, 29 Jan 2024 13:20:40 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 2/4] client/player: Add metadata support to struct capabilities
-Date: Mon, 29 Jan 2024 16:20:34 -0500
-Message-ID: <20240129212036.163298-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 3/4] client/player: Use util_iov_dup/util_iov_free whenever possible
+Date: Mon, 29 Jan 2024 16:20:35 -0500
+Message-ID: <20240129212036.163298-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240129212036.163298-1-luiz.dentz@gmail.com>
 References: <20240129212036.163298-1-luiz.dentz@gmail.com>
@@ -70,198 +70,147 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This enables defining metadata as part of the struct capabilities.
+This uses util_iov_dup/util_iov_free whenever possible.
 ---
- client/player.c | 92 ++++++++++++++++++++++++-------------------------
- 1 file changed, 46 insertions(+), 46 deletions(-)
+ client/player.c | 73 ++++++++++++++++++++++---------------------------
+ 1 file changed, 32 insertions(+), 41 deletions(-)
 
 diff --git a/client/player.c b/client/player.c
-index 623519209001..f6b2278d5a8f 100644
+index f6b2278d5a8f..b37ed20d7275 100644
 --- a/client/player.c
 +++ b/client/player.c
-@@ -1130,21 +1130,7 @@ static DBusMessage *endpoint_set_configuration(DBusConnection *conn,
- 	return NULL;
- }
+@@ -2166,7 +2166,7 @@ static DBusMessage *endpoint_select_properties_reply(struct endpoint *ep,
+ 	cfg->ep = ep;
  
--struct codec_capabilities {
--	uint8_t len;
--	uint8_t type;
--	uint8_t data[UINT8_MAX];
--};
--
--#define data(args...) ((const unsigned char[]) { args })
--
--#define CODEC_DATA(args...) \
--	{ \
--		.iov_base = (void *)data(args), \
--		.iov_len = sizeof(data(args)), \
--	}
--
--#define CODEC_CAPABILITIES(_uuid, _codec_id, _data) \
-+#define CODEC_CAPABILITIES(_uuid, _codec_id, _data, _meta) \
- 	{ \
- 		.uuid = _uuid, \
- 		.codec_id = _codec_id, \
-@@ -1152,16 +1138,17 @@ struct codec_capabilities {
+ 	/* Copy capabilities */
+-	iov_append(&cfg->caps, preset->data.iov_base, preset->data.iov_len);
++	cfg->caps = util_iov_dup(&preset->data, 1);
+ 	cfg->target_latency = preset->target_latency;
+ 
+ 	dbus_message_iter_init(msg, &iter);
+@@ -2182,8 +2182,7 @@ static DBusMessage *endpoint_select_properties_reply(struct endpoint *ep,
  	}
  
- #define LC3_DATA(_freq, _duration, _chan_count, _len_min, _len_max) \
--	CODEC_DATA(0x03, LC3_FREQ, _freq, _freq >> 8, \
--		   0x02, LC3_DURATION, _duration, \
--		   0x02, LC3_CHAN_COUNT, _chan_count, \
--		   0x05, LC3_FRAME_LEN, _len_min, _len_min >> 8, _len_max, \
--		   _len_max >> 8)
-+	UTIL_IOV_INIT(0x03, LC3_FREQ, _freq, _freq >> 8, \
-+			0x02, LC3_DURATION, _duration, \
-+			0x02, LC3_CHAN_COUNT, _chan_count, \
-+			0x05, LC3_FRAME_LEN, _len_min, _len_min >> 8, \
-+			_len_max, _len_max >> 8)
+ 	/* Copy metadata */
+-	if (ep->meta)
+-		iov_append(&cfg->meta, ep->meta->iov_base, ep->meta->iov_len);
++	cfg->meta = util_iov_dup(ep->meta, 1);
  
- static const struct capabilities {
- 	const char *uuid;
- 	uint8_t codec_id;
- 	struct iovec data;
-+	struct iovec meta;
- } caps[] = {
- 	/* A2DP SBC Source:
- 	 *
-@@ -1172,7 +1159,8 @@ static const struct capabilities {
- 	 * Bitpool Range: 2-64
- 	 */
- 	CODEC_CAPABILITIES(A2DP_SOURCE_UUID, A2DP_CODEC_SBC,
--					CODEC_DATA(0xff, 0xff, 2, 64)),
-+					UTIL_IOV_INIT(0xff, 0xff, 2, 64),
-+					UTIL_IOV_INIT()),
- 	/* A2DP SBC Sink:
- 	 *
- 	 * Channel Modes: Mono DualChannel Stereo JointStereo
-@@ -1182,7 +1170,9 @@ static const struct capabilities {
- 	 * Bitpool Range: 2-64
- 	 */
- 	CODEC_CAPABILITIES(A2DP_SINK_UUID, A2DP_CODEC_SBC,
--					CODEC_DATA(0xff, 0xff, 2, 64)),
-+					UTIL_IOV_INIT(0xff, 0xff, 2, 64),
-+					UTIL_IOV_INIT()),
+ 	if (preset->qos.phy) {
+ 		/* Set QoS parameters */
+@@ -2887,17 +2886,8 @@ static void endpoint_free(void *data)
+ {
+ 	struct endpoint *ep = data;
+ 
+-	if (ep->caps) {
+-		if (ep->caps->iov_base)
+-			g_free(ep->caps->iov_base);
+-		g_free(ep->caps);
+-	}
+-
+-	if (ep->meta) {
+-		if (ep->meta->iov_base)
+-			g_free(ep->meta->iov_base);
+-		g_free(ep->meta);
+-	}
++	util_iov_free(ep->caps, 1);
++	util_iov_free(ep->meta, 1);
+ 
+ 	if (ep->msg)
+ 		dbus_message_unref(ep->msg);
+@@ -3380,20 +3370,18 @@ static void endpoint_auto_accept(const char *input, void *user_data)
+ static void endpoint_set_metadata(const char *input, void *user_data)
+ {
+ 	struct endpoint *ep = user_data;
++	struct iovec iov;
+ 
+ 	if (!strcasecmp(input, "n") || !strcasecmp(input, "no")) {
+-		free(ep->meta->iov_base);
++		util_iov_free(ep->meta, 1);
+ 		ep->meta = NULL;
+ 		goto done;
+ 	}
+ 
+-	if (!ep->meta)
+-		ep->meta = g_new0(struct iovec, 1);
+-
+-	ep->meta->iov_base = str2bytearray((char *) input, &ep->meta->iov_len);
+-	if (!ep->meta->iov_base) {
+-		free(ep->meta);
+-		ep->meta = NULL;
++	iov.iov_base = str2bytearray((char *) input, &iov.iov_len);
++	if (iov.iov_base) {
++		util_iov_free(ep->meta, 1);
++		ep->meta = util_iov_dup(&iov, 1);
+ 	}
+ 
+ done:
+@@ -3404,22 +3392,21 @@ done:
+ static void endpoint_set_capabilities(const char *input, void *user_data)
+ {
+ 	struct endpoint *ep = user_data;
++	struct iovec iov;
+ 
+-	if (ep->caps && ep->caps->iov_base) {
+-		g_free(ep->caps->iov_base);
+-		ep->caps = g_new0(struct iovec, 1);
+-	} else
+-		ep->caps = g_new0(struct iovec, 1);
+-
+-	ep->caps->iov_base = str2bytearray((char *) input, &ep->caps->iov_len);
+-
+-	if (ep->caps->iov_len == 0x01 &&
+-			(*(uint8_t *)(ep->caps->iov_base)) == 0x00) {
+-		g_free(ep->caps->iov_base);
+-		ep->caps->iov_base = NULL;
+-		ep->caps->iov_len = 0x00;
++	if (!strcasecmp(input, "n") || !strcasecmp(input, "no")) {
++		util_iov_free(ep->caps, 1);
++		ep->caps = NULL;
++		goto done;
+ 	}
+ 
++	iov.iov_base = str2bytearray((char *) input, &iov.iov_len);
++	if (iov.iov_base) {
++		util_iov_free(ep->caps, 1);
++		ep->caps = util_iov_dup(&iov, 1);
++	}
 +
- 	/* PAC LC3 Sink:
- 	 *
- 	 * Frequencies: 8Khz 11Khz 16Khz 22Khz 24Khz 32Khz 44.1Khz 48Khz
-@@ -1192,7 +1182,9 @@ static const struct capabilities {
- 	 */
- 	CODEC_CAPABILITIES(PAC_SINK_UUID, LC3_ID,
- 					LC3_DATA(LC3_FREQ_ANY, LC3_DURATION_ANY,
--						3u, 30, 240)),
-+						3u, 30, 240),
-+					UTIL_IOV_INIT()),
++done:
+ 	bt_shell_prompt_input(ep->path, "Enter Metadata (value/no):",
+ 					endpoint_set_metadata, ep);
+ }
+@@ -3495,12 +3482,13 @@ static void cmd_register_endpoint(int argc, char *argv[])
+ 
+ 		cap = find_capabilities(ep->uuid, ep->codec);
+ 		if (cap) {
+-			if (ep->caps)
+-				ep->caps->iov_len = 0;
+-
+ 			/* Copy capabilities */
+-			iov_append(&ep->caps, cap->data.iov_base,
+-							cap->data.iov_len);
++			util_iov_free(ep->caps, 1);
++			ep->caps = util_iov_dup(&cap->data, 1);
 +
- 	/* PAC LC3 Source:
- 	 *
- 	 * Frequencies: 8Khz 11Khz 16Khz 22Khz 24Khz 32Khz 44.1Khz 48Khz
-@@ -1202,7 +1194,9 @@ static const struct capabilities {
- 	 */
- 	CODEC_CAPABILITIES(PAC_SOURCE_UUID, LC3_ID,
- 					LC3_DATA(LC3_FREQ_ANY, LC3_DURATION_ANY,
--						3u, 30, 240)),
-+						3u, 30, 240),
-+					UTIL_IOV_INIT()),
++			/* Copy metadata */
++			util_iov_free(ep->meta, 1);
++			ep->meta = util_iov_dup(&cap->meta, 1);
+ 
+ 			bt_shell_prompt_input(ep->path, "Auto Accept (yes/no):",
+ 						endpoint_auto_accept, ep);
+@@ -4129,7 +4117,10 @@ static struct endpoint *endpoint_new(const struct capabilities *cap)
+ 	ep->path = g_strdup_printf("%s/ep%u", BLUEZ_MEDIA_ENDPOINT_PATH,
+ 					g_list_length(local_endpoints));
+ 	/* Copy capabilities */
+-	iov_append(&ep->caps, cap->data.iov_base, cap->data.iov_len);
++	ep->caps = util_iov_dup(&cap->data, 1);
++	/* Copy metadata */
++	ep->meta = util_iov_dup(&cap->meta, 1);
 +
- 	/* Broadcast LC3 Source:
- 	 *
- 	 * Frequencies: 8Khz 11Khz 16Khz 22Khz 24Khz 32Khz 44.1Khz 48Khz
-@@ -1212,7 +1206,8 @@ static const struct capabilities {
- 	 */
- 	CODEC_CAPABILITIES(BCAA_SERVICE_UUID, LC3_ID,
- 					LC3_DATA(LC3_FREQ_ANY, LC3_DURATION_ANY,
--						3u, 30, 240)),
-+						3u, 30, 240),
-+					UTIL_IOV_INIT()),
+ 	local_endpoints = g_list_append(local_endpoints, ep);
  
- 	/* Broadcast LC3 Sink:
- 	 *
-@@ -1223,7 +1218,8 @@ static const struct capabilities {
- 	 */
- 	CODEC_CAPABILITIES(BAA_SERVICE_UUID, LC3_ID,
- 					LC3_DATA(LC3_FREQ_ANY, LC3_DURATION_ANY,
--						3u, 30, 240)),
-+						3u, 30, 240),
-+					UTIL_IOV_INIT()),
- };
- 
- struct codec_qos {
-@@ -1258,32 +1254,36 @@ static struct codec_preset sbc_presets[] = {
- 	 * mono, and 512kb/s for two-channel modes.
- 	 */
- 	SBC_PRESET("MQ_MONO_44_1",
--		CODEC_DATA(0x28, 0x15, 2, SBC_BITPOOL_MQ_MONO_44100)),
-+		UTIL_IOV_INIT(0x28, 0x15, 2, SBC_BITPOOL_MQ_MONO_44100)),
- 	SBC_PRESET("MQ_MONO_48",
--		CODEC_DATA(0x18, 0x15, 2, SBC_BITPOOL_MQ_MONO_48000)),
-+		UTIL_IOV_INIT(0x18, 0x15, 2, SBC_BITPOOL_MQ_MONO_48000)),
- 	SBC_PRESET("MQ_STEREO_44_1",
--		CODEC_DATA(0x21, 0x15, 2, SBC_BITPOOL_MQ_JOINT_STEREO_44100)),
-+		UTIL_IOV_INIT(0x21, 0x15, 2,
-+				SBC_BITPOOL_MQ_JOINT_STEREO_44100)),
- 	SBC_PRESET("MQ_STEREO_48",
--		CODEC_DATA(0x11, 0x15, 2, SBC_BITPOOL_MQ_JOINT_STEREO_48000)),
-+		UTIL_IOV_INIT(0x11, 0x15, 2,
-+				SBC_BITPOOL_MQ_JOINT_STEREO_48000)),
- 	SBC_PRESET("HQ_MONO_44_1",
--		CODEC_DATA(0x28, 0x15, 2, SBC_BITPOOL_HQ_MONO_44100)),
-+		UTIL_IOV_INIT(0x28, 0x15, 2, SBC_BITPOOL_HQ_MONO_44100)),
- 	SBC_PRESET("HQ_MONO_48",
--		CODEC_DATA(0x18, 0x15, 2, SBC_BITPOOL_HQ_MONO_48000)),
-+		UTIL_IOV_INIT(0x18, 0x15, 2, SBC_BITPOOL_HQ_MONO_48000)),
- 	SBC_PRESET("HQ_STEREO_44_1",
--		CODEC_DATA(0x21, 0x15, 2, SBC_BITPOOL_HQ_JOINT_STEREO_44100)),
-+		UTIL_IOV_INIT(0x21, 0x15, 2,
-+				SBC_BITPOOL_HQ_JOINT_STEREO_44100)),
- 	SBC_PRESET("HQ_STEREO_48",
--		CODEC_DATA(0x11, 0x15, 2, SBC_BITPOOL_HQ_JOINT_STEREO_48000)),
-+		UTIL_IOV_INIT(0x11, 0x15, 2,
-+			      SBC_BITPOOL_HQ_JOINT_STEREO_48000)),
- 	/* Higher bitrates not recommended by A2DP spec, it dual channel to
- 	 * avoid going above 53 bitpool:
- 	 *
- 	 * https://habr.com/en/post/456476/
- 	 * https://gitlab.freedesktop.org/pulseaudio/pulseaudio/-/issues/1092
- 	 */
--	SBC_PRESET("XQ_DUAL_44_1", CODEC_DATA(0x24, 0x15, 2, 43)),
--	SBC_PRESET("XQ_DUAL_48", CODEC_DATA(0x14, 0x15, 2, 39)),
-+	SBC_PRESET("XQ_DUAL_44_1", UTIL_IOV_INIT(0x24, 0x15, 2, 43)),
-+	SBC_PRESET("XQ_DUAL_48", UTIL_IOV_INIT(0x14, 0x15, 2, 39)),
- 	/* Ultra high bitpool that fits in 512 kbps mandatory bitrate */
--	SBC_PRESET("UQ_STEREO_44_1", CODEC_DATA(0x21, 0x15, 2, 64)),
--	SBC_PRESET("UQ_STEREO_48", CODEC_DATA(0x11, 0x15, 2, 58)),
-+	SBC_PRESET("UQ_STEREO_44_1", UTIL_IOV_INIT(0x21, 0x15, 2, 64)),
-+	SBC_PRESET("UQ_STEREO_48", UTIL_IOV_INIT(0x11, 0x15, 2, 58)),
- };
- 
- #define QOS_CONFIG(_interval, _framing, _phy, _sdu, _rtn, _latency, _delay) \
-@@ -1328,16 +1328,16 @@ static struct codec_preset sbc_presets[] = {
- 	QOS_FRAMED_2M(10000u, _sdu, _rtn, _latency, _delay)
- 
- #define LC3_PRESET_DATA(_freq, _duration, _len) \
--	CODEC_DATA(0x02, LC3_CONFIG_FREQ, _freq, \
--		   0x02, LC3_CONFIG_DURATION, _duration, \
--		   0x03, LC3_CONFIG_FRAME_LEN, _len, _len >> 8)
-+	UTIL_IOV_INIT(0x02, LC3_CONFIG_FREQ, _freq, \
-+			0x02, LC3_CONFIG_DURATION, _duration, \
-+			0x03, LC3_CONFIG_FRAME_LEN, _len, _len >> 8)
- 
- #define LC3_PRESET_DATA_ALL(_freq, _duration, _alloc, _len) \
--	CODEC_DATA(0x02, LC3_CONFIG_FREQ, _freq, \
--		   0x02, LC3_CONFIG_DURATION, _duration, \
--		   0x05, LC3_CONFIG_CHAN_ALLOC, _alloc, _alloc >> 8, \
--		   _alloc >> 16, _alloc >> 24, \
--		   0x03, LC3_CONFIG_FRAME_LEN, _len, _len >> 8)
-+	UTIL_IOV_INIT(0x02, LC3_CONFIG_FREQ, _freq, \
-+			0x02, LC3_CONFIG_DURATION, _duration, \
-+			0x05, LC3_CONFIG_CHAN_ALLOC, _alloc, _alloc >> 8, \
-+			_alloc >> 16, _alloc >> 24, \
-+			0x03, LC3_CONFIG_FRAME_LEN, _len, _len >> 8)
- 
- #define LC3_PRESET_8KHZ(_duration, _len) \
- 	LC3_PRESET_DATA(LC3_CONFIG_FREQ_8KHZ, _duration, _len)
+ 	return ep;
 -- 
 2.43.0
 
