@@ -1,32 +1,32 @@
-Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
+Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A144D60871
-	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jan 2024 11:49:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D77696086B
+	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jan 2024 11:49:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706528959; cv=none; b=SLsfbm//sOmn7yFqcj16KcJkS6ULxQhfipJXjn6RHwuX9VDa4olyWmYNEw861cw+p5jyAIFxQfUDw2LGrio/qPfp7PcosMWtXJjUhHKCWCXYZiKZgOWCJt0vFK1fTe7EqeEohcC12XKWo2rC18RpbYR9AAdi6Yz52TIWoNRKyVc=
+	t=1706528959; cv=none; b=mQzQUAH/6KU/sqj+ZFDGm7P1LE9PKDcJna+WXBQk0ZC9pWRbY789+xchcrabbQTsYlMYrg2TH5I9LN2sOQLa2SE339yqJy04JyjoP9cmkI9cBQBog/MwZNzPB9FH0NCZA94/b92k9FWe/zD6tINNLyBNqt+sOKVpwrtAP11+MPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1706528959; c=relaxed/simple;
-	bh=oP7hkoD4y9SFvkJUps5sHkG78trHf0ZIoGP9okY2syI=;
+	bh=JrdX4gG/uCk0OZpF5qXRdtzFqv9g7kPjMhpd30rLtjQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jnaZ5ErEJ1plP8kdlFPgYqBj9pIcjJGdMy5O7y5biVEN6XbhBTceFXgDtNrdzXhveiSOe1vqpn0925y+hvbBbWm/zJRry2JKFaH+GnooAor6jt271WPMms6c9I3FBOsED3IOun/PgOjQKmPn+frCcoxFPYSB4V7nloRtC+Vk2hY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl; spf=pass smtp.mailfrom=v0yd.nl; arc=none smtp.client-ip=80.241.56.171
+	 MIME-Version; b=PCnFkO1g4UaWeZmdDYZ1aK2zwKhRs96Dqq2AiqQTKITO4hxE3akmLgBeTX6ngpm30WYwkl5l99/QZ0cy4IBOACqhrhJD9sNcMp0oL0rNU6ntueiUan4UhhpnfUBSD5f8BXWURn1Nps4YtxLLxeVk3HrKjfdTvKFI9ui0ukLW9AI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl; spf=pass smtp.mailfrom=v0yd.nl; arc=none smtp.client-ip=80.241.56.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=v0yd.nl
 Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4TNmmM2LYFz9sqj;
-	Mon, 29 Jan 2024 12:49:07 +0100 (CET)
+	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4TNmmN2S8bz9sZv;
+	Mon, 29 Jan 2024 12:49:08 +0100 (CET)
 From: =?UTF-8?q?Jonas=20Dre=C3=9Fler?= <verdre@v0yd.nl>
 To: linux-bluetooth@vger.kernel.org,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: =?UTF-8?q?Jonas=20Dre=C3=9Fler?= <verdre@v0yd.nl>
-Subject: [PATCH BlueZ 1/4] mgmt-tester: Add a 0-opcode to expect_hci_list lists
-Date: Mon, 29 Jan 2024 12:48:57 +0100
-Message-ID: <20240129114900.92919-2-verdre@v0yd.nl>
+Subject: [PATCH BlueZ 2/4] mgmt-tester: Adjust a test for recent kernel changes
+Date: Mon, 29 Jan 2024 12:48:58 +0100
+Message-ID: <20240129114900.92919-3-verdre@v0yd.nl>
 In-Reply-To: <20240129114900.92919-1-verdre@v0yd.nl>
 References: <20240129114900.92919-1-verdre@v0yd.nl>
 Precedence: bulk
@@ -36,93 +36,33 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4TNmmM2LYFz9sqj
+X-Rspamd-Queue-Id: 4TNmmN2S8bz9sZv
 
-In add_expect_hci_list() we iterate through the entries of the
-expect_hci_list as long as there is an opcode, which means currently
-this relies on overflowing the buffer to detect the end of the list.
+With the changes in the kernel to move to hci_sync for connecting ACL
+devices (see kernel commit "Bluetooth: hci_conn: Only do ACL connections
+sequentially", https://lore.kernel.org/linux-bluetooth/20240108224614.56900-1-verdre@v0yd.nl/),
+the "ETIMEDOUT" error path for the "HCI Create Connection" command was
+changed, sending a "HCI Create Connection Cancel" after the timeout.
 
-This is not great and when running with address sanitizer, the
-out-of-bounds read gets detected and mgmt-tester aborts. Fix it by
-adding a trailing 0-opcode to all those lists.
+This leads to the returned error in the "Pair Device - Power off 1"
+test to change from NOT_POWERED to DISCONNECTED, so adjust for that.
 ---
- tools/mgmt-tester.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ tools/mgmt-tester.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index 7dfd1b0c7..ee12ed7d5 100644
+index ee12ed7d5..7c9e63cbb 100644
 --- a/tools/mgmt-tester.c
 +++ b/tools/mgmt-tester.c
-@@ -8798,6 +8798,9 @@ static const struct hci_cmd_data multi_ext_adv_add_second_hci_cmds[] = {
- 		.len = sizeof(le_set_ext_adv_enable_inst_2),
- 		.param = le_set_ext_adv_enable_inst_2,
- 	},
-+	{
-+		.opcode = 0,
-+	},
+@@ -3216,7 +3216,7 @@ static const struct generic_data pair_device_power_off_test_1 = {
+ 	.send_opcode = MGMT_OP_PAIR_DEVICE,
+ 	.send_func = pair_device_send_param_func,
+ 	.force_power_off = true,
+-	.expect_status = MGMT_STATUS_NOT_POWERED,
++	.expect_status = MGMT_STATUS_DISCONNECTED,
+ 	.expect_func = pair_device_expect_param_func,
  };
  
- static const struct generic_data multi_ext_advertising_add_second_2 = {
-@@ -8845,6 +8848,9 @@ static const struct hci_cmd_data multi_ext_adv_remove_adv_hci_cmds[] = {
- 		.len = sizeof(advertising_instance1_param),
- 		.param = advertising_instance1_param,
- 	},
-+	{
-+		.opcode = 0,
-+	},
- };
- 
- static const struct generic_data multi_ext_advertising_remove = {
-@@ -8877,6 +8883,9 @@ static const struct hci_cmd_data multi_ext_adv_remove_all_adv_hci_cmds[] = {
- 	{
- 		.opcode = BT_HCI_CMD_LE_CLEAR_ADV_SETS,
- 	},
-+	{
-+		.opcode = 0,
-+	},
- };
- 
- static const struct generic_data multi_ext_advertising_remove_all = {
-@@ -8913,6 +8922,9 @@ static const struct hci_cmd_data multi_ext_adv_add_2_advs_hci_cmds[] = {
- 		.len = sizeof(set_ext_adv_data_test1),
- 		.param = set_ext_adv_data_test1,
- 	},
-+	{
-+		.opcode = 0,
-+	},
- };
- 
- static const struct generic_data multi_ext_advertising_add_no_power = {
-@@ -10378,6 +10390,9 @@ static const struct hci_cmd_data ll_privacy_add_device_3_hci_list[] = {
- 		.param = set_resolv_on_param,
- 		.len = sizeof(set_resolv_on_param),
- 	},
-+	{
-+		.opcode = 0,
-+	},
- };
- 
- static const struct generic_data ll_privacy_add_device_3 = {
-@@ -10495,6 +10510,9 @@ static const struct hci_cmd_data ll_privacy_add_device_9_hci_list[] = {
- 		.len = sizeof(le_add_to_resolv_list_param),
- 		.param = le_add_to_resolv_list_param
- 	},
-+	{
-+		.opcode = 0,
-+	},
- };
- 
- static const struct generic_data ll_privacy_add_device_9 = {
-@@ -10823,6 +10841,9 @@ static const struct hci_cmd_data ll_privacy_set_device_flags_1_hci_list[] = {
- 		.param = set_resolv_on_param,
- 		.len = sizeof(set_resolv_on_param),
- 	},
-+	{
-+		.opcode = 0,
-+	},
- };
- 
- static const uint8_t device_flags_changed_params_1[] = {
 -- 
 2.43.0
 
