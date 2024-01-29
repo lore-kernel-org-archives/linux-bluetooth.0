@@ -1,62 +1,62 @@
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B51EB1586CF
-	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jan 2024 21:20:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A21E41586C7
+	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jan 2024 21:20:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706563245; cv=none; b=nnkaCpRPKa+YIvTbmY6wuZhb6ZJTww+Jbl7I+dmF/JkQZDJAvs+basAF2uaCtqGxGo7NU3vJ7fxB1HonMf2plUMEn6HL65/BTcn+YHi7Qe2qfBEsQgf5cgz70L2fZNrpmV1kDe9XlR8kbtnq95v7Uv+3Y53UoRZmi4bBCCVsNJg=
+	t=1706563247; cv=none; b=JKuARxt9MuM5J+Ef9XCCNgE9Fw29n7H9IQhQMVWfmJXOtlAzrrIO9OdTtvtMetMzpdED/wIZAa2ydleKXAwgml4Sc3DVd4JvlFoO5sR8VV97xM1jVAOrVAM0zHHbJVPnoSrTl4frsWxvu8eCZ6fkAMgq5TKWfhLR/tNlhC/r9cc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706563245; c=relaxed/simple;
-	bh=RWpqGRSkRSWk4lEGJPCW6tyR94TT26E8WeuDofH4bmU=;
+	s=arc-20240116; t=1706563247; c=relaxed/simple;
+	bh=w0jVmTXZFbgyjVLgQeuGl/Z5pxW7MYc8BKxN5v4ABiw=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NoMZYSir7eEF3AZehyKhzwr0Yu1nlBqmhyHsNsdvZniGQv17Xkugv57txvvamWfTogIAbDPCXxrYCmROy/k2jYcs/lfN8KJEzYW8BCjI8CeNds8svZLCrJHCBAb8ZqVKUv3UDHfdA1sDWrMa/IKxxKWI6I8VLPkv+iixkLsNOlI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GYiUlGBr; arc=none smtp.client-ip=209.85.128.172
+	 MIME-Version; b=Gth1kwwi05TfPkAZfYOZ8n0ff6IX8mmRWHuvOGENnidgnB025p33CuOr+IrTV8lY+5y0xqL3gVJTuqSvFdTP9pugvaUETynCyxP6oKiRqudoG5jQjsnA42BC8GDFz1NTHKhzcl6CpiVAuD9vkrqDZVzxC0yOzGAfGogUPDer62Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KiWmeIE5; arc=none smtp.client-ip=209.85.128.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GYiUlGBr"
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-5ffb07bed9bso28359357b3.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jan 2024 13:20:43 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KiWmeIE5"
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-5edfcba97e3so36194747b3.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jan 2024 13:20:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706563242; x=1707168042; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706563244; x=1707168044; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=GdjgSjuG0kj725tEWVKb219DZuYi5FEEepM+fHB8AJI=;
-        b=GYiUlGBr5jSX6qvFloDSk5Yqx+NIryCN0U6y6lqywLvl3sv/Bf0FnQDFLLHAtwSzbb
-         jCgkiF29+bLjTz/p1c6sAJliOzebS7Zwde0BE5G1N6fGKN5Pl9FKSbi8HLEqmdnXpSNm
-         NTee3oBqpBbVc4+HqYdCpzTu0ManWpRpbB+rTcKgq7tos7mgK/1pYftVCk5cXT4m13RV
-         QA4gMjadlR0j+LRZsXoSDlm5Mz5Rhhks+P6yW+ZREVvxpUYQXCCRzU2EcgM+3gLJrArk
-         jDnkWrWNMaX0XaYhV3duwlu1kYBcIbL8OrAwksQji8l7Q9ScdPjn2IEqBpc9Pxk56O0U
-         gm4w==
+        bh=Gnfr2H4NFAsroEwXj3aaG54N3pcmoalaRYfTL0HDQhI=;
+        b=KiWmeIE5rr4PWCSzDXlm7k1ONvwsnTqNKCg/g8qy6iW9YXJpFf1mD8Nkow4JXMkQZA
+         /Zqbf1dCfin9ZX6okjiC0iCGzq7qSrFK9I4qo8IhE45RP4fQX36zLE4nKrV9TwiwMqKW
+         K5Hy8yAdLysIlKQykSXtUh+L4UzujwR2q6uoMXA8P8IbhsuvgZH84DTS4cLceQlYEzGD
+         AvIip3nd1Hdp1fczfR0qI8iEoaMr3Odd23Vuyh7gtJbGFBRonxlfQzt+VuZWHw4fgMvk
+         FdMBVjYAhW/n8ExdZUtLRgvIn/ejzhq52QqdiyrE0ipyrWR+LzrJ5iRcJNQBLg2FV4re
+         2uRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706563242; x=1707168042;
+        d=1e100.net; s=20230601; t=1706563244; x=1707168044;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GdjgSjuG0kj725tEWVKb219DZuYi5FEEepM+fHB8AJI=;
-        b=U21ZmMR4W/KJSOG1KVSJgqicLrZW1WFkrbVGGb5FvXsX1ZdBzHbjh/Bv5bh5DQWJq/
-         zhQFGI/MFLXJcMr7bQGs2qp+CGZRH5x7WqOxNiEbbkmmmkK3fhFERHEeVyiGwj+6RsXu
-         M/0l1NydOHMoOjLBOZHssTHPbsG/bpWR1tHQIn1E0FzvwDSpGHqwPDGZduhx6HUEZ3nF
-         4QV1W24tsk/FCbHgNyt78FX6Q73X5o8gcuAT+r3cgiKRsLMHMykjli5FGbcyPZc+jCTf
-         0WV/ig84LFMEzrOWjUV3rTxgwG/BCI/+4JyrvTSPvhGLwrFItrpU+NgJ5nH8CaW65LH4
-         Igpw==
-X-Gm-Message-State: AOJu0YzaAzGYBH9/0kndHNyTjSEjaOMYPosJyDQt+iP963Q5+JWYkT19
-	2TadXGRC7QP9cJXaZm+chJfa72wfPg4vpFunevKUuhZSIXkFGRrz7PAAE23B
-X-Google-Smtp-Source: AGHT+IGnOIVJNgr+eycqg/F2g1ceLRf26hD07ZmK+j/Y7ZJiWe3vLlpsP2Nu4GuF6Qq8KJnzDRt0tw==
-X-Received: by 2002:a81:9104:0:b0:5ff:b07b:9a57 with SMTP id i4-20020a819104000000b005ffb07b9a57mr4143024ywg.72.1706563241850;
-        Mon, 29 Jan 2024 13:20:41 -0800 (PST)
+        bh=Gnfr2H4NFAsroEwXj3aaG54N3pcmoalaRYfTL0HDQhI=;
+        b=l8vbKr6Z1NkWyYmu/Doi7yy7DD2Fvwo7XH6LIfdgkYaTM4tuJassE6mXsikcbza0eB
+         bbJonYDHJ69W8ATgDUB7j6wb+XCCWjy4MQwvykEB/P83PJ54bMVuMe5mYDYQ8jMALQEL
+         B9rEGAOQMsErXq1ZUl5F3lb3F3CkmJpYIUHr7E/DCgr75ozad8a3Kr50wlSf82OSR2Md
+         6Jz41AAH/0msm+DC0yi7r1oUZzCZv5Qdf8a8N7PzUPHqpTuRFqX7UVYP9I9KsYkGqUgt
+         gQGwkS3DP0KX8Ym6MEUGtgxh8kWw5lIptB5zKP4pjkodrV0//ZGba8K74577GbINb2Te
+         J0zA==
+X-Gm-Message-State: AOJu0Yz6lUxvGs3og30vpFGnZSftRVovSpTj4H3DF0b/EQwA6cXNqFwm
+	ok7+JeRyNHrVXDco8jDLByZR+Yx9q+Z1bsWUqFXXR9CGo1WyTWAGZRV7ooUU
+X-Google-Smtp-Source: AGHT+IFMaow3XvN9r4tSfEIRgZ/CsCCn8VgXFwAperALO67BVAitfi4cFMxc6Xi+xR1nQG3ndP5Tww==
+X-Received: by 2002:a81:ad61:0:b0:5ea:1eb8:c37 with SMTP id l33-20020a81ad61000000b005ea1eb80c37mr4138183ywk.24.1706563243846;
+        Mon, 29 Jan 2024 13:20:43 -0800 (PST)
 Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
-        by smtp.gmail.com with ESMTPSA id l198-20020a0de2cf000000b005fff75780f3sm2704904ywe.66.2024.01.29.13.20.40
+        by smtp.gmail.com with ESMTPSA id l198-20020a0de2cf000000b005fff75780f3sm2704904ywe.66.2024.01.29.13.20.42
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jan 2024 13:20:40 -0800 (PST)
+        Mon, 29 Jan 2024 13:20:42 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 3/4] client/player: Use util_iov_dup/util_iov_free whenever possible
-Date: Mon, 29 Jan 2024 16:20:35 -0500
-Message-ID: <20240129212036.163298-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 4/4] client/player: Add .name field to struct capabilities
+Date: Mon, 29 Jan 2024 16:20:36 -0500
+Message-ID: <20240129212036.163298-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240129212036.163298-1-luiz.dentz@gmail.com>
 References: <20240129212036.163298-1-luiz.dentz@gmail.com>
@@ -70,147 +70,143 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This uses util_iov_dup/util_iov_free whenever possible.
+This adds .name field to struct capabilities which is then used to form
+the endpoint object path so it is easier to identify the endpoint
+capabilities:
+
+[bluetooth]# endpoint.list local
+/local/endpoint/pac_snk/lc3
+/local/endpoint/pac_src/lc3
+/local/endpoint/bcaa/lc3
 ---
- client/player.c | 73 ++++++++++++++++++++++---------------------------
- 1 file changed, 32 insertions(+), 41 deletions(-)
+ client/player.c | 54 ++++++++++++++++++++++++++-----------------------
+ 1 file changed, 29 insertions(+), 25 deletions(-)
 
 diff --git a/client/player.c b/client/player.c
-index f6b2278d5a8f..b37ed20d7275 100644
+index b37ed20d7275..b961c0ba223d 100644
 --- a/client/player.c
 +++ b/client/player.c
-@@ -2166,7 +2166,7 @@ static DBusMessage *endpoint_select_properties_reply(struct endpoint *ep,
- 	cfg->ep = ep;
- 
- 	/* Copy capabilities */
--	iov_append(&cfg->caps, preset->data.iov_base, preset->data.iov_len);
-+	cfg->caps = util_iov_dup(&preset->data, 1);
- 	cfg->target_latency = preset->target_latency;
- 
- 	dbus_message_iter_init(msg, &iter);
-@@ -2182,8 +2182,7 @@ static DBusMessage *endpoint_select_properties_reply(struct endpoint *ep,
- 	}
- 
- 	/* Copy metadata */
--	if (ep->meta)
--		iov_append(&cfg->meta, ep->meta->iov_base, ep->meta->iov_len);
-+	cfg->meta = util_iov_dup(ep->meta, 1);
- 
- 	if (preset->qos.phy) {
- 		/* Set QoS parameters */
-@@ -2887,17 +2886,8 @@ static void endpoint_free(void *data)
- {
- 	struct endpoint *ep = data;
- 
--	if (ep->caps) {
--		if (ep->caps->iov_base)
--			g_free(ep->caps->iov_base);
--		g_free(ep->caps);
--	}
--
--	if (ep->meta) {
--		if (ep->meta->iov_base)
--			g_free(ep->meta->iov_base);
--		g_free(ep->meta);
--	}
-+	util_iov_free(ep->caps, 1);
-+	util_iov_free(ep->meta, 1);
- 
- 	if (ep->msg)
- 		dbus_message_unref(ep->msg);
-@@ -3380,20 +3370,18 @@ static void endpoint_auto_accept(const char *input, void *user_data)
- static void endpoint_set_metadata(const char *input, void *user_data)
- {
- 	struct endpoint *ep = user_data;
-+	struct iovec iov;
- 
- 	if (!strcasecmp(input, "n") || !strcasecmp(input, "no")) {
--		free(ep->meta->iov_base);
-+		util_iov_free(ep->meta, 1);
- 		ep->meta = NULL;
- 		goto done;
- 	}
- 
--	if (!ep->meta)
--		ep->meta = g_new0(struct iovec, 1);
--
--	ep->meta->iov_base = str2bytearray((char *) input, &ep->meta->iov_len);
--	if (!ep->meta->iov_base) {
--		free(ep->meta);
--		ep->meta = NULL;
-+	iov.iov_base = str2bytearray((char *) input, &iov.iov_len);
-+	if (iov.iov_base) {
-+		util_iov_free(ep->meta, 1);
-+		ep->meta = util_iov_dup(&iov, 1);
- 	}
- 
- done:
-@@ -3404,22 +3392,21 @@ done:
- static void endpoint_set_capabilities(const char *input, void *user_data)
- {
- 	struct endpoint *ep = user_data;
-+	struct iovec iov;
- 
--	if (ep->caps && ep->caps->iov_base) {
--		g_free(ep->caps->iov_base);
--		ep->caps = g_new0(struct iovec, 1);
--	} else
--		ep->caps = g_new0(struct iovec, 1);
--
--	ep->caps->iov_base = str2bytearray((char *) input, &ep->caps->iov_len);
--
--	if (ep->caps->iov_len == 0x01 &&
--			(*(uint8_t *)(ep->caps->iov_base)) == 0x00) {
--		g_free(ep->caps->iov_base);
--		ep->caps->iov_base = NULL;
--		ep->caps->iov_len = 0x00;
-+	if (!strcasecmp(input, "n") || !strcasecmp(input, "no")) {
-+		util_iov_free(ep->caps, 1);
-+		ep->caps = NULL;
-+		goto done;
- 	}
- 
-+	iov.iov_base = str2bytearray((char *) input, &iov.iov_len);
-+	if (iov.iov_base) {
-+		util_iov_free(ep->caps, 1);
-+		ep->caps = util_iov_dup(&iov, 1);
-+	}
-+
-+done:
- 	bt_shell_prompt_input(ep->path, "Enter Metadata (value/no):",
- 					endpoint_set_metadata, ep);
+@@ -1130,11 +1130,13 @@ static DBusMessage *endpoint_set_configuration(DBusConnection *conn,
+ 	return NULL;
  }
-@@ -3495,12 +3482,13 @@ static void cmd_register_endpoint(int argc, char *argv[])
  
- 		cap = find_capabilities(ep->uuid, ep->codec);
- 		if (cap) {
--			if (ep->caps)
--				ep->caps->iov_len = 0;
--
- 			/* Copy capabilities */
--			iov_append(&ep->caps, cap->data.iov_base,
--							cap->data.iov_len);
-+			util_iov_free(ep->caps, 1);
-+			ep->caps = util_iov_dup(&cap->data, 1);
+-#define CODEC_CAPABILITIES(_uuid, _codec_id, _data, _meta) \
++#define CODEC_CAPABILITIES(_name, _uuid, _codec_id, _data, _meta) \
+ 	{ \
++		.name = _name, \
+ 		.uuid = _uuid, \
+ 		.codec_id = _codec_id, \
+ 		.data = _data, \
++		.meta = _meta, \
+ 	}
+ 
+ #define LC3_DATA(_freq, _duration, _chan_count, _len_min, _len_max) \
+@@ -1145,6 +1147,7 @@ static DBusMessage *endpoint_set_configuration(DBusConnection *conn,
+ 			_len_max, _len_max >> 8)
+ 
+ static const struct capabilities {
++	const char *name;
+ 	const char *uuid;
+ 	uint8_t codec_id;
+ 	struct iovec data;
+@@ -1158,9 +1161,10 @@ static const struct capabilities {
+ 	 * Blocks: 4 8 12 16
+ 	 * Bitpool Range: 2-64
+ 	 */
+-	CODEC_CAPABILITIES(A2DP_SOURCE_UUID, A2DP_CODEC_SBC,
+-					UTIL_IOV_INIT(0xff, 0xff, 2, 64),
+-					UTIL_IOV_INIT()),
++	CODEC_CAPABILITIES("a2dp_src/sbc", A2DP_SOURCE_UUID, A2DP_CODEC_SBC,
++				UTIL_IOV_INIT(0xff, 0xff, 2, 64),
++				UTIL_IOV_INIT()),
 +
-+			/* Copy metadata */
-+			util_iov_free(ep->meta, 1);
-+			ep->meta = util_iov_dup(&cap->meta, 1);
+ 	/* A2DP SBC Sink:
+ 	 *
+ 	 * Channel Modes: Mono DualChannel Stereo JointStereo
+@@ -1169,9 +1173,9 @@ static const struct capabilities {
+ 	 * Blocks: 4 8 12 16
+ 	 * Bitpool Range: 2-64
+ 	 */
+-	CODEC_CAPABILITIES(A2DP_SINK_UUID, A2DP_CODEC_SBC,
+-					UTIL_IOV_INIT(0xff, 0xff, 2, 64),
+-					UTIL_IOV_INIT()),
++	CODEC_CAPABILITIES("a2dp_snk/sbc", A2DP_SINK_UUID, A2DP_CODEC_SBC,
++				UTIL_IOV_INIT(0xff, 0xff, 2, 64),
++				UTIL_IOV_INIT()),
  
- 			bt_shell_prompt_input(ep->path, "Auto Accept (yes/no):",
- 						endpoint_auto_accept, ep);
-@@ -4129,7 +4117,10 @@ static struct endpoint *endpoint_new(const struct capabilities *cap)
- 	ep->path = g_strdup_printf("%s/ep%u", BLUEZ_MEDIA_ENDPOINT_PATH,
- 					g_list_length(local_endpoints));
+ 	/* PAC LC3 Sink:
+ 	 *
+@@ -1180,10 +1184,10 @@ static const struct capabilities {
+ 	 * Channel count: 3
+ 	 * Frame length: 30-240
+ 	 */
+-	CODEC_CAPABILITIES(PAC_SINK_UUID, LC3_ID,
+-					LC3_DATA(LC3_FREQ_ANY, LC3_DURATION_ANY,
+-						3u, 30, 240),
+-					UTIL_IOV_INIT()),
++	CODEC_CAPABILITIES("pac_snk/lc3", PAC_SINK_UUID, LC3_ID,
++				LC3_DATA(LC3_FREQ_ANY, LC3_DURATION_ANY, 3u, 30,
++					240),
++				UTIL_IOV_INIT()),
+ 
+ 	/* PAC LC3 Source:
+ 	 *
+@@ -1192,10 +1196,10 @@ static const struct capabilities {
+ 	 * Channel count: 3
+ 	 * Frame length: 30-240
+ 	 */
+-	CODEC_CAPABILITIES(PAC_SOURCE_UUID, LC3_ID,
+-					LC3_DATA(LC3_FREQ_ANY, LC3_DURATION_ANY,
+-						3u, 30, 240),
+-					UTIL_IOV_INIT()),
++	CODEC_CAPABILITIES("pac_src/lc3", PAC_SOURCE_UUID, LC3_ID,
++				LC3_DATA(LC3_FREQ_ANY, LC3_DURATION_ANY, 3u, 30,
++					240),
++				UTIL_IOV_INIT()),
+ 
+ 	/* Broadcast LC3 Source:
+ 	 *
+@@ -1204,10 +1208,10 @@ static const struct capabilities {
+ 	 * Channel count: 3
+ 	 * Frame length: 30-240
+ 	 */
+-	CODEC_CAPABILITIES(BCAA_SERVICE_UUID, LC3_ID,
+-					LC3_DATA(LC3_FREQ_ANY, LC3_DURATION_ANY,
+-						3u, 30, 240),
+-					UTIL_IOV_INIT()),
++	CODEC_CAPABILITIES("bcaa/lc3", BCAA_SERVICE_UUID, LC3_ID,
++				LC3_DATA(LC3_FREQ_ANY, LC3_DURATION_ANY, 3u, 30,
++					240),
++				UTIL_IOV_INIT()),
+ 
+ 	/* Broadcast LC3 Sink:
+ 	 *
+@@ -1216,10 +1220,10 @@ static const struct capabilities {
+ 	 * Channel count: 3
+ 	 * Frame length: 30-240
+ 	 */
+-	CODEC_CAPABILITIES(BAA_SERVICE_UUID, LC3_ID,
+-					LC3_DATA(LC3_FREQ_ANY, LC3_DURATION_ANY,
+-						3u, 30, 240),
+-					UTIL_IOV_INIT()),
++	CODEC_CAPABILITIES("baa/lc3", BAA_SERVICE_UUID, LC3_ID,
++				LC3_DATA(LC3_FREQ_ANY, LC3_DURATION_ANY, 3u, 30,
++					240),
++				UTIL_IOV_INIT()),
+ };
+ 
+ struct codec_qos {
+@@ -4114,8 +4118,8 @@ static struct endpoint *endpoint_new(const struct capabilities *cap)
+ 	ep = new0(struct endpoint, 1);
+ 	ep->uuid = g_strdup(cap->uuid);
+ 	ep->codec = cap->codec_id;
+-	ep->path = g_strdup_printf("%s/ep%u", BLUEZ_MEDIA_ENDPOINT_PATH,
+-					g_list_length(local_endpoints));
++	ep->path = g_strdup_printf("%s/%s", BLUEZ_MEDIA_ENDPOINT_PATH,
++				cap->name);
  	/* Copy capabilities */
--	iov_append(&ep->caps, cap->data.iov_base, cap->data.iov_len);
-+	ep->caps = util_iov_dup(&cap->data, 1);
-+	/* Copy metadata */
-+	ep->meta = util_iov_dup(&cap->meta, 1);
-+
- 	local_endpoints = g_list_append(local_endpoints, ep);
- 
- 	return ep;
+ 	ep->caps = util_iov_dup(&cap->data, 1);
+ 	/* Copy metadata */
 -- 
 2.43.0
 
