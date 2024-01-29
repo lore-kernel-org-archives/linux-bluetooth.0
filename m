@@ -1,146 +1,113 @@
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DB2567721
-	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jan 2024 13:58:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 253B22E415
+	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jan 2024 14:44:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706536698; cv=none; b=ssQT35WDCYlt1e6C2N4I55GKDV8oHbyVOi/KYOQvoxJrDKdPGDSq3T0P+Mk1J+xdyvGhtbarf6pWLQ+SVGdy6cxZbIjK9OBBZpPLivF9cj8JNYOZWbr/VQmKDThVwRHsfdRLYNS04aqQAoFq4wzGk3AKOm4JSRfGJhtKna0S29E=
+	t=1706539457; cv=none; b=Do0IQxRnRL/KbGedu85SDl7TpLQ7ZQGqUAXgDllJcHxa/d3RspkxhcZvRgEOTcNDxN67XwfnHRs3M2V4ZKj1R0NeGFw+dNlAvrbAulO+T14ZmlemSf4aXdvQKdltEdOn87yRzwcBOkcLybsfU8AcA+s6GJmlAeDkTm6KUK/aPMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706536698; c=relaxed/simple;
-	bh=Zitl050dGhwx1u2RLlvYnH0IBwgpwaeKS3GEPzetF8M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gfRAHAO3g30YshZYfFOtY/n0Yr7v8m2Dx3K1cwhVDS6ntUS+0fUgLpuD/IQJ5JeiV2PraoYB0zRqY4dQQDQibJegUqtO+w9/9TGxSyG11fyoE5XQwtj8FdPbL9KM0IQFaHEvOMs4EJ/TvoIrw0RUZ9xiXtVAzdsVznEX8mIIVVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hm5211ad; arc=none smtp.client-ip=209.85.208.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1706539457; c=relaxed/simple;
+	bh=yeoFlTl9a/bqgLVxGb60Ke+4mr2ZgTSxsYBZYPeh9ZQ=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=cuhhTLWqmPwVz3uW00fpkz05Ss/ldxKUBX41X9ZYO5OHFM+yfeJXVtB+JortehP8ajN6RSljxmwh7qJic9YGS6OmcSjWf0Jtz1/YfgUPLV5MA1KnpFYLi/ErUV+2ZAoWT6jEvGejiKvw5gAStcZdRWV6oJCP2iGvEwwRVSswDj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G4XF/KvH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hm5211ad"
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2cf33b909e8so38697371fa.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jan 2024 05:58:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706536694; x=1707141494; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E3pltyrYUnYzCic2pC9NYr3dO8UO41hNcc7S33FlDbc=;
-        b=Hm5211advc+dBUXglqn4BK9GTe17ylw8XOrIzlJyfHciNsiQNdyOlAYcNdWQW91OJB
-         g+fjUZIYhJdON/AlymY7wkb2UBlP9zqXn72GZB7YdgTZFooXCR1i8mRPSRYAc+OXgXvY
-         P0cY2aZWU/l6qaPJ7+fKXzJr0FFGsMdzfcp5hUrBwatcwEZprV++TvVv4wgJbTKpmJS0
-         44Rz/4TGDpktOBxO9DvAQYDxpv7Ki/g/yolS6sDxQlpG5zjVwZEIKgmgic2ipQTKXU9F
-         jL6jvfJLJY2JG9l7Y7Ps/VltRxdsnVYkmrCBi3ABIA5NssGqbByDQOb+8G1HAqs5aBlu
-         IkKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706536694; x=1707141494;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=E3pltyrYUnYzCic2pC9NYr3dO8UO41hNcc7S33FlDbc=;
-        b=TUqmtStTr6fpo39eRii4kYtUAJLkKMPv/lhs/7g0XKI7L43r/e66fGa6rhDfoIABgC
-         CQaSf01eJoeRVRn2XFESysQJom3f2yyc0rpdo/c+lcv2OKL/7BQjbY2Oc2cmHCXGj1dM
-         j64/6SWO7idL/xeYLC40OLx8hyb8ViWPNHSAZTmJd1+0cnrSupFx06w/MNWpN+pwfzi4
-         EO7/TWo8r4HyY46mGcDQ7hbSWmH4nE49F5MN20D3/5TubJmV72igviaWiVkVnUUMXMEE
-         fzBg00YK5g/tp0U46k77nLoQX9eWJvyTFIQUjBpShRPNkY+11ZddRUoKqcR1bAhshWfQ
-         nJSQ==
-X-Gm-Message-State: AOJu0YxX2nh1LK2H5HmHcNMJbJWgYLVqiYAt252HT8jONWmeztl3ReRO
-	dQtYSjryftYb3hKj5yk9DCpzbrA8fXNeDdWJZO7Z5UsU/JjB1zBah4HzP9PNKDh9IhjyQd47om0
-	BEsH5vCKS59a2nOsUgp+eojw8zaAwFFQW
-X-Google-Smtp-Source: AGHT+IGiGS2IZV+5/tvgSB+/7TWEccwo8BvW6PFQAPhPGiuoHOhvOebTpjRJuy+ShMfDz4UwXXn2oOLPWmJ6e1QnDl0=
-X-Received: by 2002:a2e:9f4b:0:b0:2cf:1de7:1fd with SMTP id
- v11-20020a2e9f4b000000b002cf1de701fdmr2131683ljk.20.1706536694122; Mon, 29
- Jan 2024 05:58:14 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G4XF/KvH"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BFEF5C433F1;
+	Mon, 29 Jan 2024 14:44:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706539456;
+	bh=yeoFlTl9a/bqgLVxGb60Ke+4mr2ZgTSxsYBZYPeh9ZQ=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=G4XF/KvHG7CrczCQ6KFmSgTTcyVH7xakoqoRrWV7M6nWl1sblNJJc+meErE862dbG
+	 k2mx+QC/mmndPFfCALrRXM0ovongQkf+iPaWg/R896jsqgTk+CdY1eHGVf+VRaOUiN
+	 WVtfkckSTO/S15Vb0K2ernNE1fWH/r0z3Tmu7ucuOSdXONtaUTef8H+9jpWndzHWnZ
+	 Mu0krHPDlu4Da67kmWqUWoYx7V+hlWYC2RH0tJKXaYFBAYrTmrVdnNlHZiv7B8hfWy
+	 PvdTfz0+V6N9lJ7FKkOVGa6X9BNbdFaOR1XVqH0EaOv5uob7Z53SvncMPHzUtciJDc
+	 k6VIGW8KdC9RQ==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8615C47DDB;
+	Mon, 29 Jan 2024 14:44:16 +0000 (UTC)
+From: Emil Velikov via B4 Relay <devnull+emil.l.velikov.gmail.com@kernel.org>
+Subject: [PATCH BlueZ v4 0/8] Remove support for external plugins
+Date: Mon, 29 Jan 2024 14:44:14 +0000
+Message-Id: <20240129-rm-ext-plugins-v4-0-bfd1e08c7f99@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240129114900.92919-1-verdre@v0yd.nl> <20240129114900.92919-4-verdre@v0yd.nl>
-In-Reply-To: <20240129114900.92919-4-verdre@v0yd.nl>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 29 Jan 2024 08:58:00 -0500
-Message-ID: <CABBYNZ+ujvMRouSMxPavG+mt3p8M6-otphEEj3U6sos_o=wJKg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 3/4] emulator/btdev: Send page timeout after 2 secs delay
-To: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAL65t2UC/3XMSw6DIBSF4a0YxqW5XAFLR91H04EoKImvgDU2x
+ r0XHZmaDs9Jvn8hwXhnArknC/FmcsH1XRz8kpCizrvKUFfGTRCQA2OS+paaeaRD865cF6jOQd8
+ E5lyhJhEN3lg378HnK+7ahbH3n70/se39m5oYBSpRKbAaslSqR9XmrrkWfUu21IQHjvzEMXKBn
+ CuQFoS1vzw9cnHiaeQl48xmtwy0lke+rusXo3zlNCoBAAA=
+To: linux-bluetooth@vger.kernel.org
+Cc: Emil Velikov <emil.velikov@collabora.com>
+X-Mailer: b4 0.12.4
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1706539455; l=1855;
+ i=emil.l.velikov@gmail.com; s=20230301; h=from:subject:message-id;
+ bh=yeoFlTl9a/bqgLVxGb60Ke+4mr2ZgTSxsYBZYPeh9ZQ=;
+ b=sPY/5c0BPa6VBrBUEtPGbDN87T622o2uippFPQTBrX4qFE2GvRhFWK1VMpoY1hJLwFoWrYR16
+ +d6kX37R/sSDj1U/rNHpPEcPfnH2RCiGkKExQnrOTkkV2CTa7XOUpae
+X-Developer-Key: i=emil.l.velikov@gmail.com; a=ed25519;
+ pk=qeUTVTNyI3rcR2CfNNWsloTihgzmtbZo98GdxwZKCkY=
+X-Endpoint-Received:
+ by B4 Relay for emil.l.velikov@gmail.com/20230301 with auth_id=35
+X-Original-From: Emil Velikov <emil.l.velikov@gmail.com>
+Reply-To: <emil.l.velikov@gmail.com>
 
-Hi Jonas,
+Hello everyone,
 
-On Mon, Jan 29, 2024 at 6:49=E2=80=AFAM Jonas Dre=C3=9Fler <verdre@v0yd.nl>=
- wrote:
->
-> Real bluetooth adapters wouldn't send the page timeout immediately
-> when trying to page a device, instead it would take a few seconds.
->
-> Try to behave more realistically in the emulator and send the page
-> timeout after two seconds.
-> ---
->  emulator/btdev.c | 30 +++++++++++++++++++++++++++++-
->  1 file changed, 29 insertions(+), 1 deletion(-)
->
-> diff --git a/emulator/btdev.c b/emulator/btdev.c
-> index da94f29d1..a40117400 100644
-> --- a/emulator/btdev.c
-> +++ b/emulator/btdev.c
-> @@ -1281,6 +1281,27 @@ static void conn_complete(struct btdev *btdev,
->         send_event(btdev, BT_HCI_EVT_CONN_COMPLETE, &cc, sizeof(cc));
->  }
->
-> +struct page_timeout_data {
-> +       struct btdev *btdev;
-> +       uint8_t bdaddr[6];
-> +       unsigned int timeout_id;
-> +};
-> +
-> +static bool page_timeout(void *user_data)
-> +{
-> +       struct page_timeout_data *pt_data =3D user_data;
-> +       struct btdev *btdev =3D pt_data->btdev;
-> +       const uint8_t *bdaddr =3D pt_data->bdaddr;
-> +
-> +       timeout_remove(pt_data->timeout_id);
-> +       pt_data->timeout_id =3D 0;
-> +
-> +       conn_complete(btdev, bdaddr, BT_HCI_ERR_PAGE_TIMEOUT);
-> +
-> +       free(pt_data);
-> +       return false;
-> +}
-> +
->  static int cmd_create_conn_complete(struct btdev *dev, const void *data,
->                                                 uint8_t len)
->  {
-> @@ -1298,7 +1319,14 @@ static int cmd_create_conn_complete(struct btdev *=
-dev, const void *data,
->
->                 send_event(remote, BT_HCI_EVT_CONN_REQUEST, &cr, sizeof(c=
-r));
->         } else {
-> -               conn_complete(dev, cmd->bdaddr, BT_HCI_ERR_PAGE_TIMEOUT);
-> +               struct page_timeout_data *pt_data =3D new0(struct page_ti=
-meout_data, 1);
-> +               pt_data->btdev =3D dev;
-> +               memcpy(pt_data->bdaddr, cmd->bdaddr, 6);
-> +
-> +               /* Send page timeout after 2 seconds to emulate real pagi=
-ng */
-> +               pt_data->timeout_id =3D timeout_add(2000,
-> +                                                 page_timeout,
-> +                                                 pt_data, NULL);
->         }
->
->         return 0;
-> --
-> 2.43.0
+With v4 we have moved from pre-processor to compilation checking for the
+external plugins support.
 
-We currently don't set a specific page timeout which means we are
-using the default value which is 5.12 sec, so I'd replace 2000 with
-5120, we might have to do something similar to LE Audio scanning
-though since during this period the remote instance could enable
-connections which should trigger the connection request event as well.
+Namely, as we build without one the dead-code elimination will discard
+all the relevant code. Ultimately this means we compile check both paths
+in order to catch mistakes. Thanks to Luiz for the suggestion.
 
+Link to the previous revision can be found below.
 
---=20
-Luiz Augusto von Dentz
+Thanks
+Emil
+
+- Link to v3: https://lore.kernel.org/r/20240125-rm-ext-plugins-v3-0-d141f7870bb6@gmail.com
+
+---
+Emil Velikov (8):
+      configure, README: introduce --enable-external-plugins
+      obexd: factor out external plugin support
+      bluetoothd: remove external-dummy plugin
+      bluetoothd: convert external sixaxis plugin to builtin
+      bluetoothd: factor out external plugin support
+      bluetoothd: don't export internal API
+      bluetoothd: change plugin loading alike obexd
+      android: export only (android) entrypoint from the modules
+
+ Makefile.am              |  17 ++----
+ Makefile.obexd           |   2 +
+ Makefile.plugins         |   8 ++-
+ README                   |  13 +++++
+ android/Makefile.am      |   3 ++
+ android/hal-audio.c      |   1 +
+ android/hal-bluetooth.c  |   1 +
+ android/hal-sco.c        |   1 +
+ configure.ac             |  10 ++++
+ obexd/src/obexd.h        |   2 +-
+ obexd/src/plugin.c       |  89 ++++++++++++++++++++-----------
+ obexd/src/plugin.h       |   4 ++
+ plugins/external-dummy.c |  28 ----------
+ src/btd.h                |   2 +-
+ src/plugin.c             | 135 ++++++++++++++++++++++++++++-------------------
+ src/plugin.h             |   4 ++
+ 16 files changed, 188 insertions(+), 132 deletions(-)
+---
+base-commit: 0de32f67f685b95c35a5c2f1206081af89bd88b6
+change-id: 20240116-rm-ext-plugins-ba0b852a492b
+
+Best regards,
+-- 
+Emil Velikov <emil.l.velikov@gmail.com>
+
