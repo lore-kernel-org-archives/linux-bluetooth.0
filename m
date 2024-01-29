@@ -1,176 +1,90 @@
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA3106F073
-	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jan 2024 17:27:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29ED676C87
+	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jan 2024 17:47:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706549257; cv=none; b=YT5nu7COpPLcdLnRpf0TUuP8Es58Eqci2Hn/pNSPnfsRPlY2kYE69cyO6PIYole4fg2/m2xXhwawa0SFYfHM7IPyZt0lIqayl/IEDSQzuuV8gbLJnI+exD4ygv4Dhr6rNqzbm9mYXZsMR4ji4/W/VsUqPWt55PbYpAsoiwuYGc8=
+	t=1706550479; cv=none; b=CaSI6OPu7H6sYSjKpVsMyVArj1SwovdyddBHUgICmbT31f5RMQahxBO8xp0yqkI0N4AHP2yjsyXerqSi8JBxFOTspOQlmFbaPtI5tYYYrcsZwqUXNWN7kfuQhHbSixajXhMuYL1b5FAQvbpD4c6evjIm2eEiDE/heM+Jd4Hdj/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706549257; c=relaxed/simple;
-	bh=BA4sduNidfn0zFGkUKN1zNgrQIZ2xuOPkbuZAaOohnk=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=LzwuuT/hLBO93W5kMTfcfk/t4ivmtteUZW4Mt2/ToR7mItJPIuxEWetAt5hc9iUjVHm7ARFwX4Zx1ULHePgWuzeQP1u2oW0bcXR1ByZPRM9iTh+b/kRmghe/dIc52AObpD01fVCTL5F11DyNzQgGdzZcXUBjHqyM1+1Sju44hIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CtaxTcID; arc=none smtp.client-ip=209.85.222.172
+	s=arc-20240116; t=1706550479; c=relaxed/simple;
+	bh=EyAZBkMpA/OK+QqBpmjgJctVZ+SPmxQuO6eZcI6rRvU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SD2+R8WVTd1SEdpRFCPSNxHleTMQ6D958DR0jGFsxiY09a2dZ/8+zrqbkd7KV6WkB6EmlqxqEEo350OkiWKHzTgxOLd0IL69RwcZ0seBUsfNckePkDUUCYRKLLaQuAtJiARWOUlUKpkyloED4SxBl9lSRS0oatn3Ka3o5/hwng8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KRLagFQe; arc=none smtp.client-ip=209.85.219.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CtaxTcID"
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-783da8920e5so250684285a.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jan 2024 09:27:35 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KRLagFQe"
+Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-dc25e12cc63so3549901276.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jan 2024 09:47:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706549254; x=1707154054; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=hjnjIYN5jpccytVUX1EjU2VGAANzOuK1PXpOrJvwRuo=;
-        b=CtaxTcIDmBWwEwtgt1e+HZ0yph2lwXTn6Ur8V7li8ip7fX9xRWA1DnlRRo0t4k2hJE
-         Kj1CIyR0NA9HbUNaIA0yw837m3hy1c1O3F9mEJiBd3nsH9Hi28H2WlCG4sihrkDJNnMv
-         aI2leCkRBDNDPpCtuljSTojIWmZXO9f2wB/msvKy5sx08Z4+IEq/G7SLd2SvkQ3vc2vF
-         c7rVYMEIiT22cKM0jVB15ZZsLdMDTYhhZ6sQYHlS76/1jWPUM2JY8lEYcrd67hZaX/uj
-         1AAhHDWGZSvQRa1DEgcNqytHsLtc5ls71QLw5YQodTGyR/7AblGER/LyWshrH0tFAjef
-         jIQg==
+        d=gmail.com; s=20230601; t=1706550477; x=1707155277; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=EyAZBkMpA/OK+QqBpmjgJctVZ+SPmxQuO6eZcI6rRvU=;
+        b=KRLagFQeMh116XvcakZsATyxbJAq2txfGgfMZzKdLK/rGCla6cElFH5+rul5+yvRh7
+         U3ZE+doedqAyxruEbDJ56XwEaOcrU3bd1ForgVaOn3lTVpIDJwU/+AQsTMoWX5nbuZPO
+         scaM3TcWWQqwYvt69+sopwkcDF8fbScf51ZiG5gpiASltxQg76MoR9oaVse5N2DlSOYE
+         a7VC3x+mAXst66v3yjFWX5SkC2mM93sza9AyQtNQ/itRYaee3xxiiA9P1wmi1buy5yCi
+         yBPE3RoORLXSiV4dT5Gtr1o7WKhE6PRSSmz20NOPzmVXr7YLLfpHQYiKRCD1MES7sdRd
+         NSzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706549254; x=1707154054;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1706550477; x=1707155277;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=hjnjIYN5jpccytVUX1EjU2VGAANzOuK1PXpOrJvwRuo=;
-        b=MrMETvOJqCfp48pOQZ1UQmCXf2bha9vk9jike0/KzuhtBeReioIEYhdvPewbOcDPHy
-         12uz3BACOB+ACeZWdp6pMt1mnFfyYv0snBwoViLkBtWgtJEY0RDRAHP5egV8OMt0lPnq
-         XIpYKuEio4YXT/IdNlYytGsC3NMOvVKn9rXqMC5YYY9QWIPrqGzb/pqTcjOi50oMC4ie
-         S7AnxCstebowLntgL9eeAQBH7dfsf2f3GiO8yCUjNw8d8z63tJa8RzlUPCfaDc3cjSFI
-         9b9V1iuuBDZjxeCPoqTH5zGuOM6n/8Ozf9qvp1yIfT5kPCeziqK+jXPvqCPrWbyFId0O
-         tlmQ==
-X-Gm-Message-State: AOJu0Yy2jIpI2u69qFLUoZqfnGQGCLtR2ux48LH4cQhk+HPV3eP9uZNS
-	ibXXF5VOicT/QcZk9m7aJVpLwd3pxcfw6u2zv5uPksOnDaQHjfgZnC+Swkes
-X-Google-Smtp-Source: AGHT+IHf/PsihUhiJF0m12lbxQvSEoYfrgstXP3T90aeSaKnX47DMQoBc8pkT458kLDJ3KofD5Mlfw==
-X-Received: by 2002:ae9:f441:0:b0:783:ebb7:fd64 with SMTP id z1-20020ae9f441000000b00783ebb7fd64mr4491358qkl.38.1706549254482;
-        Mon, 29 Jan 2024 09:27:34 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCUj3HErNrNkUi3o41sqvkZXMJOYyKsZ0VM94g/Jok6oqYALuFRbRUiX+r97onCpzE5qa2SbgDo6GYcglW62w2KYk1NZntkbHeWrZB9oQSu40y85m8zfUvZilIj9
-Received: from [172.17.0.2] ([172.183.121.85])
-        by smtp.gmail.com with ESMTPSA id os28-20020a05620a811c00b0078350718a63sm3310067qkn.67.2024.01.29.09.27.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jan 2024 09:27:34 -0800 (PST)
-Message-ID: <65b7e006.050a0220.daa84.c904@mx.google.com>
-Date: Mon, 29 Jan 2024 09:27:34 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============6201593272732295382=="
+        bh=EyAZBkMpA/OK+QqBpmjgJctVZ+SPmxQuO6eZcI6rRvU=;
+        b=HH2Bo4tlrgckrljT2MUXbTCF/tt1SbT+khYziYk4iXxKLe7RgpBS8FTvC47gi3bHcC
+         Fb2+tX8iovSzggb1c9RdleLEz76d+MatHgngiRNekjGmR0I7GPHT6cRyW7ft+B5ncOHm
+         3LNoL92xTKOmAV9QjkyvbI67sSmOBjM9jJdWjrZ/iOrS64jAVGSR8OKMwJy3TrmAa1Hn
+         wqqGeLTo+rrIXbgF/ZEGB9vYYS0mNRhOKmCKNwiP8/bL21PqcmD/HopyJQScxQsI3TE+
+         UqKJSF4BLeZtsV8+Ih1os1RZdLhWgdGF4vLCex875zNhrKcI0Ix9RTZELVzTUzriKNLq
+         7hLA==
+X-Gm-Message-State: AOJu0Yxsro5RzsOCRAOOJJlIWYtb+KYr0kzKWSpZIbJhutTfPHlFm0AS
+	LcBPHrqOCRoqG1TcODQvvX1nMCLe2pbu2bvfDr99dSVYBv+AIcqtdN8W5NObjy0mkDa8Y4SKuA9
+	utBfNO0dYAMJRoLm9Y04SDYQqkeMJFvif
+X-Google-Smtp-Source: AGHT+IH2PAWKPyrjhZgLxlFneyIjImbpP3klyEiD/un8DvMA9zqMML/trQ8sVuO021rWisZpmk/cipRdUSsZXtzkyFc=
+X-Received: by 2002:a5b:41:0:b0:dc6:1a0d:6746 with SMTP id e1-20020a5b0041000000b00dc61a0d6746mr3860218ybp.51.1706550477048;
+ Mon, 29 Jan 2024 09:47:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, devnull+emil.l.velikov.gmail.com@kernel.org
-Subject: RE: Remove support for external plugins
-In-Reply-To: <20240129-rm-ext-plugins-v4-1-bfd1e08c7f99@gmail.com>
-References: <20240129-rm-ext-plugins-v4-1-bfd1e08c7f99@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20240129-rm-ext-plugins-v4-0-bfd1e08c7f99@gmail.com>
+ <20240129-rm-ext-plugins-v4-7-bfd1e08c7f99@gmail.com> <a97398e2-856b-4034-b8d3-e65f54b2bb17@molgen.mpg.de>
+ <CABBYNZJY0-hfvUEM101fE4WogdH_cosP65_ai=QUKUcs57JFUA@mail.gmail.com>
+In-Reply-To: <CABBYNZJY0-hfvUEM101fE4WogdH_cosP65_ai=QUKUcs57JFUA@mail.gmail.com>
+From: Emil Velikov <emil.l.velikov@gmail.com>
+Date: Mon, 29 Jan 2024 17:47:45 +0000
+Message-ID: <CACvgo50SYgrKk5=RmzA2AqAhQZFENmTQqP62cOEoN7dpmKMN1A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v4 7/8] bluetoothd: change plugin loading alike obexd
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Paul Menzel <pmenzel@molgen.mpg.de>, Emil Velikov <emil.velikov@collabora.com>, 
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
---===============6201593272732295382==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello team,
 
-This is automated email and please do not reply to this email!
+On Mon, 29 Jan 2024 at 16:22, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
 
-Dear submitter,
+>
+> To me it sounds quite clear that he is refering to the fact that obexd
+> prints it a little differently so he is just trying to align the
+> behavior of the daemons.
+>
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=820935
+Precisely - we do basic alignment across the two daemons. Both in
+terms of code as well as logging pattern.
+Although if that's not wanted, please drop this patch. There's a
+reason why I kept it near the end of the series ;-)
 
----Test result---
+Re-sending the series for the comma in 8/8 seems excessive IMHO. If
+there are other concerns, I'd be happy to respin the lot.
+Otherwise I think it's simpler if Luiz fixes it on applying.
 
-Test Summary:
-CheckPatch                    FAIL      3.64 seconds
-GitLint                       PASS      2.33 seconds
-BuildEll                      PASS      24.08 seconds
-BluezMake                     PASS      732.29 seconds
-MakeCheck                     PASS      13.76 seconds
-MakeDistcheck                 PASS      164.26 seconds
-CheckValgrind                 PASS      226.32 seconds
-CheckSmatch                   PASS      329.54 seconds
-bluezmakeextell               PASS      107.29 seconds
-IncrementalBuild              PASS      5502.72 seconds
-ScanBuild                     PASS      928.77 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,v4,2/8] obexd: factor out external plugin support
-WARNING:IS_ENABLED_CONFIG: IS_ENABLED(x) is normally used as IS_ENABLED(CONFIG_x)
-#127: FILE: obexd/src/plugin.c:37:
-+#define IS_ENABLED(x) (x)
-
-WARNING:IS_ENABLED_CONFIG: IS_ENABLED(EXTERNAL_PLUGINS) is normally used as IS_ENABLED(CONFIG_EXTERNAL_PLUGINS)
-#253: FILE: obexd/src/plugin.c:200:
-+	if IS_ENABLED(EXTERNAL_PLUGINS)
-
-/github/workspace/src/src/13535810.patch total: 0 errors, 2 warnings, 166 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13535810.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[BlueZ,v4,5/8] bluetoothd: factor out external plugin support
-WARNING:IS_ENABLED_CONFIG: IS_ENABLED(x) is normally used as IS_ENABLED(CONFIG_x)
-#127: FILE: src/plugin.c:29:
-+#define IS_ENABLED(x) (x)
-
-WARNING:BLOCK_COMMENT_STYLE: Block comments use a trailing */ on a separate line
-#239: FILE: src/plugin.c:186:
-+	 * plugins are loaded. */
-
-WARNING:IS_ENABLED_CONFIG: IS_ENABLED(EXTERNAL_PLUGINS) is normally used as IS_ENABLED(CONFIG_EXTERNAL_PLUGINS)
-#258: FILE: src/plugin.c:205:
-+	if IS_ENABLED(EXTERNAL_PLUGINS)
-
-/github/workspace/src/src/13535813.patch total: 0 errors, 3 warnings, 178 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13535813.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[BlueZ,v4,7/8] bluetoothd: change plugin loading alike obexd
-WARNING:ENOSYS: ENOSYS means 'invalid syscall nr' and nothing else
-#108: FILE: src/plugin.c:52:
-+		if (err == -ENOSYS || err == -ENOTSUP)
-
-/github/workspace/src/src/13535815.patch total: 0 errors, 1 warnings, 106 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13535815.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6201593272732295382==--
+Thanks
+Emil
