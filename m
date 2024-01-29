@@ -1,83 +1,93 @@
-Received: from mail.andi.de1.cc (mail.andi.de1.cc [178.238.236.174])
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B32241E9;
-	Mon, 29 Jan 2024 20:34:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.238.236.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E69144CB24
+	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jan 2024 20:42:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.18.73.165
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706560471; cv=none; b=I1jxGb+EDJ76Lz3q9eHrsceb8bYk4eKGSWtjeWt81bd3C36eJQB4ucOMSrKP0UxW2NvlJVySmxBAixvmBpkiWg78PLp9SOZvrOkhAP6TddLQEUWpMi7DlqzTfGS76fOuiNk4TsDg6l7NWtiTJUIXsU4VYqBjVlKJ3BC0H7cgIrQ=
+	t=1706560930; cv=none; b=uUZo9YTi2vSWrixNP8LcZ5nrM3K6a0z8fmWK8L8mV1eCrmhPyrBefZSOZfYH3luiiN3LXKhGuSOWfUF0fRvVl1e3UARUDzuR22WcVWX9gtlL+XubMUm76NlGlQ+tzkWICJt3sa2Wj9vYA94O62zcikB02EB+aAuYtrReFDNHYN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706560471; c=relaxed/simple;
-	bh=RTzuqnmngPY/OIwUOShwFsqce0TD1wiEUlgbjjROOj0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TRVKIEAf/ycJGVonJu9TCQ4e7abYdFu016EkYMQ7KunOgQ7kYa+aN+4WPWAVCAxCKZYKVym/HhlbKNbYSoNWreLWJ2dek4pW9bTWfkiA+gY3pCUr8fb7SHNfxfmmWpae5Kr4oO3zWaItVY08EHiM0teYMalRWrwQIQGEZYMQAIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kemnade.info; spf=pass smtp.mailfrom=kemnade.info; dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b=hjh4Q8+U; arc=none smtp.client-ip=178.238.236.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kemnade.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kemnade.info
+	s=arc-20240116; t=1706560930; c=relaxed/simple;
+	bh=7mzXD94rZQaDiRyQi1Wq96pjZyIZyodiE6PCsbs+dhM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=q3gxR9GqKLtlogSqzHbpd5pdTGM8WLx0zcOoV3Rk/UgcW6VFx8V0Fm16Na8nN/KXX+dqWd2Y99L1h9/ncEyCMVvbOlCmLpEACsrEk+W7gJ1LkgSF/+uGAbW/cGDsLb0aDBoOI5umdMKBLRTiF/hoHMoVYQB6Aye8F/CB53cTQ9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=T+U+/at+; arc=none smtp.client-ip=37.18.73.165
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b="hjh4Q8+U"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=kemnade.info; s=20220719; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:References:In-Reply-To:Message-ID:Subject:Cc:To:From:Date:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=RTzuqnmngPY/OIwUOShwFsqce0TD1wiEUlgbjjROOj0=; b=hjh4Q8+UsRsAyyTpXDotmMsBb5
-	4X7Kn/3OU3V4eXMp15WwfQKJI9neYg8x6qA5lMcumbsw7ugyFdnm1jrWwzn8CPJnm48Y4LCELxmC+
-	88HU3HPvhusQzmvqLXsyLXGz+DKYtvfGFNrii+FusRY+osHRHzl1UmNIDErZlz/3SWAcioIXzjn1y
-	bD3hs+jwNbOIGF4RG/XQNsJKlqrPc+SKZ4T5YW0uFByKWjb92Fe6ucoSSOAIoGf/hVRplH/qfCm7s
-	wryEyi/mE4n7dPIDrU2DBn+0VtU+GdTH61CQ8vqRHDHMfHow0aBupTGa03AnnDwp3WR/2sXUjBB4z
-	nCbM6gcw==;
-Received: from p200300c2070939001a3da2fffebfd33a.dip0.t-ipconnect.de ([2003:c2:709:3900:1a3d:a2ff:febf:d33a] helo=aktux)
-	by mail.andi.de1.cc with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <andreas@kemnade.info>)
-	id 1rUYKh-008sGD-OZ; Mon, 29 Jan 2024 21:34:19 +0100
-Date: Mon, 29 Jan 2024 21:34:16 +0100
-From: Andreas Kemnade <andreas@kemnade.info>
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
- johan@kernel.org, jirislaby@kernel.org, gregkh@linuxfoundation.org,
- linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org, Adam Ford
- <aford173@gmail.com>, Tony Lindgren <tony@atomide.com>,
- tomi.valkeinen@ideasonboard.com, =?UTF-8?B?UMOpdGVy?= Ujfalusi
- <peter.ujfalusi@gmail.com>, robh@kernel.org, hns@goldelico.com
-Subject: Re: [RFC PATCH v2 1/3] gnss: Add AI2 protocol used by some TI combo
- chips.
-Message-ID: <20240129213416.61f86524@aktux>
-In-Reply-To: <c8af1073-22ed-4c14-be85-67632d82a3fa@molgen.mpg.de>
-References: <20240128173352.2714442-1-andreas@kemnade.info>
-	<20240128173352.2714442-2-andreas@kemnade.info>
-	<c8af1073-22ed-4c14-be85-67632d82a3fa@molgen.mpg.de>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-pc-linux-gnu)
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="T+U+/at+"
+Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id ACAA9100005;
+	Mon, 29 Jan 2024 23:42:04 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru ACAA9100005
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1706560924;
+	bh=S0rDk4HemQAYQBC8aV9gP4oOjgdPJ8qajD4OVufLL40=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+	b=T+U+/at+d5xbg7wwx6ROWiEiMCfoChn/npXmaP0Yeseh5jvc76srJJ7uPxqPyNkmw
+	 yQ7IApsinNR2SkX2ltVPzAYDxEGZGaYMwsF3J+5jhY3m95J8cz426BUPIlXGsqCr+0
+	 ESl35fkloyMg8Y1I8ERR9jH6GMqnPG266/4RLpLChHYuDLUD5wm9WkTOCGJ0dWprRS
+	 dO8qmmFJs+LgiKkasZkiSBUzvRWI16M7rEOAmxJJ0dU451HXf+ovNZ/Vf6Ewo+s5dE
+	 s9OsDMcyU+KuvDLT4wknXTsOtclyJsPOKMKQDpZciAxHiP/QCyd1UtvgN+KI91kcuU
+	 fL5pQDFM8JvcQ==
+Received: from smtp.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Mon, 29 Jan 2024 23:42:04 +0300 (MSK)
+Received: from cab-wsm-0026722.sberdevices.ru (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Mon, 29 Jan 2024 23:42:04 +0300
+From: Victor Pushkarev <VAnPushkarev@salutedevices.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <VAnPushkarev@salutedevices.com>, <sdfw_system_team@salutedevices.com>,
+	<corvinus.v@gmail.com>
+Subject: [PATCH BlueZ v1 0/2] Introduce option to limit A2DP channels
+Date: Mon, 29 Jan 2024 23:41:52 +0300
+Message-ID: <20240129204154.95773-1-VAnPushkarev@salutedevices.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-145)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 183024 [Jan 29 2024]
+X-KSMG-AntiSpam-Version: 6.1.0.3
+X-KSMG-AntiSpam-Envelope-From: vanpushkarev@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;100.64.160.123:7.1.2;127.0.0.199:7.1.2;smtp.sberdevices.ru:5.0.1,7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/01/29 16:27:00 #23447558
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-Hi,
+This patch adds feature to limit the number of active A2DP connections.
 
-On Mon, 29 Jan 2024 08:40:58 +0100
-Paul Menzel <pmenzel@molgen.mpg.de> wrote:
+This may be necessary to prevent audio mixing problem when playing from
+multiple sources using A2DP profile.
 
-> Dear Andreas,
->=20
->=20
-> Thank you for your patch. I think Linux Bluetooth patches need to be=20
-> have Bluetooth as the prefix for the commit message summary/title. Also,=
-=20
-> it=E2=80=99d be great if you removed the dot/period at the end of the com=
-mit=20
-> message summary/title.
->=20
-well, it is not a Bluetooth patch, although sent in a series with a Bluetoo=
-th
-patch included, so having Bluetooth as th prefix just does not make any sen=
-se.
+Victor Pushkarev (2):
+  main.conf: Introduce option to limit A2DP channels
+  a2dp: Reject connection when the channel limit is exceeded
 
-Regards,
-Andreas
+ profiles/audio/a2dp.c |  8 ++++++++
+ src/btd.h             |  6 ++++++
+ src/main.c            | 16 ++++++++++++++++
+ src/main.conf         |  5 +++++
+ 4 files changed, 35 insertions(+)
+
+-- 
+2.39.3 (Apple Git-145)
+
