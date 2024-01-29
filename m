@@ -1,59 +1,59 @@
 Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 569E32C6AA
-	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jan 2024 22:18:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DEC751C34
+	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jan 2024 23:04:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706566689; cv=none; b=Ho6Qv+n0KUh+uav02HyX5eE4lCyeuJd377S4ikkkiOW4YgiCW2wd51vL53V9Ov+HR6D8WOfw/i6vbop4srSNBg97gXdIv6wn9mh5RlsFGwgZBZJyBBlA/GLGhPz8C0ENUrXKNttV7/btP08ALzbyQb10QxzT9OosThT7f26Vx3A=
+	t=1706569473; cv=none; b=l23qBI9YKdsaY/NY9s5TgS5EQbxKMsW8XECvc9m9nZ8OY56PUOCBvIn7VkxNw9GzqpRSuB8Q2CM+VpL/YHVOsXgtQZMrvm/i1m67EyMlyD9rR/CL6xlgRBgvyKL5thTj/66wKXdMV6utUah+qzjwLMcioETGeEVVElNvaK8Nx3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706566689; c=relaxed/simple;
-	bh=WMocSxQTdDlls89WADox/T+fvKxjwbNExdAYvvr+ko8=;
+	s=arc-20240116; t=1706569473; c=relaxed/simple;
+	bh=q4TmBhZWLvZyUnNhTaHM4Ubk2/mSHvXS0xUBGl5wbb8=;
 	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=uHsk3PPkUqplkti99Tk50P9IbaQ3Ug67Fn8cky1P4aB4oBP63w3NDDFuwWhOoUbwVKBkGYrsABVQHKbzhKnTkaYwclipU/v/rvnoI9jZX8Ukx+V+8zZn3+sf4yQwlg9Fqx3ggq6O1shJM2LrT2ZuLO3LmVj6uc1InPveU/OirC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E/TBkjZB; arc=none smtp.client-ip=209.85.219.41
+	 In-Reply-To:References; b=nzzjYJFcpvhz/zoLvThhSgLlE29XHafgnqm46qKtG7taNmd+DMUxUuZbfavlAR+f1y/9sTue7M1z6oaE1BsJeqDzyBt18of4wuoi5dtpgt1OEzloZEdOSq6KDeGGUw9PgwCrWoiGxKnK6Sjz+YoxbRp58oWLJ0emNkJIPrlVMaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G44BnhfG; arc=none smtp.client-ip=209.85.219.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E/TBkjZB"
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-68009cb4669so25911256d6.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jan 2024 14:18:08 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G44BnhfG"
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6860ff3951aso24323076d6.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jan 2024 15:04:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706566687; x=1707171487; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706569470; x=1707174270; darn=vger.kernel.org;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=LcC+396Zb1HtEe0BpyShZtqNv249WeJCqx437IYcrVI=;
-        b=E/TBkjZBZHpJQf7AalZ2Yfii68WB+DlzLGLGD1LAnb6MU+Oi6i0hMoe2TQmtVJSZLP
-         MCRfA9SpKlN5W17UqO+R8ZPC7l0rh3cSI7xtAgrEjVOlQwl9IHPq117MK4Xuyq6aDy06
-         uKdB1qlaTM7T20sU6SWL88MJFWO8PmMVNe67WaOyyKLd3tdHa3Ay4Pd2hUkxshVzG4zi
-         PSK+2docZM5RxqMR1Y1MGU1ebm59zXGGsi5NSmwsBHbZBrZngZaFRYQLzov53QyuG1lN
-         nnzYVx5NK3okh0c5xwTxFBb/37q3UPXF5ErRNICafLFDdYXOPkndTn79ArYEy/qz4k2a
-         y8YQ==
+        bh=FA6JLEOZqdhfmiD2IIGhKib4lEDwGDYbzKaYt0BtdOg=;
+        b=G44BnhfGg7GitFSQjKENAnlsWSR7+FUrtw/cWZ7acDI1QUJfuKDqeALPBIRl6FUuGQ
+         ex9ueu4Qc+YqvQmwXN/7KfJQteWvXSuu6x6QkEb1mHXDyS+VKuSt9yHBkFxvqycAYFuJ
+         A6ic5gOEMcPgGoWSwFCCSALm9N/C5P6wK6YJt3RggqtT+Iwt5+i4YM7gMjMZ0EVypRKQ
+         c2ncY24YZ6aFYPFHsy4m5ZsltVF8yvFwMnO4SickuauLr3zx+igPR4sniBIUInQBta3O
+         ry1JyfIPnzOhPibGMIaEpM/07xntijO8d8oFC7vll3YlzFJ7rGQT/BzrFWPurBxDeKWm
+         dRUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706566687; x=1707171487;
+        d=1e100.net; s=20230601; t=1706569470; x=1707174270;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=LcC+396Zb1HtEe0BpyShZtqNv249WeJCqx437IYcrVI=;
-        b=DdEItw8d7vUrl5QTJEH7WCRtUfsSZVhXbissUJX6f0Ele7wGehH8W5sBqO1xCPbNS0
-         Yfiio/Ciwmq6gdSxzyDVH6xLhV0KebVMewgI+IXDlfOm+vD6T/u7GUSd6LyeZYeyg/t/
-         0uzF6600Qo19JROw0T7hBtzN34h36az0AEGyOlyceu7xbUH05ZHUs5nu6I0Xi+cPc20V
-         Kv9PH3rSpNUFqUqGGBrsA8F7W8xiFGfk2P3pw7qI1eQYinmGWI5Sx+5e/X1WSIBVJEmv
-         6gBkR0P85eW0J70ozUAJaAkKeccvA5b632BE/KOqQb6dYHLgoNl02+yIuQjXPG3Ag4Yo
-         qBUw==
-X-Gm-Message-State: AOJu0YxvHYW0VCeXZWBi+YH4Pizbylq5YQ3BvkGaVSSLlKOaqGl0WazR
-	y4WujT5IarN8Jb6bqRwYLAiCsC0YCki28F+cckTk45tMh1bzkXs5JryM3wWW
-X-Google-Smtp-Source: AGHT+IGUnWxki3qOs5SGVygQELpTYfKHwGoKaSA8sCcmjjgwKFJCB2fbIr+03mZwDpUgiNwlRYiKwQ==
-X-Received: by 2002:a05:6214:f03:b0:686:10eb:eef3 with SMTP id gw3-20020a0562140f0300b0068610ebeef3mr7185645qvb.91.1706566686804;
-        Mon, 29 Jan 2024 14:18:06 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVKAH6w2qp2NLY35JbjRxIX9imCfOsbAEB/8GMCTAJb6C3z8YTOyZnZc0SZ71s/50P8aMgtVBRHf8sWx6J199YDo3WQRqSKN13aQxl2YVo=
-Received: from [172.17.0.2] ([20.84.127.30])
-        by smtp.gmail.com with ESMTPSA id qp7-20020a056214598700b0068c4201f4e6sm2533853qvb.144.2024.01.29.14.18.06
+        bh=FA6JLEOZqdhfmiD2IIGhKib4lEDwGDYbzKaYt0BtdOg=;
+        b=p206xiq3+pqbqjuy+/AqbBevss5Zh3TG5FVSFzYVPdisOwvjGBIqJVawKyvX7w/pO3
+         NVgVbrQI1/hFvZPt9YB6HW9bw70vH/erhsS0t4ggAF6o/ajaBitqmk+BVu2iqLeuZ7pc
+         UnncoizfA+K4+JtWuAyROJ44ZGlbRC3IQFgHSdr2EWG+t2Qc47G2FP6z6bDDo/XboLAL
+         VNSlhcVTnDXKZYPCLTq2EgnZduGcGrcTTKmmezOyD8AFBGlN3JLzbEqpqfRDujrwuP3C
+         L7qrBc3piD1LuxYcjV9b4cEAeVG80zkAnUAZehnd3L0uqjwDRgF6Pgx6JLZ2vc/qvHXm
+         TUMw==
+X-Gm-Message-State: AOJu0YzDGuiQ2dV+IfutZ84FCke0XG/hdG8ZK+rbhpibmpHQVEbpZW6A
+	OHylzvPtjzLOElyLQIRnuSNtOul9KpffQAxVfTOGHik6aJpDCLosvVuFOL/H
+X-Google-Smtp-Source: AGHT+IGrIN5S70yJxrOeROLPRi27OtmDktFcnEuR3yKJBQ/mbaXj7fkPyKo2fbCCkuSdsWzyPVXI1g==
+X-Received: by 2002:ad4:5804:0:b0:68c:3c13:b5d6 with SMTP id dd4-20020ad45804000000b0068c3c13b5d6mr6089043qvb.46.1706569470070;
+        Mon, 29 Jan 2024 15:04:30 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCWVexe+TL0GKAEyOMj6udkUkD+9yg08bJ7eQI1gsXCn3eWEoWqMZqOS1TFigNsEJWvG65h5tQn3sZGeSH7/l03ap/Tqew==
+Received: from [172.17.0.2] ([40.76.106.54])
+        by smtp.gmail.com with ESMTPSA id lr7-20020a0562145bc700b00680c25f5f06sm3883214qvb.86.2024.01.29.15.04.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jan 2024 14:18:06 -0800 (PST)
-Message-ID: <65b8241e.050a0220.37eb2.8f55@mx.google.com>
-Date: Mon, 29 Jan 2024 14:18:06 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2754093629031520772=="
+        Mon, 29 Jan 2024 15:04:29 -0800 (PST)
+Message-ID: <65b82efd.050a0220.1196e.f8cc@mx.google.com>
+Date: Mon, 29 Jan 2024 15:04:29 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4617968910563909480=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -61,13 +61,13 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, VAnPushkarev@salutedevices.com
-Subject: RE: Introduce option to limit A2DP channels
-In-Reply-To: <20240129204154.95773-2-VAnPushkarev@salutedevices.com>
-References: <20240129204154.95773-2-VAnPushkarev@salutedevices.com>
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1,1/4] util: Add UTIL_IOV_INIT
+In-Reply-To: <20240129212036.163298-1-luiz.dentz@gmail.com>
+References: <20240129212036.163298-1-luiz.dentz@gmail.com>
 Reply-To: linux-bluetooth@vger.kernel.org
 
---===============2754093629031520772==
+--===============4617968910563909480==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -78,67 +78,49 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=821056
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=821071
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    FAIL      1.20 seconds
-GitLint                       PASS      0.64 seconds
-BuildEll                      PASS      24.30 seconds
-BluezMake                     PASS      744.06 seconds
-MakeCheck                     PASS      11.58 seconds
-MakeDistcheck                 PASS      164.00 seconds
-CheckValgrind                 PASS      227.32 seconds
-CheckSmatch                   PASS      333.77 seconds
-bluezmakeextell               PASS      109.57 seconds
-IncrementalBuild              PASS      1374.21 seconds
-ScanBuild                     PASS      955.44 seconds
+CheckPatch                    PASS      6.40 seconds
+GitLint                       PASS      1.31 seconds
+BuildEll                      PASS      23.90 seconds
+BluezMake                     PASS      705.38 seconds
+MakeCheck                     PASS      11.31 seconds
+MakeDistcheck                 PASS      166.06 seconds
+CheckValgrind                 PASS      226.45 seconds
+CheckSmatch                   PASS      332.44 seconds
+bluezmakeextell               PASS      107.91 seconds
+IncrementalBuild              PASS      2677.89 seconds
+ScanBuild                     WARNING   963.25 seconds
 
 Details
 ##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
 Output:
-[BlueZ,v1,1/2] main.conf: Introduce option to limit A2DP channels
-WARNING:STATIC_CONST_CHAR_ARRAY: static const char * array should probably be static const char * const
-#145: FILE: src/main.c:165:
-+static const char *a2dp_options[] = {
-
-/github/workspace/src/src/13536361.patch total: 0 errors, 1 warnings, 75 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13536361.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[BlueZ,v1,2/2] a2dp: Reject connection when the channel limit is exceeded
-WARNING:LONG_LINE: line length of 90 exceeds 80 columns
-#118: FILE: profiles/audio/a2dp.c:2553:
-+				queue_length(server->channels) > btd_opts.a2dp.channels) {
-
-WARNING:LONG_LINE_STRING: line length of 81 exceeds 80 columns
-#120: FILE: profiles/audio/a2dp.c:2555:
-+		DBG("Reject current connection, A2DP channel limit exceeded: %d",
-
-/github/workspace/src/src/13536360.patch total: 0 errors, 2 warnings, 14 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13536360.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
+In file included from tools/mesh-gatt/crypto.c:32:
+./src/shared/util.h:236:9: warning: 1st function call argument is an uninitialized value
+        return be32_to_cpu(get_unaligned((const uint32_t *) ptr));
+               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+./src/shared/util.h:33:26: note: expanded from macro 'be32_to_cpu'
+#define be32_to_cpu(val) bswap_32(val)
+                         ^~~~~~~~~~~~~
+/usr/include/byteswap.h:34:21: note: expanded from macro 'bswap_32'
+#define bswap_32(x) __bswap_32 (x)
+                    ^~~~~~~~~~~~~~
+In file included from tools/mesh-gatt/crypto.c:32:
+./src/shared/util.h:246:9: warning: 1st function call argument is an uninitialized value
+        return be64_to_cpu(get_unaligned((const uint64_t *) ptr));
+               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+./src/shared/util.h:34:26: note: expanded from macro 'be64_to_cpu'
+#define be64_to_cpu(val) bswap_64(val)
+                         ^~~~~~~~~~~~~
+/usr/include/byteswap.h:37:21: note: expanded from macro 'bswap_64'
+#define bswap_64(x) __bswap_64 (x)
+                    ^~~~~~~~~~~~~~
+2 warnings generated.
 
 
 
@@ -147,4 +129,4 @@ Regards,
 Linux Bluetooth
 
 
---===============2754093629031520772==--
+--===============4617968910563909480==--
