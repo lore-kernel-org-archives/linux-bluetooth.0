@@ -1,39 +1,40 @@
 Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E69144CB24
-	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jan 2024 20:42:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50A2C54278
+	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jan 2024 20:42:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.18.73.165
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706560930; cv=none; b=uUZo9YTi2vSWrixNP8LcZ5nrM3K6a0z8fmWK8L8mV1eCrmhPyrBefZSOZfYH3luiiN3LXKhGuSOWfUF0fRvVl1e3UARUDzuR22WcVWX9gtlL+XubMUm76NlGlQ+tzkWICJt3sa2Wj9vYA94O62zcikB02EB+aAuYtrReFDNHYN4=
+	t=1706560931; cv=none; b=nm2BzCS1wvYckWswwz7mocwBOJHZA3V7dYTiSBiEDe6gykZ54lkwpyWS7BQZamyaj1Wk89GfLCwzSvttfzPxsLEZrxQjOVcvFoIz56lC0+ps2T+ISnDYcKvemefFSCRWc5dp33aUghfs6vOYlop2XXt25lhLKsov2qtGsmQPRHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706560930; c=relaxed/simple;
-	bh=7mzXD94rZQaDiRyQi1Wq96pjZyIZyodiE6PCsbs+dhM=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=q3gxR9GqKLtlogSqzHbpd5pdTGM8WLx0zcOoV3Rk/UgcW6VFx8V0Fm16Na8nN/KXX+dqWd2Y99L1h9/ncEyCMVvbOlCmLpEACsrEk+W7gJ1LkgSF/+uGAbW/cGDsLb0aDBoOI5umdMKBLRTiF/hoHMoVYQB6Aye8F/CB53cTQ9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=T+U+/at+; arc=none smtp.client-ip=37.18.73.165
+	s=arc-20240116; t=1706560931; c=relaxed/simple;
+	bh=hzJPxNb8Oqikg7QeWocFKZ08fGRugycSlDrKFzIiWmo=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qui/wAzlWI4kk2le4q415u4un518B/EBBSMaZrAPWg6mU9glwSE1AqeFcbacnrpHJBs/Wl9v6yq2eW/MrvtYSnTatoCkh81IFYDjdNNmf5VCBZGnkCOv7hzIBuc1ZzsRF7e/7g9rLYYK3eKNtnH9HkBEkHTHwvwxlGohyQps7no=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=J0F3pOhh; arc=none smtp.client-ip=37.18.73.165
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="T+U+/at+"
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="J0F3pOhh"
 Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id ACAA9100005;
-	Mon, 29 Jan 2024 23:42:04 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru ACAA9100005
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 3E2AC100007;
+	Mon, 29 Jan 2024 23:42:05 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 3E2AC100007
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1706560924;
-	bh=S0rDk4HemQAYQBC8aV9gP4oOjgdPJ8qajD4OVufLL40=;
+	s=mail; t=1706560925;
+	bh=vHEAGbu1C2lZSlpX+mRsbhFmyhhvQ+2s6XKh915JP3U=;
 	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=T+U+/at+d5xbg7wwx6ROWiEiMCfoChn/npXmaP0Yeseh5jvc76srJJ7uPxqPyNkmw
-	 yQ7IApsinNR2SkX2ltVPzAYDxEGZGaYMwsF3J+5jhY3m95J8cz426BUPIlXGsqCr+0
-	 ESl35fkloyMg8Y1I8ERR9jH6GMqnPG266/4RLpLChHYuDLUD5wm9WkTOCGJ0dWprRS
-	 dO8qmmFJs+LgiKkasZkiSBUzvRWI16M7rEOAmxJJ0dU451HXf+ovNZ/Vf6Ewo+s5dE
-	 s9OsDMcyU+KuvDLT4wknXTsOtclyJsPOKMKQDpZciAxHiP/QCyd1UtvgN+KI91kcuU
-	 fL5pQDFM8JvcQ==
+	b=J0F3pOhhkdEU5HueCAYKFQD+0cPN2HveMBJIVeaIa424qQsA0pbdYwlGq+1NCdv4O
+	 zKpUncOnmB+BoZdg7niJfFeeOIGzgm/6mOc7eaBYBRyO9gv3xJL3Z7SK9ioxKqbCig
+	 xM8So+1uQpaGlrIjVzFt/ikdjgmK9Z9L6SnPW9UVNYXrtkYxdB0q7wyhc+2N2XkJxs
+	 tQ0lD91Ssb+QUiEtsAt69P57tMTmjNjuIiGP010d41WvnsR1nm59UCbCOwVMnpExuJ
+	 Vrw+PzQ9iuC4FxRYXoyKbkzZQTj2a3WPmXxrziDfJQYOCx0AUOBT5Tr5r9CAOyD8uM
+	 uCHWPhcpgQrWg==
 Received: from smtp.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
 	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Mon, 29 Jan 2024 23:42:04 +0300 (MSK)
+	Mon, 29 Jan 2024 23:42:05 +0300 (MSK)
 Received: from cab-wsm-0026722.sberdevices.ru (100.64.160.123) by
  p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
@@ -42,10 +43,12 @@ From: Victor Pushkarev <VAnPushkarev@salutedevices.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <VAnPushkarev@salutedevices.com>, <sdfw_system_team@salutedevices.com>,
 	<corvinus.v@gmail.com>
-Subject: [PATCH BlueZ v1 0/2] Introduce option to limit A2DP channels
-Date: Mon, 29 Jan 2024 23:41:52 +0300
-Message-ID: <20240129204154.95773-1-VAnPushkarev@salutedevices.com>
+Subject: [PATCH BlueZ v1 2/2] a2dp: Reject connection when the channel limit is exceeded
+Date: Mon, 29 Jan 2024 23:41:54 +0300
+Message-ID: <20240129204154.95773-3-VAnPushkarev@salutedevices.com>
 X-Mailer: git-send-email 2.39.3 (Apple Git-145)
+In-Reply-To: <20240129204154.95773-1-VAnPushkarev@salutedevices.com>
+References: <20240129204154.95773-1-VAnPushkarev@salutedevices.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -73,21 +76,33 @@ X-KSMG-LinksScanning: Clean
 X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/01/29 16:27:00 #23447558
 X-KSMG-AntiVirus-Status: Clean, skipped
 
-This patch adds feature to limit the number of active A2DP connections.
+Reject incoming connection when the configured limit
+for A2DP channels is exceeded.
 
-This may be necessary to prevent audio mixing problem when playing from
-multiple sources using A2DP profile.
+Signed-off-by: Victor Pushkarev <VAnPushkarev@salutedevices.com>
+---
+ profiles/audio/a2dp.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-Victor Pushkarev (2):
-  main.conf: Introduce option to limit A2DP channels
-  a2dp: Reject connection when the channel limit is exceeded
-
- profiles/audio/a2dp.c |  8 ++++++++
- src/btd.h             |  6 ++++++
- src/main.c            | 16 ++++++++++++++++
- src/main.conf         |  5 +++++
- 4 files changed, 35 insertions(+)
-
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index b43161a13..117b27db3 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -2549,6 +2549,14 @@ static void confirm_cb(GIOChannel *io, gpointer data)
+ 	if (!chan)
+ 		goto drop;
+ 
++	if (btd_opts.a2dp.channels &&
++				queue_length(server->channels) > btd_opts.a2dp.channels) {
++		device_request_disconnect(device, NULL);
++		DBG("Reject current connection, A2DP channel limit exceeded: %d",
++						btd_opts.a2dp.channels);
++		goto drop;
++	}
++
+ 	chan->auth_id = btd_request_authorization(&src, &dst,
+ 							ADVANCED_AUDIO_UUID,
+ 							auth_cb, chan);
 -- 
 2.39.3 (Apple Git-145)
 
