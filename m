@@ -1,310 +1,120 @@
-Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54DD571B38
-	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jan 2024 19:11:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 276797EF1F;
+	Tue, 30 Jan 2024 22:38:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706641875; cv=none; b=IM65d36KPnaFbyrHKFleq3ZBbtIqgV1m0kp6nhyGTQhQa3mL4+OyDFhCdi8+eUzCn2srh6NBpDl/i148hx8xTqO+I1kkMY5x0P+1L8LU7d5ahq6cc0cusKHPC57uCGxtglc88OORorwRHg4/I7AQQDfwVB7ON39zN2/YwW3ulFQ=
+	t=1706654339; cv=none; b=fsbcTHi0Q5/ODbspcAcI1bCxo2/VcDXImeVJOs5VItjiFV5KItoqcwSEwKQHPpkCyGGoLjztXvLuRQlvQpNm2OG5r1w6IUAXLc5eQ958oFFzMOEaaqQ1y+xjRnlPbbg/Sw123svXpY7X/ysaIbsZe5RBtl9Te6yi2LhRUwsvaqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706641875; c=relaxed/simple;
-	bh=jf/7npy4LsC6GqmahNtcpb7xEvrhArwXggJ4nei3kOU=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=B5yCuT24qyFY6v5LtIef+8HL9WIC7LystHIc6NvTiUMO3xGHFOkgrloFxaHIHPBDLvvOBxIFb9ZazuQl3nA5MRFMzdx3wMYeXTeCc1b8Tw6Gvf5CoPt1Hg+3TW1JhqXBaERe14ed+wY71TXvlB+1CR+HGlaQ/mN+j5JZuCqM1vE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=cnPocdom; arc=none smtp.client-ip=192.30.252.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1706654339; c=relaxed/simple;
+	bh=8Eyya2MZJxron5ZGyDFt7s2SHtvsfbEMHuSW8clUuFQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g6lopm4OsJ/232PuZJrEbFHP2l77y39OYuiPKFAPghIalCv1IfrTtzlvgm3ZrlWmOzbupBiUcf824n4pWq00BPnhOKH5uTEg+xqFAlZNtbmFprZ0FFPk9Mji6Cu/WR8mELHHim2pI0zOX8tHLqP+quLNYtcq5IsYUj3F503Yi9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tZqJ1j+i; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="cnPocdom"
-Received: from github.com (hubbernetes-node-70352fc.va3-iad.github.net [10.48.140.32])
-	by smtp.github.com (Postfix) with ESMTPA id 5B086E1063
-	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jan 2024 11:11:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1706641872;
-	bh=vg62n62vqqENygdgMuNLtp1Hbep1iMAaAoQwD8RbH10=;
-	h=Date:From:To:Subject:From;
-	b=cnPocdomlg8wPYO23z4w+KwRWLBprPpngxa2MUWzzWJ/LztHZsHHpRStkLLJ3IPJC
-	 UQDDHTMP9VEc9nfrQ3rsD6FcSAUOBvE0tPRi9c33B9Hj0ShhsthFlaFmRt6Bjh08GO
-	 oUndLdylwyhqJbclDbv7kzejYLZ7F2KtuVkThw48=
-Date: Tue, 30 Jan 2024 11:11:12 -0800
-From: iulia-tanasescu <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/f59f49-a692cc@github.com>
-Subject: [bluez/bluez] 8e4722: util: Add UTIL_IOV_INIT
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tZqJ1j+i"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FEABC433C7;
+	Tue, 30 Jan 2024 22:38:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706654338;
+	bh=8Eyya2MZJxron5ZGyDFt7s2SHtvsfbEMHuSW8clUuFQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=tZqJ1j+iT4U1BpRQSHn+TKtGmW+du+QKRF7/9gbYMjf0dVK8rzdEq+m7boXXeg4Js
+	 1tao+CN71PidDU27iAQ+oPFCDReDWW5k6mRlBSTavzIGXIA7pnH+2fdTRC29sj9hwV
+	 g2qGfiAa6yyczzBrgTDjeHPKnpH91ym6Jvko3bLlmh8UMMIM92e8IVQ283ucErsHKf
+	 Q7XXGlQC2kx65ZuvP0utNzdN25wV+d1E7iPZwKFCMhRTEOozPUn3phiYp/2CPZ4gNP
+	 XwTQYHZIs0nBW2aRyTIPdu1ErbFAFBnXExyt/gRbq/wbBwQj712kC/Kqz0hBe/jiN3
+	 ZBVqPY2N/sVsA==
+Date: Tue, 30 Jan 2024 16:38:56 -0600
+From: Rob Herring <robh@kernel.org>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Chen-Yu Tsai <wenst@chromium.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Sean Wang <sean.wang@mediatek.com>, linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org, linux-mediatek@lists.infradead.org,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] dt-bindings: net: bluetooth: Add MediaTek MT7921S
+ SDIO Bluetooth
+Message-ID: <20240130223856.GA2538998-robh@kernel.org>
+References: <20240126063500.2684087-1-wenst@chromium.org>
+ <20240126063500.2684087-2-wenst@chromium.org>
+ <74b9f249-fcb4-4338-bf7b-8477de6c935c@linaro.org>
+ <CAGXv+5Hu+KsTBd1JtnKcaE3qUzPhHbunoVaH2++yfNopHtFf4g@mail.gmail.com>
+ <21568334-b21f-429e-81cd-5ce77accaf3c@linaro.org>
+ <CAGXv+5HxXzjigN3Bp96vkv71WfTJ1S2b7Wgafc4GxLmhu6+jMg@mail.gmail.com>
+ <a4324473-e0c6-4d53-8de0-03b69480e40b@linaro.org>
+ <CAGXv+5HAqmUizXztMH_nY6e+6oQh01hCtxEJXKtCn3_74-sOsQ@mail.gmail.com>
+ <78241d63-3b9d-4c04-9ea5-11b45eac6f00@linaro.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
-
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 8e472230055d8d1809d7dadf00919c2f81043ab7
-      https://github.com/bluez/bluez/commit/8e472230055d8d1809d7dadf00919c2f81043ab7
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-01-29 (Mon, 29 Jan 2024)
-
-  Changed paths:
-    M src/shared/lc3.h
-    M src/shared/util.h
-
-  Log Message:
-  -----------
-  util: Add UTIL_IOV_INIT
-
-This adds UTIL_IOV_INIT macro which can be used to init elements of
-struct iovec with a byte array.
-
-
-  Commit: 423fcc4c4ce84cfc0f93aeaa237aaf165ec4116e
-      https://github.com/bluez/bluez/commit/423fcc4c4ce84cfc0f93aeaa237aaf165ec4116e
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-01-29 (Mon, 29 Jan 2024)
-
-  Changed paths:
-    M client/player.c
-
-  Log Message:
-  -----------
-  client/player: Add metadata support to struct capabilities
-
-This enables defining metadata as part of the struct capabilities.
-
-
-  Commit: 2faff4cadfe3f296176606fa07136bbe29eb95c3
-      https://github.com/bluez/bluez/commit/2faff4cadfe3f296176606fa07136bbe29eb95c3
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-01-29 (Mon, 29 Jan 2024)
-
-  Changed paths:
-    M client/player.c
-
-  Log Message:
-  -----------
-  client/player: Use util_iov_dup/util_iov_free whenever possible
-
-This uses util_iov_dup/util_iov_free whenever possible.
-
-
-  Commit: 74e49f67e940e6debcd40fea259a2109eee1f82b
-      https://github.com/bluez/bluez/commit/74e49f67e940e6debcd40fea259a2109eee1f82b
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-01-29 (Mon, 29 Jan 2024)
-
-  Changed paths:
-    M client/player.c
-
-  Log Message:
-  -----------
-  client/player: Add .name field to struct capabilities
-
-This adds .name field to struct capabilities which is then used to form
-the endpoint object path so it is easier to identify the endpoint
-capabilities:
-
-[bluetooth]# endpoint.list local
-/local/endpoint/pac_snk/lc3
-/local/endpoint/pac_src/lc3
-/local/endpoint/bcaa/lc3
-
-
-  Commit: 0273602c19e6c392622f3eabd866e6be618ecc6d
-      https://github.com/bluez/bluez/commit/0273602c19e6c392622f3eabd866e6be618ecc6d
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-01-30 (Tue, 30 Jan 2024)
-
-  Changed paths:
-    M client/player.c
-
-  Log Message:
-  -----------
-  client/player: Enable endpoint.show to work with local endpoints
-
-This enables local endpoints to be printed with endpoint.show:
-
-[bluetooth]# endpoint.show /local/endpoint/pac_snk/lc3
-Endpoint /local/endpoint/pac_snk/lc3
-	UUID 00002bc9-0000-1000-8000-00805f9b34fb
-	Codec 0x06 (6)
-	Capabilities.#0: len 0x03 type 0x01
-	Capabilities.Sampling Frequencies: 0x00ff
-	Capabilities.Sampling Frequency: 8 Khz (0x0001)
-	Capabilities.Sampling Frequency: 11.25 Khz (0x0002)
-	Capabilities.Sampling Frequency: 16 Khz (0x0004)
-	Capabilities.Sampling Frequency: 22.05 Khz (0x0008)
-	Capabilities.Sampling Frequency: 24 Khz (0x0010)
-	Capabilities.Sampling Frequency: 32 Khz (0x0020)
-	Capabilities.Sampling Frequency: 44.1 Khz (0x0040)
-	Capabilities.Sampling Frequency: 48 Khz (0x0080)
-	Capabilities.#1: len 0x02 type 0x02
-	Capabilities.Frame Duration: 0x03
-	Capabilities.Frame Duration: 7.5 ms (0x01)
-	Capabilities.Frame Duration: 10 ms (0x02)
-	Capabilities.#2: len 0x02 type 0x03
-	Capabilities.Audio Channel Count: 0x03
-	Capabilities.Audio Channel Count: 1 channel (0x01)
-	Capabilities.Audio Channel Count: 2 channel (0x02)
-	Capabilities.#3: len 0x05 type 0x04
-	Capabilities.Frame Length: 30 (0x001e) - 240 (0x00f0)
-	Locations 0x00000003 (3)
-	SupportedContext 0x00000fff (4095)
-	Context 0x00000fff (4095)
-
-
-  Commit: 12ccf5ea0fa53059e0870a49b67a36bdd21fe0c8
-      https://github.com/bluez/bluez/commit/12ccf5ea0fa53059e0870a49b67a36bdd21fe0c8
-  Author: Archie Pusaka <apusaka@chromium.org>
-  Date:   2024-01-30 (Tue, 30 Jan 2024)
-
-  Changed paths:
-    M monitor/packet.c
-
-  Log Message:
-  -----------
-  Monitor: Remove handle before assigning
-
-It is possible to have some handles not removed, for example the host
-may decide not to wait for disconnection complete event when it is
-suspending. In this case, when the peer device reconnected, we might
-have two of the some handle assigned and create problem down the road.
-
-This patch solves the issue by always removing any previous handles
-when assigning a new handle if they are the same.
-
-Reviewed-by: Zhengping Jiang <jiangzp@google.com>
-
-
-  Commit: e98bbe3f1cb20bf045c82a13186fea7a0bfb8187
-      https://github.com/bluez/bluez/commit/e98bbe3f1cb20bf045c82a13186fea7a0bfb8187
-  Author: Archie Pusaka <apusaka@chromium.org>
-  Date:   2024-01-30 (Tue, 30 Jan 2024)
-
-  Changed paths:
-    M monitor/packet.c
-
-  Log Message:
-  -----------
-  Monitor: Avoid printing stale address on connection event
-
-We now remove potentially stale handle when assigning a new handle.
-However, that is done after printing the handle and the stale address
-associated with it.
-
-Directly use print_field instead of print_handle to avoid printing the
-stale address. We still print the correct address on the following
-line anyway.
-
-
-  Commit: 2aecc09ada8b645cddc476175727a793215279d6
-      https://github.com/bluez/bluez/commit/2aecc09ada8b645cddc476175727a793215279d6
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-01-30 (Tue, 30 Jan 2024)
-
-  Changed paths:
-    M profiles/audio/bap.c
-
-  Log Message:
-  -----------
-  bap: Parse BIG handle at endpoint config
-
-This adds support to parse the "BIG" key in bcast qos parser, at
-endpoint configuration.
-
-
-  Commit: 5c90ef8d8247e857113f2ba220393f73634898b1
-      https://github.com/bluez/bluez/commit/5c90ef8d8247e857113f2ba220393f73634898b1
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-01-30 (Tue, 30 Jan 2024)
-
-  Changed paths:
-    M src/shared/bap.c
-
-  Log Message:
-  -----------
-  shared/bap: Set bcast stream metadata
-
-This updates bt_bap_stream_metadata to handle broadcast streams,
-by setting stream medatada.
-
-
-  Commit: 711814570bad07451e0c1c873f3b46c01a8d8d1f
-      https://github.com/bluez/bluez/commit/711814570bad07451e0c1c873f3b46c01a8d8d1f
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-01-30 (Tue, 30 Jan 2024)
-
-  Changed paths:
-    M src/shared/lc3.h
-
-  Log Message:
-  -----------
-  shared/lc3: Add macro for Channel Allocation LTV len
-
-This adds a macro for the Audio_Channel_Allocation LTV len.
-
-
-  Commit: a692cc44dc8735b9303f8893f784306b4d2654fe
-      https://github.com/bluez/bluez/commit/a692cc44dc8735b9303f8893f784306b4d2654fe
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-01-30 (Tue, 30 Jan 2024)
-
-  Changed paths:
-    M client/player.c
-
-  Log Message:
-  -----------
-  client/player: Update bcast endpoint input prompts
-
-This updates the input prompts for broadcast endpoint register and
-config.
-
-To register a broadcast endpoint, the user will be asked to enter
-the supported stream locations and context types.
-
-At broadcast source endpoint config, the user will provide stream
-config options: The BIG that the new stream will be part of, the
-stream Channel Allocation, and the metadata of the subgroup to
-include the stream. These options will be used to configure the
-BASE and the BIG.
-
-The flow to create a Broadcast Source is the following:
-
-[bluetooth]# endpoint.register 00001852-0000-1000-8000-
-00805f9b34fb 0x06
-[/local/endpoint/ep0] Auto Accept (yes/no): y
-[/local/endpoint/ep0] Max Transports (auto/value): a
-[/local/endpoint/ep0] Locations: 3
-[/local/endpoint/ep0] Supported Context (value): 15
-[NEW] Endpoint /org/bluez/hci0/pac_bcast0
-Endpoint /local/endpoint/ep0 registered
-
-[bluetooth]# endpoint.config /org/bluez/hci0/pac_bcast0
-/local/endpoint/ep0 16_2_1
-[/local/endpoint/ep0] BIG (auto/value): 1
-[/local/endpoint/ep0] Enter channel location (value/no): 3
-[/local/endpoint/ep0] Enter Metadata (value/no): 0x03 0x02
-0x04 0x00
-
-To create a Broadcast Sink, enter the following:
-
-[bluetooth]# endpoint.register 00001851-0000-1000-8000-
-00805f9b34fb 0x06
-[/local/endpoint/ep0] Auto Accept (yes/no): y
-[/local/endpoint/ep0] Max Transports (auto/value): a
-[/local/endpoint/ep0] Locations: 3
-[/local/endpoint/ep0] Supported Context (value): 15
-
-[bluetooth]# scan on
-[NEW] Endpoint /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/
-pac_bcast0
-
-[bluetooth]# endpoint.config
-/org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/pac_bcast0
-/local/endpoint/ep0 16_2_1
-
-
-Compare: https://github.com/bluez/bluez/compare/f59f4902bc4e...a692cc44dc87
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <78241d63-3b9d-4c04-9ea5-11b45eac6f00@linaro.org>
+
+On Tue, Jan 30, 2024 at 05:25:38PM +0100, Krzysztof Kozlowski wrote:
+> On 30/01/2024 08:47, Chen-Yu Tsai wrote:
+> > On Tue, Jan 30, 2024 at 3:37 PM Krzysztof Kozlowski
+> > <krzysztof.kozlowski@linaro.org> wrote:
+> >>
+> >> On 30/01/2024 04:32, Chen-Yu Tsai wrote:
+> >>> On Mon, Jan 29, 2024 at 3:34 PM Krzysztof Kozlowski
+> >>> <krzysztof.kozlowski@linaro.org> wrote:
+> >>>>
+> >>>> On 29/01/2024 04:38, Chen-Yu Tsai wrote:
+> >>>>
+> >>>>>>> +allOf:
+> >>>>>>> +  - $ref: bluetooth-controller.yaml#
+> >>>>>>> +
+> >>>>>>> +properties:
+> >>>>>>> +  compatible:
+> >>>>>>> +    enum:
+> >>>>>>> +      - mediatek,mt7921s-bluetooth
+> >>>>>>
+> >>>>>> Can it be also WiFi on separate bus? How many device nodes do you need
+> >>>>>> for this device?
+> >>>>>
+> >>>>> For the "S" variant, WiFi is also on SDIO. For the other two variants,
+> >>>>> "U" and "E", WiFi goes over USB and PCIe respectively. On both those
+> >>>>> variants, Bluetooth can either go over USB or UART. That is what I
+> >>>>> gathered from the pinouts. There are a dozen GPIO pins which don't
+> >>>>> have detailed descriptions though. If you want a comprehensive
+> >>>>> binding of the whole chip and all its variants, I suggest we ask
+> >>>>> MediaTek to provide it instead. My goal with the binding is to document
+> >>>>> existing usage and allow me to upstream new device trees.
+> >>>>>
+> >>>>> For now we only need the Bluetooth node. The WiFi part is perfectly
+> >>>>> detectable, and the driver doesn't seem to need the WiFi reset pin.
+> >>>>> The Bluetooth driver only uses its reset pin to reset a hung controller.
+> >>>>
+> >>>> Then suffix "bluetooth" seems redundant.
+> >>>
+> >>> I think keeping the suffix makes more sense though. The chip is a two
+> >>> function piece, and this only targets one of the functions. Also, the
+> >>
+> >> That's why I asked and you said there is only one interface: SDIO.
+> > 
+> > There's only one interface, SDIO, but two SDIO functions. The two
+> > functions, if both were to be described in the device tree, would
+> > be two separate nodes. We just don't have any use for the WiFi one
+> > right now. Does that make sense to keep the suffix?
+> 
+> Number of functions does not really matter. Number of interfaces on the
+> bus would matter. Why would you have two separate nodes for the same
+> SDIO interface? Or do you want to say there are two interfaces?
+
+Right, one device at 2 addresses on a bus should be a node with 2 "reg" 
+entries, not 2 nodes with 1 "reg" address each.
+
+Rob
