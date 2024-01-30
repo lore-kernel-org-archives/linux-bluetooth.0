@@ -1,138 +1,198 @@
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 184AF53E1A
-	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jan 2024 07:47:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFF8A60DC9
+	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jan 2024 10:25:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706600878; cv=none; b=AzK8QeYTND2tBgPBBV8JQRn0zs44adan0uYYrHHTJGKDaHJ+jtCAguSg3lfOTEmzuhrQgQ13BTeT2K4aVv+xq68dc81Uppw/DWy6FFn0K4iDnt0yEM96lx1pgqilyDDH1tX1zGJaCgmoQXAs/WT6F1PdKA1BBEcDerIua8l+nu8=
+	t=1706610329; cv=none; b=Ovn/W6RJqgcwns3PqW604odn+LrZIx5FxiOV53AYkyATxfYED3APo0ncBmyYvBqwAoXwufVQT14OSlR8xP19rRSVMwGOvBFrzgy/zsddgO2NCOPMI6Kx0ala/wRBaEYyAV2Usw1+HHANDmpuFy1i+um4QaIkwvLJRwA0xNUnlgc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706600878; c=relaxed/simple;
-	bh=fe9RoJ7uIEL7hCMIEw33xQ4RK3TqAFvgh1skAFVlC+M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RvlOm3x18k3j0tACfyKIqk5k5DIzsDsvKSuMMsIjjWRFDKPQMFdNBjI6WZCmAW254Fc058taJIK0tlbyhPWjNOuiuHi3WOTaPxfy/blcDrje0DxEBemNxoDXlOrMbKiZEjMDXCOHtEuvbVAaX7x0EednEAFyVg4NbpFx39TDioE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=c1ISUHC/; arc=none smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1706610329; c=relaxed/simple;
+	bh=jjXmPztiKxLEZlVKgA8booWJDOPlrpHDWajOKvKblsY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=qc5lxMp99eMGjSz95GHuVWLgZMKhiv+unDLlKxU0J6/acnO2BqM38IYSD+utkpCQ534RAIjtt3gE7pEt2UvqaH1el9PRzNBuEnk4xtAL4yRwid7d0U8tIV9oX/60TaXUoU8wchJLyJQHmF3WU/A4hJiXAEBtQqHFjHwXdc1P5sk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--apusaka.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IO418wDV; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--apusaka.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="c1ISUHC/"
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2cf42ca9bb2so43276101fa.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jan 2024 23:47:56 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IO418wDV"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5fffb2798bfso63838697b3.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jan 2024 02:25:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1706600875; x=1707205675; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yrrtCIWXL3eiBU/IKZjiGTOMDFzcQj7B56yYFQBrFdY=;
-        b=c1ISUHC/CAOMlQULakPGmdjoDYkECksEWpDpMafZBc/2gDLcssChTWGTLpKqQoO0H3
-         l7AG4z+4NKSSCwTN5rpfPrtP0oVCRWdA27+AZTQU10+mFDEZ3gUBn0T4fFmubkC8VGzZ
-         BpSLVqfc6taYpXNLo+9meQOEVoEFCRpn/PxCo=
+        d=google.com; s=20230601; t=1706610327; x=1707215127; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Z5aYxWZ/Gi+TpsFow2E8Zho0jfBd+6KmqtWyoKQ+m4o=;
+        b=IO418wDVmijnPaxl+SNNSXzTHVKtSK6iO2xbBjcepdrd4UUy0tPwtX3Yp5rhhP9V80
+         len34iv/i5KyxZJ0JAQyGYGbmdt+muUO82ypJjAZeam7fn0p/1E1Z7ttOUcbanBiQBjz
+         2bO1FeFxQQShhxhblxHP0QBkKmSps5QALmXisj98ooPSWP0+7CWZDYJ655zx5r9VmA1M
+         kvW4NImRkQeB9P5RDGhFUGBqD9tjmkgLK2o3jE701HcUtHV0SPxTMoTrrC63loey79OA
+         LOogc2PurqIrMwTYxs3///2fURv7Q0fs8r84xVUU/UkjlrYYWKBg/61eclKdiYgEX1D2
+         Tspw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706600875; x=1707205675;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yrrtCIWXL3eiBU/IKZjiGTOMDFzcQj7B56yYFQBrFdY=;
-        b=ZFTqgQNZ4Tt4AeDDvVLH27iknptG/fGCt7tdr+hbjjREBvyk5sXJ4pSd+x0hCGFeyh
-         RywouzFwNi7XO3qvyPNNDOzLt4LJTHFMDLiCNSa+4uaoyh7J/x7QoS4GCTZGn/vmJLqD
-         iO2+MNFIsTtAFOLu63fMkdZYF0wrF2dtWZAaOxyzZSgky9GcV2kMOLFxbjU88ZQEi2Q4
-         wwR1yC9Dmr2cTfaletBq5LBMsc78SjYcyC3a0QYddoXdUtjCA2lAoovL94Yx5V+GXdbT
-         nb6EM8k1PSX2Pud9Fr0Z6yF+hKvvfEbZZYKYcis2SDfzeFOOZMyYFf6AHVlknhTyLtsS
-         pWsA==
-X-Gm-Message-State: AOJu0Yx73NECdYJ5YLkpyC0hfso1kdMpbSllx6G6d1su6hJUrmOMRcB4
-	H/9Js1KOMvhtdoFlxi7bmdZTFYuf0lsDC2ctTYhPB1ig5qcptI0TPS2d+7H0VNZ5Jxt9q/nei0m
-	MaUvLCt5QvFVT9v6yeED/ACZIFiffkebpPuSM
-X-Google-Smtp-Source: AGHT+IFXKjnS+us0d6V3OrZKd3SFgNJjm8Z8sdbBJxjxbvtvtuMmj6Rg5rbxK84S2bRJqhxRvRxcNPSPjSDkjD+diCE=
-X-Received: by 2002:a05:651c:b07:b0:2cf:4c49:a8fc with SMTP id
- b7-20020a05651c0b0700b002cf4c49a8fcmr6437489ljr.22.1706600875032; Mon, 29 Jan
- 2024 23:47:55 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706610327; x=1707215127;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Z5aYxWZ/Gi+TpsFow2E8Zho0jfBd+6KmqtWyoKQ+m4o=;
+        b=uX3oLFW3N6Mf1gIFwdR/f9bxsuePUI6uwX2UrSbcZGhlHAPa9DyCFhgNxsGW7LYOPY
+         ODYGBKanyi+CWOvf6IuAVvPBqXafq1P6B4l3otC0pEA5Ba+zM4AME5Fw00DvB/IYoFzj
+         C+mBFU4lF+PuhuEVJ9K9UAFwlCE5SCgGuSaIm7Dtoyl0Q9aO3BoUvDlZckEIw8Io2HSq
+         ATILQv5yvNPdFtWzrCLbHKpWlC8cq76lxfeP8KkCQZ9kd160FAVT6jsNZAxY23UieMWK
+         OopG96CzdgEGOnJ7wxQx6v1AT6H4wDvy+LAAlv1epqYybD6z7NB9L84iMfDmEuNB8kba
+         zHNA==
+X-Gm-Message-State: AOJu0YzF3SgyfnHN2n+m7+W/clVgdNulf7ehsm2odRYSu0E79rbWK9l4
+	gh6OIx3bb75e188XjpQd47H9PCKPNpnQR8D4+/Pl9kwQwNKz1Uo8p3Y89EaRiuihxzAdkrc0m4D
+	mbYob3NUCj7YBjBYf3C20jq6w46FIsuRo/9zR+dwLryR2EEk18CpnbX/Ud00jbUBAcEQX3MISd3
+	1alX+5CAi6lV/LvQH70jDkTUCxnph10pTdclcU3i8DDoAGUwG+mQ==
+X-Google-Smtp-Source: AGHT+IFXAVrE0rQ0Myo1uKPbcvJCZfgjoYasPEc+Qugo3IIIhYv0PC+RBfCCASHDpm8LZf5D/OVsqIbVxMy4
+X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:17:683d:ac9b:1d63:b3ff])
+ (user=apusaka job=sendgmr) by 2002:a05:6902:2611:b0:dc2:4ab7:3d89 with SMTP
+ id dw17-20020a056902261100b00dc24ab73d89mr2899354ybb.1.1706610326688; Tue, 30
+ Jan 2024 02:25:26 -0800 (PST)
+Date: Tue, 30 Jan 2024 18:24:59 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240126063500.2684087-1-wenst@chromium.org> <20240126063500.2684087-2-wenst@chromium.org>
- <74b9f249-fcb4-4338-bf7b-8477de6c935c@linaro.org> <CAGXv+5Hu+KsTBd1JtnKcaE3qUzPhHbunoVaH2++yfNopHtFf4g@mail.gmail.com>
- <21568334-b21f-429e-81cd-5ce77accaf3c@linaro.org> <CAGXv+5HxXzjigN3Bp96vkv71WfTJ1S2b7Wgafc4GxLmhu6+jMg@mail.gmail.com>
- <a4324473-e0c6-4d53-8de0-03b69480e40b@linaro.org>
-In-Reply-To: <a4324473-e0c6-4d53-8de0-03b69480e40b@linaro.org>
-From: Chen-Yu Tsai <wenst@chromium.org>
-Date: Tue, 30 Jan 2024 15:47:43 +0800
-Message-ID: <CAGXv+5HAqmUizXztMH_nY6e+6oQh01hCtxEJXKtCn3_74-sOsQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] dt-bindings: net: bluetooth: Add MediaTek MT7921S
- SDIO Bluetooth
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Sean Wang <sean.wang@mediatek.com>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-mediatek@lists.infradead.org, 
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
+Message-ID: <20240130182459.Bluez.v2.1.If74ccbca4d541c5f576765a3a78cb8923b5f85b1@changeid>
+Subject: [Bluez PATCH v2 1/2] Monitor: Remove handle before assigning
+From: Archie Pusaka <apusaka@google.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Marcel Holtmann <marcel@holtmann.org>
+Cc: CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>, 
+	Archie Pusaka <apusaka@chromium.org>, Zhengping Jiang <jiangzp@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 30, 2024 at 3:37=E2=80=AFPM Krzysztof Kozlowski
-<krzysztof.kozlowski@linaro.org> wrote:
->
-> On 30/01/2024 04:32, Chen-Yu Tsai wrote:
-> > On Mon, Jan 29, 2024 at 3:34=E2=80=AFPM Krzysztof Kozlowski
-> > <krzysztof.kozlowski@linaro.org> wrote:
-> >>
-> >> On 29/01/2024 04:38, Chen-Yu Tsai wrote:
-> >>
-> >>>>> +allOf:
-> >>>>> +  - $ref: bluetooth-controller.yaml#
-> >>>>> +
-> >>>>> +properties:
-> >>>>> +  compatible:
-> >>>>> +    enum:
-> >>>>> +      - mediatek,mt7921s-bluetooth
-> >>>>
-> >>>> Can it be also WiFi on separate bus? How many device nodes do you ne=
-ed
-> >>>> for this device?
-> >>>
-> >>> For the "S" variant, WiFi is also on SDIO. For the other two variants=
-,
-> >>> "U" and "E", WiFi goes over USB and PCIe respectively. On both those
-> >>> variants, Bluetooth can either go over USB or UART. That is what I
-> >>> gathered from the pinouts. There are a dozen GPIO pins which don't
-> >>> have detailed descriptions though. If you want a comprehensive
-> >>> binding of the whole chip and all its variants, I suggest we ask
-> >>> MediaTek to provide it instead. My goal with the binding is to docume=
-nt
-> >>> existing usage and allow me to upstream new device trees.
-> >>>
-> >>> For now we only need the Bluetooth node. The WiFi part is perfectly
-> >>> detectable, and the driver doesn't seem to need the WiFi reset pin.
-> >>> The Bluetooth driver only uses its reset pin to reset a hung controll=
-er.
-> >>
-> >> Then suffix "bluetooth" seems redundant.
-> >
-> > I think keeping the suffix makes more sense though. The chip is a two
-> > function piece, and this only targets one of the functions. Also, the
->
-> That's why I asked and you said there is only one interface: SDIO.
+From: Archie Pusaka <apusaka@chromium.org>
 
-There's only one interface, SDIO, but two SDIO functions. The two
-functions, if both were to be described in the device tree, would
-be two separate nodes. We just don't have any use for the WiFi one
-right now. Does that make sense to keep the suffix?
+It is possible to have some handles not removed, for example the host
+may decide not to wait for disconnection complete event when it is
+suspending. In this case, when the peer device reconnected, we might
+have two of the some handle assigned and create problem down the road.
 
-> > compatible string is already used in an existing driver [1] and
-> > soon-to-be in-tree device tree [2].
->
-> That's not the way to upstream compatible. You cannot send it bypassing
-> bindings and review and later claim that's an ABI.
+This patch solves the issue by always removing any previous handles
+when assigning a new handle if they are the same.
 
-I get that. I can fix up the existing users where necessary. A proper
-binding would make the driver lookup be more efficient as well.
+Reviewed-by: Zhengping Jiang <jiangzp@google.com>
 
+---
 
-Thanks
-ChenYu
+Changes in v2:
+* Return connection pointer when removing handle
+
+ monitor/packet.c | 79 ++++++++++++++++++++++++++----------------------
+ 1 file changed, 43 insertions(+), 36 deletions(-)
+
+diff --git a/monitor/packet.c b/monitor/packet.c
+index 42e711cafa..164cc82bb2 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -189,59 +189,66 @@ static struct packet_conn_data *lookup_parent(uint16_t handle)
+ 	return NULL;
+ }
+ 
+-static void assign_handle(uint16_t index, uint16_t handle, uint8_t type,
+-					uint8_t *dst, uint8_t dst_type)
++static struct packet_conn_data *release_handle(uint16_t handle)
+ {
+ 	int i;
+ 
+ 	for (i = 0; i < MAX_CONN; i++) {
+-		if (conn_list[i].handle == 0xffff) {
+-			hci_devba(index, (bdaddr_t *)conn_list[i].src);
++		struct packet_conn_data *conn = &conn_list[i];
++
++		if (conn->handle == handle) {
++			if (conn->destroy)
++				conn->destroy(conn->data);
+ 
+-			conn_list[i].index = index;
+-			conn_list[i].handle = handle;
+-			conn_list[i].type = type;
++			queue_destroy(conn->tx_q, free);
++			queue_destroy(conn->chan_q, free);
++			memset(conn, 0, sizeof(*conn));
++			conn->handle = 0xffff;
++			return conn;
++		}
++	}
+ 
+-			if (!dst) {
+-				struct packet_conn_data *p;
++	return NULL;
++}
+ 
+-				/* If destination is not set attempt to use the
+-				 * parent one if that exists.
+-				 */
+-				p = lookup_parent(handle);
+-				if (p) {
+-					memcpy(conn_list[i].dst, p->dst,
+-						sizeof(conn_list[i].dst));
+-					conn_list[i].dst_type = p->dst_type;
+-				}
++static void assign_handle(uint16_t index, uint16_t handle, uint8_t type,
++					uint8_t *dst, uint8_t dst_type)
++{
++	struct packet_conn_data *conn = release_handle(handle);
++	int i;
+ 
++	if (!conn) {
++		for (i = 0; i < MAX_CONN; i++) {
++			if (conn_list[i].handle == 0xffff) {
++				conn = &conn_list[i];
+ 				break;
+ 			}
+-
+-			memcpy(conn_list[i].dst, dst, sizeof(conn_list[i].dst));
+-			conn_list[i].dst_type = dst_type;
+-			break;
+ 		}
+ 	}
+-}
+ 
+-static void release_handle(uint16_t handle)
+-{
+-	int i;
++	if (!conn)
++		return;
+ 
+-	for (i = 0; i < MAX_CONN; i++) {
+-		struct packet_conn_data *conn = &conn_list[i];
++	hci_devba(index, (bdaddr_t *)conn->src);
+ 
+-		if (conn->handle == handle) {
+-			if (conn->destroy)
+-				conn->destroy(conn->data);
++	conn->index = index;
++	conn->handle = handle;
++	conn->type = type;
+ 
+-			queue_destroy(conn->tx_q, free);
+-			queue_destroy(conn->chan_q, free);
+-			memset(conn, 0, sizeof(*conn));
+-			conn->handle = 0xffff;
+-			break;
++	if (!dst) {
++		struct packet_conn_data *p;
++
++		/* If destination is not set attempt to use the parent one if
++		 * that exists.
++		 */
++		p = lookup_parent(handle);
++		if (p) {
++			memcpy(conn->dst, p->dst, sizeof(conn->dst));
++			conn->dst_type = p->dst_type;
+ 		}
++	} else {
++		memcpy(conn->dst, dst, sizeof(conn->dst));
++		conn->dst_type = dst_type;
+ 	}
+ }
+ 
+-- 
+2.43.0.429.g432eaa2c6b-goog
+
