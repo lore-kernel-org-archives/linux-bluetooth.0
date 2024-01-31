@@ -1,81 +1,153 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6CD86D1BA
-	for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jan 2024 10:15:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0105F12AAFD
+	for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jan 2024 16:28:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706696113; cv=none; b=JvPLzwXX8bBruzZu+8IFpPBo7QVGUbVPqyj1NR4s3mcq31p6uO6/CzRmoHYIIg3BQt0IpPFkw9QLh9faEzmSwQrXlwwkPj9dqgeXi0B2n1Ou9+9ZYESf7th8KdUlYbKko8z//RiWV8Lf1WM7c8RO+x3sHCIqzg8PFYdJRUwLrgk=
+	t=1706718510; cv=none; b=dbKcCqlE1Rf3sRWcgL3jZzwmG4hUe6r7EKXWknsVMC7Nib6iqpgFFqSEqXGZ58BOBC/AL6afyjPKtG2UQHWZ5ne55Abzcy1Ke5cTZxuQ0DLVgLDkAt4q4/CvjNkOaQ7k3IK0B0V5BUgdeRYAvLciP6t4n0YtJgU8If50G3leCKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706696113; c=relaxed/simple;
-	bh=OkBPF8mR2w7Fh3xlNWI134IvLjz/B1L16ZHdCufRZdw=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Hc6Y0XYTFUwQ3gAA5amY7EfKNi6XZDKswB4dtf2Lnmbp5IKVsAMjsioZowo35yp2k3q3Cq9P15fA+6dxGHKz7KQJDYZeTH1nKPaCXnKOkDpxIg5eFWqqTgOcivtlL3lei9qwfgpnCmiu32vgc8P3f9DZ3/y6/Z9/j9Q00OQeWnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tBKisVDK; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1706718510; c=relaxed/simple;
+	bh=9Me0FI2+BOnBq2ewVeFQ15/jfPVOcoTVNeF7psgV3CI=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=oT9jRcpEpo/GG4ZpgDJfmlDbPNPaA5i9yupvS9fpbAWIp5sHU0CzZj0p2zR5PpyAC7K7Dn6rAmeSA3npfPMRmkNjysnmH/ZVB43Kf1Y6tecxrzf3jQtFZH0bLLPnXSqQIot1sTKvbAq+U6b6Y+eygP+x/NHZWN85q7oviRQb6Po=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iqnM0IxN; arc=none smtp.client-ip=209.85.219.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tBKisVDK"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 68247C43399
-	for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jan 2024 10:15:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706696112;
-	bh=OkBPF8mR2w7Fh3xlNWI134IvLjz/B1L16ZHdCufRZdw=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=tBKisVDK2Il4L2F05epsV3Ov4h/Uud5fZHEa1FxvT0KdqFBPixhU/jqG6FV0xRIO+
-	 EChafD/MjOudYWlfFGI9ksaXuG5UT6GNs8LBEJWCihFOM9Fv5YOY3x+ASWwgEfveNh
-	 hCycnn0e6HZ7aRLh/ycIHA5uZS8LoG7yHl+7QYCSnmjhanEShpTsUW4KIZvt6OwrZG
-	 nD+UtXya9aY96npb2tH7uGKivhD+v7lWMZWRsIAN8VF9O2nIgmhTLz8eY4ZHTeA85D
-	 Six8URKMR0eI6XwU/AkRhF1zHCSyHcDoXMIrlo22MY68O/skP3otQRriSyVU6kNO9I
-	 zLXpQ1jZFTA1Q==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 5512BC53BD0; Wed, 31 Jan 2024 10:15:12 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iqnM0IxN"
+Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-dc25e12cc63so958891276.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jan 2024 08:28:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706718507; x=1707323307; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1u1N7qqhxUuoIDz1rzVvuv+zipzvjvx1pABWYBqK2Rc=;
+        b=iqnM0IxNYfUdsyuXAhnTcJhesQPbFJ0Au9nXDan/enNhoomX6WLVXCvV0J0h1bO1Kq
+         nFISWhSWOhNaIEgjyujte3twNJAy7JsqzW2kXqhcAeX8NsH/eKErvDoiIYEsHKvbf2rQ
+         XA5AJlWU23Q+29X3R3D7B1ZpbT+CfaXajoXjZRw4m6Z2kOX9BpXyfd3AwVaWsGwdk515
+         g6xzQiZmOs0JcneN7MapwEoKRr8Wja0Zsv5FfCNFvnfCqsGGKaxIlMpIi0UHpdx2oUaP
+         cEFTpZeAh7UDGgjJhPzBIsLjXL/unk/rfrDBlnm3uKrnwSuiCt8NVuSK4X9wzp075Q5w
+         P9mg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706718507; x=1707323307;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1u1N7qqhxUuoIDz1rzVvuv+zipzvjvx1pABWYBqK2Rc=;
+        b=UKWr0QSI6ozSSudsWoi8dtSc2pRMiT3m4OVbOMT07aWwTyqFjx+TSH+r2kcSMrLcyg
+         k810iJ2KBLnDXpMumQ6a/XKJ46YlLQfxAVe369WV8ijKlPCTKKfzDOTrGkLSmjdFZPlk
+         Os+My6IbxHLL4ualI12bEppfKSlLlYH7Co2oOFidG0sy+ftuiD49Uh7B8A3Dr6Q2DSpl
+         HF7rZOpJ9AyaBNWlxvGd7yrhyA0ExOGkQe6w0pUPtw67xs/kblP6vLHLMQGvCGpU72Xb
+         Gx2KFYwxSvAzfg6mpWlATbvIBUd2mig6i0Z+xFYsmJSmZlZ2FDWTIZdwDuOXWDjPHhEj
+         pA/A==
+X-Gm-Message-State: AOJu0Ywiy0azGIMLlr5QMw/3FwygnnoyZaB4sZVVDUPt1OBIuYk40Tkz
+	SYRTf0MGs6eGPAk6tGJL6XV2l/dzIavukom/HE8w4ppzLmidHecH2PVaDAE6
+X-Google-Smtp-Source: AGHT+IFVWGUnQY1NUt7/sopjpvaiVWV7YOD2w1Wr1Ed0xFQwjmm4f0yXIilK0Kt/kxOCNgX6lUHi5A==
+X-Received: by 2002:a25:d8d1:0:b0:dc6:c2ec:ff4c with SMTP id p200-20020a25d8d1000000b00dc6c2ecff4cmr1139389ybg.6.1706718507168;
+        Wed, 31 Jan 2024 08:28:27 -0800 (PST)
+Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
+        by smtp.gmail.com with ESMTPSA id u18-20020a250952000000b00dc608353fb3sm3587333ybm.39.2024.01.31.08.28.25
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Jan 2024 08:28:26 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 218440] KASAN: slab-use-after-free in hci_send_acl in Kernel
- 6.7-rc2
-Date: Wed, 31 Jan 2024 10:15:12 +0000
-X-Bugzilla-Reason: CC AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: aros@gmx.com
-X-Bugzilla-Status: NEEDINFO
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_status
-Message-ID: <bug-218440-62941-Os0n16vx7U@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218440-62941@https.bugzilla.kernel.org/>
-References: <bug-218440-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Subject: [PATCH v1] Bluetooth: hci_event: Fix not indicating new connection for BIG Sync
+Date: Wed, 31 Jan 2024 11:28:25 -0500
+Message-ID: <20240131162825.826774-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218440
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Artem S. Tashkinov (aros@gmx.com) changed:
+BIG Sync (aka. Broadcast sink) requires to inform that the device is
+connected when a data path is active otherwise userspace could attempt
+to free resources allocated to the device object while scanning.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-             Status|NEW                         |NEEDINFO
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/hci_event.c | 18 +++++++++++-------
+ net/bluetooth/mgmt.c      |  3 +++
+ 2 files changed, 14 insertions(+), 7 deletions(-)
 
---- Comment #1 from Artem S. Tashkinov (aros@gmx.com) ---
-Is this reproducible with 6.7.2 or 6.8-rc2?
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 31df5f5b7994..acd8a778eecc 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2526,9 +2526,7 @@ static void hci_check_pending_name(struct hci_dev *hdev, struct hci_conn *conn,
+ 	 * Only those in BT_CONFIG or BT_CONNECTED states can be
+ 	 * considered connected.
+ 	 */
+-	if (conn &&
+-	    (conn->state == BT_CONFIG || conn->state == BT_CONNECTED) &&
+-	    !test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
++	if (conn && (conn->state == BT_CONFIG || conn->state == BT_CONNECTED))
+ 		mgmt_device_connected(hdev, conn, name, name_len);
+ 
+ 	if (discov->state == DISCOVERY_STOPPED)
+@@ -3760,8 +3758,9 @@ static void hci_remote_features_evt(struct hci_dev *hdev, void *data,
+ 		bacpy(&cp.bdaddr, &conn->dst);
+ 		cp.pscan_rep_mode = 0x02;
+ 		hci_send_cmd(hdev, HCI_OP_REMOTE_NAME_REQ, sizeof(cp), &cp);
+-	} else if (!test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
++	} else {
+ 		mgmt_device_connected(hdev, conn, NULL, 0);
++	}
+ 
+ 	if (!hci_outgoing_auth_needed(hdev, conn)) {
+ 		conn->state = BT_CONNECTED;
+@@ -3934,6 +3933,11 @@ static u8 hci_cc_le_setup_iso_path(struct hci_dev *hdev, void *data,
+ 		 * last.
+ 		 */
+ 		hci_connect_cfm(conn, rp->status);
++
++		/* Notify device connected in case it is a BIG Sync */
++		if (test_bit(HCI_CONN_BIG_SYNC, &conn->flags))
++			mgmt_device_connected(hdev, conn, NULL, 0);
++
+ 		break;
+ 	}
+ 
+@@ -5008,8 +5012,9 @@ static void hci_remote_ext_features_evt(struct hci_dev *hdev, void *data,
+ 		bacpy(&cp.bdaddr, &conn->dst);
+ 		cp.pscan_rep_mode = 0x02;
+ 		hci_send_cmd(hdev, HCI_OP_REMOTE_NAME_REQ, sizeof(cp), &cp);
+-	} else if (!test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
++	} else {
+ 		mgmt_device_connected(hdev, conn, NULL, 0);
++	}
+ 
+ 	if (!hci_outgoing_auth_needed(hdev, conn)) {
+ 		conn->state = BT_CONNECTED;
+@@ -5982,8 +5987,7 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
+ 		goto unlock;
+ 	}
+ 
+-	if (!test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
+-		mgmt_device_connected(hdev, conn, NULL, 0);
++	mgmt_device_connected(hdev, conn, NULL, 0);
+ 
+ 	conn->sec_level = BT_SECURITY_LOW;
+ 	conn->state = BT_CONFIG;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 8c4493255f92..bf5717094f46 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -9689,6 +9689,9 @@ void mgmt_device_connected(struct hci_dev *hdev, struct hci_conn *conn,
+ 	u16 eir_len = 0;
+ 	u32 flags = 0;
+ 
++	if (!test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
++		return;
++
+ 	/* allocate buff for LE or BR/EDR adv */
+ 	if (conn->le_adv_data_len > 0)
+ 		skb = mgmt_alloc_skb(hdev, MGMT_EV_DEVICE_CONNECTED,
+-- 
+2.43.0
 
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are on the CC list for the bug.
-You are the assignee for the bug.=
