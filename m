@@ -1,120 +1,213 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 276797EF1F;
-	Tue, 30 Jan 2024 22:38:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C11E616416
+	for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jan 2024 02:59:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706654339; cv=none; b=fsbcTHi0Q5/ODbspcAcI1bCxo2/VcDXImeVJOs5VItjiFV5KItoqcwSEwKQHPpkCyGGoLjztXvLuRQlvQpNm2OG5r1w6IUAXLc5eQ958oFFzMOEaaqQ1y+xjRnlPbbg/Sw123svXpY7X/ysaIbsZe5RBtl9Te6yi2LhRUwsvaqs=
+	t=1706669983; cv=none; b=AWBv91ZuqZ/oXaeftK/FvITratZVPwNquFcSMe2EmARku+//BSUlQIAKrSsghwAUwA23np9ZzYgDpHD9TrKzgjgeh9L+WIW2bzNwqw+ySzqFm1Pi7CjcoERO+nEeddahB8RSxaKFePxA5NGYZf7FI80+XUb7gCdmcKV0rioPbns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706654339; c=relaxed/simple;
-	bh=8Eyya2MZJxron5ZGyDFt7s2SHtvsfbEMHuSW8clUuFQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g6lopm4OsJ/232PuZJrEbFHP2l77y39OYuiPKFAPghIalCv1IfrTtzlvgm3ZrlWmOzbupBiUcf824n4pWq00BPnhOKH5uTEg+xqFAlZNtbmFprZ0FFPk9Mji6Cu/WR8mELHHim2pI0zOX8tHLqP+quLNYtcq5IsYUj3F503Yi9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tZqJ1j+i; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1706669983; c=relaxed/simple;
+	bh=PzZfpxMezNl0kJKJA2vr2vVN509YGuHSNRok/dk1ZoE=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=Y3Jt2e/S/3lXyKUUzdfzEha06iXRxTLAQ/xnkQ4kWDFC0RvqS40RZmCNEXtPkOgfCdUrK30YmTtE0FFOiYmJKolDAFdNjlbOOoqZ/v8P/tsr2MgM0p1Wjyxu5/m7ibV9hf2BlQxjdAojSoTqsQzhFaQL/+wnKzPYQ/hCBXY6w3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NXyn6unZ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tZqJ1j+i"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FEABC433C7;
-	Tue, 30 Jan 2024 22:38:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NXyn6unZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 44C18C433C7
+	for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jan 2024 02:59:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706654338;
-	bh=8Eyya2MZJxron5ZGyDFt7s2SHtvsfbEMHuSW8clUuFQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tZqJ1j+iT4U1BpRQSHn+TKtGmW+du+QKRF7/9gbYMjf0dVK8rzdEq+m7boXXeg4Js
-	 1tao+CN71PidDU27iAQ+oPFCDReDWW5k6mRlBSTavzIGXIA7pnH+2fdTRC29sj9hwV
-	 g2qGfiAa6yyczzBrgTDjeHPKnpH91ym6Jvko3bLlmh8UMMIM92e8IVQ283ucErsHKf
-	 Q7XXGlQC2kx65ZuvP0utNzdN25wV+d1E7iPZwKFCMhRTEOozPUn3phiYp/2CPZ4gNP
-	 XwTQYHZIs0nBW2aRyTIPdu1ErbFAFBnXExyt/gRbq/wbBwQj712kC/Kqz0hBe/jiN3
-	 ZBVqPY2N/sVsA==
-Date: Tue, 30 Jan 2024 16:38:56 -0600
-From: Rob Herring <robh@kernel.org>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Chen-Yu Tsai <wenst@chromium.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Sean Wang <sean.wang@mediatek.com>, linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org, linux-mediatek@lists.infradead.org,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] dt-bindings: net: bluetooth: Add MediaTek MT7921S
- SDIO Bluetooth
-Message-ID: <20240130223856.GA2538998-robh@kernel.org>
-References: <20240126063500.2684087-1-wenst@chromium.org>
- <20240126063500.2684087-2-wenst@chromium.org>
- <74b9f249-fcb4-4338-bf7b-8477de6c935c@linaro.org>
- <CAGXv+5Hu+KsTBd1JtnKcaE3qUzPhHbunoVaH2++yfNopHtFf4g@mail.gmail.com>
- <21568334-b21f-429e-81cd-5ce77accaf3c@linaro.org>
- <CAGXv+5HxXzjigN3Bp96vkv71WfTJ1S2b7Wgafc4GxLmhu6+jMg@mail.gmail.com>
- <a4324473-e0c6-4d53-8de0-03b69480e40b@linaro.org>
- <CAGXv+5HAqmUizXztMH_nY6e+6oQh01hCtxEJXKtCn3_74-sOsQ@mail.gmail.com>
- <78241d63-3b9d-4c04-9ea5-11b45eac6f00@linaro.org>
+	s=k20201202; t=1706669983;
+	bh=PzZfpxMezNl0kJKJA2vr2vVN509YGuHSNRok/dk1ZoE=;
+	h=From:To:Subject:Date:From;
+	b=NXyn6unZewFqEtipsKbl3JXkJkcttRs3uvGC3k9D2mKNuqECBRmkFNKhwOfhlrmta
+	 TjD6l3nlZ2ypAapto7GdlfdXEp0/yywOjnevYtKx2PtnVC1/8yivlW8xQVCQ3/6YHO
+	 Fa/e4pDkQ6nCC/pQ+6IuEaveY2aWZ4HsuXSqDUs0U+0r3wi706DG95/ZMwoJ2CQWS8
+	 XoTM0CDaHs+aDbu4iXfwx5sjnGY8OMAash4ohZNhM97iEkxEifdOZtROV4lwAWrENd
+	 K/xZeEZS1aZ8StOIs78dnmUaAV/4slEhBqKmTkFSgl7P7aobgVrNANJLRACH0XNTb4
+	 c7dhGlFQxQAWA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 2AB1EC4332E; Wed, 31 Jan 2024 02:59:43 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 218440] New: KASAN: slab-use-after-free in hci_send_acl in
+ Kernel 6.7-rc2
+Date: Wed, 31 Jan 2024 02:59:42 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: zhenghaoran@buaa.edu.cn
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression
+Message-ID: <bug-218440-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <78241d63-3b9d-4c04-9ea5-11b45eac6f00@linaro.org>
 
-On Tue, Jan 30, 2024 at 05:25:38PM +0100, Krzysztof Kozlowski wrote:
-> On 30/01/2024 08:47, Chen-Yu Tsai wrote:
-> > On Tue, Jan 30, 2024 at 3:37 PM Krzysztof Kozlowski
-> > <krzysztof.kozlowski@linaro.org> wrote:
-> >>
-> >> On 30/01/2024 04:32, Chen-Yu Tsai wrote:
-> >>> On Mon, Jan 29, 2024 at 3:34 PM Krzysztof Kozlowski
-> >>> <krzysztof.kozlowski@linaro.org> wrote:
-> >>>>
-> >>>> On 29/01/2024 04:38, Chen-Yu Tsai wrote:
-> >>>>
-> >>>>>>> +allOf:
-> >>>>>>> +  - $ref: bluetooth-controller.yaml#
-> >>>>>>> +
-> >>>>>>> +properties:
-> >>>>>>> +  compatible:
-> >>>>>>> +    enum:
-> >>>>>>> +      - mediatek,mt7921s-bluetooth
-> >>>>>>
-> >>>>>> Can it be also WiFi on separate bus? How many device nodes do you need
-> >>>>>> for this device?
-> >>>>>
-> >>>>> For the "S" variant, WiFi is also on SDIO. For the other two variants,
-> >>>>> "U" and "E", WiFi goes over USB and PCIe respectively. On both those
-> >>>>> variants, Bluetooth can either go over USB or UART. That is what I
-> >>>>> gathered from the pinouts. There are a dozen GPIO pins which don't
-> >>>>> have detailed descriptions though. If you want a comprehensive
-> >>>>> binding of the whole chip and all its variants, I suggest we ask
-> >>>>> MediaTek to provide it instead. My goal with the binding is to document
-> >>>>> existing usage and allow me to upstream new device trees.
-> >>>>>
-> >>>>> For now we only need the Bluetooth node. The WiFi part is perfectly
-> >>>>> detectable, and the driver doesn't seem to need the WiFi reset pin.
-> >>>>> The Bluetooth driver only uses its reset pin to reset a hung controller.
-> >>>>
-> >>>> Then suffix "bluetooth" seems redundant.
-> >>>
-> >>> I think keeping the suffix makes more sense though. The chip is a two
-> >>> function piece, and this only targets one of the functions. Also, the
-> >>
-> >> That's why I asked and you said there is only one interface: SDIO.
-> > 
-> > There's only one interface, SDIO, but two SDIO functions. The two
-> > functions, if both were to be described in the device tree, would
-> > be two separate nodes. We just don't have any use for the WiFi one
-> > right now. Does that make sense to keep the suffix?
-> 
-> Number of functions does not really matter. Number of interfaces on the
-> bus would matter. Why would you have two separate nodes for the same
-> SDIO interface? Or do you want to say there are two interfaces?
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218440
 
-Right, one device at 2 addresses on a bus should be a node with 2 "reg" 
-entries, not 2 nodes with 1 "reg" address each.
+            Bug ID: 218440
+           Summary: KASAN: slab-use-after-free in hci_send_acl in Kernel
+                    6.7-rc2
+           Product: Drivers
+           Version: 2.5
+          Hardware: All
+                OS: Linux
+            Status: NEW
+          Severity: high
+          Priority: P3
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: zhenghaoran@buaa.edu.cn
+        Regression: No
 
-Rob
+Hello,
+
+I am writing to report a potential use-after-free that our fuzzing tool fou=
+nd
+in the 'hci_send_acl' function. The bug was encountered while testing kernel
+6.7-rc2 during a Bluetooth pairing procedure. Due to the non-determinism of
+concurrent execution, this bug cannot be stably reproduced in my testing.
+
+Through disassembly, we have pinpointed the code at 'hci_send_acl+0x54', wh=
+ich
+corresponds to the function 'hci_send_acl', specifically at the line:
+
+File: net/bluetooth/hci_core.c
+Line: 3234
+struct hci_dev *hdev =3D chan->conn->hdev;
+
+Based on the allocate and free tasks reported by KASAN, we suspect that the
+use-after-free issue originates from the 'chan' variable in the parameter
+passed into the 'hci_send_acl' function.
+
+Although the 'l2cap_conn conn' variable and 'l2cap_chan conn->chan' variable
+are locked in the 'l2cap_conn_start' function, 'hci_chan conn->hchan' may s=
+till
+be released by other threads, causing a use-after-free vulnerability. This
+appears to be a very subtle timing issue, which may explain the difficulty =
+we
+have had in reproducing the bug.
+
+KASAN report=EF=BC=9A
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+BUG: KASAN: slab-use-after-free in hci_send_acl+0x54/0x770 [bluetooth]
+Read of size 8 at addr ffff888007212618 by task kworker/0:0/688
+
+CPU: 0 PID: 688 Comm: kworker/0:0 Tainted: G           O       6.7.0-rc2 #1
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1=
+.1
+04/01/2014
+Workqueue: events l2cap_info_timeout [bluetooth]
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xbf/0xf0
+ print_address_description+0x7f/0x3d0
+ print_report+0x11d/0x250
+ ? __virt_addr_valid+0xc5/0xf0
+ ? hci_send_acl+0x54/0x770 [bluetooth]
+ kasan_report+0x137/0x170
+ ? hci_send_acl+0x54/0x770 [bluetooth]
+ hci_send_acl+0x54/0x770 [bluetooth]
+ ? get_thread_local+0x9d/0x140 [mfuzz_monitor]
+ l2cap_send_cmd+0x633/0xa40 [bluetooth]
+ l2cap_send_conn_req+0x1ad/0x360 [bluetooth]
+ l2cap_start_connection+0x178/0x420 [bluetooth]
+ l2cap_conn_start+0x94e/0xdc0 [bluetooth]
+ ? get_thread_local+0x9d/0x140 [mfuzz_monitor]
+ ? __mfuzz_coverage__+0x16/0x140 [mfuzz_monitor]
+ process_one_work+0x4f0/0xab0
+ worker_thread+0x8af/0xee0
+ ? _raw_spin_lock_irqsave+0x8d/0x130
+ ? process_one_work+0xab0/0xab0
+ kthread+0x275/0x300
+ ? process_one_work+0xab0/0xab0
+ ? kthread_blkcg+0xa0/0xa0
+ ret_from_fork+0x30/0x60
+ ? kthread_blkcg+0xa0/0xa0
+ ret_from_fork_asm+0x11/0x20
+ </TASK>
+
+Allocated by task 1167:
+ kasan_set_track+0x4c/0x70
+ __kasan_kmalloc+0x82/0x90
+ __kmalloc+0xac/0x1d0
+ hci_chan_create+0x92/0x1c0 [bluetooth]
+ l2cap_conn_add+0x8f/0xe30 [bluetooth]
+ l2cap_chan_connect+0x5b4/0xff0 [bluetooth]
+ l2cap_sock_connect+0x420/0x890 [bluetooth]
+ kernel_connect+0xb3/0xe0
+ rfcomm_dlc_open+0x605/0x1190 [rfcomm]
+ rfcomm_sock_connect+0x3c4/0x7f0 [rfcomm]
+ __sys_connect+0x20f/0x270
+ __x64_sys_connect+0x71/0x80
+ do_syscall_64+0x32/0xa0
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+Freed by task 1155:
+ kasan_set_track+0x4c/0x70
+ kasan_save_free_info+0x24/0x40
+ ____kasan_slab_free+0x118/0x190
+ slab_free_freelist_hook+0xd1/0x160
+ __kmem_cache_free+0xa3/0x170
+ hci_chan_list_flush+0x85/0xc0 [bluetooth]
+ hci_conn_del+0x568/0x1010 [bluetooth]
+ hci_abort_conn_sync+0x7d9/0xaf0 [bluetooth]
+ abort_conn_sync+0x78/0xd0 [bluetooth]
+ hci_cmd_sync_work+0x1f7/0x2b0 [bluetooth]
+ process_one_work+0x4f0/0xab0
+ worker_thread+0x8af/0xee0
+ kthread+0x275/0x300
+ ret_from_fork+0x30/0x60
+ ret_from_fork_asm+0x11/0x20
+
+The buggy address belongs to the object at ffff888007212600
+ which belongs to the cache kmalloc-64 of size 64
+The buggy address is located 24 bytes inside of
+ freed 64-byte region [ffff888007212600, ffff888007212640)
+
+The buggy address belongs to the physical page:
+page:00000000baf0b98e refcount:1 mapcount:0 mapping:0000000000000000 index:=
+0x0
+pfn:0x7212
+anon flags: 0x100000000000800(slab|node=3D0|zone=3D1)
+page_type: 0xffffffff()
+raw: 0100000000000800 ffff888001041640 ffffea0000079d40 dead000000000003
+raw: 0000000000000000 0000000080200020 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff888007212500: 00 00 00 00 00 00 00 00 fc fc fc fc fc fc fc fc
+ ffff888007212580: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+>ffff888007212600: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+                            ^
+ ffff888007212680: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+ ffff888007212700: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
