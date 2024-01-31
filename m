@@ -1,255 +1,111 @@
-Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B99B85813B
-	for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jan 2024 08:19:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B4F86774E
+	for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jan 2024 09:41:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706689147; cv=none; b=SXrBRk7Js/YZF4iy5d/QkC9iC6NPgrRayWrYwVOU0kU8U8Gpe/vjcydU7bYLj455KmLFIxnGwxWgY7eDRjyyosi8XBykRntbWKS18LCMZ5/LSa2xwQ1tqqBbT5dU8pfZk+otgjmFb9rIAF9JR6uR9sXns+QFz/GW0SIOiI1EFUM=
+	t=1706694082; cv=none; b=NHCp7z9xkBNeAfN8vjF2znvEaqwQDhY6uyFWcU0g7pLA8qqBepDM1K8kXlUmg9K/1zzgsffNWNYuYybHFBuDUs3UCt140Ua2CTsUedolj0QJSTCkcoovOY68j4NJ0D4NbbkqGaua0aGlj2DuQHZEZl6XUZOb4Z1tJggpKax679Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706689147; c=relaxed/simple;
-	bh=3ZULNmvMA/msyyWez1//JEaSsRi2RMywT9HulGS2xKI=;
-	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HlnIU1nyGhUkuDFT2zSqMrikHFwF++yqiDZkfFtSuJbE84GRYu9cSxkmKbHHJJz2nTF6VKBWeMaY4yhgrBphYAfsXGi0C2deTIoRxhE+bG/aPFjk3r7UaNVIfUFAsF++BYUeutqnvYvBOW2I4Fnc0DB/sXDQpF6DKPbXb8fx7rM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=dOLn5EfW; arc=none smtp.client-ip=46.235.227.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1706694082; c=relaxed/simple;
+	bh=P2EppyB3fXdHcBrMngRRyfbG9R5EhDi2K2/u0kF84xM=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=ICmQjdzUIixzELTIUc9fKLF/9zxQ2BMZVMXve4bKrH/rfnNinfMb+daH1pSEGKEb+btP9T6dhMNKceNd4Q3X/0zK/TtaSaMIFRBAtq11qCGlarFNiUJ7PTwApEv6SA39BBAjVjOALdcs96ugT8lL/Efe2lrlnOl35h75U379QHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MuqUxLLh; arc=none smtp.client-ip=209.85.215.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="dOLn5EfW"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1706689144;
-	bh=3ZULNmvMA/msyyWez1//JEaSsRi2RMywT9HulGS2xKI=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=dOLn5EfW9cozRAgAbarY/nTWld045bGOipg8vu0CbroI70TY+R7F2CQqlStv/9LNN
-	 8qqLNU7nOf1oJSaZpQkK59U0+sIOecMTGlWBsw15KQMsaF4zgbBu6h8QyhiOVM/z9T
-	 RrlbEN7/I5o94+GmAHna6WP/5Bp2Xama5nj3RtO8pTieLWion54V/6o74kN6rCcK3y
-	 uYdysLNOSq2KGewv6kTrj0q5F7bnV/edCZAdRnoxziNRchoFxxT6sFxd54Jtoxfz/s
-	 0p7s0YSQhhyPqzZtYvRiO4dUI0GKjkJssKx/HizCAd63c10/6nmqoxcjHu0+pzsMgf
-	 I6/K1471J8zEQ==
-Received: from fdanis-XPS-13-9370.. (cola.collaboradmins.com [195.201.22.229])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by madrid.collaboradmins.com (Postfix) with ESMTPSA id D584F378203B
-	for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jan 2024 08:19:03 +0000 (UTC)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 2/2] device: Update local and remote CSRK on management event
-Date: Wed, 31 Jan 2024 09:18:56 +0100
-Message-Id: <20240131081856.308071-2-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240131081856.308071-1-frederic.danis@collabora.com>
-References: <20240131081856.308071-1-frederic.danis@collabora.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MuqUxLLh"
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-5ce07cf1e5dso2556879a12.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jan 2024 01:41:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706694080; x=1707298880; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y1y6OAdj1fJdJZm+GqDeutfyotfg2ED3IGPRLj5a6L8=;
+        b=MuqUxLLhqESpw45Hw0F/zX73mFjhwCh3mFkpsxzjEPVTc4VhE3Zn9lm2ZA5ffBHcRa
+         pIe7e6p19WOEfGZ5DW5sZ6Z9P/ietN3iwxGRLUY9HsDa5jW/wB78ZqPESTiAGRF21rtr
+         OYM91OLcR9Ms9FTth2CtvZGPNkQ5LYoQRUrdMqRjFokxROUU31e/O3mzpQw3fHovthzb
+         GdNQ3fhXxaBDL0n6DhuTdxeKm96/BgP8XlcNuP6E5IMjpLe7/kROhM7lasf76ZhDYBAR
+         GoYu00tqts2CJpyNxjPCI09h2VhVazIG+DzZGqPtqVynEZEh7K6hvsc5sWaTrDQmZEb6
+         Yv5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706694080; x=1707298880;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Y1y6OAdj1fJdJZm+GqDeutfyotfg2ED3IGPRLj5a6L8=;
+        b=eI9+kpp1abAnHOUMFC6BSR0JHGhrvL2Zed0qeOPcDHlvvgtaeS4KJXTvIVPyN2dZrV
+         bIswBLweOXEtVrvhBZlolJBkuoEUMNxUfYzKJdLagpb2y1neYw0vb+djyCc3WkOdemD0
+         tlN9Hqe5L6x2QiKSe+1QPgM7HSwLrOg4Wg4SiMHsRoR8Zc0iuDVgQuSkG1Oor1zlTR7Y
+         3gkEvcxT7/1My4WYvmOj5dtrjux/j+jPSnaicMqp1AEo2jgoHUDbjb+wEDyYLEgYRoBw
+         KVIKAWhrWncloqRRhh8IPubLNNTKnJvjSS6PhSa+Ju2XgHUbxEfqbpx2d6zPYR2m8uWk
+         XAnA==
+X-Gm-Message-State: AOJu0Yzm09SzUiYXqz5T4hebjhnh2ZqTvnXBqnJN3DHW5UxYSCjacy8C
+	ptS+V8MCaSauY7mOn/Efi06JWcxIP93D2P0EyQq/RuvmXnaDnKa2LdAutBCv
+X-Google-Smtp-Source: AGHT+IGxWIqTtOHvynNHCF8GRyVCqX/KK96rr422rYUAD7uzQFuJm5CcPTfiBRBb0xhLWtB2ErNR7A==
+X-Received: by 2002:a05:6a20:519f:b0:19d:afe1:20fe with SMTP id j31-20020a056a20519f00b0019dafe120femr841043pzf.6.1706694080317;
+        Wed, 31 Jan 2024 01:41:20 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUcyUXOgUJWVpP68J68E0ueTjHxXhiotFzJ9wQ413fLa7/6CDaKg2UR9qQ553mGVyxXUhC0A1jPheRVqcHNBNNCISgCNiS0Fk2aYTRC
+Received: from [172.17.0.2] ([20.172.0.36])
+        by smtp.gmail.com with ESMTPSA id o18-20020a17090323d200b001d8cb103327sm6090225plh.215.2024.01.31.01.41.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Jan 2024 01:41:19 -0800 (PST)
+Message-ID: <65ba15bf.170a0220.3fc3a.26ad@mx.google.com>
+Date: Wed, 31 Jan 2024 01:41:19 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============8978179797947254954=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
+Subject: RE: [BlueZ,v2,1/2] gatt-server: Add support for signed write command
+In-Reply-To: <20240131081856.308071-1-frederic.danis@collabora.com>
+References: <20240131081856.308071-1-frederic.danis@collabora.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Currently the local and remote CSRK keys are only loaded to device object
-from storage during start.
-Those keys are updated on MGMT_EV_NEW_CSRK event only in adapter object,
-but saved both in adapter and device objects.
+--===============8978179797947254954==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Those keys should be updated on management event to be able to perform
-signed write for GAP/SEC/CSIGN/BV-01-C and GAP/SEC/CSIGN/BV-02-C.
+This is automated email and please do not reply to this email!
 
-This commits updates the keys on management event in the device object and
-move their storage to device object only.
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=821585
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.73 seconds
+GitLint                       PASS      0.46 seconds
+BuildEll                      PASS      24.15 seconds
+BluezMake                     PASS      721.20 seconds
+MakeCheck                     PASS      12.11 seconds
+MakeDistcheck                 PASS      161.18 seconds
+CheckValgrind                 PASS      226.24 seconds
+CheckSmatch                   WARNING   329.55 seconds
+bluezmakeextell               PASS      106.90 seconds
+IncrementalBuild              PASS      1324.62 seconds
+ScanBuild                     PASS      931.03 seconds
+
+Details
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+src/shared/gatt-server.c:278:25: warning: Variable length array is used.src/shared/gatt-server.c:621:25: warning: Variable length array is used.src/shared/gatt-server.c:720:25: warning: Variable length array is used.src/shared/gatt-server.c:278:25: warning: Variable length array is used.src/shared/gatt-server.c:621:25: warning: Variable length array is used.src/shared/gatt-server.c:720:25: warning: Variable length array is used.src/shared/gatt-server.c:278:25: warning: Variable length array is used.src/shared/gatt-server.c:621:25: warning: Variable length array is used.src/shared/gatt-server.c:720:25: warning: Variable length array is used.
+
+
 ---
-v1 -> v2: Move CSRK keys storage to device object only
----
- src/adapter.c | 77 +--------------------------------------------------
- src/device.c  | 48 ++++++++++++++++++++++++++++++++
- src/device.h  |  3 ++
- 3 files changed, 52 insertions(+), 76 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 022390f0d..3c053c231 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -8786,75 +8786,6 @@ static void new_long_term_key_callback(uint16_t index, uint16_t length,
- 	bonding_complete(adapter, &addr->bdaddr, addr->type, 0);
- }
- 
--static void store_csrk(struct btd_adapter *adapter, const bdaddr_t *peer,
--				uint8_t bdaddr_type, const unsigned char *key,
--				uint32_t counter, uint8_t type)
--{
--	const char *group;
--	char device_addr[18];
--	char filename[PATH_MAX];
--	GKeyFile *key_file;
--	GError *gerr = NULL;
--	char key_str[33];
--	gsize length = 0;
--	gboolean auth;
--	char *str;
--	int i;
--
--	switch (type) {
--	case 0x00:
--		group = "LocalSignatureKey";
--		auth = FALSE;
--		break;
--	case 0x01:
--		group = "RemoteSignatureKey";
--		auth = FALSE;
--		break;
--	case 0x02:
--		group = "LocalSignatureKey";
--		auth = TRUE;
--		break;
--	case 0x03:
--		group = "RemoteSignatureKey";
--		auth = TRUE;
--		break;
--	default:
--		warn("Unsupported CSRK type %u", type);
--		return;
--	}
--
--	ba2str(peer, device_addr);
--
--	create_filename(filename, PATH_MAX, "/%s/%s/info",
--			btd_adapter_get_storage_dir(adapter), device_addr);
--
--	key_file = g_key_file_new();
--	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
--		error("Unable to load key file from %s: (%s)", filename,
--								gerr->message);
--		g_clear_error(&gerr);
--	}
--
--	for (i = 0; i < 16; i++)
--		sprintf(key_str + (i * 2), "%2.2X", key[i]);
--
--	g_key_file_set_string(key_file, group, "Key", key_str);
--	g_key_file_set_integer(key_file, group, "Counter", counter);
--	g_key_file_set_boolean(key_file, group, "Authenticated", auth);
--
--	create_file(filename, 0600);
--
--	str = g_key_file_to_data(key_file, &length, NULL);
--	if (!g_file_set_contents(filename, str, length, &gerr)) {
--		error("Unable set contents for %s: (%s)", filename,
--								gerr->message);
--		g_error_free(gerr);
--	}
--	g_free(str);
--
--	g_key_file_free(key_file);
--}
--
- static void new_csrk_callback(uint16_t index, uint16_t length,
- 					const void *param, void *user_data)
- {
-@@ -8882,13 +8813,7 @@ static void new_csrk_callback(uint16_t index, uint16_t length,
- 		return;
- 	}
- 
--	if (!ev->store_hint)
--		return;
--
--	store_csrk(adapter, &key->addr.bdaddr, key->addr.type, key->val, 0,
--								key->type);
--
--	btd_device_set_temporary(device, false);
-+	device_set_csrk(device, key->val, 0, key->type, ev->store_hint);
- }
- 
- static void store_irk(struct btd_adapter *adapter, const bdaddr_t *peer,
-diff --git a/src/device.c b/src/device.c
-index afd073c6c..9b3b24254 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -169,6 +169,7 @@ struct ltk_info {
- struct csrk_info {
- 	uint8_t key[16];
- 	uint32_t counter;
-+	bool auth;
- };
- 
- struct sirk_info {
-@@ -400,6 +401,7 @@ static void store_csrk(struct csrk_info *csrk, GKeyFile *key_file,
- 
- 	g_key_file_set_string(key_file, group, "Key", key);
- 	g_key_file_set_integer(key_file, group, "Counter", csrk->counter);
-+	g_key_file_set_boolean(key_file, group, "Authenticated", csrk->auth);
- }
- 
- static void store_sirk(struct sirk_info *sirk, GKeyFile *key_file,
-@@ -1955,6 +1957,52 @@ bool btd_device_get_ltk(struct btd_device *device, uint8_t key[16],
- 	return true;
- }
- 
-+void device_set_csrk(struct btd_device *device, const uint8_t val[16],
-+				uint32_t counter, uint8_t type,
-+				bool store_hint)
-+{
-+	struct csrk_info **handle;
-+	struct csrk_info *csrk;
-+	bool auth;
-+
-+	switch (type) {
-+	case 0x00:
-+		handle = &device->local_csrk;
-+		auth = FALSE;
-+		break;
-+	case 0x01:
-+		handle = &device->remote_csrk;
-+		auth = FALSE;
-+		break;
-+	case 0x02:
-+		handle = &device->local_csrk;
-+		auth = TRUE;
-+		break;
-+	case 0x03:
-+		handle = &device->remote_csrk;
-+		auth = TRUE;
-+		break;
-+	default:
-+		warn("Unsupported CSRK type %u", type);
-+		return;
-+	}
-+
-+	if (!*handle)
-+		*handle = g_new0(struct csrk_info, 1);
-+
-+	csrk = *handle;
-+	memcpy(csrk->key, val, sizeof(csrk->key));
-+	csrk->counter = counter;
-+	csrk->auth = auth;
-+
-+	if (!store_hint)
-+		return;
-+
-+	store_device_info(device);
-+
-+	btd_device_set_temporary(device, false);
-+}
-+
- static bool match_sirk(const void *data, const void *match_data)
- {
- 	const struct sirk_info *sirk = data;
-diff --git a/src/device.h b/src/device.h
-index 96f41d479..d4e70b7ef 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -135,6 +135,9 @@ void device_set_ltk(struct btd_device *device, const uint8_t val[16],
- 				bool central, uint8_t enc_size);
- bool btd_device_get_ltk(struct btd_device *device, uint8_t val[16],
- 				bool *central, uint8_t *enc_size);
-+void device_set_csrk(struct btd_device *device, const uint8_t val[16],
-+				uint32_t counter, uint8_t type,
-+				bool store_hint);
- bool btd_device_add_set(struct btd_device *device, bool encrypted,
- 				uint8_t sirk[16], uint8_t size, uint8_t rank);
- void device_store_svc_chng_ccc(struct btd_device *device, uint8_t bdaddr_type,
--- 
-2.34.1
 
+--===============8978179797947254954==--
