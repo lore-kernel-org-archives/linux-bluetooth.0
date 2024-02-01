@@ -1,62 +1,62 @@
-Received: from mail-ua1-f44.google.com (mail-ua1-f44.google.com [209.85.222.44])
+Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com [209.85.222.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71F7A6216A
-	for <linux-bluetooth@vger.kernel.org>; Thu,  1 Feb 2024 15:38:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 995D6626AD
+	for <linux-bluetooth@vger.kernel.org>; Thu,  1 Feb 2024 15:38:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706801914; cv=none; b=JiDJJs8h9IJiPFg8M8hcrCcn3Mxdi11R0/tVydrdC0vTHiesUBvZKCn9wkzT5B9iYMprp9/k1qSYgl8xy9Y7PmbtW7WFOHAvLp7xUYwpR42C5tkE7KW4n0aiFNmh4ONcEayS70ZdhEcEHrlGYyjtrfNr115arOFk6PUuD5cyBN8=
+	t=1706801916; cv=none; b=HtbnFcmB+s628FSg+jlRC15Ern2uB/nbv6qbys9LwB6HofhuD3falf7wFEsTwFgLZ8pYlPbf+Rz9E8pruiXClAKmcjrJVlqfB0e1+IIDJYDaBKN6If80IyimA+7/+cBdfuSRbmsuGyvTGV4IH1cs7cP1K0Eq3+Hmkrj05RJc+AU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706801914; c=relaxed/simple;
-	bh=AAOtZ8xC+h1vmDpGmod5czlcvsYkjYt1Bxoa+kp7CgA=;
+	s=arc-20240116; t=1706801916; c=relaxed/simple;
+	bh=gyuyQ/aK4rZwWgwe0gruyYcDUQyzIfPAlXAzVb6Vozg=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jVi8g7N8wBkSiyPPGv+iu6X1Jy4ecUlzrQ2Jmp60XeNMJ5qBNVXZblvjYF6ls/4zcKal9hgLS2Gt1QMzg2RYXyrQLKS1L/75f2cDlMY6LSOpwDHF9QztrC7+sHTcyRmSPBOC/ANy5lOQnGS5WDSKUKClVmnJtIC/bHF073ykp0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M/Yk0EOT; arc=none smtp.client-ip=209.85.222.44
+	 MIME-Version; b=ZKv4dtkZQlslVNejYKh7DIvfvTuw5+JL6SQ5iYHr7LVhy7cNisKBr0b7GwYlZ/G8pqI5WEL2r+IlPx3NLIZJ+OTWdAkisTyjsrIk16s+Gu5i6LAmJSwZBX6j9r624Fq07jit0KOmdAqzyOQmh2c2bY7y2q7sh71MoIheNwCzTAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fgyx98zJ; arc=none smtp.client-ip=209.85.222.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M/Yk0EOT"
-Received: by mail-ua1-f44.google.com with SMTP id a1e0cc1a2514c-7d5fce59261so540822241.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Feb 2024 07:38:31 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fgyx98zJ"
+Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-7d6024b181bso469830241.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Feb 2024 07:38:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706801909; x=1707406709; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706801913; x=1707406713; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=G+0d8Hy5JsXKOl1rOEs9vku4hGWhA4odGKzZJQAiN/U=;
-        b=M/Yk0EOTn7+IstCmDI3xA65DZKMtmyKxH7Q8xfiuZI+wnDedQlhwN1+7Rs0ARlL/Kq
-         ROS2Ez7/qW/FDlRXmgrVHv/o8kt/C1iOxgKPMpv84v9st3SOFK379ox3DyauxZa+1x4r
-         JUee9MQsFnOF/IHtJUN7KvlNnJR6ifqRktYPee4nRcY1BSnjiVAi9+82JopVJa9Taryq
-         iqwsyVK6wvTrY1Tw19bqEzxLFhK8h0WtH6m0/S3xv8288eRPcyA7MebwaTVaBhMlnoGD
-         IM/BjpI8i1BUHYtbGz1Cw8Vn8xIcaao0kKdx3f3aACfiHfKFRU4sZjopERLeijQxUdy1
-         s6tA==
+        bh=NfocMJ4OgAO3HX5ciQuRwEHA66Qb0abBxdrZu7QgJK8=;
+        b=fgyx98zJOxDvNAMgT8TKfsyPF06wwf3Hxakq49nL5P4+Zx5zYND85uJ3TS1+gvrEbc
+         Orm+GSB4KLXz7di0eJP+R3m1Dcmj8gU9BXQPV3r7h5WEVqr912Tz0zjVS4vNRV8jBBAx
+         9C3pdSdDOe/lPFrFklG0btyP4WAIxJsE/azwoGNACTbz8LiYcO40xmaC1E7gHPwT1aVO
+         dkoaUgfVaCz3sZAVTxbPO8YrfRKo9guQNDH1aWWaIlyyFYsYf5RBUpgJnqMgd7jP75EG
+         PQ4xIJR83G+cGp/6c5r9fCD/TuVj7hde4aidcvD3T4HgAL3s534Aa5ABq59/KmlOzE+W
+         iVrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706801909; x=1707406709;
+        d=1e100.net; s=20230601; t=1706801913; x=1707406713;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=G+0d8Hy5JsXKOl1rOEs9vku4hGWhA4odGKzZJQAiN/U=;
-        b=LP1cpMIPiy7kQKlnr4uGq221N9fknAMHdqjVR5v65q61oJ9VAf6d+XurWw30bGZB8n
-         KOIWCYYUCcBeCXUW86jSCpfhsIniQW/B8gdniRw7sVdOxt8010oyrXaBYel8ev5zML/m
-         eAK5B+VjbdUkvncpDqtelG7Ob7XkIZoSZWFZxpqBw8EDEV4Yb7QCRAFhANpAwujKF40t
-         odSSzCT4tT1HnxVkva2HGZ4h4NJ48+offHilWjrEagpNiv+BT3rTIxwjYlleNfR4EbKh
-         Nop44JbdtmwSvVlmbhuB6GTzIs3tmLbEcOsmnykAFlBrMEpAVBmeoaQSR9TJtSaRYQ/X
-         q7fw==
-X-Gm-Message-State: AOJu0YwXn4/ptRgIghD0AHGP2avlRRa4RbM1rBGC0bNNXDPYhPpEsCRf
-	5ejFStciD7DQBKrujJUHT4ZcGwqxYThMZS61104r6ypXBYMonb5VIBAYroy9
-X-Google-Smtp-Source: AGHT+IEjQmPCBzwR1qPhysfcKse1zn/wg0SuW3g8IKIvAl/7o1i1at6TO7MmqTPwmTt3gsGSa0mS4A==
-X-Received: by 2002:ac5:c76b:0:b0:4bd:3d31:353a with SMTP id c11-20020ac5c76b000000b004bd3d31353amr4544564vkn.4.1706801908920;
-        Thu, 01 Feb 2024 07:38:28 -0800 (PST)
+        bh=NfocMJ4OgAO3HX5ciQuRwEHA66Qb0abBxdrZu7QgJK8=;
+        b=hQAADA/5efLT5Aoe3YHn3aQerl4XizwbUnv8NxoBFqccqdowxckZ3Fw+9iWFz1ShXf
+         O1CWLCjb0p6U12KNwr1sQtRByTBqFAUQOvxHRGof5HMSbBx4MlkUMdfgaWIEPqDj/StI
+         RxbWjOF3+fChinDzt22AJvXpLNPdjVJWbLE/mDGszdfXirXI7DRtCi1gFcPoY3Sg+K0s
+         y5qpqrr5doZOuVHWq61bVDeL0pw9ptTMYU/sBXe3VVzaW4sOHNhbCTFudvKfnzIf85v2
+         L7acnKG8yJfUDE5N1mtSIr6J4rsonn1AKFYUHS1dPFoiMJ+cTmsbQ7cQTKlprJRjGzCD
+         koRw==
+X-Gm-Message-State: AOJu0YxqtgPsssmvaTodG4bKqqmEjam4zNZy2v52G37xZcfCusIWtaZ5
+	s/rnUC3++qEfhIAlFr87vXzW+0cyA3Q7P6BIj2H27KVMQxesHRq1w2Dw3lkd
+X-Google-Smtp-Source: AGHT+IHoQ+STx0Mtklo+82AQiYzym0FxwtREoYYkvWJJFLvYAR+q0n/qO/TxOD+ql7cJimr41fmKxA==
+X-Received: by 2002:a05:6122:17a1:b0:4b7:185a:d8d with SMTP id o33-20020a05612217a100b004b7185a0d8dmr5268349vkf.1.1706801907778;
+        Thu, 01 Feb 2024 07:38:27 -0800 (PST)
 Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
-        by smtp.gmail.com with ESMTPSA id ca5-20020a056122400500b004bd503f054asm1624586vkb.42.2024.02.01.07.38.27
+        by smtp.gmail.com with ESMTPSA id ca5-20020a056122400500b004bd503f054asm1624586vkb.42.2024.02.01.07.38.26
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 07:38:28 -0800 (PST)
+        Thu, 01 Feb 2024 07:38:26 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 5/5] bap: Fix crash when a broadcast strean setup is pending
-Date: Thu,  1 Feb 2024 10:38:20 -0500
-Message-ID: <20240201153820.1016507-5-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 4/5] shared/bap: Allow using bt_bap_attach for broadcast
+Date: Thu,  1 Feb 2024 10:38:19 -0500
+Message-ID: <20240201153820.1016507-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240201153820.1016507-1-luiz.dentz@gmail.com>
 References: <20240201153820.1016507-1-luiz.dentz@gmail.com>
@@ -70,67 +70,26 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This fixes the following crash when a broadcast stream setup is
-pending and the device is remove:
-
-bluetoothd[37]: src/device.c:device_free() 0x89a500
-bluetoothd[37]: GLib: Invalid file descriptor.
-bluetoothd[37]: ++++++++ backtrace ++++++++
-bluetoothd[37]: #1  g_logv+0x270 (/usr/lib64/libglib-2.0.so.0.7600.6) [0x7feb557e3120]
-bluetoothd[37]: #2  g_log+0x93 (/usr/lib64/libglib-2.0.so.0.7600.6) [0x7feb557e3403]
-bluetoothd[37]: #3  g_io_channel_error_from_errno+0x4a (/usr/lib64/libglib-2.0.so.0.7600.6) [0x7feb557cd9da]
-bluetoothd[37]: #4  g_io_unix_close+0x53 (/usr/lib64/libglib-2.0.so.0.7600.6) [0x7feb55839d53]
-bluetoothd[37]: #5  g_io_channel_shutdown+0x10f (/usr/lib64/libglib-2.0.so.0.7600.6) [0x7feb557cdf7f]
-bluetoothd[37]: #6  g_io_channel_unref+0x39 (/usr/lib64/libglib-2.0.so.0.7600.6) [0x7feb557ce1e9]
-bluetoothd[37]: #7  g_source_unref_internal+0x24f (/usr/lib64/libglib-2.0.so.0.7600.6) [0x7feb557db79f]
-bluetoothd[37]: #8  g_main_context_dispatch+0x288 (/usr/lib64/libglib-2.0.so.0.7600.6) [0x7feb557dd638]
-bluetoothd[37]: #9  g_main_context_iterate.isra.0+0x318 (/usr/lib64/libglib-2.0.so.0.7600.6) [0x7feb5583b6b8]
-bluetoothd[37]: #10 g_main_loop_run+0x7f (/usr/lib64/libglib-2.0.so.0.7600.6) [0x7feb557dcaff]
-bluetoothd[37]: #11 mainloop_run+0x15 (src/shared/mainloop-glib.c:68) [0x662e65]
-bluetoothd[37]: #12 mainloop_run_with_signal+0x128 (src/shared/mainloop-notify.c:190) [0x663368]
-bluetoothd[37]: #13 main+0x154b (src/main.c:1454) [0x41521b]
-bluetoothd[37]: #14 __libc_start_call_main+0x7a (/usr/lib64/libc.so.6) [0x7feb54e1fb8a]
-bluetoothd[37]: #15 __libc_start_main@@GLIBC_2.34+0x8b (/usr/lib64/libc.so.6) [0x7feb54e1fc4b]
-bluetoothd[37]: #16 _start+0x25 (src/main.c:1197) [0x416305]
-bluetoothd[37]: +++++++++++++++++++++++++++
+This enables use of bt_bap_attach for broadcast by checking if there is
+a client or ATT instance.
 ---
- profiles/audio/bap.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ src/shared/bap.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index 7e87d12d02f1..26fd465bf560 100644
---- a/profiles/audio/bap.c
-+++ b/profiles/audio/bap.c
-@@ -974,6 +974,9 @@ static DBusMessage *set_configuration(DBusConnection *conn, DBusMessage *msg,
- 			setup->id = 0;
- 		}
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index 851d6a5facc3..ce8d35f86af3 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -4156,7 +4156,8 @@ bool bt_bap_attach(struct bt_bap *bap, struct bt_gatt_client *client)
+ 	queue_foreach(bap_cbs, bap_attached, bap);
  
-+		if (ep->data->service)
-+			service_set_connecting(ep->data->service);
-+
- 		return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+ 	if (!client) {
+-		bap_attach_att(bap, bap->att);
++		if (bap->att)
++			bap_attach_att(bap, bap->att);
+ 		return true;
  	}
  
-@@ -2437,6 +2440,11 @@ static int bap_bcast_probe(struct btd_service *service)
- 		return -EINVAL;
- 	}
- 
-+	if (!bt_bap_attach(data->bap, NULL)) {
-+		error("BAP unable to attach");
-+		return -EINVAL;
-+	}
-+
- 	bap_data_add(data);
- 
- 	data->ready_id = bt_bap_ready_register(data->bap, bap_ready, service,
-@@ -2644,6 +2652,7 @@ static struct btd_profile bap_bcast_profile = {
- 	.remote_uuid	= BCAAS_UUID_STR,
- 	.device_probe	= bap_bcast_probe,
- 	.device_remove	= bap_bcast_remove,
-+	.disconnect	= bap_disconnect,
- 	.auto_connect	= false,
- 	.experimental	= true,
- };
 -- 
 2.43.0
 
