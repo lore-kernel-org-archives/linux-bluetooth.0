@@ -1,144 +1,169 @@
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6A7762159
-	for <linux-bluetooth@vger.kernel.org>; Thu,  1 Feb 2024 15:46:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 630865F49F
+	for <linux-bluetooth@vger.kernel.org>; Thu,  1 Feb 2024 15:55:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706802386; cv=none; b=iAL6GOdkGc+c+Verj2/Zplwy2WdR7tQVEBtOmAyFCUz74JR9JWFSf2u90NswbNIlrn3OdloM3U0Cy5GKG3oG4sPsxdcP08yuv9Y0nJSnGwRmChkXGN4vfNi4Smk9jbF2AqTKhIwliukMrofuqdblhi6rd9iP4zCO5gwd2nzMDWE=
+	t=1706802945; cv=none; b=TRMiIvWSChGF9Cz2Lmfq5+cLKProWCw2RuRohCKeEjhpcE3QL1zpsk+J8sY5Dv6m0KLCAYSFlPhOGXK7/4vurTmUSSi3KzbzgDJholsXYOf8pP05xge8ylBacHmyYcM53xwD7JX1lP9SU6NLSJj9I1KjtBFcUrSgb/OdRzrxNKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706802386; c=relaxed/simple;
-	bh=qO84xf0TAnzBPeZnOdovQFxAhlvEhkH9b9OtYABuFAc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Xf9QAkCZKJnZZcn8TnklhUg9EEdLzzU3AbEuTlHLoiy5IXWI17Rd97yoyexKJFHFX9i3F4F38YwY9TMwzli1X69LqEgvm8kHY/8/+C8ym1b1rsjHb5bEnHzA84tkOhh9kd/SocKDEhMZpZzGh9fTy7qnJfIduAY+Icml3UOJaPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ixjzN/J7; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1706802945; c=relaxed/simple;
+	bh=8NQkfhoBr9JLEjdzguP3BSv+GdLe2ubyahcNgiZHmhI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GCZFH+HCiQzk2cu75wPmUu6T1la/H/t+rrlbdP1FylQ1lwNZmHZUU8/n8WN1QdB0dZOVqUjbDWwOTcDJ7EutbGjpsabPhLf5HjFyIniuuwGPzIL8a1u2iewl2biI0K4NsQoRfJFvigO5WAZYwafqygSPbaMTtZiCGHaUucPoDR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=g23ux0eh; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ixjzN/J7"
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2cf1288097aso14682051fa.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Feb 2024 07:46:24 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="g23ux0eh"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-40ef75adf44so9775735e9.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Feb 2024 07:55:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706802383; x=1707407183; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nJVlBzJscMcA2voHMWrDxawYWbtejRaZS3mMueBEAW8=;
-        b=ixjzN/J7sOnmSX9PeZl1U17HsGeuDgns+4CduKG4BBZouJC9vcV2sqdhrTz6qyhAGn
-         +lmgUSXbjM6a5WPxugw+j4dR6JOlmbow6eeapKaaxSGtxoXKCO7ZeZR+qFEp/avNG3ff
-         el3c8+poxFTrte15j/gnkHKrODzTSgL6GNsHsv96dbOKzZpoCYGqxoA5LwpJjruyCJrI
-         d2AOUTOQCZ1J+KXuZ1m9b/3LnJx90UuxiUxnutnOKoRhjBkueECQi67dhY+j0MEfdbJ8
-         bWuwcQ+L1difAYzER1zW7x2KraOTgZeXXRrCbYLJYIlpIH62V+EpW2dr1Uuq8QSUrr2n
-         Z+tA==
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1706802940; x=1707407740; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=p5qM+DhIAVGaoaijHTK5tqpB0tA35c17btuMlycQtGc=;
+        b=g23ux0ehqQ3jhpUM7Aoh7LowdIwQmU3hC3UAQEWi9c28otfoKaOEeQpYug+I8NCm7p
+         moSCcaZ2fjGIQi1uRTHtcPpJvpXbeC0c1l7QPiE/LuUCRphZfxIcWI7ce/MA0/Dsxj9J
+         RhBvZa1CO/Huiv0CqamMzxG324xrCewglExsP03TvtAaj65mKUrL73brw7BMFn051W3+
+         pMivJIrRLRvh9rd1hqdQMM78VII9iWTl7gJMdB/MLkx52l4VR20LqDxb0bI0VVgR87N0
+         Tsar8SHjRoNaGJOR6VM8YHp1u4lc4oOKhVhEN376B2qmmUM7DqrbjBlaD6exCkFHlQLX
+         V32Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706802383; x=1707407183;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nJVlBzJscMcA2voHMWrDxawYWbtejRaZS3mMueBEAW8=;
-        b=wV8ls+uW4kEUg8eBdhmC+LNui8urgC/VwforQawrXj64Zcwnl3TqHkpcAkRjuV08Te
-         Bvs8uP5Z6X9OXCTrxrt0MXZifTXK6ZSiTnkDO5jGYQ44JDWncWGN4G6ydavUbFhU8c24
-         CZhqo5PrBSZ81/LFbtqLSZo2sva1jlnuag5Bo+Jeq5ayG2GytvfW2sqtmFB5OoA0htXF
-         uvadmnhK24u4nMkvoWAp8O/DlsKFTrFOVTh3/a/avPMAxXZOMJG7pEkYRTTaJTCkNL/W
-         9cBg9vx5YyoeE66sJ3alg78g5RkvMH+McHdA8o2t2boU1Pp4Hu9BdeBDCL+QQgYcRskg
-         v+Hw==
-X-Gm-Message-State: AOJu0Yy0CYxglIE90kUUlNHpJ6owlJh8TqTOpEtEOD8bIfrAejliYwmY
-	rKgjMgswB5iaUOvL6fjsIx0K9kK6CE89+wV3o5STb4SLAOMc0WeAQVmuQQbGi1FREfBGRPbqprl
-	YbIkOfrH9G/On0rZoD2SSiF8cmEE=
-X-Google-Smtp-Source: AGHT+IHfm9mY7zZd3hoPPVPTS5A6Xtd5WSAPnJev2T4N1n2AuKDvZaAoXMtWseDKEVOQi2rKEhzee6XfDwUvBKelrTM=
-X-Received: by 2002:a2e:a26f:0:b0:2cf:1174:44a with SMTP id
- k15-20020a2ea26f000000b002cf1174044amr3565314ljm.13.1706802382477; Thu, 01
- Feb 2024 07:46:22 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706802940; x=1707407740;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=p5qM+DhIAVGaoaijHTK5tqpB0tA35c17btuMlycQtGc=;
+        b=tgUaR5oSTbQG8ToM361Q+aq8ai2vR6rMT3UCLeoBkvknevfu+XkHxPXSszYvol5Kmf
+         CIgidbb5thbVnjdYUZFIqYq0NUPahYpIWyhWqUKJbR3wyADh8E46TEgYX5bHof2ebOME
+         vsGsVPnc9i8sjzh/4Ep5XmDO/qH03FylrgZ3jrxoVZZVJ7RHxCOAjWPPJTRSEH+bZ3Ig
+         V6NotoP55YTyBiPUMze4gpeZyyThIY6MHwaVBwLCxskwAA8KffYzPfeM70oIY3RE6CTV
+         h+phJC57mPm1YFQ0dJUrhvScrAa4VOgy3daXLQGsvjUFvf4cVRGdcCAfOKNag03Oktbf
+         d+RQ==
+X-Gm-Message-State: AOJu0Yye9hO6sSQmvcLWhR5MHj8w4kYsbApN8UIhTo3kREVZ+OdHBgiX
+	8fvFGWOSI3BQlM1BT5AjrNB7tWxhla8WsUpKmSmSl7CCvaQCS5e+focEDVMbmic=
+X-Google-Smtp-Source: AGHT+IFUiCpUoqg+Hwif5qU4KpnW7NZcqtWoeDcKn/KB/alf1F0byzO6udrYL9tJwF2Feal1AG/4Xw==
+X-Received: by 2002:a05:600c:4f10:b0:40e:d316:8cb8 with SMTP id l16-20020a05600c4f1000b0040ed3168cb8mr4140755wmq.27.1706802940496;
+        Thu, 01 Feb 2024 07:55:40 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCVZxNUxx4gS4K/kceUjJUevqGmQHTw1rJd6vIRpSv5lJrrJWkuLS1S1vdwD178Lv9W1djE9nJ0mkX0T3sNbVXCgfdKc0btL6jtLQHESt7VMVokV9jyDqC8y7LQMa31bMvmDhErdtqm3lXA5l8dDZp8HowT6kBThwT6ZgoBlacs/C6A69DhvW585i2UVNZ1R80UcdWg3xd8Z4qMcb7gE64scAaJ9DUlv8jYf6dizAmSJTcRcA3Tohmh20wLpYr7LD746bpC4EpeFWPt+sbaWr3kXFF1SKCmEQP7Z667O81fhKoq5f3XZAXS5Bkc9kl8NVR0JiYceI/AFy/UhUHVwRW+DTLqsxCrRK5oApKL92oNofGjI7z8/h4uWIASjhJiT2edMonOuW6gp+prhYpw+RDE1vcyb/3JN0iVNShG/AF3wpRB7N2ufwk4jYZzOgVRZmB0PxNZxyXR4keCYP9GZhCmjInkjKZebYWaSzoFgJb99JQZX9K2cFcndmRHA8PfykOLuCBjf1Agw0FctTgGsIHvLrhjQViX3kvY7ykS16JmD+wPCLFiwXxc0J7Ww7cFnSy4GHJ44mwjDW/ggOa64w6vLhpw9VMkMKaPgcTHjyoEPp2melvRPnIXn391eluQlJ85yin6QOAmfvyFU+Jxftql2KTYuxS4O6t86irppvG/Jzoe7ZZK5AS9mXttMXJhEXORuzg0ta3HQ
+Received: from brgl-uxlite.home ([2a01:cb1d:334:ac00:dd01:5dec:43e3:b607])
+        by smtp.gmail.com with ESMTPSA id ce2-20020a5d5e02000000b0033af4848124sm9650318wrb.109.2024.02.01.07.55.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Feb 2024 07:55:40 -0800 (PST)
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+To: Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Alex Elder <elder@linaro.org>,
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Abel Vesa <abel.vesa@linaro.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Lukas Wunner <lukas@wunner.de>
+Cc: linux-arm-msm@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: [RFC 0/9] power: sequencing: implement the subsystem and add first users
+Date: Thu,  1 Feb 2024 16:55:23 +0100
+Message-Id: <20240201155532.49707-1-brgl@bgdev.pl>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240201152835.196617-1-silviu.barbulescu@nxp.com>
-In-Reply-To: <20240201152835.196617-1-silviu.barbulescu@nxp.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 1 Feb 2024 10:46:09 -0500
-Message-ID: <CABBYNZ+HidHsCYBPrhedgsPOZ+=bHGzP==JyWELcaieLqYVT2w@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 0/7] Add support for multiple BISes on the bcast source
-To: Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
-Cc: linux-bluetooth@vger.kernel.org, mihai-octavian.urzica@nxp.com, 
-	vlad.pruteanu@nxp.com, andrei.istodorescu@nxp.com, iulia.tanasescu@nxp.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Silviu,
+From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-On Thu, Feb 1, 2024 at 10:28=E2=80=AFAM Silviu Florian Barbulescu
-<silviu.barbulescu@nxp.com> wrote:
->
-> This patch adds support for multiple BISes in broadcast sources.
->
-> Example commands:
-> Create a local endpoint and an endpoint for BIS1:
-> endpoint.register 00001852-0000-1000-8000-00805f9b34fb 0x06
-> [/local/endpoint/ep0] Auto Accept (yes/no): y
-> [/local/endpoint/ep0] Max Transports (auto/value): a
-> [/local/endpoint/ep0] Locations: 0x03
-> [/local/endpoint/ep0] Supported Context (value): 0
->
-> Configure BIS1, create BIS1 transport and endpoint for BIS2:
-> endpoint.config /org/bluez/hci0/pac_bcast0 /local/endpoint/ep0 48_4_1
-> [/local/endpoint/ep0] BIG (auto/value): 0x01
-> [/local/endpoint/ep0] Enter channel location (value/no): 0x01
-> [/local/endpoint/ep0] Enter Metadata (value/no): n
->
-> Configure BIS2, create BIS2 transport and endpoint for BIS3:
-> endpoint.config /org/bluez/hci0/pac_bcast1 /local/endpoint/ep0 48_4_1
-> [/local/endpoint/ep0] BIG (auto/value): 0x01
-> [/local/endpoint/ep0] Enter channel location (value/no): 0x02
-> [/local/endpoint/ep0] Enter Metadata (value/no): n
->
-> For multiple BISes acquire must be called on all transports
-> before the BIG is created:
-> transport.acquire /org/bluez/hci0/pac_bcast0/fd0
-> transport.acquire /org/bluez/hci0/pac_bcast1/fd1
-> .....
-> transport.release /org/bluez/hci0/pac_bcast0/fd0
-> transport.release /org/bluez/hci0/pac_bcast1/fd1
->
-> Silviu Florian Barbulescu (7):
->   bap: Remove set lpac user data at bcast ep register
->   shared/bap: Add support to create multiple streams for the same pac
->   bap: Create a new endpoint to be available for the next BIS
->     configuration
->   bap: Split bap_state and bap_connecting in two functions
->   shared/bap: Check the state of all the streams with the same BIG ID
->   bap: Set the generated BASE on all setups from the same BIG
->   shared/bap: Generate single BIS BASE for a configuration with BIG ID
->     0xFF
->
->  profiles/audio/bap.c | 239 ++++++++++++++++++++++++++++++++-----------
->  src/shared/bap.c     |  67 ++++++++++--
->  src/shared/bap.h     |   2 +
->  3 files changed, 238 insertions(+), 70 deletions(-)
->
->
-> base-commit: a692cc44dc8735b9303f8893f784306b4d2654fe
-> --
-> 2.39.2
+I'd like to preface the cover letter by saying right away that this
+series is not complete. It's an RFC that presents my approach and is sent
+to the list for discussion. There are no DT bindings nor docs in
+Documentation/ yet. Please review it as an RFC and not an upstreambound
+series. If the approach is accepted as correct, I'll add missing bits.
 
-Not sure how you guys are testing these changes but currently I can't
-get Broadcast Sink to work, and it crashes on the the cleanup:
+The RFC[1] presenting my proposed device-tree representation of the
+QCA6391 package present on the RB5 board - while not really officially
+accepted - was not outright rejected which is a good sign.
 
-https://gist.github.com/Vudentz/00a62914b0dc08261065cea65c0e04f0
+This series incorporates it and builds a proposed power sequencing
+subsystem together with the first dedicated driver around it. Then it
+adds first two users: the Bluetooth and WLAN modules of the QCA6391.
 
-So until we fix that I'm actually not merging new code on top, I'm
-also considering moving the driver out of bap plugin and perhaps have
-it as a standalone bcaa plugin since there have been quite a few
-occasions where broadcast code has caused regressions on unicast.
+The Bluetooth part is pretty straightforward. The WLAN however is a PCIe
+device and as such needs to be powered-up *before* it's detected on the
+PCI bus. To that end, we modify the PCI core to instantiate platform
+devices for existing DT child nodes of the PCIe ports. For those nodes
+for which a power-sequencing driver exists, we bind it and let it probe.
+The driver then triggers a rescan of the PCI bus with the aim of
+detecting the now powered-on device. The device will consume the same DT
+node as the platform, power-sequencing device. We use device links to
+make the latter become the parent of the former.
 
-Anyway Ive been working on the following fixes and I do appreciate
-some feedback:
+The main advantage of the above approach (both for PCI as well as
+generic power sequencers) is that we don't introduce significant changes
+in DT bindings and don't introduce new properties. We merely define new
+resources.
 
-https://patchwork.kernel.org/project/bluetooth/patch/20240131173002.834951-=
-1-luiz.dentz@gmail.com/
-https://patchwork.kernel.org/project/bluetooth/list/?series=3D822175
+[1] https://lore.kernel.org/all/CAMRc=MckG32DQv7b1AQL-mbnYdx4fsdYWtLwCyXc5Ma7EeSAKw@mail.gmail.com/T/#md5dc62007d12f6833d4e51658b14e0493954ba68
 
---=20
-Luiz Augusto von Dentz
+Bartosz Golaszewski (9):
+  of: provide a cleanup helper for OF nodes
+  arm64: dts: qcom: qrb5165-rb5: model the PMU of the QCA6391
+  power: sequencing: new subsystem
+  power: pwrseq: add a driver for the QCA6390 PMU module
+  Bluetooth: qca: use the power sequencer for QCA6390
+  PCI: create platform devices for child OF nodes of the port node
+  PCI: hold the rescan mutex when scanning for the first time
+  PCI/pwrctl: add PCI power control core code
+  PCI/pwrctl: add a PCI power control driver for power sequenced devices
+
+ arch/arm64/boot/dts/qcom/qrb5165-rb5.dts  | 128 +++++-
+ arch/arm64/boot/dts/qcom/sm8250.dtsi      |  10 +
+ drivers/bluetooth/hci_qca.c               |  30 ++
+ drivers/pci/Kconfig                       |   1 +
+ drivers/pci/Makefile                      |   1 +
+ drivers/pci/bus.c                         |   9 +-
+ drivers/pci/probe.c                       |   2 +
+ drivers/pci/pwrctl/Kconfig                |  17 +
+ drivers/pci/pwrctl/Makefile               |   4 +
+ drivers/pci/pwrctl/core.c                 |  82 ++++
+ drivers/pci/pwrctl/pci-pwrctl-pwrseq.c    |  83 ++++
+ drivers/pci/remove.c                      |   2 +
+ drivers/power/Kconfig                     |   1 +
+ drivers/power/Makefile                    |   1 +
+ drivers/power/sequencing/Kconfig          |  28 ++
+ drivers/power/sequencing/Makefile         |   6 +
+ drivers/power/sequencing/core.c           | 482 ++++++++++++++++++++++
+ drivers/power/sequencing/pwrseq-qca6390.c | 232 +++++++++++
+ include/linux/of.h                        |   4 +
+ include/linux/pci-pwrctl.h                |  24 ++
+ include/linux/pwrseq/consumer.h           |  53 +++
+ include/linux/pwrseq/provider.h           |  41 ++
+ 22 files changed, 1229 insertions(+), 12 deletions(-)
+ create mode 100644 drivers/pci/pwrctl/Kconfig
+ create mode 100644 drivers/pci/pwrctl/Makefile
+ create mode 100644 drivers/pci/pwrctl/core.c
+ create mode 100644 drivers/pci/pwrctl/pci-pwrctl-pwrseq.c
+ create mode 100644 drivers/power/sequencing/Kconfig
+ create mode 100644 drivers/power/sequencing/Makefile
+ create mode 100644 drivers/power/sequencing/core.c
+ create mode 100644 drivers/power/sequencing/pwrseq-qca6390.c
+ create mode 100644 include/linux/pci-pwrctl.h
+ create mode 100644 include/linux/pwrseq/consumer.h
+ create mode 100644 include/linux/pwrseq/provider.h
+
+-- 
+2.40.1
+
