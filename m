@@ -1,144 +1,132 @@
-Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BCF9839EE;
-	Fri,  2 Feb 2024 21:38:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E477839F2
+	for <linux-bluetooth@vger.kernel.org>; Fri,  2 Feb 2024 21:42:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706909931; cv=none; b=Sx+jFbKskB48E8+RXVrXE8CC91ZsLPBO7KhdvUImx92dLEGyu2FhPTkBy3jMBnxDfF8Ih/u85VrOaz++W5PRmen8ZaTIljIYoBkTS9nO+g71jszmR6K6zE6eTIWZmvVWSf7JlMMhZ4wU33ohdJGk7jaWmBF/I/Br9+95eWR4j08=
+	t=1706910163; cv=none; b=rAtNdTXU27RzIGWfsYnYxb6Yg1fHNfgQAZp0yMlo0hwyHi1+6/5ZffqHt5gzQMkbSqXQoP2knzr4Wh6beiEUhVypbmGtgH2EwKxFQf0OKviKy58YEHRLWAEztDCLrqsa84RqtRoChMCFTiF00EYTepiIQq8qgSVZ+FnOu68RVjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706909931; c=relaxed/simple;
-	bh=F6VquZN2wtXDcdORlyKdNN7aLm3JSWls/Qx7ZNJpgk0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bCLCwvhKl9ZPbPI/4rL5SBXX98v1VWdYiCincd0kCaHQXfuMIwuCIvJVnkQ5KBp3NcgC+lIDa1RwKib6VzxRRbsxMt+bzkND9DSVvrvgVtrVc5nBs7r18HO48JJ22GB0xpv3aWacCP1RUNsLpkGQi6O6haA7VuzkT8TlyA//jUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E0wRh0ez; arc=none smtp.client-ip=209.85.219.171
+	s=arc-20240116; t=1706910163; c=relaxed/simple;
+	bh=uwHqjDYIiProYmOgne8yrIVpwBOVA6M13e/Bv50xVQI=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=bP8whOw/zK8Ldrtfpt2/h7HpkqLfBDNl7WQRWdWYmisIN7anIi2iBgb51CD6UGa5AXrO5hDlWrN8+fr97NPrJ5AcPmMiAIqlcog/9FSACoVMjx8NmmfZkaLqiLAMFVfsDDIESZrVKuZXWp9r1k94M0NGBuv+uEwi22xffD8A4CA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cLvT0Lab; arc=none smtp.client-ip=209.85.219.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E0wRh0ez"
-Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-dc6c0dc50dcso2197579276.2;
-        Fri, 02 Feb 2024 13:38:49 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cLvT0Lab"
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6818f3cf006so12496346d6.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 02 Feb 2024 13:42:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706909928; x=1707514728; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gsmzFnQIcz/cfdKoMIxMibTLWaipEjSMwVTmlwFeBfY=;
-        b=E0wRh0ezVmEKg0O51crq4+Z5uvhBFLLDfwLCQ1MbTQk6NzqVQXMjErfj5lOTs6o/yM
-         KXlJBCDxUGNfbE+t/zz6//51m81gqDzTBG0WCRigC5F6JUiuXDYbzbxfEEP23Bu1AX9Y
-         KjBSJGC8zhkGqaODDAExJT9aNwF49KQDWLmkiNktmsNEnIMek3djleJBM4TA0/rzbaTB
-         LS+dOCMz6Nr/tPr0Uask5DcfpvlpE1qpgb7NQUmkwuhDbHxUEOSIFmFW1jwiKqiG8p1U
-         WPqnRk7ZtzoxJDXHY5iUqTzUZpvMyGXDddIZbYz7MxnFiOkWF5cPRb9igiFvcm28zL7Z
-         z1SQ==
+        d=gmail.com; s=20230601; t=1706910161; x=1707514961; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=zUJGUvSi8KN6i/8NNz9wgQa72XU1mYl8NIv0nz20tf0=;
+        b=cLvT0Labo1ilKMdT6DM4lj3W3Ykp9UH2blH/hPe387+4Ltfa11g0+/SEmghCf+tRFN
+         S/VTYMOuBnDNzL+V7QoJDy5Y95/VCiNDMTzSab1/ZsGXIiR6I6MLxLXckSObOfvBZOOo
+         Xdb05OV60HfuU/VN5v2qabuwfkQEdN9Ew/6jlOCfzKYQqlKLGb8hqzo6Bllo0y5ySjYS
+         MArizVmZ9rsh9g7n3UNicbJep/vKQ2TmDgWl1CjZp6N2EEV9qsVlilh3wuks2Eryn8NZ
+         6pWjlJxxpjGsGC53EsX3GvTNY23YMVJ8f6R9qkcrIaJlbOi4F9/16o1nOqJaR4qk5Pj+
+         m/qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706909928; x=1707514728;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1706910161; x=1707514961;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=gsmzFnQIcz/cfdKoMIxMibTLWaipEjSMwVTmlwFeBfY=;
-        b=s8+e8veYBgANgmlGsUZcz1+Quv+2yTTh7y6D6BSgF0335O/9lUQ45ITKy9c1jIb7g+
-         ZyLG9fmhbM96iCd42sE62tFIRtyNVIO9F6NgxhKzELqig3RZcszMX0NBCe+c2FJGdORl
-         xS4zEU/5Tb9XrQ1zIMhRF4H+6585FTd3euVUF4GiE0XKMQVDInFN++xdD0/IQoxvfLVZ
-         gkFdhlRqRI33R1a2mNZDXrFaQag79iCSPUJ6mWSRqcJN9wktqlDCsTSg9AoNyuziG7pz
-         Sb2EtpwhSe18BTbEGdncD5W0InB8tLzSmqEsIG4CmOxYOqnsD1B44qv/ggiFNiuiZsaQ
-         3WMw==
-X-Gm-Message-State: AOJu0Yy6e62SCaLCqvSLSSfIxHsXWgrCGwjQnXVgIcb0BNc6CXOIEVmi
-	iH1PLl4Jv9+jdaA3r5uKkSil9NtN9owRnVNy27PNUY7fcMzePezhUw8+uYZM
-X-Google-Smtp-Source: AGHT+IGYOWp42Mtocorzjb0cxbAYRMA2vVWpDYIkLbO4o9w9ExzIiJfKpJ5weBm3niBtrlOEcbzm3g==
-X-Received: by 2002:a25:6d46:0:b0:dc2:234d:214d with SMTP id i67-20020a256d46000000b00dc2234d214dmr9479422ybc.40.1706909928231;
-        Fri, 02 Feb 2024 13:38:48 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCWChupyp0Mz+dMNPd4Y8znsIZpNFhcPVRIRQm6YdOde7BY6Jilnu9sSnU9gwSZuDhSXAoJvuY6HDZa5BaUxEuDcp+S7Qve1n+iMakN+XBQkp0wUeBJ+KsQ=
-Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
-        by smtp.gmail.com with ESMTPSA id t2-20020a259082000000b00dc22fa579c5sm605591ybl.45.2024.02.02.13.38.46
+        bh=zUJGUvSi8KN6i/8NNz9wgQa72XU1mYl8NIv0nz20tf0=;
+        b=ND/UgD/AZA4txMQK5pD2+TDB7RC7gFgT4T3TOm2s48Eo/RmpQZhrLY8nz4WMqTM2C6
+         KXO62m8a1iM0gFv7V+zasVhti8bgmsSQLZU5SbHqrcUgy3n/e17z5hM1DlJox1Yw4RCn
+         8Pl3M5J4/I5oUwc96f99HsH7Bl1RLOtjO3TiUhbQvmyBB4arX8WuwSY3YFAlpnqrKreS
+         MTqRxWhVB/DhojO/+F/LZIpHnO//I2HsJ5SCyqa6B1xnmb53oq+ZCYzBgXqoKWVxlVxg
+         QUbeILfA1bGhF8PC6fLfiVq+JpE/UCfZszEB60IarO3dS4e2bQtA/hd1LsS8+RqMCE8P
+         ZajA==
+X-Gm-Message-State: AOJu0Yzx+y8YYG2yldsTHZFppFhHgwdyltbBhR9H03mipW+lpunJS1dv
+	cCjWEK3q5Khd7Tb59wBAu+Ea9EE3g3a6SenevZIVDDN531G+BQ6TETxa4EI8
+X-Google-Smtp-Source: AGHT+IFsuitg7xVgY6ftM8zHfrblA38m+OjeXOwxqrYMbOK4zFilxPJ4XF+MIiBVD9VtZ9paMzkRhw==
+X-Received: by 2002:a0c:f2d2:0:b0:68c:40d2:2031 with SMTP id c18-20020a0cf2d2000000b0068c40d22031mr6441913qvm.19.1706910160885;
+        Fri, 02 Feb 2024 13:42:40 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCVfKcECc30uDxZLwJ1BShBo01PBXlBoIfh6GM9yjDTb1S24PYSbEFEps2L/1B0437tKFQvuz9S31v93
+Received: from [172.17.0.2] ([172.183.130.193])
+        by smtp.gmail.com with ESMTPSA id qj22-20020a056214321600b00686a080092bsm1169002qvb.1.2024.02.02.13.42.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Feb 2024 13:38:47 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: pull request: bluetooth 2024-02-02
-Date: Fri,  2 Feb 2024 16:38:43 -0500
-Message-ID: <20240202213846.1775983-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Fri, 02 Feb 2024 13:42:40 -0800 (PST)
+Message-ID: <65bd61d0.050a0220.7bdb2.7cef@mx.google.com>
+Date: Fri, 02 Feb 2024 13:42:40 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0818751812400371184=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: [BlueZ,1/2] monitor: parse Google's Opus A2DP vendor codec capabilities
+In-Reply-To: <b02d20dd168627b35016dfd0b56beb4a3a8755bd.1706904250.git.pav@iki.fi>
+References: <b02d20dd168627b35016dfd0b56beb4a3a8755bd.1706904250.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-The following changes since commit ba5e1272142d051dcc57ca1d3225ad8a089f9858:
+--===============0818751812400371184==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-  netdevsim: avoid potential loop in nsim_dev_trap_report_work() (2024-02-02 11:00:38 -0800)
+This is automated email and please do not reply to this email!
 
-are available in the Git repository at:
+Dear submitter,
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-02-02
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=822659
 
-for you to fetch changes up to 96d874780bf5b6352e45b4c07c247e37d50263c3:
+---Test result---
 
-  Bluetooth: qca: Fix triggering coredump implementation (2024-02-02 16:13:56 -0500)
+Test Summary:
+CheckPatch                    FAIL      1.95 seconds
+GitLint                       PASS      0.57 seconds
+BuildEll                      PASS      23.97 seconds
+BluezMake                     PASS      722.72 seconds
+MakeCheck                     PASS      11.75 seconds
+MakeDistcheck                 PASS      161.55 seconds
+CheckValgrind                 PASS      224.79 seconds
+CheckSmatch                   PASS      326.14 seconds
+bluezmakeextell               PASS      106.22 seconds
+IncrementalBuild              PASS      1328.51 seconds
+ScanBuild                     PASS      976.90 seconds
 
-----------------------------------------------------------------
-bluetooth pull request for net:
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ,2/2] client/player: parse Google's Opus A2DP vendor codec capabilities
+WARNING:NEW_TYPEDEFS: do not add new typedefs
+#180: FILE: profiles/audio/a2dp-codecs.h:436:
++typedef struct {
 
- - btintel: Fix null ptr deref in btintel_read_version
- - mgmt: Fix limited discoverable off timeout
- - hci_qca: Set BDA quirk bit if fwnode exists in DT
- - hci_bcm4377: do not mark valid bd_addr as invalid
- - hci_sync: Check the correct flag before starting a scan
- - Enforce validation on max value of connection interval
- - hci_sync: Fix accept_list when attempting to suspend
- - hci_event: Fix handling of HCI_EV_IO_CAPA_REQUEST
- - Avoid potential use-after-free in hci_error_reset
- - rfcomm: Fix null-ptr-deref in rfcomm_check_security
- - hci_event: Fix wrongly recorded wakeup BD_ADDR
- - qca: Fix wrong event type for patch config command
- - qca: Fix triggering coredump implementation
+WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
+#183: FILE: profiles/audio/a2dp-codecs.h:439:
++} __attribute__ ((packed)) a2dp_opus_g_t;
 
-----------------------------------------------------------------
-Edward Adam Davis (1):
-      Bluetooth: btintel: Fix null ptr deref in btintel_read_version
+/github/workspace/src/src/13543351.patch total: 0 errors, 2 warnings, 70 lines checked
 
-Frédéric Danis (1):
-      Bluetooth: mgmt: Fix limited discoverable off timeout
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
-Janaki Ramaiah Thota (1):
-      Bluetooth: hci_qca: Set BDA quirk bit if fwnode exists in DT
+/github/workspace/src/src/13543351.patch has style problems, please review.
 
-Johan Hovold (1):
-      Bluetooth: hci_bcm4377: do not mark valid bd_addr as invalid
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
 
-Jonas Dreßler (1):
-      Bluetooth: hci_sync: Check the correct flag before starting a scan
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
-Kai-Heng Feng (1):
-      Bluetooth: Enforce validation on max value of connection interval
 
-Luiz Augusto von Dentz (2):
-      Bluetooth: hci_sync: Fix accept_list when attempting to suspend
-      Bluetooth: hci_event: Fix handling of HCI_EV_IO_CAPA_REQUEST
 
-Ying Hsu (1):
-      Bluetooth: Avoid potential use-after-free in hci_error_reset
 
-Yuxuan Hu (1):
-      Bluetooth: rfcomm: Fix null-ptr-deref in rfcomm_check_security
+---
+Regards,
+Linux Bluetooth
 
-Zijun Hu (3):
-      Bluetooth: hci_event: Fix wrongly recorded wakeup BD_ADDR
-      Bluetooth: qca: Fix wrong event type for patch config command
-      Bluetooth: qca: Fix triggering coredump implementation
 
- drivers/bluetooth/btintel.c     |  2 +-
- drivers/bluetooth/btqca.c       |  2 +-
- drivers/bluetooth/hci_bcm4377.c |  3 +--
- drivers/bluetooth/hci_qca.c     | 22 ++++++++++++++++------
- net/bluetooth/hci_core.c        |  7 ++++---
- net/bluetooth/hci_event.c       | 13 ++++++++++---
- net/bluetooth/hci_sync.c        |  7 +++++--
- net/bluetooth/l2cap_core.c      |  8 +++++++-
- net/bluetooth/mgmt.c            |  4 +++-
- net/bluetooth/rfcomm/core.c     |  2 +-
- 10 files changed, 49 insertions(+), 21 deletions(-)
+--===============0818751812400371184==--
