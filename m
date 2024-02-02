@@ -1,68 +1,67 @@
-Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
+Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF9E9768F2
-	for <linux-bluetooth@vger.kernel.org>; Fri,  2 Feb 2024 09:03:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15DD0762F3
+	for <linux-bluetooth@vger.kernel.org>; Fri,  2 Feb 2024 09:11:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706864614; cv=none; b=swmuaEgNDOLyjg1cRPANBQxuF66WJoXTk/vjzHC73L2HeDyrvj7ifFbZ99GstJKNBfexKR3aWZ7jGK0TsOsfCbXVo0IeszYy0zkSzzSjMbi1iRrODyMrVW+liq30KpFVngxBJLAjYrgn2SGmNSD3VksPx+9EiXXpkxZlCylytQc=
+	t=1706865116; cv=none; b=TiH15MhfwsFeVZaVthC2L38E15vP0Pu+t5qzm+hxRCbfXhcsZM13ksAzYFe9413+7pIJuFPfifXvAd6P0YnzvJOGv+eW+s5nZpzHGKwM/88b4ucDvQRaPNPx3YaG0HLOdwZ5MVcZvSFneuMfp+RM3g7DR46j9svK7Wu9Rham8dc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706864614; c=relaxed/simple;
-	bh=nmIJ6o/nKGoxCdPeNHhdm2ww0WnXp6xk8MnUITWzxRE=;
+	s=arc-20240116; t=1706865116; c=relaxed/simple;
+	bh=qSQ+bNWGVvEkBLVF3tPN3A8E/f85Onwr28touQiCfuI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AvNsVJwzmwCUou85tfc7wEKWFFnStyhrydxorss7B+E8kv6igI+EVhTlrIjf0mWxlK27rfKPP/23L/ygCxLRjfjg9gTu/pZVGONPyQgL2RLxxui2KZzv7cNPxKjTpT2L2Lrf2Enjs313Hdh51HlYoFgzd/l03gc3H2fZBj9ia9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=WqIn5s2Z; arc=none smtp.client-ip=209.85.222.42
+	 To:Cc:Content-Type; b=UyvUPu0+c+B3coUVIccDMYfA7/iRC8EKik725g3FbIt8OyMMt4Lsjn7vo6F2LqAlKMsN9qZNmtBTUWKHmUiIZMi/x52slLZAUO7vDLSzOF6xBsxHp+ZfV5iZYJtWCLktFdUWp2lgdAeyiwlnL49i1vtoNZ/QJCmVzc7E98RQ4jY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=qNRU3N07; arc=none smtp.client-ip=209.85.222.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="WqIn5s2Z"
-Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-7d5c25267deso789441241.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 02 Feb 2024 01:03:32 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="qNRU3N07"
+Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-7ce55932330so788663241.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 02 Feb 2024 01:11:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1706864611; x=1707469411; darn=vger.kernel.org;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1706865114; x=1707469914; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fCN752qmd2T78irI31vKFY9eZlBq4rpwdzKMS8r/StY=;
-        b=WqIn5s2Z6bkhf3P5cAAoCC9Q3A30eCh8bUEZHZ0HV0w+yDCqC571tWio40+CKl41Al
-         ix6+KWifm1ILiNg8UuNjRnacnyPdGJgJA8FxlyhHURpqIvXsY3Nc7URPmlHIojZoHnQS
-         NLoqGXcDFeqqaCeGNzU8MexsETy/Ms23RhbXD1nUP+TbN5ab5qPZ+A/LS22Wbhp5RWcA
-         c6+CgpI6se0Z0SPtzzjGm70oGHQ9Dy0UZCSJNQ821Y8l01aet+0Phav2n2gmWKvf2yvC
-         nx2tlaU/beQO2bISeCILOp71XyFT5rhKloE45IQSXyo0KtIJtUV201PlOQ0INh6zjc4J
-         FF4g==
+        bh=dROtYGaO3nv6BoiEV+4GwfEN1YhQwW+mG4GWEhZs0oA=;
+        b=qNRU3N076BYgXMqQkhQfddl/4NkZpFFDsaGGcK/ix+mUG4MmsVnU6ljd0/G1aU3QZV
+         vsUplKmLQoESXc7xnRItWYEhMCSABpYrV+8tocoaP69e+gu96Rxp16X8FTBDxB/N49/x
+         COQ5ubbFbPjplDIIMXuCsNFyzrClbvZTTDbIatKPAE7itYTM0Xq9jC8ar4BBmlPgbExy
+         AYxUvkafBj4fWrv0I/3pmhj2GIKvDaeIQD0YDdNT9DJD2qoaLAzQsX5If4Ra8rkhkUN8
+         Py0FpZWIJzIDK9hH87DzjFBuC9fX3mQGcPqARQ1YptqnGtLXRjEoWiOZpMtQC7tEoWzI
+         Y7gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706864611; x=1707469411;
+        d=1e100.net; s=20230601; t=1706865114; x=1707469914;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=fCN752qmd2T78irI31vKFY9eZlBq4rpwdzKMS8r/StY=;
-        b=HLGi2zZP7jcw4Z7wKBZTgVxEqZ40KSxQb9s8oRpgsyMq3af5jeRCsKWP97UmmSjm6m
-         mZBN0S4cMN2uwJegP5tVwgJTLkxMJEKHUBMjcumDJsBGj6iMRARuZHUSdq+6eKaYDXyK
-         wrUW00zaADkGepjoZAIfdlsDwhRpsFtoZDunDLhMyFBG+AlypA1v0LCBWvJfOvxEQysf
-         nAKkA0M0noAXrGL3SJsJ5MUh0Mi8NrnWpgEQksgemj3iECDd+eKKe2kNEbGXWrpw4tJr
-         YGgBKrFxkmGycMQ2XKE4J5nWgXZeB/Ae9qm5aS360SCJIiy0vrCmEG+HiMQb04IRoWD/
-         C3CQ==
-X-Gm-Message-State: AOJu0YwGhr+4Zwrn+spjq6jLGYj9Ji94j6OAsbVEKbnqfNisdgOAoJcL
-	kmQmmF6/YxvfNp+dbRDLUAAmX0DqwENFnOvsmbxoJtOKRnc+SE4EZncJBKpZOrWe7gxXhSmVqXZ
-	tUROczUuH2AIrZbFvF6lbCKeGBE/SdUcrqW0OBA==
-X-Google-Smtp-Source: AGHT+IEqs2bNIvCzWVgomnMreMb0zjFg7P+zxxYTKm00L9KfymfIWV9u5SWsm3QuvME2u5gS+F7nU11SjJyZUsZhto0=
-X-Received: by 2002:a05:6122:1d16:b0:4b6:d4c2:61d3 with SMTP id
- gc22-20020a0561221d1600b004b6d4c261d3mr8184430vkb.0.1706864611683; Fri, 02
- Feb 2024 01:03:31 -0800 (PST)
+        bh=dROtYGaO3nv6BoiEV+4GwfEN1YhQwW+mG4GWEhZs0oA=;
+        b=VHRQvxs/jBffkB+7pPFNXYqBDK59YnXPo3nRq7D+a4BJHOlhEQA8DDCkjfQNYG4GEg
+         w6gb9O5mEjEk7kz/3g4HRdkVq6An6FPAyRcQgjQJ2XRYxmEb/gXZxXB7neViKrKVV+mI
+         EajJzqbNIRkSyDaFh3fUfpw92gkk39xkGj5MzN7o7odEn0o557QjEgJ5xuyraeqb5yp1
+         BRJn4XxWoixd0fM/v777z5WBYhgOZiojYICOmPEym/OT3ydOTZuoLOhN4duuHYR2xajj
+         Ki3WrkBs1S1Hjg6qbWvJhOihpstT8kX2l6zU328IDKaKrBhowSSB6cuZnHgCoWxT7qwL
+         YHgw==
+X-Gm-Message-State: AOJu0YyXuLfZp9ubdYsKRT4UTXdGOheUj6QC/AFUeJja8I53q2YDXYvp
+	W4fnem2G9uBqj8j1DllG/Cxhl53v8IIMcGxUdFAua+xpTipwnfPg4dM01uCOcInEoEFCB9LWl9z
+	9o3XCfbyqHQRKdBpIfi0FWH+K7OLpUT6l+Tk0Lw==
+X-Google-Smtp-Source: AGHT+IEggfox9TaYYkDnQjtRUkVx/JuLWurtpykmnrQAcWjFZM0K4sMwZm4WFlzv0kMWZ4fdz5ytS7lu2Zk7UijDVzk=
+X-Received: by 2002:a05:6122:4a06:b0:4c0:79e:6653 with SMTP id
+ ez6-20020a0561224a0600b004c0079e6653mr3051788vkb.0.1706865113872; Fri, 02 Feb
+ 2024 01:11:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240201155532.49707-1-brgl@bgdev.pl> <20240201155532.49707-7-brgl@bgdev.pl>
- <4epbzsmxj2gfvjcufclfw7vnamr6hyeickrbyakibdtubwnefs@lkyt7mth43nq>
-In-Reply-To: <4epbzsmxj2gfvjcufclfw7vnamr6hyeickrbyakibdtubwnefs@lkyt7mth43nq>
+References: <20240201155532.49707-1-brgl@bgdev.pl> <20240201155532.49707-9-brgl@bgdev.pl>
+ <7tbhdkqpl4iuaxmc73pje2nbbkarxxpgmabc7j4q26d2rhzrv5@ltu6niel5eb4>
+In-Reply-To: <7tbhdkqpl4iuaxmc73pje2nbbkarxxpgmabc7j4q26d2rhzrv5@ltu6niel5eb4>
 From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Fri, 2 Feb 2024 10:03:19 +0100
-Message-ID: <CAMRc=Mdps2CccmoYM06W_iiNcw8QauEueGSWZOEvD5P8PFgLVQ@mail.gmail.com>
-Subject: Re: [RFC 6/9] PCI: create platform devices for child OF nodes of the
- port node
+Date: Fri, 2 Feb 2024 10:11:42 +0100
+Message-ID: <CAMRc=Md1oTrVMjZRH+Ux3JJKYeficKMYh+8V7ZA=Xz_X1hNd1g@mail.gmail.com>
+Subject: Re: [RFC 8/9] PCI/pwrctl: add PCI power control core code
 To: Bjorn Andersson <andersson@kernel.org>
 Cc: Konrad Dybcio <konrad.dybcio@linaro.org>, Rob Herring <robh@kernel.org>, 
 	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
@@ -78,114 +77,75 @@ Cc: Konrad Dybcio <konrad.dybcio@linaro.org>, Rob Herring <robh@kernel.org>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 2, 2024 at 3:59=E2=80=AFAM Bjorn Andersson <andersson@kernel.or=
+On Fri, Feb 2, 2024 at 4:53=E2=80=AFAM Bjorn Andersson <andersson@kernel.or=
 g> wrote:
 >
-> On Thu, Feb 01, 2024 at 04:55:29PM +0100, Bartosz Golaszewski wrote:
-> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> >
-> > In order to introduce PCI power-sequencing,
+
+[snip]
+
+> > +
+> > +static int pci_pwrctl_notify(struct notifier_block *nb, unsigned long =
+action,
+> > +                          void *data)
+> > +{
+> > +     struct pci_pwrctl *pwrctl =3D container_of(nb, struct pci_pwrctl,=
+ nb);
+> > +     struct device *dev =3D data;
+> > +
+> > +     if (dev_fwnode(dev) !=3D dev_fwnode(pwrctl->dev))
+> > +             return NOTIFY_DONE;
+> > +
+> > +     switch (action) {
+> > +     case BUS_NOTIFY_ADD_DEVICE:
+> > +             device_set_of_node_from_dev(dev, pwrctl->dev);
 >
-> Please provide a proper problem description.
+> What happens if the bootloader left the power on, and the
+> of_platform_populate() got probe deferred because the pwrseq wasn't
+> ready, so this happens after pci_set_of_node() has been called?
 >
-> > we need to create platform
+> (I think dev->of_node will be put, then get and then node_reused
+> assigned...but I'm not entirely sure)
+
+That's exactly what will happen and the end result will be the same.
+
 >
-> And properly express why this is a "need".
+> > +             break;
+> > +     case BUS_NOTIFY_BOUND_DRIVER:
+> > +             pwrctl->link =3D device_link_add(dev, pwrctl->dev,
+> > +                                            DL_FLAG_AUTOREMOVE_CONSUME=
+R);
+> > +             if (!pwrctl->link)
+> > +                     dev_err(pwrctl->dev, "Failed to add device link\n=
+");
+> > +             break;
+> > +     case BUS_NOTIFY_UNBOUND_DRIVER:
+> > +             device_link_del(pwrctl->link);
 >
-> > devices for child nodes of the port node. They will get matched against
-> > the pwrseq drivers
+> This might however become a NULL-pointer dereference, if dev was bound
+> to its driver before the pci_pwrctl_notify() was registered for the
+> pwrctl and then the PCI device is unbound.
 >
-> That's not what happens in your code, the child nodes of the bridge node
-> in DeviceTree will match against arbitrary platform_drivers.
->
-> I also would like this commit message to express that the job of the
-> matched device is to:
->
-> 1) power up said device, followed by triggering a scan on the parent PCI
-> bus during it's probe function.
->
-> 2)  power down said device, during its remove function.
->
-> > (if one exists) and then the actual PCI device will
-> > reuse the node once it's detected on the bus.
->
-> I think the "reuse" deserves to be clarified as there will be both a pci
-> and a platform device associated with the same of_node.
+> This would also happen if device_link_add() failed when the PCI device
+> was bound...
 >
 
-Noted all of the above. Thanks!
+Yes, I'll address it.
 
-> >
-> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> > ---
-> >  drivers/pci/bus.c    | 9 ++++++++-
-> >  drivers/pci/remove.c | 2 ++
-> >  2 files changed, 10 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/pci/bus.c b/drivers/pci/bus.c
-> > index 826b5016a101..17ab41094c4e 100644
-> > --- a/drivers/pci/bus.c
-> > +++ b/drivers/pci/bus.c
-> > @@ -12,6 +12,7 @@
-> >  #include <linux/errno.h>
-> >  #include <linux/ioport.h>
-> >  #include <linux/of.h>
-> > +#include <linux/of_platform.h>
-> >  #include <linux/proc_fs.h>
-> >  #include <linux/slab.h>
-> >
-> > @@ -342,8 +343,14 @@ void pci_bus_add_device(struct pci_dev *dev)
-> >        */
-> >       pcibios_bus_add_device(dev);
-> >       pci_fixup_device(pci_fixup_final, dev);
-> > -     if (pci_is_bridge(dev))
-> > +     if (pci_is_bridge(dev)) {
-> >               of_pci_make_dev_node(dev);
-> > +             retval =3D of_platform_populate(dev->dev.of_node, NULL, N=
-ULL,
-> > +                                           &dev->dev);
+> > +             break;
+> > +     }
+> > +
+> > +     return NOTIFY_DONE;
+> > +}
+> > +
+> > +int pci_pwrctl_device_enable(struct pci_pwrctl *pwrctl)
 >
-> I'm not familiar enough with the ins and outs of the PCI code. Can you
-> confirm that there are no problems with this (possibly) calling
-> pci_rescan_bus() before the bridge device is fully initialized below?
+> This function doesn't really "enable the device", looking at the example
+> driver it's rather "device_enabled" than "device_enable"...
 >
 
-I'll clarify that. I'm not that well versed with PCI code either but
-will get help from the right people.
+I was also thinking about pci_pwrctl_device_ready() or
+pci_pwrctl_device_prepared().
 
 Bart
 
-> Regards,
-> Bjorn
->
-> > +             if (retval)
-> > +                     pci_err(dev, "failed to populate child OF nodes (=
-%d)\n",
-> > +                             retval);
-> > +     }
-> >       pci_create_sysfs_dev_files(dev);
-> >       pci_proc_attach_device(dev);
-> >       pci_bridge_d3_update(dev);
-> > diff --git a/drivers/pci/remove.c b/drivers/pci/remove.c
-> > index d749ea8250d6..fc9db2805888 100644
-> > --- a/drivers/pci/remove.c
-> > +++ b/drivers/pci/remove.c
-> > @@ -1,6 +1,7 @@
-> >  // SPDX-License-Identifier: GPL-2.0
-> >  #include <linux/pci.h>
-> >  #include <linux/module.h>
-> > +#include <linux/of_platform.h>
-> >  #include "pci.h"
-> >
-> >  static void pci_free_resources(struct pci_dev *dev)
-> > @@ -22,6 +23,7 @@ static void pci_stop_dev(struct pci_dev *dev)
-> >               device_release_driver(&dev->dev);
-> >               pci_proc_detach_device(dev);
-> >               pci_remove_sysfs_dev_files(dev);
-> > +             of_platform_depopulate(&dev->dev);
-> >               of_pci_remove_node(dev);
-> >
-> >               pci_dev_assign_added(dev, false);
-> > --
-> > 2.40.1
-> >
+[snip!]
