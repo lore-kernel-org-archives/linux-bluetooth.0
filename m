@@ -1,67 +1,68 @@
-Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
+Received: from mail-ua1-f46.google.com (mail-ua1-f46.google.com [209.85.222.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15DD0762F3
-	for <linux-bluetooth@vger.kernel.org>; Fri,  2 Feb 2024 09:11:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCEA25253
+	for <linux-bluetooth@vger.kernel.org>; Fri,  2 Feb 2024 13:06:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706865116; cv=none; b=TiH15MhfwsFeVZaVthC2L38E15vP0Pu+t5qzm+hxRCbfXhcsZM13ksAzYFe9413+7pIJuFPfifXvAd6P0YnzvJOGv+eW+s5nZpzHGKwM/88b4ucDvQRaPNPx3YaG0HLOdwZ5MVcZvSFneuMfp+RM3g7DR46j9svK7Wu9Rham8dc=
+	t=1706879173; cv=none; b=q8x3GyTTkNZarMru2Flz04p6HRcKdvAl6utsT6nmKrctPzv5uB79+e1UX5P1tbnQWttjo3cQSP0IH2vccu8rvmP5+M8qvZlEWf2x+FflwgBxfLfJl76vvbxuYZj/uyDYET7PvMZVzdcJJfCjRJmfawWiy99+5NqtoqGdsEGyCc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706865116; c=relaxed/simple;
-	bh=qSQ+bNWGVvEkBLVF3tPN3A8E/f85Onwr28touQiCfuI=;
+	s=arc-20240116; t=1706879173; c=relaxed/simple;
+	bh=0dxT2bZfqUTaN/pgDE3v3v3YQiHSfOH7dfGHB+kmRmg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UyvUPu0+c+B3coUVIccDMYfA7/iRC8EKik725g3FbIt8OyMMt4Lsjn7vo6F2LqAlKMsN9qZNmtBTUWKHmUiIZMi/x52slLZAUO7vDLSzOF6xBsxHp+ZfV5iZYJtWCLktFdUWp2lgdAeyiwlnL49i1vtoNZ/QJCmVzc7E98RQ4jY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=qNRU3N07; arc=none smtp.client-ip=209.85.222.45
+	 To:Cc:Content-Type; b=fajVcyodxUloeaWNdHe0NKdNvbEZ9eRXs2RTGFXlhx4fLjxkx7s34hByMwuIj5PnfQICuNPNegHoip0dM6h2EM4gOYvD7MDULfL++wLhN7XhinZ0SniVGVUOh7rLEZHpuYBUg3+hUtjKogHmW346arCw+xsN/GCGqhGbIW2NqKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=krb/jVRI; arc=none smtp.client-ip=209.85.222.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="qNRU3N07"
-Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-7ce55932330so788663241.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 02 Feb 2024 01:11:54 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="krb/jVRI"
+Received: by mail-ua1-f46.google.com with SMTP id a1e0cc1a2514c-7d5c25267deso879232241.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 02 Feb 2024 05:06:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1706865114; x=1707469914; darn=vger.kernel.org;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1706879170; x=1707483970; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dROtYGaO3nv6BoiEV+4GwfEN1YhQwW+mG4GWEhZs0oA=;
-        b=qNRU3N076BYgXMqQkhQfddl/4NkZpFFDsaGGcK/ix+mUG4MmsVnU6ljd0/G1aU3QZV
-         vsUplKmLQoESXc7xnRItWYEhMCSABpYrV+8tocoaP69e+gu96Rxp16X8FTBDxB/N49/x
-         COQ5ubbFbPjplDIIMXuCsNFyzrClbvZTTDbIatKPAE7itYTM0Xq9jC8ar4BBmlPgbExy
-         AYxUvkafBj4fWrv0I/3pmhj2GIKvDaeIQD0YDdNT9DJD2qoaLAzQsX5If4Ra8rkhkUN8
-         Py0FpZWIJzIDK9hH87DzjFBuC9fX3mQGcPqARQ1YptqnGtLXRjEoWiOZpMtQC7tEoWzI
-         Y7gw==
+        bh=0dxT2bZfqUTaN/pgDE3v3v3YQiHSfOH7dfGHB+kmRmg=;
+        b=krb/jVRIzFSy7rofP1kdGAN1lBPMRGaSy3yXvyAR8qAJ/pJXXQYkLdo5cHNuP3YK5H
+         qKJuQ17g0kaiEuTHn91wZRikrV//iD8lekH50jVs/Y0M67gX98Lg7rH1iU4mDLviBnp/
+         3e5Lboy0RHc+dsoVmTCnu2WnjyO3ZDwBel2VkFIAxdadWIfXaIUQd/y8YlCHnLhzYFhy
+         sWyE2JNnKhYvITTW5SIdCL+YNzjrxYT3omFkSW2gpcNjzuMjKGk7TpxhJOi82SC173+F
+         COLFkotOjz4hBAfxqwP7o2zfb7ukpqBYVMIrwia1EMAXrP6ZMGEUCEEhH4qgH/Gk3Dnc
+         wggQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706865114; x=1707469914;
+        d=1e100.net; s=20230601; t=1706879170; x=1707483970;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=dROtYGaO3nv6BoiEV+4GwfEN1YhQwW+mG4GWEhZs0oA=;
-        b=VHRQvxs/jBffkB+7pPFNXYqBDK59YnXPo3nRq7D+a4BJHOlhEQA8DDCkjfQNYG4GEg
-         w6gb9O5mEjEk7kz/3g4HRdkVq6An6FPAyRcQgjQJ2XRYxmEb/gXZxXB7neViKrKVV+mI
-         EajJzqbNIRkSyDaFh3fUfpw92gkk39xkGj5MzN7o7odEn0o557QjEgJ5xuyraeqb5yp1
-         BRJn4XxWoixd0fM/v777z5WBYhgOZiojYICOmPEym/OT3ydOTZuoLOhN4duuHYR2xajj
-         Ki3WrkBs1S1Hjg6qbWvJhOihpstT8kX2l6zU328IDKaKrBhowSSB6cuZnHgCoWxT7qwL
-         YHgw==
-X-Gm-Message-State: AOJu0YyXuLfZp9ubdYsKRT4UTXdGOheUj6QC/AFUeJja8I53q2YDXYvp
-	W4fnem2G9uBqj8j1DllG/Cxhl53v8IIMcGxUdFAua+xpTipwnfPg4dM01uCOcInEoEFCB9LWl9z
-	9o3XCfbyqHQRKdBpIfi0FWH+K7OLpUT6l+Tk0Lw==
-X-Google-Smtp-Source: AGHT+IEggfox9TaYYkDnQjtRUkVx/JuLWurtpykmnrQAcWjFZM0K4sMwZm4WFlzv0kMWZ4fdz5ytS7lu2Zk7UijDVzk=
-X-Received: by 2002:a05:6122:4a06:b0:4c0:79e:6653 with SMTP id
- ez6-20020a0561224a0600b004c0079e6653mr3051788vkb.0.1706865113872; Fri, 02 Feb
- 2024 01:11:53 -0800 (PST)
+        bh=0dxT2bZfqUTaN/pgDE3v3v3YQiHSfOH7dfGHB+kmRmg=;
+        b=Uo5EKZTsZQBRU5Z6V2iIdQlDDeADHlbDa38N8967GUJUPhlZMGBDQKm0dVq0563WrJ
+         GIVeIwjKTjECxEeAysnNhTDWjoTaysQGhgDCvQuEiX/qUo5GgOgVn5kP9xX7Q3n+6Ktm
+         ItlnE/df/bNnNn5DTElU1+zLGtnWzaRw4wTa4RUuzw0nmZDpqA+KwftH/bSBFSSN6qTJ
+         gav3Vo0BiVKIDHtq+PbuttGH/gFdNAy8WpDUwHW6nUhhlAXve6yxuUM4ncB/Jww1nHIp
+         045L5bqC/Ed76Ky6Sfcc+ZfrPYq4q1ivbH6QkvwIKlRgQPxbkKHNDWsJ5ZKmN1I6ilX8
+         etow==
+X-Gm-Message-State: AOJu0Yxi/x7vEC+4htyt0R2PgicQz3lv+Fs9V8XVgbg91V6cSU9gcwlh
+	HoYcud985UeGRyqZlx8a78bU089ZB2J5g6Hoi01j2vD9VwqGOsXtGpCONAXlAmggMNvXiaolE73
+	E8uEKxXu0RejirRm0j3nVb9+p3S2kqXQ87adkmQ==
+X-Google-Smtp-Source: AGHT+IEWSGGwOYOwE9UNS4a7/BGQ5J1Iy+sfg/cwAIy6czcrvkxuNiWzhaxMEH75CieiMzMPxqerQJsKsDuJ/9HoZ2E=
+X-Received: by 2002:a05:6122:3a05:b0:4bd:728b:c108 with SMTP id
+ fp5-20020a0561223a0500b004bd728bc108mr8581270vkb.8.1706879170735; Fri, 02 Feb
+ 2024 05:06:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240201155532.49707-1-brgl@bgdev.pl> <20240201155532.49707-9-brgl@bgdev.pl>
- <7tbhdkqpl4iuaxmc73pje2nbbkarxxpgmabc7j4q26d2rhzrv5@ltu6niel5eb4>
-In-Reply-To: <7tbhdkqpl4iuaxmc73pje2nbbkarxxpgmabc7j4q26d2rhzrv5@ltu6niel5eb4>
+References: <20240201155532.49707-1-brgl@bgdev.pl> <20240201155532.49707-10-brgl@bgdev.pl>
+ <jb4hzijjxjv4kiy3cn2fuc5ox4x5uutredbxiwo2fvnkh2xudf@5w65qtp35ase>
+In-Reply-To: <jb4hzijjxjv4kiy3cn2fuc5ox4x5uutredbxiwo2fvnkh2xudf@5w65qtp35ase>
 From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Fri, 2 Feb 2024 10:11:42 +0100
-Message-ID: <CAMRc=Md1oTrVMjZRH+Ux3JJKYeficKMYh+8V7ZA=Xz_X1hNd1g@mail.gmail.com>
-Subject: Re: [RFC 8/9] PCI/pwrctl: add PCI power control core code
+Date: Fri, 2 Feb 2024 14:05:59 +0100
+Message-ID: <CAMRc=MdQ_uRq7a24RYt=KRSff9sw_1soQ+8ONEpNXy0emk5ChQ@mail.gmail.com>
+Subject: Re: [RFC 9/9] PCI/pwrctl: add a PCI power control driver for power
+ sequenced devices
 To: Bjorn Andersson <andersson@kernel.org>
 Cc: Konrad Dybcio <konrad.dybcio@linaro.org>, Rob Herring <robh@kernel.org>, 
 	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
@@ -77,75 +78,56 @@ Cc: Konrad Dybcio <konrad.dybcio@linaro.org>, Rob Herring <robh@kernel.org>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 2, 2024 at 4:53=E2=80=AFAM Bjorn Andersson <andersson@kernel.or=
+On Fri, Feb 2, 2024 at 5:03=E2=80=AFAM Bjorn Andersson <andersson@kernel.or=
 g> wrote:
 >
-
-[snip]
-
-> > +
-> > +static int pci_pwrctl_notify(struct notifier_block *nb, unsigned long =
-action,
-> > +                          void *data)
-> > +{
-> > +     struct pci_pwrctl *pwrctl =3D container_of(nb, struct pci_pwrctl,=
- nb);
-> > +     struct device *dev =3D data;
-> > +
-> > +     if (dev_fwnode(dev) !=3D dev_fwnode(pwrctl->dev))
-> > +             return NOTIFY_DONE;
-> > +
-> > +     switch (action) {
-> > +     case BUS_NOTIFY_ADD_DEVICE:
-> > +             device_set_of_node_from_dev(dev, pwrctl->dev);
+> On Thu, Feb 01, 2024 at 04:55:32PM +0100, Bartosz Golaszewski wrote:
+> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> >
+> > Add a PCI power control driver that's capable of correctly powering up
+> > devices using the power sequencing subsystem. For now we support the
+> > ath11k module on QCA6390.
+> >
 >
-> What happens if the bootloader left the power on, and the
-> of_platform_populate() got probe deferred because the pwrseq wasn't
-> ready, so this happens after pci_set_of_node() has been called?
->
-> (I think dev->of_node will be put, then get and then node_reused
-> assigned...but I'm not entirely sure)
-
-That's exactly what will happen and the end result will be the same.
-
->
-> > +             break;
-> > +     case BUS_NOTIFY_BOUND_DRIVER:
-> > +             pwrctl->link =3D device_link_add(dev, pwrctl->dev,
-> > +                                            DL_FLAG_AUTOREMOVE_CONSUME=
-R);
-> > +             if (!pwrctl->link)
-> > +                     dev_err(pwrctl->dev, "Failed to add device link\n=
-");
-> > +             break;
-> > +     case BUS_NOTIFY_UNBOUND_DRIVER:
-> > +             device_link_del(pwrctl->link);
->
-> This might however become a NULL-pointer dereference, if dev was bound
-> to its driver before the pci_pwrctl_notify() was registered for the
-> pwrctl and then the PCI device is unbound.
->
-> This would also happen if device_link_add() failed when the PCI device
-> was bound...
+> For a PCI device which doesn't share resources with something on another
+> bus, the whole power sequencing would be implemented in a driver like
+> this - without the involvement of the power sequence framework.
 >
 
-Yes, I'll address it.
+Yes, this is what I did in the previous incarnation of this code[1].
 
-> > +             break;
-> > +     }
-> > +
-> > +     return NOTIFY_DONE;
-> > +}
-> > +
-> > +int pci_pwrctl_device_enable(struct pci_pwrctl *pwrctl)
->
-> This function doesn't really "enable the device", looking at the example
-> driver it's rather "device_enabled" than "device_enable"...
+(I know, I should have linked it here. My bad, I will do it next time).
+
+> I think it would be nice to see this series introduce a simple
+> pci_pwrctl driver, and then (in the same series) introduce the power
+> sequence framework and your PMU driver.
 >
 
-I was also thinking about pci_pwrctl_device_ready() or
-pci_pwrctl_device_prepared().
+I disagree. I was initially annoyed by Dmitry asking me to do a lot
+more work than anticipated but he's right after all. WLAN and BT
+consuming what is really the PMU's inputs is simply not the actual
+representation. That's why we should make it a pwrseq user IMO.
+
+> One case where such model would be appropriate is the XHCI controller
+> (uPD720201) on db845c. Today we describe vddpe-3p3-supply as a supply on
+> the PCI controller, but it should have been vdd33-supply, vdd10-supply,
+> avdd33-supply on the PCI device.
+
+Sounds like a good second user then!
+
+>
+> That would provide an example for how a simple PCI power control driver
+> can/should look like, and we can discuss the PCI pieces separate from
+> the introduction of the new power sequence framework (which is unrelated
+> to PCI).
+
+I agree it's unrelated and it could possibly go upstream separately
+but the particular use-case on RB5 (and other Qcom platforms) requires
+both the PCI and generic power sequencing to be addressed.
 
 Bart
 
-[snip!]
+[snip]
+
+[1] https://lore.kernel.org/netdev/20240117160748.37682-7-brgl@bgdev.pl/T/#=
+m72f52254a52fcb8a8a44de0702cad1087d4bcfa1
