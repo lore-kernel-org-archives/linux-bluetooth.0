@@ -1,183 +1,252 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2C21626;
-	Sat,  3 Feb 2024 00:39:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B881112E42
+	for <linux-bluetooth@vger.kernel.org>; Sat,  3 Feb 2024 21:47:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706920753; cv=none; b=f9qoLdSVEmSM/6wZKAirQZwy913MnaoaSMpfS7mI4D+f993gwlytnVmoZqfiM+Q7Q9kc2BJ5v01rY1+VEv1eWTaTICVxomaLqPXxp4agrJch0pWF3OGSnucyWLiB4p/ai0coZvDgivwcbS/GDcAXWjwmVuzomoNx9P8mw0wjEl8=
+	t=1706996861; cv=none; b=mABIng7srUComlRp2+Z42xPJ4bK2FzesJNYenweHh/sleG/DbbgyUuj4w1xwuowwro5AVoWChhbP0eHkwFhzCB1tRvs5zkdCOoeHHs3j90q19Ksj7PKQDJwQS2Nw0RIJaO61+mzl0DU4X6nqQw+TCoKCAdZDgghVg7VCuTqrJzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706920753; c=relaxed/simple;
-	bh=CDhdZtJRM4I5jnsGxAP6SnwAa6RKbZAw/Fvw+maWkNY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oZsMv/R99ejzo0C5FY3Ae0ct65PuS0zTUmVNfO69njqvum8FZB48090rtiYo+plCuxQbSlJ5dWw+PHRGAUK30e6kNg6ZnnhI72n4nXuIh1zLxgEtEiIB56/P3pyPVd6WYJFAKbnvaBgOsUcsepz+x9RGnn0LY8n/xt4qqvKS3wI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Srn9fory; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1706996861; c=relaxed/simple;
+	bh=6E1wnabBGrci2jDGxq1fnK7q/fN0g+dkajTfQz31NkA=;
+	h=Date:From:To:Cc:Subject:Message-ID; b=hLIqEMwlmAqD0ENYMeebDAo4hu/paXDrNH+oTYhIEONOISsOHGhRqSL6ZD0LwRm0BxQnZ9HpHwaDOQlHJm9JZcwyEfDWExqjitocOvSFscBZ/Mt7NA0LqlEGiL0Wya2JTWm0HQrF4bWWgeIfendka2xyO9saK1dNZQPDZGdznSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CrbE1pVy; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Srn9fory"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6031BC433C7;
-	Sat,  3 Feb 2024 00:39:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706920753;
-	bh=CDhdZtJRM4I5jnsGxAP6SnwAa6RKbZAw/Fvw+maWkNY=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=Srn9foryvIJS0xs4P8A+nbDK/UMUPIPdIrEvrTmEmvXmJGrCd4aROuFdXJG0C9EWi
-	 W7X2HidnRAH5brgcd/78Y7FReHPk2xqwF6bsm8yQ0CW8JEkIjn1K5c3uxgrgPiovmS
-	 H+If+q12AMFYoxWPEaC5/pmN3bWRCeGpQn2PAFeuJX8kJyD7fYNqrxlnwWnDHotdbr
-	 pS3GlimcfeApUKGAZeSCq7m+sRLk5PzlKBpTmd57B4xi7KKSqpayq4JcQG9FWORJEf
-	 qsv4UC4Js35rhLdxVUM6y0GvVHsP/PERKPxyLTL51zMmPCyb5FPxt6aJprlpYzWDAy
-	 Uf1XThzoYDL5Q==
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2d08d9b9667so2258931fa.1;
-        Fri, 02 Feb 2024 16:39:13 -0800 (PST)
-X-Gm-Message-State: AOJu0Yx4RjFYu4qjnpNBMGyK61WxGJqXhj1YB6chRa6DhIVd+y3utOMa
-	hUVT9w5g3dpFjHctG6QMidwAsHaR9X9VY6Gnns1IkzmtrXmg1AE3Hh7s+TRxMx0A5m1KdDyO8lx
-	bcIsC1pCUHdQIajDJd5P4ACGkbIs=
-X-Google-Smtp-Source: AGHT+IHa4ZO2VYWT1mFTKA5zcN1ID/fl9uj+ci0IbUmuSvFG2RP3o0Caq0GTCM9Bplwg/QtZJRfRCtjULrwGAZocaX8=
-X-Received: by 2002:a05:6512:313b:b0:511:4643:d913 with SMTP id
- p27-20020a056512313b00b005114643d913mr20056lfd.6.1706920751563; Fri, 02 Feb
- 2024 16:39:11 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CrbE1pVy"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706996860; x=1738532860;
+  h=date:from:to:cc:subject:message-id;
+  bh=6E1wnabBGrci2jDGxq1fnK7q/fN0g+dkajTfQz31NkA=;
+  b=CrbE1pVyw21v9jLg21YxVYSJmuglMnL5RlAwVCpRzZ/Vmi5GP1WCY/00
+   40JqCRr2jAXo/8ymzvGggbOqZf+5FTdYDASGpEHn0+zv7rNho3R/QATB/
+   0sAXneU2RMagWUxLzlgEpSRokYVzHqskRkjiMLNtLnAzavcbbPYYsPgi4
+   2a3kPP9d3lnYsXjcPST5lsyBTuhTRFo3BHZAUijTq5Fm0kmdtr86pz2hN
+   nBkovAO97c4X2slcYP3XQrcxzoSifBRKLpjLYxGhOnJBFTOx1peg/KZYL
+   p/6F4OGw858jXiB2T7F4h3fJ/vzSU+Yy4+Py95xdZVt62FhTpZ1G8kzRW
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10973"; a="17756608"
+X-IronPort-AV: E=Sophos;i="6.05,241,1701158400"; 
+   d="scan'208";a="17756608"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 13:47:39 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,241,1701158400"; 
+   d="scan'208";a="373633"
+Received: from lkp-server02.sh.intel.com (HELO 59f4f4cd5935) ([10.239.97.151])
+  by fmviesa009.fm.intel.com with ESMTP; 03 Feb 2024 13:47:38 -0800
+Received: from kbuild by 59f4f4cd5935 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rWNrL-0005e1-1H;
+	Sat, 03 Feb 2024 21:47:35 +0000
+Date: Sun, 04 Feb 2024 05:47:07 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ a93e9d51834e2cdfe357fcf875e895b3d2605f10
+Message-ID: <202402040504.9n2uCLX9-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240102124747.21644-1-hao.qin@mediatek.com> <20240102124747.21644-2-hao.qin@mediatek.com>
-In-Reply-To: <20240102124747.21644-2-hao.qin@mediatek.com>
-From: Sean Wang <sean.wang@kernel.org>
-Date: Fri, 2 Feb 2024 18:39:00 -0600
-X-Gmail-Original-Message-ID: <CAGp9LzqejefGFLpuntAghHUsA58mN_2EQqKynBC-JCYXAEUSZg@mail.gmail.com>
-Message-ID: <CAGp9LzqejefGFLpuntAghHUsA58mN_2EQqKynBC-JCYXAEUSZg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] Bluetooth: btusb: mediatek: add a recovery method
- for MT7922 and MT7925
-To: Hao Qin <hao.qin@mediatek.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	Luiz Von Dentz <luiz.dentz@gmail.com>, Sean Wang <sean.wang@mediatek.com>, 
-	Deren Wu <deren.Wu@mediatek.com>, Aaron Hou <aaron.hou@mediatek.com>, 
-	Chris Lu <chris.lu@mediatek.com>, Steve Lee <steve.lee@mediatek.com>, 
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>, 
-	linux-mediatek <linux-mediatek@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 2, 2024 at 6:49=E2=80=AFAM Hao Qin <hao.qin@mediatek.com> wrote=
-:
->
-> From: "hao.qin" <hao.qin@mediatek.com>
->
-> For MT7922 and MT7925, add USB reset retry to recover from patch
-> download failure, and perform a reset before patch download to
-> avoid unexpected problems caused by unkonwn status of dongle.
->
-> Signed-off-by: hao.qin <hao.qin@mediatek.com>
-> ---
->  drivers/bluetooth/btusb.c | 29 ++++++++++++++++++++++++-----
->  1 file changed, 24 insertions(+), 5 deletions(-)
->
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index abefcd1a089d..26ad4864d06c 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -3000,17 +3000,26 @@ static int btusb_mtk_subsys_reset(struct hci_dev =
-*hdev, u32 dev_id)
->         u32 val;
->         int err;
->
-> -       if (dev_id =3D=3D 0x7925) {
-> +       if (dev_id =3D=3D 0x7922) {
-> +               btusb_mtk_uhw_reg_read(data, MTK_BT_SUBSYS_RST, &val);
-> +               val |=3D 0x00002020;
-> +               btusb_mtk_uhw_reg_write(data, MTK_BT_SUBSYS_RST, val);
-> +               btusb_mtk_uhw_reg_write(data, MTK_EP_RST_OPT, 0x00010001)=
-;
-> +               btusb_mtk_uhw_reg_read(data, MTK_BT_SUBSYS_RST, &val);
-> +               val |=3D BIT(0);
-> +               btusb_mtk_uhw_reg_write(data, MTK_BT_SUBSYS_RST, val);
-> +               msleep(100);
-> +       } else if (dev_id =3D=3D 0x7925) {
->                 btusb_mtk_uhw_reg_read(data, MTK_BT_RESET_REG_CONNV3, &va=
-l);
-> -               val |=3D (1 << 5);
-> +               val |=3D BIT(5);
->                 btusb_mtk_uhw_reg_write(data, MTK_BT_RESET_REG_CONNV3, va=
-l);
->                 btusb_mtk_uhw_reg_read(data, MTK_BT_RESET_REG_CONNV3, &va=
-l);
->                 val &=3D 0xFFFF00FF;
-> -               val |=3D (1 << 13);
-> +               val |=3D BIT(13);
->                 btusb_mtk_uhw_reg_write(data, MTK_BT_RESET_REG_CONNV3, va=
-l);
->                 btusb_mtk_uhw_reg_write(data, MTK_EP_RST_OPT, 0x00010001)=
-;
->                 btusb_mtk_uhw_reg_read(data, MTK_BT_RESET_REG_CONNV3, &va=
-l);
-> -               val |=3D (1 << 0);
-> +               val |=3D BIT(0);
->                 btusb_mtk_uhw_reg_write(data, MTK_BT_RESET_REG_CONNV3, va=
-l);
->                 btusb_mtk_uhw_reg_write(data, MTK_UDMA_INT_STA_BT, 0x0000=
-00FF);
->                 btusb_mtk_uhw_reg_read(data, MTK_UDMA_INT_STA_BT, &val);
-> @@ -3040,6 +3049,9 @@ static int btusb_mtk_subsys_reset(struct hci_dev *h=
-dev, u32 dev_id)
->         if (err < 0)
->                 bt_dev_err(hdev, "Reset timeout");
->
-> +       if (dev_id =3D=3D 0x7922)
-> +               btusb_mtk_uhw_reg_write(data, MTK_UDMA_INT_STA_BT, 0x0000=
-00FF);
-> +
->         btusb_mtk_id_get(data, 0x70010200, &val);
->         if (!val)
->                 bt_dev_err(hdev, "Can't get device id, subsys reset fail.=
-");
-> @@ -3128,8 +3140,10 @@ static int btusb_mtk_setup(struct hci_dev *hdev)
->                 fwname =3D FIRMWARE_MT7668;
->                 break;
->         case 0x7922:
-> -       case 0x7961:
->         case 0x7925:
-> +               btusb_mtk_subsys_reset(hdev, dev_id);
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: a93e9d51834e2cdfe357fcf875e895b3d2605f10  Bluetooth: qca: Fix triggering coredump implementation
 
-Is there any reason we cannot perform a subsystem reset for 0x7961?
-I believe it would enhance robustness under any circumstance, such as
-cold reboot, warm reboot, or suspension,
-ensuring that the controller can be reset to its initial state
+elapsed time: 1452m
 
-> +               fallthrough;
-> +       case 0x7961:
->                 if (dev_id =3D=3D 0x7925)
->                         snprintf(fw_bin_name, sizeof(fw_bin_name),
->                                  "mediatek/mt%04x/BT_RAM_CODE_MT%04x_1_%x=
-_hdr.bin",
-> @@ -3143,6 +3157,11 @@ static int btusb_mtk_setup(struct hci_dev *hdev)
->                                                 btusb_mtk_hci_wmt_sync);
->                 if (err < 0) {
->                         bt_dev_err(hdev, "Failed to set up firmware (%d)"=
-, err);
-> +                       if (dev_id =3D=3D 0x7922 || dev_id =3D=3D 0x7925)=
- {
+configs tested: 179
+configs skipped: 3
 
-Similarly, is there any reason we cannot apply the same approach for
-mt7961? Using a less specific condition would reduce maintenance
-effort in the future.
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-> +                               btusb_stop_traffic(data);
-> +                               usb_kill_anchored_urbs(&data->tx_anchor);
-> +                               usb_queue_reset_device(data->intf);
+tested configs:
+alpha                             allnoconfig   gcc  
+alpha                            allyesconfig   gcc  
+alpha                               defconfig   gcc  
+arc                              allmodconfig   gcc  
+arc                               allnoconfig   gcc  
+arc                              allyesconfig   gcc  
+arc                                 defconfig   gcc  
+arc                   randconfig-001-20240203   gcc  
+arc                   randconfig-002-20240203   gcc  
+arm                              allmodconfig   gcc  
+arm                               allnoconfig   clang
+arm                              allyesconfig   gcc  
+arm                                 defconfig   clang
+arm                         lpc18xx_defconfig   clang
+arm                   milbeaut_m10v_defconfig   clang
+arm                       multi_v4t_defconfig   clang
+arm                   randconfig-001-20240203   clang
+arm                   randconfig-002-20240203   clang
+arm                   randconfig-003-20240203   gcc  
+arm                   randconfig-004-20240203   clang
+arm64                            allmodconfig   clang
+arm64                             allnoconfig   gcc  
+arm64                               defconfig   gcc  
+arm64                 randconfig-001-20240203   clang
+arm64                 randconfig-002-20240203   clang
+arm64                 randconfig-003-20240203   gcc  
+arm64                 randconfig-004-20240203   gcc  
+csky                             allmodconfig   gcc  
+csky                              allnoconfig   gcc  
+csky                             allyesconfig   gcc  
+csky                                defconfig   gcc  
+csky                  randconfig-001-20240203   gcc  
+csky                  randconfig-002-20240203   gcc  
+hexagon                          allmodconfig   clang
+hexagon                           allnoconfig   clang
+hexagon                          allyesconfig   clang
+hexagon                             defconfig   clang
+hexagon               randconfig-001-20240203   clang
+hexagon               randconfig-002-20240203   clang
+i386                             allmodconfig   gcc  
+i386                              allnoconfig   gcc  
+i386                             allyesconfig   gcc  
+i386         buildonly-randconfig-001-20240203   clang
+i386         buildonly-randconfig-002-20240203   gcc  
+i386         buildonly-randconfig-003-20240203   clang
+i386         buildonly-randconfig-004-20240203   clang
+i386         buildonly-randconfig-005-20240203   clang
+i386         buildonly-randconfig-006-20240203   gcc  
+i386                                defconfig   clang
+i386                  randconfig-001-20240203   clang
+i386                  randconfig-002-20240203   gcc  
+i386                  randconfig-003-20240203   clang
+i386                  randconfig-004-20240203   gcc  
+i386                  randconfig-005-20240203   clang
+i386                  randconfig-006-20240203   gcc  
+i386                  randconfig-011-20240203   clang
+i386                  randconfig-012-20240203   gcc  
+i386                  randconfig-013-20240203   gcc  
+i386                  randconfig-014-20240203   gcc  
+i386                  randconfig-015-20240203   gcc  
+i386                  randconfig-016-20240203   gcc  
+loongarch                        allmodconfig   gcc  
+loongarch                         allnoconfig   gcc  
+loongarch                           defconfig   gcc  
+loongarch             randconfig-001-20240203   gcc  
+loongarch             randconfig-002-20240203   gcc  
+m68k                             allmodconfig   gcc  
+m68k                              allnoconfig   gcc  
+m68k                             allyesconfig   gcc  
+m68k                          amiga_defconfig   gcc  
+m68k                                defconfig   gcc  
+m68k                            mac_defconfig   gcc  
+m68k                        mvme16x_defconfig   gcc  
+microblaze                       allmodconfig   gcc  
+microblaze                        allnoconfig   gcc  
+microblaze                       allyesconfig   gcc  
+microblaze                          defconfig   gcc  
+mips                              allnoconfig   gcc  
+mips                             allyesconfig   gcc  
+mips                       lemote2f_defconfig   gcc  
+mips                     loongson1c_defconfig   gcc  
+mips                     loongson2k_defconfig   gcc  
+nios2                         3c120_defconfig   gcc  
+nios2                            allmodconfig   gcc  
+nios2                             allnoconfig   gcc  
+nios2                            allyesconfig   gcc  
+nios2                               defconfig   gcc  
+nios2                 randconfig-001-20240203   gcc  
+nios2                 randconfig-002-20240203   gcc  
+openrisc                          allnoconfig   gcc  
+openrisc                         allyesconfig   gcc  
+openrisc                            defconfig   gcc  
+parisc                           allmodconfig   gcc  
+parisc                            allnoconfig   gcc  
+parisc                           allyesconfig   gcc  
+parisc                              defconfig   gcc  
+parisc                randconfig-001-20240203   gcc  
+parisc                randconfig-002-20240203   gcc  
+parisc64                            defconfig   gcc  
+powerpc                     akebono_defconfig   clang
+powerpc                          allmodconfig   gcc  
+powerpc                           allnoconfig   gcc  
+powerpc                          allyesconfig   clang
+powerpc                     asp8347_defconfig   clang
+powerpc                 canyonlands_defconfig   clang
+powerpc               mpc834x_itxgp_defconfig   clang
+powerpc               randconfig-001-20240203   clang
+powerpc               randconfig-002-20240203   clang
+powerpc               randconfig-003-20240203   clang
+powerpc64             randconfig-001-20240203   clang
+powerpc64             randconfig-002-20240203   gcc  
+powerpc64             randconfig-003-20240203   clang
+riscv                            allmodconfig   clang
+riscv                             allnoconfig   gcc  
+riscv                            allyesconfig   clang
+riscv                               defconfig   clang
+riscv                 randconfig-001-20240203   clang
+riscv                 randconfig-002-20240203   clang
+s390                             allmodconfig   clang
+s390                              allnoconfig   clang
+s390                             allyesconfig   gcc  
+s390                                defconfig   clang
+s390                  randconfig-001-20240203   gcc  
+s390                  randconfig-002-20240203   clang
+sh                               allmodconfig   gcc  
+sh                                allnoconfig   gcc  
+sh                               allyesconfig   gcc  
+sh                                  defconfig   gcc  
+sh                    randconfig-001-20240203   gcc  
+sh                    randconfig-002-20240203   gcc  
+sh                           se7712_defconfig   gcc  
+sh                           se7722_defconfig   gcc  
+sparc                            allmodconfig   gcc  
+sparc                             allnoconfig   gcc  
+sparc                               defconfig   gcc  
+sparc64                          allmodconfig   gcc  
+sparc64                          allyesconfig   gcc  
+sparc64                             defconfig   gcc  
+sparc64               randconfig-001-20240203   gcc  
+sparc64               randconfig-002-20240203   gcc  
+um                               allmodconfig   clang
+um                                allnoconfig   clang
+um                               allyesconfig   gcc  
+um                                  defconfig   clang
+um                    randconfig-001-20240203   clang
+um                    randconfig-002-20240203   clang
+um                           x86_64_defconfig   clang
+x86_64                            allnoconfig   clang
+x86_64                           allyesconfig   clang
+x86_64       buildonly-randconfig-001-20240203   gcc  
+x86_64       buildonly-randconfig-002-20240203   gcc  
+x86_64       buildonly-randconfig-003-20240203   gcc  
+x86_64       buildonly-randconfig-004-20240203   gcc  
+x86_64       buildonly-randconfig-005-20240203   gcc  
+x86_64       buildonly-randconfig-006-20240203   gcc  
+x86_64                              defconfig   gcc  
+x86_64                randconfig-001-20240203   gcc  
+x86_64                randconfig-002-20240203   gcc  
+x86_64                randconfig-003-20240203   clang
+x86_64                randconfig-004-20240203   gcc  
+x86_64                randconfig-005-20240203   gcc  
+x86_64                randconfig-006-20240203   gcc  
+x86_64                randconfig-011-20240203   gcc  
+x86_64                randconfig-012-20240203   gcc  
+x86_64                randconfig-013-20240203   clang
+x86_64                randconfig-014-20240203   clang
+x86_64                randconfig-015-20240203   clang
+x86_64                randconfig-016-20240203   clang
+x86_64                randconfig-071-20240203   clang
+x86_64                randconfig-072-20240203   gcc  
+x86_64                randconfig-073-20240203   clang
+x86_64                randconfig-074-20240203   clang
+x86_64                randconfig-075-20240203   clang
+x86_64                randconfig-076-20240203   clang
+x86_64                          rhel-8.3-rust   clang
+xtensa                            allnoconfig   gcc  
+xtensa                  nommu_kc705_defconfig   gcc  
+xtensa                randconfig-001-20240203   gcc  
+xtensa                randconfig-002-20240203   gcc  
 
-If an error occurs during firmware download, I guess we can
-subsequently attempt to download the firmware again through several
-retries.
-This helps the controller to autonomously recover from any potential
-errors and ensure we can complete the initialization process.
-
-> +                       }
->                         return err;
->                 }
->
-> --
-> 2.18.0
->
->
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
