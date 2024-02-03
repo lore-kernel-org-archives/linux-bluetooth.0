@@ -1,281 +1,168 @@
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EAE78061F
-	for <linux-bluetooth@vger.kernel.org>; Fri,  2 Feb 2024 21:57:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1194F625;
+	Sat,  3 Feb 2024 00:29:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706911030; cv=none; b=OKad0DTFXXaOJft3wL1KpqHrAp8G1YX5ib7IrwmcVcjpFaKi4hhHbZUPB18KM+xyk6T7suemvMIKTgCkdCCPLeYCUAGsy5xCbiv6URElzxy27j7faxyTW7B8C4JugFMWF8n9R3d7Wvrr38nKxLQQtx4Ppo6Kq9WSw9m39dIVzuM=
+	t=1706920150; cv=none; b=GrYTu0r5yTsR3sWnRx1fCRcoNuAGd9GI+Oz/pxhEvBh4jmjCNXylybpw3IHU+w0xLT5TcuQMNF73FBurXQAY5tihUrqZV1yAIjShESH6EJk8eXRPMfI1rIU13LHOtNcXZdREe/iS46VsuJ2nq+WMoTpCodztwALalCl3fVOVuUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706911030; c=relaxed/simple;
-	bh=d+8ICi3awg2LHgl++ekUDIHYop7eRcwygBDEmy/W0WQ=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=a39NrJy+MaLuvHb2CNMmbHH1+Y9chC6DWzlwu6qeqVLrDg4EU0rrlYkmAQWgwPdiFiFwIshYnhD1gmvRN7EvL9Ab8CzJT/yjWm407+92ympMFK6Q8HJ9P/DTB7eL4HMA/wIib/1/gXapvIgq2njW8MetBOjgbLZ0CPyEiQBHpn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VUMkDuVb; arc=none smtp.client-ip=209.85.222.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1706920150; c=relaxed/simple;
+	bh=9TtDN1r4VnqbVkMbIdvO5V9mK3wtnObkCogkcygbwo4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uSP13Hbgl36PQlfqk1LTqPDOJ0HHbO6lKbn/dxURimCT32P7G6B1EbNCDpK7ffoM6SVXidqEswqu9+Cnpq0XH3LmmT9MieU/41Sp+3qkL7M0GGzCX4r4CD4XDjO4PBvPYbqLKT51uhwzGdBXuU30RrG5LyszfF/hi9YRHAf8F/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fkJShWdw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VUMkDuVb"
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-783dc658bd9so142955185a.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 02 Feb 2024 13:57:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706911027; x=1707515827; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=TkGOQqQaf9zdXExL4qfKFIIzfWZ3i6rReaQ3WiXm5O0=;
-        b=VUMkDuVb0mkBmW3mhA4fYJMV7UAGgzxySMwlltDvf214/FZlPZcAw7SPEHh11/EKTM
-         PklNBzdi+jsVNxIiiu2u1WqH+WncudOrFAMGVy5dxH/fOV5Bre5Tm+eE3ef39cb8fKSU
-         LlzD6aRbtSLHSQIyYbG+q88EX/pBEx2oVU339GbI+9JPt8A60uNNV5HVo5zpxYPfK8ua
-         8ST4VTXms+s1/FzY38N7eCtglb58wtySTXPnItXMZ+2OTaFWkZMfPWAnZyy2Y2a631kh
-         sK1xSt2cS8NVMsLJRdfxaT1GM8m1yOjVXM2Ou+ZEDKmR9AoEB3etP3m+N6eGGGn8ivcI
-         FBow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706911027; x=1707515827;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TkGOQqQaf9zdXExL4qfKFIIzfWZ3i6rReaQ3WiXm5O0=;
-        b=GasBOKFogV1RPBSHhqpiI8TP0eOsKZ9t5wOuLDzfaioSUMLlYyuubuV0LnoEZb+Rkt
-         HlJp8O0Muek5loZ7QewRsJZCLgAyIBLo5XeVggtZ8npFt0616UNiErgaIulR4KCdHVEp
-         4BIZVZwBDAbwOv0t6h8swVOU0gt+jqyF1X48mNnJWCIPHEgzF8/MoiZ7AuZfou5SEMpm
-         k+1Kn01UrBae0oh/BeBATwMsjJhV+HGQO8yL6RbHdqXaa0Ocj247GSIRuzX0Kts/oHkf
-         QSUZ2Ww15/lnlj+i3XBGdxyJa4v4IoVDW/FZK1+m/XFZ1H0tlYFw7wgiL0BgqqK9Eyh2
-         y1AQ==
-X-Gm-Message-State: AOJu0YwSvInMGX34w0eLP8c4WHm6bMM55s84qu1LtTlN8jqyN468CbKk
-	fbYJgG+c0WRjFEyhjmY5NyYTSDsWiJt8+ZZynvTMoYcJMYZjfgVcJ8XcqRpDDU0=
-X-Google-Smtp-Source: AGHT+IHNWqWpvKT1SOfNKYAYmXfItGgn8lRHEt5qPJDPbrMmmdyv829IP/lC7cgdrPBKaTFEi0eE0Q==
-X-Received: by 2002:a05:620a:4094:b0:785:4ece:6a10 with SMTP id f20-20020a05620a409400b007854ece6a10mr6794506qko.33.1706911026894;
-        Fri, 02 Feb 2024 13:57:06 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCU4fN/elUvp5DvdvxhcMRskE9jcIiFS4nmv/EbBU2L41zHDtTw1bcASC8qV5Xrg5dbXbL7i1ylRILSE2brZ
-Received: from [172.17.0.2] ([20.55.222.98])
-        by smtp.gmail.com with ESMTPSA id g4-20020a37e204000000b00783f534706esm998966qki.61.2024.02.02.13.57.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Feb 2024 13:57:06 -0800 (PST)
-Message-ID: <65bd6532.370a0220.7db80.6afd@mx.google.com>
-Date: Fri, 02 Feb 2024 13:57:06 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1776985525967227378=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fkJShWdw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94F22C43330;
+	Sat,  3 Feb 2024 00:29:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706920149;
+	bh=9TtDN1r4VnqbVkMbIdvO5V9mK3wtnObkCogkcygbwo4=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=fkJShWdwEJvycdkTp0BR6okr208Rn+CRxEsYXN8dp8LGq20F5iMEMPf/LKG2rRSwU
+	 i86MAVC9Lg8lRpv87YNIHKkgSFn/WtbEVpDSLSVunszCH04cXeKk8NmmcTPvxyIUC4
+	 SBwOAug5vdJuF1W8jHSw3tCnThvEGK+4N/4r+FYRiYQkooe9ONd8axRsCk1cxmxgyS
+	 hg6wJnx7rYERvEeAvVQNHQ4WWTw899IsHWvCJQyJv5sKNmh0efJ/DFNc/vQmoKOCl4
+	 kT1uMjkJj1VHspspmatx/LYjW1DoPQn+CHWTbs2PAMgZAPRiAqPBETVlrZlNIerMmQ
+	 nM9+l0OcDUf+A==
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a352d9c0f9dso77298466b.0;
+        Fri, 02 Feb 2024 16:29:09 -0800 (PST)
+X-Gm-Message-State: AOJu0YwxFK22Xe5RRetNoLp+RyBph1rVUBUHOIJaSAAwVSrN0vsy9b3b
+	j8/MJcYvQnjPGrSI5qF2pdPo3s0FBZBRcKIYt5eDaIl9s/wK2XeKOHnKvOSktyta477aUxiYUaH
+	h49QYFrdCnyuxSgwOkv6w7xYV85I=
+X-Google-Smtp-Source: AGHT+IFZ3ZGMvuqs3thX1yxw7hTJ2qyHWlAIiaxSWDC0fd6vOK5H12/qSr7bNlL3hDdiX5obbzjZ0yxKiPDlE9ehK0A=
+X-Received: by 2002:a17:906:3c02:b0:a36:95cd:5e62 with SMTP id
+ h2-20020a1709063c0200b00a3695cd5e62mr4340840ejg.7.1706920147920; Fri, 02 Feb
+ 2024 16:29:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, brgl@bgdev.pl
-Subject: RE: power: sequencing: implement the subsystem and add first users
-In-Reply-To: <20240201155532.49707-2-brgl@bgdev.pl>
-References: <20240201155532.49707-2-brgl@bgdev.pl>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20240102124747.21644-1-hao.qin@mediatek.com>
+In-Reply-To: <20240102124747.21644-1-hao.qin@mediatek.com>
+From: Sean Wang <sean.wang@kernel.org>
+Date: Fri, 2 Feb 2024 18:28:56 -0600
+X-Gmail-Original-Message-ID: <CAGp9LzpuLr4vKGSfBoCdES9kKyduADw+2DZp8aZqbR78S_sOuQ@mail.gmail.com>
+Message-ID: <CAGp9LzpuLr4vKGSfBoCdES9kKyduADw+2DZp8aZqbR78S_sOuQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] Bluetooth: btusb: mediatek: refactor
+ btusb_mtk_reset function
+To: Hao Qin <hao.qin@mediatek.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Luiz Von Dentz <luiz.dentz@gmail.com>, Sean Wang <sean.wang@mediatek.com>, 
+	Deren Wu <deren.Wu@mediatek.com>, Aaron Hou <aaron.hou@mediatek.com>, 
+	Chris Lu <chris.lu@mediatek.com>, Steve Lee <steve.lee@mediatek.com>, 
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	linux-mediatek <linux-mediatek@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============1776985525967227378==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Tue, Jan 2, 2024 at 6:49=E2=80=AFAM Hao Qin <hao.qin@mediatek.com> wrote=
+:
+>
+> From: "hao.qin" <hao.qin@mediatek.com>
+>
+> Extract function btusb_mtk_subsys_reset from btusb_mtk_reset
+> for future handling of resetting bluetooth controller without
+> USB reset.
+>
+> Signed-off-by: hao.qin <hao.qin@mediatek.com>
+>
 
-This is automated email and please do not reply to this email!
+The patch doesn't modify any logic; it simply divides the existing
+logic into two parts,
+each prepared to be called in a specific context. Thus,  Acked-by:
+Sean Wang <sean.wang@kernel.org>
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=822186
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      11.15 seconds
-GitLint                       PASS      3.00 seconds
-SubjectPrefix                 FAIL      1.39 seconds
-BuildKernel                   PASS      27.79 seconds
-CheckAllWarning               PASS      30.75 seconds
-CheckSparse                   PASS      37.46 seconds
-CheckSmatch                   PASS      99.82 seconds
-BuildKernel32                 PASS      27.11 seconds
-TestRunnerSetup               PASS      499.56 seconds
-TestRunner_l2cap-tester       PASS      17.17 seconds
-TestRunner_iso-tester         PASS      28.35 seconds
-TestRunner_bnep-tester        PASS      4.85 seconds
-TestRunner_mgmt-tester        FAIL      106.30 seconds
-TestRunner_rfcomm-tester      PASS      7.42 seconds
-TestRunner_sco-tester         PASS      13.23 seconds
-TestRunner_ioctl-tester       PASS      7.87 seconds
-TestRunner_mesh-tester        PASS      5.92 seconds
-TestRunner_smp-tester         PASS      6.90 seconds
-TestRunner_userchan-tester    PASS      5.00 seconds
-IncrementalBuild              PASS      60.54 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[RFC,2/9] arm64: dts: qcom: qrb5165-rb5: model the PMU of the QCA6391
-WARNING: DT compatible string "qcom,qca6390-pmu" appears un-documented -- check ./Documentation/devicetree/bindings/
-#138: FILE: arch/arm64/boot/dts/qcom/qrb5165-rb5.dts:112:
-+		compatible = "qcom,qca6390-pmu";
-
-WARNING: DT compatible string "pci17cb,1101" appears un-documented -- check ./Documentation/devicetree/bindings/
-#227: FILE: arch/arm64/boot/dts/qcom/qrb5165-rb5.dts:820:
-+		compatible = "pci17cb,1101";
-
-WARNING: DT compatible string vendor "pci17cb" appears un-documented -- check ./Documentation/devicetree/bindings/vendor-prefixes.yaml
-#227: FILE: arch/arm64/boot/dts/qcom/qrb5165-rb5.dts:820:
-+		compatible = "pci17cb,1101";
-
-total: 0 errors, 3 warnings, 168 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13541336.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[RFC,3/9] power: sequencing: new subsystem
-WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-#158: 
-new file mode 100644
-
-WARNING: ENOSYS means 'invalid syscall nr' and nothing else
-#706: FILE: include/linux/pwrseq/consumer.h:28:
-+	return ERR_PTR(-ENOSYS);
-
-WARNING: ENOSYS means 'invalid syscall nr' and nothing else
-#716: FILE: include/linux/pwrseq/consumer.h:38:
-+	return ERR_PTR(-ENOSYS);
-
-WARNING: ENOSYS means 'invalid syscall nr' and nothing else
-#721: FILE: include/linux/pwrseq/consumer.h:43:
-+	return -ENOSYS;
-
-WARNING: ENOSYS means 'invalid syscall nr' and nothing else
-#726: FILE: include/linux/pwrseq/consumer.h:48:
-+	return -ENOSYS;
-
-total: 0 errors, 5 warnings, 600 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13541337.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[RFC,4/9] power: pwrseq: add a driver for the QCA6390 PMU module
-WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-#165: 
-new file mode 100644
-
-WARNING: DT compatible string "qcom,qca6390-pmu" appears un-documented -- check ./Documentation/devicetree/bindings/
-#383: FILE: drivers/power/sequencing/pwrseq-qca6390.c:214:
-+		.compatible = "qcom,qca6390-pmu",
-
-total: 0 errors, 2 warnings, 256 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13541338.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[RFC,8/9] PCI/pwrctl: add PCI power control core code
-WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-#170: 
-new file mode 100644
-
-total: 0 errors, 1 warnings, 130 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13541342.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[RFC,9/9] PCI/pwrctl: add a PCI power control driver for power sequenced devices
-WARNING: please write a help paragraph that fully describes the config symbol
-#139: FILE: drivers/pci/pwrctl/Kconfig:8:
-+config PCI_PWRCTL_PWRSEQ
-+	tristate "PCI Power Control driver using the Power Sequencing subsystem"
-+	select POWER_SEQUENCING
-+	select PCI_PWRCTL
-+	default m if (ATH11K_PCI && ARCH_QCOM)
-+	help
-+	  Enable support for the PCI power control driver for device
-+	  drivers using the Power Sequencing subsystem.
-+
-
-WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-#159: 
-new file mode 100644
-
-WARNING: DT compatible string "pci17cb,1101" appears un-documented -- check ./Documentation/devicetree/bindings/
-#229: FILE: drivers/pci/pwrctl/pci-pwrctl-pwrseq.c:66:
-+		.compatible = "pci17cb,1101",
-
-WARNING: DT compatible string vendor "pci17cb" appears un-documented -- check ./Documentation/devicetree/bindings/vendor-prefixes.yaml
-#229: FILE: drivers/pci/pwrctl/pci-pwrctl-pwrseq.c:66:
-+		.compatible = "pci17cb,1101",
-
-total: 0 errors, 4 warnings, 100 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13541343.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 497, Passed: 486 (97.8%), Failed: 5, Not Run: 6
-
-Failed Test Cases
-Read Ext Controller Info 1                           Failed       0.083 seconds
-Read Ext Controller Info 2                           Failed       0.089 seconds
-Read Ext Controller Info 3                           Failed       0.092 seconds
-Read Ext Controller Info 4                           Failed       0.085 seconds
-Read Ext Controller Info 5                           Failed       0.104 seconds
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============1776985525967227378==--
+> ---
+> V1 -> V2: refactor btusb_mtk_reset function
+>
+> Link:
+>   https://lore.kernel.org/all/20231215063714.7684-1-hao.qin@mediatek.com/
+> ---
+>  drivers/bluetooth/btusb.c | 45 +++++++++++++++++++++++----------------
+>  1 file changed, 27 insertions(+), 18 deletions(-)
+>
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 0926e4451802..abefcd1a089d 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -2994,28 +2994,13 @@ static u32 btusb_mtk_reset_done(struct hci_dev *h=
+dev)
+>         return val & MTK_BT_RST_DONE;
+>  }
+>
+> -static int btusb_mtk_reset(struct hci_dev *hdev, void *rst_data)
+> +static int btusb_mtk_subsys_reset(struct hci_dev *hdev, u32 dev_id)
+>  {
+>         struct btusb_data *data =3D hci_get_drvdata(hdev);
+> -       struct btmediatek_data *mediatek;
+>         u32 val;
+>         int err;
+>
+> -       /* It's MediaTek specific bluetooth reset mechanism via USB */
+> -       if (test_and_set_bit(BTUSB_HW_RESET_ACTIVE, &data->flags)) {
+> -               bt_dev_err(hdev, "last reset failed? Not resetting again"=
+);
+> -               return -EBUSY;
+> -       }
+> -
+> -       err =3D usb_autopm_get_interface(data->intf);
+> -       if (err < 0)
+> -               return err;
+> -
+> -       btusb_stop_traffic(data);
+> -       usb_kill_anchored_urbs(&data->tx_anchor);
+> -       mediatek =3D hci_get_priv(hdev);
+> -
+> -       if (mediatek->dev_id =3D=3D 0x7925) {
+> +       if (dev_id =3D=3D 0x7925) {
+>                 btusb_mtk_uhw_reg_read(data, MTK_BT_RESET_REG_CONNV3, &va=
+l);
+>                 val |=3D (1 << 5);
+>                 btusb_mtk_uhw_reg_write(data, MTK_BT_RESET_REG_CONNV3, va=
+l);
+> @@ -3059,8 +3044,32 @@ static int btusb_mtk_reset(struct hci_dev *hdev, v=
+oid *rst_data)
+>         if (!val)
+>                 bt_dev_err(hdev, "Can't get device id, subsys reset fail.=
+");
+>
+> -       usb_queue_reset_device(data->intf);
+> +       return err;
+> +}
+>
+> +static int btusb_mtk_reset(struct hci_dev *hdev, void *rst_data)
+> +{
+> +       struct btusb_data *data =3D hci_get_drvdata(hdev);
+> +       struct btmediatek_data *mediatek;
+> +       int err;
+> +
+> +       /* It's MediaTek specific bluetooth reset mechanism via USB */
+> +       if (test_and_set_bit(BTUSB_HW_RESET_ACTIVE, &data->flags)) {
+> +               bt_dev_err(hdev, "last reset failed? Not resetting again"=
+);
+> +               return -EBUSY;
+> +       }
+> +
+> +       err =3D usb_autopm_get_interface(data->intf);
+> +       if (err < 0)
+> +               return err;
+> +
+> +       btusb_stop_traffic(data);
+> +       usb_kill_anchored_urbs(&data->tx_anchor);
+> +       mediatek =3D hci_get_priv(hdev);
+> +
+> +       err =3D btusb_mtk_subsys_reset(hdev, mediatek->dev_id);
+> +
+> +       usb_queue_reset_device(data->intf);
+>         clear_bit(BTUSB_HW_RESET_ACTIVE, &data->flags);
+>
+>         return err;
+> --
+> 2.18.0
+>
+>
