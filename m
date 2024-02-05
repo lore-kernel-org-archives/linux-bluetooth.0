@@ -1,87 +1,184 @@
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E289A17748;
-	Mon,  5 Feb 2024 10:14:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 340D73B18D
+	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Feb 2024 15:31:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707128060; cv=none; b=kxIeNJbUhbOU2IJnWq9PADddfK8H4F47uf91AjVS6lJbsVe7FtmGqsrnoZpWonHIeupUBNtMsDr3txSbSDltqkP22D8iVv5aPoZlJtjwQLN/vx4nRfKck85++SKSU7kCeb1ewd80mLRDPiYHTKSrGCsC1LmDAnGfXddgYcDOs9Q=
+	t=1707147069; cv=none; b=flMbi/O3DRTic3m6WuhFqxlRzvlbFGVl97xBEj/sJHVC1AEmhBuX/YCPrYlOaTOvi7ZkIaJRCUFIEatrX5ndKM8rhWPZlebH+/gBRpuCuUSg5NsGReZqY+XXlIZzyz2HSo+dinC267h5U3SSeJH/qUFeJrD1wKZq9Uy3lRPxUB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707128060; c=relaxed/simple;
-	bh=h09XmzjAYrmpBl0iTXX+I7W1xNVXxPK2RnBfV9Jz0b8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=THb+ZIIP1Y+m8+ssuVm6S+YaHlAhF0derLLGUw0A0537ZL0lXM92VjnXhhRRHbEAsYhDw8fcc99pgKQ23kwhMf2blBo+TBkKeVefIqzQ1BAWkpMnaeF2Zg/lYLiDbhLTP6ZqSdxZ0yG2wgUlUZP/FaD1zYilobczf525JyplgHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1707147069; c=relaxed/simple;
+	bh=m4eGtCxdfhjPBwR7e3QJYNaubLBopgYaNk8cje+dCfw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=esDhXniqea8WA92dtmTc4+5Ccuaqv0CYNlxaTIdvz0GeL0cmgH1bvZYm5ywMIIrVA3J5spAdcczATh5LRfX4kfliN0IS1EOi3wCfnPoQDP6T8xbdM4PrxsHz8GrNYpSDsP51i3QgIs5QGEGWSuV7gzqGWjwVsB173tPtgsiH2sw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ERFq9PK/; arc=none smtp.client-ip=209.85.208.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-556c3f0d6c5so4725906a12.2;
-        Mon, 05 Feb 2024 02:14:18 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ERFq9PK/"
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2cf4fafa386so57602461fa.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 05 Feb 2024 07:31:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707147066; x=1707751866; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5e00uIeyI6OC8H73sn42u4p1ZeS1NP4/QwP/wv6XXEo=;
+        b=ERFq9PK/mP26/1vRch/nhZQ3rJcKpJNoKY36c9fIqF+O2S7bniHloYw39arruqbrpP
+         HIG0CaoNeyAZSUHPBLl3rQHcS6vBCMtpk68VZqDebRsdNIHn/1Bk4hfHydUGSOK2Va+F
+         kq9rfpSJ+8a6/hu4oyCkUnpXaHYvzqzZqJuPZrYhlgdCMJKtJP1A4pwvZa33HSUyCsyt
+         1yPU/AlImMRnDed0aQKVDsi0BWe0/O2TJCplQDxoayPOws1JJNiDry7X9JGgZFOgaXSy
+         +vjTCH4yAQ5ln0Er47GTA4gxoSlV7NTuQEE02DN8MbEvwNEjfpKWzLLJ4tcizYU4jc54
+         nq5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707128057; x=1707732857;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1707147066; x=1707751866;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=SSPKPWb2+X/fBYPYBCyjcjI4u65FLsU0K06sqValewc=;
-        b=piasBwFovWv7rTVqaTy7JzVGE14kd7fwBIstBzDLVl1TIrEHkWkN1+QHYNqoQVb2TH
-         mzC5cDECHXVswuH2QOGMeWhiw7PTOOkKsLkSet0xxuZrZjP+W8z+jGN2C3iLPXauYqhZ
-         /tmkqgcB1PFwsjzwM5yjli9R2XJzUrGZCtYKTUHNa60TPTXBXHcZwB+uH4v9zJUf/qUQ
-         6xqsuAeeR5LMxc9BMdwAb+foziBsWsyK0qAo3u0DH9jQuS92D43WMbxsY5TuzKeSwycO
-         7n+WZX2sgtT9v/t7+NVcWn07XpDz1Ag5f4sWz0mLNCy5YE7W3JzzTZN2TNBUuydZZJpt
-         XRAQ==
-X-Gm-Message-State: AOJu0YwFN72YtOeknixxm+DczeCwHcpKHTeEpKs3aQzIs5QFRIsLbf9a
-	u4K7/WR04kQDivWvYVBBfRHjJ4m68exuMRv+9I2xfN+XuxGOv+5abKf6DVQThC0=
-X-Google-Smtp-Source: AGHT+IHpSdEdJG+y6/RQl2v5HHUAg2S21JQgGwWx6JYCDZCHfsdugZu+Jyu7mIbS5ZeEu4Xvo53N+w==
-X-Received: by 2002:a17:906:f8cd:b0:a35:a71d:81fe with SMTP id lh13-20020a170906f8cd00b00a35a71d81femr8389492ejb.43.1707128057126;
-        Mon, 05 Feb 2024 02:14:17 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCXok/aJvnbl/8tGiGBS4afqslCcV0MduWxPL/Dil2nqyGXS4zoIeMwBP8NzrOqtEVNNn3/KPVQPgBDd089QS728HIBBJ+cjHYx+EShhWKu1QFKMNbqEO+ORcHo6O3HOLv96S3Ay+RHMUYcVkFbm16n84CXZt+6S/hr8BKF89fiV8ar6QytA/UxkXFLhpd9kY3A4MqVyEZBKftApslBYMXfDzaqWjVXIN2497IBuaNffIKFvm1cHqOiHyA0joX9SonRQkf249G/Nquf9EEpZyhCbWYVKCMPzKNR822R+VTiacYaZq9QZEUCdJ69QLFcuqzm/QyTHtib2V/Ub91BlBw==
-Received: from localhost (fwdproxy-lla-118.fbsv.net. [2a03:2880:30ff:76::face:b00c])
-        by smtp.gmail.com with ESMTPSA id x20-20020a170906135400b00a376804704asm2416875ejb.177.2024.02.05.02.14.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Feb 2024 02:14:16 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-To: kuba@kernel.org,
-	davem@davemloft.net,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	Alexander Aring <alex.aring@gmail.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	horms@kernel.org,
-	andrew@lunn.ch,
-	linux-bluetooth@vger.kernel.org (open list:6LOWPAN GENERIC (BTLE/IEEE 802.15.4)),
-	linux-wpan@vger.kernel.org (open list:6LOWPAN GENERIC (BTLE/IEEE 802.15.4))
-Subject: [PATCH net 04/10] net: fill in MODULE_DESCRIPTION()s for 6LoWPAN
-Date: Mon,  5 Feb 2024 02:13:53 -0800
-Message-Id: <20240205101400.1480521-5-leitao@debian.org>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20240205101400.1480521-1-leitao@debian.org>
-References: <20240205101400.1480521-1-leitao@debian.org>
+        bh=5e00uIeyI6OC8H73sn42u4p1ZeS1NP4/QwP/wv6XXEo=;
+        b=qnzQ1ri33V9kBPWIQBbK8hSJydGSJ1P4kbc/ZZajfMYNUqMg3/J6IaKtrFQLCalogR
+         dlP/FDMTRXsUTVhF6NkOWZg+TpTF0KEa7Ibp7dAT9Zh+Ov7Nv0pCL77TXqmPiZX1HnBj
+         9BmrNB7+6nDckP4HJsseCicGUDasbTCTGjPQRG+U/vtHJyyzB5cR96qd+GqUp7EaVkxr
+         7s/Xc09A28q8YaJZJWkJFoq2bnvvjXSeKKRxYVJP2LJ5X0zWC5nobeAwQQNr9yjFfTjR
+         oeZ8VmQsEOhps8VFfxEPHG0emsmkaOedGYZOVbgHeCyLD/P6u9gQi49HRaelg0oTX0X+
+         76hw==
+X-Gm-Message-State: AOJu0YxvROQRUIhmnN/c+BYpP+cyMK7ZVUJgM8MWllcmizLQWMDxXh9T
+	iAxBoVLpT2/u6Kj2S5GnvHAUCOQMFxkXWNUoGGaP0H1d7B6JzfIYv3nU7O9xOqEGbU+UNuJvG8p
+	o0dwbnCCy5xQFWzIoWq/71PXlKBswfANz
+X-Google-Smtp-Source: AGHT+IEXIhmXa3bqubRxEGq3I7/DQKGbN7gUnCAvb3Be4ino8c6UsOPoozQy/BgWGIEMiY4h3A5suajSyJLlU4qm6d0=
+X-Received: by 2002:a05:651c:32a:b0:2d0:a105:4937 with SMTP id
+ b10-20020a05651c032a00b002d0a1054937mr23875ljp.52.1707147065885; Mon, 05 Feb
+ 2024 07:31:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <b02d20dd168627b35016dfd0b56beb4a3a8755bd.1706904250.git.pav@iki.fi>
+In-Reply-To: <b02d20dd168627b35016dfd0b56beb4a3a8755bd.1706904250.git.pav@iki.fi>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 5 Feb 2024 10:30:53 -0500
+Message-ID: <CABBYNZ+yD=ba=Sv0YU+LMh7qxMijxSFVCdzW9qm=309P2ra7XQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] monitor: parse Google's Opus A2DP vendor codec capabilities
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
-Add descriptions to IPv6 over Low power Wireless Personal Area Network.
+Hi Pauli,
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- net/6lowpan/core.c | 1 +
- 1 file changed, 1 insertion(+)
+On Fri, Feb 2, 2024 at 3:08=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote:
+>
+> Support parsing Opus (Google) A2DP vendor codec capabilities.
 
-diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
-index 7b3341cef926..850d4a185f55 100644
---- a/net/6lowpan/core.c
-+++ b/net/6lowpan/core.c
-@@ -179,4 +179,5 @@ static void __exit lowpan_module_exit(void)
- module_init(lowpan_module_init);
- module_exit(lowpan_module_exit);
- 
-+MODULE_DESCRIPTION("IPv6 over Low-Power Wireless Personal Area Network core module");
- MODULE_LICENSE("GPL");
--- 
-2.39.3
+Add a sample output.
 
+> ---
+>  monitor/a2dp.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 44 insertions(+)
+>
+> diff --git a/monitor/a2dp.c b/monitor/a2dp.c
+> index f6e99ab26..d26b679bc 100644
+> --- a/monitor/a2dp.c
+> +++ b/monitor/a2dp.c
+> @@ -47,6 +47,8 @@
+>  #define APTX_HD_CODEC_ID       0x0024
+>  #define LDAC_VENDOR_ID         0x0000012d
+>  #define LDAC_CODEC_ID          0x00aa
+> +#define OPUS_G_VENDOR_ID       0x000000e0
+> +#define OPUS_G_CODEC_ID                0x0001
+
+Hmm, is this vendor-specific to Google? Don't we have it defined as an
+optional codec nowadays?
+
+
+>  struct bit_desc {
+>         uint8_t bit_num;
+> @@ -201,6 +203,24 @@ static const struct bit_desc faststream_source_frequ=
+ency_table[] =3D {
+>         { }
+>  };
+>
+> +static const struct bit_desc opus_g_frequency_table[] =3D {
+> +       {  7, "48000" },
+> +       { }
+> +};
+> +
+> +static const struct bit_desc opus_g_duration_table[] =3D {
+> +       {  3, "10 ms" },
+> +       {  4, "20 ms" },
+> +       { }
+> +};
+> +
+> +static const struct bit_desc opus_g_channels_table[] =3D {
+> +       {  0, "Mono" },
+> +       {  1, "Stereo" },
+> +       {  2, "Dual Mono" },
+> +       { }
+> +};
+> +
+>  static void print_value_bits(uint8_t indent, uint32_t value,
+>                                                 const struct bit_desc *ta=
+ble)
+>  {
+> @@ -244,6 +264,7 @@ static bool codec_vendor_aptx_ll_cfg(uint8_t losc, st=
+ruct l2cap_frame *frame);
+>  static bool codec_vendor_aptx_hd_cap(uint8_t losc, struct l2cap_frame *f=
+rame);
+>  static bool codec_vendor_aptx_hd_cfg(uint8_t losc, struct l2cap_frame *f=
+rame);
+>  static bool codec_vendor_ldac(uint8_t losc, struct l2cap_frame *frame);
+> +static bool codec_vendor_opus_g(uint8_t losc, struct l2cap_frame *frame)=
+;
+>
+>  static const struct vndcodec vndcodecs[] =3D {
+>         { APTX_VENDOR_ID, APTX_CODEC_ID, "aptX",
+> @@ -256,6 +277,8 @@ static const struct vndcodec vndcodecs[] =3D {
+>           codec_vendor_aptx_hd_cap, codec_vendor_aptx_hd_cfg },
+>         { LDAC_VENDOR_ID, LDAC_CODEC_ID, "LDAC",
+>           codec_vendor_ldac, codec_vendor_ldac },
+> +       { OPUS_G_VENDOR_ID, OPUS_G_CODEC_ID, "Opus (Google)",
+> +         codec_vendor_opus_g, codec_vendor_opus_g },
+>         { }
+>  };
+>
+> @@ -685,6 +708,27 @@ static bool codec_vendor_ldac(uint8_t losc, struct l=
+2cap_frame *frame)
+>         return true;
+>  }
+>
+> +static bool codec_vendor_opus_g(uint8_t losc, struct l2cap_frame *frame)
+> +{
+> +       uint8_t cap =3D 0;
+> +
+> +       if (losc !=3D 1)
+> +               return false;
+> +
+> +       l2cap_frame_get_u8(frame, &cap);
+> +
+> +       print_field("%*cFrequency: 0x%02x", BASE_INDENT + 2, ' ', cap);
+> +       print_value_bits(BASE_INDENT + 2, cap, opus_g_frequency_table);
+> +
+> +       print_field("%*cFrame Duration: 0x%02x", BASE_INDENT + 2, ' ', ca=
+p);
+> +       print_value_bits(BASE_INDENT + 2, cap, opus_g_duration_table);
+> +
+> +       print_field("%*cChannel Mode: 0x%02x", BASE_INDENT + 2, ' ', cap)=
+;
+> +       print_value_bits(BASE_INDENT + 2, cap, opus_g_channels_table);
+> +
+> +       return true;
+> +}
+> +
+>  static bool codec_vendor_cap(uint8_t losc, struct l2cap_frame *frame)
+>  {
+>         uint32_t vendor_id =3D 0;
+> --
+> 2.43.0
+>
+>
+
+
+--
+Luiz Augusto von Dentz
