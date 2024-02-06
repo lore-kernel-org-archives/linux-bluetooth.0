@@ -1,203 +1,111 @@
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
+Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6B3B1C291
-	for <linux-bluetooth@vger.kernel.org>; Tue,  6 Feb 2024 22:36:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 833B11CD1B;
+	Tue,  6 Feb 2024 23:33:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707258986; cv=none; b=sV/19cpYabN8tK70/SVCmGszIiTB+/8WBdz4ROhdvbJFqUM3pyfnOdaGsOGxFne50BDGtG9XENMkbw+e9on83FSJM+e4REWJbzihS/6DSF0CYWatD9bJpbZy/rDq6tvL4WMEhxWqnWJL8CtasD21jg6cART+RqQ10nEQLVqOMtk=
+	t=1707262405; cv=none; b=aupVQrbeRRGdZaU3y4Sl2imzlPJYuUGvL05tvj/mG7+KT1eKflz3sN4sP5ca23JfDe60a5cyYX1I2NANxpTUUZrD/8r0AFhF4LrawC8/4JltNmqmSHaNWcK3U/PhgHc9l8/U/Tb3aI+/3z6yB0wNafSXsTEWyJM97XaYjWWUvto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707258986; c=relaxed/simple;
-	bh=8b9+uapxfH7dPsVQuxwpzm8LONeZiIAVj1XjNyHvbwY=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=EPFTbias5BNbeT0TA2dn2L16muwIzg0eWib1aAN1vWyIgmznr0c2UNxIs5bVYWGpMS+WjirW1B2Yihs/zxY5YoOM1/VynqkMX6TcYg9v2zkDJGajyI3qRh4uGP1pRlLGPTxYGAfrxWUeyCRt6EOsLIwFtWnEu31bpA1RLx7/Gdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=fi74VCi4; arc=none smtp.client-ip=192.30.252.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="fi74VCi4"
-Received: from github.com (hubbernetes-node-c64fbb9.ash1-iad.github.net [10.56.207.102])
-	by smtp.github.com (Postfix) with ESMTPA id E648A1004E5
-	for <linux-bluetooth@vger.kernel.org>; Tue,  6 Feb 2024 14:36:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1707258983;
-	bh=/LCveJmwx7KO9E7E3Jz/wJ1xPladfRe/yQ8oYtkpe7M=;
-	h=Date:From:To:Subject:From;
-	b=fi74VCi48xYYyrO2vLRZuJLzcM1/MXJWPOE+Oh6+a8CoVe4RJUSp4PfToNOBrF8WU
-	 qaC00v9rdpeqKb4fvMu4YMZ/EaAOVW0XsErSiBW/6PFUCbuhRwLraPJTlXRd0G5pBO
-	 s3MXULCrmiRZPclnMi29//pEYRgZR4ErnzcK1Kl0=
-Date: Tue, 06 Feb 2024 14:36:23 -0800
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/de8c24-cfbaa6@github.com>
-Subject: [bluez/bluez] 141513: mgmt-tester: Add a 0-entry to expect_hci_list
- lists
+	s=arc-20240116; t=1707262405; c=relaxed/simple;
+	bh=jnKwKyBLwfWp6fRdpiJAMuzoCw4XPssRIE3TQikj8BE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MYzVSU+rvdDYHNFvFkehw45K+j86XybqiHtk8Th6EMWDTyEGH77LJCCcR+5NDUknZ82PHVObxTzrf6LEQ+ulD34wR8Gh7URH5z6W5AHOvE1ndYM+F3PiWBXx75pMVnbh/kWp+Z/Us0suippAhbR6aYX/ng7SQoP2Tuu2U+JUSN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl; spf=pass smtp.mailfrom=v0yd.nl; arc=none smtp.client-ip=80.241.56.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=v0yd.nl
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [IPv6:2001:67c:2050:b231:465::2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4TTzvD1XQGz9sdS;
+	Wed,  7 Feb 2024 00:28:08 +0100 (CET)
+Message-ID: <13f5b50e-94b7-42ea-a47b-7d6270105d1d@v0yd.nl>
+Date: Wed, 7 Feb 2024 00:28:06 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Subject: Re: [PATCH v4 0/2] Bluetooth: Improve retrying of connection attempts
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20240206110816.74995-1-verdre@v0yd.nl>
+ <CABBYNZJgKCeGfL+CngEA2QcVZAtf5yEqiX7ccQsuWVtjZhCvjw@mail.gmail.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
+In-Reply-To: <CABBYNZJgKCeGfL+CngEA2QcVZAtf5yEqiX7ccQsuWVtjZhCvjw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 4TTzvD1XQGz9sdS
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 141513cd0229ef47cc96031666eb758b1824f43f
-      https://github.com/bluez/bluez/commit/141513cd0229ef47cc96031666eb7=
-58b1824f43f
-  Author: Jonas Dre=C3=9Fler <verdre@v0yd.nl>
-  Date:   2024-02-06 (Tue, 06 Feb 2024)
+Hi Luiz,
 
-  Changed paths:
-    M tools/mgmt-tester.c
+On 06.02.24 23:22, Luiz Augusto von Dentz wrote:
+> Hi Jonas,
+> 
+> On Tue, Feb 6, 2024 at 6:08 AM Jonas Dreßler <verdre@v0yd.nl> wrote:
+>>
+>> Since commit 4c67bc74f016 ("[Bluetooth] Support concurrent connect
+>> requests"), the kernel supports trying to connect again in case the
+>> bluetooth card is busy and fails to connect.
+>>
+>> The logic that should handle this became a bit spotty over time, and also
+>> cards these days appear to fail with more errors than just "Command
+>> Disallowed".
+>>
+>> This series refactores the handling of concurrent connection requests
+>> by serializing all "Create Connection" commands for ACL connections
+>> similar to how we do it for LE connections.
+>>
+>> ---
+>>
+>> v1: https://lore.kernel.org/linux-bluetooth/20240102185933.64179-1-verdre@v0yd.nl/
+>> v2: https://lore.kernel.org/linux-bluetooth/20240108183938.468426-1-verdre@v0yd.nl/
+>> v3: https://lore.kernel.org/linux-bluetooth/20240108224614.56900-1-verdre@v0yd.nl/
+>> v4:
+>>    - Removed first two commits since they are already applied
+>>    - Removed a BT_DBG() message in the acl_create_connection() function
+>>      while moving to hci_sync because it seemed out of place in hci_sync
+>>    - Added a mention of the test failure in mgmt-tester to commit message
+>>
+>> Jonas Dreßler (2):
+>>    Bluetooth: hci_conn: Only do ACL connections sequentially
+>>    Bluetooth: Remove pending ACL connection attempts
+>>
+>>   include/net/bluetooth/hci.h      |  1 +
+>>   include/net/bluetooth/hci_core.h |  1 -
+>>   include/net/bluetooth/hci_sync.h |  3 ++
+>>   net/bluetooth/hci_conn.c         | 83 +++-----------------------------
+>>   net/bluetooth/hci_event.c        | 21 ++------
+>>   net/bluetooth/hci_sync.c         | 70 +++++++++++++++++++++++++++
+>>   6 files changed, 86 insertions(+), 93 deletions(-)
+>>
+>> --
+>> 2.43.0
+> 
+> 
+> Doesn't seem to work with the new test:
+> 
+> Sequential connect - setup complete
+> Sequential connect - run
+>    Create connection finished
+>    Connect failed for Pair Device
+>    Create connection finished
+> Sequential connect - test timed out
+> Sequential connect - teardown
+> 
 
-  Log Message:
-  -----------
-  mgmt-tester: Add a 0-entry to expect_hci_list lists
+Oh you're right, it's because of the increased delay to 5.12 seconds for
+sending the page timeout. We're actually waiting for connections to fail,
+so the test will now take at least 5.12s * 3 instead of 2s * 3, which means
+test timeout needs to be increased from 7 to more like 16 seconds.
 
-In add_expect_hci_list() we iterate through the entries of the
-expect_hci_list as long as there is an opcode, which means currently
-this relies on overflowing the buffer to detect the end of the list.
+Sorry for not catching this one, should've run the test before submitting
+the patch...
 
-This is not great and when running with address sanitizer, the
-out-of-bounds read gets detected and mgmt-tester aborts. Fix it by
-adding a trailing zero-entry to all those lists.
-
-
-  Commit: 6a264df7200b3350712decf5d09d7bcef7a50fc2
-      https://github.com/bluez/bluez/commit/6a264df7200b3350712decf5d09d7=
-bcef7a50fc2
-  Author: Jonas Dre=C3=9Fler <verdre@v0yd.nl>
-  Date:   2024-02-06 (Tue, 06 Feb 2024)
-
-  Changed paths:
-    M tools/mgmt-tester.c
-
-  Log Message:
-  -----------
-  mgmt-tester: Adjust a test for recent kernel changes
-
-With the changes in the kernel to move to hci_sync for connecting ACL
-devices (see kernel commit "Bluetooth: hci_conn: Only do ACL connections
-sequentially"), the "ETIMEDOUT" error path for the "HCI Create
-Connection" command was changed, sending a "HCI Create Connection
-Cancel" command after the timeout.
-
-This leads to the returned error in the "Pair Device - Power off 1"
-test to change from NOT_POWERED to DISCONNECTED, so adjust for that.
-
-
-  Commit: d5c1c0e80f4ac26edd29e45ea3c8a4679a5eab60
-      https://github.com/bluez/bluez/commit/d5c1c0e80f4ac26edd29e45ea3c8a=
-4679a5eab60
-  Author: Jonas Dre=C3=9Fler <verdre@v0yd.nl>
-  Date:   2024-02-06 (Tue, 06 Feb 2024)
-
-  Changed paths:
-    M emulator/btdev.c
-
-  Log Message:
-  -----------
-  emulator/btdev: Send page timeout after 5.12 secs delay
-
-Real bluetooth adapters wouldn't send the page timeout immediately
-when trying to page a device, instead it would take a few seconds.
-
-Try to behave more realistically in the emulator and send the page
-timeout after 5.12 seconds, which is the default page timeout.
-
-
-  Commit: c3613b8a933d62bef10a8f4258976c41156e095f
-      https://github.com/bluez/bluez/commit/c3613b8a933d62bef10a8f4258976=
-c41156e095f
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2024-02-06 (Tue, 06 Feb 2024)
-
-  Changed paths:
-    M monitor/a2dp.c
-
-  Log Message:
-  -----------
-  monitor: parse Google's Opus A2DP vendor codec capabilities
-
-Support parsing Opus (Google) A2DP vendor codec capabilities.
-AOSP & Google Pixel Buds Pro has this implemented.
-
-> ACL Data RX: Handle 256 flags 0x02 dlen 21       #419 [hci0] 26.905032
-      Channel: 65 len 17 [PSM 25 mode Basic (0x00)] {chan 4}
-      AVDTP: Get All Capabilities (0x0c) Response Accept (0x02) type 0x00=
- label 3 nosp 0
-        Service Category: Media Transport (0x01)
-        Service Category: Media Codec (0x07)
-          Media Type: Audio (0x00)
-          Media Codec: Non-A2DP (0xff)
-            Vendor ID: Google (0x000000e0)
-            Vendor Specific Codec ID: Opus (Google) (0x0001)
-              Frequency: 0x80
-                48000
-              Frame Duration: 0x18
-                10 ms
-                20 ms
-              Channel Mode: 0x07
-                Mono
-                Stereo
-                Dual Mono
-              Reserved: 0x60
-        Service Category: Delay Reporting (0x08)
-
-
-  Commit: 1c60eb02e6c3d0e639d8edb82c251caef2e41f9a
-      https://github.com/bluez/bluez/commit/1c60eb02e6c3d0e639d8edb82c251=
-caef2e41f9a
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2024-02-06 (Tue, 06 Feb 2024)
-
-  Changed paths:
-    M client/player.c
-    M profiles/audio/a2dp-codecs.h
-
-  Log Message:
-  -----------
-  client/player: parse Google's Opus A2DP vendor codec capabilities
-
-Support parsing Opus (Google) A2DP vendor codec capabilities.
-
-Transport /org/bluez/hci0/dev_B8_7B_D4_32_44_15/sep3/fd2
-        UUID: 0000110a-0000-1000-8000-00805f9b34fb
-        Codec: 0xff (255)
-        Media Codec: Vendor Specific A2DP Codec
-        Vendor ID 0x000000e0
-        Vendor Specific Codec ID 0x0001
-        Vendor Specific Data: 0x92
-                Vendor Specific Value (Opus [Google])
-                Frequencies: 48kHz
-                Channel modes: Stereo
-                Frame durations: 20 ms
-        Device: /org/bluez/hci0/dev_B8_7B_D4_32_44_15
-        State: idle
-        Delay: 0x0898 (2200)
-        Volume: 0x001e (30)
-        Endpoint: /org/bluez/hci0/dev_B8_7B_D4_32_44_15/sep3
-
-
-  Commit: cfbaa68e5134e636ca3f3c095bb2d86d1dc6401a
-      https://github.com/bluez/bluez/commit/cfbaa68e5134e636ca3f3c095bb2d=
-86d1dc6401a
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-02-06 (Tue, 06 Feb 2024)
-
-  Changed paths:
-    M tools/mgmt-tester.c
-
-  Log Message:
-  -----------
-  mgmt-tester: Fix Read Ext Controller Info tests
-
-This fixes Read Ext Controller Info now that BT_HS has been removed.
-
-
-Compare: https://github.com/bluez/bluez/compare/de8c249f785d...cfbaa68e51=
-34
+Cheers,
+Jonas
