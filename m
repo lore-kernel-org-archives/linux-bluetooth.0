@@ -1,254 +1,158 @@
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
+Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADE9212DDBA
-	for <linux-bluetooth@vger.kernel.org>; Tue,  6 Feb 2024 10:14:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26D6412E1D1
+	for <linux-bluetooth@vger.kernel.org>; Tue,  6 Feb 2024 10:27:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707214473; cv=none; b=ooqv6l/V6K6Hnhyqh5l/Wtho/AFtyRBwoJmQX23Yij/nAyYrQzjbtf2gjRzyl+zT1oVVeV8J0yMgTbaRizA0JtKGtMIg5y/D8qKZQKVCcwCIJC2ru9uyCol9hkWo2gm35eyWwwxhhG5JYNZt5KjAab/q2sYxLWkPsf3FZZS1+Pg=
+	t=1707215228; cv=none; b=uDNENx3lRRr+uEoQqTwwQrHsU7XDFYc3gu6wOzMVdguupucgT9k583vjfsesp+KQXjMTZU5Gm+QJgri3zmFdWx3aKhNK8qg7FushVLYU28KZhTWgj0d1fEIph/7WCkmHRFXIs9z1ydOCc6BtwjKiIByZ+Afxu2YhlL8cxtqAstU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707214473; c=relaxed/simple;
-	bh=WfEjW8FQD5nU+ed6kuUdO9rJcnepjNMAUZHEcKdbH0c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k/Zg8jhRQ70ZHM286WUkMxQ7359qJFju9O5EnMrTD06GJmD1mn4FiCQ+ggWVo7JUr3qdk4Jrozk8ROo7eNKuGuVUC3JIOJvOjRy0uyic+yyXXUot6jB9xK+KL2VH65oK5hA/WzW7YX1J5aTmn+z/zPsGyLOUzVam+p9ZI10a7WM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl; spf=pass smtp.mailfrom=v0yd.nl; arc=none smtp.client-ip=80.241.56.151
+	s=arc-20240116; t=1707215228; c=relaxed/simple;
+	bh=leO4IzQYBhVYNOIutwfoU2GXh9IMTt0oA8YSR6Nz6kE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=l/9pETcdro2qzENra44pFuKPnbFxLPzcvXyy9Y8iMcGy1lj2Jmukmu/6ZECJtW1ItSHcUYmyusGNlPgLL+nkinzOXuQE6lYWPmjwKTVwG5Hsgu5mB+qvGJlLNgh9hD7oA7IBh5EJ/iobMBLol/Y30dZZmIFoMMXnfkIC4Tf4wc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl; spf=pass smtp.mailfrom=v0yd.nl; arc=none smtp.client-ip=80.241.56.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=v0yd.nl
-Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4TTfHP1SMXz9t1h;
-	Tue,  6 Feb 2024 11:14:25 +0100 (CET)
-From: =?UTF-8?q?Jonas=20Dre=C3=9Fler?= <verdre@v0yd.nl>
-To: linux-bluetooth@vger.kernel.org,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: =?UTF-8?q?Jonas=20Dre=C3=9Fler?= <verdre@v0yd.nl>
-Subject: [PATCH BlueZ v2] mgmt-tester: Ensure rfkilling HCI disconnects devices
-Date: Tue,  6 Feb 2024 11:14:15 +0100
-Message-ID: <20240206101415.46505-1-verdre@v0yd.nl>
+	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4TTfYt4vMkz9t4Y;
+	Tue,  6 Feb 2024 11:26:58 +0100 (CET)
+Message-ID: <e759875e-727d-4e62-9ab5-5b35a99f9293@v0yd.nl>
+Date: Tue, 6 Feb 2024 11:26:57 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH BlueZ 1/4] mgmt-tester: Add a 0-opcode to expect_hci_list
+ lists
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+References: <20240129114900.92919-1-verdre@v0yd.nl>
+ <20240129114900.92919-2-verdre@v0yd.nl>
+ <CABBYNZKpUr+EZtKzPo-it3oojG2jrYT4iJMugZ2Y9LATrWPQag@mail.gmail.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
+In-Reply-To: <CABBYNZKpUr+EZtKzPo-it3oojG2jrYT4iJMugZ2Y9LATrWPQag@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-The kernel was recently changed to introduce disconnecting of connected
-BT devices before the adapter gets rfkilled (see kernel commit
-"Bluetooth: Disconnect connected devices before rfkilling adapter").
+Hi Luiz,
 
-Add a test to mgmt-tester to ensure that this logic works. It uses
-async io to write to the rfkill device and then looks if the HCI
-Disconnect command gets sent for the connected device.
+On 29.01.24 14:40, Luiz Augusto von Dentz wrote:
+> Hi Jonas,
+> 
+> On Mon, Jan 29, 2024 at 6:49 AM Jonas Dreßler <verdre@v0yd.nl> wrote:
+>>
+>> In add_expect_hci_list() we iterate through the entries of the
+>> expect_hci_list as long as there is an opcode, which means currently
+>> this relies on overflowing the buffer to detect the end of the list.
+>>
+>> This is not great and when running with address sanitizer, the
+>> out-of-bounds read gets detected and mgmt-tester aborts. Fix it by
+>> adding a trailing 0-opcode to all those lists.
+>> ---
+>>   tools/mgmt-tester.c | 21 +++++++++++++++++++++
+>>   1 file changed, 21 insertions(+)
+>>
+>> diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+>> index 7dfd1b0c7..ee12ed7d5 100644
+>> --- a/tools/mgmt-tester.c
+>> +++ b/tools/mgmt-tester.c
+>> @@ -8798,6 +8798,9 @@ static const struct hci_cmd_data multi_ext_adv_add_second_hci_cmds[] = {
+>>                  .len = sizeof(le_set_ext_adv_enable_inst_2),
+>>                  .param = le_set_ext_adv_enable_inst_2,
+>>          },
+>> +       {
+>> +               .opcode = 0,
+>> +       },
+> 
+> Normally the compiler would put a NULL term when last member has ',',
+> but we should either use {} to properly terminate the list or perhaps
+> it would have been better to have a something like
+> .expect_hci_list_len = ARRAY_SIZE(list) to ensure we never access past
+> the end of the list.
 
-Use of async io is necessary because the rfkill write would block our
-thread until the disconnect and adapter shutdown is finished. To finish
-this disconnect though, the HCI emulator needs to respond to the "HCI
-Disconnect" command. Because the emulator runs in the our mgmt-tester
-thread too, it would be blocked by the write and couldn't reply,
-resulting in a timeout and test failure.
+Ahh good point, I'll add an {} entry to the lists instead. Yeah I also thought
+a bit about adding expect_hci_list_len, but decided against it because that
+could cause weird situations where the list is updated with a new HCI command
+but increasing the expect_hci_list_len is forgotten. Then we silently wouldn't
+test the new command, which seems to be a lot worse compared to a failing
+address sanitizer.
 
----
+Cheers,
+Jonas
 
-v1: https://lore.kernel.org/linux-bluetooth/20240128210547.16141-1-verdre@v0yd.nl/
-v2: added -lrt to link to real-time library for aio_* functions
-
----
- Makefile.tools      |   2 +-
- tools/mgmt-tester.c | 153 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 154 insertions(+), 1 deletion(-)
-
-diff --git a/Makefile.tools b/Makefile.tools
-index 044342e29..51ce103ea 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -124,7 +124,7 @@ tools_mgmt_tester_SOURCES = tools/mgmt-tester.c monitor/bt.h \
- 				emulator/bthost.h emulator/bthost.c \
- 				emulator/smp.c
- tools_mgmt_tester_LDADD = lib/libbluetooth-internal.la \
--				src/libshared-glib.la $(GLIB_LIBS)
-+				src/libshared-glib.la $(GLIB_LIBS) -lrt
- 
- tools_mesh_tester_SOURCES = tools/mesh-tester.c monitor/bt.h \
- 				emulator/hciemu.h emulator/hciemu.c \
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index 7dfd1b0c7..60b5a305f 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -21,6 +21,7 @@
- #include <fcntl.h>
- #include <errno.h>
- #include <unistd.h>
-+#include <aio.h>
- 
- #include <glib.h>
- 
-@@ -12760,6 +12761,149 @@ static void test_hci_devcd(const void *test_data)
- 	tester_wait(test->dump_data->timeout + 1, verify_devcd, NULL);
- }
- 
-+static const uint8_t rfkill_hci_disconnect_device[] = {
-+	0x2a, 0x00, /* handle */
-+	0x15, /* reason: Power Off */
-+};
-+
-+static const struct generic_data rfkill_disconnect_devices = {
-+	.setup_settings = settings_powered_connectable_bondable,
-+	.expect_hci_command = BT_HCI_CMD_DISCONNECT,
-+	.expect_hci_param = rfkill_hci_disconnect_device,
-+	.expect_hci_len = sizeof(rfkill_hci_disconnect_device),
-+};
-+
-+enum rfkill_type {
-+	RFKILL_TYPE_ALL = 0,
-+	RFKILL_TYPE_WLAN,
-+	RFKILL_TYPE_BLUETOOTH,
-+	RFKILL_TYPE_UWB,
-+	RFKILL_TYPE_WIMAX,
-+	RFKILL_TYPE_WWAN,
-+};
-+
-+enum rfkill_operation {
-+	RFKILL_OP_ADD = 0,
-+	RFKILL_OP_DEL,
-+	RFKILL_OP_CHANGE,
-+	RFKILL_OP_CHANGE_ALL,
-+};
-+
-+struct rfkill_event {
-+	uint32_t idx;
-+	uint8_t type;
-+	uint8_t op;
-+	uint8_t soft;
-+	uint8_t hard;
-+};
-+#define RFKILL_EVENT_SIZE_V1    8
-+
-+static void trigger_rfkill(void *user_data)
-+{
-+	struct aiocb *op = user_data;
-+	int fd;
-+	int latest_rfkill_idx;
-+	struct rfkill_event write_event;
-+
-+	tester_print("Blocking hci device via rfkill");
-+
-+	fd = open("/dev/rfkill", O_RDWR|O_CLOEXEC|O_NOCTTY|O_NONBLOCK);
-+	if (fd < 0) {
-+		tester_warn("Failed to open rfkill control device: %s",
-+				strerror(errno));
-+		tester_test_failed();
-+		free(op);
-+		return;
-+	}
-+
-+	latest_rfkill_idx = -1;
-+	while (1) {
-+		struct rfkill_event event = { 0 };
-+		ssize_t len;
-+
-+		len = read(fd, &event, sizeof(event));
-+		if (len < RFKILL_EVENT_SIZE_V1)
-+			break;
-+
-+		if (event.type == RFKILL_TYPE_BLUETOOTH)
-+			latest_rfkill_idx = event.idx;
-+	}
-+
-+	if (latest_rfkill_idx < 0) {
-+		tester_warn("No rfkill device to block found");
-+		tester_test_failed();
-+		close(fd);
-+		free(op);
-+		return;
-+	}
-+
-+	write_event.idx = latest_rfkill_idx;
-+	write_event.op = RFKILL_OP_CHANGE;
-+	write_event.soft = true;
-+
-+	op->aio_fildes = fd;
-+	op->aio_buf = &write_event;
-+	op->aio_nbytes = sizeof(write_event);
-+
-+	if (aio_write(op) != 0) {
-+		tester_warn("Failed to write to rfkill control device: %s",
-+				strerror(errno));
-+		tester_test_failed();
-+		close(fd);
-+		free(op);
-+	}
-+}
-+
-+static void finish_aio_write(void *user_data)
-+{
-+	struct aiocb *op = user_data;
-+	struct test_data *data = tester_get_data();
-+	int err;
-+	size_t ret;
-+
-+	err = aio_error(op);
-+	ret = aio_return(op);
-+	if (err != 0) {
-+		tester_warn("aio_error() return error: %s", strerror(err));
-+		tester_test_failed();
-+	} else if (ret != op->aio_nbytes) {
-+		tester_warn("aio_return() returned write failed");
-+		tester_test_failed();
-+	}
-+
-+	close(op->aio_fildes);
-+	free(op);
-+	test_condition_complete(data);
-+}
-+
-+static void test_disconnect_on_rfkill(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+	struct bthost *bthost;
-+	const uint8_t *central_bdaddr;
-+	uint8_t addr_type;
-+	struct aiocb *op = new0(struct aiocb, 1);
-+
-+	bthost = hciemu_client_get_host(data->hciemu);
-+	central_bdaddr = hciemu_get_central_bdaddr(data->hciemu);
-+	if (!central_bdaddr) {
-+		tester_warn("No central bdaddr");
-+		tester_test_failed();
-+		return;
-+	}
-+
-+	addr_type = data->hciemu_type == HCIEMU_TYPE_BREDRLE
-+		? BDADDR_BREDR : BDADDR_LE_PUBLIC;
-+
-+	bthost_hci_connect(bthost, central_bdaddr, addr_type);
-+
-+	test_command_generic(test_data);
-+
-+	tester_wait(1, trigger_rfkill, (void *)op);
-+	tester_wait(2, finish_aio_write, (void *)op);
-+	test_add_condition(data);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	tester_init(&argc, &argv);
-@@ -14925,5 +15069,14 @@ int main(int argc, char *argv[])
- 	test_bredrle_full("HCI Devcoredump - Dump Timeout", &dump_timeout, NULL,
- 				test_hci_devcd, 3);
- 
-+	/* Rfkill
-+	 * Setup: Connect to device
-+	 * Run: Block hci device via rfkill
-+	 * Expect: Disconnect HCI command sent to device
-+	 */
-+	test_bredrle("Rfkill - disconnect devices",
-+			&rfkill_disconnect_devices, NULL,
-+			test_disconnect_on_rfkill);
-+
- 	return tester_run();
- }
--- 
-2.43.0
-
+> 
+>>   };
+>>
+>>   static const struct generic_data multi_ext_advertising_add_second_2 = {
+>> @@ -8845,6 +8848,9 @@ static const struct hci_cmd_data multi_ext_adv_remove_adv_hci_cmds[] = {
+>>                  .len = sizeof(advertising_instance1_param),
+>>                  .param = advertising_instance1_param,
+>>          },
+>> +       {
+>> +               .opcode = 0,
+>> +       },
+>>   };
+>>
+>>   static const struct generic_data multi_ext_advertising_remove = {
+>> @@ -8877,6 +8883,9 @@ static const struct hci_cmd_data multi_ext_adv_remove_all_adv_hci_cmds[] = {
+>>          {
+>>                  .opcode = BT_HCI_CMD_LE_CLEAR_ADV_SETS,
+>>          },
+>> +       {
+>> +               .opcode = 0,
+>> +       },
+>>   };
+>>
+>>   static const struct generic_data multi_ext_advertising_remove_all = {
+>> @@ -8913,6 +8922,9 @@ static const struct hci_cmd_data multi_ext_adv_add_2_advs_hci_cmds[] = {
+>>                  .len = sizeof(set_ext_adv_data_test1),
+>>                  .param = set_ext_adv_data_test1,
+>>          },
+>> +       {
+>> +               .opcode = 0,
+>> +       },
+>>   };
+>>
+>>   static const struct generic_data multi_ext_advertising_add_no_power = {
+>> @@ -10378,6 +10390,9 @@ static const struct hci_cmd_data ll_privacy_add_device_3_hci_list[] = {
+>>                  .param = set_resolv_on_param,
+>>                  .len = sizeof(set_resolv_on_param),
+>>          },
+>> +       {
+>> +               .opcode = 0,
+>> +       },
+>>   };
+>>
+>>   static const struct generic_data ll_privacy_add_device_3 = {
+>> @@ -10495,6 +10510,9 @@ static const struct hci_cmd_data ll_privacy_add_device_9_hci_list[] = {
+>>                  .len = sizeof(le_add_to_resolv_list_param),
+>>                  .param = le_add_to_resolv_list_param
+>>          },
+>> +       {
+>> +               .opcode = 0,
+>> +       },
+>>   };
+>>
+>>   static const struct generic_data ll_privacy_add_device_9 = {
+>> @@ -10823,6 +10841,9 @@ static const struct hci_cmd_data ll_privacy_set_device_flags_1_hci_list[] = {
+>>                  .param = set_resolv_on_param,
+>>                  .len = sizeof(set_resolv_on_param),
+>>          },
+>> +       {
+>> +               .opcode = 0,
+>> +       },
+>>   };
+>>
+>>   static const uint8_t device_flags_changed_params_1[] = {
+>> --
+>> 2.43.0
+>>
+> 
+> 
