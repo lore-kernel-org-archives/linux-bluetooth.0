@@ -1,163 +1,385 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A69F81339A8
-	for <linux-bluetooth@vger.kernel.org>; Tue,  6 Feb 2024 15:46:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C52D6FAF;
+	Tue,  6 Feb 2024 17:17:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707234418; cv=none; b=IBqB8YijkXPXvjDPa1GXNwuWTt9BiOvlvyUfPQOgNG2UHjW4aQNKzd15zQziDl81153q04om/aQ9KNnLJJD1C3q/jzcd0DvOWddsBB4Z/JoRObp85fkperH+1DPbZ74N9is5xk2cNTySBW2lOTV4DFbt05xokVh8zwDomhJmQow=
+	t=1707239837; cv=none; b=hQPHyufvX+ze2gE8QHWE9bSA2tpzoTIawjPPGKdbt+ErvhS0QMiY9Vnt/ZsoeQKOMnCdgY8XVf32Xs+2NwbkMcUaPU9sshvSuJGjBdCxBBiBED5rm3sKlB348BrMck+oPab59amsf/PFDUv8e/cCVFsm8ksJbTE/oUaZVRtlMvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707234418; c=relaxed/simple;
-	bh=954e3Ix2bJjwx9egznKO54Ugb0NxCMf+SU0HQAbW2Ak=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=amfZG88xZWHv0ONYhmI0+4xTUU1lN56g9y7qsE4Hz8ggcK6wEqV67VEUEBTof1bvpPm5zmaTvqr2fatk9kWdsOw1HLCh7AL0hUssQO9S91yCgLE/rqxP7vytaXn+g//wkr5MRAfx+W7KwxKi51Ftwa/8Ky5NlOfk2fXHjWPDczc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cHdJ1mvK; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1707239837; c=relaxed/simple;
+	bh=3Y7hcR+QmjRhNLB72PysPEra8NTlgzKJ0tZSdOlN64Y=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I95KBRbktTpmBBZvMwwDKPYwqsyV+3cNADciynrbskIubeV/MH3/jGkbejra4vesWwQlRrGS+LtxEs0mh06H0k4iosIKHHnUZSKtY1FoMbTePtMSGTguxV2i1fkFvxpuLXBLmU9HZ2H4DBhGrfh+LTNwV57UsK2pHO7pMIGj0Zc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bjw28Cd3; arc=none smtp.client-ip=209.85.161.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cHdJ1mvK"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707234415;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=RG3/UKCCHade2ppkekYGF+HmNq9N7uNePqI8BXsMibg=;
-	b=cHdJ1mvKKw7aFJS7Ju55VnH0KJ1o0Qj4Z7ONBdWh8F55Mt2FlSMCjKuGBis0QfYVr5eAYP
-	d4nPUga0C17ZFByd2e7nDRO5zjpy122kjn7/U/1YQ8FFltoudfffSXpjkU4Y1ZEnNB1YDm
-	6NSDevd/KX1hWDHPeFwl/Gn8xct3pX4=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-138-RoqbhA6lNhiP8DLqzp0uoA-1; Tue, 06 Feb 2024 10:46:54 -0500
-X-MC-Unique: RoqbhA6lNhiP8DLqzp0uoA-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40e354aaf56so13356495e9.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Feb 2024 07:46:53 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bjw28Cd3"
+Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-59a8b9b327aso2405507eaf.2;
+        Tue, 06 Feb 2024 09:17:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707239834; x=1707844634; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:subject:cc:to:from:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=lLyPWHcBxFlNAEbuIoGNpkP18K8vI24efZX/+cAmrcY=;
+        b=bjw28Cd3CH9dClqtQK5W+I6hGxZxItCeeC955+AmT54Nl2JEn1hshuH+6yGZX5Iy8i
+         iqonTqSqjMVNG8Kljk71un9mTTLQe2TRsgJtpj+V8joCJuK/RuJcfDlvGVjhR+wR3Myb
+         mtNDuP2HnrVIFYzu4CrfMLzCkbEsG7crPGBQTYCKdOiTY2NiPg21dUjDEWXD31hUK+vA
+         Cv/m1QEul8XdYY2B5yGDaAXCZAEfgzYFdusbdA5sfFPjpchNdlcwVaYEQv77cDb0LWQT
+         n70E1tt3FqcUsWqbF3Q3JBkP3b0nin3EkLtFlOML7lGfLM+9G55nVWdgni//R5Jxvsxe
+         QSOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707234412; x=1707839212;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
+        d=1e100.net; s=20230601; t=1707239834; x=1707844634;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:subject:cc:to:from:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RG3/UKCCHade2ppkekYGF+HmNq9N7uNePqI8BXsMibg=;
-        b=H2Y82+tcH/SwoLkxN7R2dbfIyeKyqBGLPFyhkaiU3SIz4UlACvsKELvv6OFPIqN42u
-         BCj/yLR2dOGhXEiLoIp9Fth2sGNwiWjDr0Rp1oYJGaqksYMdW66aPIUnILI9FbAwUU+9
-         HIgLoY+gcOmoA8SzsQYAfonKr8USb0qCKr6nsWJzeyE6bF1T27LGcpf23tewZhgxj0PM
-         0W4MLP3iuyOoIIF7lIbDEW6+O8HD/ZeAnP8mSehYaxE22+T5RYiesy5H7LiE/vUo5X/E
-         3uHcb6I7t0JI6ccRJANaVnFLH6MwqFZDRPef2+J4d9GB3cX0WHHTRIDCves799a9LLQK
-         /NKA==
-X-Forwarded-Encrypted: i=1; AJvYcCVng8mln0gXYKTTN2P6YNA/kgH0mF6dHth3EA7F/6LG1IlJ7onqXsFTU7T0smMerbASlktTXPRJsx4JZTKp2xAIiVTvYtJvz8dZjqoCCG/9
-X-Gm-Message-State: AOJu0Yz1Whcw2tVTn7bMr15JDiiDutfkDVZjfjGWTk1UvpXxDzk9Dy6U
-	6LLhiUN/GotDMhUMH8eE0t0E5CxGoefr8oAjVvv8jZo1DYZnNG+IS2BQMl95ymtRLMrdgLV/Wir
-	Zxim70LkIM1z/V3pYEwQMTV9WtrBHyBNDF5en0vmTUDNwJ0g8MOPXEXBt9rOFABQHdPmddF1R6A
-	==
-X-Received: by 2002:a05:600c:4f54:b0:40f:db10:5f14 with SMTP id m20-20020a05600c4f5400b0040fdb105f14mr2403517wmq.1.1707234412646;
-        Tue, 06 Feb 2024 07:46:52 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEITVhzefsqrdtnxTskgmDgSDWEnq2K7bEfxcrzCc13xm7lYnzDhneOwJgB2VlO8nq0dte7fw==
-X-Received: by 2002:a05:600c:4f54:b0:40f:db10:5f14 with SMTP id m20-20020a05600c4f5400b0040fdb105f14mr2403497wmq.1.1707234412207;
-        Tue, 06 Feb 2024 07:46:52 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWnVu+AB/zm07rLgZYpibnwCW7WQJGeU/AyL+y8x+ugkKHMrqUcFgDIwEhb1QrRHQxLHKJqNGXTCzpfA5DpgzfhXBPTkUOnlMTbw3RF4Bf8a9SVyLSk2yttSfR8cpfQOrDFP2Ae7TJO55jgSwNMZHlbc1LFtFVidEo=
-Received: from gerbillo.redhat.com (146-241-224-127.dyn.eolo.it. [146.241.224.127])
-        by smtp.gmail.com with ESMTPSA id b13-20020a05600c4e0d00b0040ff1abf708sm971882wmq.18.2024.02.06.07.46.51
+        bh=lLyPWHcBxFlNAEbuIoGNpkP18K8vI24efZX/+cAmrcY=;
+        b=H6P37j2NUGxIIPZh58YuWWDZmOtBXCa2uoWntWq2aJNk1HEYXOCfl4rSSINY5MMXFg
+         e5LxGWd7J2LylDxATTGNCbFTwnUKQYmInHzkGk+EuzVsgiyR+j6NPt5ay8rvGjSlUK3C
+         N+Gr5nlhkL195YdCpYLTT93oJnblBOW9AlxDao7OHO3+d66a/iipPh5d/d0qHKknT/eZ
+         BJ3uR9TfN1F38oejVrGZY9FRDP9ajFKHCO3wCnT1N+dVyLTrhvt5QSQYRJfi7S/u5hEc
+         jPghSyD/MCPHjofCaUKg/hZ5+5QV+pqnvXTBB70kpP6BwJsXkz2VC0ESnHGszCw/EjZP
+         uXhg==
+X-Gm-Message-State: AOJu0YxAgz8FLLTXVDOF8I/aRyPU5WsLAMKzfcsz34Qj00YkNDkERQel
+	3zhHE80moXKvuzl4j3V3grhAeZAexsL4nheBt0x691T9SFHjsdDT
+X-Google-Smtp-Source: AGHT+IEaDihVqZYuQDIngt85S6vfVhoVACcZa6/uwypAJ4g8x010Aol6FDWim+lsC6GvKCTLIl43Lw==
+X-Received: by 2002:a4a:3505:0:b0:59c:c37c:8ce2 with SMTP id l5-20020a4a3505000000b0059cc37c8ce2mr3620992ooa.6.1707239834492;
+        Tue, 06 Feb 2024 09:17:14 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUZouSrN8QXgkdPEbn0tE9ioAvaLI9XYXjJnmNZqKEAkrYEKDdOfcOyjK4KY09Sdr4XYiddsG2B80rCkyDPEdM7r4ZOeLmk+V+XwNFuLEreUpziJaGORXJzepWh7DEzVZZ/4dnbyeF7FhDeU3hkqohWqN1EJZMWrodPNMytehjSBwAzBHkZwWPl5p8CHl7NudpUBXhtv9excQEvCJpu3TEjNht5ELYPdWbZhxU3iBfUZLShjq7zPiB8X1WkjuesCWjpdo3r+LkYptlLKYZnDH3KXBr5VhgbzzzZQ2Vry87ykKUap4cx1Xd7wyApYUUfEIR+eBLNlvcYzxdGE1LWKpqao34+1LNNy4uVq1dw1vzbPdHb2FiVuGhRs65PcNagq/SD2h1ihyP/oWk0Kpa4Z2EEDB2U/g==
+Received: from neuromancer. ([75.28.21.198])
+        by smtp.gmail.com with ESMTPSA id v30-20020a4a245e000000b0059a826dcf53sm382948oov.40.2024.02.06.09.17.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Feb 2024 07:46:51 -0800 (PST)
-Message-ID: <0a94e0e2579028761fd1829ed5ad7e9daa87d9db.camel@redhat.com>
-Subject: Re: pull request: bluetooth 2024-02-02
-From: Paolo Abeni <pabeni@redhat.com>
+        Tue, 06 Feb 2024 09:17:14 -0800 (PST)
+Message-ID: <65c2699a.4a0a0220.5cd9c.2ff7@mx.google.com>
+X-Google-Original-Message-ID: <ZcJpmMjGNVDw1Avw@neuromancer.>
+Date: Tue, 6 Feb 2024 11:17:12 -0600
+From: Chris Morgan <macroalpha82@gmail.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org
-Date: Tue, 06 Feb 2024 16:46:50 +0100
-In-Reply-To: <CABBYNZL4vUMUgHGd_TFWTwKtZzsBRazg_NVnVcqzgJpgybZPMA@mail.gmail.com>
-References: <20240202213846.1775983-1-luiz.dentz@gmail.com>
-	 <f40ce06c7884fca805817f9e90aeef205ce9c899.camel@redhat.com>
-	 <CABBYNZJ3bW5wsaX=e7JGhJai_w8YXjCHTnKZVn7x+FNVpn3cXg@mail.gmail.com>
-	 <69c9e55b40ff2151ed456d975755d9d4e359adf0.camel@redhat.com>
-	 <CABBYNZL4vUMUgHGd_TFWTwKtZzsBRazg_NVnVcqzgJpgybZPMA@mail.gmail.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+Cc: Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+	linux-input@vger.kernel.org,
+	Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+	Enric Balletbo i Serra <enric.balletbo@collabora.com>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Andrey Smirnov <andrew.smirnov@gmail.com>,
+	Kirill Smelkov <kirr@nexedi.com>
+Subject: Re: [PATCH] Input: uinput - Add UI_SET_UNIQ ioctl handler
+References: <20191203173821.4u6uzxeaqnt3gyz3@pali>
+ <20191203191112.GJ50317@dtor-ws>
+ <20191205105206.slibwytrcteicx6y@pali>
+ <CANFp7mXyaqoMDBs4m_Dfm9+4U88g9WoJVcV1g_4KM4xzFhiGXQ@mail.gmail.com>
+ <20191206091114.kh255jrmerruumnq@pali>
+ <20191206174048.GQ50317@dtor-ws>
+ <20191218110224.44vcgdxh3j4bn7rw@pali>
+ <20191218112659.crabhqkbcnxd6fo6@pali>
+ <20200322154734.mquwgzc63nzddiy5@pali>
+ <CABBYNZ+E3knrqWpNDKfX9qQOrrh=VLUSQAgUB=kXgK7=jwgQ9w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CABBYNZ+E3knrqWpNDKfX9qQOrrh=VLUSQAgUB=kXgK7=jwgQ9w@mail.gmail.com>
 
-On Tue, 2024-02-06 at 10:32 -0500, Luiz Augusto von Dentz wrote:
-> Hi Paolo,
->=20
-> On Tue, Feb 6, 2024 at 10:21=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> w=
-rote:
-> >=20
-> > On Tue, 2024-02-06 at 09:45 -0500, Luiz Augusto von Dentz wrote:
-> > > On Tue, Feb 6, 2024 at 9:33=E2=80=AFAM Paolo Abeni <pabeni@redhat.com=
-> wrote:
-> > > > On Fri, 2024-02-02 at 16:38 -0500, Luiz Augusto von Dentz wrote:
-> > > > > The following changes since commit ba5e1272142d051dcc57ca1d3225ad=
-8a089f9858:
-> > > > >=20
-> > > > >   netdevsim: avoid potential loop in nsim_dev_trap_report_work() =
-(2024-02-02 11:00:38 -0800)
-> > > > >=20
-> > > > > are available in the Git repository at:
-> > > > >=20
-> > > > >   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetoo=
-th.git tags/for-net-2024-02-02
-> > > > >=20
-> > > > > for you to fetch changes up to 96d874780bf5b6352e45b4c07c247e37d5=
-0263c3:
-> > > > >=20
-> > > > >   Bluetooth: qca: Fix triggering coredump implementation (2024-02=
--02 16:13:56 -0500)
-> > > > >=20
-> > > > > ----------------------------------------------------------------
-> > > > > bluetooth pull request for net:
-> > > >=20
-> > > > A couple of commits have some issue in the tag area (spaces between
-> > > > Fixes and other tag):
-> > > > >=20
-> > > > >  - btintel: Fix null ptr deref in btintel_read_version
-> > > > >  - mgmt: Fix limited discoverable off timeout
-> > > > >  - hci_qca: Set BDA quirk bit if fwnode exists in DT
-> > > >=20
-> > > > this one ^^^
-> > > >=20
-> > > > >  - hci_bcm4377: do not mark valid bd_addr as invalid
-> > > > >  - hci_sync: Check the correct flag before starting a scan
-> > > > >  - Enforce validation on max value of connection interval
-> > > >=20
-> > > > and this one ^^^
-> > >=20
-> > > Ok, do you use any tools to capture these? checkpatch at least didn't
-> > > capture anything for me.
-> >=20
-> > We use the nipa tools:
-> >=20
-> > https://github.com/linux-netdev/nipa
-> >=20
-> > specifically:
-> >=20
-> > https://github.com/linux-netdev/nipa/blob/main/tests/patch/verify_fixes=
-/verify_fixes.sh
-> >=20
-> > (it can run standalone)
->=20
-> verify_fixes.sh HEAD^..HEAD
-> verify_fixes.sh: line 201: $DESC_FD: ambiguous redirect
->=20
-> Not really sure where DESC_FD comes from, perhaps it needs to be set
-> in the environment, anyway can you send the output it is generating?
+On Mon, Jun 13, 2022 at 02:36:18PM -0700, Luiz Augusto von Dentz wrote:
+> Hi,
+> 
+> On Sun, Mar 22, 2020 at 8:47 AM Pali Rohár <pali.rohar@gmail.com> wrote:
+> >
+> > On Wednesday 18 December 2019 12:26:59 Pali Rohár wrote:
+> > > On Wednesday 18 December 2019 12:02:24 Pali Rohár wrote:
+> > > > On Friday 06 December 2019 09:40:48 Dmitry Torokhov wrote:
+> > > > > On Fri, Dec 06, 2019 at 10:11:14AM +0100, Pali Rohár wrote:
+> > > > > > On Thursday 05 December 2019 12:03:05 Abhishek Pandit-Subedi wrote:
+> > > > > > > On Thu, Dec 5, 2019 at 2:52 AM Pali Rohár <pali.rohar@gmail.com> wrote:
+> > > > > > > >
+> > > > > > > > On Tuesday 03 December 2019 11:11:12 Dmitry Torokhov wrote:
+> > > > > > > > > On Tue, Dec 03, 2019 at 06:38:21PM +0100, Pali Rohár wrote:
+> > > > > > > > > > On Tuesday 03 December 2019 00:09:47 Pali Rohár wrote:
+> > > > > > > > > >
+> > > > > > > > > > Hi Dmitry!
+> > > > > > > > > >
+> > > > > > > > > > I was looking again at those _IOW defines for ioctl calls and I have
+> > > > > > > > > > another argument why not specify 'char *' in _IOW:
+> > > > > > > > > >
+> > > > > > > > > > All ioctls in _IOW() specify as a third macro argument type which is
+> > > > > > > > > > passed as pointer to the third argument for ioctl() syscall.
+> > > > > > > > > >
+> > > > > > > > > > So e.g.:
+> > > > > > > > > >
+> > > > > > > > > >   #define EVIOCSCLOCKID _IOW('E', 0xa0, int)
+> > > > > > > > > >
+> > > > > > > > > > is called from userspace as:
+> > > > > > > > > >
+> > > > > > > > > >   int val;
+> > > > > > > > > >   ioctl(fd, EVIOCSCLOCKID, &val);
+> > > > > > > > > >
+> > > > > > > > > > Or
+> > > > > > > > > >
+> > > > > > > > > >   #define EVIOCSMASK _IOW('E', 0x93, struct input_mask)
+> > > > > > > > > >
+> > > > > > > > > > is called as:
+> > > > > > > > > >
+> > > > > > > > > >   struct input_mask val;
+> > > > > > > > > >   ioctl(fd, EVIOCSMASK, &val);
+> > > > > > > > > >
+> > > > > > > > > > So basically third argument for _IOW specify size of byte buffer passed
+> > > > > > > > > > as third argument for ioctl(). In _IOW is not specified pointer to
+> > > > > > > > > > struct input_mask, but struct input_mask itself.
+> > > > > > > > > >
+> > > > > > > > > > And in case you define
+> > > > > > > > > >
+> > > > > > > > > >   #define MY_NEW_IOCTL _IOW(UINPUT_IOCTL_BASE, 200, char*)
+> > > > > > > > > >
+> > > > > > > > > > then you by above usage you should pass data as:
+> > > > > > > > > >
+> > > > > > > > > >   char *val = "DATA";
+> > > > > > > > > >   ioctl(fd, MY_NEW_IOCTL, &val);
+> > > > > > > > > >
+> > > > > > > > > > Which is not same as just:
+> > > > > > > > > >
+> > > > > > > > > >   ioctl(fd, MY_NEW_IOCTL, "DATA");
+> > > > > > > > > >
+> > > > > > > > > > As in former case you passed pointer to pointer to data and in later
+> > > > > > > > > > case you passed only pointer to data.
+> > > > > > > > > >
+> > > > > > > > > > It just mean that UI_SET_PHYS is already defined inconsistently which is
+> > > > > > > > > > also reason why compat ioctl for it was introduced.
+> > > > > > > > >
+> > > > > > > > > Yes, you are right. UI_SET_PHYS is messed up. I guess the question is
+> > > > > > > > > what to do with all of this...
+> > > > > > > > >
+> > > > > > > > > Maybe we should define
+> > > > > > > > >
+> > > > > > > > > #define UI_SET_PHYS_STR(len)  _IOC(_IOC_WRITE, UINPUT_IOCTL_BASE, 111, len)
+> > > > > > > > > #define UI_SET_UNIQ_STR(len)  _IOC(_IOC_WRITE, UINPUT_IOCTL_BASE, 112, len)
+> > > > > > > >
+> > > > > > > > I'm not sure if this is ideal. Normally in C strings are nul-termined,
+> > > > > > > > so functions/macros do not take buffer length.
+> > > > > > > Except strncpy, strndup, snprintf, etc. all expect a buffer length. At
+> > > > > >
+> > > > > > This is something different as for these functions you pass buffer and
+> > > > > > length of buffer which is used in write mode -- not for read mode.
+> > > > > >
+> > > > > > > the user to kernel boundary of ioctl, I think we should require size
+> > > > > > > of the user buffer regardless of the data type.
+> > > > > > >
+> > > > > > > > _STR therefore in names looks inconsistent.
+> > > > > > > The _STR suffix is odd (what to name UI_SET_PHYS_STR then??) but
+> > > > > > > requiring the length seems to be common across various ioctls.
+> > > > > > > * input.h requires a length when requesting the phys and uniq
+> > > > > > > (https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/include/uapi/linux/input.h#n138)
+> > > > > > > * Same with HIDRAW when setting and getting features:
+> > > > > > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/include/uapi/linux/hidraw.h#n40,
+> > > > > > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/samples/hidraw/hid-example.c#n88
+> > > > > >
+> > > > > > All these ioctls where is passed length are in opposite direction
+> > > > > > (_IOC_READ) as our PHYS and UNIQ (_IOC_WRITE).
+> > > > > >
+> > > > > > I fully agree that when you need to read something from kernel
+> > > > > > (_IOC_READ) and then writing it to userspace, you need to specify length
+> > > > > > of userspace buffer. Exactly same as with userspace functions like
+> > > > > > memcpy, snprintf, etc... as you pointed. Otherwise you get buffer
+> > > > > > overflow as callee does not know length of buffer.
+> > > > > >
+> > > > > > But here we we have there quite different problem, we need to write
+> > > > > > something to kernel from userspace (_IOC_WRITE) and we are passing
+> > > > > > nul-term string. So in this case specifying size is not required as it
+> > > > > > is implicitly specified as part of passed string.
+> > > > >
+> > > > > With the new IOCTL definitions it does not need to be a NULL-terminated
+> > > > > string. It can be a buffer of characters with given length, and kernel
+> > > > > will NULL-terminate as this it what it wants, not what the caller has to
+> > > > > give.
+> > > >
+> > > > Hi Dmitry! I was thinking more about this problem and I will propose
+> > > > alternative solution, but first with details...
+> > > >
+> > > > I think that we should use NULL terminated strings. Or better disallow
+> > > > NULL byte inside string. Reason: all userspace application expects that
+> > > > input device name would be NULL terminated which implies that in the
+> > > > middle of name cannot be NULL byte.
+> > > >
+> > > > So this must apply also for new PHYS / UNIQ ioctl API. If we want in our
+> > > > ioctl API to use buffer + size (with upper bound limit for size) instead
+> > > > of passing NULL term string (with upper bound limit for string size)
+> > > > then kernel have to add a leading NULL byte to string, plus check that
+> > > > in the buffer there is no NULL byte. I guess this a very little
+> > > > complicate code, but nothing which is problematic.
+> > > >
+> > > > And on the userspace part. Now when userspace want to pass constant
+> > > > string for device name, it just call
+> > > >
+> > > >   ioctl(fd, UI_SET_PHYS, "my name of device");
+> > > >
+> > > > After adding a new ioctl with buffer + size API, userspace would have to
+> > > > call:
+> > > >
+> > > >   ioctl(fd, UI_SET_PHYS_STR(strlen("my name of device")), "my name of device");
+> > > >
+> > > > which looks strange, so programmers would had to move device name into
+> > > > new variable:
+> > > >
+> > > >   const char *name = "my name of device";
+> > > >   ioctl(fd, UI_SET_PHYS_STR(strlen(name)), name);
+> > > >
+> > > > For me the old ioctl API looks easier to use (no need for strlen() or
+> > > > extra variable), but this is just my preference of usage -- as it is
+> > > > simpler for me. Maybe you would have different opinion...
+> > > >
+> > > > And now question: Why we have uinput_compat_ioctl()? It is there only
+> > > > because size part of IOCTL number is different on 32bit and 64bit
+> > > > systems. As we know size part of UI_SET_PHYS is wrong and does not make
+> > > > sense...
+> > > >
+> > > > Would not it be better to change size of UI_SET_PHYS to just zero and
+> > > > then when matching ioctl number just ignore size for this UI_SET_PHYS
+> > > > ioctl? Same for UI_BEGIN_FF_UPLOAD_COMPAT and UI_END_FF_UPLOAD_COMPAT
+> > > > added in: https://git.kernel.org/tip/tip/c/7c7da40
+> > > >
+> > > > And we would not have to deal with uinput_compat_ioctl() at all.
+> > >
+> > > Below is example how change for removing UI_SET_PHYS_COMPAT may look
+> > > like. As header file is not changed and UI_SET_PHYS accepts any size
+> > > argument, it therefore accept also 32bit and 64bit integer. So no
+> > > existing 32bit applications which use UI_SET_PHYS on 64bit kernel would
+> > > not be broken...
+> > >
+> > > Is not this better change then introducing a new UI_SET_PHYS_STR ioctl
+> > > number? Because introduction of new IOCTL number has one big
+> > > disadvantage: Userspace applications needs to support fallback to old
+> > > number as older versions of kernels would be in use for a long time. And
+> > > because kernel does not have to remove old IOCTL number for backward
+> > > compatibility there is basically no need for userspace application to
+> > > user new UI_SET_PHYS_STR IOCTL number...
+> >
+> > Hello! I would like to remind this discussion as problem around a new
+> > UI_SET_UNIQ ioctl is not solved yet and uniq property is really useful
+> > for e.g. bluetooth (uinput) devices.
+> >
+> > Dmitry, when you have a time, could you please look at this discussion
+> > and decide how to go ahead?
+> 
+> Have we decided not to move further with these changes? I actually
+> have a bug in BlueZ related to it since right now we are inconsistent
+> with respect to how we handle uhid vs uinput:
+> 
+> https://github.com/bluez/bluez/issues/352
+> 
+> > > diff --git a/drivers/input/misc/uinput.c b/drivers/input/misc/uinput.c
+> > > index fd253781b..b645210d5 100644
+> > > --- a/drivers/input/misc/uinput.c
+> > > +++ b/drivers/input/misc/uinput.c
+> > > @@ -915,22 +915,6 @@ static long uinput_ioctl_handler(struct file *file, unsigned int cmd,
+> > >               retval = uinput_set_bit(arg, propbit, INPUT_PROP_MAX);
+> > >               goto out;
+> > >
+> > > -     case UI_SET_PHYS:
+> > > -             if (udev->state == UIST_CREATED) {
+> > > -                     retval = -EINVAL;
+> > > -                     goto out;
+> > > -             }
+> > > -
+> > > -             phys = strndup_user(p, 1024);
+> > > -             if (IS_ERR(phys)) {
+> > > -                     retval = PTR_ERR(phys);
+> > > -                     goto out;
+> > > -             }
+> > > -
+> > > -             kfree(udev->dev->phys);
+> > > -             udev->dev->phys = phys;
+> > > -             goto out;
+> > > -
+> > >       case UI_BEGIN_FF_UPLOAD:
+> > >               retval = uinput_ff_upload_from_user(p, &ff_up);
+> > >               if (retval)
+> > > @@ -1023,6 +1007,22 @@ static long uinput_ioctl_handler(struct file *file, unsigned int cmd,
+> > >       case UI_ABS_SETUP & ~IOCSIZE_MASK:
+> > >               retval = uinput_abs_setup(udev, p, size);
+> > >               goto out;
+> > > +
+> > > +     case UI_SET_PHYS & ~IOCSIZE_MASK:
+> > > +             if (udev->state == UIST_CREATED) {
+> > > +                     retval = -EINVAL;
+> > > +                     goto out;
+> > > +             }
+> > > +
+> > > +             phys = strndup_user(p, 1024);
+> > > +             if (IS_ERR(phys)) {
+> > > +                     retval = PTR_ERR(phys);
+> > > +                     goto out;
+> > > +             }
+> > > +
+> > > +             kfree(udev->dev->phys);
+> > > +             udev->dev->phys = phys;
+> > > +             goto out;
+> > >       }
+> > >
+> > >       retval = -EINVAL;
+> > > @@ -1042,8 +1042,6 @@ static long uinput_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
+> > >   * These IOCTLs change their size and thus their numbers between
+> > >   * 32 and 64 bits.
+> > >   */
+> > > -#define UI_SET_PHYS_COMPAT           \
+> > > -     _IOW(UINPUT_IOCTL_BASE, 108, compat_uptr_t)
+> > >  #define UI_BEGIN_FF_UPLOAD_COMPAT    \
+> > >       _IOWR(UINPUT_IOCTL_BASE, 200, struct uinput_ff_upload_compat)
+> > >  #define UI_END_FF_UPLOAD_COMPAT              \
+> > > @@ -1053,9 +1051,6 @@ static long uinput_compat_ioctl(struct file *file,
+> > >                               unsigned int cmd, unsigned long arg)
+> > >  {
+> > >       switch (cmd) {
+> > > -     case UI_SET_PHYS_COMPAT:
+> > > -             cmd = UI_SET_PHYS;
+> > > -             break;
+> > >       case UI_BEGIN_FF_UPLOAD_COMPAT:
+> > >               cmd = UI_BEGIN_FF_UPLOAD;
+> > >               break;
+> > > diff --git a/include/uapi/linux/uinput.h b/include/uapi/linux/uinput.h
+> > > index c9e677e3a..6bda2a142 100644
+> > > --- a/include/uapi/linux/uinput.h
+> > > +++ b/include/uapi/linux/uinput.h
+> > > @@ -142,6 +142,8 @@ struct uinput_abs_setup {
+> > >  #define UI_SET_LEDBIT                _IOW(UINPUT_IOCTL_BASE, 105, int)
+> > >  #define UI_SET_SNDBIT                _IOW(UINPUT_IOCTL_BASE, 106, int)
+> > >  #define UI_SET_FFBIT         _IOW(UINPUT_IOCTL_BASE, 107, int)
+> > > +/* Argument is nul-term string and for backward compatibility is there
+> > > + * specified char*, but size argument (char *) is ignored by this ioctl */
+> > >  #define UI_SET_PHYS          _IOW(UINPUT_IOCTL_BASE, 108, char*)
+> > >  #define UI_SET_SWBIT         _IOW(UINPUT_IOCTL_BASE, 109, int)
+> > >  #define UI_SET_PROPBIT               _IOW(UINPUT_IOCTL_BASE, 110, int)
+> > >
+> > >
+> >
+> > --
+> > Pali Rohár
+> > pali.rohar@gmail.com
+> 
+> 
+> 
+> -- 
+> Luiz Augusto von Dentz
 
-I usually do:
+Hate to dig a post up from the dead, but I have a use case for this
+ioctl just like the bluez team and would like to see if I can help
+push it across the finish line.
 
-export DESC_FD=3D1
-verify_fixes.sh HEAD^..HEAD
+Unlike this patch series mimicking what is done with the UI_SET_PHYS
+ioctl, I'd like to simply have a fixed size of 64 characters allowed.
+I'm choosing 64 because that's the same size as the uniq value in the
+hid_device struct (specifically it's set as `char uniq[64]`).
 
-Cheers,
+Would such a specific limit be acceptable, and if so it shouldn't have
+all the messy compatible bits like the proposed method here, would it?
 
-Paolo
-
+Thank you,
+Chris
