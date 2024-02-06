@@ -1,178 +1,114 @@
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE4A212D152
-	for <linux-bluetooth@vger.kernel.org>; Tue,  6 Feb 2024 11:23:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0319B12E1FB
+	for <linux-bluetooth@vger.kernel.org>; Tue,  6 Feb 2024 11:30:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707218597; cv=none; b=ejcgrm5NqH0uQIw4P0y0H/BpqzEU4/Jdgz3uneKpgUZxAo+yfbvkHtdkUVXOw6lBkFBfVH6/dlvgxrmqXseLpHk2Yz3wsOGD11hddbFPKvRgQrpOtKZ1AdtzjHCY2gCipgq8UzhbYiWtzyQq5o6t8XeuUFkmNlGmypS+6OUFVzs=
+	t=1707219047; cv=none; b=nxZcyENIIB3XBnIX48OeBdG9dytTyXdzMyk92HGcnVsdJZoSZbs3C4IEoHiSUKsZ8cCrhPUsSqIDG/VX+ctaMw2e8pHTPG19FK7AzQzaZGZWhhG5W6VF8jjf17z5LYxOFChWRR/hsZpawUr/GJKb3q0rcQNAohMs60G4Fo4YdK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707218597; c=relaxed/simple;
-	bh=DnMD8gUxu30juBFpQz9aXRAA2HnRTVzZQ4qj1UTY0js=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ECG0t20fwY1vYGI07IWACsTLPhueo3Jz7G3cV6d3YsQmdTDcoLueVx0n+j0uBDI7VpkbahJUyYi/k1vT7xXxY/hmQjFi3HAtmi3t5FKQloT43wi3eKCR/6JhRgwjFRmDijdgZrQdDB+MeMYxsFISirSCrLXgsgWT7YsxFQCVFkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl; spf=pass smtp.mailfrom=v0yd.nl; arc=none smtp.client-ip=80.241.56.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=v0yd.nl
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4TTgpl5LN1z9swV;
-	Tue,  6 Feb 2024 12:23:11 +0100 (CET)
-From: =?UTF-8?q?Jonas=20Dre=C3=9Fler?= <verdre@v0yd.nl>
-To: linux-bluetooth@vger.kernel.org,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: =?UTF-8?q?Jonas=20Dre=C3=9Fler?= <verdre@v0yd.nl>
-Subject: [PATCH BlueZ v2 4/4] mgmt-tester: Add a test for connecting sequentially
-Date: Tue,  6 Feb 2024 12:22:53 +0100
-Message-ID: <20240206112253.76446-5-verdre@v0yd.nl>
-In-Reply-To: <20240206112253.76446-1-verdre@v0yd.nl>
-References: <20240206112253.76446-1-verdre@v0yd.nl>
+	s=arc-20240116; t=1707219047; c=relaxed/simple;
+	bh=lujMjl/djX9uD0tKYENU5tyk1dzuNX7qXUIqMym23wA=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=AWFmPUbydo3fuW/Nggl07qCBSDCcfxgUKv8ztsI6YmZNymnh0ZmZKEAb+raE0QHzww/7t0vXALre9Nn2JCpq0HuAqsNbHU++bMisbCWEcoPs4hLC1PSDT4q+MtkH4hUD4lWVgXCePMkZqjiKFvFncDsSdxod8787q8AMItki/dg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F0YUYrsh; arc=none smtp.client-ip=209.85.219.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F0YUYrsh"
+Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-dc6d5206e96so5035756276.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Feb 2024 03:30:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707219045; x=1707823845; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=nhKZ7d2lHsWqzqDom6gNTdgbCRnCw7jE/qREsvvM+XM=;
+        b=F0YUYrshcMefDvf0L8Y4Prqn28Ib3yVQ2zGYcoI0vJoMmHqCOpnuEcEaGwOQkmN7CP
+         6w5t6myGGhan0N6OqXcAcOKwGQpSDxQc5YHeexg7GWSdvahnpZ61WkPyBM9G8KZqpav6
+         uJ7Tq7L5vjG4HocQq3azqusBCxdoYzm4fVGp/U3QVng/o50EepAVDSCf0EK+k63Wm2sX
+         7FSdEYva6dRz9Y1QN3OWp93z4NDdfieKA6Jb+5QGbGt+gjW8GLWBlPzSRjj+yDAHIlC8
+         kKjsEsYvZOC8jnU3FfxT2HVh6aRe2hVma7OFHjP1TGfP5nRQMPlMnzCJfZmvRK+iGEw0
+         PF3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707219045; x=1707823845;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nhKZ7d2lHsWqzqDom6gNTdgbCRnCw7jE/qREsvvM+XM=;
+        b=uyvJKEpTOdBvLs3vKlO6/GCHpI8ngjgBaVKrx7SRqCtXRWk6p7VEL0p8/hS0V6tpS3
+         4681XmlSq/f8SNsHQJ8IXYyq6lp6RH0j/AREf4BimldOTA+gKXgMWDP1D1aprkh0BAU2
+         ikHrjuVJIBaSHN4S7B79SssqlH55bkprSJ+HEtDyObhou+ya7fyjFD7UTKs0XQjmAwUI
+         zdBOiFupZhEbmgwapw1vqs2166LzC4ZxKv898i4/4HFj/wgkSdCE0jRbYpVQxHhmKGDf
+         uAwGs5Od1GKznRkj5XYXazfAgDhDDgtX2lMt4dhaAlPukYt+A0QxpaCku9nNyj5IXInN
+         BaBw==
+X-Gm-Message-State: AOJu0Yzxu12iB9QbDafWHyclirgla67OgpsuhgzeKlR/fpkVBJav7vad
+	Rg5RRrT40Vxe2ZJS5VIOHiLjxRI/mYGwelPogk3+hWjpX2c0UoWdWWk1OkVm
+X-Google-Smtp-Source: AGHT+IF+F6Dml9UnGAsstAB4/tWUJikDcGm9EbZD57Br6R9HGoC0yOv4SbmLIYxYFvGm2furXDInFA==
+X-Received: by 2002:a25:2e0d:0:b0:dc6:194e:8474 with SMTP id u13-20020a252e0d000000b00dc6194e8474mr1131407ybu.50.1707219043320;
+        Tue, 06 Feb 2024 03:30:43 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUkQjxADljKM1DSeQdoLB4Nl6uG5u6sYqXAXHjlTQub6am55SQuP0eF9kp1QHfl7gQOPa0JDscOmOZMbmD9Fw==
+Received: from [172.17.0.2] ([20.81.46.156])
+        by smtp.gmail.com with ESMTPSA id t34-20020a252d22000000b00dbd9eee633dsm468042ybt.59.2024.02.06.03.30.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Feb 2024 03:30:42 -0800 (PST)
+Message-ID: <65c21862.250a0220.bf5c8.2054@mx.google.com>
+Date: Tue, 06 Feb 2024 03:30:42 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5274042061611699627=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4TTgpl5LN1z9swV
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, verdre@v0yd.nl
+Subject: RE: [BlueZ,v2] mgmt-tester: Ensure rfkilling HCI disconnects devices
+In-Reply-To: <20240206101415.46505-1-verdre@v0yd.nl>
+References: <20240206101415.46505-1-verdre@v0yd.nl>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-The kernel was recently changed to only connect to ACL devices
-sequentially (see kernel commit "Bluetooth: hci_conn: Only do
-ACL connections sequentially"), similar to how it already behaves
-for LE devices.
+--===============5274042061611699627==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Add some testing for this behavior to mgmt-tester and make sure
-that new "HCI Create Connection" commands only get sent after
-the previous "Pair Device" MGMT command has failed.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=823512
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.53 seconds
+GitLint                       FAIL      0.49 seconds
+BuildEll                      PASS      24.02 seconds
+BluezMake                     PASS      713.96 seconds
+MakeCheck                     PASS      11.79 seconds
+MakeDistcheck                 PASS      161.79 seconds
+CheckValgrind                 PASS      225.85 seconds
+CheckSmatch                   PASS      326.21 seconds
+bluezmakeextell               PASS      106.89 seconds
+IncrementalBuild              PASS      663.62 seconds
+ScanBuild                     PASS      919.83 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,v2] mgmt-tester: Ensure rfkilling HCI disconnects devices
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+20: B1 Line exceeds max length (82>80): "v1: https://lore.kernel.org/linux-bluetooth/20240128210547.16141-1-verdre@v0yd.nl/"
+
+
 ---
- tools/mgmt-tester.c | 106 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 106 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index 767cd5cda..ac3045e13 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -12767,6 +12767,103 @@ static void test_hci_devcd(const void *test_data)
- 	tester_wait(test->dump_data->timeout + 1, verify_devcd, NULL);
- }
- 
-+static const struct generic_data sequential_connect = {
-+	.setup_settings = settings_powered_bondable,
-+	.pin = pair_device_pin,
-+	.pin_len = sizeof(pair_device_pin),
-+	.client_pin = pair_device_pin,
-+	.client_pin_len = sizeof(pair_device_pin),
-+};
-+
-+struct pair_devices_data {
-+	struct test_data *test_data;
-+	unsigned int n_conn_failed_evts;
-+	unsigned int n_create_conn_cmds;
-+};
-+
-+static void pair_device_command_callback(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct pair_devices_data *pd_data = user_data;
-+
-+	if (status != MGMT_STATUS_CONNECT_FAILED) {
-+		tester_warn("Unexpected status got %d expected %d",
-+			    status, MGMT_STATUS_CONNECT_FAILED);
-+		tester_test_failed();
-+		free(pd_data);
-+		return;
-+	}
-+
-+	tester_print("Connect failed for Pair Device");
-+
-+	pd_data->n_conn_failed_evts++;
-+	if (pd_data->n_conn_failed_evts != pd_data->n_create_conn_cmds) {
-+		tester_test_failed();
-+		free(pd_data);
-+		return;
-+	}
-+
-+	if (pd_data->n_conn_failed_evts == 3) {
-+		test_condition_complete(pd_data->test_data);
-+		free(pd_data);
-+	}
-+}
-+
-+static bool connect_multiple_create_conn(const void *data, uint16_t len,
-+					void *user_data)
-+{
-+	struct pair_devices_data *pd_data = user_data;
-+	const uint8_t *status = data;
-+
-+	if (*status == 0) {
-+		tester_print("Create connection finished");
-+
-+		pd_data->n_create_conn_cmds++;
-+		if (pd_data->n_conn_failed_evts != pd_data->n_create_conn_cmds - 1) {
-+			tester_test_failed();
-+			free(pd_data);
-+		}
-+	} else {
-+		tester_print("Create connection failed: 0x%02x", *status);
-+		tester_test_failed();
-+		free(pd_data);
-+	}
-+
-+	return true;
-+}
-+
-+static void test_sequential_connect(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+	struct pair_devices_data *pd_data;
-+	static uint8_t param[8] = {
-+		0x31, 0xAB, 0xCD, 0x32, 0x34, 0x73, /* random bdaddr so we fail to connect */
-+		BDADDR_BREDR,
-+		0x03, /* NoInputNoOutput */
-+	 };
-+
-+	pd_data = new0(struct pair_devices_data, 1);
-+	pd_data->test_data = data;
-+	pd_data->n_conn_failed_evts = 0;
-+	pd_data->n_create_conn_cmds = 0;
-+
-+	hciemu_add_hook(data->hciemu, HCIEMU_HOOK_POST_CMD,
-+			BT_HCI_CMD_CREATE_CONN,
-+			connect_multiple_create_conn, pd_data);
-+
-+	mgmt_send_nowait(data->mgmt, MGMT_OP_PAIR_DEVICE, data->mgmt_index,
-+			 sizeof(param), param,
-+			 pair_device_command_callback, pd_data, NULL);
-+	param[2] = 0x09; /* change bdaddr a bit */
-+	mgmt_send_nowait(data->mgmt, MGMT_OP_PAIR_DEVICE, data->mgmt_index,
-+			 sizeof(param), param,
-+			 pair_device_command_callback, pd_data, NULL);
-+	param[2] = 0x10; /* change bdaddr a bit */
-+	mgmt_send_nowait(data->mgmt, MGMT_OP_PAIR_DEVICE, data->mgmt_index,
-+			 sizeof(param), param,
-+			 pair_device_command_callback, pd_data, NULL);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	tester_init(&argc, &argv);
-@@ -14932,5 +15029,14 @@ int main(int argc, char *argv[])
- 	test_bredrle_full("HCI Devcoredump - Dump Timeout", &dump_timeout, NULL,
- 				test_hci_devcd, 3);
- 
-+	/* Sequential connect
-+	 * Setup: Power on
-+	 * Run: Try connecting to multiple devices
-+	 * Expect: Connects time out sequentially
-+	 */
-+	test_bredrle_full("Sequential connect",
-+				&sequential_connect, NULL,
-+				test_sequential_connect, 7);
-+
- 	return tester_run();
- }
--- 
-2.43.0
 
+--===============5274042061611699627==--
