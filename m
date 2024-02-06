@@ -1,32 +1,32 @@
-Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
+Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E469D12E1FC
-	for <linux-bluetooth@vger.kernel.org>; Tue,  6 Feb 2024 11:23:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C3EA12DDBF
+	for <linux-bluetooth@vger.kernel.org>; Tue,  6 Feb 2024 11:23:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707218594; cv=none; b=uRf5QZHhcg4Obv6h0CoxFejIxFI0FDPpffIV6orzIdDBpAi0FUdHvSHdFcUZtcStQ205Zl/tS8K9NCQDIbYkSENN+F9Ikvemp8C3Fq1aW+uqjDSF2+8niPD+34DRLeIn6ljYT28AyZzm2e+LzpwiaOZU4OXhHczdi9L+6Db5awE=
+	t=1707218595; cv=none; b=KgW7d3jvGtC4HQtjz3BmrIrLr7O4dG4Q+SW0zH2ZWcroWKuNaHxGZHQmgxGKi+aIyifBtTN5o0Fe8nsVTyXQ8NsN/UpzURzI9xxb5fnA50S+UU9FJUIH5Ee8o2cWWnI8lauXP/BB8Dhw3ryMX4URdFORNC9B/P/TljbJUh+7tes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707218594; c=relaxed/simple;
-	bh=wyBQMtAQ77Mo9NLIgT8063PW5DnJNq5je6ORcAdKM0U=;
+	s=arc-20240116; t=1707218595; c=relaxed/simple;
+	bh=Sc8PWzUi9/KlVw/GmVTp9nSfoCrASQlbge540XJSr9I=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SbnfrLU82qUGc8vyeYZJqinYktm64RGNLjS2geRAq2Vk2qrNk82UQ3wujkijniNRLPspmG/coxGbp6FfBeawvCyGDVDrtm6k8Jvok28g911yrNllMzd7tuViFiVtAR4XSVtJki7ZodUF7wuy1YwDi5rYyE3no5GjFRZjsgP0RqM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl; spf=pass smtp.mailfrom=v0yd.nl; arc=none smtp.client-ip=80.241.56.171
+	 MIME-Version; b=du7FcE9WmlxWb9qoh12S03+1Y/7uoByblgCKHGjUKRvNftV+Ce7jga98zGuSFwB48x/eKVz5FpmnEzNTzLUy7cR7lgUkPfvxdH7yDQhJzPY7RP6xhBbCIL5DLOBODa9nn+GbDl+hAQhasx/47rM72DwaxK0bJvc2YWYZte0SA6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl; spf=pass smtp.mailfrom=v0yd.nl; arc=none smtp.client-ip=80.241.56.151
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=v0yd.nl
 Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4TTgph5kHbz9stk;
-	Tue,  6 Feb 2024 12:23:08 +0100 (CET)
+	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4TTgpk27q4z9ssx;
+	Tue,  6 Feb 2024 12:23:10 +0100 (CET)
 From: =?UTF-8?q?Jonas=20Dre=C3=9Fler?= <verdre@v0yd.nl>
 To: linux-bluetooth@vger.kernel.org,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: =?UTF-8?q?Jonas=20Dre=C3=9Fler?= <verdre@v0yd.nl>
-Subject: [PATCH BlueZ v2 2/4] mgmt-tester: Adjust a test for recent kernel changes
-Date: Tue,  6 Feb 2024 12:22:51 +0100
-Message-ID: <20240206112253.76446-3-verdre@v0yd.nl>
+Subject: [PATCH BlueZ v2 3/4] emulator/btdev: Send page timeout after 5.12 secs delay
+Date: Tue,  6 Feb 2024 12:22:52 +0100
+Message-ID: <20240206112253.76446-4-verdre@v0yd.nl>
 In-Reply-To: <20240206112253.76446-1-verdre@v0yd.nl>
 References: <20240206112253.76446-1-verdre@v0yd.nl>
 Precedence: bulk
@@ -37,31 +37,65 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-With the changes in the kernel to move to hci_sync for connecting ACL
-devices (see kernel commit "Bluetooth: hci_conn: Only do ACL connections
-sequentially"), the "ETIMEDOUT" error path for the "HCI Create
-Connection" command was changed, sending a "HCI Create Connection
-Cancel" command after the timeout.
+Real bluetooth adapters wouldn't send the page timeout immediately
+when trying to page a device, instead it would take a few seconds.
 
-This leads to the returned error in the "Pair Device - Power off 1"
-test to change from NOT_POWERED to DISCONNECTED, so adjust for that.
+Try to behave more realistically in the emulator and send the page
+timeout after 5.12 seconds, which is the default page timeout.
 ---
- tools/mgmt-tester.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ emulator/btdev.c | 32 +++++++++++++++++++++++++++++++-
+ 1 file changed, 31 insertions(+), 1 deletion(-)
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index 7d884bbf6..767cd5cda 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -3216,7 +3216,7 @@ static const struct generic_data pair_device_power_off_test_1 = {
- 	.send_opcode = MGMT_OP_PAIR_DEVICE,
- 	.send_func = pair_device_send_param_func,
- 	.force_power_off = true,
--	.expect_status = MGMT_STATUS_NOT_POWERED,
-+	.expect_status = MGMT_STATUS_DISCONNECTED,
- 	.expect_func = pair_device_expect_param_func,
- };
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index 7b67e9430..6bf0f442b 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -1281,6 +1281,27 @@ static void conn_complete(struct btdev *btdev,
+ 	send_event(btdev, BT_HCI_EVT_CONN_COMPLETE, &cc, sizeof(cc));
+ }
  
++struct page_timeout_data {
++	struct btdev *btdev;
++	uint8_t bdaddr[6];
++	unsigned int timeout_id;
++};
++
++static bool page_timeout(void *user_data)
++{
++	struct page_timeout_data *pt_data = user_data;
++	struct btdev *btdev = pt_data->btdev;
++	const uint8_t *bdaddr = pt_data->bdaddr;
++
++	timeout_remove(pt_data->timeout_id);
++	pt_data->timeout_id = 0;
++
++	conn_complete(btdev, bdaddr, BT_HCI_ERR_PAGE_TIMEOUT);
++
++	free(pt_data);
++	return false;
++}
++
+ static int cmd_create_conn_complete(struct btdev *dev, const void *data,
+ 						uint8_t len)
+ {
+@@ -1298,7 +1319,16 @@ static int cmd_create_conn_complete(struct btdev *dev, const void *data,
+ 
+ 		send_event(remote, BT_HCI_EVT_CONN_REQUEST, &cr, sizeof(cr));
+ 	} else {
+-		conn_complete(dev, cmd->bdaddr, BT_HCI_ERR_PAGE_TIMEOUT);
++		struct page_timeout_data *pt_data =
++			new0(struct page_timeout_data, 1);
++
++		pt_data->btdev = dev;
++		memcpy(pt_data->bdaddr, cmd->bdaddr, 6);
++
++		/* Send page timeout after 5.12 seconds to emulate real paging */
++		pt_data->timeout_id = timeout_add(5120,
++						  page_timeout,
++						  pt_data, NULL);
+ 	}
+ 
+ 	return 0;
 -- 
 2.43.0
 
