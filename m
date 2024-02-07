@@ -1,236 +1,138 @@
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8669A21
-	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Feb 2024 00:07:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0154E5256
+	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Feb 2024 00:29:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707264451; cv=none; b=TZOW54nEfcA5Fy4CSpzg9wfeJ60PWaOBHS2rKXCu9AvWxudWGoTXpwwOCfW8FEWPpUFbgWviGlz1GuxonjZj0kRKzyoRSnLFvZyxA0e5kBqQ3qgzXJkSV42m/kQOGyeUIzdjtfA96i7km8l5Y007OFMgTohtl48VdSQ90czV6e8=
+	t=1707265743; cv=none; b=eb3Ve8l00vVDXH5g+VrEzWSSetWWNUzPvAdjQiBvOzBeUMFTUWzYhorlq+QnLIb3UzdVsb2v7I23A8y3L/v+Hp+n+DrYdGsUt23VGYl5US1Cj5Wj/gjR3QJyvIHixwEMQ1IFLm+5CzuU6LCevtgc9zKJ0czQSJkU2aWu2KXMRUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707264451; c=relaxed/simple;
-	bh=e/wWgvLaH6Xms95KzTm+BykT06sEDTluKljxtlhBtXI=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=D8Ftrk3r5Q5WPZBdB+wSOZP/OcfDw3q8UKi0nUw7G23LPJp9AiSKToSuqm5CuGVvI6bqD97x0n0OuJYJfQP3UiMVgymItPfoqgmvWX9wV9TcJRQQhhbpyZQRG1rluzrWzZhWlOCbNYH4utqSV3CdnAhCZwBAXqcK+a9pc6PLfMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7c2c96501e6so6208439f.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Feb 2024 16:07:29 -0800 (PST)
+	s=arc-20240116; t=1707265743; c=relaxed/simple;
+	bh=GKivdibf01cDxEgwB8MCA0cnQFTHFQAnY0laQw9juQc=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=L6GqI77T4r8lTAPEw30h5vDwkBJCNa3DmhsjNhfNJ2o5v9MUZX4qrfZrdBLbWTr35c8dDhKmeiD/WZDlsKLw3KWWltKaABWEjq2TSqN+nPYwC/oq6hCm2MNJbOhVEv2dTjAciQdLfmYnQxVeW/kwhlw4e8+vCXsdOYt9VxILZFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i+3wQDBI; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i+3wQDBI"
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2906773c7e9so52738a91.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Feb 2024 16:29:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707265741; x=1707870541; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=+mC5qS8ND0q7AMpfsYE7PGKmihjlKy+TlqR9uSXcoPk=;
+        b=i+3wQDBItNLSI5f+iQCRNo0TdPiXfcpuvtA5r5F5w67GMXdtkaZMByl6mEP8LXZMRM
+         1ZwY6HIP3vRk9/xEuvexx3YmuQFtmrhi79goeSuKk+RtFQQGDRy+zvZplmMs9M98tsBJ
+         XcxVx/wLfKKS8ZXxfPkHRgXAriZNuqs49cdmzMPvnUrlRkkB5SIRKdmqsQgTbiktHdn6
+         5PhPiPnnNXa5PtOUeWe0KZRUogUsu4b7f4i8wJpph7O1jHcr2Tj5lCZP7C/sblH5UWeZ
+         q3qJYjqWf33ChPDzeK+QOw7Qc9fBrvnnc1l/h1AKAUbwvCMU6ALbQGopBxxFeWdY/Awl
+         cT2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707264449; x=1707869249;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kOJdGbNsb2xZMjmIcHRBPA6EHTzqMxcGC265Oe/VtXQ=;
-        b=IB7UfpLkvHbql2LOI3ghv//p6CK7M61v81mD9yvOVR220B9rcj2n+2CoEaP7lgZPTO
-         wCjdtuyYD4lUqKCdsYyrvxNkrWneKI+uJlnRtpnPwNFebNoeKqgcGQ8tG3KcLs5u9H2z
-         PN0577UfjwV4L6qpp7siHmJ+Co7uKbdeCzY0oUAKhvj/kgZSP534iqtjb8GSGDve46oo
-         OVwyQsOc5HpzUifFt06W4c8Vhlor7rj3W2CvpqAVH+syAnG3JxCwUzuMfsoeW38m3p7Z
-         EvJpngKO+agzLVOMkX33iNMyxfSXkSyF3EdGZoLhxNuAkLcIKqpNO7SGadlR3DndzJcZ
-         cvlw==
-X-Gm-Message-State: AOJu0YyUxHUA+VlEAjZVDOXygXiHT+UMc9PQ65p8J3sX1ZjgrqD/lcOq
-	tfX9MmGfIbzD7Eytipc69t4ETgb4BJWvRvL40lrBMJHmG/u+HVoIAXL/tXVIdHFm/Mu3AzEKT+2
-	3VOVTGJ3Tdq4OVnsYCJJnves53DA0rif5Ub1N7F6mhE3wiHx+pG2/Mw8=
-X-Google-Smtp-Source: AGHT+IECQAH95uwwoZT2xXecLlAiaAZKlLjmj+ILu0JYJftbR1DCmNvqqTkOv/6pC1tOdsPDbpfYakYPJ+K2tbW6FtoiL6T5rIJF
+        d=1e100.net; s=20230601; t=1707265741; x=1707870541;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+mC5qS8ND0q7AMpfsYE7PGKmihjlKy+TlqR9uSXcoPk=;
+        b=r8JGhhpWLlZl65WpHPKKbDD1pp3UyDzM0jlxOoEClLQ6ft3bpmRWBVAknrEHT3f8W5
+         oJo/Wh3eZ1777PRWGs8vUiR28ILlgSvDQ4qLj9iaimkW4FRurB/JW1kZm9FQVzMnWODA
+         cNvlid0gq5AsC6Fi9h/V9/EXWdGe8rmC8MGUpP9teNuuBgHz8un285OZpMtwVL20U6sB
+         EiRCVMqIyz2YwnO+iAAH8+4FYxWnW4779EmaR/GcZpWulAU/cQWZUhxUs8lcQpIbypiP
+         6R2hearauH4txb9PcosXU9ubo6ly3Y4lhBCFAm9OlfUrNhN/xWf8WoPDt3Q18ImCp3RN
+         1IhQ==
+X-Gm-Message-State: AOJu0YwKSqNTiQwBqzbdP0FEn5sgqgVBb30V0697/O/vARq7a6PqnyWq
+	AV4WFNvkVqj2mlUvBRfkOgZb9UBl/J24VNs5Q3q8hb0f4pxDq9m2oj8S0+3J
+X-Google-Smtp-Source: AGHT+IGYzYdNCkZhH7eRb8zLQq9SAatwewyFFjeTGRD4455LnsyeCKdUFUrEx3TS7kem6GgmTWY2Og==
+X-Received: by 2002:a17:90a:3189:b0:296:9bc8:c16d with SMTP id j9-20020a17090a318900b002969bc8c16dmr1230371pjb.26.1707265740945;
+        Tue, 06 Feb 2024 16:29:00 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUDMtHskhRELzMpULiq7+NuJW1sq+pv5ij+yGu1/4sjv577RBzE7AUGK6jHXGsI8ZsLf9LGkIgQJMlWplK8Myh4dLWV4A==
+Received: from [172.17.0.2] ([52.159.137.225])
+        by smtp.gmail.com with ESMTPSA id u5-20020a17090ac88500b0029681231ae1sm154411pjt.28.2024.02.06.16.29.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Feb 2024 16:29:00 -0800 (PST)
+Message-ID: <65c2cecc.170a0220.c4977.0a5f@mx.google.com>
+Date: Tue, 06 Feb 2024 16:29:00 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============2129523119202357791=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a02:ad08:0:b0:471:2650:2b10 with SMTP id
- s8-20020a02ad08000000b0047126502b10mr29438jan.6.1707264448991; Tue, 06 Feb
- 2024 16:07:28 -0800 (PST)
-Date: Tue, 06 Feb 2024 16:07:28 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000051d4b0610bf7b20@google.com>
-Subject: [syzbot] [bluetooth?] INFO: task hung in hci_release_dev
-From: syzbot <syzbot+83da23da6243e55b4670@syzkaller.appspotmail.com>
-To: jiangshanlai@gmail.com, johan.hedberg@gmail.com, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com, 
-	tj@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v3,1/3] shared/bap: Rework stream procedures
+In-Reply-To: <20240206223513.2783330-1-luiz.dentz@gmail.com>
+References: <20240206223513.2783330-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hello,
+--===============2129523119202357791==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-syzbot found the following issue on:
+This is automated email and please do not reply to this email!
 
-HEAD commit:    076d56d74f17 Add linux-next specific files for 20240202
-git tree:       linux-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=155f1540180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=428086ff1c010d9f
-dashboard link: https://syzkaller.appspot.com/bug?extid=83da23da6243e55b4670
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1181463fe80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=105dfab7e80000
+Dear submitter,
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/dece45d1a4b5/disk-076d56d7.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/4921e269b178/vmlinux-076d56d7.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/2a9156da9091/bzImage-076d56d7.xz
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=823751
 
-The issue was bisected to:
+---Test result---
 
-commit dd6c3c5441263723305a9c52c5ccc899a4653000
-Author: Tejun Heo <tj@kernel.org>
-Date:   Mon Jan 29 18:11:24 2024 +0000
+Test Summary:
+CheckPatch                    PASS      1.50 seconds
+GitLint                       FAIL      0.87 seconds
+BuildEll                      PASS      24.31 seconds
+BluezMake                     PASS      708.93 seconds
+MakeCheck                     PASS      11.20 seconds
+MakeDistcheck                 PASS      162.85 seconds
+CheckValgrind                 PASS      226.06 seconds
+CheckSmatch                   PASS      326.92 seconds
+bluezmakeextell               PASS      106.50 seconds
+IncrementalBuild              PASS      2009.42 seconds
+ScanBuild                     WARNING   943.01 seconds
 
-    workqueue: Move pwq_dec_nr_in_flight() to the end of work item handling
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,v3,3/3] shared/bap: Make bt_bap_ref_safe check if the instance is attached
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14b9456c180000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=16b9456c180000
-console output: https://syzkaller.appspot.com/x/log.txt?x=12b9456c180000
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (81>80): "[BlueZ,v3,3/3] shared/bap: Make bt_bap_ref_safe check if the instance is attached"
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+src/shared/bap.c:1132:2: warning: Use of memory after it is freed
+        DBG(bap, "stream %p", stream);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/bap.c:40:2: note: expanded from macro 'DBG'
+        bap_debug(_bap, "%s:%s() " fmt, __FILE__, __func__, ## arg)
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/bap.c:1145:2: warning: Use of memory after it is freed
+        DBG(stream->bap, "stream %p", stream);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/bap.c:40:2: note: expanded from macro 'DBG'
+        bap_debug(_bap, "%s:%s() " fmt, __FILE__, __func__, ## arg)
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/bap.c:1240:33: warning: Use of memory after it is freed
+        for (entry = queue_get_entries(bap->state_cbs); entry;
+                                       ^~~~~~~~~~~~~~
+src/shared/bap.c:1698:3: warning: Use of memory after it is freed
+                stream_set_state(stream, BT_BAP_STREAM_STATE_CONFIG);
+                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+4 warnings generated.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+83da23da6243e55b4670@syzkaller.appspotmail.com
-Fixes: dd6c3c544126 ("workqueue: Move pwq_dec_nr_in_flight() to the end of work item handling")
-
-INFO: task syz-executor108:5074 blocked for more than 143 seconds.
-      Not tainted 6.8.0-rc2-next-20240202-syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor108 state:D stack:25360 pid:5074  tgid:5074  ppid:5064   flags:0x00004002
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5400 [inline]
- __schedule+0x17df/0x4a40 kernel/sched/core.c:6727
- __schedule_loop kernel/sched/core.c:6804 [inline]
- schedule+0x14b/0x320 kernel/sched/core.c:6819
- schedule_timeout+0xb0/0x310 kernel/time/timer.c:2159
- do_wait_for_common kernel/sched/completion.c:95 [inline]
- __wait_for_common kernel/sched/completion.c:116 [inline]
- wait_for_common kernel/sched/completion.c:127 [inline]
- wait_for_completion+0x355/0x620 kernel/sched/completion.c:148
- __flush_workqueue+0x730/0x1630 kernel/workqueue.c:3617
- drain_workqueue+0xc9/0x390 kernel/workqueue.c:3730
- destroy_workqueue+0xba/0xc40 kernel/workqueue.c:5319
- hci_release_dev+0x136/0x1670 net/bluetooth/hci_core.c:2807
- bt_host_release+0x83/0x90 net/bluetooth/hci_sysfs.c:94
- device_release+0x99/0x1c0
- kobject_cleanup lib/kobject.c:682 [inline]
- kobject_release lib/kobject.c:716 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x1f5/0x430 lib/kobject.c:733
- hci_uart_tty_close+0x1c1/0x290 drivers/bluetooth/hci_ldisc.c:552
- tty_ldisc_kill+0xa3/0x1a0 drivers/tty/tty_ldisc.c:607
- tty_ldisc_release+0x174/0x200 drivers/tty/tty_ldisc.c:775
- tty_release_struct+0x2b/0xe0 drivers/tty/tty_io.c:1696
- tty_release+0xd0c/0x12c0 drivers/tty/tty_io.c:1867
- __fput+0x429/0x8a0 fs/file_table.c:376
- task_work_run+0x24f/0x310 kernel/task_work.c:180
- exit_task_work include/linux/task_work.h:38 [inline]
- do_exit+0xa1b/0x27e0 kernel/exit.c:878
- do_group_exit+0x207/0x2c0 kernel/exit.c:1027
- __do_sys_exit_group kernel/exit.c:1038 [inline]
- __se_sys_exit_group kernel/exit.c:1036 [inline]
- __x64_sys_exit_group+0x3f/0x40 kernel/exit.c:1036
- do_syscall_64+0xfb/0x240
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
-RIP: 0033:0x7f08333d3309
-RSP: 002b:00007ffd1b9835d8 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f08333d3309
-RDX: 000000000000003c RSI: 00000000000000e7 RDI: 0000000000000000
-RBP: 00007f0833453390 R08: ffffffffffffffb8 R09: 0000555556c61610
-R10: 000000000000000e R11: 0000000000000246 R12: 00007f0833453390
-R13: 0000000000000000 R14: 00007f0833454e60 R15: 00007f08333a42f0
- </TASK>
-
-Showing all locks held in the system:
-5 locks held by kworker/u4:0/10:
-1 lock held by khungtaskd/29:
- #0: ffffffff8e130d60 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
- #0: ffffffff8e130d60 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
- #0: ffffffff8e130d60 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x55/0x2a0 kernel/locking/lockdep.c:6614
-2 locks held by getty/4817:
- #0: ffff88802afa30a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:243
- #1: ffffc90002f162f0 (&ldata->atomic_read_lock){+.+.}-{3:3}, at: n_tty_read+0x6b5/0x1e10 drivers/tty/n_tty.c:2201
-1 lock held by syz-executor108/5074:
- #0: ffff88807a68e0a0 (&tty->ldisc_sem){++++}-{0:0}, at: __tty_ldisc_lock drivers/tty/tty_ldisc.c:289 [inline]
- #0: ffff88807a68e0a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_lock_pair_timeout drivers/tty/tty_ldisc.c:352 [inline]
- #0: ffff88807a68e0a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_lock_pair drivers/tty/tty_ldisc.c:366 [inline]
- #0: ffff88807a68e0a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_release+0x110/0x200 drivers/tty/tty_ldisc.c:774
-
-=============================================
-
-NMI backtrace for cpu 1
-CPU: 1 PID: 29 Comm: khungtaskd Not tainted 6.8.0-rc2-next-20240202-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x1e7/0x2e0 lib/dump_stack.c:106
- nmi_cpu_backtrace+0x49c/0x4d0 lib/nmi_backtrace.c:113
- nmi_trigger_cpumask_backtrace+0x198/0x320 lib/nmi_backtrace.c:62
- trigger_all_cpu_backtrace include/linux/nmi.h:160 [inline]
- check_hung_uninterruptible_tasks kernel/hung_task.c:222 [inline]
- watchdog+0xfb0/0xff0 kernel/hung_task.c:379
- kthread+0x2f0/0x390 kernel/kthread.c:388
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:242
- </TASK>
-Sending NMI from CPU 1 to CPUs 0:
-NMI backtrace for cpu 0
-CPU: 0 PID: 10 Comm: kworker/u4:0 Not tainted 6.8.0-rc2-next-20240202-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
-Workqueue: events_unbound toggle_allocation_gate
-RIP: 0010:can_migrate_task+0x4ef/0x960 kernel/sched/fair.c:8991
-Code: c1 e8 03 42 0f b6 04 20 84 c0 0f 85 fa 01 00 00 44 3b 7d 00 76 6c 83 fb 01 75 0a 0f 1f 44 00 00 0f 1f 44 00 00 b9 01 00 00 00 <89> c8 48 83 c4 38 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc 48
-RSP: 0018:ffffc900000f6f70 EFLAGS: 00000046
-RAX: 0000000000000000 RBX: ffff88801969bc34 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000000000000008 RDI: ffff88801969c028
-RBP: 0000000000000001 R08: ffff88801969c02f R09: 1ffff110032d3805
-R10: dffffc0000000000 R11: ffffed10032d3806 R12: ffffc900000f7580
-R13: ffff88801969bc00 R14: dffffc0000000000 R15: ffff88801969c018
-FS:  0000000000000000(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055b598263448 CR3: 000000000df32000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <NMI>
- </NMI>
- <TASK>
- detach_tasks kernel/sched/fair.c:9088 [inline]
- load_balance+0x5480/0x8920 kernel/sched/fair.c:11335
- newidle_balance+0x6be/0x1080 kernel/sched/fair.c:12363
- pick_next_task_fair+0x27a/0xde0 kernel/sched/fair.c:8502
- __pick_next_task+0xb0/0x2c0 kernel/sched/core.c:6021
- pick_next_task kernel/sched/core.c:6111 [inline]
- __schedule+0x729/0x4a40 kernel/sched/core.c:6691
- __schedule_loop kernel/sched/core.c:6804 [inline]
- schedule+0x14b/0x320 kernel/sched/core.c:6819
- toggle_allocation_gate+0x16a/0x250 mm/kfence/core.c:828
- process_one_work kernel/workqueue.c:3049 [inline]
- process_scheduled_works+0x913/0x14f0 kernel/workqueue.c:3125
- worker_thread+0xa60/0x1000 kernel/workqueue.c:3206
- kthread+0x2f0/0x390 kernel/kthread.c:388
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:242
- </TASK>
-INFO: NMI handler (nmi_cpu_backtrace_handler) took too long to run: 1.335 msecs
 
 
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Regards,
+Linux Bluetooth
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+--===============2129523119202357791==--
