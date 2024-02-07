@@ -1,79 +1,97 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFD347F7DF;
-	Wed,  7 Feb 2024 16:10:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1A9180612
+	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Feb 2024 16:11:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707322226; cv=none; b=cV7GziCTSCesD4BDpP3DiJn4Qz+IKtA9FlAT8LfQGqvMWL3PmJif/8tGfnFCBviMK4iNqJDBcGxRpZMFTXEOdx2Lzg4Lnk0QUTEOwOI6c6aRSKG79OsKP++mf7qa/ijZvgaKUTQreJ9kvw1qmsV8lXJC2v0aMN+IGZZYqRMHImE=
+	t=1707322266; cv=none; b=GSN4tr0oS8dCzhZrlPA2ZrGOt925YZozJNuZfkwzYIg4aSt75KRWIeaiTYfO7eQqRTeScWGYqEgRE3obymj7sSuuNLv38mxnhTBzD9kM6SCW+6e2Az/spP6j04OWgwthiUv60hV+grG+AlL4pb1vUVjE50rGGMglYAWf/99H5Y0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707322226; c=relaxed/simple;
-	bh=PJbRFquDFS5PjoXy1Tp0XeTWuHvBy+YC5ZPjygbcMzI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=YJikEvVX1n1oyXZakJVLp3yySXJtmX8jxIKaJHuBngzM3TQtdI0e6tpfxVsGCm3wQRrv6Nrodlw2S82um7iGur9LAzhCoypR+RERAFh3R8qtrbAuiO+FxRpKB97q7XrMm0krqg2u9PugIqn+Vq1L4RnCJJcG17zit2Z2Lf+RH34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EhgA7COQ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1707322266; c=relaxed/simple;
+	bh=iLCnJoDsqG4g+I7oRQTzm9Qo6DrER9OeDjJFKn9y+Wg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HJNZkyCApc7A1SjzB5pKgAJZoIPDaHRX9gJvrQf+50+rRA9t4joNRi8/gn0SgMjBsn/mz8HGgD+6rjZb0FORzrREB/iYSsLLNfsR5mE2OrPA36eo3UQQDUKe4nkKANN8uN0fsG+xh/2ZyYnVLajM/5ZkXoPk2/N+RCBeWJ1See8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KvG8jIVf; arc=none smtp.client-ip=209.85.208.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EhgA7COQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4F5E9C433A6;
-	Wed,  7 Feb 2024 16:10:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707322226;
-	bh=PJbRFquDFS5PjoXy1Tp0XeTWuHvBy+YC5ZPjygbcMzI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=EhgA7COQyuQt+GU35BYtbZ7fpKQmwnqADSmDVZ7xrzTgTx0giO6i+KJavGu4/xjvo
-	 Qg2NO3WrgBCFng7gFN9nToVjyEWANNiFppflxK9QmtYiuIDkbkfMM72Ab9Qqp4iB97
-	 /ODjPZ/QGhaYOZ95JvFdn9+4Ij6Uv9kiY2bpMHQbDlTybFRXhBETK/y65eqVAoh7zg
-	 Qrf+BPU4cxSWa3d1wwe1BYNNgjCoyCDNbdv6/PAdAJQgxoVDzB0ix8uxmom5SFJzBp
-	 FgEzqbFquQg6lX/X/18t12oHVeaEc+shhXb5lOl7gbi3MSTtGODn84uzl19OvBH6A0
-	 3LH/9zSZ3p+bQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 35FA3D8C96F;
-	Wed,  7 Feb 2024 16:10:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KvG8jIVf"
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2d0d100336cso413641fa.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Feb 2024 08:11:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707322262; x=1707927062; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iLCnJoDsqG4g+I7oRQTzm9Qo6DrER9OeDjJFKn9y+Wg=;
+        b=KvG8jIVfwj3anHyMDBiD6nLJfrDiRV9VUxmO4Cjh2wXAIkxYBp1PVWz8TQs/mDntYC
+         K8EvJwONcWB7smwe/XJmsII6MEvRVn+Wpu6NiYyyjNsUyyt7ky9n9uce+0P/1m+gRzYi
+         lcZ2UiLo+q2lBCxhYbZ8BfNvh3iDcXqbTlNdJX19aafN6RI40HEsgWxGDR08Aa4Fgvly
+         S0JdoNzfMfy5iyNmKFEiiKS8MrtrYHhz9Q4AMLwEusWywocv0gEBMBF9T9qA3J4/6YMp
+         2/yvTEAXxfY63w/cM9bCxXX7TAzy6JydK9j7f4UgAWCZEMu3zbWQUeFkwJuUsY88VCAF
+         wwFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707322262; x=1707927062;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iLCnJoDsqG4g+I7oRQTzm9Qo6DrER9OeDjJFKn9y+Wg=;
+        b=BwBI0E0Ho0SCe30dPRwUN/Qf8LhoMCrc08uQo3YD6/H+e5XlzVFYQ5wkk3+KE2/V+d
+         RMSusYDhCWcE7TRvGv3pfykiXFQEt0WTmk/rSSSXxrVyj9qZHtHni2AWtdFows4x/ECX
+         5SsPM1H5Vso00Qtg5ozZjfHjelSdSwvR8kd86kL/EIasEK48hNRpzxqRyvcWh+CthwUb
+         PiSY0kaLCPnQaXYNX6qoYZsmh20U2/Hh0RzrckQX/TyXbknbpJfXHuEF92TPRs8gCL2s
+         6OGBCuRgEQUtbcQGo86gWa+FQD3EH2c5KgmRCyS3l1jB9RsqdY4iiUCgi1ZkRsPJ8IFA
+         RI5w==
+X-Gm-Message-State: AOJu0YyeUSOOm1oVLm5Thx4hkj6kTH53HUsHr7iGPjTM7wCZam3zQCBy
+	SIDHv2yjEQLvm50r5uOcxKnj8x7sOUzl0zS7XOh7/kpF8vt9xOguRL8hHFiuvAfugy9mctqiAt7
+	fgGNSTp2HEx7USBsNB8narSBdZs367Wm8
+X-Google-Smtp-Source: AGHT+IHr8+MxgRHEBQU1jxYiKhiEuPWf7rLa8QYE5REeBnGuVyAC9j2gEjmtk2RxDRHzkPDD/Dc/J9E6AVdBp7UP6RY=
+X-Received: by 2002:a2e:8545:0:b0:2d0:9bcb:6248 with SMTP id
+ u5-20020a2e8545000000b002d09bcb6248mr4646002ljj.39.1707322261862; Wed, 07 Feb
+ 2024 08:11:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v4 0/2] Bluetooth: Improve retrying of connection attempts
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <170732222621.9598.18285805408891036019.git-patchwork-notify@kernel.org>
-Date: Wed, 07 Feb 2024 16:10:26 +0000
-References: <20240206110816.74995-1-verdre@v0yd.nl>
-In-Reply-To: <20240206110816.74995-1-verdre@v0yd.nl>
-To: =?utf-8?q?Jonas_Dre=C3=9Fler_=3Cverdre=40v0yd=2Enl=3E?=@ci.codeaurora.org
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
+References: <20240207040110.398884-1-user@LBTOE> <65c3655f.170a0220.e7119.2a26@mx.google.com>
+In-Reply-To: <65c3655f.170a0220.e7119.2a26@mx.google.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 7 Feb 2024 11:10:48 -0500
+Message-ID: <CABBYNZLJZPH1gag5YBcdxjL=YY0o3ySnLA5DvUBqt0xVPcqfAA@mail.gmail.com>
+Subject: Re: [BlueZ] monitor/att: Enable the notification logging support for
+ the CCP
+To: linux-bluetooth@vger.kernel.org
+Cc: shahid.bashir.vichhi.com@web.codeaurora.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+Hi Shahid,
 
-This series was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+On Wed, Feb 7, 2024 at 6:11=E2=80=AFAM <bluez.test.bot@gmail.com> wrote:
+>
+> This is an automated email and please do not reply to this email.
+>
+> Dear Submitter,
+>
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> While preparing the CI tests, the patches you submitted couldn't be appli=
+ed to the current HEAD of the repository.
+>
+> ----- Output -----
+>
+> error: patch failed: monitor/att.c:3481
+> error: monitor/att.c: patch does not apply
+> hint: Use 'git am --show-current-patch' to see the failed patch
+>
+> Please resolve the issue and submit the patches again.
 
-On Tue,  6 Feb 2024 12:08:12 +0100 you wrote:
-> Since commit 4c67bc74f016 ("[Bluetooth] Support concurrent connect
-> requests"), the kernel supports trying to connect again in case the
-> bluetooth card is busy and fails to connect.
-> 
-> The logic that should handle this became a bit spotty over time, and also
-> cards these days appear to fail with more errors than just "Command
-> Disallowed".
-> 
-> [...]
+You probably need to rebase these changes on top of master with
+something like git pull --rebase origin/master, if you had cloned it
+from github then you probably need to either add a new remote or do a
+new clone, anyway Id recommend always have the origin remote pointing
+to the main tree not the github mirror.
 
-Here is the summary with links:
-  - [v4,1/2] Bluetooth: hci_conn: Only do ACL connections sequentially
-    https://git.kernel.org/bluetooth/bluetooth-next/c/456561ba8e49
-  - [v4,2/2] Bluetooth: Remove pending ACL connection attempts
-    https://git.kernel.org/bluetooth/bluetooth-next/c/8e14d581d125
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+--=20
+Luiz Augusto von Dentz
