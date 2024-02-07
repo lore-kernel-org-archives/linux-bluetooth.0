@@ -1,118 +1,124 @@
-Received: from mail-vs1-f50.google.com (mail-vs1-f50.google.com [209.85.217.50])
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2296811FF
-	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Feb 2024 16:26:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBA0A610B;
+	Wed,  7 Feb 2024 16:34:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707323190; cv=none; b=OV2UI6tlfUBaGsGZCYiA7KzDIX0JCf0In3dHcmGiJqIQnQY2FESlvXZ42QZENf9gelt7gen9Es79AEiXujOVIc3MaRMSRlkMd2ddB95bQN1AonDu4P2ZpG98a5ng+ThtRDQ7iAQWIruhVHuApWAEGD5FYYLBzczqhEK+MDCI68Q=
+	t=1707323655; cv=none; b=jgBZUlBw3kkavPfoiw/QiVPwbJwBveaTWtH6RMkGOvcqr768LVSKhFIshklHoo1Qq60c88nGmCaYYdkQfnS/QyrI/dquUh3O+ZCqTbEpRdr/74Tx+xeV+0CkGCLjXQ2nz/v5XbdwBAVpxYMbcj/O2I/xl/2wfFob7jUKCsLacro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707323190; c=relaxed/simple;
-	bh=s/XBm+dZXo326rp4+k8nxRmZZap7vVe94gNKobiXRkE=;
+	s=arc-20240116; t=1707323655; c=relaxed/simple;
+	bh=1KmexGjyy3Rb9e+8hKvUS8Tyik0iJdqTgZcCXMDSJsk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Dey3T1GqjUwkpBepchP9MRr+7rgxQqokZ5Ccqk6Nx6iMO/KFEgSb/W7yLNa0KpWccHWepcBj+Woe9pY/m5zW9OkPeKCSsz+UcqH5wa9RFi8IPrQzi+8QFBOdNWxqy34ZiWtxc8a3fWucv7eNM84Pv+w2uP24OCVgq6D2BYP5ICg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=tEn9GZR2; arc=none smtp.client-ip=209.85.217.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+	 To:Cc:Content-Type; b=GzzLpXmmhL2HGWRRdl3r6hGgGwjFw8I4QXXyJch8LSgLF03dEzEKKCHOZm/kUgMxOeTqHm3iY+Nhsp0AaZtcMNvPHMaWEs4XcMT905WzKk/SJVPPaZCH7TFZSjveZQwI1usWZ72xhKcUxbFmCFZI9p3HzKd2WEgc3y/xCftKoBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=huCXfLWQ; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="tEn9GZR2"
-Received: by mail-vs1-f50.google.com with SMTP id ada2fe7eead31-46d1ff63d2fso246036137.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Feb 2024 08:26:28 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="huCXfLWQ"
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5116063585aso992575e87.1;
+        Wed, 07 Feb 2024 08:34:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1707323188; x=1707927988; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1707323652; x=1707928452; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WitkzYepwCuA/S4ttZlXhAljZ+JINQO7bz0r64E60hU=;
-        b=tEn9GZR2YW5QIUhpfy9WbjVoRZUSL8A4E2UxFn9joY8wr7taRtruBFS5ZDP8cbC/PE
-         +rY/R+HXqckBU0/cXttDcGD8TCgthunpbB4V+xxuVs64YsAYfzGTEsPkWv0siLLFEIJt
-         q3DRPVhLVBcUb5jBXacEuRnI5LYw3CQmqxcHc5jRCIqyXO9Rhtg1XmecZnDl43NRf/DZ
-         Ma9XYvgXTZFHFCFw4JMHkOKYtcBvEqC1yVzvOe6OgZF3+3A36F8PJYG6fEx6CLDNeUpA
-         GiD81yogPwnuljwzAB75RmxCo3njmj1PQmWCi6ASwK+B3pAMs3hRAFhoYC2KTb1nhvBd
-         uLEw==
+        bh=/01Ta/FgtGQKqXggzl01PlQ4TYNsQiYYdgsvvx6IqHo=;
+        b=huCXfLWQsBNS7KnGSpGCv5HZizKLos1wGrJ2oryXP2AbE4akdOAgkX0K2/nXdf+1bp
+         r+gKavet4huAr03mQsHWThw0KnD6C/m6wPCbp0FAn0gJ0Q9t/IC71nl82C9XQsRIwr2j
+         i+I6wrv6zPVxrjMGvwz5Xcij/Cw67geur1lHKAmHEzu34RJVESzG+H7JqEIFusNyoBbC
+         93oscACxyaQh99TH20g1EElJrsuoRfHhL/9Yk6xJGP62BU/BVgWsj6mcBkMeq3+aL7DE
+         yRwrBEgEi88tDLstl2p+ELPROon8C2emSGZfFjsG5MyomXTZchnfHmYbfg9s9fRIx3GY
+         bCMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707323188; x=1707927988;
+        d=1e100.net; s=20230601; t=1707323652; x=1707928452;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=WitkzYepwCuA/S4ttZlXhAljZ+JINQO7bz0r64E60hU=;
-        b=vYbNHqyKjAHmkR1P3wM1vjxbDug1xr/urEZORGkDqiXUphKOiKr4gZQIglv7fEmB6V
-         tPT/nmi7dcDkb5+JTSj5gpbxwTuu0DQnMaBz+jMa2uHhFU603LY3R2KBhBpNfJ+9V+2Z
-         k4YIArmYM9WTBfXhBNJUyFIejTMJFKW16JdvYqPZYJ4TMnTAbspSmWG+Ylvv853FjNNJ
-         n08VKOXmW6QAsRNADJWZ47fVv/tCh/xlAQPUuGzC5n+Yzkv0pC1ohSIxDRTDWyPTm6xM
-         BtVhNNBkm0O3VLSqwW+dSYbBGZbJHbE8rdTneuUslcj0JqJRhAaX51k6QMvoE4Qv3Mm0
-         /aEQ==
-X-Gm-Message-State: AOJu0Ywbreo3WTBPwHBFV3ZsGR0coGQnDnqGBXiNFv6OtZTJnwYMeyiu
-	EXr62LkZr07M1v86ekvI7uS9XiTo8oV2l3Tv7RGJoMPM6yxfaSeCf4ak6dyWfTZCKTRGuARMDnO
-	Vg93/d48RVZNg8kP05oOI5qPI8AqofU7AW4KWJw==
-X-Google-Smtp-Source: AGHT+IGUHF6vzAm6fF7RlJC8wV7QGPTkkEw3A+jO1stlUQVB3BJSXCPScQIS002+UPorZpqyfxR0CW3Oxe6kmokSvso=
-X-Received: by 2002:a67:f597:0:b0:46d:295d:1c5a with SMTP id
- i23-20020a67f597000000b0046d295d1c5amr3129996vso.30.1707323187759; Wed, 07
- Feb 2024 08:26:27 -0800 (PST)
+        bh=/01Ta/FgtGQKqXggzl01PlQ4TYNsQiYYdgsvvx6IqHo=;
+        b=MXXzLep7jarUttYJQsaHyC3/eR5Ri6FEFvV1B5u/T50AFvY17j5aOmgXEx11eXLdsK
+         mOFpszVN+6JPtYdQPVJG/ZFMPktX6n3bDlK6One39ntjALqw2vo5LVG3dN1o75TAQY4S
+         KwZgHa7wiEAlFH1C8B1WeJ8PfUGfV9TrYRitJz0yQuOG0lxmmG68AElEm5KBZXXdhyW+
+         WCeF29izR+c+pQjoja122HOr79ASf/MGegKQrnM9DtrydbQStrj5Zu0+3AEu2rFIzwWb
+         kwfjBG5L1O75hk3U//FsTl2U4q7xCUbL6PdZDAZj+IRIVews40LKJgDZDRCByLJOE6fx
+         Qs5w==
+X-Gm-Message-State: AOJu0YwCOgW0Kh4cPtOQAH4qKHBZEpJwyXo7VaT1EMANj6/vUuz7pkSk
+	vhXaWNt25Dfk4/nDxVz+DUbm7k+pfh18Uy40utzwxAoUn4Gwi1DxSqtvY9u6EYdPmsjMnmqjt3b
+	5378o4YkQYLlcU6L1m4UxfXbzXXmJIQVu20Y=
+X-Google-Smtp-Source: AGHT+IFbtBRdRjdgnF47BaPIdc8LarwlW0BzEOe7itqtCRh2ZsqDkxBon3ndtMaIBv0Rj2NssIbH2OpTb0r3qovX+wc=
+X-Received: by 2002:a2e:9b1a:0:b0:2d0:b2ce:a90f with SMTP id
+ u26-20020a2e9b1a000000b002d0b2cea90fmr4592043lji.43.1707323651658; Wed, 07
+ Feb 2024 08:34:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240201155532.49707-1-brgl@bgdev.pl> <20240201155532.49707-9-brgl@bgdev.pl>
- <7tbhdkqpl4iuaxmc73pje2nbbkarxxpgmabc7j4q26d2rhzrv5@ltu6niel5eb4>
- <CAMRc=Md1oTrVMjZRH+Ux3JJKYeficKMYh+8V7ZA=Xz_X1hNd1g@mail.gmail.com> <2q5vwm7tgmpgbrm4dxfhypbs5pdggprxouvzfcherqeevpjhrj@6wtkv4za2gg5>
-In-Reply-To: <2q5vwm7tgmpgbrm4dxfhypbs5pdggprxouvzfcherqeevpjhrj@6wtkv4za2gg5>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Wed, 7 Feb 2024 17:26:16 +0100
-Message-ID: <CAMRc=MfsdsD4f3sC-BnR_sqvaHNEKWCZ+Xe+-ZhLU8vFYA06=w@mail.gmail.com>
-Subject: Re: Re: [RFC 8/9] PCI/pwrctl: add PCI power control core code
-To: Bjorn Andersson <andersson@kernel.org>
-Cc: Konrad Dybcio <konrad.dybcio@linaro.org>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Neil Armstrong <neil.armstrong@linaro.org>, 
-	Alex Elder <elder@linaro.org>, Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Abel Vesa <abel.vesa@linaro.org>, Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, 
-	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-pci@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+References: <20240206110816.74995-1-verdre@v0yd.nl> <170732222621.9598.18285805408891036019.git-patchwork-notify@kernel.org>
+In-Reply-To: <170732222621.9598.18285805408891036019.git-patchwork-notify@kernel.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 7 Feb 2024 11:33:59 -0500
+Message-ID: <CABBYNZLtbEnU3wfnym0P8gamh1_5GcUHKvAnxh4GpcBC3G56uQ@mail.gmail.com>
+Subject: Re: [PATCH v4 0/2] Bluetooth: Improve retrying of connection attempts
+To: patchwork-bot+bluetooth@kernel.org
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 2, 2024 at 5:52=E2=80=AFPM Bjorn Andersson <andersson@kernel.or=
-g> wrote:
+Hi Jonas,
+
+On Wed, Feb 7, 2024 at 11:10=E2=80=AFAM <patchwork-bot+bluetooth@kernel.org=
+> wrote:
 >
-> On Fri, Feb 02, 2024 at 10:11:42AM +0100, Bartosz Golaszewski wrote:
-> > On Fri, Feb 2, 2024 at 4:53=E2=80=AFAM Bjorn Andersson <andersson@kerne=
-l.org> wrote:
-> [..]
-> > > > +             break;
-> > > > +     }
-> > > > +
-> > > > +     return NOTIFY_DONE;
-> > > > +}
-> > > > +
-> > > > +int pci_pwrctl_device_enable(struct pci_pwrctl *pwrctl)
-> > >
-> > > This function doesn't really "enable the device", looking at the exam=
-ple
-> > > driver it's rather "device_enabled" than "device_enable"...
-> > >
+> Hello:
+>
+> This series was applied to bluetooth/bluetooth-next.git (master)
+> by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+>
+> On Tue,  6 Feb 2024 12:08:12 +0100 you wrote:
+> > Since commit 4c67bc74f016 ("[Bluetooth] Support concurrent connect
+> > requests"), the kernel supports trying to connect again in case the
+> > bluetooth card is busy and fails to connect.
 > >
-> > I was also thinking about pci_pwrctl_device_ready() or
-> > pci_pwrctl_device_prepared().
+> > The logic that should handle this became a bit spotty over time, and al=
+so
+> > cards these days appear to fail with more errors than just "Command
+> > Disallowed".
+> >
+> > [...]
 >
-> I like both of these.
+> Here is the summary with links:
+>   - [v4,1/2] Bluetooth: hci_conn: Only do ACL connections sequentially
+>     https://git.kernel.org/bluetooth/bluetooth-next/c/456561ba8e49
+>   - [v4,2/2] Bluetooth: Remove pending ACL connection attempts
+>     https://git.kernel.org/bluetooth/bluetooth-next/c/8e14d581d125
 >
-> I guess the bigger question is how the flow would look like in the event
-> that we need to power-cycle the attached PCIe device, e.g. because
-> firmware has gotten into a really bad state.
->
-> Will we need an operation that removes the device first, and then cut
-> the power, or do we cut the power and then call unprepared()?
->
+> You are awesome, thank you!
+> --
+> Deet-doot-dot, I am a bot.
+> https://korg.docs.kernel.org/patchwork/pwbot.html
 
-How would the core be notified about this power-cycle from the PCI
-subsystem? I honestly don't know. Is there a notifier we could
-subscribe to? Is the device unbound and rebound in such case?
+Something is not quite right with these changes:
 
-Bart
+L2CAP BR/EDR Client - Timeout - test passed
+L2CAP BR/EDR Client - Timeout - teardown
+Bluetooth: hci0: command 0x0408 tx timeout
+  Index Removed callback
+    Index: 0x0000
+L2CAP BR/EDR Client - Timeout - teardown complete
+L2CAP BR/EDR Client - Timeout - done
+L2CAP BR/EDR Client - Timeout                        Passed      22.329 sec=
+onds
+
+The test seems to be blocked on teardown then the command times out,
+0x0408 is HCI_OP_CREATE_CONN_CANCEL so I wonder why it would be timing
+out. Anyway the test uses SO_SNDTIMEO to set a timeout at the socket
+level but it doesn't seem it is used while creating the connection so
+it probably needs to be passed down or something.
+
+
+--=20
+Luiz Augusto von Dentz
