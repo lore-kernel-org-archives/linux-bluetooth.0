@@ -1,262 +1,62 @@
-Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com [209.85.217.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF68A77F0A
-	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Feb 2024 14:02:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE70B78B4A
+	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Feb 2024 14:12:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707400966; cv=none; b=fVL92z16yBWLW4ZRIJwNq6Op3juwbxZ896+cUFc2exjdfWRXZyYXECAc9xkR/fneZ8mMROWz/+JVSmK+WnbEGi8soBahgTuuF/P8UdT0UnjphsMgYk89M8uHuohvtTlp9oi4yDrbsW5vZalrQ2BkWN5aZCTPn46xTY8H3Z3RI8I=
+	t=1707401564; cv=none; b=uv9DMjAMKC7sLd1OOYZXILT5obFsgl2SILp/feTu1AmnBMs04+jZLrYbkCJ5R7LWNJegsuW52cgRf1bzHkiRCeHlmNAFx8ESv9HbO8hCI5KOGsPoCp/QnCxsHVFyIKau6Mg93KBt8EACejHP6cIJ5tW/HjyH8JeJieVjNwPi62Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707400966; c=relaxed/simple;
-	bh=8rRUH6txWLd23yLJjQmoiQzE/Ukkwl7p1fjlXJwlB38=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Z7WKtp4MHkgJinjcdLzHuqpT8D0sO6IJ7up6G2GoNMle4ucserLsx+dm9W8lirvDmKnkl8Fg5AHHcqQfeh6OZKIKOJufo5a5VTiVPQp+SOi2yQJcGI+HHCCc9BzhN2OAUC+wTJuOlRGF0QQZZ2i/80WOlIuOXgOa/rTbr/p2IJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UiAUMHnv; arc=none smtp.client-ip=209.85.217.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1707401564; c=relaxed/simple;
+	bh=lIuF06a7jLQlUheI6rL+f21Jjecf6K6D0ZEEXgBud5k=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Z9PNz9ytaODDVl8oJBqAzDtC+PGGROMVO226LVV2klw2s04TBq9Izerjgq/K7SA49ncXak1iWYvul0pjFWEw4dxRlM+ErGJ4fjDyefIrVezldedROgkhU17Dl38G43BWSN4V8wz58F7Ay6itg0vKWNyaX7ofyG9JhRBWGb5/VUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=OOVIJf7A; arc=none smtp.client-ip=192.30.252.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UiAUMHnv"
-Received: by mail-vs1-f54.google.com with SMTP id ada2fe7eead31-46d2c1077easo559764137.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 08 Feb 2024 06:02:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707400963; x=1708005763; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=m0B6sv5AieWEAKqPKJQ7dPCwecCgHMLOlG7AZEK8G5c=;
-        b=UiAUMHnvXmlRHqbzfh457h+wTtaZeMuOXmDEHdsvRQS14ONLxzCm0oGH8CvO+emqRQ
-         9ba+cHniShLeprOBxeIBF0Hf6JBZtQU+8Ehel3OpNLwT7gjRe0UU7Dv9nSapN+5KlT3i
-         /Sq+t11vrsBu0vJTNZjDFeyZcpNCWzVVbUMJyvwImNXbDZceslAdXK6PQo2g5mkiLdyL
-         prbLCMj6Dy9UUdtwLO0H7wMtnfR2g+DU3JMbhFTkuvS4zUPV3Cw75Ky8mU/f5INdH7+v
-         Glg89BQOwEYf9lFJQpxeLfXiV8XEOhS1H+KeTmgPywLSVDZ2GVNERl5lrp175Xsu7szB
-         knog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707400963; x=1708005763;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=m0B6sv5AieWEAKqPKJQ7dPCwecCgHMLOlG7AZEK8G5c=;
-        b=OWOqt21BXiXv4GWyxp8mF1NrLXlTiMoG27ftmgcYllUP4MAPRHSvkFknrl8/EneeEA
-         9BbKNi8GQI44KLdxANA6eJ7K8ZefFILmnBpscp48Vi+tCUScfK/v0zCM1JvTlDbTA/oI
-         cwgAZtVG5fsk5gVCeQIy8IVpiviYuTZqT3rVMaAJY9KV/bNWwAe2uUKlzntToKC7bxTd
-         wY7JQCLCWTAMblEmD6ILDq6voR1ShPH8FulEOUz35l0VlcpzeK2SA3pkKg6O1NHHZGZz
-         cXDtWtxeTINJ1Ei34JifpMo1H25a7GqGixhN2CI7tauHu/AodBFwPetgRY/EZSxOPrb5
-         TnbA==
-X-Gm-Message-State: AOJu0Yz8/6owekTMAL+pQo5ZYyIpBekDmQrANounvKI6wXkAjRIUYbOe
-	STycnyfzbMN6Xb9aSI7reiqHAWbxuI62yBC51lIDf2uOSX247EN4kcPYpuuB
-X-Google-Smtp-Source: AGHT+IHRMc5+Q3SbZPemM21NWycV3hFEYUSQJZ8/WAHwachpByvhhtKVs0kqPsjMJ5NbEHx4gPdBRw==
-X-Received: by 2002:a05:6102:2756:b0:46d:6046:2951 with SMTP id p22-20020a056102275600b0046d60462951mr2180810vsu.2.1707400962367;
-        Thu, 08 Feb 2024 06:02:42 -0800 (PST)
-Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
-        by smtp.gmail.com with ESMTPSA id v5-20020a056102074500b0046d4b868ce0sm405345vsg.34.2024.02.08.06.02.41
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Feb 2024 06:02:41 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="OOVIJf7A"
+Received: from github.com (hubbernetes-node-972c133.va3-iad.github.net [10.48.206.89])
+	by smtp.github.com (Postfix) with ESMTPA id C222E8C10BB
+	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Feb 2024 06:12:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1707401561;
+	bh=8N4z1nm63I10uflS9ZcL2IITXJyLsXoA6qb3ylXRUEo=;
+	h=Date:From:To:Subject:From;
+	b=OOVIJf7A+XxVIOlGd7H6Cix9tNA4DcqVcwQReX15bvBnKqnO5Hv2e0Q7XJyHrZQQx
+	 WP1F0xj0b4CXS+/It/EtUuKCN2rO+lSJ2hgtwcafAVHZiujsp/+bYYAXqy0hjveD6U
+	 c4BirOokdGJGhTTpW+pLdFamVMuC2SApB9Z6FICk=
+Date: Thu, 08 Feb 2024 06:12:41 -0800
+From: Luiz Augusto von Dentz <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3] Bluetooth: hci_conn: Always use sk_timeo as conn_timeout
-Date: Thu,  8 Feb 2024 09:02:40 -0500
-Message-ID: <20240208140240.3249372-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.43.0
+Message-ID: <bluez/bluez/push/refs/heads/master/cfbaa6-513561@github.com>
+Subject: [bluez/bluez] 513561: mgmt-tester: Remove High Speed test cases
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 5135613ce057c6ac03700097c5dd142533d29579
+      https://github.com/bluez/bluez/commit/5135613ce057c6ac03700097c5dd142533d29579
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-02-08 (Thu, 08 Feb 2024)
 
-This aligns the use socket sk_timeo as conn_timeout when initiating a
-connection and then use it when scheduling the resulting HCI command,
-that way the command is actually aborted synchronously thus not
-blocking commands generated by hci_abort_conn_sync to inform the
-controller the connection is to be aborted.
+  Changed paths:
+    M tools/mgmt-tester.c
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- include/net/bluetooth/hci_core.h |  5 +++--
- include/net/bluetooth/l2cap.h    |  2 +-
- net/bluetooth/6lowpan.c          |  2 +-
- net/bluetooth/hci_conn.c         |  8 +++++---
- net/bluetooth/hci_sync.c         |  2 +-
- net/bluetooth/l2cap_core.c       | 10 ++++------
- net/bluetooth/l2cap_sock.c       |  3 ++-
- net/bluetooth/mgmt.c             |  3 ++-
- net/bluetooth/sco.c              |  3 ++-
- 9 files changed, 21 insertions(+), 17 deletions(-)
+  Log Message:
+  -----------
+  mgmt-tester: Remove High Speed test cases
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 34aa9d0290fe..2bdea85b7c44 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1495,9 +1495,10 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 				u16 conn_timeout, u8 role);
- struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
- 				 u8 sec_level, u8 auth_type,
--				 enum conn_reasons conn_reason);
-+				 enum conn_reasons conn_reason, u16 timeout);
- struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
--				 __u16 setting, struct bt_codec *codec);
-+				 __u16 setting, struct bt_codec *codec,
-+				 u16 timeout);
- struct hci_conn *hci_bind_cis(struct hci_dev *hdev, bdaddr_t *dst,
- 			      __u8 dst_type, struct bt_iso_qos *qos);
- struct hci_conn *hci_bind_bis(struct hci_dev *hdev, bdaddr_t *dst,
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 92d7197f9a56..a4278aa618ab 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -939,7 +939,7 @@ int l2cap_add_scid(struct l2cap_chan *chan,  __u16 scid);
- struct l2cap_chan *l2cap_chan_create(void);
- void l2cap_chan_close(struct l2cap_chan *chan, int reason);
- int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
--		       bdaddr_t *dst, u8 dst_type);
-+		       bdaddr_t *dst, u8 dst_type, u16 timeout);
- int l2cap_chan_reconfigure(struct l2cap_chan *chan, __u16 mtu);
- int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len);
- void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 4eb1b3ced0d2..715cbafbf663 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -892,7 +892,7 @@ static int bt_6lowpan_connect(bdaddr_t *addr, u8 dst_type)
- 	chan->ops = &bt_6lowpan_chan_ops;
- 
- 	err = l2cap_chan_connect(chan, cpu_to_le16(L2CAP_PSM_IPSP), 0,
--				 addr, dst_type);
-+				 addr, dst_type, L2CAP_CONN_TIMEOUT);
- 
- 	BT_DBG("chan %p err %d", chan, err);
- 	if (err < 0)
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index a4beed8587eb..8164502234c5 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1607,7 +1607,7 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
- 
- struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
- 				 u8 sec_level, u8 auth_type,
--				 enum conn_reasons conn_reason)
-+				 enum conn_reasons conn_reason, u16 timeout)
- {
- 	struct hci_conn *acl;
- 
-@@ -1643,6 +1643,7 @@ struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
- 		acl->sec_level = BT_SECURITY_LOW;
- 		acl->pending_sec_level = sec_level;
- 		acl->auth_type = auth_type;
-+		acl->conn_timeout = timeout;
- 
- 		err = hci_acl_create_connection_sync(hdev, acl);
- 		if (err) {
-@@ -1683,14 +1684,15 @@ static struct hci_link *hci_conn_link(struct hci_conn *parent,
- }
- 
- struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
--				 __u16 setting, struct bt_codec *codec)
-+				 __u16 setting, struct bt_codec *codec,
-+				 u16 timeout)
- {
- 	struct hci_conn *acl;
- 	struct hci_conn *sco;
- 	struct hci_link *link;
- 
- 	acl = hci_connect_acl(hdev, dst, BT_SECURITY_LOW, HCI_AT_NO_BONDING,
--			      CONN_REASON_SCO_CONNECT);
-+			      CONN_REASON_SCO_CONNECT, timeout);
- 	if (IS_ERR(acl))
- 		return acl;
- 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 617407b81ffe..788a889210d8 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -6548,7 +6548,7 @@ static int __hci_acl_create_connection_sync(struct hci_dev *hdev, void *data)
- 	err = __hci_cmd_sync_status_sk(hdev, HCI_OP_CREATE_CONN,
- 				       sizeof(cp), &cp,
- 				       HCI_EV_CONN_COMPLETE,
--				       HCI_ACL_CONN_TIMEOUT, NULL);
-+				       conn->conn_timeout, NULL);
- 
- 	if (err == -ETIMEDOUT)
- 		hci_abort_conn_sync(hdev, conn, HCI_ERROR_LOCAL_HOST_TERM);
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index ab5a9d42fae7..467b242d8be0 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -6925,7 +6925,7 @@ static void l2cap_chan_by_pid(struct l2cap_chan *chan, void *data)
- }
- 
- int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
--		       bdaddr_t *dst, u8 dst_type)
-+		       bdaddr_t *dst, u8 dst_type, u16 timeout)
- {
- 	struct l2cap_conn *conn;
- 	struct hci_conn *hcon;
-@@ -7018,19 +7018,17 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
- 
- 		if (hci_dev_test_flag(hdev, HCI_ADVERTISING))
- 			hcon = hci_connect_le(hdev, dst, dst_type, false,
--					      chan->sec_level,
--					      HCI_LE_CONN_TIMEOUT,
-+					      chan->sec_level, timeout,
- 					      HCI_ROLE_SLAVE);
- 		else
- 			hcon = hci_connect_le_scan(hdev, dst, dst_type,
--						   chan->sec_level,
--						   HCI_LE_CONN_TIMEOUT,
-+						   chan->sec_level, timeout,
- 						   CONN_REASON_L2CAP_CHAN);
- 
- 	} else {
- 		u8 auth_type = l2cap_get_auth_type(chan);
- 		hcon = hci_connect_acl(hdev, dst, chan->sec_level, auth_type,
--				       CONN_REASON_L2CAP_CHAN);
-+				       CONN_REASON_L2CAP_CHAN, timeout);
- 	}
- 
- 	if (IS_ERR(hcon)) {
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index ee7a41d6994f..4287aa6cc988 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -254,7 +254,8 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr,
- 		chan->mode = L2CAP_MODE_LE_FLOWCTL;
- 
- 	err = l2cap_chan_connect(chan, la.l2_psm, __le16_to_cpu(la.l2_cid),
--				 &la.l2_bdaddr, la.l2_bdaddr_type);
-+				 &la.l2_bdaddr, la.l2_bdaddr_type,
-+				 sk->sk_sndtimeo);
- 	if (err)
- 		return err;
- 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 064a67157d43..78ab562807d0 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3444,7 +3444,8 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 	if (cp->addr.type == BDADDR_BREDR) {
- 		conn = hci_connect_acl(hdev, &cp->addr.bdaddr, sec_level,
--				       auth_type, CONN_REASON_PAIR_DEVICE);
-+				       auth_type, CONN_REASON_PAIR_DEVICE,
-+				       HCI_ACL_CONN_TIMEOUT);
- 	} else {
- 		u8 addr_type = le_addr_type(cp->addr.type);
- 		struct hci_conn_params *p;
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index c736186aba26..43daf965a01e 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -264,7 +264,8 @@ static int sco_connect(struct sock *sk)
- 	}
- 
- 	hcon = hci_connect_sco(hdev, type, &sco_pi(sk)->dst,
--			       sco_pi(sk)->setting, &sco_pi(sk)->codec);
-+			       sco_pi(sk)->setting, &sco_pi(sk)->codec,
-+			       sk->sk_sndtimeo);
- 	if (IS_ERR(hcon)) {
- 		err = PTR_ERR(hcon);
- 		goto unlock;
--- 
-2.43.0
+High Speed is has been removed so these tests are not run anymore so
+they can be safely removed.
+
 
