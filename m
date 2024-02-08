@@ -1,241 +1,635 @@
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02on2044.outbound.protection.outlook.com [40.107.249.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 433E36BB22
-	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Feb 2024 09:27:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707384454; cv=none; b=kYAEvc9FBPv+YgEupCnquV/cDrSZzL+8qiZXDak+iJ2Yffr5rk8iTL4hVr7RFgsG7RYiMK41/OPwiUg0axcwdyLkqZpTiiAUM4x4ZY7Kn+3q0EktjHyVTyeC2E315Wh33oiE7HWy887kt0FHkow7Z2q2NZv/H/p0nqCxvrT+LBU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707384454; c=relaxed/simple;
-	bh=pwexVJafXkeAOUnPAu4B/60LT1J523HNhEZa5sAFQe4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=EGM35nRZDiZMGQNL4f8Dm8lKIlmcB/EtDpCDw3Vgryj+urM2Cp4x3nSo+HNBsWW/MbFCuHXzVOirjLROzx2CSpuBuaJ0yHwkmCWMVZiJZ9FWGjp+DWzoUILU1629FDCnTDIHuz/oOna/cTz4o8WhI48TdobvALJJC7t1zpCremA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-363befae30fso12853125ab.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 08 Feb 2024 01:27:32 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707384451; x=1707989251;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7b150suGM+XIny5Nrp5YcF8s5+BlSE8/7PlYVOopfwQ=;
-        b=K3V+RcZyySaHuiVHq5g/vgP5z4VVX6Ac9ozJBlLT9LKHtKrIW4HhhRokui5+x3foi+
-         p4wICcgWhQyigDr/gJtTLxkkPPzt1/7N9rdM1sk3HCh9Y6d6UkYFQJP8o2f7b/hvA2CU
-         9BEimvhhRl+igVPgNtjAbQMc6XQPRPLSeQ1Zau8oRzeHfcgWSE7aqvAiH1xNikhXZJEb
-         mK6BgeYtF+xNlyOijoo3TS0nuPcaFSK5eM1juTZjfXP1/w6ZL2aFjKTIM5hi7XcQCYPL
-         tBA2w135AmIeWxeH93RyW2/SQrl1TB7wWMUvNC4YDTB+gzaS4Y9HOUisNicz0aoafGSv
-         x8vg==
-X-Forwarded-Encrypted: i=1; AJvYcCVYOee6R9AGcNMo9yoBSY6RrqRJJavCOt0bY/oxMOcW/Ey6gMVHew9EDT2yteYJqivHm5tgvLBPSiEVCuxjy6iUMwk9OBuqSnaB/paIyKgf
-X-Gm-Message-State: AOJu0YyLhyEVxV4q62gsLPj+NOTYVjrd1ZCQRzMsgy2sgLV5JR62dMu2
-	19wj6qngo6G0KmcSI9gHu3bDNKZOFKx0NBJL9wq0GoG9z4PwnDI+aoClqRO5E+quiQpO1Xg0mKO
-	8nbuKAUgsF71XbPyyCSWjsVeutMOvRsZy3Xkbqgg2vBtrhbB0cguB3bQ=
-X-Google-Smtp-Source: AGHT+IEkooOFMAh8njO3fd36owBe1eTZK4mB+heMZk31KB1n6gxbhHEa6kNy2Ka4JRRZIgPTRkCaQlcfrjPWcBGo+WNtp4OBpStD
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C504F6BFD8
+	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Feb 2024 11:25:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.249.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707391557; cv=fail; b=C9T/5daBiqeC9b2o7/UVL35Sq9+rLUUKBXBy499Rjk15bzOFY6FRylgL6qWrQaRDiaHUzm09CiGgckoBwtxaoIruZwM1oU7gqJ17w2joO6lpyA6IJUhzGa6SHw/seXX476nfbxfsEvVYmh1wqa3ZvQJTMlJpFCkR2YIWe2JjqDE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707391557; c=relaxed/simple;
+	bh=xeg1ujEWD/HdAldQpwbLIrYHa5ACJB2xQuRkH6Gt4sM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=nLKLrY/jajGAb5tOCouhKaBfbNwbc0JxSD446+nsCN9s6CEs5xSG1r7L3mEM2isYY4LTRUubVvZ8yd1MMYldmgghO13yA6ebBr+gFwmO9OD0k4HRPFVKNyEcNa0MX95FynE9Y7ATJA22KKKEK4nne1pB2jxPY74UahD8AfKmmGA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=Pmy73BNp; arc=fail smtp.client-ip=40.107.249.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="Pmy73BNp"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UYeDcRdYsinPdBoR+G4xl9DcAD4QQmKhHr5jirTwFuk47qRatCa7PhTX5eQuxpXQh2EY3QKJxoSVWdlAVfv8c8ol9eEJXbCRmicJ4AUNNK9OTSILbQixELs6yU8lRvljvqa5lSFksk1j+oUKMm6csZlQk0h6728u2s/SVN8Moax+bBDatf0d57KyE55PyZ3uaydu5qCj3avwADkzdTC9IqHbkoK1WTA8d75xknDmyoqmOJZW8Gvlr6GNAOLHohQNH/FTgfLIcOB7KlnOC15RY77Gc8EYP2MRzwI11WhPfVyWVrTgx5iHuDe8otLx3EvCAeLkAo6p2ZhBVgra9fTDlA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WWSiUTxQogKyQJpHrFKpT4GoDMamPNd0LNXxR/P/77k=;
+ b=hUV5JGmWsjf76onx7cwtBjIQ7Cd56TK5Il/+QUO5zHG3XCgmYgF3aDRcHlDzfKo0gKo3YTTCdaE3+ppCVIbBYZIsjEc46+Cdt4CHGkCGac28qxOjyflqTfaDHHA8BmAa4SSGL/VQpBvjoBSwVrgVxO8pi+jcwjSRWPBzc7WGZKcFIUpQV7RqYJZzwgdRCdR55CM0m7lU2hbqZPw4tUiH99lWOU1FT8bczHIMYgQqVfhNb4HGAbDTtoUq10KDSGXiU9FLiukN9VGGYnZfbdVvc9ReGpXf9txU5mMzXWZ0xtFd4kTFWDydoTsYYkqX4VwCJixVKZnJVbDqEADafxrWeQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WWSiUTxQogKyQJpHrFKpT4GoDMamPNd0LNXxR/P/77k=;
+ b=Pmy73BNpVpDXuFzBoDM0o2GiTNKDAJyXkxKSTCv0yV38VcuUezlpIRsKkK6HFzy/Su2+HZNoepfpTCdd0VoO0DnpFQi61jg9zuGuF6vJP5Bs3i2WUil505iy51anKeNtrhKHYoDa8tgQQUxX0Rd6U+CEewtYE0KIlyvEU7Z2DHM=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM9PR04MB8938.eurprd04.prod.outlook.com (2603:10a6:20b:409::20)
+ by DB9PR04MB9843.eurprd04.prod.outlook.com (2603:10a6:10:4c1::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.37; Thu, 8 Feb
+ 2024 11:25:51 +0000
+Received: from AM9PR04MB8938.eurprd04.prod.outlook.com
+ ([fe80::bbd0:4409:3f0e:afdd]) by AM9PR04MB8938.eurprd04.prod.outlook.com
+ ([fe80::bbd0:4409:3f0e:afdd%4]) with mapi id 15.20.7249.039; Thu, 8 Feb 2024
+ 11:25:51 +0000
+From: Andrei Istodorescu <andrei.istodorescu@nxp.com>
+To: luiz.dentz@gmail.com
+Cc: andrei.istodorescu@nxp.com,
+	iulia.tanasescu@nxp.com,
+	linux-bluetooth@vger.kernel.org,
+	mihai-octavian.urzica@nxp.com,
+	silviu.barbulescu@nxp.com,
+	vlad.pruteanu@nxp.com
+Subject: Re: [PATCH BlueZ 3/3] bap: Do PA Sync for each BAP Broadcast source discovered
+Date: Thu,  8 Feb 2024 13:25:49 +0200
+Message-Id: <20240208112549.7432-1-andrei.istodorescu@nxp.com>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <CABBYNZJ9VQL+bvx1=0EaPV0WJS_jLnP=3-gwTLr3rvqhSbN9iA@mail.gmail.com>
+References: <CABBYNZJ9VQL+bvx1=0EaPV0WJS_jLnP=3-gwTLr3rvqhSbN9iA@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AM0PR02CA0010.eurprd02.prod.outlook.com
+ (2603:10a6:208:3e::23) To AM9PR04MB8938.eurprd04.prod.outlook.com
+ (2603:10a6:20b:409::20)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:152b:b0:363:cc38:db22 with SMTP id
- i11-20020a056e02152b00b00363cc38db22mr561569ilu.3.1707384451345; Thu, 08 Feb
- 2024 01:27:31 -0800 (PST)
-Date: Thu, 08 Feb 2024 01:27:31 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000b7b62e0610db6b8a@google.com>
-Subject: [syzbot] [bluetooth?] KASAN: slab-use-after-free Write in __hci_acl_create_connection_sync
-From: syzbot <syzbot+3f0a39be7a2035700868@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8938:EE_|DB9PR04MB9843:EE_
+X-MS-Office365-Filtering-Correlation-Id: 18bd14eb-0949-4d18-d5b9-08dc2898b4b7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	ZTzY29T8kbPBEymDmfK1ZtsOXTrUAG8bYxhOYp5Xxhu8aAO4hMshP8JG02EJUW8X88TFWFjuasERscCMJ78OT/FYs3dYdN4CFsCq9KwrIacSY0wSsPvs5ZkZnoETx6gILbu7xxkv8Sh5PQl7VSVhHX7DwYhLzKEOHHbOoELw/CEnqo7DTih615EvKBpoGvzEFw4A9h1qSeGfcgBwSOqJVA7VAmeBLBw87dh1RatX8qKuzTMQ5d2nHdiqte74XsGHaL2OeiJooi4neED5Kp4k4wJhjdBE0+Pc0FlMwSEbt3s0YWW4DXpD49MkX4Yb/wNXIrxN1FSAGNjA2OodeZMFaaY+nlTb3c+/Ks3EXCD4qf4q9v/SHaJUGY5ux8DKO5XkR87uM3HNFpyF4Defh8dq/CvQ+gboY0MW01oVNijWlrymT2OOlz308FHgmrDv4RT7oW6kvOQiZ62UbQPVphYe6ibGi3hy6tbVSs5ARqt+Ny8NYPbc4c/I/Kll4qWtn2zFAgq1UHP51b8I0/wHQKBMFkdQSfR/MNs1RtG+ZVg06ZmFgtfdWPY681GJl6X2RATv
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8938.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(396003)(366004)(376002)(136003)(39860400002)(230273577357003)(230922051799003)(451199024)(186009)(1800799012)(64100799003)(8676002)(8936002)(4326008)(44832011)(41300700001)(66899024)(38100700002)(36756003)(2906002)(66946007)(2616005)(66476007)(30864003)(316002)(66556008)(5660300002)(6916009)(86362001)(6506007)(478600001)(53546011)(6512007)(6486002)(26005)(1076003)(83380400001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?lzjPph72QnDlseARPrRFpz457JFsCaEJXZ7z8tg4OcZ+Kn9bZ63vvljJ9NX1?=
+ =?us-ascii?Q?5FunfH4dj+nLKivZ9rn5nDBKoNWd9fcVAG6ds1u9wuQMiKhVfafFWVv4Knnz?=
+ =?us-ascii?Q?sETOOAiM8epFAMcI8y7s1vpWiyi5W/lzc4LLGPP/20Cx+y4JrD2n3hftw/J3?=
+ =?us-ascii?Q?q0qg2bp8mQSoSOhv1sSi3TqRLTUM71rSOF4ffX8g6h0RaQV18x81dH5eH2Dp?=
+ =?us-ascii?Q?nMT4nGcIz0UwKfbyW+MTTdsHa7y+EtuTghjVioezF937YIY3Ri2iia6IFUDT?=
+ =?us-ascii?Q?N7e7kqN51Hk7SHFiYWpEIPPgSrWYTOhvy/9oXxvHQ/ZtzsVYQtVqr3OQn7Yd?=
+ =?us-ascii?Q?ui9PMBHNgcH94fcbZPuckjKujIeBTrAdr9dMCX4L9rNnzvHZXPC+ic9Ee1//?=
+ =?us-ascii?Q?08Ooh7GxuYsnyOk70MeFS0cI1/SumsuOWg7Z+SeXsnFEb7dQmTvttWtyaywm?=
+ =?us-ascii?Q?oRWRkZm7hYSL/QGuaPKQqiWXQ07Gcix859gV6sz4cQtoSrgPpQU6Mk6v/DF2?=
+ =?us-ascii?Q?EvmjeKGMx7zm+OLNJF94zbKhVMo95Vs17cozIyxPZUz9hIq7uL/DeGabdHFM?=
+ =?us-ascii?Q?awHn3lyBzCKbt8m9M3AmJ8nZzRJ0oV040gDGtaOWivKcGnj+Tj+inVGft9AY?=
+ =?us-ascii?Q?78BKLix4RnVH8fxuS84Fe0IH8sdSDnlAB8nTscNfoTdhHKUi910kyle6pHWL?=
+ =?us-ascii?Q?w45IKQ/3vKSdppOhnHbf72q55BxlIGU2ZdHVpPuWxBm/l6L+zkGuJVy7T7oO?=
+ =?us-ascii?Q?7k9yDSgxdL2SPWGB4DOi5022v3D+FbAOrAg4aAVczzCn9dHdigyS5iTExntg?=
+ =?us-ascii?Q?/Zf3T1pMevvctccRTSwwIcWDoNc/uDvZmBiAjjBGAZa2QsbvtuK7640GNvtx?=
+ =?us-ascii?Q?bgcI3ch7QNMkSYl++Gt4ZW96ZAlv+6LRnXMYjETFZAiUolHbmKDcCA1QbSu9?=
+ =?us-ascii?Q?C4mvkb9Hqx0NK4IhVtQN193siKL0Jl9YRrqlF2QbJF6qtOQso9dDSUbbnUjl?=
+ =?us-ascii?Q?yLlbCvufg7uyHOSowksbBBi6tJdoSOcVA3CHqF1qBsmwWlpWvZU4KfcLki3W?=
+ =?us-ascii?Q?o3cG6puk5VHDpuVlfuEwIU4jxpB/0dmcTTcBgNH+ulVkIJ/UIYJToBGtfgCu?=
+ =?us-ascii?Q?eI1kDieIFyQK4POTl1G5SebcqMWzCmjJDdbKKFk8qsh5fUerKxcKMa/xUWm+?=
+ =?us-ascii?Q?N5RAZdb8M6zxZQ6YRy+GJIVnHWSWoaIvvkJsDTjJhAPNIFUhaA8kEi14+Rb0?=
+ =?us-ascii?Q?3z1frE9qSg2nA6BHGX3EDGuhTsrapioMF/I6Tednxsp38v6/e1JUquuz/7uY?=
+ =?us-ascii?Q?CzeTb6VCgXBygGtMGBZVo9PeFkSHjbkF+vWqy4emV4g+BpIREwiewHBLUpkN?=
+ =?us-ascii?Q?wT3N5zdOWflgXdD/AP0z3wJfEjgKYIG+njGaZ6SZrMpIQHCqQJBiJkWHIu3x?=
+ =?us-ascii?Q?pKiGO+K5FNfcdx5oZOjT0lDX1sO1vD4FjEaChZeaDJuZtPc7gzGM+AJ+qdVG?=
+ =?us-ascii?Q?DUunO2osSxQ5J0hXTrSjIvGJOICl3c/gqSYkJqqMcDLwDQMgRdisAHjbKihe?=
+ =?us-ascii?Q?43PpfePJVVTZu1NYNrjUh4bkCLJnX4xyBlUj4T4fPjn86XhoQa2RqUzE2ATZ?=
+ =?us-ascii?Q?VA=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 18bd14eb-0949-4d18-d5b9-08dc2898b4b7
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8938.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Feb 2024 11:25:51.4807
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9cRzIRKYUCM73dvvPsBLVtaa62GPzPg9PqlwIpgUM8pvpK5a93kX8OxYjaKk+KpUPbE2N0LYfyUxSuEF2Mb0XBWlJuoGqT/TcDEg5eYm8x4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB9843
 
-Hello,
+Hi Luiz,
 
-syzbot found the following issue on:
+> -----Original Message-----
+> From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+> Sent: Wednesday, February 7, 2024 4:42 PM
+> To: Andrei Istodorescu <andrei.istodorescu@nxp.com>
+> Cc: linux-bluetooth@vger.kernel.org; Mihai-Octavian Urzica <mihai-
+> octavian.urzica@nxp.com>; Silviu Florian Barbulescu
+> <silviu.barbulescu@nxp.com>; Vlad Pruteanu <vlad.pruteanu@nxp.com>;
+> Iulia Tanasescu <iulia.tanasescu@nxp.com>
+> Subject: [EXT] Re: [PATCH BlueZ 3/3] bap: Do PA Sync for each BAP Broadcast
+> source discovered
+> 
+> Caution: This is an external email. Please take care when clicking links or
+> opening attachments. When in doubt, report the message using the 'Report
+> this email' button
+> 
+> 
+> Hi Andrei,
+> 
+> On Wed, Feb 7, 2024 at 7:23 AM Andrei Istodorescu
+> <andrei.istodorescu@nxp.com> wrote:
+> >
+> > After discovering a BAP Broadcast Source do a short PA sync first to
+> > learn the BASE. After discovering the BASE check how many BISes are
+> > matching the sink capabilities and create endpoints for them. Allow
+> > user to configure one endpoint using "SetConfiguration" causing BIG
+> > synchronization to the corresponding BIS; also this results in
+> > creating a stream and the corresponding transport.
+> > ---
+> >  profiles/audio/bap.c | 324
+> > +++++++++++++++----------------------------
+> >  1 file changed, 110 insertions(+), 214 deletions(-)
+> >
+> > diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c index
+> > 88c93127bea0..8646eae2ed20 100644
+> > --- a/profiles/audio/bap.c
+> > +++ b/profiles/audio/bap.c
+> > @@ -105,6 +105,44 @@ struct bap_data {
+> >         void *user_data;
+> >  };
+> >
+> > +/* Structure holding the parameters for periodic train and BIG
+> > + * synchronization
+> > + */
+> > +static struct bt_iso_qos bap_sink_sync_parameters = {
+> > +       .bcast = {
+> > +               .big                    = BT_ISO_QOS_BIG_UNSET,
+> > +               .bis                    = BT_ISO_QOS_BIS_UNSET,
+> > +               /* HCI_LE_Periodic_Advertising_Create_Sync */
+> > +               .options                = 0x00,
+> > +               .skip                   = 0x0000,
+> > +               .sync_timeout   = 0x4000,
+> > +               .sync_cte_type  = 0x00,
+> > +               /* HCI_LE_BIG_Create_Sync */
+> > +               .encryption             = 0x00,
+> > +               .bcode                  = {0x00},
+> > +               .mse                    = 0x00,
+> > +               .timeout                = 0x4000,
+> > +               /* to remove from kernel check */
+> > +               .sync_factor    = 0x07,
+> > +               .packing                = 0x00,
+> > +               .framing                = 0x00,
+> > +               .in = {
+> > +                       .interval       = 10000,
+> > +                       .latency        = 10,
+> > +                       .sdu            = 40,
+> > +                       .phy            = 0x02,
+> > +                       .rtn            = 2,
+> > +               },
+> > +               .out = {
+> > +                       .interval       = 10000,
+> > +                       .latency        = 10,
+> > +                       .sdu            = 40,
+> > +                       .phy            = 0x02,
+> > +                       .rtn            = 2,
+> > +               }
+> > +       }
+> > +};
+> 
+> This cannot be global, it needs to be stored on a per device basis so it doesn't
+> get overwritten.
 
-HEAD commit:    b1d3a0e70c38 Add linux-next specific files for 20240208
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=15530be4180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=bb693ba195662a06
-dashboard link: https://syzkaller.appspot.com/bug?extid=3f0a39be7a2035700868
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11d95147e80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=107c2d8fe80000
+I will submit an update for this.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/176a6b395bbe/disk-b1d3a0e7.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/02d7d46f81bd/vmlinux-b1d3a0e7.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/18a5a5030e19/bzImage-b1d3a0e7.xz
+> 
+> >  static struct queue *sessions;
+> >
+> >  static bool bap_data_set_user_data(struct bap_data *data, void
+> > *user_data) @@ -422,113 +460,6 @@ static int
+> parse_array(DBusMessageIter *iter, struct iovec *iov)
+> >         return 0;
+> >  }
+> >
+> > -static bool parse_base(void *data, size_t len, util_debug_func_t func,
+> > -               uint32_t *presDelay, uint8_t *numSubgroups, uint8_t *numBis,
+> > -               struct bt_bap_codec *codec, struct iovec **caps,
+> > -               struct iovec **meta)
+> > -{
+> > -       struct iovec iov = {
+> > -               .iov_base = data,
+> > -               .iov_len = len,
+> > -       };
+> > -
+> > -       uint8_t capsLen, metaLen;
+> > -       struct iovec cc;
+> > -       struct iovec metadata;
+> > -
+> > -       if (presDelay) {
+> > -               if (!util_iov_pull_le24(&iov, presDelay))
+> > -                       return false;
+> > -               util_debug(func, NULL, "PresentationDelay %d", *presDelay);
+> > -       }
+> > -
+> > -       if (numSubgroups) {
+> > -               if (!util_iov_pull_u8(&iov, numSubgroups))
+> > -                       return false;
+> > -               util_debug(func, NULL, "NumSubgroups %d", *numSubgroups);
+> > -       }
+> > -
+> > -       if (numBis) {
+> > -               if (!util_iov_pull_u8(&iov, numBis))
+> > -                       return false;
+> > -               util_debug(func, NULL, "NumBis %d", *numBis);
+> > -       }
+> > -
+> > -       if (codec) {
+> > -               codec = util_iov_pull_mem(&iov, sizeof(*codec));
+> > -               if (!codec)
+> > -                       return false;
+> > -               util_debug(func, NULL, "%s: ID %d CID 0x%2.2x VID 0x%2.2x",
+> > -                               "Codec", codec->id, codec->cid, codec->vid);
+> > -       }
+> > -
+> > -       if (!util_iov_pull_u8(&iov, &capsLen))
+> > -               return false;
+> > -       util_debug(func, NULL, "CC Len %d", capsLen);
+> > -
+> > -       if (!capsLen)
+> > -               return false;
+> > -
+> > -       cc.iov_len = capsLen;
+> > -       cc.iov_base = util_iov_pull_mem(&iov, capsLen);
+> > -       if (!cc.iov_base)
+> > -               return false;
+> > -
+> > -       if (caps) {
+> > -               if (*caps)
+> > -                       util_iov_free(*caps, 1);
+> > -
+> > -               *caps = util_iov_dup(&cc, 1);
+> > -       }
+> > -
+> > -       for (int i = 0; capsLen > 1; i++) {
+> > -               struct bt_ltv *ltv = util_iov_pull_mem(&cc, sizeof(*ltv));
+> > -               uint8_t *caps;
+> > -
+> > -               if (!ltv) {
+> > -                       util_debug(func, NULL, "Unable to parse %s",
+> > -                                                               "Capabilities");
+> > -                       return false;
+> > -               }
+> > -
+> > -               util_debug(func, NULL, "%s #%u: len %u type %u",
+> > -                                       "CC", i, ltv->len, ltv->type);
+> > -
+> > -               caps = util_iov_pull_mem(&cc, ltv->len - 1);
+> > -               if (!caps) {
+> > -                       util_debug(func, NULL, "Unable to parse %s",
+> > -                                                               "CC");
+> > -                       return false;
+> > -               }
+> > -               util_hexdump(' ', caps, ltv->len - 1, func, NULL);
+> > -
+> > -               capsLen -= (ltv->len + 1);
+> > -       }
+> > -
+> > -       if (!util_iov_pull_u8(&iov, &metaLen))
+> > -               return false;
+> > -       util_debug(func, NULL, "Metadata Len %d", metaLen);
+> > -
+> > -       if (!metaLen)
+> > -               return false;
+> > -
+> > -       metadata.iov_len = metaLen;
+> > -       metadata.iov_base = util_iov_pull_mem(&iov, metaLen);
+> > -       if (!metadata.iov_base)
+> > -               return false;
+> > -
+> > -       if (meta) {
+> > -               if (*meta)
+> > -                       util_iov_free(*meta, 1);
+> > -
+> > -               *meta = util_iov_dup(&metadata, 1);
+> > -       }
+> > -
+> > -       util_hexdump(' ', metadata.iov_base, metaLen, func, NULL);
+> > -
+> > -       return true;
+> > -}
+> > -
+> >  static int parse_io_qos(const char *key, int var, DBusMessageIter *iter,
+> >                                 struct bt_bap_io_qos *qos)  { @@
+> > -954,6 +885,17 @@ static DBusMessage
+> *set_configuration(DBusConnection *conn, DBusMessage *msg,
+> >                 return btd_error_invalid_args(msg);
+> >         }
+> >
+> > +       /* For BAP Broadcast Sink, the capabilities and metadata are coming
+> > +        * from the source's BIS, which are present in the remote PAC
+> > +        */
+> > +       if (bt_bap_pac_get_type(ep->lpac) == BT_BAP_BCAST_SINK) {
+> > +               util_iov_free(setup->caps, 1);
+> > +               setup->caps = util_iov_dup(bt_bap_pac_get_data(ep->rpac), 1);
+> > +               util_iov_free(setup->metadata, 1);
+> > +               setup->metadata = util_iov_dup(
+> > +                               bt_bap_pac_get_metadata(ep->rpac), 1);
+> > +       }
+> > +
+> >         setup->stream = bt_bap_stream_new(ep->data->bap, ep->lpac, ep-
+> >rpac,
+> >                                                 &setup->qos,
+> > setup->caps);
+> >
+> > @@ -977,95 +919,27 @@ static DBusMessage
+> *set_configuration(DBusConnection *conn, DBusMessage *msg,
+> >                 break;
+> >         case BT_BAP_STREAM_TYPE_BCAST:
+> >                 /* No message sent over the air for broadcast */
+> > -               if (bt_bap_pac_get_type(ep->lpac) == BT_BAP_BCAST_SINK)
+> > -                       setup->msg = dbus_message_ref(msg);
+> > -               else {
+> > +               if (bt_bap_pac_get_type(ep->lpac) ==
+> > + BT_BAP_BCAST_SOURCE)
+> >                         setup->base = bt_bap_stream_get_base(setup->stream);
+> > -                       setup->id = 0;
+> >                 }
+> > +               setup->id = 0;
+> >
+> >                 if (ep->data->service)
+> >                         service_set_connecting(ep->data->service);
+> >
+> >                 return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+> > -       }
+> >
+> >         return NULL;
+> >  }
+> >
+> > -static void update_bcast_qos(struct bt_iso_qos *qos,
+> > -                       struct bt_bap_qos *bap_qos)
+> > -{
+> > -       bap_qos->bcast.big = qos->bcast.big;
+> > -       bap_qos->bcast.bis = qos->bcast.bis;
+> > -       bap_qos->bcast.sync_factor = qos->bcast.sync_factor;
+> > -       bap_qos->bcast.packing = qos->bcast.packing;
+> > -       bap_qos->bcast.framing = qos->bcast.framing;
+> > -       bap_qos->bcast.encryption = qos->bcast.encryption;
+> > -       bap_qos->bcast.options = qos->bcast.options;
+> > -       bap_qos->bcast.skip = qos->bcast.skip;
+> > -       bap_qos->bcast.sync_timeout = qos->bcast.sync_timeout;
+> > -       bap_qos->bcast.sync_cte_type = qos->bcast.sync_cte_type;
+> > -       bap_qos->bcast.mse = qos->bcast.mse;
+> > -       bap_qos->bcast.timeout = qos->bcast.timeout;
+> > -       bap_qos->bcast.io_qos.interval = qos->bcast.in.interval;
+> > -       bap_qos->bcast.io_qos.latency = qos->bcast.in.latency;
+> > -       bap_qos->bcast.io_qos.phy = qos->bcast.in.phy;
+> > -       bap_qos->bcast.io_qos.sdu = qos->bcast.in.sdu;
+> > -       bap_qos->bcast.io_qos.rtn = qos->bcast.in.rtn;
+> > -       if (!bap_qos->bcast.bcode)
+> > -               bap_qos->bcast.bcode = new0(struct iovec, 1);
+> > -       util_iov_memcpy(bap_qos->bcast.bcode, qos->bcast.bcode,
+> > -                                               sizeof(qos->bcast.bcode));
+> > -}
+> > -
+> >  static void iso_bcast_confirm_cb(GIOChannel *io, GError *err, void
+> > *user_data)  {
+> >         struct bap_setup *setup = user_data;
+> > -       struct bap_ep *ep = setup->ep;
+> > -       struct bap_data *data = ep->data;
+> > -       struct bt_iso_qos qos;
+> > -       struct bt_iso_base base;
+> > -       char address[18];
+> >         int fd;
+> > -       struct iovec *base_io;
+> > -       uint32_t presDelay;
+> > -       uint8_t numSubgroups;
+> > -       uint8_t numBis;
+> > -       struct bt_bap_codec codec;
+> > -
+> > -       bt_io_get(io, &err,
+> > -                       BT_IO_OPT_DEST, address,
+> > -                       BT_IO_OPT_QOS, &qos,
+> > -                       BT_IO_OPT_BASE, &base,
+> > -                       BT_IO_OPT_INVALID);
+> > -       if (err) {
+> > -               error("%s", err->message);
+> > -               g_error_free(err);
+> > -               goto drop;
+> > -       }
+> >
+> > -       g_io_channel_ref(io);
+> > -       btd_service_connecting_complete(data->service, 0);
+> > -       DBG("BCAST ISO: sync with %s (BIG 0x%02x BIS 0x%02x)",
+> > -                                       address, qos.bcast.big, qos.bcast.bis);
+> > -
+> > -       update_bcast_qos(&qos, &setup->qos);
+> > -
+> > -       base_io = new0(struct iovec, 1);
+> > -       util_iov_memcpy(base_io, base.base, base.base_len);
+> > -
+> > -       parse_base(base_io->iov_base, base_io->iov_len, bap_debug,
+> > -                       &presDelay, &numSubgroups, &numBis,
+> > -                       &codec, &setup->caps, &setup->metadata);
+> > -
+> > -       /* Update pac with BASE information */
+> > -       bt_bap_update_bcast_source(ep->rpac, &codec, setup->caps,
+> > -                                       setup->metadata);
+> > -       setup->id = bt_bap_stream_config(setup->stream, &setup->qos,
+> > -                                       setup->caps, NULL, NULL);
+> > -
+> > -       bt_bap_stream_set_user_data(setup->stream, ep->path);
+> > +       /* listen channel is not needed anymore */
+> > +       g_io_channel_unref(setup->io);
+> > +       setup->io = NULL;
+> >
+> >         fd = g_io_channel_unix_get_fd(io);
+> >
+> > @@ -1074,26 +948,43 @@ static void iso_bcast_confirm_cb(GIOChannel
+> *io, GError *err, void *user_data)
+> >                 g_io_channel_set_close_on_unref(io, FALSE);
+> >                 return;
+> >         }
+> > -
+> > -
+> > -       return;
+> > -
+> > -drop:
+> > -       g_io_channel_shutdown(io, TRUE, NULL);
+> > -
+> >  }
+> >
+> >  static void iso_pa_sync_confirm_cb(GIOChannel *io, void *user_data)
+> > {
+> >         GError *err = NULL;
+> > +       struct bap_data *data = user_data;
+> > +       struct bt_iso_base base;
+> > +       struct bt_bap_base base_s;
+> > +       struct bt_iso_qos qos;
+> >
+> > -       if (!bt_io_bcast_accept(io, iso_bcast_confirm_cb,
+> > -                               user_data, NULL, &err, BT_IO_OPT_INVALID)) {
+> > -               error("bt_io_bcast_accept: %s", err->message);
+> > +       btd_service_connecting_complete(data->service, 0);
+> > +
+> > +       bt_io_get(io, &err,
+> > +                       BT_IO_OPT_BASE, &base,
+> > +                       BT_IO_OPT_QOS, &qos,
+> > +                       BT_IO_OPT_INVALID);
+> > +       if (err) {
+> > +               error("%s", err->message);
+> >                 g_error_free(err);
+> >                 g_io_channel_shutdown(io, TRUE, NULL);
+> > +               return;
+> >         }
+> >
+> > +       /* The PA Sync channel becomes the new listen_io.
+> > +        * It will be later used to listen for a BIS io.
+> > +        */
+> > +       g_io_channel_unref(data->listen_io);
+> > +       data->listen_io = io;
+> > +       g_io_channel_ref(io);
+> > +
+> > +       /* Analyze received BASE data and create remote media endpoints for
+> each
+> > +        * matching BIS
+> > +        */
+> > +       base_s.subgroups = queue_new();
+> > +       bt_bap_parse_base(data->bap, base.base, base.base_len,
+> bap_debug,
+> > +                       &base_s);
+> > +       queue_foreach(base_s.subgroups, bt_bap_parse_bis, NULL);
+> >  }
+> >
+> >  static bool match_data_bap_data(const void *data, const void
+> > *match_data) @@ -1934,12 +1825,11 @@ static void setup_listen_io(struct
+> bap_data *data, struct bt_bap_stream *stream,
+> >         data->listen_io = io;
+> >  }
+> >
+> > -static void setup_listen_io_broadcast(struct bap_data *data,
+> > +static void setup_accept_io_broadcast(struct bap_data *data,
+> >                                         struct bap_setup *setup,
+> >                                         struct bt_bap_stream *stream,
+> >                                         struct bt_iso_qos *qos)  {
+> > -       GIOChannel *io;
+> >         GError *err = NULL;
+> >         struct sockaddr_iso_bc iso_bc_addr;
+> >
+> > @@ -1951,29 +1841,18 @@ static void setup_listen_io_broadcast(struct
+> > bap_data *data,
+> >
+> >         DBG("stream %p", stream);
+> >
+> > -       /* If IO already set skip creating it again */
+> > -       if (bt_bap_stream_get_io(stream) || data->listen_io)
+> > -               return;
+> > -
+> > -       io = bt_io_listen(NULL, iso_pa_sync_confirm_cb, setup, NULL, &err,
+> > -                       BT_IO_OPT_SOURCE_BDADDR,
+> > -                       btd_adapter_get_address(data->adapter),
+> > -                       BT_IO_OPT_DEST_BDADDR,
+> > -                       device_get_address(data->device),
+> > -                       BT_IO_OPT_DEST_TYPE,
+> > -                       btd_device_get_bdaddr_type(data->device),
+> > -                       BT_IO_OPT_MODE, BT_IO_MODE_ISO,
+> > -                       BT_IO_OPT_QOS, &qos->bcast,
+> > -                       BT_IO_OPT_ISO_BC_NUM_BIS, iso_bc_addr.bc_num_bis,
+> > -                       BT_IO_OPT_ISO_BC_BIS, iso_bc_addr.bc_bis,
+> > -                       BT_IO_OPT_INVALID);
+> > -       if (!io) {
+> > -               error("%s", err->message);
+> > +       if (!bt_io_bcast_accept(data->listen_io,
+> > +                       iso_bcast_confirm_cb,
+> > +                       setup, NULL, &err,
+> > +                       BT_IO_OPT_ISO_BC_NUM_BIS,
+> > +                       iso_bc_addr.bc_num_bis, BT_IO_OPT_ISO_BC_BIS,
+> > +                       iso_bc_addr.bc_bis, BT_IO_OPT_INVALID)) {
+> > +               error("bt_io_bcast_accept: %s", err->message);
+> >                 g_error_free(err);
+> >         }
+> > -       setup->io = io;
+> > -       data->listen_io = io;
+> >
+> > +       setup->io = data->listen_io;
+> > +       data->listen_io = NULL;
+> >  }
+> >  static void setup_create_ucast_io(struct bap_data *data,
+> >                                         struct bap_setup *setup, @@
+> > -2037,7 +1916,7 @@ done:
+> >         if (bt_bap_pac_get_type(setup->ep->lpac) ==
+> BT_BAP_BCAST_SOURCE)
+> >                 setup_connect_io_broadcast(data, setup, stream, &iso_qos);
+> >         else
+> > -               setup_listen_io_broadcast(data, setup, stream, &iso_qos);
+> > +               setup_accept_io_broadcast(data, setup, stream,
+> > + &iso_qos);
+> >  }
+> >
+> >  static void setup_create_io(struct bap_data *data, struct bap_setup
+> > *setup, @@ -2422,6 +2301,7 @@ static int bap_bcast_probe(struct
+> btd_service *service)
+> >         struct btd_gatt_database *database =
+> btd_adapter_get_database(adapter);
+> >         struct bap_data *data = btd_service_get_user_data(service);
+> >         char addr[18];
+> > +       GError *err = NULL;
+> >
+> >         ba2str(device_get_address(device), addr);
+> >
+> > @@ -2465,7 +2345,23 @@ static int bap_bcast_probe(struct btd_service
+> > *service)
+> >
+> >         bt_bap_set_user_data(data->bap, service);
+> >
+> > -       bt_bap_new_bcast_source(data->bap, device_get_path(device));
+> > +       DBG("Create PA sync with this source");
+> > +       data->listen_io = bt_io_listen(NULL, iso_pa_sync_confirm_cb, data,
+> > +                       NULL, &err,
+> > +                       BT_IO_OPT_SOURCE_BDADDR,
+> > +                       btd_adapter_get_address(data->adapter),
+> > +                       BT_IO_OPT_DEST_BDADDR,
+> > +                       device_get_address(data->device),
+> > +                       BT_IO_OPT_DEST_TYPE,
+> > +                       btd_device_get_bdaddr_type(data->device),
+> > +                       BT_IO_OPT_MODE, BT_IO_MODE_ISO,
+> > +                       BT_IO_OPT_QOS, &bap_sink_sync_parameters,
+> > +                       BT_IO_OPT_INVALID);
+> > +       if (!data->listen_io) {
+> > +               error("%s", err->message);
+> > +               g_error_free(err);
+> > +       }
+> 
+> I really doubt this will work in a crowded environment, it seems we would be
+> doing several PA Sync in parallel, one for each announcement found, which
+> not only would overwrite the QOS but also I don't think controller are capable
+> of doing multiple PA Sync like that so we might need to serialize the process
+> of doing short lived PA Syncs to enumerate the BASE.
+> 
+> Usually we have dealt with the serialization using an idle timer which can
+> then check services that need to be resolved, once a service is being
+> resolved then the timer shall be stopped, we restart the time everytime
+> something needs to be resolved.
+> 
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+3f0a39be7a2035700868@syzkaller.appspotmail.com
+bap_bcast_probe starts a PA Sync controller procedure for each new Broadcast 
+source seen. 
+This can take several milliseconds with physical controller and runs in an instant 
+with the emulator. The problem that can arrive is that another Broadcast source 
+gets probed and another bt_io_listen is executed before the previous one is 
+completed. In this scenario the controller will return an error for no resources 
+and the second PA sync will fail, but the one in progress will complete successfully.
+Given the timings for this to happen, can I submit a different patch for this 
+issue, or shall I fix it in this one?
 
-==================================================================
-BUG: KASAN: slab-use-after-free in __hci_acl_create_connection_sync+0x6ce/0x990 net/bluetooth/hci_sync.c:6518
-Write of size 2 at addr ffff88806b80c036 by task kworker/u9:4/5087
-
-CPU: 0 PID: 5087 Comm: kworker/u9:4 Not tainted 6.8.0-rc3-next-20240208-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
-Workqueue: hci4 hci_cmd_sync_work
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
- print_address_description mm/kasan/report.c:377 [inline]
- print_report+0x169/0x550 mm/kasan/report.c:488
- kasan_report+0x143/0x180 mm/kasan/report.c:601
- __hci_acl_create_connection_sync+0x6ce/0x990 net/bluetooth/hci_sync.c:6518
- hci_cmd_sync_work+0x22b/0x400 net/bluetooth/hci_sync.c:306
- process_one_work kernel/workqueue.c:3102 [inline]
- process_scheduled_works+0x9d7/0x1730 kernel/workqueue.c:3182
- worker_thread+0x86d/0xd70 kernel/workqueue.c:3263
- kthread+0x2f0/0x390 kernel/kthread.c:388
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:242
- </TASK>
-
-Allocated by task 6357:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- poison_kmalloc_redzone mm/kasan/common.c:370 [inline]
- __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:387
- kasan_kmalloc include/linux/kasan.h:211 [inline]
- kmalloc_trace+0x1d9/0x360 mm/slub.c:4013
- kmalloc include/linux/slab.h:590 [inline]
- kzalloc include/linux/slab.h:711 [inline]
- hci_conn_add+0xc7/0x13a0 net/bluetooth/hci_conn.c:914
- hci_conn_add_unset net/bluetooth/hci_conn.c:1016 [inline]
- hci_connect_acl+0x15d/0x470 net/bluetooth/hci_conn.c:1632
- hci_connect_sco+0x3f/0x350 net/bluetooth/hci_conn.c:1692
- sco_connect net/bluetooth/sco.c:266 [inline]
- sco_sock_connect+0x2ce/0x950 net/bluetooth/sco.c:591
- __sys_connect_file net/socket.c:2048 [inline]
- __sys_connect+0x2df/0x310 net/socket.c:2065
- __do_sys_connect net/socket.c:2075 [inline]
- __se_sys_connect net/socket.c:2072 [inline]
- __x64_sys_connect+0x7a/0x90 net/socket.c:2072
- do_syscall_64+0xfb/0x240
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
-
-Freed by task 5087:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:586
- poison_slab_object+0xa6/0xe0 mm/kasan/common.c:240
- __kasan_slab_free+0x37/0x60 mm/kasan/common.c:256
- kasan_slab_free include/linux/kasan.h:184 [inline]
- slab_free_hook mm/slub.c:2122 [inline]
- slab_free mm/slub.c:4296 [inline]
- kfree+0x14a/0x380 mm/slub.c:4406
- device_release+0x99/0x1c0
- kobject_cleanup lib/kobject.c:682 [inline]
- kobject_release lib/kobject.c:716 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x1f5/0x430 lib/kobject.c:733
- hci_conn_cleanup net/bluetooth/hci_conn.c:176 [inline]
- hci_conn_del+0x8f0/0xc70 net/bluetooth/hci_conn.c:1126
- hci_abort_conn_sync+0x583/0xde0 net/bluetooth/hci_sync.c:5361
- __hci_acl_create_connection_sync+0x60c/0x990 net/bluetooth/hci_sync.c:6554
- hci_cmd_sync_work+0x22b/0x400 net/bluetooth/hci_sync.c:306
- process_one_work kernel/workqueue.c:3102 [inline]
- process_scheduled_works+0x9d7/0x1730 kernel/workqueue.c:3182
- worker_thread+0x86d/0xd70 kernel/workqueue.c:3263
- kthread+0x2f0/0x390 kernel/kthread.c:388
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:242
-
-The buggy address belongs to the object at ffff88806b80c000
- which belongs to the cache kmalloc-4k of size 4096
-The buggy address is located 54 bytes inside of
- freed 4096-byte region [ffff88806b80c000, ffff88806b80d000)
-
-The buggy address belongs to the physical page:
-page:ffffea0001ae0200 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x6b808
-head:ffffea0001ae0200 order:3 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-flags: 0xfff80000000840(slab|head|node=0|zone=1|lastcpupid=0xfff)
-page_type: 0xffffffff()
-raw: 00fff80000000840 ffff888014c42140 ffffea000073c600 dead000000000002
-raw: 0000000000000000 0000000000040004 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 3, migratetype Unmovable, gfp_mask 0x1d2040(__GFP_IO|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC|__GFP_HARDWALL), pid 5397, tgid 5397 (syz-executor270), ts 117997642770, free_ts 25758092955
- set_page_owner include/linux/page_owner.h:31 [inline]
- post_alloc_hook+0x1ea/0x210 mm/page_alloc.c:1539
- prep_new_page mm/page_alloc.c:1546 [inline]
- get_page_from_freelist+0x34eb/0x3680 mm/page_alloc.c:3353
- __alloc_pages+0x256/0x6a0 mm/page_alloc.c:4609
- __alloc_pages_node include/linux/gfp.h:238 [inline]
- alloc_pages_node include/linux/gfp.h:261 [inline]
- alloc_slab_page+0x5f/0x160 mm/slub.c:2191
- allocate_slab mm/slub.c:2354 [inline]
- new_slab+0x84/0x2f0 mm/slub.c:2407
- ___slab_alloc+0xc73/0x1260 mm/slub.c:3541
- __slab_alloc mm/slub.c:3626 [inline]
- __slab_alloc_node mm/slub.c:3679 [inline]
- slab_alloc_node mm/slub.c:3851 [inline]
- __do_kmalloc_node mm/slub.c:3981 [inline]
- __kmalloc+0x2e3/0x4a0 mm/slub.c:3995
- kmalloc include/linux/slab.h:594 [inline]
- tomoyo_realpath_from_path+0xcf/0x5e0 security/tomoyo/realpath.c:251
- tomoyo_get_realpath security/tomoyo/file.c:151 [inline]
- tomoyo_path_perm+0x2b7/0x740 security/tomoyo/file.c:822
- tomoyo_path_symlink+0xde/0x120 security/tomoyo/tomoyo.c:212
- security_path_symlink+0xe3/0x140 security/security.c:1870
- do_symlinkat+0x136/0x3a0 fs/namei.c:4502
- __do_sys_symlink fs/namei.c:4525 [inline]
- __se_sys_symlink fs/namei.c:4523 [inline]
- __x64_sys_symlink+0x7e/0x90 fs/namei.c:4523
- do_syscall_64+0xfb/0x240
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
-page last free pid 1 tgid 1 stack trace:
- reset_page_owner include/linux/page_owner.h:24 [inline]
- free_pages_prepare mm/page_alloc.c:1140 [inline]
- free_unref_page_prepare+0x968/0xa90 mm/page_alloc.c:2388
- free_unref_page+0x37/0x3f0 mm/page_alloc.c:2528
- free_contig_range+0x9e/0x160 mm/page_alloc.c:6574
- destroy_args+0x8a/0x890 mm/debug_vm_pgtable.c:1028
- debug_vm_pgtable+0x4be/0x550 mm/debug_vm_pgtable.c:1408
- do_one_initcall+0x238/0x830 init/main.c:1233
- do_initcall_level+0x157/0x210 init/main.c:1295
- do_initcalls+0x3f/0x80 init/main.c:1311
- kernel_init_freeable+0x430/0x5d0 init/main.c:1542
- kernel_init+0x1d/0x2b0 init/main.c:1432
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:242
-
-Memory state around the buggy address:
- ffff88806b80bf00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff88806b80bf80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->ffff88806b80c000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                     ^
- ffff88806b80c080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff88806b80c100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+> > +
+> >         return 0;
+> >  }
+> >
+> > --
+> > 2.40.1
+> >
+> 
+> 
+> --
+> Luiz Augusto von Dentz
