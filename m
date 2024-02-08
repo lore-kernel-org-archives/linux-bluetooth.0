@@ -1,198 +1,754 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A35AC37711
-	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Feb 2024 20:09:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53E8E657AD
+	for <linux-bluetooth@vger.kernel.org>; Fri,  9 Feb 2024 06:58:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.134.136.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707422976; cv=none; b=psd549ecpU08lhE2jGRJAiwRYfS3TnRfyf1mVkvLnn8Kg5JtRVAskg9cYVetld36YZQJb7uLeiwAK3Se0unxcYkI0SJN+jGJrdO/5Sct3KhVXHnPXYnCArHCTGmp/+tAbYh0GyDhf1IGQn4ywpR9vpJDB8B86VzQYwnOFsj7VkU=
+	t=1707461894; cv=none; b=He3Cmw6VcPZnrch54MNx4gdSOX5dogA9wtzddHSaU1oukpX+m5ZVvSZrMAcCNrFu1xrvLkowjUEXKBcISC+SfTWCTigzNenG2wFqTz6GwPevo8JqbyDmBWBJt1Ik1iOrIhht1MRIBYc9NrVinpHrfJRZ1DOwgRtFz0w+TtWfdbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707422976; c=relaxed/simple;
-	bh=fPRMEA0/0q5KTJcPlPdITJQFh+srmgz816lGzb97hTg=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=aaxvJRr0mxkKBW1q8kFWOh6TAAWkJG0jw40bBKDbvyGE3k+RpvnmKDl8x1fJNOqyxL4248Nz17UFEQn+/3WTi1WF5l+DCP+ey+M2W9lQ+UOxMflsNkoO5IPsJ7O+e8vLLTQRboVFa2WWUAu2WjdIht93gzGZiMbgDcPYoWAO/aQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KIc2tIi2; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1707461894; c=relaxed/simple;
+	bh=fIzGvQ3EFueqlmf1LUNocqiz25izpx2iGcet7Fe94Jw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VRvmXm/zsoZslaYvk8+GRACaTOA9C2DIH0/MdLD0Jc8gZYNINkorFjj7HSr0kBelb1JEdjnieDtObpT6nHf0TgDT0gdZ132s2Bm8ua8PcikgqPXTaiNfjLFqufrpXAnSKSAb1pJkB5VVu/Mbtip5NrbVYtYoqwKT7RpQSX1KtaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O2v+6wZR; arc=none smtp.client-ip=134.134.136.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KIc2tIi2"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3BED3C433F1
-	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Feb 2024 20:09:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707422976;
-	bh=fPRMEA0/0q5KTJcPlPdITJQFh+srmgz816lGzb97hTg=;
-	h=From:To:Subject:Date:From;
-	b=KIc2tIi2JwI8n6KTWvS39TcLqHtTK+GvgNJHERPzjwHj7uUhSbAZ+qc8VozzJtjhR
-	 hVFyqo5akKG7n29cz1xn36R34Fi4n9KBvJSY8SbWXeY9ky6umEyNXwTejGKlKxgqhc
-	 SVLa7UWcK//UedMyBOj5sapgUc0uaQUpxJogfbkezfFoNlIyNvS4HATJPgjDPF3qK1
-	 gBNR440xowelh4vuVFTiWPrgn+y+Rmj0j5BhIlOQUwEvhVybX+givxlnJqkK47r/Ml
-	 Vo0P41eu7Xp0+nr7SIcUddOKumotBqwbEfLz9VZDYUxHmPPDj4ZBUWeqNSfkLsPunh
-	 v1YXd8lDvoQpA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 20796C4332E; Thu,  8 Feb 2024 20:09:36 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O2v+6wZR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707461892; x=1738997892;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=fIzGvQ3EFueqlmf1LUNocqiz25izpx2iGcet7Fe94Jw=;
+  b=O2v+6wZRdX92gyFEpx3vjr5Y+mbBVwWunFJxSjtOXljNvW9ihwf+lCSg
+   MwhszRtKSwMlfTJsaX8rm0C8IRf/jqw4S6+9eenS4/0QMzRrjbD+1lNrH
+   T8chtrLCzAUdb0yWLEDSqV0+Ln+h+9mxG3zOgSYSTAcDhPoNTkBsJybcx
+   mqK6ubHMlAZp5bWLBykkHbpzWjYPiD/o6IK/l0ZmdIa2wsiGszAiFjLaA
+   02xnfX0KpyYj/IverdKrrAwmSCte1Mc0UXvplZeS+BMjsK5t37JcBi2eg
+   Qfd/8/VABDpvOR3BbcHLtyIupF4MbgtzdzbxnHvabPGSycn7tIoTSbN9y
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10978"; a="395806868"
+X-IronPort-AV: E=Sophos;i="6.05,256,1701158400"; 
+   d="scan'208";a="395806868"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2024 22:58:11 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,256,1701158400"; 
+   d="scan'208";a="1870993"
+Received: from lbtoe.iind.intel.com ([10.224.186.133])
+  by fmviesa007.fm.intel.com with ESMTP; 08 Feb 2024 22:58:09 -0800
+From: Shahid Vichhi <shahid.bashir.vichhi@intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 218472] New: mt7921e bluetooth not working
-Date: Thu, 08 Feb 2024 20:09:35 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: bugzilla@mail.cam-it.nl
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
- op_sys bug_status bug_severity priority component assigned_to reporter
- cf_regression
-Message-ID: <bug-218472-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Cc: luiz.von.dentz@intel.com,
+	kiran.k@intel.com,
+	ajay.k.v@intel.com,
+	shahid.bashir.vichhi@intel.com
+Subject: [PATCH] monitor/att: Enable the notification logging support for the CCP
+Date: Fri,  9 Feb 2024 01:42:40 +0200
+Message-Id: <20240208234314.2004805-1-shahid.bashir.vichhi@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218472
+From: Shahid Vichhi <shahid.bashir.vichhi.com>
 
-            Bug ID: 218472
-           Summary: mt7921e bluetooth not working
-           Product: Drivers
-           Version: 2.5
-          Hardware: Other
-                OS: Linux
-            Status: NEW
-          Severity: normal
-          Priority: P3
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: bugzilla@mail.cam-it.nl
-        Regression: No
+---
+ monitor/att.c | 669 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 669 insertions(+)
 
-kernel:=20
-Linux geekom 6.7.4-arch1-1 #1 SMP PREEMPT_DYNAMIC Mon, 05 Feb 2024 22:07:49
-+0000 x86_64 GNU/Linux
+diff --git a/monitor/att.c b/monitor/att.c
+index e0164f3ddf3b..450bcc30d224 100644
+--- a/monitor/att.c
++++ b/monitor/att.c
+@@ -2433,6 +2433,654 @@ static void seeking_speed_notify(const struct l2cap_frame *frame)
+ 	print_seeking_speed(frame);
+ }
+ 
++static void print_bearer_name(const struct l2cap_frame *frame)
++{
++	char *name;
++
++	name = name2utf8((uint8_t *)frame->data, frame->size);
++
++	print_field("  Bearer Name: %s", name);
++}
++
++static void bearer_name_read(const struct l2cap_frame *frame)
++{
++	print_bearer_name(frame);
++}
++
++static void bearer_name_notify(const struct l2cap_frame *frame)
++{
++	print_bearer_name(frame);
++}
++
++static void bearer_uci_read(const struct l2cap_frame *frame)
++{
++	char *name;
++
++	name = name2utf8((uint8_t *)frame->data, frame->size);
++
++	print_field("  Bearer Uci Name: %s", name);
++}
++
++static void print_technology_name(const struct l2cap_frame *frame)
++{
++	int8_t tech_id;
++	const char *str;
++
++	if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&tech_id)) {
++		print_text(COLOR_ERROR, "  Technology id:: invalid size");
++		goto done;
++	}
++
++	switch (tech_id) {
++	case 0x01:
++		str = "3G";
++		break;
++	case 0x02:
++		str = "4G";
++		break;
++	case 0x03:
++		str = "LTE";
++		break;
++	case 0x04:
++		str = "WiFi";
++		break;
++	case 0x05:
++		str = "5G";
++		break;
++	case 0x06:
++		str = "GSM";
++		break;
++	case 0x07:
++		str = "CDMA";
++		break;
++	case 0x08:
++		str = "2G";
++		break;
++	case 0x09:
++		str = "WCDMA";
++		break;
++	default:
++		str = "Reserved";
++		break;
++	}
++
++	print_field("Technology: %s  (0x%2.2x)", str, tech_id);
++
++done:
++	if (frame->size)
++		print_hex_field("  Data", frame->data, frame->size);
++}
++
++static void bearer_technology_read(const struct l2cap_frame *frame)
++{
++	print_technology_name(frame);
++}
++
++static void bearer_technology_notify(const struct l2cap_frame *frame)
++{
++	print_technology_name(frame);
++}
++
++static void print_uri_scheme_list(const struct l2cap_frame *frame)
++{
++	char *name;
++
++	name = name2utf8((uint8_t *)frame->data, frame->size);
++
++	print_field("  Uri scheme Name: %s", name);
++}
++
++static void bearer_uri_schemes_list_read(const struct l2cap_frame *frame)
++{
++	print_uri_scheme_list(frame);
++}
++
++static void print_signal_strength(const struct l2cap_frame *frame)
++{
++	uint8_t signal_strength;
++
++	if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&signal_strength)) {
++		print_text(COLOR_ERROR, " signal_strength:: invalid size");
++		goto done;
++	}
++
++	print_field("  signal_strength: %x", signal_strength);
++
++	if (signal_strength == 0)
++		print_field("  No Service");
++	else if (signal_strength == 0x64)
++		print_field("  Maximum signal strength");
++	else if ((signal_strength > 0) && (signal_strength < 0x64))
++		print_field("  Implementation specific");
++	else if (signal_strength == 0xFF)
++		print_field("  Signal strength is unavailable");
++	else
++		print_field("  RFU");
++	}
++
++done:
++	if (frame->size)
++		print_hex_field("  Data", frame->data, frame->size);
++}
++
++static void bearer_signal_strength_read(const struct l2cap_frame *frame)
++{
++	print_signal_strength(frame);
++}
++
++static void bearer_signal_strength_notify(const struct l2cap_frame *frame)
++{
++	print_signal_strength(frame);
++}
++
++static void
++print_signal_strength_rep_intrvl(const struct l2cap_frame *frame)
++{
++	int8_t reporting_interval;
++
++	if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&reporting_interval)) {
++		print_text(COLOR_ERROR, "Reporting_interval:: invalid size");
++		goto done;
++	}
++
++	print_field("  Reporting_interval: 0x%x", reporting_interval);
++
++done:
++	if (frame->size)
++		print_hex_field("  Data", frame->data, frame->size);
++}
++
++static void
++bearer_signal_strength_rep_intrvl_read(const struct l2cap_frame *frame)
++{
++	print_signal_strength_rep_intrvl(frame);
++}
++
++static void
++bearer_signal_strength_rep_intrvl_write(const struct l2cap_frame *frame)
++{
++	print_signal_strength_rep_intrvl(frame);
++}
++
++static void print_call_list(const struct l2cap_frame *frame)
++{
++
++	uint8_t list_item_length;
++	uint8_t call_index;
++	uint8_t call_state;
++	uint8_t call_flag;
++	char *call_uri;
++
++	if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&list_item_length)) {
++		print_text(COLOR_ERROR, "    list_item_length:: invalid size");
++		goto done;
++	}
++
++	print_field("  list_item_length: 0x%x", list_item_length);
++
++	if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&call_index)) {
++		print_text(COLOR_ERROR, "  call_index:: invalid size");
++		goto done;
++	}
++
++	print_field("  call_index: 0x%x", call_index);
++
++	if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&call_state)) {
++		print_text(COLOR_ERROR, "  call_state:: invalid size");
++		goto done;
++	}
++
++	print_field("  call_state: 0x%x", call_state);
++
++	if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&call_flag)) {
++		print_text(COLOR_ERROR, "  call_flag:: invalid size");
++		goto done;
++	}
++
++	print_field("  call_flag: 0x%x", call_flag);
++
++	call_uri = name2utf8((uint8_t *)frame->data, frame->size);
++
++	print_field("  call_uri: %s", call_uri);
++
++done:
++	if (frame->size)
++		print_hex_field("  call_list Data", frame->data, frame->size);
++}
++
++static void bearer_current_call_list_read(const struct l2cap_frame *frame)
++{
++	print_call_list(frame);
++}
++
++static void bearer_current_call_list_notify(const struct l2cap_frame *frame)
++{
++	print_call_list(frame);
++}
++
++static void print_ccid(const struct l2cap_frame *frame)
++{
++	int8_t ccid;
++
++	if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&ccid)) {
++		print_text(COLOR_ERROR, "  ccid:: invalid size");
++		goto done;
++	}
++
++	print_field("  ccid: %x", ccid);
++
++done:
++	if (frame->size)
++		print_hex_field("  Data", frame->data, frame->size);
++}
++
++static void call_content_control_id_read(const struct l2cap_frame *frame)
++{
++	print_ccid(frame);
++}
++
++static void print_status_flag(const struct l2cap_frame *frame)
++{
++	int16_t flag;
++
++	if (!l2cap_frame_get_le16((void *)frame, (uint16_t *)&flag)) {
++		print_text(COLOR_ERROR, "  status flag:: invalid size");
++		goto done;
++	}
++
++	print_field("  status flag:");
++
++	if (flag & 0x1)
++		print_field("  Inband Ringtone Enabled:");
++	else
++		print_field("  Inband Ringtone Disabled:");
++
++	if (flag & 0x2)
++		print_field("  Server in silent Mode");
++	else
++		print_field("  Server Not in silent Mode");
++
++done:
++	if (frame->size)
++		print_hex_field("  Data", frame->data, frame->size);
++}
++
++static void status_flag_read(const struct l2cap_frame *frame)
++{
++	print_status_flag(frame);
++}
++
++static void status_flag_notify(const struct l2cap_frame *frame)
++{
++	print_status_flag(frame);
++}
++
++static void print_target_uri(const struct l2cap_frame *frame)
++{
++	char *name;
++	uint8_t call_idx;
++
++	if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&call_idx)) {
++		print_text(COLOR_ERROR, "  call_idx:: invalid size");
++		goto done;
++	}
++
++	print_field("  call_idx: %x", call_idx);
++
++	name = name2utf8((uint8_t *)frame->data, frame->size);
++
++	print_field("  Uri: %s", name);
++
++done:
++	if (frame->size)
++		print_hex_field("  Data", frame->data, frame->size);
++}
++
++static void incom_target_bearer_uri_read(const struct l2cap_frame *frame)
++{
++	print_target_uri(frame);
++}
++
++static void incom_target_bearer_uri_notify(const struct l2cap_frame *frame)
++{
++	print_target_uri(frame);
++}
++
++static void print_call_state(const struct l2cap_frame *frame)
++{
++	uint8_t call_Index;
++	uint8_t call_state;
++	uint8_t call_flag;
++
++	if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&call_Index)) {
++		print_text(COLOR_ERROR, "  call_Index:: invalid index");
++		goto done;
++	}
++
++	print_field("  call_Index: 0x%2.2x", call_Index);
++
++	if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&call_state)) {
++		print_text(COLOR_ERROR, "  call_state:: invalid state");
++		goto done;
++	}
++
++	print_field("  call_state: 0x%2.2x", call_state);
++
++	if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&call_flag)) {
++		print_text(COLOR_ERROR, "  call_flag:: invalid flag");
++		goto done;
++	}
++
++	print_field("  call_flag: 0x%2.2x", call_flag);
++
++done:
++	if (frame->size)
++		print_hex_field("print_call_state Data", frame->data, frame->size);
++}
++
++static void call_state_read(const struct l2cap_frame *frame)
++{
++	print_call_state(frame);
++}
++
++static void call_state_notify(const struct l2cap_frame *frame)
++{
++	print_call_state(frame);
++}
++
++static void print_call_cp(const struct l2cap_frame *frame)
++{
++	uint8_t opcode;
++	uint8_t parameter;
++	const char *str;
++	char *name;
++
++	if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&opcode)) {
++		print_text(COLOR_ERROR, "  opcode:: invalid size");
++		goto done;
++	}
++
++	print_field("  opcode: 0x%2.2x", opcode);
++
++	switch (opcode) {
++	case 0x00:
++		str = "Accept";
++		if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&parameter)) {
++			print_text(COLOR_ERROR, "  parameter:: invalid size");
++			goto done;
++		}
++		print_field("  Operation: %s  (0x%2.2x)", str, parameter);
++		break;
++	case 0x01:
++		str = "Terminate";
++		if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&parameter)) {
++			print_text(COLOR_ERROR, "  parameter:: invalid size");
++			goto done;
++		}
++		print_field("  Operation: %s  (0x%2.2x)", str, parameter);
++		break;
++	case 0x02:
++		str = "Local Hold";
++		if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&parameter)) {
++			print_text(COLOR_ERROR, "  parameter:: invalid size");
++			goto done;
++		}
++		print_field("  Operation: %s  (0x%2.2x)", str, parameter);
++		break;
++	case 0x03:
++		str = "Local Retrieve";
++		if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&parameter)) {
++			print_text(COLOR_ERROR, "  parameter:: invalid size");
++			goto done;
++		}
++		print_field("  Operation: %s  (0x%2.2x)", str, parameter);
++		break;
++	case 0x04:
++		str = "Originate";
++		name = name2utf8((uint8_t *)frame->data, frame->size);
++		print_field("  Operation: %s  Uri: %s", str, name);
++		break;
++	case 0x05:
++		str = "Join";
++		if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&parameter)) {
++			print_text(COLOR_ERROR, "  parameter:: invalid size");
++			goto done;
++		}
++		print_field("  Operation: %s  (0x%2.2x)", str, parameter);
++		break;
++	default:
++		str = "RFU";
++		print_field("  Operation: %s", str);
++		break;
++	}
++
++done:
++	if (frame->size)
++		print_hex_field("print_call_cp Data", frame->data, frame->size);
++}
++
++static void print_call_cp_notification(const struct l2cap_frame *frame)
++{
++	uint8_t opcode;
++	uint8_t result_code;
++	const char *str;
++
++	if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&opcode)) {
++		print_text(COLOR_ERROR, "  result_code:: invalid opcode");
++		goto done;
++	}
++
++	print_field("  opcode: 0x%2.2x", opcode);
++
++	if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&result_code)) {
++		print_text(COLOR_ERROR, "  result_code:: invalid result_code");
++		goto done;
++	}
++
++	print_field("  result_code: 0x%2.2x", result_code);
++
++	switch (result_code) {
++	case 0x00:
++		str = "SUCCESS";
++		break;
++	case 0x01:
++		str = "OPCODE NOT SUPPORTED";
++		break;
++	case 0x02:
++		str = "OPERATION NOT POSSIBLE";
++		break;
++	case 0x03:
++		str = "INVALID CALL INDEX";
++		break;
++	case 0x04:
++		str = "STATE MISMATCH";
++		break;
++	case 0x05:
++		str = "LACK OF RESOURCES";
++		break;
++	case 0x06:
++		str = "INVALID OUTGOING URI";
++		break;
++	default:
++		str = "RFU";
++		break;
++	}
++
++	print_field("  Status: %s", str);
++
++done:
++	if (frame->size)
++		print_hex_field("  print_call_cp Data", frame->data, frame->size);
++}
++
++static void call_cp_write(const struct l2cap_frame *frame)
++{
++	print_call_cp(frame);
++}
++
++static void call_cp_notify(const struct l2cap_frame *frame)
++{
++	print_call_cp_notification(frame);
++}
++
++static void print_call_cp_opt(const struct l2cap_frame *frame)
++{
++	uint16_t operation;
++
++	if (!l2cap_frame_get_le16((void *)frame, (uint16_t *)&operation)) {
++		print_text(COLOR_ERROR, "  status operation:: invalid size");
++		goto done;
++	}
++
++	print_field("  operation: 0x%2x", operation);
++
++	if (operation & 0x1)
++		print_field("  Local Hold and Local Retrieve Call Control Point
++					Opcodes supported");
++	else
++		print_field("  Local Hold and Local Retrieve Call Control Point
++					Opcodes not supported");
++
++	if (operation & 0x2)
++		print_field("  Join Call Control Point Opcode supported");
++	else
++		print_field("  Join Call Control Point Opcode not supported");
++
++done:
++	if (frame->size)
++		print_hex_field("  Data", frame->data, frame->size);
++}
++
++static void call_cp_opt_opcodes_read(const struct l2cap_frame *frame)
++{
++	print_call_cp_opt(frame);
++}
++
++static void print_term_reason(const struct l2cap_frame *frame)
++{
++	uint8_t call_id, reason;
++
++	if (!l2cap_frame_get_u8((void *)frame, &call_id)) {
++		print_text(COLOR_ERROR, "Call Index: invalid size");
++		goto done;
++	}
++	print_field("  call Index: %u", call_id);
++
++	if (!l2cap_frame_get_u8((void *)frame, &reason)) {
++		print_text(COLOR_ERROR, "Reason: invalid size");
++		goto done;
++	}
++
++	print_field("  Reason:");
++
++	switch (reason) {
++	case 0x00:
++		print_field("  Improper URI");
++		break;
++	case 0x01:
++		print_field("  Call Failed");
++		break;
++	case 0x02:
++		print_field("  Remote party ended the call");
++		break;
++	case 0x03:
++		print_field("  Server  ended the call");
++		break;
++	case 0x04:
++		print_field("  Line was Busy");
++		break;
++	case 0x05:
++		print_field("  Network Congestion");
++		break;
++	case 0x06:
++		print_field("  Client terminated the call");
++		break;
++	case 0x07:
++		print_field("  No service");
++		break;
++	case 0x08:
++		print_field("  No answer");
++		break;
++	case 0x09:
++		print_field("  Unspecified");
++		break;
++	default:
++		print_field("  RFU");
++		break;
++	}
++
++done:
++	if (frame->size)
++		print_hex_field("  Data", frame->data, frame->size);
++}
++
++static void call_termination_reason_notify(const struct l2cap_frame *frame)
++{
++	print_term_reason(frame);
++}
++
++static void print_incom_call(const struct l2cap_frame *frame)
++{
++	char *name;
++	uint8_t call_id;
++
++	if (!l2cap_frame_get_u8((void *)frame, &call_id)) {
++		print_text(COLOR_ERROR, "Call Index: invalid size");
++		goto done;
++	}
++
++	print_field("  Call Index: %u", call_id);
++
++	name = name2utf8((uint8_t *)frame->data, frame->size);
++
++	print_field("  call_string: %s", name);
++
++done:
++	if (frame->size)
++		print_hex_field(" Data", frame->data, frame->size);
++}
++
++static void incoming_call_read(const struct l2cap_frame *frame)
++{
++	print_incom_call(frame);
++}
++
++static void incoming_call_notify(const struct l2cap_frame *frame)
++{
++	print_incom_call(frame);
++}
++
++static void print_call_friendly_name(const struct l2cap_frame *frame)
++{
++	char *name;
++	uint8_t call_id;
++
++	if (!l2cap_frame_get_u8((void *)frame, &call_id)) {
++		print_text(COLOR_ERROR, "Call Index: invalid size");
++		goto done;
++	}
++
++	print_field("  Call Index: %u", call_id);
++
++	name = name2utf8((uint8_t *)frame->data, frame->size);
++
++	print_field("  Friendly Name: %s", name);
++
++done:
++	if (frame->size)
++		print_hex_field(" Data", frame->data, frame->size);
++}
++
++static void call_friendly_name_read(const struct l2cap_frame *frame)
++{
++	print_call_friendly_name(frame);
++}
++
++static void call_friendly_name_notify(const struct l2cap_frame *frame)
++{
++	print_call_friendly_name(frame);
++}
++
+ static const char *play_order_str(uint8_t order)
+ {
+ 	switch (order) {
+@@ -3392,6 +4040,27 @@ static const struct gatt_handler {
+ 	GATT_HANDLER(0x2bc7, NULL, bcast_audio_scan_cp_write, NULL),
+ 	GATT_HANDLER(0x2bc8, bcast_recv_state_read, NULL,
+ 					bcast_recv_state_notify),
++	GATT_HANDLER(0x2bb3, bearer_name_read, NULL, bearer_name_notify),
++	GATT_HANDLER(0x2bb4, bearer_uci_read, NULL, NULL),
++	GATT_HANDLER(0x2bb5, bearer_technology_read, NULL,
++					bearer_technology_notify),
++	GATT_HANDLER(0x2bb6, bearer_uri_schemes_list_read, NULL, NULL),
++	GATT_HANDLER(0x2bb7, bearer_signal_strength_read, NULL,
++					bearer_signal_strength_notify),
++	GATT_HANDLER(0x2bb8, bearer_signal_strength_rep_intrvl_read,
++					bearer_signal_strength_rep_intrvl_write, NULL),
++	GATT_HANDLER(0x2bb9, bearer_current_call_list_read, NULL,
++					bearer_current_call_list_notify),
++	GATT_HANDLER(0x2bba, call_content_control_id_read, NULL, NULL),
++	GATT_HANDLER(0x2bbb, status_flag_read, NULL, status_flag_notify),
++	GATT_HANDLER(0x2bbc, incom_target_bearer_uri_read, NULL,
++					incom_target_bearer_uri_notify),
++	GATT_HANDLER(0x2bbd, call_state_read, NULL, call_state_notify),
++	GATT_HANDLER(0x2bbe, NULL, call_cp_write, call_cp_notify),
++	GATT_HANDLER(0x2bbf, call_cp_opt_opcodes_read, NULL, NULL),
++	GATT_HANDLER(0x2bc0, NULL, NULL, call_termination_reason_notify),
++	GATT_HANDLER(0x2bc1, incoming_call_read, NULL, incoming_call_notify),
++	GATT_HANDLER(0x2bc2, call_friendly_name_read, NULL, call_friendly_name_notify),
+ 	GMAS
+ };
+ 
+-- 
+2.34.1
 
-relevant part of lsusb -vt:
-
-/:  Bus 003.Port 001: Dev 001, Class=3Droot_hub, Driver=3Dxhci_hcd/12p, 480M
-    ID 1d6b:0002 Linux Foundation 2.0 root hub
-    |__ Port 001: Dev 002, If 0, Class=3DHuman Interface Device, Driver=3Du=
-sbhid,
-1.5M
-        ID 046d:c313 Logitech, Inc. Internet 350 Keyboard
-    |__ Port 001: Dev 002, If 1, Class=3DHuman Interface Device, Driver=3Du=
-sbhid,
-1.5M
-        ID 046d:c313 Logitech, Inc. Internet 350 Keyboard
-    |__ Port 003: Dev 003, If 0, Class=3DHuman Interface Device, Driver=3Du=
-sbhid,
-12M
-        ID 046d:c52b Logitech, Inc. Unifying Receiver
-    |__ Port 003: Dev 003, If 1, Class=3DHuman Interface Device, Driver=3Du=
-sbhid,
-12M
-        ID 046d:c52b Logitech, Inc. Unifying Receiver
-    |__ Port 003: Dev 003, If 2, Class=3DHuman Interface Device, Driver=3Du=
-sbhid,
-12M
-        ID 046d:c52b Logitech, Inc. Unifying Receiver
-    |__ Port 004: Dev 004, If 0, Class=3DHuman Interface Device, Driver=3Du=
-sbhid,
-1.5M
-        ID 0461:4d0f Primax Electronics, Ltd HP Optical Mouse
-    |__ Port 007: Dev 005, If 0, Class=3DWireless, Driver=3Dbtusb, 480M
-        ID 13d3:3585 IMC Networks=20
-    |__ Port 007: Dev 005, If 1, Class=3DWireless, Driver=3Dbtusb, 480M
-        ID 13d3:3585 IMC Networks=20
-    |__ Port 007: Dev 005, If 2, Class=3DWireless, Driver=3D[none], 480M
-        ID 13d3:3585 IMC Networks=20
-/:  Bus 004.Port 001: Dev 001, Class=3Droot_hub, Driver=3Dxhci_hcd/4p, 1000=
-0M
-    ID 1d6b:0003 Linux Foundation 3.0 root hub
-
-dmesg | grep -i bluetooth:
-[root@geekom ~]# dmesg | grep -i bluetooth
-[    3.541061] Bluetooth: Core ver 2.22
-[    3.541584] NET: Registered PF_BLUETOOTH protocol family
-[    3.542350] Bluetooth: HCI device and connection manager initialized
-[    3.543226] Bluetooth: HCI socket layer initialized
-[    3.543725] Bluetooth: L2CAP socket layer initialized
-[    3.544517] Bluetooth: SCO socket layer initialized
-[    3.907303] Modules linked in: snd_sof_utils snd_soc_hdac_hda
-snd_hda_ext_core snd_soc_acpi_intel_match snd_soc_acpi
-soundwire_generic_allocation soundwire_bus intel_tcc_cooling(-)
-x86_pkg_temp_thermal snd_soc_core intel_powerclamp mt7921e(+) coretemp
-snd_compress ac97_bus mt7921_common snd_pcm_dmaengine kvm_intel mt792x_lib
-snd_hda_intel mousedev(+) hid_logitech_dj(+) mt76_connac_lib kvm
-snd_intel_dspcfg mt76 snd_intel_sdw_acpi i915(+) irqbypass snd_hda_codec bt=
-usb
-mac80211 btrtl snd_hda_core processor_thermal_device_pci btintel drm_buddy
-processor_thermal_device snd_hwdep rapl i2c_algo_bit vfat
-processor_thermal_wt_hint btbcm snd_pcm spi_nor processor_thermal_rfim iTCO=
-_wdt
-fat ttm btmtk libarc4 processor_thermal_rapl intel_pmc_bxt intel_rapl_msr
-intel_cstate mei_hdcp intel_rapl_common mei_pxp drm_display_helper ee1004
-iTCO_vendor_support bluetooth snd_timer mtd processor_thermal_wt_req cfg802=
-11
-intel_uncore usbhid ecdh_generic mei_me i2c_i801 cec
-processor_thermal_power_floor wmi_bmof snd pcspkr
-[    3.908310] Modules linked in: snd_sof_utils snd_soc_hdac_hda
-snd_hda_ext_core snd_soc_acpi_intel_match snd_soc_acpi
-soundwire_generic_allocation soundwire_bus intel_tcc_cooling(-)
-x86_pkg_temp_thermal snd_soc_core intel_powerclamp mt7921e(+) coretemp
-snd_compress ac97_bus mt7921_common snd_pcm_dmaengine kvm_intel mt792x_lib
-snd_hda_intel mousedev(+) hid_logitech_dj(+) mt76_connac_lib kvm
-snd_intel_dspcfg mt76 snd_intel_sdw_acpi i915(+) irqbypass snd_hda_codec bt=
-usb
-mac80211 btrtl snd_hda_core processor_thermal_device_pci btintel drm_buddy
-processor_thermal_device snd_hwdep rapl i2c_algo_bit vfat
-processor_thermal_wt_hint btbcm snd_pcm spi_nor processor_thermal_rfim iTCO=
-_wdt
-fat ttm btmtk libarc4 processor_thermal_rapl intel_pmc_bxt intel_rapl_msr
-intel_cstate mei_hdcp intel_rapl_common mei_pxp drm_display_helper ee1004
-iTCO_vendor_support bluetooth snd_timer mtd processor_thermal_wt_req cfg802=
-11
-intel_uncore usbhid ecdh_generic mei_me i2c_i801 cec
-processor_thermal_power_floor wmi_bmof snd pcspkr
-[    4.024112] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-[    4.024119] Bluetooth: BNEP filters: protocol multicast
-[    4.024122] Bluetooth: BNEP socket layer initialized
-[    5.703433] Bluetooth: hci0: Opcode 0x0c03 failed: -110
-
-something that might be relevant:
-[    3.966807] mt7921e 0000:56:00.0: HW/SW Version: 0x8a108a10, Build Time:
-20231120183400a
-[    3.982396] mt7921e 0000:56:00.0: WM Firmware Version: ____000000, Build
-Time: 20231120183441
-
-I'm guessing the 'Opcode 0x0c03 failed' and 'Port 007: Dev 005, If 2,
-Class=3DWireless, Driver=3D[none], 480M'   are to blame here?
-
-I've done a lot of searching and troubleshooting, but couldn=C2=B4t find an=
-ything
-about this particular device ID:  13d3:3585=20=20=20
-
-bluetoothctl  gives me:
-[bluetooth]# list
-[bluetooth]#=20
-any other command will give: "no default controller available".
-
-systemd bluetooth.service is enabled.
-
-Let me know if more info is needed (I don=C2=B4t do this every day),  or if=
- I should
-contact a maintainer directly.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
