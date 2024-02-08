@@ -1,66 +1,65 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97F427E771
-	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Feb 2024 16:40:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E02385276;
+	Thu,  8 Feb 2024 16:43:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707410425; cv=none; b=MdSKcQHT0NGV+foKpl4zKwk9pzPig9X+mecQZDy6HT566kN6ZpTdlS8c0bJBB2fmg0lVYpOYbSWtEJrXIvCx+akqZVC4fhgOJp8FzLz5XAr6haRpHoxsj4lUqTX9TW3ZxL84FSCTTsWJNmdCuV8goOfofwComtUz5KBanoTovXE=
+	t=1707410584; cv=none; b=m/YdOYvKLRC0XzGNoh/2oVolCady9olaX2JcDMshYlhmstLV3TeDlHXqmWq6XzpDky2Rs5XbjVXvYACr1Fh/aUrYQBvR8T991dd+esBdfD4Gc+h0nCRQNOabeZG3oN9vhkCKcmdjhHEJPPrqD2EzdS1SV9v8SXoieX3pTuddUFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707410425; c=relaxed/simple;
-	bh=OXpJXM5ENIxkUBCwl/xB7oMNxeBAlvJGW9C9NzXiVCA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qeKTtJPbxQEefEl95McAgvUvrJnIeH9RPhpHl6FUkV5YPSGxRbzgiogiEuBsg5eJfAGSgu8WgUPLyRNwWRryLEP1T6xkupVZ8hpapMpEvL2mOHsnfxipbjMAcbq0psA8DYbbSTzwDeGfLMwXEoAnOsqvSTYviGDz/GDG6OlaxDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=MVnXw8UC; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="MVnXw8UC"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4104ebb01fdso334605e9.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 08 Feb 2024 08:40:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1707410421; x=1708015221; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=MxuJQNz83Rv9rSn0MovZy25uHrT4R1JS0Xrvo9xnhdQ=;
-        b=MVnXw8UC814h62a+82y8G+LfNJ2jmkko+uK84bt57uT+kMZ4yUO3xSF2wzJYoHPj+3
-         v5by3nHhSS+xaleFjI2K5E0vt06K7phVFBtJtK94cghFiUF7igCAmTYrd94yyPc+XYEr
-         CBCE5LcbA3/72YYyMfAQ2Owj+dKvznjiyL9kipf/4jhUmJ3j8TrIxPbSKZWXnoRsqpGy
-         AWGIMVfBtfdQP/EScehaHHtuQDetZ/fLnbUKcMJKqLFhzNP1DeE91iBaR9Zayq/zBVau
-         ldmNAq/CkoXaWHpXSAOkzsDETK7itKLh1zEgr0U50RMLnOd2erYlC7/j8lP8MB4mjgv5
-         yiHw==
+	s=arc-20240116; t=1707410584; c=relaxed/simple;
+	bh=0TJr9SPkwnlTG9uKVj59UILIzyUJlgu+VRGvyidgXCc=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Wq8qvcV8UnHK1TIAELk0u63Rt8zx7+agq5cOVJ12gn30l43TzSQhPNbkLwpyx2b/O17hdIfcJpBzv2MahWb5skMXDkdGaVAob1nMThdcfrc767ERU3w/KHFRlbyXeTW2MS27Dg9mXrG7e1JdYUV0PFT9kfOxPuNBJKupbse3GXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a3916c1f9b0so170888466b.1;
+        Thu, 08 Feb 2024 08:43:02 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707410421; x=1708015221;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MxuJQNz83Rv9rSn0MovZy25uHrT4R1JS0Xrvo9xnhdQ=;
-        b=AZxkAQsL0mfu+gSWoFHcVGa5aHuStIawJe/5V2BxCA0J+v/B7TVfS2Cee2bhGZ5ht+
-         wO/zdwfuaDtAd5IebpSOWF7yMMZt9IxgWUzK0zIH0EV57EocknxbLFd6kJFPVxf1RpgU
-         BvkBXITVbkywPaDrjEdGDXG+pNcwYXZQKTMmgjn7Cj9KX4xZuVxTVL0Q9l0UKOX95P7X
-         4X4yYHyTz7BfFGCnhxGiVb7AUJ5qeHZHSQMOEU2wAI5I/opqtAbRtNV6MJBurt6hHseh
-         DF8Zn3GVhJhScULjZUNn7+u0YZ5Qg+V9CZNWMpfISOmmVaFbURyBMOjaNp6rHdb9Rhho
-         QUPA==
-X-Gm-Message-State: AOJu0Yyo/4OCFje4st9bDmaZsalLr6KiVrEjmZrZ8MlfXsb16HgBcY/1
-	a7036D47u+/cS2OBEm49/sdOlfOhz9YlRSml3Xhyd08Fqbx3W7aMUZ2fM5NS+qw=
-X-Google-Smtp-Source: AGHT+IG67zzLkDBYUQH/Oh+GXm+5eQ5upBG622C9PYnPayDKwkt63GFHsbuL4gmr6qW8MpMN8bhZdw==
-X-Received: by 2002:a5d:4089:0:b0:33a:e9b5:b14d with SMTP id o9-20020a5d4089000000b0033ae9b5b14dmr241wrp.65.1707410420747;
-        Thu, 08 Feb 2024 08:40:20 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWB2I3ETg91DGm+JML3ch4l6SiV4VksNtKz2Lhmqdg92oqKC2pFDz3odWZV6cD9nOYEAbmKUITi4dhUBv/RSid1+VbrkPCg05YBK0rw1kQSQ6T8pqSz2T8DytkGU/i8Brb72f721tWyZfZi2fwOKl62KvqVYTAhlfowCrBEk9gaAV0lfx35lKBv9YVamjPxdb4dmvaaPCA=
-Received: from brgl-uxlite.home ([2a01:cb1d:334:ac00:44bd:e160:131:19a4])
-        by smtp.gmail.com with ESMTPSA id s16-20020adfea90000000b0033b198efbedsm3915335wrm.15.2024.02.08.08.40.20
+        d=1e100.net; s=20230601; t=1707410581; x=1708015381;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=j6NrglvQNA8UcjFWlDsn4D/ol88i9iFcMKr2mLjvwfI=;
+        b=bWPMmAv5PPpeZ6rf6Mcp/rDTI2AtRyoiqfI0nedN1n+8SlC0fZkhrvXqxA0yGxH2Fb
+         VlMHoZ2YrlxvdUCn9uNbReXueajwM7rDe2GKuMAUhs/FqpDSY4AiFlDmIwy9kLcFbNmB
+         VDAFNPO/dd3oRXUyX4pOVaXVc6j+A0QMC8K2umU14YlvrwR+vWI8EYoJgsbh4/1+pLUn
+         GqXXnYXL3RdWtRrm4Fe1NzV8Ysa1Z7SkmlmTgWvJmugU6cHq6iS3Us0Ttf9AvkjbXsGy
+         YaZWU3HE0LOa5qJYGGLh9Tgj9GZMxyNmrv5LsyZ0zmnOMt1nawqywPXsdmbdPWknHbmh
+         4IOw==
+X-Forwarded-Encrypted: i=1; AJvYcCWS+GvJycw6FeHL3/I8c8fDMuvXYavmq/XTRPX/SfC3pxsw8+AsRgwrXGKb7/9HMa04EUT+5jyEyhPFaBwuiyKA5xa8SRSZi/5euljDaxNt4NUdTINYwe72QaudbxDLq72EuCKlHGzhwYQOJv31m/r8NNHqhg1UM22teWxiM741vBpOWSaLOawrPw==
+X-Gm-Message-State: AOJu0YzcSJVapR1fgF0hkMalfEBeehItCPnxJDqh5nq29ldlRlK97/yD
+	+RQZpvGNaG3TWhQusTCaCFRhrMN3R2KM7EHppwYIdEeP7YJXgsR6
+X-Google-Smtp-Source: AGHT+IEVdByW8vdmM232leKEL2grx8yFSsfrFp4uRJEt8bXULYqon2r5VuiscI/p1X3+2J9ZpGGShA==
+X-Received: by 2002:a17:906:7cc:b0:a38:e745:fb88 with SMTP id m12-20020a17090607cc00b00a38e745fb88mr2410396ejc.57.1707410580613;
+        Thu, 08 Feb 2024 08:43:00 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCV2V2LpfZ0wvPrNAyW+/jX8LM07o02stddr3VyFKzA/uf4lP94qe7uR3OZVYf+Cb3dmSMS+bRTuQ1Z0UsZ8ASHSOkZYDA7mhPlQaLK+dYmFgbH0kRcWajiF4jvarfERj2tzJAbvOxCBwtIp+7/xYxkmbT8WARVLjt6NHZXtu1TrTn8pIMw8sn867qFb5Qelcbg04Yk7NaIuKhpG5IH+z2VpdwsMh1Ofpink/9xYnewUiOGFuIqZYm1+9xNgxzxEP9jZjCmfcOzA81zU85I7udqsxpRKOQZUbF9U6pT7shyAgI8DwuvEmGoiCRCJFBDeLYLb9iQv/C8VLVj07ke3Q5T8FpMVTrs4nehtzhwGJ/zcvrRu4fNL/1VwIwMLoOgIBrcNNaIGSHAgRteVd1XS/uLhs//qZJL/DeCrE/c=
+Received: from localhost (fwdproxy-lla-006.fbsv.net. [2a03:2880:30ff:6::face:b00c])
+        by smtp.gmail.com with ESMTPSA id g15-20020a170906198f00b00a3809ce7e00sm215713ejd.196.2024.02.08.08.42.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Feb 2024 08:40:20 -0800 (PST)
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Miaoqian Lin <linmq006@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
+        Thu, 08 Feb 2024 08:43:00 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+To: kuba@kernel.org,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	Alexander Aring <alex.aring@gmail.com>
+Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: [PATCH] Bluetooth: hci_qca: don't use IS_ERR_OR_NULL() with gpiod_get_optional()
-Date: Thu,  8 Feb 2024 17:40:17 +0100
-Message-Id: <20240208164017.26699-1-brgl@bgdev.pl>
-X-Mailer: git-send-email 2.40.1
+	horms@kernel.org,
+	andrew@lunn.ch,
+	f.fainelli@gmail.com,
+	jhs@mojatatu.com,
+	Alexander Aring <aahringo@redhat.com>,
+	linux-bluetooth@vger.kernel.org (open list:6LOWPAN GENERIC (BTLE/IEEE 802.15.4)),
+	linux-wpan@vger.kernel.org (open list:6LOWPAN GENERIC (BTLE/IEEE 802.15.4))
+Subject: [PATCH net v3 4/9] net: fill in MODULE_DESCRIPTION()s for 6LoWPAN
+Date: Thu,  8 Feb 2024 08:42:39 -0800
+Message-Id: <20240208164244.3818498-5-leitao@debian.org>
+X-Mailer: git-send-email 2.39.3
+In-Reply-To: <20240208164244.3818498-1-leitao@debian.org>
+References: <20240208164244.3818498-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -69,52 +68,26 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
+Add descriptions to IPv6 over Low power Wireless Personal Area Network.
 
-The optional variants for the gpiod_get() family of functions return NULL
-if the GPIO in question is not associated with this device. They return
-ERR_PTR() on any other error. NULL descriptors are graciously handled by
-GPIOLIB and can be safely passed to any of the GPIO consumer interfaces
-as they will return 0 and act as if the function succeeded. If one is
-using the optional variant, then there's no point in checking for NULL.
-
-Fixes: 6845667146a2 ("Bluetooth: hci_qca: Fix NULL vs IS_ERR_OR_NULL check in qca_serdev_probe")
-Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Signed-off-by: Breno Leitao <leitao@debian.org>
+Acked-by: Alexander Aring <aahringo@redhat.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
 ---
- drivers/bluetooth/hci_qca.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ net/6lowpan/core.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index edd2a81b4d5e..8a60ad7acd70 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -2326,7 +2326,7 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
+index 7b3341cef926..850d4a185f55 100644
+--- a/net/6lowpan/core.c
++++ b/net/6lowpan/core.c
+@@ -179,4 +179,5 @@ static void __exit lowpan_module_exit(void)
+ module_init(lowpan_module_init);
+ module_exit(lowpan_module_exit);
  
- 		qcadev->bt_en = devm_gpiod_get_optional(&serdev->dev, "enable",
- 					       GPIOD_OUT_LOW);
--		if (IS_ERR_OR_NULL(qcadev->bt_en) &&
-+		if (IS_ERR(qcadev->bt_en) &&
- 		    (data->soc_type == QCA_WCN6750 ||
- 		     data->soc_type == QCA_WCN6855)) {
- 			dev_err(&serdev->dev, "failed to acquire BT_EN gpio\n");
-@@ -2335,7 +2335,7 @@ static int qca_serdev_probe(struct serdev_device *serdev)
- 
- 		qcadev->sw_ctrl = devm_gpiod_get_optional(&serdev->dev, "swctrl",
- 					       GPIOD_IN);
--		if (IS_ERR_OR_NULL(qcadev->sw_ctrl) &&
-+		if (IS_ERR(qcadev->sw_ctrl) &&
- 		    (data->soc_type == QCA_WCN6750 ||
- 		     data->soc_type == QCA_WCN6855 ||
- 		     data->soc_type == QCA_WCN7850))
-@@ -2357,7 +2357,7 @@ static int qca_serdev_probe(struct serdev_device *serdev)
- 	default:
- 		qcadev->bt_en = devm_gpiod_get_optional(&serdev->dev, "enable",
- 					       GPIOD_OUT_LOW);
--		if (IS_ERR_OR_NULL(qcadev->bt_en)) {
-+		if (IS_ERR(qcadev->bt_en)) {
- 			dev_warn(&serdev->dev, "failed to acquire enable gpio\n");
- 			power_ctrl_enabled = false;
- 		}
++MODULE_DESCRIPTION("IPv6 over Low-Power Wireless Personal Area Network core module");
+ MODULE_LICENSE("GPL");
 -- 
-2.40.1
+2.39.3
 
