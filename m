@@ -1,87 +1,83 @@
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECF6579940
-	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Feb 2024 15:32:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24B267D41A
+	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Feb 2024 16:00:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707406327; cv=none; b=KbODYp9zsDPSWRLtIVy51kIQtaSF9R1953KDF5R8vNrKKISgE4bEu6c6si0vcLnyNc32vhsgkKXawgBocQzAlrDBDmtV2OkOC5zY+oaYcr/WvOzirszBPPnwCELfO1Zm2pmZBPQWb/AinOfEJ0mLEit6VN6c1tTbjnXW7m7Hdok=
+	t=1707408030; cv=none; b=HONdALq20lp6VJCTAqlUbkkupOPMc/6xZhOYqKnaC+4O3DeuTDpo7jTwjBw3r/jNQUYna7nH54e0Xl5iqM2GoFGq7LVLaRC8oIC+u9/RnMJtoN52umzJwxw+Lcr6rlq87tHQ8G3XLNRvEoz2FeYcqEp52tx65d+s9Yp/zKUqJfI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707406327; c=relaxed/simple;
-	bh=fjsov3uRgEiW3nYU2LA5ZmDxMOxNF1PFM1P2zKSNJWE=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=Y8wz+eWDSpiDghQtzocd6nzHFVZLkw7S/gbO7y+w6uIYV4GFyvUNC7s18z4GbM4ATq5t39oMlj7PVEKX5NecR7e5w6DVyXAJEYJixAB2VMB+wMVLFJhp63/UADPrvAPTC6dXqaQyeQbrhAma6be+rGnGWo/FTfqorcbxzR/LL2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-363d6348a07so15329885ab.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 08 Feb 2024 07:32:05 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707406325; x=1708011125;
-        h=content-transfer-encoding:to:from:subject:message-id:in-reply-to
-         :date:mime-version:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J13MMIPfh9m7LdVejmcRDcZr7MHiXnjkLGh32J/ubZA=;
-        b=MuL40qXzStxy+Vbsc90ETzoavihi1WZkppMCyoBzd8crKi9nAbkGowqzxYn+EPKcEp
-         JZdZHzAjGYdsXHD5Lbcbn/E68RD0bapFb9sdvOlkoG6Qj6RsQ9FsBi25J/2TTWJJYVky
-         PMVDFdoipKBtzeQ8PeouVqRaL5CWzUYxax65FtzWprdfKKWuVnD2yD11yCpNk8JZcOS9
-         mzyKx/Bd1angZYKD0gaM0HM3lcmSYQLIoRkY4Za/e1vJqxIfVuQufVoQisggfISu5xEY
-         QBlT/xTUD3OHhj+GoTl2dQ0uSJja1BBBaeuU0aA7hRkq57rwO2nOL1P4Q20JET5c3Nrf
-         twcQ==
-X-Gm-Message-State: AOJu0Yyo7isrJJDTiThp0or0nxIXfGakWhZKdgpR6K8k3904kIwxPD5n
-	AIpL0lktscBZFUAHlyrahR+AerYwOrIm0AanVhPp1k38HOqwZFc1Upd6eGPvr61uw2D0pAcwKza
-	2zIJTlcB6x+1XWFRxXqmix8LzNPvPkHFLtBQC43/5ziWEFKwyabcScsY=
-X-Google-Smtp-Source: AGHT+IEXxARntCtqw9oujDkbqJu9ADvKd22NWzIad3D7h/2PbUtbLKRNZ1E6fc45LDIqWXP+mEWNhrOSFdMlCPfWKUfh+NZCzaLl
+	s=arc-20240116; t=1707408030; c=relaxed/simple;
+	bh=t+SXXZOxeYYHJfsdEcyUDh80p14COsyMs52QJGskpoI=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=SkjifrHy9CiXPEptBb6v81bE7Ribo17RaxApS2pcFZaXI9eJBUIpTRE2NIHW7t0U7JaFezsF77WuRBs8cOINZVz0Ox7BdcA+lXup6PvAcLAvLWTyk4Z4AhArgEYOdw0WU4Tcxd7rJsEvpMnvt9bdMFUivpZxSBBNbZJJG8yLRdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZnK/v0pi; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZnK/v0pi"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9D2E3C433F1
+	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Feb 2024 16:00:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707408029;
+	bh=t+SXXZOxeYYHJfsdEcyUDh80p14COsyMs52QJGskpoI=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=ZnK/v0pixhKSOHvUwAYXaU4RVPnUXIe1Ecgv8Y8VTKi5rGG24r618uJ0gy1fdZ4FV
+	 byleTuEoHIVdDqP0jIIa5drOeKGlYzrUoBXOOPDEE6Fe8LZRL3VnNqeFcbgJ3Wkte/
+	 IZcWSeXjTYdjZvPkxFktCJONVXyP+af6sIwwubD685+X/AvZE9nogmGA2/iUHbxqIB
+	 bswMywCOq6w+YPdq8SXj4bVRGNLYkLTkZrs5mIjvoXp5dFP7E2ZpAdh5PSfmkAVLJ2
+	 GF6M7Ot8nkii9lJg1A0XtY724h/tBb6qofe0ia+EQcjocmxVIczReEmN7dHxYRZHAb
+	 olHzM5TxJWjNg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 81945C4332E; Thu,  8 Feb 2024 16:00:29 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 218264] Potential kernel regression with bluetooth pairing on
+ specific radios
+Date: Thu, 08 Feb 2024 16:00:29 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: marco.rodolfi@tuta.io
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: INVALID
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_status resolution
+Message-ID: <bug-218264-62941-iprrc70YHn@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-218264-62941@https.bugzilla.kernel.org/>
+References: <bug-218264-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1c87:b0:363:b51a:7e59 with SMTP id
- w7-20020a056e021c8700b00363b51a7e59mr638787ill.0.1707406324981; Thu, 08 Feb
- 2024 07:32:04 -0800 (PST)
-Date: Thu, 08 Feb 2024 07:32:04 -0800
-In-Reply-To: <000000000000b7b62e0610db6b8a@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000007cea730610e083e8@google.com>
-Subject: Re: [syzbot] [bluetooth?] KASAN: slab-use-after-free Write in __hci_acl_create_connection_sync
-From: syzbot <syzbot+3f0a39be7a2035700868@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com, 
-	kuba@kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, luiz.von.dentz@intel.com, 
-	marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, verdre@v0yd.nl
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-syzbot has bisected this issue to:
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218264
 
-commit 456561ba8e495e9320c1f304bf1cd3d1043cbe7b
-Author: Jonas Dre=C3=9Fler <verdre@v0yd.nl>
-Date:   Tue Feb 6 11:08:13 2024 +0000
+Marco (marco.rodolfi@tuta.io) changed:
 
-    Bluetooth: hci_conn: Only do ACL connections sequentially
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+             Status|NEW                         |RESOLVED
+         Resolution|---                         |INVALID
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D154f85501800=
-00
-start commit:   b1d3a0e70c38 Add linux-next specific files for 20240208
-git tree:       linux-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=3D174f85501800=
-00
-console output: https://syzkaller.appspot.com/x/log.txt?x=3D134f8550180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3Dbb693ba195662a0=
-6
-dashboard link: https://syzkaller.appspot.com/bug?extid=3D3f0a39be7a2035700=
-868
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D11d95147e8000=
-0
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D107c2d8fe80000
+--- Comment #7 from Marco (marco.rodolfi@tuta.io) ---
+Everything seem to be back working on the latest builds of Bluez, so this m=
+ight
+just be a Bluez and not a kernel regression after all.
 
-Reported-by: syzbot+3f0a39be7a2035700868@syzkaller.appspotmail.com
-Fixes: 456561ba8e49 ("Bluetooth: hci_conn: Only do ACL connections sequenti=
-ally")
+--=20
+You may reply to this email to add a comment.
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisectio=
-n
+You are receiving this mail because:
+You are the assignee for the bug.=
