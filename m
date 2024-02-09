@@ -1,121 +1,163 @@
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18F9B57308;
-	Fri,  9 Feb 2024 07:06:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF3A4657CE
+	for <linux-bluetooth@vger.kernel.org>; Fri,  9 Feb 2024 07:32:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707462379; cv=none; b=tNz9IHojFL+9dCyqJadKR5cnTwn/QUl9jH76NjqCJtm5d+Qqi04uBi3KKFJaEjqWrwUhFMoyJQtCN40sc99ulVPnpdsqBq4nf1829ejRrmgrmP2HDdHfFIp1UrWRNRbCRRhJB0deLLrASta0pJb4z9fA3+I3dKtoHQesSWg5RBY=
+	t=1707463926; cv=none; b=rWKRozI7R91DwaILaGveBss1h2kUanRQjTDkS0rre2zlHtiVXiLPpZyras9EvSXrKFMGPJAzTam/PtK5Jj2ig1ek6BezvIi/6MjbwmsD0Owgo+Jyz5WCArrEOilU8LnioxFHPOEf4Slc/fGIDarWBnRlIOvE3MY1AtDNDM1uEVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707462379; c=relaxed/simple;
-	bh=xdfzDXGsrnjsjgrVDLKFZyComOe6tbA2kOubScLODRQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=p57Am/8XDE1jOhCJ86DyXDOlAqyNCZIESmnP5H2uFSfAwuT719qx9qWCJgVwFo8qPlOMfYDmu9xBqN9G8VwOpwyUMVGQFBGz2K7R1mNEH6/fLveOiuj9mmvzha28ig6TivPFdm4Q5I+x/TNweC0matMj4PiXRqjj1nrYwVmP+Us=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim
+	s=arc-20240116; t=1707463926; c=relaxed/simple;
+	bh=guiktpwXczqgxntjyWV8p4mbEZkPOlhWdY7vrvlbu0s=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=WcQV9jEdGsPiGBgdftFXVGRxvy2z3Rsf35H+KTLMXLic4qMN9STYZrQZhlZ3vafb6apVTgIgqaJAhqIPa/RG8Z9/l9Puye8eESvLmRUrdeVUoaJPKuZgbdvM87+3HVleUF0HicxN4NeZTb/WPTWsbmWl0aJH3L4Guy6wVcS5phM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cl1ovQCQ; arc=none smtp.client-ip=209.85.221.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-783d84ecb13so43172285a.0;
-        Thu, 08 Feb 2024 23:06:17 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cl1ovQCQ"
+Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-4c0245cba99so228084e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 08 Feb 2024 23:32:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707463923; x=1708068723; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=0/b9/hyMwthiYPIv9kmWQBeAXITT37Vf//li6dGpy9E=;
+        b=Cl1ovQCQIAkHjICGVuVfPWgmcH2bDTVsFJrrFUtcVf2wIepMoCXfApTyvsqmRauWsq
+         sKo4dsH6ltliNsE9oK2lW7Ju4M/FAlofh94U2mSlcyodvm61Ekvf1NjHuAd3RnoRzuP5
+         zBqUBXbpGrfSmvOI82nc2FT51w2YU794whUyE4s/RVhknlPi4j9vIEU17fz4d8DFfTu/
+         KdSpvHRhhcJAPS9RyH9YjwqomXB0JOZRf2upy5Enmnrb9TQSCr6OFe/wB0StUEgktSaX
+         LJvQcSTFeYxQL/soTijgiMzsKoDjyEA/XhM2gAFeSNa9ufkknHfPlezIU5vEfuDMiQEj
+         KJjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707462377; x=1708067177;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1707463923; x=1708068723;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=oADkvQHAij8FCM4vmi8qRxP7ztqbgDTFL1If0dxUooo=;
-        b=aW71Bhd7+sF5QHi0HDrYHhkNIDlkGjeL68IFPsKNlmQ4yjMUvJxp86FD4bPOgA4xC2
-         gz34x2z+/JeorlSAHad6yK2vzdNwo5d/on47T+uNxiphnz3gk1SaJ6VHJv8Xuv9kpx+I
-         9SUZF6hgs0wavRCNLj7YmFPUwxGacCXUccKYI1+FPvt7DXXsQoeYCzgIZc7spH+u+pC9
-         hzfP3Wk400UahqFULXz+Yy0qT4XJb/mdRTtFmq5u6QlrAk8GcL5Y7qsMIQc2f/Eu0VFm
-         wcXZOIw48Vu2nwCTUU7uJehlgSlWDix7p5MmlIGTZpGoku5HUTmivmgSQ0KXaBtjsahd
-         FAiw==
-X-Gm-Message-State: AOJu0YwzCxDuaOJfSOg/0okjSX/feznjkBrnPaiYj/IJbJl0Dj+SaAI5
-	yrTV7UnWP/7LO6+WFtxxfutGu5AS0ClZpKTD0zeLWu/8s4d4msiP
-X-Google-Smtp-Source: AGHT+IHzkNveMwi7bMoRQ9zqGY6hEu7DkmXBCjt5L01jg2IKMEclrEvcB31X9A7vRpwNGgki0YZlsA==
-X-Received: by 2002:a0c:aada:0:b0:68c:bdc0:1bd2 with SMTP id g26-20020a0caada000000b0068cbdc01bd2mr607755qvb.9.1707462376842;
-        Thu, 08 Feb 2024 23:06:16 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXm1EzV9GLndmBzBAWO2JUZL47ACppeNoLaIsJhQa44I7jkyxsWe5w071H3ZMCMUA7fO7bqo39hJ5o/Zyw1ijs+kUbiRwa1CdX7SQoLEmv9AnV4uo9qUnxR1lMLFFeolbxMFGhhQVmv1vSEkCJX5cg3NqMwDNumeL/2pHAcA2sbesAs35XkB/A9ddRBkt6h/XP7bVpKcmTJ9O5ytSHAJg+hhqKeF0Z3qesEdNbtsCjO4RO7jJD65sa8ZqWiy/d3ONMAQHY=
-Received: from noodle.cs.purdue.edu (switch-lwsn2133-z1r11.cs.purdue.edu. [128.10.127.250])
-        by smtp.googlemail.com with ESMTPSA id b25-20020a0c9b19000000b00681785c95e0sm576315qve.46.2024.02.08.23.06.15
+        bh=0/b9/hyMwthiYPIv9kmWQBeAXITT37Vf//li6dGpy9E=;
+        b=XQHyU2SATXL1co/0dlPq0G8D5Zo1PUB8P7AchK2LtfLh+aU6eoHmXyp+bIFKt+TBjj
+         DTOAcLcwCqUPtd79qWUlbIKugcfA1JxSQbSMVrtprzMr61j/WLulNaC5nypMdKz2Kcwe
+         OovslTe0l9tV21v6hlCO1BzcrO0P2CN5xva91Q7TZqZfM7S8brH5qqj+0+GsC4v3/JtC
+         YRx2gs6u/2jIt0+nkrrZdqoRS6LfQF3+OTsxQ/sjr9K8pRJGdrGRNPD6MndMRfbsc+lq
+         t1IuMP7aMVCy8gruXgy2Wq8/ra0Uuz11YItDDqPr2RTHJByq1J05hZNz1087y2dYSn1U
+         jxDg==
+X-Gm-Message-State: AOJu0YzCeUho59Jm73nusoqcsuX7mu/A4t+xiMKvmUsqJBgCMAXglkUk
+	B1cyHN1j1H27FaIfQWV3aRh2aGevP1Lt+oOXjtokBcRCC/0F0QIy6+lqfEaC
+X-Google-Smtp-Source: AGHT+IFsuDnleQhQks/ufQjHr341To+Uf0VBMzdWC54b85/mBtLo4FBBk/zZoCCJjrUFK8jLUg7LFw==
+X-Received: by 2002:a1f:4b05:0:b0:4c0:258c:e4d9 with SMTP id y5-20020a1f4b05000000b004c0258ce4d9mr826867vka.4.1707463923170;
+        Thu, 08 Feb 2024 23:32:03 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWRk0QFmg1BN+R61JnVnJ/ooI/i/050N7BOVTxMHYaqmJ+NFNzCNLNkJ7KdAVzcC0OPVCbkgryHB63CD31hmtNI
+Received: from [172.17.0.2] ([20.55.126.64])
+        by smtp.gmail.com with ESMTPSA id k6-20020a05620a0b8600b007853eb72c49sm511437qkh.46.2024.02.08.23.32.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Feb 2024 23:06:16 -0800 (PST)
-From: Sungwoo Kim <iam@sung-woo.kim>
-To: 
-Cc: daveti@purdue.edu,
-	Sungwoo Kim <iam@sung-woo.kim>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: add missing checks in state transitions
-Date: Fri,  9 Feb 2024 02:04:44 -0500
-Message-Id: <20240209070443.3617790-1-iam@sung-woo.kim>
-X-Mailer: git-send-email 2.25.1
+        Thu, 08 Feb 2024 23:32:03 -0800 (PST)
+Message-ID: <65c5d4f3.050a0220.7d74d.2c79@mx.google.com>
+Date: Thu, 08 Feb 2024 23:32:03 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5395317661826391122=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, iam@sung-woo.kim
+Subject: RE: Bluetooth: add missing checks in state transitions
+In-Reply-To: <20240209070443.3617790-1-iam@sung-woo.kim>
+References: <20240209070443.3617790-1-iam@sung-woo.kim>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-When an l2cap channel receives L2CAP_CONN_RSP, it revives from BT_DISCONN
-to BT_CONFIG or BT_CONNECTED.
-It is very weird, violates the specification, and I cannot see any real
-usecase for this.
-Similar to this, the L2cap channel has six illegal state transitions:
+--===============5395317661826391122==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-1. BT_CONNECT2 -> BT_CONFIG by L2CAP_CONN_RSP
-2. BT_CONNECT2 -> BT_CONNECTED by L2CAP_CONF_RSP
-3. BT_CONNECT2 -> BT_DISCONN by L2CAP_CONF_RSP
-4. BT_CONNECTED -> BT_CONFIG by L2CAP_CONN_RSP
-5. BT_DISCONN -> BT_CONFIG by L2CAP_CONN_RSP
-6. BT_DISCONN -> BT_CONNECTED by L2CAP_CONN_RSP
+This is automated email and please do not reply to this email!
 
-This patch fixes 2, 3, 5, and 6 by adding checks.
-For 1 and 4, I will make an RFC for as it requires some refactoring.
+Dear submitter,
 
-The detaild logs are described in here:
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=824554
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.92 seconds
+GitLint                       FAIL      0.53 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      27.45 seconds
+CheckAllWarning               PASS      30.10 seconds
+CheckSparse                   PASS      35.81 seconds
+CheckSmatch                   PASS      97.10 seconds
+BuildKernel32                 PASS      26.71 seconds
+TestRunnerSetup               PASS      493.02 seconds
+TestRunner_l2cap-tester       FAIL      12.06 seconds
+TestRunner_iso-tester         PASS      30.11 seconds
+TestRunner_bnep-tester        PASS      4.79 seconds
+TestRunner_mgmt-tester        FAIL      166.38 seconds
+TestRunner_rfcomm-tester      PASS      7.35 seconds
+TestRunner_sco-tester         PASS      15.17 seconds
+TestRunner_ioctl-tester       PASS      7.83 seconds
+TestRunner_mesh-tester        PASS      5.87 seconds
+TestRunner_smp-tester         PASS      6.83 seconds
+TestRunner_userchan-tester    PASS      4.99 seconds
+IncrementalBuild              PASS      25.70 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+Bluetooth: add missing checks in state transitions
+WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
+#97: 
 https://lore.kernel.org/lkml/CAJNyHpKpDdps4=QHZ77zu4jfY-NNBcGUrw6UwjuBKfpuSuE__g@mail.gmail.com/
 
-Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
+total: 0 errors, 1 warnings, 0 checks, 28 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13550940.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+Bluetooth: add missing checks in state transitions
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+20: B1 Line exceeds max length (96>80): "https://lore.kernel.org/lkml/CAJNyHpKpDdps4=QHZ77zu4jfY-NNBcGUrw6UwjuBKfpuSuE__g@mail.gmail.com/"
+##############################
+Test: TestRunner_l2cap-tester - FAIL
+Desc: Run l2cap-tester with test-runner
+Output:
+No test result found
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 492, Passed: 485 (98.6%), Failed: 6, Not Run: 1
+
+Failed Test Cases
+LL Privacy - Add Device 4 (2 Devices to AL)          Failed       0.115 seconds
+LL Privacy - Add Device 5 (2 Devices to RL)          Failed       0.115 seconds
+LL Privacy - Add Device 6 (RL is full)               Failed       0.142 seconds
+LL Privacy - Add Device 7 (AL is full)               Failed       0.143 seconds
+LL Privacy - Remove Device 2 (Remove from RL)        Timed out    2.184 seconds
+LL Privacy - Remove Device 4 (Disable Adv)           Timed out    1.846 seconds
+
+
 ---
- net/bluetooth/l2cap_core.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 60298975d..c5fa2b683 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4339,6 +4339,14 @@ static int l2cap_connect_create_rsp(struct l2cap_conn *conn,
- 
- 	l2cap_chan_lock(chan);
- 
-+	switch (chan->state) {
-+	case BT_CLOSED:
-+	case BT_DISCONN:
-+		l2cap_chan_unlock(chan);
-+		l2cap_chan_put(chan);
-+		goto unlock;
-+	}
-+
- 	switch (result) {
- 	case L2CAP_CR_SUCCESS:
- 		if (__l2cap_get_chan_by_dcid(conn, dcid)) {
-@@ -4552,6 +4560,14 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
- 	if (!chan)
- 		return 0;
- 
-+	switch (chan->state) {
-+	case BT_CLOSED:
-+	case BT_CONNECT:
-+	case BT_CONNECT2:
-+	case BT_DISCONN:
-+		goto done;
-+	}
-+
- 	switch (result) {
- 	case L2CAP_CONF_SUCCESS:
- 		l2cap_conf_rfc_get(chan, rsp->data, len);
--- 
-2.25.1
 
+--===============5395317661826391122==--
