@@ -1,138 +1,123 @@
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42BE518053
-	for <linux-bluetooth@vger.kernel.org>; Fri,  9 Feb 2024 22:26:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83ACF38DE2;
+	Fri,  9 Feb 2024 23:37:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707517593; cv=none; b=m/1WzXpwLQBMKL0Dgn2VHnLcTV37axrgygDw7/2QmdzqKzOLlN3b68pAYPiq/KQlewyOWASHLEt8YDpDEYYB7Twza9zOTc4Fq8XHaT1C41dyUvQWJ1BmJ5wE1S5Ytu/TxsQz4xXzrQMQMaNHU/TJffYSIoRUKCTUNui+EpzPjtY=
+	t=1707521824; cv=none; b=WFfBX9S3MzyEss4+/oXy68eEHa12w6tysbuhrZ9kq96gMfdv1v6dY/Bfm0I1HE+uM49JbRAzyV5VobLMJj8GJMx1ZsYNkzPZGOpqaIRHsD4PsROE/3tsJwAVoIt4XEj6KPwRtA1NgxWcgNf1Sl1wWGuV1jhQy5imCTVoHeszOdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707517593; c=relaxed/simple;
-	bh=rlVibRiToNgPfjQMq61TMyd39hrkllubuJOM+CuTrMs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rGO8t3O7HzuJSry9hvdOvqjNGZ2yzISKZ6ysrNNNBaK9gmUlcpTgHe5Iymc7ddfO1oece8pcjLtz9t7X0zsJf+y0vlZ4xhCZ7+8BEDMUne3abhEC7rW3kOBYYWIJC6HyNWRogb3OjXjhM/VvVOf/euMeiZR4JujWXdVo2P6Vgrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=itkUUaiq; arc=none smtp.client-ip=209.85.208.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1707521824; c=relaxed/simple;
+	bh=vab66JaH+98JX7uwKvF0gxBwsDwHTA+LMjKxktqFBFI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tCMh8gIzVWyF0QsqPwornGl6bScGVlXBqAiT3zsHcRHeWymPNi5JhWCnnflz4zprt3VpzkLO3InEuW9Zl+YBwUEfbbtA5EiEeHt25LRr/smEp/0n2J14xm9biolVw023wwPpLB7t+jj/PxPux/OdUoJ/PFRdU97h01xNY4eCGQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oLrmi2Ug; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="itkUUaiq"
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2d0d7985dfdso19800531fa.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 09 Feb 2024 14:26:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707517590; x=1708122390; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SNEcaCZxQZ+bw4Mp9bhy7HBjHs4E/5k2xUYBag7ipE8=;
-        b=itkUUaiqz5BnkRjQaydAXROPniwxvnoEs4KqkCYaEKFUFHcSUeEWmDKjRWg/KLsJT7
-         0feEr4cvpHzyRbFUd/zJxPHe3+cHeijPdE/z52B81GIFpA85sN3gFWCRh17OH8ynaz3z
-         2RuqzNZbuPljgmex/zxgiPwcpomjtEAHbeqaAHph7+y6v4xcAyfxTVdpBt6R4BBgYyOJ
-         GJYlNsedAPlJlUOrPD+UKpwz9GcUjhxryBPwF5iZ7RLt68Fsveanyu1xpARBiJmuPHbE
-         payDSNuxqQ+aIIx/NPGAgeO+C6jYrY1XXClkuWCxnPGkeVB2HBBr1AOimbgkMfXN3i1T
-         Wi3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707517590; x=1708122390;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SNEcaCZxQZ+bw4Mp9bhy7HBjHs4E/5k2xUYBag7ipE8=;
-        b=VnLBXcm9D9qtpJ4KinSel+vF2HZvhVXCSAkUcdQH8uFe9BCwLZ5xbIIvkc8Y0O2sWL
-         Gw1n4TT5ZlaEBnJh3cvvIcHGTGQj4fk0ibO1moulNLGAEfnW9xTNh52gDJhj1uGRDYTg
-         Qy5Kl61gLPAEnGYdBCRQaj/iRnO0mRJ5lX5f6AWwdgyThWpm2FqEL931iFYRxsupNb4c
-         k79es6R5OI5hGvun6N+I9BysdeFYv6vD++nAeHkjd6R+efM/YrH9x1oW+yKlcDn38AAF
-         Jz7wr5t/oZYS6YZdMLd2ftKSfbhtWXD8S1KY4RD0xMQiYg568foHQ/PEFtMNkGmYeUSc
-         4t1w==
-X-Gm-Message-State: AOJu0Yx2x75Ci53pM8YdLrL9BrwzR6si6tAJJVCTFtZg9j/EfxGgM+Sn
-	aTx65gcGTqi5ps+dMrbPI19tRbiTpNJQFjD3GxByEoUcTHX3S9nEP5CQuO7tpIfJhk1eRG0mTQC
-	ZIB1r9ZdMuluex8QFhug8xRdGQDw=
-X-Google-Smtp-Source: AGHT+IG6YxWXMSH1zRWmrrA07aNdSRK0I44btPElFgWd7SJTVZnrofojKzfmsslDKLAN+rqk6PAa9henImyDdBEuGFc=
-X-Received: by 2002:a2e:a787:0:b0:2d0:a35d:4418 with SMTP id
- c7-20020a2ea787000000b002d0a35d4418mr254174ljf.16.1707517589957; Fri, 09 Feb
- 2024 14:26:29 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oLrmi2Ug"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46BEFC433F1;
+	Fri,  9 Feb 2024 23:37:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707521823;
+	bh=vab66JaH+98JX7uwKvF0gxBwsDwHTA+LMjKxktqFBFI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=oLrmi2UgocGnOO/gap5TAGTQkug/s/k067+bvJPqRjk02YmbV1+nxy3sDJAyB1HvK
+	 14++nREuC0sMSTr+hpQhKlx2HG/LjbOM2lb4MK/wfkzlqlP3P8F3iDxChowgCJCeZy
+	 FKKXv2Sgu/LzYTvr5OiH6nz0xyW8+ybUsRv9HM+mcC6OaC8BHzlADy/kXvXMM2pKxH
+	 nKkxd1vCgAvIa7WkQv/dvw6Sq7Mn/5GWVhmzkze32/ZZJZD3fmBIL+fPh1D/k6NiSt
+	 3hB62JPL7qL2Sd/RFwUJq6s9V4x9xd3YXVquvrU47evSzfphB8Sz5bQY9WTnCxaI/n
+	 bjBR24cpsmSZg==
+Date: Fri, 9 Feb 2024 17:37:00 -0600
+From: Bjorn Andersson <andersson@kernel.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Konrad Dybcio <konrad.dybcio@linaro.org>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Neil Armstrong <neil.armstrong@linaro.org>, Alex Elder <elder@linaro.org>, 
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Arnd Bergmann <arnd@arndb.de>, Abel Vesa <abel.vesa@linaro.org>, 
+	Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, linux-arm-msm@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	linux-pci@vger.kernel.org, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: Re: [RFC 9/9] PCI/pwrctl: add a PCI power control driver for
+ power sequenced devices
+Message-ID: <nezjddfz22a74rbhjovq2nyba46752lwf66rw47oebfa3xg6zv@ad6wag5e5zrk>
+References: <20240201155532.49707-1-brgl@bgdev.pl>
+ <20240201155532.49707-10-brgl@bgdev.pl>
+ <jb4hzijjxjv4kiy3cn2fuc5ox4x5uutredbxiwo2fvnkh2xudf@5w65qtp35ase>
+ <CAMRc=MdQ_uRq7a24RYt=KRSff9sw_1soQ+8ONEpNXy0emk5ChQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240209164630.92208-1-andrei.istodorescu@nxp.com> <20240209164630.92208-4-andrei.istodorescu@nxp.com>
-In-Reply-To: <20240209164630.92208-4-andrei.istodorescu@nxp.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 9 Feb 2024 17:26:17 -0500
-Message-ID: <CABBYNZ+RtEWtsB3Hq2L_DrL7Pgk66fcMF-5q5sJ-Fb8ph3oBGQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 3/6] btio: Check for non-zero qos before setting
-To: Andrei Istodorescu <andrei.istodorescu@nxp.com>
-Cc: linux-bluetooth@vger.kernel.org, mihai-octavian.urzica@nxp.com, 
-	silviu.barbulescu@nxp.com, vlad.pruteanu@nxp.com, iulia.tanasescu@nxp.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMRc=MdQ_uRq7a24RYt=KRSff9sw_1soQ+8ONEpNXy0emk5ChQ@mail.gmail.com>
 
-Hi Andrei,
+On Fri, Feb 02, 2024 at 02:05:59PM +0100, Bartosz Golaszewski wrote:
+> On Fri, Feb 2, 2024 at 5:03 AM Bjorn Andersson <andersson@kernel.org> wrote:
+> >
+> > On Thu, Feb 01, 2024 at 04:55:32PM +0100, Bartosz Golaszewski wrote:
+> > > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> > >
+> > > Add a PCI power control driver that's capable of correctly powering up
+> > > devices using the power sequencing subsystem. For now we support the
+> > > ath11k module on QCA6390.
+> > >
+> >
+> > For a PCI device which doesn't share resources with something on another
+> > bus, the whole power sequencing would be implemented in a driver like
+> > this - without the involvement of the power sequence framework.
+> >
+> 
+> Yes, this is what I did in the previous incarnation of this code[1].
+> 
+> (I know, I should have linked it here. My bad, I will do it next time).
+> 
+> > I think it would be nice to see this series introduce a simple
+> > pci_pwrctl driver, and then (in the same series) introduce the power
+> > sequence framework and your PMU driver.
+> >
+> 
+> I disagree. I was initially annoyed by Dmitry asking me to do a lot
+> more work than anticipated but he's right after all. WLAN and BT
+> consuming what is really the PMU's inputs is simply not the actual
+> representation. That's why we should make it a pwrseq user IMO.
+> 
 
-On Fri, Feb 9, 2024 at 11:46=E2=80=AFAM Andrei Istodorescu
-<andrei.istodorescu@nxp.com> wrote:
->
-> ---
->  btio/btio.c | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
->
-> diff --git a/btio/btio.c b/btio/btio.c
-> index d30cfcac73ee..5a07f91c7d61 100644
-> --- a/btio/btio.c
-> +++ b/btio/btio.c
-> @@ -5,7 +5,7 @@
->   *
->   *  Copyright (C) 2009-2010  Marcel Holtmann <marcel@holtmann.org>
->   *  Copyright (C) 2009-2010  Nokia Corporation
-> - *  Copyright 2023 NXP
-> + *  Copyright 2023-2024 NXP
->   *
->   *
->   */
-> @@ -1981,7 +1981,9 @@ static GIOChannel *create_io(gboolean server, struc=
-t set_opts *opts,
->                 if (!sco_set(sock, opts->mtu, opts->voice, err))
->                         goto failed;
->                 break;
-> -       case BT_IO_ISO:
-> +       case BT_IO_ISO: {
-> +               uint8_t zeroes[sizeof(opts->qos)] =3D {0};
-> +
->                 sock =3D socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_ISO=
-);
->                 if (sock < 0) {
->                         ERROR_FAILED(err, "socket(SEQPACKET, ISO)", errno=
-);
-> @@ -1992,12 +1994,14 @@ static GIOChannel *create_io(gboolean server, str=
-uct set_opts *opts,
->                                  &opts->dst, opts->dst_type, opts->bc_sid=
-,
->                                  opts->bc_num_bis, opts->bc_bis, err) < 0=
-)
->                         goto failed;
-> -               if (!iso_set_qos(sock, &opts->qos, err))
-> -                       goto failed;
-> +               if (memcmp(&opts->qos, zeroes, sizeof(opts->qos)))
-> +                       if (!iso_set_qos(sock, &opts->qos, err))
-> +                               goto failed;
->                 if (opts->base.base_len)
->                         if (!iso_set_base(sock, &opts->base, err))
->                                 goto failed;
->                 break;
-> +       }
->         case BT_IO_INVALID:
->         default:
->                 g_set_error(err, BT_IO_ERROR, EINVAL,
-> --
-> 2.40.1
+If the PMU registers the "internal" output regulators, then PCI device
+would consume the PCI outputs of the PMU, the BT device would consume
+the BT outputs of the PMU. The PMU requests inputs enabled and drives
+BT_EN and WLAN_EN according to which subset of these output regulators
+are enabled.
 
-This is probably not the right layer to do this since btio doesn't
-know what can be consider valid for BT_IO_ISO, specially considering
-there could be different QOS settings that are not for audio streaming
-in the future, so Id suggest to move this on top of btio, perhaps in
-bap plugin.
+Pretty much exactly as "regulator-fixes" isn't a pwrseq device.
 
+Regards,
+Bjorn
 
-
---=20
-Luiz Augusto von Dentz
+> > One case where such model would be appropriate is the XHCI controller
+> > (uPD720201) on db845c. Today we describe vddpe-3p3-supply as a supply on
+> > the PCI controller, but it should have been vdd33-supply, vdd10-supply,
+> > avdd33-supply on the PCI device.
+> 
+> Sounds like a good second user then!
+> 
+> >
+> > That would provide an example for how a simple PCI power control driver
+> > can/should look like, and we can discuss the PCI pieces separate from
+> > the introduction of the new power sequence framework (which is unrelated
+> > to PCI).
+> 
+> I agree it's unrelated and it could possibly go upstream separately
+> but the particular use-case on RB5 (and other Qcom platforms) requires
+> both the PCI and generic power sequencing to be addressed.
+> 
+> Bart
+> 
+> [snip]
+> 
+> [1] https://lore.kernel.org/netdev/20240117160748.37682-7-brgl@bgdev.pl/T/#m72f52254a52fcb8a8a44de0702cad1087d4bcfa1
