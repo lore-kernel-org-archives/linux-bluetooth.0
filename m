@@ -1,195 +1,154 @@
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+Received: from mail-oa1-f42.google.com (mail-oa1-f42.google.com [209.85.160.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EADD20311;
-	Fri,  9 Feb 2024 13:36:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CEDA6995B
+	for <linux-bluetooth@vger.kernel.org>; Fri,  9 Feb 2024 14:16:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707485819; cv=none; b=p9EJ2We1Y0xtNGC8QXojTHZpwu0dC3yjUc6/1hVwHv4oJonkIHo/HfcoOrv9UdLAFlA04t/34VSPpNtLidrM0Usr5W/hvVCBr4adVY6qPYWEF6P+mdARLVemYIKKRfwJm5bltFwc9/JrEqRFT0Od8c16hnA21yVuIaPA3tHqFXY=
+	t=1707488178; cv=none; b=qVxb8YaZ2xN9Vj4wmR9oIokLfXjB+cNh2kvaVb0wmSe76BytyhZ5+rVVxVTMzP3t7Jn585RKJxRQSKB65K1D6dvAFRAdVc/4yuhS21X30nxv2rMq8X8v5gJhFrH207t8v2GpB1CGp/nYmWMvauWtW3mPByv7pgdosxwIhi5v+Sk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707485819; c=relaxed/simple;
-	bh=3vm8auiZrQRj+iHUNDAT7zCm22vZjMeBQJLQWdgtyVA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BEqCjnOHqTbg0mCK1akmQcSfjUpnx9FwB3qgHD9WDiswbhChTqWpo6XBjzAAsdli/6JG7JAEDvCxpKtV5v7sF8h8f2Afm9fgEVIykURvZriwxEti5j4PO0GPPYFeeTAzKcw5KPYTlPQok6ECvLs8msdAHvOZ+RGBiwP0ZIOHdSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VaA0JUn9; arc=none smtp.client-ip=209.85.208.171
+	s=arc-20240116; t=1707488178; c=relaxed/simple;
+	bh=Uzmy8pdwHrS1wMUJmvCHzDf9sFS7r+uY2DSU/7JrNPg=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=BLfUveBvHk2mEFYNdA3InxxS5sZQ+AMs29FoIhrl9ysB3PCuAX5POtaexYuoRnsMUjYj3nTZ3KQmdi0fRBGp6hN4h3Hnxot7p1Y4PwSqKqIxU7L8em53OkFGktpYtn1J98qftdyb337flprhoYuMvupe7Z0p8HENBnqN5vYoQr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m5gO0kDg; arc=none smtp.client-ip=209.85.160.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VaA0JUn9"
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2cf206e4d56so11692181fa.3;
-        Fri, 09 Feb 2024 05:36:57 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m5gO0kDg"
+Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-2046b2cd2d3so668975fac.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 09 Feb 2024 06:16:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707485815; x=1708090615; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5YBOdfp2b7bzt886CyrnblZUzTFAd78HV3pYIFWbcGE=;
-        b=VaA0JUn9Rz93z+O7P62bdIoxH6zBKeD/WcxRaYDBqkqqpRzW66kL/Ng+GaKnfccXIO
-         CZwVPvu2nQTWcl9ATsw1koPcAQC5STtXvy4eqilG7tFVdh01aqlSmDoi94p+/LJ6xKQ7
-         HbC8iMQ+SJonFbAp8hXf4wfpHJZsBiv01POv8DOdzE+L6Eb4mkrvKztnMfLxwFZfIBwL
-         I11GdZJoW917tFmNQFLDm89Zsso5gHOKzahWZIe2t8cViu2h7xv19wKsivM656Cvdqkd
-         d7c8O1uf4n5Vr5HlLWV0x0gajZNUo6NEDylQxMZ64gUaepQSsssPErqVLDvV44lukyD4
-         Gt6w==
+        d=gmail.com; s=20230601; t=1707488174; x=1708092974; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=AydVQatpc9+8to7jbO+jHh71eCWXPgIKPFgG/Q9U0U4=;
+        b=m5gO0kDgcm2aG4FzBfuQLRrrjDZ/5O2Ymii7ryr2iylnIz+nLNs3bV5QxhL052nOWO
+         WSHFHGDX7UqaepPyrMQDn9XVib9nMQmybOv3GYM7MoTVvBd4FSY9Voj3q9hpNu9EY44J
+         BIxv1Nc0GtDcAVV+99ddJXKb8UC9ozpBeVMooienHzRdg9qsMeOda9l+cLaMS3Le7mPM
+         k2kQIf1B/LDT+QK+dfIYiFraQFQc2qPKKvMxk9C/73+nfput9wBFdMd+vypzLApavtk3
+         wqf+2+GU+eXofeHnCdItIBqi2l1tAWSUJvJTEG12MqYsLkNKQpYKvs3a7WKkfABlidhr
+         gsAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707485815; x=1708090615;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5YBOdfp2b7bzt886CyrnblZUzTFAd78HV3pYIFWbcGE=;
-        b=Ij4QdTLy31LbkOreHZPPcRzN2XZdYg2utKByl0imn5JHbjy7seezMhKqlyUm9H5w0m
-         8r8pZlIPNNSblMIhs/w04v0sBJkqwOHgEqPhWLPTiyN7MEJErIe7sd+9rRGm9GHLhctR
-         IywsK2eN+mn35+poZqmZjEK45lIxrnu5ZvRrpwYi1wf7MBdjJcGEpjz4mjwAZ0OvcCk3
-         7Kb4l9vwRs5orcGtXyV1UU9G8TEwjtsOndRbdGP4/3thF7fcBp0bUWB9IWDf3ydKKbMh
-         YGB8Xzbvo/wEDGJ6NfZBjezPVAKszObCOKSdKQXSnjfwgjUUiC+JpRNCqyUyIMdTPPiY
-         q0zw==
-X-Gm-Message-State: AOJu0Yx0uSyIBoCkTwqGPrj1bzMfWZXz0xvTVau/sIq9JkuG+FAqb4yT
-	9i6ebk7p9/8cMzlAc8PyXCUduFXki71mwy6cSeDPB7KBdiuGrhG7cMtcyptEyixfFYp88Uw4MOh
-	zwQ4inTxsLI+WA/eLuhT8+cKa+zI=
-X-Google-Smtp-Source: AGHT+IFWbfm8yzzLHy8h1HaTWTuCPBjb9QKibp82QsvcenBLb2iBnaU79IcF9ZxbCy7QaaBICwG9tXFYPNNOE8TcwCo=
-X-Received: by 2002:a2e:9813:0:b0:2cf:5119:95cb with SMTP id
- a19-20020a2e9813000000b002cf511995cbmr1267882ljj.26.1707485815098; Fri, 09
- Feb 2024 05:36:55 -0800 (PST)
+        d=1e100.net; s=20230601; t=1707488174; x=1708092974;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AydVQatpc9+8to7jbO+jHh71eCWXPgIKPFgG/Q9U0U4=;
+        b=bCl/h8X11NsMAinnQOVMk4WWflAU3CDq31K7P1HaYv3VZNX9bpxYoVL0/4rIBPJK9O
+         DXc/XVt4XWWMF5XHRqGwIGt7GTOe4AuMKn9tvy3LgJcie8/M8Ija+9ioll9opWYWDCoz
+         e7A+D5CH9eQ3DQQWljgvW9HP70J8AOfG7y1KSfI4/UzBKTAlidyq5Np6fg/aqAc4FtCV
+         IFUl3sYXAHqOpPYJUNFr1iI+wqZGDJHl5uewQITUxnQfeL+81MS/k+2i9t0mjGP4AM5r
+         itjt02wYoqSyamx0dkL42875+mz3M2XktwyHTGnRO0qKtkRF/3Z0K38dsCd1XpIJ6P/d
+         HgDA==
+X-Gm-Message-State: AOJu0YzpSlxC2uYGufGeIyc4WMaaCs09/Ziiijp5eHMrBKZi26GqXcDr
+	Oe+rSq1lD5xFFcyJkjzUcEPWwReD3/Ugb139lxjRelV0MC94Nrr2bTePhBld
+X-Google-Smtp-Source: AGHT+IGKgaiQDmg5ZwL3PZv0bbNASMAFSllGQJvDSgERLbz5I2NAf2J1jzc8Dyp6xO3gkjmaFtMB/g==
+X-Received: by 2002:a05:6870:d0c3:b0:219:3054:3ea2 with SMTP id k3-20020a056870d0c300b0021930543ea2mr2057565oaa.0.1707488174304;
+        Fri, 09 Feb 2024 06:16:14 -0800 (PST)
+Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
+        by smtp.gmail.com with ESMTPSA id 14-20020a05612202ae00b004c02d68e4ffsm226046vkq.44.2024.02.09.06.16.13
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Feb 2024 06:16:13 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v1] Bluetooth: hci_conn: Fix UAF Write in __hci_acl_create_connection_sync
+Date: Fri,  9 Feb 2024 09:16:12 -0500
+Message-ID: <20240209141612.3554051-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <0000000000007cea730610e083e8@google.com> <216c95d9-db1f-487a-bf3d-17a496422485@v0yd.nl>
-In-Reply-To: <216c95d9-db1f-487a-bf3d-17a496422485@v0yd.nl>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 9 Feb 2024 08:36:42 -0500
-Message-ID: <CABBYNZKPaMLK5+HnsRWR9jwpdZWvbbai6p9XbePhMYdKSYUPPg@mail.gmail.com>
-Subject: Re: [syzbot] [bluetooth?] KASAN: slab-use-after-free Write in __hci_acl_create_connection_sync
-To: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
-Cc: syzbot <syzbot+3f0a39be7a2035700868@syzkaller.appspotmail.com>, 
-	davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com, 
-	kuba@kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.von.dentz@intel.com, marcel@holtmann.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Jonas,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Fri, Feb 9, 2024 at 7:37=E2=80=AFAM Jonas Dre=C3=9Fler <verdre@v0yd.nl> =
-wrote:
->
-> Hi everyone!
->
-> On 08.02.24 16:32, syzbot wrote:
-> > syzbot has bisected this issue to:
-> >
-> > commit 456561ba8e495e9320c1f304bf1cd3d1043cbe7b
-> > Author: Jonas Dre=C3=9Fler <verdre@v0yd.nl>
-> > Date:   Tue Feb 6 11:08:13 2024 +0000
-> >
-> >      Bluetooth: hci_conn: Only do ACL connections sequentially
-> >
-> > bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D154f8550=
-180000
-> > start commit:   b1d3a0e70c38 Add linux-next specific files for 20240208
-> > git tree:       linux-next
-> > final oops:     https://syzkaller.appspot.com/x/report.txt?x=3D174f8550=
-180000
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=3D134f8550180=
-000
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=3Dbb693ba1956=
-62a06
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=3D3f0a39be7a203=
-5700868
-> > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D11d95147e=
-80000
-> > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D107c2d8fe80=
-000
-> >
-> > Reported-by: syzbot+3f0a39be7a2035700868@syzkaller.appspotmail.com
-> > Fixes: 456561ba8e49 ("Bluetooth: hci_conn: Only do ACL connections sequ=
-entially")
-> >
-> > For information about bisection process see: https://goo.gl/tpsmEJ#bise=
-ction
->
-> Hmm, looking at the backtraces, I think the issue that the introduction o=
-f the
-> sequential connect has introduced another async case: In hci_connect_acl(=
-), when
-> we call hci_acl_create_connection_sync(), the conn state no longer immedi=
-ately
-> gets set to BT_CONNECT, but remains in BT_OPEN or BT_CLOSED until the hci=
-_sync
-> queue actually executes __hci_acl_create_connection_sync().
+This fixes the UAF on __hci_acl_create_connection_sync caused by
+connection abortion, it uses the same logic as to LE_LINK which uses
+hci_cmd_sync_cancel to prevent the callback to run if the connection is
+abort prematurely.
 
-Need to double check but I think we do set BT_CONNECT in case of LE
-when it is queued so which shall prevent it to be queued multiple
-times.
+Reported-by: syzbot+3f0a39be7a2035700868@syzkaller.appspotmail.com
+Fixes: 456561ba8e49 ("Bluetooth: hci_conn: Only do ACL connections sequentially")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/hci_sync.h |  3 +--
+ net/bluetooth/hci_conn.c         |  3 ++-
+ net/bluetooth/hci_sync.c         | 16 ++++++++++------
+ 3 files changed, 13 insertions(+), 9 deletions(-)
 
-> This means that now hci_connect_acl() is happy to do multiple
-> hci_acl_create_connection_sync calls, and the hci_sync machinery will hap=
-pily
-> execute them right after each other. Then the newly introduced hci_abort_=
-conn_sync()
-> in __hci_acl_create_connection_sync() calls hci_conn_del() and frees the =
-conn
-> object, so the second time we enter __hci_acl_create_connection_sync(),
-> things blow up.
->
-> It looks to me like in theory the hci_connect_le_sync() logic is prone to=
- a
-> similar issue, but in practice that's prohibited because in hci_connect_l=
-e_sync()
-> we lookup whether the conn object still exists and bail out if it doesn't=
-.
->
-> Even for LE though I think we can queue multiple hci_connect_le_sync() ca=
-lls
-> and those will happily send HCI_OP_LE_CREATE_CONN no matter what the conn=
-ection
-> state actually is?
->
-> So assuming this analysis is correct, what do we do to fix this? It seems=
- to me
-> that
->
-> 1) we want a BT_CONNECT_QUEUED state for connections, so that the state
-> machine covers this additional stage that we have for ACL and LE connecti=
-ons now.
+diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
+index 824660f8f30d..ed334c253ebc 100644
+--- a/include/net/bluetooth/hci_sync.h
++++ b/include/net/bluetooth/hci_sync.h
+@@ -139,5 +139,4 @@ int hci_le_big_terminate_sync(struct hci_dev *hdev, u8 handle);
+ 
+ int hci_le_pa_terminate_sync(struct hci_dev *hdev, u16 handle);
+ 
+-int hci_acl_create_connection_sync(struct hci_dev *hdev,
+-				   struct hci_conn *conn);
++int hci_connect_acl_sync(struct hci_dev *hdev, struct hci_conn *conn);
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 8164502234c5..587eb27f374c 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1645,7 +1645,7 @@ struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
+ 		acl->auth_type = auth_type;
+ 		acl->conn_timeout = timeout;
+ 
+-		err = hci_acl_create_connection_sync(hdev, acl);
++		err = hci_connect_acl_sync(hdev, acl);
+ 		if (err) {
+ 			hci_conn_del(acl);
+ 			return ERR_PTR(err);
+@@ -2942,6 +2942,7 @@ int hci_abort_conn(struct hci_conn *conn, u8 reason)
+ 	 */
+ 	if (conn->state == BT_CONNECT && hdev->req_status == HCI_REQ_PEND) {
+ 		switch (hci_skb_event(hdev->sent_cmd)) {
++		case HCI_EV_CONN_COMPLETE:
+ 		case HCI_EV_LE_CONN_COMPLETE:
+ 		case HCI_EV_LE_ENHANCED_CONN_COMPLETE:
+ 		case HCI_EVT_LE_CIS_ESTABLISHED:
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 788a889210d8..e1fdcb3c2706 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -6493,13 +6493,18 @@ int hci_update_adv_data(struct hci_dev *hdev, u8 instance)
+ 				  UINT_PTR(instance), NULL);
+ }
+ 
+-static int __hci_acl_create_connection_sync(struct hci_dev *hdev, void *data)
++static int hci_acl_create_conn_sync(struct hci_dev *hdev, void *data)
+ {
+-	struct hci_conn *conn = data;
++	struct hci_conn *conn;
++	u16 handle = PTR_UINT(data);
+ 	struct inquiry_entry *ie;
+ 	struct hci_cp_create_conn cp;
+ 	int err;
+ 
++	conn = hci_conn_hash_lookup_handle(hdev, handle);
++	if (!conn)
++		return 0;
++
+ 	/* Many controllers disallow HCI Create Connection while it is doing
+ 	 * HCI Inquiry. So we cancel the Inquiry first before issuing HCI Create
+ 	 * Connection. This may cause the MGMT discovering state to become false
+@@ -6556,9 +6561,8 @@ static int __hci_acl_create_connection_sync(struct hci_dev *hdev, void *data)
+ 	return err;
+ }
+ 
+-int hci_acl_create_connection_sync(struct hci_dev *hdev,
+-				   struct hci_conn *conn)
++int hci_connect_acl_sync(struct hci_dev *hdev, struct hci_conn *conn)
+ {
+-	return hci_cmd_sync_queue(hdev, __hci_acl_create_connection_sync,
+-				  conn, NULL);
++	return hci_cmd_sync_queue(hdev, hci_acl_create_conn_sync,
++				  UINT_PTR(conn->handle), NULL);
+ }
+-- 
+2.43.0
 
-BT_CONNECT already indicates that connection procedure is in progress.
-
-> 2) the conn object can still disappear while the __hci_acl_create_connect=
-ion_sync()
-> is queued, so we need something like the "if conn doesn't exist anymore, =
-bail out"
-> check from hci_connect_le_sync() in __hci_acl_create_connection_sync(), t=
-oo.
-
-Btw, I'd probably clean up the connect function and create something
-like hci_connect/hci_connect_sync which takes care of the details
-internally like it was done to abort.
-
-> That said, the current check in hci_connect_le_sync() that's using the co=
-nnection
-> handle to lookup the conn does not seem great, aren't these handles re-us=
-ed
-> after connections are torn down?
-
-Well we could perhaps do a lookup by pointer to see if the connection
-hasn't been removed in the meantime, that said to force a clash on the
-handles it need to happen in between abort, which frees the handle,
-and connect, anyway the real culprit here is that we should be able to
-abort the cmd_sync callback like we do in LE:
-
-https://github.com/bluez/bluetooth-next/blob/master/net/bluetooth/hci_conn.=
-c#L2943
-
-That way we stop the connect callback to run and don't have to worry
-about handle re-use.
-
-> Cheers,
-> Jonas
-
-
-
---=20
-Luiz Augusto von Dentz
