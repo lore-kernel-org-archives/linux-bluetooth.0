@@ -1,157 +1,158 @@
-Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C1B336AE7
-	for <linux-bluetooth@vger.kernel.org>; Fri,  9 Feb 2024 14:59:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B45764D112
+	for <linux-bluetooth@vger.kernel.org>; Fri,  9 Feb 2024 14:59:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707490762; cv=none; b=py8IwvP11wRoWgKAyO03LXW4A0XMgUxfzarWQOV7SM88IX0K/6mEIsOdSRlarcNSPkg0/z8Qns/QBQMmeLQQX0ZsgmL9lb6xWTmnddc8vM41cL5Bwr5C7isCycAbDohYTbiRwVtnUgjLDa/vBf/Q0VoRDyPqGSnm4NVVbujwlFs=
+	t=1707490765; cv=none; b=bCJrtNxNjW5AkBND8y5uVNaqjOJWRefI0cRkClplXdGKMARCiNDT6kNQOeN72FvyxL+YFXu2IwASTXgdHB03gcwQrTEYmsHBjvzt2cqy7GfiCx31b8cT9C7mp8s7O2mlyYjmNJkNrBPhtPjAjES9cOXKUaXa5B2JauUYaLq8Dl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707490762; c=relaxed/simple;
-	bh=RoATdOmJbDk9lrGtQq/f7oUJyMn08wYFoa+EP3m5fKc=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=ZCJfGS4z1+bbHJ7a29AeAZsRPynvsbj1cFLp5ZqaoiQKnTq8ExXA9AEUUGppaMMdiMOwNZhE6sl6/4r1mrwsOkE84Q+wIkLk++suYlyjWRhYkUt0NnDjhEFJfkvxH4P0j5riGsEFB0xYNgN6X/Aplsd2nlaf7Qe37VhLU7RuEfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mf1LjGuZ; arc=none smtp.client-ip=209.85.222.49
+	s=arc-20240116; t=1707490765; c=relaxed/simple;
+	bh=ihLeAQ+prGPKRU1BzULXdv9iXBAP9o8R5sctkKF1c/s=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=DDI91uigpBQIV6DG0q/BSUKbV0qbCe8A346293nF8udtRP6bGCQbwhGVNBBHIOKzP6yfrLnU7FezL7ab0dX5b3HUPUEZF0sP8OdqgCEL4x9FAIH5GxQLaiwXQExItFPI8bhkgCzHlEYuVqlLvekZ3bPSnlDly0OKxPxH2Bta3xU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mm+JULDX; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mf1LjGuZ"
-Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-7d60ee03b54so360041241.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 09 Feb 2024 06:59:21 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mm+JULDX"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1d71cb97937so10430715ad.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 09 Feb 2024 06:59:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707490759; x=1708095559; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=c2q7tQ1TG4hNxpIKUh7oxpZsvECnxvXqaKYzpr2ZN7o=;
-        b=Mf1LjGuZ3TSG0JQVAllWQ9I1mRpq0cSSE2aXsYMf/F5YC+n2vdpxdxuxYa1jIS0KYU
-         3jUXo88SVkn+M+LBOrRQL52ZJO17rO2kZ52PpxscqDFU/40Zq6yN5Wh/KZL6wfL62ppl
-         q6SUrwRbb7jU/Am3edNcuZCaVST49Op5KI+q8WSns7FkXQ9hU4G/LbU4Cp8R31I42FdB
-         6t0SKYt9S+myhobunCvbTS/z7lj5JccX863ZNzdtkSTfhZSsmzRqIkq18gHKZT9QTWik
-         WjJM2MqC/LlSW3Zk9jH2AhbsfmTsLYnbnyxV1deHI+AmYBz7QZmSOzSNNFjwkBddWu4q
-         CqjQ==
+        d=gmail.com; s=20230601; t=1707490763; x=1708095563; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ox3jmXWpbwX642MbUv/L+truprZ/MBKMbzlv61nIaDo=;
+        b=mm+JULDXbyL2ij4ab3y6kJLV8OdPxdHbnQfEH1SxRG7QBGLi5z54Cmf/pvQxzBufI3
+         ZO4Ho/qhL6R+gCgyXBz3PkTeyLGaxkWDqgfPoWZQOzJ7X1WCBEw0+TKL4Y+aixOq2Sc8
+         xkAXKHDzUq7+tansr/t0z7t3N6xE/8mTwm8t4Dfviq00MJdCzYaoxkmpkEGvr7E8ET9C
+         P3YtoOtWjXD4lhc3FVdN/ZPBUMlFq5kpob0F+etjmf+66UAP/qdX7TyCOAN8kq+26H2Y
+         yAQMtXgSLDQxtKTdL6jK49lone/+4VYu4weqQZmpSwNAW1DFRTAdrvbMtH5cGNPYEdH7
+         P0KA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707490759; x=1708095559;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=c2q7tQ1TG4hNxpIKUh7oxpZsvECnxvXqaKYzpr2ZN7o=;
-        b=BWeV0IkJengXzmXx0KoAz7DWteuzcOZzmPyb/aK21nmYrIVu8F5435511kgvvEwIvM
-         W6HIKfVL5bT8nOO/lxYafh0ypdD3CtPbt0w5/P7GyhonP4GFF+HCYA98yg5N6LzAT8k5
-         iX2S2Ic/osji6LwKDJhziOyZIGL43ISDSat4mHYko5jQO6s+BAmbJlV8rgra2tOLSU6q
-         UbsoYM38a6oB12aCy3My0RJdI3WccXcnVQcQ6Hjcb1tJ9sRdUfdL2xAHRvBlUnLBN3Ll
-         X/R97z2y4JXBSEza2rdPXA0JIGoqHvhCQPpHbfu61zfitmqNF8PrN7eB0B7zXD7MpLqM
-         RjvQ==
-X-Gm-Message-State: AOJu0YwmqFqsCo2L8BuKc5OYtuCtSrCJPm+3xu7AUntG9Wu5BalXiu7K
-	0PLiRBD63K1cjiuRcZTA06ZmYA3S7o3N4UPj4oUYfi/QDP9bbP6D17Ms5x/q
-X-Google-Smtp-Source: AGHT+IEr8C6kE4sBumPYwIlgeg3wauObuWp5usMYgcKzp1WrIb+ydVASaufaAX14+91mVpKBySOVgg==
-X-Received: by 2002:a05:6102:1607:b0:46c:b7a8:4b59 with SMTP id cu7-20020a056102160700b0046cb7a84b59mr1905606vsb.23.1707490759388;
-        Fri, 09 Feb 2024 06:59:19 -0800 (PST)
-Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
-        by smtp.gmail.com with ESMTPSA id fv8-20020a0561301a8800b007d51ebf573csm68510uab.7.2024.02.09.06.59.18
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1707490763; x=1708095563;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ox3jmXWpbwX642MbUv/L+truprZ/MBKMbzlv61nIaDo=;
+        b=t9mOU9DfPmx4e9LpC3PHN2iczfwwqPRsPYcuXADghqTJam779S1kr0v/cJ0sKwqbAl
+         He44fDBEQiSSfR9wBguWFm+M6ys+3T5fVj1OKfk9K5CUGgzf4KPwDPtMTfhUiS4cR4q/
+         XIvo/GVICzx2EAUROBPQLtLLb1HtRHe5VxZyH8yx6p2/AV+RGMHA9R6MWcFy59YPHLLo
+         JcRfy5SGh429GXAoSC3tq3ITdkZ3lmIiNa1nwTMkXUqQpbOPAOBtk+JD8x+k7v2eVS0z
+         fJVU2TY0QNyldhzF1thjZv1rufRZpMeAABiMMQgmcyDoJ11RuIGlqCSJiGJ67nUnXmyP
+         2c1A==
+X-Gm-Message-State: AOJu0YyyJeLtxSW45RRCGQKpjKJvc26f3B4j3h2WI0Shn7/qLT2T6f8l
+	R/T6IVSWSo3HhGcAWxxhZyQactPYaePGBPhUWgdqJc8QS3Lp5LYwTHqT3qs/
+X-Google-Smtp-Source: AGHT+IHaWWemiwuA17f4dxIl36boGLiv65bJBxp+muxvG7wUirM03k8jIovvhUWn8AcR0Fz0YL9cQA==
+X-Received: by 2002:a17:903:2291:b0:1d8:d73b:794f with SMTP id b17-20020a170903229100b001d8d73b794fmr2094147plh.56.1707490762606;
+        Fri, 09 Feb 2024 06:59:22 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXnnQQ6FEO85QhzNscJOcvNZSiIS+/IIMgiWqW2gXK4MxAgvaj83l5/xpGg1xyIFcwU6wdH/BhFRXU0G/Z2Il2dPlMYiw==
+Received: from [172.17.0.2] ([20.171.70.50])
+        by smtp.gmail.com with ESMTPSA id jx4-20020a170903138400b001d9602f3dbesm1627192plb.24.2024.02.09.06.59.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Feb 2024 06:59:18 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1] hog-lib: Don't destroy UHID device on detach
-Date: Fri,  9 Feb 2024 09:59:17 -0500
-Message-ID: <20240209145917.3583663-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Fri, 09 Feb 2024 06:59:22 -0800 (PST)
+Message-ID: <65c63dca.170a0220.dbce5.5608@mx.google.com>
+Date: Fri, 09 Feb 2024 06:59:22 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5709917721428322214=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v1] Bluetooth: hci_conn: Fix UAF Write in __hci_acl_create_connection_sync
+In-Reply-To: <20240209141612.3554051-1-luiz.dentz@gmail.com>
+References: <20240209141612.3554051-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============5709917721428322214==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This makes bt_hog_detach not to destroy UHID device which means the
-device node don't need to be recreated in case of reconnections which
-speeds up the process.
+This is automated email and please do not reply to this email!
 
-Fixes: https://github.com/bluez/bluez/issues/737
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=824664
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      1.32 seconds
+GitLint                       PASS      0.23 seconds
+SubjectPrefix                 PASS      0.08 seconds
+BuildKernel                   PASS      27.87 seconds
+CheckAllWarning               PASS      30.53 seconds
+CheckSparse                   PASS      36.04 seconds
+CheckSmatch                   PASS      98.66 seconds
+BuildKernel32                 PASS      27.08 seconds
+TestRunnerSetup               PASS      516.58 seconds
+TestRunner_l2cap-tester       PASS      18.22 seconds
+TestRunner_iso-tester         FAIL      131.89 seconds
+TestRunner_bnep-tester        PASS      4.80 seconds
+TestRunner_mgmt-tester        FAIL      166.48 seconds
+TestRunner_rfcomm-tester      PASS      7.45 seconds
+TestRunner_sco-tester         PASS      14.94 seconds
+TestRunner_ioctl-tester       PASS      7.85 seconds
+TestRunner_mesh-tester        PASS      5.95 seconds
+TestRunner_smp-tester         PASS      6.91 seconds
+TestRunner_userchan-tester    PASS      4.97 seconds
+IncrementalBuild              PASS      25.92 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v1] Bluetooth: hci_conn: Fix UAF Write in __hci_acl_create_connection_sync
+WARNING: Reported-by: should be immediately followed by Closes: with a URL to the report
+#97: 
+Reported-by: syzbot+3f0a39be7a2035700868@syzkaller.appspotmail.com
+Fixes: 456561ba8e49 ("Bluetooth: hci_conn: Only do ACL connections sequentially")
+
+total: 0 errors, 1 warnings, 0 checks, 53 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13551351.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+Total: 117, Passed: 116 (99.1%), Failed: 1, Not Run: 0
+
+Failed Test Cases
+ISO Connect Suspend - Success                        Failed       6.208 seconds
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 492, Passed: 486 (98.8%), Failed: 5, Not Run: 1
+
+Failed Test Cases
+LL Privacy - Add Device 4 (2 Devices to AL)          Failed       0.111 seconds
+LL Privacy - Add Device 5 (2 Devices to RL)          Failed       0.115 seconds
+LL Privacy - Add Device 7 (AL is full)               Failed       0.146 seconds
+LL Privacy - Remove Device 1 (Remove from AL)        Timed out    2.494 seconds
+LL Privacy - Remove Device 4 (Disable Adv)           Timed out    2.691 seconds
+
+
 ---
- profiles/input/hog-lib.c | 48 ++++++++++++++++++++--------------------
- 1 file changed, 24 insertions(+), 24 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
-index 7ff1ede3db35..67492a63eca3 100644
---- a/profiles/input/hog-lib.c
-+++ b/profiles/input/hog-lib.c
-@@ -1309,11 +1309,35 @@ static bool cancel_gatt_req(const void *data, const void *user_data)
- 	return g_attrib_cancel(hog->attrib, req->id);
- }
- 
-+static void uhid_destroy(struct bt_hog *hog)
-+{
-+	int err;
-+	struct uhid_event ev;
-+
-+	if (!hog->uhid_created)
-+		return;
-+
-+	bt_uhid_unregister_all(hog->uhid);
-+
-+	memset(&ev, 0, sizeof(ev));
-+	ev.type = UHID_DESTROY;
-+
-+	err = bt_uhid_send(hog->uhid, &ev);
-+
-+	if (err < 0) {
-+		error("bt_uhid_send: %s", strerror(-err));
-+		return;
-+	}
-+
-+	hog->uhid_created = false;
-+}
-+
- static void hog_free(void *data)
- {
- 	struct bt_hog *hog = data;
- 
- 	bt_hog_detach(hog);
-+	uhid_destroy(hog);
- 
- 	queue_destroy(hog->input, free);
- 	queue_destroy(hog->bas, (void *) bt_bas_unref);
-@@ -1823,29 +1847,6 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt)
- 	return true;
- }
- 
--static void uhid_destroy(struct bt_hog *hog)
--{
--	int err;
--	struct uhid_event ev;
--
--	if (!hog->uhid_created)
--		return;
--
--	bt_uhid_unregister_all(hog->uhid);
--
--	memset(&ev, 0, sizeof(ev));
--	ev.type = UHID_DESTROY;
--
--	err = bt_uhid_send(hog->uhid, &ev);
--
--	if (err < 0) {
--		error("bt_uhid_send: %s", strerror(-err));
--		return;
--	}
--
--	hog->uhid_created = false;
--}
--
- void bt_hog_detach(struct bt_hog *hog)
- {
- 	GSList *l;
-@@ -1879,7 +1880,6 @@ void bt_hog_detach(struct bt_hog *hog)
- 	queue_remove_all(hog->gatt_op, cancel_gatt_req, hog, destroy_gatt_req);
- 	g_attrib_unref(hog->attrib);
- 	hog->attrib = NULL;
--	uhid_destroy(hog);
- }
- 
- int bt_hog_set_control_point(struct bt_hog *hog, bool suspend)
--- 
-2.43.0
 
+--===============5709917721428322214==--
