@@ -1,126 +1,151 @@
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 484611E506;
-	Sun, 11 Feb 2024 15:57:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD7015A8
+	for <linux-bluetooth@vger.kernel.org>; Sun, 11 Feb 2024 20:32:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707667071; cv=none; b=UDSHj8fVdX2/AoYwvv9d7efOwbJxhJ9YwEaoVNrxKmh6xYqo3s2STWtq5EGTS4VMtG/3lecH69sN67vtV+bwpn+7AYifQqWqJIa9qCcEvg52BssM5rUCh5kZJwQezT0or6tZYWGWEi8vGVxfpPvZrs0TfNJ4cm0ecp1F2FFI8uE=
+	t=1707683539; cv=none; b=M4pqEdtZzF0saKTfU6fc2up8oWEAjdEHkeUy73IgogmPlnBGjzAsGKZg4LBXSQ985+7RTW24WMhrUxGs8/cbOW92qLbjHAKZEsgtlIoIGNXAh5HMEtq+yBrWeX98xaOgPTe59wDAa5n8IyMlRYgcuNDL3RDEYjniIlHDVDBk4sY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707667071; c=relaxed/simple;
-	bh=stmkEqJ1qXcSaTqWdTlvLqtEOfj+D0MgCx9mbqK/hAE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CARe4KZ1I3670Z8RAw0z5zALb3gMkzZicz7Ylgec42dd0Emk6yRMFDrSAvtBbaNqPVweJVPxwfj80iSw/+DRO+9OGrhSFC1fasle7rLmdwrpGBj3I75NTx2JQIjv21kyZpAosonXYtBCh6bH0QwaGNzAvqgDPOFCH2IVAqBXO0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BpVcS5gG; arc=none smtp.client-ip=209.85.208.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1707683539; c=relaxed/simple;
+	bh=aJ203YQ+VG5l8cj3cSrWU0XaKmmnOEmHEibMHWdisLs=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=KNDZ2BqBFRh8fTVeFh3U+cmK9DAz/hN2P8IkHSx+iicJFbiVGONdV/gUubngp3y4hNBSbkinfRPAxtrUVd8MQR2+4370dOalwj5LC2wmUNBvRrmFFdOc7hfpoSAdKd9ZU9QEgXFwoSvF7h6VZaNtDdUQ+m2ANil9aEGazQ+Jwls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZVyxopwG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BpVcS5gG"
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2d0aabed735so32488101fa.0;
-        Sun, 11 Feb 2024 07:57:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707667067; x=1708271867; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1hHa5kUPlIxFb3OXyDNX1LwLohhu/1WXPO430OUtUMM=;
-        b=BpVcS5gGzy29AbdSXIEGkJlPB2hKZnX7ErM5olltH8KsH7lbNXupQyvArg1Sudbf2G
-         9U2rAAER0jfdYLDBerTLlKnt16zA1p7o1hM30hmMGJhbpP7Oe7LT2tBGKJKSYmu/1znA
-         INXAMt5x354fAxLmdJqZsDk5OFxqWROJCLO+QOp8tdWs0Ynh+46ntxZivxCkOYiIRcxz
-         Gta+g2m/jSrnNMJzkglUMfeZYpi0DfDEjHCZGPhe4r4sQdOQSFKHvgg8ETtBCvR+be8G
-         cCyENBU3ZW2nPAg8rYXz28Q/D1IsolQf9Su6RXphPC6CTP69Jf6armEC1mEQuEYJ1qsf
-         jQrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707667067; x=1708271867;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1hHa5kUPlIxFb3OXyDNX1LwLohhu/1WXPO430OUtUMM=;
-        b=oIQdN/MQP6hgjCz7+H2b4+ZMkDNV4GoVCOFnNxwPW5J1J3tnPJ9xECIUBNoHiihvhc
-         43GLRjcqZXWb1wPB8cKumWiwOppxIUtqjLejUjI+YHB+c/zxFoWfk7SzW2Q8L8akmt0C
-         2liKnKe5z+uKe+wYo1VlZfFbe76VwWA7/VYN5DIrDxIrBaHfH0CzwF5GNRYMxOvdxA+M
-         5d6oGpiDLyMogdLwzGZMqhdnImS0QTBP6YmhZeVwDXio1ri9jff3oVdW8Bk/cANWEZDo
-         f6tqpbbgOvYPLujPl40e1oNWzf7Y2oed2LCCOg7Z18B5MspSdp/tOV7PFEtXu7ji6d+o
-         fVGg==
-X-Gm-Message-State: AOJu0YwnLxzc66+Gw550v5n1yFN+X/gkZdsE4PUrh9T6SGO8eZml9kh+
-	I89tk7vv3IDV7dYFtdgYDsgiopcvZkOLuLzT3a2IbmuqAvAWKSPJinSfnJ+K1HkqQDwj3l8W6nM
-	LRj8cgERCZSqNPMi7Y6/eVBMuu93bjzDk
-X-Google-Smtp-Source: AGHT+IFhqINxZv3yWOWEeiA1OlbuMFnXjwFNxOQeInzW5VoWqiv0Bxq19H5xDF6jLhd9+hi91q0aWl3V+wZyMjqARdI=
-X-Received: by 2002:a2e:8519:0:b0:2cd:5cfd:b19 with SMTP id
- j25-20020a2e8519000000b002cd5cfd0b19mr3062812lji.19.1707667066875; Sun, 11
- Feb 2024 07:57:46 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZVyxopwG"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D66A8C433F1
+	for <linux-bluetooth@vger.kernel.org>; Sun, 11 Feb 2024 20:32:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707683538;
+	bh=aJ203YQ+VG5l8cj3cSrWU0XaKmmnOEmHEibMHWdisLs=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=ZVyxopwGsRsQZ3Ny4KTQmipNyYaaiNBwUzl9QOoTal7+ABFffrm/bYUXld/IV9cdp
+	 HoM0kAcYS+aovK3tGEduTGGUWDuc5zgk2oQHbJmoPY+rtH71gVuTwSFwK3Ak8A7up+
+	 ejjeKktG7zUXwmMxmiu+wlWMFW5OdkeNe8PLJ7NnhwjbnyHkRf4P70zI1He6NkRvZW
+	 Sc1r/UqQ0gWS6oVRC8KiUxYm04IShNZ6LaTtbRBCXht6ldMl183/njYhj5oZnaivDn
+	 UDC1rLRrF/G1B1CxyPnB0czCPJSAFjnlKPL9pLRBzkCYNOBtv1U4dipWK2eYdUeIgQ
+	 EMEjqqM6ZdOhQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id BFD6BC53BD0; Sun, 11 Feb 2024 20:32:18 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 218416] hci0: command 0xfc05 tx timeout in kernel 6.7.1
+Date: Sun, 11 Feb 2024 20:32:18 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: nickolas@gupton.xyz
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-218416-62941-gDHP8vSEfD@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-218416-62941@https.bugzilla.kernel.org/>
+References: <bug-218416-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240210222226.890031-1-vibhavp@gmail.com>
-In-Reply-To: <20240210222226.890031-1-vibhavp@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Sun, 11 Feb 2024 10:57:34 -0500
-Message-ID: <CABBYNZJx68KUkiHXeZmSnzwpkK2CAB_ASrD5dK+WMocDuwuomQ@mail.gmail.com>
-Subject: Re: [PATCH 0/1] Bluetooth: mgmt: Add command for getting device IO capabilities.
-To: Vibhav Pant <vibhavp@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, 
-	johan.hedberg@gmail.com, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Vibhav,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218416
 
-On Sat, Feb 10, 2024 at 5:22=E2=80=AFPM Vibhav Pant <vibhavp@gmail.com> wro=
-te:
->
-> The following patch adds a new command to the bluetooth management interf=
-ace,
-> GET_DEVICE_IO_CAPABILITY. The command allows userspace to get the IO capa=
-bility,
-> and the authentication methods supported by a connected device. The comma=
-nd is
-> necessary in order to implement parts of the Win32 Bluetooth API in the W=
-ine,
-> specifically the following two structs:
->
-> * BLUETOOTH_AUTHENTICATION_CALLBACK_PARAMS, which provides IO and auth ca=
-pabilities
-> info for an incoming authentication request from a device.
->
-> * BTH_DEVICE_INFO, which contains flags indicating whether the device sup=
-ports
-> Simple Secure Pairing and MITM protection. The former is supported throug=
-h BlueZ's
-> "LegacyPairing" property.
->
-> Because the Wine API are implemented on top of BlueZ, I'll also be provid=
-ing a
-> corresponding patch that uses the newly added management command to expos=
-e the
-> capabilities through new properties in the org.bluez.Device1 interface.
+--- Comment #5 from Nickolas Gupton (nickolas@gupton.xyz) ---
+Bluetooth still does not work with 6.7.4, however the logs have changed from
+the error that was shown before:
 
-Interesting, but the IO capability matching logic lives under the
-kernel so I wonder how useful this information is if you can't really
-do much about the authentication method used? And in case you are
-thinking of changing the pairing procedure to just leave it up to the
-upper layer to figure it out, I don't think that is a good idea
-because that is subject to qualification that would effectively be a
-new implementation.
-
-> Thanks,
-> Vibhav
->
-> Vibhav Pant (1):
->   Bluetooth: mgmt: Add command for getting device IO capabilities.
->
->  include/net/bluetooth/mgmt.h | 19 ++++++++
->  net/bluetooth/mgmt.c         | 89 ++++++++++++++++++++++++++++++++++++
->  2 files changed, 108 insertions(+)
->
-> --
-> 2.43.0
->
->
-
+$ journalctl -b | grep -E -i bluetooth
+Feb 11 14:27:14 andromeda kernel: Bluetooth: Core ver 2.22
+Feb 11 14:27:14 andromeda kernel: NET: Registered PF_BLUETOOTH protocol fam=
+ily
+Feb 11 14:27:14 andromeda kernel: Bluetooth: HCI device and connection mana=
+ger
+initialized
+Feb 11 14:27:14 andromeda kernel: Bluetooth: HCI socket layer initialized
+Feb 11 14:27:14 andromeda kernel: Bluetooth: L2CAP socket layer initialized
+Feb 11 14:27:14 andromeda kernel: Bluetooth: SCO socket layer initialized
+Feb 11 14:27:14 andromeda kernel: Bluetooth: hci0: Found device firmware:
+intel/ibt-20-1-3.sfi
+Feb 11 14:27:14 andromeda kernel: Bluetooth: hci0: Boot Address: 0x24800
+Feb 11 14:27:14 andromeda kernel: Bluetooth: hci0: Firmware Version:
+255-255.255
+Feb 11 14:27:15 andromeda systemd[1]: Reached target Bluetooth Support.
+Feb 11 14:27:15 andromeda kernel: Bluetooth: hci0: FW download error recove=
+ry
+failed (-19)
+Feb 11 14:27:15 andromeda kernel: Bluetooth: hci0: sending frame failed (-1=
+9)
+Feb 11 14:27:15 andromeda kernel: Bluetooth: hci0: Reading supported featur=
+es
+failed (-19)
+Feb 11 14:27:15 andromeda kernel: Bluetooth: hci0: Error reading debug feat=
+ures
+Feb 11 14:27:15 andromeda kernel: Bluetooth: hci0: HCI LE Coded PHY feature=
+ bit
+is set, but its usage is not supported.
+Feb 11 14:27:15 andromeda kernel: Bluetooth: hci0: sending frame failed (-1=
+9)
+Feb 11 14:27:15 andromeda kernel: Bluetooth: hci0: Failed to read MSFT
+supported features (-19)
+Feb 11 14:27:15 andromeda systemd[1]: Stopped target Bluetooth Support.
+Feb 11 14:27:15 andromeda NetworkManager[781]: <info>  [1707683235.5366] Lo=
+aded
+device plugin: NMBluezManager
+(/usr/lib/NetworkManager/1.44.2-3/libnm-device-plugin-bluetooth.so)
+Feb 11 14:27:15 andromeda kernel: Bluetooth: hci0: Bootloader revision 0.3
+build 0 week 24 2017
+Feb 11 14:27:15 andromeda kernel: Bluetooth: hci0: Device revision is 1
+Feb 11 14:27:15 andromeda kernel: Bluetooth: hci0: Secure boot is enabled
+Feb 11 14:27:15 andromeda kernel: Bluetooth: hci0: OTP lock is enabled
+Feb 11 14:27:15 andromeda kernel: Bluetooth: hci0: API lock is enabled
+Feb 11 14:27:15 andromeda kernel: Bluetooth: hci0: Debug lock is disabled
+Feb 11 14:27:15 andromeda kernel: Bluetooth: hci0: Minimum firmware build 1
+week 10 2014
+Feb 11 14:27:15 andromeda systemd[1]: Reached target Bluetooth Support.
+Feb 11 14:27:15 andromeda kernel: Bluetooth: hci0: Found device firmware:
+intel/ibt-20-1-3.sfi
+Feb 11 14:27:15 andromeda kernel: Bluetooth: hci0: Boot Address: 0x24800
+Feb 11 14:27:15 andromeda kernel: Bluetooth: hci0: Firmware Version:
+255-255.255
+Feb 11 14:27:17 andromeda kernel: Bluetooth: hci0: Waiting for firmware
+download to complete
+Feb 11 14:27:17 andromeda kernel: Bluetooth: hci0: Firmware loaded in 13862=
+06
+usecs
+Feb 11 14:27:17 andromeda kernel: Bluetooth: hci0: Waiting for device to bo=
+ot
+Feb 11 14:27:17 andromeda kernel: Bluetooth: hci0: Device booted in 14608 u=
+secs
+Feb 11 14:27:17 andromeda kernel: Bluetooth: hci0: Malformed MSFT vendor ev=
+ent:
+0x02
+Feb 11 14:27:17 andromeda kernel: Bluetooth: hci0: Found Intel DDC paramete=
+rs:
+intel/ibt-20-1-3.ddc
+Feb 11 14:27:17 andromeda kernel: Bluetooth: hci0: Applying Intel DDC
+parameters completed
+Feb 11 14:27:17 andromeda kernel: Bluetooth: hci0: Firmware revision 0.3 bu=
+ild
+249 week 27 2023
+Feb 11 14:27:17 andromeda kernel: Bluetooth: hci0: HCI LE Coded PHY feature=
+ bit
+is set, but its usage is not supported.
 
 --=20
-Luiz Augusto von Dentz
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
