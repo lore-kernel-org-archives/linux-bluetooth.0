@@ -1,37 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59F5947A73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB1C47A7D
 	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Feb 2024 20:02:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707768160; cv=none; b=XBHooj0cbjYE1ivXgW1l0qm7/df3f7l8tDP66ZQVPoTnMNLnI3Ikg/vUXBbti6AZ2TryjikPAmtfy8WYzA27EbLLVEjw/hbohakLk8jGEAzEohwxXrb40193aN5RKx0agGFoLJ983Awus0dInCkmS+SmgVjE1l1aAXbK85HxO9k=
+	t=1707768160; cv=none; b=NLT2JAiDy3oOQM+0dQ+0/kNcbE9b2CwiKXzNL5JN4AKjXUyhC5U4ImXl+lcA4AFkmODjVgZq/V6lV3GP3/k6VKbWlQ/jONApHJ6Py+iEocynQUK4Z283yyVBfDNdRZ+vYiATyLTVBNP78NQwAsOUg3I08EViPe21CV3/UbKnmXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1707768160; c=relaxed/simple;
-	bh=VRgZPdA6D+8hoZ3UC+OUGz8Kti/bsHC2kA8oXFsh0lo=;
+	bh=egRzPvAAn5fsZb8GyFjjj6XvqI/5ax2IAHO4XlPq0F4=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=dt/NqIdwxcB/nWyfPao5RVVrxdYgW1wTcnC0LTwEZ0qJM+jDBzeHYbK+iFdg4FQEcydFerTVtAYkcTraDHTsdYRgqueQYbiPv04qp/ohBrwFvIIQ5uoiMY3kzXPe1rkwbda9dq/AUzCsBabGcFPT8gVE1gimcEEaFth27eEqINE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RY/keaxP; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=KbC5ffiYJaAgBJUdRn7DzdaYLqS5QU+CKxWQiPKPyD+Bwj2KakuMqxRdUsBD7j49Skr2OL1DQu1a1UGrNl6GQqrnl49Zp70dj2MwfqnQr2myT29T3GwPKcAdyjckjTxfjPZlwVqtcNSsS1M7d1BbsczU/b8H91++CLdsCQ62yuE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sTmRoYLR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RY/keaxP"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F2574C43399;
-	Mon, 12 Feb 2024 20:02:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sTmRoYLR"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 16083C433A6;
+	Mon, 12 Feb 2024 20:02:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1707768160;
-	bh=VRgZPdA6D+8hoZ3UC+OUGz8Kti/bsHC2kA8oXFsh0lo=;
+	bh=egRzPvAAn5fsZb8GyFjjj6XvqI/5ax2IAHO4XlPq0F4=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=RY/keaxPxOO1xgdxbT+BAldn1umHmQXb7d+6oIh9hFMj23nOJ/nqJ3X54cmV2RbUP
-	 bh5yqTJci8NVZNlVZ090K8HzRuSTaFa/YY56Tek4xajyZViqKFxfDIICdlGgriFifY
-	 FdANXmWEqJezvNi1wAqc1krUxB/BAIE48QYxPpi/f1hhvlcG/mIvF9Ak/t1HG1r0VS
-	 v0FsOhLHcTDDDo+IuKpAkzgE2knjLM+7WqB1j9zfiiEcgRtYH+qa/WVW231jEvfq6i
-	 ltZ6alEsxBghTG+anmGEHs14WEC8dcKqHIfHjhUKn5SaZPauVKZP4AZ4TmSjEiiqN2
-	 0a+/oPyLsRR0g==
+	b=sTmRoYLR/ziUVIkPtHeGoWJoaQthf5ul8d3oJgi8tLnpBdxMzbGnmLEFepJIJrwYT
+	 S5Pj4BcTGTSQCCQQzCFRpSFCIBfFsy5CWy3ivsaq3mgOYFfzEs3QR8hCEZuoxARAuS
+	 IUN/rFFDWi8d99SZXxnlKfveEnOjpPKoAlh6zwkzV2ntQzoNj4zGE1bjaCN6OD2rTa
+	 34BbCNgT5woaEgir+nOTZJ5+pLE6KmpWnqCsLjiiL8pwnXt4Rn6UnasmgmGy1YWXpd
+	 Hz+lNElYS+q/md93769/2V3p/Fz87czwAUy+E9GhF8yM39pjGQVPIarpau3I2mnQbG
+	 fDlaHQwNgE36g==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCEDCC48BC4;
-	Mon, 12 Feb 2024 20:02:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 015E7C48BC3;
+	Mon, 12 Feb 2024 20:02:40 +0000 (UTC)
 From: Emil Velikov via B4 Relay <devnull+emil.l.velikov.gmail.com@kernel.org>
-Date: Mon, 12 Feb 2024 20:02:40 +0000
-Subject: [PATCH BlueZ v2 04/10] profiles: remove unused suspend-dummy.c
+Date: Mon, 12 Feb 2024 20:02:42 +0000
+Subject: [PATCH BlueZ v2 06/10] obex: remove unused mas/messages-tracker
+ impl
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -40,18 +41,17 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240212-disto-patches-v2-4-8bab1bd08f4d@gmail.com>
+Message-Id: <20240212-disto-patches-v2-6-8bab1bd08f4d@gmail.com>
 References: <20240212-disto-patches-v2-0-8bab1bd08f4d@gmail.com>
 In-Reply-To: <20240212-disto-patches-v2-0-8bab1bd08f4d@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Emil Velikov <emil.velikov@collabora.com>, 
- Nobuhiro Iwamatsu <iwamatsu@debian.org>
+Cc: Emil Velikov <emil.velikov@collabora.com>
 X-Mailer: b4 0.12.4
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1707768157; l=4509;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1707768157; l=8063;
  i=emil.l.velikov@gmail.com; s=20230301; h=from:subject:message-id;
- bh=O5urzcyyiP0SFKs5VIgx4wp/q8Y+jAMqWGPzk079OjY=;
- b=Uru47TI0PMzfQvm0Ttb61J+M5i54qWShbtOynQf7AixSdF6TK/Gs8ZP3KxsTV8XSjdylWK0B2
- G4haOgSVxLmBZhC9T3KYvCT8EkUBRsRo2cpdk3YzfDKQx1gHev/MLiQ
+ bh=jQe/lFTSKdtDkClg+0iy9yWYeYhpYU0PJHv9DcVITWQ=;
+ b=VbaKv+6AZWguoH7BK8zbABAzVz3UT16yRx9lx87/NbVK5OHGK3OxAWUAdOzvmCb/Ts+GeYIoG
+ uv2iRINUukhBXZJ3vitE+rsU7Kk1MBb2HK6NvEzgYqyIQ4rUTIuHkyQ
 X-Developer-Key: i=emil.l.velikov@gmail.com; a=ed25519;
  pk=qeUTVTNyI3rcR2CfNNWsloTihgzmtbZo98GdxwZKCkY=
 X-Endpoint-Received:
@@ -61,47 +61,28 @@ Reply-To: <emil.l.velikov@gmail.com>
 
 From: Emil Velikov <emil.velikov@collabora.com>
 
-The file has been used for about 8 years now - see commit
-fb55b7a6ab48c4f782b16030e051029bcfa93e07 ("profiles/hog: Use no suspend
-support instead of the dummy FIFO").
+Currently we have a "dummy" and a "tracker" implementation. The latter
+was seemingly never wired into the build... Unless the git history was
+rewritten and details were lost.
 
-Inspired by a Debian patch by Nobuhiro Iwamatsu, which was changing the
-/tmp/hogsuspend socket patch to /run. Looking through the codebase we
-have a few more sockets that could use a to /run fix, but that will
-follow-up at another day.
-
-Cc: Nobuhiro Iwamatsu <iwamatsu@debian.org>
+Remove the file - it's not shipped in the tarball, so even if anyone
+want to use it they cannot.
 ---
- Makefile.plugins               |   2 -
- profiles/input/suspend-dummy.c | 149 -----------------------------------------
- 2 files changed, 151 deletions(-)
+ obexd/plugins/messages-tracker.c | 332 ---------------------------------------
+ 1 file changed, 332 deletions(-)
 
-diff --git a/Makefile.plugins b/Makefile.plugins
-index 7cf66fd59..e960eedea 100644
---- a/Makefile.plugins
-+++ b/Makefile.plugins
-@@ -74,8 +74,6 @@ builtin_sources += profiles/input/hog.c \
- 			profiles/battery/bas.c profiles/battery/bas.h \
- 			profiles/scanparam/scpp.c profiles/scanparam/scpp.h \
- 			profiles/input/suspend.h profiles/input/suspend-none.c
--
--EXTRA_DIST += profiles/input/suspend-dummy.c
- endif
- 
- if HEALTH
-diff --git a/profiles/input/suspend-dummy.c b/profiles/input/suspend-dummy.c
+diff --git a/obexd/plugins/messages-tracker.c b/obexd/plugins/messages-tracker.c
 deleted file mode 100644
-index ea1835e0f..000000000
---- a/profiles/input/suspend-dummy.c
+index 4ce9f221d..000000000
+--- a/obexd/plugins/messages-tracker.c
 +++ /dev/null
-@@ -1,149 +0,0 @@
+@@ -1,332 +0,0 @@
 -// SPDX-License-Identifier: GPL-2.0-or-later
 -/*
 - *
-- *  BlueZ - Bluetooth protocol stack for Linux
+- *  OBEX Server
 - *
-- *  Copyright (C) 2012  Nordic Semiconductor Inc.
-- *  Copyright (C) 2012  Instituto Nokia de Tecnologia - INdT
+- *  Copyright (C) 2010-2011  Nokia Corporation
 - *
 - *
 - */
@@ -111,138 +92,322 @@ index ea1835e0f..000000000
 -#endif
 -
 -#include <errno.h>
--#include <stdlib.h>
--#include <stdio.h>
--#include <string.h>
--#include <sys/types.h>
--#include <sys/stat.h>
--#include <fcntl.h>
--#include <unistd.h>
--
 -#include <glib.h>
+-#include <string.h>
 -
--#include "src/log.h"
--#include "suspend.h"
+-#include "messages.h"
 -
--#define HOG_SUSPEND_FIFO	"/tmp/hogsuspend"
+-struct message_folder {
+-	char *name;
+-	GSList *subfolders;
+-	char *query;
+-};
 -
--static suspend_event suspend_cb = NULL;
--static resume_event resume_cb = NULL;
--static guint watch = 0;
+-struct session {
+-	char *cwd;
+-	struct message_folder *folder;
+-	char *name;
+-	uint16_t max;
+-	uint16_t offset;
+-	void *user_data;
+-	void (*folder_list_cb)(void *session, int err, uint16_t size,
+-					const char *name, void *user_data);
+-};
 -
--static int fifo_open(void);
+-static struct message_folder *folder_tree = NULL;
 -
--static gboolean read_fifo(GIOChannel *io, GIOCondition cond, gpointer user_data)
+-static struct message_folder *get_folder(const char *folder)
 -{
--	char buffer[12];
--	gsize offset, left, bread;
--	GIOStatus iostatus;
+-	GSList *folders = folder_tree->subfolders;
+-	struct message_folder *last = NULL;
+-	char **path;
+-	int i;
 -
--	if (cond & (G_IO_ERR | G_IO_HUP)) {
--		/*
--		 * Both ends needs to be open simultaneously before proceeding
--		 * any input or output operation. When the remote closes the
--		 * channel, hup signal is received on this end.
--		 */
--		fifo_open();
--		return FALSE;
+-	if (g_strcmp0(folder, "/") == 0)
+-		return folder_tree;
+-
+-	path = g_strsplit(folder, "/", 0);
+-
+-	for (i = 1; path[i] != NULL; i++) {
+-		gboolean match_found = FALSE;
+-		GSList *l;
+-
+-		for (l = folders; l != NULL; l = g_slist_next(l)) {
+-			struct message_folder *folder = l->data;
+-
+-			if (g_strcmp0(folder->name, path[i]) == 0) {
+-				match_found = TRUE;
+-				last = l->data;
+-				folders = folder->subfolders;
+-				break;
+-			}
+-		}
+-
+-		if (!match_found) {
+-			g_strfreev(path);
+-			return NULL;
+-		}
 -	}
 -
--	offset = 0;
--	left = sizeof(buffer) - 1;
--	memset(buffer, 0, sizeof(buffer));
+-	g_strfreev(path);
 -
--	do {
--		iostatus = g_io_channel_read_chars(io, &buffer[offset], left,
--								&bread, NULL);
--
--		offset += bread;
--		left -= bread;
--		if (left == 0)
--			break;
--	} while (iostatus == G_IO_STATUS_NORMAL);
--
--	if (g_ascii_strncasecmp("suspend", buffer, 7) == 0)
--		suspend_cb();
--	else if (g_ascii_strncasecmp("resume", buffer, 6) == 0)
--		resume_cb();
--
--	return TRUE;
+-	return last;
 -}
 -
--static int fifo_open(void)
+-static struct message_folder *create_folder(const char *name, const char *query)
 -{
--	GIOCondition condition = G_IO_IN | G_IO_ERR | G_IO_HUP;
--	GIOChannel *fifoio;
--	int fd;
+-	struct message_folder *folder = g_new0(struct message_folder, 1);
 -
--	fd = open(HOG_SUSPEND_FIFO, O_RDONLY | O_NONBLOCK);
--	if (fd < 0) {
--		int err = -errno;
--		error("Can't open FIFO (%s): %s(%d)", HOG_SUSPEND_FIFO,
--							strerror(-err), -err);
--		return err;
+-	folder->name = g_strdup(name);
+-	folder->query = g_strdup(query);
+-
+-	return folder;
+-}
+-
+-static void destroy_folder_tree(void *root)
+-{
+-	struct message_folder *folder = root;
+-	GSList *tmp, *next;
+-
+-	if (folder == NULL)
+-		return;
+-
+-	g_free(folder->name);
+-	g_free(folder->query);
+-
+-	tmp = folder->subfolders;
+-	while (tmp != NULL) {
+-		next = g_slist_next(tmp);
+-		destroy_folder_tree(tmp->data);
+-		tmp = next;
 -	}
 -
--	fifoio = g_io_channel_unix_new(fd);
--	g_io_channel_set_close_on_unref(fifoio, TRUE);
+-	g_slist_free(folder->subfolders);
+-	g_free(folder);
+-}
 -
--	watch = g_io_add_watch(fifoio, condition, read_fifo, NULL);
+-static void create_folder_tree(void)
+-{
+-	struct message_folder *parent, *child;
 -
--	g_io_channel_unref(fifoio);
+-	folder_tree = create_folder("/", "FILTER (!BOUND(?msg))");
+-
+-	parent = create_folder("telecom", "FILTER (!BOUND(?msg))");
+-	folder_tree->subfolders = g_slist_append(folder_tree->subfolders,
+-								parent);
+-
+-	child = create_folder("msg", "FILTER (!BOUND(?msg))");
+-	parent->subfolders = g_slist_append(parent->subfolders, child);
+-
+-	parent = child;
+-
+-	child = create_folder("inbox", "?msg nmo:isSent \"false\" ; "
+-				"nmo:isDeleted \"false\" ; "
+-				"nmo:isDraft \"false\". ");
+-	parent->subfolders = g_slist_append(parent->subfolders, child);
+-
+-	child = create_folder("sent", "?msg nmo:isDeleted \"false\" ; "
+-				"nmo:isSent \"true\" . ");
+-	parent->subfolders = g_slist_append(parent->subfolders, child);
+-
+-	child = create_folder("deleted", "?msg nmo:isDeleted \"true\" . ");
+-	parent->subfolders = g_slist_append(parent->subfolders, child);
+-}
+-
+-int messages_init(void)
+-{
+-	create_folder_tree();
 -
 -	return 0;
 -}
 -
--int suspend_init(suspend_event suspend, resume_event resume)
+-void messages_exit(void)
 -{
--	struct stat st;
--	int ret;
--
--	DBG("");
--
--	suspend_cb = suspend;
--	resume_cb = resume;
--
--	if (stat(HOG_SUSPEND_FIFO, &st) == 0) {
--		if (!S_ISFIFO(st.st_mode)) {
--			error("Unexpected non-FIFO %s file", HOG_SUSPEND_FIFO);
--			return -EIO;
--		}
--
--		if (unlink(HOG_SUSPEND_FIFO) < 0) {
--			int err = -errno;
--			error("Failed to remove FIFO (%s): %s (%d)",
--				HOG_SUSPEND_FIFO, strerror(-err), -err);
--			return err;
--		}
--	}
--
--	if (mkfifo(HOG_SUSPEND_FIFO, 0600) < 0) {
--		int err = -errno;
--
--		error("Can't create FIFO (%s): %s (%d)", HOG_SUSPEND_FIFO,
--							strerror(-err), -err);
--		return err;
--	}
--
--	DBG("Created suspend-dummy FIFO on %s", HOG_SUSPEND_FIFO);
--
--	ret = fifo_open();
--	if (ret < 0)
--		unlink(HOG_SUSPEND_FIFO);
--
--	return ret;
+-	destroy_folder_tree(folder_tree);
 -}
 -
--void suspend_exit(void)
+-int messages_connect(void **s)
 -{
--	if (watch > 0) {
--		g_source_remove(watch);
--		watch = 0;
+-	struct session *session = g_new0(struct session, 1);
+-
+-	session->cwd = g_strdup("/");
+-	session->folder = folder_tree;
+-
+-	*s = session;
+-
+-	return 0;
+-}
+-
+-void messages_disconnect(void *s)
+-{
+-	struct session *session = s;
+-
+-	g_free(session->cwd);
+-	g_free(session);
+-}
+-
+-int messages_set_notification_registration(void *session,
+-		void (*send_event)(void *session,
+-			const struct messages_event *event, void *user_data),
+-		void *user_data)
+-{
+-	return -ENOSYS;
+-}
+-
+-int messages_set_folder(void *s, const char *name, gboolean cdup)
+-{
+-	struct session *session = s;
+-	char *newrel = NULL;
+-	char *newabs;
+-	char *tmp;
+-
+-	if (name && (strchr(name, '/') || strcmp(name, "..") == 0))
+-		return -EBADR;
+-
+-	if (cdup) {
+-		if (session->cwd[0] == 0)
+-			return -ENOENT;
+-
+-		newrel = g_path_get_dirname(session->cwd);
+-
+-		/* We use empty string for indication of the root directory */
+-		if (newrel[0] == '.' && newrel[1] == 0)
+-			newrel[0] = 0;
 -	}
 -
--	unlink(HOG_SUSPEND_FIFO);
+-	tmp = newrel;
+-	if (!cdup && (!name || name[0] == 0))
+-		newrel = g_strdup("");
+-	else
+-		newrel = g_build_filename(newrel ? newrel : session->cwd, name,
+-									NULL);
+-	g_free(tmp);
+-
+-	if (newrel[0] != '/')
+-		newabs = g_build_filename("/", newrel, NULL);
+-	else
+-		newabs = g_strdup(newrel);
+-
+-	session->folder = get_folder(newabs);
+-	if (session->folder == NULL) {
+-		g_free(newrel);
+-		g_free(newabs);
+-
+-		return -ENOENT;
+-	}
+-
+-	g_free(newrel);
+-	g_free(session->cwd);
+-	session->cwd = newabs;
+-
+-	return 0;
+-}
+-
+-static gboolean async_get_folder_listing(void *s)
+-{
+-	struct session *session = s;
+-	gboolean count = FALSE;
+-	int folder_count = 0;
+-	char *path = NULL;
+-	struct message_folder *folder;
+-	GSList *dir;
+-
+-	if (session->name && strchr(session->name, '/') != NULL)
+-		goto done;
+-
+-	path = g_build_filename(session->cwd, session->name, NULL);
+-
+-	if (path == NULL || strlen(path) == 0)
+-		goto done;
+-
+-	folder = get_folder(path);
+-
+-	if (folder == NULL)
+-		goto done;
+-
+-	if (session->max == 0) {
+-		session->max = 0xffff;
+-		session->offset = 0;
+-		count = TRUE;
+-	}
+-
+-	for (dir = folder->subfolders; dir &&
+-				(folder_count - session->offset) < session->max;
+-				folder_count++, dir = g_slist_next(dir)) {
+-		struct message_folder *dir_data = dir->data;
+-
+-		if (count == FALSE && session->offset <= folder_count)
+-			session->folder_list_cb(session, -EAGAIN, 0,
+-					dir_data->name, session->user_data);
+-	}
+-
+- done:
+-	session->folder_list_cb(session, 0, folder_count, NULL,
+-							session->user_data);
+-
+-	g_free(path);
+-	g_free(session->name);
+-
+-	return FALSE;
+-}
+-
+-int messages_get_folder_listing(void *s, const char *name,
+-					uint16_t max, uint16_t offset,
+-					messages_folder_listing_cb callback,
+-					void *user_data)
+-{
+-	struct session *session = s;
+-	session->name = g_strdup(name);
+-	session->max = max;
+-	session->offset = offset;
+-	session->folder_list_cb = callback;
+-	session->user_data = user_data;
+-
+-	g_idle_add_full(G_PRIORITY_DEFAULT_IDLE, async_get_folder_listing,
+-						session, NULL);
+-
+-	return 0;
+-}
+-
+-int messages_get_messages_listing(void *session, const char *name,
+-				uint16_t max, uint16_t offset,
+-				uint8_t subject_len,
+-				const struct messages_filter *filter,
+-				messages_get_messages_listing_cb callback,
+-				void *user_data)
+-{
+-	return -ENOSYS;
+-}
+-
+-int messages_get_message(void *session, const char *handle,
+-				unsigned long flags,
+-				messages_get_message_cb callback,
+-				void *user_data)
+-{
+-	return -ENOSYS;
+-}
+-
+-int messages_update_inbox(void *session, messages_status_cb callback,
+-							void *user_data)
+-{
+-	return -ENOSYS;
+-}
+-
+-int messages_set_read(void *session, const char *handle, uint8_t value,
+-				messages_status_cb callback, void *user_data)
+-{
+-	return -ENOSYS;
+-}
+-
+-int messages_set_delete(void *session, const char *handle, uint8_t value,
+-					messages_status_cb callback,
+-					void *user_data)
+-{
+-	return -ENOSYS;
+-}
+-
+-void messages_abort(void *session)
+-{
 -}
 
 -- 
