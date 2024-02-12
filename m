@@ -1,105 +1,95 @@
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4EFB4776F
-	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Feb 2024 19:34:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ED4D47F45
+	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Feb 2024 20:02:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707766467; cv=none; b=QxHGR621GS7OkJuB4I0S7q51jRlzwP3xY0sWecWvGRTIpreJPtVQTG3H7cPgnjWzgefqIyD/NRV90/zEFB4np9BYxlhdUYQm5/uwHEHsN8q6Beix59DaNnYQ9IwdeDILFPVskGKdxLrAIyo0dSU/XGWccAuVAkE/TLId80ui4yI=
+	t=1707768160; cv=none; b=O3rIvvbl+r6up6FvQ280DC0CgmduSNQ141M6xDOrBS+f5Gq4ZFNInr0GPeSrl5gBeWxVhguLSlRGOITzz44DHpeVgiUJt7oMvVRBqBLOfRyo4UXqcQy6GZSIMu0YkHd4Jr/zPm6Z0+zjkYylloHv92Xs7CYLiRHQk0LWaCT+QDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707766467; c=relaxed/simple;
-	bh=BfK5RmTNJTH5o/ScZd4dB78aCrIGRjll6fTtcV9huA0=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=YqgPkkySYrdFwjV7YlQKyTG10jMFiwRyDoBcX1kuDTKv1wu1q78x6MDk0sQ1Rf5F9B/coN4V4+CMbTO/TIIKMmTos+j1Q/Swyo52hJks/MYoO+bsTiggXCeLjSjDDdnBnyQyPdmF7lJGTFWsoL0VSO2TFrrOmImXDju0ZwHlzVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A46Y4zMm; arc=none smtp.client-ip=209.85.219.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1707768160; c=relaxed/simple;
+	bh=27XdaU5KU3C2bMi40N4HgMXvKSJ93TxqLasPGlGSRXs=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=llVAxSpY4hWMwfQu+M0KJuMhUn4nbX/QU2ZChUmbbghUQAg1wTn1wIZ3MgYwiBGQxjtt9tOD+GA/Gt2Ld60BKa45QrdmHRTROnG08oSPAtahveD70BW0QzU+i9LwGGbUFGuVeXbv2awgBuP4MIe14ZPz0tQi9K7BO88lhXbhtuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fOh2mfug; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A46Y4zMm"
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-6860ff3951aso17777816d6.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Feb 2024 11:34:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707766464; x=1708371264; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=mtDyUpwyPZOy/6kUdZhimz//miFdbYaeeN7RWX1I/oM=;
-        b=A46Y4zMmzNzh3HyAFi8gD3skGHUfhhk2FOjvqpdGwVDND2D5Dk+0VES02wg7ZYvxEv
-         yHr0xIolBfGpyh2kyL9eupvixY0oHojEIjlMGIIE+W4nF14s9svET+ibyYCL9Am/PzTn
-         6TkttDxjWXylsdSjk+ejl4a9Gs6X0C9GKC3oS5d7M0MTV3AUjVrPd5VX5QGZCDZ5fZSu
-         jOql/La1JBnejnMd+trB3WlAMWK5UaAA6BX1LAb5FrsgonBy+NhHlB6Yb+eJGRpCZbbX
-         ezWW53CD6TUUO5/Hn+oVr6eP4gvvNMYY+SGQsc+gGtXfc21o7kZWLjbHjaKoaqNa0oZe
-         foAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707766464; x=1708371264;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mtDyUpwyPZOy/6kUdZhimz//miFdbYaeeN7RWX1I/oM=;
-        b=ju6RX8B3BBk3ApNIui40rE9xafLuBrkc9WgKpJu7QdQ0RQVdZ2muQB2jSuI/wBQ6xx
-         Q62GufPp7LdXD1ft7F6Q5M1sImZIE6bQU5/jqX3S4HxPZKEsmsmSfxnPjlWmrDloWUyu
-         TTVcQReKwoWInd3g9g9v3GR5Y4X0SsbASxnCM2jN7OZANNT3l5F5ykES4JWb0Hp5lY3g
-         MTaEMEq5DJsF0x5HrHSf18vemXVF9Z2sHHS6CTPZ20LyYjNtp3NHXsb0IP5QgMtztwty
-         c73tPRyNQYeWqaXt8qbqQFgJP4DN1BJ++ONk4TJw6qhjeqjAIdnGlzbQW+W5iccPQGTV
-         TdUg==
-X-Gm-Message-State: AOJu0Yy4O6//iOl9i1PxyHYn+NOc9Ry7XF+O4lEB8GLOuc39lfyFiUgh
-	ljiHcpF9vjt/YxDt2hSrhrB+dLw7VW1lP2bjTlwZW3GiiWJQbP/PncFTCKh/8aI=
-X-Google-Smtp-Source: AGHT+IFh4BmpoQk2Mk4RYk+TZsqnPBWZIgj4aVZshzM9XXOqd6wP++Tm0cAHUTJjHnVhZCMeYBtHQw==
-X-Received: by 2002:a0c:e2cc:0:b0:68c:64d3:d98c with SMTP id t12-20020a0ce2cc000000b0068c64d3d98cmr7894897qvl.53.1707766464413;
-        Mon, 12 Feb 2024 11:34:24 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWwwVs5gZC0CY0unST2C5maTS5/lrePVRVS55h1KIw9Qunur5AhqHgq5Z+2O0JG0JkMbYCknAoEh2/2HhfYJjdTXxuZLg==
-Received: from [172.17.0.2] ([23.96.249.170])
-        by smtp.gmail.com with ESMTPSA id oo12-20020a056214450c00b0068cbacf7327sm457795qvb.107.2024.02.12.11.34.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Feb 2024 11:34:23 -0800 (PST)
-Message-ID: <65ca72bf.050a0220.e1591.3f41@mx.google.com>
-Date: Mon, 12 Feb 2024 11:34:23 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8185093916255391985=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fOh2mfug"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DDD7AC43390;
+	Mon, 12 Feb 2024 20:02:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707768159;
+	bh=27XdaU5KU3C2bMi40N4HgMXvKSJ93TxqLasPGlGSRXs=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=fOh2mfug0XH1efusfa3c5//Pf24v8EwSKgO0byfnrIOVKNzfzvxR4NLw/oAruwLCw
+	 yEv02F4jc7rodPbWNlbbfRnRAD3GX2HZGkDy+VD4og18uJO/VkwA612vkg7H223oSK
+	 pumD2Q8FKDNZ4TgEAZGezMQJz141FuGbzhgBREAwNbQm6vFqX8uu92UHo91GJWYfUH
+	 mTK8uRA30e7q7sAqccjhVHO/SzJ/FMwrRBbI7zuwiOLuhMkRqpN8qDRQCP5aXIWSpj
+	 o1D3FdpUkfZ7EurlL/PegBRszPlQut8mEgJp+hDVKzCzs2mG3jUhJnyx1qzjV21NHq
+	 DIFNirI/yKRhg==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1E51C48BC3;
+	Mon, 12 Feb 2024 20:02:39 +0000 (UTC)
+From: Emil Velikov via B4 Relay <devnull+emil.l.velikov.gmail.com@kernel.org>
+Date: Mon, 12 Feb 2024 20:02:38 +0000
+Subject: [PATCH BlueZ v2 02/10] adapter: Remove experimental flag for
+ PowerState
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v3,1/3] hog-lib: Don't destroy UHID device on detach
-In-Reply-To: <20240212173910.4061556-1-luiz.dentz@gmail.com>
-References: <20240212173910.4061556-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============8185093916255391985==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20240212-disto-patches-v2-2-8bab1bd08f4d@gmail.com>
+References: <20240212-disto-patches-v2-0-8bab1bd08f4d@gmail.com>
+In-Reply-To: <20240212-disto-patches-v2-0-8bab1bd08f4d@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Bastien Nocera <hadess@hadess.net>
+X-Mailer: b4 0.12.4
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1707768157; l=1246;
+ i=emil.l.velikov@gmail.com; s=20230301; h=from:subject:message-id;
+ bh=kBWJv6IuMJzmAjsIKoWIKgJU/uFwFAGgPEAJK3EPyjo=;
+ b=LSHYBrMDViFmJ9LE74zZVT+TFh/TVVCv3IfWPUs/pVGdSerKyT8KDIekdk5AkN2qnf/SMst4S
+ tGIHN5/O+yDCpNkEjeK2KSFdcqA/m5b+pwsSGcZCJD6AHSazBQ4x4/G
+X-Developer-Key: i=emil.l.velikov@gmail.com; a=ed25519;
+ pk=qeUTVTNyI3rcR2CfNNWsloTihgzmtbZo98GdxwZKCkY=
+X-Endpoint-Received:
+ by B4 Relay for emil.l.velikov@gmail.com/20230301 with auth_id=35
+X-Original-From: Emil Velikov <emil.l.velikov@gmail.com>
+Reply-To: <emil.l.velikov@gmail.com>
 
-This is automated email and please do not reply to this email!
+From: Bastien Nocera <hadess@hadess.net>
 
-Dear submitter,
+Now that the feature has been tested, that the API is deemed adequate
+and the reliability sufficient.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=825316
+[Emil Velikov]
+The feature has landed in Sept 2022, with inclinations that "we might
+switch it to stable in the next release", back in Nov 2022.
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.25 seconds
-GitLint                       PASS      0.89 seconds
-BuildEll                      PASS      24.49 seconds
-BluezMake                     PASS      735.31 seconds
-MakeCheck                     PASS      11.79 seconds
-MakeDistcheck                 PASS      162.84 seconds
-CheckValgrind                 PASS      226.50 seconds
-CheckSmatch                   PASS      328.83 seconds
-bluezmakeextell               PASS      107.23 seconds
-IncrementalBuild              PASS      2067.00 seconds
-ScanBuild                     PASS      921.72 seconds
-
-
-
+Today - a bit over 1 year later -  various distributions (Fedora, Gentoo
+and by extension their derivatives) are carrying this patch. I think we
+can say we're reasonably stable and can merge it upstream.
 ---
-Regards,
-Linux Bluetooth
+ src/adapter.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
+diff --git a/src/adapter.c b/src/adapter.c
+index 022390f0d..ef1e66e4b 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -3914,8 +3914,7 @@ static const GDBusPropertyTable adapter_properties[] = {
+ 	{ "Alias", "s", property_get_alias, property_set_alias },
+ 	{ "Class", "u", property_get_class },
+ 	{ "Powered", "b", property_get_powered, property_set_powered },
+-	{ "PowerState", "s", property_get_power_state, NULL, NULL,
+-			     G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
++	{ "PowerState", "s", property_get_power_state },
+ 	{ "Discoverable", "b", property_get_discoverable,
+ 					property_set_discoverable },
+ 	{ "DiscoverableTimeout", "u", property_get_discoverable_timeout,
 
---===============8185093916255391985==--
+-- 
+2.43.0
+
