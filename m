@@ -1,49 +1,49 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 415A83D0A1
-	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Feb 2024 12:02:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC02C3A269
+	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Feb 2024 12:12:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.134.136.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707739351; cv=none; b=QstB4zOgHxkmx8VrS3rVLA1EvVEIFpZUVR4/l5gieJ3W6aeopBMgR945uOdE5D7cNF3DXyMazZ2UX4yEMlBWaH7kSfm03DUwTZ7rxAolKPfumIYhG0smgaG5/twdi1cbaiP79diN0yWBJWZ4tx0/YwWTgjqR8ehvxe1Tge6cP4U=
+	t=1707739962; cv=none; b=i1Qb/gNvTArSeA0crDKRiTIgyFsd3TjbMAGuwMQ2TU0VP9F/a/QsxIRFKLu5eBtRGe75JS8v8dYfWUPle/lKl2nBJwFY4RSdelZiPtqY4ZSiyYI5sZS48lwHe7qtFbZUo940XfoTXxBpSiYPw96SHRgBArBfNAFoh7XXJV5fbGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707739351; c=relaxed/simple;
-	bh=Gau8lbmjtw8M7cmiQTWRcqqXvw3YmT1Ez7fqHr4y7Uo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IuJJV2PLkFnGFYZo8KL3QHX+PA24r5naPNFnX3zq7fDJPdrMM7X0TG62ypIGdKt7HoVPu5F1yaT/YdjV/eG0w9XjTDXR8FYucJdnVwXg2SU7RWuGWGiiEk0JqU4ldyimaqSO7Atc+6INMUBjMKn3bNf+8iIWvc3rP3cWWMWKg/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ONi1dI85; arc=none smtp.client-ip=192.198.163.7
+	s=arc-20240116; t=1707739962; c=relaxed/simple;
+	bh=ib4FalMC37231m7i/t6CZk10KgRWCsu9K2dpezK+dC4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qgmPdtIzsGVyvpDcKYOIHtfoOFz0Mbs5bQxFaN/T/vV9yGJIrmBH/TVi3kFbOjQNaQg5B6mfjXuj9m2cvyc7pE/aAYLUrabvo0DOwYdviqgLhyiLICvmR76uXKJVeqa5uHLOb7tn7rV3ImgbNrx6mTcm8/Oye7s2mCIFfoQ1eGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bU+KABRV; arc=none smtp.client-ip=134.134.136.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ONi1dI85"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bU+KABRV"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707739349; x=1739275349;
+  t=1707739959; x=1739275959;
   h=from:to:cc:subject:date:message-id:mime-version:
    content-transfer-encoding;
-  bh=Gau8lbmjtw8M7cmiQTWRcqqXvw3YmT1Ez7fqHr4y7Uo=;
-  b=ONi1dI85dkON0gZDkpKiS6Wlmy/h/QP7e6TPAY2OsnMWsE5GqG71Ir0b
-   LkGHG+Cg9B+WIMjJQUELKHCsN0Zk+VlOFZkKetUCygraYyi0aTq6MzppY
-   yo8qN8D1wrVpb92tw93E1rIu3BddSQabqrDMHGtRvdMFnCalyAyWU2TXC
-   8jPGO+BKh9UleiS5QyjBNOlUl3rcLwBQKOSKdBVD8PzGVjvOEUJ3UzN91
-   cDqRBUKfhm+4ho5Fe7OhatwsaJ+27vG70qU8b2qKyFBl1qH02E8Me1aED
-   8TO87VWaal6LAbNB5JXwUkEJDCNL4TfFTB9mUXdVjEqLj7Qa53t1fCiL3
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10981"; a="27157803"
+  bh=ib4FalMC37231m7i/t6CZk10KgRWCsu9K2dpezK+dC4=;
+  b=bU+KABRVwCRQ31LX23ev2nM6zVUe2qjVN4iJp870ClhF2z0Qom1HpFKn
+   RzJDB4yZe9sECLm2HmxXJq5qU/CzXQayawtLKESMxpEzx++PAEhcyvSb8
+   t4Z/AcF5vHaei27VLLb6KCzigSYbDM0bIMQ91+SPHmzC+zoTmMxBo5O3V
+   l49NDK6HikQM+8oD9cpBoBeo4C/M1Y6oz4fQ6db+y+g6NMdkqWEgFnZqr
+   yahugknQ2yyQKNQvxiHf09pyNSoCK/UQL9oRn12xuHYHwe0bwYcdlcKkq
+   B1gAzdSnunR+jOBh5koHuBJ4IeiNvCig5HQppbhoQ80ejeVr4FW7HREOf
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10981"; a="396148162"
 X-IronPort-AV: E=Sophos;i="6.06,263,1705392000"; 
-   d="scan'208";a="27157803"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2024 04:02:28 -0800
+   d="scan'208";a="396148162"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2024 04:12:38 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,263,1705392000"; 
-   d="scan'208";a="2912359"
+   d="scan'208";a="7196601"
 Received: from lbtoe.iind.intel.com ([10.224.186.133])
-  by orviesa006.jf.intel.com with ESMTP; 12 Feb 2024 04:02:26 -0800
+  by fmviesa004.fm.intel.com with ESMTP; 12 Feb 2024 04:12:36 -0800
 From: Shahid Vichhi <shahid.bashir.vichhi@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Shahid Vichhi <shahid.bashir.vichhi@intel.com>
-Subject: [PATCH v4] monitor/att: Enable the notification logging support for the CCP
-Date: Mon, 12 Feb 2024 07:03:58 +0200
-Message-Id: <20240212050358.687112-1-shahid.bashir.vichhi@intel.com>
+Subject: [PATCH v5] monitor/att: Enable the notification logging support for the CCP
+Date: Mon, 12 Feb 2024 07:14:10 +0200
+Message-Id: <20240212051410.693561-1-shahid.bashir.vichhi@intel.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -54,14 +54,14 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 ---
- monitor/att.c | 661 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 661 insertions(+)
+ monitor/att.c | 669 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 669 insertions(+)
 
 diff --git a/monitor/att.c b/monitor/att.c
-index e0164f3ddf3b..03e101d6a6b8 100644
+index e0164f3ddf3b..4628db44b139 100644
 --- a/monitor/att.c
 +++ b/monitor/att.c
-@@ -2433,6 +2433,645 @@ static void seeking_speed_notify(const struct l2cap_frame *frame)
+@@ -2433,6 +2433,653 @@ static void seeking_speed_notify(const struct l2cap_frame *frame)
  	print_seeking_speed(frame);
  }
  
@@ -582,7 +582,7 @@ index e0164f3ddf3b..03e101d6a6b8 100644
 +		print_hex_field("  Data", frame->data, frame->size);
 +}
 +
-+static void call_cp_oipt_opcodes_read(const struct l2cap_frame *frame)
++static void call_cp_opt_opcodes_read(const struct l2cap_frame *frame)
 +{
 +	print_call_cp_opt(frame);
 +}
@@ -691,6 +691,14 @@ index e0164f3ddf3b..03e101d6a6b8 100644
 +		goto done;
 +	}
 +
++	print_field("  Call Index: %u", call_id);
++
++	name = name2utf8((uint8_t *)frame->data, frame->size);
++
++	print_field("  Friendly Name: %s", name);
++
++done:
++	if (frame->size)
 +		print_hex_field(" Data", frame->data, frame->size);
 +}
 +
@@ -707,7 +715,7 @@ index e0164f3ddf3b..03e101d6a6b8 100644
  static const char *play_order_str(uint8_t order)
  {
  	switch (order) {
-@@ -3392,6 +4031,28 @@ static const struct gatt_handler {
+@@ -3392,6 +4039,28 @@ static const struct gatt_handler {
  	GATT_HANDLER(0x2bc7, NULL, bcast_audio_scan_cp_write, NULL),
  	GATT_HANDLER(0x2bc8, bcast_recv_state_read, NULL,
  					bcast_recv_state_notify),
