@@ -1,148 +1,157 @@
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9014847A53
-	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Feb 2024 22:18:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D721FD7
+	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Feb 2024 22:31:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707776288; cv=none; b=Ge5ZB8YbvDtZcVSeFX+CrJxaUmxytiRZNMa8kmqv4ivMCjyK/MrDUsOcxcNQZH7wQ2LRYveDR7az5V4OV8hR+M8jICaK2FAOFfRqr1NIUVDdv/f+6DUVBqEuc+y4nnbUSlWZOOCbn6nd8wk/CHPMtcSshHJSImn5QA0t1OQEh+E=
+	t=1707777112; cv=none; b=kiYQ37EGa5Ukc8ypZCGMQoqpdXm+Tp9fDOA3rLQhnoRc5AADPk7nNIvmnziX8CYoDxAr1Mi0Azhp4P0tQhetq/pVshcGZOIRAIEo805m5/Fh21VE57IERisbG3XegdrrSTktfXBSkwx4mktssgK7AiKg6ygJ99jeHJlEbJoHCyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707776288; c=relaxed/simple;
-	bh=sYwVbHLK05RmWYU6tMXarHgXiMJ/sVyNbJKJymf2WB4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tizy/OtfS7xZZY5Si2vDLyZQzMChpiGGWv7y44nN6bRMow1FodeHEX4b+ioapKKGw+W8Ch7aOlsAdZREL2leAGCrOi4fNQJcnkReimJ7YpdNAikj9rHMR6LR6qP8GrAO2Rheh948Vk8Cvn6LWxvryx3Evc4/OkbiH9MeprVKDq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g4p8hkk9; arc=none smtp.client-ip=209.85.208.179
+	s=arc-20240116; t=1707777112; c=relaxed/simple;
+	bh=RoATdOmJbDk9lrGtQq/f7oUJyMn08wYFoa+EP3m5fKc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=lYBF+PFeUTIl+VYsuUr2jreG9q2jz+zZXqGJ/w8zkwP7fPTgwrejqzlEzkvg4rbAeqJ2UU4MAvdReXozr+IgF44PouMU4O5eKpnu5+LBjQZ48kYF2g6GD2rBtiee+m/ND/0/MZYUCk3aLjxEAbVLnJ216lovqfKbwVu9yZJDOoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ksi6cHu1; arc=none smtp.client-ip=209.85.221.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g4p8hkk9"
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2d0b4ea773eso49253831fa.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Feb 2024 14:18:06 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ksi6cHu1"
+Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-4c01ca67504so569141e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Feb 2024 14:31:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707776284; x=1708381084; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hY33wlNxUbis34gZFjS1OCAARF3v45p4zZMAxR0g4lQ=;
-        b=g4p8hkk9Xwf3zbFiJt89sfhteFukrFMzpLjxxp+iD9gqsCOqMFKPsx40tLLpJzgUzk
-         3XGjgc0ZoZiEBckpzPszUyGckcF7HHAHIj8vq2yaiB5OyVDER+2EFDDaKmlvYzPNSMZy
-         1/Cew435WwIzeKCK2J0tuSbPzObJU0hyOzDgg2RWzo08y35C/AWSmEESZyhn89bNAHMZ
-         kJX7HkyzJbS4ILWMkSM+dOYU9vDw03RxAQSzdJDfL3D3Tsu/zW2yS9tIIW4lFx/AQtOs
-         cswWob4mV3xBrV9FfcNl9g3xUmGg6k6F/oyRsFllZIx+C1WYefzz+HLEHx+Yd9KHsKky
-         ujFg==
+        d=gmail.com; s=20230601; t=1707777108; x=1708381908; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=c2q7tQ1TG4hNxpIKUh7oxpZsvECnxvXqaKYzpr2ZN7o=;
+        b=Ksi6cHu16xf/xQhUxp9sEUpnKtdmpWaTSOk/3vtUTM2zrBr30+TyCqRPoGJpIl/YUX
+         F1RrfX5J4VekPE2cvJnCN7Axhf/06YSDwk0i1PQDic5ok9tf14HR2AcEZkFGfzT/6V0J
+         4j4AS7+ZMBgD558s8TFZmgOf2QEQ1HOBhYAB3eD3AnG8TqiImLiYp1l4dbIqgo7bQ1BR
+         Rk6d0smaVbvpiP/BSvPJjdGyK4htCuFFhQ1TRzMpcfC9+sRXjuFMh4UDZqj4knogs9mQ
+         eeLcMYNOsZfFZOIdBHNVTsvfrG4I8u4ccjXqiBCbri4EN+94Wc4Bvvxmvqj1wuFSPyPX
+         zJwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707776284; x=1708381084;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hY33wlNxUbis34gZFjS1OCAARF3v45p4zZMAxR0g4lQ=;
-        b=iHu1lUH7HpVQyuJ1PXBZ1LhcEYbxSaKWt3WnBRGMkfsY2mlolm80isn8UbT8V+T4kj
-         Z9iR2IHj7Ar7CiODXkFsFqDAbibdM3jP6HM7dGB3YMlQrAmmteyiUIf2VbtOCfTwbP04
-         qyG+IgM5uT1reQU8c7OstgVVIBoHSPyQv85INPUiu73/UqQHiUc9LPuqWHxgSBkQePGU
-         fhi2Oy0n/9PQ2Q/9IAR6iHjeZzu6L5sWYv1J/PngDmDljMBbxwGe8eQq522MdrHKTyAA
-         vXuHonz+4KeVeE0jCBYDNwTclo8quFuLxX2Z6SGeKZSF74ip2lZKwzX9p9h7YA6lc0FC
-         niIw==
-X-Gm-Message-State: AOJu0YyniGdIrmXOUPpqtUxI+R2WYkkUqwgEOA/3d0fTy+yKjU/M6+wG
-	QrB9bjzlkAsLKvi+jIoSa3ebcoRWTSS3Oj74rU4XgminCHX9H0Usgh+UUkjgOO60eMsp8VN8RdN
-	AevaEphW0kAjoZpWJ4dW9vsNLo7MlmqpL
-X-Google-Smtp-Source: AGHT+IESAmUOgMPzh5ygl/DHh5OMHsPx7HqjhDa4VkTdNCXMno1zSEwaOMBPS3puz6kfgsHJss5ji76QL4wYh8zg+xE=
-X-Received: by 2002:a2e:9550:0:b0:2d0:bf87:b3a6 with SMTP id
- t16-20020a2e9550000000b002d0bf87b3a6mr5077364ljh.37.1707776284283; Mon, 12
- Feb 2024 14:18:04 -0800 (PST)
+        d=1e100.net; s=20230601; t=1707777108; x=1708381908;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=c2q7tQ1TG4hNxpIKUh7oxpZsvECnxvXqaKYzpr2ZN7o=;
+        b=lABr5/DxS/uWQlBRi59HrEjHaEZNHSzCYdGdGctP0hIIUc70Y9b+rDD+l+UuM+mCRd
+         o+6Whupx2s4hKGbax103pElhRgYqhQO2tXFMiDCKd+kB3YwncOev1d33El2Ytd+vt5GH
+         unI9uBMejMMaw92zRH8KYoBb1sItqRxZtj9HsxBtNn9psHM4kC0nWoVNc9GqJtEoBm1Z
+         kBdO9lLAtpIpuQm0bSgaENFkQoOF+LVA44GT/ZaBfSmrntVPZSgMTdej87qCSif0rsFE
+         JyfA7Uzn16gk+zOnbZX8t6pEqvtVVrEJ/s8t/F0QNZY/AjMw8TjAiwXshAA9Tbqbl18x
+         UwqA==
+X-Gm-Message-State: AOJu0YzOTf6mVdnu3tCSBBjJFLuikS1GPV6xzOqGWNSablm1qNOdTdzn
+	PZmr+9P2K0Z2sy1QggU0g/9RNqyJO+W3tADBQ4+YiZa0UELisk9TF7Fd2JDk
+X-Google-Smtp-Source: AGHT+IFoJkDo6eiM/FSfKICoUMzxjfVkma9RjZ7JMJY8yGLdpoHABc266vy4ffDEUBzamz3qHSclfw==
+X-Received: by 2002:a1f:6201:0:b0:4c0:1bb6:33c with SMTP id w1-20020a1f6201000000b004c01bb6033cmr3618398vkb.12.1707777108416;
+        Mon, 12 Feb 2024 14:31:48 -0800 (PST)
+Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
+        by smtp.gmail.com with ESMTPSA id z13-20020ac5c18d000000b004c0460eeea3sm840483vkb.43.2024.02.12.14.31.47
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Feb 2024 14:31:47 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v4 1/3] hog-lib: Don't destroy UHID device on detach
+Date: Mon, 12 Feb 2024 17:31:44 -0500
+Message-ID: <20240212223146.4142264-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240212153222.8191-1-silviu.barbulescu@nxp.com> <20240212153222.8191-3-silviu.barbulescu@nxp.com>
-In-Reply-To: <20240212153222.8191-3-silviu.barbulescu@nxp.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 12 Feb 2024 17:17:52 -0500
-Message-ID: <CABBYNZ+EsY+P=sbZ-QDeWzzgNk-Q0A_8THxJDg-hONjyv-LXVg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 2/7] shared/bap: Create multiple streams for the
- same pac
-To: Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
-Cc: linux-bluetooth@vger.kernel.org, mihai-octavian.urzica@nxp.com, 
-	vlad.pruteanu@nxp.com, andrei.istodorescu@nxp.com, iulia.tanasescu@nxp.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Silviu,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Feb 12, 2024 at 10:32=E2=80=AFAM Silviu Florian Barbulescu
-<silviu.barbulescu@nxp.com> wrote:
->
-> Broadcast source requires to create multiple streams for one pac.
-> This is required for multiple BISes support.
-> ---
->  src/shared/bap.c | 28 ++++++++++++++++++++++++----
->  1 file changed, 24 insertions(+), 4 deletions(-)
->
-> diff --git a/src/shared/bap.c b/src/shared/bap.c
-> index e26dbf944..f0ffdebfe 100644
-> --- a/src/shared/bap.c
-> +++ b/src/shared/bap.c
-> @@ -5156,7 +5156,7 @@ struct bt_bap_stream *bt_bap_stream_new(struct bt_b=
-ap *bap,
->                                         struct iovec *data)
->  {
->         struct bt_bap_stream *stream;
-> -       struct bt_bap_endpoint *ep;
-> +       struct bt_bap_endpoint *ep =3D NULL;
->         struct match_pac match;
->
->         if (!bap)
-> @@ -5212,12 +5212,32 @@ struct bt_bap_stream *bt_bap_stream_new(struct bt=
-_bap *bap,
->         match.lpac =3D lpac;
->         match.rpac =3D rpac;
->
-> -       /* Check for existing stream */
-> -       ep =3D queue_find(bap->remote_eps, find_ep_pacs, &match);
-> +       /* Broadcast source supports multiple endpoints (multiple BISes)
-> +        * for one pac so allow it to register a new endpoint even if
-> +        * others already exist.
-> +        */
-> +       if (lpac->type !=3D BT_BAP_BCAST_SOURCE) {
-> +               /* Check for existing stream */
-> +               ep =3D queue_find(bap->remote_eps, find_ep_pacs, &match);
-> +       }
-> +
->         if (!ep) {
->                 /* Check for unused ASE */
->                 ep =3D queue_find(bap->remote_eps, find_ep_unused, &match=
-);
-> -               if (!ep) {
-> +               if (!ep && lpac->type =3D=3D BT_BAP_BCAST_SOURCE) {
-> +                       /* Push a new remote endpoint with direction
-> +                        * broadcast source
-> +                        */
-> +                       ep =3D bap_endpoint_new_broadcast(bap->rdb,
-> +                                       BT_BAP_BCAST_SOURCE);
-> +
-> +                       if (ep)
-> +                               queue_push_tail(bap->remote_eps, ep);
-> +                       else {
-> +                               DBG(bap, "Unable to create endpoint");
-> +                               return NULL;
-> +                       }
-> +               } else if (!ep) {
+This makes bt_hog_detach not to destroy UHID device which means the
+device node don't need to be recreated in case of reconnections which
+speeds up the process.
 
-Perhaps we need a dedicated callback from creating streams to avoid
-having to add such checks everywhere, that said I don't quite
-understand why we have Broadcast Source to find a remote endpoint, it
-shall use a local one instead and perhaps have the ep struct support
-multiple streams to be attached so we don't have to create dummy
-endpoints just to be able to create new streams.
+Fixes: https://github.com/bluez/bluez/issues/737
+---
+ profiles/input/hog-lib.c | 48 ++++++++++++++++++++--------------------
+ 1 file changed, 24 insertions(+), 24 deletions(-)
 
->                         DBG(bap, "Unable to find unused ASE");
->                         return NULL;
->                 }
-> --
-> 2.39.2
->
+diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
+index 7ff1ede3db35..67492a63eca3 100644
+--- a/profiles/input/hog-lib.c
++++ b/profiles/input/hog-lib.c
+@@ -1309,11 +1309,35 @@ static bool cancel_gatt_req(const void *data, const void *user_data)
+ 	return g_attrib_cancel(hog->attrib, req->id);
+ }
+ 
++static void uhid_destroy(struct bt_hog *hog)
++{
++	int err;
++	struct uhid_event ev;
++
++	if (!hog->uhid_created)
++		return;
++
++	bt_uhid_unregister_all(hog->uhid);
++
++	memset(&ev, 0, sizeof(ev));
++	ev.type = UHID_DESTROY;
++
++	err = bt_uhid_send(hog->uhid, &ev);
++
++	if (err < 0) {
++		error("bt_uhid_send: %s", strerror(-err));
++		return;
++	}
++
++	hog->uhid_created = false;
++}
++
+ static void hog_free(void *data)
+ {
+ 	struct bt_hog *hog = data;
+ 
+ 	bt_hog_detach(hog);
++	uhid_destroy(hog);
+ 
+ 	queue_destroy(hog->input, free);
+ 	queue_destroy(hog->bas, (void *) bt_bas_unref);
+@@ -1823,29 +1847,6 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt)
+ 	return true;
+ }
+ 
+-static void uhid_destroy(struct bt_hog *hog)
+-{
+-	int err;
+-	struct uhid_event ev;
+-
+-	if (!hog->uhid_created)
+-		return;
+-
+-	bt_uhid_unregister_all(hog->uhid);
+-
+-	memset(&ev, 0, sizeof(ev));
+-	ev.type = UHID_DESTROY;
+-
+-	err = bt_uhid_send(hog->uhid, &ev);
+-
+-	if (err < 0) {
+-		error("bt_uhid_send: %s", strerror(-err));
+-		return;
+-	}
+-
+-	hog->uhid_created = false;
+-}
+-
+ void bt_hog_detach(struct bt_hog *hog)
+ {
+ 	GSList *l;
+@@ -1879,7 +1880,6 @@ void bt_hog_detach(struct bt_hog *hog)
+ 	queue_remove_all(hog->gatt_op, cancel_gatt_req, hog, destroy_gatt_req);
+ 	g_attrib_unref(hog->attrib);
+ 	hog->attrib = NULL;
+-	uhid_destroy(hog);
+ }
+ 
+ int bt_hog_set_control_point(struct bt_hog *hog, bool suspend)
+-- 
+2.43.0
 
-
---=20
-Luiz Augusto von Dentz
