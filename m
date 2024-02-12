@@ -1,146 +1,111 @@
-Received: from air.basealt.ru (air.basealt.ru [194.107.17.39])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C31AA3A1CB;
-	Mon, 12 Feb 2024 13:10:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D74E3A1AE
+	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Feb 2024 13:16:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707743421; cv=none; b=FaNCrJ4/PHyvTO4jYooh/W/38fbdRb6XaRePFb0mDbg5qFBcd3ASUU4c0qzJOW0ldmwTvJkhxPEldo9jZ5LyTa8K7VV3a/xCSx5fjkfOdBZHkxVXEpobohmrdFI8YYkKSHTYmp0+fUd9Awqq0ROHkOPv/+NZtWfmJB0wfp6ef0U=
+	t=1707743794; cv=none; b=mgY6sWGPE4mC0vpVaS6KabQxYAtQPSI5cqWrDNVuAJnYVOej0q9FvS19onNPby+1XTqrmOAOHRujY46rZLR968xGi+KVdJ8caHYQ9cxmKzcRfGO4cPOH5eFGQhrNciC5rKQNq3Ug9r1gWpd0RJwFZR+HDSUeyAMHA4JRnAk8o0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707743421; c=relaxed/simple;
-	bh=DnGC0CwNjZhsWkEnYbpja1u3lY2fDdY275sfxdNKvrE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UHgYYtdZkRgIwZX01KEN2tY6mv6NfepF/4bGiZAS0KYxrNwZLynos/UeoDG4gBKNFOEoSQhyyDx3uH1UNFmoKb33g3czdEFf1vUj/3gsIdNPe83nPujJJtCy3PLi6F68o0RUWwBdEw+e/9B22BSxg+hD2uy14JJnSoOXICRrEfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
-Received: by air.basealt.ru (Postfix, from userid 490)
-	id 191522F2023F; Mon, 12 Feb 2024 13:10:11 +0000 (UTC)
-X-Spam-Level: 
-Received: from shell.ipa.basealt.ru (unknown [176.12.98.74])
-	by air.basealt.ru (Postfix) with ESMTPSA id 50A862F20241;
-	Mon, 12 Feb 2024 13:10:03 +0000 (UTC)
-From: oficerovas@altlinux.org
-To: oficerovas@altlinux.org,
-	stable@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Pauli Virtanen <pav@iki.fi>,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	kovalev@altlinux.org,
-	nickel@altlinux.org,
-	dutyrok@altlinux.org
-Subject: [PATCH 2/2] Bluetooth: SCO: fix sco_conn related locking and validity issues
-Date: Mon, 12 Feb 2024 16:09:33 +0300
-Message-ID: <20240212130933.3856081-3-oficerovas@altlinux.org>
-X-Mailer: git-send-email 2.42.1
-In-Reply-To: <20240212130933.3856081-1-oficerovas@altlinux.org>
-References: <20240212130933.3856081-1-oficerovas@altlinux.org>
+	s=arc-20240116; t=1707743794; c=relaxed/simple;
+	bh=wrBGtcGztR0KQPctPu9ijSK+SCO4wwg/6Ix3IGVoBAA=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=PK6yrZCSnqlP9mIXUKn69AhbAJAB3WwLxVwWbhwPFl30fGFXfQPw3L0TNSNEQmvdKq7F6JVwYdAWamPyCX/lkdR2PSk7QfcvPZJ3Jkrv+MTnxUVUvjxAcLVxBSWzhbCOwrFSItVM0DhVvj1j8zDbg26XuFG9wxbXOqKAzeDtIRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UDwwck6n; arc=none smtp.client-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UDwwck6n"
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-783f3d27bfbso144050885a.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Feb 2024 05:16:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707743791; x=1708348591; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=rOsP3fzdtRmNYsoYoy77ZCZFjybg+oT2HKXz5AfqrQI=;
+        b=UDwwck6nhOANjfKWU2X96llCtAdvKx7mbY4qJtWP1g3ZgeCHDIfHQ+9qxemmGlKdiW
+         s2BjBt35MNFxN5EJICyuVJqxwuIeliayJXqyDv6mkqua7tl8UXY9CF9dT2ep7zkEnp97
+         UZ5E6DVpVYbjjYm1TrMJwWfO4T3t6/63S6CgK6+2c50ljV1ZCGLhHeu13kLu3j98tfQg
+         7OoufkhOxAUTS00XrFmKz3WPZalP8VfpltMYZKUEJAHl6XVYh9z/IAa4NVJNUHaEg4SZ
+         gE22GL0hjB8Cu/vTJzG6biYvsz4E4UXgeQPCA47tbEmZ3uWi+Ofn/OLQmWNsutAF8N6N
+         CwuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707743791; x=1708348591;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rOsP3fzdtRmNYsoYoy77ZCZFjybg+oT2HKXz5AfqrQI=;
+        b=DaMrKW6eWKFLRqmzxEC8TPWUVtnfJ1OuUdgtS7niG+vPxGrg4SJ+qCpi58APSrWJm6
+         /7WOV8ojOaYU5kU2YyKQvHXTnj5XnpeQNcj57MUhg/MrPdeaZYLguxCqDqUhSEN7Byum
+         B9s/w4JpDPw3ay+OZwoIAqDcQlFdTBqTZleuUJ0P8sklWhliXVQjY6TPiHTn82FJjnWr
+         AbNdZ2XeqGKIiNI0ILMO/7ZmosVf9HT5BwmZn0NoJdG+UQ73oC/CncpknC+2hdSundjS
+         sxyf9bj2x9+04idqQPevIJEMrAAlWROW+76omW9Xe4K0gjfakhndqoet5ghsjwAhbHe8
+         tncg==
+X-Gm-Message-State: AOJu0YxS922XGHmx2oCH3rxd+qheUNSEQPpix+GVqV/rIhu6F8rMDOHK
+	TwIdZCPD65XfXEjrwhfPNLLHptBju1f4RFT6iJMtdQbNCiFYv0igO+pnY+Da
+X-Google-Smtp-Source: AGHT+IFP9Y8WO30RCfVI6HNfnrS0NRZfXTq2dSLvnCSttpWw9cTK/2153UglZArOIXrFxevTAkPvlg==
+X-Received: by 2002:a05:620a:7e6:b0:785:d82b:784d with SMTP id k6-20020a05620a07e600b00785d82b784dmr1934458qkk.48.1707743791326;
+        Mon, 12 Feb 2024 05:16:31 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXUwX3dXHMTPX9uDMNGD010r+eHq6QefNDCpHUCdL1v8V3T0IGDFC+OjEA/Wr6zw7ccXp25+3CAPM3izz3JgQzBTTkzoooC8ldX7gQ6JWs=
+Received: from [172.17.0.2] ([20.102.46.180])
+        by smtp.gmail.com with ESMTPSA id i12-20020a37c20c000000b007869b745e2dsm204674qkm.100.2024.02.12.05.16.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Feb 2024 05:16:31 -0800 (PST)
+Message-ID: <65ca1a2f.370a0220.b5521.0c42@mx.google.com>
+Date: Mon, 12 Feb 2024 05:16:31 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5319504191813825492=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, shahid.bashir.vichhi@intel.com
+Subject: RE: [v5] monitor/att: Enable the notification logging support for the CCP
+In-Reply-To: <20240212051410.693561-1-shahid.bashir.vichhi@intel.com>
+References: <20240212051410.693561-1-shahid.bashir.vichhi@intel.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Alexander Ofitserov <oficerovas@altlinux.org>
+--===============5319504191813825492==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-From: Pauli Virtanen <pav@iki.fi>
+This is automated email and please do not reply to this email!
 
-commit 3dcaa192ac21 ("Bluetooth: SCO: fix sco_conn related locking and validity issues")
+Dear submitter,
 
-Operations that check/update sk_state and access conn should hold
-lock_sock, otherwise they can race.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=825193
 
-The order of taking locks is hci_dev_lock > lock_sock > sco_conn_lock,
-which is how it is in connect/disconnect_cfm -> sco_conn_del ->
-sco_chan_del.
+---Test result---
 
-Fix locking in sco_connect to take lock_sock around updating sk_state
-and conn.
+Test Summary:
+CheckPatch                    PASS      0.78 seconds
+GitLint                       PASS      0.31 seconds
+BuildEll                      PASS      24.20 seconds
+BluezMake                     PASS      709.68 seconds
+MakeCheck                     PASS      11.76 seconds
+MakeDistcheck                 PASS      165.28 seconds
+CheckValgrind                 PASS      229.29 seconds
+CheckSmatch                   WARNING   328.15 seconds
+bluezmakeextell               PASS      107.22 seconds
+IncrementalBuild              PASS      658.17 seconds
+ScanBuild                     PASS      940.32 seconds
 
-sco_conn_del must not occur during sco_connect, as it frees the
-sco_conn. Hold hdev->lock longer to prevent that.
+Details
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+monitor/att.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.
 
-sco_conn_add shall return sco_conn with valid hcon. Make it so also when
-reusing an old SCO connection waiting for disconnect timeout (see
-__sco_sock_close where conn->hcon is set to NULL).
 
-This should not reintroduce the issue fixed in the earlier
-commit 9a8ec9e8ebb5 ("Bluetooth: SCO: Fix possible circular locking
-dependency on sco_connect_cfm"), the relevant fix of releasing lock_sock
-in sco_sock_connect before acquiring hdev->lock is retained.
-
-These changes mirror similar fixes earlier in ISO sockets.
-
-Fixes: 9a8ec9e8ebb5 ("Bluetooth: SCO: Fix possible circular locking dependency on sco_connect_cfm")
-Signed-off-by: Pauli Virtanen <pav@iki.fi>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Alexander Ofitserov <oficerovas@altlinux.org>
 ---
- net/bluetooth/sco.c | 23 ++++++++++++-----------
- 1 file changed, 12 insertions(+), 11 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 0e1f5dde7bfec..99b149261949a 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -126,8 +126,11 @@ static struct sco_conn *sco_conn_add(struct hci_conn *hcon)
- 	struct hci_dev *hdev = hcon->hdev;
- 	struct sco_conn *conn = hcon->sco_data;
- 
--	if (conn)
-+	if (conn) {
-+		if (!conn->hcon)
-+			conn->hcon = hcon;
- 		return conn;
-+	}
- 
- 	conn = kzalloc(sizeof(struct sco_conn), GFP_KERNEL);
- 	if (!conn)
-@@ -268,21 +271,21 @@ static int sco_connect(struct sock *sk)
- 		goto unlock;
- 	}
- 
--	hci_dev_unlock(hdev);
--	hci_dev_put(hdev);
--
- 	conn = sco_conn_add(hcon);
- 	if (!conn) {
- 		hci_conn_drop(hcon);
--		return -ENOMEM;
-+		err = -ENOMEM;
-+		goto unlock;
- 	}
- 
--	err = sco_chan_add(conn, sk, NULL);
--	if (err)
--		return err;
--
- 	lock_sock(sk);
- 
-+	err = sco_chan_add(conn, sk, NULL);
-+	if (err) {
-+		release_sock(sk);
-+		goto unlock;
-+	}
-+
- 	/* Update source addr of the socket */
- 	bacpy(&sco_pi(sk)->src, &hcon->src);
- 
-@@ -296,8 +299,6 @@ static int sco_connect(struct sock *sk)
- 
- 	release_sock(sk);
- 
--	return err;
--
- unlock:
- 	hci_dev_unlock(hdev);
- 	hci_dev_put(hdev);
--- 
-2.42.1
 
+--===============5319504191813825492==--
