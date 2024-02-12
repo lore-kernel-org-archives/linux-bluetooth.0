@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8192E12B70
-	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Feb 2024 10:22:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6722218B15
+	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Feb 2024 10:24:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707733326; cv=none; b=BqpgHPh6uYw76XqEsmhX4ca6SyZxSV/iwhja8tb9XSB6J6IeTh9ZK0FPbAIO0DzgH2s4N0eZsDgyx9q8NUwUZ8cLDTry2Qujggb5ePGfmYJiOC220+nEyi5Clhd/sj3j22vULECl7eM3XvFJ5FnYlUDzg3R5CZ/WgW0us/79Me4=
+	t=1707733461; cv=none; b=rzQbhf7GiXd1WP1ETC9604hp+EOyPbFgCxSIxMHsNRrtAeZhrMM7zYtef83gdqMDhx3GClgeQOd1DLt1rovkXHQRvwxliSekcsJMaw67UHdF8/6Ls8ldjC0tpbna/Ug1/2LbGdYzCyTW/l+V+GGfGcD0qRwEzyCoPtDN8V0w440=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707733326; c=relaxed/simple;
-	bh=4cSMvPFM82VGliD1iQeEv1xW88KH+nd9LROq4jgulME=;
+	s=arc-20240116; t=1707733461; c=relaxed/simple;
+	bh=EKytqG/xuPpla9ejhGDyy9KAWX84QMLKHE1S2DUZPRA=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=OgUBZpWiS+cSD7+D9nva6H6L0V5KXIq5c7Twsj0BeFUcLTcWVW6XyY9Rry2LZAjg/HKzpmR8ZyntAjB/kg0p0P9pTAKwapmUo9glDzxxhCCJtDcYxuEuYpWh18d411L8nyxQ247WcnB801fRFcGwnYzvoLDXyFnc52YZUH/0BsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n8oehKfz; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=Cv/GAaLHN2SLbnuISpTGxM84Wt4nBds99VY78cwYHwHqswIzAB0hXc5BWgpAxh5wRxVa6tMed9GV2bZ//AF5yRE7d44TIEp8Jo66xdwfRRNkYMoL7YHOqERj1XdPRgkGcMjl7zcl5nHkEgwZEGNHY5qkM1TXicwcnDQ+3LKrDEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BmI8f8qW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n8oehKfz"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 166AFC433F1
-	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Feb 2024 10:22:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BmI8f8qW"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D4E2AC43390
+	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Feb 2024 10:24:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707733326;
-	bh=4cSMvPFM82VGliD1iQeEv1xW88KH+nd9LROq4jgulME=;
+	s=k20201202; t=1707733460;
+	bh=EKytqG/xuPpla9ejhGDyy9KAWX84QMLKHE1S2DUZPRA=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=n8oehKfzh25DjdEEg4CTm5NIdGHwuoPjh4h+DzxwipQpRpoRnl7Ua5ixHDOqNdcpK
-	 wsU9EnG3iNgj7314vCknkz8w1l7Za/BlUR93na/GN1P9GVgrC4kGnogIAPhXKfsSys
-	 kTh9+BjkboH71Z5gnm/oA//Nqsh3+2Jsmo+1xVBC3EZn75vNfUtYx7ceasgLI5ROAv
-	 n8/KDGsox2GH82enAtuuLlUQDkuh4Ad6s7cmAH7CX+O0Bn7Vim0zp019UXFODsVeQ5
-	 subYdroD/uZwryefQGmU0CMZcwH4uT8X7ntEB7/KCrpx293UJxKxLcID0h6XwlOJe1
-	 SWk4eTtIm4K/Q==
+	b=BmI8f8qWGmKREpM36FVG2HpnWwJsLMnD0s+y9/rhd4WAi28d4rCxhETRuWeK1bt6s
+	 +JPjM/O8oR+ohxnamTJRcJju2fDo2zOR205DUuYSVPElER4CaTcrK7Uge39rzJ8BnW
+	 i0S4t5OHVuVSnNP1JGZFlvEWGYQacINqEXPT+8FGSAB0J//NS+zgPZCw9R5hTLbgDO
+	 n5CtZwSPzpE5ZJVGsCzdgsDNWypBLC6J85tZUKTxa+R2siJe+NQiJmJuLwyZRnmy1J
+	 Q/sOrAmbntrQyehqNYuCvAakfUDY9qp5DMVWq5Gayld+YRp0CSPqxwejq0+vtoener
+	 Z6ATzoU8xSCaw==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id CA938C53BCD; Mon, 12 Feb 2024 10:22:05 +0000 (UTC)
+	id BF757C53BCD; Mon, 12 Feb 2024 10:24:20 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 218468] Unable to transfer file via Bluetooth from mobile phone
  to Linux system
-Date: Mon, 12 Feb 2024 10:22:05 +0000
+Date: Mon, 12 Feb 2024 10:24:20 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -47,8 +47,8 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: short_desc
-Message-ID: <bug-218468-62941-SBP3UA8X84@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: attachments.created
+Message-ID: <bug-218468-62941-rCxlIYdS34@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-218468-62941@https.bugzilla.kernel.org/>
 References: <bug-218468-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -64,13 +64,13 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D218468
 
-Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de) changed:
+--- Comment #1 from Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de)=
+ ---
+Created attachment 305857
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D305857&action=3Dedit
+Output of `btmon` with Xiami Redmi 9A
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-            Summary|Unable to transfer file via |Unable to transfer file via
-                   |Bluetooth from Nokia N9     |Bluetooth from mobile phone
-                   |                            |to Linux system
+This also happens with the Android phone Xiamo Redmin 9A.
 
 --=20
 You may reply to this email to add a comment.
