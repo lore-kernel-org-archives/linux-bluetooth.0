@@ -1,104 +1,105 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0130E5FEF7
-	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Feb 2024 17:24:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC2A60245
+	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Feb 2024 17:34:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707845069; cv=none; b=Gf3eNYE4yl3weLoGtFPlBMYLRmruI41i56XWvaR23X63yqZ6RaSzvn8TlyIVCzcV6y9K4Lu3l2JjuLmm5KE71kmup4d4fvgd+A1K4pDzeU6mBFxANNwZVQJ3oS6gD46UVfIuqSf+10lHrwjIvP08cMY55kgSBSO0ukVXBXQzYvg=
+	t=1707845676; cv=none; b=an0/YmV/mKZoQTueGiiBhYQTmlgfUEGg1vQpPkh6wRE9/E6iZ9P+vj3L3N+wlPkDMEo4T3FnkADyj2lF3nuEzd9q4uaeyM7ty+GtLlKzihCtWLf4XKSEU+h7TI3hz0B88xGs27OhoAVTfGyuc1sdqidIUYsGVzxbTE6cVvsKs5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707845069; c=relaxed/simple;
-	bh=dAcS//bN5EUl0rmpd6MTRSeVq9WzyY8e6NY4x+P70zw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e/deynDU4gpxZ9sin5mpkPm70BgAOQF3f4NBxqeF7SJJeH5QuGp9KDwfEDNiU5lKaUu/ySMozLGe3I98njGxKrlVEBL+Syx0l2GC/2DVtaGHBOhJtPFM26dpcgJcJk/haHmo4ure6WqckhurGNiAYU6136+IxNmMpxuqbc2FY8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=jSyTHznY; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1707845676; c=relaxed/simple;
+	bh=Fezv9DFmwmxfZFn9fuIljtIYUfKaa3W4UMoSVOaOXPY=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=V86PYidr7I1f4VaSpecqkI9SF6iZV/Pz1fVPqS2bB+cFecAlISJPlRdy97KChREpPD//Ezr9hrY56L5s2t/CURnAn+SFndjsQIR004axLzAQFTd12Xzo2WgPQVNfUqzDxVp/kPPiCpVPjyN1wlqaXlprgB9XtwGlmo90sQI0/FU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mgg12TeE; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="jSyTHznY"
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-6e104a8e3f7so283714b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Feb 2024 09:24:27 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mgg12TeE"
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1d51ba18e1bso45204315ad.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Feb 2024 09:34:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1707845066; x=1708449866; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=8XLUuSB3OMz4OtDEw/wq9wIqlJoGF0PKwvDRzd4XmEc=;
-        b=jSyTHznYTizsJJLkDBNnEn1tFnEEfimEe8x37UwmjW5wso19x10HZZY61wY78EdTrW
-         9DyOEA5wzzD5R34w2VihyXRZklBwkrVUFT593Rfr1S3C2wxXn9aiFM5ujSdmB6503qjx
-         q59YdCMVaSulr24jKgyFXy9WDopCwJdtmwL04=
+        d=gmail.com; s=20230601; t=1707845674; x=1708450474; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=4KtpajEjjvfhyqIWxDAYkgzJ6PpmRFpBG0Gtd5Pg3nM=;
+        b=mgg12TeEqOSrmHEFt2q3gpVjUGcdKRAietbnaOyLLN4kSUiz4Px87Co0WGh4uvrcxa
+         cfEZ/n0XQfYSANyhzhCSUpP2EA1GP7LIYzIPbGe6kd7YK5iU4CC34+qtkMiPrkuZXP0X
+         5THXDwlffDkQfHzJ5XsJjWWm9tTiyzo0GA5ulm9B8sJRLYPF4xJRHleYheAa1byv99a6
+         2J4wScxysb2hbK8npSe7RKSywKGd0U0UAeKr6xNii/hToV0Rd1U9B5N2TNS4h8jcQwiu
+         HAn9N3gBM9PvcRQWP9u9n3hZVu2QnQpzixenOxad8tff7jgKseNtfgp0+iYjCXA0GZQh
+         tovQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707845066; x=1708449866;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1707845674; x=1708450474;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=8XLUuSB3OMz4OtDEw/wq9wIqlJoGF0PKwvDRzd4XmEc=;
-        b=B2XBcg13SJ4hRK1fQCeYgXtpaUstwarTikFJ/S5sQGVJ0eSZ4GTXdiblROtB3ozpeD
-         0CYAIXtx5DZqS16ioHsjR4/CLpQdqYdteMwKOEpqSvAoAbkobJT35VLzto53xDpENEcM
-         wvcbCjd1+00AfyBCnnyrX6OdG8/SxUEPkOmewpp5DN186vgH+4des6zAj8/s6HswtzGi
-         BNvvfv70ifgSkh/mT06NdZupmpeWDT7AIb9YPm3JF5Ejp1vyoe4IqdpPpJMpLM/ilEBL
-         5q6B5rc5e8HwAJG49nWWSTit/sI6lRQSmLW161yNCt77VLNq1/2/vZLuU2vHkJfdVIkL
-         pL9g==
-X-Gm-Message-State: AOJu0Yx39hcicKn1O6jzBiz8c8jfWn5DJRfdZ9kwaHAboBrSRfDLCNdH
-	MAD0clKquedXMXHICsSmne3x+iLzYr3agSbdWfuz7UepyuAbp2y2G+9+oOajgI52yWfMtdh3P8p
-	f9A==
-X-Google-Smtp-Source: AGHT+IFdmIO9hfCRggCQg8+KevN9Tmla+FFn050mODC8Y8KpOKXoFLl2B6fcd42BXxVy7VjHKSh6ww==
-X-Received: by 2002:a05:6a21:3115:b0:19e:a270:e766 with SMTP id yz21-20020a056a21311500b0019ea270e766mr335577pzb.5.1707845066416;
-        Tue, 13 Feb 2024 09:24:26 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCV3gdAZrMiwHKmpifH8I6waLmgmEwpS3trwB7VFLzXrxjOa5uNlGnMgRca14Hzd+QYpdvWYn5n9Liwb5rPRx6lgYUkHDUn2+cbT1jg1pJ5Q0cr3NA51wno716+wCz+1Ky7mnxQeNPx+XU919MMCJJL8nnt5gANYBIT/TVmz9WT2lovM+AK+ftEDGREWJSau0qCrGqe62uHuDdpTb6Nd+c96QUpwVeMd
-Received: from localhost (253.78.80.34.bc.googleusercontent.com. [34.80.78.253])
-        by smtp.gmail.com with UTF8SMTPSA id o21-20020a637e55000000b005c2420fb198sm2672177pgn.37.2024.02.13.09.24.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 Feb 2024 09:24:26 -0800 (PST)
-From: Hsin-chen Chuang <chharry@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: chromeos-bluetooth-upstreaming@chromium.org,
-	Hsin-chen Chuang <chharry@chromium.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	linux-kernel@vger.kernel.org
-Subject: [BlueZ PATCH] Bluetooth: hci_core: Skip hci_cmd_work if hci_request is pending
-Date: Wed, 14 Feb 2024 01:23:29 +0800
-Message-ID: <20240214012328.BlueZ.1.I10eda6f375bc8dfedf4eef3a8cf6572c65803afc@changeid>
-X-Mailer: git-send-email 2.43.0.687.g38aa6559b0-goog
+        bh=4KtpajEjjvfhyqIWxDAYkgzJ6PpmRFpBG0Gtd5Pg3nM=;
+        b=rEps/RmpuNZMlrdb7tUO5DFQ/FTR6WQEVn9uDaUZPpVl4pKKv0e736qdsM9kCA/ewh
+         PLJIodSOYCv7BG2f80cHaCT5Iig4PIVKKdSrF25Ota8OHimi2rBv32nTeNoix4HfQdN3
+         mnme/6dB6u+DglelsO5kh7eKEemu1GkbqrXYXZ/Lv5CA+k/rBWYW1/pQwUMl6CCmOOuf
+         q56p3PaMyd8z99YG2bfc9sPomrxflGHLHs/RD71kbxF8fJriXfWUucSV45oo2PpaoHkW
+         e+vUgF7/LBJLN81Xo9TWRLjIB8rkOBrVeQkWgwBYiTyRPAv69t9sd4IXyOMCZraqODlb
+         utjQ==
+X-Gm-Message-State: AOJu0YxMgE2bmvV8LNc5IrcaYphnkCcElXSVdwiFmjHoPuMDJ6zQzThS
+	IgiUMfohF+7EdED4sojQrVTHHwqEPTiS4JxkD7+i6y06zhBBEOACSdq0IBDf
+X-Google-Smtp-Source: AGHT+IFdFkZgWkh1dcjtB+b8jfNFIjlgBpEu2mb9Zi4Idv5cNMXhlTjVMS4epaOeyUBuAwZ4Ge4PZg==
+X-Received: by 2002:a17:903:2307:b0:1d9:dcd:c726 with SMTP id d7-20020a170903230700b001d90dcdc726mr265678plh.17.1707845673658;
+        Tue, 13 Feb 2024 09:34:33 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUNz9R5F3fyNphVo5P6q4b0WB4UZqfJpTruw4wEHOEClDg7K8Y5Li9PqyS8CzS2VVYOpiNRpxj1nGc/F5hUuMSrjao=
+Received: from [172.17.0.2] ([20.172.5.34])
+        by smtp.gmail.com with ESMTPSA id lg7-20020a170902fb8700b001da2f9c6e01sm2357947plb.136.2024.02.13.09.34.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Feb 2024 09:34:33 -0800 (PST)
+Message-ID: <65cba829.170a0220.f010d.81d7@mx.google.com>
+Date: Tue, 13 Feb 2024 09:34:33 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============7130346585997977693=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, ajay.k.v@intel.com
+Subject: RE: [v2,1/3] lib/uuid: Add support to compare 16bit uuids
+In-Reply-To: <20240213215703.21507-4-ajay.k.v@intel.com>
+References: <20240213215703.21507-4-ajay.k.v@intel.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-hci_cmd_work overwrites the hdev->sent_cmd which contains the required
-info for a hci_request to work. In the real world, it's observed that
-a request from hci_le_ext_create_conn_sync could be interrupted by
-the authentication (hci_conn_auth) caused by rfcomm_sock_connect. When
-it happends, hci_le_ext_create_conn_sync hangs until timeout; If the
-LE connection is triggered by MGMT, it freezes the whole MGMT interface.
+--===============7130346585997977693==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=825718
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.32 seconds
+GitLint                       PASS      0.22 seconds
+BuildEll                      PASS      23.96 seconds
+BluezMake                     PASS      720.69 seconds
+MakeCheck                     PASS      11.31 seconds
+MakeDistcheck                 PASS      162.34 seconds
+CheckValgrind                 PASS      227.07 seconds
+CheckSmatch                   PASS      327.88 seconds
+bluezmakeextell               PASS      106.37 seconds
+IncrementalBuild              PASS      662.08 seconds
+ScanBuild                     PASS      942.33 seconds
+
+
+
 ---
+Regards,
+Linux Bluetooth
 
- net/bluetooth/hci_core.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 34c8dca2069f..e3706889976d 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -4213,8 +4213,11 @@ static void hci_cmd_work(struct work_struct *work)
- 	BT_DBG("%s cmd_cnt %d cmd queued %d", hdev->name,
- 	       atomic_read(&hdev->cmd_cnt), skb_queue_len(&hdev->cmd_q));
- 
--	/* Send queued commands */
--	if (atomic_read(&hdev->cmd_cnt)) {
-+	/* Send queued commands. Don't send the command when there is a pending
-+	 * hci_request because the request callbacks would be overwritten.
-+	 */
-+	if (atomic_read(&hdev->cmd_cnt) &&
-+	    !hci_dev_test_flag(hdev, HCI_CMD_PENDING)) {
- 		skb = skb_dequeue(&hdev->cmd_q);
- 		if (!skb)
- 			return;
--- 
-2.43.0.687.g38aa6559b0-goog
-
+--===============7130346585997977693==--
