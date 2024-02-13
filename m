@@ -1,51 +1,51 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42F0E2F2F
-	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Feb 2024 16:30:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39A702919
+	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Feb 2024 16:30:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707841819; cv=none; b=Hqcu8uSNGhy4vMNPNZLL4fFAC+CFjJG/HxDnxcb+AzwPhuwcVplQUa4ENdYQOJutp/zciK2BfSju1Rwo4ZdhKUBKlpsu90eT9j3trguHJjJwiMiQ935vu/j+C101FVdWm/J2bgh5bmyja85+QTmy7dJCP7yWldw74nKyxaAjnr0=
+	t=1707841821; cv=none; b=mQJ3cQIWS8NYie4BL34bpa/3jnZ31iwsbv23rVRsFTrc0nZEvjA0yO3gZgl+rMOyxxUA1LLWh4w0BFDsu+XyieUn0wV/exlYinK6nyCG6PWOZuq3CwPdzkmmZnlDrn/v9Hx6FpjcDDpUbu5FAkML4xqWc5434z4DOMH12pPHYq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707841819; c=relaxed/simple;
-	bh=DFK6r90ERvZBmDjexRZ+0Ca86dXdPjNFRZfJWJqXjuY=;
+	s=arc-20240116; t=1707841821; c=relaxed/simple;
+	bh=2JHVNISoH9PC5E92Apajn8Qk9GGQh+lYA3YlwsUOMfM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=fmuMvAdg9IXclXONv5SoywjaEiOpniUtS6T6wewwusfyyLiHEHvg/2sSjoN0Zl09i6ySmfJFWC2ho5f8QEmDy563WNd6oUBSM/plgwhlGuNG3iiI3tQoF8VQAEmeoxku8A8QjlHV0tB24TytJDC+JdIdjcVK3KyP/ezRaBrjHus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Xg3VJp5d; arc=none smtp.client-ip=192.198.163.12
+	 MIME-Version; b=KSbf2zvFJUoNHRnUnfzVwK2YRR3YdthCrpNPXbVQ/dPPQ+cv9ag2ArG8pPaRzTsXvyMf2vm7O1k9nrzSU6JkHAQkCSMmAntllgVCg22CYwaOK+sbwtmLUD+cfrZiolaGMIhH0FDZYTtfBaWwr7r/R2gSeYq6uZgeeeJEbMnrElA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZL56UuVJ; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Xg3VJp5d"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZL56UuVJ"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1707841818; x=1739377818;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=DFK6r90ERvZBmDjexRZ+0Ca86dXdPjNFRZfJWJqXjuY=;
-  b=Xg3VJp5dS0WF6eRrxVEn7vXGrJQKGjhtWrWgyrAriQky5YLOSUR4GQvK
-   tRbf4p4dhlOZYmVkMtUT+eXEaHckGZ4VfkXd6+gVRhKwBogxbHywgldXq
-   HquXY0YMHwHT6xs0aLpaC2eVo3p8juVzKURPla5MB0zCTmGho0pSOWL54
-   vUT/p8ZX/L4Pt+qols7+eI3/7zqRYHX6MmGkBN1OUIiLOI/ckGprTRhrT
-   vB8YmnK4/s84kefSZ9ImVkHNjqaCLtep6+l7gnZtZ69Oxppy3eIK9W7mn
-   aZmnSjfaVTzvmTfp+1L3biAoR3fI2eBm4KhiGaQ3dokgY8bu6IsTiikbT
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="5629507"
+  bh=2JHVNISoH9PC5E92Apajn8Qk9GGQh+lYA3YlwsUOMfM=;
+  b=ZL56UuVJe9F26iGGDiUEdw57JnnEC8xgth03HrNUNObxzowN2M9zRaYH
+   0UpMEE1taM5Ir8C+neiEAvCqaHs4p0MEoUyARI+obnDTlVtiXphrtAeI0
+   QF7Zq/9b/lKSQ8cJ32RB3eokFDkbrVtohaVpktuLO7eGaUHMXeUmaiwQk
+   /BMIvLOwrznpr5z5yf6EMdWPOvWdfiDjqcgIkvq88zVOHCPMslv//fMmK
+   82hADMpgDs4kf4m7STFKbakTl6ZCNVimP39Pf97wbKekg1hxrr+JhaVBK
+   7Zbi3Tcj8WYVdN/49gkhNKM9M4jk/h08jtMa3AEL0d3MKf+zpcI1QByez
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="5629510"
 X-IronPort-AV: E=Sophos;i="6.06,157,1705392000"; 
-   d="scan'208";a="5629507"
+   d="scan'208";a="5629510"
 Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2024 08:30:16 -0800
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2024 08:30:17 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,157,1705392000"; 
-   d="scan'208";a="2904773"
+   d="scan'208";a="2904785"
 Received: from weba0535.iind.intel.com ([10.224.186.30])
-  by orviesa009.jf.intel.com with ESMTP; 13 Feb 2024 08:30:15 -0800
+  by orviesa009.jf.intel.com with ESMTP; 13 Feb 2024 08:30:16 -0800
 From: Ajay KV <ajay.k.v@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: kiran.k@intel.com,
 	Ajay KV <ajay.k.v@intel.com>
-Subject: [PATCH v2 1/3] lib/uuid: Add support to compare 16bit uuids
-Date: Tue, 13 Feb 2024 23:57:01 +0200
-Message-Id: <20240213215703.21507-4-ajay.k.v@intel.com>
+Subject: [PATCH v2 2/3] lib/uuid: Add GTBS UUIDs for Call Control Profile
+Date: Tue, 13 Feb 2024 23:57:02 +0200
+Message-Id: <20240213215703.21507-5-ajay.k.v@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240213215703.21507-1-ajay.k.v@intel.com>
 References: <20240213215703.21507-1-ajay.k.v@intel.com>
@@ -58,42 +58,41 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 ---
- lib/uuid.c | 9 +++++++++
- lib/uuid.h | 1 +
- 2 files changed, 10 insertions(+)
+ lib/uuid.h | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/lib/uuid.c b/lib/uuid.c
-index 1d2e1f7328b8..9a216e7cef60 100644
---- a/lib/uuid.c
-+++ b/lib/uuid.c
-@@ -120,6 +120,15 @@ int bt_uuid_cmp(const bt_uuid_t *uuid1, const bt_uuid_t *uuid2)
- 	return bt_uuid128_cmp(&u1, &u2);
- }
- 
-+int bt_uuid16_cmp(const bt_uuid_t *uuid1, uint16_t uuid2)
-+{
-+
-+	if (!uuid1 || (uuid1->type != BT_UUID16))
-+		return 0;
-+
-+	return (uuid1->value.u16 == uuid2);
-+}
-+
- /*
-  * convert the UUID to string, copying a maximum of n characters.
-  */
 diff --git a/lib/uuid.h b/lib/uuid.h
-index 8839dea08140..124e74985a80 100644
+index 124e74985a80..8404b287ed01 100644
 --- a/lib/uuid.h
 +++ b/lib/uuid.h
-@@ -242,6 +242,7 @@ int bt_uuid32_create(bt_uuid_t *btuuid, uint32_t value);
- int bt_uuid128_create(bt_uuid_t *btuuid, uint128_t value);
+@@ -221,6 +221,27 @@ extern "C" {
+ #define MICS_UUID					0x184D
+ #define MUTE_CHRC_UUID					0x2BC3
  
- int bt_uuid_cmp(const bt_uuid_t *uuid1, const bt_uuid_t *uuid2);
-+int bt_uuid16_cmp(const bt_uuid_t *uuid1, uint16_t uuid2);
- void bt_uuid_to_uuid128(const bt_uuid_t *src, bt_uuid_t *dst);
- 
- #define MAX_LEN_UUID_STR 37
++/* Call Control Service(TBS/CCS) */
++#define TBS_UUID                                0x184B
++#define GTBS_UUID                               0x184C
++
++#define BEARER_PROVIDER_NAME_CHRC_UUID          0x2bb3
++#define BEARER_UCI_CHRC_UUID                    0x2bb4
++#define BEARER_TECH_CHRC_UUID                   0x2bb5
++#define BEARER_URI_SCHEME_CHRC_UUID             0x2bb6
++#define BEARER_SIGNAL_STR_CHRC_UUID             0x2bb7
++#define BEARER_SIGNAL_INTRVL_CHRC_UUID          0x2bb8
++#define CURR_CALL_LIST_CHRC_UUID                0x2bb9
++#define BEARER_CCID_CHRC_UUID                   0x2bba
++#define CALL_STATUS_FLAG_CHRC_UUID              0x2bbb
++#define INCOM_CALL_TARGET_URI_CHRC_UUID         0x2bbc
++#define CALL_STATE_CHRC_UUID                    0x2bbd
++#define CALL_CTRL_POINT_CHRC_UUID               0x2bbe
++#define CALL_CTRL_POINT_OPT_OPCODE_CHRC_UUID    0x2bbf
++#define TERMINATION_REASON_CHRC_UUID            0x2bc0
++#define INCOMING_CALL_CHRC_UUID                 0x2bc1
++#define CALL_FRIENDLY_NAME_CHRC_UUID            0x2bc2
++
+ typedef struct {
+ 	enum {
+ 		BT_UUID_UNSPEC = 0,
 -- 
 2.34.1
 
