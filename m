@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C60AD6166C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Feb 2024 20:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BF9D4501B
+	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Feb 2024 21:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707857429; cv=none; b=T+2/1+L3r3PwjCNGKmeHw7bJQb/aiVQ+FJxfZI9KFwqiDWy/I8dWndac3JhWXmQSGXICFl1ViiqOX5w1IAMv//w0zUJiOsqbux6Al/unELQxpVtcylcxgvq+4JYEgAO3dk3+KrMlYFD3A/Y6EV8BXDx2h+lRByBJFhof034OiBk=
+	t=1707859830; cv=none; b=mxLTppFrER3O7k/DZtbE6jHCsMHSVwgzwItX684A+b2xa/sIkO7nQyHXfrklkz0bLFcv7iUzZvq7B/6PWAQjNdUNM4FImWUwIgOsimm0FPgTk5FO+UaFNQnC83KwrEFmWlpy4bAHCoHIp+dpnAm/kcGRNOM/MYQEGrZtXtd3DgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707857429; c=relaxed/simple;
-	bh=AWyCEKeD8HHzHAQtuLt12GDezweuJswgyj7aJeufyNo=;
+	s=arc-20240116; t=1707859830; c=relaxed/simple;
+	bh=4nZXIbP/Xp9zqm76i4PvDtN+49tHCGOqgndya7j8rQE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LIx4wuHDNutNAN4D3508n6GRqu8yKVanWLCYJrP/o/bzFm2XC63Tzuxk1HOIVNyQYaZ+qnfN1hI7EyEa6+P6ZZNNQnNzlPJZDESYEF/VqtizZLsk9YQw2SmL+i+5AekChhqzvRbQPEYNnyUTIS38GdsusBFTM9Wk/vwkQKV+D14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g+e2Qlr+; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=to0HiSwjhk2Irhj22/vMbLAtKsX77V1r5Tdl03/XJO/XECwJOpChDs1fcZpLJXm5VKDQvV2E9XtqS6bvibPdD97bUXNWNosndbmkIBr9vAbIpRr+6Zq0MfBUKwLS5ULopXOQGkeeWY50Jf/ceu++Gf8SxZRu7ARPda+A2V7b1Nc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sqq233rx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g+e2Qlr+"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 22C3BC43399;
-	Tue, 13 Feb 2024 20:50:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sqq233rx"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D5607C433F1;
+	Tue, 13 Feb 2024 21:30:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707857429;
-	bh=AWyCEKeD8HHzHAQtuLt12GDezweuJswgyj7aJeufyNo=;
+	s=k20201202; t=1707859829;
+	bh=4nZXIbP/Xp9zqm76i4PvDtN+49tHCGOqgndya7j8rQE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=g+e2Qlr+iQA9gBw5j3w5ACQTQ54NWz8Pkqs9dJ7YuRQExNtblGmUj1kUSeMe8fOAO
-	 fEGlFkS1Cos1qzCnt8lCpeKDYQ6CFOBiJOs6QAaSzqgUuGXiCW14wi9PP5dKwOt4It
-	 6MRoxC8Se1+lPYi2dBLHxP8v3UxRubN1Kz/rKpZDBPFxtSTnoyb0l9me6+SO00Vn8Q
-	 QrIwliINTl7QHl9V31zNOmNsgZZChXBKXz19Nwh+nGKc/kzq3hmRiJRx4Ii6CrsC+z
-	 rdiKGdkJHvKbaILZAphAffLzoFimevlN6xiDvMOS88JfE99PU3vx0kpio1CDfyC7rs
-	 rMDcCMsNU7ZhQ==
+	b=Sqq233rx5jImykqe6JXPjCBFm0gc2YOKbeCujXok4NpvZc6/U047h/9Fw8Oy0+2lh
+	 ze8Kog8k01LFWeuxgVFpOJcz1igOouPeLiTvZo01wuSCpoiQLHMBuY4KRuY876qxIW
+	 WBKGqybZXIRSEt7YFhsT9fXpdOyYAoLqfyIup+9VG7q17IhNW0C/M+wpfT2dh9gEsW
+	 M3Td1zkGU61siweAFqjT8wmZKG5KO7vR8VRBqiZF3v1MO4VkSd1De421WWguSipWvb
+	 TXmssyrbehtXHmdGSqAOcuRNLqFCZPEI5w2CPX/GoseNbKfAJbs0WXbk5FW/lMzoDl
+	 f7ZN0wn8mrJNA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0C189DC99FE;
-	Tue, 13 Feb 2024 20:50:29 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C3B63D84BCD;
+	Tue, 13 Feb 2024 21:30:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,38 +37,30 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ 0/1] btdev: Fix set PA data array overflow
+Subject: Re: [PATCH BlueZ v6] monitor/att: Enable the notification logging support
+ for the CCP
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <170785742904.22526.6089462734795932052.git-patchwork-notify@kernel.org>
-Date: Tue, 13 Feb 2024 20:50:29 +0000
-References: <20240213155803.3159-1-iulia.tanasescu@nxp.com>
-In-Reply-To: <20240213155803.3159-1-iulia.tanasescu@nxp.com>
-To: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Cc: linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com,
- mihai-octavian.urzica@nxp.com, silviu.barbulescu@nxp.com,
- vlad.pruteanu@nxp.com, andrei.istodorescu@nxp.com, luiz.dentz@gmail.com
+ <170785982979.10780.15160156427132415024.git-patchwork-notify@kernel.org>
+Date: Tue, 13 Feb 2024 21:30:29 +0000
+References: <20240213045304.1558991-1-shahid.bashir.vichhi@intel.com>
+In-Reply-To: <20240213045304.1558991-1-shahid.bashir.vichhi@intel.com>
+To: Shahid Vichhi <shahid.bashir.vichhi@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue, 13 Feb 2024 17:58:02 +0200 you wrote:
-> This fixes an array overflow that can happen if the user issues the
-> LE Set Periodic Advertising Data command with data length exceeding
-> 31 bytes.
-> 
-> This can be noticed when running the Broadcast Source/Sink scenarios
-> in bluetoothctl, using emulated controllers: If the source BASE
-> exceeds 31 bytes, the PA reports received by the Sink looks something
-> like the following:
-> 
-> [...]
+On Tue, 13 Feb 2024 06:53:04 +0200 you wrote:
+> ---
+>  monitor/att.c | 669 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 669 insertions(+)
 
 Here is the summary with links:
-  - [BlueZ,1/1] btdev: Fix set PA data array overflow
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7c49568a2758
+  - [BlueZ,v6] monitor/att: Enable the notification logging support for the CCP
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b097bf6d302e
 
 You are awesome, thank you!
 -- 
