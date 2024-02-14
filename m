@@ -1,97 +1,152 @@
-Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
+Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com [209.85.219.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADA0213A862
-	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Feb 2024 18:57:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9118134738
+	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Feb 2024 19:15:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707937048; cv=none; b=M17QO2Xrtdzg6oS+PRInD8ccpaw3SmUw2RB+py65SFKT3Q4HzSYZa7pteSQqCTC1TtjiofK3f9W3dDZ89z16ES2/BQe1lkQKH5bana5UrHZal56LWytvLRKRfmCiZGtI+HD0AonKG0jUVEcOxg3ShT/gQnufi+uVy/mtwjLtg7Q=
+	t=1707938121; cv=none; b=EhSqv7kpCQtkr+LzWJKL9u1Mth6ecSkR+GFt4i8O87UuJ3+AJyea7e341QSRg4EFodtm2kULMH0DKpY9UuOaV9KAnjxHcXhdVE6HtWL3jrje5yLnMHPga6+DJU3jAfaoDHPKx5JrXZpf5AGR3XbJ901O5+wLoA9f/YeR8lydR7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707937048; c=relaxed/simple;
-	bh=r/Gn9VbMpL6x26byGJzklBtxknH+tR8PM7yN/yyGzK8=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cCMZ1oBmhgExpfjwKUMFtQlHe1X0/WZnu1fgWezeJgv/J8RM+KrbGKZeMiFSHDztpsHTu21q9y5mc4dc1wvxywCzInqcplkMRv3iTlHdF3IuGA/Mgb/4zaSXCUnBFzdbpfgO4x1mnO1xtdoSnQ3C+vty+0cKQFRqH9CCDty88aM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VO0A4oLx; arc=none smtp.client-ip=209.85.221.176
+	s=arc-20240116; t=1707938121; c=relaxed/simple;
+	bh=Iiu6HeM+xC+X02aosnt3RGvyIHNqV7xdRmX7KINkAlc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XDpuhPfsu1AGHhLv6Bo0PxWT9WUF3YGZmk9bXsp/X0JGZAWrE/2Y/G6GzWucih11dYzHAl2dJQCijqTOc81XEEJggui0PG7uy3StAioRNNpz+4P4upIZkAJjva7jj4T3UV3uqhqcHWaSCWiPr1KSxsnpuAoAPX/Fk+mc4IfwZfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RKMCCHEI; arc=none smtp.client-ip=209.85.219.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VO0A4oLx"
-Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-4c02779e68cso16247e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Feb 2024 10:57:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RKMCCHEI"
+Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-dc6dcd9124bso7051276.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Feb 2024 11:15:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707937044; x=1708541844; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KjNeV6w5HrSFdRZEhg9X/6qYQX2xBJuhTWIha7DaqKk=;
-        b=VO0A4oLxVZ3tJh0v4NpZs0gVajNCH0foIMFAp3ZM1gi4QFDExSS+sxsZsqNvRvfbxI
-         d62EQXIQ4CMMdoAK2blM3f5YywLrs6pAzaFFQzVUmE+2MfOn0aShzN0xWi5R4ZYaplFq
-         n0EBFU2f5WkmSZb6CwcYdbubPLPj0R0ZpCCnM1+p7ksdW9UEhgwcyD4DY1eAS1AxRTgb
-         H+1O5a2kWAE1KnEtWV5cQUoCFHV2i5CvD5L8ec3sACg4NMXWhkK0rI/4x0x9bcZ8tbEL
-         R14lGOU6/H85lZaADapemRn/tm4gpaijjIqJhPxisqlwPvBDXUEgCsLxKMQhI55iIIoI
-         6WNg==
+        d=gmail.com; s=20230601; t=1707938118; x=1708542918; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2uoiHmGBEdfOYqNMigscx7wscxRdugOSeoXoJLPq0Ws=;
+        b=RKMCCHEIQ8TRFCZnYgm9nzX8IQZvH2zlgQGB3bk+uApMgnQjBJD+536pm9m111yASN
+         gjoTmVqOjPwfc72l1B/sRya+Cqq9t+FqAm0LbAoUfLjKSPhTVMQPWcYWp56dyJ9gyMMw
+         u3CgdqOhH96Y+rNY6J1eS1qszPNzHYFPJ5R9bB9ULsqOJxXnSAyADV70TqEUiHDpfJiE
+         4HJ/+6PZND1R3VYb4XH3GAEHqg5j7GFEotldfSiEWTPh/AKZyou5ywkgZ8hd5Y8wPmGG
+         NHQn5RK0ULQ5y5z2qDYUhALTe6FGnkNWuKZtjK+QGnAj02u4Cmx+CtsIqDsLUWi6Kgl9
+         wWww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707937044; x=1708541844;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1707938118; x=1708542918;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=KjNeV6w5HrSFdRZEhg9X/6qYQX2xBJuhTWIha7DaqKk=;
-        b=RfcACepB41ro+zEOlGgL+eQQxSDmMWdLpGnwAnPFwPD5QR96Yef2wyitlMlo/zFYY/
-         SPcH+itTZwt1HW5TZ617XgUKDw6fNRPTg4Dwfd+DOHklkIDqSomF0wyk+eavxBo1D5kW
-         rdLrK/+OBcWNlQ0GOpKzJwN4ORkXT4y2N5DkVTj2W3Gky9e/SN+xWF4xgOFKg2GkjKb1
-         1cF/Odazp315wqx0AxBLua844JJ5Sf/O9NOd6xUS/Nzco9qxnYYYJaVVwjbfhn4BEksn
-         dosbnmT0lozcH0wumyjaRKOcW7oCK6vKaov0zJCNff7aeU2EWC64JsVTNfj3fmjVO4SO
-         KfaQ==
-X-Gm-Message-State: AOJu0YyWPJejflXLeaAkXgGjwKE4FJBLNu/DkCOHMN3y18QYqquCEYxX
-	itq5XljHwbJCxE3xe40ZW1jeqGChwtyS4otu2aaheL+HUQjAzcgSvN1wqgoF
-X-Google-Smtp-Source: AGHT+IHBh8XvuI+bD/7A50TbQSr0khRajFaMqgdsI7WEjMq4mbnxDxPT0bgeVAWV+Yzq39+TCL24Mw==
-X-Received: by 2002:a1f:4943:0:b0:4c0:23bd:1f0d with SMTP id w64-20020a1f4943000000b004c023bd1f0dmr3434913vka.15.1707937044291;
-        Wed, 14 Feb 2024 10:57:24 -0800 (PST)
-Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
-        by smtp.gmail.com with ESMTPSA id l5-20020ac5cda5000000b004b72c016c0bsm1309545vka.5.2024.02.14.10.57.21
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Feb 2024 10:57:21 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v5 3/3] input/device: Don't destroy UHID device on disconnect
-Date: Wed, 14 Feb 2024 13:57:18 -0500
-Message-ID: <20240214185718.536748-3-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240214185718.536748-1-luiz.dentz@gmail.com>
-References: <20240214185718.536748-1-luiz.dentz@gmail.com>
+        bh=2uoiHmGBEdfOYqNMigscx7wscxRdugOSeoXoJLPq0Ws=;
+        b=oD2Edzru3gX3jF5lhjfhc0FggMQd5ByetHmXHeJqavwBUV5EvA33NGu3txPqkiqIG9
+         gTgNTMrYv3Jzi3vTH8gCNFUzHVGgfEn/xteb+L5m3NIZrmbRVlYmHvnfgXVOEPBDoVpQ
+         mSDwrc7okfgD/oNgsR2JDMPJJwnFGRxpG2tG36X92Yg+X6fJFXcwt5sZv/mpxSC+Tw5M
+         jBD82sac2nFbslUeMRB/QYYdgWKrky6/HZreCOaBg+LlbhT0pwtIYw9gNs75GpDAln4Q
+         deQipFvZIRTeLoijUfucQGwnjkr86JTzBVVtULylalArJ8Bd+8rg2Ktf7NPBWmwsnygZ
+         tI2w==
+X-Gm-Message-State: AOJu0YwJO/p2NQs6Lpuhjk3R8bOx2id8gBe1NESe5tKGCvtAEA+PZVlc
+	Op9RSRtjLtDUp1dRTCv/C6Lbjbe1eYQmltgH8d7YRwVwMnAcqMNbSumgpW89YvcXGlJlgN/sez3
+	H4MhhYO2KR45O4GteIy6uxxxDKqo=
+X-Google-Smtp-Source: AGHT+IE0C5t3epe/BERcNk1u8+WuZHwWOWhm/1L1AAFzf3sLVLbGk1cBgAAitM8/buJM9VIK9T5/4bVOB0zvuz+RVoc=
+X-Received: by 2002:a25:2e06:0:b0:dc2:398b:fa08 with SMTP id
+ u6-20020a252e06000000b00dc2398bfa08mr3146840ybu.31.1707938118646; Wed, 14 Feb
+ 2024 11:15:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CACvgo50dSAw_L3uC7WST_+9ixMWLBdfVJc8cQNQNZ48dWdUijw@mail.gmail.com>
+ <CABBYNZLrg=gYTuzB=u60_AJPSQ6YVs87u1s47fjD6v7S45M3GA@mail.gmail.com>
+In-Reply-To: <CABBYNZLrg=gYTuzB=u60_AJPSQ6YVs87u1s47fjD6v7S45M3GA@mail.gmail.com>
+From: Emil Velikov <emil.l.velikov@gmail.com>
+Date: Wed, 14 Feb 2024 19:15:07 +0000
+Message-ID: <CACvgo519JTmp1B4pMGJzHyeVsKzBxyC9ODqq9SFmcxspEX7_yg@mail.gmail.com>
+Subject: Re: Re: [PATCH BlueZ v2 00/10] Distribution inspired fixes
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, 
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Wed, 14 Feb 2024 at 18:01, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Emil,
+>
+> On Wed, Feb 14, 2024 at 12:04=E2=80=AFPM Emil Velikov <emil.l.velikov@gma=
+il.com> wrote:
+> >
+> > Hello Luiz,
+> >
+> > Due to a bug in the CI bot, I've scraped this off the ML. Hope it's
+> > not too badly formatted :-)
+> >
+> > > Here is the summary with links:
+> > >  - [BlueZ,v2,01/10] Return at least the title attribute from player_l=
+ist_metadata()
+> > >    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3Df2671bf8f=
+951
+> > >  - [BlueZ,v2,02/10] adapter: Remove experimental flag for PowerState
+> > >    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3Dd3aeae79d=
+e4b
+> > >  - [BlueZ,v2,03/10] test: consistently use /usr/bin/env python3 sheba=
+ng
+> > >    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3Dd31f04aa9=
+28a
+> > >  - [BlueZ,v2,04/10] profiles: remove unused suspend-dummy.c
+> > >    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D1313351f7=
+144
+> > >  - [BlueZ,v2,05/10] obex: remove unused syncevolution plugin
+> > >    (no matching commit)
+> > >  - [BlueZ,v2,06/10] obex: remove unused mas/messages-tracker impl
+> > >    (no matching commit)
+> > >  - [BlueZ,v2,07/10] obex: remove phonebook tracker backend
+> > >    (no matching commit)
+> > >  - [BlueZ,v2,08/10] build: ship all config files with --enable-datafi=
+les
+> > >    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3Dbe0e79629=
+9b0
+> > >  - [BlueZ,v2,09/10] obex: Use GLib helper function to manipulate path=
+s
+> > >    (no matching commit)
+> > >  - [BlueZ,v2,10/10] Allow using obexd without systemd in the user ses=
+sion
+> > >    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3Db16b19885=
+c53
+> >
+> > Massive thanks for applying the above.
+> >
+> > Out of curiosity: is there anything wrong with the few remaining ones?
+> > I had a look through the ML archives on lore.kernel.org as well as my
+> > inbox and could not find any replies.
+>
+> I don't think we should remove the syncevolution and tracker backends,
+> they shall probably be disabled first so we don't break platforms
+> still using them. As for the GLib helper I don't think that is really
+> needed, at least there doesn't seem to be a problem with current
+> handling.
+>
 
-This makes classic HID behave like HoG which keeps the UHID device
-around while disconnected so it doesn't have to be recreated on every
-reconnection.
----
- profiles/input/device.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Unless I am missing something, all four backends/implementations are
+effectively disabled and unused.
 
-diff --git a/profiles/input/device.c b/profiles/input/device.c
-index ff7e3482d0eb..0d32b705bd00 100644
---- a/profiles/input/device.c
-+++ b/profiles/input/device.c
-@@ -985,6 +985,10 @@ static int uhid_disconnect(struct input_device *idev)
- 	if (!idev->uhid_created)
- 		return 0;
- 
-+	/* Only destroy the node if virtual cable unplug flag has been set */
-+	if (!idev->virtual_cable_unplug)
-+		return 0;
-+
- 	bt_uhid_unregister_all(idev->uhid);
- 
- 	memset(&ev, 0, sizeof(ev));
--- 
-2.43.0
+Ignoring the first that you've merged already, the other three are
+syncevolution, messages-tracker, phonebook tracker. All of those obexd
+specific and have been practically dead code for approximately 6
+years. In particular ever since the obexd git repo was imported into
+bluez, they were never wired into the build system.
 
+In order to use them, one has to manually hack the bluez build system.
+Furthermore for people using the release tarball, the source files for
+syncevolution, messages-tracker are missing all together.
+Based on my archeology session - distributions (Fedora, Gentoo, Arch,
+Debian and OpenWRT at least) use the tarball and none of them change
+the build system to support/enable these.
+
+So I think they are pretty much safe to remove.
+
+Will have another look at the GLib helper and reply inline, with a
+specific example/failure mode.
+
+Thanks again o/
+Emil
