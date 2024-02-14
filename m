@@ -1,53 +1,54 @@
-Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07BFA2208E
-	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Feb 2024 21:06:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A7E01DDD1
+	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Feb 2024 21:31:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707944812; cv=none; b=TjkBy1AztxgyXG19dBZNUz7dCc8W7QXAGfi+n5JslaAGnjmn5JI9baife2NsYRrrulW3+wDB6H433t/O6qFja9fFI+OLWklu7DctgxpQmlS/efCIqZiuF24LNrJSl81qgQhkMiZ3Wjbkm7fxDe8OFm4n81DaHfSbsz9vHxRHM8Q=
+	t=1707946275; cv=none; b=pd/T511Xf+eMZ1So8Gy1zZtnyuEHki+l321w2I8Fg6G399odmH7V8Fi1m9CpIFnYvWKcJAAXHMuOCikeJU15UVmbwRYA9Pxj8xoWJ9vLfxMMVeGIum6zDYcO/SKon4Dnabz5FjqWLOipMnq3poCWS7ii2W3WE8q2hvMBOiu3fwo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707944812; c=relaxed/simple;
-	bh=IN+H7RnnTKNNPlLRX6H51HgpIt/dc2dh0GgRGB/TKt4=;
+	s=arc-20240116; t=1707946275; c=relaxed/simple;
+	bh=Gy+OGNTCx3H1idd5FB3l+q7sWQJVI8n/OJ9S2WHm644=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cbIgc0NqeE/n37w3nfdhhtMBLr60taPJ6C5VC7nj1J68IP5V5x2jRjS8HKmjgRmn07a0BsOJs7BA54qRLu92V0bkRda6bAGTW6sXxeIKB1yIxxhIVcPtGjHUbyPneZyXOCsoVeJz/GKrPy+vhKSnu8DBgDFaBCSVkLGdy7cClGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RTRMozgO; arc=none smtp.client-ip=209.85.219.174
+	 To:Cc:Content-Type; b=ie8v/4ZjKkPK6X26tifxjjv67enbL78Kac02PRJBn8dmHbgqVls7itFUhG1cXQCmSerJLia9XkBAn9rSLGa33HBQPN67m5WTD+zTCEpHxOTm3gb46CWVbo+HSg1V5/dgaJBawE3RmtlulgPfrPX24gJHW5WcsaXFc3ayzzJj3KA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CGtMT7OC; arc=none smtp.client-ip=209.85.208.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RTRMozgO"
-Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-dccb1421bdeso118114276.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Feb 2024 13:06:50 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CGtMT7OC"
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2d09cf00214so2497651fa.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Feb 2024 13:31:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707944810; x=1708549610; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1707946271; x=1708551071; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BmbP7b9Cl3ec1oQPgrmikyiQyFnVTwUTRgUG46RJxPY=;
-        b=RTRMozgOIBNXvkJj+1Lv5Y61MrY/ToVqWGNQh10I4QqNSw2KuMqg/6JDWj9EzpR7fC
-         UQmZjvYbxtkif03VHWawh+cuBIMrOuT2KLdqY8VMdCMT2xgsyEw4UspWXlkT/yGc/fdH
-         U6mWIIrMdcl9TzQ+aLVV82uhcqjTz6TNJhhF8QKCNWCCzo3a0TvRfooMWShZrm7Bv7qm
-         VoChWeXrNtHE4j2mBHJ7NiWTo6BKVzSE09zZyCk7Z3VGFDyQOw3k+t5ZSrJuKuk29V4+
-         XOc27AQzkHTdxTETNLAFsOTtVEMurU/kMxjDvVI4cNw5cMp/GVQlxBqV8j6vd/26JmAz
-         IxDA==
+        bh=csM9axeDLOPQLVR+5CPb4QOrx/yIBFftgAYOqNInFp8=;
+        b=CGtMT7OCjL42c+W+TdgRQyaBZ5bgZ6Htssd+kW01HdlmL9wRP7ceOP0U1w+KLF60Jg
+         6VMmR/KIMWFF5YJPTVdtca8KNMsupO4XTPSFzo/SvXZRpzEuq6pqMNRq5Y0MwaOXbnt6
+         qBgGYp3PlS+MApG0DJXPCYrOewqITObkR/3XJqFyX7Ct8qTSd5yKY3e4M31fl2zxaZ+b
+         5e9/DbH5lEDty19hh1Y1baC9P5ZycMfiCUV5bNzwFO7czNwzlyDDk1JNSW8fm3Erc7Gb
+         /FXOsXKCwueSUmQzA09mas7UI0EJySNBw9R+fR9bvP9LrWhp51OH60SYurd9lgP6j4B5
+         4N8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707944810; x=1708549610;
+        d=1e100.net; s=20230601; t=1707946271; x=1708551071;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=BmbP7b9Cl3ec1oQPgrmikyiQyFnVTwUTRgUG46RJxPY=;
-        b=Xz5JvWNTLHhrCp1cnYsL2HgiFyFD2tYgvFn3GdjuqjGIRacWTkspWlVhNrX5b8w5jP
-         covcjtoSMrnqmoVnOaIuiu9zEEupn/iTPdRXe3Dji544yfuzL8T65C7FpmjRNFI+7zLz
-         YcX/grTk+TUltvBWPYGfnx8NNjbi5RMU4AztKda73mm27cL8X/oMRfJHLfzdGToffdEG
-         cMkwDXiz23Ok+tFuTAz0it53ZUuXydAlaw9Wy0CJOX/Z9K4jCERpiuikeksVERvynKok
-         nuGjb5ac7hgGLitFxDfWBiQ+2bstjL/BiH4kyS2zgoQjlyjKpBx8t49AabmTP0EKaAJC
-         UDHg==
-X-Gm-Message-State: AOJu0Yw5CIZ7sqgyFibBE3zwDMDrHhppHJrUdryjj033V2L3PTahY159
-	2JAgx7AbhikeLvryrb1H7nUVM6vXwc21fMDN3ZHNvE4uE2xf774QBDVSbR0sNES04EfUwlnTRlX
-	MJX+tNIZClqIa4rGwpdwMx7C738A=
-X-Google-Smtp-Source: AGHT+IERh2IEKWKaAWU239Uql2Tl2Nrig3W+vRDiLhx10KamwQUgCC0/tJSUrivP6XA/KIh94WVH+XPM6DKhDxswCcE=
-X-Received: by 2002:a25:aba8:0:b0:dc7:1d:5db4 with SMTP id v37-20020a25aba8000000b00dc7001d5db4mr3464744ybi.34.1707944808653;
- Wed, 14 Feb 2024 13:06:48 -0800 (PST)
+        bh=csM9axeDLOPQLVR+5CPb4QOrx/yIBFftgAYOqNInFp8=;
+        b=d6fyfilh0yunHPO859jYJljUsa3lZF5oA8AcLnCwNcx4k45vJR1JD+fEC5zKDa1heM
+         7ebYET3VrQe1480WWExdXzUJpP3Y3MNeMG32tXK/iEC3NpA+oX/EDlm5TKAcdhZKdJdz
+         2UVFePIaAPyic1oTj6L1HTV9fPVqh1u4NdJfEZEhA9XvokNv6nk+/HjrmRQFfmKOU7mf
+         Xyf7UTLbZSfviOvlgCBH39gkAHFurO67Lfqe7Q0BliRaGxyNVYfpSrMi+bF44U1KkwO9
+         Z3C4LGvDZEWFUSgAdmh36T0L/+yduD6f30TDT4QABEafD3s70eGoy3OfugeCVEwmZjJd
+         Zk8g==
+X-Gm-Message-State: AOJu0YzyN5qT+C/8SRtckgbUdj2WHKperqnHj0c4QV2ucgdy0Faba1v1
+	PDuFpQWFMqVmCN2qQaPyENofW0qhsDxZcRZKsr+ijf5lZ2zq/gtm0lQsDl+BL1IzAqSzgZAgxSo
+	2xjWtVDMOuu60mg+4ve/z1iaszlg=
+X-Google-Smtp-Source: AGHT+IHZ/Pb/ndqiajSs64y/Op0x0P3A4IWvTX5vQ2v219jNd2Ogfj95h2jFg7EfiEwsgqK7LRSuaqrmqI6mpg0NoYI=
+X-Received: by 2002:a2e:9891:0:b0:2d1:1d7d:9e51 with SMTP id
+ b17-20020a2e9891000000b002d11d7d9e51mr1826347ljj.11.1707946271181; Wed, 14
+ Feb 2024 13:31:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -59,18 +60,20 @@ References: <CACvgo50dSAw_L3uC7WST_+9ixMWLBdfVJc8cQNQNZ48dWdUijw@mail.gmail.com>
  <CACvgo519JTmp1B4pMGJzHyeVsKzBxyC9ODqq9SFmcxspEX7_yg@mail.gmail.com>
  <CABBYNZLkJziPw-_pdmpHWzf9Xi3EcWsZ2SLiLo0PtctkqW92pg@mail.gmail.com> <CACvgo52uHwf-0UZbdNWukAvjnNFTvrYTY=f4Yx1raYQjmVyUzQ@mail.gmail.com>
 In-Reply-To: <CACvgo52uHwf-0UZbdNWukAvjnNFTvrYTY=f4Yx1raYQjmVyUzQ@mail.gmail.com>
-From: Emil Velikov <emil.l.velikov@gmail.com>
-Date: Wed, 14 Feb 2024 21:06:36 +0000
-Message-ID: <CACvgo51WwzAa7M=sjLyh+mKQM2=V6pOgBwR6dtWQ2Dad9mv1Qw@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 14 Feb 2024 16:30:58 -0500
+Message-ID: <CABBYNZLe6R0T90SkOqVyBpwO4p0ZgeR0=jyBtyAcoQvKX9YwWQ@mail.gmail.com>
 Subject: Re: Re: [PATCH BlueZ v2 00/10] Distribution inspired fixes
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Emil Velikov <emil.l.velikov@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org, 
 	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 14 Feb 2024 at 20:48, Emil Velikov <emil.l.velikov@gmail.com> wrote=
-:
+Hi Emil,
+
+On Wed, Feb 14, 2024 at 3:48=E2=80=AFPM Emil Velikov <emil.l.velikov@gmail.=
+com> wrote:
 >
 > Hi Luiz,
 >
@@ -164,7 +167,10 @@ d
 >
 > I think you meant to say s/work/is allowed/ :-) Commit "obex: remove
 > phonebook tracker backend" bans this as an option.
->
+
+Hmm, I don't have anything like that on git log, do you have the actual has=
+h?
+
 > > even though it doesn't track dependencies
 > > particularly well:
 > >
@@ -261,10 +267,12 @@ n_get_direct'
 > fixing the build and properly testing.
 >
 > Does that make sense?
->
 
-I may have gone a little overboard with the amount of information and
-references ;-)
+For messages I guess you are right, we can just remove them since they
+were never really used, but at least the phonebook-ebook was used at
+some point, so perhaps we just switch to use it by default, so we can
+remove the backend options, etc.
 
-Sorry about that Luiz and team
--Emil
+
+--=20
+Luiz Augusto von Dentz
