@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 292ED13F018
-	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Feb 2024 22:01:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2937113F01D
+	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Feb 2024 22:01:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707948095; cv=none; b=IB0U0UM6Sc5UvS7ZM+YAMDBx0IZNjnqL6mi9iz399dpyGns9X5mVY6QQWCSOGE9dXYwHBuT6MXHt1UpFaB2XZd2S8Y/w7XQmCATb2k8Z2GNedUSf6aoV2wlR7WVDpaKP56ycBcghBuKKmPx9ShqcUCHKRspBDycwOWhGXGiqVow=
+	t=1707948095; cv=none; b=dypbWhGRtMt0SIq7nKTQl7AyzZ4nyA6DJSjlJLdM44wNy/KISbGJhcQDkWlpFnZZNzNFkxnDtEsIgPCMqQd3MLEIXKHBRELekiXzG/gAewKD7xgKfJZn+Fdxd51/I09++7DgzMQi01ReKxlFb1ZyDptfambDoxmPDJqTNZKOo3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1707948095; c=relaxed/simple;
-	bh=QJnN6/Q0YpDS2ZB48KtZY9zuzZ9BzMPOx38uuHOHJkA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=JoKBjtzpS+5lmrSPMpYUTGfbr711XJfDDkLVJonJYKwVXB2pxv5C+6He1K31J7nP3LyhKx0e89oTQ19DGeyWxYXQ81JITf5Os3Q5V6n7FpVrqtT24REgbuXMsKf6YcyQ2+ahU+XhTGOuoSsA7eUS6xKtVn/PAlSwWoq0/Ir85JU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YYYO10rq; arc=none smtp.client-ip=10.30.226.201
+	bh=6+21W/GlIOBI4iHR5i89+VKDs8ZAU79zcgZrIeB3E4Q=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Vt5ffLPSgslyuOhnOzl77QSo1C/QTKE0JxAQ9FKrO4xUvbJeKXfe4U0tfN0IvdjE1SaddSXFV2zxH98AgPELPzWF31Pw6243rKKeO3i9tOviGPXMFcYUifRN7Trhj6CZKnDDYY5XqwgkA5KjLMCbMhmYCsJhFivSTOLHSDONE7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L2z3LW4y; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YYYO10rq"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CB83BC433F1;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L2z3LW4y"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A86CBC433C7;
 	Wed, 14 Feb 2024 22:01:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1707948094;
-	bh=QJnN6/Q0YpDS2ZB48KtZY9zuzZ9BzMPOx38uuHOHJkA=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=YYYO10rq0hAJvFbMIpP+2Lp1VV83v5mtjURhybodG2G82jdg6VumOvoc7hN01YCI2
-	 nR48a2GpzdiVrveNQhju1ru7ZUnGry+MdrNvREzK/CCRhuaj26bBZDLG1FZWvx16Xa
-	 fUrjVf1hg6n+lxHkO9mSAlrfuI7T/JoppGWajOjwL/PsAqaoSr5nePFjpa3NvXoDH7
-	 q1wybs8ydthinkyjOulogO7eB26WH1gnPf347CAYWnodO+V6tM1lRyzL0Hue7G+Dkc
-	 5QrdkmeeufL/BUFtE97HXIeeGyvvoHc6HO+x/IhCmHCns/UsW2XsAHfdKGH0KSS2pc
-	 MHjlHw2bphkjA==
+	bh=6+21W/GlIOBI4iHR5i89+VKDs8ZAU79zcgZrIeB3E4Q=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=L2z3LW4y2mxpAN+7mTdvpnyumVZZs+OCDcngjAa/ux0cesbgX//0SiVIQ3NDCgcdm
+	 JPC4s/VeHHxLUA63x7QTIvkZkYlFMOJHlQYxoH9Z6wuSFY4+vPfEfNGj2xdRoP4gNa
+	 MohrxqD4inYZPLiGq2Baiq8iEX4ugIs35COKE2BUdMwgTE68xhbEPcyjDcoift6eXd
+	 JTPoD0sLgIh0OtAigaFABoo9WDf5f+s9ZKqh8k6Ocp2RfiUFR3bDZYSUkQTsbjD0mc
+	 q0v7ebhCHhdLZ9yOEpFD8KidZAQCXjVj2bgjFq0ldhz57AB76qAQdsj4HrfQLIAC5Y
+	 Lk+eJWfPCT9vg==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A18A1C48BC3;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 878A7C48BEB;
 	Wed, 14 Feb 2024 22:01:34 +0000 (UTC)
 From: Emil Velikov via B4 Relay <devnull+emil.l.velikov.gmail.com@kernel.org>
-Date: Wed, 14 Feb 2024 22:01:24 +0000
-Subject: [PATCH BlueZ 1/4] build: fold separate install-data-hooks
+Subject: [PATCH BlueZ 0/4] Handful of build fixes and cleanups
+Date: Wed, 14 Feb 2024 22:01:23 +0000
+Message-Id: <20240214-hook-fixup-v1-0-0e158ffea140@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -40,17 +40,17 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240214-hook-fixup-v1-1-0e158ffea140@gmail.com>
-References: <20240214-hook-fixup-v1-0-0e158ffea140@gmail.com>
-In-Reply-To: <20240214-hook-fixup-v1-0-0e158ffea140@gmail.com>
+X-B4-Tracking: v=1; b=H4sIADM4zWUC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIxMDI0MT3Yz8/GzdtMyK0gLdNCMzYwOTJHNDYzMzJaCGgqJUoATYsOjY2lo
+ AbAeMNlwAAAA=
 To: linux-bluetooth@vger.kernel.org
 Cc: Emil Velikov <emil.l.velikov@gmail.com>
 X-Mailer: b4 0.12.4
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1707948093; l=1454;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1707948093; l=1229;
  i=emil.l.velikov@gmail.com; s=20230301; h=from:subject:message-id;
- bh=dtWLnKx4leNFwGkNegEX6jHOWak1uw7hhMJRp7odx88=;
- b=a15wcEhZlDXS2x+YnXiC6jYEavgqJFnrZQDLJJZaNx2A1aQgVDE21B6mzOsaAxBBERGk/zRTF
- xr2E1X5IsRQBzrWABWapgjToDBoLNY6FqtzU8AfQidxy0sFSnqhULTX
+ bh=6+21W/GlIOBI4iHR5i89+VKDs8ZAU79zcgZrIeB3E4Q=;
+ b=bDFps1/ja+C/TdgQwvt3iNfcen6zyDUBzmVyHvJmiKCtYVuuots0cKTHtmYaRpmlXlsXU5iqE
+ ciFA4gsckrwBIHKKuwbyoz6siWKKv2iVKELxFKcLP6D5KYBN44yovdf
 X-Developer-Key: i=emil.l.velikov@gmail.com; a=ed25519;
  pk=qeUTVTNyI3rcR2CfNNWsloTihgzmtbZo98GdxwZKCkY=
 X-Endpoint-Received:
@@ -58,57 +58,39 @@ X-Endpoint-Received:
 X-Original-From: Emil Velikov <emil.l.velikov@gmail.com>
 Reply-To: <emil.l.velikov@gmail.com>
 
-From: Emil Velikov <emil.l.velikov@gmail.com>
+Hello list,
 
-Autoconfigure throws a useful error, that I've missed previously. As-is
-with two identical hooks `make install` will fail.
+The very first patch in this series fixes a regression I've introduced
+recently - sorry about that.
 
-Just fold them into single place - not particularly pretty but works.
+Namely: two separate patch series introduced an `install-data-hook` and
+I didn't properly test with both combined. The former is unconditionally
+set while the latter is not.
 
-Signed-off-by: Emil Velikov <emil.l.velikov@gmail.com>
+So if obex is enabled, we fail to create the config files :facepalm:
+
+The second patch is a log pre-existing issue - we install dbus/systemd
+service files, for obexd even when building with --disable-obex
+
+The last two are trivial cleanups, so feel free to drop them if they
+don't strike your interest.
+
 ---
- Makefile.am    | 9 +++++++++
- Makefile.obexd | 6 ------
- 2 files changed, 9 insertions(+), 6 deletions(-)
+Emil Velikov (4):
+      build: fold separate install-data-hooks
+      build: install obexd (dbus,systemd} services as needed
+      build: drop %.rules make rule
+      build: simplify coverage handling
 
-diff --git a/Makefile.am b/Makefile.am
-index 5207c172b..e67551761 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -34,6 +34,15 @@ statedir = $(localstatedir)/lib/bluetooth
- install-data-hook:
- 	install -dm555 $(DESTDIR)$(confdir)
- 	install -dm700 $(DESTDIR)$(statedir)
-+if OBEX
-+if SYSTEMD
-+	$(LN_S) -f obex.service $(DESTDIR)$(SYSTEMD_USERUNITDIR)/dbus-org.bluez.obex.service
-+
-+uninstall-hook:
-+	rm -f $(DESTDIR)$(SYSTEMD_USERUNITDIR)/dbus-org.bluez.obex.service
-+endif
-+endif
-+
- 
- if DATAFILES
- dbusdir = $(DBUS_CONFDIR)/dbus-1/system.d
-diff --git a/Makefile.obexd b/Makefile.obexd
-index 81456544d..b91ca6644 100644
---- a/Makefile.obexd
-+++ b/Makefile.obexd
-@@ -2,12 +2,6 @@
- if SYSTEMD
- systemduserunitdir = $(SYSTEMD_USERUNITDIR)
- systemduserunit_DATA = obexd/src/obex.service
--
--install-data-hook:
--	$(LN_S) -f obex.service $(DESTDIR)$(SYSTEMD_USERUNITDIR)/dbus-org.bluez.obex.service
--
--uninstall-hook:
--	rm -f $(DESTDIR)$(SYSTEMD_USERUNITDIR)/dbus-org.bluez.obex.service
- endif
- 
- dbussessionbusdir = $(DBUS_SESSIONBUSDIR)
+ Makefile.am                               | 27 ++++++++++++---------------
+ Makefile.obexd                            |  9 ++-------
+ tools/{hid2hci.rules => 97-hid2hci.rules} |  0
+ 3 files changed, 14 insertions(+), 22 deletions(-)
+---
+base-commit: b55d98e5cc97e4ff8c3980b84f46c84f3b1c1ee3
+change-id: 20240214-hook-fixup-f26304b71366
 
+Best regards,
 -- 
-2.43.1
+Emil Velikov <emil.l.velikov@gmail.com>
 
