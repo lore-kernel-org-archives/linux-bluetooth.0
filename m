@@ -1,62 +1,62 @@
-Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com [209.85.221.174])
+Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7739113B7B2
-	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Feb 2024 18:57:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADA0213A862
+	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Feb 2024 18:57:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707937045; cv=none; b=TSMYFDuDnVydlwCmCAvJyw0MBGB59/TMmWi8XLgoh1l76lKoXd2UumZwy5uNeqAsdvn4PY3gq+jmQRNXW6AHXl+H4DHgb+n1bdm72F/yTNbIIgc3Txsz33Nky2VUVp/hOrhItT65EIuKVxPjR6K6ZTTXLUtml6jlIsKo1elfGms=
+	t=1707937048; cv=none; b=M17QO2Xrtdzg6oS+PRInD8ccpaw3SmUw2RB+py65SFKT3Q4HzSYZa7pteSQqCTC1TtjiofK3f9W3dDZ89z16ES2/BQe1lkQKH5bana5UrHZal56LWytvLRKRfmCiZGtI+HD0AonKG0jUVEcOxg3ShT/gQnufi+uVy/mtwjLtg7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707937045; c=relaxed/simple;
-	bh=j13zusx1iNy1VSpCf0/7Uh5Vuxv9p4qo5PlC9S9RetM=;
+	s=arc-20240116; t=1707937048; c=relaxed/simple;
+	bh=r/Gn9VbMpL6x26byGJzklBtxknH+tR8PM7yN/yyGzK8=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LrS+QgN9dAmgAHJRw+4RqMUB1l2rkQLr9Xd1SPI7WVidWY9j0xIwccRvM5aY3FvCEqracovFnbtB7h34WDSuTRC7uS84jPYpdNQqt4nC5lAWy29IW4REaPNHu16Gh5jUMwUgSerTk7oiHwqVraWyA+rIYK/WdQHfvD6ytnkqiQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fIK33Txn; arc=none smtp.client-ip=209.85.221.174
+	 MIME-Version; b=cCMZ1oBmhgExpfjwKUMFtQlHe1X0/WZnu1fgWezeJgv/J8RM+KrbGKZeMiFSHDztpsHTu21q9y5mc4dc1wvxywCzInqcplkMRv3iTlHdF3IuGA/Mgb/4zaSXCUnBFzdbpfgO4x1mnO1xtdoSnQ3C+vty+0cKQFRqH9CCDty88aM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VO0A4oLx; arc=none smtp.client-ip=209.85.221.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fIK33Txn"
-Received: by mail-vk1-f174.google.com with SMTP id 71dfb90a1353d-4c015883a13so24337e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Feb 2024 10:57:24 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VO0A4oLx"
+Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-4c02779e68cso16247e0c.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Feb 2024 10:57:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707937041; x=1708541841; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1707937044; x=1708541844; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=4kAGhHA/F4F4m8PaN/GFfvTrWCN3YPm3thn164WVswE=;
-        b=fIK33TxnO2PjuwGdyecEUzqPv8VGzlCd7xgy2WUX+djNuvJJ9a76qLiqU54zA20kkC
-         Laxq/Bsc6fIvyVjfpX/ZsIbC3bA2YR08tBhsXYn4fxG8fLQC1LMz0vXDSykdti/ZpWGj
-         MzU6qC16PBNdbaC3j4zJFpTOQlKd0i82GKymbM88e7b5TZZgiruh8QMAvlWT0UewRjA8
-         9BgTqwUVK55h0VR5JV4D3FU+EvwtebqBnDQBvzT3RIgh1e/mqiDzn0/g6pmZbBJgPHlO
-         zj6tNnKrIoZP31bYjVf6Olvp1C7vSNMXnqrlmjbF7hPw+pNlhtcX6yJ56wDrTd/A3qQ+
-         aeHQ==
+        bh=KjNeV6w5HrSFdRZEhg9X/6qYQX2xBJuhTWIha7DaqKk=;
+        b=VO0A4oLxVZ3tJh0v4NpZs0gVajNCH0foIMFAp3ZM1gi4QFDExSS+sxsZsqNvRvfbxI
+         d62EQXIQ4CMMdoAK2blM3f5YywLrs6pAzaFFQzVUmE+2MfOn0aShzN0xWi5R4ZYaplFq
+         n0EBFU2f5WkmSZb6CwcYdbubPLPj0R0ZpCCnM1+p7ksdW9UEhgwcyD4DY1eAS1AxRTgb
+         H+1O5a2kWAE1KnEtWV5cQUoCFHV2i5CvD5L8ec3sACg4NMXWhkK0rI/4x0x9bcZ8tbEL
+         R14lGOU6/H85lZaADapemRn/tm4gpaijjIqJhPxisqlwPvBDXUEgCsLxKMQhI55iIIoI
+         6WNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707937041; x=1708541841;
+        d=1e100.net; s=20230601; t=1707937044; x=1708541844;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4kAGhHA/F4F4m8PaN/GFfvTrWCN3YPm3thn164WVswE=;
-        b=UkHf9zHmx4Ue7Zy8h5L1mBzLHrfd713HRNxDsQONPqLoo1gsUVSp+IP7kkTBjaTybw
-         OKAdFEUl7U/IqqBeCSYGw8FNo6Qfwmzl2QUcyAkb1/xTGfWIbLPBakQZ9jahQN4SXuWc
-         Z7vpK/Xc2k2Lhid74oQqDcQvKYDA5mVuz/BLhmWfyqCs174R66gMCLu0e767kxrimOqm
-         z5XkfFTY+UaXif/j0ehfOtftuWgPfsCrtXpMq8GDdUdTKxxg+/oQMkxVR15J8jY7bIW6
-         t6pSFVrB9kfaHbxF8CaEGqQ6stPfBYshRgtDyOmLiSOfzaBEFrgXp8cp0Xm5us+tPFKT
-         9yGw==
-X-Gm-Message-State: AOJu0Yyj8MESGji1OXy7bJXdLu6Kxw6/Ts8VtJqnEd2Q1R2RVlrXhda4
-	JjPMjPtpnncwb5nAgqRVtdkkaqAKj9bvZwS3+sWJ+3ZKla8a8bpuoO1TQVm/
-X-Google-Smtp-Source: AGHT+IGhFo1OrpLyMnQ9TC7FCWXhlCgDbkX1eus1RSp5UPPUYhQaMdbJPIdjGuU2K+aL7/qOUa9e2g==
-X-Received: by 2002:a1f:dac1:0:b0:4c0:1ab8:ac8 with SMTP id r184-20020a1fdac1000000b004c01ab80ac8mr3485478vkg.3.1707937041390;
-        Wed, 14 Feb 2024 10:57:21 -0800 (PST)
+        bh=KjNeV6w5HrSFdRZEhg9X/6qYQX2xBJuhTWIha7DaqKk=;
+        b=RfcACepB41ro+zEOlGgL+eQQxSDmMWdLpGnwAnPFwPD5QR96Yef2wyitlMlo/zFYY/
+         SPcH+itTZwt1HW5TZ617XgUKDw6fNRPTg4Dwfd+DOHklkIDqSomF0wyk+eavxBo1D5kW
+         rdLrK/+OBcWNlQ0GOpKzJwN4ORkXT4y2N5DkVTj2W3Gky9e/SN+xWF4xgOFKg2GkjKb1
+         1cF/Odazp315wqx0AxBLua844JJ5Sf/O9NOd6xUS/Nzco9qxnYYYJaVVwjbfhn4BEksn
+         dosbnmT0lozcH0wumyjaRKOcW7oCK6vKaov0zJCNff7aeU2EWC64JsVTNfj3fmjVO4SO
+         KfaQ==
+X-Gm-Message-State: AOJu0YyWPJejflXLeaAkXgGjwKE4FJBLNu/DkCOHMN3y18QYqquCEYxX
+	itq5XljHwbJCxE3xe40ZW1jeqGChwtyS4otu2aaheL+HUQjAzcgSvN1wqgoF
+X-Google-Smtp-Source: AGHT+IHBh8XvuI+bD/7A50TbQSr0khRajFaMqgdsI7WEjMq4mbnxDxPT0bgeVAWV+Yzq39+TCL24Mw==
+X-Received: by 2002:a1f:4943:0:b0:4c0:23bd:1f0d with SMTP id w64-20020a1f4943000000b004c023bd1f0dmr3434913vka.15.1707937044291;
+        Wed, 14 Feb 2024 10:57:24 -0800 (PST)
 Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
-        by smtp.gmail.com with ESMTPSA id l5-20020ac5cda5000000b004b72c016c0bsm1309545vka.5.2024.02.14.10.57.20
+        by smtp.gmail.com with ESMTPSA id l5-20020ac5cda5000000b004b72c016c0bsm1309545vka.5.2024.02.14.10.57.21
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Feb 2024 10:57:20 -0800 (PST)
+        Wed, 14 Feb 2024 10:57:21 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v5 2/3] input.conf: Make UserspaceHID defaults to true
-Date: Wed, 14 Feb 2024 13:57:17 -0500
-Message-ID: <20240214185718.536748-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v5 3/3] input/device: Don't destroy UHID device on disconnect
+Date: Wed, 14 Feb 2024 13:57:18 -0500
+Message-ID: <20240214185718.536748-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240214185718.536748-1-luiz.dentz@gmail.com>
 References: <20240214185718.536748-1-luiz.dentz@gmail.com>
@@ -70,39 +70,28 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This makes UserspaceHID defaults to true so the plugin has more control
-over the input device lifetime.
+This makes classic HID behave like HoG which keeps the UHID device
+around while disconnected so it doesn't have to be recreated on every
+reconnection.
 ---
- profiles/input/device.c   | 2 +-
- profiles/input/input.conf | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ profiles/input/device.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/profiles/input/device.c b/profiles/input/device.c
-index 6c64ff1c1c52..ff7e3482d0eb 100644
+index ff7e3482d0eb..0d32b705bd00 100644
 --- a/profiles/input/device.c
 +++ b/profiles/input/device.c
-@@ -81,7 +81,7 @@ struct input_device {
- };
+@@ -985,6 +985,10 @@ static int uhid_disconnect(struct input_device *idev)
+ 	if (!idev->uhid_created)
+ 		return 0;
  
- static int idle_timeout = 0;
--static bool uhid_enabled = false;
-+static bool uhid_enabled = true;
- static bool classic_bonded_only = true;
++	/* Only destroy the node if virtual cable unplug flag has been set */
++	if (!idev->virtual_cable_unplug)
++		return 0;
++
+ 	bt_uhid_unregister_all(idev->uhid);
  
- void input_set_idle_timeout(int timeout)
-diff --git a/profiles/input/input.conf b/profiles/input/input.conf
-index d8645f3dd664..00a34eb63de1 100644
---- a/profiles/input/input.conf
-+++ b/profiles/input/input.conf
-@@ -9,7 +9,7 @@
- #IdleTimeout=30
- 
- # Enable HID protocol handling in userspace input profile
--# Defaults to false (HIDP handled in HIDP kernel module)
-+# Defaults to true (Use UHID instead of kernel HIDP)
- #UserspaceHID=true
- 
- # Limit HID connections to bonded devices
+ 	memset(&ev, 0, sizeof(ev));
 -- 
 2.43.0
 
