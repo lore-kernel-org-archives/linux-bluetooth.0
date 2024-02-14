@@ -1,136 +1,88 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EE5454BC9;
-	Wed, 14 Feb 2024 14:29:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C4175D8ED
+	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Feb 2024 15:36:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707920947; cv=none; b=YlaVR1nH4Qm95VwD6+FKyRHA1w+XgDOpdYgL7MpnDeSaHmdIHw+baT+Svfv/qlyBQFJB/rSLLawkGeOK9fA5XK98a91+Tvdr+RrCkT5IhJNfFd2Cqrkfx/tGkqKeh1Y1qjXutuLPpHuwKqY04Xro8XiTV6dnH/oR2R38HxmKkVM=
+	t=1707925006; cv=none; b=eYuTDI9LYmk13EhEDNR9V9dLohQjEomeAMZPzNRR8CCSn5Uyepxlhg9BErh78MYpKIKznjCFGdHLnwzxwcEYlBaZZRwO7mlfR0c45yj1oJln6QOF/cTaSM9vnXv0th9ux32WyZi2XcjKQZfqDH1bWAGmlfedSxnzbOR75i9PTfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707920947; c=relaxed/simple;
-	bh=4PZnpdOC7nL7iSy6IqRjbXbXnr5kNh4hCRe0YlxfpbY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dU92+VZOvKtbCHFw0r5NGCotM3lDH86kNrB/hosjUQAE6DiRwMbQ6i2vsLoErlHEadD335JhCE7FECWA7+hVRzOyK/4xv0PvlwtoIDpNtqU+Wec5op+P8Nc6ZYyj0/6TW/E0gBXEwXdExjBKboK8iAmLt1dl0Ih9bw2Y91RVaUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hVXjPJU0; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1707925006; c=relaxed/simple;
+	bh=aRkHKEcAFeT9VZmuYNbHE72gVcrqZ2Po13oZiqW1KJU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Crg5MgsnViB3nXidikh5SA5zHHudJoVQVofwtoGVDPCwtxa4BZOTgAkcISGtkNJjYPepWEpFuu+CocXH1+uHX0U2GoW+avnLWEl2yCy+t9Ncr+6n+5QTD0Kvcwz+NMqcYCTh0cqyWYKtVWHftU0BSxThE0QpQUUi9nDodkB/wcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=codecoup.pl; spf=pass smtp.mailfrom=codecoup.pl; dkim=pass (2048-bit key) header.d=codecoup-pl.20230601.gappssmtp.com header.i=@codecoup-pl.20230601.gappssmtp.com header.b=25OCEJHR; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=codecoup.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codecoup.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hVXjPJU0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7AA6C433F1;
-	Wed, 14 Feb 2024 14:29:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707920946;
-	bh=4PZnpdOC7nL7iSy6IqRjbXbXnr5kNh4hCRe0YlxfpbY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hVXjPJU0NBcOWMTf39vw8+II4IjZ6ZS1xuxWZCaEPpMRtVrcpjvdSZ5pbQbrzfyl5
-	 5p+9MWOmLWaPsr7LOgqJVuXpNEGu9HP5o6oHpfYm48mw/cwuZA2rOiL0TSqwgjNwtz
-	 Te7GoztDlKGI1AjilnKM5j4xJ++Ihif+bCcL80YZs2PpixddZDzKfANZjpMNrMTAKA
-	 m1PIhUC8uWSafZPkoiTw++ALnHkJPvW96yiRupPJsd6ECJAQnxwBqtTMY8b5ucoUh3
-	 icNpqgGguQ5ARz4ENnmS+uuUsuFTn88qiMgy7Lk72p/ca5ZczM4VSsbR95m3vy8ro5
-	 PVL/t1eKkJnZQ==
-Date: Wed, 14 Feb 2024 19:58:56 +0530
-From: Manivannan Sadhasivam <mani@kernel.org>
-To: Bjorn Andersson <andersson@kernel.org>
-Cc: Manivannan Sadhasivam <mani@kernel.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Alex Elder <elder@linaro.org>,
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Arnd Bergmann <arnd@arndb.de>, Abel Vesa <abel.vesa@linaro.org>,
-	Lukas Wunner <lukas@wunner.de>, linux-arm-msm@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, linux-pci@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: Re: Re: [RFC 8/9] PCI/pwrctl: add PCI power control core code
-Message-ID: <20240214142856.GG4618@thinkpad>
-References: <20240201155532.49707-1-brgl@bgdev.pl>
- <20240201155532.49707-9-brgl@bgdev.pl>
- <7tbhdkqpl4iuaxmc73pje2nbbkarxxpgmabc7j4q26d2rhzrv5@ltu6niel5eb4>
- <CAMRc=Md1oTrVMjZRH+Ux3JJKYeficKMYh+8V7ZA=Xz_X1hNd1g@mail.gmail.com>
- <2q5vwm7tgmpgbrm4dxfhypbs5pdggprxouvzfcherqeevpjhrj@6wtkv4za2gg5>
- <20240208113201.GA17587@thinkpad>
- <ycorratd3jxzg5nijbpgk6hrlgq5rl66cttfg7wv4oyyxivfm4@kfbhrlytiafe>
+	dkim=pass (2048-bit key) header.d=codecoup-pl.20230601.gappssmtp.com header.i=@codecoup-pl.20230601.gappssmtp.com header.b="25OCEJHR"
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a3d5e77cfbeso91415466b.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Feb 2024 07:36:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=codecoup-pl.20230601.gappssmtp.com; s=20230601; t=1707925002; x=1708529802; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Hy8f5Uy+HjI1YVXQ9/qbplqtMtG6O7A68qRY7uwU1Mw=;
+        b=25OCEJHRlKQ8idd7Weaz46GdxXBbsMwHd6oOsmNTPIWmkCibfCfmd3qPEo92BdytL4
+         opfa3UosM8Iyx5csgi05CsEuHdtnshiTcqJQNBnJf3ih1ozHAiZ4ZQ4+e8TBMzWB0z5G
+         7MytR6p+i6/jU3lMFrBU0bcpFMm6L+ei2IFh1fXxH3Hw40ZTeqEOFwG0xpXPefs1EEmE
+         kgA4Zoczm1EhY6FJJ514gY/QqMC6Xozt0jSv1sc8vd+805O0symkrwCXcOnLNB2Q983q
+         x4bSPo/q9bs4ATG7oVoe22BVZRoZ2z8OYx+suKYLJVba0yyOj94n3P1fE/K9D46b+ML2
+         7HVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707925002; x=1708529802;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Hy8f5Uy+HjI1YVXQ9/qbplqtMtG6O7A68qRY7uwU1Mw=;
+        b=xGaA4OUlTC5UbIYqj5LhnkN8jQGttnCWr46Aslaa52F1xbRlEp7z6qpkYUpxdzKiL3
+         cs3ju0PeuqMoIO50LiwF6/G+4MlYPDu8Uea2WCXf7kL3e2/SHoBHgqGHKbrqzWSMnCnx
+         ab+mMwvrcmeQ2azp7ReYhpE4nxSUhyW7N84gIjEG96kHWPpgfFhGAY/7s+2XaHPY5MRE
+         ykSsl+7rQvdx92kaeGFl4n8UOYqZJU22jlbtWJq1KWxUnA+95lz67NDPRCq1/hVH22gS
+         fInuLc1sWnx3Qi2CbqZMew1WYWVHxFsfq1KZtI6RdrpfMUsYeLogjiEwu/dzoffK7vtf
+         0XTA==
+X-Gm-Message-State: AOJu0YwjT+h9Zpckp1PgBlT0YmdqBe8OI+SzdpMeNsGG63MzU5sxIkaE
+	mdzPplYWrZ7dn3ScWi0FI3mTFfUyWyztzTBN30SXCDpE0wJJbRhJZNYsXt8eZsf0JgbNkIJ2OjZ
+	s
+X-Google-Smtp-Source: AGHT+IEIY6nbLxO70t1kifurfsUcyX2nu3RuUeQzc3FcWSUU7kbqL6MrwMPWcKK0sbQHrURATg/EeA==
+X-Received: by 2002:a17:906:2485:b0:a3c:ce03:5d45 with SMTP id e5-20020a170906248500b00a3cce035d45mr2209903ejb.11.1707925001846;
+        Wed, 14 Feb 2024 07:36:41 -0800 (PST)
+Received: from ix.. ([95.143.243.62])
+        by smtp.gmail.com with ESMTPSA id wp14-20020a170907060e00b00a3d36da3a57sm858872ejb.7.2024.02.14.07.36.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Feb 2024 07:36:41 -0800 (PST)
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@codecoup.pl>
+Subject: [PATCH 1/2] build: Fix typo in external-plugins configure option
+Date: Wed, 14 Feb 2024 16:36:34 +0100
+Message-ID: <20240214153635.156548-1-szymon.janc@codecoup.pl>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <ycorratd3jxzg5nijbpgk6hrlgq5rl66cttfg7wv4oyyxivfm4@kfbhrlytiafe>
 
-On Fri, Feb 09, 2024 at 05:43:56PM -0600, Bjorn Andersson wrote:
-> On Thu, Feb 08, 2024 at 05:02:01PM +0530, Manivannan Sadhasivam wrote:
-> > On Fri, Feb 02, 2024 at 10:52:11AM -0600, Bjorn Andersson wrote:
-> > > On Fri, Feb 02, 2024 at 10:11:42AM +0100, Bartosz Golaszewski wrote:
-> > > > On Fri, Feb 2, 2024 at 4:53 AM Bjorn Andersson <andersson@kernel.org> wrote:
-> > > [..]
-> > > > > > +             break;
-> > > > > > +     }
-> > > > > > +
-> > > > > > +     return NOTIFY_DONE;
-> > > > > > +}
-> > > > > > +
-> > > > > > +int pci_pwrctl_device_enable(struct pci_pwrctl *pwrctl)
-> > > > >
-> > > > > This function doesn't really "enable the device", looking at the example
-> > > > > driver it's rather "device_enabled" than "device_enable"...
-> > > > >
-> > > > 
-> > > > I was also thinking about pci_pwrctl_device_ready() or
-> > > > pci_pwrctl_device_prepared().
-> > > 
-> > > I like both of these.
-> > > 
-> > > I guess the bigger question is how the flow would look like in the event
-> > > that we need to power-cycle the attached PCIe device, e.g. because
-> > > firmware has gotten into a really bad state.
-> > > 
-> > > Will we need an operation that removes the device first, and then cut
-> > > the power, or do we cut the power and then call unprepared()?
-> > > 
-> > 
-> > Currently, we don't power cycle while resetting the devices. Most of the drivers
-> > just do a software reset using some register writes. Part of the reason for
-> > that is, the drivers themselves don't control the power to the devices and there
-> > would be no way to let the parent know about the firmware crash.
-> > 
-> 
-> I don't know what the appropriate design for this is, but we do have a
-> need for being able to recover from this state by the means of
-> power-cycling the device.
-> 
-> If it's not possible to let the device do it (in any fashion), then
-> perhaps a user-space-assisted model is needed?
-> 
-> Turning on power is an important first step, but please do consider the
-> full scope of the known problem space.
-> 
+This was causing build errors as macros were also generated with typo.
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Agree. I'm not ignoring this issue, but this is a separate topic IMO (or an
-incremental change). Because, power cycling the device in the event of a
-firmware crash or even upon receiving AER Fatal errors is valid for platforms
-not making use of this driver and an existing issue.
-
-For sure we can accomodate that functionality in this series itself, but that's
-going to drag this series to many releases (you already know how long it took
-for us to get to the current state). Instead, I'd recommend to merge it in its
-current form and have Bartosz or someone work on incremental features such as:
-
-1. Runtime/System PM
-2. Resetting the device in the event of fw crash etc...
-
-Wdyt?
-
-- Mani
-
+diff --git a/configure.ac b/configure.ac
+index 05c76dddb..70e9d4be8 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -364,7 +364,7 @@ AC_ARG_ENABLE(deprecated, AS_HELP_STRING([--enable-deprecated],
+ 					[enable_deprecated=${enableval}])
+ AM_CONDITIONAL(DEPRECATED, test "${enable_deprecated}" = "yes")
+ 
+-AC_ARG_ENABLE(external-plugsin, AS_HELP_STRING([--enable-external-plugins],
++AC_ARG_ENABLE(external-plugins, AS_HELP_STRING([--enable-external-plugins],
+ 			[enable support for external plugins]),
+ 					[enable_external_plugins=${enableval}])
+ AM_CONDITIONAL(EXTERNAL_PLUGINS, test "${enable_external_plugins}" = "yes")
 -- 
-மணிவண்ணன் சதாசிவம்
+2.43.0
+
