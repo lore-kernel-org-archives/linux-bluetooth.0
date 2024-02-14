@@ -1,97 +1,133 @@
-Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74DE560B82
-	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Feb 2024 17:04:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6216960BBC
+	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Feb 2024 17:11:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707930249; cv=none; b=h9slUMCmXQiiAbSzwsfVq3brbmXN8wpdhBlvq2nym33I8zqqjBcAwfRoJ7UwpQDgviGinD++JUZ/jYl9EGlVgl3gOW7FC4ieJ8ifd4Zb4Cmhr7suMlkNrHDm+DMWEa/ddbibTF+BB3YsOf1s5yuFPYhbg0DilPfnH6Z+BgmYDv0=
+	t=1707930699; cv=none; b=N1ZIoQxBV9NOp3m2nztp7XGv/OXjc6wjqkEOv23niCWqo8//ccse8k2POLY9Tg0H4u4LFTED3QY6HmfxpTz4mpvk5H66oHTawn6N+xpOX9reL1r4rE49BG7JQg1q7kw7iQBMvJNa4w85WG8arYuyU9x0Qq7jfTqWENWnXMWfllQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707930249; c=relaxed/simple;
-	bh=H5LHEQ8OulwG8S97MfmhK6NJlOCoyI37a8UfuFOH/ps=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=QIbxLIZk/dfgUqijM6JjY1qifWlT2f0xTusIEE7MHGLIdAo38xbrxcWRb0iADYjDDYIGePDWNdz42MZeu5194JHNw7bZ1sUfxhaTpbXK/yT6wBL1tv5ye674Cm1FSXqJPUFnPo7UXfH44prLOzgfywv1WwJ8eNsbkDXQUgAr78k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CFDJR5hZ; arc=none smtp.client-ip=209.85.219.178
+	s=arc-20240116; t=1707930699; c=relaxed/simple;
+	bh=tC5GshrpzHC4qfGHqgN4Jcq4osKSA3EmHWigz2BC+p4=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=AgxQCHmluIjx5RJ/7WFBaaNKAF7leBMbC3Rry6LTPSFD5oNXsHWcPxg8FDgzBjMvEAAuw2eMYwcm82HnLjHD8wCoXapMo8N2n79VI8/akji1STHWXwI+GJfhGqrYUxXAQtjnkfq714PlnhdlhHUpqu+P845OhBigfVZv113XVbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R7JMPhK1; arc=none smtp.client-ip=209.85.166.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CFDJR5hZ"
-Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-dcbcea9c261so2973288276.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Feb 2024 09:04:08 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R7JMPhK1"
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3641bd82979so6694435ab.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Feb 2024 09:11:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707930247; x=1708535047; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=z3gPTkIr9lPr0PtRR+Vhmq8d05c7WNhszhY0r41ZXxI=;
-        b=CFDJR5hZkAbATjN3fthKoKyGUnmpdc25Bv2FEUVMYw4rHRFoG90iWLEFOSkm3E0EkN
-         mshKokWo5LJR+GwWvvT5Tm4a92D0hP1wb5MSXgug++Q/6u96iQu/ZvswTjjO/KsY3fsv
-         KwjvmV6BoQIdFBQFfNAnPjYqEHinvbPBXeQckNF06UKo+UQqEv4gO69sXeFBPnpsLplp
-         q2FMctsPkUlCob7HwRnf1OCn4Hcb7LDCs6fWunXXSOA8UGzO+8Jj1XGwtyzNG34gKvhO
-         +x2ToRZDH9TgLNOM5qjyLL1VZ7p47AyUirs5i3Twvuq9ThtisMZuqifcc6zKHwmXCypn
-         p3ug==
+        d=gmail.com; s=20230601; t=1707930697; x=1708535497; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=4aQkQCVG9M7CAunxXVw4Cw4yjEq4IPnFWle7W4oOCbI=;
+        b=R7JMPhK1Br8EmxCKU2xBBdyk4HWBOR9t4pRgCbDJmCAUV4fsq9VCCvk/Mky6TtW4kU
+         04Vi1jwMWeJVo5GPvMOcrKD+HRAru/ZtTLrehnzp9hQyQSFG9FxBKqCnyzcpzVx+mWvZ
+         h/060dmBLM0ir+VEzIKxDwox+1EG3qFcEUcr89/TlWwSp+db/sTTxcXwLJWbxGf5zYme
+         7a/xf84QA2Tb4FmO6TYdYHRTaxbCSMmNiZAN3vwu5wToePnUg55oHwXNjb1sILkqkRCy
+         YImoJrvdgZX++qKsMdluYRR9OohH6Y4TXs4rH0auPvC2nxALxqHMNWeAPBSK61PrnKMf
+         qTOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707930247; x=1708535047;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=z3gPTkIr9lPr0PtRR+Vhmq8d05c7WNhszhY0r41ZXxI=;
-        b=vBHqUF2iqhlOfBy6elTbK5k2sHkUDBQe0gIGOmSkTIGQmZSPA4dal1lhl3J+Myjscu
-         Uon6p+Z6K+amCFefSaJ3Hj+/6Fpzh2bjfU+LeoARAa88XBimd83YIpz1p+z4641AZGC/
-         pVRxhZi3NQgqwgrI/94zLzhNASIpNn6SsBWosrZWPfnXGHTgaDnYk7zCALE0j6ap5He6
-         SjviZM3Ku0Tk2V6fUjMzaooftMEjsycc2Q/lm4z9Zpn7tVKOFpf4Cb4fBvrQk3xM0ChA
-         fASckZxZfS6dP6AekldwaPqKIcTnZ5e4P1hUnhQGIc5PfDiT85P1fQILm92Rx7l0vO1a
-         7pzw==
-X-Gm-Message-State: AOJu0Yxt8ZPVEHML0Zoy3n5Jv2AkQQbI9CQSG4uQQ7+PZZIJxg1pqaAH
-	rbIo/IsNdGFhWK2up/+7RlUCHuj9fz6W4xOUwkuV2M7/9YF1BXKIjgEq99614SNUU+1pr1ilvxy
-	KjWx9djoCVj01yaacX0151Oo9tGUgq8Y6KZ4=
-X-Google-Smtp-Source: AGHT+IE7p1LsBWALY1Jiw2lVY0vbL91Trm9FAA4tP2XqJ8oUlmx76Wq2qs2kBguVAR/4cGeXpnOT6ZgInHxgrwc3xrg=
-X-Received: by 2002:a25:2e42:0:b0:dcd:3575:db79 with SMTP id
- b2-20020a252e42000000b00dcd3575db79mr2813698ybn.6.1707930247081; Wed, 14 Feb
- 2024 09:04:07 -0800 (PST)
+        d=1e100.net; s=20230601; t=1707930697; x=1708535497;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4aQkQCVG9M7CAunxXVw4Cw4yjEq4IPnFWle7W4oOCbI=;
+        b=wQClAwP66Jx1zIP+4piXji6T85pgj8TMj0CrSfv3iFx29DHSQAYkZp0RjM/8QTaN9r
+         0tK9T09bt3T9ysuBw9xGDsp92nBzGmg228arklS+p/CdxGQhRmy1Ap+YKb4OGDfF/cgq
+         CizCBGjkx97XBokYwOS+aQ07LKc4Gma9ShvQ8xb2CO2azH3//vsLa9Pz8KigH8XyOP9I
+         9Kt1Y7q3Ydqby7+kpmun7wnPP39CyA2x8RLU1axoQiqtmLfSGVUxvObMiF7Hb7sFKmDu
+         cpq+hGUPxI74LcRXbr8FjgLwc25yvMowuXIBXun/uaaHYru9GxTloE3JM+s/YN+ELHP2
+         ppeA==
+X-Gm-Message-State: AOJu0Yymau6TXkf1wn2dBPKJf7Y23NvN59iUF17cJ7+lFpNxR5IBBhMF
+	02LNXIDHOYk1szs/1S3P+qKShq1lkWNccC+wrNjy8aBovzTP/I832F4mTygQZyQ=
+X-Google-Smtp-Source: AGHT+IEtIPGiekrWosh7lgYEGoiOp/X116X+RWJIzzUtgRGxQzWG1hmA3lg3uzX68vwGBE5khRd5ZQ==
+X-Received: by 2002:a92:d182:0:b0:363:b362:a2bb with SMTP id z2-20020a92d182000000b00363b362a2bbmr3416104ilz.32.1707930697233;
+        Wed, 14 Feb 2024 09:11:37 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUJwlCudy2Hcv/th/P792JH855tL4X5+2y4yYgjsOfofCL503UzR5euKJ+Jmcwr1me2I97PvYybfcyCzBKYXzPBjA==
+Received: from [172.17.0.2] ([20.163.86.219])
+        by smtp.gmail.com with ESMTPSA id q19-20020a632a13000000b005dc8702f0a9sm3437097pgq.1.2024.02.14.09.10.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Feb 2024 09:11:09 -0800 (PST)
+Message-ID: <65ccf42d.630a0220.b2b4f.aa5d@mx.google.com>
+Date: Wed, 14 Feb 2024 09:11:09 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5773157436774018044=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Emil Velikov <emil.l.velikov@gmail.com>
-Date: Wed, 14 Feb 2024 17:03:55 +0000
-Message-ID: <CACvgo50dSAw_L3uC7WST_+9ixMWLBdfVJc8cQNQNZ48dWdUijw@mail.gmail.com>
-Subject: Re: Re: [PATCH BlueZ v2 00/10] Distribution inspired fixes
-To: linux-bluetooth@vger.kernel.org, 
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, hadess@hadess.net
+Subject: RE: [[BlueZ] ] mesh-gatt: Fix JSON files missing from dist
+In-Reply-To: <20240214155019.325715-1-hadess@hadess.net>
+References: <20240214155019.325715-1-hadess@hadess.net>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hello Luiz,
+--===============5773157436774018044==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Due to a bug in the CI bot, I've scraped this off the ML. Hope it's
-not too badly formatted :-)
+This is automated email and please do not reply to this email!
 
-> Here is the summary with links:
->  - [BlueZ,v2,01/10] Return at least the title attribute from player_list_metadata()
->    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=f2671bf8f951
->  - [BlueZ,v2,02/10] adapter: Remove experimental flag for PowerState
->    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d3aeae79de4b
->  - [BlueZ,v2,03/10] test: consistently use /usr/bin/env python3 shebang
->    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d31f04aa928a
->  - [BlueZ,v2,04/10] profiles: remove unused suspend-dummy.c
->    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=1313351f7144
->  - [BlueZ,v2,05/10] obex: remove unused syncevolution plugin
->    (no matching commit)
->  - [BlueZ,v2,06/10] obex: remove unused mas/messages-tracker impl
->    (no matching commit)
->  - [BlueZ,v2,07/10] obex: remove phonebook tracker backend
->    (no matching commit)
->  - [BlueZ,v2,08/10] build: ship all config files with --enable-datafiles
->    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=be0e796299b0
->  - [BlueZ,v2,09/10] obex: Use GLib helper function to manipulate paths
->    (no matching commit)
->  - [BlueZ,v2,10/10] Allow using obexd without systemd in the user session
->    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b16b19885c53
+Dear submitter,
 
-Massive thanks for applying the above.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=826064
 
-Out of curiosity: is there anything wrong with the few remaining ones?
-I had a look through the ML archives on lore.kernel.org as well as my
-inbox and could not find any replies.
+---Test result---
 
-Cheers,
-Emil
+Test Summary:
+CheckPatch                    FAIL      0.50 seconds
+GitLint                       PASS      0.22 seconds
+BuildEll                      PASS      24.12 seconds
+BluezMake                     PASS      704.47 seconds
+MakeCheck                     PASS      11.79 seconds
+MakeDistcheck                 PASS      165.83 seconds
+CheckValgrind                 PASS      227.25 seconds
+CheckSmatch                   PASS      330.46 seconds
+bluezmakeextell               PASS      107.33 seconds
+IncrementalBuild              PASS      665.70 seconds
+ScanBuild                     PASS      956.84 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[[BlueZ] ] mesh-gatt: Fix JSON files missing from dist
+WARNING:BAD_FIXES_TAG: Please use correct Fixes: style 'Fixes: <12 chars of sha1> ("<title line>")' - ie: 'Fixes:  ("build: Deprecate meshctl tool")'
+#50: 
+Fixes: 1f6553edd8a5c ("build: Deprecate meshctl tool")
+
+WARNING:UNKNOWN_COMMIT_ID: Unknown commit id '1f6553edd8a5c', maybe rebased or not pulled?
+#50: 
+Fixes: 1f6553edd8a5c ("build: Deprecate meshctl tool")
+
+/github/workspace/src/src/13556710.patch total: 0 errors, 2 warnings, 10 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13556710.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+Use of uninitialized value $cid in concatenation (.) or string at /usr/bin/checkpatch.pl line 3196.
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============5773157436774018044==--
