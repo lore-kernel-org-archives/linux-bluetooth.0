@@ -1,117 +1,59 @@
-Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ADA35D75E
-	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Feb 2024 15:46:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 997515D756
+	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Feb 2024 15:50:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707925598; cv=none; b=iFZXJ4MGp0X8ekRaXRf32iZb1AnyB8CuDM4FSMjVBk1QIvlLQgH6EgIVxNLA3qLWNrHKz3WL9R+s+t47EKAF3S5e9db1iapWnqVvcZnXRyrmnUsPbcpd8no2X+A/bUP3dJ2BXPy+0cNlBYTyGxoo8iJJg/IlzPVI7QaIjop/EGw=
+	t=1707925825; cv=none; b=WoBHyrLJX+RtvDfUXB6zdl6+qPoYiawe6wMCxDJyXhfsfxLbpFB82ROZ7r+c4CHSsamRyzN0lT0W9qIHwD+B9BMV4e3/yArGLmRMj1AjASL+o0dUpRVz63ds/ys0bR+9hBJ89XWR3JjgcW9AklevL83X+RJ1mjlXcP7qoSCXyko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707925598; c=relaxed/simple;
-	bh=nXt2NydxVPyI52wKlorJbsmqB3Y1sW0XBLcflaBdxWI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RkQGD35oGVr5W2IrFYysURyshNQYWs1claSrr3AnXADEq360t71MtLLCP3zi4lyHBfsS/7pT/kWH9NOsPN0neDAWe2/M0m0BtSpWFg36J0oR+pIGA7sXcesKRhb87v4WI06UGVC1XBAe6AVOk7V0BhIyW8ivNARDjebJngl66qs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=CB5dhkms; arc=none smtp.client-ip=209.85.160.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="CB5dhkms"
-Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-2193ccbb885so2347542fac.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Feb 2024 07:46:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1707925596; x=1708530396; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=43U0prLBEviHcCJ3pSlb1u8y9sUlYBpSR6dl+zr/IL8=;
-        b=CB5dhkms/IoQIZ0SSZkK9qtAUj1aDMxKzE8xM4f9PrWezhuGOsacgz4YP2KGzuisXO
-         Yypudkqr2k/5n1+E6iTB/wf13I60X7EiEeAI9wGRgBQAZPlD/uCwJbX1D0iDVI3HsFku
-         WHDw1EOiOjFemrSSQqb1dYtDtyaYwhNkkM3EC5LG7g7BwmT6wg0ca8BoQ4iY7PpUL8SN
-         GQM6o8+LDI/wjkx0bLASEhFzVRujNmkyye7gHLbAzAL6saIlLtv6sjYsrwK/mWKDh+NA
-         CqQtQWYZQLEis8ERh3yCubqJPDzxDkdSrwt2WwlXUdnisDvZxgYMMoIS+ZFsMk7wOnKS
-         ScUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707925596; x=1708530396;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=43U0prLBEviHcCJ3pSlb1u8y9sUlYBpSR6dl+zr/IL8=;
-        b=GyNUUFluDk8iRh87+FJE7AteuOlq+mzZDimTO2ml6Y4NjyOcWmxK36T7e/3c/HPbEi
-         HSZVQXDXWKkBTuiQ1ojZtujfwRVP/7jl2I93+ytz10bGrS8+EuPJqrKSma9lWNVoAFSi
-         3WXoLrOicKfw7cLTRQ97b1ctm2yjiS4HF0pVB00P9ZQB7rpc52M8rR1XbuMLxqNiOtvV
-         cSomGhE2AAu5J/TBeAiFDkR20hrMkOKhtw4dEBnru4+5IuO33yC6+sYgYQRQiOaCq1Em
-         REZrI9Jx+CPKArjwrAiVZqHYnUELSd6tzXvmFP7Nsjt169fdi9gWS8o+3YLvt6hFCYSr
-         vTSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXtyjE4Mpza40o7v6fKv/Wi7hwD9KtRMlpVbCQgp8ynY/pjjm3YzfHNyT5W1RyyUkyHubZiB20afWYk3HtaaSNGCytZqxiqAyeSyg2/awYN
-X-Gm-Message-State: AOJu0YyZdlX5RVxxQP1b4ftQyuy3VrzjWd+UQNg4ljqPIujICnwyUP/J
-	pwJzO3UO4D60lchN41aRdacHTjzUEPDF4SvI4Grt6A7K9JFqkjRADbjyHFng8iPkGObMHEGbNkd
-	1oZxs8D4m6foxCuEiXw1Xu0oudTZwotJiASxDpg==
-X-Google-Smtp-Source: AGHT+IGq/FPDHURxZuXkT8EEMfyOBxQIWZRGOM045VqtAvTD1CETCELK38VG/mvuBgw8UVUij5Aehjzrk5JxYSrtPyI=
-X-Received: by 2002:a05:6871:551:b0:218:55c9:bb20 with SMTP id
- t17-20020a056871055100b0021855c9bb20mr3419259oal.21.1707925596168; Wed, 14
- Feb 2024 07:46:36 -0800 (PST)
+	s=arc-20240116; t=1707925825; c=relaxed/simple;
+	bh=psgHiDWoWf4d13ZMr0l3KOrHNhzri0WGmnL595a9QhY=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=LGfIPdpBT0enz5JsQMng5nJpieLRQA4xpeiAR6Drs/q+VRySz37C0sa3rkRcMlHRFjMHKD/6rvmQLIiz6Alujq4iNhqJom35HWkGpBoxz7TDbSBhbrtnAr+qpkF3t/IgghEQPDAcTiwp7mSs8tDZLa3ub/nbq5KhqqeheMG2YMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 67934240008
+	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Feb 2024 15:50:20 +0000 (UTC)
+From: Bastien Nocera <hadess@hadess.net>
+To: linux-bluetooth@vger.kernel.org
+Subject: [[BlueZ] ] mesh-gatt: Fix JSON files missing from dist
+Date: Wed, 14 Feb 2024 16:50:13 +0100
+Message-ID: <20240214155019.325715-1-hadess@hadess.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240201155532.49707-1-brgl@bgdev.pl> <20240201155532.49707-9-brgl@bgdev.pl>
- <7tbhdkqpl4iuaxmc73pje2nbbkarxxpgmabc7j4q26d2rhzrv5@ltu6niel5eb4>
-In-Reply-To: <7tbhdkqpl4iuaxmc73pje2nbbkarxxpgmabc7j4q26d2rhzrv5@ltu6niel5eb4>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Wed, 14 Feb 2024 16:46:25 +0100
-Message-ID: <CAMRc=MeM_ys7_Rk2=yhEVL6pe1bWQXqS8r_Y7P-SMQ_cTCMebA@mail.gmail.com>
-Subject: Re: [RFC 8/9] PCI/pwrctl: add PCI power control core code
-To: Bjorn Andersson <andersson@kernel.org>
-Cc: Konrad Dybcio <konrad.dybcio@linaro.org>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Neil Armstrong <neil.armstrong@linaro.org>, 
-	Alex Elder <elder@linaro.org>, Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Abel Vesa <abel.vesa@linaro.org>, Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, 
-	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-pci@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: hadess@hadess.net
 
-On Fri, Feb 2, 2024 at 4:53=E2=80=AFAM Bjorn Andersson <andersson@kernel.or=
-g> wrote:
->
+Moving EXTRA_DIST into a conditional means that if the dist isn't made
+with the deprecated tools enabled, then files will be missing from the
+distribution.
 
-[snip]
+Fixes: 1f6553edd8a5c ("build: Deprecate meshctl tool")
+---
+ Makefile.tools | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
->
-> > +             break;
-> > +     case BUS_NOTIFY_BOUND_DRIVER:
-> > +             pwrctl->link =3D device_link_add(dev, pwrctl->dev,
-> > +                                            DL_FLAG_AUTOREMOVE_CONSUME=
-R);
-> > +             if (!pwrctl->link)
-> > +                     dev_err(pwrctl->dev, "Failed to add device link\n=
-");
-> > +             break;
-> > +     case BUS_NOTIFY_UNBOUND_DRIVER:
-> > +             device_link_del(pwrctl->link);
->
-> This might however become a NULL-pointer dereference, if dev was bound
-> to its driver before the pci_pwrctl_notify() was registered for the
-> pwrctl and then the PCI device is unbound.
->
+diff --git a/Makefile.tools b/Makefile.tools
+index 044342e29bc6..4178940bf066 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -378,9 +378,8 @@ tools_meshctl_SOURCES = tools/meshctl.c \
+ tools_meshctl_LDADD = gdbus/libgdbus-internal.la src/libshared-glib.la \
+ 				lib/libbluetooth-internal.la \
+ 				$(GLIB_LIBS) $(DBUS_LIBS) -ljson-c -lreadline
+-
+-EXTRA_DIST += tools/mesh-gatt/local_node.json tools/mesh-gatt/prov_db.json
+ endif
++EXTRA_DIST += tools/mesh-gatt/local_node.json tools/mesh-gatt/prov_db.json
+ 
+ bin_PROGRAMS +=  tools/mesh-cfgclient
+ 
+-- 
+2.43.0
 
-Right. And it also makes me think that right after registering with
-the notifier, we should iterate over the PCI bus devices and see if
-the relevant one is already there.
-
-> This would also happen if device_link_add() failed when the PCI device
-> was bound...
->
-
-Right.
-
-Bart
-
-[snip]
