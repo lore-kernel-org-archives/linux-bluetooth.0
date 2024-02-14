@@ -1,137 +1,79 @@
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 976B112882A
-	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Feb 2024 22:23:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 391C7250F6
+	for <linux-bluetooth@vger.kernel.org>; Wed, 14 Feb 2024 22:50:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707949440; cv=none; b=h9VkSZONq7TO3wQgGwCHFMdPsnStAekjGNtT5d9BfG1546TrveM7GFCeuJ765NDKr/2KZ3TcbPJ24jIzV4XJYPtms10tMPUGASsJPbO9py0qpv2qF+HwwWRKv+gTN16jRHrWicQgZgw4cETnoXiIxbsM2bFP/PKYi++uB5vFKls=
+	t=1707951028; cv=none; b=epKgaZ5ueLynHyyonYFk+WP4eZLPNAF7mBiDa76RRkyNezWo+xyzcwCUFbldcTMFSO6YkQL5X8iKXyvyeLL75rbDwTBh7Bl/xhGZ155PIpWMe4dWeUUB2AKueeYnuLAKJcJUq3M+Cqws+DKu/GXrvvY6GHvibshlqquv6l0UeKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707949440; c=relaxed/simple;
-	bh=UZWu2/krPZ/h6GcL42EQRHdgxMqDW7m3QFD5YWBWBD0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hK1tgim8R1ThG00MdLJt6OcvdYhX4KHD/7RZNbU5ObLmcvOlPJc/8LyoZ/SSpXMza9c4xKcb9/4wgkSlDq2/Um5lvGThZjSf5RdyIhtBu271XcGDvIYOeBD0kiZjrpsedqL2rSus/YS4BDwDU372i+g17R0EoVVwrKpGwKDPKDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mYhOy4Cd; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1707951028; c=relaxed/simple;
+	bh=Ib3H6XeBf06GgbKtBdlPoQPElryPrReiMckkqPen1QI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=gBB2+2+oUfroS/kbQ7ZPHf50p5aKMq/putNuITumEXUGwOF2REpsAwRSGjlCiawOOdOGlpXlcSfqN9taCESJfcVsW5rFnRCURuszyZE86HRkCa32wJmxhhPYv9lChrk8s0l+kS6Ae/MKfFlD5gMG8AHmMcZlbPhdr/xRN4J9IjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eJ3apngt; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mYhOy4Cd"
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2d0c9967fdcso14776611fa.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Feb 2024 14:23:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707949436; x=1708554236; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GMpJhfyBBAwMMYGHAWDHpyiu99kNed/I2NKZjQNay0U=;
-        b=mYhOy4Cdz+eJn48luuykOWxaDreagWBk3xA5WsSqYaxoVzfrSO/ILPFi6uJpUAbsPi
-         d+kaKRAzFqauS1LRgCbCKKaB1PKNzJ5XbAPju3tLO/AJUdcKzTF4WGbjE0k2bqWlQuMu
-         Me88gB3Eyn392QZV93dsDcREuTKRT+0SstUV6A8VM9JT2GbJGxLMfzTuEg2jgOkqJQ81
-         TgL251+Fz0QkvD0Q70cVjsdHM54DB8pUqtX0m+CxyIRhJ/CeYJ59G0v91g4l5D94JqzO
-         1Z7FdAtTyuRjmapVUwIQJ/omhXkdMipZIaEZKzdR5INdvq3fZPm9XC08XuNssbjEAQvJ
-         GNxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707949436; x=1708554236;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GMpJhfyBBAwMMYGHAWDHpyiu99kNed/I2NKZjQNay0U=;
-        b=aJ3Z5FbVS/JJNTu2ISNuRxO7WCj+PaB7csfd7JLClkrHbpZmAwtkLX9xpVnOEPwhbC
-         gV3OvmtSMTmJqkOjt8n4kKd69/DpMp5pZvfiD6wdzSbCiG6zBBDk1OswvqrsG0xUAV84
-         iu6T43ROkgSOwMcr/tDKY1P2sVXYVucvc1zQz/dr/tZkEhExDEdhvkbEp9niXM5naZlv
-         ck2ndIOMlp5zrbpQUwN94Ohm6aE39UMBuS33/rLRAkWlK0Dpkl5jSBp/tNc8bnl5lpwM
-         Os6BEa5OuUChvgAMEO6ko1Xd9g1wMNYl3GZ//xKBZMaoYrJCFRaXxb06tp07N0M1YWZb
-         JktQ==
-X-Gm-Message-State: AOJu0Yy5osMh9VRvTDZvhZHqay3XNDHNL6qw0AkR5SbOkvTjO2iRYII/
-	yVMI5+ib24NQ30Egw93tHO3Lz/oyepKABy9SweMKAXDMqLnrlPeYtMM7qny8DfheatqbAeHFvex
-	LYS5cKwXZocoSEJcjmx5zc8cxlsV4SU4R
-X-Google-Smtp-Source: AGHT+IFGcmUa0WyxqmvFOeyNNS9EloxhzIuKQXWvQE+aHO65Lt9J8DTqX8ZxuA3J+CtyFYCOcvhh27BwkZx6Ce+zfKQ=
-X-Received: by 2002:a2e:8908:0:b0:2d0:e5e5:f40d with SMTP id
- d8-20020a2e8908000000b002d0e5e5f40dmr996402lji.17.1707949436204; Wed, 14 Feb
- 2024 14:23:56 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eJ3apngt"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B88D1C43390;
+	Wed, 14 Feb 2024 22:50:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707951027;
+	bh=Ib3H6XeBf06GgbKtBdlPoQPElryPrReiMckkqPen1QI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=eJ3apngtzef84BgD7ecnz+XbXmdQUozyru0RxPgJ2IAbfalU1iiim2/5AW8IW2g9H
+	 CXOoVSsoWNUyabgQ7TWOnkkgdiYzMEqvy7lJZMjq/dA/ofj8kil6D3Yt0Z2NvaMgWq
+	 u4Uyj50/yIgDHtGxMppyNkjERIFv1YHvWjyfCjFH8Q75CzT0j7dvY7Wf1K4c9HlMqT
+	 m7Ja+7CrBtvF6Iy0px5f4HMG0E+Cu0IuKrQyKDEZGRhmETSVVHpt93L5QX4IItiHL4
+	 4xSac8tdwDIjANXDGr3n9JFUSWV5SaS/wzPIX3xicKc1eboS1p73tvsN7RPLRnT8kn
+	 wM86KtoBxclNA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A2431D8C97E;
+	Wed, 14 Feb 2024 22:50:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240214-hook-fixup-v1-0-0e158ffea140@gmail.com> <20240214-hook-fixup-v1-1-0e158ffea140@gmail.com>
-In-Reply-To: <20240214-hook-fixup-v1-1-0e158ffea140@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 14 Feb 2024 17:23:43 -0500
-Message-ID: <CABBYNZJE6h9MKo8Eyh9SNyYWBSH9Kq6q5o3bcH-wEb41QXaAvw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/4] build: fold separate install-data-hooks
-To: emil.l.velikov@gmail.com
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v5 1/3] hog-lib: Don't destroy UHID device on detach
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <170795102766.1654.13661249574019506055.git-patchwork-notify@kernel.org>
+Date: Wed, 14 Feb 2024 22:50:27 +0000
+References: <20240214185718.536748-1-luiz.dentz@gmail.com>
+In-Reply-To: <20240214185718.536748-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Emil,
+Hello:
 
-On Wed, Feb 14, 2024 at 5:02=E2=80=AFPM Emil Velikov via B4 Relay
-<devnull+emil.l.velikov.gmail.com@kernel.org> wrote:
->
-> From: Emil Velikov <emil.l.velikov@gmail.com>
->
-> Autoconfigure throws a useful error, that I've missed previously. As-is
-> with two identical hooks `make install` will fail.
->
-> Just fold them into single place - not particularly pretty but works.
->
-> Signed-off-by: Emil Velikov <emil.l.velikov@gmail.com>
-> ---
->  Makefile.am    | 9 +++++++++
->  Makefile.obexd | 6 ------
->  2 files changed, 9 insertions(+), 6 deletions(-)
->
-> diff --git a/Makefile.am b/Makefile.am
-> index 5207c172b..e67551761 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -34,6 +34,15 @@ statedir =3D $(localstatedir)/lib/bluetooth
->  install-data-hook:
->         install -dm555 $(DESTDIR)$(confdir)
->         install -dm700 $(DESTDIR)$(statedir)
-> +if OBEX
-> +if SYSTEMD
-> +       $(LN_S) -f obex.service $(DESTDIR)$(SYSTEMD_USERUNITDIR)/dbus-org=
-.bluez.obex.service
-> +
-> +uninstall-hook:
-> +       rm -f $(DESTDIR)$(SYSTEMD_USERUNITDIR)/dbus-org.bluez.obex.servic=
-e
-> +endif
-> +endif
-> +
->  if DATAFILES
->  dbusdir =3D $(DBUS_CONFDIR)/dbus-1/system.d
-> diff --git a/Makefile.obexd b/Makefile.obexd
-> index 81456544d..b91ca6644 100644
-> --- a/Makefile.obexd
-> +++ b/Makefile.obexd
-> @@ -2,12 +2,6 @@
->  if SYSTEMD
->  systemduserunitdir =3D $(SYSTEMD_USERUNITDIR)
->  systemduserunit_DATA =3D obexd/src/obex.service
-> -
-> -install-data-hook:
-> -       $(LN_S) -f obex.service $(DESTDIR)$(SYSTEMD_USERUNITDIR)/dbus-org=
-.bluez.obex.service
-> -
-> -uninstall-hook:
-> -       rm -f $(DESTDIR)$(SYSTEMD_USERUNITDIR)/dbus-org.bluez.obex.servic=
-e
->  endif
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Hmm, isn't it possible to do target specific install hooks?
+On Wed, 14 Feb 2024 13:57:16 -0500 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This makes bt_hog_detach not to destroy UHID device which means the
+> device node don't need to be recreated in case of reconnections which
+> speeds up the process.
+> 
+> Fixes: https://github.com/bluez/bluez/issues/737
+> 
+> [...]
 
->  dbussessionbusdir =3D $(DBUS_SESSIONBUSDIR)
->
-> --
-> 2.43.1
->
->
+Here is the summary with links:
+  - [BlueZ,v5,1/3] hog-lib: Don't destroy UHID device on detach
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=247ae8524888
+  - [BlueZ,v5,2/3] input.conf: Make UserspaceHID defaults to true
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9698870015b0
+  - [BlueZ,v5,3/3] input/device: Don't destroy UHID device on disconnect
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ee880bee8586
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---=20
-Luiz Augusto von Dentz
