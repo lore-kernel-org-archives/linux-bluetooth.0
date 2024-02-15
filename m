@@ -1,127 +1,103 @@
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50F1C19A
-	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Feb 2024 00:09:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 070B113FEE
+	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Feb 2024 08:40:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707955773; cv=none; b=jKAqHiV0Bs1tQwZx3ixz+ZxcSg6eTKKcIBlNR4/E53EoR8rf66o03gtkVhYriSP78F8LphimV7TShRqOPW9ut4JKyv+EmNzlgV5yBNfpSwnAXBof347kXpqpwP5M5XJZkgXtL7vc91ezAhVvjvFiibveRyQoriNujQlkG4qgW0w=
+	t=1707986435; cv=none; b=f5vMrWPvcIaxBQx5cgEo8PvgbxGJR9EF2CovQnB5af8eGF96Un/G9aIiR3BgEKJEJgNm3+znkhz7T6uHASqTJLHEDnYV0MhPB6KzMaV1vwvri6ytEODwAIkQplXtWrQrrxrvY5gvff/n80cvyF+5hI3FLuBRmB0iR6ZNtgqE2Fc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707955773; c=relaxed/simple;
-	bh=lkyKnMRFOyiBt2BWpNqeDPl+r5S/FWcvwh550R7WOts=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=g6wcJ/1oFgjH7O1LZqQ/J47uI5ee2nVKxBVyvlI3N3AO9l34lPIdTUR6wXGfFfX5D1prwTTma78FARWSS9cSn+xXCt5lypuYy8oFflCAf6mxHCO2hCrsUUGQk8UuUlLzAAA62arobQ7XeK3WDEVhdmnDjwTB+ZwmZaX0y/ljdoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OBTL4kBL; arc=none smtp.client-ip=209.85.222.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1707986435; c=relaxed/simple;
+	bh=qBvGxcHs16SIfJ+Mve5hW7LDHDVDhcbN90/Cd6obXHc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=j8m+7uiljMA0rGq9VXYrFPb/v3uwgyGyWWB5W/f35+eqNfRDdVnh9Uemlp3bO64pqSoX6YbdiRJb0oSLCfnm84dfEk253/IDgN50Vx38NI456o2V2wnEfoAwv8i7lYPsqyv2clDA2iftV1MAzPnwYKCBhHlBDCKJJ4ViHFtspBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=WqY04hC9; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=PUe96L+/ reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OBTL4kBL"
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-7872bc61fd3so12342785a.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Feb 2024 16:09:32 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="WqY04hC9";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="PUe96L+/"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707955771; x=1708560571; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=qtvio0DnubqltIAd2ciZZocioe1rZ6+oYgTLtQeyKc0=;
-        b=OBTL4kBLm/S3v/yKj3YS1l+eaOS9eyvOyEqtQiTfEZY1HCwcJeXJd9kSmg7ZygNGv1
-         BBbVlAh77dR6SpiM6+z2XOdtH7gBbtE5nmCswnc45WgJiiCnsOCODxOSPW7OBalP4FMB
-         aqNY0/IP+wx9PHMUI+evIGUritxHQXbD4vtbaj7oM3mtlhPE2Atk3fgwM/hjNzoB942p
-         HO5K77mJk7Pnt3+s8qPI5wdRA1fRf3TZKH4VTlKd/KLvkiMw30KPfdfO/xHCbdlk6W1d
-         0TzAqegJSFikh3rsqBDGr8YOp6GI8Gx+eg4XjiNktJg8JpHEErv/4i4ZgocqgBVbzzlH
-         X8Hg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707955771; x=1708560571;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qtvio0DnubqltIAd2ciZZocioe1rZ6+oYgTLtQeyKc0=;
-        b=ByVAq+Dc8sVNNE5DUDlurOS9N3hxvrtO0cs+A8ajK76YVh93X2swUNvWqfelvekPL5
-         wk1KEI1gkOqgOVyyvlS0JTbkW6rcZSHO89EWfFdotpHDkD5dLGarCzVY1QdT+u059E0d
-         P5O+PSwCAt3KxJoekJIZdehiPdubjfZm2vKDe4pXk+5M+85W48MfffwgLOn7Uy/f/tz6
-         TcLTcNxnwHhDWmyMUW1BJyve38I/ONwOTt87w69/4Cki5vJBBiwuZWMzqmTD+BR5r1nu
-         tYcbBfynu5oqKuj/bNO1iS7DZ9Yei0qMW+1EYztzxbhq6VXqTJRdklI08uUyOT91xwxA
-         OdvQ==
-X-Gm-Message-State: AOJu0YwVf8534wT8JnCcfrTq6y0wEHB65mCvgPoi3difTiizVsDaKh0L
-	lAk7DzRq4QLT5ZlSP2tlsB+53W/k0RaaH8E0eOVNQqs32cnpd2e2glSw+pd/
-X-Google-Smtp-Source: AGHT+IF1aaEumgEsFD9xk9Lv6UPC6oJvP6ex+UNkdhBdcUd3HcCCwq0qJ6ZgYXN2HpwSpg5N2x5+zQ==
-X-Received: by 2002:a05:620a:2606:b0:785:d37f:8f66 with SMTP id z6-20020a05620a260600b00785d37f8f66mr401907qko.8.1707955770916;
-        Wed, 14 Feb 2024 16:09:30 -0800 (PST)
-Received: from [172.17.0.2] ([20.55.14.224])
-        by smtp.gmail.com with ESMTPSA id az42-20020a05620a172a00b007871bac855fsm111342qkb.47.2024.02.14.16.09.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Feb 2024 16:09:30 -0800 (PST)
-Message-ID: <65cd563a.050a0220.5c5e4.0713@mx.google.com>
-Date: Wed, 14 Feb 2024 16:09:30 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5126642182304886089=="
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1707986431; x=1739522431;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=puZvORcw9qnLxF8rzbQ1/miMhdi9Lrqp3j+ZxWqeDXc=;
+  b=WqY04hC9NFcx9q+4sQJJuq2687N5HRQgvbzMWvbTtGSUzz+9aINur65C
+   Swg1rNkUlfsjFx3nHb9F751dOztgdYZkMjWyIZwbyIv8Fts/uLfU4ilT8
+   Wb4mYKGZ9hwDL29K3asxsBysqF/KW1ZNynY97Hpi5qxhjb6HVkX97tPBT
+   Y3qNBk5KsRsd6IHnkA7TAS2lWIzSPZssXZgZ3V90tf5TT++AIUIfOyXxL
+   zfIft6EbrUnmpZbm6x57wR+azM9F1QtcVrFC7mPXR26Apa13yTxMe6koQ
+   oxr04yHFTS2p+H7HEc9T/OWbC3qbvfnrEfHa99TIXsIi5dRWeqSnILweN
+   A==;
+X-IronPort-AV: E=Sophos;i="6.06,161,1705359600"; 
+   d="scan'208";a="35418178"
+Received: from vmailcow01.tq-net.de ([10.150.86.48])
+  by mx1.tq-group.com with ESMTP; 15 Feb 2024 09:40:28 +0100
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id E873E172201;
+	Thu, 15 Feb 2024 09:40:27 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
+	s=dkim; t=1707986428;
+	h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=puZvORcw9qnLxF8rzbQ1/miMhdi9Lrqp3j+ZxWqeDXc=;
+	b=PUe96L+/ed570sKVzJHEKKV06TbmdSpWfQFHmKa2pnoK4pKHf5FX6sDeaw+qT8HJZWG7md
+	TV7/pNTnyxmHhopjTEUQ2Qd6TlBgvQyRFPEbvvCgAxOlLku4ckHA1hif1XKrEwOl8pvrkb
+	yUKQiTGS7aPUC2t2yhzrBY4WDv8ORu/CNN8vOqXDXHHPalhFCZp4QgB5J6+Ujp+jjl7kfk
+	eJNoTLUWFKkWZ1m0Z/Q4bCEnaTbaz+u+QnjdHHAUxGFxYaig06vfoeDXMpU+SKj+Ja0wD3
+	lzjIOHgqY3cIgsQJL1K7hXuUnHUzndNSpWrd83135yI8KSDGHLSuss05XXu9aw==
+From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: oss@ew.tq-group.com,
+	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Subject: [PATCH BlueZ 1/2] tools/rfcomm: reset ignored signals after fork
+Date: Thu, 15 Feb 2024 09:39:53 +0100
+Message-ID: <20240215083954.5233-1-matthias.schiffer@ew.tq-group.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, hadess@hadess.net
-Subject: RE: [[BlueZ,v2] ] mesh-gatt: Fix JSON files missing from dist
-In-Reply-To: <20240214224955.405535-1-hadess@hadess.net>
-References: <20240214224955.405535-1-hadess@hadess.net>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 
---===============5126642182304886089==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=826174
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      0.61 seconds
-GitLint                       PASS      0.32 seconds
-BuildEll                      PASS      24.15 seconds
-BluezMake                     PASS      735.22 seconds
-MakeCheck                     PASS      12.09 seconds
-MakeDistcheck                 PASS      165.29 seconds
-CheckValgrind                 PASS      228.23 seconds
-CheckSmatch                   PASS      333.63 seconds
-bluezmakeextell               PASS      108.61 seconds
-IncrementalBuild              PASS      691.98 seconds
-ScanBuild                     PASS      974.78 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[[BlueZ,v2] ] mesh-gatt: Fix JSON files missing from dist
-WARNING:UNKNOWN_COMMIT_ID: Unknown commit id '1f6553edd8a5', maybe rebased or not pulled?
-#52: 
-Fixes: 1f6553edd8a5 ("build: Deprecate meshctl tool")
-
-/github/workspace/src/src/13557161.patch total: 0 errors, 1 warnings, 10 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13557161.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
+rfcomm sets SIGCHLD and SIGPIPE to SIG_IGN, which is inherited by child
+processes and preserved across execvp(). Many applications do not expect
+these signals to be ignored, causing all kinds of breakage (including the
+standard C system() function misbehaving on glibc and probably other
+libcs because waitpid() does not work when SIGCHLD is ignored).
 ---
-Regards,
-Linux Bluetooth
+ tools/rfcomm.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
+diff --git a/tools/rfcomm.c b/tools/rfcomm.c
+index e013ff588..f635d4aef 100644
+--- a/tools/rfcomm.c
++++ b/tools/rfcomm.c
+@@ -212,6 +212,7 @@ static void run_cmdline(struct pollfd *p, sigset_t *sigs, char *devname,
+ 	int i;
+ 	pid_t pid;
+ 	char **cmdargv;
++	struct sigaction sa;
+ 
+ 	cmdargv = malloc((argc + 1) * sizeof(char *));
+ 	if (!cmdargv)
+@@ -225,6 +226,11 @@ static void run_cmdline(struct pollfd *p, sigset_t *sigs, char *devname,
+ 
+ 	switch (pid) {
+ 	case 0:
++		memset(&sa, 0, sizeof(sa));
++		sa.sa_handler = SIG_DFL;
++		sigaction(SIGCHLD, &sa, NULL);
++		sigaction(SIGPIPE, &sa, NULL);
++
+ 		i = execvp(cmdargv[0], cmdargv);
+ 		fprintf(stderr, "Couldn't execute command %s (errno=%d:%s)\n",
+ 				cmdargv[0], errno, strerror(errno));
+-- 
+TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
+Amtsgericht München, HRB 105018
+Geschäftsführer: Detlef Schneider, Rüdiger Stahl, Stefan Schneider
+https://www.tq-group.com/
 
---===============5126642182304886089==--
