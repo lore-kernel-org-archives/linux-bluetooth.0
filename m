@@ -1,57 +1,61 @@
 Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 070B113FEE
-	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Feb 2024 08:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1911134C3
+	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Feb 2024 08:40:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707986435; cv=none; b=f5vMrWPvcIaxBQx5cgEo8PvgbxGJR9EF2CovQnB5af8eGF96Un/G9aIiR3BgEKJEJgNm3+znkhz7T6uHASqTJLHEDnYV0MhPB6KzMaV1vwvri6ytEODwAIkQplXtWrQrrxrvY5gvff/n80cvyF+5hI3FLuBRmB0iR6ZNtgqE2Fc=
+	t=1707986439; cv=none; b=glYgx/7vECWO8aZkzE/uuYOVAIsbaxSZ+NgtMya/sJkUFJjr3PyqbUgNyN+G/ZQPauijiuZpNzehm75JxJM5YUW0QY3o9ciY/lwlMvgg+nS4uQGlZLZj/makoPzdk661f6LMBIYj4PsJejDk7AMWevEt+dfmXyQe4swJhBGVfrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707986435; c=relaxed/simple;
-	bh=qBvGxcHs16SIfJ+Mve5hW7LDHDVDhcbN90/Cd6obXHc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=j8m+7uiljMA0rGq9VXYrFPb/v3uwgyGyWWB5W/f35+eqNfRDdVnh9Uemlp3bO64pqSoX6YbdiRJb0oSLCfnm84dfEk253/IDgN50Vx38NI456o2V2wnEfoAwv8i7lYPsqyv2clDA2iftV1MAzPnwYKCBhHlBDCKJJ4ViHFtspBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=WqY04hC9; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=PUe96L+/ reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
+	s=arc-20240116; t=1707986439; c=relaxed/simple;
+	bh=l7gjk1oUl/83P+XdzIDHJaVGXIDigPODJjb4/ofdmU4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FtwROSqXlebpBk+O7Ax4KG/g/gvEkCCgX4yIyoCTI8E/JEDHEu3OGTUIowb3HiKEwX18cAlSRGcEAQMTrbDnJ5PnJeUwli/1CiGYC8Qm+dZ+lz3zvLsXDLh5HOyxL1Gpa2sJa8ZQW0f/Ht2CQJG9OioZzdciBNOxz2C7zTgm3BE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=dsRLlnzE; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=Xd/vXdir reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="WqY04hC9";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="PUe96L+/"
+	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="dsRLlnzE";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="Xd/vXdir"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1707986431; x=1739522431;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=puZvORcw9qnLxF8rzbQ1/miMhdi9Lrqp3j+ZxWqeDXc=;
-  b=WqY04hC9NFcx9q+4sQJJuq2687N5HRQgvbzMWvbTtGSUzz+9aINur65C
-   Swg1rNkUlfsjFx3nHb9F751dOztgdYZkMjWyIZwbyIv8Fts/uLfU4ilT8
-   Wb4mYKGZ9hwDL29K3asxsBysqF/KW1ZNynY97Hpi5qxhjb6HVkX97tPBT
-   Y3qNBk5KsRsd6IHnkA7TAS2lWIzSPZssXZgZ3V90tf5TT++AIUIfOyXxL
-   zfIft6EbrUnmpZbm6x57wR+azM9F1QtcVrFC7mPXR26Apa13yTxMe6koQ
-   oxr04yHFTS2p+H7HEc9T/OWbC3qbvfnrEfHa99TIXsIi5dRWeqSnILweN
-   A==;
+  t=1707986435; x=1739522435;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=oFr2SS4bZB9XrUiyjZsI9S6F2CKS7qQrFjyLbaKAiWc=;
+  b=dsRLlnzE4lJ1BxeF4kabSmcrsIsoXzunlSIsxANnk5X5EMIcxTR8aIU3
+   ttqBRrsMNX6NPKQkrluczg6t+KwTO/ZfHPmhqpF0cNm0BracCriKNEs5s
+   423BI3wRJ9jYRzcSt8myCc8JP2jcMfuQjK1/lZpB6AJVnb+2CTN6Ok5IT
+   N0sr3cAwB8r9FolzgOWWVXoU+fd5Pm3IAaCwCCy1shmlqjvSunOA6ERGG
+   UWDdGLY/4jrwwnN1suHTaOCiF7WDL1T7qCOwwMVPJbQZnJkVRragDI/a6
+   LFEn2ZAfYQ+bfOZlyAIdETCDlFKb07Q1HVvRuelWebRfYxWDoCTsvYn1P
+   g==;
 X-IronPort-AV: E=Sophos;i="6.06,161,1705359600"; 
-   d="scan'208";a="35418178"
+   d="scan'208";a="35418179"
 Received: from vmailcow01.tq-net.de ([10.150.86.48])
   by mx1.tq-group.com with ESMTP; 15 Feb 2024 09:40:28 +0100
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id E873E172201;
-	Thu, 15 Feb 2024 09:40:27 +0100 (CET)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 79547172221;
+	Thu, 15 Feb 2024 09:40:28 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
 	s=dkim; t=1707986428;
 	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding; bh=puZvORcw9qnLxF8rzbQ1/miMhdi9Lrqp3j+ZxWqeDXc=;
-	b=PUe96L+/ed570sKVzJHEKKV06TbmdSpWfQFHmKa2pnoK4pKHf5FX6sDeaw+qT8HJZWG7md
-	TV7/pNTnyxmHhopjTEUQ2Qd6TlBgvQyRFPEbvvCgAxOlLku4ckHA1hif1XKrEwOl8pvrkb
-	yUKQiTGS7aPUC2t2yhzrBY4WDv8ORu/CNN8vOqXDXHHPalhFCZp4QgB5J6+Ujp+jjl7kfk
-	eJNoTLUWFKkWZ1m0Z/Q4bCEnaTbaz+u+QnjdHHAUxGFxYaig06vfoeDXMpU+SKj+Ja0wD3
-	lzjIOHgqY3cIgsQJL1K7hXuUnHUzndNSpWrd83135yI8KSDGHLSuss05XXu9aw==
+	 content-transfer-encoding:in-reply-to:references;
+	bh=oFr2SS4bZB9XrUiyjZsI9S6F2CKS7qQrFjyLbaKAiWc=;
+	b=Xd/vXdirtFS8BrqP0dLFp2jBBh4cmixbFxMO5h6kPKNHpKsZhxmweOhQZI2L9EydcAhEUk
+	YPvDKwONC+UOcESwWvCwrAvgnZucdT86VEQsbZ++LETe0JpfteIBqpIypVkXn3WqOw2Zdj
+	+qXSl6U8+Q9wIknbAMcY6URRSgY3XVXB0kQ/KLb+jUJQP+rbEPzrFxkrJbkFRedrwMZbsN
+	dvI//7B+K1uAzoNjpH6pQNGYdxgdCu2UblSRoC8Jl+dkGnkiT0aHhEhyWo+V5PcLZOwq1P
+	HGELFEdXTH071xHQA8wRmyEVqcB+d8Q233qrzW+Dh1PBM7n+pHt98VTsMXAvWg==
 From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: oss@ew.tq-group.com,
 	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-Subject: [PATCH BlueZ 1/2] tools/rfcomm: reset ignored signals after fork
-Date: Thu, 15 Feb 2024 09:39:53 +0100
-Message-ID: <20240215083954.5233-1-matthias.schiffer@ew.tq-group.com>
+Subject: [PATCH BlueZ 2/2] tools/rfcomm: _exit() on execvp() failure
+Date: Thu, 15 Feb 2024 09:39:54 +0100
+Message-ID: <20240215083954.5233-2-matthias.schiffer@ew.tq-group.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240215083954.5233-1-matthias.schiffer@ew.tq-group.com>
+References: <20240215083954.5233-1-matthias.schiffer@ew.tq-group.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -62,39 +66,25 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Last-TLS-Session-Version: TLSv1.3
 
-rfcomm sets SIGCHLD and SIGPIPE to SIG_IGN, which is inherited by child
-processes and preserved across execvp(). Many applications do not expect
-these signals to be ignored, causing all kinds of breakage (including the
-standard C system() function misbehaving on glibc and probably other
-libcs because waitpid() does not work when SIGCHLD is ignored).
+When the exec fails, the child process must be terminated instead of
+continuing as a second main process.
 ---
- tools/rfcomm.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ tools/rfcomm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tools/rfcomm.c b/tools/rfcomm.c
-index e013ff588..f635d4aef 100644
+index f635d4aef..0139fe69b 100644
 --- a/tools/rfcomm.c
 +++ b/tools/rfcomm.c
-@@ -212,6 +212,7 @@ static void run_cmdline(struct pollfd *p, sigset_t *sigs, char *devname,
- 	int i;
- 	pid_t pid;
- 	char **cmdargv;
-+	struct sigaction sa;
- 
- 	cmdargv = malloc((argc + 1) * sizeof(char *));
- 	if (!cmdargv)
-@@ -225,6 +226,11 @@ static void run_cmdline(struct pollfd *p, sigset_t *sigs, char *devname,
- 
- 	switch (pid) {
- 	case 0:
-+		memset(&sa, 0, sizeof(sa));
-+		sa.sa_handler = SIG_DFL;
-+		sigaction(SIGCHLD, &sa, NULL);
-+		sigaction(SIGPIPE, &sa, NULL);
-+
+@@ -234,7 +234,7 @@ static void run_cmdline(struct pollfd *p, sigset_t *sigs, char *devname,
  		i = execvp(cmdargv[0], cmdargv);
  		fprintf(stderr, "Couldn't execute command %s (errno=%d:%s)\n",
  				cmdargv[0], errno, strerror(errno));
+-		break;
++		_exit(EXIT_FAILURE);
+ 	case -1:
+ 		fprintf(stderr, "Couldn't fork to execute command %s\n",
+ 				cmdargv[0]);
 -- 
 TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
 Amtsgericht München, HRB 105018
