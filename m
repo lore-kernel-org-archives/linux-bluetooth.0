@@ -1,113 +1,343 @@
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84EF43FC2
-	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 00:41:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1070810798
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 05:48:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708044099; cv=none; b=FC97rWPvWNtDy/nsbpSxkVeQlJrRp6770dSGAJO+LgjUhf5UDXnrQUYHLDvl+jzY2uZbT2+ezvwGQg8zxylAXJOTJ9Cbu41emrJJwjUKUh0zkab2Hoatp3ZhJfhhYCWs3CGMBCgY+sxqpN2IXf8sp61bE/wcmGC7s0zkfh06Hzk=
+	t=1708062522; cv=none; b=nr1OTlgwzBd9j4KGKybaG3sdPnZIdouEZ0TWOtZciLWqiT27QNsMd47ObhNGA8fkJPILekg+asePELJ2JjW+b4yFI5GsswZF7sMkBk6j56mfNzOtskc+yOre+hdgEQiRcdtKFu2WmQyLhIsgJ3bnUu2tgToM2tv5cU6A5yVv1oc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708044099; c=relaxed/simple;
-	bh=9BlW/WKvupuxlq7xPkyaO2yvsKL1AWmgvgRwo+INBX8=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Q/feQMoXZkrfG26Q4H7Qkr52RyF1NXRIFyAkD2NmrUn5OanL84hdmbf7lCjy2Dx3CRUTTYcJNJ3IeRq54aQYO6z0hrnE6zS7OrCDlSZ+wDQ84sTNIB+JAwVKFoouLDc4GLkaRdTvMtZBReBYNLMKwMWOyRyrUppX5ZmgbRQuvec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g/HtCGcF; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1708062522; c=relaxed/simple;
+	bh=4AdoLCd6eXSSX9L768o5IlVRkxZZmdfDnlW4GI0/SSU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=COydVRQy58yS38Uovo9SMWOCeDQn61FL6dw1CdPy0LibIc03DEHkF4mDkdlNUn8ussmhpc9ePUnV8cTXEr/gYOjULAw/nI0/H7w1XxVBegrZI3o4x1vc15DNMa7zUK33L/Fu6ceWfsMnApdL0PB/1rr0qQIzD5vVh2GlRctCLF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hLssGtD1; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g/HtCGcF"
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-296df89efd2so183210a91.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Feb 2024 16:41:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708044097; x=1708648897; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=zGcaIooWd+t8wpUM6yMDtXoPOqcXFh/XS/FzoRz4b4I=;
-        b=g/HtCGcFq0pehvpAW3ukmWUHDREHab/HQA4dJ9hDi+wviulLye2Eg2aZaLEfrRqj5X
-         fc326r+ACQPJl6yYmMQm4JGIEbov+lKrD/pd38kpief4GKiblKPqivUYp6eJzg4bdDM/
-         eLCoHWroy1Bw9sew/ElkGprDI1nrEP3+X1WC3Q2yso/ZzE7tFNXmtdzlD6ArR4rhFOEy
-         ZJbsGhh3NwEIIVB4QqYHB79l4p0e20msm0PpSRPUHu0movWWJxGFFYPpe97rm/FFFjtE
-         kvV7zjn3j9xLLI7fmumHUe5hjDHMnGC3UAyQcKLEzNpzsBwKg6TlCAw57f+inqbjnwfx
-         M4tA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708044097; x=1708648897;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zGcaIooWd+t8wpUM6yMDtXoPOqcXFh/XS/FzoRz4b4I=;
-        b=Aa0ib8KAShCu/woSAhVVHCW/zHrQrSTLGAd2OAeZ+6gQL1t5mq4mBFRkbF0RybHzjW
-         By+rspCW0QzvPxn4bCNeOciscYuta2WG8nRQxLlNxWX2q3p1SkZhRcPX1tLb2aB/oVqp
-         mgqmSoh1jBImNtxabB/t4yKb4ZHpCAlB/QyMSZmkjpMxR13YryAuRYhslKCxxhncHmX3
-         vKNa6isha53sdldQvP1uizUgftscT4GkTtLmPNGriyikQmLIUPYxWmcSU8ismzoCunSK
-         qSFVgV4p85CFtfI3NZ835e9VEqudFBUd9wN7aB8CYdbizqO3B535LtJlVghVFhlZcCrm
-         JeMw==
-X-Gm-Message-State: AOJu0YxnGRvFCiN41LuZfsGfwF5XemcolaV68EijIC38GzD4oC49ZNbE
-	7CVAIsH015YwW7T5F7VI9zygHvqROEi3oKgdjt9i1wNkun+vZUj67TV51+IR
-X-Google-Smtp-Source: AGHT+IF9xrqZkbNSgnqzcaAzJ6sPm6yr11xCn3V9zeKVdHNxSlxGIIM54pZaaLo2lsVjLuw6qnne/g==
-X-Received: by 2002:a17:90a:ec17:b0:299:174d:94d3 with SMTP id l23-20020a17090aec1700b00299174d94d3mr2416126pjy.28.1708044097336;
-        Thu, 15 Feb 2024 16:41:37 -0800 (PST)
-Received: from [172.17.0.2] ([52.238.25.56])
-        by smtp.gmail.com with ESMTPSA id pd12-20020a17090b1dcc00b0029696f7f443sm4129412pjb.50.2024.02.15.16.41.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Feb 2024 16:41:37 -0800 (PST)
-Message-ID: <65ceaf41.170a0220.9d896.fb97@mx.google.com>
-Date: Thu, 15 Feb 2024 16:41:37 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4092176367705703639=="
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hLssGtD1"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708062520; x=1739598520;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=4AdoLCd6eXSSX9L768o5IlVRkxZZmdfDnlW4GI0/SSU=;
+  b=hLssGtD1GB1H+uoksUvKvdhJJpKE9qnWhLTGRDTbVAkK1dzDtOsum80Y
+   210RsZZdwlSqJctkwChA7brTmDSPMxXc9GMQ9++BGQS+AGdTpZKaxJeOu
+   tA0hB4N2adZYaPGGxzO5bES2/aNBOEF8IFo1PKPoZxdI+qBX6ES6x2JFN
+   fCLqWVJ7qDWv1BfzYIP8qkZiF3xmhJZBQ6cEos3uM+iQT1y3IfdQQ3Tna
+   BS3vM0wX0X6Ozv3IZBese0B/XbgieRr+3qAWSLwKnGxkubiA0ql9TOphL
+   wI6jzrTypJhTBniKvo35pReAZN9ZLlTT0vDxvFHgXlQcddU95TVLZRCkm
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10985"; a="13287077"
+X-IronPort-AV: E=Sophos;i="6.06,163,1705392000"; 
+   d="scan'208";a="13287077"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2024 21:48:39 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,163,1705392000"; 
+   d="scan'208";a="3681378"
+Received: from lbtoe.iind.intel.com ([10.224.186.133])
+  by fmviesa007.fm.intel.com with ESMTP; 15 Feb 2024 21:48:38 -0800
+From: Shahid Vichhi <shahid.bashir.vichhi@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Shahid Vichhi <shahid.bashir.vichhi@intel.com>
+Subject: [PATCH v1] profiles/audio/ccp: Add initial code for ccp plugin
+Date: Fri, 16 Feb 2024 00:50:08 +0200
+Message-Id: <20240215225008.3996772-1-shahid.bashir.vichhi@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, tjernlund@tjernlund.se
-Subject: RE: [1/4] Replace @exec_prefix@ with @libexecdir@ in .service files.
-In-Reply-To: <20240215225249.16242-1-Joakim.Tjernlund@infinera.com>
-References: <20240215225249.16242-1-Joakim.Tjernlund@infinera.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============4092176367705703639==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=826608
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.93 seconds
-GitLint                       FAIL      1.02 seconds
-BuildEll                      PASS      24.14 seconds
-BluezMake                     PASS      731.18 seconds
-MakeCheck                     PASS      11.45 seconds
-MakeDistcheck                 PASS      163.57 seconds
-CheckValgrind                 PASS      227.16 seconds
-CheckSmatch                   PASS      332.01 seconds
-bluezmakeextell               PASS      107.61 seconds
-IncrementalBuild              PASS      2701.27 seconds
-ScanBuild                     PASS      970.94 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[1/4] Replace @exec_prefix@ with @libexecdir@ in .service files.
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T3 Title has trailing punctuation (.): "[1/4] Replace @exec_prefix@ with @libexecdir@ in .service files."
-
-
+This adds initial code for ccp plugin which handle call control profile and
+Telephone Bearer Services and Generic Telephone Bearer Services for
+client role.
 ---
-Regards,
-Linux Bluetooth
+ Makefile.plugins     |   5 +
+ configure.ac         |   4 +
+ profiles/audio/ccp.c | 238 +++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 247 insertions(+)
+ create mode 100644 profiles/audio/ccp.c
 
+diff --git a/Makefile.plugins b/Makefile.plugins
+index e960eedeabd3..4aa2c9c92854 100644
+--- a/Makefile.plugins
++++ b/Makefile.plugins
+@@ -138,6 +138,11 @@ builtin_modules += micp
+ builtin_sources += profiles/audio/micp.c
+ endif
+ 
++if CCP
++builtin_modules += ccp
++builtin_sources += profiles/audio/ccp.c
++endif
++
+ if CSIP
+ builtin_modules += csip
+ builtin_sources += profiles/audio/csip.c
+diff --git a/configure.ac b/configure.ac
+index 70e9d4be8127..c7dadf79a565 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -200,6 +200,10 @@ AC_ARG_ENABLE(mcp, AS_HELP_STRING([--disable-mcp],
+         [disable MCP profile]), [enable_mcp=${enableval}])
+ AM_CONDITIONAL(MCP, test "${enable_mcp}" != "no")
+ 
++AC_ARG_ENABLE(ccp, AS_HELP_STRING([--disable-ccp],
++        [disable CCP profile]), [enable_ccp=${enableval}])
++AM_CONDITIONAL(CCP, test "${enable_ccp}" != "no")
++
+ AC_ARG_ENABLE(vcp, AS_HELP_STRING([--disable-vcp],
+ 		[disable VCP profile]), [enable_vcp=${enableval}])
+ AM_CONDITIONAL(VCP, test "${enable_vcp}" != "no")
+diff --git a/profiles/audio/ccp.c b/profiles/audio/ccp.c
+new file mode 100644
+index 000000000000..a1992e5687eb
+--- /dev/null
++++ b/profiles/audio/ccp.c
+@@ -0,0 +1,238 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2024  Intel Corporation. All rights reserved.
++ *
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#define _GNU_SOURCE
++
++#include <ctype.h>
++#include <stdbool.h>
++#include <stdlib.h>
++#include <stdio.h>
++#include <string.h>
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <fcntl.h>
++#include <errno.h>
++
++#include <glib.h>
++
++#include "gdbus/gdbus.h"
++
++#include "lib/bluetooth.h"
++#include "lib/hci.h"
++#include "lib/sdp.h"
++#include "lib/uuid.h"
++
++#include "src/dbus-common.h"
++#include "src/shared/util.h"
++#include "src/shared/att.h"
++#include "src/shared/queue.h"
++#include "src/shared/gatt-db.h"
++#include "src/shared/gatt-client.h"
++#include "src/shared/gatt-server.h"
++#include "src/shared/ccp.h"
++
++#include "btio/btio.h"
++#include "src/plugin.h"
++#include "src/adapter.h"
++#include "src/gatt-database.h"
++#include "src/device.h"
++#include "src/profile.h"
++#include "src/service.h"
++#include "src/log.h"
++#include "src/error.h"
++
++#define GTBS_UUID_STR "0000184C-0000-1000-8000-00805f9b34fb"
++
++struct ccp_data {
++	struct btd_device *device;
++	struct btd_service *service;
++	struct bt_ccp *ccp;
++	unsigned int state_id;
++};
++
++static void ccp_debug(const char *str, void *user_data)
++{
++	DBG_IDX(0xffff, "%s", str);
++}
++
++static struct ccp_data *ccp_data_new(struct btd_device *device)
++{
++	struct ccp_data *data;
++
++	data = new0(struct ccp_data, 1);
++	data->device = device;
++
++	return data;
++}
++
++static int ccp_probe(struct btd_service *service)
++{
++	struct btd_device *device = btd_service_get_device(service);
++	struct btd_adapter *adapter = device_get_adapter(device);
++	struct btd_gatt_database *database = btd_adapter_get_database(adapter);
++	struct ccp_data *data = btd_service_get_user_data(service);
++	char addr[18];
++
++	ba2str(device_get_address(device), addr);
++	DBG("%s", addr);
++
++	/* Ignore, if we were probed for this device already */
++	if (data) {
++		error("Profile probed twice for the same device!");
++		return -EINVAL;
++	}
++
++	data = ccp_data_new(device);
++	data->service = service;
++
++	data->ccp = bt_ccp_new(btd_gatt_database_get_db(database),
++												 btd_device_get_gatt_db(device));
++
++	bt_ccp_set_debug(data->ccp, ccp_debug, NULL, NULL);
++	btd_service_set_user_data(service, data);
++
++	return 0;
++}
++
++static void ccp_data_free(struct ccp_data *data)
++{
++	if (data->service) {
++		btd_service_set_user_data(data->service, NULL);
++		bt_ccp_set_user_data(data->ccp, NULL);
++	}
++
++	bt_ccp_unref(data->ccp);
++	free(data);
++}
++
++static void ccp_data_remove(struct ccp_data *data)
++{
++	DBG("data %p", data);
++
++	ccp_data_free(data);
++}
++
++static void ccp_remove(struct btd_service *service)
++{
++	struct btd_device *device = btd_service_get_device(service);
++	struct ccp_data *data;
++	char addr[18];
++
++	ba2str(device_get_address(device), addr);
++	DBG("%s", addr);
++
++	data = btd_service_get_user_data(service);
++	if (!data) {
++		error("CCP service not handled by profile");
++		return;
++	}
++
++	ccp_data_remove(data);
++}
++
++static int ccp_accept(struct btd_service *service)
++{
++	struct btd_device *device = btd_service_get_device(service);
++	struct bt_gatt_client *client = btd_device_get_gatt_client(device);
++	struct ccp_data *data = btd_service_get_user_data(service);
++	char addr[18];
++
++	ba2str(device_get_address(device), addr);
++	DBG("%s", addr);
++
++	if (!bt_ccp_attach(data->ccp, client)) {
++		error("VCP unable to attach");
++		return -EINVAL;
++	}
++
++	/*TODO: register telephony operations here*/
++
++	btd_service_connecting_complete(service, 0);
++
++	return 0;
++}
++
++static int ccp_connect(struct btd_service *service)
++{
++	struct btd_device *device = btd_service_get_device(service);
++	char addr[18];
++
++	ba2str(device_get_address(device), addr);
++	DBG("%s", addr);
++
++	return 0;
++}
++
++static int ccp_disconnect(struct btd_service *service)
++{
++	struct btd_device *device = btd_service_get_device(service);
++	struct ccp_data *data = btd_service_get_user_data(service);
++	char addr[18];
++
++	ba2str(device_get_address(device), addr);
++	DBG("%s", addr);
++
++	bt_ccp_detach(data->ccp);
++
++	btd_service_disconnecting_complete(service, 0);
++
++	return 0;
++}
++
++static int
++ccp_server_probe(struct btd_profile *p,
++								 struct btd_adapter *adapter)
++{
++	struct btd_gatt_database *database = btd_adapter_get_database(adapter);
++
++	bt_ccp_register(btd_gatt_database_get_db(database));
++
++	return 0;
++}
++
++static void
++ccp_server_remove(struct btd_profile *p,
++									struct btd_adapter *adapter)
++{
++	DBG("CCP remove Adapter");
++}
++
++static struct btd_profile ccp_profile = {
++	.name			= "ccp",
++	.priority		= BTD_PROFILE_PRIORITY_MEDIUM,
++	.remote_uuid	= GTBS_UUID_STR,
++	.device_probe	= ccp_probe,
++	.device_remove	= ccp_remove,
++	.accept			= ccp_accept,
++	.connect		= ccp_connect,
++	.disconnect		= ccp_disconnect,
++
++	.adapter_probe	= ccp_server_probe,
++	.adapter_remove = ccp_server_remove,
++
++	.experimental	= true,
++};
++
++static int ccp_init(void)
++{
++	return btd_profile_register(&ccp_profile);
++}
++
++static void ccp_exit(void)
++{
++	btd_profile_unregister(&ccp_profile);
++}
++
++BLUETOOTH_PLUGIN_DEFINE(ccp, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
++												ccp_init, ccp_exit)
+-- 
+2.34.1
 
---===============4092176367705703639==--
