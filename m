@@ -1,75 +1,105 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A52CB139565
-	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Feb 2024 18:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1862132461
+	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Feb 2024 20:43:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708023028; cv=none; b=B//OkqcwNl2xjHF0mAfXmKG5k38FC0SkPIjAiNae+w7NwA9ZoKhWVreCbJIQvTwHAFvvn2CZpdsG//bAG853PfaPg2hamdwIQoc9ukQ44huetd8DuU5sVswrOvhG117tUjTwuDAhqmQn/IyynU9XSVG1tFZdG2QMq74b3nXBHJM=
+	t=1708029838; cv=none; b=XA+IjpxiQBJgf8evoJ+V7Oik63ogCb5Xcn3VxZ6jDdLZIwI0qYqZVM7WB7/MHwknNBtZBXCJMCYo9y90ejXj0tgaCO8lx7FjCiOEvYjYWG2aGpunt06XdaP5LbFk7VfGTPpHQZak74LVAuPVaBmbQEAbNlqFmO/0MF6MBvoiaIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708023028; c=relaxed/simple;
-	bh=TtAXNz9QrmNFPoGYXUVbdXcAx73RbdmEg9GUAbq9LWs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=iwKhqOP1w+P5t3WqVPGWLUQW5hIhBiZNUIN0Rktz12AaLlVtfaWvAEKgJnsfuHJRKHYDod04wRBGixaN236/zw7GopuiA4u89D+aiZ5811sK9RiXvcGxuzZcPjkfxWscIg+49AxzJfE1Dyq8zmrkhtJoimkV4ptpq04XMGR4KhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p08fOdUb; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1708029838; c=relaxed/simple;
+	bh=MJksk4kOEX07fQHb0Bf0inQppQcffBBj5Uvthhe7Wp4=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=BFeAsSGImymJ6tW0nQvtyTDlKxm1NrbljFaDFeHpD6ETBja7Dfw7Oob1ysnC1dE49B48O2jrRtyp6zeJ+jgarb/gsr1znjpL0N/FKMH/ygAv6IIUNvpJ8Bn2YxkdkthOs7fKqSrQSY/M+ezLrLAJT7XfUQAdi0j1mPKnI9WJg3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iU6bL5Su; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p08fOdUb"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 29874C433F1;
-	Thu, 15 Feb 2024 18:50:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iU6bL5Su"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6DBD7C433F1
+	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Feb 2024 20:43:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708023028;
-	bh=TtAXNz9QrmNFPoGYXUVbdXcAx73RbdmEg9GUAbq9LWs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=p08fOdUbX0cttJkptJ/oRLxk27ahMCJHIpX6LEivwAox2jqZDyHu903QctTbPrCkI
-	 BMSrpJTIc5qvgQS4oR5D1W1qWVQLHUy+pT/aDSKF6f13RsmNfNUOVJfa6OAGf+z76n
-	 TgYzc0dGppGVUmtzmUShn+SkSbeaUIJG5n31nYcV+Oj3djDIRiTR9sGAz8Lu3g7qKt
-	 th17O/GfHtmPt6kgs+VM0dOZOFqZiRvhUQDqzGtOzNGdyYRYS8oql4XnAmWX9y0PPc
-	 clgAk/1cz5zzv0N0e+oMGLPC750SJy4rhbE8woE8DWbCSK3Ry+qYpK9rGj/a5aALtD
-	 WHOkR0Qtvog/w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 18C56D8C97E;
-	Thu, 15 Feb 2024 18:50:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1708029837;
+	bh=MJksk4kOEX07fQHb0Bf0inQppQcffBBj5Uvthhe7Wp4=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=iU6bL5SuuJvu/mpkm1ranrpgYrt6emIVaRVV5S/FLx8VJFpgT69k9W3WdWFws90m5
+	 vBLpItJY8u4ge+oOvbPjbirf/Zm0coe8eg26IW8mWrBk64P+KMDc12DwbmKFmW7ujf
+	 JynButnzfLMXE92PSImKdzV668wq0d0p1UeCU0XQHMdtxrhN3byn1e/vrkT3KjDPJM
+	 WkxLOqVEu0IkfEXzXo2hx0R59VzTjRwg8/6FijgWkQ9iVFyYMqgTSEpxgMvNpuP6ac
+	 ZJRdr96eMULIuOg5snAEV+0aQD0810yhVZjszztRAB487pt6Iyah/8lSZYtTj0vZzj
+	 MoZlc79rJXThg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 5D4D8C53BD0; Thu, 15 Feb 2024 20:43:57 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 218416] hci0: command 0xfc05 tx timeout in kernel 6.7.1
+Date: Thu, 15 Feb 2024 20:43:57 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: vjstink@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-218416-62941-Gz6nv9UAZH@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-218416-62941@https.bugzilla.kernel.org/>
+References: <bug-218416-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1 1/2] btdev: Fix crash on page_timeout
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <170802302809.16192.13676361481138368553.git-patchwork-notify@kernel.org>
-Date: Thu, 15 Feb 2024 18:50:28 +0000
-References: <20240215145227.782554-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240215145227.782554-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
 
-Hello:
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218416
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+Jhon (vjstink@gmail.com) changed:
 
-On Thu, 15 Feb 2024 09:52:26 -0500 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> If remote device cannot be found after page_timeout then the code shall
-> not proceed to call pending_conn_del.
-> ---
->  emulator/btdev.c | 3 +++
->  1 file changed, 3 insertions(+)
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |vjstink@gmail.com
 
-Here is the summary with links:
-  - [BlueZ,v1,1/2] btdev: Fix crash on page_timeout
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=f3c35ed835bd
-  - [BlueZ,v1,2/2] rfcomm-tester: Fix crash on test-basic
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=fb339bde646c
+--- Comment #6 from Jhon (vjstink@gmail.com) ---
+I have the same issue as Nickolas, turning off the computer does not help.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+The device is also the same: Intel AX200 8087:0029. Mine is on a desktop
+motherboard.
 
+$ uname -r
+6.7.4-arch1-1
 
+$ lsusb | grep -i bluetooth
+Bus 001 Device 006: ID 8087:0029 Intel Corp. AX200 Bluetooth
+
+$ journalctl -b | grep -E -i bluetooth
+----
+Feb 15 09:06:07 home bluetoothd[948]: Bluetooth management interface 1.22
+initialized
+Feb 15 09:06:07 home systemd[1]: Started Bluetooth service.
+Feb 15 09:06:07 home systemd[1]: Reached target Bluetooth Support.
+Feb 15 09:06:07 home NetworkManager[1027]: <info>  [1707980767.6232] Loaded
+device plugin: NMBluezManager
+(/usr/lib/NetworkManager/1.44.2-3/libnm-device-plugin-bluetooth.so)
+Feb 15 09:06:08 home kernel: Bluetooth: hci0: Reading Intel version command
+failed (-110)
+Feb 15 09:06:08 home kernel: Bluetooth: hci0: command 0xfc05 tx timeout
+
+Same error was present on 6.7.3 and 6.7.2. I believe 6.6.9 was the last ver=
+sion
+where it worked fine.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
