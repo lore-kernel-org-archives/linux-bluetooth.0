@@ -1,56 +1,56 @@
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8644C145FF0
-	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 20:33:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DE791487CC
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 20:33:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708115600; cv=none; b=WlxtjcYtsLgrNE94ZGQJqqzyH4SvbYrmY7P9DLQuPsKfEWHcwf7S2u81ZJJCxlVUYy0QLrQndywGq0aPFz/fZ7JLdjxTA6xAkQqwxlrwk/12MBW4VaK05Yrj5wfsvSm8gPOMMq4fKXPtpjyxM6OdA8wxS+YRE1HPywocnE5EDsk=
+	t=1708115601; cv=none; b=f9XHrhYf233itwDsRfUCfV3Xrc1wngovNHvP+JehU9wiBXGYDTHWa1JLqel0uL51g1V67zeHYbpyuM3pavUm3QBNWrcDebJ8jS7HSySxx0XQTkQC9NxZFUg4xVHNedu5RYJ+XL/t2B1TPqLY4ighP7pTiERhKPIXqo/Y/7QImDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708115600; c=relaxed/simple;
-	bh=7siulsM+YIxL/zjVU9vKxvQTmEA2EKQzsqGyT9XfH/0=;
+	s=arc-20240116; t=1708115601; c=relaxed/simple;
+	bh=4LhLqDvGFT+IFCIuC4QIrfBunrKDwXswnSE7spSs1og=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=eVqEJiRNcRhm/aA6GcarEiNGq8CnBTynyG6GJfB+5mFv93q4wwTElBvbNvJ74SvnNiOF8PoiNgGIfHv7RjCo27vEkQWBtaIsPumD1ZTVESV+5xoZrxtr7F+uLE0S/a2EYodEJn12D44yT1S60TpDS879NZ79Zm2lLxNuWUwZEng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=RopNAYmB; arc=none smtp.client-ip=209.85.128.44
+	 MIME-Version; b=HGXUbS1aaOMQtbtwHOhKaDLox7Qubw/cEWT9dZIuWrnno+rxBVZ1rPp4fvJRMCf43K7chJKqPJfTrMtijVmTErtvVKCB1Xdba2i0epcgR96xikMOlPC9BXacMvzoyFuyBNpHP6etbxsp7adcAkVugaPELJGKKVxwvAO8nIIwIPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=pw8lpZRn; arc=none smtp.client-ip=209.85.208.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="RopNAYmB"
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-41241f64c6bso8127125e9.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 12:33:17 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="pw8lpZRn"
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2d0a4e8444dso11595751fa.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 12:33:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1708115595; x=1708720395; darn=vger.kernel.org;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1708115597; x=1708720397; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=aLo65DzlI0Pw6qQCEKnNFvuFSJmqXUdVDuf68OGs0ug=;
-        b=RopNAYmBLzbU0E8FWuUlqcWP+GlVGJt0id3KbTdr5k9HaYH+UzwCoQfr0p1eAnfS2Y
-         q9/ws62XvkUz89rZck2b2fw5t1uyn2WBFJ0Hf0MSsaobdw3m0k98z5FaG6tknDpRE1wY
-         K10/03ea4vPXLOYm9561Jquaq6kOLSduihRk/P7VN3fTPQ2bRogDP18BW0prc0klPtpq
-         pmfSKOsmTYGK5j5OcMDiHCLtyrqrGp0RWIq+4Z31VISMBcoQGOACQFLvBO9fQ0FkjX3o
-         Av22SeTujKCnxSC2kmjHEWJqUp1JlrSdt0MPnMF/ljI3K+m/uUNTjTefCWM4yYs187Oi
-         r8tQ==
+        bh=CC1pu2stpbN83NTwAu2tyUDsfSSkKlZ+7hcnIJ0S5bk=;
+        b=pw8lpZRn9/vsWZaABII0+DvViHbRjQuPwgLb4i/WqjXSHfa+GQL9WfkQm2XwOqrj0T
+         GgdQaumG3DKydg4bv2YIWQ8DAmwCPQF0Id8uxPCSEMJedRMKpx3RxsIAMQ6tN1ae2qvI
+         D2D0o7vb0bRHjGZSY6USu9vvbc8cKt05nC3L3FfK6STwd8GsqxUbPidtj7TA7VxbNmET
+         EHfo18kb0Si1z/F0xUrdzARIVWWY7FZ9wjAnfB7ibIP7WJc1tZ6h9POam9qgL/6A7YsS
+         TaXO73fSKrUMelRH2EDx7SbMwFinYm4Emmni39o3pSPCUmZsPjSPEPLEJA3dp5BxJU9R
+         xGqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708115595; x=1708720395;
+        d=1e100.net; s=20230601; t=1708115597; x=1708720397;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=aLo65DzlI0Pw6qQCEKnNFvuFSJmqXUdVDuf68OGs0ug=;
-        b=vxw6dVvnarFEcekRnTdHCUvYUFn5ywmCVEimIlFbrmw5GlwTLYLXsU2D2q/3M5v7iD
-         8AeJvf1HKmUWrCwaf/VXb79ei8O+7a6qhGwE2WAmTbTni7BRq7JVJ8vc3aLmUeo0jlKS
-         iblDD8G0LqUSP99fzx79edt3xQr1tAy5DL2BGtiM9WnufKcAr/b7LWBex04eggAf8FX5
-         JXrNNdXoITslVjZ25Tzuk2LwPf/c9EZJNDv91CULdsfBtVZWwJV9nq7WLayk66/YmQCZ
-         W5ITedxTV+2yYkX8YC8I3R28gr53o2XvQqs5hEJiLxVX3Wq+vKyAYGhfzOfZWaSwu1ri
-         7bcw==
-X-Gm-Message-State: AOJu0Ywizaa2OjK5VIsKUqGeHCFnDMs9jVN4oS+yCa6biXQXUvIpGXpu
-	QZVRCbIHYRWBzrPu3POuOI9MSxvYb+KX1filLXZxA5t5bci3Q5Md7KaasjpfxW4=
-X-Google-Smtp-Source: AGHT+IFiDpD9jnNjXHaYBDe5iqmGRvtMJpVfZZ7zS3b3nDAA5bd5zEp/CAbSuDJNq9KUS4HizlvLyA==
-X-Received: by 2002:a05:600c:b91:b0:411:e398:9f33 with SMTP id fl17-20020a05600c0b9100b00411e3989f33mr4538745wmb.15.1708115595442;
-        Fri, 16 Feb 2024 12:33:15 -0800 (PST)
+        bh=CC1pu2stpbN83NTwAu2tyUDsfSSkKlZ+7hcnIJ0S5bk=;
+        b=IjBtL4aS8V9H5GksOfE+uPqyVWDsw4nuWwBjO+xG2aGiHEWKx2vhGY9njAV9NyyzcE
+         PBftGOpQGTHe/6aIU+4eVgCIgXx2kw1XVAnRY42SQ+9PDOZDI0/yzGgkyzIF/uSTFJN2
+         kRUn28m9CLmHQOxaf5WMhBGjX7yXEaZ1J5XOPAt9IcfGHrOaXFWo3N8pmg1r2qRNJYdB
+         FvCYHmtGrX0QSNGkJrnBUj1nSxg/a9QMJbxcCMjKVLdjOxYSNA0np4HRUld6WdJLWeAV
+         DRBJDk3iXjiHqdcalfALVawd6nypFWFuOWQB5jgmBLAjDS5hmlAPdzK7r0rE7DbBn6Bg
+         YetQ==
+X-Gm-Message-State: AOJu0YySlF9/UtpKPqG90h+jUu6qdO3diiJqAaGU8Wy7zXVtt+xjqxiy
+	bZXO/OaRV+UajyhNZkJGeUcZef8f2CxFM7RxricLNULY3HIYaZD44C59rJcdvvY=
+X-Google-Smtp-Source: AGHT+IEodiKrpQa3Lrik26TTHjpOXpZBll1rH3wk3i2Jrykp7F0GsM6rUA/Fp5cYuEYiOGeqkA/RiQ==
+X-Received: by 2002:a2e:9b8d:0:b0:2d0:85dc:bf9b with SMTP id z13-20020a2e9b8d000000b002d085dcbf9bmr4383652lji.14.1708115597122;
+        Fri, 16 Feb 2024 12:33:17 -0800 (PST)
 Received: from brgl-uxlite.home ([2a01:cb1d:334:ac00:7758:12d:16:5f19])
-        by smtp.gmail.com with ESMTPSA id m5-20020a05600c4f4500b0041253d0acd6sm1420528wmq.47.2024.02.16.12.33.14
+        by smtp.gmail.com with ESMTPSA id m5-20020a05600c4f4500b0041253d0acd6sm1420528wmq.47.2024.02.16.12.33.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Feb 2024 12:33:15 -0800 (PST)
+        Fri, 16 Feb 2024 12:33:16 -0800 (PST)
 From: Bartosz Golaszewski <brgl@bgdev.pl>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
@@ -92,9 +92,9 @@ Cc: linux-bluetooth@vger.kernel.org,
 	linux-pci@vger.kernel.org,
 	linux-pm@vger.kernel.org,
 	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: [PATCH v5 03/18] dt-bindings: regulator: describe the PMU module of the QCA6390 package
-Date: Fri, 16 Feb 2024 21:32:00 +0100
-Message-Id: <20240216203215.40870-4-brgl@bgdev.pl>
+Subject: [PATCH v5 04/18] dt-bindings: net: bluetooth: qualcomm: describe regulators for QCA6390
+Date: Fri, 16 Feb 2024 21:32:01 +0100
+Message-Id: <20240216203215.40870-5-brgl@bgdev.pl>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20240216203215.40870-1-brgl@bgdev.pl>
 References: <20240216203215.40870-1-brgl@bgdev.pl>
@@ -108,188 +108,50 @@ Content-Transfer-Encoding: 8bit
 
 From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-The QCA6390 package contains discreet modules for WLAN and Bluetooth. They
-are powered by the Power Management Unit (PMU) that takes inputs from the
-host and provides LDO outputs. This document describes this module.
+QCA6390 has a compatible listed in the bindings but is missing the
+regulators description. Add the missing supply property and list the
+required ones in the allOf section.
 
 Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 ---
- .../bindings/regulator/qcom,qca6390-pmu.yaml  | 166 ++++++++++++++++++
- 1 file changed, 166 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml
+ .../net/bluetooth/qualcomm-bluetooth.yaml       | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml b/Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml
-new file mode 100644
-index 000000000000..b71fa782fc63
---- /dev/null
-+++ b/Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml
-@@ -0,0 +1,166 @@
-+# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/regulator/qcom,qca6390-pmu.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
+diff --git a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+index eba2f3026ab0..702d04cdb247 100644
+--- a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
++++ b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+@@ -62,6 +62,9 @@ properties:
+   vdddig-supply:
+     description: VDD_DIG supply regulator handle
+ 
++  vddbtcmx-supply:
++    description: VDD_BT_CMX supply regulator handle
 +
-+title: Qualcomm Technologies, Inc. QCA6390 PMU Regulators
-+
-+maintainers:
-+  - Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-+
-+description:
-+  The QCA6390 package contains discreet modules for WLAN and Bluetooth. They
-+  are powered by the Power Management Unit (PMU) that takes inputs from the
-+  host and provides LDO outputs. This document describes this module.
-+
-+properties:
-+  compatible:
-+    const: qcom,qca6390-pmu
-+
-+  vddaon-supply:
-+    description: VDD_AON supply regulator handle
-+
-+  vddpmu-supply:
-+    description: VDD_PMU supply regulator handle
-+
-+  vddrfa0p95-supply:
-+    description: VDD_RFA_0P95 supply regulator handle
-+
-+  vddrfa1p3-supply:
-+    description: VDD_RFA_1P3 supply regulator handle
-+
-+  vddrfa1p9-supply:
-+    description: VDD_RFA_1P9 supply regulator handle
-+
-+  vddpcie1p3-supply:
-+    description: VDD_PCIE_1P3 supply regulator handle<S-Del>
-+
-+  vddpcie1p9-supply:
-+    description: VDD_PCIE_1P9 supply regulator handle
-+
-+  vddio-supply:
-+    description: VDD_IO supply regulator handle
-+
-+  wlan-enable-gpios:
-+    maxItems: 1
-+    description:
-+      GPIO line enabling the ATH11K WLAN module supplied by the PMU
-+
-+  bt-enable-gpios:
-+    maxItems: 1
-+    description:
-+      GPIO line enabling the ATH11K Bluetooth module supplied by the PMU
-+
-+  regulators:
-+    type: object
-+    description:
-+      LDO outputs of the PMU
-+
-+    patternProperties:
-+      "^ldo[0-9]$":
-+        $ref: regulator.yaml#
-+        type: object
-+        unevaluatedProperties: false
-+
-+    additionalProperties: false
-+
-+required:
-+  - compatible
-+  - vddaon-supply
-+  - vddpmu-supply
-+  - vddrfa0p95-supply
-+  - vddrfa1p3-supply
-+  - vddrfa1p9-supply
-+  - vddpcie1p3-supply
-+  - vddpcie1p9-supply
-+  - vddio-supply
-+  - wlan-enable-gpios
-+  - bt-enable-gpios
-+  - regulators
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/gpio/gpio.h>
-+    pmu {
-+        compatible = "qcom,qca6390-pmu";
-+
-+        pinctrl-names = "default";
-+        pinctrl-0 = <&bt_en_state>, <&wlan_en_state>;
-+
-+        vddaon-supply = <&vreg_s6a_0p95>;
-+        vddpmu-supply = <&vreg_s2f_0p95>;
-+        vddrfa0p95-supply = <&vreg_s2f_0p95>;
-+        vddrfa1p3-supply = <&vreg_s8c_1p3>;
-+        vddrfa1p9-supply = <&vreg_s5a_1p9>;
-+        vddpcie1p3-supply = <&vreg_s8c_1p3>;
-+        vddpcie1p9-supply = <&vreg_s5a_1p9>;
-+        vddio-supply = <&vreg_s4a_1p8>;
-+
-+        wlan-enable-gpios = <&tlmm 20 GPIO_ACTIVE_HIGH>;
-+        bt-enable-gpios = <&tlmm 21 GPIO_ACTIVE_HIGH>;
-+
-+        regulators {
-+            vreg_pmu_rfa_cmn: ldo0 {
-+                regulator-name = "vreg_pmu_rfa_cmn";
-+                regulator-min-microvolt = <760000>;
-+                regulator-max-microvolt = <840000>;
-+            };
-+
-+            vreg_pmu_aon_0p59: ldo1 {
-+                regulator-name = "vreg_pmu_aon_0p59";
-+                regulator-min-microvolt = <540000>;
-+                regulator-max-microvolt = <840000>;
-+            };
-+
-+            vreg_pmu_wlcx_0p8: ldo2 {
-+                regulator-name = "vreg_pmu_wlcx_0p8";
-+                regulator-min-microvolt = <760000>;
-+                regulator-max-microvolt = <840000>;
-+            };
-+
-+            vreg_pmu_wlmx_0p85: ldo3 {
-+                regulator-name = "vreg_pmu_wlmx_0p85";
-+                regulator-min-microvolt = <810000>;
-+                regulator-max-microvolt = <890000>;
-+            };
-+
-+            vreg_pmu_btcmx_0p85: ldo4 {
-+                regulator-name = "vreg_pmu_btcmx_0p85";
-+                regulator-min-microvolt = <810000>;
-+                regulator-max-microvolt = <890000>;
-+            };
-+
-+            vreg_pmu_rfa_0p8: ldo5 {
-+                regulator-name = "vreg_pmu_rfa_0p8";
-+                regulator-min-microvolt = <760000>;
-+                regulator-max-microvolt = <840000>;
-+            };
-+
-+            vreg_pmu_rfa_1p2: ldo6 {
-+                regulator-name = "vreg_pmu_rfa_1p2";
-+                regulator-min-microvolt = <1187000>;
-+                regulator-max-microvolt = <1313000>;
-+            };
-+
-+            vreg_pmu_rfa_1p7: ldo7 {
-+                regulator-name = "vreg_pmu_rfa_1p7";
-+                regulator-min-microvolt = <1710000>;
-+                regulator-max-microvolt = <1890000>;
-+            };
-+
-+            vreg_pmu_pcie_0p9: ldo8 {
-+                regulator-name = "vreg_pmu_pcie_0p9";
-+                regulator-min-microvolt = <870000>;
-+                regulator-max-microvolt = <970000>;
-+            };
-+
-+            vreg_pmu_pcie_1p8: ldo9 {
-+                regulator-name = "vreg_pmu_pcie_1p8";
-+                regulator-min-microvolt = <1710000>;
-+                regulator-max-microvolt = <1890000>;
-+            };
-+        };
-+    };
+   vddbtcxmx-supply:
+     description: VDD_BT_CXMX supply regulator handle
+ 
+@@ -180,6 +183,20 @@ allOf:
+         - vddrfa0p8-supply
+         - vddrfa1p2-supply
+         - vddrfa1p9-supply
++  - if:
++      properties:
++        compatible:
++          contains:
++            enum:
++              - qcom,qca6390-bt
++    then:
++      required:
++        - vddrfacmn-supply
++        - vddaon-supply
++        - vddbtcmx-supply
++        - vddrfa0p8-supply
++        - vddrfa1p2-supply
++        - vddrfa1p7-supply
+ 
+ examples:
+   - |
 -- 
 2.40.1
 
