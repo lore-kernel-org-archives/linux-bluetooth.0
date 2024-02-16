@@ -1,184 +1,93 @@
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9899B14831E
-	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 23:10:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C7451487F4
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 23:11:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708125013; cv=none; b=SSu5TU5jQIUHIsafV+Gy0NeELamP84KfVChVyUAigKA4PFDh/P2zikSArlOTuFeLCGZOpCbnzBpD06plHOONb4uGfX3An2+yho8BP9OTJYZs8BiFBgdjH8QkW+MabCrfBtHz1CJMiY7+5hip/hSgypTGaLf6g6hLVS0bKrdRc04=
+	t=1708125071; cv=none; b=QDe6XY/g6WRyCHxb8Jho90semLvmraPmygQWb0GTVXnDEvblVudSC+aAPPvM/oIHRJf44r0/I2YXeqiZ1sHynp2vflrkfLZW0utkvs++7N6Byu0r8HMABFcGOlQ+xZ6pCLIQpANq1TyWxg/0Sa4ceNtfk/R4+ZGc+UPA0Io/RQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708125013; c=relaxed/simple;
-	bh=mfmEA6zSa+OORWqKlFgSku5kK5nwRZdQXnKi8D/SPd8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Y/Fwk23B/7cnwhSCXtErtOroFRgFtYc4Dy0XiuylCmYgRLylktLvL3EeVtHMSSO8ALWxdqkh4VojpiVsizT5LlLsvRb3ID4/taM/hNr8U1w4Fa4i0ki1KJ/tlZ1Pz0wV0aPVAI8pGLmcwkWXZmBZi4kLuOJikYLXcDulr+kpkHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=AOXSXFWr; arc=none smtp.client-ip=209.85.128.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1708125071; c=relaxed/simple;
+	bh=pn4oXOiprsJ9P+/w7VthZ06gnonlcvDwigv5H1AczbU=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To; b=iNKDuRu/vYMOpCarooiXblLR6lf4y5aihHDBBkcDMmaPwHhWgO0sHo9fWcFtCEf8etb4lzTZ7idA0/2NWa5XtDcNXjSksvfpEt7s9zusSINFjvwY+BG32Acw11k/8XuZJ3RJ6YJNr+r0q+6rX9do+BSonorQJSZVoWzsN+JPjew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QNt7DmlD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AOXSXFWr"
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-607fe8cc6d8so9763797b3.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 15:10:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1708125010; x=1708729810; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=EpftqacOdWcIxz3VUpc3zI1U/E0RwbiBZdYsX7Kb7J4=;
-        b=AOXSXFWrpecqGsj3FvbdDQIjHjP887SkBI4Bl4qgqmEyp6wk619/ClmzdoNIeOtz1j
-         tDFBRTTZ4BXijtr5HVAG7cqu0BwWijfc2LxgvgRliDfPlGHPIGKzJIhHQjwHJelHjVyQ
-         rp/dpDg/lvX62bGEdspeYlpgcqI7rCHt98CpiYsWMLSCTyHysVsLgsH/Mi9PXkv8IZPW
-         RnrDP9WUVm04kHfQ67x4VehA87dgAMMC2vEyqSy2YCDH6nUvxKMvEaFL93I/+w8AsTPZ
-         1hRoKNSn/OHxCPYYv+J9IC1EJfc+1aBHZQcbLbRU6Wlr1XeozRteflUVXWLLrhaypy2B
-         //xA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708125010; x=1708729810;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=EpftqacOdWcIxz3VUpc3zI1U/E0RwbiBZdYsX7Kb7J4=;
-        b=RUOmxlSBW+GAwUbzsbRerbI02M72eat7+M/yz1ruTRf7tixxUGGs0HR0fM8T/URj3B
-         lzrqrDirF6Vn5Ly309Wfkz7Ce06EQB+kA2kqNjIsnIkJKnVXiGSzhnAzaY9ohqmpADJd
-         83oMFwEUD6UHVWBLxxeT+19zToXVcRS5uHrSnIvOiu2xAY+EkOxjOlrspX4iAx/OXu4r
-         +gr1lpyzCFs9tdIhjSvxT2Uxka7WqCJ+NcuRZzUDqj5BHiOcyjrt75Y6eyORwJ/EyD12
-         mw3hHuDjIE1NQQzMzbXbyWawWd9hWxAwg6sccxTG4CbgKYeyWFc/ey+KZam1RX29OXJ9
-         O9sw==
-X-Forwarded-Encrypted: i=1; AJvYcCUCCaFymYE4rJIpL+GigtoDyKCvN4nc1YRu1yFWBlri4739WHKo/JbaA2kWGuqRAaG34jgPVaniByClGoJrCGTOopV+pUphrIgh2oib0Rul
-X-Gm-Message-State: AOJu0Yzfpz1iszIVmb/r0SLEuEUtkZy0DsV/CWqjjfcazKCFGG4K6+U0
-	uHdFFOPbNIWSGO+OiCLdOLqJsj1Z7bJgTA+cj96RtDxGKu8eJNNr5u5gpT1S5hX9dj2eF16K3Fp
-	772/jwaRzq/td5CDqCB0/p6y8Ow2Tu8Kr3kmqIA==
-X-Google-Smtp-Source: AGHT+IH7vS67BhaJmZ0qKWVe6no0q/4H1vlJ1cE1CsXNcFt1Pp6VcJPBg/0mptzu0uQFXbGKADhe7nfa9TyYWhC6deg=
-X-Received: by 2002:a0d:ebc6:0:b0:607:ec66:36b3 with SMTP id
- u189-20020a0debc6000000b00607ec6636b3mr5019006ywe.19.1708125010589; Fri, 16
- Feb 2024 15:10:10 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QNt7DmlD"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 03BFDC43390
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 23:11:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708125071;
+	bh=pn4oXOiprsJ9P+/w7VthZ06gnonlcvDwigv5H1AczbU=;
+	h=From:Date:Subject:References:In-Reply-To:To:Reply-To:From;
+	b=QNt7DmlDvdgltjZzwKSN39HQ46JaTlT/VgZpLtVlBz1kE4ulwwWFOi2x3t4FqiUyd
+	 rubZ83CH5ouSe0dyidyEBTxyLMdJfoODTFK9JCXCEssvQ7VvayTz8DBDz+4RzdD4Tc
+	 N71FEWWP/Z/RfSuZU4kpn+aZPmEvUOQRGvGnRF1q6KbQnnBG7eIGRVNi7sAkMUim3Y
+	 mdn3+4MtQYvt0TejiDrymS83qym0iz9UgAW8fiiXfWPwnrF45CwCpsJF+PTKH1btIN
+	 9F/xD+R8MkculwfK1fn+MuB7WNgilobGkfGpqYvg1l2b1lCtBkJJPb0+dg4nsGWjoe
+	 N0/E17hERIMYQ==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF694C48BF8
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 23:11:10 +0000 (UTC)
+From: Emil Velikov via B4 Relay <devnull+emil.l.velikov.gmail.com@kernel.org>
+Date: Fri, 16 Feb 2024 23:11:06 +0000
+Subject: [PATCH BlueZ v2 02/10] build: install obexd (dbus,systemd}
+ services as needed
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240216203215.40870-1-brgl@bgdev.pl> <20240216203215.40870-9-brgl@bgdev.pl>
-In-Reply-To: <20240216203215.40870-9-brgl@bgdev.pl>
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Date: Sat, 17 Feb 2024 01:09:59 +0200
-Message-ID: <CAA8EJpry2yiGXrtPqZ6RXnoTqQZr_hxA_gCPsUbmyFtEBuD4VA@mail.gmail.com>
-Subject: Re: [PATCH v5 08/18] arm64: dts: qcom: sm8650-qrd: add the Wifi node
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Kalle Valo <kvalo@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konrad.dybcio@linaro.org>, Liam Girdwood <lgirdwood@gmail.com>, 
-	Mark Brown <broonie@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Saravana Kannan <saravanak@google.com>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Arnd Bergmann <arnd@arndb.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Alex Elder <elder@linaro.org>, 
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
-	Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-pci@vger.kernel.org, linux-pm@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240216-hook-fixup-v2-2-a6b192d1a6ad@gmail.com>
+References: <20240216-hook-fixup-v2-0-a6b192d1a6ad@gmail.com>
+In-Reply-To: <20240216-hook-fixup-v2-0-a6b192d1a6ad@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+X-Mailer: b4 0.12.4
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1708125068; l=708;
+ i=emil.l.velikov@gmail.com; s=20230301; h=from:subject:message-id;
+ bh=ydMrW4KQq1RxtsNE5Z3GD8gOdVpX/eInfAQOzvCNhPM=;
+ b=IrYvb1KVOghrustydreRo3bmyf2og6elMhJBTvp+Y0TbzI7qTGuQPiB0b1hSXzDQHXXSxnBXQ
+ K2QeywgpuavAtAGEmgRUGM7CedeeoFoKeaQl+LP4GwYSBJfYVcujLMP
+X-Developer-Key: i=emil.l.velikov@gmail.com; a=ed25519;
+ pk=qeUTVTNyI3rcR2CfNNWsloTihgzmtbZo98GdxwZKCkY=
+X-Endpoint-Received:
+ by B4 Relay for emil.l.velikov@gmail.com/20230301 with auth_id=35
+X-Original-From: Emil Velikov <emil.l.velikov@gmail.com>
+Reply-To: <emil.l.velikov@gmail.com>
 
-On Fri, 16 Feb 2024 at 22:33, Bartosz Golaszewski <brgl@bgdev.pl> wrote:
->
-> From: Neil Armstrong <neil.armstrong@linaro.org>
->
-> Describe the ath12k WLAN on-board the WCN7850 module present on the
-> board.
+From: Emil Velikov <emil.l.velikov@gmail.com>
 
-WCN7850 is the same combo WiFi + BT chip. Is there any reason for
-describing its parts separately rather than using the same PMU
-approach?
+Currently we ship the service files, even when built with
+--disable-obex.
 
->
-> Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
-> [Bartosz:
->   - move the pcieport0 node into the .dtsi
->   - make regulator naming consistent with existing DT code
->   - add commit message]
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> ---
->  arch/arm64/boot/dts/qcom/sm8650-qrd.dts | 29 +++++++++++++++++++++++++
->  arch/arm64/boot/dts/qcom/sm8650.dtsi    | 10 +++++++++
->  2 files changed, 39 insertions(+)
->
-> diff --git a/arch/arm64/boot/dts/qcom/sm8650-qrd.dts b/arch/arm64/boot/dts/qcom/sm8650-qrd.dts
-> index b07cac2e5bc8..4623c358f634 100644
-> --- a/arch/arm64/boot/dts/qcom/sm8650-qrd.dts
-> +++ b/arch/arm64/boot/dts/qcom/sm8650-qrd.dts
-> @@ -845,6 +845,28 @@ &pcie0 {
->         status = "okay";
->  };
->
-> +&pcieport0 {
-> +       wifi@0 {
-> +               compatible = "pci17cb,1107";
-> +               reg = <0x10000 0x0 0x0 0x0 0x0>;
-> +
-> +               pinctrl-names = "default";
-> +               pinctrl-0 = <&wlan_en>;
-> +
-> +               enable-gpios = <&tlmm 16 GPIO_ACTIVE_HIGH>;
-> +
-> +               vdd-supply = <&vreg_s4i_0p85>;
-> +               vddio-supply = <&vreg_l15b_1p8>;
-> +               vddio1p2-supply = <&vreg_l3c_1p2>;
-> +               vddaon-supply = <&vreg_s2c_0p8>;
-> +               vdddig-supply = <&vreg_s3c_0p9>;
-> +               vddrfa1p2-supply = <&vreg_s1c_1p2>;
-> +               vddrfa1p8-supply = <&vreg_s6c_1p8>;
-> +
-> +               clocks = <&rpmhcc RPMH_RF_CLK1>;
-> +       };
-> +};
-> +
->  &pcie0_phy {
->         vdda-phy-supply = <&vreg_l1i_0p88>;
->         vdda-pll-supply = <&vreg_l3i_1p2>;
-> @@ -1139,6 +1161,13 @@ wcd_default: wcd-reset-n-active-state {
->                 bias-disable;
->                 output-low;
->         };
-> +
-> +       wlan_en: wlan-en-state {
-> +               pins = "gpio16";
-> +               function = "gpio";
-> +               drive-strength = <8>;
-> +               bias-pull-down;
-> +       };
->  };
->
->  &uart14 {
-> diff --git a/arch/arm64/boot/dts/qcom/sm8650.dtsi b/arch/arm64/boot/dts/qcom/sm8650.dtsi
-> index d488b3b3265e..baf4932e460c 100644
-> --- a/arch/arm64/boot/dts/qcom/sm8650.dtsi
-> +++ b/arch/arm64/boot/dts/qcom/sm8650.dtsi
-> @@ -2293,6 +2293,16 @@ &mc_virt SLAVE_EBI1 QCOM_ICC_TAG_ALWAYS>,
->                         dma-coherent;
->
->                         status = "disabled";
-> +
-> +                       pcieport0: pcie@0 {
-> +                               device_type = "pci";
-> +                               reg = <0x0 0x0 0x0 0x0 0x0>;
-> +                               #address-cells = <3>;
-> +                               #size-cells = <2>;
-> +                               ranges;
-> +
-> +                               bus-range = <0x01 0xff>;
-> +                       };
->                 };
->
->                 pcie0_phy: phy@1c06000 {
-> --
-> 2.40.1
->
+Move the "if OBEX" guard few lines further up.
+---
+ Makefile.obexd | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
+diff --git a/Makefile.obexd b/Makefile.obexd
+index 0e8bc6de7..e8e4a6144 100644
+--- a/Makefile.obexd
++++ b/Makefile.obexd
+@@ -1,4 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0
++if OBEX
++
+ if SYSTEMD
+ systemduserunitdir = $(SYSTEMD_USERUNITDIR)
+ systemduserunit_DATA = obexd/src/obex.service
+@@ -16,7 +18,6 @@ endif
+ dbussessionbusdir = $(DBUS_SESSIONBUSDIR)
+ dbussessionbus_DATA = obexd/src/org.bluez.obex.service
+ 
+-if OBEX
+ 
+ obex_plugindir = $(libdir)/obex/plugins
+ 
 
 -- 
-With best wishes
-Dmitry
+2.43.1
+
