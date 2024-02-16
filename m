@@ -1,245 +1,95 @@
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F2C145B18
-	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 20:33:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA7AE433BA
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 20:36:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708115625; cv=none; b=WIy0LDHqVCHVuB/S8HdPTROE+F3KvcjVU/f8J8AwwVfpEnHGNMcX7G/SmTHVRj/rqMznyVY2K+JyUUv6g+wNrF0YrKnWFZcCOyqnnvThOpNe29ooIsVGsDXK7KMZL/A93NCHEOAYNHnfQVMewcwlfYqN+raPNPKPPUkPAz8Sv0s=
+	t=1708115817; cv=none; b=BIVTAsdPWxElWouXruwYW3uZReF6FJL51NoqT5uXZDd20kASs7+pLabdiFQG2Om5Eb2Utlaqsla57kQ761hhzH/j17ZnO9EJzIVvdRR4ICQUMTrbeD20+xLAnxOZINg8DHCGqzk4OAu6I2fabSLFZtbDCLQwssxtF9YOVYYrE20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708115625; c=relaxed/simple;
-	bh=l7BCMdtK460/NfNyVFkhn6WxPhHDN9NJk1dX5OE3xb4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=YINu9WBoFv3lvIuxJMpTpnmR57tnLEA77gdsfcVHzJCqW9z7+XFzTnvY27hHHn4A8feYm7JBq3NW2G7ob42xRU+/jtIai3hY68jAsbNYzQ5HCePty+T2z5lnFlfmpyi63qcmNJZFq9Q9bN/HMZ+LRQAp9ol2oBDL50bF5hRP3yw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=AbkrsG4h; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+	s=arc-20240116; t=1708115817; c=relaxed/simple;
+	bh=U2BvCuwUkY1UGXy3BiruCl7JIkfVMwgfvwEXIoM1quc=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=uyfn0WN+ibiF6Q4j5d6yrUVkuSSe99/hz5s1NjcbYZVn7PyHiL2hjuf+Qg21rH+OrJp+t62gR3JnH4Jd0BrF+ElWs5oROPg2fhxPF/JCW+lHBldU26Gbpuvmx2I1Yz9kJtNqFYUUrGxw7icmaz30KrR05/yPBiYYjPbLazB+NY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nLqU6Wpz; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="AbkrsG4h"
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-412345cca4eso11208405e9.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 12:33:42 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nLqU6Wpz"
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1d746856d85so11024685ad.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 12:36:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1708115620; x=1708720420; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H+W//dfF0n/wy1LXmbmCGBv/0bG6tpfv/t9YAFDF8dg=;
-        b=AbkrsG4hQozdqZIAuPuUwi6rboShfc+IbD8ZzU38JoHYU54EYvu5+IRAI/AZBtmGjF
-         SNyCVX/wbfv8KwFnh8dOXq2QGD/byWIq5EppoOcTAwrDUh08EJhd9k4mY32qdpRG1iz7
-         5AQDmIaLXQhGVN6SBIdVseU09vRy9eC+p6+jhBkIh1HdEVKi88hs2PtCWDwsiitjqqoi
-         0BDFFaGoteZUSskckF+knIUgD68zDIH1lx7Cv0E1OkBocylB2h9+ojBklqMqLbacBIPS
-         PCEoyccHC2UFBLUaMm6qRdnmijMTz1b4r0zzDudQD+P2fs9+BsV7letxEFv+BSlarZxE
-         /3mQ==
+        d=gmail.com; s=20230601; t=1708115815; x=1708720615; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=U2BvCuwUkY1UGXy3BiruCl7JIkfVMwgfvwEXIoM1quc=;
+        b=nLqU6WpzEJx514wrLtMXr9R9fbRt+O4orULTcybrM/PUAkn8XuSTxkYR4Hk2f6WSp1
+         OrT6on+hUClr/Y5IWnky3VfrZ7Ii1eLVQKsHzrFNry4wOcMS6hjIKcKtrSp6mOKOe02a
+         CvEwLk3UTn58Us5MPDcBkj2NAKqBPeYB3SsxdDH/AeZKW5uIeMVrkeG97RKv1vG+nEmM
+         FjMjmgxhsa/n3Ne27tyGPK5ioh6rs+tL8ap9xaBFTuFhVKMctdRKiK8BUgHG0L3SlVOt
+         JVTYXuQtSOMQ5oU9YJSuCVcWa4gsy6MyPZ5o5uJmHe90gsRhkBVdd8TpOjiypNl99Xih
+         Q28Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708115620; x=1708720420;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=H+W//dfF0n/wy1LXmbmCGBv/0bG6tpfv/t9YAFDF8dg=;
-        b=XR5NKZxyfZq5/YeO81hhGPTJ+jjGTQCTmx7+MdBa1iTNeM9QQYWJHlTWgzjrIbVo8v
-         fOFnlcS/Y5NOfFwrv967/QK2b0RpnSUMHIvCMSSDUZLpCgb0cCAy7qasSgyIhwZ80g00
-         OsznPNDitg1H9LU8BmCYbsTJv4qYWSIWUI1ZExINI5A/1sNiQJDxXuhC/2cwZxd4gxpL
-         Q6A0nIbpQFZxEMkNMLQdyxrwoeQO6VbSCCL1d3lbyoLBk3pv0mVMCo+34hTqboaUQdcw
-         xmviLNK2DunQh8Yw+Z6pbRnQ/6YT90hIHCfF15HoGntJP6yFzB2r7FxFm0fMZrdXzORd
-         V2uA==
-X-Gm-Message-State: AOJu0YwUPopfI7PdlSW3nyxn7FPNE5VKxh9hGKyCgTNRJxUWu5A2Cryy
-	mDTxOQrrUy/3FA69dB0IjdJxOJ+YPk+KPyXVOhbAoc5RcwymdxpUQ5V6p/TOfig=
-X-Google-Smtp-Source: AGHT+IGBibCllNh8ll1Vx+GOheKaOUkavu0vOY90FybjEbw07Iwz+LAx2+7vA1a+b5lW/0606M1yCA==
-X-Received: by 2002:a05:600c:444b:b0:40f:e806:2f26 with SMTP id v11-20020a05600c444b00b0040fe8062f26mr4798554wmn.12.1708115619950;
-        Fri, 16 Feb 2024 12:33:39 -0800 (PST)
-Received: from brgl-uxlite.home ([2a01:cb1d:334:ac00:7758:12d:16:5f19])
-        by smtp.gmail.com with ESMTPSA id m5-20020a05600c4f4500b0041253d0acd6sm1420528wmq.47.2024.02.16.12.33.38
+        d=1e100.net; s=20230601; t=1708115815; x=1708720615;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=U2BvCuwUkY1UGXy3BiruCl7JIkfVMwgfvwEXIoM1quc=;
+        b=wQ5db2YyzdYEuWXlTP8xlu/jktSKOo8HLJoW3xAHI3RBfFconb0EqD+VBtjrCw2lRO
+         JyqWv4QPu2pVgMjULYC7fnfoE9siPlumkBetnCwwsL6UoGTd/wFvwA1HCWdx1yd8vcOC
+         hzIwlr56rzWyA7KCgPiC+4AtKtnkMrtSXtOfOAQWSh9IGlDToqcpvCeOowFUwa/JFE3F
+         lqmTKeg6CE/ztDIvR0jDTqyPmJ3XRhTn8y913aLY4/TtCGee2CxjBjocDsWoKt6i1Ktn
+         wUeA4d28ydd/iVXQtOkgcSDsEdaixbbqEsdQSYwNMG8UpdHWiP38iPB4QkmLhL4auQEB
+         hSAg==
+X-Gm-Message-State: AOJu0Yxm70WIV9TCpvrvA4w9NJDLDSYy4KaLYomNaMF3eRGsQ2CjiBU6
+	g3MmIOmUHFI0qo1wavAElcZUUvtiKzqhVUOtb5Dl4gsujG0xUNMNmdkhHFTg
+X-Google-Smtp-Source: AGHT+IHLi+XnA/n7c4JambJjvNb0y6uWYmRz1XMyLITjcmAElLU/uhU1QeDmVDsDCEM8H/3PE7RtjA==
+X-Received: by 2002:a17:902:c1c1:b0:1db:b43b:e9 with SMTP id c1-20020a170902c1c100b001dbb43b00e9mr1350004plc.7.1708115814730;
+        Fri, 16 Feb 2024 12:36:54 -0800 (PST)
+Received: from [172.17.0.2] ([20.172.28.132])
+        by smtp.gmail.com with ESMTPSA id mo7-20020a1709030a8700b001db5ecd115bsm255979plb.276.2024.02.16.12.36.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Feb 2024 12:33:39 -0800 (PST)
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Kalle Valo <kvalo@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	Saravana Kannan <saravanak@google.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Alex Elder <elder@linaro.org>,
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Abel Vesa <abel.vesa@linaro.org>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Lukas Wunner <lukas@wunner.de>,
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-pci@vger.kernel.org,
-	linux-pm@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: [PATCH v5 18/18] PCI/pwrctl: add a PCI power control driver for power sequenced devices
-Date: Fri, 16 Feb 2024 21:32:15 +0100
-Message-Id: <20240216203215.40870-19-brgl@bgdev.pl>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240216203215.40870-1-brgl@bgdev.pl>
-References: <20240216203215.40870-1-brgl@bgdev.pl>
+        Fri, 16 Feb 2024 12:36:54 -0800 (PST)
+Message-ID: <65cfc766.170a0220.d3bde.1f8d@mx.google.com>
+Date: Fri, 16 Feb 2024 12:36:54 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============7593378394628848044=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, brgl@bgdev.pl
+Subject: RE: power: sequencing: implement the subsystem and add first users
+In-Reply-To: <20240216203215.40870-2-brgl@bgdev.pl>
+References: <20240216203215.40870-2-brgl@bgdev.pl>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+--===============7593378394628848044==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Add a PCI power control driver that's capable of correctly powering up
-devices using the power sequencing subsystem. The first user of this
-driver is the ath11k module on QCA6390.
+This is an automated email and please do not reply to this email.
 
-Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Dear Submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: arch/arm64/boot/dts/qcom/sm8650-qrd.dts:1139
+error: arch/arm64/boot/dts/qcom/sm8650-qrd.dts: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- drivers/pci/pwrctl/Kconfig             |  9 +++
- drivers/pci/pwrctl/Makefile            |  1 +
- drivers/pci/pwrctl/pci-pwrctl-pwrseq.c | 84 ++++++++++++++++++++++++++
- 3 files changed, 94 insertions(+)
- create mode 100644 drivers/pci/pwrctl/pci-pwrctl-pwrseq.c
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/pci/pwrctl/Kconfig b/drivers/pci/pwrctl/Kconfig
-index b91170ebfb49..3880a88aa73b 100644
---- a/drivers/pci/pwrctl/Kconfig
-+++ b/drivers/pci/pwrctl/Kconfig
-@@ -5,6 +5,15 @@ menu "PCI Power control drivers"
- config PCI_PWRCTL
- 	tristate
- 
-+config PCI_PWRCTL_PWRSEQ
-+	tristate "PCI Power Control driver using the Power Sequencing subsystem"
-+	select POWER_SEQUENCING
-+	select PCI_PWRCTL
-+	default m if (ATH11K_PCI && ARCH_QCOM)
-+	help
-+	  Enable support for the PCI power control driver for device
-+	  drivers using the Power Sequencing subsystem.
-+
- config PCI_PWRCTL_WCN7850
- 	tristate "PCI Power Control driver for WCN7850"
- 	select PCI_PWRCTL
-diff --git a/drivers/pci/pwrctl/Makefile b/drivers/pci/pwrctl/Makefile
-index de20c3af1b78..47ab9db1fb42 100644
---- a/drivers/pci/pwrctl/Makefile
-+++ b/drivers/pci/pwrctl/Makefile
-@@ -3,4 +3,5 @@
- obj-$(CONFIG_PCI_PWRCTL)		+= pci-pwrctl-core.o
- pci-pwrctl-core-y			:= core.o
- 
-+obj-$(CONFIG_PCI_PWRCTL_PWRSEQ)		+= pci-pwrctl-pwrseq.o
- obj-$(CONFIG_PCI_PWRCTL_WCN7850)	+= pci-pwrctl-wcn7850.o
-diff --git a/drivers/pci/pwrctl/pci-pwrctl-pwrseq.c b/drivers/pci/pwrctl/pci-pwrctl-pwrseq.c
-new file mode 100644
-index 000000000000..43820a727b3f
---- /dev/null
-+++ b/drivers/pci/pwrctl/pci-pwrctl-pwrseq.c
-@@ -0,0 +1,84 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2024 Linaro Ltd.
-+ */
-+
-+#include <linux/device.h>
-+#include <linux/mod_devicetable.h>
-+#include <linux/module.h>
-+#include <linux/of.h>
-+#include <linux/pci-pwrctl.h>
-+#include <linux/platform_device.h>
-+#include <linux/pwrseq/consumer.h>
-+#include <linux/slab.h>
-+#include <linux/types.h>
-+
-+struct pci_pwrctl_pwrseq_data {
-+	struct pci_pwrctl ctx;
-+	struct pwrseq_desc *pwrseq;
-+};
-+
-+static void devm_pci_pwrctl_pwrseq_power_off(void *data)
-+{
-+	struct pwrseq_desc *pwrseq = data;
-+
-+	pwrseq_power_off(pwrseq);
-+}
-+
-+static int pci_pwrctl_pwrseq_probe(struct platform_device *pdev)
-+{
-+	struct pci_pwrctl_pwrseq_data *data;
-+	struct device *dev = &pdev->dev;
-+	int ret;
-+
-+	data = devm_kzalloc(dev, sizeof(*data), GFP_KERNEL);
-+	if (!data)
-+		return -ENOMEM;
-+
-+	data->pwrseq = devm_pwrseq_get(dev, of_device_get_match_data(dev));
-+	if (IS_ERR(data->pwrseq))
-+		return dev_err_probe(dev, PTR_ERR(data->pwrseq),
-+				     "Failed to get the power sequencer\n");
-+
-+	ret = pwrseq_power_on(data->pwrseq);
-+	if (ret)
-+		return dev_err_probe(dev, ret,
-+				     "Failed to power-on the device\n");
-+
-+	ret = devm_add_action_or_reset(dev, devm_pci_pwrctl_pwrseq_power_off,
-+				       data->pwrseq);
-+	if (ret)
-+		return ret;
-+
-+	data->ctx.dev = dev;
-+
-+	ret = devm_pci_pwrctl_device_set_ready(dev, &data->ctx);
-+	if (ret)
-+		return dev_err_probe(dev, ret,
-+				     "Failed to register the pwrctl wrapper\n");
-+
-+	return 0;
-+}
-+
-+static const struct of_device_id pci_pwrctl_pwrseq_of_match[] = {
-+	{
-+		/* ATH11K in QCA6390 package. */
-+		.compatible = "pci17cb,1101",
-+		.data = "wlan",
-+	},
-+	{ }
-+};
-+MODULE_DEVICE_TABLE(of, pci_pwrctl_pwrseq_of_match);
-+
-+static struct platform_driver pci_pwrctl_pwrseq_driver = {
-+	.driver = {
-+		.name = "pci-pwrctl-pwrseq",
-+		.of_match_table = pci_pwrctl_pwrseq_of_match,
-+	},
-+	.probe = pci_pwrctl_pwrseq_probe,
-+};
-+module_platform_driver(pci_pwrctl_pwrseq_driver);
-+
-+MODULE_AUTHOR("Bartosz Golaszewski <bartosz.golaszewski@linaro.org>");
-+MODULE_DESCRIPTION("Generic PCI Power Control module for power sequenced devices");
-+MODULE_LICENSE("GPL");
--- 
-2.40.1
 
+--===============7593378394628848044==--
