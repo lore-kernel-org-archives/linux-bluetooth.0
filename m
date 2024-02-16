@@ -1,124 +1,184 @@
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB8B112BF0D
-	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 22:32:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9899B14831E
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 23:10:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708122759; cv=none; b=Fzvqfbue02duVMaAbHKLLH7PqArgFt+/U04T8W9R+Ix4N1Y6fcG/B6K9LYBPrw0D99FLVPrEHsgLegxqJDWb2Jbu+eF06vFU/hdWCX2vt1PbxabXEZZzDrq0BdWWVs+IiTw61LQrwCNOAsKGGT6ulTggYFNi0LTaEwSXImQLRwE=
+	t=1708125013; cv=none; b=SSu5TU5jQIUHIsafV+Gy0NeELamP84KfVChVyUAigKA4PFDh/P2zikSArlOTuFeLCGZOpCbnzBpD06plHOONb4uGfX3An2+yho8BP9OTJYZs8BiFBgdjH8QkW+MabCrfBtHz1CJMiY7+5hip/hSgypTGaLf6g6hLVS0bKrdRc04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708122759; c=relaxed/simple;
-	bh=zb1P9RCZ2pB5erWBo65jUc8SY3N6GYAF8MGkliXNq2U=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=VSGfqzKgIX3L2OeDQEk7dsDUpBo5Xs9U2YnHvrou5oL3Hv5wdFZ6yfd/V2+JO4Dmf+6e8MFmX9DAJI7HQkTJw0QfXJ7z3uc6ltu7sTPwNAePAt1AsQtdyy7TzBm0nN+xXWBDIjhJdrO4hsupJ15UCDg+BwObENUOSJ0Nnf0VygQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dIwQndvf; arc=none smtp.client-ip=209.85.219.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1708125013; c=relaxed/simple;
+	bh=mfmEA6zSa+OORWqKlFgSku5kK5nwRZdQXnKi8D/SPd8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Y/Fwk23B/7cnwhSCXtErtOroFRgFtYc4Dy0XiuylCmYgRLylktLvL3EeVtHMSSO8ALWxdqkh4VojpiVsizT5LlLsvRb3ID4/taM/hNr8U1w4Fa4i0ki1KJ/tlZ1Pz0wV0aPVAI8pGLmcwkWXZmBZi4kLuOJikYLXcDulr+kpkHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=AOXSXFWr; arc=none smtp.client-ip=209.85.128.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dIwQndvf"
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-68c3ac1fdb9so10622336d6.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 14:32:37 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AOXSXFWr"
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-607fe8cc6d8so9763797b3.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 15:10:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708122756; x=1708727556; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=DX50ZCYlnH4PZJaIl9wax5br8xZBqGo5cs7K85b6v5w=;
-        b=dIwQndvf65+9GtWR53omGVrWy1Pv+bjEAlJ6YY4nP3N0wZV8J0GMQk9fEg7GnSGhY4
-         weSP/rF6HhHjS+svpWcdBsalLh6WsAEqFwgABI0RW85lKUyIKGCS848DLLJllXucThHY
-         t4eFlZau+JGHbnJhCcQGyHpyAZXnscVsHGpn2TATVH01/KFlDHcXu/8PQ2Q19oUoCZc3
-         HLQSrFdFoce3rFmyPAhv6mdDko45rMuak0FHwsbUeiyfvoHePF0TTIqxoYpuqfMzD+8A
-         iIy9HjtfQrbLrfP8gxpmrcmugfxvdetaKL8n87QX2S0yWOouTQB04QmXiM1jkOdv6Msz
-         1fKA==
+        d=linaro.org; s=google; t=1708125010; x=1708729810; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=EpftqacOdWcIxz3VUpc3zI1U/E0RwbiBZdYsX7Kb7J4=;
+        b=AOXSXFWrpecqGsj3FvbdDQIjHjP887SkBI4Bl4qgqmEyp6wk619/ClmzdoNIeOtz1j
+         tDFBRTTZ4BXijtr5HVAG7cqu0BwWijfc2LxgvgRliDfPlGHPIGKzJIhHQjwHJelHjVyQ
+         rp/dpDg/lvX62bGEdspeYlpgcqI7rCHt98CpiYsWMLSCTyHysVsLgsH/Mi9PXkv8IZPW
+         RnrDP9WUVm04kHfQ67x4VehA87dgAMMC2vEyqSy2YCDH6nUvxKMvEaFL93I/+w8AsTPZ
+         1hRoKNSn/OHxCPYYv+J9IC1EJfc+1aBHZQcbLbRU6Wlr1XeozRteflUVXWLLrhaypy2B
+         //xA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708122756; x=1708727556;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1708125010; x=1708729810;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=DX50ZCYlnH4PZJaIl9wax5br8xZBqGo5cs7K85b6v5w=;
-        b=jA3De31kSXQu6l5Yzd+dPs0oraw+Bnj0ydebZrvFiZ+6mIxPA44Bq4wBOiubHXHK2x
-         tbhi3JP9JfJfx84lOHNP2RTF/cwQhCgH4QqGMkqCd1k7JdUK2DbCWmydLP9DYybBcJBs
-         jff1BxNBblNr+f01zaLsHtMBPbFLqyYLVrd8kZ1RFptTUSCnjb5vtER8guxRbgl1XQrc
-         IIfHzxNUu1C9HM1ZhfRKOAIlOiOXeAcz8y4nx4Yer+ttJn0fx3PaDbhFTExxx5MbBQxq
-         ztKO3zcwUScuM02Gfxg4whtrzJt+eCDPJoS1Ud7JPK4eXTyiJeSKuAdpaabs3hmhKtlk
-         Wg6w==
-X-Gm-Message-State: AOJu0Yw/EUtv4vK8gykUfOttLUHTNNFcEZOeWRxspGBHRBfw2ExEjYOF
-	GNYBipjb7KD9IL04KOhsheusPK2hnixZ4E7dbdlhCksdscN94VHM6AhOg2Ee
-X-Google-Smtp-Source: AGHT+IH2Je3seGbrgqHv5+Z/vRdZXmlN45pMbHT10f+MaN09h3OtIiK4Yur9TH4l6BTqDw5OCHVMKQ==
-X-Received: by 2002:a05:6214:27cf:b0:68f:3c24:4744 with SMTP id ge15-20020a05621427cf00b0068f3c244744mr2245014qvb.5.1708122756442;
-        Fri, 16 Feb 2024 14:32:36 -0800 (PST)
-Received: from [172.17.0.2] ([172.183.52.222])
-        by smtp.gmail.com with ESMTPSA id ml22-20020a056214585600b0068c776b01fdsm347534qvb.65.2024.02.16.14.32.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Feb 2024 14:32:36 -0800 (PST)
-Message-ID: <65cfe284.050a0220.a412b.2f3e@mx.google.com>
-Date: Fri, 16 Feb 2024 14:32:36 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============6744902121693833217=="
+        bh=EpftqacOdWcIxz3VUpc3zI1U/E0RwbiBZdYsX7Kb7J4=;
+        b=RUOmxlSBW+GAwUbzsbRerbI02M72eat7+M/yz1ruTRf7tixxUGGs0HR0fM8T/URj3B
+         lzrqrDirF6Vn5Ly309Wfkz7Ce06EQB+kA2kqNjIsnIkJKnVXiGSzhnAzaY9ohqmpADJd
+         83oMFwEUD6UHVWBLxxeT+19zToXVcRS5uHrSnIvOiu2xAY+EkOxjOlrspX4iAx/OXu4r
+         +gr1lpyzCFs9tdIhjSvxT2Uxka7WqCJ+NcuRZzUDqj5BHiOcyjrt75Y6eyORwJ/EyD12
+         mw3hHuDjIE1NQQzMzbXbyWawWd9hWxAwg6sccxTG4CbgKYeyWFc/ey+KZam1RX29OXJ9
+         O9sw==
+X-Forwarded-Encrypted: i=1; AJvYcCUCCaFymYE4rJIpL+GigtoDyKCvN4nc1YRu1yFWBlri4739WHKo/JbaA2kWGuqRAaG34jgPVaniByClGoJrCGTOopV+pUphrIgh2oib0Rul
+X-Gm-Message-State: AOJu0Yzfpz1iszIVmb/r0SLEuEUtkZy0DsV/CWqjjfcazKCFGG4K6+U0
+	uHdFFOPbNIWSGO+OiCLdOLqJsj1Z7bJgTA+cj96RtDxGKu8eJNNr5u5gpT1S5hX9dj2eF16K3Fp
+	772/jwaRzq/td5CDqCB0/p6y8Ow2Tu8Kr3kmqIA==
+X-Google-Smtp-Source: AGHT+IH7vS67BhaJmZ0qKWVe6no0q/4H1vlJ1cE1CsXNcFt1Pp6VcJPBg/0mptzu0uQFXbGKADhe7nfa9TyYWhC6deg=
+X-Received: by 2002:a0d:ebc6:0:b0:607:ec66:36b3 with SMTP id
+ u189-20020a0debc6000000b00607ec6636b3mr5019006ywe.19.1708125010589; Fri, 16
+ Feb 2024 15:10:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, hdegoede@redhat.com
-Subject: RE: Bluetooth: hci_bcm: Limit bcm43455 baudrate to 2000000
-In-Reply-To: <20240216214016.251819-1-hdegoede@redhat.com>
-References: <20240216214016.251819-1-hdegoede@redhat.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20240216203215.40870-1-brgl@bgdev.pl> <20240216203215.40870-9-brgl@bgdev.pl>
+In-Reply-To: <20240216203215.40870-9-brgl@bgdev.pl>
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date: Sat, 17 Feb 2024 01:09:59 +0200
+Message-ID: <CAA8EJpry2yiGXrtPqZ6RXnoTqQZr_hxA_gCPsUbmyFtEBuD4VA@mail.gmail.com>
+Subject: Re: [PATCH v5 08/18] arm64: dts: qcom: sm8650-qrd: add the Wifi node
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Kalle Valo <kvalo@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konrad.dybcio@linaro.org>, Liam Girdwood <lgirdwood@gmail.com>, 
+	Mark Brown <broonie@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Saravana Kannan <saravanak@google.com>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Arnd Bergmann <arnd@arndb.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
+	Marek Szyprowski <m.szyprowski@samsung.com>, Alex Elder <elder@linaro.org>, 
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
+	Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-pci@vger.kernel.org, linux-pm@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 
---===============6744902121693833217==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Fri, 16 Feb 2024 at 22:33, Bartosz Golaszewski <brgl@bgdev.pl> wrote:
+>
+> From: Neil Armstrong <neil.armstrong@linaro.org>
+>
+> Describe the ath12k WLAN on-board the WCN7850 module present on the
+> board.
 
-This is automated email and please do not reply to this email!
+WCN7850 is the same combo WiFi + BT chip. Is there any reason for
+describing its parts separately rather than using the same PMU
+approach?
 
-Dear submitter,
+>
+> Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
+> [Bartosz:
+>   - move the pcieport0 node into the .dtsi
+>   - make regulator naming consistent with existing DT code
+>   - add commit message]
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> ---
+>  arch/arm64/boot/dts/qcom/sm8650-qrd.dts | 29 +++++++++++++++++++++++++
+>  arch/arm64/boot/dts/qcom/sm8650.dtsi    | 10 +++++++++
+>  2 files changed, 39 insertions(+)
+>
+> diff --git a/arch/arm64/boot/dts/qcom/sm8650-qrd.dts b/arch/arm64/boot/dts/qcom/sm8650-qrd.dts
+> index b07cac2e5bc8..4623c358f634 100644
+> --- a/arch/arm64/boot/dts/qcom/sm8650-qrd.dts
+> +++ b/arch/arm64/boot/dts/qcom/sm8650-qrd.dts
+> @@ -845,6 +845,28 @@ &pcie0 {
+>         status = "okay";
+>  };
+>
+> +&pcieport0 {
+> +       wifi@0 {
+> +               compatible = "pci17cb,1107";
+> +               reg = <0x10000 0x0 0x0 0x0 0x0>;
+> +
+> +               pinctrl-names = "default";
+> +               pinctrl-0 = <&wlan_en>;
+> +
+> +               enable-gpios = <&tlmm 16 GPIO_ACTIVE_HIGH>;
+> +
+> +               vdd-supply = <&vreg_s4i_0p85>;
+> +               vddio-supply = <&vreg_l15b_1p8>;
+> +               vddio1p2-supply = <&vreg_l3c_1p2>;
+> +               vddaon-supply = <&vreg_s2c_0p8>;
+> +               vdddig-supply = <&vreg_s3c_0p9>;
+> +               vddrfa1p2-supply = <&vreg_s1c_1p2>;
+> +               vddrfa1p8-supply = <&vreg_s6c_1p8>;
+> +
+> +               clocks = <&rpmhcc RPMH_RF_CLK1>;
+> +       };
+> +};
+> +
+>  &pcie0_phy {
+>         vdda-phy-supply = <&vreg_l1i_0p88>;
+>         vdda-pll-supply = <&vreg_l3i_1p2>;
+> @@ -1139,6 +1161,13 @@ wcd_default: wcd-reset-n-active-state {
+>                 bias-disable;
+>                 output-low;
+>         };
+> +
+> +       wlan_en: wlan-en-state {
+> +               pins = "gpio16";
+> +               function = "gpio";
+> +               drive-strength = <8>;
+> +               bias-pull-down;
+> +       };
+>  };
+>
+>  &uart14 {
+> diff --git a/arch/arm64/boot/dts/qcom/sm8650.dtsi b/arch/arm64/boot/dts/qcom/sm8650.dtsi
+> index d488b3b3265e..baf4932e460c 100644
+> --- a/arch/arm64/boot/dts/qcom/sm8650.dtsi
+> +++ b/arch/arm64/boot/dts/qcom/sm8650.dtsi
+> @@ -2293,6 +2293,16 @@ &mc_virt SLAVE_EBI1 QCOM_ICC_TAG_ALWAYS>,
+>                         dma-coherent;
+>
+>                         status = "disabled";
+> +
+> +                       pcieport0: pcie@0 {
+> +                               device_type = "pci";
+> +                               reg = <0x0 0x0 0x0 0x0 0x0>;
+> +                               #address-cells = <3>;
+> +                               #size-cells = <2>;
+> +                               ranges;
+> +
+> +                               bus-range = <0x01 0xff>;
+> +                       };
+>                 };
+>
+>                 pcie0_phy: phy@1c06000 {
+> --
+> 2.40.1
+>
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=826948
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      2.29 seconds
-GitLint                       PASS      0.29 seconds
-SubjectPrefix                 PASS      0.11 seconds
-BuildKernel                   PASS      27.68 seconds
-CheckAllWarning               PASS      30.71 seconds
-CheckSparse                   PASS      35.87 seconds
-CheckSmatch                   PASS      99.61 seconds
-BuildKernel32                 PASS      27.12 seconds
-TestRunnerSetup               PASS      500.52 seconds
-TestRunner_l2cap-tester       PASS      18.07 seconds
-TestRunner_iso-tester         PASS      31.03 seconds
-TestRunner_bnep-tester        PASS      4.81 seconds
-TestRunner_mgmt-tester        FAIL      167.55 seconds
-TestRunner_rfcomm-tester      PASS      7.43 seconds
-TestRunner_sco-tester         PASS      10.93 seconds
-TestRunner_ioctl-tester       PASS      7.83 seconds
-TestRunner_mesh-tester        PASS      8.35 seconds
-TestRunner_smp-tester         PASS      6.92 seconds
-TestRunner_userchan-tester    PASS      4.99 seconds
-IncrementalBuild              PASS      26.17 seconds
-
-Details
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 492, Passed: 488 (99.2%), Failed: 3, Not Run: 1
-
-Failed Test Cases
-LL Privacy - Add Device 4 (2 Devices to AL)          Failed       0.119 seconds
-LL Privacy - Add Device 6 (RL is full)               Failed       0.146 seconds
-LL Privacy - Remove Device 4 (Disable Adv)           Timed out    1.879 seconds
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6744902121693833217==--
+-- 
+With best wishes
+Dmitry
