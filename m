@@ -1,127 +1,193 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B72F054745
-	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 13:57:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64C1D12FF6C;
+	Fri, 16 Feb 2024 15:54:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708091868; cv=none; b=XuWJvGzN/VGUbDSH9aw43q6rR+ZdyMsiCk2ZpK9Eo0TD6J34LfLOg29D/4W8XixVO99cvf9paY8Li+Ce9+Nc2+FiAvIyO2SGzHgt/HUNiZbk5+x27y+MJGysqtpwObKf2xOCjuyf+ibkF+5XId7Qpxa2VJM2QsWqsiJhZH9ZHqs=
+	t=1708098866; cv=none; b=hKAhKVu2iXpo4Rxx9UzZbv0C57y7+H3lINPLZ9H5R4AV4uXMF+b4BWp5trMLb10WMJkhb1nfUduf+TaBK2Ca+HbrAAGMJ6/vLFBqlhG+c22vu7CkQ3lar8jlHcQE2bZgB6PsW818ZW7SdMMG8/3pw2Oeg8FXm/NmHlurBXVCj00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708091868; c=relaxed/simple;
-	bh=oKOlNir8NN8WRPkFhp7YFLr8sEWti1AOmZfUw9DDNto=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=t2+rFzTeBecKxMirN/gni9uU6Rorj7vYYGnQskqFGib8U/xzv3xe/sh8/Ngnweqwlh7F+boXQZMU9nUQ30ZHHoRa8BzkurRqxBCdVInbvLCGkVrkr9okmsy3dbHJjESfJ0ilhBz/8/hdlJFwegz4OUHDI3DDb0P5AZtLgUSnowc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IQrOQqdJ; arc=none smtp.client-ip=209.85.214.170
+	s=arc-20240116; t=1708098866; c=relaxed/simple;
+	bh=Tjqbu1II+07DpMdKvtq6sw+ENXJIB5UD1OOkHOIVFUE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VocKB7WnwdV05iahmiT4DU8YLz+bmpXxNDD5DBS2fjlBaD/HkWTUkYQEbDmS8b0+zHCUsKmmScbZ91e7cxmMDrQETdSHeWROj7GlZbRnVY2vqtQAbspiDLKAB5u5rV9CEJ0gJjIdci/LpJVfcOlmfn8kXp+4wFGS1AHrbtoxcUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MjzdIlQt; arc=none smtp.client-ip=209.85.208.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IQrOQqdJ"
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1dba177c596so7527195ad.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 05:57:46 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MjzdIlQt"
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2d109e82bd0so26530101fa.3;
+        Fri, 16 Feb 2024 07:54:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708091866; x=1708696666; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=g/u1BgS3apT1oJEQwIKKCnh4p2SK+GTx6gqGJuP0sN0=;
-        b=IQrOQqdJ5HzFVMMaGxsEBG8eKik4NYDnLkiCRaGa8dyTfXAWxAxZ3zQiN1Tak1RWOs
-         5Qdp7lDrfX8N90TBBi1sl/7Tl7FPGagUe7+CQcuskD/JL7khlW0bFgzSLPvjkyG864EJ
-         WQT/9+9v9m79Vz43D4tmjPDkWDxJIvaUfwI5pXkFt7OsYOwsB8OcXdwUCq54N1qN7cmj
-         IzxSico+b4WXpsWVv7U8mWFmmU5BL7xoM0odLJYB/eY+Lun8s0Rzot6ej7k4qakBavum
-         rh7l9rtkHeu/VD7xjS3Wk/TAKRGqyGbeyuWQV1VT9Mffg3ZuzzTrilGZZx/9hBEEdnSb
-         STSg==
+        d=gmail.com; s=20230601; t=1708098862; x=1708703662; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QieQktmjK48aqD6qsFc/4IxxBa+SIty3IcvbMdQjY20=;
+        b=MjzdIlQtl9Hznz7Pt1UtCkg8LJODIc7X+1dji8FjH0GF2w5trJHGiLp8ko4uLb4Uo8
+         k1q1I3VIhgCHwrVtNw9n6JxAZOE/d9AwYGuyxrJ99B9bcZHSyfs+ibD2TP5cjX73yWCW
+         uczHMBNg7gXKRYTOxaVAnRqJ7WhmfVr6R0cYRYY0aXIgtbjCGXWVK//egwMowKJn5REy
+         l1lMpJ/cEys793KrFucQT+qJOMuoJ8sKdzZC2VlUsldO+6SvAQhk4YrwNxeS6oQp2TyU
+         vAOPFahgvVzAMru6ScXwIg2EQk8awh8QW4oQvV8PBoiMBK9WQqZ79fhbzWdJ+TMCC12j
+         me+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708091866; x=1708696666;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=g/u1BgS3apT1oJEQwIKKCnh4p2SK+GTx6gqGJuP0sN0=;
-        b=ICchcGSbWk5GvPB0ehYNe8n61g/SJPTpHv8b5oXzJD87vd1xBgKntLtodXU2ytMVW7
-         e3EWktdrCIFy2mLV8uNV89FmFul7oen0ltXWkW/PT7a1zATHx8hwoZR5BPuBmA5yd6Qc
-         Kwj+vZDkU8amq0yVDhfLfSqBvMpxzS4HU/GN1Y4/B5hsdgTEWVHRwYekyGraITdJdD9c
-         +Wtnf63Way1CChWuzyX/aVzXhTheSRCdZru+8+0jgjsmuEF55zXykjNLaKo5o1Vn6EUS
-         OxzNgfd1S8pQmarSI0aAsZrzCE+e0ft77BS4NndpGGmp0ZSkwyLjOyPwSrDalD0LcryW
-         KeuQ==
-X-Gm-Message-State: AOJu0Yx8sCIY3HkwSAvq4RlrEGBuj+yS4AKUPUWe/k72BIg9ds+3f2vf
-	PU8RKw67N5vIWmcDd1juGKNkGkhPITFzE7Bc16H5hL/bJfXT3IJolPHmOPw2
-X-Google-Smtp-Source: AGHT+IFLiOhercVmemXlg8dRc6+8BbURGDl3Lu6rVpM3f9jFhAMlNVt+jHXqhakYbD2fJ9Ap577vsg==
-X-Received: by 2002:a17:903:2310:b0:1db:bd46:a429 with SMTP id d16-20020a170903231000b001dbbd46a429mr65921plh.28.1708091865770;
-        Fri, 16 Feb 2024 05:57:45 -0800 (PST)
-Received: from [172.17.0.2] ([4.227.115.132])
-        by smtp.gmail.com with ESMTPSA id lf13-20020a170902fb4d00b001dbab519ce7sm1144206plb.212.2024.02.16.05.57.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Feb 2024 05:57:45 -0800 (PST)
-Message-ID: <65cf69d9.170a0220.d1a23.3336@mx.google.com>
-Date: Fri, 16 Feb 2024 05:57:45 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============3490302341289468233=="
+        d=1e100.net; s=20230601; t=1708098862; x=1708703662;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QieQktmjK48aqD6qsFc/4IxxBa+SIty3IcvbMdQjY20=;
+        b=YyiyOTHXkTX/Zw+MRh+kE6qR1c0UbENiHiHnAKNXRPrPbpcvz6Z91KiAWtQzYxnrBl
+         1Bquu53PuW197gwW+hrS8IsVVtSOqV9OP/A3leFcTOx40eVPu9hp/mwUeyX5T5f7RDqa
+         x5IEGgQP0v4Z/FuYKo29zWTdgBtXMuQxUex2/F47y56NRGWCT9IaFf36YF+NSTWXHzvU
+         M0/Qwb+YWvBkjyQ4eS/N1zV3kCXDAU+AHjiRCwU/ISqXoqD8OgEWb5HppshweQGN/1Qh
+         RusR4rT8Fee9whuhhgUE3eeiyEc91F5noGWxr/v5JhbaYPMpab20uY2FEEfoMZqezFLa
+         GWPA==
+X-Forwarded-Encrypted: i=1; AJvYcCVzQXDCAbbkIu28Nt6Uw6aZEXNVFnplT7+SHqDIIv2IVz4bC2vwk73YvPGjg+b5nEb3YfQaPb6A1yodOj3Ybq7JMivKfSRRdex07u4zHqyNtpBK9o6v5sdcNs0AdlbKVIdWqHcEO2HoLVfZFjZ+
+X-Gm-Message-State: AOJu0Yz6q59JkjX0qr6HiMrQMBQT78ppVVBgN5YUb9z/umyRxmBy/pBx
+	phtfTcu6uTUULdQ6qpdALAw+eR7uNKh5VRJDbX6Nd/FAMMU91YLrVjEEPRgGTuRsHMWKDJfMCoP
+	HFH/ErtK618YuGdcOWjIf3nwGJzk=
+X-Google-Smtp-Source: AGHT+IGWJZT68TbDcVic8RQrugq/ayZu+n01cf4f7WcHo5EJqxmZ+x8j+V+eIUt52VEDfUbVWIE8ofKhOCrLv7yfLUA=
+X-Received: by 2002:a05:651c:b20:b0:2d0:f87f:d7f8 with SMTP id
+ b32-20020a05651c0b2000b002d0f87fd7f8mr4635538ljr.3.1708098861903; Fri, 16 Feb
+ 2024 07:54:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luca.weiss@fairphone.com
-Subject: RE: Bluetooth: Add more Bluetooth version defines
-In-Reply-To: <20240216-bluetooth-defines-v1-1-6c39aacc66a8@fairphone.com>
-References: <20240216-bluetooth-defines-v1-1-6c39aacc66a8@fairphone.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20240214012328.BlueZ.1.I10eda6f375bc8dfedf4eef3a8cf6572c65803afc@changeid>
+ <CABBYNZ+MJRSAWHjgNTNwcWCdq5y0zBU5f8XJvr1tv3LCqvdKJw@mail.gmail.com> <CADg1FFfgNHF9q+dSn=K9qjVMKx1zaBpG=NoeM_3Gr942Zj7_bA@mail.gmail.com>
+In-Reply-To: <CADg1FFfgNHF9q+dSn=K9qjVMKx1zaBpG=NoeM_3Gr942Zj7_bA@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 16 Feb 2024 10:54:08 -0500
+Message-ID: <CABBYNZJXxYJKR3zxSwO8xuWTTgkSJjdGgZbJYqgJzmpPfwUcWA@mail.gmail.com>
+Subject: Re: [BlueZ PATCH] Bluetooth: hci_core: Skip hci_cmd_work if
+ hci_request is pending
+To: Hsin-chen Chuang <chharry@google.com>
+Cc: Hsin-chen Chuang <chharry@chromium.org>, linux-bluetooth@vger.kernel.org, 
+	chromeos-bluetooth-upstreaming@chromium.org, 
+	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
+	linux-kernel@vger.kernel.org, Ying Hsu <yinghsu@google.com>, 
+	Joe Antonetti <joeantonetti@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============3490302341289468233==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Hsin-chen,
 
-This is automated email and please do not reply to this email!
+On Thu, Feb 15, 2024 at 11:21=E2=80=AFPM Hsin-chen Chuang <chharry@google.c=
+om> wrote:
+>
+> +Some Googlers who would be interested in
+>
+> Hi Luiz,
+>
+> How about moving the hci_req-related data out from sent_cmd? This allows =
+sending HCI commands while hci_req data would not be overwritten.
 
-Dear submitter,
+I have something like the following in the works:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=826776
+https://gist.github.com/Vudentz/251275bb688fac32585f90ac0076c407
 
----Test result---
+It is not stable yet, but I think we can get away with it since it
+just means we can keep the pending request stored in the req_skb, that
+said we might need to overhaul this design since it is not very clean
+in my opinion.
 
-Test Summary:
-CheckPatch                    PASS      0.50 seconds
-GitLint                       PASS      0.22 seconds
-SubjectPrefix                 PASS      0.09 seconds
-BuildKernel                   PASS      27.66 seconds
-CheckAllWarning               PASS      30.37 seconds
-CheckSparse                   PASS      35.43 seconds
-CheckSmatch                   PASS      97.60 seconds
-BuildKernel32                 PASS      26.83 seconds
-TestRunnerSetup               PASS      499.07 seconds
-TestRunner_l2cap-tester       PASS      17.96 seconds
-TestRunner_iso-tester         PASS      26.91 seconds
-TestRunner_bnep-tester        PASS      4.85 seconds
-TestRunner_mgmt-tester        FAIL      167.43 seconds
-TestRunner_rfcomm-tester      PASS      7.48 seconds
-TestRunner_sco-tester         PASS      14.98 seconds
-TestRunner_ioctl-tester       PASS      7.80 seconds
-TestRunner_mesh-tester        PASS      5.85 seconds
-TestRunner_smp-tester         PASS      6.91 seconds
-TestRunner_userchan-tester    PASS      5.63 seconds
-IncrementalBuild              PASS      26.04 seconds
+> On Fri, Feb 16, 2024 at 5:37=E2=80=AFAM Luiz Augusto von Dentz <luiz.dent=
+z@gmail.com> wrote:
+>>
+>> Hi Hsin-chen,
+>>
+>> On Tue, Feb 13, 2024 at 12:24=E2=80=AFPM Hsin-chen Chuang <chharry@chrom=
+ium.org> wrote:
+>> >
+>> > hci_cmd_work overwrites the hdev->sent_cmd which contains the required
+>> > info for a hci_request to work. In the real world, it's observed that
+>> > a request from hci_le_ext_create_conn_sync could be interrupted by
+>> > the authentication (hci_conn_auth) caused by rfcomm_sock_connect. When
+>> > it happends, hci_le_ext_create_conn_sync hangs until timeout; If the
+>> > LE connection is triggered by MGMT, it freezes the whole MGMT interfac=
+e.
+>> >
+>> > Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
+>> > ---
+>> >
+>> >  net/bluetooth/hci_core.c | 7 +++++--
+>> >  1 file changed, 5 insertions(+), 2 deletions(-)
+>> >
+>> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+>> > index 34c8dca2069f..e3706889976d 100644
+>> > --- a/net/bluetooth/hci_core.c
+>> > +++ b/net/bluetooth/hci_core.c
+>> > @@ -4213,8 +4213,11 @@ static void hci_cmd_work(struct work_struct *wo=
+rk)
+>> >         BT_DBG("%s cmd_cnt %d cmd queued %d", hdev->name,
+>> >                atomic_read(&hdev->cmd_cnt), skb_queue_len(&hdev->cmd_q=
+));
+>> >
+>> > -       /* Send queued commands */
+>> > -       if (atomic_read(&hdev->cmd_cnt)) {
+>> > +       /* Send queued commands. Don't send the command when there is =
+a pending
+>> > +        * hci_request because the request callbacks would be overwrit=
+ten.
+>> > +        */
+>> > +       if (atomic_read(&hdev->cmd_cnt) &&
+>> > +           !hci_dev_test_flag(hdev, HCI_CMD_PENDING)) {
+>> >                 skb =3D skb_dequeue(&hdev->cmd_q);
+>> >                 if (!skb)
+>> >                         return;
+>> > --
+>> > 2.43.0.687.g38aa6559b0-goog
+>>
+>>
+>> This seems to be causing some mgmt-tester failures:
+>>
+>> Pair Device - Sec Mode 3 Success 1                   Timed out   22.753 =
+seconds
+>> Pair Device - Sec Mode 3 Reject 1                    Timed out   22.533 =
+seconds
+>> Pair Device - Sec Mode 3 Reject 2                    Timed out   22.526 =
+seconds
+>>
+>> I think this is because we need to respond to an event with a command li=
+ke:
+>>
+>> < HCI Command: Create Conn.. (0x01|0x0005) plen 13  #241 [hci0] 16:25:38=
+.699066
+>>         Address: 00:AA:01:01:00:00 (Intel Corporation)
+>>         Packet type: 0x0018
+>>           DM1 may be used
+>>           DH1 may be used
+>>         Page scan repetition mode: R2 (0x02)
+>>         Page scan mode: Mandatory (0x00)
+>>         Clock offset: 0x0000
+>>         Role switch: Allow peripheral (0x01)
+>> > HCI Event: Command Status (0x0f) plen 4           #242 [hci0] 16:25:38=
+.701881
+>>       Create Connection (0x01|0x0005) ncmd 1
+>>         Status: Success (0x00)
+>> > HCI Event: Link Key Request (0x17) plen 6         #243 [hci0] 16:25:38=
+.702375
+>>         Address: 00:AA:01:01:00:00 (Intel Corporation)
+>>
+>> But because Create Connection is pending we cannot respond to Link Key
+>> Request, so it is actually a design problem if we cannot send commands
+>> because something is pending so perhaps we need to redesign how we
+>> store cmd_sent so we can have multiple outstanding commands rather
+>> than just one.
+>>
+>> --
+>> Luiz Augusto von Dentz
+>
+>
+>
+> --
+> Best Regards,
+> Hsin-chen
 
-Details
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 492, Passed: 485 (98.6%), Failed: 6, Not Run: 1
-
-Failed Test Cases
-LL Privacy - Add Device 4 (2 Devices to AL)          Failed       0.113 seconds
-LL Privacy - Add Device 5 (2 Devices to RL)          Failed       0.115 seconds
-LL Privacy - Add Device 6 (RL is full)               Failed       0.146 seconds
-LL Privacy - Add Device 7 (AL is full)               Failed       0.143 seconds
-LL Privacy - Remove Device 2 (Remove from RL)        Timed out    2.667 seconds
-LL Privacy - Remove Device 4 (Disable Adv)           Timed out    1.842 seconds
 
 
----
-Regards,
-Linux Bluetooth
-
-
---===============3490302341289468233==--
+--=20
+Luiz Augusto von Dentz
