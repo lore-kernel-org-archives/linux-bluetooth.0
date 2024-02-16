@@ -1,38 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71D5F148FE9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71D25148FE7
 	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 23:11:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708125071; cv=none; b=ZFk2r6kjq9eVoFx32SnpG/Ot3Ljy4OghKMTJmmhli3cBTFIXlRHKGqCfUgZAT8h7Z2C5zGOcyCYAfyKUDy8hk7IoMP7AGgF++qb37NXbl23FFHmTNJuNbqItoHMb3oA2k/CqN7Lwc8SvDlOP60Pu3X2GXFk4tcoM2eRukYELuT8=
+	t=1708125071; cv=none; b=BVt6qSnSABrBgfiS35HrfOtJX1MS4hRCUV7pnvZYtxpEmcetLxDOHeuYJLF7Ww2I+hYu9LmOEMzaI3YOAZq3AngcTWugWvoMIqCnqSb9xA0jhPf7+pSYGDivi3iNRyrdpt4CqpPxPVPNTpT/k9z3JlR/w6dU+0f2Im31K2Y0Uk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1708125071; c=relaxed/simple;
-	bh=YBFZWOMPNTnFzWYlSB9+DBEXXEhdj2IL5RZYHTbpTkc=;
+	bh=Ew4oTdCkjRqvpD6DFOQabHg4hDVi6mj79yCGseCHa7U=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=c9wfyNU1kNWb1gMbyIB3OxAB1DocShxHPIN4yihGdeoEQ5OuGeRLt+SnH+N+fPxFh/QLK11U/KChn/QsLAPFomPS/6mP4E2Qbk+IKXkGwjc49goi7kbcG5+keNIirNZ2d2j0KMvbN3+1JlkKdVm8JdBrdf/0hniogCYwh72dVgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Doh9niGu; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To; b=cHFf47cJp/UEWY1btwkXdwKFKYtHR4mHCAncQro8DX4KgF11JFysAv4N3usVSxfetmmKuevgvB6Sge6jTkkbQ7kderPkdY7NVjqFhZVzgZgv+y679sO6qeedAGg/6iWAW3+vJFznV/CzDBOrqOBseTEm5s832AaFRWl26cYQCvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RR/IwBu3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Doh9niGu"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3DA06C43394;
-	Fri, 16 Feb 2024 23:11:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RR/IwBu3"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 46F15C43330
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 23:11:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1708125071;
-	bh=YBFZWOMPNTnFzWYlSB9+DBEXXEhdj2IL5RZYHTbpTkc=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=Doh9niGum8mGqUV+vMzDfELrysH/9DemtSJUrFF2Lag+oi4zXZwammJigDHR2K/zA
-	 dSwab9nD2yQlAiH5dkq0C2Z8EOUTG+IIvE+xt0WxHhJgMCgvMH6E6liGO18SafH2qv
-	 IO2ni4SAqc8gLKIa46WylYQc7FmT9rHgIwMU6dS1ju1C64hqfBht9artMPhw+rshUG
-	 oi8qswL1Em52L9LXAFt7hRzQmNwUmmcv/5ZfOqggWB1DXRR/IS48Ei2Pj5QeqqagEg
-	 sVYYGtZhEOjNfIdG0ddx4l8hja/wuCtdNO2I28kJ05MRlbjobXTCnTALdh9PE9INNH
-	 KyZTwT+tg2H9w==
+	bh=Ew4oTdCkjRqvpD6DFOQabHg4hDVi6mj79yCGseCHa7U=;
+	h=From:Date:Subject:References:In-Reply-To:To:Reply-To:From;
+	b=RR/IwBu303wXkE8NZCnxAxYvQHojSzgHLdy4/OSgZSDVZ7iyraOY70RqaDvAHCtfn
+	 3smqTjexoHXB4itSiLQjeeNm4C2aSYOXlUPqAX1Ctt0RRUcU46r9HQWQkviCi73wHW
+	 9tNlJZiAieoIOyPxdwEIhmEkHpuDI5zFFpnMYireb4d25rSoEhjHr8PYEMQBuDGKsC
+	 YmuoRGuKs2JkpVWJ7faRmtv+uMZ2GCMgKx1Z4toTwqZsiJ3bh8Hcl9zOx2H17M9dW1
+	 euOJhNhohWZfi8xyIp52/tRMBiwHMHI7T0fsVtuq7jE+RPsgBnOdHpQTcHxgUFjPhV
+	 5nNV3Yyk2W7Og==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DE12C48BF6;
-	Fri, 16 Feb 2024 23:11:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3790EC54764
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 23:11:11 +0000 (UTC)
 From: Emil Velikov via B4 Relay <devnull+emil.l.velikov.gmail.com@kernel.org>
-Date: Fri, 16 Feb 2024 23:11:12 +0000
-Subject: [PATCH BlueZ v2 08/10] build: obexd: remove duplicate include
- -I$(builddir)/lib
+Date: Fri, 16 Feb 2024 23:11:13 +0000
+Subject: [PATCH BlueZ v2 09/10] gitignore: ignore all manual pages
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -41,17 +40,16 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240216-hook-fixup-v2-8-a6b192d1a6ad@gmail.com>
+Message-Id: <20240216-hook-fixup-v2-9-a6b192d1a6ad@gmail.com>
 References: <20240216-hook-fixup-v2-0-a6b192d1a6ad@gmail.com>
 In-Reply-To: <20240216-hook-fixup-v2-0-a6b192d1a6ad@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Emil Velikov <emil.l.velikov@gmail.com>
 X-Mailer: b4 0.12.4
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1708125069; l=710;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1708125069; l=1883;
  i=emil.l.velikov@gmail.com; s=20230301; h=from:subject:message-id;
- bh=OZRKsu59444Zoitt96/ZqOD/W5o3DtQdHZSS7Mt3Auw=;
- b=QQ1PG6y7ObZvheXibgk3YuKIGNRxjiKJxTOdlax43C0JPqbilmVBEzBhk/wS1PnFr4cddze0S
- m4gKvTKmUIoDyMphPCHlDNCd+AhDGrK4AjlVe20OM+VPnd5iK/5pHUw
+ bh=/2ToIKiPlK66Ad0zCXSBgK+mSXWmJcB3cLI50N1fKIU=;
+ b=tUrbANG0P3AomSxK6RYacG5aga8rSDGlk6XZIGwqP6Ffc3/pHx0CM1g019qRWCRFcVzGSUb13
+ GujUUP3N/M1CppQWB23wOIDeX+B5mpW7cHU5eh2FGOFnKmwvLRS39Ao
 X-Developer-Key: i=emil.l.velikov@gmail.com; a=ed25519;
  pk=qeUTVTNyI3rcR2CfNNWsloTihgzmtbZo98GdxwZKCkY=
 X-Endpoint-Received:
@@ -61,27 +59,101 @@ Reply-To: <emil.l.velikov@gmail.com>
 
 From: Emil Velikov <emil.l.velikov@gmail.com>
 
-The -I$(builddir)/lib include is already in the AM_CPPFLAGS. Drop the
-duplicate instance in obexd.
-
-Signed-off-by: Emil Velikov <emil.l.velikov@gmail.com>
+Drop the few explicit entries and use *.{1,5,8} instead.
 ---
- Makefile.obexd | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .gitignore | 22 +++-------------------
+ 1 file changed, 3 insertions(+), 19 deletions(-)
 
-diff --git a/Makefile.obexd b/Makefile.obexd
-index 01aa3a9c7..385e5618d 100644
---- a/Makefile.obexd
-+++ b/Makefile.obexd
-@@ -102,7 +102,7 @@ obexd_src_obexd_CPPFLAGS = $(AM_CPPFLAGS) $(GLIB_CFLAGS) $(DBUS_CFLAGS) \
- 				$(ICAL_CFLAGS) -DOBEX_PLUGIN_BUILTIN \
- 				-DPLUGINDIR=\""$(obex_plugindir)"\" \
- 				-D_FILE_OFFSET_BITS=64 \
--				-I$(builddir)/lib -I$(builddir)/obexd/src
-+				-I$(builddir)/obexd/src
+diff --git a/.gitignore b/.gitignore
+index 4da95f275..a431304c3 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1,3 +1,6 @@
++*.1
++*.5
++*.8
+ *.o
+ *.a
+ *.lo
+@@ -47,36 +50,25 @@ tools/avinfo
+ tools/bccmd
+ tools/hwdb
+ tools/ciptool
+-tools/ciptool.1
+ tools/hciattach
+-tools/hciattach.1
+ tools/hciconfig
+-tools/hciconfig.1
+ tools/hcieventmask
+ tools/hcisecfilter
+ tools/hcitool
+-tools/hcitool.1
+ tools/hcidump
+-tools/hcidump.1
+ tools/hid2hci
+-tools/hid2hci.1
+ tools/rfcomm
+-tools/rfcomm.1
+ tools/l2ping
+-tools/l2ping.1
+ tools/l2test
+ tools/cltest
+ tools/rctest
+-tools/rctest.1
+ tools/scotest
+ tools/amptest
+ tools/oobtest
+ tools/advtest
+ tools/sdptool
+-tools/sdptool.1
+ tools/avtest
+ tools/bdaddr
+-tools/badddr.1
+ tools/bluemoon
+ tools/seq2bseq
+ tools/hex2hcd
+@@ -104,7 +96,6 @@ tools/check-selftest
+ tools/mcaptest
+ tools/bneptest
+ tools/isotest
+-tools/isotest.1
+ tools/iso-tester
+ test/sap_client.pyc
+ test/bluezutils.pyc
+@@ -134,10 +125,8 @@ tools/bnep-tester
+ tools/userchan-tester
+ tools/ioctl-tester
+ tools/btattach
+-tools/btattach.1
+ tools/btconfig
+ tools/btmgmt
+-tools/btmgmt.1
+ tools/btsnoop
+ tools/btpclient
+ tools/btpclientctl
+@@ -145,22 +134,17 @@ tools/btmon-logger
+ tools/bluetooth-logger.service
+ peripheral/btsensor
+ monitor/btmon
+-monitor/btmon.1
+ emulator/btvirt
+ emulator/b1ee
+ emulator/hfp
+ client/bluetoothctl
+-client/bluetoothctl-mgmt.1
+-client/bluetoothctl-monitor.1
+ tools/meshctl
+ tools/mesh-cfgclient
+ tools/mesh-cfgtest
+ tools/mesh-tester
+ mesh/bluetooth-meshd
+-mesh/bluetooth-meshd.8
+ mesh/bluetooth-meshd.rst
  
- else
- obexd-add-service-symlink:
+-src/bluetoothd.8
+ src/bluetoothd.rst
+ src/bluetooth.service
+ mesh/bluetooth-mesh.service
 
 -- 
 2.43.1
