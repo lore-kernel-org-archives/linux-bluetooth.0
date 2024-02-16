@@ -1,38 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C7451487F4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 493461487FA
 	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 23:11:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708125071; cv=none; b=QDe6XY/g6WRyCHxb8Jho90semLvmraPmygQWb0GTVXnDEvblVudSC+aAPPvM/oIHRJf44r0/I2YXeqiZ1sHynp2vflrkfLZW0utkvs++7N6Byu0r8HMABFcGOlQ+xZ6pCLIQpANq1TyWxg/0Sa4ceNtfk/R4+ZGc+UPA0Io/RQg=
+	t=1708125071; cv=none; b=BoGc+XQPcEtjhiULswXuRd8QPOttLFOhSkaFKuxmv+fveBSk/Yu2/dZTanbWh3j41HsPMb99vx5BGZ6ln+qVYBa4m0au+AcXnsExJDhWDyt2sGe4+pgwQzJl+9dgC6TJbiOFoGaiFQU1wZ89Yo5JUqYjqpg73cD0RfYrNjfQ+no=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1708125071; c=relaxed/simple;
-	bh=pn4oXOiprsJ9P+/w7VthZ06gnonlcvDwigv5H1AczbU=;
+	bh=glCqpWt4oAuD1Ji0ik8N7GDUfG1S32Xnk6mB4hYp2c4=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To; b=iNKDuRu/vYMOpCarooiXblLR6lf4y5aihHDBBkcDMmaPwHhWgO0sHo9fWcFtCEf8etb4lzTZ7idA0/2NWa5XtDcNXjSksvfpEt7s9zusSINFjvwY+BG32Acw11k/8XuZJ3RJ6YJNr+r0q+6rX9do+BSonorQJSZVoWzsN+JPjew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QNt7DmlD; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=TLgzIlt5FvAhCUTw0uTxkC69+sHy9w+qe7waHf1NJBGkv/XMluzeij4cvqZ2YbyIMc3RsZSCAJKcEyroQAMz+1E/PaP9Ygh3HY07JAUhyXzCSvbiXy1/3aHdkk/HjoYhsrP9tzQDdukYeWch/YgF8fqFwIwyhwhj2VDfpBEVRSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZWtPFjt9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QNt7DmlD"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 03BFDC43390
-	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 23:11:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZWtPFjt9"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 20D6BC433A6;
+	Fri, 16 Feb 2024 23:11:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1708125071;
-	bh=pn4oXOiprsJ9P+/w7VthZ06gnonlcvDwigv5H1AczbU=;
-	h=From:Date:Subject:References:In-Reply-To:To:Reply-To:From;
-	b=QNt7DmlDvdgltjZzwKSN39HQ46JaTlT/VgZpLtVlBz1kE4ulwwWFOi2x3t4FqiUyd
-	 rubZ83CH5ouSe0dyidyEBTxyLMdJfoODTFK9JCXCEssvQ7VvayTz8DBDz+4RzdD4Tc
-	 N71FEWWP/Z/RfSuZU4kpn+aZPmEvUOQRGvGnRF1q6KbQnnBG7eIGRVNi7sAkMUim3Y
-	 mdn3+4MtQYvt0TejiDrymS83qym0iz9UgAW8fiiXfWPwnrF45CwCpsJF+PTKH1btIN
-	 9F/xD+R8MkculwfK1fn+MuB7WNgilobGkfGpqYvg1l2b1lCtBkJJPb0+dg4nsGWjoe
-	 N0/E17hERIMYQ==
+	bh=glCqpWt4oAuD1Ji0ik8N7GDUfG1S32Xnk6mB4hYp2c4=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=ZWtPFjt9BtQs/W6jsAC9ZucQZjqbVM9HDZCv34ZPkdOmQd/gubTRwYk4eHTX7iUta
+	 Ih4em7Ije+Q679n9yNuwMe4djsdsnO+ZbGWQUK8JKANfuJGmcJdhi3rSLaCIpXqH9A
+	 TaAnNkmv8biJDu4VNpmjPt7j1wx8hpJEvAWZb3dfQamemw0VfwyV3Olgu2Ct0/HYjn
+	 W309jRCKuE+l/EPBAB+A8IC0ML3ZulIMOQ0y/HhqtG4hja8wJV6ZTDsFiLmXoM+4iS
+	 3T0WK8d+7V0bBVu+Gwcs9wfg9+QApPQThwWcHbrToXoV1pgqdBeqRHx0BjRPlXkKLm
+	 PQtHgWBg5fbqQ==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF694C48BF8
-	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 23:11:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DC71C54764;
+	Fri, 16 Feb 2024 23:11:11 +0000 (UTC)
 From: Emil Velikov via B4 Relay <devnull+emil.l.velikov.gmail.com@kernel.org>
-Date: Fri, 16 Feb 2024 23:11:06 +0000
-Subject: [PATCH BlueZ v2 02/10] build: install obexd (dbus,systemd}
- services as needed
+Date: Fri, 16 Feb 2024 23:11:09 +0000
+Subject: [PATCH BlueZ v2 05/10] build: simplify coverage handling
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -41,16 +40,17 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240216-hook-fixup-v2-2-a6b192d1a6ad@gmail.com>
+Message-Id: <20240216-hook-fixup-v2-5-a6b192d1a6ad@gmail.com>
 References: <20240216-hook-fixup-v2-0-a6b192d1a6ad@gmail.com>
 In-Reply-To: <20240216-hook-fixup-v2-0-a6b192d1a6ad@gmail.com>
 To: linux-bluetooth@vger.kernel.org
+Cc: Emil Velikov <emil.l.velikov@gmail.com>
 X-Mailer: b4 0.12.4
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1708125068; l=708;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1708125068; l=1002;
  i=emil.l.velikov@gmail.com; s=20230301; h=from:subject:message-id;
- bh=ydMrW4KQq1RxtsNE5Z3GD8gOdVpX/eInfAQOzvCNhPM=;
- b=IrYvb1KVOghrustydreRo3bmyf2og6elMhJBTvp+Y0TbzI7qTGuQPiB0b1hSXzDQHXXSxnBXQ
- K2QeywgpuavAtAGEmgRUGM7CedeeoFoKeaQl+LP4GwYSBJfYVcujLMP
+ bh=F7HjqEFBfzVfrOcOwzbG4BM6hzjjRaT6Ip2Olxc4hyo=;
+ b=c72IAGHa37cqH7M2VSCdaRImQqKk8qNj2JMssAafC7dD0yy5p5pbfHE0hKaaG9HwmDPlzfLgi
+ WrV7URNzSNFB1HVZfnal/4EZdAl7JiLZ8iHfKzdtxrIKxvoQaYt0s9k
 X-Developer-Key: i=emil.l.velikov@gmail.com; a=ed25519;
  pk=qeUTVTNyI3rcR2CfNNWsloTihgzmtbZo98GdxwZKCkY=
 X-Endpoint-Received:
@@ -60,33 +60,42 @@ Reply-To: <emil.l.velikov@gmail.com>
 
 From: Emil Velikov <emil.l.velikov@gmail.com>
 
-Currently we ship the service files, even when built with
---disable-obex.
-
-Move the "if OBEX" guard few lines further up.
+Signed-off-by: Emil Velikov <emil.l.velikov@gmail.com>
 ---
- Makefile.obexd | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ Makefile.am | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/Makefile.obexd b/Makefile.obexd
-index 0e8bc6de7..e8e4a6144 100644
---- a/Makefile.obexd
-+++ b/Makefile.obexd
-@@ -1,4 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0
-+if OBEX
-+
- if SYSTEMD
- systemduserunitdir = $(SYSTEMD_USERUNITDIR)
- systemduserunit_DATA = obexd/src/obex.service
-@@ -16,7 +18,6 @@ endif
- dbussessionbusdir = $(DBUS_SESSIONBUSDIR)
- dbussessionbus_DATA = obexd/src/org.bluez.obex.service
+diff --git a/Makefile.am b/Makefile.am
+index 2d43493aa..94df43869 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -787,8 +787,8 @@ ell/ell.h: Makefile
+ maintainer-clean-local:
+ 	-rm -rf ell
  
--if OBEX
+-if COVERAGE
+ clean-coverage:
++if COVERAGE
+ 	@lcov --directory $(top_builddir) --zerocounters
+ 	$(RM) -r coverage $(top_builddir)/coverage.info
  
- obex_plugindir = $(libdir)/obex/plugins
+@@ -797,15 +797,9 @@ coverage: check
+ 				--output-file $(top_builddir)/coverage.info
+ 	$(AM_V_at)$(MKDIR_P) coverage
+ 	@genhtml -o coverage/ $(top_builddir)/coverage.info
++endif
  
+ clean-local: clean-coverage
+ 	-find $(top_builddir) -name "*.gcno" -delete
+ 	-find $(top_builddir) -name "*.gcda" -delete
+ 	$(RM) -r lib/bluetooth
+-
+-else
+-clean-local:
+-	-find $(top_builddir) -name "*.gcno" -delete
+-	-find $(top_builddir) -name "*.gcda" -delete
+-	$(RM) -r lib/bluetooth
+-endif
 
 -- 
 2.43.1
