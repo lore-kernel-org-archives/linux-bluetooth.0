@@ -1,58 +1,58 @@
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D4A1369AF
-	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Feb 2024 23:49:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84EF43FC2
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 00:41:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708040962; cv=none; b=VBc/tja8zZDhyJaR5R7/RurKhedW8/HnYJKJ5IEvT076o75u/zDx7bgPTCmXYT7HcSJI7G1nJ7cLDTf0ewfhzcHCaEgRutOj0OAu0deAbPgW69aSd3Ii320bQ6dWVGbCPIpD9y0Pk9ccNLGngaqXuDGFA+Y0o5mc0hJDsVEeCTI=
+	t=1708044099; cv=none; b=FC97rWPvWNtDy/nsbpSxkVeQlJrRp6770dSGAJO+LgjUhf5UDXnrQUYHLDvl+jzY2uZbT2+ezvwGQg8zxylAXJOTJ9Cbu41emrJJwjUKUh0zkab2Hoatp3ZhJfhhYCWs3CGMBCgY+sxqpN2IXf8sp61bE/wcmGC7s0zkfh06Hzk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708040962; c=relaxed/simple;
-	bh=QmIqArGqqUJ4PcikxmRi8WEt6vXBQYaraP8BnkfsHzk=;
+	s=arc-20240116; t=1708044099; c=relaxed/simple;
+	bh=9BlW/WKvupuxlq7xPkyaO2yvsKL1AWmgvgRwo+INBX8=;
 	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=tRlp34l48ZhP+LemcAPs63jVcvC6w8TeVdYHvJdh7lb/TvS3EZ0npAsy6ys61rayL03jNkV8BROCOBflxn/9Zj+sqiZihQSOM7wPGfE4ovJZ/eO+KTAzQAKY4O4bb93FAv8uIWm6wH6j6JoTj6jj7aLej/+yd5EVseiRQ0h8FvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ntn4iNGX; arc=none smtp.client-ip=209.85.222.182
+	 In-Reply-To:References; b=Q/feQMoXZkrfG26Q4H7Qkr52RyF1NXRIFyAkD2NmrUn5OanL84hdmbf7lCjy2Dx3CRUTTYcJNJ3IeRq54aQYO6z0hrnE6zS7OrCDlSZ+wDQ84sTNIB+JAwVKFoouLDc4GLkaRdTvMtZBReBYNLMKwMWOyRyrUppX5ZmgbRQuvec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g/HtCGcF; arc=none smtp.client-ip=209.85.216.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ntn4iNGX"
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-785d60ae6d5so90904785a.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Feb 2024 15:49:20 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g/HtCGcF"
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-296df89efd2so183210a91.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Feb 2024 16:41:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708040959; x=1708645759; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1708044097; x=1708648897; darn=vger.kernel.org;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=JVdbPqh1JHapTbx9llURbg9+KU8GqPgf9f5HREOYtgE=;
-        b=Ntn4iNGXxkiWvZeAnmDVr4rYd2HPrQR1fs289Uefyfhcuyl9C2gcuun8aE8t/hi14K
-         AvorDIWcJZTcXa2QVc73+17i78oVW4hExzpjZmmTsogC6R+CTdSzlKBz1HLSmpZ70onk
-         8hq5fJRdoMM5Z0C0nqxJbVkbqCyJWYfAUIY5A6E/zJY2otx79d/Z8K5lHwxcNKAEnqpF
-         N3uMmFuQBEBFBhCNLyX2RI9U/ZaMQK9QmCOp+rvMRgj9PICMGLk3CdNskeXM2Yo5YMoI
-         Fzj/9foCe37448HsZbKe4RPOi4YTSbp4sgb1zyqasKdzAvmr2g6qZn3QlDfW2dz9qV95
-         mdCQ==
+        bh=zGcaIooWd+t8wpUM6yMDtXoPOqcXFh/XS/FzoRz4b4I=;
+        b=g/HtCGcFq0pehvpAW3ukmWUHDREHab/HQA4dJ9hDi+wviulLye2Eg2aZaLEfrRqj5X
+         fc326r+ACQPJl6yYmMQm4JGIEbov+lKrD/pd38kpief4GKiblKPqivUYp6eJzg4bdDM/
+         eLCoHWroy1Bw9sew/ElkGprDI1nrEP3+X1WC3Q2yso/ZzE7tFNXmtdzlD6ArR4rhFOEy
+         ZJbsGhh3NwEIIVB4QqYHB79l4p0e20msm0PpSRPUHu0movWWJxGFFYPpe97rm/FFFjtE
+         kvV7zjn3j9xLLI7fmumHUe5hjDHMnGC3UAyQcKLEzNpzsBwKg6TlCAw57f+inqbjnwfx
+         M4tA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708040959; x=1708645759;
+        d=1e100.net; s=20230601; t=1708044097; x=1708648897;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=JVdbPqh1JHapTbx9llURbg9+KU8GqPgf9f5HREOYtgE=;
-        b=r9pNcYSg1Y8wjtmN8HEsotXr9fXx3LLO2BLW9tMl5idfEZGiJRhYcvOB+qE8nkjXM0
-         ET3u1U61iiBb9gj0W4rTx4LKDFyfIc6JQzy6YWrYSjLCRJOm6TRo7pV4BUAPKKZ9t0jt
-         EpbXbBxS1AjV4jQB7e8BhG/bsEUVJCQQfIzchb6CYHunhOidEUCpOHDMexP/+oElHlFI
-         ElCeDXMzQu33u6ZZWDI6iaysYbl125kbavVvIqBK3rrIp1GF86hhZdGaydoVJVSaYwtp
-         /aLRvo3SJ03yitFM2akQSPHbQ60rhG4ZuhXPbsl/6GUbtpQqhr/QAZ9iPHqbnSxri/5a
-         TCzw==
-X-Gm-Message-State: AOJu0YxpkY1s6wLGyS06f5Uo9UgRD9jJXfUvH86wcEKShVxUFf+OiLOp
-	fcgfcoELKTQG8T9pyT00nrUot39e5GpuUrKxjzJI2T/yWNxXoRI4e/cK01KG
-X-Google-Smtp-Source: AGHT+IEXRPeyVJkZOkA/9BzrqqsKZVOUSdy89c7GH6qyHSIF/WF5CmJ9CCMXwjWEiMtLJI1cc2eQJw==
-X-Received: by 2002:a05:620a:2490:b0:785:b8b9:f0a6 with SMTP id i16-20020a05620a249000b00785b8b9f0a6mr3771080qkn.52.1708040959596;
-        Thu, 15 Feb 2024 15:49:19 -0800 (PST)
-Received: from [172.17.0.2] ([172.183.82.149])
-        by smtp.gmail.com with ESMTPSA id e6-20020a05620a208600b007872e3b954bsm1026768qka.83.2024.02.15.15.49.19
+        bh=zGcaIooWd+t8wpUM6yMDtXoPOqcXFh/XS/FzoRz4b4I=;
+        b=Aa0ib8KAShCu/woSAhVVHCW/zHrQrSTLGAd2OAeZ+6gQL1t5mq4mBFRkbF0RybHzjW
+         By+rspCW0QzvPxn4bCNeOciscYuta2WG8nRQxLlNxWX2q3p1SkZhRcPX1tLb2aB/oVqp
+         mgqmSoh1jBImNtxabB/t4yKb4ZHpCAlB/QyMSZmkjpMxR13YryAuRYhslKCxxhncHmX3
+         vKNa6isha53sdldQvP1uizUgftscT4GkTtLmPNGriyikQmLIUPYxWmcSU8ismzoCunSK
+         qSFVgV4p85CFtfI3NZ835e9VEqudFBUd9wN7aB8CYdbizqO3B535LtJlVghVFhlZcCrm
+         JeMw==
+X-Gm-Message-State: AOJu0YxnGRvFCiN41LuZfsGfwF5XemcolaV68EijIC38GzD4oC49ZNbE
+	7CVAIsH015YwW7T5F7VI9zygHvqROEi3oKgdjt9i1wNkun+vZUj67TV51+IR
+X-Google-Smtp-Source: AGHT+IF9xrqZkbNSgnqzcaAzJ6sPm6yr11xCn3V9zeKVdHNxSlxGIIM54pZaaLo2lsVjLuw6qnne/g==
+X-Received: by 2002:a17:90a:ec17:b0:299:174d:94d3 with SMTP id l23-20020a17090aec1700b00299174d94d3mr2416126pjy.28.1708044097336;
+        Thu, 15 Feb 2024 16:41:37 -0800 (PST)
+Received: from [172.17.0.2] ([52.238.25.56])
+        by smtp.gmail.com with ESMTPSA id pd12-20020a17090b1dcc00b0029696f7f443sm4129412pjb.50.2024.02.15.16.41.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Feb 2024 15:49:19 -0800 (PST)
-Message-ID: <65cea2ff.050a0220.1180.5a7c@mx.google.com>
-Date: Thu, 15 Feb 2024 15:49:19 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0242267673238425961=="
+        Thu, 15 Feb 2024 16:41:37 -0800 (PST)
+Message-ID: <65ceaf41.170a0220.9d896.fb97@mx.google.com>
+Date: Thu, 15 Feb 2024 16:41:37 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4092176367705703639=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -60,13 +60,13 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, silviu.barbulescu@nxp.com
-Subject: RE: Add support for multiple BISes on the bcast source
-In-Reply-To: <20240215212356.310301-2-silviu.barbulescu@nxp.com>
-References: <20240215212356.310301-2-silviu.barbulescu@nxp.com>
+To: linux-bluetooth@vger.kernel.org, tjernlund@tjernlund.se
+Subject: RE: [1/4] Replace @exec_prefix@ with @libexecdir@ in .service files.
+In-Reply-To: <20240215225249.16242-1-Joakim.Tjernlund@infinera.com>
+References: <20240215225249.16242-1-Joakim.Tjernlund@infinera.com>
 Reply-To: linux-bluetooth@vger.kernel.org
 
---===============0242267673238425961==
+--===============4092176367705703639==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -77,51 +77,32 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=826588
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=826608
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    PASS      3.09 seconds
-GitLint                       PASS      2.02 seconds
-BuildEll                      PASS      25.09 seconds
-BluezMake                     PASS      769.14 seconds
-MakeCheck                     PASS      12.12 seconds
-MakeDistcheck                 PASS      172.80 seconds
-CheckValgrind                 PASS      241.48 seconds
-CheckSmatch                   PASS      347.73 seconds
-bluezmakeextell               PASS      112.50 seconds
-IncrementalBuild              PASS      5188.44 seconds
-ScanBuild                     WARNING   1011.39 seconds
+CheckPatch                    PASS      0.93 seconds
+GitLint                       FAIL      1.02 seconds
+BuildEll                      PASS      24.14 seconds
+BluezMake                     PASS      731.18 seconds
+MakeCheck                     PASS      11.45 seconds
+MakeDistcheck                 PASS      163.57 seconds
+CheckValgrind                 PASS      227.16 seconds
+CheckSmatch                   PASS      332.01 seconds
+bluezmakeextell               PASS      107.61 seconds
+IncrementalBuild              PASS      2701.27 seconds
+ScanBuild                     PASS      970.94 seconds
 
 Details
 ##############################
-Test: ScanBuild - WARNING
-Desc: Run Scan Build
+Test: GitLint - FAIL
+Desc: Run gitlint
 Output:
-src/shared/bap.c:1134:2: warning: Use of memory after it is freed
-        DBG(bap, "stream %p", stream);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/bap.c:40:2: note: expanded from macro 'DBG'
-        bap_debug(_bap, "%s:%s() " fmt, __FILE__, __func__, ## arg)
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/bap.c:1147:2: warning: Use of memory after it is freed
-        DBG(stream->bap, "stream %p", stream);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/bap.c:40:2: note: expanded from macro 'DBG'
-        bap_debug(_bap, "%s:%s() " fmt, __FILE__, __func__, ## arg)
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/bap.c:1242:33: warning: Use of memory after it is freed
-        for (entry = queue_get_entries(bap->state_cbs); entry;
-                                       ^~~~~~~~~~~~~~
-src/shared/bap.c:1281:8: warning: Use of memory after it is freed
-        bap = bt_bap_ref_safe(bap);
-              ^~~~~~~~~~~~~~~~~~~~
-src/shared/bap.c:1699:3: warning: Use of memory after it is freed
-                stream_set_state(stream, BT_BAP_STREAM_STATE_CONFIG);
-                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-5 warnings generated.
+[1/4] Replace @exec_prefix@ with @libexecdir@ in .service files.
 
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T3 Title has trailing punctuation (.): "[1/4] Replace @exec_prefix@ with @libexecdir@ in .service files."
 
 
 ---
@@ -129,4 +110,4 @@ Regards,
 Linux Bluetooth
 
 
---===============0242267673238425961==--
+--===============4092176367705703639==--
