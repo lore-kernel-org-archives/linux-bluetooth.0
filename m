@@ -1,185 +1,125 @@
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2584017BC5
-	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 07:12:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F04971292C0
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 13:22:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708067575; cv=none; b=N+hHDGIZa/vdR6L5Ip+JoyXG6UBzCWosNz0aLolCJ3YIKemGLC3I6EnqaXtztFQ5fzV97bZI9xdgAovbLqm/7U3wFw3hm/5jjLH+/lRR+wHHFgi5swSNTCotIrGqGivVg9Lyw5Uih4ecdPDTI00qb9Ng44E7+enZExAtYa7A6y0=
+	t=1708089765; cv=none; b=Db3dlAp9LYT9PZvw+A9w0aQl+cpXJ5a0oaogsk9SM2uvibCXN8ogSz5RiExR2qPB+mGbp4xQcJNiRzsu/UJZ9ShW8K5kemi2Cs2YznuZzwf75nInHKjM1P8rUr6ZrS9Lb/8BbWvquN+RryAhlkpf3eokSj5gTJSg8+Cql+/3Hig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708067575; c=relaxed/simple;
-	bh=L1+BlePQLdMeAJbsj3GxS3+KpGvg5gbHw1kug+/beZQ=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=ADG1W4LWOPL0bnVXGPULsTcWknZ0khmWEtQoLTFhGmUEh5/UBTJ0fj56DQyTKmdzwU2HA/oO15x0LYd6CUVPYSvi6iS6EZw4Y3qRJ9ebeGEeccAcfUSKndKrQkjeUsVtT0Mw1TwVP1q4CW9ezhobCDBf0/kInanxwIVLC8DZXC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KIAQNkY+; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1708089765; c=relaxed/simple;
+	bh=FsNmchVQuTTQMH/B9KKVO168bioDU6bYqSApofTtot0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Uk/1XsRCrKxfoGKaofT6KC+Myg8NFVTqbndALGZRqe+RqOsJm50Oe9For8YmJyDZKikp09HF/A/eLqmtUHKRDMIBUu2l571/5mDLENXyEGYsm3ji+ZyIphBSQIj/IcfHDdm0xWvuQSctdoe5wTyai7JcUeV2viEckslb6r6x0Mk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fairphone.com; spf=pass smtp.mailfrom=fairphone.com; dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b=eHKPBkH2; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fairphone.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fairphone.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KIAQNkY+"
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-429de32dad9so9844421cf.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Feb 2024 23:12:52 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="eHKPBkH2"
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a3de25186fbso70706266b.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 05:22:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708067572; x=1708672372; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=zBSJmxIvzPtOD6epPFQKRil1Muaq9OvDivaZPqFiL2o=;
-        b=KIAQNkY+WH1P7zO3n93uYM/xywnx8P8sNVcg8KTh/nWjKxdh0VFnS49I0DUuVyXkfY
-         ++y0dugP8/IwyNmWb2gFSeFoMWv9tsP0MA1ZEMnjhKH88iidKKB3utxF+GIzH8ezaWA6
-         BtXirr/c7gKqvmUFY7P/QipEkzZtCaHX0lKViocgg/2ao8+TVVrPLQ3BE1uN0o4ILWXV
-         X9C7+yWRZSZGZE69oQo7DCyhoFJh2bwWF+ICGQlk4ArmUAkd2FCo5oI5otF4Ce/9fFBM
-         Nm/Bmc2/7QkAiXGRyH20aEFM8EAWHIVwDngFGIkqrEMboULTNr/slx/YA+V8q/eiPx2N
-         Lr6Q==
+        d=fairphone.com; s=fair; t=1708089761; x=1708694561; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=aFDoU4DI8sHTODaC/giqLy7tDcjeeFmno8f2AA/diI4=;
+        b=eHKPBkH2tMIilq4kf2bVe+e/ZL9zguR1zfgq62EbyiN37NgFkoS/11M03mJw672bWS
+         N+P9UTArMHbk1D44BdD/JHqriApONz5nIgW9qpKwOQYfz0AG/svStcyI5Cjrq2P13vwX
+         cqjI2PyXoc/Xg72bkkJnbAWPa2Slh58QfB7dqNTWSJQqwIE6YorRYd6GLcsgf05bdsIm
+         CsQLyUWenYGxwKiaNJXNpcT0rl2YNd2KmO/7YqDe6sWvKlBWegDJZC6hvyyP3mjv+OSX
+         O51xxt5BCR06A6WIQdz8gQ5B7AZl3AXxZsaLBs7pmkiYiZWYy7heieT0AtKX3QrrIpxN
+         Dnrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708067572; x=1708672372;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1708089761; x=1708694561;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=zBSJmxIvzPtOD6epPFQKRil1Muaq9OvDivaZPqFiL2o=;
-        b=pyd0biU/d0tGfJWeW+a1oH9URT90mWxfbgHzOMU5HEsEx1dJNKGU+E5jOajgss0TT1
-         hICFSf4DlZYOZ3Bpfk4+QUisN4EuX/ibUywJxfqSzthGZDgcAzmUPWcW9k+RwqSPsTAX
-         cwW7y9jMSkCPj9CIcDx3ibIVDjaM51nSp8gqHW2G4ZKUJkBSq55pirpJQYsZKJ0HPJjR
-         LEsbWBSW9rqs2JZjBI7QJKVAjazqemOnRewQUm01QLgnvD7GOGHfcF21RWlGIce92uCe
-         8kGwIKj2w1EIf7OAu25JUb4wl34oATKM++TFs4EsY7y7ugilNK5Ga3xfPYJtpji5pXuQ
-         lqVQ==
-X-Gm-Message-State: AOJu0YyODQEg4xc0mZ2WyBLhhirEgp7G8aKvsJGzAuiXGaeuQgnu4p4A
-	cRELpC9hy4A2pOBs7PSHIOWPGnHoluiRN13t4qR/q+fr7FAX3la1zGcJ1bVAQbE=
-X-Google-Smtp-Source: AGHT+IFjkaomxbUtjkZkiJQ9kP1C66ulrOew08c7x0d2Lt3bOK8hmfpqIgL2huf4g4ePEBfQf8FUtA==
-X-Received: by 2002:ac8:6e82:0:b0:42d:d4b0:69c2 with SMTP id c2-20020ac86e82000000b0042dd4b069c2mr2565611qtv.6.1708067571785;
-        Thu, 15 Feb 2024 23:12:51 -0800 (PST)
-Received: from [172.17.0.2] ([172.183.155.27])
-        by smtp.gmail.com with ESMTPSA id e25-20020ac845d9000000b0042dac47e9b4sm1292231qto.5.2024.02.15.23.12.51
+        bh=aFDoU4DI8sHTODaC/giqLy7tDcjeeFmno8f2AA/diI4=;
+        b=PFKlGWEdACONvYJ3NrPjTnrpZ0KXSuWo2gDQ97IMcd9qEf00K+sddnpX+0aUP5da49
+         WVN69xHosNSQG9AyKeFQ1qqgqgN2zAFCWCi17m4rUashCKJfCbFcEEicwlHgl8ysNp8u
+         MYPL39k33hwpCw5hnJkV5UTOxC8VOVc9HnNvvbW8uRJHSdjqzN+Kp7MJxA0+CivaMGxo
+         VF7BLcHzbxiMX0ahxGt/wxTR25g2XAQVdcy9XGmrV0BvYbNhP6emd/slKOj291dLJEYv
+         tdOqPeFHSfYNdrak1pxTxy1l4TNCpEaCm6lGlmf0rBqoxHRw+PviS3jOs6XSyMVdqopT
+         4MjQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUa2kaSkmpFM0Yf2ekM8Z0TJfQgDJv8hKJQvhoXNmeCa52rkJDgeAr8lE38AVTto5Ezqkxa7aEEOtqlgCTJQ5zJlV0km95idUVeT2uqwpDH
+X-Gm-Message-State: AOJu0Yx+s6WIcj83uNrrfBy1moKCnaEMLF/Iy8n5/n1G8EO7u2e1lLo1
+	Qm6L7xGEGRWGbGZTZdH3PHOMPPwgHXdpxZSX9IE9UZ2462k+O4eRc0B+3EFrFJs=
+X-Google-Smtp-Source: AGHT+IHMkALfGXBfUoxsJpAiTgK6gRswQPXjfjP645gXjCyLE3nug2dYR+7QvReh0nh5hW3kChm2/w==
+X-Received: by 2002:a17:907:382:b0:a3d:841e:3d75 with SMTP id ss2-20020a170907038200b00a3d841e3d75mr3286997ejb.61.1708089761265;
+        Fri, 16 Feb 2024 05:22:41 -0800 (PST)
+Received: from otso.luca.vpn.lucaweiss.eu (144-178-202-138.static.ef-service.nl. [144.178.202.138])
+        by smtp.gmail.com with ESMTPSA id gz15-20020a170906f2cf00b00a38103ab710sm1553060ejb.125.2024.02.16.05.22.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Feb 2024 23:12:51 -0800 (PST)
-Message-ID: <65cf0af3.c80a0220.3a82.6c45@mx.google.com>
-Date: Thu, 15 Feb 2024 23:12:51 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4496080293085562898=="
+        Fri, 16 Feb 2024 05:22:41 -0800 (PST)
+From: Luca Weiss <luca.weiss@fairphone.com>
+Date: Fri, 16 Feb 2024 14:22:38 +0100
+Subject: [PATCH] Bluetooth: Add more Bluetooth version defines
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, shahid.bashir.vichhi@intel.com
-Subject: RE: [v1] profiles/audio/ccp: Add initial code for ccp plugin
-In-Reply-To: <20240215225008.3996772-1-shahid.bashir.vichhi@intel.com>
-References: <20240215225008.3996772-1-shahid.bashir.vichhi@intel.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============4496080293085562898==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20240216-bluetooth-defines-v1-1-6c39aacc66a8@fairphone.com>
+X-B4-Tracking: v=1; b=H4sIAJ1hz2UC/x2MWwqAIBAAryL7neDag+oq0UfWlguhoRZBdPekz
+ 2GYeSBSYIrQiwcCXRzZuwxYCJjt5DaSvGQGrXSlNDbS7Ccl75OVC63sKErTopqprkrsEHJ3hCz
+ u/zmM7/sBiaEz5WMAAAA=
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Johan Hedberg <johan.hedberg@gmail.com>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: ~postmarketos/upstreaming@lists.sr.ht, linux-bluetooth@vger.kernel.org, 
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ phone-devel@vger.kernel.org, Luca Weiss <luca.weiss@fairphone.com>
+X-Mailer: b4 0.12.4
 
-This is automated email and please do not reply to this email!
+Add the various Bluetooth version identifiers found in the "Assigned
+Numbers" document[0] from the Bluetooth SIG.
 
-Dear submitter,
+[0] https://www.bluetooth.com/specifications/assigned-numbers/
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=826656
+Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
+---
+To be clear, I don't have a use case for these extra defines myself but
+some time ago when working on Bluetooth I came across this and thought
+it would be interesting to have the list complete. No other motives.
+---
+ include/net/bluetooth/bluetooth.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      0.72 seconds
-GitLint                       PASS      0.28 seconds
-BuildEll                      PASS      24.21 seconds
-BluezMake                     PASS      750.96 seconds
-MakeCheck                     PASS      11.61 seconds
-MakeDistcheck                 PASS      167.44 seconds
-CheckValgrind                 PASS      235.84 seconds
-CheckSmatch                   PASS      340.89 seconds
-bluezmakeextell               PASS      110.94 seconds
-IncrementalBuild              PASS      696.23 seconds
-ScanBuild                     WARNING   1007.00 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v1] profiles/audio/ccp: Add initial code for ccp plugin
-WARNING:LONG_LINE: line length of 129 exceeds 80 columns
-#218: FILE: profiles/audio/ccp.c:100:
-+												 btd_device_get_gatt_db(device));
-
-WARNING:LONG_LINE: line length of 93 exceeds 80 columns
-#313: FILE: profiles/audio/ccp.c:195:
-+								 struct btd_adapter *adapter)
-
-WARNING:LONG_LINE: line length of 100 exceeds 80 columns
-#324: FILE: profiles/audio/ccp.c:206:
-+									struct btd_adapter *adapter)
-
-WARNING:LONG_LINE: line length of 115 exceeds 80 columns
-#356: FILE: profiles/audio/ccp.c:238:
-+												ccp_init, ccp_exit)
-
-/github/workspace/src/src/13559560.patch total: 0 errors, 4 warnings, 259 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13559560.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: ScanBuild - WARNING
-Desc: Run Scan Build
-Output:
-Makefile:13722: warning: overriding recipe for target 'install-data-hook'
-Makefile:13717: warning: ignoring old recipe for target 'install-data-hook'
-Makefile:13722: warning: overriding recipe for target 'install-data-hook'
-Makefile:13717: warning: ignoring old recipe for target 'install-data-hook'
-src/shared/gatt-client.c:451:21: warning: Use of memory after it is freed
-        gatt_db_unregister(op->client->db, op->db_id);
-                           ^~~~~~~~~~
-src/shared/gatt-client.c:696:2: warning: Use of memory after it is freed
-        discovery_op_complete(op, false, att_ecode);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:993:2: warning: Use of memory after it is freed
-        discovery_op_complete(op, success, att_ecode);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:1099:2: warning: Use of memory after it is freed
-        discovery_op_complete(op, success, att_ecode);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:1291:2: warning: Use of memory after it is freed
-        discovery_op_complete(op, success, att_ecode);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:1356:2: warning: Use of memory after it is freed
-        discovery_op_complete(op, success, att_ecode);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:1631:6: warning: Use of memory after it is freed
-        if (read_db_hash(op)) {
-            ^~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:1636:2: warning: Use of memory after it is freed
-        discover_all(op);
-        ^~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:2140:6: warning: Use of memory after it is freed
-        if (read_db_hash(op)) {
-            ^~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:2148:8: warning: Use of memory after it is freed
-                                                        discovery_op_ref(op),
-                                                        ^~~~~~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:3237:2: warning: Use of memory after it is freed
-        complete_write_long_op(req, success, 0, false);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:3259:2: warning: Use of memory after it is freed
-        request_unref(req);
-        ^~~~~~~~~~~~~~~~~~
-12 warnings generated.
-
-
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 7ffa8c192c3f..818eb142eda3 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -39,11 +39,20 @@
+ #endif
+ 
+ /* Bluetooth versions */
++#define BLUETOOTH_VER_1_0B	0
+ #define BLUETOOTH_VER_1_1	1
+ #define BLUETOOTH_VER_1_2	2
+ #define BLUETOOTH_VER_2_0	3
+ #define BLUETOOTH_VER_2_1	4
++#define BLUETOOTH_VER_3_0	5
+ #define BLUETOOTH_VER_4_0	6
++#define BLUETOOTH_VER_4_1	7
++#define BLUETOOTH_VER_4_2	8
++#define BLUETOOTH_VER_5_0	9
++#define BLUETOOTH_VER_5_1	10
++#define BLUETOOTH_VER_5_2	11
++#define BLUETOOTH_VER_5_3	12
++#define BLUETOOTH_VER_5_4	13
+ 
+ /* Reserv for core and drivers use */
+ #define BT_SKB_RESERVE	8
 
 ---
-Regards,
-Linux Bluetooth
+base-commit: 841c35169323cd833294798e58b9bf63fa4fa1de
+change-id: 20240216-bluetooth-defines-b810ce543191
 
+Best regards,
+-- 
+Luca Weiss <luca.weiss@fairphone.com>
 
---===============4496080293085562898==--
