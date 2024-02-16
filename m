@@ -1,56 +1,56 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD96613B28A
-	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 20:33:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B019013849D
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 20:33:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708115597; cv=none; b=B2X3Uo5sGBKylm6TnznrLhYFXIP9/wBfU8/8KZ56c1GnNux2gpXp3CNTuvhrQFYx3g8aOUxGk93/u42bcDNb0rCpVze1Tc3deiq+4KRZFIZGAja7sPuA+dnIze/7uh6Kl825oHLKYEnZNY37w34/j3p9hl6tZVdY1QyTD8Ts2No=
+	t=1708115598; cv=none; b=d2fPaBMzS3th1Dqz7izIZRZVQEdmdOPQaR3cOrfO9G6MuDv4Ojvg1Imfel5iNWPyCioIBR8St6N68rA4tPQktspFZIsMbvfhJrt3Bc+DDbfgwDgPz0pHHZKZAM1wQhVUpuIcbTv0yRfW71QIlLGeRIsD7L0AZ3STPcS73BGCbOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708115597; c=relaxed/simple;
-	bh=2ltRDktWv/9W2XdsRxj5VGYiomy6evtqamrK4xBuy4U=;
+	s=arc-20240116; t=1708115598; c=relaxed/simple;
+	bh=0QV0XOVkgQZCCrRrdg+X1apPFOwyznZIa0nD2VYHxpg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rt/Vjch4GjERmtPRUBTj3Y4cRyVf53tvZv4/iR+XUy/s4OcFKyn08Ny8J1kNgno+kq85THwfuuI9xNJiXmatucPDlcMDZ4k2aQ3mMlF2/hC/1yKQh+0Svh47T08H6fI+UT6YFwuVeZUgbR3qmuMuIAjWy4x/F5bM/Es2QfJZeu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=y6k7gcJp; arc=none smtp.client-ip=209.85.128.54
+	 MIME-Version; b=rmQfAfP3a0R31YxajcZDxpq60gqwecGW2oI07GIdegqAFHDUMEwHqrrSvsjNgPaIkSzQvoi6wvplxkYeQfa7e83P2OG02iBk1CJI5GIEj32eGUp7wrlD4B6IW55nWCtYm4jQ5Q3GvQ8i7tockIpHmnowRGcnXAx/PDJ/f4bb6Pg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=JvanfooB; arc=none smtp.client-ip=209.85.208.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="y6k7gcJp"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-411de7c6b3dso18844465e9.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 12:33:15 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="JvanfooB"
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2d11d17dddeso16105491fa.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Feb 2024 12:33:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1708115594; x=1708720394; darn=vger.kernel.org;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1708115592; x=1708720392; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ck620ZgSsNsz/9RxF9gWPnIMgXNLaJ0oGJUqb+80gj0=;
-        b=y6k7gcJpn+XZ7AWF0/XvQ4Q96VAarA6gk2frrhD65tMM3JI9chOvKebMHaLmx4VQiy
-         6SyTWxxIavK/cq/ZWOWDmyNL8aQ7ZpAPOS+QbbNjvv6lwYLullK5EHPYW1rKz2HeEuGE
-         REY6g/xSFDyFDikTpkIhvvvaIdB0KTc1IDerWBG62xuN5qmk0Gw7GuMS30WD1arpBHQ+
-         JSLKA/Tl4G0zDeSEZkjdyoNdLLpHpJbJYiZI8QvQgWXBs0A/7+pCBR98BsTT077hmART
-         8mZxoDeB7vnlYJILMdHv6J8oSe44huKkGYx14nIb0jVR6QEyPfLq6FnBSjhLdqnIPFUI
-         e7TQ==
+        bh=Xzau/i70OXFn0nQv+xGSpdZtho+tWjzX+6Y/L0CiXOM=;
+        b=JvanfooBq97Z2sHrKPc3VpFIgrK3j/jFli+kAib5aKwMIanlbpELte4UbuyoKFppIs
+         gnNNEzb8EG5Rd095l7oHT+3g/PZKTMaVbf46FZermOQA/Jmdl2Bwo9Rr0dywTS8lm+h3
+         +UpB0SaOvcH+gWPHsCZntdeunaiR4eKYBKxtyvCD4T5GU5zPEmO85VyHwbazjpo0p1BI
+         UDYVphdb/Q4JKjwDs/p1480137jM28OZ6Te+HzDNyyDOd+6VCiYSmwFe3SRAI2HgmzNM
+         T7e0rINuN88kEcNUzxrYwBgEasp5p77mMV0Tek2j7T318VT/AKfT0bnxXRAevCYHIOVG
+         jcUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708115594; x=1708720394;
+        d=1e100.net; s=20230601; t=1708115592; x=1708720392;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Ck620ZgSsNsz/9RxF9gWPnIMgXNLaJ0oGJUqb+80gj0=;
-        b=gX3vgAir5vE9VRjT/KxVh0NwFkRmUH+rzirT3+qjetHa700doDq9DyJkvwIbkIVCy9
-         fiIwNjPxCaC/vFkTYlOw9yhKRk02E5p3br6DX7itDJyAE8XWEE6bHSpeZdqsYRtDL4b1
-         Ya002UcCzp70J1idHopU4ZcDiM1whwqrDThv93Ubf6sBa9ZR2UW8BNTO0lOdaJ9FCRIn
-         8y7+bxGGEBs13z+E2l8VeAZ48VEkh9jsbUkVpMKkhamW0G7JDP6Dp40Ssl8hpC98BMLJ
-         S/Zfho0q9YCMEfVxe5TY6oe8W6ZFRlGm2dsxntyjwioaLOkZlUajjwOz8HdEB49flJBu
-         VdEQ==
-X-Gm-Message-State: AOJu0Yylthu5tTTdTsWWDLmVrDMhGOdqzhTNmCLFP1J59EkIf2FtaIQh
-	G939GmC8FO3QCtHtHoJu1YeMWyyJi8ahrf5RncLgLNWOPk+VxH1R2CnsffyrP/k=
-X-Google-Smtp-Source: AGHT+IFWK3RiERh4OJ6PyhlMX4HmF3lfvM2tBpYy/a0m9DxHn1nwJ9Sx7MIneHFQhvuUZ8wTNDj2GA==
-X-Received: by 2002:a05:600c:1389:b0:40e:dbdf:9fb4 with SMTP id u9-20020a05600c138900b0040edbdf9fb4mr4364542wmf.23.1708115593893;
-        Fri, 16 Feb 2024 12:33:13 -0800 (PST)
+        bh=Xzau/i70OXFn0nQv+xGSpdZtho+tWjzX+6Y/L0CiXOM=;
+        b=tSoEAgoaytecXlu9aGENyrdaAoNT1rjVgLXteQ85c1z37IyPwjRLHaRlQ3F7B95WdZ
+         hbG71ju/inUehy8CGmT/YsHZPr8Gjt87OlMx+GQQ6yjGEdqlyVcmb6Qvfc3NHbnjIh4m
+         OUOxmv8eXYq/48u9cGYWK+b0kG+mHA2vzJce9lvMMiJ6/vAkuCAUV6ImBupPn4AjkbQ1
+         ocOYizeX2vhNA/bkQq82FisXYWPKCr7mJoicd6Ca7ZX5E+rqGE7QCnSSuKrpXwU1Pdbq
+         zYj46Atvzh3uRWixwTUXwEzSXdnIOvbxVVrJ+BeRQDpjnBxCknRoj4D6vGeAEBJp66Uh
+         5NAw==
+X-Gm-Message-State: AOJu0YwZgLWgLhNO9VZRliQK6khV1HT6BHOfL1Ec1rf8pphZvCdpy8Yn
+	R31QNoZxc/sGfd3xfYA5b3Op8B6XAUuZdPzO9gXBOIFG2Cpsa62Tz06u5eBhsCk=
+X-Google-Smtp-Source: AGHT+IHDXA1CmYyMRhXqVjoGiSoJb0Qo9lCMPdos1FiMsILNtLiMwId05Qkpwu2DiA7OHYVJNW3yMg==
+X-Received: by 2002:a05:651c:b0f:b0:2d0:dfa7:fa1a with SMTP id b15-20020a05651c0b0f00b002d0dfa7fa1amr4944359ljr.0.1708115592326;
+        Fri, 16 Feb 2024 12:33:12 -0800 (PST)
 Received: from brgl-uxlite.home ([2a01:cb1d:334:ac00:7758:12d:16:5f19])
-        by smtp.gmail.com with ESMTPSA id m5-20020a05600c4f4500b0041253d0acd6sm1420528wmq.47.2024.02.16.12.33.12
+        by smtp.gmail.com with ESMTPSA id m5-20020a05600c4f4500b0041253d0acd6sm1420528wmq.47.2024.02.16.12.33.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Feb 2024 12:33:13 -0800 (PST)
+        Fri, 16 Feb 2024 12:33:11 -0800 (PST)
 From: Bartosz Golaszewski <brgl@bgdev.pl>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
@@ -91,10 +91,11 @@ Cc: linux-bluetooth@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-pci@vger.kernel.org,
 	linux-pm@vger.kernel.org,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
 	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: [PATCH v5 02/18] arm64: defconfig: enable ath12k as a module
-Date: Fri, 16 Feb 2024 21:31:59 +0100
-Message-Id: <20240216203215.40870-3-brgl@bgdev.pl>
+Subject: [PATCH v5 01/18] of: Add cleanup.h based auto release via __free(device_node) markings.
+Date: Fri, 16 Feb 2024 21:31:58 +0100
+Message-Id: <20240216203215.40870-2-brgl@bgdev.pl>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20240216203215.40870-1-brgl@bgdev.pl>
 References: <20240216203215.40870-1-brgl@bgdev.pl>
@@ -106,27 +107,64 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 
-Build the ath12k driver as a module for arm64 default config.
+The recent addition of scope based cleanup support to the kernel
+provides a convenient tool to reduce the chances of leaking reference
+counts where of_node_put() should have been called in an error path.
 
+This enables
+	struct device_node *child __free(device_node) = NULL;
+
+	for_each_child_of_node(np, child) {
+		if (test)
+			return test;
+	}
+
+with no need for a manual call of of_node_put().
+A following patch will reduce the scope of the child variable to the
+for loop, to avoid an issues with ordering of autocleanup, and make it
+obvious when this assigned a non NULL value.
+
+In this simple example the gains are small but there are some very
+complex error handling cases buried in these loops that will be
+greatly simplified by enabling early returns with out the need
+for this manual of_node_put() call.
+
+Note that there are coccinelle checks in
+scripts/coccinelle/iterators/for_each_child.cocci to detect a failure
+to call of_node_put(). This new approach does not cause false positives.
+Longer term we may want to add scripting to check this new approach is
+done correctly with no double of_node_put() calls being introduced due
+to the auto cleanup. It may also be useful to script finding places
+this new approach is useful.
+
+Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 ---
- arch/arm64/configs/defconfig | 1 +
- 1 file changed, 1 insertion(+)
+ include/linux/of.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
-index b8adb28185ad..23d6bb156cbc 100644
---- a/arch/arm64/configs/defconfig
-+++ b/arch/arm64/configs/defconfig
-@@ -409,6 +409,7 @@ CONFIG_WCN36XX=m
- CONFIG_ATH11K=m
- CONFIG_ATH11K_AHB=m
- CONFIG_ATH11K_PCI=m
-+CONFIG_ATH12K=m
- CONFIG_BRCMFMAC=m
- CONFIG_MWIFIEX=m
- CONFIG_MWIFIEX_SDIO=m
+diff --git a/include/linux/of.h b/include/linux/of.h
+index 331e05918f11..8df240214db1 100644
+--- a/include/linux/of.h
++++ b/include/linux/of.h
+@@ -13,6 +13,7 @@
+  */
+ #include <linux/types.h>
+ #include <linux/bitops.h>
++#include <linux/cleanup.h>
+ #include <linux/errno.h>
+ #include <linux/kobject.h>
+ #include <linux/mod_devicetable.h>
+@@ -134,6 +135,7 @@ static inline struct device_node *of_node_get(struct device_node *node)
+ }
+ static inline void of_node_put(struct device_node *node) { }
+ #endif /* !CONFIG_OF_DYNAMIC */
++DEFINE_FREE(device_node, struct device_node *, if (_T) of_node_put(_T))
+ 
+ /* Pointer for first entry in chain of all nodes. */
+ extern struct device_node *of_root;
 -- 
 2.40.1
 
