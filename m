@@ -1,114 +1,89 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFF777A735;
-	Sat, 17 Feb 2024 15:48:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FD1F6D1D3
+	for <linux-bluetooth@vger.kernel.org>; Sat, 17 Feb 2024 16:10:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708184889; cv=none; b=WxGTzcF5oDs5kh3oEuN3IgqSCMeEhMQMN1nKGlo45W4gbwIFhdcwTRTXPRpQnWzX6BcGIG5HI4ulzWqzcsd9UFfEJzueZhS8dTXuJmF6T/Pm6jDgIxLO1wrkCvhsRNvNLarrNd/Ml9frqbAwEpMx28PeEnTb7qj3wLl6sUviGB4=
+	t=1708186209; cv=none; b=Aaa6ysyQp9NX7jeNTxwjpw+BOHhuG2AiHwjhtPTd93AjUEDngs+kAtKnWkvEwNg5lIgr/3XGU8/iHX26FS6Rb/H/7ycPf8do/I9ku4BUXMXIwxnfpSSAgdlvuj5HhBYQZ3nnp0YovbDr+SO5ViAnx9H+YLlpWFZZJRFitV7qE+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708184889; c=relaxed/simple;
-	bh=n957lHva6zeenMJ+yyB11NqmI51yboi14R4UBuEZ4d4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=untcMPs61c7k1lphGrXn8VbBVg9kAPZIfDIYolFyKww7uwOzwx3RKw05QOVaAlAKZdsUUGZKTlph3jnDS9qvGZ5DQGMQE4eeDwIfuxAW/n7jXSkHscrB1GdeVN5oq3F1pYKL/JYiEEQ6MKlgGjoftEe5YrZDOM6Jxj1qml3VIXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oai0G6qL; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1708186209; c=relaxed/simple;
+	bh=aTUY3fZNcBKr7hDfPHDDdL92Wsr5gM2pcBmKnrCESAc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qdjvLgJtgiKbS3o0LiRRDqSX83sslqn6GzHU/bGv77vEvZRoIlSrL5yB0Z9chnMrccR7MHvytElCvXmqnkEQf3BaLcpvsWyw+fMMVTgzx8J25H4KiHKVJn6GK+Xs0PK7vu5JHfrI42ew5d17dW/9WPrAMea/AikaHePT99wwQaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TiRUwEB3; arc=none smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oai0G6qL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF36CC433F1;
-	Sat, 17 Feb 2024 15:48:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708184888;
-	bh=n957lHva6zeenMJ+yyB11NqmI51yboi14R4UBuEZ4d4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oai0G6qLzbylNPvS6aAPc55ThgalhgPu1SYKajhqffmpQesjJ2OqsAP/JoGNo3voU
-	 TkrvaUuRD2SqntuJ/K01y5d1cfIh36BRU+bkXQuUhLqzj96BRf0TatZ/fIrmiHQBfy
-	 wbMriDgDmlonGvNa5Az+exOwOL+XPPfFp0HKXkzfMTjkjZ8WwpTEqHcf10aTAm5TR1
-	 Axyh29QvnrtErk40PPetNMIw+oj/HTCOjcH+PZHOTdLngCU2zbuqnsd5ZAYgaps59q
-	 PvIb4F6sN53mvYvb7dnp8pd86GrjiYbn0psSCl9KANB/lgGL9B553RwT3SLIshZL/e
-	 JlF0JcX0camYA==
-Date: Sat, 17 Feb 2024 15:48:05 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Kalle Valo <kvalo@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Alex Elder <elder@linaro.org>,
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Abel Vesa <abel.vesa@linaro.org>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Lukas Wunner <lukas@wunner.de>,
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-wireless@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
-	linux-pm@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH v5 03/18] dt-bindings: regulator: describe the PMU module
- of the QCA6390 package
-Message-ID: <ZdDVNbjv60G9YUNy@finisterre.sirena.org.uk>
-References: <20240216203215.40870-1-brgl@bgdev.pl>
- <20240216203215.40870-4-brgl@bgdev.pl>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TiRUwEB3"
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-607f5395206so18826207b3.0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 17 Feb 2024 08:10:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708186206; x=1708791006; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=2L8QVKs8uUl+dtAY9pUxI6hAyrjHAW4LkwFzduDsZXo=;
+        b=TiRUwEB347WBR3idcEXsvEee0qsPGXqwDT1Io6mXNBJOo5kHJmZmriz91y8DIvlxVa
+         zS3y1TfTYWmxIi0ZDtGlgTyascFTETRM1xgWzuwY1euApdmosP9cebBQ5IDiIXOnTzwR
+         rFPVcUwaZ4YMSV0m6KjWIO05nX3f99ktjjosKkYIIGgw1HtY+eFPmFKJ3GdFf9PyT/GS
+         6aIAmsNj3aI3wSgV2CyEVitvbV4NF7dnXgLJxOTF/l73qGv4lWjwvNNjNhx0z5C/bkbG
+         uP0yAseLaI9U99uPk2Os90jI/yb/SICp2d7iVo4FRXBusRRKFu6vTnQnEYBe0RPn8kKN
+         Y0Qw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708186206; x=1708791006;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2L8QVKs8uUl+dtAY9pUxI6hAyrjHAW4LkwFzduDsZXo=;
+        b=WlblG9apj+Pvee7A0ed/fzMyRsbFxFV18fXA6V2jua50xfUJY9gdiVj4T87lr8thHE
+         zXTKUyeO5uFJQ9rGuFa59iXqAOaM7f2pMIMn+UB4D/GdOuhGdcenBC4uHic6FHYFa+Ek
+         KZzE2KUvE/FCdNvWXD4AiRiJwaqmYlshvAzzsynrdSjb0A3vnplfqwPpb32V2xDiwVUV
+         CPYlEzgE5osFZ9oxovCNV+P19G/nPuWbIZWeRAPl7odQnuQr2D5cKrl83z7vpAF1mfcF
+         pD6fTxkp2JIwiQwUusTCDPFydgClJRg+37IsfUmGPvowJVM15uwt2YizpP3yYcoMX7BV
+         EuTg==
+X-Gm-Message-State: AOJu0YyGBfP9T6D3HBegYC7CkNhJ3G26UlTfWIkb4s7wvrYhbA54EX2o
+	rAal1vvkiJpSCg9A3J+k8q521mX2A2HBC9qUApQXxHHy1dXdC0y+nahuh7PW3dyg7uVPmCTNXEZ
+	h30JZtoGXEZz2FrdA9wkFa6BEci5zvq8I
+X-Google-Smtp-Source: AGHT+IFCg7pf5wMaACGUP5QSEv6CxcMmYhjeJwFUFWZBE22blaftWmpmg5G+onFmkm9MUQXIn5aOE1PrfOT3H+T+2JY=
+X-Received: by 2002:a81:6e46:0:b0:607:9c75:e249 with SMTP id
+ j67-20020a816e46000000b006079c75e249mr8153536ywc.13.1708186206562; Sat, 17
+ Feb 2024 08:10:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="XBBFEBnxsUybHGMW"
-Content-Disposition: inline
-In-Reply-To: <20240216203215.40870-4-brgl@bgdev.pl>
-X-Cookie: You might have mail.
+References: <20240216-hook-fixup-v2-0-a6b192d1a6ad@gmail.com>
+In-Reply-To: <20240216-hook-fixup-v2-0-a6b192d1a6ad@gmail.com>
+From: Emil Velikov <emil.l.velikov@gmail.com>
+Date: Sat, 17 Feb 2024 16:09:54 +0000
+Message-ID: <CACvgo506E_1skkT52XeXLYmKtyGDxPET8U9eH91hpGsObshTCQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 00/10] Handful of build fixes and cleanups
+To: emil.l.velikov@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, 
+	Joakim Tjernlund <Joakim.Tjernlund@infinera.com>
+Content-Type: text/plain; charset="UTF-8"
+
+Hello everyone,
+
+On Fri, 16 Feb 2024 at 23:11, Emil Velikov via B4 Relay
+<devnull+emil.l.velikov.gmail.com@kernel.org> wrote:
+
+[snip]
+
+>       build: drop %.rules make rule
+
+This patch is flagging a bug in the CI and tripping it over. I'm
+looking at fixing the CI, but for now please drop this patch.
+
+>       build: move public headers to sub-folder
+
+This patch is causing failures in CI, which are not reproducible
+locally. Do ignore this patch as well.
 
 
---XBBFEBnxsUybHGMW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Kindly let me know if I should resend the series with the above two omitted.
 
-On Fri, Feb 16, 2024 at 09:32:00PM +0100, Bartosz Golaszewski wrote:
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->=20
-> The QCA6390 package contains discreet modules for WLAN and Bluetooth. They
-> are powered by the Power Management Unit (PMU) that takes inputs from the
-> host and provides LDO outputs. This document describes this module.
-
-Please submit patches using subject lines reflecting the style for the
-subsystem, this makes it easier for people to identify relevant patches.
-Look at what existing commits in the area you're changing are doing and
-make sure your subject lines visually resemble what they're doing.
-There's no need to resubmit to fix this alone.
-
---XBBFEBnxsUybHGMW
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXQ1TQACgkQJNaLcl1U
-h9BBnwf+JhH7AG76SVpXm/3RKzqDWuvpMu1DUot/+e5n8hK2kqMFn55zOAN2HEwL
-bZLO+MD8fXjFjLXZQ+4K8xdooNenzvCyvfYuxE8RoyThkbheKCY+m8aQLTlik/R3
-euRIOevSUYqQhYY1q5z5bgAEC6RwQi0sAHYATTbhqBjNi/MogEbXje1VBfStNYEb
-tKWS7Yi/GPw22IXDH8PYurLmAXp9k65N8ajJX7pMcALn/uUvPQZT77TVLjZ4M9yp
-a+0SiBJypHB9nTzWsA89yCH97/kWFYzAoE54vUxuQB4N6l0XgDyTyQIzIJfuNg0F
-h5HG2zP3ZTX/v/CVQjc3Vp4maV3F5Q==
-=r2fB
------END PGP SIGNATURE-----
-
---XBBFEBnxsUybHGMW--
+Thanks
+Emil
