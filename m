@@ -1,174 +1,89 @@
-Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D78A7D40F
-	for <linux-bluetooth@vger.kernel.org>; Sat, 17 Feb 2024 19:09:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 261887E107
+	for <linux-bluetooth@vger.kernel.org>; Sat, 17 Feb 2024 19:33:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708196962; cv=none; b=nj5kFAqRhByXav+OdvUOgDaWuVAHi8V5dNJcwRp4E0NnyRUZnlOZjYOGPoioqXY9ulgo3qeFMTBLzw0PLQEjURW3q8cH0HCixX/KHdjIy9aH8bUnCe1o/OI4k7ZUb8lQ1jh3vnlQGW6XM/n67hKv+y/iTfgT+h1Af/Wf3VZrFUI=
+	t=1708198385; cv=none; b=NOXoVzgvC7Lg5Ppecg7eueu7JLntn1vvPnX26YWFyC+lPt/1zvlM388R9r97wv6NaLiWCFHc3DipfM0+N9avFNBvZWtQzEczwvTfVvd0yJB6Zho0vKtIm0OMamBkJAvizMXoVL61biflAqsiD3l9aeyvuBC2GRRDJkcS3U2kbmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708196962; c=relaxed/simple;
-	bh=mHUrGkPYsyhxxlsBdHCbeAqoSBC0CP7Nshe0XTvKC8w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jgcK2289Xi59JrHTD0gMWK5My4+dMynEaXHTfAkd9c4eh+nNNUgvEmHCGmWN63waKmRQbmViixX7rKWkFYruk0ZYMBmzPdW9duqCZK2fSbSBMzEEfNhQPbDWEcCuwtK//nkdpr2K/OiEQSA3KFZDvsrnnydm2eSf2F6cUXqif20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=t6aBFFOg; arc=none smtp.client-ip=209.85.221.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="t6aBFFOg"
-Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-4c0375d438eso1091448e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 17 Feb 2024 11:09:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1708196959; x=1708801759; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1Ez+Cdi6g3dY2Nbfzh/DEfLOxMJ0SyIO8GaFN/UW2ig=;
-        b=t6aBFFOgA66oyp+Hi6Uujb4ucrAPWFqrxWHw8ZSwIdCIjqhFbfgnY/o2jWOflxnfiV
-         qak9AeXEKYFNH8StbZSVM+p75mT3J4fUFNtuOIzTESlqVvCAm/s2Sxqev6cLm+XE4icd
-         VcZG/XqbawIPmwmMiCfwNaA+w6VO3o7ReTBuqFHhyWRHEkWg8PYhR1IqO75qKafCNKEa
-         N6OopR6nCwhKUgxBzTk2xgmihjHnLMGDzHNb6SXTZsL244FdPtmret7dzHQWvnCzqLQp
-         6+o7pnjZ2vmCcQlyjC6NqZXIjq2V+vQSvcKbB7u+Us604ONI44cN3ysM+M6wYO+pCtRB
-         l3Zg==
+	s=arc-20240116; t=1708198385; c=relaxed/simple;
+	bh=7+NRhfY3XlQPeEVnAjDcYEqgsGjBLuZWk7Egl9VMI6Y=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=VPCCsr4EAAZ8CACEtvBERmqZg1yw4HDT9hvZvWsKVEKRF/GdiSOtvDryKT2ylZma12CxaRD9tQuKlrQ3xQZnxTWL/qi4lvU/rZxmQsBRq/NykWGwoTgiExViuBeAQkWm1N++lHBv5uC2TmuoS9+VQHxtzi+EdzQOifUxDWHVGWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-363b161279aso20246405ab.1
+        for <linux-bluetooth@vger.kernel.org>; Sat, 17 Feb 2024 11:33:03 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708196959; x=1708801759;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1Ez+Cdi6g3dY2Nbfzh/DEfLOxMJ0SyIO8GaFN/UW2ig=;
-        b=MlOcbxNl1PAdk6HBGvdJF1Q8PRmoARhHtdk+MVAcfo6/IuNcVxzx8NLx+c4LLikZWI
-         7WP5/Ro8RplpAQ8314xwi1t6wy7O1cQ+U9987/R4Xahcp+7X1qs91EO5NdVH4EiMheCc
-         csXxkldWbcywuLjKLQ7J8lZ1sAW19uQG9PTMLnprkSsJhKZoxZ/m0U87DW9o9uB1cbgg
-         sv9A83KvR4rnW34hLykrAwUyY5Pyv+GK0QK1cp54taqK+IY1avtFx/gUmGFkQEzHDVLg
-         BThHcQM7w/gQskjf4GrCfPKF9l9Q6MUJi4+kgmmpPfGlvxlOSli1wafh3Q4kPMcL1+rT
-         HMxg==
-X-Forwarded-Encrypted: i=1; AJvYcCW0C3QvsdUn26nnOOyGVHmapr53q3gMPovqhRQ/2qvU/XtGpVY/zYJH/7x/RNJ6NQSYEkedpbM1nd+OHO4giYJmNgyEdwbIKd6DalEjVy1B
-X-Gm-Message-State: AOJu0Yzb03Oj3Yxjq+axHRhKYzYJ0474mswMAaYW74fnjNdCpnjORt1C
-	5qThTMUxQ5d8lBN4LkArnHNcM/1E+sGxGhxQ/c5sl7ZUZouEYVNelPIy8vBQD9xuj4rqLtb0cBz
-	WEdXdCwBDg1LsYCq7vmefxcV4d5r2tBSPLylbig==
-X-Google-Smtp-Source: AGHT+IH3Shnpaid7W3lEIMwMHXlQC60MXaDAqAi1jiC4M9FRxflkXYH/2cjpGpJq/yL/ljPvWt26+2tM/6Tzhki2Rkc=
-X-Received: by 2002:a05:6122:45a0:b0:4c1:149b:fd18 with SMTP id
- de32-20020a05612245a000b004c1149bfd18mr9363330vkb.7.1708196959474; Sat, 17
- Feb 2024 11:09:19 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708198383; x=1708803183;
+        h=content-transfer-encoding:to:from:subject:message-id:in-reply-to
+         :date:mime-version:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LmuT+4Y3ckag63fBQNN2TnIvWbyVruW93vdFG08DOgM=;
+        b=oOa9Z45jjg4QwkaCWicNEQQ5DDZMiVwDe9mDIxLfEs1SUNr7Mm/ylNVSKoBUQwjc6S
+         13i8wyMjUWEowZ/MG0pI3XOeHFJ5V35Yc4+TzjEwTQdZWmMs7SzFB5JvR2uUkjvKUO6G
+         mhpiG/M0LcIAZfKccRi2LEpM8LvoL/UJ1H8BMIJW2dDS85B4rX8a+j5rCKhQa9qc/8ZF
+         FX3K2qiikXTlJmnogpNCTOtadO1ZpfMRI0+ujCyqZReANIAWikJ8a/GYkeVMcHNj64ee
+         bob2/9BUQOiCi+898Scxbxc6x3Ubje2SS1OedY6/bPZSHAptd+7YXrgDpSUxURWLUbD0
+         NNRg==
+X-Forwarded-Encrypted: i=1; AJvYcCUcN44j5Fqy9bBpRGfd8iYWg+6tZF5QnwthY1Ijv0JHnGIO42E5pbfpfpdNiqGmuU/2rEDi5CLiP5MN5ZY5343/lLMBJwyMG4hJjHA7Bpn4
+X-Gm-Message-State: AOJu0Yx/Zqq45KCxDmaoSePeraglhKodpzoA1V+7TbSUtLY075wAB9HO
+	Du2z7G/7Bh1jb8NvfI3tGX4gnoVsRrJwFsKNWloIPv/GMFRM5udPwa3+qqyUT6h2tUJzg7T4iUe
+	I++T19C6fuSP7ddk9ssXlQxmmQwTiuff+pkmlRCejxbuVkw/oHEDrFZA=
+X-Google-Smtp-Source: AGHT+IGH7w2UlxjmTBe0S2g/UvpEYqwDqYdy4smaGKdctO4xILFQWdMYdl/msB56jEw7naxLG8BtUPMPcT4hWagCelVq5kX/pLYc
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240216203215.40870-1-brgl@bgdev.pl> <20240216203215.40870-17-brgl@bgdev.pl>
- <CAA8EJpo=LFcw8PbFRvGwd9nS5ECazOHiBMWRsqfEpY-v0iQLLA@mail.gmail.com>
-In-Reply-To: <CAA8EJpo=LFcw8PbFRvGwd9nS5ECazOHiBMWRsqfEpY-v0iQLLA@mail.gmail.com>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Sat, 17 Feb 2024 20:09:08 +0100
-Message-ID: <CAMRc=Mdsg5gDCKD-=ok=mfYJoFpUVpTGFUE+om+WPYvQOc0rzA@mail.gmail.com>
-Subject: Re: [PATCH v5 16/18] power: pwrseq: add a driver for the QCA6390 PMU module
-To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Kalle Valo <kvalo@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konrad.dybcio@linaro.org>, Liam Girdwood <lgirdwood@gmail.com>, 
-	Mark Brown <broonie@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Saravana Kannan <saravanak@google.com>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Arnd Bergmann <arnd@arndb.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Alex Elder <elder@linaro.org>, 
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
-	Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-pci@vger.kernel.org, linux-pm@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+X-Received: by 2002:a05:6e02:1988:b0:363:d720:a9d0 with SMTP id
+ g8-20020a056e02198800b00363d720a9d0mr608264ilf.3.1708198383284; Sat, 17 Feb
+ 2024 11:33:03 -0800 (PST)
+Date: Sat, 17 Feb 2024 11:33:03 -0800
+In-Reply-To: <000000000000e69b5a06093287ec@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000d77a69061198ed40@google.com>
+Subject: Re: [syzbot] [bluetooth?] KASAN: slab-use-after-free Write in
+ hci_conn_drop (2)
+From: syzbot <syzbot+1683f76f1b20b826de67@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, hdanton@sina.com, 
+	johan.hedberg@gmail.com, kuba@kernel.org, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, lizhi.xu@windriver.com, luiz.dentz@gmail.com, 
+	luiz.von.dentz@intel.com, marcel@holtmann.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com, verdre@v0yd.nl
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Feb 17, 2024 at 12:17=E2=80=AFAM Dmitry Baryshkov
-<dmitry.baryshkov@linaro.org> wrote:
->
-> On Fri, 16 Feb 2024 at 22:33, Bartosz Golaszewski <brgl@bgdev.pl> wrote:
-> >
-> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> >
-> > This adds the power sequencing driver for the QCA6390's PMU module. It
-> > uses the pwrseq subsystem and knows how to match the sequencer to the
-> > consumer device by verifying the relevant properties and DT layout.
-> >
-> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> > ---
+syzbot has bisected this issue to:
 
-[snip]
+commit 456561ba8e495e9320c1f304bf1cd3d1043cbe7b
+Author: Jonas Dre=C3=9Fler <verdre@v0yd.nl>
+Date:   Tue Feb 6 11:08:13 2024 +0000
 
-> > +
-> > +static const struct pwrseq_qca6390_vreg pwrseq_qca6390_vregs_common[] =
-=3D {
-> > +       {
-> > +               .name =3D "vddio",
-> > +               .load_uA =3D 20000,
-> > +       },
-> > +       {
-> > +               .name =3D "vddaon",
-> > +               .load_uA =3D 100000,
-> > +       },
-> > +       {
-> > +               .name =3D "vddpmu",
-> > +               .load_uA =3D 1250000,
-> > +       },
-> > +       {
-> > +               .name =3D "vddrfa0p95",
-> > +               .load_uA =3D 200000,
-> > +       },
-> > +       {
-> > +               .name =3D "vddrfa1p3",
-> > +               .load_uA =3D 400000,
-> > +       },
-> > +       {
-> > +               .name =3D "vddrfa1p9",
-> > +               .load_uA =3D 400000,
-> > +       },
-> > +};
-> > +
-> > +static const struct pwrseq_qca6390_vreg pwrseq_qca6390_vregs_wlan[] =
-=3D {
-> > +       {
-> > +               .name =3D "vddpcie1p3",
-> > +               .load_uA =3D 35000,
-> > +       },
-> > +       {
-> > +               .name =3D "vddpcie1p9",
-> > +               .load_uA =3D 15000,
-> > +       },
-> > +};
->
-> I thought that we had discussed this already. According to the docs,
-> all PMU supplies should be powered on when the chip is being switched
-> on, no matter whether it is for the WiFi or for the BT.
->
+    Bluetooth: hci_conn: Only do ACL connections sequentially
 
-I know, I mostly did it to make Bjorn happy because he was adamant we
-don't need the PCIe regulators for BT and when I checked, it does work
-in practice so I thought: whatever. But indeed, the docs say
-otherwise. Noted for v6.
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D132137fc1800=
+00
+start commit:   2c3b09aac00d Add linux-next specific files for 20240214
+git tree:       linux-next
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=3D10a137fc1800=
+00
+console output: https://syzkaller.appspot.com/x/log.txt?x=3D172137fc180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=3D176d2dcbf8ba701=
+7
+dashboard link: https://syzkaller.appspot.com/bug?extid=3D1683f76f1b20b826d=
+e67
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D1765258a18000=
+0
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D16c27a58180000
 
-[snip]
+Reported-by: syzbot+1683f76f1b20b826de67@syzkaller.appspotmail.com
+Fixes: 456561ba8e49 ("Bluetooth: hci_conn: Only do ACL connections sequenti=
+ally")
 
-> > +
-> > +static const struct pwrseq_unit_data pwrseq_qca6390_bt_unit_data =3D {
-> > +       .name =3D "bluetooth-enable",
-> > +       .deps =3D pwrseq_qca6390_unit_deps,
->
-> Can we call corresponding regulator_bulk functions from bt and wlan
-> enable/disable? This will save us from building the tree-like
-> structures (and possible loops inside that tree).
->
-
-Can we? Sure, but the dependency graph (yeah, we should enforce it to
-be acyclic) is what makes this code future-proof and allows it to
-avoid repeating calls in different targets.
-
-[snip]
-
-Bart
+For information about bisection process see: https://goo.gl/tpsmEJ#bisectio=
+n
