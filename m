@@ -1,89 +1,148 @@
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FD1F6D1D3
-	for <linux-bluetooth@vger.kernel.org>; Sat, 17 Feb 2024 16:10:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C08EF1E501
+	for <linux-bluetooth@vger.kernel.org>; Sat, 17 Feb 2024 18:30:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708186209; cv=none; b=Aaa6ysyQp9NX7jeNTxwjpw+BOHhuG2AiHwjhtPTd93AjUEDngs+kAtKnWkvEwNg5lIgr/3XGU8/iHX26FS6Rb/H/7ycPf8do/I9ku4BUXMXIwxnfpSSAgdlvuj5HhBYQZ3nnp0YovbDr+SO5ViAnx9H+YLlpWFZZJRFitV7qE+o=
+	t=1708194659; cv=none; b=s9nihwnP2VxHqJRGsUS2YqOjWknoxbeZzlfocQhQtgfa5MozM0C8RJ3x1XHjqpnfF6yCuTufw+vZlxuYKlgP8Jk43GEYSy6/VcpZCEApDGRdicjbveexpSsClYkvUjtGCdr+C49igsPZpoTqNO+Pu5fC0j6JsHMTuvQTsWt7TiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708186209; c=relaxed/simple;
-	bh=aTUY3fZNcBKr7hDfPHDDdL92Wsr5gM2pcBmKnrCESAc=;
+	s=arc-20240116; t=1708194659; c=relaxed/simple;
+	bh=xTu4CwC01bOUIpKw1wk4DHay8JL9daGjNYWi0BvJoFk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qdjvLgJtgiKbS3o0LiRRDqSX83sslqn6GzHU/bGv77vEvZRoIlSrL5yB0Z9chnMrccR7MHvytElCvXmqnkEQf3BaLcpvsWyw+fMMVTgzx8J25H4KiHKVJn6GK+Xs0PK7vu5JHfrI42ew5d17dW/9WPrAMea/AikaHePT99wwQaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TiRUwEB3; arc=none smtp.client-ip=209.85.128.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=mxk++7TDYC7Jv3nydukh4foHehORTAMtleSVw+VObAVszHCQs2JrATiP4vuROW/eFB9hQayDqdjAZyY0c8Be6VUBDhwVHa/e8nM8PUr/pQuM7F/kVM1H5eMKHhGtStl3qi8oEOGfeS54rk45TxUjNsYy4j+7j2W+FNFRsV5lqXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=q+ZTbwOW; arc=none smtp.client-ip=209.85.222.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TiRUwEB3"
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-607f5395206so18826207b3.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 17 Feb 2024 08:10:07 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="q+ZTbwOW"
+Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-7d5c2502ea2so764803241.1
+        for <linux-bluetooth@vger.kernel.org>; Sat, 17 Feb 2024 10:30:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708186206; x=1708791006; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=2L8QVKs8uUl+dtAY9pUxI6hAyrjHAW4LkwFzduDsZXo=;
-        b=TiRUwEB347WBR3idcEXsvEee0qsPGXqwDT1Io6mXNBJOo5kHJmZmriz91y8DIvlxVa
-         zS3y1TfTYWmxIi0ZDtGlgTyascFTETRM1xgWzuwY1euApdmosP9cebBQ5IDiIXOnTzwR
-         rFPVcUwaZ4YMSV0m6KjWIO05nX3f99ktjjosKkYIIGgw1HtY+eFPmFKJ3GdFf9PyT/GS
-         6aIAmsNj3aI3wSgV2CyEVitvbV4NF7dnXgLJxOTF/l73qGv4lWjwvNNjNhx0z5C/bkbG
-         uP0yAseLaI9U99uPk2Os90jI/yb/SICp2d7iVo4FRXBusRRKFu6vTnQnEYBe0RPn8kKN
-         Y0Qw==
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1708194655; x=1708799455; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JeWu4dlZldb0QpDIIyWPdxjS/RZoRXziwmFM0VAD7xY=;
+        b=q+ZTbwOWLrtB7LLK3P+2bWMpv7DfIvhgi/2egNQ4e52dlt56kAs4JbMUWCIypEPg3u
+         jaPViUylF4qtQbcTBTyT70G9+UdrSLhxKL21A/9s6yJsxSRyq8xTATGcF88R6HEN/kSI
+         FEcX1CQfyK4WEt+SUb+cFk+6mPzCSgU0ZIWA/kkH614YOW0bApp+lbnisuRUJID+UlaS
+         oOt0Z2o/J2lyYUVPrLC0B6EbShI40Z+7a/Fx8TFCEz+8kcxXF+2Zmg6PaMWL2HnIyTdI
+         P5Fq871GtTT8Z3hp9dz0flsuvXqyvv2rjvK5Pq1zsVljnHdz9MUClSO7sH1Y4x9CWtmk
+         ubmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708186206; x=1708791006;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2L8QVKs8uUl+dtAY9pUxI6hAyrjHAW4LkwFzduDsZXo=;
-        b=WlblG9apj+Pvee7A0ed/fzMyRsbFxFV18fXA6V2jua50xfUJY9gdiVj4T87lr8thHE
-         zXTKUyeO5uFJQ9rGuFa59iXqAOaM7f2pMIMn+UB4D/GdOuhGdcenBC4uHic6FHYFa+Ek
-         KZzE2KUvE/FCdNvWXD4AiRiJwaqmYlshvAzzsynrdSjb0A3vnplfqwPpb32V2xDiwVUV
-         CPYlEzgE5osFZ9oxovCNV+P19G/nPuWbIZWeRAPl7odQnuQr2D5cKrl83z7vpAF1mfcF
-         pD6fTxkp2JIwiQwUusTCDPFydgClJRg+37IsfUmGPvowJVM15uwt2YizpP3yYcoMX7BV
-         EuTg==
-X-Gm-Message-State: AOJu0YyGBfP9T6D3HBegYC7CkNhJ3G26UlTfWIkb4s7wvrYhbA54EX2o
-	rAal1vvkiJpSCg9A3J+k8q521mX2A2HBC9qUApQXxHHy1dXdC0y+nahuh7PW3dyg7uVPmCTNXEZ
-	h30JZtoGXEZz2FrdA9wkFa6BEci5zvq8I
-X-Google-Smtp-Source: AGHT+IFCg7pf5wMaACGUP5QSEv6CxcMmYhjeJwFUFWZBE22blaftWmpmg5G+onFmkm9MUQXIn5aOE1PrfOT3H+T+2JY=
-X-Received: by 2002:a81:6e46:0:b0:607:9c75:e249 with SMTP id
- j67-20020a816e46000000b006079c75e249mr8153536ywc.13.1708186206562; Sat, 17
- Feb 2024 08:10:06 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708194655; x=1708799455;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JeWu4dlZldb0QpDIIyWPdxjS/RZoRXziwmFM0VAD7xY=;
+        b=uSMe04pPfOpm8SPd2zgA7U20GT4klgibaAy0GSofKfRIgjlHTQmeVMlaumMCh4FXkI
+         bD99ko7HuvzQBFbpoENHrU8YiTgJ4hXruBv8yxty0qOqYuRY3J73G8uKHnw4bJDduQ61
+         t2ydmvgNoY+f8ValVGXDCIiXoRlSB4pkbhKDZGWC2I+ARhQzgrHgIW/nfLp9P7KnMODY
+         2zoXwlBDGOdU44x7CNRIVa+0iVR7ou1hJgrcw4O+jCVFsK+h7k2yZN9QRBmctMI1TU7a
+         fgjMQWxArurf5KSRFsky8bR2ukkkD/QGfOpMIujjLc0kOpKUjBRbBEN3a8KHJ8o4dGIU
+         NXIg==
+X-Forwarded-Encrypted: i=1; AJvYcCVWTBDpytqH/Kz4FYG9oMJ8ND1CBzD+FQ8fGYxzh9m5a0KjTVfg5HnHUzXbLV2RDKoDIpoR8JRodCu4zFp7ziyT0mv6jMONgLb9woU/ZYRD
+X-Gm-Message-State: AOJu0YzQEBZRRiCoYsxlTka9D6Yl5VHfUrqBszDqFEq/Zn6iFfFa9B5X
+	2For8UdBHd/JMFU9G+U8zuorb0z9VV17WF9VIfkVa4ZWO6qe0Sac3RrfvugJslu5EdLpk9PopSP
+	nT8U51O7/zZkk4/Pns/ff0chCbDA2jF0S3ByXHA==
+X-Google-Smtp-Source: AGHT+IEGwogzVe3juwTbP5wzSPlB4FZp7n7jPtu9uTl+n1AS2iy9ckNua2af79j+lFRcSQmRv5yllrZrWuBKxrsF4JY=
+X-Received: by 2002:a05:6102:3a08:b0:46e:c752:16e7 with SMTP id
+ b8-20020a0561023a0800b0046ec75216e7mr8759486vsu.24.1708194655651; Sat, 17 Feb
+ 2024 10:30:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240216-hook-fixup-v2-0-a6b192d1a6ad@gmail.com>
-In-Reply-To: <20240216-hook-fixup-v2-0-a6b192d1a6ad@gmail.com>
-From: Emil Velikov <emil.l.velikov@gmail.com>
-Date: Sat, 17 Feb 2024 16:09:54 +0000
-Message-ID: <CACvgo506E_1skkT52XeXLYmKtyGDxPET8U9eH91hpGsObshTCQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 00/10] Handful of build fixes and cleanups
-To: emil.l.velikov@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, 
-	Joakim Tjernlund <Joakim.Tjernlund@infinera.com>
+References: <20240216203215.40870-1-brgl@bgdev.pl> <20240216203215.40870-7-brgl@bgdev.pl>
+ <87cysvd2er.fsf@kernel.org>
+In-Reply-To: <87cysvd2er.fsf@kernel.org>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Sat, 17 Feb 2024 19:30:44 +0100
+Message-ID: <CAMRc=Md10bNPswsLqdCmqzEmD+QmyZ+Eb4SUWknH-j5kK-speQ@mail.gmail.com>
+Subject: Re: [PATCH v5 06/18] dt-bindings: new: wireless: describe the ath12k
+ PCI module
+To: Kalle Valo <kvalo@kernel.org>
+Cc: Jeff Johnson <quic_jjohnson@quicinc.com>, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konrad.dybcio@linaro.org>, Liam Girdwood <lgirdwood@gmail.com>, 
+	Mark Brown <broonie@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Saravana Kannan <saravanak@google.com>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Arnd Bergmann <arnd@arndb.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
+	Marek Szyprowski <m.szyprowski@samsung.com>, Alex Elder <elder@linaro.org>, 
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
+	Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, 
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-pci@vger.kernel.org, linux-pm@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello everyone,
+On Sat, Feb 17, 2024 at 7:35=E2=80=AFAM Kalle Valo <kvalo@kernel.org> wrote=
+:
+>
+> Bartosz Golaszewski <brgl@bgdev.pl> writes:
+>
+> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> >
+> > Add device-tree bindings for the ATH12K module found in the WCN7850
+> > package.
+> >
+> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> > ---
+> >  .../net/wireless/qcom,ath12k-pci.yaml         | 103 ++++++++++++++++++
+> >  1 file changed, 103 insertions(+)
+> >  create mode 100644 Documentation/devicetree/bindings/net/wireless/qcom=
+,ath12k-pci.yaml
+> >
+> > diff --git a/Documentation/devicetree/bindings/net/wireless/qcom,ath12k=
+-pci.yaml b/Documentation/devicetree/bindings/net/wireless/qcom,ath12k-pci.=
+yaml
+> > new file mode 100644
+> > index 000000000000..063c576b99a0
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/net/wireless/qcom,ath12k-pci.ya=
+ml
+> > @@ -0,0 +1,103 @@
+> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> > +# Copyright (c) 2024 Linaro Limited
+> > +%YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/net/wireless/qcom,ath12k-pci.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +
+> > +title: Qualcomm Technologies ath12k wireless devices (PCIe)
+> > +
+> > +maintainers:
+> > +  - Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>
+> Jeff and me are the ath12k driver maintainers so shouldn't we listed
+> here as well?
+>
 
-On Fri, 16 Feb 2024 at 23:11, Emil Velikov via B4 Relay
-<devnull+emil.l.velikov.gmail.com@kernel.org> wrote:
+Sure will do. I also noticed the subject is wrong, should have been
+"net" not "new".
 
-[snip]
+Also, Jeff is not showing up for ath12k bindings in get_maintainer.pl.
+You could consider adding an N: ath12k entry to MAINTAINERS.
 
->       build: drop %.rules make rule
+Bartosz
 
-This patch is flagging a bug in the CI and tripping it over. I'm
-looking at fixing the CI, but for now please drop this patch.
-
->       build: move public headers to sub-folder
-
-This patch is causing failures in CI, which are not reproducible
-locally. Do ignore this patch as well.
-
-
-Kindly let me know if I should resend the series with the above two omitted.
-
-Thanks
-Emil
+> Jeff, this reminds me that we should add you to qcom,ath10k.yaml,
+> qcom,ath11k-pci.yaml and qcom,ath11k.yaml as maintainer.
+>
+> --
+> https://patchwork.kernel.org/project/linux-wireless/list/
+>
+> https://wireless.wiki.kernel.org/en/developers/documentation/submittingpa=
+tches
