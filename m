@@ -1,112 +1,94 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3974ADF44;
-	Sat, 17 Feb 2024 06:35:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from smtp.smtpout.orange.fr (smtp-19.smtpout.orange.fr [80.12.242.19])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2635C1CAA4
+	for <linux-bluetooth@vger.kernel.org>; Sat, 17 Feb 2024 07:31:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708151702; cv=none; b=KhS9/UYcTPgsyQsttcZeflvpZRfMTc7XhzqnTdsM4ud5G2DEKJYnjX6x2g+UCc5qfRGGZLaVHLqtiZqBoXY9Y6lKpsLqskKcKK/bFVMaMINdMJD7UEjfyjz/77uX6FRTXxg58RLqsM4W/odxt0eTl+rKwLz247lHJ5bWAyKdObQ=
+	t=1708155121; cv=none; b=ZwRKmxWKEQDd2C7fHLDD+uHYscacWWjVGSfbsL6E0fi5QyJ5nAijaJZFyJDUnpNP6+AWu7OZ1V2KvQyy8uhXHXa9s77kUX93rH7wFSQLoaeCQIsPeav5n2wmCUdIPNI0rKUe9KRToFlXrEd5GDi94+HoM3bOGVgejQKNGZvZ0Fw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708151702; c=relaxed/simple;
-	bh=P9v5bwlS7CEx0RGF6l5RaEMQEbJkoeMSl0AVCOm8vZY=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=HLWqx8eysvc2DJCFXMh1MoLJeAm5dMzVZ2GkAzp4wFfPs5c9177WWC3khY2GDHtWZAYnKk6NpDNLcYDJEwE9SK9gpq3ZyFgczqC4yEHKMlLw1dkuDrcavW8nHdojWzNuqJD1p/KQLLcaM8icd+Scg85RvRSurzAXCbW+VcTesDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PUalBi4V; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1708155121; c=relaxed/simple;
+	bh=npv7ZOWRpw6sxGJkWx9vOTc73+q2ocP0AqU18/94cms=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Eg0K5+7sVEqnkXDiM3JZIPadS4acv3vYyp+HdynssU/nxRmZCwMCJjHnKNmFzAgC7I4YHHc4qg/HkKwDXX3BjAiE44m5Jadjvp/TfUxRdgseQnulkOCTJCdCnflMZpaDJg34CfrsFuDvBNN1yyXVkQohWTLQpqlj1TzFvXgDJ9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=phcQj97w; arc=none smtp.client-ip=80.12.242.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PUalBi4V"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3882C433C7;
-	Sat, 17 Feb 2024 06:34:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708151701;
-	bh=P9v5bwlS7CEx0RGF6l5RaEMQEbJkoeMSl0AVCOm8vZY=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=PUalBi4VP+acTF5G4CtuSGC3cR8sQbK3vDeWzN46QQLixXZLxuyUXwthX0sl9EHUf
-	 LpsdqZzpsOwOxRH2yD+qTppUTUgQpSLvZFiQFDr+s/glNQTDza4ujEzNd4pCrodZnh
-	 yDMnaOJgndboanGlyO53uXPVLI/apL+vO6VZAnbNkF1rgdngRR9+5zYFltwnFPJQAr
-	 crS5pF1cQ52gePqMPhy9D5jtr4rXQGmB7vDXDyA3i8lj11G0eOdB1QkcvahmudtwA9
-	 eJwEXWM05Jxj6HaI3LZpt0woUQjXrhmDdLHa9fJ+XBHqCuiiBz2v5n4PeZbD9mpVXq
-	 F7OZs8l+23rhA==
-From: Kalle Valo <kvalo@kernel.org>
-To: Bartosz Golaszewski <brgl@bgdev.pl>,
-    Jeff Johnson <quic_jjohnson@quicinc.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,  Luiz Augusto von Dentz
- <luiz.dentz@gmail.com>,  "David S . Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
- Abeni <pabeni@redhat.com>,  Rob Herring <robh@kernel.org>,  Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,  Conor Dooley
- <conor+dt@kernel.org>,  Bjorn Andersson <andersson@kernel.org>,  Konrad
- Dybcio <konrad.dybcio@linaro.org>,  Liam Girdwood <lgirdwood@gmail.com>,
-  Mark Brown <broonie@kernel.org>,  Catalin Marinas
- <catalin.marinas@arm.com>,  Will Deacon <will@kernel.org>,  Bjorn Helgaas
- <bhelgaas@google.com>,  Saravana Kannan <saravanak@google.com>,  Geert
- Uytterhoeven <geert+renesas@glider.be>,  Arnd Bergmann <arnd@arndb.de>,
-  Neil Armstrong <neil.armstrong@linaro.org>,  Marek Szyprowski
- <m.szyprowski@samsung.com>,  Alex Elder <elder@linaro.org>,  Srini
- Kandagatla <srinivas.kandagatla@linaro.org>,  Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>,  Abel Vesa <abel.vesa@linaro.org>,
-  Manivannan Sadhasivam <mani@kernel.org>,  Lukas Wunner <lukas@wunner.de>,
-  Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-  linux-bluetooth@vger.kernel.org,  netdev@vger.kernel.org,
-  devicetree@vger.kernel.org,  linux-kernel@vger.kernel.org,
-  linux-wireless@vger.kernel.org,  linux-arm-msm@vger.kernel.org,
-  linux-arm-kernel@lists.infradead.org,  linux-pci@vger.kernel.org,
-  linux-pm@vger.kernel.org,  Bartosz Golaszewski
- <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH v5 06/18] dt-bindings: new: wireless: describe the
- ath12k PCI module
-References: <20240216203215.40870-1-brgl@bgdev.pl>
-	<20240216203215.40870-7-brgl@bgdev.pl>
-Date: Sat, 17 Feb 2024 08:34:52 +0200
-In-Reply-To: <20240216203215.40870-7-brgl@bgdev.pl> (Bartosz Golaszewski's
-	message of "Fri, 16 Feb 2024 21:32:03 +0100")
-Message-ID: <87cysvd2er.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="phcQj97w"
+Received: from fedora.home ([92.140.202.140])
+	by smtp.orange.fr with ESMTPA
+	id bF9rr7RBlRhCJbF9rr0LV3; Sat, 17 Feb 2024 08:30:48 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1708155048;
+	bh=HXDa8YFPQiliIbuq5HJ9khulV8rK+PXHSC6Ee9kcXik=;
+	h=From:To:Cc:Subject:Date;
+	b=phcQj97w9FE+Zh+H12MyDYbqxfDXboeZhcdKcaDy6IYyvzkOgI972oBzbtXtwMg5C
+	 TSZzZnStNK+6c0yjaRj6GF3y0dBpnOXAJAUlwEsLl9upx5aFrJOzMzF2hKsQXaT49C
+	 mXh+FDJQK6n9udm26kvldXMSW6j8/KqH2VouZIXH4wPfx71+y8hUTRLOsfunS4eSb0
+	 xMXnV9UilbxMZjyEV378CWYPjQR0nLNmPjq0rPE2VV1lRyo6Te76CGsSbLDlhQVbNA
+	 BXcBr0lnTd3SDNbOwf3iQ+bI5ijk3c7TvYPinnOVdFynHb25p4ZKxfLFfGilW4zWsl
+	 /+7QF7t8eyVFw==
+X-ME-Helo: fedora.home
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Sat, 17 Feb 2024 08:30:48 +0100
+X-ME-IP: 92.140.202.140
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/2] Bluetooth: btbcm: Use strreplace()
+Date: Sat, 17 Feb 2024 08:30:41 +0100
+Message-ID: <79b9c9d9f86b4c573f0d3f2dac0a6fc9e6024058.1708154999.git.christophe.jaillet@wanadoo.fr>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-Bartosz Golaszewski <brgl@bgdev.pl> writes:
+Use strreplace() instead of hand-writing it.
+It is less verbose.
 
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->
-> Add device-tree bindings for the ATH12K module found in the WCN7850
-> package.
->
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> ---
->  .../net/wireless/qcom,ath12k-pci.yaml         | 103 ++++++++++++++++++
->  1 file changed, 103 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/wireless/qcom,ath12k-pci.yaml
->
-> diff --git a/Documentation/devicetree/bindings/net/wireless/qcom,ath12k-pci.yaml b/Documentation/devicetree/bindings/net/wireless/qcom,ath12k-pci.yaml
-> new file mode 100644
-> index 000000000000..063c576b99a0
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/wireless/qcom,ath12k-pci.yaml
-> @@ -0,0 +1,103 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +# Copyright (c) 2024 Linaro Limited
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/wireless/qcom,ath12k-pci.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Qualcomm Technologies ath12k wireless devices (PCIe)
-> +
-> +maintainers:
-> +  - Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+---
+ drivers/bluetooth/btbcm.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-Jeff and me are the ath12k driver maintainers so shouldn't we listed
-here as well?
-
-Jeff, this reminds me that we should add you to qcom,ath10k.yaml,
-qcom,ath11k-pci.yaml and qcom,ath11k.yaml as maintainer.
-
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index 0a5445ac5e1b..01d2343b4978 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -11,6 +11,7 @@
+ #include <linux/firmware.h>
+ #include <linux/dmi.h>
+ #include <linux/of.h>
++#include <linux/string.h>
+ #include <asm/unaligned.h>
+ 
+ #include <net/bluetooth/bluetooth.h>
+@@ -544,7 +545,6 @@ static const char *btbcm_get_board_name(struct device *dev)
+ 	char *board_type;
+ 	const char *tmp;
+ 	int len;
+-	int i;
+ 
+ 	root = of_find_node_by_path("/");
+ 	if (!root)
+@@ -557,10 +557,7 @@ static const char *btbcm_get_board_name(struct device *dev)
+ 	len = strlen(tmp) + 1;
+ 	board_type = devm_kzalloc(dev, len, GFP_KERNEL);
+ 	strscpy(board_type, tmp, len);
+-	for (i = 0; i < len; i++) {
+-		if (board_type[i] == '/')
+-			board_type[i] = '-';
+-	}
++	strreplace(board_type, '/', '-');
+ 	of_node_put(root);
+ 
+ 	return board_type;
 -- 
-https://patchwork.kernel.org/project/linux-wireless/list/
+2.43.2
 
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
