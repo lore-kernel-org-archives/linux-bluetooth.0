@@ -1,222 +1,152 @@
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2060.outbound.protection.outlook.com [40.107.20.60])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8033288D7
-	for <linux-bluetooth@vger.kernel.org>; Mon, 19 Feb 2024 10:26:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708338412; cv=none; b=o+WESO8XlPchkxyZxdmjANmL9df5j1KvXA4XnJftqiVhvShkMsG+Z45GT1XbUgG75v2BJyoSYBjz0M0zq5vXsLQk/u12kMNYLVYP0ISO6c/qxbLiDcXxP+FQ+sSeHHFOaP35Ka8V3woOBfYo8MHaepYZssV1fbfajIR692eAQBI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708338412; c=relaxed/simple;
-	bh=lCcUA04zUjPlqcbDjjJroqxQOZ61QPH+jdJBen0HMLo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mvHGwAYQ5xSByBwqp8VKTs3oX1TyFkOA0dxM46iSVc52rzmM2qoMqV69DAwLBs/BdUz24zHzonQbCBfCEL0u2A1j1HBAJv2rvt4sjC3ErpuHKUldSxdpyBhdpldoDj860mwPrk6lNj0Xk3Lba+Kg8MpUsvbadUKQzrqUtFyqh6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=J2SZ8TRl; arc=none smtp.client-ip=209.85.128.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E62912D05D
+	for <linux-bluetooth@vger.kernel.org>; Mon, 19 Feb 2024 12:15:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.60
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708344919; cv=fail; b=ZbYw2oiHv9gglG/p7P/4anj788R3N9a9f1RsWHDTU85Ki/oXpRpFUHpaSMUnWSXk7+MmUsiapPAihkzBFbtihhVeQbTn3z0q57GZAaxMgAVXhbJhkS0tDCpxEs5p8hNTjOqbQ/nM+p+lHUMjUx7o0OlDu8yZhwG4woAPEaVRLkg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708344919; c=relaxed/simple;
+	bh=/hx7ZISOegEZsUaFUWVJFw6mtvE0wI4d3g0eBJ53ygM=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=pqNdAOANhuhoUNYx0QjW7kQbdSay+dCLIKA9L/75xVunSxdSHSu9D91bd4MWAD+QgkS0fwcVNyJZszkOEIW2fVHj3ikM+TpHSBLc8wQQS6PCQe2m3Vojh6Ai0+UJ95ayht8fMHpy9dXbs9hKElXndUoZeneYKSwe1O9IKcZ9l7k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=egbWWbNq; arc=fail smtp.client-ip=40.107.20.60
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J2SZ8TRl"
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-603fd31f5c2so42811867b3.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Feb 2024 02:26:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1708338410; x=1708943210; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=TmyLIGmDRBMuA9/uAiTaewm8j0zrsoCAkXewuup87r0=;
-        b=J2SZ8TRlXUXjErTvCm7meKfgsK876x8PjR9Lrc9V6qfoVUkCUC4BNRI4xrXnLC/Uee
-         Y8R5YdV5KqE1BIL5V2PIFp3QGWnLdp3LDS1OlZRdKJkASqCNEZdzN8ScB6au+leYAtjI
-         EKsuIHFKb11X4C/iwunFLucXzVsXtIlutqbEBw1+9Ctbt4BDYkuh2U2rhC7ZEv9KYTXj
-         IePMttvXdtYHsE3+ClHNpcrsrVYfeIH4rCK5OVT119AMhEms/2ud9Uyyg4yR9+I1igY2
-         E24p80Jdrk4UrIHyeMr6xvls2gYwklgZXZt1nh2v8XJDQNPjlO2Mc1rRtz3f6qcjK9vS
-         IcKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708338410; x=1708943210;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TmyLIGmDRBMuA9/uAiTaewm8j0zrsoCAkXewuup87r0=;
-        b=kGemu67Qo5od9uCu0depIIrAiokdVOWaaX1qQIpRUmgFxiACzolNf15zeaJ7iE0y/F
-         FEbSSJ0GaJ9d+vBLx/SIvI+UtnKazsBuHXV3vKUi9vMy+KO0eA+zsbnC4EitORoKhdKY
-         US+H+L921f2X52vY9g9y2XbEk5YSA3V8ALlAIngkRtGLSInPpkp51kO+1EnmgoRzRyri
-         2XXJGPeo2CjzCTs135BxrxSLGIE3Tvh1aQIJ+0/oUqPbTPvVvvT7rYv/kE0MQ59bI8BA
-         w/DzcPRnA+DO0bHJ68Mpr1J0/RVO6hZ1UNn69rq4S3yqhO4uNpQJ+qa/8NJ29sE5dZY5
-         P1Ow==
-X-Forwarded-Encrypted: i=1; AJvYcCWahrOAtTt5Q32i0OCNUlqROQznckE8+2QiAct3k+Hra1GYni6pYxcQ2yJLgQ2FB1opMz4+h9rp3hKH4BGMqAfl2/IHr80hygNNfQ6Cju1I
-X-Gm-Message-State: AOJu0YyTK/ziHVWG+0L6oaDaAP4hMc5QPT9kLZt0hY2vy25+qTW1ESxB
-	+B6gUyHG0uS9MdN6Oomwzapda6WeXQybjyaUIUJniu0wn8+5ilALcz27maIN0Gajw4U4lDhfAO+
-	TrW44ERaSabLNVIR09k2tlFoIBAKWSoM35bjYoA==
-X-Google-Smtp-Source: AGHT+IH8Xj1z0uS8Qm7X6TratBsLyV3NzUK9GlyrRDCdO1y8h0WcX4ALGme/oMWCWglNot9Mbw3Z17eahBSzxpWPP2s=
-X-Received: by 2002:a81:84cc:0:b0:608:427:bf61 with SMTP id
- u195-20020a8184cc000000b006080427bf61mr4616175ywf.19.1708338409779; Mon, 19
- Feb 2024 02:26:49 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="egbWWbNq"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=c9RufnY2759oZKLowVWoocwGIt/nu4PLqNkzP4T9xFvPmLmI0lx/sJtGKmrVhLFBy8hx0ZmckJ6hPiqtknGNqdkshYxKO0QBvcQWxuxuDv3HAdWFbOsn5HO5smJArgrUNWbFx5eV6hc+1eg6J/ImjNY0igAlvZiI7J/ON1zqWohD8ugrI04OVawhMid4uwRan4WHixA3e7mCsuVUeIvc5w1ap4W5QaVXDbXQGUEny6jnpR8L3picUgya/7LuEu1gWRRGKKvREHApAPDIjnbdueN59BEBvnWV7mkZLR+1hnf5U5y0YbXQsojq9X1UZTZZKBQJ4mxSDQGCWidkzlGksA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qqsxrNcgQE7NAo52UFrnM3JQuwMs564JBweaORdV7pA=;
+ b=FsW1rRUlxUJAgP3NFoRgPomVY4Dd9ijFZyFq9X+vIseBIf895lNH2XaWHUrS99O+KfBJ02Kdxsx849FBZDcOzixrU0g5YssRBG7mjO5Kt6BRq95CdwX8ZLuyFJD2jTcZuueRlTagIsmEwmwdLX/myPcKYTv8uby/geuVvhl0ugltCQNOwq5unqbMQF9q3Vj2g5UoijhEsBJBSWzJAg+ov+D9Vi7DQxNqwI00ZoOXwlzHBUSbR1WzbtdLM51SlA8fCiqL4HjVHKYTIskUYIIWekfFGMgiCQjDOEeoVJ+YSVeGoLsn+t/I5+w6+17My73tK0+ocADdKwO9GidYpkWr3Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qqsxrNcgQE7NAo52UFrnM3JQuwMs564JBweaORdV7pA=;
+ b=egbWWbNqd0S2X2eMX/VYV983GiiOGqtRHCqcoApSLqvzW0UjeZXwEyOvWm5XLta6tl1X2fRViwiBcTpKjy7+8lY1pQi7VxMA0qwa91B1PSSFW94HT1CCAxP+xqOpCn95nTlPMDg1Cj5/V2S8lflwuvAJcGyCyGbSwwRc1SPll2k=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM9PR04MB8938.eurprd04.prod.outlook.com (2603:10a6:20b:409::20)
+ by AS8PR04MB9141.eurprd04.prod.outlook.com (2603:10a6:20b:448::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.37; Mon, 19 Feb
+ 2024 12:15:14 +0000
+Received: from AM9PR04MB8938.eurprd04.prod.outlook.com
+ ([fe80::bbd0:4409:3f0e:afdd]) by AM9PR04MB8938.eurprd04.prod.outlook.com
+ ([fe80::bbd0:4409:3f0e:afdd%4]) with mapi id 15.20.7292.029; Mon, 19 Feb 2024
+ 12:15:14 +0000
+From: Andrei Istodorescu <andrei.istodorescu@nxp.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com,
+	mihai-octavian.urzica@nxp.com,
+	silviu.barbulescu@nxp.com,
+	vlad.pruteanu@nxp.com,
+	iulia.tanasescu@nxp.com,
+	Andrei Istodorescu <andrei.istodorescu@nxp.com>
+Subject: [PATCH BlueZ v3 0/4] Update Sink BASE management
+Date: Mon, 19 Feb 2024 14:15:05 +0200
+Message-Id: <20240219121509.5702-1-andrei.istodorescu@nxp.com>
+X-Mailer: git-send-email 2.40.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AM4PR07CA0026.eurprd07.prod.outlook.com
+ (2603:10a6:205:1::39) To AM9PR04MB8938.eurprd04.prod.outlook.com
+ (2603:10a6:20b:409::20)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240216203215.40870-1-brgl@bgdev.pl> <CAA8EJppt4-L1RyDeG=1SbbzkTDhLkGcmAbZQeY0S6wGnBbFbvw@mail.gmail.com>
- <e4cddd9f-9d76-43b7-9091-413f923d27f2@linaro.org> <CAA8EJpp6+2w65o2Bfcr44tE_ircMoON6hvGgyWfvFuh3HamoSQ@mail.gmail.com>
- <4d2a6f16-bb48-4d4e-b8fd-7e4b14563ffa@linaro.org>
-In-Reply-To: <4d2a6f16-bb48-4d4e-b8fd-7e4b14563ffa@linaro.org>
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Date: Mon, 19 Feb 2024 12:26:39 +0200
-Message-ID: <CAA8EJpq=iyOfYzNATRbpqfBaYSdJV1Ao5t2ewLK+wY+vEaFYAQ@mail.gmail.com>
-Subject: Re: [PATCH v5 00/18] power: sequencing: implement the subsystem and
- add first users
-To: neil.armstrong@linaro.org
-Cc: Bartosz Golaszewski <brgl@bgdev.pl>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Kalle Valo <kvalo@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
-	Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Saravana Kannan <saravanak@google.com>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, Arnd Bergmann <arnd@arndb.de>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Alex Elder <elder@linaro.org>, 
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
-	Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-pci@vger.kernel.org, linux-pm@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8938:EE_|AS8PR04MB9141:EE_
+X-MS-Office365-Filtering-Correlation-Id: daeaf2c7-807e-433c-5cfb-08dc31446d67
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	kbhXOA4aTm8ait7h4hRHqmnUx3hWYE6eUOmU98C47TX6k4hk3/KBKw4krnmc2KWNf/DJEeyLGjDV4MXfPy8xQvq56lY2IUrszjW3sM2XHOwjtYAA1LAwIhWEEGkOPJ/TbDZA78X/SU97pDYtPeEyCJDPe0uv4p37wy2Ij2RA0i5gqy68zuIvpXiQGWN57K4d/utl8zTvhIdLUrnHOtaHjAoHX/Hw9x2Ycf7wYRbRqdCsaPJ0k/xwsVkcAH6sAeo7SeJDoudJ75HyTLorAKTHKA5fn0gAjcKQfolBGF/QNCbKOBwKWJm2Ak6vEJBaQZCBeiGEvU1QQ2KJnEreTLo6kb1ldbq6UXDqM6JRPCP6e5RlLxGxAuwSyF543eJohR88pJzwQ14lemw73DZMkx8HjbgEW3ZneFsDDC3Rj1lamLzIU+DL3952prY2/PNJHmzxiH3rnXEHu47d7kOrry2fSUf5Wkp7MEDvW6kKfgWsgQYOGY1h4ZfDUHBaNUYP45+d3WOW0AKLVricQhVQV98+8skZ9lSXTE0p3ay38EbewPE=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8938.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?1eIyUch+kWgOME/GZFGONNmliZgdq06CJROL2hNABKoB5Fp5mrkbAc2GlaO6?=
+ =?us-ascii?Q?wNHLF0JDTDJnS3VGRkO85ElhreZXElZcDu25CrVER8tPJDB//SE/zCLCCoQw?=
+ =?us-ascii?Q?X6JBRzmlrMKvWKydl7Q6++S9v0pgTKtU9Ii+tMOyQOqmWBvhnUpYhSoM7HSY?=
+ =?us-ascii?Q?LCb3q840cYCseERC4IFcdtOXGz4b+M5WwlwZkPvP//TFo29qyo3S6kheBPn+?=
+ =?us-ascii?Q?QTlberj7YLm+gsFeph3uuA2DUaeMbAl8ZZL1oXawQhpQYV3Le3h9ilJw5jj6?=
+ =?us-ascii?Q?VRz1khG3x3OtJx49xPy5ceVboI4TRQXzt4+yoFuvMfziQJUw+Hepd90wyTdg?=
+ =?us-ascii?Q?8u6uUeUrUOx9QHcnl25cUOo+KgXGLgd7FNaAhleJ+AVU77AGM/smEQiTiov8?=
+ =?us-ascii?Q?0KPAwS6jpuxUx3Hpx0/Hf70z7JwBBxxcIgOBDxVIGBtTW2wdH0mGNRiLclhg?=
+ =?us-ascii?Q?ZJpSodfx32CFoA5D7Px10l82FxhzGJODvCyTClDEMnX4oNthRYfi6Z3aZpvl?=
+ =?us-ascii?Q?9KTJtjJebCM/e2enSgHTlwRgssxXMTA3ShZNbBJK2XZtiVKHYp40NMVnY1Y9?=
+ =?us-ascii?Q?Q81/7zrSspk26uzVbCxcXhzdB1I5iknaaAHnCg/S43lYH7wPGLQPM8q2Ib2W?=
+ =?us-ascii?Q?ADPSpQEIbWVGqSGWWgvXOOwbuNnYatN0cpedMDc2PCiafTK1b4T4CKkP2ZkK?=
+ =?us-ascii?Q?tt2sEJH4Tb7fyAtCF3k1Y0gXE3skcZSFXPSMvVsKsl9hkZ7/UJsIwmO4rLVX?=
+ =?us-ascii?Q?Y4XlUVt7njd/zIcSzkYS5yVVlMLP7WAlWRTl601MWbhfcgghi06ueWvRuts0?=
+ =?us-ascii?Q?BFL39ib3VEZ2bcw3vNbnfVxqQ3I2b11Ylu/N4Tp1r5AERtx/5APjTJ/zK6Xo?=
+ =?us-ascii?Q?HJc7xt/qk9QzbkU7rCXzYIHuqsGbynMiTTiQyCnJR72D0FUqak4DqLUK86yx?=
+ =?us-ascii?Q?nEf+lkRPktR438lD5+Gx8F24NItGIz9XTOEQ46QtGz/HaRAU2Fjw/+/WjFY3?=
+ =?us-ascii?Q?iEcSklyUtS1tPEhz5Tu6/FY2zYdYjjHubNTNBVvtcrSM2eEaMIYfRWFPTsgc?=
+ =?us-ascii?Q?Hh/X6068hbweza9xUSMLW82guBf0vR80sDyOyiIQSUmxGYNA0Gkd2SHG5C1F?=
+ =?us-ascii?Q?4epebqPHEdzj+f5lySXqkSbh47uP9h8dlc6clhTyvCalo6MLRkRXHAB8uEOF?=
+ =?us-ascii?Q?PhttFX8lbM5Os7ud/mIVJZR5p46Cr2Et041F79btUon2vsUHUraRrnoX2uua?=
+ =?us-ascii?Q?knmNQnCOiVzZRwvyzvN7vUbukm7yBGs3DeqNP7s9lPOJ01P8oeyizqzAL2lY?=
+ =?us-ascii?Q?05ZQepiz1FuMsOwHcld3kdtRLBGHetvH515eZsrUdWNkIYsMXGYsDn6rWb+W?=
+ =?us-ascii?Q?uHq4F7AhDrcWkD0zU58U78cEmzzX7V510HyyOSoxVR7gl18AMi79G6rUoV2d?=
+ =?us-ascii?Q?x54ruhlcd6a+GSD42Z397FfY6oho2ctXbqE/ljUExq2bDjD/wXHuAwd9+HgD?=
+ =?us-ascii?Q?AvJ2adAG1MQLwLWKVBtLaOv8hHQK+HKzpqnqLX4hh66c/P9mHd1QdzyL1TVg?=
+ =?us-ascii?Q?Vvno/N8vPiDCP16og7uVA72FhcCEWastGaoYFSpdUM9pQ/pMmXdAkAUYBAHc?=
+ =?us-ascii?Q?+A=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: daeaf2c7-807e-433c-5cfb-08dc31446d67
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8938.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2024 12:15:14.4400
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: syLgpiesVniclxedffE0GX+E0kLxXMH3P9+OsKb402KKohzhGgazeQ4C+zfQtO/vSojcHYhcW6ODfvmuWqzCGqktDtDR85JlRDIIv3IfVsU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB9141
 
-On Mon, 19 Feb 2024 at 11:42, <neil.armstrong@linaro.org> wrote:
->
-> On 19/02/2024 10:22, Dmitry Baryshkov wrote:
-> > On Mon, 19 Feb 2024 at 10:14, Neil Armstrong <neil.armstrong@linaro.org> wrote:
-> >>
-> >> On 18/02/2024 13:53, Dmitry Baryshkov wrote:
-> >>> On Fri, 16 Feb 2024 at 22:33, Bartosz Golaszewski <brgl@bgdev.pl> wrote:
-> >>>>
-> >>>> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> >>>>
-> >>>> First, I'd like to apologize for the somewhat chaotic previous iterations
-> >>>> of this series and improper versioning which was rightfully pointed out
-> >>>> to me. I figured that the scope changed so much that it didn't make sense
-> >>>> to consider previous submissions part of the same series as the original
-> >>>> RFC but others thought otherwise so this one becomes v5 and I'll keep the
-> >>>> versioning going forward.
-> >>>>
-> >>>> This is the summary of the work so far:
-> >>>>
-> >>>> v1: Original RFC:
-> >>>>
-> >>>> https://lore.kernel.org/lkml/20240104130123.37115-1-brgl@bgdev.pl/T/
-> >>>>
-> >>>> v2: First real patch series (should have been PATCH v2) adding what I
-> >>>>       referred to back then as PCI power sequencing:
-> >>>>
-> >>>> https://lore.kernel.org/linux-arm-kernel/2024021413-grumbling-unlivable-c145@gregkh/T/
-> >>>>
-> >>>> v3: RFC for the DT representation of the PMU supplying the WLAN and BT
-> >>>>       modules inside the QCA6391 package (was largely separate from the
-> >>>>       series but probably should have been called PATCH or RFC v3):
-> >>>>
-> >>>> https://lore.kernel.org/all/CAMRc=Mc+GNoi57eTQg71DXkQKjdaoAmCpB=h2ndEpGnmdhVV-Q@mail.gmail.com/T/
-> >>>>
-> >>>> v4: Second attempt at the full series with changed scope (introduction of
-> >>>>       the pwrseq subsystem, should have been RFC v4)
-> >>>>
-> >>>> https://lore.kernel.org/lkml/20240201155532.49707-1-brgl@bgdev.pl/T/
-> >>>>
-> >>>> ===
-> >>>>
-> >>>> With that out of the way, I'd like to get down to explaining the two
-> >>>> problems I'm trying to solve.
-> >>>>
-> >>>> Problem statement #1: Dynamic bus chicken-and-egg problem.
-> >>>>
-> >>>> Certain on-board PCI devices need to be powered up before they are can be
-> >>>> detected but their PCI drivers won't get bound until the device is
-> >>>> powered-up so enabling the relevant resources in the PCI device driver
-> >>>> itself is impossible.
-> >>>>
-> >>>> Problem statement #2: Sharing inter-dependent resources between devices.
-> >>>>
-> >>>> Certain devices that use separate drivers (often on different busses)
-> >>>> share resources (regulators, clocks, etc.). Typically these resources
-> >>>> are reference-counted but in some cases there are additional interactions
-> >>>> between them to consider, for example specific power-up sequence timings.
-> >>>>
-> >>>> ===
-> >>>>
-> >>>> The reason for tackling both of these problems in a single series is the
-> >>>> fact the the platform I'm working on - Qualcomm RB5 - deals with both and
-> >>>> both need to be addressed in order to enable WLAN and Bluetooth support
-> >>>> upstream.
-> >>>>
-> >>>> The on-board WLAN/BT package - QCA6391 - has a Power Management Unit that
-> >>>> takes inputs from the host and exposes LDO outputs consumed by the BT and
-> >>>> WLAN modules which can be powered-up and down independently. However
-> >>>> a delay of 100ms must be respected between enabling the BT- and
-> >>>> WLAN-enable GPIOs[*].
-> >>>>
-> >>>> ===
-> >>>>
-> >>>> This series is logically split into several sections. I'll go
-> >>>> patch-by-patch and explain each step.
-> >>>>
-> >>>> Patch 1/18:
-> >>>>
-> >>>> This is a commit taken from the list by Jonathan Cameron that adds
-> >>>> a __free() helper for OF nodes. Not strictly related to the series but
-> >>>> until said commit ends in next, I need to carry it with this series.
-> >>>>
-> >>>> Patch 2/18:
-> >>>>
-> >>>> This enables the ath12k PCI module in arm64 defconfig as Qualcomm sm8650
-> >>>> and sm8550 reference platforms use it in the WCN7850 module.
-> >>>>
-> >>>> Patches 3/18-6/18:
-> >>>>
-> >>>> These contain all relevant DT bindings changes. We add new documents for
-> >>>> the QCA6390 PMU and ATH12K devices as well as extend the bindings for the
-> >>>> Qualcomm Bluetooth and ATH11K modules with regulators used by them in
-> >>>> QCA6390.
-> >>>>
-> >>>> Patches 7/18-9/18:
-> >>>>
-> >>>> These contain changes to device-tree sources for the three platforms we
-> >>>> work with in this series. As the WCN7850 module doesn't require any
-> >>>> specific timings introducing dependencies between the Bluetooth and WLAN
-> >>>> modules, while the QCA6390 does, we take two different approaches to how
-> >>>> me model them in DT.
-> >>>>
-> >>>> For WCN7850 we hide the existence of the PMU as modeling it is simply not
-> >>>> necessary. The BT and WLAN devices on the device-tree are represented as
-> >>>> consuming the inputs (relevant to the functionality of each) of the PMU
-> >>>> directly.
-> >>>
-> >>> We are describing the hardware. From the hardware point of view, there
-> >>> is a PMU. I think at some point we would really like to describe all
-> >>> Qualcomm/Atheros WiFI+BT units using this PMU approach, including the
-> >>> older ath10k units present on RB3 (WCN3990) and db820c (QCA6174).
-> >>
-> >> While I agree with older WiFi+BT units, I don't think it's needed for
-> >> WCN7850 since BT+WiFi are now designed to be fully independent and PMU is
-> >> transparent.
-> >
-> > I don't see any significant difference between WCN6750/WCN6855 and
-> > WCN7850 from the PMU / power up point of view. Could you please point
-> > me to the difference?
-> >
->
-> The WCN7850 datasheet clearly states there's not contraint on the WLAN_EN
-> and BT_EN ordering and the only requirement is to have all input regulators
-> up before pulling up WLAN_EN and/or BT_EN.
->
-> This makes the PMU transparent and BT and WLAN can be described as independent.
 
-From the hardware perspective, there is a PMU. It has several LDOs. So
-the device tree should have the same style as the previous
-generations.
+This patch refactors the flow for the BAP Broadcast Sink.
+After discovering a new Broadcast Source a short PA Sync will be tried.
+Depending on the BASE information present in the PA and the local PACS 
+capabilities of the Sink, one remote media endpoint will be created for 
+each compatible BIS.
+Configuring one of these endpoints results in creating a stream and a 
+media transport for the corresponding BIS.
+
+Idle timer.
+This patch introduces an idle timer, responsible for processing PA Sync
+requests. One request is possible at a time. When a broadcast source is
+discovered a new request for short PA sync is enqueued. Also, when a
+SetConfiguration is requested for an existing BAP broadcast source
+endpoint another request is enqueued.
+The timer runs periodically and peeks for requests. In case there is no 
+request in progress the timer marks the already peeked request to 
+pending and starts processing it. When the request is completed, it is 
+removed from the timer's queue, so that the next request can be 
+processed.
+
+Andrei Istodorescu (4):
+  shared/bap: Add API to convert BASE into bt_bap_base queue
+  shared/bap: Add API to convert parsed BASE into pac data
+  shared/bap: Add Broadcast QOS copy functions
+  bap: Do PA Sync for each BAP Broadcast source discovered
+
+ profiles/audio/bap.c | 546 +++++++++++++++++++++++-------------------
+ src/shared/bap.c     | 552 +++++++++++++++++++++++++++++++++++++++----
+ src/shared/bap.h     |  38 ++-
+ 3 files changed, 839 insertions(+), 297 deletions(-)
 
 -- 
-With best wishes
-Dmitry
+2.40.1
+
