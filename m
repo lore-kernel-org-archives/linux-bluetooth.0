@@ -1,58 +1,58 @@
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE94720DD9
-	for <linux-bluetooth@vger.kernel.org>; Mon, 19 Feb 2024 07:34:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5801208DF
+	for <linux-bluetooth@vger.kernel.org>; Mon, 19 Feb 2024 07:34:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708328059; cv=none; b=sSR7iliENz//GPMcPPEDijlH4PXy2ZwJ7nr7DSq2BUMHpsjIvUEbf87skK0czVtgCBNFvUkVQS7CncJk/Mv+oI4zrqmTf6DnSEx7LTJ51zZ/IOfpYTorMZMd8+U3/VM1xGtZxcE4yRdn92NhMR0wapV4/bd6FBVAyqDVOsWKPi8=
+	t=1708328086; cv=none; b=Vd0fycOrSRKH0OKqAu4QCChMGsmAZtWleCIV/l93YVB+3/cITnXSd03LcItO4TaATVdXZuZS5FRWQU8o7L0xpjkjAjZLzX8dO3fPOLtNHNwKmWAXmGBo5Ot48QVDeClD+5UITBHTFNPyaWVZJCO+XhxKCFJtsw6vGuyZR/ZHmwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708328059; c=relaxed/simple;
-	bh=krkCfySZSkroyGR6IAkJme4Tqg0Cs5e39JCBndl9dII=;
+	s=arc-20240116; t=1708328086; c=relaxed/simple;
+	bh=wVr8phqPhAkF0b9oWovDQdPdxnbZUP9wWMXDE0q3O+E=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CrWaDN+AlL2cZl4ArrlWjcu8JCdvpVWNjO9Riz3mXOdfENTdLjc5t3HqDbllfql0GtcPkA71xs/hiIGyiMdjmRmpD22O8tA5m88s1fqQ2Yj6e+bzQa5AOhBPhj9/20h47z4xkPCiCNr3yCGyTrrE5ScBFw1qKygeIbO9melRiyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=XX8wxhsH; arc=none smtp.client-ip=209.85.128.53
+	 In-Reply-To:Content-Type; b=fFQfHI+RlpHN6FYBnrfwna94cCzPa0llb+3bhtzbbbqpv2dUM/eoB9Y3Y9CqOL8RWiJkkEXtBILqXNdqrAKlnEIh4twpWyys8Ucjz86oh2aW4WNe/jpee7WebO1+58yJ65rNZoDiRLib2Efb9YKMrSkB67RtfMrQhkqEm9ExQt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=vazxlQK+; arc=none smtp.client-ip=209.85.167.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XX8wxhsH"
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-41269c801eeso664825e9.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 18 Feb 2024 23:34:16 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vazxlQK+"
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5129cdae3c6so2231059e87.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 18 Feb 2024 23:34:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1708328055; x=1708932855; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1708328082; x=1708932882; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=xfYKjQlB3cTR/VJt7JP21CmTYzoHEEFMBY9a1YgsyAo=;
-        b=XX8wxhsHCzhZh6PK5Ycd2YjgnWTP1cvNkhhxWB6xKtCl8PI7bSLUfSJEoP/4ko97m3
-         NjsburrZAT2cIchEHK93HVVuvJQsxaGJyVT4DTSC1USupAQI0vQaUlvoHsHSV5bZaAzu
-         bsW5V59EW3FQYfobZorZoH1JMpmHppFfuNuUhmMY2dj7u7vUyL8o5pAKxZaWm1q6QY+g
-         bfj7rOAMF/310mnvogNqLwl5t2WnB0CJbUsilvW6fV1TnU+roXxFOSiPwYVxq02GAjZQ
-         rJFuySBlNiHeg8ergHKRSfAP88/hoCuXE9RCRCl31e9WptPKmYAnJjS4z7q/YVpx/YSI
-         ilgA==
+        bh=xvLNrJJRwNsw7GHS06wt5yBCCTtq8TZaQZJgpC0CeaY=;
+        b=vazxlQK+vf2dY9nVGPG4nyEukjERdERKTFy7JDhvY14xeTW92TFLRN2dKu8QXVw60H
+         vi4K/rRfOtnzgi67LHqdLemXcdEtVaPS1hhy0nUMRXmIOZTWLPSrLL3DizKFl4kTJqSq
+         NcP1blHJJwx4CHuFteX3aqPOZroR6VMweO+I4kI6mECQ/vvvyLapyKtZqlWItYS1zu4x
+         7D4AEfV+Y0CvCT+PbOB6vdVxOB5bHRQsfoFbZiV/bFPPTNLfSV4UzQO0fEC7Sv3Ax0Uh
+         Dp/cjG9kXfeonf35FBVXyE/lVfKL8KDlyFVy6r2uo+2Z3ikmYdPof+vWVN0abEh+8tqb
+         4u2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708328055; x=1708932855;
+        d=1e100.net; s=20230601; t=1708328082; x=1708932882;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xfYKjQlB3cTR/VJt7JP21CmTYzoHEEFMBY9a1YgsyAo=;
-        b=cJ/MPfm1hYFO2nZa3mB8E2CWEVuCKdv9noSyzYrdMevk7E/4e2+QMmRX0UIWSExES/
-         Z2x/OgpCmACgQpHcp0bwQBLUEuUjIHRMBLGM51bCzRjnNWGo0iZckzf1RQIYpLvYZVMW
-         oEUWMMIfcDwq6mvfQTKqYBp2KpJ3/lfPAJiM8iqmUtSOw6RLjLZk9Bb6iPlnlVCsS2jJ
-         R4wHagH2BLK7+AK3mm3voO9RFESgLxgFXeZ71+RNZqNlG6S522xCxwwey1vyNYrXr0Ju
-         YE/6GT0wMSU2qfOOztnj/lFpfOmYHcD9YkQOwqdF+CREOCuhWfLs2maMUiPr3z6eXhBi
-         yZCA==
-X-Gm-Message-State: AOJu0YyS3b5QCTCSWJqus330OuCh1r2ZiSO5pThMJsrroEPaysvGgg6u
-	MrGIV/a5/0O4VKt8wmYYXrIUdubG8ol1npJs9sQFr6SlqiMjbSpQghtrvSYMBLY=
-X-Google-Smtp-Source: AGHT+IEY4IXUUaJrDQ/A3fyk8ahV8A9JPF6sLtLwu5zuCAycDgcK9b/PJNWgzPznWAFvTfOJ9+QdWg==
-X-Received: by 2002:a05:600c:a3a3:b0:412:415a:43ac with SMTP id hn35-20020a05600ca3a300b00412415a43acmr5919941wmb.15.1708328055247;
-        Sun, 18 Feb 2024 23:34:15 -0800 (PST)
+        bh=xvLNrJJRwNsw7GHS06wt5yBCCTtq8TZaQZJgpC0CeaY=;
+        b=aDxGMeD6IQ9hAMx885NIJhAI4tSyp4ADJqS5qlK4F2VbB32xgZneD8clvTlySDiWw4
+         iTEjVlr+WCenrLDnmz66GTGrjOU5WFZrs1+OCjjH9PYA65BT6W85855diZjFlMJqyPXm
+         KygEDucaluENU1y44s76THIymWulU79ExMKRTDgId/L5U2CacmZzeQb66N7deZX5lILq
+         9amyNb16xIy1noOHehrvb+CQ/z6pO+mHIRiYFCLMkKxHT0rTEsv6KlGYi7e5AvQ9D5o+
+         MEU6kfyr9y+0ZTc02yC6f1U7cyftK7tNrNemDkB5zxcYjfZK8UMRfzI/YNJXGnoITqVI
+         Zkiw==
+X-Gm-Message-State: AOJu0YyqScnc/t28SPUptLr/jDKEQZTIq5SV65fqbSgNILVYhNoSqU2R
+	xau7AwaEhwkLqiOp8pFHyRt9LAPakfsnZ5x3Na9IM6Ny3QSyxlHaeVQBqxIGJKI=
+X-Google-Smtp-Source: AGHT+IHULjgckgRcgbc1CIDA7u2voVte9tOzxMYCJeWas52dwNJodaOuSWwS5Jl6p2X5XUL/pfqp6g==
+X-Received: by 2002:a05:6512:239a:b0:511:9706:58eb with SMTP id c26-20020a056512239a00b00511970658ebmr9246588lfv.1.1708328082040;
+        Sun, 18 Feb 2024 23:34:42 -0800 (PST)
 Received: from [192.168.1.20] ([178.197.222.116])
-        by smtp.gmail.com with ESMTPSA id jv14-20020a05600c570e00b0040fe3147babsm10640011wmb.0.2024.02.18.23.34.11
+        by smtp.gmail.com with ESMTPSA id jv14-20020a05600c570e00b0040fe3147babsm10640011wmb.0.2024.02.18.23.34.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 18 Feb 2024 23:34:14 -0800 (PST)
-Message-ID: <55770080-9b27-4e04-a78e-7a7e508f37c2@linaro.org>
-Date: Mon, 19 Feb 2024 08:34:11 +0100
+        Sun, 18 Feb 2024 23:34:41 -0800 (PST)
+Message-ID: <e5adbea4-1706-46b1-9f45-6b3c3b5f0954@linaro.org>
+Date: Mon, 19 Feb 2024 08:34:38 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -60,8 +60,8 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 03/18] dt-bindings: regulator: describe the PMU module
- of the QCA6390 package
+Subject: Re: [PATCH v5 04/18] dt-bindings: net: bluetooth: qualcomm: describe
+ regulators for QCA6390
 Content-Language: en-US
 To: Bartosz Golaszewski <brgl@bgdev.pl>, Marcel Holtmann
  <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
@@ -90,7 +90,7 @@ Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
  linux-pm@vger.kernel.org,
  Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 References: <20240216203215.40870-1-brgl@bgdev.pl>
- <20240216203215.40870-4-brgl@bgdev.pl>
+ <20240216203215.40870-5-brgl@bgdev.pl>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -136,28 +136,23 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20240216203215.40870-4-brgl@bgdev.pl>
+In-Reply-To: <20240216203215.40870-5-brgl@bgdev.pl>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 16/02/2024 21:32, Bartosz Golaszewski wrote:
 > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > 
-> The QCA6390 package contains discreet modules for WLAN and Bluetooth. They
-> are powered by the Power Management Unit (PMU) that takes inputs from the
-> host and provides LDO outputs. This document describes this module.
+> QCA6390 has a compatible listed in the bindings but is missing the
+> regulators description. Add the missing supply property and list the
+> required ones in the allOf section.
 > 
 > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > ---
->  .../bindings/regulator/qcom,qca6390-pmu.yaml  | 166 ++++++++++++++++++
->  1 file changed, 166 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml
-> 
 
-This matches our internal discussions and how we see the QCA6390 power
-handling based on datasheet.
 
 Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+
 
 Best regards,
 Krzysztof
