@@ -1,115 +1,142 @@
-Received: from mail-ua1-f44.google.com (mail-ua1-f44.google.com [209.85.222.44])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66CF741C7F
-	for <linux-bluetooth@vger.kernel.org>; Mon, 19 Feb 2024 18:48:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A90D7535B5;
+	Mon, 19 Feb 2024 19:46:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708368515; cv=none; b=hvTUA+ZnDhdIl4ZI0Blfv/mwC6kRPBWaPVB2Q0qDPCgcdksXzygfRvzpno3ldKFY1b7pkByArjZQfyR9SocN04yd8fHYAb8D6EGbZ1cjcI8M1XqOmIYi2bSJrpvc7xeqVtt0Rw5UK7f383In06ztWtrMLTnAp92TWpvupvvwHBk=
+	t=1708371981; cv=none; b=ahIGsntzlS9KZb1MuIwZmz/z2hgOLpJofY+iFuq0XEcnV/gHlddg8PsnpjJEA4TYoeZfDd6RofQDsW0l0m1eaRTR9/AsLPQKQyn7oDH1LpemAL2h6EVOw/p/7+C2vQSYa+O0S2MDJUu0etpxPqWLAh/4hscN1X4CpiyCGrntdC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708368515; c=relaxed/simple;
-	bh=tWv3BTcXIRuvABZYmrMpTNLM1fVSSvR8wJ9miScNVZI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=W/eiF0fwBU92hxAO3ENQwaJ5ikD2AQEYXGXQyVo0FEQyX86D+KVdh5ve/IXJVQOpX5NN6e3Cpj6at4g5yqdoWKH/j7Gbh11saSvE4JVpVMRTcEbPllyynYmMb9mOzU2e123LkUg5oP4G6PwlSrvxXocDZpLoHUTmtT3h5EiUIDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=1VGGa1fm; arc=none smtp.client-ip=209.85.222.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+	s=arc-20240116; t=1708371981; c=relaxed/simple;
+	bh=qkNCX/evOVyVcsQQXkga5V8mXV5VQFEJOLdKmEkioZw=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=MyFNsXdhJ5F6JHnb4q8KxIZPGisWQuIt2OfYqkjG5lKMic3nqdZWGBnW91NcAyh4OCx1DbMDrAlKG1L3vPPABQdWBVOghQSeUiVN76XuQvF5ib1vyeFbBSSbZW4QtOAUlhESXZy87DELxYo4bWq3zdTsl0oHZ0UqEjfv4U7Bm+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=marliere.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=marliere.net header.i=@marliere.net header.b=UeeWPQe8; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=marliere.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="1VGGa1fm"
-Received: by mail-ua1-f44.google.com with SMTP id a1e0cc1a2514c-7d6275d7d4dso2415213241.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Feb 2024 10:48:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1708368512; x=1708973312; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iw+h6XA2eEk7N3nhL73ACZ3Q8FgRaHJnjAZBDU1Wfkk=;
-        b=1VGGa1fmMaxjWD5xtBOgZYKLB62EqAJVXLgaLXI6WHf97nYa9CwwKXdkPuo7Vnzq/3
-         R+Gm0JsxkC/2YN6UHYxTktPcQYoFjNdgKmHd00V7WUGoano+PdA8jljF18mKLtOEy4y7
-         sXJ1XVpvc0KRXPoKI6DUmwJIrnAEvF+sftONKaI7f2pLDlPrbocdOCI3dpa45Ev6eAmz
-         ku2hbAmLSRUX6y5fQ8AgWoCU6tEmjoqmI9fK7lW16qfH/uv2JaXqKf45LDMIwnTWfXiQ
-         lDIkpCoNXuz7CDPdn+1wmb6l2Wl1WQddLgSqJKtLS/m4+SIORm2kmh1FEQrmVOJ9/wnA
-         TLXw==
+	dkim=pass (2048-bit key) header.d=marliere.net header.i=@marliere.net header.b="UeeWPQe8"
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1dbb47852cdso20085175ad.1;
+        Mon, 19 Feb 2024 11:46:19 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708368512; x=1708973312;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iw+h6XA2eEk7N3nhL73ACZ3Q8FgRaHJnjAZBDU1Wfkk=;
-        b=MWhDc5G+vAxDnpDlPMhJfLlNPxMzZiI22DE0u20vq1G3vfVwFSs/dS4+xrI6DuxMyX
-         C8XXOqqYghgIhxjD0Wp9efKqhJJXJU15wLPEBT8+GpgxbFxvhZunYr/ddrbF8xHaFLTA
-         XHnrvoTH5rtcrzBIMrj+SjqIG4eaYHlZMB9ze68gfKSHiWnrUEdfo81ZJGHvrcFoSf2H
-         +TCQyrVjC/95x66575hU7IvJqYb1KKsy1k4G/d7V06EZv9eGbEXG0rd5TumTpRZFIIiB
-         4F+k30NBvT8YqD9xgEYjDeIU4CxT6JFF5vimzcGYy60ZRIlYwJoRPyWNry3NzlP9ZHwV
-         mh6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVtgBhk2l5LDYqHPsnpgbuuujLpG768tggcW8ibyuthBS5ogTGh7Eo+lDpTYy6oNalBOErGU1bYzNuLmfh7o/beTbQTRduLQUm+KIu1gP7s
-X-Gm-Message-State: AOJu0YyWwPOSB7nwaYTLLqbh4UvCwjAUcAM9xy9zuXQl8JZZeNTTDJ7e
-	Qs6ut2FaValcbrPVq5l7wjpmXRYv73x15TV1oEQYQx8wevnXj34+HaMb07h64ZwZprt0zScWJO3
-	KQh5Hnozc4IUwH0vsOxkrGUc+XaPGYme9JjYcxw==
-X-Google-Smtp-Source: AGHT+IFew0xpEP8/09qOXqEwkTDNNehQKTGr1SM0trRodxSgKcCNIctA84dQ/9qfd01qZ/b5K7TWSeVoDwJUt5v12E8=
-X-Received: by 2002:a1f:e207:0:b0:4ca:f519:c25f with SMTP id
- z7-20020a1fe207000000b004caf519c25fmr2526721vkg.9.1708368512278; Mon, 19 Feb
- 2024 10:48:32 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708371979; x=1708976779;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:dkim-signature:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AwRCLhHz23aV/zozDITJb0YDvXJTzc2EO/w3xANaOLQ=;
+        b=a9omP0KFedUSS5EPWXjLWk00YwJ3CP8YV4DhTjkNEaEcStgKK4nCheISG5XCR8z7Gz
+         K6Ms63VyNn2SgE7IIYsQMuJ/lEiXWy+lg57laWDZO+176/AscwJtKJS01gZtsgn8pFzA
+         Tat+4n6s9HwkByRwU6vgvz9zIDjdB/T77yPjtsZV0hjXYETxwGCYWpXbzr3O+mDbDMqH
+         KysK+qLqHWaYz3LXHrS6HtTSjWCavD6BNHETS3Y0QNMiVt8CBdFsrgM/eRilqBm5oOoP
+         Isd6t1vMulEyw3a/W5FlTgReoibBPg/2cdZWp1Ipf/H6jN1p5eGzkLHNuxa6kEUwm10q
+         mW3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWbFgNi/GqkuCRTO9LZU3cMcgYVaLG+xT+Pl2L2qzrNDo4NojBDdV4QIr4NR6oLLKOF6XpbuPT70dWrC1Vt3UEGw6VOwXz6LH0noA685LwJN2y3EA7P5vHmSvNIcMx3N6O/9Zfx
+X-Gm-Message-State: AOJu0YwRg6jJqru1j1cgVRvUE/l6Xls9YVVl1h2bgh+gUVAYpSUTXsz6
+	QZumOzMPSbbWusRmAmVYnRGnJM3YrJz86bxXx7p3xsYd/+XwlOCn
+X-Google-Smtp-Source: AGHT+IEKAiG3a3CMkgCplA5Qh4PQ5N5JQQgN++WfYfMHwbLAwQarQeJr0+DY9GpUBLZ5F85B83fFng==
+X-Received: by 2002:a17:902:a3ce:b0:1db:a94f:903d with SMTP id q14-20020a170902a3ce00b001dba94f903dmr8295308plb.36.1708371978816;
+        Mon, 19 Feb 2024 11:46:18 -0800 (PST)
+Received: from mail.marliere.net ([24.199.118.162])
+        by smtp.gmail.com with ESMTPSA id lw8-20020a1709032ac800b001db9fa23407sm4753658plb.195.2024.02.19.11.46.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Feb 2024 11:46:18 -0800 (PST)
+From: "Ricardo B. Marliere" <ricardo@marliere.net>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marliere.net;
+	s=2024; t=1708371976;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=AwRCLhHz23aV/zozDITJb0YDvXJTzc2EO/w3xANaOLQ=;
+	b=UeeWPQe82l1RQbVnsDf77Nh8VbkC43M9SjfnDIxjvtKsinuJdi6ZhS0NHu7m8FPAIfIKxt
+	Q0hPsFb/pETo/emEdV1Acbc+EdkYzhxucmWRywziyx0aVVhs7A18V8hC9N+vYaDaX9ItwT
+	UEByd/k4q5ANyL/M2PiNShJj/LjecsmoELs5VMA6NiaOiN+zWo3jsDob2g+UWe5L00ftvO
+	GNO2Bw6F0BNib23Sqj9Xm4AP0jswKwRy5S1s2Ro8vcycwvKE8hMuLF+nfpafcQEBV8Tc1a
+	Xu5IbiqdrLbgAna47F27eyrEkkUfPYjbmoiDgw9eoJfeAPk7zkG4YkwsS/gtMQ==
+Authentication-Results: ORIGINATING;
+	auth=pass smtp.auth=ricardo@marliere.net smtp.mailfrom=ricardo@marliere.net
+Date: Mon, 19 Feb 2024 16:46:57 -0300
+Subject: [PATCH] Bluetooth: constify the struct device_type usage
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240216203215.40870-1-brgl@bgdev.pl> <20240216203215.40870-10-brgl@bgdev.pl>
- <48164f18-34d0-4053-a416-2bb63aaae74b@sirena.org.uk>
-In-Reply-To: <48164f18-34d0-4053-a416-2bb63aaae74b@sirena.org.uk>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Mon, 19 Feb 2024 19:48:20 +0100
-Message-ID: <CAMRc=Md7ymMTmF1OkydewF5C32jDNy0V+su7pcJPHKto6VLjLg@mail.gmail.com>
-Subject: Re: [PATCH v5 09/18] arm64: dts: qcom: qrb5165-rb5: model the PMU of
- the QCA6391
-To: Mark Brown <broonie@kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Kalle Valo <kvalo@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konrad.dybcio@linaro.org>, Liam Girdwood <lgirdwood@gmail.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Saravana Kannan <saravanak@google.com>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, Arnd Bergmann <arnd@arndb.de>, 
-	Neil Armstrong <neil.armstrong@linaro.org>, Marek Szyprowski <m.szyprowski@samsung.com>, 
-	Alex Elder <elder@linaro.org>, Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
-	Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, 
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-pci@vger.kernel.org, linux-pm@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240219-device_cleanup-bluetooth-v1-1-dd81ba00c95e@marliere.net>
+X-B4-Tracking: v=1; b=H4sIADCw02UC/x2MWwqAIBAAryL7naDSg7pKRGy21UJoqEUQ3T3pc
+ 2BmHogUmCJ04oFAF0f2LoMuBNgN3UqS58xglCmV0a2cs2RptDuhOw857Scl79MmFSq91BbLpjK
+ Q8yPQwve/7of3/QAyte8RagAAAA==
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Johan Hedberg <johan.hedberg@gmail.com>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ "Ricardo B. Marliere" <ricardo@marliere.net>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1525; i=ricardo@marliere.net;
+ h=from:subject:message-id; bh=qkNCX/evOVyVcsQQXkga5V8mXV5VQFEJOLdKmEkioZw=;
+ b=owEBbQKS/ZANAwAKAckLinxjhlimAcsmYgBl07AxGJrWiNXtnXNhSeiX52AHCHXjkF3XyhmeO
+ cOr2GGQuKqJAjMEAAEKAB0WIQQDCo6eQk7jwGVXh+HJC4p8Y4ZYpgUCZdOwMQAKCRDJC4p8Y4ZY
+ ps1zD/9dgzh7mROaeNsTJHEFlvzG+3pU5cdy7vyulxNhZRdlDMs8bDJYIp2dJ+J1WPRtkDszqRG
+ 0xs8w+Iv/kNBcLruG7F34LhiqwPUtvDMO4H1Q5QwQBQ45lpzZBbEczSm4TXD5aBp4VpgOR+6GnY
+ TW8UzqU6OQmzVR4Pcdilu+YXrzqfN2Id4znBgFuGSNy8c+36MpDzgQKMkAcUvikZM7jdtO6SuIy
+ fQtN2FHMXY+d8lDwc6VdFPfRoF3QHK7aEKjocdynYtF2GN5p158FIuiYmJJhiKHTLl/mFjv7whG
+ S37dLkmmFL+yLW9+4uIxAD5CUr1I3zdNPiQ8js/DMtq+uabOElAPdjm21g1PUryqvPtFSGZuGR0
+ rYJ3LJMRVeP9ENlgGF+9zn1FP2LDctPQwTxfkGvZEAIktdQgfquAdpkgAbpFYe2XhXI9ccOP3OI
+ I9GsaM6mApzKcLMQE8z1Dgm42K5oQbYhboo8YysHJjVs3riTybdnUFqmqkWREz0XzX8IN0LwYxL
+ 6dwkhxnbCh04CA4yget61jAaKCEl/PNaLDoPfZB/Du9iEogLlRBnLx94ltfGaDEHeNPVQKXiF79
+ RTt6NtgftUgfYWuZ/THJXtmFgyhCdyzgSNNPn/tRXC97dpq15OszlCPBos4Jg3cDwxOZG5/VDVN
+ 3g9GZeGe1su/lrQ==
+X-Developer-Key: i=ricardo@marliere.net; a=openpgp;
+ fpr=030A8E9E424EE3C0655787E1C90B8A7C638658A6
 
-On Mon, Feb 19, 2024 at 7:03=E2=80=AFPM Mark Brown <broonie@kernel.org> wro=
-te:
->
-> On Fri, Feb 16, 2024 at 09:32:06PM +0100, Bartosz Golaszewski wrote:
->
-> > +                     vreg_pmu_aon_0p59: ldo1 {
-> > +                             regulator-name =3D "vreg_pmu_aon_0p59";
-> > +                             regulator-min-microvolt =3D <540000>;
-> > +                             regulator-max-microvolt =3D <840000>;
-> > +                     };
->
-> That's a *very* wide voltage range for a supply that's got a name ending
-> in _0_p59 which sounds a lot like it should be fixed at 0.59V.
-> Similarly for a bunch of the other supplies, and I'm not seeing any
-> evidence that the consumers do any voltage changes here?  There doesn't
-> appear to be any logic here, I'm not convinced these are validated or
-> safe constraints.
+Since commit aed65af1cc2f ("drivers: make device_type const"), the driver
+core can properly handle constant struct device_type. Move the bt_type and
+bnep_type variables to be constant structures as well, placing it into
+read-only memory which can not be modified at runtime.
 
-No, the users don't request any regulators (or rather: software
-representations thereof) because - as per the cover letter - no
-regulators are created by the PMU driver. This is what is physically
-on the board - as the schematics and the datasheet define it. I took
-the values from the docs verbatim. In C, we create a power sequencing
-provider which doesn't use the regulator framework at all.
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Ricardo B. Marliere <ricardo@marliere.net>
+---
+ net/bluetooth/6lowpan.c   | 2 +-
+ net/bluetooth/bnep/core.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-Bartosz
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 215af9b3b589..5c1b8b5bfe71 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -572,7 +572,7 @@ static void netdev_setup(struct net_device *dev)
+ 	dev->needs_free_netdev	= true;
+ }
+ 
+-static struct device_type bt_type = {
++static const struct device_type bt_type = {
+ 	.name	= "bluetooth",
+ };
+ 
+diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+index 5a6a49885ab6..8c3f8d0c0358 100644
+--- a/net/bluetooth/bnep/core.c
++++ b/net/bluetooth/bnep/core.c
+@@ -549,7 +549,7 @@ static struct device *bnep_get_device(struct bnep_session *session)
+ 	return &conn->hcon->dev;
+ }
+ 
+-static struct device_type bnep_type = {
++static const struct device_type bnep_type = {
+ 	.name	= "bluetooth",
+ };
+ 
+
+---
+base-commit: 64b5c4c8e79c131fe8f135bab5e5dfaa245c5776
+change-id: 20240219-device_cleanup-bluetooth-0a01f6ca4752
+
+Best regards,
+-- 
+Ricardo B. Marliere <ricardo@marliere.net>
+
