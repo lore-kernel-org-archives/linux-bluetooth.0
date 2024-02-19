@@ -1,419 +1,135 @@
-Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FB1A6BB4E
-	for <linux-bluetooth@vger.kernel.org>; Sun, 18 Feb 2024 12:53:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B401394
+	for <linux-bluetooth@vger.kernel.org>; Mon, 19 Feb 2024 01:17:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708260805; cv=none; b=MDu/oJI9N8BW8Rc5ZIqtHb7AH+5c5xqdp+RM8bqoX2Wd12+K3UWKNsWl84LlrTdBWysjakgoQAKYT+s7TboZfz71PJjlh8oGM865zF1Lc48X+bCmkzXZDlOhdsojj7JX5JTvSjC1LFiXhR1GiI3o3snct1avZhqtvZapdAPsgZA=
+	t=1708305434; cv=none; b=N8gLp7h5fnL7RID23llywodTwAWX1CM+OVAmvxFpDfw/4ofM6+xKAdsxAzFrF9IJ4+0VwoCVkpCWAEOozJK9H/p9r9O0NExidPWfVmVKUh65OHzW7ihMsM6nx2ShxaG9EV0xqboGQ2H8Pa+koBkS6bTqqtNXEb9sZ8Sukeqm1+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708260805; c=relaxed/simple;
-	bh=AFMct22YgIoqWi2qRmbVz/ZZmOxUDcb0xa5uTfXHAzo=;
+	s=arc-20240116; t=1708305434; c=relaxed/simple;
+	bh=aadPJat/aV0qssEXBjSbmTEWDUUCnlGLgWiZ9Emr+LY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bwscioPf+gR4bUi1BABNOtXCSfm24XG3TNkiHm81Swrh+gPLsnTxmiI5TDpXgs0s3CvphnIvdoUlERkmA5GN6hSgXAxiC8s1TNMQcMDJ+lw4lohC2kglGFdNJtZsvqFMJi15LuE7vIDKSLJr/v7+RwQHIMDKH0sdBRzAyuXhbfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=xAuQ0RUv; arc=none smtp.client-ip=209.85.219.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xAuQ0RUv"
-Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-d9b9adaf291so1786046276.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 18 Feb 2024 04:53:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1708260802; x=1708865602; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=aIgvwhYXOOfKDZuAj4gHJv5dCMWlKRkcQpqwg2w/v2g=;
-        b=xAuQ0RUvrMMn+/7ZzeQIh+gAyelB9ovC4ke+GfggRE87YA+yKuZn53uWsfwZ92AlIx
-         03pCO22aodEpOp3pllxqZ8pp9eZ3te1KNiVr0QLzaPI/z2BeD3znuP5DaoP4W7SVdfzS
-         xjuINtDLKhmwBvzsX4C61YY7iyNTR57C9H5hC41GHpIA0feE3TkvhobtGUgRbWhoNIy4
-         ZQ0B6Ssr+krjZ2PKF+klsvmLGOn2EkTEKdDiH4stZkKKxL7+dsWZ8/r9DEO6RkWgU4Za
-         eOxfYWpXzzp3g+h4avyzc7KS9TlQOSsSSuUQb+DQyi8JNrIyrSbZcN6TC0T8YHAKV9Wl
-         VdGA==
+	 Cc:Content-Type; b=WsFIAptOP3DMtkjDyJMyBz3J/IPgjIPl64bXNeXMtb2pkXInDDuwwkl7U2vW54SInZPNSs/FXvprMLCVZtyF2PCw5frf66LqjTHUiCI50EpVqqhuE25ial6QOgVPp32bAiWuHdGQmcsdZ8JeFzyXh1I3P6DmdFds6iWN1e7Ce0s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2d228a132acso20658431fa.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 18 Feb 2024 17:17:12 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708260802; x=1708865602;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=aIgvwhYXOOfKDZuAj4gHJv5dCMWlKRkcQpqwg2w/v2g=;
-        b=Wtax9UgCjqLhE68fe/iTYt30vf4Xuh2Zk29w1F7CpxklV5SExzFBRFK6MZZWmb78ie
-         fVopigwm1w+Xvww8O5OSHNzdtmBA8tevN8oj1nxcHea/xKI9FTyjvRcTpHW7NvODc+sG
-         9hCYTdFd+mWTRKxz4HvcuhtsJbbI3VXaGmjYUrD42xExk8LQNUtQWAdrpoojS0EXowi8
-         SzPM8EDck+tNvkcUMHLWXWQzTONyT1xg9e/IuKl8Cwj7plOXoqxf82mklp0/IPOPNnB5
-         zlAqMgj3Kr/54jd0Td2uB52C4jo5X4HRxtxRqe+7/hrLXNwh10QzMkhz74Gvx9bWETN2
-         t/7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWSRUXvDCj3CV0xVqUngY8Nu12RpVtrRkDxvvS0YmiDnIajWUbvjGtOtzycJ3115w26ogqs13MOZBxA8c5rgyQ1UBpT4K/dNQaocr2ICJ9V
-X-Gm-Message-State: AOJu0YytoyT6rZ3dAN8o6Twpoi+9bPizYso1HdMwI6+5jevQGVZlM6Hd
-	Jo5qleIktzJ/HMH+k7bZ9vB8S56oKPgzcE3KyRZfCWY1ktdwTh+Jp5sjT+lvWhCajoOlQ/qnweF
-	GHOw20OcAA8w6a2ZMCUG0duJjCP8uvd0uP4x+Sg==
-X-Google-Smtp-Source: AGHT+IFlik0zx2EeQZmt7aE+QbTWJy2Fegf0nq5BRyySTt4ug/8wWwjRdjaDoh4gcQlX6H4Du0hGtNNHnKrLpA7Jafc=
-X-Received: by 2002:a05:6902:260f:b0:dc7:4790:1b70 with SMTP id
- dw15-20020a056902260f00b00dc747901b70mr7805709ybb.54.1708260802409; Sun, 18
- Feb 2024 04:53:22 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708305431; x=1708910231;
+        h=content-transfer-encoding:cc:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bnDIzKAAHqUE99uGMy3LM2/SDBhUgCs7WwrNAcRvmtM=;
+        b=nwza1rKx/Q7EGzvGE3ME+6MzSZ0bSpu8s2LLCbX8vYr8yUEALnpuqFxQyWCMKc09Cx
+         X5xS7dlFS/mCa95BzIhNjeMa4mkMB5o3wyUv8q/Rq/YZXUxWCb44loc88Y6ko/oaXXSH
+         A6xX8powQ7i8HKPB5GHfmqU4vpm+xpKCKMBwf/l3uFdJ1WlF/aBxcuufre2iUR+wdAKs
+         kSOBGuclGjqaQu23G3Vb3D/gclvVi82wsOohXAqFcHuOm4I4h1ZH6pEt64vkjSfUF90B
+         qapXGxoVT0l/JX37IdxG6XzWtv+JUq9Q/V1/T82Y6sKGVd/KHcgu3sj+ZxhqTrGNK6Z3
+         uyYw==
+X-Forwarded-Encrypted: i=1; AJvYcCXMiTui22ZvvODF10A0ak4flpcwtSeFTLNi83Wf9bf5/jNoT3qtR06jPXisrq0KL4qdC+hX/6vkHwjIboD/bEGHW+N+2p4iJdGDR280AYh1
+X-Gm-Message-State: AOJu0YzXyufKvWz6lfX6iOxNtmxfnV31S1T2ZzuG5TJCeWtL2pCc7q4y
+	M6HEHXL9igF8+mrxXeMmot1J18k9Zr9uWDfuyBtqzdibBl3wl0gOzJFlEAP9y8owvQ==
+X-Google-Smtp-Source: AGHT+IF4G97EHyvXySS9/7qoUGC5wTXeCEf0ZXoRFyNYOt92bPHuZ+uM3knVGL36sc2QCrm7OlCEgg==
+X-Received: by 2002:a05:6512:1146:b0:512:b437:4b06 with SMTP id m6-20020a056512114600b00512b4374b06mr330743lfg.67.1708305430899;
+        Sun, 18 Feb 2024 17:17:10 -0800 (PST)
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com. [209.85.167.47])
+        by smtp.gmail.com with ESMTPSA id x8-20020ac24888000000b00511ad6f50a4sm712089lfc.159.2024.02.18.17.17.10
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 18 Feb 2024 17:17:10 -0800 (PST)
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-512ab55fde6so1172778e87.2
+        for <linux-bluetooth@vger.kernel.org>; Sun, 18 Feb 2024 17:17:10 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXF2b+j9ppRjadlpxpmXkXS0CPygpx+Qq65yW3hIsszMVHQCfeEq8X265BBra5+A3mWi/5nwzoNcdk7MMOZMvwYKgDYjYuqKwVKZDkhN+/p
+X-Received: by 2002:a05:6512:2820:b0:512:88d9:93e4 with SMTP id
+ cf32-20020a056512282000b0051288d993e4mt6920153lfb.15.1708305430452; Sun, 18
+ Feb 2024 17:17:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240216203215.40870-1-brgl@bgdev.pl>
-In-Reply-To: <20240216203215.40870-1-brgl@bgdev.pl>
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Date: Sun, 18 Feb 2024 14:53:11 +0200
-Message-ID: <CAA8EJppt4-L1RyDeG=1SbbzkTDhLkGcmAbZQeY0S6wGnBbFbvw@mail.gmail.com>
-Subject: Re: [PATCH v5 00/18] power: sequencing: implement the subsystem and
- add first users
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Kalle Valo <kvalo@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konrad.dybcio@linaro.org>, Liam Girdwood <lgirdwood@gmail.com>, 
-	Mark Brown <broonie@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Saravana Kannan <saravanak@google.com>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Arnd Bergmann <arnd@arndb.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Alex Elder <elder@linaro.org>, 
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
-	Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-pci@vger.kernel.org, linux-pm@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+References: <20240209070443.3617790-1-iam@sung-woo.kim>
+In-Reply-To: <20240209070443.3617790-1-iam@sung-woo.kim>
+From: Sungwoo Kim <iam@sung-woo.kim>
+Date: Sun, 18 Feb 2024 20:16:42 -0500
+X-Gmail-Original-Message-ID: <CAJNyHpJo4D+JxCJRB30eMisux_thO1eJHf0SDsRFQMubdQSkVg@mail.gmail.com>
+Message-ID: <CAJNyHpJo4D+JxCJRB30eMisux_thO1eJHf0SDsRFQMubdQSkVg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: add missing checks in state transitions
+Cc: daveti@purdue.edu, Marcel Holtmann <marcel@holtmann.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 16 Feb 2024 at 22:33, Bartosz Golaszewski <brgl@bgdev.pl> wrote:
->
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->
-> First, I'd like to apologize for the somewhat chaotic previous iterations
-> of this series and improper versioning which was rightfully pointed out
-> to me. I figured that the scope changed so much that it didn't make sense
-> to consider previous submissions part of the same series as the original
-> RFC but others thought otherwise so this one becomes v5 and I'll keep the
-> versioning going forward.
->
-> This is the summary of the work so far:
->
-> v1: Original RFC:
->
-> https://lore.kernel.org/lkml/20240104130123.37115-1-brgl@bgdev.pl/T/
->
-> v2: First real patch series (should have been PATCH v2) adding what I
->     referred to back then as PCI power sequencing:
->
-> https://lore.kernel.org/linux-arm-kernel/2024021413-grumbling-unlivable-c145@gregkh/T/
->
-> v3: RFC for the DT representation of the PMU supplying the WLAN and BT
->     modules inside the QCA6391 package (was largely separate from the
->     series but probably should have been called PATCH or RFC v3):
->
-> https://lore.kernel.org/all/CAMRc=Mc+GNoi57eTQg71DXkQKjdaoAmCpB=h2ndEpGnmdhVV-Q@mail.gmail.com/T/
->
-> v4: Second attempt at the full series with changed scope (introduction of
->     the pwrseq subsystem, should have been RFC v4)
->
-> https://lore.kernel.org/lkml/20240201155532.49707-1-brgl@bgdev.pl/T/
->
-> ===
->
-> With that out of the way, I'd like to get down to explaining the two
-> problems I'm trying to solve.
->
-> Problem statement #1: Dynamic bus chicken-and-egg problem.
->
-> Certain on-board PCI devices need to be powered up before they are can be
-> detected but their PCI drivers won't get bound until the device is
-> powered-up so enabling the relevant resources in the PCI device driver
-> itself is impossible.
->
-> Problem statement #2: Sharing inter-dependent resources between devices.
->
-> Certain devices that use separate drivers (often on different busses)
-> share resources (regulators, clocks, etc.). Typically these resources
-> are reference-counted but in some cases there are additional interactions
-> between them to consider, for example specific power-up sequence timings.
->
-> ===
->
-> The reason for tackling both of these problems in a single series is the
-> fact the the platform I'm working on - Qualcomm RB5 - deals with both and
-> both need to be addressed in order to enable WLAN and Bluetooth support
-> upstream.
->
-> The on-board WLAN/BT package - QCA6391 - has a Power Management Unit that
-> takes inputs from the host and exposes LDO outputs consumed by the BT and
-> WLAN modules which can be powered-up and down independently. However
-> a delay of 100ms must be respected between enabling the BT- and
-> WLAN-enable GPIOs[*].
->
-> ===
->
-> This series is logically split into several sections. I'll go
-> patch-by-patch and explain each step.
->
-> Patch 1/18:
->
-> This is a commit taken from the list by Jonathan Cameron that adds
-> a __free() helper for OF nodes. Not strictly related to the series but
-> until said commit ends in next, I need to carry it with this series.
->
-> Patch 2/18:
->
-> This enables the ath12k PCI module in arm64 defconfig as Qualcomm sm8650
-> and sm8550 reference platforms use it in the WCN7850 module.
->
-> Patches 3/18-6/18:
->
-> These contain all relevant DT bindings changes. We add new documents for
-> the QCA6390 PMU and ATH12K devices as well as extend the bindings for the
-> Qualcomm Bluetooth and ATH11K modules with regulators used by them in
-> QCA6390.
->
-> Patches 7/18-9/18:
->
-> These contain changes to device-tree sources for the three platforms we
-> work with in this series. As the WCN7850 module doesn't require any
-> specific timings introducing dependencies between the Bluetooth and WLAN
-> modules, while the QCA6390 does, we take two different approaches to how
-> me model them in DT.
->
-> For WCN7850 we hide the existence of the PMU as modeling it is simply not
-> necessary. The BT and WLAN devices on the device-tree are represented as
-> consuming the inputs (relevant to the functionality of each) of the PMU
-> directly.
+Hello, could I ask for comments on this?
 
-We are describing the hardware. From the hardware point of view, there
-is a PMU. I think at some point we would really like to describe all
-Qualcomm/Atheros WiFI+BT units using this PMU approach, including the
-older ath10k units present on RB3 (WCN3990) and db820c (QCA6174).
-
-> For QCA6390 on RB5 we add the PMU node as a platform device. It consumes
-> regulators and GPIOs from the host and exposed regulators consumer in turn
-> by the BT and WLAN modules. This represents the internal structure of the
-> package.
+On Fri, Feb 9, 2024 at 2:06=E2=80=AFAM Sungwoo Kim <iam@sung-woo.kim> wrote=
+:
 >
-> Patches 10/18-14/18:
+> When an l2cap channel receives L2CAP_CONN_RSP, it revives from BT_DISCONN
+> to BT_CONFIG or BT_CONNECTED.
+> It is very weird, violates the specification, and I cannot see any real
+> usecase for this.
+> Similar to this, the L2cap channel has six illegal state transitions:
 >
-> These contain the bulk of the PCI changes for this series. We introduce
-> a simple framework for powering up PCI devices before detecting them on
-> the bus and the first user of this library in the form of the WCN7850 PCI
-> power control driver.
+> 1. BT_CONNECT2 -> BT_CONFIG by L2CAP_CONN_RSP
+> 2. BT_CONNECT2 -> BT_CONNECTED by L2CAP_CONF_RSP
+> 3. BT_CONNECT2 -> BT_DISCONN by L2CAP_CONF_RSP
+> 4. BT_CONNECTED -> BT_CONFIG by L2CAP_CONN_RSP
+> 5. BT_DISCONN -> BT_CONFIG by L2CAP_CONN_RSP
+> 6. BT_DISCONN -> BT_CONNECTED by L2CAP_CONN_RSP
 >
-> The general approach is as follows: PCI devices that need special
-> treatment before they can be powered up, scanned and bound to their PCI
-> drivers must be described on the device-tree as child nodes of the PCI
-> port node. These devices will be instantiated on the platform bus. They
-> will in fact be generic platform devices with the compatible of the form
-> used for PCI devices already upstream ("pci<vendor ID>,<device ID">). We
-> add a new directory under drivers/pci/pwrctl/ that contains PCI pwrctl
-> drivers. These drivers are platform drivers that will now be matched
-> against the devices instantiated from port children just like any other
-> platform pairs.
+> This patch fixes 2, 3, 5, and 6 by adding checks.
+> For 1 and 4, I will make an RFC for as it requires some refactoring.
 >
-> Both the power control platform device *AND* the associated PCI device
-> reuse the same OF node and have access to the same properties. The goal
-> of the platform driver is to request and bring up any required resources
-> and let the pwrctl framework know that it's now OK to rescan the bus and
-> detect the devices. When the device is bound, we are notified about it
-> by the PCI bus notifier event and can establish a device link between the
-> power control device and the PCI device so that any future extension for
-> power-management will already be able to work with the correct hierachy.
+> The detaild logs are described in here:
+> https://lore.kernel.org/lkml/CAJNyHpKpDdps4=3DQHZ77zu4jfY-NNBcGUrw6UwjuBK=
+fpuSuE__g@mail.gmail.com/
 >
-> The reusing of the OF node is the reason for the small changes to the PCI
-> OF core: as the bootloader can possibly leave the relevant regulators on
-> before booting linux, the PCI device can be detected before its platform
-> abstraction is probed. In this case, we find that device first and mark
-> its OF node as reused. The pwrctl framework handles the opposite case
-> (when the PCI device is detected only after the platform driver
-> successfully enabled it).
+> Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
+> ---
+>  net/bluetooth/l2cap_core.c | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
 >
-> Patches 15/18-16/18:
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 60298975d..c5fa2b683 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -4339,6 +4339,14 @@ static int l2cap_connect_create_rsp(struct l2cap_c=
+onn *conn,
 >
-> These add a relatively simple power sequencing subsystem and the first
-> driver using it: the pwrseq module for the QCA6390 PMU.
+>         l2cap_chan_lock(chan);
 >
-> For the record: Bjorn suggested a different solution: a regulator driver
-> that would - based on which regulators are enabled by a consumer - enable
-> relevant resources (drive the enable GPIOs) while respecting the
-> HW-specific delays. This would however require significant and yet
-> unprecised changed to the regulator subsystem as well as be an abuse of
-> the regulator provider API akin to using the reset framework for power
-> sequencing as proposed before.
+> +       switch (chan->state) {
+> +       case BT_CLOSED:
+> +       case BT_DISCONN:
+> +               l2cap_chan_unlock(chan);
+> +               l2cap_chan_put(chan);
+> +               goto unlock;
+> +       }
+> +
+>         switch (result) {
+>         case L2CAP_CR_SUCCESS:
+>                 if (__l2cap_get_chan_by_dcid(conn, dcid)) {
+> @@ -4552,6 +4560,14 @@ static inline int l2cap_config_rsp(struct l2cap_co=
+nn *conn,
+>         if (!chan)
+>                 return 0;
 >
-> Instead I'm proposing to add a subsystem that allows different devices to
-> use a shared power sequence split into consumer-specific as well as
-> common "units".
->
-> A power sequence provider driver registers a set of units with pwrseq
-> core. Each unit can be enabled and disabled and contains an optional list
-> of other units which must be enabled before it itself can be. A unit
-> represents a discreet chunk of the power sequence.
->
-> It also registers a list of targets: a target is an abstraction wrapping
-> a unit which allows consumers to tell pwrseq which unit they want to
-> reach. Real-life example is the driver we're adding here: there's a set
-> of common regulators, two PCIe-specific ones and two enable GPIOs: one
-> for Bluetooth and one for WLAN.
->
-> The Bluetooth driver requests a descriptor to the power sequencer and
-> names the target it wants to reach:
->
->     pwrseq = devm_pwrseq_get(dev, "bluetooth");
-
-Is this target tied to the device or not? If not, this might become a
-limitation, if somebody installs two WiFi/BT modules to a single
-device.
-
-> The pwrseq core then knows that when the driver calls:
->
->     pwrseq_power_on(pwrseq);
->
-> It must enable the "bluetooth-enable" unit but it depends on the
-> "regulators-common" unit so this one is enabled first. The provider
-> driver is also in charge of assuring an appropriate delay between
-> enabling the BT and WLAN enable GPIOs. The WLAN-specific resources are
-> handled by the "wlan-enable" unit and so are not enabled until the WLAN
-> driver requests the "wlan" target to be powered on.
->
-> Another thing worth discussing is the way we associate the consumer with
-> the relevant power sequencer. DT maintainers have expressed a discontent
-> with the existing mmc pwrseq bindings and have NAKed an earlier
-> initiative to introduce global pwrseq bindings to the kernel[1].
->
-> In this approach, we model the existing regulators and GPIOs in DT but
-> the pwrseq subsystem requires each provider to provide a .match()
-> callback. Whenever a consumer requests a power sequencer handle, we
-> iterate over the list of pwrseq drivers and call .match() for each. It's
-> up to the driver to verify in a platform-specific way whether it deals
-> with its consumer and let the core pwrseq code know.
-
-This looks really nice, it will allow us to migrate the BT driver to
-always use pwrseq instead of regulators without touching the DT.
-
->
-> The advantage of this over reusing the regulator or reset subsystem is
-> that it's more generalized and can handle resources of all kinds as well
-> as deal with any kind of power-on sequences: for instance, Qualcomm has
-> a PCI switch they want a driver for but this switch requires enabling
-> some resources first (PCI pwrctl) and then configuring the device over
-> I2C (which can be handled by the pwrseq provider).
->
-> Patch 17/18:
->
-> This patch makes the Qualcomm Bluetooth driver get and use the power
-> sequencer for QCA6390.
->
-> Patch 18/18:
->
-> While tiny, this patch is possibly the highlight of the entire series.
-> It uses the two abstraction layers we introduced before to create an
-> elegant power sequencing PCI power control driver and supports the ath11k
-> module on QCA6390.
->
-> With this series we can now enable BT and WLAN on several new Qualcomm
-> boards upstream.
->
-> I tested the series on RB5 while Neil tested it on sm8650-qrd and
-> sm8550-qrd.
->
-> Best Regards,
-> Bartosz Golaszewski
->
-> It's hard to list the changes between versions here as the scope changed
-> significantly between each iteration and some versions were not even full
-> series but rather RFCs for parts of the solution. For this reason, I'll
-> only start listing changes starting from v6.
->
-> [*] This is what the docs say. In practice it seems that this delay can be
-> ignored. However the subsequent model - QCA6490 - *does* require users to
-> respect it, so the problem remains valid.
->
-> [1] https://lore.kernel.org/netdev/20210829131305.534417-1-dmitry.baryshkov@linaro.org/
->
-> Bartosz Golaszewski (15):
->   arm64: defconfig: enable ath12k as a module
->   dt-bindings: regulator: describe the PMU module of the QCA6390 package
->   dt-bindings: net: bluetooth: qualcomm: describe regulators for QCA6390
->   dt-bindings: new: wireless: qcom,ath11k: describe the ath11k on
->     QCA6390
->   dt-bindings: new: wireless: describe the ath12k PCI module
->   arm64: dts: qcom: qrb5165-rb5: model the PMU of the QCA6391
->   PCI: hold the rescan mutex when scanning for the first time
->   PCI/pwrctl: reuse the OF node for power controlled devices
->   PCI/pwrctl: create platform devices for child OF nodes of the port
->     node
->   PCI/pwrctl: add PCI power control core code
->   PCI/pwrctl: add a power control driver for WCN7850
->   power: sequencing: implement the pwrseq core
->   power: pwrseq: add a driver for the QCA6390 PMU module
->   Bluetooth: qca: use the power sequencer for QCA6390
->   PCI/pwrctl: add a PCI power control driver for power sequenced devices
->
-> Jonathan Cameron (1):
->   of: Add cleanup.h based auto release via __free(device_node) markings.
->
-> Neil Armstrong (2):
->   arm64: dts: qcom: sm8550-qrd: add the Wifi node
->   arm64: dts: qcom: sm8650-qrd: add the Wifi node
->
->  .../net/bluetooth/qualcomm-bluetooth.yaml     |   17 +
->  .../net/wireless/qcom,ath11k-pci.yaml         |   28 +
->  .../net/wireless/qcom,ath12k-pci.yaml         |  103 ++
->  .../bindings/regulator/qcom,qca6390-pmu.yaml  |  166 +++
->  MAINTAINERS                                   |    8 +
->  arch/arm64/boot/dts/qcom/qrb5165-rb5.dts      |  123 +-
->  arch/arm64/boot/dts/qcom/sm8250.dtsi          |   10 +
->  arch/arm64/boot/dts/qcom/sm8550-qrd.dts       |   37 +
->  arch/arm64/boot/dts/qcom/sm8550.dtsi          |   10 +
->  arch/arm64/boot/dts/qcom/sm8650-qrd.dts       |   29 +
->  arch/arm64/boot/dts/qcom/sm8650.dtsi          |   10 +
->  arch/arm64/configs/defconfig                  |    1 +
->  drivers/bluetooth/hci_qca.c                   |   31 +
->  drivers/pci/Kconfig                           |    1 +
->  drivers/pci/Makefile                          |    1 +
->  drivers/pci/bus.c                             |    9 +-
->  drivers/pci/of.c                              |   14 +-
->  drivers/pci/probe.c                           |    2 +
->  drivers/pci/pwrctl/Kconfig                    |   25 +
->  drivers/pci/pwrctl/Makefile                   |    7 +
->  drivers/pci/pwrctl/core.c                     |  136 +++
->  drivers/pci/pwrctl/pci-pwrctl-pwrseq.c        |   84 ++
->  drivers/pci/pwrctl/pci-pwrctl-wcn7850.c       |  202 ++++
->  drivers/pci/remove.c                          |    2 +
->  drivers/power/Kconfig                         |    1 +
->  drivers/power/Makefile                        |    1 +
->  drivers/power/sequencing/Kconfig              |   28 +
->  drivers/power/sequencing/Makefile             |    6 +
->  drivers/power/sequencing/core.c               | 1065 +++++++++++++++++
->  drivers/power/sequencing/pwrseq-qca6390.c     |  353 ++++++
->  include/linux/of.h                            |    2 +
->  include/linux/pci-pwrctl.h                    |   51 +
->  include/linux/pwrseq/consumer.h               |   56 +
->  include/linux/pwrseq/provider.h               |   75 ++
->  34 files changed, 2678 insertions(+), 16 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/net/wireless/qcom,ath12k-pci.yaml
->  create mode 100644 Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml
->  create mode 100644 drivers/pci/pwrctl/Kconfig
->  create mode 100644 drivers/pci/pwrctl/Makefile
->  create mode 100644 drivers/pci/pwrctl/core.c
->  create mode 100644 drivers/pci/pwrctl/pci-pwrctl-pwrseq.c
->  create mode 100644 drivers/pci/pwrctl/pci-pwrctl-wcn7850.c
->  create mode 100644 drivers/power/sequencing/Kconfig
->  create mode 100644 drivers/power/sequencing/Makefile
->  create mode 100644 drivers/power/sequencing/core.c
->  create mode 100644 drivers/power/sequencing/pwrseq-qca6390.c
->  create mode 100644 include/linux/pci-pwrctl.h
->  create mode 100644 include/linux/pwrseq/consumer.h
->  create mode 100644 include/linux/pwrseq/provider.h
->
+> +       switch (chan->state) {
+> +       case BT_CLOSED:
+> +       case BT_CONNECT:
+> +       case BT_CONNECT2:
+> +       case BT_DISCONN:
+> +               goto done;
+> +       }
+> +
+>         switch (result) {
+>         case L2CAP_CONF_SUCCESS:
+>                 l2cap_conf_rfc_get(chan, rsp->data, len);
 > --
-> 2.40.1
+> 2.25.1
 >
-
-
--- 
-With best wishes
-Dmitry
