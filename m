@@ -1,138 +1,126 @@
-Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC6F23172D
-	for <linux-bluetooth@vger.kernel.org>; Mon, 19 Feb 2024 12:54:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AE7E36134
+	for <linux-bluetooth@vger.kernel.org>; Mon, 19 Feb 2024 13:52:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708347252; cv=none; b=rSs7TRf66l5fG/7G8XHWiMfnJQnn5lFZ8b512ATqKviV/KumIspDCzbIm9eYLK2txW+2jLJCrlxlfumQylQTaI2Tf0Te55zsajy3cEJJFuDrw5TURpZ5UwdssH46V3nWvU/2aWk40QWbrXFcAJR3LnW/qp1ce+EOaKKMG4y3nn4=
+	t=1708350761; cv=none; b=NAM4u/Qe/XOtos1ksxLGAsH678z8K4fPQCZfZHm2oGXZ1Jj9i5htHiVkEu39szU8fJhHTUgCaVc0yTQ9CTSNB/ARKhyQaj3eYcmg3lp4vJZ94mW5V4xwXo6ChNsQWdcWQfPyYR5hXVvqcuqwtaukjnkc5XN0sA92KaN7TmSoitE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708347252; c=relaxed/simple;
-	bh=sVsdNaxDrQaT+5xLkuNNBvQ4+mZpUehI+ER8LAoDUdY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=alusAnPDTlJpp7GMyBWcVNgusmfsnMKREs5VlC32mpceP+5eqUF+MKX0k09i9fvzsBiJ/K3hFGOguQ70SBRkbkSx+SrkPjxhNpU6dmKwyfAcKiDbnE4hIaH0fQhgvrEeNF1NnQ/jodJC0WoWKCXZylIL8bdk+12mZE9xy+w0CgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=udQ3cv9J; arc=none smtp.client-ip=209.85.222.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+	s=arc-20240116; t=1708350761; c=relaxed/simple;
+	bh=aZyFRl27DBvUoVYtZmIOuyZWsq+tn9n58jGmkjMJGsY=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=qT6lJlw+lR4xYBQyvvLG3bvsEml6h98GKOqrYAXO8sjXWH4tYk2QstW6RFWiR72e/xRavUERA9InIxF0x/fLF9vWCwv/FRq9tVxR8sctnX0QwcN+BIDVUlOpNPvQaZMAB7m/tvkg2P5YXGkd3seIj2tk4QssKWv95XnZ36GvkTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e9GS6NXJ; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="udQ3cv9J"
-Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-7d5cbc4a585so840457241.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Feb 2024 04:54:09 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e9GS6NXJ"
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-42c705e8e4bso30157901cf.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Feb 2024 05:52:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1708347249; x=1708952049; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sVsdNaxDrQaT+5xLkuNNBvQ4+mZpUehI+ER8LAoDUdY=;
-        b=udQ3cv9JtqKeraoYuLqdfWfwCCI8IqdYdtHNz3famgOyfzEASJbnUbi9Ip4iBFsEfQ
-         Kl8HsjfC+7SkcF9V5ISgTbGDqgyoHJRrjgR0/PfVtTCIysmhpDAH+oe378A755J6JlXM
-         1r94W6myxOuaOuRiIVphSmifjG0c6dN6Ppy0iQ1WbUj5I9pPZilN2tTRygjbg9MKHk3d
-         pnM2uYsVw244oGzm9Y/8g4n35ljis+R+dRxgOYJIEg4XNhXjTDndDIcQhpEsUBMx+Bzb
-         /xqB9GlsDT2n1v4h5B+LoZr03fuAttuy4C4vf+rBZrpUOCRTZoFDTdRI05jcpekZ90R1
-         U54A==
+        d=gmail.com; s=20230601; t=1708350758; x=1708955558; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=I4daIq7nPVT/7Bo1IPgQZKDs1l2jzL5ew74Scg3vd+s=;
+        b=e9GS6NXJQNSW7sSBuXoOIMxkO9ma7tUwGX6LEAaIw5fiyQwno8tahyq4DhMFX8K8d3
+         oDM1ecWglfKJDmF0Rrgs80Y7pi5D3GVOU3gCYZXoVamu0O5V/cGkec7WzvJP1MB0g50N
+         9ZzyR83BwmFqU8gB6i/ovuafjupOF9o7xUOp3uJJV1YZoAOx8w1p+jcN5K9l4HmUh6pi
+         0Jsj+h5N8N64gbunamMtcaVpMVMeTSLb82rL17UN9zbTmVTkly/HZX/+dCmCH6wkoV8p
+         gmVq10P9CHj+90DB05AL2sT6z/1Zw/QOQgjn6PA3LtqbHmswqO38koYT74ls643x4SZy
+         D9iQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708347249; x=1708952049;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sVsdNaxDrQaT+5xLkuNNBvQ4+mZpUehI+ER8LAoDUdY=;
-        b=Y6+BBwMvKyIwVwv8IE5GAasvp0vuF6Ecj23sR/8sjHfzKbrY/iFrd/CREMzszfPffW
-         fZ5CwTUWXNzcK0380ZJsmSlb1pibaQH7BRldAHNSMuwRMnUDWPkV/a9PNyrwsGKZKBpf
-         hsle6vxEaFTTh59S6sfsGT4mWdPwv5ljsqYnWdYqOobigYj3BJ4W8kzrEPvyi2HMDaqb
-         MAFyPYmhipxzwMNEJkKWvjQ5Br/drEvjDKb4P/tHCcVJY9OvW/7oDdLHItMbQpAU7saC
-         6dgPdFOVQ4JA2bzZB8BufgqIp11n/XUetgOMuA45unZPmYzVp/qhWkkYbyravCYDCrVd
-         V/LQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX+YUkKav2IygL65SBYLoqqihQxLbZMAhB+pRWHvfBY+CUT9p/Gnx6KtjzfcIl/oHKGmKP1447Hp/LFq3tqTpC9GNI62N2vuP4BiqHlJMbG
-X-Gm-Message-State: AOJu0YxJSZrL9+F90Z2h4kH/sOCPS4Mo2wXVLpfjGf3RQM+sPdvsdsH8
-	+OZeKI7WVy/pHJwkfZ1INCbk6DNRNUtFG7tpbPo0XZNMNr1mEFkpN3U6VG78N58b+iPhZCNyO8v
-	tJ1/82TXw9RwFWm8vPC9+UU3zI3rQk2RtuE8h+A==
-X-Google-Smtp-Source: AGHT+IHxyvxbs8UNV+RvesaBK90xtZZfu2Xu6HFPB14T7Tm6G1AVsPn3zgxyvNAFZBNi1d1T6kkfRUxMA6fnOOW6aBY=
-X-Received: by 2002:a67:c902:0:b0:46d:2b65:aa16 with SMTP id
- w2-20020a67c902000000b0046d2b65aa16mr6787860vsk.34.1708347248824; Mon, 19 Feb
- 2024 04:54:08 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708350758; x=1708955558;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=I4daIq7nPVT/7Bo1IPgQZKDs1l2jzL5ew74Scg3vd+s=;
+        b=bljS6vggyZycQbZpdPWxquDHRW/Y0Ugio5DNXTilVMD0bc1a3zJe4+rgbpxbZAtdHM
+         UEW4fUFkniZZersTIWI+iZz6dVo5sxtEIY82Go5NE+0CWvBrCI5R9FCc9Ka2tU1YyN6+
+         RSEcpzyQ3cdg/dLngEomGLETcouvNM/zbiwpKXGwjuLIx+tWqQKST13rOiTCG+hOMFR4
+         MxYppQm9dhZ34r/TQ59bzs5fowm2IvsfMa3kWxDXvqmYHl1coYCQ9U01n3bJeQPsYwjQ
+         TWa5vkcZapz0j3pbz8X8MRLvAm7ArdbPGhqfzAH2T9LvLbX2FNwiu0Mg/okEXRRXWL9s
+         h45w==
+X-Gm-Message-State: AOJu0Yxlc/5+zZXeczaqkYAt4SQqi+gpiXkQ6iaxTEvzfyG22ssw09b1
+	7p4l4/IO7Pj6xuaUjkCF7X+3v42hkMujuN14gQD8VCJ3VnmAUt0LlenhtnawHFE=
+X-Google-Smtp-Source: AGHT+IFVZ1cs6yzi3i3D8Y+q5hGBGX0WOnBX3api1WetPYPXLuuuJbvs1D9/+POgxmfUz2+DUpOjTw==
+X-Received: by 2002:ad4:5cce:0:b0:68f:7127:a2d7 with SMTP id iu14-20020ad45cce000000b0068f7127a2d7mr3247357qvb.43.1708350758317;
+        Mon, 19 Feb 2024 05:52:38 -0800 (PST)
+Received: from [172.17.0.2] ([172.183.148.24])
+        by smtp.gmail.com with ESMTPSA id mk9-20020a056214580900b0068f760929c0sm749535qvb.71.2024.02.19.05.52.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Feb 2024 05:52:37 -0800 (PST)
+Message-ID: <65d35d25.050a0220.1b85b.1b57@mx.google.com>
+Date: Mon, 19 Feb 2024 05:52:37 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5238182350620082273=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240216203215.40870-1-brgl@bgdev.pl> <20240216203215.40870-4-brgl@bgdev.pl>
- <ZdDVNbjv60G9YUNy@finisterre.sirena.org.uk> <CAMRc=Mf9Sro4kM_Jn8_v=cyO5PxCp6AnBdeS9XspqVDGKdA_Dg@mail.gmail.com>
- <7c1327c0-d0ea-4797-a5fa-5844ba46bf53@linaro.org>
-In-Reply-To: <7c1327c0-d0ea-4797-a5fa-5844ba46bf53@linaro.org>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Mon, 19 Feb 2024 13:53:57 +0100
-Message-ID: <CAMRc=Me=3HhGc_yZuaEo1TsLbF2R=g+072185_PAh5GmAQ-M7w@mail.gmail.com>
-Subject: Re: [PATCH v5 03/18] dt-bindings: regulator: describe the PMU module
- of the QCA6390 package
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Mark Brown <broonie@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Kalle Valo <kvalo@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
-	Liam Girdwood <lgirdwood@gmail.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Saravana Kannan <saravanak@google.com>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Arnd Bergmann <arnd@arndb.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Alex Elder <elder@linaro.org>, 
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
-	Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, 
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-pci@vger.kernel.org, linux-pm@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, andrei.istodorescu@nxp.com
+Subject: RE: Update Sink BASE management
+In-Reply-To: <20240219121509.5702-2-andrei.istodorescu@nxp.com>
+References: <20240219121509.5702-2-andrei.istodorescu@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Mon, Feb 19, 2024 at 8:32=E2=80=AFAM Krzysztof Kozlowski
-<krzysztof.kozlowski@linaro.org> wrote:
->
-> On 17/02/2024 19:32, Bartosz Golaszewski wrote:
-> > On Sat, Feb 17, 2024 at 4:48=E2=80=AFPM Mark Brown <broonie@kernel.org>=
- wrote:
-> >>
-> >> On Fri, Feb 16, 2024 at 09:32:00PM +0100, Bartosz Golaszewski wrote:
-> >>> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> >>>
-> >>> The QCA6390 package contains discreet modules for WLAN and Bluetooth.=
- They
-> >>> are powered by the Power Management Unit (PMU) that takes inputs from=
- the
-> >>> host and provides LDO outputs. This document describes this module.
-> >>
-> >> Please submit patches using subject lines reflecting the style for the
-> >> subsystem, this makes it easier for people to identify relevant patche=
-s.
-> >> Look at what existing commits in the area you're changing are doing an=
-d
-> >> make sure your subject lines visually resemble what they're doing.
-> >> There's no need to resubmit to fix this alone.
-> >
-> > Mark,
-> >
-> > This is quite vague, could you elaborate? I have no idea what is wrong
-> > with this patch.
->
-> Use subject prefixes matching the subsystem. You can get them for
-> example with `git log --oneline -- DIRECTORY_OR_FILE` on the directory
-> your patch is touching.
->
-> Best regards,
-> Krzysztof
->
+--===============5238182350620082273==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Yes, I always do. And for Documentation/devicetree/bindings/regulator/
-the subjects are split 50:50 between "dt-bindings: regulator: ..." and
-"regulator: dt-bindings: ...". For Documentation/devicetree/bindings/
-it's overwhelmingly "dt-bindings: <subsystem>: ...". It's the first
-time someone wants me to send a DT bindings patch without
-"dt-bindings" coming first in the subject.
+This is automated email and please do not reply to this email!
 
-I mean: I can do it alright but it's not stated anywhere explicitly.
+Dear submitter,
 
-Bartosz
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=827440
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      2.43 seconds
+GitLint                       PASS      1.22 seconds
+BuildEll                      PASS      24.04 seconds
+BluezMake                     PASS      737.33 seconds
+MakeCheck                     PASS      11.93 seconds
+MakeDistcheck                 PASS      163.85 seconds
+CheckValgrind                 PASS      227.56 seconds
+CheckSmatch                   PASS      332.33 seconds
+bluezmakeextell               PASS      107.79 seconds
+IncrementalBuild              PASS      2747.63 seconds
+ScanBuild                     WARNING   953.47 seconds
+
+Details
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+src/shared/bap.c:1117:2: warning: Use of memory after it is freed
+        DBG(bap, "stream %p", stream);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/bap.c:40:2: note: expanded from macro 'DBG'
+        bap_debug(_bap, "%s:%s() " fmt, __FILE__, __func__, ## arg)
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/bap.c:1130:2: warning: Use of memory after it is freed
+        DBG(stream->bap, "stream %p", stream);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/bap.c:40:2: note: expanded from macro 'DBG'
+        bap_debug(_bap, "%s:%s() " fmt, __FILE__, __func__, ## arg)
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/bap.c:1225:33: warning: Use of memory after it is freed
+        for (entry = queue_get_entries(bap->state_cbs); entry;
+                                       ^~~~~~~~~~~~~~
+3 warnings generated.
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============5238182350620082273==--
