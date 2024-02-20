@@ -1,280 +1,330 @@
-Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com [209.85.221.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2050.outbound.protection.outlook.com [40.107.104.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09B0327447
-	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Feb 2024 16:31:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708446707; cv=none; b=Z94JKRA9htX8B2mM6vy2lCOJYrHKtKQVAGteJtGB1FfVvJo+82ulPSw2bC0ZoWIdTVZvfjGaA+gelaoxNgsa8foVd9B15B5C/cGVwQdJiL0yT0Cf0rBKIbvrqHxajMhLxKX8/YnaHUetttfYQZyIu+hswgFDKRZPzjr4HjZdHQw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708446707; c=relaxed/simple;
-	bh=jnCg1kAkNfZbgwhiD3cdPywllmq/5lrE2tL6NuAnT58=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=ilG6Km/TxXEVa/+llVJ8FG8lQCiD3If0B635hA5oCxVEfknWWuS7bJwlUOWip5sdnUA64bXF6Q4WimPtul5k+VFHR2MsZKHEQ4nA1zYb44tJbXuD0EcMj6OI7OxnkBBlpsOt+09Jw2P0RuPQDxTGfVzob5HCMMzf0CUPKuRv/Vs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FHYzEe8w; arc=none smtp.client-ip=209.85.221.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 093EE1E48F
+	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Feb 2024 16:35:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.104.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708446945; cv=fail; b=MI//kH+TtUF3HVuwJJ9roSKOrX1mv063Gez6vcoZjVX6+xvp1GjllEpUiY8Q3Rg+K8L7OLtkpnAUI/KPewIZvK3RmNgYq/lBvO1R/08vRNyY8lFw9WatgEyzl+C5r1kQN/Xs1jmhqzFbZfwroF3koNlytXJdf1oR9h/XF6gzUUc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708446945; c=relaxed/simple;
+	bh=pHtphUKhakUBwl7tMbgGt8xZ9rzdOMi4KKYcABf2qtk=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=Jt9F3OIC+fuEo2k448VhWV8PfKJHnMY0yQFWGxyzxbHYAlqerp5QRaXXbtO/9LRVzvsnJXBMlH9fz+fmiqebgFrVkrq38NawO+B5T/Ux/Q43W9ud4PwXSBUi/yCBpwnxny6woZVVvB6KyfQE0WanStALJHgf3/QFkmwDNcmE1Hg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=MbhhcJvk; arc=fail smtp.client-ip=40.107.104.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FHYzEe8w"
-Received: by mail-vk1-f174.google.com with SMTP id 71dfb90a1353d-4c857f1c18cso559388e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Feb 2024 08:31:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708446704; x=1709051504; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=OBjtOfYlMDEoFd1pIB8iTjT0LlWK/V0yia49T1AmMKY=;
-        b=FHYzEe8waPCNeM/ecBf0p22X1kh6ricZlvxby5HSP11W7EhK0vSb45sR+7XDY6r9q4
-         Ii5OhswQydQhkSpIGScW6DgkWyfu4szw65dOZFQaieQ+GAlrtexyYBUMofl8Q+YBQqhf
-         ujpj8blmKZO6eAfmV/xNijZeRiDakVcpOhFaPO/oNt+8YfD1edMXpXoBzj9UU4hDy77d
-         DY1AuZEWGUvmLw27kVFb4VUxQu24bbKNrYh7DNjx3QAG3N2OUb5rTM3lKdhvxcGp4zk1
-         RRoFEH03dU5GqUsBOkWUdBefhh/IzOlPyi/DyyEQNWGDtfEfu8GtCRkhq0FjRtjfNOpl
-         A8xw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708446704; x=1709051504;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OBjtOfYlMDEoFd1pIB8iTjT0LlWK/V0yia49T1AmMKY=;
-        b=Zp1K4he4+Hi4HjkbEz6vMSUhlTTA2dQV2rPuczBByDEPwjLxdSkKOeoaOaKe5fR2kB
-         JK9hQpv8MBjJFlsQv16CbKpvrrJwAukEcWN51veWmFnybPug0+RXuhWjyUj4hzFmw33f
-         c76+SGUK5UcsysfOdRuGsqZ8tHdt0p63us/bEcBsoh0upKicbwCrvPt/ho4S2oDhlc59
-         k8RQyOjafbj7z50J51hRbyvS+kswjC8/7xzYdXmPxxq051+IwtnfowCEaOSrGz7hh1/d
-         EGz7PI+6PUQccRCRWzqvtjtlji4N/R1Y8vKwHEXiVcrgD6OobsJtatSqiqXsOIarucra
-         H4bg==
-X-Gm-Message-State: AOJu0Yy+dDLe1zPgcPW3yi5gKZjiHm2paKxSfvjUN/OYwQmEB4b4VlLj
-	4eHXSWJGrcS2QfXeIJQEmVDZzlbz9cQK0kYFA7SBJtJU8qAZJPz/1s6Tc8+7
-X-Google-Smtp-Source: AGHT+IF3kLeKX2DicUrDkxGfaYW3R7SS1Lc8lyg9gzEsixv03Vee/NH5v+F+URpNRT9bIw0JOcvXeA==
-X-Received: by 2002:a1f:cc86:0:b0:4c0:e29:c438 with SMTP id c128-20020a1fcc86000000b004c00e29c438mr13174054vkg.8.1708446704145;
-        Tue, 20 Feb 2024 08:31:44 -0800 (PST)
-Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
-        by smtp.gmail.com with ESMTPSA id l75-20020a1ffe4e000000b004c9793bed42sm987788vki.37.2024.02.20.08.31.42
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Feb 2024 08:31:43 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="MbhhcJvk"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NlKT/J6oxWDIvHRICMj95fR9JkMTHKoty3clG8SnEI+3PnSFbp0+TH/JjGbbfKtACeZk1vY6eRA8Xn44CrpLnBpMd81VHBfrEkV2hMPDurfGLc1CQ07ZTsHzQ3+pKcQDJd7UG3obxIOH7ddlX/PMDqY7pwamdmvXT8cXiEb94okrqWFT4eypNvJrHLJr8rqJwkihq15ITkxMYYdS6uYGePkov1z4CCDcdzn/87mwdm3VBBb8TaySx6SoPNWQFzCml4EqHdlunJNyIFFfa3QploYfXS0cMF1cYVjlgjVCo+9FK/Q7e7CTBl7EO0K5NWxpTcHvzoLObuWtNj5TEjTheg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/gufB6O3w1wBLSZiYUfbhS5gbHtU4j4VXQ2nu0h6iZU=;
+ b=ErFUxPP8Lh78kOqKLzGnfhS9PLv7CMVyy7H0Kwn4aZUdQA35XDTSLn0frnNGhyFfrsZ9qDPv9m3FVC4ITzS8oNDaEv/ZVcEIiU8yNTIMg9T7s84SIdbtxEJkX6FCr7vI8vLthlJ2S7+YVfJcJB9/H5Q9zcPgJyOgS2hIfTcx6sp5cbdpAAO53BkfTJLFDG7/NhXLqN4EXjyB1kWLgIACyYL/T4de98b6sL0E/xXQ+ptW97hQK8q3LAIQrvVbJydD/qIKYf1dLB7Mwg60OGC66zsLmNcuiq/DAsTpAEKUx0RbozcR4BY8n1DebYM3cj081/3XjcmudY6w6DyUlANsfw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/gufB6O3w1wBLSZiYUfbhS5gbHtU4j4VXQ2nu0h6iZU=;
+ b=MbhhcJvkYCsZsiRs4VZR/CCpLF2JSbz688Wt29S1EJPnPMNeOEjtVHzApUyS/UWxfatG7x1aWI4g2thU0JjwFiOVU7BP9dI2dNTxuCtWOxoSq96lpQYXfFrh/cp+utwOpudCacY95C1FgFDXEzwRcBr+gR+MPKsiY3hn6KJuNog=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
+ by AS4PR04MB9433.eurprd04.prod.outlook.com (2603:10a6:20b:4e9::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.38; Tue, 20 Feb
+ 2024 16:35:40 +0000
+Received: from AS8PR04MB8898.eurprd04.prod.outlook.com
+ ([fe80::40f:c80d:7049:8213]) by AS8PR04MB8898.eurprd04.prod.outlook.com
+ ([fe80::40f:c80d:7049:8213%5]) with mapi id 15.20.7292.029; Tue, 20 Feb 2024
+ 16:35:40 +0000
+From: Iulia Tanasescu <iulia.tanasescu@nxp.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: hci_sync: Fix overwriting request callback
-Date: Tue, 20 Feb 2024 11:31:41 -0500
-Message-ID: <20240220163141.354936-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.43.0
+Cc: claudia.rosu@nxp.com,
+	mihai-octavian.urzica@nxp.com,
+	silviu.barbulescu@nxp.com,
+	vlad.pruteanu@nxp.com,
+	andrei.istodorescu@nxp.com,
+	luiz.dentz@gmail.com,
+	Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Subject: [RFC] Bluetooth: ISO: Reassemble fragmented BASE
+Date: Tue, 20 Feb 2024 18:35:31 +0200
+Message-Id: <20240220163531.2900-1-iulia.tanasescu@nxp.com>
+X-Mailer: git-send-email 2.39.2
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: MI1P293CA0002.ITAP293.PROD.OUTLOOK.COM (2603:10a6:290:2::9)
+ To AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|AS4PR04MB9433:EE_
+X-MS-Office365-Filtering-Correlation-Id: e7255bc9-81f7-467a-6deb-08dc3231f983
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	RYOi1YNQjyrDhmoAouF94uF5+sgHe6zNL0YkRgVSPZWNSoUtA0Uhs0O6D2okeU4RJm9k3rKa2L0pSR49KtGccv0VBBsD5Lid61e6XkN/xNkABNeHoLo3c+BGXTtkeECrVOuN8U0d8CpjBzKr7YuGNuFFTR6+oPYhxbZifIX/W/dwYgqrcsG7MRy5U9cs0at81WUgbVMTJPZECjOQXikGPsaPJ5OP4+yC4ZMu07ZWghMETXRfghEHh3/1Xt24WmoyTxJwLnRX4Lw7I+BIhLAtKq8yTNwuqs7EruAT6ftn+sUw+tweunO/ADlxTwDcA3YQx4T/PWwmCqCljFzw4urLk4lI+eAFVdNseIeXvx9NiXsYvKC4l0fsLx+0KyALq2S60FkNut4zP0nKLZ9ydwPLTxviKW1xwOoAA7Tf5xlqlLgm2cxu9Jl+1RuZqpFLATR2+nBK9y43Y7Q/jDY6NK0RWYTE/KUPOWMff5g/MjqACj6tYL2bJMl/vjCulYzrHpiz3GQ/HEtMPf3jz4mq5UJTHfSWiEvDzYsHDsfPJ8kItws=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?VVEoIhTU5oV89yQ31QHBOw2/bf6+EiCCSojmusYxvCBAaQRl1km5xBhePzk3?=
+ =?us-ascii?Q?DGLPAF+9zdszT7/n+CoFs7nye3VA8iEsDIR+Kb8zoG+rNirQPI27x+QJZCBX?=
+ =?us-ascii?Q?f/elqefkpw81DcqWS6V0t/DZX0CKW8zp3G/wIheGv0hMxD+svcNi/tLsyWJd?=
+ =?us-ascii?Q?CjBEfRuW7lBW+IFtVaxkSo6X1fvLt65IBc7Teru3dlwtvoTUgHsAw0mzfbIy?=
+ =?us-ascii?Q?kbQkD1oXFF2prdCDDflf1ts+siKynaQbf8DB4mqRUKFRmujpSLE9+KO46PoX?=
+ =?us-ascii?Q?g9ORknq3jpqzO6gGIoi8GrXmGf6Bm9L0qqB1jvzlN/HBLmf7A74yF9MP3/i+?=
+ =?us-ascii?Q?fY1HNv0CcOOdm8+p/jEziGzB0BdV1BZoDJtMfgXIbFq1pxJm+/WuDHqEPOST?=
+ =?us-ascii?Q?jtCMnuqm+qKoLLutVYRk28w9dX0Fe7kdYZVRGSeoHh2qW704CNIGxdL8HDBG?=
+ =?us-ascii?Q?+6O97a1wBBA5NSOpgOaDthELYEb9dxdQ4yfU0CCWe4bd44yZ1WmpiQKe0Mmv?=
+ =?us-ascii?Q?zVvzJrbHEwg+2VPP5uC0T319VltoaNKbgcbuAY58D7EGqtZ45GXAsTJpv3g1?=
+ =?us-ascii?Q?9u1z3ee22Fzu0451+IWfh+hrcOB+yk/rtuS+srxDAx+C1AjSH0/QgrM8GFSo?=
+ =?us-ascii?Q?wQ5XORuuN1Kou9hoiZV8Hl1grJqhVmS8jJM4F9XMYpyF6mJGjq7NH2qQPH3B?=
+ =?us-ascii?Q?2VnD2yQ9rZTSvMqUSzCoPualgltAZzL0BiYvRKjQbkp6t3FFlDTHocXGOBeg?=
+ =?us-ascii?Q?05I/lM+7AzptbB6bjQNwskyQNgrkDFRyC3gFIuBYpJnplQlfjEUzALHkBsVL?=
+ =?us-ascii?Q?2A66uQYJeBmB61I2jcZWDpZnT+lXq0HEyb7QcMi7OXpc63enNkOU2OdFxjGO?=
+ =?us-ascii?Q?DhVQxyfk+ppUdbc4em9vv9DARRcQFAT5t+odHit1bVuw14c0KCNnnYu515O1?=
+ =?us-ascii?Q?mmg4LewJ4TTVcuoHbI5th+AFvEJQTDPl5x4wlqgEeicbs6yfjJgy8j4P47eA?=
+ =?us-ascii?Q?tt8CFEkbctS6G3QHWD+MvFcW/m/LBjsnPHnl3ynrUse5CpL7CqzJ9q51oi/f?=
+ =?us-ascii?Q?OyiOgjKUxc7kMCSQP1Y75KTUzqeWZohbiIpskdTGLV1ekWDjdDny9imBve7x?=
+ =?us-ascii?Q?hwj3PaJnOxfux5/E9KdCdtjJHYIJdiaJ263W4jgKohJoVuWNu3zk1GS+L2gV?=
+ =?us-ascii?Q?jy4SrXjB/ohwVWDSNg5Fc0j1JblXDO6xFbvNnH5YDQIzm7NaiJNqac3R3Lnq?=
+ =?us-ascii?Q?2UaImoY8oqPjRa216FzHltdQFfNzyNyCGB4l5Fg6LeVACsLJXMv1ke6FQJ/y?=
+ =?us-ascii?Q?Oy0v22Y+jd4Vd80xr1WwMpgn7kE5beFX2UGjI9W2WcKW2Z4YQ5IcrNvqnknI?=
+ =?us-ascii?Q?F12yaE7ObNp/IoYw5MVxiB9duWje5juPPMCUx9WhY+Bd8Q+O/vUxWCcgZPet?=
+ =?us-ascii?Q?J0pMxoM/qOrrcaAPpUOAGZy+8+ftpsy0bs5h9Lc0J3VnK8bc9Y6XToCJCu4E?=
+ =?us-ascii?Q?ZUqZENeTWPsADOItwcNGELpuBZoc0jUa757qOVdwRgXTDrEn4RYmdvwRYQ6q?=
+ =?us-ascii?Q?KRK6A+n/RdlgG0aQSJCPmRgch8g3NAoqxj2+oX2m?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e7255bc9-81f7-467a-6deb-08dc3231f983
+X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8898.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2024 16:35:40.1512
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: qP+VuWrvCSDbkMaGVWufp91gHuVauCeSQPIxesErSzAU5N+QJdn3vGXnQCDRUySRF+eg8CqhQVRlZcNh1EC7Ew==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS4PR04MB9433
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+For a Broadcast Sink, this adds support for reassembling fragmented PA
+data. This is needed if the BASE comes fragmented in multiple PA reports.
+After all PA fragments have been reassembled, the BASE can be retrieved
+by the user via getsockopt.
 
-In a few cases the stack may generate commands as responses to events
-which would happen to overwrite the sent_cmd, so this attempts to store
-the request in req_skb so even if sent_cmd is replaced with a new
-command the pending request will remain in stored in req_skb.
+PA fragments could be reassembled inside hci_event.c and a complete PA
+report could be indicated to iso.c, or like it is currently, if PA
+fragments are indicated separately, reassembly would need to be done in
+iso.c.
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+For a Broadcast Source, the user sets the BASE via setsockopt. The full
+PA data is built at bis bind, inside conn->le_per_adv_data. This array
+would be fit to hold the reassembled PA data on the Sink side as well,
+but a listening socket does not have an associated hcon...Currently for
+the Broadcast Sink, a hcon is created only after the first BIGInfo report,
+which arrives after the PA sync established event and all initial PA
+reports. The hcon is notified to iso.c, a child socket is created and it
+is notified to userspace, to mark the PA sync step as completed.
+
+I see 2 possibilities:
+
+1. Keep a pa_data array inside the iso sock struct, use it to reassemble
+PA fragments, and extract BASE from it when needed.
+
+2. Instead of creating the hcon after the first BIGInfo report, the hcon
+could be created when the PA sync established event is received. The
+le_per_adv_data can be used to reassemble the PA fragments, and the hcon
+will be notified to iso.c after the first BIGInfo report, when all
+information necessary to create and populate the child socket is
+available.
+
+In this patch I am showing the first idea, but I think the second one
+may provide a design more in line with the broadcast source scenario,
+when handling PA data and BASE.
+
+Are there any opinions about this?
+
+Signed-off-by: Iulia Tanasescu <iulia.tanasescu@nxp.com>
 ---
- net/bluetooth/hci_conn.c  |  2 +-
- net/bluetooth/hci_core.c  | 46 +++++++++++++++++++++++++++------------
- net/bluetooth/hci_event.c | 18 +++++++--------
- net/bluetooth/hci_sync.c  | 15 +++++++++++++
- 4 files changed, 57 insertions(+), 24 deletions(-)
+ include/net/bluetooth/hci.h |  7 +++-
+ net/bluetooth/iso.c         | 79 +++++++++++++++++++++++++++----------
+ 2 files changed, 64 insertions(+), 22 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 21e0b4064d05..1acc75a49bb0 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -2893,7 +2893,7 @@ int hci_abort_conn(struct hci_conn *conn, u8 reason)
- 	 * connection can be in BT_CONNECT at time.
- 	 */
- 	if (conn->state == BT_CONNECT && hdev->req_status == HCI_REQ_PEND) {
--		switch (hci_skb_event(hdev->sent_cmd)) {
-+		switch (hci_skb_event(hdev->req_skb)) {
- 		case HCI_EV_CONN_COMPLETE:
- 		case HCI_EV_LE_CONN_COMPLETE:
- 		case HCI_EV_LE_ENHANCED_CONN_COMPLETE:
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 34c8dca2069f..6ca4c0df9f9c 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1522,8 +1522,8 @@ static void hci_cmd_timeout(struct work_struct *work)
- 	struct hci_dev *hdev = container_of(work, struct hci_dev,
- 					    cmd_timer.work);
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 08cb5cb249a4..a856e88719d2 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1,7 +1,7 @@
+ /*
+    BlueZ - Bluetooth protocol stack for Linux
+    Copyright (C) 2000-2001 Qualcomm Incorporated
+-   Copyright 2023 NXP
++   Copyright 2023-2024 NXP
  
--	if (hdev->sent_cmd) {
--		u16 opcode = hci_skb_opcode(hdev->sent_cmd);
-+	if (hdev->req_skb) {
-+		u16 opcode = hci_skb_opcode(hdev->req_skb);
+    Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
  
- 		bt_dev_err(hdev, "command 0x%4.4x tx timeout", opcode);
+@@ -2037,6 +2037,7 @@ struct hci_cp_le_set_per_adv_params {
+ } __packed;
  
-@@ -2828,6 +2828,7 @@ void hci_release_dev(struct hci_dev *hdev)
- 	ida_destroy(&hdev->unset_handle_ida);
- 	ida_free(&hci_index_ida, hdev->id);
- 	kfree_skb(hdev->sent_cmd);
-+	kfree_skb(hdev->req_skb);
- 	kfree_skb(hdev->recv_event);
- 	kfree(hdev);
- }
-@@ -3157,21 +3158,33 @@ int __hci_cmd_send(struct hci_dev *hdev, u16 opcode, u32 plen,
- EXPORT_SYMBOL(__hci_cmd_send);
+ #define HCI_MAX_PER_AD_LENGTH	252
++#define HCI_MAX_PER_AD_TOT_LENGTH	1650
  
- /* Get data from the previously sent command */
--void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode)
-+static void *hci_cmd_data(struct sk_buff *skb, __u16 opcode)
- {
- 	struct hci_command_hdr *hdr;
+ #define HCI_OP_LE_SET_PER_ADV_DATA		0x203f
+ struct hci_cp_le_set_per_adv_data {
+@@ -2797,6 +2798,10 @@ struct hci_ev_le_per_adv_report {
+ 	__u8     data[];
+ } __packed;
  
--	if (!hdev->sent_cmd)
-+	if (!skb || skb->len < HCI_COMMAND_HDR_SIZE)
- 		return NULL;
- 
--	hdr = (void *) hdev->sent_cmd->data;
-+	hdr = (void *)skb->data;
- 
- 	if (hdr->opcode != cpu_to_le16(opcode))
- 		return NULL;
- 
--	BT_DBG("%s opcode 0x%4.4x", hdev->name, opcode);
-+	return skb->data + HCI_COMMAND_HDR_SIZE;
-+}
- 
--	return hdev->sent_cmd->data + HCI_COMMAND_HDR_SIZE;
-+/* Get data from the previously sent command */
-+void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode)
-+{
-+	void *data;
++#define LE_PA_DATA_COMPLETE	0x00
++#define LE_PA_DATA_MORE_TO_COME	0x01
++#define LE_PA_DATA_TRUNCATED	0x02
 +
-+	/* Check if opcode matches last sent command */
-+	data = hci_cmd_data(hdev->sent_cmd, opcode);
-+	if (!data)
-+		/* Check if opcode matches last request */
-+		data = hci_cmd_data(hdev->req_skb, opcode);
-+
-+	return data;
- }
+ #define HCI_EV_LE_EXT_ADV_SET_TERM	0x12
+ struct hci_evt_le_ext_adv_set_term {
+ 	__u8	status;
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index 04f6572d35f1..e9a3b4f74e2f 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -3,7 +3,7 @@
+  * BlueZ - Bluetooth protocol stack for Linux
+  *
+  * Copyright (C) 2022 Intel Corporation
+- * Copyright 2023 NXP
++ * Copyright 2023-2024 NXP
+  */
  
- /* Get data from last received event */
-@@ -4072,17 +4085,19 @@ void hci_req_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status,
- 	if (!status && !hci_req_is_complete(hdev))
- 		return;
+ #include <linux/module.h>
+@@ -70,8 +70,15 @@ struct iso_pinfo {
+ 	unsigned long		flags;
+ 	struct bt_iso_qos	qos;
+ 	bool			qos_user_set;
+-	__u8			base_len;
+-	__u8			base[BASE_MAX_LENGTH];
++	union {
++		__u8		base_len;
++		__u16		pa_data_len;
++	};
++	union {
++		__u8		base[BASE_MAX_LENGTH];
++		__u8		pa_data[HCI_MAX_PER_AD_TOT_LENGTH];
++	};
++	__u16			pa_data_offset;
+ 	struct iso_conn		*conn;
+ };
  
-+	skb = hdev->req_skb;
-+
- 	/* If this was the last command in a request the complete
--	 * callback would be found in hdev->sent_cmd instead of the
-+	 * callback would be found in hdev->req_skb instead of the
- 	 * command queue (hdev->cmd_q).
- 	 */
--	if (bt_cb(hdev->sent_cmd)->hci.req_flags & HCI_REQ_SKB) {
--		*req_complete_skb = bt_cb(hdev->sent_cmd)->hci.req_complete_skb;
-+	if (skb && bt_cb(skb)->hci.req_flags & HCI_REQ_SKB) {
-+		*req_complete_skb = bt_cb(skb)->hci.req_complete_skb;
- 		return;
- 	}
+@@ -1573,7 +1580,7 @@ static int iso_sock_getsockopt(struct socket *sock, int level, int optname,
+ 	struct sock *sk = sock->sk;
+ 	int len, err = 0;
+ 	struct bt_iso_qos *qos;
+-	u8 base_len;
++	size_t base_len;
+ 	u8 *base;
  
--	if (bt_cb(hdev->sent_cmd)->hci.req_complete) {
--		*req_complete = bt_cb(hdev->sent_cmd)->hci.req_complete;
-+	if (skb && bt_cb(skb)->hci.req_complete) {
-+		*req_complete = bt_cb(skb)->hci.req_complete;
- 		return;
- 	}
+ 	BT_DBG("sk %p", sk);
+@@ -1612,13 +1619,20 @@ static int iso_sock_getsockopt(struct socket *sock, int level, int optname,
+ 		break;
  
-@@ -4199,8 +4214,11 @@ static void hci_send_cmd_sync(struct hci_dev *hdev, struct sk_buff *skb)
- 		return;
- 	}
- 
--	if (hci_req_status_pend(hdev))
--		hci_dev_set_flag(hdev, HCI_CMD_PENDING);
-+	if (hci_req_status_pend(hdev) &&
-+	    !hci_dev_test_and_set_flag(hdev, HCI_CMD_PENDING)) {
-+		kfree_skb(hdev->req_skb);
-+		hdev->req_skb = skb_clone(skb, GFP_KERNEL);
-+	}
- 
- 	atomic_dec(&hdev->cmd_cnt);
- }
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 6071a1226e1b..bffd2c7ff608 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4368,7 +4368,7 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, void *data,
- 	 * (since for this kind of commands there will not be a command
- 	 * complete event).
- 	 */
--	if (ev->status || (hdev->sent_cmd && !hci_skb_event(hdev->sent_cmd))) {
-+	if (ev->status || (hdev->req_skb && !hci_skb_event(hdev->req_skb))) {
- 		hci_req_cmd_complete(hdev, *opcode, ev->status, req_complete,
- 				     req_complete_skb);
- 		if (hci_dev_test_flag(hdev, HCI_CMD_PENDING)) {
-@@ -7170,10 +7170,10 @@ static void hci_le_meta_evt(struct hci_dev *hdev, void *data,
- 	bt_dev_dbg(hdev, "subevent 0x%2.2x", ev->subevent);
- 
- 	/* Only match event if command OGF is for LE */
--	if (hdev->sent_cmd &&
--	    hci_opcode_ogf(hci_skb_opcode(hdev->sent_cmd)) == 0x08 &&
--	    hci_skb_event(hdev->sent_cmd) == ev->subevent) {
--		*opcode = hci_skb_opcode(hdev->sent_cmd);
-+	if (hdev->req_skb &&
-+	    hci_opcode_ogf(hci_skb_opcode(hdev->req_skb)) == 0x08 &&
-+	    hci_skb_event(hdev->req_skb) == ev->subevent) {
-+		*opcode = hci_skb_opcode(hdev->req_skb);
- 		hci_req_cmd_complete(hdev, *opcode, 0x00, req_complete,
- 				     req_complete_skb);
- 	}
-@@ -7541,10 +7541,10 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 	}
- 
- 	/* Only match event if command OGF is not for LE */
--	if (hdev->sent_cmd &&
--	    hci_opcode_ogf(hci_skb_opcode(hdev->sent_cmd)) != 0x08 &&
--	    hci_skb_event(hdev->sent_cmd) == event) {
--		hci_req_cmd_complete(hdev, hci_skb_opcode(hdev->sent_cmd),
-+	if (hdev->req_skb &&
-+	    hci_opcode_ogf(hci_skb_opcode(hdev->req_skb)) != 0x08 &&
-+	    hci_skb_event(hdev->req_skb) == event) {
-+		hci_req_cmd_complete(hdev, hci_skb_opcode(hdev->req_skb),
- 				     status, &req_complete, &req_complete_skb);
- 		req_evt = event;
- 	}
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 4a28aef2f01f..7306020ccda3 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -32,6 +32,10 @@ static void hci_cmd_sync_complete(struct hci_dev *hdev, u8 result, u16 opcode,
- 	hdev->req_result = result;
- 	hdev->req_status = HCI_REQ_DONE;
- 
-+	/* Free the request command so it is not used as response */
-+	kfree_skb(hdev->req_skb);
-+	hdev->req_skb = NULL;
-+
- 	if (skb) {
- 		struct sock *sk = hci_skb_sk(skb);
- 
-@@ -4952,6 +4956,11 @@ int hci_dev_open_sync(struct hci_dev *hdev)
- 			hdev->sent_cmd = NULL;
+ 	case BT_ISO_BASE:
+-		if (sk->sk_state == BT_CONNECTED &&
+-		    !bacmp(&iso_pi(sk)->dst, BDADDR_ANY)) {
+-			base_len = iso_pi(sk)->conn->hcon->le_per_adv_data_len;
+-			base = iso_pi(sk)->conn->hcon->le_per_adv_data;
+-		} else {
++		if (!bacmp(&iso_pi(sk)->dst, BDADDR_ANY)) {
++			/* For a Broadcast Source, the BASE was stored
++			 * in iso_pi(sk)->base.
++			 */
+ 			base_len = iso_pi(sk)->base_len;
+ 			base = iso_pi(sk)->base;
++		} else {
++			/* For a Broadcast Sink, the complete data received in
++			 * PA reports is stored. Extract BASE from there.
++			 */
++			base = eir_get_service_data(iso_pi(sk)->pa_data,
++						    iso_pi(sk)->pa_data_len,
++						    EIR_BAA_SERVICE_UUID,
++						    &base_len);
  		}
  
-+		if (hdev->req_skb) {
-+			kfree_skb(hdev->req_skb);
-+			hdev->req_skb = NULL;
+ 		len = min_t(unsigned int, len, base_len);
+@@ -1834,8 +1848,9 @@ static void iso_conn_ready(struct iso_conn *conn)
+ 		bacpy(&iso_pi(sk)->dst, &hcon->dst);
+ 		iso_pi(sk)->dst_type = hcon->dst_type;
+ 		iso_pi(sk)->sync_handle = iso_pi(parent)->sync_handle;
+-		memcpy(iso_pi(sk)->base, iso_pi(parent)->base, iso_pi(parent)->base_len);
+-		iso_pi(sk)->base_len = iso_pi(parent)->base_len;
++		memcpy(iso_pi(sk)->pa_data, iso_pi(parent)->pa_data,
++		       iso_pi(parent)->pa_data_len);
++		iso_pi(sk)->pa_data_len = iso_pi(parent)->pa_data_len;
+ 
+ 		hci_conn_hold(hcon);
+ 		iso_chan_add(conn, sk, parent);
+@@ -1904,8 +1919,8 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
+ 	 * a BIG Info it attempts to check if there any listening socket with
+ 	 * the same sync_handle and if it does then attempt to create a sync.
+ 	 * 3. HCI_EV_LE_PER_ADV_REPORT: When a PA report is received, it is stored
+-	 * in iso_pi(sk)->base so it can be passed up to user, in the case of a
+-	 * broadcast sink.
++	 * in iso_pi(sk)->pa_data so the BASE can later be passed up to user, in
++	 * the case of a broadcast sink.
+ 	 */
+ 	ev1 = hci_recv_event_data(hdev, HCI_EV_LE_PA_SYNC_ESTABLISHED);
+ 	if (ev1) {
+@@ -1961,16 +1976,38 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
+ 
+ 	ev3 = hci_recv_event_data(hdev, HCI_EV_LE_PER_ADV_REPORT);
+ 	if (ev3) {
+-		size_t base_len = ev3->length;
+-		u8 *base;
+-
+ 		sk = iso_get_sock_listen(&hdev->bdaddr, bdaddr,
+ 					 iso_match_sync_handle_pa_report, ev3);
+-		base = eir_get_service_data(ev3->data, ev3->length,
+-					    EIR_BAA_SERVICE_UUID, &base_len);
+-		if (base && sk && base_len <= sizeof(iso_pi(sk)->base)) {
+-			memcpy(iso_pi(sk)->base, base, base_len);
+-			iso_pi(sk)->base_len = base_len;
++
++		if (!sk)
++			goto done;
++
++		if (ev3->data_status == LE_PA_DATA_TRUNCATED) {
++			/* The controller was unable to retrieve PA data. */
++			memset(iso_pi(sk)->pa_data, 0,
++			       HCI_MAX_PER_AD_TOT_LENGTH);
++			iso_pi(sk)->pa_data_len = 0;
++			iso_pi(sk)->pa_data_offset = 0;
++			return lm;
 +		}
 +
- 		clear_bit(HCI_RUNNING, &hdev->flags);
- 		hci_sock_dev_event(hdev, HCI_DEV_CLOSE);
- 
-@@ -5112,6 +5121,12 @@ int hci_dev_close_sync(struct hci_dev *hdev)
- 		hdev->sent_cmd = NULL;
- 	}
- 
-+	/* Drop last request */
-+	if (hdev->req_skb) {
-+		kfree_skb(hdev->req_skb);
-+		hdev->req_skb = NULL;
-+	}
++		if (iso_pi(sk)->pa_data_offset + ev3->length >
++		    HCI_MAX_PER_AD_TOT_LENGTH)
++			goto done;
 +
- 	clear_bit(HCI_RUNNING, &hdev->flags);
- 	hci_sock_dev_event(hdev, HCI_DEV_CLOSE);
- 
++		memcpy(iso_pi(sk)->pa_data + iso_pi(sk)->pa_data_offset,
++		       ev3->data, ev3->length);
++		iso_pi(sk)->pa_data_offset += ev3->length;
++
++		if (ev3->data_status == LE_PA_DATA_COMPLETE) {
++			/* All PA data has been received. */
++			iso_pi(sk)->pa_data_len = iso_pi(sk)->pa_data_offset;
++			iso_pi(sk)->pa_data_offset = 0;
++		} else {
++			/* This is a PA data fragment. Keep pa_data_len set to 0
++			 * until all data has been reassembled.
++			 */
++			iso_pi(sk)->pa_data_len  = 0;
+ 		}
+ 	} else {
+ 		sk = iso_get_sock_listen(&hdev->bdaddr, BDADDR_ANY, NULL, NULL);
 -- 
-2.43.0
+2.39.2
 
