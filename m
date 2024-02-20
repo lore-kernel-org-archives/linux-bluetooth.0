@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC28D134CC0;
-	Tue, 20 Feb 2024 19:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1B4D134CEC
+	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Feb 2024 19:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708456229; cv=none; b=Xji5FOE5YC7TzK5rrs8qTsBiFsslqKGgxCdHkfzaC/tKjdxUeIFw+K1K+RVajzGtxuHCsTxnggBuN8Or5GWLQ5OEFqMOGlZuXhCNCyBU7YPgnBoY7NTkldHCcGIglSQsdgnJMHEpAfzyXGxWpdkWFSLyMrAyUFf6c5LzpRv6oY4=
+	t=1708456229; cv=none; b=G6iTt92cX2sMIUI5KdnDW9khpDR2rYAXidwLAniesXAHzlNngHOCHXgstrj+NMFdPrxOJra0DtgEPj2Dz62YYhIjurGdd/Q1nXrECyMmpSrFQXDnKtbrtwk+BdYrGY1pfp/qxH4WaUuf0Npin7TVsmSJxw65XISUiPSR0SAiA0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1708456229; c=relaxed/simple;
-	bh=27nB2IlG0oC8pl+ybaf2Om7tssbnEIBfziDJLNGJSok=;
+	bh=p4+bl7DCl6RioYKfHOs8F7tSIkUc4dPBcVxLO7XhFj8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=jE6zNk17/LkRzOQJre6XOjZy1dSuzBCJgIX2s1T3+46QVzEJ/+oe4xhgknlASUedcu4++hT/mh4qWk1gANq/VO1iZHnTWcmylmCGQ1h+1gAVNoQ+UosDQ3vpMLpXYu0gsgQ21CGEDImzfavcrc2dfqOhXf+hpcZDISMEFbghYmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KVP6t+dA; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=dYl2WdtEXVLUzV3m5HHvENK/UONlVMawQJ2fGxQBM7Gsh4VMAQZQLWQ+85LwpmSs3uaoPXB1b/mkD8tjQJoZQSabvD0S/+jxVYZ+SSZv3UaAK7Ga6jSgfqOQRzwIqXBenDvKtdTQKOFtUTgrGMNeJMH5QcgPP+UxJ5imTwnFgAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fhl0Mkqh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KVP6t+dA"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5B451C43390;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fhl0Mkqh"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 732A2C43399;
 	Tue, 20 Feb 2024 19:10:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1708456229;
-	bh=27nB2IlG0oC8pl+ybaf2Om7tssbnEIBfziDJLNGJSok=;
+	bh=p4+bl7DCl6RioYKfHOs8F7tSIkUc4dPBcVxLO7XhFj8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KVP6t+dAtJQokj8FfTq6+AnOPOR+LMbEANCMVHPKcWUwwc+DX74J7NVK4Rr3+EVA/
-	 XKOruX5SBzACWyfMVFi4ilGr0ybprB5YKXa1QKHQ8+0gKci0r7fVXGwbg4W3/JM2Rv
-	 jSYp6eFF4dHC6iLLDrHOzZIUHhwAnvcjL3Oepd3szUM+5H245YIJSeUXFEoojYOIZR
-	 b9hBuAkNbxo2udYpiRUV0CBAMR0GKR0QJA4aXEUfVWj27dDrKxs3gTOcPJHxnefZ1y
-	 IFN2hNyQOV/ub+r/SFlscya7Yv/Ya5LNGnEtEt9W/Ad+1+bMkTfAIwz8qj2kSXxltZ
-	 RKeL8ylOkO9Sg==
+	b=fhl0MkqhP0YzmDxMAGH6Fdx/3m9NklZ8EWGVJkDvM7t1v10Uk6lTZYmWEh5QDH2ya
+	 OWlmB5HIBJMyPlJeeA6S1KdFKNarRAmGzSGhQmmTF1tDHc/zR1GDNTTCTgOoDtsxxX
+	 hxhdXoVfq0EdeYSZQf0TspqHZL3q9lsN+THFmOJy3kvhuqYjHHPMU6ARPWHP62pEub
+	 oCDYLrZaHk2TgljeLrK1tAL3PU/0FZ0jLpNqZ2qG5/vcRMbVFYHhIePpQCJk9j0PLK
+	 JlEUYn+o3wCKT7RphUp7asrowqNWsMKAm2jmM28Ey6kZKdiE4fO/YzxXA111D80Obk
+	 t4HMmEDz0hVjA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 40C31D990CD;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5090FD84BC4;
 	Tue, 20 Feb 2024 19:10:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -37,38 +37,34 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: constify the struct device_type usage
+Subject: Re: [PATCH v2] Bluetooth: hci_sync: Fix overwriting request callback
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <170845622926.2554.17835222559444960671.git-patchwork-notify@kernel.org>
+ <170845622932.2554.1081133820469371235.git-patchwork-notify@kernel.org>
 Date: Tue, 20 Feb 2024 19:10:29 +0000
-References: <20240219-device_cleanup-bluetooth-v1-1-dd81ba00c95e@marliere.net>
-In-Reply-To: <20240219-device_cleanup-bluetooth-v1-1-dd81ba00c95e@marliere.net>
-To: Ricardo B. Marliere <ricardo@marliere.net>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, gregkh@linuxfoundation.org
+References: <20240220163141.354936-1-luiz.dentz@gmail.com>
+In-Reply-To: <20240220163141.354936-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon, 19 Feb 2024 16:46:57 -0300 you wrote:
-> Since commit aed65af1cc2f ("drivers: make device_type const"), the driver
-> core can properly handle constant struct device_type. Move the bt_type and
-> bnep_type variables to be constant structures as well, placing it into
-> read-only memory which can not be modified at runtime.
+On Tue, 20 Feb 2024 11:31:41 -0500 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Signed-off-by: Ricardo B. Marliere <ricardo@marliere.net>
+> In a few cases the stack may generate commands as responses to events
+> which would happen to overwrite the sent_cmd, so this attempts to store
+> the request in req_skb so even if sent_cmd is replaced with a new
+> command the pending request will remain in stored in req_skb.
 > 
 > [...]
 
 Here is the summary with links:
-  - Bluetooth: constify the struct device_type usage
-    https://git.kernel.org/bluetooth/bluetooth-next/c/8a496378559f
+  - [v2] Bluetooth: hci_sync: Fix overwriting request callback
+    https://git.kernel.org/bluetooth/bluetooth-next/c/df90bef42e65
 
 You are awesome, thank you!
 -- 
