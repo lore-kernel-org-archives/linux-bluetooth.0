@@ -1,180 +1,76 @@
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3859E76C9C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Feb 2024 19:10:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC1ED13475F
+	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Feb 2024 19:10:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708456227; cv=none; b=lBetnnvLgxM5vc44LohtSMgk3jI9bs3j426YGCXTLPouoia7JpMP/jQsuufW0ywQL4zKuuQIM8SH/O/+4urogz3eiDSP7zlnazFdEYalGn+CbCitonOT+4w2BSI73ipVXwYweNaA7hHDmdRVkKy92NyGpPzySgfIDhiRP9Je6Pk=
+	t=1708456229; cv=none; b=OYpZz+yfho5Plgt3hHNpPfEo9oLbi18+T2wxzRjV9FvzQDSJxt68wiRtCR53JzAaxKg7FoRcpkaOnnJQDVysj0yt5zKwa7/49H4ZgkfsbOGdEK7GqzrIvW4oSQ0+495I+o2WxQ5tXNQyEwb5sb2dex5T8mSWOG6KDzcd7J2vUyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708456227; c=relaxed/simple;
-	bh=iEHYIou+4+i7VY0TcX+FbGPWw2PKLo/A5wQEkrIexAk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=a+oHSM5nHLUZpxs517/NnzcS+MuuhN1LT47NQFcGO7gmNIBDmMBPZjA0UhDQk/jTu6dbMTUdxhXlOFa/0qhv/2TZmfO2ACcUFqCg84Lv8LL4cRxn2P7L0P/0ynPCpoBQIg0UYYgDc2PdrU0aGBzZlyHJ4FltqFxZmRmJnKvnMGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KQV6hwjo; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1708456229; c=relaxed/simple;
+	bh=B7XzCkafX7kFYHJ4bKQHNdI4x4GVsQOHxEc055709rw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=gx25ZFhGKZioBs6xFyzxTkkZOAc8nbXzecHo+Ba7Nf1l4fxvRHm9hbrjx/LW3sC4OF8IoqO22RuRD7MC/GFh+sGQiqtwS9cJPEUrXxeNElG6ciIzcq1UnY31pmuoYxLgEsWhLMn1jmRCgvoVo7+jjUnNZnaHBDOPd8i1UiAWYNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=icAiGkao; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KQV6hwjo"
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2d1094b5568so77315011fa.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Feb 2024 11:10:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708456223; x=1709061023; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=u6vzG72NaYuZDX3ICQRal7rxTpULVtCmDxBdOjw42tw=;
-        b=KQV6hwjoWGG6usx+3o01F4f1gcnZNpunYp0V7877KMBizMMosYk5nZA7QrWyfRM41Y
-         6iZ/yL4MS2kEFYkGIQgT/oOf4z9pE+9iuMVxd0dHduosoXnOYMRBprZW5SpEzlrv8uSD
-         qfPtNtT4ZKdb/ddmLU8nEMY2apQARdpPR1vklMwtZjllE+nQqx1Ef3P/JB1S0R/YNW/l
-         pLgoRk9wCf/ijljNBAEm8g4iHXUlUpQYW2ycaXpAeyyxg5heGrK5hEfkoyqPN4oIjpsU
-         c8qMiltUi3dpkl3GlrFbFFMERTS0B//bHqV+843YzlAzUsOcmqW4WL/i47X55QkklaQw
-         kMbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708456223; x=1709061023;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=u6vzG72NaYuZDX3ICQRal7rxTpULVtCmDxBdOjw42tw=;
-        b=jZPSZHXvlNPQa91RBgYllWKCWuz8QhLmjLtgbTQwUyvxBXPnHpVSkPhYrgDKbNsOJf
-         SjeincbV/GyAfK0jbB0LfWfyCbHFHDz0YGaUagXTR8U5wfvjvI2SaK3Zua0Z7iddkC9A
-         ImqH7lMBMaojWxpzYSBo1IR4tPXWEMlx605zuKbQ0GonQOcR0Swtv9d3vDhjW8VKVCIR
-         gRnKTGLyOYwbW4eXVhovBl8DOI4N3B3K22USsqaKf4SYQwNjR+CtmyrvZS74gE/0iMTY
-         H7gKnl8SK6Sd6PScgABZIkKiPuk4BmOq1XqMjtU3gZAWdPiwPBZH1vNd7WNR1wsi0f7U
-         BPoA==
-X-Gm-Message-State: AOJu0YyTtdVAx9BiJQ7+gA0bKENAHoS87JaELiDQaIRGdPZ8BzE5dAbX
-	fwahiDlpu0mF5KFL3j6OUQsQfJV3tub5AUSFtEBBdUFmJDZ4c5abMOWqrAqAlrUPwtG1yPQSazk
-	FFVU2HmbMRy1BQjqH1efdEpnyK/Mi2KkQ
-X-Google-Smtp-Source: AGHT+IHFfVDXAzSCU/3q3kfalscsMeqIRv2IfzLq9n9BusOK9mlxaR+e00AWzfBxA3PH8P2vrdZjkzbkqIFokbTi00A=
-X-Received: by 2002:a2e:b4a2:0:b0:2d2:4703:1ac3 with SMTP id
- q2-20020a2eb4a2000000b002d247031ac3mr1804490ljm.5.1708456222953; Tue, 20 Feb
- 2024 11:10:22 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="icAiGkao"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 654A3C43394;
+	Tue, 20 Feb 2024 19:10:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708456229;
+	bh=B7XzCkafX7kFYHJ4bKQHNdI4x4GVsQOHxEc055709rw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=icAiGkao1S6emN+rXSCeogq2I9Plu6VqTUZUZKEGdXwPEr5gyc1OBaKozrTlb3/FC
+	 Y+ZpZ91MHbu5bmQ8Yb1FZDg8scinmB3V0dc4yPEl2arU0agOKOfEAUu/URI0U1QvyR
+	 hvkyeyI5v64Bub61a7qh4wfPC3Btb4SuHoXtJSkTK8ckzW5v7N2rtFlCZ+SCDUXmDI
+	 V9rYoEp48dBrxINtKQMOIEcY/ha0gQFIxhLt3JsWEcODJzqpDmORwSf5BLtn3z/jvM
+	 o/8RTUxl/YYTH9ZWU5J50HNUPtmgf4ZSelcef+o8TqXt/cuOXinTiuJqFzRNVsrOSz
+	 EwKxXX9d/9Nbw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 49591D84BC2;
+	Tue, 20 Feb 2024 19:10:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240215212356.310301-1-silviu.barbulescu@nxp.com> <20240215212356.310301-5-silviu.barbulescu@nxp.com>
-In-Reply-To: <20240215212356.310301-5-silviu.barbulescu@nxp.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 20 Feb 2024 14:10:10 -0500
-Message-ID: <CABBYNZJ=yn6O8TEJ0p3Q-JF0UpHTKxHy8tEd_Qv+JQ4vuYm6XA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v3 4/7] shared/bap: Add state in stream struct for
- bcast source
-To: Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
-Cc: linux-bluetooth@vger.kernel.org, mihai-octavian.urzica@nxp.com, 
-	vlad.pruteanu@nxp.com, andrei.istodorescu@nxp.com, iulia.tanasescu@nxp.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v1] Bluetooth: hci_sync: Fix UAF on hci_abort_conn_sync
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <170845622929.2554.5406134305914775720.git-patchwork-notify@kernel.org>
+Date: Tue, 20 Feb 2024 19:10:29 +0000
+References: <20240216205005.111967-1-luiz.dentz@gmail.com>
+In-Reply-To: <20240216205005.111967-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-Hi Silviu,
+Hello:
 
-On Thu, Feb 15, 2024 at 4:24=E2=80=AFPM Silviu Florian Barbulescu
-<silviu.barbulescu@nxp.com> wrote:
->
-> Add state support in the stream struct for broadcast source.
-> ---
->  src/shared/bap.c | 32 ++++++++++++++++++--------------
->  1 file changed, 18 insertions(+), 14 deletions(-)
->
-> diff --git a/src/shared/bap.c b/src/shared/bap.c
-> index a39b95407..524bfa058 100644
-> --- a/src/shared/bap.c
-> +++ b/src/shared/bap.c
-> @@ -251,6 +251,8 @@ struct bt_bap_stream {
->         struct bt_bap_stream *link;
->         struct bt_bap_stream_io *io;
->         const struct bt_bap_stream_ops *ops;
-> +       uint8_t bcast_old_state;
-> +       uint8_t bcast_state;
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Lets have it as generic one, old_state and state.
+On Fri, 16 Feb 2024 15:50:05 -0500 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> Fixes the following trace where hci_acl_create_conn_sync attempts to
+> call hci_abort_conn_sync after timeout:
+> 
+> BUG: KASAN: slab-use-after-free in hci_abort_conn_sync
+> (net/bluetooth/hci_sync.c:5439)
+> Read of size 2 at addr ffff88800322c032 by task kworker/u3:2/36
+> 
+> [...]
 
->         bool client;
->         void *user_data;
->  };
-> @@ -1271,7 +1273,6 @@ static void bap_stream_state_changed(struct bt_bap_=
-stream *stream)
->
->  static void stream_set_state(struct bt_bap_stream *stream, uint8_t state=
-)
->  {
-> -       struct bt_bap_endpoint *ep =3D stream->ep;
->         struct bt_bap *bap =3D stream->bap;
->
->         /* Check if ref_count is already 0 which means detaching is in
-> @@ -1283,14 +1284,6 @@ static void stream_set_state(struct bt_bap_stream =
-*stream, uint8_t state)
->                 return;
->         }
->
-> -       ep->old_state =3D ep->state;
-> -       ep->state =3D state;
-> -
-> -       DBG(bap, "stream %p dir 0x%02x: %s -> %s", stream,
-> -                       bt_bap_stream_get_dir(stream),
-> -                       bt_bap_stream_statestr(stream->ep->old_state),
-> -                       bt_bap_stream_statestr(stream->ep->state));
-> -
->         if (stream->ops && stream->ops->set_state)
->                 stream->ops->set_state(stream, state);
->
-> @@ -1527,6 +1520,14 @@ static void bap_ucast_set_state(struct bt_bap_stre=
-am *stream, uint8_t state)
->  {
->         struct bt_bap_endpoint *ep =3D stream->ep;
->
-> +       ep->old_state =3D ep->state;
-> +       ep->state =3D state;
-> +
-> +       DBG(stream->bap, "stream %p dir 0x%02x: %s -> %s", stream,
-> +                       bt_bap_stream_get_dir(stream),
-> +                       bt_bap_stream_statestr(stream->ep->old_state),
-> +                       bt_bap_stream_statestr(stream->ep->state));
-> +
->         if (stream->lpac->type =3D=3D BT_BAP_BCAST_SINK || stream->client=
-)
->                 goto done;
->
-> @@ -1942,22 +1943,25 @@ static void bap_bcast_set_state(struct bt_bap_str=
-eam *stream, uint8_t state)
->         struct bt_bap *bap =3D stream->bap;
->         const struct queue_entry *entry;
->
-> +       stream->bcast_old_state =3D stream->bcast_state;
-> +       stream->bcast_state =3D state;
-> +
->         DBG(bap, "stream %p dir 0x%02x: %s -> %s", stream,
->                         bt_bap_stream_get_dir(stream),
-> -                       bt_bap_stream_statestr(stream->ep->old_state),
-> -                       bt_bap_stream_statestr(stream->ep->state));
-> +                       bt_bap_stream_statestr(stream->bcast_old_state),
-> +                       bt_bap_stream_statestr(stream->bcast_state));
->
->         for (entry =3D queue_get_entries(bap->state_cbs); entry;
->                                                         entry =3D entry->=
-next) {
->                 struct bt_bap_state *state =3D entry->data;
->
->                 if (state->func)
-> -                       state->func(stream, stream->ep->old_state,
-> -                                       stream->ep->state, state->data);
-> +                       state->func(stream, stream->bcast_old_state,
-> +                                       stream->bcast_state, state->data)=
-;
->         }
->
->         /* Post notification updates */
-> -       switch (stream->ep->state) {
-> +       switch (stream->bcast_state) {
->         case BT_ASCS_ASE_STATE_IDLE:
->                 bap_stream_detach(stream);
->                 break;
-> --
-> 2.39.2
->
+Here is the summary with links:
+  - [v1] Bluetooth: hci_sync: Fix UAF on hci_abort_conn_sync
+    https://git.kernel.org/bluetooth/bluetooth-next/c/55a7c10e71ae
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---=20
-Luiz Augusto von Dentz
