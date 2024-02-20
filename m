@@ -1,192 +1,200 @@
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA9D054FB8
-	for <linux-bluetooth@vger.kernel.org>; Mon, 19 Feb 2024 22:21:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4286E45942
+	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Feb 2024 05:48:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708381319; cv=none; b=NuHwC1zR+ENjIjIGQ7EHfH1beeCB+GxNiQ13UUgC8bzpkzmYOz8muJXzy+HwqzVUn0TUYT9FVoIjVgZaKrJHAQpes/1OLKPUMFlli66rrXEFb1tERNBXiC7kBQjbYHlnrCwhahksTVlcpyhpjfU2tS5776ix4CGR5bTypTPAKbg=
+	t=1708408130; cv=none; b=ZyOoiIbhKE+lqDRbMStX7Z1CVUapyBk57wSMgggpTssq8/vU39k3295Iw4XdzyFSuN9t2Y5X9YHYzjFRwEbz8d+O3d5jcXeF75hzv2dAu4aWFp7FY4JbLN5sD0Sr47EJhONdmoyd4okI0AwFCNmmQiwvqTf0tYZJ2PgxlTf4dqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708381319; c=relaxed/simple;
-	bh=AV04W98SGcs03DR+MbROhSLr0Maq3x3IF7tuWG4r08E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OHXdBB0JiiI+8yOr22YfXAaW1K4chILWsMjInSyLMOOrSeP4Bryc4D4hMCCBwxK5XcgO36dmJ6tXBQxdVcOEZHikCaISKd0hC8wSB7wvYSbS//UHhhUxcWTfPUlzS1E4p2m/RgPXJByx47Qhh0DrrWialagKB24rabe6y6XH5Aw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=jeBEtE8D; arc=none smtp.client-ip=209.85.128.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1708408130; c=relaxed/simple;
+	bh=z7gJCV/d69l/nV8+T3a2zDK6cK+BttGfVeHDfyn0NIY=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=rlv3QhSiTaaPAJ4vztzu1E4brcvMBYNMNyPaE+t21vN7N63HF6efcqbQLBjwTGm89WaqPCFfyznHQUBr3BioB1zZlL0dl1MihvAUcqGZ0eW/U5iB7q/TU2MuvimXTs8+icfaZGjX7ZZhNXiW+AUQ1zdRCuPvw/B2LY1i1CfeQeI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GqeMD32c; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jeBEtE8D"
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-6085ed1e916so2355937b3.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Feb 2024 14:21:57 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GqeMD32c"
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5645960cd56so2673691a12.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Feb 2024 21:48:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1708381317; x=1708986117; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CWBfqhdEXedBrtNGEQDXyHOTQXUxKpS9xFZl5trWPds=;
-        b=jeBEtE8D5+RBIx8FwXYe8gUqn9uAmiKUwypD5maslZ2iX9iMfG22I5zVV2MhFz/O+f
-         e7k6cUsrsAlM17Ys50ObNbcuDligfa6M1uh3Lme7xPi/iysl3Md6dk3qY4LPFHydMTTt
-         xNIl0wtPa3UvLZ4GJToMPIja2UHOY9++XHEogBuwgGA2+ahV0L7qpQSw2puGwTneltJ8
-         INrX2j378nAQkTnIK0fS+iiGsZ51kfR26MNaQe7xhwSvaZ6f8fDKA3XcDxoqvfJLIqOt
-         El4H4KFRCDUGnY9oVUhm3v9SEoXEXuqkF1wlxdOUXdeq7Fl8ewcAwO5cOeWB87jRkFQQ
-         BkWg==
+        d=gmail.com; s=20230601; t=1708408126; x=1709012926; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=rLOQhUioTnxbgJQ2lCwH8Y9HynrlMw1e7POa9cYYhbE=;
+        b=GqeMD32c9AycEcNbNbsN7/X6M5V7YrdMcCAWS4Q+hl5YZOzGBGM0yG1i9TE2s3vRH6
+         E5oRQd+S75G075uPNxnN7sN5xb0l40nXWfRs5t4/6EaasDjmghuxVIumK0HC/Ib0/DAC
+         akQgIS1A3J+Rq7CTeAhalrdLUWh1VFkkSWcPktpPaL2I5cSlWJCrkelbyaqIpXS3O8Nv
+         KBNfC3o35OJflQTxlKZa0rcQ9IW6/jvt1feHpRa10LHxLVnzx2/uwPmsF8wFCN8FwDSl
+         E/VB1XZzyKYHsXjtttCZpwyY5NWKrreyHvlr+dDbSxI2KP7E9Cz/kGZvMewxhuDCL4ag
+         q8Jw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708381317; x=1708986117;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CWBfqhdEXedBrtNGEQDXyHOTQXUxKpS9xFZl5trWPds=;
-        b=lx4uJyeoHxSj6HxLeDpDArQftildKcEC56+xyhDkOF/kr2xHSctvhrcNCl5kt64ucX
-         l8EQQmDPuAeeSlniTasuoc7sdr4nFibvFJT0C5k3cmYVZh4m0Aqpu9ixybBi+6F+MjBK
-         c/1AsAuTl38JurH6xoWy6epmKzl4iLjW9VYZsh8PVAlbrz61XM0nDTAAY+8Amkzh/IJP
-         /OXXXPTcOYuIUV7191XcQXDn1srLPYTqhGL9QjGqNg6zSxjLoHISTA6iWziIkrtfHkl0
-         i/psUmt64naAHJ3FsI1ZgGtnp3inZbd9uRJ/GjQqLnoPGMsrh2xe0oTM8C4zWpmB6cvb
-         SxEg==
-X-Forwarded-Encrypted: i=1; AJvYcCUfwpVQaPZqPv/n7dm4XpXFKKMTvNT1fmEgMfwqD5WPmKs5mShxQvAO5QOYz8KyhDp1fkgiSV6dg85vqNiZ1SlOriih8qo4bzD9BOPMIoDw
-X-Gm-Message-State: AOJu0YxCdAQunrHTybHX5ccpQF1llwsNPU3KlPZ+38ztss+ecOmlZwOb
-	X2RNN0Tz+KZtNsJL0w2AEkZ4S3dVBVpIvOaQ8uPswVd/K3dAkxOiW+43H0tP8SHNdgf6tguQSen
-	vk8Z+02jGUjqEI+6C+6RnQR7MQp78pTR8cLFWVg==
-X-Google-Smtp-Source: AGHT+IEw1QxrScZ5otnCQ0EY59GfXlyDDJtQ3b51NbbVrQfFF81qQ7/f7MndD7svyF5jQtcz/STFrjnb2NG3XxDBlfQ=
-X-Received: by 2002:a81:b603:0:b0:607:caee:ebd4 with SMTP id
- u3-20020a81b603000000b00607caeeebd4mr13871897ywh.31.1708381316805; Mon, 19
- Feb 2024 14:21:56 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708408126; x=1709012926;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rLOQhUioTnxbgJQ2lCwH8Y9HynrlMw1e7POa9cYYhbE=;
+        b=W20tR3K+cfnzZg+w5vwU++0aSWerG3Qc6BM7zioYzjjeTZPUPpIA2pWpIwq7H6VFmM
+         7IjZImC5EjvDryH+J0Cu1z/4mu2dv1BcIJje1lf0jF5Gm2cmk/e5MIvL9SoxNPHZAJCo
+         erBynbBLNcisEfiVF7+OALe+SqaeLwdEXFEI2u33dgKPVsf7mmgZt23DJCUlaSWd24GC
+         oqUfJo8DEkn+TCJd2oEEP+4V+Ul5JcfVzh0wdEo6go2a8xaoVR4zbLd+sgbV0PoRPNol
+         hCu7jPtYwVO4VCOB13M52JUDntvA9uFlj65jJRN7ODpgSLccfdPnfrr1+3m2T5ZqNf90
+         cChQ==
+X-Gm-Message-State: AOJu0YwlAbSjvMTgiSGBF3wXhZniyCbApJWzOHj/dBnnqKoKjToU7qJ1
+	32kDRXnqh/f6/aRaO2J1rzHZ9//pKhg2yVY6pKM4J/jYQiuW03IoNQVNxbSEiHw6L3r3faw4G20
+	tsKfCteCu7Bho+oBsi6sMsfRuWawKteDgbMY=
+X-Google-Smtp-Source: AGHT+IEY08NHJjPR9zsKzz/saHwxeTbHsJn8WcR4uvTubdxUGMARqdVifsceKKQUieWdDjmx3y3yQUhgGNm1IoqDY+k=
+X-Received: by 2002:a05:6402:5248:b0:564:a994:a057 with SMTP id
+ t8-20020a056402524800b00564a994a057mr1894226edd.27.1708408126238; Mon, 19 Feb
+ 2024 21:48:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240216203215.40870-1-brgl@bgdev.pl> <CAA8EJppt4-L1RyDeG=1SbbzkTDhLkGcmAbZQeY0S6wGnBbFbvw@mail.gmail.com>
- <e4cddd9f-9d76-43b7-9091-413f923d27f2@linaro.org> <CAA8EJpp6+2w65o2Bfcr44tE_ircMoON6hvGgyWfvFuh3HamoSQ@mail.gmail.com>
- <4d2a6f16-bb48-4d4e-b8fd-7e4b14563ffa@linaro.org> <CAA8EJpq=iyOfYzNATRbpqfBaYSdJV1Ao5t2ewLK+wY+vEaFYAQ@mail.gmail.com>
- <CAMRc=Mfnpusf+mb-CB5S8_p7QwVW6owekC5KcQF0qrR=iOQ=oA@mail.gmail.com>
- <CAA8EJppY7VTrDz3-FMZh2qHoU+JSGUjCVEi5x=OZgNVxQLm3eQ@mail.gmail.com> <b9a31374-8ea9-407e-9ec3-008a95e2b18b@linaro.org>
-In-Reply-To: <b9a31374-8ea9-407e-9ec3-008a95e2b18b@linaro.org>
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Date: Tue, 20 Feb 2024 00:21:45 +0200
-Message-ID: <CAA8EJppWY8c-pF75WaMadWtEuaAyCc5A1VLEq=JmB2Ngzk-zyw@mail.gmail.com>
-Subject: Re: [PATCH v5 00/18] power: sequencing: implement the subsystem and
- add first users
-To: neil.armstrong@linaro.org
-Cc: Bartosz Golaszewski <brgl@bgdev.pl>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Kalle Valo <kvalo@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
-	Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Saravana Kannan <saravanak@google.com>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, Arnd Bergmann <arnd@arndb.de>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Alex Elder <elder@linaro.org>, 
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
-	Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-pci@vger.kernel.org, linux-pm@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+From: Alaganraj Sandhanam <alagan.linux@gmail.com>
+Date: Mon, 19 Feb 2024 21:48:34 -0800
+Message-ID: <CAMrsnHr7_XoCBqaW_E45j61aLKOUr2HBUWykwBqU_37YNh9Hrw@mail.gmail.com>
+Subject: Re: Out of Band (OOB) pairing using btmgmt tool
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, 19 Feb 2024 at 19:18, <neil.armstrong@linaro.org> wrote:
->
-> On 19/02/2024 13:33, Dmitry Baryshkov wrote:
-> > On Mon, 19 Feb 2024 at 14:23, Bartosz Golaszewski <brgl@bgdev.pl> wrote=
-:
-> >>
-> >> On Mon, Feb 19, 2024 at 11:26=E2=80=AFAM Dmitry Baryshkov
-> >> <dmitry.baryshkov@linaro.org> wrote:
-> >>>
-> >>
-> >> [snip]
-> >>
-> >>>>>>>>
-> >>>>>>>> For WCN7850 we hide the existence of the PMU as modeling it is s=
-imply not
-> >>>>>>>> necessary. The BT and WLAN devices on the device-tree are repres=
-ented as
-> >>>>>>>> consuming the inputs (relevant to the functionality of each) of =
-the PMU
-> >>>>>>>> directly.
-> >>>>>>>
-> >>>>>>> We are describing the hardware. From the hardware point of view, =
-there
-> >>>>>>> is a PMU. I think at some point we would really like to describe =
-all
-> >>>>>>> Qualcomm/Atheros WiFI+BT units using this PMU approach, including=
- the
-> >>>>>>> older ath10k units present on RB3 (WCN3990) and db820c (QCA6174).
-> >>>>>>
-> >>>>>> While I agree with older WiFi+BT units, I don't think it's needed =
-for
-> >>>>>> WCN7850 since BT+WiFi are now designed to be fully independent and=
- PMU is
-> >>>>>> transparent.
-> >>>>>
-> >>>>> I don't see any significant difference between WCN6750/WCN6855 and
-> >>>>> WCN7850 from the PMU / power up point of view. Could you please poi=
-nt
-> >>>>> me to the difference?
-> >>>>>
-> >>>>
-> >>>> The WCN7850 datasheet clearly states there's not contraint on the WL=
-AN_EN
-> >>>> and BT_EN ordering and the only requirement is to have all input reg=
-ulators
-> >>>> up before pulling up WLAN_EN and/or BT_EN.
-> >>>>
-> >>>> This makes the PMU transparent and BT and WLAN can be described as i=
-ndependent.
-> >>>
-> >>>  From the hardware perspective, there is a PMU. It has several LDOs. =
-So
-> >>> the device tree should have the same style as the previous
-> >>> generations.
-> >>>
-> >>
-> >> My thinking was this: yes, there is a PMU but describing it has no
-> >> benefit (unlike QCA6x90). If we do describe, then we'll end up having
-> >> to use pwrseq here despite it not being needed because now we won't be
-> >> able to just get regulators from WLAN/BT drivers directly.
-> >>
-> >> So I also vote for keeping it this way. Let's go into the package
-> >> detail only if it's required.
-> >
-> > The WiFi / BT parts are not powered up by the board regulators. They
-> > are powered up by the PSU. So we are not describing it in the accurate
-> > way.
->
-> I disagree, the WCN7850 can also be used as a discrete PCIe M.2 card, and=
- in
-> this situation the PCIe part is powered with the M.2 slot and the BT side
-> is powered separately as we currently do it now.
+Dear Luiz /Community,
 
-QCA6390 can also be used as a discrete M.2 card.
+I'm trying to verify OOB pairing by manually sharing pairing
+information using the btmgmt tool (Not using NFC)
+between BLE central and peripheral devices.
 
-> So yes there's a PMU, but it's not an always visible hardware part, from =
-the
-> SoC PoV, only the separate PCIe and BT subsystems are visible/controllabl=
-e/powerable.
+This is similar to the question below, which is not answered.I tried
+googling, but couldn't find the right info, so turned to the community
+for help.
+https://stackoverflow.com/questions/42344367/out-of-band-bluetooth-pairing-with-the-btmgmt-tool-on-linux
 
-From the hardware point:
-- There is a PMU
-- The PMU is connected to the board supplies
-- Both WiFi and BT parts are connected to the PMU
-- The BT_EN / WLAN_EN pins are not connected to the PMU
+Here are the steps I followed.
 
-So, not representing the PMU in the device tree is a simplification.
+1. secure connection is enabled in both devices.
 
->
-> Neil
->
-> >
-> > Moreover, I think we definitely want to move BT driver to use only the
-> > pwrseq power up method. Doing it in the other way results in the code
-> > duplication and possible issues because of the regulator / pwrseq
-> > taking different code paths.
+Central:
+# btmgmt info
+Index list with 1 item
+hci0: Primary controller
+addr 00:1F:7B:4A:0E:CB version 12 manufacturer 72 class 0x000000
+supported settings: powered connectable fast-connectable discoverable
+bondable link-security ssp br/edr le advertising secure-conn
+debug-keys privacy static-addr phy-configuration
+current settings: powered connectable discoverable bondable le secure-conn
+name Panda
 
---=20
-With best wishes
-Dmitry
+Peripheral:
+# btmgmt info
+Index list with 1 item
+hci0: Primary controller
+addr 00:1F:7B:4A:0E:81 version 9 manufacturer 72 class 0x000000
+supported settings: powered connectable fast-connectable discoverable
+bondable link-security ssp br/edr le advertising secure-conn
+debug-keys privacy static-addr phy-configuration
+current settings: powered connectable discoverable bondable le
+advertising secure-conn
+name imx8mmpanda
+short name
+
+
+2. Unable to read local-oob
+[mgmt]# local-oob
+Too small (32 bytes) read_local_oob rsp
+
+3. So random and hash values generated using "le-oob"
+
+Central:
+[mgmt]# le-oob
+LE Device Address: 00:1F:7B:4A:0E:CB (public)
+LE Role: 0x01
+LE SC Confirmation Value: 1e8cb994e8d913adf0fc55196b3e3f0e
+LE SC Random Value: f1813b0ddd3ca126ac847dc8cbe492a0
+Flags: 0x02
+
+Peripheral:
+[mgmt]# le-oob
+LE Device Address: 00:1F:7B:4A:0E:81 (public)
+LE Role: 0x02
+LE SC Confirmation Value: 759058bc5620bf728f3e18ce88728d67
+LE SC Random Value: 1329bb1dbc7f13f846c12360f596ada0
+Flags: 0x06
+
+3. paring info updated using "remote-oob" but seeing 0 for R,H in btmon log
+
+Central:
+[mgmt]# remote-oob 00:1F:7B:4A:0E:81 -t 1 -r
+f1813b0ddd3ca126ac847dc8cbe492a0 -h 1e8cb994e8d913adf0fc55196b3e3f0e
+-R 1329bb1dbc7f13f846c12360f596ada0 -H
+759058bc5620bf728f3e18ce88728d67
+
+Peripheral:
+[mgmt]# remote-oob 00:1F:7B:4A:0E:CB -t 1 -r
+1329bb1dbc7f13f846c12360f596ada0 -h 759058bc5620bf728f3e18ce88728d67
+-R f1813b0ddd3ca126ac847dc8cbe492a0 -H
+1e8cb994e8d913adf0fc55196b3e3f0e
+
+btmon log:
+@ MGMT Command: Add Remote Out Of Band Data (0x0021) plen 71
+                            {0x0002} [hci0] 30.534680
+        BR/EDR Address: 00:1F:7B:4A:0E:CB (TechNexion Ltd.)
+        Hash C from P-192: 00000000000000000000000000000000
+        Randomizer R with P-192: 00000000000000000000000000000000
+        Hash C from P-256: 00000000000000000000000000000000
+        Randomizer R with P-256: 00000000000000000000000000000000
+@ MGMT Event: Command Complete (0x0001) plen 10
+                                       {0x0002} [hci0] 30.534706
+      Add Remote Out Of Band Data (0x0021) plen 7
+        Status: Success (0x00)
+        BR/EDR Address: 00:1F:7B:4A:0E:CB (TechNexion Ltd.)
+
+Also seeing BR/EDR address instead of LE address.
+
+5. paring initiated w/ address type 1 (LE Public)
+pair -t 1 00:1F:7B:4A:0E:81
+
+6.  OOB data flag is not set in both pairing request and response
+So fall back to IO capability and prompting to confirm the numerical comparison.
+
+btmon log:
+< ACL Data TX: Handle 128 flags 0x00 dlen 11
+                                              #534 [hci0] 121.916889
+      SMP: Pairing Request (0x01) len 6
+        IO capability: DisplayYesNo (0x01)
+        OOB data: Authentication data not present (0x00)
+        Authentication requirement: Bonding, MITM, SC, No Keypresses (0x0d)
+        Max encryption key size: 16
+        Initiator key distribution: EncKey Sign (0x05)
+        Responder key distribution: EncKey IdKey Sign (0x07)
+< ACL Data TX: Handle 128 flags 0x00 dlen 7
+                                              #535 [hci0] 121.917990
+      ATT: Exchange MTU Request (0x02) len 2
+        Client RX MTU: 517
+
+> HCI Event: Number of Completed Packets (0x13) plen 5                                                               #536 [hci0] 121.961103
+        Num handles: 1
+        Handle: 128 Address: 00:1F:7B:4A:0E:81 (TechNexion Ltd.)
+        Count: 1
+> HCI Event: Number of Completed Packets (0x13) plen 5                                                               #537 [hci0] 121.961727
+        Num handles: 1
+        Handle: 128 Address: 00:1F:7B:4A:0E:81 (TechNexion Ltd.)
+        Count: 1
+> ACL Data RX: Handle 128 flags 0x02 dlen 11                                                                         #538 [hci0] 122.005568
+      SMP: Pairing Response (0x02) len 6
+        IO capability: NoInputNoOutput (0x03)
+        OOB data: Authentication data not present (0x00)
+        Authentication requirement: Bonding, MITM, SC, No Keypresses (0x0d)
+        Max encryption key size: 16
+        Initiator key distribution: EncKey Sign (0x05)
+        Responder key distribution: EncKey Sign (0x05)
+> ACL Data RX: Handle 128 flags 0x02 dlen 7
+
+7. Tried to set OOB data flag using below command but it doesn't help
+set-flags 00:1F:7B:4A:0E:CB -f 0x0004
+
+I don't know how to set the OOB data flag using the btmgmt tool.
+I would appreciate any input regarding this.
+
+Thank you
+Raj
