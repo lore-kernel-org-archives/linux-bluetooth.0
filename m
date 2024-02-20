@@ -1,75 +1,171 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1B14133987
-	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Feb 2024 19:10:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BFD676C9C
+	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Feb 2024 21:21:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708456229; cv=none; b=ezBXXMNU2NLcN0DAgPUg2i9WELZmk3U/KbqgHeKCQ83Xw4XzfUoHyV/QsNSC/vERO0+mkCYdyjmVC2HPAMTW6WA93cvKcbgDgDnt6+a/uKzlh3nOsqIK3YOi6v44IhKkMOtS/Unnbh8lUfiDBFUZFI9Opt71K2HnKhrJM85TYJQ=
+	t=1708464073; cv=none; b=BcKkS9VAa8pUJNARXOPqJ/+Bot0Ek0gRIVkhrjT78DxPj2BdbMpraGBi2PPl+mC5v/+ySHpt0++pxFz5eomCHbCjhM8zQ3wyKF75bFyYXB6qEYTsiY68BptfHThugpIh+eLUIzgcB8F/0BH42fwvULOtKDogf6HCu9S0t0ZFjMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708456229; c=relaxed/simple;
-	bh=Lj8Nd7/5NKbDeX0Z7ph8vfB502/6NtRLCxBw64giC1o=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ZFkgiGNhjIeGx7wt2b88IAXvScIkzwfz3tv369HTbU/LnWm0eTQWqnwm2hoJNo3nVsB25GHSb3a0O0kZDmUAsPJWOR/WVX1gAoEuaIcNRraAs/D8rKzOHELFa+/lkFesUVyM6Rvcb7p6ze4oKtYTsHpnoGyjgT54oRxORVJlK5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ISPAyA+D; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1708464073; c=relaxed/simple;
+	bh=QIb79S8dEXh8LFbr/l1y4IqwiNhKYcYdvIOdGbZPR10=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=opaRIZuipo7cLgld8PB2Zjgyqyn/09uVdD1WxswUaaN0QJrBpKnXzu/Fp2Iq3/01aqpNrJ0qGBoA8o2khNbQQQKJeIV0bYBXz1zq4NIfbGVFLzLItmNs5/bwpM4qDUg2lccmvVvDzIGxJe/oRnOopk8Zcqx3jVftfwFqoVTs2lg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=kJ6oHUQB; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ISPAyA+D"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7A817C433B1;
-	Tue, 20 Feb 2024 19:10:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708456229;
-	bh=Lj8Nd7/5NKbDeX0Z7ph8vfB502/6NtRLCxBw64giC1o=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ISPAyA+DT0F89XvNil+Z1kAJtKRLCDhF9O98DcK3dpifYQCjQs7fKOrAz004AXsA6
-	 /yxw4W7kgV5Tf6tbswjvwDoSTT5AWsFf33vEdqptko8o6F9L+h4DqHjzB/twpSxuJD
-	 Cz68opDkqUXB4c/C2IGCAaq2F2XlKIVM8Uyb0olGIwEvourau7zQcUShZ8qzzPr1TV
-	 KmWMOItU2L7q7lU4cAmO3YIapSk7qPRVLmZux/dxq7CvTuuzIvLVpevZqZIv/E9yCl
-	 jh6FdKezXyUKKm3mP1pUDxBps+vWsAt68iDv4fNoY4S5OZNGYa23GWnGX3WIambIL9
-	 ef+RME/mABOog==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 591DDD84BC6;
-	Tue, 20 Feb 2024 19:10:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kJ6oHUQB"
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-512ab55fde6so4372041e87.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Feb 2024 13:21:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1708464069; x=1709068869; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=aewqZFQqAR8f8P67ZzKs5ZfSe1DqicHVEuGcz5XnehA=;
+        b=kJ6oHUQBobYzdU7nmQFkM3o1PTzoD/1gWwOCvaCiuaShekcaWW64iGJ+G9nrY2rEXR
+         ty/VqImKjaPAXIHGh2hBywNFMUNF37eHSug1XHzVLgjEuUPekwwFHi70nlxVG97wMkg/
+         bq2pXuDPqDRpW+M4DRfa28qEVuwOVDtOvfgzl9ZKQAyxbnHpK0dxu2/pXFU1zwhFfArn
+         IV/xkFys5PLZw2jigIjJCYO/DoTEXCkVImGCVNfGn7SAims0skOmVCLUvgVcn3LRdSxf
+         kg/K6oybXpR6nWqv1J9MO5bZGveHi56Hr9fJ+/e0AVRuBXvjK+ot0MI1492XMKc69zwQ
+         kEuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708464069; x=1709068869;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aewqZFQqAR8f8P67ZzKs5ZfSe1DqicHVEuGcz5XnehA=;
+        b=sSqED3+Dp0NcEWFzJdA+kGu1v9NfzKlz+/XzVi5WmoD2q3pkZUfvXp62qkKQ01WnRc
+         qvOW+NhkIK7e5ENxk9u2zBObeDW28bTV5WVqx+vW9cAuncHQSos3kx/FnYTuhVx7zuG7
+         nLmmGHtZUBkA6RR68TMZ+EfifiW/zMH49g/COxbG9oKvEE4Sx25NetcHkYLKkgxntbsj
+         YWXxKzQ35HZYzZFRqsgaAPuvmsL3egVZg8dwvZ568ItZEybwL7YanfXKNTn3j1C7HTJU
+         yFZDK5K8nXXyCQHvb+CW3mkHO/Au2yQpvC5p9nCyrZD7m39xDjiVQY5/FP10h6vTKqei
+         /FaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVi+GrPbtNHDgYBNDNUXwjxG4vP7RClQZ+BOdDQX4+Lj7V/8iI0lYj4OgPLmhcHC8yQO+OjrzD3xu0s+eCgzjqlGj1NEAMZBlHANjRGMWSI
+X-Gm-Message-State: AOJu0Yy/uDi63iLngcLuk3VXA89oMSjw9l2TmyyN5orO4JpjHU8dRmG7
+	cUvWEvsyHGRy6bPpAOO3U3bOgJt+f31jMJKtwUrAlOIgp/U3K0/uMF5d02x2PMM=
+X-Google-Smtp-Source: AGHT+IE7oxGB2v2CxKN0KBUsYoVrLWeS67J9KHU2sgtn9zhSwTZSLaGf6S53k3pQEILvmz2pBWcsQg==
+X-Received: by 2002:a05:6512:48b:b0:512:b85e:9831 with SMTP id v11-20020a056512048b00b00512b85e9831mr3472902lfq.36.1708464069273;
+        Tue, 20 Feb 2024 13:21:09 -0800 (PST)
+Received: from [192.168.192.135] (078088045141.garwolin.vectranet.pl. [78.88.45.141])
+        by smtp.gmail.com with ESMTPSA id q23-20020ac24a77000000b00512b25729bdsm972840lfp.31.2024.02.20.13.21.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Feb 2024 13:21:08 -0800 (PST)
+Message-ID: <17bbd9ae-0282-430e-947b-e6fb08c53af7@linaro.org>
+Date: Tue, 20 Feb 2024 22:21:04 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 14/18] PCI/pwrctl: add a power control driver for
+ WCN7850
+To: Mark Brown <broonie@kernel.org>, Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Kalle Valo <kvalo@kernel.org>,
+ Bjorn Andersson <andersson@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Bjorn Helgaas <bhelgaas@google.com>, Saravana Kannan <saravanak@google.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>, Arnd Bergmann <arnd@arndb.de>,
+ Neil Armstrong <neil.armstrong@linaro.org>,
+ Marek Szyprowski <m.szyprowski@samsung.com>, Alex Elder <elder@linaro.org>,
+ Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Abel Vesa <abel.vesa@linaro.org>, Manivannan Sadhasivam <mani@kernel.org>,
+ Lukas Wunner <lukas@wunner.de>,
+ Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
+ linux-pm@vger.kernel.org,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+References: <20240216203215.40870-1-brgl@bgdev.pl>
+ <20240216203215.40870-15-brgl@bgdev.pl>
+ <d5d603dc-ec66-4e21-aa41-3b25557f1fb7@sirena.org.uk>
+ <CAMRc=MeUjKPS3ANE6=7WZ3kbbGAdyE8HeXFN=75Jp-pVyBaWrQ@mail.gmail.com>
+ <ea08a286-ff53-4d58-ae41-38cca151508c@sirena.org.uk>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@linaro.org>
+Autocrypt: addr=konrad.dybcio@linaro.org; keydata=
+ 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
+ izWDgYvmBE8=
+In-Reply-To: <ea08a286-ff53-4d58-ae41-38cca151508c@sirena.org.uk>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1] Bluetooth: hci_sync: Fix UAF on create_le_conn_complete
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <170845622936.2554.13668052389155897936.git-patchwork-notify@kernel.org>
-Date: Tue, 20 Feb 2024 19:10:29 +0000
-References: <20240220181319.368485-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240220181319.368485-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
 
-Hello:
-
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Tue, 20 Feb 2024 13:13:19 -0500 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On 20.02.2024 13:47, Mark Brown wrote:
+> On Tue, Feb 20, 2024 at 12:22:42PM +0100, Bartosz Golaszewski wrote:
+>> On Mon, Feb 19, 2024 at 6:50 PM Mark Brown <broonie@kernel.org> wrote:
+>>> On Fri, Feb 16, 2024 at 09:32:11PM +0100, Bartosz Golaszewski wrote:
 > 
-> While waiting for hci_dev_lock the hci_conn object may be cleanup
-> causing the following trace:
+>>>> +static struct pci_pwrctl_wcn7850_vreg pci_pwrctl_wcn7850_vregs[] = {
+>>>> +     {
+>>>> +             .name = "vdd",
+>>>> +             .load_uA = 16000,
+>>>> +     },
 > 
-> BUG: KASAN: slab-use-after-free in hci_connect_le_scan_cleanup+0x29/0x350
-> Read of size 8 at addr ffff888001a50a30 by task kworker/u3:1/111
+>>> I know a bunch of the QC stuff includes these load numbers but are they
+>>> actually doing anything constructive?  It keeps coming up that they're
+>>> causing a bunch of work and it's not clear that they have any great
+>>> effect on modern systems.
 > 
-> [...]
+>> Yes, we have what is called a high-power mode and a low-power mode in
+>> regulators and these values are used to determine which one to use.
+> 
+> Are you *sure* this actually happens (and that the regulators don't
+> figure it out by themselves), especially given that the consumers are
+> just specifying the load once rather than varying it dynamically at
+> runtime which is supposed to be the use case for this API?  This API is
+> intended to be used dynamically, if the regulator always needs to be in
+> a particular mode just configure that statically.
 
-Here is the summary with links:
-  - [v1] Bluetooth: hci_sync: Fix UAF on create_le_conn_complete
-    https://git.kernel.org/bluetooth/bluetooth-next/c/25956d989c60
+*AFAIU*
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+The regulators aggregate the requested current (there may be
+multiple consumers) and then it's decided if it's high enough
+to jump into HPM.
 
+Konrad
 
