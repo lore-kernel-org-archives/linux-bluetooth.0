@@ -1,70 +1,68 @@
-Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com [209.85.222.41])
+Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com [209.85.217.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5029F664B1
-	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Feb 2024 11:16:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9686667E6A
+	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Feb 2024 11:22:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708427785; cv=none; b=nKzHV/gWkuN785LspzAnur+jPRT/MFCM++2+M8MuxESOyuasidMhfACzwQ9SQFRT/0/847jFqIUu5kQC21bgCPF56zMfSlxqgFmu6ArY/MYdSNmL+iJ7LoTDEXevZcLecwSUE8TKVlXgnWTROx6Ateq7IFd6Rx7HRDMp+HR0dkY=
+	t=1708428176; cv=none; b=M7MlSmYM3wV2s2NWUJ2sC1ylL+FhYft6pIDriXUjSCkU+jI/BjT3MP4d50pHZ4MR3EUTWb2PAmshxpTFP6RyQvD04XuzHBJzope1CiDCBKqi4D74j+nBlCPVGsNQIQqpNHe6Jw+0Q0QOVoUN43eWTu1sE+Ibt0l42IJNmP/Tn2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708427785; c=relaxed/simple;
-	bh=0XEVX7reUloJJ0HXCmKNanytjESGdOW7twiOSY0z6jI=;
+	s=arc-20240116; t=1708428176; c=relaxed/simple;
+	bh=dQqffqh6T4LO8Z67UPdabicBep7/vKvQtPnTrA6jWl0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lOLkw6HtGMebscwzl+/1lDWqTrfcV+el+eHy/er/MeqaKW7qb8Eff318YHVyOoO4TxFxtYF6tVOvVoiihIa7ltDlHiwl7FDvBT8ivg8mNAFQYYf+HtUvR4ICMjQGdr8LaZRt3HhzYOPx6Q8JWIwuchlg4uBHOhYUGJM4M8eTsl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=iDGtm6aD; arc=none smtp.client-ip=209.85.222.41
+	 To:Cc:Content-Type; b=DTigkGli4zddVe6mghme4kPFBd9T7lY4fOYspwbeRuJW2Ci0l25GZwn0gUSMvWP+Ts+vQWoPaMZiZsXGTGSGzw4yQmdSII0BJyudVWybw3zYhYstPhoLSGH5sDVsHKSh5tyQnHqoyD+3YIJCQ74jugdeUQ910Sj3zNrxFgb2++k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=vSO0mx5a; arc=none smtp.client-ip=209.85.217.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="iDGtm6aD"
-Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-7d5fce59261so3488250241.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Feb 2024 03:16:23 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="vSO0mx5a"
+Received: by mail-vs1-f46.google.com with SMTP id ada2fe7eead31-47064e95199so323069137.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Feb 2024 03:22:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1708427782; x=1709032582; darn=vger.kernel.org;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1708428173; x=1709032973; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/TGQQf9QVaNxe+P/ET43bTj+OwzYLCPf9zjW80RckT8=;
-        b=iDGtm6aDQFMcDmVljb+fXB1UkYRGIUzBmDrTWX9JQOVFyeXsgoLl4wS9utqR9RV71f
-         T+8WHTK/iwqEgTvdFhQudDhLfT4UzAX9vI/v8NGmdEsUnUPLq2PxHkN3IvBa2OGOPVGy
-         LLNkNuWZEubob9k5MyrOgCf2GRn6NzxhmvgqGcfhyV5jQlXdpXjJroxrzwveUbhdM2Ay
-         otnH9ivwaAR4c8tL84tYyfYHWLmNTDYIFluzKDDitHIJ8viijOpjl5JUOLopdC4YTshI
-         RfL7ZXx7mldMdMT3nwydmjVrhK0J1aVXrd/e25JWwSUdFclB4zHERRvw/ru6KwedJ/Ig
-         scfg==
+        bh=tnGpsA2N+oEjNvZD5MvHoPc7WS23uAKNUryh+bWrqLI=;
+        b=vSO0mx5a+FNZasQYE4RcLEccUm4jxE8F3vYw1Sc5Z6kw5LmrJjsBHkEAhmB/OwiObt
+         tP8uQWrOti3T4Rsuxd2Dqutiv+AGL72KptpRTUkZnO4DrhN39ZYEcR8wGuugsTxpFzN7
+         lQyH9QDVQWiZp67zAJGmlFmxUG44rWwjGYkA4JBpouU3dzGX53eAy0Vv5CiKJSR7jW2u
+         Bgca6eN8Oj+QhK3B5CBSfGP3EnYlRfI1NNrpHpbcj623KRgeabfPIRWT4zzt3u/8VT9A
+         3G7DDvfLBZ5+7czw32tDwcCPbEA+IOYiiR/QTDyburwckbN3vOFgvgyvYIRhLTX3n1qu
+         m82w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708427782; x=1709032582;
+        d=1e100.net; s=20230601; t=1708428173; x=1709032973;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=/TGQQf9QVaNxe+P/ET43bTj+OwzYLCPf9zjW80RckT8=;
-        b=Y9uJiGkgr0FsNsZkFLc94GyABxNwqLFd4YbLzJCb4rqP9/1X3Gmg7C3BZP96Ucs3Vi
-         pO+0nWjXQbeixjaN4PoZZmx1au6bzmNiSlSZdCDqadLgswU3uus/ZqtcimPWpxyk+vVA
-         dyPlekB29E+mrBh6Dfg4ZktBa1ujZqP60OfD4gqlRloxBVFnO2pATGr7pDVtgiGjsGBA
-         FlV9lsk3Dmc3L2xQKB2WJYKfCU6U0LqJc1HI+i4BpnauJb394lFitCeObt4TTtJ/UJ1Z
-         5D0LAUc72V7DnFSWgilO0yxOKwqkifLtA6sR5kMmxTfLG1aIypvpIZbDpsZbA0prqcS0
-         lvqg==
-X-Forwarded-Encrypted: i=1; AJvYcCWEwmko2gSZTpORYHfr62Qp3xPU0AeNBZtAebwG7ouO1CUq+b8TjbW8UFgbLY3rMm/bqhOBgq7Ghzn0wG0GoYy9jNCuDCyqrE1f8Nj+tzfu
-X-Gm-Message-State: AOJu0Yz4pXYkiSdyctMYzvdq6kI0qhi8SNai6Z2WCjsjJ+NZTgGgxy8g
-	HbR/d17pLLpxVpodzAnfr0W7Ew6RdiL+DLDcCkZJF+3RpmQAc+mOZiMnpcaoJQIEdv1zRNsSIDa
-	/9bh3O9ZZG/tmiP/M5hJQPqIi3LVba1JtDkjw5w==
-X-Google-Smtp-Source: AGHT+IF0CN7Ryol7qmamq7DrWXyYZkwvZgbPRNHrR3nczqiDKiEYYS7aZK8HtFSbIhrDgqTa7oMs3VHOgqV6taESy9U=
-X-Received: by 2002:a05:6102:1610:b0:470:51ab:3e46 with SMTP id
- cu16-20020a056102161000b0047051ab3e46mr5334654vsb.30.1708427781847; Tue, 20
- Feb 2024 03:16:21 -0800 (PST)
+        bh=tnGpsA2N+oEjNvZD5MvHoPc7WS23uAKNUryh+bWrqLI=;
+        b=uy3Q69psrWAfDSAjpxtlE+EQUis4rKapHCMWLs6gQSBZF8yHWFT/GAS4iwpKo2SrbO
+         dBKLs3x8tnwN9ZBNeQHI3H640WffrpbQzh0EOtoNMvj55pPylVo0PlDlM2Fy7wkJ+1+I
+         ipkL37kFYe0vwz+VyAdJUTzXmlbeFUB0KSotDLgtXKwzp6TSXPbHzs0PtFJQnQXdzT+L
+         EU10jVud8w4h7jzSCX7kondcHwCM7KoOmBvFhSoSzjnymXcc5mlwZxAPYRkF3YT5Mm0b
+         iWDMWbAmIQ2widrTM+EzoemLvlpCOF0c41y3mwreqaPGN3TrCUqu19rtxUsMzidoFkVO
+         Qh/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV44xbwLCUTBkxg1lqP2nRzcYXulF/Qs/BPz5gOKH8h54ifjIaQp+TPc6K2qptprtWPbT76S/1+k2IayRuBXXe7IKS9pUc2cJgEJinJCCci
+X-Gm-Message-State: AOJu0YzhBwE9rXpSLimj++kwrqxkg/1PPvGX2pr83OoGoSeZhIlkyAKJ
+	Ic7v5bjIpOryctegw0Lbx9f2V2c2crapJT+DKSrWeSOS9xs+RARua+PEiTPAymveEzwiDIiOUwb
+	3Xxe3jt4N0UvH2AK2G8Sl5aOA/aB4VlqridVeBg==
+X-Google-Smtp-Source: AGHT+IGmypbXGvIgsXnS85V0NkbV+58vcVfrux92hdJBvsnBD1MJ/T8V6U4tgekizLSc354z11MbuHbewdtd9TTnF58=
+X-Received: by 2002:a67:ec0a:0:b0:470:4dd8:b18 with SMTP id
+ d10-20020a67ec0a000000b004704dd80b18mr5421598vso.19.1708428173554; Tue, 20
+ Feb 2024 03:22:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240216203215.40870-1-brgl@bgdev.pl> <20240216203215.40870-10-brgl@bgdev.pl>
- <48164f18-34d0-4053-a416-2bb63aaae74b@sirena.org.uk> <CAMRc=Md7ymMTmF1OkydewF5C32jDNy0V+su7pcJPHKto6VLjLg@mail.gmail.com>
- <8e392aed-b5f7-486b-b5c0-5568e13796ec@sirena.org.uk>
-In-Reply-To: <8e392aed-b5f7-486b-b5c0-5568e13796ec@sirena.org.uk>
+References: <20240216203215.40870-1-brgl@bgdev.pl> <20240216203215.40870-15-brgl@bgdev.pl>
+ <d5d603dc-ec66-4e21-aa41-3b25557f1fb7@sirena.org.uk>
+In-Reply-To: <d5d603dc-ec66-4e21-aa41-3b25557f1fb7@sirena.org.uk>
 From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Tue, 20 Feb 2024 12:16:10 +0100
-Message-ID: <CAMRc=MeAXEyV47nDO_WPQqEQxSYFWTrwVPAtLghkfONj56FGVA@mail.gmail.com>
-Subject: Re: [PATCH v5 09/18] arm64: dts: qcom: qrb5165-rb5: model the PMU of
- the QCA6391
+Date: Tue, 20 Feb 2024 12:22:42 +0100
+Message-ID: <CAMRc=MeUjKPS3ANE6=7WZ3kbbGAdyE8HeXFN=75Jp-pVyBaWrQ@mail.gmail.com>
+Subject: Re: [PATCH v5 14/18] PCI/pwrctl: add a power control driver for WCN7850
 To: Mark Brown <broonie@kernel.org>
 Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
 	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
@@ -88,68 +86,41 @@ Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gm
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 19, 2024 at 8:59=E2=80=AFPM Mark Brown <broonie@kernel.org> wro=
+On Mon, Feb 19, 2024 at 6:50=E2=80=AFPM Mark Brown <broonie@kernel.org> wro=
 te:
 >
-> On Mon, Feb 19, 2024 at 07:48:20PM +0100, Bartosz Golaszewski wrote:
-> > On Mon, Feb 19, 2024 at 7:03=E2=80=AFPM Mark Brown <broonie@kernel.org>=
- wrote:
-> > > On Fri, Feb 16, 2024 at 09:32:06PM +0100, Bartosz Golaszewski wrote:
+> On Fri, Feb 16, 2024 at 09:32:11PM +0100, Bartosz Golaszewski wrote:
 >
-> > > > +                     vreg_pmu_aon_0p59: ldo1 {
-> > > > +                             regulator-name =3D "vreg_pmu_aon_0p59=
-";
-> > > > +                             regulator-min-microvolt =3D <540000>;
-> > > > +                             regulator-max-microvolt =3D <840000>;
-> > > > +                     };
+> > +static struct pci_pwrctl_wcn7850_vreg pci_pwrctl_wcn7850_vregs[] =3D {
+> > +     {
+> > +             .name =3D "vdd",
+> > +             .load_uA =3D 16000,
+> > +     },
 >
-> > > That's a *very* wide voltage range for a supply that's got a name end=
-ing
-
-Because it's an error, it should have been 640000. Thanks for spotting it.
-
-> > > in _0_p59 which sounds a lot like it should be fixed at 0.59V.
-> > > Similarly for a bunch of the other supplies, and I'm not seeing any
-> > > evidence that the consumers do any voltage changes here?  There doesn=
-'t
-> > > appear to be any logic here, I'm not convinced these are validated or
-> > > safe constraints.
->
-> > No, the users don't request any regulators (or rather: software
-> > representations thereof) because - as per the cover letter - no
-> > regulators are created by the PMU driver. This is what is physically
-> > on the board - as the schematics and the datasheet define it. I took
->
-> The above makes no sense.  How can constraints be "what is physically on
-> the board", particularly variable constrants when there isn't even a
-> consumer?  What values are you taking from which documentation?
+> I know a bunch of the QC stuff includes these load numbers but are they
+> actually doing anything constructive?  It keeps coming up that they're
+> causing a bunch of work and it's not clear that they have any great
+> effect on modern systems.
 >
 
-The operating conditions for PMU outputs. I took them from a
-confidential datasheet. There's a table for input constraints and
-possible output values.
+Yes, we have what is called a high-power mode and a low-power mode in
+regulators and these values are used to determine which one to use.
 
-And what do you mean by there not being any consumers? The WLAN and BT
-*are* the consumers.
-
-> The cover letter and binding both claimed (buried after large amounts of
-> changelog) that these PMUs were exposing regulators to consumers and the
-> DTS puports to do exactly that...
+> > +static int pci_pwrctl_wcn7850_power_on(struct pci_pwrctl_wcn7850_ctx *=
+ctx)
+> > +{
+> > +     int ret;
+> > +
+> > +     ret =3D regulator_bulk_enable(ctx->pdata->num_vregs, ctx->regs);
+> > +     if (ret)
+> > +             return ret;
+> > +
+> > +     ret =3D clk_prepare_enable(ctx->clk);
+> > +     if (ret)
+> > +             return ret;
 >
+> This won't disable the regulators on error.
 
-Yes, but I'm not sure what the question is.
-
-> > the values from the docs verbatim. In C, we create a power sequencing
-> > provider which doesn't use the regulator framework at all.
->
-> For something that doesn't use the regulator framework at all what
-> appears to be a provider in patch 16 ("power: pwrseq: add a driver for
-> the QCA6390 PMU module") seems to have a lot of regualtor API calls?
-
-This driver is a power sequencing *provider* but also a regulator
-*consumer*. It gets regulators from the host and exposes a power
-sequencer to *its* consumers (WLAN and BT). On DT it exposes
-regulators (LDO outputs of the PMU) but we don't instantiate them in
-C.
+Indeed. Thanks for catching this.
 
 Bart
