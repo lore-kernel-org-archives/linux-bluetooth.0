@@ -1,342 +1,118 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from mail-40133.protonmail.ch (mail-40133.protonmail.ch [185.70.40.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B5183B781
-	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Feb 2024 10:28:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D42236B18
+	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Feb 2024 10:45:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708511295; cv=none; b=ZguVrIgXfNRUUHYjsafYajdgREGn0HJop5WlKarfGD9YdWpXz77g4Fc/tkQtTeSkidG1ivqQVjVF1jHGkk5fI5x1KDSzfSzFPRCcmMDr7GHxal/BKzKEFPY74fOeBuxmGUfzkNLVvdxBhk6eBLqR4BEUo7i7d0IFkcnDyuIuKS0=
+	t=1708512312; cv=none; b=Q+ETAxuLO9vDIS11yrekWsthdfSolSupZTM48vfkdSRyZd/D2hr7KR+1LGtcAQ7GQ5jXYtLFkdaFaUgTdnas0e+deVVuCdusfxAQ0SYNBd1QAsPg4Wj2Z6zXgjphABpNck+37yJiNxbUImSPM4fD/Qjyy+/KotXIJ4ottwARqVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708511295; c=relaxed/simple;
-	bh=UYVabs0rlkpoCnSc1MSXtPzVaNv4JUd4iR1q04SMPDU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RaaTW4cfxI0q+aH5mduLBsBLrw3USsbvQMoIVWkjXu9CZ46p4MQHRSuXv2lw3Cf8BLatPZ+NryyJgNXEZ1QsZ7opI3J+CroVKgALJXeRp6Ds5WoAU889HM/utEIm+Lb3Sg2YAm/yifdrpqSRz48/ezCT0a8AipPxHYkFHaWr2LM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nWzo8SrM; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1708512312; c=relaxed/simple;
+	bh=B+pFKzfHCAn1l9phqimNCv3GOadgzMPuRi6KuJaaOLo=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=UIMtwVGaOoigbBLWpD2fBZvi5OekHiHQeZNYxkavu/FX/ryBZmCSdrRZ39dO8C/WQlffIQApjbX5tfGpGXEjAwPkENAZMMoEn4Rbe6c4KqLvRCWc8SYLMnrdVBY0aQohDNtUiHUuLV7uZpG+tyrE2fRUyhtJ2mhrLd4F/5wZwd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=m+svlqX1; arc=none smtp.client-ip=185.70.40.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nWzo8SrM"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708511293; x=1740047293;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=UYVabs0rlkpoCnSc1MSXtPzVaNv4JUd4iR1q04SMPDU=;
-  b=nWzo8SrMRaEAQiE4hLrP4MaOTLyiWMchH7AVZET4cVBWS+SY79YLeXAO
-   fByZNylFh7OgruMialEb/hlvcC9z2cmG/qgjcIy/fNPBdtFm9Ru6ZXMeZ
-   sj7bMYYNH74m6uJC4mvIIgkq2WuWKp934BTYeWhzoZ/k/82Sz0wNmUbHg
-   KNYn8ywO89uPwRMLthiw+ki0vbqjZbfx+yNN+a+GUCNv57zvhPifhkNVC
-   J5ns//bJNj81vbYnKhV5Rpbin8Io1aX7czx9R2LMswKaZa8wn1kFMWVAC
-   0ZbHVvs1s8MwdN20oSt2LlGQJcZvCI9H2hug6KURGbJOtsQ4vsg7828D0
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10990"; a="5617890"
-X-IronPort-AV: E=Sophos;i="6.06,175,1705392000"; 
-   d="scan'208";a="5617890"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2024 02:28:12 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,175,1705392000"; 
-   d="scan'208";a="9730963"
-Received: from lbtoe.iind.intel.com ([10.224.186.133])
-  by orviesa003.jf.intel.com with ESMTP; 21 Feb 2024 02:28:11 -0800
-From: Shahid Vichhi <shahid.bashir.vichhi@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Shahid Vichhi <shahid.bashir.vichhi@intel.com>
-Subject: [ BlueZ,v3] profiles/audio/ccp: Add CCP plugin for call control profile
-Date: Wed, 21 Feb 2024 05:22:22 +0200
-Message-Id: <20240221032221.404011-1-shahid.bashir.vichhi@intel.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="m+svlqX1"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+	s=protonmail3; t=1708512302; x=1708771502;
+	bh=ALAUWDo1q/pR2NBpJFnmEYadC1ZlGbn8mjRrWt60C40=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=m+svlqX1hRCs4J4W5yLiwQZfqk4xDYx8LnEnZJYACPKrr+fBDgNxqDhlQClYyMeTH
+	 lhaYUtTEOoMFmciUkS+W8ooZFZHVLPkq3TuZ/UxtljFazPcJExt9L7mJ6O4wNt5e3Y
+	 5HN9iwJocnRPinMTSaS0qN+5vPCG49ywpY6lgZvg2DDVA0bWXBjcWjngogij9ZmyXp
+	 Dp15QVBASSQ4nB5JTrwzGK5fhQxlvTG0VdAuZGwW7HQtgV+x+qr2tXmMh5Vn+EoTUc
+	 sPVsnc4jer6r/d8llyroTgJSs24At98KKlTdMUhSmLdDnA9kxeaNm1ERQkEQ+QafV1
+	 jM8RUe/upHodQ==
+Date: Wed, 21 Feb 2024 10:44:53 +0000
+To: linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com
+From: Emil Kronborg <emil.kronborg@protonmail.com>
+Cc: linux-kernel@vger.kernel.org
+Subject: Bluetooth issues with hci_sync after v6.4+
+Message-ID: <4o3o7jaskrim3aajexbhlxn46d3ej5y6bjwe6htevzywgymn7d@uvdewtfe444z>
+Feedback-ID: 20949900:user:proton
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This adds initial code for CCP plugin which handle CALL CONTROL PROFILE for
-Telephone Bearer Services and Generic Telephone Bearer Services in the
-client role.
-This has been tested using teams application by initiating call between
-Linux BTOE and Windows server with LE audio enabled.
----
- Makefile.plugins     |   5 +
- configure.ac         |   4 +
- profiles/audio/ccp.c | 235 +++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 244 insertions(+)
- create mode 100644 profiles/audio/ccp.c
+Hi,
 
-diff --git a/Makefile.plugins b/Makefile.plugins
-index e960eedeabd3..4aa2c9c92854 100644
---- a/Makefile.plugins
-+++ b/Makefile.plugins
-@@ -138,6 +138,11 @@ builtin_modules += micp
- builtin_sources += profiles/audio/micp.c
- endif
+After updating Linux on an i.MX28 board, I encountered errors related to
+Bluetooth:
 
-+if CCP
-+builtin_modules += ccp
-+builtin_sources += profiles/audio/ccp.c
-+endif
-+
- if CSIP
- builtin_modules += csip
- builtin_sources += profiles/audio/csip.c
-diff --git a/configure.ac b/configure.ac
-index 70e9d4be8127..c7dadf79a565 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -200,6 +200,10 @@ AC_ARG_ENABLE(mcp, AS_HELP_STRING([--disable-mcp],
-         [disable MCP profile]), [enable_mcp=${enableval}])
- AM_CONDITIONAL(MCP, test "${enable_mcp}" != "no")
- 
-+AC_ARG_ENABLE(ccp, AS_HELP_STRING([--disable-ccp],
-+        [disable CCP profile]), [enable_ccp=${enableval}])
-+AM_CONDITIONAL(CCP, test "${enable_ccp}" != "no")
-+
- AC_ARG_ENABLE(vcp, AS_HELP_STRING([--disable-vcp],
- 		[disable VCP profile]), [enable_vcp=${enableval}])
- AM_CONDITIONAL(VCP, test "${enable_vcp}" != "no")
-diff --git a/profiles/audio/ccp.c b/profiles/audio/ccp.c
-new file mode 100644
-index 000000000000..fe678de9fede
---- /dev/null
-+++ b/profiles/audio/ccp.c
-@@ -0,0 +1,235 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2024  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#define _GNU_SOURCE
-+
-+#include <ctype.h>
-+#include <stdbool.h>
-+#include <stdlib.h>
-+#include <stdio.h>
-+#include <string.h>
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+#include <fcntl.h>
-+#include <errno.h>
-+
-+#include <glib.h>
-+
-+#include "gdbus/gdbus.h"
-+
-+#include "lib/bluetooth.h"
-+#include "lib/hci.h"
-+#include "lib/sdp.h"
-+#include "lib/uuid.h"
-+
-+#include "src/dbus-common.h"
-+#include "src/shared/util.h"
-+#include "src/shared/att.h"
-+#include "src/shared/queue.h"
-+#include "src/shared/gatt-db.h"
-+#include "src/shared/gatt-client.h"
-+#include "src/shared/gatt-server.h"
-+#include "src/shared/ccp.h"
-+
-+#include "btio/btio.h"
-+#include "src/plugin.h"
-+#include "src/adapter.h"
-+#include "src/gatt-database.h"
-+#include "src/device.h"
-+#include "src/profile.h"
-+#include "src/service.h"
-+#include "src/log.h"
-+#include "src/error.h"
-+
-+#define GTBS_UUID_STR "0000184C-0000-1000-8000-00805f9b34fb"
-+
-+struct ccp_data {
-+	struct btd_device *device;
-+	struct btd_service *service;
-+	struct bt_ccp *ccp;
-+	unsigned int state_id;
-+};
-+
-+static void ccp_debug(const char *str, void *user_data)
-+{
-+	DBG_IDX(0xffff, "%s", str);
-+}
-+
-+static struct ccp_data *ccp_data_new(struct btd_device *device)
-+{
-+	struct ccp_data *data;
-+
-+	data = new0(struct ccp_data, 1);
-+	data->device = device;
-+
-+	return data;
-+}
-+
-+static int ccp_probe(struct btd_service *service)
-+{
-+	struct btd_device *device = btd_service_get_device(service);
-+	struct btd_adapter *adapter = device_get_adapter(device);
-+	struct btd_gatt_database *database = btd_adapter_get_database(adapter);
-+	struct ccp_data *data = btd_service_get_user_data(service);
-+	char addr[18];
-+
-+	ba2str(device_get_address(device), addr);
-+	DBG("%s", addr);
-+
-+	if (data) {
-+		error("Profile probed twice for the same device!");
-+		return -EINVAL;
-+	}
-+
-+	data = ccp_data_new(device);
-+	data->service = service;
-+
-+	data->ccp = bt_ccp_new(btd_gatt_database_get_db(database),
-+			       btd_device_get_gatt_db(device));
-+
-+	bt_ccp_set_debug(data->ccp, ccp_debug, NULL, NULL);
-+	btd_service_set_user_data(service, data);
-+
-+	return 0;
-+}
-+
-+static void ccp_data_free(struct ccp_data *data)
-+{
-+	if (data->service) {
-+		btd_service_set_user_data(data->service, NULL);
-+		bt_ccp_set_user_data(data->ccp, NULL);
-+	}
-+
-+	bt_ccp_unref(data->ccp);
-+	free(data);
-+}
-+
-+static void ccp_data_remove(struct ccp_data *data)
-+{
-+	DBG("data %p", data);
-+
-+	ccp_data_free(data);
-+}
-+
-+static void ccp_remove(struct btd_service *service)
-+{
-+	struct btd_device *device = btd_service_get_device(service);
-+	struct ccp_data *data;
-+	char addr[18];
-+
-+	ba2str(device_get_address(device), addr);
-+	DBG("%s", addr);
-+
-+	data = btd_service_get_user_data(service);
-+	if (!data) {
-+		error("CCP service not handled by profile");
-+		return;
-+	}
-+
-+	ccp_data_remove(data);
-+}
-+
-+static int ccp_accept(struct btd_service *service)
-+{
-+	struct btd_device *device = btd_service_get_device(service);
-+	struct bt_gatt_client *client = btd_device_get_gatt_client(device);
-+	struct ccp_data *data = btd_service_get_user_data(service);
-+	char addr[18];
-+
-+	ba2str(device_get_address(device), addr);
-+	DBG("%s", addr);
-+
-+	if (!bt_ccp_attach(data->ccp, client)) {
-+		error("CCP unable to attach");
-+		return -EINVAL;
-+	}
-+
-+	/* TODO: register telephony operations here */
-+
-+	btd_service_connecting_complete(service, 0);
-+
-+	return 0;
-+}
-+
-+static int ccp_connect(struct btd_service *service)
-+{
-+	struct btd_device *device = btd_service_get_device(service);
-+	char addr[18];
-+
-+	ba2str(device_get_address(device), addr);
-+	DBG("%s", addr);
-+
-+	return 0;
-+}
-+
-+static int ccp_disconnect(struct btd_service *service)
-+{
-+	struct btd_device *device = btd_service_get_device(service);
-+	struct ccp_data *data = btd_service_get_user_data(service);
-+	char addr[18];
-+
-+	ba2str(device_get_address(device), addr);
-+	DBG("%s", addr);
-+
-+	bt_ccp_detach(data->ccp);
-+
-+	btd_service_disconnecting_complete(service, 0);
-+
-+	return 0;
-+}
-+
-+static int ccp_server_probe(struct btd_profile *p, struct btd_adapter *adapter)
-+{
-+	struct btd_gatt_database *database = btd_adapter_get_database(adapter);
-+
-+	bt_ccp_register(btd_gatt_database_get_db(database));
-+
-+	return 0;
-+}
-+
-+static void
-+ccp_server_remove(struct btd_profile *p,
-+		  struct btd_adapter *adapter)
-+{
-+	DBG("CCP remove adapter");
-+}
-+
-+static struct btd_profile ccp_profile = {
-+	.name			= "ccp",
-+	.priority		= BTD_PROFILE_PRIORITY_MEDIUM,
-+	.remote_uuid	= GTBS_UUID_STR,
-+	.device_probe	= ccp_probe,
-+	.device_remove	= ccp_remove,
-+	.accept			= ccp_accept,
-+	.connect		= ccp_connect,
-+	.disconnect		= ccp_disconnect,
-+
-+	.adapter_probe	= ccp_server_probe,
-+	.adapter_remove = ccp_server_remove,
-+
-+	.experimental	= true,
-+};
-+
-+static int ccp_init(void)
-+{
-+	return btd_profile_register(&ccp_profile);
-+}
-+
-+static void ccp_exit(void)
-+{
-+	btd_profile_unregister(&ccp_profile);
-+}
-+
-+BLUETOOTH_PLUGIN_DEFINE(ccp, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
-+			ccp_init, ccp_exit)
--- 
-2.34.1
+$ journalctl -p3 -xb
+(...)
+Feb 06 14:05:49 hp1 bluetoothd[183]: /usr/src/debug/bluez5/5.69-r0/src/adap=
+ter.c:reset_adv_monitors_complete() Failed to reset Adv Monitors: Failed (0=
+x03)
+Feb 06 14:05:50 hp1 bluetoothd[183]: Failed to clear UUIDs: Failed (0x03)
+Feb 06 14:05:50 hp1 bluetoothd[183]: Failed to add UUID: Failed (0x03)
+Feb 06 14:05:50 hp1 bluetoothd[183]: Failed to add UUID: Failed (0x03)
+Feb 06 14:05:50 hp1 bluetoothd[183]: Failed to add UUID: Failed (0x03)
+
+I found that [1] encountered similar errors, which were addressed in
+95b701543305 ("Bluetooth: btusb: Fix bluetooth on Intel Macbook 2014").
+However, the board I am working with uses the Bluetooth HCI UART driver
+instead of the USB driver. After bisecting, I identified the offending
+commit as d883a4669a1d ("Bluetooth: hci_sync: Only allow
+hci_cmd_sync_queue if running"). While reverting the commit would
+resolve my issues, I am uncertain if this problem is unique to my setup,
+as I have not come across other reports for ARM boards or the Bluetooth
+HCI UART driver. Do you have any ideas how to solve this? Any pointers
+are appreciated.
+
+Below is (some) of the log when running the daemon in debug mode. I only
+included part of it to not clutter the mail. Let me know if you want the
+full log instead.
+
+$ /usr/libexec/bluetooth/bluetoothd -n -d
+(...)
+bluetoothd[384]: /usr/src/debug/bluez5/5.69-r0/src/shared/mgmt.c:send_reque=
+st() [0x0000] command 0x0053
+bluetoothd[384]: /usr/src/debug/bluez5/5.69-r0/src/shared/mgmt.c:can_read_d=
+ata() [0x0000] command 0x53 status: 0x03
+bluetoothd[384]: /usr/src/debug/bluez5/5.69-r0/src/adapter.c:reset_adv_moni=
+tors_complete() Failed to reset Adv Monitors: Failed (0x03)
+bluetoothd[384]: /usr/src/debug/bluez5/5.69-r0/src/shared/mgmt.c:send_reque=
+st() write failed: Network is down
+bluetoothd[384]: Failed to clear UUIDs: Failed (0x03)
+bluetoothd[384]: /usr/src/debug/bluez5/5.69-r0/src/shared/mgmt.c:send_reque=
+st() write failed: Network is down
+bluetoothd[384]: Failed to add UUID: Failed (0x03)
+
+And here is some information about the device. Note that I anonymized
+the MAC address.
+
+$ hciconfig -a
+hci0:   Type: Primary  Bus: UART
+        BD Address: XX:XX:XX:XX:XX:XX  ACL MTU: 1021:6  SCO MTU: 180:4
+        UP RUNNING
+        RX bytes:5761 acl:0 sco:0 events:494 errors:0
+        TX bytes:70546 acl:0 sco:0 commands:494 errors:0
+        Features: 0xff 0xfe 0x2d 0xfe 0xdb 0xff 0x7b 0x87
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF
+        Link mode: PERIPHERAL ACCEPT
+        Name: 'BlueZ 5.69'
+        Class: 0x000000
+        Service Classes: Unspecified
+        Device Class: Miscellaneous,
+        HCI Version: 4.2 (0x8)  Revision: 0x0
+        LMP Version: 4.2 (0x8)  Subversion: 0xac0f
+        Manufacturer: Texas Instruments Inc. (13)
+
+Let me know if I can provide more information.
+
+[1]:
+https://bugs.archlinux.org/task/78980.html
+
+--=20
+Emil Kronborg
 
