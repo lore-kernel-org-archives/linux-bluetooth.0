@@ -1,130 +1,342 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E33BD15444C;
-	Tue, 20 Feb 2024 23:44:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B5183B781
+	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Feb 2024 10:28:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708472666; cv=none; b=NOlWbgbqZ2zl1iHh8CkO8jCkR5fS87PjWZSCzlGgEVLGrc+V9BqDTuYnIqEYXDZCyknJVqBPld+xBcQFbfvtOCEfQpNlSe4/i1avKs37tHOUuze64Hpy64pUbl5nKlaGlnZKajFihzRHFFb2ghrJbD/4shPfOzgGoRuRzXFZBAM=
+	t=1708511295; cv=none; b=ZguVrIgXfNRUUHYjsafYajdgREGn0HJop5WlKarfGD9YdWpXz77g4Fc/tkQtTeSkidG1ivqQVjVF1jHGkk5fI5x1KDSzfSzFPRCcmMDr7GHxal/BKzKEFPY74fOeBuxmGUfzkNLVvdxBhk6eBLqR4BEUo7i7d0IFkcnDyuIuKS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708472666; c=relaxed/simple;
-	bh=Zxy/pymnMx5rTDOnldO5AbT5UwWB1Dt3XC+eanXoo2Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IJWSICJMZ44PGLmO5i8WNKcBHnIF6c01TpUO+mJQZnKoeb/cy7Q/GsAbeDyB06siKzPLQgOIDDIGBnTm1L+yFy5qte8azTRiz5LE3s4iQo145BFRoA7mcV7RrPARMPtFV2RjaGCrrCLgFeQkz7w5LIMX5ntvALi4A/9rtHrN+j0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MVw8eBpT; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1708511295; c=relaxed/simple;
+	bh=UYVabs0rlkpoCnSc1MSXtPzVaNv4JUd4iR1q04SMPDU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RaaTW4cfxI0q+aH5mduLBsBLrw3USsbvQMoIVWkjXu9CZ46p4MQHRSuXv2lw3Cf8BLatPZ+NryyJgNXEZ1QsZ7opI3J+CroVKgALJXeRp6Ds5WoAU889HM/utEIm+Lb3Sg2YAm/yifdrpqSRz48/ezCT0a8AipPxHYkFHaWr2LM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nWzo8SrM; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MVw8eBpT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2019DC433F1;
-	Tue, 20 Feb 2024 23:44:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708472665;
-	bh=Zxy/pymnMx5rTDOnldO5AbT5UwWB1Dt3XC+eanXoo2Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MVw8eBpTCjdftSTyEbvxYQwqBQu3kUyua3/5maqJotrEpeQPF8MT/1EbtFAFQFqfY
-	 K0t7zPYZFcaMD3RHTzSC0Uzv22Ugf1jGS0lzKX4sZDiF2uJlHtf54PreCVaOTr3Tfw
-	 EsNQcr25WGsNXahnwTYIKVKmHvjdlK1vnLLqa/lqMd9ZP0CJAoHHVpjm1IDApXd34L
-	 K8FF/7Nu8P3ZfXeqfPWePnahSDfkXSU50X19KYac3SI+AfDNsTcHOD0rG9WKxl6ASe
-	 5A+s/TjQHvdaFIsr3eOLqD/cnd9vXh+RwYFkBVZ9DdjLYfhoL8QluOXvPfeX7MKiVt
-	 orv+kbQUnDC4w==
-Date: Tue, 20 Feb 2024 23:44:14 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Konrad Dybcio <konrad.dybcio@linaro.org>
-Cc: Bartosz Golaszewski <brgl@bgdev.pl>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Kalle Valo <kvalo@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Alex Elder <elder@linaro.org>,
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Abel Vesa <abel.vesa@linaro.org>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Lukas Wunner <lukas@wunner.de>,
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-wireless@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
-	linux-pm@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH v5 14/18] PCI/pwrctl: add a power control driver for
- WCN7850
-Message-ID: <53f0956f-ee64-4bd6-b44f-cbebafd42e46@sirena.org.uk>
-References: <20240216203215.40870-1-brgl@bgdev.pl>
- <20240216203215.40870-15-brgl@bgdev.pl>
- <d5d603dc-ec66-4e21-aa41-3b25557f1fb7@sirena.org.uk>
- <CAMRc=MeUjKPS3ANE6=7WZ3kbbGAdyE8HeXFN=75Jp-pVyBaWrQ@mail.gmail.com>
- <ea08a286-ff53-4d58-ae41-38cca151508c@sirena.org.uk>
- <17bbd9ae-0282-430e-947b-e6fb08c53af7@linaro.org>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nWzo8SrM"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708511293; x=1740047293;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=UYVabs0rlkpoCnSc1MSXtPzVaNv4JUd4iR1q04SMPDU=;
+  b=nWzo8SrMRaEAQiE4hLrP4MaOTLyiWMchH7AVZET4cVBWS+SY79YLeXAO
+   fByZNylFh7OgruMialEb/hlvcC9z2cmG/qgjcIy/fNPBdtFm9Ru6ZXMeZ
+   sj7bMYYNH74m6uJC4mvIIgkq2WuWKp934BTYeWhzoZ/k/82Sz0wNmUbHg
+   KNYn8ywO89uPwRMLthiw+ki0vbqjZbfx+yNN+a+GUCNv57zvhPifhkNVC
+   J5ns//bJNj81vbYnKhV5Rpbin8Io1aX7czx9R2LMswKaZa8wn1kFMWVAC
+   0ZbHVvs1s8MwdN20oSt2LlGQJcZvCI9H2hug6KURGbJOtsQ4vsg7828D0
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10990"; a="5617890"
+X-IronPort-AV: E=Sophos;i="6.06,175,1705392000"; 
+   d="scan'208";a="5617890"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2024 02:28:12 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,175,1705392000"; 
+   d="scan'208";a="9730963"
+Received: from lbtoe.iind.intel.com ([10.224.186.133])
+  by orviesa003.jf.intel.com with ESMTP; 21 Feb 2024 02:28:11 -0800
+From: Shahid Vichhi <shahid.bashir.vichhi@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Shahid Vichhi <shahid.bashir.vichhi@intel.com>
+Subject: [ BlueZ,v3] profiles/audio/ccp: Add CCP plugin for call control profile
+Date: Wed, 21 Feb 2024 05:22:22 +0200
+Message-Id: <20240221032221.404011-1-shahid.bashir.vichhi@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="w1C+bNORgZucbhbU"
-Content-Disposition: inline
-In-Reply-To: <17bbd9ae-0282-430e-947b-e6fb08c53af7@linaro.org>
-X-Cookie: E = MC ** 2 +- 3db
+Content-Transfer-Encoding: 8bit
 
+This adds initial code for CCP plugin which handle CALL CONTROL PROFILE for
+Telephone Bearer Services and Generic Telephone Bearer Services in the
+client role.
+This has been tested using teams application by initiating call between
+Linux BTOE and Windows server with LE audio enabled.
+---
+ Makefile.plugins     |   5 +
+ configure.ac         |   4 +
+ profiles/audio/ccp.c | 235 +++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 244 insertions(+)
+ create mode 100644 profiles/audio/ccp.c
 
---w1C+bNORgZucbhbU
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+diff --git a/Makefile.plugins b/Makefile.plugins
+index e960eedeabd3..4aa2c9c92854 100644
+--- a/Makefile.plugins
++++ b/Makefile.plugins
+@@ -138,6 +138,11 @@ builtin_modules += micp
+ builtin_sources += profiles/audio/micp.c
+ endif
 
-On Tue, Feb 20, 2024 at 10:21:04PM +0100, Konrad Dybcio wrote:
-> On 20.02.2024 13:47, Mark Brown wrote:
++if CCP
++builtin_modules += ccp
++builtin_sources += profiles/audio/ccp.c
++endif
++
+ if CSIP
+ builtin_modules += csip
+ builtin_sources += profiles/audio/csip.c
+diff --git a/configure.ac b/configure.ac
+index 70e9d4be8127..c7dadf79a565 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -200,6 +200,10 @@ AC_ARG_ENABLE(mcp, AS_HELP_STRING([--disable-mcp],
+         [disable MCP profile]), [enable_mcp=${enableval}])
+ AM_CONDITIONAL(MCP, test "${enable_mcp}" != "no")
+ 
++AC_ARG_ENABLE(ccp, AS_HELP_STRING([--disable-ccp],
++        [disable CCP profile]), [enable_ccp=${enableval}])
++AM_CONDITIONAL(CCP, test "${enable_ccp}" != "no")
++
+ AC_ARG_ENABLE(vcp, AS_HELP_STRING([--disable-vcp],
+ 		[disable VCP profile]), [enable_vcp=${enableval}])
+ AM_CONDITIONAL(VCP, test "${enable_vcp}" != "no")
+diff --git a/profiles/audio/ccp.c b/profiles/audio/ccp.c
+new file mode 100644
+index 000000000000..fe678de9fede
+--- /dev/null
++++ b/profiles/audio/ccp.c
+@@ -0,0 +1,235 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2024  Intel Corporation. All rights reserved.
++ *
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#define _GNU_SOURCE
++
++#include <ctype.h>
++#include <stdbool.h>
++#include <stdlib.h>
++#include <stdio.h>
++#include <string.h>
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <fcntl.h>
++#include <errno.h>
++
++#include <glib.h>
++
++#include "gdbus/gdbus.h"
++
++#include "lib/bluetooth.h"
++#include "lib/hci.h"
++#include "lib/sdp.h"
++#include "lib/uuid.h"
++
++#include "src/dbus-common.h"
++#include "src/shared/util.h"
++#include "src/shared/att.h"
++#include "src/shared/queue.h"
++#include "src/shared/gatt-db.h"
++#include "src/shared/gatt-client.h"
++#include "src/shared/gatt-server.h"
++#include "src/shared/ccp.h"
++
++#include "btio/btio.h"
++#include "src/plugin.h"
++#include "src/adapter.h"
++#include "src/gatt-database.h"
++#include "src/device.h"
++#include "src/profile.h"
++#include "src/service.h"
++#include "src/log.h"
++#include "src/error.h"
++
++#define GTBS_UUID_STR "0000184C-0000-1000-8000-00805f9b34fb"
++
++struct ccp_data {
++	struct btd_device *device;
++	struct btd_service *service;
++	struct bt_ccp *ccp;
++	unsigned int state_id;
++};
++
++static void ccp_debug(const char *str, void *user_data)
++{
++	DBG_IDX(0xffff, "%s", str);
++}
++
++static struct ccp_data *ccp_data_new(struct btd_device *device)
++{
++	struct ccp_data *data;
++
++	data = new0(struct ccp_data, 1);
++	data->device = device;
++
++	return data;
++}
++
++static int ccp_probe(struct btd_service *service)
++{
++	struct btd_device *device = btd_service_get_device(service);
++	struct btd_adapter *adapter = device_get_adapter(device);
++	struct btd_gatt_database *database = btd_adapter_get_database(adapter);
++	struct ccp_data *data = btd_service_get_user_data(service);
++	char addr[18];
++
++	ba2str(device_get_address(device), addr);
++	DBG("%s", addr);
++
++	if (data) {
++		error("Profile probed twice for the same device!");
++		return -EINVAL;
++	}
++
++	data = ccp_data_new(device);
++	data->service = service;
++
++	data->ccp = bt_ccp_new(btd_gatt_database_get_db(database),
++			       btd_device_get_gatt_db(device));
++
++	bt_ccp_set_debug(data->ccp, ccp_debug, NULL, NULL);
++	btd_service_set_user_data(service, data);
++
++	return 0;
++}
++
++static void ccp_data_free(struct ccp_data *data)
++{
++	if (data->service) {
++		btd_service_set_user_data(data->service, NULL);
++		bt_ccp_set_user_data(data->ccp, NULL);
++	}
++
++	bt_ccp_unref(data->ccp);
++	free(data);
++}
++
++static void ccp_data_remove(struct ccp_data *data)
++{
++	DBG("data %p", data);
++
++	ccp_data_free(data);
++}
++
++static void ccp_remove(struct btd_service *service)
++{
++	struct btd_device *device = btd_service_get_device(service);
++	struct ccp_data *data;
++	char addr[18];
++
++	ba2str(device_get_address(device), addr);
++	DBG("%s", addr);
++
++	data = btd_service_get_user_data(service);
++	if (!data) {
++		error("CCP service not handled by profile");
++		return;
++	}
++
++	ccp_data_remove(data);
++}
++
++static int ccp_accept(struct btd_service *service)
++{
++	struct btd_device *device = btd_service_get_device(service);
++	struct bt_gatt_client *client = btd_device_get_gatt_client(device);
++	struct ccp_data *data = btd_service_get_user_data(service);
++	char addr[18];
++
++	ba2str(device_get_address(device), addr);
++	DBG("%s", addr);
++
++	if (!bt_ccp_attach(data->ccp, client)) {
++		error("CCP unable to attach");
++		return -EINVAL;
++	}
++
++	/* TODO: register telephony operations here */
++
++	btd_service_connecting_complete(service, 0);
++
++	return 0;
++}
++
++static int ccp_connect(struct btd_service *service)
++{
++	struct btd_device *device = btd_service_get_device(service);
++	char addr[18];
++
++	ba2str(device_get_address(device), addr);
++	DBG("%s", addr);
++
++	return 0;
++}
++
++static int ccp_disconnect(struct btd_service *service)
++{
++	struct btd_device *device = btd_service_get_device(service);
++	struct ccp_data *data = btd_service_get_user_data(service);
++	char addr[18];
++
++	ba2str(device_get_address(device), addr);
++	DBG("%s", addr);
++
++	bt_ccp_detach(data->ccp);
++
++	btd_service_disconnecting_complete(service, 0);
++
++	return 0;
++}
++
++static int ccp_server_probe(struct btd_profile *p, struct btd_adapter *adapter)
++{
++	struct btd_gatt_database *database = btd_adapter_get_database(adapter);
++
++	bt_ccp_register(btd_gatt_database_get_db(database));
++
++	return 0;
++}
++
++static void
++ccp_server_remove(struct btd_profile *p,
++		  struct btd_adapter *adapter)
++{
++	DBG("CCP remove adapter");
++}
++
++static struct btd_profile ccp_profile = {
++	.name			= "ccp",
++	.priority		= BTD_PROFILE_PRIORITY_MEDIUM,
++	.remote_uuid	= GTBS_UUID_STR,
++	.device_probe	= ccp_probe,
++	.device_remove	= ccp_remove,
++	.accept			= ccp_accept,
++	.connect		= ccp_connect,
++	.disconnect		= ccp_disconnect,
++
++	.adapter_probe	= ccp_server_probe,
++	.adapter_remove = ccp_server_remove,
++
++	.experimental	= true,
++};
++
++static int ccp_init(void)
++{
++	return btd_profile_register(&ccp_profile);
++}
++
++static void ccp_exit(void)
++{
++	btd_profile_unregister(&ccp_profile);
++}
++
++BLUETOOTH_PLUGIN_DEFINE(ccp, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
++			ccp_init, ccp_exit)
+-- 
+2.34.1
 
-> > Are you *sure* this actually happens (and that the regulators don't
-> > figure it out by themselves), especially given that the consumers are
-> > just specifying the load once rather than varying it dynamically at
-> > runtime which is supposed to be the use case for this API?  This API is
-> > intended to be used dynamically, if the regulator always needs to be in
-> > a particular mode just configure that statically.
-
-> *AFAIU*
-
-> The regulators aggregate the requested current (there may be
-> multiple consumers) and then it's decided if it's high enough
-> to jump into HPM.
-
-Yes, that's the theory - I just question if it actually does something
-useful in practice.  Between regulators getting more and more able to
-figure out mode switching autonomously based on load monitoring and them
-getting more efficient it's become very unclear if this actually
-accomplishes anything, the only usage is the Qualcomm stuff and that's
-all really unsophisticated and has an air of something that's being
-cut'n'pasted forwards rather than delivering practical results.  There
-is some value at ultra low loads, but that's more for suspend modes than
-for actual use.
-
---w1C+bNORgZucbhbU
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXVOUsACgkQJNaLcl1U
-h9B4Sgf/U1Mvu4f6A7qzABpKd9BB7OcLPxH6iSmo8bzo4Tx8MZhge4nd6FITJ9Qr
-BMMbYW8osslMnOrHCH0Pat8hVGnQqDL6a0xURC3B0/E1PLgC9f0+licqpxxQTRqL
-V2Mm42QnAwLrug2ACCRxhByQxjl8c4eknu+KFgpJtIJNfM5UlnJ4kF4voEBkQBIC
-/69z0ZVKAyuebe3Q+EtAh/Vm0HA2d6cb9JsjqOSQnoyFXEqExFuqEZoIhdzrn9bM
-Y6j+npu1uSv+PyaTRXnB6Kf7SZdk1cmghtBmYh/hSh3tjsZvJw5i9GBc3UklYcl+
-oSruwA9tsK/zK0w2x1N+Iah+Bv2l9g==
-=u1/w
------END PGP SIGNATURE-----
-
---w1C+bNORgZucbhbU--
