@@ -1,77 +1,211 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EE627C097
-	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Feb 2024 16:40:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDC0680C08
+	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Feb 2024 16:48:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708533630; cv=none; b=YJCImKE880X5S3gLjE6L8xYRcBBEwSxZvhoLsh+QyJEyLw1cjoyMqDibyUzma5nkUBY8S6eMZsM1gh2cHbIkDLUwT4OCJ8/YPakyilKvHdkAW5F00WJiYVccpGzLJc6Qk6UqOrVKV5AWzNKXWvcdT0AE0MM6fetl7HOEn4BCmVE=
+	t=1708534097; cv=none; b=a8gE5pVDu/8sD+iUz7ufJjPjXtJ6mrpR5DCgOaUIp++lwFKBE6QQh75vOTs+W97yFxh29xKAhGoneiVeb9kZPVQeOGPXmKUWgRM84FJq4K+NDkkXSJ4EJt4iRbcYI6PS+E4vZRDQ88F3X4zq1GaCrwA7vhjtquXgJnoQkZGds4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708533630; c=relaxed/simple;
-	bh=gjLwyceByQpNNK2Kc8whViaCLfQCF0IybO2DALJFaQk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=kNS6CO+nPZtayRvFPURvnz5NIHNoSluDr2Xd+AyL2D8Se/c9A9NojtuOINjOryDPicJia9nQaG4DiEkhOghv6e41kNnBl4Hm070xtT1Fa7h0tr0djBDXwYCCimI1dui+i7OjShFDVgYLQ9dT5JrHnk5gbno2Sv+U+4VTj6OJnbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tMGWopHg; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tMGWopHg"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B453DC43330;
-	Wed, 21 Feb 2024 16:40:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708533629;
-	bh=gjLwyceByQpNNK2Kc8whViaCLfQCF0IybO2DALJFaQk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tMGWopHgCTJgua6f52evBiCP9RRU7pCIziW7B7J4AeqSuPZvOF7eEGKqbCm1jKA57
-	 lsySQXS3m/ZxJ9lz0hn5Ajqpu0W4HMFnXat4JfxlqgSpHYZVtBlFNgfvjhvnUjOYyF
-	 0soKWAdJJMuzMnLK6WT7AhodNTK2qU7tBnJCFGrIEEB2/2AjqeXCC9d2+PcGO9TZxa
-	 +WEktESZPKAu/rfOcBnQ7PaN13xwmBpJRiFsUXIOxpS9QiLVdf7aR/ceNemdxOfNna
-	 B1FWvk3NAmYcZSPUCZZgZi4JphsKAy0/VrmGg3optqYgJt2U5/BK8ESxZDVpad+MFY
-	 36WvKSkrfCZQw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 990E8C00446;
-	Wed, 21 Feb 2024 16:40:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1708534097; c=relaxed/simple;
+	bh=EaEg+1b+10YWmcbtQuD0L0OyIozr7NF0uGTsgis6N7Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WIuGIqoRY/3Y38N8yWdSrlAFTF6ovmp2ym4FUkXUdDmtL+Sa5Mb4laYOtI5sRoxp3uWGuMRF7LvJMXOYKtJoYmnRohpdiMDh82t/SkKxAdF8cVRX+ehb01skrM0CGwQ1AgjkTYzmM0IgE2OJXWbXHWHp7ZULBqz7Au+wQBMojWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.34] (g34.guest.molgen.mpg.de [141.14.220.34])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 4531661E5FE01;
+	Wed, 21 Feb 2024 17:47:50 +0100 (CET)
+Message-ID: <6df743f5-d2ae-4d07-ac32-7ed0b89fa77f@molgen.mpg.de>
+Date: Wed, 21 Feb 2024 17:47:49 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: btintel: Print Firmware Sequencer information
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <170853362962.13387.8484041172965236687.git-patchwork-notify@kernel.org>
-Date: Wed, 21 Feb 2024 16:40:29 +0000
-References: <20240221133346.3295639-1-kiran.k@intel.com>
-In-Reply-To: <20240221133346.3295639-1-kiran.k@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] Bluetooth: btintel: Print Firmware Sequencer
+ information
+Content-Language: en-US
 To: Kiran K <kiran.k@intel.com>
 Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
  chethan.tumkur.narayan@intel.com
+References: <20240221133346.3295639-1-kiran.k@intel.com>
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20240221133346.3295639-1-kiran.k@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello:
+Dear Kiran,
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed, 21 Feb 2024 19:03:46 +0530 you wrote:
+Thank you for incorperating the feedback.
+
+Am 21.02.24 um 14:33 schrieb Kiran K:
 > Firmware sequencer (FSEQ) is a common code shared across Bluetooth
 > and Wifi. Printing FSEQ will help to debug if there is any mismatch
 > between Bluetooth and Wifi FSEQ.
 > 
 > Signed-off-by: Kiran K <kiran.k@intel.com>
 > ---
->  drivers/bluetooth/btintel.c | 114 ++++++++++++++++++++++++++++++++++++
->  1 file changed, 114 insertions(+)
+>   drivers/bluetooth/btintel.c | 114 ++++++++++++++++++++++++++++++++++++
+>   1 file changed, 114 insertions(+)
 > 
-> [...]
+> Kernel log snippet:
+> 
+> [    3.643765] Bluetooth: hci0: Fseq status: Success (0x00)
+> [    3.643769] Bluetooth: hci0: Fseq executed: 00.00.02.41
+> [    3.643771] Bluetooth: hci0: Fseq BT Top: 00.00.02.41
 
-Here is the summary with links:
-  - [v2] Bluetooth: btintel: Print Firmware Sequencer information
-    https://git.kernel.org/bluetooth/bluetooth-next/c/452481b004a5
+Next time I think this could go into the proper commit message.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+> index e5b043d96207..a083c4b8621c 100644
+> --- a/drivers/bluetooth/btintel.c
+> +++ b/drivers/bluetooth/btintel.c
+> @@ -2670,6 +2670,119 @@ static void btintel_set_msft_opcode(struct hci_dev *hdev, u8 hw_variant)
+>   	}
+>   }
+>   
+> +static void btintel_print_fseq_info(struct hci_dev *hdev)
+> +{
+> +	struct sk_buff *skb;
+> +	u8 *p;
+> +	u32 val;
+> +	const char *str;
+> +
+> +	skb = __hci_cmd_sync(hdev, 0xfcb3, 0, NULL, HCI_CMD_TIMEOUT);
+> +	if (IS_ERR(skb)) {
+> +		bt_dev_dbg(hdev, "Reading fseq status command failed (%ld)",
+> +			   PTR_ERR(skb));
+> +		return;
+> +	}
+> +
+> +	if (skb->len < (sizeof(u32) * 16 + 2)) {
+> +		bt_dev_dbg(hdev, "Malformed packet of length %u received",
+> +			   skb->len);
+
+I would have also printed the value of `sizeof(u32) * 16 + 2`:
+
+     bt_dev_dbg(hdev, "Malformed packet of length %u received: too short 
+< %u", skb->len, sizeof(u32) * 16 + 2)
 
 
+Kind regards,
+
+Paul
+
+
+> +		kfree_skb(skb);
+> +		return;
+> +	}
+> +
+> +	p = skb_pull_data(skb, 1);
+> +	if (*p) {
+> +		bt_dev_dbg(hdev, "Failed to get fseq status (0x%2.2x)", *p);
+> +		kfree_skb(skb);
+> +		return;
+> +	}
+> +
+> +	p = skb_pull_data(skb, 1);
+> +	switch (*p) {
+> +	case 0:
+> +		str = "Success";
+> +		break;
+> +	case 1:
+> +		str = "Fatal error";
+> +		break;
+> +	case 2:
+> +		str = "Semaphore acquire error";
+> +		break;
+> +	default:
+> +		str = "Unknown error";
+> +		break;
+> +	}
+> +
+> +	if (*p) {
+> +		bt_dev_err(hdev, "Fseq status: %s (0x%2.2x)", str, *p);
+> +		kfree_skb(skb);
+> +		return;
+> +	}
+> +
+> +	bt_dev_info(hdev, "Fseq status: %s (0x%2.2x)", str, *p);
+> +
+> +	val = get_unaligned_le32(skb_pull_data(skb, 4));
+> +	bt_dev_dbg(hdev, "Reason: 0x%8.8x", val);
+> +
+> +	val = get_unaligned_le32(skb_pull_data(skb, 4));
+> +	bt_dev_dbg(hdev, "Global version: 0x%8.8x", val);
+> +
+> +	val = get_unaligned_le32(skb_pull_data(skb, 4));
+> +	bt_dev_dbg(hdev, "Installed version: 0x%8.8x", val);
+> +
+> +	p = skb->data;
+> +	skb_pull_data(skb, 4);
+> +	bt_dev_info(hdev, "Fseq executed: %2.2u.%2.2u.%2.2u.%2.2u", p[0], p[1],
+> +		    p[2], p[3]);
+> +
+> +	p = skb->data;
+> +	skb_pull_data(skb, 4);
+> +	bt_dev_info(hdev, "Fseq BT Top: %2.2u.%2.2u.%2.2u.%2.2u", p[0], p[1],
+> +		    p[2], p[3]);
+> +
+> +	val = get_unaligned_le32(skb_pull_data(skb, 4));
+> +	bt_dev_dbg(hdev, "Fseq Top init version: 0x%8.8x", val);
+> +
+> +	val = get_unaligned_le32(skb_pull_data(skb, 4));
+> +	bt_dev_dbg(hdev, "Fseq Cnvio init version: 0x%8.8x", val);
+> +
+> +	val = get_unaligned_le32(skb_pull_data(skb, 4));
+> +	bt_dev_dbg(hdev, "Fseq MBX Wifi file version: 0x%8.8x", val);
+> +
+> +	val = get_unaligned_le32(skb_pull_data(skb, 4));
+> +	bt_dev_dbg(hdev, "Fseq BT version: 0x%8.8x", val);
+> +
+> +	val = get_unaligned_le32(skb_pull_data(skb, 4));
+> +	bt_dev_dbg(hdev, "Fseq Top reset address: 0x%8.8x", val);
+> +
+> +	val = get_unaligned_le32(skb_pull_data(skb, 4));
+> +	bt_dev_dbg(hdev, "Fseq MBX timeout: 0x%8.8x", val);
+> +
+> +	val = get_unaligned_le32(skb_pull_data(skb, 4));
+> +	bt_dev_dbg(hdev, "Fseq MBX ack: 0x%8.8x", val);
+> +
+> +	val = get_unaligned_le32(skb_pull_data(skb, 4));
+> +	bt_dev_dbg(hdev, "Fseq CNVi id: 0x%8.8x", val);
+> +
+> +	val = get_unaligned_le32(skb_pull_data(skb, 4));
+> +	bt_dev_dbg(hdev, "Fseq CNVr id: 0x%8.8x", val);
+> +
+> +	val = get_unaligned_le32(skb_pull_data(skb, 4));
+> +	bt_dev_dbg(hdev, "Fseq Error handle: 0x%8.8x", val);
+> +
+> +	val = get_unaligned_le32(skb_pull_data(skb, 4));
+> +	bt_dev_dbg(hdev, "Fseq Magic noalive indication: 0x%8.8x", val);
+> +
+> +	val = get_unaligned_le32(skb_pull_data(skb, 4));
+> +	bt_dev_dbg(hdev, "Fseq OTP version: 0x%8.8x", val);
+> +
+> +	val = get_unaligned_le32(skb_pull_data(skb, 4));
+> +	bt_dev_dbg(hdev, "Fseq MBX otp version: 0x%8.8x", val);
+> +
+> +	kfree_skb(skb);
+> +}
+> +
+>   static int btintel_setup_combined(struct hci_dev *hdev)
+>   {
+>   	const u8 param[1] = { 0xFF };
+> @@ -2902,6 +3015,7 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+>   
+>   		err = btintel_bootloader_setup_tlv(hdev, &ver_tlv);
+>   		btintel_register_devcoredump_support(hdev);
+> +		btintel_print_fseq_info(hdev);
+>   		break;
+>   	default:
+>   		bt_dev_err(hdev, "Unsupported Intel hw variant (%u)",
