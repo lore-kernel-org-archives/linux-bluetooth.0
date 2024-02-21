@@ -1,118 +1,128 @@
-Received: from mail-40133.protonmail.ch (mail-40133.protonmail.ch [185.70.40.133])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2102.outbound.protection.outlook.com [40.107.220.102])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D42236B18
-	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Feb 2024 10:45:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.133
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708512312; cv=none; b=Q+ETAxuLO9vDIS11yrekWsthdfSolSupZTM48vfkdSRyZd/D2hr7KR+1LGtcAQ7GQ5jXYtLFkdaFaUgTdnas0e+deVVuCdusfxAQ0SYNBd1QAsPg4Wj2Z6zXgjphABpNck+37yJiNxbUImSPM4fD/Qjyy+/KotXIJ4ottwARqVI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708512312; c=relaxed/simple;
-	bh=B+pFKzfHCAn1l9phqimNCv3GOadgzMPuRi6KuJaaOLo=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=UIMtwVGaOoigbBLWpD2fBZvi5OekHiHQeZNYxkavu/FX/ryBZmCSdrRZ39dO8C/WQlffIQApjbX5tfGpGXEjAwPkENAZMMoEn4Rbe6c4KqLvRCWc8SYLMnrdVBY0aQohDNtUiHUuLV7uZpG+tyrE2fRUyhtJ2mhrLd4F/5wZwd0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=m+svlqX1; arc=none smtp.client-ip=185.70.40.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B403405D4
+	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Feb 2024 11:19:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.102
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708514353; cv=fail; b=i2Dp/EdnQNlLhNfB3g/chS/4Zvb8u0Tm/483y7qHVpkPJEatY1fxOuB3w+mQ2th/uwAepoIQaewoXBni0F6tuzBIqwds3oC9OLnilkTReudSWBjDTTNf46h9lZohsO8ihPgroVQsnSzdx3RVr2UCgnp0FV6snxBsWMWZ86v7Nsg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708514353; c=relaxed/simple;
+	bh=77L5sBvtA/ALW5ll6XFI7QHLfDYSUHo5CzhAgmcKDTA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YnwspiGf1EoupdOWwWryq2hPtQmFv1oZvyOPjl/YUKIsFsyRoahr14fL6IS8gt4D0mUjiNxwxjeo2HsoO/TAje4STVZpfkbe27uTabcD/mM5H0jIcVzEdRfes5hazDouE60W7B4in8g3SXsrOS/wNDCkIazYZo5vAhIFO6UvHb4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=infinera.com; spf=pass smtp.mailfrom=infinera.com; dkim=pass (2048-bit key) header.d=infinera.com header.i=@infinera.com header.b=dR0h6hLC; arc=fail smtp.client-ip=40.107.220.102
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=infinera.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infinera.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="m+svlqX1"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1708512302; x=1708771502;
-	bh=ALAUWDo1q/pR2NBpJFnmEYadC1ZlGbn8mjRrWt60C40=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=m+svlqX1hRCs4J4W5yLiwQZfqk4xDYx8LnEnZJYACPKrr+fBDgNxqDhlQClYyMeTH
-	 lhaYUtTEOoMFmciUkS+W8ooZFZHVLPkq3TuZ/UxtljFazPcJExt9L7mJ6O4wNt5e3Y
-	 5HN9iwJocnRPinMTSaS0qN+5vPCG49ywpY6lgZvg2DDVA0bWXBjcWjngogij9ZmyXp
-	 Dp15QVBASSQ4nB5JTrwzGK5fhQxlvTG0VdAuZGwW7HQtgV+x+qr2tXmMh5Vn+EoTUc
-	 sPVsnc4jer6r/d8llyroTgJSs24At98KKlTdMUhSmLdDnA9kxeaNm1ERQkEQ+QafV1
-	 jM8RUe/upHodQ==
-Date: Wed, 21 Feb 2024 10:44:53 +0000
-To: linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com
-From: Emil Kronborg <emil.kronborg@protonmail.com>
-Cc: linux-kernel@vger.kernel.org
-Subject: Bluetooth issues with hci_sync after v6.4+
-Message-ID: <4o3o7jaskrim3aajexbhlxn46d3ej5y6bjwe6htevzywgymn7d@uvdewtfe444z>
-Feedback-ID: 20949900:user:proton
+	dkim=pass (2048-bit key) header.d=infinera.com header.i=@infinera.com header.b="dR0h6hLC"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eTJZpAramXSJA7+nNMoAKTHz6Up6lKFcOX6hnVp77uCv4YvJvOAdJkQMogrDykpNVH1Wstnqp9GwDYkwD1hdAIZ2wC8pxxQ7SnPQU5F3d/dlL4cz0Qej2y6Q+A3JbbmYtT4RQWqz2j1nQw+nQeMKLXkBJAcpA+EiJO3Z2U/7eMDmq88RwZqGD1weKspjdCPy9pX+Y7D0KKKIAagS94UiwRn4H1sWVBUL3iWcezds6rFqBTSbrlN+GbWqwHyhUx3VL5XC8deOrDwlkjePpwaM7ngZ1O4q/4Fh/T7ccUDEfbgoqa0yWVodslD/iWRCUYUuIKfadPMA51A1BV4ryXy0GA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QTVM845iq+F3b3U7a8XVzt2XzoVMSH4BWbga3R9aaRM=;
+ b=lwtsy1xRKbyYBnMFttVH734pO+O4qNEaK7avPUM+yNEkkcyklitgoN7CvKAR5SPQdpIfX8WtqiXe8dnxo77uUpNYvZtfRJ4806pedR1vrh6sP7Ttiy0qr7QpTNKNZ/yaRUdJL3rklaeVZR12VlYT1viQjLor+MUXpGWTxli67/RpYo0IVNcjehkjCqPRAGs27M4PWJwuA9KmyDrhNtj5VSNUPump3g4N5Buo/r0MMfRAI5kAB8y38MT9d39fBhKDeeEWKvORiarPNj/6M9U4NcSEhSpz9yM8dnAtr+JaoLxHH77FHGeJhawO3dUCLCQT1sxUvv1aEwHQ/NVfXQKy/w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 8.4.225.30) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=infinera.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=infinera.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=infinera.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QTVM845iq+F3b3U7a8XVzt2XzoVMSH4BWbga3R9aaRM=;
+ b=dR0h6hLCt8HkhtLTVaroed5X2Mgr8X5hWL1d2LrkdtRqYDw2T3ZwGxqa5IupZ+7FagIG50x2ReyTXf5VYkxLJgxVeWPF/FaJUbmDv3hNdIjknCN87qYFMFlpgkapZOWMu2vuRoC2ehataMr0Tp/w5p3606ugHPaHsD0hKywxzXwmMvLIsL5yc1r5raKbuaW3IwXTnzY6JtkWDkyiV79YM9Qa9P3Cax5d0xd5zz+RSs1FBvhfk/tutABpRZ9LRjTp+y78Xaf5ZoxrRx+Y9brRhncacSrRF7CYjPSxhFqJm03kskKBqwqtmi4F61rAQXVwCeVPVeoAqrxKz4JBYvGrxw==
+Received: from BY3PR03CA0022.namprd03.prod.outlook.com (2603:10b6:a03:39a::27)
+ by DS0PR10MB6749.namprd10.prod.outlook.com (2603:10b6:8:11c::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.39; Wed, 21 Feb
+ 2024 11:19:07 +0000
+Received: from SJ1PEPF00001CDC.namprd05.prod.outlook.com
+ (2603:10b6:a03:39a:cafe::8) by BY3PR03CA0022.outlook.office365.com
+ (2603:10b6:a03:39a::27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.40 via Frontend
+ Transport; Wed, 21 Feb 2024 11:19:07 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 8.4.225.30)
+ smtp.mailfrom=infinera.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=infinera.com;
+Received-SPF: Pass (protection.outlook.com: domain of infinera.com designates
+ 8.4.225.30 as permitted sender) receiver=protection.outlook.com;
+ client-ip=8.4.225.30; helo=owa.infinera.com; pr=C
+Received: from owa.infinera.com (8.4.225.30) by
+ SJ1PEPF00001CDC.mail.protection.outlook.com (10.167.242.4) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7292.25 via Frontend Transport; Wed, 21 Feb 2024 11:19:07 +0000
+Received: from sv-ex16-prd.infinera.com (10.100.96.229) by
+ sv-ex16-prd.infinera.com (10.100.96.229) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 21 Feb 2024 03:19:06 -0800
+Received: from sv-smtp-pd1.infinera.com (10.100.98.81) by
+ sv-ex16-prd.infinera.com (10.100.96.229) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Wed, 21 Feb 2024 03:19:06 -0800
+Received: from se-metroit-prd1.infinera.com ([10.210.32.58]) by sv-smtp-pd1.infinera.com with Microsoft SMTPSVC(10.0.17763.1697);
+	 Wed, 21 Feb 2024 03:19:05 -0800
+Received: from gentoo-jocke.infinera.com (gentoo-jocke.infinera.com [10.210.71.68])
+	by se-metroit-prd1.infinera.com (Postfix) with ESMTP id 617952C06D81;
+	Wed, 21 Feb 2024 12:19:05 +0100 (CET)
+Received: by gentoo-jocke.infinera.com (Postfix, from userid 1001)
+	id 557874011AEE; Wed, 21 Feb 2024 12:19:05 +0100 (CET)
+From: Joakim Tjernlund <joakim.tjernlund@infinera.com>
+To: <linux-bluetooth@vger.kernel.org>, Emil Velikov <emil.l.velikov@gmail.com>
+CC: Joakim Tjernlund <Joakim.Tjernlund@infinera.com>
+Subject: [PATCH] bluez.pc.in: Add definition of libexecdir
+Date: Wed, 21 Feb 2024 12:17:59 +0100
+Message-ID: <20240221111901.2807853-1-joakim.tjernlund@infinera.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-OriginalArrivalTime: 21 Feb 2024 11:19:06.0326 (UTC) FILETIME=[C84EEF60:01DA64B7]
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CDC:EE_|DS0PR10MB6749:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7b26a660-dd23-47f6-4160-08dc32ceeb5f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	TPS7mf4ed9Zxp6nOneOQpV+vgbNS8xAuk7nwxauTdZK6euQpzI43YQWBOxDd6/6jg9EfZ97FfHzR3+Q+AirW6famTOgEBz5C1V9FtzizfNIZHjUnEOfPLAY5+3jjhiUtX5g9HoaFkNug42+LYMR0aj+7jePCw2h/3vTpEP6QAPaYBxp2UirOfmgq+qnQ1TZZPlCjdV+Jd+hwQmcqGsPDSzJaCG9VB0h78tKAidzsItlL33VN2Qd496uvSipHnls/BRg+bbZaNLH/0pltWH98nhUXKNkVMX1PRUsENZDjDOaIIzkpJrVIGm7E2pQKAUUIukbvQqxK/S1RVccrs1dRIOcgj9+7fNqHyJlk5pm/M0xeGdylYCLhHDRithZbu8+wf0FB+fy2XJtfLxQEnPXjTkVTl2jl3XBNYRHoU/f+nfUTKi4TfNryJbAbaS+dRNh1XNnSNk/bX0ALSJmDlxoK6DyBy+4nHWyJAv2AHlQDgclFo3AhfnlzFuEbb/GGDFOOtjfYIupfbSnHMXg8VKHyf/sNbsizd5hfLQgfbjLjqh73jmh/EVDdt/EM4jr1/9WrAEyF4wh+9CvoUCR6SJGJDERk0GPCsEBiztqpwdl2eB71S13UV1q2M20gRPvJJf8Q7Pxq4bwGt4gIkFsQWoXl/6zOT6zE+nsuF/Xq5DxpINo=
+X-Forefront-Antispam-Report:
+	CIP:8.4.225.30;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:owa.infinera.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(36860700004)(46966006);DIR:OUT;SFP:1102;
+X-OriginatorOrg: infinera.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Feb 2024 11:19:07.3151
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7b26a660-dd23-47f6-4160-08dc32ceeb5f
+X-MS-Exchange-CrossTenant-Id: 285643de-5f5b-4b03-a153-0ae2dc8aaf77
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=285643de-5f5b-4b03-a153-0ae2dc8aaf77;Ip=[8.4.225.30];Helo=[owa.infinera.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00001CDC.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR10MB6749
 
-Hi,
+From: Joakim Tjernlund <Joakim.Tjernlund@infinera.com>
 
-After updating Linux on an i.MX28 board, I encountered errors related to
-Bluetooth:
+Signed-off-by: Joakim Tjernlund <Joakim.Tjernlund@infinera.com>
+---
+ lib/bluez.pc.in | 1 +
+ 1 file changed, 1 insertion(+)
 
-$ journalctl -p3 -xb
-(...)
-Feb 06 14:05:49 hp1 bluetoothd[183]: /usr/src/debug/bluez5/5.69-r0/src/adap=
-ter.c:reset_adv_monitors_complete() Failed to reset Adv Monitors: Failed (0=
-x03)
-Feb 06 14:05:50 hp1 bluetoothd[183]: Failed to clear UUIDs: Failed (0x03)
-Feb 06 14:05:50 hp1 bluetoothd[183]: Failed to add UUID: Failed (0x03)
-Feb 06 14:05:50 hp1 bluetoothd[183]: Failed to add UUID: Failed (0x03)
-Feb 06 14:05:50 hp1 bluetoothd[183]: Failed to add UUID: Failed (0x03)
-
-I found that [1] encountered similar errors, which were addressed in
-95b701543305 ("Bluetooth: btusb: Fix bluetooth on Intel Macbook 2014").
-However, the board I am working with uses the Bluetooth HCI UART driver
-instead of the USB driver. After bisecting, I identified the offending
-commit as d883a4669a1d ("Bluetooth: hci_sync: Only allow
-hci_cmd_sync_queue if running"). While reverting the commit would
-resolve my issues, I am uncertain if this problem is unique to my setup,
-as I have not come across other reports for ARM boards or the Bluetooth
-HCI UART driver. Do you have any ideas how to solve this? Any pointers
-are appreciated.
-
-Below is (some) of the log when running the daemon in debug mode. I only
-included part of it to not clutter the mail. Let me know if you want the
-full log instead.
-
-$ /usr/libexec/bluetooth/bluetoothd -n -d
-(...)
-bluetoothd[384]: /usr/src/debug/bluez5/5.69-r0/src/shared/mgmt.c:send_reque=
-st() [0x0000] command 0x0053
-bluetoothd[384]: /usr/src/debug/bluez5/5.69-r0/src/shared/mgmt.c:can_read_d=
-ata() [0x0000] command 0x53 status: 0x03
-bluetoothd[384]: /usr/src/debug/bluez5/5.69-r0/src/adapter.c:reset_adv_moni=
-tors_complete() Failed to reset Adv Monitors: Failed (0x03)
-bluetoothd[384]: /usr/src/debug/bluez5/5.69-r0/src/shared/mgmt.c:send_reque=
-st() write failed: Network is down
-bluetoothd[384]: Failed to clear UUIDs: Failed (0x03)
-bluetoothd[384]: /usr/src/debug/bluez5/5.69-r0/src/shared/mgmt.c:send_reque=
-st() write failed: Network is down
-bluetoothd[384]: Failed to add UUID: Failed (0x03)
-
-And here is some information about the device. Note that I anonymized
-the MAC address.
-
-$ hciconfig -a
-hci0:   Type: Primary  Bus: UART
-        BD Address: XX:XX:XX:XX:XX:XX  ACL MTU: 1021:6  SCO MTU: 180:4
-        UP RUNNING
-        RX bytes:5761 acl:0 sco:0 events:494 errors:0
-        TX bytes:70546 acl:0 sco:0 commands:494 errors:0
-        Features: 0xff 0xfe 0x2d 0xfe 0xdb 0xff 0x7b 0x87
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF
-        Link mode: PERIPHERAL ACCEPT
-        Name: 'BlueZ 5.69'
-        Class: 0x000000
-        Service Classes: Unspecified
-        Device Class: Miscellaneous,
-        HCI Version: 4.2 (0x8)  Revision: 0x0
-        LMP Version: 4.2 (0x8)  Subversion: 0xac0f
-        Manufacturer: Texas Instruments Inc. (13)
-
-Let me know if I can provide more information.
-
-[1]:
-https://bugs.archlinux.org/task/78980.html
-
---=20
-Emil Kronborg
+diff --git a/lib/bluez.pc.in b/lib/bluez.pc.in
+index 3d6e59616..1c2f30b33 100644
+--- a/lib/bluez.pc.in
++++ b/lib/bluez.pc.in
+@@ -1,6 +1,7 @@
+ prefix=@prefix@
+ exec_prefix=@exec_prefix@
+ libdir=@libdir@
++libexecdir=@libexecdir@
+ includedir=@includedir@
+  
+ Name: BlueZ
+-- 
+2.43.0
 
