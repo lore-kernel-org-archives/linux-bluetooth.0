@@ -1,213 +1,119 @@
-Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A947D3FB39
-	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Feb 2024 11:00:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 727513770E
+	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Feb 2024 11:23:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708599629; cv=none; b=BVcX8npevXXiINfgC2djrhTB8UipM4QbgQyTXX46Qm4M6uB8wSzFAC/Wtv0q37s1POcAnpHEa6rBbW7wYrnA1nSavfdf9wA0E/00xvbzW8ENEsd1GZ+ww74EsoiHKdZvWtsy4H2t6AWub6okq+WdjWlidvwJEm/jdSsf00dwMVI=
+	t=1708600990; cv=none; b=iqM4I6zqqNeHV52+R4IuFBvXh8+3LK/IxFUUnwudxvpw1ARuFZ8/eBbNhQMwAsLhEvwSr58UeaowDDWQIGUNYcI0PURemOUBfT9KJ1hF7lL9HE9doD96KD3pMg+0j9n1jFxU23NpxIo9HNNJSG9GwiglxlvCLKwpqME5ith1vKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708599629; c=relaxed/simple;
-	bh=4SUhFECzfgHvN70ojLHKQ96rAaBsv2JrpKaeoW6p6NU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PYYs1cLk9ipV/7ywOtRtCIaen7nOK16Q+ZkcJaPI5XIP5GWJGe+RN1wBS/SIQI2ZYxNzdRBTJXh5nS/lxCrAKAacGBkfHk8J8buTaWYjqbz2RJNrjIsfgB5qRI0JaIdjiha2nlg25SZTkpT6b34fKofYflwHjURsi/9aNJt48u0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=VkMj3gfd; arc=none smtp.client-ip=209.85.221.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+	s=arc-20240116; t=1708600990; c=relaxed/simple;
+	bh=qM/Ys9cy+p0n5wtTF6yBdXp4QGvlQ64E0lXwBT7/XpQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DJwLs/8Ho/L08+JmwOBWS5/noheiSnOVnLqfDQaBrtim4FgeikDr5KRXOnfZtyaAobFJtV0mVMLP5NDK7qgqGm6N0PllZRsIsp61aa1Uq3dq6aryuoXzmoX8joub8Efc3kdevY44jRJmsA+kcMtylRcInVWNutGdLz8ffmP50x4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=rrHZKqXW; arc=none smtp.client-ip=46.235.227.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="VkMj3gfd"
-Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-4c7c5ea58acso857009e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Feb 2024 03:00:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1708599625; x=1709204425; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/H/VIpoB4an+Mp36arHK/D3Ob8nW5Qqkhlyoj2/3jaw=;
-        b=VkMj3gfdcFnz42zo5KLDCMaRFv4b0U0/AkjZW3epTqbYbaaD/h/iHU2FIa7Mnr67md
-         RBQ/zLS3xiCJ7ptiCQHAbPPXT3IafWKRdsIVBZfOFupfDQikMwPe+HIUEEXz5hUCweSC
-         7iangEDzwS2C0DVrsWpOxQ1BXQquior9uqGpoJhTf3S8FWWEAW5lh1VLiQ7H6pfpAnta
-         zQF50G8AMFwP+rxRZrPI8PlG3ULBuAz6yR0FfurGccUNuZrxkzFdhihk0QxIZskLoEfQ
-         fpB8b5AMkjka5xduQ7XAaeUdfCGEyQNStzPei9FXlsjUhdP0N7qvAAPEsQ6hTOFCtr/v
-         3fqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708599625; x=1709204425;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/H/VIpoB4an+Mp36arHK/D3Ob8nW5Qqkhlyoj2/3jaw=;
-        b=kcF26+3s7lg1nlgey6M7GuRyFa7Ppzje0uWlhcp2kZZaC1nMz6ERPshrWRlOJj9jCG
-         6TXC4aAZ+pm5x005LXH0Gpz4BA+CBB6Aa+OK/mPbrHKH08j6IuMeWZe5xHKScFPrXQPP
-         LydXlonqD711Wwlw2kWIp07dtlNsw6rYgkmO2rGDRDsvKxZ1Pq3RXIASJmIl552KDxDz
-         pbA25XzhOfAbjDGOIAitMUef9TUF6zW2NmmIWyiCvGCB1cjpkYB3agcxqIpHQ0mfPiH8
-         xjialZ0BbyNNjCoVYKLZNztEPtPnNEh4Bw9MEhXpi7uFW9kjT6tWH3P6gK5uPdLGabm6
-         mlaQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXo41y0YooELCshwEySX5X/vzgR2cHXDDdK7rCbm4jbwZqKZ5m89kKfFCD8iRNMTx4mCwty+vUhkgZvfucD6M8ZZDmKXs9hsA1a/szIyucx
-X-Gm-Message-State: AOJu0Yyd4oVLDZguViYw6yEagOemapnw5PqzdIHOAoGy26SMnrahA2FO
-	OC39b+L6wqge+TCdJTqp3IFx5pREJEDHHPeiOsbkWeEGZd06pD/eQpOa/Ua/Q4aBMFkkhRW4kMA
-	FGDrv9KymLv7rIbek5Yp6WA/eMWWnr6zfL7mgqg==
-X-Google-Smtp-Source: AGHT+IGc4k4afM7yOHcqPtsyx85w0wC4eDvcktSKZo2fOpRx3WfdsV144zf5agpJ1l8kNtCEpqQOOt7K2tgZtw6QOw8=
-X-Received: by 2002:a1f:4a45:0:b0:4c7:7760:8f12 with SMTP id
- x66-20020a1f4a45000000b004c777608f12mr12070252vka.2.1708599625549; Thu, 22
- Feb 2024 03:00:25 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="rrHZKqXW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1708600986;
+	bh=qM/Ys9cy+p0n5wtTF6yBdXp4QGvlQ64E0lXwBT7/XpQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=rrHZKqXWKu8HKzzCLd9/chpOS+cfWnep32ujt+aUSTjILmjX5w2v0afTBPAl4IdT6
+	 xV+0HBHUoxxDXcbXWszfWNw2Atl9UvgG74Z2bYceBFRm9RTgms1mMJtApj5AlCUfGh
+	 KDEXmC1Av86QbWEztLyD82W2GxPrScUlLAXECnkSKRto56z5IOEOWN0LtVo+JJ1Z+/
+	 n0Xe2dCatGZmZevn1IkUPONYEah/I8ZvbkgOS8Q4H1wOEjFoaPGIuyz5Q06Rj3sQE7
+	 BNkZb9qAltwWhI2xzcJNcc4sxBzV4wW1F5XHAnugnA5qEubUPNOdoFZ4Ll57DKiOFt
+	 SF2yuwJkF0sPw==
+Received: from [100.117.211.133] (ec2-34-240-57-77.eu-west-1.compute.amazonaws.com [34.240.57.77])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: martyn)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 4EFC73782082;
+	Thu, 22 Feb 2024 11:23:06 +0000 (UTC)
+Message-ID: <8dad5b42-a843-4935-a31e-91a2eadf0c72@collabora.com>
+Date: Thu, 22 Feb 2024 11:23:05 +0000
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240216203215.40870-1-brgl@bgdev.pl> <CAA8EJppt4-L1RyDeG=1SbbzkTDhLkGcmAbZQeY0S6wGnBbFbvw@mail.gmail.com>
- <e4cddd9f-9d76-43b7-9091-413f923d27f2@linaro.org> <CAA8EJpp6+2w65o2Bfcr44tE_ircMoON6hvGgyWfvFuh3HamoSQ@mail.gmail.com>
- <4d2a6f16-bb48-4d4e-b8fd-7e4b14563ffa@linaro.org> <CAA8EJpq=iyOfYzNATRbpqfBaYSdJV1Ao5t2ewLK+wY+vEaFYAQ@mail.gmail.com>
- <CAMRc=Mfnpusf+mb-CB5S8_p7QwVW6owekC5KcQF0qrR=iOQ=oA@mail.gmail.com>
- <CAA8EJppY7VTrDz3-FMZh2qHoU+JSGUjCVEi5x=OZgNVxQLm3eQ@mail.gmail.com>
- <b9a31374-8ea9-407e-9ec3-008a95e2b18b@linaro.org> <CAA8EJppWY8c-pF75WaMadWtEuaAyCc5A1VLEq=JmB2Ngzk-zyw@mail.gmail.com>
-In-Reply-To: <CAA8EJppWY8c-pF75WaMadWtEuaAyCc5A1VLEq=JmB2Ngzk-zyw@mail.gmail.com>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Thu, 22 Feb 2024 12:00:14 +0100
-Message-ID: <CAMRc=Md6SoXukoGb4bW-CSYgjpO4RL+0Uu3tYrZzgSgVtFH6Sw@mail.gmail.com>
-Subject: Re: [PATCH v5 00/18] power: sequencing: implement the subsystem and
- add first users
-To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Cc: neil.armstrong@linaro.org, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Kalle Valo <kvalo@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
-	Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Saravana Kannan <saravanak@google.com>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, Arnd Bergmann <arnd@arndb.de>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Alex Elder <elder@linaro.org>, 
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
-	Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-pci@vger.kernel.org, linux-pm@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] Bluetooth: af_bluetooth: Fix Use-After-Free in
+ bt_sock_recvmsg
+Content-Language: en-US
+To: Hyunwoo Kim <v4bel@theori.io>, marcel@holtmann.org, luiz.dentz@gmail.com
+Cc: imv4bel@gmail.com, johan.hedberg@gmail.com,
+ linux-bluetooth@vger.kernel.org
+References: <20231209105518.GA408904@v4bel-B760M-AORUS-ELITE-AX>
+From: Martyn Welch <martyn.welch@collabora.com>
+In-Reply-To: <20231209105518.GA408904@v4bel-B760M-AORUS-ELITE-AX>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Feb 19, 2024 at 11:21=E2=80=AFPM Dmitry Baryshkov
-<dmitry.baryshkov@linaro.org> wrote:
->
-> On Mon, 19 Feb 2024 at 19:18, <neil.armstrong@linaro.org> wrote:
-> >
-> > On 19/02/2024 13:33, Dmitry Baryshkov wrote:
-> > > On Mon, 19 Feb 2024 at 14:23, Bartosz Golaszewski <brgl@bgdev.pl> wro=
-te:
-> > >>
-> > >> On Mon, Feb 19, 2024 at 11:26=E2=80=AFAM Dmitry Baryshkov
-> > >> <dmitry.baryshkov@linaro.org> wrote:
-> > >>>
-> > >>
-> > >> [snip]
-> > >>
-> > >>>>>>>>
-> > >>>>>>>> For WCN7850 we hide the existence of the PMU as modeling it is=
- simply not
-> > >>>>>>>> necessary. The BT and WLAN devices on the device-tree are repr=
-esented as
-> > >>>>>>>> consuming the inputs (relevant to the functionality of each) o=
-f the PMU
-> > >>>>>>>> directly.
-> > >>>>>>>
-> > >>>>>>> We are describing the hardware. From the hardware point of view=
-, there
-> > >>>>>>> is a PMU. I think at some point we would really like to describ=
-e all
-> > >>>>>>> Qualcomm/Atheros WiFI+BT units using this PMU approach, includi=
-ng the
-> > >>>>>>> older ath10k units present on RB3 (WCN3990) and db820c (QCA6174=
-).
-> > >>>>>>
-> > >>>>>> While I agree with older WiFi+BT units, I don't think it's neede=
-d for
-> > >>>>>> WCN7850 since BT+WiFi are now designed to be fully independent a=
-nd PMU is
-> > >>>>>> transparent.
-> > >>>>>
-> > >>>>> I don't see any significant difference between WCN6750/WCN6855 an=
-d
-> > >>>>> WCN7850 from the PMU / power up point of view. Could you please p=
-oint
-> > >>>>> me to the difference?
-> > >>>>>
-> > >>>>
-> > >>>> The WCN7850 datasheet clearly states there's not contraint on the =
-WLAN_EN
-> > >>>> and BT_EN ordering and the only requirement is to have all input r=
-egulators
-> > >>>> up before pulling up WLAN_EN and/or BT_EN.
-> > >>>>
-> > >>>> This makes the PMU transparent and BT and WLAN can be described as=
- independent.
-> > >>>
-> > >>>  From the hardware perspective, there is a PMU. It has several LDOs=
-. So
-> > >>> the device tree should have the same style as the previous
-> > >>> generations.
-> > >>>
-> > >>
-> > >> My thinking was this: yes, there is a PMU but describing it has no
-> > >> benefit (unlike QCA6x90). If we do describe, then we'll end up havin=
-g
-> > >> to use pwrseq here despite it not being needed because now we won't =
-be
-> > >> able to just get regulators from WLAN/BT drivers directly.
-> > >>
-> > >> So I also vote for keeping it this way. Let's go into the package
-> > >> detail only if it's required.
-> > >
-> > > The WiFi / BT parts are not powered up by the board regulators. They
-> > > are powered up by the PSU. So we are not describing it in the accurat=
-e
-> > > way.
-> >
-> > I disagree, the WCN7850 can also be used as a discrete PCIe M.2 card, a=
-nd in
-> > this situation the PCIe part is powered with the M.2 slot and the BT si=
-de
-> > is powered separately as we currently do it now.
->
-> QCA6390 can also be used as a discrete M.2 card.
->
-> > So yes there's a PMU, but it's not an always visible hardware part, fro=
-m the
-> > SoC PoV, only the separate PCIe and BT subsystems are visible/controlla=
-ble/powerable.
->
-> From the hardware point:
-> - There is a PMU
-> - The PMU is connected to the board supplies
-> - Both WiFi and BT parts are connected to the PMU
-> - The BT_EN / WLAN_EN pins are not connected to the PMU
->
-> So, not representing the PMU in the device tree is a simplification.
->
+Hi Hyunwoo,
 
-What about the existing WLAN and BT users of similar packages? We
-would have to deprecate a lot of existing bindings. I don't think it's
-worth it.
+I've been looking into a few CVEs, the one of interest in this case is 
+CVE-2024-21803.
 
-The WCN7850 is already described in bindings as consuming what is PMUs
-inputs and not its outputs.
+There seems to be little publicly available information about this CVE, 
+however the title of this patch and the affected kernel range suggest 
+this may be a fix for this CVE.
 
-Bart
+Would you be able to clarify whether this is a fix for CVE-2024-21803?
 
-> >
-> > Neil
-> >
-> > >
-> > > Moreover, I think we definitely want to move BT driver to use only th=
-e
-> > > pwrseq power up method. Doing it in the other way results in the code
-> > > duplication and possible issues because of the regulator / pwrseq
-> > > taking different code paths.
+Thanks,
+
+Martyn
+
+On 09/12/2023 10:55, Hyunwoo Kim wrote:
+> This can cause a race with bt_sock_ioctl() because
+> bt_sock_recvmsg() gets the skb from sk->sk_receive_queue
+> and then frees it without holding lock_sock.
+> A use-after-free for a skb occurs with the following flow.
+> ```
+> bt_sock_recvmsg() -> skb_recv_datagram() -> skb_free_datagram()
+> bt_sock_ioctl() -> skb_peek()
+> ```
+> Add lock_sock to bt_sock_recvmsg() to fix this issue.
 >
-> --
-> With best wishes
-> Dmitry
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Signed-off-by: Hyunwoo Kim <v4bel@theori.io>
+> ---
+> v1 -> v2: Remove duplicate release_sock()s
+> ---
+>   net/bluetooth/af_bluetooth.c | 7 ++++++-
+>   1 file changed, 6 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+> index 336a76165454..b93464ac3517 100644
+> --- a/net/bluetooth/af_bluetooth.c
+> +++ b/net/bluetooth/af_bluetooth.c
+> @@ -309,11 +309,14 @@ int bt_sock_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+>   	if (flags & MSG_OOB)
+>   		return -EOPNOTSUPP;
+>   
+> +	lock_sock(sk);
+> +
+>   	skb = skb_recv_datagram(sk, flags, &err);
+>   	if (!skb) {
+>   		if (sk->sk_shutdown & RCV_SHUTDOWN)
+> -			return 0;
+> +			err = 0;
+>   
+> +		release_sock(sk);
+>   		return err;
+>   	}
+>   
+> @@ -343,6 +346,8 @@ int bt_sock_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+>   
+>   	skb_free_datagram(sk, skb);
+>   
+> +	release_sock(sk);
+> +
+>   	if (flags & MSG_TRUNC)
+>   		copied = skblen;
+>   
