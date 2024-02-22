@@ -1,55 +1,55 @@
-Received: from mail-vs1-f50.google.com (mail-vs1-f50.google.com [209.85.217.50])
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 977EA60B94
-	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Feb 2024 12:27:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A7A5131726
+	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Feb 2024 12:47:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708604872; cv=none; b=Zq3N9Z7ibeO9K2u2Ll+NUS7Q5/d9jllsFoul/HNGKzDpXx9c0jfk3XB05XkU42+V/hhgzi73hiID13jvxSARZ9uLgp221AP8yyQ1vpCUmcVg/gnpILby6U4V5SAxTy1PTFnebpdiTZYK2xu6zFk+fcJT7rYzsdUnaHClQqCAAAo=
+	t=1708606059; cv=none; b=gck+wHHVCepgbeKX54Kk4tgD5lfRx1XvU3BHp5EC1eSV8o6Sylct2PmApu84kUpyo9XG9saHn3DYCSdEZMfiGC01S5l36/OCvA2Ykx+vPEElDemNyp+tH1D00J3ywrxnaI9V7xeiAI7IQ72sTybr0NjnOJiAaehdbWU/Uut9r/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708604872; c=relaxed/simple;
-	bh=wSHsjtGyIG8Oy03Ay1/8wBYOX3m/TamMnf+lgB3hfcQ=;
+	s=arc-20240116; t=1708606059; c=relaxed/simple;
+	bh=m3KTK3YPxZ8Ta+evN1W5IuCGgOUWeCLZqbjOnBZFKRQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rdHV/fTKFsUjynKF/EKZfNj9v+YqbepCVYdi7gCHnH3MEh/cDXclkQy+lZ1GIQobn2cltnHhDe5O6zTFaDRVkF/pm066VeUv/CF6NCMHrQgOWeJ+TSy9TgijaOCGrjjvh8VRtcLBotHekpNmq6P88dBYgF4OoSOyiGaia81F4bQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=2eHmZLCC; arc=none smtp.client-ip=209.85.217.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+	 To:Cc:Content-Type; b=gX9UJZ0sA11ypyF8OUErps7Tytjl//RgGV+DU2yAJqfMAk6ZyVO2okzi6tpC/VGXwA5guPAKI50qZUcdg+xmGAsbRXiZik725zpwGyhwI3My/CnOoldRiXW0d2kSY1ZKfWbqZSJ8/hhY/EYucsmovD5C0CW6F5gI8dGvtO70wgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=xqfaOZeV; arc=none smtp.client-ip=209.85.128.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="2eHmZLCC"
-Received: by mail-vs1-f50.google.com with SMTP id ada2fe7eead31-4705496ac55so994105137.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Feb 2024 04:27:50 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xqfaOZeV"
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-607bfa4c913so17124197b3.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Feb 2024 04:47:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1708604869; x=1709209669; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1708606052; x=1709210852; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=87z6zq0uGbrgFYkt6YA8mx0pzsMb/ayOMfEcY0+aFV8=;
-        b=2eHmZLCC9NwBA2UI5DGC/Jym4gQdwpEaB5dYGg8BPMMcWhUag3yJ3LSPgIglBODGNj
-         laSYuL9M50I3fQqKy/BcYy47MEVvy3cess5Mxj7FT5D3JD1yFF0gn3grXrPklA1UvB9U
-         uXepih9fGlDcxDC4iZpDtdhIjBvo7P6APwamwvC4ADjSipEHq2p+q9/cVXrgYjNrdUbP
-         xWXmzTGJ8evLKWkV9psjTd4sDs5ujxHAUQ0PRtGihxttBlvBP6VHOLY0Luxi0yIOCKUM
-         sgy4vPS7GBZStZBLdL+KJwQj/JYcnH7ZKAP8Vw+2CY93nFdd7epamkepxOlFfaqdpD/P
-         1g0A==
+        bh=cjevDkt1D1JkgAXupb+doke4NkWeti+PVxN8r/3kjqU=;
+        b=xqfaOZeV9Xml3qtOVixhy/hDgqXxZUPHRymd5gqASelTagUhsWPIWjA23w3+Jsefj8
+         Mw9JkOL9q2r/G5o6Z5o1VyG2DMOKf14lP7MhoVvlHicpCUSOjkbwHA9QO9LimHqAmZeO
+         HnSs+dBRGUNTPZ44vokqk8aRfCRDTfU2LkTUZWvDBRLBNkk8YSapi1rAiKUw2darZuJM
+         SeZXLuqkSSkwSZOgyzjD5/K1KsdoyysSkH9G7FkwaBK1DQKpz7hNWrGZPq/uDOmXnrwh
+         DE1M7UfvQOgPJoxxkFIQfLEuKgxgrIFUdXYJYAcmbM8VUFjyRcf2/93VUr91m+F0jYn+
+         ftvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708604869; x=1709209669;
+        d=1e100.net; s=20230601; t=1708606052; x=1709210852;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=87z6zq0uGbrgFYkt6YA8mx0pzsMb/ayOMfEcY0+aFV8=;
-        b=Tae2MWLBDA4jhsTbGq3ak6j0v8xw3lkc/QkFFJcef4lHHBTTEExX2p+RTUpEwL/pEK
-         h9bii77N5Zr1J+YBY5qcuIHQuGZIEv3XbhcIEo9/qE5pcFpgMUH4KsA+r+I8Tes5e8cB
-         BLJhQHdizKjVIDGFAHvYM7+LkSJoX968X6fYXCknhPqBZzVeiIq/NZe6ZiSdGk+GP3a/
-         vfRyRL42KWqUOL7QMN/BYKrOHMDByqkf6A/tyjE7DDHnD//bfzJMkDWkoKXs5S4X5jpI
-         iyXNrkWQ4YZKskXKevTihel8tNctZnHQ/XPgRXbMwGI4f5ajt4gvqFiqwhpLswYrA67o
-         vgfA==
-X-Forwarded-Encrypted: i=1; AJvYcCWk0TjMaP6rJrPDJE+egqkW+GTl58RmKeNxhetIXTwN3HhoyXaMglAM6Fd2ChUbg++ZEvqCrPTig+Ga57bNZEJbHstNNVJSRBMHnBP2Kdhr
-X-Gm-Message-State: AOJu0Yx90yDnw8FUKlCuk2iS99AgWRslnCuvTC2FvEmtQtQsGmFermKJ
-	SH5w2RyGOQ5dZEt4eq9q8c7i/u7gHKnlxakKYkyyYnLbcMfjfJ51AkGs+VpOrAjia2p9mg1ctxg
-	/zqDPcE+BJhme1z8egmPK6TJCPOKj5sQvet7A5g==
-X-Google-Smtp-Source: AGHT+IEX89w8BA5MRuF+hYzsldrzWJL7R30+wWpJcrmQgBmAJsacwJX7Ls13cXFgRWb101UOeMKn5UqfoaZY6qWXHKw=
-X-Received: by 2002:a05:6102:c50:b0:471:bde0:4050 with SMTP id
- y16-20020a0561020c5000b00471bde04050mr1095401vss.8.1708604869551; Thu, 22 Feb
- 2024 04:27:49 -0800 (PST)
+        bh=cjevDkt1D1JkgAXupb+doke4NkWeti+PVxN8r/3kjqU=;
+        b=HEwPoeHKeA2aDGkZUUn0xrDpLta4IuQz6p5dqdXTidXO7gsEIHvEgVWl8hvlVfKnF4
+         6SxuZnOSetmXolemqJAI/XvaTbJcr2xoCO8jKTmbVQJTtdbEigI3l3K+cAhWlHY73HHI
+         2ynEvfU9VdzAfHJD2J4ictTY/stSRBelg+MU6B0TrFD6VD2zyHdzZjckDw9ZBYxPSn0P
+         7DemdDTpGjkr/qz4U9Bf5CnPe60ALWX4FczBjAxVZVXOU8JGS2mYqXBNjyKwoBsgwkhw
+         FCTy72wWwJTuOLI4cuBM9UaO5/fn3InZJCNc+B++eEFIkYMf/v/nWdtx7trO1LeTkqxY
+         rekQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVqL0bE/GDz09k8PsFUT+A5Ie9jTg98JxjnmLov0C6DHKB5OXFj9enejgUxmZbRSU0hHcupOg+/q1k1SnaMTlHq6eI5lKMMgx3vvGrV/QCe
+X-Gm-Message-State: AOJu0Yx1ncgN4Zk7brOS0FqU9dm4djA8oxCzGX0VsIiNBBDObnsFjD5b
+	YNmBHYzS0/9KrSAGodColzwiBeqtBUppLhYH1REEr+lSvEY1mXfzIcttXYiIwynYftqLZ+nrVwf
+	tW6bpzcgagDZVt8jJzzEqQ5Q1I6u/p3ugyjnoYA==
+X-Google-Smtp-Source: AGHT+IFZyODYrfNMOWolnkP9Q1Ii/VWkZNQIAuDJ5HIrP0A43mZ2a1e8TWOpBNPPiL+jm8qBJECIV4Y0C7wlK4X8GKU=
+X-Received: by 2002:a05:690c:3388:b0:608:3fe8:15bf with SMTP id
+ fl8-20020a05690c338800b006083fe815bfmr13168793ywb.21.1708606051976; Thu, 22
+ Feb 2024 04:47:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -62,14 +62,15 @@ References: <20240216203215.40870-1-brgl@bgdev.pl> <CAA8EJppt4-L1RyDeG=1SbbzkTDh
  <CAMRc=Mfnpusf+mb-CB5S8_p7QwVW6owekC5KcQF0qrR=iOQ=oA@mail.gmail.com>
  <CAA8EJppY7VTrDz3-FMZh2qHoU+JSGUjCVEi5x=OZgNVxQLm3eQ@mail.gmail.com>
  <b9a31374-8ea9-407e-9ec3-008a95e2b18b@linaro.org> <CAA8EJppWY8c-pF75WaMadWtEuaAyCc5A1VLEq=JmB2Ngzk-zyw@mail.gmail.com>
- <CAMRc=Md6SoXukoGb4bW-CSYgjpO4RL+0Uu3tYrZzgSgVtFH6Sw@mail.gmail.com> <CAA8EJprUM6=ZqTwWLB8rW8WRDqwncafa-szSsTvPQCOOSXUn_w@mail.gmail.com>
-In-Reply-To: <CAA8EJprUM6=ZqTwWLB8rW8WRDqwncafa-szSsTvPQCOOSXUn_w@mail.gmail.com>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Thu, 22 Feb 2024 13:27:38 +0100
-Message-ID: <CAMRc=Metemd=24t0RJw-O9Z0-cg4mESouOfvMVLs_rJDCwRBPQ@mail.gmail.com>
+ <CAMRc=Md6SoXukoGb4bW-CSYgjpO4RL+0Uu3tYrZzgSgVtFH6Sw@mail.gmail.com>
+ <CAA8EJprUM6=ZqTwWLB8rW8WRDqwncafa-szSsTvPQCOOSXUn_w@mail.gmail.com> <CAMRc=Metemd=24t0RJw-O9Z0-cg4mESouOfvMVLs_rJDCwRBPQ@mail.gmail.com>
+In-Reply-To: <CAMRc=Metemd=24t0RJw-O9Z0-cg4mESouOfvMVLs_rJDCwRBPQ@mail.gmail.com>
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date: Thu, 22 Feb 2024 14:47:20 +0200
+Message-ID: <CAA8EJprJTj7o0ATrQbF_38tW+kLspF1nBySg+_y_RWmadVnV9A@mail.gmail.com>
 Subject: Re: [PATCH v5 00/18] power: sequencing: implement the subsystem and
  add first users
-To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
 Cc: neil.armstrong@linaro.org, Marcel Holtmann <marcel@holtmann.org>, 
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, "David S . Miller" <davem@davemloft.net>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -92,149 +93,170 @@ Cc: neil.armstrong@linaro.org, Marcel Holtmann <marcel@holtmann.org>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 22, 2024 at 12:27=E2=80=AFPM Dmitry Baryshkov
-<dmitry.baryshkov@linaro.org> wrote:
+On Thu, 22 Feb 2024 at 14:27, Bartosz Golaszewski <brgl@bgdev.pl> wrote:
 >
-> On Thu, 22 Feb 2024 at 13:00, Bartosz Golaszewski <brgl@bgdev.pl> wrote:
+> On Thu, Feb 22, 2024 at 12:27=E2=80=AFPM Dmitry Baryshkov
+> <dmitry.baryshkov@linaro.org> wrote:
 > >
-> > On Mon, Feb 19, 2024 at 11:21=E2=80=AFPM Dmitry Baryshkov
-> > <dmitry.baryshkov@linaro.org> wrote:
+> > On Thu, 22 Feb 2024 at 13:00, Bartosz Golaszewski <brgl@bgdev.pl> wrote=
+:
 > > >
-> > > On Mon, 19 Feb 2024 at 19:18, <neil.armstrong@linaro.org> wrote:
+> > > On Mon, Feb 19, 2024 at 11:21=E2=80=AFPM Dmitry Baryshkov
+> > > <dmitry.baryshkov@linaro.org> wrote:
 > > > >
-> > > > On 19/02/2024 13:33, Dmitry Baryshkov wrote:
-> > > > > On Mon, 19 Feb 2024 at 14:23, Bartosz Golaszewski <brgl@bgdev.pl>=
- wrote:
-> > > > >>
-> > > > >> On Mon, Feb 19, 2024 at 11:26=E2=80=AFAM Dmitry Baryshkov
-> > > > >> <dmitry.baryshkov@linaro.org> wrote:
-> > > > >>>
-> > > > >>
-> > > > >> [snip]
-> > > > >>
-> > > > >>>>>>>>
-> > > > >>>>>>>> For WCN7850 we hide the existence of the PMU as modeling i=
-t is simply not
-> > > > >>>>>>>> necessary. The BT and WLAN devices on the device-tree are =
-represented as
-> > > > >>>>>>>> consuming the inputs (relevant to the functionality of eac=
-h) of the PMU
-> > > > >>>>>>>> directly.
-> > > > >>>>>>>
-> > > > >>>>>>> We are describing the hardware. From the hardware point of =
-view, there
-> > > > >>>>>>> is a PMU. I think at some point we would really like to des=
-cribe all
-> > > > >>>>>>> Qualcomm/Atheros WiFI+BT units using this PMU approach, inc=
-luding the
-> > > > >>>>>>> older ath10k units present on RB3 (WCN3990) and db820c (QCA=
-6174).
-> > > > >>>>>>
-> > > > >>>>>> While I agree with older WiFi+BT units, I don't think it's n=
-eeded for
-> > > > >>>>>> WCN7850 since BT+WiFi are now designed to be fully independe=
-nt and PMU is
-> > > > >>>>>> transparent.
-> > > > >>>>>
-> > > > >>>>> I don't see any significant difference between WCN6750/WCN685=
-5 and
-> > > > >>>>> WCN7850 from the PMU / power up point of view. Could you plea=
-se point
-> > > > >>>>> me to the difference?
-> > > > >>>>>
-> > > > >>>>
-> > > > >>>> The WCN7850 datasheet clearly states there's not contraint on =
-the WLAN_EN
-> > > > >>>> and BT_EN ordering and the only requirement is to have all inp=
-ut regulators
-> > > > >>>> up before pulling up WLAN_EN and/or BT_EN.
-> > > > >>>>
-> > > > >>>> This makes the PMU transparent and BT and WLAN can be describe=
-d as independent.
-> > > > >>>
-> > > > >>>  From the hardware perspective, there is a PMU. It has several =
-LDOs. So
-> > > > >>> the device tree should have the same style as the previous
-> > > > >>> generations.
-> > > > >>>
-> > > > >>
-> > > > >> My thinking was this: yes, there is a PMU but describing it has =
-no
-> > > > >> benefit (unlike QCA6x90). If we do describe, then we'll end up h=
-aving
-> > > > >> to use pwrseq here despite it not being needed because now we wo=
-n't be
-> > > > >> able to just get regulators from WLAN/BT drivers directly.
-> > > > >>
-> > > > >> So I also vote for keeping it this way. Let's go into the packag=
-e
-> > > > >> detail only if it's required.
+> > > > On Mon, 19 Feb 2024 at 19:18, <neil.armstrong@linaro.org> wrote:
 > > > > >
-> > > > > The WiFi / BT parts are not powered up by the board regulators. T=
-hey
-> > > > > are powered up by the PSU. So we are not describing it in the acc=
-urate
-> > > > > way.
-> > > >
-> > > > I disagree, the WCN7850 can also be used as a discrete PCIe M.2 car=
-d, and in
-> > > > this situation the PCIe part is powered with the M.2 slot and the B=
-T side
-> > > > is powered separately as we currently do it now.
-> > >
-> > > QCA6390 can also be used as a discrete M.2 card.
-> > >
-> > > > So yes there's a PMU, but it's not an always visible hardware part,=
- from the
-> > > > SoC PoV, only the separate PCIe and BT subsystems are visible/contr=
-ollable/powerable.
-> > >
-> > > From the hardware point:
-> > > - There is a PMU
-> > > - The PMU is connected to the board supplies
-> > > - Both WiFi and BT parts are connected to the PMU
-> > > - The BT_EN / WLAN_EN pins are not connected to the PMU
-> > >
-> > > So, not representing the PMU in the device tree is a simplification.
-> > >
-> >
-> > What about the existing WLAN and BT users of similar packages? We
-> > would have to deprecate a lot of existing bindings. I don't think it's
-> > worth it.
->
-> We have bindings that are not reflecting the hardware. So yes, we
-> should gradually update them once the powerseq is merged.
->
-> > The WCN7850 is already described in bindings as consuming what is PMUs
-> > inputs and not its outputs.
->
-> So do WCN6855 and QCA6391 BlueTooth parts.
->
-
-That is not true for the latter, this series is adding regulators for it.
-
-Bart
-
-> >
-> > Bart
-> >
-> > > >
-> > > > Neil
-> > > >
+> > > > > On 19/02/2024 13:33, Dmitry Baryshkov wrote:
+> > > > > > On Mon, 19 Feb 2024 at 14:23, Bartosz Golaszewski <brgl@bgdev.p=
+l> wrote:
+> > > > > >>
+> > > > > >> On Mon, Feb 19, 2024 at 11:26=E2=80=AFAM Dmitry Baryshkov
+> > > > > >> <dmitry.baryshkov@linaro.org> wrote:
+> > > > > >>>
+> > > > > >>
+> > > > > >> [snip]
+> > > > > >>
+> > > > > >>>>>>>>
+> > > > > >>>>>>>> For WCN7850 we hide the existence of the PMU as modeling=
+ it is simply not
+> > > > > >>>>>>>> necessary. The BT and WLAN devices on the device-tree ar=
+e represented as
+> > > > > >>>>>>>> consuming the inputs (relevant to the functionality of e=
+ach) of the PMU
+> > > > > >>>>>>>> directly.
+> > > > > >>>>>>>
+> > > > > >>>>>>> We are describing the hardware. From the hardware point o=
+f view, there
+> > > > > >>>>>>> is a PMU. I think at some point we would really like to d=
+escribe all
+> > > > > >>>>>>> Qualcomm/Atheros WiFI+BT units using this PMU approach, i=
+ncluding the
+> > > > > >>>>>>> older ath10k units present on RB3 (WCN3990) and db820c (Q=
+CA6174).
+> > > > > >>>>>>
+> > > > > >>>>>> While I agree with older WiFi+BT units, I don't think it's=
+ needed for
+> > > > > >>>>>> WCN7850 since BT+WiFi are now designed to be fully indepen=
+dent and PMU is
+> > > > > >>>>>> transparent.
+> > > > > >>>>>
+> > > > > >>>>> I don't see any significant difference between WCN6750/WCN6=
+855 and
+> > > > > >>>>> WCN7850 from the PMU / power up point of view. Could you pl=
+ease point
+> > > > > >>>>> me to the difference?
+> > > > > >>>>>
+> > > > > >>>>
+> > > > > >>>> The WCN7850 datasheet clearly states there's not contraint o=
+n the WLAN_EN
+> > > > > >>>> and BT_EN ordering and the only requirement is to have all i=
+nput regulators
+> > > > > >>>> up before pulling up WLAN_EN and/or BT_EN.
+> > > > > >>>>
+> > > > > >>>> This makes the PMU transparent and BT and WLAN can be descri=
+bed as independent.
+> > > > > >>>
+> > > > > >>>  From the hardware perspective, there is a PMU. It has severa=
+l LDOs. So
+> > > > > >>> the device tree should have the same style as the previous
+> > > > > >>> generations.
+> > > > > >>>
+> > > > > >>
+> > > > > >> My thinking was this: yes, there is a PMU but describing it ha=
+s no
+> > > > > >> benefit (unlike QCA6x90). If we do describe, then we'll end up=
+ having
+> > > > > >> to use pwrseq here despite it not being needed because now we =
+won't be
+> > > > > >> able to just get regulators from WLAN/BT drivers directly.
+> > > > > >>
+> > > > > >> So I also vote for keeping it this way. Let's go into the pack=
+age
+> > > > > >> detail only if it's required.
+> > > > > >
+> > > > > > The WiFi / BT parts are not powered up by the board regulators.=
+ They
+> > > > > > are powered up by the PSU. So we are not describing it in the a=
+ccurate
+> > > > > > way.
 > > > > >
-> > > > > Moreover, I think we definitely want to move BT driver to use onl=
-y the
-> > > > > pwrseq power up method. Doing it in the other way results in the =
-code
-> > > > > duplication and possible issues because of the regulator / pwrseq
-> > > > > taking different code paths.
+> > > > > I disagree, the WCN7850 can also be used as a discrete PCIe M.2 c=
+ard, and in
+> > > > > this situation the PCIe part is powered with the M.2 slot and the=
+ BT side
+> > > > > is powered separately as we currently do it now.
+> > > >
+> > > > QCA6390 can also be used as a discrete M.2 card.
+> > > >
+> > > > > So yes there's a PMU, but it's not an always visible hardware par=
+t, from the
+> > > > > SoC PoV, only the separate PCIe and BT subsystems are visible/con=
+trollable/powerable.
+> > > >
+> > > > From the hardware point:
+> > > > - There is a PMU
+> > > > - The PMU is connected to the board supplies
+> > > > - Both WiFi and BT parts are connected to the PMU
+> > > > - The BT_EN / WLAN_EN pins are not connected to the PMU
+> > > >
+> > > > So, not representing the PMU in the device tree is a simplification=
+.
+> > > >
 > > >
-> > > --
-> > > With best wishes
-> > > Dmitry
+> > > What about the existing WLAN and BT users of similar packages? We
+> > > would have to deprecate a lot of existing bindings. I don't think it'=
+s
+> > > worth it.
+> >
+> > We have bindings that are not reflecting the hardware. So yes, we
+> > should gradually update them once the powerseq is merged.
+> >
+> > > The WCN7850 is already described in bindings as consuming what is PMU=
+s
+> > > inputs and not its outputs.
+> >
+> > So do WCN6855 and QCA6391 BlueTooth parts.
+> >
 >
+> That is not true for the latter, this series is adding regulators for it.
+
+But the bindings exist already, so you still have to extend it,
+deprecating regulator-less bindings.
+
+Bartosz, I really don't understand what is the issue there. There is a
+PMU. As such it should be represented in the DT and it can be handled
+by the same driver as you are adding for QCA6390.
+
 >
+> Bart
 >
-> --
-> With best wishes
-> Dmitry
+> > >
+> > > Bart
+> > >
+> > > > >
+> > > > > Neil
+> > > > >
+> > > > > >
+> > > > > > Moreover, I think we definitely want to move BT driver to use o=
+nly the
+> > > > > > pwrseq power up method. Doing it in the other way results in th=
+e code
+> > > > > > duplication and possible issues because of the regulator / pwrs=
+eq
+> > > > > > taking different code paths.
+> > > >
+> > > > --
+> > > > With best wishes
+> > > > Dmitry
+> >
+> >
+> >
+> > --
+> > With best wishes
+> > Dmitry
+
+
+
+--=20
+With best wishes
+Dmitry
