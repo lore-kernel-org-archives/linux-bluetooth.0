@@ -1,105 +1,127 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE7C645BF6
-	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Feb 2024 12:18:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4075355C28;
+	Thu, 22 Feb 2024 12:21:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708604291; cv=none; b=if17PurO2oVNcuXJRlCJeR03Uqgqc7D8LgTGBMUdUzMwDMZl7Md51qOKt4UkwvwEmvFp+vtLVPO+yNjEyS3XmEAGLtejyS31oIHEiBSOqRKmJ0IH6OD1IfHXHSkT/q9Z1LffvTW2gFl3ZZ6rMc9+NXxVXNoB8cngUPRRy9A7J4w=
+	t=1708604507; cv=none; b=Z8xJ3xZsVFNTHO/YjKKJzrpI6I9tzF6C7tuoZDhAe6lzSZrXpsLN4nI+fVZWJlhR25OY08R6zTg0uhsjBKDZUY3U2aQ3JfqHhOmThqn3wqCXsYljwak89oYSqDoXk9Y/gh1e7iCC4+UpYUUMeYR9NEbyadX218spl5A9DgFtqNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708604291; c=relaxed/simple;
-	bh=aiVPSswc/TQmL2rCQf7rgqmBzYOLeNU0nu0Lq2gPWk8=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=AvRscSxFo0JYsvxhs0x7sAHLiLSmhKGZxDZcI0T4kzkoQ1ADU6KOl7h19TbeaNzuDD/NksCwVKWD/8jaysHhYi1VacpMnUkmvnJqxuFd++MD9AbbVcXlIpFQoilCRcdUQGvj1PNkpR+OAv5tCfmvsN7yZeMN4z+wnlrR0pSJHCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nDa7b9T3; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1708604507; c=relaxed/simple;
+	bh=EqZbzaH/qaB7a7IKc6JYTdatq4CHgvMWc4c4mJHW2hE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IVjtJUg6NUJ5CM35VO8VXbepV/5gVRPM799nC637htVLwp30Vkr29y/MxlWFwdiSyuCIcyUTmm5daNeBhwbSODwh+31ZU6djOzVTj1djWdL/445r0Pdcb6xfvt069m5WRnr/qTz2ihDF0JX0b434506R7vM0Iwz7SQsrMo9lsK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vais+w7d; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nDa7b9T3"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 86278C43394
-	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Feb 2024 12:18:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vais+w7d"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81E0DC433C7;
+	Thu, 22 Feb 2024 12:21:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708604289;
-	bh=aiVPSswc/TQmL2rCQf7rgqmBzYOLeNU0nu0Lq2gPWk8=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=nDa7b9T3rgG6ejHezhBWA03uqPLgFKiea1I/AyexGRfbADUb9fPKbn/qg1p5ebzMr
-	 m9dStZ1+OcE0qpU79G75jNm8ch9ZU76+1i8wAHX4vjpMK3x/dx+SYUbPbo0IkLR5rd
-	 YEZVf6hAaAGyK3V6zH6ScaZL8umhqojI93nPMSWzqjYEQhgX+USViUjkhTLLoXryZj
-	 gjEaOYBS/LG2AZG8aBEO5ATzGzT7aq6BMmeMAIqaDs0c78veILahCAc4/gs+jvOITP
-	 COdYTa+u0g151diCLob6pYuDopGQe4gvKAXxyODNIEcxPDUjmHUt501z1rRoOrj4ox
-	 0NkfJpj1Xw6nQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 71927C53BD4; Thu, 22 Feb 2024 12:18:09 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 86931] hid-generic 0005:099A:0500.0001: unknown main item tag
- 0x0
-Date: Thu, 22 Feb 2024 12:18:09 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: kernel@nerdbynature.de
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-86931-62941-iQ7HRfTFNP@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-86931-62941@https.bugzilla.kernel.org/>
-References: <bug-86931-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=k20201202; t=1708604506;
+	bh=EqZbzaH/qaB7a7IKc6JYTdatq4CHgvMWc4c4mJHW2hE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Vais+w7dVBc+Xk4EvckzPmvM6a/2KjvGzm2VDrn7oZd6lT1sMCuOcX1qDb2PMDCEW
+	 IZALOUfq5R7czopyD6Q8n/kouh0W3vDg13fw2wPev+9aOxAzv5iSFTj01WlgeRtm8q
+	 rfrlSSvGHi8dMfB4nzhaZ81mQagcgNVTDsSzCfY3Yk76RiQvI4C+1mW9qVZN85sa5q
+	 Uz3u+hqODk6ps05MFS1CAhRh/TkO/5AAWb5UNCazW0O8MTp8aD1OJpRyMUiaGn3Rcm
+	 lv9vU3NJ1hmnoVZQ4RN+226xKHklRHGaTs1CBXAw5vmIXparkNzLdJs/W+pgHBWnYG
+	 hT7MEcGskAyYw==
+Date: Thu, 22 Feb 2024 12:21:36 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Kalle Valo <kvalo@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Alex Elder <elder@linaro.org>,
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Abel Vesa <abel.vesa@linaro.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Lukas Wunner <lukas@wunner.de>,
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-wireless@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
+	linux-pm@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH v5 14/18] PCI/pwrctl: add a power control driver for
+ WCN7850
+Message-ID: <52fba837-989b-4213-8af7-f02cd8cb48c8@sirena.org.uk>
+References: <20240216203215.40870-1-brgl@bgdev.pl>
+ <20240216203215.40870-15-brgl@bgdev.pl>
+ <d5d603dc-ec66-4e21-aa41-3b25557f1fb7@sirena.org.uk>
+ <CAMRc=MeUjKPS3ANE6=7WZ3kbbGAdyE8HeXFN=75Jp-pVyBaWrQ@mail.gmail.com>
+ <ea08a286-ff53-4d58-ae41-38cca151508c@sirena.org.uk>
+ <17bbd9ae-0282-430e-947b-e6fb08c53af7@linaro.org>
+ <53f0956f-ee64-4bd6-b44f-cbebafd42e46@sirena.org.uk>
+ <CAMRc=MedCX_TGGawMhr39oXtJPF4pOQF=Jh2z4uXkOxwhfJWRw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="M/jaeVyfzRnxNsGp"
+Content-Disposition: inline
+In-Reply-To: <CAMRc=MedCX_TGGawMhr39oXtJPF4pOQF=Jh2z4uXkOxwhfJWRw@mail.gmail.com>
+X-Cookie: I have accepted Provolone into my life!
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D86931
 
---- Comment #11 from Christian Kujau (kernel@nerdbynature.de) ---
-Happens here with an Apple Magic Mouse A1296:
+--M/jaeVyfzRnxNsGp
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-kernel: magicmouse 0005:05AC:030D.000D: unknown main item tag 0x0
-kernel: input: Maus as
-/devices/pci0000:00/0000:00:14.0/usb1/1-7/1-7:1.0/bluetooth/hci0/hci0:512/0=
-005:05AC:030D.000D/input/input34
-kernel: magicmouse 0005:05AC:030D.000D: input,hidraw4: BLUETOOTH HID v3.06
-Mouse [Maus] on e4:70:b8:3f:cc:93
+On Thu, Feb 22, 2024 at 10:22:50AM +0100, Bartosz Golaszewski wrote:
+> On Wed, Feb 21, 2024 at 12:44=E2=80=AFAM Mark Brown <broonie@kernel.org> =
+wrote:
 
-$ hwinfo --bluetooth
-09: USB 00.0: 11500 Bluetooth Device=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-  [Created at usb.122]
-  Unique ID: X7GA.GS0ueMFUyi1
-  Parent ID: k4bc.2DFUsyrieMD
-  SysFS ID: /devices/pci0000:00/0000:00:14.0/usb1/1-7/1-7:1.0
-  SysFS BusID: 1-7:1.0
-  Hardware Class: bluetooth
-  Model: "Intel Bluetooth wireless interface"
-  Hotplug: USB
-  Vendor: usb 0x8087 "Intel Corp."
-  Device: usb 0x0a2b "Bluetooth wireless interface"
-  Revision: "0.10"
-  Driver: "btusb"
-  Driver Modules: "btusb"
-  Speed: 12 Mbps
-  Module Alias: "usb:v8087p0A2Bd0010dcE0dsc01dp01icE0isc01ip01in00"
-  Driver Info #0:
-    Driver Status: btusb is active
-    Driver Activation Cmd: "modprobe btusb"
-  Config Status: cfg=3Dnew, avail=3Dyes, need=3Dno, active=3Dunknown
-  Attached to: #14 (Hub)
+> > Yes, that's the theory - I just question if it actually does something
+> > useful in practice.  Between regulators getting more and more able to
+> > figure out mode switching autonomously based on load monitoring and them
+> > getting more efficient it's become very unclear if this actually
+> > accomplishes anything, the only usage is the Qualcomm stuff and that's
+> > all really unsophisticated and has an air of something that's being
+> > cut'n'pasted forwards rather than delivering practical results.  There
+> > is some value at ultra low loads, but that's more for suspend modes than
+> > for actual use.
 
---=20
-You may reply to this email to add a comment.
+> Removing it would be out of scope for this series and I don't really
+> want to introduce any undefined behavior when doing a big development
+> like that. I'll think about it separately.
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+This is new code?
+
+--M/jaeVyfzRnxNsGp
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXXPE8ACgkQJNaLcl1U
+h9CIHwf/XP89jkt/tlGa4jICwu1iztzFqaiTJkTcvJjUXga/U61RNmUVRGfMlGTs
+NbXYJFbdHP6Rz6ClY+/Ws+p1AsrvAOj18ufykhqOSOf5OBAsi8Lzeex5WSN0LZKs
+iT7v2mfE45b+lM8yTNapT0z3KoAKh9QWJHmohYHG+cJadqgoYuv8zZfPVWIBJhFD
+I6jZ37EHzRJ5t9CgmJBA84tQojwDT3sie2EuZQ+wTGvaPloUU3LJuAv+ZF5LMsIi
+o+kwTHP7xgkb5VD9I6EcO70CHkzvwSKLXzuhvEB4jGlrWNXjL7ZYjPyoruUMbtrS
+LRRnFjVnLkvTL1/Jg1GArsnIQd7Xow==
+=UdGL
+-----END PGP SIGNATURE-----
+
+--M/jaeVyfzRnxNsGp--
