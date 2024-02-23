@@ -1,123 +1,181 @@
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E707143C45
-	for <linux-bluetooth@vger.kernel.org>; Fri, 23 Feb 2024 18:51:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB4CA145B1B;
+	Fri, 23 Feb 2024 21:39:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708714310; cv=none; b=ckzK4upDsai0nLuoklxdrGTkzN4XfLe9NIWbY/mv9L8IjQRmoEK1wENz7q5obGPBYW2LVMrrd0Dk7oqglzt54HI6E0t8/my1qi0Ft9mIkOokvwi7MMPKgL9NSjeTU+bEhRWDxbLAjEY+xTmlyrz2y84xgxvIGyE6dQhOI1Ihlpc=
+	t=1708724372; cv=none; b=pAyHt3TNgWgEbL8PxRzkcUIPUrkSJv17U1QrPR/VGghPyJtka58qp5ruM9Y5jPWQa7aym+5w48ELfEQwCyolhLNjaigq5/OR0Ou8ewRKmRje/tsND/jq8p5tphQ6iFGXWiIWnL/RdEF0twUxGmDjECkVLxNmeb0UrvbI66TdSdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708714310; c=relaxed/simple;
-	bh=v/C+4lxN2MEg+SabtpQVnH5l5gD0mndkNcChg5N2lt4=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=sSTS1iNSrVs1WjORynNHZ0+AIQHfIO7ZDh3SAhcQGu5rJTP8luuXfW48LKg9+Hl0j6RJxFQBqmAbEIZW/lAgCuvAV/n+5tsRAsIyVVZxwQp9DkCMb0mSXb23cRKqT+gaTpccnzsOOQMNd8kNUc0FyPQ85bLpAvdKJ5Ml1ASdjpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cTl2mqns; arc=none smtp.client-ip=209.85.222.169
+	s=arc-20240116; t=1708724372; c=relaxed/simple;
+	bh=mq4SvG7SWA3etLr2nckw6IZrUzeAQQs1+Xf7aQM2F50=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oExkVCkvRwH6usz0JiTdAr0HupLTeDpIs4R2Zk+orlEa2O41srQSjr0+T1UkXcLfi/K5ApZKvZyLKpjFxuvXwQ2DvuCT4QN0AzY5vEbehaGg1HZeaaqXufTf3AfZzZo/MSl5m+aW7F0PL9wjC7pfBmeqoyFWzerZLQQqWP9AK7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ENo7FEAO; arc=none smtp.client-ip=209.85.167.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cTl2mqns"
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-787ba57afd1so30606185a.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Feb 2024 10:51:46 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ENo7FEAO"
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-512be6fda52so1100916e87.0;
+        Fri, 23 Feb 2024 13:39:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708714305; x=1709319105; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=9A0pV8TWTFdZhsgTNu8OlWDky1Ggd5oxY1Tge/rTm9g=;
-        b=cTl2mqnseif4rD4CQUPW8/SL5gFm4saH8JIYq2+xxr64ei2Q1N0/8R1yvgInfUIQhe
-         2qrLv0w7Dfi7F9mTDAJYUCc+bAoc9gk5vc4Zee0AWcestrzCUIJBwqcEBwBU4mVcm5ds
-         u60yXrLMuobn+gzoYVboyaZpjqUsDLoGxRfMxdWirZSkKduDfW9Lsjuz+kPNZ0OOJsb/
-         J4qqRUBHix9MjpeZENIXgebNSoZUGrZrX4ExBXnfNP3QgD/XVq3E9qMH/WaY9B90EUvl
-         XQBUjFr+tjWefZa0c7w9owB/uVARNXJYfjRLEb4E2+FieH9GsXtK0dkFuiTJKI8W+Pe0
-         fr+Q==
+        d=gmail.com; s=20230601; t=1708724369; x=1709329169; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=b6ujNt33DTW/nBjyL7svpOEhORGOnWdQHD+ihLBARuc=;
+        b=ENo7FEAOiw5SujziZWfueLNqlNV+VqhqnCq3Huje4sRodxSy2xxf2gYkt/aFCZheCc
+         biEny9+07ttUxKxHyuVc5DttrZoZU+NBlgYm6Gyhn6tJMOBhiT1ic5y86B5uN52zhg5S
+         GllIY7JxoeZuoFQCg3OK79FOoGqdse0lwjOtFaNPM9bOgmfPOKK/SBl27sWqNWhJlq34
+         v37cfgwDRZUGYSszOxpgl9XAIPnHzzvF2Zcx3sNCt0pwX8pAtPclsuLbX4Necr+auPtN
+         RW7ATJfGb61Wu5FEdpgSjcEWdeSRyqIBqKnDaKRTfE4u5wSdzsHhCTpJRD92ed5UHYm/
+         n7Zw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708714305; x=1709319105;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1708724369; x=1709329169;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=9A0pV8TWTFdZhsgTNu8OlWDky1Ggd5oxY1Tge/rTm9g=;
-        b=sp64w+/ZETvt4rBLbGz/gaNbivjGyi1psinvH3i1Ihotn8P1fxwOHMx4XL6Vtz75wa
-         9dvRkjdCqh/EkOGJ0vXj7UP0vTn6xO24a+no8PlD9n5Zs+HhpP9RY8TvlYveXzADnt9x
-         RrGe/cWMEyOV1WH1/Vo/BEfXHNDL+QuZqP5kA+1e+rP+yxV3BfLkhJKfReSzpsOD0NFX
-         ZnYdsdJ6u423dNP+0Eyaw4NovWw/ZwW5LktVyk/Zbn+pLYqACsIGgY86MfsobvbDoe2y
-         BceU4Ao0EBWeM2Au815ahXfCHSdriY+TDxV+Y9Gf5WkAhDMI6ZQoLE2vqfw2c0IPKx6U
-         RKUw==
-X-Gm-Message-State: AOJu0Ywil7/G201ag40tDw/rqaobk3Bn2afuXPMVXIff6SnlNBxC6hwM
-	P7WaxsaWNkLIfuMHaHyTvfxXSm583D8lr0e+3Z1zlbBjVLMdBpS45RYQ4Ipk
-X-Google-Smtp-Source: AGHT+IGP1eTGo0NhSWwxVlB5hwUaSc1e/hR/ChLk5estj+mldUCPTzCYiiPiQTIMVQIDck+j/cy5KA==
-X-Received: by 2002:a05:620a:e06:b0:787:272a:e298 with SMTP id y6-20020a05620a0e0600b00787272ae298mr690569qkm.62.1708714305330;
-        Fri, 23 Feb 2024 10:51:45 -0800 (PST)
-Received: from [172.17.0.2] ([172.183.51.240])
-        by smtp.gmail.com with ESMTPSA id o28-20020a05620a111c00b00787a1c74595sm1828444qkk.105.2024.02.23.10.51.44
+        bh=b6ujNt33DTW/nBjyL7svpOEhORGOnWdQHD+ihLBARuc=;
+        b=qDTP+pdUISDBiVkuLV2C2DUWONURcCiPf7BRnWqr5Xlrdg7s+/+RsxaO8a10pbGv3T
+         p4/hB0MkYdVOtqHmNC1JdTwTv+WNu3pfCPAe0/OT7uisjyYU0jbbV5M5C5s3PEhVvH9t
+         DghpcvhQCmtajnGc2ii0QV2/XytUt/Gt7ZimYlbrpaoTsobJkGSNBTq5Jflhw0LIKgAK
+         RzCzWdjQ2+9q8UYrufJ+pvTL4lVa2gczr1dhkj5qATnjM8kjm0wJNzRZjS4ZISduXY4a
+         1+MdqD+6kuDSbk1T3sR9ktBux4Rgz5lsXX/1KeE2plYn+KXRyYRKvKztSQV9EvV2Y2hA
+         7TTw==
+X-Forwarded-Encrypted: i=1; AJvYcCW0t6HF2ztu6hduXlISLWJTbX9CCIe0yyjqbAwvYFeVeva4/jZZcHF2ljXivdwubpVxfHrQrJr/kzDvrNFOrSAfNO/IsYy78o8EkIcHaUOHnJk9tljDG6bB8awYYaBH1Insk8p3VBbNHw9SO5aj
+X-Gm-Message-State: AOJu0Yyud9WO17h0h67lkwnx5SZ9o+JdfP0hsDtC24o1D1AvKzlHdxFz
+	nbSNmp0MH85KsfC+iu6IXc63JOIdZNK23GsMMTl/CNbGSVaiC58GYdFStyFMsW8=
+X-Google-Smtp-Source: AGHT+IE/jus2VH97rc84MPtCtfaDJv1OQqDINTjfWmlepN0n6jUlYDIvv/ERKNvEZ8opvrKDyUtjTg==
+X-Received: by 2002:a05:6512:614:b0:512:e51f:b58 with SMTP id b20-20020a056512061400b00512e51f0b58mr665816lfe.24.1708724368494;
+        Fri, 23 Feb 2024 13:39:28 -0800 (PST)
+Received: from localhost.localdomain ([94.19.228.143])
+        by smtp.gmail.com with ESMTPSA id i1-20020ac25b41000000b005114ee99515sm2584897lfp.220.2024.02.23.13.39.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Feb 2024 10:51:45 -0800 (PST)
-Message-ID: <65d8e941.050a0220.4a056.95fc@mx.google.com>
-Date: Fri, 23 Feb 2024 10:51:45 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8651876102105498255=="
+        Fri, 23 Feb 2024 13:39:27 -0800 (PST)
+From: Andrey Skvortsov <andrej.skvortzov@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Hilda Wu <hildawu@realtek.com>,
+	Alex Lu <alex_lu@realsil.com.cn>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Arnaud Ferraris <arnaud.ferraris@collabora.com>,
+	Andrey Skvortsov <andrej.skvortzov@gmail.com>
+Subject: [PATCH 0/2] Bluetooth: btrtl: fix out of bounds memory access
+Date: Sat, 24 Feb 2024 00:37:02 +0300
+Message-ID: <20240223213704.290849-1-andrej.skvortzov@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, silviu.barbulescu@nxp.com
-Subject: RE: Add support for multiple BISes on the bcast source
-In-Reply-To: <20240223164813.66484-2-silviu.barbulescu@nxp.com>
-References: <20240223164813.66484-2-silviu.barbulescu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============8651876102105498255==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+The problem is detected by KASAN.
+btrtl driver uses private hci data to store 'struct btrealtek_data'.
+If btrtl driver is used with btusb, then memory for private hci data
+is allocated in btusb. But no private data is allocated after hci_dev,
+when btrtl is used with hci_h5.
 
-This is automated email and please do not reply to this email!
+These commits add memory allocation for hci_h5 case.
 
-Dear submitter,
+ ==================================================================
+ BUG: KASAN: slab-out-of-bounds in btrtl_initialize+0x6cc/0x958 [btrtl]
+ Write of size 8 at addr ffff00000f5a5748 by task kworker/u9:0/76
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=829188
+ Hardware name: Pine64 PinePhone (1.2) (DT)
+ Workqueue: hci0 hci_power_on [bluetooth]
+ Call trace:
+  dump_backtrace+0x9c/0x128
+  show_stack+0x20/0x38
+  dump_stack_lvl+0x48/0x60
+  print_report+0xf8/0x5d8
+  kasan_report+0x90/0xd0
+  __asan_store8+0x9c/0xc0
+  	 [btrtl]
+  h5_btrtl_setup+0xd0/0x2f8 [hci_uart]
+  h5_setup+0x50/0x80 [hci_uart]
+  hci_uart_setup+0xd4/0x260 [hci_uart]
+  hci_dev_open_sync+0x1cc/0xf68 [bluetooth]
+  hci_dev_do_open+0x34/0x90 [bluetooth]
+  hci_power_on+0xc4/0x3c8 [bluetooth]
+  process_one_work+0x328/0x6f0
+  worker_thread+0x410/0x778
+  kthread+0x168/0x178
+  ret_from_fork+0x10/0x20
 
----Test result---
+ Allocated by task 53:
+  kasan_save_stack+0x3c/0x68
+  kasan_save_track+0x20/0x40
+  kasan_save_alloc_info+0x68/0x78
+  __kasan_kmalloc+0xd4/0xd8
+  __kmalloc+0x1b4/0x3b0
+  hci_alloc_dev_priv+0x28/0xa58 [bluetooth]
+  hci_uart_register_device+0x118/0x4f8 [hci_uart]
+  h5_serdev_probe+0xf4/0x178 [hci_uart]
+  serdev_drv_probe+0x54/0xa0
+  really_probe+0x254/0x588
+  __driver_probe_device+0xc4/0x210
+  driver_probe_device+0x64/0x160
+  __driver_attach_async_helper+0x88/0x158
+  async_run_entry_fn+0xd0/0x388
+  process_one_work+0x328/0x6f0
+  worker_thread+0x410/0x778
+  kthread+0x168/0x178
+  ret_from_fork+0x10/0x20
 
-Test Summary:
-CheckPatch                    PASS      2.21 seconds
-GitLint                       PASS      1.39 seconds
-BuildEll                      PASS      24.08 seconds
-BluezMake                     PASS      730.41 seconds
-MakeCheck                     PASS      11.71 seconds
-MakeDistcheck                 PASS      163.60 seconds
-CheckValgrind                 PASS      226.46 seconds
-CheckSmatch                   PASS      330.87 seconds
-bluezmakeextell               PASS      107.61 seconds
-IncrementalBuild              PASS      3404.27 seconds
-ScanBuild                     WARNING   946.94 seconds
+ Last potentially related work creation:
+  kasan_save_stack+0x3c/0x68
+  __kasan_record_aux_stack+0xb0/0x150
+  kasan_record_aux_stack_noalloc+0x14/0x20
+  __queue_work+0x33c/0x960
+  queue_work_on+0x98/0xc0
+  hci_recv_frame+0xc8/0x1e8 [bluetooth]
+  h5_complete_rx_pkt+0x2c8/0x800 [hci_uart]
+  h5_rx_payload+0x98/0xb8 [hci_uart]
+  h5_recv+0x158/0x3d8 [hci_uart]
+  hci_uart_receive_buf+0xa0/0xe8 [hci_uart]
+  ttyport_receive_buf+0xac/0x178
+  flush_to_ldisc+0x130/0x2c8
+  process_one_work+0x328/0x6f0
+  worker_thread+0x410/0x778
+  kthread+0x168/0x178
+  ret_from_fork+0x10/0x20
 
-Details
-##############################
-Test: ScanBuild - WARNING
-Desc: Run Scan Build
-Output:
-src/shared/bap.c:1147:2: warning: Use of memory after it is freed
-        DBG(stream->bap, "stream %p", stream);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/bap.c:40:2: note: expanded from macro 'DBG'
-        bap_debug(_bap, "%s:%s() " fmt, __FILE__, __func__, ## arg)
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/bap.c:1281:8: warning: Use of memory after it is freed
-        bap = bt_bap_ref_safe(bap);
-              ^~~~~~~~~~~~~~~~~~~~
-src/shared/bap.c:1699:3: warning: Use of memory after it is freed
-                stream_set_state(stream, BT_BAP_STREAM_STATE_CONFIG);
-                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-3 warnings generated.
+ Second to last potentially related work creation:
+  kasan_save_stack+0x3c/0x68
+  __kasan_record_aux_stack+0xb0/0x150
+  kasan_record_aux_stack_noalloc+0x14/0x20
+  __queue_work+0x788/0x960
+  queue_work_on+0x98/0xc0
+  __hci_cmd_sync_sk+0x23c/0x7a0 [bluetooth]
+  __hci_cmd_sync+0x24/0x38 [bluetooth]
+  btrtl_initialize+0x760/0x958 [btrtl]
+  h5_btrtl_setup+0xd0/0x2f8 [hci_uart]
+  h5_setup+0x50/0x80 [hci_uart]
+  hci_uart_setup+0xd4/0x260 [hci_uart]
+  hci_dev_open_sync+0x1cc/0xf68 [bluetooth]
+  hci_dev_do_open+0x34/0x90 [bluetooth]
+  hci_power_on+0xc4/0x3c8 [bluetooth]
+  process_one_work+0x328/0x6f0
+  worker_thread+0x410/0x778
+  kthread+0x168/0x178
+  ret_from_fork+0x10/0x20
+ ==================================================================
 
+Fixes: 5b355944b190 ("Bluetooth: btrtl: Add btrealtek data struct")
+Fixes: 044014ce85a1 ("Bluetooth: btrtl: Add Realtek devcoredump support")
+Signed-off-by: Andrey Skvortsov <andrej.skvortzov@gmail.com>
 
+Andrey Skvortsov (2):
+  Bluetooth: hci_h5: Add ability to allocate memory for private data
+  Bluetooth: btrtl: fix out of bounds memory access
 
----
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/hci_h5.c     |  5 ++++-
+ drivers/bluetooth/hci_serdev.c |  9 +++++----
+ drivers/bluetooth/hci_uart.h   | 12 +++++++++++-
+ 3 files changed, 20 insertions(+), 6 deletions(-)
 
+-- 
+2.43.0
 
---===============8651876102105498255==--
