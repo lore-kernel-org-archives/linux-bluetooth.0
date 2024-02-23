@@ -1,99 +1,78 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C7434A2F;
-	Fri, 23 Feb 2024 14:32:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2E978289E
+	for <linux-bluetooth@vger.kernel.org>; Fri, 23 Feb 2024 14:49:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708698740; cv=none; b=MsvTQzob7wWjwZ/6qxvnqwoiTLFEShBhlPxDchgluGo3gYvh9Rx7S9vtsrAQdd1erYYBkhzLu6ZCPn2u8lbGJhQ5tVl0jeM+wyNo5YYSA3aPknsfLtsTfDb0h9PoZrUjf9wNRxQOegHpRiw+2khgZX7wDsBpV0XTBJEu4WlcA7w=
+	t=1708699758; cv=none; b=kk2PY1mbH16PgdbrPrHLoNZ9G5uznlS8SG7Q9VD5X/rpjC98r4Z7U0D4xETBxpJqE0ZmNS8fuROpRv1N7qqKBb4VpTdTiSP0YARBLv/VjWIthS3ju/uInrghuD/oS/ClA6Vb1miK7HzdV1LSnCnlZ5sWwusMtuZ3QQv9Ig+hrNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708698740; c=relaxed/simple;
-	bh=6CxhTI2jTiafcu7o2bWlObYCVZe38zQ+4jHomDIbkiE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lCNmeKVm+XCxHG29ZpqwI8uWqoOTrZW35VsErLZuM1G2AFJdYAL1pPYP7JvdrsFQyPfbGiPCizTHUImHk8lTM0pY4i4J0twXPRe3kfrWQy0POYPaEPqpcGUrjur2ItuIqV/PZkODQUkHyHQ6cNDVjiNGhb7RfNJfVJfeZevWRDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.34] (g34.guest.molgen.mpg.de [141.14.220.34])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id D53F261E5FE05;
-	Fri, 23 Feb 2024 15:30:34 +0100 (CET)
-Message-ID: <de2d4d3c-1a4e-4399-aa96-9e8217621fa7@molgen.mpg.de>
-Date: Fri, 23 Feb 2024 15:30:34 +0100
+	s=arc-20240116; t=1708699758; c=relaxed/simple;
+	bh=//YRyxWz+GVUVxy1pgiK92r/2PyMjTq/8xZ5rUfMC6s=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=W5wX5FcOLZNIBxnN4Mf0GR/EjfM4IHKQ2yGNLLayDR6SEubnWCdxr212Xif+PLqR5HLmdf9mf5IeVQzvarn4Py9oGJoMkK9CIw7dd2bSOvXdgVxgMz15cNguKI1dr6UWvzSLLkwTp5gyYXngEdf7kZlso74D+N2zeNSKEUQDZWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ePbUpoWi; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ePbUpoWi"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A5327C43390;
+	Fri, 23 Feb 2024 14:49:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708699758;
+	bh=//YRyxWz+GVUVxy1pgiK92r/2PyMjTq/8xZ5rUfMC6s=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ePbUpoWiN2VQ0C+O9n1k/PEQy+V6ks324BzyYbdB05MNdih3tNLM1Zvljk0iN90L7
+	 fSAs0eryH92NISibpjciDb8IEqfj5BfQOeJbn+GouNQfmEgAS0j+pCAL54aQ4H3Z/a
+	 eCfZSlNcqCukziCSDy991vAgqW4l1Ub412e+sO5z+u8VXhwbIdxTQIHRWj7DJEG8oZ
+	 txyqkFktXyNej+H9k4JnDNxKtH7dTeaFfq+PtbkxUHAKJZZ9UqjUCFyHVSevMC6I68
+	 hgp8o5I+Q6MEt+scetgrVAeano2ew27gtw3cgJRFPA+s7FQLm6oG+7T877O8U6U2iW
+	 YAgHgklF+5o+g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 90BFDD84BBB;
+	Fri, 23 Feb 2024 14:49:18 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] linux-firmware: update firmware for mediatek bluetooth
- chip (MT7921)
-Content-Language: en-US
-To: Chris Lu <chris.lu@mediatek.com>
-Cc: Josh Boyer <jwboyer@kernel.org>, David Woodhouse <dwmw2@infradead.org>,
- Ben Hutchings <ben@decadent.org.uk>, Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
- Deren Wu <deren.Wu@mediatek.com>, Aaron Hou <aaron.hou@mediatek.com>,
- KM Lin <km.lin@mediatek.com>, Robin Chiu <robin.chiu@mediatek.com>,
- Steve Lee <steve.lee@mediatek.com>, linux-bluetooth@vger.kernel.org,
- linux-firmware@kernel.org, linux-kernel@vger.kernel.org,
- linux-mediatek@lists.infradead.org
-References: <20240223095044.7824-1-chris.lu@mediatek.com>
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20240223095044.7824-1-chris.lu@mediatek.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ 0/1] Fix crash when unregistering bcast source endpoint
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <170869975858.4728.3060324332171674384.git-patchwork-notify@kernel.org>
+Date: Fri, 23 Feb 2024 14:49:18 +0000
+References: <20240223141609.27181-1-silviu.barbulescu@nxp.com>
+In-Reply-To: <20240223141609.27181-1-silviu.barbulescu@nxp.com>
+To: Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org, mihai-octavian.urzica@nxp.com,
+ vlad.pruteanu@nxp.com, andrei.istodorescu@nxp.com, luiz.dentz@gmail.com,
+ iulia.tanasescu@nxp.com
 
-Dear Chris,
+Hello:
 
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Thank you for your patch. Some nits.
-
-Am 23.02.24 um 10:50 schrieb Chris Lu:
-> Update binary firmware for MT7921 BT devices.
+On Fri, 23 Feb 2024 16:16:08 +0200 you wrote:
+> In bt_bap_stream_release stream is accessed after free
+> ERROR: AddressSanitizer: heap-use-after-free on address
+> READ of size 8 at 0x60d0000001e0 thread T0
+>     #0 0x556602a14ce0 in bt_bap_stream_release src/shared/bap.c:5423
+>     #1 0x556602981292 in queue_foreach src/shared/queue.c:207
+>     #2 0x556602a0712a in bt_bap_remove_pac src/shared/bap.c:3572
+>     #3 0x5566026ca846 in media_endpoint_destroy profiles/audio/media.c:180
+>     #4 0x5566026cdef9 in unregister_endpoint profiles/audio/media.c:1708
 > 
-> File: mediatek/BT_RAM_CODE_MT7961_1_2_hdr.bin
-> Version: 20240219111427
+> [...]
 
-The title is very unspecific for `git log --oneline`. Could you mention 
-the version number in there? Maybe:
+Here is the summary with links:
+  - [BlueZ,1/1] shared/bap: Fix crash unreg bcast src endpoint
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=8f262a27bdf2
 
-linux-firmware: Update MediaTek MT7921 Bluetooth chip FW to 20240219111427
-
-Also, could you please add a change-log of what changed between version 
-20231109191416 and 20240219111427?
-
-> Signed-off-by: Chris Lu <chris.lu@mediatek.com>
-> ---
->   WHENCE                                  |   2 +-
->   mediatek/BT_RAM_CODE_MT7961_1_2_hdr.bin | Bin 532206 -> 530926 bytes
->   2 files changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/WHENCE b/WHENCE
-> index 576f8d73..f7dcc6db 100644
-> --- a/WHENCE
-> +++ b/WHENCE
-> @@ -5645,7 +5645,7 @@ Licence: Redistributable. See LICENCE.mediatek for details.
->   Driver: mt7921 - MediaTek MT7921 bluetooth chipset
->   
->   File: mediatek/BT_RAM_CODE_MT7961_1_2_hdr.bin
-> -Version: 20231109191416
-> +Version: 20240219111427
->   
->   Licence: Redistributable. See LICENCE.mediatek for details.
->   
-> diff --git a/mediatek/BT_RAM_CODE_MT7961_1_2_hdr.bin b/mediatek/BT_RAM_CODE_MT7961_1_2_hdr.bin
-> index c7a96755b122ef7aa601eb40fbd7abb9ca85a545..34b791b7cc66780a80a18a631a9d578b2a744546 100644
-> GIT binary patch
-> literal 530926
-
-[…]
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Kind regards,
-
-Paul
