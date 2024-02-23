@@ -1,91 +1,112 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BD9C140362;
-	Thu, 22 Feb 2024 23:56:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFCECBA5F
+	for <linux-bluetooth@vger.kernel.org>; Fri, 23 Feb 2024 02:47:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708646206; cv=none; b=beAas/wX7DQYyqSvWehvRRNSZ1gyGvKLWKoa7A0kIE/qiEtft69vV3kCESrhOE/xQ/sl31cGNZZXxBYZi5wrdFsVepDYRiesAyZ9W1eMnUdeOvVl5H6X/mdq/eKsD3Wo8EuH25lWF/m1LPrsjx5Pzr6BNM2eWPr1O+7e7hGHw3w=
+	t=1708656440; cv=none; b=ENR6NHAoSqH9lTVfMrnQxHIYIxJ+49xXH0veid2rzdI33uAt8JIFBobGOX6IyRQk78pxyaHj/WJd4nG8cGfqaa+siuJQ3sxg7/A9hiTTPr759YUDds3hdfbh6kXsckRsiVuyVS5hgiBCN4+ML5Ifil5AbpjswGLXxi4OBV93zy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708646206; c=relaxed/simple;
-	bh=LT7juKYEp/f9qDdcPqJbGxaoih0K5Y+y46uk9wz7+VY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z5f6ML4zKljqf3oY9ES1XlBlWi8Nyj2Is6yt7IMd/pajQHuL+NAFubbptuH2yI/7bmXlkOndbEvyxBfLdsUahWYMJMJUUJtmoOlatPZz+xvafpd0N4kRo/Gkhscn3zziQmffzhU1MClRPAUpLRkVvooGXQnCQ1gXlenvl/yuwzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QwVwDGWI; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1708656440; c=relaxed/simple;
+	bh=N1PlpBeb9p0ZNMC/g+rcDApl0dSEb/JPGs8QJauNkAE=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eXJc/OdKlfBft9sr3sO+fa0Kb9Xi9fYkf0bJiLi92dg3VSlzoLyaie+ZWsebF739ROyYioBJdCV6NSrv8zYqOEy1NSpWefi3qS8lvz8a83+uGoAHygVcXAimIYT9PXfjNOYvIF3ZdyB5gLHfYWr34SFLLClZz07KhAQCuwI+GQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Ka3wbHJ2; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QwVwDGWI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6C2AC433F1;
-	Thu, 22 Feb 2024 23:56:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708646206;
-	bh=LT7juKYEp/f9qDdcPqJbGxaoih0K5Y+y46uk9wz7+VY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QwVwDGWIlGDmjoUCNCnCFjCexY9JD7sAHDcwAtfbLFz/EfjD4Dl7h8NdQCK9HF6mm
-	 WhoyA8k+H+L9QUxdt1OIbqcKsqhnbommtNHEnyitbUj56o2OnxuWqZlEa9wclisnJ0
-	 IGjdNMZexcOyHDpi32KWAqKbN1H3rhJe7I8e7/NZ0Be6SPEtLrTkvVoHC0buJQy8Tj
-	 ei5CO8qRI5ijGU/ATAl7SfnYIvqxoT3/hjpi/Xyde8bwQMtoGD1PZZlgO3WWbMy/Ur
-	 FUte7UJKB5pU8XI0WfH0bfoE0OEeKaE1jPVkYTMohF1FiO6v9lxlsl1gusSdJTLFy1
-	 sYfmPdRpgPiuw==
-Date: Thu, 22 Feb 2024 16:56:42 -0700
-From: Rob Herring <robh@kernel.org>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Kalle Valo <kvalo@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Alex Elder <elder@linaro.org>,
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Abel Vesa <abel.vesa@linaro.org>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Lukas Wunner <lukas@wunner.de>,
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-wireless@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
-	linux-pm@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH v5 06/18] dt-bindings: new: wireless: describe the ath12k
- PCI module
-Message-ID: <20240222235642.GA3830828-robh@kernel.org>
-References: <20240216203215.40870-1-brgl@bgdev.pl>
- <20240216203215.40870-7-brgl@bgdev.pl>
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Ka3wbHJ2"
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41N1JWtk011899;
+	Fri, 23 Feb 2024 02:47:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-type; s=qcppdkim1; bh=t46jsw53gYaMNtTjqCW6
+	k9yinF/+RjccQj70uH0zH+Q=; b=Ka3wbHJ28JYQ0lnK1I5R4d+MjyIKhSLkMzOK
+	qGzIhsI+wzk42RWcNj+WzGByY/byeUlF4ZUhSAc2DuVzJPSTj8eN8crxCKEoGnfB
+	A4daTRSFcBBnV8otIiOVrj/O0qiRoTzj4GlPxXRiQzYqgJKQSLD3d6Ol9XWX5E9w
+	oFdtHRfmYJgXzPOsEAMxaFJRIuS8LQBw4woHwG4Tso/9qwpQBDzcXyqC/UFSAvp2
+	ejeULkthoc06LncPQZkL75vtEMCfNXDfPJ8MAMmUFO1OhwhLuWHmjOKn+1WuoXxL
+	NTOYPhO2mt0tNOnoXE5ls0jFNa+uZwvGgG2vKSoeEA//a08e+g==
+Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3weg88r9tx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 23 Feb 2024 02:47:14 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 41N2ksjg032007
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 23 Feb 2024 02:46:54 GMT
+Received: from zijuhu-gv.qualcomm.com (10.80.80.8) by
+ nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Thu, 22 Feb 2024 18:46:53 -0800
+From: Zijun Hu <quic_zijuhu@quicinc.com>
+To: <luiz.dentz@gmail.com>, <marcel@holtmann.org>
+CC: <linux-bluetooth@vger.kernel.org>, Zijun Hu <quic_zijuhu@quicinc.com>
+Subject: [PATCH v2] Bluetooth: btusb: Fix triggering coredump implementation for QCA
+Date: Fri, 23 Feb 2024 10:46:45 +0800
+Message-ID: <1708656405-28017-1-git-send-email-quic_zijuhu@quicinc.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1707023659-4189-1-git-send-email-quic_zijuhu@quicinc.com>
+References: <1707023659-4189-1-git-send-email-quic_zijuhu@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240216203215.40870-7-brgl@bgdev.pl>
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: 8eBjaOysMspHF7Gy1UnK1A9NzFOEuVPK
+X-Proofpoint-GUID: 8eBjaOysMspHF7Gy1UnK1A9NzFOEuVPK
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-22_15,2024-02-22_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ malwarescore=0 suspectscore=0 impostorscore=0 clxscore=1011 adultscore=0
+ phishscore=0 priorityscore=1501 bulkscore=0 mlxscore=0 spamscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2402120000 definitions=main-2402230018
 
-On Fri, Feb 16, 2024 at 09:32:03PM +0100, Bartosz Golaszewski wrote:
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+btusb_coredump_qca() uses __hci_cmd_sync() to send a vendor-specific
+command to trigger firmware coredump, but the command does not
+have any event as its sync response, so it is not suitable to use
+__hci_cmd_sync(), fixed by using __hci_cmd_send().
 
-s/new/net/ in the subject.
+Fixes: 20981ce2d5a5 ("Bluetooth: btusb: Add WCN6855 devcoredump support")
+Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+---
+Changes since v1:
+ - Correct commit message
 
-> 
-> Add device-tree bindings for the ATH12K module found in the WCN7850
-> package.
-> 
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> ---
->  .../net/wireless/qcom,ath12k-pci.yaml         | 103 ++++++++++++++++++
->  1 file changed, 103 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/wireless/qcom,ath12k-pci.yaml
+ drivers/bluetooth/btusb.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index edfb49bbaa28..ff282cc25710 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3469,13 +3469,12 @@ static void btusb_dump_hdr_qca(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ static void btusb_coredump_qca(struct hci_dev *hdev)
+ {
++	int err;
+ 	static const u8 param[] = { 0x26 };
+-	struct sk_buff *skb;
+ 
+-	skb = __hci_cmd_sync(hdev, 0xfc0c, 1, param, HCI_CMD_TIMEOUT);
+-	if (IS_ERR(skb))
+-		bt_dev_err(hdev, "%s: triggle crash failed (%ld)", __func__, PTR_ERR(skb));
+-	kfree_skb(skb);
++	err = __hci_cmd_send(hdev, 0xfc0c, 1, param);
++	if (err < 0)
++		bt_dev_err(hdev, "%s: triggle crash failed (%d)", __func__, err);
+ }
+ 
+ /*
+-- 
+2.7.4
+
