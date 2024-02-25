@@ -1,104 +1,83 @@
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.andi.de1.cc (mail.andi.de1.cc [178.238.236.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 672734879B
-	for <linux-bluetooth@vger.kernel.org>; Sat, 24 Feb 2024 20:04:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE5D21B951;
+	Sun, 25 Feb 2024 22:17:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.238.236.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708805078; cv=none; b=KucJWAqPqmfG2jeWlZPSKBicCIcjaBfr6+DxF7oJau3xesO40jyEsMYsjnRk7QbNuZSGGBGcqHSuf9wDKmXvjjAlghWJJppkW1hbzn1NbyOwbnNSt+BTL2wWcHSFyQtXuIDNjRiCMa0vh5U91Iip1Jz9tpr7+Z90Fgq9Sv5V3pY=
+	t=1708899422; cv=none; b=aki6gR1h3nXU9vB6LfAo5dwOHN0hDmSuAxTK2nv4y64fd759NXBU/Lx/PowISIwEqPGIRXU80Y0qf7Nc9vofAiONrRwO62dB5NRDO1Dx0hBi9CzhSGsrLAHcQE8772JnMUR5QeNNgt1VZOhNnpto8ixFlzGrwhLlyNNVVtXpSV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708805078; c=relaxed/simple;
-	bh=YgzcNko4uMB50X98OxfWhfxcPLlW0FI7x2ym6c5If7o=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=nhYzj8rp7OGzJ86vwramyCbrO943051BbdmeBjO7+n/ITnai2GhgiYttXggtv+EjEVXo1ulq2JwSM+O1q0s8Gq9dqhgcrEGelxoprRQgAoG5fXUuDFMJg1zG2Ij0G40FYvdnFtxT0h+qomwBxlHEs32ddMbMqym5HTCf2upndrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mwvX53zV; arc=none smtp.client-ip=209.85.222.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1708899422; c=relaxed/simple;
+	bh=jeHQpRe/PYPkHOWH1dZb/CPMqdHQRIz2YV5ogvkCEeM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cBPN/lKRIUq2ESZUiklGY5yB3o/6vdH+02YhGgmYnXvly7RLKpmgSzNp3Q9FovNipp27trvMkBCbDDLZydf28GdhQnP9xX1Lo2GSBQWymWYEyDwV88gs1iRbTm7HD7KO/0PsRbBuwsF1jdSIlOFJB94kG0vVpQct8exQHgXfKdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kemnade.info; spf=pass smtp.mailfrom=kemnade.info; dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b=4Pk6DKq9; arc=none smtp.client-ip=178.238.236.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kemnade.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kemnade.info
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mwvX53zV"
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-787a843003eso130019585a.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 24 Feb 2024 12:04:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708805076; x=1709409876; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=rGDtcbNZ/xDsACw/lant4+GghlowexllYNxl86Qgpsg=;
-        b=mwvX53zVgJoivjxkh3ykdOCdbJ4of1XndKYN+jj40FJQeqqxH8CbuDcDuasdJpuSaA
-         09WPggFbgfhCse4/QiAhGOWvBjmUGcKfJAZ6IK4zqCkbuCpOe9+wJS76G9MvTOPPUTl6
-         6abQCbYGcXDVa2TGaNlOoGcnNCRyeb/iTwSdNQERv8Qn094J4H3Eu4neZbB2vJ3lA+MA
-         fcM7jXoHf+twE13UnBMstW2z/UmzyC1qlDFAT1Ct2pyRGojibaYdUg6jgPc00C21eU23
-         CKdyVGE5QppImZ4F/XMVGwTHG0AbYVgvljYavqF/FtXYMs2EgThvbciVO7dbzi/0XOny
-         eOjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708805076; x=1709409876;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rGDtcbNZ/xDsACw/lant4+GghlowexllYNxl86Qgpsg=;
-        b=IZk9yT5WTZXLn04FWh48I/GVCvsWggpWO3eC1+N2vtBxYB9hM80cROXFx4gAsR3TN2
-         TOb5dfHvYrbQcRU2i5h3u5PiZTuSnIaRnWO/fSAS02IVlcjlv1K3HJInyHb5lh5v0Zgd
-         lu25h73S427hJDQocacyg5pnYkaIglHJgb4WQXgY+P+FwzxqGft9T+nCr4h+ukmh2UZv
-         0QWtmiC6Yuqm9FYzZKGM+cJoCb77P8OSaqJvkfpdvHdOyUqoGq+Aw5fldgj6LS7G+thq
-         U1IACgRxykhTLD1L3kgJhwh7fky4uweNaON/wz67qm4Nn698zgSlg5Jv/JwfvzLqgx78
-         H+Ug==
-X-Gm-Message-State: AOJu0YxuI+M4UEttB2auv4y7zZo0w0IG4kB+ga/+PWp3hrOr/SlUGWQY
-	9XIvpnq+N55hMD6cTQNqDFC1K6wz4DfTOufXXdhA/IgA42i57uyCR3KtzDc6
-X-Google-Smtp-Source: AGHT+IGE6eMFJ3JXi9h+Q7e/NzBwhgaYL+0a6/95jRN9d6oFRpeK4ryZ35M8+AjlNhfZBjfVrNBd6Q==
-X-Received: by 2002:a05:620a:1676:b0:785:a011:f542 with SMTP id d22-20020a05620a167600b00785a011f542mr3594738qko.34.1708805076093;
-        Sat, 24 Feb 2024 12:04:36 -0800 (PST)
-Received: from [172.17.0.2] ([20.109.38.145])
-        by smtp.gmail.com with ESMTPSA id br37-20020a05620a462500b007874e54ab1esm878740qkb.20.2024.02.24.12.04.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 24 Feb 2024 12:04:35 -0800 (PST)
-Message-ID: <65da4bd3.050a0220.aecfc.26b6@mx.google.com>
-Date: Sat, 24 Feb 2024 12:04:35 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5008385874567981074=="
+	dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b="4Pk6DKq9"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=kemnade.info; s=20220719; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:References:In-Reply-To:Message-ID:Subject:Cc:To:From:Date:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=jtRdD2QDrxEQ5SkxqPR80IXjR4gRCZhQicNpQyc6IxA=; b=4Pk6DKq9GdrESGEpYij+gIu4Ei
+	grrJBfLAyNUh6SS3kbeX3NEvVZyx8Y36pDSZABuWovkoIdvAZNqhbL/8sJmeNSkCT1bSN8hwyBo+L
+	agDg7LK+sdjBp0AAYEIzvGg9/Qak/uPVkbLsACKnhRHgDl5eslxl0F5nvbR/asXONY8U+9cmNHztu
+	9flYlxvY1KSlwo9utWlzCnoZPPnkCNZoyhM0E4pehlcoLVSTD9QX5TVfbZymOekBjH31XxZ5FkVQR
+	uy0z5bEk5TUeJ7W4cS1cSWC3Ze8v6mBdEPPKDLqZZPW4BTkaQ0xldzRVSrU3z0JPLStJ5cNEQ/YLY
+	MND02/5Q==;
+Received: from p200301077700b1001a3da2fffebfd33a.dip0.t-ipconnect.de ([2003:107:7700:b100:1a3d:a2ff:febf:d33a] helo=aktux)
+	by mail.andi.de1.cc with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <andreas@kemnade.info>)
+	id 1reMni-009mAU-BQ; Sun, 25 Feb 2024 23:16:50 +0100
+Date: Sun, 25 Feb 2024 23:16:47 +0100
+From: Andreas Kemnade <andreas@kemnade.info>
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+ johan@kernel.org, jirislaby@kernel.org, gregkh@linuxfoundation.org,
+ linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org, Adam Ford
+ <aford173@gmail.com>, Tony Lindgren <tony@atomide.com>,
+ tomi.valkeinen@ideasonboard.com, =?UTF-8?B?UMOpdGVy?= Ujfalusi
+ <peter.ujfalusi@gmail.com>, robh@kernel.org, hns@goldelico.com
+Subject: Re: [RFC PATCH v2 3/3] gnss: Add driver for AI2 protocol
+Message-ID: <20240225231647.3abdf378@aktux>
+In-Reply-To: <1cc869a6-8547-4c5b-b39d-10f4a3e11dff@molgen.mpg.de>
+References: <20240128173352.2714442-1-andreas@kemnade.info>
+	<20240128173352.2714442-4-andreas@kemnade.info>
+	<1cc869a6-8547-4c5b-b39d-10f4a3e11dff@molgen.mpg.de>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, Joakim.Tjernlund@infinera.com
-Subject: RE: cups: Use pkg-config to find cups backend dir
-In-Reply-To: <20240224183650.3571984-1-joakim.tjernlund@infinera.com>
-References: <20240224183650.3571984-1-joakim.tjernlund@infinera.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
---===============5008385874567981074==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Paul,
 
-This is automated email and please do not reply to this email!
+I have left out one thing to answer.
 
-Dear submitter,
+On Mon, 29 Jan 2024 08:53:27 +0100
+Paul Menzel <pmenzel@molgen.mpg.de> wrote:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=829501
+> > +	ret =3D ai2_send_frame(ai2dev, skb);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	msleep(200); =20
+>=20
+> I=E2=80=99d be great if you added a comment, why this long delay is neede=
+d.
 
----Test result---
+Well, I am just a bit paranoid, s/msleep/wait_for_completion_timeout/ and
+complete() on some ack would probably improve this. I just hesitated to add
+something like this until I have the feeling that I do not need to turn the
+driver upside-down.
 
-Test Summary:
-CheckPatch                    PASS      0.42 seconds
-GitLint                       PASS      0.31 seconds
-BuildEll                      PASS      23.94 seconds
-BluezMake                     PASS      723.49 seconds
-MakeCheck                     PASS      11.79 seconds
-MakeDistcheck                 PASS      164.00 seconds
-CheckValgrind                 PASS      228.53 seconds
-CheckSmatch                   PASS      332.63 seconds
-bluezmakeextell               PASS      108.23 seconds
-IncrementalBuild              PASS      672.66 seconds
-ScanBuild                     PASS      966.78 seconds
-
-
-
----
 Regards,
-Linux Bluetooth
-
-
---===============5008385874567981074==--
+Andreas
