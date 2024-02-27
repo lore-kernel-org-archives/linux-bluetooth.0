@@ -1,186 +1,122 @@
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
+Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EB671420B3
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Feb 2024 15:15:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C84A1386C0
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Feb 2024 15:59:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709046944; cv=none; b=q2iYZg1u/eq3JVZv2HTOXOJt4a2tW5sQ1O1X7AjNmk0m/aOPrtkY9GCqUhzc+SxrKUcV4LvVrBEuuFKotoSoa0gpqpLPPjJar2Lg5VaU3+irtKZ+JCEa2oLyhbuUae7W+y2SauKuK66FFJD6vZHP7QvuKVrwtWf2bzejw/3Pvqc=
+	t=1709049561; cv=none; b=dGoKd4Vstw2GqZR+VnD7NeHtzKGS4xCH2RA+2ynMhgKJwSYaZ2o+XUvqN0QioeoHTMMpWg5yCPgM2lZaKsiHoMfv/JqaNAtHDyqhZOYAgyZMorP65K01NSWoom4hHfI6FqzfdWxTwKDwKLpyp2pK5JFIGHCsGdiaDQ1dAQdslI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709046944; c=relaxed/simple;
-	bh=eSFD0jMX9QX3F36TXKIE36SpBbtzb+/+q2DtOdKZDt4=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=X2AyIgYYX+tbajcIQDd+PyOgFoArb3DrDT1SJCrQzkIA6lVH/MkySwL/E/ukn4FBaKBzGT+rGnsOM9x/7QvHsyyPrSIiFjqUfKW+GNNeVezs7mHZ56awUsR01dhsZ3B8WcCq2OVeZ516IAI0GZfJySS7bbZHM1ylv/CKUnGa/nY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HZ7301Dk; arc=none smtp.client-ip=209.85.128.174
+	s=arc-20240116; t=1709049561; c=relaxed/simple;
+	bh=L5JJIJGRhxN4pyHpuFp2x1RTeKErOFr8ynLpilhMHOE=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=oZBG4djrv45Cr7mX5PJwNrVXfPa/bEp/HNZTiDS8h5FL3rxsakI+ysJjPot9URFpGWwQlCPcGYsmRLe1i+9nuMxgKDt/EUx9QmibhZj5SG2x0aDZywOAzeX3IhvLl26FSB2nymUy5JQmhHp0XgT9pLq5VHHGmnqx0ha7aRXrPoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lGAb6xUv; arc=none smtp.client-ip=209.85.167.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HZ7301Dk"
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-607f8894550so31457357b3.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Feb 2024 07:15:43 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lGAb6xUv"
+Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-3c19e18470aso1903325b6e.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Feb 2024 07:59:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709046942; x=1709651742; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bXvzMmiAQBkYjtoM4i7MxrToF6Q1C4jv7wnZl9wJ/YM=;
-        b=HZ7301Dk/Dhdi+ftdMLjVCXYrEiHp9EZGKKx9MSxKedbtbEKMsBomth/NjrFSAvYkr
-         45Mg3YZk2UE4S0LBawqRnyPetfbhpvW5TAw/pn/F9WcYOhmcIzKZyWH4OoLXRVhqGcS8
-         UgBozU3LyOGPTd/LepeQZSJGMo3uW1WqACjyfMQ0fjw0U1mDZS6lJ9hiBPNUPz0zrjCk
-         wV5xiQpemf/klcZVK1vo/WjpiQSGHPOMTnNWiB+A1whNa5xVRJwlUs2+5pzV3kEU0v5o
-         dSm5+OLGQ/PXrEpftZbAe9AEKLK/HrV5+V1sD8ac4kqntlH2pRCsrEoPQYYJW/j1QVlb
-         A8xw==
+        d=gmail.com; s=20230601; t=1709049559; x=1709654359; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=GgTWVOES17M0Yej6EjKMCbsiR84I4bE4nEcpiLbwHbM=;
+        b=lGAb6xUvxvF3I3FwO0bGJlg0Ct4YnFT7VZyfAlPtN2/suUCJ01icmKk2TPdet0uUos
+         RTafZDeYkilfskC4b32wnV3XxXRbdboSk2wlgKvVYKs8yAlQoSHq1oj3N3cknLvqaJq1
+         ksxkpLY/7XhpvUisDdDD+a9PJa4ZwdbAM3cuZhDd/ekw2NJeS4TgAjtnjl8BJsuSXH8K
+         tDE8jjGdwXVg22KBPUYXpH6+6hEJcfz0gXwWleAPM5z7ylqb8il3yxZ2xEHd4a+r9VDr
+         hIav4+LeoaN4RtKKh8O9+RW7RifQWVK0h7P5tvRJBiuDGL/3UBmCG3BOLdmuWTy3md3M
+         8eng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709046942; x=1709651742;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bXvzMmiAQBkYjtoM4i7MxrToF6Q1C4jv7wnZl9wJ/YM=;
-        b=JERZDKySvFtbkXv86i2G1nU7TuGV944qhop18SWhjQoesvLOE7CC7Lo79rKyElKMG/
-         mTXU9qQjKVbz9YHsBfatLP4k//hc6Zn2pPU1EbOq0OALWmJGej4NgOHMZoqM3cz6wMJY
-         jGPC9oEaydHCgZBcS3w57N4SAVLZ+bdRtB8jXAQpw58nVDWTK2gQSp+twytLHebpKrzO
-         5BfyH78msMb/3MP4lA22MFAAIiTJayWtTHeNzDpP3mFzczX9pcJlrdfgZdRgK55fhQNw
-         jvESJFJffbIlMAwM/RJ5NBhy7HhgWcCCHP2a6/gV8N+GtMOIxTlTQDUsjWPs3uemO2E5
-         TezA==
-X-Gm-Message-State: AOJu0YxZQcnloTXCKtKoDfaw+v14qoIgjv2rVHe+QvueK/5SzZowoiEh
-	1AkM+kIZ+PGADg6lFgM/aKlHL/S2mW0sqGzjKh2urtYx7DF3UUZHLcwlqrVO
-X-Google-Smtp-Source: AGHT+IGSphaOqa3MvfcXJ6BAxuEnEU98wTDSrWQPjQq2OS2MR8lVJhKihzvDuE4jujzzw0MZ2LAQSQ==
-X-Received: by 2002:a81:8352:0:b0:608:b64a:1517 with SMTP id t79-20020a818352000000b00608b64a1517mr2345623ywf.19.1709046941628;
-        Tue, 27 Feb 2024 07:15:41 -0800 (PST)
-Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
-        by smtp.gmail.com with ESMTPSA id h28-20020a05612201dc00b004d335f1bdb7sm32726vko.37.2024.02.27.07.15.39
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1709049559; x=1709654359;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GgTWVOES17M0Yej6EjKMCbsiR84I4bE4nEcpiLbwHbM=;
+        b=IW+ObZcnH3l/7HYTwuoNjXa4JukvYHbp+LzHIEvTO3TcVV2kFeGaMQxOBBmNIeM2nB
+         DdXy3TbswQSCbpigaErLGZI6zDO8CACHxMINA7//JcHsSOmXu9Ci4HvoBEkRgbFN59lc
+         jFxsy8tUpOR+UCGuaKe0/qfTlLLA2KIWCfXCa0KZyjpO80TXv1ubXv/Ct4aGTYHQ682R
+         te4i4b5sN2sSSHcElcPiHIo+QthEAWw/ztgJ+WcMG7WOXiv1gJKbFnd3JxtIQRXSQPtt
+         ApXbGJF4Zs6oLbTP75cUlldSvyC0S8pZv9yqTc5yLYGHf9cXwQJCyp/GxG2gENpb/X1o
+         w8pw==
+X-Gm-Message-State: AOJu0Ywo4toBtZ5eGpw2BU8DLygj+HzV9CYMPPrqBC84tmKk19wWqi5k
+	/ZSQL5nD/DgE85Q3HEzXR9KQKSFd1MQHNQCdtmUcf1hdF9aoJ0vxf/fn7psB
+X-Google-Smtp-Source: AGHT+IE+DnK5gbE5oQ2vW5n7SNF+wjhJKyJamOUxp9nShLouTialXNF5zJgctSPNNUT91DQ/4dZ+6A==
+X-Received: by 2002:a05:6358:5e04:b0:17b:57ee:7b7e with SMTP id q4-20020a0563585e0400b0017b57ee7b7emr9629601rwn.26.1709049558359;
+        Tue, 27 Feb 2024 07:59:18 -0800 (PST)
+Received: from [172.17.0.2] ([40.71.163.76])
+        by smtp.gmail.com with ESMTPSA id nz7-20020a0562143a8700b0068d29a0009csm4260881qvb.85.2024.02.27.07.59.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Feb 2024 07:15:39 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 2/2] Bluetooth: hci_sync: Use QoS to determine which PHY to scan
-Date: Tue, 27 Feb 2024 10:15:37 -0500
-Message-ID: <20240227151537.1884044-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240227151537.1884044-1-luiz.dentz@gmail.com>
-References: <20240227151537.1884044-1-luiz.dentz@gmail.com>
+        Tue, 27 Feb 2024 07:59:18 -0800 (PST)
+Message-ID: <65de06d6.050a0220.cc628.0353@mx.google.com>
+Date: Tue, 27 Feb 2024 07:59:18 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============2397011596286466361=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v5,1/2] Bluetooth: hci_sync: Use address filtering when HCI_PA_SYNC is set
+In-Reply-To: <20240227151537.1884044-1-luiz.dentz@gmail.com>
+References: <20240227151537.1884044-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============2397011596286466361==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This used the hci_conn QoS to determine which PHY to scan when creating
-a PA Sync.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=830316
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.34 seconds
+GitLint                       PASS      0.62 seconds
+SubjectPrefix                 PASS      0.24 seconds
+BuildKernel                   PASS      27.74 seconds
+CheckAllWarning               PASS      30.40 seconds
+CheckSparse                   PASS      36.39 seconds
+CheckSmatch                   PASS      101.69 seconds
+BuildKernel32                 PASS      26.94 seconds
+TestRunnerSetup               PASS      498.06 seconds
+TestRunner_l2cap-tester       FAIL      25.74 seconds
+TestRunner_iso-tester         PASS      129.50 seconds
+TestRunner_bnep-tester        PASS      4.82 seconds
+TestRunner_mgmt-tester        PASS      116.94 seconds
+TestRunner_rfcomm-tester      PASS      7.40 seconds
+TestRunner_sco-tester         PASS      10.95 seconds
+TestRunner_ioctl-tester       PASS      7.79 seconds
+TestRunner_mesh-tester        PASS      5.88 seconds
+TestRunner_smp-tester         PASS      6.83 seconds
+TestRunner_userchan-tester    PASS      4.96 seconds
+IncrementalBuild              PASS      31.59 seconds
+
+Details
+##############################
+Test: TestRunner_l2cap-tester - FAIL
+Desc: Run l2cap-tester with test-runner
+Output:
+Total: 51, Passed: 50 (98.0%), Failed: 1, Not Run: 0
+
+Failed Test Cases
+L2CAP LE Client - Close socket 2                     Timed out    2.172 seconds
+
+
 ---
- net/bluetooth/hci_sync.c | 66 +++++++++++++++++++++++++++++++++-------
- 1 file changed, 55 insertions(+), 11 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index ab609089ac4c..6e16ebde854d 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -2758,6 +2758,14 @@ static u8 hci_update_accept_list_sync(struct hci_dev *hdev)
- 	return filter_policy;
- }
- 
-+static void hci_le_scan_phy_params(struct hci_cp_le_scan_phy_params *cp,
-+				   u8 type, u16 interval, u16 window)
-+{
-+	cp->type = type;
-+	cp->interval = cpu_to_le16(interval);
-+	cp->window = cpu_to_le16(window);
-+}
-+
- static int hci_le_set_ext_scan_param_sync(struct hci_dev *hdev, u8 type,
- 					  u16 interval, u16 window,
- 					  u8 own_addr_type, u8 filter_policy)
-@@ -2765,7 +2773,7 @@ static int hci_le_set_ext_scan_param_sync(struct hci_dev *hdev, u8 type,
- 	struct hci_cp_le_set_ext_scan_params *cp;
- 	struct hci_cp_le_scan_phy_params *phy;
- 	u8 data[sizeof(*cp) + sizeof(*phy) * 2];
--	u8 num_phy = 0;
-+	u8 num_phy = 0x00;
- 
- 	cp = (void *)data;
- 	phy = (void *)cp->data;
-@@ -2775,28 +2783,64 @@ static int hci_le_set_ext_scan_param_sync(struct hci_dev *hdev, u8 type,
- 	cp->own_addr_type = own_addr_type;
- 	cp->filter_policy = filter_policy;
- 
-+	/* Check if PA Sync is in progress then select the PHY based on the
-+	 * hci_conn.iso_qos.
-+	 */
-+	if (hci_dev_test_flag(hdev, HCI_PA_SYNC)) {
-+		struct hci_cp_le_add_to_accept_list *sent;
-+
-+		sent = hci_sent_cmd_data(hdev, HCI_OP_LE_ADD_TO_ACCEPT_LIST);
-+		if (sent) {
-+			struct hci_conn *conn;
-+
-+			conn = hci_conn_hash_lookup_ba(hdev, ISO_LINK,
-+						       &sent->bdaddr);
-+			if (conn) {
-+				struct bt_iso_qos *qos = &conn->iso_qos;
-+
-+				if (qos->bcast.in.phy & BT_ISO_PHY_1M ||
-+				    qos->bcast.in.phy & BT_ISO_PHY_2M) {
-+					cp->scanning_phys |= LE_SCAN_PHY_1M;
-+					hci_le_scan_phy_params(phy, type,
-+							       interval,
-+							       window);
-+					num_phy++;
-+					phy++;
-+				}
-+
-+				if (qos->bcast.in.phy & BT_ISO_PHY_CODED) {
-+					cp->scanning_phys |= LE_SCAN_PHY_CODED;
-+					hci_le_scan_phy_params(phy, type,
-+							       interval,
-+							       window);
-+					num_phy++;
-+					phy++;
-+				}
-+
-+				if (num_phy)
-+					goto done;
-+			}
-+		}
-+	}
-+
- 	if (scan_1m(hdev) || scan_2m(hdev)) {
- 		cp->scanning_phys |= LE_SCAN_PHY_1M;
--
--		phy->type = type;
--		phy->interval = cpu_to_le16(interval);
--		phy->window = cpu_to_le16(window);
--
-+		hci_le_scan_phy_params(phy, type, interval, window);
- 		num_phy++;
- 		phy++;
- 	}
- 
- 	if (scan_coded(hdev)) {
- 		cp->scanning_phys |= LE_SCAN_PHY_CODED;
--
--		phy->type = type;
--		phy->interval = cpu_to_le16(interval);
--		phy->window = cpu_to_le16(window);
--
-+		hci_le_scan_phy_params(phy, type, interval, window);
- 		num_phy++;
- 		phy++;
- 	}
- 
-+done:
-+	if (!num_phy)
-+		return -EINVAL;
-+
- 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EXT_SCAN_PARAMS,
- 				     sizeof(*cp) + sizeof(*phy) * num_phy,
- 				     data, HCI_CMD_TIMEOUT);
--- 
-2.43.0
 
+--===============2397011596286466361==--
