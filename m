@@ -1,61 +1,61 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C67BD74412
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Feb 2024 20:04:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5775C74426
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Feb 2024 20:04:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709150643; cv=pass; b=mvp8vDiUUXnXMcP8oZ5OJe3eZczFccAD2iaeeFGoB4XiiPcl8u8vmQSEcgmYBvNIHP6wulRiMKdxVFMIcI/t+Eh2wN1e5D2i87SlaqdI829RyKdA73ISJskV9rdgwNlFu5aUc8qIa8pEYk9hPuoMTn4RMZ/ShKGm33F1J1tB7O8=
+	t=1709150644; cv=pass; b=sChufF6nHoyTiA7aje0VvZNrSNx0GtIaEwVvV37t+sTPgKCN9QLg/EuhzAbu8ab6mpGeclg8iXbnm29hNB9TxHLBu6LXCkDRxPATTYh0ybOgawFmPim/VeON2daZ0eF3sIW5JQwJWTqr2Y5Iu0ewwN54toXOhhfPWuKsskVx6ac=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709150643; c=relaxed/simple;
-	bh=dJ2QqBvUOy/j0pSEoZu6dOKIEiu58XqmvjqDqFAcriM=;
+	s=arc-20240116; t=1709150644; c=relaxed/simple;
+	bh=Xpgw8RzfiOV7c607k6YknS+aKHFD32znYo7Mdenl2OA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=A/IOZuf5zVWFRMHYj4HqR1zO7p8+Kt0Z+z0GB2WuQ3QHj3ajta/o7dtt42Pzn9ggYByiTDIY4gLbQnizkZmf/co81ayqD3BUysATRFVvPcikLZUcZVvOaVcIctoMmrwUYpPEHzs7atTE6YrLiCTWlYKlBCSnvrKkDoiuhh3kzUM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=X9GKiMyz; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=S+OL+2Q0GWFlSq/g5tMjvvVPVYbyw0MjjFh5sfT5Mf82AYaA4VzlOh7wC+lRlgCHkRHZG++mzpUBOoXLJrln49SodAkn++9sXdqDFXckIwYKQmcARj1BEwWHFfF8BQpIG+8gGl1YsyN6AcufbDoz7c6+RZby8WiIYngB0Gle0PA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=V1CeytCc; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="X9GKiMyz"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="V1CeytCc"
 Received: from monolith.lan (unknown [193.138.7.158])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4TlQKW00snzyxR;
-	Wed, 28 Feb 2024 22:03:58 +0200 (EET)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4TlQKW6ZqNzyyw;
+	Wed, 28 Feb 2024 22:03:59 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1709150639;
+	t=1709150640;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=w4G0jAuJ8gvFLcHu+ubt+Ek1wrUKLqbuD+fTQ4Z84og=;
-	b=X9GKiMyzUHyPyYUNMn+58c2XFP6E7K2GnAAbAblWTxNFecK6qgH+BvAoNOyOrK1DKIViFI
-	61y0e3ygmoocastlK8oXvwLtOSSWHbIoYxB1l0EYMob+lR2uqh29E7A6qvWgvopR5KvwYe
-	qxI/AxURhl+x0QrDK92+tfB8Z/3U//E=
+	bh=YCy+DFVmyNrdCZXqYvszAitDkeet40gm8286NI506HU=;
+	b=V1CeytCcdArOz8/qfqTDYVExJzsugoySyWpk8tFSN0PvDAyeFltjN/su/DE5KtqDHcnf5b
+	qhckOiPAhQ4g4YXVK85B29gbo8SOr29lMiiL9b1rUZZmQlF/1XoN78Hi/R2rD55hcJVQgT
+	m3Xt2VHkKOE6sS1GKq/6+0ZhBZ53/NY=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1709150639;
+	s=meesny; t=1709150640;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=w4G0jAuJ8gvFLcHu+ubt+Ek1wrUKLqbuD+fTQ4Z84og=;
-	b=sCFkplaVs+ZTf7neOq7bxSC52PfSYDeISMMJQK2GgOhSplauSMexdakkcJIJpnaM1QJa2c
-	vbcvOVaCQ+SFG40/TYdbbHeZuxoBc3X12JoEWS9M3OtW6nM+MyaEsNxfs8c2rPmp2XWb0T
-	IxMpZnX600ix3HyNO7nr2xPnPvwo7cM=
+	bh=YCy+DFVmyNrdCZXqYvszAitDkeet40gm8286NI506HU=;
+	b=SY16Zr0QuLVfXx4bAEdU9yORBZBsh7zH/1u+T6M3vY8FFNkstaKQMu/F4pI7jOXfHUisfL
+	5JW1jFIGzG0eXKo7/u6ZLBIjTzUbGVUoQUqqpWa6lwv5Mnc0Q44/wqhS/pdWRiUP6n5xf/
+	7Nhh8sOEmSTW/dXcAig8PL8cpnDVsp0=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1709150639; a=rsa-sha256; cv=none;
-	b=ctg3Q/DpYu4/KsUFmLZ17kLumbfHr3Fko/5Dz1V73KK5C99AKoMsqlBl+REytFgnVjLgEl
-	STxx972wzTRAVQHYWiLqJJCXePVMPMda5HEzJubqfmbc2pCABIO5VZxKi/tK3iPgbcp0i1
-	CsOXQLhVoTstQNhBqt0Nk+w3zmjx55c=
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1709150640; a=rsa-sha256; cv=none;
+	b=i1NhawL3fS5Nb0yac3oov2/G3E4DsHCGpXRrdiqBIlJgA00pE0jOFgHM/eiKMyPaRPWBH6
+	I5QcFhAV2Ijv1CzSzZt+ooeVQcAvDOUxVDvOuQudWA/jNortGhJyM/O19z9lUGgbzPhjgl
+	7kxvMAEDe5TOUzRkZYnmK5kOwTyQdb0=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [RFC PATCH 2/3] Bluetooth: ISO: add new ioctl() for reading tx latency
-Date: Wed, 28 Feb 2024 22:03:40 +0200
-Message-ID: <8e5df7837d596cbedcfa04d766ce1caba50d853b.1709150574.git.pav@iki.fi>
+Subject: [RFC PATCH 3/3] Bluetooth: L2CAP: add new ioctl() for reading tx latency
+Date: Wed, 28 Feb 2024 22:03:41 +0200
+Message-ID: <abe7d76d2cdc1d328da65770fa08150d285d318f.1709150574.git.pav@iki.fi>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <cover.1709150574.git.pav@iki.fi>
 References: <cover.1709150574.git.pav@iki.fi>
@@ -68,105 +68,90 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 Add ioctl BTGETTXINFO to read information of a previous packet
-completion event concerning a given ISO socket.
+completion event concerning a given L2CAP socket.
 
-It contains sufficient information so the user can know which previous
-sendmsg() the packet corresponds to and what was its completion time in
-monotonic clock, so latency can be calculated.  The user can then also
-know the packet queue length (in units of their sendmsg packets).
+Mark skbs submitted so that hci_core updates latency info in the
+hci_chan.  Read the information in the ioctl.
 
-Mark submitted skb so that hci_core updates the latency information, and
-read it in the ioctl.
+The ioctl is the same as for ISO sockets.
 
 Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
- include/net/bluetooth/bluetooth.h | 37 ++++++++++++++++++++
- net/bluetooth/iso.c               | 58 ++++++++++++++++++++++++++++---
- 2 files changed, 90 insertions(+), 5 deletions(-)
+ include/net/bluetooth/bluetooth.h |  2 +-
+ net/bluetooth/l2cap_core.c        | 12 ++++++++
+ net/bluetooth/l2cap_sock.c        | 50 ++++++++++++++++++++++++++++++-
+ 3 files changed, 62 insertions(+), 2 deletions(-)
 
 diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index f6bdd040adaa..ff4230d15461 100644
+index ff4230d15461..480f5cbc24e4 100644
 --- a/include/net/bluetooth/bluetooth.h
 +++ b/include/net/bluetooth/bluetooth.h
-@@ -239,6 +239,43 @@ struct bt_codecs {
- 
- #define BT_ISO_BASE		20
- 
-+/* BTGETTXINFO: Transmission latency information.
-+ *
-+ * Produces information of a previous event when a packet was sent, and the
-+ * length of packet queue at that time.
-+ *
-+ * Applicable to: Bluetooth ISO sockets.
-+ *
-+ * Input: Zero-initialize reserved flag bits and other fields.
-+ *
-+ * Output:
-+ *
-+ * Fails with ENOENT if no packet has been sent.
-+ *
-+ * - flags: currently always 0, all bits reserved for extensions.
-+ *
-+ * - queue: total number of packets in queue (controller and socket buffers)
-+ *   at the time of the event.
-+ *
-+ * - time: reference event timestamp (nsec, in system monotonic clock).
-+ *
-+ * - offset: offset (nsec) of actual packet timing from the reference timestamp.
-+ *   Currently always 0.
-+ *
-+ * For packet latencies in nanoseconds, the application can track timestamps
-+ * t[j] when it sent packet j. Then, given t[k] < tx_info.time < t[k + 1],
-+ * event packet j = k - tx.queue and ref_latency_nsec = tx_info.time - t[j].
-+ */
-+
-+#define BTGETTXINFO	_IOWR('B', 100, struct bt_tx_info)
-+
-+struct bt_tx_info {
-+	__u32	flags;
-+	__u32	queue;
-+	__s64	time;
-+	__s64	offset;
-+} __packed;
-+
- __printf(1, 2)
- void bt_info(const char *fmt, ...);
- __printf(1, 2)
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 30c777c469f9..4953c987e4fd 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -500,6 +500,8 @@ static int iso_send_frame(struct sock *sk, struct sk_buff *skb)
- 
- 	if (skb->len > qos->ucast.out.sdu)
- 		return -EMSGSIZE;
-+	if (sk->sk_state != BT_CONNECTED)
-+		return -ENOTCONN;
- 
- 	len = skb->len;
- 
-@@ -509,10 +511,9 @@ static int iso_send_frame(struct sock *sk, struct sk_buff *skb)
- 	hdr->slen = cpu_to_le16(hci_iso_data_len_pack(len,
- 						      HCI_ISO_STATUS_VALID));
- 
--	if (sk->sk_state == BT_CONNECTED)
--		hci_send_iso(conn->hcon, skb);
--	else
--		len = -ENOTCONN;
-+	hci_mark_tx_latency(&conn->hcon->tx_latency, skb);
-+
-+	hci_send_iso(conn->hcon, skb);
- 
- 	return len;
- }
-@@ -2232,6 +2233,53 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- 	kfree_skb(skb);
+@@ -244,7 +244,7 @@ struct bt_codecs {
+  * Produces information of a previous event when a packet was sent, and the
+  * length of packet queue at that time.
+  *
+- * Applicable to: Bluetooth ISO sockets.
++ * Applicable to: Bluetooth ISO and L2CAP sockets.
+  *
+  * Input: Zero-initialize reserved flag bits and other fields.
+  *
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 467b242d8be0..c70f935d9242 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -2488,6 +2488,13 @@ static void l2cap_le_flowctl_send(struct l2cap_chan *chan)
+ 	       skb_queue_len(&chan->tx_q));
  }
  
-+static int iso_sock_ioctl(struct socket *sock, unsigned int cmd,
-+			  unsigned long arg)
++static void mark_tx_latency(struct l2cap_chan *chan, struct sk_buff *skb)
++{
++	struct hci_chan *hchan = chan->conn->hchan;
++
++	hci_mark_tx_latency(&hchan->tx_latency, skb);
++}
++
+ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
+ {
+ 	struct sk_buff *skb;
+@@ -2526,6 +2533,8 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
+ 		if (err)
+ 			return err;
+ 
++		mark_tx_latency(chan, skb_peek(&seg_queue));
++
+ 		skb_queue_splice_tail_init(&seg_queue, &chan->tx_q);
+ 
+ 		l2cap_le_flowctl_send(chan);
+@@ -2547,6 +2556,7 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
+ 		if (IS_ERR(skb))
+ 			return PTR_ERR(skb);
+ 
++		mark_tx_latency(chan, skb);
+ 		l2cap_do_send(chan, skb);
+ 		err = len;
+ 		break;
+@@ -2570,6 +2580,8 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
+ 		if (err)
+ 			break;
+ 
++		mark_tx_latency(chan, skb_peek(&seg_queue));
++
+ 		if (chan->mode == L2CAP_MODE_ERTM)
+ 			l2cap_tx(chan, NULL, &seg_queue, L2CAP_EV_DATA_REQUEST);
+ 		else
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 4287aa6cc988..08c130bd8b98 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1207,6 +1207,54 @@ static int l2cap_sock_recvmsg(struct socket *sock, struct msghdr *msg,
+ 	return err;
+ }
+ 
++static int l2cap_sock_ioctl(struct socket *sock, unsigned int cmd,
++			    unsigned long arg)
 +{
 +	struct sock *sk = sock->sk;
++	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
 +	struct tx_latency latency;
 +	struct bt_tx_info info;
 +
@@ -184,13 +169,13 @@ index 30c777c469f9..4953c987e4fd 100644
 +
 +		lock_sock(sk);
 +
-+		if (sk->sk_state != BT_CONNECTED) {
++		if (sk->sk_state != BT_CONNECTED || !chan->conn ||
++		    !chan->conn->hchan) {
 +			release_sock(sk);
 +			return -EINVAL;
 +		}
 +
-+		hci_copy_tx_latency(&latency,
-+				    &iso_pi(sk)->conn->hcon->tx_latency);
++		hci_copy_tx_latency(&latency, &chan->conn->hchan->tx_latency);
 +
 +		release_sock(sk);
 +
@@ -210,18 +195,18 @@ index 30c777c469f9..4953c987e4fd 100644
 +	return bt_sock_ioctl(sock, cmd, arg);
 +}
 +
- static struct hci_cb iso_cb = {
- 	.name		= "ISO",
- 	.connect_cfm	= iso_connect_cfm,
-@@ -2270,7 +2318,7 @@ static const struct proto_ops iso_sock_ops = {
- 	.sendmsg	= iso_sock_sendmsg,
- 	.recvmsg	= iso_sock_recvmsg,
+ /* Kill socket (only if zapped and orphan)
+  * Must be called on unlocked socket, with l2cap channel lock.
+  */
+@@ -1883,7 +1931,7 @@ static const struct proto_ops l2cap_sock_ops = {
+ 	.sendmsg	= l2cap_sock_sendmsg,
+ 	.recvmsg	= l2cap_sock_recvmsg,
  	.poll		= bt_sock_poll,
 -	.ioctl		= bt_sock_ioctl,
-+	.ioctl		= iso_sock_ioctl,
++	.ioctl		= l2cap_sock_ioctl,
+ 	.gettstamp	= sock_gettstamp,
  	.mmap		= sock_no_mmap,
  	.socketpair	= sock_no_socketpair,
- 	.shutdown	= iso_sock_shutdown,
 -- 
 2.44.0
 
