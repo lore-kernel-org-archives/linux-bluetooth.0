@@ -1,212 +1,145 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5775C74426
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Feb 2024 20:04:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709150644; cv=pass; b=sChufF6nHoyTiA7aje0VvZNrSNx0GtIaEwVvV37t+sTPgKCN9QLg/EuhzAbu8ab6mpGeclg8iXbnm29hNB9TxHLBu6LXCkDRxPATTYh0ybOgawFmPim/VeON2daZ0eF3sIW5JQwJWTqr2Y5Iu0ewwN54toXOhhfPWuKsskVx6ac=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709150644; c=relaxed/simple;
-	bh=Xpgw8RzfiOV7c607k6YknS+aKHFD32znYo7Mdenl2OA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=S+OL+2Q0GWFlSq/g5tMjvvVPVYbyw0MjjFh5sfT5Mf82AYaA4VzlOh7wC+lRlgCHkRHZG++mzpUBOoXLJrln49SodAkn++9sXdqDFXckIwYKQmcARj1BEwWHFfF8BQpIG+8gGl1YsyN6AcufbDoz7c6+RZby8WiIYngB0Gle0PA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=V1CeytCc; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAA931DDF4
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Feb 2024 20:31:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709152285; cv=none; b=BFBSZy8c5rVkACJNi+lxkK5GYXt3xh6jLMVl18L1J8RW1L52Klxeu+Ay8FAyzrKUzyxCulJ6g4idKIpRfkZFJnFjc3uOHH1cRa18S7ZuFc7j00R6X+M7f9zNkncT/tPwed1AbVM3hezJpAQFYabncq5qYk/Lfl4ZTEgon1ZYHW4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709152285; c=relaxed/simple;
+	bh=utEUvRgslPQR0IX9lAgjnQSNl8NTzHlnafOfm5Op/Xg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rUXMnVBQRGZZ956qbvV8LIK5ZLFJPubf4Tq2cCyJcFBGIqxQrWcvDYW8dNIVbwj9JVFiDBmdZiJpn9jBbyxqUa4YsUKMMbNUQqjz1ObMi6VZgpBsvMsviDjUTJc3tybLYsIUnNBOmR43ExmWdtGQEIV4wX8QHrCUtGDMw3noFp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JX1cdhUG; arc=none smtp.client-ip=209.85.208.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="V1CeytCc"
-Received: from monolith.lan (unknown [193.138.7.158])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4TlQKW6ZqNzyyw;
-	Wed, 28 Feb 2024 22:03:59 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1709150640;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YCy+DFVmyNrdCZXqYvszAitDkeet40gm8286NI506HU=;
-	b=V1CeytCcdArOz8/qfqTDYVExJzsugoySyWpk8tFSN0PvDAyeFltjN/su/DE5KtqDHcnf5b
-	qhckOiPAhQ4g4YXVK85B29gbo8SOr29lMiiL9b1rUZZmQlF/1XoN78Hi/R2rD55hcJVQgT
-	m3Xt2VHkKOE6sS1GKq/6+0ZhBZ53/NY=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1709150640;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YCy+DFVmyNrdCZXqYvszAitDkeet40gm8286NI506HU=;
-	b=SY16Zr0QuLVfXx4bAEdU9yORBZBsh7zH/1u+T6M3vY8FFNkstaKQMu/F4pI7jOXfHUisfL
-	5JW1jFIGzG0eXKo7/u6ZLBIjTzUbGVUoQUqqpWa6lwv5Mnc0Q44/wqhS/pdWRiUP6n5xf/
-	7Nhh8sOEmSTW/dXcAig8PL8cpnDVsp0=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1709150640; a=rsa-sha256; cv=none;
-	b=i1NhawL3fS5Nb0yac3oov2/G3E4DsHCGpXRrdiqBIlJgA00pE0jOFgHM/eiKMyPaRPWBH6
-	I5QcFhAV2Ijv1CzSzZt+ooeVQcAvDOUxVDvOuQudWA/jNortGhJyM/O19z9lUGgbzPhjgl
-	7kxvMAEDe5TOUzRkZYnmK5kOwTyQdb0=
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [RFC PATCH 3/3] Bluetooth: L2CAP: add new ioctl() for reading tx latency
-Date: Wed, 28 Feb 2024 22:03:41 +0200
-Message-ID: <abe7d76d2cdc1d328da65770fa08150d285d318f.1709150574.git.pav@iki.fi>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <cover.1709150574.git.pav@iki.fi>
-References: <cover.1709150574.git.pav@iki.fi>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JX1cdhUG"
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2d228a132acso2053221fa.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Feb 2024 12:31:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709152282; x=1709757082; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xrAS243Uv/BtsnctMlI6RKJ4i1o9H5I4rcJEBTPdvJc=;
+        b=JX1cdhUGjeC/qLJrrrLfFsPR/NiyOyQNCOydRq2VEeL91iMTkOdaXMBwaut3/VnzjF
+         4/B+Fr/vpBeTY0RYJMwqoVwpSxJ8KGx8CBm8bGOpLDqDDsA9b7CbPPDHoxAxNOgEBB3n
+         ljiWUXVcV9BpsFeVEMiXDf6eKcPzU17cgqa+uyu2KScjEPON4kfD88XPxcutfqQerH0f
+         leliLbaltqPxpOJQj1VSvb+u7FbmDG12+Mgw06kAu+7A+sgPPxxSDijqNSCkWH9dIymz
+         Ndxd69JJSIMDyKv+yt/OlmtF6RCReb2Eed6fmWsKP3UMhii1KDrqN3absjGYSj6GPMKZ
+         3hgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709152282; x=1709757082;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xrAS243Uv/BtsnctMlI6RKJ4i1o9H5I4rcJEBTPdvJc=;
+        b=LC9s6sb4MXQQPwduJ4DPRHhlZk3Piv901QaD+C5hn5IXgkhlWGVtBkBLaXHWiH9SiD
+         qfXPCzWswf6wqV7rkcn2Bu3yaDgdFKb3IhVAjCpJXJ1UzfNGQwXZrmsRWlrnjQx6pibH
+         iXQPe6QyB+oLzBzHgtigssXXOVnKPpnbebu+50jx7FPQq7GVGDoTFnASCARFiy1JfQXb
+         ndNI5/V36uFszt3N50wqP5v5STNFXRithWkf0uOy0O1RmbvrkEKIKi4ltwZLxnfz99If
+         PDwtmrHI68i3JTh5diA8wxSBWPqXMJH666zSCDRMsAyHLwock28re1jHJHl1zKrXgVVW
+         hSYA==
+X-Gm-Message-State: AOJu0Yyf8GZRWd8hLpgAqMEloyALNs4/lq+UdYql8v5B0l/Ff7xPaxfr
+	lhq+3kjH1+MdSvx1y1BcUjh91MqOK2qt4bmAckSiNMNoTIbOwgE2+tmB2MNpfvCdVza3odKHgKH
+	/7jHsbyYNG9S8dIjj5IiMqgiX88FRQqsNFkw=
+X-Google-Smtp-Source: AGHT+IFFXy5b67mQyz0KTth5iz7rWl5nkq7B16idYCHQzrf0PDmk6mNS2WnZY1VaIHkB7pDzIF4QHYWqcf0GEISqdlQ=
+X-Received: by 2002:a2e:bc12:0:b0:2d2:607e:8121 with SMTP id
+ b18-20020a2ebc12000000b002d2607e8121mr10516928ljf.43.1709152281420; Wed, 28
+ Feb 2024 12:31:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <cover.1709150574.git.pav@iki.fi>
+In-Reply-To: <cover.1709150574.git.pav@iki.fi>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 28 Feb 2024 15:31:08 -0500
+Message-ID: <CABBYNZ+J_SUi_T987ND3hyN228zvX0gD62QNqk5D=GDc+nypTQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/3] Bluetooth: add transmission latency tracking for
+ ISO & L2CAP
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add ioctl BTGETTXINFO to read information of a previous packet
-completion event concerning a given L2CAP socket.
+Hi Pauli,
 
-Mark skbs submitted so that hci_core updates latency info in the
-hci_chan.  Read the information in the ioctl.
+On Wed, Feb 28, 2024 at 3:11=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote:
+>
+> Add ISO/L2CAP socket ioctl() BTGETTXINFO which informs the user how long
+> it took the kernel and controller to complete their sendmsg(), and how
+> many sendmsg() are in socket and controller queues.
+>
+> This currently provides information of the latest packet only, in
+> principle there could be a ringbuffer containing few latest packets, not
+> clear if that would be useful.
+>
+> These patches allow fixing / working around controller(?) issue where
+> two ISO streams in same group get desynchronized.  Having accurate
+> knowledge of the packet queue lengths, user application can drop packets
+> if it detects the ISO streams are not in sync.
+>
+> Pipewire side:
+> https://gitlab.freedesktop.org/pvir/pipewire/-/commits/iso-ts-test
+>
+> With this change, https://github.com/bluez/bluez/issues/515 is more or
+> less fixed, and the sound server can figure out the total latency to
+> audio rendering (tx latency + transport latency + presentation delay).
+>
+> For ISO, this can be changed to use LE Read ISO TX Sync, when the clock
+> and sequence number synchronization issues there are figured out, and a
+> quirk is added for controllers with nonfunctional implementation.
+>
+> For the L2CAP latency, I'll need to think a bit more what is the audio
+> use case. Motivation was that AVDTP delay report values appear to be off
+> by ~0..40 ms compared to observed audio latency and this amount can vary
+> per connection and time, so not explained by unaccounted code
+> algorithmic delays etc. Currently it's not clear if there is relation to
+> TX side latency, so it may be down to receiver side implementation.
+>
+> This needs a bit more work to figure out, but the L2CAP patch is anyway
+> here.  Due to the possible fragmentation in ISO sendmsg(), it seems we
+> anyway need the tx_info_queue thing and can't easily do it by counting
+> packets, and L2CAP required part is small addition on top of that.
 
-The ioctl is the same as for ISO sockets.
+That is not how it is normally done with sockets, normally this is
+done with use of SO_TIMESTAMPING which is then reported using the
+socket error queue:
 
-Signed-off-by: Pauli Virtanen <pav@iki.fi>
----
- include/net/bluetooth/bluetooth.h |  2 +-
- net/bluetooth/l2cap_core.c        | 12 ++++++++
- net/bluetooth/l2cap_sock.c        | 50 ++++++++++++++++++++++++++++++-
- 3 files changed, 62 insertions(+), 2 deletions(-)
+https://www.kernel.org/doc/html/latest/networking/timestamping.html
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index ff4230d15461..480f5cbc24e4 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -244,7 +244,7 @@ struct bt_codecs {
-  * Produces information of a previous event when a packet was sent, and the
-  * length of packet queue at that time.
-  *
-- * Applicable to: Bluetooth ISO sockets.
-+ * Applicable to: Bluetooth ISO and L2CAP sockets.
-  *
-  * Input: Zero-initialize reserved flag bits and other fields.
-  *
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 467b242d8be0..c70f935d9242 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -2488,6 +2488,13 @@ static void l2cap_le_flowctl_send(struct l2cap_chan *chan)
- 	       skb_queue_len(&chan->tx_q));
- }
- 
-+static void mark_tx_latency(struct l2cap_chan *chan, struct sk_buff *skb)
-+{
-+	struct hci_chan *hchan = chan->conn->hchan;
-+
-+	hci_mark_tx_latency(&hchan->tx_latency, skb);
-+}
-+
- int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
- {
- 	struct sk_buff *skb;
-@@ -2526,6 +2533,8 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
- 		if (err)
- 			return err;
- 
-+		mark_tx_latency(chan, skb_peek(&seg_queue));
-+
- 		skb_queue_splice_tail_init(&seg_queue, &chan->tx_q);
- 
- 		l2cap_le_flowctl_send(chan);
-@@ -2547,6 +2556,7 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
- 		if (IS_ERR(skb))
- 			return PTR_ERR(skb);
- 
-+		mark_tx_latency(chan, skb);
- 		l2cap_do_send(chan, skb);
- 		err = len;
- 		break;
-@@ -2570,6 +2580,8 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
- 		if (err)
- 			break;
- 
-+		mark_tx_latency(chan, skb_peek(&seg_queue));
-+
- 		if (chan->mode == L2CAP_MODE_ERTM)
- 			l2cap_tx(chan, NULL, &seg_queue, L2CAP_EV_DATA_REQUEST);
- 		else
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 4287aa6cc988..08c130bd8b98 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1207,6 +1207,54 @@ static int l2cap_sock_recvmsg(struct socket *sock, struct msghdr *msg,
- 	return err;
- }
- 
-+static int l2cap_sock_ioctl(struct socket *sock, unsigned int cmd,
-+			    unsigned long arg)
-+{
-+	struct sock *sk = sock->sk;
-+	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
-+	struct tx_latency latency;
-+	struct bt_tx_info info;
-+
-+	BT_DBG("sk %p cmd %x arg %lx", sk, cmd, arg);
-+
-+	switch (cmd) {
-+	case BTGETTXINFO:
-+		/* Require zero-initialized, to allow later extensions */
-+		if (copy_from_user(&info, (void __user *)arg, sizeof(info)))
-+			return -EFAULT;
-+		if (info.flags || info.queue || info.time || info.offset)
-+			return -EINVAL;
-+
-+		memset(&info, 0, sizeof(info));
-+
-+		lock_sock(sk);
-+
-+		if (sk->sk_state != BT_CONNECTED || !chan->conn ||
-+		    !chan->conn->hchan) {
-+			release_sock(sk);
-+			return -EINVAL;
-+		}
-+
-+		hci_copy_tx_latency(&latency, &chan->conn->hchan->tx_latency);
-+
-+		release_sock(sk);
-+
-+		if (!latency.now.time)
-+			return -ENOENT;
-+
-+		info.queue = latency.now.queue;
-+		info.time = ktime_to_ns(latency.now.time);
-+		info.offset = latency.now.offset;
-+
-+		if (copy_to_user((void __user *)arg, &info, sizeof(info)))
-+			return -EFAULT;
-+
-+		return 0;
-+	}
-+
-+	return bt_sock_ioctl(sock, cmd, arg);
-+}
-+
- /* Kill socket (only if zapped and orphan)
-  * Must be called on unlocked socket, with l2cap channel lock.
-  */
-@@ -1883,7 +1931,7 @@ static const struct proto_ops l2cap_sock_ops = {
- 	.sendmsg	= l2cap_sock_sendmsg,
- 	.recvmsg	= l2cap_sock_recvmsg,
- 	.poll		= bt_sock_poll,
--	.ioctl		= bt_sock_ioctl,
-+	.ioctl		= l2cap_sock_ioctl,
- 	.gettstamp	= sock_gettstamp,
- 	.mmap		= sock_no_mmap,
- 	.socketpair	= sock_no_socketpair,
--- 
-2.44.0
+Sorry to tell you just now, you might have lost a lot of time doing
+all of the changes, next time just drop and RFC early on with the
+general design so you don't spend too much time before getting any
+feedback.
 
+> TBD: iso-tester / l2cap-tester tests
+>
+> Pauli Virtanen (3):
+>   Bluetooth: add transmission latency tracking for ISO and ACL
+>   Bluetooth: ISO: add new ioctl() for reading tx latency
+>   Bluetooth: L2CAP: add new ioctl() for reading tx latency
+>
+>  include/net/bluetooth/bluetooth.h |  39 +++++++++++
+>  include/net/bluetooth/hci_core.h  |  30 ++++++++
+>  net/bluetooth/hci_conn.c          | 110 +++++++++++++++++++++++++++++-
+>  net/bluetooth/hci_core.c          |  14 ++++
+>  net/bluetooth/hci_event.c         |  66 ++++++++++++++++++
+>  net/bluetooth/iso.c               |  58 ++++++++++++++--
+>  net/bluetooth/l2cap_core.c        |  12 ++++
+>  net/bluetooth/l2cap_sock.c        |  50 +++++++++++++-
+>  8 files changed, 372 insertions(+), 7 deletions(-)
+>
+> --
+> 2.44.0
+>
+>
+
+
+--=20
+Luiz Augusto von Dentz
