@@ -1,163 +1,109 @@
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 167A120320
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Feb 2024 04:53:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D74322065
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Feb 2024 09:12:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709095998; cv=none; b=AeyvNwAYnsWE73I9JFoKr2BmvOfKTAZDbDn6quliMLNZlUSRKgePc+ZmF5YQh72v0vvueZ4ljcgfLF6UTTWp/iom3Oe05j1vlZWTWaYOowayJJfrJozc1EfbM4YviweB5XCleU7n7GgjvcwJFohjsbyaPPtMz4EECZl8bWu5KbU=
+	t=1709111567; cv=none; b=iObZWDFT25qv7b9QSYHTFgJPlzZxDq5+tnBSRyq4MrzT2O6Td277rCLszlYtFaakgtlgJ7ZZyFkXqPyEvDdOuZsVcRYPR+EJAOTAACITFSlIxUSs8Qo/uvCAWPO2FBeDshYbB8GqFADztwRz7l4fA8ZHgOhm+HOXvWxqmehyfV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709095998; c=relaxed/simple;
-	bh=wZmkdZbXJo1h2ax0tDtCwbt9EHwto6bbJWngD1zBDe0=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=kkwZTVB2tLK5Pl8mlxtoJhFNuDuVNiL5L8QO0ti5PXxtVL0zvuP14e7uQ8H8AcT4BrdgkGfl80LGw1CTjLwPKE6f3ZAVSbl6D+7PhsPEiGkhsaVXmE9kiiFi21umQARlZYqzpNL/I5mqa8VcprxErExPDVBiwld08nZdkp6M4lU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-36512fcf643so34424335ab.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Feb 2024 20:53:16 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709095996; x=1709700796;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wLp1bsry9uAqXzf4BDbA5DbOjqtNpJoqrZgoXxy1hjA=;
-        b=T9lKffZq4TmXtcv2GMMo8nHu03I441GgMplPwR60sSTEO4lHmglXT1OltdxHUpVK23
-         8zyctH6lg/E7OoNQBghNecu5Bb/WDobH+BkGPqxeH56DQOu1bgmjWRIvxtVS0ZgymrEF
-         fT/Otg/kbPYKkwJKRwIZBDMD9R0mmQxAELLxzID6g7O2aA/71vAIeYfTa5BkyE+f6Shx
-         jNQ5rbwnnIjg0BCHR1hrWRoZelvseAM/1r2tdyheiIGbp40UUGDf/VI4wEMzM+CUweOb
-         OHYEkMk66XG2hPBotxOy55vWPj5AllR21M+mWaOaHsZjaXmtcsZmInaZtNKJ7/yHSeTM
-         0Usw==
-X-Forwarded-Encrypted: i=1; AJvYcCWSG8tDi04fogaa/8qJMCDh2qzjgdyJLPgkJkJ1IRzOhS45bNy1INQpR/pCWN0yNhqDhouTEp6cSVf6X78toOa5yvoLIDvzGX9LuuATf8Vl
-X-Gm-Message-State: AOJu0YzKK6Nxt931Z0bdJH5fd5f03Q+Ihj95kxTFsK2snvi4p9lEkcAk
-	UJmzUjQsj7+66VIQ3V/+dyckXzhJ41p9FA3GxPnzAyjrMnfPrNaFUcsbtA5QrEQAbBuQfWE6Uyu
-	IPWkh+wCn9dsga9Gy/J0gN8J/1GLxQyjR6bmynQpbpFVLFxdrtakGM7w=
-X-Google-Smtp-Source: AGHT+IFKtGl7Hrq3wGX5AY1HvUoLSLPZ95MyV08N+LxrKQn3KHztGVxS791I4R0OlCFYcsJAIYR5hY09FiCWWVY9XWIsmPkPw0Mc
+	s=arc-20240116; t=1709111567; c=relaxed/simple;
+	bh=Ds4vrfrn3SzVSKeb+mnKQ4GmeNNuApOXg4f9oVa0QSw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lIm4v9XwnfT9T299iKJNjjI5Ww12tCMtkEuWVIoGPSwb4lYmRbIG1ZHKyPvNjaYrckZlBaEKFN2wX2oUXbW6p1jBV9JjJHJLWIGpH2IM6Bj6P4bW3YPVng29bxIKcfrxB6u3NsBivUtlM8aIdCoikndThHKjWHBwZBhY3oDv6x8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mP7E7+B4; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mP7E7+B4"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709111565; x=1740647565;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Ds4vrfrn3SzVSKeb+mnKQ4GmeNNuApOXg4f9oVa0QSw=;
+  b=mP7E7+B4VqZWB3RiXMpuD6vZxWPaVtowb3PaNKu27plJtfRRLYKT10Xl
+   yLSQPMo3zgOZaXbOT+XpRuKGrgDsp7AvI39UmkUW4lpvAgolgg2zIHt8l
+   /D7yNELnCzPfzKr+dCtUgyBpruN7ce3cNRUyCL0kfS0XmpyiUuwAp3vYc
+   iQg9kOz7RITSPOsbhhG4K6mmnJJYF/TRVrdH3Kga9MBlGEfY2EqaQdDsA
+   fJZ1M5nTUP4DZS8nR70V8rcY/lClDNxhBqZp1sQfp7kT1zbOTBSZJgGTP
+   ato7RuUt5v0L4O7K36BCl4BAneueC7zm3+EO12y7VgVARi+rjgPVx0eO8
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10996"; a="7282273"
+X-IronPort-AV: E=Sophos;i="6.06,190,1705392000"; 
+   d="scan'208";a="7282273"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2024 01:12:44 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,190,1705392000"; 
+   d="scan'208";a="7797515"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by orviesa006.jf.intel.com with ESMTP; 28 Feb 2024 01:12:43 -0800
+From: Kiran K <kiran.k@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	Kiran K <kiran.k@intel.com>
+Subject: [PATCH v1] monitor/intel: Add decoding of firmware SHA1 in read version event
+Date: Wed, 28 Feb 2024 14:55:04 +0530
+Message-Id: <20240228092504.3716904-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1808:b0:365:424a:73db with SMTP id
- a8-20020a056e02180800b00365424a73dbmr848046ilv.4.1709095996307; Tue, 27 Feb
- 2024 20:53:16 -0800 (PST)
-Date: Tue, 27 Feb 2024 20:53:16 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000bf4687061269eb1b@google.com>
-Subject: [syzbot] [bluetooth?] WARNING in hci_conn_del
-From: syzbot <syzbot+b2545b087a01a7319474@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com, 
-	kuba@kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, luiz.von.dentz@intel.com, 
-	marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, william.xuanziyang@huawei.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    603c04e27c3e Merge tag 'parisc-for-6.8-rc6' of git://git.k..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=12d065aa180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=eff9f3183d0a20dd
-dashboard link: https://syzkaller.appspot.com/bug?extid=b2545b087a01a7319474
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17960122180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15d70222180000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/ffe1f52b2e32/disk-603c04e2.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/76775e0b335d/vmlinux-603c04e2.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/8cd3c1c87eef/bzImage-603c04e2.xz
-
-The issue was bisected to:
-
-commit 181a42edddf51d5d9697ecdf365d72ebeab5afb0
-Author: Ziyang Xuan <william.xuanziyang@huawei.com>
-Date:   Wed Oct 11 09:57:31 2023 +0000
-
-    Bluetooth: Make handle of hci_conn be unique
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1357945c180000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=10d7945c180000
-console output: https://syzkaller.appspot.com/x/log.txt?x=1757945c180000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b2545b087a01a7319474@syzkaller.appspotmail.com
-Fixes: 181a42edddf5 ("Bluetooth: Make handle of hci_conn be unique")
-
-------------[ cut here ]------------
-ida_free called for id=8192 which is not allocated.
-WARNING: CPU: 1 PID: 5074 at lib/idr.c:525 ida_free+0x370/0x420 lib/idr.c:525
-Modules linked in:
-CPU: 1 PID: 5074 Comm: syz-executor104 Not tainted 6.8.0-rc5-syzkaller-00278-g603c04e27c3e #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
-RIP: 0010:ida_free+0x370/0x420 lib/idr.c:525
-Code: 10 42 80 3c 28 00 74 05 e8 8d 4b 9b f6 48 8b 7c 24 40 4c 89 fe e8 a0 89 17 00 90 48 c7 c7 80 cd c5 8c 89 de e8 21 32 fd f5 90 <0f> 0b 90 90 eb 3d e8 45 27 39 f6 49 bd 00 00 00 00 00 fc ff df 4d
-RSP: 0018:ffffc900039ef920 EFLAGS: 00010246
-RAX: 59cbf4b1e8f11a00 RBX: 0000000000002000 RCX: ffff88802da20000
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
-RBP: ffffc900039efa18 R08: ffffffff81577ab2 R09: 1ffff110172a51a2
-R10: dffffc0000000000 R11: ffffed10172a51a3 R12: ffffc900039ef960
-R13: dffffc0000000000 R14: ffff88801e3ec0a0 R15: 0000000000000246
-FS:  0000000000000000(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f78fc079f08 CR3: 000000002db8e000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- hci_conn_cleanup net/bluetooth/hci_conn.c:157 [inline]
- hci_conn_del+0x7c0/0xcb0 net/bluetooth/hci_conn.c:1188
- hci_conn_hash_flush+0x18e/0x240 net/bluetooth/hci_conn.c:2646
- hci_dev_close_sync+0x9ab/0xff0 net/bluetooth/hci_sync.c:4954
- hci_dev_do_close net/bluetooth/hci_core.c:554 [inline]
- hci_unregister_dev+0x1e3/0x4e0 net/bluetooth/hci_core.c:2739
- vhci_release+0x83/0xd0 drivers/bluetooth/hci_vhci.c:674
- __fput+0x429/0x8a0 fs/file_table.c:376
- task_work_run+0x24e/0x310 kernel/task_work.c:180
- exit_task_work include/linux/task_work.h:38 [inline]
- do_exit+0xa2c/0x2740 kernel/exit.c:871
- do_group_exit+0x206/0x2c0 kernel/exit.c:1020
- __do_sys_exit_group kernel/exit.c:1031 [inline]
- __se_sys_exit_group kernel/exit.c:1029 [inline]
- __x64_sys_exit_group+0x3f/0x40 kernel/exit.c:1029
- do_syscall_64+0xf9/0x240
- entry_SYSCALL_64_after_hwframe+0x6f/0x77
-RIP: 0033:0x7f78fc021449
-Code: Unable to access opcode bytes at 0x7f78fc02141f.
-RSP: 002b:00007ffd8ebe2238 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
-RAX: ffffffffffffffda RBX: 0000000000000001 RCX: 00007f78fc021449
-RDX: 000000000000003c RSI: 00000000000000e7 RDI: 0000000000000001
-RBP: 00007f78fc0ad2b0 R08: ffffffffffffffb0 R09: 000000ff00ff4650
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007f78fc0ad2b0
-R13: 0000000000000000 R14: 00007f78fc0add00 R15: 00007f78fbfef4e0
- </TASK>
-
-
+< HCI Command: Intel Read Version (0x3f|0x0005) plen 1
+        Requested Type:
+          All Supported Types(0xff)
+> HCI Event: Command Complete (0x0e) plen 107
+      Intel Read Version (0x3f|0x0005) ncmd 1
+        Status: Success (0x00)
+        CNVi TOP(16): 0x00400410
+        CNVr TOP(17): 0x00400410
+        CNVi BT(18): 0x00173700
+        CNVr BT(19): 0x00123720
+        CNVr OTP(21): 0x0413
+        Device Rev ID(22): 0x0000
+        USB VID(23): 0x8087
+        USB PID(24): 0x0032
+        Image Type(28): Firmware(0x03)
+        Time Stamp(29): 23-42
+        Build Type(30): 0x01
+        Build Num(31): 0x00011d97
+        FW Build Product(32): 0x06
+        FW Build HW(33): 0x06
+        FW Build Step(34): 0xa0
+        BT Spec(35): 0x00
+        Manufacturer(36): Intel Corp. (2)
+        HCI Revision(37): 0x3597
+        LMP SubVersion(38): 0x3597
+        OTP Lock(42): Disabled(0)
+        API Lock(43): Disabled(0)
+        Firmware SHA1(50): 0x2e575f2a
+        Unknown Type(51):
+        00
+        Unknown Type(52):
+        Unknown Type(53):
+        00 00 00 00
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ monitor/intel.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+diff --git a/monitor/intel.c b/monitor/intel.c
+index 0de864d8a41e..aa05a803bf8e 100644
+--- a/monitor/intel.c
++++ b/monitor/intel.c
+@@ -291,6 +291,7 @@ static const struct intel_version_tlv_desc {
+ 	{ 47, "SBE Type", print_version_tlv_u8 },
+ 	{ 48, "OTP BDADDR", print_version_tlv_otp_bdaddr },
+ 	{ 49, "Unlocked State", print_version_tlv_enabled },
++	{ 50, "Firmware SHA1", print_version_tlv_u32 },
+ 	{ 0, NULL, NULL },
+ };
+ 
+-- 
+2.34.1
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
