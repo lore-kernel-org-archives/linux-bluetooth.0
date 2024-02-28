@@ -1,145 +1,140 @@
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAA931DDF4
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Feb 2024 20:31:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C22A5E06C
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Feb 2024 20:34:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709152285; cv=none; b=BFBSZy8c5rVkACJNi+lxkK5GYXt3xh6jLMVl18L1J8RW1L52Klxeu+Ay8FAyzrKUzyxCulJ6g4idKIpRfkZFJnFjc3uOHH1cRa18S7ZuFc7j00R6X+M7f9zNkncT/tPwed1AbVM3hezJpAQFYabncq5qYk/Lfl4ZTEgon1ZYHW4=
+	t=1709152450; cv=none; b=Ab12WwYsupv+9rD7gLbmtn542ehoGVzYybhdHJD84fQMmYXYNaudx/rw81PdjY3SBUOO01LLSMgc3ufOj4Bvdiitf1rLKh39Kmk7wCok4poCpMoQ6AqU8SHQNKFC+FqcgiuuSZTXms5rjYmqfJ9qWbKVit/NPjXj23h5PA2iHA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709152285; c=relaxed/simple;
-	bh=utEUvRgslPQR0IX9lAgjnQSNl8NTzHlnafOfm5Op/Xg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rUXMnVBQRGZZ956qbvV8LIK5ZLFJPubf4Tq2cCyJcFBGIqxQrWcvDYW8dNIVbwj9JVFiDBmdZiJpn9jBbyxqUa4YsUKMMbNUQqjz1ObMi6VZgpBsvMsviDjUTJc3tybLYsIUnNBOmR43ExmWdtGQEIV4wX8QHrCUtGDMw3noFp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JX1cdhUG; arc=none smtp.client-ip=209.85.208.169
+	s=arc-20240116; t=1709152450; c=relaxed/simple;
+	bh=2fxYIhAHJlqa2yICN32e/RCGk6anICFNhcWJbE2vr/c=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=gKpx0JKeenil/1NYJgLE0EkHFF6zJWvtuspwNY1gPInj07ZJrzYF2uuDW9kGsJL6ob69A1eWO9/YVkdFS7E+Mgt+kr68sro37RKylCX7i08LqLdaQG7/ARj1DUVNCxqWye/4gvfCgVDkjn9V/9BNGJO9NTBaNPpJiLlbD+7aai0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vts0xC/Z; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JX1cdhUG"
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2d228a132acso2053221fa.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Feb 2024 12:31:23 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vts0xC/Z"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1dc9222b337so2265585ad.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Feb 2024 12:34:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709152282; x=1709757082; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xrAS243Uv/BtsnctMlI6RKJ4i1o9H5I4rcJEBTPdvJc=;
-        b=JX1cdhUGjeC/qLJrrrLfFsPR/NiyOyQNCOydRq2VEeL91iMTkOdaXMBwaut3/VnzjF
-         4/B+Fr/vpBeTY0RYJMwqoVwpSxJ8KGx8CBm8bGOpLDqDDsA9b7CbPPDHoxAxNOgEBB3n
-         ljiWUXVcV9BpsFeVEMiXDf6eKcPzU17cgqa+uyu2KScjEPON4kfD88XPxcutfqQerH0f
-         leliLbaltqPxpOJQj1VSvb+u7FbmDG12+Mgw06kAu+7A+sgPPxxSDijqNSCkWH9dIymz
-         Ndxd69JJSIMDyKv+yt/OlmtF6RCReb2Eed6fmWsKP3UMhii1KDrqN3absjGYSj6GPMKZ
-         3hgw==
+        d=gmail.com; s=20230601; t=1709152448; x=1709757248; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=GnZ/zNQuaJQXIw3NunIUrkuwxIWIj26vtcUJjkjpb7M=;
+        b=Vts0xC/ZumIaEjItYzZF+jpRutrQw5MyzbprKbBAHBk0cz4gspDEqNNpLN4NTI4oPe
+         Fc0BrbkX/ybruEYyv5wtSvzp9EvQKtOQ7ijUFYGiVdU9A62WGlk95Rh2pzk0dwgxB1Sp
+         KIGimB0QYPSt/UByx5bKaC/+h1YJ7KM3OHKbS04BbmwX2HtA6BBY2OqOZ9vFV4EgmvWr
+         O0pG5Duvxtgci9N6etNfTYhwL+TmxSM+iCsgW2X3SoTY0Iaaj+6tv7pl/XAThrcVS+Bg
+         fYAcwpukNaDO4H2+A1sqbzscGQPGRV5eJ7EbMuMQiQK+VLKs4uruR4WrckRjSyP2CBBW
+         xm7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709152282; x=1709757082;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xrAS243Uv/BtsnctMlI6RKJ4i1o9H5I4rcJEBTPdvJc=;
-        b=LC9s6sb4MXQQPwduJ4DPRHhlZk3Piv901QaD+C5hn5IXgkhlWGVtBkBLaXHWiH9SiD
-         qfXPCzWswf6wqV7rkcn2Bu3yaDgdFKb3IhVAjCpJXJ1UzfNGQwXZrmsRWlrnjQx6pibH
-         iXQPe6QyB+oLzBzHgtigssXXOVnKPpnbebu+50jx7FPQq7GVGDoTFnASCARFiy1JfQXb
-         ndNI5/V36uFszt3N50wqP5v5STNFXRithWkf0uOy0O1RmbvrkEKIKi4ltwZLxnfz99If
-         PDwtmrHI68i3JTh5diA8wxSBWPqXMJH666zSCDRMsAyHLwock28re1jHJHl1zKrXgVVW
-         hSYA==
-X-Gm-Message-State: AOJu0Yyf8GZRWd8hLpgAqMEloyALNs4/lq+UdYql8v5B0l/Ff7xPaxfr
-	lhq+3kjH1+MdSvx1y1BcUjh91MqOK2qt4bmAckSiNMNoTIbOwgE2+tmB2MNpfvCdVza3odKHgKH
-	/7jHsbyYNG9S8dIjj5IiMqgiX88FRQqsNFkw=
-X-Google-Smtp-Source: AGHT+IFFXy5b67mQyz0KTth5iz7rWl5nkq7B16idYCHQzrf0PDmk6mNS2WnZY1VaIHkB7pDzIF4QHYWqcf0GEISqdlQ=
-X-Received: by 2002:a2e:bc12:0:b0:2d2:607e:8121 with SMTP id
- b18-20020a2ebc12000000b002d2607e8121mr10516928ljf.43.1709152281420; Wed, 28
- Feb 2024 12:31:21 -0800 (PST)
+        d=1e100.net; s=20230601; t=1709152448; x=1709757248;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GnZ/zNQuaJQXIw3NunIUrkuwxIWIj26vtcUJjkjpb7M=;
+        b=HKI/QSFZjmbctcaod5EX+rZKM8JbgiAz2d3c2K5zdlgvSPs58aKsov6MyyvLSzkHaR
+         LpfVze47A+5VTlA/8V6paV2KIbwnQlCfsJD1raDOR1XWqLwOx6XKz8zqDhq6tj94uCPQ
+         GCXjOh7bCCm6Lnwa/24JhQKbobM1iKq/EHtYdKXRxf76HYUuovOGg4PNxHTdtpA9X0Ok
+         YGSsh9nleDGoCVmZ+K++tp/iGhglObJCNWJMmvj8733NYX4uOSks4sxcChpikgYAOYIX
+         Cc8toLAGegr0d11ksDL7CtibDq8uX2k9c3K42c9dv/kRndN9lRQvKZwpxXB7pDWd/guu
+         /Qew==
+X-Gm-Message-State: AOJu0YyXt45V14u7blIIbGkYnCO0bIAhQs/C+7sMQv8W8P50Ipm5Q8tQ
+	taS73DgmiHQdAgknSS9KX2CV9d7bGdkUGY5lMVPVnsznq8Rzwpc58kJCxn20
+X-Google-Smtp-Source: AGHT+IHwifEsL9Lg8cVC3dxRHYvqOl60Vr7k8qMkA8AJa8Gk9sF2e48lGzWdYSd4tCSTDa74JpDJKQ==
+X-Received: by 2002:a17:902:ee86:b0:1dc:ce28:a47d with SMTP id a6-20020a170902ee8600b001dcce28a47dmr79725pld.17.1709152448335;
+        Wed, 28 Feb 2024 12:34:08 -0800 (PST)
+Received: from [172.17.0.2] ([20.172.6.165])
+        by smtp.gmail.com with ESMTPSA id ay11-20020a1709028b8b00b001dbf5048712sm3674742plb.93.2024.02.28.12.34.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Feb 2024 12:34:08 -0800 (PST)
+Message-ID: <65df98c0.170a0220.550bb.253e@mx.google.com>
+Date: Wed, 28 Feb 2024 12:34:08 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4679466763611035885=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1709150574.git.pav@iki.fi>
-In-Reply-To: <cover.1709150574.git.pav@iki.fi>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 28 Feb 2024 15:31:08 -0500
-Message-ID: <CABBYNZ+J_SUi_T987ND3hyN228zvX0gD62QNqk5D=GDc+nypTQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/3] Bluetooth: add transmission latency tracking for
- ISO & L2CAP
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: Bluetooth: add transmission latency tracking for ISO & L2CAP
+In-Reply-To: <c99ba1062eea9d1bd463bafc7f052bd2d93de172.1709150574.git.pav@iki.fi>
+References: <c99ba1062eea9d1bd463bafc7f052bd2d93de172.1709150574.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Pauli,
+--===============4679466763611035885==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Wed, Feb 28, 2024 at 3:11=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote:
->
-> Add ISO/L2CAP socket ioctl() BTGETTXINFO which informs the user how long
-> it took the kernel and controller to complete their sendmsg(), and how
-> many sendmsg() are in socket and controller queues.
->
-> This currently provides information of the latest packet only, in
-> principle there could be a ringbuffer containing few latest packets, not
-> clear if that would be useful.
->
-> These patches allow fixing / working around controller(?) issue where
-> two ISO streams in same group get desynchronized.  Having accurate
-> knowledge of the packet queue lengths, user application can drop packets
-> if it detects the ISO streams are not in sync.
->
-> Pipewire side:
-> https://gitlab.freedesktop.org/pvir/pipewire/-/commits/iso-ts-test
->
-> With this change, https://github.com/bluez/bluez/issues/515 is more or
-> less fixed, and the sound server can figure out the total latency to
-> audio rendering (tx latency + transport latency + presentation delay).
->
-> For ISO, this can be changed to use LE Read ISO TX Sync, when the clock
-> and sequence number synchronization issues there are figured out, and a
-> quirk is added for controllers with nonfunctional implementation.
->
-> For the L2CAP latency, I'll need to think a bit more what is the audio
-> use case. Motivation was that AVDTP delay report values appear to be off
-> by ~0..40 ms compared to observed audio latency and this amount can vary
-> per connection and time, so not explained by unaccounted code
-> algorithmic delays etc. Currently it's not clear if there is relation to
-> TX side latency, so it may be down to receiver side implementation.
->
-> This needs a bit more work to figure out, but the L2CAP patch is anyway
-> here.  Due to the possible fragmentation in ISO sendmsg(), it seems we
-> anyway need the tx_info_queue thing and can't easily do it by counting
-> packets, and L2CAP required part is small addition on top of that.
+This is automated email and please do not reply to this email!
 
-That is not how it is normally done with sockets, normally this is
-done with use of SO_TIMESTAMPING which is then reported using the
-socket error queue:
+Dear submitter,
 
-https://www.kernel.org/doc/html/latest/networking/timestamping.html
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=830847
 
-Sorry to tell you just now, you might have lost a lot of time doing
-all of the changes, next time just drop and RFC early on with the
-general design so you don't spend too much time before getting any
-feedback.
+---Test result---
 
-> TBD: iso-tester / l2cap-tester tests
->
-> Pauli Virtanen (3):
->   Bluetooth: add transmission latency tracking for ISO and ACL
->   Bluetooth: ISO: add new ioctl() for reading tx latency
->   Bluetooth: L2CAP: add new ioctl() for reading tx latency
->
->  include/net/bluetooth/bluetooth.h |  39 +++++++++++
->  include/net/bluetooth/hci_core.h  |  30 ++++++++
->  net/bluetooth/hci_conn.c          | 110 +++++++++++++++++++++++++++++-
->  net/bluetooth/hci_core.c          |  14 ++++
->  net/bluetooth/hci_event.c         |  66 ++++++++++++++++++
->  net/bluetooth/iso.c               |  58 ++++++++++++++--
->  net/bluetooth/l2cap_core.c        |  12 ++++
->  net/bluetooth/l2cap_sock.c        |  50 +++++++++++++-
->  8 files changed, 372 insertions(+), 7 deletions(-)
->
-> --
-> 2.44.0
->
->
+Test Summary:
+CheckPatch                    PASS      2.92 seconds
+GitLint                       PASS      0.64 seconds
+SubjectPrefix                 PASS      0.22 seconds
+BuildKernel                   PASS      28.25 seconds
+CheckAllWarning               PASS      30.98 seconds
+CheckSparse                   WARNING   36.36 seconds
+CheckSmatch                   WARNING   98.52 seconds
+BuildKernel32                 PASS      26.86 seconds
+TestRunnerSetup               PASS      493.62 seconds
+TestRunner_l2cap-tester       PASS      17.87 seconds
+TestRunner_iso-tester         FAIL      32.55 seconds
+TestRunner_bnep-tester        PASS      4.78 seconds
+TestRunner_mgmt-tester        FAIL      112.87 seconds
+TestRunner_rfcomm-tester      PASS      7.27 seconds
+TestRunner_sco-tester         PASS      10.88 seconds
+TestRunner_ioctl-tester       PASS      7.79 seconds
+TestRunner_mesh-tester        PASS      5.82 seconds
+TestRunner_smp-tester         PASS      7.17 seconds
+TestRunner_userchan-tester    PASS      4.92 seconds
+IncrementalBuild              PASS      73.74 seconds
+
+Details
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+Total: 117, Passed: 116 (99.1%), Failed: 1, Not Run: 0
+
+Failed Test Cases
+ISO Connect Suspend - Success                        Failed       6.215 seconds
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 492, Passed: 489 (99.4%), Failed: 1, Not Run: 2
+
+Failed Test Cases
+LL Privacy - Start Discovery 2 (Disable RL)          Failed       0.182 seconds
 
 
---=20
-Luiz Augusto von Dentz
+---
+Regards,
+Linux Bluetooth
+
+
+--===============4679466763611035885==--
