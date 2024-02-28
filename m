@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BBBB14EFF5
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Feb 2024 14:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC0E14F992;
+	Wed, 28 Feb 2024 14:00:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709128833; cv=none; b=Fp9lmhFIkm0j+3ZI1RU5UDNEcMzJlzTiYoPyXLyRfyvtDT1DYiPLd4vpn3T6TLpk4raa3svFg1O4/1roI0MmqMmbt+lNiwQ499eM/V9xcJWYKgmYZCT2LEHsTm1MeozmgW40KM14HTXJEbdFi44bwjgbriLnbu4iO/z5T2Ei2Xg=
+	t=1709128833; cv=none; b=gdOmfLXOmzzVA42BepTtiMSC9oN2xhoJKd3JGxOR2tFe41Io3Qagg7bOjPs/6P1Wd+HqRP8KxwkMxSJ8QfmWPzbNGS9QHrzgg9PCd+zKV7N3Rbb/bu6U8QqRbyCCsvGHFx3ingLeZtk0Ep/3eCzXEY0/ijWZ2952ZS4euG+WnOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709128833; c=relaxed/simple;
-	bh=/WtDFE2kg9pE3YKdZktz/rLX0NGFIGOlVwyynPWU/rs=;
+	bh=FRGldkwfIaBwPgBrOO7G4I2QRVPXPDq+/BE5aGCJtLY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Kf3YkQB+SenMfhZ5D0EY//UsWvv/8F+ZWZC3T5Tm/i5j2PkftIBIxMrRpKEt/HIUyFFoE6qJDORCeUwFKheXH14txSHJtE9RvOziECFhi9B1VqKGZCOx9vZFoy6Melj1pDYrmauCqPxkTRppI3SMF2tDOkJABKHYWH0FbQzSn7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TPc6aanU; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=mTsnBjCxbUdn0kA58fuOqGMPVgc/N9/pEu5HStPGlmcPDIw2Y9YMAw6SBtqDuE54ZQdjX9c/OT6yoM7vnIGbWs8G5M4VyIgB+Sggat93qr0C3e/8l186wbSdRqN6ZpQh6L54qyx77QVRwQEiRPbgImltI40lUglQ2exMBU9Etvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=suaf1H+W; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TPc6aanU"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F3E10C433F1;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="suaf1H+W"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id ED332C43394;
 	Wed, 28 Feb 2024 14:00:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1709128833;
-	bh=/WtDFE2kg9pE3YKdZktz/rLX0NGFIGOlVwyynPWU/rs=;
+	bh=FRGldkwfIaBwPgBrOO7G4I2QRVPXPDq+/BE5aGCJtLY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TPc6aanUy5drzEzugou2+WrpYhsvsWoA2pBkLJSio0I/+7lTmlAaPaPYuG5Cuc/Pg
-	 iMEFc9Sb0ffbGoQkN2bxOawwb7AZMEw3LVgVxCvL8sBNH0n88Rs9Y/bune+f0KDNnv
-	 zlhNwiFwQ1kCIcKLK5Z2lEY7mXemCu0SXggdntQg8pRXNLBd7HnUuYuAgGH/TggHrK
-	 Z0F49BbhYc5xmwaJ+XyYVhGOMgIhtxvoIQ4K1ad1JL0RtrxJK4SJbkaiGLd+fegEDY
-	 Pc1g6MgjlPggfKzUZSY7j9ObMDXoV14dFFiZYaE1K9a4qUxrm22Ba5+NLMkM5B3O2P
-	 gBwkYzuaR6NcA==
+	b=suaf1H+W9cIihL5Rj91Wu7gJtVNybvYytAzgvhIjM0+1mL5u7C9I60MkvBh1bUCNS
+	 ORkNsGWkk6mx/jCfO3362jzBZlZXEr1Aba1fnMSyD6M7xoee1YhfHE2C7Zcq7NyLRy
+	 H0KcwwUEAd3LJY4HUh4l53I83euYNaPCbhTfqPJXMxsouUUT4o1qd0rbCkDjNE4Xro
+	 hV8XQwTUzsTtSaUWp9ey/KCb0NaBsWfBIkYTEIJdIjXYVHp0rU8KaQ/dWNBQ3/Zsev
+	 ICfz0XWMCrvIi7WzGCIwAXPSXSI4uwZ4In8Igul6XfcchEYutYADziMdYNCkh3BEB4
+	 /9CWzg1HJLbgQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D95E9D84BC5;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D0DF5D88FB1;
 	Wed, 28 Feb 2024 14:00:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -37,34 +37,39 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3] Bluetooth: hci_sync: Fix overwriting request callback
+Subject: Re: [PATCH 0/2] Bluetooth: btrtl: fix out of bounds memory access
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <170912883288.30835.15310393594185558591.git-patchwork-notify@kernel.org>
+ <170912883285.30835.6246607641130073666.git-patchwork-notify@kernel.org>
 Date: Wed, 28 Feb 2024 14:00:32 +0000
-References: <20240227220428.2035718-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240227220428.2035718-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+References: <20240223213704.290849-1-andrej.skvortzov@gmail.com>
+In-Reply-To: <20240223213704.290849-1-andrej.skvortzov@gmail.com>
+To: Andrey Skvortsov <andrej.skvortzov@gmail.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, hildawu@realtek.com,
+ alex_lu@realsil.com.cn, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org, arnaud.ferraris@collabora.com
 
 Hello:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
+This series was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue, 27 Feb 2024 17:04:28 -0500 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Sat, 24 Feb 2024 00:37:02 +0300 you wrote:
+> The problem is detected by KASAN.
+> btrtl driver uses private hci data to store 'struct btrealtek_data'.
+> If btrtl driver is used with btusb, then memory for private hci data
+> is allocated in btusb. But no private data is allocated after hci_dev,
+> when btrtl is used with hci_h5.
 > 
-> In a few cases the stack may generate commands as responses to events
-> which would happen to overwrite the sent_cmd, so this attempts to store
-> the request in req_skb so even if sent_cmd is replaced with a new
-> command the pending request will remain in stored in req_skb.
+> These commits add memory allocation for hci_h5 case.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3] Bluetooth: hci_sync: Fix overwriting request callback
-    https://git.kernel.org/bluetooth/bluetooth-next/c/afe04d6e61dd
+  - [1/2] Bluetooth: hci_h5: Add ability to allocate memory for private data
+    https://git.kernel.org/bluetooth/bluetooth-next/c/171271f419d8
+  - [2/2] Bluetooth: btrtl: fix out of bounds memory access
+    https://git.kernel.org/bluetooth/bluetooth-next/c/d8f519096785
 
 You are awesome, thank you!
 -- 
