@@ -1,79 +1,139 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com [209.85.222.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC0E14F992;
-	Wed, 28 Feb 2024 14:00:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 991CA159580;
+	Wed, 28 Feb 2024 14:56:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709128833; cv=none; b=gdOmfLXOmzzVA42BepTtiMSC9oN2xhoJKd3JGxOR2tFe41Io3Qagg7bOjPs/6P1Wd+HqRP8KxwkMxSJ8QfmWPzbNGS9QHrzgg9PCd+zKV7N3Rbb/bu6U8QqRbyCCsvGHFx3ingLeZtk0Ep/3eCzXEY0/ijWZ2952ZS4euG+WnOU=
+	t=1709132209; cv=none; b=RZbWxSVbZ69n8Dt58ZDHkK3yK4zPc+1hldJXsdR0XlcKzgUlIO4TEDkOQuKAErJojLPHgT912rrhnBI1MHhoSf8MMtn0FPx00WZ29FEjD1qU6H2aWOnPBGY0tdpSvRcZthPwqUs0UgDuBzB4NAgB121CCRI3CWjP0FM6G75UFUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709128833; c=relaxed/simple;
-	bh=FRGldkwfIaBwPgBrOO7G4I2QRVPXPDq+/BE5aGCJtLY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mTsnBjCxbUdn0kA58fuOqGMPVgc/N9/pEu5HStPGlmcPDIw2Y9YMAw6SBtqDuE54ZQdjX9c/OT6yoM7vnIGbWs8G5M4VyIgB+Sggat93qr0C3e/8l186wbSdRqN6ZpQh6L54qyx77QVRwQEiRPbgImltI40lUglQ2exMBU9Etvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=suaf1H+W; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1709132209; c=relaxed/simple;
+	bh=LFtt6jYH550GfjfnHy2suFQlJmGNsclLpKkLfTltmdc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bMxqrBSd+tTNR9cQVk4V8Yx70eYqnw52Rbe+xYzNUd4+SyuZqebFgWegrKTdSqpuMRJQkjbHxTFvG1wYpnUySnY07QG9pcE3U5jDQSVndLSSzxXSECiDG9U+XhKXXabgTIP/gNnWPQU2DxY4PA9sAv+99l8RiUO03Ue72dCkNkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GQXsno1K; arc=none smtp.client-ip=209.85.222.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="suaf1H+W"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id ED332C43394;
-	Wed, 28 Feb 2024 14:00:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709128833;
-	bh=FRGldkwfIaBwPgBrOO7G4I2QRVPXPDq+/BE5aGCJtLY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=suaf1H+W9cIihL5Rj91Wu7gJtVNybvYytAzgvhIjM0+1mL5u7C9I60MkvBh1bUCNS
-	 ORkNsGWkk6mx/jCfO3362jzBZlZXEr1Aba1fnMSyD6M7xoee1YhfHE2C7Zcq7NyLRy
-	 H0KcwwUEAd3LJY4HUh4l53I83euYNaPCbhTfqPJXMxsouUUT4o1qd0rbCkDjNE4Xro
-	 hV8XQwTUzsTtSaUWp9ey/KCb0NaBsWfBIkYTEIJdIjXYVHp0rU8KaQ/dWNBQ3/Zsev
-	 ICfz0XWMCrvIi7WzGCIwAXPSXSI4uwZ4In8Igul6XfcchEYutYADziMdYNCkh3BEB4
-	 /9CWzg1HJLbgQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D0DF5D88FB1;
-	Wed, 28 Feb 2024 14:00:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GQXsno1K"
+Received: by mail-ua1-f51.google.com with SMTP id a1e0cc1a2514c-7d5bbbe57b9so2639751241.3;
+        Wed, 28 Feb 2024 06:56:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709132206; x=1709737006; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XK6G9YO0V0Qe0S9grj3xZi7Ihi03g6FojMFTZREVg04=;
+        b=GQXsno1KtJZQU+n60DboSR8Wz1WlCvJ+tL8pWpvBcjThjvsif1ZqWUc3lB7lkxSiBO
+         mo4YJY9k6WhwowMBPTq4PfMTnYd391sK+lRbM6f+9wsqE7/QrYahPeHe26L7tmyog/1/
+         7mhPRihGf1zOHKUKFOOLJRzYr3PdtNqgdnWnd1UFKWqTHySQS1CkILjjm+NQKoLDExZ0
+         Fd7HfpfcOClZBOKc4HfAbDcLSSwDL7mIHiypEld0LNO0rFHj5VZRfg8mt7ZorelqId2p
+         of4RVC8eicgXm+izNYrLf3M+LV08PsHZ+58wP5PQ+tumVEXJIHOH2YrHk3FMt4gVL1+O
+         GoGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709132206; x=1709737006;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XK6G9YO0V0Qe0S9grj3xZi7Ihi03g6FojMFTZREVg04=;
+        b=T1R+E12klTTFYfwNNzVl4kJQc6ucT8UIRicrXjOgVbwYxpVF1SEmQGNBJQLrBJ1kiD
+         cm1s8bbuwZfAtcdpCRowksd2oqryyE/dBIHqOtPRcI8OZJ9pyX1wbwVKMFTs8Hc2CdQ8
+         hu6Pi/9aRaAFIhPH1a+iCxB3RkO72MyUbMBVybEEdJZPfK5q6w3A8+Tfb+5fcLTGMWQd
+         q92DrfMkzPAtxOMrWKQVmKNCVhKLMz5S3uidDmE0ih9AvP28mjBgcAvwOf4PjXrvw+/Y
+         q53mRRJpWIj6no+hwDlxyPnpVQO41AN5CAaFPIXZyJsjOrspxniSz0RbRuT/5biCQUvc
+         h7yw==
+X-Forwarded-Encrypted: i=1; AJvYcCWmxoFRMPvCICU6SITDVZBrnIJq1QT9OrtawVf5oBnHNyjEvOm8v29zaocWJ0nFfUVioyx0u0/AKyvlm+wGtx1XmisYcSnv
+X-Gm-Message-State: AOJu0Yy4lg10PTSdLpYojPTah8BuAHCbRNoDqt13ZPS8EVgiKrpQ5yCn
+	3UjoIS4zgrGu9XAp+0fjNMDeeDR5A0gxS0RBsLdpLek0DkleFqon
+X-Google-Smtp-Source: AGHT+IFzia7gk+Ocdm2vnl3M/Jkb3TLv9DiLZswmEV4nYrDwwVfvu3tG1QBQKhHlfd+dw54HbqC5/g==
+X-Received: by 2002:a67:eada:0:b0:472:69ab:f7be with SMTP id s26-20020a67eada000000b0047269abf7bemr1981104vso.35.1709132206229;
+        Wed, 28 Feb 2024 06:56:46 -0800 (PST)
+Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id cf4-20020a056130114400b007d648972c4esm1395580uab.4.2024.02.28.06.56.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Feb 2024 06:56:45 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: pull request: bluetooth 2024-02-28
+Date: Wed, 28 Feb 2024 09:56:43 -0500
+Message-ID: <20240228145644.2269088-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 0/2] Bluetooth: btrtl: fix out of bounds memory access
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <170912883285.30835.6246607641130073666.git-patchwork-notify@kernel.org>
-Date: Wed, 28 Feb 2024 14:00:32 +0000
-References: <20240223213704.290849-1-andrej.skvortzov@gmail.com>
-In-Reply-To: <20240223213704.290849-1-andrej.skvortzov@gmail.com>
-To: Andrey Skvortsov <andrej.skvortzov@gmail.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, hildawu@realtek.com,
- alex_lu@realsil.com.cn, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, arnaud.ferraris@collabora.com
 
-Hello:
+The following changes since commit 4adfc94d4aeca1177e1188ba83c20ed581523fe1:
 
-This series was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Documentations: correct net_cachelines title for struct inet_sock (2024-02-28 11:25:37 +0000)
 
-On Sat, 24 Feb 2024 00:37:02 +0300 you wrote:
-> The problem is detected by KASAN.
-> btrtl driver uses private hci data to store 'struct btrealtek_data'.
-> If btrtl driver is used with btusb, then memory for private hci data
-> is allocated in btusb. But no private data is allocated after hci_dev,
-> when btrtl is used with hci_h5.
-> 
-> These commits add memory allocation for hci_h5 case.
-> 
-> [...]
+are available in the Git repository at:
 
-Here is the summary with links:
-  - [1/2] Bluetooth: hci_h5: Add ability to allocate memory for private data
-    https://git.kernel.org/bluetooth/bluetooth-next/c/171271f419d8
-  - [2/2] Bluetooth: btrtl: fix out of bounds memory access
-    https://git.kernel.org/bluetooth/bluetooth-next/c/d8f519096785
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-02-28
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+for you to fetch changes up to 6abf9dd26bb1699c17d601b9a292577d01827c0e:
 
+  Bluetooth: qca: Fix triggering coredump implementation (2024-02-28 09:50:51 -0500)
 
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+ - mgmt: Fix limited discoverable off timeout
+ - hci_qca: Set BDA quirk bit if fwnode exists in DT
+ - hci_bcm4377: do not mark valid bd_addr as invalid
+ - hci_sync: Check the correct flag before starting a scan
+ - Enforce validation on max value of connection interval
+ - hci_sync: Fix accept_list when attempting to suspend
+ - hci_event: Fix handling of HCI_EV_IO_CAPA_REQUEST
+ - Avoid potential use-after-free in hci_error_reset
+ - rfcomm: Fix null-ptr-deref in rfcomm_check_security
+ - hci_event: Fix wrongly recorded wakeup BD_ADDR
+ - qca: Fix wrong event type for patch config command
+ - qca: Fix triggering coredump implementation
+
+----------------------------------------------------------------
+Frédéric Danis (1):
+      Bluetooth: mgmt: Fix limited discoverable off timeout
+
+Janaki Ramaiah Thota (1):
+      Bluetooth: hci_qca: Set BDA quirk bit if fwnode exists in DT
+
+Johan Hovold (1):
+      Bluetooth: hci_bcm4377: do not mark valid bd_addr as invalid
+
+Jonas Dreßler (1):
+      Bluetooth: hci_sync: Check the correct flag before starting a scan
+
+Kai-Heng Feng (1):
+      Bluetooth: Enforce validation on max value of connection interval
+
+Luiz Augusto von Dentz (2):
+      Bluetooth: hci_sync: Fix accept_list when attempting to suspend
+      Bluetooth: hci_event: Fix handling of HCI_EV_IO_CAPA_REQUEST
+
+Ying Hsu (1):
+      Bluetooth: Avoid potential use-after-free in hci_error_reset
+
+Yuxuan Hu (1):
+      Bluetooth: rfcomm: Fix null-ptr-deref in rfcomm_check_security
+
+Zijun Hu (3):
+      Bluetooth: hci_event: Fix wrongly recorded wakeup BD_ADDR
+      Bluetooth: qca: Fix wrong event type for patch config command
+      Bluetooth: qca: Fix triggering coredump implementation
+
+ drivers/bluetooth/btqca.c       |  2 +-
+ drivers/bluetooth/hci_bcm4377.c |  3 +--
+ drivers/bluetooth/hci_qca.c     | 22 ++++++++++++++++------
+ net/bluetooth/hci_core.c        |  7 ++++---
+ net/bluetooth/hci_event.c       | 13 ++++++++++---
+ net/bluetooth/hci_sync.c        |  7 +++++--
+ net/bluetooth/l2cap_core.c      |  8 +++++++-
+ net/bluetooth/mgmt.c            |  4 +++-
+ net/bluetooth/rfcomm/core.c     |  2 +-
+ 9 files changed, 48 insertions(+), 20 deletions(-)
