@@ -1,104 +1,106 @@
-Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD4704AEF8
-	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Feb 2024 16:31:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.176
+Received: from m16.mail.126.com (m16.mail.126.com [220.197.31.8])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BB6E41C77
+	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Feb 2024 16:55:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709224265; cv=none; b=j/EYY6xq9uJ0pE7rrID26Ji2Yp5rH1qiQnoLDxeeqfcGdWSGJHUGIyzCpLsAH2/o3kC/cFrozFqJaOsnThWmlVdAEmUGVrYCi2nZIWI/VvuqfE/83rrXGoxRHelavgLf1mk26VfiNg4FjvlO8rlXjnQIJa+yZgHX+lLfQhOyrR8=
+	t=1709225735; cv=none; b=Lb4zU6A6lJA2y2PAsdl8lsHso32Gqz2U2+qyd7GCwZsvTNHfWShLb2ZOxUNNCUNcL6SyZ/NAmEb3cT4ZsX0gczPKgUCzM5KHvHQqm/td9yodj5ratNHTXtlOPznA/WVbjRqclm06g2jKpQajkSTWn1Yr9qyEAmKDtN0ChI7pQJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709224265; c=relaxed/simple;
-	bh=MaFu1Fg0ObL6gWlE4kFys/9SUipteVOwHBiKMsA4sjo=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=H5cbccN6eIstJNEfbEsw7V7gIkKzbMnx2Qc6vJA2+l8Sg+NYj0oCcPYocLlKv6K5dkSbeRt1HWnq7aAIxk+bwG6MBrhUSjYe/x6KTJiSyL8m6lDALaPK33lK+lk12yaVgfWP9oiLrg2KX8apGVTu+bbKtjziN51M7qQ3x0fnbxo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HgwUiYTZ; arc=none smtp.client-ip=209.85.167.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1709225735; c=relaxed/simple;
+	bh=7gUIpL4jSZ3Zwe8HxthkeDpVSgu6jynmTZzfRmv/Gh0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=n7Q1JNoqPf2zPtNIQ2WL10dhvduEm5F2Qe2BiczlqxQdPTzftGNIvqDZLkmhN/mTgvp18KVDaWbtLMHxkhJeAA3FEtsUGZ+3EfFz/7HpiyW7FmCb+CdK2fOC7HqOsF+yCPj9BdSuO666QwwVFKAkLh6zjwkIeZ1kPGrzC3YUuB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com; spf=pass smtp.mailfrom=126.com; dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b=CjxURkPe; arc=none smtp.client-ip=220.197.31.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HgwUiYTZ"
-Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-3bbbc6b4ed1so791421b6e.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Feb 2024 08:31:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709224261; x=1709829061; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=vBOGhlEngIAmW7Dz4nebCD5z9cZVZe2pIRB/WyU6cno=;
-        b=HgwUiYTZ+6DAw2Y5mVJmPoNaLz4KZtLqROEalghN1anIxwVTEG9egxWOQzGtZqyTzX
-         3rWb8xUaliHTRtGdvU56sX5C7xwlgNFFRfsegAnwpFn8a/pdlNX7xMiV3QrStMA798uF
-         qrtqcKuULweadcoHX5WaaOmWQmciqauMq0EvDyFwVPhUzYpJ7JAxZrhDlTSAYweNNgSV
-         OArg9KNUXW7heGlaNJCczAGw7bt9UPjIv0LmiUlywLyTG6HzLhiz3DODDpx/lMmXBFuJ
-         JynpfiK4IpTGNUstx9RgU/J0Rnl0aRmdj5H72mEi0e4fYvIkwUUn/w2+rDiW4igDi6oZ
-         pLqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709224261; x=1709829061;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vBOGhlEngIAmW7Dz4nebCD5z9cZVZe2pIRB/WyU6cno=;
-        b=wRTFeG3phufKn9xWGiDoMsAJxWGoWUO5hhi0gktWUn99WFoUtM45kt7L6NCG/ktLr2
-         7X9vNDlMwnD2MUlQkFOICKkLzmFBEE3twEbbS+UX+rkg9qDcVrgtDNTECuf/5PZP/sV+
-         PtyTlu9fD2Sa85DVkwKVGxYVtvhibVpQfOmyPXZjy2oQ6Z9xJt/f4f4rt9cRjYOjqk5W
-         JDo6dFLf51UAMN4jyzy/Cs6FXl2Xy+8P4+GI7inqCUGNu7XO1kdBEeRuiEWoGrp+3Nmw
-         ryA4oTszp9am8pWaz2TrtJ0adYM5i0Q4nSRAfgqStjfxGOInrUAdwyglYz8GAOB6uHux
-         HnBQ==
-X-Gm-Message-State: AOJu0YzYXORjo5QhQcnfh7wXO7EwuQ44OHm0WP/zpSa/KwrPcEDkbgdP
-	nKBMd29x9Zwz5FKg+AtKSBkzAxQ/B+VjL/QSv6W5+Az+cu09N06rvUuUzkmD
-X-Google-Smtp-Source: AGHT+IFxC0b0wJ//nrKuA3Hrz5KnrrasbsmFr44rxJplNBw+dbi6cU+fRdhAROpCCfXNpBzIDZMZzQ==
-X-Received: by 2002:a05:6358:93a7:b0:17b:57a6:888e with SMTP id h39-20020a05635893a700b0017b57a6888emr2997918rwb.2.1709224261491;
-        Thu, 29 Feb 2024 08:31:01 -0800 (PST)
-Received: from [172.17.0.2] ([20.55.222.111])
-        by smtp.gmail.com with ESMTPSA id mu4-20020a056214328400b0068fd10638c0sm883819qvb.20.2024.02.29.08.31.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Feb 2024 08:31:01 -0800 (PST)
-Message-ID: <65e0b145.050a0220.a8acd.4292@mx.google.com>
-Date: Thu, 29 Feb 2024 08:31:01 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============9164300088644873148=="
+	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="CjxURkPe"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=bCZXK
+	iu56B+bwe6vJ63qmch8dj3KkivIMKRand9NPCA=; b=CjxURkPeALBrprYm9YUso
+	6HAAr9Eq4uZxtjt6DBnWuwbicusIUvIeXRi8V0VpBkSvPTMDtPBigCpA3hqD1Biu
+	K6GbdRSxfcSn1Uvf0g51n2oIzB27emi1RrxS2mQfDi5cZbAn//qLEjYZemwFAYa4
+	V8QT2TxIwo6bELpq+4k5aA=
+Received: from localhost.localdomain (unknown [58.22.7.114])
+	by gzga-smtp-mta-g1-1 (Coremail) with SMTP id _____wBHz19YrOBlKfvYBA--.2067S2;
+	Fri, 01 Mar 2024 00:10:01 +0800 (CST)
+From: Xiao Yao <xiaokeqinhealth@126.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Xiao Yao <xiaoyao@rock-chips.com>
+Subject: [PATCH BlueZ 1/1] avrcp: Add strict checks for supported events
+Date: Fri,  1 Mar 2024 00:09:55 +0800
+Message-Id: <20240229160955.530638-1-xiaokeqinhealth@126.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1] shared/bap: Remove bt_bap_stream_bcast_new
-In-Reply-To: <20240229151755.2589489-1-luiz.dentz@gmail.com>
-References: <20240229151755.2589489-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wBHz19YrOBlKfvYBA--.2067S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7uw48XrW8Zr1rZr1rXryrJFb_yoW8Kr1UpF
+	W7WFy3KrZxJFs2qr9FqasYg39I9FW8Cr929r15Xw17Zr43GFy5tF10kF13ta4DZrsFgrW0
+	vF15tay2va1UuFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07USeHgUUUUU=
+X-CM-SenderInfo: 50ld0yhhtl0xhhdo3xa6rslhhfrp/1tbiEBqT1WVLaHwA4wAAsV
 
---===============9164300088644873148==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Xiao Yao <xiaoyao@rock-chips.com>
 
-This is automated email and please do not reply to this email!
+In some resource-limited embedded systems, if the player is not
+registered, but the supported event contains the status/track/
+settings events that need player support, it will return some
+unreasonable values to the peer, which will cause confusion on
+the peer device and cause some unknown problems.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=831152
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.47 seconds
-GitLint                       PASS      0.30 seconds
-BuildEll                      PASS      23.78 seconds
-BluezMake                     PASS      724.51 seconds
-MakeCheck                     PASS      12.30 seconds
-MakeDistcheck                 PASS      162.73 seconds
-CheckValgrind                 PASS      228.64 seconds
-CheckSmatch                   PASS      330.72 seconds
-bluezmakeextell               PASS      107.48 seconds
-IncrementalBuild              PASS      677.84 seconds
-ScanBuild                     PASS      942.33 seconds
-
-
-
+In my test scenario, bluez was the role of the source to connect
+the bose speaker. bluez could send absolute volume to the bose
+speaker, but it could not adjust the volume of bluez. By checking
+the btsnoop, we could see that bluez had registered volume change
+notification. When I removed the events above, everything worked
+fine. I also tested on iPhone/Android and everything worked fine.
 ---
-Regards,
-Linux Bluetooth
+ profiles/audio/avrcp.c | 23 ++++++++++++++---------
+ 1 file changed, 14 insertions(+), 9 deletions(-)
 
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 36ce01a14..34fc23306 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -4152,21 +4152,26 @@ static void target_init(struct avrcp *session)
+ 
+ 		init_volume = media_player_get_device_volume(session->dev);
+ 		media_transport_update_device_volume(session->dev, init_volume);
+-	}
+ 
+-	session->supported_events |= (1 << AVRCP_EVENT_STATUS_CHANGED) |
+-				(1 << AVRCP_EVENT_TRACK_CHANGED) |
+-				(1 << AVRCP_EVENT_TRACK_REACHED_START) |
+-				(1 << AVRCP_EVENT_TRACK_REACHED_END) |
+-				(1 << AVRCP_EVENT_SETTINGS_CHANGED);
++		/* These events below requires a player */
++		session->supported_events |= (1 << AVRCP_EVENT_STATUS_CHANGED) |
++					(1 << AVRCP_EVENT_TRACK_CHANGED) |
++					(1 << AVRCP_EVENT_TRACK_REACHED_START) |
++					(1 << AVRCP_EVENT_TRACK_REACHED_END) |
++					(1 << AVRCP_EVENT_SETTINGS_CHANGED);
+ 
+-	if (target->version < 0x0104)
+-		return;
++		if (target->version < 0x0104)
++			return;
+ 
+-	session->supported_events |=
++		session->supported_events |=
+ 				(1 << AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED) |
+ 				(1 << AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED) |
+ 				(1 << AVRCP_EVENT_VOLUME_CHANGED);
++	} else {
++		if (target->version > 0x0103)
++			session->supported_events =
++					(1 << AVRCP_EVENT_VOLUME_CHANGED);
++	}
+ 
+ 	/* Only check capabilities if controller is not supported */
+ 	if (session->controller == NULL)
+-- 
+2.34.1
 
---===============9164300088644873148==--
