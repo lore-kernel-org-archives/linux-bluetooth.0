@@ -1,78 +1,113 @@
-Received: from m15.mail.163.com (m15.mail.163.com [45.254.50.219])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FA7D50A63;
-	Thu, 29 Feb 2024 08:41:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.50.219
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53A875D91B
+	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Feb 2024 09:33:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709196083; cv=none; b=ijjhR7wqG4ke6DmZbRm2hWTL3WtC6SJyf9jaTimldipDJa2NNIPcBRrYLU4DUbQ6SszXQHLi6WtLOW0o6u0/atO3ztdHiAoiY73rdC0k7JzqEKBoDdVD/IqTol7Z4kmxwpNQat0+EDRpQQ7OI0joNaH3qAuhrkEN6P3AysDwg14=
+	t=1709199225; cv=none; b=He+jq2bR0YL5ZidSfa7FE7bEFB6KuqSMIUGQFJorSxkBV6TrVbSfli4+XmPTwWIgCQ62Kt8DGPqA8f7xbS9SgIhq6gvryP3Cg6ycsat/C2HJOnTJquFH4ydoSb/eh5tApbPw+bFTBO+APqUX9iBPnqvCKnZzKbFaObmeyqlhtRk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709196083; c=relaxed/simple;
-	bh=03KT88bs5CPFUzGWiSf0JoK4aabPHEcPRG/J8ct3YMs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UoSXKS7WiStDvQreBKx7yXhbaUIjvyU0L+AT6svNTzb2/NCaAmm2eGLIaphbvCfViauj9YXJziS2xynvQ7rpfffhGcgThcEwvova5VFFvVyR2KaZvOkgNP7NM5KlpkLzQorFvUtOIWuSBwG8apBPbDkQ77PIZAu8PMWt4GIvDuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=gQXMnted; arc=none smtp.client-ip=45.254.50.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1709199225; c=relaxed/simple;
+	bh=atF7Yzid6BWop89/Zxc+TPhf48cWY50fQBNJerc+C1U=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=M0Nyy4tTqn288pMvznxLPoU1x/gI4Qwz2q45odjho+m/a4e5yAQl2HLqvsa3mLjR9WDZVthGQyddRQRxSibm2HyIHCVKzADStFRqer82pkVIeoktd8MCLbNbcSu0G51+q601wXOmopmQi8AQvMfO5Ug3iKw7bbv/N/iISW7+1C0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hPTGkTGS; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="gQXMnted"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=hyAxN
-	nJEjaEeWu++V1hIX4/hQ1ibrMzym3D/Hwm9ZGQ=; b=gQXMntedUhlzrlxQ4uEv6
-	zKmC6QNXfalg9kKuLxySTnTzIws33S1WybuoCtsfhXs348FFRWVuoVzqZKNsMYd0
-	qiRt7N23hA4nB/Qprz6wF1C0HHgwGh5/DsMJFhZ6UlhZMocoNO4j5+W1YUxlSpSL
-	vOWw3irxW37MRHfIg31r1I=
-Received: from WH-D-007635B.QUECTEL.COM (unknown [223.76.229.213])
-	by gzga-smtp-mta-g0-4 (Coremail) with SMTP id _____wD33oYhQ+BloLRsGg--.37440S2;
-	Thu, 29 Feb 2024 16:41:07 +0800 (CST)
-From: clancy_shang@163.com
-To: marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	zhongjun.yu@quectel.com,
-	Clancy Shang <clancy.shang@quectel.com>
-Subject: [PATCH] Bluetooth: mgmt: Fix wrong param be used
-Date: Thu, 29 Feb 2024 16:40:59 +0800
-Message-Id: <20240229084059.895730-1-clancy_shang@163.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hPTGkTGS"
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1d93edfa76dso7013085ad.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Feb 2024 01:33:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709199223; x=1709804023; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=w6oLGGAqlSorq+09qp4BqoCYKuMulCfx3dZOvD3GgW4=;
+        b=hPTGkTGShjazTXUsM7xTwsSnOxEIOYuhyppgcuiL5+naKp2DB9jIlr5dChVWODX/oc
+         KyqzZB7/INCwcgXLHyoGcH6KK+/4dxAxHGIt/mZXDA9fsCw/yP3GSx5Y3KTre1slT4mX
+         qRMeoz76WqHOhHzBeF1MFLN/gC90UfOAqg10mJtm4prswX0bcJgAC6wTitZqagKj3yFD
+         QlFZaYuXCVpA90hbcMLZz2XcOMucO7cLY5EF5wv0eVBKyPvohFXXfIPlEx3iHkseXetP
+         f7N6EQtZ8P2YWMYC0oYv4JbTzqMazXD60avI8o4uumAC3pWO0NFTmQVR011wx8fQKOXz
+         wugA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709199223; x=1709804023;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=w6oLGGAqlSorq+09qp4BqoCYKuMulCfx3dZOvD3GgW4=;
+        b=BuwuCaLk7utQ8jijMmtKqpiAqjfJ680xiaFsbwfLuXef3T0m6CXdkDgZxsrbvJvhki
+         +yTF6f5XZMsUFU3a2KoZXS3yjVQ/u9xW5DivKgPk1yoVEd7ArmYsx2R/wayZzW0yG0FS
+         FJ/+wjyu3q9wX4jSLG30cfbCCTwCDq58NdfYQQJgZESwlCBVIlZv6BR6Gqb2DCDgCWYu
+         7Ya3b34defqOqPUKcsSPWTWuC7yY5ovEdG8NinfNFanSuRaUefyAMoK7gEcdqxlqd182
+         tKZ0jiwpKTtsZji8Rpvrfm9q1mghQ/ccz7Fv/KtKaWwBq6bTdKEUgkrJvfl8pm9H6RaS
+         VBrA==
+X-Gm-Message-State: AOJu0YwJELDuUKXquzJdMVvtid6jXZZtujagfPbzT8+z4d/CAM0iFlaB
+	GLm8InsXM4gR1jIBDueMWIpOjFUzz/EFcrzlhTQ9zUImEvGKESP37QMIANfr
+X-Google-Smtp-Source: AGHT+IFt+v9CElhWEGxJRNdMj82pN8WEPZU/ncZqwfE9TNw0ZrWRN+1aNAicF3+pyNCjo96Mwr/VeQ==
+X-Received: by 2002:a17:903:2405:b0:1dc:71b6:5727 with SMTP id e5-20020a170903240500b001dc71b65727mr1662633plo.50.1709199223300;
+        Thu, 29 Feb 2024 01:33:43 -0800 (PST)
+Received: from [172.17.0.2] ([13.83.123.115])
+        by smtp.gmail.com with ESMTPSA id c18-20020a170903235200b001dc6f7e794dsm990300plh.16.2024.02.29.01.33.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Feb 2024 01:33:43 -0800 (PST)
+Message-ID: <65e04f77.170a0220.8455e.2912@mx.google.com>
+Date: Thu, 29 Feb 2024 01:33:43 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0558368282656761322=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD33oYhQ+BloLRsGg--.37440S2
-X-Coremail-Antispam: 1Uf129KBjvdXoWrKrW7WF4rWw1UWF1rXFWUArb_yoWDZFXEgF
-	409ay7uF4UXryvyF4Y93WrWr1Sya4a9Fs7Xr9xKrWxAr98Gr1UuFn7AF9xJFn3uanxZrn7
-	Zr4DXF4F9w409jkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU01q2tUUUUU==
-X-CM-SenderInfo: xfod0ux1bvxtlqj6il2tof0z/1tbisAiLuGV4H-ePSAABs4
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, clancy_shang@163.com
+Subject: RE: Bluetooth: mgmt: Fix wrong param be used
+In-Reply-To: <20240229084059.895730-1-clancy_shang@163.com>
+References: <20240229084059.895730-1-clancy_shang@163.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Clancy Shang <clancy.shang@quectel.com>
+--===============0558368282656761322==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-if the BlueZ library calls the API interface "adapter_set_device_flags",
-which sends the "MGMT_OP_SET_DEVICE_FLAGS" opcode to the kernel, but
-does not receive the callback message "MGMT_EV_DEVICE_FLAGS_CHANGED"
-from the kernel. it fixs this bug.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Clancy Shang <clancy.shang@quectel.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=831013
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.48 seconds
+GitLint                       PASS      0.21 seconds
+SubjectPrefix                 PASS      0.06 seconds
+BuildKernel                   PASS      28.00 seconds
+CheckAllWarning               PASS      30.85 seconds
+CheckSparse                   PASS      36.39 seconds
+CheckSmatch                   PASS      99.08 seconds
+BuildKernel32                 PASS      27.03 seconds
+TestRunnerSetup               PASS      502.24 seconds
+TestRunner_l2cap-tester       PASS      19.46 seconds
+TestRunner_iso-tester         PASS      32.42 seconds
+TestRunner_bnep-tester        PASS      4.74 seconds
+TestRunner_mgmt-tester        PASS      109.42 seconds
+TestRunner_rfcomm-tester      PASS      8.42 seconds
+TestRunner_sco-tester         PASS      14.95 seconds
+TestRunner_ioctl-tester       PASS      7.88 seconds
+TestRunner_mesh-tester        PASS      5.90 seconds
+TestRunner_smp-tester         PASS      6.91 seconds
+TestRunner_userchan-tester    PASS      5.01 seconds
+IncrementalBuild              PASS      26.91 seconds
+
+
+
 ---
- net/bluetooth/mgmt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 9dd815b6603f..c74abdf3618f 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -5177,7 +5177,7 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- done:
- 	if (status == MGMT_STATUS_SUCCESS)
--		device_flags_changed(sk, hdev, &cp->addr.bdaddr, cp->addr.type,
-+		device_flags_changed(NULL, hdev, &cp->addr.bdaddr, cp->addr.type,
- 				     supported_flags, current_flags);
- 
- 	return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_SET_DEVICE_FLAGS, status,
--- 
-2.25.1
 
+--===============0558368282656761322==--
