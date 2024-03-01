@@ -1,89 +1,84 @@
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF51C3FE23;
-	Fri,  1 Mar 2024 05:53:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 980A3224C9;
+	Fri,  1 Mar 2024 07:48:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709272403; cv=none; b=DClwS/FvRRKvhMLT9glWZ6G+BwY1NerM2fR6dhMRb/4Rui91FuMGMSqMHEvQf7lBY0LIKLlBb2kRtWu/hEc0FtNBJotZ9QTG2vtmySjTsuRPc9QuW30qOdf8b0ssf0UZu9WvM9oSCEQLBovriTIKywam80Ezn4i88jVqUHrcBy8=
+	t=1709279338; cv=none; b=ItdkEkWbAY6XwG7/ge1MvvNwjrYii1cBpHQgyi+yZd/Zn2oHJEplbTuEHKwm/0yP6H7XMdgVCkbkIJMQ6xxJfD8vHj7Yng06YYT2MOKdPbGXXdap01PNrhbMKgx4DmLim11nf7nS4s09nRxI9JRQ5Iiz9H4WdedXiirsXKI/K3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709272403; c=relaxed/simple;
-	bh=5TgWZb4/KOE0mCOVJEt0Xmql79Rk7IHFG+Z2FeL2hOM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lWrJcjFe16zWiftiXDWMEjBeJkOggDyowiwFA3Fjxdfos9kWxKsiuhdu4Ropx33AX3lkwuNPIMvi4ll/Bug8K1E/hvB5mjC00TeLBTb6Vd+wKpF/aVUzdeI/OAPWVxnvOF7rMY+hGTq5lefssUNcwe9gv+WQOt33Zu96nFOY7Hg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=fg9cY+vd; arc=none smtp.client-ip=80.237.130.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="fg9cY+vd"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:
-	Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
-	In-Reply-To:References; bh=ncXBQX+kSqn2nKAzLMBhXZ/NTpGfNX4QeH2wgUJQDLU=;
-	t=1709272401; x=1709704401; b=fg9cY+vdRQ/5I1wx0xTsG4qDZg1EbxfVpZh9frGXqmf4pOa
-	fYvJSOqMLW4UxAasulNfqeSkEwrtUYob0CLjYXE8m+sOotSN8n9Tlgz2onrfheEh5vsUDkv+PZkGB
-	VUYonlLGxcsf6yWwUiS274ztj18gvzPIoGE8mq1QGJbDw9Pl07PK0is2FRv+ip2hi0h61I1sldYiI
-	WkRaKPoic0lv8ZchRhgfCDUWsxPrPwBqOV5lGTERizWI7UiksEeGDTeTA/JBh2IuuatI+EWnIAFd8
-	6Esvk+tgvpjiiSZa/h7NFIza2/dIqvjdM61zakYY21m2e41Hd/A7/g92g/nwcy2w==;
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1rfvpd-00044Z-Up; Fri, 01 Mar 2024 06:53:18 +0100
-Message-ID: <7639639c-7c63-44a9-81bc-f9093b70559f@leemhuis.info>
-Date: Fri, 1 Mar 2024 06:53:17 +0100
+	s=arc-20240116; t=1709279338; c=relaxed/simple;
+	bh=E/ihWaWaF4K9BLjfH+VCqKUQ3nWg1zKktoSPxclj7M0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Whzk8r4usykXguk9Hnq5bCG+M14Xre4Le7IeC4mgUBMfrm36LCHrWdM8TQ5M7HGgj+0vT7Z95ZHKVszi44EJ289H7BQusCynFDrhZzEJGvUsSZsaibXG5fuJ+iRKP++zoqMxzfJl4kkyQrynvRoG+L/EMd34THqkfbe6mb7zids=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from r.smirnovsmtp.omp.ru (10.189.215.22) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Fri, 1 Mar
+ 2024 10:48:41 +0300
+From: Roman Smirnov <r.smirnov@omp.ru>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Roman Smirnov <r.smirnov@omp.ru>, Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Sergey Shtylyov
+	<s.shtylyov@omp.ru>, <linux-bluetooth@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
+Subject: [PATCH 0/2] Bluetooth: mgmt: remove useless NULL checks
+Date: Fri, 1 Mar 2024 07:48:22 +0000
+Message-ID: <20240301074824.1259409-1-r.smirnov@omp.ru>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Bluetooth: af_bluetooth: Fix Use-After-Free in bt_sock_recvmsg
-Content-Language: en-US, de-DE
-To: linux-bluetooth@vger.kernel.org
-Cc: stable@vger.kernel.org, regressions@lists.linux.dev
-References: <20240226213855.GB3202@hostway.ca>
-From: "Linux regression tracking #adding (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <20240226213855.GB3202@hostway.ca>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1709272401;a6bacc60;
-X-HE-SMSGID: 1rfvpd-00044Z-Up
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 03/01/2024 07:24:14
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 183879 [Mar 01 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;r.smirnovsmtp.omp.ru:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 03/01/2024 07:28:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 3/1/2024 3:59:00 AM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On 26.02.24 22:38, Simon Kirby wrote:
-> 
-> I bisected a regression where reading from a Bluetooth device gets stuck
-> in recvfrom() calls. The device here is a Wii Balance Board, using
-> https://github.com/initialstate/beerfridge/blob/master/wiiboard_test.py;
-> this worked fine in v6.6.1 and v6.6.8, but when I tried on a v6.6.14
-> build, the script no longer outputs any readings.
-> 
-> 1d576c3a5af850bf11fbd103f9ba11aa6d6061fb is the first bad commit
-> 
-> which maps to upstream commit 2e07e8348ea454615e268222ae3fc240421be768:
-> 
-> Bluetooth: af_bluetooth: Fix Use-After-Free in bt_sock_recvmsg
-> 
-> With this commit in place, as also in v6.7 and v6.7.6, the script does
-> not output anything _unless_ I strace the process, in which case a bunch
-> of recvmsg() syscalls are shown, and then it hangs again. If I ^C the
-> strace and run it a few times, eventually the script will get enough data
-> and output a reading.
+Svace reports NULL check after dereference in
+mgmt_set_connectable_complete() and add_ext_adv_params_complete().
+The following patches remove these checks.
 
-Thanks for the report. To be sure the issue doesn't fall through the
-cracks unnoticed, I'm adding it to regzbot, the Linux kernel regression
-tracking bot:
+Found by Linux Verification Center (linuxtesting.org) with Svace.
 
-#regzbot ^introduced 2e07e8348ea454
-#regzbot title af_bluetooth: reading from a device gets stuck in
-recvfrom() calls
-#regzbot ignore-activity
+Roman Smirnov (2):
+  Bluetooth: mgmt: remove useless NULL checks in
+    mgmt_set_connectable_complete()
+  Bluetooth: mgmt: remove useless NULL checks in
+    add_ext_adv_params_complete()
 
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
---
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-That page also explains what to do if mails like this annoy you.
+ net/bluetooth/mgmt.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+-- 
+2.34.1
