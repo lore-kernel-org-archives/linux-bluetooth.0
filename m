@@ -1,98 +1,113 @@
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E1376EB6B;
-	Fri,  1 Mar 2024 13:39:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 662AE1C05
+	for <linux-bluetooth@vger.kernel.org>; Fri,  1 Mar 2024 14:31:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709300394; cv=none; b=pj6DGNAJnpHsiIGG/xw4+5EBvHrO2nFz90CMVlO9wEjU6cgP1H6tBWjBaLAnEnhLm9BBNo6tyVXhTAR+znVjLIny5GSFTNavdRGj0GeEmRWBESMWu9JVzKZpfb6Z8I7AmEyvMTAsI1Qfc3SiR1H/qD4E6MQTX1kTH4UTVqPyooA=
+	t=1709303510; cv=none; b=oaqbjKcoS6Ro7iyPtJn0TUoKMxDNzWblF6hhsZ7cENX54XixexTnuSJh06DCIUUV8rHaJB7T6AxS4/zcNKP7SYI2YvQ+90sRkANCw/brlcbpdOsuqPXbkjmoaX4qtd5zgQBiF+S2xRBQpM4x+niUabvNYNEzPNAAUGeJyOjmsEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709300394; c=relaxed/simple;
-	bh=V2rng/KDEPN7OaZoxlqZdAX9L9wicAGD3trWoJMgFDc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NB1UbnczrKXcCyhos3W7RdenUAiTG2/TX64lWR1b4rJMhsTObrsSrk1iUG34cGFejtAorcXmFLEQO4qurB6xExmOAFt2d/WvU+blMh+lNmJgb+D1aoxDPPTiFoq9OWTlKhryXg6HfHD4W/i3s2Tbt6f42r6G9yd4xDw54Gwj6Hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from r.smirnovsmtp.omp.ru (10.189.215.22) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Fri, 1 Mar
- 2024 16:39:35 +0300
-From: Roman Smirnov <r.smirnov@omp.ru>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Roman Smirnov <r.smirnov@omp.ru>, Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Sergey Shtylyov
-	<s.shtylyov@omp.ru>, <linux-bluetooth@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
-Subject: [PATCH v2 2/2] Bluetooth: mgmt: remove NULL check in add_ext_adv_params_complete()
-Date: Fri, 1 Mar 2024 13:39:16 +0000
-Message-ID: <20240301133916.1268403-3-r.smirnov@omp.ru>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240301133916.1268403-1-r.smirnov@omp.ru>
-References: <20240301133916.1268403-1-r.smirnov@omp.ru>
+	s=arc-20240116; t=1709303510; c=relaxed/simple;
+	bh=ap7Uk6vd1pnKDkARxCbZ2TM/Pbrqts/FVed5Osnn7C0=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=hFrIAj4+WU28GZHTSD1LbTQP6ctFyx57gZkwhWGlrgNxym47dkoS8TTHu5zMpWG/vkBR+AmSNNmBLfKNfe+7ZqeCP7KQbFL+YMGNN5TwHNAtk4wGgSHL69TLdgsaGsYDIzYbu+IEpYF7f7LghPO8LPKqXn2TDKP8/kNLRDf+MKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rlw5WfcP; arc=none smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rlw5WfcP"
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-68fe8e20259so11154106d6.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 01 Mar 2024 06:31:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709303508; x=1709908308; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=7L8Zud0enqTNQldgkV+OQqkKoUch14A5UAgmKhCs5hY=;
+        b=Rlw5WfcPcvAiILIdU5RJ+pgiPLzwWNteo226NUWoqJ5A+HiCGmITLjUfiY2j1wpfNp
+         EoFmPl9bx4iHuOxtaPlcPmqofV+SYUaXQjf2eiq+vpTBf/4bzKema7LZjahOOpY5O1sY
+         6oWNEusiTg4ETSi/GdZvjVelamq2ehCBRdUuDZdZ7yVVdNg5lD/94YAScU5yf64JbRls
+         Qv/7ofpOiQp7x8EikADa8V0NCQST3ADaQa8+zRGYNrwi8ui8RktNpksq0hwO3xAjYPDg
+         j3xKsocA/NaY4cySYglatvCtmZvUhKueXvCRTkmY5OSU9adartK1XWazuVHm5OGTTUgA
+         +43A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709303508; x=1709908308;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7L8Zud0enqTNQldgkV+OQqkKoUch14A5UAgmKhCs5hY=;
+        b=c7dF5jf5Sn+o5jpiLL2rs/6nvIBNcrES7rqBcy6LWZsy8jhNgXLd3hZqFNsaQ/yNrE
+         7yI/T5+Pr2qc/6ECcwwvph3CyUGdvuIZaQvnNdzXd73htpzKT+wsZQSVrOjnpMYn5bxF
+         uJHlQmD0suF32KsejIypIt4ygltplwGlfzkd7wvBh0QU36oSvUCCla/OLbZjn1yKvFIu
+         jn7YjjxfIUmtIJ1uCkVY891RdQI+bvSzL4Wo2B55Qgx60OKDap14Qq4xHwsNPL2WCr0T
+         q9m3nOyZUqsHdJa6orp5iaLaXUULFyNgkf2pEOH1ArKc5E77xTvDvhy2izbcuQTpSDU5
+         ohgQ==
+X-Gm-Message-State: AOJu0YwhhLuAO4ICyU9vMvLdJ7NS4znNWKAzbjpEN2yya1/URtSwmoCV
+	+gGki33Z2Osc3eT5SZixakfDKrNwttWXs4B25UpMvtGIvfraTnbmB0eDk80V
+X-Google-Smtp-Source: AGHT+IG0bAYsrlLehagzW4UHOKxMdbKVPEuPF9McHijtsby8ElpVioCNQCYA8X61MkJp6/K3p2kjdw==
+X-Received: by 2002:a0c:bf0f:0:b0:690:3099:6e21 with SMTP id m15-20020a0cbf0f000000b0069030996e21mr1706255qvi.4.1709303508141;
+        Fri, 01 Mar 2024 06:31:48 -0800 (PST)
+Received: from [172.17.0.2] ([23.100.70.210])
+        by smtp.gmail.com with ESMTPSA id ow1-20020a0562143f8100b0068c8be959a0sm1909347qvb.111.2024.03.01.06.31.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Mar 2024 06:31:48 -0800 (PST)
+Message-ID: <65e1e6d4.050a0220.8f323.8e24@mx.google.com>
+Date: Fri, 01 Mar 2024 06:31:48 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3053726172324725826=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 03/01/2024 13:19:36
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 183893 [Mar 01 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info:
-	127.0.0.199:7.1.2;omp.ru:7.1.1;r.smirnovsmtp.omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: FromAlignment: s
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 03/01/2024 13:26:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 3/1/2024 10:14:00 AM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, r.smirnov@omp.ru
+Subject: RE: Bluetooth: mgmt: remove useless NULL checks
+In-Reply-To: <20240301133916.1268403-2-r.smirnov@omp.ru>
+References: <20240301133916.1268403-2-r.smirnov@omp.ru>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Remove the cmd pointer NULL check in add_ext_adv_params_complete()
-because it occurs earlier in add_ext_adv_params(). This check is
-also unnecessary because the pointer is dereferenced just before it.
+--===============3053726172324725826==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Found by Linux Verification Center (linuxtesting.org) with Svace.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Roman Smirnov <r.smirnov@omp.ru>
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=831524
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.24 seconds
+GitLint                       PASS      0.62 seconds
+SubjectPrefix                 PASS      0.24 seconds
+BuildKernel                   PASS      27.82 seconds
+CheckAllWarning               PASS      30.33 seconds
+CheckSparse                   PASS      36.28 seconds
+CheckSmatch                   PASS      97.76 seconds
+BuildKernel32                 PASS      26.87 seconds
+TestRunnerSetup               PASS      495.91 seconds
+TestRunner_l2cap-tester       PASS      18.05 seconds
+TestRunner_iso-tester         PASS      28.31 seconds
+TestRunner_bnep-tester        PASS      4.78 seconds
+TestRunner_mgmt-tester        PASS      111.03 seconds
+TestRunner_rfcomm-tester      PASS      7.36 seconds
+TestRunner_sco-tester         PASS      14.95 seconds
+TestRunner_ioctl-tester       PASS      7.87 seconds
+TestRunner_mesh-tester        PASS      5.91 seconds
+TestRunner_smp-tester         PASS      6.84 seconds
+TestRunner_userchan-tester    PASS      4.97 seconds
+IncrementalBuild              PASS      32.08 seconds
+
+
+
 ---
- net/bluetooth/mgmt.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index cd8c4e094c55..b48d2d974263 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -8826,8 +8826,7 @@ static void add_ext_adv_params_complete(struct hci_dev *hdev, void *data,
- 	}
- 
- unlock:
--	if (cmd)
--		mgmt_pending_free(cmd);
-+	mgmt_pending_free(cmd);
- 
- 	hci_dev_unlock(hdev);
- }
--- 
-2.34.1
+
+--===============3053726172324725826==--
