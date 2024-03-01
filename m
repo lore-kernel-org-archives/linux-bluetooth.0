@@ -1,87 +1,70 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BA3253387
-	for <linux-bluetooth@vger.kernel.org>; Fri,  1 Mar 2024 20:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A231B5732A;
+	Fri,  1 Mar 2024 21:18:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709326231; cv=none; b=KesfoXqa5l6EzF1QIgKw2J2D0EjC+psP5ahif6xirNEZ0QTM2di9LSOlUlH4xFLiYAwGVBu4jak3RUwD2AMObtswvZHbIEZJGEcZjtRKeD6cYF0Z7hLeewgvhoEsvFa4/aPVmU1rvVcXw4Xn9DGfH+CvlWDn/9UsExOk8zdNlhw=
+	t=1709327889; cv=none; b=V+QEx/xrekCyVZDxNiifb2EALu4G3fN9zKuclMR1vmgWnC781rCZ+L/fr6DO23elNaK8lYGqXaqDWg1uPTl02CuYyv6cfiwbleYGfuZPKQpVA3qomMUUtuCfwjusKe3FAGgJmvGqEnOkmzM3Lx0oGc2HMOyvoCWHSKb25vWIsbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709326231; c=relaxed/simple;
-	bh=vMHvvjIGNjRXSpoBJE90jxtUemciKmETEpBUUhXeKZQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=er6rfPp8oefSg3ECpsJ7kzqWhOzf8miOdQNqI1Z+c1X6NXiDf70w/+5wGcNvCsI5Pj9c4iIoTViYyaUgWnH+2Z2e3AcqlK8aDZJ4t9SBDrNqNCtox4Ukn3rLbYGZ8a2Xi8tiRj1XaIIoQ3/kS75zOKPU9fM3k4nV37h0n74h0/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vRf0sYRl; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1709327889; c=relaxed/simple;
+	bh=zxytVGMfrFUkY7rHqDZSUhzm0IK8y99ueBD485sWH9U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n9hQRh13A4bgPMORj+PVbQu9/F+/NAiU8cn2BQg2eJAg6ibwplTPJup/ai2S12G3e1y0xDLZRdUPIrh5tO4F32MSg37U/kGPBrrX7YHtQlIBArJIo3M+DtUB4hp/wjdqBskeuVyGDYuXiZNqfluZaZuo171QI2QU7KSGPFHjdoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UCPijtkV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vRf0sYRl"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4412EC433F1;
-	Fri,  1 Mar 2024 20:50:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UCPijtkV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9FD0C433C7;
+	Fri,  1 Mar 2024 21:18:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709326231;
-	bh=vMHvvjIGNjRXSpoBJE90jxtUemciKmETEpBUUhXeKZQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=vRf0sYRlX8WeoxYwdy09kMHQ9CnfPFvDgSEwF6LdX7E87hWcSl3xzodcf3DI+mUp4
-	 QU4cm8nOecCco9nThuzwol0qMh6w+ja6qeGsu0daExotpqMQiaU4qEMNGRK5JHcyJY
-	 Ae1ycQEwMd+gNy7pxhuPh7NikS1DnJbw4vyxyx7qoXVyX8NHr4LO1DNP/C3CeMOezV
-	 3kC85EcXw5fo1q5nu7fae24yHkRis6IwIzy7zaKlOpy5gBn5ly5TKW4R9f7SwSh3Xc
-	 dSXVhnCv/ZPFo2fbNrBgsewseLAQphNm8bKgLAZT08LotS3iAbmWuyzPtX9CAq/uze
-	 1bUSKkRLwkUJQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 27464C595C4;
-	Fri,  1 Mar 2024 20:50:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1709327889;
+	bh=zxytVGMfrFUkY7rHqDZSUhzm0IK8y99ueBD485sWH9U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UCPijtkVbQ0865AGd1T4TriEvEbD8D5U1299GvPKjhYoyWpCmvkd2F8wd8BU8DwxY
+	 mHnIOva7/Aa7MxuBsF045XWM7rQluulU7BAauACMDJkokKG6FnxoElDCv6kw3u+1Bn
+	 tAnGmadabtuDvT/t3CtHXGcUcMTqX/QZ8ArE11JI9ZNlrTCXgCg1F1rdCOmnc5hVbx
+	 /IFAqQi3Nfh3YpOdyPyCruc4P1w2CiM4rmNtR3p6JMDrIISUPxoVEwhdzuoAOWrEH9
+	 sXwnPwaAIPHl/oSzZCoHm0s3/+L9jsO+uUEiOSQBspk/6SNVeCHgdM1qUZlSY6Hi08
+	 PoP5t6LXKXVyw==
+Date: Fri, 1 Mar 2024 15:18:06 -0600
+From: Rob Herring <robh@kernel.org>
+To: Jeffrey Hugo <quic_jhugo@quicinc.com>
+Cc: quic_bgodavar@quicinc.com, marcel@holtmann.org, quic_rjliao@quicinc.com,
+	linux-bluetooth@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	luiz.dentz@gmail.com, edumazet@google.com, netdev@vger.kernel.org,
+	davem@davemloft.net, krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org, quic_bjorande@quicinc.com,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH RESEND] dt-bindings: net: bluetooth: qualcomm: Fix
+ bouncing @codeaurora
+Message-ID: <170932788622.3054344.2673462722673584802.robh@kernel.org>
+References: <20240223162027.4016065-1-quic_jhugo@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v5 0/6] Update Sink BASE management
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <170932623115.13774.13135467294587042748.git-patchwork-notify@kernel.org>
-Date: Fri, 01 Mar 2024 20:50:31 +0000
-References: <20240301150029.14386-1-andrei.istodorescu@nxp.com>
-In-Reply-To: <20240301150029.14386-1-andrei.istodorescu@nxp.com>
-To: Andrei Istodorescu <andrei.istodorescu@nxp.com>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
- mihai-octavian.urzica@nxp.com, silviu.barbulescu@nxp.com,
- vlad.pruteanu@nxp.com, iulia.tanasescu@nxp.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240223162027.4016065-1-quic_jhugo@quicinc.com>
 
-Hello:
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Fri,  1 Mar 2024 17:00:23 +0200 you wrote:
-> This patch refactors the flow for the BAP Broadcast Sink.
-> After discovering a new Broadcast Source a short PA Sync will be tried.
-> Depending on the BASE information present in the PA and the local PACS
-> capabilities of the Sink, one remote media endpoint will be created for
-> each compatible BIS.
-> Configuring one of these endpoints results in creating a stream and a
-> media transport for the corresponding BIS.
+On Fri, 23 Feb 2024 09:20:27 -0700, Jeffrey Hugo wrote:
+> The servers for the @codeaurora domain are long retired and any messages
+> sent there will bounce.  Update the maintainer addresses for this
+> binding to match the entries in .mailmap so that anyone looking in the
+> file for a contact will see a correct address.
 > 
-> [...]
+> Signed-off-by: Jeffrey Hugo <quic_jhugo@quicinc.com>
+> ---
+> 
+> Rob, will you take this patch into your tree for 6.9?
+> 
+>  .../devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
 
-Here is the summary with links:
-  - [BlueZ,v5,1/6] shared/util: Add push LTV utilitary function
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3f7d81e906e0
-  - [BlueZ,v5,2/6] shared/bap: Allow reading endpoint metadata and data
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7ec9a0f77c6e
-  - [BlueZ,v5,3/6] shared/bap: Update local PACS for broadcast sink also
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=98aba4aaef7a
-  - [BlueZ,v5,4/6] shared/bap: Do stream configuration in bap_bcast_config
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2ec513fc37d7
-  - [BlueZ,v5,5/6] shared/bap: Add API to add an observed BIS
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d2fa46e08c3b
-  - [BlueZ,v5,6/6] bap: Do PA Sync for each BAP Broadcast source discovered
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=29fe7bd07fbd
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Applied, thanks!
 
