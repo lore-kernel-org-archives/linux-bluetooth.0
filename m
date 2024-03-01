@@ -1,127 +1,87 @@
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6479915C4
-	for <linux-bluetooth@vger.kernel.org>; Fri,  1 Mar 2024 19:42:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BA3253387
+	for <linux-bluetooth@vger.kernel.org>; Fri,  1 Mar 2024 20:50:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709322171; cv=none; b=aGg2TEfcYSpGDZZe+88uzkaJGLZUoYQgPMbRK+Je+7T4lf2X6NWHFF2yJOYbHw4O8Jai4QNeVPTcayepvy+TSuOdJUadH2/p7jAhGz7RAQeZ0SxFBbriOM0VAce/AzMNQqBO9cgXjsMaqvtUoj15z2BdsUJBxbW4WdqCaA6bR+4=
+	t=1709326231; cv=none; b=KesfoXqa5l6EzF1QIgKw2J2D0EjC+psP5ahif6xirNEZ0QTM2di9LSOlUlH4xFLiYAwGVBu4jak3RUwD2AMObtswvZHbIEZJGEcZjtRKeD6cYF0Z7hLeewgvhoEsvFa4/aPVmU1rvVcXw4Xn9DGfH+CvlWDn/9UsExOk8zdNlhw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709322171; c=relaxed/simple;
-	bh=0gGqOex04LeVhpuzyrL6LnTgDY1AuOAFVLe3jxRHHNk=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=hWJq59omBBJrEWFl/ld4CMNSY4LTMbJwusRe8pApb2cLgoHEJqk32nwOvsfxho7TNuLZ0wBbnogdTzmkmY/+KXwN5cbtaol9tagV7pN4JLrkax61unuK8cxnRdaJsOfwjWME6TDIEOo7yNCi8fE+jb9QJ9xz85cTAxtQ/5yn0s8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DM+/gufW; arc=none smtp.client-ip=209.85.128.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1709326231; c=relaxed/simple;
+	bh=vMHvvjIGNjRXSpoBJE90jxtUemciKmETEpBUUhXeKZQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=er6rfPp8oefSg3ECpsJ7kzqWhOzf8miOdQNqI1Z+c1X6NXiDf70w/+5wGcNvCsI5Pj9c4iIoTViYyaUgWnH+2Z2e3AcqlK8aDZJ4t9SBDrNqNCtox4Ukn3rLbYGZ8a2Xi8tiRj1XaIIoQ3/kS75zOKPU9fM3k4nV37h0n74h0/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vRf0sYRl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DM+/gufW"
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-6098b9ed2a3so4548957b3.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 01 Mar 2024 11:42:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709322169; x=1709926969; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=bgMjkQ5Qy1/3nJdTHtXC9e72YLv/wa350LhsXvkfN8A=;
-        b=DM+/gufWZ06yYoiK/TVQJUXMj5CkDZ5NlVwh6iRgkpWHGd+LnfO7ejb11wSMgUBWCF
-         8UAxX4ZP57a15rKCAbdTn3vO1NH7KH4wITjCsvz8pdYiG2hGrg8hmUGimyAuZMBl763c
-         z0l10HcwgoyY4tOBustIuBEsDfm93bVz1mNOgfKZALXZEIP6zdVx4Ov5vuBy5ZBRw5xD
-         n3+NBtih+tAiADxjnPShOy8WC793GVHL8j0tndrgyS4zOJNGIlBTF+sHSHcDc3E6ftty
-         1kTRkabUVsk/srNNM6dEnySaU/O4DzEx3QokXHWTsKkAOCbcoadBlWpP/16+K0POjQmh
-         665g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709322169; x=1709926969;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bgMjkQ5Qy1/3nJdTHtXC9e72YLv/wa350LhsXvkfN8A=;
-        b=AKvVOPlO9R+uPHLDMswMPOX8NxfoYDBSFABgtWMQ+oXmhbHrD4EF1LwFiZvrqyslVm
-         0p6ndDRAHKfBFTc6Qr8h+i/Vpaw7Ejw8McVTLoof07AqIVUKQT2+MgnJFJqOUyrvCpSh
-         7+yK1JKRwdKsiLZUASwHi8KWRisONVym62INkF76f5FPgY8hT4ABCiR/YaEfbanfwL/C
-         b0zffPgHIvulk0NoNZdSDsdIYjUBysC+vlXseSBvIS0PanAgKN/0zEzLkVIuYWdRHlpF
-         r4n7frLjkQYrmkQDTfTXAsqPXg69SGjSAD7ROnzYZTwDisDKJ7zH3phn0RCKJP/AL6wJ
-         k3sw==
-X-Gm-Message-State: AOJu0YzuQoHcmYo7cc4vCoCPSlYOSyz4FgKsoT+TfFo0hI13qCC46k7/
-	PzhjDDtBMx2rLLqJKyyN3bBrYX0kh/3lkfGoT4zRxCCVnynSsr0G5us5yTU2
-X-Google-Smtp-Source: AGHT+IHwEkPRDlbkwl3r69pK7ByWiRnfHPuGKuAWFb13nNaWjJOO497h6XRAKIoGfr+PzGsVh3BGKg==
-X-Received: by 2002:a25:aa8b:0:b0:dcd:5bdb:4aa4 with SMTP id t11-20020a25aa8b000000b00dcd5bdb4aa4mr2494766ybi.51.1709322169417;
-        Fri, 01 Mar 2024 11:42:49 -0800 (PST)
-Received: from [172.17.0.2] ([20.81.46.145])
-        by smtp.gmail.com with ESMTPSA id b19-20020ac85413000000b0042e625a110dsm1961479qtq.78.2024.03.01.11.42.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Mar 2024 11:42:49 -0800 (PST)
-Message-ID: <65e22fb9.c80a0220.251fe.a509@mx.google.com>
-Date: Fri, 01 Mar 2024 11:42:49 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0567799888673470239=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vRf0sYRl"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4412EC433F1;
+	Fri,  1 Mar 2024 20:50:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709326231;
+	bh=vMHvvjIGNjRXSpoBJE90jxtUemciKmETEpBUUhXeKZQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=vRf0sYRlX8WeoxYwdy09kMHQ9CnfPFvDgSEwF6LdX7E87hWcSl3xzodcf3DI+mUp4
+	 QU4cm8nOecCco9nThuzwol0qMh6w+ja6qeGsu0daExotpqMQiaU4qEMNGRK5JHcyJY
+	 Ae1ycQEwMd+gNy7pxhuPh7NikS1DnJbw4vyxyx7qoXVyX8NHr4LO1DNP/C3CeMOezV
+	 3kC85EcXw5fo1q5nu7fae24yHkRis6IwIzy7zaKlOpy5gBn5ly5TKW4R9f7SwSh3Xc
+	 dSXVhnCv/ZPFo2fbNrBgsewseLAQphNm8bKgLAZT08LotS3iAbmWuyzPtX9CAq/uze
+	 1bUSKkRLwkUJQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 27464C595C4;
+	Fri,  1 Mar 2024 20:50:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v1] Bluetooth: af_bluetooth: Fix deadlock
-In-Reply-To: <20240301185034.2756103-1-luiz.dentz@gmail.com>
-References: <20240301185034.2756103-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v5 0/6] Update Sink BASE management
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <170932623115.13774.13135467294587042748.git-patchwork-notify@kernel.org>
+Date: Fri, 01 Mar 2024 20:50:31 +0000
+References: <20240301150029.14386-1-andrei.istodorescu@nxp.com>
+In-Reply-To: <20240301150029.14386-1-andrei.istodorescu@nxp.com>
+To: Andrei Istodorescu <andrei.istodorescu@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
+ mihai-octavian.urzica@nxp.com, silviu.barbulescu@nxp.com,
+ vlad.pruteanu@nxp.com, iulia.tanasescu@nxp.com
 
---===============0567799888673470239==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello:
 
-This is automated email and please do not reply to this email!
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Dear submitter,
+On Fri,  1 Mar 2024 17:00:23 +0200 you wrote:
+> This patch refactors the flow for the BAP Broadcast Sink.
+> After discovering a new Broadcast Source a short PA Sync will be tried.
+> Depending on the BASE information present in the PA and the local PACS
+> capabilities of the Sink, one remote media endpoint will be created for
+> each compatible BIS.
+> Configuring one of these endpoints results in creating a stream and a
+> media transport for the corresponding BIS.
+> 
+> [...]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=831666
+Here is the summary with links:
+  - [BlueZ,v5,1/6] shared/util: Add push LTV utilitary function
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3f7d81e906e0
+  - [BlueZ,v5,2/6] shared/bap: Allow reading endpoint metadata and data
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7ec9a0f77c6e
+  - [BlueZ,v5,3/6] shared/bap: Update local PACS for broadcast sink also
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=98aba4aaef7a
+  - [BlueZ,v5,4/6] shared/bap: Do stream configuration in bap_bcast_config
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2ec513fc37d7
+  - [BlueZ,v5,5/6] shared/bap: Add API to add an observed BIS
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d2fa46e08c3b
+  - [BlueZ,v5,6/6] bap: Do PA Sync for each BAP Broadcast source discovered
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=29fe7bd07fbd
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.66 seconds
-GitLint                       PASS      0.32 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      28.28 seconds
-CheckAllWarning               PASS      30.85 seconds
-CheckSparse                   WARNING   36.83 seconds
-CheckSmatch                   PASS      98.99 seconds
-BuildKernel32                 PASS      27.51 seconds
-TestRunnerSetup               PASS      505.14 seconds
-TestRunner_l2cap-tester       PASS      20.25 seconds
-TestRunner_iso-tester         PASS      32.70 seconds
-TestRunner_bnep-tester        PASS      4.81 seconds
-TestRunner_mgmt-tester        FAIL      114.53 seconds
-TestRunner_rfcomm-tester      PASS      7.45 seconds
-TestRunner_sco-tester         PASS      15.01 seconds
-TestRunner_ioctl-tester       PASS      8.04 seconds
-TestRunner_mesh-tester        PASS      6.02 seconds
-TestRunner_smp-tester         PASS      6.93 seconds
-TestRunner_userchan-tester    PASS      5.01 seconds
-IncrementalBuild              PASS      26.39 seconds
-
-Details
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/af_bluetooth.c:223:25: warning: context imbalance in 'bt_accept_enqueue' - different lock contexts for basic block
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 492, Passed: 489 (99.4%), Failed: 1, Not Run: 2
-
-Failed Test Cases
-LL Privacy - Add Device 6 (RL is full)               Failed       0.194 seconds
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
----
-Regards,
-Linux Bluetooth
-
-
---===============0567799888673470239==--
