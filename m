@@ -1,104 +1,89 @@
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14C463612E
-	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Feb 2024 18:06:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF51C3FE23;
+	Fri,  1 Mar 2024 05:53:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709229974; cv=none; b=sCiBJg2eCYhKrXdBpwUP7kz2bwmW4atsfO0rLXC/Usz4kodF0WkfkBtDhg5B0nvkqcII5A8j3EHmDf0VfXUz45eQ66ZUh9CFac0H0YU/CL3I3CcNhrrFpPABa3U1aj0qX5EhwYdILWDp1Vh6JQAwc3HHkWA2XxKQrWDYeihSb8c=
+	t=1709272403; cv=none; b=DClwS/FvRRKvhMLT9glWZ6G+BwY1NerM2fR6dhMRb/4Rui91FuMGMSqMHEvQf7lBY0LIKLlBb2kRtWu/hEc0FtNBJotZ9QTG2vtmySjTsuRPc9QuW30qOdf8b0ssf0UZu9WvM9oSCEQLBovriTIKywam80Ezn4i88jVqUHrcBy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709229974; c=relaxed/simple;
-	bh=11MXlIn56oCck9adY/wf9iPfyBz23EAFqyXBVJO5yhk=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=YbZ4zgtJXfmFOK+Ht1aGevzwWDrNg37N5wf64ijazpKZ+o1/F1RpO2wjBKbVmjb7hy5gkLZwfkzqY+3mDDTwft/FaZi181wT9FKEN182JE7Y9ZGv4VXvsnt2s/h2x8//pugJeX8P7W2yg5ULvDipoUZ3Kxfli+HlkaGaEDQ1HTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SOSdMlTy; arc=none smtp.client-ip=209.85.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1709272403; c=relaxed/simple;
+	bh=5TgWZb4/KOE0mCOVJEt0Xmql79Rk7IHFG+Z2FeL2hOM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lWrJcjFe16zWiftiXDWMEjBeJkOggDyowiwFA3Fjxdfos9kWxKsiuhdu4Ropx33AX3lkwuNPIMvi4ll/Bug8K1E/hvB5mjC00TeLBTb6Vd+wKpF/aVUzdeI/OAPWVxnvOF7rMY+hGTq5lefssUNcwe9gv+WQOt33Zu96nFOY7Hg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=fg9cY+vd; arc=none smtp.client-ip=80.237.130.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SOSdMlTy"
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-68f9c01a148so5385226d6.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Feb 2024 10:06:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709229972; x=1709834772; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=zuNdEp4skMAQKlvJsve0fV5N85aIjxWJQmW98+WMLpQ=;
-        b=SOSdMlTyqRBW3GbStcnINZQ5qxgV5AMp+kT3sqtUJfndeSjHRj6YGT2SDVK4qlALVd
-         4nyun+F/i6ZiygeNnDSyNc4UFmk5DyZ3VjKKl61aVc1kpgTNlHqVJzU9NTGwqp/aeJC3
-         H3pD0cdHodDYENKk1igaG9TpW3CjYUDu4VqbUeGyPEYQRIyMb4aobyxrqZvGVlv5pWWQ
-         gd4LBtwZlP9jCbS/7Uoh9zNwLoVPCls7iDwIpGyN1xeQO4tUvD6b7r8k5BkG9oF3f6uJ
-         jaRS1hquZd/8pTswvwIhXaFMxW7P5uVlAqzvfdto+BFRCeiW+YMETP8AOjDw0jt0Md4L
-         epQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709229972; x=1709834772;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zuNdEp4skMAQKlvJsve0fV5N85aIjxWJQmW98+WMLpQ=;
-        b=nxsDZa3akpDZLymiKeq9LRQggIA5sFm+UAayzDJ+tku1MUuCiCSMJBBG1hAUVYp0RI
-         e/ttdj/dQ07gPM/eb5sMMoggb+/cjKW4gbCTy39qoSxFxmK6K8REDhmyDhuS9EwXXihb
-         PAzrsA3XnmZZ3OQaBSyuRlRYl/6ipRqVdWCGRvu+me0f49/j9J3Cy3D/VG+O3daOIc+o
-         lEtTNIxZ2470XZaxIoNlDKIKmqQcwhAd8FNBcWnQyt/HBO5cOAVRMJQ76DKDw4d5Cgh5
-         4mFRZplZVRHppWwTQA9o/l+D14pvbesd4Ehx6Q+KhGzwQKRSwJolBEC4ryyK85q7QvE8
-         0psw==
-X-Gm-Message-State: AOJu0YxEAJZ1PSLZHd6zoDFLvWfQcbKoBUwHJ3mNL4BBGhtz6KkMpehC
-	AgC+hqYhkniNMnse16uonkZ8ISnLBJ76qbajiIzJb1POHY7u0i/N0AIqDtSx
-X-Google-Smtp-Source: AGHT+IFDE9rsJd6VdYbgZO+dBQap322uDy1oGB4yWX/WADwLYCsyeZcxyM9CK1sNHOXOXIwOfVvkwg==
-X-Received: by 2002:a0c:e402:0:b0:68f:b710:511 with SMTP id o2-20020a0ce402000000b0068fb7100511mr3136262qvl.39.1709229971885;
-        Thu, 29 Feb 2024 10:06:11 -0800 (PST)
-Received: from [172.17.0.2] ([20.55.46.193])
-        by smtp.gmail.com with ESMTPSA id lr9-20020a0562145bc900b006904ca1971esm572462qvb.42.2024.02.29.10.06.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Feb 2024 10:06:11 -0800 (PST)
-Message-ID: <65e0c793.050a0220.97ff0.379c@mx.google.com>
-Date: Thu, 29 Feb 2024 10:06:11 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0218032000784542696=="
+	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="fg9cY+vd"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:
+	Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
+	In-Reply-To:References; bh=ncXBQX+kSqn2nKAzLMBhXZ/NTpGfNX4QeH2wgUJQDLU=;
+	t=1709272401; x=1709704401; b=fg9cY+vdRQ/5I1wx0xTsG4qDZg1EbxfVpZh9frGXqmf4pOa
+	fYvJSOqMLW4UxAasulNfqeSkEwrtUYob0CLjYXE8m+sOotSN8n9Tlgz2onrfheEh5vsUDkv+PZkGB
+	VUYonlLGxcsf6yWwUiS274ztj18gvzPIoGE8mq1QGJbDw9Pl07PK0is2FRv+ip2hi0h61I1sldYiI
+	WkRaKPoic0lv8ZchRhgfCDUWsxPrPwBqOV5lGTERizWI7UiksEeGDTeTA/JBh2IuuatI+EWnIAFd8
+	6Esvk+tgvpjiiSZa/h7NFIza2/dIqvjdM61zakYY21m2e41Hd/A7/g92g/nwcy2w==;
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+	id 1rfvpd-00044Z-Up; Fri, 01 Mar 2024 06:53:18 +0100
+Message-ID: <7639639c-7c63-44a9-81bc-f9093b70559f@leemhuis.info>
+Date: Fri, 1 Mar 2024 06:53:17 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, xiaokeqinhealth@126.com
-Subject: RE: [BlueZ,1/1] avrcp: Add strict checks for supported events
-In-Reply-To: <20240229160955.530638-1-xiaokeqinhealth@126.com>
-References: <20240229160955.530638-1-xiaokeqinhealth@126.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============0218032000784542696==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: Bluetooth: af_bluetooth: Fix Use-After-Free in bt_sock_recvmsg
+Content-Language: en-US, de-DE
+To: linux-bluetooth@vger.kernel.org
+Cc: stable@vger.kernel.org, regressions@lists.linux.dev
+References: <20240226213855.GB3202@hostway.ca>
+From: "Linux regression tracking #adding (Thorsten Leemhuis)"
+ <regressions@leemhuis.info>
+Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
+In-Reply-To: <20240226213855.GB3202@hostway.ca>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1709272401;a6bacc60;
+X-HE-SMSGID: 1rfvpd-00044Z-Up
 
-This is automated email and please do not reply to this email!
+On 26.02.24 22:38, Simon Kirby wrote:
+> 
+> I bisected a regression where reading from a Bluetooth device gets stuck
+> in recvfrom() calls. The device here is a Wii Balance Board, using
+> https://github.com/initialstate/beerfridge/blob/master/wiiboard_test.py;
+> this worked fine in v6.6.1 and v6.6.8, but when I tried on a v6.6.14
+> build, the script no longer outputs any readings.
+> 
+> 1d576c3a5af850bf11fbd103f9ba11aa6d6061fb is the first bad commit
+> 
+> which maps to upstream commit 2e07e8348ea454615e268222ae3fc240421be768:
+> 
+> Bluetooth: af_bluetooth: Fix Use-After-Free in bt_sock_recvmsg
+> 
+> With this commit in place, as also in v6.7 and v6.7.6, the script does
+> not output anything _unless_ I strace the process, in which case a bunch
+> of recvmsg() syscalls are shown, and then it hangs again. If I ^C the
+> strace and run it a few times, eventually the script will get enough data
+> and output a reading.
 
-Dear submitter,
+Thanks for the report. To be sure the issue doesn't fall through the
+cracks unnoticed, I'm adding it to regzbot, the Linux kernel regression
+tracking bot:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=831186
+#regzbot ^introduced 2e07e8348ea454
+#regzbot title af_bluetooth: reading from a device gets stuck in
+recvfrom() calls
+#regzbot ignore-activity
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.45 seconds
-GitLint                       PASS      0.31 seconds
-BuildEll                      PASS      23.86 seconds
-BluezMake                     PASS      714.52 seconds
-MakeCheck                     PASS      11.47 seconds
-MakeDistcheck                 PASS      162.63 seconds
-CheckValgrind                 PASS      227.31 seconds
-CheckSmatch                   PASS      329.91 seconds
-bluezmakeextell               PASS      106.94 seconds
-IncrementalBuild              PASS      671.86 seconds
-ScanBuild                     PASS      945.34 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0218032000784542696==--
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+--
+Everything you wanna know about Linux kernel regression tracking:
+https://linux-regtracking.leemhuis.info/about/#tldr
+That page also explains what to do if mails like this annoy you.
