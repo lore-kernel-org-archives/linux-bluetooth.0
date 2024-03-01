@@ -1,58 +1,58 @@
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251F13A1A7
-	for <linux-bluetooth@vger.kernel.org>; Fri,  1 Mar 2024 17:03:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C7F5182B9
+	for <linux-bluetooth@vger.kernel.org>; Fri,  1 Mar 2024 18:13:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709312582; cv=none; b=TD6Iovm6zpYqHrojE65HuXynQ6fz/GR/APpFm+rHidpRTEYvWpozH8JI9Rj9hLheVUPQoCsKoFbWTDnu6ZfY/jy5IKgugpxlWBbriQNEVi2SebYD+YHUM+1rbgr0ZjlgU9/J4F7n+IGAIozaDZUc5O5alws5QJ+9Ui5+0V4lz3o=
+	t=1709316803; cv=none; b=o7+cPbULNTDG8/Y8MrNKr0SOYr/5Ff1zGQMNpqUxzM+VKWd8JoRT5k6+Ouyss6CJFFeHqY9JF745N+Yv8S1rktLb3iPJgmhiDe6oExUC6H6/7uOegj3Gk/xF9AtaX1GrFjRo13XHScxIxjx0dQ57+AE5jOrYRaQxMISFb4/HM6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709312582; c=relaxed/simple;
-	bh=+YHX9FtTI9rLqRViKA8ilasvR2/Oz/tp373nlUDGT3k=;
+	s=arc-20240116; t=1709316803; c=relaxed/simple;
+	bh=LsQATpS6VJTBaDlm9on0GRQI/rG/OpZ4hXo07u5toq4=;
 	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=JVpggNT0Jw6QS5pAeKCTD3qVdDe7Z1zrBfGzklLddBUjrW12/SpHNJErITDJrX1T3tWnufqbhrqcXXek+uBiboXuENLgmkYf9fCP5+DFQd0kCIZ6Yf0CN36J9sE5j43eL8tFX9Ewc8tqEnZYtKRmOdt3J48ZOcYstfvPifLXU7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JI0Nspzz; arc=none smtp.client-ip=209.85.160.169
+	 In-Reply-To:References; b=RlLG2ayzjJG4Ury1gBECV2AxZQqp16+EsggNWcESgxZQ+pSjbw54N7ebHi2Q5BxzraxltQKRHB0O60E7QBlbD3hfKpkBRHxOxiK+cMK//68QgfNZk1IzdyiNVxPx2Dylb6cjKAz5jNqpmHhKuzOjmp6lS/ZTsn15W/O6eqY4+Ls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Sn4c2K64; arc=none smtp.client-ip=209.85.222.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JI0Nspzz"
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-42a35c720b8so8651971cf.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 01 Mar 2024 09:03:00 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sn4c2K64"
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-787be5d999aso139487685a.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 01 Mar 2024 10:13:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709312580; x=1709917380; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1709316801; x=1709921601; darn=vger.kernel.org;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=MIt1/vnX6qKXjMyX2UhiOlaFznwOq2X/oMO5R668mXY=;
-        b=JI0NspzzLLMKK1NRki4zxG+Tg3hS7WWC/yE4LPUMGMT6SKNUS5YXT/kqBRo488JmC9
-         I2NAFr1YMVYrg8hjco6N677CJa3TBDyKaoCL+1v5r1YX8KNP+GkE2IZA0MdJboo0m5Va
-         K7/7GglZV+aTI96KKfU7hXxmQ0v8kKedEwRyoHcewrADxbrb5eUhzz1bRTUL5JgRUBlq
-         9ayL/P5U7fMSfuw3pBtnU/3EUsN2dw7E0hHZ57Bdd4ODAdrCFISL0XhOStIhi0/YuzjK
-         bJvKElV9Morm7MSk7MtwoY5Iy1qRse7Xe3ugYInbzB4BuSc6pgI+oR3O8s6Ei8rlTIpE
-         IcfQ==
+        bh=wNqoCIDsctuHm3P0+gNC2C2jgiIlRcD9tc6CM/vXmH0=;
+        b=Sn4c2K64+MNJzGD9j3ysDgbSv7VBcoTw0K4MRejorurB9wWviELN8T18CdgLB27fbc
+         EF1+Twq0XzFwiQjQYFvGWGH7Ym4CJyv1n8pQ8678ekuoYMox4a2YIGGENQYGi61dvFwl
+         OjzveDl30va335mdwv19X7CPe1Iw2h9CzIAlKia3NlrBdEb/vt3J6ukdDJ5tLLAxJZI5
+         z7V3kuOMwdqsW/nzp8E4Knf12zpgC1SPK/Kd4Tci0AhyUtg9IW7XhPC1bWf0oUDYTvfK
+         7nfBnkSx8pBXxL0osnmZq3gh3UPBK/Oce+5ItPKA7T7dNj5T5zEZYZw8pPYNijEYjyEt
+         TUrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709312580; x=1709917380;
+        d=1e100.net; s=20230601; t=1709316801; x=1709921601;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=MIt1/vnX6qKXjMyX2UhiOlaFznwOq2X/oMO5R668mXY=;
-        b=KUNoURGZEuw+SC9numacN9pY+3lakgqDrlnGOUO3XXfqbNrO0Ff5fWEPwUI46eA0Mh
-         ZQs/TR8RQHdzoFQUzbQYQncDlc9BSg1aEnxle8b8aY3y+DIzBs05iClK6ypDiJdCBeZK
-         066JQZZXE8Mr1NGkaB7qlrpeCQjCfiAYc0ULMcvPSCKVnfOogjlYO3+pbyTP03JS4NXZ
-         YBcnKfe0sPREen07lpqENb0tlEJAfkXl56w6UeS85puUFM+N4qIoTQDfdhEhKE44pA7N
-         bvt0opKUtqtjeV2Uy550bY2z9xS/tS7Cc42icpximt5Hre2sAOSv3KiCYxqaXJjMe4Do
-         yCnQ==
-X-Gm-Message-State: AOJu0YwHVsmKrj4dyIuHnVDh4c4JjbP018xy442Uxtx6YeFu0BGiuY5C
-	lixSc0yhCv3Gbyy9+mW5hCd6XHWviL/Juna00V1AJlGMDrIUcpPPC3HKJEj0
-X-Google-Smtp-Source: AGHT+IFG8MIAQtnEs6kNiTC9kWJpJ3ZIZm9byArBkudnqHf8P9mdd5k44QKS1gxzZxJT3s25Nw6uYA==
-X-Received: by 2002:a05:622a:613:b0:42e:bcd9:df0 with SMTP id z19-20020a05622a061300b0042ebcd90df0mr2172202qta.62.1709312579918;
-        Fri, 01 Mar 2024 09:02:59 -0800 (PST)
-Received: from [172.17.0.2] ([20.109.38.196])
-        by smtp.gmail.com with ESMTPSA id h5-20020ac85685000000b0042e495a126bsm1859216qta.36.2024.03.01.09.02.59
+        bh=wNqoCIDsctuHm3P0+gNC2C2jgiIlRcD9tc6CM/vXmH0=;
+        b=uJZTzu2hR82S3qhqZmzd9Hj/Kiy/KVzdIK4IKrO43em/qEYID56Z8liRyCCFwPQgtW
+         KaAyYNc499eKQLiBSO8qF/9pNfPe+1gyvzbNgn7IHnKXhVwjtBCnvi51ZYZQ3D5y6p3o
+         tD+FE66L93wgg5zX+yQAxHhF7zqfX+cG8tCFgGM4nUrpaKtmgytG1wQuobN0dCsFtNpN
+         FVziAonKKQz6gqZtKFcRIm2RHd1CSY08NBnXxEeE1OHFnkT/vS0heQpXLgf8NTt8Rh9c
+         jxSTEO65jIeIF4jo20tYs5bh3ZAH4K4sLs3r4u+wOLBp7Zd1xIF6ZGvktaPU3MiGSSOi
+         ZfDQ==
+X-Gm-Message-State: AOJu0Yx1DPYMKlAZpa6hqblivfWkPktR2APD5eyGIiEFzkG1cFovB78G
+	i6H3vztd16+RdMSfk3PhWIHX7laQR0nZGMDx2wAYxOgeadPqQfPVuBeF0TY0
+X-Google-Smtp-Source: AGHT+IGWBAJgqk9A8mZgi3abffkOmx0z8cdKbL5anrHJZXhDH7T6PJr4k1/Vo/WkO0APK4ETwcIbqQ==
+X-Received: by 2002:a05:620a:66e:b0:787:cda2:19eb with SMTP id a14-20020a05620a066e00b00787cda219ebmr2307412qkh.45.1709316801167;
+        Fri, 01 Mar 2024 10:13:21 -0800 (PST)
+Received: from [172.17.0.2] ([20.55.46.112])
+        by smtp.gmail.com with ESMTPSA id z8-20020ae9f448000000b00787c6ed9a68sm1847034qkl.91.2024.03.01.10.13.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Mar 2024 09:02:59 -0800 (PST)
-Message-ID: <65e20a43.c80a0220.f2c3c.9710@mx.google.com>
-Date: Fri, 01 Mar 2024 09:02:59 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1419332967453157269=="
+        Fri, 01 Mar 2024 10:13:20 -0800 (PST)
+Message-ID: <65e21ac0.e90a0220.619a.9ed5@mx.google.com>
+Date: Fri, 01 Mar 2024 10:13:20 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3573542321591004741=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -60,13 +60,13 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, andrei.istodorescu@nxp.com
-Subject: RE: Update Sink BASE management
-In-Reply-To: <20240301150029.14386-2-andrei.istodorescu@nxp.com>
-References: <20240301150029.14386-2-andrei.istodorescu@nxp.com>
+To: linux-bluetooth@vger.kernel.org, silviu.barbulescu@nxp.com
+Subject: RE: Add command to create local endpoint in bluetoothctl
+In-Reply-To: <20240301163946.5484-2-silviu.barbulescu@nxp.com>
+References: <20240301163946.5484-2-silviu.barbulescu@nxp.com>
 Reply-To: linux-bluetooth@vger.kernel.org
 
---===============1419332967453157269==
+--===============3573542321591004741==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -77,56 +77,22 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=831555
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=831596
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    PASS      3.17 seconds
-GitLint                       PASS      1.86 seconds
-BuildEll                      PASS      23.87 seconds
-BluezMake                     PASS      698.28 seconds
-MakeCheck                     PASS      11.97 seconds
-MakeDistcheck                 PASS      162.56 seconds
-CheckValgrind                 PASS      226.73 seconds
-CheckSmatch                   PASS      330.56 seconds
-bluezmakeextell               PASS      106.97 seconds
-IncrementalBuild              PASS      3956.07 seconds
-ScanBuild                     WARNING   936.82 seconds
-
-Details
-##############################
-Test: ScanBuild - WARNING
-Desc: Run Scan Build
-Output:
-src/shared/bap.c:1156:2: warning: Use of memory after it is freed
-        DBG(stream->bap, "stream %p", stream);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/bap.c:40:2: note: expanded from macro 'DBG'
-        bap_debug(_bap, "%s:%s() " fmt, __FILE__, __func__, ## arg)
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-1 warning generated.
-In file included from tools/mesh-gatt/crypto.c:32:
-./src/shared/util.h:238:9: warning: 1st function call argument is an uninitialized value
-        return be32_to_cpu(get_unaligned((const uint32_t *) ptr));
-               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-./src/shared/util.h:33:26: note: expanded from macro 'be32_to_cpu'
-#define be32_to_cpu(val) bswap_32(val)
-                         ^~~~~~~~~~~~~
-/usr/include/byteswap.h:34:21: note: expanded from macro 'bswap_32'
-#define bswap_32(x) __bswap_32 (x)
-                    ^~~~~~~~~~~~~~
-In file included from tools/mesh-gatt/crypto.c:32:
-./src/shared/util.h:248:9: warning: 1st function call argument is an uninitialized value
-        return be64_to_cpu(get_unaligned((const uint64_t *) ptr));
-               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-./src/shared/util.h:34:26: note: expanded from macro 'be64_to_cpu'
-#define be64_to_cpu(val) bswap_64(val)
-                         ^~~~~~~~~~~~~
-/usr/include/byteswap.h:37:21: note: expanded from macro 'bswap_64'
-#define bswap_64(x) __bswap_64 (x)
-                    ^~~~~~~~~~~~~~
-2 warnings generated.
+CheckPatch                    PASS      0.49 seconds
+GitLint                       PASS      0.32 seconds
+BuildEll                      PASS      25.16 seconds
+BluezMake                     PASS      756.43 seconds
+MakeCheck                     PASS      11.47 seconds
+MakeDistcheck                 PASS      164.18 seconds
+CheckValgrind                 PASS      231.40 seconds
+CheckSmatch                   PASS      341.44 seconds
+bluezmakeextell               PASS      107.68 seconds
+IncrementalBuild              PASS      692.60 seconds
+ScanBuild                     PASS      1002.86 seconds
 
 
 
@@ -135,4 +101,4 @@ Regards,
 Linux Bluetooth
 
 
---===============1419332967453157269==--
+--===============3573542321591004741==--
