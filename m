@@ -1,113 +1,114 @@
-Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C5D7134A1
-	for <linux-bluetooth@vger.kernel.org>; Sat,  2 Mar 2024 08:56:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709369785; cv=none; b=UIhr7WrOJkHV1vupoAVOjQ4pjuvN66pf7dhm4EU9YV9wCiWcAZ3ul8NDi+6philu6u8cWKQhsgkye3z8p0oyT1zfDiBj2CG0q6FgrIQOVInXA4Sbl6RFbksJi2Y3dmTA3htR/KPCi1F5ZRqpDINuuoXNqpQwKpkARTvpocNGt4c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709369785; c=relaxed/simple;
-	bh=awmx5WT+IMqCpNOAdckqm6x9cpKnnHAd/VHCcYeiVlU=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Ei1474JBhU32wPn+lCNW9aw7HYdcEHxPtsIzcCq/cB6TiZFes7OsKAk7y3zAduMADKbkgUqjdQhMf2/4JCOhJE07NwwRyVt4/DviRVeOerS/l2ayrAfrgJLftXaMdV/I3jvmY++O9vhZbGtjd4sd38EPOeYhk50xljyv7yq34MA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lm/lU5CF; arc=none smtp.client-ip=209.85.160.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3C8A2C683
+	for <linux-bluetooth@vger.kernel.org>; Sat,  2 Mar 2024 17:06:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709399204; cv=pass; b=AphRi3B4qSAbeHjjB+a5iUZChioIP1GCjoIDGzGwERnUau3oPdAE9NwnrBvqz7hmHiDvn3Efi1E+v91ztPKfCeA7xUKeRfUM1r50V5cFAK4xVkXeL4UdmYmJSjQ1x0QLWaZo2SyIKVjtDtI4P9tVEXSluudT6fJAHQk72R97UZY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709399204; c=relaxed/simple;
+	bh=4pkNqiLMkhqOLLrbeBDBHXbaEXWQcxVJEsZwYuGq4Rc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ISfTsaLS4TsxO7kIN4WYMwY9VzJqHHAbDgcR50RaPPWj5aK9+qXn3k14mdER9IdAc4+9cKAdtvjJ+vNfnGkDFOYgMDyaUcT4L8WawzL1G30rthw3Kijne2Wk5r3BFhh0WDjbrX69PqZHl7yhs349oMtT5FD4YG8YqwZ8hKZxzlw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=Dr4s6fPE; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lm/lU5CF"
-Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-21ea1aae402so1507339fac.1
-        for <linux-bluetooth@vger.kernel.org>; Sat, 02 Mar 2024 00:56:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709369783; x=1709974583; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=XWHWEa3G6sE0xakIHSAHStpHSrqsmzZ0hv0LbVtqGYg=;
-        b=Lm/lU5CFatSOIL4ST4KExv2fXF//Ejha16RQqge1Vy0WqxJxPICIs58DlMdtTVIYRk
-         czd3ofaNpHuGMfeYB5GvbNeSp3SXT2T4JyBk5S6K6Yw7REl5558l9LFEYJooF0AZ64K5
-         KrdtB93Xyf///tpZ/VfH3crfWD8Np8sjajlBnSn03mfQtgCs/Y09nGbNVle6B0BJBlmT
-         RnyEd2DIs2d+OZ2vAjtq/iSgg+9VDVsAQoqwjIzYZ9SM7Ok6MOXqFMkPktgaoyx6XkA1
-         rRFu36NcgqJW9L7+X4q3eI537HOWB1kpG5zzJfSq4UMU+Jup06AoVljle2mHuAq+LRZE
-         puWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709369783; x=1709974583;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XWHWEa3G6sE0xakIHSAHStpHSrqsmzZ0hv0LbVtqGYg=;
-        b=MZK+gkCrZmz6VEZWFVRAJxJj/uO8p2K0MZJeHs7Sw7WLWuxwYDHcz6+ruEtbILhQFC
-         RgKXlIWJXE0mZ4CyJGSv2vJQICpi2664QfNDh4YnaihlbdRjHjtBq3rNbFM8n+UAuPd4
-         B6dWTgKtjfLgwICPk8s+JG1rDpCN72CMg3FbaIdctDbOgjQFE/g4cFa2GA5iZLXQYiuC
-         oDR/9+jhiyGYJHirJvqaE3Tjp8Co/IeTvE9z0ZuF51JfoxFSqCTTjD+oHMg/q5VyUHsX
-         YblMnUudREZ+9BOpSYlGeofP6NwjIJU1v3L93YRUtb2wK/M+AwZ9MLVWJkC9P2PDUuOs
-         KGBg==
-X-Gm-Message-State: AOJu0Yx9lgEP3uueSxpEmNcZAUNAu7ZiLTzSs5szmzDhQX0M/Ys2Y4Lx
-	88QV2+zbzCbfBNJArWV16f8Z6LFIPvfWw+zn++3iyDH8SEk89SqWD8sk4hgr
-X-Google-Smtp-Source: AGHT+IFkJcZK/gveVfgVW5xBVeG5zFikT5MJwVqqU19iC0CLYjjpBCfEIWf4IcOdFPxhGN7flh6nJQ==
-X-Received: by 2002:a05:6870:dc4b:b0:21f:f485:6b71 with SMTP id nr11-20020a056870dc4b00b0021ff4856b71mr5027495oab.8.1709369783307;
-        Sat, 02 Mar 2024 00:56:23 -0800 (PST)
-Received: from [172.17.0.2] ([4.227.114.178])
-        by smtp.gmail.com with ESMTPSA id b123-20020a62cf81000000b006e594b068c8sm4209807pfg.116.2024.03.02.00.56.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 Mar 2024 00:56:23 -0800 (PST)
-Message-ID: <65e2e9b7.620a0220.5fb7d.3820@mx.google.com>
-Date: Sat, 02 Mar 2024 00:56:23 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4800162063082071467=="
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="Dr4s6fPE"
+Received: from monolith.lan (unknown [193.138.7.138])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4TnBFM2224zyxR;
+	Sat,  2 Mar 2024 19:06:29 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1709399191;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=EkjfuxVgBnvb5r2537n+vIYXH6IlLYTiCGav7Xq5l44=;
+	b=Dr4s6fPEdSn4PDsitv7GZqiqG1V8F4q+wYQUXC5/QoXCZk0PyDQFnsG/NT60eJOjH13mIW
+	a9XNJQJAXBZ9uGQdRRI8P24fWa8GWPwKiilnoSwDrJzIwlhfEnwva3iyIp1vt9O17LAYMm
+	8nKs45AYiX3Ssw+X8Ee8F/x+oB6Ekf8=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1709399191;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=EkjfuxVgBnvb5r2537n+vIYXH6IlLYTiCGav7Xq5l44=;
+	b=RrAe6QFsmRd+8Ax5bl4aMLCipOgHerHup77zPINthE7GUK+HK8ODW5OVM5qvtPrF/VPv1g
+	Qd3T0Vb1KM0rVvqwBrLY9xh18D9ZOYsrDs5CHMh7LdTLE6dsoQmRa6c61suCt6iBLghs2f
+	hCy+klJ0ZhWOLrKTOBz9G/HVfKv2Yio=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1709399191; a=rsa-sha256; cv=none;
+	b=MW6ak0dlDE4dzxrFGzmWAuI0ySmISgorEgNQSPQFtXC/uPim1TK0TL4NsPSXk0ur1Xrgg8
+	eZfAzEyqse/xxwYGCWl9orFGuVN/2viOfpB8ZgycVzZg4r31z/XYiCWtlPeXwQIYxnHxSv
+	UwPvTrazIEA01jktKZ1mL0aN4M9ISY8=
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH] Bluetooth: fix use-after-free in accessing skb after sending it
+Date: Sat,  2 Mar 2024 19:06:23 +0200
+Message-ID: <90576ca2ad6b1c3e24c585c734cde44bbcb388bf.1709399114.git.pav@iki.fi>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, dan.carpenter@linaro.org
-Subject: RE: Bluetooth: ISO: Clean up returns values in iso_connect_ind()
-In-Reply-To: <5f73d9d7-61d7-49ab-a5e3-adda72685122@moroto.mountain>
-References: <5f73d9d7-61d7-49ab-a5e3-adda72685122@moroto.mountain>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============4800162063082071467==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+hci_send_cmd_sync first sends skb and then tries to clone it.  However,
+the driver may have already freed the skb at that point.
 
-This is automated email and please do not reply to this email!
+Fix by cloning the sent_cmd cloned just above, instead of the original.
 
-Dear submitter,
+Log:
+================================================================
+BUG: KASAN: slab-use-after-free in __copy_skb_header+0x1a/0x240
+...
+Call Trace: ..
+ __skb_clone+0x59/0x2c0
+ hci_cmd_work+0x3b3/0x3d0 [bluetooth]
+ process_one_work+0x459/0x900
+...
+Allocated by task 129: ...
+ __alloc_skb+0x1ae/0x220
+ __hci_cmd_sync_sk+0x44c/0x7a0 [bluetooth]
+ __hci_cmd_sync_status+0x24/0xb0 [bluetooth]
+ set_cig_params_sync+0x778/0x7d0 [bluetooth]
+...
+Freed by task 0: ...
+ kmem_cache_free+0x157/0x3c0
+ __usb_hcd_giveback_urb+0x11e/0x1e0
+ usb_giveback_urb_bh+0x1ad/0x2a0
+ tasklet_action_common.isra.0+0x259/0x4a0
+ __do_softirq+0x15b/0x5a7
+================================================================
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=831774
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.50 seconds
-GitLint                       PASS      0.21 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      27.72 seconds
-CheckAllWarning               PASS      30.40 seconds
-CheckSparse                   PASS      36.05 seconds
-CheckSmatch                   PASS      97.93 seconds
-BuildKernel32                 PASS      27.08 seconds
-TestRunnerSetup               PASS      496.58 seconds
-TestRunner_l2cap-tester       PASS      18.06 seconds
-TestRunner_iso-tester         PASS      30.38 seconds
-TestRunner_bnep-tester        PASS      4.71 seconds
-TestRunner_mgmt-tester        PASS      108.85 seconds
-TestRunner_rfcomm-tester      PASS      7.37 seconds
-TestRunner_sco-tester         PASS      14.92 seconds
-TestRunner_ioctl-tester       PASS      7.77 seconds
-TestRunner_mesh-tester        PASS      5.86 seconds
-TestRunner_smp-tester         PASS      6.78 seconds
-TestRunner_userchan-tester    PASS      4.88 seconds
-IncrementalBuild              PASS      25.83 seconds
-
-
-
+Fixes: ea5391e7b256 ("Bluetooth: hci_sync: Fix overwriting request callback")
+Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hci_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 6ca4c0df9f9c..df3aa41e376d 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -4217,7 +4217,7 @@ static void hci_send_cmd_sync(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (hci_req_status_pend(hdev) &&
+ 	    !hci_dev_test_and_set_flag(hdev, HCI_CMD_PENDING)) {
+ 		kfree_skb(hdev->req_skb);
+-		hdev->req_skb = skb_clone(skb, GFP_KERNEL);
++		hdev->req_skb = skb_clone(hdev->sent_cmd, GFP_KERNEL);
+ 	}
+ 
+ 	atomic_dec(&hdev->cmd_cnt);
+-- 
+2.44.0
 
---===============4800162063082071467==--
