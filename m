@@ -1,284 +1,132 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0768E3FB32
-	for <linux-bluetooth@vger.kernel.org>; Sat,  2 Mar 2024 20:10:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709410207; cv=pass; b=ls1V49sdnmHm5KB6qHL2/KuExau4wur7CUd4v7MgJvfAto2h6aazTqn1iGr7Pa267ELTcX15fHaW+yCndwOalmq/0QTnpt4bQ680FmlrYyhysXR2rSsn/I4Xi+R59eRT6XAye4wnc9rFbdla5swPpr8GM9x72NXBPUUbqVmK/TM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709410207; c=relaxed/simple;
-	bh=kRnp7V3lDW3v6atmRTpeyY8sqVIQFjFY0kd1VmPR/Ws=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=av127Xq4vZKVThDmtHZcn9iSFLZjxlazSD4N8UCDw1pEjbbpKg0Hy+bxOYo/aD/T3RQsUZD5yO+S3nQ1AgzSpiWpjm3HE55MtGQ9fVGV/RfQBY38pN9B7xRQBHateQhn2HfNAxJnBMZV02sWnI36jgOCdfaLC8quFUqIUKP7GTE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=mWwFYOOD; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D49515EA2
+	for <linux-bluetooth@vger.kernel.org>; Sat,  2 Mar 2024 20:33:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709411610; cv=none; b=jUJ8z3OiFRupjc5pw+cF5/r+DQzDjHAeZBvkJ4g2GIEUkRUSml9gVZl9DwQX4XBxlB3fc2ndCx9wd5MNOf/GsDMZ4OEZLnCU8rniZ5F07hJeSU6L5eV/2F/S5tABmfRTlhzQJOaVMAS2L8kvh0KF0S42MNzoUqNEMUufTzZpw6o=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709411610; c=relaxed/simple;
+	bh=5qEVGgXghf789QTF6Vviq09kHNOjQZJgQPRio1oG5wY=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=okeUUQpSoXs1A8mouIvkvtjWVmfFwLjAWm+jdZ15vRKmyUIWdjAQU4hNllDmr8KpPuRAVtnktUh2Dj/nlFBG7kmoOY3ISkn2JQEFXnokt9bNzeyAXoqj5plO6Q8YaoutHGWFwKY6ULNfzX9GC4bAYDjDiUe59Cd8cVRRu8+xHpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QwA/O9dK; arc=none smtp.client-ip=209.85.166.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="mWwFYOOD"
-Received: from monolith.lan (unknown [193.138.7.138])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4TnGK72NHSz101J;
-	Sat,  2 Mar 2024 22:10:03 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1709410204;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=V1ZAG7iQohgKpksnivQ289GL76Qye04C74/31MpvBes=;
-	b=mWwFYOODXMNBy8T0RdOlJMnawkmqGiJ7qVu7zo5M2YPKrA/CMDALG+ZeMU5ibF88VkXTnS
-	NBvFfmHs8umEgmvRN8qBOcBGLVagag79qB1PPtu3sqYXvelhMcB33lI1tuH+mieM8N6JAv
-	cfEgu9aZYmh+p6sFW1xEY9hNFOorkKI=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1709410203;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=V1ZAG7iQohgKpksnivQ289GL76Qye04C74/31MpvBes=;
-	b=IkidcPkwXuS8RUsZG0OGR98DqDBhagFkHUKY1ytwoziY0OCRr8BeoSyFHO/YDpsYiBrTC7
-	nZHVH2f2jMNOPoEdOuYhCwwOh0KsH5lru3hRefyO29hy6d3OFMgI7STrVT5e1OeSMPzWy7
-	L5tGrrscJLC0dsRP7X22t/vxezzjAyw=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1709410204; a=rsa-sha256; cv=none;
-	b=lPOOB7NpBPyQQSxzGCSFOS6F2YJerWAko+EfqFbDVqugPFGkH5viw2+05PdD23sqR6Ul56
-	umiKxBLk2V97blCShkHj5kMarfQmXrRcQpkXFr8HgVbFGVD3ISUrk1ZHwZB+SB7KbvW4ON
-	MM2Vh+jSC/n9uTLbg++bAPtYDgWC3jM=
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 3/3] l2cap-tester: Add test for TX timestamping
-Date: Sat,  2 Mar 2024 22:09:53 +0200
-Message-ID: <38c3902f2ea373295f0b839861f35f55b3a44c17.1709409039.git.pav@iki.fi>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <cover.1709409039.git.pav@iki.fi>
-References: <cover.1709409039.git.pav@iki.fi>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QwA/O9dK"
+Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-7c83fbeb300so16406139f.3
+        for <linux-bluetooth@vger.kernel.org>; Sat, 02 Mar 2024 12:33:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709411607; x=1710016407; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=YWs/kx6ClVcKXIGk91vtjusRqRD6ZLeb6cqT+TeBH1k=;
+        b=QwA/O9dKSe80N10jNuAzeeAvsL7O7uMV1wPXgsHqRsBH08nKu8caPVvEdfs4jXxe0Q
+         0/f3/F8wV1TyPpSp3dj9VmkFbcOCigp7bBc4EC7kiogAiYc0GzZbdN7RCAcWlMNFt14b
+         DZ3nZoAOR/Foiy4hA3VRm9jYiJGc2V7035Rc0NhgAJhat6qfECrf2UnLc0SaIHqvt12T
+         gjD2CeM29++wQ8UdUGFTOlQkFz+DzVN6cdcZSUu5ijKxB5JMgUA43oIR6Pltgx/Y+HAo
+         JVA+sBsh+Jd8gIEUEI2Z3dJF/Ns7taYJSZ40fflSD4pY0sKlenRjOWtxa1aMXeYFgrrm
+         jQEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709411607; x=1710016407;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YWs/kx6ClVcKXIGk91vtjusRqRD6ZLeb6cqT+TeBH1k=;
+        b=dZr0Qs0lNw/ySqkY8bNWUjE1SJYq4TANlO1P/FbRhfSFwsZbl14ORyd/GgqjgWC9r3
+         B/sQYQGL3ewvLUI8mEH7eSA7JF3tUJNHAPpw28YUHJ0iWwLq0+akljX/5NCkKKeXHGqH
+         LmgBIH2kXtBtgi9i8Ekf2TGp0o5FfWB2cliShUL0QgGMbzzQCXYf1xvS5gLCXUCnzpsm
+         +XVJuzaBmfalbsUy9tiezF1B3fq+IBFA0b0/O7xWMa/uVFzsX0qU2kBZwLnfVOzlB8Le
+         4xFfN++ROD5AeNzFOD7OdG3REqJaD0CWvBf5YxCIasE6TG/uB/mJ8IMmRNWSbN4dDn7O
+         aaYA==
+X-Gm-Message-State: AOJu0YxHwUXl3x62ijE8P7UiBOvg01rVhHNSgaLiwwqUkYRBw7nC6rr6
+	AaBb9os5zdvQo5p4gg9a7XIfD0DV2hNPes5IX8oQssavw4/9iPFSksAm3V7S
+X-Google-Smtp-Source: AGHT+IE94m2mE/hntQsVyu+R3O3WFoSZih2P85vMFaRsEYdt2PBWMrNdiZY9bVAX0QHWHAwCovLfew==
+X-Received: by 2002:a05:6e02:144c:b0:365:3e8f:6ac4 with SMTP id p12-20020a056e02144c00b003653e8f6ac4mr5563377ilo.27.1709411607588;
+        Sat, 02 Mar 2024 12:33:27 -0800 (PST)
+Received: from [172.17.0.2] ([52.157.4.128])
+        by smtp.gmail.com with ESMTPSA id 30-20020a63195e000000b005d67862799asm4872082pgz.44.2024.03.02.12.33.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 02 Mar 2024 12:33:27 -0800 (PST)
+Message-ID: <65e38d17.630a0220.6d377.4b55@mx.google.com>
+Date: Sat, 02 Mar 2024 12:33:27 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============8395193839238784125=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: Bluetooth: add TX timestamping for ISO and L2CAP
+In-Reply-To: <d19187ab9842df2565d1d82beb171a8967d2ea94.1709409547.git.pav@iki.fi>
+References: <d19187ab9842df2565d1d82beb171a8967d2ea94.1709409547.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Add test
+--===============8395193839238784125==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-L2CAP BR/EDR Client - TX Timestamping
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=831819
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      2.84 seconds
+GitLint                       PASS      0.55 seconds
+SubjectPrefix                 PASS      0.18 seconds
+BuildKernel                   PASS      27.56 seconds
+CheckAllWarning               PASS      30.66 seconds
+CheckSparse                   WARNING   35.36 seconds
+CheckSmatch                   WARNING   97.77 seconds
+BuildKernel32                 PASS      26.93 seconds
+TestRunnerSetup               PASS      497.74 seconds
+TestRunner_l2cap-tester       PASS      18.07 seconds
+TestRunner_iso-tester         PASS      128.12 seconds
+TestRunner_bnep-tester        PASS      4.73 seconds
+TestRunner_mgmt-tester        FAIL      111.18 seconds
+TestRunner_rfcomm-tester      PASS      7.27 seconds
+TestRunner_sco-tester         PASS      14.86 seconds
+TestRunner_ioctl-tester       PASS      7.67 seconds
+TestRunner_mesh-tester        PASS      5.88 seconds
+TestRunner_smp-tester         PASS      6.79 seconds
+TestRunner_userchan-tester    PASS      4.91 seconds
+IncrementalBuild              PASS      59.57 seconds
+
+Details
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 492, Passed: 489 (99.4%), Failed: 1, Not Run: 2
+
+Failed Test Cases
+LL Privacy - Start Discovery 2 (Disable RL)          Failed       0.171 seconds
+
+
 ---
- tools/l2cap-tester.c | 106 +++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 101 insertions(+), 5 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
-index 461f2c27c..f990110d9 100644
---- a/tools/l2cap-tester.c
-+++ b/tools/l2cap-tester.c
-@@ -30,6 +30,9 @@
- 
- #include "src/shared/tester.h"
- #include "src/shared/mgmt.h"
-+#include "src/shared/util.h"
-+
-+#include "tester-utils.h"
- 
- struct test_data {
- 	const void *test_data;
-@@ -38,12 +41,15 @@ struct test_data {
- 	struct hciemu *hciemu;
- 	enum hciemu_type hciemu_type;
- 	unsigned int io_id;
-+	unsigned int err_io_id;
- 	uint16_t handle;
- 	uint16_t scid;
- 	uint16_t dcid;
- 	int sk;
- 	int sk2;
- 	bool host_disconnected;
-+	int step;
-+	struct tx_tstamp_data tx_ts;
- };
- 
- struct l2cap_data {
-@@ -86,6 +92,9 @@ struct l2cap_data {
- 	bool defer;
- 
- 	bool shut_sock_wr;
-+
-+	uint32_t so_timestamping;
-+	unsigned int send_extra;
- };
- 
- static void print_debug(const char *str, void *user_data)
-@@ -226,6 +235,11 @@ static void test_post_teardown(const void *test_data)
- 		data->io_id = 0;
- 	}
- 
-+	if (data->err_io_id > 0) {
-+		g_source_remove(data->err_io_id);
-+		data->err_io_id = 0;
-+	}
-+
- 	hciemu_unref(data->hciemu);
- 	data->hciemu = NULL;
- }
-@@ -245,6 +259,7 @@ static void test_data_free(void *test_data)
- 			break; \
- 		user->hciemu_type = HCIEMU_TYPE_BREDR; \
- 		user->io_id = 0; \
-+		user->err_io_id = 0; \
- 		user->test_data = data; \
- 		tester_add_full(name, data, \
- 				test_pre_setup, setup, func, NULL, \
-@@ -259,6 +274,7 @@ static void test_data_free(void *test_data)
- 			break; \
- 		user->hciemu_type = HCIEMU_TYPE_LE; \
- 		user->io_id = 0; \
-+		user->err_io_id = 0; \
- 		user->test_data = data; \
- 		tester_add_full(name, data, \
- 				test_pre_setup, setup, func, NULL, \
-@@ -321,6 +337,17 @@ static const struct l2cap_data client_connect_write_success_test = {
- 	.data_len = sizeof(l2_data),
- };
- 
-+static const struct l2cap_data client_connect_tx_timestamping_test = {
-+	.client_psm = 0x1001,
-+	.server_psm = 0x1001,
-+	.write_data = l2_data,
-+	.data_len = sizeof(l2_data),
-+	.so_timestamping = (SOF_TIMESTAMPING_SOFTWARE |
-+					SOF_TIMESTAMPING_OPT_ID |
-+					SOF_TIMESTAMPING_TX_SOFTWARE),
-+	.send_extra = 2,
-+};
-+
- static const struct l2cap_data client_connect_shut_wr_success_test = {
- 	.client_psm = 0x1001,
- 	.server_psm = 0x1001,
-@@ -1096,6 +1123,8 @@ static void bthost_received_data(const void *buf, uint16_t len,
- 	struct test_data *data = tester_get_data();
- 	const struct l2cap_data *l2data = data->test_data;
- 
-+	--data->step;
-+
- 	if (len != l2data->data_len) {
- 		tester_test_failed();
- 		return;
-@@ -1103,7 +1132,7 @@ static void bthost_received_data(const void *buf, uint16_t len,
- 
- 	if (memcmp(buf, l2data->write_data, l2data->data_len))
- 		tester_test_failed();
--	else
-+	else if (!data->step)
- 		tester_test_passed();
- }
- 
-@@ -1207,6 +1236,61 @@ static bool check_mtu(struct test_data *data, int sk)
- 	return true;
- }
- 
-+static gboolean recv_errqueue(GIOChannel *io, GIOCondition cond,
-+							gpointer user_data)
-+{
-+	struct test_data *data = user_data;
-+	const struct l2cap_data *l2data = data->test_data;
-+	int sk = g_io_channel_unix_get_fd(io);
-+	int err;
-+
-+	data->step--;
-+
-+	err = tx_tstamp_recv(&data->tx_ts, sk, l2data->data_len);
-+	if (err > 0)
-+		return TRUE;
-+	else if (!err && !data->step)
-+		tester_test_passed();
-+	else
-+		tester_test_failed();
-+
-+	data->err_io_id = 0;
-+	return FALSE;
-+}
-+
-+static void l2cap_tx_timestamping(struct test_data *data, GIOChannel *io)
-+{
-+	const struct l2cap_data *l2data = data->test_data;
-+	struct so_timestamping so = {
-+		.flags = l2data->so_timestamping,
-+	};
-+	int sk;
-+	int err;
-+	unsigned int count;
-+
-+	if (!(l2data->so_timestamping & SOF_TIMESTAMPING_TX_RECORD_MASK))
-+		return;
-+
-+	sk = g_io_channel_unix_get_fd(io);
-+
-+	tester_print("Enabling TX timestamping");
-+
-+	tx_tstamp_init(&data->tx_ts, l2data->so_timestamping);
-+
-+	for (count = 0; count < l2data->send_extra + 1; ++count)
-+		data->step += tx_tstamp_expect(&data->tx_ts);
-+
-+	err = setsockopt(sk, SOL_SOCKET, SO_TIMESTAMPING, &so, sizeof(so));
-+	if (err < 0) {
-+		tester_warn("setsockopt SO_TIMESTAMPING: %s (%d)",
-+						strerror(errno), errno);
-+		tester_test_failed();
-+		return;
-+	}
-+
-+	data->err_io_id = g_io_add_watch(io, G_IO_ERR, recv_errqueue, data);
-+}
-+
- static gboolean l2cap_connect_cb(GIOChannel *io, GIOCondition cond,
- 							gpointer user_data)
- {
-@@ -1249,15 +1333,23 @@ static gboolean l2cap_connect_cb(GIOChannel *io, GIOCondition cond,
- 	} else if (l2data->write_data) {
- 		struct bthost *bthost;
- 		ssize_t ret;
-+		unsigned int count;
-+
-+		data->step = 0;
- 
- 		bthost = hciemu_client_get_host(data->hciemu);
- 		bthost_add_cid_hook(bthost, data->handle, data->dcid,
- 					bthost_received_data, NULL);
- 
--		ret = write(sk, l2data->write_data, l2data->data_len);
--		if (ret != l2data->data_len) {
--			tester_warn("Unable to write all data");
--			tester_test_failed();
-+		l2cap_tx_timestamping(data, io);
-+
-+		for (count = 0; count < l2data->send_extra + 1; ++count) {
-+			ret = write(sk, l2data->write_data, l2data->data_len);
-+			if (ret != l2data->data_len) {
-+				tester_warn("Unable to write all data");
-+				tester_test_failed();
-+			}
-+			++data->step;
- 		}
- 
- 		return FALSE;
-@@ -2280,6 +2372,10 @@ int main(int argc, char *argv[])
- 					&client_connect_write_success_test,
- 					setup_powered_client, test_connect);
- 
-+	test_l2cap_bredr("L2CAP BR/EDR Client - TX Timestamping",
-+					&client_connect_tx_timestamping_test,
-+					setup_powered_client, test_connect);
-+
- 	test_l2cap_bredr("L2CAP BR/EDR Client - Invalid PSM 1",
- 					&client_connect_nval_psm_test_1,
- 					setup_powered_client, test_connect);
--- 
-2.44.0
 
+--===============8395193839238784125==--
