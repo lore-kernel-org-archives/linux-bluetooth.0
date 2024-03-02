@@ -1,212 +1,123 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 553DB125C4
-	for <linux-bluetooth@vger.kernel.org>; Sat,  2 Mar 2024 08:10:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D5CD134A1
+	for <linux-bluetooth@vger.kernel.org>; Sat,  2 Mar 2024 08:30:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709367007; cv=none; b=E0Qdrr2zXARLD2vO738lJhP+19fx5FNIPQ5XAV2e9mDqx2PD0fT0r709CGdLxTrjow/ZC6pDDxE4R48SU8cQFRMudIAwKp5I412iJc8wYWZCRgC0zSDXg67ad6NvIgfm6BwqIGBwgwti8XBdC1B0gYRabshWXmTxGp+8trbh5tY=
+	t=1709368251; cv=none; b=GCMxMDv3LCSEkBXNCdOydBfU44eseXJr7p5VcBDvbCUdaR4Q1qyQ4U/alu3V8BmhvX36vzfDu1+BpvX6ToxvtW1SImtxmQy3Bq0FrJq8AuVD1HH8hvfifnaWEDdHS9d/kS1Rojvpbxti5oyW6KfAlCy5uBVJY+gZ9DrgXHjuE3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709367007; c=relaxed/simple;
-	bh=L0oor2AO1V23YTSF8p7pWaHCPVtxBzSs98aHYdSXbFk=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=Zye4zBcHif9eYMNXNAf5a10a3oRrgs1ZJUUfxGDRP1K0qZPgcvpMsG9wcKB2I/lF48S4FrdYEW5pBUBUeQisPZrmcssyJ09f/MH4QdnSPlaMCkPpZfaDTc1x2M7v7nzUOnWw3AVDZDQQ1+EsRrrHhCgwaFGeHGlUnjxOl6W8Ga4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Qn7JKtBj; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1709368251; c=relaxed/simple;
+	bh=FhJw75e257Az8mxXeRR41uutfZ0ZnhQWt5by0FdTv/U=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=MElDkffWlwR9tMnfhWNSsqmppjxzf32/ROY69bwP3afYDMxiIUc3fAPm/jxU++O/+D57p3v1A/QLZpHk2/4hSMMUvSf1GCbLhBDcN2ncaAAjlEmRmN1VZQ6tWKeBB7UMF60+KeXIPsfP8RYwRD0361HQir3PHrSMZN+SEawU07M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=IYmCr8Ja; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Qn7JKtBj"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709367005; x=1740903005;
-  h=date:from:to:cc:subject:message-id;
-  bh=L0oor2AO1V23YTSF8p7pWaHCPVtxBzSs98aHYdSXbFk=;
-  b=Qn7JKtBj1Tui44rSuMdO7qTL8KJCfbW/vwonbgp6qAmaIdVGJf7MqtAc
-   AIo0xk11H4VM1O25Lk7Q/d331998wiw3feSLI6VQBCwVarvDSHMsXQ+rU
-   tnOJqi6iNUy1zKY0wYAWTNfbpuGauc4g2cpcYjFwGdM0f5iT/dDiDTYnU
-   RfdDv7le2NFs9KDl7kspAYngb37TaOg6CZjZ4K8Lufnvg6yqZpgK8O3Gv
-   u3suQJ9jYyMU+a0/uBJ8mLB2c6IvC4ahSq1WyvZlD292mPtfd5MRaUVgN
-   GQLcKx/7liQbCbq9K7DX45LkOrEtL0ol8EiAO0jFIy1m+6I1TgzsaJDAD
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11000"; a="15324246"
-X-IronPort-AV: E=Sophos;i="6.06,199,1705392000"; 
-   d="scan'208";a="15324246"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2024 00:10:04 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,199,1705392000"; 
-   d="scan'208";a="8806445"
-Received: from lkp-server02.sh.intel.com (HELO 3c78fa4d504c) ([10.239.97.151])
-  by orviesa007.jf.intel.com with ESMTP; 02 Mar 2024 00:10:03 -0800
-Received: from kbuild by 3c78fa4d504c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rgKRV-000ERh-0K;
-	Sat, 02 Mar 2024 08:10:01 +0000
-Date: Sat, 02 Mar 2024 16:09:10 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- cfbc55231f8e28afb2cc422a8c299b09765d5e31
-Message-ID: <202403021607.QxegEskv-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IYmCr8Ja"
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-412cb6148dfso5965635e9.1
+        for <linux-bluetooth@vger.kernel.org>; Sat, 02 Mar 2024 00:30:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1709368248; x=1709973048; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LOcsM9bK++g0t5d/3L0FrYxkOtpdjx7QFD2VwrE7ApY=;
+        b=IYmCr8JasAluwetgH8FdyW04hsAf/kM8vPOMOBVoifM86/Xfpyf1q23pRefkYNGJDe
+         eNt2WrAxLdnrmYkZbgg5hy8DH2Qma/0MhQtk83N8wDljaXCTcdC66LdZB+TjGilVUZrG
+         oQV4+Dst8vVFS5niFD596zOlKvtfRcSvIMCZthO0LsX7boiX5Tw/DjX+efTRSrJqpXd0
+         s4EHHzKhSCJvG1DrqwW9sbs2/hmD8iGddO0NMjqbw0wlgyTvyMtSQhVAE0clDCjiJufg
+         NN+uuFVu4DBqv8B5s3jmF6p7gmcbSFKxVQgjHnnY180KnsmkbzqgOKfxxBkeJ/kPLIEn
+         gMkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709368248; x=1709973048;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LOcsM9bK++g0t5d/3L0FrYxkOtpdjx7QFD2VwrE7ApY=;
+        b=r/Jr0Osz7Ao02mlWqh6a2sgPMNl3JucH4LwvH9KZNjuBAsrZAVhyTuRxtPO09CBpI+
+         My+7ixLXTfcLELfxXqI6wYaHnNokr0bHjmYUEjbh8iK2P78/V/zyXFX/sMekBhOMhM4z
+         d9IKZKUcJ2kxWxOTxsbaAAGLIobx3kq2U03TFtpqA+LHlIX2BjPsTQYR/jz704DTwmlm
+         GpDUmFYxtW+uI2Az8WEIHpzT1p+EOVRM2XHWXl2H4qCltY+JKMusHupae7+Zs2rzB/Xh
+         HlZfL+C2Ykjfu9ulToYjMgHZFx+pFtaP5noueMLCuc2tXIiA/1OdGceBXr8A9d2VgzBa
+         7qhA==
+X-Forwarded-Encrypted: i=1; AJvYcCWoUuMwGTwdZYvf2VSnZOg9FPtJhB4DhNZiR3Md7oIPPRnB5U6gLYws+KCBQoQ+XOYiVN4uRNtfu2X8IUJAHiM/bl4lbFkDFIgS3NIQYn+A
+X-Gm-Message-State: AOJu0YwJJXkoS/beMPv5Bl4qXz7RVxzQr5N6J9kHG4C6jWrI3u1uKYWb
+	xsJe07H0suaJyAqRSDQHVhtpG5SriMOMlF6N89x0pUVoAw7Ky2uWI4wJgMtDlU8=
+X-Google-Smtp-Source: AGHT+IGHC6HfBXM5nrYJHQLRoXksV5gxN2hyd8vm2fltZWuTwZWskF98EeISwQKVDYPxh9Y3tIt5Ng==
+X-Received: by 2002:a05:600c:5024:b0:412:d0ab:a6f2 with SMTP id n36-20020a05600c502400b00412d0aba6f2mr1129766wmr.39.1709368248431;
+        Sat, 02 Mar 2024 00:30:48 -0800 (PST)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id l18-20020adfb112000000b0033d4deb2356sm6729168wra.56.2024.03.02.00.30.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 02 Mar 2024 00:30:47 -0800 (PST)
+Date: Sat, 2 Mar 2024 11:30:43 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: [PATCH] Bluetooth: ISO: Clean up returns values in iso_connect_ind()
+Message-ID: <5f73d9d7-61d7-49ab-a5e3-adda72685122@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: cfbc55231f8e28afb2cc422a8c299b09765d5e31  Bluetooth: bnep: Fix out-of-bound access
+This function either returns 0 or HCI_LM_ACCEPT.  Make it clearer which
+returns are which and delete the "lm" variable because it is no longer
+required.
 
-elapsed time: 732m
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+---
+ net/bluetooth/iso.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-configs tested: 139
-configs skipped: 3
-
-The following configs have been built successfully.
-More configs may be tested in the coming days.
-
-tested configs:
-alpha                             allnoconfig   gcc  
-alpha                            allyesconfig   gcc  
-alpha                               defconfig   gcc  
-arc                              allmodconfig   gcc  
-arc                               allnoconfig   gcc  
-arc                              allyesconfig   gcc  
-arc                                 defconfig   gcc  
-arc                   randconfig-001-20240302   gcc  
-arc                   randconfig-002-20240302   gcc  
-arm                              allmodconfig   gcc  
-arm                               allnoconfig   clang
-arm                              allyesconfig   gcc  
-arm                                 defconfig   clang
-arm                   randconfig-001-20240302   gcc  
-arm                   randconfig-002-20240302   gcc  
-arm                   randconfig-003-20240302   gcc  
-arm                   randconfig-004-20240302   clang
-arm64                            allmodconfig   clang
-arm64                             allnoconfig   gcc  
-arm64                               defconfig   gcc  
-arm64                 randconfig-001-20240302   gcc  
-arm64                 randconfig-002-20240302   gcc  
-arm64                 randconfig-003-20240302   clang
-arm64                 randconfig-004-20240302   gcc  
-csky                             allmodconfig   gcc  
-csky                              allnoconfig   gcc  
-csky                             allyesconfig   gcc  
-csky                                defconfig   gcc  
-csky                  randconfig-001-20240302   gcc  
-csky                  randconfig-002-20240302   gcc  
-hexagon                          allmodconfig   clang
-hexagon                           allnoconfig   clang
-hexagon                          allyesconfig   clang
-hexagon                             defconfig   clang
-hexagon               randconfig-001-20240302   clang
-hexagon               randconfig-002-20240302   clang
-i386                             allmodconfig   gcc  
-i386                              allnoconfig   gcc  
-i386                             allyesconfig   gcc  
-i386         buildonly-randconfig-001-20240302   clang
-i386         buildonly-randconfig-002-20240302   gcc  
-i386         buildonly-randconfig-003-20240302   gcc  
-i386         buildonly-randconfig-004-20240302   clang
-i386         buildonly-randconfig-005-20240302   gcc  
-i386         buildonly-randconfig-006-20240302   gcc  
-i386                                defconfig   clang
-i386                  randconfig-001-20240302   clang
-i386                  randconfig-002-20240302   gcc  
-i386                  randconfig-003-20240302   clang
-i386                  randconfig-004-20240302   gcc  
-i386                  randconfig-005-20240302   gcc  
-i386                  randconfig-006-20240302   clang
-i386                  randconfig-011-20240302   gcc  
-i386                  randconfig-012-20240302   gcc  
-i386                  randconfig-013-20240302   gcc  
-i386                  randconfig-014-20240302   gcc  
-i386                  randconfig-015-20240302   clang
-i386                  randconfig-016-20240302   gcc  
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch                           defconfig   gcc  
-loongarch             randconfig-001-20240302   gcc  
-loongarch             randconfig-002-20240302   gcc  
-m68k                             allmodconfig   gcc  
-m68k                              allnoconfig   gcc  
-m68k                             allyesconfig   gcc  
-m68k                                defconfig   gcc  
-microblaze                       allmodconfig   gcc  
-microblaze                        allnoconfig   gcc  
-microblaze                       allyesconfig   gcc  
-microblaze                          defconfig   gcc  
-mips                              allnoconfig   gcc  
-mips                             allyesconfig   gcc  
-nios2                            allmodconfig   gcc  
-nios2                             allnoconfig   gcc  
-nios2                            allyesconfig   gcc  
-nios2                               defconfig   gcc  
-nios2                 randconfig-001-20240302   gcc  
-nios2                 randconfig-002-20240302   gcc  
-openrisc                          allnoconfig   gcc  
-openrisc                         allyesconfig   gcc  
-openrisc                            defconfig   gcc  
-parisc                           allmodconfig   gcc  
-parisc                            allnoconfig   gcc  
-parisc                           allyesconfig   gcc  
-parisc                              defconfig   gcc  
-parisc                randconfig-001-20240302   gcc  
-parisc                randconfig-002-20240302   gcc  
-parisc64                            defconfig   gcc  
-powerpc                          allmodconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc                          allyesconfig   clang
-powerpc               randconfig-001-20240302   clang
-powerpc               randconfig-002-20240302   clang
-powerpc               randconfig-003-20240302   gcc  
-powerpc64             randconfig-001-20240302   clang
-powerpc64             randconfig-002-20240302   gcc  
-powerpc64             randconfig-003-20240302   gcc  
-riscv                            allmodconfig   clang
-riscv                             allnoconfig   gcc  
-riscv                            allyesconfig   clang
-riscv                               defconfig   clang
-riscv                 randconfig-001-20240302   gcc  
-riscv                 randconfig-002-20240302   gcc  
-s390                             allmodconfig   clang
-s390                              allnoconfig   clang
-s390                             allyesconfig   gcc  
-s390                                defconfig   clang
-s390                  randconfig-001-20240302   gcc  
-s390                  randconfig-002-20240302   clang
-sh                               allmodconfig   gcc  
-sh                                allnoconfig   gcc  
-sh                               allyesconfig   gcc  
-sh                                  defconfig   gcc  
-sh                    randconfig-001-20240302   gcc  
-sh                    randconfig-002-20240302   gcc  
-sparc                            allmodconfig   gcc  
-sparc                             allnoconfig   gcc  
-sparc                               defconfig   gcc  
-sparc64                          allmodconfig   gcc  
-sparc64                          allyesconfig   gcc  
-sparc64                             defconfig   gcc  
-sparc64               randconfig-001-20240302   gcc  
-sparc64               randconfig-002-20240302   gcc  
-um                               allmodconfig   clang
-um                                allnoconfig   clang
-um                               allyesconfig   gcc  
-um                                  defconfig   clang
-um                             i386_defconfig   gcc  
-um                    randconfig-001-20240302   gcc  
-um                    randconfig-002-20240302   clang
-um                           x86_64_defconfig   clang
-x86_64                            allnoconfig   clang
-x86_64                           allyesconfig   clang
-x86_64                              defconfig   gcc  
-x86_64                          rhel-8.3-rust   clang
-xtensa                            allnoconfig   gcc  
-xtensa                randconfig-001-20240302   gcc  
-xtensa                randconfig-002-20240302   gcc  
-
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index 30c777c469f9..8af75d37b14c 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -1910,7 +1910,6 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
+ 	struct hci_evt_le_big_info_adv_report *ev2;
+ 	struct hci_ev_le_per_adv_report *ev3;
+ 	struct sock *sk;
+-	int lm = 0;
+ 
+ 	bt_dev_dbg(hdev, "bdaddr %pMR", bdaddr);
+ 
+@@ -1954,7 +1953,7 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
+ 
+ 			if (sk && test_bit(BT_SK_PA_SYNC_TERM,
+ 					   &iso_pi(sk)->flags))
+-				return lm;
++				return 0;
+ 		}
+ 
+ 		if (sk) {
+@@ -2041,16 +2040,14 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
+ 
+ done:
+ 	if (!sk)
+-		return lm;
+-
+-	lm |= HCI_LM_ACCEPT;
++		return 0;
+ 
+ 	if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags))
+ 		*flags |= HCI_PROTO_DEFER;
+ 
+ 	sock_put(sk);
+ 
+-	return lm;
++	return HCI_LM_ACCEPT;
+ }
+ 
+ static void iso_connect_cfm(struct hci_conn *hcon, __u8 status)
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.43.0
+
