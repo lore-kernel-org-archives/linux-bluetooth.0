@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B87343AD5
-	for <linux-bluetooth@vger.kernel.org>; Mon,  4 Mar 2024 16:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B84342071;
+	Mon,  4 Mar 2024 16:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709569829; cv=none; b=JbGOB+iRIRgNsuvgvh6J24DiIbSQ7l6FWt1gTu2qugtbMoV4lTm/LwG1StpYjqprsiNJCLRhGP/hrb95vQ70a8gVWjRr59oROA8r8GN+AOYgVFmCtqHOpRhG0rFHKgng83K+vr7r5DYAl2bdECOAo/AlNc/rVEh/HjAKxa+bM8Y=
+	t=1709569829; cv=none; b=jGw8CR+OK2q+FoIkSTEOOc1SYfGVELot+TZ7wqUcPgz4aUuDvhjlQiB7gBWXTAbjyzrUOtZRPpbFVkBH8+MP9q3umk9eec93bq4pGXhP3+OlOtL14kPIyck/1EC5Wte05X8TfZOFQBFDjYncCrFcnXcdis8ymj6Ne41ZJnokZkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709569829; c=relaxed/simple;
-	bh=lHREuSZmFEcJgqNM/hJAPfZexX9jerU28oELH2ngdbc=;
+	bh=OSXo1H5aBhl5e2r4vyWeRTS/snB8L/hD9fmPaQ9eJVw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hocWd9/ZBMiaX460oEKvKAmlnZXCqgTp3/Rs8BRE2IQNkWunkX7u9v7oMWsnv/Ya+miJXsfETcYFXa3RzIZZwU0jhw4VvX6qvxNuhBnB3tcZvmjXFYV6Jh4SYX4d8V6Sz6V4Pudb8/sCCiHSRdyvEoDfLMnZMr2TuDI8jlD3zl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M6s1SkAD; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=JjDLcm9dAGwor4Zb1n227UfqNTMhf1P9jzUqC1nSkpFqO/Xq2ANdwMG1ETPDhtzBCjeG94apkmGA5ZWtkTdzJeUgR9VvPi7LEq8qsENxSw1OnbEQggjQj8RNXDsSYija5iPbEwgoCDtmzY3BOHH2GsbalFIuL8UL3odX0eZy708=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TteyW69m; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M6s1SkAD"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id ECF93C43394;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TteyW69m"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E4C5FC43601;
 	Mon,  4 Mar 2024 16:30:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709569829;
-	bh=lHREuSZmFEcJgqNM/hJAPfZexX9jerU28oELH2ngdbc=;
+	s=k20201202; t=1709569828;
+	bh=OSXo1H5aBhl5e2r4vyWeRTS/snB8L/hD9fmPaQ9eJVw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=M6s1SkADMsulLZK5j4XIkZN4T1AkUVX2+p/RopcBz4yoUpLmW2WsJIzzLjo/t94M8
-	 EAWp0bBwVKg1qCLBPQzwKK023lksDBtjvx0Zb1QDqMHXH693Sg6MVLhouupH3H7/TM
-	 hYqMb0xzIxTuMqyozRx1/sdtVoI4BMJcmvS/ckggGzOKp1E/z2IPh9JKNeb5Dmzcjl
-	 29K3WrK/XHVnPVEeQk2aVByaEbOLhUbpqMHL0RWbij3zrEME21OheShPVXLtiQX5b7
-	 Vu88XCiqTMtuRJiebSjl/QWwuopyvqVjUh7GkgIkoN50JLQFbsplVH0Jqh9iE49KbR
-	 VV+E95YaMpqyA==
+	b=TteyW69mbX0Y4JV5NE7oDqRnEESPRxny1kHjL3sDpsoEkR0xagTuTvcw39ZI2xIGZ
+	 5gmdF4T8HjloSS0u6PJHKWXEXtdjvduE8dgW43NJJKYjfBV3D+KqfIqBZtiL0MydZX
+	 7U2xzfTONwwv9l9GPQRsoSb4eKmZG2IwLQm6zr++0hUuYJlWP/+2nN/jvPvwSM74sO
+	 qs4D0Or38PTpGORm0UJZdXFD+Vj4QRvwfZ1GZzcLinyGTSTFiTLufjDMd7dPiEcZZj
+	 DpNz1FIo/PwUEI0/h3cWolsCXZb+7ppgttGLbUO1ZmUykP4I9aXe7B/JhRxKEDa4mA
+	 cgDliRXCxvStg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D97E4D9A4BB;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D13C7D88F88;
 	Mon,  4 Mar 2024 16:30:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -37,58 +37,36 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1] Bluetooth: af_bluetooth: Fix deadlock
+Subject: Re: [PATCH] Bluetooth: ISO: Clean up returns values in iso_connect_ind()
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <170956982888.9053.11683995132686615918.git-patchwork-notify@kernel.org>
+ <170956982885.9053.16120975602469036766.git-patchwork-notify@kernel.org>
 Date: Mon, 04 Mar 2024 16:30:28 +0000
-References: <20240301185034.2756103-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240301185034.2756103-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+References: <5f73d9d7-61d7-49ab-a5e3-adda72685122@moroto.mountain>
+In-Reply-To: <5f73d9d7-61d7-49ab-a5e3-adda72685122@moroto.mountain>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: luiz.dentz@gmail.com, marcel@holtmann.org, johan.hedberg@gmail.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel-janitors@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Fri,  1 Mar 2024 13:50:34 -0500 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Sat, 2 Mar 2024 11:30:43 +0300 you wrote:
+> This function either returns 0 or HCI_LM_ACCEPT.  Make it clearer which
+> returns are which and delete the "lm" variable because it is no longer
+> required.
 > 
-> Attemting to do sock_lock on .recvmsg may cause a deadlock as shown
-> bellow, so instead of using sock_sock this uses sk_receive_queue.lock
-> on bt_sock_ioctl to avoid the UAF:
-> 
-> INFO: task kworker/u9:1:121 blocked for more than 30 seconds.
->       Not tainted 6.7.6-lemon #183
-> Workqueue: hci0 hci_rx_work
-> Call Trace:
->  <TASK>
->  __schedule+0x37d/0xa00
->  schedule+0x32/0xe0
->  __lock_sock+0x68/0xa0
->  ? __pfx_autoremove_wake_function+0x10/0x10
->  lock_sock_nested+0x43/0x50
->  l2cap_sock_recv_cb+0x21/0xa0
->  l2cap_recv_frame+0x55b/0x30a0
->  ? psi_task_switch+0xeb/0x270
->  ? finish_task_switch.isra.0+0x93/0x2a0
->  hci_rx_work+0x33a/0x3f0
->  process_one_work+0x13a/0x2f0
->  worker_thread+0x2f0/0x410
->  ? __pfx_worker_thread+0x10/0x10
->  kthread+0xe0/0x110
->  ? __pfx_kthread+0x10/0x10
->  ret_from_fork+0x2c/0x50
->  ? __pfx_kthread+0x10/0x10
->  ret_from_fork_asm+0x1b/0x30
->  </TASK>
-> 
-> [...]
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> ---
+>  net/bluetooth/iso.c | 9 +++------
+>  1 file changed, 3 insertions(+), 6 deletions(-)
 
 Here is the summary with links:
-  - [v1] Bluetooth: af_bluetooth: Fix deadlock
-    https://git.kernel.org/bluetooth/bluetooth-next/c/40245851528a
+  - Bluetooth: ISO: Clean up returns values in iso_connect_ind()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/d64e5af89e6c
 
 You are awesome, thank you!
 -- 
