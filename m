@@ -1,117 +1,107 @@
-Received: from mail-ua1-f48.google.com (mail-ua1-f48.google.com [209.85.222.48])
+Received: from mail11.truemail.it (mail11.truemail.it [217.194.8.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86048627E2
-	for <linux-bluetooth@vger.kernel.org>; Mon,  4 Mar 2024 18:12:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80AFE60261;
+	Mon,  4 Mar 2024 18:14:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.194.8.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709575924; cv=none; b=POBGf6o9sgTpE+4X85eYY/WD+PjxA7wbyUHLl/nyrDek1wM/Hb3ul1mGWFI5ClWIaKYQEzvr0vA5uxH5I5jljUPk0FcPz4WrwN6wMwEN+XmfT3f3jEJdXQZHIK7nN044coM3GlvOHXi6IjE3TOhFjokVP4W44VMr8P8hSxGjL0w=
+	t=1709576076; cv=none; b=ZuAGbKAmbI+TDLmI01XBGfGJUWe2cpv8S+8Cbmhd3B+qDmrk0wpfPIMkMAmrcCjGYoVWCFjWDmn5WviihButQr6KmEcXAioz7gijTg2awQTcuzhGlrqpFFJ4BSx1D/oMFswFvDfMwjRLOfVgFZAkXXgUArQTtCFdHIkSVjigepI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709575924; c=relaxed/simple;
-	bh=WhIj9/lBuauUvRwX2XgJEIA3Mh+ozkOsXC8KzrQc/0I=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QyUL42rEf5WvpZZ0vLGWU0t+PmOU605IE8DkjXih9w8hAHQ0ABfz3mx6+PeWlomP+1ineFtJdBADAdTP2qLnuY3tqMVqgu4aL4K3KeC3HBp8dQObv8tyzhSUnxpteiEYhgjKrrqymkyeO/IOgpDJTfUAV8yH5+077j1pG2DlR+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kLve0O2f; arc=none smtp.client-ip=209.85.222.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1709576076; c=relaxed/simple;
+	bh=yCWM8ixm9Q5GJtAr9YxRI0nlBbJJJ+jn3PUBaQAZXt4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=EuSGTTwqlYbDg0q+qIJH+zvQe2jq5E4LFKnTTxHGBPnSy/OpweRhknpzwBmmk5UUMtOiSts/iTVV7zGpvZOR3RjcaUeOmUQg4qYbthNLlzsRHWy+jckFuGjH7FZLVAo7+RFG6VmvetMr3Q5X0ySsTk/e1emSRqHQco/PE/mX7w0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it; spf=pass smtp.mailfrom=dolcini.it; dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b=F3akSMUd; arc=none smtp.client-ip=217.194.8.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dolcini.it
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kLve0O2f"
-Received: by mail-ua1-f48.google.com with SMTP id a1e0cc1a2514c-7d5bbbe592dso2720443241.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 04 Mar 2024 10:12:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709575921; x=1710180721; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YNZrRAUzN5MGr9s/8qpbckxWtvLECJmp99x9D5PzTZ0=;
-        b=kLve0O2fMjsY4mgGmzM4lN3YU4rM7JHOuX7ZS316g0kpqNeJgSeUMX6mmaHxcsMxrJ
-         Fk9ihgwfryw3T0K00UyGi8aSbJlBil9NQh/IPvzhkCcbLDYFfTZ+qNfW6r0TyEav7JOx
-         uAqtMQ6/RQQQPxXsjirY5fF+J+njvPVei6tIn4TakayJk2I6EaisJC3+bpYBqEvJdwwa
-         xC6PrFNs1/SS8ndqNrXkKgJ45/+QEeiQ1eRRm8+5bkOB95xaxBPsqKw2ywA88OanxofW
-         UsT/Y1o9M0jvrLdhG0HhyzbOSoyzT7lhnDMe12EOwvFGqRkGWrHw3awS46eYND7Dt8qH
-         cWPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709575921; x=1710180721;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YNZrRAUzN5MGr9s/8qpbckxWtvLECJmp99x9D5PzTZ0=;
-        b=nG37S2lIX8BEqNlYl2CUvS/efoERA9Ubdrp5qDAzcSdW49DDiaVgdKwH8OXfumJFiH
-         bjwVVlfFtJC7KPMWte5NudWPpg00lQTQJJzpXsPuGmlOLqlOD8V7i5r+/YUm06vEUkAP
-         WGT3g0ickMQF5OBElGl4+9ZRsoN7pvTNCFUPP7Nuuv0WthK2FmCGjr4XAwGiXDoDR8aF
-         GBb8L0O5U8UWzBJnny2Bq7+hqo41uPkaX7Dj/dYS1Q3fcLM6cTdr3nu2iFV8W76JFUca
-         IHZe5WUabs8mAJXE2sI5Kk4cvepk/PPu2S5PYuaK/mpXCx041cXkHJeaNyq3vOV4H2KV
-         HPWQ==
-X-Gm-Message-State: AOJu0YwIa698u3ifDfFiOgKA42KvPnYGeSlh72Zzrz28ofKwGGxij5+I
-	fvMJvha5K9iZRaAHSF5oAgBYB+oJkie3yhGd3a0Jt1a9M6LW7scFwfXvlqes
-X-Google-Smtp-Source: AGHT+IHSydA8gcY2JDCguDIXwJttLrvGKqzNKDrgcYXEm4KGYFBkgzocdwJSTb3vJs/RU7AJMgtIRg==
-X-Received: by 2002:a67:ad17:0:b0:472:a0f3:9c71 with SMTP id t23-20020a67ad17000000b00472a0f39c71mr5602079vsl.25.1709575919358;
-        Mon, 04 Mar 2024 10:11:59 -0800 (PST)
-Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id bq9-20020a056102534900b0047064bd643csm1539656vsb.11.2024.03.04.10.11.58
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Mar 2024 10:11:58 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2] build: Fix distcheck
-Date: Mon,  4 Mar 2024 13:11:57 -0500
-Message-ID: <20240304181157.3170287-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b="F3akSMUd"
+Received: from francesco-nb.corp.toradex.com (31-10-206-125.static.upc.ch [31.10.206.125])
+	by mail11.truemail.it (Postfix) with ESMTPA id 7A4251F91A;
+	Mon,  4 Mar 2024 19:14:29 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dolcini.it;
+	s=default; t=1709576069;
+	bh=AG195yM7a11qN4a7vlK78xakfrw+QRDW32XY1+id4RI=; h=From:To:Subject;
+	b=F3akSMUd2drSZbXyLgkMXFMLCzSUJhqLLfITyU5Nkzov1zsxr8Lw+cT3ZzwvNmLSt
+	 tksLq0wk0LNiofR/WqPzc1u/oG6w/7Bl25BOV05/yQvVa/EvoytJbQqaHmCEtN0hlO
+	 eiZEqcmpFlN7NdTkvOM00maD1AEwDp2YZVDJdhYPF8wdy4X2Z6ha4Qa6JzbkracCbo
+	 H08/wuhDz7JRZFr0MfvoDHbtn6xOUZtsP6kS/n9T+yEswZpJDg2xxN4SY7yyF8OJvK
+	 ECHJ7+TQx9nK/ghWDe3f7bxd6AnXB66XihXd01f05xaK+rxzVUNCIhLy6fxk2bPuO8
+	 ivMyo8/OmYL4g==
+From: Francesco Dolcini <francesco@dolcini.it>
+To: Amitkumar Karwar <amitkumar.karwar@nxp.com>,
+	Neeraj Kale <neeraj.sanjaykale@nxp.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Ziswiler <marcel.ziswiler@toradex.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	Francesco Dolcini <francesco.dolcini@toradex.com>
+Subject: [PATCH v2] Bluetooth: btnxpuart: Fix btnxpuart_close
+Date: Mon,  4 Mar 2024 19:14:21 +0100
+Message-Id: <20240304181421.14777-1-francesco@dolcini.it>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Marcel Ziswiler <marcel.ziswiler@toradex.com>
 
-This fixes the following errors:
+Fix scheduling while atomic BUG in btnxpuart_close(), properly
+purge the transmit queue and free the receive skb.
 
-/usr/bin/mkdir -p '/backend'
-/usr/bin/mkdir: cannot create directory ‘/backend’: Permission denied
-make[3]: *** [Makefile:4768: install-cupsPROGRAMS] Error 1
+[   10.973809] BUG: scheduling while atomic: kworker/u9:0/80/0x00000002
+...
+[   10.980740] CPU: 3 PID: 80 Comm: kworker/u9:0 Not tainted 6.8.0-rc7-0.0.0-devel-00005-g61fdfceacf09 #1
+[   10.980751] Hardware name: Toradex Verdin AM62 WB on Dahlia Board (DT)
+[   10.980760] Workqueue: hci0 hci_power_off [bluetooth]
+[   10.981169] Call trace:
+...
+[   10.981363]  uart_update_mctrl+0x58/0x78
+[   10.981373]  uart_dtr_rts+0x104/0x114
+[   10.981381]  tty_port_shutdown+0xd4/0xdc
+[   10.981396]  tty_port_close+0x40/0xbc
+[   10.981407]  uart_close+0x34/0x9c
+[   10.981414]  ttyport_close+0x50/0x94
+[   10.981430]  serdev_device_close+0x40/0x50
+[   10.981442]  btnxpuart_close+0x24/0x98 [btnxpuart]
+[   10.981469]  hci_dev_close_sync+0x2d8/0x718 [bluetooth]
+[   10.981728]  hci_dev_do_close+0x2c/0x70 [bluetooth]
+[   10.981862]  hci_power_off+0x20/0x64 [bluetooth]
+
+Fixes: 689ca16e5232 ("Bluetooth: NXP: Add protocol support for NXP Bluetooth chipsets")
+Cc: stable@vger.kernel.org
+Signed-off-by: Marcel Ziswiler <marcel.ziswiler@toradex.com>
+Reviewed-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+[ fd: reword commit message ]
+Signed-off-by: Francesco Dolcini <francesco.dolcini@toradex.com>
 ---
- Makefile.tools | 6 +++++-
- configure.ac   | 8 +++++++-
- 2 files changed, 12 insertions(+), 2 deletions(-)
+v2:
+ - reword commit message
+ - added rb neeraj
+v1: https://lore.kernel.org/all/20231018145540.34014-2-marcel@ziswiler.com/
+---
+ drivers/bluetooth/btnxpuart.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/Makefile.tools b/Makefile.tools
-index c17244677673..27a753762d1c 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -539,7 +539,11 @@ endif
+diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
+index 55b6e3dcd4ec..0b93c2ff29e4 100644
+--- a/drivers/bluetooth/btnxpuart.c
++++ b/drivers/bluetooth/btnxpuart.c
+@@ -1252,6 +1252,9 @@ static int btnxpuart_close(struct hci_dev *hdev)
  
- if CUPS
- 
--cupsdir = $(CUPSDIR)
-+if CUPS_SERVERBIN
-+cupsdir = $(CUPS_SERVERBIN)/backend
-+else
-+cupsdir = $(libdir)/cups/backend
-+endif
- 
- cups_PROGRAMS = profiles/cups/bluetooth
- 
-diff --git a/configure.ac b/configure.ac
-index af0e9900e732..6552154a86dd 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -247,7 +247,13 @@ AC_ARG_ENABLE(cups, AS_HELP_STRING([--disable-cups],
-                 [disable CUPS printer support]), [enable_cups=${enableval}])
- AM_CONDITIONAL(CUPS, test "${enable_cups}" != "no")
- if (test "${enable_cups}" != "no"); then
--   AC_SUBST(CUPSDIR, `$PKG_CONFIG cups --variable=cups_serverbin`/backend)
-+	AC_MSG_CHECKING([cups directory])
-+	cups_serverbin=`$PKG_CONFIG cups --variable=cups_serverbin`
-+	AM_CONDITIONAL(CUPS_SERVERBIN, test "${cups_serverbin}" != "")
-+	if (test "${cups_serverbin}" != ""); then
-+		AC_SUBST(CUPS_SERVERBIN, ${cups_serverbin})
-+	fi
-+	AC_MSG_RESULT([${cups_serverbin}])
- fi
- 
- AC_ARG_ENABLE(mesh, AS_HELP_STRING([--enable-mesh],
+ 	ps_wakeup(nxpdev);
+ 	serdev_device_close(nxpdev->serdev);
++	skb_queue_purge(&nxpdev->txq);
++	kfree_skb(nxpdev->rx_skb);
++	nxpdev->rx_skb = NULL;
+ 	clear_bit(BTNXPUART_SERDEV_OPEN, &nxpdev->tx_state);
+ 	return 0;
+ }
 -- 
-2.43.0
+2.39.2
 
