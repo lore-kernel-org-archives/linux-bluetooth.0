@@ -1,46 +1,46 @@
 Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2087.outbound.protection.outlook.com [40.107.7.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 582775BAFA
-	for <linux-bluetooth@vger.kernel.org>; Mon,  4 Mar 2024 16:51:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1591B5C90B
+	for <linux-bluetooth@vger.kernel.org>; Mon,  4 Mar 2024 16:51:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.7.87
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709571071; cv=fail; b=hyAP1SbK1y7mfF08Y59gxW1X3l1Dr6eUaXcoyu2nuOaj4kRh40kJKnDfTb9jVvGmrPl65MByNQhXSOQS7n8rfY0ElDw0PdzCdvwqmRR9cwmgXtTGdoB+9yYh0DwOKae+CoLzsVNk+pvkSvjtxeXcPef9Q7bTFzR+i55dg/S3Y8A=
+	t=1709571074; cv=fail; b=B90tyANdipGGh0MUzdxVbiQ/5r4TfJPg6cIStHXVAKrnNTea0KVewkVdi7gdqaT6ql1KrEVtnbzXSpHwmIS75jeVRyeO7z2vB023U7x6eRkEX6S6y/SSkKPpBruoE2bpZQLi61tMlujWkc3r7CKmnVZJWIgVNmStOSFWnQRJQgI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709571071; c=relaxed/simple;
-	bh=b8eMKjSR/BcsH3tfbQxqbB8WS7Rtv1WSqwxg+baMWkk=;
+	s=arc-20240116; t=1709571074; c=relaxed/simple;
+	bh=qypvq3WZS+sAS2I2ygXWWnnSF86rWyxEV4/9r4Ma+q4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=vACJNwk1lOy/F4RmeJ1U7a8pSZOun+JL8RanSGWOkVVUbP+NYTlB+GwCrJBRIYJDMWSZh6xNcfVVOxt2RVI+dXefyy95nIUG7ZxKgEZCc6Lh4u4Rk3YphNdXOLjCxZQ8BMFDeQiXXT8vwDFsMkDLmUPtBL0ZS8+SPKTRMsqcJTg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=SWh7z55U; arc=fail smtp.client-ip=40.107.7.87
+	 Content-Type:MIME-Version; b=SNEaXDckHD6WKtxOjrjdEd8kfFlCLNQ8CtbUGgmV0pEdBtUtbIr5BpOS7fqXgkENr6L4obRXgY7g3D0qzRC7rkh/rLuzu+wZLvp9XXb7Lb1c4sbEX5alZHD1HR5bG6QBgJGdTbVvKBWDsPoM713LqcMZ5BxVn/1z7GiUgky1tAs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=NfCqRudH; arc=fail smtp.client-ip=40.107.7.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="SWh7z55U"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="NfCqRudH"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=N9LIqvmb8EQKw8fSMdoggbNwr7dmV5adNT6sBhViSKARXU5bsZtjYRCDfbe3hKdH8tDM1lgHL/P8s+2sh7nryeR/8LBsgn4uj5GAUKdVh7L+swymJAJtLuGUbV6lKUyjbUzqYOUj/BStVMRI1cNbF31cGn2Z0sG9hAaNRI9uo6rVjnhs7suRHvyPkx3SXT54RCyivZIvv/l1quB/AQFuJCPX8y6Ja0UXbmDzpSwIrkAb0uHDaY/7x4FJ6kJrxvj/Y3ftUygJSvcpRWfvVMWaCOfutpzNqYENC9TLGEGiLgIxaDWUIA/E0DK7vNVGXwVwszzKIkV0JUWqKm2DqK5pXw==
+ b=Hn1hPEfAAaCJDr4BCaAHjjuTFnKYh4rsl6RIjAD2soPRjU6xR4AXEr++lvgr5kPxnJ/8Dz/u0hZKPmSnUIddjdMhbJWxc/DKePhp+HPcJOoS6W6yD83oHMleTPcHtrds70nL7NXo9dwubPYjDFhobBohlf13aY351J3H5PyKjzoIlTho8VZhZHU9yGfhI3C+REvFYn9lQrVszsS+wnepSdWl62vE6TFAfjMVk+8qRgH2uG3u8S0N4wMVDWBCgr2tLPMS4GqLDl1H9YMGnF4MMIh2JFmzZCIDa/QUsToH/HJS77diJw7ogoII3e1UMSAGTGWrhBIwVYuk6aHhcSnJmQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uTIaFcnuiXhePi42TF0+ajq49nVI0AcwP6Lz9FqCMUo=;
- b=TRPg0p2OjuH3YESKeybls2IQlFhNG6sp8+XtEovQcB++azk5A8iLaD5hsIXVYkj9mhjGcclS+Z08t5AGXM6Ynp4TVcwHJYxZBw1J9KC3FPFhn6s2UTXMBYZPMcO8U80UGr2jmXrWYvo/XSpxZeX4zKJmvVhb6zjodVOSD7TRMaq5WUUu8UKs9lguqBBvRDOLDnTY3ulSs9nQ288EDQlrCwxuhsC/I5jC5Z2d/qSLcQ2P4cEr4a+ofms5nrHOwibIlupXFRhSNTju995HPwdej9u5sFgAjuDpydkOP3xzW5+wceoaw4CTNkvVzzM3QpdL9tNKJo1cgqaQ9PkJgkeYVw==
+ bh=b6OGAPnN0bHDtTjpttYJtlZ1Gbh1Pczq5AXUxMuEZNQ=;
+ b=cyFFgOAj6V36TGX1f5F6rOt40MuKvrAmwuZIwLrJSSliCyWl4gZted+Bcuzk8uKg1+KAxc1D3HbY8fcY1SS2OXGpTePc9eIH2+zebVAl5vav4M2OunfvKgcQf3A5uyx287C1Okqr901C0IIHwY49aa6UWa+ZwsF6WkWBE8lxzIhONmaJVHy555EdFvvlYhmoO3O/GGqnaBZUDi3HENI4nCB/7zrgviWi0yyGOQCPbjw/R4BuXzxNoFI01404UkYKe9jglp8SWQ5pt8iNwXP4Crxlxu+p2hJcmeswAxLBoVw8vzTL3fjb60FYoVuYet8tkQNwhQ3ez6UVfVuQPtvZGg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uTIaFcnuiXhePi42TF0+ajq49nVI0AcwP6Lz9FqCMUo=;
- b=SWh7z55Uc/DcVYXKaiwDaFds82nOWI/NokEreUK66hhoVxA46mBw8gehZ/oy0gYF5HN2c6GqUC4frUVdbKEYfEt3ya6rzxl33oywWMCL6v/bo7d+TfT0SXQmqA1NECUCCpOjnKJcgAxUFqnQ3736GLyy9utK+0mXjWEeYB/59Rg=
+ bh=b6OGAPnN0bHDtTjpttYJtlZ1Gbh1Pczq5AXUxMuEZNQ=;
+ b=NfCqRudHceh/ma8JA8s9IF6I06uPDBrUBNckvoOrsW1pSqBFFFoeq2Cs9v07lWeB6UjP8Ubj7GDSGYxqf31o/HoqpTJJrkC9FZ55tu8j3Ba2GLb+MRo7GK5gJW0lZF0n9XZtsX1NWUqKo7M1Ws2zoQEqAVK715wNVdnd/HXNSz8=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
  by AM7PR04MB7064.eurprd04.prod.outlook.com (2603:10a6:20b:118::21) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.38; Mon, 4 Mar
- 2024 16:51:06 +0000
+ 2024 16:51:09 +0000
 Received: from AS8PR04MB8898.eurprd04.prod.outlook.com
  ([fe80::c65:a818:c6c3:679f]) by AS8PR04MB8898.eurprd04.prod.outlook.com
  ([fe80::c65:a818:c6c3:679f%6]) with mapi id 15.20.7339.035; Mon, 4 Mar 2024
- 16:51:06 +0000
+ 16:51:09 +0000
 From: Iulia Tanasescu <iulia.tanasescu@nxp.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudia.rosu@nxp.com,
@@ -50,16 +50,16 @@ Cc: claudia.rosu@nxp.com,
 	andrei.istodorescu@nxp.com,
 	luiz.dentz@gmail.com,
 	Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Subject: [1/2] Bluetooth: ISO: Fix circular locking dependency warning
-Date: Mon,  4 Mar 2024 18:50:49 +0200
-Message-Id: <20240304165050.3430-2-iulia.tanasescu@nxp.com>
+Subject: [2/2] Bluetooth: ISO: Always release hdev at the end of iso_listen_bis
+Date: Mon,  4 Mar 2024 18:50:50 +0200
+Message-Id: <20240304165050.3430-3-iulia.tanasescu@nxp.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240304165050.3430-1-iulia.tanasescu@nxp.com>
 References: <20240304165050.3430-1-iulia.tanasescu@nxp.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: VI1PR06CA0142.eurprd06.prod.outlook.com
- (2603:10a6:803:a0::35) To AS8PR04MB8898.eurprd04.prod.outlook.com
+X-ClientProxiedBy: VI1PR07CA0211.eurprd07.prod.outlook.com
+ (2603:10a6:802:58::14) To AS8PR04MB8898.eurprd04.prod.outlook.com
  (2603:10a6:20b:42d::15)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -69,151 +69,82 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|AM7PR04MB7064:EE_
-X-MS-Office365-Filtering-Correlation-Id: fc6230d7-5a4c-4647-47cb-08dc3c6b4901
+X-MS-Office365-Filtering-Correlation-Id: 8f217564-9c3b-4cc1-d9ea-08dc3c6b4ae9
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	//ysKPFm25XqBlltEx7sMupt8s1RoaWf50IxMyEbmOcbhbLlrx8uWlxXWlXoDe942Uoqz++U3s4dyeWxpu3sp23NHuCrKKjpZjpFjaud2MccaEv4RTDbj3fLW0Jdx1Rq57XqxSLVOtAgyiAOtau1LLQyVv8b0HIf7KbwG5OFvTmr03d6GxgaKBsdfAJ/kfws9F+PvIIMRiWdl11MmlzJw8HlC+VB1a2Ldfdlgpx76G8O4Dr5o94b9BxILFP1PEaInPBRRqlcvSPj2g3M4SMU+4f7WsFXmvCZTIWCTxm3etUFDSkFWRi+hf22V+Wd7AEtdxVoL/iuC08rhu7TsQiqGVCWmqPHeMEljTDqjjVihRrfPYibG4zrQatFtvFvpE4JDuBsH6I6D2tjNQeQZi+nF0PoOtPsoWqiEPziC5l99hSSw5e3Y2QPliBBKqxST2bL8x7LUqOm3kvJjmOlH4Rg20kraD3O1iFuQxFBydMnUjJtssqNrVSmTktSLzZrkYNZ7aPQ2MreNPikAAiqLM1j+K/dVybvrixAjlWnTk2CBpyx4WDOYIE8cX1QIX+j49DLncLmcLxJ4+z65cgd68G3ee+jJD2c744YSIF+cn1XWB8cy1QMy4rvf1fHc7mn27EDLrYqI+gzmeIpqmdNa/HKBq3cj8YhsyeYlgJEpFj/FhU=
+	4hG6s+jy9xpMCNsakoREcWS2zDOLtJESS2fNDcBBOAXhpQw4738BYeRmZhb2tKTyTt9oBHCmH3QD0P3xX7iLfj9OBi0GHF0cAgGwjV72jhU3WeQxXHV53vJFlB/4vBjrb0r7GA1LVphCKm2cYQHmfiyFby/bCW0sK8r7eQ5U3TQkWWWZ1FKTDp6RU0gvlstoPEzO/xOH7stxjfR2HTSnZ+miVnN70RoU0ufe77eavrtlP1gP0tj4Sf/oV0MBf7SZv8xo+7uvT4m1VM84QjzgSfnGE7zsgYWicG1tOUNn6VNUHDwDTrYUwLv+lnenJ2cAhn8tkIHt06TMKeNB2qVMiATdYau74zyQAsVE5gmXdFJm7Ssp8r+bQXVkJ9rUuomsmnK29WAuLJ3XD5H2jq/skCAOxkpFGIFBwtZpDsZ/Cpjrcgpvolpd6BfBFSx2SxVLpf6xj0vQjzMymV/LT9nPHsPDhDyXFnKcdz1tbQ+7HDahwiYQ5+UEQEWTTS/FCko7YQ01kuJBjP/GHr82NxF5z50JNvB9xV6NaFw9Abf4xvBE8luVaIGaPZNj7KXTxcTXOrOTng0ACTehTKl2apt3lyyYwTszFc03+gryfZZ+gzCVbVHN+Hw/FRQ5dVe5xyq0IhGI6zgCac/xKoTVWvoAOx7LEF1o6DeawbyMeEi7TUU=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?98imclkTF9DQfongwKayj0rxeGgw6EoPmNm0o1joLfuNZ9A0S1acCaygq+Ic?=
- =?us-ascii?Q?ENXPrx2w4q3z1lv8MYdbA5kn37l9nDFHfdiY8uN2UCRXQP67w/+NC58J7Gmf?=
- =?us-ascii?Q?xtluON/IMHe42Qg7xGTzzG5KKufe7SmTd7n6wPf3/1A28wjmI7VGeJhj7cgR?=
- =?us-ascii?Q?ihojb/AWl0XMj08LWOTRZB8aW8Pw5bBy3Pv7YMpvIsRMmRfv5VCd5aiBIvGH?=
- =?us-ascii?Q?6Ho0tB+qrEXU9Uu60/691kBAMUTg+Z1WnCOMitoq5FmmuTMc0vbPezKB+9va?=
- =?us-ascii?Q?HQNpJZ6djLXBK+ROprxBM6LibP4yME5HTEIiNhQ1EzC+ChbwAAGppCxc/Mtp?=
- =?us-ascii?Q?DkZZ0uMn2q/oyXv/tT+c4rn6Xc81uObxE/RUGX7OLPWWW5mWsEkSdY4KwSNa?=
- =?us-ascii?Q?YvUA8R4iIfPIGnX3hL8mAu4QHKG3+xnJZlj2b68ZHQpSBy3IOFcOF59rOK9b?=
- =?us-ascii?Q?DzeiyIP/IKuP+XRGfW2JJ1qfD7KQwNmxhuwyezAcJUGSCLz2NUDkgoMtiRw9?=
- =?us-ascii?Q?T2uDiL6n8Wb/Xtn9pPQDCe29iF6UrgxhYcPs4fIhblD1fmRxf67RXoviiTsW?=
- =?us-ascii?Q?0Df50KOxT9BTYQyLoNsSlfjDZRdNBjhxd3ieEfbalaWsXS/x25nIXaUkNybY?=
- =?us-ascii?Q?CUNOQWyv/dkS7Mm0lAc7Qw+g4uvxslwOFexK1KzCy1Y1DT/QwW/ngQPEUbu4?=
- =?us-ascii?Q?SpBq4LuNpOWxdwVSdbpyhS733Rdu02RjrXtMybkBGU6/1IBkFPZaInOybgEe?=
- =?us-ascii?Q?6HsvzepZdnQoM2foKNESAmwiqK4iz/6RqcSZ+qi6D/LRfYI8avU1LsM57rzN?=
- =?us-ascii?Q?RtZVYH5l7147so/WQS0yVA0XH6pBPDMu9950/N8QI0cL2or21GpGXWZ9rPeS?=
- =?us-ascii?Q?bQBsjspFyOj12rSFi/B7wrzZHAjO+0aixqD6chOoZ38O+pFET32YFd6QmoGr?=
- =?us-ascii?Q?HoH/Ie4xhZq9IWaOSGCg3Y+2cHYptJ1hL0RL0WJbQwWakmQulPl6XikQhJ0d?=
- =?us-ascii?Q?hA0Vzaf30CmaF+cmiRxDfdzWMDmBd0aWU9NW6mqJ69ZXFgzy1pM+NcGRsA7a?=
- =?us-ascii?Q?9FO2zMGHb3PxBipff+uOfXe7lv+r+Fq1P9NDYsXE0GDuHYG999izpHwGPyVu?=
- =?us-ascii?Q?UW39a4MwPpQgRD3CcKCVAxjy5zULJheXFhN9DmvmGxxXyV+Z+t+8liiP20DN?=
- =?us-ascii?Q?jszjntSMUHXynfy2C8GPOhPsjr4kg1+Om5HFLGiB9P/ZLLGWcJsuokR20EgR?=
- =?us-ascii?Q?7W1j/1d6GbBBM+1jB8TFJFIBrK62oFeeyLR2goM0FP4JuHMJG53JOhzPdyKi?=
- =?us-ascii?Q?9Pw8Ij8vuDBsxeweAaNLIPaZuBM2LKYz+Ib6IczCosbOqOnfcCBhXpmpOF0h?=
- =?us-ascii?Q?vG5S5aMudxM6te/hieSfc280uUynTbInFCmMOYQx/7ISzOZxGbdU/DFyzSVt?=
- =?us-ascii?Q?SDburrP+/xG+k+t2jggV233vIrnnkAhx3cs0z2O8jkRA7ruYDwANxxRQv8UA?=
- =?us-ascii?Q?/e/9aOuvlpIDDyqm/uj1CBNgcGp/676iBiRTnU/BLeeSlak8L592dns2WRNk?=
- =?us-ascii?Q?PjKR4R7iDwLFNvQeWkRAkqGwTMLbs0t8GifxvoWCkRCmJe8Pf5CIyKJZgIRn?=
- =?us-ascii?Q?tA=3D=3D?=
+	=?us-ascii?Q?6bzyqRPWny3h0EPRZtXryD2/n/yQkxbgsYsn/ocyewUcAGCqPv/DocBTmBDH?=
+ =?us-ascii?Q?DWWSCf8kTyZwIFBpMDe+c4HyP5xvUYUWiHGCIjMvu4ju8gZn3/mF3vEwkEgO?=
+ =?us-ascii?Q?T4augwLJdiJsO+hsLJnXr219H0pBd2yCiTPI+6N6BqH7gYhjl1ORE5RZ6kKb?=
+ =?us-ascii?Q?0tghSOS/+wIJBk6HXvgIpDi1sxtNXVnSnpbGCVkpRW7hHzarJJHODJ67IYAe?=
+ =?us-ascii?Q?/cGWHz/GgM7o/Dr0cEr0TroWV/vdh9VzMdQM9VxbBXF29PAcOa5PMoiNuZ3S?=
+ =?us-ascii?Q?2QTifLDIG3xQbCKZ7rTjV23dRZRryIntEwTpbsTZvWyMjGniHT/OZ+7w1Qx3?=
+ =?us-ascii?Q?gJnvvwtw6rDEu8rYeFhIUS3rVpBkc1YE0jMlyP5I1902as7jdnZ7G4DOSX6s?=
+ =?us-ascii?Q?iqjauV/PIAJtJbjf6qpTxvXZpFD2Gf6iLYx7VVCwLKyRpUFRIUPSyo0+oDfj?=
+ =?us-ascii?Q?bPnlsLzZQGQLaV3UA+qKs/HILsC1MPHhIn2+cZMbMwPhJjoh+46gErZSnnrs?=
+ =?us-ascii?Q?FtI/6IPhhiCj+xaQHmOM/jpbwrl4rVwaPo7SNGoLTKds16VtuYtnMOGRXAaf?=
+ =?us-ascii?Q?f1nw+dDEQmjBo8f0RaWl4E5KQJLd2mpQCovRhdngE/QaYCGrc6biclLFNf69?=
+ =?us-ascii?Q?+WkgsRBiYQB2M2zKccaoJWil0d27VqfCwN47yemlgzJmdfwu/z56Czq6BnwK?=
+ =?us-ascii?Q?tOnSdJL/x4r4Z1Vg6G8WBoecGC3sfRz31uw3EMatOZ5brnyftnoviq/9GHut?=
+ =?us-ascii?Q?HRPuL6Y2NAOhlMUbLFod741JwsKP7+44p+NKSe+SBRPzhRtl/t/x2C1y5ono?=
+ =?us-ascii?Q?Gdx9+XtPX0bOVSd3Gok5y5e9zu+RVrY3eUFIXrOwmsoIHCQ4GQf74GNOFQv4?=
+ =?us-ascii?Q?N0L/PUVY0pSSu8YWhB3abX8KoI5a7ZikeOQdsUVqKAKCMRSOa/j7xxgaWD8/?=
+ =?us-ascii?Q?S2uipcpiVExisi3hg+qJ3ooEBFbL6MojAOCIjPb1hPcXaUwstCESMF+RShbY?=
+ =?us-ascii?Q?gIfAqr6uTFp9QKSLU0GQDLG1reNXl6Pt7DNDVJ6wczwke3y6T9fEJbmKuklv?=
+ =?us-ascii?Q?ic/t/UBFs9+vEu49YY58Yf3XzymCq5ZstNpu57qEgsmVr6p6yeZfYsMydVAG?=
+ =?us-ascii?Q?aPurIv3sLS9hTJuP0wOd6s5WhdNx7wBtCWRIFTUaXocu0dWHDOIW2Y1wDgB4?=
+ =?us-ascii?Q?Ok+DBSij5kJ6JSwD24nG6XkgZap9XfptLkf4MMvclQN+VyE9OR/BYGPHjzCl?=
+ =?us-ascii?Q?/gx8cdKemTR2MXLySSjHeOXI1zH4ZMuYzjNc+36WodofCT7LqVMF5pByi7cj?=
+ =?us-ascii?Q?/ZyzG8nvJ6vHhCb8bSoylRDjV1iiP3iPXZtHw18vnQU2nvtiDYPUW9RCsWie?=
+ =?us-ascii?Q?dR10QWj4HJdhAL2hz9oCXw4XhB7f27kTFVyIlDN5pnYn7FT2p9Qt7ab8na81?=
+ =?us-ascii?Q?fRdyaKky8Jt80dvhQ9UKK5lKJ1MHepn5U3J7pjVGZBH1JwlZkxfWQGLFHEb6?=
+ =?us-ascii?Q?TT2iUM7aCsTBVTGiHSOXAWadoZlIsCseuUVkqXspcURLrJeTGLPDFRgSCLMf?=
+ =?us-ascii?Q?77dyv+MnhHEP5KIQjA2cXOVCTVgZ8kFF1xZ2v262+Y01+wD7B5sW5ryxavt+?=
+ =?us-ascii?Q?cA=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fc6230d7-5a4c-4647-47cb-08dc3c6b4901
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8f217564-9c3b-4cc1-d9ea-08dc3c6b4ae9
 X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8898.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2024 16:51:06.4754
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2024 16:51:09.6821
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vFUXQXkfBaoE34sAdCBrcZNI2oowatmQWEDP1vqmIm6tbQktl8GkB8odbEyjGSgChuTXRGxh0xado+gtmp3/EA==
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9E9eA3iZL6gJVHMUejYcp7mRQ5qZsDvjfYavXFYEIeF9yUncIHEz3q9hR0+9/A6ah42KntedrkGKV0BTBrtAvg==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR04MB7064
 
-This fixes the circular locking dependency warning caused
-by iso_listen_bis acquiring the hdev lock while the socket
-has been locked in the caller function.
-
-======================================================
-WARNING: possible circular locking dependency detected
-6.8.0-rc5+ #1 Not tainted
-------------------------------------------------------
-iso-tester/2950 is trying to acquire lock:
-ffff88817a048080 (&hdev->lock){+.+.}-{3:3}, at: iso_sock_listen+0x305/0x8d0
-
-               but task is already holding lock:
-ffff888197c39278 (sk_lock-AF_BLUETOOTH-BTPROTO_ISO){+.+.}-{0:0},
-               at: iso_sock_listen+0x91/0x8d0
-
-               which lock already depends on the new lock.
-
-               the existing dependency chain (in reverse order) is:
-
- -> #1 (sk_lock-AF_BLUETOOTH-BTPROTO_ISO){+.+.}-{0:0}:
-        lock_sock_nested+0x3b/0xb0
-        iso_connect_cis+0x185/0x540
-        iso_sock_connect+0x445/0x7e0
-        __sys_connect_file+0xd5/0x100
-        __sys_connect+0x11e/0x150
-        __x64_sys_connect+0x42/0x60
-        do_syscall_64+0x8d/0x150
-        entry_SYSCALL_64_after_hwframe+0x6e/0x76
-
--> #0 (&hdev->lock){+.+.}-{3:3}:
-        __lock_acquire+0x208f/0x3720
-        lock_acquire+0x16d/0x3f0
-        __mutex_lock+0x155/0x1310
-        mutex_lock_nested+0x1b/0x30
-        iso_sock_listen+0x305/0x8d0
-        __sys_listen+0x106/0x190
-        __x64_sys_listen+0x30/0x40
-        do_syscall_64+0x8d/0x150
-        entry_SYSCALL_64_after_hwframe+0x6e/0x76
-
-        other info that might help us debug this:
-
-Possible unsafe locking scenario:
-
-        CPU0                    CPU1
-        ----                    ----
-   lock(sk_lock-AF_BLUETOOTH-BTPROTO_ISO);
-                                lock(&hdev->lock);
-                                lock(sk_lock-AF_BLUETOOTH-BTPROTO_ISO);
-   lock(&hdev->lock);
-
-                *** DEADLOCK ***
-
-1 lock held by iso-tester/2950:
-0: ffff888197c39278 (sk_lock-AF_BLUETOOTH-BTPROTO_ISO){+.+.}-{0:0},
-                at: iso_sock_listen+0x91/0x8d0
+Since hci_get_route holds the device before returning, the hdev
+should be released with hci_dev_put at the end of iso_listen_bis
+even if the function returns with an error.
 
 Signed-off-by: Iulia Tanasescu <iulia.tanasescu@nxp.com>
 ---
- net/bluetooth/iso.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ net/bluetooth/iso.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 30c777c469f9..163b07db575d 100644
+index 163b07db575d..b1a211b75625 100644
 --- a/net/bluetooth/iso.c
 +++ b/net/bluetooth/iso.c
-@@ -1069,6 +1069,7 @@ static int iso_sock_connect(struct socket *sock, struct sockaddr *addr,
- 	return err;
- }
+@@ -1131,13 +1131,13 @@ static int iso_listen_bis(struct sock *sk)
+ 		goto unlock;
+ 	}
  
-+/* This function requires the caller to hold sk lock */
- static int iso_listen_bis(struct sock *sk)
- {
- 	struct hci_dev *hdev;
-@@ -1095,7 +1096,12 @@ static int iso_listen_bis(struct sock *sk)
- 	if (!hdev)
- 		return -EHOSTUNREACH;
- 
-+	/* To avoid circular locking dependencies,
-+	 * hdev should be locked first before sk.
-+	 */
-+	release_sock(sk);
- 	hci_dev_lock(hdev);
-+	lock_sock(sk);
- 
- 	/* Fail if user set invalid QoS */
- 	if (iso_pi(sk)->qos_user_set && !check_bcast_qos(&iso_pi(sk)->qos)) {
-@@ -1128,7 +1134,10 @@ static int iso_listen_bis(struct sock *sk)
- 	hci_dev_put(hdev);
- 
+-	hci_dev_put(hdev);
+-
  unlock:
-+	/* Unlock order should be in reverse from lock order. */
-+	release_sock(sk);
+ 	/* Unlock order should be in reverse from lock order. */
+ 	release_sock(sk);
  	hci_dev_unlock(hdev);
-+	lock_sock(sk);
+ 	lock_sock(sk);
++
++	hci_dev_put(hdev);
  	return err;
  }
  
