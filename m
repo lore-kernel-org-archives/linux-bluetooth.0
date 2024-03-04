@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B84342071;
-	Mon,  4 Mar 2024 16:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73A654CDFB
+	for <linux-bluetooth@vger.kernel.org>; Mon,  4 Mar 2024 16:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709569829; cv=none; b=jGw8CR+OK2q+FoIkSTEOOc1SYfGVELot+TZ7wqUcPgz4aUuDvhjlQiB7gBWXTAbjyzrUOtZRPpbFVkBH8+MP9q3umk9eec93bq4pGXhP3+OlOtL14kPIyck/1EC5Wte05X8TfZOFQBFDjYncCrFcnXcdis8ymj6Ne41ZJnokZkQ=
+	t=1709569829; cv=none; b=pNUYuFPqM1Aln3xNztnd7uEGnIL4HKnobakwVVajJ8aZv/FFtSBL5Ns9czy4DBNst6JfEO8u+g2WEdI/mqml6FGVlHbkbIIcO0kZK5FNYsk1oGKOlPcEo6W6XSsTOXvxvYUQG756+gWJbYVFAcPrTRzzieYQkzvP/q0+DFb7rmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709569829; c=relaxed/simple;
-	bh=OSXo1H5aBhl5e2r4vyWeRTS/snB8L/hD9fmPaQ9eJVw=;
+	bh=gkMP0jzMzUpEN/GCnCPlRf7DeQTAqCM4PggLaze3sck=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JjDLcm9dAGwor4Zb1n227UfqNTMhf1P9jzUqC1nSkpFqO/Xq2ANdwMG1ETPDhtzBCjeG94apkmGA5ZWtkTdzJeUgR9VvPi7LEq8qsENxSw1OnbEQggjQj8RNXDsSYija5iPbEwgoCDtmzY3BOHH2GsbalFIuL8UL3odX0eZy708=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TteyW69m; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=CNSoQvQTmDuCihsZrXwUvLA9HNK7BsWUAE5xmtspP6cyOI3nLTCAB7IFkJdfbxEILQMRa6OItCgQzhzi4RwOXVA8f0XBkCmGpqSaVrdvRN+Zd2zSm5hDBp6xx57/4k23aeAtk90J/rEB0BMjHPfTzf8+1pwGLIT5nvfyXlGtoxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KmxwV4Af; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TteyW69m"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E4C5FC43601;
-	Mon,  4 Mar 2024 16:30:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KmxwV4Af"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 08090C43609;
+	Mon,  4 Mar 2024 16:30:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709569828;
-	bh=OSXo1H5aBhl5e2r4vyWeRTS/snB8L/hD9fmPaQ9eJVw=;
+	s=k20201202; t=1709569829;
+	bh=gkMP0jzMzUpEN/GCnCPlRf7DeQTAqCM4PggLaze3sck=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TteyW69mbX0Y4JV5NE7oDqRnEESPRxny1kHjL3sDpsoEkR0xagTuTvcw39ZI2xIGZ
-	 5gmdF4T8HjloSS0u6PJHKWXEXtdjvduE8dgW43NJJKYjfBV3D+KqfIqBZtiL0MydZX
-	 7U2xzfTONwwv9l9GPQRsoSb4eKmZG2IwLQm6zr++0hUuYJlWP/+2nN/jvPvwSM74sO
-	 qs4D0Or38PTpGORm0UJZdXFD+Vj4QRvwfZ1GZzcLinyGTSTFiTLufjDMd7dPiEcZZj
-	 DpNz1FIo/PwUEI0/h3cWolsCXZb+7ppgttGLbUO1ZmUykP4I9aXe7B/JhRxKEDa4mA
-	 cgDliRXCxvStg==
+	b=KmxwV4AfuiicBbAvFT83638dYH22lqXLyWae4itb0C9B6PN8/HqWnCrZ5Rn3BI8Vx
+	 AHI1r+m8bREpAWcfHRnhuuBOBuDgoItu22lC07JE5HkBKA0cB1wLjYdBHfVH7pDYVP
+	 9lSDm7cvxbXDXyuNumlGXO0+ySU5meFPnOCmbtW6QnVynpOzJH/ZitKuUP+7AHFUpo
+	 j6esPl8b9cOcpQGHuciVFuqBdX5WI2AMrXFoJRZtQgduS//NSyvy3LxCArXmOtWKTq
+	 VhzYFPpJ85f/Iw86zhWDxJaFnAyjeP12Oxi2zlqYaBQBZ+5dGV/hpzwhtgvjeBotUg
+	 rUpifUjidpZTg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D13C7D88F88;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E0DC0D88F8A;
 	Mon,  4 Mar 2024 16:30:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -37,36 +37,56 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: ISO: Clean up returns values in iso_connect_ind()
+Subject: Re: [PATCH] Bluetooth: fix use-after-free in accessing skb after sending
+ it
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <170956982885.9053.16120975602469036766.git-patchwork-notify@kernel.org>
+ <170956982891.9053.14301258419582340101.git-patchwork-notify@kernel.org>
 Date: Mon, 04 Mar 2024 16:30:28 +0000
-References: <5f73d9d7-61d7-49ab-a5e3-adda72685122@moroto.mountain>
-In-Reply-To: <5f73d9d7-61d7-49ab-a5e3-adda72685122@moroto.mountain>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: luiz.dentz@gmail.com, marcel@holtmann.org, johan.hedberg@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- kernel-janitors@vger.kernel.org
+References: <90576ca2ad6b1c3e24c585c734cde44bbcb388bf.1709399114.git.pav@iki.fi>
+In-Reply-To: <90576ca2ad6b1c3e24c585c734cde44bbcb388bf.1709399114.git.pav@iki.fi>
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Sat, 2 Mar 2024 11:30:43 +0300 you wrote:
-> This function either returns 0 or HCI_LM_ACCEPT.  Make it clearer which
-> returns are which and delete the "lm" variable because it is no longer
-> required.
+On Sat,  2 Mar 2024 19:06:23 +0200 you wrote:
+> hci_send_cmd_sync first sends skb and then tries to clone it.  However,
+> the driver may have already freed the skb at that point.
 > 
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> ---
->  net/bluetooth/iso.c | 9 +++------
->  1 file changed, 3 insertions(+), 6 deletions(-)
+> Fix by cloning the sent_cmd cloned just above, instead of the original.
+> 
+> Log:
+> ================================================================
+> BUG: KASAN: slab-use-after-free in __copy_skb_header+0x1a/0x240
+> ...
+> Call Trace: ..
+>  __skb_clone+0x59/0x2c0
+>  hci_cmd_work+0x3b3/0x3d0 [bluetooth]
+>  process_one_work+0x459/0x900
+> ...
+> Allocated by task 129: ...
+>  __alloc_skb+0x1ae/0x220
+>  __hci_cmd_sync_sk+0x44c/0x7a0 [bluetooth]
+>  __hci_cmd_sync_status+0x24/0xb0 [bluetooth]
+>  set_cig_params_sync+0x778/0x7d0 [bluetooth]
+> ...
+> Freed by task 0: ...
+>  kmem_cache_free+0x157/0x3c0
+>  __usb_hcd_giveback_urb+0x11e/0x1e0
+>  usb_giveback_urb_bh+0x1ad/0x2a0
+>  tasklet_action_common.isra.0+0x259/0x4a0
+>  __do_softirq+0x15b/0x5a7
+> ================================================================
+> 
+> [...]
 
 Here is the summary with links:
-  - Bluetooth: ISO: Clean up returns values in iso_connect_ind()
-    https://git.kernel.org/bluetooth/bluetooth-next/c/d64e5af89e6c
+  - Bluetooth: fix use-after-free in accessing skb after sending it
+    https://git.kernel.org/bluetooth/bluetooth-next/c/d147be932692
 
 You are awesome, thank you!
 -- 
