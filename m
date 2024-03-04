@@ -1,65 +1,75 @@
-Received: from mail11.truemail.it (mail11.truemail.it [217.194.8.81])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A3B079934;
-	Mon,  4 Mar 2024 19:29:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.194.8.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A36D7A738
+	for <linux-bluetooth@vger.kernel.org>; Mon,  4 Mar 2024 20:10:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709580604; cv=none; b=cZ3RS5CGwckDcDWpFa5IHabb5eCnM3Tcr30Z2hajAVbyU+j3G/koiV+shkp7L9JaTU8bKA+ecrXATSHESDi28adp3KKN6RdfmwwvcYKz8EaKAo0ohnplwvNcppSDXJJhjclhLVvTATkFic+Wa5OHiQ+Cduyc55ipcJzwz08m2f8=
+	t=1709583027; cv=none; b=jN/w/tB1tdNmdxfJGNFOMRYifg/IoqNH9+G+ItDh18yfQk4DRZ28EbSjoqNGpiRuarG2+mObFlMTMiHZ0DZufloa1PXwBF4rPbqhURLNGq0NEXwHC0tb3inJtaeyo6IT4Ln537unkmYGumQZjivURMYMNtz0i8mVZ6EndW/UYjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709580604; c=relaxed/simple;
-	bh=OHHQkLHOYhKzzUAIATtYY0qzmwZeAs+dZRjgbBX/R1s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HyyVI/6gB5cqjWUox8ESQKioo1H6q8+wnd4m445g4zMUVhnyYvIKKfnf+Eei+Z/T76D32boMJrewMsGWKYactfzavIJp5saX6iybaDEQAyiFEeBoNB5nePADUjvSa+xR0MqdkV8Si55YoMzLjORYCy2H9l4EC/cGePf1S529VC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it; spf=pass smtp.mailfrom=dolcini.it; dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b=H9O9cVle; arc=none smtp.client-ip=217.194.8.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dolcini.it
+	s=arc-20240116; t=1709583027; c=relaxed/simple;
+	bh=Tl0F8vnYZlZHfGNjUQKZjcY1vcbvHE55MXI2e68Bmtk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=NAgEPSTl8SSmH5PGmgCd1olgUCs5DUeV3wALodRhLvxlfEuEU5ZQ5V9za/WrHCMikij4V7AlSvzbaAtOS6kjuPGyY4PDWJno3SupPhvqyLDINjpTspEhgkVCJItkPt7nKb5Wpnp9WGX8kfPvppL1FflZzpPGtV4WXARNt8gMZjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f5qkLVKz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b="H9O9cVle"
-Received: from francesco-nb (31-10-206-125.static.upc.ch [31.10.206.125])
-	by mail11.truemail.it (Postfix) with ESMTPA id 3B4A320272;
-	Mon,  4 Mar 2024 20:29:57 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dolcini.it;
-	s=default; t=1709580597;
-	bh=gYZ+/ZNs5fL/27laenTgswxEUSGg+HFZXtEGcfk/WM8=; h=From:To:Subject;
-	b=H9O9cVlewkYHIk3S/Cj4ZSQ5uqbe4unbHVBrnYKoUOdB0fHbS4ZOkyP9HhYp2Llsi
-	 +klTM/4bR/M27dzGGAZr9au1TAgEPFWH4BOqosriFlWqGmS1bECUR2eNBx728/totM
-	 mijIwfXuGK6zuv+T75j5pgjoZ/t4nJF1F2tiAgiWtUz3HokTRmPsw78KevG2SPDwWW
-	 MATWS6uNniA3F2V0CNWRVMnA5CYqhAh8dOHXBR3Yt903uKL4IqDdPtbxo/nhj3RNGB
-	 YR6+j2AiuBFFM6JHWfBpGXiKlj/7kez9vP3/gusltez2nO6LUpoJ9QUgOlbrXNZlRb
-	 ydDhF8L6/hFmA==
-Date: Mon, 4 Mar 2024 20:29:52 +0100
-From: Francesco Dolcini <francesco@dolcini.it>
-To: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-	amitkumar.karwar@nxp.com, rohit.fule@nxp.com, sherry.sun@nxp.com,
-	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: btnxpuart: Enable Power Save feature on
- startup
-Message-ID: <20240304192952.GA17410@francesco-nb>
-References: <20240304170753.500074-1-neeraj.sanjaykale@nxp.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f5qkLVKz"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A605AC433B1;
+	Mon,  4 Mar 2024 20:10:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709583026;
+	bh=Tl0F8vnYZlZHfGNjUQKZjcY1vcbvHE55MXI2e68Bmtk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=f5qkLVKztFdwoy+6QlglHH7pq15FTQFEQ1jhF78iKOF/yu0cM3CLluGOyYO4/WGtm
+	 fGQUF8LhtAA+nS/64pS7xHSDUZ2EVqVcoTr8lXuHtU5R2dwb0UYsyc0fu5HCYsAS5l
+	 HJ4bfh8SyxlTx3uSQ6yWwdkDGpiBojfuN/9GO8lo5Wxaet44lb8R4EvXfRsMCCRgEk
+	 XPQyJuN1p0TRf+/Crt7/R2JBbgbFMN1oA9aKueaEqTFNdNlV+5uhWBipUbCCbTB1aZ
+	 tQ7vAY0wXhMoFClY44p7alJF9jCMwZTw49A4kpZY7OXkwJ+mUz3WE6eXg+qcWQ0rC4
+	 AKvTX4/fBcwyQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 88AFAD88F87;
+	Mon,  4 Mar 2024 20:10:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240304170753.500074-1-neeraj.sanjaykale@nxp.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v2] build: Fix distcheck
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <170958302655.15452.18312812563036978488.git-patchwork-notify@kernel.org>
+Date: Mon, 04 Mar 2024 20:10:26 +0000
+References: <20240304181157.3170287-1-luiz.dentz@gmail.com>
+In-Reply-To: <20240304181157.3170287-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-On Mon, Mar 04, 2024 at 10:37:53PM +0530, Neeraj Sanjay Kale wrote:
-> This sets the default power save mode setting to enabled.
+Hello:
+
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Mon,  4 Mar 2024 13:11:57 -0500 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> The power save feature is now stable and stress test issues, such as the
-> TX timeout error, have been resolved.
+> This fixes the following errors:
+> 
+> /usr/bin/mkdir -p '/backend'
+> /usr/bin/mkdir: cannot create directory ‘/backend’: Permission denied
+> make[3]: *** [Makefile:4768: install-cupsPROGRAMS] Error 1
+> 
+> [...]
 
-I assume that the stability issue has been fixed in firmware, correct?
-What's going to happen if running the updated driver with old firmware?
-What about combo Wi-Fi/BT firmware files, were those updated? I'm
-currently using this driver with this firmware [1]
+Here is the summary with links:
+  - [BlueZ,v2] build: Fix distcheck
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d5a9195a6269
 
-[1] https://github.com/nxp-imx/imx-firmware/blob/lf-5.15.52_2.1.0/nxp/FwImage_IW416_SD/sdiouartiw416_combo_v0.bin
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Francesco
 
