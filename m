@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94E9C7BB15;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D27C47C086;
 	Mon,  4 Mar 2024 21:30:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709587827; cv=none; b=GmtBmm1hKkLMRO4hDxEfw2kNkqoVkyDgedbn0EFCAG6cE+MD9UrMlTFJ5GNetsxk+kN7vfb10xOtt/0RNZFarESMQJY7+3Rvk/1YH0orxV8ewA9FmcJ9JOktry7xtGDRkQSbWVgjQOkuFIyezV7J5CQaVAQ9otZlfs1813QoHZY=
+	t=1709587827; cv=none; b=t6Kh+IPwpNCdJS8C3+sZhsn6BK3WiYbgBBO4fLamsnPAFHwyDmpc07lxieHnXdeyxMzdWVKeoslmoq7fZ3U+A2cIBn2qoD3rbDmlL4X1kiY7RNXm681J1Rt4MKHG0wn7Gwob9dLonz9r0ZNDmOA+nfV5T8rCnC32MfleQoAIxu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709587827; c=relaxed/simple;
-	bh=wQM4E4uvvREbG1oZD2w8qlYgmeXO2Ul+K0vshQ5kJXg=;
+	bh=W27zYtNAsaurBFbAYeVJtWJ3xNO1se3Yby7vpbfIx2g=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Bui80npAGV5NQ1N2GZnwyP20HJ8t6aUKPtSu5a9Rt2533uRe1vQWoid+NMbmW4lxOn/KQHaWfvtPWfqFFeeSLnNez+rw/KlWqkRM6YDfFrY61bYYZ3Q9pkGqL0/OQGgPJA4iADvZx55+R00ru91Xd1sRPpPLz8VRBlfbug3tn08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E0OdNdLJ; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=V7y3BN61Lhi2QcRzjd8GBoH5F3xbIHMPmSZUoRg3cZTMjmX1mBjhXPc0RQt90XLWjKDEgsYNax8TqjxHuVuDXnCff8S2VP400JBmovxp1K9DQdC51+Zy+dC2GDO6KsUXeqKLiGMWX350oonEG0ACcKF+ef+p1RW7p2XYjewL9hY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GKg6MDaw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E0OdNdLJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 62622C433B2;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GKg6MDaw"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7155CC43330;
 	Mon,  4 Mar 2024 21:30:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1709587827;
-	bh=wQM4E4uvvREbG1oZD2w8qlYgmeXO2Ul+K0vshQ5kJXg=;
+	bh=W27zYtNAsaurBFbAYeVJtWJ3xNO1se3Yby7vpbfIx2g=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=E0OdNdLJwxx4n2N3kns2ufibbx9G5yVLeD1Bn6/FXfZglaOgIoDNrvYrRja9n0zFw
-	 c3qE171XnwpBbfNvC1qCbq/fODoVm4gXzgg1VKnjWBQw1p/YEbX15/v3w8gUVSdY1M
-	 eOLH4ldNuZxpqAWqbqpKzhXCRzCv3gco7mwpn4X1PG0OeT+uquC6rUOKMpC1kHzoh/
-	 VV5WNbRGMNNQgCSgc8R10FPI/lNENlEiS7HUjKID+MckRQpq+EHvgPCTqvJ5ck08z3
-	 +5xYb3d0I2IYX1VwsCkrZegosY20KWNev1bIzUP0Q5QUjf6zAaW43H0r6J+nRXkrc1
-	 lmW7qfXc15gqg==
+	b=GKg6MDaw9KQctlTOAoYPW0xR33Wh575vjxUKNmIWsFhx1XVxU+wJFaUwzjcA2XwyE
+	 aqBeIWpeOYsUoagOetbysEWODn0JkZKaKfJbdKy9SJL2oa7kpN8rX1+IinMijUI1Q7
+	 dlfibqPUP/IjYBH0yfqT8986zMlBjWYlSYroYg/MtvpOV6wb5Kk7zUaTQBzAZ9ZIu4
+	 CRo9tqUSDAPLBSG++k/McODuy5qROJm4L33MTgk2fOJFvv5TezVMlzFEgj3yMW7Hws
+	 plzCUH+9/MjpGSfFO48kAgLWFeQF8oDssavLAkunTvje1VjMFBvgiNatWjA0Yqn6WT
+	 3gk8vCuVEC0dA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 44149D9A4B9;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 54421D9A4BB;
 	Mon,  4 Mar 2024 21:30:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -37,54 +37,38 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: btnxpuart: Fix btnxpuart_close
+Subject: Re: [PATCH] [PATCH] Bluetooth: btusb: Add support Mediatek MT7920
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <170958782727.29902.5588082329084966658.git-patchwork-notify@kernel.org>
+ <170958782734.29902.13888163732970633114.git-patchwork-notify@kernel.org>
 Date: Mon, 04 Mar 2024 21:30:27 +0000
-References: <20240304181421.14777-1-francesco@dolcini.it>
-In-Reply-To: <20240304181421.14777-1-francesco@dolcini.it>
-To: Francesco Dolcini <francesco@dolcini.it>
-Cc: amitkumar.karwar@nxp.com, neeraj.sanjaykale@nxp.com, marcel@holtmann.org,
- luiz.dentz@gmail.com, marcel.ziswiler@toradex.com,
+References: <20240304144844.2042-1-peter.tsao@mediatek.com>
+In-Reply-To: <20240304144844.2042-1-peter.tsao@mediatek.com>
+To: Peter Tsao <peter.tsao@mediatek.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+ sean.wang@mediatek.com, deren.Wu@mediatek.com, chris.lu@mediatek.com,
+ aaron.hou@mediatek.com, steve.lee@mediatek.com,
  linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org, francesco.dolcini@toradex.com
+ linux-mediatek@lists.infradead.org
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon,  4 Mar 2024 19:14:21 +0100 you wrote:
-> From: Marcel Ziswiler <marcel.ziswiler@toradex.com>
+On Mon, 4 Mar 2024 22:48:44 +0800 you wrote:
+> This patch is added support Mediatek MT7920
+> The firmware location of MT7920 will set to
+> /lib/firmware/mediatek/
 > 
-> Fix scheduling while atomic BUG in btnxpuart_close(), properly
-> purge the transmit queue and free the receive skb.
-> 
-> [   10.973809] BUG: scheduling while atomic: kworker/u9:0/80/0x00000002
-> ...
-> [   10.980740] CPU: 3 PID: 80 Comm: kworker/u9:0 Not tainted 6.8.0-rc7-0.0.0-devel-00005-g61fdfceacf09 #1
-> [   10.980751] Hardware name: Toradex Verdin AM62 WB on Dahlia Board (DT)
-> [   10.980760] Workqueue: hci0 hci_power_off [bluetooth]
-> [   10.981169] Call trace:
-> ...
-> [   10.981363]  uart_update_mctrl+0x58/0x78
-> [   10.981373]  uart_dtr_rts+0x104/0x114
-> [   10.981381]  tty_port_shutdown+0xd4/0xdc
-> [   10.981396]  tty_port_close+0x40/0xbc
-> [   10.981407]  uart_close+0x34/0x9c
-> [   10.981414]  ttyport_close+0x50/0x94
-> [   10.981430]  serdev_device_close+0x40/0x50
-> [   10.981442]  btnxpuart_close+0x24/0x98 [btnxpuart]
-> [   10.981469]  hci_dev_close_sync+0x2d8/0x718 [bluetooth]
-> [   10.981728]  hci_dev_do_close+0x2c/0x70 [bluetooth]
-> [   10.981862]  hci_power_off+0x20/0x64 [bluetooth]
+> The information in /sys/kernel/debug/usb/devices about MT7920U
+> Bluetooth device is listed as the below
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] Bluetooth: btnxpuart: Fix btnxpuart_close
-    https://git.kernel.org/bluetooth/bluetooth-next/c/3f40a47f3589
+  - Bluetooth: btusb: Add support Mediatek MT7920
+    https://git.kernel.org/bluetooth/bluetooth-next/c/2ea671b17896
 
 You are awesome, thank you!
 -- 
