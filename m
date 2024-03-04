@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D27C47C086;
-	Mon,  4 Mar 2024 21:30:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E84CD1F92C;
+	Mon,  4 Mar 2024 21:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709587827; cv=none; b=t6Kh+IPwpNCdJS8C3+sZhsn6BK3WiYbgBBO4fLamsnPAFHwyDmpc07lxieHnXdeyxMzdWVKeoslmoq7fZ3U+A2cIBn2qoD3rbDmlL4X1kiY7RNXm681J1Rt4MKHG0wn7Gwob9dLonz9r0ZNDmOA+nfV5T8rCnC32MfleQoAIxu4=
+	t=1709588429; cv=none; b=uin3kMH5UARJ6njdLAHiyib5EIqgObqkGvILcFpFhOzsqoGRI5dwB8Nm1+JbFw49zMnCYg55KF+46ZcybVmCTcZaM2w6rzNNw9g7YuG9D7oPisYC7Bf15jjlBY4fc3JC8tD7SPaZ7c39LNGbxVECBGmdW19g1VKbJpQ+z8nJMSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709587827; c=relaxed/simple;
-	bh=W27zYtNAsaurBFbAYeVJtWJ3xNO1se3Yby7vpbfIx2g=;
+	s=arc-20240116; t=1709588429; c=relaxed/simple;
+	bh=0yqtvKb6euEXfWCJ5BupuWOTgDwHxNA52Wph41RVxls=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=V7y3BN61Lhi2QcRzjd8GBoH5F3xbIHMPmSZUoRg3cZTMjmX1mBjhXPc0RQt90XLWjKDEgsYNax8TqjxHuVuDXnCff8S2VP400JBmovxp1K9DQdC51+Zy+dC2GDO6KsUXeqKLiGMWX350oonEG0ACcKF+ef+p1RW7p2XYjewL9hY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GKg6MDaw; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=odUiJ3iuJmtTXhK8NsQhQzbWtBL4SN69aRD/CFnZMgLaiSP9TzkrvIREECws2SJyhgnfMubbmFF5sZJ3+mI9XcF3jE8iRhmCqykg7ZsIccObme2xhX5tnMzshYneDlqrDeZIeTZ15jhPR5XqlppYwTne+mVD5aCNr2BJKCtOgpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cv43hwON; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GKg6MDaw"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7155CC43330;
-	Mon,  4 Mar 2024 21:30:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cv43hwON"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 760E9C43390;
+	Mon,  4 Mar 2024 21:40:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709587827;
-	bh=W27zYtNAsaurBFbAYeVJtWJ3xNO1se3Yby7vpbfIx2g=;
+	s=k20201202; t=1709588427;
+	bh=0yqtvKb6euEXfWCJ5BupuWOTgDwHxNA52Wph41RVxls=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GKg6MDaw9KQctlTOAoYPW0xR33Wh575vjxUKNmIWsFhx1XVxU+wJFaUwzjcA2XwyE
-	 aqBeIWpeOYsUoagOetbysEWODn0JkZKaKfJbdKy9SJL2oa7kpN8rX1+IinMijUI1Q7
-	 dlfibqPUP/IjYBH0yfqT8986zMlBjWYlSYroYg/MtvpOV6wb5Kk7zUaTQBzAZ9ZIu4
-	 CRo9tqUSDAPLBSG++k/McODuy5qROJm4L33MTgk2fOJFvv5TezVMlzFEgj3yMW7Hws
-	 plzCUH+9/MjpGSfFO48kAgLWFeQF8oDssavLAkunTvje1VjMFBvgiNatWjA0Yqn6WT
-	 3gk8vCuVEC0dA==
+	b=Cv43hwONEsIKBQ2wAnPHyKgBXY3Qz4Yq5mTh4jqxkMmXkuHWyQxYPXmCcHakE9vlh
+	 AK5n9xvDKKoYcGxVaRypsGBGZcTttntFuHhJe5V6wdf6MnArXFdqJ5yIgeX6xJ25bt
+	 DjlyKmzZcGanJf/42sZmdzwgzZJGBOSr/zJNmm/Pf1XC+szC/LNoSvdlcOf2pNl6zG
+	 ZpAueehZgD4/M0O/c1hrDeeQKe8Gn5eDNOYhDoTv9X3oW5P9a/3HZUZid5HbjOPaUg
+	 W6j8lVtPdOtNRJ9bGeInbcOJPR/lKZks8MkcIXH7YYJBEMuYq3Yc8177bTw5wbngZ0
+	 uYhJVfQArBJlw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 54421D9A4BB;
-	Mon,  4 Mar 2024 21:30:27 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 55F16C3274B;
+	Mon,  4 Mar 2024 21:40:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,38 +37,39 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] [PATCH] Bluetooth: btusb: Add support Mediatek MT7920
+Subject: Re: [PATCH] Bluetooth: Add new quirk for broken read key length on
+ ATS2851
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <170958782734.29902.13888163732970633114.git-patchwork-notify@kernel.org>
-Date: Mon, 04 Mar 2024 21:30:27 +0000
-References: <20240304144844.2042-1-peter.tsao@mediatek.com>
-In-Reply-To: <20240304144844.2042-1-peter.tsao@mediatek.com>
-To: Peter Tsao <peter.tsao@mediatek.com>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
- sean.wang@mediatek.com, deren.Wu@mediatek.com, chris.lu@mediatek.com,
- aaron.hou@mediatek.com, steve.lee@mediatek.com,
+ <170958842734.5292.12544056625468291768.git-patchwork-notify@kernel.org>
+Date: Mon, 04 Mar 2024 21:40:27 +0000
+References: <20240227014328.1052386-1-nukelet64@gmail.com>
+In-Reply-To: <20240227014328.1052386-1-nukelet64@gmail.com>
+To: Vinicius Peixoto <nukelet64@gmail.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, johan.hedberg@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
  linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mediatek@lists.infradead.org
+ netdev@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon, 4 Mar 2024 22:48:44 +0800 you wrote:
-> This patch is added support Mediatek MT7920
-> The firmware location of MT7920 will set to
-> /lib/firmware/mediatek/
+On Mon, 26 Feb 2024 22:43:26 -0300 you wrote:
+> The ATS2851 controller erroneously reports support for the "Read
+> Encryption Key Length" HCI command. This makes it unable to connect
+> to any devices, since this command is issued by the kernel during the
+> connection process in response to an "Encryption Change" HCI event.
 > 
-> The information in /sys/kernel/debug/usb/devices about MT7920U
-> Bluetooth device is listed as the below
+> Add a new quirk (HCI_QUIRK_BROKEN_ENC_KEY_SIZE) to hint that the command
+> is unsupported, preventing it from interrupting the connection process.
 > 
 > [...]
 
 Here is the summary with links:
-  - Bluetooth: btusb: Add support Mediatek MT7920
-    https://git.kernel.org/bluetooth/bluetooth-next/c/2ea671b17896
+  - Bluetooth: Add new quirk for broken read key length on ATS2851
+    https://git.kernel.org/bluetooth/bluetooth-next/c/88f741deaa76
 
 You are awesome, thank you!
 -- 
