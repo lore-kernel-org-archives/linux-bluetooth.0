@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1192510A24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B20910A35
 	for <linux-bluetooth@vger.kernel.org>; Mon,  4 Mar 2024 21:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709586029; cv=none; b=EWBYxCrsLZ0lvrC+DCq7EhsWdkrze5PrP2IagutZBuvDebpGooojAJBPy7vTaQfKRHb/va6HihDcuLjVpBg1kiVVp2ncNuf20XzPOOBAdjeT9ohs8HmtKSmx0TJ/y+4PZYxIVybJlUWPzE+GpoF3UKRukyVMeirUZx6PVAxpTjY=
+	t=1709586029; cv=none; b=DAwzAJEqkUhuQwWaZwkldNZU8VM2n5WLgLh5Yroq8qz6wFFvubvEkFhxvDVv2hScapMCbeFLMkUFohfKivsCvi9G7N2DlHWt98iz206F1WtCQrwxu6b6fbiBdVtDoEhLNQKYZsfX2NzHICDoKS/xVBVAuhF4gJkxLOh364BzUfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709586029; c=relaxed/simple;
-	bh=FLEK6DWvxOcyqKPbWl7WNYQYSUpyZ6XN+c7lNeUELx4=;
+	bh=wCnQSDBI5MZ2qv2TWiab4MrbkXGAmdP/Nzxcj7L+SH0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=TmR84CBwD/PmBSbVUxcl096CdG2/vt/ca0q1AZsxidofoccht/u49inaR99KC65jp7mVII0Rl4YoX4fLs4KzuIFjEmTthG5SY/Xj3/17CTHdsvX8EqdYxrX5PNmT3gMsL+7e9KXQ5JJH3UoU7QBexYwrV/EIp8kJNqZEt13TyaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZAXg0ZNW; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=e1VjctqTjiJGVNKqFBWSa7J5Rm4tGTpG/MOomZMvz+0tjAxDp/0MVrhvy4XA6wZQsElvZAiA/qH9LBn9LTpgxzJcTZd4evrJEqv0mlEOYlPgtDFTgQfgIUJFDNBM+iKt+rBjHUT+NN2AjJsSsFYtsE2a/ckLYGYFtXX69AcI3jg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=REVnTeMq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZAXg0ZNW"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E546BC43399;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="REVnTeMq"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DE8BEC43394;
 	Mon,  4 Mar 2024 21:00:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1709586028;
-	bh=FLEK6DWvxOcyqKPbWl7WNYQYSUpyZ6XN+c7lNeUELx4=;
+	bh=wCnQSDBI5MZ2qv2TWiab4MrbkXGAmdP/Nzxcj7L+SH0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ZAXg0ZNW7T0i5CxkNkfKLg4uxzoksDFjG1sXTkMu/rn5VFDGruYHBA2Kq1AK2dtm7
-	 QHzuTnqxaDaNsErmTXg7OVG9a2bTvoMyVtRDu9SVbQtdQvqo9iTo0bluRfH3HXHkTn
-	 MyKc10oDGI78qRzb7vb3LMu2nAOHnUniGDig3TzzKbDFxrLt2YkMSsJuu93GFZwZwk
-	 koyYn8PmLLEytJWJwrd0hV4F8P7fHOz4giAIq1NUz3dBdvhMCAv9d3BH6+xPn2YS2V
-	 6iuP7hZavNuTwZ0a9Kzlwr5WUr6c9wg/HXZhd3fNC/TVbTxSg58l5vpVZ0J9UU8bFz
-	 VB0lAa510VkfA==
+	b=REVnTeMqk/FubTSp5hhvkgIncsKIUzGGeZvXQAZ7AKEe4Hn9i1IR5d6aD58Ux8jxq
+	 4J6q0AjHE6JJG2PuD0Oa6LnnbmZU4ko0RKPTHxMlMrk+BgIaBxSN05WOPX03avG+4q
+	 eGhAZR8/ZdvCqzleFrrbBpjtUBzy0o/Fc1Hc4m5jUYWbFod/gKMjok30zz5oucBE8b
+	 LuLbdDwDwKm7ZlfUO55jnCYSNf5JON9kIaGHZiLDOiil+S82tM57xgEQb2UQFN1atu
+	 tqXtD8bzuikx9DI+UcjDyT7WHGYFIp2h4aGXYmndUgNFn30PCtishC9VzU1HdwqTKX
+	 Tml5NjWZQuQNQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CA874D9A4BB;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C2100D88F87;
 	Mon,  4 Mar 2024 21:00:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -37,35 +37,37 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ] Don't install conf and state dir on systemd
+Subject: Re: [RESEND PATCH BlueZ v2 0/2] Add support for signed write command
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <170958602882.11728.8847999337738114915.git-patchwork-notify@kernel.org>
+ <170958602879.11728.9496552961788201433.git-patchwork-notify@kernel.org>
 Date: Mon, 04 Mar 2024 21:00:28 +0000
-References: <20240304142200.69968-1-mg@max.gautier.name>
-In-Reply-To: <20240304142200.69968-1-mg@max.gautier.name>
-To: Max Gautier <mg@max.gautier.name>
+References: <20240304155839.48888-1-frederic.danis@collabora.com>
+In-Reply-To: <20240304155839.48888-1-frederic.danis@collabora.com>
+To: =?utf-8?b?RnLDqWTDqXJpYyBEYW5pcyA8ZnJlZGVyaWMuZGFuaXNAY29sbGFib3JhLmNvbT4=?=@ci.codeaurora.org
 Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This patch was applied to bluetooth/bluez.git (master)
+This series was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon,  4 Mar 2024 15:21:57 +0100 you wrote:
-> The bluetooth.service file already specify the State and Configuration
-> directories with the correct modes, which guarantee they will be
-> available (with proper permissions) when bluetoohd starts.
+On Mon,  4 Mar 2024 16:58:37 +0100 you wrote:
+> GAP/SEC/CSIGN/BV-02-C request the ability to check that signed write has
+> been performed successfully.
 > 
-> Not installing those helps implementing the "Hermetic /usr" pattern
-> (TL;DR: '/usr' contains everything necessary to boostrap a working
-> system)
+> Move the storage of local and remote CSRK keys to the device object.
+> This allow to pass GAP/SEC/CSIGN/BV-01-C and GAP/SEC/CSIGN/BV-02-C tests.
+> 
+> v1 -> v2: Move CSRK keys storage to device object only
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ] Don't install conf and state dir on systemd
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7665fb5d943c
+  - [RESEND,BlueZ,v2,1/2] gatt-server: Add support for signed write command
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=71f0a1e88d9a
+  - [RESEND,BlueZ,v2,2/2] device: Update local and remote CSRK on management event
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3eba64ba2c85
 
 You are awesome, thank you!
 -- 
