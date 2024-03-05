@@ -1,140 +1,122 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FA3718628;
-	Tue,  5 Mar 2024 18:24:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B5271BC26
+	for <linux-bluetooth@vger.kernel.org>; Tue,  5 Mar 2024 18:57:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709663045; cv=none; b=RDj+NKqQDDM/7abhINDV8b/ezXrl4hqMacqi55gpVAkpJ32dgXQE16OkQZJMqZorXsv1tYku9HJxingtUy8PD5jgcy0cQiQBY2a+QuboDphrs+0h4npFgeSLkQW5t+kozSxXCw6/xNI5WgeXxGsBOKzJmX5OtsNpNNz2VMwahRo=
+	t=1709665022; cv=none; b=UlsnVmIYoLm+D/OB4cTZqRmiys7S6beJtyH369Xk7m0qYTAs6Wx3nmDRYtjrPwBLljdxk4uYsv5+tPqyMHte/GIGgcHtTjhUdbT+yPfoC5mnKRNnaFiEtZQO96IhHfvvZmLTui2aBR+CVcP/tcPuAkHEL9s+kg6bTMv/oLX/PvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709663045; c=relaxed/simple;
-	bh=TdfupDTf1t5grk4CAdN9p9bu1bJf5wgJEBrWS5hljOg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=eT4eGTUeBsinTB1b+uRUm4hCWJfM7CeffWDU3uGxQHwOl5HK7A9cw7n+aAIqLdZP40XjIHhkxq12UD5KePSwm28Z/nZnKrJj1IjlxDAhspwzCWnzWf4dkx8dFDFTcz5N8BIfgDiOaWfXAdvqjgI78Cv51SdzjyIJ6zXzZFhe5nc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jJo1F27w; arc=none smtp.client-ip=209.85.128.42
+	s=arc-20240116; t=1709665022; c=relaxed/simple;
+	bh=uc01dxAC3q5klt9pETtP0dVmZuYjK5uXLI5r2Ae8vjU=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=bANm59q+/sp7CXRVWMqSxeAJ98xfbBpCGj5Fuanr+XOqA/al7V4xi83A1VlN6+2sX8AgPZdzet6+/WsB5q9QXKm26avfuggY79eXS7lX/Zfq+OK8kWyXTic5IsuaO2b0AICwULWvQY/nQSFbmvH3n03Uq0vuGQFyiXHLPQKGN2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jU03YLqv; arc=none smtp.client-ip=209.85.219.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jJo1F27w"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-412ee276dc9so6458255e9.1;
-        Tue, 05 Mar 2024 10:24:03 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jU03YLqv"
+Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-68facd7ea4bso532916d6.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 05 Mar 2024 10:57:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709663042; x=1710267842; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vewip57IplzR6mytY6eKGIRl6x4l2s/G9UmkfWElT2c=;
-        b=jJo1F27wG6ZlYZ4Lfj3ooioshZis+J3Rtgl3tnC9b+e8wJE9uCiceZ1RaqAODX2Irv
-         mPGzsU18LEkBDqY25FwF5mKi1FQwd3tde6XAdyg1QqCzPFqmnFzHqQLBv576Tsi/x85P
-         cFXMz+cQnr3nwR3fAx8CsDMGPgEwJogQmlnm7xrza0NVoEDDdUzGm8wPqMqR54oPPHNW
-         VkRPSR8JwdOp5RTTYPGPtTsg9ymVGhpjmySwRvTAgjk8ide50dtoq3Q/ID1fMezklk/P
-         T/BZ95NsEJNOx57WSbgz/5mNqEDLwzb9UK0vFrYfu8A5vM/eMZ+s4S+k7BLqt55pSNup
-         ar9Q==
+        d=gmail.com; s=20230601; t=1709665020; x=1710269820; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=WvU8l3z03GQsByI/0kiHJ3yUj/x9DQHa8SB4R4r23+Q=;
+        b=jU03YLqvaSDZ/00yDu+BeSfABkFSytBBYbMuVUjKclS1kXu7DYZyhl/Bphhayr8NZL
+         /cNMthOQ9ibzjXxQOCcJHGrZDUmkat9q0ZsZrXEi5GcXPNAiQveJvazKu4hBngRJ7lnE
+         rS6y3UP4wiW/7GKmOkJuAUN4UTAP9rfUOZSzRTIbabGZtKxx4SSH1Uik7IN9LHsF754e
+         YdUkH3Bib9F8y2mKHkMe/ob9UkHHPrSW1qg6905jPpC0V7TZTAtOgpUz9ytrS0w7NF7p
+         VlZBzN11nqMcMjU+jhjxe72dVu+c6a8U4gcNd+uWN+f08yrPDR1JArIw3ybmSoRhoJBO
+         8g0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709663042; x=1710267842;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1709665020; x=1710269820;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Vewip57IplzR6mytY6eKGIRl6x4l2s/G9UmkfWElT2c=;
-        b=dKz53j1hbJSZoHeZobNXhCPYk3SVtn7msCQyULto/ides2dpTcPySwe/lYIDPZgUYB
-         REvNMBnmFd0T0r2MM0y0wYWBkxMZBiVxnz1bDq4ABUS3x/3U8tK8upNKvscWh8Bpcz04
-         /GuloAoj7wwS8fNYD7XdVL9TYQFjn504elOTYuMZONbWuo9zck3C1G6EbYCqg8tUI3kB
-         KRra4G6bsH3aU7z+t9KJeTn2AjsEbgiE2i1VPGdHaY/3rzsKpl/RzCfRV/hkv2paYFFn
-         PG6g8ql+DpffTwJEhUKJkgA72vXESQvvvg7WR6PNDicIQJcRJpJBfcCfk39me3EZhRW4
-         xKgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX4/yIQITTCf4EhsMjjyQ24JuNPBOibDRXvFSLBFnO+XTGtPeV+sNWDFB14Km5THBhpbBuGmzfYN3nEOENN7zxwvSBmSKjHcRe6OnqQ
-X-Gm-Message-State: AOJu0Ywyn23oOlTimPZjxCGcy98aNijkKsZLLgG+Wd+1tu3IZMBRDPqW
-	8qtX0ozSMQBbGllS5MgV6rxBe7XNgaAPGe+3MM+DMASnjLzdkJl0
-X-Google-Smtp-Source: AGHT+IHuLC2lqjmF/KzE+5aw87KqSBEd9s52FBcCsTOYoo6Oei/ieq/y3oovoRv5bXnPKrKBSFxAIw==
-X-Received: by 2002:a05:600c:3481:b0:412:e676:2ff1 with SMTP id a1-20020a05600c348100b00412e6762ff1mr4363859wmq.41.1709663041649;
-        Tue, 05 Mar 2024 10:24:01 -0800 (PST)
-Received: from [::1] ([2001:19f0:ac01:93b:5400:4ff:fe77:2098])
-        by smtp.gmail.com with ESMTPSA id l1-20020a05600c1d0100b00412ea52b102sm3592206wms.34.2024.03.05.10.23.59
+        bh=WvU8l3z03GQsByI/0kiHJ3yUj/x9DQHa8SB4R4r23+Q=;
+        b=DrF7o3fuVvNtPu5fqUezfVWsW7+HiE8xfiK3JqDhohsVejTCkxI3v/REZEW3k3pA72
+         8c9z4DXj6fRUlHCXJ/Kyrfaq88/YdxnNNnVolX46RLPh/ZRQnFUIXd6bCAhPHrq2W3c0
+         BUnp6tYsj+nm1WnrUDvlxwjBY5A/fzvRaY8k8Qq5zsYCTJI6Q+HcsE/GrW2eglQiwvM/
+         MqCoIVSgA58cF4CyTJaisC2oP6B4319c+wI96bvKNkikDe7vSc1+o/MOqHgQq+oFiqGs
+         f2tEp7Kn/9PTlQcbKwMud5JN/r9AxL9sF5dvyavau2tHHWk+8eZSdcvX17EFyKl3nWQh
+         wxBg==
+X-Gm-Message-State: AOJu0YwskFzRCwAaI7ie8JSUvMA26SYhhNhevH4HFHTuEswYJ31K965o
+	XPyyItTheO0vkMZX0kKRrwkTkCDMv/lN8EHKRk7irXwsVPalB8635YntpItD
+X-Google-Smtp-Source: AGHT+IE3W02QRqqtAK4wpzpg5+YI+O5GvicrdCrZZjs8g0AbJTOhL3ZHP8hV+rmTQGX9ezD/BC3iHA==
+X-Received: by 2002:a05:6214:5484:b0:690:7b7e:18e1 with SMTP id lg4-20020a056214548400b006907b7e18e1mr2797527qvb.29.1709665020115;
+        Tue, 05 Mar 2024 10:57:00 -0800 (PST)
+Received: from [172.17.0.2] ([40.76.117.204])
+        by smtp.gmail.com with ESMTPSA id r8-20020a0ccc08000000b0068f6e1c3582sm6411800qvk.146.2024.03.05.10.56.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Mar 2024 10:24:01 -0800 (PST)
-From: Yuxin Wang <yuxinwang9999@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yuxin Wang <yuxinwang9999@gmail.com>
-Subject: [PATCH] Bluetooth: Fix inconsistent LE packet sending behaviors
-Date: Tue,  5 Mar 2024 18:23:49 +0000
-Message-Id: <20240305182349.4182578-1-yuxinwang9999@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Tue, 05 Mar 2024 10:57:00 -0800 (PST)
+Message-ID: <65e76afb.0c0a0220.19579.b556@mx.google.com>
+Date: Tue, 05 Mar 2024 10:57:00 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0586287350580115067=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, yuxinwang9999@gmail.com
+Subject: RE: Bluetooth: Fix inconsistent LE packet sending behaviors
+In-Reply-To: <20240305182349.4182578-1-yuxinwang9999@gmail.com>
+References: <20240305182349.4182578-1-yuxinwang9999@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-In the `hci_sched_le` function, the calculation of `quote` within
-`hci_chan_sent` may become incorrect after breaking from the inner
-while loop. The issue stems from `hci_chan_sent` using `hdev->le_cnt`
-instead of the updated `cnt`. As a result, `quote` may exceed `cnt`,
-leading to a negative `cnt` and causing further inconsistent behaviors.
+--===============0586287350580115067==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This patch modifies `cnt` to be a pointer, aligning with the pattern
-used in the nearby `hci_sched_iso` function.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Yuxin Wang <yuxinwang9999@gmail.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=832651
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.66 seconds
+GitLint                       PASS      0.39 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      28.46 seconds
+CheckAllWarning               PASS      32.23 seconds
+CheckSparse                   PASS      37.71 seconds
+CheckSmatch                   PASS      101.28 seconds
+BuildKernel32                 PASS      28.33 seconds
+TestRunnerSetup               PASS      509.11 seconds
+TestRunner_l2cap-tester       PASS      18.12 seconds
+TestRunner_iso-tester         FAIL      32.80 seconds
+TestRunner_bnep-tester        PASS      4.85 seconds
+TestRunner_mgmt-tester        PASS      111.60 seconds
+TestRunner_rfcomm-tester      PASS      7.40 seconds
+TestRunner_sco-tester         PASS      14.96 seconds
+TestRunner_ioctl-tester       PASS      7.87 seconds
+TestRunner_mesh-tester        PASS      5.88 seconds
+TestRunner_smp-tester         PASS      6.88 seconds
+TestRunner_userchan-tester    PASS      4.99 seconds
+IncrementalBuild              PASS      26.17 seconds
+
+Details
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+Total: 117, Passed: 116 (99.1%), Failed: 1, Not Run: 0
+
+Failed Test Cases
+ISO Connect Suspend - Success                        Failed       4.189 seconds
+
+
 ---
- net/bluetooth/hci_core.c | 19 +++++++------------
- 1 file changed, 7 insertions(+), 12 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 2821a42ce..785a6dde9 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3750,19 +3750,19 @@ static void hci_sched_le(struct hci_dev *hdev)
- {
- 	struct hci_chan *chan;
- 	struct sk_buff *skb;
--	int quote, cnt, tmp;
-+	int quote, *cnt, tmp;
- 
- 	BT_DBG("%s", hdev->name);
- 
- 	if (!hci_conn_num(hdev, LE_LINK))
- 		return;
- 
--	cnt = hdev->le_pkts ? hdev->le_cnt : hdev->acl_cnt;
-+	cnt = hdev->le_pkts ? &hdev->le_cnt : &hdev->acl_cnt;
- 
--	__check_timeout(hdev, cnt, LE_LINK);
-+	__check_timeout(hdev, *cnt, LE_LINK);
- 
--	tmp = cnt;
--	while (cnt && (chan = hci_chan_sent(hdev, LE_LINK, &quote))) {
-+	tmp = *cnt;
-+	while (*cnt && (chan = hci_chan_sent(hdev, LE_LINK, &quote))) {
- 		u32 priority = (skb_peek(&chan->data_q))->priority;
- 		while (quote-- && (skb = skb_peek(&chan->data_q))) {
- 			BT_DBG("chan %p skb %p len %d priority %u", chan, skb,
-@@ -3777,7 +3777,7 @@ static void hci_sched_le(struct hci_dev *hdev)
- 			hci_send_frame(hdev, skb);
- 			hdev->le_last_tx = jiffies;
- 
--			cnt--;
-+			(*cnt)--;
- 			chan->sent++;
- 			chan->conn->sent++;
- 
-@@ -3787,12 +3787,7 @@ static void hci_sched_le(struct hci_dev *hdev)
- 		}
- 	}
- 
--	if (hdev->le_pkts)
--		hdev->le_cnt = cnt;
--	else
--		hdev->acl_cnt = cnt;
--
--	if (cnt != tmp)
-+	if (*cnt != tmp)
- 		hci_prio_recalculate(hdev, LE_LINK);
- }
- 
--- 
-2.39.2
 
+--===============0586287350580115067==--
