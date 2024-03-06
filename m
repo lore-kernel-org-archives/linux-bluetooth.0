@@ -1,299 +1,179 @@
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E6C2131738
-	for <linux-bluetooth@vger.kernel.org>; Wed,  6 Mar 2024 13:43:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709732611; cv=none; b=na67feG36i926pyj56h2sZeexLzV/omA2Ulunk8Iv1ljag192zq9zr/IojJOJ5BM/eILW/gE/+R44bGSxui8ItKtIUfLHH1sSbCVj/m760fwklLnVg9BOScw0L2tYkQy/AxoZHlKCpaUJTu9fBYzvQ/fT4cDOHg2gVlNmqvpdCE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709732611; c=relaxed/simple;
-	bh=2sd5sRwvPQFHqmBHtKbud+sIo5O1ZK+UXhgVxDDGJY8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=awrvbAANtpQwb44t/0ndMuYutTU0xgSqhBxnAHd9bOKm/UIOwyiRKiU/3JWmC68E6abv2WmtUvv5CF7LcJ7l/yVmUq4r8yya00+aGIPtLptx9PEjnLIbsyGwMnSN6lOU2PmSB5UtIB8BryHNw1DmnVCqrGaoDTkJfRi9pqDpr+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lhPUg198; arc=none smtp.client-ip=209.85.208.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33D0113540F
+	for <linux-bluetooth@vger.kernel.org>; Wed,  6 Mar 2024 16:12:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709741527; cv=pass; b=Cs0QRVvRq8v+ZovardwSa9uG/HJCdjJqzo35p8twKqV/hEWpauadHaaGph/PPnUyVTGHmj3uYrmvTMAaQsq8DbHLmmmh4LAvJ1RHcPxYtrou4Ie55pKPWR/LRDHgZ6eb/lJxINbsjdYotdMf6DfaXQc2Gc4ii+ND1l0QuGrROgM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709741527; c=relaxed/simple;
+	bh=uHf4KDeEOa/MoEOXQGzFoMXWxUiFYSOrDBR45jqzh4o=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=O1y6uR3W888tRPMH9dxxK4Ph9ThiCt3LkKux1h1ru7OTga1DtDlrWzqXBMuJCv+ev7o7FJ8T5ONoat3Krd7V1xnFFB5kczVZ3PsXuQXM++wWh+HNaMqzzd+8n4CmYQIs6+7Wvv5qC4JbnvO8mhluWQPp0Xvn7vO0DPDwv1Jdm3w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=W220bvl1; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lhPUg198"
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2d27184197cso95606011fa.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 06 Mar 2024 05:43:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709732608; x=1710337408; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QyBIygUvTMhV1CX+JkpaFZvh9b+k6umxdRVcGYn6apc=;
-        b=lhPUg198VK700ja8DZnPKMLzDQsx6tCusHNjPgZ+Q6LCvF1iXgPh4WR8vRT1eeJQiT
-         btjZcdbH4bMcMETPmm38RXjv3UP5aAwucP1bCSFf/GGaX6IYP8LLVLwdcz95UyEWy571
-         UKsms3ZeWvmOXTtvdhUZMTSuq1OVFVxmigB1khWIhXpxOC9s6tWZ3N6EYfHspF2Y0Ui/
-         5mpCffAIF6PSUJ+kaa4JqO5mBwi8xSu6jZygWSKZHtcePoekF0KdcPFWBG4P4LWKlzI2
-         LYYAbCb6eoqnPwsUoyClsbNHTuMYUZDQwg3W6dVp6A24EPM7/tWwZVXOLBWxC1Lcrw6m
-         F13g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709732608; x=1710337408;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QyBIygUvTMhV1CX+JkpaFZvh9b+k6umxdRVcGYn6apc=;
-        b=OMsI008bfrj+9oogjNUtCGrwAcsdNt+HYF56kTeKZfW+GFp/wh1Qc2foFJ6WHny+fx
-         Gyg+y9NqU/C2xEd5awpuxSrgx5o4Vna0HfW59HSOrMDNyCnVlK3zXHERpyRLpZR6LjYE
-         9qQl5FjAf+Cn6W5qhOVW3lJSkEHIUSqZlF0qTmY6qGYXkBjaLsP940N2NGGaeITMGayR
-         vxVWJqXGDwBaV5x1CBSJaPeMdeRRm+tTU2j1Px9Ie4QTokfxyVAM7td3JpmAsknrswNE
-         PTrqwkJYCKDbR1nXLUqgHkE3SjvtLleVbUblLxppYM6U27Dbbu8jZ9mJ1ca3/NIkXcb0
-         k96A==
-X-Gm-Message-State: AOJu0YzlkvTk6U9HkBoRVZ2cBAb3ck+aMrmDa4ZSspBdHsdrD1tNnQpl
-	rFsJq32B/IBiMVhZEsFgdvYWDsFVTvVYLRPwggu7ieE8XtIWR61gc+kPc72qWYguiLNte072rNF
-	wGY+ZFGKkP8nPahOUvzWSXLsa+pVPwoX9Ws8=
-X-Google-Smtp-Source: AGHT+IHfoHKuPhbe8V47cC5PF6OL95yplHxahwbXv+mqnfSRi+oMwLOAAeDUGMldRsuVTEeghoEEl98T9e4smwG+tEY=
-X-Received: by 2002:a2e:86c8:0:b0:2d2:e784:abc2 with SMTP id
- n8-20020a2e86c8000000b002d2e784abc2mr3566844ljj.33.1709732607296; Wed, 06 Mar
- 2024 05:43:27 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="W220bvl1"
+Received: from [192.168.1.195] (unknown [IPv6:2a0c:f040:0:2790::a01d])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4TqcrW004qz49Pyl;
+	Wed,  6 Mar 2024 18:11:54 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1709741515;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=mDUPzqcu1e80xDjzWwKQ7BvEndaKyK9WEBXv5YEz6As=;
+	b=W220bvl1KnVt4y7/NYbZkxUojaB9WxIbCmZMkKw7tzISq9RuIRKmPLyXCJTmysmc870sd8
+	T8M9rVKEnRZRn5W0AG/jWNPCGaY7bpf/ESUcsGJzghMrDqt+jykwROuGxbYle2itSLdSFO
+	O71YLOrk9LpxquCLEkcRQ4S8bAORBtY34DqB12t7cx85xVmUeQ8O30VsSbuzD+9246qqOV
+	oUeaK6yc+6QTaaTQXrel7HwNG0VxglhoQgyxy1Q4lsLLikL5Jh4nLMzj1fBm0xZWG6KMw6
+	abUQ4cwme2DfjuUMpiBg7CRom3wiJdsYrrmj8O+osX/yw4CxFuj+ooFcjo4wbw==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1709741515; a=rsa-sha256;
+	cv=none;
+	b=cGyHWwiZsp2JLlAuuB+rSMCLcm5aC2t5BOaKouR1xvgarn/w0HPfGb3LeblMZ7Zf7nRDyF
+	xz7MQokWNCEbucxYHideWJhJWL5xtSRInWfHNv+mvJ9LcMpWRvQKvYNTnAFBAy+wunWNwx
+	MtiAmZf5M65Z6qsjsstA2tRyovVeyvQ7+j2KzT9FreQhnn0lvlHqvgvyj3dTvmOF9CCHv4
+	a9TbWC3LsjmYuWQd6JLPXRSa10+hDcPyNWCW0gL1csOsrE2jnNkDMbLLa69qgjrH952Jq1
+	kRJztpf3HCNOqE/5lPhrT4JGvxZtC942GuoCVKTTgtTP9/skYnfJkHLC1nUBkA==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1709741515;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=mDUPzqcu1e80xDjzWwKQ7BvEndaKyK9WEBXv5YEz6As=;
+	b=fL5uABJdz2N81Vnb+lpx3KEi4ElyO3yFj9orEmQNd7NRwWQLXQJj2LdfcZlOm4VuJayfEp
+	Yjd9XM51S46C4oGziBrN9YrIlWSvfeSinyefYx1mo7S05bgF66uqPSwhK/SKDbXhozoeVx
+	Vk5hdwPTZc0ne23Kw3rOOoDrQVfbFCrCNGu8LXsE/EgKywbnz/AKI783V5EySAN5n5tU+l
+	h+s3jPvfslQkNQ6iy/3F4Kss6xADpITzwQwL1TZVFyMNTkuMAzTkeNzD8Z9iA+L+rjR1bT
+	tlLwx8Ph+Yz/BnVfCKF9lJ7FGzByrRZINhgogbnIuZKhY4jr0HeLQABuBCOIQw==
+Message-ID: <67057b99a60736a9b4ce8dae59cee93eed4373f8.camel@iki.fi>
+Subject: Re: [PATCH v2 1/2] Bluetooth: ISO: Fix circular locking dependency
+ warning
+From: Pauli Virtanen <pav@iki.fi>
+To: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Wed, 06 Mar 2024 18:11:52 +0200
+In-Reply-To: <20240305140939.5090-2-iulia.tanasescu@nxp.com>
+References: <20240305140939.5090-1-iulia.tanasescu@nxp.com>
+	 <20240305140939.5090-2-iulia.tanasescu@nxp.com>
+Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
+ keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240305144459.119564-1-kiran.k@intel.com> <20240305144459.119564-2-kiran.k@intel.com>
- <CABBYNZJC60s9m8D_KmYOT6R8+QY5_c5-4VgcgO8phpWD7ZTqWQ@mail.gmail.com> <PH0PR11MB75853FCEE7FAD4406EA64A34F5212@PH0PR11MB7585.namprd11.prod.outlook.com>
-In-Reply-To: <PH0PR11MB75853FCEE7FAD4406EA64A34F5212@PH0PR11MB7585.namprd11.prod.outlook.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 6 Mar 2024 08:43:14 -0500
-Message-ID: <CABBYNZJojKayf2zHYGEqXtuYnCrgvd=_EY+nBXx+_CfwFrvZOQ@mail.gmail.com>
-Subject: Re: [PATCH v3 2/2] Bluetooth: btintel: Add support for downloading
- intermediate loader
-To: "K, Kiran" <kiran.k@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, 
-	"Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>, 
-	"Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Kiran,
+Hi,
 
-On Wed, Mar 6, 2024 at 4:44=E2=80=AFAM K, Kiran <kiran.k@intel.com> wrote:
->
-> Hi Luiz,
->
-> Thanks for the comments.
->
-> > -----Original Message-----
-> > From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> > Sent: Wednesday, March 6, 2024 3:57 AM
-> > To: K, Kiran <kiran.k@intel.com>
-> > Cc: linux-bluetooth@vger.kernel.org; Srivatsa, Ravishankar
-> > <ravishankar.srivatsa@intel.com>; Tumkur Narayan, Chethan
-> > <chethan.tumkur.narayan@intel.com>
-> > Subject: Re: [PATCH v3 2/2] Bluetooth: btintel: Add support for downloa=
-ding
-> > intermediate loader
-> >
-> > Hi Kiran,
-> >
-> > On Tue, Mar 5, 2024 at 9:31=E2=80=AFAM Kiran K <kiran.k@intel.com> wrot=
-e:
-> > >
-> > > Some variants of Intel controllers like BlazarI supports downloading
-> > > of Intermediate bootloader (IML) image. IML gives flexibility to fix
-> > > issues as its not possible to fix issue in Primary bootloader once
-> > > flashed to ROM. This patch adds the support to download IML before
-> > downloading operational firmware image.
-> > >
-> > > dmesg logs:
-> > > [13.399003] Bluetooth: Core ver 2.22
-> > > [13.399006] Bluetooth: Starting self testing [13.401194] Bluetooth:
-> > > ECDH test passed in 2135 usecs [13.421175] Bluetooth: SMP test passed
-> > > in 597 usecs [13.421184] Bluetooth: Finished self testing [13.422919]
-> > > Bluetooth: HCI device and connection manager initialized [13.422923]
-> > > Bluetooth: HCI socket layer initialized [13.422925] Bluetooth: L2CAP
-> > > socket layer initialized [13.422930] Bluetooth: SCO socket layer
-> > > initialized [13.458065] Bluetooth: hci0: Device revision is 0
-> > > [13.458071] Bluetooth: hci0: Secure boot is disabled [13.458072]
-> > > Bluetooth: hci0: OTP lock is disabled [13.458072] Bluetooth: hci0: AP=
-I
-> > > lock is enabled [13.458073] Bluetooth: hci0: Debug lock is disabled
-> > > [13.458073] Bluetooth: hci0: Minimum firmware build 1 week 10 2014
-> > > [13.458075] Bluetooth: hci0: Bootloader timestamp 2022.46 buildtype 1
-> > > build 26590 [13.458324] Bluetooth: hci0: DSM reset method type: 0x00
-> > > [13.460678] Bluetooth: hci0: Found device firmware:
-> > > intel/ibt-0090-0291-iml.sfi [13.460684] Bluetooth: hci0: Boot Address=
-:
-> > > 0x30099000 [13.460685] Bluetooth: hci0: Firmware Version: 227-11.24
-> > > [13.562554] Bluetooth: hci0: Waiting for firmware download to complet=
-e
-> > > [13.563023] Bluetooth: hci0: Firmware loaded in 99941 usecs
-> > > [13.563057] Bluetooth: hci0: Waiting for device to boot [13.565029]
-> > > Bluetooth: hci0: Malformed MSFT vendor event: 0x02 [13.565148]
-> > > Bluetooth: hci0: Device booted in 2064 usecs [13.567065] Bluetooth:
-> > > hci0: No device address configured [13.569010] Bluetooth: hci0: Found
-> > > device firmware: intel/ibt-0090-0291.sfi [13.569061] Bluetooth: hci0:
-> > > Boot Address: 0x10000800 [13.569062] Bluetooth: hci0: Firmware
-> > > Version: 227-11.24 [13.788891] Bluetooth: BNEP (Ethernet Emulation)
-> > > ver 1.3 [13.788897] Bluetooth: BNEP filters: protocol multicast
-> > > [13.788902] Bluetooth: BNEP socket layer initialized [15.435905]
-> > > Bluetooth: hci0: Waiting for firmware download to complete [15.436016=
-]
-> > > Bluetooth: hci0: Firmware loaded in 1823233 usecs [15.436258]
-> > > Bluetooth: hci0: Waiting for device to boot [15.471140] Bluetooth:
-> > > hci0: Device booted in 34277 usecs [15.471201] Bluetooth: hci0:
-> > > Malformed MSFT vendor event: 0x02 [15.471487] Bluetooth: hci0: Found
-> > > Intel DDC parameters: intel/ibt-0090-0291.ddc [15.474353] Bluetooth:
-> > > hci0: Applying Intel DDC parameters completed [15.474486] Bluetooth:
-> > > hci0: Found Intel DDC parameters: intel/bdaddress.cfg [15.475299]
-> > > Bluetooth: hci0: Applying Intel DDC parameters completed [15.479381]
-> > > Bluetooth: hci0: Firmware timestamp 2024.10 buildtype 3 build 58595
-> > > [15.479385] Bluetooth: hci0: Firmware SHA1: 0xb4f3cc46 [15.483243]
-> > > Bluetooth: hci0: Fseq status: Success (0x00) [15.483246] Bluetooth:
-> > > hci0: Fseq executed: 00.00.00.00 [15.483247] Bluetooth: hci0: Fseq BT
-> > > Top: 00.00.00.00 [15.578712] Bluetooth: MGMT ver 1.22 [15.822682]
-> > > Bluetooth: RFCOMM TTY layer initialized [15.822690] Bluetooth: RFCOMM
-> > > socket layer initialized [15.822695] Bluetooth: RFCOMM ver 1.11
-> > >
-> > > Signed-off-by: Kiran K <kiran.k@intel.com>
-> > > ---
-> > >  drivers/bluetooth/btintel.c | 38
-> > > ++++++++++++++++++++++++++++++++++++-
-> > >  drivers/bluetooth/btintel.h |  3 +++
-> > >  2 files changed, 40 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.=
-c
-> > > index ed98bb867cff..00e98606cf02 100644
-> > > --- a/drivers/bluetooth/btintel.c
-> > > +++ b/drivers/bluetooth/btintel.c
-> > > @@ -521,6 +521,9 @@ static int btintel_version_info_tlv(struct hci_de=
-v
-> > *hdev,
-> > >                             version->min_fw_build_nn, version->min_fw=
-_build_cw,
-> > >                             2000 + version->min_fw_build_yy);
-> > >                 break;
-> > > +       case IMG_IML:
-> > > +               variant =3D "Intermediate loader";
-> > > +               break;
-> > >         case IMG_OP:
-> > >                 variant =3D "Firmware";
-> > >                 break;
-> > > @@ -2194,10 +2197,26 @@ static void btintel_get_fw_name_tlv(const
-> > struct intel_version_tlv *ver,
-> > >                                     char *fw_name, size_t len,
-> > >                                     const char *suffix)  {
-> > > +       const char *format;
-> > >         /* The firmware file name for new generation controllers will=
- be
-> > >          * ibt-<cnvi_top type+cnvi_top step>-<cnvr_top type+cnvr_top =
-step>
-> > >          */
-> > > -       snprintf(fw_name, len, "intel/ibt-%04x-%04x.%s",
-> > > +       switch (ver->cnvi_top & 0xfff) {
-> > > +       /* Only Blazar  product supports downloading of intermediate =
-loader
-> > > +        * image
-> > > +        */
-> > > +       case CNVI_BLAZARI:
-> > > +               if (ver->img_type =3D=3D IMG_BOOTLOADER)
-> > > +                       format =3D "intel/ibt-%04x-%04x-iml.%s";
-> >
-> > Shouldn't iml be the extension rather than the name? Like in intel/ibt-=
-0090-
-> > 0291.iml which you can probably achieve by just replacing suffix, that =
-said this
-> > function seems to be called with .ddc as suffix as well so I assume the=
-re is
->
-> I feel it's better to keep the extension as sfi as the image format for I=
-ML and OP binaries are same.
+ti, 2024-03-05 kello 16:09 +0200, Iulia Tanasescu kirjoitti:
+> This fixes the circular locking dependency warning caused
+> by iso_listen_bis acquiring the hdev lock while the socket
+> has been locked in the caller function.
 
-So sfi and ddc are file formats? The only thing Ive found was:
+I think the commit message and the comment should explain why there is
+no deadlock, and that the lockdep warning is a false positive.
 
-https://filext.com/file-extension/SFI
+E.g. fuzzer calling connect() and listen() at the same time seems it
+would be dangerous here?
 
-They sound more like binary blobs, .bin, or image files .img, but we
-choose to distinct them via file extension, thus why Is suggested to
-use .iml.
-
-> > some check preventing it to be called while version is IMG_BOOTLOADER?
-> There is no such restriction. The same function gets called even when ver=
-sion is IMG_BOOTLOADER. Inside this function we check for product and versi=
-on to decide whether to load IML or OP image.
-
-Wouldn't we end up having *iml.ddc then?
-
-> >
-> > > +               else
-> > > +                       format =3D "intel/ibt-%04x-%04x.%s";
-> > > +               break;
-> > > +       default:
-> > > +                       format =3D "intel/ibt-%04x-%04x.%s";
-> > > +               break;
-> > > +       }
-> > > +
-> > > +       snprintf(fw_name, len, format,
-> > >                  INTEL_CNVX_TOP_PACK_SWAB(INTEL_CNVX_TOP_TYPE(ver-
-> > >cnvi_top),
-> > >                                           INTEL_CNVX_TOP_STEP(ver->cn=
-vi_top)),
-> > >
-> > > INTEL_CNVX_TOP_PACK_SWAB(INTEL_CNVX_TOP_TYPE(ver->cnvr_top),
-> > > @@ -2607,6 +2626,23 @@ static int btintel_bootloader_setup_tlv(struct
-> > hci_dev *hdev,
-> > >         if (err)
-> > >                 return err;
-> > >
-> > > +       err =3D btintel_read_version_tlv(hdev, ver);
-> > > +       if (err)
-> > > +               return err;
-> > > +
-> > > +       /* If image type returned is IMG_IML, then controller support=
-s
-> > > +        * intermediae loader image
-> > > +        */
-> > > +       if (ver->img_type =3D=3D IMG_IML) {
-> > > +               err =3D btintel_prepare_fw_download_tlv(hdev, ver, &b=
-oot_param);
-> > > +               if (err)
-> > > +                       return err;
-> > > +
-> > > +               err =3D btintel_boot(hdev, boot_param);
-> > > +               if (err)
-> > > +                       return err;
-> > > +       }
-> > > +
-> > >         btintel_clear_flag(hdev, INTEL_BOOTLOADER);
-> > >
-> > >         btintel_get_fw_name_tlv(ver, ddcname, sizeof(ddcname), "ddc")=
-;
-> > > diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.=
-h
-> > > index 52b2f1986f85..ae15b2253b6d 100644
-> > > --- a/drivers/bluetooth/btintel.h
-> > > +++ b/drivers/bluetooth/btintel.h
-> > > @@ -51,7 +51,10 @@ struct intel_tlv {
-> > >         u8 val[];
-> > >  } __packed;
-> > >
-> > > +#define CNVI_BLAZARI           0x900
-> > > +
-> > >  #define IMG_BOOTLOADER         0x01    /* Bootloader image */
-> > > +#define IMG_IML                        0x02    /* Intermediate image=
- */
-> > >  #define IMG_OP                 0x03    /* Operational image */
-> > >
-> > >  struct intel_version_tlv {
-> > > --
-> > > 2.34.1
-> > >
-> > >
-> >
-> >
-> > --
-> > Luiz Augusto von Dentz
->
-> Regards,
-> Kiran
->
-
+>=20
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
+> WARNING: possible circular locking dependency detected
+> 6.8.0-rc5+ #1 Not tainted
+> ------------------------------------------------------
+> iso-tester/2950 is trying to acquire lock:
+> ffff88817a048080 (&hdev->lock){+.+.}-{3:3}, at: iso_sock_listen+0x305/0x8=
+d0
+>=20
+>                but task is already holding lock:
+> ffff888197c39278 (sk_lock-AF_BLUETOOTH-BTPROTO_ISO){+.+.}-{0:0},
+>                at: iso_sock_listen+0x91/0x8d0
+>=20
+>                which lock already depends on the new lock.
+>=20
+>                the existing dependency chain (in reverse order) is:
+>=20
+>  -> #1 (sk_lock-AF_BLUETOOTH-BTPROTO_ISO){+.+.}-{0:0}:
+>         lock_sock_nested+0x3b/0xb0
+>         iso_connect_cis+0x185/0x540
+>         iso_sock_connect+0x445/0x7e0
+>         __sys_connect_file+0xd5/0x100
+>         __sys_connect+0x11e/0x150
+>         __x64_sys_connect+0x42/0x60
+>         do_syscall_64+0x8d/0x150
+>         entry_SYSCALL_64_after_hwframe+0x6e/0x76
+>=20
+> -> #0 (&hdev->lock){+.+.}-{3:3}:
+>         __lock_acquire+0x208f/0x3720
+>         lock_acquire+0x16d/0x3f0
+>         __mutex_lock+0x155/0x1310
+>         mutex_lock_nested+0x1b/0x30
+>         iso_sock_listen+0x305/0x8d0
+>         __sys_listen+0x106/0x190
+>         __x64_sys_listen+0x30/0x40
+>         do_syscall_64+0x8d/0x150
+>         entry_SYSCALL_64_after_hwframe+0x6e/0x76
+>=20
+>         other info that might help us debug this:
+>=20
+> Possible unsafe locking scenario:
+>=20
+>         CPU0                    CPU1
+>         ----                    ----
+>    lock(sk_lock-AF_BLUETOOTH-BTPROTO_ISO);
+>                                 lock(&hdev->lock);
+>                                 lock(sk_lock-AF_BLUETOOTH-BTPROTO_ISO);
+>    lock(&hdev->lock);
+>=20
+>                 *** DEADLOCK ***
+>=20
+> 1 lock held by iso-tester/2950:
+> 0: ffff888197c39278 (sk_lock-AF_BLUETOOTH-BTPROTO_ISO){+.+.}-{0:0},
+>                 at: iso_sock_listen+0x91/0x8d0
+>=20
+> Signed-off-by: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+> ---
+>  net/bluetooth/iso.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+> index 8af75d37b14c..5ca7bb0806b0 100644
+> --- a/net/bluetooth/iso.c
+> +++ b/net/bluetooth/iso.c
+> @@ -1095,7 +1095,10 @@ static int iso_listen_bis(struct sock *sk)
+>  	if (!hdev)
+>  		return -EHOSTUNREACH;
+> =20
+> -	hci_dev_lock(hdev);
+> +	/* To avoid circular locking dependency warnings,
+> +	 * use nested lock for hdev.
+> +	 */
+> +	mutex_lock_nested(&hdev->lock, SINGLE_DEPTH_NESTING);
+> =20
+>  	/* Fail if user set invalid QoS */
+>  	if (iso_pi(sk)->qos_user_set && !check_bcast_qos(&iso_pi(sk)->qos)) {
 
 --=20
-Luiz Augusto von Dentz
+Pauli Virtanen
