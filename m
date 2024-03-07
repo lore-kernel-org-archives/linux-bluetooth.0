@@ -1,145 +1,109 @@
-Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f46.google.com (mail-ua1-f46.google.com [209.85.222.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 614C912FF8B
-	for <linux-bluetooth@vger.kernel.org>; Thu,  7 Mar 2024 16:42:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D13F012FF86
+	for <linux-bluetooth@vger.kernel.org>; Thu,  7 Mar 2024 17:01:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709829739; cv=none; b=kl7rlOGjcoQ/N3f/7R8ALgcKkgZRNyUM+PiJ8EY5asx4gjwQ2vdT1IymSXdEbrozPSFdC9FNGsSk7XHy8R8MqLizr52/X3oyT7+eyds1sQ2PE2Yg7St8kIQL+3EIwKuY/jWfvd/4UVl0NWpPrdq9vyA6HioyxJOwFAt+Qzf3P50=
+	t=1709830876; cv=none; b=YyNlnxPt+vC/8ouzCSiSFcrm9tHNRg1McJdkHcW1eRH2rLftOrPSCAIEKhkNNiEJQAYU4Jgq2SJ8WMUzhBcFVUq6R1L/9pU8ZgY8MWN0BEy7utS7oFV/SgaISmAtuylxeltMbMND0zPasHuZvr4xx306+vQWU5yGAkLKM+rIeoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709829739; c=relaxed/simple;
-	bh=H1OvJTKyTFsoPpie/iVcrTQ62Ie48SJiioE27w5MSFE=;
-	h=From:To:Subject:Date:Message-Id:MIME-Version:Content-Type:
-	 Content-Type; b=Gt170lfObYrfwN28WivCp4qZ1JxNKps7lnCgybPwpM/ng5m4w1tSdKqOrk56uaOzVo8UySLyVSapcHSo3Fsd+vaWNoK5CkF/fKo8tImIZVx7+mRAzcKOCq/QWgH5E6jfDn+zaHP/dytwfnWvEIcwmiA2JkuDgLU3bRX8pU1QIxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=OgtQ0774; arc=none smtp.client-ip=46.235.227.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1709830876; c=relaxed/simple;
+	bh=GdY0aq29e/r1IjTwX3a32aQDvmZFpdy2FUznLXj7Rcw=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=fsVNlrsdexpBFZQGTHhaShXjCxNnmnMmVgm0nDvVdVJQXzqWYPJOASiLlFmb+XAus496AcF8EV0AFevKOzPV5firgu2jecKbxDSQQ5rhuR/jA9wihjKTDeYwkCmEhZ0/OvRuvHVJ7CLbXSdU4WMg8NCh9t5y8mGI/lqostthMik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fSns0e4W; arc=none smtp.client-ip=209.85.222.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="OgtQ0774"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1709829735;
-	bh=H1OvJTKyTFsoPpie/iVcrTQ62Ie48SJiioE27w5MSFE=;
-	h=From:To:Subject:Date:From;
-	b=OgtQ07743Qn7sR25HQFWPz1+dIEJdjCitBtsJ/D2AI1Z0H10TuIW8hftq32WVxTjf
-	 Ol22Wv6yIuYC+QyFU8TSENHn2cbIoUQ0PTqdcSrQKLVy6hUIhUd1YE85OPK/evAuDs
-	 ZSfafIJKtI9c+sedIMbUmKrzUYdVw2pBprqCkhVDv9bS9m08LgiUSC9ighTr1r9nqe
-	 m8rUCT7yKLCrBucpk0dJ8EZh/pUlYAcC9+tNLwBLFXdE4h6FKl94IoSEM7qcFJik/m
-	 V/+jMm3NFmYfxxzO8FOIBmqbIJon5lYM+iHkWiluGGuQHqyQnNnzgE6vvuDM7OZBXr
-	 GUcB53+/POQVg==
-Received: from fdanis-XPS-13-9370.. (cola.collaboradmins.com [195.201.22.229])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 5604237813CA
-	for <linux-bluetooth@vger.kernel.org>; Thu,  7 Mar 2024 16:42:15 +0000 (UTC)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fSns0e4W"
+Received: by mail-ua1-f46.google.com with SMTP id a1e0cc1a2514c-7dae66def19so565915241.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 07 Mar 2024 09:01:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709830872; x=1710435672; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q8nrs+sqbjTUno3Gmy9RVGvmMPDqcLRi6BJsFAiMcC4=;
+        b=fSns0e4WbIAbKab4sNyaXLQgXIpFrJNV1m0leHFtB7m8a+FvBx+oNUOYkIm0f0isBN
+         4NeZ/AYv/ODQqresX8cXoDbPNoANJmyceyPTA04iW7QTk+xcn2JZPAWdru70s21l5ICc
+         atYTLojviBcGK7MEirHGZbA+AbrzX58m/2RM9KhprbSOHayktTDGp/Likty6at/+jGq3
+         nTs7CtE7mWzbBn4OuNMvvfoKdf5ENmfl1LWAPau2i8lY74XJtD+frdvj6AvdJyGQDeZz
+         Bdyh7dtVpIOTfQ/t3K/KTJyfPxG7j6M61TfuoY2LeSa9gZBsmMM0IKDnP/Bq+3XO9HEK
+         oPqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709830872; x=1710435672;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q8nrs+sqbjTUno3Gmy9RVGvmMPDqcLRi6BJsFAiMcC4=;
+        b=iTjwK5wJYQ9noUmD45yj57wKkZR9hkp16xp7cAQOac1j182kwsIQnnwa3LwDTXbAHE
+         IBllW7nTM0HlMQ6LaMMSmL/XifEsSWJhLz4r2BYMIXV5V0DTa0FWqQN+rf/E7NnhxzPv
+         wHkPvcyts+ayrGFMQHUxNBYnIf2Sm3AcYIifAVgqJp6cSJ5Ns72DmJ8wRnRnisGtxGIV
+         gUl6295rjpHXZ0pQ7M0suiKxJsVgdyqn/Y4uUqTmU/z5QrXZgAVWLDf+pFh9wdFO9/OC
+         JyzOoIMDqlnAln2zqq3LLz7MtBzpd9jg/NP2SxA/ngAJUfpE49NsGVO82y5+DqAMTmVt
+         Nk2A==
+X-Gm-Message-State: AOJu0YxoBETeJxUVeSrVvevEMBhzH8P7x+6UT4AZGYJe79fCNzo8mZve
+	yG4EnrSr1T923L3hU7zloKn7RRDUoAmVGz4yyxdzbwwmr34d7LR3bAq9yXxA
+X-Google-Smtp-Source: AGHT+IG2ZnQ9QhQzR4RrVIi5UwH7OWMq7qqpltGD5wHFd6gNNja3cYpjlkdJBHqAtUHew8GhwkSrIg==
+X-Received: by 2002:a67:efc7:0:b0:471:e1ad:39f5 with SMTP id s7-20020a67efc7000000b00471e1ad39f5mr7610067vsp.25.1709830872370;
+        Thu, 07 Mar 2024 09:01:12 -0800 (PST)
+Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id hx3-20020a67e783000000b0047254aee7cfsm2666218vsb.10.2024.03.07.09.01.11
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Mar 2024 09:01:11 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] Bluetooth: Fix eir name length
-Date: Thu,  7 Mar 2024 17:42:05 +0100
-Message-Id: <20240307164205.1011133-1-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.34.1
+Subject: [PATCH v1] Bluetooth: ISO: Align broadcast sync_timeout with connection timeout
+Date: Thu,  7 Mar 2024 12:01:10 -0500
+Message-ID: <20240307170110.4096559-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-According to Section 1.2 of Core Specification Supplement Part A the
-complete or short name strings are defined as utf8s, which should not
-include the trailing NULL for variable length array as defined in Core
-Specification Vol1 Part E Section 2.9.3.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The trailing NULL was introduce by commit f61851f64b17
-("Bluetooth: Fix append max 11 bytes of name to scan rsp data")
+This aligns broadcast sync_timeout with existing connection timeouts
+which are 20 seconds long.
 
-Removing the trailing NULL allows PTS to retrieve the random address based
-on device name, e.g. for SM/PER/KDU/BV-02-C, SM/PER/KDU/BV-08-C or
-GAP/BROB/BCST/BV-03-C.
-
-Signed-off-by: Frédéric Danis <frederic.danis@collabora.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/eir.c  | 29 +++++++----------------------
- net/bluetooth/mgmt.c |  2 +-
- 2 files changed, 8 insertions(+), 23 deletions(-)
+ include/net/bluetooth/bluetooth.h | 2 ++
+ net/bluetooth/iso.c               | 4 ++--
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/eir.c b/net/bluetooth/eir.c
-index 9214189279e8..1bc51e2b05a3 100644
---- a/net/bluetooth/eir.c
-+++ b/net/bluetooth/eir.c
-@@ -13,48 +13,33 @@
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 7ffa8c192c3f..9fe95a22abeb 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -164,6 +164,8 @@ struct bt_voice {
+ #define BT_ISO_QOS_BIG_UNSET	0xff
+ #define BT_ISO_QOS_BIS_UNSET	0xff
  
- #define PNP_INFO_SVCLASS_ID		0x1200
++#define BT_ISO_SYNC_TIMEOUT	0x07d0 /* 20 secs */
++
+ struct bt_iso_io_qos {
+ 	__u32 interval;
+ 	__u16 latency;
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index 8af75d37b14c..c8793e57f4b5 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -834,10 +834,10 @@ static struct bt_iso_qos default_qos = {
+ 		.bcode			= {0x00},
+ 		.options		= 0x00,
+ 		.skip			= 0x0000,
+-		.sync_timeout		= 0x4000,
++		.sync_timeout		= BT_ISO_SYNC_TIMEOUT,
+ 		.sync_cte_type		= 0x00,
+ 		.mse			= 0x00,
+-		.timeout		= 0x4000,
++		.timeout		= BT_ISO_SYNC_TIMEOUT,
+ 	},
+ };
  
--static u8 eir_append_name(u8 *eir, u16 eir_len, u8 type, u8 *data, u8 data_len)
--{
--	u8 name[HCI_MAX_SHORT_NAME_LENGTH + 1];
--
--	/* If data is already NULL terminated just pass it directly */
--	if (data[data_len - 1] == '\0')
--		return eir_append_data(eir, eir_len, type, data, data_len);
--
--	memcpy(name, data, HCI_MAX_SHORT_NAME_LENGTH);
--	name[HCI_MAX_SHORT_NAME_LENGTH] = '\0';
--
--	return eir_append_data(eir, eir_len, type, name, sizeof(name));
--}
--
- u8 eir_append_local_name(struct hci_dev *hdev, u8 *ptr, u8 ad_len)
- {
- 	size_t short_len;
- 	size_t complete_len;
- 
--	/* no space left for name (+ NULL + type + len) */
--	if ((max_adv_len(hdev) - ad_len) < HCI_MAX_SHORT_NAME_LENGTH + 3)
-+	/* no space left for name (+ type + len) */
-+	if ((max_adv_len(hdev) - ad_len) < HCI_MAX_SHORT_NAME_LENGTH + 2)
- 		return ad_len;
- 
- 	/* use complete name if present and fits */
- 	complete_len = strnlen(hdev->dev_name, sizeof(hdev->dev_name));
- 	if (complete_len && complete_len <= HCI_MAX_SHORT_NAME_LENGTH)
--		return eir_append_name(ptr, ad_len, EIR_NAME_COMPLETE,
--				       hdev->dev_name, complete_len + 1);
-+		return eir_append_data(ptr, ad_len, EIR_NAME_COMPLETE,
-+				       hdev->dev_name, complete_len);
- 
- 	/* use short name if present */
- 	short_len = strnlen(hdev->short_name, sizeof(hdev->short_name));
- 	if (short_len)
--		return eir_append_name(ptr, ad_len, EIR_NAME_SHORT,
-+		return eir_append_data(ptr, ad_len, EIR_NAME_SHORT,
- 				       hdev->short_name,
--				       short_len == HCI_MAX_SHORT_NAME_LENGTH ?
--				       short_len : short_len + 1);
-+				       short_len);
- 
- 	/* use shortened full name if present, we already know that name
- 	 * is longer then HCI_MAX_SHORT_NAME_LENGTH
- 	 */
- 	if (complete_len)
--		return eir_append_name(ptr, ad_len, EIR_NAME_SHORT,
-+		return eir_append_data(ptr, ad_len, EIR_NAME_SHORT,
- 				       hdev->dev_name,
- 				       HCI_MAX_SHORT_NAME_LENGTH);
- 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 9613cc8a60f8..32ed6e9245a3 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -8408,7 +8408,7 @@ static int read_adv_features(struct sock *sk, struct hci_dev *hdev,
- 
- static u8 calculate_name_len(struct hci_dev *hdev)
- {
--	u8 buf[HCI_MAX_SHORT_NAME_LENGTH + 3];
-+	u8 buf[HCI_MAX_SHORT_NAME_LENGTH + 2]; /* len + type + name */
- 
- 	return eir_append_local_name(hdev, buf, 0);
- }
 -- 
-2.34.1
+2.43.0
 
