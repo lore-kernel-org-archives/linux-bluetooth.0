@@ -1,67 +1,66 @@
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D5AC1E515
-	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Mar 2024 17:37:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE333217
+	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Mar 2024 17:41:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709919457; cv=none; b=nAx//WSixO/t6znsyIeln6t/CEM2ObrGc/LoHAnsE0ZM2p2CiDkRUroOZjbUqo2F+P5dfGmJXlAECpIlmoswLc7QU6NAx7yZ4LyPi37DXWp270uzoPAcRvAGLkZ0z3lGmc7aTP73qBL+ng0xB7xCMzvHEo2V/36nih4noRoUU2w=
+	t=1709919704; cv=none; b=sN5c5y3HFIvffX8/wVmGJUWNL0QrYWTKEwopld0A4MK9e2Q7SHYGb/a93O6rvBqtrHcUJdoXz/8p0IDhA44kCICtqOqPMB0a5DZ6L9rK33eC+zCofLhD51JUpEg/0mC+BKHm82i21z+TNC7B+h4B81pC8vD4ogxJdsv3Y6Nv//c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709919457; c=relaxed/simple;
-	bh=JYMt3YJV9irfcRmlBWrADXZM8bHeUsxAJ+Vvcy7Qxd8=;
+	s=arc-20240116; t=1709919704; c=relaxed/simple;
+	bh=MK7YnTrZXkumRnwgauyhkvgXciBsr1N5FG2keIjnIgk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uau28BsvltnNUr1D5vp4jupEXRYVFz2VdgSA/cZPUwTnv4n0Ch9yt27ceefIE5/Zl9huA2voH6eOmjjU26yxrpNvIMy9wK1B2NfSiaa9pyQZ88t9qBPggQUaLKtXqj1NA6+3q2pYxluayz+qxri0g0Xrhbz4oSSr4zsXFHherX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ow1Ee5CZ; arc=none smtp.client-ip=209.85.208.182
+	 To:Cc:Content-Type; b=AKsmkIEOVoPevh2N2o1Bb9Cf+BhxrmgmSHI5efciLW3/TicbOFzMAVq+MPCG/dBRwzStYsgdnF+h88xMydLoDO7u954WDiv2epKs6KaXdT66unTLlWmKl4a33IslF5Aw1G6yyyNpuTjN//16JkuN5Xd2EdHGWKTZkrqp/hw+yyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P7n13BH8; arc=none smtp.client-ip=209.85.167.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ow1Ee5CZ"
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2d3f4fef377so31142951fa.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 08 Mar 2024 09:37:35 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P7n13BH8"
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5101cd91017so3790675e87.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 08 Mar 2024 09:41:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709919454; x=1710524254; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1709919701; x=1710524501; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=w7y0f9QFlXLtv3RFLZNYHWzMIFPPkAOJNu8AX7HeH30=;
-        b=Ow1Ee5CZgDbrk7ex7O9n3WwPxcsEdVXH8pT7p1Ti20Rqmz+1EZcWC4Vcjj1UnEmqfK
-         xlML4J1EyJPIz+/O966Wlcrjn5MYCC3+7mBFYpX+rb8qYstnnrYOZseiwhxoQRJb5ecN
-         2Guzqkb4dWmOfHjsJ5IdwUz63vfMymi3H5utVsy32y7AUf/yNXHwRezxHmbxOlHHDdK5
-         oTIRwHb4SlCgyn/gUetwZBMmSyEsJcfsxxb3U8T5e8kghuyzjcrDrSWfN8m48y+N38J1
-         0R1MZm8JlW5X8gkMJfBt8y8jG3nf1u/nEJNDfGLLU7EAQw/lASJDUY2J8mgvE/r4g2OU
-         LGQQ==
+        bh=P4YNYsr9gWnS3mFq/zvwGqqZs4nvxmI8GdnUy92/mBk=;
+        b=P7n13BH8mUs9oqY36DHgDy7hlQoaq/NE7fZwEUSGOUN/dUH0Me2erO07bCBiWe2+BO
+         Vmz79JH5AmH8ixk4mTSxnwXqQw1g9y1QuyqRy4i6u9CNiedSJg/CNBkf18w6f6l5wrtI
+         VwrIt4aVP6LNUo114UgotQOJCHJFLNymJxTD4B+7ibwJv3xGa/9teId35Zsp+Qz2823K
+         soJoKIxCzkFfNf/UCijxqgiRTtnSQgOHIwyquUT6/5CrRO3aviV74bG0Us7dtfbQdYMo
+         LnJLfngOg4M0tGDWoFvNSJZk9quTOgJf/re1xRLpFZ2rbRuNmtmQHV5cQzI3gF8bb91n
+         J3fQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709919454; x=1710524254;
+        d=1e100.net; s=20230601; t=1709919701; x=1710524501;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=w7y0f9QFlXLtv3RFLZNYHWzMIFPPkAOJNu8AX7HeH30=;
-        b=K2EzImp48y/xo7ktwDU4BFe/EBIg0QBi6nlqyhQvPiNfLodnOfWmoqgnIjOVnYn8Tx
-         JlcV3Qo1DXblj7DzQYM1eBtdIvhpPJESqtHc6dXOvjrzAMySBgOSEgZ3c5wTmpcnYuLA
-         GKH/8jB2atYVeu/Uv4LC8mAK/yscYjvYqUDEIbzwWdyTiiaywn7n7QrhVidwZJW5+cFV
-         NH+ZgmJVcxoaAyEC0/M/WAH8t34r6UpqqOXUukZ4ynr9R872JnSWVh+4n1h+baRUrAKr
-         Td+FPocZbspPZk8RNdmkwy7F3/2BjB3CAf7kwZtnW2SLvnjBYEyu20yHRp1jE6G0Gcyr
-         Y++A==
-X-Gm-Message-State: AOJu0Ywj4wsOP/SxxXHxDVuxJUP7+PoNZaqwkBUPc13gea5H1qTEGhbT
-	IL+NhM2wVKNEK0KahpQrw3JDWQSe+sizLTWzTOK0B/EdRWGDr7/PqzLyWAgnpLsqJiDU9LSys5Y
-	1tJXSAzImnuujM4aMsrXmWv4gZsc+XhFZ
-X-Google-Smtp-Source: AGHT+IHT4r7DabfJUHLPVUzWZqPyteDRgG+lblElZBIc+8jr2xmkMc4VbsqZT4HcGzhN9cYmGhECxcm/59sJPvqW67c=
-X-Received: by 2002:a2e:b1d4:0:b0:2d3:3261:b186 with SMTP id
- e20-20020a2eb1d4000000b002d33261b186mr3970262lja.29.1709919453921; Fri, 08
- Mar 2024 09:37:33 -0800 (PST)
+        bh=P4YNYsr9gWnS3mFq/zvwGqqZs4nvxmI8GdnUy92/mBk=;
+        b=lBYDg7BiG36UX6rkEL8Q0yi0hxY3oC2XXufHH2gl51OjXgH+RIDGMh/z5FUIbMBrQR
+         Y9jru0NAKhoivvvKQqqyJ4nO9XQJy5g4/DADMuFn3nqXHVC6Kel4kbE8BrLhm16o9nLi
+         vpmowYHkveaZSLY1I4kKkBUIY7WRoeBTB0g9zqJKm7E3p3PQOsdlGQmFUqPwm4ciWEp3
+         +RCgtxW+DoHr1b9P4l7ueuIVTOniL1kR6UZY+Vrgwo+7/VEL65n2cFy02PgDjmz9LfxF
+         ZRb/dYbm38WXY2QyZ79u8UOiockHO3Tnc/NJ1EKkEy2trfysBCFr81z1/gial8Gy2CRn
+         bH+A==
+X-Gm-Message-State: AOJu0YzdZv3M+IP8hAT+zt7fBDOdLJBGOsgIFt9Z+WF5+XZxqOd6Xs19
+	oFne4bL+IVwDbiDkhILPyCF8Tpcr0O+K5kHzXT+72rhcFIrirZUMtvC/sdb/jlJNutEBbqvf1AA
+	xU4cfUh9utaIJQIlipURKNe+4J+lhDEKm
+X-Google-Smtp-Source: AGHT+IHm6/4/ANEsHCST/9XOr/pWKobUKIl/3EVToVm/vGG2CV3coqLbnpsEtMYSedUmap0wxjMZ2fmmcygmH+QIbxk=
+X-Received: by 2002:a2e:9c05:0:b0:2d2:4783:872a with SMTP id
+ s5-20020a2e9c05000000b002d24783872amr3918398lji.29.1709919700550; Fri, 08 Mar
+ 2024 09:41:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240308165232.53906-1-silviu.barbulescu@nxp.com> <20240308165232.53906-2-silviu.barbulescu@nxp.com>
-In-Reply-To: <20240308165232.53906-2-silviu.barbulescu@nxp.com>
+References: <20240308165232.53906-1-silviu.barbulescu@nxp.com> <20240308165232.53906-3-silviu.barbulescu@nxp.com>
+In-Reply-To: <20240308165232.53906-3-silviu.barbulescu@nxp.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 8 Mar 2024 12:37:21 -0500
-Message-ID: <CABBYNZJLxD2i+sSduOszVwoH25mZDa0OR0DFAEPGcYxTtQ=thg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/3] player: Add reconfiguration prompt for
- broadcast source
+Date: Fri, 8 Mar 2024 12:41:28 -0500
+Message-ID: <CABBYNZ+vH71y1bEhLDtnmsfvMLJ7wUnA60R3-DJ_kB7w2NzgEA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/3] transport: Add support to update the transport configuration
 To: Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
 Cc: linux-bluetooth@vger.kernel.org, mihai-octavian.urzica@nxp.com, 
 	vlad.pruteanu@nxp.com, andrei.istodorescu@nxp.com, iulia.tanasescu@nxp.com
@@ -73,94 +72,70 @@ Hi Silviu,
 On Fri, Mar 8, 2024 at 11:52=E2=80=AFAM Silviu Florian Barbulescu
 <silviu.barbulescu@nxp.com> wrote:
 >
-> endpoint.config /org/bluez/hci0/pac_bcast0 /local/endpoint/ep0 48_4_1
-> [/local/endpoint/ep0] This is a BIS Reconfiguration? (yes/no): y
-> The BIS index is assigned in the order of the configuration
-> starting with 1
-> [/local/endpoint/ep0] BIS Index (value): 1
-> [/local/endpoint/ep0] BIG (auto/value): 0
-> [/local/endpoint/ep0] Enter channel location (value/no): 2
-> [/local/endpoint/ep0] Enter Metadata (value/no): n
+> Add support to update the transport configuration
 >
 > ---
->  client/player.c | 46 ++++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 44 insertions(+), 2 deletions(-)
+>  profiles/audio/transport.c | 23 +++++++++++++++++++++++
+>  profiles/audio/transport.h |  1 +
+>  2 files changed, 24 insertions(+)
 >
-> diff --git a/client/player.c b/client/player.c
-> index a40bf66e3..35143115a 100644
-> --- a/client/player.c
-> +++ b/client/player.c
-> @@ -3809,6 +3809,48 @@ static void config_endpoint_iso_group(const char *=
-input, void *user_data)
->         }
+> diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
+> index 159fbd575..c8492d4a1 100644
+> --- a/profiles/audio/transport.c
+> +++ b/profiles/audio/transport.c
+> @@ -1483,6 +1483,29 @@ static void bap_update_bcast_qos(const struct medi=
+a_transport *transport)
+>                         "Configuration");
 >  }
 >
-> +static void endpoint_set_reconfigure_cfg(const char *input, void *user_d=
-ata)
+> +void bap_update_bcast_config(struct media_transport *transport)
 > +{
-> +       char *endptr =3D NULL;
-> +       int value;
-> +       struct endpoint_config *cfg =3D user_data;
+> +       struct bap_transport *bap =3D transport->data;
+> +       struct iovec *cc;
 > +
-> +       value =3D strtol(input, &endptr, 0);
+> +       cc =3D bt_bap_stream_get_config(bap->stream);
 > +
-> +       if (!endptr || *endptr !=3D '\0' || value > UINT8_MAX) {
-> +               bt_shell_printf("Invalid argument: %s\n", input);
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       if (((int)cc->iov_len !=3D transport->size) ||
+> +               (memcmp(cc->iov_base, transport->configuration,
+> +                       transport->size) !=3D 0)) {
+> +               free(transport->configuration);
+> +               transport->configuration =3D util_memdup(cc->iov_base,
+> +                                                       cc->iov_len);
+> +               transport->size =3D cc->iov_len;
+> +
+> +               g_dbus_emit_property_changed(btd_get_dbus_connection(),
+> +                       transport->path, MEDIA_TRANSPORT_INTERFACE,
+> +                       "Configuration");
 > +       }
 > +
-> +       cfg->ep->iso_stream =3D value;
-> +
-> +       bt_shell_prompt_input(cfg->ep->path,
-> +               "BIG (auto/value):",
-> +               config_endpoint_iso_group, cfg);
+> +       bap_update_bcast_qos(transport);
 > +}
 > +
-> +static void endpoint_is_reconfigure_cfg(const char *input, void *user_da=
-ta)
-> +{
-> +       struct endpoint_config *cfg =3D user_data;
-> +
-> +       if (!strcasecmp(input, "n") || !strcasecmp(input, "no")) {
-> +               cfg->ep->iso_stream =3D BT_ISO_QOS_STREAM_UNSET;
-> +               goto done;
-> +       } else {
-> +               bt_shell_printf("The BIS index is assigned  in the order =
-of "
-> +                               "the configuration starting with 1\n");
-> +               bt_shell_prompt_input(cfg->ep->path,
-> +               "BIS Index (value):",
-> +               endpoint_set_reconfigure_cfg, cfg);
-> +               return;
-> +       }
-> +
-> +done:
-> +       bt_shell_prompt_input(cfg->ep->path,
-> +               "BIG (auto/value):",
-> +               config_endpoint_iso_group, cfg);
-> +}
-> +
->  static void endpoint_set_config_bcast(struct endpoint_config *cfg)
+>  static guint transport_bap_resume(struct media_transport *transport,
+>                                 struct media_owner *owner)
 >  {
->         cfg->ep->bcode =3D g_new0(struct iovec, 1);
-> @@ -3835,8 +3877,8 @@ static void endpoint_set_config_bcast(struct endpoi=
-nt_config *cfg)
->         }
->
->         bt_shell_prompt_input(cfg->ep->path,
-> -               "BIG (auto/value):",
-> -               config_endpoint_iso_group, cfg);
-> +               "This is a BIS reconfiguration? (yes/no):",
-> +               endpoint_is_reconfigure_cfg, cfg);
->  }
->
->  static void cmd_config_endpoint(int argc, char *argv[])
+> diff --git a/profiles/audio/transport.h b/profiles/audio/transport.h
+> index b46bc8025..6df419a67 100644
+> --- a/profiles/audio/transport.h
+> +++ b/profiles/audio/transport.h
+> @@ -16,6 +16,7 @@ struct media_transport *media_transport_create(struct b=
+td_device *device,
+>                                                 uint8_t *configuration,
+>                                                 size_t size, void *data,
+>                                                 void *stream);
+> +void bap_update_bcast_config(struct media_transport *transport);
+
+Lets not bypass layers here, so the config updates probably need to be
+pushed thru bt_bap_stream somehow, perhaps via a new callback or a
+state change where the transport.c can query the new configuration and
+update its D-Bus property.
+
+>  void media_transport_destroy(struct media_transport *transport);
+>  const char *media_transport_get_path(struct media_transport *transport);
 > --
 > 2.39.2
+>
 
-Instead of having a 2 step process we could ask the BIS index right
-away and if the user answers no/0 it means it doesn't want to
-reconfigure an existing index.
 
 --=20
 Luiz Augusto von Dentz
