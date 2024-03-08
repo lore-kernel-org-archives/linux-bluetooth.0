@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26ADB567A
-	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Mar 2024 16:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DDC32C862
+	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Mar 2024 16:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709914832; cv=none; b=Q8mtz6kyKmSmrbYvFKWLUAVYDpfz9qM+a/QmodQjlSsiifq/NWUp/civMkHEN1Sr+d5bDHvEfONprxovYUloaZbW7J3T2nsWmcvhqtrS98ipBYa5U6OCa3gPTw6fqXPuqZRiljLNIwOaNxL+wWaCB96KpS+bMssMDJVFXx0bm4Y=
+	t=1709914832; cv=none; b=PV00+QqlWfwdBjKDJXuey0Ei91Aw3ooip9JK9cXem6CZucTywrUCQe0dRp5zdvpwm9hebGDCdegmbYhiG6At+GPWH5L7HypN7THdqaIL0rNgIdidDfm6kBUP8OoO44hTl3gbIbw74avvPgr9TPwXvcU8idZYEylNn3/Mphlk8rc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709914832; c=relaxed/simple;
-	bh=dHWhMC9VvB7gbYKkeG4Uz+VWaga3bL0nH4KX8w5Eqnc=;
+	bh=LvL9lA4xohcCF4yVN4E2t6eNxrqFQ+KAUFaTRkdkeNY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LN/krSADxkNwkwmE77gXMRbi2X3vdhb6pd1zyBTJm//f66ibk0DOk4tzLHSPjSYXsmjfBVfr561ABQyx9skOkuDYEwuelT4ik2meDbXUMHDG8teGfJqYLwRvuAQkZ84TvG2R1BuDfvzjTk3YiiSL0FRQKz6TloX5FuyiU4eQzik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yax/odCV; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=j1W5Au0yP+PIsLNlyrpzWQZlPdwsF5Jbiyf0gfSemjAObdsFrMvSvHPMgYzBeB+V34iczxXAxP3GBayJZ4IVUXC3b32hpwSUy+xiTRiN3oo4gvAEQwadVl55C5lhOv/f9bqHCK1e3NPXeDhMa1frHcTO5CZq6upuDlSH4EBcUDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=St2z9ghq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yax/odCV"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C7DEDC433C7;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="St2z9ghq"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DE1FEC43394;
 	Fri,  8 Mar 2024 16:20:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1709914831;
-	bh=dHWhMC9VvB7gbYKkeG4Uz+VWaga3bL0nH4KX8w5Eqnc=;
+	bh=LvL9lA4xohcCF4yVN4E2t6eNxrqFQ+KAUFaTRkdkeNY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Yax/odCVbpfn7v/UNb5peMLOkNhXxlQY6JO5SLhSdvd06rul0TtrWDUwNfSdgeS6B
-	 xd9yscPxPvBjGk+shUUVk778NNckIAAFL99nKcab5kdcOXkQGiPaToYnW1hqTmOjot
-	 n0jZ1ouDRIKysUwCcRqxHwRibXpSa1l/rN3NRgY4WFQVlBdili6qc3A+Ki0j922h6R
-	 XnzTb3snWAuBn9JPGWvLNhj3KodjICuNjTI9f5CqkHUbw9GULp7RSuPKm8N3fdM1Kn
-	 hstiJpGuGOWL5KTcFgjpEvCMp0yInLX4k0FJT6OlfuRx2xchOijoMX5Yt77DKRDFLE
-	 EzlH2x0HWke8w==
+	b=St2z9ghq4w48YP8DPwDmxxSEJWTtsBdhPekJmurhwTyEvsKWt5qaLCkItzGraJS35
+	 0vK2RpaxJ51ikzCfAW/hNpKkeCbxBzhtJpaju3UngkuvpMZa6v5pDkqQSrYN+3WIIb
+	 r30Ct5g4z3E7/y6E9dLZm+N0hXP9UEfXn+ufwvizm/RV7OADRFGGPugRoOhr08Mm9s
+	 h3Pv3H9arJ+uHL8MjgnSvcVcerL3+oUB/Ja8yAlE+vfdOvJhXTiZbCKMpizm1UKduF
+	 NTBVupxRrRv17KyayTAjTemC7pj45OXkXlujHbFQelRnRuFszKj+aMS+OUUk2hw+4H
+	 p5mJw4KjNCAmA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AEBA2C39562;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C5ACCD84BD9;
 	Fri,  8 Mar 2024 16:20:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -37,44 +37,37 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ 0/4] client: Add scripts to start broadcast source/sink
+Subject: Re: [PATCH BlueZ v1] bluetooth: Add BT_ISO_SYNC_TIMEOUT
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <170991483169.24074.17936933316756402243.git-patchwork-notify@kernel.org>
+ <170991483180.24074.320922338627503897.git-patchwork-notify@kernel.org>
 Date: Fri, 08 Mar 2024 16:20:31 +0000
-References: <20240307155850.68395-1-iulia.tanasescu@nxp.com>
-In-Reply-To: <20240307155850.68395-1-iulia.tanasescu@nxp.com>
-To: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Cc: linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com,
- mihai-octavian.urzica@nxp.com, silviu.barbulescu@nxp.com,
- vlad.pruteanu@nxp.com, andrei.istodorescu@nxp.com, luiz.dentz@gmail.com
+References: <20240307170118.4096656-1-luiz.dentz@gmail.com>
+In-Reply-To: <20240307170118.4096656-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluez.git (master)
+This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Thu,  7 Mar 2024 17:58:46 +0200 you wrote:
-> This patch adds some shell fixes and introduces bluetoothctl scripts
-> for starting a broadcast source/sink.
+On Thu,  7 Mar 2024 12:01:18 -0500 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> Iulia Tanasescu (4):
->   client/gatt: Quit shell after user input has been processed
->   client/adv_monitor: Remove shell quit from adv_monitor_register_app
->   shared/shell: Add fixes for the init script scenario
->   client: Add scripts to start broadcast source/sink
-> 
-> [...]
+> This defines BT_ISO_SYNC_TIMEOUT(20 sec) which shall be considered the
+> default sync_timeout and make all instance previously hardcoding a
+> value to use it.
+> ---
+>  lib/bluetooth.h      | 2 ++
+>  profiles/audio/bap.c | 6 +++---
+>  src/shared/bass.c    | 4 ++--
+>  tools/iso-tester.c   | 4 ++--
+>  4 files changed, 9 insertions(+), 7 deletions(-)
 
 Here is the summary with links:
-  - [BlueZ,1/4] client/gatt: Quit shell after user input has been processed
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=352e75263632
-  - [BlueZ,2/4] client/adv_monitor: Remove shell quit from adv_monitor_register_app
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=32e9d15a6094
-  - [BlueZ,3/4] shared/shell: Add fixes for the init script scenario
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=fcbea6f3658d
-  - [BlueZ,4/4] client: Add scripts to start broadcast source/sink
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9e9f079e8952
+  - [BlueZ,v1] bluetooth: Add BT_ISO_SYNC_TIMEOUT
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=aa7a814690d0
 
 You are awesome, thank you!
 -- 
