@@ -1,35 +1,65 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DDC32C862
-	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Mar 2024 16:20:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 498F225761;
+	Fri,  8 Mar 2024 16:20:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709914832; cv=none; b=PV00+QqlWfwdBjKDJXuey0Ei91Aw3ooip9JK9cXem6CZucTywrUCQe0dRp5zdvpwm9hebGDCdegmbYhiG6At+GPWH5L7HypN7THdqaIL0rNgIdidDfm6kBUP8OoO44hTl3gbIbw74avvPgr9TPwXvcU8idZYEylNn3/Mphlk8rc=
+	t=1709914856; cv=none; b=gyXqthOIEMEltG+9jvj7cwTabNTEu+xBn69iszXHw6S9OJfIOCzCJY1lbjcc7HP57AQqlUjb0hcFn/ARcMhPljFpewGmryY1CuQRvynBr6fIW3gvzvtlwnZUTvjp9cSye/pnmaM4ixN7TOFD1oaqIJB/bi8GyKqHyCotPCcj7hY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709914832; c=relaxed/simple;
-	bh=LvL9lA4xohcCF4yVN4E2t6eNxrqFQ+KAUFaTRkdkeNY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=j1W5Au0yP+PIsLNlyrpzWQZlPdwsF5Jbiyf0gfSemjAObdsFrMvSvHPMgYzBeB+V34iczxXAxP3GBayJZ4IVUXC3b32hpwSUy+xiTRiN3oo4gvAEQwadVl55C5lhOv/f9bqHCK1e3NPXeDhMa1frHcTO5CZq6upuDlSH4EBcUDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=St2z9ghq; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1709914856; c=relaxed/simple;
+	bh=9qupHguL9fRpK1DkBs11N4LB4iV5sz6pVP0WmZ3V7hE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AkUhhOFf4i+2v/x5eC8XypkKEJBgxYltTv9frDgbNqyRhkYxHNHpdCqnCCRJ41NK+SgrYBL3CI2s9t9KrtTUo2mhUZBCV8jolS+4T2kEgQ40eMqOk2wej37tudTK4BG0RXl4kY6VefdG9bvBedQLf7T18xezonYwgg6EWaQBAns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GfMn1i71; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="St2z9ghq"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DE1FEC43394;
-	Fri,  8 Mar 2024 16:20:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709914831;
-	bh=LvL9lA4xohcCF4yVN4E2t6eNxrqFQ+KAUFaTRkdkeNY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=St2z9ghq4w48YP8DPwDmxxSEJWTtsBdhPekJmurhwTyEvsKWt5qaLCkItzGraJS35
-	 0vK2RpaxJ51ikzCfAW/hNpKkeCbxBzhtJpaju3UngkuvpMZa6v5pDkqQSrYN+3WIIb
-	 r30Ct5g4z3E7/y6E9dLZm+N0hXP9UEfXn+ufwvizm/RV7OADRFGGPugRoOhr08Mm9s
-	 h3Pv3H9arJ+uHL8MjgnSvcVcerL3+oUB/Ja8yAlE+vfdOvJhXTiZbCKMpizm1UKduF
-	 NTBVupxRrRv17KyayTAjTemC7pj45OXkXlujHbFQelRnRuFszKj+aMS+OUUk2hw+4H
-	 p5mJw4KjNCAmA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C5ACCD84BD9;
-	Fri,  8 Mar 2024 16:20:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GfMn1i71"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1dc13fb0133so7660215ad.3;
+        Fri, 08 Mar 2024 08:20:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709914854; x=1710519654; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ylV49xp7G/5derN4W10dhfCftimVKGiaFzSUndcrrBw=;
+        b=GfMn1i71ircfXBBq0kr8evSQFbq9Nyo6Wx6KlnqRY6jU5HOjLqZCouAZ8ctlrTeGKd
+         /lYMLItp4tyvAkJ8WxJNP9UFHdRtbeYaoqktCEnA1+PCStWGoGbBG1mcZiBAbWm4Q1Qo
+         eTemnP86Se0+ianNH4pbMsjCg+ZxTWbQ+cSQMLRhRzMIZfU0dSV61xWNY9VLpe16IQ7z
+         kelw5/LXBKoC7eRfACRgj6VJpK/5Hmidhu87OQmyxF5vcijc32Dy9TusJMMtswqCposv
+         5MiAfCB2I4uHV5rW2q048KDKEhC2aMiT2+V8P1NqZhNo64yRYJh/k3DnNyJn6b+jOha6
+         XrdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709914854; x=1710519654;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ylV49xp7G/5derN4W10dhfCftimVKGiaFzSUndcrrBw=;
+        b=uoGsQMNjWJwg5/uPOVGmZIAREi/NWziuG6d6TZV97jv1Q9IPpuDAte/mTldgh168CT
+         4VrFTQhUOL0TEW4xUgTi5cb55ewxlotDLyvw2x5LsR6E3v+xFG/qMpVsytKI5dS4NHgD
+         5mLMWzYcEUmGXCAutHPL4DxV8Q/slgiw+HFNWa2W+qjS1M6YzezZYPswqzb6n+V3fg7k
+         k5fQ81aH0xH2P/IHwZAvpgDBH6YZGapVV5C/t7cnXjg6eesPhYCefmSgbcWyZPEizbek
+         NmbWW3vUWYHdd6ljimwC4zQGwtSEphSpJKGES/b/IY9iWHl7yVaGnrxPvWzypJTJaVqB
+         ig8A==
+X-Forwarded-Encrypted: i=1; AJvYcCX7eFGNtiHhPfbIZ63KErFqIKcUu/UUTuaPrMzEqSOwRlfRgWK94iNsQejcCXkEd3KmvjxRBYEDAlsUMdbErVERbD5F8hjdyTElBzaAlR1fQykHzZSD6hGN7yrRNygsvZRgCmPzM6q7CxJU5xW1
+X-Gm-Message-State: AOJu0YyQIja6/9+wO8tKIkbQN/D66i9RLDz87REnkDXACAVngukN4TXG
+	gv8YqO+8Vl2U3AESw8smJaNd+lsPstWjSrtKGhCfBcSS/VaMRxpI
+X-Google-Smtp-Source: AGHT+IFCiuU2H9n8kjde079kqmMIoFXj29yk5vhNY+eKT979HwQ4aEqQ6RBhgX+/svIx/Cqmb53VqQ==
+X-Received: by 2002:a17:902:d488:b0:1dd:5686:81d with SMTP id c8-20020a170902d48800b001dd5686081dmr5762693plg.18.1709914854550;
+        Fri, 08 Mar 2024 08:20:54 -0800 (PST)
+Received: from ubu.. ([2401:4900:1c83:357e:32b:6491:476d:5fa8])
+        by smtp.gmail.com with ESMTPSA id l5-20020a170903120500b001dc3ef7aa2bsm16501107plh.49.2024.03.08.08.20.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Mar 2024 08:20:54 -0800 (PST)
+From: Ayaan Mirza Baig <ayaanmirza.788@gmail.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: Ayaan Mirza Baig <ayaanmirza.788@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: bfusb: Updated code to follow style guide
+Date: Fri,  8 Mar 2024 21:50:37 +0530
+Message-Id: <20240308162037.100226-1-ayaanmirza.788@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -37,41 +67,54 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1] bluetooth: Add BT_ISO_SYNC_TIMEOUT
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <170991483180.24074.320922338627503897.git-patchwork-notify@kernel.org>
-Date: Fri, 08 Mar 2024 16:20:31 +0000
-References: <20240307170118.4096656-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240307170118.4096656-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
 
-Hello:
+Added indendations, removed trailing spaces, added empty lines after declaration.
+Fixed Warnings with checkpatch
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+Signed-off-by: Ayaan Mirza Baig <ayaanmirza.788@gmail.com>
+---
+ drivers/bluetooth/bfusb.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-On Thu,  7 Mar 2024 12:01:18 -0500 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This defines BT_ISO_SYNC_TIMEOUT(20 sec) which shall be considered the
-> default sync_timeout and make all instance previously hardcoding a
-> value to use it.
-> ---
->  lib/bluetooth.h      | 2 ++
->  profiles/audio/bap.c | 6 +++---
->  src/shared/bass.c    | 4 ++--
->  tools/iso-tester.c   | 4 ++--
->  4 files changed, 9 insertions(+), 7 deletions(-)
-
-Here is the summary with links:
-  - [BlueZ,v1] bluetooth: Add BT_ISO_SYNC_TIMEOUT
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=aa7a814690d0
-
-You are awesome, thank you!
+diff --git a/drivers/bluetooth/bfusb.c b/drivers/bluetooth/bfusb.c
+index cab93935cc7f..08beae26e345 100644
+--- a/drivers/bluetooth/bfusb.c
++++ b/drivers/bluetooth/bfusb.c
+@@ -275,6 +275,7 @@ static inline int bfusb_recv_block(struct bfusb_data *data, int hdr, unsigned ch
+ 		case HCI_EVENT_PKT:
+ 			if (len >= HCI_EVENT_HDR_SIZE) {
+ 				struct hci_event_hdr *hdr = (struct hci_event_hdr *) buf;
++
+ 				pkt_len = HCI_EVENT_HDR_SIZE + hdr->plen;
+ 			} else {
+ 				bt_dev_err(data->hdev, "event block is too short");
+@@ -285,6 +286,7 @@ static inline int bfusb_recv_block(struct bfusb_data *data, int hdr, unsigned ch
+ 		case HCI_ACLDATA_PKT:
+ 			if (len >= HCI_ACL_HDR_SIZE) {
+ 				struct hci_acl_hdr *hdr = (struct hci_acl_hdr *) buf;
++
+ 				pkt_len = HCI_ACL_HDR_SIZE + __le16_to_cpu(hdr->dlen);
+ 			} else {
+ 				bt_dev_err(data->hdev, "data block is too short");
+@@ -295,6 +297,7 @@ static inline int bfusb_recv_block(struct bfusb_data *data, int hdr, unsigned ch
+ 		case HCI_SCODATA_PKT:
+ 			if (len >= HCI_SCO_HDR_SIZE) {
+ 				struct hci_sco_hdr *hdr = (struct hci_sco_hdr *) buf;
++
+ 				pkt_len = HCI_SCO_HDR_SIZE + hdr->dlen;
+ 			} else {
+ 				bt_dev_err(data->hdev, "audio block is too short");
+@@ -365,9 +368,8 @@ static void bfusb_rx_complete(struct urb *urb)
+ 			buf   += 3;
+ 		}
+ 
+-		if (count < len) {
++		if (count < len)
+ 			bt_dev_err(data->hdev, "block extends over URB buffer ranges");
+-		}
+ 
+ 		if ((hdr & 0xe1) == 0xc1)
+ 			bfusb_recv_block(data, hdr, buf, len);
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.34.1
 
