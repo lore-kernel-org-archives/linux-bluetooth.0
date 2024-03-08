@@ -1,62 +1,62 @@
-Received: from mail-ua1-f48.google.com (mail-ua1-f48.google.com [209.85.222.48])
+Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com [209.85.221.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 012F85FDB3
-	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Mar 2024 22:10:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A19324B5B
+	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Mar 2024 22:10:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709935818; cv=none; b=JrF4p08Jh9kf7xiG5ir8HNsXiA46VSgiJSleMDZaMCNX+hwItJR/Mnipv0gMruDMu1pt9biLXwmbBCmAbrGSzuMhapk/oTbgZKclsBTPS/ndgkEs9CTVMhuKrN2rIfbWnc4/gfkwN+cZHsehJbCep1Xlr6w3/Cn0eSHVvms44YY=
+	t=1709935820; cv=none; b=BCC3qEQ7Bn2S4fj8sEtPk7mwSBSUp0i5MQcQ3E9Z/7hdZGEuHWYYjpb8ViDF9sHvwOz1MkDICl9OreQ798xjSbhSUR92Y8QGQQD1GlQk0zYHpUKhjdpV6UsB86n71e0zOgyb9DaQVDqX4JzKSt2+98nQVN2p9sb0ict1kRGInDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709935818; c=relaxed/simple;
-	bh=28iptPzQ8GM/Czk49i40kS2ksA0YKipUYYgpTO5/15I=;
+	s=arc-20240116; t=1709935820; c=relaxed/simple;
+	bh=j9bz+SgudFucVmm8NF9NFnS2fUl7HcnE5Kb1otyXLso=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ccNyhl+mXeDG+th8hmLKOOJMIBUpqce/mM2zUm2TXz/qYI+VmeMVEYkNfSEzQM5f3j0GN6nYvCFDjq6S+QQNlbN/7uRic4NC2Vcn/UIvbLiZLcozFkZkukT1CxCIbyF775h0UYQQ+WBfH7LERsE2DY1GVq8HS2JhMaI1VtDmEi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R/8MRtaH; arc=none smtp.client-ip=209.85.222.48
+	 MIME-Version; b=D8xP3Sjvgte5rogHjFy/WPVzjeEc3dOdP9GA4Gw7nma7FwTTGpVluLm2174TRFKrnLVtgUCSPmdxTLlafoIvwqiU7pJiFzUPtQ+Ul4FpakWIuvcXt9h6kSgm+B+k0RnhDkN6mZ2Vd7RJwLhtxcHPcWifhncJWBBL3y0/pt+qN+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fl8eaK6k; arc=none smtp.client-ip=209.85.221.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R/8MRtaH"
-Received: by mail-ua1-f48.google.com with SMTP id a1e0cc1a2514c-7db1a2c1f96so1639947241.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 08 Mar 2024 14:10:16 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fl8eaK6k"
+Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-4d34fbbd91eso811844e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 08 Mar 2024 14:10:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709935815; x=1710540615; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1709935817; x=1710540617; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=KuefABokbSsjxTGPqgZ0gA9y3X9yGv7eqCAtxoixHko=;
-        b=R/8MRtaHnsR1zKf2tDPFrx7fQeqkxuQ66oBWEbC0PLMTDxdGHcDoJ/W4Hiq/aLNQSN
-         ZfE+5B08aNwYnNaIDfPTsIdYnA5NVidEj0eJBgs7hccgM1C25mdJ+Z6mk/VXJ0po3yOQ
-         ym7YdyYZYaqloFjt22ovfGx4/tvXceJViBY+fqn86F4sddB3TIkENIg/KBAX/d+khK3X
-         p2x4YtJKkH10MkFzNOwPxFu8lwFgiy0+Uegx4LRNsDm2V09HLqAkrawhdKFymnzhUZfV
-         Cb8BbPz8Xcmb/uUMXOJveruuO5mMe+xsnhirJYRdrNQVHphQkkc0ik+erslM2ZFZKXVx
-         SVSw==
+        bh=ac+TOeNfDBn3AAxKk7pgLTj6atTlKNmnyNll3+p4OJA=;
+        b=Fl8eaK6kExWxK4vxLMX8ffqtrQKtSyJBZKK2RhpdHUycnjlMD6Awo7ZYEhSlS+Q81f
+         BUBCK2Twf3aeMvki1ORcH3RLdfD3QAgQblU/vW5YZEAKVV9xBIrEkErYmlyzgMYJSiop
+         /+C4Wik5BEtNkGHHK0G7L7AGpYNzKZu7Z2Hxo726+iEue5imH0ZrKMUfnACL853gVkji
+         CkrUkxgc0mSQ3jlNjc8sTNYoNibr69oRsn1iGBwy8/lCvvsBQX4Ih2CZQeSCYtWIv5rh
+         /Q8a2vIm4cbAjY+eeiiPWKWUXqRiJv+cJ4jMGZ37MQI+213D+HeXYjfCsNWts3cm/Hc9
+         km6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709935815; x=1710540615;
+        d=1e100.net; s=20230601; t=1709935817; x=1710540617;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=KuefABokbSsjxTGPqgZ0gA9y3X9yGv7eqCAtxoixHko=;
-        b=FFmB67zQ8fDNSCgw+w7IBcuFFUU6xv+E+O/qDt7TGrWSbCeED8eWmMgH4OT8Bjq76x
-         EW6I8BwnRHGAkw65bEY8C9MJ0rq9Ploa+v0xQzfZaA2fdwJUuzdGo9UsFF4Ep6tyVsy/
-         /m+pxDEE2i8KJNAeUv0NA0hmTH5bsbnmWstUdKHeKuaGQR+cVbut8NpQvDyU7JvxFYLl
-         LoRNy1Gcr3nP+OTKDtHZ/Uyg74OzRtP/qdJfTZF8shMO9I0NmkvZ8eSwF7m/aSNnkd8d
-         Rfnvcx4JUm0xVuoAmX8dbHVDS024yiG/xHH1o0s95V12vJTQNieEe53MbxawhMp62pyL
-         Zmpg==
-X-Gm-Message-State: AOJu0YxF1GNsNf/cHgxwrU5El1e5z9sVTCXnprAbWxAHvw5NuL+4tkjc
-	GtRv4IfwpA7jH2aWVUnYaNQynddh6TMzIim5y6ctrH1c/V039/sVd0FpeRQh
-X-Google-Smtp-Source: AGHT+IGTqSl/1IUs9ZjDlSYAJf/GB0klKfz7w1M+iHof6oNPXK3wR0ZfJlsYI5qfeCB6U6REQ1gYzQ==
-X-Received: by 2002:a05:6122:905:b0:4c9:2540:8520 with SMTP id j5-20020a056122090500b004c925408520mr812720vka.1.1709935814764;
-        Fri, 08 Mar 2024 14:10:14 -0800 (PST)
+        bh=ac+TOeNfDBn3AAxKk7pgLTj6atTlKNmnyNll3+p4OJA=;
+        b=YRFdIzvT5K/yS7aZ+8tMqqmH6jBvOgujtCUeYhf7kcP1KiM54xVj5O3L0r9XSf1ddp
+         fV2ToA/P7VXamvuZNVROB2gAdiAlzmrgfBH4kEW2yj5ml4Z3zBIrdzp6jp0bFAjIG5SP
+         98fR6LvAKwYTRXM7T2hIh7QrkNKG3Ku6lWzptrPuZABCJrjpuVMrSUET4v+tfCAQ9ucs
+         R633yz6UVdHr1FSjWH1ojZWptZrsqarTspQIA/m+ox4+mtPE6PpXoY2yFpaiavjnbTEY
+         gwJ7ix8Ty2NaURD+JW1oxMxUU0y2PbP8bISyCzXdaSVW3OoEv+ecsipxmyF/+MghfgE/
+         W5pg==
+X-Gm-Message-State: AOJu0YzRY5+UphWERpMHKzMUA67+5Yzqq7Qas0M6QEvIedSTcKtT73gR
+	ThTKOEFy3YgK23y3KsQrOPsaepquUbe0Yrq4m26pxREXsjKswVwTGyhy7A/C
+X-Google-Smtp-Source: AGHT+IG1C/QPtGYNmIiLPmoWuzzLw+EMpHGOV9A6PLigZMTSF3ZqsKqG+8E+2SV5A3WpCL9aJjpYdw==
+X-Received: by 2002:a05:6122:4e8f:b0:4d3:3a8c:13ad with SMTP id gf15-20020a0561224e8f00b004d33a8c13admr717854vkb.8.1709935817322;
+        Fri, 08 Mar 2024 14:10:17 -0800 (PST)
 Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id el15-20020a056122278f00b004d33d93758asm29039vkb.23.2024.03.08.14.10.12
+        by smtp.gmail.com with ESMTPSA id el15-20020a056122278f00b004d33d93758asm29039vkb.23.2024.03.08.14.10.15
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Mar 2024 14:10:13 -0800 (PST)
+        Fri, 08 Mar 2024 14:10:15 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 3/4] input: Use bt_uhid_create instead of UHID_CREATE
-Date: Fri,  8 Mar 2024 17:10:06 -0500
-Message-ID: <20240308221007.250681-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 4/4] test-uhid: Test bt_uhid_create and bt_uhid_destroy
+Date: Fri,  8 Mar 2024 17:10:07 -0500
+Message-ID: <20240308221007.250681-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240308221007.250681-1-luiz.dentz@gmail.com>
 References: <20240308221007.250681-1-luiz.dentz@gmail.com>
@@ -70,51 +70,56 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This makes use of bt_uhid_create instead of directly submitting
-UHID_CREATE since it can track UHID_START by itself.
-
-Fixes: https://github.com/bluez/bluez/issues/771
+This test bt_uhid_create and bt_uhid_destroy instead of directly
+submitting UHID_CREATE and UHID_DESTROY.
 ---
- profiles/input/device.c | 21 ++++-----------------
- 1 file changed, 4 insertions(+), 17 deletions(-)
+ unit/test-uhid.c | 28 ++++++++++++++++++++--------
+ 1 file changed, 20 insertions(+), 8 deletions(-)
 
-diff --git a/profiles/input/device.c b/profiles/input/device.c
-index 0d32b705bd00..d5b7d6728c88 100644
---- a/profiles/input/device.c
-+++ b/profiles/input/device.c
-@@ -941,28 +941,15 @@ static int ioctl_disconnect(struct input_device *idev, uint32_t flags)
- static int uhid_connadd(struct input_device *idev, struct hidp_connadd_req *req)
+diff --git a/unit/test-uhid.c b/unit/test-uhid.c
+index 8a8eef855bc5..f2f9cda097af 100644
+--- a/unit/test-uhid.c
++++ b/unit/test-uhid.c
+@@ -228,19 +228,31 @@ static const struct uhid_event ev_feature = {
+ static void test_client(gconstpointer data)
  {
- 	int err;
--	struct uhid_event ev;
+ 	struct context *context = create_context(data);
++	int err;
  
- 	if (idev->uhid_created)
- 		return 0;
+-	if (g_str_equal(context->data->test_name, "/uhid/command/create"))
+-		bt_uhid_send(context->uhid, &ev_create);
++	err = bt_uhid_create(context->uhid, "", NULL, NULL, 0, 0, 0, 0, NULL,
++				0);
++	if (err < 0)
++		tester_test_failed();
  
--	/* create uHID device */
--	memset(&ev, 0, sizeof(ev));
--	ev.type = UHID_CREATE;
--	strncpy((char *) ev.u.create.name, req->name, sizeof(ev.u.create.name));
--	ba2strlc(&idev->src, (char *) ev.u.create.phys);
--	ba2strlc(&idev->dst, (char *) ev.u.create.uniq);
--	ev.u.create.vendor = req->vendor;
--	ev.u.create.product = req->product;
--	ev.u.create.version = req->version;
--	ev.u.create.country = req->country;
--	ev.u.create.bus = BUS_BLUETOOTH;
--	ev.u.create.rd_data = req->rd_data;
--	ev.u.create.rd_size = req->rd_size;
--
--	err = bt_uhid_send(idev->uhid, &ev);
-+	err = bt_uhid_create(idev->uhid, req->name, &idev->src, &idev->dst,
-+				req->vendor, req->product, req->version,
-+				req->country, req->rd_data, req->rd_size);
- 	if (err < 0) {
--		error("bt_uhid_send: %s", strerror(-err));
-+		error("bt_uhid_create: %s", strerror(-err));
- 		return err;
- 	}
+-	if (g_str_equal(context->data->test_name, "/uhid/command/destroy"))
+-		bt_uhid_send(context->uhid, &ev_destroy);
++	if (g_str_equal(context->data->test_name, "/uhid/command/destroy")) {
++		err = bt_uhid_destroy(context->uhid);
++		if (err < 0)
++			tester_test_failed();
++	}
  
+ 	if (g_str_equal(context->data->test_name,
+-						"/uhid/command/feature_answer"))
+-		bt_uhid_send(context->uhid, &ev_feature_answer);
++				"/uhid/command/feature_answer")) {
++		err = bt_uhid_send(context->uhid, &ev_feature_answer);
++		if (err < 0)
++			tester_test_failed();
++	}
+ 
+-	if (g_str_equal(context->data->test_name, "/uhid/command/input"))
+-		bt_uhid_send(context->uhid, &ev_input);
++	if (g_str_equal(context->data->test_name, "/uhid/command/input")) {
++		err = bt_uhid_send(context->uhid, &ev_input);
++		if (err < 0)
++			tester_test_failed();
++	}
+ 
+ 	context_quit(context);
+ }
 -- 
 2.43.0
 
