@@ -1,104 +1,101 @@
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F33C87FA
-	for <linux-bluetooth@vger.kernel.org>; Sat,  9 Mar 2024 00:53:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA66C2033A;
+	Sat,  9 Mar 2024 03:16:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709945630; cv=none; b=RtRHW9ZwCq+dKob+vSb7H/sFrc6uJ7S1omDKmWTBBQfLieg42z3Db0z+EACExC52UrFOf0OFCU3UIfCWAPbt4fQ7Bd40fv8b+iDr+3uTn/TgWxe37ShqT02S0jFM43Ja+6zVmVqyTqa47pJP2j2KJ71ua48vs3cfiaQhf3FZtbs=
+	t=1709954193; cv=none; b=ZZ4bsqdspGsqzbuNnMlpGrzr9hnaQkaxYZ1+8SlB8XC2xSJjMJ9qbYW4TH9YoUD4TI6SlIpZIOGHERPCLbWoHNwSUgg0yFILw/D8V4sD41Z+0juTLhVBRANIUGqwWK5BKa54UMZw19c94AqBIQnCgrFlCxN0F57WQbwxfF1udHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709945630; c=relaxed/simple;
-	bh=m9sFBDT7hpj6nHZ12uB54UeoimW5AfqIm5cFpv0bMqw=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=G0f0ni55vo85srpqLYM522lYQ/4d2SggsYMkcOSnlSLRN27SrgxJ6iaFe11POp+WbIC7zs5rfx9AOHg1cE0rehjUnl78Uajfd3w5pI1hjOsowaZO68VnpuOd4GWkHZ67vzQSKxPL9cqkxEXeF2BknHFgI+QWJXy09kk7Ekdwi1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mWUp6yxw; arc=none smtp.client-ip=209.85.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1709954193; c=relaxed/simple;
+	bh=6oz/c8tuVzvCAxWB8vw3sC38CdKkKexJbHpFIM6YNvw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=d+gV9PVtNjAlqe7ELNP09zLToRnQsal6SU0Oq4br5QYaXEpNalgbt0MfEWlZIP06i7+6OtncvP7G6dhszWmT4qvk3GJqtkAlcxUGfcq8EwTz+ZLIgxOcFVyFU9bLS87DhI32uPbKrBffnHcQrWUYnFQikkCWhvul843yOF/ZMAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=Idf5SuAR; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mWUp6yxw"
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-690b7ce0f59so6269196d6.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 08 Mar 2024 16:53:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709945627; x=1710550427; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=HoI9sLzeQrWbEiS5qkXJm16sjhFutL7pTuEtZXsx1+0=;
-        b=mWUp6yxwbgIw8HOhFiNxQOgfmIt86esAhMB2IkI0BT5PGFMLWPir5s7qH/KEatnDPu
-         g9TyQBcEuBRCGbLSCK743pU/sX5C3JdYD/b+i9QBPVHi2VZHSdEyT2p9WsRCPp2erw/W
-         zdRNH2aEDCAnrCPvBs+PynwSGWlsX27JXabCiWFgKzR4bVzTqyWECE7zLGCgs0v/zgxD
-         ZZ6SsIVK+QB3vOAgfcZ498Wp+/xDzcvVLAHUUWA2nCI2yQXvvYG3O7grvaeXviuoxZLr
-         7wETmU4Mf1lQGhgs3Z718m4V+CpQdp8PBDsGeT9FxOLHduLPsWNSs6Sj0RJ4lkp3x5Zh
-         nCVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709945627; x=1710550427;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HoI9sLzeQrWbEiS5qkXJm16sjhFutL7pTuEtZXsx1+0=;
-        b=mk2T9rH+zsbJfsKcJuZl+iwA54kGY//1KvFe21AVOZ/SQ1HuHfZup+B98fTzVb1b6n
-         9oDKQ6Fn2aOTz62g06C4d3hx+hxTw9PvZ5xNMD1UsO1jzMEO3Q/9JcolId2kZ3DeoRms
-         lxmzkih0Qji45cQBwWWdGx52HIDf8x89k9CpAasoG3mZqHI4s5feJxrQZ20NFzj7LqBL
-         eIuwz+WSv1ct3HMXT4KRXNvTpPLFaLKCckrQQtKWkEzkaAzAvwK+N6Olg61ToWc2h8QJ
-         WcmyTEqxIbTtj7aa4iC1CA3VhOmGJLMrQpmytfsj1gZg68MD0OEx2syzSHRx5Lv3tpNO
-         o3mw==
-X-Gm-Message-State: AOJu0YyvpGeqym+AgAGnF1CjYDTkDRSqU0c/wj6hmnLR8ZMbYkM6t50y
-	utSrAzBAEPU6YbuYBWytqHmDR6AfwsZnVqA+3kdjdh6lXFQtLZBvWcWnSKSO
-X-Google-Smtp-Source: AGHT+IHVf37NWTcnSy8AXaRzPzM3M55m5fhbUUsV2ScU0ZpQVM6ts6SIqGv+58ZeZti47Lno7d5ccw==
-X-Received: by 2002:a0c:f04a:0:b0:690:baa3:d411 with SMTP id b10-20020a0cf04a000000b00690baa3d411mr1064234qvl.28.1709945627650;
-        Fri, 08 Mar 2024 16:53:47 -0800 (PST)
-Received: from [172.17.0.2] ([172.183.51.242])
-        by smtp.gmail.com with ESMTPSA id ej5-20020ad45a45000000b0068fc8e339b8sm299627qvb.136.2024.03.08.16.53.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Mar 2024 16:53:47 -0800 (PST)
-Message-ID: <65ebb31b.d40a0220.dfe07.0fc3@mx.google.com>
-Date: Fri, 08 Mar 2024 16:53:47 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0980245126151196526=="
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="Idf5SuAR"
+Received: from tr.lan (ip-86-49-120-218.bb.vodafone.cz [86.49.120.218])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 0896187D46;
+	Sat,  9 Mar 2024 04:16:28 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1709954189;
+	bh=UUyIP5v6l38yz4FL82VwcPPfb7PIR/nDthpWPLat13s=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Idf5SuAR8sooS11ChZBi97oOpOpQ8uXKeWSoQflaHk4jdqOCxGWeWd3YeYoTaEkUQ
+	 bmgATmBvoGZZXjYRWwrVFp7fA6Aqi2RCWtyNTe7flZ+m06mSeigIpGoQcKLX8FS3tJ
+	 k5wEn0Uc2vM+6smx115l7ji0yg99elo3I0Mm4DcGzhd4VB685j1v7RsV0sSqO1INdJ
+	 iPeZnXPkzzzqdR/TEwjpDRMyUvPS4Zd3bN9PPFj9rTD0WwLfsNrcZQY8Z5W9ldSMbv
+	 4qYaPGhK5WJGF73xbKveS00PNKw5h9Gq1oNBAcyikNN10z9wiA9MYTV8xH6+5wZrvc
+	 FMobs0+JzvP5A==
+From: Marek Vasut <marex@denx.de>
+To: linux-bluetooth@vger.kernel.org
+Cc: Marek Vasut <marex@denx.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	devicetree@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH 1/2] dt-bindings: net: broadcom-bluetooth: Add CYW43439 DT binding
+Date: Sat,  9 Mar 2024 04:15:12 +0100
+Message-ID: <20240309031609.270308-1-marex@denx.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1,1/4] shared/uhid: Add bt_uhid_create
-In-Reply-To: <20240308221007.250681-1-luiz.dentz@gmail.com>
-References: <20240308221007.250681-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
---===============0980245126151196526==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+CYW43439 is a Wi-Fi + Bluetooth combo device from Infineon.
+The Bluetooth part is capable of Bluetooth 5.2 BR/EDR/LE .
+This chip is present e.g. on muRata 1YN module. Extend the
+binding with its DT compatible.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=833928
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.71 seconds
-GitLint                       PASS      6.28 seconds
-BuildEll                      PASS      23.74 seconds
-BluezMake                     PASS      1635.49 seconds
-MakeCheck                     PASS      13.16 seconds
-MakeDistcheck                 PASS      175.34 seconds
-CheckValgrind                 PASS      244.12 seconds
-CheckSmatch                   PASS      344.72 seconds
-bluezmakeextell               PASS      117.34 seconds
-IncrementalBuild              PASS      5980.43 seconds
-ScanBuild                     PASS      1003.69 seconds
-
-
-
+Signed-off-by: Marek Vasut <marex@denx.de>
 ---
-Regards,
-Linux Bluetooth
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Conor Dooley <conor+dt@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
+Cc: Linus Walleij <linus.walleij@linaro.org>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Rob Herring <robh@kernel.org>
+Cc: devicetree@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org
+Cc: netdev@vger.kernel.org
+---
+ Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml | 1 +
+ 1 file changed, 1 insertion(+)
 
+diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml b/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
+index cc70b00c6ce57..670bff0078ed7 100644
+--- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
++++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
+@@ -27,6 +27,7 @@ properties:
+       - brcm,bcm4335a0
+       - brcm,bcm4349-bt
+       - cypress,cyw4373a0-bt
++      - infineon,cyw43439-bt
+       - infineon,cyw55572-bt
+ 
+   shutdown-gpios:
+-- 
+2.43.0
 
---===============0980245126151196526==--
