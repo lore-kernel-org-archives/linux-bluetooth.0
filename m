@@ -1,62 +1,62 @@
-Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
+Received: from mail-vs1-f50.google.com (mail-vs1-f50.google.com [209.85.217.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C45E458119
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Mar 2024 22:43:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C80A958200
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Mar 2024 22:43:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710197014; cv=none; b=OOUfphJa8HzVYccVuq/KBPnEpiorlNPEDKBSD7DpcPgjuSjKQHGi2WsSirdYXwml2vmxl7pb/LNgYSy0hbUduUl4qgUMbWsMx/b+T6/eTMLDAITuU+WNYgZHtqoGtOlFveqoa4EmscrS36Ds3OV380rqf5SozzseKmNPbsvhScA=
+	t=1710197016; cv=none; b=Zf1XJYLNwJKSVeKeGPHGeSm9JfA0+jBrSrH3+y8eq3/wZjffnhQCulRv7EaBZVsOsftYqXtKgYtU+tb2jJ8T8r8fBg3Lbj+a4symZbru+eXW9pPUxpTtDX15S307etnXB0jBVjgziwJTNUVhJCXSUcEjlN99qU/pzVMObsrLPkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710197014; c=relaxed/simple;
-	bh=FfPCppVcSYknsnxqBvS2qzmqpvVcEFIsGs6Ce+q58A4=;
+	s=arc-20240116; t=1710197016; c=relaxed/simple;
+	bh=kCl/FjyFg2v0d19c8o1f/+lxhrSPQp9UZRKB3ZY/9v0=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aTseuP0ZEgco8qbOh3rhOnpN54yad1hEKsdJZtWTfL7QCg4XYPNNA1WKZj6N+sXF+55N417ZMK5+Hfad3FUNItWdd5z8bCRyuZ/u5C5OHKCm+sQpfUi16Y9YQRR6n0wGuGDGR2DapM7S507qX8dGrjPkMzzjW/mDLyA6udlYsJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F9Vx+Ma5; arc=none smtp.client-ip=209.85.217.51
+	 MIME-Version; b=LR1Ooc8xJfZnSRBV1AFoUuHF/UOkbIWYHvDM5ZnNFLpvAh5zXMVjVXruAX4ayvLcbAHcUynoW6MnxDglVKbH4VJjwDz8006Ps3NF5OR1OZJBWHkyYGlvkCAIDna4BAo2T+Y8ciQ9JjmDVgIUS/FwKelPhROlmADRbRsUxI5clNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TQ7J8Mxb; arc=none smtp.client-ip=209.85.217.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F9Vx+Ma5"
-Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-4727b9d7b1fso715064137.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Mar 2024 15:43:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TQ7J8Mxb"
+Received: by mail-vs1-f50.google.com with SMTP id ada2fe7eead31-472d80cda16so1104309137.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Mar 2024 15:43:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710197011; x=1710801811; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1710197013; x=1710801813; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=IZM1XkQj7ah1htGxaEUTQI7nRzsS9xzGuWx9zjMLiUg=;
-        b=F9Vx+Ma5dD67Jd0RsWaiW5lHbkxG57Cb3PgxEY4C92xr+QrtYmiLi3iB7cVcxN/xau
-         7lirR67RoTQf3ckU/kmm/ahKlQ/Lm5i3tIoYk6El7vUwsqHRY/eg+NdYVq+3X7n3Ulpb
-         cTo+MCGxGt5q8fsVw1HDljYUy8KRqgE14gLD0VxU+uCrnV2tqYd9uhJc6atEbmHimYc6
-         eHjTVswEfXYKMklyIiuGGOxBkqf0pjorJW/gIIf7ha416G3jr/Gd93oBS9fH9/JIpTja
-         5AQSjf1P2T68yOEuBF1wb476rdZZUPW6q4wce7Eclgf/8pZaI+vs/eimpi06z9fSgTB+
-         mYPg==
+        bh=XBbU+hM+5RPM0xomTDkCuqOrXyZs6r1aenEFhKfWOBo=;
+        b=TQ7J8Mxb76MgO71ED75cFqZRhVMbzOwxk616Giu8MmS9alldxy58VpXycqk22Fpmfp
+         pIh699abXGJoFZ+Kbm4Qlps+uH/mUgG0GwOX0mUvrZ9n0GF3Eq+JG21uOgZT4LUcrS5l
+         LL9iGtzfPvkeZAn774tCdZcJ5W5IIw1flaycKa7xc+eRy7XXBK+4oolW5p51PIW9XKnI
+         qXa13odW3iwOoZthAXrDoGuKJ+1BwqKQE4u0n7uSzE3AfHxX3osZS1mxkj3Zokkd1dbv
+         C54ROZT0GfMsEOVIETtd9x2mcoKZsxsWu/Srof+B1xyAzAi+kVdyaA2xHl3+giAOacvR
+         rZgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710197011; x=1710801811;
+        d=1e100.net; s=20230601; t=1710197013; x=1710801813;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=IZM1XkQj7ah1htGxaEUTQI7nRzsS9xzGuWx9zjMLiUg=;
-        b=rBu/l/PWkrUd986ecHWTr8lG72Hld1GhgxE2vfAUc98m34T2LayGsGQI1SXjDXF5US
-         Im+R1ATN6ejQGVpE0Jt77Jdg6hiZ3QELX/perlwa9kbDuLjuyQi7b/QOtswA3rkES0qK
-         ex/Y+jfJVaZK8dNMWWUVa1L9T+VZ3gqGrTrtNJvIHSdNI+sIuLoFzloklFR1v+oc5e59
-         PmMdfEwakzV74Q/ASZQGCVcHwlhxJbHzAYlliYG1ugzSmaQDPfzkc5XGUDBt9iHe/CVV
-         k2EvZQHPKHbXW4Qvpd5SoVODkw62qA6pKgScrKMUQAarzYa2dwB7PPuqRNpBUbrXQJOG
-         gHlA==
-X-Gm-Message-State: AOJu0YyVhZQ4n155MxtpiTkawnFuNNbu4f2KPbvSrL4tv2F4AAw9/jh1
-	F9OdGogQ/XGt7/FAA3WK59KwCeM0nc6+CN+s3DDOUrejRHuauEahaN/20ayc
-X-Google-Smtp-Source: AGHT+IHxm5PheoOXIZHNJXoHbNrghsZCTU0uvWCf5Fe2Upjfaw5CfGfICWvmjyKKGLI3Bskb2PHVHA==
-X-Received: by 2002:a05:6102:a50:b0:473:1f0f:a968 with SMTP id i16-20020a0561020a5000b004731f0fa968mr2030820vss.1.1710197010875;
-        Mon, 11 Mar 2024 15:43:30 -0700 (PDT)
+        bh=XBbU+hM+5RPM0xomTDkCuqOrXyZs6r1aenEFhKfWOBo=;
+        b=V4c1P3KPamf6yGQnwkMvBvwobBRpxah+dc2EnwHy32MF2MfTt11RbIfB2X9HLJKJg1
+         Kf0JExT2bjsWvfNS+vBn24WVo9opHgVhpm5u3KJsiXjakqRYz7VQFQ6DAXO1D95JbvFE
+         Ph7FVCZH423rvNjkgUq5jUyH2uc5VvAJdfIzLaXf7IEglrgYb2XM8WLacfHknttL/fVU
+         5FmZovoCtLxaA1Gd2eyuOlYPbvztQTEs1dTvmzhZiboR/SjOH/UdHs1i/gtaqXwDdo6k
+         TP5QhGd79Sn+ZQIhGepRPc+Z1fV1uSwT7wuW2u5AlxIu+kBxwftdD+BeozS0fvOeJn9O
+         mTJw==
+X-Gm-Message-State: AOJu0YyF6B5FDF1r6nxR/l2VHIohLW0SlUqVXmPjWmlaEF0vZA/Uxf7j
+	4tWnixrgSQsv4lHq6Ww8sNO/7kJ5R2Q8ng7v3eulrZrQTDupFEfBsXvJgQo7
+X-Google-Smtp-Source: AGHT+IEI7nCg43Fn5AL8WJ1uPvvJlzyuuP04yZ9B8syKdh8A65wOj1n728Y7RKvzloV0J4lOlRydng==
+X-Received: by 2002:a05:6102:358e:b0:473:4173:d45b with SMTP id h14-20020a056102358e00b004734173d45bmr1887013vsu.17.1710197013095;
+        Mon, 11 Mar 2024 15:43:33 -0700 (PDT)
 Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id db12-20020a056130238c00b007dbb2f61472sm829979uab.38.2024.03.11.15.43.29
+        by smtp.gmail.com with ESMTPSA id db12-20020a056130238c00b007dbb2f61472sm829979uab.38.2024.03.11.15.43.31
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Mar 2024 15:43:29 -0700 (PDT)
+        Mon, 11 Mar 2024 15:43:31 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v4 2/4] hog-lib: Use bt_uhid functions
-Date: Mon, 11 Mar 2024 18:43:25 -0400
-Message-ID: <20240311224327.1023070-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v4 3/4] input/device: Use bt_uhid functions
+Date: Mon, 11 Mar 2024 18:43:26 -0400
+Message-ID: <20240311224327.1023070-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240311224327.1023070-1-luiz.dentz@gmail.com>
 References: <20240311224327.1023070-1-luiz.dentz@gmail.com>
@@ -72,335 +72,219 @@ From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 This makes use of bt_uhid function instead of directly submitting
 events directly using bt_uhid_send.
----
- profiles/input/hog-lib.c | 168 ++++++---------------------------------
- 1 file changed, 25 insertions(+), 143 deletions(-)
 
-diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
-index 67492a63eca3..8071e1364b10 100644
---- a/profiles/input/hog-lib.c
-+++ b/profiles/input/hog-lib.c
-@@ -79,8 +79,6 @@ struct bt_hog {
- 	GSList			*reports;
+Fixes: https://github.com/bluez/bluez/issues/771
+---
+ profiles/input/device.c | 93 ++++++++++-------------------------------
+ 1 file changed, 22 insertions(+), 71 deletions(-)
+
+diff --git a/profiles/input/device.c b/profiles/input/device.c
+index 0d32b705bd00..c4f75c7442e8 100644
+--- a/profiles/input/device.c
++++ b/profiles/input/device.c
+@@ -73,7 +73,6 @@ struct input_device {
+ 	unsigned int		reconnect_timer;
+ 	uint32_t		reconnect_attempt;
  	struct bt_uhid		*uhid;
- 	int			uhid_fd;
 -	bool			uhid_created;
--	bool			uhid_start;
- 	uint64_t		uhid_flags;
- 	uint16_t		bcdhid;
- 	uint8_t			bcountrycode;
-@@ -99,7 +97,6 @@ struct bt_hog {
- 	struct queue		*gatt_op;
- 	struct gatt_db		*gatt_db;
- 	struct gatt_db_attribute	*report_map_attr;
--	struct queue		*input;
- };
- 
- struct report {
-@@ -326,8 +323,6 @@ static void report_value_cb(const guint8 *pdu, guint16 len, gpointer user_data)
+ 	uint8_t			report_req_pending;
+ 	unsigned int		report_req_timer;
+ 	uint32_t		report_rsp_id;
+@@ -215,32 +214,20 @@ static bool uhid_send_get_report_reply(struct input_device *idev,
+ 					const uint8_t *data, size_t size,
+ 					uint32_t id, uint16_t err)
  {
- 	struct report *report = user_data;
- 	struct bt_hog *hog = report->hog;
 -	struct uhid_event ev;
--	uint8_t *buf;
+ 	int ret;
+ 
+ 	if (data == NULL)
+ 		size = 0;
+ 
+-	if (size > sizeof(ev.u.get_report_reply.data))
+-		size = sizeof(ev.u.get_report_reply.data);
+-
+-	if (!idev->uhid_created) {
++	if (!bt_uhid_created(idev->uhid)) {
+ 		DBG("HID report (%zu bytes) dropped", size);
+ 		return false;
+ 	}
+ 
+-	memset(&ev, 0, sizeof(ev));
+-	ev.type = UHID_GET_REPORT_REPLY;
+-	ev.u.get_report_reply.id = id;
+-	ev.u.get_report_reply.err = err;
+-	ev.u.get_report_reply.size = size;
+-
+-	if (size > 0)
+-		memcpy(ev.u.get_report_reply.data, data, size);
+-
+-	ret = bt_uhid_send(idev->uhid, &ev);
++	ret = bt_uhid_get_report_reply(idev->uhid, id, 0, err, data, size);
+ 	if (ret < 0) {
+-		error("bt_uhid_send: %s (%d)", strerror(-ret), -ret);
++		error("bt_uhid_get_report_reply: %s (%d)", strerror(-ret),
++			-ret);
+ 		return false;
+ 	}
+ 
+@@ -252,20 +239,15 @@ static bool uhid_send_get_report_reply(struct input_device *idev,
+ static bool uhid_send_set_report_reply(struct input_device *idev,
+ 					uint32_t id, uint16_t err)
+ {
+-	struct uhid_event ev;
+ 	int ret;
+ 
+-	if (!idev->uhid_created)
++	if (!bt_uhid_created(idev->uhid))
+ 		return false;
+ 
+-	memset(&ev, 0, sizeof(ev));
+-	ev.type = UHID_SET_REPORT_REPLY;
+-	ev.u.set_report_reply.id = id;
+-	ev.u.set_report_reply.err = err;
+-
+-	ret = bt_uhid_send(idev->uhid, &ev);
++	ret = bt_uhid_set_report_reply(idev->uhid, id, err);
+ 	if (ret < 0) {
+-		error("bt_uhid_send: %s (%d)", strerror(-ret), -ret);
++		error("bt_uhid_set_report_reply: %s (%d)", strerror(-ret),
++			-ret);
+ 		return false;
+ 	}
+ 
+@@ -275,30 +257,19 @@ static bool uhid_send_set_report_reply(struct input_device *idev,
+ static bool uhid_send_input_report(struct input_device *idev,
+ 					const uint8_t *data, size_t size)
+ {
+-	struct uhid_event ev;
  	int err;
  
- 	if (len < ATT_NOTIFICATION_HEADER_SIZE) {
-@@ -338,40 +333,10 @@ static void report_value_cb(const guint8 *pdu, guint16 len, gpointer user_data)
- 	pdu += ATT_NOTIFICATION_HEADER_SIZE;
- 	len -= ATT_NOTIFICATION_HEADER_SIZE;
+ 	if (data == NULL)
+ 		size = 0;
+ 
+-	if (size > sizeof(ev.u.input.data))
+-		size = sizeof(ev.u.input.data);
+-
+-	if (!idev->uhid_created) {
++	if (!bt_uhid_created(idev->uhid)) {
+ 		DBG("HID report (%zu bytes) dropped", size);
+ 		return false;
+ 	}
  
 -	memset(&ev, 0, sizeof(ev));
 -	ev.type = UHID_INPUT;
--	buf = ev.u.input.data;
+-	ev.u.input.size = size;
 -
--	/* BLUETOOTH SPECIFICATION Page 16 of 26
--	 * HID Service Specification
--	 *
--	 * Report ID shall be nonzero in a Report Reference characteristic
--	 * descriptor where there is more than one instance of the Report
--	 * characteristic for any given Report Type.
--	 */
--	if (report->numbered && report->id) {
--		buf[0] = report->id;
--		len = MIN(len, sizeof(ev.u.input.data) - 1);
--		memcpy(buf + 1, pdu, len);
--		ev.u.input.size = ++len;
--	} else {
--		len = MIN(len, sizeof(ev.u.input.data));
--		memcpy(buf, pdu, len);
--		ev.u.input.size = len;
--	}
+-	if (size > 0)
+-		memcpy(ev.u.input.data, data, size);
 -
--	/* If uhid had not sent UHID_START yet queue up the input */
--	if (!hog->uhid_created || !hog->uhid_start) {
--		if (!hog->input)
--			hog->input = queue_new();
--
--		queue_push_tail(hog->input, util_memdup(&ev, sizeof(ev)));
--		return;
--	}
--
--	err = bt_uhid_send(hog->uhid, &ev);
-+	err = bt_uhid_input(hog->uhid, report->numbered ? report->id : 0, pdu,
-+				len);
- 	if (err < 0)
+-	err = bt_uhid_send(idev->uhid, &ev);
++	err = bt_uhid_input(idev->uhid, 0, data, size);
+ 	if (err < 0) {
 -		error("bt_uhid_send: %s (%d)", strerror(-err), -err);
 +		error("bt_uhid_input: %s (%d)", strerror(-err), -err);
- }
+ 		return false;
+ 	}
  
- static void report_notify_destroy(void *user_data)
-@@ -832,56 +797,32 @@ static void set_numbered(void *data, void *user_data)
+@@ -385,7 +356,7 @@ static gboolean intr_watch_cb(GIOChannel *chan, GIOCondition cond, gpointer data
+ 		virtual_cable_unplug(idev);
+ 
+ 	/* If connection abruptly ended, uhid might be not yet disconnected */
+-	if (idev->uhid_created)
++	if (bt_uhid_created(idev->uhid))
+ 		uhid_disconnect(idev);
+ 
+ 	return FALSE;
+@@ -445,6 +416,7 @@ static void hidp_recv_ctrl_handshake(struct input_device *idev, uint8_t param)
+ 			timeout_remove(idev->report_req_timer);
+ 			idev->report_req_timer = 0;
+ 		}
++		uhid_send_set_report_reply(idev, idev->report_rsp_id, 0);
+ 		idev->report_rsp_id = 0;
  	}
  }
+@@ -625,7 +597,7 @@ static bool hidp_report_req_timeout(gpointer data)
+ 		break;
+ 	}
  
--static bool input_dequeue(const void *data, const void *match_data)
--{
--	const struct uhid_event *ev = data;
--	const struct bt_hog *hog = match_data;
--	int err;
--
--	err = bt_uhid_send(hog->uhid, ev);
--	if (err < 0) {
--		error("bt_uhid_send: %s (%d)", strerror(-err), -err);
--		return false;
--	}
--
--	return true;
--}
--
- static void start_flags(struct uhid_event *ev, void *user_data)
+-	DBG("Device %s HIDP %s request timed out", address, req_type_str);
++	error("Device %s HIDP %s request timed out", address, req_type_str);
+ 
+ 	idev->report_req_pending = 0;
+ 	idev->report_req_timer = 0;
+@@ -941,28 +913,15 @@ static int ioctl_disconnect(struct input_device *idev, uint32_t flags)
+ static int uhid_connadd(struct input_device *idev, struct hidp_connadd_req *req)
  {
- 	struct bt_hog *hog = user_data;
- 
--	hog->uhid_start = true;
- 	hog->uhid_flags = ev->u.start.dev_flags;
- 
- 	DBG("uHID device flags: 0x%16" PRIx64, hog->uhid_flags);
- 
- 	if (hog->uhid_flags)
- 		g_slist_foreach(hog->reports, set_numbered, hog);
--
--	queue_remove_all(hog->input, input_dequeue, hog, free);
- }
- 
- static void set_report_cb(guint8 status, const guint8 *pdu,
- 					guint16 plen, gpointer user_data)
- {
- 	struct bt_hog *hog = user_data;
--	struct uhid_event rsp;
  	int err;
- 
- 	hog->setrep_att = 0;
- 
--	memset(&rsp, 0, sizeof(rsp));
--	rsp.type = UHID_SET_REPORT_REPLY;
--	rsp.u.set_report_reply.id = hog->setrep_id;
--	rsp.u.set_report_reply.err = status;
--
- 	if (status != 0)
- 		error("Error setting Report value: %s", att_ecode2str(status));
- 
--	err = bt_uhid_send(hog->uhid, &rsp);
-+	err = bt_uhid_set_report_reply(hog->uhid, hog->setrep_id, status);
- 	if (err < 0)
--		error("bt_uhid_send: %s", strerror(-err));
-+		error("bt_uhid_set_report_reply: %s", strerror(-err));
- }
- 
- static void set_report(struct uhid_event *ev, void *user_data)
-@@ -937,34 +878,16 @@ fail:
- }
- 
- static void report_reply(struct bt_hog *hog, uint8_t status, uint8_t id,
--			bool numbered, uint16_t len, const uint8_t *data)
-+			uint16_t len, const uint8_t *data)
- {
--	struct uhid_event rsp;
- 	int err;
- 
- 	hog->getrep_att = 0;
- 
--	memset(&rsp, 0, sizeof(rsp));
--	rsp.type = UHID_GET_REPORT_REPLY;
--	rsp.u.get_report_reply.id = hog->getrep_id;
--
--	if (status)
--		goto done;
--
--	if (numbered && len > 0) {
--		rsp.u.get_report_reply.size = len + 1;
--		rsp.u.get_report_reply.data[0] = id;
--		memcpy(&rsp.u.get_report_reply.data[1], data, len);
--	} else {
--		rsp.u.get_report_reply.size = len;
--		memcpy(rsp.u.get_report_reply.data, data, len);
--	}
--
--done:
--	rsp.u.get_report_reply.err = status;
--	err = bt_uhid_send(hog->uhid, &rsp);
-+	err = bt_uhid_get_report_reply(hog->uhid, hog->getrep_id, status, id,
-+					data, len);
- 	if (err < 0)
--		error("bt_uhid_send: %s", strerror(-err));
-+		error("bt_uhid_get_report_reply: %s", strerror(-err));
- }
- 
- static void get_report_cb(guint8 status, const guint8 *pdu, guint16 len,
-@@ -994,7 +917,7 @@ static void get_report_cb(guint8 status, const guint8 *pdu, guint16 len,
- 	++pdu;
- 
- exit:
--	report_reply(hog, status, report->id, report->numbered, len, pdu);
-+	report_reply(hog, status, report->numbered ? report->id : 0, len, pdu);
- }
- 
- static void get_report(struct uhid_event *ev, void *user_data)
-@@ -1030,61 +953,33 @@ static void get_report(struct uhid_event *ev, void *user_data)
- 
- fail:
- 	/* reply with an error on failure */
--	report_reply(hog, err, 0, false, 0, NULL);
-+	report_reply(hog, err, 0, 0, NULL);
- }
- 
- static void uhid_create(struct bt_hog *hog, uint8_t *report_map,
- 							size_t report_map_len)
- {
- 	uint8_t *value = report_map;
 -	struct uhid_event ev;
- 	size_t vlen = report_map_len;
--	int i, err;
-+	int err;
- 	GError *gerr = NULL;
--
--	if (vlen > sizeof(ev.u.create2.rd_data)) {
--		error("Report MAP too big: %zu > %zu", vlen,
--					sizeof(ev.u.create2.rd_data));
--		return;
--	}
--
+ 
+-	if (idev->uhid_created)
++	if (bt_uhid_created(idev->uhid))
+ 		return 0;
+ 
 -	/* create uHID device */
 -	memset(&ev, 0, sizeof(ev));
--	ev.type = UHID_CREATE2;
-+	bdaddr_t src, dst;
- 
- 	bt_io_get(g_attrib_get_channel(hog->attrib), &gerr,
--			BT_IO_OPT_SOURCE, ev.u.create2.phys,
--			BT_IO_OPT_DEST, ev.u.create2.uniq,
-+			BT_IO_OPT_SOURCE_BDADDR, &src,
-+			BT_IO_OPT_DEST_BDADDR, &dst,
- 			BT_IO_OPT_INVALID);
+-	ev.type = UHID_CREATE;
+-	strncpy((char *) ev.u.create.name, req->name, sizeof(ev.u.create.name));
+-	ba2strlc(&idev->src, (char *) ev.u.create.phys);
+-	ba2strlc(&idev->dst, (char *) ev.u.create.uniq);
+-	ev.u.create.vendor = req->vendor;
+-	ev.u.create.product = req->product;
+-	ev.u.create.version = req->version;
+-	ev.u.create.country = req->country;
+-	ev.u.create.bus = BUS_BLUETOOTH;
+-	ev.u.create.rd_data = req->rd_data;
+-	ev.u.create.rd_size = req->rd_size;
 -
- 	if (gerr) {
- 		error("Failed to connection details: %s", gerr->message);
- 		g_error_free(gerr);
- 		return;
- 	}
- 
--	/* Phys + uniq are the same size (hw address type) */
--	for (i = 0;
--	    i < (int)sizeof(ev.u.create2.phys) && ev.u.create2.phys[i] != 0;
--	    ++i) {
--		ev.u.create2.phys[i] = tolower(ev.u.create2.phys[i]);
--		ev.u.create2.uniq[i] = tolower(ev.u.create2.uniq[i]);
--	}
--
--	strncpy((char *) ev.u.create2.name, hog->name,
--						sizeof(ev.u.create2.name) - 1);
--	ev.u.create2.vendor = hog->vendor;
--	ev.u.create2.product = hog->product;
--	ev.u.create2.version = hog->version;
--	ev.u.create2.country = hog->bcountrycode;
--	ev.u.create2.bus = BUS_BLUETOOTH;
--	ev.u.create2.rd_size = vlen;
--
--	memcpy(ev.u.create2.rd_data, value, vlen);
--
--	err = bt_uhid_send(hog->uhid, &ev);
-+	err = bt_uhid_create(hog->uhid, hog->name, &src, &dst,
-+				hog->vendor, hog->product, hog->version,
-+				hog->bcountrycode, value, vlen);
+-	err = bt_uhid_send(idev->uhid, &ev);
++	err = bt_uhid_create(idev->uhid, req->name, &idev->src, &idev->dst,
++				req->vendor, req->product, req->version,
++				req->country, req->rd_data, req->rd_size);
  	if (err < 0) {
 -		error("bt_uhid_send: %s", strerror(-err));
 +		error("bt_uhid_create: %s", strerror(-err));
- 		return;
+ 		return err;
  	}
  
-@@ -1093,9 +988,6 @@ static void uhid_create(struct bt_hog *hog, uint8_t *report_map,
- 	bt_uhid_register(hog->uhid, UHID_GET_REPORT, get_report, hog);
- 	bt_uhid_register(hog->uhid, UHID_SET_REPORT, set_report, hog);
+@@ -972,17 +931,14 @@ static int uhid_connadd(struct input_device *idev, struct hidp_connadd_req *req)
+ 	bt_uhid_register(idev->uhid, UHID_SET_REPORT, hidp_send_set_report,
+ 									idev);
  
--	hog->uhid_created = true;
--	hog->uhid_start = false;
+-	idev->uhid_created = true;
 -
- 	DBG("HoG created uHID device");
+ 	return err;
  }
  
-@@ -1146,7 +1038,8 @@ static void read_report_map(struct bt_hog *hog)
- {
- 	uint16_t handle;
- 
--	if (!hog->report_map_attr || hog->uhid_created || hog->report_map_id)
-+	if (!hog->report_map_attr || bt_uhid_created(hog->uhid) ||
-+			hog->report_map_id)
- 		return;
- 
- 	handle = gatt_db_attribute_get_handle(hog->report_map_attr);
-@@ -1312,24 +1205,14 @@ static bool cancel_gatt_req(const void *data, const void *user_data)
- static void uhid_destroy(struct bt_hog *hog)
+ static int uhid_disconnect(struct input_device *idev)
  {
  	int err;
 -	struct uhid_event ev;
--
--	if (!hog->uhid_created)
--		return;
  
- 	bt_uhid_unregister_all(hog->uhid);
+-	if (!idev->uhid_created)
++	if (!bt_uhid_created(idev->uhid))
+ 		return 0;
+ 
+ 	/* Only destroy the node if virtual cable unplug flag has been set */
+@@ -991,17 +947,12 @@ static int uhid_disconnect(struct input_device *idev)
+ 
+ 	bt_uhid_unregister_all(idev->uhid);
  
 -	memset(&ev, 0, sizeof(ev));
 -	ev.type = UHID_DESTROY;
 -
--	err = bt_uhid_send(hog->uhid, &ev);
--
-+	err = bt_uhid_destroy(hog->uhid);
+-	err = bt_uhid_send(idev->uhid, &ev);
++	err = bt_uhid_destroy(idev->uhid);
  	if (err < 0) {
 -		error("bt_uhid_send: %s", strerror(-err));
 +		error("bt_uhid_destroy: %s", strerror(-err));
- 		return;
+ 		return err;
  	}
+ 
+-	idev->uhid_created = false;
 -
--	hog->uhid_created = false;
+ 	return err;
  }
  
- static void hog_free(void *data)
-@@ -1339,7 +1222,6 @@ static void hog_free(void *data)
- 	bt_hog_detach(hog);
- 	uhid_destroy(hog);
- 
--	queue_destroy(hog->input, free);
- 	queue_destroy(hog->bas, (void *) bt_bas_unref);
- 	g_slist_free_full(hog->instances, hog_free);
- 
-@@ -1810,7 +1692,7 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt)
- 		bt_hog_attach(instance, gatt);
- 	}
- 
--	if (!hog->uhid_created) {
-+	if (!bt_uhid_created(hog->uhid)) {
- 		DBG("HoG discovering characteristics");
- 		if (hog->attr)
- 			gatt_db_service_foreach_char(hog->attr,
-@@ -1822,7 +1704,7 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt)
- 					char_discovered_cb, hog);
- 	}
- 
--	if (!hog->uhid_created)
-+	if (!bt_uhid_created(hog->uhid))
- 		return true;
- 
- 	/* If UHID is already created, set up the report value handlers to
 -- 
 2.43.0
 
