@@ -1,130 +1,354 @@
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27DDC45974
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Mar 2024 15:33:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 078E339AFF
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Mar 2024 18:45:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710171229; cv=none; b=flxVY476J/41OY8vpNeKsYVqbqCrBRHv5IKQrrDnCzLlCruRyHv+ET2JO/a2zt+3XOhMM3Hwzdj6V8loe/uz0C+fukzoY/V6667YruFChMoZ2w9cT4d69M8amenbckDeTzZInnOm7PVL4uhFN6yG8QqwTD6mlF1QWRFswddkCv8=
+	t=1710182702; cv=none; b=KWUhEScySL9mEfi4mgQGZ2YqdMKF3lELvQ/3frxpW4q8FsG3VMytvnYkwmlq3QGBunqY2pzWg8aRx51YdN67Cf3G87/KmzBYaddl7ut8thvXHCEvShFDkjQJQXqCIEB307MtpD/KK8kgLerwjaUxpT4gt4Z/c3KGdO5fqTrnaN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710171229; c=relaxed/simple;
-	bh=FJ/HRZnMzLmJPNY/vcSUMoZXd6dp5jxLhEln9XfpPsI=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=tbjuSBwngEekmHdwWOQiqUBFob7FqtJ6vqREa2RFiHSKrXFHxWXAD+DNya6Jd0jqYGzMniS1tNWcBHEgUUtXr0amOXsE829lRNLtjFY9H2GjHV2Pr7OTDQz2lmFzWq5Ic0tMMlT99/GMLdq6zjVsklGoC2wnyuq2JiX11w0uohM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EcXDYd1o; arc=none smtp.client-ip=209.85.219.42
+	s=arc-20240116; t=1710182702; c=relaxed/simple;
+	bh=LHxjSWUW7L4su5LQZ+xO1z8qYBul1CUvwL5G+oKRD0Y=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=DLsIL20zbfMw7BREqsYFCjczCpyge0MX99/jBvqca2o8lIz5waos+gYXClnlVNctD2b7bg1VEqDZB65WLyUjDORZALVcIfqdh7IHRy4W0UqNsvyl/Ll1BXIz/92O7pAByp67tPbK151lVjCfRtMDaJ1xvLYmPl6uwBlY6Yg5l9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m81JywLH; arc=none smtp.client-ip=209.85.221.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EcXDYd1o"
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-690c1747c3cso18543916d6.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Mar 2024 08:33:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m81JywLH"
+Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-4d342e854cbso875368e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Mar 2024 11:45:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710171227; x=1710776027; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=/Al6zGpthwRRALkN2lbbL22v5jF6tQigBSoW3rSepKc=;
-        b=EcXDYd1odHNJPlpaWQXXr0xDvtIXBKQbmFodmEsL3DM2IBGx43Oksc9hymyGbDjDb9
-         e3caAJu9O8o3lZtToDCeTalzTVd8TX41GdFwKsRKu6r8eurApH4fuZ1tWiMqddVS6lYJ
-         Qyiu61/m4yr34+XitkyMWG4pJ/z5FpfGP9xIfI/f3DRSkZfZI/AaTDMGstZuokaEl+Eo
-         DuLn+/G1lKfqrxjZ2XwnOj7RDHuxR3ho2T30u8OOIufl0mymUEnofgM8uASRQ9wf6y6s
-         OVh9YKssqt+k97Z8RzQuR0vjVLGRvFWtgURlvm73w0d9gFe+IcYzx40iFDedGRK+X5u4
-         LEaw==
+        d=gmail.com; s=20230601; t=1710182699; x=1710787499; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=pAgGs/9bsOxQd6RMYAuYqdx1SzyswJpanvxRvdDtGPg=;
+        b=m81JywLHcJ0eiD6fEQUMfUSWrsKq6Vo0KIjnwVng8nbRwz0bISoQovIEYZFC0gCTkm
+         nRzOfrs9XlPL7c4Fgd0AiiIcBg+8S+xuTTx8a9s9atf9K1s/apMQ8MBGH5mtVlU735Uu
+         g4ZREEl8VOujttf0BUwF1g1pyAMgz+/2covxoWpWsbrqOjUnaiz+ufIoUjrwBABJrjHw
+         AxEs5zna94nfj9nPHaY8opzXU0v/u3sh1HDJ5ZWcmm5oRr+5Pzb0BLroEv1SJD+xqpTI
+         8l1RF3dkTa+Kof6DYO/hB0V5t/JBCJiN6aD7Z1lKgREHBDpuM8zrCPAHzJgZ8Khi3w1G
+         tR8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710171227; x=1710776027;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/Al6zGpthwRRALkN2lbbL22v5jF6tQigBSoW3rSepKc=;
-        b=poRRg6O+8oy+0nf1J7moRqGGoJgmmMGLmIW4Qw1N2D2RZJdDV15ZlfM7P+NTzVH1Q8
-         oWO4EVmq5SS5st6GxfTkKZE3UIs2q5VWINxbsY0VTV7RdqvuSAp/gLuIJvko68maiC/S
-         v5V3N1wZfLoI9lOY1b6EWu/cBsIsbGahb1UWZuxuh1Vn1bJKWYHCP9VaLO8L0cSl/A1x
-         nKuMvEPIIayjbaJJXa4vKdEFFfK4fY3MKhpDfd1/zKpItpSGkHhcxyoIy9ucV857vx5N
-         NLIMqB9Hs/y1cBkWKFcQ7M9dER8T0dDktTLkTBz1aoLDJ5FooFkvEN0hIUqTSL8eURQi
-         bIqA==
-X-Gm-Message-State: AOJu0YwiXIpcNabL8x717vufXy9duKEBDj+l+HSPkM8LL+zqeWrYIiT6
-	VXt7O2lmn085KKb2u2xhMCNbeoPt1UZNJpQC4NcrhTVrgY6ypVRqvtF1lNYO
-X-Google-Smtp-Source: AGHT+IHEKMu9MjgLrLuKXfe84SthIoZ+SDlN4TxJI9gQEUFBJuVRUDbFru1XI9pCJD10myo8Ss4r8A==
-X-Received: by 2002:a0c:df87:0:b0:690:b39e:bf0d with SMTP id w7-20020a0cdf87000000b00690b39ebf0dmr12514724qvl.8.1710171226943;
-        Mon, 11 Mar 2024 08:33:46 -0700 (PDT)
-Received: from [172.17.0.2] ([40.76.119.26])
-        by smtp.gmail.com with ESMTPSA id z4-20020a0cfc04000000b0069097b23cd9sm2717760qvo.105.2024.03.11.08.33.46
+        d=1e100.net; s=20230601; t=1710182699; x=1710787499;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pAgGs/9bsOxQd6RMYAuYqdx1SzyswJpanvxRvdDtGPg=;
+        b=XndvpwUAaAFBA0e9MZSsxFe/ZDDJcFeT8eieApeOiV5QZeY6PH7n7oD5WPKXcz6QEe
+         PYF1upI52cx0ZLnrgBAElaoCVx0HUBhUpCoqI6ezOppNEa8RNatNFAveFGzDsr/vVUBS
+         Fk8QwahSRMbq2aJCdmmUQbIIwXP/EsaFQx7hq5x3eHpEqKbPCxkjsaXYL0cGPxtaQ6YC
+         jmyQa8wE98mQ0l7bL28O0WDxtU+mVv6r/pFWUDlbX1RbiT97mUHd0w9QGuTuJ5id9sCJ
+         UeeFGl7hxHLtkKwJ5ONsygfcuBLZfwCS3Lj1VII2I9L7FolRdZeIhAgZoURvGSOYJHdE
+         lkhg==
+X-Gm-Message-State: AOJu0Yy8OM+VPXuLfvJr1ekU5i8pQB2V8n+ZJ3/Hebr8AaV7ZiY73nat
+	BKBBWO0O4FoJQRpr2tapdmjgfkoByyy534qFTBqWDQbnH5CEqLd1U+nPbjSL
+X-Google-Smtp-Source: AGHT+IH8QxXS0isJa7lc8QNLUK/sYwleCA5yY+ifQPz1PJFQaZaP0lfd08IoJfR7sj96/PlRJEtr6w==
+X-Received: by 2002:a1f:ca01:0:b0:4d3:3846:73bb with SMTP id a1-20020a1fca01000000b004d3384673bbmr1035539vkg.7.1710182698580;
+        Mon, 11 Mar 2024 11:44:58 -0700 (PDT)
+Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id i15-20020a056122128f00b004c003cf5e14sm672510vkp.28.2024.03.11.11.44.57
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Mar 2024 08:33:46 -0700 (PDT)
-Message-ID: <65ef245a.0c0a0220.623e0.899b@mx.google.com>
-Date: Mon, 11 Mar 2024 08:33:46 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5446683865108649364=="
+        Mon, 11 Mar 2024 11:44:57 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2 1/4] shared/uhid: Add dedicated functions for each UHID opcode
+Date: Mon, 11 Mar 2024 14:44:53 -0400
+Message-ID: <20240311184456.890351-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v1] Bluetooth: btintel: Use proper prefixes
-In-Reply-To: <20240311143703.751323-1-luiz.dentz@gmail.com>
-References: <20240311143703.751323-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============5446683865108649364==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=834337
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.23 seconds
-GitLint                       PASS      0.88 seconds
-SubjectPrefix                 PASS      0.36 seconds
-BuildKernel                   PASS      28.45 seconds
-CheckAllWarning               PASS      31.07 seconds
-CheckSparse                   PASS      36.61 seconds
-CheckSmatch                   PASS      100.32 seconds
-BuildKernel32                 PASS      27.52 seconds
-TestRunnerSetup               PASS      524.60 seconds
-TestRunner_l2cap-tester       PASS      20.49 seconds
-TestRunner_iso-tester         FAIL      39.11 seconds
-TestRunner_bnep-tester        PASS      4.98 seconds
-TestRunner_mgmt-tester        FAIL      114.65 seconds
-TestRunner_rfcomm-tester      PASS      7.52 seconds
-TestRunner_sco-tester         PASS      13.11 seconds
-TestRunner_ioctl-tester       PASS      7.89 seconds
-TestRunner_mesh-tester        PASS      5.97 seconds
-TestRunner_smp-tester         PASS      6.96 seconds
-TestRunner_userchan-tester    PASS      5.12 seconds
-IncrementalBuild              PASS      26.97 seconds
-
-Details
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-Total: 117, Passed: 116 (99.1%), Failed: 1, Not Run: 0
-
-Failed Test Cases
-ISO Connect2 Suspend - Success                       Failed      10.209 seconds
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 492, Passed: 489 (99.4%), Failed: 1, Not Run: 2
-
-Failed Test Cases
-LL Privacy - Add Device 4 (2 Devices to AL)          Failed       0.167 seconds
-
-
+This adds bt_uhid_create which uses UHID_CREATE2 and tracks progress of
+when the device is ready to receive events and in the meantime queues
+them while waiting for UHID_START and other dedicated functions for each
+UHID opcode so users don't need to build each command manually.
 ---
-Regards,
-Linux Bluetooth
+ src/shared/uhid.c | 209 +++++++++++++++++++++++++++++++++++++++++++++-
+ src/shared/uhid.h |  13 +++
+ 2 files changed, 218 insertions(+), 4 deletions(-)
 
+diff --git a/src/shared/uhid.c b/src/shared/uhid.c
+index 1f15443cd6d0..5e846e52e244 100644
+--- a/src/shared/uhid.c
++++ b/src/shared/uhid.c
+@@ -26,11 +26,18 @@
+ 
+ #define UHID_DEVICE_FILE "/dev/uhid"
+ 
++#ifndef MIN
++#define MIN(x, y) ((x) < (y) ? (x) : (y))
++#endif
++
+ struct bt_uhid {
+ 	int ref_count;
+ 	struct io *io;
+ 	unsigned int notify_id;
+ 	struct queue *notify_list;
++	struct queue *input;
++	bool created;
++	bool started;
+ };
+ 
+ struct uhid_notify {
+@@ -48,6 +55,9 @@ static void uhid_free(struct bt_uhid *uhid)
+ 	if (uhid->notify_list)
+ 		queue_destroy(uhid->notify_list, free);
+ 
++	if (uhid->input)
++		queue_destroy(uhid->input, free);
++
+ 	free(uhid);
+ }
+ 
+@@ -215,14 +225,11 @@ bool bt_uhid_unregister_all(struct bt_uhid *uhid)
+ 	return true;
+ }
+ 
+-int bt_uhid_send(struct bt_uhid *uhid, const struct uhid_event *ev)
++static int uhid_send(struct bt_uhid *uhid, const struct uhid_event *ev)
+ {
+ 	ssize_t len;
+ 	struct iovec iov;
+ 
+-	if (!uhid->io)
+-		return -ENOTCONN;
+-
+ 	iov.iov_base = (void *) ev;
+ 	iov.iov_len = sizeof(*ev);
+ 
+@@ -233,3 +240,197 @@ int bt_uhid_send(struct bt_uhid *uhid, const struct uhid_event *ev)
+ 	/* uHID kernel driver does not handle partial writes */
+ 	return len != sizeof(*ev) ? -EIO : 0;
+ }
++
++int bt_uhid_send(struct bt_uhid *uhid, const struct uhid_event *ev)
++{
++	if (!uhid->io)
++		return -ENOTCONN;
++
++	/* Queue events if uhid has not been created yet */
++	if (!uhid->started) {
++		if (!uhid->input)
++			uhid->input = queue_new();
++
++		queue_push_tail(uhid->input, util_memdup(ev, sizeof(*ev)));
++		return 0;
++	}
++
++	return uhid_send(uhid, ev);
++}
++
++static bool input_dequeue(const void *data, const void *match_data)
++{
++	struct uhid_event *ev = (void *)data;
++	struct bt_uhid *uhid = (void *)match_data;
++
++	return bt_uhid_send(uhid, ev) == 0;
++}
++
++static void uhid_start(struct uhid_event *ev, void *user_data)
++{
++	struct bt_uhid *uhid = user_data;
++
++	uhid->started = true;
++
++	/* dequeue input events send while UHID_CREATE2 was in progress */
++	queue_remove_all(uhid->input, input_dequeue, uhid, free);
++}
++
++int bt_uhid_create(struct bt_uhid *uhid, const char *name, bdaddr_t *src,
++			bdaddr_t *dst, uint32_t vendor, uint32_t product,
++			uint32_t version, uint32_t country, void *rd_data,
++			size_t rd_size)
++{
++	struct uhid_event ev;
++	int err;
++
++	if (!uhid || !name || rd_size > sizeof(ev.u.create2.rd_data))
++		return -EINVAL;
++
++	if (uhid->created)
++		return 0;
++
++	memset(&ev, 0, sizeof(ev));
++	ev.type = UHID_CREATE2;
++	strncpy((char *) ev.u.create2.name, name,
++			sizeof(ev.u.create2.name) - 1);
++	if (src)
++		sprintf((char *)ev.u.create2.phys,
++			"%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x",
++			src->b[5], src->b[4], src->b[3], src->b[2], src->b[1],
++			src->b[0]);
++	if (dst)
++		sprintf((char *)ev.u.create2.uniq,
++			"%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x",
++			dst->b[5], dst->b[4], dst->b[3], dst->b[2], dst->b[1],
++			dst->b[0]);
++	ev.u.create2.vendor = vendor;
++	ev.u.create2.product = product;
++	ev.u.create2.version = version;
++	ev.u.create2.country = country;
++	ev.u.create2.bus = BUS_BLUETOOTH;
++	if (rd_size)
++		memcpy(ev.u.create2.rd_data, rd_data, rd_size);
++	ev.u.create2.rd_size = rd_size;
++
++	err = uhid_send(uhid, &ev);
++	if (err)
++		return err;
++
++	bt_uhid_register(uhid, UHID_START, uhid_start, uhid);
++
++	uhid->created = true;
++	uhid->started = false;
++
++	return 0;
++}
++
++bool bt_uhid_created(struct bt_uhid *uhid)
++{
++	if (!uhid)
++		return false;
++
++	return uhid->created;
++}
++
++bool bt_uhid_started(struct bt_uhid *uhid)
++{
++	if (!uhid)
++		return false;
++
++	return uhid->started;
++}
++
++int bt_uhid_input(struct bt_uhid *uhid, uint8_t number, const void *data,
++			size_t size)
++{
++	struct uhid_event ev;
++	struct uhid_input2_req *req = &ev.u.input2;
++	size_t len = 0;
++
++	if (!uhid)
++		return -EINVAL;
++
++	memset(&ev, 0, sizeof(ev));
++	ev.type = UHID_INPUT2;
++
++	if (number) {
++		req->data[len++] = number;
++		req->size = 1 + MIN(size, sizeof(req->data) - 1);
++	} else
++		req->size = MIN(size, sizeof(req->data));
++
++	if (data && size)
++		memcpy(&req->data[len], data, req->size - len);
++
++	return bt_uhid_send(uhid, &ev);
++}
++
++int bt_uhid_set_report_reply(struct bt_uhid *uhid, uint8_t id, uint8_t status)
++{
++	struct uhid_event ev;
++	struct uhid_set_report_reply_req *rsp = &ev.u.set_report_reply;
++
++	if (!uhid)
++		return false;
++
++	memset(&ev, 0, sizeof(ev));
++	ev.type = UHID_SET_REPORT_REPLY;
++	rsp->id = id;
++	rsp->err = status;
++
++	return bt_uhid_send(uhid, &ev);
++}
++
++int bt_uhid_get_report_reply(struct bt_uhid *uhid, uint8_t id, uint8_t number,
++				uint8_t status, const void *data, size_t size)
++{
++	struct uhid_event ev;
++	struct uhid_get_report_reply_req *rsp = &ev.u.get_report_reply;
++	size_t len = 0;
++
++	if (!uhid)
++		return false;
++
++	memset(&ev, 0, sizeof(ev));
++	ev.type = UHID_GET_REPORT_REPLY;
++	rsp->id = id;
++	rsp->err = status;
++
++	if (!data || !size)
++		goto done;
++
++	if (number) {
++		rsp->data[len++] = number;
++		rsp->size += MIN(size, sizeof(rsp->data) - 1);
++	} else
++		rsp->size = MIN(size, sizeof(ev.u.input.data));
++
++	memcpy(&rsp->data[len], data, rsp->size - len);
++
++done:
++	return bt_uhid_send(uhid, &ev);
++}
++
++int bt_uhid_destroy(struct bt_uhid *uhid)
++{
++	struct uhid_event ev;
++	int err;
++
++	if (!uhid)
++		return -EINVAL;
++
++	if (!uhid->created)
++		return 0;
++
++	memset(&ev, 0, sizeof(ev));
++	ev.type = UHID_DESTROY;
++
++	err = bt_uhid_send(uhid, &ev);
++	if (err < 0)
++		return err;
++
++	uhid->created = false;
++
++	return err;
++}
+diff --git a/src/shared/uhid.h b/src/shared/uhid.h
+index 55ae839f3017..d70533882727 100644
+--- a/src/shared/uhid.h
++++ b/src/shared/uhid.h
+@@ -11,6 +11,7 @@
+ #include <stdbool.h>
+ #include <stdint.h>
+ #include <linux/uhid.h>
++#include <bluetooth/bluetooth.h>
+ 
+ struct bt_uhid;
+ 
+@@ -29,3 +30,15 @@ bool bt_uhid_unregister(struct bt_uhid *uhid, unsigned int id);
+ bool bt_uhid_unregister_all(struct bt_uhid *uhid);
+ 
+ int bt_uhid_send(struct bt_uhid *uhid, const struct uhid_event *ev);
++int bt_uhid_create(struct bt_uhid *uhid, const char *name, bdaddr_t *src,
++			bdaddr_t *dst, uint32_t vendor, uint32_t product,
++			uint32_t version, uint32_t country, void *rd_data,
++			size_t rd_size);
++bool bt_uhid_created(struct bt_uhid *uhid);
++bool bt_uhid_started(struct bt_uhid *uhid);
++int bt_uhid_input(struct bt_uhid *uhid, uint8_t number, const void *data,
++			size_t size);
++int bt_uhid_set_report_reply(struct bt_uhid *uhid, uint8_t id, uint8_t status);
++int bt_uhid_get_report_reply(struct bt_uhid *uhid, uint8_t id, uint8_t number,
++				uint8_t status, const void *data, size_t size);
++int bt_uhid_destroy(struct bt_uhid *uhid);
+-- 
+2.43.0
 
---===============5446683865108649364==--
