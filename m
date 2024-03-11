@@ -1,111 +1,104 @@
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 669E657303
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Mar 2024 21:50:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 398B954FA3
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Mar 2024 21:52:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710193810; cv=none; b=DccWaM9DvbJEO7yXt9loRgHYCkku0OdthsNZ6luGr20CmKYzZu8VAYou/Zd7WeeFP2rXzi9HVolbTLrGzERqYVmckiE3f1KfAjPzJpxPAc85XAXzcZIoNZIHLuQoA3nLMcqka9R2+PxTwY1FX/U4sF8aNekRVmu5WVc1gEztdVw=
+	t=1710193957; cv=none; b=cEI4GsOMdh69/o6uKAYEdu9Ov2YxZxVfmE3XnGlHWztBC+sAjbMbIS1cJwBpI5H2hkbfst0fw5htSdhyJvvtNf1+a4lzJxutnZBQAsAyZLzNfVP5WyklMRlx0bOfG7d+/RUv8PgxEyfTF/k7q56Dz0if3apyWJfOGwrmjRjk5EY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710193810; c=relaxed/simple;
-	bh=siklY8AyTepBDoVjY5hu8J7Bk3TQfvEqwxIzIKqkXfM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Np1CMKyTzqdZZduwsrMRd62CU1xbA+ITPP6HMLKptJpdP0KVHkpVFKJjy4wO/0JLr1eG3txDGMYajRbKhtwUbG/foSj2/5CTrZHu//TyhNzJjfuq2x/Qb7+itbSm4vWSfo8cl8hgzynQrgrDcM3666jwJjPFTLzKD7sj9zCn/w4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1rjnWz-0003DX-Kg; Mon, 11 Mar 2024 22:50:01 +0100
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1rjnWz-005nDk-5d; Mon, 11 Mar 2024 22:50:01 +0100
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1rjnWz-004IoU-0I;
-	Mon, 11 Mar 2024 22:50:01 +0100
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	linux-arm-msm@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	kernel@pengutronix.de
-Subject: [PATCH 1/3] Bluetooth: btqcomsmd: Convert to platform remove callback returning void
-Date: Mon, 11 Mar 2024 22:49:52 +0100
-Message-ID:  <0707da8c41e85d74788733bc455275580bed778b.1710193561.git.u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1710193561.git.u.kleine-koenig@pengutronix.de>
-References: <cover.1710193561.git.u.kleine-koenig@pengutronix.de>
+	s=arc-20240116; t=1710193957; c=relaxed/simple;
+	bh=k65c4jiPa4gX0wNiVZpUE3NspB/un96zmzHQppkfhPU=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=eQQR8vBuIAk1PMDLquXaAbVfNPpk3oRLH5ebmbH+k0mrfjBB9JJxVXN11vck/30mGgKVg7VffujmGaxx+pUTxyOAXA8tQmNVsLStQGaVivDzPAae35QTE37n1q8SE1HdL4gxgFzLCs9/jiAdxe1vOrqr/l0BtJo48lO2IeJHY94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TCQ+LiZG; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TCQ+LiZG"
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6e66e8fcc2dso3412846b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Mar 2024 14:52:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710193955; x=1710798755; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=tcQeUXK+fAoATEimfKNengwMoye6VXMrk0moYk4wz6Q=;
+        b=TCQ+LiZGF3lgD1xsZlT1kuG0L6iyXHIBqVHSF5Qs8qJrc2ucHKqIYEoE1m6X9hIxde
+         gLCuzOJ6DxixGzm2FXaJUiSKEreQlupeK/OXkFvJ/o9hpbLK7mZ8TLtMS1UVI8bcv3Fr
+         J5j0RfDmxWZUCEYEWyQg/TCcSaSQzSpzBT6cte9pTPc3lFPZPWbFBUsNiag/fQPtiyPy
+         LqlB6xLYmZ4hJQq/1RBta1fQowad4U7yrzPyT11HUw82rug5Jcvg5zFlTxnfwmS6i08S
+         PDArW54EnOwDuttf86r79WvpaXB8aXi+aBg2XYe4Zez/v0LBfsm/EiAGZoJB3bVo71YG
+         Y22A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710193955; x=1710798755;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tcQeUXK+fAoATEimfKNengwMoye6VXMrk0moYk4wz6Q=;
+        b=CBpHlPik5kGikBb4BAXoMushzn+uX3eBOwNQrJ3jnR25Y7CoiHDCvpaLjeTmh5yT5u
+         AcP3WG6YCLdvxJ+inwwjv8s/GDqFwMlyXHkuK70rt02gWgVTlkJiye2yc3x/pdfB9Qq+
+         HlhOtbWbYfq5NKtsNjSZ3Nas+OA6A90cMszoDBoxCB/OCEqiKPTxCpy6jTY17NziuxB9
+         9L3U1iz17kldUX5waosVxnJbiCpDz32XF1oeNvO4GnAaFC3xDVokx1zftuoLzgY/wr50
+         2590D6lT6uIFECcRdj+23uNZpeF5A2JPhXYczUEwAu6PUAcCcw1Oj66p3RyZ3fmumFre
+         nA+g==
+X-Gm-Message-State: AOJu0Yy4lpziLRg8jc/XCI2lg0/7sd1pq4KyRNDT9vofpPPVVz+8OfXB
+	tm7dnBdusvQr5cXRzb+BFilvJbdYVMs0uxWbyz75ZxGlZw+asiMQxJYFpfqY
+X-Google-Smtp-Source: AGHT+IFvROAssa57Bmcm4xo1ZD7X1/y1/mbkpzskqcBWr2+AaNyKa98qArjqkLmASVbCXTMykrW5Bw==
+X-Received: by 2002:a05:6a00:4fce:b0:6e6:9ac7:8024 with SMTP id le14-20020a056a004fce00b006e69ac78024mr2934096pfb.14.1710193955114;
+        Mon, 11 Mar 2024 14:52:35 -0700 (PDT)
+Received: from [172.17.0.2] ([4.227.115.11])
+        by smtp.gmail.com with ESMTPSA id gr26-20020a056a004d1a00b006e535131c52sm4996892pfb.146.2024.03.11.14.52.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Mar 2024 14:52:34 -0700 (PDT)
+Message-ID: <65ef7d22.050a0220.863cf.e436@mx.google.com>
+Date: Mon, 11 Mar 2024 14:52:34 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8396208546142650821=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1879; i=u.kleine-koenig@pengutronix.de; h=from:subject:message-id; bh=siklY8AyTepBDoVjY5hu8J7Bk3TQfvEqwxIzIKqkXfM=; b=owGbwMvMwMXY3/A7olbonx/jabUkhtT3NU1Rn3wXpyxf3yMs9988Ppn5pVyIYblWQ9V3kRnbz To51f07GY1ZGBi5GGTFFFnsG9dkWlXJRXau/XcZZhArE8gUBi5OAZhIpQf7X1l31pM/uSTOsQSz amTNVbDR1dW4sbvF/hjnvfQyrfLbvK38zhlW4Tf3b9khrVehPyciaYupc98N4YoDJi+drCPOOF1 es+Ltgj1RbYyPyyNC/RM4d4RZubsWLFkxzcX+heD2o1/Y9QKktasMfE2DVM/9szT4f6dfTOHFjO L6xgBZjdNCu8SMkkyz/3D2Tj2s1WHTq+UndKmrdfL2pbOFPz9YFbvhvCrr1/JDj3tP72q/ab37h uz+jFsKu6dy2plkhN/l3P2Fx9Jwd0X+8UX2WV3T93c3twhJnGAJz5PpEjBjq0nPje68wfZVps11 0SZeZf891xfKqE1VMJO1q5R6WhctPf/jVoHrhguM3gAA
-X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-bluetooth@vger.kernel.org
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v2,1/4] shared/uhid: Add dedicated functions for each UHID opcode
+In-Reply-To: <20240311184456.890351-1-luiz.dentz@gmail.com>
+References: <20240311184456.890351-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-The .remove() callback for a platform driver returns an int which makes
-many driver authors wrongly assume it's possible to do error handling by
-returning an error code. However the value returned is ignored (apart
-from emitting a warning) and this typically results in resource leaks.
+--===============8396208546142650821==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-To improve here there is a quest to make the remove callback return
-void. In the first step of this quest all drivers are converted to
-.remove_new(), which already returns void. Eventually after all drivers
-are converted, .remove_new() will be renamed to .remove().
+This is automated email and please do not reply to this email!
 
-Trivially convert this driver from always returning zero in the remove
-callback to the void returning variant.
+Dear submitter,
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=834419
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.44 seconds
+GitLint                       PASS      0.82 seconds
+BuildEll                      PASS      23.96 seconds
+BluezMake                     PASS      1616.78 seconds
+MakeCheck                     PASS      13.18 seconds
+MakeDistcheck                 PASS      175.40 seconds
+CheckValgrind                 PASS      244.90 seconds
+CheckSmatch                   PASS      347.14 seconds
+bluezmakeextell               PASS      118.36 seconds
+IncrementalBuild              PASS      6031.14 seconds
+ScanBuild                     PASS      1006.01 seconds
+
+
+
 ---
- drivers/bluetooth/btqcomsmd.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btqcomsmd.c b/drivers/bluetooth/btqcomsmd.c
-index 11c7e04bf394..88dbb2f3fabf 100644
---- a/drivers/bluetooth/btqcomsmd.c
-+++ b/drivers/bluetooth/btqcomsmd.c
-@@ -197,7 +197,7 @@ static int btqcomsmd_probe(struct platform_device *pdev)
- 	return ret;
- }
- 
--static int btqcomsmd_remove(struct platform_device *pdev)
-+static void btqcomsmd_remove(struct platform_device *pdev)
- {
- 	struct btqcomsmd *btq = platform_get_drvdata(pdev);
- 
-@@ -206,8 +206,6 @@ static int btqcomsmd_remove(struct platform_device *pdev)
- 
- 	rpmsg_destroy_ept(btq->cmd_channel);
- 	rpmsg_destroy_ept(btq->acl_channel);
--
--	return 0;
- }
- 
- static const struct of_device_id btqcomsmd_of_match[] = {
-@@ -218,7 +216,7 @@ MODULE_DEVICE_TABLE(of, btqcomsmd_of_match);
- 
- static struct platform_driver btqcomsmd_driver = {
- 	.probe = btqcomsmd_probe,
--	.remove = btqcomsmd_remove,
-+	.remove_new = btqcomsmd_remove,
- 	.driver  = {
- 		.name  = "btqcomsmd",
- 		.of_match_table = btqcomsmd_of_match,
--- 
-2.43.0
 
+--===============8396208546142650821==--
