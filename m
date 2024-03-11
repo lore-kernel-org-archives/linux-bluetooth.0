@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B0E06772F;
-	Mon, 11 Mar 2024 15:14:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0E0F69968;
+	Mon, 11 Mar 2024 15:14:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710170083; cv=none; b=PKPvqD94gEnBXfHe7x6jox8GYFmjz6rSvncE7Co+6E9EFG6w0EienaHR6Bjet/wAXeh8txpQAuPhXrZm/2tOvr0aIIc8Dqz/UWZJ9yU5FYtP0Ozcwn7nV/LaPO+gSXDs2TmpUwUefNG+2cXa4qSBKMX1GjU00fzCEF0miDPVEV8=
+	t=1710170092; cv=none; b=lhZcZf+cy1FmKr/5irlN/gyDwpfX+3tYGRG+2NU+TzdS4nsmVtSNSZVh8gCpjCWfCQnauV7mX85rXP91Q2mdhuY1irPsK2++vitlqwC2/IAPCjFZOQFgE7/Xr4b0UXkqy3e6XQ/hVIWLwkwM3r10BJbVt0JEm41wCI5n3PkaO3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710170083; c=relaxed/simple;
-	bh=Du80a8081lcmLcIyq1r2JOmgELaCBxEoYXMTEtF6bGQ=;
+	s=arc-20240116; t=1710170092; c=relaxed/simple;
+	bh=OJoDDSsYjtltlAlhmkFANMN+uZeJZlwsYuKJ5H4O1y8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ai7oqcplp47ebB85Vz8lBWHI8sz1XlNsxRyI8E1YlWRltjy8/JkcqKQdwYFM3PnhtccYptbBzv9Gw66L6kVyn8PxdE0KWa/Tx/PJHSwkzlMGuQcsmOLw9je46Qwj09D92nyHioTtCoA4jYGDXdgwfDqDf7vzH0F2Z+3fOHJuw68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UzvcM/LI; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=e9Lxm7W8ZUHUXnHzphfJ0ldrwaPkzLeT7rR+tNYwSkS/V63A/bc7DTOyZyvC1X2RsNvUJXQV3Nf4LTvW+apcfUf1rm2UVrW7DVPOuzX59lg5zMQrwbrCdnCQuHa5M+tuQ7b+bT5LHVHlZHTcHKuHyHTL5wt7Wt3NudOQQT3VX0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ynl2yInw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UzvcM/LI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9FE8C43399;
-	Mon, 11 Mar 2024 15:14:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ynl2yInw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 931B4C433F1;
+	Mon, 11 Mar 2024 15:14:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710170082;
-	bh=Du80a8081lcmLcIyq1r2JOmgELaCBxEoYXMTEtF6bGQ=;
+	s=k20201202; t=1710170091;
+	bh=OJoDDSsYjtltlAlhmkFANMN+uZeJZlwsYuKJ5H4O1y8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=UzvcM/LIfg0+Fh06ZERX9d+TEew5QrE2RdO9U0LkgktOMFrOcGE75aZ5h4xrm57zV
-	 guoyziz+of6m6lraWE3HMkiBaNfmrGEPLTlO0vtttlhFcuLc0IzM6psKQCUsZqUOBZ
-	 fBemULoCtmVoU1WH50uza3DJp9stGG3JTYS/Vs6VE1d+MxmpP85lp51X1bqhKIK6u3
-	 V/p09pNWJJJALtEm7R++IwW6W0dK1y99iwx3a26ZOSFDAxa+38epDLyWdQCPj39wG7
-	 yluYMvprc95oANMW37Ve5Yi970FFPDi0u5yzgbn0Prx8H6jmNzthwomrxkv/8IrxLA
-	 41uITOsuDf+DA==
+	b=Ynl2yInwR1DO6J6y6fPtqKvrs5UJiIoRFxV/axnqWiwBQb0QQ0207dfVZe0VDCBW4
+	 EW3N8ViauIpA8M1wr6+59XZ+ka9i8pjV/VIgzlL5s9mlcgB3EBnDx2kURK9cfbAkM8
+	 M+Wa9NBudaRHNV75pZrW5/SwBBsAx1vOFRUkK3K+TZzK9bvS1a1h86kzWwU7iF9M4B
+	 Iq4HIa8AFwmgQn7FMs6pozUdAzF68/hu4HgmDfvhpQUzX2sk15KOdhxy2oAZ+4PIje
+	 wDVAo6TK/jWDjGOhe0BYinjl6JfudQ//rklhhz7sCyeGXtiWlsRSQBrpSgZZRA7daF
+	 bU+zPrat+jkiQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -36,12 +36,12 @@ Cc: Yuxuan Hu <20373622@buaa.edu.cn>,
 	johan.hedberg@gmail.com,
 	luiz.dentz@gmail.com,
 	linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 2/3] Bluetooth: rfcomm: Fix null-ptr-deref in rfcomm_check_security
-Date: Mon, 11 Mar 2024 11:14:36 -0400
-Message-ID: <20240311151438.318746-2-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 3/4] Bluetooth: rfcomm: Fix null-ptr-deref in rfcomm_check_security
+Date: Mon, 11 Mar 2024 11:14:43 -0400
+Message-ID: <20240311151445.318822-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240311151438.318746-1-sashal@kernel.org>
-References: <20240311151438.318746-1-sashal@kernel.org>
+In-Reply-To: <20240311151445.318822-1-sashal@kernel.org>
+References: <20240311151445.318822-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -50,7 +50,7 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.10.212
+X-stable-base: Linux 5.4.271
 Content-Transfer-Encoding: 8bit
 
 From: Yuxuan Hu <20373622@buaa.edu.cn>
@@ -91,10 +91,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index 8d6fce9005bdd..4f54c7df3a94f 100644
+index 2db9e285215c5..596fa3172642b 100644
 --- a/net/bluetooth/rfcomm/core.c
 +++ b/net/bluetooth/rfcomm/core.c
-@@ -1937,7 +1937,7 @@ static struct rfcomm_session *rfcomm_process_rx(struct rfcomm_session *s)
+@@ -1940,7 +1940,7 @@ static struct rfcomm_session *rfcomm_process_rx(struct rfcomm_session *s)
  	/* Get data directly from socket receive queue without copying it. */
  	while ((skb = skb_dequeue(&sk->sk_receive_queue))) {
  		skb_orphan(skb);
