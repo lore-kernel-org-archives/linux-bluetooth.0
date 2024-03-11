@@ -1,108 +1,130 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B12F069DFE;
-	Mon, 11 Mar 2024 15:14:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27DDC45974
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Mar 2024 15:33:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710170098; cv=none; b=eZKaqgXe+osfiOHM63Ah0b5SweLWOtRzDN70Bo2MzlyB2enwBNIcdZxuA6vR4W04rrepbXtUI7XnBZM4tv4uOk7IwdjRDj2IJGoEnNCFefitNA2faMu6y8kHqcxjqMbH0369pBY2uRiJLJKGR7TVd2O8obpnGpZ78LJRerybnuA=
+	t=1710171229; cv=none; b=flxVY476J/41OY8vpNeKsYVqbqCrBRHv5IKQrrDnCzLlCruRyHv+ET2JO/a2zt+3XOhMM3Hwzdj6V8loe/uz0C+fukzoY/V6667YruFChMoZ2w9cT4d69M8amenbckDeTzZInnOm7PVL4uhFN6yG8QqwTD6mlF1QWRFswddkCv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710170098; c=relaxed/simple;
-	bh=+Edrx2XfKxPuOmgT1J/mjBl3Z5EuYP0xs8ERWYUbd6A=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Fr1bUCmqai6z1bmmoh5UodtT/0YkSSSZ0UHZCGgl7SKU28aL3CwbU+E3eQBSN5HfZ9EmsMJ9X6vlmgjnVusHYLzy6RsEhKM/FtnWnIRy2YabbVnzegAFPT2FBf5OzXub5ids35lKYNbIajKiI9hTB3305w+0V5Ez3j7o2ZC+IMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yiw7GJy9; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1710171229; c=relaxed/simple;
+	bh=FJ/HRZnMzLmJPNY/vcSUMoZXd6dp5jxLhEln9XfpPsI=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=tbjuSBwngEekmHdwWOQiqUBFob7FqtJ6vqREa2RFiHSKrXFHxWXAD+DNya6Jd0jqYGzMniS1tNWcBHEgUUtXr0amOXsE829lRNLtjFY9H2GjHV2Pr7OTDQz2lmFzWq5Ic0tMMlT99/GMLdq6zjVsklGoC2wnyuq2JiX11w0uohM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EcXDYd1o; arc=none smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yiw7GJy9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9096DC43141;
-	Mon, 11 Mar 2024 15:14:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710170098;
-	bh=+Edrx2XfKxPuOmgT1J/mjBl3Z5EuYP0xs8ERWYUbd6A=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Yiw7GJy9En+anwueNzbQAJ9xypEg2ULvSgziJvXOfm945Y9SdOCov3NxCSgxD5UTJ
-	 6q3g329iToIRk6YSbmMEvSuOuH7heLidykgaEBjiibgbZeSCKrmaKBmso7SlcnXyMS
-	 teZmbEI4YBrEMaMrapI6pJo44XZmIdr1oTz+yu4WsRBL0WO9O+ylwIwLu56j/5heXk
-	 FexKPU4KXQ1LEQgFNc9dLQouHq2BEAlTeQUQPeOl6HBs0vlIFkbiaMut0a3xTC2hjn
-	 6ePlG3yYmiUycKQaNE9vcDtlrR6sPx49ZVqiC70Wp6m1+1m8rN4XfUor1dUFfBEFpm
-	 35hpOZ1Jhmthg==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Yuxuan Hu <20373622@buaa.edu.cn>,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	Sasha Levin <sashal@kernel.org>,
-	marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 2/3] Bluetooth: rfcomm: Fix null-ptr-deref in rfcomm_check_security
-Date: Mon, 11 Mar 2024 11:14:52 -0400
-Message-ID: <20240311151454.318918-2-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240311151454.318918-1-sashal@kernel.org>
-References: <20240311151454.318918-1-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EcXDYd1o"
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-690c1747c3cso18543916d6.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Mar 2024 08:33:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710171227; x=1710776027; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=/Al6zGpthwRRALkN2lbbL22v5jF6tQigBSoW3rSepKc=;
+        b=EcXDYd1odHNJPlpaWQXXr0xDvtIXBKQbmFodmEsL3DM2IBGx43Oksc9hymyGbDjDb9
+         e3caAJu9O8o3lZtToDCeTalzTVd8TX41GdFwKsRKu6r8eurApH4fuZ1tWiMqddVS6lYJ
+         Qyiu61/m4yr34+XitkyMWG4pJ/z5FpfGP9xIfI/f3DRSkZfZI/AaTDMGstZuokaEl+Eo
+         DuLn+/G1lKfqrxjZ2XwnOj7RDHuxR3ho2T30u8OOIufl0mymUEnofgM8uASRQ9wf6y6s
+         OVh9YKssqt+k97Z8RzQuR0vjVLGRvFWtgURlvm73w0d9gFe+IcYzx40iFDedGRK+X5u4
+         LEaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710171227; x=1710776027;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/Al6zGpthwRRALkN2lbbL22v5jF6tQigBSoW3rSepKc=;
+        b=poRRg6O+8oy+0nf1J7moRqGGoJgmmMGLmIW4Qw1N2D2RZJdDV15ZlfM7P+NTzVH1Q8
+         oWO4EVmq5SS5st6GxfTkKZE3UIs2q5VWINxbsY0VTV7RdqvuSAp/gLuIJvko68maiC/S
+         v5V3N1wZfLoI9lOY1b6EWu/cBsIsbGahb1UWZuxuh1Vn1bJKWYHCP9VaLO8L0cSl/A1x
+         nKuMvEPIIayjbaJJXa4vKdEFFfK4fY3MKhpDfd1/zKpItpSGkHhcxyoIy9ucV857vx5N
+         NLIMqB9Hs/y1cBkWKFcQ7M9dER8T0dDktTLkTBz1aoLDJ5FooFkvEN0hIUqTSL8eURQi
+         bIqA==
+X-Gm-Message-State: AOJu0YwiXIpcNabL8x717vufXy9duKEBDj+l+HSPkM8LL+zqeWrYIiT6
+	VXt7O2lmn085KKb2u2xhMCNbeoPt1UZNJpQC4NcrhTVrgY6ypVRqvtF1lNYO
+X-Google-Smtp-Source: AGHT+IHEKMu9MjgLrLuKXfe84SthIoZ+SDlN4TxJI9gQEUFBJuVRUDbFru1XI9pCJD10myo8Ss4r8A==
+X-Received: by 2002:a0c:df87:0:b0:690:b39e:bf0d with SMTP id w7-20020a0cdf87000000b00690b39ebf0dmr12514724qvl.8.1710171226943;
+        Mon, 11 Mar 2024 08:33:46 -0700 (PDT)
+Received: from [172.17.0.2] ([40.76.119.26])
+        by smtp.gmail.com with ESMTPSA id z4-20020a0cfc04000000b0069097b23cd9sm2717760qvo.105.2024.03.11.08.33.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Mar 2024 08:33:46 -0700 (PDT)
+Message-ID: <65ef245a.0c0a0220.623e0.899b@mx.google.com>
+Date: Mon, 11 Mar 2024 08:33:46 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5446683865108649364=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 4.19.309
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v1] Bluetooth: btintel: Use proper prefixes
+In-Reply-To: <20240311143703.751323-1-luiz.dentz@gmail.com>
+References: <20240311143703.751323-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Yuxuan Hu <20373622@buaa.edu.cn>
+--===============5446683865108649364==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-[ Upstream commit 2535b848fa0f42ddff3e5255cf5e742c9b77bb26 ]
+This is automated email and please do not reply to this email!
 
-During our fuzz testing of the connection and disconnection process at the
-RFCOMM layer, we discovered this bug. By comparing the packets from a
-normal connection and disconnection process with the testcase that
-triggered a KASAN report. We analyzed the cause of this bug as follows:
+Dear submitter,
 
-1. In the packets captured during a normal connection, the host sends a
-`Read Encryption Key Size` type of `HCI_CMD` packet
-(Command Opcode: 0x1408) to the controller to inquire the length of
-encryption key.After receiving this packet, the controller immediately
-replies with a Command Completepacket (Event Code: 0x0e) to return the
-Encryption Key Size.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=834337
 
-2. In our fuzz test case, the timing of the controller's response to this
-packet was delayed to an unexpected point: after the RFCOMM and L2CAP
-layers had disconnected but before the HCI layer had disconnected.
+---Test result---
 
-3. After receiving the Encryption Key Size Response at the time described
-in point 2, the host still called the rfcomm_check_security function.
-However, by this time `struct l2cap_conn *conn = l2cap_pi(sk)->chan->conn;`
-had already been released, and when the function executed
-`return hci_conn_security(conn->hcon, d->sec_level, auth_type, d->out);`,
-specifically when accessing `conn->hcon`, a null-ptr-deref error occurred.
+Test Summary:
+CheckPatch                    PASS      1.23 seconds
+GitLint                       PASS      0.88 seconds
+SubjectPrefix                 PASS      0.36 seconds
+BuildKernel                   PASS      28.45 seconds
+CheckAllWarning               PASS      31.07 seconds
+CheckSparse                   PASS      36.61 seconds
+CheckSmatch                   PASS      100.32 seconds
+BuildKernel32                 PASS      27.52 seconds
+TestRunnerSetup               PASS      524.60 seconds
+TestRunner_l2cap-tester       PASS      20.49 seconds
+TestRunner_iso-tester         FAIL      39.11 seconds
+TestRunner_bnep-tester        PASS      4.98 seconds
+TestRunner_mgmt-tester        FAIL      114.65 seconds
+TestRunner_rfcomm-tester      PASS      7.52 seconds
+TestRunner_sco-tester         PASS      13.11 seconds
+TestRunner_ioctl-tester       PASS      7.89 seconds
+TestRunner_mesh-tester        PASS      5.97 seconds
+TestRunner_smp-tester         PASS      6.96 seconds
+TestRunner_userchan-tester    PASS      5.12 seconds
+IncrementalBuild              PASS      26.97 seconds
 
-To fix this bug, check if `sk->sk_state` is BT_CLOSED before calling
-rfcomm_recv_frame in rfcomm_process_rx.
+Details
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+Total: 117, Passed: 116 (99.1%), Failed: 1, Not Run: 0
 
-Signed-off-by: Yuxuan Hu <20373622@buaa.edu.cn>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Failed Test Cases
+ISO Connect2 Suspend - Success                       Failed      10.209 seconds
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 492, Passed: 489 (99.4%), Failed: 1, Not Run: 2
+
+Failed Test Cases
+LL Privacy - Add Device 4 (2 Devices to AL)          Failed       0.167 seconds
+
+
 ---
- net/bluetooth/rfcomm/core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index 86edf512d4971..b2e69500439c9 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -1939,7 +1939,7 @@ static struct rfcomm_session *rfcomm_process_rx(struct rfcomm_session *s)
- 	/* Get data directly from socket receive queue without copying it. */
- 	while ((skb = skb_dequeue(&sk->sk_receive_queue))) {
- 		skb_orphan(skb);
--		if (!skb_linearize(skb)) {
-+		if (!skb_linearize(skb) && sk->sk_state != BT_CLOSED) {
- 			s = rfcomm_recv_frame(s, skb);
- 			if (!s)
- 				break;
--- 
-2.43.0
 
+--===============5446683865108649364==--
