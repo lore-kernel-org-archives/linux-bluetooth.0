@@ -1,113 +1,104 @@
-Received: from smtpbgeu1.qq.com (smtpbgeu1.qq.com [52.59.177.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8452469D;
-	Tue, 12 Mar 2024 01:52:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.59.177.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78E941FA2
+	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Mar 2024 01:54:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710208355; cv=none; b=BUSs4UC4oX5sJvfitbDWXZmPdJj5UJ9UrFQjAxh73J8xl9D0b0a3VGuUKV/c3zHULA/mT4JDYeO99rfePQvM7dRFzSpi9T/PifcBeSWjkS/Vaut4m8wJZv3icJAmh7+u3P7NdZ6Y2pq9lyZ10nK/4X5enLQnTqdOM9xDBMmqIzU=
+	t=1710208473; cv=none; b=EAWL+JVknyH5W4mNC4SRV7WOxdng7EKw2sxdSdxsFWTCFUH2vjmWva7wZUD5wjQP4JK8xukfqJnZcSpufKbmoi1BKBq85NTxoosJ5ofT38E917RSEGVaoR64dlUgu669KNj7osRhXIVa0UbJyVAIGii7o3msB4WeNBwmmtjfN4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710208355; c=relaxed/simple;
-	bh=oZSt8rOcfsApDGaXioQ83dqa7XFV7dDDeX7YZCZIXWU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qjFzsdOGiOHt9eDon2HoTqMH9nfNRjO6zPRISximx74/9ERa4sBh6gyEBNgbD1yh4mJ9sn7Xo0DUhQIy89bF1flNg9VSIN3t9SGgG6eufpJyu7hiE0GQQX5bKIXyYKQanmjyQznX+j9V7Vo2vyw6gs/pJOv/4KTOM9VmVCAbFnQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; arc=none smtp.client-ip=52.59.177.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-X-QQ-mid: bizesmtp90t1710208311tl9p0klz
-X-QQ-Originating-IP: s65UGkHpF2o9p4eY6Dtwin3B09Ieh1+LZF8N2A+5T0M=
-Received: from localhost.localdomain ( [113.57.152.160])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 12 Mar 2024 09:51:50 +0800 (CST)
-X-QQ-SSF: 01400000000000C0B000000A0000000
-X-QQ-FEAT: +ynUkgUhZJknQdj8DNcL8xe+8WjYPGdGsyvtr2K5zIPQKmQCiczINsccDoZnI
-	HJVUjYUBSd8lDwyrexXgUWl244sLWMjP/w183+z4b7bftBLDzY8Av2OVl0ez4k8xWxj4Ez6
-	9bVlrmszXEyztdKczipe13X4bYZh5IuP41Fln6ESwV+oA6cicmCuKIwX7ZNkZJz93pIUj7v
-	K1mnHPGJ90iJTHa42FrY7yqdJfyTmUY9CCMSQZ63hJbTL/gFnxQGDXbRfvAWznFG7sQs2Re
-	ZNzEZHRww3pRL4dz/zhx/1Un5HB+rQsTUwDuXR0C+bVsLICZ6YakvdM0lacMi7Y3lLjFS1e
-	bkslMyyfKivbHZAYWVB+XnhmA1TuQ71x+ZCKACRgFIB4IO3XDOJprc4GMqP0dnDc8DtVFwD
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 4870457541553938088
-From: WangYuli <wangyuli@uniontech.com>
-To: wangyuli@uniontech.com,
-	marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: Larry.Finger@lwfinger.net,
-	guanwentao@uniontech.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH] Bluetooth: Add device 0bda:4853 to blacklist/quirk table
-Date: Tue, 12 Mar 2024 09:51:33 +0800
-Message-ID: <893FB314C6C03130+20240312015133.232214-1-wangyuli@uniontech.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1710208473; c=relaxed/simple;
+	bh=in3WCtfYS2FVSZBiVi1QxnDKB+bThaOm1Q4RM8r/Qv8=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=T3MRM42kkeIZq02THY9DNr8HpsTjsx/ldug1Frlz2UwdGRDaeohdDuMu+7uSrHIP2uiGAZ6IpHzhpVW5akZ8KMEAU1LuhQkq8NsVS+0BOTMmDnbPwnOJfkNZxTqOpHOSP44AQOBjNbq7oYVma37ihX+PVQi/Ce7fTBGa4v8onK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eFF2y8WK; arc=none smtp.client-ip=209.85.222.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eFF2y8WK"
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-781753f52afso358095285a.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Mar 2024 18:54:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710208471; x=1710813271; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=UHQXU596QmCwFyU2lw6iZUnRI51WpIS4/3G+yYjjU+A=;
+        b=eFF2y8WKx8wTntxyaatvawbK3+0HWeIaOKH12unsuSKKowkW7vAoUIATr853lXKS3e
+         4uc5LCWaGSaZ0YRM0CvXLQX/ChyijMuuJ4rDXgFz0fWZw93Ny+KTKYJx0TDeUJiW5BFE
+         Hp4mBMaP0Gz9qcpGTHW3r1UvsRxgaL6EOskCLHVsd3Dx1zmMRkYlj0yCATrKMYKt9drB
+         Kk+kKBv/JvsR1fk/RMhaQ8oaludLN78FkmChnusTg4e4/7W+AscRBolN5jPOvAWg20nH
+         uQ7IPxmC2gWv8PK7LoGTqL1u82oYxcGVUYzsF3p39b70GqbBlvc6K2zTkhK9+8HgKr6R
+         UIkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710208471; x=1710813271;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UHQXU596QmCwFyU2lw6iZUnRI51WpIS4/3G+yYjjU+A=;
+        b=vhGPa8nTgMBe+VfPu3Io8g69bIQtQMggLAfwcviZF/OVnXcloIIn/CzSYCeni4OZK+
+         IxCEczxEEGgWlJI7VM4vdZ9pBZQsvxqynEFhuBswMf0wNi6W4LhU5sDBP4bYpUttAuTy
+         0ZdiHOsUFf9Kq0YwusD0v7oyG0Cw0m4ZTFYTypkY0lDwipaCGPobYmTC+hEdMIFu91sq
+         SMK/dsYd5vnznU2sFoG5Y9DwC7QB9+whPME6b/vJaNxNZaeZ9bR3nK88LWtzRZNGNGQc
+         EYDhP5A5rFlnzqkigGsIAIOErvQRvQMJ3hkRIfNLcHtf3kNQXps0D7avsGODT0Nex62p
+         sqFQ==
+X-Gm-Message-State: AOJu0YwwfWZ7LtGFB+XknbFIAJZ7A0ufYfnRsGplMgqazUN8ZNMYYVSE
+	UudEzOdpiz+F9S93PEETxS/VaoP4GIh/m7EBnSgQve3XHLZ9g3A5qslCJVpI
+X-Google-Smtp-Source: AGHT+IGWRrlV6tXRcYL4s77y4r04eQjumsJ9/h8D0nfrwofwokBcOVMigtCp7FahCz0X4DW4F/8t+Q==
+X-Received: by 2002:a05:620a:a93:b0:787:bb73:7b0c with SMTP id v19-20020a05620a0a9300b00787bb737b0cmr9364752qkg.58.1710208471146;
+        Mon, 11 Mar 2024 18:54:31 -0700 (PDT)
+Received: from [172.17.0.2] ([74.249.13.182])
+        by smtp.gmail.com with ESMTPSA id g29-20020a05620a219d00b00788622ebf52sm2725133qka.85.2024.03.11.18.54.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Mar 2024 18:54:30 -0700 (PDT)
+Message-ID: <65efb5d6.050a0220.d284c.a9c8@mx.google.com>
+Date: Mon, 11 Mar 2024 18:54:30 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4597949901970277249=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v4,1/4] shared/uhid: Add dedicated functions for each UHID opcode
+In-Reply-To: <20240311224327.1023070-1-luiz.dentz@gmail.com>
+References: <20240311224327.1023070-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-This new device is part of a Realtek RTW8852BE chip. Without this change
-the device utilizes an obsolete version of the firmware that is encoded
-in it rather than the updated Realtek firmware and config files from
-the firmware directory. The latter files implement many new features.
+--===============4597949901970277249==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The device table is as follows:
+This is automated email and please do not reply to this email!
 
-T: Bus=03 Lev=01 Prnt=01 Port=09 Cnt=03 Dev#= 4 Spd=12 MxCh= 0
-D: Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
-P: Vendor=0bda ProdID=4853 Rev= 0.00
-S: Manufacturer=Realtek
-S: Product=Bluetooth Radio
-S: SerialNumber=00e04c000001
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=81(I) Atr=03(Int.) MxPS= 16 Ivl=1ms
-E: Ad=02(O) Atr=02(Bulk) MxPS= 64 Ivl=0ms
-E: Ad=82(I) Atr=02(Bulk) MxPS= 64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=03(O) Atr=01(Isoc) MxPS= 0 Ivl=1ms
-E: Ad=83(I) Atr=01(Isoc) MxPS= 0 Ivl=1ms
-I: If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=03(O) Atr=01(Isoc) MxPS= 9 Ivl=1ms
-E: Ad=83(I) Atr=01(Isoc) MxPS= 9 Ivl=1ms
-I: If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=03(O) Atr=01(Isoc) MxPS= 17 Ivl=1ms
-E: Ad=83(I) Atr=01(Isoc) MxPS= 17 Ivl=1ms
-I: If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=03(O) Atr=01(Isoc) MxPS= 25 Ivl=1ms
-E: Ad=83(I) Atr=01(Isoc) MxPS= 25 Ivl=1ms
-I: If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=03(O) Atr=01(Isoc) MxPS= 33 Ivl=1ms
-E: Ad=83(I) Atr=01(Isoc) MxPS= 33 Ivl=1ms
-I: If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=03(O) Atr=01(Isoc) MxPS= 49 Ivl=1ms
-E: Ad=83(I) Atr=01(Isoc) MxPS= 49 Ivl=1ms
+Dear submitter,
 
-Link: https://lore.kernel.org/all/20230810144507.9599-1-Larry.Finger@lwfinger.net/
-Cc: stable@vger.kernel.org
-Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
-Signed-off-by: WangYuli <wangyuli@uniontech.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=834468
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      2.00 seconds
+GitLint                       PASS      1.22 seconds
+BuildEll                      PASS      25.08 seconds
+BluezMake                     PASS      1601.22 seconds
+MakeCheck                     PASS      13.81 seconds
+MakeDistcheck                 PASS      176.59 seconds
+CheckValgrind                 PASS      246.14 seconds
+CheckSmatch                   PASS      348.92 seconds
+bluezmakeextell               PASS      118.82 seconds
+IncrementalBuild              PASS      6046.28 seconds
+ScanBuild                     PASS      1009.66 seconds
+
+
+
 ---
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 06e915b57283..d9c621d15fee 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -542,6 +542,8 @@ static const struct usb_device_id quirks_table[] = {
- 	/* Realtek 8852BE Bluetooth devices */
- 	{ USB_DEVICE(0x0cb8, 0xc559), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x0bda, 0x4853), .driver_info = BTUSB_REALTEK |
-+						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x0bda, 0x887b), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x0bda, 0xb85b), .driver_info = BTUSB_REALTEK |
--- 
-2.43.0
 
+--===============4597949901970277249==--
