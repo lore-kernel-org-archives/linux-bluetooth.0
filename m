@@ -1,113 +1,217 @@
-Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
+Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 353A27A122
-	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Mar 2024 11:57:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB225F4FA
+	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Mar 2024 15:17:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710244671; cv=none; b=D0qeCBAA2STFso1v3oO+sDJzystdxz+soa+khbTZyWkoloJBc5qJrqaoj+bPMmcSvw20yyXtYhhlOk621m8v21BM8kddl5dF8Hs0F6LNj4mxFv2UcG5sCcpxQ7Aza+3LLxqlcRgAdvzVjdaEzTr7YkQx28QfUEPJnt0UL7OhU7c=
+	t=1710256666; cv=none; b=KT43OyYeVh8lCE1RjYw5Ni3O4XXdcccp5lzAaYJrS+JiCqJPi6CVZPsWrSK4mba3ROn5S1yCXa/wOzxc0ehzEGPznbm70291HI+X4gmfnnan5ZK3DKfI93aVJEoWY61bYA2jlznng8e1sMVrZOQlkWtbN6sMCBNLYSTVxBXh/IY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710244671; c=relaxed/simple;
-	bh=PDfSOl0NJRRg6E5ZyUmXJbo/XcHiYo5cPHeZe4NCdK8=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=eILeUIVosnkw/KuFwaEJu6buAgttA+tEyME91tJoYK+aXRDC2uiYNwa4k3RlXSErm2Mxu5bILKZTm84id2eOa9x0qKwOkNF4PsOms40noPkfAdg04oft8Wq8dIMOoEMU7O0bUlmpPsJTSfXB8yxgFUueqz+NKCECHq6q5jrTNs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cNGRk4dQ; arc=none smtp.client-ip=209.85.217.43
+	s=arc-20240116; t=1710256666; c=relaxed/simple;
+	bh=e4+PHqDauya9n2dspmku/9IFy3579jWCY4iOuSZnHjA=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=aCOtcMHkS+3qRgepd1tOhZqDjPx1AL3fiYpIUzIpOAMPJ4ZvBhdwuAKRss9Ik0Rbua4gligFdiGVgKwK/DzU62zbz5b9BUEuAQfujnA7nCVsVeW8b94olM0mjTf6CZO75K+KMWNnFxF5jQ8El7dudTvh6TZzFe+3FM8pLtX3Sa0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mgp4DSTR; arc=none smtp.client-ip=209.85.210.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cNGRk4dQ"
-Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-47288b46f2fso879173137.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Mar 2024 04:57:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mgp4DSTR"
+Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-6e53893c559so637180a34.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Mar 2024 08:17:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710244669; x=1710849469; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=IOVWhRNbSiUrWQEyyKcwCxKI8TBszxl2MqWxOPsKtH4=;
-        b=cNGRk4dQcHxbG2HJLZ83QkMZyFKGvX8SFB01slvbt6JwTMFe3zenG5snErUv+5cuiT
-         t38jAS/zYwpPOxSQnkzGk6b1ztGrjk+NIiCTBf73ZBnS6KKIfxacfum1R1VlFpKavyVv
-         91OgkH7kJi4lWl0uPWNfxBkD0wS9vbo6vxj/7RJ05z9FuUafrmMZhmapanVlAhSXUTtR
-         sDAzxr2Ydg0EdXx9kLz5YxPGa9WsttI1r9mVvP8sgbZfJwZrWZ6CNxCFQyAbliuqPr3s
-         U7GiGzNiFEZlD+T0GIbI8IJXL7mTXcipKJERofnel8Pzondu2g9tFKPqD4Xs/8tLfUw6
-         Sh/g==
+        d=gmail.com; s=20230601; t=1710256662; x=1710861462; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=lCfHqTTsLIjf6PahHwoSB6au2rlpK/wHDjPqDhpqcc4=;
+        b=Mgp4DSTRQQwKW9xIwmOHIUu6wauMBMDYNncRlOQnyEug1/cAb+SFhOp3YygaTeD7uJ
+         wDMctq/WOImUbQrsLmekkQ8guclPjeVFN5jYPr92Py+nCceIJISNRxAas+QdVG45dAM2
+         bdC2zF9apBUKoQMsLMUunHaucJ06Sg3deod7FMVBUCPJa4P2NBNUVol7WZvH3y0K468F
+         7EuPYjR8IkhGRrt+LexB1xAh3fGn8/zFCkeyvyrIL2ujGMCROeb1sNgyjIMxLgPi4jMq
+         CsV15sFy0J/ohHO92c+9Frs362KjWKm/+2XCXExv/LUK6K9grxqaz1ZG93KCLnv5dObO
+         28Rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710244669; x=1710849469;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IOVWhRNbSiUrWQEyyKcwCxKI8TBszxl2MqWxOPsKtH4=;
-        b=iciVwAc4RuuHzFjUvrHWC+VovkY/c3u4ii2zjhlBjZ2ZUQ9GKfkB3PcthJ8AQrWsb5
-         iXGssFDi212JKqVHC+T57vZ2WWPF4tBjCg76iPn0NOJlaoHYQyIPUSPQZKx/oEqP/W3Y
-         ScbA9pmDiG6I2OXYbxJbJi+qKeaWDH3kk26N9/jDatGODdjXI5Y5yfEaxBkAFCKZtmqP
-         lFD8x48/KgKlpg/dcJ5ZL1sPLFDHQii1erifFl5g3slq+dvNgq4KX/MYe5ZnIbI9xXqq
-         jQe+bY8GdY324RqRMKgAZM+SgRmLX+aJuHMpDq8ANBgGp7xf8zhT70CqjTTOi/mXutja
-         BWhg==
-X-Gm-Message-State: AOJu0Yy1aDnYuGV8+TwK3KgnqnuM8a6DSwE1UMNBHUXQqF9OxHJKEDBw
-	Cas2HgR5rZgxK2eSd+ZEVzHJ1H7EPaJ1n2xLU5UeqFXRGk2HeqjBFlCnRpK/
-X-Google-Smtp-Source: AGHT+IFxYBD+QideWb0Edb/sU5VWvArlgJ8qpJnnL02clFM+FMt/AYOR/N5jke64GLQNK9r5VnRWwg==
-X-Received: by 2002:a67:f041:0:b0:472:64f5:f0a5 with SMTP id q1-20020a67f041000000b0047264f5f0a5mr6155957vsm.18.1710244669041;
-        Tue, 12 Mar 2024 04:57:49 -0700 (PDT)
-Received: from [172.17.0.2] ([20.97.191.131])
-        by smtp.gmail.com with ESMTPSA id c12-20020a0ce7cc000000b00690c33599f0sm3201684qvo.91.2024.03.12.04.57.48
+        d=1e100.net; s=20230601; t=1710256662; x=1710861462;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lCfHqTTsLIjf6PahHwoSB6au2rlpK/wHDjPqDhpqcc4=;
+        b=o3fXIUcZMux1FtepjnIWJ/ABIsr+iZ7zoiGxeyFNQAx4obe0Ts8sbM+kJAtwF5625N
+         1zNdjEizkrBZ/RpSdQxTw6KQiG8sRg30xdCf0rzihsK5nByPF0UR3G5y0e63RThP7aHO
+         8lmvECerCNB0MbGGDaJfMDfmvJcZOgfT3VN3uNVuAcv4nuY7sfSxqrWaH0KQ8zvysiYx
+         YSdXsH8x6E2K86jp15TqZDcKrabVgDiDxWfWektdEfPlWKD77gUDk8X7KZwdw9H9r3oM
+         b2GNwGR4KeaTs6iz3sWROAtZMi8hItyfQYx2winYIaX+2ZvSfgO+jcVIpGG64Y/e2kGR
+         qn0w==
+X-Gm-Message-State: AOJu0YzDjAOWYB9SdRcB9cCCm7OEgwxSyLy/e/4woobEj4w08QP67zOF
+	UWb7YLMihx3DQS/BMEM/8R2QrzhWW7xTKX0TryH2UU4ClDqDGkS/Wc/CWF99
+X-Google-Smtp-Source: AGHT+IFv7vO4LRgQRHLwzAXjDWa/FgbYshc/irREQHRgnunpBu3phVX34/fu/hkep6Du6e66c+6adA==
+X-Received: by 2002:a9d:7581:0:b0:6e5:2435:37cf with SMTP id s1-20020a9d7581000000b006e5243537cfmr7294814otk.37.1710256662362;
+        Tue, 12 Mar 2024 08:17:42 -0700 (PDT)
+Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id i4-20020ac5cd84000000b004d339781311sm896646vka.56.2024.03.12.08.17.41
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Mar 2024 04:57:48 -0700 (PDT)
-Message-ID: <65f0433c.0c0a0220.9c47.ba2b@mx.google.com>
-Date: Tue, 12 Mar 2024 04:57:48 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6687736244479685239=="
+        Tue, 12 Mar 2024 08:17:41 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] client/player: Split unicast and broadcast presets
+Date: Tue, 12 Mar 2024 11:17:40 -0400
+Message-ID: <20240312151740.1105289-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, max.chou@realtek.com
-Subject: RE: [v2] Bluetooth: btrtl: Add the support for RTL8922A
-In-Reply-To: <20240312111848.4599-1-max.chou@realtek.com>
-References: <20240312111848.4599-1-max.chou@realtek.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============6687736244479685239==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=834605
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.84 seconds
-GitLint                       PASS      0.33 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      27.96 seconds
-CheckAllWarning               PASS      30.66 seconds
-CheckSparse                   PASS      35.95 seconds
-CheckSmatch                   PASS      99.48 seconds
-BuildKernel32                 PASS      27.21 seconds
-TestRunnerSetup               PASS      511.01 seconds
-TestRunner_l2cap-tester       PASS      19.94 seconds
-TestRunner_iso-tester         PASS      28.20 seconds
-TestRunner_bnep-tester        PASS      4.78 seconds
-TestRunner_mgmt-tester        PASS      110.37 seconds
-TestRunner_rfcomm-tester      PASS      7.37 seconds
-TestRunner_sco-tester         PASS      15.01 seconds
-TestRunner_ioctl-tester       PASS      7.91 seconds
-TestRunner_mesh-tester        PASS      6.96 seconds
-TestRunner_smp-tester         PASS      6.85 seconds
-TestRunner_userchan-tester    PASS      4.99 seconds
-IncrementalBuild              PASS      26.33 seconds
-
-
-
+Although their name matches unicast and broadcast are not actually the
+same when it comes to RTN and Max Latency, so this splits their settings
+into 2 presets tables and fix the values for broadcast.
 ---
-Regards,
-Linux Bluetooth
+ client/player.c | 115 +++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 110 insertions(+), 5 deletions(-)
 
+diff --git a/client/player.c b/client/player.c
+index a40bf66e3967..cb771447bf4b 100644
+--- a/client/player.c
++++ b/client/player.c
+@@ -1403,7 +1403,7 @@ static struct codec_preset sbc_presets[] = {
+ 		.target_latency = 0x03, \
+ 	}
+ 
+-static struct codec_preset lc3_presets[] = {
++static struct codec_preset lc3_ucast_presets[] = {
+ 	/* Table 4.43: QoS configuration support setting requirements */
+ 	LC3_PRESET("8_1_1",
+ 			LC3_PRESET_8KHZ(LC3_CONFIG_DURATION_7_5, 26u),
+@@ -1565,6 +1565,111 @@ static struct codec_preset lc3_presets[] = {
+ 			LC3_10_UNFRAMED(2 * 120u, 1u, 20u, 10000u)),
+ };
+ 
++static struct codec_preset lc3_bcast_presets[] = {
++	/* Table 6.4: Broadcast Audio Stream configuration support requirements
++	 * for the Broadcast Source and Broadcast Sink
++	 */
++	LC3_PRESET("8_1_1",
++			LC3_PRESET_8KHZ(LC3_CONFIG_DURATION_7_5, 26u),
++			LC3_7_5_UNFRAMED(26u, 2u, 8u, 40000u)),
++	LC3_PRESET("8_2_1",
++			LC3_PRESET_8KHZ(LC3_CONFIG_DURATION_10, 30u),
++			LC3_10_UNFRAMED(30u, 2u, 10u, 40000u)),
++	LC3_PRESET("16_1_1",
++			LC3_PRESET_16KHZ(LC3_CONFIG_DURATION_7_5, 30u),
++			LC3_7_5_UNFRAMED(30u, 2u, 8u, 40000u)),
++	LC3_PRESET("16_2_1",
++			LC3_PRESET_16KHZ(LC3_CONFIG_DURATION_10, 40u),
++			LC3_10_UNFRAMED(40u, 2u, 10u, 40000u)),
++	LC3_PRESET("24_1_1",
++			LC3_PRESET_24KHZ(LC3_CONFIG_DURATION_7_5, 45u),
++			LC3_7_5_UNFRAMED(45u, 2u, 8u, 40000u)),
++	LC3_PRESET("24_2_1",
++			LC3_PRESET_24KHZ(LC3_CONFIG_DURATION_10, 60u),
++			LC3_10_UNFRAMED(60u, 2u, 10u, 40000u)),
++	LC3_PRESET("32_1_1",
++			LC3_PRESET_32KHZ(LC3_CONFIG_DURATION_7_5, 60u),
++			LC3_7_5_UNFRAMED(60u, 2u, 8u, 40000u)),
++	LC3_PRESET("32_2_1",
++			LC3_PRESET_32KHZ(LC3_CONFIG_DURATION_10, 80u),
++			LC3_10_UNFRAMED(80u, 2u, 10u, 40000u)),
++	LC3_PRESET("44_1_1",
++			LC3_PRESET_44KHZ(LC3_CONFIG_DURATION_7_5, 98u),
++			QOS_FRAMED_2M(8163u, 98u, 4u, 24u, 40000u)),
++	LC3_PRESET("44_2_1",
++			LC3_PRESET_44KHZ(LC3_CONFIG_DURATION_10, 130u),
++			QOS_FRAMED_2M(10884u, 130u, 4u, 31u, 40000u)),
++	LC3_PRESET("48_1_1",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_7_5, 75u),
++			LC3_7_5_UNFRAMED(75u, 4u, 15u, 40000u)),
++	LC3_PRESET("48_2_1",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_10, 100u),
++			LC3_10_UNFRAMED(100u, 4u, 20u, 40000u)),
++	LC3_PRESET("48_3_1",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_7_5, 90u),
++			LC3_7_5_UNFRAMED(90u, 4u, 15u, 40000u)),
++	LC3_PRESET("48_4_1",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_10, 120u),
++			LC3_10_UNFRAMED(120u, 4u, 20u, 40000u)),
++	LC3_PRESET("48_5_1",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_7_5, 117u),
++			LC3_7_5_UNFRAMED(117u, 4u, 15u, 40000u)),
++	LC3_PRESET("48_6_1",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_10, 155u),
++			LC3_10_UNFRAMED(155u, 4u, 20u, 40000u)),
++	/* Broadcast Audio Stream configuration settings for high-reliability
++	 * audio data.
++	 */
++	LC3_PRESET_HR("8_1_2",
++			LC3_PRESET_8KHZ(LC3_CONFIG_DURATION_7_5, 26u),
++			LC3_7_5_UNFRAMED(26u, 4u, 45u, 40000u)),
++	LC3_PRESET_HR("8_2_2",
++			LC3_PRESET_8KHZ(LC3_CONFIG_DURATION_10, 30u),
++			LC3_10_UNFRAMED(30u, 4u, 60u, 40000u)),
++	LC3_PRESET_HR("16_1_2",
++			LC3_PRESET_16KHZ(LC3_CONFIG_DURATION_7_5, 30u),
++			LC3_7_5_UNFRAMED(30u, 4u, 45u, 40000u)),
++	LC3_PRESET_HR("16_2_2",
++			LC3_PRESET_16KHZ(LC3_CONFIG_DURATION_10, 40u),
++			LC3_10_UNFRAMED(40u, 4u, 60u, 40000u)),
++	LC3_PRESET_HR("24_1_2",
++			LC3_PRESET_24KHZ(LC3_CONFIG_DURATION_7_5, 45u),
++			LC3_7_5_UNFRAMED(45u, 4u, 45u, 40000u)),
++	LC3_PRESET_HR("24_2_2",
++			LC3_PRESET_24KHZ(LC3_CONFIG_DURATION_10, 60u),
++			LC3_10_UNFRAMED(60u, 4u, 60u, 40000u)),
++	LC3_PRESET_HR("32_1_2",
++			LC3_PRESET_32KHZ(LC3_CONFIG_DURATION_7_5, 60u),
++			LC3_7_5_UNFRAMED(60u, 4u, 45u, 40000u)),
++	LC3_PRESET_HR("32_2_2",
++			LC3_PRESET_32KHZ(LC3_CONFIG_DURATION_10, 80u),
++			LC3_10_UNFRAMED(80u, 4u, 60u, 40000u)),
++	LC3_PRESET_HR("44_1_2",
++			LC3_PRESET_44KHZ(LC3_CONFIG_DURATION_7_5, 98u),
++			QOS_FRAMED_2M(8163u, 4u, 13u, 54u, 40000u)),
++	LC3_PRESET_HR("44_2_2",
++			LC3_PRESET_44KHZ(LC3_CONFIG_DURATION_10, 130u),
++			QOS_FRAMED_2M(10884u, 130u, 4u, 60u, 40000u)),
++	LC3_PRESET_HR("48_1_2",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_7_5, 75u),
++			LC3_7_5_UNFRAMED(75u, 4u, 50u, 40000u)),
++	LC3_PRESET_HR("48_2_2",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_10, 100u),
++			LC3_10_UNFRAMED(100u, 4u, 65u, 40000u)),
++	LC3_PRESET_HR("48_3_2",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_7_5, 90u),
++			LC3_7_5_UNFRAMED(90u, 4u, 50u, 40000u)),
++	LC3_PRESET_HR("48_4_2",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_10, 120u),
++			LC3_10_UNFRAMED(120u, 4u, 65u, 40000u)),
++	LC3_PRESET_HR("48_5_2",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_7_5, 117u),
++			LC3_7_5_UNFRAMED(117u, 4u, 50u, 40000u)),
++	LC3_PRESET_HR("48_6_2",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_10, 155u),
++			LC3_10_UNFRAMED(155u, 4u, 65u, 40000u)),
++};
++
+ static void print_ltv(const char *str, void *user_data)
+ {
+ 	const char *label = user_data;
+@@ -1615,10 +1720,10 @@ static struct preset {
+ } presets[] = {
+ 	PRESET(A2DP_SOURCE_UUID, A2DP_CODEC_SBC, sbc_presets, 6),
+ 	PRESET(A2DP_SINK_UUID, A2DP_CODEC_SBC, sbc_presets, 6),
+-	PRESET(PAC_SINK_UUID, LC3_ID, lc3_presets, 3),
+-	PRESET(PAC_SOURCE_UUID, LC3_ID, lc3_presets, 3),
+-	PRESET(BCAA_SERVICE_UUID,  LC3_ID, lc3_presets, 3),
+-	PRESET(BAA_SERVICE_UUID,  LC3_ID, lc3_presets, 3),
++	PRESET(PAC_SINK_UUID, LC3_ID, lc3_ucast_presets, 3),
++	PRESET(PAC_SOURCE_UUID, LC3_ID, lc3_ucast_presets, 3),
++	PRESET(BCAA_SERVICE_UUID,  LC3_ID, lc3_bcast_presets, 3),
++	PRESET(BAA_SERVICE_UUID,  LC3_ID, lc3_bcast_presets, 3),
+ };
+ 
+ static void parse_vendor_codec(const char *codec, uint16_t *vid, uint16_t *cid)
+-- 
+2.43.0
 
---===============6687736244479685239==--
