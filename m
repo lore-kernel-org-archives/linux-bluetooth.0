@@ -1,19 +1,19 @@
 Received: from mail.nfschina.com (unknown [42.101.60.195])
-	by smtp.subspace.kernel.org (Postfix) with SMTP id F0DEB10A35
-	for <linux-bluetooth@vger.kernel.org>; Wed, 13 Mar 2024 07:36:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with SMTP id F25BD1FAA
+	for <linux-bluetooth@vger.kernel.org>; Wed, 13 Mar 2024 07:44:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=42.101.60.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710315417; cv=none; b=VlqOs3+8qV2gLQVAS/0nR3RflNz1A6E9NCDyhqsmBu8UTBId7IBjtyMJUM0VqO9O/zDDThFf/lIl28R3g12+VTqNgbLhU6D8rg8VL/Q4tjRUjAIL2cG/qQUeyUsTJNPQKcPvfLt4+1fDNYzaWpxeFI+DMn6MJC6cUehv5oDz02c=
+	t=1710315858; cv=none; b=R07kR51acNVcwNxu9sk5mvlDt7chOjdZfThxuLfWnFoTUVpdVWqk+X6siKl1DeodX+tvdKWMMTB2v4AXi9xM/pWJYmnx/qnGyxLxbeSX3xSSNaJ2XUJdMmV+3T0qGvfxnZkMf98UfHMyAkag8G/9FXKsvttVXy4ii17SW1aEyKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710315417; c=relaxed/simple;
+	s=arc-20240116; t=1710315858; c=relaxed/simple;
 	bh=VvfoF8rJk7T+G0p7C7pe7ujeL2gGxj8Wj89lKnIjHFk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QLyVtwA75hNDeFV/onmvFYRge6nFzqVMzj6tRWRz6Y79rNfZGL3KF5LdgHpPacmJfx0PABrkkSvBjrlMIIWVPDThAqYfb7YkUE32d3yjS8bexPuQ/dXB5tt2QBR4xxzugPY0HhLO3U0q7kUHC7migdnIbiytbgHmatko4Thzk+U=
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=adfyzf4RMD6UhlXegFpz2awF/ZBeUCr8EC8VP93AbXUiIwoM8R0V4c304FrX3wyuWBmSsIINl+WcsIJsHMk5CPak2O0yPZY6GWJeVnXB7l+adSJuOSSjpnXY/biM5huf9L1baVkXQBMcLcJVo0y3ojMzARvxnuX21NXUwU9Ygko=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com; spf=pass smtp.mailfrom=nfschina.com; arc=none smtp.client-ip=42.101.60.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nfschina.com
 Received: from localhost.localdomain (unknown [103.163.180.2])
-	by mail.nfschina.com (Maildata Gateway V2.8.8) with ESMTPA id 690456031E61E;
-	Wed, 13 Mar 2024 15:36:48 +0800 (CST)
+	by mail.nfschina.com (Maildata Gateway V2.8.8) with ESMTPA id A6F0A6032CDC7;
+	Wed, 13 Mar 2024 15:44:05 +0800 (CST)
 X-MD-Sfrom: youwan@nfschina.com
 X-MD-SrcIP: 103.163.180.2
 From: Youwan Wang <youwan@nfschina.com>
@@ -22,9 +22,9 @@ Cc: johan.hedberg@gmail.com,
 	luiz.dentz@gmail.com,
 	linux-bluetooth@vger.kernel.org,
 	Youwan Wang <youwan@nfschina.com>
-Subject: [v2] Bluetooth: btusb: Add return ENOBUFS error code
-Date: Wed, 13 Mar 2024 15:36:40 +0800
-Message-Id: <20240313073640.426862-1-youwan@nfschina.com>
+Subject: [v3] Bluetooth: btusb: Set error code in btusb_mtk_hci_wmt_sync()
+Date: Wed, 13 Mar 2024 15:43:58 +0800
+Message-Id: <20240313074358.427090-1-youwan@nfschina.com>
 X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
