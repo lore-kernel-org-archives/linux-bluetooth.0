@@ -1,134 +1,217 @@
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2090.outbound.protection.outlook.com [40.107.101.90])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DE6D41238
-	for <linux-bluetooth@vger.kernel.org>; Wed, 13 Mar 2024 14:27:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.90
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710340050; cv=fail; b=kojR0Xx/RNbWA9MUbtwS+NxCTBGhEbIHImvCFOsrOgQ7XBaL3GBvmREPyVnKzx+++kC14mGKRypZ3tWEFbLDWXn/4pjsKWKzpAWXsfBVRTpxSbQrPE02qaYmxSh4JO+F2FULf5uPNKG36iGZzKof9aW1ACeoky9w0gd8t4oFlOg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710340050; c=relaxed/simple;
-	bh=6ubWFW44QF9gqV0D7Uo1DJTCl+aa4GgkRzUVoadfXiI=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ntGuYdiBs0sqcOsaacp+JH5rdZgcxXGj3Ofrvj1kpRwhXa0UFgLIp3qHZNzcSof6HBXSTySMIl8Y+pmsuzikcIl84nZkXAPekr75H1BLG+O2grdfZt3jCZSemXRMnRqcBpc3d7FR+ZTn9RRsgIr8mH9LuItAPdHuJMjIQLqoofQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lairdconnect.com; spf=pass smtp.mailfrom=lairdconnect.com; dkim=pass (2048-bit key) header.d=lairdconnect.com header.i=@lairdconnect.com header.b=wxWP/8gN; arc=fail smtp.client-ip=40.107.101.90
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lairdconnect.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lairdconnect.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 232AA43AC8
+	for <linux-bluetooth@vger.kernel.org>; Wed, 13 Mar 2024 15:07:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710342431; cv=none; b=LewG4u3OIHCqcm7IliA2llkE7wN0y7tziO9gqvzrOU875lx19DfVf69OxSeCpnI27EC5kF0WnrZUgFSOEr/O2FOtpA6hTHbVPIy3bBViATaAvyaWEzVtVNPcnCNiTUQ4AfiMxj3XZoMsMsQE/K0ebLKhAZ40TA+uDduoRXPTTdA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710342431; c=relaxed/simple;
+	bh=e4+PHqDauya9n2dspmku/9IFy3579jWCY4iOuSZnHjA=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=DgkGwLk8REDc8TdycrTpZl+OOJtsg3G6o+EEqdE2+6xFaAzgHlGc3OWTjV1JCYx95Q9vjA64jE5HkWdX4rQxzeHUZJFFwnXdplEaBWxneNMJwHcvBxgkv+zoo3oLtbpTrjQ9rVfnnVa6tF/7OtY7DM7z2vQJ2H71dwPbUWtcuQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=grLc/znx; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=lairdconnect.com header.i=@lairdconnect.com header.b="wxWP/8gN"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JVrr47VVL6TxX7dYQQNxmfqq3I94LjFz2hKzHIk3R460uYHKs8+9NbgYAW5tK0P5Isl1VwqfeZZ62MwRX4ajZEWRRPhlQeleOg2/IRhxMfSLR3DDn6WpdfedN32quVwQ3MHCQ2QJHXYeYr4s9tAbetVeXU6rstgbiigw7UR+dGi6Jq/+gvyA0h5GThl9Lo5nNXBuB7gszDjkm3V0fsAvY/WKWVDa6+PtrF8MUQdlDrtm+8yY43Hlbm6i2vZXUF7BZv+93QVlIrzU2FxMBu7fxGzLWC/eZQHyXGH0r90yo8SY1UtseZWtwozQZ/j/r2010iIiAcBv6s9OIbAASMVZkw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6ubWFW44QF9gqV0D7Uo1DJTCl+aa4GgkRzUVoadfXiI=;
- b=F75WNd5qAS60BarbgJKNo+eRHz8wQo53Qhb/1h+ZvPi9owf+0X+j4Ln3zrk7gTdNiz5ivuaoMrUfo1RXg1KJQu5xFutKSJVvgRnRXQUdoDUU6KnyEERnbGT5pfvzZuib4+t/iEeTCOlo95eSpqAw8WOwdb4vOnhb8Rls4QJIcrqM66ds0RWZeF/5HNI3zoQFdfHc96/6X/OrZbg3XKrtM/q2BfpLajVUYohpoPhdKFW/3eKtbZd3xnn3iKW8UQ+8kwhNTNF26CqdrdFciWSnHReDMhCY4PlWN3EypJRA2WthCSrrhHdLn7oUVG1h9q2rqViDCe5p7CznJGTotrlqLA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=lairdconnect.com; dmarc=pass action=none
- header.from=lairdconnect.com; dkim=pass header.d=lairdconnect.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lairdconnect.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6ubWFW44QF9gqV0D7Uo1DJTCl+aa4GgkRzUVoadfXiI=;
- b=wxWP/8gN84LBq6A2zAritfLavdloI9nsRBpYv1C4FMvGpwhVZltZUAfEZunbwOLXGgnV9TcdZzRQml78qbX6RnFktKDabLdGzXhyDE/kVH+prHIyYaDNpBpV/Fpduk6yW94CME/Fyv3LE6bf/F+Zmya8bI2PhvqJ3xVGmKaFF9owmvvHGLmTlnXPKh1+vmcaP7otElPve2U+vWa98H+sQ4wLOZLEeYgiwO+AUk/yolAlYnyoyz1eAJQrO+WQVE+02Htw4Exj85qRMPvZFQBnTDnl8Kj0FIIq0ZhThPhtzSA0OPkEiImP2cZ20SBLFuQKku7okuUIySLv6mZ8fvzxlg==
-Received: from PH7PR14MB5300.namprd14.prod.outlook.com (2603:10b6:510:13c::8)
- by PH7PR14MB5781.namprd14.prod.outlook.com (2603:10b6:510:212::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.35; Wed, 13 Mar
- 2024 14:27:24 +0000
-Received: from PH7PR14MB5300.namprd14.prod.outlook.com
- ([fe80::e26b:8dfa:5b06:594a]) by PH7PR14MB5300.namprd14.prod.outlook.com
- ([fe80::e26b:8dfa:5b06:594a%4]) with mapi id 15.20.7362.031; Wed, 13 Mar 2024
- 14:27:22 +0000
-From: Chris Laplante <Chris.Laplante@lairdconnect.com>
-To: "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>
-CC: Chris Laplante <Chris.Laplante@lairdconnect.com>
-Subject: Concurrent Peripheral and Central Roles
-Thread-Topic: Concurrent Peripheral and Central Roles
-Thread-Index: AQHadVKP/Sk6SiRdkkOOc4pRWv18Ww==
-Date: Wed, 13 Mar 2024 14:27:22 +0000
-Message-ID:
- <PH7PR14MB5300AF1826295555381F300DFB2A2@PH7PR14MB5300.namprd14.prod.outlook.com>
-References:
- <DM6PR14MB387122AE48F0A1870EDED496FB9C9@DM6PR14MB3871.namprd14.prod.outlook.com>
-In-Reply-To:
- <DM6PR14MB387122AE48F0A1870EDED496FB9C9@DM6PR14MB3871.namprd14.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=lairdconnect.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH7PR14MB5300:EE_|PH7PR14MB5781:EE_
-x-ms-office365-filtering-correlation-id: 4765f1d2-2817-43b4-110f-08dc4369b251
-x-ms-exchange-atpmessageproperties: SA
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- Fdws77orlj0fdzNVXxyyAtTknsW5q4ZCePZkCtXMVPHYvVLU3BZoX+vTAQaHHAj6XqYUst2nrAcE7HWnSWHWuyrkOL2PGCJSzf2uGMdU60DZxpnVBt355vAippz3lhH1Z7DFeQFZ5qBzKuvv750qWkv2SWSoRIrQZ8NdVc2hDEX9JKPp2Yq3ZOTo9RLBSHIv7zMpYStyKMAkXdYo9jGeDX+9lfWT3HLq/PwzaDuEtapwUAjPOhd2VC909RGkNBuDPr4tceOkgVD3Tbfv95Z9xcay49mciZiDmaJnXZ0qysiYzecQC+u0hKpN+zoZCVnlwF6ZHVFRPQpF1lE+D5/+Mqbp5e2Nwn9MNr1vftTAvPyzU1eE4tp7yRQ/73YotDYBOcrcglvgz43qGGt45a5wiqbwcn8hEAAhcsqFX3a//kIhPlokY9W3wPnXC+B//ScSjHWE20ta+XOD/IKYbSn2/uQCvHYs+lOeGh2KGoD5aZh0D12xErsHCf43uwU+Gjh4oVWLW9bMv6D2uhpS3DYwqlu6m8yZvq6qdqkuzL/gKDv7PDzAbZ39E1awIkP0SbKdK59/No4F8ImwK/8RROcU0QzEupRfL6RY/OPkJ0JDXwAXbIEv1SIXpqaj4tk5tlLVtXJmthwaQ2AoN+Ngf79ESr4PtdmQSjfgl00SD7x6PXgUSSDR8gKbmy+zTGafSXuKx5PkwM4cC8vhFvEpL/EF/0SXAaGvYt+GxkJztYP/fU8=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR14MB5300.namprd14.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(38070700009);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?YfLUdZiZzg1QocdPtXFxeo/tu+2X7qN/aSrCLrNtyu/+z1bq9FnqMbFue2U/?=
- =?us-ascii?Q?pdYDZ3xZGRUB3kHCAkq4vY+PTBVosTJYTXb1LKkTuQmr8hpfNk16US2e0MQq?=
- =?us-ascii?Q?ZIRXlRKU2gppGV22OGv4DKX18hlG2G3N01kre2eNLd1EfTCpIzF5H5AmSQI3?=
- =?us-ascii?Q?cuthvtL2uU3R42mvC5HakZCwd7/z6s2xUfifz95Wa9yQ5XJ7oCcaI9s6hgH+?=
- =?us-ascii?Q?CWpviBFHA5RdeToN66O7BU7awsOftrqIAFjYEwMS05blo9TkkLckEbkdN1Ow?=
- =?us-ascii?Q?EZwPGhd9HAUiG25yunrQa5xPNxQwJflHPdeCUdSMLAIoHAyUealSyDIf1mvY?=
- =?us-ascii?Q?4lXlAQ5EXE49cfk9g1XWPRAX19wvYDys+DIVxJKC3N4qiwLWFMHH1F8rPPjg?=
- =?us-ascii?Q?ZMbPB6h2ltVGKndf6hUfmf15VkIgUR/1b9DdNMKbbDBEaJTl8U+pa7CtvWhh?=
- =?us-ascii?Q?zuHwNfWEgnoFpUgLJRfTFS1rGMdFBwWclkYRHXLnDyvdd6CkXlFjS5TcAnOf?=
- =?us-ascii?Q?lNBxn7g4uWTTxdkgUuffMYlaFAnz/7ZJ20+l1946ZGECpdOnoScarhyW4TPj?=
- =?us-ascii?Q?V+hddUdTfFvbKe+s19e1rCP15rYMdm0yqnNpD855lknrC69N5a5X1mR1NWOq?=
- =?us-ascii?Q?fZv5+4llrn4HNNp/jFqK0GAsdEJDQaO+4zishyTWJUyPoy2jxXjDqyvS69Bi?=
- =?us-ascii?Q?9FaDQbwDEfXzh4q/PyuP2xUW0iZCva/iEWg6Z5Er6M6N5Ti5LfnSD4DgPCjy?=
- =?us-ascii?Q?5CQcFQ9SiSFaPEcci30u10EIOS8SaK0Ou/PyBc/hzbZuHBmy4omuNCvpgIhI?=
- =?us-ascii?Q?6he9bYQVlvwLecKAx4naHxgyIlI97VoS9CRnbsj8D8VWIeZiWm26hReNQxTW?=
- =?us-ascii?Q?fx+HYbZpYwodld52oJRiiwPIOxwU6m1AKX11NW/JvAT4uYC3oayQZKpC6g5e?=
- =?us-ascii?Q?WuEHFFWnhJOUrqE1kbq14xy4+EV1QUIQl2EY2vtPAGfvmw1Ysv0763TH6THC?=
- =?us-ascii?Q?mWWPthqTjnxi3URHeBU6aJx+UBtdfqQjQrF4eIgK71BIXOkilc6b3+M5IUFK?=
- =?us-ascii?Q?R+3j++XmP4D6L3cVfeyQVEDPYbsgSeqf5Wf/ZuxNHZOtJVXr1OzloNVQ0SCS?=
- =?us-ascii?Q?JeuMpOVUMn3N3FiCHSN3XpKib++pekWfvDQwpumxFGvx8tGsvDsKORJv/NM2?=
- =?us-ascii?Q?6JPJkg7WBw1fo/NHsRfEKUGzo2gFZiobKxZC5Z+485e/u68zObE+4ijUm/1p?=
- =?us-ascii?Q?+xnnoLnmn+Pg8kiNLyDw8lv5VWwOBbLknxpJc+zjv+H/VQG47Do9BKCs5nee?=
- =?us-ascii?Q?WB7GE6FA27yS4N/eblg4jUDKJ9lZ4BzDlLrkKlrC0Buljg19b4yQ9NnSIM3V?=
- =?us-ascii?Q?QJvrjunixqUnSa+mrFHJJk6mNF9kzpkVkJHIFekcyxtJu/HfQ1RN2LS5u7IR?=
- =?us-ascii?Q?jxqYkWu4cUz74lrCasV/muz3rgjQkXfPtT5XpYrC/cQB9UUfNuLuhbbe14W3?=
- =?us-ascii?Q?EhucN0asA/bMOuwoL4glFchhgMlpVFT93SKZX9CFQrcAv9FRin/vx6rkXwgc?=
- =?us-ascii?Q?0v4bv8+2RjSoLqGW5C0e0N1dhvAQ4km3GH92k8hStfjWJ30BNmTS2NtupFad?=
- =?us-ascii?Q?o+JMl+5QIzbzeyvOgoqyIIhHaQxV4T05MC2AgS5CB0Wwiole6+7ByRwqFuHt?=
- =?us-ascii?Q?csAUeQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="grLc/znx"
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-42f2009e559so8745721cf.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Mar 2024 08:07:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710342428; x=1710947228; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=lCfHqTTsLIjf6PahHwoSB6au2rlpK/wHDjPqDhpqcc4=;
+        b=grLc/znxAi/g0/pw+36vNdvEFn2DGU7kv7hXS0XZ/ugNKp279FyXMgPwYNGEbSE0X1
+         5ZvOq4oRuUprJLBxj8cxPjWXiZogEX0fIHve0Ppvjt0ZoqTS1aLR+/hXrRc30ey86Eos
+         yHfK7dXVu7/BMPM8x/nOOQEX9iZC950OjjtyoSgdNtyVziwkC1SxSMmmtOBPx0Xo9zKi
+         +Iyub0vzV0KliefZUNkucsF9r1v9/vv4RxqAAFvvlmyZTxcUHEmeCSEQezqTtVWlmhfa
+         Uv0JV8I3PQd/8DuczjGAGnuhxSu7L2l5OnXBWF7noK5vB8GP16QfdZqwEVdMZ46XeVo7
+         SOTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710342428; x=1710947228;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lCfHqTTsLIjf6PahHwoSB6au2rlpK/wHDjPqDhpqcc4=;
+        b=jB3NAoIPs3/UPCv7YkUhOCdUrgrIJhZXA81aXJ1OY1Nzx32y5x8X1fYtaAUTFzVc4W
+         wI3oAXsYBOfMM2w/PBw+6eoIx1YD15mUI+aLDo15FoCgn8mgjqLMmWKi6jaMpexJMoX0
+         uCDWzxguDDQqGQ1gNBI5ZNiPs7OzEK1ImeIj5/oor60Os4BABLde2bHbZIdz95AAmjj0
+         6k+Eo58DnK35nP5SVIE1bGKWEiVS6rOfL+Wv8rxpzj/jxOF0OxKDFCnClxXBNWEXkaIH
+         Xb2RB2+ojdkgjEvFQL3HocQpl4AGy4LdtcimGfWhSlITY/qKuoMYA6D8Y/GT3ji4JTyy
+         dV0w==
+X-Gm-Message-State: AOJu0YwnzGXWsZott1R3/VC/iGFNpPXI7aeKRe3QCo16Z/9v6xoGv1jY
+	cIgGyV2WD2WOqVF7JHzRv24JRdGtUQaEintqc1Lp3YNxCru3iR9Rw1v6+g5k
+X-Google-Smtp-Source: AGHT+IGh2d7MdnJYdxNLeVMl8E4WCd45z7Qrb5JaEpcHtYJNKE/M84WzOv2fq0vC2gicAFafd9nPhg==
+X-Received: by 2002:a05:6214:2b0a:b0:68f:f859:ee06 with SMTP id jx10-20020a0562142b0a00b0068ff859ee06mr175651qvb.12.1710342428432;
+        Wed, 13 Mar 2024 08:07:08 -0700 (PDT)
+Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id bi47-20020a05612218af00b004cd29aaccd6sm1205610vkb.2.2024.03.13.08.07.07
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Mar 2024 08:07:07 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2 1/4] client/player: Split unicast and broadcast presets
+Date: Wed, 13 Mar 2024 11:07:03 -0400
+Message-ID: <20240313150706.1279036-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: lairdconnect.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR14MB5300.namprd14.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4765f1d2-2817-43b4-110f-08dc4369b251
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Mar 2024 14:27:22.1749
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a67ad7fe-2b14-4d12-b58f-bb509b58f338
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: EzNzwUXnBjtnr0ZyWg4kHDCkw0pt8QibYFF3J8K8JHM/yqmrCnD3RXET/wexQ89z0Fkp5ewyUnFvB7Q5BmaStp37t8KnvsuWOFDrF4eqpYk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR14MB5781
+Content-Transfer-Encoding: 8bit
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Does the BlueZ stack support concurrent peripheral and Central roles. I don=
-'t think it is supported but was hoping for more details.
+Although their name matches unicast and broadcast are not actually the
+same when it comes to RTN and Max Latency, so this splits their settings
+into 2 presets tables and fix the values for broadcast.
+---
+ client/player.c | 115 +++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 110 insertions(+), 5 deletions(-)
 
-Thanks in advance.
-Chris
-THE INFORMATION CONTAINED IN THIS DOCUMENT IS OF A PROPRIETARY NATURE AND I=
-S INTENDED TO BE KEPT CONFIDENTIAL BETWEEN THE SENDER AND THE INTENDED RECI=
-PIENT. IT MAY NOT BE REPRODUCED OR USED WITHOUT EXPRESS WRITTEN PERMISSION =
-OF EZURIO
+diff --git a/client/player.c b/client/player.c
+index a40bf66e3967..cb771447bf4b 100644
+--- a/client/player.c
++++ b/client/player.c
+@@ -1403,7 +1403,7 @@ static struct codec_preset sbc_presets[] = {
+ 		.target_latency = 0x03, \
+ 	}
+ 
+-static struct codec_preset lc3_presets[] = {
++static struct codec_preset lc3_ucast_presets[] = {
+ 	/* Table 4.43: QoS configuration support setting requirements */
+ 	LC3_PRESET("8_1_1",
+ 			LC3_PRESET_8KHZ(LC3_CONFIG_DURATION_7_5, 26u),
+@@ -1565,6 +1565,111 @@ static struct codec_preset lc3_presets[] = {
+ 			LC3_10_UNFRAMED(2 * 120u, 1u, 20u, 10000u)),
+ };
+ 
++static struct codec_preset lc3_bcast_presets[] = {
++	/* Table 6.4: Broadcast Audio Stream configuration support requirements
++	 * for the Broadcast Source and Broadcast Sink
++	 */
++	LC3_PRESET("8_1_1",
++			LC3_PRESET_8KHZ(LC3_CONFIG_DURATION_7_5, 26u),
++			LC3_7_5_UNFRAMED(26u, 2u, 8u, 40000u)),
++	LC3_PRESET("8_2_1",
++			LC3_PRESET_8KHZ(LC3_CONFIG_DURATION_10, 30u),
++			LC3_10_UNFRAMED(30u, 2u, 10u, 40000u)),
++	LC3_PRESET("16_1_1",
++			LC3_PRESET_16KHZ(LC3_CONFIG_DURATION_7_5, 30u),
++			LC3_7_5_UNFRAMED(30u, 2u, 8u, 40000u)),
++	LC3_PRESET("16_2_1",
++			LC3_PRESET_16KHZ(LC3_CONFIG_DURATION_10, 40u),
++			LC3_10_UNFRAMED(40u, 2u, 10u, 40000u)),
++	LC3_PRESET("24_1_1",
++			LC3_PRESET_24KHZ(LC3_CONFIG_DURATION_7_5, 45u),
++			LC3_7_5_UNFRAMED(45u, 2u, 8u, 40000u)),
++	LC3_PRESET("24_2_1",
++			LC3_PRESET_24KHZ(LC3_CONFIG_DURATION_10, 60u),
++			LC3_10_UNFRAMED(60u, 2u, 10u, 40000u)),
++	LC3_PRESET("32_1_1",
++			LC3_PRESET_32KHZ(LC3_CONFIG_DURATION_7_5, 60u),
++			LC3_7_5_UNFRAMED(60u, 2u, 8u, 40000u)),
++	LC3_PRESET("32_2_1",
++			LC3_PRESET_32KHZ(LC3_CONFIG_DURATION_10, 80u),
++			LC3_10_UNFRAMED(80u, 2u, 10u, 40000u)),
++	LC3_PRESET("44_1_1",
++			LC3_PRESET_44KHZ(LC3_CONFIG_DURATION_7_5, 98u),
++			QOS_FRAMED_2M(8163u, 98u, 4u, 24u, 40000u)),
++	LC3_PRESET("44_2_1",
++			LC3_PRESET_44KHZ(LC3_CONFIG_DURATION_10, 130u),
++			QOS_FRAMED_2M(10884u, 130u, 4u, 31u, 40000u)),
++	LC3_PRESET("48_1_1",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_7_5, 75u),
++			LC3_7_5_UNFRAMED(75u, 4u, 15u, 40000u)),
++	LC3_PRESET("48_2_1",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_10, 100u),
++			LC3_10_UNFRAMED(100u, 4u, 20u, 40000u)),
++	LC3_PRESET("48_3_1",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_7_5, 90u),
++			LC3_7_5_UNFRAMED(90u, 4u, 15u, 40000u)),
++	LC3_PRESET("48_4_1",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_10, 120u),
++			LC3_10_UNFRAMED(120u, 4u, 20u, 40000u)),
++	LC3_PRESET("48_5_1",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_7_5, 117u),
++			LC3_7_5_UNFRAMED(117u, 4u, 15u, 40000u)),
++	LC3_PRESET("48_6_1",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_10, 155u),
++			LC3_10_UNFRAMED(155u, 4u, 20u, 40000u)),
++	/* Broadcast Audio Stream configuration settings for high-reliability
++	 * audio data.
++	 */
++	LC3_PRESET_HR("8_1_2",
++			LC3_PRESET_8KHZ(LC3_CONFIG_DURATION_7_5, 26u),
++			LC3_7_5_UNFRAMED(26u, 4u, 45u, 40000u)),
++	LC3_PRESET_HR("8_2_2",
++			LC3_PRESET_8KHZ(LC3_CONFIG_DURATION_10, 30u),
++			LC3_10_UNFRAMED(30u, 4u, 60u, 40000u)),
++	LC3_PRESET_HR("16_1_2",
++			LC3_PRESET_16KHZ(LC3_CONFIG_DURATION_7_5, 30u),
++			LC3_7_5_UNFRAMED(30u, 4u, 45u, 40000u)),
++	LC3_PRESET_HR("16_2_2",
++			LC3_PRESET_16KHZ(LC3_CONFIG_DURATION_10, 40u),
++			LC3_10_UNFRAMED(40u, 4u, 60u, 40000u)),
++	LC3_PRESET_HR("24_1_2",
++			LC3_PRESET_24KHZ(LC3_CONFIG_DURATION_7_5, 45u),
++			LC3_7_5_UNFRAMED(45u, 4u, 45u, 40000u)),
++	LC3_PRESET_HR("24_2_2",
++			LC3_PRESET_24KHZ(LC3_CONFIG_DURATION_10, 60u),
++			LC3_10_UNFRAMED(60u, 4u, 60u, 40000u)),
++	LC3_PRESET_HR("32_1_2",
++			LC3_PRESET_32KHZ(LC3_CONFIG_DURATION_7_5, 60u),
++			LC3_7_5_UNFRAMED(60u, 4u, 45u, 40000u)),
++	LC3_PRESET_HR("32_2_2",
++			LC3_PRESET_32KHZ(LC3_CONFIG_DURATION_10, 80u),
++			LC3_10_UNFRAMED(80u, 4u, 60u, 40000u)),
++	LC3_PRESET_HR("44_1_2",
++			LC3_PRESET_44KHZ(LC3_CONFIG_DURATION_7_5, 98u),
++			QOS_FRAMED_2M(8163u, 4u, 13u, 54u, 40000u)),
++	LC3_PRESET_HR("44_2_2",
++			LC3_PRESET_44KHZ(LC3_CONFIG_DURATION_10, 130u),
++			QOS_FRAMED_2M(10884u, 130u, 4u, 60u, 40000u)),
++	LC3_PRESET_HR("48_1_2",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_7_5, 75u),
++			LC3_7_5_UNFRAMED(75u, 4u, 50u, 40000u)),
++	LC3_PRESET_HR("48_2_2",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_10, 100u),
++			LC3_10_UNFRAMED(100u, 4u, 65u, 40000u)),
++	LC3_PRESET_HR("48_3_2",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_7_5, 90u),
++			LC3_7_5_UNFRAMED(90u, 4u, 50u, 40000u)),
++	LC3_PRESET_HR("48_4_2",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_10, 120u),
++			LC3_10_UNFRAMED(120u, 4u, 65u, 40000u)),
++	LC3_PRESET_HR("48_5_2",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_7_5, 117u),
++			LC3_7_5_UNFRAMED(117u, 4u, 50u, 40000u)),
++	LC3_PRESET_HR("48_6_2",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_10, 155u),
++			LC3_10_UNFRAMED(155u, 4u, 65u, 40000u)),
++};
++
+ static void print_ltv(const char *str, void *user_data)
+ {
+ 	const char *label = user_data;
+@@ -1615,10 +1720,10 @@ static struct preset {
+ } presets[] = {
+ 	PRESET(A2DP_SOURCE_UUID, A2DP_CODEC_SBC, sbc_presets, 6),
+ 	PRESET(A2DP_SINK_UUID, A2DP_CODEC_SBC, sbc_presets, 6),
+-	PRESET(PAC_SINK_UUID, LC3_ID, lc3_presets, 3),
+-	PRESET(PAC_SOURCE_UUID, LC3_ID, lc3_presets, 3),
+-	PRESET(BCAA_SERVICE_UUID,  LC3_ID, lc3_presets, 3),
+-	PRESET(BAA_SERVICE_UUID,  LC3_ID, lc3_presets, 3),
++	PRESET(PAC_SINK_UUID, LC3_ID, lc3_ucast_presets, 3),
++	PRESET(PAC_SOURCE_UUID, LC3_ID, lc3_ucast_presets, 3),
++	PRESET(BCAA_SERVICE_UUID,  LC3_ID, lc3_bcast_presets, 3),
++	PRESET(BAA_SERVICE_UUID,  LC3_ID, lc3_bcast_presets, 3),
+ };
+ 
+ static void parse_vendor_codec(const char *codec, uint16_t *vid, uint16_t *cid)
+-- 
+2.43.0
+
