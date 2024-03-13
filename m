@@ -1,81 +1,119 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31EC9523C
-	for <linux-bluetooth@vger.kernel.org>; Wed, 13 Mar 2024 15:20:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B1FE4779E
+	for <linux-bluetooth@vger.kernel.org>; Wed, 13 Mar 2024 15:32:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710343232; cv=none; b=WqI3igXk2qapSPV2dFtzpcdT7arT7Jpv9BsbZ/nPnR18vjOo2jfpgv9Zr8VqzINswqKxCiI7pZFcquRO0cIVJVWVxRYG6ZLN/35AX2sCJPbQoMejWLIv31eyTz0VXye0n1VXK+yEyQlf9OFM2BwJPGhXTgTsNFATHDEhTCOtx0c=
+	t=1710343927; cv=none; b=UIq686vesfvnNAYgIeGJ3j8TN4pzmo0+Aw9Xq0PIeLb4q5Ld0L2DNEOuVulsE/vRwuNl+vTAwvlrpXVxbFuILoQEfMa/chLMNra7tJPTWDODIFm6wJcAdhJVqcFkTA/ucNC3o0zQGenvlNmyXHMcyz3RUZrOLDlZCYvBPlIkUa4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710343232; c=relaxed/simple;
-	bh=PFu4WzBjUmqptacNnEUjCvRmxowGdkZFlJTpQMJAr0Y=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JmWLNF7+ugVFqdvURCMkQyyPvgOCjASX3u7+KZ+ezh6/L43YsCSTyPVlj1YIPwzMLjWrR3D+aFUVm76OnHvqrQdsN8dbv8v41U1/nwMrNkqddXFRtil01+TsqNZ002jBr5uqY7YSQleJDJv57Tme+c9oG1GVKd7lf++FnkYtRIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TJN6Ry+s; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1710343927; c=relaxed/simple;
+	bh=/0dcY+0Ln+Pl0w3iXhii7Fbd3IzKB7GpbAmAa+0CLx0=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=DXgeyscupd6MDwZTr2JPCjxibYXoDqBHk4a7WypOFzaGGDVZ473pOOdtGXTSGuA3c5RTMye3uLTnVNzWcvSHMCWjt0QdOpvHph21f7utYK8VIxeckBmiqg/cDAaoPkCFIyhIVnd0rO/c8ORKZfHdUNLQFdVGPKKtqwzyblxSO/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=BZZTDBo5; arc=none smtp.client-ip=192.30.252.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TJN6Ry+s"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id AA12EC43390;
-	Wed, 13 Mar 2024 15:20:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710343230;
-	bh=PFu4WzBjUmqptacNnEUjCvRmxowGdkZFlJTpQMJAr0Y=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TJN6Ry+sQnuu23FIYEogld1uwmByovDs2XkPiqTN0An7ux7MvNeFaxDwTnERWIMxK
-	 yhlTJQCA8VyggvT4yYhoT4cKJebUfZYVHKH23GWcgTdZYyypfvTO5tDAnFsoiqz20Y
-	 SDhuwhl3Yj1+ZEsEUScrjoXhKphSzAJ7s2EHIot798gLciGRBNnVeWzNGWN4cGdVaW
-	 cRLENOwFpBy1p0btGk5q+JX0qQ39owAQEYkqVuVxFrksRSKt53+mxI74d6UZahin/3
-	 qECL+wrg1wcwXZAqrB3jITXck5Mng+gPmEsedpwHCL0sWK9+9/Ekei1PSnGD0bDtIy
-	 OaYUbVSjj3jHA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 92E3ED9505F;
-	Wed, 13 Mar 2024 15:20:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="BZZTDBo5"
+Received: from github.com (hubbernetes-node-21e7085.ac4-iad.github.net [10.52.125.27])
+	by smtp.github.com (Postfix) with ESMTPA id 6C473641100
+	for <linux-bluetooth@vger.kernel.org>; Wed, 13 Mar 2024 08:32:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1710343925;
+	bh=khOZX8ci8IzFeeFNpXBmc5nj5iQpgR/wkCULIk2scoY=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=BZZTDBo5/gy/kcQa/cXnPgRvTVHlreDKD/Vs4z/BP2lF7qunZNuuJf9+FHRv6EW+/
+	 npeHEEGXFq/BbPsPyNunvgSZMXmMf71SxeJymZuLwv/njzPrcFsypdXW4iSTv8HGbK
+	 wBBLY6PqODl9ORFuUG0hSATJ1aJhj6rQM/Cszd3o=
+Date: Wed, 13 Mar 2024 08:32:05 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/c9dddb-f5fecf@github.com>
+Subject: [bluez/bluez] 92ed63: shared/uhid: Add dedicated functions for each
+ UHID...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v4 1/4] shared/uhid: Add dedicated functions for each
- UHID opcode
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <171034323059.496.16490811193100411222.git-patchwork-notify@kernel.org>
-Date: Wed, 13 Mar 2024 15:20:30 +0000
-References: <20240311224327.1023070-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240311224327.1023070-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 92ed637ab2bc44b812fd8c7bff5b5f41fcc48255
+      https://github.com/bluez/bluez/commit/92ed637ab2bc44b812fd8c7bff5b5f41fcc48255
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-03-11 (Mon, 11 Mar 2024)
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M src/shared/uhid.c
+    M src/shared/uhid.h
 
-On Mon, 11 Mar 2024 18:43:24 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This adds bt_uhid_create which uses UHID_CREATE2 and tracks progress of
-> when the device is ready to receive events and in the meantime queues
-> them while waiting for UHID_START and other dedicated functions for each
-> UHID opcode so users don't need to build each command manually.
-> 
-> [...]
+  Log Message:
+  -----------
+  shared/uhid: Add dedicated functions for each UHID opcode
 
-Here is the summary with links:
-  - [BlueZ,v4,1/4] shared/uhid: Add dedicated functions for each UHID opcode
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=92ed637ab2bc
-  - [BlueZ,v4,2/4] hog-lib: Use bt_uhid functions
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=256d0b594d04
-  - [BlueZ,v4,3/4] input/device: Use bt_uhid functions
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c0c9e462be46
-  - [BlueZ,v4,4/4] test-uhid: Test bt_uhid functions
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=f5fecf037b1e
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+This adds bt_uhid_create which uses UHID_CREATE2 and tracks progress of
+when the device is ready to receive events and in the meantime queues
+them while waiting for UHID_START and other dedicated functions for each
+UHID opcode so users don't need to build each command manually.
 
 
+  Commit: 256d0b594d044222975f55e3b2d02990e0f88f87
+      https://github.com/bluez/bluez/commit/256d0b594d044222975f55e3b2d02990e0f88f87
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-03-11 (Mon, 11 Mar 2024)
+
+  Changed paths:
+    M profiles/input/hog-lib.c
+
+  Log Message:
+  -----------
+  hog-lib: Use bt_uhid functions
+
+This makes use of bt_uhid function instead of directly submitting
+events directly using bt_uhid_send.
+
+
+  Commit: c0c9e462be465ae3e9458256636f10f4d6acbedb
+      https://github.com/bluez/bluez/commit/c0c9e462be465ae3e9458256636f10f4d6acbedb
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-03-11 (Mon, 11 Mar 2024)
+
+  Changed paths:
+    M profiles/input/device.c
+
+  Log Message:
+  -----------
+  input/device: Use bt_uhid functions
+
+This makes use of bt_uhid function instead of directly submitting
+events directly using bt_uhid_send.
+
+Fixes: https://github.com/bluez/bluez/issues/771
+
+
+  Commit: f5fecf037b1ea31612cb0226cc2634994a4671c4
+      https://github.com/bluez/bluez/commit/f5fecf037b1ea31612cb0226cc2634994a4671c4
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-03-11 (Mon, 11 Mar 2024)
+
+  Changed paths:
+    M unit/test-uhid.c
+
+  Log Message:
+  -----------
+  test-uhid: Test bt_uhid functions
+
+This tests bt_uhid_create, bt_uhid_input and bt_uhid_destroy instead of
+directly submitting UHID_CREATE, UHID_INPUT and UHID_DESTROY.
+
+
+Compare: https://github.com/bluez/bluez/compare/c9dddb642663...f5fecf037b1e
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
