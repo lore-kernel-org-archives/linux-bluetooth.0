@@ -1,195 +1,167 @@
-Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53A4720DDB
-	for <linux-bluetooth@vger.kernel.org>; Wed, 13 Mar 2024 21:19:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF2242260B
+	for <linux-bluetooth@vger.kernel.org>; Wed, 13 Mar 2024 23:49:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710364789; cv=none; b=P/jEValgTk4RvmYLNaoDCKt+DDPKvTJy8Ij7WA2wVKGe2zKdShVk/HYuaYB+kr53G/F2RQsD3s0ldfrtzXXlWBvO9gGuTFkJ8dEdUK1vWgIE0WuTOZmsWdthxikh73tMUIEa//muLCS8i9pk2RpVuqtg8FXY/BCdaAbCmSFoia4=
+	t=1710373754; cv=none; b=m8D5rtmirDNNvjrU94YsYI6F28QchfVccvZgxW2hv3CTyvjHWNp9VEijya9hXEwM1JGMApNYFCprZoZFNYSH4ll/118miFhSLrDAg0AXtcWm/goECb8ZTuKmYufLKkALGn/I0epwU++4SsU3ZK+73ITbBi1zWRj74cyfH3+Xrjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710364789; c=relaxed/simple;
-	bh=b7mIt2us4bSHKZSaNMsSZb63MhUTFWf6H01vjL8E7Fs=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=cSMFKxMWdeV3RNSeGgrqV1JRjCZF6V9Arh92gmV+8VMjOzIHzqz9kGZVN9xJvFgSqu5zqwcGvGdCs3FENhaoRMA11c/KBUuqbuyvC0FHYiaM2HpFNB5ulm5IemSrqQFdo4+iFCB8Ko2GlXg0EqAIO3ppVLleSs6LgRh34hnckFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V1IZfjW0; arc=none smtp.client-ip=209.85.221.176
+	s=arc-20240116; t=1710373754; c=relaxed/simple;
+	bh=j3hmTbkQrJ4C3xsA9nirlbjQtoC938A9rbJAMbGilVk=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=bXQlhNBqLUxu4PWANh4YbBvm3+bq56c6dssEXYZoyDvJ6odIDEJxY5mweDxwYv54N+Q1EsQ3mBs9FoBQWRSVv2lVQeqPsM0McjwMmrnkwNltnN+QdSYTlRQTQuEKZzfjgqEwQ0zH8D55B8Vt9ALwhAU6siaiQc7GqUqauLrFSVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TkG/YUF/; arc=none smtp.client-ip=209.85.160.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V1IZfjW0"
-Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-4d41b1200deso99651e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Mar 2024 14:19:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TkG/YUF/"
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-42f1d354005so1667071cf.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Mar 2024 16:49:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710364786; x=1710969586; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=E7M6bG98oxEt39U36FkqUwvU3XdWcCNWkTEfwP8528Q=;
-        b=V1IZfjW0SGP3+eDHAu9ba9b2HNz8xhq1i1YUGhMBfPD3jzm61XjXhU7C+JL8HYONRM
-         ZhfqpGILwRGlpCSuuaF/JLc0LyaWIT23LkFYLjkdKCRoNEB/gbBW8oNILtSATO5Qdm1y
-         lFfAcxelKYVGYdnUqX1FhPWRqm8jDfgd60i9/++wiKb/K8Z78TgF4tK8YFBAW3QMX0z/
-         IaH/tN8A8sW8KrXs0fK01CpItQ6g7Gsj4ax2+QME//AzezZG8o3usJps4hI5eF6gK7a4
-         0uA+K5+Qup4c36pl4QS8JTY5SnTMuQQyDNe4mH7zZBK/m406ImolC+j5jAWVyAibDMdc
-         krbw==
+        d=gmail.com; s=20230601; t=1710373751; x=1710978551; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=j3hmTbkQrJ4C3xsA9nirlbjQtoC938A9rbJAMbGilVk=;
+        b=TkG/YUF/X3JfkGbYuDDV8oFRXWUUVDASEKt7/7qqdaR6h1C7snVMJJbZpZ3UVSBI0i
+         Pha+vFmruwjm8F3h6wTptJQr4mP5rLIR7snZnMXBMhE4zL4w3P99rHqjI5PmSuSkeJJ7
+         7r8iNJlIWQtAm1cu1UkdXWFKRSdBsxFUrSiuctzVQ7ovLPgDtBqfECCNQ+7KxvunQeLo
+         XqHFKQ0gMmt4zO+QPn915wUo10tgM4Wk/hXSL/VafJemdbuPtZ/ybTvmjyQ9HtUWL87W
+         98zCX2U0DeUyuL10KdI8tm7GGgHllrYHcJi1h3biFVuENzvIWS/uJUSJEMXRAA2qnF9I
+         DuaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710364786; x=1710969586;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=E7M6bG98oxEt39U36FkqUwvU3XdWcCNWkTEfwP8528Q=;
-        b=Dhf6fqfGUNwnNhGK4jq7ByVdTN8+Pqj2pL+AJXnxYUcmtZqPDjcfLO1gyLZRKMv7W1
-         DI0iw/LQ7lPykkWZKcCyFrK1DHdxCH62S1HNuKR4vheAeCV1hfpDue/soTbpRaIgubWd
-         nicOfpiAUWoelVddnyGYvOmhsQgqJvNVjL3/Tl7Y5cX0xWiBXshhYCpb9TKjaJIr70wC
-         OfjOw4+17jx9KZWiiv7RfhFR8LXuaGCCZ9xrcBRbjPjPMPwddrJcVr1y9yeCVUpqBjIx
-         QFpimbJDJlJ7yF6CgfrK5kIGAqQ06ztqjd4NLLtEYa9Xn6umQ55GiVsOchX+4Of0sxUg
-         1mrw==
-X-Gm-Message-State: AOJu0YyOj6o7B6CDE/fwGLKqfwFb5PvR7oEIz/GbDJepo9zIBvfsW4dN
-	hSuWJfrj78cTqKXioFh2W7jaNSXc3t4rJKbUqTM7fCgauo6rOsxPnJEzARDV
-X-Google-Smtp-Source: AGHT+IFGdBNAz/hXM/uzRaRa6vIuQlPMAAeAP125e6JdoPUy9lGKdRu29J+4OBpyjLPN6eJwBqlG4Q==
-X-Received: by 2002:ac5:cdd8:0:b0:4d4:872:c68a with SMTP id u24-20020ac5cdd8000000b004d40872c68amr139360vkn.1.1710364786403;
-        Wed, 13 Mar 2024 14:19:46 -0700 (PDT)
-Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 15-20020a056122080f00b004d41b9843e6sm30940vkj.12.2024.03.13.14.19.45
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1710373751; x=1710978551;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=j3hmTbkQrJ4C3xsA9nirlbjQtoC938A9rbJAMbGilVk=;
+        b=ZcFmqQ0hnQujG5KAmc8xgmvNbNeY4PcYWauwYCeWYqVzKhF4VRhogLM8bCx+EFqs27
+         1Idb2jwRHszRniGLy3/h++4ytL4AsZsxsXEqd83ldlH5ujRmpGGjvIulakXNwvzrKpBh
+         WHvA4sel90Zhnpi//Kyko5qpwbXVrJfqY0blb+pt3d285sNuFCnd+MWfc2wsTitEokNG
+         6MgR7DYHQ6KUn+ensugzEolIuGS/dQIGPm6X3MkgBV1OACnktWowH3GkflilN4yY20mh
+         EGt/rj8keuRQ/boscQWB7Gvfg4Y8CEqto4SBdw+xGN/kWtPy+A0H5c1zTGBDdT+BuUgS
+         6MXA==
+X-Gm-Message-State: AOJu0Yz8n37drdmNX/oCozcBuZR0X1jIQYBb5hl2ENEET9ooT/hFOHu+
+	F81ZFH8rzIFFSAyyJ4nx+gyegG1gWqGjGNRWAnKwuWmnDXPMHJ2Xp5qf+ul6
+X-Google-Smtp-Source: AGHT+IHafXXshI+OpMhptlqH3vvYmQrm9jjxdaXA+ZasAWL2MRcRZsFrg5zfwD0o2I86COIprBF4sg==
+X-Received: by 2002:a0c:f10a:0:b0:690:d881:3b40 with SMTP id i10-20020a0cf10a000000b00690d8813b40mr254349qvl.11.1710373751475;
+        Wed, 13 Mar 2024 16:49:11 -0700 (PDT)
+Received: from [172.17.0.2] ([74.249.13.190])
+        by smtp.gmail.com with ESMTPSA id a12-20020a056214062c00b0068fef1264f6sm176129qvx.101.2024.03.13.16.49.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Mar 2024 14:19:45 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1] input/device: Force UHID_DESTROY on error
-Date: Wed, 13 Mar 2024 17:19:44 -0400
-Message-ID: <20240313211944.1440225-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Wed, 13 Mar 2024 16:49:11 -0700 (PDT)
+Message-ID: <65f23b77.050a0220.d6cb8.0c6c@mx.google.com>
+Date: Wed, 13 Mar 2024 16:49:11 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3242894383830598436=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v4,1/6] client/player: Split unicast and broadcast presets
+In-Reply-To: <20240313194400.1397477-1-luiz.dentz@gmail.com>
+References: <20240313194400.1397477-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============3242894383830598436==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-If we cannot sent a message back to the device destroy the UHID device
-since it is likely that the driver is trying to reach the remote device
-which is no longer connected.
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9ODM1MDgzCgotLS1U
+ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
+ICBGQUlMICAgICAgMy4zOCBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
+U1MgICAgICAxLjgzIHNlY29uZHMKQnVpbGRFbGwgICAgICAgICAgICAgICAgICAgICAgUEFTUyAg
+ICAgIDIzLjk4IHNlY29uZHMKQmx1ZXpNYWtlICAgICAgICAgICAgICAgICAgICAgUEFTUyAgICAg
+IDE2NjAuMzkgc2Vjb25kcwpNYWtlQ2hlY2sgICAgICAgICAgICAgICAgICAgICBGQUlMICAgICAg
+MTAuODggc2Vjb25kcwpNYWtlRGlzdGNoZWNrICAgICAgICAgICAgICAgICBGQUlMICAgICAgMzUu
+MjIgc2Vjb25kcwpDaGVja1ZhbGdyaW5kICAgICAgICAgICAgICAgICBGQUlMICAgICAgMjM1LjM2
+IHNlY29uZHMKQ2hlY2tTbWF0Y2ggICAgICAgICAgICAgICAgICAgUEFTUyAgICAgIDM0Ny4wNCBz
+ZWNvbmRzCmJsdWV6bWFrZWV4dGVsbCAgICAgICAgICAgICAgIFBBU1MgICAgICAxMTcuOTIgc2Vj
+b25kcwpJbmNyZW1lbnRhbEJ1aWxkICAgICAgICAgICAgICBQQVNTICAgICAgOTQ4Ni40NCBzZWNv
+bmRzClNjYW5CdWlsZCAgICAgICAgICAgICAgICAgICAgIFBBU1MgICAgICA5NzAuODEgc2Vjb25k
+cwoKRGV0YWlscwojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tQYXRj
+aCAtIEZBSUwKRGVzYzogUnVuIGNoZWNrcGF0Y2gucGwgc2NyaXB0Ck91dHB1dDoKW0JsdWVaLHY0
+LDIvNl0gY2xpZW50L3BsYXllcjogVXNlIG1hY3JvcyBmcm9tIGxjMy5oIHRvIGRlZmluZSBwcmVz
+ZXRzCldBUk5JTkc6UkVQRUFURURfV09SRDogUG9zc2libGUgcmVwZWF0ZWQgd29yZDogJ2ZvcicK
+Izk3OiAKVGhpcyBtYWtlcyB1c2Ugb2YgbWFjcm9zIGZvciBmb3IgbGMzLmggdG8gZGVmaW5lIHBy
+ZXNldCBjb25maWd1cmF0aW9uCgovZ2l0aHViL3dvcmtzcGFjZS9zcmMvc3JjLzEzNTkxODUxLnBh
+dGNoIHRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMzk3IGxpbmVzIGNoZWNrZWQKCk5PVEU6
+IEZvciBzb21lIG9mIHRoZSByZXBvcnRlZCBkZWZlY3RzLCBjaGVja3BhdGNoIG1heSBiZSBhYmxl
+IHRvCiAgICAgIG1lY2hhbmljYWxseSBjb252ZXJ0IHRvIHRoZSB0eXBpY2FsIHN0eWxlIHVzaW5n
+IC0tZml4IG9yIC0tZml4LWlucGxhY2UuCgovZ2l0aHViL3dvcmtzcGFjZS9zcmMvc3JjLzEzNTkx
+ODUxLnBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4KCk5PVEU6IElnbm9y
+ZWQgbWVzc2FnZSB0eXBlczogQ09NTUlUX01FU1NBR0UgQ09NUExFWF9NQUNSTyBDT05TVF9TVFJV
+Q1QgRklMRV9QQVRIX0NIQU5HRVMgTUlTU0lOR19TSUdOX09GRiBQUkVGRVJfUEFDS0VEIFNQRFhf
+TElDRU5TRV9UQUcgU1BMSVRfU1RSSU5HIFNTQ0FORl9UT19LU1RSVE8KCk5PVEU6IElmIGFueSBv
+ZiB0aGUgZXJyb3JzIGFyZSBmYWxzZSBwb3NpdGl2ZXMsIHBsZWFzZSByZXBvcnQKICAgICAgdGhl
+bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlIENIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoKW0Js
+dWVaLHY0LDMvNl0gc2hhcmVkL2xjMzogQWRkIGRlZmluaXRpb24gZm9yIGJyb2FkY2FzdCBjb25m
+aWd1cmF0aW9ucwpXQVJOSU5HOlBSRUZFUl9ERUZJTkVEX0FUVFJJQlVURV9NQUNSTzogUHJlZmVy
+IF9fcGFja2VkIG92ZXIgX19hdHRyaWJ1dGVfXygocGFja2VkKSkKIzEyNjogRklMRTogc3JjL3No
+YXJlZC9iYXAtZGVmcy5oOjE1OgorI2RlZmluZSBfX3BhY2tlZCBfX2F0dHJpYnV0ZV9fKChwYWNr
+ZWQpKQoKL2dpdGh1Yi93b3Jrc3BhY2Uvc3JjL3NyYy8xMzU5MTg1Mi5wYXRjaCB0b3RhbDogMCBl
+cnJvcnMsIDEgd2FybmluZ3MsIDg1MyBsaW5lcyBjaGVja2VkCgpOT1RFOiBGb3Igc29tZSBvZiB0
+aGUgcmVwb3J0ZWQgZGVmZWN0cywgY2hlY2twYXRjaCBtYXkgYmUgYWJsZSB0bwogICAgICBtZWNo
+YW5pY2FsbHkgY29udmVydCB0byB0aGUgdHlwaWNhbCBzdHlsZSB1c2luZyAtLWZpeCBvciAtLWZp
+eC1pbnBsYWNlLgoKL2dpdGh1Yi93b3Jrc3BhY2Uvc3JjL3NyYy8xMzU5MTg1Mi5wYXRjaCBoYXMg
+c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuCgpOT1RFOiBJZ25vcmVkIG1lc3NhZ2UgdHlw
+ZXM6IENPTU1JVF9NRVNTQUdFIENPTVBMRVhfTUFDUk8gQ09OU1RfU1RSVUNUIEZJTEVfUEFUSF9D
+SEFOR0VTIE1JU1NJTkdfU0lHTl9PRkYgUFJFRkVSX1BBQ0tFRCBTUERYX0xJQ0VOU0VfVEFHIFNQ
+TElUX1NUUklORyBTU0NBTkZfVE9fS1NUUlRPCgpOT1RFOiBJZiBhbnkgb2YgdGhlIGVycm9ycyBh
+cmUgZmFsc2UgcG9zaXRpdmVzLCBwbGVhc2UgcmVwb3J0CiAgICAgIHRoZW0gdG8gdGhlIG1haW50
+YWluZXIsIHNlZSBDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKCltCbHVlWix2NCw0LzZdIGNs
+aWVudC9wbGF5ZXI6IFVzZSBRT1MgbWFjcm9zIGZyb20gbGMzLmggdG8gZGVmaW5lIHByZXNldHMK
+V0FSTklORzpSRVBFQVRFRF9XT1JEOiBQb3NzaWJsZSByZXBlYXRlZCB3b3JkOiAnZm9yJwojOTc6
+IApUaGlzIG1ha2VzIHVzZSBvZiBRT1MgbWFjcm9zIGZvciBmb3IgbGMzLmggdG8gZGVmaW5lIHBy
+ZXNldAoKL2dpdGh1Yi93b3Jrc3BhY2Uvc3JjL3NyYy8xMzU5MTg1NC5wYXRjaCB0b3RhbDogMCBl
+cnJvcnMsIDEgd2FybmluZ3MsIDU5NyBsaW5lcyBjaGVja2VkCgpOT1RFOiBGb3Igc29tZSBvZiB0
+aGUgcmVwb3J0ZWQgZGVmZWN0cywgY2hlY2twYXRjaCBtYXkgYmUgYWJsZSB0bwogICAgICBtZWNo
+YW5pY2FsbHkgY29udmVydCB0byB0aGUgdHlwaWNhbCBzdHlsZSB1c2luZyAtLWZpeCBvciAtLWZp
+eC1pbnBsYWNlLgoKL2dpdGh1Yi93b3Jrc3BhY2Uvc3JjL3NyYy8xMzU5MTg1NC5wYXRjaCBoYXMg
+c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuCgpOT1RFOiBJZ25vcmVkIG1lc3NhZ2UgdHlw
+ZXM6IENPTU1JVF9NRVNTQUdFIENPTVBMRVhfTUFDUk8gQ09OU1RfU1RSVUNUIEZJTEVfUEFUSF9D
+SEFOR0VTIE1JU1NJTkdfU0lHTl9PRkYgUFJFRkVSX1BBQ0tFRCBTUERYX0xJQ0VOU0VfVEFHIFNQ
+TElUX1NUUklORyBTU0NBTkZfVE9fS1NUUlRPCgpOT1RFOiBJZiBhbnkgb2YgdGhlIGVycm9ycyBh
+cmUgZmFsc2UgcG9zaXRpdmVzLCBwbGVhc2UgcmVwb3J0CiAgICAgIHRoZW0gdG8gdGhlIG1haW50
+YWluZXIsIHNlZSBDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKCiMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIwpUZXN0OiBNYWtlQ2hlY2sgLSBGQUlMCkRlc2M6IFJ1biBCbHVleiBNYWtl
+IENoZWNrCk91dHB1dDoKCi4vdGVzdC1kcml2ZXI6IGxpbmUgMTA3OiAzMTk1NyBBYm9ydGVkICAg
+ICAgICAgICAgICAgICAoY29yZSBkdW1wZWQpICIkQCIgPiAkbG9nX2ZpbGUgMj4mMQptYWtlWzNd
+OiAqKiogW01ha2VmaWxlOjExNjQyOiB0ZXN0LXN1aXRlLmxvZ10gRXJyb3IgMQptYWtlWzJdOiAq
+KiogW01ha2VmaWxlOjExNzUwOiBjaGVjay1URVNUU10gRXJyb3IgMgptYWtlWzFdOiAqKiogW01h
+a2VmaWxlOjEyMTc5OiBjaGVjay1hbV0gRXJyb3IgMgptYWtlOiAqKiogW01ha2VmaWxlOjEyMTgx
+OiBjaGVja10gRXJyb3IgMgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogTWFr
+ZURpc3RjaGVjayAtIEZBSUwKRGVzYzogUnVuIEJsdWV6IE1ha2UgRGlzdGNoZWNrCk91dHB1dDoK
+ClBhY2thZ2UgY3VwcyB3YXMgbm90IGZvdW5kIGluIHRoZSBwa2ctY29uZmlnIHNlYXJjaCBwYXRo
+LgpQZXJoYXBzIHlvdSBzaG91bGQgYWRkIHRoZSBkaXJlY3RvcnkgY29udGFpbmluZyBgY3Vwcy5w
+YycKdG8gdGhlIFBLR19DT05GSUdfUEFUSCBlbnZpcm9ubWVudCB2YXJpYWJsZQpObyBwYWNrYWdl
+ICdjdXBzJyBmb3VuZApJbiBmaWxlIGluY2x1ZGVkIGZyb20gLi4vLi4vc3JjL3NoYXJlZC9iYXAu
+YzozMDoKLi4vLi4vc3JjL3NoYXJlZC9iYXAuaDoxMzoxMDogZmF0YWwgZXJyb3I6IHNyYy9zaGFy
+ZWQvYmFwLWRlZnMuaDogTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeQogICAxMyB8ICNpbmNsdWRl
+ICJzcmMvc2hhcmVkL2JhcC1kZWZzLmgiCiAgICAgIHwgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn4KY29tcGlsYXRpb24gdGVybWluYXRlZC4KbWFrZVsyXTogKioqIFtNYWtlZmlsZTo4
+NTcwOiBzcmMvc2hhcmVkL2xpYnNoYXJlZF9tYWlubG9vcF9sYS1iYXAubG9dIEVycm9yIDEKbWFr
+ZVsyXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZVsxXTogKioqIFtN
+YWtlZmlsZTo0NjQ2OiBhbGxdIEVycm9yIDIKbWFrZTogKioqIFtNYWtlZmlsZToxMjEwMjogZGlz
+dGNoZWNrXSBFcnJvciAxCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBDaGVj
+a1ZhbGdyaW5kIC0gRkFJTApEZXNjOiBSdW4gQmx1ZXogTWFrZSBDaGVjayB3aXRoIFZhbGdyaW5k
+Ck91dHB1dDoKCnRvb2xzL21nbXQtdGVzdGVyLmM6IEluIGZ1bmN0aW9uIOKAmG1haW7igJk6CnRv
+b2xzL21nbXQtdGVzdGVyLmM6MTI3MjE6NTogbm90ZTogdmFyaWFibGUgdHJhY2tpbmcgc2l6ZSBs
+aW1pdCBleGNlZWRlZCB3aXRoIOKAmC1mdmFyLXRyYWNraW5nLWFzc2lnbm1lbnRz4oCZLCByZXRy
+eWluZyB3aXRob3V0CjEyNzIxIHwgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKICAg
+ICAgfCAgICAgXn5+fgouL3Rlc3QtZHJpdmVyOiBsaW5lIDEwNzogNjIyNDggQWJvcnRlZCAgICAg
+ICAgICAgICAgICAgKGNvcmUgZHVtcGVkKSAiJEAiID4gJGxvZ19maWxlIDI+JjEKbWFrZVszXTog
+KioqIFtNYWtlZmlsZToxMTY0MjogdGVzdC1zdWl0ZS5sb2ddIEVycm9yIDEKbWFrZVsyXTogKioq
+IFtNYWtlZmlsZToxMTc1MDogY2hlY2stVEVTVFNdIEVycm9yIDIKbWFrZVsxXTogKioqIFtNYWtl
+ZmlsZToxMjE3OTogY2hlY2stYW1dIEVycm9yIDIKbWFrZTogKioqIFtNYWtlZmlsZToxMjE4MTog
+Y2hlY2tdIEVycm9yIDIKCgotLS0KUmVnYXJkcywKTGludXggQmx1ZXRvb3RoCgo=
 
-Fixes: https://github.com/bluez/bluez/issues/777
----
- profiles/input/device.c | 60 ++++++++++++++++++++++-------------------
- 1 file changed, 32 insertions(+), 28 deletions(-)
-
-diff --git a/profiles/input/device.c b/profiles/input/device.c
-index c4f75c7442e8..8184d7c9ff7b 100644
---- a/profiles/input/device.c
-+++ b/profiles/input/device.c
-@@ -105,7 +105,6 @@ bool input_get_classic_bonded_only(void)
- 
- static void input_device_enter_reconnect_mode(struct input_device *idev);
- static int connection_disconnect(struct input_device *idev, uint32_t flags);
--static int uhid_disconnect(struct input_device *idev);
- 
- static bool input_device_bonded(struct input_device *idev)
- {
-@@ -314,6 +313,28 @@ static bool hidp_recv_intr_data(GIOChannel *chan, struct input_device *idev)
- 	return true;
- }
- 
-+static int uhid_disconnect(struct input_device *idev, bool force)
-+{
-+	int err;
-+
-+	if (!bt_uhid_created(idev->uhid))
-+		return 0;
-+
-+	/* Only destroy the node if virtual cable unplug flag has been set */
-+	if (!idev->virtual_cable_unplug && !force)
-+		return 0;
-+
-+	bt_uhid_unregister_all(idev->uhid);
-+
-+	err = bt_uhid_destroy(idev->uhid);
-+	if (err < 0) {
-+		error("bt_uhid_destroy: %s", strerror(-err));
-+		return err;
-+	}
-+
-+	return err;
-+}
-+
- static gboolean intr_watch_cb(GIOChannel *chan, GIOCondition cond, gpointer data)
- {
- 	struct input_device *idev = data;
-@@ -356,8 +377,7 @@ static gboolean intr_watch_cb(GIOChannel *chan, GIOCondition cond, gpointer data
- 		virtual_cable_unplug(idev);
- 
- 	/* If connection abruptly ended, uhid might be not yet disconnected */
--	if (bt_uhid_created(idev->uhid))
--		uhid_disconnect(idev);
-+	uhid_disconnect(idev, false);
- 
- 	return FALSE;
- }
-@@ -654,8 +674,11 @@ static void hidp_send_set_report(struct uhid_event *ev, void *user_data)
- 			timeout_add_seconds(REPORT_REQ_TIMEOUT,
- 					hidp_report_req_timeout, idev, NULL);
- 		idev->report_rsp_id = ev->u.set_report.id;
--	} else
-+	} else {
- 		uhid_send_set_report_reply(idev, ev->u.set_report.id, EIO);
-+		/* Force UHID_DESTROY on error */
-+		uhid_disconnect(idev, true);
-+	}
- }
- 
- static void hidp_send_get_report(struct uhid_event *ev, void *user_data)
-@@ -698,9 +721,12 @@ static void hidp_send_get_report(struct uhid_event *ev, void *user_data)
- 						hidp_report_req_timeout, idev,
- 						NULL);
- 		idev->report_rsp_id = ev->u.get_report.id;
--	} else
-+	} else {
- 		uhid_send_get_report_reply(idev, NULL, 0, ev->u.get_report.id,
- 									EIO);
-+		/* Force UHID_DESTROY on error */
-+		uhid_disconnect(idev, true);
-+	}
- }
- 
- static void epox_endian_quirk(unsigned char *data, int size)
-@@ -934,28 +960,6 @@ static int uhid_connadd(struct input_device *idev, struct hidp_connadd_req *req)
- 	return err;
- }
- 
--static int uhid_disconnect(struct input_device *idev)
--{
--	int err;
--
--	if (!bt_uhid_created(idev->uhid))
--		return 0;
--
--	/* Only destroy the node if virtual cable unplug flag has been set */
--	if (!idev->virtual_cable_unplug)
--		return 0;
--
--	bt_uhid_unregister_all(idev->uhid);
--
--	err = bt_uhid_destroy(idev->uhid);
--	if (err < 0) {
--		error("bt_uhid_destroy: %s", strerror(-err));
--		return err;
--	}
--
--	return err;
--}
--
- static gboolean encrypt_notify(GIOChannel *io, GIOCondition condition,
- 								gpointer data)
- {
-@@ -1087,7 +1091,7 @@ static int connection_disconnect(struct input_device *idev, uint32_t flags)
- 		idev->virtual_cable_unplug = true;
- 
- 	if (idev->uhid)
--		return uhid_disconnect(idev);
-+		return uhid_disconnect(idev, false);
- 	else
- 		return ioctl_disconnect(idev, flags);
- }
--- 
-2.43.0
-
+--===============3242894383830598436==--
