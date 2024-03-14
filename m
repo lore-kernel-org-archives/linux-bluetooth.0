@@ -1,81 +1,77 @@
-Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69F011D53F
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Mar 2024 14:32:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.210
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81F7914A8C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Mar 2024 14:50:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710426731; cv=none; b=tXmogLK6HPEMvmtZT7bYeGFPau4ONtWQMx5w6nfNe4cOFMF/msQQ82d0WcCfvMG8A7GED6LIv0XUavK2xS5BBatjnmaGWS/CUKty1Ct9OnMrPYGg/WIDBYZ1XC318Wb+HFaQcjl5Fj4Jx9ALBsACIXyJaahnp27v4/+aZgAZDq0=
+	t=1710427830; cv=none; b=c7thfePYZP2IOhQIXWR4VoBmjuovp3AWm5xFY9bcrw0i3GusdEWy1uZyhPjNJuV1wu8b/7B3kmGIkn1vR9O6w+AIluRXu6mnnM2smUJJosUwKVA1zF3xPSvO8CTHwROUZUWb65u23EraHjY2iBpRW57fcETJANU0QEhO3vmRNXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710426731; c=relaxed/simple;
-	bh=d9w4H8zemO9ZzLLT3CflC9gRWVzeOA8YvYoyPsu5VFA=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=FViLFALRVoJDWsmBrwANpvfSejceCcagCpNGz51PQYJkWz6TipHQbuJkLBCl1jW5TqxLXhR5IbvyEw/KvXGMRSbOBF99qKWRzul2akx/ciwoL2cstmVYcMC7m1ry8mXdnJBX+WnbdeFkbzhewt1if6nzq8enypzujfkDNtvvwdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=f7+HrdUL; arc=none smtp.client-ip=192.30.252.210
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1710427830; c=relaxed/simple;
+	bh=w3ujegH6fq1GBnLHaN94vO6JrAmJ6XTUuHrCBJAhi/4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=bwE39KRSoIPNRhfEfXaU89U3vyLLWRL5F+huU5RXinjV726DZcWMC8rnyMp9wLytSZS6UEck2QqPX3IsSthqeY0krYIQys+xFch/woQcPZKefh2rjPEBC9mdP9xBdR8p9sWFIbhAYgberiIROXfDnj3t0tZTyh15n1Hp6BtpQZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aWvU4Wh+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="f7+HrdUL"
-Received: from github.com (hubbernetes-node-d8d992d.ash1-iad.github.net [10.56.159.43])
-	by smtp.github.com (Postfix) with ESMTPA id 6EFA46013B5
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Mar 2024 07:32:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1710426729;
-	bh=Fra/H1lNzi3Jy9h9PZnUBP7Ma8kioahANq7VpI93qPg=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=f7+HrdULXGDwhjrkhVji0cS/ZYVwKEmpPaKFG+ar0URuH/aAQc5zPiLzdfRAiUtCQ
-	 UNnbsFYsyiJ/5/zZ6KtjQVRFg6d06F7xSkqK2S2SZ1DsvYP5UqkT/h+Cu7JD3iR4BU
-	 MO4VqqO0nxpjkfa8ikvAlNiCqyuXwDRXQz00/6KM=
-Date: Thu, 14 Mar 2024 07:32:09 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/3ad367-0959cb@github.com>
-Subject: [bluez/bluez] b56131: build: Fix make distcheck
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aWvU4Wh+"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5D3D7C43390;
+	Thu, 14 Mar 2024 14:50:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710427830;
+	bh=w3ujegH6fq1GBnLHaN94vO6JrAmJ6XTUuHrCBJAhi/4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=aWvU4Wh+ZVw0U8bbTHrHG5lVeJXyLWqf9WYnCB6jiIK2wC2my2d4fgVABYr4HLRx5
+	 K8cusBeHEkOlf6N+R7NH2CUpN2Cx1XvvYLc8qQjvcRvbPUPVmiVhftqJ8YAfVdO2pu
+	 agw5qhLHAUwfrGC7oG2icQOXgTmLxQ5rst/S1LETvPhR8VW+3TQGLZyygQDmauRSAv
+	 tdybg+nP89frRD6abea900wKo9cXXf9bqE4IGHxR667QqWx9Wnbl4/khpOGX3+/ysc
+	 9ZEChYcF4Rc9nq3WOOCbcDTv91EOxXkMghNHwzUkgRhJl+5WmCK66oBgwbCRk/pcbQ
+	 P6OwrsWC5n4Hw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4D30CC595C3;
+	Thu, 14 Mar 2024 14:50:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ 0/1] client/player: Update minimum LC3 SDU size to
+ accommodate 8_1 config
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <171042783031.19013.14035626803025494123.git-patchwork-notify@kernel.org>
+Date: Thu, 14 Mar 2024 14:50:30 +0000
+References: <20240313090359.164196-1-vlad.pruteanu@nxp.com>
+In-Reply-To: <20240313090359.164196-1-vlad.pruteanu@nxp.com>
+To: Vlad Pruteanu <vlad.pruteanu@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org, mihai-octavian.urzica@nxp.com,
+ silviu.barbulescu@nxp.com, iulia.tanasescu@nxp.com,
+ andrei.istodorescu@nxp.com, luiz.dentz@gmail.com
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: b561318193bde11cf5c87b7207bd67b795897f2b
-      https://github.com/bluez/bluez/commit/b561318193bde11cf5c87b7207bd67b795897f2b
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-03-14 (Thu, 14 Mar 2024)
+Hello:
 
-  Changed paths:
-    M Makefile.am
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  build: Fix make distcheck
+On Wed, 13 Mar 2024 11:03:58 +0200 you wrote:
+> Currently the minimum LC3 SDU size is set to 30B. Thus, if a source
+> uses the 8_1_1 config which has a SDU size of 26 the sink's capabilities
+> won't match and the appropriate endpoint won't be created.
+> 
+> Vlad Pruteanu (1):
+>   client/player: Update minimum LC3 SDU size to accommodate 8_1 config
+> 
+> [...]
 
-Add missing file src/shared/bap-defs.h.
+Here is the summary with links:
+  - [BlueZ,1/1] client/player: Update minimum LC3 SDU size to accommodate 8_1 config
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=84628e5d109c
 
-
-  Commit: 0959cb8f5f462b2011d64f8599e4567f98821e77
-      https://github.com/bluez/bluez/commit/0959cb8f5f462b2011d64f8599e4567f98821e77
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-03-14 (Thu, 14 Mar 2024)
-
-  Changed paths:
-    M unit/test-bap.c
-
-  Log Message:
-  -----------
-  test-bap: Fix 44.1 KHz tests
-
-44.1 Khz where broken due to change to LC3_QOS_UCAST which now properly
-sets the framing, so this changes the test vectors of 44.1 Khz test to
-properly set it since those required framing.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Compare: https://github.com/bluez/bluez/compare/3ad367874630...0959cb8f5f46
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
