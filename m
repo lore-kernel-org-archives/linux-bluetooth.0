@@ -1,122 +1,155 @@
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01DC65A11F
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Mar 2024 13:08:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51FE71DFE4;
+	Thu, 14 Mar 2024 14:30:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710421693; cv=none; b=SAa6TCxITN1ErPN4AgCZhWqiwPPbmXWvbo7MBUP1iK99RZPMTmYYq6CjdEw1VGsYzNa7C8McgppWHaLec9EhXoAIYTqm3pm+RoVrDHbbA5mHQe7297A8XzLKJ5IkzP0K7oTaMqfM13UASvhIhRu4fdHSFqlH430kZswm7+oF0Xc=
+	t=1710426653; cv=none; b=tRKp/uY+NHZhCWBKNBUSy31fSUB7D78D5hZtH0+3MPPvIkryphxOe4UUfBfPsLCNlVdTPCakgtIGzQbH5EzWs3q+iWWtR1XR+/xc4eHhcZZARuDvcq5vCWKDhPYGKr7zbJ3H7BRWKd20oAfSZsEDOGX/YNx9CyCffbZi4fpPmDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710421693; c=relaxed/simple;
-	bh=dmrp3DxaauAUZ/VbBCGeqDSvlZovAOR9Jc36WDStW4Y=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=R6TGktOeXeK4ngypgFaD+CWbfUmrnu0CatEefkhe0/sG99mJICbFxiT6ZjjdbnKaLhgIRRusFmk/Sz14seYvl0AlpyztnXxxBMnuyKK39+4rbQw64w13pu6MNd8Z1y02Aj9UlSqQxj0p5IwnwYskU6vRPWzIJF3tSuXLh0cpa7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cxVxu7WA; arc=none smtp.client-ip=209.85.219.50
+	s=arc-20240116; t=1710426653; c=relaxed/simple;
+	bh=nOgzAl/kZbPiswgz+PAekV21T21wnBeyrjRSsKn26CM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=a/+otjJiH/bme1P/LDQt/a41eRD+2ReXhMpFBB8TqugdewR+SqZOjl7Cf0iOZwmCJNc0G6wi09HxnXmbGeUfFqMcN5h+soX323CymojDn+DDey1+RUD8dtdntHeH7k3w+5fwQHkgK/2aksIgok2Zug7tzkbftaOw6nPtSemqcYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IBT/fG+U; arc=none smtp.client-ip=209.85.208.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cxVxu7WA"
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-690c1747c3cso8552336d6.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Mar 2024 06:08:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IBT/fG+U"
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2d228a132acso13445281fa.0;
+        Thu, 14 Mar 2024 07:30:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710421691; x=1711026491; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=enlwGoHu8FYPbtwDTF/8z765+6A8NqY9Jl4yRzOW8d8=;
-        b=cxVxu7WA/zu57Q2uSkyU5+5HveOxqj9egxD1BHUyyqPmCWFlSjI7bD3sR6JiF9vvbp
-         hoehpK7jpHko2Wo0hHA9qzm1ER6xjj8SscRpfYtxPBEv9SokykuDJHifhml34/MS/PUM
-         eiDaSM/B7ErMC+NC2IGlRGdDNC/JOfYusxi5g7X/kLgTqSjYGyKee2u5tfeC9MwkB/4q
-         7imHOL3qJE/ljehSNIlMz6VWRH1/0ICRnUXXoduXHzJ0XiQWqDDUpylLuUFzPN0eih0J
-         Kza8vKJZRDRzwpKlrIrhoBj/q5FIJj907T1jqx9DnlhCCbCaovRWXa/DSrdChwYpdLzy
-         7C6Q==
+        d=gmail.com; s=20230601; t=1710426649; x=1711031449; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vGuFdLL2A0SVLqEVBpXHYOjMN8ZFaFaJtzrBQiA78yk=;
+        b=IBT/fG+UoTGoay0EmebQKsLd1xnBhTWvqPbC+Ld2KDKjmQWzSHFE3NXO7nRGD8Y+nu
+         cvnTXg19e/a26VGLCOY/pw9UwxzYcNuUP00P2+nsrmx0PziyDX3gwuUhFUGKLm4jrQk7
+         byGEyUl7aaCNuuDuno6L4bica3IfLiNSejkHOUwatxldkQVUKHRg9CsHHHaaOflWTkKH
+         /VOhrlxh93eAkaqAhLJa3FJTxU/yN52ZMw2hi7t9yEREj89kEerdPjD1rVrVrWRNEhsm
+         a9CAXK7K23PuLR7GgrQpAX4SkdijIFEugKUu0YEMqZWS/B7Gk+bTuiMx0Sd1iEYz5IC1
+         PrYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710421691; x=1711026491;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=enlwGoHu8FYPbtwDTF/8z765+6A8NqY9Jl4yRzOW8d8=;
-        b=vlMtdvPx8Ge8CooC8gGQ88adf05i6B58Yh63h28Dx4R/OxEscaI9Djus8SlCKnxwt8
-         epZn2rMf491f/W16p1ZIo8bz4ijJsyXL9oyNOYCRp9WbXzNurLzDySy+KAKbe3XRllYv
-         8cvGcOpEQzfllCDXq05+64sQhkabiGr/w/pSOLRxwKMkpqiOdmT0KFHMp+KHYX4E6Ed7
-         85AMla73LqduS4eoQErWTe8E+ixZGWMzycj6k0f+aqbj9YxNKkaKXrWI5JNSWhZsYq7+
-         CK9bKcbEwAziIxDPZ6c/zBKmuLP4qM0DJ5NwIqLVLjt0WkbhOcckJJmmgfh/g9N6MYKP
-         1sNw==
-X-Gm-Message-State: AOJu0YxkeR8BDKXFk/yUfpI8skbyJuTeRW60bb8qIoSytBPgU+IrCacf
-	jnDbQFbRWKzLj4ITCWKg0oyL/uZjHXLtaNoljdAEGCiXRRjvd8VUDTbgNBQT
-X-Google-Smtp-Source: AGHT+IFP6WFxoYlIRt+MU7fs+rmTjxrLYQOa3M8WBLBdE9KL2E0wySOKaxfEC//4aGP4E2zcAuTxeg==
-X-Received: by 2002:a05:6214:1792:b0:690:d6d8:d521 with SMTP id ct18-20020a056214179200b00690d6d8d521mr3109631qvb.23.1710421690629;
-        Thu, 14 Mar 2024 06:08:10 -0700 (PDT)
-Received: from [172.17.0.2] ([40.76.238.214])
-        by smtp.gmail.com with ESMTPSA id jv3-20020a05621429e300b00690c9256676sm427977qvb.49.2024.03.14.06.08.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Mar 2024 06:08:10 -0700 (PDT)
-Message-ID: <65f2f6ba.050a0220.f2fa6.1059@mx.google.com>
-Date: Thu, 14 Mar 2024 06:08:10 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6122080281355162866=="
+        d=1e100.net; s=20230601; t=1710426649; x=1711031449;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vGuFdLL2A0SVLqEVBpXHYOjMN8ZFaFaJtzrBQiA78yk=;
+        b=bnTVt2Hdx2LveYr1gSPXy2yef1WcsdiB8FSpxknbjMmXwh/N3J2yB8sF32VelyTjpi
+         lWOv+MtCAYbNxgT4QBK6CZ0+V1Dyp+j2wWSUF4rAk5H7K5sBAevTVbmAekCpjnabiokz
+         G1HfvU0Er1V7WSqfdP4EQgRHZTu2pK1c2D8CYOy1fKOsY7FRyipYFXRNaXH9Nf5KYT72
+         FTsmoBWr1VKtQbybsu1iJmPO7gsB7mUqI6odOTw5XBJvI0fmECagMtNRBF8/nCTdM/jK
+         XxsmCBdayXhVPu6dXRIQ6gc2FjX89YnScFdiKkV76I70+IbOZBTKfcFE7BW9gB2j1nNA
+         fnFA==
+X-Forwarded-Encrypted: i=1; AJvYcCWI8a+8f3UFeoYA8C5bpCDr/rqWQ0RaW6M6f+U4A/rm4q03X2KvlB2KyADx3LbkzGbOTJhkqJQVpeah2+nR23SLQEJsY3bMN3y4arXLjWyysmSrF6tyMtrqnReSKRQpr3n1kCPWrVwcF7/qW4zInizHnialfPewlG5H8eC6e84qBLEBt7a6
+X-Gm-Message-State: AOJu0YyraJt+7zESLGLiIsD5a/mIyPXvUwVkP3X9bKjTR27d9+Wm//tV
+	SSIy/jX33Y+Y5BKMUcVu2EkOef4Y1r/mCoR2LE/2KW6bjmr3d2sAeLHYfMQv1xvDY7ys9GLBq0b
+	s+C6dlrFIuJ0e96TtxF0KtPdztgRCKQTj
+X-Google-Smtp-Source: AGHT+IEuwoDwnTWhjt/JkLKa02QILhgzuO/FfliJLD2dXLjPQ9EXst9r8FPLjaypVgQWKhFpurrnVj3WvXCN81+5+3I=
+X-Received: by 2002:a2e:a592:0:b0:2d4:6815:fc6f with SMTP id
+ m18-20020a2ea592000000b002d46815fc6fmr1554846ljp.30.1710426649071; Thu, 14
+ Mar 2024 07:30:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, neeraj.sanjaykale@nxp.com
-Subject: RE: [v1,1/1] Bluetooth: btnxpuart: Add handling for boot-signature timeout errors
-In-Reply-To: <20240314122952.1867-1-neeraj.sanjaykale@nxp.com>
-References: <20240314122952.1867-1-neeraj.sanjaykale@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20240314084412.1127-1-johan+linaro@kernel.org>
+In-Reply-To: <20240314084412.1127-1-johan+linaro@kernel.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 14 Mar 2024 10:30:36 -0400
+Message-ID: <CABBYNZJV1htg46Gyu=7_iUWdukM+rHLitsLjxmWWYFGXty3tVw@mail.gmail.com>
+Subject: Re: [PATCH] Revert "Bluetooth: hci_qca: Set BDA quirk bit if fwnode
+ exists in DT"
+To: Johan Hovold <johan+linaro@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
+	Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============6122080281355162866==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Johan,
 
-This is automated email and please do not reply to this email!
+On Thu, Mar 14, 2024 at 4:44=E2=80=AFAM Johan Hovold <johan+linaro@kernel.o=
+rg> wrote:
+>
+> This reverts commit 7dcd3e014aa7faeeaf4047190b22d8a19a0db696.
+>
+> Qualcomm Bluetooth controllers like WCN6855 do not have persistent
+> storage for the Bluetooth address and must therefore start as
+> unconfigured to allow the user to set a valid address unless one has
+> been provided by the boot firmware in the devicetree.
+>
+> A recent change snuck into v6.8-rc7 and incorrectly started marking the
+> default (non-unique) address as valid. This specifically also breaks the
+> Bluetooth setup for some user of the Lenovo ThinkPad X13s.
+>
+> Note that this is the second time Qualcomm breaks the driver this way
+> and that this was fixed last year by commit 6945795bc81a ("Bluetooth:
+> fix use-bdaddr-property quirk"), which also has some further details.
+>
+> Fixes: 7dcd3e014aa7 ("Bluetooth: hci_qca: Set BDA quirk bit if fwnode exi=
+sts in DT")
+> Cc: stable@vger.kernel.org      # 6.8
+> Cc: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+> Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
 
-Dear submitter,
+Well I guess I will need to start asking for evidence that this works
+on regular Linux distros then, because it looks like that is not the
+environment Janaki and others Qualcomm folks are testing with.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=835311
+What I probably would consider as evidence is bluetoothd logs showing
+that the controller has been configured correctly or perhaps there is
+a simpler way?
 
----Test result---
+> ---
+>  drivers/bluetooth/hci_qca.c | 13 +------------
+>  1 file changed, 1 insertion(+), 12 deletions(-)
+>
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index edd2a81b4d5e..f989c05f8177 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -7,7 +7,6 @@
+>   *
+>   *  Copyright (C) 2007 Texas Instruments, Inc.
+>   *  Copyright (c) 2010, 2012, 2018 The Linux Foundation. All rights rese=
+rved.
+> - *  Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reser=
+ved.
+>   *
+>   *  Acknowledgements:
+>   *  This file is based on hci_ll.c, which was...
+> @@ -1904,17 +1903,7 @@ static int qca_setup(struct hci_uart *hu)
+>         case QCA_WCN6750:
+>         case QCA_WCN6855:
+>         case QCA_WCN7850:
+> -
+> -               /* Set BDA quirk bit for reading BDA value from fwnode pr=
+operty
+> -                * only if that property exist in DT.
+> -                */
+> -               if (fwnode_property_present(dev_fwnode(hdev->dev.parent),=
+ "local-bd-address")) {
+> -                       set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->qui=
+rks);
+> -                       bt_dev_info(hdev, "setting quirk bit to read BDA =
+from fwnode later");
+> -               } else {
+> -                       bt_dev_dbg(hdev, "local-bd-address` is not presen=
+t in the devicetree so not setting quirk bit for BDA");
+> -               }
+> -
+> +               set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
+>                 hci_set_aosp_capable(hdev);
+>
+>                 ret =3D qca_read_soc_version(hdev, &ver, soc_type);
+> --
+> 2.43.2
+>
 
-Test Summary:
-CheckPatch                    PASS      0.69 seconds
-GitLint                       PASS      0.32 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      28.19 seconds
-CheckAllWarning               PASS      30.79 seconds
-CheckSparse                   PASS      36.74 seconds
-CheckSmatch                   PASS      99.34 seconds
-BuildKernel32                 PASS      27.54 seconds
-TestRunnerSetup               PASS      513.49 seconds
-TestRunner_l2cap-tester       PASS      20.10 seconds
-TestRunner_iso-tester         FAIL      30.73 seconds
-TestRunner_bnep-tester        PASS      4.84 seconds
-TestRunner_mgmt-tester        PASS      108.19 seconds
-TestRunner_rfcomm-tester      PASS      8.62 seconds
-TestRunner_sco-tester         PASS      15.01 seconds
-TestRunner_ioctl-tester       PASS      7.88 seconds
-TestRunner_mesh-tester        PASS      5.88 seconds
-TestRunner_smp-tester         PASS      6.89 seconds
-TestRunner_userchan-tester    PASS      4.96 seconds
-IncrementalBuild              PASS      26.55 seconds
 
-Details
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-Total: 117, Passed: 116 (99.1%), Failed: 1, Not Run: 0
-
-Failed Test Cases
-ISO Connect2 Suspend - Success                       Failed       4.208 seconds
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6122080281355162866==--
+--=20
+Luiz Augusto von Dentz
