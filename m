@@ -1,157 +1,203 @@
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0AD917F5
-	for <linux-bluetooth@vger.kernel.org>; Fri, 15 Mar 2024 21:11:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A53453FC2
+	for <linux-bluetooth@vger.kernel.org>; Sat, 16 Mar 2024 00:49:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710537069; cv=none; b=UxgHM7eI+kPwMUVH/MPyzeJos19y/OPOSc+qbiVcts4dF7H4s129biiRUdqFZ18v4wWfqC08utNYVK//VHqLBuyomf/EFcxxFMvBfto2UW+d1NT5arrGo99C0rwcMw2jIDdKDawrMjX30cmM4zJdZsf14L1/wDjlJgrAnQsWqC0=
+	t=1710550189; cv=none; b=gSzLp5ATpEYQfK3rd84HoZ6/wMJBIpJaPYgvRoN6+kVF2xzDDJHsnFxWPc9lE5pn8Zl+KpKCjRo8S7N+/mZc838vSuKnKlTtb+b05XGfw9mUJR30CuIwUXYyCf8E1mnQs9yb6kcY8kutrcib2iv0qfWsZ+AjWj2SN6eL37utaLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710537069; c=relaxed/simple;
-	bh=vmVrJTM05U1UNR8w2msyFi3Sc8aecWnQlR0EDkMd/M0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NwpawDXI6PxJ5VpzdgRXg78fltL3mkUb2jmSjEXg+m4OjsmF0LMO9qRNWpC4b+bifOdHE9wrje534+hbai2EXC/uPepH+KaE5dCJUf5hilQLtMuHjQltOsBlivsiZ1w1+QTkirb1l9oQq9rUmzmb3VYUvHNmqu2nSUeW9uLneVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BH+bVP6K; arc=none smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1710550189; c=relaxed/simple;
+	bh=KPBCGOlo92oySGJ/YMElzESDv4SEQx3+JOTMi0xyGsU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Si+taRTOi9DfqApY7gbDTXulY9AIzlfpJOauqrQPYJUimd4SLNwk1S1TMlDHHr2/hMgi1JD+xRawYjCAOSgNFLhnGI2WgSUfxKbe3S6rFMgpEnkLaC37ye3UCODgpJLsQyhG3wkmAe7C+1QUJqYI1qaq9vM3ARXm5s4Akx39iVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AoCnwVv7; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BH+bVP6K"
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2d28387db09so35197511fa.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Mar 2024 14:11:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710537065; x=1711141865; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VeHcUIY5/RBgR37oAK6rtiMgtON6wL4RtufL5DorhXY=;
-        b=BH+bVP6KB9JxCJOlYgZTZKDpHgwlK1hG9P+Ly0JtXNJaZtgujMyDnGov9WJPmuyn/R
-         jcIngmjfUf4K3PFSfgGzLpHTIToW8rzUHSnboqh62q8eJB7f0bNbH1DIKtFxX2E4fV9U
-         LtARHE5Q7qoNEvnXrWmiJhBUQsqyazHSo3riYRfE+LM3DTZsWAwJSoWO6gXWGB7fdKWy
-         sQ7JPUu4ntFnQlC5BXkLCd+5odNhGwYW1v1dKBNZC/wn38F1+DCZ1oHnJjj+scDWKtkC
-         MkTK3fwGLtSHDOgDlxmOcrtYsqRzUBBjSOP6BH+sauru4WDx4Kuf10kqdPx5FDCpUJN1
-         0JhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710537065; x=1711141865;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VeHcUIY5/RBgR37oAK6rtiMgtON6wL4RtufL5DorhXY=;
-        b=Dk6Yc1lbIxeI7Gj/9JYGw9ac3y8QaZ7q2EJhwdF3XB5vRBcOMO+G6ZJxuw4nyQg3wH
-         70kybId+X9K9aW8TZzCEBBmOFcDq8p4DNFbGg+VeDfdI8MzRQUxJzid6WJQpkWyZ4U6w
-         y4E8BmzXawWBXmGGj+69ZG4XGs6b3LoHXdHSmZ5QkiA8wK6C5ZPLcCmokIMMW/QKFDvq
-         zcxwtANmtij5WeTBwb3UYaDN8xrQL6BCW+WK6CS6A8QDTKAfqUQwObRHBkqxyhBoS5s+
-         2WcCjHJotupsQi+9jINC1ZQh/3q6n+gqhqf0HxG7Ux7ArFOmS1sacXO1PDE6DMV2j0hj
-         sRnA==
-X-Gm-Message-State: AOJu0Yyw9A5cYKgS2xm8oRuYncZl5+4NdpelQLJC4FtpQuvPrNcKTvbx
-	+SViajXNpw5ABYgPMuIc+VWhqz4TOSIIYPzJakJEE/Q63rZBOGR18CBrVwKbk3F3grKTTpDHpY2
-	ThzuheAwE9aNPKkgOyS7PtgrwrBtoVBHUydY=
-X-Google-Smtp-Source: AGHT+IEMBnAV5QDB3G/j/bnbwmygldIjerPA8UbYaAfeZFJjIBLOtCyoYaEH6VhA+0mCK/QFwtykWsNAE4B/fI5mA68=
-X-Received: by 2002:a2e:9581:0:b0:2d4:3dfc:af88 with SMTP id
- w1-20020a2e9581000000b002d43dfcaf88mr2613839ljh.7.1710537064290; Fri, 15 Mar
- 2024 14:11:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AoCnwVv7"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1710550187; x=1742086187;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=KPBCGOlo92oySGJ/YMElzESDv4SEQx3+JOTMi0xyGsU=;
+  b=AoCnwVv7nwArCvV3kyVq06EbdNu/nbtRDbhKN/bg2eENLRo6r8xi7Pb+
+   YX4qwXO6otHzngZNFfif7ELA/++rcV8E/31Zpbciq0uzRHk89LFRXiScR
+   J6FgnsBw8vkOEnX69PRaL2QbpZPTHQ7pfyt+CL0ITmwQEtZU/4I1fbwkX
+   R22khmKa5i95f1TrfoWc8+M/9LrG4gKlOE5RhpMPOC/nQi2yoN1lQijek
+   IK3aFcTLWwlZG1Z//ttTjCeXaBpDVeNNuwtkut9D69vF8/xb7Z3JxdzET
+   QFhDbzadjmOs7s337mHwiDKEr9RxHSiiRawD+6j2rwhSLIukYwYseJJ9r
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11014"; a="8382690"
+X-IronPort-AV: E=Sophos;i="6.07,129,1708416000"; 
+   d="scan'208";a="8382690"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2024 17:49:46 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,129,1708416000"; 
+   d="scan'208";a="12910660"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by fmviesa008.fm.intel.com with ESMTP; 15 Mar 2024 17:49:44 -0700
+From: Kiran K <kiran.k@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	Kiran K <kiran.k@intel.com>
+Subject: [PATCH v1] monitor/intel: Add decode support for vendor command 0xfc2a
+Date: Sat, 16 Mar 2024 06:33:27 +0530
+Message-Id: <20240316010327.944183-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <PH7PR14MB530075545340A73BC4BA353EFB282@PH7PR14MB5300.namprd14.prod.outlook.com>
- <CABBYNZKNq=8OUjDRBRhiVGrC216af3NHgdMGHynwiNZoMyD=Cw@mail.gmail.com> <PH7PR14MB5300C5E6F45A73CCFC0BB96DFB282@PH7PR14MB5300.namprd14.prod.outlook.com>
-In-Reply-To: <PH7PR14MB5300C5E6F45A73CCFC0BB96DFB282@PH7PR14MB5300.namprd14.prod.outlook.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 15 Mar 2024 17:10:51 -0400
-Message-ID: <CABBYNZJEHQK5VGQ1p934UAp6nx+mGyV8KTwzvAaiXp19niuyRg@mail.gmail.com>
-Subject: Re: Bluetoothctl Fail when typing power on
-To: Chris Laplante <Chris.Laplante@lairdconnect.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Chris,
+0xfc2a command is used to read the connection information by bdaddress.
 
-On Fri, Mar 15, 2024 at 4:07=E2=80=AFPM Chris Laplante
-<Chris.Laplante@lairdconnect.com> wrote:
->
-> Hi Luiz,
->
-> Thanks for the quick response.
->
-> I am using btattach.
->
-> Btmon shows Bluetooth failed to set mode: Failed
->
-> It seems like there is a lot of messaging going on so communication HW wi=
-se appears ok.
+btmon output:
 
-Just scroll down to the end:
+< HCI Command: Intel Read Connection Info by bd address (0x3f|0x002a) plen 7
+        Device Address Type: Random Device Address (0x01)
+        Address: CF:AC:A6:79:3C:AF (OUI CF-AC-A6)
+        af 3c 79 a6 ac cf
+> HCI Event: Command Complete (0x0e) plen 9
+      Intel Read Connection Info by bd address (0x3f|0x002a) ncmd 1
+        Status: Success (0x00)
+        Number of handles: 0x01
+        Handle: 3585
+        State: Connection is established on this handle (0x06)
+        Type: Handle belongs to LE link (0x04)
+---
+ monitor/intel.c | 106 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 106 insertions(+)
 
-< HCI Command: Reset (0x03|0x0003) plen 0                  #83 [hci0] 37.50=
-5694
-> HCI Event: Hardware Error (0x10) plen 1                  #84 [hci0] 37.50=
-7119
-        Code: 0x00
+diff --git a/monitor/intel.c b/monitor/intel.c
+index aa05a803bf8e..d50f70779459 100644
+--- a/monitor/intel.c
++++ b/monitor/intel.c
+@@ -534,6 +534,109 @@ static void manufacturer_mode_cmd(uint16_t index, const void *data,
+ 	print_field("Reset behavior: %s (0x%2.2x)", str, reset);
+ }
+ 
++static void read_connection_info_cmd(uint16_t index, const void *data,
++				     uint8_t size)
++{
++	uint8_t addr_type;
++	const char *str;
++
++	addr_type = get_u8(data);
++
++	switch (addr_type) {
++	case 0x00:
++		str = "Public Device Address";
++		break;
++	case 0x01:
++		str = "Random Device Address";
++		break;
++	default:
++		str = "Unknown Device Address";
++		break;
++	}
++	print_field("Device Address Type: %s (0x%2.2x)", str, addr_type);
++	packet_print_addr("Address", data + 1, 0x00);
++	packet_hexdump(data + 1, 6);
++
++}
++
++static void read_connection_info_rsp(uint16_t index, const void *data,
++				     uint8_t size)
++{
++	uint8_t status = get_u8(data);
++	uint8_t hndls;
++	const uint8_t *p;
++	const char *str;
++	uint8_t i;
++
++	print_status(status);
++
++	if (status)
++		return;
++	size--;
++
++	hndls = get_u8(data + 1);
++	print_field("Number of handles: 0x%2.2x", hndls);
++	size--;
++
++	for (i = 0, p = data + 2; size > 0 && i < hndls;
++			size -= 4, i++, p = p + 4) {
++		uint16_t handle = get_le16(p);
++		uint8_t state = get_u8(p + 2);
++		uint8_t type = get_u8(p + 3);
++
++		print_field("Handle: %u", handle);
++		switch (state) {
++		case 1:
++			str = "Connection is detached but handle is not yet released";
++			break;
++		case 2:
++			str = "Connection is used for outgoing remote name request";
++			break;
++		case 4:
++			str = "Connection is prepared  but handle is not yet sent to host";
++			break;
++		case 5:
++			str = "Connection request is pending to the host on this handle";
++			break;
++		case 6:
++			str = "Connection is established on this handle";
++			break;
++		case 7:
++			str = "Connection is in Hold mode";
++			break;
++		case 8:
++			str = "Connection in Sniff mode";
++			break;
++		default:
++			str = "Unknown state";
++			break;
++		}
++
++		print_field("State: %s (0x%2.2x)", str, state);
++		switch (type) {
++		case 0:
++			str = "Handle belongs to SCO link";
++			break;
++		case 1:
++			str = "Handle belongs to ACL link";
++			break;
++		case 2:
++			str = "Handle belongs to eSCO link";
++			break;
++		case 4:
++			str  = "Handle belongs to LE link";
++			break;
++		case 255:
++			str = "Handle doesn't have an associated link";
++			break;
++		default:
++			str = "Unknown link";
++			break;
++		}
++		print_field("Type: %s (0x%2.2x)", str, type);
++	}
++}
++
+ static void write_bd_data_cmd(uint16_t index, const void *data, uint8_t size)
+ {
+ 	uint8_t features[8];
+@@ -763,6 +866,9 @@ static const struct vendor_ocf vendor_ocf_table[] = {
+ 	{ 0x012, "Read Link RSSI" },
+ 	{ 0x022, "Get Exception Info" },
+ 	{ 0x024, "Clear Exception Info" },
++	{ 0x02a, "Read Connection Info by bd address",
++			read_connection_info_cmd, 7, true,
++			read_connection_info_rsp, 1, false },
+ 	{ 0x02f, "Write BD Data",
+ 			write_bd_data_cmd, 6, false },
+ 	{ 0x030, "Read BD Data",
+-- 
+2.34.1
 
-Btw, it might be a good idea to attempt with a newer kernel since 5.15
-is not that new compared to BlueZ 5.65, so you may run into
-incompatibilities depending on what you want to do, and if you are
-looking into central+peripheral that landed after 5.15 was released.
-
-
-> Chris
->
-> -----Original Message-----
-> From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> Sent: Friday, March 15, 2024 3:48 PM
-> To: Chris Laplante <Chris.Laplante@lairdconnect.com>
-> Cc: linux-bluetooth@vger.kernel.org
-> Subject: Re: Bluetoothctl Fail when typing power on
->
-> EXTERNAL EMAIL: Be careful with attachments and links.
->
-> Hi Chris,
->
-> On Fri, Mar 15, 2024 at 3:40=E2=80=AFPM Chris Laplante <Chris.Laplante@la=
-irdconnect.com> wrote:
-> >
-> > In BlueZ 5.65 I am able to attach. When I go into bluetoothctl I can se=
-e my device address. When I type power on I see the following error:
-> >
-> > Failed to set power on: org.bluez.Error.Failed
-> >
-> > I have found a few threads online where people had the same issue but t=
-here doesn't seem to be any common denominator.
-> >
-> > I have tried rfkill list and nothing is blocked. Regardless I still typ=
-e rfkill unblock Bluetooth but I still get the error.
-> >
-> > I have tried to stop and start the Bluetooth service.
-> >
-> > systemctl stop bluetooth.service
-> > systemctl start bluetooth.service
-> >
-> > IS there something in the build environment that may be missing? Any su=
-ggestions?
->
-> Well if it can't be powered then there is something wrong at kernel level=
-, does btmon show anything? Are you using btattach to set it up?
->
-> > Thanks!
-> > Chris
-> > THE INFORMATION CONTAINED IN THIS DOCUMENT IS OF A PROPRIETARY NATURE
-> > AND IS INTENDED TO BE KEPT CONFIDENTIAL BETWEEN THE SENDER AND THE
-> > INTENDED RECIPIENT. IT MAY NOT BE REPRODUCED OR USED WITHOUT EXPRESS
-> > WRITTEN PERMISSION OF EZURIO
-> >
->
->
-> --
-> Luiz Augusto von Dentz
-> THE INFORMATION CONTAINED IN THIS DOCUMENT IS OF A PROPRIETARY NATURE AND=
- IS INTENDED TO BE KEPT CONFIDENTIAL BETWEEN THE SENDER AND THE INTENDED RE=
-CIPIENT. IT MAY NOT BE REPRODUCED OR USED WITHOUT EXPRESS WRITTEN PERMISSIO=
-N OF EZURIO
-
-
-
---=20
-Luiz Augusto von Dentz
