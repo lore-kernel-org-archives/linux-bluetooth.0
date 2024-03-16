@@ -1,35 +1,59 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7F9F1BDD3;
-	Sat, 16 Mar 2024 17:20:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710609629; cv=none; b=H8DvV3GXxTgJWx3S3GJICc/nclGsVPnkk3hB4E09kPsXSbt6InicRuLBdedz8tFvvHdV0Hh2Bl8Mh9NlxrnPgcFYDk8IDAbfPuTiSc6s65bERbjfS/5mQEzHxZ1Py0TrY9vYGtj/8dCMhM21E0PrwIOmVgFckl86tAL2pgVQt0M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710609629; c=relaxed/simple;
-	bh=6In+/F5LAk300z+6Nl7Ldiqqsymq+aCtseBEiwn5L2g=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=HF+myaDYx30odLuakC1DjE5u7gz63zpvwXHz6OuSVqdRoNOROhzRv5P/Z9EAdOQ4So8O31WasNS64Y0PYzeOFxXzH4jwPQE/cD+vz6boXob2yQ3HdKO5aPYz+jrMY0bpZAx91qn70UUCk+jh1dsEXJRLqStM2VSyE4MocK52Vzo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o7Lzh+T/; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1826E542
+	for <linux-bluetooth@vger.kernel.org>; Sat, 16 Mar 2024 18:36:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710614217; cv=pass; b=pi+Nl5kJpYTYF0M/VR5itN/KdZrpbLHymfOX+wCJjAUgWlHfI+5A0s91Lryhb5lx1414UjFQ7Ydic3oaPGntkqGhZYzPmfeZX2qjY9MrWSoaL46Ngorz9t4VqadFNK5ql136uF7+eI4T87B8Xj2O4ZVGxm/3XIRxGMyxCR4cwLE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710614217; c=relaxed/simple;
+	bh=Qgd7tC5rqpQHVJbt04ewOPHcnQGldpssPFwAeOpUck0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TyR/2D8S/vfBWSCQwcRYMbz2lunriLrO57U0o9EGG0vLLGVqbjW9bQh62yowfeyaf0ykWzg751ZIax+/d6wpd3K8b9sPMWmKzVgtIqSvA6lGM0IfcE2K65DAkqKkkLni+Ir9FNxmcnG3uNO+6iEI5vcOzefo1Tis60nbMAcYMFk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=XBrJIOYs; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o7Lzh+T/"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2F9D1C433F1;
-	Sat, 16 Mar 2024 17:20:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710609629;
-	bh=6In+/F5LAk300z+6Nl7Ldiqqsymq+aCtseBEiwn5L2g=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=o7Lzh+T/UVTOJ/tOcGJG8En9eYwh5Uof2c3zwpOIo0l2k8x2mYfMjOF2/jJAAMMHY
-	 zj04ZbG5ooNTUFmDudYcUrHEuZxFHH3ibhv5Y5eEvn1Sg5slrdme59q8c4RE2OQM2X
-	 NfkLCArHVMH5OXgIrla80UT2HAOsEHS2VA1OJXzsWO7PHAVB4aHKoJ37vgaq6XjyIl
-	 ZlYS/26ns124xM4gydOS+hp5ZVQDEjItcLbAGvEEcub1zA63bVKNOkEtKMwwsuJtcg
-	 NObDzWw6ikxs9ZChxGQqlrqXt9okmEvK9TMBg/M7UYlMo1iFvEZIlKj39+oWyYSMhm
-	 oFZSU/XPO2Hxw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1D02CD95053;
-	Sat, 16 Mar 2024 17:20:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="XBrJIOYs"
+Received: from monolith.lan (unknown [185.77.218.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4Txqb10bZGzySM;
+	Sat, 16 Mar 2024 20:36:44 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1710614205;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=hGSZjQuPPFYEdM55/0weBV1UsWRNWL134Dk1nJz12G8=;
+	b=XBrJIOYsVcZZI5py8qngvQPIHTakQcaLOAf4Y0a9/WKJBCelxq6Dj2gVlrxuWbvdTvzF2J
+	lnY1IfaXEMbsGUjCG9CR3UAvELraVadTx2clrenXlWvQ0YNPCgbYG+sKK9Azwh/LJNbnhO
+	qwvn5FGlmiZjD07ctI091aP4JM5V0Hs=
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1710614205; a=rsa-sha256; cv=none;
+	b=hyKE9z7cG1Hags9YZ9nMlZrT4i83NBlG4lhwYXLVYUy2jxjCPpzgpv1VBHmuqgi6+naYf2
+	oOO8ftp8+0nOAycAuZoIvBq2Aq2xNPluqO9U3+5vTUlOlL70cRLBPXmcHH7Z9ev1moH5bL
+	pWH0oMZ0FWjYB1XNVF7p7GtEoxbjiIU=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1710614205;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=hGSZjQuPPFYEdM55/0weBV1UsWRNWL134Dk1nJz12G8=;
+	b=VVmyXWbQ1/IFoMTEtC3Bdb3d4lwPmxNbC+xIIK0XBJbPT6ahhMA0JFDv814NgBfUDUnDhm
+	txmdcr9FIS+V04I8lXA84iI0vtD0c5w4ZinoyZv8xDXNq1YNENpqRXH2ygb6y8nBsIgSqV
+	TuhGrZ6LpLUksl82ICSFLZZFkWQ3/U4=
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ] a2dp: fix setup->err use-after-free
+Date: Sat, 16 Mar 2024 20:36:38 +0200
+Message-ID: <154e1a604eb8c3d924699489da72ea905915fb88.1710614196.git.pav@iki.fi>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -37,77 +61,220 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Add support for MediaTek MT7922 Bluetooth device
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <171060962911.7860.8197106959740941783.git-patchwork-notify@kernel.org>
-Date: Sat, 16 Mar 2024 17:20:29 +0000
-References: <SYYP282MB1197FB116B937D8CB0E57305AB282@SYYP282MB1197.AUSP282.PROD.OUTLOOK.COM>
-In-Reply-To: <SYYP282MB1197FB116B937D8CB0E57305AB282@SYYP282MB1197.AUSP282.PROD.OUTLOOK.COM>
-To: Ian W MORRISON <ianwmorrison@live.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hello:
+setup->err is set to values that either are on stack of avdtp.c
+routines, obtained from callbacks, or allocated on heap. This is
+inconsistent, and use-after-free in some cases.
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+Fix by always allocating setup->err ourselves, copying any values
+obtained from callbacks.  Add setup_error_set/init and do all setup->err
+manipulation via them.
 
-On Fri, 15 Mar 2024 17:46:54 +1100 you wrote:
-> This patch adds support for the MediaTek MT7922 Bluetooth device.
-> 
-> The information in /sys/kernel/debug/usb/devices about the MT7922
-> is as follows:
-> 
-> T:  Bus=03 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
-> D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=13d3 ProdID=3585 Rev= 1.00
-> S:  Manufacturer=MediaTek Inc.
-> S:  Product=Wireless_Device
-> S:  SerialNumber=000000000
-> C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
-> A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
-> E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
-> E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
-> I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
-> E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
-> 
-> [...]
+Fixes crash:
 
-Here is the summary with links:
-  - Add support for MediaTek MT7922 Bluetooth device
-    https://git.kernel.org/bluetooth/bluetooth-next/c/f4a0fc6780c7
+==994225==ERROR: AddressSanitizer: stack-use-after-return
+READ of size 1 at 0x7f15ee5189c0 thread T0
+    #0 0x445724 in avdtp_error_category profiles/audio/avdtp.c:657
+    #1 0x41e59e in error_to_errno profiles/audio/a2dp.c:303
+    #2 0x42bb23 in a2dp_reconfigure profiles/audio/a2dp.c:1336
+    #3 0x7f15f1512798 in g_timeout_dispatch
+    ...
+Address 0x7f15ee5189c0 is located in stack of thread T0 at offset 64 in frame
+    #0 0x466b76 in avdtp_parse_rej profiles/audio/avdtp.c:3056
+  This frame has 2 object(s):
+    [48, 49) 'acp_seid' (line 3058)
+    [64, 72) 'err' (line 3057) <== Memory access at offset 64 is inside this variable
+---
+ profiles/audio/a2dp.c | 68 +++++++++++++++++++++++++------------------
+ 1 file changed, 39 insertions(+), 29 deletions(-)
 
-You are awesome, thank you!
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index b43161a13..a3c294bc3 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -222,6 +222,7 @@ static void setup_free(struct a2dp_setup *s)
+ 		avdtp_unref(s->session);
+ 	g_slist_free_full(s->cb, g_free);
+ 	g_slist_free_full(s->caps, g_free);
++	g_free(s->err);
+ 	g_free(s);
+ }
+ 
+@@ -270,17 +271,34 @@ static void setup_cb_free(struct a2dp_setup_cb *cb)
+ 	g_free(cb);
+ }
+ 
++static void setup_error_set(struct a2dp_setup *setup, struct avdtp_error *err)
++{
++	if (!err) {
++		g_free(setup->err);
++		setup->err = NULL;
++	} else {
++		if (!setup->err)
++			setup->err = g_new0(struct avdtp_error, 1);
++		memcpy(setup->err, err, sizeof(struct avdtp_error));
++	}
++}
++
++static void setup_error_init(struct a2dp_setup *setup, uint8_t type, int id)
++{
++	struct avdtp_error err;
++
++	avdtp_error_init(&err, type, id);
++	setup_error_set(setup, &err);
++}
++
+ static void finalize_setup_errno(struct a2dp_setup *s, int err,
+ 					GSourceFunc cb1, ...)
+ {
+ 	GSourceFunc finalize;
+ 	va_list args;
+-	struct avdtp_error avdtp_err;
+ 
+-	if (err < 0) {
+-		avdtp_error_init(&avdtp_err, AVDTP_ERRNO, -err);
+-		s->err = &avdtp_err;
+-	}
++	if (err < 0)
++		setup_error_init(s, AVDTP_ERRNO, -err);
+ 
+ 	va_start(args, cb1);
+ 	finalize = cb1;
+@@ -576,10 +594,7 @@ done:
+ 
+ 	finalize_config(setup);
+ 
+-	if (setup->err) {
+-		g_free(setup->err);
+-		setup->err = NULL;
+-	}
++	setup_error_set(setup, NULL);
+ 
+ 	setup_unref(setup);
+ 
+@@ -588,11 +603,9 @@ done:
+ 
+ static void endpoint_setconf_cb(struct a2dp_setup *setup, gboolean ret)
+ {
+-	if (ret == FALSE) {
+-		setup->err = g_new(struct avdtp_error, 1);
+-		avdtp_error_init(setup->err, AVDTP_MEDIA_CODEC,
++	if (ret == FALSE)
++		setup_error_init(setup, AVDTP_MEDIA_CODEC,
+ 					AVDTP_UNSUPPORTED_CONFIGURATION);
+-	}
+ 
+ 	auto_config(setup);
+ 	setup_unref(setup);
+@@ -671,8 +684,7 @@ static gboolean endpoint_setconf_ind(struct avdtp *session,
+ 
+ 		if (cap->category == AVDTP_DELAY_REPORTING &&
+ 					!a2dp_sep->delay_reporting) {
+-			setup->err = g_new(struct avdtp_error, 1);
+-			avdtp_error_init(setup->err, AVDTP_DELAY_REPORTING,
++			setup_error_init(setup, AVDTP_DELAY_REPORTING,
+ 					AVDTP_UNSUPPORTED_CONFIGURATION);
+ 			goto done;
+ 		}
+@@ -683,8 +695,7 @@ static gboolean endpoint_setconf_ind(struct avdtp *session,
+ 		codec = (struct avdtp_media_codec_capability *) cap->data;
+ 
+ 		if (codec->media_codec_type != a2dp_sep->codec) {
+-			setup->err = g_new(struct avdtp_error, 1);
+-			avdtp_error_init(setup->err, AVDTP_MEDIA_CODEC,
++			setup_error_init(setup, AVDTP_MEDIA_CODEC,
+ 					AVDTP_UNSUPPORTED_CONFIGURATION);
+ 			goto done;
+ 		}
+@@ -704,10 +715,9 @@ static gboolean endpoint_setconf_ind(struct avdtp *session,
+ 			return TRUE;
+ 		}
+ 
+-		setup_unref(setup);
+-		setup->err = g_new(struct avdtp_error, 1);
+-		avdtp_error_init(setup->err, AVDTP_MEDIA_CODEC,
++		setup_error_init(setup, AVDTP_MEDIA_CODEC,
+ 					AVDTP_UNSUPPORTED_CONFIGURATION);
++		setup_unref(setup);
+ 		break;
+ 	}
+ 
+@@ -886,7 +896,7 @@ static void invalidate_remote_cache(struct a2dp_setup *setup,
+ 		/* Set error to -EAGAIN so the likes of policy plugin can
+ 		 * reattempt to connect.
+ 		 */
+-		avdtp_error_init(setup->err, AVDTP_ERRNO, -EAGAIN);
++		setup_error_init(setup, AVDTP_ERRNO, -EAGAIN);
+ 	}
+ }
+ 
+@@ -910,10 +920,10 @@ static void setconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+ 	if (err) {
+ 		if (setup) {
+ 			setup_ref(setup);
+-			setup->err = err;
++			setup_error_set(setup, err);
+ 			invalidate_remote_cache(setup, err);
+ 			finalize_config(setup);
+-			setup->err = NULL;
++			setup_error_set(setup, NULL);
+ 			setup_unref(setup);
+ 		}
+ 
+@@ -1116,7 +1126,7 @@ static void open_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+ 
+ 	if (err) {
+ 		setup->stream = NULL;
+-		setup->err = err;
++		setup_error_set(setup, err);
+ 		if (setup->start)
+ 			finalize_resume(setup);
+ 	} else if (setup->chan)
+@@ -1191,7 +1201,7 @@ static void start_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+ 
+ 	if (err) {
+ 		setup->stream = NULL;
+-		setup->err = err;
++		setup_error_set(setup, err);
+ 	}
+ 
+ 	finalize_resume(setup);
+@@ -1270,7 +1280,7 @@ static void suspend_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+ 
+ 	if (err) {
+ 		setup->stream = NULL;
+-		setup->err = err;
++		setup_error_set(setup, err);
+ 	}
+ 
+ 	finalize_suspend(setup);
+@@ -1418,7 +1428,7 @@ static void close_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+ 
+ 	if (err) {
+ 		setup->stream = NULL;
+-		setup->err = err;
++		setup_error_set(setup, err);
+ 		finalize_config(setup);
+ 		return;
+ 	}
+@@ -1528,7 +1538,7 @@ static void reconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+ 
+ 	if (err) {
+ 		setup->stream = NULL;
+-		setup->err = err;
++		setup_error_set(setup, err);
+ 	}
+ 
+ 	finalize_config(setup);
+@@ -2885,7 +2895,7 @@ static void discover_cb(struct avdtp *session, GSList *seps,
+ 
+ 	setup->seps = seps;
+ 	if (err)
+-		setup->err = err;
++		setup_error_set(setup, err);
+ 
+ 	if (!err) {
+ 		g_slist_foreach(seps, foreach_register_remote_sep, setup->chan);
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.44.0
 
