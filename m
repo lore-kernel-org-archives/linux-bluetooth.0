@@ -1,280 +1,251 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1826E542
-	for <linux-bluetooth@vger.kernel.org>; Sat, 16 Mar 2024 18:36:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710614217; cv=pass; b=pi+Nl5kJpYTYF0M/VR5itN/KdZrpbLHymfOX+wCJjAUgWlHfI+5A0s91Lryhb5lx1414UjFQ7Ydic3oaPGntkqGhZYzPmfeZX2qjY9MrWSoaL46Ngorz9t4VqadFNK5ql136uF7+eI4T87B8Xj2O4ZVGxm/3XIRxGMyxCR4cwLE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710614217; c=relaxed/simple;
-	bh=Qgd7tC5rqpQHVJbt04ewOPHcnQGldpssPFwAeOpUck0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TyR/2D8S/vfBWSCQwcRYMbz2lunriLrO57U0o9EGG0vLLGVqbjW9bQh62yowfeyaf0ykWzg751ZIax+/d6wpd3K8b9sPMWmKzVgtIqSvA6lGM0IfcE2K65DAkqKkkLni+Ir9FNxmcnG3uNO+6iEI5vcOzefo1Tis60nbMAcYMFk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=XBrJIOYs; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48359D26A
+	for <linux-bluetooth@vger.kernel.org>; Sun, 17 Mar 2024 06:30:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710657017; cv=none; b=XYyFKMlWyBE62fGyM8YHRxL/zuK6UkbL6/mtzJD/KGm/jcAGviX/Am9+PkCkzJJi8u/yVF/wEEupvP/JAxcffprCXC2l2mV0FtPusri1129V/p1ubvtzBdxaLBVHm1CpknDw1tJFxp4TaZsX5IvCGyiYiUFUEssUcYtY+fVqfPA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710657017; c=relaxed/simple;
+	bh=7+dBZUYxZwqluFYWJXjI3vdVyegNn09WVjSvqlmCKeg=;
+	h=Date:From:To:Cc:Subject:Message-ID; b=Wgwtxa7pw2NBxWhYkXJMVwsoYP02j9S7Xa3sFiTCbXPh4jUl51YBOpy5d57I6W6dPQsHby/cYVunyvujKmvPh7zQAkeG5XKsAdScYrVcHdJ3E/mFcXHHlMQCTGLFh2Cko3UOqcrwlImPutg+F7fMdxURNSGuRJN1kkciYiEI6Eo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GSZVHYSn; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="XBrJIOYs"
-Received: from monolith.lan (unknown [185.77.218.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4Txqb10bZGzySM;
-	Sat, 16 Mar 2024 20:36:44 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1710614205;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=hGSZjQuPPFYEdM55/0weBV1UsWRNWL134Dk1nJz12G8=;
-	b=XBrJIOYsVcZZI5py8qngvQPIHTakQcaLOAf4Y0a9/WKJBCelxq6Dj2gVlrxuWbvdTvzF2J
-	lnY1IfaXEMbsGUjCG9CR3UAvELraVadTx2clrenXlWvQ0YNPCgbYG+sKK9Azwh/LJNbnhO
-	qwvn5FGlmiZjD07ctI091aP4JM5V0Hs=
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1710614205; a=rsa-sha256; cv=none;
-	b=hyKE9z7cG1Hags9YZ9nMlZrT4i83NBlG4lhwYXLVYUy2jxjCPpzgpv1VBHmuqgi6+naYf2
-	oOO8ftp8+0nOAycAuZoIvBq2Aq2xNPluqO9U3+5vTUlOlL70cRLBPXmcHH7Z9ev1moH5bL
-	pWH0oMZ0FWjYB1XNVF7p7GtEoxbjiIU=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1710614205;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=hGSZjQuPPFYEdM55/0weBV1UsWRNWL134Dk1nJz12G8=;
-	b=VVmyXWbQ1/IFoMTEtC3Bdb3d4lwPmxNbC+xIIK0XBJbPT6ahhMA0JFDv814NgBfUDUnDhm
-	txmdcr9FIS+V04I8lXA84iI0vtD0c5w4ZinoyZv8xDXNq1YNENpqRXH2ygb6y8nBsIgSqV
-	TuhGrZ6LpLUksl82ICSFLZZFkWQ3/U4=
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ] a2dp: fix setup->err use-after-free
-Date: Sat, 16 Mar 2024 20:36:38 +0200
-Message-ID: <154e1a604eb8c3d924699489da72ea905915fb88.1710614196.git.pav@iki.fi>
-X-Mailer: git-send-email 2.44.0
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GSZVHYSn"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1710657015; x=1742193015;
+  h=date:from:to:cc:subject:message-id;
+  bh=7+dBZUYxZwqluFYWJXjI3vdVyegNn09WVjSvqlmCKeg=;
+  b=GSZVHYSn7+6W8TjeQcOrZLSO33vXvQp2EqAVY+C1XhruQ1+AF+AiyMen
+   DZ4Rfh8EW+kWToAER7hddTpL3rYmyEIFWSzOXCGrBqefs2f5g9cxDr+Ye
+   jlDbNWAkZIY7RNcrk81PeZ68LgYE/4+S8JnxRRUlGX2pOlXp9UZ4ZrsVz
+   +SFlFzXg68xr4R6J7udGJXYRvNP1lLlNG2hnKSOttpRa7IoeC37GBaFOf
+   aRqsCoxS4S0vnFDs5BIaUjsMJFGXnsTLN8mlsc5aXisHj8r0gkrvAAGa0
+   t55ioDqoek91fdSijyrFjVV675Q6BX7hp/Ay39U+VR2D/nw6Iw78oBsMV
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11015"; a="6089539"
+X-IronPort-AV: E=Sophos;i="6.07,132,1708416000"; 
+   d="scan'208";a="6089539"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2024 23:30:14 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,132,1708416000"; 
+   d="scan'208";a="17834514"
+Received: from lkp-server01.sh.intel.com (HELO b21307750695) ([10.239.97.150])
+  by orviesa003.jf.intel.com with ESMTP; 16 Mar 2024 23:30:13 -0700
+Received: from kbuild by b21307750695 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rlk26-000G4X-2e;
+	Sun, 17 Mar 2024 06:30:10 +0000
+Date: Sun, 17 Mar 2024 14:30:05 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ f4a0fc6780c7c1583133a9b8f10d76f769e41d34
+Message-ID: <202403171401.kfjzPlTp-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-setup->err is set to values that either are on stack of avdtp.c
-routines, obtained from callbacks, or allocated on heap. This is
-inconsistent, and use-after-free in some cases.
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: f4a0fc6780c7c1583133a9b8f10d76f769e41d34  Bluetooth: Add support for MediaTek MT7922 device
 
-Fix by always allocating setup->err ourselves, copying any values
-obtained from callbacks.  Add setup_error_set/init and do all setup->err
-manipulation via them.
+elapsed time: 723m
 
-Fixes crash:
+configs tested: 178
+configs skipped: 3
 
-==994225==ERROR: AddressSanitizer: stack-use-after-return
-READ of size 1 at 0x7f15ee5189c0 thread T0
-    #0 0x445724 in avdtp_error_category profiles/audio/avdtp.c:657
-    #1 0x41e59e in error_to_errno profiles/audio/a2dp.c:303
-    #2 0x42bb23 in a2dp_reconfigure profiles/audio/a2dp.c:1336
-    #3 0x7f15f1512798 in g_timeout_dispatch
-    ...
-Address 0x7f15ee5189c0 is located in stack of thread T0 at offset 64 in frame
-    #0 0x466b76 in avdtp_parse_rej profiles/audio/avdtp.c:3056
-  This frame has 2 object(s):
-    [48, 49) 'acp_seid' (line 3058)
-    [64, 72) 'err' (line 3057) <== Memory access at offset 64 is inside this variable
----
- profiles/audio/a2dp.c | 68 +++++++++++++++++++++++++------------------
- 1 file changed, 39 insertions(+), 29 deletions(-)
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index b43161a13..a3c294bc3 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -222,6 +222,7 @@ static void setup_free(struct a2dp_setup *s)
- 		avdtp_unref(s->session);
- 	g_slist_free_full(s->cb, g_free);
- 	g_slist_free_full(s->caps, g_free);
-+	g_free(s->err);
- 	g_free(s);
- }
- 
-@@ -270,17 +271,34 @@ static void setup_cb_free(struct a2dp_setup_cb *cb)
- 	g_free(cb);
- }
- 
-+static void setup_error_set(struct a2dp_setup *setup, struct avdtp_error *err)
-+{
-+	if (!err) {
-+		g_free(setup->err);
-+		setup->err = NULL;
-+	} else {
-+		if (!setup->err)
-+			setup->err = g_new0(struct avdtp_error, 1);
-+		memcpy(setup->err, err, sizeof(struct avdtp_error));
-+	}
-+}
-+
-+static void setup_error_init(struct a2dp_setup *setup, uint8_t type, int id)
-+{
-+	struct avdtp_error err;
-+
-+	avdtp_error_init(&err, type, id);
-+	setup_error_set(setup, &err);
-+}
-+
- static void finalize_setup_errno(struct a2dp_setup *s, int err,
- 					GSourceFunc cb1, ...)
- {
- 	GSourceFunc finalize;
- 	va_list args;
--	struct avdtp_error avdtp_err;
- 
--	if (err < 0) {
--		avdtp_error_init(&avdtp_err, AVDTP_ERRNO, -err);
--		s->err = &avdtp_err;
--	}
-+	if (err < 0)
-+		setup_error_init(s, AVDTP_ERRNO, -err);
- 
- 	va_start(args, cb1);
- 	finalize = cb1;
-@@ -576,10 +594,7 @@ done:
- 
- 	finalize_config(setup);
- 
--	if (setup->err) {
--		g_free(setup->err);
--		setup->err = NULL;
--	}
-+	setup_error_set(setup, NULL);
- 
- 	setup_unref(setup);
- 
-@@ -588,11 +603,9 @@ done:
- 
- static void endpoint_setconf_cb(struct a2dp_setup *setup, gboolean ret)
- {
--	if (ret == FALSE) {
--		setup->err = g_new(struct avdtp_error, 1);
--		avdtp_error_init(setup->err, AVDTP_MEDIA_CODEC,
-+	if (ret == FALSE)
-+		setup_error_init(setup, AVDTP_MEDIA_CODEC,
- 					AVDTP_UNSUPPORTED_CONFIGURATION);
--	}
- 
- 	auto_config(setup);
- 	setup_unref(setup);
-@@ -671,8 +684,7 @@ static gboolean endpoint_setconf_ind(struct avdtp *session,
- 
- 		if (cap->category == AVDTP_DELAY_REPORTING &&
- 					!a2dp_sep->delay_reporting) {
--			setup->err = g_new(struct avdtp_error, 1);
--			avdtp_error_init(setup->err, AVDTP_DELAY_REPORTING,
-+			setup_error_init(setup, AVDTP_DELAY_REPORTING,
- 					AVDTP_UNSUPPORTED_CONFIGURATION);
- 			goto done;
- 		}
-@@ -683,8 +695,7 @@ static gboolean endpoint_setconf_ind(struct avdtp *session,
- 		codec = (struct avdtp_media_codec_capability *) cap->data;
- 
- 		if (codec->media_codec_type != a2dp_sep->codec) {
--			setup->err = g_new(struct avdtp_error, 1);
--			avdtp_error_init(setup->err, AVDTP_MEDIA_CODEC,
-+			setup_error_init(setup, AVDTP_MEDIA_CODEC,
- 					AVDTP_UNSUPPORTED_CONFIGURATION);
- 			goto done;
- 		}
-@@ -704,10 +715,9 @@ static gboolean endpoint_setconf_ind(struct avdtp *session,
- 			return TRUE;
- 		}
- 
--		setup_unref(setup);
--		setup->err = g_new(struct avdtp_error, 1);
--		avdtp_error_init(setup->err, AVDTP_MEDIA_CODEC,
-+		setup_error_init(setup, AVDTP_MEDIA_CODEC,
- 					AVDTP_UNSUPPORTED_CONFIGURATION);
-+		setup_unref(setup);
- 		break;
- 	}
- 
-@@ -886,7 +896,7 @@ static void invalidate_remote_cache(struct a2dp_setup *setup,
- 		/* Set error to -EAGAIN so the likes of policy plugin can
- 		 * reattempt to connect.
- 		 */
--		avdtp_error_init(setup->err, AVDTP_ERRNO, -EAGAIN);
-+		setup_error_init(setup, AVDTP_ERRNO, -EAGAIN);
- 	}
- }
- 
-@@ -910,10 +920,10 @@ static void setconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
- 	if (err) {
- 		if (setup) {
- 			setup_ref(setup);
--			setup->err = err;
-+			setup_error_set(setup, err);
- 			invalidate_remote_cache(setup, err);
- 			finalize_config(setup);
--			setup->err = NULL;
-+			setup_error_set(setup, NULL);
- 			setup_unref(setup);
- 		}
- 
-@@ -1116,7 +1126,7 @@ static void open_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
- 
- 	if (err) {
- 		setup->stream = NULL;
--		setup->err = err;
-+		setup_error_set(setup, err);
- 		if (setup->start)
- 			finalize_resume(setup);
- 	} else if (setup->chan)
-@@ -1191,7 +1201,7 @@ static void start_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
- 
- 	if (err) {
- 		setup->stream = NULL;
--		setup->err = err;
-+		setup_error_set(setup, err);
- 	}
- 
- 	finalize_resume(setup);
-@@ -1270,7 +1280,7 @@ static void suspend_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
- 
- 	if (err) {
- 		setup->stream = NULL;
--		setup->err = err;
-+		setup_error_set(setup, err);
- 	}
- 
- 	finalize_suspend(setup);
-@@ -1418,7 +1428,7 @@ static void close_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
- 
- 	if (err) {
- 		setup->stream = NULL;
--		setup->err = err;
-+		setup_error_set(setup, err);
- 		finalize_config(setup);
- 		return;
- 	}
-@@ -1528,7 +1538,7 @@ static void reconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
- 
- 	if (err) {
- 		setup->stream = NULL;
--		setup->err = err;
-+		setup_error_set(setup, err);
- 	}
- 
- 	finalize_config(setup);
-@@ -2885,7 +2895,7 @@ static void discover_cb(struct avdtp *session, GSList *seps,
- 
- 	setup->seps = seps;
- 	if (err)
--		setup->err = err;
-+		setup_error_set(setup, err);
- 
- 	if (!err) {
- 		g_slist_foreach(seps, foreach_register_remote_sep, setup->chan);
+tested configs:
+alpha                             allnoconfig   gcc  
+alpha                            allyesconfig   gcc  
+alpha                               defconfig   gcc  
+arc                              allmodconfig   gcc  
+arc                               allnoconfig   gcc  
+arc                              allyesconfig   gcc  
+arc                          axs101_defconfig   gcc  
+arc                                 defconfig   gcc  
+arc                         haps_hs_defconfig   gcc  
+arc                     haps_hs_smp_defconfig   gcc  
+arc                   randconfig-001-20240317   gcc  
+arc                   randconfig-002-20240317   gcc  
+arm                              allmodconfig   gcc  
+arm                               allnoconfig   clang
+arm                              allyesconfig   gcc  
+arm                         assabet_defconfig   clang
+arm                                 defconfig   clang
+arm                           imxrt_defconfig   clang
+arm                   randconfig-001-20240317   clang
+arm                   randconfig-002-20240317   clang
+arm                   randconfig-003-20240317   gcc  
+arm                   randconfig-004-20240317   clang
+arm64                            allmodconfig   clang
+arm64                             allnoconfig   gcc  
+arm64                               defconfig   gcc  
+arm64                 randconfig-001-20240317   clang
+arm64                 randconfig-002-20240317   gcc  
+arm64                 randconfig-003-20240317   gcc  
+arm64                 randconfig-004-20240317   clang
+csky                             allmodconfig   gcc  
+csky                              allnoconfig   gcc  
+csky                             allyesconfig   gcc  
+csky                                defconfig   gcc  
+csky                  randconfig-001-20240317   gcc  
+csky                  randconfig-002-20240317   gcc  
+hexagon                          allmodconfig   clang
+hexagon                           allnoconfig   clang
+hexagon                          allyesconfig   clang
+hexagon                             defconfig   clang
+hexagon               randconfig-001-20240317   clang
+hexagon               randconfig-002-20240317   clang
+i386                             allmodconfig   gcc  
+i386                              allnoconfig   gcc  
+i386                             allyesconfig   gcc  
+i386         buildonly-randconfig-001-20240317   gcc  
+i386         buildonly-randconfig-002-20240317   clang
+i386         buildonly-randconfig-003-20240317   gcc  
+i386         buildonly-randconfig-004-20240317   clang
+i386         buildonly-randconfig-005-20240317   clang
+i386         buildonly-randconfig-006-20240317   gcc  
+i386                                defconfig   clang
+i386                  randconfig-001-20240317   clang
+i386                  randconfig-002-20240317   clang
+i386                  randconfig-003-20240317   clang
+i386                  randconfig-004-20240317   clang
+i386                  randconfig-005-20240317   gcc  
+i386                  randconfig-006-20240317   gcc  
+i386                  randconfig-011-20240317   clang
+i386                  randconfig-012-20240317   clang
+i386                  randconfig-013-20240317   clang
+i386                  randconfig-014-20240317   gcc  
+i386                  randconfig-015-20240317   gcc  
+i386                  randconfig-016-20240317   clang
+loongarch                        allmodconfig   gcc  
+loongarch                         allnoconfig   gcc  
+loongarch                           defconfig   gcc  
+loongarch             randconfig-001-20240317   gcc  
+loongarch             randconfig-002-20240317   gcc  
+m68k                             allmodconfig   gcc  
+m68k                              allnoconfig   gcc  
+m68k                             allyesconfig   gcc  
+m68k                                defconfig   gcc  
+m68k                        mvme147_defconfig   gcc  
+microblaze                       allmodconfig   gcc  
+microblaze                        allnoconfig   gcc  
+microblaze                       allyesconfig   gcc  
+microblaze                          defconfig   gcc  
+mips                              allnoconfig   gcc  
+mips                             allyesconfig   gcc  
+mips                           jazz_defconfig   clang
+mips                      loongson3_defconfig   gcc  
+mips                malta_qemu_32r6_defconfig   gcc  
+nios2                            allmodconfig   gcc  
+nios2                             allnoconfig   gcc  
+nios2                            allyesconfig   gcc  
+nios2                               defconfig   gcc  
+nios2                 randconfig-001-20240317   gcc  
+nios2                 randconfig-002-20240317   gcc  
+openrisc                          allnoconfig   gcc  
+openrisc                         allyesconfig   gcc  
+openrisc                            defconfig   gcc  
+parisc                           allmodconfig   gcc  
+parisc                            allnoconfig   gcc  
+parisc                           allyesconfig   gcc  
+parisc                              defconfig   gcc  
+parisc                randconfig-001-20240317   gcc  
+parisc                randconfig-002-20240317   gcc  
+parisc64                            defconfig   gcc  
+powerpc                          allmodconfig   gcc  
+powerpc                           allnoconfig   gcc  
+powerpc                          allyesconfig   clang
+powerpc                  mpc866_ads_defconfig   clang
+powerpc                      ppc6xx_defconfig   gcc  
+powerpc               randconfig-001-20240317   clang
+powerpc               randconfig-002-20240317   gcc  
+powerpc               randconfig-003-20240317   clang
+powerpc64             randconfig-001-20240317   gcc  
+powerpc64             randconfig-002-20240317   clang
+powerpc64             randconfig-003-20240317   clang
+riscv                            allmodconfig   clang
+riscv                             allnoconfig   gcc  
+riscv                            allyesconfig   clang
+riscv                               defconfig   clang
+riscv                 randconfig-001-20240317   clang
+riscv                 randconfig-002-20240317   clang
+s390                             allmodconfig   clang
+s390                              allnoconfig   clang
+s390                             allyesconfig   gcc  
+s390                                defconfig   clang
+s390                  randconfig-001-20240317   clang
+s390                  randconfig-002-20240317   gcc  
+sh                               allmodconfig   gcc  
+sh                                allnoconfig   gcc  
+sh                               allyesconfig   gcc  
+sh                                  defconfig   gcc  
+sh                        edosk7705_defconfig   gcc  
+sh                               j2_defconfig   gcc  
+sh                    randconfig-001-20240317   gcc  
+sh                    randconfig-002-20240317   gcc  
+sh                          rsk7201_defconfig   gcc  
+sh                           se7712_defconfig   gcc  
+sparc                            allmodconfig   gcc  
+sparc                             allnoconfig   gcc  
+sparc                               defconfig   gcc  
+sparc64                          allmodconfig   gcc  
+sparc64                          allyesconfig   gcc  
+sparc64                             defconfig   gcc  
+sparc64               randconfig-001-20240317   gcc  
+sparc64               randconfig-002-20240317   gcc  
+um                               allmodconfig   clang
+um                                allnoconfig   clang
+um                               allyesconfig   gcc  
+um                                  defconfig   clang
+um                             i386_defconfig   gcc  
+um                    randconfig-001-20240317   gcc  
+um                    randconfig-002-20240317   gcc  
+um                           x86_64_defconfig   clang
+x86_64                            allnoconfig   clang
+x86_64                           allyesconfig   clang
+x86_64       buildonly-randconfig-001-20240317   gcc  
+x86_64       buildonly-randconfig-002-20240317   gcc  
+x86_64       buildonly-randconfig-003-20240317   gcc  
+x86_64       buildonly-randconfig-004-20240317   clang
+x86_64       buildonly-randconfig-005-20240317   gcc  
+x86_64       buildonly-randconfig-006-20240317   clang
+x86_64                              defconfig   gcc  
+x86_64                randconfig-001-20240317   gcc  
+x86_64                randconfig-002-20240317   gcc  
+x86_64                randconfig-003-20240317   gcc  
+x86_64                randconfig-004-20240317   gcc  
+x86_64                randconfig-005-20240317   gcc  
+x86_64                randconfig-006-20240317   clang
+x86_64                randconfig-011-20240317   clang
+x86_64                randconfig-012-20240317   gcc  
+x86_64                randconfig-013-20240317   clang
+x86_64                randconfig-014-20240317   clang
+x86_64                randconfig-015-20240317   gcc  
+x86_64                randconfig-016-20240317   clang
+x86_64                randconfig-071-20240317   gcc  
+x86_64                randconfig-072-20240317   clang
+x86_64                randconfig-073-20240317   clang
+x86_64                randconfig-074-20240317   gcc  
+x86_64                randconfig-075-20240317   gcc  
+x86_64                randconfig-076-20240317   clang
+x86_64                          rhel-8.3-rust   clang
+xtensa                            allnoconfig   gcc  
+xtensa                  cadence_csp_defconfig   gcc  
+xtensa                       common_defconfig   gcc  
+
 -- 
-2.44.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
