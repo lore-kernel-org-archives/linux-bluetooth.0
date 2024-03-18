@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CAE5364A5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1FFB364BA;
 	Mon, 18 Mar 2024 11:08:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710760139; cv=none; b=gAH9NGIjzz5m8bDrnv+UP1LtHQsxagJFjVCy6l4P+R/87VkhpayD58uCYW6L+tk10YsblxlOAbZhVvs6XQGctikUVO7KzcSW1ra37Mr8GtvyZuTgQNIaxru6YPvziELYG5XYTc7GX64XdvydRYRbZDkwh7Wz8z8MCWL7wF/MGWU=
+	t=1710760139; cv=none; b=sxzCQ85zcnlMq1BA4WqmgTs/wHUN88CfTmIjPopHbKAEf95eikCuITVhGTn3qsV+JfJBJ/v+S6/hBrUVEJu0jEGCkUVgENTd85vIUbaKD49tcwPdy9Hmgbsg6NzdzvTOidWyY8syCRYEHL5gvB/iRGre3Y9p/bwmD/B6g4GVfGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1710760139; c=relaxed/simple;
-	bh=LbF5XXFvk6aEASRyo5T1oNgGQ0IDpAcetqWbVeoDdks=;
+	bh=VQl76OihFJ6MD7Q7CC4hfGfrDaQ2DcOqSN3Z7HUNPy4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rGBrSLlaD2suCdlWrLvyfImLAJMl7pbsCDuBNUaQJBV6DDmJqHubeji7js7ydKWvYujXbb1Ele0kDkPr+WUPXfiE5q8ICPm+HHPtcKcc6WDLCBuhR5DRyGwIQx4gT9UwdKFtLDCCSH8lDGOxFECOCYF2oVSbvO61xvgzQuv87aI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d8FOSeNk; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=bt/HVZ+9u8h2+dp+CAsrLQEzGnrwqLILw3SEP22O1Tjry1qQRZFII53och698WW6+zQPmjuBpGkXFNy8/GaVuPupZjF8IRUAWJA1BM82EeUJMBQHsvgxsit7imZU/zd6v5Fg2eG6z6mNqHaF2UBKOXVEbq0AQDQo4VfFc9h222U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RstFvpPV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d8FOSeNk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A968C433F1;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RstFvpPV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DA0DC43141;
 	Mon, 18 Mar 2024 11:08:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1710760139;
-	bh=LbF5XXFvk6aEASRyo5T1oNgGQ0IDpAcetqWbVeoDdks=;
+	bh=VQl76OihFJ6MD7Q7CC4hfGfrDaQ2DcOqSN3Z7HUNPy4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=d8FOSeNk/y9r/aT7VpvidzMNJsY0MptShLWEY4zGfX2D4aeH51ltatmrwczSxNdJw
-	 UarcT8igxfK4R/bT7kvyHolJyssS8Mr3GmpLVhiziX5cD69Eia2itbO0OShky9x9Yy
-	 4WfwmurW1F4guk4F4WyQKKteP9mE9m+3IZfvWEcFlLV2lcz0nBvK+zbZgL+HoJSEPw
-	 y8ICt14eIW0ufL+jxmZeneKjD4VlYAdQKfd/sntLw+0S7i1hDmmNYqx4q+/Y8CAKGV
-	 8Fbf/vCPUF93L2E8zrlyvtTSrLDEHPL0R62qzBrHjsV9NYNSScI/MoctW6Beea/tx9
-	 vwsXR67bWmAuA==
+	b=RstFvpPV6fSrd69/0/PjEtpdZXRg9OeNvTe/kgTqto/4Fk8qVpZUDM9VkCwGYgk/v
+	 MrFQSwPnH+g2WO6EmFW0H3sSlF1XYFo7016p+hEu6CTsKJ9n5uB1nmWofWrjTwEv21
+	 1R1xDrw+RYhh06fFg1vSNCdG5WIT5QtsZfBTkgf2RWaurGPeI8OnTxMgOsqzhc7xfP
+	 BGa+JR1/XDwcPECcHIbwYSWDy1O/++R0YE0xj9HE+h+4OrFYTtYrarHw0QYBT566gu
+	 YV2UavkOmmsClR4Qv7yGZkMk+TzEgi1K0jGolhsi4T2NsLQKYBL4UOQWLV+3jhdXt9
+	 +EE0qOruf1n6w==
 Received: from johan by xi.lan with local (Exim 4.97.1)
 	(envelope-from <johan+linaro@kernel.org>)
-	id 1rmArY-000000008Jl-34xm;
+	id 1rmArY-000000008Jp-3iDJ;
 	Mon, 18 Mar 2024 12:09:04 +0100
 From: Johan Hovold <johan+linaro@kernel.org>
 To: Marcel Holtmann <marcel@holtmann.org>,
@@ -46,10 +46,13 @@ Cc: Rob Herring <robh+dt@kernel.org>,
 	netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Johan Hovold <johan+linaro@kernel.org>
-Subject: [PATCH v2 1/4] dt-bindings: bluetooth: add new wcn3991 compatible to fix bd_addr
-Date: Mon, 18 Mar 2024 12:08:52 +0100
-Message-ID: <20240318110855.31954-2-johan+linaro@kernel.org>
+	Johan Hovold <johan+linaro@kernel.org>,
+	stable@vger.kernel.org,
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+	Nikita Travkin <nikita@trvn.ru>
+Subject: [PATCH v2 3/4] Bluetooth: qca: fix device-address endianness
+Date: Mon, 18 Mar 2024 12:08:54 +0100
+Message-ID: <20240318110855.31954-4-johan+linaro@kernel.org>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <20240318110855.31954-1-johan+linaro@kernel.org>
 References: <20240318110855.31954-1-johan+linaro@kernel.org>
@@ -61,73 +64,54 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Several Qualcomm Bluetooth controllers lack persistent storage for the
-device address and instead one can be provided by the boot firmware
-using the 'local-bd-address' devicetree property.
+The WCN6855 firmware on the Lenovo ThinkPad X13s expects the Bluetooth
+device address in big-endian order when setting it using the
+EDL_WRITE_BD_ADDR_OPCODE command.
 
-The Bluetooth bindings clearly says that the address should be specified
-in little-endian order, but due to a long-standing bug in the Qualcomm
-driver which reversed the address some bootloaders have been providing
-the address in big-endian order instead.
+Presumably, this is the case for all non-ROME devices which all use the
+EDL_WRITE_BD_ADDR_OPCODE command for this (unlike the ROME devices which
+use a different command and expect the address in little-endian order).
 
-The only device out there that should be affected by this is the WCN3991
-used in some Chromebooks. To maintain backwards compatibility, mark the
-current compatible string as deprecated and add a new
-'qcom,wcn3991-bt-bdaddr-le' for firmware which conforms with the
-binding.
+Reverse the little-endian address before setting it to make sure that
+the address can be configured using tools like btmgmt or using the
+'local-bd-address' devicetree property.
 
+Note that this can potentially break systems with boot firmware which
+has started relying on the broken behaviour and is incorrectly passing
+the address via devicetree in big-endian order.
+
+Fixes: 5c0a1001c8be ("Bluetooth: hci_qca: Add helper to set device address")
+Cc: stable@vger.kernel.org      # 5.1
+Cc: Balakrishna Godavarthi <quic_bgodavar@quicinc.com>
+Cc: Matthias Kaehlcke <mka@chromium.org>
+Tested-by: Nikita Travkin <nikita@trvn.ru> # sc7180
 Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
 ---
- .../net/bluetooth/qualcomm-bluetooth.yaml     | 29 +++++++++++--------
- 1 file changed, 17 insertions(+), 12 deletions(-)
+ drivers/bluetooth/btqca.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
-index eba2f3026ab0..b6fce6d02138 100644
---- a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
-+++ b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
-@@ -15,18 +15,22 @@ description:
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index b40b32fa7f1c..19cfc342fc7b 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -826,11 +826,15 @@ EXPORT_SYMBOL_GPL(qca_uart_setup);
  
- properties:
-   compatible:
--    enum:
--      - qcom,qca2066-bt
--      - qcom,qca6174-bt
--      - qcom,qca9377-bt
--      - qcom,wcn3988-bt
--      - qcom,wcn3990-bt
--      - qcom,wcn3991-bt
--      - qcom,wcn3998-bt
--      - qcom,qca6390-bt
--      - qcom,wcn6750-bt
--      - qcom,wcn6855-bt
--      - qcom,wcn7850-bt
-+    oneOf:
-+      - enum:
-+          - qcom,qca2066-bt
-+          - qcom,qca6174-bt
-+          - qcom,qca9377-bt
-+          - qcom,wcn3988-bt
-+          - qcom,wcn3990-bt
-+          - qcom,wcn3991-bt-bdaddr-le
-+          - qcom,wcn3998-bt
-+          - qcom,qca6390-bt
-+          - qcom,wcn6750-bt
-+          - qcom,wcn6855-bt
-+          - qcom,wcn7850-bt
-+      - enum:
-+          - qcom,wcn3991-bt
-+        deprecated: true
+ int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+ {
++	bdaddr_t bdaddr_swapped;
+ 	struct sk_buff *skb;
+ 	int err;
  
-   enable-gpios:
-     maxItems: 1
-@@ -122,6 +126,7 @@ allOf:
-               - qcom,wcn3988-bt
-               - qcom,wcn3990-bt
-               - qcom,wcn3991-bt
-+              - qcom,wcn3991-bt-bdaddr-le
-               - qcom,wcn3998-bt
-     then:
-       required:
+-	skb = __hci_cmd_sync_ev(hdev, EDL_WRITE_BD_ADDR_OPCODE, 6, bdaddr,
+-				HCI_EV_VENDOR, HCI_INIT_TIMEOUT);
++	baswap(&bdaddr_swapped, bdaddr);
++
++	skb = __hci_cmd_sync_ev(hdev, EDL_WRITE_BD_ADDR_OPCODE, 6,
++				&bdaddr_swapped, HCI_EV_VENDOR,
++				HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+ 		err = PTR_ERR(skb);
+ 		bt_dev_err(hdev, "QCA Change address cmd failed (%d)", err);
 -- 
 2.43.2
 
