@@ -1,120 +1,95 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2026364BF;
-	Mon, 18 Mar 2024 11:08:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEBAC364CD
+	for <linux-bluetooth@vger.kernel.org>; Mon, 18 Mar 2024 11:36:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710760139; cv=none; b=nlSiremQ48t3lxbKb1+lkEB/V+hWuE9iLIMInBiQP4CPtCx4CrE76OxFf+aJy1kSKNtIx8fHCTepNMzyPSGrxWoeu23wHww/obCtWZV0qKOyd1JaSWC7ogr2qfm+e37ZuuF0TXAwkyLnPwmfVJCmdZ/rQmHvnfUoRfbiYdoALsc=
+	t=1710761812; cv=none; b=nhI9WWd6KjH1LLHMAeT0iX1Xvzps4688zoE9Vv9SVuj3veSone4wzjeiyJudPlpWhaKiabGDaNiG7qI5c4gMWv/gvT8wB6aok8iUJAErJT/IhnamKzJIiUf8wvNO8kExfNrLp0XyxMFvI79Q2NQqDngkip2lIJMdepQO+c7K08M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710760139; c=relaxed/simple;
-	bh=vFYxI/evLVZ5xnjJcv/HxjQrEpYkbG+SjslgqJGSw9Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XmMfZGRdFYBrGaUndz0SUDzQCfOj2wjqlsl/VMFVEkPWemKAiHZ3BUwaa4tWgyZHeyb4loJ3ZjWhsnedLGD06wARgO/e0JZtMp/+c6W+Crpu3wSd93fdTTzq0oAENMe1DKu0WmRi/bm0msK6c99sT/ANhLs7T9f/SmxOQF/Ln/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cR/ElfzX; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1710761812; c=relaxed/simple;
+	bh=FNuruXuaNEpeCSuGIPuNA69+xpLnzjCrgTxTbRrC370=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=DldDoj+XqL80Em/DTYdByAn+CTFkP0Ye63cvvPVGKtFEWeYg1hC0uQuRUSnVs2vzzzz622lg9kKzDKE9A9vUWRfbMzDm2YnNOgcpUEn4J5/GNcFK3RwWT0Hm3s+qU3izhB4LLWpJp6VvU4eu30ru0TE6GsZfHJjHbZOewILojMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Eu615Svr; arc=none smtp.client-ip=209.85.210.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cR/ElfzX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D12BC433B1;
-	Mon, 18 Mar 2024 11:08:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710760139;
-	bh=vFYxI/evLVZ5xnjJcv/HxjQrEpYkbG+SjslgqJGSw9Q=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cR/ElfzXeQ5RfhRBRufwn/QdOag6NRNsRSMmdvp4OsBMEkQg194NAMaR2m0mPHUDs
-	 wJkU0TxY95DRJ+IY7QKwzqchYsoXp5vVatMtvmOJfXw4VH7nB7V0z9RQv1RPPTmrQO
-	 ftPgFbYGUIqzOVD6oIO0E8d4wdB0eyc59HM4pnhU5dqlfk9ZXpJ8Mw0luUmOHTJhLa
-	 51ht3JXKgZXCEbsNTmtwBpR6Bq/eOILukrNVKEZe154dBlA5YwxpLHyzIhICsoHFq+
-	 G0cPna4EHmvl6BcJbCn7fZUUzdzNdlMuIdJvgMrjDldD4BCb41QICj9y2yO2jhEuWc
-	 fRqVfXQYGD68w==
-Received: from johan by xi.lan with local (Exim 4.97.1)
-	(envelope-from <johan+linaro@kernel.org>)
-	id 1rmArY-000000008Jr-45VI;
-	Mon, 18 Mar 2024 12:09:05 +0100
-From: Johan Hovold <johan+linaro@kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Matthias Kaehlcke <mka@chromium.org>,
-	Doug Anderson <dianders@google.com>,
-	Bjorn Andersson <quic_bjorande@quicinc.com>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	linux-bluetooth@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Johan Hovold <johan+linaro@kernel.org>,
-	stable@vger.kernel.org,
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>
-Subject: [PATCH v2 4/4] Bluetooth: qca: fix wcn3991 'local-bd-address' endianness
-Date: Mon, 18 Mar 2024 12:08:55 +0100
-Message-ID: <20240318110855.31954-5-johan+linaro@kernel.org>
-X-Mailer: git-send-email 2.43.2
-In-Reply-To: <20240318110855.31954-1-johan+linaro@kernel.org>
-References: <20240318110855.31954-1-johan+linaro@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Eu615Svr"
+Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-6e69ae0ff44so69104a34.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Mar 2024 04:36:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710761809; x=1711366609; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=FNuruXuaNEpeCSuGIPuNA69+xpLnzjCrgTxTbRrC370=;
+        b=Eu615SvrMOslZkM+f1mZ1WpThV6EJmaqm3i+f56Ihz56X3gmuVrzoYOe8FK+AdUHZd
+         0UgY1mbvg9P40RGMvPBiFwtXqHZRMPptFMhsesAILWsrrAUbCQY2XrB87m/DTpi6ZxJ5
+         l1DjHO8x/MxhXWe/LGOCutiPABHNR1wpMin5yaIPzEXNxYLbQkrgn2qGB3v7iEKxlB78
+         5yvsP4jLuC/YiR+NaPas4lkA999jz9KZ2sK9LSj52K4TjXpgiHDIaEjIsTE/FiixHtSZ
+         9cINJ8LiXTyrqp7NQqhohZf++oFac1/KhnDxsusp17rm+DeTmPTBQtvnEVWFqT0STCKR
+         LtRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710761809; x=1711366609;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FNuruXuaNEpeCSuGIPuNA69+xpLnzjCrgTxTbRrC370=;
+        b=ZyGM1hnR5U1c0Rb99g+wj87K/b3MVkHHaxB4N5G7vxcstIBp/B6bqJ5Xl4R5GCcQQb
+         09LDRQWkUML+gBL8cfeccPadUMZRgTZoOCjATIbIwACvvaxuh7sOU8Fu5R4kWLqdGzve
+         chqt9yMtWeBnMjI9BHKv896MlNKXIK5ViwelgrO7sfVmxwKQT3wm+nWp0w/XWWZAgTSv
+         c5YCNkMy48LED8WvNIWAAca/ET5URMCoPhKM01FMLMdqoziV8tQKgfGJlVGUSby9WxoG
+         dbfWSAtwP6SV0PG6eh6K8gCGRTxiskfrNRZdDxzQE7I9w8fOGGzojDRVerRVSiBSFvJ1
+         DArg==
+X-Gm-Message-State: AOJu0YwMwcUfw9zpW3A4gH8RZNrljdfCY+sVMBTHzKzp8V9+avCfOFpF
+	O05apO1G/c2s5b0wf9E5Eg4lyAvZVOp325PBwlb8ufecNg1at2pKHQmQn5cp
+X-Google-Smtp-Source: AGHT+IEwQWLqVLNbUySCkXb3I4adrxMCzMgNm42YP+T8naGZsjK2j8vhyTcHQOJFFU5x6h/QkbV2sg==
+X-Received: by 2002:a05:6830:1555:b0:6e6:8916:da21 with SMTP id l21-20020a056830155500b006e68916da21mr4501235otp.30.1710761809553;
+        Mon, 18 Mar 2024 04:36:49 -0700 (PDT)
+Received: from [172.17.0.2] ([20.51.198.161])
+        by smtp.gmail.com with ESMTPSA id q4-20020ad45ca4000000b00690c77505bdsm5240151qvh.37.2024.03.18.04.36.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Mar 2024 04:36:49 -0700 (PDT)
+Message-ID: <65f82751.d40a0220.f02c6.10cb@mx.google.com>
+Date: Mon, 18 Mar 2024 04:36:49 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5008692449197814802=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, johan+linaro@kernel.org
+Subject: RE: Bluetooth: qca: fix device-address endianness
+In-Reply-To: <20240318110855.31954-2-johan+linaro@kernel.org>
+References: <20240318110855.31954-2-johan+linaro@kernel.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Due to a long-standing bug in the Qualcomm Bluetooth driver, the device
-address has so far been reversed when configuring the controller.
+--===============5008692449197814802==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This has led to one vendor reversing the address provided by the
-boot firmware using the 'local-bd-address' devicetree property.
+This is an automated email and please do not reply to this email.
 
-The only device affected by this should be the WCN3991 used in some
-Chromebooks. The corresponding compatible string has now been deprecated
-so that the underlying driver bug can be fixed without breaking
-backwards compatibility.
+Dear Submitter,
 
-Set the HCI_QUIRK_BDADDR_PROPERTY_BROKEN quirk for the deprecated
-compatible string and add the new 'qcom,wcn3991-bt-bdaddr-le' string to
-the match table for boot firmware that conforms with the binding.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-Fixes: 7d250a062f75 ("Bluetooth: hci_qca: Add support for Qualcomm Bluetooth SoC WCN3991")
-Cc: stable@vger.kernel.org      # 5.10
-Cc: Balakrishna Godavarthi <quic_bgodavar@quicinc.com>
-Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
+----- Output -----
+
+error: patch failed: drivers/bluetooth/hci_qca.c:1904
+error: drivers/bluetooth/hci_qca.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- drivers/bluetooth/hci_qca.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index f989c05f8177..346274fe66d8 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1904,6 +1904,16 @@ static int qca_setup(struct hci_uart *hu)
- 	case QCA_WCN6855:
- 	case QCA_WCN7850:
- 		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
-+
-+		if (soc_type == QCA_WCN3991) {
-+			struct device *dev = GET_HCIDEV_DEV(hdev);
-+
-+			if (device_is_compatible(dev, "qcom,wcn3991-bt")) {
-+				set_bit(HCI_QUIRK_BDADDR_PROPERTY_BROKEN,
-+						&hdev->quirks);
-+			}
-+		}
-+
- 		hci_set_aosp_capable(hdev);
- 
- 		ret = qca_read_soc_version(hdev, &ver, soc_type);
-@@ -2597,6 +2607,7 @@ static const struct of_device_id qca_bluetooth_of_match[] = {
- 	{ .compatible = "qcom,wcn3988-bt", .data = &qca_soc_data_wcn3988},
- 	{ .compatible = "qcom,wcn3990-bt", .data = &qca_soc_data_wcn3990},
- 	{ .compatible = "qcom,wcn3991-bt", .data = &qca_soc_data_wcn3991},
-+	{ .compatible = "qcom,wcn3991-bt-bdaddr-le", .data = &qca_soc_data_wcn3991},
- 	{ .compatible = "qcom,wcn3998-bt", .data = &qca_soc_data_wcn3998},
- 	{ .compatible = "qcom,wcn6750-bt", .data = &qca_soc_data_wcn6750},
- 	{ .compatible = "qcom,wcn6855-bt", .data = &qca_soc_data_wcn6855},
--- 
-2.43.2
 
+--===============5008692449197814802==--
