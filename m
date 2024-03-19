@@ -1,89 +1,122 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2CD31E4A9;
-	Tue, 19 Mar 2024 16:26:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECFBBF9FF
+	for <linux-bluetooth@vger.kernel.org>; Tue, 19 Mar 2024 16:35:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710865560; cv=none; b=tQf3ySc8MKEErjj7sbTGZlsC3Lx5w3y/O1dv7jmea/c6FuKKQ2VIQc/sXJTQ2RX65a0NjkSba9/SlE8kteVtiYiSJYQbdBzWzOKqPag+YNk+Wdf0Nn8jTqXVsEoWq+tCQ277i3vs2Zjgx4ViaBPyuCtvh9TMM2+tzVL20/z6qhI=
+	t=1710866141; cv=none; b=Gm3mRovDBccRxWlyZ9gShpzE5yH5vTnOlXvapAQzeJm5H8V17wwyFWP8W7MQfZI0pd8Jvce/biVoAnvBVNuRZ2V8HYTw78VlCm9Cnz4DPinXSHYYrmcuG01UsxTbRF2iTElOVXO4nqUyy40KugphE4UJ1pSheIOJ9DFQ0dZ32Bw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710865560; c=relaxed/simple;
-	bh=+wx6pm84h4SSZqN7LgwX7nuza5CpaVwm5ikzrYbkklk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=boV1zwR71BUH79giYDsA43+NRKuf4+xqoW2i7Hn4CZfmMMEa++SqqFP27GnimTharEHDITgHCZtAuxWIeZO7YgkBZgWmfGXtljxc/OQ0MKgu1vaMSI1VcGDbr5dMLEwc43rDq1z9u6EW9OjOaeT8DxyqhzRrmuw9pkDg3aKJv0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EDacBSHb; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1710866141; c=relaxed/simple;
+	bh=v2u1Qkew2g6O7OxfoOPpZ+WZyFkaJ/IvZtu04Og6awY=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Ppc2GI9hvP3xciZodqp5UCYveJAybYOGjDwuK+BdXbBywsLcRnBXtKUDgHabgXvMEVxrSrc8uG5VQI57MXfYCs1SgE89njlSp/q43BtfB/WSe4EfrjJWBJCzgb2UhKutp3ldnj8ch57vtrS18rNtnYoUm+K9Jt5F7LPnG3NjYe4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=njGll/Bj; arc=none smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EDacBSHb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10679C433F1;
-	Tue, 19 Mar 2024 16:26:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710865560;
-	bh=+wx6pm84h4SSZqN7LgwX7nuza5CpaVwm5ikzrYbkklk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EDacBSHbddGGkBkjEvMDDec/065XpdXqytnKL4IiuFBQn6bJQqM2BM3iYDROEXxDp
-	 Km/QA7SXjxgSKyx+h0CxnIqPzDye5DToSDv7SMX737+StXoMB0yOhcGJsEGmn4Hbv+
-	 ykNJFOhDZ0No+Sph2HQYihKOx6y8+Sb2Euf/uoTPk/MI+aizrVKh1E/jgikx03NzFV
-	 rvbnvQkWXKhSDGUXhpIMg2dwW2+Q/BvmM7J6RdzWdlK/3n54mwx1ibUKDl/u8uMbRf
-	 QbpPpCww1mqacFKfGIfPnYKg2jI9yc98w9elBpUaOvH8Ar2ZSWczvTlp/qHfBak43C
-	 ocspy0Tj07VzQ==
-Received: from johan by xi.lan with local (Exim 4.97.1)
-	(envelope-from <johan@kernel.org>)
-	id 1rmcHu-000000000s5-45bY;
-	Tue, 19 Mar 2024 17:26:07 +0100
-Date: Tue, 19 Mar 2024 17:26:06 +0100
-From: Johan Hovold <johan@kernel.org>
-To: Doug Anderson <dianders@chromium.org>
-Cc: Johan Hovold <johan+linaro@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	cros-qcom-dts-watchers@chromium.org,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
-	Matthias Kaehlcke <mka@chromium.org>,
-	Rocky Liao <quic_rjliao@quicinc.com>,
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v3 2/5] Bluetooth: add quirk for broken address properties
-Message-ID: <Zfm8nifvqb3xO5HG@hovoldconsulting.com>
-References: <20240319152926.1288-1-johan+linaro@kernel.org>
- <20240319152926.1288-3-johan+linaro@kernel.org>
- <CAD=FV=VUFodCAXEJgfpSqZZdtQaw5-8n_-sX_2p6LuQ2ixLRpQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="njGll/Bj"
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-690fed6816fso38347696d6.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Mar 2024 09:35:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710866139; x=1711470939; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=jrhm2mahM5/boUBm/NzUHVftT7ZLwFl/o5aFGA8qqeM=;
+        b=njGll/BjzzO+IgOU+3FkEHyueD7hmKx+d6sjT5JGSQ3Kt3e9qaRTHZ4ABc9lTNnX9G
+         oRVLV6Bz4wvgt+58cYDDgR4Eq+kMBFFO/ZulJjoNXqvoKj1byglTOuj4RmFnsgmEbqeA
+         EQ2CdGPN1jS5ki797fnOK1UpTmF5WaB1o3sLRd/jI0Em97Jc/h7HjJawtNuQIzu75fc2
+         x6wdzwo6NvQ6Uc+XJcFeSRK/jedLiEk3HKl1fTtaavJT4b8XeI1JtwCiBB1fe9+s7C5w
+         QenrtwPZNIiuonFIX8AwiHb11cqFm4bklKSVJpOeplbNhFnGJ8ZxT34lGWjGMtKlgQHD
+         LLlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710866139; x=1711470939;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jrhm2mahM5/boUBm/NzUHVftT7ZLwFl/o5aFGA8qqeM=;
+        b=cKBULZI3eaQN735yxyhdbZal7ftABW3KzGR9r7XLHXfqqlIaVtuhnuVYZ6hXBMS5/0
+         NGzpSFL++KlV1Y4YkiFjYrAg4dyoSF4ouo0+iG2APBW6wPedk4qq5ovnL69/39S1dulb
+         XFdbgqSARyzkm597CG0sKRw+HroVxw0Z+bL58y+N+2AqhLrb1nEHfPCkyy5H4V2QWWqm
+         olSxD4Y3UPoAmzryu+74jB6GZ51vTq1rb0IoVA2FD80bF+lbFJJ73D/pWppxN52lvnI9
+         sOQWR56WVLKctf70jIs0/S0O1qOiSDD8tIDX7qW9VvEIxAuDg3/9ZqdRgHYXUCYUY4MY
+         Gx2w==
+X-Gm-Message-State: AOJu0Yy4KvFK62E+egEeE/kXqn6VN1VwzGgJqu5EIThvhRLRhG3pDKQL
+	pcFaB23KlqjxDq5oillx9ve2gNwxuILE1dEvuzi+dS0lS/pTfLGSs+M+zl3n/VQ=
+X-Google-Smtp-Source: AGHT+IH2rf+d0fzrKVMJU3GEAhqQtJtHoGyV2ryaugqg0X80dyOgGWsc6K5Dzgu4o/jl5TTRSOT0GQ==
+X-Received: by 2002:a0c:e14a:0:b0:696:1ed8:4672 with SMTP id c10-20020a0ce14a000000b006961ed84672mr6025556qvl.13.1710866138651;
+        Tue, 19 Mar 2024 09:35:38 -0700 (PDT)
+Received: from [172.17.0.2] ([20.51.159.35])
+        by smtp.gmail.com with ESMTPSA id r3-20020a0562140c8300b0069612ee6742sm2995654qvr.14.2024.03.19.09.35.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Mar 2024 09:35:38 -0700 (PDT)
+Message-ID: <65f9beda.050a0220.b12e4.df35@mx.google.com>
+Date: Tue, 19 Mar 2024 09:35:38 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6616238374105979427=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAD=FV=VUFodCAXEJgfpSqZZdtQaw5-8n_-sX_2p6LuQ2ixLRpQ@mail.gmail.com>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, johan+linaro@kernel.org
+Subject: RE: Bluetooth: qca: fix NULL-deref on non-serdev setup
+In-Reply-To: <20240319154611.2492-2-johan+linaro@kernel.org>
+References: <20240319154611.2492-2-johan+linaro@kernel.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Tue, Mar 19, 2024 at 09:10:23AM -0700, Doug Anderson wrote:
-> On Tue, Mar 19, 2024 at 8:29 AM Johan Hovold <johan+linaro@kernel.org> wrote:
+--===============6616238374105979427==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-> > +       /* When this quirk is set, the Bluetooth Device Address provided by
-> > +        * the 'local-bd-address' fwnode property is incorrectly specified in
-> > +        * big-endian order.
-> > +        *
-> > +        * This quirk can be set before hci_register_dev is called or
-> > +        * during the hdev->setup vendor callback.
-> > +        */
-> > +       HCI_QUIRK_BDADDR_PROPERTY_BROKEN,
-> 
-> Like with the binding, I feel like
-> "HCI_QUIRK_BDADDR_PROPERTY_BACKWARDS" or
-> "HCI_QUIRK_BDADDR_PROPERTY_SWAPPED" would be more documenting but I
-> don't feel strongly.
+This is automated email and please do not reply to this email!
 
-So, same reasoning here, this it not some quirk that people should go
-around setting without first considering to fix their boot firmware.
+Dear submitter,
 
-Johan
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=836459
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.37 seconds
+GitLint                       PASS      0.68 seconds
+SubjectPrefix                 PASS      0.26 seconds
+BuildKernel                   PASS      28.52 seconds
+CheckAllWarning               PASS      31.44 seconds
+CheckSparse                   PASS      37.17 seconds
+CheckSmatch                   PASS      100.28 seconds
+BuildKernel32                 PASS      28.14 seconds
+TestRunnerSetup               PASS      519.52 seconds
+TestRunner_l2cap-tester       PASS      20.20 seconds
+TestRunner_iso-tester         PASS      30.52 seconds
+TestRunner_bnep-tester        PASS      4.81 seconds
+TestRunner_mgmt-tester        FAIL      108.33 seconds
+TestRunner_rfcomm-tester      PASS      7.41 seconds
+TestRunner_sco-tester         PASS      15.08 seconds
+TestRunner_ioctl-tester       PASS      7.89 seconds
+TestRunner_mesh-tester        PASS      5.91 seconds
+TestRunner_smp-tester         PASS      6.93 seconds
+TestRunner_userchan-tester    PASS      5.04 seconds
+IncrementalBuild              PASS      32.26 seconds
+
+Details
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 492, Passed: 489 (99.4%), Failed: 1, Not Run: 2
+
+Failed Test Cases
+LL Privacy - Add Device 7 (AL is full)               Failed       0.202 seconds
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6616238374105979427==--
