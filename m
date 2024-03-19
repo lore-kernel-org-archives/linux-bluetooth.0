@@ -1,112 +1,77 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73BFD19BDC;
-	Tue, 19 Mar 2024 17:38:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68D9528383;
+	Tue, 19 Mar 2024 18:07:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710869916; cv=none; b=e7yO4h/L8fmWDxroIUM0qmid17v+XCPqlo1PQZvEAxCIg1+i2VTClznjEs7xFkY4XLICDkqYSmjW6szf6igixwLTJORGep/LecaOTWvzT6KqzjYtzB+h78yF+T8POcpp5ygOrblAsJ7kmW0TEXYCWKtFtABVU0rMDXiAM1OZbW8=
+	t=1710871669; cv=none; b=Il6bndQBGEQB/TPfP4SvsAkVqFT23/4fw/cFP6g7x9VsH+8zKAOhexfsNMkMBgM07goLG+Q7FC5vA7KaAL6PBI8wfDgzAkFwaI6PCiBCLYpAzyo6VPcExdRLdzl8yyM5cbr6lLItk0OPMoOUUBp/80JwhebhNmO3zTeBTFfMHOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710869916; c=relaxed/simple;
-	bh=4vuAWBj1evs6v+OZMqxOpqf/OaE6RssOo2tlPJIKe2o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FBbHb3nfeM5Y/ZwZNvNJO52MK5dNvVsdAY6wmuHFZLsFg7Ua36MpynaYReQNJTxu6/85yVS07Ifwxh4IvH+MK5mQzUbSWyiF5CUkFl7DAEnN1EBJaBMLg8EqXJ+bI3KmJyFIfb5fLbLD5TMlLn95UnSjEaukTu0MgHKwBeKpv6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FhpGq69C; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1710871669; c=relaxed/simple;
+	bh=9+OK1+c/8JOBYR1YQueWcR3S1IUR3nOrsBdURiXOeQk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OH3+3vIUffQjFmf71FhHsxNCTgFMLKC2O94gD/7DkyQyeyY2SC4dkzy+KuEZUA1Z6d1ptLZPPD8Rpw5G3oO03/StNDrKYH80nWB1rJFXzkadxMcAkNmo3NJqwBMlUqGiutqNHrnaerk2A4ERBTm/nJy2QcVg0TvA5vvp7sQKMww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=CY1lyTcE; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FhpGq69C"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00477C433F1;
-	Tue, 19 Mar 2024 17:38:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710869916;
-	bh=4vuAWBj1evs6v+OZMqxOpqf/OaE6RssOo2tlPJIKe2o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FhpGq69CjbpLw7gdlpfimviyUI9rG1eiCMCeg4oRTfRHYiaEvNeWnvg8fB629aLZW
-	 AZ81lwqhxnWfbJDM9iuNZ5Kl5VgSgWoIfbkIO/0TdZPrxNElSmJNv1D4NHBr1x3QQd
-	 d98gs93XJgtAocflD6uznvPw2sPCqqyu19aSUi6BLS8vDa9pSw7V22D7C0mag/CeXa
-	 J+Bwkwx3Dn4Rg02ptndnzDRowRBiznOdoFMON7/tYTQ3gGghhJIQFnLmaFVdaWM7K0
-	 tRNrfqA5FYAFZjs861/KJiC57kUwu+d4A5Q5wuYc3cLP7a6wjL6pOW4W69YHBVCwGG
-	 HvG5QSe0kw+nQ==
-Received: from johan by xi.lan with local (Exim 4.97.1)
-	(envelope-from <johan@kernel.org>)
-	id 1rmdQA-0000000016b-11LA;
-	Tue, 19 Mar 2024 18:38:42 +0100
-Date: Tue, 19 Mar 2024 18:38:42 +0100
-From: Johan Hovold <johan@kernel.org>
-To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Cc: Doug Anderson <dianders@chromium.org>,
-	Johan Hovold <johan+linaro@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	cros-qcom-dts-watchers@chromium.org,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
-	Matthias Kaehlcke <mka@chromium.org>,
-	Rocky Liao <quic_rjliao@quicinc.com>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v3 2/5] Bluetooth: add quirk for broken address properties
-Message-ID: <ZfnNoi4ahVlzHvvo@hovoldconsulting.com>
-References: <20240319152926.1288-1-johan+linaro@kernel.org>
- <20240319152926.1288-3-johan+linaro@kernel.org>
- <CAD=FV=VUFodCAXEJgfpSqZZdtQaw5-8n_-sX_2p6LuQ2ixLRpQ@mail.gmail.com>
- <Zfm8nifvqb3xO5HG@hovoldconsulting.com>
- <CAA8EJprp89VgFMjHv=EynROUs632CfQPbEka0GAcEAy743EMaA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="CY1lyTcE"
+Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 23B77879E8;
+	Tue, 19 Mar 2024 19:07:43 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1710871664;
+	bh=BAVXIaMxVuPkFRS9oEYN4x4tDrjCx4Yiuoc6W+g6TAs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=CY1lyTcEI+HjM0Eqxn5Gxkcpaw8eQBNFRH6gH+MF2MWgQfiSwac1kLdSpOERiHDMg
+	 w4ZUew46ru2XterW2I7S8rF39bdziqfyiOuW1++RIXCD2eJ2OKP9OAUsSmGV41vfPh
+	 86MB4Iw0Z2QHfsMYdyj2+0f63eKxAo+a7qbnEoOsF3bQryYYDO89OBVlaQv9oM4a5l
+	 Ur5Wl0q2dcWyp5N0+dv8eIz8Y24nur2e/isXYAJSEYx8M77p1CebJxZFSUQUEsWzqk
+	 5dguYlDdrpYH4mjt20ngkVMnbcQlRdlTB6UiTTJkgHthwmycGFyd+hdABMEAl87MYP
+	 xqcz5tBrm8w0A==
+Message-ID: <878e72e6-8a75-4593-8080-e3d9b3f7f523@denx.de>
+Date: Tue, 19 Mar 2024 19:07:42 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAA8EJprp89VgFMjHv=EynROUs632CfQPbEka0GAcEAy743EMaA@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] dt-bindings: net: broadcom-bluetooth: Add CYW43439 DT
+ binding
+Content-Language: en-US
+To: Conor Dooley <conor@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Conor Dooley <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Marcel Holtmann <marcel@holtmann.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240309031609.270308-1-marex@denx.de>
+ <20240317-spotter-imminent-1a29a152648b@spud>
+From: Marek Vasut <marex@denx.de>
+In-Reply-To: <20240317-spotter-imminent-1a29a152648b@spud>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-On Tue, Mar 19, 2024 at 07:01:57PM +0200, Dmitry Baryshkov wrote:
-> On Tue, 19 Mar 2024 at 18:26, Johan Hovold <johan@kernel.org> wrote:
-> >
-> > On Tue, Mar 19, 2024 at 09:10:23AM -0700, Doug Anderson wrote:
-> > > On Tue, Mar 19, 2024 at 8:29 AM Johan Hovold <johan+linaro@kernel.org> wrote:
-> >
-> > > > +       /* When this quirk is set, the Bluetooth Device Address provided by
-> > > > +        * the 'local-bd-address' fwnode property is incorrectly specified in
-> > > > +        * big-endian order.
-> > > > +        *
-> > > > +        * This quirk can be set before hci_register_dev is called or
-> > > > +        * during the hdev->setup vendor callback.
-> > > > +        */
-> > > > +       HCI_QUIRK_BDADDR_PROPERTY_BROKEN,
-> > >
-> > > Like with the binding, I feel like
-> > > "HCI_QUIRK_BDADDR_PROPERTY_BACKWARDS" or
-> > > "HCI_QUIRK_BDADDR_PROPERTY_SWAPPED" would be more documenting but I
-> > > don't feel strongly.
-> >
-> > So, same reasoning here, this it not some quirk that people should go
-> > around setting without first considering to fix their boot firmware.
+On 3/17/24 4:03 PM, Conor Dooley wrote:
+> On Sat, Mar 09, 2024 at 04:15:12AM +0100, Marek Vasut wrote:
+>> CYW43439 is a Wi-Fi + Bluetooth combo device from Infineon.
+>> The Bluetooth part is capable of Bluetooth 5.2 BR/EDR/LE .
+>> This chip is present e.g. on muRata 1YN module. Extend the
+>> binding with its DT compatible.
 > 
-> The address can be considered broken in many different ways. The name
-> should still be descriptive enough. If you want to specify that it is
-> a broken behaviour, please consider something like BROKEN_BE.
+> How come there's no fallback here? Looking at the binding patch there's
+> no device-specific handling done, what's incompatibly different between
+> this device and some of the other ones supported by the hci_bcm driver?
 
-I doubt that Qualcomm will be able come up with another way to break the
-address property. They'd have to try real hard.
-
-And this is an internal define which can be changed at any time. There's
-also some worth in keeping it aligned with the DT property, which I'm
-more open to renaming (e.g. if the DT maintainers thinks dropping the
-vendor prefix makes sense).
-
-The alternative I considered but rejected was something like
-"local-bd-address-be" as that would be too neutral.
-
-Perhaps "local-bd-address-reversed" would at least signal that something
-is backwards, but I still fear that that may be too subtle.
-
-Johan
+For posterity, should be addressed in V2.
