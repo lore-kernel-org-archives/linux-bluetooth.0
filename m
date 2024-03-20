@@ -1,227 +1,116 @@
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47486A031
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Mar 2024 17:32:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E829974E38
+	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Mar 2024 18:30:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710955967; cv=none; b=fB2eSfKJbJRCV57YT9XqMJCXws+HGbpDeheX2Y5H6+cY37V3DRLVhpCr7W1OrN2gL+OnlwlHvRx5VtqqNkja/XA16REEo2N87jecZ9WpaBDcGQZtOMhYFrNZQQReoKJC/+wuCH9DrzA2ezvs5nG5xRNHdLlw3CX+PeQm5+qH4s8=
+	t=1710959444; cv=none; b=XfuQooVCoZ2lNWehGcy0RpgOqcHDCALTDl8Caxr8hZq/fI+gYyyLHzNP/2WfHwYsrTg5vWoofGT+2CdQDokjqEfZjC8h3jqnxPH4N85+FwqX7jqIdaSiEGjLpNvYlqmPSP82QA8aiWVwMjL11vC+MZ5IVcA4/BHugi3Z0gpy7cs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710955967; c=relaxed/simple;
-	bh=EoGgYWtvZyh3lFFflV6BCH9H6HGj2rHw/w6Y7yeDC8k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=e7ZQCrtY/0/WXS+YYO2yWWR9mHp0jwLLnqwml/puomNP2a4Q3q4GJt3SISWEbhht5XycrknF/92ln/xNXAF5l4tCMsvAIX/eD6gmX7Hw93mmMR4dTFRgDdrQzvpnb0dXkMJCHIC87BX7pVq0LNuFrGgu0nj/O48xrXKXGIzLDpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JcOSbl1H; arc=none smtp.client-ip=209.85.208.180
+	s=arc-20240116; t=1710959444; c=relaxed/simple;
+	bh=55b4rrW5mmTIfz1WueoXRp1JDRgxNMSEDrMH7f9JmoA=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=CCGc9OKoARURUP69iPiUmDRPfM7cGD+DAqbdYTqQRNfDr3d+iNVu4reF52rd6vNw3hwXR1cTzCSTjKfJD54N4L+I7oh3Kf4X71hpnJBPa/Ca4PpvlUzYNTK/Ol8eq7Zuuxi+MsbcNrsXAf2Puu0zMgqRFC7WBbCk3Mc1zWnhOes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jAeGxE0O; arc=none smtp.client-ip=209.85.128.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JcOSbl1H"
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2d220e39907so1772341fa.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Mar 2024 10:32:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jAeGxE0O"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4146af3ebc8so966025e9.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Mar 2024 11:30:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710955964; x=1711560764; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+TPL+eiivbDib0+dVtTV5dkeu2T8plVk938CGyQMwkI=;
-        b=JcOSbl1HNLFw7lYs7FFq5EZqOS/6FO/mm/Oa4azoU2pNxAMuxlfvZgClKVd5V/LCkB
-         6PSOiteLZqqRDLKGxLdwXPuwiM8n7143Ff8kgWNKoR6FVOwG5YiBMGZZAzBevhvQNQaq
-         z/ZNDr7pAQEyEOeOGWg+pWbdE89/Ov6mWvuL8UhFQJXVr84qENHExpMxKih9NNJvWcaI
-         wNV7l0L/KMyLaRjYqzbMUz9myLLYsfAbFpEqDVdHanxAK4D8BHF42S2ftUD418rNmYos
-         eKezyKk5X9rUi+wLcTqi2X0WmvQniR3GgYKo5j6g1InAwZneNphCKTaGYpCzSAeYimh9
-         C5+A==
+        d=gmail.com; s=20230601; t=1710959440; x=1711564240; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kwlrMkhjYHMWNIC6iIWezqATnpstXoiCQq3Z8kKPQEc=;
+        b=jAeGxE0Olo5D43QmBHNQuuXEz+zDRuU9FoBRr0QX/44lNHxYiwA72qn/dNB1LIFL3x
+         BV63v9ai2J2YqYXpGPbThWgjPvNfadN1sGI14FGxCcOEef2lSQgSy1z+i69QENrVv2Fj
+         Lt93KXVUXuhNX0GHTibMKG5UQgKcuXkKdaGLVXZHt9ZogGM6lxp+dR9rlp5Be+UXgTia
+         aecSVQrH7ZP0DuqfVE8pPME0ivo3ftkbrePUu9HhEFakPDLZrCyCXn1e/xM6KnlJ++Io
+         k1+rMszdH3XXtSuaAhNIHid9etmgH9yzajoV1VajRHQ2Zz/B/YuL5a345LsHOuqRGUPE
+         TK6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710955964; x=1711560764;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+TPL+eiivbDib0+dVtTV5dkeu2T8plVk938CGyQMwkI=;
-        b=hjAk9GwDKemMRY8K5ZCU5p1W1OeTvDdWGo9UE7O17wqsk8QobFipPq7ysdZJmWYstl
-         F14jlGGo1mKh+PRUQHh/TfReT3gNVaNGW4EnATJdwt7+WOcSoxHeEXQSIBbXQJLdamSX
-         Hqy1Mo+6cdpxYLOoIiKp0U3pRq0seaDm2v4U7675/QPgIry0xu7hZEBBeMCQpQHdJej/
-         4I/x/tw7TM8BLSVktgA658Q+q9qLCc7jizulxBENaxuEXPbU1FjlCUojVTxeQ7Sz0LmS
-         pUIznhuakykTdX1iiVHMkOaftcuVetA++QIy7uamtj37PXwzl8ml3ELGbbxDj5d55z/A
-         +gcA==
-X-Gm-Message-State: AOJu0YxKi0U09jzSdWCw1zHXEDLhJ2dAl531ZIeOt8EQlDSuxfICnJHq
-	IFilBMjKPLwFsnxsZyUhArsDR9GZv2NgBzi5YZ7x7Iz2NOtPPF5RHZdD0LeShmJ8gG7J0S6Dy4J
-	xNzTLZa+d+Y8O/NyBbBnXQQpSgRM=
-X-Google-Smtp-Source: AGHT+IFd4F6d79W69Du5hJx5Nbqo5sDQm1rTkvBMi7TiHGcnpDlSBsc4JJ4/1oGSoy0HMUKve0mmciNpHBpUObqtyXQ=
-X-Received: by 2002:a05:651c:1414:b0:2d5:9d0c:9ff8 with SMTP id
- u20-20020a05651c141400b002d59d0c9ff8mr3821302lje.28.1710955963467; Wed, 20
- Mar 2024 10:32:43 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1710959440; x=1711564240;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kwlrMkhjYHMWNIC6iIWezqATnpstXoiCQq3Z8kKPQEc=;
+        b=NHjll88FgYkN/AcK3YRm6tHzb62Ql3kpZ6BOBWXJbC0E68oET6erAM7cEUUCFvggVF
+         +zCscjml2W+Cy8GWXJWuwIKrFSEmnJZr40tlzXb1W3F+qPaIA7xTvq46KBKh3Fr3+xkO
+         in2v0Hc5H+wlJFodrqGjhJ+edAI8htbrzMWsRSaVS1Ut1+BZY3KeRYG1sM51x58iIuHP
+         vd0ADOCWYEbUbqtXEW7852OCPGpem8RR9TQtHBVqULiY69cfV+K1pLIwebSgcEiPKE7P
+         SlUw2QW/VZLDNk46hKkfhCAuQzMAD0TbUz1obQJY5+wlClhydsYrTuTdx1Q16uf0DS8F
+         rihg==
+X-Gm-Message-State: AOJu0YyBr0SH7lUqg/g92HIv2fAOzG9nrNOErjVBssqwtIzAD9uCmfGc
+	ebH2V+GzXsPCIvUVa8niETGBplzHVtc9DGlElY/0ofRCOdsIaDxq3/WswcuQOiMZjhH/
+X-Google-Smtp-Source: AGHT+IEtOa/d4jr/Df5AnGQPWYeq/K/pfCIrTat1/flz1j+/vx6npwPai9/igRhTNdXIxffUNNAsuQ==
+X-Received: by 2002:a05:600c:a02:b0:414:8d7:8292 with SMTP id z2-20020a05600c0a0200b0041408d78292mr10067972wmp.0.1710959440169;
+        Wed, 20 Mar 2024 11:30:40 -0700 (PDT)
+Received: from lvondent-mobl3.. (ftip004290803.acc4.faraday.21cn-nte.bt.net. [109.144.76.63])
+        by smtp.gmail.com with ESMTPSA id j14-20020a05600c190e00b004146bcdde06sm2927313wmq.6.2024.03.20.11.30.39
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Mar 2024 11:30:39 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] shared/btsnoop: Add proper identifiers for ISO packets
+Date: Wed, 20 Mar 2024 18:30:37 +0000
+Message-ID: <20240320183038.411332-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240320144153.46408-1-silviu.barbulescu@nxp.com> <20240320144153.46408-3-silviu.barbulescu@nxp.com>
-In-Reply-To: <20240320144153.46408-3-silviu.barbulescu@nxp.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 20 Mar 2024 17:32:30 +0000
-Message-ID: <CABBYNZL-JFqb5wq-k4Ge2zOVPf71E3pVsnu5X-h4LOy1tziNCQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/2] player: Allow endpoint config without local
- endpoint argument
-To: Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
-Cc: linux-bluetooth@vger.kernel.org, mihai-octavian.urzica@nxp.com, 
-	vlad.pruteanu@nxp.com, andrei.istodorescu@nxp.com, iulia.tanasescu@nxp.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Silviu,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wed, Mar 20, 2024 at 2:42=E2=80=AFPM Silviu Florian Barbulescu
-<silviu.barbulescu@nxp.com> wrote:
->
-> Update endpoint config command to create local endpoint for broadcast
->  endpoint, this will be used to configure a broadcast source\sink if
->  register endpoint is done from another application like PipeWire
+This adds ISO packets identifiers so they are properly stored on files.
+---
+ src/shared/btsnoop.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-Sorry but will not gona fly, we don't have any business with endpoints
-from other process in the system, in fact we might actually make it
-strictly prohibit for third-party process to use SetConfiguration with
-endpoint that do not belong their own D-Bus connection, same for
-MediaTransport, they shall only be acquired by the process that
-created them.
+diff --git a/src/shared/btsnoop.c b/src/shared/btsnoop.c
+index 8b93203b3..bc5f7fcbe 100644
+--- a/src/shared/btsnoop.c
++++ b/src/shared/btsnoop.c
+@@ -305,6 +305,9 @@ static uint32_t get_flags_from_opcode(uint16_t opcode)
+ 	case BTSNOOP_OPCODE_SCO_TX_PKT:
+ 	case BTSNOOP_OPCODE_SCO_RX_PKT:
+ 		break;
++	case BTSNOOP_OPCODE_ISO_TX_PKT:
++	case BTSNOOP_OPCODE_ISO_RX_PKT:
++		break;
+ 	case BTSNOOP_OPCODE_OPEN_INDEX:
+ 	case BTSNOOP_OPCODE_CLOSE_INDEX:
+ 		break;
+@@ -428,6 +431,14 @@ static bool pklg_read_hci(struct btsnoop *btsnoop, struct timeval *tv,
+ 		*index = 0x0000;
+ 		*opcode = BTSNOOP_OPCODE_SCO_RX_PKT;
+ 		break;
++	case 0x12:
++		*index = 0x0000;
++		*opcode = BTSNOOP_OPCODE_ISO_TX_PKT;
++		break;
++	case 0x13:
++		*index = 0x0000;
++		*opcode = BTSNOOP_OPCODE_ISO_RX_PKT;
++		break;
+ 	case 0x0b:
+ 		*index = 0x0000;
+ 		*opcode = BTSNOOP_OPCODE_VENDOR_DIAG;
+@@ -470,6 +481,11 @@ static uint16_t get_opcode_from_flags(uint8_t type, uint32_t flags)
+ 			return BTSNOOP_OPCODE_SCO_TX_PKT;
+ 	case 0x04:
+ 		return BTSNOOP_OPCODE_EVENT_PKT;
++	case 0x05:
++		if (flags & 0x01)
++			return BTSNOOP_OPCODE_ISO_RX_PKT;
++		else
++			return BTSNOOP_OPCODE_ISO_TX_PKT;
+ 	case 0xff:
+ 		if (flags & 0x02) {
+ 			if (flags & 0x01)
+-- 
+2.44.0
 
-Also I remember quite clearly stating that we would move away from
-using MediaEndpoint for Broadcast Sink, instead what we shall be doing
-is enumerating BIS as MediaTransport directly so the likes of pipewire
-can Acquire them directly without doing any configuration since they
-are already configured over the air. Broadcast source will probably
-require a special interface at pipewire side, or perhaps a dedicated
-card which gets configured via some configuration file, etc, but we
-shall not depend on bluetoothctl to configured it, that will just make
-things more complicated than really helping.
-
-> ---
->  client/player.c | 80 +++++++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 77 insertions(+), 3 deletions(-)
->
-> diff --git a/client/player.c b/client/player.c
-> index ab33bfc46..b02a40423 100644
-> --- a/client/player.c
-> +++ b/client/player.c
-> @@ -3662,10 +3662,15 @@ static void endpoint_set_config_bcast(struct endp=
-oint_config *cfg)
->                 config_endpoint_iso_group, cfg);
->  }
->
-> +static void endpoint_init_defaults(struct endpoint *ep);
->  static void cmd_config_endpoint(int argc, char *argv[])
->  {
-> +       DBusMessageIter iter;
->         struct endpoint_config *cfg;
-> -       const struct codec_preset *preset;
-> +       const struct codec_preset *preset =3D NULL;
-> +       const struct capabilities *cap;
-> +       uint8_t codec;
-> +       const char *uuid;
->
->         cfg =3D new0(struct endpoint_config, 1);
->
-> @@ -3680,8 +3685,75 @@ static void cmd_config_endpoint(int argc, char *ar=
-gv[])
->         /* Search for the local endpoint */
->         cfg->ep =3D endpoint_find(argv[2]);
->         if (!cfg->ep) {
-> -               bt_shell_printf("Local Endpoint %s not found\n", argv[2])=
-;
-> -               goto fail;
-> +               /* If argc !=3D 3 then argv[2] should be the
-> +                * local endpoint. Return error.
-> +                */
-> +               if (argc !=3D 3) {
-> +                       bt_shell_printf("Local Endpoint %s not found\n",
-> +                                       argv[2]);
-> +                       goto fail;
-> +               }
-> +
-> +               /* If local endpoint is not found verify if this is a
-> +                * broadcast remote endpoint because this can be an
-> +                * endpoint config command with remote endpoint and
-> +                * preset. In this case we have to create its own
-> +                * local endpoint.
-> +                */
-> +               if (!g_dbus_proxy_get_property(cfg->proxy, "UUID", &iter)=
-)
-> +                       return;
-> +               dbus_message_iter_get_basic(&iter, &uuid);
-> +
-> +               /* The local endpoint must have the UUID of local pac but
-> +                * the remote endpoint has the UUID of the remote pac, so
-> +                * based on this information we determine the UUID for th=
-e
-> +                * local endpoint.
-> +                */
-> +               if (!strcmp(uuid, BAA_SERVICE_UUID))
-> +                       uuid =3D BCAA_SERVICE_UUID;
-> +               else if (!strcmp(uuid, BCAA_SERVICE_UUID))
-> +                       uuid =3D BAA_SERVICE_UUID;
-> +               else {
-> +                       /* This should be a local endpoint because is not
-> +                        * a broadcast endpoint.
-> +                        */
-> +                       bt_shell_printf("Local Endpoint %s not found\n",
-> +                                       argv[2]);
-> +                       goto fail;
-> +               }
-> +
-> +               if (!g_dbus_proxy_get_property(cfg->proxy, "Codec", &iter=
-))
-> +                       return;
-> +
-> +               dbus_message_iter_get_basic(&iter, &codec);
-> +
-> +               /* Verify if the local endpoint already exists */
-> +               cfg->ep =3D endpoint_find(uuid);
-> +               if ((!cfg->ep) || (cfg->ep->codec !=3D codec)) {
-> +                       /* Get capabilities to create the local endpoint =
-*/
-> +                       cap =3D find_capabilities(uuid, codec);
-> +                       if (!cap) {
-> +                               bt_shell_printf(
-> +                                       "Capabilities not found for UUID =
-%s, codec id %d",
-> +                                       uuid, codec);
-> +                               goto fail;
-> +                       }
-> +
-> +                       cfg->ep =3D endpoint_new(cap);
-> +                       endpoint_init_defaults(cfg->ep);
-> +               }
-> +
-> +               /* Verify if argv[2] parameter is a valid preset */
-> +               preset =3D preset_find_name(cfg->ep->preset, argv[2]);
-> +               if (!preset) {
-> +                       bt_shell_printf("Preset %s not found\n",
-> +                               argv[2]);
-> +                       /* Free created endpoint */
-> +                       local_endpoints =3D g_list_remove(local_endpoints=
-,
-> +                                               cfg->ep);
-> +                       endpoint_free(cfg->ep);
-> +                       goto fail;
-> +               }
->         }
->
->         if (argc > 3) {
-> @@ -3690,7 +3762,9 @@ static void cmd_config_endpoint(int argc, char *arg=
-v[])
->                         bt_shell_printf("Preset %s not found\n", argv[3])=
-;
->                         goto fail;
->                 }
-> +       }
->
-> +       if (preset) {
->                 cfg->caps =3D g_new0(struct iovec, 1);
->                 /* Copy capabilities */
->                 util_iov_append(cfg->caps, preset->data.iov_base,
-> --
-> 2.39.2
->
-
-
---=20
-Luiz Augusto von Dentz
