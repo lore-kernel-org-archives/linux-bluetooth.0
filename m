@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 222243C060
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D7283C068
 	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Mar 2024 09:30:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710927033; cv=none; b=gh6C5M3kqTg+aSqy9OHH/y8eNqhJmRtOh5W+1imMAuOGC0zu7uWlwsEHkbnSvoE7/88QElTM4Y2WlehX2WQ+mezlFjeDeW1OTBRfQqo+uji8z29ttcPiHH2s0plSEACxhR7z6vVpHoKNAewxUiXF1m2SxPdqY108QA8rkJV03xw=
+	t=1710927033; cv=none; b=iNzTDhEi5iAWZigAflJEmzikFEwAUHm0yCA513c8EQXUMXJXYaSt6bJYbDN6yfel6fvpUjfi6MF0nj7UAcv9KjhJXUvw5qoFdWkqzV0NMriROO+brLXqSsJxRy60helaZhykcGI1mT1JzXiZEGVf2FeUlVBgRojEVlQD5LlE2ac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1710927033; c=relaxed/simple;
-	bh=GB23MQ2UfyCz+i4q8RnCH2lv/FMN5NSXLaOALq+kMVA=;
+	bh=lAVGXd989nU/QV8U2uoEJTgErF63RupFCXZ1eokGQuk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=dL2BFkfbv152hw1ptFv6agG8+NyBSyRspz0jOfsz3OSLiRUH/0h+fwgD7bfvcBxu7lZzyXxiXAa4H++AvAqBmKiTd6B6XlYznTb1p6uyI7RRUw1pZvz1zPyE5wNtWdHwz+qDJwCsXJHYiX2J/1OvbAj3Sosdk/fR7uCb3sZ9D54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c8b0jlZG; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=mqDjLXjtCDpd32Yd9UxRyJ2Zt5Rwy2ZsNTRkBlZpaZ/IEoMtwbILkI/12K5FeVm4SPKBjKEl8fj2hx8grz/Sh/1Vja7d1pEhDvHhEpmgVFXaqXgS2kRkkIXdISEj8jDqH2GfjuYT6eR4tFfxG+Jq4HPsq6rQoBJ8ji5r+Ft/SgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t0MLInpM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c8b0jlZG"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BF4FBC43394;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t0MLInpM"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D127AC43390;
 	Wed, 20 Mar 2024 09:30:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1710927032;
-	bh=GB23MQ2UfyCz+i4q8RnCH2lv/FMN5NSXLaOALq+kMVA=;
+	bh=lAVGXd989nU/QV8U2uoEJTgErF63RupFCXZ1eokGQuk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=c8b0jlZGxpdQG9gevpLRPyxY2kX92lgODBXcHhJqgyiIC3CeZXhulOeifv5lHv5FZ
-	 Mzsf+zd9jqWS77+DCSJtrx+wuJvHvGBsUxB6sHZhnNnYjW13e0eL90q90hvJZ7ZT7D
-	 qecbbuZXQMzPu0INPSARW981zAC2pXvS8+eEN8JHvOJchq6WUkQxMpTXvedePRAIKm
-	 qIdhWYHQON68FDnQQ+yMSV/3/kyOLmaft+oaE4Rjly+jmuh3mj5bMLBsNRytMGaHgc
-	 ZujH/TVooNqHRz9DgrV2Wy5slKTcUfGRnS+JT0p0ktZ5O0e+c7/D/tQN9Hti6eCaaZ
-	 VXfWgbnqOgnFw==
+	b=t0MLInpM7mjQZ3yZvMX//mE+bsAZ7e7g0DYXgnhtBrLIyzmE1nWgmDCPGvkaxkJgJ
+	 9dSAFu8+at0J517W/03JfmitTvFFm4qbvcCbWHEY9rXSoOmAb1BjOJT/Z0zDyiMWUS
+	 eA1IgB0+dpbMU6DUAA1oenxmxVuY/6W4Zz9tD10ha/ugl5VAhlte+kUICdMHhvJVAj
+	 CjgOMZIXVruByLoRxN5y4I6WdGU669M9GImZtrm2+b+CfSRpZL40lqZCdRI+T226sa
+	 lQoP57wn46YSmld8ZMMJK7wdExzKdb6ZRMS7UJ/ecS5w1cfZ6hikm/CWMudw+dEg1z
+	 K25oPJO5C256w==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B2A7ED982E0;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C4CDBD84BB1;
 	Wed, 20 Mar 2024 09:30:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -37,44 +37,35 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ 0/3] shared/util: Add util_iov_append function
+Subject: Re: [PATCH BlueZ] a2dp: fix setup->err use-after-free
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <171092703272.20558.17141447352072346740.git-patchwork-notify@kernel.org>
+ <171092703279.20558.12930550090274246801.git-patchwork-notify@kernel.org>
 Date: Wed, 20 Mar 2024 09:30:32 +0000
-References: <20240319151917.834974-1-vlad.pruteanu@nxp.com>
-In-Reply-To: <20240319151917.834974-1-vlad.pruteanu@nxp.com>
-To: Vlad Pruteanu <vlad.pruteanu@nxp.com>
-Cc: linux-bluetooth@vger.kernel.org, mihai-octavian.urzica@nxp.com,
- silviu.barbulescu@nxp.com, iulia.tanasescu@nxp.com,
- andrei.istodorescu@nxp.com, luiz.dentz@gmail.com
+References: <154e1a604eb8c3d924699489da72ea905915fb88.1710614196.git.pav@iki.fi>
+In-Reply-To: <154e1a604eb8c3d924699489da72ea905915fb88.1710614196.git.pav@iki.fi>
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluez.git (master)
+This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue, 19 Mar 2024 17:19:14 +0200 you wrote:
-> Currently iov_append is defined in 2 places, client/player.c and
-> src/shared/bap.c. The player.c implementation is faulty as it
-> does not allocate additional memory for the data that it appends
-> to the original iovec. This can cause buffer overflows such as
-> the one attached at the end of this message, which was discovered
-> while running an Unicast setup. Therefore, the implementation from
-> src/shared/bap.c was used to create util_iov_append as it allocates
-> new memory appropriately. The existing calls to iov_append from
-> src/shared/bap.c and client/player.c were replaced with the new
-> util_iov_append.
+On Sat, 16 Mar 2024 20:36:38 +0200 you wrote:
+> setup->err is set to values that either are on stack of avdtp.c
+> routines, obtained from callbacks, or allocated on heap. This is
+> inconsistent, and use-after-free in some cases.
+> 
+> Fix by always allocating setup->err ourselves, copying any values
+> obtained from callbacks.  Add setup_error_set/init and do all setup->err
+> manipulation via them.
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ,1/3] shared/util: Add util_iov_append function
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9fc5f9e05d84
-  - [BlueZ,2/3] shared/bap: Use util_iov_append instead of iov_append
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=060e3dd69ed3
-  - [BlueZ,3/3] client/player: Use util_iov_append instead of iov_append
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e96a7fdd697b
+  - [BlueZ] a2dp: fix setup->err use-after-free
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c04b96dda5ce
 
 You are awesome, thank you!
 -- 
