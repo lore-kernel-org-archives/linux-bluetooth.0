@@ -1,74 +1,65 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1FB62E62E
-	for <linux-bluetooth@vger.kernel.org>; Fri, 22 Mar 2024 15:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEF5556B8F
+	for <linux-bluetooth@vger.kernel.org>; Fri, 22 Mar 2024 16:09:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711122629; cv=none; b=KlnG09vZFcCki9dRTXtPxV+G31lhbpdz7rP4ue9J7Hl74rdnIiF3v0tc3mRlOoUIF3U096mJCLbU/lIHZvKXpp21gPMDegMEuFHGoL8zlZLOruqifYsCe82cNFf0loM1Y7QobV4fkcoLz0JC8vunGUI5ay4i24j8CnHgMyBBbfo=
+	t=1711123783; cv=none; b=NlmIM1AIvWxfqGFMRgd5QrvmWwwgF9boKTSWCpPey7g5L2F2vkgMeOnUDs6YDc8eTRNxcZTNg2FCaN66oV0Aarlh4IGE9GG5wb8pyOWuzQQYMSpSX+6vMExvNGhSj+m5ScbrsV1qevQWpbfKN+lfxpKrdkJIxXuIAXHIDwt+DuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711122629; c=relaxed/simple;
-	bh=ZSJiwr1qvzz7XQ3QRGBQZyRTERsDLhvLEBD6YQBOHrg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=X2+EZBLVmdBBvkP+3m2h3zZPfXan6y+Z+8rJAw/wjw7rKepmR+V1u5i/g0PqXGUKL7DvkGF2y1GDWJoT5/ROj5VNg6hqjHcNi72YgzagF48HXTkOTf5P31UJwuQ0Qt2kyZw46wjiw5uyoB+6A75VOXnx8Qcy9MkIe7GeoTYARcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FOq8gqIB; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711123783; c=relaxed/simple;
+	bh=BV8ewJPjTxMnbh3DCQe18kb1NW++4HQ9fd7Cxm8gmWQ=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=LYVk2ycqE9/TrTUfF6BlSavRkkypLW9oA1Dzn5m0zfs5zp+jA1ghG4MfPGHG8duDhMYlZMjMQTR1KitjDo3BplB/3hT7zLWunv026JFXL4GZHV+607p9d5ob9iUlX2Lk63xqVa9KwWf64+i7MYgA6NHfjlRUHNHKI10cHb32ptQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=fa7AMoeT; arc=none smtp.client-ip=192.30.252.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FOq8gqIB"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 07CC5C43390;
-	Fri, 22 Mar 2024 15:50:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711122629;
-	bh=ZSJiwr1qvzz7XQ3QRGBQZyRTERsDLhvLEBD6YQBOHrg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=FOq8gqIBOvQDxI6l3houhzEFUGBNygcMyx9uPaKZGA1Ork/W4AMJNXInKtm7cpn26
-	 n+vDbwFUdSngIgHA7auD7r5Cu3PRSugYs40H2ONO9dwQugScElIsyzi7X0RnQMRst7
-	 FSivrDGz2Ip8FG/UGlYPEw0rn9rIkByD1G6JAcDOvZjgSXBhf2ZNpi65pk0/jmbNhs
-	 YXOqCBgVLylTRAfSS5UYLGy1yampW5Q+aE34vIZRyOPoK1Pz5DLyKxvNVQzUa27HR8
-	 3XYLfMU9hoVWXs4hT0KZ2ogWAUFC8G1661jDM8z3slkqoUckSF0ylAiL2k8uaefrpq
-	 TRZ7KFklKefvQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E52F4D9505B;
-	Fri, 22 Mar 2024 15:50:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="fa7AMoeT"
+Received: from github.com (hubbernetes-node-410ec37.ac4-iad.github.net [10.52.146.34])
+	by smtp.github.com (Postfix) with ESMTPA id F2B1670140B
+	for <linux-bluetooth@vger.kernel.org>; Fri, 22 Mar 2024 09:09:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1711123780;
+	bh=6HEK9UWmbg23McZc9pEIYSkkpF+AYIZjULaHsCHWOqk=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=fa7AMoeTwJ6N9AMGsbw9OmCb5LdZzkTLAmW+Me3/3dkdRtaEDYY2d1uj8gV/GVibE
+	 qs/P0gnHb9Eo2rMiI7YxxKXcBZeb43NQUJNRF8qOmVEfGCEXAi3gM0M7VBMZpD0htE
+	 P21dD4pmBtm8V7sl63lOjrSFmg1+gDslVF+XwiGM=
+Date: Fri, 22 Mar 2024 09:09:39 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/925092-87cabb@github.com>
+Subject: [bluez/bluez] 87cabb: bap: Fix not setting adapter address type
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v2] bap: Fix not setting adapter address type
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <171112262893.17124.6027957229910115815.git-patchwork-notify@kernel.org>
-Date: Fri, 22 Mar 2024 15:50:28 +0000
-References: <20240322143831.198777-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240322143831.198777-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 87cabb26793554ad9f67f0b23ecf19869b20dd17
+      https://github.com/bluez/bluez/commit/87cabb26793554ad9f67f0b23ecf19869b20dd17
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-03-22 (Fri, 22 Mar 2024)
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M profiles/audio/bap.c
 
-On Fri, 22 Mar 2024 14:38:31 +0000 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This fixes not setting adapter address type when listening/connecting
-> ISO sockets which prevents them working when adapter comes unconfigured
-> which then gets assigned a random address.
-> ---
->  profiles/audio/bap.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
+  Log Message:
+  -----------
+  bap: Fix not setting adapter address type
 
-Here is the summary with links:
-  - [BlueZ,v2] bap: Fix not setting adapter address type
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=87cabb267935
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+This fixes not setting adapter address type when listening/connecting
+ISO sockets which prevents them working when adapter comes unconfigured
+which then gets assigned a random address.
 
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
