@@ -1,125 +1,70 @@
-Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B1F23778
-	for <linux-bluetooth@vger.kernel.org>; Fri, 22 Mar 2024 10:07:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A5882E3EB
+	for <linux-bluetooth@vger.kernel.org>; Fri, 22 Mar 2024 10:10:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711102051; cv=none; b=ImuQM5faZizoCAB1EbainyANePI5aon1eyNLGuYxySOaPkDAAUfSnFAk88S+r3vxXxIzSk+mVjjE5IDTn+pxYFJrJ8ZEiLKapCV7FQdK9a1LB9OE1VKa5aKF9zPzRpkD6aV3pbtom3Ed9OIqdPLHnzlQ51HvPWWXn/1c7vZu8zI=
+	t=1711102232; cv=none; b=p8sAKDezpUYrliLGMB37sA3Gk4IbkbHpwcs7GBkUxSYPpM/eN63JkUOKglnrYceaKfjnCEq650WVwWCw+gLsImLhAz7rZuDP4N9QFW4Mr6Jp8CjjjFj6ecB9jol6GZkFyYU1XKyC00OVT3RrGJBa9JhlZ4qwPzgPKJas90E8fkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711102051; c=relaxed/simple;
-	bh=SCCApGeELkuDcNwGdLzOHz1W1fdN5uH8OMgJx9EX9C8=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=oKg1hfIyANB5L1vsgI0Kyoahc590TAOZ5+c9nuUTp6sjfux+eRzsYIgX3QLAF9+emHcJ3WcVFDyLqvo8lPjPLQTEukfFCDLmhRbPCEMWr+6m+5pabNfaE3CpzRmqU3hUqosN8bi/xX5SZYgaxoJcDPhc75hJX7CjfDvfLu3c3GU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=gRcMY0l/; arc=none smtp.client-ip=192.30.252.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1711102232; c=relaxed/simple;
+	bh=U83cE4G3o7a9IqDZvhQBhOJWBHrsZPaPI1zI5Hjk2tA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Wxsjrxxlo2dnyuTeqqoxydijFVXl88MFiRIgnJoBb+5NhfRd2+ytpPMhvfqAwZrC+xrLgQrJYIwUSQyPa2g829kEVaGjPeF718I8xoufq6YvvsheD9iWykY9HIabJiKuJ+KrjzZBMF99YFn8K/48niZLhe8ccOGh5lCi3d4dZMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lfPL7Sia; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="gRcMY0l/"
-Received: from github.com (hubbernetes-node-ed7c0d8.ac4-iad.github.net [10.52.142.35])
-	by smtp.github.com (Postfix) with ESMTPA id B3D3F640C43
-	for <linux-bluetooth@vger.kernel.org>; Fri, 22 Mar 2024 03:07:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1711102048;
-	bh=bN0o6cEp4jFasj8UpOEgH8JHduJdkqMwvTKXXOId8m0=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=gRcMY0l/j0v4pxGoyuGkbYBhAcF5tm2E4H+2gZB7pwADQkPhoKIeba760EbkH+fYP
-	 L8aKRX5yjkVpSPaaes2VxiGenDnIJL6KewdpvAjiWk4k1ye+s78mfQkC8oylADrsGM
-	 YnHv8D5KUYYYoiNO0CYGAYm918HrX+vEgG3m5xpM=
-Date: Fri, 22 Mar 2024 03:07:28 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/b8ad34-925092@github.com>
-Subject: [bluez/bluez] bbf198: Fix crash in iov_append_ltv function
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lfPL7Sia"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3FE1BC43390;
+	Fri, 22 Mar 2024 10:10:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711102232;
+	bh=U83cE4G3o7a9IqDZvhQBhOJWBHrsZPaPI1zI5Hjk2tA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=lfPL7Siad+CTc30Tb5Jts7DhUq6pA6wJf6IcgkaNLsKsNl2gEJ+1Ih0Qwi9rSZx6U
+	 r1N6f/zD8/qgudf0QEDZSAS5xXl+SYFblq5D0LIuuXC+XVc2E1Lop1V8rg3vMN2PRt
+	 jlX/fZyqIVMZdxz5PrcaO/AqwfGc5w0wT1CliPvfEmsUn6BY+B47TGkkfXqPtUXdyC
+	 Z77hVeyTpTpwcANIWdjIk+sUySkoL+rWadNJiVxI3cOrYq9ZD5fvVW0IqfgjzfV11n
+	 hWrs91jLPQmu6qkLEF4TtjWGegPq1X0gHoA69xoIF1azVS5vLyobmeG3Cvghyy9sdS
+	 1VuV2MkmTMCzA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2CA10D982F8;
+	Fri, 22 Mar 2024 10:10:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [BlueZ] obexd: Remove redundant judgments and fix code style
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <171110223217.5004.10195724040717201859.git-patchwork-notify@kernel.org>
+Date: Fri, 22 Mar 2024 10:10:32 +0000
+References: <20240321021925.513182-1-youwan@nfschina.com>
+In-Reply-To: <20240321021925.513182-1-youwan@nfschina.com>
+To: Youwan Wang <youwan@nfschina.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: bbf198280e701580cf2284800d56811bae71b80a
-      https://github.com/bluez/bluez/commit/bbf198280e701580cf2284800d56811bae71b80a
-  Author: Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
-  Date:   2024-03-22 (Fri, 22 Mar 2024)
+Hello:
 
-  Changed paths:
-    M client/player.c
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  Fix crash in iov_append_ltv function
+On Thu, 21 Mar 2024 10:19:25 +0800 you wrote:
+> Signed-off-by: Youwan Wang <youwan@nfschina.com>
+> ---
+>  obexd/src/manager.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
 
-Fix function iov_append_ltv crashes because is not reallocating memory
-Use util_ltv_push from util.c
+Here is the summary with links:
+  - [BlueZ] obexd: Remove redundant judgments and fix code style
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=97fa2525fb10
 
-[bluetooth]# [NEW] Endpoint /org/bluez/hci0/pac_bcast0
-[bluetooth]# Endpoint /local/endpoint/ep0 registered
-endpoint.config /org/bluez/hci0/pac_bcast0 /local/endpoint/ep0 48_4_1
-[/local/endpoint/ep0] BIG (auto/value): 0
-[/local/endpoint/ep0] Enter channel location (value/no): 3
-=================================================================
-==80806==ERROR: AddressSanitizer: heap-buffer-overflow on
- address 0x60200000a8ba at pc 0x561971611e0e bp 0x7ffd45ab1f00
- sp 0x7ffd45ab1ef0 WRITE of size 1 at 0x60200000a8ba thread T0
-  0x561971611e0d in put_u8 src/shared/util.h:254
-  0x561971611e0d in util_iov_push_u8 src/shared/util.c:534
-  0x5619715c28f0 in iov_append_ltv client/player.c:3565
-  0x5619715c28f0 in config_endpoint_channel_location client/player.c:3593
-  0x5619716226ce in bt_shell_release_prompt src/shared/shell.c:744
-  0x561971623087 in rl_handler src/shared/shell.c:769
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-  Commit: a2b2d2e4ab0ee375b24007e23f19e3122fa33764
-      https://github.com/bluez/bluez/commit/a2b2d2e4ab0ee375b24007e23f19e3122fa33764
-  Author: Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
-  Date:   2024-03-22 (Fri, 22 Mar 2024)
-
-  Changed paths:
-    M client/player.c
-
-  Log Message:
-  -----------
-  player: Adjust SDU size based on the number of locations
-
-Adjust the SDU size based on the number of locations/channels
-that is being requested.
-
-
-  Commit: 97fa2525fb104856c80f67af27cd87af09a41c4d
-      https://github.com/bluez/bluez/commit/97fa2525fb104856c80f67af27cd87af09a41c4d
-  Author: Youwan Wang <youwan@nfschina.com>
-  Date:   2024-03-22 (Fri, 22 Mar 2024)
-
-  Changed paths:
-    M obexd/src/manager.c
-
-  Log Message:
-  -----------
-  obexd: Remove redundant judgments and fix code style
-
-
-  Commit: 9250929edde3b5740e5cf3b33e58a075f0e640be
-      https://github.com/bluez/bluez/commit/9250929edde3b5740e5cf3b33e58a075f0e640be
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-03-22 (Fri, 22 Mar 2024)
-
-  Changed paths:
-    M src/shared/btsnoop.c
-
-  Log Message:
-  -----------
-  shared/btsnoop: Add proper identifiers for ISO packets
-
-This adds ISO packets identifiers so they are properly stored on files.
-
-
-Compare: https://github.com/bluez/bluez/compare/b8ad3490a350...9250929edde3
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
