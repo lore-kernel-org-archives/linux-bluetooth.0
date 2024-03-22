@@ -1,147 +1,107 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B56295FBA6
-	for <linux-bluetooth@vger.kernel.org>; Fri, 22 Mar 2024 16:56:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711126606; cv=pass; b=azzBWgoMQ/DlpmL8i8aH+caN2mPnIVJbiiydpBCQdXeDA2QW/Hk8DRu0NNDnEv0KuVF3oy9iyqbnoS49Zd5hSYLRw8AWxesmzQlYu5iAo3u7kOPY1Da0NrGeC0CQVcJHziLlr3xX3CRfY3JhUX+FaENJt9BKAwOkLKiyDI8DnXw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711126606; c=relaxed/simple;
-	bh=HmDNysnwr+eVJcVyvuwoimUCmEosTGDIBGwT0Gd9eIs=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=BUhEYKcj51Kj6zbfUigVEwZil3iTD7eU9DM0tpMArljpUTR2kMr/5PdbwqQHBg2HbPSWaQmfOUBC5ABr+XTIhCZiZRh07lSw/Ufng9/6LPsrPgyqpcQ0BZDNpA4brSIpl1Njkp4e3O+wvfMeJw1AcHT67hvowhosnM51HNBh8FE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=JR3R3gWg; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+Received: from m16.mail.126.com (m16.mail.126.com [117.135.210.7])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32A386216D
+	for <linux-bluetooth@vger.kernel.org>; Fri, 22 Mar 2024 18:06:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.7
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711130804; cv=none; b=bopcpkQnISV9nwh9PZYQAA1rNhTrkIto1c2TMLg66zSqOfCfnrkyud4ANFgK21zsQUmQx4RufJqoO+xg2sVpv/tSm0nTWT4lOjGe6FyeB6PqCN/+ql9KntRJk+kvSENcWcc6097njNm400yfNHsj1eAsRfo/VkaBjW/i4shpcLs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711130804; c=relaxed/simple;
+	bh=ZDi1gAA0yqJ2zl+yKEq9CaHTbFhf5PPE7V2a+4KIbnU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uBQnS3f8vgVka1pnaWAZol4LFfyG3Vn3EvtileZsJr3Nz+QxRedSJtCJjxMzwKrSHmgGsULBsnHloLTMbUD/7BtTXfcNCs9eMkQwwM2c3WCObQ7qmzHS+qIaWB7ViI2Pm35mf+4HGHvJUgoYQsrlgiF598ENj5jqAxZrIphLpa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com; spf=pass smtp.mailfrom=126.com; dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b=eQ3QSUwr; arc=none smtp.client-ip=117.135.210.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="JR3R3gWg"
-Received: from [192.168.1.195] (unknown [IPv6:2a0c:f040:0:2790::a03d])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4V1T4d5VRbz49Q08;
-	Fri, 22 Mar 2024 18:56:33 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1711126594;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8vk5QPa8Ddpr3Tv3fxWVghmAqzj4yb5xmWGUamAaWZs=;
-	b=JR3R3gWgJls8uKpb9Ovre5pZt013xIHxkPsvNo0w6EAHaznBfQZYcJmr1Od8nV/vqCRFZ0
-	6BLDQdRm2einipBX1uHF00PMF96t3u6waOySFmAsjVWKfXqIBuU76oAjUqT18Li4IbMOvk
-	L56nJgN9Ne3SqigDJs58FWw9t88UyMrDNAOw8H7zjmgDg6PSIzvcX7zFbOvsUQF8+L9SxC
-	59E/UFuCz6QL8bZU9zX80p5UAfK6Ic9fv79MPlEIShuWADGWCI7YVHAM3g9VEbYNE2DfyU
-	y/wtxxvXuGqM8CKFWBXaWmXDeI1jdKFmp0mGJTkile9Dq5XZDCtQlHYe/GH4TQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1711126594;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8vk5QPa8Ddpr3Tv3fxWVghmAqzj4yb5xmWGUamAaWZs=;
-	b=bNoVnhevvShLUQc1SaCwcOaFfeaEtYePHah2KJmWR85I0Ra3eFrcmPb41+MKiLT1rOazWA
-	BhBnwhz+aA+CiwXU4mTBZmyXk7BbEek5cmdZ2I5GsXVHFh6tQTbn94yialHCu+wz65bXYv
-	leGj+n5xo3UwPoHcD92VuD1pnUM+h4T3Xm7gzNYbOOnbjR2TNFZ0yJqM5ChgPZ1PWZBi7L
-	fAQNBjYHiq3Xe/O4+QN4aLSCsJAsaaFv+2ukcdn4T71sBQ5ufsZRn8/vbNTMgbqohW0BKF
-	OP93yUFEgtW/rk8bcPn3bxDp45wxyoLsdEP9F2M+ptFvpzZxyE9pNXrUqzPWjA==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1711126594; a=rsa-sha256;
-	cv=none;
-	b=qBaubpczSjHdof2JZRBR3+FDxjguHXHVEkBnKmgxs4Ud0gpPPGwg1wmVFlBcFsmZML8JlR
-	dUliqT013nwB2uj9eQWJfzHPLZXl1Aezg3ItWM+TO+wrHwc5stledMRA28vrWxF7IyCkhO
-	/R0sLdkqGUDI0fnwGNtL7jcO1JwUEO9cmTs81laZsGsEw+nbavdRFMVmNKXqjvRMcI6+gl
-	oG8cPYtG950ldAp+7TH9wv6yvakwvCf8x9h85E/AuKuciwMIWsPDxq+KF2WAvGLzpiwRLA
-	cpaKJ5mS7VX9boXTKJ3XXPsz2iCwYO9VwmdkaVhX7s3yIb+sCECFCr0d4fT1QQ==
-Message-ID: <713b1d0333eb2f12e63bc8a7b8f423e1240abae0.camel@iki.fi>
-Subject: Re: [PATCH v2 0/5] Bluetooth: add TX timestamping for ISO/SCO/L2CAP
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 22 Mar 2024 18:56:31 +0200
-In-Reply-To: <cover.1710440392.git.pav@iki.fi>
-References: <cover.1710440392.git.pav@iki.fi>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="eQ3QSUwr"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
+	s=s110527; h=Message-ID:Date:MIME-Version:Subject:From:
+	Content-Type; bh=cW2mt37Z/a+Rt6EHEHmz1Gi6tbwi2vJAaXQEKqVoAMk=;
+	b=eQ3QSUwryqFDkAo9jq/GuEqwdIIZwIQj3gzXsvdB6Hoa+KEYHJKm15ePsPZrGP
+	aqkVNzWs/cLmGQEl0jmuEDQI5sNVPAsjGBBponEwchZm9cXUWCrbLqKYRhwGyvOJ
+	Z22Z/0BZfue+c2BX5t3Tz/Y7jCO4z9wwhaBJWnPAkYULE=
+Received: from [192.168.50.76] (unknown [58.22.7.114])
+	by gzga-smtp-mta-g0-3 (Coremail) with SMTP id _____wD3XySgyP1lg1AXAQ--.37525S2;
+	Sat, 23 Mar 2024 02:06:27 +0800 (CST)
+Message-ID: <0078fcaa-180b-47e9-991a-6f18d920f4b0@126.com>
+Date: Sat, 23 Mar 2024 02:06:24 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH BlueZ] avctp: Remove redundant UUID checks and additions
+Content-Language: en-GB
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, Xiao Yao <xiaoyao@rock-chips.com>
+References: <20240322143830.1476938-1-xiaokeqinhealth@126.com>
+ <CABBYNZK64cAFTm7221QxN2T4Eip0=LbpmWUX_bJ3w+O4wAG2UQ@mail.gmail.com>
+From: Yao Xiao <xiaokeqinhealth@126.com>
+In-Reply-To: <CABBYNZK64cAFTm7221QxN2T4Eip0=LbpmWUX_bJ3w+O4wAG2UQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3XySgyP1lg1AXAQ--.37525S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7CrWDKF1rGF4rZF1fJr17GFg_yoW8Zry7pF
+	yYgFyUJFWkKr15ta4avF18uryaq3yUAr95WrZ5tw4jkwn3GryYqFyktr1Fqa4UursFkw4F
+	vrWUGF92vwsIv3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UKsj8UUUUU=
+X-CM-SenderInfo: 50ld0yhhtl0xhhdo3xa6rslhhfrp/1tbimgSp1WVLafX+oAABsP
 
-Hi Luiz,
+Hi,
 
-to, 2024-03-14 kello 20:20 +0200, Pauli Virtanen kirjoitti:
-> Add support for TX timestamping in ISO/SCO/L2CAP sockets.
->=20
-> These patches allow fixing / working around controller(?) issue where
-> two ISO streams in same group get desynchronized. It also gives user
-> applications the best latency information as available to kernel.
->=20
-> Also add sockopt BT_NO_ERRQUEUE_POLL to optionally disable POLLERR
-> wakeup on TX timestamp arrival, which is mainly a nuisance in the use
-> case here.  The alternative to this seems be to deal with the POLLERR
-> wakeups in BlueZ side, but this seems hard as it's always enabled in
-> poll() flags so not clear if anything else than polling at regular
-> intervals can be done there.
+在 2024/3/22 23:28, Luiz Augusto von Dentz 写道:
 
-Any suggestions what the plan here should be?
+> Hi,
+>
+> On Fri, Mar 22, 2024 at 2:39 PM Xiao Yao <xiaokeqinhealth@126.com> wrote:
+>> From: Xiao Yao <xiaoyao@rock-chips.com>
+>>
+>> ---
+>>   profiles/audio/avctp.c | 6 ------
+>>   1 file changed, 6 deletions(-)
+>>
+>> diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
+>> index 8ad146df1..6199ee951 100644
+>> --- a/profiles/audio/avctp.c
+>> +++ b/profiles/audio/avctp.c
+>> @@ -1597,12 +1597,6 @@ static void avctp_confirm_cb(GIOChannel *chan, gpointer data)
+>>          if (session == NULL)
+>>                  return;
+>>
+>> -       if (btd_device_get_service(device, AVRCP_REMOTE_UUID) == NULL)
+>> -               btd_device_add_uuid(device, AVRCP_REMOTE_UUID);
+>> -
+>> -       if (btd_device_get_service(device, AVRCP_TARGET_UUID) == NULL)
+>> -               btd_device_add_uuid(device, AVRCP_TARGET_UUID);
+> Patch description makes no sense to me, this code is adding the UUIDs
+> of AVCTP if the device over its PSM because at this point perhaps SDP
+> discovery is not complete.
+In the scenario encountered, the SDP service discovery has already
+been completed, with the SDP record only containing AVRCP_REMOTE_UUID.
+At this point, the device is added support for AVRCP_TARGET_UUID,
+which leads to the following code being executed:
+   controller_init(session);
+     //avrcp.c:controller_init() 0x55bcdbd690 version 0x0000
+     session->controller = controller;
+However, avrcp_set_volume relies on session->controller, erroneously
+issuing the AVRCP_SET_ABSOLUTE_VOLUME command.
 
-The suggestions so far:
+Perhaps add a check to verify that SDP discovery has completed before
+adding the UUID?
 
-1. Socket TX timestamping & deal with POLLERR in BlueZ
+Additionally, there is another concern: is it appropriate to add support
+for both AVRCP_REMOTE_UUID and AVRCP_TARGET_UUID before the completion
+of SDP? if one of the UUIDs is not supported,how should it be handled?
 
-2. Socket TX timestamping & disable POLLERR via setsockopt
+>
+>>          switch (psm) {
+>>          case AVCTP_CONTROL_PSM:
+>>                  avctp_control_confirm(session, chan, device);
+>> --
+>> 2.34.1
+>>
+>>
+>
 
-3. Some custom latency reporting mechanism
-
-
-> Pipewire side:
-> https://gitlab.freedesktop.org/pvir/pipewire/-/commits/iso-ts-test2
->=20
-> With this change, https://github.com/bluez/bluez/issues/515 is more or
-> less fixed, and the sound server can figure out the total latency to
-> audio rendering (tx latency + transport latency + presentation delay).
->=20
-> For ISO, we can later use LE Read ISO TX Sync to provide hardware
-> timestamps, but this requires figuring out the sequence number
-> synchronization first.
->=20
-> v2:
-> - Rename *tx_comp* -> *tx*
-> - Add hci_send_conn_frame() and handle all link types
-> - Add SCO timestamping. Deal with no flow control -> no Num_Comp_* events
-> - Handle HCI_FLOW_CTL_MODE_BLOCK_BASED
-> - Add BT_NO_ERRQUEUE_POLL
->=20
-> Pauli Virtanen (5):
->   Bluetooth: add support for skb TX timestamping
->   Bluetooth: ISO: add TX timestamping
->   Bluetooth: L2CAP: add TX timestamping
->   Bluetooth: SCO: add TX timestamping
->   Bluetooth: add BT_NO_ERRQUEUE_POLL socket option
->=20
->  include/net/bluetooth/bluetooth.h |  10 ++-
->  include/net/bluetooth/hci_core.h  |  12 ++++
->  include/net/bluetooth/l2cap.h     |   3 +-
->  net/bluetooth/6lowpan.c           |   2 +-
->  net/bluetooth/af_bluetooth.c      |  72 ++++++++++++++++++-
->  net/bluetooth/hci_conn.c          | 111 ++++++++++++++++++++++++++++++
->  net/bluetooth/hci_core.c          |  19 +++--
->  net/bluetooth/hci_event.c         |  11 ++-
->  net/bluetooth/iso.c               |  32 ++++++---
->  net/bluetooth/l2cap_core.c        |  11 ++-
->  net/bluetooth/l2cap_sock.c        |  23 +++++--
->  net/bluetooth/sco.c               |  27 ++++++--
->  net/bluetooth/smp.c               |   2 +-
->  13 files changed, 303 insertions(+), 32 deletions(-)
->=20
-
---=20
-Pauli Virtanen
