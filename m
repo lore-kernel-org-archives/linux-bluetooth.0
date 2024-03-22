@@ -1,35 +1,60 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A5F12E822
-	for <linux-bluetooth@vger.kernel.org>; Fri, 22 Mar 2024 10:10:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70AE45D72B
+	for <linux-bluetooth@vger.kernel.org>; Fri, 22 Mar 2024 13:36:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711102232; cv=none; b=ZhXvkkwiPkK0DJUe8t3aq/UXk9p02L0gcDJ55xmCai4wK4f/LZ0MJz2imMR+Jsfq6xf/dlz3wfH5nHRs+iLw6IklFIXxlq33YGNAJRIuAf6xMHWBwKnmF569lBKZG2Nrz31SJCMV8iWpjritcNEwDHGuDM8Z/CaODIHjQmhGVNM=
+	t=1711114569; cv=none; b=cSTLjYQCsJUOWIWVJikpjRrJKShatzEo7nu1qNIT6eaRdOUKbahoQWg0qW7p1ulNhaoxetVKZcf7SUOVu15NHNW+Yfl+bxkIaMVybnVOtdY8S/LL24O3vFn+S2RPjmsZCsWKjB67HIgF1hgt/47wnRahc6WUj9gHGcn9Z6KyV7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711102232; c=relaxed/simple;
-	bh=eEJxT9zi3pb/qDtrbgkFeHm3/hUAWYT+WgvVryfPPv0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=OOEmJUK2GiIBZu+4tlqZShzsg9Sx6amZx3FmMnasl7PspzGgfBTtjzChhmjEdhwLgqQEviDU324OULU9IY5usSxSkSCPjCuTRncQNaiQWoqngNvEKN/EEsNULa7rudXGo+hyj4TCebhm5x3v+CeHWFMHojhP8rydpUvw1RKRXBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aIvD/XLC; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711114569; c=relaxed/simple;
+	bh=vIT8LwGVG91TxeYOCcfqhfXzJmU+7cIIcnWzlZNPc3A=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=gCOYmU0qKE0gjMb4t5ci95gXFtPRJClr1JhyXhChMCMUisMLS+JdtmE6+w7GCu2no4dvRWIsXKl0CiIsTfz8Yqa2yJ7hkrDX66WVgMxnQMq/U7hZDXys7Rhl24YIHuirI9S8Of0CgOXtRvJ+YNvwuNx6ANee9pA3VgLAo2Tu1tk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jKNqPKyi; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aIvD/XLC"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 34370C433C7;
-	Fri, 22 Mar 2024 10:10:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711102232;
-	bh=eEJxT9zi3pb/qDtrbgkFeHm3/hUAWYT+WgvVryfPPv0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=aIvD/XLCqKPfeKg20BHA09brzTQY6DIkSHbeAXx3bATX65fnzQNlwZCaOGJJkHVjG
-	 9qdyr+h0F7fimG7e54a9WFfH2Fyjo8WaGrIjOcdP8zV0lxlFZAqzC4bs+cVJVJ++lM
-	 CmuvfMXBEkabYWrK7If5POkLUSvko6cbudlJGFPkJ/xjFxNgLqJq2tMa4Sx9NMcC2o
-	 YOcgtmeqK446ALwJWhXdIpW5jIiUVIj1KDR/zUAaQ1wSIYZikURGFjjV7M0UUnY1WD
-	 ZjvFx3HQmccV5B/NWLo6WuzNhBw7wTbFzCGafdKsoIKS401bXFuywbW6iZ/00jPb3y
-	 pE4NVlpf6Gxvw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2270DD982E2;
-	Fri, 22 Mar 2024 10:10:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jKNqPKyi"
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-414776775d3so9999455e9.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Mar 2024 06:36:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711114565; x=1711719365; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=87r4rh9xnhwTfyQ8xucHULUHP9DRNgLZBZsgxdFQ3AM=;
+        b=jKNqPKyiz/UnR2Ptx6b93USOVJLTDblk/wA2kaDkN3c81BVcv672jSX0+qoHmTEp2r
+         SDXDu8j5o7Db9GTru9e5vKBt8+XTiLk0XLAN8ZKs9zCHMSqAc2scfy3oDc606VUrow8x
+         sVBUG6nxWdhxXkUf0WlJUJe2gA+QAH3+Y5DJYqH2jc2CKWc1DWO28olB433d7lO3/SaW
+         498NtvRnk1aCBDwXa8jA+6BHQp18qYUGEIQzaeGAW2eRrZVJHmerT62fpZsk+sfRSH63
+         Eima9hp5K9/4YJL0ZL7KIkBxZXxLu7pk+OFm85V+0lokZBuYWXuka5KsEUmz3BybqUcy
+         tzJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711114565; x=1711719365;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=87r4rh9xnhwTfyQ8xucHULUHP9DRNgLZBZsgxdFQ3AM=;
+        b=R8rs8piDcYu3v4Xj44wPj4kQXLLZ33mdXfoTKK07+BffBDMah9BDhX/fw0V0he9GB3
+         /eCHWQao7ND5gjfYnxGfTXDPgqFpUqW3YGZ5UF1KX8rzGUy/a/kVt8R25KyTKv5rC34+
+         TAK1pnHNRJ30mhkyYAsgh/7TycmtFbriB7PO0iF8hsSdaekqG2fKFTsYkjxscpdhTsRy
+         WYAGdWpp9eW0QeJ64yDCR7RTbFs2NKBVBzVaWJ1x3zlX1f/xEkgbjvw6JkvnLStgjEYe
+         dT1K88M9MSXqsaMMhyQ45qPjloFG/jJy8N3y1GBwyyddN12B4kPOPLqVAsiHnWoYRn/M
+         RkFw==
+X-Gm-Message-State: AOJu0Yw0yeLYTUFFNxiPa601Aqm+M+gUv48W18pdKDsiLnrmDny04Zof
+	X/Nsf8WybNNH2gmVDV2S3HfHcLCi+A9bQIYvGcX5jqGfhFsTroalIIN/Gb2rhT/YFjKR
+X-Google-Smtp-Source: AGHT+IGw7qXptLujr9DdrpYHgSdV6cIIPazw21qZ2WWf5S83mTAazvlRGbXn2hRVZ83gNRocKfvXvg==
+X-Received: by 2002:a5d:4645:0:b0:33e:7029:96bf with SMTP id j5-20020a5d4645000000b0033e702996bfmr1377685wrs.58.1711114564925;
+        Fri, 22 Mar 2024 06:36:04 -0700 (PDT)
+Received: from lvondent-mobl3.. (ftip004290803.acc4.faraday.21cn-nte.bt.net. [109.144.76.63])
+        by smtp.gmail.com with ESMTPSA id b7-20020a056000054700b0033e7b05edf3sm2107915wrf.44.2024.03.22.06.36.03
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Mar 2024 06:36:03 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] bap: Fix not setting adapter address type
+Date: Fri, 22 Mar 2024 13:36:03 +0000
+Message-ID: <20240322133603.43620-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -37,51 +62,28 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ 0/1] Fix crash in iov_append_ltv function
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <171110223213.5004.5133673168895047268.git-patchwork-notify@kernel.org>
-Date: Fri, 22 Mar 2024 10:10:32 +0000
-References: <20240320210350.101941-1-silviu.barbulescu@nxp.com>
-In-Reply-To: <20240320210350.101941-1-silviu.barbulescu@nxp.com>
-To: Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
-Cc: linux-bluetooth@vger.kernel.org, mihai-octavian.urzica@nxp.com,
- vlad.pruteanu@nxp.com, andrei.istodorescu@nxp.com, luiz.dentz@gmail.com,
- iulia.tanasescu@nxp.com
 
-Hello:
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+This fixes not setting adapter address type when listening for
+broadcasters (aka Broadcast Sink).
+---
+ profiles/audio/bap.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-On Wed, 20 Mar 2024 23:03:49 +0200 you wrote:
-> Fix function iov_append_ltv crashes because is not reallocating memory
-> Use util_ltv_push from util.c
-> 
-> [bluetooth]# [NEW] Endpoint /org/bluez/hci0/pac_bcast0
-> [bluetooth]# Endpoint /local/endpoint/ep0 registered
-> endpoint.config /org/bluez/hci0/pac_bcast0 /local/endpoint/ep0 48_4_1
-> [/local/endpoint/ep0] BIG (auto/value): 0
-> [/local/endpoint/ep0] Enter channel location (value/no): 3
-> ==80806==ERROR: AddressSanitizer: heap-buffer-overflow on
-> address 0x60200000a8ba at pc 0x561971611e0e bp 0x7ffd45ab1f00
-> sp 0x7ffd45ab1ef0 WRITE of size 1 at 0x60200000a8ba thread T0
-> 0x561971611e0d in put_u8 src/shared/util.h:254
-> 0x561971611e0d in util_iov_push_u8 src/shared/util.c:534
-> 0x5619715c28f0 in iov_append_ltv client/player.c:3565
-> 0x5619715c28f0 in config_endpoint_channel_location client/player.c:3593
-> 0x5619716226ce in bt_shell_release_prompt src/shared/shell.c:744
-> 0x561971623087 in rl_handler src/shared/shell.c:769
-> 
-> [...]
-
-Here is the summary with links:
-  - [BlueZ,1/1] Fix crash in iov_append_ltv function
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=bbf198280e70
-
-You are awesome, thank you!
+diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
+index 38900771a..ec55614ca 100644
+--- a/profiles/audio/bap.c
++++ b/profiles/audio/bap.c
+@@ -2737,6 +2737,8 @@ static int short_lived_pa_sync(struct bap_bcast_pa_req *req)
+ 			NULL, &err,
+ 			BT_IO_OPT_SOURCE_BDADDR,
+ 			btd_adapter_get_address(data->adapter),
++			BT_IO_OPT_SOURCE_TYPE,
++			btd_adapter_get_address_type(data->adapter),
+ 			BT_IO_OPT_DEST_BDADDR,
+ 			device_get_address(data->device),
+ 			BT_IO_OPT_DEST_TYPE,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.44.0
 
