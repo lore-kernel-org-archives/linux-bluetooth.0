@@ -1,72 +1,108 @@
-Received: from m16.mail.126.com (m16.mail.126.com [117.135.210.9])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B46E47F5D
-	for <linux-bluetooth@vger.kernel.org>; Fri, 22 Mar 2024 14:38:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.9
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C6FD47F7F;
+	Fri, 22 Mar 2024 14:45:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711118330; cv=none; b=KqjaLzU5V7z+6nz7ijkNYGmtCD7m/+3MUTHQ6wGlPoEL48RV97miv4ISxJ2WdN6VYZHRquAgKOfSQ0Ldw8y9y5Y/NPb4syA/UDVFmEgoGxYdYYOytbEjFWsVG99mGbOdE7CVTrqUVPcQRflRlIjI+462ABJcHmMvNL95xK61jg0=
+	t=1711118701; cv=none; b=G5LLB4QlW7KtNWIth73QMYwXHA9lQ6OvvUMxlhISLlOX9iPTLXPlYheCHePYJ2JtrtXa+jIeH8XEESwkwtGYt4HsoQN2rDCh1QlxC9DtEEpZJCFRsoXOpAxRY3qxEueTEVr4IWuc79LtsFLUlgQGITDy82lKK1qUr09KMdeU2pk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711118330; c=relaxed/simple;
-	bh=src+WaGSgLX7scvyppQr1O8bWgruike09lAr2xHi9r0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LY3l4I98wkMsXMyL8qhFNiuLN7mtgNTBh9iEysO2IlWeerXu6om8UFheaX6adRF69qlr7MdX2lGVXMVZ6JedYG98EFv6MwaLYz/YhzZouTd199tkMYSlob2Hqv7AQSIEOnZY50GkNd9MxUzUa+LUFKFKqC75j8gb/TRZTtUEaH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com; spf=pass smtp.mailfrom=126.com; dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b=XMvuyVuH; arc=none smtp.client-ip=117.135.210.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
+	s=arc-20240116; t=1711118701; c=relaxed/simple;
+	bh=oJOb22wO4m+N/5n0eP9Z0CpvUQn2sWpgpr9DVZAQk+o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Cx+bC34pmDYMH+GkAfGfkubPZkQ5xk1oQOuCDpbMaNiDJ6oJWCk+VzHwUj7M7V7W5urC8durhMpVTkgQC9sPK6M7JW9HWaSYFuzlQBT9z784EnfrZsVJyeOkhv3VP5j4XtP0u60N7PCcip5KBUXDK/95K/HxynRATEcEHX+5swA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WjPVXYXO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="XMvuyVuH"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=X1loo
-	rMf+QvlOFhsm1qxJ7wrN3yiqLfmZe22Cq60aZc=; b=XMvuyVuHMeulso/qfR3or
-	FZTUlSP2E6wjk6SXhvpF/NmGZvkKnmAP6v5kq7kXB+WadKLnXUr6y17+WbNgPcJD
-	v5D/Xxv7wDaCFYiEfsrUoPSAacc7fJMTVoNuTDEbJllHKUuHqDiDKvP8+TjllUBL
-	0sBB6ygccvRayIS04kzSvg=
-Received: from localhost.localdomain (unknown [58.22.7.114])
-	by gzga-smtp-mta-g0-2 (Coremail) with SMTP id _____wD3n5_pl_1lmkIWAQ--.55737S2;
-	Fri, 22 Mar 2024 22:38:35 +0800 (CST)
-From: Xiao Yao <xiaokeqinhealth@126.com>
-To: linux-bluetooth@vger.kernel.org,
-	luiz.dentz@gmail.com
-Cc: Xiao Yao <xiaoyao@rock-chips.com>
-Subject: [PATCH BlueZ] avctp: Remove redundant UUID checks and additions
-Date: Fri, 22 Mar 2024 22:38:30 +0800
-Message-Id: <20240322143830.1476938-1-xiaokeqinhealth@126.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WjPVXYXO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42E37C433F1;
+	Fri, 22 Mar 2024 14:44:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711118700;
+	bh=oJOb22wO4m+N/5n0eP9Z0CpvUQn2sWpgpr9DVZAQk+o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WjPVXYXOBygNVlQYfGKlpPu601j+i0avVfAeryoYW6+156u+jIoWgruPO6EFERoAj
+	 x79IJUs2tykeelwIHNxl3+pIoO0/O2eumqYSvFpQhlisKihvn8pWO+e/12vYMhqO4k
+	 zye4r+l1JMOda7Iss6U8lxDSuTyyUP6lh97RD61hzndqIQfZNYy9++yYbSoVIu6jDA
+	 yGdlGYx5oOPMEZQ1EpjNdu8H4s7/8L98HLD1kY6fRfw0+k4AANax1HNpGaTi811UTE
+	 /ynR2igcSH3qdIU4zhwR/j+DXh5/Y6J0/WrsYYCBn6ueJe2UAaHjLJ7nf2AVQn2B+x
+	 QFvu/CgFTINkw==
+Date: Fri, 22 Mar 2024 09:44:57 -0500
+From: Bjorn Andersson <andersson@kernel.org>
+To: Johan Hovold <johan+linaro@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	cros-qcom-dts-watchers@chromium.org, Konrad Dybcio <konrad.dybcio@linaro.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
+	Matthias Kaehlcke <mka@chromium.org>, Douglas Anderson <dianders@chromium.org>, 
+	Rocky Liao <quic_rjliao@quicinc.com>, Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, 
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
+	Rob Clark <robdclark@chromium.org>
+Subject: Re: [PATCH v4 2/4] arm64: dts: qcom: sc7180-trogdor: mark bluetooth
+ address as broken
+Message-ID: <hcpgho3xrkxas55c5isxi7mwusdjbxkyxlt74r72gfxuunzikx@jxiyumioezb6>
+References: <20240320075554.8178-1-johan+linaro@kernel.org>
+ <20240320075554.8178-3-johan+linaro@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3n5_pl_1lmkIWAQ--.55737S2
-X-Coremail-Antispam: 1Uf129KBjvdXoWrKFW7Xw4rGr4kury3AF4Dtwb_yoW3WFc_Z3
-	s5ZryUWa18t34vvF43Xw4UXr9aqr4Sq395uas3trn7KF4UXrWYgw17ZFWYvrn3u3Z3Cry3
-	ZFy8ZF45KrnxWjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7xRReOJ7UUUUU==
-X-CM-SenderInfo: 50ld0yhhtl0xhhdo3xa6rslhhfrp/1tbiEBap1WVLafNveQABsZ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240320075554.8178-3-johan+linaro@kernel.org>
 
-From: Xiao Yao <xiaoyao@rock-chips.com>
+On Wed, Mar 20, 2024 at 08:55:52AM +0100, Johan Hovold wrote:
+> Several Qualcomm Bluetooth controllers lack persistent storage for the
+> device address and instead one can be provided by the boot firmware
+> using the 'local-bd-address' devicetree property.
+> 
+> The Bluetooth bindings clearly states that the address should be
+> specified in little-endian order, but due to a long-standing bug in the
+> Qualcomm driver which reversed the address some boot firmware has been
+> providing the address in big-endian order instead.
+> 
+> The boot firmware in SC7180 Trogdor Chromebooks is known to be affected
+> so mark the 'local-bd-address' property as broken to maintain backwards
+> compatibility with older firmware when fixing the underlying driver bug.
+> 
+> Note that ChromeOS always updates the kernel and devicetree in lockstep
+> so that there is no need to handle backwards compatibility with older
+> devicetrees.
+> 
+> Fixes: 7ec3e67307f8 ("arm64: dts: qcom: sc7180-trogdor: add initial trogdor and lazor dt")
+> Cc: stable@vger.kernel.org      # 5.10
+> Cc: Rob Clark <robdclark@chromium.org>
+> Reviewed-by: Douglas Anderson <dianders@chromium.org>
+> Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
 
----
- profiles/audio/avctp.c | 6 ------
- 1 file changed, 6 deletions(-)
+Acked-by: Bjorn Andersson <andersson@kernel.org>
+Reviewed-by: Bjorn Andersson <andersson@kernel.org>
 
-diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-index 8ad146df1..6199ee951 100644
---- a/profiles/audio/avctp.c
-+++ b/profiles/audio/avctp.c
-@@ -1597,12 +1597,6 @@ static void avctp_confirm_cb(GIOChannel *chan, gpointer data)
- 	if (session == NULL)
- 		return;
- 
--	if (btd_device_get_service(device, AVRCP_REMOTE_UUID) == NULL)
--		btd_device_add_uuid(device, AVRCP_REMOTE_UUID);
--
--	if (btd_device_get_service(device, AVRCP_TARGET_UUID) == NULL)
--		btd_device_add_uuid(device, AVRCP_TARGET_UUID);
--
- 	switch (psm) {
- 	case AVCTP_CONTROL_PSM:
- 		avctp_control_confirm(session, chan, device);
--- 
-2.34.1
+Please merge this through the BT tree, together with the other patches.
 
+Regards,
+Bjorn
+
+> ---
+>  arch/arm64/boot/dts/qcom/sc7180-trogdor.dtsi | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/arch/arm64/boot/dts/qcom/sc7180-trogdor.dtsi b/arch/arm64/boot/dts/qcom/sc7180-trogdor.dtsi
+> index 46aaeba28604..ebe37678102f 100644
+> --- a/arch/arm64/boot/dts/qcom/sc7180-trogdor.dtsi
+> +++ b/arch/arm64/boot/dts/qcom/sc7180-trogdor.dtsi
+> @@ -943,6 +943,8 @@ bluetooth: bluetooth {
+>  		vddrf-supply = <&pp1300_l2c>;
+>  		vddch0-supply = <&pp3300_l10c>;
+>  		max-speed = <3200000>;
+> +
+> +		qcom,local-bd-address-broken;
+>  	};
+>  };
+>  
+> -- 
+> 2.43.2
+> 
