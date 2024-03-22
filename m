@@ -1,230 +1,125 @@
-Received: from mail-4027.protonmail.ch (mail-4027.protonmail.ch [185.70.40.27])
+Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98CB6B67D
-	for <linux-bluetooth@vger.kernel.org>; Fri, 22 Mar 2024 05:50:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.27
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B1F23778
+	for <linux-bluetooth@vger.kernel.org>; Fri, 22 Mar 2024 10:07:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711086661; cv=none; b=uUxOdqBlV0skk8232lpn15mGoQ0C4Kw2UrKOhsdJXuUJJhFZNHjdkEGPWe7V6nOHmG0AjaaIYmfMVrN1p/20lkdoRLbIQTSWJLnMyxX5ZZiM9EwxWhCLVsw4ArXc74ST6ynm2T/PFHVZbbWAogopJzKynAlsigvSIjfj3fUo0KI=
+	t=1711102051; cv=none; b=ImuQM5faZizoCAB1EbainyANePI5aon1eyNLGuYxySOaPkDAAUfSnFAk88S+r3vxXxIzSk+mVjjE5IDTn+pxYFJrJ8ZEiLKapCV7FQdK9a1LB9OE1VKa5aKF9zPzRpkD6aV3pbtom3Ed9OIqdPLHnzlQ51HvPWWXn/1c7vZu8zI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711086661; c=relaxed/simple;
-	bh=oEeYldermshSLxb7N9IZbSvtBhiJcLM+hFvf7ztZSS8=;
-	h=Date:To:From:Subject:Message-ID:MIME-Version:Content-Type; b=e7Mw5HpeyhJPHnX8oabgiMuiImNtQ35BwyYbfmHzaIqqqoDWWQvOV5ZVuxGyV1C6Kw6geC8xVVf2nI7x2SsxiXVWa6aZZBbVy8RyrDdtCvQ4o9NiYuAxYrmvV71cKlTgzdCQacggmu/Z1nXhQMro2sMgnhUcp2w9IhmInve0mPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=i6IacEKd; arc=none smtp.client-ip=185.70.40.27
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	s=arc-20240116; t=1711102051; c=relaxed/simple;
+	bh=SCCApGeELkuDcNwGdLzOHz1W1fdN5uH8OMgJx9EX9C8=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=oKg1hfIyANB5L1vsgI0Kyoahc590TAOZ5+c9nuUTp6sjfux+eRzsYIgX3QLAF9+emHcJ3WcVFDyLqvo8lPjPLQTEukfFCDLmhRbPCEMWr+6m+5pabNfaE3CpzRmqU3hUqosN8bi/xX5SZYgaxoJcDPhc75hJX7CjfDvfLu3c3GU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=gRcMY0l/; arc=none smtp.client-ip=192.30.252.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="i6IacEKd"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=as7doqpzabd3pjg6fygjsnxhuu.protonmail; t=1711086650; x=1711345850;
-	bh=oEeYldermshSLxb7N9IZbSvtBhiJcLM+hFvf7ztZSS8=;
-	h=Date:To:From:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=i6IacEKdntwS1RJtw87hl9uJzi430rlP1kB375m5O8xWGh821UIWfBXOjMQj5BVsp
-	 DugoCJN+nMYySLhiN9kZZN6aGJ49VQfO2XuM5BkOAe00dbm18STSTSgCyQur+K7QLa
-	 CPMZ/BvYFoadnSTSukn9IDwWh+HnT8z8fe21WN+EnGD9sgWdowGWabFoziNRRDdpxn
-	 ezJYMS6Pj7tlGoPN9ZnQe4SyKAHYLtnd2EwbB8beng8iamoQf7eHFNsOEifgfBMSBc
-	 UThslJStcjCoTsYbDMnkK24b8NSA5VmOnOHu3ifI1Ovj6N/FBw12d/NoZhVxOAyly3
-	 v+8HciwbV5QXA==
-Date: Fri, 22 Mar 2024 05:50:36 +0000
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-From: Rustmilian <Rustmilian@proton.me>
-Subject: [BR] bluez/bluez-libs regression
-Message-ID: <RH_cQJ7FRJYEEw3rGLEa6UiZ8X2xiX8_H7n8K0J75X_SE3d40navRBE4wXK92zQry9pTQzN2LZkYp20THDIlI0LALSBQQIvJ_pRQQ0P8J20=@proton.me>
-Feedback-ID: 52648909:user:proton
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="gRcMY0l/"
+Received: from github.com (hubbernetes-node-ed7c0d8.ac4-iad.github.net [10.52.142.35])
+	by smtp.github.com (Postfix) with ESMTPA id B3D3F640C43
+	for <linux-bluetooth@vger.kernel.org>; Fri, 22 Mar 2024 03:07:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1711102048;
+	bh=bN0o6cEp4jFasj8UpOEgH8JHduJdkqMwvTKXXOId8m0=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=gRcMY0l/j0v4pxGoyuGkbYBhAcF5tm2E4H+2gZB7pwADQkPhoKIeba760EbkH+fYP
+	 L8aKRX5yjkVpSPaaes2VxiGenDnIJL6KewdpvAjiWk4k1ye+s78mfQkC8oylADrsGM
+	 YnHv8D5KUYYYoiNO0CYGAYm918HrX+vEgG3m5xpM=
+Date: Fri, 22 Mar 2024 03:07:28 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/b8ad34-925092@github.com>
+Subject: [bluez/bluez] bbf198: Fix crash in iov_append_ltv function
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature"; micalg=pgp-sha512; boundary="------715b35f60be64c83c04d79020cf36221d043fee1e864ea0aae4bc2646f7c1a47"; charset=utf-8
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------715b35f60be64c83c04d79020cf36221d043fee1e864ea0aae4bc2646f7c1a47
-Content-Type: multipart/mixed;boundary=---------------------65b410175d41f66955c4833e41809421
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: bbf198280e701580cf2284800d56811bae71b80a
+      https://github.com/bluez/bluez/commit/bbf198280e701580cf2284800d56811bae71b80a
+  Author: Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
+  Date:   2024-03-22 (Fri, 22 Mar 2024)
 
------------------------65b410175d41f66955c4833e41809421
-Content-Type: multipart/alternative;boundary=---------------------77362a392b7cb5d8898a2d71abd51b12
+  Changed paths:
+    M client/player.c
 
------------------------77362a392b7cb5d8898a2d71abd51b12
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;charset=utf-8
+  Log Message:
+  -----------
+  Fix crash in iov_append_ltv function
 
-There's a regression somewhere between bluez 5.69 bluez-libs 5.69 (working=
-) and latest (currently 5.73) that breaks Bluetooth for device :
-`Bus 001 Device 010: ID 0bda:b00a Realtek Semiconductor Corp. Realtek Blue=
-tooth 4.2 Adapter`
+Fix function iov_append_ltv crashes because is not reallocating memory
+Use util_ltv_push from util.c
 
-bluetooth.service says condition unmet : /sys/class/bluetooth/ not found, =
-checking it; `/sys/class/bluetooth/` exists but is empty when it's suppose=
-d to have a symlink from `/sys/class/bluetooth/hci0/` to `/sys/devices/pci=
-0000:00/0000:00:08.1/0000:03:00.3/usb1/1-4/1-4:1.0/bluetooth/hci0/`
-looking through the log there's also errors :
-`usb 1-4: device descriptor read/64, error -71`
-`usb 1-4: device not accepting address 6, error -71`
-`usb 1-4: device not accepting address 7, error -71`
-`usb usb1-port4: unable to enumerate USB device`
-
-attachment is logs taken from the working version.
------------------------77362a392b7cb5d8898a2d71abd51b12
-Content-Type: multipart/related;boundary=---------------------599e9a306617f90fc40787259be49e23
-
------------------------599e9a306617f90fc40787259be49e23
-Content-Type: text/html;charset=utf-8
-Content-Transfer-Encoding: base64
-
-PGRpdiBzdHlsZT0iZm9udC1mYW1pbHk6IEFyaWFsLCBzYW5zLXNlcmlmOyBmb250LXNpemU6IDE0
-cHg7Ij5UaGVyZSdzIGEgcmVncmVzc2lvbiBzb21ld2hlcmUgYmV0d2VlbiBibHVleiA1LjY5IGJs
-dWV6LWxpYnMgNS42OSAod29ya2luZykgYW5kIGxhdGVzdCAoY3VycmVudGx5IDUuNzMpIHRoYXQg
-YnJlYWtzIEJsdWV0b290aCBmb3IgZGV2aWNlIDo8YnI+Cjxjb2RlPkJ1cyAwMDEgRGV2aWNlIDAx
-MDogSUQgMGJkYTpiMDBhIFJlYWx0ZWsgU2VtaWNvbmR1Y3RvciBDb3JwLiBSZWFsdGVrIEJsdWV0
-b290aCA0LjIgQWRhcHRlcjwvY29kZT48YnI+Cjxicj4KYmx1ZXRvb3RoLnNlcnZpY2Ugc2F5cyBj
-b25kaXRpb24gdW5tZXQgOiAvc3lzL2NsYXNzL2JsdWV0b290aC8gbm90IGZvdW5kLCBjaGVja2lu
-ZyBpdDsgPGNvZGU+L3N5cy9jbGFzcy9ibHVldG9vdGgvPC9jb2RlPiBleGlzdHMgYnV0IGlzIGVt
-cHR5IHdoZW4gaXQncyBzdXBwb3NlZCB0byBoYXZlIGEgc3ltbGluayBmcm9tIDxjb2RlPi9zeXMv
-Y2xhc3MvYmx1ZXRvb3RoL2hjaTAvPC9jb2RlPiB0byA8Y29kZT4vc3lzL2RldmljZXMvcGNpMDAw
-MDowMC8wMDAwOjAwOjA4LjEvMDAwMDowMzowMC4zL3VzYjEvMS00LzEtNDoxLjAvYmx1ZXRvb3Ro
-L2hjaTAvPC9jb2RlPjxicj4KbG9va2luZyB0aHJvdWdoIHRoZSBsb2cgdGhlcmUncyBhbHNvIGVy
-cm9ycyA6PGJyPgo8Y29kZT51c2IgMS00OiBkZXZpY2UgZGVzY3JpcHRvciByZWFkLzY0LCBlcnJv
-ciAtNzE8L2NvZGU+PGJyPgo8Y29kZT51c2IgMS00OiBkZXZpY2Ugbm90IGFjY2VwdGluZyBhZGRy
-ZXNzIDYsIGVycm9yIC03MTwvY29kZT48YnI+Cjxjb2RlPnVzYiAxLTQ6IGRldmljZSBub3QgYWNj
-ZXB0aW5nIGFkZHJlc3MgNywgZXJyb3IgLTcxPC9jb2RlPjxicj4KPGNvZGU+dXNiIHVzYjEtcG9y
-dDQ6IHVuYWJsZSB0byBlbnVtZXJhdGUgVVNCIGRldmljZTwvY29kZT48YnI+Cjxicj4KYXR0YWNo
-bWVudCBpcyBsb2dzIHRha2VuIGZyb20gdGhlIHdvcmtpbmcgdmVyc2lvbi48L2Rpdj4=
------------------------599e9a306617f90fc40787259be49e23--
------------------------77362a392b7cb5d8898a2d71abd51b12--
------------------------65b410175d41f66955c4833e41809421
-Content-Type: text/markdown; filename="5.69_logs.md"; name="5.69_logs.md"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="5.69_logs.md"; name="5.69_logs.md"
-
-CmBgYHpzaApCdXMgMDAxLlBvcnQgMDAxOiBEZXYgMDAxLCBDbGFzcz1yb290X2h1YiwgRHJpdmVy
-PXhoY2lfaGNkLzZwLCA0ODBNCiAgICB8X18gUG9ydCAwMDI6IERldiAwMDIsIElmIDAsIENsYXNz
-PUh1bWFuIEludGVyZmFjZSBEZXZpY2UsIERyaXZlcj11c2JoaWQsIDEuNU0KICAgIHxfXyBQb3J0
-IDAwMjogRGV2IDAwMiwgSWYgMSwgQ2xhc3M9SHVtYW4gSW50ZXJmYWNlIERldmljZSwgRHJpdmVy
-PXVzYmhpZCwgMS41TQogICAgfF9fIFBvcnQgMDAzOiBEZXYgMDAzLCBJZiAwLCBDbGFzcz1IdW1h
-biBJbnRlcmZhY2UgRGV2aWNlLCBEcml2ZXI9dXNiaGlkLCAxLjVNCiAgICB8X18gUG9ydCAwMDQ6
-IERldiAwMTAsIElmIDAsIENsYXNzPVdpcmVsZXNzLCBEcml2ZXI9YnR1c2IsIDEyTQogICAgfF9f
-IFBvcnQgMDA0OiBEZXYgMDEwLCBJZiAxLCBDbGFzcz1XaXJlbGVzcywgRHJpdmVyPWJ0dXNiLCAx
-Mk0KICAgIHxfXyBQb3J0IDAwNTogRGV2IDAwOCwgSWYgMCwgQ2xhc3M9SHViLCBEcml2ZXI9aHVi
-LzRwLCA0ODBNCiAgICAgICAgfF9fIFBvcnQgMDAyOiBEZXYgMDA5LCBJZiAwLCBDbGFzcz1WaWRl
-bywgRHJpdmVyPXV2Y3ZpZGVvLCA0ODBNCiAgICAgICAgfF9fIFBvcnQgMDAyOiBEZXYgMDA5LCBJ
-ZiAxLCBDbGFzcz1WaWRlbywgRHJpdmVyPXV2Y3ZpZGVvLCA0ODBNCi86ICBCdXMgMDAyLlBvcnQg
-MDAxOiBEZXYgMDAxLCBDbGFzcz1yb290X2h1YiwgRHJpdmVyPXhoY2lfaGNkLzRwLCAxMDAwME0K
-YGBgCgpgYGB6c2gKWyAgIDEwLjY1MjY3NV0gdXNiIDEtNDogUHJvZHVjdDogQmx1ZXRvb3RoIFJh
-ZGlvClsgICAxMC43NTcwODddIEJsdWV0b290aDogQ29yZSB2ZXIgMi4yMgpbICAgMTAuNzU3MjIz
-XSBCbHVldG9vdGg6IEhDSSBkZXZpY2UgYW5kIGNvbm5lY3Rpb24gbWFuYWdlciBpbml0aWFsaXpl
-ZApbICAgMTAuNzU3MjI5XSBCbHVldG9vdGg6IEhDSSBzb2NrZXQgbGF5ZXIgaW5pdGlhbGl6ZWQK
-WyAgIDEwLjc1NzIzMl0gQmx1ZXRvb3RoOiBMMkNBUCBzb2NrZXQgbGF5ZXIgaW5pdGlhbGl6ZWQK
-WyAgIDEwLjc1NzIzNl0gQmx1ZXRvb3RoOiBTQ08gc29ja2V0IGxheWVyIGluaXRpYWxpemVkClsg
-ICAxMC44MTMwMjVdIEJsdWV0b290aDogaGNpMDogUlRMOiBleGFtaW5pbmcgaGNpX3Zlcj0wOCBo
-Y2lfcmV2PTAwMGMgbG1wX3Zlcj0wOCBsbXBfc3VidmVyPTg4MjEKWyAgIDEwLjgxNDU3MF0gQmx1
-ZXRvb3RoOiBoY2kwOiBSVEw6IHJvbV92ZXJzaW9uIHN0YXR1cz0wIHZlcnNpb249MQpbICAgMTAu
-ODE0NTc1XSBCbHVldG9vdGg6IGhjaTA6IFJUTDogbG9hZGluZyBydGxfYnQvcnRsODgyMWNfZncu
-YmluClsgICAxMC44MTYxOTZdIEJsdWV0b290aDogaGNpMDogUlRMOiBsb2FkaW5nIHJ0bF9idC9y
-dGw4ODIxY19jb25maWcuYmluClsgICAxMC44MTYyOTBdIEJsdWV0b290aDogaGNpMDogUlRMOiBj
-Zmdfc3ogMTAsIHRvdGFsIHN6IDM0OTI2ClsgICAxMC45MDU4MzhdIEJsdWV0b290aDogQk5FUCAo
-RXRoZXJuZXQgRW11bGF0aW9uKSB2ZXIgMS4zClsgICAxMC45MDU4NDNdIEJsdWV0b290aDogQk5F
-UCBmaWx0ZXJzOiBwcm90b2NvbCBtdWx0aWNhc3QKWyAgIDEwLjkwNTg0OF0gQmx1ZXRvb3RoOiBC
-TkVQIHNvY2tldCBsYXllciBpbml0aWFsaXplZApbICAgMTEuNDI2MTk3XSBCbHVldG9vdGg6IGhj
-aTA6IFJUTDogZncgdmVyc2lvbiAweDc1YjhmMDk4ClsgICAxMS41MjQyNDBdIEJsdWV0b290aDog
-TUdNVCB2ZXIgMS4yMgpbICAgMTEuNTcxODgyXSBCbHVldG9vdGg6IFJGQ09NTSBUVFkgbGF5ZXIg
-aW5pdGlhbGl6ZWQKWyAgIDExLjU3MTg5MV0gQmx1ZXRvb3RoOiBSRkNPTU0gc29ja2V0IGxheWVy
-IGluaXRpYWxpemVkClsgICAxMS41NzE4OTZdIEJsdWV0b290aDogUkZDT01NIHZlciAxLjExCmBg
-YAoKYGBgenNoCkNvbnRyb2xsZXIgRDg6QzA6QTY6WFg6WFg6WFggKHB1YmxpYykKCU5hbWU6IEhB
-TAoJQWxpYXM6IEhBTAoJQ2xhc3M6IDB4MDA3YzAxMGMgKDgxMjY3MzIpCglQb3dlcmVkOiB5ZXMK
-CURpc2NvdmVyYWJsZTogbm8KCURpc2NvdmVyYWJsZVRpbWVvdXQ6IDB4MDAwMDAwYjQgKDE4MCkK
-CVBhaXJhYmxlOiB5ZXMKCVVVSUQ6IE1lc3NhZ2UgTm90aWZpY2F0aW9uIFNlLi4gKDAwMDAxMTMz
-LTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYikKCVVVSUQ6IEEvViBSZW1vdGUgQ29udHJvbCAg
-ICAgICAgKDAwMDAxMTBlLTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYikKCVVVSUQ6IFZlbmRv
-ciBzcGVjaWZpYyAgICAgICAgICAgKDAzYjgwZTVhLWVkZTgtNGIzMy1hNzUxLTZjZTM0ZWM0Yzcw
-MCkKCVVVSUQ6IE9CRVggT2JqZWN0IFB1c2ggICAgICAgICAgKDAwMDAxMTA1LTAwMDAtMTAwMC04
-MDAwLTAwODA1ZjliMzRmYikKCVVVSUQ6IE1lc3NhZ2UgQWNjZXNzIFNlcnZlciAgICAgKDAwMDAx
-MTMyLTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYikKCVVVSUQ6IFBuUCBJbmZvcm1hdGlvbiAg
-ICAgICAgICAgKDAwMDAxMjAwLTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYikKCVVVSUQ6IEly
-TUMgU3luYyAgICAgICAgICAgICAgICAgKDAwMDAxMTA0LTAwMDAtMTAwMC04MDAwLTAwODA1Zjli
-MzRmYikKCVVVSUQ6IFZlbmRvciBzcGVjaWZpYyAgICAgICAgICAgKDAwMDA1MDA1LTAwMDAtMTAw
-MC04MDAwLTAwMDJlZTAwMDAwMSkKCVVVSUQ6IEEvViBSZW1vdGUgQ29udHJvbCBUYXJnZXQgKDAw
-MDAxMTBjLTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYikKCVVVSUQ6IEdlbmVyaWMgQXR0cmli
-dXRlIFByb2ZpbGUgKDAwMDAxODAxLTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYikKCVVVSUQ6
-IFBob25lYm9vayBBY2Nlc3MgU2VydmVyICAgKDAwMDAxMTJmLTAwMDAtMTAwMC04MDAwLTAwODA1
-ZjliMzRmYikKCVVVSUQ6IEF1ZGlvIFNpbmsgICAgICAgICAgICAgICAgKDAwMDAxMTBiLTAwMDAt
-MTAwMC04MDAwLTAwODA1ZjliMzRmYikKCVVVSUQ6IERldmljZSBJbmZvcm1hdGlvbiAgICAgICAg
-KDAwMDAxODBhLTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYikKCVVVSUQ6IEdlbmVyaWMgQWNj
-ZXNzIFByb2ZpbGUgICAgKDAwMDAxODAwLTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYikKCVVV
-SUQ6IEhhbmRzZnJlZSBBdWRpbyBHYXRld2F5ICAgKDAwMDAxMTFmLTAwMDAtMTAwMC04MDAwLTAw
-ODA1ZjliMzRmYikKCVVVSUQ6IEF1ZGlvIFNvdXJjZSAgICAgICAgICAgICAgKDAwMDAxMTBhLTAw
-MDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYikKCVVVSUQ6IE9CRVggRmlsZSBUcmFuc2ZlciAgICAg
-ICAgKDAwMDAxMTA2LTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYikKCVVVSUQ6IEhhbmRzZnJl
-ZSAgICAgICAgICAgICAgICAgKDAwMDAxMTFlLTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYikK
-CU1vZGFsaWFzOiB1c2I6djFENkJwMDI0NmQwNTQ1CglEaXNjb3ZlcmluZzogbm8KCVJvbGVzOiBj
-ZW50cmFsCglSb2xlczogcGVyaXBoZXJhbApBZHZlcnRpc2luZyBGZWF0dXJlczoKCUFjdGl2ZUlu
-c3RhbmNlczogMHgwMCAoMCkKCVN1cHBvcnRlZEluc3RhbmNlczogMHgwNSAoNSkKCVN1cHBvcnRl
-ZEluY2x1ZGVzOiB0eC1wb3dlcgoJU3VwcG9ydGVkSW5jbHVkZXM6IGFwcGVhcmFuY2UKCVN1cHBv
-cnRlZEluY2x1ZGVzOiBsb2NhbC1uYW1lCmBgYAoKYGBgenNoCuKXjyBibHVldG9vdGguc2Vydmlj
-ZSAtIEJsdWV0b290aCBzZXJ2aWNlCiAgICAgTG9hZGVkOiBsb2FkZWQgKC91c3IvbGliL3N5c3Rl
-bWQvc3lzdGVtL2JsdWV0b290aC5zZXJ2aWNlOyBlbmFibGVkOyBwcmVzZXQ6IGRpc2FibGVkKQog
-ICAgIEFjdGl2ZTogYWN0aXZlIChydW5uaW5nKSBzaW5jZSBUaHUgMjAyNC0wMy0yMSAyMzo0Njow
-MiBFRFQ7IDJzIGFnbwogICAgICAgRG9jczogbWFuOmJsdWV0b290aGQoOCkKICAgTWFpbiBQSUQ6
-IDgyNzAgKGJsdWV0b290aGQpCiAgICAgU3RhdHVzOiAiUnVubmluZyIKICAgICAgVGFza3M6IDEg
-KGxpbWl0OiAzOTI1KQogICAgIE1lbW9yeTogMi4wTSAocGVhazogMi4zTSkKICAgICAgICBDUFU6
-IDQ2bXMKICAgICBDR3JvdXA6IC9zeXN0ZW0uc2xpY2UvYmx1ZXRvb3RoLnNlcnZpY2UKICAgICAg
-ICAgICAgIOKUlOKUgDgyNzAgL3Vzci9saWIvYmx1ZXRvb3RoL2JsdWV0b290aGQKCk1hciAyMSAy
-Mzo0NjowMiBIQUwgYmx1ZXRvb3RoZFs4MjcwXTogRW5kcG9pbnQgcmVnaXN0ZXJlZDogc2VuZGVy
-PToxLjQ0IHBhdGg9L01lZGlhRW5kcG9pbnQvQTJEUFNvdXJjZS9hcHR4X2xsXzEKTWFyIDIxIDIz
-OjQ2OjAyIEhBTCBibHVldG9vdGhkWzgyNzBdOiBFbmRwb2ludCByZWdpc3RlcmVkOiBzZW5kZXI9
-OjEuNDQgcGF0aD0vTWVkaWFFbmRwb2ludC9BMkRQU291cmNlL2FwdHhfbGxfMApNYXIgMjEgMjM6
-NDY6MDIgSEFMIGJsdWV0b290aGRbODI3MF06IEVuZHBvaW50IHJlZ2lzdGVyZWQ6IHNlbmRlcj06
-MS40NCBwYXRoPS9NZWRpYUVuZHBvaW50L0EyRFBTb3VyY2UvYXB0eF9sbF9kdXBsZXhfMQpNYXIg
-MjEgMjM6NDY6MDIgSEFMIGJsdWV0b290aGRbODI3MF06IEVuZHBvaW50IHJlZ2lzdGVyZWQ6IHNl
-bmRlcj06MS40NCBwYXRoPS9NZWRpYUVuZHBvaW50L0EyRFBTb3VyY2UvYXB0eF9sbF9kdXBsZXhf
-MApNYXIgMjEgMjM6NDY6MDIgSEFMIGJsdWV0b290aGRbODI3MF06IEVuZHBvaW50IHJlZ2lzdGVy
-ZWQ6IHNlbmRlcj06MS40NCBwYXRoPS9NZWRpYUVuZHBvaW50L0EyRFBTb3VyY2UvZmFzdHN0cmVh
-bQpNYXIgMjEgMjM6NDY6MDIgSEFMIGJsdWV0b290aGRbODI3MF06IEVuZHBvaW50IHJlZ2lzdGVy
-ZWQ6IHNlbmRlcj06MS40NCBwYXRoPS9NZWRpYUVuZHBvaW50L0EyRFBTb3VyY2UvZmFzdHN0cmVh
-bV9kdXBsZXgKTWFyIDIxIDIzOjQ2OjAyIEhBTCBibHVldG9vdGhkWzgyNzBdOiBFbmRwb2ludCBy
-ZWdpc3RlcmVkOiBzZW5kZXI9OjEuNDQgcGF0aD0vTWVkaWFFbmRwb2ludC9BMkRQU2luay9vcHVz
-XzA1Ck1hciAyMSAyMzo0NjowMiBIQUwgYmx1ZXRvb3RoZFs4MjcwXTogRW5kcG9pbnQgcmVnaXN0
-ZXJlZDogc2VuZGVyPToxLjQ0IHBhdGg9L01lZGlhRW5kcG9pbnQvQTJEUFNvdXJjZS9vcHVzXzA1
-Ck1hciAyMSAyMzo0NjowMiBIQUwgYmx1ZXRvb3RoZFs4MjcwXTogRW5kcG9pbnQgcmVnaXN0ZXJl
-ZDogc2VuZGVyPToxLjQ0IHBhdGg9L01lZGlhRW5kcG9pbnQvQTJEUFNpbmsvb3B1c18wNV9kdXBs
-ZXgKTWFyIDIxIDIzOjQ2OjAyIEhBTCBibHVldG9vdGhkWzgyNzBdOiBFbmRwb2ludCByZWdpc3Rl
-cmVkOiBzZW5kZXI9OjEuNDQgcGF0aD0vTWVkaWFFbmRwb2ludC9BMkRQU291cmNlL29wdXNfMDVf
-ZHVwbGV4CmBgYA==
------------------------65b410175d41f66955c4833e41809421
-Content-Type: application/pgp-keys; filename="publickey - Rustmilian@proton.me - 0x8E492719.asc"; name="publickey - Rustmilian@proton.me - 0x8E492719.asc"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="publickey - Rustmilian@proton.me - 0x8E492719.asc"; name="publickey - Rustmilian@proton.me - 0x8E492719.asc"
-
-LS0tLS1CRUdJTiBQR1AgUFVCTElDIEtFWSBCTE9DSy0tLS0tCgp4ak1FWlpUWGdCWUpLd1lCQkFI
-YVJ3OEJBUWRBTktKd3RmdkdBcmY5cGpTaERyQ1djRG9Sek1LY1U1RmYKVXo4SndYRXBnb2ZOS0ZK
-MWMzUnRhV3hwWVc0Z0tGZHZjbXNwSUR4U2RYTjBiV2xzYVdGdVFIQnliM1J2CmJpNXRaVDdDa3dR
-VEZnb0FPeFloQkk1Skp4bXJSNmRxRUxCZkJ1MmdrZGlBY1J4UkJRSmxsTmVBQWhzRApCUXNKQ0Fj
-Q0FpSUNCaFVLQ1FnTEFnUVdBZ01CQWg0SEFoZUFBQW9KRU8yZ2tkaUFjUnhSVjd3QkFJWmoKTDhR
-aS84YmNzNmpxWDlBcEQ1QnlRd0R0TC91K0JUV0lqRnNkZ3RVdEFRQ3RLeGZ5a0s3QXNPSldOUFVZ
-CnBNTWdGMGRKejJvckkrYmNucTNCZXQyS0RzNDRCR1dVMTRBU0Npc0dBUVFCbDFVQkJRRUJCMENH
-ejl1WgpzaE13Uno0VDVzMG5CMUpWcjJVRTJtdXc5eVhLNURBdWhCb1VaZ01CQ0FmQ2VBUVlGZ29B
-SUJZaEJJNUoKSnhtclI2ZHFFTEJmQnUyZ2tkaUFjUnhSQlFKbGxOZUFBaHNNQUFvSkVPMmdrZGlB
-Y1J4Ujl4b0JBSXdaCjk2SDRleHJJemExaitTc1VQLzJSSXlEQ2NaNUdUK2F0NktwODZEQVRBUDRx
-Sk8zMTFjdkxyM0dGY2RObgpxb25jc1g4UmJ0Q1dLc21Kc0FtUG9VRUdDdz09Cj11UUhDCi0tLS0t
-RU5EIFBHUCBQVUJMSUMgS0VZIEJMT0NLLS0tLS0K
------------------------65b410175d41f66955c4833e41809421--
-
---------715b35f60be64c83c04d79020cf36221d043fee1e864ea0aae4bc2646f7c1a47
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: ProtonMail
-
-wnUEARYKACcFgmX9HBUJkO2gkdiAcRxRFiEEjkknGatHp2oQsF8G7aCR2IBx
-HFEAANQ6AQCrxBMahLxat7m9B017pmlYjgcrt94nFuhuX5WCO7dNfAEAmVgX
-x1UBb3U+UUra6eE8bklM5dc0Cuss/HyLFCmkyQM=
-=nreT
------END PGP SIGNATURE-----
+[bluetooth]# [NEW] Endpoint /org/bluez/hci0/pac_bcast0
+[bluetooth]# Endpoint /local/endpoint/ep0 registered
+endpoint.config /org/bluez/hci0/pac_bcast0 /local/endpoint/ep0 48_4_1
+[/local/endpoint/ep0] BIG (auto/value): 0
+[/local/endpoint/ep0] Enter channel location (value/no): 3
+=================================================================
+==80806==ERROR: AddressSanitizer: heap-buffer-overflow on
+ address 0x60200000a8ba at pc 0x561971611e0e bp 0x7ffd45ab1f00
+ sp 0x7ffd45ab1ef0 WRITE of size 1 at 0x60200000a8ba thread T0
+  0x561971611e0d in put_u8 src/shared/util.h:254
+  0x561971611e0d in util_iov_push_u8 src/shared/util.c:534
+  0x5619715c28f0 in iov_append_ltv client/player.c:3565
+  0x5619715c28f0 in config_endpoint_channel_location client/player.c:3593
+  0x5619716226ce in bt_shell_release_prompt src/shared/shell.c:744
+  0x561971623087 in rl_handler src/shared/shell.c:769
 
 
---------715b35f60be64c83c04d79020cf36221d043fee1e864ea0aae4bc2646f7c1a47--
+  Commit: a2b2d2e4ab0ee375b24007e23f19e3122fa33764
+      https://github.com/bluez/bluez/commit/a2b2d2e4ab0ee375b24007e23f19e3122fa33764
+  Author: Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
+  Date:   2024-03-22 (Fri, 22 Mar 2024)
 
+  Changed paths:
+    M client/player.c
+
+  Log Message:
+  -----------
+  player: Adjust SDU size based on the number of locations
+
+Adjust the SDU size based on the number of locations/channels
+that is being requested.
+
+
+  Commit: 97fa2525fb104856c80f67af27cd87af09a41c4d
+      https://github.com/bluez/bluez/commit/97fa2525fb104856c80f67af27cd87af09a41c4d
+  Author: Youwan Wang <youwan@nfschina.com>
+  Date:   2024-03-22 (Fri, 22 Mar 2024)
+
+  Changed paths:
+    M obexd/src/manager.c
+
+  Log Message:
+  -----------
+  obexd: Remove redundant judgments and fix code style
+
+
+  Commit: 9250929edde3b5740e5cf3b33e58a075f0e640be
+      https://github.com/bluez/bluez/commit/9250929edde3b5740e5cf3b33e58a075f0e640be
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-03-22 (Fri, 22 Mar 2024)
+
+  Changed paths:
+    M src/shared/btsnoop.c
+
+  Log Message:
+  -----------
+  shared/btsnoop: Add proper identifiers for ISO packets
+
+This adds ISO packets identifiers so they are properly stored on files.
+
+
+Compare: https://github.com/bluez/bluez/compare/b8ad3490a350...9250929edde3
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
