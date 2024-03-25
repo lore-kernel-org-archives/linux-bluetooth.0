@@ -1,173 +1,160 @@
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B71E914273
-	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Mar 2024 17:00:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5DA64691;
+	Mon, 25 Mar 2024 17:10:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711386009; cv=none; b=pCrZnQ0BRpuCAyNm+A7uSc2x6XdzhsfTNZwe6X9lr/nx4DUv32pN/G3rRnOwEzPZWdG4dhj3KD9ZjR3uWTEbmaxCxqA1tWd3a+DwKfwyuZIx7mUF43QwXGD/pnGD/kGxi/ilc8ih9Tez8VlDaMsbpUxvZJ5OTQjgojTCB2JpWh8=
+	t=1711386629; cv=none; b=IxkkQlUiq2phVXHQvCd1/4e7rVlpCOLUGafzrMImo1OKQczHrCtqRbZvdIsxCpX/euBD1IxGlDdOrEhHJjCJcNpSoztFFHqvd2y4I6F6U251Q3HEQS4roenK/WfZ0GbXtnNBoEtyBtpwTykXFIiFNyHAZSxdoRMiu7pGSQEGaPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711386009; c=relaxed/simple;
-	bh=sU2N+3VMbYpctRrmkqNvMSsDe5DH8U6ybHQNS3FaOfM=;
+	s=arc-20240116; t=1711386629; c=relaxed/simple;
+	bh=pFp4gPtTDKexn2npyj7o2olGRBQTvM/rJe6ltASYeT0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IrYADmYKEJo+iZBsYukMLZEdbyGQxOAf0WWcQ+RY3vD1YmVg+ALNRevESD357GACnCXRkBm652rOuMMFRYSD9sZnZq4aG8XSxbkRnoQ6Cn8sedOTmGwiLQKvX0e1HAqyxmvlpHndz/XJbDUYOWjPaBeaXQY9knVgTYn5+dVOfJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FsQNWs+Z; arc=none smtp.client-ip=209.85.208.182
+	 To:Cc:Content-Type; b=lEHptirc7LtJLgshslA6DvRXZK3K4X8m1r5QSS1keWjaM2O4EVoSzMHWKopkWU0XZUhc0je60P3EMTmTdYNT1M1PKDP0wXjgUkmKDiXuXz7KWog4/e2kfUTVfXZ2+u4z302OCycn5ITKCnxxCo0RAc6359MK0B5SsBTvxgJsGg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZHE1u0cm; arc=none smtp.client-ip=209.85.208.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FsQNWs+Z"
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2d109e82bd0so63112391fa.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Mar 2024 10:00:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZHE1u0cm"
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2d687da75c4so54141001fa.0;
+        Mon, 25 Mar 2024 10:10:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711386006; x=1711990806; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1711386626; x=1711991426; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=20c2gjbqNq6L0248iIcu+8YTQSmCYw9fp1rS1tfrVSU=;
-        b=FsQNWs+Ze1rzzbq4HUWR+zRJnB8jwhtY+gHn+reYXaPu/JPmO6RynZxQfxpu75idDz
-         ErrkeFRkvuERS48P5Epb6Zfy1CfpKSs+l8+/OHSkOvTcJknEP8kkvf5swl6deIskSABp
-         4FxBKeVGV19J07QIdAAVTtFkSkNmf4MsRzUnDCQN1zoOzJlIuXaFd+Br0Xvzw5ypPL8S
-         HTo/yTiKO8bvcPerzqWs0KNobAAEHQmI4abb3udWW4h5qeXMCgDXEKHUf9LPVIqYuikK
-         35qpFc3QjaCK9hSmv45IM2M1i3EVcTQ+tmVusz6gzYf2A5HcyBfxgkBFSKjbnnLxuaaB
-         sSFw==
+        bh=BwMLgzH6wnxYe3UAd8y0FxS7cIE9QmN5MqBKxy7JrsM=;
+        b=ZHE1u0cmtj8AcCfjJmjmqX1zSzJ9gFU1R93ERiu1LLRpBp5zNTk3nLPH2DoURHwe/T
+         B6p6T1suif3mHqEWb6Ahs0DIbgjR1epaOsHeJ0hb7T3UhKmuhEx1HPpheBESVFG45vA6
+         PgxS4sw4IsGbJ59ABFHHV3PKBtHte9zgU/9M6nsTjktSks86vkACkYX98fyQpU5W1GEf
+         6aTu5tH5ku8C5vNIVM6PK9V2989+Z2JOwLR9wUKEQ8145THOXOK63CmIlZqNo0LXpiM5
+         ItLPmXB9/C7e4iW/zIyxpRMX5ZTHnWN6BRCMDN60GED3ebl1ZFxYN1Vei3qxIGVxvDIt
+         AUTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711386006; x=1711990806;
+        d=1e100.net; s=20230601; t=1711386626; x=1711991426;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=20c2gjbqNq6L0248iIcu+8YTQSmCYw9fp1rS1tfrVSU=;
-        b=H3ocFRiFQIfeJrMM2RmWiaOK+4tiWmP0hXsgyYA2VK2QY64IVm3/tC3JRWnCHVisXK
-         VGKkh5Kgc9xEvcq6COo2jjK/1nMYioG4bZY7GwJUlCfGYXsZg92ljzX+jHlWyQt157LN
-         qOxokrhlToeg+v5Jr/97M2+QPmr5Uuo7Fgkdzo9qBfQSJ4mLsu+1Gg+vdxp3S2abkULZ
-         igbZ1mf+x0CXjphTx1BWpZLbqbppTbuQn5VLzHDfiiozeThJZjDOdCwj4YLLNkv2aYTu
-         ctFDAG24iG1zxwntDVIR4OTDf/0dOhktSDF+iOo0CJ5FG7cQsxmJ0ZCXfgYCMSqcfew+
-         khwA==
-X-Gm-Message-State: AOJu0Yxe1/kFf4U2MuUBQ4VS4+8IcZE+ZssJjo7BswPW+hTNT1nPDYR8
-	2Jfvw5ti1oDy55NPa52AbHsN87zltBsRF5GOmrDfDJwkTCVFBR8NG47M1FJiJF3LiBD75vTCjhb
-	8/QsRfbRT4HK9sFbGYMk0NBlzDPi13lVoQfE=
-X-Google-Smtp-Source: AGHT+IG03NWXbXGbGLacfY9NNJ5UZ9oFvp4GC2ltOWzWrCSXnJVwuITv9bqA9mnPzT2wsmOZMqUQOlz7AIKaLqwjLZk=
-X-Received: by 2002:a2e:9846:0:b0:2d6:dd11:94f0 with SMTP id
- e6-20020a2e9846000000b002d6dd1194f0mr1684470ljj.30.1711386005611; Mon, 25 Mar
- 2024 10:00:05 -0700 (PDT)
+        bh=BwMLgzH6wnxYe3UAd8y0FxS7cIE9QmN5MqBKxy7JrsM=;
+        b=LhgCoA3SQdED7jAra2/QXcxVQi9pHTdr0pYI6C1UUcQ1kI4e+1jRsnHvu68JCMJLPL
+         wCWVlBXljXU0QUbAgfBHXlI3fauIk7tAOd3r+Ku9QAALx5dvDw5ZeM75lOKK147a7SXU
+         AVxv8WBnBUEUytjhJtxu2/dP45NEC7n93ayyp4U5dGI5PlYJwBjfumLi73nTYq0ZAmrM
+         Cfy5iAS2eYxI/XobV9VAmfeOoB+QMZrtvzVg87U5RzlJrd2cHLahez878tPtgKGHAN+9
+         /SCDQV41uvf2Wy3/9AUFM6K8YI3zAcJGw3Oz3qTc7g6rXsrf91/jI2UWVei9ezeFxS8G
+         /oww==
+X-Forwarded-Encrypted: i=1; AJvYcCXcXEwQ1xjnoodfHtqz0pxPkM9XqC00rfnB2PJBrXHkY1mOB9ek7SCjG905U861KqdeDNzirECb8ZR0+KZ2qTOkp7NJ6Chmw0NBJwpeMPID6twXRbEL5VpkYiSM53e2kgw0zX40q4MAQvziFtwgrAqQaGiGBHILp6cRwZrznmlDSPZAeIyC
+X-Gm-Message-State: AOJu0Yy5acxVv9rWSrxG61MJjBYM+KF/lhVuduQqsy6q68QzUvb++3i5
+	8yo5WbdIgaKo27reY7RRNPpAG/gbBjRiOS9bZqnugNuOf4DmEoeJZytP1gRYVKGf2ePXzkgdqsr
+	xT81WdydK7hbiYl+LZtzt+/FE5ZdDtIQWj4E=
+X-Google-Smtp-Source: AGHT+IH0uLBDu+CPcEXoaO/ggiaMnED1lydzcIxcbXNL3AtmSh1RdhO63bQbgK7wy1bO4NKMyxlFdYHjUYZCH/wcP3E=
+X-Received: by 2002:a2e:7804:0:b0:2d6:ab62:2eae with SMTP id
+ t4-20020a2e7804000000b002d6ab622eaemr4734300ljc.17.1711386625643; Mon, 25 Mar
+ 2024 10:10:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240325061841.22387-1-hui.wang@canonical.com>
-In-Reply-To: <20240325061841.22387-1-hui.wang@canonical.com>
+References: <20240314084412.1127-1-johan+linaro@kernel.org>
+ <CABBYNZJV1htg46Gyu=7_iUWdukM+rHLitsLjxmWWYFGXty3tVw@mail.gmail.com>
+ <ZfMStHjwtCT1SW3z@hovoldconsulting.com> <964131ff-293d-47d1-8119-a389fa21f385@leemhuis.info>
+In-Reply-To: <964131ff-293d-47d1-8119-a389fa21f385@leemhuis.info>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 25 Mar 2024 12:59:53 -0400
-Message-ID: <CABBYNZLNQtYnh=DbPV7vzmt_Aje87dBuEJrhXiJRabOr5a3O0w@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_event: conn is already encryped before
- conn establishes
-To: Hui Wang <hui.wang@canonical.com>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, 
-	johan.hedberg@gmail.com
+Date: Mon, 25 Mar 2024 13:10:13 -0400
+Message-ID: <CABBYNZJ0ukd_8=SFzy8CEwgP7hV5unodca0NZ2zDZh+jPJsEFQ@mail.gmail.com>
+Subject: Re: [PATCH] Revert "Bluetooth: hci_qca: Set BDA quirk bit if fwnode
+ exists in DT"
+To: Linux regressions mailing list <regressions@lists.linux.dev>
+Cc: Johan Hovold <johan@kernel.org>, Johan Hovold <johan+linaro@kernel.org>, 
+	Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
+	Janaki Ramaiah Thota <quic_janathot@quicinc.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Hui,
+Hi Johan,
 
-On Mon, Mar 25, 2024 at 2:19=E2=80=AFAM Hui Wang <hui.wang@canonical.com> w=
-rote:
+On Mon, Mar 25, 2024 at 9:57=E2=80=AFAM Linux regression tracking (Thorsten
+Leemhuis) <regressions@leemhuis.info> wrote:
 >
-> We have a BT headset (Lenovo Thinkplus XT99), the pairing and
-> connecting has no problem, once this headset is paired, bluez will
-> remember this device and will auto re-connect it whenever the device
-> is power on. The auto re-connecting works well with Windows and
-> Android, but with Linux, it always fails. Through debugging, we found
-> at the rfcomm connection stage, the bluetooth stack reports
-> "Connection refused - security block (0x0003)".
+> Bluetooth Maintainers, what's...
 >
-> For this device, the re-connecting negotiation process is different
-> from other BT headsets, it sends the Link_KEY_REQUEST command before
-> the CONNECT_REQUEST completes, and it doesn't send ENCRYPT_CHANGE
-> command during the negotiation. When the device sends the "connect
-> complete" to hci, the ev->encr_mode is 1.
+> On 14.03.24 16:07, Johan Hovold wrote:
+> > On Thu, Mar 14, 2024 at 10:30:36AM -0400, Luiz Augusto von Dentz wrote:
+> >> On Thu, Mar 14, 2024 at 4:44=E2=80=AFAM Johan Hovold <johan+linaro@ker=
+nel.org> wrote:
+> >
+> >>> This reverts commit 7dcd3e014aa7faeeaf4047190b22d8a19a0db696.
+> >>>
+> >>> Qualcomm Bluetooth controllers like WCN6855 do not have persistent
+> >>> storage for the Bluetooth address and must therefore start as
+> >>> unconfigured to allow the user to set a valid address unless one has
+> >>> been provided by the boot firmware in the devicetree.
+> >>>
+> >>> A recent change snuck into v6.8-rc7 and incorrectly started marking t=
+he
+> >>> default (non-unique) address as valid. This specifically also breaks =
+the
+> >>> Bluetooth setup for some user of the Lenovo ThinkPad X13s.
+> >>>
+> >>> Note that this is the second time Qualcomm breaks the driver this way
+> >>> and that this was fixed last year by commit 6945795bc81a ("Bluetooth:
+> >>> fix use-bdaddr-property quirk"), which also has some further details.
+> >>>
+> >>> Fixes: 7dcd3e014aa7 ("Bluetooth: hci_qca: Set BDA quirk bit if fwnode=
+ exists in DT")
+> >>> Cc: stable@vger.kernel.org      # 6.8
+> >>> Cc: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+> >>> Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
+> >>
+> >> Well I guess I will need to start asking for evidence that this works
+> >> on regular Linux distros then, because it looks like that is not the
+> >> environment Janaki and others Qualcomm folks are testing with.
+> >>
+> >> What I probably would consider as evidence is bluetoothd logs showing
+> >> that the controller has been configured correctly or perhaps there is
+> >> a simpler way?
+> >
+> > Well, in this case we actually want the controller to remain
+> > unconfigured (e.g. to avoid having every user of the X13s unknowingly
+> > use the same default address).
+> >
+> > I'm not sure why Qualcomm insists on breaking these quirks, but I guess
+> > they just haven't understood why they exist. It's of course convenient
+> > to be able to use the default address during development without first
+> > having to provide an address, but that's not a valid reason to break th=
+e
+> > driver.
+> >
+> > From what I hear the Qualcomm developers only care about Android and I
+> > believe they have some out-of-tree hack for retrieving the device
+> > address directly from the rootfs.
+> >
+> > For the X13s, and as I think I've mentioned before, we have been trying
+> > to get Qualcomm to tell us how to access the assigned addresses that ar=
+e
+> > stored in some secure world storage so that we can set it directly from
+> > the driver. But until we figure that out, users will need to continue
+> > setting the address manually.
 >
-> So here in the conn_complete_evt(), if ev->encr_mode is 1, link type
-> is ACL and HCI_CONN_ENCRYPT is not set, we set HCI_CONN_ENCRYPT to
-> this conn, and update conn->enc_key_size accordingly.
+> ...the plan forward here? This to me sounds like a case where a quick
+> revert is the right (interim?) solution, but nevertheless nothing
+> happened for ~10 days now afaics. Or am I missing something?
 >
-> After this change, this BT headset could re-connect with Linux
-> successfully.
-
-I suspect it is doing Security Mode 3, so it establishes the
-encryption _before_ the connection handle which probably disables
-EncryptionChange since there is no handle at that point. That said I
-don't remember what we shall do with respect to AES since the
-Encryption_Enabled field can only be set to 0x00 or 0x01 so I assume
-the later can only be:
-
-Link Level Encryption is ON with E0 for BR/EDR.
-
-> Signed-off-by: Hui Wang <hui.wang@canonical.com>
-> ---
-> This is the btmon log for auto re-connecting negotiation:
-> Before applying this patch:
-> https://pastebin.com/NUa9RJv8
->
-> After applying the patch:
-> https://pastebin.com/GqviChTC
-
-Lets add these to the patch description to be more informative about
-the change, you can strip the unrelated traffic at the start and end
-and just focus on what changes to the traffic the patches introduces.
-
-
-> net/bluetooth/hci_event.c | 26 ++++++++++++++++++++++++++
->  1 file changed, 26 insertions(+)
->
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 4ae224824012..0c45beb08cb2 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -3208,6 +3208,32 @@ static void hci_conn_complete_evt(struct hci_dev *=
-hdev, void *data,
->                 if (test_bit(HCI_ENCRYPT, &hdev->flags))
->                         set_bit(HCI_CONN_ENCRYPT, &conn->flags);
->
-> +               /* "Link key request" completed ahead of "connect request=
-" completes */
-> +               if (ev->encr_mode =3D=3D 1 && !test_bit(HCI_CONN_ENCRYPT,=
- &conn->flags) &&
-> +                   ev->link_type =3D=3D ACL_LINK) {
-> +                       struct link_key *key;
-> +                       struct hci_cp_read_enc_key_size cp;
-> +
-> +                       key =3D hci_find_link_key(hdev, &ev->bdaddr);
-> +                       if (key) {
-> +                               set_bit(HCI_CONN_ENCRYPT, &conn->flags);
-> +
-> +                               if (!(hdev->commands[20] & 0x10)) {
-> +                                       conn->enc_key_size =3D HCI_LINK_K=
-EY_SIZE;
-> +                                       goto notify;
-> +                               }
-> +
-> +                               cp.handle =3D cpu_to_le16(conn->handle);
-> +                               if (hci_send_cmd(hdev, HCI_OP_READ_ENC_KE=
-Y_SIZE,
-> +                                                sizeof(cp), &cp)) {
-> +                                       bt_dev_err(hdev, "sending read ke=
-y size failed");
-> +                                       conn->enc_key_size =3D HCI_LINK_K=
-EY_SIZE;
-> +                               }
-> +notify:
-> +                               hci_encrypt_cfm(conn, ev->status);
-> +                       }
-> +               }
-> +
->                 /* Get remote features */
->                 if (conn->type =3D=3D ACL_LINK) {
->                         struct hci_cp_read_remote_features cp;
+> Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
 > --
-> 2.34.1
+> Everything you wanna know about Linux kernel regression tracking:
+> https://linux-regtracking.leemhuis.info/about/#tldr
+> If I did something stupid, please tell me, as explained on that page.
 >
+> #regzbot poke
 
+I guess the following is the latest version:
 
---
+https://patchwork.kernel.org/project/bluetooth/list/?series=3D836664
+
+Or are you working on a v5?
+
+--=20
 Luiz Augusto von Dentz
