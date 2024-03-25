@@ -1,103 +1,149 @@
-Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ECEC1946C
-	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Mar 2024 19:32:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72ECD1946C;
+	Mon, 25 Mar 2024 19:39:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711395122; cv=none; b=oz6LWU36artIaAOUtgbojI5m/SU1qZ7vC+dpPSW1aa9YdxWxalK3PhX9XaTjGEC59z9FNXIAqGi+I7N63tXFvQhF1p8rXg5CJCIQe+FNxnqWTbu84DbYk2OZVfeeRunk5XGXC7vA7oKJIJ8yvQ4T2BhrbWa6pbBnvHLG0usU5p8=
+	t=1711395560; cv=none; b=Hkn1mT8Xx9tTFYxTdt7sZjdyaNy7EDmbOFp6MNvsEJ7II0SFOYGNNU51piuDkDhrLgPnq3c1ASnp2I6dN8HOpu4DYCp7XQHNwqy9dlsh9++O9zSuO3y92m06VAe6nAoK+V8T/j66TWsqIA5AzWylCd9DNUoeCcUUThJOKkjXS+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711395122; c=relaxed/simple;
-	bh=vKk6xUWIgIzl/HAu5Qosp84BMNLvwG/A4s+f9JdBbX8=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=DTu25HY+MQ2OPuAwTH36YlfkAwJEVUTwZ3Pa7mLbkR59LtaK9ORF3LQE3cVKIWGuKWmh7wbKiJMsp5XPKWyBpASBj1lnloeA6/QpYAqEBxh5zz6y+T4QdadPLciuLkNQWi+74a6pMP+p6frJpjPXJ7u+QWE7F5OiH25Cxd0rCJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=hTK1GsOt; arc=none smtp.client-ip=192.30.252.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1711395560; c=relaxed/simple;
+	bh=CsVUf50sObcUku/mroVotClxV0W8lcZ0puo+cGBDLrk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VQCafsbMXivNaDfNTRScS/stvuEphcTFPiMi12H22p1/+drodkwr4nF3hVh99m25MhlGlDIacxZgOiEAv0TT8BQhnClr2VLA7cOjGkY//BfTuQT5nsEjShNZcrizXRX7a5M1aP4v2ELtHKuV07ht1KNGh4IslZa13hndBY3BWqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j+UlkKyz; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="hTK1GsOt"
-Received: from github.com (hubbernetes-node-98a4582.va3-iad.github.net [10.48.209.81])
-	by smtp.github.com (Postfix) with ESMTPA id 68A2C4E110F
-	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Mar 2024 12:32:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1711395120;
-	bh=5UO8t/b4j6qZB+Z9m+yUcNUrdc9bJEDganY8bFn7NXQ=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=hTK1GsOtEFUM10Di6TISOPocr58Z7ozDe+Y/oc1AjGb8A3JRU5meSD0B8aL5eH4X+
-	 MmmE16wOL4pRqW/WIMawkhKUttabv+lNNAy+jn0MGjguAoHqO5trTgFz7eMC1+2EqD
-	 xXP0I0EU0W6AA9J4bm4I+5QK5WfLsCKgbYs4Vp+g=
-Date: Mon, 25 Mar 2024 12:32:00 -0700
-From: howardchungg <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/87cabb-150bd6@github.com>
-Subject: [bluez/bluez] 745450: bap: Fix setting adapter address type for
- unicast
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j+UlkKyz"
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2d4886a1cb4so62765271fa.0;
+        Mon, 25 Mar 2024 12:39:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711395556; x=1712000356; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NCiFMH0263F/w1Boz/4ACSdzIpxCPhV2O6OirjCh0B0=;
+        b=j+UlkKyzdKkiScGAeDI+RgtrBEyKcHPSuRhxUFAEEjRimySNRdiJG8GYK8CyRPL3UC
+         mcj8PEFeEqII3+K1uTLqqsur/s6ouCNqiODCofqJCGEV+sUGEVrWCBeTcXLGayw6Dqmm
+         VmJf/NUvlv0ZH0WBIPEkPvMtElmTlbkX4xuX/hI1jMp8+YGNQHC8na61VDv2CEX+qVQX
+         15rpB91WUwWWp2BigLic0WqoU+hEa48bsuL4qGHn9jDrbvi4ZutqjVQnrcXW61G3kT3k
+         5qrM4QUbJIFLAcf/tIj+MyNPrqkWHXLe1Ys1RkIF8uDQ9q/5psz0r52MFpUS8ErDTd6B
+         vBCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711395556; x=1712000356;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NCiFMH0263F/w1Boz/4ACSdzIpxCPhV2O6OirjCh0B0=;
+        b=ou+wZa9ILVEHpNW26MYQd3xftQ6HVTviGGWU4j8X6AHL1F36H45IPIx+TjDDr0iCwn
+         tnNx+XpO/T/Y/zw+94Dc/8kwro5sOKZuM0Usv8If4fls0H062UZ94UFDTVsaH0w7+Ufg
+         RZVido5I6OzP4ySSS7lppbQnO5sSaHQ0XjkwPFHrPx8oNFZDWO/BXz8mOwTz8FmDFZQL
+         KWAaO2EThOwddYID/ZudlL3OmAIScYGhAAOSsOy1o/KZwcqjr9Tjws696x1jo9Xiy+Rn
+         /Ap4GQ5aBHCZ0LtqDb7E1gPb5jfBHv4GPwccPU3yqCid8TD351f3xiP6FeIlUC5rRDDN
+         73pQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXNiDxMh3rCVbK6mp2H+TKHRoN3z3USH2wJxWLiE4UWNYCKHm8DOlF7Ig+mPl28b2NtwNSHEpHZ+7qmPCbTkfemMvfAQyFXGssWUjJZXB9gXh4k7f4VP4yF4mHR0lMXLL9ddo6g51IPrzVhG9PBNh4CZhfo02JnAW7ZogWRmGKN1+8VMsE4
+X-Gm-Message-State: AOJu0Ywjw1tbnHGJEkOReIBKUAfDqHTmE5SH3v5kSw/PwlsSaWFFYw5I
+	60w8ehNaQncD9pPbOBi+DAJU7Bfa+CCq0bsrvpspXzv4VCnRdtV/fpPru/1bPC/k2dSyQe9IH36
+	c1LaO2CP0ZFyl5e2g3E8FDvQIoCQ=
+X-Google-Smtp-Source: AGHT+IEO0HQYH0RAUefHQ88oKPd8VrLRPkmE6nkd2e0YQtTaamD6D0keaaFiiiGRD8g+GOmhBLFR4FTEiV/wSwncUdI=
+X-Received: by 2002:a2e:8e86:0:b0:2d4:8fd0:b5f2 with SMTP id
+ z6-20020a2e8e86000000b002d48fd0b5f2mr5556267ljk.7.1711395556273; Mon, 25 Mar
+ 2024 12:39:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+References: <20240314084412.1127-1-johan+linaro@kernel.org>
+ <CABBYNZJV1htg46Gyu=7_iUWdukM+rHLitsLjxmWWYFGXty3tVw@mail.gmail.com>
+ <ZfMStHjwtCT1SW3z@hovoldconsulting.com> <964131ff-293d-47d1-8119-a389fa21f385@leemhuis.info>
+ <CABBYNZJ0ukd_8=SFzy8CEwgP7hV5unodca0NZ2zDZh+jPJsEFQ@mail.gmail.com> <ZgGzWWV4Lh2Nal--@hovoldconsulting.com>
+In-Reply-To: <ZgGzWWV4Lh2Nal--@hovoldconsulting.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 25 Mar 2024 15:39:03 -0400
+Message-ID: <CABBYNZJaXUhu1A+NyVT-TAJw49zcV6TMdGeVy2F+AVKWBOVC-g@mail.gmail.com>
+Subject: Re: [PATCH] Revert "Bluetooth: hci_qca: Set BDA quirk bit if fwnode
+ exists in DT"
+To: Johan Hovold <johan@kernel.org>
+Cc: Linux regressions mailing list <regressions@lists.linux.dev>, Johan Hovold <johan+linaro@kernel.org>, 
+	Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
+	Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 74545026520a35c48349796246b6423285e10b0a
-      https://github.com/bluez/bluez/commit/74545026520a35c48349796246b6423285e10b0a
-  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
-  Date:   2024-03-25 (Mon, 25 Mar 2024)
+Hi Johan
 
-  Changed paths:
-    M profiles/audio/bap.c
+On Mon, Mar 25, 2024 at 1:24=E2=80=AFPM Johan Hovold <johan@kernel.org> wro=
+te:
+>
+> On Mon, Mar 25, 2024 at 01:10:13PM -0400, Luiz Augusto von Dentz wrote:
+> > On Mon, Mar 25, 2024 at 9:57=E2=80=AFAM Linux regression tracking (Thor=
+sten
+> > Leemhuis) <regressions@leemhuis.info> wrote:
+> > > On 14.03.24 16:07, Johan Hovold wrote:
+> > > > On Thu, Mar 14, 2024 at 10:30:36AM -0400, Luiz Augusto von Dentz wr=
+ote:
+> > > >> On Thu, Mar 14, 2024 at 4:44=E2=80=AFAM Johan Hovold <johan+linaro=
+@kernel.org> wrote:
+> > > >
+> > > >>> This reverts commit 7dcd3e014aa7faeeaf4047190b22d8a19a0db696.
+> > > >>>
+> > > >>> Qualcomm Bluetooth controllers like WCN6855 do not have persisten=
+t
+> > > >>> storage for the Bluetooth address and must therefore start as
+> > > >>> unconfigured to allow the user to set a valid address unless one =
+has
+> > > >>> been provided by the boot firmware in the devicetree.
+> > > >>>
+> > > >>> A recent change snuck into v6.8-rc7 and incorrectly started marki=
+ng the
+> > > >>> default (non-unique) address as valid. This specifically also bre=
+aks the
+> > > >>> Bluetooth setup for some user of the Lenovo ThinkPad X13s.
+> > > >>>
+> > > >>> Note that this is the second time Qualcomm breaks the driver this=
+ way
+> > > >>> and that this was fixed last year by commit 6945795bc81a ("Blueto=
+oth:
+> > > >>> fix use-bdaddr-property quirk"), which also has some further deta=
+ils.
+> > > >>>
+> > > >>> Fixes: 7dcd3e014aa7 ("Bluetooth: hci_qca: Set BDA quirk bit if fw=
+node exists in DT")
+> > > >>> Cc: stable@vger.kernel.org      # 6.8
+> > > >>> Cc: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+> > > >>> Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
+>
+> > > ...the plan forward here? This to me sounds like a case where a quick
+> > > revert is the right (interim?) solution, but nevertheless nothing
+> > > happened for ~10 days now afaics. Or am I missing something?
+>
+> > I guess the following is the latest version:
+> >
+> > https://patchwork.kernel.org/project/bluetooth/list/?series=3D836664
+> >
+> > Or are you working on a v5?
+>
+> This patch (revert) fixes a separate issue than the series you link to
+> above, but it is also a prerequisite for that series.
+>
+> v4 is indeed the latest version, and it has been acked by Rob and Bjorn
+> so you can take it all through the Bluetooth tree. Just remember to
+> apply this patch (the revert) first.
 
-  Log Message:
-  -----------
-  bap: Fix setting adapter address type for unicast
+Doesn't seem to apply cleanly:
 
-This fixes the settin of the adapter address type for unciast
-scenario. Currently the address type is searched in data->adapter
-however, this pointer is null and leads to the crash listed at the
-end of this message. Instead, the address type should be taken from
-the adapter variable, which is initialised using device_get_adapter
-at the beggining of the function.
+Applying: Bluetooth: qca: fix device-address endianness
+error: patch failed: drivers/bluetooth/hci_qca.c:1904
+error: drivers/bluetooth/hci_qca.c: patch does not apply
+Patch failed at 0004 Bluetooth: qca: fix device-address endianness
 
-==321444==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000016
-(pc 0x5601d284e03e bp 0x000000000016 sp 0x7ffdb164b740 T0)
-==321444==The signal is caused by a READ memory access.
-==321444==Hint: address points to the zero page.
-0 0x5601d284e03e in btd_adapter_get_address_type src/adapter.c:545
-1 0x5601d27a3f78 in setup_connect_io profiles/audio/bap.c:1860
-2 0x5601d27a3f78 in setup_create_ucast_io profiles/audio/bap.c:2053
-3 0x5601d27a3f78 in setup_create_io profiles/audio/bap.c:2106
-4 0x5601d27a57cd in bap_state profiles/audio/bap.c:2143
-5 0x5601d29d30df in bap_stream_state_changed src/shared/bap.c:1250
-6 0x5601d29d71e2 in bap_ep_set_status src/shared/bap.c:4395
-7 0x5601d293d592 in queue_foreach src/shared/queue.c:207
-8 0x5601d2975c84 in notify_cb src/shared/gatt-client.c:2257
-9 0x5601d2964217 in handle_notify src/shared/att.c:1012
-10 0x5601d2964217 in can_read_data src/shared/att.c:1096
+> Johan
 
 
-  Commit: 150bd6e81b3578290d71197b6fde4d26e06ea6e3
-      https://github.com/bluez/bluez/commit/150bd6e81b3578290d71197b6fde4d26e06ea6e3
-  Author: Yun-Hao Chung <howardchung@google.com>
-  Date:   2024-03-25 (Mon, 25 Mar 2024)
 
-  Changed paths:
-    M src/advertising.c
-
-  Log Message:
-  -----------
-  Advertising: Emit features property update
-
-Advertising manager has some properties that relies on kernel
-information. Once we received the information from kernel, we should
-emit property update.
-
-
-Compare: https://github.com/bluez/bluez/compare/87cabb267935...150bd6e81b35
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--=20
+Luiz Augusto von Dentz
