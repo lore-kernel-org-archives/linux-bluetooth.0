@@ -1,111 +1,124 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9292584D31
-	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Mar 2024 08:12:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7638A18133E
+	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Mar 2024 09:31:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711354339; cv=none; b=dZfTFXyqStaU1sN/5wJB5zaYN5st5tigENwaeh/sP/HvAb2aNjekxnZ36iMzrVrXk0Kl0D/5zwbhjEA1xzuQ7JP3urHBZis8ffv9OgQlpzvTYImfkU+d2YStsFArzF8svFTffv9y0kQaklZgbRMrRFy3E/nGbSocHPHjGQSZFEs=
+	t=1711359113; cv=none; b=tqQxRdvtbqq6TIGgtNvRyMQL3N01Ro1OZEQx6Ypb4e73GzlfZzgKvA/G2ePr3vujwIO2jitUK/PQdQJptVdkzO2s4lWBFxrzUMudPPSOcKNRdbpevnmaX3dyko7KNxw+LYDcTjBbNH08sohStkhfNJmk3rT1TiDar6Rhg8vCOSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711354339; c=relaxed/simple;
-	bh=vFDI24isPeRvRRA6vdmR1ucMlvFJg/CmhTJBlQgK8n8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AB8Nh/or69SLOXufSM3q2h4ig6O7Xc76bwxNnP09OgpC3Rp1JhKdLOo/Yp5IvmwnJC1JCBHGaXZ5SPaqARn+wUOtVEElQvc4N1urc49YGldfDEySx1X37bV+BdEWBOT/8xpT2V3t0mFa2wsVnFmuwwB/7IOGZxlYgFxRMgWhfMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Sm6aZRc+; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1711359113; c=relaxed/simple;
+	bh=BQTHQzJ99je8C/mMUWg0DQuV3tlbGOkND19jU6BnZbM=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=tipWN3crc4SSJ5dCPFUXNBCqb76ukNLh55+s6T/2iW/GpoYEu0FEJlBaNT8yfsz2j44V08sRxcLX9aFZ//efSShhu1d+ljvksHvYk7E6wOJkIEywXGSL8DFUhVesB1Rdu1GEigf5dwaOVGwlDwdT//vko1TMocpIArio7s7i0do=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UnjHzTtK; arc=none smtp.client-ip=209.85.219.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Sm6aZRc+"
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42P6DNLd004422;
-	Mon, 25 Mar 2024 08:12:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-type; s=qcppdkim1; bh=0rwkD8aYr30APL3p8xzI
-	j6h47CUuz3pZAi0pG+ayEho=; b=Sm6aZRc+XEz7JEVac1cUOyJxw4txibrr8BTl
-	adWfaI9i8HwqHYxHOShm1yjlbnPFQJhzi0nk7L1gEDJiy0zlzaOK6wqHUFRyYt4w
-	AlDVqEZJvnmI1hN86qYtfDCf9rrIsBp2xlYUB+IOpM11TrsrdsrwadySel9Zqq3L
-	E3OhAb82iLg3ZoutrSXdyF9laUFa8TQK3XqpueE6sv7XiXV7AOqOt4hTDFmBxvZ9
-	rcdnJcVxVu8KbfeCJhmCMHPzKE+/omaCV68ze8/u0XfKB+cFQScVacNQniT+4LaW
-	hfr/QUPNLaojOnU5siXMfsDQ5iYVjk0/VxDkrYil06DqXXwC+A==
-Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3x319j8eyv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 25 Mar 2024 08:12:14 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 42P8CBRr025798
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 25 Mar 2024 08:12:11 GMT
-Received: from zijuhu-gv.qualcomm.com (10.80.80.8) by
- nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Mon, 25 Mar 2024 01:12:09 -0700
-From: Zijun Hu <quic_zijuhu@quicinc.com>
-To: <luiz.dentz@gmail.com>, <marcel@holtmann.org>
-CC: <linux-bluetooth@vger.kernel.org>, Zijun Hu <quic_zijuhu@quicinc.com>
-Subject: [PATCH v2 RESEND] Bluetooth: btusb: Fix triggering coredump implementation for QCA
-Date: Mon, 25 Mar 2024 16:11:49 +0800
-Message-ID: <1711354309-27605-1-git-send-email-quic_zijuhu@quicinc.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1708656405-28017-1-git-send-email-quic_zijuhu@quicinc.com>
-References: <1708656405-28017-1-git-send-email-quic_zijuhu@quicinc.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UnjHzTtK"
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-69107859bedso28761916d6.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Mar 2024 02:31:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711359110; x=1711963910; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=nNHOW3vnnOC1cSMneQ8cMPqtzrNJXl6iIN4nX5VUjK0=;
+        b=UnjHzTtKzNkLZ9Js+FRToNCe4BLPSt3Kyxlh27XciGk7Y0bPUySfhox7jdaWC1oxvF
+         dwXj6KUSTzqL+hm1Fd00KLx88mWP8scYEKSmp2MRclX6BLAw3SqHGihnYudtzmg9sg6f
+         IeQ18Br9e0VcrNbQVzOjC4S0wD12+hiH+nCKIWKsbCZ1PQwMej0Kazbm0ttnWHd6awcU
+         YEC6+zLRAYiiDaeywM7N39zR0dmnUXNT07+Bs67PU3xjkqmjY8Zu0IDJ1WdA0PzDsweF
+         c6hc60cO6i7YVBZSH4GbA23Zx5xWvqTtlj5Bt+A6irHhO6h2B6mZNAAUF69U5L/riSSO
+         uVwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711359110; x=1711963910;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nNHOW3vnnOC1cSMneQ8cMPqtzrNJXl6iIN4nX5VUjK0=;
+        b=NS9kqi4yG+NWfs/f2HBL3QTH5NpHpJ+3F3AmDMNWXA/cjTu1XNJSEV+N0FdRAsn2PS
+         XIYyPAYgdQ17MLz1+unP9bcJkNnuK2NhpN6oJwKDomecewt+GeuszVOyQJIDg/IG5Zpe
+         ieIvGdhiPASqM1rbeZzQUdNUtmYkReG2DMQiyS3Sa4LeYE9yun9lCVdfHr9naSIkHQTN
+         CGbnbWyJmc01McOCddVBhlWs069CvDCGdP5HjsW13KDFJIe8HZOd6JRzeoLlcaE23EvH
+         ditSAV1rK3d+ztt5nCCyqFly+gS8+gZENvLkEGhHU5Bcjjy7kYlNeZyY31UhQX0UKNAK
+         lKZw==
+X-Gm-Message-State: AOJu0Yw67Ir+g+w/pStPzTJHjt6LElZ8h41uWjTaiJq8gzQFulOQsIFX
+	i1rs2TP5s8BvzNIeuNOvkV/DA1dA2wlHFgyWmrlkrfk/2HRe11Skr9hfB7aY
+X-Google-Smtp-Source: AGHT+IF01GSr8lV6DDh1ygCnyjzo5xBVRPaNgFms3c1lGYVNrAakCv7/n2u5HPyN9Uck+baP6Jj5Fg==
+X-Received: by 2002:a05:6214:dc8:b0:696:8d0e:7ef9 with SMTP id 8-20020a0562140dc800b006968d0e7ef9mr3271260qvt.33.1711359110212;
+        Mon, 25 Mar 2024 02:31:50 -0700 (PDT)
+Received: from [172.17.0.2] ([172.191.11.253])
+        by smtp.gmail.com with ESMTPSA id p3-20020a05621421e300b0069612ee6742sm3913237qvj.14.2024.03.25.02.31.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Mar 2024 02:31:50 -0700 (PDT)
+Message-ID: <66014486.050a0220.25bf9.3a6b@mx.google.com>
+Date: Mon, 25 Mar 2024 02:31:50 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4186759599846937500=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: qKDzmZvrH86nhvO3aN-YRx_MvgJogT7o
-X-Proofpoint-GUID: qKDzmZvrH86nhvO3aN-YRx_MvgJogT7o
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-25_05,2024-03-21_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
- mlxscore=0 impostorscore=0 lowpriorityscore=0 bulkscore=0 clxscore=1015
- adultscore=0 mlxlogscore=999 priorityscore=1501 spamscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2403210001
- definitions=main-2403250043
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, hui.wang@canonical.com
+Subject: RE: Bluetooth: hci_event: conn is already encryped before conn establishes
+In-Reply-To: <20240325061841.22387-1-hui.wang@canonical.com>
+References: <20240325061841.22387-1-hui.wang@canonical.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-btusb_coredump_qca() uses __hci_cmd_sync() to send a vendor-specific
-command to trigger firmware coredump, but the command does not
-have any event as its sync response, so it is not suitable to use
-__hci_cmd_sync(), fixed by using __hci_cmd_send().
+--===============4186759599846937500==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Fixes: 20981ce2d5a5 ("Bluetooth: btusb: Add WCN6855 devcoredump support")
-Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=837757
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.67 seconds
+GitLint                       PASS      0.32 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      26.60 seconds
+CheckAllWarning               PASS      29.09 seconds
+CheckSparse                   WARNING   34.58 seconds
+CheckSmatch                   WARNING   94.16 seconds
+BuildKernel32                 PASS      25.82 seconds
+TestRunnerSetup               PASS      485.43 seconds
+TestRunner_l2cap-tester       PASS      20.75 seconds
+TestRunner_iso-tester         PASS      29.18 seconds
+TestRunner_bnep-tester        PASS      4.50 seconds
+TestRunner_mgmt-tester        PASS      110.90 seconds
+TestRunner_rfcomm-tester      PASS      7.07 seconds
+TestRunner_sco-tester         PASS      14.61 seconds
+TestRunner_ioctl-tester       PASS      7.38 seconds
+TestRunner_mesh-tester        PASS      5.57 seconds
+TestRunner_smp-tester         PASS      6.55 seconds
+TestRunner_userchan-tester    PASS      4.73 seconds
+IncrementalBuild              PASS      24.78 seconds
+
+Details
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+
+
 ---
-V1 -> V2: Correct commit message
+Regards,
+Linux Bluetooth
 
- drivers/bluetooth/btusb.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index c391e612b83b..9e9b9fc84211 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -3485,13 +3485,12 @@ static void btusb_dump_hdr_qca(struct hci_dev *hdev, struct sk_buff *skb)
- 
- static void btusb_coredump_qca(struct hci_dev *hdev)
- {
-+	int err;
- 	static const u8 param[] = { 0x26 };
--	struct sk_buff *skb;
- 
--	skb = __hci_cmd_sync(hdev, 0xfc0c, 1, param, HCI_CMD_TIMEOUT);
--	if (IS_ERR(skb))
--		bt_dev_err(hdev, "%s: triggle crash failed (%ld)", __func__, PTR_ERR(skb));
--	kfree_skb(skb);
-+	err = __hci_cmd_send(hdev, 0xfc0c, 1, param);
-+	if (err < 0)
-+		bt_dev_err(hdev, "%s: triggle crash failed (%d)", __func__, err);
- }
- 
- /*
--- 
-2.7.4
-
+--===============4186759599846937500==--
