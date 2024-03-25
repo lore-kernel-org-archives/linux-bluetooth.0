@@ -1,89 +1,165 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E890E3398B;
-	Mon, 25 Mar 2024 19:48:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2286F10940;
+	Mon, 25 Mar 2024 20:04:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711396111; cv=none; b=cJGPm2qEbBnBoD1bGIS3eCkyMdzEkRbJOjOKI6jdRuKsvYXbuGHx2LJQgIwkSusyWDe++wRFNlOVdZbTxRwEtYShcBu3ZoVpdG+bhTYU6u8psRDbnhchVg64TyCZfjTopAOyD+OFEFDU3vnsB2K2vZkNp6zF9tVvkGi+J5MhcXA=
+	t=1711397061; cv=none; b=pAKuCscD2od867yhXbdUTsPEzIQ2KuUitpZ2I4+z15m4ZPxdZmQhdXem1kXKvDPokCjYvjYIuW8rUS4O9XuPWk6MF976PiJ3luq3bJMBqinuMy/ZsH3K9CFLyfo7q3CD20xK9rT5r8m2j1M7AGgsV7zhu29pWNwJroIfXsLmV1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711396111; c=relaxed/simple;
-	bh=kewFYRqhie/XcnlberYm9YkkG/goelTdU5EXcYg82SI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZoXGaAItEnUp7lCNacU0J4tn+LK027YbjhHhlh19am7qRVmu3yWtVY0N65TIsbYppgGtDFXYuXVlPBD7pd8xoF6cEG1hkox3AJEeu/lr7kvsI9tAK9Zp4I764OKeQvFoB1S+EfbjJhjqWuU8emUNN1M0YAHK9/0COV34XmyrmMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=heK1Rnyk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711397061; c=relaxed/simple;
+	bh=7LbosvrRoSaOFVXQNHiQGzHq/d1asJ/LAmMmK1qoAOY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=uZ9XpgQ9agVbCYDc8NnSxR6j8tAmnLIdp2L/j+/nAEVWi0rhWFuQHVgAx74p2sMSQdkhV3wgnXx4qzZRZ0xoS49VZpYnLtmaz4tOXRHzbKjlHe4+E9LCQvLZFbAN/AdqNSeDq93Hm3xce/JW4rPIwBt4P5H2ac6EHCqVLNGKgWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=SomlfL+H; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="heK1Rnyk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6615EC43399;
-	Mon, 25 Mar 2024 19:48:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711396110;
-	bh=kewFYRqhie/XcnlberYm9YkkG/goelTdU5EXcYg82SI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=heK1Rnyk787MP455BDd1yxr9409bzn8Hv0bqIVRyNYrbowroQ69aNvxQOxU4DHGBR
-	 jJh+DkmtP+ncevvebIpYOT/JxqxQZNuc2WCQZ/MUQAIVlComsZ91HsiEKFk0Weg1x5
-	 gkecO7l0hRzPxVykSxxNN/pIK49A7u1M+wFPK26oSaGNgDeeTXDCAKUhmwfr0Apsw4
-	 6p76S4hoVFFN1I+paNG+Ey0UHIH059mzKj7O6+hoIfKydPhuSN07bkDMzx66mLSYpL
-	 snZe4KI+OFFcuQChSQFw62REjB4YAb3kVgLoYUe4qDk2r8Em6pZOppG21KKclXtfjc
-	 QD8WACQy4sdYA==
-Received: from johan by xi.lan with local (Exim 4.97.1)
-	(envelope-from <johan@kernel.org>)
-	id 1roqJC-000000004LS-15hB;
-	Mon, 25 Mar 2024 20:48:38 +0100
-Date: Mon, 25 Mar 2024 20:48:38 +0100
-From: Johan Hovold <johan@kernel.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Linux regressions mailing list <regressions@lists.linux.dev>,
-	Johan Hovold <johan+linaro@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Janaki Ramaiah Thota <quic_janathot@quicinc.com>
-Subject: Re: [PATCH] Revert "Bluetooth: hci_qca: Set BDA quirk bit if fwnode
- exists in DT"
-Message-ID: <ZgHVFjAZ1uqEiUa2@hovoldconsulting.com>
-References: <20240314084412.1127-1-johan+linaro@kernel.org>
- <CABBYNZJV1htg46Gyu=7_iUWdukM+rHLitsLjxmWWYFGXty3tVw@mail.gmail.com>
- <ZfMStHjwtCT1SW3z@hovoldconsulting.com>
- <964131ff-293d-47d1-8119-a389fa21f385@leemhuis.info>
- <CABBYNZJ0ukd_8=SFzy8CEwgP7hV5unodca0NZ2zDZh+jPJsEFQ@mail.gmail.com>
- <ZgGzWWV4Lh2Nal--@hovoldconsulting.com>
- <CABBYNZJaXUhu1A+NyVT-TAJw49zcV6TMdGeVy2F+AVKWBOVC-g@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="SomlfL+H"
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42PIuBuO017962;
+	Mon, 25 Mar 2024 20:03:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=h+1UxwxuvCslZU2aNyiMM9f3pn/NiRqoN5yz+kk6g5M=; b=So
+	mlfL+HDTZJC1n3IMkgeXNeqt1HUmnWw6VJ03VK+CJ6SDIWdofyQdB9DoVuaCtpYK
+	7vFB/JC803KoaRTgSGWX1PJrR6FAH7tVfAEW5P6mOmjtmu6hmFjcuSrFwfQywpnN
+	RQK760jtY3C0n+qV4AD+ynWyNzoyfO1HezeRJ9KeCu85B2OOyzAGXSmFXF4pXLmV
+	p72il8IfVsl8zz9S/Nnq2E5fkKfa/htkMcJqBAMoM2CO0cQey3CyKWlsdXcDmfRY
+	yN7HzpZZCmfhlKOnNEEjbEQdExAP+22NBvOsX6U/K+lP5bqkGR5SmdyB5VmsclXM
+	DOtgk/Dph0FZOJpqh08A==
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3x34hssqwf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Mar 2024 20:03:48 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 42PK3lQt002408
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Mar 2024 20:03:47 GMT
+Received: from [10.227.110.203] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Mon, 25 Mar
+ 2024 13:03:45 -0700
+Message-ID: <8019f005-efaa-4b31-90d7-fdefd5f6191e@quicinc.com>
+Date: Mon, 25 Mar 2024 13:03:44 -0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 04/16] dt-bindings: net: wireless: qcom,ath11k:
+ describe the ath11k on QCA6390
+Content-Language: en-US
+To: Bartosz Golaszewski <brgl@bgdev.pl>, Kalle Valo <kvalo@kernel.org>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz
+	<luiz.dentz@gmail.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio
+	<konrad.dybcio@linaro.org>,
+        Liam Girdwood <lgirdwood@gmail.com>, Mark Brown
+	<broonie@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon
+	<will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+        Saravana Kannan
+	<saravanak@google.com>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        Arnd
+ Bergmann <arnd@arndb.de>,
+        Neil Armstrong <neil.armstrong@linaro.org>,
+        Marek
+ Szyprowski <m.szyprowski@samsung.com>,
+        Alex Elder <elder@linaro.org>,
+        Srini
+ Kandagatla <srinivas.kandagatla@linaro.org>,
+        Greg Kroah-Hartman
+	<gregkh@linuxfoundation.org>,
+        Abel Vesa <abel.vesa@linaro.org>,
+        Manivannan
+ Sadhasivam <mani@kernel.org>,
+        Lukas Wunner <lukas@wunner.de>,
+        Dmitry
+ Baryshkov <dmitry.baryshkov@linaro.org>,
+        <linux-bluetooth@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-wireless@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-pci@vger.kernel.org>,
+        <linux-pm@vger.kernel.org>,
+        Bartosz Golaszewski
+	<bartosz.golaszewski@linaro.org>
+References: <20240325131624.26023-1-brgl@bgdev.pl>
+ <20240325131624.26023-5-brgl@bgdev.pl> <87r0fy8lde.fsf@kernel.org>
+ <CAMRc=Mc2Tc8oHr5NVo=aHAADkJtGCDAVvJs+7V-19m2zGi-vbw@mail.gmail.com>
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+In-Reply-To: <CAMRc=Mc2Tc8oHr5NVo=aHAADkJtGCDAVvJs+7V-19m2zGi-vbw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABBYNZJaXUhu1A+NyVT-TAJw49zcV6TMdGeVy2F+AVKWBOVC-g@mail.gmail.com>
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: amv7YH_YeBwotbXxq6Rf_df94OWD9htV
+X-Proofpoint-GUID: amv7YH_YeBwotbXxq6Rf_df94OWD9htV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-25_18,2024-03-21_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 adultscore=0
+ spamscore=0 phishscore=0 lowpriorityscore=0 mlxscore=0 bulkscore=0
+ impostorscore=0 clxscore=1011 mlxlogscore=999 malwarescore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2403210001 definitions=main-2403250121
 
-On Mon, Mar 25, 2024 at 03:39:03PM -0400, Luiz Augusto von Dentz wrote:
-> On Mon, Mar 25, 2024 at 1:24 PM Johan Hovold <johan@kernel.org> wrote:
-> > On Mon, Mar 25, 2024 at 01:10:13PM -0400, Luiz Augusto von Dentz wrote:
-
-> > > I guess the following is the latest version:
-> > >
-> > > https://patchwork.kernel.org/project/bluetooth/list/?series=836664
-> > >
-> > > Or are you working on a v5?
-> >
-> > This patch (revert) fixes a separate issue than the series you link to
-> > above, but it is also a prerequisite for that series.
-> >
-> > v4 is indeed the latest version, and it has been acked by Rob and Bjorn
-> > so you can take it all through the Bluetooth tree. Just remember to
-> > apply this patch (the revert) first.
+On 3/25/2024 7:09 AM, Bartosz Golaszewski wrote:
+> On Mon, Mar 25, 2024 at 2:57 PM Kalle Valo <kvalo@kernel.org> wrote:
+>>
+>> Bartosz Golaszewski <brgl@bgdev.pl> writes:
+>>
+>>> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>>>
+>>> Add a PCI compatible for the ATH11K module on QCA6390 and describe the
+>>> power inputs from the PMU that it consumes.
+>>>
+>>> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>>
+>> [...]
+>>
+>>> +allOf:
+>>> +  - if:
+>>> +      properties:
+>>> +        compatible:
+>>> +          contains:
+>>> +            const: pci17cb,1101
+>>> +    then:
+>>> +      required:
+>>> +        - vddrfacmn-supply
+>>> +        - vddaon-supply
+>>> +        - vddwlcx-supply
+>>> +        - vddwlmx-supply
+>>> +        - vddrfa0p8-supply
+>>> +        - vddrfa1p2-supply
+>>> +        - vddrfa1p7-supply
+>>> +        - vddpcie0p9-supply
+>>> +        - vddpcie1p8-supply
+>>
+>> I don't know DT well enough to know what the "required:" above means,
+>> but does this take into account that there are normal "plug&play" type
+>> of QCA6390 boards as well which don't need any DT settings?
+>>
 > 
-> Doesn't seem to apply cleanly:
-> 
-> Applying: Bluetooth: qca: fix device-address endianness
-> error: patch failed: drivers/bluetooth/hci_qca.c:1904
-> error: drivers/bluetooth/hci_qca.c: patch does not apply
-> Patch failed at 0004 Bluetooth: qca: fix device-address endianness
+> Do they require a DT node though for some reason?
 
-Did you apply this patch (the revert) before trying to apply the series?
+I would not expect the "PC" flavor of the card to require DT.
+The "mobile" and "automotive" flavors would probably require it.
 
-Johan
