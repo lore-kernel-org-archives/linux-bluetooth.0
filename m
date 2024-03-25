@@ -1,56 +1,56 @@
 Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BAC313E899
-	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Mar 2024 13:17:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815ED1411CA
+	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Mar 2024 13:17:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711372625; cv=none; b=bs0UlqV5gPS+3vq6uEWZluRbrTHu8gTBvEPkWfVqz374ohoLYAEqAcwfpekT9/zd2yybx3YCJdSFTRoQ97N1FbJYH7QBhZBUwXbyMoS6jWS6S928ptDSpNA3E44xpZX0j0sSjw1HUlO/ZK9u5E2Ar1ZLFyZEaExS6Xo7nfW5UXU=
+	t=1711372627; cv=none; b=qDLp3t30sI9h+sEgfyO64vOOiNV94iNzK2aIVVsjAim6ILOjTlAIQTv3GGqKzidUFhbNmXAFpiTlDI6jaNgCO5XWexyvCHRe3CBMFWNCuu4I7TXAs9TEZmuctbqf158fX/MnNugKtuK1zmBJsYndufCDAAT1kGTf9ZUV0TW11o0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711372625; c=relaxed/simple;
-	bh=wf7ju8vqsLnPRCFf/XISMutA94e5S8E6OhesXhPqqxY=;
+	s=arc-20240116; t=1711372627; c=relaxed/simple;
+	bh=hfgHIMnmFRtgUtFw/WNES77oLFQa+HHCcDhOj+ME/vk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=VnyI74A82XnABLpi9y72COdjuIrlNOXEfaJa5qWiJ1wsoTIeH8z4SsHCo2qTM4iOxvJdlEEm6+hGxHJj/Q42JnldOYSrmv8M/ibflq4FvERE5zOMKqNGbMFHNaDqCS7HoNuYpTtt1oudLaEzbWTESv0Whpd7jDMMONWoDqTYLtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=24BaF3aY; arc=none smtp.client-ip=209.85.128.53
+	 MIME-Version; b=rf45u4/fwTl8Ctc3ioVebrEzahdaxHXVegwBtBKsrRb+62FS0Se3PAgu4UELQWr1EZH4f+RzQ5HxP1liY0mvthxv/9c5dbF3hYyR9Tnmcyz1Pg+FcZxoFw4td12V29GWkBDnMnpVC86TLLFsnoYRfdNzNXhIFuZS+tW7LnWq2II=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=VUqPhL5I; arc=none smtp.client-ip=209.85.128.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="24BaF3aY"
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4148c2a3a3fso1427335e9.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Mar 2024 06:17:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="VUqPhL5I"
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-41489d59523so4891725e9.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Mar 2024 06:17:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1711372621; x=1711977421; darn=vger.kernel.org;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1711372623; x=1711977423; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=j+WJda3ss7hoIdDj+/OQZmjsnCcOcWE53qMUaI5LDqg=;
-        b=24BaF3aYujXFjNyCLTxmz/p4l0ezw7gLSIA8/bm3tS7bC+qugn0NwR02EJ4EBcrhlB
-         ZCK/GmFXD69os4Hgc1Lh0rmIDpNKmtxLckrnz8C3XxEaQB2bGWMjUTsaVOK3zteU5Wit
-         f5JzIDawC8nwMSySn4zvUV0rj5bmO45a++qBkEDvQfF2JiJAMTlBcPPnP+pyy31K0O8/
-         P/qPGkdckfnaaaIP85VRaLKJC/8GmvwCdcGR69URLyo5Z1UBkZP+UTf/CJdqaoj1TQWm
-         wiXGe6dZgPLrLQJYbp2col6qaqiVj9FuoZxPgDvW94zZEiyb9lAe16I53E5nxGZLR052
-         rwWw==
+        bh=SGOfh5Up2s4Hsb0xRVMMugzy1VQqOQKd6pFoEiLe/18=;
+        b=VUqPhL5I8BiB9qCPijxmso0QfhUJA6kqCUxzrs7jWb5qWPn6s8ZTyU5DCyw8eqPZYm
+         tl47Fcxm/PD4KefzYWfATuusl2WTQgiDV1249UrwnqkQ0p/o3aOGl35FOo9g1qDIzUmv
+         9GogrgpyYPZQNMis19K6XZxJ+Gv4RPWVgyRsoUBCEovHahW29SzLaptLSuUVHOv/cme5
+         jIdxO7hZMLxorF5ROk2ibQ5UbXbWXS1YBnmw+65RwpwGMhjvwx6xBQMyatIVYdenoqAW
+         fgGQJe7MloM4mp2EPHkgkzOjLO3CePYdJ611ZHmyQbpJ2k/SUu9kKHA4ilpWAxlGZY9z
+         6/Xg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711372621; x=1711977421;
+        d=1e100.net; s=20230601; t=1711372623; x=1711977423;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=j+WJda3ss7hoIdDj+/OQZmjsnCcOcWE53qMUaI5LDqg=;
-        b=gmPdHd9bkFJBYYSa9eRQCsXSVDrdG/Q24OrKzImKcddDQjLaN3Fg+EJbDylYoen77K
-         n/IzT2sAZtFLApACatZ5N4122ETE+G5HH4uieWl2z20WrwDEzqZAPOKNKLaqWMNbk8jO
-         Y92shP+cXSyIn0ZHELFd5BAtmEa3+eS0BjKLh/B0Kf1p3+hm33p6uonBz2zXOc81nmCO
-         4X+lkCnjyr4+8hVRciyYDSbGDZ9G/qqCKA4KHtzlzpjkZ2JAQ/zd7ObDrGFaXbYsn2Hj
-         wcazTiK8zTROVQJLSV+kiM5woSaciCJItZOv/c9GVaaNlzE8lJUtGyqNaeySYgI3tJP0
-         Yq6Q==
-X-Gm-Message-State: AOJu0Yw3BA6aeL3FBkY5PI5buZFOaEY8iJgJXdZWcfOq8i2y8GU3vrP8
-	XNIG2I2IfjOFCvLTCVFFGSJvOxZaRk1eBPtRKFTN7JyHfMSq5o0MXQSj0f9XvcA=
-X-Google-Smtp-Source: AGHT+IHrGIgcKSHFDPU7oqzDQS0x8s+zHke3Mslpoj4/V9XzWkb5PtGf2llHH3pvarPz9u9Ic3zPsQ==
-X-Received: by 2002:a05:600c:41cc:b0:414:245:f6df with SMTP id t12-20020a05600c41cc00b004140245f6dfmr4966316wmh.21.1711372621200;
-        Mon, 25 Mar 2024 06:17:01 -0700 (PDT)
+        bh=SGOfh5Up2s4Hsb0xRVMMugzy1VQqOQKd6pFoEiLe/18=;
+        b=uuJCUcEa6/xpmvbRpicIxNwkPZ98i9OFjowwePpLvfCWyF6RXKfRJasIOi8CKH74cw
+         lECBH1OwZ0+cBZtTSHHj0HEDHjLJxkwQGRZ2I4kebCGv88Kk3iqPns67m6q5w0Fr+hLC
+         u84FdOcBPTxm1kVKYY6Dwli2PjU99xQpsIzb3tWi5Gni8t4FwUDDpjQgMtxT8ZEOeDhB
+         b3bvM0dj4F0hSwrJrc4IMljtxWZ5L8wcViSpyTkY74+ZowjxMtB2UP+cYq0HYWJm6Qfu
+         4zS4DxrYzg3KYF+zbddcxKrmRsy1xIgflCpa4Mx4FpkGwWkBxbCvmPOZzo98EyIDuTsP
+         4Jbg==
+X-Gm-Message-State: AOJu0YwTT8ag73/EZop9jhazRzydF1ERaXlNaj9vKVNttl2n1x1hEkJS
+	BJM5E2b72K9oQ5aTLSgyH40FMPKU336PK6H7lf5Eckpr4rO9U7skk4KHtPfIf3Y=
+X-Google-Smtp-Source: AGHT+IHZRY1QWKBr33rhlgymM9kBVbcL1shwEGnPH+sbwWy/MBO17W93kXESsMvT66cCBqV7Q+yhyA==
+X-Received: by 2002:a05:600c:4714:b0:414:7e73:1f8c with SMTP id v20-20020a05600c471400b004147e731f8cmr4727120wmo.37.1711372622673;
+        Mon, 25 Mar 2024 06:17:02 -0700 (PDT)
 Received: from brgl-uxlite.home ([2a01:cb1d:75a:e000:861d:8b72:a859:4ce9])
-        by smtp.gmail.com with ESMTPSA id p11-20020a056000018b00b0033e75e5f280sm9485245wrx.113.2024.03.25.06.16.59
+        by smtp.gmail.com with ESMTPSA id p11-20020a056000018b00b0033e75e5f280sm9485245wrx.113.2024.03.25.06.17.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Mar 2024 06:17:00 -0700 (PDT)
+        Mon, 25 Mar 2024 06:17:02 -0700 (PDT)
 From: Bartosz Golaszewski <brgl@bgdev.pl>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
@@ -91,11 +91,10 @@ Cc: linux-bluetooth@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-pci@vger.kernel.org,
 	linux-pm@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: [PATCH v6 03/16] dt-bindings: net: bluetooth: qualcomm: describe regulators for QCA6390
-Date: Mon, 25 Mar 2024 14:16:11 +0100
-Message-Id: <20240325131624.26023-4-brgl@bgdev.pl>
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: [PATCH v6 04/16] dt-bindings: net: wireless: qcom,ath11k: describe the ath11k on QCA6390
+Date: Mon, 25 Mar 2024 14:16:12 +0100
+Message-Id: <20240325131624.26023-5-brgl@bgdev.pl>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20240325131624.26023-1-brgl@bgdev.pl>
 References: <20240325131624.26023-1-brgl@bgdev.pl>
@@ -109,51 +108,82 @@ Content-Transfer-Encoding: 8bit
 
 From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-QCA6390 has a compatible listed in the bindings but is missing the
-regulators description. Add the missing supply property and list the
-required ones in the allOf section.
+Add a PCI compatible for the ATH11K module on QCA6390 and describe the
+power inputs from the PMU that it consumes.
 
 Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 ---
- .../net/bluetooth/qualcomm-bluetooth.yaml       | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ .../net/wireless/qcom,ath11k-pci.yaml         | 46 +++++++++++++++++++
+ 1 file changed, 46 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
-index 528ef3572b62..d844acaec1d3 100644
---- a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
-+++ b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
-@@ -62,6 +62,9 @@ properties:
-   vdddig-supply:
-     description: VDD_DIG supply regulator handle
+diff --git a/Documentation/devicetree/bindings/net/wireless/qcom,ath11k-pci.yaml b/Documentation/devicetree/bindings/net/wireless/qcom,ath11k-pci.yaml
+index 41d023797d7d..8675d7d0215c 100644
+--- a/Documentation/devicetree/bindings/net/wireless/qcom,ath11k-pci.yaml
++++ b/Documentation/devicetree/bindings/net/wireless/qcom,ath11k-pci.yaml
+@@ -17,6 +17,7 @@ description: |
+ properties:
+   compatible:
+     enum:
++      - pci17cb,1101  # QCA6390
+       - pci17cb,1103  # WCN6855
  
-+  vddbtcmx-supply:
-+    description: VDD_BT_CMX supply regulator handle
+   reg:
+@@ -28,10 +29,55 @@ properties:
+       string to uniquely identify variant of the calibration data for designs
+       with colliding bus and device ids
+ 
++  vddrfacmn-supply:
++    description: VDD_RFA_CMN supply regulator handle
 +
-   vddbtcxmx-supply:
-     description: VDD_BT_CXMX supply regulator handle
++  vddaon-supply:
++    description: VDD_AON supply regulator handle
++
++  vddwlcx-supply:
++    description: VDD_WL_CX supply regulator handle
++
++  vddwlmx-supply:
++    description: VDD_WL_MX supply regulator handle
++
++  vddrfa0p8-supply:
++    description: VDD_RFA_0P8 supply regulator handle
++
++  vddrfa1p2-supply:
++    description: VDD_RFA_1P2 supply regulator handle
++
++  vddrfa1p7-supply:
++    description: VDD_RFA_1P7 supply regulator handle
++
++  vddpcie0p9-supply:
++    description: VDD_PCIE_0P9 supply regulator handle
++
++  vddpcie1p8-supply:
++    description: VDD_PCIE_1P8 supply regulator handle
++
+ required:
+   - compatible
+   - reg
  
-@@ -180,6 +183,20 @@ allOf:
-         - vddrfa0p8-supply
-         - vddrfa1p2-supply
-         - vddrfa1p9-supply
++allOf:
 +  - if:
 +      properties:
 +        compatible:
 +          contains:
-+            enum:
-+              - qcom,qca6390-bt
++            const: pci17cb,1101
 +    then:
 +      required:
 +        - vddrfacmn-supply
 +        - vddaon-supply
-+        - vddbtcmx-supply
++        - vddwlcx-supply
++        - vddwlmx-supply
 +        - vddrfa0p8-supply
 +        - vddrfa1p2-supply
 +        - vddrfa1p7-supply
++        - vddpcie0p9-supply
++        - vddpcie1p8-supply
++
+ additionalProperties: false
  
  examples:
-   - |
 -- 
 2.40.1
 
