@@ -1,56 +1,56 @@
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 605B913E6DE
-	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Mar 2024 13:17:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BAC313E899
+	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Mar 2024 13:17:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711372624; cv=none; b=J3Lc8zA9y5sImIUnHN/f2M1ifrIj2md/PC7otV9LuXmY0VmZ21VTzjTo8YGb4bWg7qI1mp/jSTCkY58dzy61yMMWDe8lD2XP5AactHWN/tnjdaNZNWYCI7Yj4wdxA9GNiKxAeDTVdtNGFpoP0k0O4iM5MmmO8eFhpCgZa1qwR4I=
+	t=1711372625; cv=none; b=bs0UlqV5gPS+3vq6uEWZluRbrTHu8gTBvEPkWfVqz374ohoLYAEqAcwfpekT9/zd2yybx3YCJdSFTRoQ97N1FbJYH7QBhZBUwXbyMoS6jWS6S928ptDSpNA3E44xpZX0j0sSjw1HUlO/ZK9u5E2Ar1ZLFyZEaExS6Xo7nfW5UXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711372624; c=relaxed/simple;
-	bh=6EJanTOb9lmBTF84w02dw6YmtQBZ//XxYHWVbdxtB38=;
+	s=arc-20240116; t=1711372625; c=relaxed/simple;
+	bh=wf7ju8vqsLnPRCFf/XISMutA94e5S8E6OhesXhPqqxY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=r2dMVfxQUTci5MXqxH6Svc/mvddeugpWMb5Ts3VWYCUTNJBvoS2VxvYj/1Nd3ROK/N5PZy/HOGWzf5ZtLUX8IATvRCZUf7b3dhQklzAoPBj2H53UynfWdSEyMwccUQr68qHGJ/P1QxLTjeeOiT1hBESA+IeFv4bGyWtfKHVEfxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=se0Wjkhd; arc=none smtp.client-ip=209.85.167.46
+	 MIME-Version; b=VnyI74A82XnABLpi9y72COdjuIrlNOXEfaJa5qWiJ1wsoTIeH8z4SsHCo2qTM4iOxvJdlEEm6+hGxHJj/Q42JnldOYSrmv8M/ibflq4FvERE5zOMKqNGbMFHNaDqCS7HoNuYpTtt1oudLaEzbWTESv0Whpd7jDMMONWoDqTYLtE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=24BaF3aY; arc=none smtp.client-ip=209.85.128.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="se0Wjkhd"
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-51588f70d2dso4999452e87.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Mar 2024 06:17:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="24BaF3aY"
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4148c2a3a3fso1427335e9.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Mar 2024 06:17:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1711372619; x=1711977419; darn=vger.kernel.org;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1711372621; x=1711977421; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9V84zGWHhNqI3aEKBbqoMuQ965CIVij1HgYyzK0b1yI=;
-        b=se0WjkhdEhv1Yp+rM5vu6A4BsWXSvoPH2l3gX+WCIyVRTKUMbr+t6vs9s2tdEp3yQZ
-         wFPKxFGX7TXCbQmHN33HvwFMJje4FQOqC3UqIGtxSK6I6B1oEnxQtRHTFSwymqQm0gec
-         A9RpvyjBTDSKhryCz+OxLJnX2NWeOcM3Lna8sGxkTTFcdUKjIfuNnjpof2rkH3ZQrG9S
-         Ym/cA6l/LTKyIm2/LtqvNN5JXSNPZ/vax/wiYkikEaz2nGv0kfTk3nn/MXH9k9ThfIwo
-         biFEtFMUtcRu/HyVejUh1etY5zVsoDhmpk/s4Apohl8l4j4u0cDSRPid+mkAEQ1K1v9U
-         m0Zg==
+        bh=j+WJda3ss7hoIdDj+/OQZmjsnCcOcWE53qMUaI5LDqg=;
+        b=24BaF3aYujXFjNyCLTxmz/p4l0ezw7gLSIA8/bm3tS7bC+qugn0NwR02EJ4EBcrhlB
+         ZCK/GmFXD69os4Hgc1Lh0rmIDpNKmtxLckrnz8C3XxEaQB2bGWMjUTsaVOK3zteU5Wit
+         f5JzIDawC8nwMSySn4zvUV0rj5bmO45a++qBkEDvQfF2JiJAMTlBcPPnP+pyy31K0O8/
+         P/qPGkdckfnaaaIP85VRaLKJC/8GmvwCdcGR69URLyo5Z1UBkZP+UTf/CJdqaoj1TQWm
+         wiXGe6dZgPLrLQJYbp2col6qaqiVj9FuoZxPgDvW94zZEiyb9lAe16I53E5nxGZLR052
+         rwWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711372619; x=1711977419;
+        d=1e100.net; s=20230601; t=1711372621; x=1711977421;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=9V84zGWHhNqI3aEKBbqoMuQ965CIVij1HgYyzK0b1yI=;
-        b=o6wNOUDREeuwKkf8bLD+COaWN6RPHecyZNXsSeZXAxBSmL/MrhyFpK9VBMGtKA0PQ/
-         e2g5gq3CM4DnTvR+32DAd1H/baP9d9oOotiTjdzOTo7stm0LEbw+4zyo4Vmzrphiix2e
-         TbWsjtS72uUnyKZl5tTk/pkNcOHe9B2dR7EgzlmvaQrNeVw/HVohoBfB9rwrKPeDqTfM
-         40rtqthhV4HeJ+cy4T4A6WcPSMJMk0GEbjs6gOjgCq0x3zRkW89mahEMP4gF5uXrPXhB
-         BqSEZ0fQikYeF7WMzgwByxr17UpnkmhZXPHGq4j8QvL0GUjdA0rug0NknqnmhARChtnX
-         xs3Q==
-X-Gm-Message-State: AOJu0YyF96LGrsWyKFoq49uBChFTTxxC1Da+7V6iE26JT6Hrbee8z7lK
-	+B1ws6seTxSdPzlMZfvg6E5jImmDkUBZHT6WAeISPUcZX1PeEqbou13XOi8pOB8=
-X-Google-Smtp-Source: AGHT+IEJvXpyYOxHwIwWL88KBcpPwn0R7Fchkf1Dzvcc/UuyhrMuuTIaVTEp1xNfrw/QKp8Xtgt69g==
-X-Received: by 2002:a19:6917:0:b0:513:a39e:ae45 with SMTP id e23-20020a196917000000b00513a39eae45mr4575257lfc.62.1711372619309;
-        Mon, 25 Mar 2024 06:16:59 -0700 (PDT)
+        bh=j+WJda3ss7hoIdDj+/OQZmjsnCcOcWE53qMUaI5LDqg=;
+        b=gmPdHd9bkFJBYYSa9eRQCsXSVDrdG/Q24OrKzImKcddDQjLaN3Fg+EJbDylYoen77K
+         n/IzT2sAZtFLApACatZ5N4122ETE+G5HH4uieWl2z20WrwDEzqZAPOKNKLaqWMNbk8jO
+         Y92shP+cXSyIn0ZHELFd5BAtmEa3+eS0BjKLh/B0Kf1p3+hm33p6uonBz2zXOc81nmCO
+         4X+lkCnjyr4+8hVRciyYDSbGDZ9G/qqCKA4KHtzlzpjkZ2JAQ/zd7ObDrGFaXbYsn2Hj
+         wcazTiK8zTROVQJLSV+kiM5woSaciCJItZOv/c9GVaaNlzE8lJUtGyqNaeySYgI3tJP0
+         Yq6Q==
+X-Gm-Message-State: AOJu0Yw3BA6aeL3FBkY5PI5buZFOaEY8iJgJXdZWcfOq8i2y8GU3vrP8
+	XNIG2I2IfjOFCvLTCVFFGSJvOxZaRk1eBPtRKFTN7JyHfMSq5o0MXQSj0f9XvcA=
+X-Google-Smtp-Source: AGHT+IHrGIgcKSHFDPU7oqzDQS0x8s+zHke3Mslpoj4/V9XzWkb5PtGf2llHH3pvarPz9u9Ic3zPsQ==
+X-Received: by 2002:a05:600c:41cc:b0:414:245:f6df with SMTP id t12-20020a05600c41cc00b004140245f6dfmr4966316wmh.21.1711372621200;
+        Mon, 25 Mar 2024 06:17:01 -0700 (PDT)
 Received: from brgl-uxlite.home ([2a01:cb1d:75a:e000:861d:8b72:a859:4ce9])
-        by smtp.gmail.com with ESMTPSA id p11-20020a056000018b00b0033e75e5f280sm9485245wrx.113.2024.03.25.06.16.57
+        by smtp.gmail.com with ESMTPSA id p11-20020a056000018b00b0033e75e5f280sm9485245wrx.113.2024.03.25.06.16.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Mar 2024 06:16:58 -0700 (PDT)
+        Mon, 25 Mar 2024 06:17:00 -0700 (PDT)
 From: Bartosz Golaszewski <brgl@bgdev.pl>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
@@ -91,10 +91,11 @@ Cc: linux-bluetooth@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-pci@vger.kernel.org,
 	linux-pm@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: [PATCH v6 02/16] regulator: dt-bindings: describe the PMU module of the WCN7850 package
-Date: Mon, 25 Mar 2024 14:16:10 +0100
-Message-Id: <20240325131624.26023-3-brgl@bgdev.pl>
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH v6 03/16] dt-bindings: net: bluetooth: qualcomm: describe regulators for QCA6390
+Date: Mon, 25 Mar 2024 14:16:11 +0100
+Message-Id: <20240325131624.26023-4-brgl@bgdev.pl>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20240325131624.26023-1-brgl@bgdev.pl>
 References: <20240325131624.26023-1-brgl@bgdev.pl>
@@ -108,90 +109,51 @@ Content-Transfer-Encoding: 8bit
 
 From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-The WCN7850 package contains discreet modules for WLAN and Bluetooth. They
-are powered by the Power Management Unit (PMU) that takes inputs from the
-host and provides LDO outputs. Extend the bindings for QCA6390 to also
-document this model.
+QCA6390 has a compatible listed in the bindings but is missing the
+regulators description. Add the missing supply property and list the
+required ones in the allOf section.
 
 Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 ---
- .../bindings/regulator/qcom,qca6390-pmu.yaml  | 36 ++++++++++++++++++-
- 1 file changed, 35 insertions(+), 1 deletion(-)
+ .../net/bluetooth/qualcomm-bluetooth.yaml       | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml b/Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml
-index 9d39ff9a75fd..2e543661a1e2 100644
---- a/Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml
-+++ b/Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml
-@@ -16,20 +16,37 @@ description:
+diff --git a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+index 528ef3572b62..d844acaec1d3 100644
+--- a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
++++ b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+@@ -62,6 +62,9 @@ properties:
+   vdddig-supply:
+     description: VDD_DIG supply regulator handle
  
- properties:
-   compatible:
--    const: qcom,qca6390-pmu
-+    enum:
-+      - qcom,qca6390-pmu
-+      - qcom,wcn7850-pmu
++  vddbtcmx-supply:
++    description: VDD_BT_CMX supply regulator handle
 +
-+  vdd-supply:
-+    description: VDD supply regulator handle
+   vddbtcxmx-supply:
+     description: VDD_BT_CXMX supply regulator handle
  
-   vddaon-supply:
-     description: VDD_AON supply regulator handle
- 
-+  vdddig-supply:
-+    description: VDD_DIG supply regulator handle
-+
-   vddpmu-supply:
-     description: VDD_PMU supply regulator handle
- 
-+  vddio1p2-supply:
-+    description: VDD_IO_1P2 supply regulator handle
-+
-   vddrfa0p95-supply:
-     description: VDD_RFA_0P95 supply regulator handle
- 
-+  vddrfa1p2-supply:
-+    description: VDD_RFA_1P2 supply regulator handle
-+
-   vddrfa1p3-supply:
-     description: VDD_RFA_1P3 supply regulator handle
- 
-+  vddrfa1p8-supply:
-+    description: VDD_RFA_1P8 supply regulator handle
-+
-   vddrfa1p9-supply:
-     description: VDD_RFA_1P9 supply regulator handle
- 
-@@ -50,6 +67,10 @@ properties:
-     maxItems: 1
-     description: GPIO line enabling the ATH11K Bluetooth module supplied by the PMU
- 
-+  clocks:
-+    maxItems: 1
-+    description: Reference clock handle
-+
-   regulators:
-     type: object
-     description:
-@@ -83,6 +104,19 @@ allOf:
-         - vddpcie1p3-supply
-         - vddpcie1p9-supply
-         - vddio-supply
+@@ -180,6 +183,20 @@ allOf:
+         - vddrfa0p8-supply
+         - vddrfa1p2-supply
+         - vddrfa1p9-supply
 +  - if:
 +      properties:
 +        compatible:
 +          contains:
-+            const: qcom,wcn7850-pmu
++            enum:
++              - qcom,qca6390-bt
 +    then:
 +      required:
-+        - vdd-supply
-+        - vddio-supply
++        - vddrfacmn-supply
 +        - vddaon-supply
-+        - vdddig-supply
++        - vddbtcmx-supply
++        - vddrfa0p8-supply
 +        - vddrfa1p2-supply
-+        - vddrfa1p8-supply
++        - vddrfa1p7-supply
  
- additionalProperties: false
- 
+ examples:
+   - |
 -- 
 2.40.1
 
