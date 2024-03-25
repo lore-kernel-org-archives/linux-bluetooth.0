@@ -1,81 +1,104 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ABEA130E4F;
-	Mon, 25 Mar 2024 16:40:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7E4C5490B
+	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Mar 2024 16:41:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711384829; cv=none; b=oqaA6kt8UkIr4qihTJoKtjuifutZmR89/C+PpBYXws6Pl2hmkUInFj7OeolvfbbKPn7BO8+0LaP859qn3OXPsnx79A4HAYD25Bt7TiJn1TA4DQ3rP3Hxd+ncxY5GyAUSAFZCBlfYqHrhewlVqhOJfSLnzQLFzdyuOhxr5YXej4c=
+	t=1711384875; cv=none; b=jJWyrW9EFY33Pq8ytV4ciOvcgCFgRyXe+KltjmjOdo805nLi04+vAjy1XJ3T0spTztxZBLoruCSZu6AAXoqq/Adf3dgMbnLQgnOT1PtLQEwrdGvwDDHtnSUJKlG2IxI2AwmY13g1QI/fGZGJgUiMHF42bXmPZ0+3xfLSdzBGWh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711384829; c=relaxed/simple;
-	bh=Slq/eDTLuhoRN5Z+0B7+H1DisJleCn95vap4bZ0KkEM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mybIKfMuKp6xSMb2IX41XGRKwHBy32WSlq77fU9ftclN7sSHKBywkKYbKgBdC+2SRbChEXDtqt0V9gJHVEs3d4vv/ou79NC7nVIaSfsFCZffHtfKYwc007NqvTfPUr4Dp9AQk26SbYprA8x4EamdqgajQ7vlOEDV5IjSjFhiV7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uYckELU5; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711384875; c=relaxed/simple;
+	bh=/PXEvJV6YFN4IC/JKYOBkDmTXiE8hGHQdrLFKiAUUW0=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Cj/1cVWJIYo4o7mARBwId2TRzUCNUhwfGiXDVg76lSeWKA8/07ndQa8uSRIBIKyHbfshVEARMLzsJoWpe7UuopZGrBNc1jxIpNLjSxYBwo/Vtu1rtD5fijmCzsc6roXqueIHuwhM3X01hdMSVhjI1T1DYhy1EBVMZTzknI0la5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m1dCUZMP; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uYckELU5"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2E127C433F1;
-	Mon, 25 Mar 2024 16:40:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711384829;
-	bh=Slq/eDTLuhoRN5Z+0B7+H1DisJleCn95vap4bZ0KkEM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=uYckELU5c1ZZjIPjlyBzbPhsQ0j6jRQDO1ubaWmSaRnRnKs4KX455RPu0buKw53zB
-	 9SH2Ss0yHhJv52ixvBLiYaZz+d5K7QR72Ge5JovyzmflukJxGklVWnKpM2axGl4oGO
-	 07uwRkoupzGHRdy5Rsnu4wiA+2tFccc6LXWtNe3n+tqsdpXypQZYm8ufLkOsjalgPR
-	 vmts92D7oC/IyMnr47qW/XkcaJrFnf8Q4xk+H0Tm9iiZb0gtq6ssrTfNPjFjvZ9uQR
-	 K+Za0+1jh2N1pj5UJaJ4G0O49zxAV030jK7ib3qRhATqwZHbExzW0fc4G1WMcIFVq+
-	 UuQVpNLhOzeDQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1B1CAD2D0ED;
-	Mon, 25 Mar 2024 16:40:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m1dCUZMP"
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-5e42b4bbfa4so2579474a12.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Mar 2024 09:41:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711384873; x=1711989673; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=brjNZcvhWhUHVrjm86azbAqVHUuukvUz3igtHlzghzY=;
+        b=m1dCUZMPbXfqL2AYfHvULjUvfF7f15fnjv2Hi5MgnmEodr+0ug+o8izdL1QhUH7f+C
+         rbcn3vv/OrUOKdzvPEueexA+h1ZAMQpTO3+jbOlu6nTUIv/y8Vllvr1fkP9yoZR7qdBR
+         C85NeDFqUEqPglAi7DAtvyiQ9TY1YHnG+4mZfFbUCMRulUo4Sg/4WCKoCqxueCz6bxLc
+         QFWEq+thORzC3POEvtwyqTWpM7i80QugHPql6d/EbZwhqe+SalZnCQ3PbM9s6/3T+ZkR
+         B8iNXznB6hQZy43rpJVvbCleMajqXsDu3QqBnrE6U4NB9pEXejpMshmf9LygR38ttyEE
+         GT5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711384873; x=1711989673;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=brjNZcvhWhUHVrjm86azbAqVHUuukvUz3igtHlzghzY=;
+        b=F+zO7sPnFxXGUP07SVWoBMa9JQSo5EE+k5gr2Nw73kGhCM5WyOFlfLp0A7CAd4UE7j
+         L/lxIo7FTKlcm1E8KIo1UcSA2Ihmn3K3EQln9vV2B2csWoLapPjFW6kXU6KNTn3aBybg
+         jvMQuPSbdLWAfw7qlaUws8tTcn9+YOwde4u3fJulEbTH1khWVmhtM9EQhcfnFtnm3wd8
+         bXtXL1NiSfdlATW3sf7v78IUSsdmw6Q2jWAVreV03CWfc9zaczFKBNmo7d0t6tv+9oCz
+         KPgsX7OZL8oPdVKSAd3L0WWv+LyEtjk0YMzQqHFq/JOPcFL/50DVIU/8hAwpssTwx5UX
+         HPUg==
+X-Gm-Message-State: AOJu0Yx2zg3g/XV2i7gMRjw8/caHip1zMmISg8weF3yLc/68UPvdoYQN
+	lqwnA3ToGeLMQ5wneuGWthFSk7DTj5yr28qJJL2v6pSxB/uGoW/bnTB3swI5
+X-Google-Smtp-Source: AGHT+IEBGkO+a72yCVktmaR3sfsmqRVITId8SE2tf0X9pPJjcbfEvuSE0Eb8IArYdILrmaOvCrZOyA==
+X-Received: by 2002:a05:6a21:998f:b0:1a3:466d:d33 with SMTP id ve15-20020a056a21998f00b001a3466d0d33mr10477775pzb.9.1711384872755;
+        Mon, 25 Mar 2024 09:41:12 -0700 (PDT)
+Received: from [172.17.0.2] ([20.172.2.101])
+        by smtp.gmail.com with ESMTPSA id du12-20020a056a002b4c00b006e6813f2301sm4326611pfb.56.2024.03.25.09.41.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Mar 2024 09:41:12 -0700 (PDT)
+Message-ID: <6601a928.050a0220.d70fa.ab86@mx.google.com>
+Date: Mon, 25 Mar 2024 09:41:12 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5278147457006865656=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 0/3] Bluetooth: Convert to platform remove callback returning
- void
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <171138482910.29632.1995561805577774426.git-patchwork-notify@kernel.org>
-Date: Mon, 25 Mar 2024 16:40:29 +0000
-References: <cover.1710193561.git.u.kleine-koenig@pengutronix.de>
-In-Reply-To: <cover.1710193561.git.u.kleine-koenig@pengutronix.de>
-To: =?utf-8?q?Uwe_Kleine-K=C3=B6nig_=3Cu=2Ekleine-koenig=40pengutronix=2Ede=3E?=@ci.codeaurora.org
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, andersson@kernel.org,
- konrad.dybcio@linaro.org, linux-arm-msm@vger.kernel.org,
- linux-bluetooth@vger.kernel.org, kernel@pengutronix.de
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, vlad.pruteanu@nxp.com
+Subject: RE: client/player: Fix transport.send command's transfer of packets
+In-Reply-To: <20240325144031.335354-2-vlad.pruteanu@nxp.com>
+References: <20240325144031.335354-2-vlad.pruteanu@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hello:
+--===============5278147457006865656==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This series was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+This is automated email and please do not reply to this email!
 
-On Mon, 11 Mar 2024 22:49:51 +0100 you wrote:
-> Hello,
-> 
-> this series converts all platform drivers below drivers/bluetooth to
-> stop using struct platform_driver::remove(). See commit 5c5a7680e67b
-> ("platform: Provide a remove callback that returns no value") for an
-> extended explanation and the eventual goal.
-> 
-> [...]
+Dear submitter,
 
-Here is the summary with links:
-  - [1/3] Bluetooth: btqcomsmd: Convert to platform remove callback returning void
-    https://git.kernel.org/bluetooth/bluetooth-next/c/5bffd666f4ac
-  - [2/3] Bluetooth: hci_bcm: Convert to platform remove callback returning void
-    https://git.kernel.org/bluetooth/bluetooth-next/c/526f6c35de83
-  - [3/3] Bluetooth: hci_intel: Convert to platform remove callback returning void
-    https://git.kernel.org/bluetooth/bluetooth-next/c/0dc3ce6b3c1f
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=837924
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.34 seconds
+GitLint                       PASS      0.23 seconds
+BuildEll                      PASS      24.69 seconds
+BluezMake                     PASS      1710.49 seconds
+MakeCheck                     PASS      13.72 seconds
+MakeDistcheck                 PASS      173.11 seconds
+CheckValgrind                 PASS      247.65 seconds
+CheckSmatch                   PASS      344.68 seconds
+bluezmakeextell               PASS      116.81 seconds
+IncrementalBuild              PASS      1507.39 seconds
+ScanBuild                     PASS      988.72 seconds
 
 
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============5278147457006865656==--
