@@ -1,102 +1,107 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C5B9146010
-	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Mar 2024 09:38:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 106AF182715
+	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Mar 2024 10:10:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711359524; cv=none; b=oz+9AE9a4+Y9g4C95CjCAjIxBN7SvykSgKoAl3SIcPVMR1MgL0zzn9PJhXEU+L3UolxMCrugyth/nnm+0U2dfiBcqND7JxmMw5nbd6ersd/3sk0s3x8i+8GwXSDhZpCBAir7W4Us8sw2FSciv6Bo6tIyqkah458nDyZ1Kg6yFTg=
+	t=1711361426; cv=none; b=RF/ysEQXdAlvlY2LZwHbq35tAfm3npqqmextrR2dC64B2b8eAg1wuWD3Rks/LOZ8l4Hwm7OgQrojsPVY+vRh4NzN0FyQm3weAAqFJCzXp5YOAm0NZhJk/typFGh7swMv0swHiSQuKAbFpLem7PsrdQekzdARhEutJDla2ez15Vw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711359524; c=relaxed/simple;
-	bh=ST74PPnnGVbTknn+iqWWbSMNA5ohxxbiG23ZjSHH5wI=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=qGAJz6YWkTNXpOdrrSzyYrEM5u6/IgHdH4douNFsQ0bZmHFnEsj6QNGf+/ickTwFUi37Y3LSzNN7zlQ24WGJp9H692ZIOh7kH2ZlAp5CYB5rMmQXZVjgdVRCmVxQTAvcjYV+UNnfqTyylg3HlgAobiohAkNrAnLfmmomqFHiX/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TBiZ8k0m; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711361426; c=relaxed/simple;
+	bh=Mrzg63EbUwF336V6fWMIk5vRiUljxb35ctM9m77R3XA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=sOezjEY+yp5o0IF/FnaEhdy6DKG7W1McrhGxpWHJE/vS76064NB+XTJU44mUb6+WuHZhKrdeOI2ktWXXcXkdLukNMjIz66rx1N9BeFjOuhLfyTMccCa7Gb1VeHCXRl/n4PDp4v7iNE8Ta6Jp28berKEWQhKcHgRhCh1WLKVPFZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--howardchung.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=odDDus6C; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--howardchung.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TBiZ8k0m"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B7F15C43390
-	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Mar 2024 09:38:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711359523;
-	bh=ST74PPnnGVbTknn+iqWWbSMNA5ohxxbiG23ZjSHH5wI=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=TBiZ8k0m6LUuoJrlmOMTDZ5wkH6btBHiW2CPrgywVkwoFpG1OYTjXQCfpeth3bEB8
-	 usgeMfFm83hxlJaJ1gpKZyztuAeWUi2qfXo/2i1920SZChvn1koEKI/u4YsajF4RMp
-	 XQxTQMn/NizXkDx/NQNtdUtiU//hhPdw5Tl1NGC7WCnU0Z7OmSNdNYt73+mI1zY01Z
-	 pD6NkVJuebtFw5FBDWDg5qdV4wNdehSX4T8CZeDwJtgofY2HL7OQ2QkiSRMTb2+UmW
-	 ZAzeEh34L+bAVN+0hNHQQuPXg1Qn56YJAqL4ASk+jd7JTHnVMyp1K/DI1xKTyC00TM
-	 o/o1OkXbBDiHw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id A68BCC53BCD; Mon, 25 Mar 2024 09:38:43 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 218416] hci0: command 0xfc05 tx timeout in kernel 6.7.1
-Date: Mon, 25 Mar 2024 09:38:43 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: vjstink@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-218416-62941-vdNfRU8qrL@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218416-62941@https.bugzilla.kernel.org/>
-References: <bug-218416-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="odDDus6C"
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dd169dd4183so4892085276.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Mar 2024 03:10:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1711361424; x=1711966224; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=rPoDdA/17uei8EMpsiKpGk6NmEsfbhCRydX+z72OfVk=;
+        b=odDDus6CVA/s/6GZUFs1Vc+/peEjV3qBc0hMoZAxbXaJh1oT1wR6tgKbIapnh1Xbck
+         BaejVxBxp/8iI7U12lHjoAuPXTElFiZshlc+HEacYfU7BOKepusxKQ8DtiNN6i9Jbbjl
+         fvC2h9M+UxiGaFhKjyO7WRSeZE9ORHHy5V+cGXme257kiczbqJaB2+uZQ8wrAoNHubII
+         Jd1Vjkgo6n4YYOb0p/OFmPQp5fpLy8TmY4K6PVjTeOoyl86mT/Bci2Ie+5FTdMlv6KDW
+         u43R96vjwhxi2wI03pYWWH95U3EkTBb5gXf1QHQF+ArlkuvfVV8h5joS6eAbVFFc17PY
+         DyMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711361424; x=1711966224;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rPoDdA/17uei8EMpsiKpGk6NmEsfbhCRydX+z72OfVk=;
+        b=g0jnD29Xe5s8pRapmAqPuhoQJu7i1vnQUAiLl4XcLZsNeZRV6bpToIv+f+DJ94lSTM
+         A8kHZz8CanP1n3DKLKDSZPM/Ik5R1RnwqUGrar9RtnXt4usjJUXjsP6rSYKFyZx0e/qP
+         L4vR92MejrjEPcNpHd01ZkxkYh9Te4EVcto2mdxMQTx7cxsLzzvV/5l5mi1ReCbJ4Z01
+         3/GkAHS2i8FHFF4GVqm2Tmc80ThTUwsWCxBZHeBcyNhJrP3z/mzpD9YHJkahYdW6W0wo
+         mTZ9xxxFvcHcAowJ7yauCtRyrXWgQeWDLWYg0Mcr0WYqUTfyJLdZIlr7GuGc0BHPIChe
+         AfpA==
+X-Gm-Message-State: AOJu0Yykr1cJ6vGMv3MxoL46w30mGjMcV8w0mlOVL0d5NGyhtbQTvmjQ
+	l+L4HLUKNcK1F5K7YgnAjnKOS03Xdel3uuxxViiRnlEGwwo7Jl+9WnmOWhJ8IuPQAkAqb758VKC
+	/n1XDz8LGOh2NHh/QzkLDdo5apl/ZOL6iwFXPuGdeZicpUUqe40RbE98Ulea2M61M4WpOhcZ/zU
+	sxg1A9HPHikz0HJ8n8cvjfZqRiCfPtb7wjf+tIwTYT9nX8k3PsA+B7htJOMC0CwxLTLMlQDIU=
+X-Google-Smtp-Source: AGHT+IE7x4dNmSMZhpbA+mPgkeKs/hJJUxNSZ9MozGG4iWR+eII3XtuR9xq83ae0K6LQhQ9+JW8hgNGtFm16nr1t/A==
+X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:17:e49c:63be:93d9:c243])
+ (user=howardchung job=sendgmr) by 2002:a05:6902:1207:b0:dcd:3a37:65 with SMTP
+ id s7-20020a056902120700b00dcd3a370065mr237433ybu.7.1711361423434; Mon, 25
+ Mar 2024 03:10:23 -0700 (PDT)
+Date: Mon, 25 Mar 2024 18:10:04 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.396.g6e790dbe36-goog
+Message-ID: <20240325181004.Bluez.1.I8b0ed6ef2fa5a273f990a5c9f0872aaa539b8b39@changeid>
+Subject: [Bluez PATCH] Advertising: Emit features property update
+From: Howard Chung <howardchung@google.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Marcel Holtmann <marcel@holtmann.org>
+Cc: CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>, 
+	Yun-Hao Chung <howardchung@google.com>, apusaka <apusaka@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218416
+From: Yun-Hao Chung <howardchung@google.com>
 
---- Comment #8 from Jhon (vjstink@gmail.com) ---
-(In reply to Nickolas Gupton from comment #7)
-> Bluetooth is still not working on boot with kernel 6.7.9 with linux-firmw=
-are
-> 20240220
-> However, if I run this script (may take 2-3 runs sometimes) it will work:
->=20
-> $ cat reset_bluetooth.sh=20
-> modprobe -r btusb
-> modprobe -r btintel
-> sleep 2
-> modprobe btintel
-> modprobe btusb
-> sleep 1
-> systemctl restart bluetooth
+Advertising manager has some properties that relies on kernel
+information. Once we received the information from kernel, we should
+emit property update.
 
+Reviewed-by: apusaka <apusaka@chromium.org>
+---
 
-Thanks for the script, it actually works after a couple of tries as you say,
-really great.
+ src/advertising.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-I wonder, how did you enable these extra debug messages in journalctl? For
-example, in mine it doesn't say anything about which firmware files it trie=
-s to
-load.
-I was trying to identify what it loads to replace them with some older vers=
-ions
-and see if I can make it work that way.
+diff --git a/src/advertising.c b/src/advertising.c
+index 0131fc1c7..7f55a20e3 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -1890,6 +1890,19 @@ static void read_adv_features_callback(uint8_t status, uint16_t length,
+ 	/* Reset existing instances */
+ 	if (feat->num_instances)
+ 		remove_advertising(manager, 0);
++
++	/* Emit property update */
++	g_dbus_emit_property_changed(btd_get_dbus_connection(),
++		adapter_get_path(manager->adapter),
++		LE_ADVERTISING_MGR_IFACE, "SupportedFeatures");
++
++	g_dbus_emit_property_changed(btd_get_dbus_connection(),
++		adapter_get_path(manager->adapter),
++		LE_ADVERTISING_MGR_IFACE, "SupportedIncludes");
++
++	g_dbus_emit_property_changed(btd_get_dbus_connection(),
++		adapter_get_path(manager->adapter),
++		LE_ADVERTISING_MGR_IFACE, "SupportedSecondaryChannels");
+ }
+ 
+ static void read_controller_cap_complete(uint8_t status, uint16_t length,
+-- 
+2.44.0.396.g6e790dbe36-goog
 
-
-I also want to confirm again that the issue is still present in kernel 6.8.1
-with the latest firmware update: 20240312
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
