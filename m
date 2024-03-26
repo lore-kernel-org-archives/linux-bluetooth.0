@@ -1,130 +1,115 @@
-Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C40874A0A
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Mar 2024 16:43:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7DC013CC6E;
+	Tue, 26 Mar 2024 16:57:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711471406; cv=none; b=VD2a3N6EG7YJWVWqKt+Fn6r3WaY5awQsQFPm1brNQL+BKLwN+0BuD9faBJTvVgllADNTM9Ez+jONKze7aP+yweCxGKnUTmTVhngV6OGRAiC2amrFl7bRAng2fIljejQsx/VN1zi9GIs9+JeLz0544XdjA5dUXEW/9x5wtfvdWAA=
+	t=1711472226; cv=none; b=c4O4kQuATXK74qtVsqEYJNYgTdiEkgFfiDq3/C9m4W21ytMtJJGf27hlfnhLAu5MqPI+7lB8dxLmUbMSjNnYJHGaTfMmZeUgmB4f/K/WJQmKVeqbJMBiuuVxYXUK2J5HSktSPK4xOZvGnqcbibsItLZom9rjucPXlyYa/44lGtU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711471406; c=relaxed/simple;
-	bh=A8WYjF/Dhj9kF73cfANIqmcdphaFglvFZjUsWJ3BzKs=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Xz8G9SJOo1StKALcKZVYzCFjfm98CA7YY/nTFgThQKlrfmgHQiRId3ai7G7EDqZfVXX5/fWmQ4crg7SfshWaVw1aW1v67v5Sw9wjMnfJanbbrlfeldzMZ2flNRJVoDl1dDUdEjO9mnsZqRLsh3GzNULfKhgSYxuImyidY90XF40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dGaFZdWj; arc=none smtp.client-ip=209.85.222.50
+	s=arc-20240116; t=1711472226; c=relaxed/simple;
+	bh=2qeRp3NpCuiDAJ/3gyrJI5txbBbOCmyfgeNGwUJ34QM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IeXg1uaGseb1Pp1ZlAIDk27kRWKZJBf9fWxNT8l/WxVJGTo8tcFIDUmIDI5V+g8uLPq5C5U4wTKnmspeft3Yew8Oax3X5ENGvdCNX/xEtYg2Zvu5LT5UTNxtzIH0vue1EEnohBdI9hP9zwv1RqQzmAy+EadInUQnZEDfP1ls988=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HUmah7Wj; arc=none smtp.client-ip=209.85.208.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dGaFZdWj"
-Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-7db123701bcso1551308241.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Mar 2024 09:43:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HUmah7Wj"
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2d4a8bddc21so77179501fa.0;
+        Tue, 26 Mar 2024 09:57:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711471400; x=1712076200; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=nthGlb3FB3B+HqLkaF6NISmJc2r1dMzeBpZPtAbkYTY=;
-        b=dGaFZdWj/oKvCBxVPQdDJ3chdjiYfgXaYTE8za/ftGObSqEfTCttOI/dkDstv2+iS0
-         2FRCOZQgT39QoIHyeu0MslV/bUm8QjIMzQdbKhKjKAVc2piVFdJdPR4keCNIxDERIQed
-         Uk0A2ADqDkAjYXxtH+k+YJoZyYGrs9Zr1mpxlEQJJ/SRyADW6ki80ImDBS3SO+BhtIEh
-         7xP0AivU8Emd8+tHvZGKPfh+YrTCixlBhzpmAMkV5LhZz4eSmTuSmAxkHWhXhYlnsQ1L
-         PxUi0SUH/rBKpYloXG7vUR92m5an7uyq69V+3IMVqovdTsLpldlGYkBDYpEQ8rEw8Dgg
-         GFSA==
+        d=gmail.com; s=20230601; t=1711472223; x=1712077023; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IU22RLww3/XOivsSv4VG6tutKJTJKSIdnxTJz7w+A7w=;
+        b=HUmah7WjkPthCGovK7uX3sqd34N05gU2mlDf7HGgBtoknB48xqyAnLyVvmMfJo3MAO
+         q+BheaODd55QOjq6D/kuq6HjFsXZIYuRl7QGZGaIYREf7itqFrdQNOvlMO5vvW2Lck1v
+         8dDbNm3wiyOZQ+PGwCCxL//PVx66knjqcXznJy5hPWRUqt7s+s+NWVA4sa68mI5K45ZP
+         0V9ptv0cZ/LmAmBBdl7QNJxCrfrkO3aLWpFe756hTIY+1/91IlEUitAvtfujGrjWRPHg
+         DkBZEZEOJ8v37ZHmRTbz0Pjo8DvryK/Pd9P/taIiLS64+4pzzsEZ6fEWcVp77w+VoSmD
+         X53g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711471400; x=1712076200;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nthGlb3FB3B+HqLkaF6NISmJc2r1dMzeBpZPtAbkYTY=;
-        b=Tn8EugFNNo7jGmhhFOPuLoQPu0+IKlyAT1vUfqYgRo3zXU3oIP5iWNiFB8OFqGmUeQ
-         afGv1qedVh69fwgU7gmCwbiMOymcvV1vBoCLyVBM+k71+tpD3tkTPSeP/HlWFEkePjsD
-         9QnyF6xGxne8VWCroDfvJBaarY7rf8mCwmwoOEuGBWxnM/bnyugT0jgAjnzEyeN6Zvjp
-         MzI42SacUArKC0/7NbUL+KF9zfX669Jj7wozZVNm0EOVY7SYMH7KnxbSwRYmoctrpYLq
-         8IL+b1aUxIxDhx2tExVDYLWV1qTYOhvpSjsdsF5zfa7M3CuVWExPyGDhl1D/8N8vC3+m
-         YkXw==
-X-Gm-Message-State: AOJu0YxXwAPQt8J6TT+KI0eMwrDgZuhuHy4iSE/b3Ak0nS45v3aVqlp7
-	E97SwORk74DGEdh8VAGgfLi4Y+UMLJ8pSWh69zBq4Wjq7Pp4sD3HaAUFKZJ9
-X-Google-Smtp-Source: AGHT+IE1Iw67u4gFeVzpve3pnKArhKTajqoavhTWAdhHKJ1IPo5UGxxtv/CoGHcqVNi0WrYoXR2t7g==
-X-Received: by 2002:ac5:c75c:0:b0:4d4:ef9:719d with SMTP id b28-20020ac5c75c000000b004d40ef9719dmr340907vkn.5.1711471399647;
-        Tue, 26 Mar 2024 09:43:19 -0700 (PDT)
-Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id fn12-20020a056122298c00b004d8949c60d0sm465244vkb.10.2024.03.26.09.43.18
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Mar 2024 09:43:19 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v1] Bluetooth: hci_sync: Fix not checking error on hci_cmd_sync_cancel_sync
-Date: Tue, 26 Mar 2024 12:43:17 -0400
-Message-ID: <20240326164317.1460864-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.44.0
+        d=1e100.net; s=20230601; t=1711472223; x=1712077023;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IU22RLww3/XOivsSv4VG6tutKJTJKSIdnxTJz7w+A7w=;
+        b=jfTIOkq7oh+4neD1K6WgzXmcOR3/q3O4p0YXiGXEsdro1rxxkBIuYMPwXZ18X3ClRV
+         zJREihTa19G9Zvg0hNE06GQoMsbZMs8E2I3UhEx02UqXdvjH6SZYwHLjRb2UwSQu5SQH
+         i71asi9zdYrSMBMOMBaueNgVafiZ1OG14Rr/fjjXpccOmY5SltWnyJ3e1cpzqYwWbi0D
+         sqKt5pMjJYb/IwIScEQEUsj7Wv7eUO/MA23/sVD4UiZxECOL8HxmK7yj2OaUQfLVfceJ
+         u7eiuL3Oq94o57VtsfANMONhULfQscvJurUSgXc99ZfArjw32xgOlKrBIyRAfws6S4vx
+         nPMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVWkxQv/G48hyzhWY/XwriG075YVHO8r3hXMO7jhcCVacdSkUJW21gCXFQ8vI6canEfnl64YOCNZ00AshoYfiflveS7ZHkp1kT291AhHq6W7yWRvwikW0vb0jg6VBJOzPtlyIPU1tFiZxK8NVeJ
+X-Gm-Message-State: AOJu0YxPvNAMv9ReoBwELDWHTU4NiDPJDAqRJ0XVuCrGLoN6Vsj1crZi
+	RpAenAY2eQjhgYLvbFuwPwhGEOAbnH4rzxKmLHD2u6+fALQYiNBekhHH3uvt4UUmzoEo/mHwNRG
+	6ZuWwSGPkDrkrqDnepbw0NC76KX7b/CbZ09k=
+X-Google-Smtp-Source: AGHT+IG1ZbFTx/MVVy6KI+dZ/kXiCyWDzCYWscY6etooM2mCnGEIMPlRg7hdSoLTGuQbmIXPG1EoR/a1KhikHD0w/O4=
+X-Received: by 2002:a2e:b8cb:0:b0:2d2:dac3:90f with SMTP id
+ s11-20020a2eb8cb000000b002d2dac3090fmr157304ljp.52.1711472222756; Tue, 26 Mar
+ 2024 09:57:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <08275279-7462-4f4a-a0ee-8aa015f829bc@leemhuis.info>
+In-Reply-To: <08275279-7462-4f4a-a0ee-8aa015f829bc@leemhuis.info>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 26 Mar 2024 12:56:50 -0400
+Message-ID: <CABBYNZKDa9KR8A_4TbpPyiLWFFH22T=Z9jk7N=o6U+z1oB+7vg@mail.gmail.com>
+Subject: Re: [REGRESSION] Oops during init in btintel_read_debug_features with
+ today's mainline
+To: Thorsten Leemhuis <linux@leemhuis.info>
+Cc: Marcel Holtmann <marcel@holtmann.org>, 
+	Linux kernel regressions list <regressions@lists.linux.dev>, 
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Thorsten,
 
-hci_cmd_sync_cancel_sync shall check the error passed to it since it
-will be propagated using req_result which is __u32 it needs to be
-properly set to a positive value if it was passed as negative othertise
-IS_ERR will not trigger as -(errno) would be converted to a positive
-value.
+On Tue, Mar 26, 2024 at 4:44=E2=80=AFAM Thorsten Leemhuis <linux@leemhuis.i=
+nfo> wrote:
+>
+> Lo! Just booted 6.9 for the first time and noticed the Bluetooth code
+> causes an Oops (see below) during boot that did not happen with 6.8 and
+> earlier. This is on Fedora 40 with a vanilla kernel on a Lenovo Thinkpad
+> T14s Gen1 AMD.
+>
+> Do I need to bisect this? Or is this known already? Or does anyone by
+> chance an idea what might cause this? Or is there some other way to get
+> down to the problem?
+>
+> Ciao, Thorsten
+>
+> [Full dmesg: https://www.leemhuis.info/files/misc/dmesg-6.9-btprob]
+>
+> [   19.903869] Bluetooth: hci0: Found device firmware: intel/ibt-20-1-3.s=
+fi
+> [   19.903908] Bluetooth: hci0: Boot Address: 0x24800
+> [   19.903913] Bluetooth: hci0: Firmware Version: 255-255.255
+> [   19.906245] usb 6-4: USB disconnect, device number 3
+> [   19.906364] usb 2-2: Found UVC 1.50 device Integrated Camera (04f2:b6c=
+b)
+> [   19.906583] Bluetooth: hci0: FW download error recovery failed (-19)
+> [   19.906649] Bluetooth: hci0: sending frame failed (-19)
+> [   19.906666] BUG: kernel NULL pointer dereference, address: 00000000000=
+00070
+> [   19.906672] #PF: supervisor read access in kernel mode
+> [   19.906677] #PF: error_code(0x0000) - not-present page
+> [   19.906681] PGD 0 P4D 0
+> [   19.906688] Oops: 0000 [#1] PREEMPT SMP NOPTI
+> [   19.906701] Hardware name: LENOVO 20UH001HGE/20UH001HGE, BIOS R1CET77W=
+(1.46 ) 10/26/2023
+> [   19.906706] Workqueue: hci0 hci_power_on [bluetooth]
+> [   19.906775] RIP: 0010:btintel_read_debug_features (/usr/src/debug/[...=
+]/drivers/bluetooth/btintel.c:1306) btintel
 
-Fixes: 711c35949648 ("Bluetooth: hci_core: Cancel request on command timeout")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/hci_core.c | 6 +++---
- net/bluetooth/hci_sync.c | 5 ++++-
- 2 files changed, 7 insertions(+), 4 deletions(-)
+Seem like the following could be reason:
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 1690ae57a09d..a7028d38c1f5 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2874,7 +2874,7 @@ static void hci_cancel_cmd_sync(struct hci_dev *hdev, int err)
- 	cancel_delayed_work_sync(&hdev->ncmd_timer);
- 	atomic_set(&hdev->cmd_cnt, 1);
- 
--	hci_cmd_sync_cancel_sync(hdev, -err);
-+	hci_cmd_sync_cancel_sync(hdev, err);
- }
- 
- /* Suspend HCI device */
-@@ -2894,7 +2894,7 @@ int hci_suspend_dev(struct hci_dev *hdev)
- 		return 0;
- 
- 	/* Cancel potentially blocking sync operation before suspend */
--	hci_cancel_cmd_sync(hdev, -EHOSTDOWN);
-+	hci_cancel_cmd_sync(hdev, EHOSTDOWN);
- 
- 	hci_req_sync_lock(hdev);
- 	ret = hci_suspend_sync(hdev);
-@@ -4210,7 +4210,7 @@ static void hci_send_cmd_sync(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	err = hci_send_frame(hdev, skb);
- 	if (err < 0) {
--		hci_cmd_sync_cancel_sync(hdev, err);
-+		hci_cmd_sync_cancel_sync(hdev, -err);
- 		return;
- 	}
- 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 639090b9f4b8..8fe02921adf1 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -617,7 +617,10 @@ void hci_cmd_sync_cancel_sync(struct hci_dev *hdev, int err)
- 	bt_dev_dbg(hdev, "err 0x%2.2x", err);
- 
- 	if (hdev->req_status == HCI_REQ_PEND) {
--		hdev->req_result = err;
-+		/* req_result is __u32 so error must be positive to be properly
-+		 * propagated.
-+		 */
-+		hdev->req_result = err < 0 ? -err : err;
- 		hdev->req_status = HCI_REQ_CANCELED;
- 
- 		wake_up_interruptible(&hdev->req_wait_q);
--- 
-2.44.0
-
+https://patchwork.kernel.org/project/bluetooth/patch/20240326164317.1460864=
+-1-luiz.dentz@gmail.com/
