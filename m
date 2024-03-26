@@ -1,133 +1,126 @@
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 800611865C;
-	Tue, 26 Mar 2024 16:58:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C90111C694;
+	Tue, 26 Mar 2024 17:05:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711472308; cv=none; b=V9aR13ydGZSkHUJb8GAFCS2cKK8DLPTw6J+oylz2IkC3/EOndNDMVcWekm2rh2U3Hn8pqy07Rrq+7QDb4c1S0eFJdVQEogmtTMVUHbfngTGP9kcxMOYfDxgLZIkyhT9eIcqn4XHAVpt0PE821sMAS3RFLNwikbktqY45hQrJT5w=
+	t=1711472752; cv=none; b=GyTTmL/ZwEL3V8OzRpBT4PaRsxKJKthSslR01kpBQDSQnNVSsdbzGV/jNvD8wf4rTPHKLnYx5pF0451uE9DM3O6aNBkQCLB5zqdiatXrtYzCdM6u59QXx8SRdCSwGbxibjo9tYuJx6wU7l6FFjPWDKV517wLl+xmT7l0MJRGZRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711472308; c=relaxed/simple;
-	bh=50BqQDcDVQNITuDK3eJNa0b+mguy7/AkzhyNXxuLwAs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fIQuEmo5Z0GEqGR9YD2tP5IF4wddFGRUmRi3Szq28+ENRrNtoejjJpT0xeQ3Amn6l50xUYLUErV9tY8l+bFipNTqhEUuM6h17ROwtRmv3SmEepfpuup3jrHX+kzzJPhqoTq8WseS/WcVxpL1NMEG2izE+mTiy1Auk8VrB/oMbf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E6zriJyu; arc=none smtp.client-ip=209.85.208.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1711472752; c=relaxed/simple;
+	bh=71bc6Icg2W+tsc/KrncHz55w8fQK/AdKxcY+zxw842I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DYQgTcG3yMFa4SlGZnU3TJJPpf5FSc9rarbIcpWhdtGk8+sEjQaqQrTRLZCpaFA6pVkZcuiaY3s1eIAT+/hqufIua+Oe6bPll1tWgeHEmGTljbehsLmpTdSI3p/H6esehtMYkwLQSHRb5/Ml7envCt/2rjcmnow9KgmL33oZDqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f8Z0eTCE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E6zriJyu"
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2d6eedf3e99so6454431fa.1;
-        Tue, 26 Mar 2024 09:58:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711472305; x=1712077105; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=50BqQDcDVQNITuDK3eJNa0b+mguy7/AkzhyNXxuLwAs=;
-        b=E6zriJyuOAgFrT6Sr+C6C19vUFvatjLmIpfKFaUs9M1mjP3KmEct4vfmvQhHDZs6Qc
-         xiK2CH9QvNh2wxtGMcExn1naF0AFMrhqZ7OX3RRf6JsL1L30AohNjl9ON5Qd4O56BRJy
-         XmN6VKJHbO7AsNe8O1Gl9OqtZ/ooMKf0CJUS5JGhuvPyZdm0o7dOyt82/2CRcPayyz1y
-         34iV+OuAQgFXmvoeuhhAF8Fma6AxLRdgOqkYaeDZ4O+iBuMyR+I/KKcguzvSEGv3eU/S
-         l3e2kMCeGlKxNOifCEmjTnph0RVW1kEdQnUJ9+7BrUI5iOeRjx+TcIJmnMD8fkCYiOQM
-         J+LA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711472305; x=1712077105;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=50BqQDcDVQNITuDK3eJNa0b+mguy7/AkzhyNXxuLwAs=;
-        b=oh501KOeghLRTzk20Iq6SGTunOAy5VMpRXP71NJ6/dUoXk9RBefv2lxWdOdM1iUZQf
-         GOpQdpxpu40meCxYEJoYW86A1/PeiE3HRBbcb597sd4zL0RGSnEyIKrzkZ8cYvpkMk7e
-         /R3+4l64oP1HvYKdeCH+nONDTJ179waQWLbbuYEyXBtoPwIW9YAig9nLUHl6cqJBoWVm
-         FsOD/YaLbgeWatwC4h9Pjx0q/41jSEllSSF7u0QsbH49VNzLYigUY2BA+/16Hrlimg39
-         Yt2L2CM3rw1vRnN2lPzPnlxeGb9sLTgtojNg+EYIhDoqRZV99rKwEBAPdODq6yA8cauz
-         r4rA==
-X-Forwarded-Encrypted: i=1; AJvYcCWJM/+hNpPVl5A7nidcwFMHmV17sFGyOJKWq3XC3yjsoWbrINbkvncoLe7eNGADXqqhTzZvjtPUfzPc5Wv1daNxRKsToQIiolGAghSV+z2eQD64KbVMScZYqj5dFMiIzuDpUpVmDttPmCIxnO3JoL0evwXrcYTcevT3O/MnJB5ooU9DclIV
-X-Gm-Message-State: AOJu0YwNve6HyfLmD4bNj5DygkNJPq0zyr2sOE9Zjr7PzKuXnjfYpzHt
-	gWQXcZZMOfMgL1fMCjT1PFQVRjSvSHLkIRMi1bA9P7Giq2YZ71G9AuFIZ0JQiqi7QHBLfkRNSK4
-	xu9h/Cn3m8o2gJGEpqQwkTRk3ng8=
-X-Google-Smtp-Source: AGHT+IEuCe2UdhWsZ9pv7297ZbfrjwO9PvFFV1b1MMnC3eyQey151SCgwgx3p7p9BMN5BYGkpdafNnXXiZTJJYvS5Vg=
-X-Received: by 2002:a2e:a374:0:b0:2d4:6d2a:2df7 with SMTP id
- i20-20020a2ea374000000b002d46d2a2df7mr753307ljn.18.1711472304649; Tue, 26 Mar
- 2024 09:58:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f8Z0eTCE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 378A0C433F1;
+	Tue, 26 Mar 2024 17:05:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711472751;
+	bh=71bc6Icg2W+tsc/KrncHz55w8fQK/AdKxcY+zxw842I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=f8Z0eTCE91cnVLMjLsMZ5XnbXj46lolCBrEa2MuMCeOGKl2oNVv8YsfvE+OcWzfiR
+	 2zZEvqlWd85/5mlWV+X3+eev3YcTeIbNtOytfIp97MmTfdvIP4a8oe/9oP5jsqhEih
+	 KrEshn1lL9OneLTXy5A3ktgc7q0v/8hHhC+hUFQCQe22on3BOwFw+XtA/vv/IvGayB
+	 hftb7+vs2AaKRqiZXmwNOIiE5v8kPXZX7paNsjz/IcH0HAfnNg+xjjp2EiWvbaYZEf
+	 Myua/CeRUH2RRkxwg1P1O6ahhk60xu6EUI2aj/SxXWACo5VfjhGitiA4EGDc9nzM2I
+	 xLIGc7N/yvZgQ==
+Received: from johan by xi.lan with local (Exim 4.97.1)
+	(envelope-from <johan@kernel.org>)
+	id 1rpAFK-000000006pW-44Tm;
+	Tue, 26 Mar 2024 18:05:59 +0100
+Date: Tue, 26 Mar 2024 18:05:58 +0100
+From: Johan Hovold <johan@kernel.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Kalle Valo <kvalo@kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Alex Elder <elder@linaro.org>,
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Abel Vesa <abel.vesa@linaro.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Lukas Wunner <lukas@wunner.de>,
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-wireless@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
+	linux-pm@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	ath11k@lists.infradead.org
+Subject: Re: [PATCH v6 04/16] dt-bindings: net: wireless: qcom,ath11k:
+ describe the ath11k on QCA6390
+Message-ID: <ZgMAdvEADhJ8TXa9@hovoldconsulting.com>
+References: <20240325131624.26023-1-brgl@bgdev.pl>
+ <20240325131624.26023-5-brgl@bgdev.pl>
+ <87r0fy8lde.fsf@kernel.org>
+ <CAMRc=Mc2Tc8oHr5NVo=aHAADkJtGCDAVvJs+7V-19m2zGi-vbw@mail.gmail.com>
+ <87frwe8jiu.fsf@kernel.org>
+ <CAMRc=MdCv+vTMZML-wzRQqZZavquV3DABYM4KYw-HwqS47sTyw@mail.gmail.com>
+ <874jct10yf.fsf@kernel.org>
+ <CAMRc=Me5ef_kFDz0SyGZb4S+2Ma4i=Fek_tzwj+bYD4DGSV4mA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CABBYNZJ0ukd_8=SFzy8CEwgP7hV5unodca0NZ2zDZh+jPJsEFQ@mail.gmail.com>
- <ZgGzWWV4Lh2Nal--@hovoldconsulting.com> <CABBYNZJaXUhu1A+NyVT-TAJw49zcV6TMdGeVy2F+AVKWBOVC-g@mail.gmail.com>
- <ZgHVFjAZ1uqEiUa2@hovoldconsulting.com> <CABBYNZJUVhNKVD=s+=eYJ1q+j1W8rVSRqM4bKPbxT=TKrnZdoQ@mail.gmail.com>
- <ZgHbPo57UKUxK7G8@hovoldconsulting.com> <CABBYNZJFzDaLdXsdNEP1384JaJEN5E78cgmWfOus_LGOREGsWA@mail.gmail.com>
- <ZgJ0okobGv5nPreG@hovoldconsulting.com> <CABBYNZKJJuPHEwyXFRi8Z=P0GyaY-HdamsxmV8sR+R97ETTmEg@mail.gmail.com>
- <ZgLnOHiCzo5AQzra@hovoldconsulting.com> <ZgL10ur0825LgWVK@hovoldconsulting.com>
-In-Reply-To: <ZgL10ur0825LgWVK@hovoldconsulting.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 26 Mar 2024 12:58:12 -0400
-Message-ID: <CABBYNZ+1vXi51YbcfqaHTwW+z7OL=yDCuab6X8eDB-q+CoO+7w@mail.gmail.com>
-Subject: Re: [PATCH] Revert "Bluetooth: hci_qca: Set BDA quirk bit if fwnode
- exists in DT"
-To: Johan Hovold <johan@kernel.org>
-Cc: Linux regressions mailing list <regressions@lists.linux.dev>, Johan Hovold <johan+linaro@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
-	Janaki Ramaiah Thota <quic_janathot@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMRc=Me5ef_kFDz0SyGZb4S+2Ma4i=Fek_tzwj+bYD4DGSV4mA@mail.gmail.com>
 
-Hi Johan,
+On Tue, Mar 26, 2024 at 05:32:55PM +0100, Bartosz Golaszewski wrote:
+> On Tue, Mar 26, 2024 at 4:12 PM Kalle Valo <kvalo@kernel.org> wrote:
 
-On Tue, Mar 26, 2024 at 12:20=E2=80=AFPM Johan Hovold <johan@kernel.org> wr=
-ote:
->
-> Hi Luiz,
->
-> On Tue, Mar 26, 2024 at 04:18:16PM +0100, Johan Hovold wrote:
-> > On Tue, Mar 26, 2024 at 10:17:13AM -0400, Luiz Augusto von Dentz wrote:
-> > > On Tue, Mar 26, 2024 at 3:09=E2=80=AFAM Johan Hovold <johan@kernel.or=
-g> wrote:
-> > > > On Mon, Mar 25, 2024 at 04:31:53PM -0400, Luiz Augusto von Dentz wr=
-ote:
->
-> > > > > All the
-> > > > > CI automation is done on bluetooth-next and if you are asking to =
-be
-> > > > > done via bluetooth tree which is based on the latest rc that is n=
-ot
-> > > > > how things works here, we usually first apply to bluetooth-next a=
-nd in
-> > > > > case it needs to be backported then it later done via pull-reques=
-t.
-> > > >
-> > > > The revert fixes a regression in 6.7-rc7 and should get to Linus as=
- soon
-> > > > as possible and I assume you have some way to get fixes into mainli=
-ne
-> > > > for the current development cycle.
+> > >> Adding also Johan and ath11k list. For example, I don't know what's the
+> > >> plan with Lenovo X13s, will it use this framework? I guess in theory we
+> > >> could have devices which use qcom,ath11k-calibration-variant from DT but
+> > >> not any of these supply properties?
 > > >
-> > > Yeah I will send it later today to be included in the next rc release
-> > > and since it is marked for stable that shall trigger the process of
-> > > backporting it.
+> > > Good point. I will receive the X13s in a month from now. I do plan on
+> > > upstreaming correct support for WLAN and BT for it as well.
 > > >
-> > > > The series fixes a critical bug in the Qualcomm driver and should
-> > > > similarly get into mainline as soon as possible to avoid having peo=
-ple
-> > > > unknowingly start relying on the broken behaviour (reversed address=
-).
-> > > > The bug in this case is older, but since the bug is severe and we'r=
-e
-> > > > only at rc1, I don't think this one should wait for 6.10 either.
->
-> I just double checked the bluetooth-next branch and everything looks
-> good now (revert + endianness fix series). Thanks!
->
-> Did I understand you correctly that you'll be able to get all five
-> commits into 6.9 during this development cycle (e.g. 6.9-rc2)?
+> > > I guess we can always relax the requirements once a valid use-case appears?
+> >
+> > I think we have such cases already now:
+> >
+> > $ git grep ath11k-calibration-variant -- arch
+> > arch/arm64/boot/dts/qcom/qcm6490-fairphone-fp5.dts:     qcom,ath11k-calibration-variant = "Fairphone_5";
+> > arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts:                     qcom,ath11k-calibration-variant = "LE_X13S";
+> >
+> > But please do check that. I'm no DT expert :)
+> 
+> You're thinking about making the required: field depend on the value
+> of qcom,ath11k-calibration-variant? Am I getting this right?
 
-Yep, I will be preparing a pull-request with them later this week,
-there are some other fixes that I want to get in as well.
+No, I think Kalle is worried about requiring the supply properties for
+certain PCI device ids, in case we have existing or future devicetrees
+with those ids that did not specify them or that need not specify them
+(e.g. any PC modules).
 
+Currently we only have the X13s controller in mainline being described
+by a PCIe endpoint node in DT, but it has a different id ("pci17cb,1103"
+instead of "pci17cb,1101" which you are adding here).
 
---=20
-Luiz Augusto von Dentz
+The Fairphone controller is apparently not a PCI device at all.
+
+Johan
