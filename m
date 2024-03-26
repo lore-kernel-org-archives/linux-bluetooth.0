@@ -1,99 +1,113 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f48.google.com (mail-ua1-f48.google.com [209.85.222.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E73B13CA98;
-	Tue, 26 Mar 2024 16:20:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 214C26CDD9
+	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Mar 2024 16:26:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711470027; cv=none; b=Fw4GL4TrfuRDdq7Gpqb6IDhhkJ4Mr6nXSTj5g5tjPHpKviFSvVwNqdAXVa7qbDwdMqt7ZXcQu+zeNFL2g8mbismeGw0d38j/6BDO1lOdCvD+1okBB/7ZccwyTkHUuh4XdfNqHtPSGGzgcg2RhwXMDGjmlsG1KVRcP+rlTaO63wA=
+	t=1711470408; cv=none; b=UvSv+wmMoGBHy+9NRrBlhOxQnD/4PH588T/mcGkAubWI4ktMA9062ZGnM2Rnrymav2BPbE6wGNXZW4ccpoBoJOKvsRNawMmp2J7Hrp5bS6i3Y0XmVSf9EEfI9rmYnz3v83H5j8BMZMrBLFyRCF2KKLHAHIV36Oeqq3WkoHCrzlw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711470027; c=relaxed/simple;
-	bh=tH7ShG5e19q5dk8DGs/7rFZaClfulgISrGFPuWcP0mg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CWAkjnaQ1RMfxJ58iRTpgBFDJVYthH8VLGqhuMzy8ShmMWfbB0sREts2gNmmNku0lYma4XhaWgAmoud6U135rXq1jjTPvZhHJn1Vneiqj5Rz+tl3i3Rtc+C0/CYv9aaa3IRjD07a2R0IF3vhoe9mEfnitb08LSet+FGkD++e8lY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e6C92dz6; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711470408; c=relaxed/simple;
+	bh=webspxOA/u6u3QNP3nqrQpRn8ISwU7Z91ZYFrkfXyvQ=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=ZRTta1NYu8U2sQjEQ9rkA5NjiMYizmG0HC/xuC77enVzPicVFiyuoVUeUUwO+tQdKL3wyvaLj8E37AKVDaeiDJyahRwUcpSkmMH31EafA7KCllUXUy+qMgDO2Joc9kJLlFDkgsVeh35ID6T+wOI4bCnZCMji3uxPp3xc2NwkSdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F8RPlA2+; arc=none smtp.client-ip=209.85.222.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e6C92dz6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3EE8C43394;
-	Tue, 26 Mar 2024 16:20:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711470026;
-	bh=tH7ShG5e19q5dk8DGs/7rFZaClfulgISrGFPuWcP0mg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=e6C92dz6raZp0WrjtLHCxqpCcVWV3awH3jwOkT/LShocw+towYCYzHIpMxVqVR6ci
-	 S4vUVgmYGNay0dotswGf42xd6YmI7FN3UtHnq6i4yoeLo+CYBvI39oh+zvkPu/nwP6
-	 ze88G0lKQJKrmGrEVoi348mOb39+eZjNn3WGMk9Elebb301GZ8pneFWt9kNFD/0BoR
-	 C2ADW6obNGlsFyXcw3F6Z0qvBucbUllRtd/Dd06q/8Xx85VfeplO6YXdN3Kd3Ia0RI
-	 O4dyir2E/RrcwhToChH4LNMoUI3HwPM4CWyWULbzkCZysMCLqQdXDQiswmdtYCXJOZ
-	 munyLNIT7r7zQ==
-Received: from johan by xi.lan with local (Exim 4.97.1)
-	(envelope-from <johan@kernel.org>)
-	id 1rp9XO-000000006Yi-1ZUs;
-	Tue, 26 Mar 2024 17:20:35 +0100
-Date: Tue, 26 Mar 2024 17:20:34 +0100
-From: Johan Hovold <johan@kernel.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Linux regressions mailing list <regressions@lists.linux.dev>,
-	Johan Hovold <johan+linaro@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Janaki Ramaiah Thota <quic_janathot@quicinc.com>
-Subject: Re: [PATCH] Revert "Bluetooth: hci_qca: Set BDA quirk bit if fwnode
- exists in DT"
-Message-ID: <ZgL10ur0825LgWVK@hovoldconsulting.com>
-References: <CABBYNZJ0ukd_8=SFzy8CEwgP7hV5unodca0NZ2zDZh+jPJsEFQ@mail.gmail.com>
- <ZgGzWWV4Lh2Nal--@hovoldconsulting.com>
- <CABBYNZJaXUhu1A+NyVT-TAJw49zcV6TMdGeVy2F+AVKWBOVC-g@mail.gmail.com>
- <ZgHVFjAZ1uqEiUa2@hovoldconsulting.com>
- <CABBYNZJUVhNKVD=s+=eYJ1q+j1W8rVSRqM4bKPbxT=TKrnZdoQ@mail.gmail.com>
- <ZgHbPo57UKUxK7G8@hovoldconsulting.com>
- <CABBYNZJFzDaLdXsdNEP1384JaJEN5E78cgmWfOus_LGOREGsWA@mail.gmail.com>
- <ZgJ0okobGv5nPreG@hovoldconsulting.com>
- <CABBYNZKJJuPHEwyXFRi8Z=P0GyaY-HdamsxmV8sR+R97ETTmEg@mail.gmail.com>
- <ZgLnOHiCzo5AQzra@hovoldconsulting.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F8RPlA2+"
+Received: by mail-ua1-f48.google.com with SMTP id a1e0cc1a2514c-7e101b8fed9so979858241.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Mar 2024 09:26:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711470405; x=1712075205; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=IEAF3A8m05rv0jBI1u3aH9jwFP4DdhRk4k2kk5uVb80=;
+        b=F8RPlA2+TIT0j1jDlcUjv96dNSboKb6K/eHTEd4YC68/Y/Lzi9ui8rQuJ0BAux2BXj
+         GpgaPk0QZtKzhDiktyQ/cDvjL5nbO2GSEUkD7oZc0SaVG0tmlYJypxlSgjV7WO/FxaSc
+         2y+hBLnMBQTIqI6pi/fRusR03qkR5Z+YO2TbydQBC9jSTGJTWPUXneRwoWCt2+buCu28
+         eXL5e2nkuxn82hl6nfOZ3KuHooICizGNyqXJI0ArbA5lHHLERG+Hk9Q6zTjYQ5jkhMvE
+         30x6cq97uyYFvne18KJAwDxJSaBI32HVoAFMSINfNKYdSOFYTydlCRjrk9x9zJfs4NAt
+         ZVWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711470405; x=1712075205;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IEAF3A8m05rv0jBI1u3aH9jwFP4DdhRk4k2kk5uVb80=;
+        b=BZHxIwk5r5MfQ8abBAwa4avgdZAz0tFe99lqhsid/398wAzLpdEorEBoErq3pEupFl
+         2Q0ncSsg6A42DzKBVEC7LNEoam50nDd8JTjo0QNAo3dacomdRX8eOV/zRZp8FSIpz7kc
+         RVaK29ygxOmXFvwzVremxaSMkCz1ipvKdbCR05BPtiNbX57D8P5DJ+/0x3PhEyulYLCt
+         lkPWw5qEZLcNdvh5vn/+6Vx8iL8UTpqpwUQn2omvaXTJa14UPkEAfE6JA80N5ZtDhLSw
+         KuX0/a8+CPGeWYjhAx7M/IpEn+mu4vMv8+5pR8zJAx6ZN+vxizr72Qm4YX67pBCit0Wr
+         rEoQ==
+X-Gm-Message-State: AOJu0Yx/a1zF0fNotdDt/AJuw0hD9eFntu/Noc/WU/qu+CGVFS0wNJsm
+	YGZ/uhfE5eNA/P75+8mig6O6Y4TzJu7kNX29aa9/2X5YwQOznUqUezF5C7JB
+X-Google-Smtp-Source: AGHT+IG8J1/UWz9zSgHezIVKoMObl1KUK/i+fBs4RzLXn5ne7+kKlx6m+IVLUgfW5ymAHpt20p3G/Q==
+X-Received: by 2002:a67:c410:0:b0:476:de63:c6de with SMTP id c16-20020a67c410000000b00476de63c6demr1872945vsk.24.1711470404198;
+        Tue, 26 Mar 2024 09:26:44 -0700 (PDT)
+Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id r25-20020a67ea59000000b0046d2de55f2csm1321497vso.15.2024.03.26.09.26.42
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Mar 2024 09:26:43 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v1] Bluetooth: ISO: Don't reject BT_ISO_QOS if parameters are unset
+Date: Tue, 26 Mar 2024 12:26:42 -0400
+Message-ID: <20240326162642.1459442-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZgLnOHiCzo5AQzra@hovoldconsulting.com>
 
-Hi Luiz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Tue, Mar 26, 2024 at 04:18:16PM +0100, Johan Hovold wrote:
-> On Tue, Mar 26, 2024 at 10:17:13AM -0400, Luiz Augusto von Dentz wrote:
-> > On Tue, Mar 26, 2024 at 3:09 AM Johan Hovold <johan@kernel.org> wrote:
-> > > On Mon, Mar 25, 2024 at 04:31:53PM -0400, Luiz Augusto von Dentz wrote:
+Consider certain values (0x00) as unset and load proper default if
+an application has not set them properly.
 
-> > > > All the
-> > > > CI automation is done on bluetooth-next and if you are asking to be
-> > > > done via bluetooth tree which is based on the latest rc that is not
-> > > > how things works here, we usually first apply to bluetooth-next and in
-> > > > case it needs to be backported then it later done via pull-request.
-> > >
-> > > The revert fixes a regression in 6.7-rc7 and should get to Linus as soon
-> > > as possible and I assume you have some way to get fixes into mainline
-> > > for the current development cycle.
-> > 
-> > Yeah I will send it later today to be included in the next rc release
-> > and since it is marked for stable that shall trigger the process of
-> > backporting it.
-> > 
-> > > The series fixes a critical bug in the Qualcomm driver and should
-> > > similarly get into mainline as soon as possible to avoid having people
-> > > unknowingly start relying on the broken behaviour (reversed address).
-> > > The bug in this case is older, but since the bug is severe and we're
-> > > only at rc1, I don't think this one should wait for 6.10 either.
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/iso.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-I just double checked the bluetooth-next branch and everything looks
-good now (revert + endianness fix series). Thanks!
-
-Did I understand you correctly that you'll be able to get all five
-commits into 6.9 during this development cycle (e.g. 6.9-rc2)?
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index c8793e57f4b5..d24148ea883c 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -1451,8 +1451,8 @@ static bool check_ucast_qos(struct bt_iso_qos *qos)
  
-Johan
+ static bool check_bcast_qos(struct bt_iso_qos *qos)
+ {
+-	if (qos->bcast.sync_factor == 0x00)
+-		return false;
++	if (!qos->bcast.sync_factor)
++		qos->bcast.sync_factor = 0x01;
+ 
+ 	if (qos->bcast.packing > 0x01)
+ 		return false;
+@@ -1475,6 +1475,9 @@ static bool check_bcast_qos(struct bt_iso_qos *qos)
+ 	if (qos->bcast.skip > 0x01f3)
+ 		return false;
+ 
++	if (!qos->bcast.sync_timeout)
++		qos->bcast.sync_timeout = BT_ISO_SYNC_TIMEOUT;
++
+ 	if (qos->bcast.sync_timeout < 0x000a || qos->bcast.sync_timeout > 0x4000)
+ 		return false;
+ 
+@@ -1484,6 +1487,9 @@ static bool check_bcast_qos(struct bt_iso_qos *qos)
+ 	if (qos->bcast.mse > 0x1f)
+ 		return false;
+ 
++	if (!qos->bcast.timeout)
++		qos->bcast.sync_timeout = BT_ISO_SYNC_TIMEOUT;
++
+ 	if (qos->bcast.timeout < 0x000a || qos->bcast.timeout > 0x4000)
+ 		return false;
+ 
+-- 
+2.43.0
+
