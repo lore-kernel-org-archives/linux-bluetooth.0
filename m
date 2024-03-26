@@ -1,82 +1,57 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C90111C694;
-	Tue, 26 Mar 2024 17:05:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5CC51BC30;
+	Tue, 26 Mar 2024 17:07:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711472752; cv=none; b=GyTTmL/ZwEL3V8OzRpBT4PaRsxKJKthSslR01kpBQDSQnNVSsdbzGV/jNvD8wf4rTPHKLnYx5pF0451uE9DM3O6aNBkQCLB5zqdiatXrtYzCdM6u59QXx8SRdCSwGbxibjo9tYuJx6wU7l6FFjPWDKV517wLl+xmT7l0MJRGZRo=
+	t=1711472873; cv=none; b=P1D7L3av1sRDgqAiV2/lEQBkL0FrWrAjOyRl+eY4Y1LWh3tXoEZrVRkpc7MLOujdAH91h3wecgJzAgUzra8TjKaES/XgBV2yNcX9cxQ2lUPLYntba/rqsayjOI4w2cvDHMpCulEDOxvIkfTOn39tHYbvsAqUoLeX3eboo9ZGvso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711472752; c=relaxed/simple;
-	bh=71bc6Icg2W+tsc/KrncHz55w8fQK/AdKxcY+zxw842I=;
+	s=arc-20240116; t=1711472873; c=relaxed/simple;
+	bh=apTnrnce0SUkwLXn+Zd0KKmK+W2FLOA6q7nRFX2NOCs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DYQgTcG3yMFa4SlGZnU3TJJPpf5FSc9rarbIcpWhdtGk8+sEjQaqQrTRLZCpaFA6pVkZcuiaY3s1eIAT+/hqufIua+Oe6bPll1tWgeHEmGTljbehsLmpTdSI3p/H6esehtMYkwLQSHRb5/Ml7envCt/2rjcmnow9KgmL33oZDqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f8Z0eTCE; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=TxswqI5R4Bs3XMRmDrYdFagyr1LG2B+ASbgXWWInW6ewnE56d8AhgJqarYU6CRsKSI9CN28YVY4z6w0VP0N3bOPBAKV1QGs/nrghYWBeZwPP7GmMHcWVFiWp+23AzRpRzMgkvU3JQJe88LmhcqSRllKG5LPV3kG0NVueTFTsLv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HOMBDpkx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f8Z0eTCE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 378A0C433F1;
-	Tue, 26 Mar 2024 17:05:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HOMBDpkx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78C52C433C7;
+	Tue, 26 Mar 2024 17:07:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711472751;
-	bh=71bc6Icg2W+tsc/KrncHz55w8fQK/AdKxcY+zxw842I=;
+	s=k20201202; t=1711472872;
+	bh=apTnrnce0SUkwLXn+Zd0KKmK+W2FLOA6q7nRFX2NOCs=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=f8Z0eTCE91cnVLMjLsMZ5XnbXj46lolCBrEa2MuMCeOGKl2oNVv8YsfvE+OcWzfiR
-	 2zZEvqlWd85/5mlWV+X3+eev3YcTeIbNtOytfIp97MmTfdvIP4a8oe/9oP5jsqhEih
-	 KrEshn1lL9OneLTXy5A3ktgc7q0v/8hHhC+hUFQCQe22on3BOwFw+XtA/vv/IvGayB
-	 hftb7+vs2AaKRqiZXmwNOIiE5v8kPXZX7paNsjz/IcH0HAfnNg+xjjp2EiWvbaYZEf
-	 Myua/CeRUH2RRkxwg1P1O6ahhk60xu6EUI2aj/SxXWACo5VfjhGitiA4EGDc9nzM2I
-	 xLIGc7N/yvZgQ==
+	b=HOMBDpkx2VhmMjbiHfu/i/5327cpKQV8Q9JdMMFnm7NH4GySlKkSMl1L03sElfHoE
+	 GkvhGU9usasbKxfLBA5El69ZtgPf7mDqqy/5PqJuy3Vnaga8HWX+vopcyEPfSZhF0/
+	 CrVYWvy/G+sW3bVBmnaqgcrsgQSqYcHasKu4SW7VmaQBbcyQMsiVb8i1ibCey4Kk8f
+	 IVb8ZR39fivzgh0oRLM077T2kVeI4ZhuWx5mKkW1c7IakJjkQ1dWt+fjTRxNOa8tfm
+	 yDP6MR2/VWkbRbXnJyjRwzSMj0a+u+9qeOh+EL8qXpieCPXPh5Q4U/uFVmxV0kXsBZ
+	 HXUzg8rt0lZcg==
 Received: from johan by xi.lan with local (Exim 4.97.1)
 	(envelope-from <johan@kernel.org>)
-	id 1rpAFK-000000006pW-44Tm;
-	Tue, 26 Mar 2024 18:05:59 +0100
-Date: Tue, 26 Mar 2024 18:05:58 +0100
+	id 1rpAHJ-000000006pz-0gDZ;
+	Tue, 26 Mar 2024 18:08:01 +0100
+Date: Tue, 26 Mar 2024 18:08:01 +0100
 From: Johan Hovold <johan@kernel.org>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Kalle Valo <kvalo@kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Alex Elder <elder@linaro.org>,
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Abel Vesa <abel.vesa@linaro.org>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Lukas Wunner <lukas@wunner.de>,
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-wireless@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
-	linux-pm@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	ath11k@lists.infradead.org
-Subject: Re: [PATCH v6 04/16] dt-bindings: net: wireless: qcom,ath11k:
- describe the ath11k on QCA6390
-Message-ID: <ZgMAdvEADhJ8TXa9@hovoldconsulting.com>
-References: <20240325131624.26023-1-brgl@bgdev.pl>
- <20240325131624.26023-5-brgl@bgdev.pl>
- <87r0fy8lde.fsf@kernel.org>
- <CAMRc=Mc2Tc8oHr5NVo=aHAADkJtGCDAVvJs+7V-19m2zGi-vbw@mail.gmail.com>
- <87frwe8jiu.fsf@kernel.org>
- <CAMRc=MdCv+vTMZML-wzRQqZZavquV3DABYM4KYw-HwqS47sTyw@mail.gmail.com>
- <874jct10yf.fsf@kernel.org>
- <CAMRc=Me5ef_kFDz0SyGZb4S+2Ma4i=Fek_tzwj+bYD4DGSV4mA@mail.gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Linux regressions mailing list <regressions@lists.linux.dev>,
+	Johan Hovold <johan+linaro@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+Subject: Re: [PATCH] Revert "Bluetooth: hci_qca: Set BDA quirk bit if fwnode
+ exists in DT"
+Message-ID: <ZgMA8WdRVeOjbxun@hovoldconsulting.com>
+References: <CABBYNZJaXUhu1A+NyVT-TAJw49zcV6TMdGeVy2F+AVKWBOVC-g@mail.gmail.com>
+ <ZgHVFjAZ1uqEiUa2@hovoldconsulting.com>
+ <CABBYNZJUVhNKVD=s+=eYJ1q+j1W8rVSRqM4bKPbxT=TKrnZdoQ@mail.gmail.com>
+ <ZgHbPo57UKUxK7G8@hovoldconsulting.com>
+ <CABBYNZJFzDaLdXsdNEP1384JaJEN5E78cgmWfOus_LGOREGsWA@mail.gmail.com>
+ <ZgJ0okobGv5nPreG@hovoldconsulting.com>
+ <CABBYNZKJJuPHEwyXFRi8Z=P0GyaY-HdamsxmV8sR+R97ETTmEg@mail.gmail.com>
+ <ZgLnOHiCzo5AQzra@hovoldconsulting.com>
+ <ZgL10ur0825LgWVK@hovoldconsulting.com>
+ <CABBYNZ+1vXi51YbcfqaHTwW+z7OL=yDCuab6X8eDB-q+CoO+7w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -86,41 +61,17 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMRc=Me5ef_kFDz0SyGZb4S+2Ma4i=Fek_tzwj+bYD4DGSV4mA@mail.gmail.com>
+In-Reply-To: <CABBYNZ+1vXi51YbcfqaHTwW+z7OL=yDCuab6X8eDB-q+CoO+7w@mail.gmail.com>
 
-On Tue, Mar 26, 2024 at 05:32:55PM +0100, Bartosz Golaszewski wrote:
-> On Tue, Mar 26, 2024 at 4:12 PM Kalle Valo <kvalo@kernel.org> wrote:
+On Tue, Mar 26, 2024 at 12:58:12PM -0400, Luiz Augusto von Dentz wrote:
+> On Tue, Mar 26, 2024 at 12:20 PM Johan Hovold <johan@kernel.org> wrote:
 
-> > >> Adding also Johan and ath11k list. For example, I don't know what's the
-> > >> plan with Lenovo X13s, will it use this framework? I guess in theory we
-> > >> could have devices which use qcom,ath11k-calibration-variant from DT but
-> > >> not any of these supply properties?
-> > >
-> > > Good point. I will receive the X13s in a month from now. I do plan on
-> > > upstreaming correct support for WLAN and BT for it as well.
-> > >
-> > > I guess we can always relax the requirements once a valid use-case appears?
-> >
-> > I think we have such cases already now:
-> >
-> > $ git grep ath11k-calibration-variant -- arch
-> > arch/arm64/boot/dts/qcom/qcm6490-fairphone-fp5.dts:     qcom,ath11k-calibration-variant = "Fairphone_5";
-> > arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts:                     qcom,ath11k-calibration-variant = "LE_X13S";
-> >
-> > But please do check that. I'm no DT expert :)
+> > Did I understand you correctly that you'll be able to get all five
+> > commits into 6.9 during this development cycle (e.g. 6.9-rc2)?
 > 
-> You're thinking about making the required: field depend on the value
-> of qcom,ath11k-calibration-variant? Am I getting this right?
+> Yep, I will be preparing a pull-request with them later this week,
+> there are some other fixes that I want to get in as well.
 
-No, I think Kalle is worried about requiring the supply properties for
-certain PCI device ids, in case we have existing or future devicetrees
-with those ids that did not specify them or that need not specify them
-(e.g. any PC modules).
-
-Currently we only have the X13s controller in mainline being described
-by a PCIe endpoint node in DT, but it has a different id ("pci17cb,1103"
-instead of "pci17cb,1101" which you are adding here).
-
-The Fairphone controller is apparently not a PCI device at all.
+Perfect, thanks!
 
 Johan
