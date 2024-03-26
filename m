@@ -1,115 +1,133 @@
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7DC013CC6E;
-	Tue, 26 Mar 2024 16:57:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 800611865C;
+	Tue, 26 Mar 2024 16:58:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711472226; cv=none; b=c4O4kQuATXK74qtVsqEYJNYgTdiEkgFfiDq3/C9m4W21ytMtJJGf27hlfnhLAu5MqPI+7lB8dxLmUbMSjNnYJHGaTfMmZeUgmB4f/K/WJQmKVeqbJMBiuuVxYXUK2J5HSktSPK4xOZvGnqcbibsItLZom9rjucPXlyYa/44lGtU=
+	t=1711472308; cv=none; b=V9aR13ydGZSkHUJb8GAFCS2cKK8DLPTw6J+oylz2IkC3/EOndNDMVcWekm2rh2U3Hn8pqy07Rrq+7QDb4c1S0eFJdVQEogmtTMVUHbfngTGP9kcxMOYfDxgLZIkyhT9eIcqn4XHAVpt0PE821sMAS3RFLNwikbktqY45hQrJT5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711472226; c=relaxed/simple;
-	bh=2qeRp3NpCuiDAJ/3gyrJI5txbBbOCmyfgeNGwUJ34QM=;
+	s=arc-20240116; t=1711472308; c=relaxed/simple;
+	bh=50BqQDcDVQNITuDK3eJNa0b+mguy7/AkzhyNXxuLwAs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IeXg1uaGseb1Pp1ZlAIDk27kRWKZJBf9fWxNT8l/WxVJGTo8tcFIDUmIDI5V+g8uLPq5C5U4wTKnmspeft3Yew8Oax3X5ENGvdCNX/xEtYg2Zvu5LT5UTNxtzIH0vue1EEnohBdI9hP9zwv1RqQzmAy+EadInUQnZEDfP1ls988=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HUmah7Wj; arc=none smtp.client-ip=209.85.208.177
+	 To:Cc:Content-Type; b=fIQuEmo5Z0GEqGR9YD2tP5IF4wddFGRUmRi3Szq28+ENRrNtoejjJpT0xeQ3Amn6l50xUYLUErV9tY8l+bFipNTqhEUuM6h17ROwtRmv3SmEepfpuup3jrHX+kzzJPhqoTq8WseS/WcVxpL1NMEG2izE+mTiy1Auk8VrB/oMbf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E6zriJyu; arc=none smtp.client-ip=209.85.208.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HUmah7Wj"
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2d4a8bddc21so77179501fa.0;
-        Tue, 26 Mar 2024 09:57:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E6zriJyu"
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2d6eedf3e99so6454431fa.1;
+        Tue, 26 Mar 2024 09:58:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711472223; x=1712077023; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1711472305; x=1712077105; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=IU22RLww3/XOivsSv4VG6tutKJTJKSIdnxTJz7w+A7w=;
-        b=HUmah7WjkPthCGovK7uX3sqd34N05gU2mlDf7HGgBtoknB48xqyAnLyVvmMfJo3MAO
-         q+BheaODd55QOjq6D/kuq6HjFsXZIYuRl7QGZGaIYREf7itqFrdQNOvlMO5vvW2Lck1v
-         8dDbNm3wiyOZQ+PGwCCxL//PVx66knjqcXznJy5hPWRUqt7s+s+NWVA4sa68mI5K45ZP
-         0V9ptv0cZ/LmAmBBdl7QNJxCrfrkO3aLWpFe756hTIY+1/91IlEUitAvtfujGrjWRPHg
-         DkBZEZEOJ8v37ZHmRTbz0Pjo8DvryK/Pd9P/taIiLS64+4pzzsEZ6fEWcVp77w+VoSmD
-         X53g==
+        bh=50BqQDcDVQNITuDK3eJNa0b+mguy7/AkzhyNXxuLwAs=;
+        b=E6zriJyuOAgFrT6Sr+C6C19vUFvatjLmIpfKFaUs9M1mjP3KmEct4vfmvQhHDZs6Qc
+         xiK2CH9QvNh2wxtGMcExn1naF0AFMrhqZ7OX3RRf6JsL1L30AohNjl9ON5Qd4O56BRJy
+         XmN6VKJHbO7AsNe8O1Gl9OqtZ/ooMKf0CJUS5JGhuvPyZdm0o7dOyt82/2CRcPayyz1y
+         34iV+OuAQgFXmvoeuhhAF8Fma6AxLRdgOqkYaeDZ4O+iBuMyR+I/KKcguzvSEGv3eU/S
+         l3e2kMCeGlKxNOifCEmjTnph0RVW1kEdQnUJ9+7BrUI5iOeRjx+TcIJmnMD8fkCYiOQM
+         J+LA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711472223; x=1712077023;
+        d=1e100.net; s=20230601; t=1711472305; x=1712077105;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=IU22RLww3/XOivsSv4VG6tutKJTJKSIdnxTJz7w+A7w=;
-        b=jfTIOkq7oh+4neD1K6WgzXmcOR3/q3O4p0YXiGXEsdro1rxxkBIuYMPwXZ18X3ClRV
-         zJREihTa19G9Zvg0hNE06GQoMsbZMs8E2I3UhEx02UqXdvjH6SZYwHLjRb2UwSQu5SQH
-         i71asi9zdYrSMBMOMBaueNgVafiZ1OG14Rr/fjjXpccOmY5SltWnyJ3e1cpzqYwWbi0D
-         sqKt5pMjJYb/IwIScEQEUsj7Wv7eUO/MA23/sVD4UiZxECOL8HxmK7yj2OaUQfLVfceJ
-         u7eiuL3Oq94o57VtsfANMONhULfQscvJurUSgXc99ZfArjw32xgOlKrBIyRAfws6S4vx
-         nPMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVWkxQv/G48hyzhWY/XwriG075YVHO8r3hXMO7jhcCVacdSkUJW21gCXFQ8vI6canEfnl64YOCNZ00AshoYfiflveS7ZHkp1kT291AhHq6W7yWRvwikW0vb0jg6VBJOzPtlyIPU1tFiZxK8NVeJ
-X-Gm-Message-State: AOJu0YxPvNAMv9ReoBwELDWHTU4NiDPJDAqRJ0XVuCrGLoN6Vsj1crZi
-	RpAenAY2eQjhgYLvbFuwPwhGEOAbnH4rzxKmLHD2u6+fALQYiNBekhHH3uvt4UUmzoEo/mHwNRG
-	6ZuWwSGPkDrkrqDnepbw0NC76KX7b/CbZ09k=
-X-Google-Smtp-Source: AGHT+IG1ZbFTx/MVVy6KI+dZ/kXiCyWDzCYWscY6etooM2mCnGEIMPlRg7hdSoLTGuQbmIXPG1EoR/a1KhikHD0w/O4=
-X-Received: by 2002:a2e:b8cb:0:b0:2d2:dac3:90f with SMTP id
- s11-20020a2eb8cb000000b002d2dac3090fmr157304ljp.52.1711472222756; Tue, 26 Mar
- 2024 09:57:02 -0700 (PDT)
+        bh=50BqQDcDVQNITuDK3eJNa0b+mguy7/AkzhyNXxuLwAs=;
+        b=oh501KOeghLRTzk20Iq6SGTunOAy5VMpRXP71NJ6/dUoXk9RBefv2lxWdOdM1iUZQf
+         GOpQdpxpu40meCxYEJoYW86A1/PeiE3HRBbcb597sd4zL0RGSnEyIKrzkZ8cYvpkMk7e
+         /R3+4l64oP1HvYKdeCH+nONDTJ179waQWLbbuYEyXBtoPwIW9YAig9nLUHl6cqJBoWVm
+         FsOD/YaLbgeWatwC4h9Pjx0q/41jSEllSSF7u0QsbH49VNzLYigUY2BA+/16Hrlimg39
+         Yt2L2CM3rw1vRnN2lPzPnlxeGb9sLTgtojNg+EYIhDoqRZV99rKwEBAPdODq6yA8cauz
+         r4rA==
+X-Forwarded-Encrypted: i=1; AJvYcCWJM/+hNpPVl5A7nidcwFMHmV17sFGyOJKWq3XC3yjsoWbrINbkvncoLe7eNGADXqqhTzZvjtPUfzPc5Wv1daNxRKsToQIiolGAghSV+z2eQD64KbVMScZYqj5dFMiIzuDpUpVmDttPmCIxnO3JoL0evwXrcYTcevT3O/MnJB5ooU9DclIV
+X-Gm-Message-State: AOJu0YwNve6HyfLmD4bNj5DygkNJPq0zyr2sOE9Zjr7PzKuXnjfYpzHt
+	gWQXcZZMOfMgL1fMCjT1PFQVRjSvSHLkIRMi1bA9P7Giq2YZ71G9AuFIZ0JQiqi7QHBLfkRNSK4
+	xu9h/Cn3m8o2gJGEpqQwkTRk3ng8=
+X-Google-Smtp-Source: AGHT+IEuCe2UdhWsZ9pv7297ZbfrjwO9PvFFV1b1MMnC3eyQey151SCgwgx3p7p9BMN5BYGkpdafNnXXiZTJJYvS5Vg=
+X-Received: by 2002:a2e:a374:0:b0:2d4:6d2a:2df7 with SMTP id
+ i20-20020a2ea374000000b002d46d2a2df7mr753307ljn.18.1711472304649; Tue, 26 Mar
+ 2024 09:58:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <08275279-7462-4f4a-a0ee-8aa015f829bc@leemhuis.info>
-In-Reply-To: <08275279-7462-4f4a-a0ee-8aa015f829bc@leemhuis.info>
+References: <CABBYNZJ0ukd_8=SFzy8CEwgP7hV5unodca0NZ2zDZh+jPJsEFQ@mail.gmail.com>
+ <ZgGzWWV4Lh2Nal--@hovoldconsulting.com> <CABBYNZJaXUhu1A+NyVT-TAJw49zcV6TMdGeVy2F+AVKWBOVC-g@mail.gmail.com>
+ <ZgHVFjAZ1uqEiUa2@hovoldconsulting.com> <CABBYNZJUVhNKVD=s+=eYJ1q+j1W8rVSRqM4bKPbxT=TKrnZdoQ@mail.gmail.com>
+ <ZgHbPo57UKUxK7G8@hovoldconsulting.com> <CABBYNZJFzDaLdXsdNEP1384JaJEN5E78cgmWfOus_LGOREGsWA@mail.gmail.com>
+ <ZgJ0okobGv5nPreG@hovoldconsulting.com> <CABBYNZKJJuPHEwyXFRi8Z=P0GyaY-HdamsxmV8sR+R97ETTmEg@mail.gmail.com>
+ <ZgLnOHiCzo5AQzra@hovoldconsulting.com> <ZgL10ur0825LgWVK@hovoldconsulting.com>
+In-Reply-To: <ZgL10ur0825LgWVK@hovoldconsulting.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 26 Mar 2024 12:56:50 -0400
-Message-ID: <CABBYNZKDa9KR8A_4TbpPyiLWFFH22T=Z9jk7N=o6U+z1oB+7vg@mail.gmail.com>
-Subject: Re: [REGRESSION] Oops during init in btintel_read_debug_features with
- today's mainline
-To: Thorsten Leemhuis <linux@leemhuis.info>
-Cc: Marcel Holtmann <marcel@holtmann.org>, 
-	Linux kernel regressions list <regressions@lists.linux.dev>, 
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Date: Tue, 26 Mar 2024 12:58:12 -0400
+Message-ID: <CABBYNZ+1vXi51YbcfqaHTwW+z7OL=yDCuab6X8eDB-q+CoO+7w@mail.gmail.com>
+Subject: Re: [PATCH] Revert "Bluetooth: hci_qca: Set BDA quirk bit if fwnode
+ exists in DT"
+To: Johan Hovold <johan@kernel.org>
+Cc: Linux regressions mailing list <regressions@lists.linux.dev>, Johan Hovold <johan+linaro@kernel.org>, 
+	Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
+	Janaki Ramaiah Thota <quic_janathot@quicinc.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Thorsten,
+Hi Johan,
 
-On Tue, Mar 26, 2024 at 4:44=E2=80=AFAM Thorsten Leemhuis <linux@leemhuis.i=
-nfo> wrote:
+On Tue, Mar 26, 2024 at 12:20=E2=80=AFPM Johan Hovold <johan@kernel.org> wr=
+ote:
 >
-> Lo! Just booted 6.9 for the first time and noticed the Bluetooth code
-> causes an Oops (see below) during boot that did not happen with 6.8 and
-> earlier. This is on Fedora 40 with a vanilla kernel on a Lenovo Thinkpad
-> T14s Gen1 AMD.
+> Hi Luiz,
 >
-> Do I need to bisect this? Or is this known already? Or does anyone by
-> chance an idea what might cause this? Or is there some other way to get
-> down to the problem?
+> On Tue, Mar 26, 2024 at 04:18:16PM +0100, Johan Hovold wrote:
+> > On Tue, Mar 26, 2024 at 10:17:13AM -0400, Luiz Augusto von Dentz wrote:
+> > > On Tue, Mar 26, 2024 at 3:09=E2=80=AFAM Johan Hovold <johan@kernel.or=
+g> wrote:
+> > > > On Mon, Mar 25, 2024 at 04:31:53PM -0400, Luiz Augusto von Dentz wr=
+ote:
 >
-> Ciao, Thorsten
+> > > > > All the
+> > > > > CI automation is done on bluetooth-next and if you are asking to =
+be
+> > > > > done via bluetooth tree which is based on the latest rc that is n=
+ot
+> > > > > how things works here, we usually first apply to bluetooth-next a=
+nd in
+> > > > > case it needs to be backported then it later done via pull-reques=
+t.
+> > > >
+> > > > The revert fixes a regression in 6.7-rc7 and should get to Linus as=
+ soon
+> > > > as possible and I assume you have some way to get fixes into mainli=
+ne
+> > > > for the current development cycle.
+> > >
+> > > Yeah I will send it later today to be included in the next rc release
+> > > and since it is marked for stable that shall trigger the process of
+> > > backporting it.
+> > >
+> > > > The series fixes a critical bug in the Qualcomm driver and should
+> > > > similarly get into mainline as soon as possible to avoid having peo=
+ple
+> > > > unknowingly start relying on the broken behaviour (reversed address=
+).
+> > > > The bug in this case is older, but since the bug is severe and we'r=
+e
+> > > > only at rc1, I don't think this one should wait for 6.10 either.
 >
-> [Full dmesg: https://www.leemhuis.info/files/misc/dmesg-6.9-btprob]
+> I just double checked the bluetooth-next branch and everything looks
+> good now (revert + endianness fix series). Thanks!
 >
-> [   19.903869] Bluetooth: hci0: Found device firmware: intel/ibt-20-1-3.s=
-fi
-> [   19.903908] Bluetooth: hci0: Boot Address: 0x24800
-> [   19.903913] Bluetooth: hci0: Firmware Version: 255-255.255
-> [   19.906245] usb 6-4: USB disconnect, device number 3
-> [   19.906364] usb 2-2: Found UVC 1.50 device Integrated Camera (04f2:b6c=
-b)
-> [   19.906583] Bluetooth: hci0: FW download error recovery failed (-19)
-> [   19.906649] Bluetooth: hci0: sending frame failed (-19)
-> [   19.906666] BUG: kernel NULL pointer dereference, address: 00000000000=
-00070
-> [   19.906672] #PF: supervisor read access in kernel mode
-> [   19.906677] #PF: error_code(0x0000) - not-present page
-> [   19.906681] PGD 0 P4D 0
-> [   19.906688] Oops: 0000 [#1] PREEMPT SMP NOPTI
-> [   19.906701] Hardware name: LENOVO 20UH001HGE/20UH001HGE, BIOS R1CET77W=
-(1.46 ) 10/26/2023
-> [   19.906706] Workqueue: hci0 hci_power_on [bluetooth]
-> [   19.906775] RIP: 0010:btintel_read_debug_features (/usr/src/debug/[...=
-]/drivers/bluetooth/btintel.c:1306) btintel
+> Did I understand you correctly that you'll be able to get all five
+> commits into 6.9 during this development cycle (e.g. 6.9-rc2)?
 
-Seem like the following could be reason:
+Yep, I will be preparing a pull-request with them later this week,
+there are some other fixes that I want to get in as well.
 
-https://patchwork.kernel.org/project/bluetooth/patch/20240326164317.1460864=
--1-luiz.dentz@gmail.com/
+
+--=20
+Luiz Augusto von Dentz
