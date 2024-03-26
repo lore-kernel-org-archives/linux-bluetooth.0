@@ -1,60 +1,65 @@
-Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
+Received: from mail-vk1-f170.google.com (mail-vk1-f170.google.com [209.85.221.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AC8C762F7
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Mar 2024 15:20:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67EA2811E2
+	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Mar 2024 15:20:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711466419; cv=none; b=a2dSfGb2W1IPOU527FEkLloIsbiBu2nq/WJ7TIy0IjByRAZ9E+zdcRUMz67X7XMr5P8HnO0B+0P7g8bLVXE8GXV/UlQXEURtlXTjoGGWJ+hL2I3/UfwGmc53PyOxt/95qM0SIfE5Pya0Qk4JiDsbXptGrLkruf1SIqB9ryrO46E=
+	t=1711466420; cv=none; b=HSMI5aTM5jHc92ucRydNuUTrBzX5cNtAxww5sRsjvCMq3wXdPLu6N3kR5/PCthIQ8dz8auKHSa7T7kVDtc83cD1yHqIyXWwtskkFXxvbOqac6ZwFT/VGAXajxguTWlhw7qmeWQBWMWJDJR716bGqR5lLBj4T4DSyM5f6F+UCGVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711466419; c=relaxed/simple;
-	bh=Qeo/IMR1Af0B4oZnrj7HcnmHE4DDvzWyoDa1UlF/FsU=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=AMg5WJUJ7CdvFyYDt5AwWiASRx0sLcRO7ZjoDOq6XziROjN6Bj4W2cVT8oyQpebTqQVLhbSKyd9G9QFS8d7JoGMZvz/6iR44N7Th4Ca6REdng0MsgwyYO7sfT+AUoUsdgWwM0eEPIQm4PV7brO0xeqSH2kE804NHDgYHv57IxAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZFHYF+PE; arc=none smtp.client-ip=209.85.222.45
+	s=arc-20240116; t=1711466420; c=relaxed/simple;
+	bh=4fEIHR61NgpUtS7IFlNCDDxfhdnf5SIwgozkQq8JgQw=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=sHrOO4Dv78I8xsq4deimTa/elXXtIKwwQVJxusW/7+iQD/ZNFCxXxIHz90lPV39Iq32REJUBVmecOjWKz2YLgvLAGPx2aT3MIGibBE1xv+XwLxp3Lrtyf6RAllxve/GSkagqP/8fgNCv8FGn6DxpInHkCeiGdOfcXqxzytRZZos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CxgWV2pP; arc=none smtp.client-ip=209.85.221.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZFHYF+PE"
-Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-7db123701bcso1521020241.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Mar 2024 08:20:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CxgWV2pP"
+Received: by mail-vk1-f170.google.com with SMTP id 71dfb90a1353d-4d43c633fecso2294953e0c.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Mar 2024 08:20:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20230601; t=1711466416; x=1712071216; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=dYt7L8519WyOHNCKEsuYZugSLS2WHfHXim6xkEbKu4s=;
-        b=ZFHYF+PEJYvIuaDnsC1PyI3o0lch4B626YEde9Z025WvhiGf8ZRZ54tI37Z5SUKOtc
-         RVacOuJ8WP0VoSz4qm59O+HWRLzIyMNSPWGb9LtfwQbBwpvc4IxKvpFxhaQRvVXO7ph2
-         7IxC1Amank86XS8rMrvjZZGvSnTnDtx4t78i+trVabHC1cr6itfic9EJyHI0wHDOxiXr
-         a/dDHIUANUOXXp8RTP4qCdGg/dTDtzojPt61kl13rTibJE/OwMfHYw4s0ZWOP1Azp4x+
-         gVqD4/IYL+fh11RVEVm3hMSNHMuHuUhZVKOWFIXjTK1WMvpE89GkRxyDkaTFpU0NflCC
-         KSBA==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lfxy2vEf8T5TZWebfbgqwWLFPCtX3gyaDX3PcUYuFoo=;
+        b=CxgWV2pPsgwmibFtf0w5PX4+uPAkSUtkCgDo+QEpoQmZTqfWvuFnlO0i9FqvXiNxic
+         t/9MVOGaJX62/GJCiN+1Qu5nXJGJYFWQDtM0NKnK1BdR+5TLtQYp+WZHJzPHGoWZTXOD
+         /+noXnTEmE7TVwdjjLAzwDPmaQUxKrCtY/ZAr30PuKENFxhNs0Me61+dmfZA5M360O3b
+         yds1MNBmDsZmkao9IP6360HMOoWR0xDglmJMpLFcFYqajkDKUWoFe9svCYt49JIoLiIp
+         dJCvTIyE+DdKB9B+aGHXFQ9kXCZyA9dA74Oyzx3t/bc15pM0Cl0w0QZMRfPccJLog8SI
+         J7dw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1711466416; x=1712071216;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dYt7L8519WyOHNCKEsuYZugSLS2WHfHXim6xkEbKu4s=;
-        b=EdTGj31sxcud5Jii3Vdlv/lVTxfCXluCx0jEi0Q40KBc/Z/90zgVPvVs0ecIuz9I/8
-         Z3qq5w95LJQ9GSBbpwfhHrtMN+xcyRkN1xGOG0uD6GFxPBVn84a4SdantI4m9NhPzLbD
-         m5s1b9vCKRLqhD/TjqRPITGDUllXvZ5zBsZXZzReCcW2T7woXcB6Md1CgrdJdfsZWQ5s
-         Z7yt/uCZRE2hDM2EtvsG7E/Mh0k/kjRhjPhc9CeF2GsgPGOvtG0d3Zdo0mAoorZiI4sr
-         brf/ICOceu4XruSNOiskpNTvzxNvTSz0/6tVVfgAX8z7wuleEb4N3sNRghagAfGJ1gCC
-         NimQ==
-X-Gm-Message-State: AOJu0YxXIXoEhpro9Z/UyLO+CdfVlNxU080qMd8hy1pvEzRUhKoA8wIm
-	Is7RjcBXsfBO0VkAYhAoWDYwIUV/ywRTxSMsgUshHhOURsbjXNWFHeFzeRhU
-X-Google-Smtp-Source: AGHT+IHVshJ6ExFhCbkOoQjWabiyLvI+87eSl1igFEZizuqGySleslHVUb5QJMVeWGEc7nwb9c2ttA==
-X-Received: by 2002:a05:6122:6a6:b0:4d3:3b1b:aa92 with SMTP id r6-20020a05612206a600b004d33b1baa92mr15551vkq.11.1711466414935;
-        Tue, 26 Mar 2024 08:20:14 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lfxy2vEf8T5TZWebfbgqwWLFPCtX3gyaDX3PcUYuFoo=;
+        b=I0Mnrybm/ZQhU8DlLLa5S463R/xn6pnTstLo52B0GV2lBp7CkWZnpC7D1yioNHlfUb
+         2hZwX8hz5rV9dMpL13B3EXgdnToCwYuhHKciACnVDKTPgXqEAkmlEUm91DIGa8vXFQCj
+         CSdONocKZO9T4rzNAqZHrnY4cjJmisFr12q5lkncPfI/lPfKHAPcETiy1g5gcwnhRuR6
+         HjQ92yAljDJx9pRbgWIDmxYr3ovuTG/3hqW5BjEsv3F+SF2e8DvO2r2aeM2fBmOH/ac2
+         qerFzGQQMZAM/nAbMe27IRf2Iz7mt2CPkThAgwABWzSQjw3q4XFoFA5O5/yGcAoqm0s3
+         V2og==
+X-Gm-Message-State: AOJu0YwwfrOR9hWoNeEQHQIW2+NY++q3QeBHFPfE2pT/H4mNuC0vDHw/
+	hGYi6kyNn/gr9mjjCGIWNAcGAMTUe22o5PlaOkYTjd5jfNSyeEf0nPS/FlWc
+X-Google-Smtp-Source: AGHT+IFDwlyZsW8/DWsoCtlWHlVZ3I9lFlM75ywmSeBUjNepOQxOUQdtyidxqCoqPkrBhiC4TlIR6Q==
+X-Received: by 2002:a05:6122:54b:b0:4c9:b8a8:78d4 with SMTP id y11-20020a056122054b00b004c9b8a878d4mr9267573vko.3.1711466416437;
+        Tue, 26 Mar 2024 08:20:16 -0700 (PDT)
 Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id q14-20020a1ff20e000000b004c880fc9728sm1382266vkh.46.2024.03.26.08.20.13
+        by smtp.gmail.com with ESMTPSA id q14-20020a1ff20e000000b004c880fc9728sm1382266vkh.46.2024.03.26.08.20.15
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Mar 2024 08:20:13 -0700 (PDT)
+        Tue, 26 Mar 2024 08:20:15 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 1/2] shared/shell: Add script command
-Date: Tue, 26 Mar 2024 11:20:11 -0400
-Message-ID: <20240326152012.1432957-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 2/2] shared/shell: Add commands from scripts to history
+Date: Tue, 26 Mar 2024 11:20:12 -0400
+Message-ID: <20240326152012.1432957-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.44.0
+In-Reply-To: <20240326152012.1432957-1-luiz.dentz@gmail.com>
+References: <20240326152012.1432957-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -65,237 +70,62 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds script command to main menu which can be used to execute
-scripts at any point rather than just at the init.
+This enables saving the commands run from a script to also be visible in
+the history.
 ---
- src/shared/shell.c | 186 +++++++++++++++++++++++++++------------------
- 1 file changed, 110 insertions(+), 76 deletions(-)
+ src/shared/shell.c | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
 
 diff --git a/src/shared/shell.c b/src/shared/shell.c
-index 0e4cbb7b12cb..d68d6798f117 100644
+index d68d6798f117..f3f7bab9a616 100644
 --- a/src/shared/shell.c
 +++ b/src/shared/shell.c
-@@ -258,6 +258,115 @@ static void cmd_export(int argc, char *argv[])
- 	}
- }
+@@ -863,8 +863,6 @@ int bt_shell_release_prompt(const char *input)
  
-+static int bt_shell_queue_exec(char *line)
-+{
-+	int err;
-+
-+	/* Queue if already executing */
-+	if (data.line) {
-+		/* Check if prompt is being held then release using the line */
-+		if (!bt_shell_release_prompt(line))
-+			return 0;
-+		queue_push_tail(data.queue, strdup(line));
-+		return 0;
-+	}
-+
-+	bt_shell_printf("%s\n", line);
-+
-+	err = bt_shell_exec(line);
-+	if (!err)
-+		data.line = strdup(line);
-+
-+	return err;
-+}
-+
-+static bool input_read(struct io *io, void *user_data)
-+{
-+	int fd;
-+	char *line = NULL;
-+	size_t len = 0;
-+	ssize_t nread;
-+
-+	fd = io_get_fd(io);
-+
-+	if (fd == STDIN_FILENO) {
-+		rl_callback_read_char();
-+		return true;
-+	}
-+
-+	if (!data.f) {
-+		data.f = fdopen(fd, "r");
-+		if (!data.f) {
-+			printf("fdopen: %s (%d)\n", strerror(errno), errno);
-+			return false;
-+		}
-+	}
-+
-+	nread = getline(&line, &len, data.f);
-+	if (nread > 0) {
-+		int err;
-+
-+		if (line[nread - 1] == '\n')
-+			line[nread - 1] = '\0';
-+
-+		err = bt_shell_queue_exec(line);
-+		if (err < 0)
-+			printf("%s: %s (%d)\n", line, strerror(-err), -err);
-+	} else {
-+		fclose(data.f);
-+		data.f = NULL;
-+	}
-+
-+	free(line);
-+
-+	return true;
-+}
-+
-+static bool io_hup(struct io *io, void *user_data)
-+{
-+	if (queue_remove(data.inputs, io)) {
-+		if (!queue_isempty(data.inputs))
-+			return false;
-+	}
-+
-+	mainloop_quit();
-+
-+	return false;
-+}
-+
-+static bool bt_shell_script_attach(int fd)
-+{
-+	struct io *io;
-+
-+	io = io_new(fd);
-+	if (!io)
-+		return false;
-+
-+	io_set_read_handler(io, input_read, NULL, NULL);
-+	io_set_disconnect_handler(io, io_hup, NULL, NULL);
-+
-+	queue_push_tail(data.inputs, io);
-+
-+	return true;
-+}
-+
-+static void cmd_script(int argc, char *argv[])
-+{
-+	int fd;
-+
-+	fd = open(argv[1], O_RDONLY);
-+	if (fd < 0) {
-+		printf("Unable to open %s: %s (%d)\n", argv[1],
-+						strerror(errno), errno);
-+		bt_shell_noninteractive_quit(EXIT_FAILURE);
-+		return;
-+	}
-+
-+	printf("Running script %s...\n", argv[1]);
-+
-+	bt_shell_script_attach(fd);
-+}
-+
- static const struct bt_shell_menu_entry default_menu[] = {
- 	{ "back",         NULL,       cmd_back, "Return to main menu", NULL,
- 							NULL, cmd_back_exists },
-@@ -271,6 +380,7 @@ static const struct bt_shell_menu_entry default_menu[] = {
- 					"Display help about this program" },
- 	{ "export",       NULL,       cmd_export,
- 						"Print environment variables" },
-+	{ "script",       "<filename>", cmd_script, "Run script" },
- 	{ }
- };
- 
-@@ -1033,18 +1143,6 @@ static char **shell_completion(const char *text, int start, int end)
- 	return matches;
- }
- 
--static bool io_hup(struct io *io, void *user_data)
--{
--	if (queue_remove(data.inputs, io)) {
--		if (!queue_isempty(data.inputs))
--			return false;
--	}
--
--	mainloop_quit();
--
--	return false;
--}
--
- static void signal_callback(int signum, void *user_data)
+ static void rl_handler(char *input)
  {
- 	static bool terminated = false;
-@@ -1304,28 +1402,6 @@ int bt_shell_run(void)
- 	return status;
- }
+-	HIST_ENTRY *last;
+-
+ 	if (!input) {
+ 		rl_insert_text("quit");
+ 		rl_redisplay();
+@@ -879,14 +877,6 @@ static void rl_handler(char *input)
+ 	if (!bt_shell_release_prompt(input))
+ 		goto done;
  
--static int bt_shell_queue_exec(char *line)
--{
--	int err;
+-	last = history_get(history_length + history_base - 1);
+-	/* append only if input is different from previous command */
+-	if (!last || strcmp(input, last->line))
+-		add_history(input);
 -
--	/* Queue if already executing */
--	if (data.line) {
--		/* Check if prompt is being held then release using the line */
--		if (!bt_shell_release_prompt(line))
--			return 0;
--		queue_push_tail(data.queue, strdup(line));
--		return 0;
--	}
+-	if (data.monitor)
+-		bt_log_printf(0xffff, data.name, LOG_INFO, "%s", input);
 -
--	bt_shell_printf("%s\n", line);
--
--	err = bt_shell_exec(line);
--	if (!err)
--		data.line = strdup(line);
--
--	return err;
--}
--
+ 	bt_shell_exec(input);
+ 
+ done:
+@@ -1404,12 +1394,21 @@ int bt_shell_run(void)
+ 
  int bt_shell_exec(const char *input)
  {
++	HIST_ENTRY *last;
  	wordexp_t w;
-@@ -1451,48 +1527,6 @@ void bt_shell_set_prompt(const char *string)
- 	rl_redisplay();
- }
+ 	int err;
  
--static bool input_read(struct io *io, void *user_data)
--{
--	int fd;
--	char *line = NULL;
--	size_t len = 0;
--	ssize_t nread;
--
--	fd = io_get_fd(io);
--
--	if (fd == STDIN_FILENO) {
--		rl_callback_read_char();
--		return true;
--	}
--
--	if (!data.f) {
--		data.f = fdopen(fd, "r");
--		if (!data.f) {
--			printf("fdopen: %s (%d)\n", strerror(errno), errno);
--			return false;
--		}
--	}
--
--	nread = getline(&line, &len, data.f);
--	if (nread > 0) {
--		int err;
--
--		if (line[nread - 1] == '\n')
--			line[nread - 1] = '\0';
--
--		err = bt_shell_queue_exec(line);
--		if (err < 0)
--			printf("%s: %s (%d)\n", line, strerror(-err), -err);
--	} else {
--		fclose(data.f);
--		data.f = NULL;
--	}
--
--	free(line);
--
--	return true;
--}
--
- static bool shell_quit(void *data)
- {
- 	mainloop_quit();
+ 	if (!input)
+ 		return 0;
+ 
++	last = history_get(history_length + history_base - 1);
++	/* append only if input is different from previous command */
++	if (!last || strcmp(input, last->line))
++		add_history(input);
++
++	if (data.monitor)
++		bt_log_printf(0xffff, data.name, LOG_INFO, "%s", input);
++
+ 	err = wordexp(input, &w, WRDE_NOCMD);
+ 	switch (err) {
+ 	case WRDE_BADCHAR:
 -- 
 2.44.0
 
