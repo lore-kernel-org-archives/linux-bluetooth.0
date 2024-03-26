@@ -1,60 +1,59 @@
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EECB513C3D8
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Mar 2024 18:46:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E14AC13D25C
+	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Mar 2024 19:50:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711478808; cv=none; b=eIgSy/5wK8qIvsa1jdO+RE4LVnvEWZT9ZTMT1gyDaWbWAn2gdqVHdAZvXjDVTfzR8jmJnqGyWlanI/YAo4Uf3ljqDPozt4K1M/E+nmA3fplcOE6Z6eQFJaacLOf6lWrJ2cVonHNMxR+aUtVmeZzpHuKfTaLsaIAadu9rZ1PhZ6w=
+	t=1711482638; cv=none; b=D61CYU4g+lrUxn9LURquw+i3w2TXTUiXQEnF07CZJhfzX/TcMnBXAHJokIml7tijqAGVEHrmKLYQEGo+2rgAiNIWY41S8/pu0v0U2tc5Zn0EawXG3mqW+jj+kkrnwHt8mdb76ovUvVlvPanqZ3T6hgEOQvCHFf/vFkRnjfXnOak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711478808; c=relaxed/simple;
-	bh=Lfpy+o0TDJ1LR4DY+MLKXblS1exEVtPSo+x6Lgx0wFM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=WZJJ1DNZaM0BCcXaV/H09B6VE9aAuwMBwfFg6nfih3bHAjJHPj+LLcIz13ncmgdvJ+pBktp2vtIoh/k9GXSBDX50TSJBmj0EbrVaJXolOPGoBdzCTL4dI6wFIVx09DEyqzBg+nhB/l4ChpSiYtAn6QlCqydVuGw5M3XmkvruhbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=ryFfH1jJ; arc=none smtp.client-ip=80.237.130.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+	s=arc-20240116; t=1711482638; c=relaxed/simple;
+	bh=cTBLyIjQ4CssK1la7/mUTnd3Bp/kCDEsv9p4m7uJTB8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=XNVLFeFHEGzsobSW/p7NLz+UyH7cbhXpO1u32s1RNfEJJPZILyjOVIFyQRShYsen1fN5bMDLa2rs5SwJydYA0+5H9uSFEP5zYg3Xv8QaLkh5/42b/KI/GrFiw0xSJHBUuUVZhgNxN5W84MldTVYkfaMfNv1RdOzCm09L9oQ56kE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A8Boq3B4; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="ryFfH1jJ"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:To:Subject:Reply-To:MIME-Version:Date:Message-ID:
-	From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:In-Reply-To:
-	References; bh=VEYyKzV+7KLu8j1+bYTwS2eazaf/OrVv59VycEAU/Os=; t=1711478806;
-	x=1711910806; b=ryFfH1jJZXwKrgz5t28n3k8NRC3fM2MsJQ6a4Whb49IxFl15TmiCbovVVf0eZ
-	ili8i4e249m1W5WmgdXdTLkGaVbiroV0kTDhtjoMJQeQYeMEL0F1wbIPNI+TY6FLvfNQPYf+CMghR
-	63inpu1+MsH6vrjxlMJPgGS7HIlKrsFvRSWw7oUaYiAR9BU4/We/vAWrcSdmaX0sABQ7HX2gY9ohR
-	Aqpw5GlWiDuiOrl54H2Qd86NfitulX8qKBQTKWEe6fbfvUJ2gULcixsPuCs4zxxo/ykQC9cjnKSjI
-	aDBmRgHS1C8DejqjY9z7A1BbNaMpmzZKTne414WzGENcEcddrQ==;
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1rpBop-00059j-VT; Tue, 26 Mar 2024 19:46:44 +0100
-Message-ID: <7c82b5a5-f2fa-4136-b5f8-9d3874869dbb@leemhuis.info>
-Date: Tue, 26 Mar 2024 19:46:43 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A8Boq3B4"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6C524C43390;
+	Tue, 26 Mar 2024 19:50:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711482637;
+	bh=cTBLyIjQ4CssK1la7/mUTnd3Bp/kCDEsv9p4m7uJTB8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=A8Boq3B44P4Uf+BfdEnS71zsVcUmpl0tdWAvuPxnYdHA6Q/ytXA19mY4u1+ANNzyt
+	 YFMYtd9F2V97GlEEjnsFYPFKovdB6rN3W/UA4xIZMdlGjiCkRjywXAo8ISML+Hg3pE
+	 RcV5T9umu3nhChcU9T0tu5PNpi7vnyYP/G7EIL+D6Ben2pQCsELHQqGeD+n7wiRXMt
+	 rTTNDA1CiWHY4x1IuqfA5d3r1ql+pPGYQl8r+QsyN2KwRHnx+aS/foLaIBXCkpZH/U
+	 3rSYzP132tc+sezQcLoDxQGNOOHMojXlD846G5yU5mBVLDZijTGdDC5fepANDOwO8z
+	 rkvIKY42T9dHw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5AFDFD2D0E9;
+	Tue, 26 Mar 2024 19:50:37 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
+Content-Transfer-Encoding: 8bit
 Subject: Re: [PATCH v1] Bluetooth: hci_sync: Fix not checking error on
  hci_cmd_sync_cancel_sync
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- linux-bluetooth@vger.kernel.org
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <171148263736.22204.6662439741909879492.git-patchwork-notify@kernel.org>
+Date: Tue, 26 Mar 2024 19:50:37 +0000
 References: <20240326164317.1460864-1-luiz.dentz@gmail.com>
-From: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-Content-Language: en-US, de-DE
 In-Reply-To: <20240326164317.1460864-1-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1711478806;cca043ed;
-X-HE-SMSGID: 1rpBop-00059j-VT
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-On 26.03.24 17:43, Luiz Augusto von Dentz wrote:
+Hello:
+
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Tue, 26 Mar 2024 12:43:17 -0400 you wrote:
 > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
 > hci_cmd_sync_cancel_sync shall check the error passed to it since it
@@ -63,13 +62,15 @@ On 26.03.24 17:43, Luiz Augusto von Dentz wrote:
 > IS_ERR will not trigger as -(errno) would be converted to a positive
 > value.
 > 
-> Fixes: 711c35949648 ("Bluetooth: hci_core: Cancel request on command timeout")
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> [...]
 
-This fixed my problem:
+Here is the summary with links:
+  - [v1] Bluetooth: hci_sync: Fix not checking error on hci_cmd_sync_cancel_sync
+    https://git.kernel.org/bluetooth/bluetooth-next/c/e9c62fdc7f3e
 
-Reported-and-tested-by: Thorsten Leemhuis <linux@leemhuis.info>
-Closes:
-https://lore.kernel.org/all/08275279-7462-4f4a-a0ee-8aa015f829bc@leemhuis.info/
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Ciao, Thorsten
+
