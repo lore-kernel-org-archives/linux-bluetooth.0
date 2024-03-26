@@ -1,145 +1,95 @@
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8E0812E6D
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Mar 2024 16:33:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B62561BC57
+	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Mar 2024 16:39:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711470790; cv=none; b=S4IW/WFVWQDGsR1zOJkCy8gWVka0TyyzujopFwi2ZiQZXUa3dySK+W59etFi41hpftiOB5glTfxNWRoCvi6nvktGQJtMVHqSaoYwwAH2XQSewh46TxP/fTk6uy/7DZdW+vUcryYbGbKJJgYntMlQJWnxRa290v2y7RuPh2dpBk0=
+	t=1711471180; cv=none; b=BWIc/G5JjP/wr61MrLQjz/wamGt1aOfwb8J7M4/VVqwwwedgWSf8fn09riBRBx8J+EyZBBGRnm55ASbMkytFe0yC/7/XTJvKjm7v/YXUYOdD4UQ4G1Tmc3/+pfuPBfrUpObympYPFTVpoMSBVc/GYBYqwqPZhamLfdyQMZYoRSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711470790; c=relaxed/simple;
-	bh=lVoQMVplppCC3bZfzFJMPRwm9a5E9DObxpQyJv4ei/c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=h9IcnUHAKA070wFM+cMWLsC1+wD2iCk8YCFs1OUTBLS3iYKU+wXmbohXrUzWxuCCEblmbJ5Mi9YJO9ZSF1fXgYkm1fnPshIrT36lwPfi8X+6piC4O2zbnADDYkzhtyZj8fzE5c7RyaokmGp/z5oqMVBnJNbhty0lTemFBYm3TIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=tbx9eszl; arc=none smtp.client-ip=209.85.208.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+	s=arc-20240116; t=1711471180; c=relaxed/simple;
+	bh=qJY03vycFuDGN42Vhk4NWQci1uwoqFlmqVIZhR3NZpw=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=ln96rkj0m+7qVGDZ+X85U33SXK9EwbsdE1klVlfY0znupd2fPnEVxGbem/bsvPgHEgwUALKQqp7G7oew4TIncKA32LKBz5sUaXBThExUM4pTmFI4O3aY8NP76aqc7jK/SRtIzrD/qg2RicGyQRFfRHvm5NRZaljZ9PBuqCbOiZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LNhkzX+t; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="tbx9eszl"
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2d4979cd8c8so59435541fa.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Mar 2024 09:33:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LNhkzX+t"
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-6e6b5432439so4427256b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Mar 2024 09:39:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1711470787; x=1712075587; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eQ6jS2CUTKGhZdxpuXUPTr0agZibBpPyyI13tXK5e6s=;
-        b=tbx9eszl0cv3hSGR2z5T1MUqNEFMqOK0hvuUXK4rky/ZLiX7/ruc4w35Wa6enxWLhy
-         jqYTQ6baqOYwBEPfw8EyZsa1IaqSg7IlHG+YqWDCCA0rIkEN94Vbs5U6ww3v89vN1w1I
-         0nqGzNdcCZSF0zAp6TSiu46brej3P99kOXNi4PRIAzaw0yMELlRpmcXliW4+4QxY+LtV
-         O8xrYDYrVS4Up40ecp8dyuj/sICiqnVfBNZVkxQg6hmXUnZFDaK/qkfK7cpzxGt63mcL
-         eZAhX6x/1ghz8UjnhKhvM95t5Bgtrh5YH7RDfBvymF0vUdIjbVmyPCYnXR5AfFfD5PYR
-         BD1Q==
+        d=gmail.com; s=20230601; t=1711471178; x=1712075978; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=qJY03vycFuDGN42Vhk4NWQci1uwoqFlmqVIZhR3NZpw=;
+        b=LNhkzX+tDq9HQ5pTZiM3h2BAHpuVDUsF/ei03Ia6zRTBoXb+PU7+NmcbG/wdvgFcas
+         SVLtqkuIn2VVzaIejVCYJeyAeFdbL6cGu+QEe0DTNDFqQopzQIJS5Y0Ca3hV5h9+OgHa
+         iDxpsLoHIHWz6A4C33vs0NaE6LbkT+AA9Ar8lg58GRqi1ErdiwV1NOYmkct9nHG23cxf
+         AFVmHmo+Ds5GC0jOUGMWEAzObB/pQnWGKduYLLVTf/XofCQBk7oRoZ+YvH/iuHuqVOGN
+         4mw3nsciy5cbh4n2WpQZHJWTsStAa/6k0yQEMBYEQgAwu0h9YSAgWOBSt++9AKn5jWX2
+         FFNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711470787; x=1712075587;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eQ6jS2CUTKGhZdxpuXUPTr0agZibBpPyyI13tXK5e6s=;
-        b=g9SkHEic2nnbaF2oZpM7lKANCLfxleKo13zGDQ1DYRRQkvl2tce/ZkqliZbtg6G/A9
-         yLwCYUJKp4chVFNUewgPB0jagH1po64vTwEycAoVG5gZAhxeu/pxCEqrqwrJ4UbrV7fF
-         RIrPQgpj6WPT6r99NmBq06s/M86LEx1OF3bzH6WXUdKEU1aMlcD4oVi+xUVhKe3fycjM
-         BFZvERjvVN8MAr65gUA+MUmt4EGJwTVBOteTJmOcDTVIo8B0cvs6XuK8jm29cCLampCZ
-         /3swQQuUfV0ujYFKTyO1kOzeOJ86I+FH3GPcFg574c12Uca7b+tiho8RqxcPB1tv9/0Z
-         AXJg==
-X-Forwarded-Encrypted: i=1; AJvYcCUXGWVrqh86jneoF3RdY4RA+Zuwxryn+LSL8GV4B3+paKwQxiwd8PSVDqa9HRVQdwhI5ENZZv10Q1VlieOgWB4/YgYO5CkMbajjfjlsTT0j
-X-Gm-Message-State: AOJu0YxFa85hflPOSvQgNDj+S4V+aH5zfOiPTTfXIQe9Q2bH5XC7mIt4
-	JBC82QMq8oo0/JhdGni98CkBlDL70XHMVthqr7tSvuaRlXnCQxvkWecdQMzRiKT5vRd5NinnxSj
-	u4s2RKE2R+VrWWvHujRXSa/IhBcCJAiZvhdRWzw==
-X-Google-Smtp-Source: AGHT+IEPlW3Mndd9DAskKl8BnO4uLoQgb2fvBGrOQCORYGpNt3ZO7pjyZJGUAGM4Jnm65aupzhhwN4AXLf4B/UzV5SQ=
-X-Received: by 2002:a05:651c:210b:b0:2d2:4477:6359 with SMTP id
- a11-20020a05651c210b00b002d244776359mr800282ljq.7.1711470786783; Tue, 26 Mar
- 2024 09:33:06 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1711471178; x=1712075978;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qJY03vycFuDGN42Vhk4NWQci1uwoqFlmqVIZhR3NZpw=;
+        b=IrR3pvkhDVAPdg5/pcPIcs83Y6UkEv/tIfjlFhXxbGbKzaxeH+SI7C8ox6Sd+9r+mJ
+         SntRE1nbtpiy5VaLRKkLAkWDgwhWfNjZ2jDNbnmpGtEYwIdSeVGix9S/irqFZKxwo4cc
+         8epqU9UHe1lUrz6bKZ2rhNZMCwDxoHyRsgLwT3YqWUPB9T8ZYqJhhjguInSFqB4mEQ0d
+         IbV0mH5qSvuuIayTHlxytHTyOiHGwbqjEg8F//1j3O75ljz9VvR0ZCpMmdipQrfEMaWS
+         Pxr+R9OD0n7XKcw0Lxa2AjQTIVfVJeZtz6GyaDiKzPfjcp2sBwkIU6tuGZUt/14VfBwm
+         l3Kw==
+X-Gm-Message-State: AOJu0YxjMlSZur1Fi6tLtc7wKyLM5SdhVP1q5MkJZiOCLUoV9v7HRpK1
+	AdWeZC/7KDp7QMeKA0/QX4ldqEJUV3Y6tkKaKihhT2seWxfmveHvFErq5hnd
+X-Google-Smtp-Source: AGHT+IHBPROpqxYLICQtRrg/XoKNqHRQdu9kXTEbOJQyasj0pEq/nRk/hOpK/R6PU7Y4h/au2g2f0g==
+X-Received: by 2002:a05:6a20:9c8a:b0:1a3:3cc3:b251 with SMTP id mj10-20020a056a209c8a00b001a33cc3b251mr2189691pzb.26.1711471177695;
+        Tue, 26 Mar 2024 09:39:37 -0700 (PDT)
+Received: from [172.17.0.2] ([52.159.142.196])
+        by smtp.gmail.com with ESMTPSA id n25-20020a62e519000000b006e6c6a50e5esm3302400pff.34.2024.03.26.09.39.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Mar 2024 09:39:37 -0700 (PDT)
+Message-ID: <6602fa49.620a0220.b31c0.950b@mx.google.com>
+Date: Tue, 26 Mar 2024 09:39:37 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7172836074397603156=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240325131624.26023-1-brgl@bgdev.pl> <20240325131624.26023-5-brgl@bgdev.pl>
- <87r0fy8lde.fsf@kernel.org> <CAMRc=Mc2Tc8oHr5NVo=aHAADkJtGCDAVvJs+7V-19m2zGi-vbw@mail.gmail.com>
- <87frwe8jiu.fsf@kernel.org> <CAMRc=MdCv+vTMZML-wzRQqZZavquV3DABYM4KYw-HwqS47sTyw@mail.gmail.com>
- <874jct10yf.fsf@kernel.org>
-In-Reply-To: <874jct10yf.fsf@kernel.org>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Tue, 26 Mar 2024 17:32:55 +0100
-Message-ID: <CAMRc=Me5ef_kFDz0SyGZb4S+2Ma4i=Fek_tzwj+bYD4DGSV4mA@mail.gmail.com>
-Subject: Re: [PATCH v6 04/16] dt-bindings: net: wireless: qcom,ath11k:
- describe the ath11k on QCA6390
-To: Kalle Valo <kvalo@kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
-	Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Saravana Kannan <saravanak@google.com>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, Arnd Bergmann <arnd@arndb.de>, 
-	Neil Armstrong <neil.armstrong@linaro.org>, Marek Szyprowski <m.szyprowski@samsung.com>, 
-	Alex Elder <elder@linaro.org>, Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
-	Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, 
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-pci@vger.kernel.org, linux-pm@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, ath11k@lists.infradead.org, 
-	Johan Hovold <johan@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v1] Bluetooth: ISO: Don't reject BT_ISO_QOS if parameters are unset
+In-Reply-To: <20240326162642.1459442-1-luiz.dentz@gmail.com>
+References: <20240326162642.1459442-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Tue, Mar 26, 2024 at 4:12=E2=80=AFPM Kalle Valo <kvalo@kernel.org> wrote=
-:
->
-> Bartosz Golaszewski <brgl@bgdev.pl> writes:
->
-> >> >> I don't know DT well enough to know what the "required:" above mean=
-s,
-> >> >> but does this take into account that there are normal "plug&play" t=
-ype
-> >> >> of QCA6390 boards as well which don't need any DT settings?
-> >> >
-> >> > Do they require a DT node though for some reason?
-> >>
-> >> You can attach the device to any PCI slot, connect the WLAN antenna an=
-d
-> >> it just works without DT nodes. I'm trying to make sure here that basi=
-c
-> >> setup still works.
-> >>
-> >
-> > Sure, definitely. I there's no DT node, then the binding doesn't apply
-> > and the driver (the platform part of it) will not probe.
-> >
-> >> Adding also Johan and ath11k list. For example, I don't know what's th=
-e
-> >> plan with Lenovo X13s, will it use this framework? I guess in theory w=
-e
-> >> could have devices which use qcom,ath11k-calibration-variant from DT b=
-ut
-> >> not any of these supply properties?
-> >>
-> >
-> > Good point. I will receive the X13s in a month from now. I do plan on
-> > upstreaming correct support for WLAN and BT for it as well.
-> >
-> > I guess we can always relax the requirements once a valid use-case appe=
-ars?
->
-> I think we have such cases already now:
->
-> $ git grep ath11k-calibration-variant -- arch
-> arch/arm64/boot/dts/qcom/qcm6490-fairphone-fp5.dts:     qcom,ath11k-calib=
-ration-variant =3D "Fairphone_5";
-> arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts:              =
-       qcom,ath11k-calibration-variant =3D "LE_X13S";
->
-> But please do check that. I'm no DT expert :)
->
+--===============7172836074397603156==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-You're thinking about making the required: field depend on the value
-of qcom,ath11k-calibration-variant? Am I getting this right?
+This is an automated email and please do not reply to this email.
 
-Bart
+Dear Submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: net/bluetooth/iso.c:1451
+error: net/bluetooth/iso.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7172836074397603156==--
