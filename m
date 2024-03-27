@@ -1,377 +1,403 @@
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36145149E1A;
-	Wed, 27 Mar 2024 16:56:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65A2B14C592
+	for <linux-bluetooth@vger.kernel.org>; Wed, 27 Mar 2024 17:02:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711558567; cv=none; b=Jt93xgPR8itQMZaE9RMVQtnRkgFD7GFrsjFg6deQmhGKtehTjkBl2d5m0ug3ajeqjz9XInRJyp/AfB4qjWgOh7MpaeYkPrxmME8mIcrVjDL2epGwhURfQtIC6H3TWMxDJ5/oFx24xmicGK8SGDuy5wJvJLrv+ZA4H7Tafwv01G0=
+	t=1711558974; cv=none; b=CZFRo+z+CR2tmHzIL7oTjcXCjZ5l/818ctUurumQDSZ+Ba7eZEBBObtCos7Nhq/rVq6UnWgKjtMqF0xMT6WA4fB1PjOwQZxvK5YhEC2jVfB4h71mxAS/rlndNKRLsXJ3m50kjKap8r6Z0D+bczbMxZ6XghwvdK+EmPR8EZU7YCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711558567; c=relaxed/simple;
-	bh=L78l5HV6r6FvAq0ammCKTqc3oUxKocapFhHEKjY00Ug=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=flS3CIYKZtpjwxPOCYWVlJo+wH7zqyHrDTpPiPe9jxpJQ2LMd4JYlbCharhkStoeJeGa6tJ/yLJ5sLYW++BImpeFXLKS/t5RahWtjQ9i2DFE+VfNAI1x60TL2wqGpnKiSCETj/l+muLE9lU+nm2cgVDNUTpiJwaItmyJVsGkIb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AGtFmWoq; arc=none smtp.client-ip=209.85.208.179
+	s=arc-20240116; t=1711558974; c=relaxed/simple;
+	bh=3Yx620YjuZn9L0g5lPjJl5oypRAftz0rs1MvQvBNBks=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=uvJmoSMGesabzzrahk1iH3890HytkQlyE/iIqeKsyUc0PrOkk6Ek5TOw5VZqYvx7uRGtnU/TXHVlIrhTaSE51BcDqiUkAu8IpLcxlvT2BivGK8FAqZUArwN8zipQXgsIofgC4rol2R2AE4jsBYaD+EwPxPVGCyOPH4fDUs5F3FE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iPLMrvy2; arc=none smtp.client-ip=209.85.210.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AGtFmWoq"
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2d4886a1cb4so91077191fa.0;
-        Wed, 27 Mar 2024 09:56:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iPLMrvy2"
+Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-6e6f72b63e2so18813a34.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Mar 2024 10:02:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711558563; x=1712163363; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FyBhgXGV/r7A7I3H1G+vTu3S7hP/dCUL8SoTG8bF7gk=;
-        b=AGtFmWoqwmXTks/oub1gy6nlz8WwylMJlaDBLbTFGBzV1Oi3OegSO6s1eFuob7kZv2
-         YpviDzpU0CRCqaZu8Cvc/++pA+Wv4H+ZyohQ3lbuanwx1DVR4EmGJrXQHzefwsMu5NGy
-         h5sFqv6vehHohpzKKbd/s+YbfE8LTVrfD31d9lVYWHR0SWEeLM5kvC2t+i7d5G548NRP
-         7axXYFof7EfdC+JH/T82iLBwtwdrGy5XgdfmUYYOu9DAEU5GwiHNW9Ko4gOxo3XwP70A
-         YU5mEWcxCbFt/jCWQxVqpELdtRpKmEwbaWwWyS9H5OrijTk7bJDrXfNp3qwganpfphdT
-         SvaA==
+        d=gmail.com; s=20230601; t=1711558970; x=1712163770; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=puSNBm1ovB9B505ifKifavpAcRWiJSljyd892/Vmh8c=;
+        b=iPLMrvy2VZNqd5yeqNPf7IYS6ryXZsGCdmnDDqi6r0sfvNa72VnfGojkEF8R6r/Ld0
+         mdj6W4myA/O1cbEDXj0e62WdIiVSUy+/1/8vllSQGiFUEPok/ETck/7FSkdsB2lle45G
+         akofcrAuVdBK7UHpNv/czzlmzvESGRTHQh0tHzYKBdgT5y0R8QMYrXoPUu2hPWfaOMM0
+         bQ7kWGu13jDRREW9JG+bKo4l7ByS7Okvv5s1nOpwC+JUFJ2Bxjk5Ix3q407j5guSqKKv
+         OEpjHXjncVl5YOGTK0bHos5FZanj3djQIvfK44SrG+oWRrePdPMuekRG3iLak6rhsq2O
+         fh7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711558563; x=1712163363;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FyBhgXGV/r7A7I3H1G+vTu3S7hP/dCUL8SoTG8bF7gk=;
-        b=Voa3DnssEUDCvzQb52jG3az0XoihXRh7VFMehrGbr5OatmacL1BjSE/JsWjR48If2N
-         A4uLPMwLRx37YFW2AP7xOONT/qqm8aX4coyOHt9/+gQ5s5VU/Gb6vh6WwyuykvMDWV6I
-         AtzpOVTyJZPoJqM+0OBg80spbM6byZ+1cs+evZdUUkn8E3yu5LclXt8UEgK75/+OBOai
-         uPBpd6Nd0slRNfupKVdXrlwoncw92ghTIEk0zRmQSLvNb6CT4NLw3DDi6hyCvhstjbBA
-         jqlrM8bz2L573J8qQ/nLVZ2zFk80wmtT2DOpQ0b3FT4ebRnm7XQBdCFXgmaBPacanYrb
-         HLcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVI4DprzihZF2IslTJakQqZHvz4zG1/OXadzPalMaB7NIZbTj9pMNenrjD/JXjTxqTbj8I/XGu0jQibq86ClE0Xi6KtcRaZsBIqxwHDjBW0LFpNbpqgEMLoTBSrphqXucyDM9ULoSivf44f2Pvh+u1KW15Nh0YQ0oLOQrR6DM9WCMPd6O9AdYAaRtnvRit3tv0ujQwyV8/BInIEE6EptBq/he/4lo0b
-X-Gm-Message-State: AOJu0YxeLPyztFgJI9H/SVCYazY1gxdDUeN9UVIcA1aqqjHFpJadpir6
-	8B6t+oROiDef97qnYl3YSJ/HYaWryfLsGimdxI8XKa+4jJOIoxw9kKnCmYAfXuuZaqvYlgSTYgc
-	Lc+yMirKzJU9xGPeQ07Pm+0aOU2Q=
-X-Google-Smtp-Source: AGHT+IHgkl+xfw6U0Pi6v9QP9YmxuYstHmaIne8ORlpeS/0ZFtRzCIoh2DRawH7RG84PM8PiO3jIWeSsohP5NpYcv6U=
-X-Received: by 2002:a05:651c:124c:b0:2d6:b582:58b8 with SMTP id
- h12-20020a05651c124c00b002d6b58258b8mr443482ljh.52.1711558562772; Wed, 27 Mar
- 2024 09:56:02 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1711558970; x=1712163770;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=puSNBm1ovB9B505ifKifavpAcRWiJSljyd892/Vmh8c=;
+        b=Da68Te0mrmPUGwB3I+3VeCtvjRsmbnZw8kZoJ3bd9MKLp47ShFWMOvrGWEWpnnHrrD
+         WEQMpNKvu/++qw3PtBllFZzQ1uBuLCMc4xzLzHr/D8/UKevtRI55LVMnbcWQ02l6E8Rn
+         m3Hlno+BTPytipWmX3iiXAr63qqNZRGPTDD5uM0uDAr7tRzZwfD49N4tW7M9I3eoi63e
+         bNJUUBGLac+os8md1DPg69Q5lSLmbBex7LDNDpuvUnqxtgy+fpc5EFz+GbjE2gXjzcWV
+         TRveJPculZPNT8ic7t2lTbjTYC/o56AXFf9GbS3UkOmvP/3DKmNyW3TcHb9AFxTKoaBl
+         SVng==
+X-Gm-Message-State: AOJu0Yz1rkxhxZVK6Xcv2Tb9zlTYF0+Kd5ZXW+kX/V4f5G/TnUeV4mbV
+	dMtDpQU0E7yBsFackbr9oII0/BmUV/gT9XX59jQfef6FdtnNXj/aH9sNpaZp
+X-Google-Smtp-Source: AGHT+IG7Y5T0Yysz5XwTw6w9lOhVIaECMr0P3bJohi5ONJtM4EOS40iCVKktDRA77qGZNF0iwMYeIQ==
+X-Received: by 2002:a05:6830:20cb:b0:6e6:8b5a:814d with SMTP id z11-20020a05683020cb00b006e68b5a814dmr658306otq.13.1711558969860;
+        Wed, 27 Mar 2024 10:02:49 -0700 (PDT)
+Received: from [172.17.0.2] ([20.51.199.0])
+        by smtp.gmail.com with ESMTPSA id eh12-20020a056214186c00b0069183a8de64sm6476676qvb.75.2024.03.27.10.02.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Mar 2024 10:02:49 -0700 (PDT)
+Message-ID: <66045139.050a0220.87687.32b6@mx.google.com>
+Date: Wed, 27 Mar 2024 10:02:49 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7192424905286791003=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ZgRIF1bkXlZlaK22@neat>
-In-Reply-To: <ZgRIF1bkXlZlaK22@neat>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 27 Mar 2024 12:55:49 -0400
-Message-ID: <CABBYNZLi_PCbRB6CVYxwOG04917tDudMvuVT1NU3LVth=xpCtw@mail.gmail.com>
-Subject: Re: [PATCH v2][next] Bluetooth: L2CAP: Avoid -Wflex-array-member-not-at-end
- warnings
-To: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-hardening@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, brgl@bgdev.pl
+Subject: RE: power: sequencing: implement the subsystem and add first users
+In-Reply-To: <20240325131624.26023-2-brgl@bgdev.pl>
+References: <20240325131624.26023-2-brgl@bgdev.pl>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Gustavo,
+--===============7192424905286791003==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Wed, Mar 27, 2024 at 12:23=E2=80=AFPM Gustavo A. R. Silva
-<gustavoars@kernel.org> wrote:
->
-> -Wflex-array-member-not-at-end is coming in GCC-14, and we are getting
-> ready to enable it globally.
+This is automated email and please do not reply to this email!
 
-Which tree is this base on, I just rebased bluetooth-next on top of
-net-next but it looks like CI is still failing to build it, so either
-we don't have all the dependencies already in net-next or perhaps you
-had it submit while the tree had not been updated.
+Dear submitter,
 
-> There are currently a couple of objects (`req` and `rsp`), in a couple
-> of structures, that contain flexible structures (`struct l2cap_ecred_conn=
-_req`
-> and `struct l2cap_ecred_conn_rsp`), for example:
->
-> struct l2cap_ecred_rsp_data {
->         struct {
->                 struct l2cap_ecred_conn_rsp rsp;
->                 __le16 scid[L2CAP_ECRED_MAX_CID];
->         } __packed pdu;
->         int count;
-> };
->
-> in the struct above, `struct l2cap_ecred_conn_rsp` is a flexible
-> structure:
->
-> struct l2cap_ecred_conn_rsp {
->         __le16 mtu;
->         __le16 mps;
->         __le16 credits;
->         __le16 result;
->         __le16 dcid[];
-> };
->
-> So, in order to avoid ending up with a flexible-array member in the
-> middle of another structure, we use the `struct_group_tagged()` (and
-> `__struct_group()` when the flexible structure is `__packed`) helper
-> to separate the flexible array from the rest of the members in the
-> flexible structure:
->
-> struct l2cap_ecred_conn_rsp {
->         struct_group_tagged(l2cap_ecred_conn_rsp_hdr, hdr,
->
->         ... the rest of members
->
->         );
->         __le16 dcid[];
-> };
->
-> With the change described above, we now declare objects of the type of
-> the tagged struct, in this example `struct l2cap_ecred_conn_rsp_hdr`,
-> without embedding flexible arrays in the middle of other structures:
->
-> struct l2cap_ecred_rsp_data {
->         struct {
->                 struct l2cap_ecred_conn_rsp_hdr rsp;
->                 __le16 scid[L2CAP_ECRED_MAX_CID];
->         } __packed pdu;
->         int count;
-> };
->
-> Also, when the flexible-array member needs to be accessed, we use
-> `container_of()` to retrieve a pointer to the flexible structure.
->
-> We also use the `DEFINE_RAW_FLEX()` helper for a couple of on-stack
-> definitions of a flexible structure where the size of the flexible-array
-> member is known at compile-time.
->
-> So, with these changes, fix the following warnings:
-> net/bluetooth/l2cap_core.c:1260:45: warning: structure containing a flexi=
-ble array member is not at the end of another structure [-Wflex-array-membe=
-r-not-at-end]
-> net/bluetooth/l2cap_core.c:3740:45: warning: structure containing a flexi=
-ble array member is not at the end of another structure [-Wflex-array-membe=
-r-not-at-end]
-> net/bluetooth/l2cap_core.c:4999:45: warning: structure containing a flexi=
-ble array member is not at the end of another structure [-Wflex-array-membe=
-r-not-at-end]
-> net/bluetooth/l2cap_core.c:7116:47: warning: structure containing a flexi=
-ble array member is not at the end of another structure [-Wflex-array-membe=
-r-not-at-end]
->
-> Link: https://github.com/KSPP/linux/issues/202
-> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-> ---
-> Changes in v2:
->  - Add a couple of code comments.
->
-> v1:
->  - Link: https://lore.kernel.org/linux-hardening/ZgMpynzZ8FltPCi3@neat/
->
-> Hi!
->
-> I wonder if `struct l2cap_ecred_conn_rsp` should also be `__packed`.
->
-> Thanks
->  - Gustavo
->
->  include/net/bluetooth/l2cap.h | 22 +++++++++++------
->  net/bluetooth/l2cap_core.c    | 46 ++++++++++++++++-------------------
->  2 files changed, 35 insertions(+), 33 deletions(-)
->
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.=
-h
-> index a4278aa618ab..7d4a3e766e7b 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -463,18 +463,24 @@ struct l2cap_le_credits {
->  #define L2CAP_ECRED_MAX_CID            5
->
->  struct l2cap_ecred_conn_req {
-> -       __le16 psm;
-> -       __le16 mtu;
-> -       __le16 mps;
-> -       __le16 credits;
-> +       /* New members must be added within the struct_group() macro belo=
-w. */
-> +       __struct_group(l2cap_ecred_conn_req_hdr, hdr, __packed,
-> +               __le16 psm;
-> +               __le16 mtu;
-> +               __le16 mps;
-> +               __le16 credits;
-> +       );
->         __le16 scid[];
->  } __packed;
->
->  struct l2cap_ecred_conn_rsp {
-> -       __le16 mtu;
-> -       __le16 mps;
-> -       __le16 credits;
-> -       __le16 result;
-> +       /* New members must be added within the struct_group() macro belo=
-w. */
-> +       struct_group_tagged(l2cap_ecred_conn_rsp_hdr, hdr,
-> +               __le16 mtu;
-> +               __le16 mps;
-> +               __le16 credits;
-> +               __le16 result;
-> +       );
->         __le16 dcid[];
->  };
->
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 467b242d8be0..bf087eca489e 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -1257,7 +1257,7 @@ static void l2cap_le_connect(struct l2cap_chan *cha=
-n)
->
->  struct l2cap_ecred_conn_data {
->         struct {
-> -               struct l2cap_ecred_conn_req req;
-> +               struct l2cap_ecred_conn_req_hdr req;
->                 __le16 scid[5];
->         } __packed pdu;
->         struct l2cap_chan *chan;
-> @@ -3737,7 +3737,7 @@ static void l2cap_ecred_list_defer(struct l2cap_cha=
-n *chan, void *data)
->
->  struct l2cap_ecred_rsp_data {
->         struct {
-> -               struct l2cap_ecred_conn_rsp rsp;
-> +               struct l2cap_ecred_conn_rsp_hdr rsp;
->                 __le16 scid[L2CAP_ECRED_MAX_CID];
->         } __packed pdu;
->         int count;
-> @@ -3746,6 +3746,8 @@ struct l2cap_ecred_rsp_data {
->  static void l2cap_ecred_rsp_defer(struct l2cap_chan *chan, void *data)
->  {
->         struct l2cap_ecred_rsp_data *rsp =3D data;
-> +       struct l2cap_ecred_conn_rsp *rsp_flex =3D
-> +               container_of(&rsp->pdu.rsp, struct l2cap_ecred_conn_rsp, =
-hdr);
->
->         if (test_bit(FLAG_ECRED_CONN_REQ_SENT, &chan->flags))
->                 return;
-> @@ -3755,7 +3757,7 @@ static void l2cap_ecred_rsp_defer(struct l2cap_chan=
- *chan, void *data)
->
->         /* Include all channels pending with the same ident */
->         if (!rsp->pdu.rsp.result)
-> -               rsp->pdu.rsp.dcid[rsp->count++] =3D cpu_to_le16(chan->sci=
-d);
-> +               rsp_flex->dcid[rsp->count++] =3D cpu_to_le16(chan->scid);
->         else
->                 l2cap_chan_del(chan, ECONNRESET);
->  }
-> @@ -4995,10 +4997,7 @@ static inline int l2cap_ecred_conn_req(struct l2ca=
-p_conn *conn,
->                                        u8 *data)
->  {
->         struct l2cap_ecred_conn_req *req =3D (void *) data;
-> -       struct {
-> -               struct l2cap_ecred_conn_rsp rsp;
-> -               __le16 dcid[L2CAP_ECRED_MAX_CID];
-> -       } __packed pdu;
-> +       DEFINE_RAW_FLEX(struct l2cap_ecred_conn_rsp, pdu, dcid, L2CAP_ECR=
-ED_MAX_CID);
->         struct l2cap_chan *chan, *pchan;
->         u16 mtu, mps;
->         __le16 psm;
-> @@ -5017,7 +5016,7 @@ static inline int l2cap_ecred_conn_req(struct l2cap=
-_conn *conn,
->         cmd_len -=3D sizeof(*req);
->         num_scid =3D cmd_len / sizeof(u16);
->
-> -       if (num_scid > ARRAY_SIZE(pdu.dcid)) {
-> +       if (num_scid > L2CAP_ECRED_MAX_CID) {
->                 result =3D L2CAP_CR_LE_INVALID_PARAMS;
->                 goto response;
->         }
-> @@ -5046,7 +5045,7 @@ static inline int l2cap_ecred_conn_req(struct l2cap=
-_conn *conn,
->
->         BT_DBG("psm 0x%2.2x mtu %u mps %u", __le16_to_cpu(psm), mtu, mps)=
-;
->
-> -       memset(&pdu, 0, sizeof(pdu));
-> +       memset(pdu, 0, sizeof(*pdu));
->
->         /* Check if we have socket listening on psm */
->         pchan =3D l2cap_global_chan_by_psm(BT_LISTEN, psm, &conn->hcon->s=
-rc,
-> @@ -5072,8 +5071,8 @@ static inline int l2cap_ecred_conn_req(struct l2cap=
-_conn *conn,
->
->                 BT_DBG("scid[%d] 0x%4.4x", i, scid);
->
-> -               pdu.dcid[i] =3D 0x0000;
-> -               len +=3D sizeof(*pdu.dcid);
-> +               pdu->dcid[i] =3D 0x0000;
-> +               len +=3D sizeof(*pdu->dcid);
->
->                 /* Check for valid dynamic CID range */
->                 if (scid < L2CAP_CID_DYN_START || scid > L2CAP_CID_LE_DYN=
-_END) {
-> @@ -5107,13 +5106,13 @@ static inline int l2cap_ecred_conn_req(struct l2c=
-ap_conn *conn,
->                 l2cap_ecred_init(chan, __le16_to_cpu(req->credits));
->
->                 /* Init response */
-> -               if (!pdu.rsp.credits) {
-> -                       pdu.rsp.mtu =3D cpu_to_le16(chan->imtu);
-> -                       pdu.rsp.mps =3D cpu_to_le16(chan->mps);
-> -                       pdu.rsp.credits =3D cpu_to_le16(chan->rx_credits)=
-;
-> +               if (!pdu->credits) {
-> +                       pdu->mtu =3D cpu_to_le16(chan->imtu);
-> +                       pdu->mps =3D cpu_to_le16(chan->mps);
-> +                       pdu->credits =3D cpu_to_le16(chan->rx_credits);
->                 }
->
-> -               pdu.dcid[i] =3D cpu_to_le16(chan->scid);
-> +               pdu->dcid[i] =3D cpu_to_le16(chan->scid);
->
->                 __set_chan_timer(chan, chan->ops->get_sndtimeo(chan));
->
-> @@ -5135,13 +5134,13 @@ static inline int l2cap_ecred_conn_req(struct l2c=
-ap_conn *conn,
->         l2cap_chan_put(pchan);
->
->  response:
-> -       pdu.rsp.result =3D cpu_to_le16(result);
-> +       pdu->result =3D cpu_to_le16(result);
->
->         if (defer)
->                 return 0;
->
->         l2cap_send_cmd(conn, cmd->ident, L2CAP_ECRED_CONN_RSP,
-> -                      sizeof(pdu.rsp) + len, &pdu);
-> +                      sizeof(*pdu) + len, pdu);
->
->         return 0;
->  }
-> @@ -7112,14 +7111,11 @@ EXPORT_SYMBOL_GPL(l2cap_chan_connect);
->  static void l2cap_ecred_reconfigure(struct l2cap_chan *chan)
->  {
->         struct l2cap_conn *conn =3D chan->conn;
-> -       struct {
-> -               struct l2cap_ecred_reconf_req req;
-> -               __le16 scid;
-> -       } pdu;
-> +       DEFINE_RAW_FLEX(struct l2cap_ecred_reconf_req, pdu, scid, 1);
->
-> -       pdu.req.mtu =3D cpu_to_le16(chan->imtu);
-> -       pdu.req.mps =3D cpu_to_le16(chan->mps);
-> -       pdu.scid    =3D cpu_to_le16(chan->scid);
-> +       pdu->mtu =3D cpu_to_le16(chan->imtu);
-> +       pdu->mps =3D cpu_to_le16(chan->mps);
-> +       pdu->scid[0] =3D cpu_to_le16(chan->scid);
->
->         chan->ident =3D l2cap_get_ident(conn);
->
-> --
-> 2.34.1
->
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=837880
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      17.35 seconds
+GitLint                       FAIL      5.29 seconds
+SubjectPrefix                 FAIL      2.20 seconds
+BuildKernel                   PASS      30.27 seconds
+CheckAllWarning               PASS      32.81 seconds
+CheckSparse                   PASS      40.46 seconds
+CheckSmatch                   FAIL      35.39 seconds
+BuildKernel32                 PASS      29.16 seconds
+TestRunnerSetup               PASS      522.12 seconds
+TestRunner_l2cap-tester       PASS      20.13 seconds
+TestRunner_iso-tester         FAIL      32.73 seconds
+TestRunner_bnep-tester        PASS      4.90 seconds
+TestRunner_mgmt-tester        PASS      112.58 seconds
+TestRunner_rfcomm-tester      PASS      7.33 seconds
+TestRunner_sco-tester         PASS      14.93 seconds
+TestRunner_ioctl-tester       PASS      7.77 seconds
+TestRunner_mesh-tester        FAIL      6.00 seconds
+TestRunner_smp-tester         PASS      6.87 seconds
+TestRunner_userchan-tester    PASS      4.97 seconds
+IncrementalBuild              PASS      95.81 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v6,01/16] regulator: dt-bindings: describe the PMU module of the QCA6390 package
+WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+#147: 
+new file mode 100644
+
+total: 0 errors, 1 warnings, 151 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13602138.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
---=20
-Luiz Augusto von Dentz
+[v6,05/16] dt-bindings: net: wireless: describe the ath12k PCI module
+WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+#145: 
+new file mode 100644
+
+total: 0 errors, 1 warnings, 100 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13602142.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[v6,06/16] arm64: dts: qcom: sm8550-qrd: add the Wifi node
+WARNING: DT compatible string vendor "pci17cb" appears un-documented -- check ./Documentation/devicetree/bindings/vendor-prefixes.yaml
+#225: FILE: arch/arm64/boot/dts/qcom/sm8550-qrd.dts:891:
++		compatible = "pci17cb,1107";
+
+total: 0 errors, 1 warnings, 137 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13602143.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[v6,07/16] arm64: dts: qcom: sm8650-qrd: add the Wifi node
+WARNING: DT compatible string vendor "pci17cb" appears un-documented -- check ./Documentation/devicetree/bindings/vendor-prefixes.yaml
+#228: FILE: arch/arm64/boot/dts/qcom/sm8650-qrd.dts:915:
++		compatible = "pci17cb,1107";
+
+total: 0 errors, 1 warnings, 123 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13602145.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[v6,08/16] arm64: dts: qcom: qrb5165-rb5: add the Wifi node
+WARNING: DT compatible string vendor "pci17cb" appears un-documented -- check ./Documentation/devicetree/bindings/vendor-prefixes.yaml
+#223: FILE: arch/arm64/boot/dts/qcom/qrb5165-rb5.dts:800:
++		compatible = "pci17cb,1101";
+
+total: 0 errors, 1 warnings, 143 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13602144.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[v6,12/16] PCI/pwrctl: add PCI power control core code
+WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+#186: 
+new file mode 100644
+
+total: 0 errors, 1 warnings, 212 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13602149.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[v6,13/16] power: sequencing: implement the pwrseq core
+WARNING: ENOSYS means 'invalid syscall nr' and nothing else
+#1328: FILE: include/linux/pwrseq/consumer.h:31:
++	return ERR_PTR(-ENOSYS);
+
+WARNING: ENOSYS means 'invalid syscall nr' and nothing else
+#1338: FILE: include/linux/pwrseq/consumer.h:41:
++	return ERR_PTR(-ENOSYS);
+
+WARNING: ENOSYS means 'invalid syscall nr' and nothing else
+#1343: FILE: include/linux/pwrseq/consumer.h:46:
++	return -ENOSYS;
+
+WARNING: ENOSYS means 'invalid syscall nr' and nothing else
+#1348: FILE: include/linux/pwrseq/consumer.h:51:
++	return -ENOSYS;
+
+total: 0 errors, 4 warnings, 1234 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13602150.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[v6,14/16] power: pwrseq: add a driver for the PMU module on the QCom WCN chipsets
+WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+#183: 
+new file mode 100644
+
+total: 0 errors, 1 warnings, 360 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13602151.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[v6,16/16] PCI/pwrctl: add a PCI power control driver for power sequenced devices
+WARNING: please write a help paragraph that fully describes the config symbol
+#155: FILE: drivers/pci/pwrctl/Kconfig:8:
++config PCI_PWRCTL_PWRSEQ
++	tristate "PCI Power Control driver using the Power Sequencing subsystem"
++	select POWER_SEQUENCING
++	select PCI_PWRCTL
++	default m if (ATH11K_PCI && ARCH_QCOM)
++	help
++	  Enable support for the PCI power control driver for device
++	  drivers using the Power Sequencing subsystem.
++
+
+WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+#176: 
+new file mode 100644
+
+WARNING: DT compatible string vendor "pci17cb" appears un-documented -- check ./Documentation/devicetree/bindings/vendor-prefixes.yaml
+#246: FILE: drivers/pci/pwrctl/pci-pwrctl-pwrseq.c:66:
++		.compatible = "pci17cb,1101",
+
+WARNING: DT compatible string vendor "pci17cb" appears un-documented -- check ./Documentation/devicetree/bindings/vendor-prefixes.yaml
+#251: FILE: drivers/pci/pwrctl/pci-pwrctl-pwrseq.c:71:
++		.compatible = "pci17cb,1107",
+
+total: 0 errors, 4 warnings, 107 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13602153.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v6,01/16] regulator: dt-bindings: describe the PMU module of the QCA6390 package
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (81>80): "[v6,01/16] regulator: dt-bindings: describe the PMU module of the QCA6390 package"
+13: B1 Line exceeds max length (85>80): " create mode 100644 Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml"
+[v6,02/16] regulator: dt-bindings: describe the PMU module of the WCN7850 package
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (81>80): "[v6,02/16] regulator: dt-bindings: describe the PMU module of the WCN7850 package"
+[v6,03/16] dt-bindings: net: bluetooth: qualcomm: describe regulators for QCA6390
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (81>80): "[v6,03/16] dt-bindings: net: bluetooth: qualcomm: describe regulators for QCA6390"
+[v6,04/16] dt-bindings: net: wireless: qcom,ath11k: describe the ath11k on QCA6390
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (82>80): "[v6,04/16] dt-bindings: net: wireless: qcom,ath11k: describe the ath11k on QCA6390"
+[v6,05/16] dt-bindings: net: wireless: describe the ath12k PCI module
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+12: B1 Line exceeds max length (83>80): " create mode 100644 Documentation/devicetree/bindings/net/wireless/qcom,ath12k.yaml"
+[v6,11/16] PCI/pwrctl: create platform devices for child OF nodes of the port node
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (82>80): "[v6,11/16] PCI/pwrctl: create platform devices for child OF nodes of the port node"
+[v6,14/16] power: pwrseq: add a driver for the PMU module on the QCom WCN chipsets
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (82>80): "[v6,14/16] power: pwrseq: add a driver for the PMU module on the QCom WCN chipsets"
+[v6,16/16] PCI/pwrctl: add a PCI power control driver for power sequenced devices
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (81>80): "[v6,16/16] PCI/pwrctl: add a PCI power control driver for power sequenced devices"
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
+
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+Total: 117, Passed: 116 (99.1%), Failed: 1, Not Run: 0
+
+Failed Test Cases
+ISO Connect Suspend - Success                        Failed       4.185 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 9 (90.0%), Failed: 1, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 2                               Failed       0.097 seconds
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7192424905286791003==--
