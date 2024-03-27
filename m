@@ -1,221 +1,169 @@
-Received: from mail.nfschina.com (unknown [42.101.60.195])
-	by smtp.subspace.kernel.org (Postfix) with SMTP id 3252921A1C
-	for <linux-bluetooth@vger.kernel.org>; Wed, 27 Mar 2024 02:43:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=42.101.60.195
+Received: from smtp-relay-canonical-0.canonical.com (smtp-relay-canonical-0.canonical.com [185.125.188.120])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7A6E224DC
+	for <linux-bluetooth@vger.kernel.org>; Wed, 27 Mar 2024 03:16:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711507410; cv=none; b=IoldJgEUGilgVebAAa0gqjvnXWuDjKcUHbmF2ab0QZzc2mB30GMz3H5RAngQFju8XRe3s9ZsmaxbeMwQZmLguSHY3SDWbXM5+kEB+eCpGj9W/QQHkzTjrj8ztJyL3BoNsrNq8V6/X0Z9Lo8SOAKk2UQXotPklv4I5rIB1vhFzhg=
+	t=1711509415; cv=none; b=BXSylmD6s2Loz4LBjrJvCp6EnKzlwGdsv+HHDut7hiRKi/wY2Id0DCLz6UUXWIuCTdeXGEmLmuHLLgAU0/Qqp2ynTGO7T6sdUqhpcK3NlAZHLHkhRAw/Eu5kSpkMKUpiq34Zq531OdAMSV99AQLPhdgKUIOOPM03pd/NZcybw00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711507410; c=relaxed/simple;
-	bh=CeDV/18SD+bNaF3rc12GYjUPpyS4DFObE1L+rH7TKd0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=L5gZ75NWx/CnSUoEYUqXjJByHEezx89uNLCFNHGK5aoi3d8FcM2Kp6KCdMlqZM4CmDCQ9ryIJd4MVomDU2IB/VlQeauAx0D4/f6JxK2UrlYLqHESbBBAa/y8jzBUtvihhcodz75U9wCDx1sI5ZQxBfyW3ezwYeQ99/5ajtke8I0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com; spf=pass smtp.mailfrom=nfschina.com; arc=none smtp.client-ip=42.101.60.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nfschina.com
-Received: from localhost.localdomain (unknown [103.163.180.46])
-	by mail.nfschina.com (Maildata Gateway V2.8.8) with ESMTPA id 47927601ACFBE;
-	Wed, 27 Mar 2024 10:43:15 +0800 (CST)
-X-MD-Sfrom: youwan@nfschina.com
-X-MD-SrcIP: 103.163.180.46
-From: Youwan Wang <youwan@nfschina.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Youwan Wang <youwan@nfschina.com>
-Subject: [BlueZ] obexd: Fix "Size" use g_dbus_emit_property_changed_full() to emit
-Date: Wed, 27 Mar 2024 10:43:06 +0800
-Message-Id: <20240327024306.575116-1-youwan@nfschina.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1711509415; c=relaxed/simple;
+	bh=PtxCyoh8kHYeJPqnEt9qhSJ2XPVSv7pK4t6JdznHRvI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VSlDaAxNigeS1qwjdDJkOn3x8HkwgEslLKvkPMSYB1EoJQpkm6t5P5A3d5LRuBkxDI4pSCBIOir3vLLu+pPjk5ikzxhrNKsvGV0Ba5L6hymnssf0kuG6Hd5B7j5nPpEKmc5gJSrFtU9IG9i1kWSuYp+DUcUanVikeH3rM5b5cTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=iKHCXcei; arc=none smtp.client-ip=185.125.188.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="iKHCXcei"
+Received: from [192.168.0.106] (unknown [123.112.66.108])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPSA id 9248E3F28B;
+	Wed, 27 Mar 2024 03:16:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1711509404;
+	bh=GyDYJPl5SAMCniRMuwyDANpyukdxuKJxNiZBTiPucuA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type;
+	b=iKHCXceiRhZtCv1iFkyOI1wxj/4Y+Zna2nEVSsIOG1tdPiKYZyP6DcrTZBBI+x/Qd
+	 3fASE5zr+xp0AEnP1UvHVS69HpM/s4JzNVgLY08zpjHR/M/VrcAeywfLFCZ67W+1IK
+	 Vk0ow56lRUnynfnW7PfZmN3uUEjJhAJsVIu+Oz9g+J9MdPPRwihecJBXpN7GNq/JZm
+	 NcWWA1joNkrAHNO7LKU7b3YXDSVy/6nSR3ULqv/3Z8X2Y9OrCVAa4visAzLty235lm
+	 IhpOam78RDtash/pkSHMomfMqgYSAvHGFRxuBNDxg2Bj9r7BSV9tx39lqDUkym2ne9
+	 KiaJN8V3Z8gBA==
+Message-ID: <36b87a84-1979-4237-bd68-ddef2601951e@canonical.com>
+Date: Wed, 27 Mar 2024 11:16:36 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: hci_event: conn is already encryped before
+ conn establishes
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
+ marcel@holtmann.org, johan.hedberg@gmail.com
+References: <20240325061841.22387-1-hui.wang@canonical.com>
+ <bedd53fd-e034-4038-9180-5ee378460e09@molgen.mpg.de>
+Content-Language: en-US
+From: Hui Wang <hui.wang@canonical.com>
+In-Reply-To: <bedd53fd-e034-4038-9180-5ee378460e09@molgen.mpg.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-This is the comment for g_dbus_emit_property_changed()
-/*
- * Note that when multiple properties for a given object path are changed
- * in the same mainloop iteration, they will be grouped with the last
- * property changed. If this behaviour is undesired, use
- * g_dbus_emit_property_changed_full() with the
- * G_DBUS_PROPERTY_CHANGED_FLAG_FLUSH flag, causing the signal to ignore
- * any grouping.
- */
 
-When receiving a "small file" through Bluetooth, When using Blueman to
-transfer files to the configured directory, "small files" in the cache
-will not be moved to the configured directory. Debugging found that the
-three properties "Size" "Transferred" and "complete" were reported at once
-through the g_dbus_emit_property_changed function, but the "Size" property
-did not have a value, it appears that there are the following errors
-"UnicodeDecodeError: 'utf-8' codec can't decode byte 0xb5 in position 0:
-invalid start byte" in Blueman log.
-So let the "Size" property use g_dbus_emit_property_changed_full to
-single emit, if use g_dbus_emit_property_changed（grouped）to emit,
-there is a possibility that "Size" property value has been freed
+On 3/25/24 22:18, Paul Menzel wrote:
+> Dear Hui,
+>
+>
+> Thank you for your patch. Some minor nits from my side.
+>
+> Regarding the summary (encryp*t*ed), please describe the action of the 
+> change and not the issue.
+>
+> Am 25.03.24 um 07:18 schrieb Hui Wang:
+>> We have a BT headset (Lenovo Thinkplus XT99), the pairing and
+>> connecting has no problem, once this headset is paired, bluez will
+>> remember this device and will auto re-connect it whenever the device
+>> is power on. The auto re-connecting works well with Windows and
+>
+> power*ed*
+>
+>> Android, but with Linux, it always fails. Through debugging, we found
+>> at the rfcomm connection stage, the bluetooth stack reports
+>> "Connection refused - security block (0x0003)".
+>>
+>> For this device, the re-connecting negotiation process is different
+>> from other BT headsets, it sends the Link_KEY_REQUEST command before
+>> the CONNECT_REQUEST completes, and it doesn't send ENCRYPT_CHANGE
+>> command during the negotiation. When the device sends the "connect
+>> complete" to hci, the ev->encr_mode is 1.
+>
+> Is that in accordance with the specification or a violation?
+>
+According to Luiz's comment, looks like it follows the Security Mode 3 
+policy, Encryption is established during Link Level.
+>> So here in the conn_complete_evt(), if ev->encr_mode is 1, link type
+>> is ACL and HCI_CONN_ENCRYPT is not set, we set HCI_CONN_ENCRYPT to
+>> this conn, and update conn->enc_key_size accordingly.
+>>
+>> After this change, this BT headset could re-connect with Linux
+>> successfully.
+>
+> Despite this being a generic issue, could you please document with 
+> what controller you tested this?
+>
+> Do you have any bug/issue tracker URL, you can reference?
+OK, will address them in the v2, and will also fix those misspell.
+>
+>> Signed-off-by: Hui Wang <hui.wang@canonical.com>
+>> ---
+>> This is the btmon log for auto re-connecting negotiation:
+>> Before applying this patch:
+>> https://pastebin.com/NUa9RJv8
+>>
+>> After applying the patch:
+>> https://pastebin.com/GqviChTC
+>>
+>> net/bluetooth/hci_event.c | 26 ++++++++++++++++++++++++++
+>>   1 file changed, 26 insertions(+)
+>>
+>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+>> index 4ae224824012..0c45beb08cb2 100644
+>> --- a/net/bluetooth/hci_event.c
+>> +++ b/net/bluetooth/hci_event.c
+>> @@ -3208,6 +3208,32 @@ static void hci_conn_complete_evt(struct 
+>> hci_dev *hdev, void *data,
+>>           if (test_bit(HCI_ENCRYPT, &hdev->flags))
+>>               set_bit(HCI_CONN_ENCRYPT, &conn->flags);
+>>   +        /* "Link key request" completed ahead of "connect request" 
+>> completes */
+>> +        if (ev->encr_mode == 1 && !test_bit(HCI_CONN_ENCRYPT, 
+>> &conn->flags) &&
+>> +            ev->link_type == ACL_LINK) {
+>> +            struct link_key *key;
+>> +            struct hci_cp_read_enc_key_size cp;
+>> +
+>> +            key = hci_find_link_key(hdev, &ev->bdaddr);
+>> +            if (key) {
+>> +                set_bit(HCI_CONN_ENCRYPT, &conn->flags);
+>> +
+>> +                if (!(hdev->commands[20] & 0x10)) {
+>> +                    conn->enc_key_size = HCI_LINK_KEY_SIZE;
+>> +                    goto notify;
+>> +                }
+>> +
+>> +                cp.handle = cpu_to_le16(conn->handle);
+>> +                if (hci_send_cmd(hdev, HCI_OP_READ_ENC_KEY_SIZE,
+>> +                         sizeof(cp), &cp)) {
+>> +                    bt_dev_err(hdev, "sending read key size failed");
+>> +                    conn->enc_key_size = HCI_LINK_KEY_SIZE;
+>> +                }
+>> +notify:
+>> +                hci_encrypt_cfm(conn, ev->status);
+>
+>
+> Is goto and labels necessary?
 
-The following is the issue log
+Will drop them in the v2, replace them with if {} else {}
 
-dbus-monitor log:
+Thanks,
 
-signal time=1710900297.140618 sender=:1.50 -> destination=(null)
-serial=59 path=/org/bluez/obex/server/session4/transfer3;
-interface=org.freedesktop.DBus.Properties; member=PropertiesChanged
+Hui.
 
-   string "org.bluez.obex.Transfer1"
-   array [
-      dict entry(
-         string "Status"
-         variant             string "complete"
-      )
-      dict entry(
-         string "Transferred"
-         variant             uint64 0
-      )
-   ]
-   array [
-      string "Size"
-   ]
-method call time=1710900297.141361 sender=:1.39 -> destination=:1.50
-serial=417 path=/org/bluez/obex/server/session4/transfer3;
- interface=org.freedesktop.DBus.Properties; member=Get
-
-   string "org.bluez.obex.Transfer1"
-   string "Size"
-error time=1710900297.141596 sender=:1.50 -> destination=:1.39
-error_name=org.freedesktop.DBus.Error.InvalidArgs reply_serial=417
-
-   string "No such property 'Size'"
-
-blueman log
-
-blueman.desktop[2368]: blueman-applet 09.42.04 DEBUG
-Transfer:25 do_g_properties_changed: /org/bluez/obex/server/session2/
-transfer1 Transferred 0
-blueman.desktop[2368]: blueman-applet 09.42.04 DEBUG
-Base:74 do_g_properties_changed: /org/bluez/obex/server/session2
-{'Source': 'xxx', 'Destination': 'xxx', 'Root': 'xxx/.cache/obexd'}
-blueman.desktop[2368]: blueman-applet 09.42.04 ERROR
-TransferService:97 _authorize_push: Failed to get StatusIcon
-blueman.desktop[2368]: blueman-applet 09.42.15 INFO
-Notification:239 do_g_signal: accept
-blueman.desktop[2368]: blueman-applet 09.42.15 INFO
-TransferService:57 on_action : Action accept
-blueman.desktop[2368]: blueman-applet 09.42.15 INFO
-Notification:239 do_g_signal: 3
-blueman.desktop[2368]: blueman-applet 09.42.15 DEBUG
-Notification:247 do_g_signal: The notification was closed by a call
-to CloseNotification.
-blueman.desktop[2368]:UnicodeDecodeError: 'utf-8' codec can't decode byte
-0xb5 in position 0: invalid start byte
-blueman.desktop[2368]: blueman-applet 09.42.15 INFO
-Manager:73 _on_object_removed: /org/bluez/obex/server/session2/transfer1
-blueman.desktop[2368]: blueman-applet 09.42.15 INFO
-Manager:80 _on_object_removed: /org/bluez/obex/server/session2
-
-After fix, The following log
-
-dbus-monitor log:
-
-signal time=1711000976.672383 sender=:1.724 -> destination=(null)
-serial=18 path=/org/bluez/obex/server/session1/transfer0;
-interface=org.freedesktop.DBus.Properties; member=PropertiesChanged
-
-   string "org.bluez.obex.Transfer1"
-   array [
-      dict entry(
-         string "Size"
-         variant             uint64 50
-      )
-   ]
-   array [
-   ]
-signal time=1711000976.672483 sender=:1.724 -> destination=(null)
-serial=19 path=/org/bluez/obex/server/session1/transfer0;
-interface=org.freedesktop.DBus.Properties; member=PropertiesChanged
-
-   string "org.bluez.obex.Transfer1"
-   array [
-      dict entry(
-         string "Status"
-         variant             string "complete"
-      )
-      dict entry(
-         string "Transferred"
-         variant             uint64 0
-      )
-   ]
-   array [
-   ]
-
-blueman log
-
-blueman.desktop[2368]: blueman-applet 14.13.29 DEBUG
-Transfer:25 do_g_properties_changed: /org/bluez/obex/server/session2/
-transfer1 Transferred 0
-blueman.desktop[2368]: blueman-applet 14.13.29 DEBUG
-Base:74 do_g_properties_changed: /org/bluez/obex/server/session2
-{'Source': 'xxx', 'Destination': 'xxx', 'Root': 'xxx'}
-blueman.desktop[2368]: blueman-applet 14.13.29 ERROR
-TransferService:97 _authorize_push: Failed to get StatusIcon
-blueman.desktop[2368]: blueman-applet 14.13.36 INFO
-Notification:239 do_g_signal: accept
-blueman.desktop[2368]: blueman-applet 14.13.36 INFO
-TransferService:57 on_action : Action accept
-blueman.desktop[2368]: blueman-applet 14.13.36 INFO
-Notification:239 do_g_signal: 3
-blueman.desktop[2368]: blueman-applet 14.13.36 DEBUG
-Notification:247 do_g_signal: The notification was closed by a call to
-CloseNotification.
-blueman.desktop[2368]: blueman-applet 14.13.36 DEBUG
-Transfer:25 do_g_properties_changed: /org/bluez/obex/server/session2/
-transfer1 Size 50
-blueman.desktop[2368]: blueman-applet 14.13.36 DEBUG
-Transfer:25 do_g_properties_changed: /org/bluez/obex/server/session2/
-transfer1 Status complete
-blueman.desktop[2368]: blueman-applet 14.13.36 INFO
-Manager:86 _on_transfer_completed: /org/bluez/obex/server/session2/
-transfer1 True
-blueman.desktop[2368]: blueman-applet 14.13.36 INFO
-TransferService:275 _on_transfer_completed: Destination file exists,
-renaming to: xxx.txt
-blueman.desktop[2368]: blueman-applet 14.13.36 ERROR
-TransferService:256 _notify_kwargs: No statusicon found
-blueman.desktop[2368]: blueman-applet 14.13.36 INFO
-TransferService:241 _add_open : adding action
-blueman.desktop[2368]: blueman-applet 14.13.36 DEBUG
-Transfer:25 do_g_properties_changed: /org/bluez/obex/server/session2/
-transfer1 Transferred 0
-blueman.desktop[2368]: blueman-applet 14.13.36 INFO
-Manager:73 _on_object_removed: /org/bluez/obex/server/session2/transfer1
-blueman.desktop[2368]: blueman-applet 14.13.36 INFO
-Manager:80 _on_object_removed: /org/bluez/obex/server/session2
-
-Signed-off-by: Youwan Wang <youwan@nfschina.com>
----
- obexd/src/manager.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/obexd/src/manager.c b/obexd/src/manager.c
-index c393911a7..6be531638 100644
---- a/obexd/src/manager.c
-+++ b/obexd/src/manager.c
-@@ -528,8 +528,13 @@ void manager_emit_transfer_property(struct obex_transfer *transfer,
- 	if (transfer->path == NULL)
- 		return;
- 
--	g_dbus_emit_property_changed(connection, transfer->path,
--					TRANSFER_INTERFACE, name);
-+	if (strcasecmp("Size", name) == 0)
-+		g_dbus_emit_property_changed_full(connection, transfer->path,
-+						TRANSFER_INTERFACE, name,
-+						G_DBUS_PROPERTY_CHANGED_FLAG_FLUSH);
-+	else
-+		g_dbus_emit_property_changed(connection, transfer->path,
-+						TRANSFER_INTERFACE, name);
- }
- 
- void manager_emit_transfer_started(struct obex_transfer *transfer)
--- 
-2.25.1
-
+>
+>> +            }
+>> +        }
+>> +
+>>           /* Get remote features */
+>>           if (conn->type == ACL_LINK) {
+>>               struct hci_cp_read_remote_features cp;
+>
+>
+> Kind regards,
+>
+> Paul
