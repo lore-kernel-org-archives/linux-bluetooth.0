@@ -1,104 +1,164 @@
-Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2098.outbound.protection.outlook.com [40.107.223.98])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E84214F102
-	for <linux-bluetooth@vger.kernel.org>; Wed, 27 Mar 2024 18:10:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711563054; cv=none; b=Z6An71FmtgosO3F8YxFeRQ2djPiDjPy5ExTcuUI9K62bQfrpSLN95AW75Z9p3SeQK1Qn6bRia6AiEopLvcaMAUfpapWlOSoKvnS4Z5D59yIQ6xvX5tvIJkNuHeN79AOpmSt2+KGx1eC5WMfMC/3bowNBrH7h4Uq+BWAKW/ws8rY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711563054; c=relaxed/simple;
-	bh=yYV9QCF7XAARtHcw4QfM7IhXu14vd9E0Yle4lD1yW2Q=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=papjhSJv45YQ4w9Bffc14UhYleY2O+DmCPh6ToYvBuy5r8rzN93W0lZSJWV+zoT+4CGodnIxQevX0gMrW3j1zDHMj+xBIy7ZTat7XfxV3Rl2fBQmBpL9H/gVKjhwvdBPZjb5eMsYSOK662rXtcropwI9T6KV0Wjmd2jZorjfwMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SftG8FL9; arc=none smtp.client-ip=209.85.160.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 050D012A144
+	for <linux-bluetooth@vger.kernel.org>; Wed, 27 Mar 2024 18:15:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.98
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711563353; cv=fail; b=cGvc6mEJ0atflVP7Mo5gtemeTF4iOqyI7/RS53ewYDm4MhCfHP68yTCRkRqFbxQVGRGupivwBR7E8GVaAOlFCCTHK/uRiQVBkMHuumSmXw94ThQMf1aK/bcL3hgR9+vlVuiaM38v0Jr54NAeOj/GKZRyx52yM4LlPatK1HO0nB8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711563353; c=relaxed/simple;
+	bh=dQxSpd3mZmNjf4DkUl/uPK962VdKrlz9rIEel6JDhjw=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=tFhm8SUeYhnqbIP7XyVGqfyBjo1TTJE0xhnAlYNxYzd0aoPmHApDf7Iw75oFtfYo0p+y6y5Nn7KYRy2hc6uE6RWkQpzc79ZH9b0MtSuq0fuabNDlxwiQYjazEetXoK3qBKd7Q1IfNbAq0Ku7M+TWIYnufgvLtvCVMWzASSGKD0w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ezurio.com; spf=pass smtp.mailfrom=ezurio.com; dkim=pass (2048-bit key) header.d=ezurio.com header.i=@ezurio.com header.b=VUrYjAw1; arc=fail smtp.client-ip=40.107.223.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ezurio.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ezurio.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SftG8FL9"
-Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-222a9eae9a7so71365fac.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Mar 2024 11:10:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711563051; x=1712167851; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=tFce7JgGfSXOAp8O2DjBcffOpTvplFe97chZb0GkglA=;
-        b=SftG8FL9Nzhl4IPPu5iWfzfxUfDhOrxSMjWBOoC8wITlZBpYJWnNDuO0u7LHEu7Rc2
-         nYy9SzgmbnMFtbPAXvg583E6MlGC76O5pIFiRGhldKvxQhTeANXQrafc6MN5E7wgv1I/
-         k+yeNpigzy1rQMSHYmGArdae0toGQt6Bc9c9+RLOGJF64lTptJ02+fvxUnYS4cXRDD9V
-         pHEVN7LLCUwzOoLEyaSedK9yBBfA7Q7MsXc6YK8wG+0pgvNJ+44Lq8WoPBZjSghVWW4m
-         0FUmgdlObJMIN5QvB5+3mZX1FKlTCfappVM8Wp7mfAYquWRdUndKOXZM0Mu2RPGS9HLW
-         1KsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711563051; x=1712167851;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tFce7JgGfSXOAp8O2DjBcffOpTvplFe97chZb0GkglA=;
-        b=etsz4kppJx3v7PPJeCaeIDvSXmP5Nwn94e6BZVXS8UXv+tUZsz/h2MTi+HCOnMenHJ
-         gFqejPFKMXUimWVlrZ/QfEOfDA3u8UBuCTTQRkqePzLFGkABzJbdgBSPJ0br98p3eXsM
-         LIwslUq+mXVTRGfvWJuTZ8jjBsXE5yzeBmtiEuCfX+4oor82Mj1YNS+8adi20eSiLqP0
-         b2lzttUpf7pCw4TxvqDJpJIJaUaL3lcYr3LU4EqNVNyJj5fjZqlCnzzE27GsuG09D8N7
-         Ubpfg/cF1KCQKLQtUxbp4FQ54TI5hlqVaE+kS5tp4y0hj4DpJ1pTcmDBtwjr+kOlo1Qi
-         KKsA==
-X-Gm-Message-State: AOJu0YxsTqLJckc/ZkavXRA7V0p13ei3tZJeA3cBs0nF+TKLxAb/Gj62
-	Q+aIA+VQiQ7A/BN8xa2PnyaM/wmQmTkC7uRQ4F4VV2OAQw4k4mBi2TJVyufs
-X-Google-Smtp-Source: AGHT+IHTikhVR8Q9wvCTxeroUE2hFAjXhtEgFSlTHVYQiGYn7o3gu2z95tJtPb43hhpqZUxzGQ8zIQ==
-X-Received: by 2002:a05:6870:6f08:b0:229:8389:a0d2 with SMTP id qw8-20020a0568706f0800b002298389a0d2mr480801oab.43.1711563051395;
-        Wed, 27 Mar 2024 11:10:51 -0700 (PDT)
-Received: from [172.17.0.2] ([23.96.249.165])
-        by smtp.gmail.com with ESMTPSA id hh9-20020a05622a618900b004313b4ccfa6sm4963557qtb.13.2024.03.27.11.10.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Mar 2024 11:10:51 -0700 (PDT)
-Message-ID: <6604612b.050a0220.23bac.7d18@mx.google.com>
-Date: Wed, 27 Mar 2024 11:10:51 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4037168997154763759=="
+	dkim=pass (2048-bit key) header.d=ezurio.com header.i=@ezurio.com header.b="VUrYjAw1"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Loq2GbSc7bY1ERJKzyrlCfeEzTcUIEOX2PGSVibsjRsw3impmrofBIrmq+8Byf1S00eFYsddh3EIByoK3VuMV3dfFmZezN61a507ZhX6nDQOICzVURQ2vJTxnfHwV98hoIpP32T/AvP5GkqH2Unfvt3wCcGhvDvzfmo5HSXx8IUaV5yKWxwdi0qtkFh2xe5x6FuzjgTwzHpIfv+F4wDtqy32SkdWKI28eEDL40owxcz6NGPwTEM/ytR8ncymySFi09CB3dT+YogKV/zBqRS68doXMlhfJ/0WAfxhbCXi8rme45qDfKm5Tj/57kanW4eONlFZXFlXlPHpE3P6Bh+D3g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=KU1rCjZntAdYkgm/vjVM/2tzBHgScIwHL/z+X8m+Wjc=;
+ b=au3phGnh/lD+GpLR3h0pDi/Qv+ENE4NfAz4ltNgfn3XhzvN/Qzh3RIGpBqhcnA4mmLMg1/LY/kQvj2UcP6bamfdtaIjp6Es4dp/sehykxNrkjQiLk3Tp1HQ+9Hd7/SIkSYa2/QFQz5vYv7p1ncAbAaj89Qlao/3g2clla+IwtF5dLxv+Qx2vBZR9tiinFa1y/baEMo9zpAou6kkUOxoZc0PwJ8uwc5LM/ZJl7QKh/FE8SSFS05LuBS7VejlMPsL7kDBJG14g8/fztHtfspTDEzHzkpjlLOFuBAJh7sg3k8hkfAinnR02+t3yhoTxX1uTdRiQ3Wne4GPB95wQ+YsQxQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=ezurio.com; dmarc=pass action=none header.from=ezurio.com;
+ dkim=pass header.d=ezurio.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ezurio.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KU1rCjZntAdYkgm/vjVM/2tzBHgScIwHL/z+X8m+Wjc=;
+ b=VUrYjAw1w8tcwJGe8BDcZ5XSVNTjwGKci9El37jHZ8ZHpN0oLbAIo6luL0gb/TS+MWlmL/P6wSTIeNaHwLD2NBYZDwIN017yTQrMyKVuY3LpOmnI52thEAYwQgwAg5i9edtdfE3kC08fPN+EVDoupM37RPXA7G6Pz8hzKk/iZj+tTPKZhH6/DXui90rUWjQyOpqGqnmtg77tZ6YfcKwoZuk1isJt0wNrQAM8BbpI1IGPybBOAe1XVV5Kp4eeuTd4ZWr4+CJ4is+PfaSiUlbUnLtfmKTfYqyaag8MgadfMIbrOXTXQUrpOvNISI55okFZO6tBcmKXTb9kFmep4pFPzg==
+Received: from PH7PR14MB5300.namprd14.prod.outlook.com (2603:10b6:510:13c::8)
+ by CO6PR14MB4273.namprd14.prod.outlook.com (2603:10b6:5:348::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.26; Wed, 27 Mar
+ 2024 18:15:48 +0000
+Received: from PH7PR14MB5300.namprd14.prod.outlook.com
+ ([fe80::e26b:8dfa:5b06:594a]) by PH7PR14MB5300.namprd14.prod.outlook.com
+ ([fe80::e26b:8dfa:5b06:594a%4]) with mapi id 15.20.7409.031; Wed, 27 Mar 2024
+ 18:15:48 +0000
+From: Chris Laplante <Chris.Laplante@ezurio.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: Maximum Bonded Devices
+Thread-Topic: Maximum Bonded Devices
+Thread-Index: AdqAcgMJHCNRz56XQrWX+InNCWrc+A==
+Date: Wed, 27 Mar 2024 18:15:48 +0000
+Message-ID:
+ <PH7PR14MB53009C64A876F92F7F472CB5E9342@PH7PR14MB5300.namprd14.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=ezurio.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH7PR14MB5300:EE_|CO6PR14MB4273:EE_
+x-ms-office365-filtering-correlation-id: 9854d6b4-5526-47a8-8b47-08dc4e89ed8d
+x-ms-exchange-atpmessageproperties: SA
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ U5whAACIHAQD8af1NOhHaFPwlqj3gO/bO2w19BelfM7T2mt1CVRpeBaII1eTQMyXAYM/W+mMtIuLSoKUT1iepUcZEk5m6SsT9x8AVx468xRY9Gc2TSxcq32iV7LrLgYnuAMWiYk/Hjy2z1q/SBf5qt0OY19LVhtaLEc1PKqd/WFgJIliOV1D7vBITAUI6VM8+trsLQjFeL/wAcxQFgLTZqaBNCMCa4hDI+Q8M7aQXpBt5usvPTfOK6Epnz8UYTjNwkCCwqhtithiIv+Ul3ESJzengoKdKXbXMjblctu8y/tnBYdypceQuH5dlvzSF+6v36laKGusaozA7xaxcDkR+InJR3lg5ISm82+/EMPs49HonPmKe3KmvhwDSmwVVXceWFLD1935LDFWcGvedejnoiXdq0w0ylP1nDoEayNWBcs98/D2kahScJxea+tHdKxETty8E5nKqEhxehO0qpAbLWrG12oxbrqh1bwfUk22CDZpB5IGQnHSgXwUPe+olz+MrUPrsG55jmK2OF79uw+zA19bVDQtEnl7wXDFvNnMpD7ch8u+ASmX+mCmj2DlO1ZXx1J6bd9NF/HmAaTFkfOkSyZd4D5VjqyyRR6YBX+hojKV4TN9q44gqwICCex6J/jllBSF+AqP0XAK5R54u3PzFI89UyIteN1KKCfxhR9Yh7Uqvr3Pa121YyflvTBSbJBhaLFcNySi/ahu3hv4o58I14UCfBwg3X9bwS4WJJpkyb0=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR14MB5300.namprd14.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015)(38070700009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?4qf682oIhmUEEL1ReZJ9bO1FSdQxrK3sy2BDUl4RbZLEJ/MQ6AxSPZ2TvmbS?=
+ =?us-ascii?Q?lK+GBaAayKYGMKKK84Vl+oPvmLz6NjP4l03FXs4x0Z7YdNf5tLFyC+45YRX1?=
+ =?us-ascii?Q?SyvecfLfNG4J2pfg7cR8TBWqxgSxF4T0ysVVmO8ktab8WK0OJf6jUlY+2JFA?=
+ =?us-ascii?Q?pXy7dIZPPpH7Zg1iZh0NkMd47VceD65ivD04T687+SCAU/YCc14K2K+I9+Q6?=
+ =?us-ascii?Q?PaAFcqSFVE+udxAJTsIthQ7U70ZmpUd8omniJ84IorLHTMRLBtej7Q5RVHbt?=
+ =?us-ascii?Q?Fi5LotD04dmTrLuV1m5UJWNc9KKG/YwM2jzPtzhrB1dQGgYsHSnHHNHrW+1+?=
+ =?us-ascii?Q?KrGoAREnZ2HFD8GiP5KYQH/XaMtUalfxIui87hhuyfXuMdEGT+TdzPRLfLmK?=
+ =?us-ascii?Q?H0gg5/FtV6WlPkz/cUe5ZY19xnoFT0h7yz6zQKq2wjoYfHMb3Kq7EqkWiTcK?=
+ =?us-ascii?Q?5m6NsbdnVYHMh3o9TIGlCKteHj/VBhZpiGqbp4Sm1C/wP2EN9hpoxVPdOa6h?=
+ =?us-ascii?Q?GIHbLt+XppivOY6Ez9YfBsxPnKfQ4jI0BWO1ro7OYGz3tuyCmicWMK1szyNf?=
+ =?us-ascii?Q?HP3Ehg84/2Zlih0CWsKtOmBu29Z4dHVS2O8Mv3Jt7GbXpSQc45bjWsoFZkQT?=
+ =?us-ascii?Q?rNYj1Zj4XlUxMnQFYdmMANEaFcG1eQdD3JP/PdPVRpbnhUhix1L96snzfreP?=
+ =?us-ascii?Q?GejcbKv1173z1f62TrnfxkS2xa+JBJIei7OVDoDe4S7MRsasUGk5TKWnyjT0?=
+ =?us-ascii?Q?FLc5SZgUw6UXmfBJdkSKVhpIqhDU8yjTEh+mT65T+ifV5f1TE3yr20/zHglw?=
+ =?us-ascii?Q?jGkJ5p8EVHMEa4exzBt+TnYBrA0Y/WP1EUDdAJc4UiaKvA+gqq8/3dNV28RI?=
+ =?us-ascii?Q?Q1xNAjw572hYtDXVXxt8j1ZwD65TgkUG4jMqUYTOObbhxfWIsQaRvlgG03Qo?=
+ =?us-ascii?Q?gUz8MC4SqZes9DwW74+oOHLY9Wnhj8sFMpuDkt0XAXynmkyDhl3Kbfloym/B?=
+ =?us-ascii?Q?kAGv7GSD2fS+ydm9rFs2v3DBBxu2BhYxNfmgP98TyioD+d+lsmU+JxYbRI+x?=
+ =?us-ascii?Q?ogqkAlCapdOSsWnJxgTjpqtNjyGYEO4A3G8zrnoJpaIzJCOgU5mvqfyED5Me?=
+ =?us-ascii?Q?xf0m8TJDuziMnfHZXPPIs4TG/yLr/Atu6CEpK/H4QsW6Ixgei9H6U3+mLavg?=
+ =?us-ascii?Q?P8SFmZ1G7h96lwfQdZYTYiiLr7i+JFUVmr20YOYKa0KrgrDQmpGkFl7/8yRp?=
+ =?us-ascii?Q?NsXE5Njlud0KfBYC//xUHWcoxRnJSr178jGE2ExjqzHpB4jfZNwCOSRuUrAh?=
+ =?us-ascii?Q?NJKkBpmy54BzttQBl57mpKL5LusbMfzdDIvMx/5GlqwVi343i0IJiqOUt7gr?=
+ =?us-ascii?Q?2GntIYG83dtUuv0LItiJ7CP93L7KWfu0QPbYEy6M+GkIjyqWWBSdHKbvF7hO?=
+ =?us-ascii?Q?U1Uqstmxu/0YGx+6quTFEpbLmHDEeh/GTomWbqxFkaRGNCCb5FOs/9oSTZ5I?=
+ =?us-ascii?Q?4j4x+GrsjjyqLQLmfSWsuYGSAEN67spj7LLrlcBYqNfBKbyIjs9lKIbbw6ev?=
+ =?us-ascii?Q?mfRyhj51vkGJzH+F1IWFANq43QghmVZ4Xq2IQ50WtKfivEJuNquWv0uLBzjo?=
+ =?us-ascii?Q?nb7R62Xacjmw38ZSu0OOkYS5meU9hHpiOLeF0rBguS5y?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com
-Subject: RE: Remove POLLOUT check before bcast defer accept
-In-Reply-To: <20240327161019.3078-2-iulia.tanasescu@nxp.com>
-References: <20240327161019.3078-2-iulia.tanasescu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-OriginatorOrg: ezurio.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR14MB5300.namprd14.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9854d6b4-5526-47a8-8b47-08dc4e89ed8d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Mar 2024 18:15:48.2202
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a67ad7fe-2b14-4d12-b58f-bb509b58f338
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: uH5eXfkn1HClqLC/PeT7NgqjZmfI1m719HAbiMcJV9rtwhOfVWDVBLLuh9j7MJOU5hHJXzLFMJEd67ctWVWS/MHK9Ie4sRFdlfhkJLBaeWU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR14MB4273
 
---===============4037168997154763759==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi,
 
-This is automated email and please do not reply to this email!
+I have a customer with an issue where they are unable to get 30 devices pai=
+red and bonded when the BL5340PA (nRF5340) SoC as their central device.
 
-Dear submitter,
+Following details might help you out-
+1.      They are using the hci_usb sample code as the firmware on the SoC.
+2.      The stack on the host Linux system being used is BlueZ (version 5.6=
+6)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=838961
+They are able to pair and bond with upto 8 devices pretty quickly and then =
+this process slows down and they aren't able to pair with more than 12-15 s=
+ensors in a single go.
+After the pairing and bonding process stagnates at around 12-15 sensors if =
+they restart the host system (and in turn the SoC as well) they are able to=
+ pair with a few more sensors but not 30 sensors.
+So far out of the things that they have tried out to identify the source of=
+ the problem it has something to do with the BlueZ stack configuration ( th=
+ey are currently using the default stack configuration) and/ or the firmwar=
+e configuration parameters.
 
----Test result---
+Do you have any idea on what configuration parameters could be causing this=
+ behaviour and/ or what configuration changes need to be made so that they =
+can achieve the target of pairing and bonding with 30 sensors. If you have =
+any more questions please let me know.
 
-Test Summary:
-CheckPatch                    PASS      0.90 seconds
-GitLint                       PASS      0.61 seconds
-BuildEll                      PASS      24.41 seconds
-BluezMake                     PASS      1708.45 seconds
-MakeCheck                     PASS      12.78 seconds
-MakeDistcheck                 PASS      180.35 seconds
-CheckValgrind                 PASS      245.99 seconds
-CheckSmatch                   PASS      362.14 seconds
-bluezmakeextell               PASS      120.19 seconds
-IncrementalBuild              PASS      3072.32 seconds
-ScanBuild                     PASS      1022.92 seconds
+I believe the default is set to something like 65K devices per MaxControlle=
+rs in main.c as well as main.conf
 
+parse_config_u16(config, "General", "MaxControllers",
+                                                &btd_opts.max_adapters,
+                                                0, UINT16_MAX);
 
+# Maximum number of controllers allowed to be exposed to the system.
+# Default=3D0 (unlimited)
+#MaxControllers=3D0
 
----
-Regards,
-Linux Bluetooth
+I am assuming the issue isn't BlueZ specific but if there is any thoughts o=
+r guidance you may have it would be appreciated.
 
+Thanks
+Chris
 
---===============4037168997154763759==--
+THE INFORMATION CONTAINED IN THIS DOCUMENT IS OF A PROPRIETARY NATURE AND I=
+S INTENDED TO BE KEPT CONFIDENTIAL BETWEEN THE SENDER AND THE INTENDED RECI=
+PIENT. IT MAY NOT BE REPRODUCED OR USED WITHOUT EXPRESS WRITTEN PERMISSION =
+OF EZURIO
