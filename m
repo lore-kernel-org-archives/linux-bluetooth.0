@@ -1,235 +1,129 @@
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13D0E1411E8
-	for <linux-bluetooth@vger.kernel.org>; Wed, 27 Mar 2024 14:25:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D5DF38396
+	for <linux-bluetooth@vger.kernel.org>; Wed, 27 Mar 2024 15:07:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711549532; cv=none; b=DG5Vl3zENn1MgoZ3zKpRNUEP1na4j42pM9uWTshT+VUuJA0bOjDss4oTFMRnn7tYGoIBEyJ+R0xslse/WHK4srGvJikRxlkNXtbbbGGng7Q+nvJ9vjhcVGdymbnT5UdSyAHcCfKN1O4Nk3pVrUg9MbVNYDTLJSW1EJUHYG3psNI=
+	t=1711552025; cv=none; b=iSLOM6X8C22/zTjWTHZgniLnngZNixLXutZGWccbi8HPIS3wcrXpf4K3OND87Fl0yNAOB9O76UmGQaV/sbRUFxzQ9rI/z0tOIQ42Cu70sZcO6CTm77GeL3BHj1oXEliS9jys2ZN5quz7RhPHppvGNaeQgE4KMTgSG2PWNda4xCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711549532; c=relaxed/simple;
-	bh=dFudLloDviN/TDXnNDnXEekBSh428fo2cUF88yQuwsE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gTPzMOtFzqZQ8t2VczL8CDyf2D9+4llJZZer+4drxbAyP9amtbUVxftO/8Vv2vIXH3/cSG+AAPyJxcbG3+qiIL24+8mR6SH0V101Bkn6GtVrPhTzYDfc0qI7D3u8ohKnN7TNyGK2Ui/dW91wpOpJo6PFYxnMN8fy4r0k2yTedXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id F3826240007;
-	Wed, 27 Mar 2024 14:25:26 +0000 (UTC)
-From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Cc: Gui-Dong Han <2045gemini@gmail.com>
-Subject: [PATCH] Bluetooth: Fix TOCTOU in HCI debugfs implementation
-Date: Wed, 27 Mar 2024 15:24:56 +0100
-Message-ID: <20240327142526.332756-1-hadess@hadess.net>
-X-Mailer: git-send-email 2.44.0
+	s=arc-20240116; t=1711552025; c=relaxed/simple;
+	bh=bt5YEx0vo58jlRSaQB+ETRwBaItBhzefJjJnJW0A110=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=XAJvC65esggpK7uU70/K7eebGXA2omakDtdMyZj/cUdlTYNK2AStwgAe7twh9Q4Hh2MA7/t2hA8LAeXT1e1AZIEs6412ta5Ns+2c0NzcKhgHMLIewoj1vYowCyHwhQGgO7f7j4HDcXw9huRFdxwad/RomUV7cdc8fL306OuVW2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HfrudHPr; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HfrudHPr"
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6e6f4ad4c57so5224042b3a.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Mar 2024 08:07:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711552021; x=1712156821; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=UBsCX2DM/XbtWg7/5i75/6SgJpopif7Pct0PHeRnecY=;
+        b=HfrudHPrQpgJZ4ZyKXLz/C9RljCgwRIXEQW+p4Q7Mk6K9GQYjbRD+PAHg+6LaGrkxC
+         MqfXDN4w6Lu3kXq0qW6pECCN73fZqwF4qCzyERJonPmOrnLj9/MJebqWo2P8iRkrGtFz
+         VoGjvlg5ESdSgxdROZSeYfjghFDW5UiZaKwnLlDIZov40h1Iifrxh1r9BZBapY/hdCqq
+         o5nopA9lLzYAo+DO82dWGbjR+TAeZS69GJrfz5ITmgc+XUBGuxvtRzi8P0jGrCAIja4A
+         Y1ViMR1As3dF7xqMlSnzLTK/wSbSV4QU9IxTVwHKyBjmqvL7bTpNFODmokTKP7GVUhiO
+         8l5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711552021; x=1712156821;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UBsCX2DM/XbtWg7/5i75/6SgJpopif7Pct0PHeRnecY=;
+        b=YFESThbuJxy8rlVmszLB2zPVC0zNVGV01qZiOYysCCZri2hwXt0u97VCgJgaUUIsKn
+         HcZAIQIChRBVeAfGAUkm0OEZrJopD/AzCt7NNiAqvx163/LhCC0d43VOvFVgPQJ1VyYz
+         9AK7JQVatau23lw3DSx0aaKiL2pJD4UF1DFyT+Lrk7Ppxo7slWwxxy4v6o1au5M81hjO
+         Sv3Y7apvmW4p0KWzct84fwHQNIZJ29mQxW6q7Y1tm7xlSTJH0PpD8315PmFrer5OJjho
+         iTopBzP+wFSz30zxvrn4cOwrGAF/Bq54i9TBssZGIf6veybMJvey+lNgU3iDePfr/b68
+         As4w==
+X-Gm-Message-State: AOJu0Yyb+UJ4EE6oSajDAiVIxIHL6YOUxhMawt/0YmhIuQxw8ByWeGJ8
+	4ONBZnJAN96AtKcVNupNafyXfP6/9zeamytwRfRxHZ5IKEdbyBdPREulG4Fq
+X-Google-Smtp-Source: AGHT+IFYcrMO3vSXjfGRn3oe80J/XFx208Sfz7cIhcB9JlsmuHNZ5W7VuNVboy4DVfvgEyFxAisbdw==
+X-Received: by 2002:a05:6a00:3cc8:b0:6ea:b610:eaff with SMTP id ln8-20020a056a003cc800b006eab610eaffmr77068pfb.21.1711552021530;
+        Wed, 27 Mar 2024 08:07:01 -0700 (PDT)
+Received: from [172.17.0.2] ([52.234.26.80])
+        by smtp.gmail.com with ESMTPSA id y33-20020a631821000000b005dbed0ffb10sm9318595pgl.83.2024.03.27.08.07.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Mar 2024 08:07:01 -0700 (PDT)
+Message-ID: <66043615.630a0220.e77cf.a138@mx.google.com>
+Date: Wed, 27 Mar 2024 08:07:01 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3630044152600932224=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: hadess@hadess.net
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, hadess@hadess.net
+Subject: RE: Bluetooth: Fix TOCTOU in HCI debugfs implementation
+In-Reply-To: <20240327142526.332756-1-hadess@hadess.net>
+References: <20240327142526.332756-1-hadess@hadess.net>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-struct hci_dev members conn_info_max_age, conn_info_min_age,
-le_conn_max_interval, le_conn_min_interval, le_adv_max_interval,
-and le_adv_min_interval can be modified from the HCI core code, as well
-through debugfs.
+--===============3630044152600932224==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The debugfs implementation, that's only available to privileged users,
-will check for boundaries, making sure that the minimum value being set
-is strictly above the maximum value that already exists, and vice-versa.
+This is automated email and please do not reply to this email!
 
-However, as both minimum and maximum values can be changed concurrently
-to us modifying them, we need to make sure that the value we check is
-the value we end up using.
+Dear submitter,
 
-For example, with ->conn_info_max_age set to 10, conn_info_min_age_set()
-gets called from vfs handlers to set conn_info_min_age to 8.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=838901
 
-In conn_info_min_age_set(), this goes through:
-	if (val == 0 || val > hdev->conn_info_max_age)
-		return -EINVAL;
+---Test result---
 
-Concurrently, conn_info_max_age_set() gets called to set to set the
-conn_info_max_age to 7:
-	if (val == 0 || val > hdev->conn_info_max_age)
-		return -EINVAL;
-That check will also pass because we used the old value (10) for
-conn_info_max_age.
+Test Summary:
+CheckPatch                    PASS      0.54 seconds
+GitLint                       FAIL      0.54 seconds
+SubjectPrefix                 PASS      0.07 seconds
+BuildKernel                   PASS      27.85 seconds
+CheckAllWarning               PASS      30.40 seconds
+CheckSparse                   PASS      36.02 seconds
+CheckSmatch                   PASS      98.47 seconds
+BuildKernel32                 PASS      26.97 seconds
+TestRunnerSetup               PASS      519.49 seconds
+TestRunner_l2cap-tester       PASS      20.17 seconds
+TestRunner_iso-tester         PASS      32.68 seconds
+TestRunner_bnep-tester        PASS      4.81 seconds
+TestRunner_mgmt-tester        PASS      113.85 seconds
+TestRunner_rfcomm-tester      PASS      7.31 seconds
+TestRunner_sco-tester         PASS      14.94 seconds
+TestRunner_ioctl-tester       PASS      7.76 seconds
+TestRunner_mesh-tester        PASS      5.80 seconds
+TestRunner_smp-tester         PASS      6.89 seconds
+TestRunner_userchan-tester    PASS      4.92 seconds
+IncrementalBuild              PASS      26.45 seconds
 
-After those checks that both passed, the struct hci_dev access
-is mutex-locked, disabling concurrent access, but that does not matter
-because the invalid value checks both passed, and we'll end up with
-conn_info_min_age = 8 and conn_info_max_age = 7
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+Bluetooth: Fix TOCTOU in HCI debugfs implementation
 
-To fix this problem, we need to lock the structure access before so the
-check and assignment are not interrupted.
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+20: B3 Line contains hard tab characters (\t): "	if (val == 0 || val > hdev->conn_info_max_age)"
+21: B3 Line contains hard tab characters (\t): "		return -EINVAL;"
+25: B3 Line contains hard tab characters (\t): "	if (val == 0 || val > hdev->conn_info_max_age)"
+26: B3 Line contains hard tab characters (\t): "		return -EINVAL;"
+49: B1 Line exceeds max length (89>80): "Link: https://lore.kernel.org/linux-bluetooth/20231222161317.6255-1-2045gemini@gmail.com/"
+51: B1 Line exceeds max length (89>80): "Link: https://lore.kernel.org/linux-bluetooth/20231222162931.6553-1-2045gemini@gmail.com/"
+52: B1 Line exceeds max length (89>80): "Link: https://lore.kernel.org/linux-bluetooth/20231222162310.6461-1-2045gemini@gmail.com/"
+58: B1 Line exceeds max length (81>80): "I've made changes to the patches that you submitted in December 2023 and that are"
 
-This fix was originally devised by the BassCheck[1] team, and
-considered the problem to be an atomicity one. This isn't the case as
-there aren't any concerns about the variable changing while we check it,
-but rather after we check it parallel to another change.
 
-This patch fixes CVE-2024-24858 and CVE-2024-24857.
-
-[1] https://sites.google.com/view/basscheck/
-
-Co-developed-by: Gui-Dong Han <2045gemini@gmail.com>
-Signed-off-by: Gui-Dong Han <2045gemini@gmail.com>
-Link: https://lore.kernel.org/linux-bluetooth/20231222161317.6255-1-2045gemini@gmail.com/
-Link: https://nvd.nist.gov/vuln/detail/CVE-2024-24858
-Link: https://lore.kernel.org/linux-bluetooth/20231222162931.6553-1-2045gemini@gmail.com/
-Link: https://lore.kernel.org/linux-bluetooth/20231222162310.6461-1-2045gemini@gmail.com/
-Link: https://nvd.nist.gov/vuln/detail/CVE-2024-24857
-Fixes: 31ad169148df ("Bluetooth: Add conn info lifetime parameters to debugfs")
-Fixes: 729a1051da6f ("Bluetooth: Expose default LE advertising interval via debugfs")
-Fixes: 71c3b60ec6d2 ("Bluetooth: Move BR/EDR debugfs file creation into hci_debugfs.c")
-Signed-off-by: Bastien Nocera <hadess@hadess.net>
 ---
-Hello Gui-Dong Han,
+Regards,
+Linux Bluetooth
 
-I've made changes to the patches that you submitted in December 2023 and that are
-linked above to:
-- correct the commit message and description, this isn't an atomicity
-  problem, but a TOCTOU problem
-- corrected the "fixes" references to be of the original code
-- added CVE references for the changes that warranted it
 
-I've kept you as the co-author of this patch and kept the references to
-BassCheck as well.
-
-Let me know what you think.
-
-Regards
-
- net/bluetooth/hci_debugfs.c | 48 ++++++++++++++++++++++++-------------
- 1 file changed, 32 insertions(+), 16 deletions(-)
-
-diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-index 233453807b50..ce3ff2fa72e5 100644
---- a/net/bluetooth/hci_debugfs.c
-+++ b/net/bluetooth/hci_debugfs.c
-@@ -218,10 +218,12 @@ static int conn_info_min_age_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
- 
--	if (val == 0 || val > hdev->conn_info_max_age)
-+	hci_dev_lock(hdev);
-+	if (val == 0 || val > hdev->conn_info_max_age) {
-+		hci_dev_unlock(hdev);
- 		return -EINVAL;
-+	}
- 
--	hci_dev_lock(hdev);
- 	hdev->conn_info_min_age = val;
- 	hci_dev_unlock(hdev);
- 
-@@ -246,10 +248,12 @@ static int conn_info_max_age_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
- 
--	if (val == 0 || val < hdev->conn_info_min_age)
-+	hci_dev_lock(hdev);
-+	if (val == 0 || val < hdev->conn_info_min_age) {
-+		hci_dev_unlock(hdev);
- 		return -EINVAL;
-+	}
- 
--	hci_dev_lock(hdev);
- 	hdev->conn_info_max_age = val;
- 	hci_dev_unlock(hdev);
- 
-@@ -567,10 +571,12 @@ static int sniff_min_interval_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
- 
--	if (val == 0 || val % 2 || val > hdev->sniff_max_interval)
-+	hci_dev_lock(hdev);
-+	if (val == 0 || val % 2 || val > hdev->sniff_max_interval) {
-+		hci_dev_unlock(hdev);
- 		return -EINVAL;
-+	}
- 
--	hci_dev_lock(hdev);
- 	hdev->sniff_min_interval = val;
- 	hci_dev_unlock(hdev);
- 
-@@ -595,10 +601,12 @@ static int sniff_max_interval_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
- 
--	if (val == 0 || val % 2 || val < hdev->sniff_min_interval)
-+	hci_dev_lock(hdev);
-+	if (val == 0 || val % 2 || val < hdev->sniff_min_interval) {
-+		hci_dev_unlock(hdev);
- 		return -EINVAL;
-+	}
- 
--	hci_dev_lock(hdev);
- 	hdev->sniff_max_interval = val;
- 	hci_dev_unlock(hdev);
- 
-@@ -850,10 +858,12 @@ static int conn_min_interval_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
- 
--	if (val < 0x0006 || val > 0x0c80 || val > hdev->le_conn_max_interval)
-+	hci_dev_lock(hdev);
-+	if (val < 0x0006 || val > 0x0c80 || val > hdev->le_conn_max_interval) {
-+		hci_dev_unlock(hdev);
- 		return -EINVAL;
-+	}
- 
--	hci_dev_lock(hdev);
- 	hdev->le_conn_min_interval = val;
- 	hci_dev_unlock(hdev);
- 
-@@ -878,10 +888,12 @@ static int conn_max_interval_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
- 
--	if (val < 0x0006 || val > 0x0c80 || val < hdev->le_conn_min_interval)
-+	hci_dev_lock(hdev);
-+	if (val < 0x0006 || val > 0x0c80 || val < hdev->le_conn_min_interval) {
-+		hci_dev_unlock(hdev);
- 		return -EINVAL;
-+	}
- 
--	hci_dev_lock(hdev);
- 	hdev->le_conn_max_interval = val;
- 	hci_dev_unlock(hdev);
- 
-@@ -990,10 +1002,12 @@ static int adv_min_interval_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
- 
--	if (val < 0x0020 || val > 0x4000 || val > hdev->le_adv_max_interval)
-+	hci_dev_lock(hdev);
-+	if (val < 0x0020 || val > 0x4000 || val > hdev->le_adv_max_interval) {
-+		hci_dev_unlock(hdev);
- 		return -EINVAL;
-+	}
- 
--	hci_dev_lock(hdev);
- 	hdev->le_adv_min_interval = val;
- 	hci_dev_unlock(hdev);
- 
-@@ -1018,10 +1032,12 @@ static int adv_max_interval_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
- 
--	if (val < 0x0020 || val > 0x4000 || val < hdev->le_adv_min_interval)
-+	hci_dev_lock(hdev);
-+	if (val < 0x0020 || val > 0x4000 || val < hdev->le_adv_min_interval) {
-+		hci_dev_unlock(hdev);
- 		return -EINVAL;
-+	}
- 
--	hci_dev_lock(hdev);
- 	hdev->le_adv_max_interval = val;
- 	hci_dev_unlock(hdev);
- 
--- 
-2.44.0
-
+--===============3630044152600932224==--
