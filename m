@@ -1,234 +1,195 @@
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB83054BDA
-	for <linux-bluetooth@vger.kernel.org>; Thu, 28 Mar 2024 08:21:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F04812594
+	for <linux-bluetooth@vger.kernel.org>; Thu, 28 Mar 2024 09:06:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711614080; cv=none; b=ZtrqRqltSrfnWQC6cMBDdG+6F03s6a0c74FkAEO/+HWoGhki+q/tmj6UT7G/+co3Q/vyXOLf96qIYTMeZdbELAJjaWqn44qsB+gfH3tIQwkLBfqXEWpWb+cTqa/RqPrh6ObKG+J2U4gVeAbLwRXpPlukRxG5goMD8qrW25NvuXc=
+	t=1711616809; cv=none; b=vCdjqiHUGaS3Ogv4vbxq+pX0ROyVjsxNtcm5EdgmFjmYRL5x/k4w4W3MQ8XSFR1ZUvnQZkGq9SWNV5EXwAothxXRJc1jFKmCjaHGBX0DzJbQtnUvHBAXLnDp57JbgSNS+ehL4IXyE/LmCdVgwCxtVfqg/tU8ZHarZVnBrTNDLgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711614080; c=relaxed/simple;
-	bh=MCSX0q4aQg77SlGr7mQ/0pTXUJibSXe6v6TlY3D1lsI=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=jluTaant1sqb3RGvVrbSn/5FUAxvy6awiCT+QNkazOqgJgzdvYBnQKycWm1CFCdd1ZAkpqMUjSPH7hFo1mxg9QkBgVAqAtGh3sW+elSaQv/WhDSaHSylUSqG2FoWrDEnN2Mu6JUVvhj0BKHq4uIfy/82+g6t2QV5EMBt3/vKFwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7cf265b30e2so65691039f.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Mar 2024 01:21:18 -0700 (PDT)
+	s=arc-20240116; t=1711616809; c=relaxed/simple;
+	bh=QKZlzANIuQdmukUikdQFyOBcn1TAzWevP344CY635aQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jXpoDwu3mH5rjGSkhm3P51Q4g68zX2BJFdIB1fF5pC+OCH/twTZxBJ+tPbvyJdbq+rFU5uQSv7SerdCe+h4cgOR3jk6Qs8FYvf4lvl7o0wzzKcPcOZDA01ww6h5mv17Xw7v5Vu1Pn7D1VXMIn8Zg7MglN+mUd29uCZPTbaIK1u8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=PBjPu3NR; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PBjPu3NR"
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-33ed7ba1a42so428200f8f.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Mar 2024 02:06:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1711616806; x=1712221606; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Dn0ZZagXdZyiyz8hyk3Yzu6UlAUBcmSNEY43lxmrvpA=;
+        b=PBjPu3NRVGzIWBZxws33C/e0WHBr/mfqOTd1wSRXoDBRm/tcB83plPcBJc38hVZS+D
+         JVt/KtCENHpy0Ex7T51PRJXArLWthgCpa3VbvY/F/P/p70Iw5Tz9fdxlNIIQ/CtCkQcB
+         /HxGpOdYbSkIDwXUCpMj+dqEm+6xbCcau99FzVTmQSssrbgVuKK17QEc8B3osnFTi64F
+         NMS5C4JJk8xbD67n7feMqdfUbdM+uNGELxLz91CPmi36KlTQ7NpLAaOBmTzmmmn/dBm3
+         J6p+tcr8oBmulHTgQaJyOpjBouKTP1JD+OxRSNg3oNjstisYnznnzQ24Yuhjm7+Qj5zW
+         YAoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711614078; x=1712218878;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ECf+rGZmG7JONk5+/pz8pSXo4jpd0Dy8/WSqTB1ROs8=;
-        b=dMMm9t5Obk9YFhUz+1jeuGKWcOyMQK9kh3trnaFSj0e9RPt6hAftWzJ3BQ9NmhVfxa
-         cS96cIfKu6zzP1+YzfsE+sjB7PYfF27/z0qUYUqAMwVKQDh4eX3CWcOYfFcO9SI79UOI
-         mLp4NLkoR/uG5BkjsEymgbim4KMVaxDteQ9tBwk4Bbam45bMNIg64/VteBkIHIYqWB9W
-         f0CBDge5HKwvFQda5PHV0S2lyRD1wM8IHHtyPRe5v3YqhMpskSV6KZWZ8tUBwgnjB0cW
-         rayNV4PsbcdE7oieiO4KdvmFBJBuqRWzsahl4r62uqYfFVWCPpCEnYKnSwAXqW6oW9kL
-         xEYA==
-X-Forwarded-Encrypted: i=1; AJvYcCVwD/hJccLWfUjCQkl1WR/7IT4r5aoEwA8vqAHBNi8oBbpAtVqp7B2joHhwXFi3BRPUe5vGAsyd04t3LG1Vzrr2lD1+A0Tou3gDVZl+fa6D
-X-Gm-Message-State: AOJu0YwYumQ90FQymcaGvk2+2KXQqovQTsMJRY89KVEvqV9J3ypwNDKy
-	R4oyOYtaqTXXLzrb30Y59O7L/5qkGMM+Wpp+4Crl+pZcboLnsDmQCopDdpStIObBK/FrE8klMDB
-	emJ8KdLfXtNlpVHsV3rtiNSTO33nLjhj+xA1CiQq2CmhCzMiZWw9U+ZA=
-X-Google-Smtp-Source: AGHT+IEaQi8QXGwYOjcERuu8VCNAnteICHXcLop1+RZucD2smqNyPXvGWD6JvQLQXoPOIqipJ4Dc8fze2hMsYzKKBlDqJkmAu9B6
+        d=1e100.net; s=20230601; t=1711616806; x=1712221606;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Dn0ZZagXdZyiyz8hyk3Yzu6UlAUBcmSNEY43lxmrvpA=;
+        b=vSmUJt2l08SASg7zVfQA4cW+1J9VSoVclEgHsEujeiHCiIXwSnewqufjOEhFdh1UaK
+         RS3tSbcp5/cdfW+IvzQd8gVZcnSw97wEYVYls9neSpMfmWrOz/kkRwY8zvbiN6+s0ZRn
+         73qbZor9M2tBNf4fXTr80lEVtEEaovbrDIESDKKfFA1SLHToW749McI9u7wMZNZXzn1S
+         PBUq1Eq1CtDGXLxIoCeC9GbJOZ2PwA0QcJ3EiToI1CGrc6ctR5RyBduvxJ/Zrau3k7qG
+         NfNDQ+4pP1evFDbnKaqzHBpbdfA/+hVTk2wlXgbTZsBE4TVKxdSh18QSDkyfRk4atfUQ
+         8aVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUmw1T2hdEmcPmXVRQ0WBNr0lSgaYQ47eDGSVMAiOry0BbU4gSXJy3SJy20TYiydJ0QGcSuLyzhfc5dOqAiDF4gWjp/ZcSoVqwzSDT0KkBh
+X-Gm-Message-State: AOJu0YxbOK7muObAegrF584e1r8l2nNEJQsa3BE4CCYA+0ZWjGJ2ICVj
+	K7/8f32kut8hQxlJfnfWo1e/eQPK9KG6FhX9+lGbHytUdLgn4Msmf2DEkOO66ZE=
+X-Google-Smtp-Source: AGHT+IEriX5MSpAunoRRkPBv7PxELwypyvwD5CMt+D+h1lDKnzldxliMy7AOYv9W2AQi+0cEO5FCTA==
+X-Received: by 2002:a5d:47ce:0:b0:341:8974:9bae with SMTP id o14-20020a5d47ce000000b0034189749baemr2513172wrc.19.1711616806333;
+        Thu, 28 Mar 2024 02:06:46 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.219.148])
+        by smtp.gmail.com with ESMTPSA id c3-20020a056000184300b0033e91509224sm1203778wri.22.2024.03.28.02.06.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Mar 2024 02:06:45 -0700 (PDT)
+Message-ID: <a18b2f9f-3b54-4f38-a93f-a5665cbebfa8@linaro.org>
+Date: Thu, 28 Mar 2024 10:06:42 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:240b:b0:368:9839:d21a with SMTP id
- bs11-20020a056e02240b00b003689839d21amr133635ilb.5.1711614078045; Thu, 28 Mar
- 2024 01:21:18 -0700 (PDT)
-Date: Thu, 28 Mar 2024 01:21:18 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000001d626c0614b4352f@google.com>
-Subject: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in mgmt_pending_foreach
-From: syzbot <syzbot+a878cdc1d5451bfaa51c@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 01/16] regulator: dt-bindings: describe the PMU module
+ of the QCA6390 package
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Kalle Valo <kvalo@kernel.org>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konrad.dybcio@linaro.org>, Liam Girdwood
+ <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Bjorn Helgaas <bhelgaas@google.com>, Saravana Kannan <saravanak@google.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>, Arnd Bergmann <arnd@arndb.de>,
+ Neil Armstrong <neil.armstrong@linaro.org>,
+ Marek Szyprowski <m.szyprowski@samsung.com>, Alex Elder <elder@linaro.org>,
+ Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Abel Vesa <abel.vesa@linaro.org>, Manivannan Sadhasivam <mani@kernel.org>,
+ Lukas Wunner <lukas@wunner.de>,
+ Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
+ linux-pm@vger.kernel.org,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+References: <20240325131624.26023-1-brgl@bgdev.pl>
+ <20240325131624.26023-2-brgl@bgdev.pl>
+ <af9def4e-c6d6-49d9-a457-68c40492587a@linaro.org>
+ <CAMRc=Mdw9Ox5EC6=GdR_1kzWcfhpdbz1Hu3e7+GY9-wqTh2fhQ@mail.gmail.com>
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
+ cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
+ JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
+ gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
+ J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
+ NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
+ BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
+ vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
+ Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
+ TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzTRLcnp5c3p0b2Yg
+ S296bG93c2tpIDxrcnp5c3p0b2Yua296bG93c2tpQGxpbmFyby5vcmc+wsGUBBMBCgA+FiEE
+ m9B+DgxR+NWWd7dUG5NDfTtBYpsFAmI+BxMCGwMFCRRfreEFCwkIBwIGFQoJCAsCBBYCAwEC
+ HgECF4AACgkQG5NDfTtBYptgbhAAjAGunRoOTduBeC7V6GGOQMYIT5n3OuDSzG1oZyM4kyvO
+ XeodvvYv49/ng473E8ZFhXfrre+c1olbr1A8pnz9vKVQs9JGVa6wwr/6ddH7/yvcaCQnHRPK
+ mnXyP2BViBlyDWQ71UC3N12YCoHE2cVmfrn4JeyK/gHCvcW3hUW4i5rMd5M5WZAeiJj3rvYh
+ v8WMKDJOtZFXxwaYGbvFJNDdvdTHc2x2fGaWwmXMJn2xs1ZyFAeHQvrp49mS6PBQZzcx0XL5
+ cU9ZjhzOZDn6Apv45/C/lUJvPc3lo/pr5cmlOvPq1AsP6/xRXsEFX/SdvdxJ8w9KtGaxdJuf
+ rpzLQ8Ht+H0lY2On1duYhmro8WglOypHy+TusYrDEry2qDNlc/bApQKtd9uqyDZ+rx8bGxyY
+ qBP6bvsQx5YACI4p8R0J43tSqWwJTP/R5oPRQW2O1Ye1DEcdeyzZfifrQz58aoZrVQq+innR
+ aDwu8qDB5UgmMQ7cjDSeAQABdghq7pqrA4P8lkA7qTG+aw8Z21OoAyZdUNm8NWJoQy8m4nUP
+ gmeeQPRc0vjp5JkYPgTqwf08cluqO6vQuYL2YmwVBIbO7cE7LNGkPDA3RYMu+zPY9UUi/ln5
+ dcKuEStFZ5eqVyqVoZ9eu3RTCGIXAHe1NcfcMT9HT0DPp3+ieTxFx6RjY3kYTGLOwU0EVUNc
+ NAEQAM2StBhJERQvgPcbCzjokShn0cRA4q2SvCOvOXD+0KapXMRFE+/PZeDyfv4dEKuCqeh0
+ hihSHlaxTzg3TcqUu54w2xYskG8Fq5tg3gm4kh1Gvh1LijIXX99ABA8eHxOGmLPRIBkXHqJY
+ oHtCvPc6sYKNM9xbp6I4yF56xVLmHGJ61KaWKf5KKWYgA9kfHufbja7qR0c6H79LIsiYqf92
+ H1HNq1WlQpu/fh4/XAAaV1axHFt/dY/2kU05tLMj8GjeQDz1fHas7augL4argt4e+jum3Nwt
+ yupodQBxncKAUbzwKcDrPqUFmfRbJ7ARw8491xQHZDsP82JRj4cOJX32sBg8nO2N5OsFJOcd
+ 5IE9v6qfllkZDAh1Rb1h6DFYq9dcdPAHl4zOj9EHq99/CpyccOh7SrtWDNFFknCmLpowhct9
+ 5ZnlavBrDbOV0W47gO33WkXMFI4il4y1+Bv89979rVYn8aBohEgET41SpyQz7fMkcaZU+ok/
+ +HYjC/qfDxT7tjKXqBQEscVODaFicsUkjheOD4BfWEcVUqa+XdUEciwG/SgNyxBZepj41oVq
+ FPSVE+Ni2tNrW/e16b8mgXNngHSnbsr6pAIXZH3qFW+4TKPMGZ2rZ6zITrMip+12jgw4mGjy
+ 5y06JZvA02rZT2k9aa7i9dUUFggaanI09jNGbRA/ABEBAAHCwXwEGAEKACYCGwwWIQSb0H4O
+ DFH41ZZ3t1Qbk0N9O0FimwUCYDzvagUJFF+UtgAKCRAbk0N9O0Fim9JzD/0auoGtUu4mgnna
+ oEEpQEOjgT7l9TVuO3Qa/SeH+E0m55y5Fjpp6ZToc481za3xAcxK/BtIX5Wn1mQ6+szfrJQ6
+ 59y2io437BeuWIRjQniSxHz1kgtFECiV30yHRgOoQlzUea7FgsnuWdstgfWi6LxstswEzxLZ
+ Sj1EqpXYZE4uLjh6dW292sO+j4LEqPYr53hyV4I2LPmptPE9Rb9yCTAbSUlzgjiyyjuXhcwM
+ qf3lzsm02y7Ooq+ERVKiJzlvLd9tSe4jRx6Z6LMXhB21fa5DGs/tHAcUF35hSJrvMJzPT/+u
+ /oVmYDFZkbLlqs2XpWaVCo2jv8+iHxZZ9FL7F6AHFzqEFdqGnJQqmEApiRqH6b4jRBOgJ+cY
+ qc+rJggwMQcJL9F+oDm3wX47nr6jIsEB5ZftdybIzpMZ5V9v45lUwmdnMrSzZVgC4jRGXzsU
+ EViBQt2CopXtHtYfPAO5nAkIvKSNp3jmGxZw4aTc5xoAZBLo0OV+Ezo71pg3AYvq0a3/oGRG
+ KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
+ fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <CAMRc=Mdw9Ox5EC6=GdR_1kzWcfhpdbz1Hu3e7+GY9-wqTh2fhQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hello,
+On 27/03/2024 19:55, Bartosz Golaszewski wrote:
+> On Wed, Mar 27, 2024 at 7:17 PM Krzysztof Kozlowski
+> <krzysztof.kozlowski@linaro.org> wrote:
+>>
+>> On 25/03/2024 14:16, Bartosz Golaszewski wrote:
+>>> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>>>
+>>> The QCA6390 package contains discreet modules for WLAN and Bluetooth. They
+>>> are powered by the Power Management Unit (PMU) that takes inputs from the
+>>> host and provides LDO outputs. This document describes this module.
+>>>
+>>> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>>
+>> Can you start using b4?
+>>
+>> This is a friendly reminder during the review process.
+>>
+>> It looks like you received a tag and forgot to add it.
+>>
+>> If you do not know the process, here is a short explanation:
+>> Please add Acked-by/Reviewed-by/Tested-by tags when posting new
+>> versions, under or above your Signed-off-by tag. Tag is "received", when
+>> provided in a message replied to you on the mailing list. Tools like b4
+>> can help here. However, there's no need to repost patches *only* to add
+>> the tags. The upstream maintainer will do that for tags received on the
+>> version they apply.
+>>
+>> https://elixir.bootlin.com/linux/v6.5-rc3/source/Documentation/process/submitting-patches.rst#L577
+>>
+>> If a tag was not added on purpose, please state why and what changed.
+>>
+> 
+> As per the first sentence of the cover letter: I dropped review tags
+> from the patches that changed significantly while keeping them for
+> those that didn't. If there's a way to let your automation know about
+> this, please let me know/point me in the right direction because I
+> don't know about it.
+> 
 
-syzbot found the following issue on:
+I went through changelog and did not see any remarks that patch #1
+changed. b4 diff tells me: not much changed. Same properties and you
+just do not require supplies on other variant.
 
-HEAD commit:    f99c5f563c17 Merge tag 'nf-24-03-21' of git://git.kernel.o..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=14166479180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6fb1be60a193d440
-dashboard link: https://syzkaller.appspot.com/bug?extid=a878cdc1d5451bfaa51c
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+This is rather minor change - just see by yourself.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Best regards,
+Krzysztof
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/65d3f3eb786e/disk-f99c5f56.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/799cf7f28ff8/vmlinux-f99c5f56.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/ab26c60c3845/bzImage-f99c5f56.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+a878cdc1d5451bfaa51c@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: slab-use-after-free in mgmt_pending_foreach+0x7d/0x130
-Read of size 8 at addr ffff88808c1adb00 by task syz-executor.0/31083
-
-CPU: 1 PID: 31083 Comm: syz-executor.0 Not tainted 6.8.0-syzkaller-05271-gf99c5f563c17 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x1e7/0x2e0 lib/dump_stack.c:106
- print_address_description mm/kasan/report.c:377 [inline]
- print_report+0x169/0x550 mm/kasan/report.c:488
- kasan_report+0x143/0x180 mm/kasan/report.c:601
- mgmt_pending_foreach+0x7d/0x130
- __mgmt_power_off+0x187/0x420 net/bluetooth/mgmt.c:9433
- hci_dev_close_sync+0x5d2/0x1050 net/bluetooth/hci_sync.c:5149
- hci_dev_do_close net/bluetooth/hci_core.c:554 [inline]
- hci_dev_close+0x112/0x210 net/bluetooth/hci_core.c:579
- sock_do_ioctl+0x158/0x460 net/socket.c:1222
- sock_ioctl+0x629/0x8e0 net/socket.c:1341
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:904 [inline]
- __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:890
- do_syscall_64+0xfb/0x240
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
-RIP: 0033:0x7f0d3407dda9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f0d34e3d0c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f0d341abf80 RCX: 00007f0d3407dda9
-RDX: 0000000000000000 RSI: 00000000400448ca RDI: 0000000000000005
-RBP: 00007f0d340ca47a R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007f0d341abf80 R15: 00007ffc97b42758
- </TASK>
-
-Allocated by task 20735:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- poison_kmalloc_redzone mm/kasan/common.c:370 [inline]
- __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:387
- kasan_kmalloc include/linux/kasan.h:211 [inline]
- kmalloc_trace+0x1d9/0x360 mm/slub.c:4012
- kmalloc include/linux/slab.h:590 [inline]
- kzalloc include/linux/slab.h:711 [inline]
- mgmt_pending_new+0x65/0x250 net/bluetooth/mgmt_util.c:269
- mgmt_pending_add+0x36/0x120 net/bluetooth/mgmt_util.c:296
- user_pairing_resp+0x30c/0x580 net/bluetooth/mgmt.c:3632
- hci_mgmt_cmd+0xc45/0x11d0 net/bluetooth/hci_sock.c:1715
- hci_sock_sendmsg+0x7a5/0x11c0 net/bluetooth/hci_sock.c:1835
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:745
- sock_write_iter+0x2dd/0x400 net/socket.c:1160
- call_write_iter include/linux/fs.h:2108 [inline]
- new_sync_write fs/read_write.c:497 [inline]
- vfs_write+0xa84/0xcb0 fs/read_write.c:590
- ksys_write+0x1a0/0x2c0 fs/read_write.c:643
- do_syscall_64+0xfb/0x240
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
-
-The buggy address belongs to the object at ffff88808c1adb00
- which belongs to the cache kmalloc-96 of size 96
-The buggy address is located 0 bytes inside of
- freed 96-byte region [ffff88808c1adb00, ffff88808c1adb60)
-
-The buggy address belongs to the physical page:
-page:ffffea0002306b40 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x8c1ad
-anon flags: 0xfff00000000800(slab|node=0|zone=1|lastcpupid=0x7ff)
-page_type: 0xffffffff()
-raw: 00fff00000000800 ffff888014c41780 ffffea000275af00 dead000000000005
-raw: 0000000000000000 0000000000200020 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 0, migratetype Unmovable, gfp_mask 0x112820(GFP_ATOMIC|__GFP_NOWARN|__GFP_NORETRY|__GFP_HARDWALL), pid 5149, tgid 5149 (kworker/1:4), ts 186720315546, free_ts 186591746837
- set_page_owner include/linux/page_owner.h:31 [inline]
- post_alloc_hook+0x1ea/0x210 mm/page_alloc.c:1533
- prep_new_page mm/page_alloc.c:1540 [inline]
- get_page_from_freelist+0x33ea/0x3580 mm/page_alloc.c:3311
- __alloc_pages+0x256/0x680 mm/page_alloc.c:4569
- __alloc_pages_node include/linux/gfp.h:238 [inline]
- alloc_pages_node include/linux/gfp.h:261 [inline]
- alloc_slab_page+0x5f/0x160 mm/slub.c:2190
- allocate_slab mm/slub.c:2354 [inline]
- new_slab+0x84/0x2f0 mm/slub.c:2407
- ___slab_alloc+0xd1b/0x13e0 mm/slub.c:3540
- __slab_alloc mm/slub.c:3625 [inline]
- __slab_alloc_node mm/slub.c:3678 [inline]
- slab_alloc_node mm/slub.c:3850 [inline]
- kmalloc_trace+0x267/0x360 mm/slub.c:4007
- kmalloc include/linux/slab.h:590 [inline]
- dst_cow_metrics_generic+0x56/0x1c0 net/core/dst.c:178
- dst_metrics_write_ptr include/net/dst.h:133 [inline]
- dst_metric_set include/net/dst.h:194 [inline]
- icmp6_dst_alloc+0x270/0x420 net/ipv6/route.c:3286
- mld_sendpack+0x69b/0xda0 net/ipv6/mcast.c:1807
- mld_send_cr net/ipv6/mcast.c:2119 [inline]
- mld_ifc_work+0x7d6/0xd90 net/ipv6/mcast.c:2650
- process_one_work kernel/workqueue.c:3254 [inline]
- process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
- worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
- kthread+0x2f0/0x390 kernel/kthread.c:388
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
-page last free pid 7393 tgid 7390 stack trace:
- reset_page_owner include/linux/page_owner.h:24 [inline]
- free_pages_prepare mm/page_alloc.c:1140 [inline]
- free_unref_page_prepare+0x968/0xa90 mm/page_alloc.c:2346
- free_unref_page+0x37/0x3f0 mm/page_alloc.c:2486
- discard_slab mm/slub.c:2453 [inline]
- __put_partials+0xeb/0x130 mm/slub.c:2922
- put_cpu_partial+0x17c/0x250 mm/slub.c:2997
- __slab_free+0x302/0x410 mm/slub.c:4166
- qlink_free mm/kasan/quarantine.c:163 [inline]
- qlist_free_all+0x5e/0xc0 mm/kasan/quarantine.c:179
- kasan_quarantine_reduce+0x14f/0x170 mm/kasan/quarantine.c:286
- __kasan_slab_alloc+0x23/0x80 mm/kasan/common.c:322
- kasan_slab_alloc include/linux/kasan.h:201 [inline]
- slab_post_alloc_hook mm/slub.c:3813 [inline]
- slab_alloc_node mm/slub.c:3860 [inline]
- __do_kmalloc_node mm/slub.c:3980 [inline]
- __kmalloc+0x1e0/0x4a0 mm/slub.c:3994
- kmalloc include/linux/slab.h:594 [inline]
- tomoyo_realpath_from_path+0xcf/0x5e0 security/tomoyo/realpath.c:251
- tomoyo_get_realpath security/tomoyo/file.c:151 [inline]
- tomoyo_path_number_perm+0x23a/0x880 security/tomoyo/file.c:723
- security_file_ioctl+0x75/0xb0 security/security.c:2726
- __do_sys_ioctl fs/ioctl.c:898 [inline]
- __se_sys_ioctl+0x47/0x170 fs/ioctl.c:890
- do_syscall_64+0xfb/0x240
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
-
-Memory state around the buggy address:
- ffff88808c1ada00: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
- ffff88808c1ada80: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
->ffff88808c1adb00: fb fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
-                   ^
- ffff88808c1adb80: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
- ffff88808c1adc00: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
-==================================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
