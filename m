@@ -1,137 +1,234 @@
-Received: from omta38.uswest2.a.cloudfilter.net (omta38.uswest2.a.cloudfilter.net [35.89.44.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1759E46424
-	for <linux-bluetooth@vger.kernel.org>; Thu, 28 Mar 2024 05:51:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.89.44.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB83054BDA
+	for <linux-bluetooth@vger.kernel.org>; Thu, 28 Mar 2024 08:21:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711605117; cv=none; b=mS7g7QK0vU92QjkG22/Ds7GU1zwuCzUA02rv21wCcgt9yvw9PtT8bRwJk92/z8x80Z7K2R5uZGwRyRTBH6SpiA77KqRWozQ2cLysR8/idAEDpcbb/vP4MdXdyvcCMopzpNtTRqTNeQEDxI1ZsuIsAC6PKRsViN4+K+QO7otk9Sw=
+	t=1711614080; cv=none; b=ZtrqRqltSrfnWQC6cMBDdG+6F03s6a0c74FkAEO/+HWoGhki+q/tmj6UT7G/+co3Q/vyXOLf96qIYTMeZdbELAJjaWqn44qsB+gfH3tIQwkLBfqXEWpWb+cTqa/RqPrh6ObKG+J2U4gVeAbLwRXpPlukRxG5goMD8qrW25NvuXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711605117; c=relaxed/simple;
-	bh=XzUh4e+GUGrMcXpbZTUiag+z5Q0W3vzGlRM1MWSPvVs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GI0okRjCUwwVuPKETOUxzuE0CVeuPp4Qwfs04DnagG0DL0B7Me7IZ1agnAob5X5lk+vgyI/ER9l5BPcNq/uIT5P1/AjtRxml9iT9C275lqn1uV06mlbP6UYHm/2/wIeUjEIgXCGduqa70v7phcMX70ho5ctPK3fGKWdYiFVMtWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=Oc5M9ecH; arc=none smtp.client-ip=35.89.44.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="Oc5M9ecH"
-Received: from eig-obgw-6007a.ext.cloudfilter.net ([10.0.30.247])
-	by cmsmtp with ESMTPS
-	id pWKlrl3P7DI6fpig7rHoPf; Thu, 28 Mar 2024 05:51:55 +0000
-Received: from gator4166.hostgator.com ([108.167.133.22])
-	by cmsmtp with ESMTPS
-	id pig6r7mJ7Vdenpig6r3Mca; Thu, 28 Mar 2024 05:51:55 +0000
-X-Authority-Analysis: v=2.4 cv=M4FLKTws c=1 sm=1 tr=0 ts=6605057b
- a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=zXgy4KOrraTBHT4+ULisNA==:17
- a=IkcTkHD0fZMA:10 a=K6JAEmCyrfEA:10 a=wYkD_t78qR0A:10 a=_Wotqz80AAAA:8
- a=VwQbUJbxAAAA:8 a=ig1jn5DGqgWrHlYdm24A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=buJP51TR1BpY-zbLSsyS:22 a=AjGcO6oz07-iQ99wixmX:22
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=OcyKQZGGVgXeDvPpM0FzUWGtl7ItivqUfJysf/GnhwY=; b=Oc5M9ecHzFYA7FQzOy/2hKZgz/
-	v7+B98xURL/wvmkDwRhiolfQGFH2gbMZr9FVDZV1Z2UzeubH2VbS0VAHDZolh/TjEqt74o0tSnUNa
-	uoMaH+biF4r1ZK9hFJV5BZdpYn9A2LiXNBdimeeWMa5yeAcEu3imYTd30bbeWscSZQdgYVU9OLbx9
-	0LwpRJXh5G4Yl2qOb86kA0MOeLn+kcgzCr8uOWzeaDu5E1qeZDHGp8PAn+bUOutiexX11tLcbLlaW
-	q06PUqQVIWmJDIgUISU9c9FSDuG0BV4aulTOvlaGvMnk4/zVd6MYFRHXff+685NrPm2LbvSFGKtk+
-	3yC2tTNA==;
-Received: from [201.172.173.147] (port=46938 helo=[192.168.15.14])
-	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96.2)
-	(envelope-from <gustavo@embeddedor.com>)
-	id 1rpig5-0000I1-2n;
-	Thu, 28 Mar 2024 00:51:53 -0500
-Message-ID: <ceb2091f-d36f-419e-8ed6-2165b6842d96@embeddedor.com>
-Date: Wed, 27 Mar 2024 23:51:50 -0600
+	s=arc-20240116; t=1711614080; c=relaxed/simple;
+	bh=MCSX0q4aQg77SlGr7mQ/0pTXUJibSXe6v6TlY3D1lsI=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=jluTaant1sqb3RGvVrbSn/5FUAxvy6awiCT+QNkazOqgJgzdvYBnQKycWm1CFCdd1ZAkpqMUjSPH7hFo1mxg9QkBgVAqAtGh3sW+elSaQv/WhDSaHSylUSqG2FoWrDEnN2Mu6JUVvhj0BKHq4uIfy/82+g6t2QV5EMBt3/vKFwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7cf265b30e2so65691039f.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Mar 2024 01:21:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711614078; x=1712218878;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ECf+rGZmG7JONk5+/pz8pSXo4jpd0Dy8/WSqTB1ROs8=;
+        b=dMMm9t5Obk9YFhUz+1jeuGKWcOyMQK9kh3trnaFSj0e9RPt6hAftWzJ3BQ9NmhVfxa
+         cS96cIfKu6zzP1+YzfsE+sjB7PYfF27/z0qUYUqAMwVKQDh4eX3CWcOYfFcO9SI79UOI
+         mLp4NLkoR/uG5BkjsEymgbim4KMVaxDteQ9tBwk4Bbam45bMNIg64/VteBkIHIYqWB9W
+         f0CBDge5HKwvFQda5PHV0S2lyRD1wM8IHHtyPRe5v3YqhMpskSV6KZWZ8tUBwgnjB0cW
+         rayNV4PsbcdE7oieiO4KdvmFBJBuqRWzsahl4r62uqYfFVWCPpCEnYKnSwAXqW6oW9kL
+         xEYA==
+X-Forwarded-Encrypted: i=1; AJvYcCVwD/hJccLWfUjCQkl1WR/7IT4r5aoEwA8vqAHBNi8oBbpAtVqp7B2joHhwXFi3BRPUe5vGAsyd04t3LG1Vzrr2lD1+A0Tou3gDVZl+fa6D
+X-Gm-Message-State: AOJu0YwYumQ90FQymcaGvk2+2KXQqovQTsMJRY89KVEvqV9J3ypwNDKy
+	R4oyOYtaqTXXLzrb30Y59O7L/5qkGMM+Wpp+4Crl+pZcboLnsDmQCopDdpStIObBK/FrE8klMDB
+	emJ8KdLfXtNlpVHsV3rtiNSTO33nLjhj+xA1CiQq2CmhCzMiZWw9U+ZA=
+X-Google-Smtp-Source: AGHT+IEaQi8QXGwYOjcERuu8VCNAnteICHXcLop1+RZucD2smqNyPXvGWD6JvQLQXoPOIqipJ4Dc8fze2hMsYzKKBlDqJkmAu9B6
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2][next] Bluetooth: L2CAP: Avoid
- -Wflex-array-member-not-at-end warnings
-To: Kees Cook <kees@kernel.org>, Luiz Augusto von Dentz
- <luiz.dentz@gmail.com>, "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-References: <ZgRIF1bkXlZlaK22@neat>
- <CABBYNZLi_PCbRB6CVYxwOG04917tDudMvuVT1NU3LVth=xpCtw@mail.gmail.com>
- <d5b0c70e-8369-4b99-9a42-9a4a93098251@embeddedor.com>
- <E3E65D27-9A43-4D99-8AF7-C857A169D8E2@kernel.org>
-Content-Language: en-US
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-In-Reply-To: <E3E65D27-9A43-4D99-8AF7-C857A169D8E2@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 201.172.173.147
-X-Source-L: No
-X-Exim-ID: 1rpig5-0000I1-2n
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: ([192.168.15.14]) [201.172.173.147]:46938
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 4
-X-Org: HG=hgshared;ORG=hostgator;
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
-X-CMAE-Envelope: MS4xfIUIbZjhnfL96mt0wqNpHEslZoDVrHVVqYzCE5t4LcleyJyM3/MTZ8+yg5ns1Re3Eg92b3jp3VhvDZJ98R5T86JgkxpQnvL3Zt3XJ7GyVkVWHoOgKt39
- e7vlk28g8hzrC+Fgzm/Y3LAu5YhtQ4wMahOKlr7FJO1suy+PCwfWYjaP/iTHUiDk8NI+8pkGIwE77+Gk5Xk7g4uCP8pJUOozd0XE164ntWrkk9NE1l1Wq7z0
+X-Received: by 2002:a05:6e02:240b:b0:368:9839:d21a with SMTP id
+ bs11-20020a056e02240b00b003689839d21amr133635ilb.5.1711614078045; Thu, 28 Mar
+ 2024 01:21:18 -0700 (PDT)
+Date: Thu, 28 Mar 2024 01:21:18 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000001d626c0614b4352f@google.com>
+Subject: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in mgmt_pending_foreach
+From: syzbot <syzbot+a878cdc1d5451bfaa51c@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    f99c5f563c17 Merge tag 'nf-24-03-21' of git://git.kernel.o..
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=14166479180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6fb1be60a193d440
+dashboard link: https://syzkaller.appspot.com/bug?extid=a878cdc1d5451bfaa51c
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/65d3f3eb786e/disk-f99c5f56.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/799cf7f28ff8/vmlinux-f99c5f56.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/ab26c60c3845/bzImage-f99c5f56.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+a878cdc1d5451bfaa51c@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: slab-use-after-free in mgmt_pending_foreach+0x7d/0x130
+Read of size 8 at addr ffff88808c1adb00 by task syz-executor.0/31083
+
+CPU: 1 PID: 31083 Comm: syz-executor.0 Not tainted 6.8.0-syzkaller-05271-gf99c5f563c17 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x1e7/0x2e0 lib/dump_stack.c:106
+ print_address_description mm/kasan/report.c:377 [inline]
+ print_report+0x169/0x550 mm/kasan/report.c:488
+ kasan_report+0x143/0x180 mm/kasan/report.c:601
+ mgmt_pending_foreach+0x7d/0x130
+ __mgmt_power_off+0x187/0x420 net/bluetooth/mgmt.c:9433
+ hci_dev_close_sync+0x5d2/0x1050 net/bluetooth/hci_sync.c:5149
+ hci_dev_do_close net/bluetooth/hci_core.c:554 [inline]
+ hci_dev_close+0x112/0x210 net/bluetooth/hci_core.c:579
+ sock_do_ioctl+0x158/0x460 net/socket.c:1222
+ sock_ioctl+0x629/0x8e0 net/socket.c:1341
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:904 [inline]
+ __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:890
+ do_syscall_64+0xfb/0x240
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
+RIP: 0033:0x7f0d3407dda9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f0d34e3d0c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f0d341abf80 RCX: 00007f0d3407dda9
+RDX: 0000000000000000 RSI: 00000000400448ca RDI: 0000000000000005
+RBP: 00007f0d340ca47a R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000000b R14: 00007f0d341abf80 R15: 00007ffc97b42758
+ </TASK>
+
+Allocated by task 20735:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ poison_kmalloc_redzone mm/kasan/common.c:370 [inline]
+ __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:387
+ kasan_kmalloc include/linux/kasan.h:211 [inline]
+ kmalloc_trace+0x1d9/0x360 mm/slub.c:4012
+ kmalloc include/linux/slab.h:590 [inline]
+ kzalloc include/linux/slab.h:711 [inline]
+ mgmt_pending_new+0x65/0x250 net/bluetooth/mgmt_util.c:269
+ mgmt_pending_add+0x36/0x120 net/bluetooth/mgmt_util.c:296
+ user_pairing_resp+0x30c/0x580 net/bluetooth/mgmt.c:3632
+ hci_mgmt_cmd+0xc45/0x11d0 net/bluetooth/hci_sock.c:1715
+ hci_sock_sendmsg+0x7a5/0x11c0 net/bluetooth/hci_sock.c:1835
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:745
+ sock_write_iter+0x2dd/0x400 net/socket.c:1160
+ call_write_iter include/linux/fs.h:2108 [inline]
+ new_sync_write fs/read_write.c:497 [inline]
+ vfs_write+0xa84/0xcb0 fs/read_write.c:590
+ ksys_write+0x1a0/0x2c0 fs/read_write.c:643
+ do_syscall_64+0xfb/0x240
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
+
+The buggy address belongs to the object at ffff88808c1adb00
+ which belongs to the cache kmalloc-96 of size 96
+The buggy address is located 0 bytes inside of
+ freed 96-byte region [ffff88808c1adb00, ffff88808c1adb60)
+
+The buggy address belongs to the physical page:
+page:ffffea0002306b40 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x8c1ad
+anon flags: 0xfff00000000800(slab|node=0|zone=1|lastcpupid=0x7ff)
+page_type: 0xffffffff()
+raw: 00fff00000000800 ffff888014c41780 ffffea000275af00 dead000000000005
+raw: 0000000000000000 0000000000200020 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 0, migratetype Unmovable, gfp_mask 0x112820(GFP_ATOMIC|__GFP_NOWARN|__GFP_NORETRY|__GFP_HARDWALL), pid 5149, tgid 5149 (kworker/1:4), ts 186720315546, free_ts 186591746837
+ set_page_owner include/linux/page_owner.h:31 [inline]
+ post_alloc_hook+0x1ea/0x210 mm/page_alloc.c:1533
+ prep_new_page mm/page_alloc.c:1540 [inline]
+ get_page_from_freelist+0x33ea/0x3580 mm/page_alloc.c:3311
+ __alloc_pages+0x256/0x680 mm/page_alloc.c:4569
+ __alloc_pages_node include/linux/gfp.h:238 [inline]
+ alloc_pages_node include/linux/gfp.h:261 [inline]
+ alloc_slab_page+0x5f/0x160 mm/slub.c:2190
+ allocate_slab mm/slub.c:2354 [inline]
+ new_slab+0x84/0x2f0 mm/slub.c:2407
+ ___slab_alloc+0xd1b/0x13e0 mm/slub.c:3540
+ __slab_alloc mm/slub.c:3625 [inline]
+ __slab_alloc_node mm/slub.c:3678 [inline]
+ slab_alloc_node mm/slub.c:3850 [inline]
+ kmalloc_trace+0x267/0x360 mm/slub.c:4007
+ kmalloc include/linux/slab.h:590 [inline]
+ dst_cow_metrics_generic+0x56/0x1c0 net/core/dst.c:178
+ dst_metrics_write_ptr include/net/dst.h:133 [inline]
+ dst_metric_set include/net/dst.h:194 [inline]
+ icmp6_dst_alloc+0x270/0x420 net/ipv6/route.c:3286
+ mld_sendpack+0x69b/0xda0 net/ipv6/mcast.c:1807
+ mld_send_cr net/ipv6/mcast.c:2119 [inline]
+ mld_ifc_work+0x7d6/0xd90 net/ipv6/mcast.c:2650
+ process_one_work kernel/workqueue.c:3254 [inline]
+ process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
+ worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
+ kthread+0x2f0/0x390 kernel/kthread.c:388
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+page last free pid 7393 tgid 7390 stack trace:
+ reset_page_owner include/linux/page_owner.h:24 [inline]
+ free_pages_prepare mm/page_alloc.c:1140 [inline]
+ free_unref_page_prepare+0x968/0xa90 mm/page_alloc.c:2346
+ free_unref_page+0x37/0x3f0 mm/page_alloc.c:2486
+ discard_slab mm/slub.c:2453 [inline]
+ __put_partials+0xeb/0x130 mm/slub.c:2922
+ put_cpu_partial+0x17c/0x250 mm/slub.c:2997
+ __slab_free+0x302/0x410 mm/slub.c:4166
+ qlink_free mm/kasan/quarantine.c:163 [inline]
+ qlist_free_all+0x5e/0xc0 mm/kasan/quarantine.c:179
+ kasan_quarantine_reduce+0x14f/0x170 mm/kasan/quarantine.c:286
+ __kasan_slab_alloc+0x23/0x80 mm/kasan/common.c:322
+ kasan_slab_alloc include/linux/kasan.h:201 [inline]
+ slab_post_alloc_hook mm/slub.c:3813 [inline]
+ slab_alloc_node mm/slub.c:3860 [inline]
+ __do_kmalloc_node mm/slub.c:3980 [inline]
+ __kmalloc+0x1e0/0x4a0 mm/slub.c:3994
+ kmalloc include/linux/slab.h:594 [inline]
+ tomoyo_realpath_from_path+0xcf/0x5e0 security/tomoyo/realpath.c:251
+ tomoyo_get_realpath security/tomoyo/file.c:151 [inline]
+ tomoyo_path_number_perm+0x23a/0x880 security/tomoyo/file.c:723
+ security_file_ioctl+0x75/0xb0 security/security.c:2726
+ __do_sys_ioctl fs/ioctl.c:898 [inline]
+ __se_sys_ioctl+0x47/0x170 fs/ioctl.c:890
+ do_syscall_64+0xfb/0x240
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
+
+Memory state around the buggy address:
+ ffff88808c1ada00: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
+ ffff88808c1ada80: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
+>ffff88808c1adb00: fb fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
+                   ^
+ ffff88808c1adb80: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
+ ffff88808c1adc00: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
+==================================================================
 
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-On 27/03/24 23:28, Kees Cook wrote:
-> 
-> 
-> On March 27, 2024 11:08:33 AM MDT, "Gustavo A. R. Silva" <gustavo@embeddedor.com> wrote:
->> Hi!
->>
->> On 3/27/24 10:55, Luiz Augusto von Dentz wrote:
->>> Hi Gustavo,
->>>
->>> On Wed, Mar 27, 2024 at 12:23 PM Gustavo A. R. Silva
->>> <gustavoars@kernel.org> wrote:
->>>>
->>>> -Wflex-array-member-not-at-end is coming in GCC-14, and we are getting
->>>> ready to enable it globally.
->>>
->>> Which tree is this base on, I just rebased bluetooth-next on top of
->>> net-next but it looks like CI is still failing to build it, so either
->>> we don't have all the dependencies already in net-next or perhaps you
->>> had it submit while the tree had not been updated.
->>
->> This is based off of linux-next.
->>
->> I think net-next is missing this commit in v6.9-rc1:
->>
->> d8e45f2929b9 "overflow: Change DEFINE_FLEX to take __counted_by member")
->>
->> https://git.kernel.org/linus/d8e45f2929b9
-> 
-> Just FYI, that is in rc1. (I sent it late to avoid a netdev collision.)
-> 
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-Yep.
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-They haven't pulled all the changes from mainline up to -rc1, yet:
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/log/
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
---
-Gustavo
+If you want to undo deduplication, reply with:
+#syz undup
