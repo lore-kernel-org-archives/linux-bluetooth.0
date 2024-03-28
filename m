@@ -1,151 +1,88 @@
-Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B774405FC
-	for <linux-bluetooth@vger.kernel.org>; Thu, 28 Mar 2024 05:16:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 411EF2C19B;
+	Thu, 28 Mar 2024 05:28:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711602998; cv=none; b=jN/9Rpnye49ST6Xy41bjQ3x34WDzYwaFWQSgSZ+lUvPFTgOruP4VU0SUQ0rupB+nQu3i3ewFMz0x3IkrMAMruL7GSogxYZEkUcYF7LXvoL7/xT7VTOujrgXgowgcw29FRYtSNO6P5ztDBdqGOv9Jhn8qrDq1gchaF/2VR/51VE4=
+	t=1711603725; cv=none; b=IdY0U9Kf480GpiXHH8nh4xjl9QldF/iRwtNnuvt7v1YsAz+u8dj+yqNDY5P0zJ6SuJril8c05xSrNo7Ev6QCJvAG+VXbeJkvVCoZ88fYy6LVTGkAXvugdrTLJz05X/ubBnWc34SUOIdGbBDyU/0lff6ImeSJWQWiBQ0jcRXSZ/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711602998; c=relaxed/simple;
-	bh=sBPTJcGEYTbv3hcgUwqNauzYtskOKb+GWpnb7br0MOg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lbSKhW5A/+hpvvIL1eV++hH/cbKIwU4PeM849tC0zZfq6YP6K2P0umvdJ7Y8mrcxfFNssLMcygGXHWjHYuVrC6tUtTEIVrSbv/eBR3RPtl2deNwZ8Th02pL7PhmFmOL4qpj7QckhwOeRaEZzH+4cQF9NhwwWtfLZ8LB6IaIUFd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=gXPbjKTb; arc=none smtp.client-ip=209.85.161.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1711603725; c=relaxed/simple;
+	bh=baXI8FUz6bZRMfsAVddS0YOu+Ahk/pnkvxz+NYj8V/A=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=NPD0DZtuCmfAkbMwYg9uc/5uPYQx9wFDTxnlkwMgq+KfFvkVjc/DtnV8S3zwra0wbXlxqhni93ykv0MjcYaBCflpeV+r4+tptO+tMtuRamZEq/UekCI6WBEbKIoKYiU/tADLye/gOn65DsESzc6ggs5a2Arz8joejxEjAyjnYSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tbg8POKN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gXPbjKTb"
-Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-5a58009fe88so308065eaf.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Mar 2024 22:16:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1711602994; x=1712207794; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NCBBqATkrmhAqNvcc7V5yUc6Bj0MDD2J9Hd2vuTQUac=;
-        b=gXPbjKTbrvtfpT6/qEmVUxns+A30LH6QOiAjT4F0xLZUPzUZg0ordNOvATabg2F/Wl
-         kPv7rlwtWOxfgPm2w1j9yiVchrEqiifXfpuqKbM3c55rO+d/cQmcOVsJtdO/BdsefRN9
-         RxOKLZQ8lQKHo0Up3S4+54dabwBIgvbFJlg0eTR2NGULCedimJYCVi8NEO/uINa2jv1N
-         m9SrGDUqniaEzEwLDKjTqPO6IIW3ujVusL7p6WPrXVYciMFtPwv7L9mAU+/qpWitn5fr
-         hH1CJycNEicAhv28MTJZUrDtXoqvUlSPCv54sDagwBcdt6nzOokgIGUCvI13cWlf71La
-         jDOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711602994; x=1712207794;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NCBBqATkrmhAqNvcc7V5yUc6Bj0MDD2J9Hd2vuTQUac=;
-        b=dKngZQlvY9NwrdC5JMINDTaAEAJV5dSpYem+wdUDp+jHCNo+48oxYdX7oQ/FSNIk3Z
-         NF2RbqdSgjNmm9b55c/M2tJ8OCEEg+UguvsWVzS8OLOVLTa2miqj5cbGJQFgeFanhphz
-         l0oipw+TN2kZFlBiDqNteq8Z8BVMMexYy+VJeyTefx6XjZWvnU3IRJUZN9aYYWsRCGQV
-         tnci5DNIHGlUMJYg9tF1dSrvUEIHVCgr9DpTjXHi6T2YgsJf/GgmVHr7UUdwikriCw2B
-         8AGkv5BUc+Vp+WdgOS4zCdfReBJ1RpVvpyv2MWYtU9jJmUy8sqcf/Y7SoMk0RPgXrru8
-         lnWA==
-X-Forwarded-Encrypted: i=1; AJvYcCW3mNZAxQK5JmYPT7Mf4Eilo4ahd356+IQlbXw8OQlPTa+yLmBIrQ4/FcXGvlAZRIhGyCxECKPMfLumkKgY270ECaOq7+QvLZ4ITlUJRALZ
-X-Gm-Message-State: AOJu0Yygdq3+1ICpj4K2O8Zx+vQ0PR/6GzmShot1EYcO3YMLCNDd4NHq
-	gH8urqQ4WsazvPbI6Hu3h7dzVsWCVCI1Dn0FqSYyUyEFoW0El2aVaqlYFMWEITk=
-X-Google-Smtp-Source: AGHT+IENjWm30W77Sho1F7STKjVDKRSghd/5qoLRwkalJNx2D7PN+W1+MnXgZZvq+TiwN/1tI/fojA==
-X-Received: by 2002:a05:6358:5307:b0:17e:8f90:dd31 with SMTP id n7-20020a056358530700b0017e8f90dd31mr1555244rwf.32.1711602994298;
-        Wed, 27 Mar 2024 22:16:34 -0700 (PDT)
-Received: from localhost ([122.172.85.206])
-        by smtp.gmail.com with ESMTPSA id u23-20020a63df17000000b005e857bba96csm433309pgg.10.2024.03.27.22.16.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Mar 2024 22:16:33 -0700 (PDT)
-Date: Thu, 28 Mar 2024 10:46:31 +0530
-From: Viresh Kumar <viresh.kumar@linaro.org>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Gonglei <arei.gonglei@huawei.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Viresh Kumar <vireshk@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	David Airlie <airlied@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Gurchetan Singh <gurchetansingh@chromium.org>,
-	Chia-I Wu <olvaffe@gmail.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Joerg Roedel <joro@8bytes.org>, Alexander Graf <graf@amazon.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Kalle Valo <kvalo@kernel.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Vishal Verma <vishal.l.verma@intel.com>,
-	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>,
-	Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Mathieu Poirier <mathieu.poirier@linaro.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>,
-	Anton Yakovlev <anton.yakovlev@opensynergy.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	virtualization@lists.linux.dev, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev,
-	kvm@vger.kernel.org, linux-wireless@vger.kernel.org,
-	nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	alsa-devel@alsa-project.org, linux-sound@vger.kernel.org
-Subject: Re: [PATCH 09/22] gpio: virtio: drop owner assignment
-Message-ID: <20240328051631.c5eitp4mzaj4bh6i@vireshk-i7>
-References: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
- <20240327-module-owner-virtio-v1-9-0feffab77d99@linaro.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tbg8POKN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70648C43390;
+	Thu, 28 Mar 2024 05:28:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711603724;
+	bh=baXI8FUz6bZRMfsAVddS0YOu+Ahk/pnkvxz+NYj8V/A=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=Tbg8POKNNoOJq0D0phAMHk6pYkZCMmkQ2EIzZqi8JGN0hkEtRq8Nq2LyooOr7rK1M
+	 SYfVCYmv5Ye9Sq1qEerMbARJZ5ZiflHRja5EeNzagne841dwAOgpmGy8CoGfruHFYS
+	 NexSskI//ddnkulMX2+uGZ1r3zBQSlFGzjPNhD/dWmTR7NM8CkHgN4dFnOgGi+4wOu
+	 TjccFs2RDsQ0f9cDEVTCBw0WP8SkGz5rPplzoOAY19EBhFjBEHTejhFT1UkRwgAnHk
+	 g6Gz1yJzVfFMEmF0XW+j/OTgxfg2ujYwuQfLt2zamoxE23aGN20WgzxGWYik/u7f60
+	 r3zJOhyVNuPEA==
+Date: Wed, 27 Mar 2024 23:28:43 -0600
+From: Kees Cook <kees@kernel.org>
+To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v2=5D=5Bnext=5D_Bluetooth=3A_L2CAP=3A_Avo?=
+ =?US-ASCII?Q?id_-Wflex-array-member-not-at-end_warnings?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <d5b0c70e-8369-4b99-9a42-9a4a93098251@embeddedor.com>
+References: <ZgRIF1bkXlZlaK22@neat> <CABBYNZLi_PCbRB6CVYxwOG04917tDudMvuVT1NU3LVth=xpCtw@mail.gmail.com> <d5b0c70e-8369-4b99-9a42-9a4a93098251@embeddedor.com>
+Message-ID: <E3E65D27-9A43-4D99-8AF7-C857A169D8E2@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240327-module-owner-virtio-v1-9-0feffab77d99@linaro.org>
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 27-03-24, 13:41, Krzysztof Kozlowski wrote:
-> virtio core already sets the .owner, so driver does not need to.
-> 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> 
-> ---
-> 
-> Depends on the first patch.
-> ---
->  drivers/gpio/gpio-virtio.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/drivers/gpio/gpio-virtio.c b/drivers/gpio/gpio-virtio.c
-> index fcc5e8c08973..9fae8e396c58 100644
-> --- a/drivers/gpio/gpio-virtio.c
-> +++ b/drivers/gpio/gpio-virtio.c
-> @@ -653,7 +653,6 @@ static struct virtio_driver virtio_gpio_driver = {
->  	.remove			= virtio_gpio_remove,
->  	.driver			= {
->  		.name		= KBUILD_MODNAME,
-> -		.owner		= THIS_MODULE,
->  	},
->  };
->  module_virtio_driver(virtio_gpio_driver);
 
-Acked-by: Viresh Kumar <viresh.kumar@linaro.org>
 
--- 
-viresh
+On March 27, 2024 11:08:33 AM MDT, "Gustavo A=2E R=2E Silva" <gustavo@embe=
+ddedor=2Ecom> wrote:
+>Hi!
+>
+>On 3/27/24 10:55, Luiz Augusto von Dentz wrote:
+>> Hi Gustavo,
+>>=20
+>> On Wed, Mar 27, 2024 at 12:23=E2=80=AFPM Gustavo A=2E R=2E Silva
+>> <gustavoars@kernel=2Eorg> wrote:
+>>>=20
+>>> -Wflex-array-member-not-at-end is coming in GCC-14, and we are getting
+>>> ready to enable it globally=2E
+>>=20
+>> Which tree is this base on, I just rebased bluetooth-next on top of
+>> net-next but it looks like CI is still failing to build it, so either
+>> we don't have all the dependencies already in net-next or perhaps you
+>> had it submit while the tree had not been updated=2E
+>
+>This is based off of linux-next=2E
+>
+>I think net-next is missing this commit in v6=2E9-rc1:
+>
+>d8e45f2929b9 "overflow: Change DEFINE_FLEX to take __counted_by member")
+>
+>https://git=2Ekernel=2Eorg/linus/d8e45f2929b9
+
+Just FYI, that is in rc1=2E (I sent it late to avoid a netdev collision=2E=
+)
+
+--=20
+Kees Cook
