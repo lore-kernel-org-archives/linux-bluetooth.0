@@ -1,123 +1,111 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7CC4127B66
-	for <linux-bluetooth@vger.kernel.org>; Thu, 28 Mar 2024 14:40:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 912481E48C;
+	Thu, 28 Mar 2024 14:55:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711636830; cv=none; b=guguBGhkyDDBDdX204+jsBSpajZrzGkn7itI/5Hl9JMfAOTqnmhY3YgyJ/RQHJFJxi8LUtPGrVk+9fPLovkhpRqJMUnKA16CZNcH97mL/yNgQ+4XmNmDPY2DhVESC8JPXkUj0jGPTUGo+DLQlYdRah5NxzTyHZ5v5OCA9xsxCSY=
+	t=1711637731; cv=none; b=pELeYOcHZ/qu3yMURgNbY/idB94VvNfBN2T/0pF+ExmWlIO2ClDdk/dJ0LZikuKyDDi6SepioheKD1R5IjqFzlork5sF5tNPp350FJt2PORqFeGR9RnrIrAIbsNzAjoEZGuR2hcZLBYB5BVgjVFD9EP0u4279suSSoLzd5DkgIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711636830; c=relaxed/simple;
-	bh=ETp2kUCngV/gRPebf/MNlnQuW3cWGkCuzBvRvH3k+Ls=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=No06PkmjPw2z/kTyqakNpG9YwNrM6jwDxPA7kVGL+jyqsiC7ya07m2zkk+x3ApdOB4vG3VOsKNwh2wFl2EIveFH14jAoxLik1e5SBqqwhUPGfOF8Al1YaI2oVsKHQAthjC9htkCJLwLxIWktiX4EGZb4uJbqpwGHw9joxqN7iqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sfPd0TmP; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711637731; c=relaxed/simple;
+	bh=N1Hlh0/nQyHFsmO9kXfMBpqfOjJKnBxxQzST5ZvMFGI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=COSlVt72JtdkwknvsGtLln1LGxaJS+iOASefJOeuDWxTmF6IlYjfHry/boLJpufOdYCHim+jcdb4+56vidb24f7fY3NAykdYQlRbfE9Hk6F0O2cGLp7dnIImW1dUeEakezbWXWLvSYwB8oHKKH3inxYwVJdPv1pm5F8XmlHsraE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=hlwUv/1I; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sfPd0TmP"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8F8DBC433B2;
-	Thu, 28 Mar 2024 14:40:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711636829;
-	bh=ETp2kUCngV/gRPebf/MNlnQuW3cWGkCuzBvRvH3k+Ls=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=sfPd0TmPF9nDCzN7GOJ3H4J2k3sTc9Fi+OTjfSOfwJJqh/UZUQ63V09VTP1Ywjm+o
-	 WR4+04P6aBG7c8LcKMzvWtjh3fG9prv/y21fQJAImGIEuKhccvoRker70fMFLn0kzF
-	 vUB4Hv5JB6+rhHv7Meu4vLfyIpeNs+FpRADAS4XV/ZsLBSadmaiT1McRls1dd/H0GN
-	 bxyMJopiRfWCvC3WhXOSVTzjWJaKRuelc/TXRe4vPc+913FxuviArje1PgON6us6q5
-	 aZs1QLnA4LKt9iDuW35s8NM9nMXHT386L3YmCXjg+9vYUx1jeP4ZCsxbS/7BtmMjWG
-	 TGYsH+bjUKdKQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 84F71D8BCE9;
-	Thu, 28 Mar 2024 14:40:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="hlwUv/1I"
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42SBA2M6023688;
+	Thu, 28 Mar 2024 14:55:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=JQTagzTLA0ahr+zdqFFccuIih+ODyT0fmJmBoKrjDoo=; b=hl
+	wUv/1IeIk8g5cFNiLFj7Si3KibGei4qTmHufiufhKKa07Mn33fC03xh9dcZqz8q2
+	Bf/YFRU8YKzm1n3qGJCqGa5NPMum3hP4ayG+SF5IxdiJhnMz3RplOeYofD5+xywY
+	GEd7WyIefrXm+3kCRXdh8cZiy0izTXPj5nZDOEOs3YkOCm4dFEV5ha6WDy/JfNu5
+	wwIEYCldKb6TqRGhK0yIM4fQp8AMKBY0JtI1DOQf+giSqFvQiu5TDUe/9p0ruQr7
+	bMcFzNpGTffCakh4zbYRicgffIXSDKMGjwyb/NL/3DkrKsaqZdSxgbQe9hyvg8lp
+	2K5K/UsBVIpuFHnUHVFw==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3x4u203ptv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 28 Mar 2024 14:55:23 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 42SEtMnc027055
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 28 Mar 2024 14:55:22 GMT
+Received: from [10.218.29.219] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Thu, 28 Mar
+ 2024 07:55:19 -0700
+Message-ID: <124a7d54-5a18-4be7-9a76-a12017f6cce5@quicinc.com>
+Date: Thu, 28 Mar 2024 20:25:16 +0530
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1] monitor/att: Add support for decoding GATT Long
- Reads
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <171163682954.3770.1408580707285106467.git-patchwork-notify@kernel.org>
-Date: Thu, 28 Mar 2024 14:40:29 +0000
-References: <20240327150727.1584607-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240327150727.1584607-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Revert "Bluetooth: hci_qca: Set BDA quirk bit if fwnode
+ exists in DT"
+To: <patchwork-bot+bluetooth@kernel.org>,
+        Johan Hovold
+	<johan+linaro@kernel.org>
+CC: <luiz.dentz@gmail.com>, <marcel@holtmann.org>,
+        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <stable@vger.kernel.org>, <quic_mohamull@quicinc.com>,
+        <quic_hbandi@quicinc.com>
+References: <20240314084412.1127-1-johan+linaro@kernel.org>
+ <171146704035.9961.13096206001570615153.git-patchwork-notify@kernel.org>
+Content-Language: en-US
+From: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+In-Reply-To: <171146704035.9961.13096206001570615153.git-patchwork-notify@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 9N6dvkzbmne6emHvKabkk5wZfoBqHh1i
+X-Proofpoint-ORIG-GUID: 9N6dvkzbmne6emHvKabkk5wZfoBqHh1i
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-28_15,2024-03-27_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ lowpriorityscore=0 spamscore=0 impostorscore=0 malwarescore=0 phishscore=0
+ adultscore=0 clxscore=1011 mlxlogscore=821 mlxscore=0 priorityscore=1501
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2403210001 definitions=main-2403280102
 
-Hello:
+Hi Johan,
+We made this change to configure the device which supports persistent memory for the BD-Address
+So to make device functional in both scenarios we are adding a new property in dts file to distinguish persistent and non-persistent support of BD Address and set HCI_QUIRK_USE_BDADDR_PROPERTY bit accordingly
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Wed, 27 Mar 2024 11:07:27 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On 3/26/2024 9:00 PM, patchwork-bot+bluetooth@kernel.org wrote:
+> Hello:
 > 
-> This adds support for decoding GATT Long Reads:
+> This patch was applied to bluetooth/bluetooth-next.git (master)
+> by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 > 
-> < ACL Data TX: Handle 3585 flags 0x00 dlen 7
->       ATT: Read Request (0x0a) len 2
->         Handle: 0x0028 Type: Report Map (0x2a4b)
-> > ACL Data RX: Handle 3585 flags 0x02 dlen 27
->       ATT: Read Response (0x0b) len 22
->         Value[22]: 05010902a10185020901a10095107501150025010509
->         Long Value[22]: 05010902a10185020901a10095107501150025010509
-> < ACL Data TX: Handle 3585 flags 0x00 dlen 9
->       ATT: Read Blob Request (0x0c) len 4
->         Handle: 0x0028 Type: Report Map (0x2a4b)
->         Offset: 0x0016
-> > ACL Data RX: Handle 3585 flags 0x02 dlen 27
->       ATT: Read Blob Response (0x0d) len 22
->         Value[22]: 19012910810205011601f826ff07750c950209300931
->         Long Value[44]: 05010902a10185020901a1009510750115002501050919
->                         012910810205011601f826ff07750c950209300931
-> < ACL Data TX: Handle 3585 flags 0x00 dlen 9
->       ATT: Read Blob Request (0x0c) len 4
->         Handle: 0x0028 Type: Report Map (0x2a4b)
->         Offset: 0x002c
-> > ACL Data RX: Handle 3585 flags 0x02 dlen 27
->       ATT: Read Blob Response (0x0d) len 22
->         Value[22]: 81061581257f75089501093881069501050c0a380281
->         Long Value[66]: 05010902a10185020901a1009510750115002501050919
->                         012910810205011601f826ff07750c9502093009318106
->                         1581257f75089501
-> < ACL Data TX: Handle 3585 flags 0x00 dlen 9
->       ATT: Read Blob Request (0x0c) len 4
->         Handle: 0x0028 Type: Report Map (0x2a4b)
->         Offset: 0x0042
-> > ACL Data RX: Handle 3585 flags 0x02 dlen 27
->       ATT: Read Blob Response (0x0d) len 22
->         Value[22]: 06c0c00643ff0a0202a101851175089513150026ff00
->         Long Value[88]: 05010902a10185020901a1009510750115002501050919
->                         012910810205011601f826ff07750c9502093009318106
->                         1581257f75089501093881069501050c0a38028106c0c0
->                         0643ff0a0202a101851175089513150026ff00
-> < ACL Data TX: Handle 3585 flags 0x00 dlen 9
->       ATT: Read Blob Request (0x0c) len 4
->         Handle: 0x0028 Type: Report Map (0x2a4b)
->         Offset: 0x0058
-> > ACL Data RX: Handle 3585 flags 0x02 dlen 14
->       ATT: Read Blob Response (0x0d) len 9
->         Value[9]: 0902810009029100c0
->         Handle: 0x0028 Type: Report Map (0x2a4b)
->         Value[97]: 05010902a10185020901a1009510750115002501050919
->                    012910810205011601f826ff07750c9502093009318106
->                    1581257f75089501093881069501050c0a38028106c0c0
->                    0643ff0a0202a101851175089513150026ff0009028100
->                    09029100c0
+> On Thu, 14 Mar 2024 09:44:12 +0100 you wrote:
+>> This reverts commit 7dcd3e014aa7faeeaf4047190b22d8a19a0db696.
+>>
+>> Qualcomm Bluetooth controllers like WCN6855 do not have persistent
+>> storage for the Bluetooth address and must therefore start as
+>> unconfigured to allow the user to set a valid address unless one has
+>> been provided by the boot firmware in the devicetree.
+>>
+>> [...]
 > 
-> [...]
+> Here is the summary with links:
+>    - Revert "Bluetooth: hci_qca: Set BDA quirk bit if fwnode exists in DT"
+>      https://git.kernel.org/bluetooth/bluetooth-next/c/ac0cf3552972
+> 
+> You are awesome, thank you!
 
-Here is the summary with links:
-  - [BlueZ,v1] monitor/att: Add support for decoding GATT Long Reads
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=cd22ff6a1fef
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Thanks,
+Janaki Ram
