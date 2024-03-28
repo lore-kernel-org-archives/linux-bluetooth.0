@@ -1,141 +1,104 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDC385BADB
-	for <linux-bluetooth@vger.kernel.org>; Thu, 28 Mar 2024 17:08:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 509F73BBC5
+	for <linux-bluetooth@vger.kernel.org>; Thu, 28 Mar 2024 18:05:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711645713; cv=none; b=atJ56poyUM0B1jqZJw0eg7ZnuwSXmdEhJfolNKDGQG0guuwRzVtgPafAkOnEzCfvX2NEB9co1IFRlMX7pyv6dZbStrQF8UmlehCMPnwju1NMjHB71c4Jgbp9prdt/2D/NXpLHuJQ65B2DO5GGWA4+Uiwijzpxg1zoYQF50mN16o=
+	t=1711649106; cv=none; b=rF4Gv/KT1ncj6v8oLknb6lHIpever/zXOj8nZj7xd8D7oW+jNe8J53fm41J0IE0RYqBhLgoSkFojmrnko4m8bDmX6AB267y4MoVrcSeypVsKQng6b6N7Pmy8XmpBc1Ap8kMO3qYuCnddm8Sk8w2htoi2qwHCsxyPgg99t4c3KB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711645713; c=relaxed/simple;
-	bh=Rh3IW5rU3PVv5IFrd5c61y98olbgKxP6Ang6BwVP4sk=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=NGYPv5B6vhzAHlSL60ZE0S5ELxB/rM7f6qBRQSxujX5xLe1A95Kwo1vlNBPNUjvlCR7BJuWQODzA5VYn/z3hrEcAJTQsCjIqDzwvM/ntgR7Os/amRz+a6hFf4kULlzr4uegN6qKguFaS49xjxC4ekZeu8ZX+URyxQMMUR1TVclQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XfU0jKmZ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711649106; c=relaxed/simple;
+	bh=2a79i+PoGTgTvbvmFxY0lKQox/kVLsT7zkDRhyh/MDc=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=LkmM+ZlUBaS18g2G+ELnVRd1Jwik4tOLJDiY03Wi/1yW1rShjRR1T9CyqEwgTM2OvEsoEM13nY0i9zympUXNMTHk93DD9ArS1fOD8hrfq/XLUeqW8pvf/X6CvrwgivnpuQ2NkffoyKHiDd+Ey5kJgs7s1oXlAZcAkn3UwYjKIk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mz8ITmJ8; arc=none smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XfU0jKmZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38E77C433F1;
-	Thu, 28 Mar 2024 17:08:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711645713;
-	bh=Rh3IW5rU3PVv5IFrd5c61y98olbgKxP6Ang6BwVP4sk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=XfU0jKmZ5/DwK/e0JJoj3+r36+1vGwjN5Dd8Gm36y1XMg8f38w1JI2VVeWNAlUFtN
-	 IoJkypHMkICMYJnBBfa6AUsCV13/2Htz1Uh2XoGFCpYrz4vvXGO4tCd5lZpEk2UI/H
-	 adS6spLh3jWOD72aFEp4AibF5zal/mHZ1FSYPHzd+kN3DvT8Mre6GRD3cRi/pZfZrw
-	 rkfPAo23VtQvdcgFzKOmdRMmHhVzaI2PiRXk5lrfVlu2eTh2FbRe/bpdP4bD5CL1Rd
-	 IKG5VW7QzAmqdpt18D8qC2auEm6hKVrCpiuat4cYCo5xwt7rnaxF29JoIwvoZx7edF
-	 HYo7utAwV0//Q==
-Date: Thu, 28 Mar 2024 12:08:31 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Kiran K <kiran.k@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	Chandrashekar <chandrashekar.devegowda@intel.com>
-Subject: Re: [PATCH v1 3/3] Bluetooth: btintel_pcie: Add *setup* function to
- download firmware
-Message-ID: <20240328170831.GA1570559@bhelgaas>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mz8ITmJ8"
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-430ddb1a227so7368351cf.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Mar 2024 11:05:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711649104; x=1712253904; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=eWXerRw57tAZbINoK0yKCIhTwRzLsQP/48rA7k2Yx8s=;
+        b=mz8ITmJ8CwrhehQ1b4pLHLZ8+OH+Y61BpbPoJuZLAQs5BOBydz0wdJLIMVgKIzTqvh
+         ZpwIuSOJhtboIENKPRtPqvMgp3YCiyCVi5J91Y2rIjmfOJcVNy1jtxTP3SAUmYm32rGf
+         BMvvII8ewkuoHIt5mO/0InB5vZdOVJfyZzosBKJ2+d59xnc+KmLyqicleor0Kst3OwQj
+         yAJn2AnUOCOgfZ/K8A6EmkHWNbJPi+ZU4qCQgM/4I8Qke475rKzZgkx1Ib+ZnCJUdiV6
+         I+BQtgwJ5O25pos8pYHY+IUdnlYdPGkWNyf/lBdrR7OIQOoxoss2EWfqimkfq157jkHP
+         mcIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711649104; x=1712253904;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eWXerRw57tAZbINoK0yKCIhTwRzLsQP/48rA7k2Yx8s=;
+        b=oNwNgyjfgt6WtgZ8r7DACRBqMjsFEp2NUwQ3liezvX3u2JnFy72nDskYsfbqDoP7ch
+         tzrPi8tSWaLDBgm0lFzXxd/uYCvss+TOL8sZdiKZ9037fGJnxvP9xxtMPsW0DKLa4CGb
+         s7BSii4+IvdglcyAD7Dcbj9G9usbz7ht5anviWGAq2GNij8G/8DsvO3v3RsI1FLvqhUF
+         tL8h0zLIXLhJNBby05zFprnhCSkn3osR1MP85uTyQRkl3h4keYHFi/2Efw+MeSXkYNIz
+         nDlpFA8cp6ZwNYzDHOR0NIV3SwCZ2UUaDBPhQNLd24qhdKrf88ttxI/JZOgrCC79DQbv
+         OqHw==
+X-Gm-Message-State: AOJu0Yz9ztqBegi/voSz2BAFRlY9h/nqrsrDEXLwoaWlhbBl97ecqgzg
+	qElIl9Wejal6BYK22z2S8zzld+L6+xQucOktrdsaGGxV8M1VmcCAerTEfzWG
+X-Google-Smtp-Source: AGHT+IGcFRvDJkScmR8yD/+hIlRpqyxKNETz3Dj4xMOgSMoTBCD3GozqG56xLKWWd1jcV/oom3QCdA==
+X-Received: by 2002:ac8:7f4b:0:b0:430:be66:50a4 with SMTP id g11-20020ac87f4b000000b00430be6650a4mr34647qtk.63.1711649104145;
+        Thu, 28 Mar 2024 11:05:04 -0700 (PDT)
+Received: from [172.17.0.2] ([20.109.39.247])
+        by smtp.gmail.com with ESMTPSA id cr7-20020a05622a428700b004313f54aaa9sm819260qtb.5.2024.03.28.11.05.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Mar 2024 11:05:03 -0700 (PDT)
+Message-ID: <6605b14f.050a0220.3089a.4c4b@mx.google.com>
+Date: Thu, 28 Mar 2024 11:05:03 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1062295982931557922=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240328111904.992068-3-kiran.k@intel.com>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v3,1/2] input/device: Fix not handling IdleTimeout when uhid is in use
+In-Reply-To: <20240328153252.1752439-1-luiz.dentz@gmail.com>
+References: <20240328153252.1752439-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Thu, Mar 28, 2024 at 04:49:04PM +0530, Kiran K wrote:
-> Add to support to download firmware.
+--===============1062295982931557922==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-s/Add to/Add/
+This is automated email and please do not reply to this email!
 
-> +static void btintel_pcie_prepare_tx(struct txq *txq, u16 tfd_index,
-> +				    struct sk_buff *skb)
-> +{
-> +	struct data_buf *buf;
-> +	struct tfd *tfd;
-> +
-> +	tfd = &txq->tfds[tfd_index];
-> +	memset(tfd, 0, sizeof(*tfd));
-> +
-> +	/* Get the buffer of the tfd index for DMA */
+Dear submitter,
 
-s/tfd/TFD/ for consistency.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=839408
 
-> +static int btintel_pcie_hci_send_frame(struct hci_dev *hdev,
-> +				       struct sk_buff *skb)
-> +{
-> +	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
-> +	int ret;
-> +	u32 type;
-> +
-> +	/* Due to the fw limitation, the type header of the packet should be
-> +	 * 4 bytes unlikely 1 byte for UART. In UART, the firmware can reads
-> +	 * the first byte to get the packet type and redirect the rest of data
-> +	 * packet to the right handler. But for PCIe, THF(Transfer Flow Handler)
-> +	 * fetches the 4 bytes of data from DMA memory and by the time it reads
-> +	 * the first 4 bytes, it already consumes some part of packet. Thus
-> +	 * the packet type indicator for iBT PCIe is 4 bytes.
-> +	 * Luckily, when HCI core creates the skb, it allocated 8 bytes of
-> +	 * head room for profile and driver use, and before sending the data
-> +	 * to the device, append the iBT PCIe packet type in the front.
+---Test result---
 
-s/unlikely/unlike/
-s/can reads/can read/
-s/it already consumes/it has already consumed/
+Test Summary:
+CheckPatch                    PASS      1.50 seconds
+GitLint                       PASS      0.72 seconds
+BuildEll                      PASS      23.76 seconds
+BluezMake                     PASS      1635.96 seconds
+MakeCheck                     PASS      13.39 seconds
+MakeDistcheck                 PASS      173.91 seconds
+CheckValgrind                 PASS      243.57 seconds
+CheckSmatch                   PASS      343.80 seconds
+bluezmakeextell               PASS      116.95 seconds
+IncrementalBuild              PASS      2937.28 seconds
+ScanBuild                     PASS      983.30 seconds
 
-Add blank line between paragraphs.
 
-> +	 */
-> +	switch (hci_skb_pkt_type(skb)) {
-> +	case HCI_COMMAND_PKT:
-> +		type = BTINTEL_PCIE_HCI_CMD_PKT;
-> +		if (btintel_test_flag(hdev, INTEL_BOOTLOADER)) {
-> +			struct hci_command_hdr *cmd = (void *)skb->data;
-> +			__u16 opcode = le16_to_cpu(cmd->opcode);
-> +
-> +			/* When the 0xfc01 command is issued to boot into
-> +			 * the operational firmware, it will actually not
-> +			 * send a command complete event. To keep the flow
-> +			 * control working inject that event here.
-> +			 */
-> +			if (opcode == 0xfc01)
-> +				btintel_pcie_inject_cmd_complete(hdev, opcode);
-> +		}
-> +		hdev->stat.cmd_tx++;
-> +		break;
-> +	case HCI_ACLDATA_PKT:
-> +		type = BTINTEL_PCIE_HCI_ACL_PKT;
-> +		hdev->stat.acl_tx++;
-> +		break;
-> +	case HCI_SCODATA_PKT:
-> +		type = BTINTEL_PCIE_HCI_SCO_PKT;
-> +		hdev->stat.sco_tx++;
-> +		break;
-> +	default:
-> +		bt_dev_err(hdev, "Unknown HCI packet type");
-> +		ret = -EILSEQ;
-> +		goto exit_error;
-> +	}
-> +	memcpy(skb_push(skb, BTINTEL_PCIE_HCI_TYPE_LEN), &type,
-> +	       BTINTEL_PCIE_HCI_TYPE_LEN);
-> +
-> +	ret = btintel_pcie_send_sync(data, skb);
-> +	if (ret) {
-> +		hdev->stat.err_tx++;
-> +		bt_dev_err(hdev, "Failed to send frame (%d)", ret);
-> +		goto exit_error;
-> +	} else {
-> +		hdev->stat.byte_tx += skb->len;
-> +		kfree_skb(skb);
-> +	}
-> +
-> +exit_error:
-> +
-> +	return ret;
 
-There's no cleanup here, so it would be simpler to omit "ret"
-completely and return directly above instead of using the goto.
+---
+Regards,
+Linux Bluetooth
 
-> +}
+
+--===============1062295982931557922==--
