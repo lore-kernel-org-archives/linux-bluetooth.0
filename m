@@ -1,51 +1,47 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95F9B15F301;
-	Fri, 29 Mar 2024 12:33:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 774A416B427;
+	Fri, 29 Mar 2024 12:33:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711715586; cv=none; b=Xe8gtCJZyaozWEHNLajAzH7dUn3DMd/WgrRznxoM7wN81MiwgU5rt8/3j0CbWPV0tCtkol/09LQn0TXeoQ2dVJ3soYKwxeRwVFeZv1AvClMIIPeT6zWE0xsOqNFnj+/FdKugXhjPq9a6L5wnErhfkEHRxZ7ERBy7L7Y7384WXqQ=
+	t=1711715634; cv=none; b=dLudOKk9OAhxWJfLItRCXTMt9dRONyLtXMTGodJwf3uDpTzKwQCwUWl03dbOgPyFwdktu4Ekr/A3F8D6SJ2KV+xm4xIpXWuzQZQbbFiKFvABfSNIDGQ1+ATtoFUEOGFRZ3lJKndhLzbESHHI6h8elqQRs/SOWeIwlulvBrNC+t8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711715586; c=relaxed/simple;
-	bh=4fg65O1FuQRomrbX9eU2W2hmBoGbIhKA8D1UBF0ceD0=;
+	s=arc-20240116; t=1711715634; c=relaxed/simple;
+	bh=4mzSwU+rBbD+a3y/qpgN7uKaMCIQtUp9DuawA5aMUxM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=H2eyKroz1IXFwYvn/JsoQWfqNi5FunH4Uol7nTNzZ7vuTcpR2iDENs5ky4Sz5wnjZ+oAtBU8p5DFV3rGQF2awgxbLuB42uMV+q197b5BVyTDDybzlm7s6SiLFSNBWm1fNyDfU+qISk1Vni3kvLWoq8/hTmfqbxemtXPhfH8JA0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h/7M6ic8; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=cfgxLaKl6yj0BkMV43A+SIN/ytjD5MwNrEx80AQadDPmIkyVKFaE8YG/gZqgSNHqbSFZf0wb2lNluZBfFUbiR3mSsNfyUWk01MNdNKYoyOPwo9nCbk+RBNHREyvAr50cnfSiLSNI8p1yfimmGez1m6Km2HCCrtKjaujYDlGOV4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a95gvcLG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h/7M6ic8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24F0EC43394;
-	Fri, 29 Mar 2024 12:33:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a95gvcLG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B2BAC433A6;
+	Fri, 29 Mar 2024 12:33:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711715586;
-	bh=4fg65O1FuQRomrbX9eU2W2hmBoGbIhKA8D1UBF0ceD0=;
+	s=k20201202; t=1711715634;
+	bh=4mzSwU+rBbD+a3y/qpgN7uKaMCIQtUp9DuawA5aMUxM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=h/7M6ic8J4G8Wn5MQv9wX/AJ1f6lulUs9VqLFM1Tff4O1JlpobKdKqTexAnDW2gvS
-	 kcLWst3RcU/M9lSNG8stPct6YujoS7GHjJr48i25SRPLrD4p1T9vVHGVh1OcBpHIkb
-	 1dzp2mcvxkFWyBV+9+a8Cb1sIB14WAoKwZYDNtjiIJ5hmHuoYKyeRXIfVEG3JlkAcn
-	 kaTt1jaU7CjD44lBnbkyCeZAw0ujimJDn0Um+L+JnbWtI3y77hI/x8APCv26C90wtp
-	 adP6XvID3eqkdCoXP59nbRrZoTjY9eaHs5GXBNkd9ePrkzlq41n8nXA86vWLxoHv4K
-	 pg8ZFe/kplnyQ==
+	b=a95gvcLGNUZznuINoqSxGxCAautWqmEv3gT1emJ2qL3U+aOnvsVhNivSSzyTSvoc7
+	 wM9SufRT5ur1/VxzMQ+fQnbK+kFBN/MHJoQFwmv/N9UPCOE7awc2mlBszwEIBqpAeO
+	 n+WIT29XmYvDDh2oHE8agIbcIdY+ntZ/bIKxyE2UE7X4j8tSw/BBVu221YPeOwfGXV
+	 e7IMpesrWfImUfmnkrHzZT+Jw6YKJ5gCbsTlflJ3v2ur2eDhc4ZSzj909ofPn5bD8T
+	 XytUZwx9Ijrk3kFSEmnKTnQtdB5dzzmJtL5HL2hOktcTF65MLP/C+shBfE1VtA9P9t
+	 ftFbl34GKX61A==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Takashi Iwai <tiwai@suse.de>,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
+Cc: Edward Adam Davis <eadavis@qq.com>,
+	syzbot+830d9e3fa61968246abd@syzkaller.appspotmail.com,
 	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
 	marcel@holtmann.org,
 	luiz.dentz@gmail.com,
-	angelogioacchino.delregno@collabora.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH AUTOSEL 6.1 31/31] Bluetooth: btmtk: Add MODULE_FIRMWARE() for MT7922
-Date: Fri, 29 Mar 2024 08:31:50 -0400
-Message-ID: <20240329123207.3085013-31-sashal@kernel.org>
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.15 20/20] Bluetooth: btintel: Fix null ptr deref in btintel_read_version
+Date: Fri, 29 Mar 2024 08:33:08 -0400
+Message-ID: <20240329123316.3085691-20-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240329123207.3085013-1-sashal@kernel.org>
-References: <20240329123207.3085013-1-sashal@kernel.org>
+In-Reply-To: <20240329123316.3085691-1-sashal@kernel.org>
+References: <20240329123316.3085691-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,54 +50,37 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.83
+X-stable-base: Linux 5.15.153
 Content-Transfer-Encoding: 8bit
 
-From: Takashi Iwai <tiwai@suse.de>
+From: Edward Adam Davis <eadavis@qq.com>
 
-[ Upstream commit 3e465a07cdf444140f16bc57025c23fcafdde997 ]
+[ Upstream commit b79e040910101b020931ba0c9a6b77e81ab7f645 ]
 
-Since dracut refers to the module info for defining the required
-firmware files and btmtk driver doesn't provide the firmware info for
-MT7922, the generate initrd misses the firmware, resulting in the
-broken Bluetooth.
+If hci_cmd_sync_complete() is triggered and skb is NULL, then
+hdev->req_skb is NULL, which will cause this issue.
 
-This patch simply adds the MODULE_FIRMWARE() for the missing entry
-for covering that.
-
-Link: https://bugzilla.suse.com/show_bug.cgi?id=1214133
-Signed-off-by: Takashi Iwai <tiwai@suse.de>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Reviewed-by: Matthias Brugger <matthias.bgg@gmail.com>
+Reported-and-tested-by: syzbot+830d9e3fa61968246abd@syzkaller.appspotmail.com
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/btmtk.c | 1 +
- drivers/bluetooth/btmtk.h | 1 +
- 2 files changed, 2 insertions(+)
+ drivers/bluetooth/btintel.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-index 809762d64fc65..b77e337778a44 100644
---- a/drivers/bluetooth/btmtk.c
-+++ b/drivers/bluetooth/btmtk.c
-@@ -288,4 +288,5 @@ MODULE_LICENSE("GPL");
- MODULE_FIRMWARE(FIRMWARE_MT7622);
- MODULE_FIRMWARE(FIRMWARE_MT7663);
- MODULE_FIRMWARE(FIRMWARE_MT7668);
-+MODULE_FIRMWARE(FIRMWARE_MT7922);
- MODULE_FIRMWARE(FIRMWARE_MT7961);
-diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
-index 2a88ea8e475e8..ee0b1d27aa5c0 100644
---- a/drivers/bluetooth/btmtk.h
-+++ b/drivers/bluetooth/btmtk.h
-@@ -4,6 +4,7 @@
- #define FIRMWARE_MT7622		"mediatek/mt7622pr2h.bin"
- #define FIRMWARE_MT7663		"mediatek/mt7663pr2h.bin"
- #define FIRMWARE_MT7668		"mediatek/mt7668pr2h.bin"
-+#define FIRMWARE_MT7922		"mediatek/BT_RAM_CODE_MT7922_1_1_hdr.bin"
- #define FIRMWARE_MT7961		"mediatek/BT_RAM_CODE_MT7961_1_2_hdr.bin"
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 2a4cc5d8c2d40..75623302d00e7 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -405,7 +405,7 @@ int btintel_read_version(struct hci_dev *hdev, struct intel_version *ver)
+ 	struct sk_buff *skb;
  
- #define HCI_EV_WMT 0xe4
+ 	skb = __hci_cmd_sync(hdev, 0xfc05, 0, NULL, HCI_CMD_TIMEOUT);
+-	if (IS_ERR(skb)) {
++	if (IS_ERR_OR_NULL(skb)) {
+ 		bt_dev_err(hdev, "Reading Intel version information failed (%ld)",
+ 			   PTR_ERR(skb));
+ 		return PTR_ERR(skb);
 -- 
 2.43.0
 
