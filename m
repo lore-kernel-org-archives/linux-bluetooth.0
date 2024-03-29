@@ -1,141 +1,132 @@
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02on2116.outbound.protection.outlook.com [40.107.249.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 504F139846
-	for <linux-bluetooth@vger.kernel.org>; Fri, 29 Mar 2024 03:32:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711683141; cv=none; b=t0BLQ6MpRxPeIZSKKNg48cgqzxMpu9/brA/6FNW7iiVvH2yAl0qSHqv2N+Me4qZUychZN09xbmMwYwEGybl4Eht6WHw+6a0TuNLrrzmaNVyv51kfSxlb//geWcLQrUNglaryX7XkqPBGmfStUTSzXrLQ610+N6REkjlj/4nJqzk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711683141; c=relaxed/simple;
-	bh=69KRmUtWXHywhnB3iYY1w/fb3Q4NhRnIHst9zW/e4+g=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=bsMC1xDuo7660IOyJwbrn8FFH2Gn5Xlgmk2HEW/r8R9g83ZpwLujG6uUdjRpFBCilrUVfE+s3zCgdkzfG7uzmSarhbY8tzEVf3FPAx6zSDneYu92liJ1Dny8zASWXRX7zPOfiWGNS9bbFhSPtIifosqnTGtryUT9RbGmLmqIEts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l4m7NqcU; arc=none smtp.client-ip=209.85.219.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9B4F11187
+	for <linux-bluetooth@vger.kernel.org>; Fri, 29 Mar 2024 06:35:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.249.116
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711694155; cv=fail; b=Wv1MahV/6qjg4pFZk8QHyVXTxYMrGn0PQ4jgJIQ+kuJr8Lj0fAENGvB+4epMw/jkBLwFnNZfzKqwpPjI/7my+HyNMBOYasQN+SeXWwCUOjf/TENFj06PSeZA+Fw3fPuJPb49EirjU9QzoKPebRd27AeV70Y3X/QpDmFKnQQ9S8A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711694155; c=relaxed/simple;
+	bh=4UCSvsweLe6Z3vjxXL6Vp0aM9L73NuOtvqA2B3U3jkU=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=DQ8rN6XGmnbs2MpJqBjUKDlZwMfYMu8IaMyzqf+Yj4bOHJuvc2+bpoDR+P5c8aWaE6sV0g3c/y9Z6Q6wKT66jh09/EkOIJKzSjD0GZqtWt6F4BDdsWXFPvdDWQ8zdt5qNgMC5DMlJ4yo+sqSDUz23zIM9aU0JKpxNCq0iojTBRA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=FKYhno6w; arc=fail smtp.client-ip=40.107.249.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l4m7NqcU"
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-696a7f533aeso9333446d6.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Mar 2024 20:32:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711683139; x=1712287939; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=TRPbpaL2tzjx7BiB6PdedNMU2dd5vHkulV5chN8/HhA=;
-        b=l4m7NqcUyl1QcX+0sJG3LMXIxA3zvOU1ZVfJlcjhEvXcAayS8WWLx1t24Mgu+TI4mE
-         0tVmI6wXJc3MYtxx0WlfexyQWTUXYPARRNTMy/bxH6BjED9eNlwr5VIKjo2pWAOcADTO
-         gthVi1s9x8LlhF3gg8Rf9/7tUPO80Fz3J9TqAg4mgjL6ELBjCL+l9akaCGhtoMMShc6C
-         lyMRfa8VJUmXNi2nwYkD3ZR0kNWspb0gr6o/yBScqsp9+zD9HeWmHSwNF3ALcnbbEhc/
-         s9V8kmbgKaA6PgwcNTAGwNVKVb6t0oz55KRnNpjErI0+lSBoZU16m4AaH/T59EFszRYj
-         H2lw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711683139; x=1712287939;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TRPbpaL2tzjx7BiB6PdedNMU2dd5vHkulV5chN8/HhA=;
-        b=E653v/+0QDa0C5BxYTlJZ+ZUQYvLc6mLgxoXc3xwismL9YwalXYVjSqoJIXh+MdXi/
-         uu+atVTHSD1zm38IcSx/cDv5uTVg8f6RhMqEa+YifMIsmLQseJGZsqcWSCXou/15JzfT
-         2tpkMxQgAtdI6V0CpqKplewP1VcQeIQWwEfysyQWYBANgYznjtcYc/C3+/WKWBL3GdRR
-         EG5QGMt+c73HsqH5w92Xh2PC3ypSn7lP2P1/Tf0tzvsb5n5WLtdMh4/nfUOB7aTHuHk7
-         Sc5+w26dBQcI6VZ5eWCXBrA6vl+apPmskQmdPbOcJ261fUAgLTyBFNUo/VAWxTfzsLOV
-         Enmw==
-X-Gm-Message-State: AOJu0Yzr8bjcrBYuPZlLTLLUfCJR8NJ5qik8Tt7oj3lMZwxBUm5rfb6d
-	6Idh9y8+ZCeSlXDPCO+nVZACV9NdtSv3wK6P+EJiuOcvsN6tbGk/oLKmugbl
-X-Google-Smtp-Source: AGHT+IGkg6hTbREqQW4/W3sdwxDDZwvNNzzKcm+gffPMuLK42XVeVbC7+Vn9mRE7SdIxjP+fzbjVEQ==
-X-Received: by 2002:a05:6214:329:b0:696:2b0e:ead4 with SMTP id j9-20020a056214032900b006962b0eead4mr1061285qvu.54.1711683138971;
-        Thu, 28 Mar 2024 20:32:18 -0700 (PDT)
-Received: from [172.17.0.2] ([20.51.206.228])
-        by smtp.gmail.com with ESMTPSA id kj15-20020a056214528f00b00696ae38c7bfsm1249205qvb.35.2024.03.28.20.32.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Mar 2024 20:32:18 -0700 (PDT)
-Message-ID: <66063642.050a0220.551b4.a99d@mx.google.com>
-Date: Thu, 28 Mar 2024 20:32:18 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0825961313178321871=="
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="FKYhno6w"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UhWTafiRqxxWoyjqIRiQHwJCQSEljESJYuH34Rqct/Zjeo3iJrYQYXja/FaqJ4sGkeklIima5fKr7+G58NVrcC8ryCrhSaC4NFF+5Ljae1Mq1/JspiNg9TThz5gy4+9mA8j4jf9vcg/UhyN1PEcEl5j2XkMYzYeN9vnS/yMKBXCewFJyQBdoLArjeJBk7Pua5g0+mI/QI92+uklgQMQH2nIkD8ZJluyecEZB8794Yu7zrtAQFLeukYaAx6Rh2kxu3EE2Qce4kvMFIcivCCzQLM/aMuBTFOrmGuWhYq7NaIlp9sHXS+S2lhpgiMvSzdo33mFIBnj2SHoiSEJHHZ15qQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=oyAHHiZme4Ts5mnzX3bpJP7o58TxH/GWJ4vo87IYqys=;
+ b=LUtzJcKT5kZjaHS5gxSThx79eeDyytNY5aiN0KBOtvlJK+TpmO9sSkLofzqw9kRVZmVn8h801qmf8Ve+ZpTw+C6q3dkkIwykboAd5h139zUEger6+ivGlEw4oumb1k+Mq6mlOhrSTBDjXYvj+/kSSBXf9nivvKz+LvYs54GH2PkjBm7LmizUaI4xEZl6k1OZiS8DWNunbGVkWXm19sOJLlFjaoTRSUDGOIEe2VHY7AmjNY6QE3qKAzs2LMUORde+ZRfem/cYnWfitH1nXqhQAjB8PaXhSDp/J+ScYj3HqmL3xnhb1zbyZB6r4GgzvdDHyRBrPax1U7aCszc97SXh3g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oyAHHiZme4Ts5mnzX3bpJP7o58TxH/GWJ4vo87IYqys=;
+ b=FKYhno6wD0cwYd2zyx/MbYcDc2i/73UBThBgPBIJdp0OCZKos5AiH1WlWly/NJggSz3+g7ywlI5SWRwSbFbcl/yk0QBW/kMf153YzHVnBvwu70urDVQ4DzlawASnzYXwrFKwGRycCpILfGTEmNqzyIuyJZc9V2yuZKkPMZKN3pg=
+Received: from AS5PR04MB9754.eurprd04.prod.outlook.com (2603:10a6:20b:654::9)
+ by AM8PR04MB8017.eurprd04.prod.outlook.com (2603:10a6:20b:249::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.31; Fri, 29 Mar
+ 2024 06:35:51 +0000
+Received: from AS5PR04MB9754.eurprd04.prod.outlook.com
+ ([fe80::5fa0:979d:f0e1:a28e]) by AS5PR04MB9754.eurprd04.prod.outlook.com
+ ([fe80::5fa0:979d:f0e1:a28e%3]) with mapi id 15.20.7409.028; Fri, 29 Mar 2024
+ 06:35:51 +0000
+From: Mahesh Talewad <mahesh.talewad@nxp.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: devyani.godbole@nxp.com,
+	luiz.dentz@gmail.com,
+	sarveshwar.bajaj@nxp.com,
+	mahesh.talewad@nxp.com
+Subject: [PATCH BlueZ v1 0/1] Autoconnecttimeout max value increased to 20000 msecs
+Date: Fri, 29 Mar 2024 08:35:33 +0200
+Message-Id: <20240329063534.56892-1-mahesh.talewad@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AS4P251CA0015.EURP251.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5d2::17) To AS5PR04MB9754.eurprd04.prod.outlook.com
+ (2603:10a6:20b:654::9)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, wangyuli@uniontech.com
-Subject: RE: [RESEND.,v2] Bluetooth: btusb: Add Realtek RTL8852BE support ID 0x0bda:0x4853
-In-Reply-To: <883A1BECA61AB8B7+20240329023440.191799-1-wangyuli@uniontech.com>
-References: <883A1BECA61AB8B7+20240329023440.191799-1-wangyuli@uniontech.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS5PR04MB9754:EE_|AM8PR04MB8017:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	TBoh32C6bGPvPQsz3EX0Y+YuM5uDVqmz0m4vuZFjLSuWaiSvX7B/26grI7iSVXoDbd8jrsmx6uZmkmLusBp/mFp3HpzN1YHyrif054AYoE2lqdnFIX6ZmBEd4nAQ/iH3/Veh5kCQEs5RPTQup+0SY7QkufKBT/rhJDQ33NpAh2ZiBgrdMDCEU/MLudnmtPEmsVc9WPKaswcGTgmHYfKpUIvaZuy+ZxhveRU601oiT/Xlpl2F/Ccbnne5ULUOAaTijQ3/3JZlAh4QhPQ/jTQ6H6/Ny7NzLKubmRCDNm3jF+mFFk+WRnDIeR0vR97Rrrx6+GM9U8aBThzjwC66SXMIJEn8zWoDBgmsPIYa+0J+b5mrb8eA+nPP42IOKJgHXxhhZ33MNhhf0gTZA1V13s4OIXStMxbpNX5JuSv2/hqoR919eJ1zvvJJ07/4hUe6bCmXgRgk5fUlZOU4JvUKT4vTS6jgy+cMubqnvtY5O21IvztwHtNIhpXvZcw1JShCTtTJfYH9us1er1DjFJ4/Bq9+uw32ZlkUmAqBWXXv93pSr4vaJZPtXRUk92/ZamBjNKEDvSpYZySIRnJWiTMhn/NUTjA9IRh7nk0Gpu9wu51LwOa1h6FVhpoiLVszFpcfw0285wCumi8Lv6j7h/yqTd0WboutAVauapBkCvxh02O/FzlHxAhbhjjBb/Ep3c3AMQbNlTLBaYNtCY1kvYnXOUas5A==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS5PR04MB9754.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015)(52116005)(38350700005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?jpHRwrMV6A6u3ELsbsaYu7SGlrjSD/hUKlrAQ+7uCYjFptcTXniUcNSXpu8O?=
+ =?us-ascii?Q?diZUvT8XLPhKi2JAwZ2nL7J5/eX09oiCDMZOO8TZh2FC833XCEMRLQp4TMz5?=
+ =?us-ascii?Q?/r88QvBxelbBFq/4hOtRDuGEafjVLapgKjahsil6Pf8KvHJomDiofbwDlUNF?=
+ =?us-ascii?Q?m+ZXeQhUavHaaMEgTwYLZhTE44cukevKM9/OvAe9vJ4y3Pa+vSlFhu3IoXmn?=
+ =?us-ascii?Q?8P5ni0Ii5eVwuSg7Ugi4Vr/ot8pTzLFmg4peYQEChEK37Cfs/T6IDMmZb9FC?=
+ =?us-ascii?Q?lRKw0WENS+co+W1mMYpMp0IXu+1o+xZjFfGZjSPDY5v7+Y63fQtaFmBF+oOu?=
+ =?us-ascii?Q?uuRzFGfBtvnuCIAJKqpGbErgVsEZNXR2QFWB29UBtgCSZPRuZp2ibxPowZh9?=
+ =?us-ascii?Q?llaoL7JkDmPY7KqssR7+8Al5ZPrmyv/bj/lQ4GralqSpsbSkrOYOGRYM7LaJ?=
+ =?us-ascii?Q?mqpuqmworgNjF0CfAgctjShHSbgetTrDp7KvSGo4ewGskFFuKfIHSPed8+O8?=
+ =?us-ascii?Q?ef2EK+dFVjClTn/SDRhxku6v45N1zX4A0Jwb9C5U+Y+6ly4eZDVvekr1BK/L?=
+ =?us-ascii?Q?DZPbgKojUn7pbH/Ym9axB9HDBliVMDHj/EkbqoDrx/pcmge8gtJuLCJ977SR?=
+ =?us-ascii?Q?eAimbIylHZEI1ZUT4DvIPbEJWp3atexLKXNLsk6RiVYv1UeMCbXZrZJ0SnjC?=
+ =?us-ascii?Q?ISME+p/pFE70wGt29kltl+QGv4knXhcWdSCNxvGz3QxbGjh3T/pv2wixg/Ll?=
+ =?us-ascii?Q?PnRMMswVv9SZTKdr9tPXBncMLguUea6f7xhQc8nOPKwyeeJ/JJ2QlXCGiPLN?=
+ =?us-ascii?Q?Q2eZQRZv7WDClXPFR4hX5bRJCoEabI1wPJMjiCw0SemuQQt0QI/SCH7DQi5M?=
+ =?us-ascii?Q?40rEQqAYW1BivJGJHLDbcqFhfkDaxzAqVSs9WBu2KizCvB6FbP/K26M3nFG1?=
+ =?us-ascii?Q?SqLAQLJDesixpEmZim2iFBSAWJ+eHQtx5dpTHb1EgWwAzKMuC/z+n5ZVWBg4?=
+ =?us-ascii?Q?kD0KEWVja4tlg21y57vqc8EIEagbLXKdBRnnNwqTrcQOC5ZmaI2GmsctC/4Y?=
+ =?us-ascii?Q?HsiZ9qq6mcQL/qEbOyIl8c9tdwgA5YY9loyo4/dIweG8jav5n4VCIhWL3URm?=
+ =?us-ascii?Q?+uCFbJVLC4S0XboJnCatDBM3T2KwxaR4WjJM6ExAvhRHxEsRyj65PPYCqqFa?=
+ =?us-ascii?Q?kbN0Npi56BYEqAmubgi19d25yJ+uPQzjCdCFPlsvvtF7Tj/VVIdVd4dZDFII?=
+ =?us-ascii?Q?nGphnFd8yOCyouAsKhHcXw9dUOQyXO7cySlXV9KDBbYjxK65IGAZ7EM3t/Yf?=
+ =?us-ascii?Q?hQBxP3lotMkVj27kRnwzm53cDFZUut7uyTAONRBf4skK4kLnMLn+zi6dcd7Z?=
+ =?us-ascii?Q?zQaCfSGwQ0h/+CLio/6X2lgcJtmxbzH+l6p/7XCbe+J9ClWFQynqYOLIfu0x?=
+ =?us-ascii?Q?K9BgWLhPMUxwaNJcmn3bLxinjSiOJj7Sy/tqHmI4i24+rZrp0UNh5lw4Y6Af?=
+ =?us-ascii?Q?ArJprdivT/xgtRonTAltKwUd9sfTqstwh/wBeTErkI9bGs3VgGWogPGxzZH2?=
+ =?us-ascii?Q?1qMGu4LMiPPv3WMehx3Vq7gbNO32Y0ruQ2Pe7dEzBf+HUK5zeHxezbvYZvK1?=
+ =?us-ascii?Q?AA=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 08832594-0d04-48aa-883a-08dc4fba7a0b
+X-MS-Exchange-CrossTenant-AuthSource: AS5PR04MB9754.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2024 06:35:51.1031
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: /0vWVX1qF5BfOSbSLhf0M3VXggJvVhK1dSSjPWfyV0sLMkqScc0Lkc9tqMwTq3R31srzE0FeAUMUgPQI9ChHoA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR04MB8017
 
---===============0825961313178321871==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello Maintainers,
 
-This is automated email and please do not reply to this email!
+This Patch is for following point:
+  In implementation Autoconnecttimeout max value is 16384 msecs.
+  Increased this Autoconnecttimeout max value to 20000 msecs.
+        
+Thank you in advance for your review.
 
-Dear submitter,
+Thanks and regards,
+Mahesh Vithal Talewad
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=839622
+Mahesh Talewad (1):
+  Autoconnecttimeout max value increased to 20000 msecs from 16384 msecs
 
----Test result---
+ src/main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Test Summary:
-CheckPatch                    PASS      0.67 seconds
-GitLint                       PASS      0.34 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      30.11 seconds
-CheckAllWarning               PASS      32.80 seconds
-CheckSparse                   PASS      38.17 seconds
-CheckSmatch                   FAIL      34.97 seconds
-BuildKernel32                 PASS      28.99 seconds
-TestRunnerSetup               PASS      524.06 seconds
-TestRunner_l2cap-tester       PASS      19.97 seconds
-TestRunner_iso-tester         FAIL      30.47 seconds
-TestRunner_bnep-tester        PASS      4.76 seconds
-TestRunner_mgmt-tester        PASS      113.30 seconds
-TestRunner_rfcomm-tester      PASS      7.31 seconds
-TestRunner_sco-tester         PASS      14.99 seconds
-TestRunner_ioctl-tester       PASS      7.79 seconds
-TestRunner_mesh-tester        PASS      5.94 seconds
-TestRunner_smp-tester         PASS      6.85 seconds
-TestRunner_userchan-tester    PASS      4.92 seconds
-IncrementalBuild              PASS      27.93 seconds
+-- 
+2.34.1
 
-Details
-##############################
-Test: CheckSmatch - FAIL
-Desc: Run smatch tool with source
-Output:
-
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
-make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
-make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: net] Error 2
-make[2]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
-make[4]: *** Waiting for unfinished jobs....
-make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
-make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
-make: *** [Makefile:240: __sub-make] Error 2
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-Total: 117, Passed: 116 (99.1%), Failed: 1, Not Run: 0
-
-Failed Test Cases
-ISO Connect Suspend - Success                        Failed       4.181 seconds
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0825961313178321871==--
