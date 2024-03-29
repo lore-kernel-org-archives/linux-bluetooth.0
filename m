@@ -1,76 +1,125 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDB0D849C;
-	Fri, 29 Mar 2024 22:50:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BFBC4B5DA;
+	Fri, 29 Mar 2024 23:22:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711752630; cv=none; b=biBVEMUQ0pD3FmSkiJ9sxBbHb4wsOhsdC/IdJPvSVut/O5ab4dGWb/JB4h7/kIEea7Isbp+0JWXbQcGvdHqbf32MGnBZgKI7LTgHmREL4Pk2n46xU4OUudeIhI1EVYcsawHRF/XjZfg9gyAd5m3VwiZcrlemZWbTe6IRaYs1fSs=
+	t=1711754574; cv=none; b=T8ZiMItxzllVnhMN7mKBttTO8VbRcQ5pwVgMkXJuNEACK0+e4inNcZ8iN90okGdVpf/4XMLGqFrAlvzID0wRVqp0hiOWB9i6gZyLgefqExMxVOrYhOiW51hqIUCFSHUDVNq7MA8oNkaOynnbYpgCRYf3+yRvcxU4wI24CcCNGdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711752630; c=relaxed/simple;
-	bh=d6GYHZj1nwm/xAWq38KgFLCAjeu3oj6MG7PKrVN2dik=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=epB2fowdHfquABx1fTbw/pWYcb7zELL1S85TXQhbSuZrEdOy/Iw4/M0mheG84kZyq9ge+0D74lr7YAuOo4SHQnxknXl0v6xGY3rGARafXBaZC+G0Jox/R9OWJYbvCTSHCwEFwQljA768dYbO0avYQLgSYa/IHcgODQ4U7H9VZMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QPl6KWXQ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711754574; c=relaxed/simple;
+	bh=0Bgz3dygYfsN6NPG3lTjxdOt5S268zJki5K2RHRufYU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=VeMYwD+5F7IspitGWxwFCcYDOallyaNt0PUOkIM0AbsFxilqxi/WxMoHMe4PcLRTfSM007ctA6zwN8m1JsxjNwd5SSh2Rp24WTxwRblZx1MLcZHYASy+CnVYxIX6IF4bKR4e5mO9khUMwcVm8dqKFqEhyNbW8adFypnqbwJflIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=mTcIVgYm; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QPl6KWXQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3013CC43394;
-	Fri, 29 Mar 2024 22:50:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711752630;
-	bh=d6GYHZj1nwm/xAWq38KgFLCAjeu3oj6MG7PKrVN2dik=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=QPl6KWXQvu8etNRRr+r8OMKyD6R97QbdR9BUKsTPtOE7Kqjbj0Wzwr2xkLyiUBOCj
-	 EhPM3BDLS7sB3nqz8OwL4C5r4EVrvhikxo71yksyhl6g8RZix/5BP7LjrYPeBKOfUp
-	 wBDjGqQX99DbyBqqEiSjvjL/oqo3Zl0up2BrkC0QCEcbAAzoAyb4Ht/h7gmsISUFFH
-	 bFa5SbbqTmqpeirrBBBF0jFPoiF2SQIFEgVHTAO0enqA8UJgc7iNjAzyhoGYr0Io7u
-	 qqFGr/qSOegSrVvqT6lM2WA3H4zZrrLtdkBIK1J6oKBNL/j7HGWNFywkVMJdW0nwTT
-	 vR5M4jXKxAarQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 22B38D2D0EB;
-	Fri, 29 Mar 2024 22:50:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="mTcIVgYm"
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42TLQSj5013426;
+	Fri, 29 Mar 2024 23:22:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=7UwDx5OuW8FtPG7iPK+HFKmVAJuPi5oZKhU7vXS9aS4=; b=mT
+	cIVgYmE4vn+1WKdCBKVvcGY9JpVQgjzMVAqLZ+1qHySgkRDqdScgPph+XSqVvOgd
+	l6yggGX8sisnfUgUXH3Vj3/QyHyb3K8MOhCeRdayW5pgmekSkoXU4zi1mbJ1Jzxt
+	P+1U3mgoKCWPZaNbEBuzLTNyMLkiig0x1jc88aMmEpmJryuvkz6L8ain01FN2Uvc
+	IgaLKzmraIvOv6LxShxYk3V2qayP/Qv67DdjsjrDazoQjgWkUfadtWc+FVqKYhjo
+	kvLGgLc4o9NJoLlPPLAeAl6yLaZfHNUpl6zcfwh/G7H/jMDaYO1lZ/DjIOMntWa8
+	Lpg6rNlqt9WCbM4SY2tg==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3x5sm6j50r-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 29 Mar 2024 23:22:35 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 42TNMYfx000427
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 29 Mar 2024 23:22:34 GMT
+Received: from [10.110.124.221] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Fri, 29 Mar
+ 2024 16:22:33 -0700
+Message-ID: <8ba398c9-b71c-4447-a1d0-bd560e41f39f@quicinc.com>
+Date: Fri, 29 Mar 2024 16:22:32 -0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull request: bluetooth 2024-03-29
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171175263013.1693.13688049482640225166.git-patchwork-notify@kernel.org>
-Date: Fri, 29 Mar 2024 22:50:30 +0000
-References: <20240329140453.2016486-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240329140453.2016486-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 4/7] wifi: ath10k: sdio: drop driver owner initialization
+Content-Language: en-US
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Ulf Hansson
+	<ulf.hansson@linaro.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto
+ von Dentz <luiz.dentz@gmail.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+        Kalle
+ Valo <kvalo@kernel.org>, Jeff Johnson <jjohnson@kernel.org>,
+        Arend van Spriel
+	<arend.vanspriel@broadcom.com>,
+        Brian Norris <briannorris@chromium.org>,
+        =?UTF-8?B?SsOpcsO0bWUgUG91aWxsZXI=?= <jerome.pouiller@silabs.com>
+CC: <linux-mmc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-bluetooth@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-mediatek@lists.infradead.org>, <linux-wireless@vger.kernel.org>,
+        <ath10k@lists.infradead.org>, <brcm80211@lists.linux.dev>,
+        <brcm80211-dev-list.pdl@broadcom.com>
+References: <20240329-module-owner-sdio-v1-0-e4010b11ccaa@linaro.org>
+ <20240329-module-owner-sdio-v1-4-e4010b11ccaa@linaro.org>
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+In-Reply-To: <20240329-module-owner-sdio-v1-4-e4010b11ccaa@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: pj5BXDPNqd-BazKf3WC1xlwtDGjZg8-7
+X-Proofpoint-GUID: pj5BXDPNqd-BazKf3WC1xlwtDGjZg8-7
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-29_13,2024-03-28_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
+ priorityscore=1501 adultscore=0 mlxlogscore=928 suspectscore=0
+ impostorscore=0 spamscore=0 lowpriorityscore=0 bulkscore=0 clxscore=1011
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2403210001 definitions=main-2403290208
 
-Hello:
-
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri, 29 Mar 2024 10:04:53 -0400 you wrote:
-> The following changes since commit 0ba80d96585662299d4ea4624043759ce9015421:
+On 3/29/2024 10:24 AM, Krzysztof Kozlowski wrote:
+> Core in sdio_register_driver() already sets the .owner, so driver does
+> not need to.
 > 
->   octeontx2-af: Fix issue with loading coalesced KPU profiles (2024-03-29 11:45:42 +0000)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-03-29
-> 
-> [...]
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-Here is the summary with links:
-  - pull request: bluetooth 2024-03-29
-    https://git.kernel.org/netdev/net/c/365af7ace014
+Acked-by: Jeff Johnson <quic_jjohnson@quicinc.com>
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+> 
+> ---
+> 
+> Depends on the first patch.
+> ---
+>  drivers/net/wireless/ath/ath10k/sdio.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/drivers/net/wireless/ath/ath10k/sdio.c b/drivers/net/wireless/ath/ath10k/sdio.c
+> index 1acb9fba9a8e..cddd9e3010ee 100644
+> --- a/drivers/net/wireless/ath/ath10k/sdio.c
+> +++ b/drivers/net/wireless/ath/ath10k/sdio.c
+> @@ -2667,7 +2667,6 @@ static struct sdio_driver ath10k_sdio_driver = {
+>  	.probe = ath10k_sdio_probe,
+>  	.remove = ath10k_sdio_remove,
+>  	.drv = {
+> -		.owner = THIS_MODULE,
+>  		.pm = ATH10K_SDIO_PM_OPS,
+>  	},
+>  };
+> 
 
