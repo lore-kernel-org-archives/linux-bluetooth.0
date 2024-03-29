@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B770B17494B;
-	Fri, 29 Mar 2024 12:35:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 965F6175C9D;
+	Fri, 29 Mar 2024 12:35:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711715715; cv=none; b=qAw8HrRhUwj7KkHB9Fu1R6GqQ07PgVmGlnAJCv9wNEDyQ5PTcYCuIQJbDM0mz44b/M7J4R8CBaWTkIvSJI0Nd4/aIkhE3lgQnidF4V7agNiwjVu9r7zlJUVsGdwlhrMYR4HNwrV6AjFXcUrQ5f0Fi3bFxCCZWzzMJInPbM5JEBg=
+	t=1711715741; cv=none; b=sLnEuEIPgJjN4vFivHaVb4/UUB/3SqhB3knS74qXAL3Ub6yoVCPpeUsYRhVMqe4GhQnTRIiG/U1Zj0x4eDvd2TJrheacNixcQmyZh5OqXz/SJo+yl3DRkMUnvhjGNd1adcQgibm2GsZdJ1tc5UmcJGaH/md1k6WBDUi/WqimjPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711715715; c=relaxed/simple;
-	bh=VuhDQ16JS8wiurFZRtJ3I1+nWANqiOZRiHZEQmjBnOQ=;
+	s=arc-20240116; t=1711715741; c=relaxed/simple;
+	bh=y5sLR1F7e4AqMERpcQ07sKZBrNLzvfWoWAKDF3ZJhDA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=btKcyfA5Bxb+YAtrI8LqyKNF+nrOp04tEkTQpYIedjlXKRccDIO8Rw61/K7fKiywho7QcnD6aYZNEHb9Vl1CmxmrV6/JGDuzvBRjUSnZWF6HDdg/64vhOuvNyJ5KLV2+6hv7qBDMTB/8RZ7w5IWdVqg+4p1Y71XjA4e/S+OpfyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V5uadi1m; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=RV5yDBrScLTZ8ovLAb73VyUiLQWXJVmUlAv+PvK3G5kb5fyHo0RnSnN+XbYSukxoYllTjddZeMDwJTrYwJvibzaigD1cN7OsnwfipSe1rA7zyv1XlaBGIUCFaUqRJ1Aohci/ZQIML3bviz5H46lnwiB0Cg5Clr1AizdCcVX/f6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o93J3z8g; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V5uadi1m"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52DC1C43394;
-	Fri, 29 Mar 2024 12:35:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o93J3z8g"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C76CC433F1;
+	Fri, 29 Mar 2024 12:35:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711715715;
-	bh=VuhDQ16JS8wiurFZRtJ3I1+nWANqiOZRiHZEQmjBnOQ=;
+	s=k20201202; t=1711715741;
+	bh=y5sLR1F7e4AqMERpcQ07sKZBrNLzvfWoWAKDF3ZJhDA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=V5uadi1mD+sEzQ/xdV6c2JGmrEVFhoVHG3hCag1IUvMTEBDbdrxnwovRex2dzP826
-	 aKlkzERCdXWQ4sUnwzOpDFc0CVcTblWsh2dzwqzxh5s9kyZqeCWmSlTADRA3ePS1lq
-	 aMl0tyWwruB8idNu9hMuk7+v98LGxlbVlpCfgpauZxAesibBIGtAeqU3u3Ek2k3pnj
-	 nNhheU2pHPSPzqIsrEJ7a6dZ7GbOTCPROQaPAT2hD9M4klSmNzQ2oMfHnAxzzF30Zh
-	 zJMWJqVlNmomnn54t5oGPJXGR73Y8Yipje2eBPfbM9DY3d2X6xQeqpWt8GY//Ku8bh
-	 qN5blpeed7esw==
+	b=o93J3z8gWuqH+dtpYyX2hnI/y8xLKk0G36HSp/o84MAteSoIOkPJFAEM2Sr8HCXFg
+	 f26D/wy//Dy9BGDzxP2/RK8FAnjnMQZNb6kioY7Au8ixsIYd5L+oO1UzzUNr3RHjtq
+	 0l+IBo2fnZxmJviL87WLon3A2O7TVirpMkyzmShw4r3P+5XvNiEiP7Pw0CPOHVjj30
+	 4kO/CRUsCS1Ogrm7ptSFIdCvretGXua6YLv6YH1Cxiuu8S7JV4UOBVkfhU6303MZss
+	 fkkcOb9A/Pg9OSOM3Ip4wIN4S9njlINWiYv20guzZK4WtlnUhoCDggWV2OgHMQt+x+
+	 yHWDI6N9bpDTA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -36,12 +36,12 @@ Cc: Edward Adam Davis <eadavis@qq.com>,
 	marcel@holtmann.org,
 	luiz.dentz@gmail.com,
 	linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 15/15] Bluetooth: btintel: Fix null ptr deref in btintel_read_version
-Date: Fri, 29 Mar 2024 08:34:38 -0400
-Message-ID: <20240329123445.3086536-15-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 11/11] Bluetooth: btintel: Fix null ptr deref in btintel_read_version
+Date: Fri, 29 Mar 2024 08:35:17 -0400
+Message-ID: <20240329123522.3086878-11-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240329123445.3086536-1-sashal@kernel.org>
-References: <20240329123445.3086536-1-sashal@kernel.org>
+In-Reply-To: <20240329123522.3086878-1-sashal@kernel.org>
+References: <20240329123522.3086878-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -50,7 +50,7 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.4.273
+X-stable-base: Linux 4.19.311
 Content-Transfer-Encoding: 8bit
 
 From: Edward Adam Davis <eadavis@qq.com>
@@ -69,10 +69,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index bb99c8653aabf..5694dd63c1459 100644
+index 5270d55132015..6a3c0ad9f10ce 100644
 --- a/drivers/bluetooth/btintel.c
 +++ b/drivers/bluetooth/btintel.c
-@@ -340,7 +340,7 @@ int btintel_read_version(struct hci_dev *hdev, struct intel_version *ver)
+@@ -355,7 +355,7 @@ int btintel_read_version(struct hci_dev *hdev, struct intel_version *ver)
  	struct sk_buff *skb;
  
  	skb = __hci_cmd_sync(hdev, 0xfc05, 0, NULL, HCI_CMD_TIMEOUT);
