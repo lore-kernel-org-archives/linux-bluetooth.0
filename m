@@ -1,52 +1,47 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F6CF159568;
-	Fri, 29 Mar 2024 12:31:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D6315F306;
+	Fri, 29 Mar 2024 12:33:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711715508; cv=none; b=ccRqHAJWQpeMg68yokTvJV9bNxM71pA1fKpNO+yz+z4Oi2GhESHndDOro4Cyob7Np19fp1tLXzN+73YfY/yh/yDIe7h/u9+iat/DGUzg3vr7hIUfeCSZSZd6Gy8/aaRP5zQSmopL8sXmNNEGZT6Az1S6P7BUPQx9FKgP8ThGwTo=
+	t=1711715584; cv=none; b=BGm8WJSosFjoNq/mFikHgZjIDV/UxgAGHiGF80TuzwVsy7JREl4UMFWpVGgaoRJJ1VMLGRBhShWXoRwjEgVlsbZIYigI7nlbV9viwiYf+Y0DtGNeN0kT8VDwDtMQ29GW9/6KPhoXgsfOk4qoj7PcC05lAskW18cCx9SLQLm2KFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711715508; c=relaxed/simple;
-	bh=APwdEwsa+dUpIWkjzeVZLkCgNGfC9AIm/WhrEoYtNsc=;
+	s=arc-20240116; t=1711715584; c=relaxed/simple;
+	bh=TmFIMTZbI423B22N6Purza9qEzTFucilnbCzm34PcbU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=g1gWZajXsB1rL3Ht1HSvUlrvCOhL4T3mHY5D3IH5QE4rqywyvTJ+PiqOhCtTgi0hw8vhQM2FRs1k0Wyt1s9iFan79CySL8Bd7k8woU+9daEn4FRoRyOdmPJl5rsN3Ju8/umFnIGjqS3N14czvJB1scmr6NjX4VwOzwLFKOL6Wtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z2F7YUM4; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=NYIhA/Fa4mhcFOsa/oSMpufe+9SGeX1Tk7VWzOeF9xRVjWS54j8jaJEnCppDI4TbXPbyCNriOK+Y2N7bzDEHyeL6aXz7qDX86LZBBqRKmEOl5TJqT0EM9yznR5Tt1la/WI2m8xyTVF1GvYqKdn7/jqB2UfSkL/JggUmsrrmRVLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YsElp6gW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z2F7YUM4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E170C433F1;
-	Fri, 29 Mar 2024 12:31:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YsElp6gW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B08EDC433F1;
+	Fri, 29 Mar 2024 12:33:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711715508;
-	bh=APwdEwsa+dUpIWkjzeVZLkCgNGfC9AIm/WhrEoYtNsc=;
+	s=k20201202; t=1711715584;
+	bh=TmFIMTZbI423B22N6Purza9qEzTFucilnbCzm34PcbU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Z2F7YUM4dCLsNx83GuA51YVB5/EILbbbBYCTQReKDnJjWxCfHpgyxD/K9b5kzlF2Q
-	 x5ZKDU6d0d3hE4cle9bR/LUFatO/GPHWJulkimgbfIf+Zxg+LlbIMAFVjNHAoMdEG7
-	 MHnU8jTlvB3BnxBT7TrGAb6a1xe5i84QYw+m5SXSwzTtlS9CInz4WvSjRBxRe1NdCu
-	 /6T/r8YCj2NcXEmvvPlpV/l3lZBv64ykPCPr0ywg6q//yPmiPJyyYnzEu3jrx51YUG
-	 1C0GOf7GPMaGKEuofuOZt78M6ZNqf/lhh31qGngy5cnwp+y6ka7vogAy9zQQHobl/i
-	 bIJocg/XNx46g==
+	b=YsElp6gW+A0nrwbU2IH0ELqYvO4Y6nMrxBPKG+SEhbLwc5WB4KMgPLYua9yg/OAip
+	 XrAgx9/tLYLO/BxKzHMD9srG7/fAwvF0eReXAysSVbNAEWwR0OQkhOg8rEjmOsjHt0
+	 LJgyP8LV75gjMOpx3s9FD/9hfs/msIXl4T/nQwJ2HEErDaGBzT1jY0dlEwUaTUfvV5
+	 5tLUgkFOQ8QW/WS+aBptTEsWF0mV0vLPehddixiKr/W9mUYKUTprER2Ht+MzpclA7H
+	 a2pHMV1fLU1rP1CmExyBpxbCjmwHNZ6b+JZNyIO9VbN7l9+LxocxDegaAPpKSzMkoY
+	 N22bXYfXP/9bQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Vinicius Peixoto <nukelet64@gmail.com>,
+Cc: Edward Adam Davis <eadavis@qq.com>,
+	syzbot+830d9e3fa61968246abd@syzkaller.appspotmail.com,
 	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
 	marcel@holtmann.org,
 	luiz.dentz@gmail.com,
-	johan.hedberg@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 52/52] Bluetooth: Add new quirk for broken read key length on ATS2851
-Date: Fri, 29 Mar 2024 08:29:22 -0400
-Message-ID: <20240329122956.3083859-52-sashal@kernel.org>
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.1 30/31] Bluetooth: btintel: Fix null ptr deref in btintel_read_version
+Date: Fri, 29 Mar 2024 08:31:49 -0400
+Message-ID: <20240329123207.3085013-30-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240329122956.3083859-1-sashal@kernel.org>
-References: <20240329122956.3083859-1-sashal@kernel.org>
+In-Reply-To: <20240329123207.3085013-1-sashal@kernel.org>
+References: <20240329123207.3085013-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -55,87 +50,37 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.23
+X-stable-base: Linux 6.1.83
 Content-Transfer-Encoding: 8bit
 
-From: Vinicius Peixoto <nukelet64@gmail.com>
+From: Edward Adam Davis <eadavis@qq.com>
 
-[ Upstream commit 48201a3b3f398be6a01f78a14b18bd5d31c47458 ]
+[ Upstream commit b79e040910101b020931ba0c9a6b77e81ab7f645 ]
 
-The ATS2851 controller erroneously reports support for the "Read
-Encryption Key Length" HCI command. This makes it unable to connect
-to any devices, since this command is issued by the kernel during the
-connection process in response to an "Encryption Change" HCI event.
+If hci_cmd_sync_complete() is triggered and skb is NULL, then
+hdev->req_skb is NULL, which will cause this issue.
 
-Add a new quirk (HCI_QUIRK_BROKEN_ENC_KEY_SIZE) to hint that the command
-is unsupported, preventing it from interrupting the connection process.
-
-This is the error log from btmon before this patch:
-
-> HCI Event: Encryption Change (0x08) plen 4
-        Status: Success (0x00)
-        Handle: 2048 Address: ...
-        Encryption: Enabled with E0 (0x01)
-< HCI Command: Read Encryption Key Size (0x05|0x0008) plen 2
-        Handle: 2048 Address: ...
-> HCI Event: Command Status (0x0f) plen 4
-      Read Encryption Key Size (0x05|0x0008) ncmd 1
-        Status: Unknown HCI Command (0x01)
-
-Signed-off-by: Vinicius Peixoto <nukelet64@gmail.com>
+Reported-and-tested-by: syzbot+830d9e3fa61968246abd@syzkaller.appspotmail.com
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/btusb.c   | 1 +
- include/net/bluetooth/hci.h | 8 ++++++++
- net/bluetooth/hci_event.c   | 3 ++-
- 3 files changed, 11 insertions(+), 1 deletion(-)
+ drivers/bluetooth/btintel.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 66080fae072f2..efa22335d75d7 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -4475,6 +4475,7 @@ static int btusb_probe(struct usb_interface *intf,
- 		set_bit(HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER, &hdev->quirks);
- 		set_bit(HCI_QUIRK_BROKEN_SET_RPA_TIMEOUT, &hdev->quirks);
- 		set_bit(HCI_QUIRK_BROKEN_EXT_SCAN, &hdev->quirks);
-+		set_bit(HCI_QUIRK_BROKEN_READ_ENC_KEY_SIZE, &hdev->quirks);
- 	}
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index bbad1207cdfd8..c77c06b84d86c 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -405,7 +405,7 @@ int btintel_read_version(struct hci_dev *hdev, struct intel_version *ver)
+ 	struct sk_buff *skb;
  
- 	if (!reset)
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index bdee5d649cc61..8c36e094ec99f 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -330,6 +330,14 @@ enum {
- 	 * during the hdev->setup vendor callback.
- 	 */
- 	HCI_QUIRK_BROKEN_LE_CODED,
-+
-+	/*
-+	 * When this quirk is set, the HCI_OP_READ_ENC_KEY_SIZE command is
-+	 * skipped during an HCI_EV_ENCRYPT_CHANGE event. This is required
-+	 * for Actions Semiconductor ATS2851 based controllers, which erroneously
-+	 * claim to support it.
-+	 */
-+	HCI_QUIRK_BROKEN_READ_ENC_KEY_SIZE,
- };
- 
- /* HCI device flags */
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index bc383b680db87..45286ef6c528f 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3660,7 +3660,8 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, void *data,
- 		 * controller really supports it. If it doesn't, assume
- 		 * the default size (16).
- 		 */
--		if (!(hdev->commands[20] & 0x10)) {
-+		if (!(hdev->commands[20] & 0x10) ||
-+		    test_bit(HCI_QUIRK_BROKEN_READ_ENC_KEY_SIZE, &hdev->quirks)) {
- 			conn->enc_key_size = HCI_LINK_KEY_SIZE;
- 			goto notify;
- 		}
+ 	skb = __hci_cmd_sync(hdev, 0xfc05, 0, NULL, HCI_CMD_TIMEOUT);
+-	if (IS_ERR(skb)) {
++	if (IS_ERR_OR_NULL(skb)) {
+ 		bt_dev_err(hdev, "Reading Intel version information failed (%ld)",
+ 			   PTR_ERR(skb));
+ 		return PTR_ERR(skb);
 -- 
 2.43.0
 
