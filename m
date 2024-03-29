@@ -1,142 +1,116 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EFDA12D771
-	for <linux-bluetooth@vger.kernel.org>; Fri, 29 Mar 2024 13:28:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DCC95B1E7;
+	Fri, 29 Mar 2024 14:04:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711718923; cv=none; b=hCehsppTw+mYQOEsL7n2EF3U7wryDFFORhk90dxQxhHg7WZaJBAqY0WuDTHxT176eeEv3RnJZ1ozGTxhRxkwhF9Qz+o7Mr8WvG3O9Wbe1gsFA9pN7/stydhLUDAOe1aE4uIA9hGJ3yLNn/tQxkQ5gd16B3ULjwo+KA+W4gDCoZs=
+	t=1711721099; cv=none; b=G+XRCZr5/ziYOcASO1Gk+GIGBXxOOvRj5xteap/RjsCr/JUpBsVgX63YtbmDsHI3ja2Xzxh9uiaPW8OGScZvxS0cQvy4TyGhLgeu0Q3ZqfDefIMCj3cjsmmaGJmebkxep/pxhP6N8g2jwX8ZVC18fLWdsK5DXq0ocPXEx3aBcIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711718923; c=relaxed/simple;
-	bh=zlmV0sBDPPllGZWjPqa2/c1/r7nXDK5/rzJZO9Fvals=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hvjpr2YFT5JTYNLs9ItPBLONrBOpViCE1YXNAjOJytoF7QmnlFD2BCWIcS2sIYvpo+XY1NT//Ij39Ma7zt/nT6ACI5bnGCjDoo++SD0ReP0mE0HK6d0AV9Q0AmPyLZPNnlqxW/g1qwPhsnwsdyCUg2J67iQRS7+VvcPhfZyfRtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D2niIYrZ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1711721099; c=relaxed/simple;
+	bh=1Y6cLJeHlyYyPDFBLxlrzMQIY+UE+tXkiWtDDAsTKbY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RNq0wsLm2pTO+vn99o2pQGtYuNjXvZ6Ptkn5sTRKeyKIayu9rotUh0q3pQxnxz0ItSIP95Kfe/xrFdKYL855fj9kcCsCXBiGoys3pxlU6HTj4R+Cilv2YeeaO3kd4A1oQnHzci3/CmdJ2R9z4lD08lUGZjqnDhH0+Kc6ttMwBl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LEtTnS3S; arc=none smtp.client-ip=209.85.128.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D2niIYrZ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711718920;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9b2+syugljaMrrOP++3j3QqL3+aM8ytb7iOaLk3Q4wQ=;
-	b=D2niIYrZMvpjNrC4G656TPLRc5Q0xOKgrzGDqFoeTgxqV0qqlWadjuRNfrBJ4d7A5Pv5uU
-	lzoBvay1nsqIkFle4B+r8Vnl5T8aXj9pccfyeJar1I03LtIgS5UHvDmy+ZYMnbBGNQGWN2
-	t+//VpR9cO9Jg9au63aOu//y2sWIXSM=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-35--vpHp0yONM6rvkPC8uLpYA-1; Fri, 29 Mar 2024 09:28:38 -0400
-X-MC-Unique: -vpHp0yONM6rvkPC8uLpYA-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-33ed44cb765so1145146f8f.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Mar 2024 06:28:36 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LEtTnS3S"
+Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-60a0599f647so17870317b3.1;
+        Fri, 29 Mar 2024 07:04:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711721097; x=1712325897; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=TWdd/wmbwqgOgc8OcHWgAF9xeFNbGVFyi2tXQqMtAmM=;
+        b=LEtTnS3S2AqS5WSnHMtWCRrUpyNLuXxhfL21PtfZ8im/p6GpGzZbfKlw138X55hCAy
+         23f3lSus3ArYNHL7F7zFsPY+oXK2RtiUjVg7r8VvzREEW958hJgylzIcrqZJ+0OAbEDf
+         IEZv7doNqbDhbbbdYIRCuxQ/4ilHfHDckfEebqP48rPdH1eYf3HEclgg4Qv7L2w4WKU6
+         lfn3Ykbu/7ygQyUun9Zg8PkznirqB9D2pHQRKZF8Le9SBVERfMMH63XLt1LOyJTKBOWp
+         XrAHyL9mTkaO1Fx+3D5UyPH65EgbYDEH3uiJT4ib95BcgGhkYVGdYwBk8r1UdcBKBofj
+         chZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711718915; x=1712323715;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9b2+syugljaMrrOP++3j3QqL3+aM8ytb7iOaLk3Q4wQ=;
-        b=uV7pmRUUMVJiCQcCcc/JdeuvEjN+P7IQDXbUM8L8Q8/sx24DnYCEvaztkB/WJ5BU9r
-         +8oei7VlflPsr1Rp2/Xsg2CWScknMkdQO96PiLB9kV3CoBC3L6dosx9JL1gevva6bKgt
-         bj37WrX0cazx9eUNyXIrGMVmmWIHZ6hKgiMUZvdMJCxlYbRbwD7zpVX8ERDKxAyXC1fl
-         u7qV9x+zn5N2YQ99I0DkYMjwmdgYr/SKBmi23TCSqZHMGg1tJ93V2rTD07+AykHsHVdd
-         3Eg5PDzx/4+KRJBuFqjqAnE5cEuEZyka+BQhbr2ZEH0qiWcxFc5jGw7l1SFrOFWXqJxD
-         z/jA==
-X-Forwarded-Encrypted: i=1; AJvYcCV1Vs4sukuqCQssV9+f+jEXxXegV3vek149YnGcvTk+MaSMgoStHkmmQP0q+wJpqq5/9pAy/m+9j7Sa0zBW7n6wH4jPimgVJuNdQkpd12lN
-X-Gm-Message-State: AOJu0YwdiP7aVGNO1diNOzkhNOq19SK55I36hFQEz1FHxYOmeYM+mca6
-	UvHkl9xfB9JpumfvhXOjxYDNA8v+MYzB722eAShRs/X/QJFEfpmK3UHLJsW5agAkvRG8AOUL9yc
-	mJgx04NzJtfSWVAbOlvDkILytwNEROurRbgx2v+VEt7UCssjbie1IDiJ3cB/Q6DIHVw==
-X-Received: by 2002:a05:6000:258:b0:343:3e54:6208 with SMTP id m24-20020a056000025800b003433e546208mr405112wrz.55.1711718915582;
-        Fri, 29 Mar 2024 06:28:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG0y693U6Mrafzyu7YFm6f17FVsvRLIAvGL111PeLg9URymVxfxN4rrw7+XNw571qiaGR1ycw==
-X-Received: by 2002:a05:6000:258:b0:343:3e54:6208 with SMTP id m24-20020a056000025800b003433e546208mr405040wrz.55.1711718915211;
-        Fri, 29 Mar 2024 06:28:35 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-12-25-33.business.telecomitalia.it. [87.12.25.33])
-        by smtp.gmail.com with ESMTPSA id e11-20020a056000194b00b00341c6b53358sm4171063wry.66.2024.03.29.06.28.31
+        d=1e100.net; s=20230601; t=1711721097; x=1712325897;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TWdd/wmbwqgOgc8OcHWgAF9xeFNbGVFyi2tXQqMtAmM=;
+        b=Sz57twshdWmERm6MoveH7g8mpcbXIGUZqR7y9etby0WIGzsX8oWylW4C0YRxELbZ7e
+         wZ618v/vYaPBho92jOGRc77NKfqYYWe8OT+IRDYoXo6E1IZjzuSF7PR1OIuWsHiPyNdg
+         VjsbsiI5kFR1vFk41GXpf5LLpXKRTPvKAApruPY00FbErlQYcJJVmJprGiCBYfux1u7C
+         MbhvYuusRPxJckWXiQDczSHkyXFAAFysyDXmMpkexzusJBb0arSCJE4K+gXM0yaT0OwX
+         QmC2DF4kXF3EvnOJ89+jGvG2RWOXz5vINUkaWpoABdk+bU6KAaXq7Evckr1pxWDfa+Z2
+         /Ryw==
+X-Forwarded-Encrypted: i=1; AJvYcCWnfbU6+NdJvKghlO/t/UAQde5mCSSoejy+sH9c7dcAvdtUIcJ2gbLG/H8W29R6fGydsPdxMUQ2tUhuQ0zl7ytZix1b7UlP
+X-Gm-Message-State: AOJu0YygJtwb62hWLzZFAgEv8WVsHt/ewYbfn0IkWsHPGB/owDPEUCFG
+	NhdJB0l0aXVcKVjxipmAWiLHXe3iT3BZSztEQC6lQFtgaTqjwjPF
+X-Google-Smtp-Source: AGHT+IERKmxXy/EG+EUf+hLpiS6pVgE0VC7VY2as7qf4bagGy1dorUzz2wkvjf/suC9stPui0YICFA==
+X-Received: by 2002:a0d:dd46:0:b0:610:bc71:43ab with SMTP id g67-20020a0ddd46000000b00610bc7143abmr2499222ywe.44.1711721095746;
+        Fri, 29 Mar 2024 07:04:55 -0700 (PDT)
+Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id g131-20020a81a989000000b006119c166cc0sm805287ywh.85.2024.03.29.07.04.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Mar 2024 06:28:34 -0700 (PDT)
-Date: Fri, 29 Mar 2024 14:28:27 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Richard Weinberger <richard@nod.at>, Anton Ivanov <anton.ivanov@cambridgegreys.com>, 
-	Johannes Berg <johannes@sipsolutions.net>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gonglei <arei.gonglei@huawei.com>, 
-	"David S. Miller" <davem@davemloft.net>, Viresh Kumar <vireshk@kernel.org>, 
-	Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, 
-	David Airlie <airlied@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, 
-	Gurchetan Singh <gurchetansingh@chromium.org>, Chia-I Wu <olvaffe@gmail.com>, 
-	Jean-Philippe Brucker <jean-philippe@linaro.org>, Joerg Roedel <joro@8bytes.org>, Alexander Graf <graf@amazon.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Eric Van Hensbergen <ericvh@kernel.org>, 
-	Latchesar Ionkov <lucho@ionkov.net>, Dominique Martinet <asmadeus@codewreck.org>, 
-	Christian Schoenebeck <linux_oss@crudebyte.com>, Kalle Valo <kvalo@kernel.org>, 
-	Dan Williams <dan.j.williams@intel.com>, Vishal Verma <vishal.l.verma@intel.com>, 
-	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
-	Pankaj Gupta <pankaj.gupta.linux@gmail.com>, Bjorn Andersson <andersson@kernel.org>, 
-	Mathieu Poirier <mathieu.poirier@linaro.org>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
-	Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>, 
-	Anton Yakovlev <anton.yakovlev@opensynergy.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
-	virtualization@lists.linux.dev, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-um@lists.infradead.org, linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-gpio@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, netdev@vger.kernel.org, 
-	v9fs@lists.linux.dev, kvm@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org, linux-sound@vger.kernel.org
-Subject: Re: [PATCH 01/22] virtio: store owner from modules with
- register_virtio_driver()
-Message-ID: <e2xy5kjdctpitcrev2byqc5gcwntvsd6pfutrvp3l2kfe3llgs@l2xp5opj7xu2>
-References: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
- <20240327-module-owner-virtio-v1-1-0feffab77d99@linaro.org>
- <oaoiehcpkjs3wrhc22pwx676pompxml2z5dcq32a6fvsyntonw@hnohrbbp6wpm>
- <d01cc73e-a365-4ce8-a25f-780ea45bc581@linaro.org>
+        Fri, 29 Mar 2024 07:04:54 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: pull request: bluetooth 2024-03-29
+Date: Fri, 29 Mar 2024 10:04:53 -0400
+Message-ID: <20240329140453.2016486-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <d01cc73e-a365-4ce8-a25f-780ea45bc581@linaro.org>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Mar 29, 2024 at 01:07:31PM +0100, Krzysztof Kozlowski wrote:
->On 29/03/2024 12:42, Stefano Garzarella wrote:
->>> };
->>>
->>> -int register_virtio_driver(struct virtio_driver *driver)
->>> +int __register_virtio_driver(struct virtio_driver *driver, struct module *owner)
->>> {
->>> 	/* Catch this early. */
->>> 	BUG_ON(driver->feature_table_size && !driver->feature_table);
->>> 	driver->driver.bus = &virtio_bus;
->>> +	driver->driver.owner = owner;
->>> +
->>
->> `.driver.name =  KBUILD_MODNAME` also seems very common, should we put
->> that in the macro as well?
->
->This is a bit different thing. Every driver is expected to set owner to
->itself (THIS_MODULE), but is every driver name KBUILD_MODNAME?
+The following changes since commit 0ba80d96585662299d4ea4624043759ce9015421:
 
-Nope, IIUC we have 2 exceptions:
-- drivers/firmware/arm_scmi/virtio.c
-- arch/um/drivers/virt-pci.c
+  octeontx2-af: Fix issue with loading coalesced KPU profiles (2024-03-29 11:45:42 +0000)
 
->Remember that this overrides whatever driver actually put there.
+are available in the Git repository at:
 
-They can call __register_virtio_driver() where we can add the `name`
-parameter. That said, I don't have a strong opinion, we can leave it
-as it is.
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-03-29
 
-Thanks,
-Stefano
+for you to fetch changes up to 7835fcfd132eb88b87e8eb901f88436f63ab60f7:
 
+  Bluetooth: Fix TOCTOU in HCI debugfs implementation (2024-03-29 09:48:37 -0400)
+
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+ - Bluetooth: Fix TOCTOU in HCI debugfs implementation
+ - Bluetooth: hci_event: set the conn encrypted before conn establishes
+ - Bluetooth: qca: fix device-address endianness
+ - Bluetooth: hci_sync: Fix not checking error on hci_cmd_sync_cancel_sync
+
+----------------------------------------------------------------
+Bastien Nocera (1):
+      Bluetooth: Fix TOCTOU in HCI debugfs implementation
+
+Hui Wang (1):
+      Bluetooth: hci_event: set the conn encrypted before conn establishes
+
+Johan Hovold (5):
+      Revert "Bluetooth: hci_qca: Set BDA quirk bit if fwnode exists in DT"
+      dt-bindings: bluetooth: add 'qcom,local-bd-address-broken'
+      arm64: dts: qcom: sc7180-trogdor: mark bluetooth address as broken
+      Bluetooth: add quirk for broken address properties
+      Bluetooth: qca: fix device-address endianness
+
+Luiz Augusto von Dentz (1):
+      Bluetooth: hci_sync: Fix not checking error on hci_cmd_sync_cancel_sync
+
+ .../bindings/net/bluetooth/qualcomm-bluetooth.yaml |  4 ++
+ arch/arm64/boot/dts/qcom/sc7180-trogdor.dtsi       |  2 +
+ drivers/bluetooth/btqca.c                          |  8 +++-
+ drivers/bluetooth/hci_qca.c                        | 19 ++++-----
+ include/net/bluetooth/hci.h                        |  9 ++++
+ net/bluetooth/hci_core.c                           |  6 +--
+ net/bluetooth/hci_debugfs.c                        | 48 ++++++++++++++--------
+ net/bluetooth/hci_event.c                          | 25 +++++++++++
+ net/bluetooth/hci_sync.c                           | 10 ++++-
+ 9 files changed, 98 insertions(+), 33 deletions(-)
