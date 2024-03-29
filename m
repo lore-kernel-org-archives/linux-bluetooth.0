@@ -1,83 +1,89 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C97A2241EC
-	for <linux-bluetooth@vger.kernel.org>; Fri, 29 Mar 2024 08:52:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 153FE3CF7D
+	for <linux-bluetooth@vger.kernel.org>; Fri, 29 Mar 2024 09:13:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711702351; cv=none; b=fy4l+P+gJE01HE5OTtzYA4BLNUhFCMQYQmDyYbnFYnxf5YuGa5Ndwmbm5SU0ytm69AZMO/CJXN8MkTL4EclRjZdCh8FT3NaIKlj1Yw3j4M5iN7gfwNOyWmfMJL7tLUDQP+JtQR70Tz6IV1BEURAOxeDib9P5qcJIpA51cBsReZA=
+	t=1711703596; cv=none; b=uLB+YP4WNioHgeO2cuvnHdz+3B6aEK7X0Q968onQRo42SzxX6/SOhjGVvtdJkB9nwz+8DLhgZGHloXMNrIRHxvbaubPBY86ST4u89vIjW5gt9zyF4GY7yomaf1fX0mFRGruZDuq5INh4GnKKdhiPbUxJVD6WTdXToZ9b9NkeOJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711702351; c=relaxed/simple;
-	bh=2le/Vfo6y1YAgcJbpfDuhzqanNc+hYNpdPlSa+hAhdw=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=YkU4xvZrF0qcG43YHheQgXEshz/1OZkC7UkDVhR6pOGt9Sc5CYgZSzgshffJRJqMNOPrqkMcOJ7Id+SiBgp0vLajTcdN9KGpZskTLfsHo29Pn7D8/AVoGw3bCdIEJLsI3/1I8Lk5M6tU4+fgggLQHTeaoR2yfKtDNJuCgxlBl9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OiUPDJBF; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OiUPDJBF"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5FFC8C43394
-	for <linux-bluetooth@vger.kernel.org>; Fri, 29 Mar 2024 08:52:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711702351;
-	bh=2le/Vfo6y1YAgcJbpfDuhzqanNc+hYNpdPlSa+hAhdw=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=OiUPDJBFTnk5SiZKinKNlb/gXe5QjWU5YyY75IkXdU7z2TTtmdyRCdYrxQUxiAkr1
-	 2asj0oH7RL8RCBdmoCYNVDoioSNO6UY7Hq9r97dG6hkRt1lU1MgZEWVjlBilVaNl5D
-	 U3BAo6gxNtPb9rWblv1CaTDtVe95vLnq8cM/a88fOxuIRDz28MBmsQ43hsLuCpcjMw
-	 vTjneF7quuTDuqmxUzxBGr8I1dWVubkfsJGOsSmjJl0g/qHXFedzTYKdfvc3iB1ckJ
-	 Tt+Z4UQkXNCIHgDPgMpq3f0CptGmA0TsWXgsS6DEi7t2NAnGny1jWKEvbdPace+y3y
-	 Zsbp6sdxX68Xw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 539F8C4332E; Fri, 29 Mar 2024 08:52:31 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 218416] hci0: command 0xfc05 tx timeout in kernel 6.7.1
-Date: Fri, 29 Mar 2024 08:52:31 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: contact@odelierre.fr
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-218416-62941-B38fBvEF8x@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218416-62941@https.bugzilla.kernel.org/>
-References: <bug-218416-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1711703596; c=relaxed/simple;
+	bh=8pBZqcXYozg+NDDMS9/9XZJw12sGkJSfubs4bVyvQuw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mr3ImV5sLdGGUFgotk6j0vowWdXTx9OE7tiUtsQS5O79et2sqVQ4P680NZNADeOLxoDYmo7BfyeuThbTm4TZfW6AS13GYmxDsq6ZNthIWl4zXA1RAJejz0ytUyo4iJq/NuXmt3FgzvOi00Uq2LKEBwZNJkl4jpS6eGVhAFGe+HM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.2] (ip5f5af607.dynamic.kabel-deutschland.de [95.90.246.7])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 7956261E5FE05;
+	Fri, 29 Mar 2024 10:13:02 +0100 (CET)
+Message-ID: <e7dfb37d-9163-4d58-aafb-2a2ebca73c4d@molgen.mpg.de>
+Date: Fri, 29 Mar 2024 10:13:01 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH BlueZ v1 1/1] Autoconnecttimeout max value increased to
+ 20000 msecs from 16384 msecs
+To: Mahesh Talewad <mahesh.talewad@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org, devyani.godbole@nxp.com,
+ luiz.dentz@gmail.com, sarveshwar.bajaj@nxp.com
+References: <20240329063534.56892-1-mahesh.talewad@nxp.com>
+ <20240329063534.56892-2-mahesh.talewad@nxp.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20240329063534.56892-2-mahesh.talewad@nxp.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218416
+Dear Mahesh,
 
-Olivier Delierre (contact@odelierre.fr) changed:
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |contact@odelierre.fr
+Thank you for you patch.
 
---- Comment #9 from Olivier Delierre (contact@odelierre.fr) ---
-Had the same issue. Somehow, after a long power-off and turning on again,
-Bluetooth managed to show up and the message was gone. Using an AX200 as we=
-ll.
+Am 29.03.24 um 07:35 schrieb Mahesh Talewad:
+>   - In implementation Autoconnecttimeout max value is 16384 msecs.
+>     Increased this Autoconnecttimeout max value to 20000 msecs.
 
-Currently using kernel 6.8.2
+Please do *not* format it as a list item. I’d also rewrite the commit 
+message summary/title to use imperative mood:
 
---=20
-You may reply to this email to add a comment.
+> Increase autoconnect timeout max from 16.384 s to 20 s
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+Please also add, why this change is necessary.
+
+> Signed-off-by: Mahesh Talewad <mahesh.talewad@nxp.com>
+> ---
+>   src/main.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/src/main.c b/src/main.c
+> index b1339c230..8ce72badc 100644
+> --- a/src/main.c
+> +++ b/src/main.c
+> @@ -656,7 +656,7 @@ static void parse_le_config(GKeyFile *config)
+>   		  &btd_opts.defaults.le.autoconnect_timeout,
+>   		  sizeof(btd_opts.defaults.le.autoconnect_timeout),
+>   		  0x0001,
+> -		  0x4000},
+> +		  0x4E20},
+
+Please add a comment with the decimal value. (Or why not use a decimal 
+value?)
+
+Also, isn’t
+
+2 * 16 + 15 * 256 + 4 * 16^3 = 20256
+
+Why not just use 0x5000 (= 20480) to make it easier to calculate?
+
+>   		{ "AdvMonAllowlistScanDuration",
+>   		  &btd_opts.defaults.le.advmon_allowlist_scan_duration,
+>   		  sizeof(btd_opts.defaults.le.advmon_allowlist_scan_duration),
