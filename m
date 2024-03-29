@@ -1,144 +1,224 @@
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1A2A1E893
-	for <linux-bluetooth@vger.kernel.org>; Fri, 29 Mar 2024 17:57:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 399281E893
+	for <linux-bluetooth@vger.kernel.org>; Fri, 29 Mar 2024 17:59:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711735055; cv=none; b=RT901wmIvzafCHkjNuQ2bRUtRFOsNhx9ZBMGttoSVtU/WcBZHRZhlUMUI7ajVmcFl7O5QzL9svIMmSGufa0PgtoD82njfY/7JLs+ocmmTZ0yQTl8+jeQsdMfJ4atbgNtvt24Zbd4Uq7lKtR6zzjd/ADLTtlwS87MqjFk7CgETco=
+	t=1711735187; cv=none; b=a6fnT22466ZDVCV/JlywtH/Pgcz5rD19/pJHlEOVNeyQ+ohX7SPVlf2BWOygdTLHUrRLCeLwAZR4fR4mpV58YIEV79tp+oKwH/15L3esTe5VnPo1RDZPDjrKR+ptBzmfW35o1wourlLQsHLFahxhsAcrQNIjYpi1+C9qfV1wZbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711735055; c=relaxed/simple;
-	bh=s5DKnhxUC2Jce0L/or8W59+8StAVb4eKeWBolM51a8Q=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=g75Tzy/mdaI6jA1FbfwXH8UDekCcwbvRGlVUbOwJi9nqpLoGorTtGGD8QREkept8QKRxzhGg3XXoDoSVIDFs9mrl/QbDnX7WmVaPj3zH8LAgx7oIpVEbp27ka2w2+oZWsHMuaOLQ99Pp7DL12x3JTgIvgFxI+SeOYsDjC9i17WI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dIJbaSAy; arc=none smtp.client-ip=209.85.219.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1711735187; c=relaxed/simple;
+	bh=4oGADmJuiZ8xan04O+kk5IQeNYbRNOQoXRzwB732UBA=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=SFCWjcHGEuph8m7zX2oZxWuUZnGuRK9/l5lWmEDvQZH5o0bVlVMjt6HS77lBnOU+MZmp9I32sZ9+ieC1D60Xjo5e/dDGyxoh+f83ZvosMdcDs/WSChk8Eezmb4gECfaJe3eETEUzXlOIGMdnUb1dztkwXZEKQOshGC2dNxWR3Bg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fzz7IB4+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dIJbaSAy"
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-696147fb5a7so17823106d6.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Mar 2024 10:57:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711735052; x=1712339852; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=PCMnUt4Wqt/FPyHtsej/tmiHuZqVAysyOqkeatVzouo=;
-        b=dIJbaSAyONMvwRQQLMvhznE4gh83ahQx+mw9X84ejS1VFxMMWmZTsNr1ZCJgm5Sexb
-         RvO0Bd+VHzQR/BrKvMh9TURjKXXyh/7sisLF2Ewr5rNSe3fDQU2bPyC4n7rE/OlZRA5p
-         fWFFs/lUVAul3rjvdWPI5BEzNNCZDR4135+igFzz7vgO0SUZCzdZMJHfikrRzjCR47oQ
-         KXGqqBxBv9NFow/nZSZDZ4XYerm0AK8g34MWfEyouVKx2uwqwd849KpewnvVYche1Z+u
-         yg1DBcVSxrlGVxJiDVyseo7sYoINlOyQ61syULyFxkhFHVYp8mV9UGvk5JSZUlp07sAB
-         3rmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711735052; x=1712339852;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PCMnUt4Wqt/FPyHtsej/tmiHuZqVAysyOqkeatVzouo=;
-        b=bZxs3ZZplMmoeX2lANSMTUgdvNkKHI5eVeUMZUcmX73WZTQTkr68cqHwtMnbGPKvSG
-         SjSC56eqqIOAJrQpw5eGiv8eOx9ZeoMa9M/oO3C4VyhVgthpwEdXPbSJ7o2vsYizQlJq
-         aF5sl1HW231B04Hsqyow2fRdFhqQlVhzkiZVMYMABatA2RcZIHFafHLm0c0k27gGeysO
-         8bK7VEaRubFv9nN6/DjyXMJvkVnchLw/7n3UW+N5os2xw/SLzI2dPbGNz/h6rPmTgysi
-         SaEoqDDxVW3JYVB1PJSgBHpBP9tY6UmPQmIpGRgo1wlSxHG2X8ZGUe3uaYchf1jcv98B
-         Xjhg==
-X-Gm-Message-State: AOJu0YyTljvcHRS2iJ7Gy2EKRNToIRjjUOfaDAfNyv30jvPYgjSbprgo
-	0Ckv5E9X7lEGb3Q0vCCSF9FRAQtETLrTVdt7bCGfCqzO753tCY9LuDO/mw0K
-X-Google-Smtp-Source: AGHT+IEk+QdVAm0wAO0hnryl4WC1L7gu9Symua+7eFQmZfsWIwqkAyUq+q42y98HoYB17rzqThW5Ww==
-X-Received: by 2002:a0c:f303:0:b0:696:7617:2c12 with SMTP id j3-20020a0cf303000000b0069676172c12mr3040541qvl.24.1711735052469;
-        Fri, 29 Mar 2024 10:57:32 -0700 (PDT)
-Received: from [172.17.0.2] ([20.55.14.153])
-        by smtp.gmail.com with ESMTPSA id gg12-20020a056214252c00b006986d9c6b6asm1828485qvb.112.2024.03.29.10.57.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Mar 2024 10:57:32 -0700 (PDT)
-Message-ID: <6607010c.050a0220.66e87.c673@mx.google.com>
-Date: Fri, 29 Mar 2024 10:57:32 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0205271284827306202=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fzz7IB4+"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B2DD0C43399
+	for <linux-bluetooth@vger.kernel.org>; Fri, 29 Mar 2024 17:59:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711735186;
+	bh=4oGADmJuiZ8xan04O+kk5IQeNYbRNOQoXRzwB732UBA=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=fzz7IB4+1U0Z/UrGK0D8zuy67wNhHsTuleqq8t6Ur6ITaPM6IvPKnXE/Lsxnt/5AQ
+	 fdR5+Lm85fXiq7QtmvnQ38ftxJ3Ef7ut58pSEV6SPhwtGocLXfJzZxxo1mhRTzb3mT
+	 aJtwMbasCyu/8hYp8t2aqOTyM48eTv8YRwZlCpO2KGqCPuUn9n20tVpJ6iEqecxgTl
+	 eQjJ1bVloLhMDsYwGyBGJEPuAbaRB9QNEM9O4rQwyiD6lT9PARre2ceiFleXxDKV61
+	 ZE8122LIygZyyesm9aTz8WNkY77ktd7WIpt7/nplKDLMaNwDlTV6IpL7JRqAogCXwK
+	 8o4wjkN69nqmA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id A846BC53BD8; Fri, 29 Mar 2024 17:59:46 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 217023] [Intel AX200] hci0: Malformed MSFT vendor event: 0x02
+Date: Fri, 29 Mar 2024 17:59:46 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: grivel.ocsin@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-217023-62941-EWWeXKSKXz@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-217023-62941@https.bugzilla.kernel.org/>
+References: <bug-217023-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, krzysztof.kozlowski@linaro.org
-Subject: RE: mmc/wifi/bluetooth: store owner from modules with sdio_register_driver()
-In-Reply-To: <20240329-module-owner-sdio-v1-1-e4010b11ccaa@linaro.org>
-References: <20240329-module-owner-sdio-v1-1-e4010b11ccaa@linaro.org>
-Reply-To: linux-bluetooth@vger.kernel.org
 
---===============0205271284827306202==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+https://bugzilla.kernel.org/show_bug.cgi?id=3D217023
 
-This is automated email and please do not reply to this email!
+grivel bugsky (grivel.ocsin@gmail.com) changed:
 
-Dear submitter,
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |grivel.ocsin@gmail.com
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=839853
+--- Comment #10 from grivel bugsky (grivel.ocsin@gmail.com) ---
+My report for an:
 
----Test result---
+Manufacturer: ASUSTeK COMPUTER INC.
+Product Name: ROG Zephyrus G16 GU603VI_GU603VI
 
-Test Summary:
-CheckPatch                    PASS      4.61 seconds
-GitLint                       PASS      2.29 seconds
-SubjectPrefix                 FAIL      1.06 seconds
-BuildKernel                   PASS      29.05 seconds
-CheckAllWarning               PASS      33.45 seconds
-CheckSparse                   PASS      38.27 seconds
-CheckSmatch                   FAIL      34.67 seconds
-BuildKernel32                 PASS      28.48 seconds
-TestRunnerSetup               PASS      514.63 seconds
-TestRunner_l2cap-tester       PASS      17.94 seconds
-TestRunner_iso-tester         PASS      29.71 seconds
-TestRunner_bnep-tester        PASS      5.63 seconds
-TestRunner_mgmt-tester        PASS      109.04 seconds
-TestRunner_rfcomm-tester      PASS      7.30 seconds
-TestRunner_sco-tester         PASS      14.92 seconds
-TestRunner_ioctl-tester       PASS      7.76 seconds
-TestRunner_mesh-tester        PASS      5.83 seconds
-TestRunner_smp-tester         PASS      6.77 seconds
-TestRunner_userchan-tester    PASS      4.96 seconds
-IncrementalBuild              PASS      53.91 seconds
+https://linux-hardware.org/?probe=3De7501b45b5
 
-Details
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: CheckSmatch - FAIL
-Desc: Run smatch tool with source
-Output:
+Error initial : [6.736003] Bluetooth: hci0: Malformed MSFT vendor event: 0x=
+02.
 
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
-make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
-make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: net] Error 2
-make[2]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
-make[4]: *** Waiting for unfinished jobs....
-make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
-make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
-make: *** [Makefile:240: __sub-make] Error 2
+0: phy0: Wireless LAN
+        Soft blocked: no
+        Hard blocked: no
+1: hci0: Bluetooth
+        Soft blocked: no
+        Hard blocked: no
+
+Linux polmton 6.5.0-26-generic #26-Ubuntu SMP PREEMPT_DYNAMIC Tue Mar 5
+21:19:28 UTC 2024 x86_64 x86_64 x86_64 GNU/Linux$
+
+[    4.961218] Bluetooth: hci0: Device revision is 0
+[    4.961221] Bluetooth: hci0: Secure boot is enabled
+[    4.961223] Bluetooth: hci0: OTP lock is enabled
+[    4.961223] Bluetooth: hci0: API lock is enabled
+[    4.961224] Bluetooth: hci0: Debug lock is disabled
+[    4.961225] Bluetooth: hci0: Minimum firmware build 1 week 10 2014
+[    4.961226] Bluetooth: hci0: Bootloader timestamp 2019.40 buildtype 1 bu=
+ild
+38
+[    4.963975] Bluetooth: hci0: Found device firmware: intel/ibt-0040-0041.=
+sfi
+[    4.963996] Bluetooth: hci0: Boot Address: 0x100800
+[    4.963997] Bluetooth: hci0: Firmware Version: 98-13.23
+[    6.412347] Bluetooth: hci0: Waiting for firmware download to complete
+[    6.413186] Bluetooth: hci0: Firmware loaded in 1415242 usecs
+[    6.413217] Bluetooth: hci0: Waiting for device to boot
+[    6.429192] Bluetooth: hci0: Device booted in 15615 usecs
+[    6.429195] Bluetooth: hci0: Malformed MSFT vendor event: 0x02
+[    6.429344] Bluetooth: hci0: Found Intel DDC parameters:
+intel/ibt-0040-0041.ddc
+[    6.433886] Bluetooth: hci0: Applying Intel DDC parameters achieved
+[    6.436212] Bluetooth: hci0: Firmware timestamp 2023.13 build type 1 bui=
+ld
+62562
+[    4.821065] Bluetooth: Core ver 2.22
+[    4.821103] Bluetooth: HCI device and connection manager initialized
+[    4.821108] Bluetooth: HCI socket layer initialized
+[    4.821111] Bluetooth: L2CAP socket layer initialized
+[    4.821115] Bluetooth: SCO socket layer initialized
+[    4.961218] Bluetooth: hci0: Device revision is 0
+[    4.961221] Bluetooth: hci0: Secure boot is enabled
+[    4.961223] Bluetooth: hci0: OTP lock is enabled
+[    4.961223] Bluetooth: hci0: API lock is enabled
+[    4.961224] Bluetooth: hci0: Debug lock is disabled
+[    4.961225] Bluetooth: hci0: Minimum firmware build 1 week 10 2014
+[    4.961226] Bluetooth: hci0: Bootloader timestamp 2019.40 buildtype 1 bu=
+ild
+38
+[    4.963975] Bluetooth: hci0: Found device firmware: intel/ibt-0040-0041.=
+sfi
+[    4.963996] Bluetooth: hci0: Boot Address: 0x100800
+[    4.963997] Bluetooth: hci0: Firmware Version: 98-13.23
+[    5.046967] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+[    5.046971] Bluetooth: BNEP filters: protocol multicast
+[    5.046975] Bluetooth: BNEP socket layer initialized
+[    6.412347] Bluetooth: hci0: Waiting for firmware download to complete
+[    6.413186] Bluetooth: hci0: Firmware loaded in 1415242 usecs
+[    6.413217] Bluetooth: hci0: Waiting for device to boot
+[    6.429192] Bluetooth: hci0: Device booted in 15615 usecs
+[    6.429195] Bluetooth: hci0: Malformed MSFT vendor event: 0x02
+[    6.429344] Bluetooth: hci0: Found Intel DDC parameters:
+intel/ibt-0040-0041.ddc
+[    6.433886] Bluetooth: hci0: Applying Intel DDC parameters completed
+[    6.436212] Bluetooth: hci0: Firmware timestamp 2023.13 buildtype 1 build
+62562
+[    6.506296] Bluetooth: MGMT ver 1.22
+[    6.519923] Bluetooth: RFCOMM TTY layer initialized
+[    6.519929] Bluetooth: RFCOMM socket layer initialized
+[    6.519934] Bluetooth: RFCOMM ver 1.11
+[    4.961218] Bluetooth: hci0: Device revision is 0
+[    4.961221] Bluetooth: hci0: Secure boot is enabled
+[    4.961223] Bluetooth: hci0: OTP lock is enabled
+[    4.961223] Bluetooth: hci0: API lock is enabled
+[    4.961224] Bluetooth: hci0: Debug lock is disabled
+[    4.961225] Bluetooth: hci0: Minimum firmware build 1 week 10 2014
+[    4.961226] Bluetooth: hci0: Bootloader timestamp 2019.40 buildtype 1 bu=
+ild
+38
+[    4.963975] Bluetooth: hci0: Found device firmware: intel/ibt-0040-0041.=
+sfi
+[    4.963996] Bluetooth: hci0: Boot Address: 0x100800
+[    4.963997] Bluetooth: hci0: Firmware Version: 98-13.23
+[    6.412347] Bluetooth: hci0: Waiting for firmware download to complete
+[    6.413186] Bluetooth: hci0: Firmware loaded in 1415242 usecs
+[    6.413217] Bluetooth: hci0: Waiting for device to boot
+[    6.429192] Bluetooth: hci0: Device booted in 15615 usecs
+[    6.429195] Bluetooth: hci0: Malformed MSFT vendor event: 0x02
+[    6.429344] Bluetooth: hci0: Found Intel DDC parameters:
+intel/ibt-0040-0041.ddc
+[    6.433886] Bluetooth: hci0: Applying Intel DDC parameters completed
+[    6.436212] Bluetooth: hci0: Firmware timestamp 2023.13 buildtype 1 build
+62562
 
 
----
-Regards,
-Linux Bluetooth
+description: Bluetooth wireless interface
+product: AX211 Bluetooth
 
+  *-network
+       description: Ethernet interface
+       product: Raptor Lake PCH CNVi WiFi
+       vendor: Intel Corporation
+       physical id: 14.3
+       bus info: pci@0000:00:14.3
+       logical name: wlo1
+       version: 01
+       serial: 0e:0e:c5:26:e5:be
+       width: 64 bits
+       clock: 33MHz
+       capabilities: pm msi pciexpress msix bus_master cap_list ethernet
+physical
+       configuration: broadcast=3Dyes driver=3Diwlwifi
+driverversion=3D6.5.0-26-generic firmware=3D83.e8f84e98.0 so-a0-gf-a0-83.uc
+ip=3D192.168.0.130 latency=3D0 link=3Dyes multicast=3Dyes
+       resources: iomemory:620-61f irq:16 memory:622f284000-622f287fff
+  *-network
+       description: Ethernet interface
+       product: RTL8111/8168/8411 PCI Express Gigabit Ethernet Controller
+       vendor: Realtek Semiconductor Co., Ltd.
+       physical id: 0
+       bus info: pci@0000:39:00.0
+       logical name: enp57s0
+       version: 15
+       serial: 08:bf:b8:2f:21:e0
+       capacity: 1Gbit/s
+       width: 64 bits
+       clock: 33MHz
+       capabilities: pm msi pciexpress msix bus_master cap_list ethernet
+physical tp mii 10bt 10bt-fd 100bt 100bt-fd 1000bt-fd autonegotiation
+       configuration: autonegotiation=3Don broadcast=3Dyes driver=3Dr8169
+driverversion=3D6.5.0-26-generic firmware=3Drtl8168h-2_0.0.2 02/26/15 laten=
+cy=3D0
+link=3Dno multicast=3Dyes port=3Dtwisted pair
+       resources: irq:18 ioport:3000(size=3D256) memory:60204000-60204fff
+memory:60200000-60203fff
 
---===============0205271284827306202==--
+...
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
