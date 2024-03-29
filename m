@@ -1,127 +1,113 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C90F43FBBC;
-	Fri, 29 Mar 2024 07:25:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D00ED101D0
+	for <linux-bluetooth@vger.kernel.org>; Fri, 29 Mar 2024 08:37:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711697156; cv=none; b=le2zLKfqJF6Xkmbm6Prg1J15hyD/43ECTyFOlYml3IFbP4BDYh8a0OBzhRZxK51Swa/Gu7dg7mcsJ812+EPwrjl0HWX3XPUTfLezM3fJRU7oYm3FySLofQwzw5VNS65gynSe7/RVwkN5c6lqSAFuEBNsYejf+IG4khcfanVOp2E=
+	t=1711701472; cv=none; b=nbbJe2kmvNIOqJKOz4wzvP7YZfxPoxOadZBU2rdz2wPzAOyZp77FRY2QhChk4wOzd/5FDjglkqzInr/OkK4FAY9SJT+Xhss5B5TCZ5+GrzhWPSlu/6sPlB11gat871O19BNhgP6SABKFUKhtId/rJRS0uyYegmV1omyp0YOwDa8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711697156; c=relaxed/simple;
-	bh=KIvMNu9WkvQCofweVAwnulcFxwRN34Ifb8Ui/THsKiA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=H9HoCjbMj+ymaK4/1p3YydB8/sgHknzioO9lkA12Sf/hAUOkheJIg+WtCI/aGnPH9lgaqKbatK5JNeBTiFYiekDtfLKOIpsYNXiRJqyXeEjwkMmLbACkItuCobHPsOxv3pcUSpjJeSUR6XaXNrfzGpQcGoUCFzb+o0Yay9kUugU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=KorUyFD7; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1711701472; c=relaxed/simple;
+	bh=Ng4vwGwhIyJ6ngXiH/PADO3z2yeM7+FoBjND/+cD8E8=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=WNAb+SptpnHNhk2M6LtzZfBqIkoS7VpY3lFpurozjVdT+gUO2Yl461LyKjfmziHKpuImJE0II6q6rpoECLza2wxL2Q09IDYIvREx3NQT8+PeFSJkL5lhXBIxtJFBhK9JXdySjrhju26YQFry56kAPGLAUMY7BgH34NZVNMzLZQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bgfAiCbz; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="KorUyFD7"
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42T5Oxx7005595;
-	Fri, 29 Mar 2024 07:25:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=VwtuCx9Ufi24zRIKC72QCsInTwX8ii5rSOdpOxqX2IM=; b=Ko
-	rUyFD7gjzxZO1x3O+Y9QJ+7IYsSlInk+VG+uP1Rj4tslboz9Bnuy1xHjxsaz/Rte
-	o96qQjdWfpYrGiu53P+Ox6eJN1x7M/gBRMtDZwyAm21k/InoFjoie1H8y5NtRbHW
-	9BaB7qVBQOhkZzqd6NbeD0F1xxEfpyyDhHXZtDhdJDVHqd/btGYghzj9vO+vsqXi
-	LFsAt1p9Mw87oYrgn4M8MQLSQ/nkyzIvQJ7ODXICBe0lnGRc//fJABJulXTua8SW
-	+UhSsfXVgNlDhs0RFphHfwd5J36VOFxK/+OdpS17aIupVfh2vfslLWYzhkm0znwX
-	bNLBjAy8+GV1+7QIqNaQ==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3x5aquj33f-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 29 Mar 2024 07:25:48 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 42T7Ploa011843
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 29 Mar 2024 07:25:47 GMT
-Received: from [10.218.29.219] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Fri, 29 Mar
- 2024 00:25:43 -0700
-Message-ID: <c03abbbd-faa5-4fdc-b7c3-5554a90c3419@quicinc.com>
-Date: Fri, 29 Mar 2024 12:55:40 +0530
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bgfAiCbz"
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-78a60d10eeeso110691585a.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Mar 2024 01:37:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711701469; x=1712306269; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=GHQD2CyfP0gPHY5vcRpUBxCl2aXFmz7rzIZGcVBmfxw=;
+        b=bgfAiCbzjqx69L6Z5Owyl0qrCTKcyJCPHjSw9cGX4gCSMVk3rzaU6WBRbRDIArgMxu
+         MZEFvaoz8a1Q/3Uq3AOTp/3rLwzQGFJOmXyqkqodkdBjuCRSKwyQOc3H1CuwePXBfgeI
+         LmQo4C3UP0yNEper7M8YWmBQ6wUV88t04pyFWOWa6yIP5Xf14NtAomfoWBEh9owveX1F
+         3tKUHbZTNffcJkXna8OqvJRa2RmVhH+VAoBKaq4SZuYhgT/IEjQpG4faRnON0VcCuAme
+         hVU2xjpcEV8RWkysryFzUdjasNiD9YW0JqrJW37ygE86fbCqA3LsTswwWPt+WCVQg/+N
+         q8cA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711701469; x=1712306269;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GHQD2CyfP0gPHY5vcRpUBxCl2aXFmz7rzIZGcVBmfxw=;
+        b=JooRyMbdfIHrV9i1A6NWmpg71uLdZayDxygKhJsKdRMl2YdzegfMcZ9e8EKZhxfCv/
+         1OdcVvy7G7GSqMkEE/7XI7F2aSVTY5EewQMCK0SdlubGaTbIgIlddY2LLcLyL9Jb/sFQ
+         JlRjS3RI0csOcM9bg4RTnTT33TAdXuXS/Q1q7Ipdq12Y+SOqWAmthDC0mOMwayaCRgrs
+         f5Tx3eKi5XPotmsfZuGP+obgRAh2KCRPL764GvIELLI7rIdNMJkxfYtomhgDw7YnZBtJ
+         bEvn8fRPsbeUfx2+NjoiFyJV5dTFwFBC9aS5AKbuWdWLybem/SHlF3WYdMhx5k0iBgN/
+         lJKQ==
+X-Gm-Message-State: AOJu0YypIUQcDX2j+ew1XXDVaGdoohFIiplvgBGyiyzvW6PZ53DdUElY
+	v9QUY5fsJDf8T/0qSEQTBnjpm4VmoEyH/ZOeFoENu/DezaK5SHKbLYN/OpoM
+X-Google-Smtp-Source: AGHT+IGbFlKrBsWPq8ywoxV6FmyKdAdwtMcR1VLO/t2yFcpevTwHdW0TGewDrtTr5QW/RMUApVN18w==
+X-Received: by 2002:a05:620a:4012:b0:78a:5e3a:ccdb with SMTP id h18-20020a05620a401200b0078a5e3accdbmr2359160qko.28.1711701469603;
+        Fri, 29 Mar 2024 01:37:49 -0700 (PDT)
+Received: from [172.17.0.2] ([20.55.214.240])
+        by smtp.gmail.com with ESMTPSA id i5-20020a05620a144500b0078a6db384b4sm1219582qkl.30.2024.03.29.01.37.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Mar 2024 01:37:48 -0700 (PDT)
+Message-ID: <66067ddc.050a0220.852ba.9b8f@mx.google.com>
+Date: Fri, 29 Mar 2024 01:37:48 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0173228082426310947=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Revert "Bluetooth: hci_qca: Set BDA quirk bit if fwnode
- exists in DT"
-To: Johan Hovold <johan@kernel.org>
-CC: <patchwork-bot+bluetooth@kernel.org>,
-        Johan Hovold
-	<johan+linaro@kernel.org>, <luiz.dentz@gmail.com>,
-        <marcel@holtmann.org>, <linux-bluetooth@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>,
-        <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>
-References: <20240314084412.1127-1-johan+linaro@kernel.org>
- <171146704035.9961.13096206001570615153.git-patchwork-notify@kernel.org>
- <124a7d54-5a18-4be7-9a76-a12017f6cce5@quicinc.com>
- <ZgWLeo5KSLurLDhK@hovoldconsulting.com>
-Content-Language: en-US
-From: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
-In-Reply-To: <ZgWLeo5KSLurLDhK@hovoldconsulting.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, mahesh.talewad@nxp.com
+Subject: RE: Autoconnecttimeout max value increased to 20000 msecs
+In-Reply-To: <20240329063534.56892-2-mahesh.talewad@nxp.com>
+References: <20240329063534.56892-2-mahesh.talewad@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============0173228082426310947==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: n7zlYDUH6iL-6q2llIRA2Ne01Ovvu-fw
-X-Proofpoint-GUID: n7zlYDUH6iL-6q2llIRA2Ne01Ovvu-fw
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-29_06,2024-03-28_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- priorityscore=1501 impostorscore=0 malwarescore=0 phishscore=0
- clxscore=1011 adultscore=0 mlxscore=0 suspectscore=0 mlxlogscore=999
- bulkscore=0 lowpriorityscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2403210001 definitions=main-2403290062
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=839675
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.48 seconds
+GitLint                       FAIL      0.48 seconds
+BuildEll                      PASS      24.42 seconds
+BluezMake                     PASS      1658.83 seconds
+MakeCheck                     PASS      13.87 seconds
+MakeDistcheck                 PASS      176.99 seconds
+CheckValgrind                 PASS      248.83 seconds
+CheckSmatch                   PASS      350.74 seconds
+bluezmakeextell               PASS      119.39 seconds
+IncrementalBuild              PASS      1440.37 seconds
+ScanBuild                     PASS      992.18 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,v1,1/1] Autoconnecttimeout max value increased to 20000 msecs from 16384 msecs
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (85>80): "[BlueZ,v1,1/1] Autoconnecttimeout max value increased to 20000 msecs from 16384 msecs"
 
 
+---
+Regards,
+Linux Bluetooth
 
-On 3/28/2024 8:53 PM, Johan Hovold wrote:
-Hi Johan,
-Thanks for the valuable inputs.
-> [ Please wrap your emails at 72 columns or so. ]
->
 
-Noted.
-
-> On Thu, Mar 28, 2024 at 08:25:16PM +0530, Janaki Ramaiah Thota wrote:
->> We made this change to configure the device which supports persistent
->> memory for the BD-Address
-> 
-> Can you say something more about which devices support persistent
-> storage for the address? Is that all or just some of the chip variants?
-> 
-
-Most of the devices support persistent storage, and bd-address storage
-is chosen based on the OEM and Target.
-
->> So to make device functional in both scenarios we are adding a new
->> property in dts file to distinguish persistent and non-persistent
->> support of BD Address and set HCI_QUIRK_USE_BDADDR_PROPERTY bit
->> accordingly
-> 
-> Depending on the answer to my questions above, you may be able to infer
-> this from the compatible string and/or you can read out the address from
-> the device and only set the quirk if it's set to the default address.
-> 
-> You should not need to add a new property for this.
-> 
-> Johan
-
-As per my understanding, altering the compatible string may cause duplicate
-configuration, right ?
-
-Thanks,
-JanakiRam
-
-  
-
+--===============0173228082426310947==--
