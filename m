@@ -1,103 +1,117 @@
-Received: from mail.tuxedocomputers.com (mail.tuxedocomputers.com [157.90.84.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bg5.exmail.qq.com (bg5.exmail.qq.com [43.155.80.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1503A132810;
-	Thu, 28 Mar 2024 23:20:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=157.90.84.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78BCB1755B;
+	Fri, 29 Mar 2024 02:36:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.155.80.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711668039; cv=none; b=YC6j5ixwktVeTTwwOoCIjov8OYtqCoMbUeQup0WJw4Y7+dQ+LLKvUtr7th2o4NX0wgG8q330z9fyD5f0AjMi4a8VadfVPLXO4v5cOWjRCwci581lSEZNzIxYVpAHAbR3atvclI7yaJsPeH7C9fA5C9Gtz5SPr16iLulUihh5fGo=
+	t=1711679812; cv=none; b=Vgw2u/Jpm9SBLTTAO4MYtqfJd5A9/m3/AhDwOKKFaOda/nfryOAbYrLowzr7uQiW1xBIDhslxp4XMoFZTlGrFeBaCjbYunGDpkz/pX2tz434kU2cTbrD3RrJgyzVXrecwDQdUigzugb//DI5J8pF2CU0O7aMIN8SNn4vOTYHBgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711668039; c=relaxed/simple;
-	bh=34jIQYyG3HwhAtKIumxUv8XfeSTT8CDhCLqScz3CDRI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SHXy2QQB7JtNid+MDH6LYmiiwPniqCiA7GhRn3M+yaunEoR9A7JzW9+JX/0V8kFyl6POBRK0HJoZ/gP8mGuZVrQbM304y4NcomfGaUB0Au+Hz4tD+EoxkS2bIElIWr8ZRVObdLk+ny7nl7oyuf99iFiKBy/6aD+jiXdhVagOGsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tuxedocomputers.com; spf=pass smtp.mailfrom=tuxedocomputers.com; dkim=pass (1024-bit key) header.d=tuxedocomputers.com header.i=@tuxedocomputers.com header.b=O1irU1hx; arc=none smtp.client-ip=157.90.84.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tuxedocomputers.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxedocomputers.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tuxedocomputers.com header.i=@tuxedocomputers.com header.b="O1irU1hx"
-Received: from [192.168.42.20] (pd9e59192.dip0.t-ipconnect.de [217.229.145.146])
-	(Authenticated sender: wse@tuxedocomputers.com)
-	by mail.tuxedocomputers.com (Postfix) with ESMTPSA id D0DBC2FC0063;
-	Fri, 29 Mar 2024 00:20:31 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tuxedocomputers.com;
-	s=default; t=1711668032;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jhkvNvnameJwMfmvqN5hnsuhbbtE6or15TxgqStiKbk=;
-	b=O1irU1hxVaN+6UhGvajjQ1uwRXgPkPeyIM4GE+Bo7CuszA0mnkies30vjYPFK/8u8QJ99Z
-	cl3vDPy7/WQqtIIhfB19Nnja+ql3Q/AYrrWpdo8orGTGmjG8cwasNR/PKcccT5yh2MD7wY
-	DQiAZTvHQn/sAET7aMYiouQCpGVCC5c=
-Authentication-Results: mail.tuxedocomputers.com;
-	auth=pass smtp.auth=wse@tuxedocomputers.com smtp.mailfrom=wse@tuxedocomputers.com
-Message-ID: <29d54137-f3b9-4556-b99e-61a0f681f164@tuxedocomputers.com>
-Date: Fri, 29 Mar 2024 00:20:31 +0100
+	s=arc-20240116; t=1711679812; c=relaxed/simple;
+	bh=lNo8VGQtKXlMfN/GYEunrmU3o4T2AUaXwiOuGq+GC6w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pBBWQ32zuet58KDvpeaFGkKSL/Elm0+ehOk6hkB7YNIp+yFGOS7EUiDBGGGyB7dj+W1pnUAu7TsQwc/PO1sJ+Fw9VXETruDXNkPNwWhyWIhJymGNo2RKICFsfFl0X8k4HOK2+9YWiETtY0uiA4jV/kVse74LcDAzpU130wsj+/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; arc=none smtp.client-ip=43.155.80.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+X-QQ-mid: bizesmtp84t1711679709tqsna5x2
+X-QQ-Originating-IP: 9DI/m0nSHoWrbokge9cHLwFEuyqWtQa85xBPKylsOvw=
+Received: from localhost.localdomain ( [113.57.152.160])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Fri, 29 Mar 2024 10:35:08 +0800 (CST)
+X-QQ-SSF: 01400000000000C0B000000A0000000
+X-QQ-FEAT: dKvkn8qoLrENEuiqnKnh9VViaa0Ck5dpdvYt66Om678Du6fG4F5jOWi9xLycH
+	0x800yDg72x2tc6GIm7S29N1SP8HaCEOuVPPGPzTInfWr0hL2ndppAaTM780+IqaiEkXFgy
+	MKoiPhkslcsFTqoiOsxNkRoIQde70anacwn+kz4QgmPOnf5/59PLc3CkDMC/mGK2WLoiIOM
+	6/kArRC3s8f8F/5owm3Hj0BUOQqfce8WTfV5PYhQvawSN3D1iMVbB31fmQYml53ED05OeBW
+	TEVDlLvQSejbPQAFlYH0aNDmBymvOP/ddK7vdFI+IDptD2l+w3D35KYd+sEwG6k1itUP0ac
+	bPFMT/s/wKaHkl9r2hpUJYQ6DU4OPGCNdRAdjhpaTNt5dtpGOinxHSSNR6rgQcIro464cir
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 1572931789947820350
+From: WangYuli <wangyuli@uniontech.com>
+To: wangyuli@uniontech.com,
+	Larry.Finger@lwfinger.net,
+	marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com,
+	guanwentao@uniontech.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [RESEND. PATCH v2] Bluetooth: btusb: Add Realtek RTL8852BE support ID 0x0bda:0x4853
+Date: Fri, 29 Mar 2024 10:34:39 +0800
+Message-ID: <883A1BECA61AB8B7+20240329023440.191799-1-wangyuli@uniontech.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: btintel: Add devices to
- HCI_QUIRK_BROKEN_LE_CODED
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Christoffer Sandberg
- <cs@tuxedo.de>, linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240328131800.63328-1-wse@tuxedocomputers.com>
- <CABBYNZ+OaJ9QVE_KmBNL8QbBv4r5erL57u3BzFv0AnmUzY=PTA@mail.gmail.com>
-Content-Language: en-US
-From: Werner Sembach <wse@tuxedocomputers.com>
-In-Reply-To: <CABBYNZ+OaJ9QVE_KmBNL8QbBv4r5erL57u3BzFv0AnmUzY=PTA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-Hi Luiz,
+Add the support ID(0x0bda, 0x4853) to usb_device_id table for
+Realtek RTL8852BE.
 
-Am 28.03.24 um 15:17 schrieb Luiz Augusto von Dentz:
-> Hi Werner,
->
-> On Thu, Mar 28, 2024 at 9:18 AM Werner Sembach <wse@tuxedocomputers.com> wrote:
->> From: Christoffer Sandberg <cs@tuxedo.de>
->>
->> For HW variants 0x17, 0x18 and 0x19 LE Coded PHY causes scan and
->> connection issues when enabled. This patch disables it through
->> the existing quirk.
->>
->> Signed-off-by: Christoffer Sandberg <cs@tuxedo.de>
->> Signed-off-by: Werner Sembach <wse@tuxedocomputers.com>
->> Cc: <stable@vger.kernel.org>
->> ---
->>   drivers/bluetooth/btintel.c | 2 ++
->>   1 file changed, 2 insertions(+)
->>
->> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
->> index cdc5c08824a0a..6dbfb74d0adf9 100644
->> --- a/drivers/bluetooth/btintel.c
->> +++ b/drivers/bluetooth/btintel.c
->> @@ -2881,6 +2881,8 @@ static int btintel_setup_combined(struct hci_dev *hdev)
->>          case 0x17:
->>          case 0x18:
->>          case 0x19:
->> +               /* 0x17, 0x18 and 0x19 have issues when LE Coded PHY is enabled */
->> +               set_bit(HCI_QUIRK_BROKEN_LE_CODED, &hdev->quirks);
-> If it is just these 3 then we are missing a break here.
+Without this change the device utilizes an obsolete version of
+the firmware that is encoded in it rather than the updated Realtek
+firmware and config files from the firmware directory. The latter
+files implement many new features.
 
-The cases are not added by the patch, the fallthrough was here before. This 
-patch just adds this quirk for these 3 cases on top to the other things done 
-below, aka the fallthrough is intentional.
+The device table is as follows:
 
-Best regards,
+T: Bus=03 Lev=01 Prnt=01 Port=09 Cnt=03 Dev#= 4 Spd=12 MxCh= 0
+D: Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
+P: Vendor=0bda ProdID=4853 Rev= 0.00
+S: Manufacturer=Realtek
+S: Product=Bluetooth Radio
+S: SerialNumber=00e04c000001
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=81(I) Atr=03(Int.) MxPS= 16 Ivl=1ms
+E: Ad=02(O) Atr=02(Bulk) MxPS= 64 Ivl=0ms
+E: Ad=82(I) Atr=02(Bulk) MxPS= 64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=03(O) Atr=01(Isoc) MxPS= 0 Ivl=1ms
+E: Ad=83(I) Atr=01(Isoc) MxPS= 0 Ivl=1ms
+I: If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=03(O) Atr=01(Isoc) MxPS= 9 Ivl=1ms
+E: Ad=83(I) Atr=01(Isoc) MxPS= 9 Ivl=1ms
+I: If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=03(O) Atr=01(Isoc) MxPS= 17 Ivl=1ms
+E: Ad=83(I) Atr=01(Isoc) MxPS= 17 Ivl=1ms
+I: If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=03(O) Atr=01(Isoc) MxPS= 25 Ivl=1ms
+E: Ad=83(I) Atr=01(Isoc) MxPS= 25 Ivl=1ms
+I: If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=03(O) Atr=01(Isoc) MxPS= 33 Ivl=1ms
+E: Ad=83(I) Atr=01(Isoc) MxPS= 33 Ivl=1ms
+I: If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=03(O) Atr=01(Isoc) MxPS= 49 Ivl=1ms
+E: Ad=83(I) Atr=01(Isoc) MxPS= 49 Ivl=1ms
 
-Werner
+Cc: stable@vger.kernel.org
+Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
+Signed-off-by: WangYuli <wangyuli@uniontech.com>
+---
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
->
->>          case 0x1b:
->>          case 0x1c:
->>                  /* Display version information of TLV type */
->> --
->> 2.34.1
->>
->
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index c391e612b83b..3356af3a7f61 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -542,6 +542,8 @@ static const struct usb_device_id quirks_table[] = {
+ 	/* Realtek 8852BE Bluetooth devices */
+ 	{ USB_DEVICE(0x0cb8, 0xc559), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0bda, 0x4853), .driver_info = BTUSB_REALTEK |
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0bda, 0x887b), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0bda, 0xb85b), .driver_info = BTUSB_REALTEK |
+-- 
+2.43.0
+
