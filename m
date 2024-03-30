@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8991828DC1
-	for <linux-bluetooth@vger.kernel.org>; Sat, 30 Mar 2024 13:59:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D0B36AE4
+	for <linux-bluetooth@vger.kernel.org>; Sat, 30 Mar 2024 15:50:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711807165; cv=none; b=ibuSTcYanMI0bKx52Q932vnuAi0SUBUkuIoq+3p2doLBnu9mFipUE+Q9r/DcL8D3UkeC1olr9njceukDTLZoAJjPVetbFk8jtxeUgCXB+C3E2cO8aIxGNJxCT3zAyDomhFc4oZls1lLmOlavOpxQNsA/LEcYkoxw18xrAFVqb14=
+	t=1711813835; cv=none; b=inqfueDQjc0qsCf8yY4XQS2PTKolxcaVAlLVhqBns+sI3n7x1J/TITOAzmKjUDQ1qYtu6aDTTyBZK960jPgE4xuXBlXwU27TEd8XmqQkl1mymwBsQOUs/hvpjuVYm1piAKKo/jIeHtBXpoQ65XkF6TahspNpmAiM9mds5Ixb5iY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711807165; c=relaxed/simple;
-	bh=8YS2p+N775XcpfhnZf5v2Wn2ew+U9xIj1nnrK8tgwQ0=;
+	s=arc-20240116; t=1711813835; c=relaxed/simple;
+	bh=QAkLyRJUQOM7ENc4gwFsd6+FzXKQW5rH1yn42ETknIY=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=bUb0SKMHJWFr73mqHoQVg6T2VqL2IqgyLm+qfJDqPG4V0WDtVShefRIn+jJ8OwP9t068nH4EzQjE15ggvUfw7DCxqApFGWhhfF/klBBUs+5b9cMuxoFW79palxhU27mGtb/FCWpjpKWq0y5BGPVkoDttdikbvX3HNTHokj75Mns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TTO6p4+i; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=amu+Qh/0RqA5BlbpQ5/52yx5l+fsLXEjfjtp3iKymLjiVzaT3hPM1hY23EtonMscMZGMsRpZNdB3vV4dWJlIBCVAZVYub6yuMhNnnPb6/3ZrvZc8LiteZgr+4+fZe1QGtwXxddo/SJT1k2zo3KnNxaxDxuzrBR7pwRjvB9YkgyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r1ThMA/t; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TTO6p4+i"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 26B3AC433C7
-	for <linux-bluetooth@vger.kernel.org>; Sat, 30 Mar 2024 13:59:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r1ThMA/t"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D18B5C43390
+	for <linux-bluetooth@vger.kernel.org>; Sat, 30 Mar 2024 15:50:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711807165;
-	bh=8YS2p+N775XcpfhnZf5v2Wn2ew+U9xIj1nnrK8tgwQ0=;
+	s=k20201202; t=1711813834;
+	bh=QAkLyRJUQOM7ENc4gwFsd6+FzXKQW5rH1yn42ETknIY=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=TTO6p4+ifJPgD7pSt23VFMuqLid5RMvS/uPE2wxa+JaTdQbaG4x4jhZSgggwSuv5N
-	 26+YPPEkrgQdYqm3fuuRa8VzcbRnGlkQ8RX72dTMXlz7k+bl/iG/N7vnmB09aiGP3A
-	 PVh+2lIIhoUGzkbBakcJJUnVuomQ9GShq3cY6s3UNGqqwotDhAcFI49F3jxyHkl637
-	 x4ebFNW6DstMjBFOcqzw86DMimjJ3/ZKVNUngSvPEK2T7S0c9aRqyEU2qW2uTeCOD7
-	 8cIoWmMPX0mssZy5d4DjhqTgHphQUO9JYSBRl/iuQj0TpT8lIEezGQszuoit/Fy7Xb
-	 G0t39XBcwqfaQ==
+	b=r1ThMA/tc7aiMvLgw3n6vef/ToaazP+E571V1+mz2dmI91dS0kxKY1bBM/Su9nlhT
+	 Aj5tQxm696C578Wcnpm/1yhtiKE0rDNWV0vZbNkTHD5BCAE1wyuetM/ApVvQGPxwHy
+	 XrO3zj5Gp36P+HmghKC+4xqmrA0pfOY9QFNJlxdeGcXvWhX+ODvqjtHkn2144pHaCx
+	 eQoQh/E/E6QRNplNPKUDi0QgLGGkc1RW9dAQ05FtZMLFU3vZ4whKLOLf87Z2d5MIPf
+	 ST7B7my5lu0I9OVK+rFPHzx6H/EToHpS8HXJzqvQMXv3x4aqUaeSMUsjJbOOoMlsCN
+	 SXAE3fbsWfNMQ==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 1F281C53BD6; Sat, 30 Mar 2024 13:59:25 +0000 (UTC)
+	id BF4A8C53BD2; Sat, 30 Mar 2024 15:50:34 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 218651] kernel 6.8.2 - Bluetooth bug/dump at boot
-Date: Sat, 30 Mar 2024 13:59:24 +0000
+Date: Sat, 30 Mar 2024 15:50:34 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -47,7 +47,7 @@ X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-218651-62941-vvV9gO1cEv@https.bugzilla.kernel.org/>
+Message-ID: <bug-218651-62941-RVBMEm4Y6j@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-218651-62941@https.bugzilla.kernel.org/>
 References: <bug-218651-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -63,15 +63,11 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D218651
 
---- Comment #12 from The Linux kernel's regression tracker (Thorsten Leemhu=
+--- Comment #13 from The Linux kernel's regression tracker (Thorsten Leemhu=
 is) (regressions@leemhuis.info) ---
-From the bisection and the oops it's pretty like a duplicate of
-https://lore.kernel.org/all/08275279-7462-4f4a-a0ee-8aa015f829bc@leemhuis.i=
+I asked the stable team to pick up the patch:
+https://lore.kernel.org/all/bf267566-c18c-4ad9-9263-8642ecfdef1f@leemhuis.i=
 nfo/
-
-Then this patch should help (which might only get to Linus next Thursday):
-https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/=
-?id=3D1c3366abdbe884
 
 --=20
 You may reply to this email to add a comment.
