@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15C5A2770B
-	for <linux-bluetooth@vger.kernel.org>; Sat, 30 Mar 2024 17:27:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C22E23A1D3
+	for <linux-bluetooth@vger.kernel.org>; Sat, 30 Mar 2024 19:34:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711819622; cv=none; b=P62S3G5RIWdX4mMtEkFOLzKZwEczKmtUk49EBgnC5+uUlOXQ+iN36F5IQscItgjxMtdJSQ4Mcw4mCbObquzjH7H2lOXPHjwj8r/KKXNo4AmJ5MEpQM4UR8sy2vveAYinCIMbaZHHrQ5ExN2QDH4UNCeh4IsMC8juuqsJLopPD0c=
+	t=1711827242; cv=none; b=qnA8Y6n/LVbKN2tcf8TmW7ChQxRXy0KJHbsU0QzCf01Wqi3wCWpHUalYdVORjN5vvcbycB2NesHxNgCIq54vlwr1urQnHiMOS80nZeR23PIiWDTgCbSwHViG4Z9i5IUJm9zKeZpuLNud+OMy4LI402erprJMQr2On1OWMHGbaKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711819622; c=relaxed/simple;
-	bh=6x6Fyz/n77w7bjoP34q2UPKiQgOdfdFoyQ4uNKATtGI=;
+	s=arc-20240116; t=1711827242; c=relaxed/simple;
+	bh=S/b3jZ86KFTY/EJVgd7XLZqcL/oumwW/2r6oWGoVqQU=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=DuEl91v2N+eHA0s7ZMO7k4PlFRQcnMZIFPouI75DeLXQMk84Gdec1OaraJ7lEQzFDmRonOVW0yA9gd/LPFhZ3oAUbEtUaPKWzw29/g9LEC9Qhnjc/AUERZtG7thtSu/i6dgy1hQRlblgrVQOpxEpJX5EOb4mhzR/HmWKUzD03FU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q5kV9tCR; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=Uk340JELqFJaZLaLMq4gHY9k4sUeIuV81lA3n6yl8JBuUFQ8Wnr/8HYzbV0nOj4EkT6SnxjzqllYBE0R8g1sKlLom/l2fM07pl1d4etbVgo+9fWH6OJ8/wBgd1Y/5EkLnp3e/wnXxU5sYw/hh47o+kleSnbXNWTR7uO3/lTvhIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kgzQapg6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q5kV9tCR"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 95A45C433F1
-	for <linux-bluetooth@vger.kernel.org>; Sat, 30 Mar 2024 17:27:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kgzQapg6"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4D779C433C7
+	for <linux-bluetooth@vger.kernel.org>; Sat, 30 Mar 2024 19:34:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711819621;
-	bh=6x6Fyz/n77w7bjoP34q2UPKiQgOdfdFoyQ4uNKATtGI=;
+	s=k20201202; t=1711827242;
+	bh=S/b3jZ86KFTY/EJVgd7XLZqcL/oumwW/2r6oWGoVqQU=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=q5kV9tCRa5bIrsttgUNHg/MEqe4OIwUTO58tJ84u5rb78SpKuS0MQ0tJx3WGbHbbS
-	 p/lMHVjOHHr/TfDDffWjnRnJNenjzWtN2iKkiUJqMIVIjY6u8UFKS4KpXYGak1IGS+
-	 mGv8nh93K+CPPTXNwDsBCIgodzFG54mdD3dOVbk40mvA8P3VCOtHIiTvuD7F7KXGIT
-	 6asmZ6vV6DZYLaOgNPiq37W3fIwaw6BXlEIH9j2H+A0hdoDlFVq0GgU/81XD9wcBMQ
-	 5z1FQP+KoWNvfqhUExKLACr/Oodgfp62nFiue6i3BOYb1ehpQurvNvrrrmcIp1PosC
-	 8TIOtr854lpBg==
+	b=kgzQapg6xHaVdEGZMp08+zih6G6cB74j/BR5QZUIBfQBYPp5scpD5AQaPhtvs7UgV
+	 T6KANCWOfuFWyrByi1tJ0Rh7oNPMGcCcLrBnU4ZJzLDyDjd3mwDGz0IB/ImgKipmyu
+	 Nj5s/D7zad0yBUGilbrK7YcUGECBX+srLLwILBavrciHKFm0S5GCZCf2+dfoXvaA3Z
+	 qnoEsojTidgMc0lsAE5Gi3+tDjDOm6dDLwLIVQN1Wz3HY54zfXKRtytBRncnageamF
+	 OcwzNS25yJdtjXag2e2yXKlxo5koipGfuVKnOwjUSKvAw2DxF7lCqEyP/sc3v3WLaM
+	 Wuz266S+nNnZw==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 7F90FC53BD2; Sat, 30 Mar 2024 17:27:01 +0000 (UTC)
+	id 35606C53BD6; Sat, 30 Mar 2024 19:34:02 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 218651] kernel 6.8.2 - Bluetooth bug/dump at boot
-Date: Sat, 30 Mar 2024 17:27:01 +0000
+Date: Sat, 30 Mar 2024 19:34:01 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -40,14 +40,14 @@ X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: high
-X-Bugzilla-Who: regressions@leemhuis.info
+X-Bugzilla-Who: kbugreports@proton.me
 X-Bugzilla-Status: NEW
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-218651-62941-kwKGlolbQ0@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-218651-62941-A5qRoE50sH@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-218651-62941@https.bugzilla.kernel.org/>
 References: <bug-218651-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -63,9 +63,33 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D218651
 
---- Comment #14 from The Linux kernel's regression tracker (Thorsten Leemhu=
-is) (regressions@leemhuis.info) ---
-Fix now queued for the next release of all affected stable/longterm series
+kbugreports@proton.me changed:
+
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |kbugreports@proton.me
+
+--- Comment #15 from kbugreports@proton.me ---
+I can confirm this bug for / in kernel v6.6.23.
+
+Not that I care about bluetooth, but apparently it also affects usb.
+
+This issue is present at most but not all boots, sometimes it does not occu=
+r.
+
+Real world consequence on my system (thinkpad, kabylake) is that external u=
+sb
+keyboard and mouse are not recognized -> system unusable. Inbuild touchpad
+works, so I can initiate a reboot, but the system doesn't power down proper=
+ly
+and still needs a hard reset to complete the "reboot".
+
+If the system happens to boot fine (i.e. the new, unusual output on the boot
+screen is missing), those problems don't appear.
+
+Going back to kernel v6.6.22 solve this issue for me.
+
+Hoping / assuming the fix will also be included in the 6.6.24 kernel.
 
 --=20
 You may reply to this email to add a comment.
