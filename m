@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C22E23A1D3
-	for <linux-bluetooth@vger.kernel.org>; Sat, 30 Mar 2024 19:34:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD9213D0C4
+	for <linux-bluetooth@vger.kernel.org>; Sat, 30 Mar 2024 21:52:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711827242; cv=none; b=qnA8Y6n/LVbKN2tcf8TmW7ChQxRXy0KJHbsU0QzCf01Wqi3wCWpHUalYdVORjN5vvcbycB2NesHxNgCIq54vlwr1urQnHiMOS80nZeR23PIiWDTgCbSwHViG4Z9i5IUJm9zKeZpuLNud+OMy4LI402erprJMQr2On1OWMHGbaKQ=
+	t=1711835521; cv=none; b=PDNabSy0jPyg6Py3wZKE2mCkadOJrPdl+gMIrvJ932SF7iXKtaqxknNAYj5+MDLW4xhD7XYB92uALXKGGpcYJ1URXyk27JBR95AmZKBdntYM4esZ1bKWk9xJK2xHI32EONdE+6l6qc5BAxeTe+cOFCwCqVlDaDu3kh5Inn0YlDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711827242; c=relaxed/simple;
-	bh=S/b3jZ86KFTY/EJVgd7XLZqcL/oumwW/2r6oWGoVqQU=;
+	s=arc-20240116; t=1711835521; c=relaxed/simple;
+	bh=M3vxbeo4W5eydHAVM+Wm2XhVoEDPJu1G/IGkCDXcfdE=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Uk340JELqFJaZLaLMq4gHY9k4sUeIuV81lA3n6yl8JBuUFQ8Wnr/8HYzbV0nOj4EkT6SnxjzqllYBE0R8g1sKlLom/l2fM07pl1d4etbVgo+9fWH6OJ8/wBgd1Y/5EkLnp3e/wnXxU5sYw/hh47o+kleSnbXNWTR7uO3/lTvhIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kgzQapg6; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=r5wUG9x7UyPo0wX9Dnd+OKwIf95MhVEclrvip0LloNConRaIpGdYHXp0TYY8hIP3x6UuW20LxBm3J4CPB0QTI0pKVhxxckzrM62kC5cBI8Dez+DoQg8z0l3PXO4JKindemG/IGhKCn0xWiF6Vg1rhfzCKKa54lajtuZESu2VYaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HXaIo2WR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kgzQapg6"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4D779C433C7
-	for <linux-bluetooth@vger.kernel.org>; Sat, 30 Mar 2024 19:34:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HXaIo2WR"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2F687C433C7
+	for <linux-bluetooth@vger.kernel.org>; Sat, 30 Mar 2024 21:52:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711827242;
-	bh=S/b3jZ86KFTY/EJVgd7XLZqcL/oumwW/2r6oWGoVqQU=;
+	s=k20201202; t=1711835521;
+	bh=M3vxbeo4W5eydHAVM+Wm2XhVoEDPJu1G/IGkCDXcfdE=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=kgzQapg6xHaVdEGZMp08+zih6G6cB74j/BR5QZUIBfQBYPp5scpD5AQaPhtvs7UgV
-	 T6KANCWOfuFWyrByi1tJ0Rh7oNPMGcCcLrBnU4ZJzLDyDjd3mwDGz0IB/ImgKipmyu
-	 Nj5s/D7zad0yBUGilbrK7YcUGECBX+srLLwILBavrciHKFm0S5GCZCf2+dfoXvaA3Z
-	 qnoEsojTidgMc0lsAE5Gi3+tDjDOm6dDLwLIVQN1Wz3HY54zfXKRtytBRncnageamF
-	 OcwzNS25yJdtjXag2e2yXKlxo5koipGfuVKnOwjUSKvAw2DxF7lCqEyP/sc3v3WLaM
-	 Wuz266S+nNnZw==
+	b=HXaIo2WRoIGbtzR5EvVDrVHR7iMB/NGfBIe88l5ecSWu3Br/ayctrLBwBArL+Tby5
+	 PZ4C/eDq2NmiXhEHB5/3Zde2zqXpJNQ8aRBaWTpKZdmyl4F/9Sbf3N7EfgKgP3boUz
+	 Niggw9g4GYfsri1XARuX2wcwGJ9nz3H1uzH1e5k5oJJnS0lohD0fzNthXgBMl1N8cY
+	 zHYO4Zy7ZLEwh2fxhF+3jNmKluK43DWrp8vtkf7gzjuFVBlT0+zGlwGspJHy5zuRKO
+	 W/lMf1csygIiH8ZVaC/cKLs0a5oCaCyxgIKzNoYxQLh2puakVZJGuzchs/KuviNjKk
+	 kjQA5ixfo3NVw==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 35606C53BD6; Sat, 30 Mar 2024 19:34:02 +0000 (UTC)
+	id 1ABF7C53BD2; Sat, 30 Mar 2024 21:52:01 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 218651] kernel 6.8.2 - Bluetooth bug/dump at boot
-Date: Sat, 30 Mar 2024 19:34:01 +0000
+Date: Sat, 30 Mar 2024 21:52:00 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -40,14 +40,14 @@ X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: high
-X-Bugzilla-Who: kbugreports@proton.me
+X-Bugzilla-Who: ferdi@sttc-nlp.nl
 X-Bugzilla-Status: NEW
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-218651-62941-A5qRoE50sH@https.bugzilla.kernel.org/>
+Message-ID: <bug-218651-62941-NqUQwgw3Yu@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-218651-62941@https.bugzilla.kernel.org/>
 References: <bug-218651-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -63,33 +63,21 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D218651
 
-kbugreports@proton.me changed:
+Ferdi Scholten (ferdi@sttc-nlp.nl) changed:
 
            What    |Removed                     |Added
 ----------------------------------------------------------------------------
-                 CC|                            |kbugreports@proton.me
+                 CC|                            |ferdi@sttc-nlp.nl
 
---- Comment #15 from kbugreports@proton.me ---
-I can confirm this bug for / in kernel v6.6.23.
+--- Comment #16 from Ferdi Scholten (ferdi@sttc-nlp.nl) ---
+The bug is also in kernel v6.7.11 affecting bluetooth and usb. Also causing=
+ the
+system to hang at reboot or shutdown. This is on a Lenovo thinkpad T560 (in=
+tel
+skylake)
 
-Not that I care about bluetooth, but apparently it also affects usb.
-
-This issue is present at most but not all boots, sometimes it does not occu=
-r.
-
-Real world consequence on my system (thinkpad, kabylake) is that external u=
-sb
-keyboard and mouse are not recognized -> system unusable. Inbuild touchpad
-works, so I can initiate a reboot, but the system doesn't power down proper=
-ly
-and still needs a hard reset to complete the "reboot".
-
-If the system happens to boot fine (i.e. the new, unusual output on the boot
-screen is missing), those problems don't appear.
-
-Going back to kernel v6.6.22 solve this issue for me.
-
-Hoping / assuming the fix will also be included in the 6.6.24 kernel.
+Also confirmed on Lenovo thinkpad p52s laptop. Also causing hang on
+reboot/shutdown.
 
 --=20
 You may reply to this email to add a comment.
