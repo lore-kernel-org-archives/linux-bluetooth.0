@@ -1,168 +1,162 @@
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD86F1494BB
-	for <linux-bluetooth@vger.kernel.org>; Sun, 31 Mar 2024 08:46:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2494F6E5EF
+	for <linux-bluetooth@vger.kernel.org>; Sun, 31 Mar 2024 09:34:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711874786; cv=none; b=Ho3zDS88YyfTu0eKQs6RkxG1Nx2FeTAXS7/WOrYD58+PgozceXxgUotLutPDCa2oeWTz3PSsiyq4e0Fnje9rq545gdwcuRpuO4+InAcVt80Heg3UfFkC4rKfAYzLb43TnBIMk3rU6ERlS5Fn8dvxpjFWp/Sln1OvtgzM3CG4p3w=
+	t=1711877643; cv=none; b=eDPSBr5ZVns9viOx/qC8i4nVE1OyG4NX7Hk9n2Hw6M34lik6KQTTY7QTmuMor2eqs/3eF9H2zXDvIZ1P/oEWxw4Pz65kuJuaLdpMMndMC/wpg4xEolVa/V2xd/qmUPnErXR6BbPDnRpTGdljMJwhztVRyzkAD0b/PQQ4/31bpKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711874786; c=relaxed/simple;
-	bh=ZZgxTq79++b7HHq30K3VBjFNBWdk1QKSfVGAvnwx7/U=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=MnI/kANxCRCgOuTwCP9ieKh5E32qNm7RCOS9hatsIupcKYPNnkEyN32OrXMQsNvprwNFRYvWvN/909YxaLLkocCkC3nxXkk9V8H0SCkCGwXbFo/RUQQWudxW7/ZgdNDB17lM7tHecLVWznZZHckKsAFfZ+A1ZintuLyiFDlYk4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Hjtn5Hln; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1711877643; c=relaxed/simple;
+	bh=m0ako4n/X504pRyFhm5g63NiZWuph1p7zIFFtn/gmwg=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=TtL0PhXZ8TMXZfFvIg6pTPIDXvyaEs96OZxl77wAdHwkZMuNYNpXa1/SSs/Hgo4/+CihVwCUbocOn81ow4yJ9APzPL28MUZqzzZEv6Fr6CaoHz+JbVoNMDBdozqCYdGM1NMh92iXbgKck4y9yiWVN03c0O64AIOrmJQ0uuiNCmE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eNpCrlLd; arc=none smtp.client-ip=209.85.222.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Hjtn5Hln"
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-33ecb04e018so2449070f8f.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 31 Mar 2024 01:46:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eNpCrlLd"
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-789f00aba19so239734385a.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 31 Mar 2024 02:34:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1711874782; x=1712479582; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PUGaKwdvwMokLlZR31UQgBcIJ2q0krEU+yZMO7QbwcI=;
-        b=Hjtn5Hlnes+w/e3w0eIr7nTTgSvMkDmZzsGAWeX3YC3DfaOpgP2PPknWKtAJoy6EE/
-         qmCDP91IjqyT+WUq1JbCAoWyjT8nVHhBFmWdVgk0Fe56zIGX0EzaY4w5JojZUz8eOTSq
-         bbVl2PykGm/CmM9SBKHHXHVZBsO5HZaZIDO33uuEaZufu9xJt7GORX5VUBtdXMbrqC/X
-         Y0LErKvrlsDnwUy4CqDF8HF1dE5RNaIEwnyl3cbuOSSMg4B0PyOU51qtlo5YuSt6FLLf
-         MToJ2Fztixc0ZZyl+McVdkXLITXzwverL2iGuRWtvyoEjfDLYSgIL5jdI6FpwhSg6kGH
-         kWPg==
+        d=gmail.com; s=20230601; t=1711877641; x=1712482441; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=lRRlN1xyRttIXxs3FqOf2H64eo/TJXX6ueh1CQc76Xw=;
+        b=eNpCrlLdPb0pd+qTY4pXvhv9Xd0tUNWx0gjkLDzo35+NirgsxKqkEluYk5YOSfTgE1
+         iJ1doVDLSoRX2gGIRRZfSasn6xeiTt58jbFVFCMz3j+yG30rVzP8VvmHc2HhNmGT2k1p
+         FobnYIOTDy+Es24Ut+a1O7yTXhwvq5tS8hcBVyNiwo713AlxRNmQ0b2czhB9xVKaOfuH
+         abLQChqIP3Ds+fa3MyAj34sB6KXG+1CEb6pwd0bBhMjWuizR5IisGSh0v+SQArH/wWRH
+         IVf/2W+/QxUMDhNIl6AkGa6/Hf+98lljyzCV5umJ2Go7H9vR7nATvD09VjPCxKCrF6HB
+         JwWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711874782; x=1712479582;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PUGaKwdvwMokLlZR31UQgBcIJ2q0krEU+yZMO7QbwcI=;
-        b=MxxGn4yj7MUHDpmQwVMPQezXQlY1M0M4/dKQ3bwwrs+fflOAa7vTBCY9N+kmvvB7t6
-         LwyE+XMKLApDSdBT3PgGTxd92gp2ZvH/JlkgoWKPbWSWMntkQyjwiBBQHfpXhZVONvUc
-         zY4e2HKCMYQiMlMIP+AIygXL9zVzs8DDarY/d1OhgvLAOIjy41JiS2G4stLkM2w34Ais
-         HFKtIKQNK0GwagyR2ovP6o3uf/F9udws4MQLBga5csCBh3XQFKbULFSftYD5RzJ6mgya
-         CbLZHrJd1y5aD9zCKZdfV3Vigvq0rOgGXtSLkUZgmBbY1A/fq3QdSK25b7d8f3xL1Al+
-         geYg==
-X-Forwarded-Encrypted: i=1; AJvYcCVG8y7Qc1tBhkodkjT4G99erZ9I2rQ0XhGu3d34q92Ybq1ddmIeNWpFSfUbu60WGIqp2OXyw/+8b5ALnwgt9pTOgWKjPwHUTsmFJonKQ08O
-X-Gm-Message-State: AOJu0YwYs4MjRKVfDQFpHDcZHE0ef498b1xP+3SOA2sMO4TRgxWa2HUt
-	I58Rtv3oWj5D2yaxvXsxPTs+7ziAqGUhMIusIh/ldy6bnM/ra+E3GQQlE9Ag924=
-X-Google-Smtp-Source: AGHT+IF7MARc7H4ZqzG7wJkQ89qaWtgYzIyVWgX/basw0DoDqcekmy5aXwgVIVD/A5uDZbyMRmIPWA==
-X-Received: by 2002:adf:f88f:0:b0:341:d2f9:494c with SMTP id u15-20020adff88f000000b00341d2f9494cmr3575737wrp.55.1711874782419;
-        Sun, 31 Mar 2024 01:46:22 -0700 (PDT)
-Received: from [127.0.1.1] ([178.197.223.16])
-        by smtp.gmail.com with ESMTPSA id k17-20020adff5d1000000b00341b7388dafsm8436003wrp.77.2024.03.31.01.46.18
+        d=1e100.net; s=20230601; t=1711877641; x=1712482441;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lRRlN1xyRttIXxs3FqOf2H64eo/TJXX6ueh1CQc76Xw=;
+        b=JTquzUycX5tZkDjQepK36ZS9fH1dp++J0ScyIRMx9UQpvpExdXZWYbIEQh0qZUaWj3
+         9jru8l4HVp0Zmu6+883QV74RoksAe+RT0/ZjClOZSWVHLTNyZumEbx/H3Q0Yy4Ltf2Ab
+         +lc0NXeobQtnuinuFXSAl60ENgyNKBMzW1tocpIyUeKsQZ7MLQrPCFbzv/rGQvvz0YuH
+         K2RcUzaG5xkg5ROwdWaPv3oM19H2aj9vQukQEYRyKissjpmH1ZvVOWpkIm9F/b+wao9F
+         QBvONo8XOQoc8y8+mDlse3ONPqQOvLO5/VmOvYwUVmyNLIrPDr9v+wS4HkQKQtZBldAc
+         CXkQ==
+X-Gm-Message-State: AOJu0YxM+hUK6h8phYI1y8gwRQ6PM/lLOvlRl4xg8yoRdyGtjHbzNY5i
+	qvZ+hnW24sfMA6JfBuXLj5fjHxdkD+pu0ivRHuuuvy+q2GhHJdaCRw8qGz2W
+X-Google-Smtp-Source: AGHT+IEew89HhPvYYNRt2PpK1C8yUg0TfbzZWuLnA28vvKx/j5E/jWm5z+b/Opa/vpxgiSFXskm/9w==
+X-Received: by 2002:a05:622a:104c:b0:432:e819:2440 with SMTP id f12-20020a05622a104c00b00432e8192440mr1427653qte.50.1711877640669;
+        Sun, 31 Mar 2024 02:34:00 -0700 (PDT)
+Received: from [172.17.0.2] ([74.249.21.241])
+        by smtp.gmail.com with ESMTPSA id dr14-20020a05622a528e00b0042f43a486c9sm3456726qtb.77.2024.03.31.02.34.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 31 Mar 2024 01:46:21 -0700 (PDT)
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Date: Sun, 31 Mar 2024 10:44:12 +0200
-Subject: [PATCH v2 25/25] sound: virtio: drop owner assignment
+        Sun, 31 Mar 2024 02:34:00 -0700 (PDT)
+Message-ID: <66092e08.050a0220.9e1c3.144d@mx.google.com>
+Date: Sun, 31 Mar 2024 02:34:00 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6571274858547939088=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, krzysztof.kozlowski@linaro.org
+Subject: RE: virtio: store owner from modules with register_virtio_driver()
+In-Reply-To: <20240331-module-owner-virtio-v2-1-98f04bfaf46a@linaro.org>
+References: <20240331-module-owner-virtio-v2-1-98f04bfaf46a@linaro.org>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============6571274858547939088==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240331-module-owner-virtio-v2-25-98f04bfaf46a@linaro.org>
-References: <20240331-module-owner-virtio-v2-0-98f04bfaf46a@linaro.org>
-In-Reply-To: <20240331-module-owner-virtio-v2-0-98f04bfaf46a@linaro.org>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Jonathan Corbet <corbet@lwn.net>, 
- David Hildenbrand <david@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, 
- Richard Weinberger <richard@nod.at>, 
- Anton Ivanov <anton.ivanov@cambridgegreys.com>, 
- Johannes Berg <johannes@sipsolutions.net>, 
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
- Jens Axboe <axboe@kernel.dk>, Marcel Holtmann <marcel@holtmann.org>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- Olivia Mackall <olivia@selenic.com>, 
- Herbert Xu <herbert@gondor.apana.org.au>, Amit Shah <amit@kernel.org>, 
- Arnd Bergmann <arnd@arndb.de>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- Gonglei <arei.gonglei@huawei.com>, "David S. Miller" <davem@davemloft.net>, 
- Sudeep Holla <sudeep.holla@arm.com>, 
- Cristian Marussi <cristian.marussi@arm.com>, 
- Viresh Kumar <vireshk@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, 
- Bartosz Golaszewski <brgl@bgdev.pl>, David Airlie <airlied@redhat.com>, 
- Gurchetan Singh <gurchetansingh@chromium.org>, 
- Chia-I Wu <olvaffe@gmail.com>, 
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
- Daniel Vetter <daniel@ffwll.ch>, 
- Jean-Philippe Brucker <jean-philippe@linaro.org>, 
- Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, 
- Robin Murphy <robin.murphy@arm.com>, Alexander Graf <graf@amazon.com>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Eric Van Hensbergen <ericvh@kernel.org>, 
- Latchesar Ionkov <lucho@ionkov.net>, 
- Dominique Martinet <asmadeus@codewreck.org>, 
- Christian Schoenebeck <linux_oss@crudebyte.com>, 
- Stefano Garzarella <sgarzare@redhat.com>, Kalle Valo <kvalo@kernel.org>, 
- Dan Williams <dan.j.williams@intel.com>, 
- Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>, 
- Ira Weiny <ira.weiny@intel.com>, 
- Pankaj Gupta <pankaj.gupta.linux@gmail.com>, 
- Bjorn Andersson <andersson@kernel.org>, 
- Mathieu Poirier <mathieu.poirier@linaro.org>, 
- "James E.J. Bottomley" <jejb@linux.ibm.com>, 
- "Martin K. Petersen" <martin.petersen@oracle.com>, 
- Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>, 
- Anton Yakovlev <anton.yakovlev@opensynergy.com>, 
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
-Cc: virtualization@lists.linux.dev, linux-doc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-um@lists.infradead.org, 
- linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
- linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
- linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org, 
- iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev, 
- kvm@vger.kernel.org, linux-wireless@vger.kernel.org, nvdimm@lists.linux.dev, 
- linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org, 
- linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org, 
- linux-sound@vger.kernel.org, 
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=719;
- i=krzysztof.kozlowski@linaro.org; h=from:subject:message-id;
- bh=ZZgxTq79++b7HHq30K3VBjFNBWdk1QKSfVGAvnwx7/U=;
- b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBmCSJm5t8lRjxPTys8b+WU0OKgg1LgcvzKJ4xNt
- n3OV06BuwyJAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCZgkiZgAKCRDBN2bmhouD
- 13W/D/oDYwucjXt0Tt8Y0Uy9LmGcrAbjofc6FyMbOg5ZcMm5e3+WVCaJvH1GzuMW7eKutG1NKq4
- SG+22VBevobbwXkTrzQkvyrydccLRDbeWLWm+HJad5tojpoFvW83SYI4iPlD0b266lNVIdzpKjz
- hcUgfDLubJvg2WN81urFjglAG74SusSyGpct+7+xypg9xUvAMj+j+vblD6MiYvdlR7YTT07NpVb
- CnsXjptZ5D0mdqdAp/yyZAVgxH8IatToMVp+zeRzRlVPHc8mepyeo/z9irAjfvJMoh/GGv0t6Gr
- 6lHVgN1q09NOsaKCBvZgBc1M3JNDSEvRjO4LMT7dAINa97EQdIp9+8ZpNqqX0RQXYDulXZIS5+F
- Fi4LuIifmxFvnLlK3XGafTiE+izB6Av3JwLIwcg0Q9VTwxzmWeoDKL9c1o0P/bZ5TzBsp8cO5Az
- EQrw4GwFCAMD7jfVzip/IzS25Sgb5lVDNqj2sWyi5R9/l0bzGoRd8h0nMUo0h60LV8+UQNG4Qn2
- Z5ijAWCJJVA4mNoA3tp1IfoltFnoxAy+WhGYLKaLo80DfbVnlQAHuwY8P4oIqsfEalA2ZTmhTBx
- qz3zO+FBApnCfqIytRnVYYYjPxsP+kbjFVJOBhR1fGzSU1/is2cPkZduK341zXENT6nHwkNDVK4
- VB34pc8fk3aFIrA==
-X-Developer-Key: i=krzysztof.kozlowski@linaro.org; a=openpgp;
- fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
 
-virtio core already sets the .owner, so driver does not need to.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=840075
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      16.10 seconds
+GitLint                       PASS      8.38 seconds
+SubjectPrefix                 FAIL      3.36 seconds
+BuildKernel                   PASS      29.69 seconds
+CheckAllWarning               PASS      32.17 seconds
+CheckSparse                   PASS      47.13 seconds
+CheckSmatch                   FAIL      34.47 seconds
+BuildKernel32                 PASS      28.48 seconds
+TestRunnerSetup               PASS      511.48 seconds
+TestRunner_l2cap-tester       PASS      17.82 seconds
+TestRunner_iso-tester         PASS      27.95 seconds
+TestRunner_bnep-tester        PASS      4.67 seconds
+TestRunner_mgmt-tester        PASS      112.35 seconds
+TestRunner_rfcomm-tester      PASS      7.24 seconds
+TestRunner_sco-tester         PASS      14.85 seconds
+TestRunner_ioctl-tester       PASS      7.66 seconds
+TestRunner_mesh-tester        PASS      5.75 seconds
+TestRunner_smp-tester         PASS      6.71 seconds
+TestRunner_userchan-tester    PASS      7.47 seconds
+IncrementalBuild              PASS      132.79 seconds
+
+Details
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
+
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+
 
 ---
+Regards,
+Linux Bluetooth
 
-Depends on the first patch.
----
- sound/virtio/virtio_card.c | 1 -
- 1 file changed, 1 deletion(-)
 
-diff --git a/sound/virtio/virtio_card.c b/sound/virtio/virtio_card.c
-index 2da20c625247..7805daea0102 100644
---- a/sound/virtio/virtio_card.c
-+++ b/sound/virtio/virtio_card.c
-@@ -438,7 +438,6 @@ static unsigned int features[] = {
- 
- static struct virtio_driver virtsnd_driver = {
- 	.driver.name = KBUILD_MODNAME,
--	.driver.owner = THIS_MODULE,
- 	.id_table = id_table,
- 	.feature_table = features,
- 	.feature_table_size = ARRAY_SIZE(features),
-
--- 
-2.34.1
-
+--===============6571274858547939088==--
