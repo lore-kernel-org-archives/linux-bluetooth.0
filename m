@@ -1,162 +1,181 @@
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2494F6E5EF
-	for <linux-bluetooth@vger.kernel.org>; Sun, 31 Mar 2024 09:34:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02A3914430C
+	for <linux-bluetooth@vger.kernel.org>; Sun, 31 Mar 2024 11:20:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711877643; cv=none; b=eDPSBr5ZVns9viOx/qC8i4nVE1OyG4NX7Hk9n2Hw6M34lik6KQTTY7QTmuMor2eqs/3eF9H2zXDvIZ1P/oEWxw4Pz65kuJuaLdpMMndMC/wpg4xEolVa/V2xd/qmUPnErXR6BbPDnRpTGdljMJwhztVRyzkAD0b/PQQ4/31bpKM=
+	t=1711884043; cv=none; b=PQnoM8FDcNWmGcraGLJBxICrM1h2Lfht3VmG9Glcv9ISHZErAp0t3RO9SoCjcI/IGw8jPPlVxMUtqY0DrGJuUSQGcLHBm8wCDfeWTnFdCJeD4WnP+31teY3F3meTEj0lpQAjz1BLQ7sbVSgjPlzIlamsZ1999ofXCtPqJAfX2K4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711877643; c=relaxed/simple;
-	bh=m0ako4n/X504pRyFhm5g63NiZWuph1p7zIFFtn/gmwg=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=TtL0PhXZ8TMXZfFvIg6pTPIDXvyaEs96OZxl77wAdHwkZMuNYNpXa1/SSs/Hgo4/+CihVwCUbocOn81ow4yJ9APzPL28MUZqzzZEv6Fr6CaoHz+JbVoNMDBdozqCYdGM1NMh92iXbgKck4y9yiWVN03c0O64AIOrmJQ0uuiNCmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eNpCrlLd; arc=none smtp.client-ip=209.85.222.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1711884043; c=relaxed/simple;
+	bh=HA92dRzVt3vZdgr5pQJY02em2UTWtsR+GLFyMiGbHw4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m1tBTK3Lp+mpwrC8OOTmBGpOqYaaLZDufWoBamCm4oesnba6zWPc8z3Ti5ZywYCr3EeYXp8nMnHFVj6Qx4t0+McvJJCZu6fPQmL62bcbOLzlHuSTMHrjl2AiRIzPWDlbl2ygcNJW0ME2nkcQAt7zIYPipG90yF0RpAExJqOLbzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a1hpBM37; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eNpCrlLd"
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-789f00aba19so239734385a.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 31 Mar 2024 02:34:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711877641; x=1712482441; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=lRRlN1xyRttIXxs3FqOf2H64eo/TJXX6ueh1CQc76Xw=;
-        b=eNpCrlLdPb0pd+qTY4pXvhv9Xd0tUNWx0gjkLDzo35+NirgsxKqkEluYk5YOSfTgE1
-         iJ1doVDLSoRX2gGIRRZfSasn6xeiTt58jbFVFCMz3j+yG30rVzP8VvmHc2HhNmGT2k1p
-         FobnYIOTDy+Es24Ut+a1O7yTXhwvq5tS8hcBVyNiwo713AlxRNmQ0b2czhB9xVKaOfuH
-         abLQChqIP3Ds+fa3MyAj34sB6KXG+1CEb6pwd0bBhMjWuizR5IisGSh0v+SQArH/wWRH
-         IVf/2W+/QxUMDhNIl6AkGa6/Hf+98lljyzCV5umJ2Go7H9vR7nATvD09VjPCxKCrF6HB
-         JwWQ==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a1hpBM37"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711884039;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZAFJ+0SeTqdsqNS6GC0N4AccV7yeFgGXHpRB2cwbNo4=;
+	b=a1hpBM37STJJF6S4p6MZ/xqDk30mYGAw7LDwe3Yv90w1dN4nMG8QdIQCQvG8OsC+ibYLUT
+	TIiWy+whVNi+KVxVZn3CO/ou3yxmfUeggs5iMrczirYm7DC+Yo5oIzll5k30NnKww/GwAO
+	7Sm2MySxPlfU2liFL9L+1brIAVyjJHM=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-253-s0BiESHIOQGCyW-4aI2MYQ-1; Sun, 31 Mar 2024 07:20:35 -0400
+X-MC-Unique: s0BiESHIOQGCyW-4aI2MYQ-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-414ae9b8c04so21085305e9.2
+        for <linux-bluetooth@vger.kernel.org>; Sun, 31 Mar 2024 04:20:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711877641; x=1712482441;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lRRlN1xyRttIXxs3FqOf2H64eo/TJXX6ueh1CQc76Xw=;
-        b=JTquzUycX5tZkDjQepK36ZS9fH1dp++J0ScyIRMx9UQpvpExdXZWYbIEQh0qZUaWj3
-         9jru8l4HVp0Zmu6+883QV74RoksAe+RT0/ZjClOZSWVHLTNyZumEbx/H3Q0Yy4Ltf2Ab
-         +lc0NXeobQtnuinuFXSAl60ENgyNKBMzW1tocpIyUeKsQZ7MLQrPCFbzv/rGQvvz0YuH
-         K2RcUzaG5xkg5ROwdWaPv3oM19H2aj9vQukQEYRyKissjpmH1ZvVOWpkIm9F/b+wao9F
-         QBvONo8XOQoc8y8+mDlse3ONPqQOvLO5/VmOvYwUVmyNLIrPDr9v+wS4HkQKQtZBldAc
-         CXkQ==
-X-Gm-Message-State: AOJu0YxM+hUK6h8phYI1y8gwRQ6PM/lLOvlRl4xg8yoRdyGtjHbzNY5i
-	qvZ+hnW24sfMA6JfBuXLj5fjHxdkD+pu0ivRHuuuvy+q2GhHJdaCRw8qGz2W
-X-Google-Smtp-Source: AGHT+IEew89HhPvYYNRt2PpK1C8yUg0TfbzZWuLnA28vvKx/j5E/jWm5z+b/Opa/vpxgiSFXskm/9w==
-X-Received: by 2002:a05:622a:104c:b0:432:e819:2440 with SMTP id f12-20020a05622a104c00b00432e8192440mr1427653qte.50.1711877640669;
-        Sun, 31 Mar 2024 02:34:00 -0700 (PDT)
-Received: from [172.17.0.2] ([74.249.21.241])
-        by smtp.gmail.com with ESMTPSA id dr14-20020a05622a528e00b0042f43a486c9sm3456726qtb.77.2024.03.31.02.34.00
+        d=1e100.net; s=20230601; t=1711884034; x=1712488834;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZAFJ+0SeTqdsqNS6GC0N4AccV7yeFgGXHpRB2cwbNo4=;
+        b=dpmc7sHJ/o3AJHINnhfgDWsQcO5mKPWProhYd07Tn2kIoXVD4Y+QfvZUH6hIGoguTz
+         yJhnn6gZT2S0WVH8ofdOBYp4O6LeQ4tI3uQAgrDs62W9v53L7uBx2IPqc5FkusT0lwUU
+         7Yc1ssTU2cszSnLS7fAf/Uyuctemd9nu/Pu7bQljGlZWa/laFKmzT+uSueDKWEKh3BSa
+         e3aQGBFCPoJ9DJjYP84cOVwcRqBbBUVgg+90kG0SeoRIBrrmNEeX/QA4WWpNY9VEU0u4
+         K81hwEWAcbJLs0uS0baPYdCLoNVE/R68MMhCafVsnnWXDfnKLb23420vl2zdvtQWuPNb
+         +UFA==
+X-Forwarded-Encrypted: i=1; AJvYcCUWahmLvCybX4b4qUWwdaY/r5HXUAnyCb2Mdxm4oRnUqVfFtnz9g4Zu+uAiMZ2q9EgRDogJnVDgVb8Ji2uWZlcVRqssfEToiNiTCerkZ0oL
+X-Gm-Message-State: AOJu0YyN/Gp+tZSPUb2TZGswPaCAh1WsIyrpB3fO4cHF1bKrECXhzGpY
+	ReiQsFuesvnAO2DDGZwmO01Hds5eNnMrnLHr8PTF8xJh/mxEKYnWSkGq4J1uUciDFkFxPLCPePG
+	w9icHuPD6MPphKBjFpCcL7FgMHzYFpUUWVmuMgI2R/X0R1DCc14PUGzEy33Vliij8PQ==
+X-Received: by 2002:a05:600c:220f:b0:413:e19:337f with SMTP id z15-20020a05600c220f00b004130e19337fmr6115866wml.22.1711884034571;
+        Sun, 31 Mar 2024 04:20:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEhoN6xvj4jps7JZJhPCGbovoaf04BQIV4BBUP7925nSfWx1HPIV5PQzN7Ku2MIo02ql2sOQw==
+X-Received: by 2002:a05:600c:220f:b0:413:e19:337f with SMTP id z15-20020a05600c220f00b004130e19337fmr6115845wml.22.1711884033951;
+        Sun, 31 Mar 2024 04:20:33 -0700 (PDT)
+Received: from redhat.com ([2a02:14f:173:c52c:ce6f:ec9c:ca7c:7200])
+        by smtp.gmail.com with ESMTPSA id u22-20020a05600c139600b004148d7b889asm14465567wmf.8.2024.03.31.04.20.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 31 Mar 2024 02:34:00 -0700 (PDT)
-Message-ID: <66092e08.050a0220.9e1c3.144d@mx.google.com>
-Date: Sun, 31 Mar 2024 02:34:00 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6571274858547939088=="
+        Sun, 31 Mar 2024 04:20:33 -0700 (PDT)
+Date: Sun, 31 Mar 2024 07:20:24 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: virtualization@lists.linux.dev, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
+	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev,
+	kvm@vger.kernel.org, linux-wireless@vger.kernel.org,
+	nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	alsa-devel@alsa-project.org, linux-sound@vger.kernel.org
+Subject: Re: [PATCH 01/22] virtio: store owner from modules with
+ register_virtio_driver()
+Message-ID: <20240331071546-mutt-send-email-mst@kernel.org>
+References: <20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org>
+ <20240327-module-owner-virtio-v1-1-0feffab77d99@linaro.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, krzysztof.kozlowski@linaro.org
-Subject: RE: virtio: store owner from modules with register_virtio_driver()
-In-Reply-To: <20240331-module-owner-virtio-v2-1-98f04bfaf46a@linaro.org>
-References: <20240331-module-owner-virtio-v2-1-98f04bfaf46a@linaro.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240327-module-owner-virtio-v1-1-0feffab77d99@linaro.org>
 
---===============6571274858547939088==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=840075
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      16.10 seconds
-GitLint                       PASS      8.38 seconds
-SubjectPrefix                 FAIL      3.36 seconds
-BuildKernel                   PASS      29.69 seconds
-CheckAllWarning               PASS      32.17 seconds
-CheckSparse                   PASS      47.13 seconds
-CheckSmatch                   FAIL      34.47 seconds
-BuildKernel32                 PASS      28.48 seconds
-TestRunnerSetup               PASS      511.48 seconds
-TestRunner_l2cap-tester       PASS      17.82 seconds
-TestRunner_iso-tester         PASS      27.95 seconds
-TestRunner_bnep-tester        PASS      4.67 seconds
-TestRunner_mgmt-tester        PASS      112.35 seconds
-TestRunner_rfcomm-tester      PASS      7.24 seconds
-TestRunner_sco-tester         PASS      14.85 seconds
-TestRunner_ioctl-tester       PASS      7.66 seconds
-TestRunner_mesh-tester        PASS      5.75 seconds
-TestRunner_smp-tester         PASS      6.71 seconds
-TestRunner_userchan-tester    PASS      7.47 seconds
-IncrementalBuild              PASS      132.79 seconds
-
-Details
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: CheckSmatch - FAIL
-Desc: Run smatch tool with source
-Output:
-
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
-make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
-make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: net] Error 2
-make[2]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
-make[4]: *** Waiting for unfinished jobs....
-make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
-make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
-make: *** [Makefile:240: __sub-make] Error 2
+On Wed, Mar 27, 2024 at 01:40:54PM +0100, Krzysztof Kozlowski wrote:
+> Modules registering driver with register_virtio_driver() might forget to
+> set .owner field.  i2c-virtio.c for example has it missing.  The field
+> is used by some of other kernel parts for reference counting
+> (try_module_get()), so it is expected that drivers will set it.
+> 
+> Solve the problem by moving this task away from the drivers to the core
+> amba bus code, just like we did for platform_driver in
+> commit 9447057eaff8 ("platform_device: use a macro instead of
+> platform_driver_register").
+> 
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
 
----
-Regards,
-Linux Bluetooth
+
+This makes sense. So this will be:
+
+Fixes: 3cfc88380413 ("i2c: virtio: add a virtio i2c frontend driver")
+Cc: "Jie Deng" <jie.deng@intel.com>
+
+and I think I will pick this patch for this cycle to fix
+the bug. The cleanups can go in the next cycle.
 
 
---===============6571274858547939088==--
+> ---
+>  Documentation/driver-api/virtio/writing_virtio_drivers.rst | 1 -
+>  drivers/virtio/virtio.c                                    | 6 ++++--
+>  include/linux/virtio.h                                     | 7 +++++--
+>  3 files changed, 9 insertions(+), 5 deletions(-)
+> 
+> diff --git a/Documentation/driver-api/virtio/writing_virtio_drivers.rst b/Documentation/driver-api/virtio/writing_virtio_drivers.rst
+> index e14c58796d25..e5de6f5d061a 100644
+> --- a/Documentation/driver-api/virtio/writing_virtio_drivers.rst
+> +++ b/Documentation/driver-api/virtio/writing_virtio_drivers.rst
+> @@ -97,7 +97,6 @@ like this::
+>  
+>  	static struct virtio_driver virtio_dummy_driver = {
+>  		.driver.name =  KBUILD_MODNAME,
+> -		.driver.owner = THIS_MODULE,
+>  		.id_table =     id_table,
+>  		.probe =        virtio_dummy_probe,
+>  		.remove =       virtio_dummy_remove,
+> diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
+> index f173587893cb..9510c551dce8 100644
+> --- a/drivers/virtio/virtio.c
+> +++ b/drivers/virtio/virtio.c
+> @@ -362,14 +362,16 @@ static const struct bus_type virtio_bus = {
+>  	.remove = virtio_dev_remove,
+>  };
+>  
+> -int register_virtio_driver(struct virtio_driver *driver)
+> +int __register_virtio_driver(struct virtio_driver *driver, struct module *owner)
+>  {
+>  	/* Catch this early. */
+>  	BUG_ON(driver->feature_table_size && !driver->feature_table);
+>  	driver->driver.bus = &virtio_bus;
+> +	driver->driver.owner = owner;
+> +
+>  	return driver_register(&driver->driver);
+>  }
+> -EXPORT_SYMBOL_GPL(register_virtio_driver);
+> +EXPORT_SYMBOL_GPL(__register_virtio_driver);
+>  
+>  void unregister_virtio_driver(struct virtio_driver *driver)
+>  {
+> diff --git a/include/linux/virtio.h b/include/linux/virtio.h
+> index b0201747a263..26c4325aa373 100644
+> --- a/include/linux/virtio.h
+> +++ b/include/linux/virtio.h
+> @@ -170,7 +170,7 @@ size_t virtio_max_dma_size(const struct virtio_device *vdev);
+>  
+>  /**
+>   * struct virtio_driver - operations for a virtio I/O driver
+> - * @driver: underlying device driver (populate name and owner).
+> + * @driver: underlying device driver (populate name).
+>   * @id_table: the ids serviced by this driver.
+>   * @feature_table: an array of feature numbers supported by this driver.
+>   * @feature_table_size: number of entries in the feature table array.
+> @@ -208,7 +208,10 @@ static inline struct virtio_driver *drv_to_virtio(struct device_driver *drv)
+>  	return container_of(drv, struct virtio_driver, driver);
+>  }
+>  
+> -int register_virtio_driver(struct virtio_driver *drv);
+> +/* use a macro to avoid include chaining to get THIS_MODULE */
+> +#define register_virtio_driver(drv) \
+> +	__register_virtio_driver(drv, THIS_MODULE)
+> +int __register_virtio_driver(struct virtio_driver *drv, struct module *owner);
+>  void unregister_virtio_driver(struct virtio_driver *drv);
+>  
+>  /* module_virtio_driver() - Helper macro for drivers that don't do
+> 
+> -- 
+> 2.34.1
+
