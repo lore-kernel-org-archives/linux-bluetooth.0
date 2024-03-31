@@ -1,107 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A02CA146D40
-	for <linux-bluetooth@vger.kernel.org>; Sun, 31 Mar 2024 16:56:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 336FC146D65;
+	Sun, 31 Mar 2024 19:14:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711904170; cv=none; b=M7hn+i7XBPQwNewnoRpKLwZp7hPYhSO8noAgDV6xHe2OmdGMr0P0VM/O3mUW/PoYhC6a42XrFcSeHm+3LbIGVq8oeB3ElSrRPBQx3UOTwIuweaGEOQWnk6ahP2ZpHZM4Ik4FuwpEu1ORyV2NonssN3XelQS+fb900jYO8ys4d5w=
+	t=1711912498; cv=none; b=oh+O+MSTwZtz3rMb9RxAFvq0sd4dbREus/XhsuLVEwvCpQTa0MIRGF+UqVrNnoG30Se8RLjt/9svBVLIQwSTcs6ROPMAXbuJC66+3LztDAslqTJ1cUR2nFJYUhQR2BjAkgUW4+ulifnQrROPEpGN6KQR+M1bNjHp4Si+w5qw9Ro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711904170; c=relaxed/simple;
-	bh=jWSvyXrRhKBkq/L8S6xxkq6T19+HFY+Qqm+53vYrpSo=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ItX0BGOKCTYkJUZnFPUsdtcpbA/icK5QxiZkLSskRTh4sNVJ8cdKGxjaSiBk4mr3wXIVGAVPdwo6TwfNRsv738Hb4ky6eLNII4F0eSg1cGBVjZB/sHLPFNRLInpgaMd0J82JuFki8NiLwtq2HpT5v7GQN0/0vTy6JpEU04fcWo4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hgz8jqCY; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hgz8jqCY"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1B869C43390
-	for <linux-bluetooth@vger.kernel.org>; Sun, 31 Mar 2024 16:56:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711904170;
-	bh=jWSvyXrRhKBkq/L8S6xxkq6T19+HFY+Qqm+53vYrpSo=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=hgz8jqCY+V4qz7IHSl0cLGMJZX/1r6I+uTWqC+3sMmqr1aUMWzFmWjzJeAhpel/GQ
-	 rr8rcioExTO0yk1yCL4XqDOWxwjebBd3w2+G3EHEcLjwFqh0Cze0qnFx8sA88iIgDY
-	 oKacWjXHjh7tkKzXzY/O2A2UhvzFj7hlNPFAHdS7H4jGxgrCIKVKGdhRaJMpAKZ/uD
-	 ss9QHwxLqpORtDVFVllGzbedQkkvxjv9smGv96yG5GAxLSZo4RDTfLnWzbwx2Qsfs1
-	 QFcGRs+8EVpHQvfLzGxsozdXNXkxQlNGMaVe/M4pu7fdOJ6bpB9WHp+Jpg+Cz4UJa5
-	 44JnHOL+NECCw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 0CFFDC53BD7; Sun, 31 Mar 2024 16:56:10 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 218651] kernel 6.8.2 - Bluetooth bug/dump at boot
-Date: Sun, 31 Mar 2024 16:56:09 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: wolf.seifert@web.de
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-218651-62941-rBrGRweMD8@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218651-62941@https.bugzilla.kernel.org/>
-References: <bug-218651-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1711912498; c=relaxed/simple;
+	bh=aisnBOSe6twHW7ZdfD8orcM1pcSwRgzSY+oaCtUg+fQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oaddLqaYhj38gbrRb+5S3E5fETBJnjBr6Oe8of6qM/G6vVUMM4YKHovxK8jjaJ5u8XfTSP/sRu6lpDw+EPm4+VjfIZjT9vV5i8mEol4eG4BPW189xl1Goget4l0Sw2IT2c6Bhe7+Do/Gopoy8uSbiQcDrmAxvXRg7IVmEiAF0+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EA63713D5;
+	Sun, 31 Mar 2024 12:15:20 -0700 (PDT)
+Received: from bogus (unknown [10.57.81.195])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0E84A3F64C;
+	Sun, 31 Mar 2024 12:14:34 -0700 (PDT)
+Date: Sun, 31 Mar 2024 20:14:32 +0100
+From: Sudeep Holla <sudeep.holla@arm.com>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	David Hildenbrand <david@redhat.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Gonglei <arei.gonglei@huawei.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Cristian Marussi <cristian.marussi@arm.com>,
+	Viresh Kumar <vireshk@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	David Airlie <airlied@redhat.com>,
+	Gurchetan Singh <gurchetansingh@chromium.org>,
+	Chia-I Wu <olvaffe@gmail.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Daniel Vetter <daniel@ffwll.ch>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Alexander Graf <graf@amazon.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Latchesar Ionkov <lucho@ionkov.net>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Christian Schoenebeck <linux_oss@crudebyte.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	Kalle Valo <kvalo@kernel.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Vishal Verma <vishal.l.verma@intel.com>,
+	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>,
+	Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>,
+	"James E.J. Bottomley" <jejb@linux.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>,
+	Anton Yakovlev <anton.yakovlev@opensynergy.com>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	virtualization@lists.linux.dev, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
+	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev,
+	kvm@vger.kernel.org, linux-wireless@vger.kernel.org,
+	nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	Sudeep Holla <sudeep.holla@arm.com>, alsa-devel@alsa-project.org,
+	linux-sound@vger.kernel.org
+Subject: Re: [PATCH v2 11/25] firmware: arm_scmi: virtio: drop owner
+ assignment
+Message-ID: <20240331191432.sfp5dq6nyvf4yf34@bogus>
+References: <20240331-module-owner-virtio-v2-0-98f04bfaf46a@linaro.org>
+ <20240331-module-owner-virtio-v2-11-98f04bfaf46a@linaro.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240331-module-owner-virtio-v2-11-98f04bfaf46a@linaro.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218651
+On Sun, Mar 31, 2024 at 10:43:58AM +0200, Krzysztof Kozlowski wrote:
+> virtio core already sets the .owner, so driver does not need to.
+>
 
---- Comment #19 from wolf.seifert@web.de ---
-(In reply to The Linux kernel's regression tracker (Thorsten Leemhuis) from
-comment #18)
-> If the kernel without the patch (In reply to wolf.seifert from comment #1=
-7)
-> >
-> > Although the git bisect gave the same git commit, the problem is probab=
-ly
-> > different and the suggested fix did not work.
-> >=20
-> > See
-> > https://bbs.archlinux.org/viewtopic.php?pid=3D2161135#p2161135
-> > for details.
->=20
-> Spreading feedback over multiple places makes things hard.
->=20
-> And journalctl -k / dmesg would be helpful.=20
->=20
-> Did your kernel threw that "kernel: BUG: kernel NULL pointer dereference"
-> before the fix? If it did not, it was a different problem to begin with a=
-nd
-> worth its own ticket, as things otherwise get confusing.=20
->=20
-> Or did the kernel throw that error and it's gone now, but things are not
-> working? Then the patch helped -- but there might be another problem or t=
-he
-> fix is not enough. Building a 6.8.2 kernel with the culprit removed could
-> help to narrow things down.
+Acked-by: Sudeep Holla <sudeep.holla@arm.com>
 
-Sorry for the confusion! In fact I never had this "kernel: BUG: kernel NULL
-pointer dereference", but other people having this commented my original po=
-st,
-so things got messed up.
-
-Anyway, the git bisection is probably o.k., only the problem is different. I
-will try to clarify and open a own ticket.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+-- 
+Regards,
+Sudeep
