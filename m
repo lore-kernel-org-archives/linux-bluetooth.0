@@ -1,325 +1,153 @@
-Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ADDE4EB24
-	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Apr 2024 18:58:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80875249E4
+	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Apr 2024 19:02:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711997899; cv=none; b=MjP5WdA/Yas0NF4/bfFUyl4GM+0DRRDToxJmRRItDQabLbKRb/KZFRxq8AagxWBSqHMqoZ1VBSHW5WJgTfL9o/0lplJzVH+XKqxJL23O3ViFE0cPZNTGDAAnqBQ4Z9tbaz/rfMR+i6JoMMJhafBTXeJrD+1aeFpL8GW4tGN7RUM=
+	t=1711998154; cv=none; b=ckrf9WAsiVo/rLzcuCuJceS9+YKCSuBRG6CcRTjPaHExcpFOqtoIIJgdwY421tNhlZGQ5FdSVjYDQZm5kDAUE9plKWU5G/AbEccADweQt3sRU9vf4Ajjr3Cl/JZucM1zZgH8m/bmdCwE2mMUW1UNQ50C8NDAvVRF0OwvNwwxsKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711997899; c=relaxed/simple;
-	bh=hw8OXYTtBKtj9JO0Gr0/1t8xbk4BmKmZqW3GagAzeF8=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=K10L8utiivFhGhBS6v5bfnNgab09BHh5DpeXB2d9mtZX/kXy2rS88PH3puZVtL+bYSBGzwPHHSntb9xRzalYM207HXaNoEYypB0urW4UExXZbn6s1m79QHJjj48rdf8z5E2lb91Y4ffOtyJIsRX1rVkg1sbUfo9luaBW8W8NQgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VhWC0yhI; arc=none smtp.client-ip=209.85.219.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VhWC0yhI"
-Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-dc6dcd9124bso4065528276.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Apr 2024 11:58:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711997896; x=1712602696; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5OQ2+f5h0a/jQeGROK30s9fYXFaaR/lH4klznMiUDcY=;
-        b=VhWC0yhI5kefcalmyQsSnmRMLJtOI9zHf1jmat4gdXgBFHEGnAfspN3aAuBFrS7yqp
-         20ylHPU1UZFFLaFOu7vphvm1QauxDxwoqUYNMvslymPF+CNYVV/U6eQBuoxQ7HBfVAkv
-         NSDAB06rlgID3KE3Fktl9+97dzUYBvoXmv/5CHiUcz49OBKo3c2as/7ITRgzoBtmAwfi
-         GvY58fvUB1YlKtktIcEGA4TQ5gkA/CnEUs1hMnzBBwJ8QgrxQdMLZR+/wecpTnO2phTB
-         Mj8IOiY1DWPgK5P03A5CKuDvPkCvGmDxsHZ93C7PQO+1FdyB+1+oB6vvPjySfcrxKrnS
-         XF7w==
+	s=arc-20240116; t=1711998154; c=relaxed/simple;
+	bh=9gVCugrtMVlxFl0fvxh1v0DkRcOwHPfTloU3gfeVGpE=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=tnget050Uqdz9cd8ezvgkN9MUSMJ65HPAHlcwHbncwYrW4t61+fDxHqxIb/rNkdZEHnvrYsPu8dguBeb9yy7QyHFF/qd2R6RnXAscNf8FG0GAaKdB0Yt5LXsfWcD9/JvXduPZTwEqvxnAvrZPWQ5wyhIjOx1vFMDKgsXRc2TI5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7d096c4d663so465164739f.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Apr 2024 12:02:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711997896; x=1712602696;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5OQ2+f5h0a/jQeGROK30s9fYXFaaR/lH4klznMiUDcY=;
-        b=GbXuzLG3eZYVfhq2JrJyGaCXF8UhTZZfkgeQt7WkQlpSdLtV5tchRvmcjc2O78sIC7
-         klK/qivViswpFdhFLbA7iG7VsB83HJfKPT3zWfDQyPXgYSGxHKK9gLJbtJuGJx3Fj8fD
-         yHzufeEJxQGZMaXab5GJ0RO+WmLAR5467F8lxemsW7pQyDy4Lg9M5hR8GIDvJyMuFhrH
-         2tpAcnl/gBW3HcxBW+LPuO0pxW39uMCBmNhN4nUu0DOktYaqtpOuaKAhxelYBk00s+8l
-         Vlmdcgl5N2EsQsAlxVizXdzOt8cnGVfLS7iCeTj10v+e/KrEDqCYeOl01GxRVKQrmOw6
-         3rMQ==
-X-Gm-Message-State: AOJu0YyBfqhbP4m51VfIWwKXgY2D8N62jHoiSXVR+QJQzYTN7OrpD/Z2
-	i5tdgfFDf2yhJo5ep8Du+8GKPpmuGZmfOZ/GX+5eWIez7O73SarUyad/fmfS
-X-Google-Smtp-Source: AGHT+IHnkKoescqXHuE3AEFctXQSQXki3MZVSZ1OICLVk9eQ6EaJ2BwH15Cjt9uCxSVvHoNPq6LmBw==
-X-Received: by 2002:a25:1e54:0:b0:dcd:3d6:68ad with SMTP id e81-20020a251e54000000b00dcd03d668admr7641989ybe.0.1711997895819;
-        Mon, 01 Apr 2024 11:58:15 -0700 (PDT)
-Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id o9-20020a25ea49000000b00dcc234241c4sm2153739ybe.55.2024.04.01.11.58.13
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Apr 2024 11:58:13 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v4 3/3] input/device: Add replay support
-Date: Mon,  1 Apr 2024 14:58:08 -0400
-Message-ID: <20240401185808.2520694-3-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240401185808.2520694-1-luiz.dentz@gmail.com>
-References: <20240401185808.2520694-1-luiz.dentz@gmail.com>
+        d=1e100.net; s=20230601; t=1711998151; x=1712602951;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6kDZew4ve18Pfr/WRK0uNVQv+L79Eyyay4NBpvHc3H0=;
+        b=SKx9SRYh8GNT0nyIVAJ9x0Y3IkECzJibuifOVIxxq2wPLDbr7IkG0DNCZRP6cXDhAH
+         sCowfpPxmA0FZO7eipl0Y77scOPotW3Zb3Ok+ZtT7EyWOpvEh71dfDu9+he/HFNtzJ2I
+         XZPtv+uhaxpLMU/lN3CxJ9/Qg0nU7b0GJdPWyqNTyV2/eGLMn7t0tnGMvoANWslWgV5Y
+         fCQxAOF4dwVYBzV9on6ucCa7vYpa9nEvibNcOvjkOCQGCKMkDXykr10OgRGMVFWo2/jm
+         iG6NkOIcAuLDdyYLtJ0PKKLL4WBbeD4z5LTQ/o/hMfnW2DcPa83HU1bmjvIGdBfAigzm
+         Oimw==
+X-Forwarded-Encrypted: i=1; AJvYcCUNbJfznfQZZlkaL73yth0IQ0LoKGJjjKBTbPPaJzs+V4jHzCMRLQW6palwwwYQAHRcCcOgSVBkprH248ep03ttriXjU7I2UEbrB9slsNUi
+X-Gm-Message-State: AOJu0Yz7PgJGdCCJxJLZAf/QtQBMBVzqeSVDL41/2tulpV2xYTSyylt4
+	ezczzrDh7Bk4RrnBcbmJohTyqXCM52LiPCNVWiBHsqMJSZU/W2W4DTtOBwUbLfHFDyvDK29s6ML
+	iz/hwfG1mJtLgi5PLusD1qdX3d52gxQkhcRk9nz5wVmxGDYy6cUzRUO8=
+X-Google-Smtp-Source: AGHT+IGPdUoeo2l8+p6J+8T0SDvD3uXH+t5qJvwMHr/CxnKGVczBxzShD1ENUG53XJAvp7t+LPn3vcoSC9dy0b3io7FCKAdWBG3z
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6638:1641:b0:47e:c8fb:e9e7 with SMTP id
+ a1-20020a056638164100b0047ec8fbe9e7mr423957jat.2.1711998151394; Mon, 01 Apr
+ 2024 12:02:31 -0700 (PDT)
+Date: Mon, 01 Apr 2024 12:02:31 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000ab9af106150da113@google.com>
+Subject: [syzbot] [bluetooth?] memory leak in corrupted (2)
+From: syzbot <syzbot+e1c69cadec0f1a078e3d@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hello,
 
-This adds replay support when uhid is in use and the input node is keep
-while disconnected:
+syzbot found the following issue on:
 
-Fixes: https://github.com/bluez/bluez/issues/777
+HEAD commit:    39cd87c4eb2b Linux 6.9-rc2
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1605e039180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=25b176ce9d4c8dbf
+dashboard link: https://syzkaller.appspot.com/bug?extid=e1c69cadec0f1a078e3d
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10c59af9180000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/69179c757379/disk-39cd87c4.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/adff5d3652af/vmlinux-39cd87c4.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/b614bf284a7d/bzImage-39cd87c4.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+e1c69cadec0f1a078e3d@syzkaller.appspotmail.com
+
+BUG: memory leak
+unreferenced object 0xffff888109ffe280 (size 640):
+  comm "syz-executor.0", pid 5071, jiffies 4294942273
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 01 1a 0c 01 02 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace (crc d037fcd3):
+    [<ffffffff8165cfec>] kmemleak_alloc_recursive include/linux/kmemleak.h:42 [inline]
+    [<ffffffff8165cfec>] slab_post_alloc_hook mm/slub.c:3802 [inline]
+    [<ffffffff8165cfec>] slab_alloc_node mm/slub.c:3845 [inline]
+    [<ffffffff8165cfec>] kmem_cache_alloc_node+0x28c/0x330 mm/slub.c:3888
+    [<ffffffff84337006>] kmalloc_reserve+0xe6/0x180 net/core/skbuff.c:577
+    [<ffffffff8433aa85>] __alloc_skb+0xd5/0x220 net/core/skbuff.c:668
+    [<ffffffff84a79b1b>] alloc_skb include/linux/skbuff.h:1313 [inline]
+    [<ffffffff84a79b1b>] bt_skb_alloc include/net/bluetooth/bluetooth.h:489 [inline]
+    [<ffffffff84a79b1b>] hci_prepare_cmd+0x2b/0xb0 net/bluetooth/hci_request.c:219
+    [<ffffffff84a7a147>] hci_req_add_ev net/bluetooth/hci_request.c:253 [inline]
+    [<ffffffff84a7a147>] hci_req_add+0x57/0xe0 net/bluetooth/hci_request.c:273
+    [<ffffffff84a0c231>] hci_scan_req+0x41/0x70 net/bluetooth/hci_core.c:73
+    [<ffffffff84a79550>] __hci_req_sync+0x70/0x3c0 net/bluetooth/hci_request.c:128
+    [<ffffffff84a79aa7>] hci_req_sync+0x67/0xa0 net/bluetooth/hci_request.c:204
+    [<ffffffff84a117d3>] hci_dev_cmd+0x3f3/0x550 net/bluetooth/hci_core.c:790
+    [<ffffffff84a5436c>] hci_sock_ioctl+0x3ec/0x6f0 net/bluetooth/hci_sock.c:1153
+    [<ffffffff843227d2>] sock_do_ioctl+0x82/0x1a0 net/socket.c:1222
+    [<ffffffff843249fe>] sock_ioctl+0x14e/0x480 net/socket.c:1341
+    [<ffffffff817356f6>] vfs_ioctl fs/ioctl.c:51 [inline]
+    [<ffffffff817356f6>] __do_sys_ioctl fs/ioctl.c:904 [inline]
+    [<ffffffff817356f6>] __se_sys_ioctl fs/ioctl.c:890 [inline]
+    [<ffffffff817356f6>] __x64_sys_ioctl+0xf6/0x150 fs/ioctl.c:890
+    [<ffffffff85089f05>] do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+    [<ffffffff85089f05>] do_syscall_64+0xa5/0x1e0 arch/x86/entry/common.c:83
+    [<ffffffff8520012b>] entry_SYSCALL_64_after_hwframe+0x72/0x7a
+
+BUG: memory leak
+unreferenced object 0xffff88810c96b300 (size 240):
+  comm "kworker/u9:1", pid 4479, jiffies 4294942273
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace (crc b92bbddd):
+    [<ffffffff8165c6c1>] kmemleak_alloc_recursive include/linux/kmemleak.h:42 [inline]
+    [<ffffffff8165c6c1>] slab_post_alloc_hook mm/slub.c:3802 [inline]
+    [<ffffffff8165c6c1>] slab_alloc_node mm/slub.c:3845 [inline]
+    [<ffffffff8165c6c1>] kmem_cache_alloc+0x271/0x310 mm/slub.c:3852
+    [<ffffffff84341f6a>] skb_clone+0xaa/0x190 net/core/skbuff.c:2063
+    [<ffffffff84a0cbdb>] hci_send_cmd_sync net/bluetooth/hci_core.c:4220 [inline]
+    [<ffffffff84a0cbdb>] hci_cmd_work+0x1db/0x200 net/bluetooth/hci_core.c:4240
+    [<ffffffff812ec200>] process_one_work+0x290/0x630 kernel/workqueue.c:3254
+    [<ffffffff812ed22d>] process_scheduled_works kernel/workqueue.c:3335 [inline]
+    [<ffffffff812ed22d>] worker_thread+0x2bd/0x510 kernel/workqueue.c:3416
+    [<ffffffff812fb36c>] kthread+0xfc/0x140 kernel/kthread.c:388
+    [<ffffffff811582b5>] ret_from_fork+0x45/0x60 arch/x86/kernel/process.c:147
+    [<ffffffff81002efa>] ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+
+
+
 ---
- profiles/input/device.c | 169 +++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 168 insertions(+), 1 deletion(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/profiles/input/device.c b/profiles/input/device.c
-index b622ee8cd681..b3d69d86f3d4 100644
---- a/profiles/input/device.c
-+++ b/profiles/input/device.c
-@@ -42,6 +42,8 @@
- #include "src/sdp-client.h"
- #include "src/shared/timeout.h"
- #include "src/shared/uhid.h"
-+#include "src/shared/util.h"
-+#include "src/shared/queue.h"
- 
- #include "device.h"
- #include "hidp_defs.h"
-@@ -55,6 +57,19 @@ enum reconnect_mode_t {
- 	RECONNECT_ANY
- };
- 
-+struct hidp_msg {
-+	uint8_t hdr;
-+	struct iovec *iov;
-+};
-+
-+struct hidp_replay {
-+	bool replaying;
-+	struct queue *out;
-+	struct queue *in;
-+	struct queue *re_out;
-+	struct queue *re_in;
-+};
-+
- struct input_device {
- 	struct btd_service	*service;
- 	struct btd_device	*device;
-@@ -78,6 +93,7 @@ struct input_device {
- 	uint32_t		report_rsp_id;
- 	bool			virtual_cable_unplug;
- 	unsigned int		idle_timer;
-+	struct hidp_replay	*replay;
- };
- 
- static int idle_timeout = 0;
-@@ -113,8 +129,30 @@ static bool input_device_bonded(struct input_device *idev)
- 				btd_device_get_bdaddr_type(idev->device));
- }
- 
-+static void hidp_msg_free(void *data)
-+{
-+	struct hidp_msg *msg = data;
-+
-+	util_iov_free(msg->iov, 1);
-+	free(msg);
-+}
-+
-+static void hidp_replay_free(struct hidp_replay *replay)
-+{
-+	if (!replay)
-+		return;
-+
-+	queue_destroy(replay->re_in, NULL);
-+	queue_destroy(replay->in, hidp_msg_free);
-+	queue_destroy(replay->re_out, NULL);
-+	queue_destroy(replay->out, hidp_msg_free);
-+	free(replay);
-+}
-+
- static void input_device_free(struct input_device *idev)
- {
-+	hidp_replay_free(idev->replay);
-+
- 	bt_uhid_unref(idev->uhid);
- 	btd_service_unref(idev->service);
- 	btd_device_unref(idev->device);
-@@ -246,12 +284,95 @@ static bool hidp_send_message(struct input_device *idev, GIOChannel *chan,
- 	return true;
- }
- 
-+static void hidp_replay_send(struct input_device *idev)
-+{
-+	struct hidp_msg *msg;
-+
-+	if (!idev->replay || !idev->replay->replaying)
-+		return;
-+
-+	msg = queue_pop_head(idev->replay->re_out);
-+	if (!msg) {
-+		DBG("uhid replay finished");
-+		idev->replay->replaying = false;
-+		return;
-+	}
-+
-+	DBG("hdr 0x%02x size %zu", msg->hdr, msg->iov->iov_len);
-+
-+	hidp_send_message(idev, NULL, msg->hdr, msg->iov->iov_base,
-+			  msg->iov->iov_len);
-+}
-+
-+static void hidp_replay_recv(struct input_device *idev, uint8_t hdr,
-+				const uint8_t *data, size_t size)
-+{
-+	struct hidp_msg *msg;
-+
-+	if (!idev->replay || !idev->replay->replaying)
-+		return;
-+
-+	msg = queue_pop_head(idev->replay->re_in);
-+
-+	if (msg && (msg->hdr != hdr || msg->iov->iov_len != size ||
-+			memcmp(msg->iov->iov_base, data, size)))
-+		error("uhid replay input error... discarding");
-+
-+	hidp_replay_send(idev);
-+}
-+
-+static struct hidp_replay *hidp_replay_new(void)
-+{
-+	struct hidp_replay *replay = new0(struct hidp_replay, 1);
-+
-+	replay->out = queue_new();
-+	replay->in = queue_new();
-+
-+	return replay;
-+}
-+
-+static void hidp_record_message(struct input_device *idev, bool out,
-+				uint8_t hdr, const uint8_t *data, size_t size)
-+{
-+	struct hidp_msg *msg;
-+	struct iovec iov = { (void *)data, size };
-+
-+	/* Only record messages if uhid has been created */
-+	if (!bt_uhid_created(idev->uhid))
-+		return;
-+
-+	if (idev->replay && idev->replay->replaying) {
-+		if (!out)
-+			hidp_replay_recv(idev, hdr, data, size);
-+		return;
-+	}
-+
-+	if (!idev->replay)
-+		idev->replay = hidp_replay_new();
-+
-+	msg = new0(struct hidp_msg, 1);
-+	msg->hdr = hdr;
-+	msg->iov = util_iov_dup(&iov, 1);
-+
-+	if (out) {
-+		DBG("output[%u]: hdr 0x%02x size %zu",
-+			queue_length(idev->replay->out), hdr, size);
-+		queue_push_tail(idev->replay->out, msg);
-+	} else {
-+		DBG("input[%u]: hdr 0x%02x size %zu",
-+			queue_length(idev->replay->in), hdr, size);
-+		queue_push_tail(idev->replay->in, msg);
-+	}
-+}
-+
- static bool hidp_send_ctrl_message(struct input_device *idev, uint8_t hdr,
- 					const uint8_t *data, size_t size)
- {
- 	if (hdr == (HIDP_TRANS_HID_CONTROL | HIDP_CTRL_VIRTUAL_CABLE_UNPLUG))
- 		idev->virtual_cable_unplug = true;
- 
-+	hidp_record_message(idev, true, hdr, data, size);
-+
- 	return hidp_send_message(idev, idev->ctrl_io, hdr, data, size);
- }
- 
-@@ -558,6 +679,12 @@ static bool hidp_recv_ctrl_message(GIOChannel *chan, struct input_device *idev)
- 	type = hdr & HIDP_HEADER_TRANS_MASK;
- 	param = hdr & HIDP_HEADER_PARAM_MASK;
- 
-+	/* While replaying don't involve the driver since it will likely get
-+	 * confused with messages it already things it has received.
-+	 */
-+	if (idev->replay && idev->replay->replaying)
-+		goto done;
-+
- 	switch (type) {
- 	case HIDP_TRANS_HANDSHAKE:
- 		hidp_recv_ctrl_handshake(idev, param);
-@@ -575,6 +702,9 @@ static bool hidp_recv_ctrl_message(GIOChannel *chan, struct input_device *idev)
- 		break;
- 	}
- 
-+done:
-+	hidp_record_message(idev, false, hdr, data + 1, len - 1);
-+
- 	return true;
- }
- 
-@@ -973,12 +1103,49 @@ static int ioctl_disconnect(struct input_device *idev, uint32_t flags)
- 	return err;
- }
- 
-+static void queue_append(void *data, void *user_data)
-+{
-+	queue_push_tail(user_data, data);
-+}
-+
-+static struct queue *queue_dup(struct queue *q)
-+{
-+	struct queue *dup;
-+
-+	if (!q || queue_isempty(q))
-+		return NULL;
-+
-+	dup = queue_new();
-+
-+	queue_foreach(q, queue_append, dup);
-+
-+	return dup;
-+}
-+
-+static void hidp_replay_init(struct input_device *idev)
-+{
-+	if (!idev->replay || idev->replay->replaying)
-+		return;
-+
-+	idev->replay->replaying = true;
-+
-+	queue_destroy(idev->replay->re_in, NULL);
-+	idev->replay->re_in = queue_dup(idev->replay->in);
-+
-+	queue_destroy(idev->replay->re_out, NULL);
-+	idev->replay->re_out = queue_dup(idev->replay->out);
-+
-+	hidp_replay_send(idev);
-+}
-+
- static int uhid_connadd(struct input_device *idev, struct hidp_connadd_req *req)
- {
- 	int err;
- 
--	if (bt_uhid_created(idev->uhid))
-+	if (bt_uhid_created(idev->uhid)) {
-+		hidp_replay_init(idev);
- 		return 0;
-+	}
- 
- 	err = bt_uhid_create(idev->uhid, req->name, &idev->src, &idev->dst,
- 				req->vendor, req->product, req->version,
--- 
-2.44.0
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
