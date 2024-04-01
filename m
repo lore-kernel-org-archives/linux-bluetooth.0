@@ -1,60 +1,65 @@
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED1E4F9DF
-	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Apr 2024 18:58:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119C34EB24
+	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Apr 2024 18:58:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711997894; cv=none; b=B3cq6f25GXf6cJCF+YuDbFwqnbpHcN9aJqk9VCifzJCGL/nA3oojqGSsbTQ8UoTH0pUiLQvS1+kT8m9sC+Du/uu5QerxWWAcinTzz5LtfDWvIfNokQ3PlpuoTe7u3WabwY5lf7gm6ww5tG0cs9D3EbLGmN3+xlJ+8hHJdIUdriM=
+	t=1711997896; cv=none; b=pcjMpe++3v6FxHxJvib+7nmB6ogp2xdvMK2XtuCXJYC2kHF5YSDby8ExmZ5eIVg0yt98+1MS3ftKaDW1OES6lyDZbFSjO25GeOarZkADw/n7J9IFoQ06UekQUZW/na6mz556YiZRK4Ql1rWgA+nvrDbfwRHby+hIjNUIYoXQzvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711997894; c=relaxed/simple;
-	bh=jc27TBSDxlljRPF07T3OnDVRGhlpgDIJWgSIqWSiYiM=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=f7W9a0JVEeH9A6+xazDsrEnC/AHcarHVHIpX7LahXfTgMOfWUlRiwlPNsrHX7IeJ7iU5zr2qgyNGRoWl9s97tj8oHy16fRXGZ/2JoJhaYK0PYwzihA9qo7OoHkxrMHzTZ6XWQKQdWq3bQLfTWoHRGGABXFwYrN/xajl9tkz6HSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OBz3o4ya; arc=none smtp.client-ip=209.85.128.179
+	s=arc-20240116; t=1711997896; c=relaxed/simple;
+	bh=oBYiZuw4EXH6CclXvwVXPz++tRo1ZT9usZqsMq50P3o=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=d+jHbPPDGda4dVYJB+zhVeQwDNrCeimtikHvY9CY8+TgeTfrQuSqnAajJwDZRKhI8WDRjxwfOl3uS9INCLaSHZkC5mRkEvwgLjRO+6ikAx+NfYQjGYawpWWAH9Ft+/TCyFpexEbzskib5+WVXVTH9Koq/4fiLvlU5pCdUnNIdAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WK0+NXLX; arc=none smtp.client-ip=209.85.219.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OBz3o4ya"
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-60a434ea806so47192097b3.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Apr 2024 11:58:12 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WK0+NXLX"
+Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-dcc6fc978ddso3366080276.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Apr 2024 11:58:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711997891; x=1712602691; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=cXA+oiwz2b8EHFOBjQLtlpM7ubcXnMrzwUHSkgQ2sUk=;
-        b=OBz3o4yaFnlio2b2MMhwX97tyoKz1hw9NLa6BFyj4v/PP4dYRNV9UtCx0VncJrM/wx
-         khn/fb9fM7Uxp2tj9EPr7uKYu0FBkdeP6JETVGfs+ur4y6vWamFWPagBj3qwiXVs6xWR
-         8i/NVJtP44mzHUmW5nr2GzcwVQerQSyk1DGyqRrvKeTtQNVviTnELZupZfHp9zoEl3FJ
-         L8m8KyoSoSnJthwXvrtI0D7dEVXSYNtp6xa5/Ap3aUD64C0Ni6O0M07m05aYxMm+XiQr
-         4nhN7iW9b8DV+voaIOP2ycqObT1koX8OnWkjqdpsYhLFW41jhIx4MzogtYvX4MKSTSrP
-         0ywQ==
+        d=gmail.com; s=20230601; t=1711997893; x=1712602693; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5xhyNVQ9ZSEd+DznykOtJOMpyp8tgw0j029Fgjisiwo=;
+        b=WK0+NXLXdnNeKWkMkSqs6oUwHJ+SY6b2Uc4v2obqGrIYWeKysQk9hm6WknOHdXnai+
+         wXPknpVLu81I4RSfsgGFvJnxeaFfjqQJIvLYFrp6mTfrYd+XBrmVt3349XC0Dy4JL0BH
+         E+S/GcbyQjee5X/AHcKiwoX23MqJLB0dodwanuYFFk0dtAduoY0Cf0CPKD4urDbO/+N1
+         ZJVTavwk8nJ/WfkWypNDJs6FkiaLvDDL6OoraboLRixfJN3HKrb9kNHfjpSv51epTLQB
+         vs4SeP4dH95LY9XyejsWe5Ch9il5V+kvz1DPxxB9Dgm6agfhJsDF/yyYQ0PraAC01WMZ
+         7DGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711997891; x=1712602691;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cXA+oiwz2b8EHFOBjQLtlpM7ubcXnMrzwUHSkgQ2sUk=;
-        b=oh2pf1oWwaU0MO+XS79SBmSd7UowHIDPgXgpHrfLx0cwWmttFPMPeL5ErevpdKj255
-         z80Pe+v1v8nagpIKXxaAxhwnl8Hh2hqg27/8IJQoctGFxTcG7APiUS2fPhz8LqiUP62h
-         GOmHPQWYYyLrUHrY1SeNFa02OqHwNXlpu8aFN1JseCcxsWSwo7MWY1tkTSnw5K8Ux096
-         PZe/OjObQzzCu3P4rc8auiKCQveehrNtxG6v5ztJTpGCiHGj+M5VsVHj0SVTAzs32RGk
-         dLe+V9kVhEVUnqexI2J50VrLV3ciiKV7k0/2wxZccZa7NoKUDwZxM/CD9YP4RJenhoHA
-         m7fQ==
-X-Gm-Message-State: AOJu0YwjWaMGKgeJL1E9Gx6R2DAc2Q/DDT5+yaYu7MnfvmMi0V5tExzj
-	9JEiGixvCSXlL9zldDBN4Tj0p3nZ9ppu79j5/lFcDv+gnD70Gb81dFlMXE8g
-X-Google-Smtp-Source: AGHT+IGeePDJ/1CBvfkj98bCvpFTbn/eSl4jPp8G3uy6fwVnurf0FFV8Tu+lKOQmjp/04L2wZ8C+3w==
-X-Received: by 2002:a25:1f82:0:b0:dd0:97e8:74e6 with SMTP id f124-20020a251f82000000b00dd097e874e6mr8361019ybf.55.1711997890844;
-        Mon, 01 Apr 2024 11:58:10 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1711997893; x=1712602693;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5xhyNVQ9ZSEd+DznykOtJOMpyp8tgw0j029Fgjisiwo=;
+        b=m/D2X7PGI1BoKSyYWgkoCg6YRIo/5NtuYfAHgv9Gqf3R1bVFFYpcT7RijKH4DRZews
+         /nkeTsFCfd12ucAFwWcRSVGvZFW/k0qU4HdX8JjtpYZ2e0uKAibl/0UYWp3pWTusW3hV
+         n2zVi067UtvO2fcn+GqfadWOySQIApvaAPXl30eHjGKmeAaUtZC9auUGmxGpLLSk+4CW
+         O2zPgut5I9rBOZouDm0G5+s0fUYp/ZUO9hPpUwUrysRgYb+Lz9IwTXtA2S4lW2VkTrkJ
+         WpHqWwYKk/bzev+s04oQOMP568BkEUsB/tUekEC4TSKd/RbNyT1je8/lGGt6MrDWhAxJ
+         ITew==
+X-Gm-Message-State: AOJu0Yx28PsvCDGzamFC50iiQQPSvJXwvb14bWO+m1XnF9ekYTUXGGiP
+	nu5xi4HLexdarY8avq7b9Yo2pir+o/EwlFps7dc17+sXhRjgsBygDgZtx/Mq
+X-Google-Smtp-Source: AGHT+IGRRK97d1wbPKPqlHKvj1RE5Pgu+KUt+pca5JKxOCZoWwWBLvRIad3LOhOYia1iuQRLEkTi5w==
+X-Received: by 2002:a25:ade0:0:b0:dcf:bf81:5f28 with SMTP id d32-20020a25ade0000000b00dcfbf815f28mr10192375ybe.0.1711997893281;
+        Mon, 01 Apr 2024 11:58:13 -0700 (PDT)
 Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id o9-20020a25ea49000000b00dcc234241c4sm2153739ybe.55.2024.04.01.11.58.09
+        by smtp.gmail.com with ESMTPSA id o9-20020a25ea49000000b00dcc234241c4sm2153739ybe.55.2024.04.01.11.58.11
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Apr 2024 11:58:10 -0700 (PDT)
+        Mon, 01 Apr 2024 11:58:11 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v4 1/3] input/device: Fix not handling IdleTimeout when uhid is in use
-Date: Mon,  1 Apr 2024 14:58:06 -0400
-Message-ID: <20240401185808.2520694-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v4 2/3] input.conf: Change IdleTimeout unit to be in seconds
+Date: Mon,  1 Apr 2024 14:58:07 -0400
+Message-ID: <20240401185808.2520694-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.44.0
+In-Reply-To: <20240401185808.2520694-1-luiz.dentz@gmail.com>
+References: <20240401185808.2520694-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -65,178 +70,42 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-When uhid is in use IdleTimeout was not taking any effect, this also
-attempt to force the destroy the input device node to make it useful
-for users that don't want to keep the input node forever.
+This changes IdleTimeout unit to be in seconds instead of in minutes
+which offer better granularity.
 ---
- profiles/input/device.c   | 86 +++++++++++++++++++++++++++------------
- profiles/input/input.conf |  2 +-
- 2 files changed, 61 insertions(+), 27 deletions(-)
+ profiles/input/input.conf | 5 +++--
+ profiles/input/manager.c  | 2 +-
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/profiles/input/device.c b/profiles/input/device.c
-index 1b28cdc174b1..b622ee8cd681 100644
---- a/profiles/input/device.c
-+++ b/profiles/input/device.c
-@@ -77,6 +77,7 @@ struct input_device {
- 	unsigned int		report_req_timer;
- 	uint32_t		report_rsp_id;
- 	bool			virtual_cable_unplug;
-+	unsigned int		idle_timer;
- };
- 
- static int idle_timeout = 0;
-@@ -139,6 +140,9 @@ static void input_device_free(struct input_device *idev)
- 		g_free(idev->req);
- 	}
- 
-+	if (idev->idle_timer)
-+		timeout_remove(idev->idle_timer);
-+
- 	if (idev->reconnect_timer > 0)
- 		timeout_remove(idev->reconnect_timer);
- 
-@@ -156,8 +160,54 @@ static void virtual_cable_unplug(struct input_device *idev)
- 	idev->virtual_cable_unplug = false;
- }
- 
--static bool hidp_send_message(GIOChannel *chan, uint8_t hdr,
--					const uint8_t *data, size_t size)
-+static int uhid_disconnect(struct input_device *idev, bool force)
-+{
-+	int err;
-+
-+	if (!bt_uhid_created(idev->uhid))
-+		return 0;
-+
-+	/* Only destroy the node if virtual cable unplug flag has been set */
-+	if (!idev->virtual_cable_unplug && !force)
-+		return 0;
-+
-+	bt_uhid_unregister_all(idev->uhid);
-+
-+	err = bt_uhid_destroy(idev->uhid);
-+	if (err < 0) {
-+		error("bt_uhid_destroy: %s", strerror(-err));
-+		return err;
-+	}
-+
-+	return err;
-+}
-+
-+static bool input_device_idle_timeout(gpointer user_data)
-+{
-+	struct input_device *idev = user_data;
-+
-+	idev->idle_timer = 0;
-+
-+	DBG("path=%s", idev->path);
-+
-+	uhid_disconnect(idev, true);
-+	connection_disconnect(idev, 0);
-+
-+	return false;
-+}
-+
-+static void input_device_idle_reset(struct input_device *idev)
-+{
-+	timeout_remove(idev->idle_timer);
-+
-+	if (idle_timeout)
-+		idev->idle_timer = timeout_add_seconds(idle_timeout,
-+					input_device_idle_timeout, idev,
-+					NULL);
-+}
-+
-+static bool hidp_send_message(struct input_device *idev, GIOChannel *chan,
-+				uint8_t hdr, const uint8_t *data, size_t size)
- {
- 	int fd;
- 	ssize_t len;
-@@ -191,6 +241,8 @@ static bool hidp_send_message(GIOChannel *chan, uint8_t hdr,
- 		return false;
- 	}
- 
-+	input_device_idle_reset(idev);
-+
- 	return true;
- }
- 
-@@ -200,13 +252,13 @@ static bool hidp_send_ctrl_message(struct input_device *idev, uint8_t hdr,
- 	if (hdr == (HIDP_TRANS_HID_CONTROL | HIDP_CTRL_VIRTUAL_CABLE_UNPLUG))
- 		idev->virtual_cable_unplug = true;
- 
--	return hidp_send_message(idev->ctrl_io, hdr, data, size);
-+	return hidp_send_message(idev, idev->ctrl_io, hdr, data, size);
- }
- 
- static bool hidp_send_intr_message(struct input_device *idev, uint8_t hdr,
- 					const uint8_t *data, size_t size)
- {
--	return hidp_send_message(idev->intr_io, hdr, data, size);
-+	return hidp_send_message(idev, idev->intr_io, hdr, data, size);
- }
- 
- static bool uhid_send_get_report_reply(struct input_device *idev,
-@@ -297,6 +349,8 @@ static bool hidp_recv_intr_data(GIOChannel *chan, struct input_device *idev)
- 		return true;
- 	}
- 
-+	input_device_idle_reset(idev);
-+
- 	hdr = data[0];
- 	if (hdr != (HIDP_TRANS_DATA | HIDP_DATA_RTYPE_INPUT)) {
- 		DBG("unsupported HIDP protocol header 0x%02x", hdr);
-@@ -313,28 +367,6 @@ static bool hidp_recv_intr_data(GIOChannel *chan, struct input_device *idev)
- 	return true;
- }
- 
--static int uhid_disconnect(struct input_device *idev, bool force)
--{
--	int err;
--
--	if (!bt_uhid_created(idev->uhid))
--		return 0;
--
--	/* Only destroy the node if virtual cable unplug flag has been set */
--	if (!idev->virtual_cable_unplug && !force)
--		return 0;
--
--	bt_uhid_unregister_all(idev->uhid);
--
--	err = bt_uhid_destroy(idev->uhid);
--	if (err < 0) {
--		error("bt_uhid_destroy: %s", strerror(-err));
--		return err;
--	}
--
--	return err;
--}
--
- static gboolean intr_watch_cb(GIOChannel *chan, GIOCondition cond, gpointer data)
- {
- 	struct input_device *idev = data;
-@@ -520,6 +552,8 @@ static bool hidp_recv_ctrl_message(GIOChannel *chan, struct input_device *idev)
- 		return true;
- 	}
- 
-+	input_device_idle_reset(idev);
-+
- 	hdr = data[0];
- 	type = hdr & HIDP_HEADER_TRANS_MASK;
- 	param = hdr & HIDP_HEADER_PARAM_MASK;
 diff --git a/profiles/input/input.conf b/profiles/input/input.conf
-index 00a34eb63de1..fc20c58b6b32 100644
+index fc20c58b6b32..273e15bc9c80 100644
 --- a/profiles/input/input.conf
 +++ b/profiles/input/input.conf
-@@ -6,7 +6,7 @@
+@@ -4,8 +4,9 @@
+ # particular interface
+ [General]
  
- # Set idle timeout (in minutes) before the connection will
- # be disconnect (defaults to 0 for no timeout)
--#IdleTimeout=30
-+#IdleTimeout=0
+-# Set idle timeout (in minutes) before the connection will
+-# be disconnect (defaults to 0 for no timeout)
++# Set idle timeout (in seconds) before the connection will be disconnect and
++# the input device is removed.
++# Defaults: 0 (disabled)
+ #IdleTimeout=0
  
  # Enable HID protocol handling in userspace input profile
- # Defaults to true (Use UHID instead of kernel HIDP)
+diff --git a/profiles/input/manager.c b/profiles/input/manager.c
+index 92789a003c89..f4598bcd4e47 100644
+--- a/profiles/input/manager.c
++++ b/profiles/input/manager.c
+@@ -89,7 +89,7 @@ static int input_init(void)
+ 							"IdleTimeout", &err);
+ 		if (!err) {
+ 			DBG("input.conf: IdleTimeout=%d", idle_timeout);
+-			input_set_idle_timeout(idle_timeout * 60);
++			input_set_idle_timeout(idle_timeout);
+ 		} else
+ 			g_clear_error(&err);
+ 
 -- 
 2.44.0
 
