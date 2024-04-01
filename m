@@ -1,186 +1,156 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28F464F5ED;
-	Mon,  1 Apr 2024 18:24:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A1EE4CDE0
+	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Apr 2024 18:55:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711995867; cv=none; b=Yt4l0Fe86x7WNKYqO/Pd9h82rNOI2C4JwCEmE+Feh4jB1z02foioFh2kcigpZ7SVP+fzUC9nEkgWOpW+cK6YBC1LuQuXwM2Is5d9DG43KQgEdur0xNlanLV/kGkNp+qUTc3bzrzlifirp/e3wov8882gy2u4Uxo/jo8h6R04rHE=
+	t=1711997731; cv=none; b=Ft8P78pf4qLJTCQMd9LPSx8Eo5xEPsi9ok+bR9/jUAz4M/NIAjoWBqACqFukzvr+dO0ImsF3slGja01IIaUEz5786O38YeTzwsaIlbmUKT378kSc2CoxbQM444jFZ/Ol6ngTWx3zJCrmiHJ8jxLxixmyiz7HcQsj5dK0mE7oVII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711995867; c=relaxed/simple;
-	bh=v5//NGqmsFVDnGzhvsk7EyqTibVqjq4qRRtWuGQKJsE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=NPuVuMbu9TXTSszgcduUx4bgn2PNygMFFEvvxrL2dKAcwtac3fAQESjry6HLcACW5KaIowkiG8EaHCexi7aFHY1TISOYjt1yG3yG253vNy1y/FeEYTZb6DUTGyMrPGTMwWOx2aIXv6jgLnAsLiofwbY+GRjJYfg1Dh58eoq/Kqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SGpDzeDq; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711997731; c=relaxed/simple;
+	bh=HeX7jbP0wf97qqNi37vp2GcM14JsxO1fmFLfXQGiK8U=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=gHwJDDpmwtjhn7Y+YG3ADG4oFvPyv872HWG46+eER4vtnMAjLz7BW5ksr/nAMWPnkXYE5BapYwJadplJueuDWCkNAUCGU+v4upNXJjmrv3N/DZ3kMNvp3eVa0eizrg9WxQvfWLHkTWdT7zyifI04WVV+8MbPmlLARVNJlL7K85Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MBmm4vYo; arc=none smtp.client-ip=209.85.219.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SGpDzeDq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14369C433C7;
-	Mon,  1 Apr 2024 18:24:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711995865;
-	bh=v5//NGqmsFVDnGzhvsk7EyqTibVqjq4qRRtWuGQKJsE=;
-	h=From:Date:Subject:To:Cc:From;
-	b=SGpDzeDq6M9jklr2zsSGYXjkwLg/8vHciarHq5sG97XFBCjttynIM86XN4UOhD7Ql
-	 CHB9RP69aOmjV/9jNGDX1RVsIPIMpDdzdvvdio43O1savIEro+l0AaD3wjaTjJBnGC
-	 fWhNfI/jS/N1GixCAQd99Bc59Kkd5zXzxEVRUM1NlIYBY6PioVD4yLi4i2PoHs9CLM
-	 uRVApnm0CQwFq5+kSZwiO/h7e9H+WKn0cSP4JixZNE/Kf5N6x3cRg554edOdJjY8aD
-	 wSZzUGbRsHav6ZS+3vPzZCEDo/MT33Gzxzx9CvgGf5UxIh+5/z/jPV99RGMTcSsbDJ
-	 hkwhu2NBATBhw==
-From: Nathan Chancellor <nathan@kernel.org>
-Date: Mon, 01 Apr 2024 11:24:17 -0700
-Subject: [PATCH bluetooth] Bluetooth: Fix type of len in
- {l2cap,sco}_sock_getsockopt_old()
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MBmm4vYo"
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-6990b53a2cbso7751426d6.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Apr 2024 11:55:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711997728; x=1712602528; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=eM5AVhBX3iAJ3K3rJIaCnrJsgwzZP1a0KwpP00D+olc=;
+        b=MBmm4vYoefsfRW7dqAS4WsCj36YdKg/zjSVRJVyGU8/Hc03zJb62IV+3/0KdoA8qFo
+         dLWzUyruAOA7GTkvPS4uNwmGfqTfBHUrV3gjwZI4WCIb051UHVTgssydNcpUU4ygTSGs
+         gNksP+tflSFC6FaOJYsq2lVnWUydD8Tz6Rm7VaoThVq9xvYTWtmElttg/bnCTdDdBYCp
+         bG6RnCn/98oTzGF/xNCpKlploECTVX7Tyru4wf1bhepTh9/AkuKU+nbGEEy/4kblZzGO
+         cFDOtCAt9VOVTuxulQnwTwCdQEbAPmPIvHiAjnhognAUli03NkiipaOZP0D9Otm7BYl0
+         G9OA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711997728; x=1712602528;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eM5AVhBX3iAJ3K3rJIaCnrJsgwzZP1a0KwpP00D+olc=;
+        b=t1brHjUBafNNeXyQ9v7vc0AeVEloYxawOWJvS90pg4qjf/wFuHrvaoaG4jktc/8xNb
+         W6VWWs63fBVk6Tubdh9wB2sYZh28pmV7i7cR+lrB7HJ9g3H/6dxU2JpjQp9vx2WkBFLH
+         YVJpU8lVvMiJsR65fWvQAvlahgz/egf0Fl7/wjIMygGNsNfToNjww8tyvu9Bv/asXXgI
+         JxDD68hROPLkRiHXwrY/dV6ErJnvSP+2/LwHnR3V5beK73rTnPTGAaP3hbydjIRUemil
+         rPE/7sKl77yQhBtC8N5GkPOoL/ZKEZK17OYbYZJIeEmWCL3hdc/FTynyDInCVVZF7ukT
+         BlmA==
+X-Gm-Message-State: AOJu0YxgoBrWzD3oOx9/3tNrWFSd6ntL7nQKTtlQeK9Z6ROTEwbMlJaX
+	fvtGUke0sdiAyVt+ODxOr5gGQTjiKWP3DhzZZTTBD3/ELSckUGSuu4HVqrl/
+X-Google-Smtp-Source: AGHT+IH+64fqjmypd6U3lkjwmqTAPMrXE+3NK8deUI+iMBgn0ToC6GAOZ17YNM1SGmKE/V2Abyjt/g==
+X-Received: by 2002:a0c:e082:0:b0:691:85a2:4434 with SMTP id l2-20020a0ce082000000b0069185a24434mr16240310qvk.26.1711997728146;
+        Mon, 01 Apr 2024 11:55:28 -0700 (PDT)
+Received: from [172.17.0.2] ([20.81.46.185])
+        by smtp.gmail.com with ESMTPSA id j13-20020a05621419cd00b00698f9a12ccbsm2760421qvc.20.2024.04.01.11.55.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Apr 2024 11:55:27 -0700 (PDT)
+Message-ID: <660b031f.050a0220.285ce.9cb5@mx.google.com>
+Date: Mon, 01 Apr 2024 11:55:27 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3316674919039631589=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, nathan@kernel.org
+Subject: RE: Bluetooth: Fix type of len in {l2cap,sco}_sock_getsockopt_old()
+In-Reply-To: <20240401-bluetooth-fix-len-type-getsockopt_old-v1-1-c6b5448b5374@kernel.org>
+References: <20240401-bluetooth-fix-len-type-getsockopt_old-v1-1-c6b5448b5374@kernel.org>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============3316674919039631589==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240401-bluetooth-fix-len-type-getsockopt_old-v1-1-c6b5448b5374@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAND7CmYC/z2N0QrCMAwAf2Xk2UC3BRV/RWTMLm7B0pQ2ymTs3
- y0++Hhw3G1QOAsXuDQbZH5LEY0V2kMDfhnjzChTZehcR45ci/fwYlO1BR+yYuCI9kmMM1tR/9R
- kg4YJT72n8cxHR0RQWylz1X+fK/wTcNv3L5/jXoKCAAAA
-To: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc: ndesaulniers@google.com, morbo@google.com, justinstitt@google.com, 
- keescook@chromium.org, linux-bluetooth@vger.kernel.org, 
- llvm@lists.linux.dev, patches@lists.linux.dev, stable@vger.kernel.org, 
- Nathan Chancellor <nathan@kernel.org>
-X-Mailer: b4 0.14-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5307; i=nathan@kernel.org;
- h=from:subject:message-id; bh=v5//NGqmsFVDnGzhvsk7EyqTibVqjq4qRRtWuGQKJsE=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDGlcv29EWk/amRpT3Nr2VGzu/oTbVYImwfyfQnaxlYfPS
- N1wuP1TRykLgxgXg6yYIkv1Y9XjhoZzzjLeODUJZg4rE8gQBi5OAZiI0StGhvk1s5OWXF35WvDt
- lcK2PsOfIrtDFgQuvyqXs55BWPbhx1cM/7PkptzwmNkTIakytasoSOmrgoQPe1iBrED21poDVy/
- cYwYA
-X-Developer-Key: i=nathan@kernel.org; a=openpgp;
- fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-After an innocuous optimization change in LLVM main (19.0.0), x86_64
-allmodconfig (which enables CONFIG_KCSAN / -fsanitize=thread) fails to
-build due to the checks in check_copy_size():
+This is automated email and please do not reply to this email!
 
-  In file included from net/bluetooth/sco.c:27:
-  In file included from include/linux/module.h:13:
-  In file included from include/linux/stat.h:19:
-  In file included from include/linux/time.h:60:
-  In file included from include/linux/time32.h:13:
-  In file included from include/linux/timex.h:67:
-  In file included from arch/x86/include/asm/timex.h:6:
-  In file included from arch/x86/include/asm/tsc.h:10:
-  In file included from arch/x86/include/asm/msr.h:15:
-  In file included from include/linux/percpu.h:7:
-  In file included from include/linux/smp.h:118:
-  include/linux/thread_info.h:244:4: error: call to '__bad_copy_from' declared with 'error' attribute: copy source size is too small
-    244 |                         __bad_copy_from();
-        |                         ^
+Dear submitter,
 
-The same exact error occurs in l2cap_sock.c. The copy_to_user()
-statements that are failing come from l2cap_sock_getsockopt_old() and
-sco_sock_getsockopt_old(). This does not occur with GCC with or without
-KCSAN or Clang without KCSAN enabled.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=840324
 
-len is defined as an 'int' because it is assigned from
-'__user int *optlen'. However, it is clamped against the result of
-sizeof(), which has a type of 'size_t' ('unsigned long' for 64-bit
-platforms). This is done with min_t() because min() requires compatible
-types, which results in both len and the result of sizeof() being casted
-to 'unsigned int', meaning len changes signs and the result of sizeof()
-is truncated. From there, len is passed to copy_to_user(), which has a
-third parameter type of 'unsigned long', so it is widened and changes
-signs again. This excessive casting in combination with the KCSAN
-instrumentation causes LLVM to fail to eliminate the __bad_copy_from()
-call, failing the build.
+---Test result---
 
-The official recommendation from LLVM developers is to consistently use
-long types for all size variables to avoid the unnecessary casting in
-the first place. Change the type of len to size_t in both
-l2cap_sock_getsockopt_old() and sco_sock_getsockopt_old(). This clears
-up the error while allowing min_t() to be replaced with min(), resulting
-in simpler code with no casts and fewer implicit conversions. While len
-is a different type than optlen now, it should result in no functional
-change because the result of sizeof() will clamp all values of optlen in
-the same manner as before.
+Test Summary:
+CheckPatch                    PASS      0.87 seconds
+GitLint                       FAIL      0.56 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      30.03 seconds
+CheckAllWarning               PASS      32.35 seconds
+CheckSparse                   WARNING   38.83 seconds
+CheckSmatch                   FAIL      35.20 seconds
+BuildKernel32                 PASS      28.75 seconds
+TestRunnerSetup               PASS      516.50 seconds
+TestRunner_l2cap-tester       PASS      17.87 seconds
+TestRunner_iso-tester         PASS      29.90 seconds
+TestRunner_bnep-tester        PASS      4.72 seconds
+TestRunner_mgmt-tester        FAIL      112.06 seconds
+TestRunner_rfcomm-tester      PASS      9.34 seconds
+TestRunner_sco-tester         PASS      15.00 seconds
+TestRunner_ioctl-tester       PASS      7.72 seconds
+TestRunner_mesh-tester        PASS      5.74 seconds
+TestRunner_smp-tester         PASS      6.76 seconds
+TestRunner_userchan-tester    PASS      4.94 seconds
+IncrementalBuild              PASS      28.03 seconds
 
-Cc: stable@vger.kernel.org
-Closes: https://github.com/ClangBuiltLinux/linux/issues/2007
-Link: https://github.com/llvm/llvm-project/issues/85647
-Signed-off-by: Nathan Chancellor <nathan@kernel.org>
----
- net/bluetooth/l2cap_sock.c | 7 ++++---
- net/bluetooth/sco.c        | 7 ++++---
- 2 files changed, 8 insertions(+), 6 deletions(-)
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+Bluetooth: Fix type of len in {l2cap,sco}_sock_getsockopt_old()
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 4287aa6cc988..81193427bf05 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -439,7 +439,8 @@ static int l2cap_sock_getsockopt_old(struct socket *sock, int optname,
- 	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
- 	struct l2cap_options opts;
- 	struct l2cap_conninfo cinfo;
--	int len, err = 0;
-+	int err = 0;
-+	size_t len;
- 	u32 opt;
- 
- 	BT_DBG("sk %p", sk);
-@@ -486,7 +487,7 @@ static int l2cap_sock_getsockopt_old(struct socket *sock, int optname,
- 
- 		BT_DBG("mode 0x%2.2x", chan->mode);
- 
--		len = min_t(unsigned int, len, sizeof(opts));
-+		len = min(len, sizeof(opts));
- 		if (copy_to_user(optval, (char *) &opts, len))
- 			err = -EFAULT;
- 
-@@ -536,7 +537,7 @@ static int l2cap_sock_getsockopt_old(struct socket *sock, int optname,
- 		cinfo.hci_handle = chan->conn->hcon->handle;
- 		memcpy(cinfo.dev_class, chan->conn->hcon->dev_class, 3);
- 
--		len = min_t(unsigned int, len, sizeof(cinfo));
-+		len = min(len, sizeof(cinfo));
- 		if (copy_to_user(optval, (char *) &cinfo, len))
- 			err = -EFAULT;
- 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 43daf965a01e..9a72d7f1946c 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -967,7 +967,8 @@ static int sco_sock_getsockopt_old(struct socket *sock, int optname,
- 	struct sock *sk = sock->sk;
- 	struct sco_options opts;
- 	struct sco_conninfo cinfo;
--	int len, err = 0;
-+	int err = 0;
-+	size_t len;
- 
- 	BT_DBG("sk %p", sk);
- 
-@@ -989,7 +990,7 @@ static int sco_sock_getsockopt_old(struct socket *sock, int optname,
- 
- 		BT_DBG("mtu %u", opts.mtu);
- 
--		len = min_t(unsigned int, len, sizeof(opts));
-+		len = min(len, sizeof(opts));
- 		if (copy_to_user(optval, (char *)&opts, len))
- 			err = -EFAULT;
- 
-@@ -1007,7 +1008,7 @@ static int sco_sock_getsockopt_old(struct socket *sock, int optname,
- 		cinfo.hci_handle = sco_pi(sk)->conn->hcon->handle;
- 		memcpy(cinfo.dev_class, sco_pi(sk)->conn->hcon->dev_class, 3);
- 
--		len = min_t(unsigned int, len, sizeof(cinfo));
-+		len = min(len, sizeof(cinfo));
- 		if (copy_to_user(optval, (char *)&cinfo, len))
- 			err = -EFAULT;
- 
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+18: B1 Line exceeds max length (132>80): "  include/linux/thread_info.h:244:4: error: call to '__bad_copy_from' declared with 'error' attribute: copy source size is too small"
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/sco.c: note: in included file:./include/net/bluetooth/hci_core.h:150:35: warning: array of flexible structures
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
+
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 492, Passed: 487 (99.0%), Failed: 3, Not Run: 2
+
+Failed Test Cases
+Start Discovery LE - (Ext Scan Param)                Failed       0.102 seconds
+Start Discovery - (coded, Scan Param)                Failed       0.112 seconds
+Start Discovery - (1m, 2m, coded, Scan Param)        Failed       0.109 seconds
+
 
 ---
-base-commit: 7835fcfd132eb88b87e8eb901f88436f63ab60f7
-change-id: 20240401-bluetooth-fix-len-type-getsockopt_old-73c4a8e60444
+Regards,
+Linux Bluetooth
 
-Best regards,
--- 
-Nathan Chancellor <nathan@kernel.org>
 
+--===============3316674919039631589==--
