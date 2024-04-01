@@ -1,153 +1,214 @@
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80875249E4
-	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Apr 2024 19:02:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D0851C4F
+	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Apr 2024 19:12:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711998154; cv=none; b=ckrf9WAsiVo/rLzcuCuJceS9+YKCSuBRG6CcRTjPaHExcpFOqtoIIJgdwY421tNhlZGQ5FdSVjYDQZm5kDAUE9plKWU5G/AbEccADweQt3sRU9vf4Ajjr3Cl/JZucM1zZgH8m/bmdCwE2mMUW1UNQ50C8NDAvVRF0OwvNwwxsKU=
+	t=1711998749; cv=none; b=o1eVxGLJfFZhEnEoI9CgcLAz6TXRDwur/5IVOgbDEvGAu0povHHF1/8GEJPpCQm7OIDekdZXm9/K4YStFVmmmlu53qI94MS46RKvueLoctzowutkw9KkdgOM24fvzOY/DAO+FR9iFfCkFeyiXpUQyTrREmBNYP59C5OqK7dqpV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711998154; c=relaxed/simple;
-	bh=9gVCugrtMVlxFl0fvxh1v0DkRcOwHPfTloU3gfeVGpE=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=tnget050Uqdz9cd8ezvgkN9MUSMJ65HPAHlcwHbncwYrW4t61+fDxHqxIb/rNkdZEHnvrYsPu8dguBeb9yy7QyHFF/qd2R6RnXAscNf8FG0GAaKdB0Yt5LXsfWcD9/JvXduPZTwEqvxnAvrZPWQ5wyhIjOx1vFMDKgsXRc2TI5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7d096c4d663so465164739f.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Apr 2024 12:02:32 -0700 (PDT)
+	s=arc-20240116; t=1711998749; c=relaxed/simple;
+	bh=lZZgdgpRsCAM7XWp90WoIM3pYzhJNQF6JGgYWb3X5bU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CxuSxGmoai4m2iwQrKa9jhy83GTh7clwFT2fEs+65di7rfO1Vs2glgS8bhU6FD1kQifqZPBgbD9Y3DJHNoESGwmYb5k3pavIbdxdJBtWcFc8jWRE6BqVbWVEePuwYI+N9m+K6mIKgu9+8JE3APes/ny2tbnC4/XUen1IbW93aO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Vptv/EIu; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Vptv/EIu"
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a4e34d138f9so391855766b.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Apr 2024 12:12:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1711998746; x=1712603546; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=obzM0IGvE9A6DBXNxjXsovCrfa1fQhH1FBfKC4ISWA4=;
+        b=Vptv/EIubwgd09yg//VGFdZ2al7QJR+OyCM1aEzIE/MKlzqEegsgrDG3wO4/+CRi3d
+         GXmDyXcDerAOm/R1nmSn/IA36pfuXjX82p3+n0s/9fD7vpsDeoXKAWF97hCcs5BF6Svi
+         JBI/tru3sFMFfkY6o1oZdgAngjz6ThBwjb7SkWFNEz+V2sjbZ0G5H/jHi/uQcgi5CF4J
+         adXnGxg++dx7gh8S9uLdZji9R5HVPZJK9KA8z7gRMqz2bIpE4o0Dz7zH5W5OXkZBDjE2
+         i99eiHjkcrGR9wjSPYn6Iu73sDDoPTKx+2yqZ2IQlCE9G6/N3ZdQZLTC6yVBK2Z1K//P
+         UN+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711998151; x=1712602951;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6kDZew4ve18Pfr/WRK0uNVQv+L79Eyyay4NBpvHc3H0=;
-        b=SKx9SRYh8GNT0nyIVAJ9x0Y3IkECzJibuifOVIxxq2wPLDbr7IkG0DNCZRP6cXDhAH
-         sCowfpPxmA0FZO7eipl0Y77scOPotW3Zb3Ok+ZtT7EyWOpvEh71dfDu9+he/HFNtzJ2I
-         XZPtv+uhaxpLMU/lN3CxJ9/Qg0nU7b0GJdPWyqNTyV2/eGLMn7t0tnGMvoANWslWgV5Y
-         fCQxAOF4dwVYBzV9on6ucCa7vYpa9nEvibNcOvjkOCQGCKMkDXykr10OgRGMVFWo2/jm
-         iG6NkOIcAuLDdyYLtJ0PKKLL4WBbeD4z5LTQ/o/hMfnW2DcPa83HU1bmjvIGdBfAigzm
-         Oimw==
-X-Forwarded-Encrypted: i=1; AJvYcCUNbJfznfQZZlkaL73yth0IQ0LoKGJjjKBTbPPaJzs+V4jHzCMRLQW6palwwwYQAHRcCcOgSVBkprH248ep03ttriXjU7I2UEbrB9slsNUi
-X-Gm-Message-State: AOJu0Yz7PgJGdCCJxJLZAf/QtQBMBVzqeSVDL41/2tulpV2xYTSyylt4
-	ezczzrDh7Bk4RrnBcbmJohTyqXCM52LiPCNVWiBHsqMJSZU/W2W4DTtOBwUbLfHFDyvDK29s6ML
-	iz/hwfG1mJtLgi5PLusD1qdX3d52gxQkhcRk9nz5wVmxGDYy6cUzRUO8=
-X-Google-Smtp-Source: AGHT+IGPdUoeo2l8+p6J+8T0SDvD3uXH+t5qJvwMHr/CxnKGVczBxzShD1ENUG53XJAvp7t+LPn3vcoSC9dy0b3io7FCKAdWBG3z
+        d=1e100.net; s=20230601; t=1711998746; x=1712603546;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=obzM0IGvE9A6DBXNxjXsovCrfa1fQhH1FBfKC4ISWA4=;
+        b=phewoKk+gcmDSADI+ELGHOLhK5r/BTtZmOfTlwiZqUD0Zoh1VE3H+3ddy2Gyr423k2
+         34bxbsMXYgyv7c/EDQnlxcUfqPiu/ng+aTe7qR3a3BwjidLCJ6wADp4UcyyCZq2fgE4k
+         jtZuvIHwuCctje2GSjs0A4kg4zeq60UuFr97ddm2N0PVT5aFWmBMewaFozDHcM4xnBxL
+         soiLEflxhsc8FXNPN7Z07NDQdhxauxHMP+fXHStF7gZKd1XNQICzucAWrjUhSad7AGiM
+         An8FEcWjEY6eL8GdIpRP7oKDglkv5hZtQ7JY2ocWJz4U6ZfrUwKf3S0DgIo84tAbqR2G
+         HViQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWFGSiosOQavLPmOGtaI41jrhT/gNTdNQuEUH1HOK8mI3hqNW5f1YSTyy9Ki7TDTlLCLR9bNSWThWNRnEUhaMZtgBFF/6Ar379M/EkbT7o5
+X-Gm-Message-State: AOJu0YzBkyyhnVnFAzR/rWoiABAOcqguGiyPD9cBkiJnLnh92MjEYGL1
+	bKSMpVQRzcjbn7QkyZgoajSigce/Wle9mjAincvOn/xKQFz2ZS+gsvIrisvjrVH+IN7ZJvRLvWt
+	xhHL7IfC7XO5RVcY1dDYTFagSH+0k/KslmIF8
+X-Google-Smtp-Source: AGHT+IFrZn3P1g+mO8cYYJQ1aggkfW8cijER2IOdPjsyl9o0cR1x5wATnba0CgmMUUzNstTzMmB5e81d1T6aIF3k/Pw=
+X-Received: by 2002:a17:906:cb86:b0:a47:2f8c:7614 with SMTP id
+ mf6-20020a170906cb8600b00a472f8c7614mr6155069ejb.43.1711998746014; Mon, 01
+ Apr 2024 12:12:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:1641:b0:47e:c8fb:e9e7 with SMTP id
- a1-20020a056638164100b0047ec8fbe9e7mr423957jat.2.1711998151394; Mon, 01 Apr
- 2024 12:02:31 -0700 (PDT)
-Date: Mon, 01 Apr 2024 12:02:31 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000ab9af106150da113@google.com>
-Subject: [syzbot] [bluetooth?] memory leak in corrupted (2)
-From: syzbot <syzbot+e1c69cadec0f1a078e3d@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	syzkaller-bugs@googlegroups.com
+References: <20240401-bluetooth-fix-len-type-getsockopt_old-v1-1-c6b5448b5374@kernel.org>
+In-Reply-To: <20240401-bluetooth-fix-len-type-getsockopt_old-v1-1-c6b5448b5374@kernel.org>
+From: Justin Stitt <justinstitt@google.com>
+Date: Mon, 1 Apr 2024 12:12:13 -0700
+Message-ID: <CAFhGd8q7vomqQ27FRi-Bn4Dn0s-Qp_PLWS_jwLUi4TFC0KSbeQ@mail.gmail.com>
+Subject: Re: [PATCH bluetooth] Bluetooth: Fix type of len in {l2cap,sco}_sock_getsockopt_old()
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com, 
+	ndesaulniers@google.com, morbo@google.com, keescook@chromium.org, 
+	linux-bluetooth@vger.kernel.org, llvm@lists.linux.dev, 
+	patches@lists.linux.dev, stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Mon, Apr 1, 2024 at 11:24=E2=80=AFAM Nathan Chancellor <nathan@kernel.or=
+g> wrote:
+>
+> After an innocuous optimization change in LLVM main (19.0.0), x86_64
+> allmodconfig (which enables CONFIG_KCSAN / -fsanitize=3Dthread) fails to
+> build due to the checks in check_copy_size():
+>
+>   In file included from net/bluetooth/sco.c:27:
+>   In file included from include/linux/module.h:13:
+>   In file included from include/linux/stat.h:19:
+>   In file included from include/linux/time.h:60:
+>   In file included from include/linux/time32.h:13:
+>   In file included from include/linux/timex.h:67:
+>   In file included from arch/x86/include/asm/timex.h:6:
+>   In file included from arch/x86/include/asm/tsc.h:10:
+>   In file included from arch/x86/include/asm/msr.h:15:
+>   In file included from include/linux/percpu.h:7:
+>   In file included from include/linux/smp.h:118:
+>   include/linux/thread_info.h:244:4: error: call to '__bad_copy_from' dec=
+lared with 'error' attribute: copy source size is too small
+>     244 |                         __bad_copy_from();
+>         |                         ^
+>
+> The same exact error occurs in l2cap_sock.c. The copy_to_user()
+> statements that are failing come from l2cap_sock_getsockopt_old() and
+> sco_sock_getsockopt_old(). This does not occur with GCC with or without
+> KCSAN or Clang without KCSAN enabled.
+>
+> len is defined as an 'int' because it is assigned from
+> '__user int *optlen'. However, it is clamped against the result of
+> sizeof(), which has a type of 'size_t' ('unsigned long' for 64-bit
+> platforms). This is done with min_t() because min() requires compatible
+> types, which results in both len and the result of sizeof() being casted
+> to 'unsigned int', meaning len changes signs and the result of sizeof()
+> is truncated. From there, len is passed to copy_to_user(), which has a
+> third parameter type of 'unsigned long', so it is widened and changes
+> signs again. This excessive casting in combination with the KCSAN
+> instrumentation causes LLVM to fail to eliminate the __bad_copy_from()
+> call, failing the build.
+>
+> The official recommendation from LLVM developers is to consistently use
+> long types for all size variables to avoid the unnecessary casting in
+> the first place. Change the type of len to size_t in both
+> l2cap_sock_getsockopt_old() and sco_sock_getsockopt_old(). This clears
+> up the error while allowing min_t() to be replaced with min(), resulting
+> in simpler code with no casts and fewer implicit conversions. While len
+> is a different type than optlen now, it should result in no functional
+> change because the result of sizeof() will clamp all values of optlen in
+> the same manner as before.
+>
+> Cc: stable@vger.kernel.org
+> Closes: https://github.com/ClangBuiltLinux/linux/issues/2007
+> Link: https://github.com/llvm/llvm-project/issues/85647
+> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
 
-syzbot found the following issue on:
+Reviewed-by: Justin Stitt <justinstitt@google.com>
 
-HEAD commit:    39cd87c4eb2b Linux 6.9-rc2
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1605e039180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=25b176ce9d4c8dbf
-dashboard link: https://syzkaller.appspot.com/bug?extid=e1c69cadec0f1a078e3d
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10c59af9180000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/69179c757379/disk-39cd87c4.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/adff5d3652af/vmlinux-39cd87c4.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/b614bf284a7d/bzImage-39cd87c4.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+e1c69cadec0f1a078e3d@syzkaller.appspotmail.com
-
-BUG: memory leak
-unreferenced object 0xffff888109ffe280 (size 640):
-  comm "syz-executor.0", pid 5071, jiffies 4294942273
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 01 1a 0c 01 02 00 00 00 00  ................
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace (crc d037fcd3):
-    [<ffffffff8165cfec>] kmemleak_alloc_recursive include/linux/kmemleak.h:42 [inline]
-    [<ffffffff8165cfec>] slab_post_alloc_hook mm/slub.c:3802 [inline]
-    [<ffffffff8165cfec>] slab_alloc_node mm/slub.c:3845 [inline]
-    [<ffffffff8165cfec>] kmem_cache_alloc_node+0x28c/0x330 mm/slub.c:3888
-    [<ffffffff84337006>] kmalloc_reserve+0xe6/0x180 net/core/skbuff.c:577
-    [<ffffffff8433aa85>] __alloc_skb+0xd5/0x220 net/core/skbuff.c:668
-    [<ffffffff84a79b1b>] alloc_skb include/linux/skbuff.h:1313 [inline]
-    [<ffffffff84a79b1b>] bt_skb_alloc include/net/bluetooth/bluetooth.h:489 [inline]
-    [<ffffffff84a79b1b>] hci_prepare_cmd+0x2b/0xb0 net/bluetooth/hci_request.c:219
-    [<ffffffff84a7a147>] hci_req_add_ev net/bluetooth/hci_request.c:253 [inline]
-    [<ffffffff84a7a147>] hci_req_add+0x57/0xe0 net/bluetooth/hci_request.c:273
-    [<ffffffff84a0c231>] hci_scan_req+0x41/0x70 net/bluetooth/hci_core.c:73
-    [<ffffffff84a79550>] __hci_req_sync+0x70/0x3c0 net/bluetooth/hci_request.c:128
-    [<ffffffff84a79aa7>] hci_req_sync+0x67/0xa0 net/bluetooth/hci_request.c:204
-    [<ffffffff84a117d3>] hci_dev_cmd+0x3f3/0x550 net/bluetooth/hci_core.c:790
-    [<ffffffff84a5436c>] hci_sock_ioctl+0x3ec/0x6f0 net/bluetooth/hci_sock.c:1153
-    [<ffffffff843227d2>] sock_do_ioctl+0x82/0x1a0 net/socket.c:1222
-    [<ffffffff843249fe>] sock_ioctl+0x14e/0x480 net/socket.c:1341
-    [<ffffffff817356f6>] vfs_ioctl fs/ioctl.c:51 [inline]
-    [<ffffffff817356f6>] __do_sys_ioctl fs/ioctl.c:904 [inline]
-    [<ffffffff817356f6>] __se_sys_ioctl fs/ioctl.c:890 [inline]
-    [<ffffffff817356f6>] __x64_sys_ioctl+0xf6/0x150 fs/ioctl.c:890
-    [<ffffffff85089f05>] do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-    [<ffffffff85089f05>] do_syscall_64+0xa5/0x1e0 arch/x86/entry/common.c:83
-    [<ffffffff8520012b>] entry_SYSCALL_64_after_hwframe+0x72/0x7a
-
-BUG: memory leak
-unreferenced object 0xffff88810c96b300 (size 240):
-  comm "kworker/u9:1", pid 4479, jiffies 4294942273
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace (crc b92bbddd):
-    [<ffffffff8165c6c1>] kmemleak_alloc_recursive include/linux/kmemleak.h:42 [inline]
-    [<ffffffff8165c6c1>] slab_post_alloc_hook mm/slub.c:3802 [inline]
-    [<ffffffff8165c6c1>] slab_alloc_node mm/slub.c:3845 [inline]
-    [<ffffffff8165c6c1>] kmem_cache_alloc+0x271/0x310 mm/slub.c:3852
-    [<ffffffff84341f6a>] skb_clone+0xaa/0x190 net/core/skbuff.c:2063
-    [<ffffffff84a0cbdb>] hci_send_cmd_sync net/bluetooth/hci_core.c:4220 [inline]
-    [<ffffffff84a0cbdb>] hci_cmd_work+0x1db/0x200 net/bluetooth/hci_core.c:4240
-    [<ffffffff812ec200>] process_one_work+0x290/0x630 kernel/workqueue.c:3254
-    [<ffffffff812ed22d>] process_scheduled_works kernel/workqueue.c:3335 [inline]
-    [<ffffffff812ed22d>] worker_thread+0x2bd/0x510 kernel/workqueue.c:3416
-    [<ffffffff812fb36c>] kthread+0xfc/0x140 kernel/kthread.c:388
-    [<ffffffff811582b5>] ret_from_fork+0x45/0x60 arch/x86/kernel/process.c:147
-    [<ffffffff81002efa>] ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
-
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+> ---
+>  net/bluetooth/l2cap_sock.c | 7 ++++---
+>  net/bluetooth/sco.c        | 7 ++++---
+>  2 files changed, 8 insertions(+), 6 deletions(-)
+>
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index 4287aa6cc988..81193427bf05 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -439,7 +439,8 @@ static int l2cap_sock_getsockopt_old(struct socket *s=
+ock, int optname,
+>         struct l2cap_chan *chan =3D l2cap_pi(sk)->chan;
+>         struct l2cap_options opts;
+>         struct l2cap_conninfo cinfo;
+> -       int len, err =3D 0;
+> +       int err =3D 0;
+> +       size_t len;
+>         u32 opt;
+>
+>         BT_DBG("sk %p", sk);
+> @@ -486,7 +487,7 @@ static int l2cap_sock_getsockopt_old(struct socket *s=
+ock, int optname,
+>
+>                 BT_DBG("mode 0x%2.2x", chan->mode);
+>
+> -               len =3D min_t(unsigned int, len, sizeof(opts));
+> +               len =3D min(len, sizeof(opts));
+>                 if (copy_to_user(optval, (char *) &opts, len))
+>                         err =3D -EFAULT;
+>
+> @@ -536,7 +537,7 @@ static int l2cap_sock_getsockopt_old(struct socket *s=
+ock, int optname,
+>                 cinfo.hci_handle =3D chan->conn->hcon->handle;
+>                 memcpy(cinfo.dev_class, chan->conn->hcon->dev_class, 3);
+>
+> -               len =3D min_t(unsigned int, len, sizeof(cinfo));
+> +               len =3D min(len, sizeof(cinfo));
+>                 if (copy_to_user(optval, (char *) &cinfo, len))
+>                         err =3D -EFAULT;
+>
+> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+> index 43daf965a01e..9a72d7f1946c 100644
+> --- a/net/bluetooth/sco.c
+> +++ b/net/bluetooth/sco.c
+> @@ -967,7 +967,8 @@ static int sco_sock_getsockopt_old(struct socket *soc=
+k, int optname,
+>         struct sock *sk =3D sock->sk;
+>         struct sco_options opts;
+>         struct sco_conninfo cinfo;
+> -       int len, err =3D 0;
+> +       int err =3D 0;
+> +       size_t len;
+>
+>         BT_DBG("sk %p", sk);
+>
+> @@ -989,7 +990,7 @@ static int sco_sock_getsockopt_old(struct socket *soc=
+k, int optname,
+>
+>                 BT_DBG("mtu %u", opts.mtu);
+>
+> -               len =3D min_t(unsigned int, len, sizeof(opts));
+> +               len =3D min(len, sizeof(opts));
+>                 if (copy_to_user(optval, (char *)&opts, len))
+>                         err =3D -EFAULT;
+>
+> @@ -1007,7 +1008,7 @@ static int sco_sock_getsockopt_old(struct socket *s=
+ock, int optname,
+>                 cinfo.hci_handle =3D sco_pi(sk)->conn->hcon->handle;
+>                 memcpy(cinfo.dev_class, sco_pi(sk)->conn->hcon->dev_class=
+, 3);
+>
+> -               len =3D min_t(unsigned int, len, sizeof(cinfo));
+> +               len =3D min(len, sizeof(cinfo));
+>                 if (copy_to_user(optval, (char *)&cinfo, len))
+>                         err =3D -EFAULT;
+>
+>
+> ---
+> base-commit: 7835fcfd132eb88b87e8eb901f88436f63ab60f7
+> change-id: 20240401-bluetooth-fix-len-type-getsockopt_old-73c4a8e60444
+>
+> Best regards,
+> --
+> Nathan Chancellor <nathan@kernel.org>
+>
