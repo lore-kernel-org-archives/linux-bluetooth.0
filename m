@@ -1,105 +1,141 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4A3038DD8
-	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Apr 2024 12:12:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 233313D556
+	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Apr 2024 12:40:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711973537; cv=none; b=poiCWKsyg8WLtxMXsOhos7GLd3yZp/MbO0kJKfKcIhiesBTS5AQsrZtZJdyOw5OUjviMf6NRqmU1pXJr+iytnATuZovB36nCqhO7nGM5DWRMdMRO4H5H4xRiRyRQlTAx/iAnAiGrWnuJJn2vnnfQSTiy+OmeL7U59rCLgyXoTdE=
+	t=1711975257; cv=none; b=A5gkCOQ9+L8Yjqxlq5lm7Tvlu20TlfDkm67tscQJ8S3kW/v5il4aeuNfqU6r6SK2CGtez3/ONONtXDtcVCln6kCz1bexBcEaRTZD+xohWLFpMc3ZeajGVkgj4Ehn9mCgUl4ZyfCemMtdwypkvSz2LN+Vg8HBRT4VSmrM+BmsvCI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711973537; c=relaxed/simple;
-	bh=WFZuHYkyA0WtZFhWiqwtz3AAlvhc0O0TbeufMDXS6o8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=d0I5WlTYLuHroVdcN41WKe4B2d41GzwqI+lon+3oB39P/44WF24QssRFVyj9fgFPuZxVlRU5UWjwC8CwSCNSNx+m9uIhINYtaDg+u7GQ89qKUYcAvYa3W6ZLT3MYB2WJd71w/nRfGEBDK86NyDXUFOGHYnAgZxTIgzurp3vyVRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=azNuCFQI; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1711975257; c=relaxed/simple;
+	bh=kxQ4MP6nqh8JZK+2F1MfglkH0AqkSE1b57hXkn1y0dQ=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=jeMgf1tRecq2wo14SVvEEsK4EOE0fGk0k3WeAhAFz12qvy3QmF/pMg5IAFSQmOUYgm1hT61yRzQgnp1Xdii0b55XLTss4VDuVT9FuSqwj6/ZDSfwyMEOCyOUsEmKX/AU83d+9DuE10NfG9RvLOFRS/M4+5ZS0dFw1WCHinbI7PY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BDiHClUS; arc=none smtp.client-ip=209.85.160.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="azNuCFQI"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711973535; x=1743509535;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=WFZuHYkyA0WtZFhWiqwtz3AAlvhc0O0TbeufMDXS6o8=;
-  b=azNuCFQIGy5hB2J5uvFKTux4f01MhAKQOwcD/hWMxMfhJynJzNE8egIY
-   Jn2VJ1y3IzpPoghejtXURP3/eaBGLCg78Ah0B08CXVcodo3Z1i00dz6eE
-   LJY6un55/fClh1o7PzZnjBeQ5oVlP0Gt3XYjCMbRWdSy9r6UqSLm3ze1H
-   9eOLXH1LccnbdYl4J+FUPUqzvET1LwqRE4pY2zdA0EVv+sg0MBOJ1IyOX
-   Ps4e4oVfNwusDAMH1R95H9F758XyxDzWzhdmqpigImut4BMRoCZHo9Dss
-   D5nlNwgzxScwSjNIC3rDmUQ1o8+51jRPu3Qxsp3BHInPRF+gtyyoS5I41
-   w==;
-X-CSE-ConnectionGUID: KeIZ+OPUSfelb20DoJ/JCA==
-X-CSE-MsgGUID: ntjTRpJtTaiZaJOlMi9CAg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11030"; a="17668342"
-X-IronPort-AV: E=Sophos;i="6.07,172,1708416000"; 
-   d="scan'208";a="17668342"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2024 05:12:14 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,172,1708416000"; 
-   d="scan'208";a="22362869"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by fmviesa004.fm.intel.com with ESMTP; 01 Apr 2024 05:12:12 -0700
-From: Kiran K <kiran.k@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: ravishankar.srivatsa@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v2 2/2] Bluetooth: btintel: Direct exception event to bluetooth stack
-Date: Mon,  1 Apr 2024 17:55:59 +0530
-Message-Id: <20240401122559.1097489-2-kiran.k@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240401122559.1097489-1-kiran.k@intel.com>
-References: <20240401122559.1097489-1-kiran.k@intel.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BDiHClUS"
+Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-229b2396180so2378515fac.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Apr 2024 05:40:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711975255; x=1712580055; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=s/FryuT0N4E00RVIHl7eoGAR6cwEdFif3rkfqCWArnY=;
+        b=BDiHClUSs07aWvxRSKFFYFfcPoaysjMWXy7VZgRpgaNAA5akUI+ghSPvRbWm/dUC/6
+         bxF2z8WZSDGC+7WTx7D1v5dS3qCNFOTntO5g7WP5LsRLp6pme2rMm8MNA6z9KNpFf5ZT
+         71K+7843kqNFNvk8oTpJaW8J/DLuFqkQ304G4OwVNA7WyNrc9Bytqa1P0hbpsgenLxsA
+         Bi87dA+cBJzlHrgthVlELAieIPSRHTii7HF5RL5gal++ms4RCjI2lhAKhAC1dpB6tNMD
+         TYZoeCvRosUe0XhbYBzHWSlj4Xei/YeUAnMcvMAAAbF5QMW+gpL+eDkkqzmzF7kbox5N
+         cbmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711975255; x=1712580055;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=s/FryuT0N4E00RVIHl7eoGAR6cwEdFif3rkfqCWArnY=;
+        b=NWO1cJXONT05zUpkGkUiQ/0Jsv3nhEvCQJ8vnCwOYy26yqLJsSHlR/Q/HIRmozwzSM
+         TIapfGhz45zSWDL2vW6vVNzPW69L2SP6XtF6Bvpn9Jx3p7h76rzUJPUQLAO4SgCpAeNR
+         ItIX2cdHbSPVbAdpRC3qO+lE0sgsHXPyF5fLbwNtqacNy8lxOJw29Si+r5qf4Iv8KHNA
+         Sb4nRvla7ag13fWTx5855Ildty91Xe0NyiI2jNF2i/bYdE6vrvLdLt7FBtgB3j9f0nXR
+         r4eP53MHDSGsmf09zU26avEFUEzTEB4fgx9SCZv81/0Pum2lmzHwRzir7nUq8xHbS4cq
+         0udg==
+X-Gm-Message-State: AOJu0YxEITcAv0aWN08xmuYiy6Q+p8lp0GJaC4zMSo2/Arbwqo/y4nai
+	BGbn7dxELncA1ElaS2aA5PjIXHYhKnRNLrAOxV38DVIgpAu4Zl2oQYE2eFCz
+X-Google-Smtp-Source: AGHT+IH8Fy6KgPUSWfHk9jTqCoe7iqLEUrAI+uvpE1GGtk1NgrO6bjD2hSXo34QxngEptyc+5liwHg==
+X-Received: by 2002:a05:6870:3481:b0:221:8a03:6de7 with SMTP id n1-20020a056870348100b002218a036de7mr9169174oah.32.1711975254845;
+        Mon, 01 Apr 2024 05:40:54 -0700 (PDT)
+Received: from [172.17.0.2] ([20.168.23.49])
+        by smtp.gmail.com with ESMTPSA id e3-20020a636903000000b005dc4806ad7dsm7735592pgc.40.2024.04.01.05.40.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Apr 2024 05:40:54 -0700 (PDT)
+Message-ID: <660aab56.630a0220.d0f51.23a3@mx.google.com>
+Date: Mon, 01 Apr 2024 05:40:54 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6736664523195113121=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, kiran.k@intel.com
+Subject: RE: [v2,1/2] Bluetooth: btintel: Dump exception event
+In-Reply-To: <20240401122559.1097489-1-kiran.k@intel.com>
+References: <20240401122559.1097489-1-kiran.k@intel.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Have exception event part of HCI traces which helps for debug.
+--===============6736664523195113121==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-snoop traces:
-> HCI Event: Vendor (0xff) plen 79
-        Vendor Prefix (0x8780)
-      Intel Extended Telemetry (0x03)
-        Unknown extended telemetry event type (0xde)
-        01 01 de
-        Unknown extended subevent 0x07
-        01 01 de 07 01 de 06 1c ef be ad de ef be ad de
-        ef be ad de ef be ad de ef be ad de ef be ad de
-        ef be ad de 05 14 ef be ad de ef be ad de ef be
-        ad de ef be ad de ef be ad de 43 10 ef be ad de
-        ef be ad de ef be ad de ef be ad de
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Kiran K <kiran.k@intel.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=840240
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.05 seconds
+GitLint                       PASS      0.48 seconds
+SubjectPrefix                 PASS      0.18 seconds
+BuildKernel                   PASS      30.06 seconds
+CheckAllWarning               PASS      32.69 seconds
+CheckSparse                   PASS      37.65 seconds
+CheckSmatch                   FAIL      34.67 seconds
+BuildKernel32                 PASS      28.90 seconds
+TestRunnerSetup               PASS      522.61 seconds
+TestRunner_l2cap-tester       PASS      17.84 seconds
+TestRunner_iso-tester         FAIL      31.02 seconds
+TestRunner_bnep-tester        PASS      4.68 seconds
+TestRunner_mgmt-tester        PASS      112.40 seconds
+TestRunner_rfcomm-tester      PASS      7.39 seconds
+TestRunner_sco-tester         PASS      15.34 seconds
+TestRunner_ioctl-tester       PASS      7.70 seconds
+TestRunner_mesh-tester        PASS      5.75 seconds
+TestRunner_smp-tester         PASS      6.75 seconds
+TestRunner_userchan-tester    PASS      4.86 seconds
+IncrementalBuild              PASS      32.48 seconds
+
+Details
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
+
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+Total: 117, Passed: 116 (99.1%), Failed: 1, Not Run: 0
+
+Failed Test Cases
+ISO Connect2 Suspend - Success                       Failed       4.219 seconds
+
+
 ---
- drivers/bluetooth/btintel.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index c0dbbd1a2032..dde1dc45df9c 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -3138,13 +3138,12 @@ static int btintel_diagnostics(struct hci_dev *hdev, struct sk_buff *skb)
- 			       skb->data, skb->len, false);
- 		/* Generate devcoredump from exception */
- 		if (!hci_devcd_init(hdev, skb->len)) {
--			hci_devcd_append(hdev, skb);
-+			hci_devcd_append(hdev, skb_clone(skb, GFP_KERNEL));
- 			hci_devcd_complete(hdev);
- 		} else {
- 			bt_dev_err(hdev, "Failed to generate devcoredump");
--			kfree_skb(skb);
- 		}
--		return 0;
-+	break;
- 	default:
- 		bt_dev_err(hdev, "Invalid exception type %02X", tlv->val[0]);
- 	}
--- 
-2.34.1
 
+--===============6736664523195113121==--
