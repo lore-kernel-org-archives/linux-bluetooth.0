@@ -1,133 +1,105 @@
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05F4D1F5FD
-	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Apr 2024 11:56:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AFA1383AA
+	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Apr 2024 12:12:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711972608; cv=none; b=cQi743AMf9j9XngzlsPXTkV8sPNve9aRSXerMo2jp5U38tifJO5DK/s2XvZCEPEQ1Quch9NXmM2a/60taC2H8Mls26LHmO9B64Sc/jy60TUcxUDGhmjgxzsxGpU0rxotn2WwhP6hv7ZeCtX3FSRVhuLwzedT3xwoavWn9RrdQZ4=
+	t=1711973535; cv=none; b=HAb2PkFICNgiSWZmTEqN2I3cvBCyZ1qpr2Dm6skDqylWrEO/NK58cb2vcu3G1cdvXbGtoJGydHNlvQcPjaPziDJo0FS23vMDlfSXj393eNjx3Br+0y2Vu6Eb5+je/wZweF73H7FCnLl5jptozBCJ+bnlffOBROYGB1bLeDrGCE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711972608; c=relaxed/simple;
-	bh=YCtNyJJ0Ea2CJniqomvws4d43PPrQd5ytpnVE4HJqbY=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=hpkLgE8ElFHxwKgoV+tEZyco/w041fPXzA/YZ7G/y4JukjQY0Nv1nErq0LUQqTXxu6T4oC1kFpPNR4qsSLAdmsNk9JUVP691ZUhCkywEnbGzLTpU+7i1hUl17XHtZVM7z93VtjfzUnuBUbe387/td1ACRE9EZUwwDURBMH/pE6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UO8I1hDN; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1711973535; c=relaxed/simple;
+	bh=crgzU3wdhBfAO5fxKkFrZz3AjrsIAgXMLOZhqEsWg0Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WXZ/AbbKuQSu2bP5BmruzaDrKn6UA3JRvfcj+lumTAZH/vx9aJ3bIHcgLSMDj5LZUhxOdkftfqEWB1s0vpuSkdRn+26FWQb+vEr4lzrm1UjQ8AjnyyDAU2bVdnPfcZmspdDedsUPXsU+EqUw6qN0rRHFcS6aWx/KXux49Qu1Jl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GGJ8H4zY; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UO8I1hDN"
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6ea9a605ca7so2719005b3a.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Apr 2024 04:56:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711972606; x=1712577406; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=YZaeQ9sH6iaY3jQwvAP3giCDURyf/+nnYlpkHjbf4YY=;
-        b=UO8I1hDNU3fN+D9Qty+Mo1VaDzh0NMnJ9flejmZWjX1j2puLmQkzTbSZhuWHZPh3LU
-         4znWoLjTO1ZL74Gr6C+2uwuzQ8YL9QhGkw7fD8UBbJCBvoRGfFpcsRyT0eCHC5W0rw9O
-         jrlwZO7I7WDQFqGPOccvcX/QY1v2gJZPjMbNRTIv4sVAWsdO8GKsTtyLLt7uFYYWsGJ3
-         2I2pu+xNChhKpggYYy/EUJxMJySX1B+kQ7EJKdZ4DcknESoIy/sEZLpjN8ODlcrkKev9
-         A9bi5UjAB+AdW14Fmoytxl814+OgGnUvpaRZ3sJKoOxOdzwNbeJbi1bHjMqQAnkimNc/
-         fhaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711972606; x=1712577406;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YZaeQ9sH6iaY3jQwvAP3giCDURyf/+nnYlpkHjbf4YY=;
-        b=sU3FvJMIJkl2xgHFK2Q44QvLk8/YUeel44iTTcbKilPb73JBrapI2SeupmaLS2t2Uc
-         84hV45FpPjl++cAlH3SPrdlU1ISKhlSDM1OIPu6Dml5GOPTLhtSMNgfvStuVFDwJvs8V
-         flRnltq/pa35OefOW8puqEJ/zndZaEiEOQYuGudyBL1KqCuGZkA7nqMP6mnlFNOnmt3y
-         KRZ5h0nogagrEnulDM+GAGUGUK/su1ucFmMO9zQsCIFa0H9+8ESPEAuDwxkKEdaB0rR0
-         YJCc4eECeJHgSD0ifCk8ipsf1oCR1/bfwJ8iT9K8382VshlO3CbeWt2+7WdtUZ098X3J
-         RyCA==
-X-Gm-Message-State: AOJu0YzllYiIu/ZEuFFVpVUgI3yENdvrTz5+lXrPBKi/zAZKevH4GrkB
-	a8J2Ft1oZwC16ofNSVSrJKBOZT1X57K3gYJq1ZoawFOEGglTMMMq6R1/WrJY
-X-Google-Smtp-Source: AGHT+IHK0bB3tEiSs8hKfR9Zt3rGHYZ2e9XygT6Z/1aZd2XsBRzkzyw08LFkTLRELNtIUvrYmpzGDw==
-X-Received: by 2002:a05:6a00:2d9d:b0:6ea:e8aa:f11e with SMTP id fb29-20020a056a002d9d00b006eae8aaf11emr11395189pfb.17.1711972605869;
-        Mon, 01 Apr 2024 04:56:45 -0700 (PDT)
-Received: from [172.17.0.2] ([4.227.115.136])
-        by smtp.gmail.com with ESMTPSA id p5-20020aa79e85000000b006ea790c2232sm7681276pfq.79.2024.04.01.04.56.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Apr 2024 04:56:45 -0700 (PDT)
-Message-ID: <660aa0fd.a70a0220.9076f.29cf@mx.google.com>
-Date: Mon, 01 Apr 2024 04:56:45 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3538722135122506616=="
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GGJ8H4zY"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711973533; x=1743509533;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=crgzU3wdhBfAO5fxKkFrZz3AjrsIAgXMLOZhqEsWg0Y=;
+  b=GGJ8H4zYAb24FzrtXeSf7CAdAz92Ow5LvAwEKPDKLLNxqh8gaBOWjEBB
+   bdHZVhbW9oliPE/O9W8N92D+QfyXjR4dvF2ksaX5PM+gn2n0Fsc3wvowP
+   HJQ0vMtk20ddbduuZ+O54cH67kBZQTb/DkPeGGln0SAAlbJeQaS3MFz8A
+   USOGf0MpGdBYqRAUW5Bxso3v/VvCzYV+HevP3q7iGwba/LbQ36bGFmbXn
+   kVzZID8StrHfhB+Ly8JFdMqVk6mQtPeMdpcN71YOdrtu8GUIzO0TcLGWL
+   PsLK/x+vaqdjZ+S6oAGK5y88F1TIKkaPLw9x52o9FPKB+mOrE8fcqY0pa
+   g==;
+X-CSE-ConnectionGUID: FMzBPfQST8mIh8qFnyUtwA==
+X-CSE-MsgGUID: oivBc0ymRo+WCWSpWo9SNQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11030"; a="17668341"
+X-IronPort-AV: E=Sophos;i="6.07,172,1708416000"; 
+   d="scan'208";a="17668341"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2024 05:12:13 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,172,1708416000"; 
+   d="scan'208";a="22362866"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by fmviesa004.fm.intel.com with ESMTP; 01 Apr 2024 05:12:11 -0700
+From: Kiran K <kiran.k@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	Kiran K <kiran.k@intel.com>
+Subject: [PATCH v2 1/2] Bluetooth: btintel: Dump exception event
+Date: Mon,  1 Apr 2024 17:55:58 +0530
+Message-Id: <20240401122559.1097489-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, kiran.k@intel.com
-Subject: RE: [v1,1/2] Bluetooth: btintel: Direct exception event to bluetooth stack
-In-Reply-To: <20240401114214.1082870-1-kiran.k@intel.com>
-References: <20240401114214.1082870-1-kiran.k@intel.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============3538722135122506616==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Having exception event dump in kernel log helps debugging the use cases
+where snoop traces are not available.
 
-This is automated email and please do not reply to this email!
+dmesg:
 
-Dear submitter,
+[27.032666] Bluetooth: hci0: Exception occurred - type: 0xde
+[27.032703] Bluetooth: hci0: ff 4f 87 80 03 01 01 de 07 01 de 06 1c ef be ad
+[27.032729] Bluetooth: hci0: de ef be ad de ef be ad de ef be ad de ef be ad
+[27.032753] Bluetooth: hci0: de ef be ad de ef be ad de 05 14 ef be ad de ef
+[27.032778] Bluetooth: hci0: be ad de ef be ad de ef be ad de ef be ad de 43
+[27.032803] Bluetooth: hci0: 10 ef be ad de ef be ad de ef be ad de ef be ad
+[27.032827] Bluetooth: hci0: de
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=840239
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.19 seconds
-GitLint                       PASS      0.51 seconds
-SubjectPrefix                 PASS      6.87 seconds
-BuildKernel                   PASS      29.29 seconds
-CheckAllWarning               PASS      31.97 seconds
-CheckSparse                   PASS      37.61 seconds
-CheckSmatch                   FAIL      34.21 seconds
-BuildKernel32                 PASS      28.41 seconds
-TestRunnerSetup               PASS      512.17 seconds
-TestRunner_l2cap-tester       PASS      17.82 seconds
-TestRunner_iso-tester         PASS      29.53 seconds
-TestRunner_bnep-tester        PASS      4.67 seconds
-TestRunner_mgmt-tester        PASS      109.30 seconds
-TestRunner_rfcomm-tester      PASS      7.19 seconds
-TestRunner_sco-tester         PASS      18.14 seconds
-TestRunner_ioctl-tester       PASS      8.07 seconds
-TestRunner_mesh-tester        PASS      5.62 seconds
-TestRunner_smp-tester         PASS      6.66 seconds
-TestRunner_userchan-tester    PASS      4.81 seconds
-IncrementalBuild              PASS      32.49 seconds
-
-Details
-##############################
-Test: CheckSmatch - FAIL
-Desc: Run smatch tool with source
-Output:
-
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
-make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
-make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: net] Error 2
-make[2]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
-make[4]: *** Waiting for unfinished jobs....
-make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
-make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
-make: *** [Makefile:240: __sub-make] Error 2
-
-
+Signed-off-by: Kiran K <kiran.k@intel.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btintel.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index a19ebe47bd95..c0dbbd1a2032 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -3119,6 +3119,7 @@ EXPORT_SYMBOL_GPL(btintel_configure_setup);
+ static int btintel_diagnostics(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct intel_tlv *tlv = (void *)&skb->data[5];
++	char prefix[64];
+ 
+ 	/* The first event is always an event type TLV */
+ 	if (tlv->type != INTEL_TLV_TYPE_ID)
+@@ -3129,6 +3130,12 @@ static int btintel_diagnostics(struct hci_dev *hdev, struct sk_buff *skb)
+ 	case INTEL_TLV_FATAL_EXCEPTION:
+ 	case INTEL_TLV_DEBUG_EXCEPTION:
+ 	case INTEL_TLV_TEST_EXCEPTION:
++		bt_dev_err(hdev, "Exception occurred - type: 0x%2.2x",
++			   tlv->val[0]);
++		snprintf(prefix, sizeof(prefix), "Bluetooth: %s: ",
++			 bt_dev_name(hdev));
++		print_hex_dump(KERN_ERR, prefix, DUMP_PREFIX_NONE, 16, 1,
++			       skb->data, skb->len, false);
+ 		/* Generate devcoredump from exception */
+ 		if (!hci_devcd_init(hdev, skb->len)) {
+ 			hci_devcd_append(hdev, skb);
+-- 
+2.34.1
 
---===============3538722135122506616==--
