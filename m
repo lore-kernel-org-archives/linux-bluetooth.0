@@ -1,161 +1,104 @@
-Received: from mail.wantyapps.xyz (mail.wantyapps.xyz [66.135.5.160])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C38898495;
-	Tue,  2 Apr 2024 18:38:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.135.5.160
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82A641756A
+	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Apr 2024 18:42:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712083095; cv=none; b=Bdab9A39dNgorgRY5K2bd7DdNMBCXG+v5jfo6LjruxOWdsSHzpBc+odz74h3RCBugr1Oo418if5s39iEv4Ha3InolxZn8b3/pbhEiWYTyb/E7NkhNu+roPH19vMePJctGc5S0XX4JHwSgJS4r6QXcjb05AiBN50zE6KZKCBJ6qY=
+	t=1712083351; cv=none; b=iAxUM3e+wn33aFn2GtgWLv9wxKfWzkNJ3riQbqmdjAnpe8rOv/G8oR5zJQSYpV80xFnXG9XWd1g9ApSKNXVBZvLtKN+jxv2uyKvPY4bQ8PMDAQwkyZMSp3GtImnpFZrMn2JMM232f/B8+xDAY2QQAVwB8O23shts9Wvi8eFaBD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712083095; c=relaxed/simple;
-	bh=HhaPo8p+l4ugT5iV2J7FKycZxcYWiG4CD/2/oEp97F4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=G7eqdUcffozHmlSloE6iByyeJpWC0QWWLIGEyEtuXP7Pvc9m9sokHaRqAUwi7nMh3gee8AxdXd9riGP0cAJ1n/YjWO08UgCKaoD5elzQhm4TosyB7lptB/3cU80z+IKcbJjlMGrM/Rnfn1Oz2/8cPj5gQjmnjS0ljbREqwaplLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=wantyapps.xyz; spf=pass smtp.mailfrom=wantyapps.xyz; dkim=pass (2048-bit key) header.d=wantyapps.xyz header.i=@wantyapps.xyz header.b=mpHq3mLG; arc=none smtp.client-ip=66.135.5.160
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=wantyapps.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wantyapps.xyz
+	s=arc-20240116; t=1712083351; c=relaxed/simple;
+	bh=KtbjppMpGLRbRB4YbCo01QzaD+ikinAsIHbZuiJ8WnI=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=IANULDz6QlGUVLfnmw5SRlsBSHMMctNM0BJcrnXY0ND3FfYaUhV3h4SXCc9vmHmETV59Wh9TPFiOPxcV6uV3soz1HNOpC8oML/fBKQnBP1yibyym72BEBeo6dXASxeFRbfUknT9t7P1HQ1Wo737rLzCJWq3ENBKVUlV/hG0xZus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZdIE1ymG; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wantyapps.xyz header.i=@wantyapps.xyz header.b="mpHq3mLG"
-Received: from multivac.localdomain (unknown [147.235.205.62])
-	by mail.wantyapps.xyz (Postfix) with ESMTPSA id 7620893C6F;
-	Tue,  2 Apr 2024 18:38:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=wantyapps.xyz;
-	s=mail; t=1712083088;
-	bh=HhaPo8p+l4ugT5iV2J7FKycZxcYWiG4CD/2/oEp97F4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=mpHq3mLGer51ZCGSPiMBmMV93fF3Y0AwjwCSRRqnVlwh0WrJnw9U1YAwWmMlw3DGr
-	 nAbSsU8s/lWucsAdGplNstTBEy4V8JSneGk6txUPGqOvybJ6QelqA5uGyqauG18NId
-	 vI/8eeoxvT+LVreue2gEgV938955bQIrj9AXZC179wVuGC4lloZTlrWUKcevUKpjJ6
-	 ZLykB0G0HoxeIHkEpLWD9fU3v3HsigCo8QFAqxIYq+ncbfyZxo8zhoH7AvvyWKac69
-	 yT0BpOzh7gusP0x0hfvE0MNkZ4ThzkhFmlwtWnsjS1A4cWZuzMBUqQZUwGWy70LGEj
-	 h64dmbvmUDQ5w==
-From: me@wantyapps.xyz
-To: 
-Cc: me@wantyapps.xyz,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: hci_intel: Fix multiple issues reported by checkpatch.pl
-Date: Tue,  2 Apr 2024 21:37:45 +0300
-Message-ID: <20240402183751.107948-1-me@wantyapps.xyz>
-X-Mailer: git-send-email 2.44.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZdIE1ymG"
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6ead4093f85so5198520b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Apr 2024 11:42:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712083349; x=1712688149; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=SDwY0aAFrqbcLXdPdv5Ry7eTcx7dIx78MvbiM7+NoDo=;
+        b=ZdIE1ymGj4lhDaknwI810vtFlMfeYIUr/nMwYExWLwi4/vJaWDyM8YKWgcYO2xJVi8
+         a1itwvpPGCZhyS9+QWWiamInHU72LMk9JM0QH+QNP40eLgisB9jH10u5eYMPY6Jp7AZ+
+         Ijanuye0HnS19L5RX42Z8r6LoO8BuHLkX96lFRas5BY64biKCqlsqJ/ApIGT3Sbu8k1a
+         /mUgG5sz9qpHi9e4BNjZJZBJ8OZXddHc1trNhtfz8OBYxwC4muwCVRvOO6WX/zzNyPSq
+         1dGRFdp4IawF9hwVxNLlz3U/5rOHrgyNSNTXsDd0CX4nkUAUGihX7OA/bnuY2/1gerrr
+         KJIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712083349; x=1712688149;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SDwY0aAFrqbcLXdPdv5Ry7eTcx7dIx78MvbiM7+NoDo=;
+        b=crGiO17YEjC4ART5CnsYmgF0mRXK3E1sO+R8ivvxQ9VPusdObeV41QGrzw8YyL2YSg
+         bka6/QBKK27INernKHsMdKmfPDHeNGJnKHaNLQfTDFJMoYBa3eA+EkmvvUWKckYP6TmV
+         6HdRnHqbKHJcF53Wnp4oxC+R1+dKn6PO1U6uVgDO3Dsw1ef6g1LLsyp2ltfrBjxHV0Jc
+         orjZdvIQW2feE4TlpRnUD6WyOiTESkenaX5iTtJf+u17RV+FIiOvGd4ivIqrVwVsZJXG
+         HndKgzcAKHCOJtfbZH99ccGnJt2Z2m0KoCYfKa1YodLdYHYGCPfJTeHz7dx1Ijhh93pQ
+         YObA==
+X-Gm-Message-State: AOJu0YyfWQvm1YIqYAeW8Xui8E8kgc59bvxmyf5ninM2AGcoerTj0Pzq
+	JSUhBgNnQPorCMl4zooKwj3TICfUb+E757QAebqx+CsBnlNe3HapQuyDmvzo
+X-Google-Smtp-Source: AGHT+IF+u2dDUtR9ADGR0eZnaRcUK8hdTmvR4K47y1PAud62MvfQLmQj0f16zYEzt21cVB9u5kfFSg==
+X-Received: by 2002:a05:6a00:1992:b0:6e7:47e2:d8ed with SMTP id d18-20020a056a00199200b006e747e2d8edmr12189091pfl.26.1712083348749;
+        Tue, 02 Apr 2024 11:42:28 -0700 (PDT)
+Received: from [172.17.0.2] ([13.91.69.169])
+        by smtp.gmail.com with ESMTPSA id ff15-20020a056a002f4f00b006e77ed385c4sm10189532pfb.184.2024.04.02.11.42.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Apr 2024 11:42:28 -0700 (PDT)
+Message-ID: <660c5194.050a0220.c2e05.b484@mx.google.com>
+Date: Tue, 02 Apr 2024 11:42:28 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1777813028357374829=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: [BlueZ] adapter: add support for setting NO_ERRQUEUE_POLL experimental feature
+In-Reply-To: <abbf81af1d80d8a2863f1b441b5c39bad8e89fa2.1712076220.git.pav@iki.fi>
+References: <abbf81af1d80d8a2863f1b441b5c39bad8e89fa2.1712076220.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Uri Arev <me@wantyapps.xyz>
+--===============1777813028357374829==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This fixes the following CHECKs, WARNINGs, and ERRORs reported in
-hci_intel.c
+This is automated email and please do not reply to this email!
 
-Reported by checkpatch.pl:
------------
-hci_intel.c
------------
-WARNING: Prefer using '"%s...", __func__' to using 'intel_setup', this
-        function's name, in a string
-+       bt_dev_dbg(hdev, "start intel_setup");
+Dear submitter,
 
-ERROR: code indent should use tabs where possible
-+        /* Check for supported iBT hardware variants of this firmware$
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=840719
 
-ERROR: code indent should use tabs where possible
-+         * loading method.$
+---Test result---
 
-ERROR: code indent should use tabs where possible
-+         *$
+Test Summary:
+CheckPatch                    PASS      0.33 seconds
+GitLint                       PASS      0.21 seconds
+BuildEll                      PASS      24.60 seconds
+BluezMake                     PASS      1717.15 seconds
+MakeCheck                     PASS      13.41 seconds
+MakeDistcheck                 PASS      176.85 seconds
+CheckValgrind                 PASS      249.19 seconds
+CheckSmatch                   PASS      357.01 seconds
+bluezmakeextell               PASS      121.03 seconds
+IncrementalBuild              PASS      1588.00 seconds
+ScanBuild                     PASS      993.03 seconds
 
-ERROR: code indent should use tabs where possible
-+         * This check has been put in place to ensure correct forward$
 
-ERROR: code indent should use tabs where possible
-+         * compatibility options when newer hardware variants come along.$
 
-ERROR: code indent should use tabs where possible
-+         */$
-
-CHECK: No space is necessary after a cast
-+       duration = (unsigned long long) ktime_to_ns(delta) >> 10;
-
-CHECK: No space is necessary after a cast
-+       duration = (unsigned long long) ktime_to_ns(delta) >> 10;
-
-WARNING: Missing a blank line after declarations
-+               int err = PTR_ERR(intel->rx_skb);
-+               bt_dev_err(hu->hdev, "Frame reassembly failed (%d)", err);
-
-Signed-off-by: Uri Arev <me@wantyapps.xyz>
-Suggested-by: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 ---
-Changes in v2:
-Changed bt_dev_dbg(hdev, "start intel_setup"); to bt_dev_dbg(hdev, "");
-as suggested by Luiz Augusto von Dentz
----
- drivers/bluetooth/hci_intel.c | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-index 78afb9a348e7..53e394676f6b 100644
---- a/drivers/bluetooth/hci_intel.c
-+++ b/drivers/bluetooth/hci_intel.c
-@@ -537,7 +537,7 @@ static int intel_setup(struct hci_uart *hu)
- 	int speed_change = 0;
- 	int err;
- 
--	bt_dev_dbg(hdev, "start intel_setup");
-+	bt_dev_dbg(hdev, "");
- 
- 	hu->hdev->set_diag = btintel_set_diag;
- 	hu->hdev->set_bdaddr = btintel_set_bdaddr;
-@@ -591,12 +591,12 @@ static int intel_setup(struct hci_uart *hu)
- 		return -EINVAL;
- 	}
- 
--        /* Check for supported iBT hardware variants of this firmware
--         * loading method.
--         *
--         * This check has been put in place to ensure correct forward
--         * compatibility options when newer hardware variants come along.
--         */
-+	/* Check for supported iBT hardware variants of this firmware
-+	 * loading method.
-+	 *
-+	 * This check has been put in place to ensure correct forward
-+	 * compatibility options when newer hardware variants come along.
-+	 */
- 	switch (ver.hw_variant) {
- 	case 0x0b:	/* LnP */
- 	case 0x0c:	/* WsP */
-@@ -777,7 +777,7 @@ static int intel_setup(struct hci_uart *hu)
- 
- 	rettime = ktime_get();
- 	delta = ktime_sub(rettime, calltime);
--	duration = (unsigned long long) ktime_to_ns(delta) >> 10;
-+	duration = (unsigned long long)ktime_to_ns(delta) >> 10;
- 
- 	bt_dev_info(hdev, "Firmware loaded in %llu usecs", duration);
- 
-@@ -822,7 +822,7 @@ static int intel_setup(struct hci_uart *hu)
- 
- 	rettime = ktime_get();
- 	delta = ktime_sub(rettime, calltime);
--	duration = (unsigned long long) ktime_to_ns(delta) >> 10;
-+	duration = (unsigned long long)ktime_to_ns(delta) >> 10;
- 
- 	bt_dev_info(hdev, "Device booted in %llu usecs", duration);
- 
-@@ -977,6 +977,7 @@ static int intel_recv(struct hci_uart *hu, const void *data, int count)
- 				    ARRAY_SIZE(intel_recv_pkts));
- 	if (IS_ERR(intel->rx_skb)) {
- 		int err = PTR_ERR(intel->rx_skb);
-+
- 		bt_dev_err(hu->hdev, "Frame reassembly failed (%d)", err);
- 		intel->rx_skb = NULL;
- 		return err;
--- 
-2.44.0
 
+--===============1777813028357374829==--
