@@ -1,148 +1,272 @@
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2114.outbound.protection.outlook.com [40.107.8.114])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50B65133401
-	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Apr 2024 15:50:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.8.114
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712073008; cv=fail; b=YoT/czwVch8SJ1x7JiSBC2Gbqmd9rbzulAmK5GxgtLB0iz5CPG+7GOqeZL6Xy0pYsd4mNdTEGIzjStg9al+oVieB7ZlHWd6xDz9Cl2FdDIUo8lkYOBcvAPy4JI1Vai0kIqk9h2rLALKs8PHvPJauOVWYSPFxI+vFQZlqnGiDCMo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712073008; c=relaxed/simple;
-	bh=swDMMHmTaGxHO1IemxQ4ipJWjGBLe/Puml12kK4CfKo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=TmpNMKqkjdWrTs85ODw3TyTFtv+kmJ9aSFlAOnP41lATU/tg3xUJvKtJpYAAw/SEQtzaAiARV3e5A6ft9u8wOQufi5Zh9JdxiaFVJxAyKiLtDXp8irn3Nfv5NzloECld0CMmxCsQzYqlzq6aFAeTpwY5tBKRKZTP6d7rYBW1Ka4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=K/Eg5m4N; arc=fail smtp.client-ip=40.107.8.114
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD781E480
+	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Apr 2024 15:53:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712073214; cv=none; b=XJv2kDJGU6aPc6q7Jwy5+jOYjWolTNJN1bfMHKHfcQg38M0/yvNaVG7t8bXxP2KV/lDkrkI5pH/iJPzMzKmwg7dGFXNvT3kucU6px/LE6gTLtDcRKYLECaRf+pajwQ9waa1dTcQfvl10dT4Ou/WANTAb92eScA0SWncDPfMaZHc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712073214; c=relaxed/simple;
+	bh=+HNPQ6Z7n9wLxk648WN1twuqrR6ZaDsrS2Ef5bzoAQs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UlkVWBU/kmt6X9v4XXhlsi5rYgiyMJxXoJGHZRN+4rrihCY+JLEUS2tYkxtmSKZGLjh6oMsQQi66GU3Qd8zIVdAKCIpLXzdQnIbWKF1R+xngt6OEWIbwwVtoKX4R4PvgpBufMbP3B1HlEec/ki6lGPU2teyRQYZOtoLUvivXsmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=blRuv0M8; arc=none smtp.client-ip=209.85.208.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="K/Eg5m4N"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PBz543wUj84nZjKagVqUKprCQK/u2wkpU0ynwCPAz3P95vSNCam4LYqRBS3JX3f4v4XIofJNb2sS7b/rqwvsD15iJfzuVyxZAokg2AhHeHiaUKwPxY1Tjsp2U/KRfbHU+WamoEtWix3X62qHPNO/b48cV/58lB5WrSSZ3CPm68nUEFBk+5357DuV07VDaH3cHybAsT7U9mtxq61LhW9oSbgT2XdvrfjUxxIKiXXK/aNWlKFxuO+Beu237fTiwd4O5H+VyxNrWvOoR42RH8t0I9JzPV5h27Xu15piOx/ZbG5W4ipSvQibDm8PD+HhuWkyxxJCe9Zzkbrb8MTuZ7Awjw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gN8P41+A1llq0zoqkXi+RtLEhXcLdm1inuMfXyu69OI=;
- b=M3TXZaO2J48Y4aoRJrVy6zdPNffii1L2e59l3+Y/jv67VEhjnr1NDjw5iBQBFqBfj5DDFBMPMkzWZW/XRc81DiwnCrbGH4vums0S+BrhYZCYGtlKwQK+IoAjV3ERCKbJ1uwyCV0LKiunAItgtEIGDjGOx9qRWmF5ZQThlHy6nsFkWkyjzDCLj9i/yevhlJ5zDGIOepuKJ4j6ng6udn1oZ6jgFxCfX0PUMuWEqE8ClFQmAfcTESd3bg1rW1RiKpW/Xp+hljkEPoxkPqgSQgBdGv73ZJTG70iurb14vHob36B4F6B6awBCXFO5OMr8gpgZExHp6HT4JxkU303gXsmIlQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gN8P41+A1llq0zoqkXi+RtLEhXcLdm1inuMfXyu69OI=;
- b=K/Eg5m4N7BhMh5TTdS5jvFM6ZfZFngBkKAWmUWqBfkYRWHY2qrHym5htCjv/RQ8ORa575U+m2mMQUSj74K+U0YlPsMw4EGWCveWt2NsP+1dz/O8OdoOsP0ndPOlPJ7zgqMYqasVWzWiYhJ2xCeiEU2ZZ7z/IOJs80rnwfed5ZSE=
-Received: from VI1PR04MB10073.eurprd04.prod.outlook.com (2603:10a6:800:1dd::8)
- by GV1PR04MB9198.eurprd04.prod.outlook.com (2603:10a6:150:29::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Tue, 2 Apr
- 2024 15:50:01 +0000
-Received: from VI1PR04MB10073.eurprd04.prod.outlook.com
- ([fe80::7bc8:c6eb:cb72:91cf]) by VI1PR04MB10073.eurprd04.prod.outlook.com
- ([fe80::7bc8:c6eb:cb72:91cf%5]) with mapi id 15.20.7409.042; Tue, 2 Apr 2024
- 15:50:01 +0000
-From: Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: mihai-octavian.urzica@nxp.com,
-	silviu.barbulescu@nxp.com,
-	vlad.pruteanu@nxp.com,
-	andrei.istodorescu@nxp.com,
-	luiz.dentz@gmail.com,
-	iulia.tanasescu@nxp.com
-Subject: [PATCH BlueZ 1/1] bap: Fix endpoint unregister for BAP broadcast source
-Date: Tue,  2 Apr 2024 18:49:55 +0300
-Message-Id: <20240402154955.45229-2-silviu.barbulescu@nxp.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240402154955.45229-1-silviu.barbulescu@nxp.com>
-References: <20240402154955.45229-1-silviu.barbulescu@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AS4PR10CA0002.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:20b:5dc::19) To VI1PR04MB10073.eurprd04.prod.outlook.com
- (2603:10a6:800:1dd::8)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="blRuv0M8"
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2d4360ab3daso69683751fa.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Apr 2024 08:53:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712073210; x=1712678010; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BXNk4Q4mvytvhm8U2GXCz4dv3YODuoCIYa2DVPXxvgU=;
+        b=blRuv0M8MGDqcOPLErK9arPXlYmWBC8EGup3fYDugGLN2wL8cnw8pyhVecHeB/owkC
+         SHiDxIDMBDhaNKwgLYmYsZGuRi2RlSV9CRm7s5azmqwxUTLAjl/l6yfgF0oxdQHgTHAZ
+         RXeg5xmse+63tmN7M//fhhmb2tkqCoqf9HFulp+HU50i1qq4eWjwAUQ2qk4lNwL9j6zJ
+         dIx+o3x1vGaWUMDdDcuRaGmTqtOFTbWtWlsHI42oq19EFtrzhyE/sde2puVcuywG+hz8
+         wAWEbKlCJOjU35H8aFllTxctrWGJV+ZcPQzwIMI7sbN/5L2OkksFy1QT1ZfWYjmzWVm9
+         Qnug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712073210; x=1712678010;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BXNk4Q4mvytvhm8U2GXCz4dv3YODuoCIYa2DVPXxvgU=;
+        b=S100rc6zIWw2PPKXM5nGtPTKkTnr8ssbln/lx1ddeJi9/mbRREJayZWluFN93cyd5F
+         E9cULR7zY4HmC3GS53f1jx58WLana/rTujs/42Y6OvF412BvAeXlY+RJ3Rqm+Kt6C4ec
+         jK4cm1VwA0JcaE++Lbiuuy30vWr2cy2kvnzzJbajC2UdIPEetcNFWlAmDgGnfArzLwQk
+         3eRgs3srtsdquPtNUXTtedb0lVFVau7oHMDU3OK3KPdDQewcIsIopYfPFowzaFBFR1u0
+         I9agGkmXMhROj/p+bTZjyRHx2Gl7/zBR6rEK5Q5Ab/gMWfD14xsorCUPmJFDrpmlBq3+
+         f9CA==
+X-Gm-Message-State: AOJu0YxSXMuone5qlNTHrMG+PX/YR3Dy3p7EIvEp656e4NaNa5TbnlFo
+	zr47vDEa3OhE/si3YJeeyyR0KRPvDdFNtEN97mTPFUYrG9A5fvx0s6lL4Mp97ji2/dWVcGq3GN2
+	6n0wPOKcq2lvufDCY57QrURa14uP7xDRY
+X-Google-Smtp-Source: AGHT+IEw9xgZc08gFBB9lDRh4T9GyzWqpgc1whYzvRRNyuZG4pRVubwohJXo4K4/uQIjjYEPceHosgim+Kkq+ZGOBMM=
+X-Received: by 2002:a2e:a704:0:b0:2d8:c64:ffe5 with SMTP id
+ s4-20020a2ea704000000b002d80c64ffe5mr4729039lje.29.1712073210325; Tue, 02 Apr
+ 2024 08:53:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: VI1PR04MB10073:EE_|GV1PR04MB9198:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	B1y2REVBZIFrN/LKiXRrKaG2wa4kgA84/oVTxIWwLLQY870/lemjEdDqTerJC0jFZNNV5t0QH9V0YtdXWSyEFlX3WU7Q9vr+QOifW67bS2sr2E/Yo6HjWXpIForSWudunCpQXp2naHjDDOyak3alRvvM5bnyx7yTJlASqV5t4XPqi8VpEEcEA4t5w01V+4Iuo7oTv4fl59jMY7Zk5WfwHxDx2Tw6rWo5s6ekW76CzdJ32vqxPtW5YqLYoQVYyVn9WcwJ46S1Hcl+3jhO5WfEG+qnwNHIfV/Xq5t2IXF2JhBktJvoFzUafD42F8xVRgXD9y509uYWl1Sc3YA5KKV9WPlX0ThliAAUB+YrwoW7GPccelkudLIlBA9B23/icmEhb5exXee7yI3rxaU/TgykQJyzL5713RtwUGhCEdFGToFrULrrTGSjJqnpicUy16V/D21Sz35STmjXaE+Res/A+CvaBnQ3jSOIqbhL8erShNBW7Ywexwfo1uqPaxoc7KooiaXYoDLdTF7gnr/CYm0OKIuji9VNLdWOoKa9c5Sjj7KdTD/QjcIH4gf+rp98bJaYDKMHc/3BqPQ9rle27OUylzpxr1/Ey2l+Z2/NKdFtCqr8mWaR6HqJYiEjEniDvDhAGmkdgPoSm9eBNapDtj9GfNxbbYRUCWKp7+R+5zcWaGc=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB10073.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?WVzTpS6QOXv/Hb4cs25ifzARbPYWjI48qVRVVGEb1aRQRW9QEMfnkULLzALD?=
- =?us-ascii?Q?IZkyg+NGIVMjvEDDPT5vdbrECGkx49FQ6a6v2okTr2a3Epe155Wi1oWBPUuq?=
- =?us-ascii?Q?NP6iLw8BpTsOz+Ftj13y5FttsQd/mvnleJQqBNyZIe5uC/DXHU6rt/s1dfg9?=
- =?us-ascii?Q?1RgJq6S5oULcS3rJKPyan+cJzVEhOISYzfMuVbcHg8zLz9/Qz+Fg+MhgBLMs?=
- =?us-ascii?Q?k9jl3IIhPx98WUDroQy+BMuiEbotGoS8l9+kHgThPA1qZZhKJKbSPnvu06wX?=
- =?us-ascii?Q?4el/B5somfHkPzAgSYkjHnsvoq4gQW9pEhlJnuOYOzmYQLFL0CbnB+SBWVuy?=
- =?us-ascii?Q?ZlHFQ9KK5fzOXG3upw33L3R4fJn/AtBX+WKHvsUwsNEpwyYsuIWtLxW3QAVk?=
- =?us-ascii?Q?+z7sAw7q3inIVGxVzDY1gdfm3k+q/9336aCr9ySTZK0ZdbPE3vQaQNEC+Br9?=
- =?us-ascii?Q?onFeJMa4EDvbJp0IWEyP6BE+DtLbhMG78nEmxE/uw2B8y02MDs90ByLEGGfA?=
- =?us-ascii?Q?SBIStgC9pJNVm/lwfCaWRs9TUIAb9HFf3pms5/0jlrsz8Sz6NLlF9ZHCV6dV?=
- =?us-ascii?Q?6wmGdeaCjymwyzE9XhntZy/uppSdFJZ+nh5O5Qng54wPV/gr5H6kqTFjUSTl?=
- =?us-ascii?Q?QFIsmewNzTQIyUneMJ5v/xqa4cpbQcUKJgC0K+n4HmueSbBeO1qR8fNnh0kw?=
- =?us-ascii?Q?G1urk4V6PlYydpqn26fuGudO8pM9Tc1QDKJFL3a0li0MBu/FvbDzOa3bfVAe?=
- =?us-ascii?Q?vX4fX4ZDT1bB35Sgh5EEYiAtdnB7IgIauPmNwnUD5Ia/CbqZzOCLCF6Czf5e?=
- =?us-ascii?Q?tNc0Sz3XIbwswzs1c7G3V+c5fpZXz5y0R0sWV6PpSa75NXdWCY0cvuYEMuX9?=
- =?us-ascii?Q?iUmIh4F773NE9rNXRLBTzx9v9tw9ABNcJg+gkYc8lADH4AYI8ihw1KUzAhy8?=
- =?us-ascii?Q?lXChf9y1cvgGTpuDnoHcN7tJIRZx70Y05HFfuiXN3IxCWRhm2u6gG19dbMlt?=
- =?us-ascii?Q?hODSFU5MX4wyPnUQwfCe1+457jQJbjD9f9bCswFQrni00LIpIFT0jx1Gye/y?=
- =?us-ascii?Q?ya9w6w3S9VJo805yzfZmOuQxNwmbU6NlSONqVhVmV4bomlcHb2VGqnb0MMM2?=
- =?us-ascii?Q?6zTTJ79BYP7WWBdfmnLmHvEYAoPmwCekqK+5f9oTIdaiuGDGIgwyyIWmG5R6?=
- =?us-ascii?Q?14XdreeP4JYB+HNYtdOoSPOoYMAGHGoECwt4xRybOrVSp3lbK1WQhJmcfJHd?=
- =?us-ascii?Q?rZa/jxaT7O+bGisNVf+PQ1SFc2Fxi2urLleoi4D69G5Tr8YPZvHRZBRa3OBy?=
- =?us-ascii?Q?iIUcYnXOOBCM2QG3xYqU0ijAlCZvrW8t65O6QeQ7PTNFHZt8EPGaxebBV1v5?=
- =?us-ascii?Q?davBzg6wIYK2Xwr37igLPY3Q5lJzkbgCpBchuzzw0LWenszb0MjWmVkB7NnQ?=
- =?us-ascii?Q?9d2iuIUGBKeG0YMuZVkJbOHagIDK/yChLXaykeAo//FCuEMOiuAGRIOxlDXb?=
- =?us-ascii?Q?9KT5VDSRnOGpOLIiqDdyB0YvVu2aCENbN1qezyQl7v69OgrlnRABDiMWBtbm?=
- =?us-ascii?Q?XhRuFJouXxAFaxDnWV4ibMbQWXIj5UjLmv1HMpjmRT9vCJ4QMGo4QW7wCF+R?=
- =?us-ascii?Q?iQ=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 805bbda7-451b-4630-2244-08dc532c8e2e
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR04MB10073.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2024 15:50:01.0152
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5ubSpcy96Ri659fQJZdA9wwp5qQmPPUu0qfU5g0fc9aTfAR7TWcQK7EbnUBeOFZklN7obHM3zuHvxcpXoNDrWaLEYsfNhfmkifRAwgQcdZk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1PR04MB9198
+References: <20240402114326.3330-1-iulia.tanasescu@nxp.com> <20240402114326.3330-4-iulia.tanasescu@nxp.com>
+In-Reply-To: <20240402114326.3330-4-iulia.tanasescu@nxp.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 2 Apr 2024 11:53:17 -0400
+Message-ID: <CABBYNZLsV_1+GZ139bOpk7jPFFMx-bFedj-zOk2Ns5QmiGgBAQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 3/3] iso-tester: Add test for Broadcast Receiver Get BASE
+To: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com, 
+	mihai-octavian.urzica@nxp.com, silviu.barbulescu@nxp.com, 
+	vlad.pruteanu@nxp.com, andrei.istodorescu@nxp.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Fix endpoint not being removed when endpoint unregister
- is called for BAP broadcast source
+Hi Iulia,
 
----
- profiles/audio/bap.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
-
-diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index 52a9f5e00..db0af7e7c 100644
---- a/profiles/audio/bap.c
-+++ b/profiles/audio/bap.c
-@@ -2490,15 +2490,12 @@ static void pac_removed(struct bt_bap_pac *pac, void *user_data)
- 
- static void pac_removed_broadcast(struct bt_bap_pac *pac, void *user_data)
+On Tue, Apr 2, 2024 at 7:43=E2=80=AFAM Iulia Tanasescu <iulia.tanasescu@nxp=
+.com> wrote:
+>
+> This adds a new Broadcast Receiver test, to validate that a Broadcast
+> Sink is able to sync to the PA transmitted by a Source (when no BIG
+> is active) and is able to successfully detect the BASE:
+>
+> ISO Broadcaster Receiver Defer Get BASE - Success
+> ---
+>  tools/iso-tester.c | 70 ++++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 67 insertions(+), 3 deletions(-)
+>
+> diff --git a/tools/iso-tester.c b/tools/iso-tester.c
+> index 60afef301..67d698291 100644
+> --- a/tools/iso-tester.c
+> +++ b/tools/iso-tester.c
+> @@ -23,6 +23,7 @@
+>  #include "lib/bluetooth.h"
+>  #include "lib/iso.h"
+>  #include "lib/mgmt.h"
+> +#include "lib/uuid.h"
+>
+>  #include "monitor/bt.h"
+>  #include "emulator/vhci.h"
+> @@ -34,6 +35,8 @@
+>  #include "src/shared/util.h"
+>  #include "src/shared/queue.h"
+>
+> +#define EIR_SERVICE_DATA_16    0x16
+> +
+>  #define QOS_IO(_interval, _latency, _sdu, _phy, _rtn) \
+>  { \
+>         .interval =3D _interval, \
+> @@ -487,6 +490,7 @@ struct iso_client_data {
+>         size_t base_len;
+>         bool listen_bind;
+>         bool pa_bind;
+> +       bool big;
+>  };
+>
+>  typedef bool (*iso_defer_accept_t)(struct test_data *data, GIOChannel *i=
+o);
+> @@ -1301,6 +1305,7 @@ static const struct iso_client_data bcast_16_2_1_re=
+cv =3D {
+>         .recv =3D &send_16_2_1,
+>         .bcast =3D true,
+>         .server =3D true,
+> +       .big =3D true,
+>  };
+>
+>  static const struct iso_client_data bcast_enc_16_2_1_recv =3D {
+> @@ -1309,6 +1314,7 @@ static const struct iso_client_data bcast_enc_16_2_=
+1_recv =3D {
+>         .recv =3D &send_16_2_1,
+>         .bcast =3D true,
+>         .server =3D true,
+> +       .big =3D true,
+>  };
+>
+>  static const struct iso_client_data bcast_16_2_1_recv_defer =3D {
+> @@ -1319,6 +1325,7 @@ static const struct iso_client_data bcast_16_2_1_re=
+cv_defer =3D {
+>         .bcast =3D true,
+>         .server =3D true,
+>         .listen_bind =3D true,
+> +       .big =3D true,
+>  };
+>
+>  static const struct iso_client_data bcast_16_2_1_recv_defer_no_bis =3D {
+> @@ -1327,6 +1334,7 @@ static const struct iso_client_data bcast_16_2_1_re=
+cv_defer_no_bis =3D {
+>         .defer =3D true,
+>         .bcast =3D true,
+>         .server =3D true,
+> +       .big =3D true,
+>  };
+>
+>  static const struct iso_client_data bcast_16_2_1_recv_defer_pa_bind =3D =
+{
+> @@ -1336,6 +1344,17 @@ static const struct iso_client_data bcast_16_2_1_r=
+ecv_defer_pa_bind =3D {
+>         .bcast =3D true,
+>         .server =3D true,
+>         .pa_bind =3D true,
+> +       .big =3D true,
+> +};
+> +
+> +static const struct iso_client_data bcast_16_2_1_recv_defer_get_base =3D=
  {
--	struct btd_service *service = user_data;
--	struct bap_data *data;
-+	struct bap_data *data = user_data;
- 	struct queue *queue;
- 	struct bap_ep *ep;
- 
- 	DBG("pac %p", pac);
- 
--	data = btd_service_get_user_data(service);
--
- 	switch (bt_bap_pac_get_type(pac)) {
- 	case BT_BAP_SINK:
- 		queue = data->srcs;
--- 
-2.40.1
+> +       .qos =3D QOS_IN_16_2_1,
+> +       .expect_err =3D 0,
+> +       .defer =3D true,
+> +       .bcast =3D true,
+> +       .server =3D true,
+> +       .base =3D base_lc3_ac_12,
+> +       .base_len =3D sizeof(base_lc3_ac_12),
+>  };
+>
+>  static const struct iso_client_data bcast_ac_12 =3D {
+> @@ -1498,9 +1517,28 @@ static void setup_powered_callback(uint8_t status,=
+ uint16_t length,
+>                 if (isodata->bcast) {
+>                         bthost_set_pa_params(host);
+>                         bthost_set_pa_enable(host, 0x01);
+> -                       bthost_create_big(host, 1,
+> -                                       isodata->qos.bcast.encryption,
+> -                                       isodata->qos.bcast.bcode);
+> +
+> +                       if (isodata->base) {
+> +                               uint8_t eir[HCI_MAX_PER_AD_LENGTH] =3D {0=
+};
+> +                               uint16_t eir_len =3D 0;
+> +
+> +                               eir[eir_len++] =3D EIR_SERVICE_DATA_LENGT=
+H - 1 +
+> +                                                       isodata->base_len=
+;
+> +                               eir[eir_len++] =3D EIR_SERVICE_DATA_16;
+> +                               put_le16(BAA_SERVICE, &eir[eir_len]);
+> +                               eir_len +=3D 2;
+> +                               memcpy(&eir[eir_len], isodata->base,
+> +                                                       isodata->base_len=
+);
+> +                               eir_len +=3D isodata->base_len;
 
+I'd use util_iov helpers to generate this instead of manually
+generating it like above.
+
+> +
+> +                               bthost_set_pa_data(host, eir, eir_len);
+> +                       }
+> +
+> +                       if (isodata->big)
+> +                               bthost_create_big(host, 1,
+> +                                               isodata->qos.bcast.encryp=
+tion,
+> +                                               isodata->qos.bcast.bcode)=
+;
+> +
+>                 } else if (!isodata->send && isodata->recv) {
+>                         const uint8_t *bdaddr;
+>
+> @@ -2183,6 +2221,7 @@ static gboolean iso_connect(GIOChannel *io, GIOCond=
+ition cond,
+>         socklen_t len;
+>         struct bt_iso_qos qos;
+>         bool ret =3D true;
+> +       uint8_t base[BASE_MAX_LENGTH] =3D {0};
+>
+>         sk =3D g_io_channel_unix_get_fd(io);
+>
+> @@ -2211,6 +2250,27 @@ static gboolean iso_connect(GIOChannel *io, GIOCon=
+dition cond,
+>                 return FALSE;
+>         }
+>
+> +       if (isodata->bcast && isodata->server && isodata->base) {
+> +               len =3D BASE_MAX_LENGTH;
+> +
+> +               if (getsockopt(sk, SOL_BLUETOOTH, BT_ISO_BASE,
+> +                               base, &len) < 0) {
+> +                       tester_warn("Can't get socket option : %s (%d)",
+> +                                               strerror(errno), errno);
+> +                       data->step =3D 0;
+> +                       tester_test_failed();
+> +                       return FALSE;
+> +               }
+> +
+> +               if (len !=3D isodata->base_len ||
+> +                               memcmp(base, isodata->base, len)) {
+> +                       tester_warn("Unexpected BASE");
+> +                       data->step =3D 0;
+> +                       tester_test_failed();
+> +                       return FALSE;
+> +               }
+> +       }
+> +
+>         len =3D sizeof(sk_err);
+>
+>         if (getsockopt(sk, SOL_SOCKET, SO_ERROR, &sk_err, &len) < 0)
+> @@ -3383,6 +3443,10 @@ int main(int argc, char *argv[])
+>                                         &bcast_16_2_1_recv_defer_pa_bind,
+>                                         setup_powered,
+>                                         test_bcast_recv_defer);
+> +       test_iso("ISO Broadcaster Receiver Defer Get BASE - Success",
+> +                                       &bcast_16_2_1_recv_defer_get_base=
+,
+> +                                       setup_powered,
+> +                                       test_bcast_recv);
+>
+>         test_iso("ISO Broadcaster AC 12 - Success", &bcast_ac_12, setup_p=
+owered,
+>                                                         test_bcast);
+> --
+> 2.39.2
+>
+
+
+--=20
+Luiz Augusto von Dentz
