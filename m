@@ -1,157 +1,287 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B1421332A7
-	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Apr 2024 14:39:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 388DC13473D
+	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Apr 2024 15:44:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712068781; cv=none; b=dV3f+RFEm/I2rFnGOLOcoppYYb4CZpxQUmf9tr1/+ztPUmqOdJoyANqBfUnUEuGWu1VKAPCDjrDKctwgeeuNvdC5cfNmxakagepq6gEbYS1Xv+MEAOkaizJgM4aIYP5SoUmDfcZtlD9fPywKIUfcyh8ba+8VF501WtRsXx1wmtE=
+	t=1712072653; cv=none; b=ck80ZbO1pGEjBMoFLTBt0s7q6KhebzQVdrHrxV+/IvY+SOM0+pIlGBt0t4eFEdn7fScvQ0VdRa8jnZVoFEQIoG9IltDIbYhze7XZVVr+Yv4CJiMOe3isszDg0Sebj/U6Frk4BxQcXvnRBj7gnQc5Rw4z+Clp8q297HzGENcUtUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712068781; c=relaxed/simple;
-	bh=lSQbyo7eLhMpnRVvaIIwzLop0QKzQhAGkk28fOMZxIc=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=gYGh+sQMwDE3JZebc9hiKLs+L+hEb2Dhi+WGqV7BZVEUWzQ8mHc7SJnTUEPK1n12o7ABubkdRsjVaHfkfiJFxk9VzzF4m/yz4TH56sI4Q6lq5umAdSNA0y2KV2UbSJY6ERzpMEGP2Wuy8dVkcRCrj1lWNAOjnryMqtZpnS8nGIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nbSADsew; arc=none smtp.client-ip=209.85.214.170
+	s=arc-20240116; t=1712072653; c=relaxed/simple;
+	bh=/4Yb0Tr/13iCVGpalfYLqYFZRSt6fhRXcWuwsCmHqaE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Os7x07hY+WP4Sn3/Ap8faPoIlOAiWWRvl0WLw9QRiV5KvSayQHAxdaRr89ZbaC4apQLKMyw/zI/BbrSK6fkY9UESGdrQ3bjPKnh17gka1LZdM4dTJeaZU9ZXTJi2ZCmo9HHcCopMx+UHClEVhbjCv9qa9iN9qm9dzU3OI38fhfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jROpaUsf; arc=none smtp.client-ip=209.85.208.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nbSADsew"
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1e00d1e13a2so34792885ad.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Apr 2024 07:39:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jROpaUsf"
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2d700beb60bso90526791fa.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Apr 2024 08:44:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712068779; x=1712673579; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=U9yzNqR1q+l6ZGu7H8hq42duNkR80pfc+OOyi4A+IpQ=;
-        b=nbSADsew5yeKZJ4D51NBaH2jJWyihSj0BK/ohHIM4C7njTnn4TyB6pmxfh995qTsMa
-         WKMUJ5AnQZyA2D0Dq8wStfW3thBmX/hkd4JV1/IDqiN5xjPtrZBmIy/1yqndXEDfK4Z8
-         MkuFJAhR5kGz9KcPhQghzld51Nyhe+/Kndj26jhYbPE40u24hYkUQhMph5ODTpct8jU9
-         yWRO7p20KAey7tlnjU2e19a8SOd6zdD6vEDGco0AHgfzzHO6CudXbBbprW0LrRbsjtJj
-         5zUZQ7vJnwtMFXlcoHEC3KTtn8jkYs04vd/EAmYdq1ERitU/8mY0LoLXHgo6GjGBwOoV
-         bESA==
+        d=gmail.com; s=20230601; t=1712072649; x=1712677449; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kt/QD9PQdh65+FTke1a9sc/rZRWLCZ8Xm2JVNub0x9c=;
+        b=jROpaUsfNcawD2QhVLpDQi4jBHlsJ9E2JiorrO3ew7sq6sKVL9SKQKFpjuXojqQ56d
+         R/HgT6L/auLYcxci2kNsKV3YN1L0VkX18LCrpROuZoCAfLZS7gFX7rS56f2VRYWBcyp/
+         H/wMJCsXx4FzE3jm5JFuCHQzzRSzUr0rN8E0EFwzXAwosMVfDkAqGLYHfKYuNOqSTwjr
+         ngJEFvtaLjBt/XyK4Z8pjYux31wXOa05ySM/a6Q9uk5lt3aiP7+mYUspp+W12/Rk3C6+
+         QZHTAGTdcQYRb4jfCuEKmJIkOm+QnW8prAdqwHBtN2Qr2dRdy96u8ioGlsvUmVcMGjz0
+         1QGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712068779; x=1712673579;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=U9yzNqR1q+l6ZGu7H8hq42duNkR80pfc+OOyi4A+IpQ=;
-        b=eSU3IPCQgmrW1gArDwxh1aV7ovLSgBwAbUqS2BNRjp+HQVNY0RuO9vr2sUU3NEpac1
-         JMRQAzRmRIeeOmtwQoLa2qj11CyJshwYJBRvEc/8F0YNYwUGi1IAvruDTtAde9NAZ6KE
-         MZxN1sRc9esuENxKsYdz3Ws/qt/SUL9+rD3i7zLlOoWFx6wdsFqH/9vmeRF0X84Sxt9t
-         wwvEkIYazwMYVy3TC55vCJjaGUcIqrjBez66nuQ0jNn+t9ZqbmNP/R80w7dec87Cu/IH
-         ayfRFhpA5XpxdWmJpZukOA5QQz72zv9vaNWSaiogRaMGvoBJtn5pXYo0F6KNZyYGBFu0
-         Lm/w==
-X-Gm-Message-State: AOJu0YwxWNswuec218JC9Xy1dDRTH7Y9+5Y48sJCes3pPlduBf8WL/Mu
-	ayku2AMIREVjelaGi/F3Uy7IbKSJh48YxM4i045AV6IaxtCLSIATJspwD1Lx
-X-Google-Smtp-Source: AGHT+IEF/3d6PHHjDL+/Mj2prfA6WuL7/hTLnhxNBRxFhbaGg4aVDoSVvECnQexSqCBbLYLA2pDMLQ==
-X-Received: by 2002:a17:902:ed85:b0:1dd:63a4:68cf with SMTP id e5-20020a170902ed8500b001dd63a468cfmr10479253plj.69.1712068778959;
-        Tue, 02 Apr 2024 07:39:38 -0700 (PDT)
-Received: from [172.17.0.2] ([20.171.70.58])
-        by smtp.gmail.com with ESMTPSA id l5-20020a170902f68500b001e06cc3be27sm11208517plg.253.2024.04.02.07.39.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Apr 2024 07:39:38 -0700 (PDT)
-Message-ID: <660c18aa.170a0220.3261d.c9bf@mx.google.com>
-Date: Tue, 02 Apr 2024 07:39:38 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5616049339516824695=="
+        d=1e100.net; s=20230601; t=1712072649; x=1712677449;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kt/QD9PQdh65+FTke1a9sc/rZRWLCZ8Xm2JVNub0x9c=;
+        b=rdA6sF0K1J+Vshqgf6cCVEljTBfKFY5CLCepDaOMkrJn8f/hSEFNOLe2QcOBBUhjcW
+         WmFGqRqvBap3yLXXLWp+hSWajS1JWPTuRiN7b3YseDmzgGdb/0E7KU8SNc5IErSr6x1p
+         oPbCJut2cxuAtsYUh5ApNwjg9+0J2BACz2WmSrqyfNZ9Ex5XE1TvxTt4KtE4OB3EAepI
+         rWL1f9WV7cVLN96J5QS1UKvhFZ6XcRDMul7nuER/C10payuoPgtBkEVQDN4Z0jmPfxRo
+         cSAQWE4klZ3gjm+xwumpUuLE2JKvKP5HYlEKpg9nBuIQ0xSATbyTMOw38KgDL3twHyJO
+         Xqfw==
+X-Gm-Message-State: AOJu0Yxme+qSPhZREg/KvIXCgfxESqWc2Y/qciI2hlf9MKGJ98NIWpnr
+	pjd525EQIagBeF3DLf/02ybwc1GOcBSjCbEzWFS2yZG52mCcwLQEyBQG0MqtYwmEkhUvLF2WwIs
+	mYAtKSjKU9nqQIV/Xujs8P4XObJQj2znU
+X-Google-Smtp-Source: AGHT+IEzmKENCuUzkeaDPnbQiYojKvgBeG0AAnfEFP2KkuyF1P56fWyYo37sypDZWdDnHpbDixLkTKRBzPhxQrW8sU8=
+X-Received: by 2002:a2e:3c0c:0:b0:2d6:f5c6:e5a1 with SMTP id
+ j12-20020a2e3c0c000000b002d6f5c6e5a1mr1771715lja.12.1712072648976; Tue, 02
+ Apr 2024 08:44:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com
-Subject: RE: iso-tester: Add test for Broadcast Receiver Get BASE
-In-Reply-To: <20240402114326.3330-2-iulia.tanasescu@nxp.com>
-References: <20240402114326.3330-2-iulia.tanasescu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20240402113931.3164-1-iulia.tanasescu@nxp.com> <20240402113931.3164-2-iulia.tanasescu@nxp.com>
+In-Reply-To: <20240402113931.3164-2-iulia.tanasescu@nxp.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 2 Apr 2024 11:43:56 -0400
+Message-ID: <CABBYNZKSjjpU48COeTz3H6i+WKFr=Zb3D9Eudp5r_puiuaj=dg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Bluetooth: ISO: Make iso_get_sock_listen generic
+To: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com, 
+	mihai-octavian.urzica@nxp.com, silviu.barbulescu@nxp.com, 
+	vlad.pruteanu@nxp.com, andrei.istodorescu@nxp.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============5616049339516824695==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Iulia,
 
-This is automated email and please do not reply to this email!
+On Tue, Apr 2, 2024 at 7:39=E2=80=AFAM Iulia Tanasescu <iulia.tanasescu@nxp=
+.com> wrote:
+>
+> This makes iso_get_sock_listen more generic, to return matching socket
+> in the state provided as argument.
+>
+> Signed-off-by: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+> ---
+>  net/bluetooth/iso.c | 75 +++++++++++++++++++++++++--------------------
+>  1 file changed, 42 insertions(+), 33 deletions(-)
+>
+> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+> index 42b4495e019e..3fcaef506bde 100644
+> --- a/net/bluetooth/iso.c
+> +++ b/net/bluetooth/iso.c
+> @@ -85,8 +85,9 @@ static void iso_sock_disconn(struct sock *sk);
+>
+>  typedef bool (*iso_sock_match_t)(struct sock *sk, void *data);
+>
+> -static struct sock *iso_get_sock_listen(bdaddr_t *src, bdaddr_t *dst,
+> -                                       iso_sock_match_t match, void *dat=
+a);
+> +static struct sock *iso_get_sock(bdaddr_t *src, bdaddr_t *dst,
+> +                                unsigned char state,
 
-Dear submitter,
+Lets add a name to the enum in bluetooth.h when the socket states are
+defined then we can use it here instead of passing as unsigned char.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=840594
+> +                                iso_sock_match_t match, void *data);
+>
+>  /* ---- ISO timers ---- */
+>  #define ISO_CONN_TIMEOUT       (HZ * 40)
+> @@ -233,10 +234,11 @@ static void iso_conn_del(struct hci_conn *hcon, int=
+ err)
+>                  * terminated are not processed anymore.
+>                  */
+>                 if (test_bit(BT_SK_PA_SYNC, &iso_pi(sk)->flags)) {
+> -                       parent =3D iso_get_sock_listen(&hcon->src,
+> -                                                    &hcon->dst,
+> -                                                    iso_match_conn_sync_=
+handle,
+> -                                                    hcon);
+> +                       parent =3D iso_get_sock(&hcon->src,
+> +                                             &hcon->dst,
+> +                                             BT_LISTEN,
+> +                                             iso_match_conn_sync_handle,
+> +                                             hcon);
+>
+>                         if (parent) {
+>                                 set_bit(BT_SK_PA_SYNC_TERM,
+> @@ -584,22 +586,23 @@ static struct sock *__iso_get_sock_listen_by_sid(bd=
+addr_t *ba, bdaddr_t *bc,
+>         return NULL;
+>  }
+>
+> -/* Find socket listening:
+> +/* Find socket in given state:
+>   * source bdaddr (Unicast)
+>   * destination bdaddr (Broadcast only)
+>   * match func - pass NULL to ignore
+>   * match func data - pass -1 to ignore
+>   * Returns closest match.
+>   */
+> -static struct sock *iso_get_sock_listen(bdaddr_t *src, bdaddr_t *dst,
+> -                                       iso_sock_match_t match, void *dat=
+a)
+> +static struct sock *iso_get_sock(bdaddr_t *src, bdaddr_t *dst,
+> +                                unsigned char state,
+> +                                iso_sock_match_t match, void *data)
+>  {
+>         struct sock *sk =3D NULL, *sk1 =3D NULL;
+>
+>         read_lock(&iso_sk_list.lock);
+>
+>         sk_for_each(sk, &iso_sk_list.head) {
+> -               if (sk->sk_state !=3D BT_LISTEN)
+> +               if (sk->sk_state !=3D state)
+>                         continue;
+>
+>                 /* Match Broadcast destination */
+> @@ -1805,32 +1808,37 @@ static void iso_conn_ready(struct iso_conn *conn)
+>                                                  HCI_EVT_LE_BIG_SYNC_ESTA=
+BILISHED);
+>
+>                         /* Get reference to PA sync parent socket, if it =
+exists */
+> -                       parent =3D iso_get_sock_listen(&hcon->src,
+> -                                                    &hcon->dst,
+> -                                                    iso_match_pa_sync_fl=
+ag, NULL);
+> +                       parent =3D iso_get_sock(&hcon->src, &hcon->dst,
+> +                                             BT_LISTEN,
+> +                                             iso_match_pa_sync_flag,
+> +                                             NULL);
+>                         if (!parent && ev)
+> -                               parent =3D iso_get_sock_listen(&hcon->src=
+,
+> -                                                            &hcon->dst,
+> -                                                            iso_match_bi=
+g, ev);
+> +                               parent =3D iso_get_sock(&hcon->src,
+> +                                                     &hcon->dst,
+> +                                                     BT_LISTEN,
+> +                                                     iso_match_big, ev);
+>                 } else if (test_bit(HCI_CONN_PA_SYNC_FAILED, &hcon->flags=
+)) {
+>                         ev2 =3D hci_recv_event_data(hcon->hdev,
+>                                                   HCI_EV_LE_PA_SYNC_ESTAB=
+LISHED);
+>                         if (ev2)
+> -                               parent =3D iso_get_sock_listen(&hcon->src=
+,
+> -                                                            &hcon->dst,
+> -                                                            iso_match_si=
+d, ev2);
+> +                               parent =3D iso_get_sock(&hcon->src,
+> +                                                     &hcon->dst,
+> +                                                     BT_LISTEN,
+> +                                                     iso_match_sid, ev2)=
+;
+>                 } else if (test_bit(HCI_CONN_PA_SYNC, &hcon->flags)) {
+>                         ev3 =3D hci_recv_event_data(hcon->hdev,
+>                                                   HCI_EVT_LE_BIG_INFO_ADV=
+_REPORT);
+>                         if (ev3)
+> -                               parent =3D iso_get_sock_listen(&hcon->src=
+,
+> -                                                            &hcon->dst,
+> -                                                            iso_match_sy=
+nc_handle, ev3);
+> +                               parent =3D iso_get_sock(&hcon->src,
+> +                                                     &hcon->dst,
+> +                                                     BT_LISTEN,
+> +                                                     iso_match_sync_hand=
+le,
+> +                                                     ev3);
+>                 }
+>
+>                 if (!parent)
+> -                       parent =3D iso_get_sock_listen(&hcon->src,
+> -                                                       BDADDR_ANY, NULL,=
+ NULL);
+> +                       parent =3D iso_get_sock(&hcon->src, BDADDR_ANY,
+> +                                             BT_LISTEN, NULL, NULL);
+>
+>                 if (!parent)
+>                         return;
+> @@ -1951,8 +1959,8 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t =
+*bdaddr, __u8 *flags)
+>          */
+>         ev1 =3D hci_recv_event_data(hdev, HCI_EV_LE_PA_SYNC_ESTABLISHED);
+>         if (ev1) {
+> -               sk =3D iso_get_sock_listen(&hdev->bdaddr, bdaddr, iso_mat=
+ch_sid,
+> -                                        ev1);
+> +               sk =3D iso_get_sock(&hdev->bdaddr, bdaddr, BT_LISTEN,
+> +                                 iso_match_sid, ev1);
+>                 if (sk && !ev1->status)
+>                         iso_pi(sk)->sync_handle =3D le16_to_cpu(ev1->hand=
+le);
+>
+> @@ -1962,12 +1970,12 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_=
+t *bdaddr, __u8 *flags)
+>         ev2 =3D hci_recv_event_data(hdev, HCI_EVT_LE_BIG_INFO_ADV_REPORT)=
+;
+>         if (ev2) {
+>                 /* Try to get PA sync listening socket, if it exists */
+> -               sk =3D iso_get_sock_listen(&hdev->bdaddr, bdaddr,
+> -                                               iso_match_pa_sync_flag, N=
+ULL);
+> +               sk =3D iso_get_sock(&hdev->bdaddr, bdaddr, BT_LISTEN,
+> +                                 iso_match_pa_sync_flag, NULL);
+>
+>                 if (!sk) {
+> -                       sk =3D iso_get_sock_listen(&hdev->bdaddr, bdaddr,
+> -                                                iso_match_sync_handle, e=
+v2);
+> +                       sk =3D iso_get_sock(&hdev->bdaddr, bdaddr, BT_LIS=
+TEN,
+> +                                         iso_match_sync_handle, ev2);
+>
+>                         /* If PA Sync is in process of terminating,
+>                          * do not handle any more BIGInfo adv reports.
+> @@ -2007,8 +2015,8 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t =
+*bdaddr, __u8 *flags)
+>                 u8 *base;
+>                 struct hci_conn *hcon;
+>
+> -               sk =3D iso_get_sock_listen(&hdev->bdaddr, bdaddr,
+> -                                        iso_match_sync_handle_pa_report,=
+ ev3);
+> +               sk =3D iso_get_sock(&hdev->bdaddr, bdaddr, BT_LISTEN,
+> +                                 iso_match_sync_handle_pa_report, ev3);
+>                 if (!sk)
+>                         goto done;
+>
+> @@ -2057,7 +2065,8 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t =
+*bdaddr, __u8 *flags)
+>                         hcon->le_per_adv_data_len =3D 0;
+>                 }
+>         } else {
+> -               sk =3D iso_get_sock_listen(&hdev->bdaddr, BDADDR_ANY, NUL=
+L, NULL);
+> +               sk =3D iso_get_sock(&hdev->bdaddr, BDADDR_ANY,
+> +                                 BT_LISTEN, NULL, NULL);
+>         }
+>
+>  done:
+> --
+> 2.39.2
+>
 
----Test result---
 
-Test Summary:
-CheckPatch                    PASS      1.06 seconds
-GitLint                       FAIL      0.93 seconds
-BuildEll                      FAIL      20.18 seconds
-BluezMake                     PASS      1616.74 seconds
-MakeCheck                     PASS      12.97 seconds
-MakeDistcheck                 PASS      175.42 seconds
-CheckValgrind                 PASS      243.56 seconds
-CheckSmatch                   WARNING   347.79 seconds
-bluezmakeextell               FAIL      6.77 seconds
-IncrementalBuild              PASS      4627.14 seconds
-ScanBuild                     PASS      984.86 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ,1/3] lib: Add macros for HCI_MAX_PER_AD_LENGTH and EIR_SERVICE_DATA_LENGTH
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T1 Title exceeds max length (81>80): "[BlueZ,1/3] lib: Add macros for HCI_MAX_PER_AD_LENGTH and EIR_SERVICE_DATA_LENGTH"
-##############################
-Test: BuildEll - FAIL
-Desc: Build and Install ELL
-Output:
-
-writing RSA key
-writing RSA key
-writing RSA key
-writing RSA key
-writing RSA key
-make[1]: *** [Makefile:3253: unit/ec-cert-server.pem] Error 1
-make[1]: *** Waiting for unfinished jobs....
-make: *** [Makefile:1293: all] Error 2
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-emulator/bthost.c:584:28: warning: Variable length array is used.emulator/bthost.c:741:28: warning: Variable length array is used.
-##############################
-Test: bluezmakeextell - FAIL
-Desc: Build Bluez with External ELL
-Output:
-
-configure.ac:21: installing './compile'
-configure.ac:36: installing './config.guess'
-configure.ac:36: installing './config.sub'
-configure.ac:5: installing './install-sh'
-configure.ac:5: installing './missing'
-Makefile.am: installing './depcomp'
-parallel-tests: installing './test-driver'
-Package cups was not found in the pkg-config search path.
-Perhaps you should add the directory containing `cups.pc'
-to the PKG_CONFIG_PATH environment variable
-No package 'cups' found
-configure: error: Package requirements (ell >= 0.39) were not met:
-
-No package 'ell' found
-
-Consider adjusting the PKG_CONFIG_PATH environment variable if you
-installed software in a non-standard prefix.
-
-Alternatively, you may set the environment variables ELL_CFLAGS
-and ELL_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============5616049339516824695==--
+--=20
+Luiz Augusto von Dentz
