@@ -1,61 +1,61 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58F2B15991F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D73A15A482
 	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Apr 2024 16:43:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712076199; cv=pass; b=iKlSrvyuesNfxDy7eavS66sEXLbvQmXPhyEfYJvKUaE3+nWSNp3CFB11rp0W7xGj/TEAnrVQJJNJbCf3AC7cpXWNJvVnJISxofjQoQFzvfLrkUnXzw9EUOWNnWPmFY0GbUNF0yNS7D9Hg7cIEajk6YA/1/9TcdKVKeeV/JbV5to=
+	t=1712076199; cv=pass; b=VXsj4GKHI1YKC8JiYkjol4pxzrLhl8p8Pe+JQL17HBzbAbjZ07x3+rZWmAcs/fuZfvk4lhCwJezOFR56vdrRp2S5L3msuxGAJzZmNRR3mRu8XG9F1dPPKO84mWwqncVdKM4MjLmgWasE6NdzqA1wgNWGBRpdrf8GXkSFlrnGk9I=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1712076199; c=relaxed/simple;
-	bh=R1O/ht1ocoXEyVTEdAgk2S2D/NajFcKMc1FubLogsP4=;
+	bh=TCLET5blhARH0Y9rYNPn+iH8jknXfTvFaUVSR0DWYpo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Cfuhai9tLqN4QU4F7AC7KR/+bC51ZV3p5yNRk9oHk8PP5443noVYW/DCEwEnq8QdHl+5nSn1ekAd7HRUmD/zeQIgCtK5E7HJjG8hKNa/ZcS9HNYHHBN6aBNU6hdtQCBcu2ePipUUzYvDivxevsrOd7fdDoDDamksjGm+ni2EuMQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=Ga2Iwc1v; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=FuUuBtsf50B8h35JF2PvvFF0p8luZ9x9j/t+5yU9r5i+ojUUrfrXJfpHyqGi7cJ+r0g7BZr4Ni8VNZ0LnYwG8nGKG2TYSTLpYaKQ+CLZ8PYs7oJgdYDj6NhTxkStFWrRmzhQbhb3iGY9vR8JphvDKz2TjRyB0LMXyBNmqQXCto4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=xQkdP/rB; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="Ga2Iwc1v"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="xQkdP/rB"
 Received: from monolith.lan (unknown [193.138.7.178])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4V8DGC0WdPz107m;
-	Tue,  2 Apr 2024 19:43:14 +0300 (EEST)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4V8DGC5zvpzyTX;
+	Tue,  2 Apr 2024 19:43:15 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1712076195;
+	t=1712076196;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5JzT69tOdpsUYsIOroGvf9htTZN0rV5ZdKs7wA0E/5Y=;
-	b=Ga2Iwc1vX+oDHYcFFM41xQCcxkDXOGrIdlmFJASm6ZC6xu2ggqNWHkua4I2k9BU9lm43qS
-	HqiaUGog2EBHRiLueYkyUJnCeGghhdg/sSz0v3NzKagjYRZTTCahWGL3zegZxUeN9Zpvt1
-	hzm0iiInyVwFIUDRovaRmrunaPo/n54=
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1712076195; a=rsa-sha256; cv=none;
-	b=rB8XfyDwHMIkzJ9pkIH4CMPYWGPmgWwMcojlXDPtIpTfSGYFxQac2UuSDhls8r7UUdNc2N
-	JBy3TMp/AqSZrWZwH5UeRfvQF2bGjGh+j0CWh6Yl3dt+naXP7KgqYwZxTzuAmJUzx/olaP
-	qZKHJxh30unjXCyYjY8eFalk8uM/gYQ=
+	bh=LrP4Nncol27MzA8D+MQJQLCx3rKITNmukLoTjk6w3oE=;
+	b=xQkdP/rBiU8P1NIqdLwbQ24wpvPRnUKWy7cOeprGX9bEq91qyH8ry6RtaiDDzczRQqCV4N
+	m2bhxYTjQ+e68AEh8cOBXDiCSd6+XF4T1HAQdhGsjLwJNf/dqKMelod3W00u4P0XB7jqMO
+	Zcw018PAH/g3e38qs+x5W2+T5LEMm18=
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1712076196; a=rsa-sha256; cv=none;
+	b=RlJwtOhpI7IIKnSKtV0/wYLcnkMoTtkkBwdBImIqUAi17MpHX/wbvwk0z9NmESIBFXCYxg
+	AHX6hKSE74e7llnrWP4V2Hddq8qh6Qmp+xcKInKdzu/HPdb2mX0p5XNnah4mJ/t2J8l/S0
+	7P7HRIk0mMmICFeHauwlkodABwUx4Kg=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1712076195;
+	s=meesny; t=1712076196;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5JzT69tOdpsUYsIOroGvf9htTZN0rV5ZdKs7wA0E/5Y=;
-	b=iy/R3075rkQKk8TZTr1ohpTb5lxocQS5ONK5iGL1yVE/10sRyShL5TEj+/ocoaicwL3+Fu
-	7tIvxmgAXRCpXYngud629EgRYCazDKr4IBIE1F9J46mUf2xIeFWhMNYXAUINrbcIaNgGJn
-	bFg4IfLPuzFaTE17MOhZXVKlsjrwWrE=
+	bh=LrP4Nncol27MzA8D+MQJQLCx3rKITNmukLoTjk6w3oE=;
+	b=Ox7LyKMFVbxF94eDZt2gHrCwDSbMRyfY1bbHwEY59fszFUTq+NknsE+cgFMilBEkMSA6oF
+	293mGJSbhvscESpkq2bptYjP2+OqghYYOWtbNs9UhspHif48V7ewhifUOHfckm3e3xWq94
+	RKrC6rcJbg2Bv4QO0eItI50bL74yaxE=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v3 6/8] bthost: handle client L2CAP conn in LE credit based mode
-Date: Tue,  2 Apr 2024 19:43:03 +0300
-Message-ID: <7a5fdae79e414381ca74fd1251c3020303baa6c6.1712076170.git.pav@iki.fi>
+Subject: [PATCH BlueZ v3 7/8] l2cap-tester: add tests for LE Client read/write/tx-timestamping
+Date: Tue,  2 Apr 2024 19:43:04 +0300
+Message-ID: <7d439f0ec2b8f451c66b33ef720e0657c64cf21c.1712076170.git.pav@iki.fi>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <cover.1712076170.git.pav@iki.fi>
 References: <cover.1712076170.git.pav@iki.fi>
@@ -67,388 +67,102 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Allow bthost hooks to receive data from L2CAP LE credit based
-connections. Handle LE credit header when receiving, and reassemble
-received SDU.
+Add tests:
 
-Handle L2CAP LE credit header also in bthost_send_cid.
+L2CAP LE Client - Read Success
+L2CAP LE Client - Write Success
+L2CAP LE Client - TX Timestamping
 ---
- emulator/bthost.c | 205 ++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 180 insertions(+), 25 deletions(-)
+ tools/l2cap-tester.c | 41 ++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 40 insertions(+), 1 deletion(-)
 
-diff --git a/emulator/bthost.c b/emulator/bthost.c
-index 8c40fce90..8616bf715 100644
---- a/emulator/bthost.c
-+++ b/emulator/bthost.c
-@@ -162,11 +162,21 @@ struct btconn {
- 	void *recv_data;
+diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
+index f990110d9..d7f2e481a 100644
+--- a/tools/l2cap-tester.c
++++ b/tools/l2cap-tester.c
+@@ -484,6 +484,30 @@ static const struct l2cap_data le_client_connect_timeout_test_1 = {
+ 	.timeout = 1,
  };
  
-+enum l2cap_mode {
-+	L2CAP_MODE_OTHER,
-+	L2CAP_MODE_LE_CRED,
-+	L2CAP_MODE_LE_ENH_CRED,
++static const struct l2cap_data le_client_connect_read_success_test = {
++	.client_psm = 0x0080,
++	.server_psm = 0x0080,
++	.read_data = l2_data,
++	.data_len = sizeof(l2_data),
 +};
 +
- struct l2conn {
-+	struct l2conn *next;
- 	uint16_t scid;
- 	uint16_t dcid;
- 	uint16_t psm;
--	struct l2conn *next;
-+	enum l2cap_mode mode;
-+	uint16_t data_len;
-+	uint16_t recv_len;
-+	void *recv_data;
- };
- 
- struct rcconn {
-@@ -275,6 +285,7 @@ struct bthost *bthost_create(void)
- 
- static void l2conn_free(struct l2conn *conn)
- {
-+	free(conn->recv_data);
- 	free(conn);
- }
- 
-@@ -360,6 +371,7 @@ static struct l2conn *bthost_add_l2cap_conn(struct bthost *bthost,
- 	l2conn->psm = psm;
- 	l2conn->scid = scid;
- 	l2conn->dcid = dcid;
-+	l2conn->mode = L2CAP_MODE_OTHER;
- 
- 	l2conn->next = conn->l2conns;
- 	conn->l2conns = l2conn;
-@@ -415,6 +427,19 @@ static struct l2conn *btconn_find_l2cap_conn_by_scid(struct btconn *conn,
- 	return NULL;
- }
- 
-+static struct l2conn *btconn_find_l2cap_conn_by_dcid(struct btconn *conn,
-+								uint16_t dcid)
-+{
-+	struct l2conn *l2conn;
++static const struct l2cap_data le_client_connect_write_success_test = {
++	.client_psm = 0x0080,
++	.server_psm = 0x0080,
++	.write_data = l2_data,
++	.data_len = sizeof(l2_data),
++};
 +
-+	for (l2conn = conn->l2conns; l2conn != NULL; l2conn = l2conn->next) {
-+		if (l2conn->dcid == dcid)
-+			return l2conn;
-+	}
++static const struct l2cap_data le_client_connect_tx_timestamping_test = {
++	.client_psm = 0x0080,
++	.server_psm = 0x0080,
++	.write_data = l2_data,
++	.data_len = sizeof(l2_data),
++	.so_timestamping = (SOF_TIMESTAMPING_SOFTWARE |
++					SOF_TIMESTAMPING_OPT_ID |
++					SOF_TIMESTAMPING_TX_SOFTWARE),
++};
 +
-+	return NULL;
-+}
+ static const struct l2cap_data le_client_connect_adv_success_test_1 = {
+ 	.client_psm = 0x0080,
+ 	.server_psm = 0x0080,
+@@ -1079,6 +1103,8 @@ static gboolean client_received_data(GIOChannel *io, GIOCondition cond,
+ 	char buf[1024];
+ 	int sk;
+ 
++	tester_debug("Client received data");
 +
- static struct l2cap_conn_cb_data *bthost_find_l2cap_cb_by_psm(
- 					struct bthost *bthost, uint16_t psm)
- {
-@@ -609,14 +634,24 @@ static void send_iov(struct bthost *bthost, uint16_t handle, uint16_t cid,
- }
+ 	sk = g_io_channel_unix_get_fd(io);
+ 	if (read(sk, buf, l2data->data_len) != l2data->data_len) {
+ 		tester_warn("Unable to read %u bytes", l2data->data_len);
+@@ -1123,6 +1149,8 @@ static void bthost_received_data(const void *buf, uint16_t len,
+ 	struct test_data *data = tester_get_data();
+ 	const struct l2cap_data *l2data = data->test_data;
  
- static void send_acl(struct bthost *bthost, uint16_t handle, uint16_t cid,
--						const void *data, uint16_t len)
-+				bool sdu_hdr, const void *data, uint16_t len)
- {
--	struct iovec iov;
-+	struct iovec iov[2];
-+	uint16_t sdu;
-+	int num = 0;
++	tester_debug("BTHost received data: %u bytes", len);
 +
-+	if (sdu_hdr) {
-+		sdu = cpu_to_le16(len);
-+		iov[num].iov_base = &sdu;
-+		iov[num].iov_len = sizeof(sdu);
-+		num++;
-+	}
+ 	--data->step;
  
--	iov.iov_base = (void *) data;
--	iov.iov_len = len;
-+	iov[num].iov_base = (void *) data;
-+	iov[num].iov_len = len;
-+	num++;
- 
--	send_iov(bthost, handle, cid, &iov, 1);
-+	send_iov(bthost, handle, cid, iov, num);
- }
- 
- static uint8_t l2cap_sig_send(struct bthost *bthost, struct btconn *conn,
-@@ -711,12 +746,19 @@ void bthost_send_cid(struct bthost *bthost, uint16_t handle, uint16_t cid,
- 					const void *data, uint16_t len)
- {
- 	struct btconn *conn;
-+	struct l2conn *l2conn;
-+	bool sdu_hdr = false;
- 
- 	conn = bthost_find_conn(bthost, handle);
- 	if (!conn)
- 		return;
- 
--	send_acl(bthost, handle, cid, data, len);
-+	l2conn = btconn_find_l2cap_conn_by_dcid(conn, cid);
-+	if (l2conn && (l2conn->mode == L2CAP_MODE_LE_CRED ||
-+			l2conn->mode == L2CAP_MODE_LE_ENH_CRED))
-+		sdu_hdr = true;
-+
-+	send_acl(bthost, handle, cid, sdu_hdr, data, len);
- }
- 
- void bthost_send_cid_v(struct bthost *bthost, uint16_t handle, uint16_t cid,
-@@ -1779,7 +1821,7 @@ static void rfcomm_sabm_send(struct bthost *bthost, struct btconn *conn,
- 	cmd.length = RFCOMM_LEN8(0);
- 	cmd.fcs = rfcomm_fcs2((uint8_t *)&cmd);
- 
--	send_acl(bthost, conn->handle, l2conn->dcid, &cmd, sizeof(cmd));
-+	send_acl(bthost, conn->handle, l2conn->dcid, false, &cmd, sizeof(cmd));
- }
- 
- static bool l2cap_conn_rsp(struct bthost *bthost, struct btconn *conn,
-@@ -2110,6 +2152,7 @@ static bool l2cap_le_conn_req(struct bthost *bthost, struct btconn *conn,
- 				uint8_t ident, const void *data, uint16_t len)
- {
- 	const struct bt_l2cap_pdu_le_conn_req *req = data;
-+	struct l2cap_conn_cb_data *cb_data;
- 	struct bt_l2cap_pdu_le_conn_rsp rsp;
- 	uint16_t psm;
- 
-@@ -2124,7 +2167,8 @@ static bool l2cap_le_conn_req(struct bthost *bthost, struct btconn *conn,
- 	rsp.mps = 23;
- 	rsp.credits = 1;
- 
--	if (bthost_find_l2cap_cb_by_psm(bthost, psm))
-+	cb_data = bthost_find_l2cap_cb_by_psm(bthost, psm);
-+	if (cb_data)
- 		rsp.dcid = cpu_to_le16(conn->next_cid++);
- 	else
- 		rsp.result = cpu_to_le16(0x0002); /* PSM Not Supported */
-@@ -2132,6 +2176,20 @@ static bool l2cap_le_conn_req(struct bthost *bthost, struct btconn *conn,
- 	l2cap_sig_send(bthost, conn, BT_L2CAP_PDU_LE_CONN_RSP, ident, &rsp,
- 								sizeof(rsp));
- 
-+	if (!rsp.result) {
-+		struct l2conn *l2conn;
-+
-+		l2conn = bthost_add_l2cap_conn(bthost, conn,
-+							le16_to_cpu(rsp.dcid),
-+							le16_to_cpu(req->scid),
-+							le16_to_cpu(psm));
-+		l2conn->mode = L2CAP_MODE_LE_CRED;
-+
-+		if (cb_data && l2conn->psm == cb_data->psm && cb_data->func)
-+			cb_data->func(conn->handle, l2conn->dcid,
-+							cb_data->user_data);
-+	}
-+
- 	return true;
- }
- 
-@@ -2139,11 +2197,14 @@ static bool l2cap_le_conn_rsp(struct bthost *bthost, struct btconn *conn,
- 				uint8_t ident, const void *data, uint16_t len)
- {
- 	const struct bt_l2cap_pdu_le_conn_rsp *rsp = data;
-+	struct l2conn *l2conn;
- 
- 	if (len < sizeof(*rsp))
- 		return false;
- 	/* TODO add L2CAP connection before with proper PSM */
--	bthost_add_l2cap_conn(bthost, conn, 0, le16_to_cpu(rsp->dcid), 0);
-+	l2conn = bthost_add_l2cap_conn(bthost, conn, 0,
-+						le16_to_cpu(rsp->dcid), 0);
-+	l2conn->mode = L2CAP_MODE_LE_CRED;
- 
- 	return true;
- }
-@@ -2196,16 +2257,19 @@ static bool l2cap_ecred_conn_rsp(struct bthost *bthost, struct btconn *conn,
- 		uint16_t scid[5];
- 	} __attribute__ ((packed)) *rsp = data;
- 	int num_scid, i;
-+	struct l2conn *l2conn;
- 
- 	if (len < sizeof(*rsp))
- 		return false;
- 
- 	num_scid = len / sizeof(*rsp->scid);
- 
--	for (i = 0; i < num_scid; i++)
-+	for (i = 0; i < num_scid; i++) {
- 		/* TODO add L2CAP connection before with proper PSM */
--		bthost_add_l2cap_conn(bthost, conn, 0,
-+		l2conn = bthost_add_l2cap_conn(bthost, conn, 0,
- 				      le16_to_cpu(rsp->scid[i]), 0);
-+		l2conn->mode = L2CAP_MODE_LE_ENH_CRED;
-+	}
- 
- 
- 	return true;
-@@ -2333,7 +2397,7 @@ static void rfcomm_ua_send(struct bthost *bthost, struct btconn *conn,
- 	cmd.length = RFCOMM_LEN8(0);
- 	cmd.fcs = rfcomm_fcs2((uint8_t *)&cmd);
- 
--	send_acl(bthost, conn->handle, l2conn->dcid, &cmd, sizeof(cmd));
-+	send_acl(bthost, conn->handle, l2conn->dcid, false, &cmd, sizeof(cmd));
- }
- 
- static void rfcomm_dm_send(struct bthost *bthost, struct btconn *conn,
-@@ -2347,7 +2411,7 @@ static void rfcomm_dm_send(struct bthost *bthost, struct btconn *conn,
- 	cmd.length = RFCOMM_LEN8(0);
- 	cmd.fcs = rfcomm_fcs2((uint8_t *)&cmd);
- 
--	send_acl(bthost, conn->handle, l2conn->dcid, &cmd, sizeof(cmd));
-+	send_acl(bthost, conn->handle, l2conn->dcid, false, &cmd, sizeof(cmd));
- }
- 
- static void rfcomm_sabm_recv(struct bthost *bthost, struct btconn *conn,
-@@ -2636,12 +2700,97 @@ static void process_rfcomm(struct bthost *bthost, struct btconn *conn,
- 	}
- }
- 
-+static void append_l2conn_data(struct bthost *bthost, struct l2conn *conn,
-+				const void *data, uint16_t len)
-+{
-+	if (!conn->recv_data) {
-+		bthost_debug(bthost, "Unexpected L2CAP SDU data: sCID 0x%4.4x ",
-+								conn->scid);
-+		return;
-+	}
-+
-+	if (conn->recv_len + len > conn->data_len) {
-+		bthost_debug(bthost, "Unexpected L2CAP SDU data: sCID 0x%4.4x ",
-+								conn->scid);
-+		return;
-+	}
-+
-+	memcpy(conn->recv_data + conn->recv_len, data, len);
-+	conn->recv_len += len;
-+
-+	bthost_debug(bthost, "L2CAP SDU data: %u/%u bytes", conn->recv_len,
-+							conn->data_len);
-+}
-+
-+static void free_l2conn_data(struct l2conn *conn)
-+{
-+	free(conn->recv_data);
-+	conn->recv_data = NULL;
-+	conn->recv_len = 0;
-+	conn->data_len = 0;
-+}
-+
-+static void new_l2conn_data(struct bthost *bthost, struct l2conn *conn,
-+								uint16_t len)
-+{
-+	free(conn->recv_data);
-+	conn->recv_data = malloc(len);
-+	conn->recv_len = 0;
-+	conn->data_len = len;
-+}
-+
-+static bool process_l2cap_conn(struct bthost *bthost, struct btconn *conn,
-+				struct l2conn *l2conn, struct iovec *data)
-+{
-+	struct bt_l2cap_pdu_le_flowctl_creds creds;
-+	uint16_t sdu;
-+
-+	if (!l2conn)
-+		return true;
-+
-+	switch (l2conn->mode) {
-+	case L2CAP_MODE_LE_CRED:
-+	case L2CAP_MODE_LE_ENH_CRED:
-+		break;
-+	case L2CAP_MODE_OTHER:
-+		return true;
-+	}
-+
-+	/* Credit-based flow control */
-+
-+	creds.cid = cpu_to_le16(l2conn->scid);
-+	creds.credits = cpu_to_le16(1);
-+	l2cap_sig_send(bthost, conn, BT_L2CAP_PDU_LE_FLOWCTL_CREDS, 0,
-+							&creds, sizeof(creds));
-+
-+	if (!l2conn->data_len) {
-+		if (!util_iov_pull_le16(data, &sdu)) {
-+			free_l2conn_data(l2conn);
-+			bthost_debug(bthost, "L2CAP invalid SDU");
-+			return false;
-+		}
-+		new_l2conn_data(bthost, l2conn, sdu);
-+	}
-+
-+	append_l2conn_data(bthost, l2conn, data->iov_base, data->iov_len);
-+
-+	if (l2conn->recv_len < l2conn->data_len)
-+		return false;  /* SDU incomplete */
-+
-+	l2conn->data_len = 0;
-+	data->iov_base = l2conn->recv_data;
-+	data->iov_len = l2conn->recv_len;
-+
-+	return true;
-+}
-+
- static void process_l2cap(struct bthost *bthost, struct btconn *conn,
--					const void *data, uint16_t len)
-+					const void *buf, uint16_t len)
- {
--	const struct bt_l2cap_hdr *l2_hdr = data;
-+	const struct bt_l2cap_hdr *l2_hdr = buf;
- 	struct cid_hook *hook;
- 	struct l2conn *l2conn;
-+	struct iovec data;
- 	uint16_t cid, l2_len;
- 
- 	l2_len = le16_to_cpu(l2_hdr->len);
-@@ -2654,31 +2803,37 @@ static void process_l2cap(struct bthost *bthost, struct btconn *conn,
- 	bthost_debug(bthost, "L2CAP data: %u bytes", l2_len);
- 
- 	cid = le16_to_cpu(l2_hdr->cid);
-+	l2conn = btconn_find_l2cap_conn_by_scid(conn, cid);
-+
-+	data.iov_base = (void *)l2_hdr->data;
-+	data.iov_len = l2_len;
-+
-+	if (!process_l2cap_conn(bthost, conn, l2conn, &data))
-+		return;
- 
- 	hook = find_cid_hook(conn, cid);
- 	if (hook) {
--		hook->func(l2_hdr->data, l2_len, hook->user_data);
-+		hook->func(data.iov_base, data.iov_len, hook->user_data);
- 		return;
+ 	if (len != l2data->data_len) {
+@@ -1313,7 +1341,7 @@ static gboolean l2cap_connect_cb(GIOChannel *io, GIOCondition cond,
+ 		goto failed;
  	}
  
- 	switch (cid) {
- 	case 0x0001:
--		l2cap_sig(bthost, conn, l2_hdr->data, l2_len);
-+		l2cap_sig(bthost, conn, data.iov_base, data.iov_len);
- 		break;
- 	case 0x0005:
--		l2cap_le_sig(bthost, conn, l2_hdr->data, l2_len);
-+		l2cap_le_sig(bthost, conn, data.iov_base, data.iov_len);
- 		break;
- 	case 0x0006:
--		smp_data(conn->smp_data, l2_hdr->data, l2_len);
-+		smp_data(conn->smp_data, data.iov_base, data.iov_len);
- 		break;
- 	case 0x0007:
--		smp_bredr_data(conn->smp_data, l2_hdr->data, l2_len);
-+		smp_bredr_data(conn->smp_data, data.iov_base, data.iov_len);
- 		break;
- 	default:
--		l2conn = btconn_find_l2cap_conn_by_scid(conn, cid);
- 		if (l2conn && l2conn->psm == 0x0003)
--			process_rfcomm(bthost, conn, l2conn, l2_hdr->data,
--								l2_len);
-+			process_rfcomm(bthost, conn, l2conn, data.iov_base,
-+								data.iov_len);
- 		else
- 			bthost_debug(bthost,
- 					"Packet for unknown CID 0x%04x (%u)",
-@@ -3494,7 +3649,7 @@ void bthost_send_rfcomm_data(struct bthost *bthost, uint16_t handle,
- 	}
+-	tester_print("Successfully connected");
++	tester_print("Successfully connected to CID 0x%04x", data->dcid);
  
- 	uih_frame[uih_len - 1] = rfcomm_fcs((void *)hdr);
--	send_acl(bthost, handle, rcconn->scid, uih_frame, uih_len);
-+	send_acl(bthost, handle, rcconn->scid, false, uih_frame, uih_len);
+ 	if (!check_mtu(data, sk)) {
+ 		tester_test_failed();
+@@ -1505,6 +1533,8 @@ static void client_l2cap_connect_cb(uint16_t handle, uint16_t cid,
+ {
+ 	struct test_data *data = user_data;
  
- 	free(uih_frame);
++	tester_debug("Client connect CID 0x%04x handle 0x%04x", cid, handle);
++
+ 	data->dcid = cid;
+ 	data->handle = handle;
  }
+@@ -2430,6 +2460,15 @@ int main(int argc, char *argv[])
+ 	test_l2cap_le("L2CAP LE Client - Timeout",
+ 				&le_client_connect_timeout_test_1,
+ 				setup_powered_client, test_connect_timeout);
++	test_l2cap_le("L2CAP LE Client - Read Success",
++					&le_client_connect_read_success_test,
++					setup_powered_client, test_connect);
++	test_l2cap_le("L2CAP LE Client - Write Success",
++				&le_client_connect_write_success_test,
++				setup_powered_client, test_connect);
++	test_l2cap_le("L2CAP LE Client - TX Timestamping",
++				&le_client_connect_tx_timestamping_test,
++				setup_powered_client, test_connect);
+ 	test_l2cap_le("L2CAP LE Client, Direct Advertising - Success",
+ 				&le_client_connect_adv_success_test_1,
+ 				setup_powered_client, test_connect);
 -- 
 2.44.0
 
