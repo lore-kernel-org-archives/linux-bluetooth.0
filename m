@@ -1,83 +1,135 @@
-Received: from mail.tuxedocomputers.com (mail.tuxedocomputers.com [157.90.84.7])
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECFE156766;
-	Tue,  2 Apr 2024 09:17:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=157.90.84.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1C5579B8A
+	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Apr 2024 10:57:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712049478; cv=none; b=ZAJz/oTAxzs/pS7OYWU1og8pqeVrs63LjyN5yD8yNhdpm40jp0dMO3LnoFgdv79TbfjiyTPZ6TCkPXzCaKa0zblgw2ubOIHeTcoMqu97PbHMVzQLZFzsmLkfM5SWAVS+gGFCmGkiRM0V3r6ALT42tqnvrVy3qhP2138lIQJZbus=
+	t=1712055468; cv=none; b=ETkaBmxZW/fIfCD/34NZMGsorgGzLToQ5/n0dIYSnDZpzlcNpUSbWlmXyH/0bryaycdgAa4dWbB94BlqOMFUkyZbKcFJzxm3lNwPYIqXGSt2HTVjG4/P4YAE6ObcnZo36xPUxGp+5fT1rIS05wmbqAQHnQSP732DXCgCCjif8Wk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712049478; c=relaxed/simple;
-	bh=kLCMaKI7+BrwnnoGSoIuNn+cbwCpoIeucymr6iUKRhE=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=eZ45YYyh8LXPzS/aVjgRCHx4f7gMCXqIgY5L7LzNjUjhznSu7wVCb5OlcxKarBQNnLtpIub5L/MR6vmFbuJghcLl1ppBYroCOe/BgwIcH9pHAvHizsY9P4kRquS5Qv+u88d0VBAefYF6NpkEnz4Oi1c6ITszbD/Sf9C7PAEnAl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tuxedo.de; spf=pass smtp.mailfrom=tuxedo.de; dkim=pass (2048-bit key) header.d=tuxedo.de header.i=@tuxedo.de header.b=GcHIsoiF; arc=none smtp.client-ip=157.90.84.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tuxedo.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxedo.de
+	s=arc-20240116; t=1712055468; c=relaxed/simple;
+	bh=Hr7Xp50rW+8exIfPBdNB+2gt14zjJGKAfeBvyG31h3c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZNyKZfuuwN7SLLesEGSy2idfTKCrnjBw3JeQS1KBkXUTfJcrgDOq5vCCmz/UHK4fc7sRrGgnw+Lnv5CB/RiLede4QAA/0snM0FTqqPycn21eX+ABLfL0AyuNZNBZnTU7ZGgC2Y6a14IfBtn0YG0ep9L9qQwfT5OTawhMBD2Lqxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=hyggrUQg; arc=none smtp.client-ip=209.85.128.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxedo.de header.i=@tuxedo.de header.b="GcHIsoiF"
-Received: from mail.tuxedocomputers.com (localhost [IPv6:::1])
-	(Authenticated sender: cs@tuxedocomputers.com)
-	by mail.tuxedocomputers.com (Postfix) with ESMTPA id 22F882FC0063;
-	Tue,  2 Apr 2024 11:17:45 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tuxedo.de; s=default;
-	t=1712049465;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Y5tY6k0ZLmkz6XkazdkXb7L0Y1vhdIIAYIiiPQmk3pw=;
-	b=GcHIsoiFc+ZblluRqBR8ChHfyO3RZRLyzX3G8s695s/pz+iG7JVOzGRxXK7g/2TvJbgZ90
-	IqXvzCP+0j4GO1HDKw7OWTYTTWC+DDxdkxLdi5c1qOA4xoNOzfCIXzaNqVv1oDAr8gb7nW
-	LOVaBBRhYIEGH/ZIJYvlCVgA27IwR6MukiulNo1yc2obtLJsa+Bj0RtYcVMu49JKsXxAeT
-	evVpf2Hgls7lBkjmuE4KFEgeHTDBtrewnz5dh6rcze4jBP8+Fedt15l785cE+Tt1nG9WDd
-	H3ZvDx1arQOYQoD7RYIgU7Ptr3L/gbqzGN2q5vvCIlXNiFF1yNBHd2AxCHk0/A==
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hyggrUQg"
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-6153e169066so1170817b3.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Apr 2024 03:57:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1712055466; x=1712660266; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=heR2AZ16RGjephYYk3nVkJQSU4kssIE/CVztHg4PbLw=;
+        b=hyggrUQgPnmeMneJ2liKSXdae8XB3vszf+yzwwLoMQbrbQ1dP1eS48Y+tyYwbmBrc/
+         ytyVyVA0dBnb9mLjmfVG+gUnkYPGMis+KyO02sGIoVbpd83ivPNUATWHBbvrto3XlA9F
+         821l34KnzZKYkUahoCGLnK0HYEtCqZ/jiqtkF01hfcqRVzNEgCN5/wSX7CYqg0teMdwn
+         BnMPqSPFuT+9LwQED1xHAVFj8Ktw59J3mhouSp3Ei2RcCyBjA1BSBXEWfeDJy39xl3Jk
+         RouzQAqKFJ2fmZ61DJ6tNXohSnKkTbj9owNvyJF0ep6UyTdy+BygpGJtJjgLo+TFKfD5
+         nh6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712055466; x=1712660266;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=heR2AZ16RGjephYYk3nVkJQSU4kssIE/CVztHg4PbLw=;
+        b=JIvNTueiG49ggsNvZ5xzm0ZlxgNR2qdcyZFuo8r0CA9vB/mPRwlcNtxFENftbkf7rS
+         1o+vneTjKyub2+iowpaOVBFsVxc2byUk+yb+/i4t38fgd7g7JcHUdASkTb0GsSc/e+Ar
+         4+4XlkMefdS21YfV63t+9kgM0NFieAzNB/no6l4lkJXVhrqeSL/H2FGhYUycVpABZaJD
+         gQu7gP7KlVfKdBZXFhfpCO3MJ8DO3fOWxYiS35dA7VjP+SqlcPItCzQPWEo4s4X2Gk6p
+         ZIfSMw9j2eogYUksmZ3T5MY/S6Hsjm/9bagRuQ//+GKf7QvoNm0disLcg8sZDUgGw1ms
+         qkxw==
+X-Forwarded-Encrypted: i=1; AJvYcCV1WRvFNnMCIx6VCZg47cn1TUuoqjOev1Dck7CzWYutc/4w6QHDu0B0jF94Hc+6nbA9ZpkEYLrw5zeY101JG3X6HC4uTtyzR7qx+paLgevy
+X-Gm-Message-State: AOJu0YxTLufG4MTsgb0OMzvNwGtY/rWwMVPA8Imv3HSqExTzK+B8+lGr
+	8F42jhhrRKl+tEWgZQJwo5zyIjU3DZ1Hn/BS7oo9mMFSX9t4My8nLqNYMTAwlTzJHovlSsRlS7t
+	GRmPfHSTDBacapvn6oz9vC5Ihpss8n4oPTYKxvQ==
+X-Google-Smtp-Source: AGHT+IG0hl043sikYSStWfJMtXPIZPLFFTefeWAq9LsJotUVsTuh5FFEl/udwTnzeyfi+7Th8cC2dNNikPb4b1WN2ok=
+X-Received: by 2002:a81:5d45:0:b0:608:e133:7ece with SMTP id
+ r66-20020a815d45000000b00608e1337ecemr11694233ywb.36.1712055465511; Tue, 02
+ Apr 2024 03:57:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Tue, 02 Apr 2024 11:17:45 +0200
-From: Christoffer Sandberg <cs@tuxedo.de>
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: Werner Sembach <wse@tuxedocomputers.com>, Marcel Holtmann
- <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Christoffer Sandberg <cs@tuxedo.de>, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: btintel: Add devices to
- HCI_QUIRK_BROKEN_LE_CODED
-In-Reply-To: <ee6259a2-05c3-4d6d-9dda-7a7b8f55fbfe@molgen.mpg.de>
-References: <20240328131800.63328-1-wse@tuxedocomputers.com>
- <ee6259a2-05c3-4d6d-9dda-7a7b8f55fbfe@molgen.mpg.de>
-User-Agent: Roundcube Webmail/1.4.15
-Message-ID: <bda6baa41b6b4511830603138d896add@tuxedocomputers.com>
-X-Sender: cs@tuxedo.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240329-module-owner-sdio-v1-0-e4010b11ccaa@linaro.org>
+In-Reply-To: <20240329-module-owner-sdio-v1-0-e4010b11ccaa@linaro.org>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Date: Tue, 2 Apr 2024 12:57:09 +0200
+Message-ID: <CAPDyKFqct4ZV3UbTzWKO08MzDTm_BX6K02kefV26mEain0SXqA@mail.gmail.com>
+Subject: Re: [PATCH 0/7] mmc/wifi/bluetooth: store owner from modules with sdio_register_driver()
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Kalle Valo <kvalo@kernel.org>, 
+	Jeff Johnson <jjohnson@kernel.org>, Arend van Spriel <arend.vanspriel@broadcom.com>, 
+	Brian Norris <briannorris@chromium.org>, =?UTF-8?B?SsOpcsO0bWUgUG91aWxsZXI=?= <jerome.pouiller@silabs.com>, 
+	linux-mmc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-mediatek@lists.infradead.org, linux-wireless@vger.kernel.org, 
+	ath10k@lists.infradead.org, brcm80211@lists.linux.dev, 
+	brcm80211-dev-list.pdl@broadcom.com
+Content-Type: text/plain; charset="UTF-8"
 
-Dear Paul,
+On Fri, 29 Mar 2024 at 18:24, Krzysztof Kozlowski
+<krzysztof.kozlowski@linaro.org> wrote:
+>
+> Merging
+> =======
+> All further patches depend on the first patch.  Everything could go via
+> one tree, e.g. MMC, or the cleanup patches removing owner would wait a
+> cycle.
 
-On 28.3.2024 14:23, Paul Menzel wrote:
-> On what hardware with what clients do you experience this exactly?
-> 
+Patch 1 applied for next, thanks!
 
-The wifi/bluetooth modules AX201, AX210 and AX211 (cases 0x18, 0x17 and 
-0x19 respectively) used in various notebook devices started having 
-issues as of the patch that enabled le coded phy in the driver. (We also 
-use AX200, however without issue.)
+I can certainly pick the remaining in the series through my mmc tree,
+but waiting a bit to queue them up to allow some more acks to be
+received.
 
-Noted behaviour as of the issues: Device scan took longer and when it 
-did find a device connection often failed or timed out.
+Kind regards
+Uffe
 
-I do not know if a special type of bluetooth client is affected. It was 
-partially tested by looking at the difference in enumeration of the 
-current mix of bluetooth clients in the area (where you could clearly 
-see the difference at a glance) and with one specific device.  A 
-bluetooth connected watercooling system (TUXEDO Aquaris or 
-LCT21001/LCT22002) where a test case showed the mentioned issues.
 
-Best regards,
-
-Christoffer
+>
+> Description
+> ===========
+> Modules registering driver with sdio_register_driver() might
+> forget to set .owner field.
+>
+> Solve the problem by moving this task away from the drivers to the core
+> code, just like we did for platform_driver in commit 9447057eaff8
+> ("platform_device: use a macro instead of platform_driver_register").
+>
+> Best regards,
+> Krzysztof
+>
+> ---
+> Krzysztof Kozlowski (7):
+>       mmc: sdio: store owner from modules with sdio_register_driver()
+>       bluetooth: btmrvl_sdio: drop driver owner initialization
+>       bluetooth: btmtksdio: drop driver owner initialization
+>       wifi: ath10k: sdio: drop driver owner initialization
+>       wifi: brcm80211: drop driver owner initialization
+>       wifi: marvell: mwifiex: drop driver owner initialization
+>       wifi: silabs: wfx: drop driver owner initialization
+>
+>  drivers/bluetooth/btmrvl_sdio.c                           | 1 -
+>  drivers/bluetooth/btmtksdio.c                             | 1 -
+>  drivers/mmc/core/sdio_bus.c                               | 9 ++++++---
+>  drivers/net/wireless/ath/ath10k/sdio.c                    | 1 -
+>  drivers/net/wireless/broadcom/brcm80211/brcmfmac/bcmsdh.c | 1 -
+>  drivers/net/wireless/marvell/mwifiex/sdio.c               | 1 -
+>  drivers/net/wireless/silabs/wfx/bus_sdio.c                | 1 -
+>  include/linux/mmc/sdio_func.h                             | 5 ++++-
+>  8 files changed, 10 insertions(+), 10 deletions(-)
+> ---
+> base-commit: 087c142b2b04898c897aa77938d05a93907150e5
+> change-id: 20240329-module-owner-sdio-abd5de3f1d74
+>
+> Best regards,
+> --
+> Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+>
