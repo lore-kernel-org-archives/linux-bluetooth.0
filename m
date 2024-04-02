@@ -1,44 +1,35 @@
-Received: from mail.wantyapps.xyz (mail.wantyapps.xyz [66.135.5.160])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EF001E480;
-	Tue,  2 Apr 2024 15:56:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.135.5.160
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0798134BE;
+	Tue,  2 Apr 2024 16:01:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712073396; cv=none; b=Na3wTjCURBdRKJygXb0+J01/YjbmlZ2AnuvMRXk/3ZnBTuMyioyxtheB/g0oK54z4YtVG6xseCbpzy5t8A8Y+14+ZHcIwZeCyQ5gTZ6dbziHa/kcwNAykzuqTnjduZQ/gQ7QCwTfL3NCfgSbB08AGV89RK/wCZSkr4fplHtS0Ws=
+	t=1712073694; cv=none; b=JhVqDE6aOv5bK3+EYiY1JXG7crXOBNqjx0K6qJcXLtRp2fd7YMPPbH76pVmAQChafEiEV2Hm7pTHqasKLHq90hODGbxXm8VeQQFBY9eSZMunU1GkVVt939ZrnOW5vvtsM+7q3U2btkVDYkUZUffLJG9GpVN/9E15FmvAkTTVd+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712073396; c=relaxed/simple;
-	bh=3uUdxpNMJCSv/whZqF+Y9KRjEax86QarR254jAZl9Yk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=n0sk6NRkc54MQXVJag8yyyWNzoNZ7MXdEHUr6txJEVMIgDJ7qqxpfbCsrFrvlLaAgdE56s5i611aFkdUtdDG2zlnvHTP4+5Fa8h/F8ngxwP6VigA57cd8ozUop+3Z3i2UaC9fxYz8lZZlzui+wZCCi4c9fcR+nJWf37wb6PP8nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=wantyapps.xyz; spf=pass smtp.mailfrom=wantyapps.xyz; dkim=pass (2048-bit key) header.d=wantyapps.xyz header.i=@wantyapps.xyz header.b=QfVU6kTu; arc=none smtp.client-ip=66.135.5.160
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=wantyapps.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wantyapps.xyz
+	s=arc-20240116; t=1712073694; c=relaxed/simple;
+	bh=0q8JNj03RO1bowqfHPzaZnTUaz8dx0ZxbwFogRfGt1M=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ETi1wh0yW/vkWXS+mTbDl3NyqyB7/Lgvg6A74a0DR6ymJh8Zp5tu1TDxa9wwUGIWIr9qCJ0TOiyobq/DF7ZsUHiG5wkP1UwOGZmHRp1Rq81HqYOW3bdWCwfz2ZhEnutbLF9zC66qC1w63wTZ5UEaGfityi7IPQYgkH7p+Ojxc20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aQacvV0G; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wantyapps.xyz header.i=@wantyapps.xyz header.b="QfVU6kTu"
-Received: from multivac.localdomain (unknown [147.235.205.62])
-	by mail.wantyapps.xyz (Postfix) with ESMTPSA id 511EE93B8D;
-	Tue,  2 Apr 2024 15:56:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=wantyapps.xyz;
-	s=mail; t=1712073388;
-	bh=3uUdxpNMJCSv/whZqF+Y9KRjEax86QarR254jAZl9Yk=;
-	h=From:To:Cc:Subject:Date:From;
-	b=QfVU6kTuNxAmCn40yRCWmwiXs5oahcAAdwl6+mD5HGXHiPqbuuMc5Qi30vucXyPnB
-	 RzxEreWWA2qmbt15BSjFox8EV6Y4Qh2KX1t1Cz1bg0o2/P21j1MsTcCPj+fewPLjhO
-	 Oizd914Iem9wFMdpDgZZjL1xCUeKbD+GHMA3mmuRWEiATrm297T6nV1wyyTRoteUPV
-	 Nb/nMWqV4h7Rc5Ug5VpK1HTCCUdyk2x2D/bzJWNzrScR4zG32r8zlTuXmssdwL6Qrl
-	 YdjPkZVy7QYUc2cVcyUKFbZK34jj21aDnPOcn5mQLTyLplNi3qtSZco6dmWDh8xwOv
-	 jU6X5vSSrGCdg==
-From: me@wantyapps.xyz
-To: 
-Cc: me@wantyapps.xyz,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_intel: Fix multiple issues reported by checkpatch.pl
-Date: Tue,  2 Apr 2024 18:55:38 +0300
-Message-ID: <20240402155543.36856-1-me@wantyapps.xyz>
-X-Mailer: git-send-email 2.44.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aQacvV0G"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id AFE6AC433F1;
+	Tue,  2 Apr 2024 16:01:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712073693;
+	bh=0q8JNj03RO1bowqfHPzaZnTUaz8dx0ZxbwFogRfGt1M=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=aQacvV0G+OhRzC8z4HX1dsD2z7D+fNJkWLGHczj4FsxKG/oUvdlsB0xZVvsYzSwPH
+	 oI2Se5Vk1OcFStl6Z2HRWJe5DDxRVn+PgHg2U9HmuObz15reNzoJNChuKC8t42z3qh
+	 R+ESDeGCb9aS4zDxr8GY1nYom8C0pxqOnHgaAw3goLMiMJU1joSJwckaYNE1aVzMhN
+	 EbhVoDRHIwA6Nlyrt5P83q1ieC00fb8tPczV/Up5cPzMI2WR55/W116oc7WBfJpypg
+	 UVaApXWvfk6paPZKcHUUZT4HjbjVIdwCRFup1ygMqs3tb+OMC2iBoK+nF7Lf4mOas8
+	 De6y7bbODJ43A==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9D2D7D9A14F;
+	Tue,  2 Apr 2024 16:01:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -46,110 +37,42 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth: fix memory leak in hci_req_sync_complete()
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <171207369363.10776.3107408338305294242.git-patchwork-notify@kernel.org>
+Date: Tue, 02 Apr 2024 16:01:33 +0000
+References: <20240402113205.7260-1-dmantipov@yandex.ru>
+In-Reply-To: <20240402113205.7260-1-dmantipov@yandex.ru>
+To: Dmitry Antipov <dmantipov@yandex.ru>
+Cc: johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, lvc-project@linuxtesting.org,
+ syzbot+39ec16ff6cc18b1d066d@syzkaller.appspotmail.com, stable@vger.kernel.org
 
-From: Uri Arev <me@wantyapps.xyz>
+Hello:
 
-This fixes the following CHECKs, WARNINGs, and ERRORs reported in
-hci_intel.c
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Reported by checkpatch.pl:
------------
-hci_intel.c
------------
-WARNING: Prefer using '"%s...", __func__' to using 'intel_setup', this function's name, in a string
-+	bt_dev_dbg(hdev, "start intel_setup");
+On Tue,  2 Apr 2024 14:32:05 +0300 you wrote:
+> In 'hci_req_sync_complete()', always free the previous sync
+> request state before assigning reference to a new one.
+> 
+> Reported-by: syzbot+39ec16ff6cc18b1d066d@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=39ec16ff6cc18b1d066d
+> Cc: stable@vger.kernel.org
+> Fixes: f60cb30579d3 ("Bluetooth: Convert hci_req_sync family of function to new request API")
+> Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+> 
+> [...]
 
-ERROR: code indent should use tabs where possible
-+        /* Check for supported iBT hardware variants of this firmware$
+Here is the summary with links:
+  - Bluetooth: fix memory leak in hci_req_sync_complete()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/4d0d849bc5fd
 
-ERROR: code indent should use tabs where possible
-+         * loading method.$
-
-ERROR: code indent should use tabs where possible
-+         *$
-
-ERROR: code indent should use tabs where possible
-+         * This check has been put in place to ensure correct forward$
-
-ERROR: code indent should use tabs where possible
-+         * compatibility options when newer hardware variants come along.$
-
-ERROR: code indent should use tabs where possible
-+         */$
-
-CHECK: No space is necessary after a cast
-+	duration = (unsigned long long) ktime_to_ns(delta) >> 10;
-
-CHECK: No space is necessary after a cast
-+	duration = (unsigned long long) ktime_to_ns(delta) >> 10;
-
-WARNING: Missing a blank line after declarations
-+		int err = PTR_ERR(intel->rx_skb);
-+		bt_dev_err(hu->hdev, "Frame reassembly failed (%d)", err);
-
-Signed-off-by: Uri Arev <me@wantyapps.xyz>
----
- drivers/bluetooth/hci_intel.c | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-index 78afb9a348e7..44731de1a2d6 100644
---- a/drivers/bluetooth/hci_intel.c
-+++ b/drivers/bluetooth/hci_intel.c
-@@ -537,7 +537,7 @@ static int intel_setup(struct hci_uart *hu)
- 	int speed_change = 0;
- 	int err;
- 
--	bt_dev_dbg(hdev, "start intel_setup");
-+	bt_dev_dbg(hdev, "start %s", __func__);
- 
- 	hu->hdev->set_diag = btintel_set_diag;
- 	hu->hdev->set_bdaddr = btintel_set_bdaddr;
-@@ -591,12 +591,12 @@ static int intel_setup(struct hci_uart *hu)
- 		return -EINVAL;
- 	}
- 
--        /* Check for supported iBT hardware variants of this firmware
--         * loading method.
--         *
--         * This check has been put in place to ensure correct forward
--         * compatibility options when newer hardware variants come along.
--         */
-+	/* Check for supported iBT hardware variants of this firmware
-+	 * loading method.
-+	 *
-+	 * This check has been put in place to ensure correct forward
-+	 * compatibility options when newer hardware variants come along.
-+	 */
- 	switch (ver.hw_variant) {
- 	case 0x0b:	/* LnP */
- 	case 0x0c:	/* WsP */
-@@ -777,7 +777,7 @@ static int intel_setup(struct hci_uart *hu)
- 
- 	rettime = ktime_get();
- 	delta = ktime_sub(rettime, calltime);
--	duration = (unsigned long long) ktime_to_ns(delta) >> 10;
-+	duration = (unsigned long long)ktime_to_ns(delta) >> 10;
- 
- 	bt_dev_info(hdev, "Firmware loaded in %llu usecs", duration);
- 
-@@ -822,7 +822,7 @@ static int intel_setup(struct hci_uart *hu)
- 
- 	rettime = ktime_get();
- 	delta = ktime_sub(rettime, calltime);
--	duration = (unsigned long long) ktime_to_ns(delta) >> 10;
-+	duration = (unsigned long long)ktime_to_ns(delta) >> 10;
- 
- 	bt_dev_info(hdev, "Device booted in %llu usecs", duration);
- 
-@@ -977,6 +977,7 @@ static int intel_recv(struct hci_uart *hu, const void *data, int count)
- 				    ARRAY_SIZE(intel_recv_pkts));
- 	if (IS_ERR(intel->rx_skb)) {
- 		int err = PTR_ERR(intel->rx_skb);
-+
- 		bt_dev_err(hu->hdev, "Frame reassembly failed (%d)", err);
- 		intel->rx_skb = NULL;
- 		return err;
+You are awesome, thank you!
 -- 
-2.44.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
