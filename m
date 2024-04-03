@@ -1,142 +1,253 @@
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F0AD1494BA
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Apr 2024 14:56:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEC1A17C98
+	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Apr 2024 16:35:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712156195; cv=none; b=Sp0kjf9csn1SVCTm8TIJZX6j8c3LqrEczKgAAFhZ6te90UjdIQ6AshQuJaCsO+/ULqlJei1WV4TVbRT++Xeryrxf6Viz1dzOopk4iqxkwL6O72EfSXp2CktrnySNLR7oBwvCLYzPVC3lDCixpn+5dEiTORjXDfdFi4aJkW3CrdM=
+	t=1712162144; cv=none; b=YfwoelEqPYNFgeDW5i8oL4ziroWCjLzL2CSAAS1ycjpd4ChzOdKYzQhraaN+tmQIpOIdH/CrLHmKrmd4xVJiBydCR5p8fUh/DrKobk8WNPe9jRfm/nFjuvfKg5js5QDOd57EgUNP0EitsIr94aWjlShWXUmI9Pt6ZSHJnrMFxlA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712156195; c=relaxed/simple;
-	bh=4ae24oEgbSHmwAdFClSkG00opqajPT5DyeO6or5/0D0=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=NLLqBE4Jf2YB3QHXo8onykT/pVmj/3GkOmb9ngm81F80ulKeogbWix8Q6GNXlCkgISqdNf4wfy5uPcX25g/KqOyAMpTmcV1JBEJALHvT3UCQ8651lKRQrMROvl/ovUItlyP6CRbcWBkBoIUzgiP5747CbaMyaKqwxwQyXX/m2r8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jEPDKCtj; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1712162144; c=relaxed/simple;
+	bh=5J1y18JW2daZxBMhgXu52DM/+FwFYzBXVii0gXprOAs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Bl05X2cPgtUreWWtUOtC7CvVYHizL2bwM0wLeSi95MVJ2sMNi6yKjgeEqfsQkIJy8kYcVcVIaRS6osWTdS7T0r4FPu9/DOrZuPaeEpdUgJfw6tYlDpzt1VfdTWC5GxIKx7HqzuYIhMVQNSLzfZPwEo5folyf1udXxDcB3wAGxfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=OHhN5g/I; arc=none smtp.client-ip=46.235.227.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jEPDKCtj"
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6ecd957f949so439899b3a.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Apr 2024 07:56:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712156193; x=1712760993; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=OSYpxx+RI9jVeTH13Rvu3on7qBO4MyZr2m9DXkyul5g=;
-        b=jEPDKCtj+owBvTQJape2kJr6nKeqH187hyooCm5B450WuWcuFkFvav1s0+CvTxepi5
-         P7ppETVtls6FclJelIQRK/BwnN6pXC2l1ty2kv+B+HKXcesRUvZVr2F7CWycGmPxy63h
-         GKfwOky+qN9Yk4rI2P54+2xRIyf8GPm0NCO2QuigYAb8/JCK1TtTScKA/PPMn58kxLe1
-         AjxbHAC/lBT+oMggcB3sBP3f606twsEX7+DUJOzHLMxxmZIB0gTu1amoV8FM5BkEO3V6
-         z1wsAQEj0RQZpOFs1r0OB8cNXWi/vFSM1DX2IxUhN6+Oc0jDWp2cRXobBnOQj62CQ3HB
-         ILrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712156193; x=1712760993;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OSYpxx+RI9jVeTH13Rvu3on7qBO4MyZr2m9DXkyul5g=;
-        b=dhsAHhK8oEm7u+qBQBpA1q0mGwpWp5FKSt7CLaJNXMQivt6Lb4sBb3+BCZj2Vw7kBb
-         WT/WR45JIytyeXJ3fDnzTLhtFfh3C/jht1c+Pqp5UKSQ9E10EtVg0goKIKogwwxPxdzP
-         i+55bUaX+xq6BP3BckCXrXVe729UxY1FXAIcFap/6iQzFO/w+Njl9i/mVkppMFpB7n9u
-         lPU3UV/BjeHweJ2xd/t6H0DwqHoQ0D18oX+yaS5C+VjQ8JI9AhKPH3oI3stQyNspm5UE
-         JJHfaCaNUlJj2m6g0Bxeu+oxBAFJYNU/rKw0n+hwaSSY8QduDTmvQy7iwe4Av4GEib0B
-         5r7A==
-X-Gm-Message-State: AOJu0YzegvO/VyWlbNRCUF2KWHT8U9xYbwN+jyTpcJiH56V3dNc0XQGr
-	33l10t5doMG6pAy1K0zR5Q/aO/S+lkfPbS1BzxrTVIx6EX3yxCC+uUFvgU/N
-X-Google-Smtp-Source: AGHT+IHVO7sMjR/Mi7zErUaMsJlwfMcur/4Ec5enDZQ1+ELwwH1v00LZOZtVvTbFYY+uWFzJv1O0+w==
-X-Received: by 2002:a05:6a20:3949:b0:1a7:e98:96dd with SMTP id r9-20020a056a20394900b001a70e9896ddmr3421027pzg.8.1712156193399;
-        Wed, 03 Apr 2024 07:56:33 -0700 (PDT)
-Received: from [172.17.0.2] ([52.157.1.129])
-        by smtp.gmail.com with ESMTPSA id y12-20020aa7804c000000b006e6b41511fdsm12146035pfm.94.2024.04.03.07.56.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Apr 2024 07:56:33 -0700 (PDT)
-Message-ID: <660d6e21.a70a0220.59536.1688@mx.google.com>
-Date: Wed, 03 Apr 2024 07:56:33 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5442878818289683948=="
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="OHhN5g/I"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1712162140;
+	bh=5J1y18JW2daZxBMhgXu52DM/+FwFYzBXVii0gXprOAs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=OHhN5g/Iwvj9P5fLHExealBWqHyU2a+j37GXQ9XpIQ3AZjFz6pO8MbPGw2O4G56ss
+	 6sAGQJ5Pv1LMXjR60HYiqqsTV7XJIHgDqrmAIGtVzydFtMKdlI4XVYPdRncfBMgJW7
+	 OL4kr6vwZtPnGPv4zm+EImzafZgaf8Klfohou6J9MAmvPF2Kth1+rxeiZCbORD8l8L
+	 Y1Jhs9FUfavKiiovY1TrJQbYh+0DUOfPE4NGc8TNUGKvqZ4Mkr3zlZSBgNxAkMqIJT
+	 rf0U02grHG++EWcrRgm0pXhPk1gPsXdSj4bSx8xhoFFifbbdYEzvXdkTf8ltUSsj8m
+	 jcgIafQgR6Jfg==
+Received: from [100.72.96.248] (cola.collaboradmins.com [195.201.22.229])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 97AAB378000E;
+	Wed,  3 Apr 2024 16:35:40 +0000 (UTC)
+Message-ID: <75805a80-f714-4cc4-9929-72992399c30b@collabora.com>
+Date: Wed, 3 Apr 2024 18:35:39 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, krzysztof.kozlowski@linaro.org
-Subject: RE: mmc/wifi/bluetooth: store owner from modules with sdio_register_driver()
-In-Reply-To: <20240403-module-owner-sdio-v2-1-ae46d6b955eb@linaro.org>
-References: <20240403-module-owner-sdio-v2-1-ae46d6b955eb@linaro.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH BlueZ] plugins: Add new plugin to fix airpods pairing
+To: Szymon Janc <szymon.janc@codecoup.pl>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+References: <20240403110808.805771-1-frederic.danis@collabora.com>
+ <CAAEJBhL6pb=PeO_mezcga+aVxDew+zQwTDhTWkHT-wnfXONHtQ@mail.gmail.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis@collabora.com>
+In-Reply-To: <CAAEJBhL6pb=PeO_mezcga+aVxDew+zQwTDhTWkHT-wnfXONHtQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
---===============5442878818289683948==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi,
 
-This is automated email and please do not reply to this email!
+On 03/04/2024 15:50, Szymon Janc wrote:
+> Hi,
+>
+> On Wed, 3 Apr 2024 at 13:08, Frédéric Danis
+> <frederic.danis@collabora.com> wrote:
+>> Apple Airpods are discoverable and pairable in BREDR mode, but also
+>> advertise in unconnectable mode in LE with the same Public address, at the
+>> same time. As the pairing process uses the latest seen address, sometimes
+>> it uses the LE Public address to pair, which fails.
+>>
+>> This commit adds a new adapter driver plugin which force the BREDR last
+>> seen time on LE Public address device found event related to an Apple
+>> device, allowing pairing process to always use the BREDR.
+>>
+> While I'm fine with having plugin for this specific case, I wonder if
+> select_conn_bearer() shouldn't take
+> bearer's connectable state into account when selecting bearer for connection
 
-Dear submitter,
+Yes, this could be a lot simpler, but couldn't it break some other 
+pairing case?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=841110
+>> This commit is based on proposal
+>> https://lore.kernel.org/all/20240103101328.1812899-1-clancy_shang@163.com/
+>> ---
+>>   Makefile.plugins  |   3 ++
+>>   plugins/airpods.c | 132 ++++++++++++++++++++++++++++++++++++++++++++++
+>>   2 files changed, 135 insertions(+)
+>>   create mode 100644 plugins/airpods.c
+>>
+>> diff --git a/Makefile.plugins b/Makefile.plugins
+>> index 4aa2c9c92..2ebd8aaf6 100644
+>> --- a/Makefile.plugins
+>> +++ b/Makefile.plugins
+>> @@ -11,6 +11,9 @@ builtin_sources += plugins/autopair.c
+>>   builtin_modules += policy
+>>   builtin_sources += plugins/policy.c
+>>
+>> +builtin_modules += airpods
+>> +builtin_sources += plugins/airpods.c
+>> +
+>>   if ADMIN
+>>   builtin_modules += admin
+>>   builtin_sources += plugins/admin.c
+>> diff --git a/plugins/airpods.c b/plugins/airpods.c
+>> new file mode 100644
+>> index 000000000..5043f0cca
+>> --- /dev/null
+>> +++ b/plugins/airpods.c
+>> @@ -0,0 +1,132 @@
+>> +// SPDX-License-Identifier: GPL-2.0-or-later
+>> +/*
+>> + *
+>> + *  BlueZ - Bluetooth protocol stack for Linux
+>> + *
+>> + *  Copyright (C) 2024 Frédéric Danis <frederic.danis@collabora.com>
+>> + *
+>> + *
+>> + */
+>> +
+>> +#ifdef HAVE_CONFIG_H
+>> +#include <config.h>
+>> +#endif
+>> +
+>> +#include <stdbool.h>
+>> +
+>> +#include <glib.h>
+>> +
+>> +#include "bluetooth/bluetooth.h"
+>> +
+>> +#include "lib/mgmt.h"
+>> +#include "src/plugin.h"
+>> +#include "src/adapter.h"
+>> +#include "src/device.h"
+>> +#include "src/eir.h"
+>> +#include "src/log.h"
+>> +#include "src/shared/mgmt.h"
+>> +#include "src/shared/util.h"
+>> +
+>> +#define APPLE_INC_VENDOR_ID 0x004c
+>> +
+>> +static struct mgmt *mgmt;
+>> +
+>> +static bool eir_msd_is_apple_inc(GSList *msd_list)
+>> +{
+>> +       GSList *msd_l, *msd_next;
+>> +
+>> +       for (msd_l = msd_list; msd_l != NULL; msd_l = msd_next) {
+>> +               const struct eir_msd *msd = msd_l->data;
+>> +
+>> +               msd_next = g_slist_next(msd_l);
+>> +
+>> +               if (msd->company == APPLE_INC_VENDOR_ID)
+>> +                       return true;
+>> +       }
+>> +
+>> +       return false;
+>> +}
+>> +
+>> +static void airpods_device_found_callback(uint16_t index, uint16_t length,
+>> +                                       const void *param, void *user_data)
+>> +{
+>> +       struct btd_device *dev;
+>> +       const struct mgmt_ev_device_found *ev = param;
+>> +       struct btd_adapter *adapter = user_data;
+>> +       uint16_t eir_len;
+>> +       uint32_t flags = le32_to_cpu(ev->flags);
+>> +       struct eir_data eir_data;
+>> +
+>> +       dev = btd_adapter_find_device(adapter,  &ev->addr.bdaddr,
+>> +                                       ev->addr.type);
+>> +       if (!dev)
+>> +               return;
+>> +
+>> +       if (length < sizeof(*ev)) {
+>> +               warn("Too short device found event (%u bytes)", length);
+>> +               return;
+>> +       }
+>> +
+>> +       eir_len = btohs(ev->eir_len);
+>> +       if (length != sizeof(*ev) + eir_len) {
+>> +               warn("Device found event size mismatch (%u != %zu)",
+>> +                                       length, sizeof(*ev) + eir_len);
+>> +               return;
+>> +       }
+>> +
+>> +       if (eir_len == 0)
+>> +               return;
+>> +
+>> +       memset(&eir_data, 0, sizeof(eir_data));
+>> +       eir_parse(&eir_data, ev->eir, eir_len);
+>> +
+>> +       if (eir_msd_is_apple_inc(eir_data.msd_list) &&
+>> +                               (flags & MGMT_DEV_FOUND_NOT_CONNECTABLE) &&
+>> +                               (ev->addr.type == BDADDR_LE_PUBLIC)) {
+>> +               DBG("Force BREDR last seen");
+>> +               device_set_bredr_support(dev);
+>> +               device_update_last_seen(dev, BDADDR_BREDR, true);
+>> +       }
+>> +}
+>> +
+>> +static int airpods_probe(struct btd_adapter *adapter)
+>> +{
+>> +       if (!mgmt)
+>> +               mgmt = mgmt_new_default();
+>> +
+>> +       if (!mgmt) {
+>> +               fprintf(stderr, "Failed to open management socket\n");
+>> +               return 0;
+>> +       }
+>> +
+>> +       mgmt_register(mgmt, MGMT_EV_DEVICE_FOUND,
+>> +                                       btd_adapter_get_index(adapter),
+>> +                                       airpods_device_found_callback,
+>> +                                       adapter, NULL);
+>> +
+>> +       return 0;
+>> +}
+>> +
+>> +static void airpods_remove(struct btd_adapter *adapter)
+>> +{
+>> +       mgmt_unregister_index(mgmt, btd_adapter_get_index(adapter));
+>> +}
+>> +
+>> +static struct btd_adapter_driver airpods_driver = {
+>> +       .name   = "airpods",
+>> +       .probe  = airpods_probe,
+>> +       .remove = airpods_remove,
+>> +};
+>> +
+>> +static int airpods_init(void)
+>> +{
+>> +       return btd_register_adapter_driver(&airpods_driver);
+>> +}
+>> +
+>> +static void airpods_exit(void)
+>> +{
+>> +       btd_unregister_adapter_driver(&airpods_driver);
+>> +}
+>> +
+>> +BLUETOOTH_PLUGIN_DEFINE(airpods, VERSION,
+>> +               BLUETOOTH_PLUGIN_PRIORITY_LOW, airpods_init, airpods_exit)
+>> --
+>> 2.34.1
+>>
+>>
+>
 
----Test result---
+-- 
+Frédéric Danis
+Senior Software Engineer
 
-Test Summary:
-CheckPatch                    PASS      3.07 seconds
-GitLint                       PASS      1.40 seconds
-SubjectPrefix                 FAIL      0.69 seconds
-BuildKernel                   PASS      29.73 seconds
-CheckAllWarning               PASS      32.46 seconds
-CheckSparse                   PASS      38.12 seconds
-CheckSmatch                   FAIL      34.81 seconds
-BuildKernel32                 PASS      29.06 seconds
-TestRunnerSetup               PASS      518.13 seconds
-TestRunner_l2cap-tester       PASS      21.01 seconds
-TestRunner_iso-tester         PASS      29.85 seconds
-TestRunner_bnep-tester        PASS      4.62 seconds
-TestRunner_mgmt-tester        PASS      110.07 seconds
-TestRunner_rfcomm-tester      PASS      7.10 seconds
-TestRunner_sco-tester         PASS      14.66 seconds
-TestRunner_ioctl-tester       PASS      7.49 seconds
-TestRunner_mesh-tester        PASS      5.64 seconds
-TestRunner_smp-tester         PASS      6.63 seconds
-TestRunner_userchan-tester    PASS      4.80 seconds
-IncrementalBuild              PASS      57.83 seconds
+Collabora Ltd.
+Platinum Building, St John's Innovation Park, Cambridge CB4 0DS, United Kingdom
+Registered in England & Wales, no. 5513718
 
-Details
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: CheckSmatch - FAIL
-Desc: Run smatch tool with source
-Output:
-
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
-make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
-make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: net] Error 2
-make[2]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
-make[4]: *** Waiting for unfinished jobs....
-make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
-make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
-make: *** [Makefile:240: __sub-make] Error 2
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============5442878818289683948==--
