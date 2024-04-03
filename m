@@ -1,94 +1,109 @@
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+Received: from mail.tuxedocomputers.com (mail.tuxedocomputers.com [157.90.84.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79A1115218F
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Apr 2024 17:14:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16D71152187
+	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Apr 2024 17:32:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=157.90.84.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712164501; cv=none; b=cThk1fH4FIdgQCv9GSzNMbWvB+Z6M6QNdY7HvnscigHNANaDq7CHobBmsI6VGzv/mnnkvQA7yvOQ9ziEBpyDiJUR2WDOVyJ8x6OYtBi43nsNX1E4gWSnYz/rwZ6TM/bY6MU+NCDKvGwV0itflf4Mns5WTWpi4YGYpEvGTs77vwo=
+	t=1712165569; cv=none; b=ozaf5/b6Js7bvD1YEhlB8OcfJQErv6p1T+IF3hmMSTDjb1NebMVrAojdShMP8h76qceCbliforicvRcNLa28m7qXk8kOFNwyoJCji0zkd4X9U+IHZr3RWJo7vf9zVFtxPhKeZBorYl2kZFEHgpZRmmvssbp7cRjFWiOeUV5eJRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712164501; c=relaxed/simple;
-	bh=djOGx53iyD6XQpzd8p7vEgUOeE5D/NxrPP+OaZti6Co=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=huaBvfHf3GO1GbuWR12glwFq3SBtENXsXEvTjAxVou9Rf3s+oaDlX+G3qW9wKVuloeQh4qdpJCd1I422dMOdxiESJKhvbCQs95judthqdQX7sLNATvasP7sgf8WYuP2Iw0dN/B6nwRvqG+w4x5Pi1xvD90ao8QKIMpx+ZlU131Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cUKK5lTl; arc=none smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1712165569; c=relaxed/simple;
+	bh=p2MY0oYE0BdehlhQIU11n7CS8rT0srtYbxj/rlbgyFQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nRjiqYEHleE5chL6TM2fve1W8u42zijyWwXM6ahazkaHrFWWjog/uRDuP/Y/hqGvAwaajlDPkjvZwoB9fVuSqSU3Pn7M0jQzimj4IZM02a61HKx3b/CwPi8353RJK3Kt4ZgTVO8jQOEWQ47godt+ePXIcFCS+AHlQqDWFUmuawY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tuxedocomputers.com; spf=pass smtp.mailfrom=tuxedocomputers.com; dkim=pass (1024-bit key) header.d=tuxedocomputers.com header.i=@tuxedocomputers.com header.b=TgA0gmhU; arc=none smtp.client-ip=157.90.84.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tuxedocomputers.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxedocomputers.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cUKK5lTl"
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2d6fd3cfaa6so669161fa.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Apr 2024 10:14:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712164496; x=1712769296; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=djOGx53iyD6XQpzd8p7vEgUOeE5D/NxrPP+OaZti6Co=;
-        b=cUKK5lTl96i/m9nzTliyVP8JIR/0S32rQI73ss6bi2t7A7dbTjaGH6bYkEm5zBDPfE
-         JBckaKb6Ncp9BBKzrTyMCt3/ojvYBNwmLGG38yrSXBBLbgMx/Uk29TBUu1P/yQD/qH+b
-         wMLBQiTTHPozhre2ocgflSwXD3Uh5iVaDXgNHVhAEodNqNTEdrA3dlkc+j7NzeK8xqQ2
-         VMI/527fSMj89TSSamPvA9Wdh/lJBwmc0Rx07vW1y+JCs33UP4bzbCxzb4HF3fosbl75
-         X/4CRtTz6dGokZYYHGm4IKQLaNlQF12wLu09BVO30iz183+jgXUlRmYtyyXTXIVrVYUg
-         bA+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712164496; x=1712769296;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=djOGx53iyD6XQpzd8p7vEgUOeE5D/NxrPP+OaZti6Co=;
-        b=dOWn0nBFUYF/GaULo+dvtDmjVNNkEfPik6EW/3rqnB4BB8Yzp5wSM9GCTl8I4C/mhL
-         P+z1MfA/mS4q9qBRmdKJm76DM5br1J9J0b69VV7zuJeEIHHZVmlaRjeMfJlYRZZpoYp0
-         0oS+bSwU+QNJBWkPwl4kvYHkQmhtPrPlTyXc1kLtM14TgfjcpH45SebuPqsAalnkpHdE
-         6vg6l+YjBzTXz77usb37Ex52XeaHhnA7m3f/6mAfp4juhBaNcxwgZ6oe52ZoqQvH5rpB
-         G+gLBBR7jdCK4zP3ZlxQDTrwT8sXJG6YYf5FOpnuacVBwMKCq0mVWmUVntShslD+XxtA
-         IvKQ==
-X-Gm-Message-State: AOJu0YzUhF1k65GgzV3OSM9OgoQkgIUGLDrmfxNMxBYTdwVFjED4weAR
-	62vyTIeEcw4lcZOKRgXzCA9rU3VLVn29U9EiSYdX51E+gBzA7Ql8dRrr5S1YFaki+Aa4XZyYrEL
-	eNBc/0hHKnG5TeXP2RsqjzjTd98QVS4CA
-X-Google-Smtp-Source: AGHT+IEWuUpXwzVSV1SzajCGX7x4Zsbaz1KKZjoCn1sXXM1UDA2zi/ov7zAnY8sAjCWf5CUn3D6Uk9OH1fID9mRCL8E=
-X-Received: by 2002:a2e:91d9:0:b0:2d6:eaf0:87b4 with SMTP id
- u25-20020a2e91d9000000b002d6eaf087b4mr203025ljg.11.1712164496204; Wed, 03 Apr
- 2024 10:14:56 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=tuxedocomputers.com header.i=@tuxedocomputers.com header.b="TgA0gmhU"
+Received: from [192.168.42.20] (p5b164b56.dip0.t-ipconnect.de [91.22.75.86])
+	(Authenticated sender: wse@tuxedocomputers.com)
+	by mail.tuxedocomputers.com (Postfix) with ESMTPSA id 97EF12FC0064;
+	Wed,  3 Apr 2024 19:32:43 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tuxedocomputers.com;
+	s=default; t=1712165563;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tsYtlgX4H8Lnf7nDA9d4DGU/VUChSBTFLvN8JaBLeRw=;
+	b=TgA0gmhUevA0S4Kxdm9gW+flq6i83Xn12Lcb68d4XaukfIQlqNsmw9ytVeMEAlc9xLvfcI
+	WYUD8MqOlP16kScWTIorr3Gml4vYlRrDHLMWbLWKu6JYf/ykZYfcWnV9nuPDv7SLOCN73t
+	cjZBl22VM6rcVrW1J/bdQbio6dwfpVA=
+Authentication-Results: mail.tuxedocomputers.com;
+	auth=pass smtp.auth=wse@tuxedocomputers.com smtp.mailfrom=wse@tuxedocomputers.com
+Message-ID: <d32c669a-3782-49ef-9ece-e654bbb82123@tuxedocomputers.com>
+Date: Wed, 3 Apr 2024 19:32:43 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1fd56079e4aa89aa1056a3cf185610a683ee02ba.1712161649.git.pav@iki.fi>
- <660d8dd3.630a0220.f18e4.0633@mx.google.com>
-In-Reply-To: <660d8dd3.630a0220.f18e4.0633@mx.google.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 3 Apr 2024 13:14:43 -0400
-Message-ID: <CABBYNZJD2Du0Y8Pf3C2GPxMEYut2AmV36g59EmONM74baARhrw@mail.gmail.com>
-Subject: Re: tests: add TX timestamping tests
-To: linux-bluetooth@vger.kernel.org
-Cc: pav@iki.fi
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: btintel: Add devices to
+ HCI_QUIRK_BROKEN_LE_CODED
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org
+References: <20240328131800.63328-1-wse@tuxedocomputers.com>
+ <CABBYNZ+OaJ9QVE_KmBNL8QbBv4r5erL57u3BzFv0AnmUzY=PTA@mail.gmail.com>
+ <29d54137-f3b9-4556-b99e-61a0f681f164@tuxedocomputers.com>
+ <0fd88d1ed7704938f54460e0e42a2f934690bf01.camel@iki.fi>
+Content-Language: en-US
+From: Werner Sembach <wse@tuxedocomputers.com>
+In-Reply-To: <0fd88d1ed7704938f54460e0e42a2f934690bf01.camel@iki.fi>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Pauli,
 
-On Wed, Apr 3, 2024 at 1:11=E2=80=AFPM <bluez.test.bot@gmail.com> wrote:
+Am 02.04.24 um 19:16 schrieb Pauli Virtanen:
+> pe, 2024-03-29 kello 00:20 +0100, Werner Sembach kirjoitti:
+>> Hi Luiz,
+>>
+>> Am 28.03.24 um 15:17 schrieb Luiz Augusto von Dentz:
+>>> Hi Werner,
+>>>
+>>> On Thu, Mar 28, 2024 at 9:18 AM Werner Sembach <wse@tuxedocomputers.com> wrote:
+>>>> From: Christoffer Sandberg <cs@tuxedo.de>
+>>>>
+>>>> For HW variants 0x17, 0x18 and 0x19 LE Coded PHY causes scan and
+>>>> connection issues when enabled. This patch disables it through
+>>>> the existing quirk.
+>>>>
+>>>> Signed-off-by: Christoffer Sandberg <cs@tuxedo.de>
+>>>> Signed-off-by: Werner Sembach <wse@tuxedocomputers.com>
+>>>> Cc: <stable@vger.kernel.org>
+>>>> ---
+>>>>    drivers/bluetooth/btintel.c | 2 ++
+>>>>    1 file changed, 2 insertions(+)
+>>>>
+>>>> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+>>>> index cdc5c08824a0a..6dbfb74d0adf9 100644
+>>>> --- a/drivers/bluetooth/btintel.c
+>>>> +++ b/drivers/bluetooth/btintel.c
+>>>> @@ -2881,6 +2881,8 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+>>>>           case 0x17:
+>>>>           case 0x18:
+>>>>           case 0x19:
+>>>> +               /* 0x17, 0x18 and 0x19 have issues when LE Coded PHY is enabled */
+>>>> +               set_bit(HCI_QUIRK_BROKEN_LE_CODED, &hdev->quirks);
+>>> If it is just these 3 then we are missing a break here.
+>> The cases are not added by the patch, the fallthrough was here before. This
+>> patch just adds this quirk for these 3 cases on top to the other things done
+>> below, aka the fallthrough is intentional.
+> See
 >
-> This is an automated email and please do not reply to this email.
+> https://docs.kernel.org/next/process/deprecated.html#implicit-switch-case-fall-through
+Thanks for the link, will add the explicit fallthrough in a v2.
 >
-> Dear Submitter,
 >
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> While preparing the CI tests, the patches you submitted couldn't be appli=
-ed to the current HEAD of the repository.
->
-> ----- Output -----
->
-> error: patch failed: tools/iso-tester.c:34
-> error: tools/iso-tester.c: patch does not apply
-> hint: Use 'git am --show-current-patch' to see the failed patch
->
-> Please resolve the issue and submit the patches again.
-
-You probably need to rebase these changes, Ive pushed a couple of
-changes to iso-tester yesterday.
-
---=20
-Luiz Augusto von Dentz
+>> Best regards,
+>>
+>> Werner
+>>
+>>>>           case 0x1b:
+>>>>           case 0x1c:
+>>>>                   /* Display version information of TLV type */
+>>>> --
+>>>> 2.34.1
+>>>>
