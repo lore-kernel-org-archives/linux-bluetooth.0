@@ -1,178 +1,223 @@
-Received: from mail.wantyapps.xyz (mail.wantyapps.xyz [66.135.5.160])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 819E515AAA7;
-	Tue,  2 Apr 2024 21:35:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.135.5.160
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57DA7548FF
+	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Apr 2024 07:08:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712093722; cv=none; b=rYAqdW5BPJl1/M9iFmqG57IasJLZNI3Nxoq4KYNcPDMAv3hz5PXdI17iJxvUpgtDx71g5Zq2L3HvqzfQVrIhPLZX/3ygYtzUKYp3NPAU2LCF2bYfIO9tUaRAln9rNv8Mem/mMowySQQHueJtk3/TqfW7M0ymVSrGk9jPuDecaPs=
+	t=1712128137; cv=none; b=rWhdd2qvjOCGGoz0/Xs9lVWJ9zwWvxG29pDMiw7Mf5xbH02dJ6dAY7JnMF3odIpxApSle3gIx6NeKAMKPjBAufpYNUbU1J1BE/VDrAP+FFUAG6MD1+4pZnUGgZI8rTYf2vdI+d96LrsJDbiPWo36taRO6FILox/OrQYasiCtMDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712093722; c=relaxed/simple;
-	bh=mNmmeopVZW8R+hRHGFqpjTJLMIULY/6ZugH9hRAZW+Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ipdcUOo/b7QrzeuxhcgPDdXVS8Q9IzUvgCwD8vCnCo/2bprRG29zuAcJzIf7/q4Wz86lO0FkYlGxBU/B2Bk2VnUlu9+JsHH9SRHYTA9pwTbwxaY7pATCogu+LfUPCkUBu0zKSxwySMf6kr8hRx5WG0Wp0lfPuFIVgxHnkMMWd3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=wantyapps.xyz; spf=pass smtp.mailfrom=wantyapps.xyz; dkim=pass (2048-bit key) header.d=wantyapps.xyz header.i=@wantyapps.xyz header.b=IFzlhnzS; arc=none smtp.client-ip=66.135.5.160
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=wantyapps.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wantyapps.xyz
+	s=arc-20240116; t=1712128137; c=relaxed/simple;
+	bh=M19O2kLv+yEk9Sxp128qOgaUm85LENGWmkNp4gTwGvU=;
+	h=Date:From:To:Cc:Subject:Message-ID; b=B2vRyXxRA/mryK67bmI3b+WrQPRlAVO82XfYl/imDu4FS1lzBwL+Mfuux7/urM5hVfVphfJ/xL8Ak54cbZtVjBOn/MRCkCj1//b1Fb/3WYVKNIJenEew49Z0tDKbWDnVfSX3DAhoOaq8Wwk933fgQ+Qz42kGgVJIT32JP2yaxdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MUWCE92o; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wantyapps.xyz header.i=@wantyapps.xyz header.b="IFzlhnzS"
-Received: from multivac (unknown [147.235.205.62])
-	by mail.wantyapps.xyz (Postfix) with ESMTPSA id 63A7C93D53;
-	Tue,  2 Apr 2024 21:35:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=wantyapps.xyz;
-	s=mail; t=1712093719;
-	bh=mNmmeopVZW8R+hRHGFqpjTJLMIULY/6ZugH9hRAZW+Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IFzlhnzSBf0HkC+YMBQQ/rDsq25ktTne7JWz+FOVI2sA/Ko4c1lGRyck6b1M8W+Ep
-	 zQAABuoHEhxWoDHz1CTpYtVnhojyP/6m+rBDMYx0Ba58+nzQ0iI7C5AiTPZieCYDXu
-	 mRvfA0b0/6zia4PKIexSIkrNdqlely9gwINkInJJx8iXt0KWQvNZuLdVzsMRwOOieH
-	 6JSZNxr/EDmDVChgPsWB7dl8P9GlQOWd0u1To3+TDbgip3KFA0LWeGmtmwsWgwQXoD
-	 N/p3bgv66kecEEHJ3c3WODcjfsyAhC6zBpotYrYB4QvET5XUPou5NQUvKDrAg96t2E
-	 he/8fWh8qKiVg==
-Date: Wed, 3 Apr 2024 00:35:15 +0300
-From: Uri Arev <me@wantyapps.xyz>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hci_intel: Fix multiple issues reported by
- checkpatch.pl
-Message-ID: <kjytiegrl5spztv43qsiqtvgsnjbk6tkaxfzm564u5i4jsgrh7@2edrsmgjzrzt>
-References: <20240402155543.36856-1-me@wantyapps.xyz>
- <CABBYNZJ5y9DDgKwZjsCrpn6fn0KgR5NOnQ9YuZ1bGS=mbseMGA@mail.gmail.com>
- <vnw2eqp5acqtszne6xhlb6bplxv4fomv4mnrjy3qcnduaqcq6p@4xg65mm6mcmn>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MUWCE92o"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712128136; x=1743664136;
+  h=date:from:to:cc:subject:message-id;
+  bh=M19O2kLv+yEk9Sxp128qOgaUm85LENGWmkNp4gTwGvU=;
+  b=MUWCE92o1yRRXRo3JTNi0GSYWNyiXiDU3tTlLZ0/Xz3DqNWrA6IhXPT4
+   CwADemECULyUU6ln6op0sQpxNWC1tETnGetn8abHqmx1bHcb4TyvYAR6N
+   duddqnZUefRRA9WAICqxhHcYRooPsw2bMOV8MT82VyMRj1STdh9l3AT+0
+   wpiV94W3dpsTTqLVSheVP6BB+7OjejopEDMFdc0BSeJi9l+Ku14EMC2+t
+   DCSwIU47A3TBIJGaX5lcwBNV++JC5W6Cgj9g8qp68HIIuj2i2Ez66QgBe
+   lvKuWjj+niIn60TLOx5baYYBmbP4tmbO0mBfig7NP0QNA+NrxZPkXYao9
+   A==;
+X-CSE-ConnectionGUID: Yce9JBSIRW2xob0XZ6jmIg==
+X-CSE-MsgGUID: /MNm0ugqRZOwfsE0FPFHMA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11032"; a="18497070"
+X-IronPort-AV: E=Sophos;i="6.07,176,1708416000"; 
+   d="scan'208";a="18497070"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2024 00:08:56 -0700
+X-CSE-ConnectionGUID: 8ktHsdXcRHyGtm6eJeYQIA==
+X-CSE-MsgGUID: 5VCAgddBStiVETyuW9yzhw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,176,1708416000"; 
+   d="scan'208";a="23029823"
+Received: from lkp-server02.sh.intel.com (HELO 90ee3aa53dbd) ([10.239.97.151])
+  by orviesa005.jf.intel.com with ESMTP; 03 Apr 2024 00:08:55 -0700
+Received: from kbuild by 90ee3aa53dbd with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rrujr-0001xs-2C;
+	Wed, 03 Apr 2024 07:08:52 +0000
+Date: Wed, 03 Apr 2024 15:08:34 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 3e3fa13686bf73bddc07072894085ef93df65ace
+Message-ID: <202404031532.x244viay-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <vnw2eqp5acqtszne6xhlb6bplxv4fomv4mnrjy3qcnduaqcq6p@4xg65mm6mcmn>
 
-On Tue, Apr 02, 2024 at 07:12:23PM +0300, Uri Arev wrote:
-> Hi Luiz, thanks for taking the time to review my patch.
-> 
-> On Tue, Apr 02, 2024 at 12:06:30PM -0400, Luiz Augusto von Dentz wrote:
-> > Hi Uri,
-> > 
-> > On Tue, Apr 2, 2024 at 11:56 AM <me@wantyapps.xyz> wrote:
-> > >
-> > > From: Uri Arev <me@wantyapps.xyz>
-> > >
-> > > This fixes the following CHECKs, WARNINGs, and ERRORs reported in
-> > > hci_intel.c
-> > >
-> > > Reported by checkpatch.pl:
-> > > -----------
-> > > hci_intel.c
-> > > -----------
-> > > WARNING: Prefer using '"%s...", __func__' to using 'intel_setup', this function's name, in a string
-> > > +       bt_dev_dbg(hdev, "start intel_setup");
-> > >
-> > > ERROR: code indent should use tabs where possible
-> > > +        /* Check for supported iBT hardware variants of this firmware$
-> > >
-> > > ERROR: code indent should use tabs where possible
-> > > +         * loading method.$
-> > >
-> > > ERROR: code indent should use tabs where possible
-> > > +         *$
-> > >
-> > > ERROR: code indent should use tabs where possible
-> > > +         * This check has been put in place to ensure correct forward$
-> > >
-> > > ERROR: code indent should use tabs where possible
-> > > +         * compatibility options when newer hardware variants come along$
-> > >
-> > > ERROR: code indent should use tabs where possible
-> > > +         */$
-> > >
-> > > CHECK: No space is necessary after a cast
-> > > +       duration = (unsigned long long) ktime_to_ns(delta) >> 10;
-> > >
-> > > CHECK: No space is necessary after a cast
-> > > +       duration = (unsigned long long) ktime_to_ns(delta) >> 10;
-> > >
-> > > WARNING: Missing a blank line after declarations
-> > > +               int err = PTR_ERR(intel->rx_skb);
-> > > +               bt_dev_err(hu->hdev, "Frame reassembly failed (%d)", err);
-> > >
-> > > Signed-off-by: Uri Arev <me@wantyapps.xyz>
-> > > ---
-> > >  drivers/bluetooth/hci_intel.c | 19 ++++++++++---------
-> > >  1 file changed, 10 insertions(+), 9 deletions(-)
-> > >
-> > > diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-> > > index 78afb9a348e7..44731de1a2d6 100644
-> > > --- a/drivers/bluetooth/hci_intel.c
-> > > +++ b/drivers/bluetooth/hci_intel.c
-> > > @@ -537,7 +537,7 @@ static int intel_setup(struct hci_uart *hu)
-> > >         int speed_change = 0;
-> > >         int err;
-> > >
-> > > -       bt_dev_dbg(hdev, "start intel_setup");
-> > > +       bt_dev_dbg(hdev, "start %s", __func__);
-> > 
-> > We probably don't need __func__ either since this is normally calls
-> > pr_debug which already has support for printing function names if the
-> > user wants to, so I just leave as bt_dev_dbg(hdev, "");
-> > 
-> Thanks for the comment, will revise. I still don't know most of the
-> debugging functions in the kernel, as I am a relatively new hacker.
-> 
-> > >
-> > >         hu->hdev->set_diag = btintel_set_diag;
-> > >         hu->hdev->set_bdaddr = btintel_set_bdaddr;
-> > > @@ -591,12 +591,12 @@ static int intel_setup(struct hci_uart *hu)
-> > >                 return -EINVAL;
-> > >         }
-> > >
-> > > -        /* Check for supported iBT hardware variants of this firmware
-> > > -         * loading method.
-> > > -         *
-> > > -         * This check has been put in place to ensure correct forward
-> > > -         * compatibility options when newer hardware variants come along.
-> > > -         */
-> > > +       /* Check for supported iBT hardware variants of this firmware
-> > > +        * loading method.
-> > > +        *
-> > > +        * This check has been put in place to ensure correct forward
-> > > +        * compatibility options when newer hardware variants come along.
-> > > +        */
-> > >         switch (ver.hw_variant) {
-> > >         case 0x0b:      /* LnP */
-> > >         case 0x0c:      /* WsP */
-> > > @@ -777,7 +777,7 @@ static int intel_setup(struct hci_uart *hu)
-> > >
-> > >         rettime = ktime_get();
-> > >         delta = ktime_sub(rettime, calltime);
-> > > -       duration = (unsigned long long) ktime_to_ns(delta) >> 10;
-> > > +       duration = (unsigned long long)ktime_to_ns(delta) >> 10;
-> > >
-> > >         bt_dev_info(hdev, "Firmware loaded in %llu usecs", duration);
-> > >
-> > > @@ -822,7 +822,7 @@ static int intel_setup(struct hci_uart *hu)
-> > >
-> > >         rettime = ktime_get();
-> > >         delta = ktime_sub(rettime, calltime);
-> > > -       duration = (unsigned long long) ktime_to_ns(delta) >> 10;
-> > > +       duration = (unsigned long long)ktime_to_ns(delta) >> 10;
-> > >
-> > >         bt_dev_info(hdev, "Device booted in %llu usecs", duration);
-> > >
-> > > @@ -977,6 +977,7 @@ static int intel_recv(struct hci_uart *hu, const void *data, int count)
-> > >                                     ARRAY_SIZE(intel_recv_pkts));
-> > >         if (IS_ERR(intel->rx_skb)) {
-> > >                 int err = PTR_ERR(intel->rx_skb);
-> > > +
-> > >                 bt_dev_err(hu->hdev, "Frame reassembly failed (%d)", err);
-> > >                 intel->rx_skb = NULL;
-> > >                 return err;
-> > > --
-> > > 2.44.0
-> > >
-Hey Luiz, I sent a v2 that adds the above suggestion and fixes gitlint.
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 3e3fa13686bf73bddc07072894085ef93df65ace  Bluetooth: ISO: Handle PA sync when no BIGInfo reports are generated
 
-                 Uri Arev
+elapsed time: 801m
+
+configs tested: 146
+configs skipped: 3
+
+The following configs have been built successfully.
+More configs may be tested in the coming days.
+
+tested configs:
+alpha                             allnoconfig   gcc  
+alpha                            allyesconfig   gcc  
+alpha                               defconfig   gcc  
+arc                              allmodconfig   gcc  
+arc                               allnoconfig   gcc  
+arc                              allyesconfig   gcc  
+arc                                 defconfig   gcc  
+arc                   randconfig-001-20240403   gcc  
+arc                   randconfig-002-20240403   gcc  
+arm                              allmodconfig   gcc  
+arm                               allnoconfig   clang
+arm                              allyesconfig   gcc  
+arm                                 defconfig   clang
+arm                   randconfig-001-20240403   gcc  
+arm                   randconfig-002-20240403   gcc  
+arm                   randconfig-003-20240403   clang
+arm                   randconfig-004-20240403   gcc  
+arm64                            allmodconfig   clang
+arm64                             allnoconfig   gcc  
+arm64                               defconfig   gcc  
+arm64                 randconfig-001-20240403   clang
+arm64                 randconfig-002-20240403   clang
+arm64                 randconfig-003-20240403   gcc  
+arm64                 randconfig-004-20240403   clang
+csky                             allmodconfig   gcc  
+csky                              allnoconfig   gcc  
+csky                             allyesconfig   gcc  
+csky                                defconfig   gcc  
+csky                  randconfig-001-20240403   gcc  
+csky                  randconfig-002-20240403   gcc  
+hexagon                          allmodconfig   clang
+hexagon                           allnoconfig   clang
+hexagon                          allyesconfig   clang
+hexagon                             defconfig   clang
+hexagon               randconfig-001-20240403   clang
+hexagon               randconfig-002-20240403   clang
+i386                             allmodconfig   gcc  
+i386                              allnoconfig   gcc  
+i386                             allyesconfig   gcc  
+i386         buildonly-randconfig-001-20240403   gcc  
+i386         buildonly-randconfig-002-20240403   clang
+i386         buildonly-randconfig-003-20240403   clang
+i386         buildonly-randconfig-004-20240403   clang
+i386         buildonly-randconfig-005-20240403   gcc  
+i386         buildonly-randconfig-006-20240403   clang
+i386                                defconfig   clang
+i386                  randconfig-001-20240403   gcc  
+i386                  randconfig-002-20240403   clang
+i386                  randconfig-003-20240403   gcc  
+i386                  randconfig-004-20240403   gcc  
+i386                  randconfig-005-20240403   clang
+i386                  randconfig-006-20240403   gcc  
+i386                  randconfig-011-20240403   gcc  
+i386                  randconfig-012-20240403   clang
+i386                  randconfig-013-20240403   gcc  
+i386                  randconfig-014-20240403   clang
+i386                  randconfig-015-20240403   gcc  
+i386                  randconfig-016-20240403   clang
+loongarch                        allmodconfig   gcc  
+loongarch                         allnoconfig   gcc  
+loongarch                           defconfig   gcc  
+loongarch             randconfig-001-20240403   gcc  
+loongarch             randconfig-002-20240403   gcc  
+m68k                             allmodconfig   gcc  
+m68k                              allnoconfig   gcc  
+m68k                             allyesconfig   gcc  
+m68k                                defconfig   gcc  
+microblaze                       allmodconfig   gcc  
+microblaze                        allnoconfig   gcc  
+microblaze                       allyesconfig   gcc  
+microblaze                          defconfig   gcc  
+mips                              allnoconfig   gcc  
+mips                             allyesconfig   gcc  
+nios2                            allmodconfig   gcc  
+nios2                             allnoconfig   gcc  
+nios2                            allyesconfig   gcc  
+nios2                               defconfig   gcc  
+nios2                 randconfig-001-20240403   gcc  
+nios2                 randconfig-002-20240403   gcc  
+openrisc                          allnoconfig   gcc  
+openrisc                         allyesconfig   gcc  
+openrisc                            defconfig   gcc  
+parisc                           allmodconfig   gcc  
+parisc                            allnoconfig   gcc  
+parisc                           allyesconfig   gcc  
+parisc                              defconfig   gcc  
+parisc                randconfig-001-20240403   gcc  
+parisc                randconfig-002-20240403   gcc  
+parisc64                            defconfig   gcc  
+powerpc                          allmodconfig   gcc  
+powerpc                           allnoconfig   gcc  
+powerpc                          allyesconfig   clang
+powerpc               randconfig-001-20240403   gcc  
+powerpc               randconfig-002-20240403   gcc  
+powerpc               randconfig-003-20240403   clang
+powerpc64             randconfig-001-20240403   gcc  
+powerpc64             randconfig-002-20240403   clang
+powerpc64             randconfig-003-20240403   gcc  
+riscv                            allmodconfig   clang
+riscv                             allnoconfig   gcc  
+riscv                            allyesconfig   clang
+riscv                               defconfig   clang
+riscv                 randconfig-001-20240403   clang
+riscv                 randconfig-002-20240403   clang
+s390                             allmodconfig   clang
+s390                              allnoconfig   clang
+s390                             allyesconfig   gcc  
+s390                                defconfig   clang
+s390                  randconfig-001-20240403   clang
+s390                  randconfig-002-20240403   clang
+sh                               allmodconfig   gcc  
+sh                                allnoconfig   gcc  
+sh                               allyesconfig   gcc  
+sh                                  defconfig   gcc  
+sh                    randconfig-001-20240403   gcc  
+sh                    randconfig-002-20240403   gcc  
+sparc                            allmodconfig   gcc  
+sparc                             allnoconfig   gcc  
+sparc                               defconfig   gcc  
+sparc64                          allmodconfig   gcc  
+sparc64                          allyesconfig   gcc  
+sparc64                             defconfig   gcc  
+sparc64               randconfig-001-20240403   gcc  
+sparc64               randconfig-002-20240403   gcc  
+um                               allmodconfig   clang
+um                                allnoconfig   clang
+um                               allyesconfig   gcc  
+um                                  defconfig   clang
+um                             i386_defconfig   gcc  
+um                    randconfig-001-20240403   gcc  
+um                    randconfig-002-20240403   clang
+um                           x86_64_defconfig   clang
+x86_64                            allnoconfig   clang
+x86_64                           allyesconfig   clang
+x86_64       buildonly-randconfig-001-20240403   gcc  
+x86_64       buildonly-randconfig-002-20240403   gcc  
+x86_64       buildonly-randconfig-003-20240403   clang
+x86_64       buildonly-randconfig-004-20240403   gcc  
+x86_64       buildonly-randconfig-005-20240403   clang
+x86_64       buildonly-randconfig-006-20240403   gcc  
+x86_64                              defconfig   gcc  
+x86_64                randconfig-001-20240403   gcc  
+x86_64                          rhel-8.3-rust   clang
+xtensa                            allnoconfig   gcc  
+xtensa                randconfig-001-20240403   gcc  
+xtensa                randconfig-002-20240403   gcc  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
