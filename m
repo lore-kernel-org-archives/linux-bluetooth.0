@@ -1,136 +1,63 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.wantyapps.xyz (mail.wantyapps.xyz [66.135.5.160])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAD7B1D54B
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Apr 2024 19:01:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4927C156241;
+	Wed,  3 Apr 2024 20:39:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.135.5.160
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712170897; cv=none; b=LUby1fUgzqY1OfkXgmXf8a3BkudIoXmNp0fzGBB144vgEx7z933KCiqJBhSbW2kFNO15yIzQPK+NaA257U+kGGWHewzb1DbYGa3aXEIwlorcWlcSHZA1riYvywYf9jjKcotbjiauhQqgzIruQCLu5W05Uj+C9GePvsPY5PgQGj0=
+	t=1712176748; cv=none; b=ra39Z9oNRe/VwD8jj/bWky/9lT/l8gp4boRSY7s8XnExpcx6tVpe806JsWKKdP6nvbqNsstk70PfV9F/uiRPgPhYp7rvhAdw+oC9mtXhpadStoUZgDe+SFgUKZ70DXOMrgy1d06DP+iHpn67SsuA+H5v7Qm1uS4cLq2qgwvplIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712170897; c=relaxed/simple;
-	bh=kzkszAY3zXOTVsG16X/Y3CsTQ6840RVebqn5bsP1/NI=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=RNgkADmvZJoOsZhNVYvEZ9kVa6emKrWqwNbayDUqFwP2aoTK8STLarLjWdP4JF0i9ZBbeAkMq7BW6H5XDBIxQd/r3rYwxw3wmT2c6KOXCGGNP8B2JSBeEYSTsBtQLR/4CnuRcfdDYllZyQ+Il+puWfoIr2/Qv+D6afmhFiPFPPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ItKaiiVY; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1712176748; c=relaxed/simple;
+	bh=Mf0E1LOV6BLyakJKEycZcKKzbM7jRgFhb+ltvV49FDA=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hm5v6oCfQWPWT99Z1EMb/J7xKwOPS0T4KebqHOByxY1y/zgymnMTrAPm+ej1ZIN0kgiLlwnw91PeWn6z88iNYn/OsCd2uaxtiCg1c8u8V8FS6pm1xTaoiFrClme7Tvr0a2DW7IJTa1XINPclXfWnfNwYYO0UNPSqyOoolpUguIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=wantyapps.xyz; spf=pass smtp.mailfrom=wantyapps.xyz; dkim=pass (2048-bit key) header.d=wantyapps.xyz header.i=@wantyapps.xyz header.b=q5KMlX+V; arc=none smtp.client-ip=66.135.5.160
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=wantyapps.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wantyapps.xyz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ItKaiiVY"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1e2232e30f4so1008935ad.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Apr 2024 12:01:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712170895; x=1712775695; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=tg/oL1yX4Sb9LI5hQBDrDNw1utuFeprHdoZW8jkr2Bo=;
-        b=ItKaiiVYdhMre4FDomsH958PwZOqKHSY3545vp2tEHUJ9bwfytlWPan0jpHnNJqCTE
-         wariA+nLRdzqpzjgyvrSLAKgWrXmhsWjmVNMElIVBJm1k9Q8O89Jgsjoymj3oGaDZwSH
-         vTzsry6gd8rhje1I70RhUpSHNVwISVcsq4Oqc04g/I2q2V8JKwCAuHmZhqPWmqGdJEYp
-         PnRwjCAnwf1vjU/Fj1L4dmgnl+ZAuOcVT1ldPaxFG0nBGSH8Q1O7+gIYxQNmN+OZjrVl
-         dlklZS1Jc69EEqQJgE9FYaO3WQyhNZ8FMMonGIf/UWuqJY8OH0A5ENt3qE2OAedqXbfR
-         /C7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712170895; x=1712775695;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tg/oL1yX4Sb9LI5hQBDrDNw1utuFeprHdoZW8jkr2Bo=;
-        b=R2V1TOFVCusMauADDjtBycZfLUY5LLh9c7lo98a37eo3iAWwr6eA1tM55nH2TtbHKo
-         bV31Ts4DNtY+oYVr/iCq3uOYcW3Qq/LE0hCBWj7QRvEZI8F3hCDL9Gv7M/ZDhMZICWFt
-         OalFaQ6YeVd9mXduxjJkiUs75OXgCJMp6i1rtK/0yGwQ7rkv7RLnt6NIKM3ymwSx/or/
-         QiePPIs/d8l4PcfOwXKLTM4O21SZd0mzbwp7RDAWewRz8msUcSf1GCoUYdAHXi6n+yUz
-         EZCHvCen4OXzKIGV4ALHY+CdYFkyrH6ZzGH9YDtjeivqTQFUi/lERVB92RFCzu1KIJpX
-         rQoQ==
-X-Gm-Message-State: AOJu0YwMgu3YrqI1XXAegmI4hjWZKveyxLIKDOIoKXAo7JHCwI4plezh
-	3x7Zid6mBpRXN9816UMQ73+XvKH4bIpWC9peYLPPfX5VS+PG+aJ3Yw7mcBhE
-X-Google-Smtp-Source: AGHT+IEaV8/eHQOjBVJcCyTt1Ih6o6MySMdcIz6B2fWrDgwD+v3aJaVa4NSUQwzYFYajA0YYE5Hk/w==
-X-Received: by 2002:a17:903:2656:b0:1e1:1d5:f857 with SMTP id je22-20020a170903265600b001e101d5f857mr162835plb.34.1712170894953;
-        Wed, 03 Apr 2024 12:01:34 -0700 (PDT)
-Received: from [172.17.0.2] ([13.83.123.179])
-        by smtp.gmail.com with ESMTPSA id a21-20020a170902ee9500b001e268c9e38asm4426387pld.43.2024.04.03.12.01.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Apr 2024 12:01:34 -0700 (PDT)
-Message-ID: <660da78e.170a0220.12930.eabe@mx.google.com>
-Date: Wed, 03 Apr 2024 12:01:34 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5189527878594222690=="
+	dkim=pass (2048-bit key) header.d=wantyapps.xyz header.i=@wantyapps.xyz header.b="q5KMlX+V"
+Received: from multivac (unknown [147.235.205.62])
+	by mail.wantyapps.xyz (Postfix) with ESMTPSA id 36A3194484;
+	Wed,  3 Apr 2024 20:38:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=wantyapps.xyz;
+	s=mail; t=1712176739;
+	bh=Mf0E1LOV6BLyakJKEycZcKKzbM7jRgFhb+ltvV49FDA=;
+	h=Date:From:To:Subject:References:In-Reply-To:From;
+	b=q5KMlX+ViUGKpMFw9fGq5Deed8jHYH3Kfh+09+moZJnG5065IEB/ktL4FBcCZU49c
+	 jo0LkE7rj/p9tZFADlfIw62mKsuUuEDwSOlHlL9FFzsDAy/XlxM/vuD2bdiZf4fyYq
+	 jvty6Wg0BxIgRBEdyk97v8qo0U6yOQsXxRpLTrgBymE0AiFYpLUwH6/w75bY/1/9yS
+	 VSaTLh58+ZKG6H7bUlQ7m42Op7WnsCpdisRxlesUpEdrEdDbbM/mFRaRLMVmgNUFRH
+	 6L+DdjHhD0CLc0m2xoP1hFNsMpWUex9lr3R97U8nuGb+2jWvJMRRpHLACm5nyzzjHM
+	 yDL/euRvrpbDw==
+Date: Wed, 3 Apr 2024 23:38:55 +0300
+From: Uri Arev <me@wantyapps.xyz>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] Bluetooth: hci_intel: Fix multiple issues reported by
+ checkpatch.pl
+Message-ID: <kczljnvpyfsddfhg2yffjftbvm7g5abbcyr7t2hytnusbfgxsu@ecpgrhl5fblc>
+References: <20240402183751.107948-1-me@wantyapps.xyz>
+ <nip5vnycbq6vbtwx553yaym6mtnz5f3qzkfzpduidf7qrky7ux@7hufve7ptxwi>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, arkadiusz.bokowy@gmail.com
-Subject: RE: [BlueZ] advertising: Do not crash in case of adv update failure
-In-Reply-To: <20240403171236.853491-1-arkadiusz.bokowy@gmail.com>
-References: <20240403171236.853491-1-arkadiusz.bokowy@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <nip5vnycbq6vbtwx553yaym6mtnz5f3qzkfzpduidf7qrky7ux@7hufve7ptxwi>
 
---===============5189527878594222690==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Tue, Apr 02, 2024 at 11:10:16PM +0300, Uri Arev wrote:
+> Hey, it seems that the CheckSmatch test has failed for this revision (v2)
+> and the first version of this patch as well. I checked lore.kernel.org
+> and patchwork.kernel.org and it seems that the test has failed multiple
+> times for multiple unrelated patches. Is this a problem that can safely
+> be ignored?
+> 
+>                  Uri Arev
+> 
+Hey Luiz, Sorry I am bothering you. Did you get my previous emails? I
+fixed `__func__` as per your suggestion and added the tag.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=841166
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      0.52 seconds
-GitLint                       FAIL      0.49 seconds
-BuildEll                      PASS      24.47 seconds
-BluezMake                     PASS      1677.49 seconds
-MakeCheck                     PASS      13.13 seconds
-MakeDistcheck                 PASS      176.03 seconds
-CheckValgrind                 PASS      244.92 seconds
-CheckSmatch                   PASS      348.86 seconds
-bluezmakeextell               PASS      118.37 seconds
-IncrementalBuild              PASS      1443.51 seconds
-ScanBuild                     PASS      982.29 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ] advertising: Do not crash in case of adv update failure
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#96: 
-bluetoothd: ../src/advertising.c:add_client_complete() Failed to add advertisement: Busy (0x0a)
-
-/github/workspace/src/src/13616515.patch total: 0 errors, 1 warnings, 19 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13616515.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ] advertising: Do not crash in case of adv update failure
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-9: B1 Line exceeds max length (95>80): "bluetoothd: ../src/advertising.c:add_client_complete() Failed to add advertisement: Busy (0x0a)"
-10: B1 Line exceeds max length (145>80): "dbus: arguments to dbus_message_get_no_reply() were incorrect, assertion "message != NULL" failed in file ../../../dbus/dbus-message.c line 3235."
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============5189527878594222690==--
+                 Uri Arev
