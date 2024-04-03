@@ -1,115 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49753C152
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Apr 2024 12:32:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4AD41474C0
+	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Apr 2024 12:59:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712147543; cv=none; b=esIZRoygnKqS6guXPRAxlJz5kcoSkqF+qF4nN4TinsXvRf/w8YcudjEQmXEhPsmj8ARS0QFCJ23Wb8vfuitv1uGzHU5GI6k/3nMPfe4Da5aQROFiWOf02tXeP854QtUiSm7fQZOSv7ShOoLJ53WhC6vMi3rv38Aqega7DEDkVIk=
+	t=1712149183; cv=none; b=JF6W8CQ61xe0I50zlxwrgXp8RnIPNGWYU5ADZvv47EhsvtTbqAnKBo7IbPDPIAoyxbuV8ds56kWLDnYjpCMXXCXoyfrSRnX8upZQVY9l2arEUioi7jqhSZazINcvQ3K0VfLa213VF2txyw9tXxd5aGPbbWY1SDZrSQyJFqvq9pg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712147543; c=relaxed/simple;
-	bh=X35XMzk3A8uoTckEnKiVMa5b/pZxR7OiFNkczAB5vXE=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=pGlIzbxWL1LgAWdpHmHZuUkr1biGj2cJV0cYwp+zGti+0ZGa6nZnUY91QYQbmZlkdLlDFiaEdsZsqaJJPpwZkdF8GEMjx4jndpNYEFxiisNozn2sxDpLRUoC4conWEsKTi1rtGBnw4jO8NWlf49ezDkjar2wTQBlb/DL0NRMvmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KvU/cvNf; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1712149183; c=relaxed/simple;
+	bh=v+e9YhQsXWbCYoXOfFFQJJdyUnWymC5gUWBx2KTybxE=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=fFamLMAnMvbxnzpu8IHDBDuUrAWlAQmykxViLx0NyT6N5+7ZddYaMOHXg6mwwxUTRNWCsELGpirzzoxGUgmYJAVyWaydOyF28KMLbON+i458Oln4jhjpJyuyeXNLy5PSI1MdPYcxbB3xst6fLdtm591Y3M6YMtker2AbKpWUvUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dppJyTSC; arc=none smtp.client-ip=209.85.219.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KvU/cvNf"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A7946C433A6
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Apr 2024 12:32:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712147542;
-	bh=X35XMzk3A8uoTckEnKiVMa5b/pZxR7OiFNkczAB5vXE=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=KvU/cvNf1J0zJuzGPdCzP+VdLBQmhvG7FBPa2d7Ii2I2Kg6S3LM1j/ei3U6W0wxTR
-	 SwfaHzu0ueOVryi1Icj65CkitmsOvYPtUOfA44VRG7luLy9/bMK8a+u4FHuf3u0y47
-	 YuR0L0mC0b6vcP145zLARPTnSZ8I5AoC/UuxogRHeV+AD41WATzEANqO+UTBfNjAUU
-	 yhY1D/xqfnnzCwoB/8VkPN4SM/91DAWeTBwnpu6xzxyBm5ALcx2rnp3W8gI9BMp+EC
-	 Hgzw55y2TH5EgRdNekJtJgPDMSUVH9gjY6FbBdD4/hp4/bYA7iAQ6+zDH+1ClS0fzD
-	 ixBdHT2Sktt7w==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 9FA22C53BD1; Wed,  3 Apr 2024 12:32:22 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 218416] hci0: command 0xfc05 tx timeout in kernel 6.7.1
-Date: Wed, 03 Apr 2024 12:32:22 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: thomas.creutz@gmx.de
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-218416-62941-VstOn0gUXv@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218416-62941@https.bugzilla.kernel.org/>
-References: <bug-218416-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dppJyTSC"
+Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-6992d93c146so503636d6.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Apr 2024 05:59:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712149181; x=1712753981; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=UVBJKZqtjP/eXfkiUmGMoXz1Eool2gTHOFHUAa3bBJ8=;
+        b=dppJyTSC0Q29+rmRF9TOGRXS+I7FE+rPDsu4qFLSp4vAYCiLLxmhkq1ov62oq5EE9R
+         o7Jkf2sOcp3iKZwqnFQcSet2x0Y72cfhUxVk27f5XXwJtVyDt+3ur0kHH5SNUmQQy5oQ
+         Usaj98HH+v0j9MszfvOeNUUHAXQiVvdQQZafoMCXtR6WdiQVQ6HdXwvMZhffPb8AJYfv
+         y+edZwlp1ajOrVDOPajtbXUHs08ULrUcjD9EaffSOojK3xO47oPOpLZYNbzHCsooPGEz
+         R7WF8a4fB2JN6HrY9rlsAAoRY2Z4znP5vPpS4QWGCN/vN6fiCis8uGnjcE4AbXCFX3Ui
+         y3NA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712149181; x=1712753981;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UVBJKZqtjP/eXfkiUmGMoXz1Eool2gTHOFHUAa3bBJ8=;
+        b=a2NlMxvCoy+2l9tgMcmSGhyx6eNyQhd6/nt/6W66nFou7MKx98S0qEa+cj0SQtLuRq
+         PMp9qc6JFMjsqf8Ys+6SAsTA3GSHyp8tltHGlxZhci8eJSuX/ri5aSSurqKJqfNp3i85
+         V4gS1E9KUE5A7n38x9Q4gd/yNYDsdYJBbiy6Ge5VgkS+nzH9Jj4jjVUynWsizsj4rMts
+         Jyho2QGjQJAYKFkJXvSsPDibqlhzWbu+O76wvqc3G20dRPur3Hc9/DC2n+b5/7n1/15C
+         7yfi/rOYalPyxV/KBz+6ZsGNRMweyvlkEzKJA2EfZNjjVdlaYxTtoqzVc42pvfDnMODU
+         tm3g==
+X-Gm-Message-State: AOJu0YwC20Q4nj3b66pvoBnNMFu+SvuOFRdo3qyVW0XFSRLxzr+OYRum
+	MJeX3vJ2f5PJTuKXAnBuK4AlLKkhAMfNnK6nTe1uEk1QgB+Z6obWiBJxwZYA
+X-Google-Smtp-Source: AGHT+IET3O7zg0rdTRfJm3DyVzuqt48Ialc/Zry5ezzHIGwZ2aK47zz7qf/UjyZ5RU0hfPw28588+Q==
+X-Received: by 2002:a0c:f791:0:b0:691:abc:ade5 with SMTP id s17-20020a0cf791000000b006910abcade5mr4070148qvn.27.1712149180671;
+        Wed, 03 Apr 2024 05:59:40 -0700 (PDT)
+Received: from [172.17.0.2] ([40.76.119.179])
+        by smtp.gmail.com with ESMTPSA id p1-20020a05621421e100b00696b282f582sm6455309qvj.97.2024.04.03.05.59.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Apr 2024 05:59:40 -0700 (PDT)
+Message-ID: <660d52bc.050a0220.ceaf5.058e@mx.google.com>
+Date: Wed, 03 Apr 2024 05:59:40 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0626326089686805787=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, howardchung@google.com
+Subject: RE: Fix descriptor display issue in btmon
+In-Reply-To: <20240403190511.Bluez.1.I0e799d0a6494565e232db4c86a8979cf898b1840@changeid>
+References: <20240403190511.Bluez.1.I0e799d0a6494565e232db4c86a8979cf898b1840@changeid>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218416
+--===============0626326089686805787==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Thomas Creutz (thomas.creutz@gmx.de) changed:
+This is automated email and please do not reply to this email!
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |thomas.creutz@gmx.de
+Dear submitter,
 
---- Comment #15 from Thomas Creutz (thomas.creutz@gmx.de) ---
-I also get:
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=841052
 
-~$ dmesg | grep -i blue
-[   13.838221] Bluetooth: Core ver 2.22
-[   13.838236] NET: Registered PF_BLUETOOTH protocol family
-[   13.838237] Bluetooth: HCI device and connection manager initialized
-[   13.838240] Bluetooth: HCI socket layer initialized
-[   13.838241] Bluetooth: L2CAP socket layer initialized
-[   13.838244] Bluetooth: SCO socket layer initialized
-[   14.329584] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-[   14.329588] Bluetooth: BNEP filters: protocol multicast
-[   14.329590] Bluetooth: BNEP socket layer initialized
-[   16.032582] Bluetooth: hci0: Reading Intel version command failed (-110)
-[   16.032583] Bluetooth: hci0: command 0xfc05 tx timeout
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.11 seconds
+GitLint                       PASS      0.77 seconds
+BuildEll                      PASS      24.08 seconds
+BluezMake                     PASS      1626.86 seconds
+MakeCheck                     PASS      12.97 seconds
+MakeDistcheck                 PASS      174.35 seconds
+CheckValgrind                 PASS      244.01 seconds
+CheckSmatch                   WARNING   346.65 seconds
+bluezmakeextell               PASS      117.47 seconds
+IncrementalBuild              PASS      2928.57 seconds
+ScanBuild                     PASS      965.46 seconds
+
+Details
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+monitor/att.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/att.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.
 
 
-~$ modinfo btintel
-filename:=20=20=20=20=20=20
-/lib/modules/6.5.0-26-generic/kernel/drivers/bluetooth/btintel.ko
-firmware:       intel/ibt-12-16.ddc
-firmware:       intel/ibt-12-16.sfi
-firmware:       intel/ibt-11-5.ddc
-firmware:       intel/ibt-11-5.sfi
-license:        GPL
-version:        0.1
-description:    Bluetooth support for Intel devices ver 0.1
-author:         Marcel Holtmann <marcel@holtmann.org>
-srcversion:     FDF2221B8ED4B01F8EADF85
-depends:        bluetooth
-retpoline:      Y
-intree:         Y
-name:           btintel
-vermagic:       6.5.0-26-generic SMP preempt mod_unload modversions=20
+---
+Regards,
+Linux Bluetooth
 
-~$ lsusb | grep -i bluetooth
-Bus 001 Device 005: ID 8087:0025 Intel Corp. Wireless-AC 9260 Bluetooth Ada=
-pter
 
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+--===============0626326089686805787==--
