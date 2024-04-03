@@ -1,265 +1,115 @@
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53D7C14831D
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Apr 2024 13:50:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14879148318;
+	Wed,  3 Apr 2024 13:52:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712152252; cv=none; b=OyW7oOwwNycEDv1TloHb6VGflqDQi24OmkgB2334ovCT6c77i2TvzMktILVffkCgwo0xJjU9GYwAvg+1RaKcN3F8Ox8c5vGFkmjVvTCqfHNMuSuluoMXBvDUW/TS3Rue8XNy6YV13JyYreteqAno3sIKAq6vRqFslE17aWqlaaY=
+	t=1712152322; cv=none; b=Rvoc5Pm4CltGTy669hFURPvH62T9TfhvHzdz03YT9Ux63g+eY7pZQuwTzokRzcRal0QeLt2PNGA6NjW7mj4jpkpDpMDjUCJbgS3C6SJranr6zwcKBwxZrilfn1iQ7OOQyQhXFywXna//7/yqrsb/hKEUkWG8zQEWYWm0TS0qtm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712152252; c=relaxed/simple;
-	bh=d+ReEHmcQvQ3Zlp6Ngorh0c8S9BU9MNCHwOT3fLSo64=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RG4RB4UrAC5Gvvk5iSxtAr6tmbw6EeA6mp9cayzghSB29mMExU81LLCNDD/bkuOPujfOndT1QkTBfs2e+RiRqq3hOyntxQNu9h3utMSpvGafAg/1nHp+u8lJSUXDWDJ6E2g2BTfLxu0WD+GwyO1OGi5vTvrjzy5QuRHC/UQ4Ayw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=codecoup.pl; spf=pass smtp.mailfrom=codecoup.pl; dkim=pass (2048-bit key) header.d=codecoup-pl.20230601.gappssmtp.com header.i=@codecoup-pl.20230601.gappssmtp.com header.b=kulAHpwj; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=codecoup.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codecoup.pl
+	s=arc-20240116; t=1712152322; c=relaxed/simple;
+	bh=5kpPFNQ9hey0wtu6FPTQxZ2nne63r+uHCH8qOkaxR64=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tD9LXHOvXaKxL++P6eK95U0kpZFzkWBIvoNesMhhIfZdUjKQDSQFCwMQYETsameYJHK/c2IweTdneX5GQdB3rRP++MmuCb+wTS7yQcnEX5/zmQF3xFJf77Qo6+5VethUTgeTN/+R4y2SwL/SiAfSx99y8RYFicD8yPg0+5GfjVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=tGaRFaNU; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codecoup-pl.20230601.gappssmtp.com header.i=@codecoup-pl.20230601.gappssmtp.com header.b="kulAHpwj"
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-513d717269fso7609071e87.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Apr 2024 06:50:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=codecoup-pl.20230601.gappssmtp.com; s=20230601; t=1712152248; x=1712757048; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4wXhryY2mZi0KKsuU1at2JuZl+X3Fq9B5y2NlIDFsYg=;
-        b=kulAHpwjTKej1tGi/eLNY049wOFVgABIRyNqfCmUO3qUkcK3s27c0UdDsDRx00M6oW
-         4SlJhDzciSA7GIrip1m/o7Q17D+hyrFElSN8oZTu+8giItWWhnlOmL4oJLfJ/Os6J1z5
-         +vsdKv+bdEt2XM7ay8hO1NTdhclkroS9FDul47IBLrjAXK3mVZlV2j45B5KbsrsmzUdO
-         V9URd1dpK/FiyZHw8CBLHg0gD+DdPu+ft4PKyqbThgz7SXLHj4GJqMVE+yVlgu1Chy6G
-         VAUjAPMiEhIeKBG0I7hE780zbdxFYd3NxnIDPTuBiCsBQ+H5nwYEVXm/E9twwPkEm+fN
-         5BHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712152248; x=1712757048;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4wXhryY2mZi0KKsuU1at2JuZl+X3Fq9B5y2NlIDFsYg=;
-        b=NcQwTOKsBfg5TecKHXHae4LhAVu20Oc9uxkUyWXXKK65fyiid77W9XMPlOVbjB9MWv
-         Oohv8pwDCNxtfBhtb+Lhbgk0uHkPHGaY0Fjff3orCDU5mBxsFpK2OBbXSn/LSOuoHfbD
-         5M0s3HFAgWF7JjWnhB06t63PCULVfRgAuPX5WXxrEHAUrDw4sywzZzJBd/gKBDMJeMRc
-         GMiY8UaZCRBoYjgc0FzMY+NWGcdgTr1CZbA1m3M4ZnYzTrr5vAMMw0lHpJyy7RSNFOXZ
-         K6OxlkpZuiLmWlc/BZMoBELxJP2HdoVv+9yB/IS6GoaxAI0njIdhfSs1MExSYIh4iiPA
-         fevg==
-X-Gm-Message-State: AOJu0YwF8k6I4zdlAtAqcDibUSB6BMgfKuS1Xd/YzUFlHaiMnpVX/C7b
-	DyGYh6+qJwfY/iVIKEEObYtl5/oXH2FWLdp4d/bPs0svMiPGkxCo7f3e95PG87derhrVBQxEivS
-	peNrex+ikjkKxHCcCTKBgWjOr9cGK2Z7w7ZZuRYo3UUQ0S/kKazA=
-X-Google-Smtp-Source: AGHT+IGTCS+FAEg4zIxdnomn51NxKaSmy75PnlUHEBaolLZNbQR4jib1QUWe6ej/EVnX/2jVhwCETFOKTV7fTexJQI0=
-X-Received: by 2002:a05:6512:3711:b0:515:d037:d8e with SMTP id
- z17-20020a056512371100b00515d0370d8emr8689946lfr.40.1712152248197; Wed, 03
- Apr 2024 06:50:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="tGaRFaNU"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 433DUVu0007150;
+	Wed, 3 Apr 2024 13:52:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=81vB5rVDUlQxHkJtgz4MbO4SKniyJUcv6K8MS+gKQTg=;
+ b=tGaRFaNUMVSb7n84E8VxtZ4Y7EkuCAyEo4zKd8bDRJCbdor7A31dmD7b+c3B9sVYIhII
+ R3Cp6T7rZfevQjQn6lEMW6ftPljJ006bdCv8l8i1uBXjJf2YxIFuqINA/ehSHhyZedMb
+ QXrDdyRGnWOwL4r0aHH7Ivtvs/2c9Y7C6jea4osv1c00s2c58JdscLbqDEzryhK8Xlc+
+ hJm3Qv/KqXAga3IPCLeaY8St0KmL4DBsbG+u1YUF8LrDLgrWjIr275SzG3KfVA9Vq7Fr
+ I0/77Y5WytJJk/X1/GeH1gG+SSErGUJyhWJ2oN43k1UXWKUM+npJ6o/HTWACfRv3i/ke Vg== 
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x9826r1m8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 03 Apr 2024 13:51:59 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 433CK0FC002203;
+	Wed, 3 Apr 2024 13:51:59 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3x6xjmneeb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 03 Apr 2024 13:51:58 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 433Dptbb44958168
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 3 Apr 2024 13:51:57 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E3D2E20040;
+	Wed,  3 Apr 2024 13:51:54 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B73452004B;
+	Wed,  3 Apr 2024 13:51:54 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  3 Apr 2024 13:51:54 +0000 (GMT)
+From: Niklas Schnelle <schnelle@linux.ibm.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, Arnd Bergmann <arnd@kernel.org>,
+        Heiko Carstens <hca@linux.ibm.com>, linux-kernel@vger.kernel.org,
+        Niklas Schnelle <schnelle@linux.ibm.com>
+Subject: [PATCH 0/1] Bluetooth: Handle HAS_IOPORT dependencies
+Date: Wed,  3 Apr 2024 15:51:53 +0200
+Message-Id: <20240403135154.905614-1-schnelle@linux.ibm.com>
+X-Mailer: git-send-email 2.40.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: JxEHLm0qEGtkoJrXV7a2X9hs_Yvh4pv5
+X-Proofpoint-GUID: JxEHLm0qEGtkoJrXV7a2X9hs_Yvh4pv5
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240403110808.805771-1-frederic.danis@collabora.com>
-In-Reply-To: <20240403110808.805771-1-frederic.danis@collabora.com>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-Date: Wed, 3 Apr 2024 15:50:37 +0200
-Message-ID: <CAAEJBhL6pb=PeO_mezcga+aVxDew+zQwTDhTWkHT-wnfXONHtQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] plugins: Add new plugin to fix airpods pairing
-To: =?UTF-8?B?RnLDqWTDqXJpYyBEYW5pcw==?= <frederic.danis@collabora.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-03_13,2024-04-03_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
+ lowpriorityscore=0 clxscore=1011 phishscore=0 priorityscore=1501
+ malwarescore=0 mlxlogscore=999 spamscore=0 adultscore=0 impostorscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2403210000 definitions=main-2404030095
 
-Hi,
+Hi Marcel, Luiz,
 
-On Wed, 3 Apr 2024 at 13:08, Fr=C3=A9d=C3=A9ric Danis
-<frederic.danis@collabora.com> wrote:
->
-> Apple Airpods are discoverable and pairable in BREDR mode, but also
-> advertise in unconnectable mode in LE with the same Public address, at th=
-e
-> same time. As the pairing process uses the latest seen address, sometimes
-> it uses the LE Public address to pair, which fails.
->
-> This commit adds a new adapter driver plugin which force the BREDR last
-> seen time on LE Public address device found event related to an Apple
-> device, allowing pairing process to always use the BREDR.
->
+This is a follow up in my ongoing effort of making inb()/outb() and
+similar I/O port accessors compile-time optional. Previously I sent this
+as a treewide series titled "treewide: Remove I/O port accessors for
+HAS_IOPORT=n" with the latest being its 5th version[0]. With a significant
+subset of patches merged I've changed over to per-subsystem series. These
+series are stand alone and should be merged via the relevant tree such
+that with all subsystems complete we can follow this up with the final
+patch that will make the I/O port accessors compile-time optional.
 
-While I'm fine with having plugin for this specific case, I wonder if
-select_conn_bearer() shouldn't take
-bearer's connectable state into account when selecting bearer for connectio=
-n
+The current state of the full series with changes to the remaining
+subsystems and the aforementioned final patch can be found for your
+convenience on my git.kernel.org tree in the has_ioport_v6 branch[1] with
+signed tags. As for compile-time vs runtime see Linus' reply to my first
+attempt[2].
 
-> This commit is based on proposal
-> https://lore.kernel.org/all/20240103101328.1812899-1-clancy_shang@163.com=
-/
-> ---
->  Makefile.plugins  |   3 ++
->  plugins/airpods.c | 132 ++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 135 insertions(+)
->  create mode 100644 plugins/airpods.c
->
-> diff --git a/Makefile.plugins b/Makefile.plugins
-> index 4aa2c9c92..2ebd8aaf6 100644
-> --- a/Makefile.plugins
-> +++ b/Makefile.plugins
-> @@ -11,6 +11,9 @@ builtin_sources +=3D plugins/autopair.c
->  builtin_modules +=3D policy
->  builtin_sources +=3D plugins/policy.c
->
-> +builtin_modules +=3D airpods
-> +builtin_sources +=3D plugins/airpods.c
-> +
->  if ADMIN
->  builtin_modules +=3D admin
->  builtin_sources +=3D plugins/admin.c
-> diff --git a/plugins/airpods.c b/plugins/airpods.c
-> new file mode 100644
-> index 000000000..5043f0cca
-> --- /dev/null
-> +++ b/plugins/airpods.c
-> @@ -0,0 +1,132 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2024 Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabor=
-a.com>
-> + *
-> + *
-> + */
-> +
-> +#ifdef HAVE_CONFIG_H
-> +#include <config.h>
-> +#endif
-> +
-> +#include <stdbool.h>
-> +
-> +#include <glib.h>
-> +
-> +#include "bluetooth/bluetooth.h"
-> +
-> +#include "lib/mgmt.h"
-> +#include "src/plugin.h"
-> +#include "src/adapter.h"
-> +#include "src/device.h"
-> +#include "src/eir.h"
-> +#include "src/log.h"
-> +#include "src/shared/mgmt.h"
-> +#include "src/shared/util.h"
-> +
-> +#define APPLE_INC_VENDOR_ID 0x004c
-> +
-> +static struct mgmt *mgmt;
-> +
-> +static bool eir_msd_is_apple_inc(GSList *msd_list)
-> +{
-> +       GSList *msd_l, *msd_next;
-> +
-> +       for (msd_l =3D msd_list; msd_l !=3D NULL; msd_l =3D msd_next) {
-> +               const struct eir_msd *msd =3D msd_l->data;
-> +
-> +               msd_next =3D g_slist_next(msd_l);
-> +
-> +               if (msd->company =3D=3D APPLE_INC_VENDOR_ID)
-> +                       return true;
-> +       }
-> +
-> +       return false;
-> +}
-> +
-> +static void airpods_device_found_callback(uint16_t index, uint16_t lengt=
-h,
-> +                                       const void *param, void *user_dat=
-a)
-> +{
-> +       struct btd_device *dev;
-> +       const struct mgmt_ev_device_found *ev =3D param;
-> +       struct btd_adapter *adapter =3D user_data;
-> +       uint16_t eir_len;
-> +       uint32_t flags =3D le32_to_cpu(ev->flags);
-> +       struct eir_data eir_data;
-> +
-> +       dev =3D btd_adapter_find_device(adapter,  &ev->addr.bdaddr,
-> +                                       ev->addr.type);
-> +       if (!dev)
-> +               return;
-> +
-> +       if (length < sizeof(*ev)) {
-> +               warn("Too short device found event (%u bytes)", length);
-> +               return;
-> +       }
-> +
-> +       eir_len =3D btohs(ev->eir_len);
-> +       if (length !=3D sizeof(*ev) + eir_len) {
-> +               warn("Device found event size mismatch (%u !=3D %zu)",
-> +                                       length, sizeof(*ev) + eir_len);
-> +               return;
-> +       }
-> +
-> +       if (eir_len =3D=3D 0)
-> +               return;
-> +
-> +       memset(&eir_data, 0, sizeof(eir_data));
-> +       eir_parse(&eir_data, ev->eir, eir_len);
-> +
-> +       if (eir_msd_is_apple_inc(eir_data.msd_list) &&
-> +                               (flags & MGMT_DEV_FOUND_NOT_CONNECTABLE) =
-&&
-> +                               (ev->addr.type =3D=3D BDADDR_LE_PUBLIC)) =
-{
-> +               DBG("Force BREDR last seen");
-> +               device_set_bredr_support(dev);
-> +               device_update_last_seen(dev, BDADDR_BREDR, true);
-> +       }
-> +}
-> +
-> +static int airpods_probe(struct btd_adapter *adapter)
-> +{
-> +       if (!mgmt)
-> +               mgmt =3D mgmt_new_default();
-> +
-> +       if (!mgmt) {
-> +               fprintf(stderr, "Failed to open management socket\n");
-> +               return 0;
-> +       }
-> +
-> +       mgmt_register(mgmt, MGMT_EV_DEVICE_FOUND,
-> +                                       btd_adapter_get_index(adapter),
-> +                                       airpods_device_found_callback,
-> +                                       adapter, NULL);
-> +
-> +       return 0;
-> +}
-> +
-> +static void airpods_remove(struct btd_adapter *adapter)
-> +{
-> +       mgmt_unregister_index(mgmt, btd_adapter_get_index(adapter));
-> +}
-> +
-> +static struct btd_adapter_driver airpods_driver =3D {
-> +       .name   =3D "airpods",
-> +       .probe  =3D airpods_probe,
-> +       .remove =3D airpods_remove,
-> +};
-> +
-> +static int airpods_init(void)
-> +{
-> +       return btd_register_adapter_driver(&airpods_driver);
-> +}
-> +
-> +static void airpods_exit(void)
-> +{
-> +       btd_unregister_adapter_driver(&airpods_driver);
-> +}
-> +
-> +BLUETOOTH_PLUGIN_DEFINE(airpods, VERSION,
-> +               BLUETOOTH_PLUGIN_PRIORITY_LOW, airpods_init, airpods_exit=
-)
-> --
-> 2.34.1
->
->
+Thanks,
+Niklas
 
+[0] https://lore.kernel.org/all/20230522105049.1467313-1-schnelle@linux.ibm.com/
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/niks/linux.git/log/?h=has_ioport_v6
+[2] https://lore.kernel.org/lkml/CAHk-=wg80je=K7madF4e7WrRNp37e3qh6y10Svhdc7O8SZ_-8g@mail.gmail.com/
 
---=20
-pozdrawiam
-Szymon K. Janc
+Niklas Schnelle (1):
+  Bluetooth: add HAS_IOPORT dependencies
+
+ drivers/bluetooth/Kconfig | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+-- 
+2.40.1
+
