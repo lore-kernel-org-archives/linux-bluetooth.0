@@ -1,68 +1,68 @@
 Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D82C314A62A
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Apr 2024 16:46:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C5B4152163
+	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Apr 2024 16:46:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712162767; cv=pass; b=hawSCSgtUnghJEjwNGePQNCs0R3V2kKwh+Nx/geUoL2XV7p16z8lc9nxLqglJdl4+nF4XFS1zSrKh3yUyYQnHGTrTRKfnRZbDd+704BU1b8LBMQtLpXQz4BtnSZh81wxu06kGTv6S+2xpgE1V0aV745R1XQuyd1DjMTrYuqm7C4=
+	t=1712162769; cv=pass; b=QHCdurZuYI+4tLDhxXBSB1AznmHgHmmO+D7RyyUzJ4EUoBjEETIlhzTN15o0JFrWsXjrXYlP1N+51QbJjXsjL4es70vF37PoMUrNA8AoN/Go1ryGkXk4fqycXzqxeqznjC/V58651cha+1C2XD1Pk2b8S905Id4IeCL7iXbGzYI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712162767; c=relaxed/simple;
-	bh=StPEuiKAeiq82XBkYiuWhlDUKTkobFlfmXkJOPMvKmE=;
+	s=arc-20240116; t=1712162769; c=relaxed/simple;
+	bh=R1O/ht1ocoXEyVTEdAgk2S2D/NajFcKMc1FubLogsP4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GOzbd5j0QzVHsS0SZ0Y4PZPJqiNp96iF/SGIjs0Saf8R13nbvxfSdPihxK26buXazE57EB0xPDz09SGaP4FDy3nAvu82GZPP87MXtcPdI55rg4OGC8UdGgswe5qtp6K8k7rab3hpmG0H+rcV4PMiUK/TCv4jGD+/CQGTb0oVF0Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=hJju99DM; arc=pass smtp.client-ip=185.185.170.37
+	 MIME-Version; b=OH9uQ9IkIXkFTBCHC2pKTw2nPU4SbAsa9b199Lmt8vhvvqG5LpsDrjggiHFZWB49LOajnDEMeejOn1Z/5hvRo2qzTd6LK4e/s6BHoPt0UuVRD/jYJ5d7ZBKHvZ2xzcivup3/I039qMXYZzRi4Mxc8s+72ZL5dricIsBizxn+DGg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=aYjy+qmB; arc=pass smtp.client-ip=185.185.170.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="hJju99DM"
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="aYjy+qmB"
 Received: from monolith.lan (unknown [193.138.7.138])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4V8rGx6PF1z49Q3T;
-	Wed,  3 Apr 2024 19:46:01 +0300 (EEST)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4V8rGy6RSLz49Q3H;
+	Wed,  3 Apr 2024 19:46:02 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1712162762;
+	t=1712162763;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=TDgcnUwgNYO1QAdjXUz+rX6ZwN/SF2lcJ3PIv/uFfOU=;
-	b=hJju99DMDhE7IyHWVFVH+QTUr0ThM5HUAeNGpQvIefE4pJB3bUviCiOX2zhefIUCLaPJf0
-	H3y19KS/RdUK837sjiIGQ3AO4J0z6ZPxlQMnFpaCbTQu4yYLMziJlYhDrlCQ9TBg6N+882
-	usjb4NnXpDoJSGqwx2BYKhPTxVl475yZLALic/d8BiHzt43zuATbY6kiUakbpeATcneYXZ
-	tzQ0lvQM8DejjXZXtnheI49xzKAEHPYB/Qz5VACn9Do5lfVgnaFCb5rMksihUU9YQCyRQU
-	Tqq/O9DSyoOGqD8OpcrLTbhlQKZDUBQo28cGdGDtW8fv7eNd2hNF6Ic0bUWXeQ==
+	bh=5JzT69tOdpsUYsIOroGvf9htTZN0rV5ZdKs7wA0E/5Y=;
+	b=aYjy+qmBmE1XnLkEIkkicucPxa971RvSH1J7c5xngQRPuOoh0+4rCqP76cnzOt22w0y/yx
+	/KUAUf1Jr0veoFVAhcNyJCtrGIi3Efdb473orMNzmDhgNT9NKVM03YcAPMehGx+9HWrr/l
+	MvPo3mfiMNrSOr5ZxCvr1DHoNrtET83KZvqn9qecmW9qWdLw+5OsPaUgCohZ9yfxm2aBp9
+	pJXtrXOEgJ/QMbFNPYwYrwLEOsCczHJ4zheZq2tRZB67I3hfCL/LXIXQC6VMkjf35ejwQ2
+	h+jYs24FWN42wYs9q9l03HnjWGpeNJbu/ORHp+r7WY+30lxTYy+qij/qB3Ad3g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1712162762;
+	s=lahtoruutu; t=1712162763;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=TDgcnUwgNYO1QAdjXUz+rX6ZwN/SF2lcJ3PIv/uFfOU=;
-	b=ty+vix+ZzjU8mGQMZ33B7p11/h0YqY3mB+ytfjAyOMCSkSN/ZbNCYjTeRWTzM6faVWfwNp
-	s8oZmm3awbAfSNAGO55lnlZk2O0vLBqv1hDAR7LctZlCZLI+sQoZ2/a0F6n5JDiPIJ2T/B
-	hX//GvO6/4BI/ZnQ49jfD+Bse2QGBvnE5j7aiqDorq87X8fcoaTmi5zLuwd+4kyweIFSaR
-	crSi08zL3PoGnsuG7SvLTCoX0+wnNho2MZNPB0HAMafAmMTNHbGgCvYJHmLtxO7KEurwdY
-	dPEg6Qo2zTARPQLbwJ+/29h9UV+BpB0zRPenuaCScyclzFSqccD7skOi+5J9eg==
+	bh=5JzT69tOdpsUYsIOroGvf9htTZN0rV5ZdKs7wA0E/5Y=;
+	b=Iz3z2O013T1eMw72BpO2xzt08pTtiExcipWUBDa5R+XXi6X+UJlLgjOR80+1NUJ3sEZ3QV
+	p02jqhj/h7+rTvm4H+KlwRqxYI8HzaBVYGYKIuiZspaQTNpG52sfrLH2Szi66R9x1pkryK
+	ADk744guop/xCLmgn1E3nBjV0yg7ydnDZjZIdHWo2FWqKRUygYoQ7MZLhQiYW5BMjvd/81
+	5bSI6HDf4rderhJQbn9OvW+tgYJsVhD0cTdinkKddgsi8s1UHJdEgW2P24PY+UwDkEvSxY
+	JE5EV7Un8+CPt9T5oKfb6uMHxzGiRNHh90K1qgDsJ2UT+nDMtfuTpkmevy7J/g==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1712162762; a=rsa-sha256;
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1712162763; a=rsa-sha256;
 	cv=none;
-	b=ManfpcjeIJ8iI5hqykyH8U5epy9+T5bL8fSRDQNj5kNqnmooYUg6E+mK6VDRoRnjbILg75
-	An3SU3L2hZsZVHOO+bUrTnm4Uf47KZLsLj5xi7px7RVLJcARlLTGmohW3f3U/gPQu8ND1D
-	xzGv8kZqO8Kfirr/OqVAT3MZO2+F6qgQApNc8OtBAPnwJ3x9JJla43mVZLFNwXS9CNjBD2
-	LsBbxVUiIwRYcGeVrtWtxKlLG92JfuCSglU4ocBmfDSwT3dlsUe27EQkUtCDTcALlSdLrX
-	i09BqFu0HlU8H9qxVle3jHlGHSYqs+mIcZHIgFTMaQUxGkylrvoO5rhu+LeUqg==
+	b=n7tCAlj5qGJAKbpM8B3PYo4H3Cwcg3wVNDG7IYgKVJzc1NETAj9HuNYxLWHcpdKblwLS0J
+	dLaanMBAjV4RIg02tFAeecJbui2oHQV8tp24S4Mtzu9xN3GbexGACc+T5ueQ2xklB6fWIF
+	7cp4y4EzUzKFTlOW/TX6XpSnF/QEtS6YEXYBBA1X+OPlkkH3DY9JVge6Q5MYrtfeterXEk
+	wgiC4IV9lwPvu1lVkDvcJEh0nGxXmV3lPZVFr0IOCZFDsRzQ0RY4caOH8nXr9K2B/6GKq2
+	OXh8r9lbYnvkX0/Kymdtp+xbsBWxwENnllbhKhEBz6iIF6SOEMKTIIK1ic/Lmw==
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v5 2/7] iso-tester: Add tests for TX timestamping
-Date: Wed,  3 Apr 2024 19:43:21 +0300
-Message-ID: <edbbfcab6a6696640a6130ac0139485f3e27cf86.1712161649.git.pav@iki.fi>
+Subject: [PATCH BlueZ v5 6/7] bthost: handle client L2CAP conn in LE credit based mode
+Date: Wed,  3 Apr 2024 19:43:25 +0300
+Message-ID: <3c8ff0aa2e7f0b1d72c9c221329be12a2412d1fb.1712161649.git.pav@iki.fi>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <cover.1712161649.git.pav@iki.fi>
 References: <cover.1712161649.git.pav@iki.fi>
@@ -74,468 +74,388 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add TX timestamping test utilities in new tools/tester.h, so that they
-can be shared between testers.
+Allow bthost hooks to receive data from L2CAP LE credit based
+connections. Handle LE credit header when receiving, and reassemble
+received SDU.
 
-Add tests:
-
-ISO Send - TX Timestamping
-ISO Send - TX Sched Timestamping
-ISO Send - TX Msg Timestamping
+Handle L2CAP LE credit header also in bthost_send_cid.
 ---
- tools/iso-tester.c | 182 ++++++++++++++++++++++++++++++++++++++++++---
- tools/tester.h     | 163 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 335 insertions(+), 10 deletions(-)
- create mode 100644 tools/tester.h
+ emulator/bthost.c | 205 ++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 180 insertions(+), 25 deletions(-)
 
-diff --git a/tools/iso-tester.c b/tools/iso-tester.c
-index 60afef301..14a2e7d46 100644
---- a/tools/iso-tester.c
-+++ b/tools/iso-tester.c
-@@ -18,6 +18,9 @@
- #include <poll.h>
- #include <stdbool.h>
- 
-+#include <linux/errqueue.h>
-+#include <linux/net_tstamp.h>
-+
- #include <glib.h>
- 
- #include "lib/bluetooth.h"
-@@ -34,6 +37,8 @@
- #include "src/shared/util.h"
- #include "src/shared/queue.h"
- 
-+#include "tester.h"
-+
- #define QOS_IO(_interval, _latency, _sdu, _phy, _rtn) \
- { \
- 	.interval = _interval, \
-@@ -462,11 +467,12 @@ struct test_data {
- 	uint16_t handle;
- 	uint16_t acl_handle;
- 	struct queue *io_queue;
--	unsigned int io_id[2];
-+	unsigned int io_id[3];
- 	uint8_t client_num;
- 	int step;
- 	bool reconnect;
- 	bool suspending;
-+	struct tx_tstamp_data tx_ts;
+diff --git a/emulator/bthost.c b/emulator/bthost.c
+index 8c40fce90..8616bf715 100644
+--- a/emulator/bthost.c
++++ b/emulator/bthost.c
+@@ -162,11 +162,21 @@ struct btconn {
+ 	void *recv_data;
  };
  
- struct iso_client_data {
-@@ -487,6 +493,22 @@ struct iso_client_data {
- 	size_t base_len;
- 	bool listen_bind;
- 	bool pa_bind;
++enum l2cap_mode {
++	L2CAP_MODE_OTHER,
++	L2CAP_MODE_LE_CRED,
++	L2CAP_MODE_LE_ENH_CRED,
++};
 +
-+	/* Enable SO_TIMESTAMPING with these flags */
-+	uint32_t so_timestamping;
-+
-+	/* Enable SO_TIMESTAMPING using CMSG instead of setsockopt() */
-+	bool cmsg_timestamping;
-+
-+	/* Number of additional packets to send, before SO_TIMESTAMPING.
-+	 * Used to test kernel timestamp TX queue logic.
-+	 */
-+	unsigned int repeat_send_pre_ts;
-+
-+	/* Number of additional packets to send, after SO_TIMESTAMPING.
-+	 * Used for testing TX timestamping OPT_ID.
-+	 */
-+	unsigned int repeat_send;
+ struct l2conn {
++	struct l2conn *next;
+ 	uint16_t scid;
+ 	uint16_t dcid;
+ 	uint16_t psm;
+-	struct l2conn *next;
++	enum l2cap_mode mode;
++	uint16_t data_len;
++	uint16_t recv_len;
++	void *recv_data;
  };
  
- typedef bool (*iso_defer_accept_t)(struct test_data *data, GIOChannel *io);
-@@ -677,15 +699,14 @@ static void io_free(void *data)
- static void test_data_free(void *test_data)
+ struct rcconn {
+@@ -275,6 +285,7 @@ struct bthost *bthost_create(void)
+ 
+ static void l2conn_free(struct l2conn *conn)
  {
- 	struct test_data *data = test_data;
-+	unsigned int i;
- 
- 	if (data->io_queue)
- 		queue_destroy(data->io_queue, io_free);
- 
--	if (data->io_id[0] > 0)
--		g_source_remove(data->io_id[0]);
--
--	if (data->io_id[1] > 0)
--		g_source_remove(data->io_id[1]);
-+	for (i = 0; i < ARRAY_SIZE(data->io_id); ++i)
-+		if (data->io_id[i] > 0)
-+			g_source_remove(data->io_id[i]);
- 
- 	free(data);
++	free(conn->recv_data);
+ 	free(conn);
  }
-@@ -987,6 +1008,38 @@ static const struct iso_client_data connect_16_2_1_send = {
- 	.send = &send_16_2_1,
- };
  
-+static const struct iso_client_data connect_send_tx_timestamping = {
-+	.qos = QOS_16_2_1,
-+	.expect_err = 0,
-+	.send = &send_16_2_1,
-+	.so_timestamping = (SOF_TIMESTAMPING_SOFTWARE |
-+					SOF_TIMESTAMPING_OPT_ID |
-+					SOF_TIMESTAMPING_TX_SOFTWARE),
-+	.repeat_send = 1,
-+	.repeat_send_pre_ts = 2,
-+};
-+
-+static const struct iso_client_data connect_send_tx_sched_timestamping = {
-+	.qos = QOS_16_2_1,
-+	.expect_err = 0,
-+	.send = &send_16_2_1,
-+	.so_timestamping = (SOF_TIMESTAMPING_SOFTWARE |
-+					SOF_TIMESTAMPING_TX_SOFTWARE |
-+					SOF_TIMESTAMPING_OPT_TSONLY |
-+					SOF_TIMESTAMPING_TX_SCHED),
-+	.repeat_send = 1,
-+};
-+
-+static const struct iso_client_data connect_send_tx_cmsg_timestamping = {
-+	.qos = QOS_16_2_1,
-+	.expect_err = 0,
-+	.send = &send_16_2_1,
-+	.so_timestamping = (SOF_TIMESTAMPING_SOFTWARE |
-+					SOF_TIMESTAMPING_TX_SOFTWARE),
-+	.repeat_send = 1,
-+	.cmsg_timestamping = true,
-+};
-+
- static const struct iso_client_data listen_16_2_1_recv = {
- 	.qos = QOS_16_2_1,
- 	.expect_err = 0,
-@@ -1410,14 +1463,17 @@ static void bthost_recv_data(const void *buf, uint16_t len, void *user_data)
- 	struct test_data *data = user_data;
- 	const struct iso_client_data *isodata = data->test_data;
+@@ -360,6 +371,7 @@ static struct l2conn *bthost_add_l2cap_conn(struct bthost *bthost,
+ 	l2conn->psm = psm;
+ 	l2conn->scid = scid;
+ 	l2conn->dcid = dcid;
++	l2conn->mode = L2CAP_MODE_OTHER;
  
-+	--data->step;
-+
- 	tester_print("Client received %u bytes of data", len);
+ 	l2conn->next = conn->l2conns;
+ 	conn->l2conns = l2conn;
+@@ -415,6 +427,19 @@ static struct l2conn *btconn_find_l2cap_conn_by_scid(struct btconn *conn,
+ 	return NULL;
+ }
  
- 	if (isodata->send && (isodata->send->iov_len != len ||
- 			memcmp(isodata->send->iov_base, buf, len))) {
- 		if (!isodata->recv->iov_base)
- 			tester_test_failed();
--	} else
-+	} else if (!data->step) {
- 		tester_test_passed();
++static struct l2conn *btconn_find_l2cap_conn_by_dcid(struct btconn *conn,
++								uint16_t dcid)
++{
++	struct l2conn *l2conn;
++
++	for (l2conn = conn->l2conns; l2conn != NULL; l2conn = l2conn->next) {
++		if (l2conn->dcid == dcid)
++			return l2conn;
 +	}
- }
- 
- static void bthost_iso_disconnected(void *user_data)
-@@ -2058,17 +2114,93 @@ static void iso_recv(struct test_data *data, GIOChannel *io)
- 	data->io_id[0] = g_io_add_watch(io, G_IO_IN, iso_recv_data, data);
- }
- 
--static void iso_send(struct test_data *data, GIOChannel *io)
-+static gboolean iso_recv_errqueue(GIOChannel *io, GIOCondition cond,
-+							gpointer user_data)
- {
-+	struct test_data *data = user_data;
- 	const struct iso_client_data *isodata = data->test_data;
--	ssize_t ret;
-+	int sk = g_io_channel_unix_get_fd(io);
-+	int err;
 +
-+	data->step--;
-+
-+	err = tx_tstamp_recv(&data->tx_ts, sk, isodata->send->iov_len);
-+	if (err > 0)
-+		return TRUE;
-+	else if (!err && !data->step)
-+		tester_test_passed();
-+	else
-+		tester_test_failed();
-+
-+	data->io_id[2] = 0;
-+	return FALSE;
++	return NULL;
 +}
 +
-+static void iso_tx_timestamping(struct test_data *data, GIOChannel *io)
+ static struct l2cap_conn_cb_data *bthost_find_l2cap_cb_by_psm(
+ 					struct bthost *bthost, uint16_t psm)
+ {
+@@ -609,14 +634,24 @@ static void send_iov(struct bthost *bthost, uint16_t handle, uint16_t cid,
+ }
+ 
+ static void send_acl(struct bthost *bthost, uint16_t handle, uint16_t cid,
+-						const void *data, uint16_t len)
++				bool sdu_hdr, const void *data, uint16_t len)
+ {
+-	struct iovec iov;
++	struct iovec iov[2];
++	uint16_t sdu;
++	int num = 0;
++
++	if (sdu_hdr) {
++		sdu = cpu_to_le16(len);
++		iov[num].iov_base = &sdu;
++		iov[num].iov_len = sizeof(sdu);
++		num++;
++	}
+ 
+-	iov.iov_base = (void *) data;
+-	iov.iov_len = len;
++	iov[num].iov_base = (void *) data;
++	iov[num].iov_len = len;
++	num++;
+ 
+-	send_iov(bthost, handle, cid, &iov, 1);
++	send_iov(bthost, handle, cid, iov, num);
+ }
+ 
+ static uint8_t l2cap_sig_send(struct bthost *bthost, struct btconn *conn,
+@@ -711,12 +746,19 @@ void bthost_send_cid(struct bthost *bthost, uint16_t handle, uint16_t cid,
+ 					const void *data, uint16_t len)
+ {
+ 	struct btconn *conn;
++	struct l2conn *l2conn;
++	bool sdu_hdr = false;
+ 
+ 	conn = bthost_find_conn(bthost, handle);
+ 	if (!conn)
+ 		return;
+ 
+-	send_acl(bthost, handle, cid, data, len);
++	l2conn = btconn_find_l2cap_conn_by_dcid(conn, cid);
++	if (l2conn && (l2conn->mode == L2CAP_MODE_LE_CRED ||
++			l2conn->mode == L2CAP_MODE_LE_ENH_CRED))
++		sdu_hdr = true;
++
++	send_acl(bthost, handle, cid, sdu_hdr, data, len);
+ }
+ 
+ void bthost_send_cid_v(struct bthost *bthost, uint16_t handle, uint16_t cid,
+@@ -1779,7 +1821,7 @@ static void rfcomm_sabm_send(struct bthost *bthost, struct btconn *conn,
+ 	cmd.length = RFCOMM_LEN8(0);
+ 	cmd.fcs = rfcomm_fcs2((uint8_t *)&cmd);
+ 
+-	send_acl(bthost, conn->handle, l2conn->dcid, &cmd, sizeof(cmd));
++	send_acl(bthost, conn->handle, l2conn->dcid, false, &cmd, sizeof(cmd));
+ }
+ 
+ static bool l2cap_conn_rsp(struct bthost *bthost, struct btconn *conn,
+@@ -2110,6 +2152,7 @@ static bool l2cap_le_conn_req(struct bthost *bthost, struct btconn *conn,
+ 				uint8_t ident, const void *data, uint16_t len)
+ {
+ 	const struct bt_l2cap_pdu_le_conn_req *req = data;
++	struct l2cap_conn_cb_data *cb_data;
+ 	struct bt_l2cap_pdu_le_conn_rsp rsp;
+ 	uint16_t psm;
+ 
+@@ -2124,7 +2167,8 @@ static bool l2cap_le_conn_req(struct bthost *bthost, struct btconn *conn,
+ 	rsp.mps = 23;
+ 	rsp.credits = 1;
+ 
+-	if (bthost_find_l2cap_cb_by_psm(bthost, psm))
++	cb_data = bthost_find_l2cap_cb_by_psm(bthost, psm);
++	if (cb_data)
+ 		rsp.dcid = cpu_to_le16(conn->next_cid++);
+ 	else
+ 		rsp.result = cpu_to_le16(0x0002); /* PSM Not Supported */
+@@ -2132,6 +2176,20 @@ static bool l2cap_le_conn_req(struct bthost *bthost, struct btconn *conn,
+ 	l2cap_sig_send(bthost, conn, BT_L2CAP_PDU_LE_CONN_RSP, ident, &rsp,
+ 								sizeof(rsp));
+ 
++	if (!rsp.result) {
++		struct l2conn *l2conn;
++
++		l2conn = bthost_add_l2cap_conn(bthost, conn,
++							le16_to_cpu(rsp.dcid),
++							le16_to_cpu(req->scid),
++							le16_to_cpu(psm));
++		l2conn->mode = L2CAP_MODE_LE_CRED;
++
++		if (cb_data && l2conn->psm == cb_data->psm && cb_data->func)
++			cb_data->func(conn->handle, l2conn->dcid,
++							cb_data->user_data);
++	}
++
+ 	return true;
+ }
+ 
+@@ -2139,11 +2197,14 @@ static bool l2cap_le_conn_rsp(struct bthost *bthost, struct btconn *conn,
+ 				uint8_t ident, const void *data, uint16_t len)
+ {
+ 	const struct bt_l2cap_pdu_le_conn_rsp *rsp = data;
++	struct l2conn *l2conn;
+ 
+ 	if (len < sizeof(*rsp))
+ 		return false;
+ 	/* TODO add L2CAP connection before with proper PSM */
+-	bthost_add_l2cap_conn(bthost, conn, 0, le16_to_cpu(rsp->dcid), 0);
++	l2conn = bthost_add_l2cap_conn(bthost, conn, 0,
++						le16_to_cpu(rsp->dcid), 0);
++	l2conn->mode = L2CAP_MODE_LE_CRED;
+ 
+ 	return true;
+ }
+@@ -2196,16 +2257,19 @@ static bool l2cap_ecred_conn_rsp(struct bthost *bthost, struct btconn *conn,
+ 		uint16_t scid[5];
+ 	} __attribute__ ((packed)) *rsp = data;
+ 	int num_scid, i;
++	struct l2conn *l2conn;
+ 
+ 	if (len < sizeof(*rsp))
+ 		return false;
+ 
+ 	num_scid = len / sizeof(*rsp->scid);
+ 
+-	for (i = 0; i < num_scid; i++)
++	for (i = 0; i < num_scid; i++) {
+ 		/* TODO add L2CAP connection before with proper PSM */
+-		bthost_add_l2cap_conn(bthost, conn, 0,
++		l2conn = bthost_add_l2cap_conn(bthost, conn, 0,
+ 				      le16_to_cpu(rsp->scid[i]), 0);
++		l2conn->mode = L2CAP_MODE_LE_ENH_CRED;
++	}
+ 
+ 
+ 	return true;
+@@ -2333,7 +2397,7 @@ static void rfcomm_ua_send(struct bthost *bthost, struct btconn *conn,
+ 	cmd.length = RFCOMM_LEN8(0);
+ 	cmd.fcs = rfcomm_fcs2((uint8_t *)&cmd);
+ 
+-	send_acl(bthost, conn->handle, l2conn->dcid, &cmd, sizeof(cmd));
++	send_acl(bthost, conn->handle, l2conn->dcid, false, &cmd, sizeof(cmd));
+ }
+ 
+ static void rfcomm_dm_send(struct bthost *bthost, struct btconn *conn,
+@@ -2347,7 +2411,7 @@ static void rfcomm_dm_send(struct bthost *bthost, struct btconn *conn,
+ 	cmd.length = RFCOMM_LEN8(0);
+ 	cmd.fcs = rfcomm_fcs2((uint8_t *)&cmd);
+ 
+-	send_acl(bthost, conn->handle, l2conn->dcid, &cmd, sizeof(cmd));
++	send_acl(bthost, conn->handle, l2conn->dcid, false, &cmd, sizeof(cmd));
+ }
+ 
+ static void rfcomm_sabm_recv(struct bthost *bthost, struct btconn *conn,
+@@ -2636,12 +2700,97 @@ static void process_rfcomm(struct bthost *bthost, struct btconn *conn,
+ 	}
+ }
+ 
++static void append_l2conn_data(struct bthost *bthost, struct l2conn *conn,
++				const void *data, uint16_t len)
 +{
-+	const struct iso_client_data *isodata = data->test_data;
-+	int so = isodata->so_timestamping;
- 	int sk;
-+	int err;
-+	unsigned int count;
-+
-+	if (!(isodata->so_timestamping & SOF_TIMESTAMPING_TX_RECORD_MASK))
-+		return;
-+
-+	tester_print("Enabling TX timestamping");
-+
-+	tx_tstamp_init(&data->tx_ts, isodata->so_timestamping);
-+
-+	for (count = 0; count < isodata->repeat_send + 1; ++count)
-+		data->step += tx_tstamp_expect(&data->tx_ts);
- 
- 	sk = g_io_channel_unix_get_fd(io);
- 
-+	data->io_id[2] = g_io_add_watch(io, G_IO_ERR, iso_recv_errqueue, data);
-+
-+	if (isodata->cmsg_timestamping)
-+		so &= ~SOF_TIMESTAMPING_TX_RECORD_MASK;
-+
-+	err = setsockopt(sk, SOL_SOCKET, SO_TIMESTAMPING, &so, sizeof(so));
-+	if (err < 0) {
-+		tester_warn("setsockopt SO_TIMESTAMPING: %s (%d)",
-+						strerror(errno), errno);
-+		tester_test_failed();
++	if (!conn->recv_data) {
++		bthost_debug(bthost, "Unexpected L2CAP SDU data: sCID 0x%4.4x ",
++								conn->scid);
 +		return;
 +	}
++
++	if (conn->recv_len + len > conn->data_len) {
++		bthost_debug(bthost, "Unexpected L2CAP SDU data: sCID 0x%4.4x ",
++								conn->scid);
++		return;
++	}
++
++	memcpy(conn->recv_data + conn->recv_len, data, len);
++	conn->recv_len += len;
++
++	bthost_debug(bthost, "L2CAP SDU data: %u/%u bytes", conn->recv_len,
++							conn->data_len);
 +}
 +
-+static void iso_send_data(struct test_data *data, GIOChannel *io)
++static void free_l2conn_data(struct l2conn *conn)
 +{
-+	const struct iso_client_data *isodata = data->test_data;
-+	char control[CMSG_SPACE(sizeof(uint32_t))];
-+	struct msghdr msg = {
-+		.msg_iov = (struct iovec *)isodata->send,
-+		.msg_iovlen = 1,
-+	};
-+	struct cmsghdr *cmsg;
-+	ssize_t ret;
-+	int sk;
++	free(conn->recv_data);
++	conn->recv_data = NULL;
++	conn->recv_len = 0;
++	conn->data_len = 0;
++}
 +
- 	tester_print("Writing %zu bytes of data", isodata->send->iov_len);
- 
--	ret = writev(sk, isodata->send, 1);
-+	sk = g_io_channel_unix_get_fd(io);
++static void new_l2conn_data(struct bthost *bthost, struct l2conn *conn,
++								uint16_t len)
++{
++	free(conn->recv_data);
++	conn->recv_data = malloc(len);
++	conn->recv_len = 0;
++	conn->data_len = len;
++}
 +
-+	if (isodata->cmsg_timestamping) {
-+		memset(control, 0, sizeof(control));
-+		msg.msg_control = control;
-+		msg.msg_controllen = sizeof(control);
++static bool process_l2cap_conn(struct bthost *bthost, struct btconn *conn,
++				struct l2conn *l2conn, struct iovec *data)
++{
++	struct bt_l2cap_pdu_le_flowctl_creds creds;
++	uint16_t sdu;
 +
-+		cmsg = CMSG_FIRSTHDR(&msg);
-+		cmsg->cmsg_level = SOL_SOCKET;
-+		cmsg->cmsg_type = SO_TIMESTAMPING;
-+		cmsg->cmsg_len = CMSG_LEN(sizeof(uint32_t));
++	if (!l2conn)
++		return true;
 +
-+		*((uint32_t *)CMSG_DATA(cmsg)) = (isodata->so_timestamping &
-+					SOF_TIMESTAMPING_TX_RECORD_MASK);
++	switch (l2conn->mode) {
++	case L2CAP_MODE_LE_CRED:
++	case L2CAP_MODE_LE_ENH_CRED:
++		break;
++	case L2CAP_MODE_OTHER:
++		return true;
 +	}
 +
-+	ret = sendmsg(sk, &msg, 0);
- 	if (ret < 0 || isodata->send->iov_len != (size_t) ret) {
- 		tester_warn("Failed to write %zu bytes: %s (%d)",
- 				isodata->send->iov_len, strerror(errno), errno);
-@@ -2076,6 +2208,22 @@ static void iso_send(struct test_data *data, GIOChannel *io)
++	/* Credit-based flow control */
++
++	creds.cid = cpu_to_le16(l2conn->scid);
++	creds.credits = cpu_to_le16(1);
++	l2cap_sig_send(bthost, conn, BT_L2CAP_PDU_LE_FLOWCTL_CREDS, 0,
++							&creds, sizeof(creds));
++
++	if (!l2conn->data_len) {
++		if (!util_iov_pull_le16(data, &sdu)) {
++			free_l2conn_data(l2conn);
++			bthost_debug(bthost, "L2CAP invalid SDU");
++			return false;
++		}
++		new_l2conn_data(bthost, l2conn, sdu);
++	}
++
++	append_l2conn_data(bthost, l2conn, data->iov_base, data->iov_len);
++
++	if (l2conn->recv_len < l2conn->data_len)
++		return false;  /* SDU incomplete */
++
++	l2conn->data_len = 0;
++	data->iov_base = l2conn->recv_data;
++	data->iov_len = l2conn->recv_len;
++
++	return true;
++}
++
+ static void process_l2cap(struct bthost *bthost, struct btconn *conn,
+-					const void *data, uint16_t len)
++					const void *buf, uint16_t len)
+ {
+-	const struct bt_l2cap_hdr *l2_hdr = data;
++	const struct bt_l2cap_hdr *l2_hdr = buf;
+ 	struct cid_hook *hook;
+ 	struct l2conn *l2conn;
++	struct iovec data;
+ 	uint16_t cid, l2_len;
+ 
+ 	l2_len = le16_to_cpu(l2_hdr->len);
+@@ -2654,31 +2803,37 @@ static void process_l2cap(struct bthost *bthost, struct btconn *conn,
+ 	bthost_debug(bthost, "L2CAP data: %u bytes", l2_len);
+ 
+ 	cid = le16_to_cpu(l2_hdr->cid);
++	l2conn = btconn_find_l2cap_conn_by_scid(conn, cid);
++
++	data.iov_base = (void *)l2_hdr->data;
++	data.iov_len = l2_len;
++
++	if (!process_l2cap_conn(bthost, conn, l2conn, &data))
++		return;
+ 
+ 	hook = find_cid_hook(conn, cid);
+ 	if (hook) {
+-		hook->func(l2_hdr->data, l2_len, hook->user_data);
++		hook->func(data.iov_base, data.iov_len, hook->user_data);
  		return;
  	}
  
-+	data->step++;
-+}
-+
-+static void iso_send(struct test_data *data, GIOChannel *io)
-+{
-+	const struct iso_client_data *isodata = data->test_data;
-+	unsigned int count;
-+
-+	for (count = 0; count < isodata->repeat_send_pre_ts; ++count)
-+		iso_send_data(data, io);
-+
-+	iso_tx_timestamping(data, io);
-+
-+	for (count = 0; count < isodata->repeat_send + 1; ++count)
-+		iso_send_data(data, io);
-+
- 	if (isodata->bcast) {
- 		tester_test_passed();
- 		return;
-@@ -3197,6 +3345,20 @@ int main(int argc, char *argv[])
- 	test_iso("ISO Send - Success", &connect_16_2_1_send, setup_powered,
- 							test_connect);
+ 	switch (cid) {
+ 	case 0x0001:
+-		l2cap_sig(bthost, conn, l2_hdr->data, l2_len);
++		l2cap_sig(bthost, conn, data.iov_base, data.iov_len);
+ 		break;
+ 	case 0x0005:
+-		l2cap_le_sig(bthost, conn, l2_hdr->data, l2_len);
++		l2cap_le_sig(bthost, conn, data.iov_base, data.iov_len);
+ 		break;
+ 	case 0x0006:
+-		smp_data(conn->smp_data, l2_hdr->data, l2_len);
++		smp_data(conn->smp_data, data.iov_base, data.iov_len);
+ 		break;
+ 	case 0x0007:
+-		smp_bredr_data(conn->smp_data, l2_hdr->data, l2_len);
++		smp_bredr_data(conn->smp_data, data.iov_base, data.iov_len);
+ 		break;
+ 	default:
+-		l2conn = btconn_find_l2cap_conn_by_scid(conn, cid);
+ 		if (l2conn && l2conn->psm == 0x0003)
+-			process_rfcomm(bthost, conn, l2conn, l2_hdr->data,
+-								l2_len);
++			process_rfcomm(bthost, conn, l2conn, data.iov_base,
++								data.iov_len);
+ 		else
+ 			bthost_debug(bthost,
+ 					"Packet for unknown CID 0x%04x (%u)",
+@@ -3494,7 +3649,7 @@ void bthost_send_rfcomm_data(struct bthost *bthost, uint16_t handle,
+ 	}
  
-+	/* Test basic TX timestamping */
-+	test_iso("ISO Send - TX Timestamping", &connect_send_tx_timestamping,
-+						setup_powered, test_connect);
-+
-+	/* Test schedule-time TX timestamps are emitted */
-+	test_iso("ISO Send - TX Sched Timestamping",
-+			&connect_send_tx_sched_timestamping, setup_powered,
-+			test_connect);
-+
-+	/* Test TX timestamping with flags set via per-packet CMSG */
-+	test_iso("ISO Send - TX CMSG Timestamping",
-+			&connect_send_tx_cmsg_timestamping, setup_powered,
-+			test_connect);
-+
- 	test_iso("ISO Receive - Success", &listen_16_2_1_recv, setup_powered,
- 							test_listen);
+ 	uih_frame[uih_len - 1] = rfcomm_fcs((void *)hdr);
+-	send_acl(bthost, handle, rcconn->scid, uih_frame, uih_len);
++	send_acl(bthost, handle, rcconn->scid, false, uih_frame, uih_len);
  
-diff --git a/tools/tester.h b/tools/tester.h
-new file mode 100644
-index 000000000..617de842e
---- /dev/null
-+++ b/tools/tester.h
-@@ -0,0 +1,163 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2022  Intel Corporation.
-+ *
-+ */
-+
-+#include <stdbool.h>
-+#include <stdlib.h>
-+#include <stdint.h>
-+#include <time.h>
-+#include <sys/socket.h>
-+#include <linux/errqueue.h>
-+#include <linux/net_tstamp.h>
-+
-+#include <glib.h>
-+
-+#define SEC_NSEC(_t)  ((_t) * 1000000000LL)
-+#define TS_NSEC(_ts)  (SEC_NSEC((_ts)->tv_sec) + (_ts)->tv_nsec)
-+
-+struct tx_tstamp_data {
-+	struct {
-+		uint32_t id;
-+		uint32_t type;
-+	} expect[16];
-+	unsigned int pos;
-+	unsigned int count;
-+	unsigned int sent;
-+	uint32_t so_timestamping;
-+};
-+
-+static inline void tx_tstamp_init(struct tx_tstamp_data *data,
-+				uint32_t so_timestamping)
-+{
-+	memset(data, 0, sizeof(*data));
-+	memset(data->expect, 0xff, sizeof(data->expect));
-+
-+	data->so_timestamping = so_timestamping;
-+}
-+
-+static inline int tx_tstamp_expect(struct tx_tstamp_data *data)
-+{
-+	unsigned int pos = data->count;
-+	int steps;
-+
-+	if (data->so_timestamping & SOF_TIMESTAMPING_TX_SCHED) {
-+		g_assert(pos < ARRAY_SIZE(data->expect));
-+		data->expect[pos].type = SCM_TSTAMP_SCHED;
-+		data->expect[pos].id = data->sent;
-+		pos++;
-+	}
-+
-+	if (data->so_timestamping & SOF_TIMESTAMPING_TX_SOFTWARE) {
-+		g_assert(pos < ARRAY_SIZE(data->expect));
-+		data->expect[pos].type = SCM_TSTAMP_SND;
-+		data->expect[pos].id = data->sent;
-+		pos++;
-+	}
-+
-+	data->sent++;
-+
-+	steps = pos - data->count;
-+	data->count = pos;
-+	return steps;
-+}
-+
-+static inline int tx_tstamp_recv(struct tx_tstamp_data *data, int sk, int len)
-+{
-+	unsigned char control[512];
-+	ssize_t ret;
-+	char buf[1024];
-+	struct msghdr msg;
-+	struct iovec iov;
-+	struct cmsghdr *cmsg;
-+	struct scm_timestamping *tss = NULL;
-+	struct sock_extended_err *serr = NULL;
-+	struct timespec now;
-+
-+	iov.iov_base = buf;
-+	iov.iov_len = sizeof(buf);
-+
-+	memset(&msg, 0, sizeof(msg));
-+	msg.msg_iov = &iov;
-+	msg.msg_iovlen = 1;
-+	msg.msg_control = control;
-+	msg.msg_controllen = sizeof(control);
-+
-+	ret = recvmsg(sk, &msg, MSG_ERRQUEUE);
-+	if (ret < 0) {
-+		tester_warn("Failed to read from errqueue: %s (%d)",
-+							strerror(errno), errno);
-+		return -EINVAL;
-+	}
-+
-+	if (data->so_timestamping & SOF_TIMESTAMPING_OPT_TSONLY) {
-+		if (ret != 0) {
-+			tester_warn("Packet copied back to errqueue");
-+			return -EINVAL;
-+		}
-+	} else if (len > ret) {
-+		tester_warn("Packet not copied back to errqueue: %zd", ret);
-+		return -EINVAL;
-+	}
-+
-+	for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL;
-+					cmsg = CMSG_NXTHDR(&msg, cmsg)) {
-+		if (cmsg->cmsg_level == SOL_SOCKET &&
-+					cmsg->cmsg_type == SCM_TIMESTAMPING) {
-+			tss = (void *)CMSG_DATA(cmsg);
-+		} else if (cmsg->cmsg_level == SOL_BLUETOOTH &&
-+					cmsg->cmsg_type == BT_SCM_ERROR) {
-+			serr = (void *)CMSG_DATA(cmsg);
-+		}
-+	}
-+
-+	if (!tss) {
-+		tester_warn("SCM_TIMESTAMPING not found");
-+		return -EINVAL;
-+	}
-+
-+	if (!serr) {
-+		tester_warn("BT_SCM_ERROR not found");
-+		return -EINVAL;
-+	}
-+
-+	if (serr->ee_errno != ENOMSG ||
-+				serr->ee_origin != SO_EE_ORIGIN_TIMESTAMPING) {
-+		tester_warn("BT_SCM_ERROR wrong for timestamping");
-+		return -EINVAL;
-+	}
-+
-+	clock_gettime(CLOCK_REALTIME, &now);
-+
-+	if (TS_NSEC(&now) < TS_NSEC(tss->ts) ||
-+			TS_NSEC(&now) > TS_NSEC(tss->ts) + SEC_NSEC(10)) {
-+		tester_warn("nonsense in timestamp");
-+		return -EINVAL;
-+	}
-+
-+	if (data->pos >= data->count) {
-+		tester_warn("Too many timestamps");
-+		return -EINVAL;
-+	}
-+
-+	if ((data->so_timestamping & SOF_TIMESTAMPING_OPT_ID) &&
-+				serr->ee_data != data->expect[data->pos].id) {
-+		tester_warn("Bad timestamp id %u", serr->ee_data);
-+		return -EINVAL;
-+	}
-+
-+	if (serr->ee_info != data->expect[data->pos].type) {
-+		tester_warn("Bad timestamp type %u", serr->ee_info);
-+		return -EINVAL;
-+	}
-+
-+	tester_print("Got valid TX timestamp %u", data->pos);
-+
-+	++data->pos;
-+
-+	return data->count - data->pos;
-+}
+ 	free(uih_frame);
+ }
 -- 
 2.44.0
 
