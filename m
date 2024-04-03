@@ -1,200 +1,115 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C836D141991;
-	Wed,  3 Apr 2024 12:24:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49753C152
+	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Apr 2024 12:32:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712147097; cv=none; b=GJb4kOlT3h5xeP4y8OIJlcIxPzZeDQX88LUFOiYzvnmQVAXpBaJpp5/y2HooYcvXnr2Agq3IyIqRtgYtstDclESWE82D1BjAaVtqRO/Hq4o/poB2LbXAKXj6Zy4gjmUjCDNHs0GycSc2U0aavDebEfnkaIU5zQeXPOr4AW/PPtU=
+	t=1712147543; cv=none; b=esIZRoygnKqS6guXPRAxlJz5kcoSkqF+qF4nN4TinsXvRf/w8YcudjEQmXEhPsmj8ARS0QFCJ23Wb8vfuitv1uGzHU5GI6k/3nMPfe4Da5aQROFiWOf02tXeP854QtUiSm7fQZOSv7ShOoLJ53WhC6vMi3rv38Aqega7DEDkVIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712147097; c=relaxed/simple;
-	bh=KcgYpc+9CjDQi/NJxVHV2bo7S5xb6FjkQ15XYp0RmCE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B+QK8eNE5TEMUqFwqq6rhxpXg0RTYbRlc8jWG3Tv3jj3HYfUEJboGqaT8r7lVc32JWaoLUwJwfsdeCMhqGoyy5nDmzqRWwY6g9w7xr0XzE0wE9HxYRVhbWDVxCN6f+pKdAwrZMik9JESX8/74cK7e1I1lzyMnCHKT1DfUpJ8mTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SnvjN/BM; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1712147543; c=relaxed/simple;
+	bh=X35XMzk3A8uoTckEnKiVMa5b/pZxR7OiFNkczAB5vXE=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=pGlIzbxWL1LgAWdpHmHZuUkr1biGj2cJV0cYwp+zGti+0ZGa6nZnUY91QYQbmZlkdLlDFiaEdsZsqaJJPpwZkdF8GEMjx4jndpNYEFxiisNozn2sxDpLRUoC4conWEsKTi1rtGBnw4jO8NWlf49ezDkjar2wTQBlb/DL0NRMvmY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KvU/cvNf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SnvjN/BM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A46EC433C7;
-	Wed,  3 Apr 2024 12:24:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KvU/cvNf"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A7946C433A6
+	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Apr 2024 12:32:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712147097;
-	bh=KcgYpc+9CjDQi/NJxVHV2bo7S5xb6FjkQ15XYp0RmCE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SnvjN/BMqtmaBYJ95X2POqxVnvib0Hcs46hn31TOd76XhAhYvKfJiKcNldggmuqqm
-	 517zdgNjgB7eLZt6b5C+o97voT2HYvaBV7oTaE3JdNkYkFkwljRGjPjQSH104EVB7y
-	 o2qOc7Xnaec9ss4pc4II/GVmqAtXQ+1/APosntGH0B4XnrTtD1au+44FHYx8wcNfmT
-	 w5waF8he/KUouIQKffezkpj/joMyaGMtHoSnMkmAdRFLtIWwa4ffRveU2LIGIR5e3T
-	 TC+f5EYpwGcl05mNsKAsLytFareyzB9UKE4TaOcsHhQs1/gKOHtBI0iyIG6azTYfut
-	 72lKie0cjUzqQ==
-Received: from johan by xi.lan with local (Exim 4.97.1)
-	(envelope-from <johan@kernel.org>)
-	id 1rrzfl-000000004bT-3UUs;
-	Wed, 03 Apr 2024 14:24:58 +0200
-Date: Wed, 3 Apr 2024 14:24:57 +0200
-From: Johan Hovold <johan@kernel.org>
-To: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
-Cc: Johan Hovold <johan+linaro@kernel.org>, luiz.dentz@gmail.com,
-	marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-	quic_mohamull@quicinc.com, quic_hbandi@quicinc.com
-Subject: Re: [PATCH] Revert "Bluetooth: hci_qca: Set BDA quirk bit if fwnode
- exists in DT"
-Message-ID: <Zg1KmcFQ3bAJa8qJ@hovoldconsulting.com>
-References: <20240314084412.1127-1-johan+linaro@kernel.org>
- <171146704035.9961.13096206001570615153.git-patchwork-notify@kernel.org>
- <124a7d54-5a18-4be7-9a76-a12017f6cce5@quicinc.com>
- <ZgWLeo5KSLurLDhK@hovoldconsulting.com>
- <c03abbbd-faa5-4fdc-b7c3-5554a90c3419@quicinc.com>
+	s=k20201202; t=1712147542;
+	bh=X35XMzk3A8uoTckEnKiVMa5b/pZxR7OiFNkczAB5vXE=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=KvU/cvNf1J0zJuzGPdCzP+VdLBQmhvG7FBPa2d7Ii2I2Kg6S3LM1j/ei3U6W0wxTR
+	 SwfaHzu0ueOVryi1Icj65CkitmsOvYPtUOfA44VRG7luLy9/bMK8a+u4FHuf3u0y47
+	 YuR0L0mC0b6vcP145zLARPTnSZ8I5AoC/UuxogRHeV+AD41WATzEANqO+UTBfNjAUU
+	 yhY1D/xqfnnzCwoB/8VkPN4SM/91DAWeTBwnpu6xzxyBm5ALcx2rnp3W8gI9BMp+EC
+	 Hgzw55y2TH5EgRdNekJtJgPDMSUVH9gjY6FbBdD4/hp4/bYA7iAQ6+zDH+1ClS0fzD
+	 ixBdHT2Sktt7w==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 9FA22C53BD1; Wed,  3 Apr 2024 12:32:22 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 218416] hci0: command 0xfc05 tx timeout in kernel 6.7.1
+Date: Wed, 03 Apr 2024 12:32:22 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: thomas.creutz@gmx.de
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-218416-62941-VstOn0gUXv@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-218416-62941@https.bugzilla.kernel.org/>
+References: <bug-218416-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c03abbbd-faa5-4fdc-b7c3-5554a90c3419@quicinc.com>
 
-On Fri, Mar 29, 2024 at 12:55:40PM +0530, Janaki Ramaiah Thota wrote:
-> On 3/28/2024 8:53 PM, Johan Hovold wrote:
-> > On Thu, Mar 28, 2024 at 08:25:16PM +0530, Janaki Ramaiah Thota wrote:
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218416
 
-> >> We made this change to configure the device which supports persistent
-> >> memory for the BD-Address
-> > 
-> > Can you say something more about which devices support persistent
-> > storage for the address? Is that all or just some of the chip variants?
+Thomas Creutz (thomas.creutz@gmx.de) changed:
 
-> Most of the devices support persistent storage, and bd-address storage
-> is chosen based on the OEM and Target.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |thomas.creutz@gmx.de
 
-Can you be more specific about which devices support it (or say which do
-not)?
+--- Comment #15 from Thomas Creutz (thomas.creutz@gmx.de) ---
+I also get:
 
-Is the address stored in some external eeprom or similar which the OEM
-can choose to populate?
-
-> >> So to make device functional in both scenarios we are adding a new
-> >> property in dts file to distinguish persistent and non-persistent
-> >> support of BD Address and set HCI_QUIRK_USE_BDADDR_PROPERTY bit
-> >> accordingly
-> > 
-> > Depending on the answer to my questions above, you may be able to infer
-> > this from the compatible string and/or you can read out the address from
-> > the device and only set the quirk if it's set to the default address.
-> > 
-> > You should not need to add a new property for this.
-
-> As per my understanding, altering the compatible string may cause duplicate
-> configuration, right ?
-
-If it's the same device and just a different configuration then we can't
-use the compatible string for this.
-
-It seems we need a patch like the below to address this. But please
-provide some more details (e.g. answers to the questions above) so I can
-determine what the end result should look like.
-
-Johan
+~$ dmesg | grep -i blue
+[   13.838221] Bluetooth: Core ver 2.22
+[   13.838236] NET: Registered PF_BLUETOOTH protocol family
+[   13.838237] Bluetooth: HCI device and connection manager initialized
+[   13.838240] Bluetooth: HCI socket layer initialized
+[   13.838241] Bluetooth: L2CAP socket layer initialized
+[   13.838244] Bluetooth: SCO socket layer initialized
+[   14.329584] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+[   14.329588] Bluetooth: BNEP filters: protocol multicast
+[   14.329590] Bluetooth: BNEP socket layer initialized
+[   16.032582] Bluetooth: hci0: Reading Intel version command failed (-110)
+[   16.032583] Bluetooth: hci0: command 0xfc05 tx timeout
 
 
-From 9719effe80fcc17518131816fdfeb1824cfa08b6 Mon Sep 17 00:00:00 2001
-From: Johan Hovold <johan+linaro@kernel.org>
-Date: Thu, 20 Apr 2023 14:10:55 +0200
-Subject: [PATCH] Bluetooth: btqca: add invalid device address check
+~$ modinfo btintel
+filename:=20=20=20=20=20=20
+/lib/modules/6.5.0-26-generic/kernel/drivers/bluetooth/btintel.ko
+firmware:       intel/ibt-12-16.ddc
+firmware:       intel/ibt-12-16.sfi
+firmware:       intel/ibt-11-5.ddc
+firmware:       intel/ibt-11-5.sfi
+license:        GPL
+version:        0.1
+description:    Bluetooth support for Intel devices ver 0.1
+author:         Marcel Holtmann <marcel@holtmann.org>
+srcversion:     FDF2221B8ED4B01F8EADF85
+depends:        bluetooth
+retpoline:      Y
+intree:         Y
+name:           btintel
+vermagic:       6.5.0-26-generic SMP preempt mod_unload modversions=20
 
-Some Qualcomm Bluetooth controllers lack persistent storage for the
-device address and therefore end up using the default address
-00:00:00:00:5a:ad.
+~$ lsusb | grep -i bluetooth
+Bus 001 Device 005: ID 8087:0025 Intel Corp. Wireless-AC 9260 Bluetooth Ada=
+pter
 
-Apparently this depends on how the controller has been integrated so we
-can not use the device type alone to determine when the address is
-valid.
+--=20
+You may reply to this email to add a comment.
 
-Instead read back the address during setup() and only set the
-HCI_QUIRK_USE_BDADDR_PROPERTY flag when needed.
-
-Fixes: de79a9df1692 ("Bluetooth: btqcomsmd: use HCI_QUIRK_USE_BDADDR_PROPERTY")
-Fixes: e668eb1e1578 ("Bluetooth: hci_core: Don't stop BT if the BD address missing in dts")
-Fixes: 6945795bc81a ("Bluetooth: fix use-bdaddr-property quirk")
-Cc: stable@vger.kernel.org	# 6.5
-Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
----
- drivers/bluetooth/btqca.c   | 33 +++++++++++++++++++++++++++++++++
- drivers/bluetooth/hci_qca.c |  2 --
- 2 files changed, 33 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-index 19cfc342fc7b..15124157372c 100644
---- a/drivers/bluetooth/btqca.c
-+++ b/drivers/bluetooth/btqca.c
-@@ -15,6 +15,8 @@
- 
- #define VERSION "0.1"
- 
-+#define QCA_BDADDR_DEFAULT (&(bdaddr_t) {{ 0xad, 0x5a, 0x00, 0x00, 0x00, 0x00 }})
-+
- int qca_read_soc_version(struct hci_dev *hdev, struct qca_btsoc_version *ver,
- 			 enum qca_btsoc_type soc_type)
- {
-@@ -612,6 +614,35 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
- }
- EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
- 
-+static void qca_check_bdaddr(struct hci_dev *hdev)
-+{
-+	struct hci_rp_read_bd_addr *bda;
-+	struct sk_buff *skb;
-+	int err;
-+
-+	if (bacmp(&hdev->public_addr, BDADDR_ANY))
-+		return;
-+
-+	skb = __hci_cmd_sync(hdev, HCI_OP_READ_BD_ADDR, 0, NULL,
-+			     HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		err = PTR_ERR(skb);
-+		bt_dev_err(hdev, "Failed to read device address (%d)", err);
-+		return;
-+	}
-+
-+	if (skb->len != sizeof(*bda)) {
-+		bt_dev_err(hdev, "Device address length mismatch");
-+		goto free_skb;
-+	}
-+
-+	bda = (struct hci_rp_read_bd_addr *)skb->data;
-+	if (!bacmp(&bda->bdaddr, QCA_BDADDR_DEFAULT))
-+		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
-+free_skb:
-+	kfree_skb(skb);
-+}
-+
- static void qca_generate_hsp_nvm_name(char *fwname, size_t max_size,
- 		struct qca_btsoc_version ver, u8 rom_ver, u16 bid)
- {
-@@ -818,6 +849,8 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 		break;
- 	}
- 
-+	qca_check_bdaddr(hdev);
-+
- 	bt_dev_info(hdev, "QCA setup on UART is completed");
- 
- 	return 0;
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index b266db18c8cc..b621a0a40ea4 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1908,8 +1908,6 @@ static int qca_setup(struct hci_uart *hu)
- 	case QCA_WCN6750:
- 	case QCA_WCN6855:
- 	case QCA_WCN7850:
--		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
--
- 		qcadev = serdev_device_get_drvdata(hu->serdev);
- 		if (qcadev->bdaddr_property_broken)
- 			set_bit(HCI_QUIRK_BDADDR_PROPERTY_BROKEN, &hdev->quirks);
--- 
-2.43.2
-
+You are receiving this mail because:
+You are the assignee for the bug.=
