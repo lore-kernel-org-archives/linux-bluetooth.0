@@ -1,239 +1,127 @@
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D467F487B6
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Apr 2024 14:37:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBC641494B7
+	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Apr 2024 14:56:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712155028; cv=none; b=SHJtBgYamiujiJshLQcHSKvcr3GoFeVMp8N2hd2YaLShKYAViu7BCZLItQ2w9lGdhtkbOn/8udmwxonkjXVkVU1XO8rtpP17o4EbSuxIqMR6SC8k2jJ3ayDCtjkaoOLNBiXW7ozhm+0IckkOWI5B68U0IuW3eLdvatmSm4qZU3Y=
+	t=1712156175; cv=none; b=hu6sN2jg3W7gI/J6HizJkzbLG9NpeGHcftFtTHbyrZ3hn1Ucsee4nYigUsGv/wROGQbyIWKLeTp8jm2AwKvuui7bjrfFAYapeYH0FCItFazvLTtCPhlDngsdUU7tEFiu0BEZXOpoeh03LsIfMEz2vz5H+Tz65O38Vsyo2Rzj1pA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712155028; c=relaxed/simple;
-	bh=fHoICP3HXjjRfBaVlWZg1arBBDikU7iqoU5nsGDXKRE=;
+	s=arc-20240116; t=1712156175; c=relaxed/simple;
+	bh=qIMp/Bi43gG5OxVpu00ce21O5fSpFFXCTZkgJC0kaJQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VtgUEvbDwINfZGLmb+H24ExBtmEIjtlU3mO3WX1auEIk+rxlWBOvfJg0/cRjHqc2nIX1Sstqix1Mb5ih6lFk0u2EV/kNE3pbRam+v68v4Cp47AphfywBL0YWn7QT1neVMXFLtTI8BaAFIw7ebJPOwkswqivPLC6ROMiyk5qyxpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YFCepEsR; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=X/e9igxKp1MV7GMwsRzeKIkEm6Xaki3rari/H7hABq/te6Jbi3bxNuWuPLFZ6Hf+Vh7YLyVIA+p/vyhA0nmChMgQvcKfzRkQjexqse0tnmX98IE+NWDvRzWg5vyELXsYd2yxM/gfapXq8Kc/7RDyrzZCIAVOLmU4AGy4dHUNQMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=aKnImIsP; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YFCepEsR"
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2d109e82bd0so85839311fa.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Apr 2024 07:37:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="aKnImIsP"
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-513e134f73aso8523198e87.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Apr 2024 07:56:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712155025; x=1712759825; darn=vger.kernel.org;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1712156172; x=1712760972; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HU4GSADV4V2ByvG6bjQlHg3rrhNnog9lRiZozgCukcM=;
-        b=YFCepEsR4jmkh4KOK2d9eRKb2MOgbNGVB9SYp1+YHZqoCVmmd1NVZuugczI/ObP/zW
-         pY8aI7vvZ/kY2ay/Rtc00zE0Fr1I8qHOf1JFyCxccNCe7Yj+H/eark1SvKRc9sZsAkVb
-         4tKhh3i6bLHCSkjnW3dzYFDN8FLYbT4kXdYjuY9UR7RdpjV4LYSdfN83S7G4mxv4vJOG
-         EUHfxhx8InxkIH4hDQxEQWWfu6cvkGB034vJVi5nVdRhD+WoBRTAfWkZIOyK9ooYZrlB
-         ShgUKlgfTN5v065hh0Atsjylvyu+cwgsruf17iz/rvUiC/81kUaXtjmBerUS/JGUPdHq
-         M+5w==
+        bh=0AEDPySL2e/8A7unRrzw52gMZQYQQOXlB4w/mt06n1w=;
+        b=aKnImIsP8DZAEOQspUmW8LWc/9dXAMfFVzUOfjLRQsExSm+YC8ycRjE9jQg1o6dCoh
+         5iCfqS8uDMWH8uO6lMAz2bXbEK1O0D1nYOBbq3XqtW79q/Cc7cVCG/R+muXrspBOhUUm
+         wadCcstUMIMt3R/oSq96Xl2cpKgJiSVRjicPLlU31sGKvbVAKvjSD7hEZhM0KUek9PDj
+         D9ZxTZrrn2A9yTFvjpckb3yAeEfUcfL7ftrnJfDZXwe2Sxq44SAu4rCtOAIHV/88Fhxr
+         lrLYKerwj6Ig9SZ5Ouak9rn5oo6VaMzJgxH0mXFJBHIYX3GIlS7S/g+p7/JVK98F7huP
+         C6Vg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712155025; x=1712759825;
+        d=1e100.net; s=20230601; t=1712156172; x=1712760972;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HU4GSADV4V2ByvG6bjQlHg3rrhNnog9lRiZozgCukcM=;
-        b=FAOWlhJs4BQEYTK4IqiAGfLkuabeQUv/1pUfuITcJPKTi4zWnLQ1ZIGeIslHkiSK2r
-         M8SMPEiejpw2KYKeYiA7HD+tw+6h3RmaYUJkdL6Ch8URGLp5tDzpPgVUhemZ6s29A+yg
-         wPj7ehhSKh+ay88t4NjjPD7LMzrbFRwApceY1fj8lqTUC91wewf19KW2tThmW+TL4osZ
-         rvt2RciauQ2Ip3OdAY96hKWGMD4mRF7Clatt19lRv2AKoioZd0nhosvWGIYmUwKwpHzX
-         1sZiEldXTExa8O9WAix1K8E9sidpDNZLDQMLichZuYueQkhWJENq0v6xaL9zN6GjA9SD
-         q6Ng==
-X-Gm-Message-State: AOJu0YxXoqufNQonzM9NCg8IRF6DvCBY6JKxM25JtY8qMZN4boDTFV5N
-	Lru9RnCkEo4+hueeg1xDUlvGcC81WHb2gFgZjl1N/GwmvkzUNML5DTydl6VfV8oYygdUEDMx8UN
-	vc4LLtKlk52IitoIhpMNYNt4tZfZKmiGK
-X-Google-Smtp-Source: AGHT+IE2BXPFFGYy+AJHnpOyBiaNlaG+pIR0kT9FcPJ/rsyFKt1lDlasFjgnJdrNYbK8UOFE7dDNFV1XwKGpDYJTOeo=
-X-Received: by 2002:a2e:9216:0:b0:2d8:2761:a90f with SMTP id
- k22-20020a2e9216000000b002d82761a90fmr4885848ljg.33.1712155024685; Wed, 03
- Apr 2024 07:37:04 -0700 (PDT)
+        bh=0AEDPySL2e/8A7unRrzw52gMZQYQQOXlB4w/mt06n1w=;
+        b=UPoE2aAHNoI7oYTkKCt7j6IN6ory8gHiCcC1+14d+uuWCrWQx6Ij8AsaF8FVqF7rfa
+         L7HrHZAO4CwYPswwXj6cch0HCGCTjSN/8IJegA0A2SFOOUjBDuT7Ym92zfo5fbbZ7fkv
+         RNKFq8h55tGeivnsRgKfMyYME0PDW7QSZVmqYIU+0ZZuQj293Dt4W2gm9z2ba4/6gisj
+         aAPxlFg5Z1Kq4TwQeM++wjqhj7kIvgOg+Drw8ktFXMk+1L0/mBIiM9OUkgMwNGhFevwK
+         RKNI2C7FjyuLl7zKHJ+lkU+nSKJ2DQkBqe9xm4l1Fwaw2qdyDM3/q4kGFwsqhQcdcMps
+         JwqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWINjgFBB4jDbHIoEZkDdAKeiqLxGaTohAiouA4pbWgLLZbjjqg19o1MMoLddxG4Gr3lwpaKRnexUNO3kqfWTKsT5pXbFdLDBsTvsDD4wyp
+X-Gm-Message-State: AOJu0YyPoYdTeUfEb3y+kVu0S2KYZvSnsxoszYv+Q6D5dyfZwuDh8dbN
+	VVDwzxTsCHPTS0wZ1zk4iENoYtHBmgFLI3Fm6PszJn6ezuj7qHA1ZUVS5+gACcqkIXRQd4zTxUL
+	vKFfF3mLTzlsQzv/8x/z4H9DzEbeMck5PtEZwrA==
+X-Google-Smtp-Source: AGHT+IH1uAqfWGiUk+RIbBgdGkD1xZiuVe0WG6sH6tI1B254BJw9nsHUMXBNKMkZlc7467jz/bVPfZDn3fzBPSidFbA=
+X-Received: by 2002:a05:6512:36d2:b0:515:c17e:ddb1 with SMTP id
+ e18-20020a05651236d200b00515c17eddb1mr11741487lfs.50.1712156171964; Wed, 03
+ Apr 2024 07:56:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240403110549.75516-1-howardchung@google.com> <20240403110549.75516-2-howardchung@google.com>
-In-Reply-To: <20240403110549.75516-2-howardchung@google.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 3 Apr 2024 10:36:51 -0400
-Message-ID: <CABBYNZKpPbnPcfJmi42smd6E-JUh6kBi9aX6EWpq-h7_tBVJMA@mail.gmail.com>
-Subject: Re: [Bluez PATCH 2/2] shared/gatt: Add descriptor insert function
-To: Howard Chung <howardchung@google.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
-	CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>, 
-	Archie Pusaka <apusaka@chromium.org>
+References: <20240325131624.26023-1-brgl@bgdev.pl> <20240325131624.26023-6-brgl@bgdev.pl>
+ <87msqm8l6q.fsf@kernel.org>
+In-Reply-To: <87msqm8l6q.fsf@kernel.org>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Wed, 3 Apr 2024 16:56:01 +0200
+Message-ID: <CAMRc=MeCjNn7QdDrcQMuj32JFYoemQ6A8WOYcwKJo1YhDTfY+Q@mail.gmail.com>
+Subject: Re: [PATCH v6 05/16] dt-bindings: net: wireless: describe the ath12k
+ PCI module
+To: Kalle Valo <kvalo@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
+	Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Bjorn Helgaas <bhelgaas@google.com>, Saravana Kannan <saravanak@google.com>, 
+	Geert Uytterhoeven <geert+renesas@glider.be>, Arnd Bergmann <arnd@arndb.de>, 
+	Neil Armstrong <neil.armstrong@linaro.org>, Marek Szyprowski <m.szyprowski@samsung.com>, 
+	Alex Elder <elder@linaro.org>, Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
+	Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, 
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-pci@vger.kernel.org, linux-pm@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Howard,
-
-On Wed, Apr 3, 2024 at 7:06=E2=80=AFAM Howard Chung <howardchung@google.com=
-> wrote:
+On Mon, Mar 25, 2024 at 3:01=E2=80=AFPM Kalle Valo <kvalo@kernel.org> wrote=
+:
 >
-> service->attributes has an assumption that it should look like:
-> |char_uuid|char_1|desc_1_1|desc_1_2|char_uuid|char_2|desc_2_1|char_uuid|.=
-..
-> where desc_x_y means a descriptor of char_x.
-
-Will need to check the trace but I believe BlueZ always discover all
-characteristics before moving to descriptors, if that is not happening
-they there is probably a bug somewhere, that said perhaps you are
-doing the discovery procedure with another stack which doesn't employ
-the same logic, although inefficient it is possible to discover out of
-order but that would require reassigning the descriptors to
-characteristics once they are found, which is also inefficient but I
-would understand if you after supporting other stacks.
-
-> In monitor, an attribute is inserted as soon as it is found. It is not
-> guranteed that all the descriptors of a characteristic would be found
-> before another characteristic is found.
-
-You might want to include such a trace, don't recall seeing any stack
-that does out-order discover.
-
-> This adds a function to insert the descriptor with the given handle to
-> an appropriate place in its service attribute list and make monitor to
-> use this function when a descripter is found.
+> Bartosz Golaszewski <brgl@bgdev.pl> writes:
 >
-> Reviewed-by: Archie Pusaka <apusaka@chromium.org>
-> ---
+> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> >
+> > +
+> > +maintainers:
+> > +  - Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 >
->  monitor/att.c        |  2 +-
->  src/shared/gatt-db.c | 66 ++++++++++++++++++++++++++++++++++++++++++++
->  src/shared/gatt-db.h |  9 ++++++
->  3 files changed, 76 insertions(+), 1 deletion(-)
->
-> diff --git a/monitor/att.c b/monitor/att.c
-> index ddeb54d9e..503099745 100644
-> --- a/monitor/att.c
-> +++ b/monitor/att.c
-> @@ -4153,7 +4153,7 @@ static struct gatt_db_attribute *insert_desc(const =
-struct l2cap_frame *frame,
->         if (!db)
->                 return NULL;
->
-> -       return gatt_db_append_descriptor(db, handle, uuid, 0, NULL, NULL,=
- NULL);
-> +       return gatt_db_insert_descriptor(db, handle, uuid, 0, NULL, NULL,=
- NULL);
->  }
->
->  static void att_find_info_rsp_16(const struct l2cap_frame *frame)
-> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-> index 39bba9b54..f08c5afaa 100644
-> --- a/src/shared/gatt-db.c
-> +++ b/src/shared/gatt-db.c
-> @@ -1002,6 +1002,72 @@ service_append_descriptor(struct gatt_db_service *=
-service,
->         return service->attributes[i];
->  }
->
-> +struct gatt_db_attribute *
-> +gatt_db_insert_descriptor(struct gatt_db *db,
-> +                                       uint16_t handle,
-> +                                       const bt_uuid_t *uuid,
-> +                                       uint32_t permissions,
-> +                                       gatt_db_read_t read_func,
-> +                                       gatt_db_write_t write_func,
-> +                                       void *user_data)
-> +{
-> +       struct gatt_db_attribute *attrib, *iter_attr, *char_attr =3D NULL=
-;
-> +       struct gatt_db_service *service;
-> +       int i, j, num_index, char_index;
-> +
-> +       attrib =3D gatt_db_get_service(db, handle);
-> +       if (!attrib)
-> +               return NULL;
-> +
-> +       service =3D attrib->service;
-> +       num_index =3D get_attribute_index(service, 0);
-> +       if (!num_index)
-> +               return NULL;
-> +
-> +       // Find the characteristic the descriptor belongs to.
-> +       for (i =3D 0; i < num_index; i++) {
-> +               iter_attr =3D service->attributes[i];
-> +               if (bt_uuid_cmp(&characteristic_uuid, &iter_attr->uuid))
-> +                       continue;
-> +
-> +               if (iter_attr->handle > handle)
-> +                       continue;
-> +
-> +               // Find the characteristic with the largest handle among =
-those
-> +               // with handles less than the descriptor's handle.
-> +               if (!char_attr || iter_attr->handle > char_attr->handle) =
-{
-> +                       char_attr =3D iter_attr;
-> +                       char_index =3D i;
-> +               }
-> +       }
-> +
-> +       // There is no characteristic contain this descriptor. Something =
-went
-> +       // wrong
-> +       if (!char_attr)
-> +               return NULL;
-> +
-> +       // Find the end of this characteristic
-> +       for (i =3D char_index + 1; i < num_index; i++) {
-> +               iter_attr =3D service->attributes[i];
-> +
-> +               if (!bt_uuid_cmp(&characteristic_uuid, &iter_attr->uuid) =
-||
-> +                       !bt_uuid_cmp(&included_service_uuid, &iter_attr->=
-uuid))
-> +                       break;
-> +       }
-> +
-> +       // Move all of the attributes after the end of this characteristi=
-c to
-> +       // its next index.
-> +       for (j =3D num_index; j > i; j--)
-> +               service->attributes[j] =3D service->attributes[j - 1];
-> +
-> +       service->attributes[i] =3D new_attribute(service, handle, uuid, N=
-ULL, 0);
-> +
-> +       set_attribute_data(service->attributes[i], read_func, write_func,
-> +                                                       permissions, user=
-_data);
-> +
-> +       return service->attributes[i];
-> +}
-> +
->  struct gatt_db_attribute *
->  gatt_db_append_descriptor(struct gatt_db *db,
->                                         uint16_t handle,
-> diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-> index ec0eccdfc..4c4e88d87 100644
-> --- a/src/shared/gatt-db.h
-> +++ b/src/shared/gatt-db.h
-> @@ -80,6 +80,15 @@ gatt_db_append_characteristic(struct gatt_db *db,
->                                         gatt_db_write_t write_func,
->                                         void *user_data);
->
-> +struct gatt_db_attribute *
-> +gatt_db_insert_descriptor(struct gatt_db *db,
-> +                                       uint16_t handle,
-> +                                       const bt_uuid_t *uuid,
-> +                                       uint32_t permissions,
-> +                                       gatt_db_read_t read_func,
-> +                                       gatt_db_write_t write_func,
-> +                                       void *user_data);
-> +
->  struct gatt_db_attribute *
->  gatt_db_append_descriptor(struct gatt_db *db,
->                                         uint16_t handle,
-> --
-> 2.44.0.478.gd926399ef9-goog
+> IMHO it would be better to have just driver maintainers listed here.
 >
 
+Why? What's wrong with having the author of the bindings in the Cc list?
 
---=20
-Luiz Augusto von Dentz
+> > +required:
+> > +  - compatible
+> > +  - reg
+> > +  - vddaon-supply
+> > +  - vddwlcx-supply
+> > +  - vddwlmx-supply
+> > +  - vddrfacmn-supply
+> > +  - vddrfa0p8-supply
+> > +  - vddrfa1p2-supply
+> > +  - vddrfa1p8-supply
+> > +  - vddpcie0p9-supply
+> > +  - vddpcie1p8-supply
+>
+> Same comment here as in patch 4. There are also ath12k PCI devices which
+> don't need DT at all. I don't know if that should be reflected in the
+> bindings doc but I want to point out this.
+>
+
+But DT bindings don't apply to devices that don't have DT nodes. This
+isn't an issue at all.
+
+Bart
