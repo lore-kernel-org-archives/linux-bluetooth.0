@@ -1,141 +1,239 @@
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEA8F1429A
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Apr 2024 14:31:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D467F487B6
+	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Apr 2024 14:37:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712154685; cv=none; b=qImhNHu0g9PpnrKkWP8qKkCnvlNE5n8OAdcYu+FSoqUZ7yfKB12HPPwc8s17sxDGQ4avvOGaaRE2z6HNOlFf65os4dxLT9EH0GmRIsQKm3076QC33Hzqw4Zib8+q1vEsp77Tob2uO/SG+8ce6jYWUVAtAXGggP1Kan4FZ3xSios=
+	t=1712155028; cv=none; b=SHJtBgYamiujiJshLQcHSKvcr3GoFeVMp8N2hd2YaLShKYAViu7BCZLItQ2w9lGdhtkbOn/8udmwxonkjXVkVU1XO8rtpP17o4EbSuxIqMR6SC8k2jJ3ayDCtjkaoOLNBiXW7ozhm+0IckkOWI5B68U0IuW3eLdvatmSm4qZU3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712154685; c=relaxed/simple;
-	bh=jvLsY9a1nkxCE5BCCbKPtWVd5Kpnbbyv6lLhrE13Qe8=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=JI2E546O9BbwHSMpGVcbhA85FHwXPoz9Bj8hcRXKqUHdCbGHUdkhMQPzVTf7Pk+LbNrZX0yUPmF+3CIaNN3M5PH94O+FTafSbP81v9QfApzKJEf/tJrJfpENUrlyzTBYjBtsYN6WF/9VG+S2vrZVk0REdr65yii9BwxyQsOK4Tc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bYtqu+9Y; arc=none smtp.client-ip=209.85.215.178
+	s=arc-20240116; t=1712155028; c=relaxed/simple;
+	bh=fHoICP3HXjjRfBaVlWZg1arBBDikU7iqoU5nsGDXKRE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VtgUEvbDwINfZGLmb+H24ExBtmEIjtlU3mO3WX1auEIk+rxlWBOvfJg0/cRjHqc2nIX1Sstqix1Mb5ih6lFk0u2EV/kNE3pbRam+v68v4Cp47AphfywBL0YWn7QT1neVMXFLtTI8BaAFIw7ebJPOwkswqivPLC6ROMiyk5qyxpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YFCepEsR; arc=none smtp.client-ip=209.85.208.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bYtqu+9Y"
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-5cf2d73a183so728312a12.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Apr 2024 07:31:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YFCepEsR"
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2d109e82bd0so85839311fa.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Apr 2024 07:37:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712154683; x=1712759483; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=birAYp425XEmWG/uvNkW2caI0/FFMPlzCJNEVRCM8vM=;
-        b=bYtqu+9Y1sUu1w92kH3wV1usmdLnbHhkzH5lcGxqO/DRwI3Zfq/gfE7n0VGfkmWuIl
-         6UsIuNLcTbdHF+NThoiNfq9AMBwLIE+y8LcjwEEhVL1s1gLyyhKMtt/bTPm8j0z8RLMC
-         r4LyV8oJ8SCND8M6OF/t1yZmdlwRBy3UpLu3o5S31JbsmeJxa3WpG9s1bNNVWmOmJrLS
-         +qJfoapvHwIwAhpKtL71lAKprL13jRFC7aZ7+EKK4e/WS3A83ARbMTCiX6XcQ4GyFohN
-         XYXSuoEEzOww+OmS6RBoke81dBRjEWD7N6h9EOc9w+W4WqO7qQjPByCc/bFomnaCqoAL
-         pD1g==
+        d=gmail.com; s=20230601; t=1712155025; x=1712759825; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HU4GSADV4V2ByvG6bjQlHg3rrhNnog9lRiZozgCukcM=;
+        b=YFCepEsR4jmkh4KOK2d9eRKb2MOgbNGVB9SYp1+YHZqoCVmmd1NVZuugczI/ObP/zW
+         pY8aI7vvZ/kY2ay/Rtc00zE0Fr1I8qHOf1JFyCxccNCe7Yj+H/eark1SvKRc9sZsAkVb
+         4tKhh3i6bLHCSkjnW3dzYFDN8FLYbT4kXdYjuY9UR7RdpjV4LYSdfN83S7G4mxv4vJOG
+         EUHfxhx8InxkIH4hDQxEQWWfu6cvkGB034vJVi5nVdRhD+WoBRTAfWkZIOyK9ooYZrlB
+         ShgUKlgfTN5v065hh0Atsjylvyu+cwgsruf17iz/rvUiC/81kUaXtjmBerUS/JGUPdHq
+         M+5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712154683; x=1712759483;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=birAYp425XEmWG/uvNkW2caI0/FFMPlzCJNEVRCM8vM=;
-        b=dnLRW28eJQQvU33SsdOVzhjN8cA7AiSjogwFatfZs0R4n1uGAU0gRqMFYQ3050IGWN
-         nOnPeq8NhoQoKtncwoTtx+NPLFbyp5PC5jdMuuPwkulrEWt6UMqUFobsJyqKJNPRua03
-         +C/m+b5NM82HMGiw93rcY4XKTVY27pu/AH3rYC6pTzx6sZAOaykEX+MrcPoc94v7pRDA
-         aWsq0iLnjDBjHSObSgcsfCIKntBzUBMAQ078fmbAcfwtf5QDRmWcXGNoysa6jwRZo4MC
-         gxpJZwUQ04Sr1pxJtENvP148PJ9oW52O90m3ory0Z5IJIsNdKRTcw1Edd/lrbMHqpeIo
-         wuQA==
-X-Gm-Message-State: AOJu0Yx1/AWZOAteOZYEY7VkzdUzmWX2QTXPiK26+kWUxCM9g6JYL8yh
-	56XM+qAi+DPXmbfpEDoNkkPkXhpTEdShHZUDZVBAWpx2/IrT1+v8a2jbRGcu
-X-Google-Smtp-Source: AGHT+IF++4/aZxe4GOKmc3bjYzol0NhHU5B3HdmPcc5RQ+49Wg3JWxZhqsutkzlvpOVNlX2st94Lgg==
-X-Received: by 2002:a17:90a:f50b:b0:2a2:9e5d:9bf9 with SMTP id cs11-20020a17090af50b00b002a29e5d9bf9mr2217045pjb.8.1712154682737;
-        Wed, 03 Apr 2024 07:31:22 -0700 (PDT)
-Received: from [172.17.0.2] ([20.172.29.180])
-        by smtp.gmail.com with ESMTPSA id mt11-20020a17090b230b00b002a29e717991sm1393289pjb.22.2024.04.03.07.31.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Apr 2024 07:31:22 -0700 (PDT)
-Message-ID: <660d683a.170a0220.ec1c.3102@mx.google.com>
-Date: Wed, 03 Apr 2024 07:31:22 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8709429658267043776=="
+        d=1e100.net; s=20230601; t=1712155025; x=1712759825;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HU4GSADV4V2ByvG6bjQlHg3rrhNnog9lRiZozgCukcM=;
+        b=FAOWlhJs4BQEYTK4IqiAGfLkuabeQUv/1pUfuITcJPKTi4zWnLQ1ZIGeIslHkiSK2r
+         M8SMPEiejpw2KYKeYiA7HD+tw+6h3RmaYUJkdL6Ch8URGLp5tDzpPgVUhemZ6s29A+yg
+         wPj7ehhSKh+ay88t4NjjPD7LMzrbFRwApceY1fj8lqTUC91wewf19KW2tThmW+TL4osZ
+         rvt2RciauQ2Ip3OdAY96hKWGMD4mRF7Clatt19lRv2AKoioZd0nhosvWGIYmUwKwpHzX
+         1sZiEldXTExa8O9WAix1K8E9sidpDNZLDQMLichZuYueQkhWJENq0v6xaL9zN6GjA9SD
+         q6Ng==
+X-Gm-Message-State: AOJu0YxXoqufNQonzM9NCg8IRF6DvCBY6JKxM25JtY8qMZN4boDTFV5N
+	Lru9RnCkEo4+hueeg1xDUlvGcC81WHb2gFgZjl1N/GwmvkzUNML5DTydl6VfV8oYygdUEDMx8UN
+	vc4LLtKlk52IitoIhpMNYNt4tZfZKmiGK
+X-Google-Smtp-Source: AGHT+IE2BXPFFGYy+AJHnpOyBiaNlaG+pIR0kT9FcPJ/rsyFKt1lDlasFjgnJdrNYbK8UOFE7dDNFV1XwKGpDYJTOeo=
+X-Received: by 2002:a2e:9216:0:b0:2d8:2761:a90f with SMTP id
+ k22-20020a2e9216000000b002d82761a90fmr4885848ljg.33.1712155024685; Wed, 03
+ Apr 2024 07:37:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, schnelle@linux.ibm.com
-Subject: RE: Bluetooth: Handle HAS_IOPORT dependencies
-In-Reply-To: <20240403135154.905614-2-schnelle@linux.ibm.com>
-References: <20240403135154.905614-2-schnelle@linux.ibm.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20240403110549.75516-1-howardchung@google.com> <20240403110549.75516-2-howardchung@google.com>
+In-Reply-To: <20240403110549.75516-2-howardchung@google.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 3 Apr 2024 10:36:51 -0400
+Message-ID: <CABBYNZKpPbnPcfJmi42smd6E-JUh6kBi9aX6EWpq-h7_tBVJMA@mail.gmail.com>
+Subject: Re: [Bluez PATCH 2/2] shared/gatt: Add descriptor insert function
+To: Howard Chung <howardchung@google.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
+	CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>, 
+	Archie Pusaka <apusaka@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============8709429658267043776==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Howard,
 
-This is automated email and please do not reply to this email!
+On Wed, Apr 3, 2024 at 7:06=E2=80=AFAM Howard Chung <howardchung@google.com=
+> wrote:
+>
+> service->attributes has an assumption that it should look like:
+> |char_uuid|char_1|desc_1_1|desc_1_2|char_uuid|char_2|desc_2_1|char_uuid|.=
+..
+> where desc_x_y means a descriptor of char_x.
 
-Dear submitter,
+Will need to check the trace but I believe BlueZ always discover all
+characteristics before moving to descriptors, if that is not happening
+they there is probably a bug somewhere, that said perhaps you are
+doing the discovery procedure with another stack which doesn't employ
+the same logic, although inefficient it is possible to discover out of
+order but that would require reassigning the descriptors to
+characteristics once they are found, which is also inefficient but I
+would understand if you after supporting other stacks.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=841098
+> In monitor, an attribute is inserted as soon as it is found. It is not
+> guranteed that all the descriptors of a characteristic would be found
+> before another characteristic is found.
 
----Test result---
+You might want to include such a trace, don't recall seeing any stack
+that does out-order discover.
 
-Test Summary:
-CheckPatch                    PASS      0.51 seconds
-GitLint                       PASS      0.23 seconds
-SubjectPrefix                 PASS      0.08 seconds
-BuildKernel                   PASS      30.89 seconds
-CheckAllWarning               PASS      33.71 seconds
-CheckSparse                   PASS      39.12 seconds
-CheckSmatch                   FAIL      35.41 seconds
-BuildKernel32                 PASS      29.45 seconds
-TestRunnerSetup               PASS      534.74 seconds
-TestRunner_l2cap-tester       PASS      18.29 seconds
-TestRunner_iso-tester         PASS      33.41 seconds
-TestRunner_bnep-tester        PASS      4.81 seconds
-TestRunner_mgmt-tester        FAIL      113.70 seconds
-TestRunner_rfcomm-tester      PASS      7.38 seconds
-TestRunner_sco-tester         PASS      15.00 seconds
-TestRunner_ioctl-tester       PASS      8.13 seconds
-TestRunner_mesh-tester        PASS      6.63 seconds
-TestRunner_smp-tester         PASS      7.24 seconds
-TestRunner_userchan-tester    PASS      5.03 seconds
-IncrementalBuild              PASS      30.27 seconds
+> This adds a function to insert the descriptor with the given handle to
+> an appropriate place in its service attribute list and make monitor to
+> use this function when a descripter is found.
+>
+> Reviewed-by: Archie Pusaka <apusaka@chromium.org>
+> ---
+>
+>  monitor/att.c        |  2 +-
+>  src/shared/gatt-db.c | 66 ++++++++++++++++++++++++++++++++++++++++++++
+>  src/shared/gatt-db.h |  9 ++++++
+>  3 files changed, 76 insertions(+), 1 deletion(-)
+>
+> diff --git a/monitor/att.c b/monitor/att.c
+> index ddeb54d9e..503099745 100644
+> --- a/monitor/att.c
+> +++ b/monitor/att.c
+> @@ -4153,7 +4153,7 @@ static struct gatt_db_attribute *insert_desc(const =
+struct l2cap_frame *frame,
+>         if (!db)
+>                 return NULL;
+>
+> -       return gatt_db_append_descriptor(db, handle, uuid, 0, NULL, NULL,=
+ NULL);
+> +       return gatt_db_insert_descriptor(db, handle, uuid, 0, NULL, NULL,=
+ NULL);
+>  }
+>
+>  static void att_find_info_rsp_16(const struct l2cap_frame *frame)
+> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+> index 39bba9b54..f08c5afaa 100644
+> --- a/src/shared/gatt-db.c
+> +++ b/src/shared/gatt-db.c
+> @@ -1002,6 +1002,72 @@ service_append_descriptor(struct gatt_db_service *=
+service,
+>         return service->attributes[i];
+>  }
+>
+> +struct gatt_db_attribute *
+> +gatt_db_insert_descriptor(struct gatt_db *db,
+> +                                       uint16_t handle,
+> +                                       const bt_uuid_t *uuid,
+> +                                       uint32_t permissions,
+> +                                       gatt_db_read_t read_func,
+> +                                       gatt_db_write_t write_func,
+> +                                       void *user_data)
+> +{
+> +       struct gatt_db_attribute *attrib, *iter_attr, *char_attr =3D NULL=
+;
+> +       struct gatt_db_service *service;
+> +       int i, j, num_index, char_index;
+> +
+> +       attrib =3D gatt_db_get_service(db, handle);
+> +       if (!attrib)
+> +               return NULL;
+> +
+> +       service =3D attrib->service;
+> +       num_index =3D get_attribute_index(service, 0);
+> +       if (!num_index)
+> +               return NULL;
+> +
+> +       // Find the characteristic the descriptor belongs to.
+> +       for (i =3D 0; i < num_index; i++) {
+> +               iter_attr =3D service->attributes[i];
+> +               if (bt_uuid_cmp(&characteristic_uuid, &iter_attr->uuid))
+> +                       continue;
+> +
+> +               if (iter_attr->handle > handle)
+> +                       continue;
+> +
+> +               // Find the characteristic with the largest handle among =
+those
+> +               // with handles less than the descriptor's handle.
+> +               if (!char_attr || iter_attr->handle > char_attr->handle) =
+{
+> +                       char_attr =3D iter_attr;
+> +                       char_index =3D i;
+> +               }
+> +       }
+> +
+> +       // There is no characteristic contain this descriptor. Something =
+went
+> +       // wrong
+> +       if (!char_attr)
+> +               return NULL;
+> +
+> +       // Find the end of this characteristic
+> +       for (i =3D char_index + 1; i < num_index; i++) {
+> +               iter_attr =3D service->attributes[i];
+> +
+> +               if (!bt_uuid_cmp(&characteristic_uuid, &iter_attr->uuid) =
+||
+> +                       !bt_uuid_cmp(&included_service_uuid, &iter_attr->=
+uuid))
+> +                       break;
+> +       }
+> +
+> +       // Move all of the attributes after the end of this characteristi=
+c to
+> +       // its next index.
+> +       for (j =3D num_index; j > i; j--)
+> +               service->attributes[j] =3D service->attributes[j - 1];
+> +
+> +       service->attributes[i] =3D new_attribute(service, handle, uuid, N=
+ULL, 0);
+> +
+> +       set_attribute_data(service->attributes[i], read_func, write_func,
+> +                                                       permissions, user=
+_data);
+> +
+> +       return service->attributes[i];
+> +}
+> +
+>  struct gatt_db_attribute *
+>  gatt_db_append_descriptor(struct gatt_db *db,
+>                                         uint16_t handle,
+> diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+> index ec0eccdfc..4c4e88d87 100644
+> --- a/src/shared/gatt-db.h
+> +++ b/src/shared/gatt-db.h
+> @@ -80,6 +80,15 @@ gatt_db_append_characteristic(struct gatt_db *db,
+>                                         gatt_db_write_t write_func,
+>                                         void *user_data);
+>
+> +struct gatt_db_attribute *
+> +gatt_db_insert_descriptor(struct gatt_db *db,
+> +                                       uint16_t handle,
+> +                                       const bt_uuid_t *uuid,
+> +                                       uint32_t permissions,
+> +                                       gatt_db_read_t read_func,
+> +                                       gatt_db_write_t write_func,
+> +                                       void *user_data);
+> +
+>  struct gatt_db_attribute *
+>  gatt_db_append_descriptor(struct gatt_db *db,
+>                                         uint16_t handle,
+> --
+> 2.44.0.478.gd926399ef9-goog
+>
 
-Details
-##############################
-Test: CheckSmatch - FAIL
-Desc: Run smatch tool with source
-Output:
 
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
-make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
-make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: net] Error 2
-make[2]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
-make[4]: *** Waiting for unfinished jobs....
-make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
-make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
-make: *** [Makefile:240: __sub-make] Error 2
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 492, Passed: 489 (99.4%), Failed: 1, Not Run: 2
-
-Failed Test Cases
-LL Privacy - Start Discovery 2 (Disable RL)          Failed       0.180 seconds
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8709429658267043776==--
+--=20
+Luiz Augusto von Dentz
