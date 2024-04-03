@@ -1,221 +1,200 @@
-Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FAA6135A5F
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Apr 2024 11:08:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C836D141991;
+	Wed,  3 Apr 2024 12:24:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712142497; cv=none; b=ruHdRgkLju+pBHH2pJNs2fTAVFuQLeOdVLDQsdlwP9QhO3RPITFM9OafCPyuKULwZQf9pp3bllal9624cFKDb3s4UYXzMLJZVfdbhsSktgJx5RCDKDbEnCHeiskaozFLuEKxj92fCKVGPBlyCyF2jAoxRgRrzqIT+lMhgT3zGAI=
+	t=1712147097; cv=none; b=GJb4kOlT3h5xeP4y8OIJlcIxPzZeDQX88LUFOiYzvnmQVAXpBaJpp5/y2HooYcvXnr2Agq3IyIqRtgYtstDclESWE82D1BjAaVtqRO/Hq4o/poB2LbXAKXj6Zy4gjmUjCDNHs0GycSc2U0aavDebEfnkaIU5zQeXPOr4AW/PPtU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712142497; c=relaxed/simple;
-	bh=uJoDIqrrobnXry5Q1/FbtDdWifcTcjSiuEF9jU4na60=;
-	h=From:To:Subject:Date:Message-Id:MIME-Version:Content-Type; b=noAF91YHKPtxBR67UE5GrglBCnJnBGGox/V8kJN72dDkB5eg3gjUA0g2q6QbUYluZzOR7Y1N96SiS6aDJ4WM49UrNvZrDNR0hdOz3NzI6u2gwoDiS316ibntHzx8Yg2LDIUuc78RntZ+4qOeT6Z/8eC7z50MKVlCCVF4eelJgao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=tKDDYCjD; arc=none smtp.client-ip=46.235.227.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1712147097; c=relaxed/simple;
+	bh=KcgYpc+9CjDQi/NJxVHV2bo7S5xb6FjkQ15XYp0RmCE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B+QK8eNE5TEMUqFwqq6rhxpXg0RTYbRlc8jWG3Tv3jj3HYfUEJboGqaT8r7lVc32JWaoLUwJwfsdeCMhqGoyy5nDmzqRWwY6g9w7xr0XzE0wE9HxYRVhbWDVxCN6f+pKdAwrZMik9JESX8/74cK7e1I1lzyMnCHKT1DfUpJ8mTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SnvjN/BM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="tKDDYCjD"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1712142493;
-	bh=uJoDIqrrobnXry5Q1/FbtDdWifcTcjSiuEF9jU4na60=;
-	h=From:To:Subject:Date:From;
-	b=tKDDYCjDSjvi5+4O/O8wtIRQWXMPrA3w4RmhQ3V4G4KZEQiyqy7xc+OoxlohNYCS0
-	 EtsIPDg8xJSheiWa14e0q7lstGsHR9z3L1qNnX3cQGotXdXWjB4QxjEdOtRjK2WQDx
-	 SlzJBxch8QJBO5HnwqEfiNQ2Zqn1klWAReuy7RTTTjvfFYM1WE8mNqIEI/sWOr0kM4
-	 Aw3sgX9fVaTQtP+xcRhXG0J2XGhagM5/A8FeQPlKzaSEX7u4Avm9cEfLIz4tmrLFp/
-	 XcknclGTC+0AIicp2KPvlY1TYyRXDJA3A+x82bAq1JwhPagRlqHpQGiXr9JDjoaN2U
-	 ZwlsJESVzw/Ag==
-Received: from fdanis-XPS-13-9370.. (cola.collaboradmins.com [195.201.22.229])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 8FF4837820CD
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Apr 2024 11:08:13 +0000 (UTC)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] plugins: Add new plugin to fix airpods pairing
-Date: Wed,  3 Apr 2024 13:08:08 +0200
-Message-Id: <20240403110808.805771-1-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SnvjN/BM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A46EC433C7;
+	Wed,  3 Apr 2024 12:24:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712147097;
+	bh=KcgYpc+9CjDQi/NJxVHV2bo7S5xb6FjkQ15XYp0RmCE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SnvjN/BMqtmaBYJ95X2POqxVnvib0Hcs46hn31TOd76XhAhYvKfJiKcNldggmuqqm
+	 517zdgNjgB7eLZt6b5C+o97voT2HYvaBV7oTaE3JdNkYkFkwljRGjPjQSH104EVB7y
+	 o2qOc7Xnaec9ss4pc4II/GVmqAtXQ+1/APosntGH0B4XnrTtD1au+44FHYx8wcNfmT
+	 w5waF8he/KUouIQKffezkpj/joMyaGMtHoSnMkmAdRFLtIWwa4ffRveU2LIGIR5e3T
+	 TC+f5EYpwGcl05mNsKAsLytFareyzB9UKE4TaOcsHhQs1/gKOHtBI0iyIG6azTYfut
+	 72lKie0cjUzqQ==
+Received: from johan by xi.lan with local (Exim 4.97.1)
+	(envelope-from <johan@kernel.org>)
+	id 1rrzfl-000000004bT-3UUs;
+	Wed, 03 Apr 2024 14:24:58 +0200
+Date: Wed, 3 Apr 2024 14:24:57 +0200
+From: Johan Hovold <johan@kernel.org>
+To: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+Cc: Johan Hovold <johan+linaro@kernel.org>, luiz.dentz@gmail.com,
+	marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+	quic_mohamull@quicinc.com, quic_hbandi@quicinc.com
+Subject: Re: [PATCH] Revert "Bluetooth: hci_qca: Set BDA quirk bit if fwnode
+ exists in DT"
+Message-ID: <Zg1KmcFQ3bAJa8qJ@hovoldconsulting.com>
+References: <20240314084412.1127-1-johan+linaro@kernel.org>
+ <171146704035.9961.13096206001570615153.git-patchwork-notify@kernel.org>
+ <124a7d54-5a18-4be7-9a76-a12017f6cce5@quicinc.com>
+ <ZgWLeo5KSLurLDhK@hovoldconsulting.com>
+ <c03abbbd-faa5-4fdc-b7c3-5554a90c3419@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c03abbbd-faa5-4fdc-b7c3-5554a90c3419@quicinc.com>
 
-Apple Airpods are discoverable and pairable in BREDR mode, but also
-advertise in unconnectable mode in LE with the same Public address, at the
-same time. As the pairing process uses the latest seen address, sometimes
-it uses the LE Public address to pair, which fails.
+On Fri, Mar 29, 2024 at 12:55:40PM +0530, Janaki Ramaiah Thota wrote:
+> On 3/28/2024 8:53 PM, Johan Hovold wrote:
+> > On Thu, Mar 28, 2024 at 08:25:16PM +0530, Janaki Ramaiah Thota wrote:
 
-This commit adds a new adapter driver plugin which force the BREDR last
-seen time on LE Public address device found event related to an Apple
-device, allowing pairing process to always use the BREDR.
+> >> We made this change to configure the device which supports persistent
+> >> memory for the BD-Address
+> > 
+> > Can you say something more about which devices support persistent
+> > storage for the address? Is that all or just some of the chip variants?
 
-This commit is based on proposal
-https://lore.kernel.org/all/20240103101328.1812899-1-clancy_shang@163.com/
+> Most of the devices support persistent storage, and bd-address storage
+> is chosen based on the OEM and Target.
+
+Can you be more specific about which devices support it (or say which do
+not)?
+
+Is the address stored in some external eeprom or similar which the OEM
+can choose to populate?
+
+> >> So to make device functional in both scenarios we are adding a new
+> >> property in dts file to distinguish persistent and non-persistent
+> >> support of BD Address and set HCI_QUIRK_USE_BDADDR_PROPERTY bit
+> >> accordingly
+> > 
+> > Depending on the answer to my questions above, you may be able to infer
+> > this from the compatible string and/or you can read out the address from
+> > the device and only set the quirk if it's set to the default address.
+> > 
+> > You should not need to add a new property for this.
+
+> As per my understanding, altering the compatible string may cause duplicate
+> configuration, right ?
+
+If it's the same device and just a different configuration then we can't
+use the compatible string for this.
+
+It seems we need a patch like the below to address this. But please
+provide some more details (e.g. answers to the questions above) so I can
+determine what the end result should look like.
+
+Johan
+
+
+From 9719effe80fcc17518131816fdfeb1824cfa08b6 Mon Sep 17 00:00:00 2001
+From: Johan Hovold <johan+linaro@kernel.org>
+Date: Thu, 20 Apr 2023 14:10:55 +0200
+Subject: [PATCH] Bluetooth: btqca: add invalid device address check
+
+Some Qualcomm Bluetooth controllers lack persistent storage for the
+device address and therefore end up using the default address
+00:00:00:00:5a:ad.
+
+Apparently this depends on how the controller has been integrated so we
+can not use the device type alone to determine when the address is
+valid.
+
+Instead read back the address during setup() and only set the
+HCI_QUIRK_USE_BDADDR_PROPERTY flag when needed.
+
+Fixes: de79a9df1692 ("Bluetooth: btqcomsmd: use HCI_QUIRK_USE_BDADDR_PROPERTY")
+Fixes: e668eb1e1578 ("Bluetooth: hci_core: Don't stop BT if the BD address missing in dts")
+Fixes: 6945795bc81a ("Bluetooth: fix use-bdaddr-property quirk")
+Cc: stable@vger.kernel.org	# 6.5
+Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
 ---
- Makefile.plugins  |   3 ++
- plugins/airpods.c | 132 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 135 insertions(+)
- create mode 100644 plugins/airpods.c
+ drivers/bluetooth/btqca.c   | 33 +++++++++++++++++++++++++++++++++
+ drivers/bluetooth/hci_qca.c |  2 --
+ 2 files changed, 33 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile.plugins b/Makefile.plugins
-index 4aa2c9c92..2ebd8aaf6 100644
---- a/Makefile.plugins
-+++ b/Makefile.plugins
-@@ -11,6 +11,9 @@ builtin_sources += plugins/autopair.c
- builtin_modules += policy
- builtin_sources += plugins/policy.c
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index 19cfc342fc7b..15124157372c 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -15,6 +15,8 @@
  
-+builtin_modules += airpods
-+builtin_sources += plugins/airpods.c
+ #define VERSION "0.1"
+ 
++#define QCA_BDADDR_DEFAULT (&(bdaddr_t) {{ 0xad, 0x5a, 0x00, 0x00, 0x00, 0x00 }})
 +
- if ADMIN
- builtin_modules += admin
- builtin_sources += plugins/admin.c
-diff --git a/plugins/airpods.c b/plugins/airpods.c
-new file mode 100644
-index 000000000..5043f0cca
---- /dev/null
-+++ b/plugins/airpods.c
-@@ -0,0 +1,132 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2024 Frédéric Danis <frederic.danis@collabora.com>
-+ *
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdbool.h>
-+
-+#include <glib.h>
-+
-+#include "bluetooth/bluetooth.h"
-+
-+#include "lib/mgmt.h"
-+#include "src/plugin.h"
-+#include "src/adapter.h"
-+#include "src/device.h"
-+#include "src/eir.h"
-+#include "src/log.h"
-+#include "src/shared/mgmt.h"
-+#include "src/shared/util.h"
-+
-+#define APPLE_INC_VENDOR_ID 0x004c
-+
-+static struct mgmt *mgmt;
-+
-+static bool eir_msd_is_apple_inc(GSList *msd_list)
+ int qca_read_soc_version(struct hci_dev *hdev, struct qca_btsoc_version *ver,
+ 			 enum qca_btsoc_type soc_type)
+ {
+@@ -612,6 +614,35 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+ }
+ EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
+ 
++static void qca_check_bdaddr(struct hci_dev *hdev)
 +{
-+	GSList *msd_l, *msd_next;
++	struct hci_rp_read_bd_addr *bda;
++	struct sk_buff *skb;
++	int err;
 +
-+	for (msd_l = msd_list; msd_l != NULL; msd_l = msd_next) {
-+		const struct eir_msd *msd = msd_l->data;
-+
-+		msd_next = g_slist_next(msd_l);
-+
-+		if (msd->company == APPLE_INC_VENDOR_ID)
-+			return true;
-+	}
-+
-+	return false;
-+}
-+
-+static void airpods_device_found_callback(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct btd_device *dev;
-+	const struct mgmt_ev_device_found *ev = param;
-+	struct btd_adapter *adapter = user_data;
-+	uint16_t eir_len;
-+	uint32_t flags = le32_to_cpu(ev->flags);
-+	struct eir_data eir_data;
-+
-+	dev = btd_adapter_find_device(adapter,  &ev->addr.bdaddr,
-+					ev->addr.type);
-+	if (!dev)
++	if (bacmp(&hdev->public_addr, BDADDR_ANY))
 +		return;
 +
-+	if (length < sizeof(*ev)) {
-+		warn("Too short device found event (%u bytes)", length);
++	skb = __hci_cmd_sync(hdev, HCI_OP_READ_BD_ADDR, 0, NULL,
++			     HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		err = PTR_ERR(skb);
++		bt_dev_err(hdev, "Failed to read device address (%d)", err);
 +		return;
 +	}
 +
-+	eir_len = btohs(ev->eir_len);
-+	if (length != sizeof(*ev) + eir_len) {
-+		warn("Device found event size mismatch (%u != %zu)",
-+					length, sizeof(*ev) + eir_len);
-+		return;
++	if (skb->len != sizeof(*bda)) {
++		bt_dev_err(hdev, "Device address length mismatch");
++		goto free_skb;
 +	}
 +
-+	if (eir_len == 0)
-+		return;
-+
-+	memset(&eir_data, 0, sizeof(eir_data));
-+	eir_parse(&eir_data, ev->eir, eir_len);
-+
-+	if (eir_msd_is_apple_inc(eir_data.msd_list) &&
-+				(flags & MGMT_DEV_FOUND_NOT_CONNECTABLE) &&
-+				(ev->addr.type == BDADDR_LE_PUBLIC)) {
-+		DBG("Force BREDR last seen");
-+		device_set_bredr_support(dev);
-+		device_update_last_seen(dev, BDADDR_BREDR, true);
-+	}
++	bda = (struct hci_rp_read_bd_addr *)skb->data;
++	if (!bacmp(&bda->bdaddr, QCA_BDADDR_DEFAULT))
++		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
++free_skb:
++	kfree_skb(skb);
 +}
 +
-+static int airpods_probe(struct btd_adapter *adapter)
-+{
-+	if (!mgmt)
-+		mgmt = mgmt_new_default();
+ static void qca_generate_hsp_nvm_name(char *fwname, size_t max_size,
+ 		struct qca_btsoc_version ver, u8 rom_ver, u16 bid)
+ {
+@@ -818,6 +849,8 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 		break;
+ 	}
+ 
++	qca_check_bdaddr(hdev);
 +
-+	if (!mgmt) {
-+		fprintf(stderr, "Failed to open management socket\n");
-+		return 0;
-+	}
-+
-+	mgmt_register(mgmt, MGMT_EV_DEVICE_FOUND,
-+					btd_adapter_get_index(adapter),
-+					airpods_device_found_callback,
-+					adapter, NULL);
-+
-+	return 0;
-+}
-+
-+static void airpods_remove(struct btd_adapter *adapter)
-+{
-+	mgmt_unregister_index(mgmt, btd_adapter_get_index(adapter));
-+}
-+
-+static struct btd_adapter_driver airpods_driver = {
-+	.name	= "airpods",
-+	.probe	= airpods_probe,
-+	.remove	= airpods_remove,
-+};
-+
-+static int airpods_init(void)
-+{
-+	return btd_register_adapter_driver(&airpods_driver);
-+}
-+
-+static void airpods_exit(void)
-+{
-+	btd_unregister_adapter_driver(&airpods_driver);
-+}
-+
-+BLUETOOTH_PLUGIN_DEFINE(airpods, VERSION,
-+		BLUETOOTH_PLUGIN_PRIORITY_LOW, airpods_init, airpods_exit)
+ 	bt_dev_info(hdev, "QCA setup on UART is completed");
+ 
+ 	return 0;
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index b266db18c8cc..b621a0a40ea4 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1908,8 +1908,6 @@ static int qca_setup(struct hci_uart *hu)
+ 	case QCA_WCN6750:
+ 	case QCA_WCN6855:
+ 	case QCA_WCN7850:
+-		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
+-
+ 		qcadev = serdev_device_get_drvdata(hu->serdev);
+ 		if (qcadev->bdaddr_property_broken)
+ 			set_bit(HCI_QUIRK_BDADDR_PROPERTY_BROKEN, &hdev->quirks);
 -- 
-2.34.1
+2.43.2
 
