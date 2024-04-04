@@ -1,100 +1,101 @@
-Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com [209.85.219.169])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83CD074C0D
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Apr 2024 09:31:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4430A8627C
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Apr 2024 10:50:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712223094; cv=none; b=EGqciJ2PVKP8zaGpHO0wURqr1lHm/PuTeIDiBcg1/pTfVoAHW5Mv/q2i0z5zxXBpZld71HHyIHWCUS8U2LYBtBvCE3sQY14C//6uO5F/Y5p7izeufHFsdNmbSnXVVuLSRF4ykWNlEQ51Rttlli/E2qPf7nuy0L1VY6UArGOK8ks=
+	t=1712227836; cv=none; b=MYHXLZMP4GJ8rAt/b4YK1KY4wTrV+XTa1yGuaWTf91IaA2KWKRIvzanV/5nLnMLXZZJPjE/GOZ7+mm0w/GmQkhyWDp2d98qctcT9NOj9MPh5ndaJjZG9EIR/Ytx+zmFd9Pur5XspQ6VGorkXiBh9/U0CxmZ/mXt7WV8n1tsZBos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712223094; c=relaxed/simple;
-	bh=eal+hbwuJR0GkxwgPiJg2NCYAvGM7tKiSJzcHq0j6dA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GGDu39kOOYYBTrgxVuEEeYsSH9NqfXMNATNNl/MffW/sO7CBxulMij+aD6K64wo2qV6NL802O00WeB8dPfbXtmV4kc1xHSOSq9gjJ/rGarkeG1cg6OjQcE2qn0QMciCWyAuylcxB9N0ZNT50RA3/WWEcUYctE+5T2CpuLf4ntt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=IDIQIVuS; arc=none smtp.client-ip=209.85.219.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1712227836; c=relaxed/simple;
+	bh=hCUJ9Vyeg9IAERTsInyGPjcv+2BcLki9AiF4RXL+nKk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=pX5HfylX5UhBdFk1CeEO2lf0mQEvWhnFt59TuqD9RqLFkPj44pFX8VuHQQ0ZnGvvnA9dtRZRe6mUWin2wMH03qj1k81pnYuatO9sWJWIyPI097YlNxXnIS8GmmhekQffcqCTsXG/NaMgv8LVkz2w71eCtFEgKAIVZ/qvSKUD2dI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--apusaka.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2tmtILFg; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--apusaka.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IDIQIVuS"
-Received: by mail-yb1-f169.google.com with SMTP id 3f1490d57ef6-dd161eb03afso746007276.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Apr 2024 02:31:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2tmtILFg"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc6ceade361so1592871276.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Apr 2024 03:50:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1712223091; x=1712827891; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=QJzdwgYqSiXBG2wAbt+70V3f0hLZ0hXphRY5qJD39hQ=;
-        b=IDIQIVuSWzz/kI90Xib4W+1zCVY4pIjQCEiWSvoH9xAYiIDaC3HmgZPB70q3bF5Zqw
-         J3hlygutFS16HiA6/H5LLfPmfDTCBbjjPvquHBCVt6NyvlAanqlqHijX2yXkcRe3AIla
-         IqkOX86dse2kSa0XxKO16AsIJlq1Nr2gNhAb/1B8szRxoaYtoN5h+HzVlszju4xMaqGH
-         sbsO+JX9Czpr9v77XztS15C4DFvS6264r57pKsESNJeR4wm0QUtUz7x3aG+KgmpY70d1
-         SN7d2gEhfeHJW1sikNgHU/8J+An0bRPLQjOZS+9r+vRbn5mm1Zs4XCvjE4dAnkr+pwwJ
-         5wNA==
+        d=google.com; s=20230601; t=1712227834; x=1712832634; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Mlncb6RTaE9eevbsiI44CKn4YnO0CJ8k+DNS9ZBOEnY=;
+        b=2tmtILFgzR/QN7WpyW0RJt/3lmH03ce4DXVSkPSwKzDI2n8r/PWBcRjowntWQMvtXH
+         n+TodXalvp5hKOUfou2G90+RZ6g7g0uaoH59ILJGIicTA407EM4uqonV9aAy431eoEUf
+         Y+bl/Yq9UafV5xZfMSomxHwGQkw9bSjcXth45TQi9cs2yi0tGzs9m4ECiDoISdrPtv3y
+         7rI2aABIdutCdP/zwU1YVXDr9hWl7QRQEyK0kgnzKcRXpzMLd9KZwJb72JqQrlp+yeXc
+         +aj52IYr3T67WwtGtXQu3zd6Swl3f9KSSVyOzlAIL8rCwda6LNXVI3QR2edf2T1jS1Bk
+         t8rQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712223091; x=1712827891;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QJzdwgYqSiXBG2wAbt+70V3f0hLZ0hXphRY5qJD39hQ=;
-        b=Fq85x7xg/4Vyorl8qQehaEvRgGsV3ZQwaZxLbuVvuW7xdyYbHiB+QC4Cwsx/uxbRji
-         x81NR5Jo62GCxT4ynfHvJS8h5zX/6Lnob/7x4FczTFYOB1daWOLOG4I8V6utnJTUJSbV
-         szS0QPs2eL3f74FesLz6F3/je9W+821SipojriM+hxZ+I1sedLpKWYAgZBgocr41Dy7u
-         jgr9AzBGz/TdCO/uYoAky7Y9u2npl55yGreyhfdVoJNnqYPmNtRc2k/o/IqZxKYhwCBs
-         fd6yeVHy+iMgn0CR4+pVzn5PRhYhFtz51CNf5fSbEFgf4+5FrK5KjEGDY3r5ISCvAEAd
-         VEaQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUhsZ+gv8DWZmYy+ASofE3+y9RxdIS1JUmr0CEk6KzgKG8czPISDrqMSJ3TCvDiv6dLi5FpE7Mth+bgoBLaioqaJnAIS1R9lVLfbbIGyEnR
-X-Gm-Message-State: AOJu0YypT3q3ox1+UgS5ZzcF09kgatQ9+9MtYqgTF01hoCSxKnHhSIso
-	bg3TxLTDyo4cxL0boUU2mMpuLlNsbFPPTNlQqK+CjXqUIl22Moa9qblWOwLIRQ/3AonSvdX3yKB
-	OXaU5Ff6r6xjT7stq35btE97pFFQTQyws4o8AuA==
-X-Google-Smtp-Source: AGHT+IHTXtbKZV4PRrgxvlL/R1tUqcSFTjPcwK6//feDtYUO9NjrShijYYET6/+oeV22B9HIEQVjv5iZuw/cw+hBGTs=
-X-Received: by 2002:a25:ac04:0:b0:dc7:423c:b8aa with SMTP id
- w4-20020a25ac04000000b00dc7423cb8aamr1828891ybi.12.1712223091503; Thu, 04 Apr
- 2024 02:31:31 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1712227834; x=1712832634;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Mlncb6RTaE9eevbsiI44CKn4YnO0CJ8k+DNS9ZBOEnY=;
+        b=BciufOn/OPaRts/FD8nTTCxe2/ugUBh7kRqq8AEg2wNZbR6GOHz7hFvSpoEAnT4iHT
+         MbLiDdos+XFt7XbBdhi4sm4bS6WFymcskOCzXppsVI5rZKHzf2BTtMhmwkrmJkW1hifq
+         W+5zsR3OKYUBRJQB52FUsgFgnfbOCEN779aObiObv7I7QCN0TrOXJ+zbAnfFJWEa+fNW
+         oMFVNuOXY4PKAtkHIhCH3w0jaznirMDrqVVsVbnaJ7tBQ+2fkhiPbWshLRcZOaFWt7V5
+         cB8nBNP+KSpiqDoVn/e2lYSyrf4GAhKFkH6YfHFF561frRi5L1oDU1gtOq3CNXM7HU1r
+         NGhA==
+X-Gm-Message-State: AOJu0YzAzJPiST7s9zN/RH0VoGTxhTWxbekaMc4z6ChOIgjWko9X4y4k
+	OOnNwI5NWJNc/ZEv/TLKZdxqv3WylhpHZQuqAbQABxTszz/CariMgAhJ502TFsKhGKMtfhw3q69
+	1Tb4hhzgV149FK8m0DtWTMR3+RgGkQqnrUSYXPrYk6G9OcGLvoPeWY9gr/I+AJXUqKJ+TYg8U0x
+	N7u0FOxfJ4J8g9zjribhu5o8n21ihHt6ACGCjfb8USolOE04jm8w==
+X-Google-Smtp-Source: AGHT+IFCI77genrFWALO1MYcTCjnmSXDxKWa/27R7lAj4vgx7ukYdJLz4LoSoP8DLHc1C5Hb9x2H2r3mvNO+
+X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:17:7828:b507:ed1b:110d])
+ (user=apusaka job=sendgmr) by 2002:a05:6902:1505:b0:dcd:ad52:6932 with SMTP
+ id q5-20020a056902150500b00dcdad526932mr642375ybu.5.1712227834197; Thu, 04
+ Apr 2024 03:50:34 -0700 (PDT)
+Date: Thu,  4 Apr 2024 18:50:23 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240403-module-owner-sdio-v2-0-ae46d6b955eb@linaro.org>
-In-Reply-To: <20240403-module-owner-sdio-v2-0-ae46d6b955eb@linaro.org>
-From: Ulf Hansson <ulf.hansson@linaro.org>
-Date: Thu, 4 Apr 2024 11:30:54 +0200
-Message-ID: <CAPDyKFodTh-KN+=b1B3V+7aNEoR0SPo5-xjFaWu=gYEtsDy1pQ@mail.gmail.com>
-Subject: Re: [PATCH v2 0/7] mmc/wifi/bluetooth: store owner from modules with sdio_register_driver()
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Kalle Valo <kvalo@kernel.org>, 
-	Jeff Johnson <jjohnson@kernel.org>, Arend van Spriel <arend.vanspriel@broadcom.com>, 
-	Brian Norris <briannorris@chromium.org>, Francesco Dolcini <francesco@dolcini.it>, 
-	=?UTF-8?B?SsOpcsO0bWUgUG91aWxsZXI=?= <jerome.pouiller@silabs.com>, 
-	linux-mmc@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-mediatek@lists.infradead.org, linux-wireless@vger.kernel.org, 
-	ath10k@lists.infradead.org, brcm80211@lists.linux.dev, 
-	brcm80211-dev-list.pdl@broadcom.com, Jeff Johnson <quic_jjohnson@quicinc.com>, 
-	Francesco Dolcini <francesco.dolcini@toradex.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
+Message-ID: <20240404185022.1.Ic27505c8f1ca7d4a653b1dcc1b08cdfc862a4622@changeid>
+Subject: [PATCH] Bluetooth: l2cap: Don't double set the HCI_CONN_MGMT_CONNECTED
+ bit
+From: Archie Pusaka <apusaka@google.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Marcel Holtmann <marcel@holtmann.org>
+Cc: CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>, 
+	Archie Pusaka <apusaka@chromium.org>, Manish Mandlik <mmandlik@chromium.org>, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 3 Apr 2024 at 16:17, Krzysztof Kozlowski
-<krzysztof.kozlowski@linaro.org> wrote:
->
-> Changes in v2:
-> 1. Add "wifi: ath10k: sdio: simplify module initialization" patch, from
->    my other patchset to avoid conflicts.
-> 2. Add Acks/Rb tags.
-> 3. Drop applied SDIO patch, which was the dependency for the rest
->    cleanups.
-> 4. Update subjects according to feedback.
-> - Link to v1: https://lore.kernel.org/r/20240329-module-owner-sdio-v1-0-e4010b11ccaa@linaro.org
->
-> Merging
-> =======
-> With Acks from Kalle, please take entire set via mmc/sdio.
+From: Archie Pusaka <apusaka@chromium.org>
 
-The series applied for next, thanks!
+The bit is set and tested inside mgmt_device_connected(), therefore we
+must not set it just outside the function.
 
-[...]
+Fixes: eeda1bf97bb5 ("Bluetooth: hci_event: Fix not indicating new connection for BIG Sync")
+Signed-off-by: Archie Pusaka <apusaka@chromium.org>
+Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
 
-Kind regards
-Uffe
+---
+
+ net/bluetooth/l2cap_core.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index cf3b8e9b7b3ba..b0970462a6899 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4063,8 +4063,7 @@ static int l2cap_connect_req(struct l2cap_conn *conn,
+ 		return -EPROTO;
+ 
+ 	hci_dev_lock(hdev);
+-	if (hci_dev_test_flag(hdev, HCI_MGMT) &&
+-	    !test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &hcon->flags))
++	if (hci_dev_test_flag(hdev, HCI_MGMT))
+ 		mgmt_device_connected(hdev, hcon, NULL, 0);
+ 	hci_dev_unlock(hdev);
+ 
+-- 
+2.44.0.478.gd926399ef9-goog
+
