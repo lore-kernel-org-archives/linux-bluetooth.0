@@ -1,122 +1,129 @@
-Received: from mail-pg1-f196.google.com (mail-pg1-f196.google.com [209.85.215.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46A905026E
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Apr 2024 06:35:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 826FE548F1
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Apr 2024 07:02:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712212559; cv=none; b=WB0FXEUqxe4bVFuF3YnGDnfpN0KfVaFMcjRf/uttdGqGfpTnWqe4k8Ir09vVj5fH3AzhATQojvn3U6hQw9ho2Iy5b5HTXWdCzj6BUEW7YEI+fsnlw2AoHPVrJo45OPCO18ewsT67iWgzaFG9hTMX4Dq5Aps57enMnVDjuLnGOUk=
+	t=1712214129; cv=none; b=J/12m1Lcc5W7LrjPZ5VQh+7RDuv5PX3T5BSx/8DFlS1fsImB/Hpn56jjX5DDMK+Fij3X+APNwN/mqOa2i08QdSXVbhhCosst9R0tXIkoe9o5AwYAAgbl+VxxHS+VLtuhytGnfr65yPwp9sn12zVRSCt2Q433ncc/W0jdwramJms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712212559; c=relaxed/simple;
-	bh=8M4hIrlK2uR6e5vTScV7TVav+ErpZMQnMSWb35WlyA4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PHA/QdwdED7JbYV+fJk2NEBjt3lcSly7QHdeppKkLsfzHPyL8QTlH4MDR7cdA4gDP48q9w+9SQBLUj6/BkxaKj8CfjuV1Q6QIZLdZNepFdfIKH79dWp7OPOn+i8zkEIiOd/oq9NxmzoShDDWGiQagHKz4AQWM+wA3ixmTQMq+rY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CUhbbttC; arc=none smtp.client-ip=209.85.215.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1712214129; c=relaxed/simple;
+	bh=dFJRj380gKVI43/nlP7xKAJau1g/342z2iAdld/1AII=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=EDf2Q5WxXsllrdmfASKPv5yZ56axeleGK5FZnJkkvW8Ge1UdrsMvXGJsiwGlb+FaFBBh1jCniuURVLvI6qmwURbZavyznv+61b/wB7xbz4rxzgzXircaEeBfG9pcCA16WnbYAoPltfaYNdE4eWg3xhrrmo0hcUsqfnJnN8HcBlw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=svsFl811; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CUhbbttC"
-Received: by mail-pg1-f196.google.com with SMTP id 41be03b00d2f7-517ab9a4a13so541804a12.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Apr 2024 23:35:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712212557; x=1712817357; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=K3OVNybMFs0FD/o9yBx03xj8cW+nFxr91pjuCnSQOmQ=;
-        b=CUhbbttC3IeHtx9Nk5dCzrrE17Ylf0PuYMnTatH5ULWBgh5HoN6aIWXffsikkwVlr1
-         iXZU/z0okwnpffhzMirSbYsTmv2jpH7kvO1jLHbo7pxrDBg1aZs/yrgRs+x/FTif+km4
-         8OlUmOTJwviFhj5fEUlYQrgBs9UlObu30FrL6mWqTkytvYhYlsAFlpGAPyBpiQq9ha/a
-         w/pBbvc6VU4vkiZLiOMLuMc664xX5FY4WrajLg/3XWxtXyZ0syLCs7DbcVbkz8VpYn4u
-         s0Y/2ie8x+uHwHuWCIpt/lCe4/rRO47HI1ykWr4YjNGn6z3KsAZbyNXdlFFGFU98xiKM
-         WlAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712212557; x=1712817357;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=K3OVNybMFs0FD/o9yBx03xj8cW+nFxr91pjuCnSQOmQ=;
-        b=f6uDh7ojzeVFT4A+kVYCGyqcSWo3ZmGl0dOxxiECdZ6Abi0RQyjFtSxIFAq4dL5kxt
-         B/diXTRqs8VDusGaM5jpZtT8JisKIHRRjG5ZOZ7IzNADo1rdlaLllWwsZP79hilirJaP
-         BdcJ3LS7yIFLV35JTNreHeh3Ugo3/tctAwkrpjjw/YyEkQIBF1bWgfpmZYdptVO6O1JC
-         FdsrB/J6ogUZ+9Kclk6/CfWyhPsAQoN6hCK5HyaK8QAP/srvobOGvUKhCGYq09rKNs8X
-         1LnRTpET3oD/i04oXvnVX21x4VK6aCU+JK9zhOpDjVB8V6PstqFY+Ki+rYTI5RlZ61gq
-         hOPQ==
-X-Gm-Message-State: AOJu0YxbsxB9PR5vsXoyqu2eXDujMbvGqz8KZ5y39acRtHKGCn/R/94O
-	UcOfweGgraCt/t8K8mw9sEiKXIwvI4oru+aV7i5vNJEcZKQPzLPF9T7o81FlV7k8Yhns
-X-Google-Smtp-Source: AGHT+IFDRu4sx4d9Tm1D6pr6aJYbgpN+2Sj0HuDE3f3IICe5AY4/fZIGywzFXQDZJd3KTfCEAsrRTQ==
-X-Received: by 2002:a05:6a21:1506:b0:1a5:6bfd:6bdd with SMTP id nq6-20020a056a21150600b001a56bfd6bddmr1975963pzb.50.1712212557413;
-        Wed, 03 Apr 2024 23:35:57 -0700 (PDT)
-Received: from ?IPV6:2600:3c0a:e002:7f00::1001? ([2600:3c0a:e002:7f00::1001])
-        by smtp.gmail.com with ESMTPSA id p16-20020a1709027ed000b001e249843f3csm9873741plb.223.2024.04.03.23.35.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Apr 2024 23:35:57 -0700 (PDT)
-Message-ID: <b7769335-3af4-469a-bf58-a3a51f03c842@gmail.com>
-Date: Wed, 3 Apr 2024 23:35:56 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="svsFl811"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 076A6C433C7
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Apr 2024 07:02:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712214129;
+	bh=dFJRj380gKVI43/nlP7xKAJau1g/342z2iAdld/1AII=;
+	h=From:To:Subject:Date:From;
+	b=svsFl811ZEe04D6HBhFox7Dqr9TC9jCTQ0fAEWcgM64ZJ5INHsLUyknrr1PYRkKL1
+	 fGXoeUlDmCn3wTE1yD4YE4N1tt1lIYRYWrxC8ei/majDyLt8mLEdCT6CdRCdVSyfTq
+	 w6uPAAtvDGIXtNYLcEXTcSRwfYfVsl4Ei16t8Y8WZ3hrCkFv3ZN2X045fqE4WRSp2e
+	 f7MqfBmV7D+3toYijRYb60DeLA66uSrw2ZaB8DHC1vwlXunpYfRNJ0KNaLZ3HmmzQn
+	 nu0vNsa3sKT//OJkI5u9X2FPlsulva1Pie5dxfj/8NLH2L/hysVIqkO4SbN4FcTDhu
+	 MN4hPPC3gHHnQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id EC501C53BD2; Thu,  4 Apr 2024 07:02:08 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 218680] New: bluetooth connected status not shown in KDE
+ desktop GUIs
+Date: Thu, 04 Apr 2024 07:02:08 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: wolf.seifert@web.de
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_file_loc bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys bug_status bug_severity priority
+ component assigned_to reporter cc cf_regression cf_bisect_commit
+Message-ID: <bug-218680-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH BlueZ 1/1] Revert "device: Consider service state on
- device_is_connected"
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: linux-bluetooth@vger.kernel.org
-References: <20240403205252.71978-1-dimitris.on.linux@gmail.com>
- <20240403205252.71978-2-dimitris.on.linux@gmail.com>
- <06c64895-a99b-4705-8965-d8ea66eef74a@molgen.mpg.de>
-Content-Language: en-US
-From: Dimitris <dimitris.on.linux@gmail.com>
-In-Reply-To: <06c64895-a99b-4705-8965-d8ea66eef74a@molgen.mpg.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-Hi Paul,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218680
 
-> Please document the reason for the revert.
+               URL: https://github.com/archlinux/linux.git
+            Bug ID: 218680
+           Summary: bluetooth connected status not shown in KDE desktop
+                    GUIs
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 6.8.2
+          Hardware: Intel
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: wolf.seifert@web.de
+                CC: luiz.dentz@gmail.com
+        Regression: Yes
+           Bisected 81526f2920bf8a03b670dbc2d45f35f204344d55
+         commit-id:
 
-I've since done a narrower change; instead of the revert I'm only 
-factoring out the state check that avoids the busy loop at "rfkill block 
-bluetooth" time.
+Since 6.8.2 bluetooth connected status is not shown any more in KDE desktop
+GUIs: it looks disconnected but in fact is connected and working (bluetooth
+headset).
 
-Updated cover letter and patch under the "V2" part of the thread:
+$ systemctl status bluetooth
+bluetoothd[413]: Authorization request for non-connected device!? (in RED)
 
-https://lore.kernel.org/linux-bluetooth/20240404024521.120349-1-dimitris.on.linux@gmail.com/T/#u
+The "Authorization request for non-connected device!?" also appears in the
+journalctl output.
 
-Issue steps to reproduce from e.g. 
-https://github.com/bluez/bluez/issues/785 :
 
-- Connect at least one device. Tried this with either one of: Logitech 
-MX Master 3, Google Pixel Buds Pro.
-- Run rfkill block bluetooth
-- bluetoothd takes a whole core, GNOME quick settings and status still 
-shows bluetooth as "active". I have to kill -9 the process to get the 
-block to really complete.
-- Turning off the connected device does not break the loop.
+It turned out that commit "81526f2920bf8a03b670dbc2d45f35f204344d55" is
+responsible for this malfunction: I made an Arch Linux package build for
+6.8.2.arch1-1 with this single commit
+"81526f2920bf8a03b670dbc2d45f35f204344d55" reverted and it worked again. So
+"81526f2920bf8a03b670dbc2d45f35f204344d55" is the one and only cause for th=
+is
+malfunction.
 
-Busy loop stack looks like:
 
-> #0  adapter_remove_connection (adapter=0x55a17e6889d0, device=0x55a17e698d30, bdaddr_type=2 '\002') at src/adapter.c:7476
-> #1  0x000055a17e55979f in adapter_stop (adapter=0x55a17e6889d0) at src/adapter.c:7527
-> #2  settings_changed (settings=<optimized out>, adapter=0x55a17e6889d0) at src/adapter.c:622
-> #3  new_settings_callback (index=<optimized out>, length=<optimized out>, param=<optimized out>, user_data=0x55a17e6889d0) at src/adapter.c:705
-> #4  0x000055a17e59981e in queue_foreach (user_data=0x7ffe49a7ef20, function=0x55a17e591e60 <notify_handler>, queue=0x55a17e683280) at src/shared/queue.c:207
-> #5  queue_foreach (user_data=0x7ffe49a7ef20, function=0x55a17e591e60 <notify_handler>, queue=0x55a17e683280) at src/shared/queue.c:190
-> #6  process_notify (param=<optimized out>, length=<optimized out>, index=<optimized out>, event=<optimized out>, mgmt=0x55a17e682f30) at src/shared/mgmt.c:349
-> #7  can_read_data (io=<optimized out>, user_data=0x55a17e682f30) at src/shared/mgmt.c:409
-> #8  0x000055a17e5bb679 in watch_callback (channel=<optimized out>, cond=<optimized out>, user_data=<optimized out>) at src/shared/io-glib.c:157
-> #9  0x00007f876edd4e5c in g_main_context_dispatch_unlocked.lto_priv () from target:/lib64/libglib-2.0.so.0
-> #10 0x00007f876ee2ff18 in g_main_context_iterate_unlocked.isra () from target:/lib64/libglib-2.0.so.0
-> #11 0x00007f876edd6447 in g_main_loop_run () from target:/lib64/libglib-2.0.so.0
-> #12 0x000055a17e4f1d64 in mainloop_run () at src/shared/mainloop-glib.c:66
-> #13 mainloop_run_with_signal (func=0x55a17e544740 <signal_callback>, user_data=0x0) at src/shared/mainloop-notify.c:188
-> #14 main (argc=<optimized out>, argv=<optimized out>) at src/main.c:1455
+$ git show 81526f2920bf8a03b670dbc2d45f35f204344d55
+commit 81526f2920bf8a03b670dbc2d45f35f204344d55
+Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date:   Wed Jan 31 11:24:19 2024 -0500
 
-First time submitter here, should I resubmit/start a new thread for this 
-"V2" approach?
+    Bluetooth: hci_event: Fix not indicating new connection for BIG Sync
 
-Thanks
+    [ Upstream commit eeda1bf97bb500a901f7a9ee5615bad2160f2378 ]
 
-D.
+    BIG Sync (aka. Broadcast sink) requires to inform that the device is
+    connected when a data path is active otherwise userspace could attempt
+    to free resources allocated to the device object while scanning.
+
+    Fixes: 1d11d70d1f6b ("Bluetooth: ISO: Pass BIG encryption info through
+QoS")
+    Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+...
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
