@@ -1,158 +1,101 @@
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2115.outbound.protection.outlook.com [40.107.21.115])
+Received: from forward200a.mail.yandex.net (forward200a.mail.yandex.net [178.154.239.93])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A515483A0A
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Apr 2024 11:41:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.115
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712230895; cv=fail; b=t5mFlKCV81htgTj4PI2su/txb1JNp9U/irn1snuOjV3ld5Xq2ihLsoGTR49DIUGmiTx6gXKUtXVEBdKzgWFzwnQirj/NB2Q+siPCW7HyXC1bSecWFJrcOboz9blQDe63FYoMTTy/8HS0lL95kXtAePEwO2v/uKqmAYbJyS8YimU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712230895; c=relaxed/simple;
-	bh=l9sOdYXIihnKxG3b9JJ/W7PMJ7bORjYf/mwo6eYP8CY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=meLqLIGvROTtiKEJ4gtGF6egSFF8npC3GxX2DKR0rJTKfSrXSOJtXzvpUGwzZ3+PCLda4btv1CPowVaVwNjXZN9TKFVN+H7n6GJge0es8v8xsPqI9IcEd0MNqaE7kbYNOBRRvcQVfsCh0e0YcxI9tNjM/TH8zPDNX/ducSXwPMI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=AcXWVvGl; arc=fail smtp.client-ip=40.107.21.115
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0536B83A09
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Apr 2024 12:02:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.93
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712232183; cv=none; b=Q76SwEyHqKNxUJzcckd4CE8BB/F1sy7maQJnwbQqPN8SOOXP77qDqdU5hOT9GgbbxAthHKVzdPeJ/GEFg4IpNWoKNKBoPMP+EJTEVOTnibv7sZVyDwQ+txRHko9sJyY24V9ixbuvlxyMI6BicjoBVXhV7MUmOXv5WgrR63k/l4I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712232183; c=relaxed/simple;
+	bh=VPzVFvUfOroAkxKVkn05FAwf4T6cwbY0BWXxzmjzz0s=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=u5jKfm7ajrT7oTun/8xDhM+313SSFxEDv9khKnLbiUfjxkNqdajVkP/iZoypQOsjqdAJ/+b6GvI3psFGsQUQ8amLD1zFtZEBr42eaRRJyhVyyV0vxeG2Z184PaGTBNBtOE6SbnbeAuqJGznS8FlYgIgT9BqSl7aBupExsgS85eY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=Oil/KrEt; arc=none smtp.client-ip=178.154.239.93
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="AcXWVvGl"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=V2mcnUm4rmzcy0mgQxPhXbPe+IXX9ucVFDqZMC699v7DykdEhAZS9+rpPUXFyAxM5Wxg8sgOtgcWP+vXZ2MaPGJ5Be9JvRu5mREsoSIt4Ekl8f3+gHRg/npGg/jfxwbE2R2lQ8ZzT8cTwJn7IWROXEZvDXerYdI+rAWLYXKcWMRUAUFXPAVEWyAQQ1DEY5uQjtpStQ/OhTe38hPbim8IUt7eKSwhlnG+iurcjDQy8JchsbNtiy6LMvY4B5sCUFFalVTqgOOKxjogeQKyxwiqxC7ljpQrS4Kyxnm4rSDHQ8U0lA0BtjuJ0BPyXUXutf+xW87wSLX55MoiduIiXibFzw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Hda8y0MGDXQi3/w8040VUnrydqBquzD20ZLwcx34OKs=;
- b=NR0aS1v7xdltWr2sxUQbOnMoPjPfyq8DnINlzW2UVI5FBAqSRe+kh0JHt9sMIAj8+v2shDO00g2WcLjUzW4cDibH8/gyf+xSkKrPDadWQhyPth/pjpfjmXMdWRSj0HRDXZx4TBHzEebhUg1LHdufQApBBENO7+I78psbkTUlc8ik2lIDBAMQWmV2F6nmF0NujWSUkRdDi8JNIy+MIW7wCEGZDZH5nUzeJKM4hybOqf5LrKyt2xZVZ36RM7GLb8EMc7eiUvZ8j4pzidxd24y/0DYSKYPnfxOp7NLHUFQ5xUQIwDmWU3hx86spnz/2qVzUpQx8ANEju/AT61THCfnF+Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Hda8y0MGDXQi3/w8040VUnrydqBquzD20ZLwcx34OKs=;
- b=AcXWVvGlYHxirfIB5KZcsIwCOfufeGyGt8jgbVQ+rq8tIkep6waOU7Divm+26gEQKLBcaYjNJfrvGQ1rQVFC/TZxR1GvX+8O6DQglvCNxO2tAIWU7Sw55wugjJQ9RgJrtzqIkJP0Xk8B1iaWx91migcnL3Ik0x243rDVTV+n2Zw=
-Received: from AS5PR04MB9754.eurprd04.prod.outlook.com (2603:10a6:20b:654::9)
- by PA1PR04MB10443.eurprd04.prod.outlook.com (2603:10a6:102:450::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Thu, 4 Apr
- 2024 11:41:27 +0000
-Received: from AS5PR04MB9754.eurprd04.prod.outlook.com
- ([fe80::5fa0:979d:f0e1:a28e]) by AS5PR04MB9754.eurprd04.prod.outlook.com
- ([fe80::5fa0:979d:f0e1:a28e%3]) with mapi id 15.20.7409.042; Thu, 4 Apr 2024
- 11:41:27 +0000
-From: Mahesh Talewad <mahesh.talewad@nxp.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: devyani.godbole@nxp.com,
-	luiz.dentz@gmail.com,
-	sarveshwar.bajaj@nxp.com,
-	mahesh.talewad@nxp.com
-Subject: [PATCH BlueZ v2 1/1] Increase autoconnect timeout max from 16.384s to 20.480s
-Date: Thu,  4 Apr 2024 14:40:54 +0300
-Message-Id: <20240404114054.4987-2-mahesh.talewad@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240404114054.4987-1-mahesh.talewad@nxp.com>
-References: <20240404114054.4987-1-mahesh.talewad@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SG2P153CA0001.APCP153.PROD.OUTLOOK.COM (2603:1096::11) To
- AS5PR04MB9754.eurprd04.prod.outlook.com (2603:10a6:20b:654::9)
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="Oil/KrEt"
+Received: from forward102a.mail.yandex.net (forward102a.mail.yandex.net [IPv6:2a02:6b8:c0e:500:1:45:d181:d102])
+	by forward200a.mail.yandex.net (Yandex) with ESMTPS id B302867141
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Apr 2024 14:56:26 +0300 (MSK)
+Received: from mail-nwsmtp-smtp-production-main-54.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-54.vla.yp-c.yandex.net [IPv6:2a02:6b8:c18:3d80:0:640:1395:0])
+	by forward102a.mail.yandex.net (Yandex) with ESMTPS id B99CC60C6D;
+	Thu,  4 Apr 2024 14:56:18 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-54.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id GuSJ98AETeA0-WC39XwCo;
+	Thu, 04 Apr 2024 14:56:18 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1712231778; bh=VPzVFvUfOroAkxKVkn05FAwf4T6cwbY0BWXxzmjzz0s=;
+	h=Cc:To:Subject:From:Date:Message-ID;
+	b=Oil/KrEtHhZaWHJCCgsQ5iDgO0Cc3LWIJnGL7gMeFyShtzd8SJIt7NQXbJP8Wwh+I
+	 lYV2liIsBtZP4MlP4YwbTUXP5xDxrKrGGYWQqr+Yl2BQmoOmcoiijuZrEK4mwm9rEQ
+	 xgBwIFt7pLDuv1a2fSV5wIOdKKtPteTVHsOxph2M=
+Authentication-Results: mail-nwsmtp-smtp-production-main-54.vla.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+Message-ID: <b8e08d30-1ac4-4b59-890a-a2ba8cce1d4f@yandex.ru>
+Date: Thu, 4 Apr 2024 14:56:16 +0300
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS5PR04MB9754:EE_|PA1PR04MB10443:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	/5D612nCx1QRqgOf5L3CEljAgvQDdKbFWuCewxze0+ygNsv14wPmm/dS17/7iTYDRK1jjNSK2xz8W8NbYKn/RaU1ezkftjK7SDp45JbwV5amJxqikyOtzf2nMowSKC7wwlNOl7fXyFvwlyJfsr+eAKXXvHfYRDqYu0zXTutN78RGTmn8pFlZNPNm2y80fauxVlNUIfx7giFOnLe2OPsrkqll+adw5aDjgLD7H8hDv6rQeINAP4iXMHC70yC6e6nFUjhfs2bLypc5kVHX/3BPHoSkcLP12PgUx1C1cDjmVl7NDiccu92JqV3MPtqq6YK/WPoeDVGoXsrbCfb/SZwHHFjQPMNMifiQPAsbWwmjYLOLZJ0cI+1rcVsFfBfi4PV6ATEA/n7KTOJk+PTm0n5l1JGdQMPonz1PHhqveCKX8sGBieD6g0QBXVJvz4SBwhiNrjyFruroIcP6yO2TBmJ5E/gzHZ72/AiHXE72aH47Zcd6lAAN1nnQrFPIChgS0oYV75rkeKcSwcoVNqFyPXT/CgGvYPxHSPT7kpCNQedWkEAXZtOnyCmEx4iob6juGcxuWxCuC/lsyTpT4AjbE59Q71jAbnE+8P3W1HVKCHTo5rVDoqOC+tUi07qJORIiWpEUocmbmoUW6H8uDTVwUSgWsFKQdJ7o6Z75WjnrF73qbJ4Aj1R6xSUFe5Q8P/jscU6seLLFZeGVfimAjbgmlLoLXQ==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS5PR04MB9754.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(52116005)(1800799015)(376005)(366007)(38350700005);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?ljnfFPufk2iOhSE2j7n29gOknRCpFZibs5kLVINxVk1peHVQ0TJNQUHKBDyo?=
- =?us-ascii?Q?zxZEcrIGrGCXMsIp96mSEK2uLhk1uixdf0pjjNtQEFwm5BVZnn9yz+0kcvaA?=
- =?us-ascii?Q?tC0mo3GfVfKSykBD8mvtfAQj7a9FzAfsZKd9OSB/xXQORZ24RJlsV2xNnYL8?=
- =?us-ascii?Q?3ycgUPswy14EcwUAZp1qoFjehrBDE7ty7sth2Gd6qYPasVn7SMW3m/JbN0PT?=
- =?us-ascii?Q?45461vKZe+NxNS/ieB7uKBXAZpVRnYqdd2tv+8S2sihsVvkkVwCqCjfLE5Gn?=
- =?us-ascii?Q?nKGQMjWH83pHNX+NjYwT1yvIA6RNQwJZLiXtMFqg1ZeU6jQCw6Yz96IVcMk/?=
- =?us-ascii?Q?VW21v6UXtzHZnxB2rarXAY1A5Eq29CUGNlsRf3rXC2/yGAy9CM0GI3HIAqPI?=
- =?us-ascii?Q?IYxwU5sfrFBvw8Rn4QbWoxNC/y0SPy6LglL/Nc9Lp21qEKU59MzBQE9cQE7b?=
- =?us-ascii?Q?d14iP1RrO8j/bHgQlTE6Jbia8p98IG2/ZokcbkSlIvHoVCxFO0j4olTg/n9R?=
- =?us-ascii?Q?THwhZgM80zm+58WCCeO3Qt1DigxoNv5OmdAgZ550CvrvuVGQVQ7hBQAlKSOP?=
- =?us-ascii?Q?qokT2CLqQ4DVseRtXwMRjfN1tz4A7LoGp/RXI+yeZ19le1Ky8dfGx8zhHj6D?=
- =?us-ascii?Q?c4pwdbzmwdIDz51wCcm7SwM7Q7aKMjO3ZN5iKya7aMtA0QwAe+6d3Ie3G30k?=
- =?us-ascii?Q?F/fhGVluneq/IkFAnLgjKnRTYx27gVLvHzfIkf3bBTrYvyqxork+iv8LAP7E?=
- =?us-ascii?Q?OquRJSayRN/gEp0jZMHFEcHl7/9b0ERy7ShEVIAEKPFZFSdtTVURckW/aj0r?=
- =?us-ascii?Q?HAe/7zBQKdmMAiG5JAble/laoU7ANN1qMBUk8xU0Ya722pH5BodMNuZPYWym?=
- =?us-ascii?Q?HOaYsMz7U5AQ7Suv1wkRDBjw7JjN+mpLWAJjjRYjB1amlx5vpYkWBhfSq74K?=
- =?us-ascii?Q?eR2RZmKsWscDAhBad6rZzvVBlrnNOvG2F0NawbH/wXaFulJgKhk5m3RqVPhd?=
- =?us-ascii?Q?iKl3JaWqPsiJbBf9ykw6oKhS4yzIyvJzSMLewhmeG5zjTMP85cCKD0EOQhky?=
- =?us-ascii?Q?dMWBu2kLXARI9SnMx3DulBZJA9LoWQoYzDQpk9XEeeJIocFg+kabqkdm/FR5?=
- =?us-ascii?Q?5Rm/JKNK073PAscAmc+tvgewLWo2k5xMAt7fmSmHIN2wo46ljA0K8D+hMJ5S?=
- =?us-ascii?Q?O6BHpcaufA1iNNeZufYB+YRaIvWz5mAwxZWMc/XWnf/mDQUTNT1bk6NvE9Kf?=
- =?us-ascii?Q?rN1dtu1lPFsa5SE23iOE6c/K0CiOHz48sNkwAmCshfpIjDBxQDhCf5z1sRR9?=
- =?us-ascii?Q?gXA3KvIRAmGVMji08go+ya5tgMUpLx70/OZbWS+/bGDtmZ5kQ8f3fuQnunmR?=
- =?us-ascii?Q?fznBSJWZmfbByqpcWmXnk/bG+TRRQwRtMsfW7BsAwBq2BhkfJYNbqyWWPqZa?=
- =?us-ascii?Q?pbxLno7F4nQoqt0lmPgNpXDpq/Oa3MckQNQwngdY9K9y9JdeOiGmczyTMoVF?=
- =?us-ascii?Q?Jmp8KGMx5B9D99bNUURcUHj7cGlH+boWOOaNjwRy7jqv9dEf7Va0AXlYrPpE?=
- =?us-ascii?Q?9tcvuKNzytcKVEGGrlzb2bX4P7RCPPPlKKpl6yVfg0xmN7VpIzXjYYI+vqbB?=
- =?us-ascii?Q?EA=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3f591f88-082c-45f1-07ff-08dc549c29ff
-X-MS-Exchange-CrossTenant-AuthSource: AS5PR04MB9754.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Apr 2024 11:41:27.8482
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: pXRRuvxDiCMq9Y0DqXVPtwawXwYnedFL3/x6ncEpRp7ynYUE3F+tJI8jraB1+UhGGYU+NOQHhl69w9DmlIzgow==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA1PR04MB10443
+User-Agent: Mozilla Thunderbird
+From: Dmitry Antipov <dmantipov@yandex.ru>
+Subject: On https://syzkaller.appspot.com/bug?extid=4c0d0c4cde787116d465
+To: Hillf Danton <hdanton@sina.com>
+Cc: linux-bluetooth@vger.kernel.org,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Content-Language: en-US
+Autocrypt: addr=dmantipov@yandex.ru; keydata=
+ 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
+ A/UwwXBRuvydGV0=
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
- - In current implementation Autoconnecttimeout max value is
-   16384[0x4000] msecs.
- - Since some controllers need some more time to respond to cmd
-   'LE Extended Create Connection' hence increased this
-   Autoconnecttimeout max value to 20480[0x5000] msecs.
+Hillf,
 
-For ex:
-- In some controllers, If we include LE-Coded PHY in the initiating
- PHY List, BLE INIT scheduler selects the 1M and Coded PHY scanning
- as an initiator in round robin manner, and due to this available
- bandwidth gets distributed between 1M and Coded PHY, and this
- results in longer time taken for connection establishment by
- the controller.
-- If ref device is advertising at 1.5 sec intervals, with create
- connection timeout of 4 sec,  the controller gets only 2 opportunities
- for the connection. Without the inclusion of LE-coded PHY,
- DUT takes ~3.8 sec for the connection establishment.Hence as described
- in above point  with the inclusion of LE-coded PHY it is difficult to
- achieve 100% connection success with the device having
- adv interval of 1.5 sec.
+first of all I should say that I'm new to bluetooth and may misunderstand something.
 
-Hence increased Autoconnecttimeout max value to 20480[0x5000] msecs.
+IIUC your patch at https://syzkaller.appspot.com/text?tag=Patch&x=15faf610e80000
+assumes that an instances of 'struct sco_conn' can share the same 'struct sock'
+(that's why an extra calls to 'sock_hold()' was added). OTOH my patch at
+https://lore.kernel.org/linux-bluetooth/20240403142706.25748-1-dmantipov@yandex.ru/T/#t
+assumes that this is wrong because SCO (by definition) is a point-to-point
+link between the master device and a specific slave device, and prevents
+from creating such a sharing instead. So the question is: should we always
+assume 1:1 relationship between SCO connection and kernel socket?
 
-Signed-off-by: Mahesh Talewad <mahesh.talewad@nxp.com>
----
- src/main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Any comments are highly appreciated, thanks in advance.
 
-diff --git a/src/main.c b/src/main.c
-index f774670e4..081a388ad 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -657,7 +657,7 @@ static void parse_le_config(GKeyFile *config)
- 		  &btd_opts.defaults.le.autoconnect_timeout,
- 		  sizeof(btd_opts.defaults.le.autoconnect_timeout),
- 		  0x0001,
--		  0x4000},
-+		  0x5000},  /*max val: 20480 msec*/
- 		{ "AdvMonAllowlistScanDuration",
- 		  &btd_opts.defaults.le.advmon_allowlist_scan_duration,
- 		  sizeof(btd_opts.defaults.le.advmon_allowlist_scan_duration),
--- 
-2.34.1
-
+Dmitry
