@@ -1,54 +1,54 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EE6284FD4
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Apr 2024 12:36:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36B4B1EB56
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Apr 2024 12:47:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712234167; cv=none; b=Y8KN9db5U+q1WDElMDB0Y6vr+lsmq9tk8YS88z3rxToPEB2wowxoo0ctTsr60f+/KDSxyXnBFJ10ReyAKAklFHv1Xxobblvq5TIT02SZhLxvvJyOnLkCkJiO/jUJ0CGsAyrm4fjasxj/eYM24nH8P28qOIv5cDVwol2mKs4JPDE=
+	t=1712234848; cv=none; b=a0qMk6Vz1E0SEN8V0sZtzDdu+TKSEym2mrEWZBvia02U71WhqmUfA9pqzBurq2qu5P0FCGff6efkJ4OolS2oSyFzJG/XbaqssIToNOMnFWZIitczsUDx48Znnk4e3i9eBTx/Ss/2fUsl2n9PDPunSmba+6/czUzlWOib/TuJ7AE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712234167; c=relaxed/simple;
-	bh=KbwE1NsHi4AsfJ/IYfPczDgTVOEGvOzaRygH0/pznYg=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=GOLANljPUuq2f6T4co2y4lQTKQQ2GJB+jGAA9qqJwdU27xYkoNByG2R9aYRB6FL92DxuotyrFU6RUhlzPTQwTMBCJzj38T04SlQKB1j9m5+Fp75kVaFIR724jJNuOJui2WlmY8ZqDBCuo6j9cC+VuXoRkwYaTjWo8iGNhAuYtGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gztEV7kJ; arc=none smtp.client-ip=209.85.219.201
+	s=arc-20240116; t=1712234848; c=relaxed/simple;
+	bh=6vPwNnUm5wuszzwF3/evPWmXn7z7IG8kXOsBsz0DM3U=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=dn0Vc3dRyKt7u4+zFy6AV2etlZFYZw+x603seVBsDD7YtGyIVMCQV9aAZkvziiJ4BOFLVFX3lPOZRVuJR4HxlxzEawmfC0CQ4Ds/ZA5j0ploG6ozb0LGASHcWJbhbytJ9WQRK23qwvJu2ZH/RTE3mElO7IpOTW9Qp/JzFpTeO10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tTUGywXd; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gztEV7kJ"
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dccc49ef73eso1555863276.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Apr 2024 05:36:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tTUGywXd"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-614245201b6so14887277b3.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Apr 2024 05:47:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712234164; x=1712838964; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1712234844; x=1712839644; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=rOiU0W7g05Pn+3o4Fvvf1842pVs7ifW1bDAtFcu8LVE=;
-        b=gztEV7kJTngt9pukiTrjBPXh760H2mzmIW67sfvqvkmPKnwwyWQYb1Y/K/pmyDtmYr
-         MH0MV1QEOJyZDsvea0vuIPxGVSE3ZmpnPdtj2hVFkoOS2H2cgw/ZKy0ezq2ywi5v5/eM
-         ++jpmmDjEng/h/F6rbX3DFp7IS5gPwCoojeqOgZ7caXfDLvjNFbtN/kRf/7y+AlMGjKn
-         qLDVzmly/6rDpqRHfZgcX1e3T8lrinObZVPe6wGY+QWmY6mFdK3yn++CIJ3Pc08u3way
-         fTT2QJE02UtaoYTuGHW+viu17+2QaA3s55ITH6AHBYgJhIqGoAJ4o+t1k3bfjm1ZQLPn
-         UGaQ==
+        bh=rdveWuoQPuCrzsfRXyCupWB141FzfSWpZKcqBv79Nsg=;
+        b=tTUGywXdrvORw85yqzjXSxDRHkD5kbOx3QnaaOM5bm3KiL5O/ZPgcBG0p7W1iru+lX
+         jshu+LNTu6VSmXQqonklkxPAIGvtHhuUy+6bcQVuxxH2aNR+LbhIkWdnIIJeaykWFq3O
+         +fEtymQP1HYHtzaehHZmkbX+/W7U5llt9OYSV7ux/tYzw/wWo52txCzb0NTkF+n1jl3d
+         dZaIgflqTXVI5ppzuQq8AdcqoIuYqwC3q7awXtJV8ywb+aYF6N3y+RucyLxrFcoaHc7V
+         fpxMG/Nxs1nthWl8lifu6UcHmvYiObHYbrxoC8NlIN+V88GKWFpPZjCaEdVt6q0/ePEo
+         pwNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712234164; x=1712838964;
+        d=1e100.net; s=20230601; t=1712234844; x=1712839644;
         h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=rOiU0W7g05Pn+3o4Fvvf1842pVs7ifW1bDAtFcu8LVE=;
-        b=UJe+fLrwdwtx2mvnURnObullaY9ndIUPJQ3s3x4LVqEHcX2bBJuFuwCp/eEaBli7J4
-         p8mN1nGrqRqLbLT5xALM6Pyhy4o+RQDsPai+z1W1K530LFH9so5QEkAIj6bPE8SF31TX
-         RJhuF2ex/Vc+lNhyRD0r07YYNxKrk7MCMyRCu87Az0eXNaERd7GUhYeIVoyeGgzPBpl+
-         SHSColJM/lqhQBnS/jqpmySAq8maFl5HbHGr5iQx85Ym9v88pAv1EltR5g5uySlrj+1r
-         CWFH44lcHMtbiAbHT58lMG16YXDLcFE0HQ+op0ULZlIXrU9GhfAN732PnB60EnblapOb
-         mdsw==
-X-Forwarded-Encrypted: i=1; AJvYcCUQpCktVasbruNgEnv6LgcIfDhZYap1iq4gwAQy2QxBdijp7+EB4Ej37YRuxUZMsu+K/NQFOOMtYrPDZjeG0HOLBxYL+gONLjM5yZpXyKDz
-X-Gm-Message-State: AOJu0YxL/g8NWRxlOILgBR5OHLUNi8J9z1R2qALjk7GeuASin6M+7Xw2
-	olcU/soHeaHijO2qSKShpJ1LQ6Dza43I9dttbjcsV2RWJHIjYp4vFrkQistD0zeQsV7fO4tWM30
-	bL7h6almvxw==
-X-Google-Smtp-Source: AGHT+IFCwGdWEqbhqz8fH0WtZRrISgIEZTiTSugvTR/R00vwE4Rn2LMkc0EJ7bgdybk9D+O4A8/KqjvdaoFPGg==
+        bh=rdveWuoQPuCrzsfRXyCupWB141FzfSWpZKcqBv79Nsg=;
+        b=d/wvF6dp/Yvq9qUBEDntY6NGSteTotChveoRFz52fhMaFGkTD2WCJBuilO55WQ0bt5
+         PamkpA71HfJVeb+qBGBqtMbHwHjaOiZtsXFQl4YvWd8mNjw1rkfVWFJdQOEdkGEU9L97
+         bMOXOsVPIdl4t3XDLx5YXkVSV7S78TvtweoF5F0osMRclOa6oPehXLWdhRjTzRDYShxw
+         So2eLdvx0NE8aUxST+vOxwmg/gpMtll8DYJwhPFNG6VsWEmmYsjCJZmB9ETbfO/XsrM1
+         53NPaGkQVUZcky97qCEGmbx/JIV+rBsMxol0A8rb3jeoJg5FYzX2ldzD3+0jgwV/770i
+         AZzg==
+X-Forwarded-Encrypted: i=1; AJvYcCUEDkFVgtror7Oz/xzoctkVaTAjfO11H3eLtihAP3hgYMDn1oDY/kc8qKlSflwkPWGV17mz2Q24sJZajxSPoXC7glgoAXjBs5aGMwBRAEqT
+X-Gm-Message-State: AOJu0YydrCnNDybzUOnkSCfv5QLuLTOVPSKLuI+RDL+vwtApMxh/K+5k
+	CmNbBqvQeQUqImTA8h6HnlSYFYZN8YvOENQkJ185ux+yLuR9Bh7naqzGbBGcWYYciWys7j+RRFv
+	ikYQ8tRVzsA==
+X-Google-Smtp-Source: AGHT+IFO+JRVGYl9OmjhcAndcYTpXEYeF2mL/4Wm2MkAAZ0zDuz58o78Rrf+qKBgWVFdRGlqUDCS2zVr1f/u6g==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:1083:b0:dc2:2ace:860 with SMTP
- id v3-20020a056902108300b00dc22ace0860mr225975ybu.2.1712234164328; Thu, 04
- Apr 2024 05:36:04 -0700 (PDT)
-Date: Thu,  4 Apr 2024 12:36:02 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:6902:102b:b0:dcc:6065:2b3d with SMTP
+ id x11-20020a056902102b00b00dcc60652b3dmr607745ybt.8.1712234844323; Thu, 04
+ Apr 2024 05:47:24 -0700 (PDT)
+Date: Thu,  4 Apr 2024 12:47:23 +0000
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -56,9 +56,8 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240404123602.2369488-1-edumazet@google.com>
-Subject: [PATCH net] Bluetooth: validate setsockopt( BT_PKT_STATUS /
- BT_DEFER_SETUP) user input
+Message-ID: <20240404124723.2429464-1-edumazet@google.com>
+Subject: [PATCH net] Bluetooth: validate setsockopt(RFCOMM_LM) user input
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -68,15 +67,16 @@ Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-syzbot reported sco_sock_setsockopt() is copying data without
+syzbot reported rfcomm_sock_setsockopt_old() is copying data without
 checking user input length.
 
  BUG: KASAN: slab-out-of-bounds in copy_from_sockptr_offset include/linux/sockptr.h:49 [inline]
  BUG: KASAN: slab-out-of-bounds in copy_from_sockptr include/linux/sockptr.h:55 [inline]
- BUG: KASAN: slab-out-of-bounds in sco_sock_setsockopt+0xc0b/0xf90 net/bluetooth/sco.c:893
-Read of size 4 at addr ffff88805f7b15a3 by task syz-executor.5/12578
+ BUG: KASAN: slab-out-of-bounds in rfcomm_sock_setsockopt_old net/bluetooth/rfcomm/sock.c:632 [inline]
+ BUG: KASAN: slab-out-of-bounds in rfcomm_sock_setsockopt+0x893/0xa70 net/bluetooth/rfcomm/sock.c:673
+Read of size 4 at addr ffff8880209a8bc3 by task syz-executor632/5064
 
-CPU: 1 PID: 12578 Comm: syz-executor.5 Not tainted 6.8.0-syzkaller-08951-gfe46a7dd189e #0
+CPU: 0 PID: 5064 Comm: syz-executor632 Not tainted 6.8.0-syzkaller-08951-gfe46a7dd189e #0
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
 Call Trace:
  <TASK>
@@ -87,25 +87,26 @@ Call Trace:
   kasan_report+0x143/0x180 mm/kasan/report.c:601
   copy_from_sockptr_offset include/linux/sockptr.h:49 [inline]
   copy_from_sockptr include/linux/sockptr.h:55 [inline]
-  sco_sock_setsockopt+0xc0b/0xf90 net/bluetooth/sco.c:893
-  do_sock_setsockopt+0x3b1/0x720 net/socket.c:2311
+  rfcomm_sock_setsockopt_old net/bluetooth/rfcomm/sock.c:632 [inline]
+  rfcomm_sock_setsockopt+0x893/0xa70 net/bluetooth/rfcomm/sock.c:673
+  do_sock_setsockopt+0x3af/0x720 net/socket.c:2311
   __sys_setsockopt+0x1ae/0x250 net/socket.c:2334
   __do_sys_setsockopt net/socket.c:2343 [inline]
   __se_sys_setsockopt net/socket.c:2340 [inline]
   __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2340
- do_syscall_64+0xfd/0x240
+ do_syscall_64+0xfb/0x240
  entry_SYSCALL_64_after_hwframe+0x6d/0x75
-RIP: 0033:0x7f3c2487dde9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f3c256b40c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000036
-RAX: ffffffffffffffda RBX: 00007f3c249abf80 RCX: 00007f3c2487dde9
-RDX: 0000000000000010 RSI: 0000000000000112 RDI: 0000000000000008
-RBP: 00007f3c248ca47a R08: 0000000000000002 R09: 0000000000000000
-R10: 0000000020000080 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000004d R14: 00007f3c249abf80 R15: 00007fff5dcf4978
+RIP: 0033:0x7f36ff898dc9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 91 18 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffe010c2208 EFLAGS: 00000246 ORIG_RAX: 0000000000000036
+RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f36ff898dc9
+RDX: 0000000000000003 RSI: 0000000000000012 RDI: 0000000000000006
+RBP: 0000000000000006 R08: 0000000000000002 R09: 0000000000000000
+R10: 00000000200000c0 R11: 0000000000000246 R12: 0000555567399338
+R13: 000000000000000e R14: 0000000000000000 R15: 0000000000000000
  </TASK>
 
-Allocated by task 12578:
+Allocated by task 5064:
   kasan_save_stack mm/kasan/common.c:47 [inline]
   kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
   poison_kmalloc_redzone mm/kasan/common.c:370 [inline]
@@ -120,23 +121,23 @@ Allocated by task 12578:
   __do_sys_setsockopt net/socket.c:2343 [inline]
   __se_sys_setsockopt net/socket.c:2340 [inline]
   __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2340
- do_syscall_64+0xfd/0x240
+ do_syscall_64+0xfb/0x240
  entry_SYSCALL_64_after_hwframe+0x6d/0x75
 
-The buggy address belongs to the object at ffff88805f7b15a0
+The buggy address belongs to the object at ffff8880209a8bc0
  which belongs to the cache kmalloc-8 of size 8
 The buggy address is located 1 bytes to the right of
- allocated 2-byte region [ffff88805f7b15a0, ffff88805f7b15a2)
+ allocated 2-byte region [ffff8880209a8bc0, ffff8880209a8bc2)
 
 The buggy address belongs to the physical page:
-page:ffffea00017dec40 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x5f7b1
+page:ffffea0000826a00 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x209a8
 flags: 0xfff00000000800(slab|node=0|zone=1|lastcpupid=0x7ff)
 page_type: 0xffffffff()
-raw: 00fff00000000800 ffff888014c41280 ffffea0000a26d80 dead000000000002
+raw: 00fff00000000800 ffff888014c41280 ffffea000081fb80 dead000000000002
 raw: 0000000000000000 0000000080800080 00000001ffffffff 0000000000000000
 page dumped because: kasan: bad access detected
 page_owner tracks the page as allocated
-page last allocated via order 0, migratetype Unmovable, gfp_mask 0x12cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY), pid 5091, tgid 5091 (syz-executor.3), ts 75758857522, free_ts 75730585588
+page last allocated via order 0, migratetype Unmovable, gfp_mask 0x12cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY), pid 1, tgid 1 (swapper/0), ts 9917548498, free_ts 0
   set_page_owner include/linux/page_owner.h:31 [inline]
   post_alloc_hook+0x1ea/0x210 mm/page_alloc.c:1533
   prep_new_page mm/page_alloc.c:1540 [inline]
@@ -152,51 +153,29 @@ page last allocated via order 0, migratetype Unmovable, gfp_mask 0x12cc0(GFP_KER
   __slab_alloc_node mm/slub.c:3663 [inline]
   slab_alloc_node mm/slub.c:3835 [inline]
   __do_kmalloc_node mm/slub.c:3965 [inline]
-  __kmalloc_node_track_caller+0x2d6/0x4e0 mm/slub.c:3986
-  kstrdup+0x3a/0x80 mm/util.c:62
-  __kernfs_new_node+0x9d/0x880 fs/kernfs/dir.c:611
-  kernfs_new_node+0x13a/0x240 fs/kernfs/dir.c:691
-  kernfs_create_dir_ns+0x43/0x120 fs/kernfs/dir.c:1052
-  sysfs_create_dir_ns+0x189/0x3a0 fs/sysfs/dir.c:59
-  create_dir lib/kobject.c:73 [inline]
-  kobject_add_internal+0x435/0x8d0 lib/kobject.c:240
-  kobject_add_varg lib/kobject.c:374 [inline]
-  kobject_init_and_add+0x124/0x190 lib/kobject.c:457
-  netdev_queue_add_kobject net/core/net-sysfs.c:1786 [inline]
-  netdev_queue_update_kobjects+0x1ee/0x5f0 net/core/net-sysfs.c:1838
-  register_queue_kobjects net/core/net-sysfs.c:1900 [inline]
-  netdev_register_kobject+0x265/0x320 net/core/net-sysfs.c:2140
-page last free pid 5103 tgid 5103 stack trace:
-  reset_page_owner include/linux/page_owner.h:24 [inline]
-  free_pages_prepare mm/page_alloc.c:1140 [inline]
-  free_unref_page_prepare+0x968/0xa90 mm/page_alloc.c:2346
-  free_unref_page_list+0x5a3/0x850 mm/page_alloc.c:2532
-  release_pages+0x2744/0x2a80 mm/swap.c:1042
-  tlb_batch_pages_flush mm/mmu_gather.c:98 [inline]
-  tlb_flush_mmu_free mm/mmu_gather.c:293 [inline]
-  tlb_flush_mmu+0x34d/0x4e0 mm/mmu_gather.c:300
-  tlb_finish_mmu+0xd4/0x200 mm/mmu_gather.c:392
-  exit_mmap+0x4b6/0xd40 mm/mmap.c:3300
-  __mmput+0x115/0x3c0 kernel/fork.c:1345
-  exit_mm+0x220/0x310 kernel/exit.c:569
-  do_exit+0x99e/0x27e0 kernel/exit.c:865
-  do_group_exit+0x207/0x2c0 kernel/exit.c:1027
-  __do_sys_exit_group kernel/exit.c:1038 [inline]
-  __se_sys_exit_group kernel/exit.c:1036 [inline]
-  __x64_sys_exit_group+0x3f/0x40 kernel/exit.c:1036
- do_syscall_64+0xfd/0x240
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
+  __kmalloc+0x2e5/0x4a0 mm/slub.c:3979
+  kmalloc_array include/linux/slab.h:665 [inline]
+  kcalloc include/linux/slab.h:696 [inline]
+  group_cpus_evenly+0x294/0x5f0 lib/group_cpus.c:365
+  blk_mq_map_queues+0x4c/0x3e0 block/blk-mq-cpumap.c:23
+  blk_mq_alloc_tag_set+0x7ac/0xf40 block/blk-mq.c:4521
+  nbd_dev_add+0x367/0xc80 drivers/block/nbd.c:1831
+  nbd_init+0x224/0x2e0 drivers/block/nbd.c:2593
+  do_one_initcall+0x238/0x830 init/main.c:1241
+  do_initcall_level+0x157/0x210 init/main.c:1303
+  do_initcalls+0x3f/0x80 init/main.c:1319
+  kernel_init_freeable+0x435/0x5d0 init/main.c:1550
+page_owner free stack trace missing
 
 Memory state around the buggy address:
- ffff88805f7b1480: 05 fc fc fc 05 fc fc fc fa fc fc fc 05 fc fc fc
- ffff88805f7b1500: 05 fc fc fc 05 fc fc fc 05 fc fc fc 05 fc fc fc
->ffff88805f7b1580: 04 fc fc fc 02 fc fc fc fa fc fc fc 05 fc fc fc
-                               ^
- ffff88805f7b1600: fa fc fc fc 05 fc fc fc fa fc fc fc 05 fc fc fc
- ffff88805f7b1680: 05 fc fc fc 05 fc fc fc 00 fc fc fc fa fc fc fc
+ ffff8880209a8a80: 06 fc fc fc 06 fc fc fc 06 fc fc fc 07 fc fc fc
+ ffff8880209a8b00: fa fc fc fc 05 fc fc fc 05 fc fc fc 05 fc fc fc
+>ffff8880209a8b80: fa fc fc fc fa fc fc fc 02 fc fc fc fa fc fc fc
+                                           ^
+ ffff8880209a8c00: 00 fc fc fc 00 fc fc fc 00 fc fc fc 05 fc fc fc
+ ffff8880209a8c80: 05 fc fc fc 05 fc fc fc fa fc fc fc 00 fc fc fc
 
-Fixes: 00398e1d5183 ("Bluetooth: Add support for BT_PKT_STATUS CMSG data for SCO connections")
-Fixes: b96e9c671b05 ("Bluetooth: Add BT_DEFER_SETUP option to sco socket")
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
 Reported-by: syzbot <syzkaller@googlegroups.com>
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 Cc: Marcel Holtmann <marcel@holtmann.org>
@@ -204,28 +183,17 @@ Cc: Johan Hedberg <johan.hedberg@gmail.com>
 Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com> (supporter:BLUETOOTH SUBSYSTEM)
 Cc: linux-bluetooth@vger.kernel.org
 ---
- net/bluetooth/sco.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ net/bluetooth/rfcomm/sock.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 43daf965a01e4ac5c9329150080b00dcd63c7e1c..9d013f01865fd2509f28eac3bceadf682f0a5edb 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -843,6 +843,10 @@ static int sco_sock_setsockopt(struct socket *sock, int level, int optname,
- 			break;
- 		}
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index b54e8a530f55a1ff9547a2a5546db34059ebd672..39155b41e9d781a4099bb7b7f29bb53d8fc63e9e 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -629,6 +629,10 @@ static int rfcomm_sock_setsockopt_old(struct socket *sock, int optname,
  
-+		if (optlen < sizeof(u32)) {
-+			err = -EINVAL;
-+			break;
-+		}
- 		if (copy_from_sockptr(&opt, optval, sizeof(u32))) {
- 			err = -EFAULT;
- 			break;
-@@ -890,6 +894,10 @@ static int sco_sock_setsockopt(struct socket *sock, int level, int optname,
- 		break;
- 
- 	case BT_PKT_STATUS:
+ 	switch (optname) {
+ 	case RFCOMM_LM:
 +		if (optlen < sizeof(u32)) {
 +			err = -EINVAL;
 +			break;
