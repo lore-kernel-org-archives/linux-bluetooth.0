@@ -1,112 +1,96 @@
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9149632C8E
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Apr 2024 16:16:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712247397; cv=none; b=CT26vMO+2LqhXheh4zkYXTYrmaHNE241IIgTahi7KTFAYwjfkgpTZMizcRY5okaWAEWNPbkQQNHkZ2J+12pN1gA2k6489Vw78qBWO4SeMWJZQOzhUtA7g2GlxjWUY0OP2B6eYfSEMUnmhjGzFsoLzX3xLl1eSME4XPW/nzSVDkM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712247397; c=relaxed/simple;
-	bh=ywTF/bRvJikN4R7LsiKyrpubVud3pBaGydWM/IDCMyE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=leoqsOYTGRvDitqVZOtGCDbeO+8XBA77F1aE1BfGiVDn3g8/CLacww7q81Ovgt8frRU0A26WPs4DUw0KKoow9KfcBR3RyltY+JVTFJxXl7PHxTPY2MGaYzz0jY/FfPCt2i/l3Z8QNGWbh4yiy+NpObAP/KMBt12PhwYC7nGUxZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KXFbcIxH; arc=none smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 721A117BA8
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Apr 2024 16:21:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712247694; cv=pass; b=PN6vS/23YFdOepsrc2VPCtZ+sanTQfp28nTQqdZ2qdDyf4elE1MX0kX12n9z9iVU8ru8iVD3PuDTN62XVX0xn5UvvL4kSMHWDQ7KlLPKu/qppzJcOpXK9IGaZ7NedHIWosv+/Lm5fkFAy6bAlo/2gcuYni7ShSyIVXBMF0jyRc8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712247694; c=relaxed/simple;
+	bh=Rbylmd5Rutq4+i7hfKxure17mD3Xd1qpj1qB5aB12wg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=BZ3gUjifv/dUse8ZmtxNbuLqwBWZeQaAp3lbi68QpwLqdFnt1N60BVxuP2qbFN/RROJvFcXgAUhMV7tnJGwHWknUMcob06kFHDC54EPA2qhOmSgZVBvGBvMryec1xWvJwxHj8ueIcbeHRp/ezZ96x+sgdYzy34z7NnYlios/Wgc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=OLhSFwyf; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KXFbcIxH"
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2d6eedf3e99so21824871fa.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Apr 2024 09:16:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712247394; x=1712852194; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wxHRlAzWXKXOux9JRiv3nn2Vy83la2ZitJfVw9v0cZY=;
-        b=KXFbcIxH7U6CalCLmu7ZItbkSPDQx0uuzAnNI/zhlqwXmiICRlVbtYZlYVha90ieWN
-         /DBfPNLB8o/7LpgFFmW7p8CEzgMLn4ZvoQxMe+3nby7/9l+weANaW0ozXniyN0i7aqGV
-         2Cextf3rTHw09HqRFYeX61aUc58BS7JiwiZINzaVKwXXbvOZszf5uSDUGiZL/3AuhElT
-         7dEcW8CKQr88QqLHUtUrcAV44w8A1z/+7Ha4OJscXiniLs73JdQoMTYihn6M1y81h2gF
-         QSHV0GORxGuFq2wU9LvrwSZZCQkaKTajadxvb8TccXUYImZTetB2kVcpv4NGcwaV7qUi
-         gUTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712247394; x=1712852194;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wxHRlAzWXKXOux9JRiv3nn2Vy83la2ZitJfVw9v0cZY=;
-        b=FQew/uSWXmVZ7/ehTcCrjOpT7KG0fTjy8VXr1GYp2+1tLHB5Hp2tx4fziu4BJ3lcEd
-         ScIpx9rHF1oa6INtvIJ9mrsHme89YrLZim74WfxnQ+l3/j3SS/dWp3ahMq9SfVpvMFpE
-         L3Gu1g5wXYgODaWWIQo3JmEpgZFpj5ZwGOJZzNy9e+giInqu/nFjAjiPtYcwPIXp5hgi
-         SqVneHL5ErnqjCmcXrdKZlNzAIfAerbfV/5FmWtGtUmWfJO1nyrhexPbfhOMlNVYwn3g
-         KyJGVnBYu8Qy6PreCaHkf7VyjWKRMTrLjvMhcOStF8xzezCYoEjKal/LAJaR+pOODpqP
-         mjSQ==
-X-Gm-Message-State: AOJu0YyvqxYka1pLJWRByAlkjILZTd+yKLbuZcXSezrBCk29l/jQH2C1
-	lg7f39kAD3ldEPkUv5gqIcPlLCSXbxMGd5Q24SK8oZj0jyaDJ7dImUmcsSYVnBuP35TMrp1Xyv7
-	XNRBG/6ZihDOjHH9EOuZ4g/CGvM1su3Y0
-X-Google-Smtp-Source: AGHT+IHnh+7v6xRHdXW+XdI4ijT0WuAcoSlF+QW1a+A4w6o+GBZOtw/JJ/43yWbFVYgsunQPF1bw1Din76ptU0v7Ouk=
-X-Received: by 2002:a2e:9b48:0:b0:2d8:60ae:f37d with SMTP id
- o8-20020a2e9b48000000b002d860aef37dmr355600ljj.12.1712247393360; Thu, 04 Apr
- 2024 09:16:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="OLhSFwyf"
+Received: from monolith.lan (unknown [193.138.7.178])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4V9RhB0SfFz49Q4X;
+	Thu,  4 Apr 2024 19:21:29 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1712247690;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DQHBUQvSEBJ4gmBHTLJ902z3SIHMiTvD4BQrU7DmKLU=;
+	b=OLhSFwyfuM5dNboUSKJs/RPtVYQd89rG9qyhAiE6R+FHqMJrQ7d3JzszPHsuZ5fvyIhfEw
+	QBZkKMlKxzBc2qwXqqy0y6yas+hOqtUvGHa+6Nvvwx/o2fww4vpUgZ/H1McpVxP0pTT1W7
+	mqYfNBJC0TT1MiLZtyaNTAW15WnI68cBHTQYISr4ays5lMVXiyh4uFft76xc3yTL/HEAvn
+	97sHQVdjZpEwHWbPsF22TSwzN68QK5fhKzgWgyyw8JDFNYQiL+MAumFeZ12Ht/RLfqFLk2
+	bHJ2dspDIrBWRxKOJgAMFsLVtb+vLSDC7vPI5NOrekpxz4O4FMtTZ3oBwDr+oQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1712247690;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DQHBUQvSEBJ4gmBHTLJ902z3SIHMiTvD4BQrU7DmKLU=;
+	b=B3L4LBMsX0h4cxaF8KmreAjjtxFOtPeT9ZxzHt2oOtzfU44Z6cEQ1EwyLWnzMT6gRQ7JkB
+	XnnI3j/qVna9x+oBLlVxJSxdkh6BRZXget/7gA2qdjDDbMBBdUXoB9PCmMOrqF34njPbT0
+	br9Y4yBEs+ZTL7nh2WeiBFiPHsvAY2Nv8noKhs5+y8iCnAmDmC6gadedmESuJ38blk1/1O
+	C0de1H61Fl3OYPcgj2jfKDlR2kuxAY541fetBISV8sfZlvwnJZfIoass/vmxmNtUEnAzUC
+	sLhe+7p5dNwOpJuMeAu3kWW2B5V7FjR7FR30PK7pigIN2C6SiOQmOf4+xAjLTw==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1712247690; a=rsa-sha256;
+	cv=none;
+	b=cDXEav8ROflLrHE3xfDgsO05agVWEbFe6ZzCIYDS8FbwLiCUg69bDt06zmvBsCTa4tC/GB
+	6nD2WW4CYsP5G0WNZbxhj1q0iBXq4vdzP+BSumOzMuFkh4xehFNgKdsSgv4dxdV60ui/G8
+	slNgVrDjv+jXXSkbCSNEGPYDO9C/l0c4pyjkT1UvRhsUWy4Ho7KzRKP7YPuoPQh8sb0lCZ
+	m2Bzc4IKomKILDhrJk8zQVhYdQBUH1NYTYDfF0RxjcNRr2WJrvMz7xCt0DvS6tMsZHI3Fc
+	rrGCDqSrKTrJJPJ83dOqaMGZMi6l3f78FidqyY13+NHILk30scNF4XcR/FJ0/g==
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ v7 1/7] lib: add BT_SCM_ERROR
+Date: Thu,  4 Apr 2024 19:21:17 +0300
+Message-ID: <231de55e44e48272c02dac8ee735af9316ec46e0.1712243675.git.pav@iki.fi>
+X-Mailer: git-send-email 2.44.0
+In-Reply-To: <cover.1712243675.git.pav@iki.fi>
+References: <cover.1712243675.git.pav@iki.fi>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240403205252.71978-1-dimitris.on.linux@gmail.com>
- <20240404024521.120349-1-dimitris.on.linux@gmail.com> <20240404024521.120349-2-dimitris.on.linux@gmail.com>
- <CABBYNZJjSp74CoJU2RYCft_nQi85EWnk9JOvyxMH8YmAtON+8w@mail.gmail.com> <0f681858-fe53-4964-82f9-5f3c3ee903e3@gmail.com>
-In-Reply-To: <0f681858-fe53-4964-82f9-5f3c3ee903e3@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 4 Apr 2024 12:16:20 -0400
-Message-ID: <CABBYNZLmff+NWTp3=5S5g8nx=KxJ0=PgxT7v9viO_hS=U15=1g@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/1] Refactor btd_device_is_connected
-To: Dimitris <dimitris.on.linux@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Dimitris,
+Add new CMSG type used in new kernel TX timestamping support.
+---
+ lib/bluetooth.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-On Thu, Apr 4, 2024 at 11:52=E2=80=AFAM Dimitris <dimitris.on.linux@gmail.c=
-om> wrote:
->
-> On 4/4/24 07:59, Luiz Augusto von Dentz wrote:
->
-> >> diff --git a/src/adapter.c b/src/adapter.c
-> >> index 4bcc464de..0b7aab4b5 100644
-> >> --- a/src/adapter.c
-> >> +++ b/src/adapter.c
-> >> @@ -7486,7 +7486,7 @@ static void adapter_remove_connection(struct btd=
-_adapter *adapter,
-> >>                  device_cancel_authentication(device, TRUE);
-> >>
-> >>          /* If another bearer is still connected */
-> >> -       if (btd_device_is_connected(device))
-> >> +       if (btd_device_state_is_connected(device))
-> >
-> > Perhaps btd_device_bearer_is_connected would be a better name.
->
-> Thanks, I'll rename.
->
-> > I guess the problem is that some service is indicating it is still
-> > connected though?
->
-> Newbie question for sure, but: As this is happening in the code path for
-> "disabling bluetooth", shouldn't services already be disconnected here?
+diff --git a/lib/bluetooth.h b/lib/bluetooth.h
+index 75dc960c8..a4ed65d0b 100644
+--- a/lib/bluetooth.h
++++ b/lib/bluetooth.h
+@@ -141,6 +141,7 @@ struct bt_voice {
+ #define BT_PKT_STATUS		16
+ 
+ #define BT_SCM_PKT_STATUS	0x03
++#define BT_SCM_ERROR		0x04
+ 
+ #define BT_ISO_QOS		17
+ 
+-- 
+2.44.0
 
-That is exactly what I would like to know, why is there a service
-still indicating it is connected if the controller is rfkilled, so
-while this should break it back to the old behavior we still need to
-fix the service that is causing the problem so perhaps we need to
-print its profile/drive name and figure out what is the driver that is
-causing it.
-
-> D.
-
-
-
---=20
-Luiz Augusto von Dentz
