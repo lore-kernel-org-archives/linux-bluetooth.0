@@ -1,28 +1,58 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f196.google.com (mail-pg1-f196.google.com [209.85.215.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02D0A1AAC4
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Apr 2024 06:24:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46A905026E
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Apr 2024 06:35:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712211895; cv=none; b=ig39FuuErUotP7KYaawxR+L3qm7Ib58yGjSuzEDZlxuIi5GHRjwGOXnNNp0uI0n3/10qzw+rgXaXCs7gSYcY/Ovn1qjdUy0YXh4IOThut+tVv63rG1biZVdBGHKxS8eoQoLrjFfoTPQi2KPyTHTDjdoSlAamuNEhLKnuoZlW2/Q=
+	t=1712212559; cv=none; b=WB0FXEUqxe4bVFuF3YnGDnfpN0KfVaFMcjRf/uttdGqGfpTnWqe4k8Ir09vVj5fH3AzhATQojvn3U6hQw9ho2Iy5b5HTXWdCzj6BUEW7YEI+fsnlw2AoHPVrJo45OPCO18ewsT67iWgzaFG9hTMX4Dq5Aps57enMnVDjuLnGOUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712211895; c=relaxed/simple;
-	bh=UpnoFfAsdwkMDaGlE8PgpjZpA6/85hDei8fdaxoVr3Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
-	 In-Reply-To:Content-Type; b=NzcLzxFuz5jaI6/MKGbu1gzRzzH7qaSMpp7CVa383deyEUjfc0pIwM0BUeuniiQNL9OWT/Tqx5GKANp2TNL0qpdSHZdljF5Aa1ZDKbrb6YTU4IW2sjy+Lzb0fZ3Scc/du6U7obX64qtRWgQyzS7mZTSkuuxc8LD7pDJrFABPxZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.2] (ip5f5af2ce.dynamic.kabel-deutschland.de [95.90.242.206])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id C906E61E5FE01;
-	Thu,  4 Apr 2024 08:24:39 +0200 (CEST)
-Message-ID: <06c64895-a99b-4705-8965-d8ea66eef74a@molgen.mpg.de>
-Date: Thu, 4 Apr 2024 08:24:38 +0200
+	s=arc-20240116; t=1712212559; c=relaxed/simple;
+	bh=8M4hIrlK2uR6e5vTScV7TVav+ErpZMQnMSWb35WlyA4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PHA/QdwdED7JbYV+fJk2NEBjt3lcSly7QHdeppKkLsfzHPyL8QTlH4MDR7cdA4gDP48q9w+9SQBLUj6/BkxaKj8CfjuV1Q6QIZLdZNepFdfIKH79dWp7OPOn+i8zkEIiOd/oq9NxmzoShDDWGiQagHKz4AQWM+wA3ixmTQMq+rY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CUhbbttC; arc=none smtp.client-ip=209.85.215.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CUhbbttC"
+Received: by mail-pg1-f196.google.com with SMTP id 41be03b00d2f7-517ab9a4a13so541804a12.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Apr 2024 23:35:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712212557; x=1712817357; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=K3OVNybMFs0FD/o9yBx03xj8cW+nFxr91pjuCnSQOmQ=;
+        b=CUhbbttC3IeHtx9Nk5dCzrrE17Ylf0PuYMnTatH5ULWBgh5HoN6aIWXffsikkwVlr1
+         iXZU/z0okwnpffhzMirSbYsTmv2jpH7kvO1jLHbo7pxrDBg1aZs/yrgRs+x/FTif+km4
+         8OlUmOTJwviFhj5fEUlYQrgBs9UlObu30FrL6mWqTkytvYhYlsAFlpGAPyBpiQq9ha/a
+         w/pBbvc6VU4vkiZLiOMLuMc664xX5FY4WrajLg/3XWxtXyZ0syLCs7DbcVbkz8VpYn4u
+         s0Y/2ie8x+uHwHuWCIpt/lCe4/rRO47HI1ykWr4YjNGn6z3KsAZbyNXdlFFGFU98xiKM
+         WlAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712212557; x=1712817357;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=K3OVNybMFs0FD/o9yBx03xj8cW+nFxr91pjuCnSQOmQ=;
+        b=f6uDh7ojzeVFT4A+kVYCGyqcSWo3ZmGl0dOxxiECdZ6Abi0RQyjFtSxIFAq4dL5kxt
+         B/diXTRqs8VDusGaM5jpZtT8JisKIHRRjG5ZOZ7IzNADo1rdlaLllWwsZP79hilirJaP
+         BdcJ3LS7yIFLV35JTNreHeh3Ugo3/tctAwkrpjjw/YyEkQIBF1bWgfpmZYdptVO6O1JC
+         FdsrB/J6ogUZ+9Kclk6/CfWyhPsAQoN6hCK5HyaK8QAP/srvobOGvUKhCGYq09rKNs8X
+         1LnRTpET3oD/i04oXvnVX21x4VK6aCU+JK9zhOpDjVB8V6PstqFY+Ki+rYTI5RlZ61gq
+         hOPQ==
+X-Gm-Message-State: AOJu0YxbsxB9PR5vsXoyqu2eXDujMbvGqz8KZ5y39acRtHKGCn/R/94O
+	UcOfweGgraCt/t8K8mw9sEiKXIwvI4oru+aV7i5vNJEcZKQPzLPF9T7o81FlV7k8Yhns
+X-Google-Smtp-Source: AGHT+IFDRu4sx4d9Tm1D6pr6aJYbgpN+2Sj0HuDE3f3IICe5AY4/fZIGywzFXQDZJd3KTfCEAsrRTQ==
+X-Received: by 2002:a05:6a21:1506:b0:1a5:6bfd:6bdd with SMTP id nq6-20020a056a21150600b001a56bfd6bddmr1975963pzb.50.1712212557413;
+        Wed, 03 Apr 2024 23:35:57 -0700 (PDT)
+Received: from ?IPV6:2600:3c0a:e002:7f00::1001? ([2600:3c0a:e002:7f00::1001])
+        by smtp.gmail.com with ESMTPSA id p16-20020a1709027ed000b001e249843f3csm9873741plb.223.2024.04.03.23.35.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 03 Apr 2024 23:35:57 -0700 (PDT)
+Message-ID: <b7769335-3af4-469a-bf58-a3a51f03c842@gmail.com>
+Date: Wed, 3 Apr 2024 23:35:56 -0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -32,31 +62,61 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH BlueZ 1/1] Revert "device: Consider service state on
  device_is_connected"
-To: Dimitris <dimitris.on.linux@gmail.com>
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: linux-bluetooth@vger.kernel.org
 References: <20240403205252.71978-1-dimitris.on.linux@gmail.com>
  <20240403205252.71978-2-dimitris.on.linux@gmail.com>
+ <06c64895-a99b-4705-8965-d8ea66eef74a@molgen.mpg.de>
 Content-Language: en-US
-Cc: linux-bluetooth@vger.kernel.org
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20240403205252.71978-2-dimitris.on.linux@gmail.com>
+From: Dimitris <dimitris.on.linux@gmail.com>
+In-Reply-To: <06c64895-a99b-4705-8965-d8ea66eef74a@molgen.mpg.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Dear Dimitris,
+Hi Paul,
 
+> Please document the reason for the revert.
 
-Am 03.04.24 um 22:52 schrieb Dimitris:
-> This reverts commit 44d3f67277f83983e1e9697eda7b9aeb40ca231d.
+I've since done a narrower change; instead of the revert I'm only 
+factoring out the state check that avoids the busy loop at "rfkill block 
+bluetooth" time.
 
-Please document the reason for the revert.
+Updated cover letter and patch under the "V2" part of the thread:
 
-> ---
->   src/device.c | 6 +-----
->   1 file changed, 1 insertion(+), 5 deletions(-)
+https://lore.kernel.org/linux-bluetooth/20240404024521.120349-1-dimitris.on.linux@gmail.com/T/#u
 
-[…]
+Issue steps to reproduce from e.g. 
+https://github.com/bluez/bluez/issues/785 :
 
+- Connect at least one device. Tried this with either one of: Logitech 
+MX Master 3, Google Pixel Buds Pro.
+- Run rfkill block bluetooth
+- bluetoothd takes a whole core, GNOME quick settings and status still 
+shows bluetooth as "active". I have to kill -9 the process to get the 
+block to really complete.
+- Turning off the connected device does not break the loop.
 
-Kind regards,
+Busy loop stack looks like:
 
-Paul
+> #0  adapter_remove_connection (adapter=0x55a17e6889d0, device=0x55a17e698d30, bdaddr_type=2 '\002') at src/adapter.c:7476
+> #1  0x000055a17e55979f in adapter_stop (adapter=0x55a17e6889d0) at src/adapter.c:7527
+> #2  settings_changed (settings=<optimized out>, adapter=0x55a17e6889d0) at src/adapter.c:622
+> #3  new_settings_callback (index=<optimized out>, length=<optimized out>, param=<optimized out>, user_data=0x55a17e6889d0) at src/adapter.c:705
+> #4  0x000055a17e59981e in queue_foreach (user_data=0x7ffe49a7ef20, function=0x55a17e591e60 <notify_handler>, queue=0x55a17e683280) at src/shared/queue.c:207
+> #5  queue_foreach (user_data=0x7ffe49a7ef20, function=0x55a17e591e60 <notify_handler>, queue=0x55a17e683280) at src/shared/queue.c:190
+> #6  process_notify (param=<optimized out>, length=<optimized out>, index=<optimized out>, event=<optimized out>, mgmt=0x55a17e682f30) at src/shared/mgmt.c:349
+> #7  can_read_data (io=<optimized out>, user_data=0x55a17e682f30) at src/shared/mgmt.c:409
+> #8  0x000055a17e5bb679 in watch_callback (channel=<optimized out>, cond=<optimized out>, user_data=<optimized out>) at src/shared/io-glib.c:157
+> #9  0x00007f876edd4e5c in g_main_context_dispatch_unlocked.lto_priv () from target:/lib64/libglib-2.0.so.0
+> #10 0x00007f876ee2ff18 in g_main_context_iterate_unlocked.isra () from target:/lib64/libglib-2.0.so.0
+> #11 0x00007f876edd6447 in g_main_loop_run () from target:/lib64/libglib-2.0.so.0
+> #12 0x000055a17e4f1d64 in mainloop_run () at src/shared/mainloop-glib.c:66
+> #13 mainloop_run_with_signal (func=0x55a17e544740 <signal_callback>, user_data=0x0) at src/shared/mainloop-notify.c:188
+> #14 main (argc=<optimized out>, argv=<optimized out>) at src/main.c:1455
+
+First time submitter here, should I resubmit/start a new thread for this 
+"V2" approach?
+
+Thanks
+
+D.
