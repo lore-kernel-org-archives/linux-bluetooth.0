@@ -1,195 +1,87 @@
-Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E45F12D201
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Apr 2024 19:07:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B43E82C63
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Apr 2024 19:10:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712257650; cv=none; b=H9XR5CJ19NVQrtr1m+kIf/mOxYemuVcGKf9EaVbweJGTKcP8MEnthCjhKf3WSKdtBzrMTJgf9KIU7/OHd8jU5sFzZvPV7IL+gIitCBT480AHzbz8DVdctB72phijRyy2KdmIPtm8M7A5W7QjSTdej0V0U/nXp4cZYsBs8Pd0go0=
+	t=1712257831; cv=none; b=poF+E4PIBPX0vAxtVMq3vRSFFHpZGQaLwn4YS3EUhjWFoSMCrvTl90N3hRRwVaZunyBi+zdtl8yvhE12PqT9273Jw/XsVPvSWVkChw+MQNCY8P8BcdXCGhiV8PrMLnMdRqV5kajHWfD10o5IO04an99Dnka/1fw7tUJknZwAEPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712257650; c=relaxed/simple;
-	bh=l69Sk01Ys3USS2abDWovhI7y9XcHi6L6bIoDYDHskow=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=X+AelLqyxX5ACV6FB0F7NUOP7HRaDiuO5RhqHVY/ArWguxXpsE9zAL90dMQg9OjAtnBIo1B4e3QUfzJhWFl9NBH3mSAExjHETbkqZrwPZvOqkdmS96M+6qG75BnOeyAeLXeiuBFJFDociWm63UqZbmbxBju1FqbPOa3f+cT0qZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=A9nDuNEm; arc=none smtp.client-ip=192.30.252.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1712257831; c=relaxed/simple;
+	bh=wUwmY7Z+mAph4HS8NLPtJR56D8/m42PLHKU3Mmo4bgo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=PZPRT8z+0Hfp/1shdtU9faLYOpuiWVkM6erpjxSFiMbl2p6fgr7pPjo3om63CP2cXST57KJIvARO10MHCgXbK7CuQ8shW4Xu/uUHtbcwziwpnpA0w2ne+gn1peeFwj5iAUTNrTbRDtEsJ9MZW9TeZb9AKXpT22wTCf8YujMplwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FoVIgOZf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="A9nDuNEm"
-Received: from github.com (hubbernetes-node-741fd13.va3-iad.github.net [10.48.160.18])
-	by smtp.github.com (Postfix) with ESMTPA id 5B373E1111
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Apr 2024 12:07:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1712257648;
-	bh=fB0MnapLegmmN2BzBkVIaKnYnjGY0GWWWBiSHj/f0bU=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=A9nDuNEmsfzA0qWWEaRYLYbVH3INU0B5a2v+NomH6XEBkrfhDsZYE+Md9WQNeRX25
-	 HxjIqyBObfP0YHfubFRGnabwq2hnCkg8QPyT+TAqoVfUeiEsQCWc7bWzlyD4LtSYrt
-	 PWrgBHy/PHX7AVuyFcqD4RFrYSSRixlWn9x9ABXg=
-Date: Thu, 04 Apr 2024 12:07:28 -0700
-From: Pauli Virtanen <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/b8b408-4fe4fd@github.com>
-Subject: [bluez/bluez] 036583: device: Add btd_device_bearer_is_connected
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FoVIgOZf"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 827C6C433C7;
+	Thu,  4 Apr 2024 19:10:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712257830;
+	bh=wUwmY7Z+mAph4HS8NLPtJR56D8/m42PLHKU3Mmo4bgo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=FoVIgOZfiigwMC5EzztbLcBIbgN58Nyv+rgPiE+t5ocmeR3a+4S8isI07Xht1T0a9
+	 X5bqdDtD5XVzcormU4m3E7CMn/63XfxOPkVVVtWd6UUt3HDByefEJw6GhqwOIx8ZD5
+	 GEt3P53c1pMgkNVw8AUDa5lsKUKnk47r+rdinlxdrY5n+yvkWg60Gch9d7PUOfIrwp
+	 w1I9o0n0qTQ5S733oDmhjUQNKEtsUJPpxUiRM9vXY2AAYLSxNmAT4LTayvgkpBuf2A
+	 oDoWpIewnr+yH/6b2KxKrZmqpaYc6mKdBpFyrEBEK8lJH4PkCZMuhNuBbRDr6UxYau
+	 E+enLLZbjskBQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 73126D84BAD;
+	Thu,  4 Apr 2024 19:10:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v7 0/7] tests: add TX timestamping tests
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <171225783046.32408.15392696538219375629.git-patchwork-notify@kernel.org>
+Date: Thu, 04 Apr 2024 19:10:30 +0000
+References: <cover.1712243675.git.pav@iki.fi>
+In-Reply-To: <cover.1712243675.git.pav@iki.fi>
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 036583f9bbec8540fbd85b980674aad4916d3093
-      https://github.com/bluez/bluez/commit/036583f9bbec8540fbd85b980674aad4916d3093
-  Author: Dimitris <dimitris.on.linux@gmail.com>
-  Date:   2024-04-04 (Thu, 04 Apr 2024)
+Hello:
 
-  Changed paths:
-    M src/adapter.c
-    M src/device.c
-    M src/device.h
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  device: Add btd_device_bearer_is_connected
+On Thu,  4 Apr 2024 19:21:16 +0300 you wrote:
+> Add tests for TX timestamping
+> 
+> v7:
+> - Fix CI (false positive) compiler warning in sco-tester.c
+> 
+> v6:
+> - Rebase.
+> 
+> [...]
 
-This adds btd_device_bearer_is_connected and use it when testing if
-device needs to be disconnected.
+Here is the summary with links:
+  - [BlueZ,v7,1/7] lib: add BT_SCM_ERROR
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b3bfe2110b7a
+  - [BlueZ,v7,2/7] iso-tester: Add tests for TX timestamping
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=5e85956e11e7
+  - [BlueZ,v7,3/7] l2cap-tester: Add test for TX timestamping
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=349d7975e608
+  - [BlueZ,v7,4/7] btdev: set nonzero SCO mtu & max pkt
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7158101e6c35
+  - [BlueZ,v7,5/7] sco-tester: add TX timestamping test
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9faf6f908fcc
+  - [BlueZ,v7,6/7] bthost: handle client L2CAP conn in LE credit based mode
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9b21ce6f7956
+  - [BlueZ,v7,7/7] l2cap-tester: add tests for LE Client read/write/tx-timestamping
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=4fe4fda73be1
 
-Fixes: https://github.com/bluez/bluez/issues/785
-
-
-  Commit: b3bfe2110b7a90e285e52679679ac8f496f4ad5b
-      https://github.com/bluez/bluez/commit/b3bfe2110b7a90e285e52679679ac8f496f4ad5b
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2024-04-04 (Thu, 04 Apr 2024)
-
-  Changed paths:
-    M lib/bluetooth.h
-
-  Log Message:
-  -----------
-  lib: add BT_SCM_ERROR
-
-Add new CMSG type used in new kernel TX timestamping support.
-
-
-  Commit: 5e85956e11e76bfffd84c095f160d0d841d38041
-      https://github.com/bluez/bluez/commit/5e85956e11e76bfffd84c095f160d0d841d38041
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2024-04-04 (Thu, 04 Apr 2024)
-
-  Changed paths:
-    M tools/iso-tester.c
-    A tools/tester.h
-
-  Log Message:
-  -----------
-  iso-tester: Add tests for TX timestamping
-
-Add TX timestamping test utilities in new tools/tester.h, so that they
-can be shared between testers.
-
-Add tests:
-
-ISO Send - TX Timestamping
-ISO Send - TX Sched Timestamping
-ISO Send - TX Msg Timestamping
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-  Commit: 349d7975e6083848de90dedd2a481927eb1da4d7
-      https://github.com/bluez/bluez/commit/349d7975e6083848de90dedd2a481927eb1da4d7
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2024-04-04 (Thu, 04 Apr 2024)
-
-  Changed paths:
-    M tools/l2cap-tester.c
-
-  Log Message:
-  -----------
-  l2cap-tester: Add test for TX timestamping
-
-Add test
-
-L2CAP BR/EDR Client - TX Timestamping
-
-
-  Commit: 7158101e6c35a499c646ca9827f3366bfd3bf07a
-      https://github.com/bluez/bluez/commit/7158101e6c35a499c646ca9827f3366bfd3bf07a
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2024-04-04 (Thu, 04 Apr 2024)
-
-  Changed paths:
-    M emulator/btdev.c
-
-  Log Message:
-  -----------
-  btdev: set nonzero SCO mtu & max pkt
-
-Set nonzero max pkt count, so that kernel can transmit data.
-The request & accept/reject flow is not emulated yet.
-
-
-  Commit: 9faf6f908fcc40ec194eb6cbae10824d809e0167
-      https://github.com/bluez/bluez/commit/9faf6f908fcc40ec194eb6cbae10824d809e0167
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2024-04-04 (Thu, 04 Apr 2024)
-
-  Changed paths:
-    M tools/sco-tester.c
-
-  Log Message:
-  -----------
-  sco-tester: add TX timestamping test
-
-Add test:
-
-SCO CVSD Send - TX Timestamping
-
-
-  Commit: 9b21ce6f7956db0343842dfea1f34586b0ec59d3
-      https://github.com/bluez/bluez/commit/9b21ce6f7956db0343842dfea1f34586b0ec59d3
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2024-04-04 (Thu, 04 Apr 2024)
-
-  Changed paths:
-    M emulator/bthost.c
-
-  Log Message:
-  -----------
-  bthost: handle client L2CAP conn in LE credit based mode
-
-Allow bthost hooks to receive data from L2CAP LE credit based
-connections. Handle LE credit header when receiving, and reassemble
-received SDU.
-
-Handle L2CAP LE credit header also in bthost_send_cid.
-
-
-  Commit: 4fe4fda73be1f649b212dc594e3631a51b84afff
-      https://github.com/bluez/bluez/commit/4fe4fda73be1f649b212dc594e3631a51b84afff
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2024-04-04 (Thu, 04 Apr 2024)
-
-  Changed paths:
-    M tools/l2cap-tester.c
-
-  Log Message:
-  -----------
-  l2cap-tester: add tests for LE Client read/write/tx-timestamping
-
-Add tests:
-
-L2CAP LE Client - Read Success
-L2CAP LE Client - Write Success
-L2CAP LE Client - TX Timestamping
-
-
-Compare: https://github.com/bluez/bluez/compare/b8b4083c179e...4fe4fda73be1
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
