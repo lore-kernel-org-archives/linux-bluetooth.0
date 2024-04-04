@@ -1,230 +1,173 @@
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E45113340F
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Apr 2024 19:14:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE6FC1C6A0
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Apr 2024 19:57:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712258090; cv=none; b=RL9bvIrDngeBRTt2rYJIZcvn9/+WnRbGqsi22vPAgDNQbIVP06iTEWrESJN9/vJ0uaX+Aes1YoOWGR3kjXP+x2v6eV8E/zjlW7/SHH9vAkTB5vthkscmC+Lt+/HrgP8TkF+yUjBqaiNqyazKSqti+apkbT1o9m9zRjVpxewVKpw=
+	t=1712260626; cv=none; b=S7qgwUqqjXyc23dgbWQBxzTFcE/KyR5ggPWjhKf2GYssM92oirrZ6Yi1M0Fcw3RnakwWvgYaA6WVODwwouk5X7ZHfH68YYaWlSlB9b9NaXT+ggH8QD6MDKQ5mW2INsKQeuU1P9W0Tk09rrNMbcZBwTn5ruPmpDNT2QUsRCHk5fg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712258090; c=relaxed/simple;
-	bh=5InxRozM7qCCoL7A3GDYW1R5umdr5Kooq8ghTbTRdbk=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type; b=pq0s6zsyzp4oYeiZ6jluJkzKBTQg7C40zQFIOR5OX2vjsq7xhFTri3i/r3T/y2rBrj+m3P0/HQ8KULleZ/PXXBKYeRJ0d5cyFsbYHehBsMJ2DTorAApLhdk3dQO55Vm8cXgpG/9tTU1ZheERXMCT3YIoojeSPgTc5MmUffOVOGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=GD8/3lUX; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=penguintechs.org
+	s=arc-20240116; t=1712260626; c=relaxed/simple;
+	bh=lGCShbIWFwAo9s/J507dVCMKTD+OlwrkqL4enzK5/xg=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=QNy8TvmzIKUlXoCf/rLC+0byEphCgdcIrFp1Vu8TAmJ0z9Va2ePXoNk1sRTtAEFCpx0oONYkEze1LPcCo2OjOHNi6HquqqISYHfvYHb9WdPibQEtSKtCt6FOTlBkJZcm/adf4MV8e2Uwj+TEyexFuoQ8yffJgRoOg44bDSEaTO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BAAfvPQO; arc=none smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="GD8/3lUX"
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6ea9a605ca7so1036284b3a.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Apr 2024 12:14:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BAAfvPQO"
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6990b53a2cbso20463336d6.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Apr 2024 12:57:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=penguintechs.org; s=google; t=1712258087; x=1712862887; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:to:subject:from
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MbF66O3k0UzwHeaOhaqXqequZ9uqXlexXgMorz4+oEA=;
-        b=GD8/3lUX6dzo+clygpz05TsR1cmKooY8xfDWNJr6v+H+RFD/jP3yhNTih3+Qzmycfu
-         Iw/CTkzEXXBNVmnHyr1Rs7hdAk0Bz4AnrX/7HP5kmKhtIsZd9CeXIqvDKcIMi5AUDdzQ
-         SSBpBKIGRGm1AlLyjfd9eR/c1joZGW84I1JM4=
+        d=gmail.com; s=20230601; t=1712260623; x=1712865423; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=aiSxwZkMIIqE43ykBjJbBaRkkPBhOlFMvbpRrl2aIEo=;
+        b=BAAfvPQOmR/deIXJfGUtsI/S+ogAjZcvKi3QSTLonyrhW1gzuiE2Tiqidisdag0clx
+         jtqKkOq/Ml5srVSslkA7cEOvxYoe1CrnU6+OZoZFRFxi9ye3DvvlwIDJMUlNPZrTUYsI
+         +AbecCix8e/aQSs+bhxvFav0gnAFXbb3x+3AHfI6UCO/3ynToXXbAHI8blaGNxRpFsDJ
+         6GXZZChok+glDfGWdJGKKuyqIfYrwQOU59ASzC2AiXF66ChOAS1IEY6q5if+qCXPuZTv
+         oT9zw7dkdev+DRM6CIx5XvFMwKt5ezEalGOl+yrkzkUsViAIhIeNOXfaicrfSmEeTIRZ
+         nR/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712258087; x=1712862887;
-        h=content-transfer-encoding:content-language:to:subject:from
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=MbF66O3k0UzwHeaOhaqXqequZ9uqXlexXgMorz4+oEA=;
-        b=UBxg1d44927Pxl25hqZGZX5edIm9GwnJ9W0sv0GnxlOqRr22yemjbeUNeT8Qt1hxr4
-         xe2YSnygoMDXeelTM/nRD7Qdd60srbbr2/aR4Gog8ISV8MGdlo5NUNrGxbXcvcLg0oIe
-         sM9CkAcJcVeKXlF3RP7+szA3OmPlRuJ5jEsrzbkLj02mM2J+UmP3hrXTRCameZseR5gu
-         dyjGmDAYjAryAoHJpfvq2S+WGCUK4/1EADfmCKhYrEWFQxXuVCtJecIGTWRNYgzRXNnZ
-         2EdyWXAmIX2bnyOxO+/Z6qGhw9HORiRJ9hOJvapYGnI9DGkZhQ7+vBgZJnszDJEftOVc
-         MNLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWPi7ocKevH/Y2vPb9dy+SbaMQoyhL5XkfeoGKq8doYFrHTT0gG4YdQQzxQBb7trYdmqHg/9XrGDl188blvW1ZZmXpW4hf6EbOgRuqwNh7w
-X-Gm-Message-State: AOJu0Yys52kDDCLBWa0yDcOuZ5/N63BY2SJYiMdXXcdNvl8kZZI/WiaX
-	qTiOxgKTyzm/1p4TTCdJ5aDI8xeuQmWc9EwsmQiwEAt6VMQhYRuS9NP6MKqzKaCUhvPnewWOoyw
-	n5w==
-X-Google-Smtp-Source: AGHT+IFi2InwVa+XHVz4khnYhN6vTZ6qQQwqC3hjG+kfowtmt1zKweI+IMp70LOgUj7+iTGvDnxvGg==
-X-Received: by 2002:a05:6a00:4614:b0:6ea:2501:d607 with SMTP id ko20-20020a056a00461400b006ea2501d607mr638178pfb.0.1712258087343;
-        Thu, 04 Apr 2024 12:14:47 -0700 (PDT)
-Received: from ?IPV6:2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08? ([2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08])
-        by smtp.gmail.com with ESMTPSA id n16-20020aa79850000000b006e64ddfa71asm14385974pfq.170.2024.04.04.12.14.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Apr 2024 12:14:46 -0700 (PDT)
-Message-ID: <a03dace1-ca0f-41d6-8e2c-636e3b053a3a@penguintechs.org>
-Date: Thu, 4 Apr 2024 12:14:46 -0700
+        d=1e100.net; s=20230601; t=1712260623; x=1712865423;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aiSxwZkMIIqE43ykBjJbBaRkkPBhOlFMvbpRrl2aIEo=;
+        b=p3dBIOC7f7FoxJvkfbr4GMXJLEb7x73cqXOUa8JSbQsfWl/jfKaKK7TCLUZ5vT0ggk
+         8whMBDqR7raV+olgKdIpLhMsSX78ruPg9e2q7eYCSl11IZoM+xOxtx/vXArCo7NfCOrW
+         KSwniFK42e+0AyoC13J82rgAyVuyaXaOLQXfzEsR/rsvS4+BKUfrRo2iX+Hvwdn08yN1
+         YAlxWTmpo+G1g08VOMLgbHz12qI0ie6kPligygkcA0n/0WK6y8QugNl0zZ9oh7Ixpf+I
+         4GRqHbhOzTNkJG6SiRy1s4tRPPUy43XBC9ZtuacO9wEDHH3W6MHebEIYXMBguBt1aRtn
+         eW+A==
+X-Gm-Message-State: AOJu0Yyq+w5ODEYuV+iawPtxQoWaMCvWT94H4iAClWPeKK//Eq2EL3oF
+	KaqOm2e6uzdhHAXmpTt4O84h90UY0iGC5WyzkyFIYvazsxs3WCJFdQwWxmHE
+X-Google-Smtp-Source: AGHT+IGYNd2cl6f+1FZC7rj2ULqD+/iRs6oN4McNXPVM9S7ckJ9wtCKY/hMTK2QAJB2oBXllQVA7rw==
+X-Received: by 2002:a05:6214:5002:b0:692:494f:f0aa with SMTP id jo2-20020a056214500200b00692494ff0aamr860948qvb.9.1712260623251;
+        Thu, 04 Apr 2024 12:57:03 -0700 (PDT)
+Received: from [172.17.0.2] ([40.76.119.167])
+        by smtp.gmail.com with ESMTPSA id er8-20020a056214190800b00698fe4f91edsm19955qvb.79.2024.04.04.12.57.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Apr 2024 12:57:03 -0700 (PDT)
+Message-ID: <660f060f.050a0220.2cc46.02aa@mx.google.com>
+Date: Thu, 04 Apr 2024 12:57:03 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8956711733111892015=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Wren Turkal <wt@penguintechs.org>
-Subject: QCA6390 bluetooth doesn't work after warm boot or disable/reenable
-To: ath11k@lists.infradead.org, linux-bluetooth@vger.kernel.org
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, me@wantyapps.xyz
+Subject: RE: Bluetooth: ath3k: Fix multiple issues reported by checkpatch.pl
+In-Reply-To: <20240404191423.1545366-1-me@wantyapps.xyz>
+References: <20240404191423.1545366-1-me@wantyapps.xyz>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hey there ath11k/bluetooth folks,
+--===============8956711733111892015==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-I am having a pretty major problem with QCA6930 for some time (maybe a 
-year or two). I have this bluetooth device:
+This is automated email and please do not reply to this email!
 
-72:00.0 Unassigned class [ff00]: Qualcomm Technologies, Inc QCA6390 
-Wireless Network Adapter
+Dear submitter,
 
-This device appears to be driven by the ath11k module and others. I hope 
-I am pinging the right lists.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=841553
 
-I am using Fedora Rawhide. Fully updated yesterday. My uname reports this:
+---Test result---
 
-Linux braindead.localdomain 
-6.9.0-0.rc2.20240402git026e680b0a08.24.fc41.x86_64 #1 SMP 
-PREEMPT_DYNAMIC Tue Apr  2 17:51:18 UTC 2024 x86_64 GNU/Linux
+Test Summary:
+CheckPatch                    PASS      0.68 seconds
+GitLint                       FAIL      0.51 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      29.86 seconds
+CheckAllWarning               PASS      32.46 seconds
+CheckSparse                   PASS      43.20 seconds
+CheckSmatch                   FAIL      34.86 seconds
+BuildKernel32                 PASS      28.92 seconds
+TestRunnerSetup               PASS      519.31 seconds
+TestRunner_l2cap-tester       PASS      18.38 seconds
+TestRunner_iso-tester         FAIL      32.33 seconds
+TestRunner_bnep-tester        PASS      4.65 seconds
+TestRunner_mgmt-tester        FAIL      114.31 seconds
+TestRunner_rfcomm-tester      PASS      7.24 seconds
+TestRunner_sco-tester         PASS      14.95 seconds
+TestRunner_ioctl-tester       PASS      10.37 seconds
+TestRunner_mesh-tester        PASS      7.01 seconds
+TestRunner_smp-tester         PASS      6.76 seconds
+TestRunner_userchan-tester    PASS      4.86 seconds
+IncrementalBuild              PASS      27.95 seconds
 
-My main bluetooth device is  a Logitech MX 3 Mac mouse that uses 
-bluetooth. When bluetooth fails, so does the mouse. I have power cycle 
-my laptop when that happens. I'd love to help find a fix for this.
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+Bluetooth: ath3k: Fix multiple issues reported by checkpatch.pl
 
-The problem is that I cannot disable and re-enable the bluetooth on my 
-system. Bluetooth also doesn't work after a warm boot. I have to power 
-cycle my laptop to recover bluetooth funcitonality. I have tried the 
-following:
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+21: B3 Line contains hard tab characters (\t): "+				const struct firmware *firmware)"
+24: B3 Line contains hard tab characters (\t): "+		err = usb_bulk_msg(udev, pipe, send_buf, size,"
+25: B3 Line contains hard tab characters (\t): "+					&len, 3000);"
+28: B3 Line contains hard tab characters (\t): "+		if (err || (len != size)) {"
+32: B3 Line contains hard tab characters (\t): "+			struct ath3k_version *version)"
+36: B3 Line contains hard tab characters (\t): "+		const struct firmware *firmware)"
+39: B3 Line contains hard tab characters (\t): "+		err = usb_bulk_msg(udev, pipe, send_buf, size,"
+40: B3 Line contains hard tab characters (\t): "+					&len, 3000);"
+43: B3 Line contains hard tab characters (\t): "+		if (err || (len != size)) {"
+46: B3 Line contains hard tab characters (\t): "+	switch (fw_version.ref_clock) {"
+50: B3 Line contains hard tab characters (\t): "+	snprintf(filename, ATH3K_NAME_LEN, "ar3k/ramps_0x%08x_%d%s","
+51: B3 Line contains hard tab characters (\t): "+		le32_to_cpu(fw_version.rom_version), clk_value, ".dfu");"
+55: B3 Line contains hard tab characters (\t): "+			const struct usb_device_id *id)"
+58: B3 Line contains hard tab characters (\t): "+			BT_ERR("Firmware file \"%s\" not found","
+59: B3 Line contains hard tab characters (\t): "+							ATH3K_FIRMWARE);"
+62: B3 Line contains hard tab characters (\t): "+			BT_ERR("Firmware file \"%s\" request failed (err=%d)","
+63: B3 Line contains hard tab characters (\t): "+							ATH3K_FIRMWARE, ret);"
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
 
-* logging into KDE Plasma (bluetooth stops working)
-* logging into GNOME (works on cold boot, fails on warm boot)
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+Total: 121, Passed: 120 (99.2%), Failed: 1, Not Run: 0
 
-After logging into GNOME during a cold boot, I have also done "systemctl 
-restart bluetooth.service". I get these journal logs during the stop;
+Failed Test Cases
+ISO Connect2 Suspend - Success                       Failed       4.209 seconds
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 492, Passed: 489 (99.4%), Failed: 1, Not Run: 2
 
-➜  bt_kernel_bug cat journal-stop-bluetooth-service.log
-Apr 04 10:14:41 braindead.localdomain NetworkManager[1120]: <info> 
-[1712250881.7060] device (F0:5C:77:F2:60:FC): state change: disconnected 
--> unmanaged (reason 'removed', sys-iface-state: 'removed')
-Apr 04 10:14:41 braindead.localdomain systemd[1]: Starting 
-systemd-rfkill.service - Load/Save RF Kill Switch Status...
-Apr 04 10:14:41 braindead.localdomain systemd[1]: Started 
-systemd-rfkill.service - Load/Save RF Kill Switch Status.
-Apr 04 10:14:41 braindead.localdomain audit[1]: SERVICE_START pid=1 
-uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 
-msg='unit=systemd-rfkill comm="systemd" exe="/usr/lib/systemd/systemd" 
-hostname=? addr=? terminal=? res=success'
-Apr 04 10:14:46 braindead.localdomain systemd[1]: 
-systemd-rfkill.service: Deactivated successfully.
-Apr 04 10:14:46 braindead.localdomain audit[1]: SERVICE_STOP pid=1 uid=0 
-auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 
-msg='unit=systemd-rfkill comm="systemd" exe="/usr/lib/systemd/systemd" 
-hostname=? addr=? terminal=? res=success'
+Failed Test Cases
+LL Privacy - Remove Device 4 (Disable Adv)           Timed out    2.606 seconds
 
-I get these journal logs during start:
 
-Apr 04 10:15:05 braindead.localdomain kernel: Bluetooth: hci0: setting 
-up ROME/QCA6390
-Apr 04 10:15:05 braindead.localdomain systemd[1]: Starting 
-systemd-rfkill.service - Load/Save RF Kill Switch Status...
-Apr 04 10:15:05 braindead.localdomain systemd[1]: Started 
-systemd-rfkill.service - Load/Save RF Kill Switch Status.
-Apr 04 10:15:05 braindead.localdomain audit[1]: SERVICE_START pid=1 
-uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 
-msg='unit=systemd-rfkill comm="systemd" exe="/usr/lib/systemd/systemd" 
-hostname=? addr=? terminal=? res=success'
-Apr 04 10:15:05 braindead.localdomain kernel: Bluetooth: hci0: QCA 
-Product ID   :0x00000010
-Apr 04 10:15:05 braindead.localdomain kernel: Bluetooth: hci0: QCA SOC 
-Version  :0x400a0200
-Apr 04 10:15:05 braindead.localdomain kernel: Bluetooth: hci0: QCA ROM 
-Version  :0x00000200
-Apr 04 10:15:05 braindead.localdomain kernel: Bluetooth: hci0: QCA Patch 
-Version:0x00003ac0
-Apr 04 10:15:05 braindead.localdomain kernel: Bluetooth: hci0: QCA 
-controller version 0x02000200
-Apr 04 10:15:05 braindead.localdomain kernel: Bluetooth: hci0: QCA 
-Downloading qca/htbtfw20.tlv
-Apr 04 10:15:06 braindead.localdomain kernel: Bluetooth: hci0: QCA 
-Failed to send TLV segment (-110)
-Apr 04 10:15:06 braindead.localdomain kernel: Bluetooth: hci0: QCA 
-Failed to download patch (-110)
-Apr 04 10:15:06 braindead.localdomain kernel: Bluetooth: hci0: Retry BT 
-power ON:0
-Apr 04 10:15:08 braindead.localdomain kernel: Bluetooth: hci0: command 
-0xfc00 tx timeout
-Apr 04 10:15:08 braindead.localdomain kernel: Bluetooth: hci0: Reading 
-QCA version information failed (-110)
-Apr 04 10:15:08 braindead.localdomain kernel: Bluetooth: hci0: Retry BT 
-power ON:1
-Apr 04 10:15:10 braindead.localdomain systemd[1]: 
-systemd-rfkill.service: Deactivated successfully.
-Apr 04 10:15:10 braindead.localdomain audit[1]: SERVICE_STOP pid=1 uid=0 
-auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 
-msg='unit=systemd-rfkill comm="systemd" exe="/usr/lib/systemd/systemd" 
-hostname=? addr=? terminal=? res=success'
-Apr 04 10:15:10 braindead.localdomain kernel: Bluetooth: hci0: command 
-0xfc00 tx timeout
-Apr 04 10:15:10 braindead.localdomain kernel: Bluetooth: hci0: Reading 
-QCA version information failed (-110)
-Apr 04 10:15:10 braindead.localdomain kernel: Bluetooth: hci0: Retry BT 
-power ON:2
-Apr 04 10:15:13 braindead.localdomain bluetoothd[986]: Failed to set 
-mode: Authentication Failed (0x05)
-Apr 04 10:15:13 braindead.localdomain kernel: Bluetooth: hci0: command 
-0xfc00 tx timeout
-Apr 04 10:15:13 braindead.localdomain kernel: Bluetooth: hci0: Reading 
-QCA version information failed (-110)
-Apr 04 10:15:15 braindead.localdomain chronyd[1065]: Selected source 
-204.17.205.8 (2.fedora.pool.ntp.org)
-Apr 04 10:15:22 braindead.localdomain systemd[1687]: Created slice 
-background.slice - User Background Tasks Slice.
-Apr 04 10:15:22 braindead.localdomain systemd[1687]: Starting 
-systemd-tmpfiles-clean.service - Cleanup of User's Temporary Files and 
-Directories...
-Apr 04 10:15:22 braindead.localdomain systemd[1687]: Finished 
-systemd-tmpfiles-clean.service - Cleanup of User's Temporary Files and 
-Directories.
-Apr 04 10:15:38 braindead.localdomain audit: BPF prog-id=86 op=LOAD
-Apr 04 10:15:38 braindead.localdomain systemd[1]: Starting 
-plocate-updatedb.service - Update the plocate database...
-Apr 04 10:15:41 braindead.localdomain systemd[1687]: Started 
-vte-spawn-21527424-cb2d-479f-af17-22251e2b37a0.scope - VTE child process 
-5144 launched by gnome-terminal-server process 4668.
-Apr 04 10:15:53 braindead.localdomain systemd[1]: 
-plocate-updatedb.service: Deactivated successfully.
-Apr 04 10:15:53 braindead.localdomain systemd[1]: Finished 
-plocate-updatedb.service - Update the plocate database.
-Apr 04 10:15:53 braindead.localdomain systemd[1]: 
-plocate-updatedb.service: Consumed 6.802s CPU time.
-Apr 04 10:15:53 braindead.localdomain audit[1]: SERVICE_START pid=1 
-uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 
-msg='unit=plocate-updatedb comm="systemd" exe="/usr/lib/systemd/systemd" 
-hostname=? addr=? terminal=? res=success'
-Apr 04 10:15:53 braindead.localdomain audit[1]: SERVICE_STOP pid=1 uid=0 
-auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 
-msg='unit=plocate-updatedb comm="systemd" exe="/usr/lib/systemd/systemd" 
-hostname=? addr=? terminal=? res=success'
-Apr 04 10:15:54 braindead.localdomain audit: BPF prog-id=86 op=UNLOAD
-Apr 04 10:16:13 braindead.localdomain baloo_file_extractor[5251]: 
-kf.idletime: Could not find any system poller plugin
-Apr 04 10:16:13 braindead.localdomain baloo_file_extractor[5251]: 
-qt.core.qobject.connect: QObject::connect(KAbstractIdleTimePoller, 
-KIdleTime): invalid nullptr parameter
-Apr 04 10:16:13 braindead.localdomain baloo_file_extractor[5251]: 
-qt.core.qobject.connect: QObject::connect(KAbstractIdleTimePoller, 
-KIdleTime): invalid nullptr parameter
+---
+Regards,
+Linux Bluetooth
 
-There's a bunch of errors in those logs starting with these two 
-seemingly important lines:
 
-Apr 04 10:15:06 braindead.localdomain kernel: Bluetooth: hci0: QCA 
-Failed to send TLV segment (-110)
-Apr 04 10:15:06 braindead.localdomain kernel: Bluetooth: hci0: QCA 
-Failed to download patch (-110)
-
-FWIW, I get similar logs after logging into KDE Plasma. I also get 
-similar logs after a warm boot.
-
-This appears to be some kind of bug in the initialization of the 
-hardware. Is there any additional information I can provide to help 
-troubleshoot this problem.
-
-wt
--- 
-You're more amazing than you think!
+--===============8956711733111892015==--
