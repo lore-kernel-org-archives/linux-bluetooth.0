@@ -1,77 +1,92 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4711D1D6A5
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Apr 2024 18:50:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EDB312C7FB
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Apr 2024 19:03:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712256632; cv=none; b=iTQ3awDy2nKZ7bqj8ZesYJxhU5UROxUxljZnTc6qkK/qBkUcR4S434f8uBn2r7Z5SMp0hpvSUHEyoxqAQCLbIbQw9Ot4AaAEF7cyRoOSQ4MFQT6fUadqdwQjlEBYYm9mPDGBuhMRPx6vOdTAfLdWMpW7WT59jXd7VgLLIjk6mQM=
+	t=1712257388; cv=none; b=I+ItPhccnwa5H9VxlPyeG//LPcJqhT3t4X36or8iAb92m2YBdztlBUORZBoctzt5XkI5Rdf4yVYT6G4bUUJHk0feVBnZIA01Ai+tDMEhP4LHlWZyYzceo+OXrOA4X4jvohZgz2w95pFvJJTVZMGrawNQtIDbj0x2hDQalbkVNKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712256632; c=relaxed/simple;
-	bh=9dwrKBwyRWRDaC3oELDaLLoxt9NAEG86fkCL4/DtPq4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hNDgFeRMsU8fI6woanU86f3+w1l5AZ3bQwD1WRRlyK/BF8NTgO4uE8uXVBBwss8fIcSwVfluvgHTndY4Vpr9YQM2rtxx1r/nUSNZPKohYSyyjQ/WX48r92BCXBieytaiLbjLVN8Yjxk3VmwLmy61AzcC8AzoRp+RobyhKRwbXLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cwNsIcyq; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1712257388; c=relaxed/simple;
+	bh=/BgY3Rb4KGTUE8LNU5ENR93N3yPOpkP5eThWZKYeMSU=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=Cp+YlMosZbVeYPt8fkuWsXZOF4QyIO7FBjDP2Dzsku672/3L+c5UPxPa1Ub+XwknRUY59HnpszALsanS3hRgzbICzyo3XzcpxzwBOSTsN1RjdlTmEtCRlkX7wrQMNdmtvvStJHCxp1PpAapZ2ZQk0MI2zeYNrc+aLFOdsHLzdmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=d8908FJU; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=penguintechs.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cwNsIcyq"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C12DFC433C7;
-	Thu,  4 Apr 2024 18:50:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712256630;
-	bh=9dwrKBwyRWRDaC3oELDaLLoxt9NAEG86fkCL4/DtPq4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cwNsIcyq8W5TasQcUCKICu+6tSHAwyMHOUr1AQbEtc3QC7e2TBLfnku+R4eP/o5vt
-	 KXnoa1sMVZbXD3LoniT8x5YfVN1Eloo09046DHs6s6AyZEmJQPz0hHhkmEEhj7IB69
-	 3XjMqketUVsT20bhlNr6dIEGkxVplhXIzqADixtuVHnfRdQMDCFhbzy/4z7RHFe1FR
-	 8xHARHwH9zLNk5OauQgfRI+UPN/f+rdkLgYyCeX2rQUKSGkaub+IhAVfkP1ZYfg9lM
-	 lSGT14Zjj2CcfuhuAijkw0IRGGSu0KdMHPRfv6IXgJuhd+L29q/y4jQXkPedddu17A
-	 F4oRr+9R1wdBQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AFF5ED84BA4;
-	Thu,  4 Apr 2024 18:50:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="d8908FJU"
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2a226f8e44aso933174a91.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Apr 2024 12:03:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=penguintechs.org; s=google; t=1712257385; x=1712862185; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F+dc1DcxVAxBWTys4V7Wa8EiTvAGlJvNoLSLbyF+ei8=;
+        b=d8908FJUEtkHRWdCW1afd21Y9hGhIV2nDcRRW72PfbTCSvFkxF6S3tD7zHcXLPEg/Q
+         slbgoGWH8+NJvyYFh/J63Z4nte0tpLgHGHmOoxTlFKY2caOryM2sSxRr67Tp/VUlsKu4
+         1K91pYwdun0fpBBV17X/nRoYKCRbv+vrfNb8Y=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712257385; x=1712862185;
+        h=content-transfer-encoding:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=F+dc1DcxVAxBWTys4V7Wa8EiTvAGlJvNoLSLbyF+ei8=;
+        b=SqF6GUGSd7IaROrUHwBkTD2lGqdT36MvV2H24ERvUJ9ESDLBM3uFSnbL4l2n/zNT3b
+         cvv0ixe6yO4Rd0t4lozmGS7It8aU/t48jGaV6TmM6w+qmLOaaR1sZGHAV/5KYKLiVZms
+         k+QXHMz/j7tUO/NSUfXl+8oCx97pXG/n94Gme6eQW6KKV0bXl4633Rejof1HCC3JNLS2
+         GX3l7IMb80sMZwrmwK8WyxXOJIcxRoBBHW1ASwZ5K3B5KR5K/55sVeOOBPSRElsdkkvH
+         UvzzeDvveED6tV4NYOcF1c+Sx+x99+YoQz304zA+Fckig7Vdn1OMExx9TyEdZUWaYoaq
+         eItg==
+X-Gm-Message-State: AOJu0YzID0YjJA1A5YLmSkyfuQk/ia5Tadk/m5D1aLJvU0fKTtEXPU1L
+	brRpPtKEnAyvhmPw2jgGYA94JpN3T2xwxvLRSL5zxz0m0AZt3YG//NUFE82ZkduOjeHSltkjSTt
+	06Q==
+X-Google-Smtp-Source: AGHT+IG+JgXXz58Ua9WmNYk9Ka74bb8u0Vf27OXPB04pp3RSnWxazValEorWWNAwb1+DHqSaq2jlzQ==
+X-Received: by 2002:a17:90b:1e4d:b0:29b:8926:c161 with SMTP id pi13-20020a17090b1e4d00b0029b8926c161mr3218857pjb.19.1712257384739;
+        Thu, 04 Apr 2024 12:03:04 -0700 (PDT)
+Received: from ?IPV6:2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08? ([2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08])
+        by smtp.gmail.com with ESMTPSA id e21-20020a17090ac21500b002a0981a7af5sm41201pjt.32.2024.04.04.12.03.03
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Apr 2024 12:03:04 -0700 (PDT)
+Message-ID: <980ac002-efb7-4ed7-92ac-fb0caca41b59@penguintechs.org>
+Date: Thu, 4 Apr 2024 12:03:03 -0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ 0/1] V3: Fix busy loop when disabling BT
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <171225663071.19551.11859340308005262666.git-patchwork-notify@kernel.org>
-Date: Thu, 04 Apr 2024 18:50:30 +0000
-References: <20240404183050.334414-1-dimitris.on.linux@gmail.com>
-In-Reply-To: <20240404183050.334414-1-dimitris.on.linux@gmail.com>
-To: Dimitris <dimitris.on.linux@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: linux-bluetooth@vger.kernel.org
+From: Wren Turkal <wt@penguintechs.org>
+Subject: dead link for subscribing to mailing list on bluez website
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello:
+The link to the mailing list subscription at 
+https://www.bluez.org/development/lists/ is dead. I was hoping someone 
+could update that or point me to a git repo that I can send an MR for.
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+If someone here wants to do it, the correct current link appears to be 
+https://subspace.kernel.org/vger.kernel.org.html. There aren't html 
+anchors on that page that I see on that page, so I can't find a link 
+directly to the linux-bluetooth list entry in the large list of mailing 
+lists.
 
-On Thu,  4 Apr 2024 11:30:49 -0700 you wrote:
-> Splitting the service state test out of btd_device_is_connected
-> and using only the bearer-specific test from adapter_remove_connection.
-> 
-> This intends to fix a busy loop that happens when BT is disabled
-> from userspace with e.g. "rfkill block bluetooth":
-> 
-> 1. Connect at least one device.
-> 2. Run rfkill block bluetooth.
-> 3. bluetoothd takes 100% CPU.
-> 
-> [...]
+However there is an option for a link to directly highlight the 
+linux-bluetooth text that only works in chrome:
+https://subspace.kernel.org/vger.kernel.org.html#:~:text=449-,linux%2Dbluetooth,-Linux%20bluetooth%20development
 
-Here is the summary with links:
-  - [BlueZ,1/1] refactor bearer connected test
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=036583f9bbec
+Firefox will not jump to the highlight with that link, but will load the 
+page fine. Maybe use that link instead of the bare one to make it better 
+for those that have chrome with no apparent costs to other browsers?
 
-You are awesome, thank you!
+FWIW, I am not subscribed to this list. Please keep me on any threads if 
+that helps.
+
+Thanks,
+wt
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+You're more amazing than you think!
