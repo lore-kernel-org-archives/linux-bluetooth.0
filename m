@@ -1,104 +1,155 @@
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09F3A8662B
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Apr 2024 13:47:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB2211BC46
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Apr 2024 14:59:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712238464; cv=none; b=M5IEthZskxzYSya62AMsBxN5c/tA6ksMrbK6+1Z9jhIi/JhAI+7skRBHG0KxuzJcZXpBtJeog0IT97vkzSOOvCfo5BkPOWD7HeBkFEmIx0KB6zDwl4uSWFtBjBh5aGGqS8nZxfzWn8bMRrWjw+cDznzCo/yQXdXXVjnYGHiVpeY=
+	t=1712242756; cv=none; b=cxNnKDc68QtaCP1XGddzhMoqo8eBC4Co2yUvyvQuP9VFs3L3P2JQdGrhsTh/M8bcLy8uRXmiITXPWMOH1mdNHN7tDkmBG7/WcY+QoMSuzxuTDq7RA1oDBcUI8GKEyLMOh2JNf7FAmlbIJrRwUOj6z6DI65BJYvLxHiF3KHLLXsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712238464; c=relaxed/simple;
-	bh=NAr31UyiVs4W78SGYcNiVOtA6+RsGHGMng7emzOQs58=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=aG9pBnv/RYew4C5utJ/p23rIds4sJGENBaYG1Yh4qhpqIGw7J/6+semRGJWZU3iARIz5MjFKi1wIJFMw10nYHeQdLT2q7cI4EEWKLdsGFB+oiCvOxYbI7HXL/AQCAswc2c0ewBlDUDD4AeUk8uodnaC8sMgg5RoHwUVQHRpHz/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YcbDeB6X; arc=none smtp.client-ip=209.85.210.181
+	s=arc-20240116; t=1712242756; c=relaxed/simple;
+	bh=SbnHO41/mqL5szyrnVGV8VFEptIH0oJcbUyGQSikPz8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Z9/a1QNtk4ZHlErXxEL46ISNVv0wtvdmeT2t1kcW3HjhywgJ0NjemWZMhzrati9ffuOhGJxWq/dJz2KH2Kf2rpf5lxUpQR8GNrVqDbNS5kYv6DFeCcIrOJN1V1fLdEEDpiBFA9uCXnKo2crDy6WVYYhb5vSCatrzGdJxsDkwxIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=apSSwOvx; arc=none smtp.client-ip=209.85.208.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YcbDeB6X"
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6ea9a605ca7so754860b3a.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Apr 2024 06:47:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="apSSwOvx"
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2d8129797fcso14653481fa.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Apr 2024 07:59:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712238462; x=1712843262; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=qmegCHCVJR0uQAsDpig8NVUWjsbRKYzCmOuiUBShJHI=;
-        b=YcbDeB6XSeIwd+xOMTkatlHEiWKriLAqYDPoT1ORReXE38b5DKMtNghlepJTl42nXZ
-         oMS7ctaVjd//WamtubVnVuGgGb9b/8eve6RKPRrhePOKZsp1k/vTJ5aRJnp5/A9wl404
-         tEi+WtexzoPjiCBTCEnM87qidLVsuhs+taLNwg3Gocx99MrZI82rnGdoPkA4OqsEMdl5
-         KNV5v2N2SfB6gf6hKNu/kDIpIJNil0vdBZszT7qR6r9qLTmyessrJ4lIiCvE+Sq5LyxW
-         Au781bJx9CnukZhZOoVOB/9RwchmlXbfRppp3esfMU4FAMFEFmt6lB18b251uV2J/+uk
-         3XuA==
+        d=gmail.com; s=20230601; t=1712242753; x=1712847553; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iExl5yWgF6ewZTVDUwxjdktgzpPueh1+2u16rTUnNDc=;
+        b=apSSwOvxEGL5jR3a7VbLeff//ET4CiIh2CZXp5bsDFPgPqNKJxc01IUZrkLqCtSnm6
+         y15MfpwnnvnhJsGF6HZg2jf+nSYB1kciEpnugH2Sar8kRO3j0us+wY+3I00BprqMs09Q
+         QM7ZbjnWNSBSv6adbUByVo/MwV00OAMn0SDDkAR0ENTZ1DBTID2JkYNKex1F58XzP3Xr
+         q0CErVC23xjnmvsXNp0V7WGYaohRRmpGQxxoqhCKMUusUogviYj3uc4ab7yj9qi6u1J1
+         Su8p2brn8eUwA/FqoFC+0JdcXb3+Ysa70bXWtJXh/yaTG4R50wy7TEfeP4w5Vpky5hTN
+         F4zw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712238462; x=1712843262;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qmegCHCVJR0uQAsDpig8NVUWjsbRKYzCmOuiUBShJHI=;
-        b=j+fH/2FJIUW1IycYrmRBvJcLi6QLRoSbBAylAHBIhOB4pEpzYG7TqOniErpVDGkbdy
-         zm+/Slffs6oCnbNvPmMzkrEbPdkI3e7xDHeK1QgB+kYYfU68fHM+/ucuUupdijmvCymW
-         sar3CtzALTA5ZWpyMAINNvHcv8VUXVZnt+7V/fYIO21txejAPRxq8S6vWW38WAldtTi4
-         ozEX4QqD/+oEpGWOpP2fXGJjH+/zs1PtHghcBRJajOn+P1PWhfP5eeYbYsSS/3snbPZR
-         02HMxeDbh7ndOv+AsQzU8A3MjYRsGpszRrIEZni+qSlBJ9aXb9u97OzfBDxr1muKQuii
-         K/8g==
-X-Gm-Message-State: AOJu0YzxWN/pvkvZgUdTqo7EIRehz4lp5l2rHqAIrpzINt+mPPIHuCW2
-	qdikuFnRYbchX4gKLcv7B1IX99HQEnHrypKdeVi0lL8Tl274Xe1pPNJ3xQCU
-X-Google-Smtp-Source: AGHT+IEc/XFyWg7dEmDocwabPFrDRemFyMz00HLnoWJSVvOVMnkoNrk++vYgnVFD0gb0lJGMgdjdYg==
-X-Received: by 2002:a05:6a00:1802:b0:6ea:f43b:b961 with SMTP id y2-20020a056a00180200b006eaf43bb961mr7720660pfa.6.1712238462038;
-        Thu, 04 Apr 2024 06:47:42 -0700 (PDT)
-Received: from [172.17.0.2] ([20.172.5.217])
-        by smtp.gmail.com with ESMTPSA id g18-20020aa78192000000b006e7324d32bbsm13652510pfi.122.2024.04.04.06.47.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Apr 2024 06:47:41 -0700 (PDT)
-Message-ID: <660eaf7d.a70a0220.dae91.61b1@mx.google.com>
-Date: Thu, 04 Apr 2024 06:47:41 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3835580915271529115=="
+        d=1e100.net; s=20230601; t=1712242753; x=1712847553;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iExl5yWgF6ewZTVDUwxjdktgzpPueh1+2u16rTUnNDc=;
+        b=pVfaYMSoaBgaVBFl0bD0AmID9UcdB/LaPp/4XfHtVJYkuUPlP+smx6tqtIjQKoG859
+         AhSG+BRdqDiVqje8W+vS1WaF8OmNHlOUTKCS9qOtDnsF44AAA6T7GzkfrSIg0UMgZrEP
+         09YV4s9HAqTzCPG3phR2aAH4CUuaILP6+jacnEsli7tm1ZZXHjS2trDG5/zkKNvyfPE7
+         I1Z7ko+zi8TlNncxScIwmKbnejMEzCXAgEmZ3fUSdcc9wAtMCLaFeVsjPru6nALGnJ42
+         XCVFTx93XhOOZsc5v04eH1mXD4hVhRAnKuPwO6q1W/hB/6svQfxQp0LS8YujBamTLQv9
+         kxXw==
+X-Gm-Message-State: AOJu0YyhUFWEyAH+NtnTNdVXnte3oAifxYgataSdCSD1VulUQLQzJwBZ
+	o6bHRuYHddWuXV85Oq9ozoB49a5HoPNks06fFqYUcGGceoR+kXbDj9TrDZrPTJdQVWdJrpaJy6b
+	lPIp8Du8vFjJhaAlEqfx0zVcKVFk=
+X-Google-Smtp-Source: AGHT+IHvyklYW5K/JfA2bEumY/h2zVHFVx0B6+wKplpd9m6o68iTLFwl0gERpgX+N5wKZ1ctoB2exqn9XO07sK6c9cc=
+X-Received: by 2002:a2e:9d05:0:b0:2d6:ec1b:ee06 with SMTP id
+ t5-20020a2e9d05000000b002d6ec1bee06mr2210727lji.11.1712242752612; Thu, 04 Apr
+ 2024 07:59:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, mahesh.talewad@nxp.com
-Subject: RE: Autoconnecttimeout max value increased to 20480 msecs
-In-Reply-To: <20240404114054.4987-2-mahesh.talewad@nxp.com>
-References: <20240404114054.4987-2-mahesh.talewad@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20240403205252.71978-1-dimitris.on.linux@gmail.com>
+ <20240404024521.120349-1-dimitris.on.linux@gmail.com> <20240404024521.120349-2-dimitris.on.linux@gmail.com>
+In-Reply-To: <20240404024521.120349-2-dimitris.on.linux@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 4 Apr 2024 10:59:00 -0400
+Message-ID: <CABBYNZJjSp74CoJU2RYCft_nQi85EWnk9JOvyxMH8YmAtON+8w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/1] Refactor btd_device_is_connected
+To: Dimitris <dimitris.on.linux@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============3835580915271529115==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Dimitris,
 
-This is automated email and please do not reply to this email!
+On Wed, Apr 3, 2024 at 10:46=E2=80=AFPM Dimitris <dimitris.on.linux@gmail.c=
+om> wrote:
+>
+> Splitting the service state test out of btd_device_is_connected
+> and using the state-specific test from adapter_remove_connection.
+>
+> This intends to fix a busy loop that happens when BT is disabled
+> from userspace with e.g. "rfkill block bluetooth".
+> ---
+>  src/adapter.c | 2 +-
+>  src/device.c  | 7 ++++++-
+>  src/device.h  | 1 +
+>  3 files changed, 8 insertions(+), 2 deletions(-)
+>
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 4bcc464de..0b7aab4b5 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -7486,7 +7486,7 @@ static void adapter_remove_connection(struct btd_ad=
+apter *adapter,
+>                 device_cancel_authentication(device, TRUE);
+>
+>         /* If another bearer is still connected */
+> -       if (btd_device_is_connected(device))
+> +       if (btd_device_state_is_connected(device))
 
-Dear submitter,
+Perhaps btd_device_bearer_is_connected would be a better name.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=841385
+>                 return;
+>
+>         adapter->connections =3D g_slist_remove(adapter->connections, dev=
+ice);
+> diff --git a/src/device.c b/src/device.c
+> index 5e74633c6..123b1b796 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -3273,13 +3273,18 @@ uint8_t btd_device_get_bdaddr_type(struct btd_dev=
+ice *dev)
+>
+>  bool btd_device_is_connected(struct btd_device *dev)
+>  {
+> -       if (dev->bredr_state.connected || dev->le_state.connected)
+> +       if (btd_device_state_is_connected(dev))
+>                 return true;
+>
+>         return find_service_with_state(dev->services,
+>                                                 BTD_SERVICE_STATE_CONNECT=
+ED);
 
----Test result---
+I guess the problem is that some service is indicating it is still
+connected though?
 
-Test Summary:
-CheckPatch                    PASS      0.32 seconds
-GitLint                       PASS      0.23 seconds
-BuildEll                      PASS      24.59 seconds
-BluezMake                     PASS      1652.90 seconds
-MakeCheck                     PASS      13.39 seconds
-MakeDistcheck                 PASS      176.66 seconds
-CheckValgrind                 PASS      245.64 seconds
-CheckSmatch                   PASS      347.36 seconds
-bluezmakeextell               PASS      118.76 seconds
-IncrementalBuild              PASS      1418.35 seconds
-ScanBuild                     PASS      990.80 seconds
+>  }
+>
+> +bool btd_device_state_is_connected(struct btd_device *dev)
+> +{
+> +       return dev->bredr_state.connected || dev->le_state.connected;
+> +}
+> +
+>  static void clear_temporary_timer(struct btd_device *dev)
+>  {
+>         if (dev->temporary_timer) {
+> diff --git a/src/device.h b/src/device.h
+> index d4e70b7ef..e3191f2a4 100644
+> --- a/src/device.h
+> +++ b/src/device.h
+> @@ -104,6 +104,7 @@ void device_set_rssi(struct btd_device *device, int8_=
+t rssi);
+>  void device_set_tx_power(struct btd_device *device, int8_t tx_power);
+>  void device_set_flags(struct btd_device *device, uint8_t flags);
+>  bool btd_device_is_connected(struct btd_device *dev);
+> +bool btd_device_state_is_connected(struct btd_device *dev);
+>  uint8_t btd_device_get_bdaddr_type(struct btd_device *dev);
+>  bool device_is_retrying(struct btd_device *device);
+>  void device_bonding_complete(struct btd_device *device, uint8_t bdaddr_t=
+ype,
+> --
+> 2.44.0
+>
+>
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============3835580915271529115==--
+--=20
+Luiz Augusto von Dentz
