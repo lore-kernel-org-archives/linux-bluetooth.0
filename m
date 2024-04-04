@@ -1,71 +1,35 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B12B212AAF8
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Apr 2024 16:21:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712247699; cv=pass; b=Iv8EwYxsRj/WysPXEmb+2eWx5mlwvSuJ3n/cIUCvUx8awSFWBvmH5dErex2LwaQbQZumnmC4jG2PD1UWBLfgTk1T/c34WlpJI7otJLSXJWHazEuBJ3qIWcypSIZpjB1UoCEFUZax0CZdtD/xRIYD8lWAI1bez5VARSAt/lXfktg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712247699; c=relaxed/simple;
-	bh=CrXNap1pfijvwwb1PYCA8Mn9xNcPGXye6UaGzidWKcs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hayo6+7AKofgSvcsJFFrLswq1JAUak9vlqDmInB7DRdPT+mZuCnNEG+jElueykXk3FX3Pr4ZVQGDOb+jTgpLwXvspA6mzdoAdZfJv3l71rgnOZxSxXMjfoA5ahgkd6vXgmKZ3gvPsaOPnorgcojEJczbFZ4TsbHE7QQYi0WuysE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=k/qRIzCk; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E9B414A8B;
+	Thu,  4 Apr 2024 16:30:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712248229; cv=none; b=a5qglwOQ13IpwVip+RwrBZsAFOM4+6+57x2nhu6yoD0Ogij8U72lCN+b9nl0TpMiBfjmAvBuDIN6IHkR4lFNYAkvQSTdt19y0plw5xHYhzfbHQxiXXCNR1Sc+xd4ns5ceM+HQlmlsEMeiYIA8ueAYNXNGTTLQMXl8a4d5gY3uAs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712248229; c=relaxed/simple;
+	bh=BVhTXashEG57puklFol7XbJe6FSrSBczHcdEuLpp3iM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=kenqLgu8L5rWmlFpMzRMZizmwCUnRZ5/G9Rzz8cUq+OmTPIMDJBxRKBiZ8Q3PNPwfqi5kQikcxOK7uGh/fh7+i4oTSyI/WR1xc4Kgb6OYE+j2JS/fMJ/CyT8RHBqig+On8TOmhS8H4QhT7WT8cuJk+Oc2ARgM+GUZXNEq92QhMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hsmwht34; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="k/qRIzCk"
-Received: from monolith.lan (unknown [193.138.7.178])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4V9RhH3LNVz49Q20;
-	Thu,  4 Apr 2024 19:21:35 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1712247696;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dptXVj4bIU0PiLtrHZKTYLF2BmJUfMRxzrJx8J2qiDU=;
-	b=k/qRIzCkeReZzYP1tC8cnyZPZ4SwHh+QnKtS8xU2ddV+zGRI3+yMP15SGnUdJxSJNNjmxh
-	WHblUo5JuPjnjiQAr4Pkvj73lEioyWN0O0Ku8fT0V7WaTeLHzvENv2LopL4X+qmWPN02ae
-	gPqk0lYGjf42QuWtuw0cXfdvWir335AyKQ8/WLdt0Bq90kypB67W08p4JSdZfyKejfPeia
-	07YhK/nZ728bl9TYCUg6l5WD1Zk1eqLeIYRyYlwnh7T6Gsb2XUzzujovuFnmL4QA3ahaeR
-	UxivpOkH8mGqVKAObtBszRbzqmMZHJ0CgJwgdt2VN8VXAxqkZlc4oanHTHPbrA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1712247696;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dptXVj4bIU0PiLtrHZKTYLF2BmJUfMRxzrJx8J2qiDU=;
-	b=Ez68ZYYIrNIRdrXSqGUb2hDErrOfPilxaalm8dqlflz92d2cOlTlo7dPYIKEgMINKJGKiA
-	mpc3stVqXFoM5TW0WS3fa22zpME/LHvWi3VOFTMOuIjuog2JUCSMGQqWKPDy25CdkgKsCi
-	XZv/ux16kj1NQX2ZzGlr64f0HSX1ArTmwREU1LjEJNUHPSNpCFoeEW6GWGujNQptFD0Ien
-	coErKuVDO/L7OefUjejNmfDLAlWvE1GrFficbpTQ46i2SgxulC1bhiqCZ9UxKm82NWVa4b
-	V6+wY6tDAyQ0A6FAiw7ahj4zlHjbfvbmqB8qxcj/fZtOKosWtYQQRluiiD84cQ==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1712247696; a=rsa-sha256;
-	cv=none;
-	b=k8pzJgWjID+lUI5kPdWUoL8DghlEHPznaa3jCxHIjZBo7tSK3zpPmGxg7L2XhNvI12G+1X
-	rxuy+0SwoGX8Dg+6vEF7uKrvkBvbAwQsSItdG+95tpGFAaMOcR57RV+KOy8ob4Pucfp3B8
-	V30lQcChEICbHBcV1YME7DOR2JzkETupNy1cF5GljffUSRzVn5WjZBiGZ4lGkVvH5IORrY
-	JLLZgz8SGPkaK8dxP0QvSQ2+lUXk/ICophwsCaEZF0oi7rNGoMz/JPlI/9hFvIHVzfCsr9
-	kIvus0oMgQCc5p/oNDsFcn+kz+hmFUWDEYE27fkSeuCTAhh35rYLTQfLccK3yQ==
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v7 7/7] l2cap-tester: add tests for LE Client read/write/tx-timestamping
-Date: Thu,  4 Apr 2024 19:21:23 +0300
-Message-ID: <cb708bf61320f65aa7961ab0ffd261a90a252198.1712243675.git.pav@iki.fi>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <cover.1712243675.git.pav@iki.fi>
-References: <cover.1712243675.git.pav@iki.fi>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hsmwht34"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4A7D3C433C7;
+	Thu,  4 Apr 2024 16:30:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712248229;
+	bh=BVhTXashEG57puklFol7XbJe6FSrSBczHcdEuLpp3iM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Hsmwht34uUDEQzhRK1cgphbEHpX7XgDjagInAX5Z07E/FXvdJJlgs/io39DrxhGV4
+	 Zd9cX0LlYZvGqiwYlnEsZPSxqIJuf7AT+oc6InsYFND5GdUrA03GTiYqcYyl5nCQLI
+	 oK6tzVYPv78eGi1Jxq2YKeYc9gHKQidM8SAl8+6GsSfARSPlXjMpZ1b0nVHITF+H3T
+	 jeUog2UP1LBu5NwMqVjZ//s+5SlV/JLsFEsE6pwgLu4386rtUrnycFNcpf6ab87Oh3
+	 UOk2kIF1UczAjiu3oBmZx9rujaLisLMoi3yyOvuGUZ933J+SNfvy3M1G6/zb1haum3
+	 C6PVsqFLvDnNg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 352BBD84BAC;
+	Thu,  4 Apr 2024 16:30:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -73,103 +37,45 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth: l2cap: Don't double set the
+ HCI_CONN_MGMT_CONNECTED
+ bit
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <171224822921.32019.3904901733305096930.git-patchwork-notify@kernel.org>
+Date: Thu, 04 Apr 2024 16:30:29 +0000
+References: <20240404185022.1.Ic27505c8f1ca7d4a653b1dcc1b08cdfc862a4622@changeid>
+In-Reply-To: <20240404185022.1.Ic27505c8f1ca7d4a653b1dcc1b08cdfc862a4622@changeid>
+To: Archie Pusaka <apusaka@google.com>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
+ johan.hedberg@gmail.com, marcel@holtmann.org,
+ chromeos-bluetooth-upstreaming@chromium.org, apusaka@chromium.org,
+ mmandlik@chromium.org, linux-kernel@vger.kernel.org
 
-Add tests:
+Hello:
 
-L2CAP LE Client - Read Success
-L2CAP LE Client - Write Success
-L2CAP LE Client - TX Timestamping
----
- tools/l2cap-tester.c | 41 ++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 40 insertions(+), 1 deletion(-)
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
-index 375ff767b..02d1571d2 100644
---- a/tools/l2cap-tester.c
-+++ b/tools/l2cap-tester.c
-@@ -487,6 +487,30 @@ static const struct l2cap_data le_client_connect_timeout_test_1 = {
- 	.timeout = 1,
- };
- 
-+static const struct l2cap_data le_client_connect_read_success_test = {
-+	.client_psm = 0x0080,
-+	.server_psm = 0x0080,
-+	.read_data = l2_data,
-+	.data_len = sizeof(l2_data),
-+};
-+
-+static const struct l2cap_data le_client_connect_write_success_test = {
-+	.client_psm = 0x0080,
-+	.server_psm = 0x0080,
-+	.write_data = l2_data,
-+	.data_len = sizeof(l2_data),
-+};
-+
-+static const struct l2cap_data le_client_connect_tx_timestamping_test = {
-+	.client_psm = 0x0080,
-+	.server_psm = 0x0080,
-+	.write_data = l2_data,
-+	.data_len = sizeof(l2_data),
-+	.so_timestamping = (SOF_TIMESTAMPING_SOFTWARE |
-+					SOF_TIMESTAMPING_OPT_ID |
-+					SOF_TIMESTAMPING_TX_SOFTWARE),
-+};
-+
- static const struct l2cap_data le_client_connect_adv_success_test_1 = {
- 	.client_psm = 0x0080,
- 	.server_psm = 0x0080,
-@@ -1082,6 +1106,8 @@ static gboolean client_received_data(GIOChannel *io, GIOCondition cond,
- 	char buf[1024];
- 	int sk;
- 
-+	tester_debug("Client received data");
-+
- 	sk = g_io_channel_unix_get_fd(io);
- 	if (read(sk, buf, l2data->data_len) != l2data->data_len) {
- 		tester_warn("Unable to read %u bytes", l2data->data_len);
-@@ -1126,6 +1152,8 @@ static void bthost_received_data(const void *buf, uint16_t len,
- 	struct test_data *data = tester_get_data();
- 	const struct l2cap_data *l2data = data->test_data;
- 
-+	tester_debug("BTHost received data: %u bytes", len);
-+
- 	--data->step;
- 
- 	if (len != l2data->data_len) {
-@@ -1314,7 +1342,7 @@ static gboolean l2cap_connect_cb(GIOChannel *io, GIOCondition cond,
- 		goto failed;
- 	}
- 
--	tester_print("Successfully connected");
-+	tester_print("Successfully connected to CID 0x%04x", data->dcid);
- 
- 	if (!check_mtu(data, sk)) {
- 		tester_test_failed();
-@@ -1506,6 +1534,8 @@ static void client_l2cap_connect_cb(uint16_t handle, uint16_t cid,
- {
- 	struct test_data *data = user_data;
- 
-+	tester_debug("Client connect CID 0x%04x handle 0x%04x", cid, handle);
-+
- 	data->dcid = cid;
- 	data->handle = handle;
- }
-@@ -2431,6 +2461,15 @@ int main(int argc, char *argv[])
- 	test_l2cap_le("L2CAP LE Client - Timeout",
- 				&le_client_connect_timeout_test_1,
- 				setup_powered_client, test_connect_timeout);
-+	test_l2cap_le("L2CAP LE Client - Read Success",
-+					&le_client_connect_read_success_test,
-+					setup_powered_client, test_connect);
-+	test_l2cap_le("L2CAP LE Client - Write Success",
-+				&le_client_connect_write_success_test,
-+				setup_powered_client, test_connect);
-+	test_l2cap_le("L2CAP LE Client - TX Timestamping",
-+				&le_client_connect_tx_timestamping_test,
-+				setup_powered_client, test_connect);
- 	test_l2cap_le("L2CAP LE Client, Direct Advertising - Success",
- 				&le_client_connect_adv_success_test_1,
- 				setup_powered_client, test_connect);
+On Thu,  4 Apr 2024 18:50:23 +0800 you wrote:
+> From: Archie Pusaka <apusaka@chromium.org>
+> 
+> The bit is set and tested inside mgmt_device_connected(), therefore we
+> must not set it just outside the function.
+> 
+> Fixes: eeda1bf97bb5 ("Bluetooth: hci_event: Fix not indicating new connection for BIG Sync")
+> Signed-off-by: Archie Pusaka <apusaka@chromium.org>
+> Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
+> 
+> [...]
+
+Here is the summary with links:
+  - Bluetooth: l2cap: Don't double set the HCI_CONN_MGMT_CONNECTED bit
+    https://git.kernel.org/bluetooth/bluetooth-next/c/d6126dfaf91e
+
+You are awesome, thank you!
 -- 
-2.44.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
