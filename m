@@ -1,134 +1,104 @@
-Received: from mail-oa1-f68.google.com (mail-oa1-f68.google.com [209.85.160.68])
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A011F1C6B8
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Apr 2024 02:45:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A54020330
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Apr 2024 04:40:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712198759; cv=none; b=nT62I11toJPVWRqxijlTMg4jC1TKlLhxMedJu0v2tNsLhY71KAo6E7ac8plUNnSPsTVyc8xWioz6v/U3636BGgRjkzdMAE37KphCmh2jtKUuFhWL1tUeJigk7T8KADeaPpEKJzuGCt9Bew0qWtHpDFY6F9vI3nFGXX2g7SQL80o=
+	t=1712205629; cv=none; b=G5DVQDO9Tpv85/5InRaFGvDLDDoYriXoNoDlmswDo124WV9SlaUGmIaglR8GuungK+UG5LohFwPWjMyigU3d5OsBXltC2P9Rhcjqdk1pChpb5El2scVG16KwnHyM1lJR8ELVZROhflx8sjMuvPFgmJVyf72sJegnN0+Y01Q4BAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712198759; c=relaxed/simple;
-	bh=6dKcgsSsKRcR2zluwdPeBCuYg1/K5k4r3QaqVHsTPK4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZasNbNp7TKEWqFuiWPoC8ANt0hSmW+EA+OOs9R1YJiGLRyMhNphSht01tOw+OGlJSBYL5OWX2+txHBOB2nSfZhXLhCU9JzMCR8JQMfO4SfSkJxowBn1jFrL5p+gK5T5w+ihqznP83NIKnywGj1YMOkR8ReWp9eaIifix/HDK3B0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J2RIXBty; arc=none smtp.client-ip=209.85.160.68
+	s=arc-20240116; t=1712205629; c=relaxed/simple;
+	bh=xUCS6boVQD4C1giw0JIy1xeDSjXD5lpQ1v1NzIuyPbs=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=S9V3UNm1SrwQCAktEIcjuiKxX6/XSNEaClkeI0DfqDTzWiF1PuW43K3Lh4kch/lJtA/4NQv++cxlRAojQe14z2BgtgwpDd7fW7nMBqsTaLHWJpKUOBo3QZ0P+j4Si1dQY7t3YMg79i8o8PRBDFShFdSbH7zH+WAWIzm/Mp+9It4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RDW2FhCs; arc=none smtp.client-ip=209.85.160.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J2RIXBty"
-Received: by mail-oa1-f68.google.com with SMTP id 586e51a60fabf-22e7560b94aso275982fac.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Apr 2024 19:45:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RDW2FhCs"
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-43448ff9be3so3904151cf.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Apr 2024 21:40:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712198756; x=1712803556; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PXeFRW6/7y6+A0LTRNjTlTWuylfSEcRX+XVrjnQMJOE=;
-        b=J2RIXBtyKVs8OZST+sr6aaOQjlvaFU33mlPStHiCvcROPgjLS287xCY7Yxif/zKK8B
-         rCPBV0vYB8eHgS8D5pio5BzBGXSgPzA/ZbmB4HhPW9aq2eWDa7mQaCW1XkBUF/3Jb14I
-         fhCIgyRUnenA5hbSJUg0Q7Cfe/zu0jCXvHNN9NWia/JSQiVXUFs2bUK0UoMsVku4OWkV
-         vIXnPjxryly5w7AE6SEiqwCemSwoLRUkgjISS0GYTiPeoeQmamSXEBRF3boYbrqIlgTu
-         hGXKPqT03PTxsOxfF5ZO9IuwaqD58rnwOL25rINj4MQSc76lxvc4boy/xqbqYzhrhOMn
-         Zs4g==
+        d=gmail.com; s=20230601; t=1712205627; x=1712810427; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=zkQAjefUYWpAs+L8HQfHSYOfqshvirNofTpSzXgClro=;
+        b=RDW2FhCsRNTzxDQxeb3+k32mFuf0NHQXbHg9Kuui68JjyKZwxyC50y+t7zNuCHBXL2
+         CE7jNXroL62Q1LM5VxSbHqHkq2wBodJIxLz3EYs378LwIy/NB1IbkLN9bnCGDJlxNP/5
+         vP/9tTJSGSvtmFEEryCS9t45ALTfQa1ux2mONnls8TYiEFy7TEdzGssdxzkhIE6qiyxY
+         NxfdthudHFoGtstMpW/Tx88WaLabmccU2JnFT+OXHfpVNd/XHxylq6bK3WKyrZUHXvDp
+         je/bIJJEno2pXc4MAfpG33VtGwy7ztgYzRjnvk88oLNV5/kNn4pajgpxaZcpfaL8rnic
+         ITLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712198756; x=1712803556;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PXeFRW6/7y6+A0LTRNjTlTWuylfSEcRX+XVrjnQMJOE=;
-        b=EHaP1f6cXctH21/mOw9P7pEJx69SHzTvWi+0OPaAcVNgm2x5hs3M90fkzRtVQmjalO
-         eB/bU+jBImnAXKsm4alDnonzSphkONX5v+t5vzy8BFP8CLtfVb0zZ9Gtqqq0t+yYFdWl
-         u929cc7e3rMqCl0lDvDg5k5Yq7d6qhDAgor7dfB3PbkSbl0SAEHw+SfIO1qbmFphyjs0
-         V+Pzk7ZuKWhSab1VmDBOTDpnrVaFQSXs1JDhkLDLqGs6zkzwW85wVEbZHT31jmRvUOWO
-         BKkJe5clqiEEyA2V5VySjvBZyYI2abBTtLaRUNCunxuoKxUjVJr0EN99RImte7tL5izM
-         7qgQ==
-X-Gm-Message-State: AOJu0Yw02Shaaw/suXpvyIX2ImeOx0kst4b0DBBwe3Gj0vx57VNMd0eg
-	eR+KXChMxCAHGPnYd6fqV2Qj76NtNuS0aqlm9Z4kux9/x2vGia9gTTKekOdJMhA8qBZE
-X-Google-Smtp-Source: AGHT+IEUNlG3GB7HO8J3QJY4t5JtKEVdZ1dTdp2JquNDu3b6OxX4Qc9KMVcZ2RgwLeB+hLfy7pwu4Q==
-X-Received: by 2002:a05:6870:1391:b0:22e:a4ab:68cc with SMTP id 17-20020a056870139100b0022ea4ab68ccmr1131651oas.25.1712198755944;
-        Wed, 03 Apr 2024 19:45:55 -0700 (PDT)
-Received: from angua.lan ([2600:3c0a:e002:7f00::1001])
-        by smtp.gmail.com with ESMTPSA id g8-20020aa79dc8000000b006e56da42e24sm12512869pfq.158.2024.04.03.19.45.55
+        d=1e100.net; s=20230601; t=1712205627; x=1712810427;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zkQAjefUYWpAs+L8HQfHSYOfqshvirNofTpSzXgClro=;
+        b=i66+lo8FdX8LLgx0npURB9xfSGzvwpIzD5HFcIv9k/Xw496kZ7XVaZE+spTEPM0d36
+         Zl15toH9mDxXX4ZloyukkAGcQz+b2/q3/IAGpPi/2Ykjbiq+h2nDN24ZsilnV9KWrN13
+         2YF5QBjxltJV/lJLSLpXMSOGe1EUjDMDxbB4u4yaGzkY3lNs/W6H+WUYfn9sH+7HaKFK
+         qtBkyRtUtDwkvmmGSaD3PLOr+Q5s7r0xEVmrrnNorD8FvVSrl3ormDN4uCKPK7v5PqHg
+         ntFWaRQmGxTRE/efltPn+5Ugox6PVzxice9mQs0lw7FNBosDGNWBEnChnPW+H+zO87kA
+         W0oA==
+X-Gm-Message-State: AOJu0Yxn15mZm4EF5F9azoKusYht7bJwBxezxjLtbJX6qtvoR6dKz0vk
+	p1S30sc5aNpKjjUteLOitQVkhlDqswrwOr5nnyoExl6XdXtZXt5kb2VhEDbp
+X-Google-Smtp-Source: AGHT+IFRQsrQB4JhamuKxOYjm0BSbpvc5kuLrXnI/RVd0+0e2aLRIu8tHN/7y1eqI0Yr6hPnmqcn2Q==
+X-Received: by 2002:a05:622a:47:b0:434:5025:be8 with SMTP id y7-20020a05622a004700b0043450250be8mr693824qtw.1.1712205626918;
+        Wed, 03 Apr 2024 21:40:26 -0700 (PDT)
+Received: from [172.17.0.2] ([172.183.161.214])
+        by smtp.gmail.com with ESMTPSA id et16-20020a05622a4b1000b00430b385f721sm7226740qtb.15.2024.04.03.21.40.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Apr 2024 19:45:55 -0700 (PDT)
-From: Dimitris <dimitris.on.linux@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Dimitris <dimitris.on.linux@gmail.com>
-Subject: [PATCH BlueZ 1/1] Refactor btd_device_is_connected
-Date: Wed,  3 Apr 2024 19:45:21 -0700
-Message-ID: <20240404024521.120349-2-dimitris.on.linux@gmail.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240404024521.120349-1-dimitris.on.linux@gmail.com>
-References: <20240403205252.71978-1-dimitris.on.linux@gmail.com>
- <20240404024521.120349-1-dimitris.on.linux@gmail.com>
+        Wed, 03 Apr 2024 21:40:26 -0700 (PDT)
+Message-ID: <660e2f3a.050a0220.564b5.54c0@mx.google.com>
+Date: Wed, 03 Apr 2024 21:40:26 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6858438488268051285=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, dimitris.on.linux@gmail.com
+Subject: RE: V2: Fix busy loop when disabling BT
+In-Reply-To: <20240404024521.120349-2-dimitris.on.linux@gmail.com>
+References: <20240404024521.120349-2-dimitris.on.linux@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Splitting the service state test out of btd_device_is_connected
-and using the state-specific test from adapter_remove_connection.
+--===============6858438488268051285==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This intends to fix a busy loop that happens when BT is disabled
-from userspace with e.g. "rfkill block bluetooth".
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=841263
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.45 seconds
+GitLint                       PASS      0.31 seconds
+BuildEll                      PASS      25.64 seconds
+BluezMake                     PASS      1663.82 seconds
+MakeCheck                     PASS      13.49 seconds
+MakeDistcheck                 PASS      190.09 seconds
+CheckValgrind                 PASS      247.23 seconds
+CheckSmatch                   PASS      348.43 seconds
+bluezmakeextell               PASS      118.28 seconds
+IncrementalBuild              PASS      1436.09 seconds
+ScanBuild                     PASS      991.93 seconds
+
+
+
 ---
- src/adapter.c | 2 +-
- src/device.c  | 7 ++++++-
- src/device.h  | 1 +
- 3 files changed, 8 insertions(+), 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 4bcc464de..0b7aab4b5 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -7486,7 +7486,7 @@ static void adapter_remove_connection(struct btd_adapter *adapter,
- 		device_cancel_authentication(device, TRUE);
- 
- 	/* If another bearer is still connected */
--	if (btd_device_is_connected(device))
-+	if (btd_device_state_is_connected(device))
- 		return;
- 
- 	adapter->connections = g_slist_remove(adapter->connections, device);
-diff --git a/src/device.c b/src/device.c
-index 5e74633c6..123b1b796 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -3273,13 +3273,18 @@ uint8_t btd_device_get_bdaddr_type(struct btd_device *dev)
- 
- bool btd_device_is_connected(struct btd_device *dev)
- {
--	if (dev->bredr_state.connected || dev->le_state.connected)
-+	if (btd_device_state_is_connected(dev))
- 		return true;
- 
- 	return find_service_with_state(dev->services,
- 						BTD_SERVICE_STATE_CONNECTED);
- }
- 
-+bool btd_device_state_is_connected(struct btd_device *dev)
-+{
-+	return dev->bredr_state.connected || dev->le_state.connected;
-+}
-+
- static void clear_temporary_timer(struct btd_device *dev)
- {
- 	if (dev->temporary_timer) {
-diff --git a/src/device.h b/src/device.h
-index d4e70b7ef..e3191f2a4 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -104,6 +104,7 @@ void device_set_rssi(struct btd_device *device, int8_t rssi);
- void device_set_tx_power(struct btd_device *device, int8_t tx_power);
- void device_set_flags(struct btd_device *device, uint8_t flags);
- bool btd_device_is_connected(struct btd_device *dev);
-+bool btd_device_state_is_connected(struct btd_device *dev);
- uint8_t btd_device_get_bdaddr_type(struct btd_device *dev);
- bool device_is_retrying(struct btd_device *device);
- void device_bonding_complete(struct btd_device *device, uint8_t bdaddr_type,
--- 
-2.44.0
 
+--===============6858438488268051285==--
