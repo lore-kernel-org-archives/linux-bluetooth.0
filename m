@@ -1,230 +1,230 @@
-Received: from mail.wantyapps.xyz (mail.wantyapps.xyz [66.135.5.160])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2493E13119B;
-	Thu,  4 Apr 2024 19:14:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.135.5.160
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E45113340F
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Apr 2024 19:14:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712258086; cv=none; b=CMWxrYIbLr1I+3tD8kuFykerWs1OHZ8uTWHd58dsyDM6VlfYo3jf1OLPFIHs9gFdjF1B1psFNyXWQ+o4EKl1FI5g8aUyyGYVlu9VeAhoTVoTSuFBpOSSCMGSnsRBZ/OjDakg8Oh9skA3nK+vEfCny6orP0f27TMsFzpj6js4mSY=
+	t=1712258090; cv=none; b=RL9bvIrDngeBRTt2rYJIZcvn9/+WnRbGqsi22vPAgDNQbIVP06iTEWrESJN9/vJ0uaX+Aes1YoOWGR3kjXP+x2v6eV8E/zjlW7/SHH9vAkTB5vthkscmC+Lt+/HrgP8TkF+yUjBqaiNqyazKSqti+apkbT1o9m9zRjVpxewVKpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712258086; c=relaxed/simple;
-	bh=QueE5iv6KUjeMTE44OC109wI3g5umCLfJ4vOn6h6GzQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JsVfUbkr05e0hSoNedsMs9yrX7aH47iAmfJcEfEKX5s7KZts2HZna52HXq7f2jW0hmoU8cqvfrC58TaBXbgvpWwmehfoMHll4B12nutCHJQVaRHAkWc6fRuT0XxNIo6ijgDYYSjh0RwpcPCxDuCl/jEGIkKCDsZqiyQwF3kxejQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=wantyapps.xyz; spf=pass smtp.mailfrom=wantyapps.xyz; dkim=pass (2048-bit key) header.d=wantyapps.xyz header.i=@wantyapps.xyz header.b=cf1DVxsM; arc=none smtp.client-ip=66.135.5.160
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=wantyapps.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wantyapps.xyz
+	s=arc-20240116; t=1712258090; c=relaxed/simple;
+	bh=5InxRozM7qCCoL7A3GDYW1R5umdr5Kooq8ghTbTRdbk=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type; b=pq0s6zsyzp4oYeiZ6jluJkzKBTQg7C40zQFIOR5OX2vjsq7xhFTri3i/r3T/y2rBrj+m3P0/HQ8KULleZ/PXXBKYeRJ0d5cyFsbYHehBsMJ2DTorAApLhdk3dQO55Vm8cXgpG/9tTU1ZheERXMCT3YIoojeSPgTc5MmUffOVOGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=GD8/3lUX; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=penguintechs.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wantyapps.xyz header.i=@wantyapps.xyz header.b="cf1DVxsM"
-Received: from multivac.localdomain (unknown [147.235.205.62])
-	by mail.wantyapps.xyz (Postfix) with ESMTPSA id D4CEE94A47;
-	Thu,  4 Apr 2024 19:14:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=wantyapps.xyz;
-	s=mail; t=1712258082;
-	bh=QueE5iv6KUjeMTE44OC109wI3g5umCLfJ4vOn6h6GzQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=cf1DVxsM7uXEYoHbAL7ZiDAKfBmvdxgEIPhOkObOdbkGPjSndgy88fKHfPd7eLX1d
-	 qT9WzEsSzK8ohMmf7HFS7KljeeW2vqEyGAqGmMsoeIeirjn4LichnTlIWxzGyl9MOY
-	 5Y9ec4CPwaJaxaPzbjo9FRzXvxNSAAvcOaABpq/7SovpAg5sVAdKGqJ1k/7hTa4g4b
-	 druFCyqsv2MWOr9ZwACG+LHwzDhHx9lYUNtyNypvR8wprudikMXM2pwPHOMQhBsGlE
-	 mKc1c3CCpRHutJoUAlc0fmkAAwjbSSixPoXunMcphjM8mw6VzWwRScE4IumCKSHnwD
-	 NUMHVIQsCbBvQ==
-From: me@wantyapps.xyz
-To: 
-Cc: me@wantyapps.xyz,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: ath3k: Fix multiple issues reported by checkpatch.pl
-Date: Thu,  4 Apr 2024 22:13:45 +0300
-Message-ID: <20240404191423.1545366-1-me@wantyapps.xyz>
-X-Mailer: git-send-email 2.44.0
+	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="GD8/3lUX"
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6ea9a605ca7so1036284b3a.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Apr 2024 12:14:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=penguintechs.org; s=google; t=1712258087; x=1712862887; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:to:subject:from
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MbF66O3k0UzwHeaOhaqXqequZ9uqXlexXgMorz4+oEA=;
+        b=GD8/3lUX6dzo+clygpz05TsR1cmKooY8xfDWNJr6v+H+RFD/jP3yhNTih3+Qzmycfu
+         Iw/CTkzEXXBNVmnHyr1Rs7hdAk0Bz4AnrX/7HP5kmKhtIsZd9CeXIqvDKcIMi5AUDdzQ
+         SSBpBKIGRGm1AlLyjfd9eR/c1joZGW84I1JM4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712258087; x=1712862887;
+        h=content-transfer-encoding:content-language:to:subject:from
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=MbF66O3k0UzwHeaOhaqXqequZ9uqXlexXgMorz4+oEA=;
+        b=UBxg1d44927Pxl25hqZGZX5edIm9GwnJ9W0sv0GnxlOqRr22yemjbeUNeT8Qt1hxr4
+         xe2YSnygoMDXeelTM/nRD7Qdd60srbbr2/aR4Gog8ISV8MGdlo5NUNrGxbXcvcLg0oIe
+         sM9CkAcJcVeKXlF3RP7+szA3OmPlRuJ5jEsrzbkLj02mM2J+UmP3hrXTRCameZseR5gu
+         dyjGmDAYjAryAoHJpfvq2S+WGCUK4/1EADfmCKhYrEWFQxXuVCtJecIGTWRNYgzRXNnZ
+         2EdyWXAmIX2bnyOxO+/Z6qGhw9HORiRJ9hOJvapYGnI9DGkZhQ7+vBgZJnszDJEftOVc
+         MNLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWPi7ocKevH/Y2vPb9dy+SbaMQoyhL5XkfeoGKq8doYFrHTT0gG4YdQQzxQBb7trYdmqHg/9XrGDl188blvW1ZZmXpW4hf6EbOgRuqwNh7w
+X-Gm-Message-State: AOJu0Yys52kDDCLBWa0yDcOuZ5/N63BY2SJYiMdXXcdNvl8kZZI/WiaX
+	qTiOxgKTyzm/1p4TTCdJ5aDI8xeuQmWc9EwsmQiwEAt6VMQhYRuS9NP6MKqzKaCUhvPnewWOoyw
+	n5w==
+X-Google-Smtp-Source: AGHT+IFi2InwVa+XHVz4khnYhN6vTZ6qQQwqC3hjG+kfowtmt1zKweI+IMp70LOgUj7+iTGvDnxvGg==
+X-Received: by 2002:a05:6a00:4614:b0:6ea:2501:d607 with SMTP id ko20-20020a056a00461400b006ea2501d607mr638178pfb.0.1712258087343;
+        Thu, 04 Apr 2024 12:14:47 -0700 (PDT)
+Received: from ?IPV6:2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08? ([2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08])
+        by smtp.gmail.com with ESMTPSA id n16-20020aa79850000000b006e64ddfa71asm14385974pfq.170.2024.04.04.12.14.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Apr 2024 12:14:46 -0700 (PDT)
+Message-ID: <a03dace1-ca0f-41d6-8e2c-636e3b053a3a@penguintechs.org>
+Date: Thu, 4 Apr 2024 12:14:46 -0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+From: Wren Turkal <wt@penguintechs.org>
+Subject: QCA6390 bluetooth doesn't work after warm boot or disable/reenable
+To: ath11k@lists.infradead.org, linux-bluetooth@vger.kernel.org
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-From: Uri Arev <me@wantyapps.xyz>
+Hey there ath11k/bluetooth folks,
 
-This fixes some CHECKs reported by the checpatch script.
+I am having a pretty major problem with QCA6930 for some time (maybe a 
+year or two). I have this bluetooth device:
 
-Issues reported in ath3k.c:
--------
-ath3k.c
--------
-CHECK: Please don't use multiple blank lines
-+
-+
+72:00.0 Unassigned class [ff00]: Qualcomm Technologies, Inc QCA6390 
+Wireless Network Adapter
 
-CHECK: Blank lines aren't necessary after an open brace '{'
-+static const struct usb_device_id ath3k_blist_tbl[] = {
-+
+This device appears to be driven by the ath11k module and others. I hope 
+I am pinging the right lists.
 
-CHECK: Alignment should match open parenthesis
-+static int ath3k_load_firmware(struct usb_device *udev,
-+				const struct firmware *firmware)
+I am using Fedora Rawhide. Fully updated yesterday. My uname reports this:
 
-CHECK: Alignment should match open parenthesis
-+		err = usb_bulk_msg(udev, pipe, send_buf, size,
-+					&len, 3000);
+Linux braindead.localdomain 
+6.9.0-0.rc2.20240402git026e680b0a08.24.fc41.x86_64 #1 SMP 
+PREEMPT_DYNAMIC Tue Apr  2 17:51:18 UTC 2024 x86_64 GNU/Linux
 
-CHECK: Unnecessary parentheses around 'len != size'
-+		if (err || (len != size)) {
+My main bluetooth device is  a Logitech MX 3 Mac mouse that uses 
+bluetooth. When bluetooth fails, so does the mouse. I have power cycle 
+my laptop when that happens. I'd love to help find a fix for this.
 
-CHECK: Alignment should match open parenthesis
-+static int ath3k_get_version(struct usb_device *udev,
-+			struct ath3k_version *version)
+The problem is that I cannot disable and re-enable the bluetooth on my 
+system. Bluetooth also doesn't work after a warm boot. I have to power 
+cycle my laptop to recover bluetooth funcitonality. I have tried the 
+following:
 
-CHECK: Alignment should match open parenthesis
-+static int ath3k_load_fwfile(struct usb_device *udev,
-+		const struct firmware *firmware)
+* logging into KDE Plasma (bluetooth stops working)
+* logging into GNOME (works on cold boot, fails on warm boot)
 
-CHECK: Alignment should match open parenthesis
-+		err = usb_bulk_msg(udev, pipe, send_buf, size,
-+					&len, 3000);
+After logging into GNOME during a cold boot, I have also done "systemctl 
+restart bluetooth.service". I get these journal logs during the stop;
 
-CHECK: Unnecessary parentheses around 'len != size'
-+		if (err || (len != size)) {
+➜  bt_kernel_bug cat journal-stop-bluetooth-service.log
+Apr 04 10:14:41 braindead.localdomain NetworkManager[1120]: <info> 
+[1712250881.7060] device (F0:5C:77:F2:60:FC): state change: disconnected 
+-> unmanaged (reason 'removed', sys-iface-state: 'removed')
+Apr 04 10:14:41 braindead.localdomain systemd[1]: Starting 
+systemd-rfkill.service - Load/Save RF Kill Switch Status...
+Apr 04 10:14:41 braindead.localdomain systemd[1]: Started 
+systemd-rfkill.service - Load/Save RF Kill Switch Status.
+Apr 04 10:14:41 braindead.localdomain audit[1]: SERVICE_START pid=1 
+uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 
+msg='unit=systemd-rfkill comm="systemd" exe="/usr/lib/systemd/systemd" 
+hostname=? addr=? terminal=? res=success'
+Apr 04 10:14:46 braindead.localdomain systemd[1]: 
+systemd-rfkill.service: Deactivated successfully.
+Apr 04 10:14:46 braindead.localdomain audit[1]: SERVICE_STOP pid=1 uid=0 
+auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 
+msg='unit=systemd-rfkill comm="systemd" exe="/usr/lib/systemd/systemd" 
+hostname=? addr=? terminal=? res=success'
 
-CHECK: Blank lines aren't necessary after an open brace '{'
-+	switch (fw_version.ref_clock) {
-+
+I get these journal logs during start:
 
-CHECK: Alignment should match open parenthesis
-+	snprintf(filename, ATH3K_NAME_LEN, "ar3k/ramps_0x%08x_%d%s",
-+		le32_to_cpu(fw_version.rom_version), clk_value, ".dfu");
+Apr 04 10:15:05 braindead.localdomain kernel: Bluetooth: hci0: setting 
+up ROME/QCA6390
+Apr 04 10:15:05 braindead.localdomain systemd[1]: Starting 
+systemd-rfkill.service - Load/Save RF Kill Switch Status...
+Apr 04 10:15:05 braindead.localdomain systemd[1]: Started 
+systemd-rfkill.service - Load/Save RF Kill Switch Status.
+Apr 04 10:15:05 braindead.localdomain audit[1]: SERVICE_START pid=1 
+uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 
+msg='unit=systemd-rfkill comm="systemd" exe="/usr/lib/systemd/systemd" 
+hostname=? addr=? terminal=? res=success'
+Apr 04 10:15:05 braindead.localdomain kernel: Bluetooth: hci0: QCA 
+Product ID   :0x00000010
+Apr 04 10:15:05 braindead.localdomain kernel: Bluetooth: hci0: QCA SOC 
+Version  :0x400a0200
+Apr 04 10:15:05 braindead.localdomain kernel: Bluetooth: hci0: QCA ROM 
+Version  :0x00000200
+Apr 04 10:15:05 braindead.localdomain kernel: Bluetooth: hci0: QCA Patch 
+Version:0x00003ac0
+Apr 04 10:15:05 braindead.localdomain kernel: Bluetooth: hci0: QCA 
+controller version 0x02000200
+Apr 04 10:15:05 braindead.localdomain kernel: Bluetooth: hci0: QCA 
+Downloading qca/htbtfw20.tlv
+Apr 04 10:15:06 braindead.localdomain kernel: Bluetooth: hci0: QCA 
+Failed to send TLV segment (-110)
+Apr 04 10:15:06 braindead.localdomain kernel: Bluetooth: hci0: QCA 
+Failed to download patch (-110)
+Apr 04 10:15:06 braindead.localdomain kernel: Bluetooth: hci0: Retry BT 
+power ON:0
+Apr 04 10:15:08 braindead.localdomain kernel: Bluetooth: hci0: command 
+0xfc00 tx timeout
+Apr 04 10:15:08 braindead.localdomain kernel: Bluetooth: hci0: Reading 
+QCA version information failed (-110)
+Apr 04 10:15:08 braindead.localdomain kernel: Bluetooth: hci0: Retry BT 
+power ON:1
+Apr 04 10:15:10 braindead.localdomain systemd[1]: 
+systemd-rfkill.service: Deactivated successfully.
+Apr 04 10:15:10 braindead.localdomain audit[1]: SERVICE_STOP pid=1 uid=0 
+auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 
+msg='unit=systemd-rfkill comm="systemd" exe="/usr/lib/systemd/systemd" 
+hostname=? addr=? terminal=? res=success'
+Apr 04 10:15:10 braindead.localdomain kernel: Bluetooth: hci0: command 
+0xfc00 tx timeout
+Apr 04 10:15:10 braindead.localdomain kernel: Bluetooth: hci0: Reading 
+QCA version information failed (-110)
+Apr 04 10:15:10 braindead.localdomain kernel: Bluetooth: hci0: Retry BT 
+power ON:2
+Apr 04 10:15:13 braindead.localdomain bluetoothd[986]: Failed to set 
+mode: Authentication Failed (0x05)
+Apr 04 10:15:13 braindead.localdomain kernel: Bluetooth: hci0: command 
+0xfc00 tx timeout
+Apr 04 10:15:13 braindead.localdomain kernel: Bluetooth: hci0: Reading 
+QCA version information failed (-110)
+Apr 04 10:15:15 braindead.localdomain chronyd[1065]: Selected source 
+204.17.205.8 (2.fedora.pool.ntp.org)
+Apr 04 10:15:22 braindead.localdomain systemd[1687]: Created slice 
+background.slice - User Background Tasks Slice.
+Apr 04 10:15:22 braindead.localdomain systemd[1687]: Starting 
+systemd-tmpfiles-clean.service - Cleanup of User's Temporary Files and 
+Directories...
+Apr 04 10:15:22 braindead.localdomain systemd[1687]: Finished 
+systemd-tmpfiles-clean.service - Cleanup of User's Temporary Files and 
+Directories.
+Apr 04 10:15:38 braindead.localdomain audit: BPF prog-id=86 op=LOAD
+Apr 04 10:15:38 braindead.localdomain systemd[1]: Starting 
+plocate-updatedb.service - Update the plocate database...
+Apr 04 10:15:41 braindead.localdomain systemd[1687]: Started 
+vte-spawn-21527424-cb2d-479f-af17-22251e2b37a0.scope - VTE child process 
+5144 launched by gnome-terminal-server process 4668.
+Apr 04 10:15:53 braindead.localdomain systemd[1]: 
+plocate-updatedb.service: Deactivated successfully.
+Apr 04 10:15:53 braindead.localdomain systemd[1]: Finished 
+plocate-updatedb.service - Update the plocate database.
+Apr 04 10:15:53 braindead.localdomain systemd[1]: 
+plocate-updatedb.service: Consumed 6.802s CPU time.
+Apr 04 10:15:53 braindead.localdomain audit[1]: SERVICE_START pid=1 
+uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 
+msg='unit=plocate-updatedb comm="systemd" exe="/usr/lib/systemd/systemd" 
+hostname=? addr=? terminal=? res=success'
+Apr 04 10:15:53 braindead.localdomain audit[1]: SERVICE_STOP pid=1 uid=0 
+auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 
+msg='unit=plocate-updatedb comm="systemd" exe="/usr/lib/systemd/systemd" 
+hostname=? addr=? terminal=? res=success'
+Apr 04 10:15:54 braindead.localdomain audit: BPF prog-id=86 op=UNLOAD
+Apr 04 10:16:13 braindead.localdomain baloo_file_extractor[5251]: 
+kf.idletime: Could not find any system poller plugin
+Apr 04 10:16:13 braindead.localdomain baloo_file_extractor[5251]: 
+qt.core.qobject.connect: QObject::connect(KAbstractIdleTimePoller, 
+KIdleTime): invalid nullptr parameter
+Apr 04 10:16:13 braindead.localdomain baloo_file_extractor[5251]: 
+qt.core.qobject.connect: QObject::connect(KAbstractIdleTimePoller, 
+KIdleTime): invalid nullptr parameter
 
-CHECK: Alignment should match open parenthesis
-+static int ath3k_probe(struct usb_interface *intf,
-+			const struct usb_device_id *id)
+There's a bunch of errors in those logs starting with these two 
+seemingly important lines:
 
-CHECK: Alignment should match open parenthesis
-+			BT_ERR("Firmware file \"%s\" not found",
-+							ATH3K_FIRMWARE);
+Apr 04 10:15:06 braindead.localdomain kernel: Bluetooth: hci0: QCA 
+Failed to send TLV segment (-110)
+Apr 04 10:15:06 braindead.localdomain kernel: Bluetooth: hci0: QCA 
+Failed to download patch (-110)
 
-CHECK: Alignment should match open parenthesis
-+			BT_ERR("Firmware file \"%s\" request failed (err=%d)",
-+							ATH3K_FIRMWARE, ret);
+FWIW, I get similar logs after logging into KDE Plasma. I also get 
+similar logs after a warm boot.
 
-total: 0 errors, 0 warnings, 14 checks, 540 lines checked
+This appears to be some kind of bug in the initialization of the 
+hardware. Is there any additional information I can provide to help 
+troubleshoot this problem.
 
-Signed-off-by: Uri Arev <me@wantyapps.xyz>
----
- drivers/bluetooth/ath3k.c | 25 +++++++++++--------------
- 1 file changed, 11 insertions(+), 14 deletions(-)
-
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 88262d3a9392..ce97b336fbfb 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -3,7 +3,6 @@
-  * Copyright (c) 2008-2009 Atheros Communications Inc.
-  */
- 
--
- #include <linux/module.h>
- #include <linux/kernel.h>
- #include <linux/init.h>
-@@ -128,7 +127,6 @@ MODULE_DEVICE_TABLE(usb, ath3k_table);
-  * for AR3012
-  */
- static const struct usb_device_id ath3k_blist_tbl[] = {
--
- 	/* Atheros AR3012 with sflash firmware*/
- 	{ USB_DEVICE(0x0489, 0xe04e), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0489, 0xe04d), .driver_info = BTUSB_ATH3012 },
-@@ -202,7 +200,7 @@ static inline void ath3k_log_failed_loading(int err, int len, int size,
- #define TIMEGAP_USEC_MAX	100
- 
- static int ath3k_load_firmware(struct usb_device *udev,
--				const struct firmware *firmware)
-+			       const struct firmware *firmware)
- {
- 	u8 *send_buf;
- 	int len = 0;
-@@ -237,9 +235,9 @@ static int ath3k_load_firmware(struct usb_device *udev,
- 		memcpy(send_buf, firmware->data + sent, size);
- 
- 		err = usb_bulk_msg(udev, pipe, send_buf, size,
--					&len, 3000);
-+				   &len, 3000);
- 
--		if (err || (len != size)) {
-+		if (err || len != size) {
- 			ath3k_log_failed_loading(err, len, size, count);
- 			goto error;
- 		}
-@@ -262,7 +260,7 @@ static int ath3k_get_state(struct usb_device *udev, unsigned char *state)
- }
- 
- static int ath3k_get_version(struct usb_device *udev,
--			struct ath3k_version *version)
-+			     struct ath3k_version *version)
- {
- 	return usb_control_msg_recv(udev, 0, ATH3K_GETVERSION,
- 				    USB_TYPE_VENDOR | USB_DIR_IN, 0, 0,
-@@ -271,7 +269,7 @@ static int ath3k_get_version(struct usb_device *udev,
- }
- 
- static int ath3k_load_fwfile(struct usb_device *udev,
--		const struct firmware *firmware)
-+			     const struct firmware *firmware)
- {
- 	u8 *send_buf;
- 	int len = 0;
-@@ -310,8 +308,8 @@ static int ath3k_load_fwfile(struct usb_device *udev,
- 		memcpy(send_buf, firmware->data + sent, size);
- 
- 		err = usb_bulk_msg(udev, pipe, send_buf, size,
--					&len, 3000);
--		if (err || (len != size)) {
-+				   &len, 3000);
-+		if (err || len != size) {
- 			ath3k_log_failed_loading(err, len, size, count);
- 			kfree(send_buf);
- 			return err;
-@@ -425,7 +423,6 @@ static int ath3k_load_syscfg(struct usb_device *udev)
- 	}
- 
- 	switch (fw_version.ref_clock) {
--
- 	case ATH3K_XTAL_FREQ_26M:
- 		clk_value = 26;
- 		break;
-@@ -441,7 +438,7 @@ static int ath3k_load_syscfg(struct usb_device *udev)
- 	}
- 
- 	snprintf(filename, ATH3K_NAME_LEN, "ar3k/ramps_0x%08x_%d%s",
--		le32_to_cpu(fw_version.rom_version), clk_value, ".dfu");
-+		 le32_to_cpu(fw_version.rom_version), clk_value, ".dfu");
- 
- 	ret = request_firmware(&firmware, filename, &udev->dev);
- 	if (ret < 0) {
-@@ -456,7 +453,7 @@ static int ath3k_load_syscfg(struct usb_device *udev)
- }
- 
- static int ath3k_probe(struct usb_interface *intf,
--			const struct usb_device_id *id)
-+		       const struct usb_device_id *id)
- {
- 	const struct firmware *firmware;
- 	struct usb_device *udev = interface_to_usbdev(intf);
-@@ -505,10 +502,10 @@ static int ath3k_probe(struct usb_interface *intf,
- 	if (ret < 0) {
- 		if (ret == -ENOENT)
- 			BT_ERR("Firmware file \"%s\" not found",
--							ATH3K_FIRMWARE);
-+			       ATH3K_FIRMWARE);
- 		else
- 			BT_ERR("Firmware file \"%s\" request failed (err=%d)",
--							ATH3K_FIRMWARE, ret);
-+			       ATH3K_FIRMWARE, ret);
- 		return ret;
- 	}
- 
+wt
 -- 
-2.44.0
-
+You're more amazing than you think!
