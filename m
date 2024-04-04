@@ -1,121 +1,158 @@
-Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2115.outbound.protection.outlook.com [40.107.21.115])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F25D83CDA
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A515483A0A
 	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Apr 2024 11:41:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712230893; cv=none; b=p7nlslfLefSFLC6MLT7tk4qiEmOvLoVM3uK92HLpRF29q9pzuMElay4nqA4K6iv54lxvPcnUO1Xii1QLvnza+8Su0HWDPgFns+twJCNI2Zpicz8X9R0dThXgG6rrtDbXUZv8ZilrH0SMMGwHwCBzFccjd9jx+xhUecSzj2kAPls=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712230893; c=relaxed/simple;
-	bh=xTu/IdCn/048THaVHddyM991QlKheudeHaOzDUEba/4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CbnfdACCpKM7Uc4gFzSIuRFwmKigKjPc5Isqa3rKxlnO63rflNgyWp4oa0Igwxjgy2oh4JUrhAaah0aW3A+CPVh9rXkfOvXd7DPrtRkicJR4IW2sgEQ52w1orcJR64JjxayzrJEsSVFNY9/+GTeLqwau8Gxc92lTxEoXyw1GGzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=BzpYfce4; arc=none smtp.client-ip=209.85.219.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.115
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712230895; cv=fail; b=t5mFlKCV81htgTj4PI2su/txb1JNp9U/irn1snuOjV3ld5Xq2ihLsoGTR49DIUGmiTx6gXKUtXVEBdKzgWFzwnQirj/NB2Q+siPCW7HyXC1bSecWFJrcOboz9blQDe63FYoMTTy/8HS0lL95kXtAePEwO2v/uKqmAYbJyS8YimU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712230895; c=relaxed/simple;
+	bh=l9sOdYXIihnKxG3b9JJ/W7PMJ7bORjYf/mwo6eYP8CY=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=meLqLIGvROTtiKEJ4gtGF6egSFF8npC3GxX2DKR0rJTKfSrXSOJtXzvpUGwzZ3+PCLda4btv1CPowVaVwNjXZN9TKFVN+H7n6GJge0es8v8xsPqI9IcEd0MNqaE7kbYNOBRRvcQVfsCh0e0YcxI9tNjM/TH8zPDNX/ducSXwPMI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=AcXWVvGl; arc=fail smtp.client-ip=40.107.21.115
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BzpYfce4"
-Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-dc6d8bd612dso977867276.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Apr 2024 04:41:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1712230889; x=1712835689; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xTu/IdCn/048THaVHddyM991QlKheudeHaOzDUEba/4=;
-        b=BzpYfce4q/zv0gCorIvWLSXuzW4HjLtqKmXuLtELMIG7pv5Gw5rD2es8aCVqQFqD//
-         8JggHBzNznjWgNLq2nD9WBWW0NsYaidmHqnL2ihAYJpv7o5gc1VJY6DJ0clWC7aekflL
-         okxkVaJGNSO0qVH2yOxsFJLCq+7hYpnwhkr7HgXgiRTKZmRNaOv51pSZ+2EvNJ7l32Ax
-         3rV1o60Rwqf7/3WoHSX+9OLMYTDALVEnxQwPAvQSTwkL+2+b5q+pMv+fOiTCP+zwNcc+
-         ViJk4rxb2Vw07nE8VHUP+XT2krjKR9JIgTGsriDdaif1hRFImGjHsjVSH1La3PcFbNJH
-         hkUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712230889; x=1712835689;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xTu/IdCn/048THaVHddyM991QlKheudeHaOzDUEba/4=;
-        b=kQ5FDuMEBOJrDiXMOuvmclZSV5UfxIKvYEPpIsFUfeT4n5vVucOnEXAj+P9OLwM6e3
-         60ubGQ/iRWSDAcgikkqgmbYg8L5Il1N1mcJvEduKgXZQwDQRX4u2P7Xsa2quDWMQv3cw
-         z2JT6MTd/rXtzph2vMpgMaJmyXKpXd7C4umUvuTXDR+CgQkHz2BWCb0oasUBn0XRpAja
-         YScyNSIrVxcOScdVbr7HQFcLpF15RIv4XWJGV4PAXujY7kRlckzZ1b/ysVQ3RBS5MSBR
-         qcHiKTt6WGWqi/8ihlaXCwpOJoAx/R2yZCVBdrDOB/KOVtw6cwRzQKD4d001XBGRPBPr
-         ul7g==
-X-Forwarded-Encrypted: i=1; AJvYcCWIcIzM1cYETMJGlXuuyqCjaRCpHda631usl7jJ1sGjZ4WVMURjGnH1nHlFL7i8BfHonfkTVbIXQkXCrEg7Q5yeLpcYc/EK/ohjeCUSO8gK
-X-Gm-Message-State: AOJu0YyoE/T7EfXAvxzfVSGwI2UtglRlDHg/LjKL6zqfFGtBjz14dV65
-	xqReBzzHdIjh60yTqRYfXJWv1Ci5Bc6Dghgq11+aTvj0Cu7NzcqnK6+xhbgUA2xQa0fDDV2cDna
-	MxIANh2Hl1zbtWR+IES1Bh6lRnpiNXqNJui7NqA==
-X-Google-Smtp-Source: AGHT+IEhL+O4bSIOCRsSy+Vdywn61xtrVBJ3li47sHwN1FOt8H7g9W+tj2/Or7rao9/9euGeRsXbtXq4vPMz7+GnZRc=
-X-Received: by 2002:a25:ba86:0:b0:dd1:6fab:81e4 with SMTP id
- s6-20020a25ba86000000b00dd16fab81e4mr2034373ybg.37.1712230889318; Thu, 04 Apr
- 2024 04:41:29 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="AcXWVvGl"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=V2mcnUm4rmzcy0mgQxPhXbPe+IXX9ucVFDqZMC699v7DykdEhAZS9+rpPUXFyAxM5Wxg8sgOtgcWP+vXZ2MaPGJ5Be9JvRu5mREsoSIt4Ekl8f3+gHRg/npGg/jfxwbE2R2lQ8ZzT8cTwJn7IWROXEZvDXerYdI+rAWLYXKcWMRUAUFXPAVEWyAQQ1DEY5uQjtpStQ/OhTe38hPbim8IUt7eKSwhlnG+iurcjDQy8JchsbNtiy6LMvY4B5sCUFFalVTqgOOKxjogeQKyxwiqxC7ljpQrS4Kyxnm4rSDHQ8U0lA0BtjuJ0BPyXUXutf+xW87wSLX55MoiduIiXibFzw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Hda8y0MGDXQi3/w8040VUnrydqBquzD20ZLwcx34OKs=;
+ b=NR0aS1v7xdltWr2sxUQbOnMoPjPfyq8DnINlzW2UVI5FBAqSRe+kh0JHt9sMIAj8+v2shDO00g2WcLjUzW4cDibH8/gyf+xSkKrPDadWQhyPth/pjpfjmXMdWRSj0HRDXZx4TBHzEebhUg1LHdufQApBBENO7+I78psbkTUlc8ik2lIDBAMQWmV2F6nmF0NujWSUkRdDi8JNIy+MIW7wCEGZDZH5nUzeJKM4hybOqf5LrKyt2xZVZ36RM7GLb8EMc7eiUvZ8j4pzidxd24y/0DYSKYPnfxOp7NLHUFQ5xUQIwDmWU3hx86spnz/2qVzUpQx8ANEju/AT61THCfnF+Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Hda8y0MGDXQi3/w8040VUnrydqBquzD20ZLwcx34OKs=;
+ b=AcXWVvGlYHxirfIB5KZcsIwCOfufeGyGt8jgbVQ+rq8tIkep6waOU7Divm+26gEQKLBcaYjNJfrvGQ1rQVFC/TZxR1GvX+8O6DQglvCNxO2tAIWU7Sw55wugjJQ9RgJrtzqIkJP0Xk8B1iaWx91migcnL3Ik0x243rDVTV+n2Zw=
+Received: from AS5PR04MB9754.eurprd04.prod.outlook.com (2603:10a6:20b:654::9)
+ by PA1PR04MB10443.eurprd04.prod.outlook.com (2603:10a6:102:450::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Thu, 4 Apr
+ 2024 11:41:27 +0000
+Received: from AS5PR04MB9754.eurprd04.prod.outlook.com
+ ([fe80::5fa0:979d:f0e1:a28e]) by AS5PR04MB9754.eurprd04.prod.outlook.com
+ ([fe80::5fa0:979d:f0e1:a28e%3]) with mapi id 15.20.7409.042; Thu, 4 Apr 2024
+ 11:41:27 +0000
+From: Mahesh Talewad <mahesh.talewad@nxp.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: devyani.godbole@nxp.com,
+	luiz.dentz@gmail.com,
+	sarveshwar.bajaj@nxp.com,
+	mahesh.talewad@nxp.com
+Subject: [PATCH BlueZ v2 1/1] Increase autoconnect timeout max from 16.384s to 20.480s
+Date: Thu,  4 Apr 2024 14:40:54 +0300
+Message-Id: <20240404114054.4987-2-mahesh.talewad@nxp.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240404114054.4987-1-mahesh.talewad@nxp.com>
+References: <20240404114054.4987-1-mahesh.talewad@nxp.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SG2P153CA0001.APCP153.PROD.OUTLOOK.COM (2603:1096::11) To
+ AS5PR04MB9754.eurprd04.prod.outlook.com (2603:10a6:20b:654::9)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240331-module-owner-virtio-v2-0-98f04bfaf46a@linaro.org> <20240331-module-owner-virtio-v2-12-98f04bfaf46a@linaro.org>
-In-Reply-To: <20240331-module-owner-virtio-v2-12-98f04bfaf46a@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Thu, 4 Apr 2024 13:41:18 +0200
-Message-ID: <CACRpkdYpVUq1SgxnPVfRdTiNg3o8dcBePxoxu9GRYy6LdzUE5A@mail.gmail.com>
-Subject: Re: [PATCH v2 12/25] gpio: virtio: drop owner assignment
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Jonathan Corbet <corbet@lwn.net>, 
-	David Hildenbrand <david@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, 
-	Richard Weinberger <richard@nod.at>, Anton Ivanov <anton.ivanov@cambridgegreys.com>, 
-	Johannes Berg <johannes@sipsolutions.net>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gonglei <arei.gonglei@huawei.com>, 
-	"David S. Miller" <davem@davemloft.net>, Sudeep Holla <sudeep.holla@arm.com>, 
-	Cristian Marussi <cristian.marussi@arm.com>, Viresh Kumar <vireshk@kernel.org>, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, David Airlie <airlied@redhat.com>, 
-	Gurchetan Singh <gurchetansingh@chromium.org>, Chia-I Wu <olvaffe@gmail.com>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, Daniel Vetter <daniel@ffwll.ch>, 
-	Jean-Philippe Brucker <jean-philippe@linaro.org>, Joerg Roedel <joro@8bytes.org>, 
-	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>, Alexander Graf <graf@amazon.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Eric Van Hensbergen <ericvh@kernel.org>, Latchesar Ionkov <lucho@ionkov.net>, 
-	Dominique Martinet <asmadeus@codewreck.org>, Christian Schoenebeck <linux_oss@crudebyte.com>, 
-	Stefano Garzarella <sgarzare@redhat.com>, Kalle Valo <kvalo@kernel.org>, 
-	Dan Williams <dan.j.williams@intel.com>, Vishal Verma <vishal.l.verma@intel.com>, 
-	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
-	Pankaj Gupta <pankaj.gupta.linux@gmail.com>, Bjorn Andersson <andersson@kernel.org>, 
-	Mathieu Poirier <mathieu.poirier@linaro.org>, "James E.J. Bottomley" <jejb@linux.ibm.com>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Vivek Goyal <vgoyal@redhat.com>, 
-	Miklos Szeredi <miklos@szeredi.hu>, Anton Yakovlev <anton.yakovlev@opensynergy.com>, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, virtualization@lists.linux.dev, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-um@lists.infradead.org, linux-block@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-gpio@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, 
-	netdev@vger.kernel.org, v9fs@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, nvdimm@lists.linux.dev, 
-	linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org, 
-	linux-sound@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Viresh Kumar <viresh.kumar@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS5PR04MB9754:EE_|PA1PR04MB10443:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	/5D612nCx1QRqgOf5L3CEljAgvQDdKbFWuCewxze0+ygNsv14wPmm/dS17/7iTYDRK1jjNSK2xz8W8NbYKn/RaU1ezkftjK7SDp45JbwV5amJxqikyOtzf2nMowSKC7wwlNOl7fXyFvwlyJfsr+eAKXXvHfYRDqYu0zXTutN78RGTmn8pFlZNPNm2y80fauxVlNUIfx7giFOnLe2OPsrkqll+adw5aDjgLD7H8hDv6rQeINAP4iXMHC70yC6e6nFUjhfs2bLypc5kVHX/3BPHoSkcLP12PgUx1C1cDjmVl7NDiccu92JqV3MPtqq6YK/WPoeDVGoXsrbCfb/SZwHHFjQPMNMifiQPAsbWwmjYLOLZJ0cI+1rcVsFfBfi4PV6ATEA/n7KTOJk+PTm0n5l1JGdQMPonz1PHhqveCKX8sGBieD6g0QBXVJvz4SBwhiNrjyFruroIcP6yO2TBmJ5E/gzHZ72/AiHXE72aH47Zcd6lAAN1nnQrFPIChgS0oYV75rkeKcSwcoVNqFyPXT/CgGvYPxHSPT7kpCNQedWkEAXZtOnyCmEx4iob6juGcxuWxCuC/lsyTpT4AjbE59Q71jAbnE+8P3W1HVKCHTo5rVDoqOC+tUi07qJORIiWpEUocmbmoUW6H8uDTVwUSgWsFKQdJ7o6Z75WjnrF73qbJ4Aj1R6xSUFe5Q8P/jscU6seLLFZeGVfimAjbgmlLoLXQ==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS5PR04MB9754.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(52116005)(1800799015)(376005)(366007)(38350700005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?ljnfFPufk2iOhSE2j7n29gOknRCpFZibs5kLVINxVk1peHVQ0TJNQUHKBDyo?=
+ =?us-ascii?Q?zxZEcrIGrGCXMsIp96mSEK2uLhk1uixdf0pjjNtQEFwm5BVZnn9yz+0kcvaA?=
+ =?us-ascii?Q?tC0mo3GfVfKSykBD8mvtfAQj7a9FzAfsZKd9OSB/xXQORZ24RJlsV2xNnYL8?=
+ =?us-ascii?Q?3ycgUPswy14EcwUAZp1qoFjehrBDE7ty7sth2Gd6qYPasVn7SMW3m/JbN0PT?=
+ =?us-ascii?Q?45461vKZe+NxNS/ieB7uKBXAZpVRnYqdd2tv+8S2sihsVvkkVwCqCjfLE5Gn?=
+ =?us-ascii?Q?nKGQMjWH83pHNX+NjYwT1yvIA6RNQwJZLiXtMFqg1ZeU6jQCw6Yz96IVcMk/?=
+ =?us-ascii?Q?VW21v6UXtzHZnxB2rarXAY1A5Eq29CUGNlsRf3rXC2/yGAy9CM0GI3HIAqPI?=
+ =?us-ascii?Q?IYxwU5sfrFBvw8Rn4QbWoxNC/y0SPy6LglL/Nc9Lp21qEKU59MzBQE9cQE7b?=
+ =?us-ascii?Q?d14iP1RrO8j/bHgQlTE6Jbia8p98IG2/ZokcbkSlIvHoVCxFO0j4olTg/n9R?=
+ =?us-ascii?Q?THwhZgM80zm+58WCCeO3Qt1DigxoNv5OmdAgZ550CvrvuVGQVQ7hBQAlKSOP?=
+ =?us-ascii?Q?qokT2CLqQ4DVseRtXwMRjfN1tz4A7LoGp/RXI+yeZ19le1Ky8dfGx8zhHj6D?=
+ =?us-ascii?Q?c4pwdbzmwdIDz51wCcm7SwM7Q7aKMjO3ZN5iKya7aMtA0QwAe+6d3Ie3G30k?=
+ =?us-ascii?Q?F/fhGVluneq/IkFAnLgjKnRTYx27gVLvHzfIkf3bBTrYvyqxork+iv8LAP7E?=
+ =?us-ascii?Q?OquRJSayRN/gEp0jZMHFEcHl7/9b0ERy7ShEVIAEKPFZFSdtTVURckW/aj0r?=
+ =?us-ascii?Q?HAe/7zBQKdmMAiG5JAble/laoU7ANN1qMBUk8xU0Ya722pH5BodMNuZPYWym?=
+ =?us-ascii?Q?HOaYsMz7U5AQ7Suv1wkRDBjw7JjN+mpLWAJjjRYjB1amlx5vpYkWBhfSq74K?=
+ =?us-ascii?Q?eR2RZmKsWscDAhBad6rZzvVBlrnNOvG2F0NawbH/wXaFulJgKhk5m3RqVPhd?=
+ =?us-ascii?Q?iKl3JaWqPsiJbBf9ykw6oKhS4yzIyvJzSMLewhmeG5zjTMP85cCKD0EOQhky?=
+ =?us-ascii?Q?dMWBu2kLXARI9SnMx3DulBZJA9LoWQoYzDQpk9XEeeJIocFg+kabqkdm/FR5?=
+ =?us-ascii?Q?5Rm/JKNK073PAscAmc+tvgewLWo2k5xMAt7fmSmHIN2wo46ljA0K8D+hMJ5S?=
+ =?us-ascii?Q?O6BHpcaufA1iNNeZufYB+YRaIvWz5mAwxZWMc/XWnf/mDQUTNT1bk6NvE9Kf?=
+ =?us-ascii?Q?rN1dtu1lPFsa5SE23iOE6c/K0CiOHz48sNkwAmCshfpIjDBxQDhCf5z1sRR9?=
+ =?us-ascii?Q?gXA3KvIRAmGVMji08go+ya5tgMUpLx70/OZbWS+/bGDtmZ5kQ8f3fuQnunmR?=
+ =?us-ascii?Q?fznBSJWZmfbByqpcWmXnk/bG+TRRQwRtMsfW7BsAwBq2BhkfJYNbqyWWPqZa?=
+ =?us-ascii?Q?pbxLno7F4nQoqt0lmPgNpXDpq/Oa3MckQNQwngdY9K9y9JdeOiGmczyTMoVF?=
+ =?us-ascii?Q?Jmp8KGMx5B9D99bNUURcUHj7cGlH+boWOOaNjwRy7jqv9dEf7Va0AXlYrPpE?=
+ =?us-ascii?Q?9tcvuKNzytcKVEGGrlzb2bX4P7RCPPPlKKpl6yVfg0xmN7VpIzXjYYI+vqbB?=
+ =?us-ascii?Q?EA=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3f591f88-082c-45f1-07ff-08dc549c29ff
+X-MS-Exchange-CrossTenant-AuthSource: AS5PR04MB9754.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Apr 2024 11:41:27.8482
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: pXRRuvxDiCMq9Y0DqXVPtwawXwYnedFL3/x6ncEpRp7ynYUE3F+tJI8jraB1+UhGGYU+NOQHhl69w9DmlIzgow==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA1PR04MB10443
 
-On Sun, Mar 31, 2024 at 10:45=E2=80=AFAM Krzysztof Kozlowski
-<krzysztof.kozlowski@linaro.org> wrote:
+ - In current implementation Autoconnecttimeout max value is
+   16384[0x4000] msecs.
+ - Since some controllers need some more time to respond to cmd
+   'LE Extended Create Connection' hence increased this
+   Autoconnecttimeout max value to 20480[0x5000] msecs.
 
-> virtio core already sets the .owner, so driver does not need to.
->
-> Acked-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> Acked-by: Viresh Kumar <viresh.kumar@linaro.org>
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+For ex:
+- In some controllers, If we include LE-Coded PHY in the initiating
+ PHY List, BLE INIT scheduler selects the 1M and Coded PHY scanning
+ as an initiator in round robin manner, and due to this available
+ bandwidth gets distributed between 1M and Coded PHY, and this
+ results in longer time taken for connection establishment by
+ the controller.
+- If ref device is advertising at 1.5 sec intervals, with create
+ connection timeout of 4 sec,  the controller gets only 2 opportunities
+ for the connection. Without the inclusion of LE-coded PHY,
+ DUT takes ~3.8 sec for the connection establishment.Hence as described
+ in above point  with the inclusion of LE-coded PHY it is difficult to
+ achieve 100% connection success with the device having
+ adv interval of 1.5 sec.
 
-Acked-by: Linus Walleij <linus.walleij@linaro.org>
+Hence increased Autoconnecttimeout max value to 20480[0x5000] msecs.
 
-Yours,
-Linus Walleij
+Signed-off-by: Mahesh Talewad <mahesh.talewad@nxp.com>
+---
+ src/main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/main.c b/src/main.c
+index f774670e4..081a388ad 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -657,7 +657,7 @@ static void parse_le_config(GKeyFile *config)
+ 		  &btd_opts.defaults.le.autoconnect_timeout,
+ 		  sizeof(btd_opts.defaults.le.autoconnect_timeout),
+ 		  0x0001,
+-		  0x4000},
++		  0x5000},  /*max val: 20480 msec*/
+ 		{ "AdvMonAllowlistScanDuration",
+ 		  &btd_opts.defaults.le.advmon_allowlist_scan_duration,
+ 		  sizeof(btd_opts.defaults.le.advmon_allowlist_scan_duration),
+-- 
+2.34.1
+
