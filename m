@@ -1,337 +1,147 @@
-Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47])
+Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C72EB174EFF
-	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Apr 2024 21:11:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 287B91C36
+	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Apr 2024 21:31:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712351514; cv=none; b=jMFCWO/LS87VwMllkyRGY4U/01pcxsoOwWgabX3WzdnXNj7gfkl2MhnoxrecNShZZ7oNgCuSDyARGlleJ04XJXZzbxFIHpBHLQ60jLTBB6gRMztQpg9bWxhDyQavUKEewBfX03S7uKFkHH2vB6XStICYcBWqs99urM//xgO274U=
+	t=1712352702; cv=none; b=u1DKNVk86b88qzPXzuKxacVmoQ9RpH0zgdBwuHx8aEBRv8r3/oIr9sceiv3NrC8ZfnrB2Q9VrJc5DnLqJyRy60aFGCkJCWRdItUoqak/yhgeuiChZAw6Zz2cM1CzF8lENZ1z6zxBHYEI7mxJb6V9B/d75C16sqkCCri7nXHuM6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712351514; c=relaxed/simple;
-	bh=1yzERKIilyRiTFlJHPGsD6mNM+htdmPWv2jvYHpSa5g=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZjHHLY5lHyOEoqvOCTkp6b9RgmSbX+QK+TDrHPOj5D5nvqKWkWasfLgVr8d1U9CG/k6dINgUHhrnnBxKs7mmToA8byMGZVlW+4mIzstyymjD5ZVDOHAeCuEvfdm3PSR6kYrMDlnnJJlV6Wgaxxsq1lt676bCIct3DO8FkXOO/Ec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YU5yYSZy; arc=none smtp.client-ip=209.85.217.47
+	s=arc-20240116; t=1712352702; c=relaxed/simple;
+	bh=5KxKxploAs9zSA/rC8mgHeVtQXE9Erkjde2eEqHAZ84=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=hADWavn6cBLNvlbyxjO/9Gqf6AD/gTEgarhrdypjjZrbkPj7ssxDl2uzYzIz7pyjCtobpD8akacYykVc4BwQ4WoazvoURsCBwdGxQvROgzmfSGB8vk2+yTAZC/pBXgbDp1LDpj1V/8/+tJTx+YeHlh002RabH9DWDac1YyBqgl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DT0oOWsz; arc=none smtp.client-ip=209.85.160.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YU5yYSZy"
-Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-479dbcdba2dso443390137.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Apr 2024 14:11:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DT0oOWsz"
+Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-222a9eae9a7so1262204fac.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Apr 2024 14:31:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712351511; x=1712956311; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jRkz3xIMUtWDjyEVKXZ0P/9jWENEqXJMLXLfsYwVQmE=;
-        b=YU5yYSZyZP+fPJUekSLxrFWh6Xb+wdNZ4kOV2L9JUowc4L327o8wyveDT/9Jnbb1qN
-         5OELm7miYXJXzIv+KpD3wcTRuWJ1fcVH6Dn1Dcq4N9tfQdXTr1XZEYTgcZJsmeKNwrVB
-         EDjVMbu0T2rAaNSd7vM6yo/AXpurN53DH6279RmYIPB3ps5UNaDch0oFUe3hBxhqjE5K
-         yWNHsseR0eIBEjEMRHP7DJN7/XvKMDjTfRwPXr77KL/2GxiXN/nQb4RuKsqFMHuQdMfP
-         9Bwwn5XE69wltNffEvkhVElt673ioUevOh5x4wuQliv6fXOwu7F3bjn9RGtpxGk+pZ5T
-         j8rg==
+        d=gmail.com; s=20230601; t=1712352700; x=1712957500; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=IuItlfnMBeiVhsEPMqXh6mkNzk+oR8zcdy2GkakojfU=;
+        b=DT0oOWszTPzLgMyDsE84kxJtcEntp5xLJVVtERdqnqK116VDmisMNwXULxDH+ZLWJA
+         JsB0xQsLhoyhABaxSuFTOIbYgh9J2IaIlb1cqzJg6Le7aEWNHgdOJLWAPsZnxj+fDfYp
+         TB2PGJ6ioLmGsM6SSAgmUjx6AoFNjpJe6x0aXqRiSOT9rXm2U9U1Khyh+PXrE44mt/iK
+         piHP2LSLtXNKxAzmpDVhvWe4YExlwVGvRdrEhWsMRC+LeLNGfCgQsGqgDJ+RV5d3Bevo
+         SIO9w9o3h7nWjtvFZM8xnxllGNzkr9IdPZBy1Vr8Ni8T0ciSNHVD/c4nBiFaFV4NoROp
+         Tu3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712351511; x=1712956311;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jRkz3xIMUtWDjyEVKXZ0P/9jWENEqXJMLXLfsYwVQmE=;
-        b=iynJycww9F1NnhjuflqwGrySZJYI/ZiqjurgR5g5nQWhkAYvjVwNmWGuuKt3ieFeLU
-         RVULbQhjxIGmVItMkozt1vg/UdXXgHBvtHHTEyZQvA8bhynoFwIM7F5Uig6QfZHoAjX1
-         qYQNeY1SylVT7v2qKThTQhTBZuOO3U7hRvL7QNrgj2UzEs8YpGwZPKekw+h89oQsdaJz
-         0mYjb1kI8JNc+bg5fEm58ADb6fsXGuCnYUD7vcy3iHetJEnhaO83cCvLD6ZZ6QmxbZby
-         IvPRvkZW6rICcAKcykMw/ROvSFRoWqhSLF26XwYRtIA9Ukiw+uelCnNymUKGp44mCtOJ
-         slUQ==
-X-Gm-Message-State: AOJu0Yw1O9ZlAkZk5Ql7cKgsIQb6C8gnPp7R+uurZiP8fQL8W89K8s55
-	ccPFr57j/rnInjGaLJKiopwbBo3wdAZjt/5bPNHP6S0QaL/a15f6UDrfdooe
-X-Google-Smtp-Source: AGHT+IGa9qq9/PeqVcD06wPH0Fm4OYMm3IDZGo8DqnzmpmO6K4uykiM7wiHVdPEtnkZnkhs/xciq9Q==
-X-Received: by 2002:a05:6102:4189:b0:478:37c4:b20e with SMTP id cd9-20020a056102418900b0047837c4b20emr2751640vsb.20.1712351510986;
-        Fri, 05 Apr 2024 14:11:50 -0700 (PDT)
-Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id dx26-20020a056130291a00b007e3d1347195sm306723uab.3.2024.04.05.14.11.49
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1712352700; x=1712957500;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IuItlfnMBeiVhsEPMqXh6mkNzk+oR8zcdy2GkakojfU=;
+        b=SQ6mG10i+xE+U45+B7N12zq986BO7ggY6ze3Mu1oim1abeWhHUzVzoCviQTuVSuVjP
+         loE8JZ3UnTfqUrLwcuHpY4KYr5arnPMq1wZMJxvDk6tBruS91wQBYNf4HLmi2+/yl8Dv
+         FaxD7raZY5mBUAyQ5iB9XCFj/fCqX9m0R6Tx5SoT2lcIikR9VGfOF5QE9KJNQ9Gl0vsw
+         4Ptr24nD+LtfcmVVh5eIeuxPEfGvYNJiLbOLlQL+HeCynabVUcU6ShX+mWNRIcOHuZqi
+         5Kw9i835leRAJ8rZKDzNHfe+BLXV+J9wmqOTPQQ68mUZdXHdTagZWsgxr+GlyRYebI12
+         0/jg==
+X-Gm-Message-State: AOJu0Yxr5ZY/JRcJ+f2djWBstFjfFd6lPqMRM3lAdMSof+RfALGPWtQm
+	UdO7PUKDaYfK/OMMcI8a7YOfPX6aTMau0fyBv/+VdjEoikv6S/BJilBvCGb1
+X-Google-Smtp-Source: AGHT+IGreJSK6WFoL8710uky/Og3HW9LEILekYpKiUt61vlfQYFlZDqTR1iH8uuszjmBYet1VKlCVA==
+X-Received: by 2002:a05:6870:93ca:b0:22b:a8f3:36b7 with SMTP id c10-20020a05687093ca00b0022ba8f336b7mr2945199oal.55.1712352700053;
+        Fri, 05 Apr 2024 14:31:40 -0700 (PDT)
+Received: from [172.17.0.2] ([74.249.21.241])
+        by smtp.gmail.com with ESMTPSA id o24-20020a05620a22d800b0078bdd8fa570sm962047qki.106.2024.04.05.14.31.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Apr 2024 14:11:49 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v6 3/3] input/device: Add replay support
-Date: Fri,  5 Apr 2024 17:11:45 -0400
-Message-ID: <20240405211145.3463154-3-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240405211145.3463154-1-luiz.dentz@gmail.com>
-References: <20240405211145.3463154-1-luiz.dentz@gmail.com>
+        Fri, 05 Apr 2024 14:31:39 -0700 (PDT)
+Message-ID: <66106dbb.050a0220.1f98f.6fff@mx.google.com>
+Date: Fri, 05 Apr 2024 14:31:39 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2779491084290305563=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v1] Bluetooth: hci_sync: Use advertised PHYs on hci_le_ext_create_conn_sync
+In-Reply-To: <20240405204037.3451091-1-luiz.dentz@gmail.com>
+References: <20240405204037.3451091-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============2779491084290305563==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This adds replay support when uhid is in use and the input node is keep
-while disconnected:
+This is automated email and please do not reply to this email!
 
-Fixes: https://github.com/bluez/bluez/issues/777
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=841940
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.42 seconds
+GitLint                       PASS      0.31 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      30.80 seconds
+CheckAllWarning               PASS      33.87 seconds
+CheckSparse                   WARNING   38.40 seconds
+CheckSmatch                   FAIL      35.62 seconds
+BuildKernel32                 PASS      29.76 seconds
+TestRunnerSetup               PASS      538.83 seconds
+TestRunner_l2cap-tester       PASS      20.58 seconds
+TestRunner_iso-tester         PASS      33.21 seconds
+TestRunner_bnep-tester        PASS      4.84 seconds
+TestRunner_mgmt-tester        FAIL      117.42 seconds
+TestRunner_rfcomm-tester      PASS      7.38 seconds
+TestRunner_sco-tester         PASS      14.98 seconds
+TestRunner_ioctl-tester       PASS      7.67 seconds
+TestRunner_mesh-tester        PASS      5.74 seconds
+TestRunner_smp-tester         PASS      6.85 seconds
+TestRunner_userchan-tester    PASS      4.95 seconds
+IncrementalBuild              PASS      28.67 seconds
+
+Details
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
+
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 492, Passed: 488 (99.2%), Failed: 2, Not Run: 2
+
+Failed Test Cases
+LL Privacy - Add Device 5 (2 Devices to RL)          Failed       0.170 seconds
+LL Privacy - Remove Device 4 (Disable Adv)           Timed out    1.918 seconds
+
+
 ---
- profiles/input/device.c | 174 +++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 173 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/profiles/input/device.c b/profiles/input/device.c
-index b622ee8cd681..21da16155b0c 100644
---- a/profiles/input/device.c
-+++ b/profiles/input/device.c
-@@ -42,6 +42,8 @@
- #include "src/sdp-client.h"
- #include "src/shared/timeout.h"
- #include "src/shared/uhid.h"
-+#include "src/shared/util.h"
-+#include "src/shared/queue.h"
- 
- #include "device.h"
- #include "hidp_defs.h"
-@@ -55,6 +57,19 @@ enum reconnect_mode_t {
- 	RECONNECT_ANY
- };
- 
-+struct hidp_msg {
-+	uint8_t hdr;
-+	struct iovec *iov;
-+};
-+
-+struct hidp_replay {
-+	bool replaying;
-+	struct queue *out;
-+	struct queue *in;
-+	struct queue *re_out;
-+	struct queue *re_in;
-+};
-+
- struct input_device {
- 	struct btd_service	*service;
- 	struct btd_device	*device;
-@@ -78,6 +93,7 @@ struct input_device {
- 	uint32_t		report_rsp_id;
- 	bool			virtual_cable_unplug;
- 	unsigned int		idle_timer;
-+	struct hidp_replay	*replay;
- };
- 
- static int idle_timeout = 0;
-@@ -113,8 +129,30 @@ static bool input_device_bonded(struct input_device *idev)
- 				btd_device_get_bdaddr_type(idev->device));
- }
- 
-+static void hidp_msg_free(void *data)
-+{
-+	struct hidp_msg *msg = data;
-+
-+	util_iov_free(msg->iov, 1);
-+	free(msg);
-+}
-+
-+static void hidp_replay_free(struct hidp_replay *replay)
-+{
-+	if (!replay)
-+		return;
-+
-+	queue_destroy(replay->re_in, NULL);
-+	queue_destroy(replay->in, hidp_msg_free);
-+	queue_destroy(replay->re_out, NULL);
-+	queue_destroy(replay->out, hidp_msg_free);
-+	free(replay);
-+}
-+
- static void input_device_free(struct input_device *idev)
- {
-+	hidp_replay_free(idev->replay);
-+
- 	bt_uhid_unref(idev->uhid);
- 	btd_service_unref(idev->service);
- 	btd_device_unref(idev->device);
-@@ -171,6 +209,10 @@ static int uhid_disconnect(struct input_device *idev, bool force)
- 	if (!idev->virtual_cable_unplug && !force)
- 		return 0;
- 
-+	/* Destroy replay messages */
-+	hidp_replay_free(idev->replay);
-+	idev->replay = NULL;
-+
- 	bt_uhid_unregister_all(idev->uhid);
- 
- 	err = bt_uhid_destroy(idev->uhid);
-@@ -246,12 +288,96 @@ static bool hidp_send_message(struct input_device *idev, GIOChannel *chan,
- 	return true;
- }
- 
-+static void hidp_replay_resend(struct input_device *idev)
-+{
-+	struct hidp_msg *msg;
-+
-+	if (!idev->replay || !idev->replay->replaying)
-+		return;
-+
-+	msg = queue_pop_head(idev->replay->re_out);
-+	if (!msg) {
-+		DBG("uhid replay finished");
-+		idev->replay->replaying = false;
-+		return;
-+	}
-+
-+	if (hidp_send_message(idev, NULL, msg->hdr, msg->iov->iov_base,
-+				msg->iov->iov_len))
-+		DBG("hdr 0x%02x size %zu", msg->hdr, msg->iov->iov_len);
-+	else
-+		error("uhid replay resend failed");
-+}
-+
-+static void hidp_replay_recv(struct input_device *idev, uint8_t hdr,
-+				const uint8_t *data, size_t size)
-+{
-+	struct hidp_msg *msg;
-+
-+	if (!idev->replay || !idev->replay->replaying)
-+		return;
-+
-+	msg = queue_pop_head(idev->replay->re_in);
-+
-+	if (msg && (msg->hdr != hdr || msg->iov->iov_len != size ||
-+			memcmp(msg->iov->iov_base, data, size)))
-+		error("uhid replay input error... discarding");
-+
-+	hidp_replay_resend(idev);
-+}
-+
-+static struct hidp_replay *hidp_replay_new(void)
-+{
-+	struct hidp_replay *replay = new0(struct hidp_replay, 1);
-+
-+	replay->out = queue_new();
-+	replay->in = queue_new();
-+
-+	return replay;
-+}
-+
-+static void hidp_record_message(struct input_device *idev, bool out,
-+				uint8_t hdr, const uint8_t *data, size_t size)
-+{
-+	struct hidp_msg *msg;
-+	struct iovec iov = { (void *)data, size };
-+
-+	/* Only record messages if uhid has been created */
-+	if (!bt_uhid_created(idev->uhid))
-+		return;
-+
-+	if (idev->replay && idev->replay->replaying) {
-+		if (!out)
-+			hidp_replay_recv(idev, hdr, data, size);
-+		return;
-+	}
-+
-+	if (!idev->replay)
-+		idev->replay = hidp_replay_new();
-+
-+	msg = new0(struct hidp_msg, 1);
-+	msg->hdr = hdr;
-+	msg->iov = util_iov_dup(&iov, 1);
-+
-+	if (out) {
-+		DBG("output[%u]: hdr 0x%02x size %zu",
-+			queue_length(idev->replay->out), hdr, size);
-+		queue_push_tail(idev->replay->out, msg);
-+	} else {
-+		DBG("input[%u]: hdr 0x%02x size %zu",
-+			queue_length(idev->replay->in), hdr, size);
-+		queue_push_tail(idev->replay->in, msg);
-+	}
-+}
-+
- static bool hidp_send_ctrl_message(struct input_device *idev, uint8_t hdr,
- 					const uint8_t *data, size_t size)
- {
- 	if (hdr == (HIDP_TRANS_HID_CONTROL | HIDP_CTRL_VIRTUAL_CABLE_UNPLUG))
- 		idev->virtual_cable_unplug = true;
- 
-+	hidp_record_message(idev, true, hdr, data, size);
-+
- 	return hidp_send_message(idev, idev->ctrl_io, hdr, data, size);
- }
- 
-@@ -558,6 +684,12 @@ static bool hidp_recv_ctrl_message(GIOChannel *chan, struct input_device *idev)
- 	type = hdr & HIDP_HEADER_TRANS_MASK;
- 	param = hdr & HIDP_HEADER_PARAM_MASK;
- 
-+	/* While replaying don't involve the driver since it will likely get
-+	 * confused with messages it already things it has received.
-+	 */
-+	if (idev->replay && idev->replay->replaying)
-+		goto done;
-+
- 	switch (type) {
- 	case HIDP_TRANS_HANDSHAKE:
- 		hidp_recv_ctrl_handshake(idev, param);
-@@ -575,6 +707,9 @@ static bool hidp_recv_ctrl_message(GIOChannel *chan, struct input_device *idev)
- 		break;
- 	}
- 
-+done:
-+	hidp_record_message(idev, false, hdr, data + 1, len - 1);
-+
- 	return true;
- }
- 
-@@ -973,12 +1108,49 @@ static int ioctl_disconnect(struct input_device *idev, uint32_t flags)
- 	return err;
- }
- 
-+static void queue_append(void *data, void *user_data)
-+{
-+	queue_push_tail(user_data, data);
-+}
-+
-+static struct queue *queue_dup(struct queue *q)
-+{
-+	struct queue *dup;
-+
-+	if (!q || queue_isempty(q))
-+		return NULL;
-+
-+	dup = queue_new();
-+
-+	queue_foreach(q, queue_append, dup);
-+
-+	return dup;
-+}
-+
-+static void hidp_replay_init(struct input_device *idev)
-+{
-+	if (!idev->replay || idev->replay->replaying)
-+		return;
-+
-+	idev->replay->replaying = true;
-+
-+	queue_destroy(idev->replay->re_in, NULL);
-+	idev->replay->re_in = queue_dup(idev->replay->in);
-+
-+	queue_destroy(idev->replay->re_out, NULL);
-+	idev->replay->re_out = queue_dup(idev->replay->out);
-+
-+	hidp_replay_resend(idev);
-+}
-+
- static int uhid_connadd(struct input_device *idev, struct hidp_connadd_req *req)
- {
- 	int err;
- 
--	if (bt_uhid_created(idev->uhid))
-+	if (bt_uhid_created(idev->uhid)) {
-+		hidp_replay_init(idev);
- 		return 0;
-+	}
- 
- 	err = bt_uhid_create(idev->uhid, req->name, &idev->src, &idev->dst,
- 				req->vendor, req->product, req->version,
--- 
-2.44.0
 
+--===============2779491084290305563==--
