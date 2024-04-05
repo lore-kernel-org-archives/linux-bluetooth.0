@@ -1,115 +1,259 @@
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-vs1-f53.google.com (mail-vs1-f53.google.com [209.85.217.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6CCA17166A
-	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Apr 2024 17:45:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF881327FD
+	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Apr 2024 20:40:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712339151; cv=none; b=R9u3PwazD/DOI+rQM3R/olSrJTGUjc5A8OuWi1Bi3z+GmbDcYajrYS6TNWjx1eZaFk1M9CV9Qais9LkWT5QlZp0glDepUdewqFe2Vx/YW/jS9D8xJA6DFDSyoUV1n0b/7ddqThJ5LUC8+UbAcSmmMhqCc+EWyxSVppaMNeD/x08=
+	t=1712349643; cv=none; b=KfvN3EX4H8Y04/aS5xoOR7/VA+rCRv0Mjor9xO3eh1/TY2ZlXjDec5z6OYt8RiDsexJZpvjhr4EQUyMTOORWEo2X+XQlhKhx9d8U9j8jCFM7nFZoOUCjw73MovgyRexRhUb+pvwNjT6gHUqqGw+gIeqlL4jHfyv1UaGiYflRAtk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712339151; c=relaxed/simple;
-	bh=wTKr7S2CnGDPCH8KeSUhRKLbKn96nzFzodF76YgrJho=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KSymoc3IJx/e6QtH9ehajjoWvSR/+mzWIc1ODL6oaX/ODkBOok4RoPLecEzMxViu3mKuTMBGZ7GrtO9auf64tHMS307Ho0yUMVMEm62+wrYZWVItu4TfvGlGfATJSKiMFvxga801opkDeXRaRIAPWmm2O4y0zQt6WtAdWqEgRHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PZppgxgv; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1712349643; c=relaxed/simple;
+	bh=IhblGxMd9yJqKopJFSk1GfqO4DJF6Fs3dsULEDraGCE=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=NdRAOeyQ1RxRrotXuAayhj4TG+QnAMHydHspaeWCGn+EIzEG9/fjT963eiApHfKZzpYfNliZv0KAC/qOwV2rRvrUpje0RwW47buSqOpIrlydu8nX55cwVWw4Ao3M9PO0exE4w0+R/6lstBLzbrTfAj8/RuE9mkroCXAP2t8+2LU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZKUU1wlj; arc=none smtp.client-ip=209.85.217.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PZppgxgv"
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-56beb6e68aeso1444a12.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Apr 2024 10:45:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZKUU1wlj"
+Received: by mail-vs1-f53.google.com with SMTP id ada2fe7eead31-479dd0261c8so456666137.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Apr 2024 13:40:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712339148; x=1712943948; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wTKr7S2CnGDPCH8KeSUhRKLbKn96nzFzodF76YgrJho=;
-        b=PZppgxgv3sXQ5rxBacQdn/ZCVjKHGo/bOeV+IPdhHr1lRFql2XWpnBDmpThAhNZLMJ
-         8LEt9Ja2ub9Trpfrypt/+CVvFnaLaFoigDmmZEZ6Wz2D1AEaP5WsJkRJ1ZuH7/p6vFwJ
-         VYUlnUNdNfPqEKKw6PavVhDV3bCLzQ8/fu90lt95UmV+QvtJbRRudaoPsT8yiyho9oKP
-         vRkv3ZBpG2/rBcbbIz3/CHZ2Im7QKAf4f1UpzV+vsZWtilfIYssYhBmQ2vCdM+cnC3vG
-         +uGrTioOEk4cOepPAcjvwO+gmk55vIZJylySm6fhjX2auqd3y2EfXgA5jKgYgeXK9Cz3
-         u87w==
+        d=gmail.com; s=20230601; t=1712349639; x=1712954439; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=M1Blhnk+L1PUl6YPM7Nsr/j9YTx6eTBK+O3njw4NuFw=;
+        b=ZKUU1wljambLv/yenE8aPuNQYBIQuAWFEbgU7eU7FJLJ8FvsRtI9C8Fh0Y0nsXzWnz
+         2QiRyk5tZ8gr9Lp11fmqTDIDF/0csvTVfyL6oR26ASw03vD82kC5pGoj2Oy8WfMqXHEZ
+         ojzrs3te85wwgEwUYY6vv1QIZ8xOLs3SEBnyF2+1T0kZsl1FCKPURboGNMWmGcfXPbKr
+         n1Rha0f7PKzLPkA3Ly2lu6zwUNxTD6Fu8PSvmtwfSkTJBItT0a8OUL5rwntLq7iZzWUN
+         DuzN9BMCij6s0+1Pwb4Qxop9e6/TnU5JRv5IeHzyxTa8V0p8tpeG5FBj/GCi39XPk3+u
+         kKgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712339148; x=1712943948;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wTKr7S2CnGDPCH8KeSUhRKLbKn96nzFzodF76YgrJho=;
-        b=GnlLLwrB32ePAGTmOwiuRTUmLQqdkaGpPlHjbFtLN7TEwHvc8MVt0VGJ0hZNQXliUc
-         gOPNf38fDbxmdAtC/LbNozSmvYh8jBh7KDn68WAXJMy5xqjEWiveaYLr1IhVCemuW3mf
-         fh9M/Gb9X98ejkHTZwzzebZuN2GHuW+gTZFyjA8lTmXXxmfBrYBmrUHObzWPhzcObr5T
-         XSuaP7D929xG3y0ttz2SFSWUGXhFBTddcykK/F+dSYX5qVqXGGXAxhnRV2ziNKCFKjMO
-         9O/jQRXLzcdtqdf+OsargJT/mAxIxXGUTPmkFzX8EupI3g/69a+9PYvXvwqXIaji26SP
-         As3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXSj+6EGT4+uRpVcxKiNy1lwziM2dH3kcJY+X2KHJnmCnHnCuNKWFujeaAe68NaLAkoQl3SrNmG5pgf9Mpk3cxRL+NkQIpyiPYgYamfw2Ix
-X-Gm-Message-State: AOJu0YywyXPOCPp2KBOICDvAfTZRkOSUvNGM8F+NVPSXVwu5Zxo4V5W4
-	YuoRFiVK18K7tHv/mDMa06ATmwL3VuwZ+lT75aNB0xnTOQ5crDipuAB3ZM3JY6B9exdL5pIqYAC
-	DPWJiunudX6yY4nvo55d/rJDk9mDvo3BEtiYd
-X-Google-Smtp-Source: AGHT+IFke6+lQWu9zNJbcE0cSexFTPrPSGmDeOHgeNv57K2lPwQ0sztrffp2byynXgEUGPFmDFwUOZ2UrYxWydLMWbQ=
-X-Received: by 2002:aa7:d94f:0:b0:56e:2239:bcbe with SMTP id
- l15-20020aa7d94f000000b0056e2239bcbemr5277eds.2.1712339148083; Fri, 05 Apr
- 2024 10:45:48 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1712349640; x=1712954440;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=M1Blhnk+L1PUl6YPM7Nsr/j9YTx6eTBK+O3njw4NuFw=;
+        b=YQPni6p8qQpvk2+z5oa5eIT8bXKihX5oItoGMvSbvIHc2V3m9vk1xQerYfrB8ziKXi
+         DcEU5l/lz2kk8sQqMTsVeQNN47srOqr5vzHwksm2lL6iSJ0pk+rAR8bQ+Jieb+np0/Mr
+         zbPcNzrky5x8Uh1UayOAUFMGqFH9or4eoqOE0gyHNqhH2P4IL7kwpyg0YArsDFNiqk96
+         0WrZGCENgIGCD+q4FpyWBSzYbpK9vZUgE9rvrST+/kTshYc7kGg/N7BipwOqvy4gDB6w
+         geydfsNNU1OSgzW86QZ4sa/aNKzZtKhnPFCWUQzNejMaPLLUpGwRRjyIt6Q5zb3TbBNC
+         0VSw==
+X-Gm-Message-State: AOJu0YxiR8rhq1i5E5dSpoZ5sTvmaPgPDCeJb9vOa0w15wc/jVHvI16e
+	03leH7gq3e52Nk1N+tabYIlVxQOs5d4/Q8pv5Ay/WJ4kTZ+OdhDBqvTHAMHb
+X-Google-Smtp-Source: AGHT+IEm8inMhP3VNfdswbarehZIkDLpMbLzHLYEE3UBZ81B7EauU5kjOA9JD0dVduDh/fV8CZ2l0Q==
+X-Received: by 2002:a05:6102:358e:b0:479:e7bc:86d2 with SMTP id h14-20020a056102358e00b00479e7bc86d2mr542995vsu.3.1712349639562;
+        Fri, 05 Apr 2024 13:40:39 -0700 (PDT)
+Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id l3-20020ab07183000000b007e3a8a03f4bsm290902uao.26.2024.04.05.13.40.38
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Apr 2024 13:40:38 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v1] Bluetooth: hci_sync: Use advertised PHYs on hci_le_ext_create_conn_sync
+Date: Fri,  5 Apr 2024 16:40:33 -0400
+Message-ID: <20240405204037.3451091-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240404123602.2369488-1-edumazet@google.com> <CABBYNZJB+n7NN2QkBt5heDeWq0wbyE1Y4CUyK9Ne7vBRnmuWaw@mail.gmail.com>
- <CANn89iLweXJRLdn=v6WbqtvW6q0yLz_Dox87+GAnZUmx0WevKA@mail.gmail.com>
- <CABBYNZK08zDX07N9BTcFku=RSzc=W_74K2n2ky5f+qSexSLM+g@mail.gmail.com>
- <CANn89iLO9hO9QqQtNh=qEmLy+tE2Dr7fe9Nuj2dxYrG-z0Cy5g@mail.gmail.com>
- <CABBYNZ+F44x3aYK1kKUi8vLJT04QF48ONzrW06YJz=aq_oSHzA@mail.gmail.com>
- <CANn89iJzJc+qNgwnEuzGReXqp6Gs7hWnex0_+f2CP9eTuohZyA@mail.gmail.com> <CABBYNZK=oKCcMv8GEx__XiR+tSUwoTnwRkh2-6tJw1He9oGr6w@mail.gmail.com>
-In-Reply-To: <CABBYNZK=oKCcMv8GEx__XiR+tSUwoTnwRkh2-6tJw1He9oGr6w@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 5 Apr 2024 19:45:37 +0200
-Message-ID: <CANn89i+TB_cb9tSHW+8dAiqWXpAmtw=ktVG3WujiJfL2WcASiA@mail.gmail.com>
-Subject: Re: [PATCH net] Bluetooth: validate setsockopt( BT_PKT_STATUS /
- BT_DEFER_SETUP) user input
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	syzbot <syzkaller@googlegroups.com>, Marcel Holtmann <marcel@holtmann.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Apr 5, 2024 at 7:38=E2=80=AFPM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Eric,
->
-> On Fri, Apr 5, 2024 at 12:30=E2=80=AFPM Eric Dumazet <edumazet@google.com=
-> wrote:
-> >
-> > On Fri, Apr 5, 2024 at 6:24=E2=80=AFPM Luiz Augusto von Dentz
-> > <luiz.dentz@gmail.com> wrote:
-> > >
-> > ave used this so far (without risking a kernel bug)
-> > >
-> > > Fair enough, if we don't really have any risk of breaking the API
-> > > (would result in using uninitialized memory) then I propose we do
-> > > something like this:
-> > >
-> > > https://gist.github.com/Vudentz/c9092e8a3cb1e7e6a8fd384a51300eee
-> > >
-> > > That said perhaps copy_from_sockptr shall really take into account
-> > > both source and destination lengths so it could incorporate the check
-> > > e.g. if (dst_size > src_size) but that might result in changing every
-> > > user of copy_from_sockptr thus I left it to be specific to bluetooth.
-> >
-> > Make sure to return -EINVAL if the user provided length is too small,
-> > not -EFAULT.
->
-> Sure, there was also a use of -EOVERFLOW and the fact we are using the
-> return of copy_from_sockptr so if it fails we just return -EFAULT
-> anyway, so if we do start returning the error from the like
-> bt_copy_from_sockptr then we better figure out the errors it returns
-> are proper.
->
-> Btw, do you want me to spin a new version containing these changes or
-> you would like to incorporate them into your patch and spin a v2?
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Please go ahead and submit your own patch(es), thanks !
+The extended advertising reports do report the PHYs so this store then
+in hci_conn so it can be later used in hci_le_ext_create_conn_sync to
+narrow the PHYs to be scanned since the controller will also perform a
+scan having a smaller set of PHYs shall reduce the time it takes to
+find and connect peers.
+
+Fixes: 288c90224eec ("Bluetooth: Enable all supported LE PHY by default")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/hci_core.h |  4 +++-
+ net/bluetooth/hci_conn.c         |  6 ++++--
+ net/bluetooth/hci_event.c        | 20 ++++++++++++--------
+ net/bluetooth/hci_sync.c         |  9 ++++++---
+ net/bluetooth/l2cap_core.c       |  2 +-
+ 5 files changed, 26 insertions(+), 15 deletions(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index fd6fd4029452..f0e1f1ae39c5 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -744,6 +744,8 @@ struct hci_conn {
+ 	__u8		le_per_adv_data[HCI_MAX_PER_AD_TOT_LEN];
+ 	__u16		le_per_adv_data_len;
+ 	__u16		le_per_adv_data_offset;
++	__u8		le_adv_phy;
++	__u8		le_adv_sec_phy;
+ 	__u8		le_tx_phy;
+ 	__u8		le_rx_phy;
+ 	__s8		rssi;
+@@ -1519,7 +1521,7 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
+ 				     enum conn_reasons conn_reason);
+ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 				u8 dst_type, bool dst_resolved, u8 sec_level,
+-				u16 conn_timeout, u8 role);
++				u16 conn_timeout, u8 role, u8 phy, u8 sec_phy);
+ void hci_connect_le_scan_cleanup(struct hci_conn *conn, u8 status);
+ struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
+ 				 u8 sec_level, u8 auth_type,
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index ce94ffaf06d4..a3b226255eb9 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1266,7 +1266,7 @@ u8 hci_conn_set_handle(struct hci_conn *conn, u16 handle)
+ 
+ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 				u8 dst_type, bool dst_resolved, u8 sec_level,
+-				u16 conn_timeout, u8 role)
++				u16 conn_timeout, u8 role, u8 phy, u8 sec_phy)
+ {
+ 	struct hci_conn *conn;
+ 	struct smp_irk *irk;
+@@ -1329,6 +1329,8 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 	conn->dst_type = dst_type;
+ 	conn->sec_level = BT_SECURITY_LOW;
+ 	conn->conn_timeout = conn_timeout;
++	conn->le_adv_phy = phy;
++	conn->le_adv_sec_phy = sec_phy;
+ 
+ 	err = hci_connect_le_sync(hdev, conn);
+ 	if (err) {
+@@ -2276,7 +2278,7 @@ struct hci_conn *hci_connect_cis(struct hci_dev *hdev, bdaddr_t *dst,
+ 		le = hci_connect_le(hdev, dst, dst_type, false,
+ 				    BT_SECURITY_LOW,
+ 				    HCI_LE_CONN_TIMEOUT,
+-				    HCI_ROLE_SLAVE);
++				    HCI_ROLE_SLAVE, 0, 0);
+ 	else
+ 		le = hci_connect_le_scan(hdev, dst, dst_type,
+ 					 BT_SECURITY_LOW,
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 868ffccff773..539bbbe26176 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -6046,7 +6046,7 @@ static void hci_le_conn_update_complete_evt(struct hci_dev *hdev, void *data,
+ static struct hci_conn *check_pending_le_conn(struct hci_dev *hdev,
+ 					      bdaddr_t *addr,
+ 					      u8 addr_type, bool addr_resolved,
+-					      u8 adv_type)
++					      u8 adv_type, u8 phy, u8 sec_phy)
+ {
+ 	struct hci_conn *conn;
+ 	struct hci_conn_params *params;
+@@ -6101,7 +6101,7 @@ static struct hci_conn *check_pending_le_conn(struct hci_dev *hdev,
+ 
+ 	conn = hci_connect_le(hdev, addr, addr_type, addr_resolved,
+ 			      BT_SECURITY_LOW, hdev->def_le_autoconnect_timeout,
+-			      HCI_ROLE_MASTER);
++			      HCI_ROLE_MASTER, phy, sec_phy);
+ 	if (!IS_ERR(conn)) {
+ 		/* If HCI_AUTO_CONN_EXPLICIT is set, conn is already owned
+ 		 * by higher layer that tried to connect, if no then
+@@ -6136,8 +6136,9 @@ static struct hci_conn *check_pending_le_conn(struct hci_dev *hdev,
+ 
+ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
+ 			       u8 bdaddr_type, bdaddr_t *direct_addr,
+-			       u8 direct_addr_type, s8 rssi, u8 *data, u8 len,
+-			       bool ext_adv, bool ctl_time, u64 instant)
++			       u8 direct_addr_type, u8 phy, u8 sec_phy, s8 rssi,
++			       u8 *data, u8 len, bool ext_adv, bool ctl_time,
++			       u64 instant)
+ {
+ 	struct discovery_state *d = &hdev->discovery;
+ 	struct smp_irk *irk;
+@@ -6225,7 +6226,7 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
+ 	 * for advertising reports) and is already verified to be RPA above.
+ 	 */
+ 	conn = check_pending_le_conn(hdev, bdaddr, bdaddr_type, bdaddr_resolved,
+-				     type);
++				     type, phy, sec_phy);
+ 	if (!ext_adv && conn && type == LE_ADV_IND &&
+ 	    len <= max_adv_len(hdev)) {
+ 		/* Store report for later inclusion by
+@@ -6371,7 +6372,8 @@ static void hci_le_adv_report_evt(struct hci_dev *hdev, void *data,
+ 		if (info->length <= max_adv_len(hdev)) {
+ 			rssi = info->data[info->length];
+ 			process_adv_report(hdev, info->type, &info->bdaddr,
+-					   info->bdaddr_type, NULL, 0, rssi,
++					   info->bdaddr_type, NULL, 0,
++					   HCI_ADV_PHY_1M, 0, rssi,
+ 					   info->data, info->length, false,
+ 					   false, instant);
+ 		} else {
+@@ -6456,6 +6458,8 @@ static void hci_le_ext_adv_report_evt(struct hci_dev *hdev, void *data,
+ 		if (legacy_evt_type != LE_ADV_INVALID) {
+ 			process_adv_report(hdev, legacy_evt_type, &info->bdaddr,
+ 					   info->bdaddr_type, NULL, 0,
++					   info->primary_phy,
++					   info->secondary_phy,
+ 					   info->rssi, info->data, info->length,
+ 					   !(evt_type & LE_EXT_ADV_LEGACY_PDU),
+ 					   false, instant);
+@@ -6761,8 +6765,8 @@ static void hci_le_direct_adv_report_evt(struct hci_dev *hdev, void *data,
+ 
+ 		process_adv_report(hdev, info->type, &info->bdaddr,
+ 				   info->bdaddr_type, &info->direct_addr,
+-				   info->direct_addr_type, info->rssi, NULL, 0,
+-				   false, false, instant);
++				   info->direct_addr_type, HCI_ADV_PHY_1M, 0,
++				   info->rssi, NULL, 0, false, false, instant);
+ 	}
+ 
+ 	hci_dev_unlock(hdev);
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index c5d8799046cc..4c707eb64e6f 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -6346,7 +6346,8 @@ static int hci_le_ext_create_conn_sync(struct hci_dev *hdev,
+ 
+ 	plen = sizeof(*cp);
+ 
+-	if (scan_1m(hdev)) {
++	if (scan_1m(hdev) && (conn->le_adv_phy == HCI_ADV_PHY_1M ||
++			      conn->le_adv_sec_phy == HCI_ADV_PHY_1M)) {
+ 		cp->phys |= LE_SCAN_PHY_1M;
+ 		set_ext_conn_params(conn, p);
+ 
+@@ -6354,7 +6355,8 @@ static int hci_le_ext_create_conn_sync(struct hci_dev *hdev,
+ 		plen += sizeof(*p);
+ 	}
+ 
+-	if (scan_2m(hdev)) {
++	if (scan_2m(hdev) && (conn->le_adv_phy == HCI_ADV_PHY_2M ||
++			      conn->le_adv_sec_phy == HCI_ADV_PHY_2M)) {
+ 		cp->phys |= LE_SCAN_PHY_2M;
+ 		set_ext_conn_params(conn, p);
+ 
+@@ -6362,7 +6364,8 @@ static int hci_le_ext_create_conn_sync(struct hci_dev *hdev,
+ 		plen += sizeof(*p);
+ 	}
+ 
+-	if (scan_coded(hdev)) {
++	if (scan_coded(hdev) && (conn->le_adv_phy == HCI_ADV_PHY_CODED ||
++				 conn->le_adv_sec_phy == HCI_ADV_PHY_CODED)) {
+ 		cp->phys |= LE_SCAN_PHY_CODED;
+ 		set_ext_conn_params(conn, p);
+ 
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index cf3b8e9b7b3b..3e5d2d8a2a66 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -7028,7 +7028,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 		if (hci_dev_test_flag(hdev, HCI_ADVERTISING))
+ 			hcon = hci_connect_le(hdev, dst, dst_type, false,
+ 					      chan->sec_level, timeout,
+-					      HCI_ROLE_SLAVE);
++					      HCI_ROLE_SLAVE, 0, 0);
+ 		else
+ 			hcon = hci_connect_le_scan(hdev, dst, dst_type,
+ 						   chan->sec_level, timeout,
+-- 
+2.44.0
+
