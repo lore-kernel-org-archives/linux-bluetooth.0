@@ -1,94 +1,75 @@
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 979881B962
-	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Apr 2024 16:30:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D19C0219E4
+	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Apr 2024 16:35:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712334643; cv=none; b=jtI88s6qVRP8xteGsprF9YKL/tuLA4GdZga81NequlgbPaI016/hqrsicIj8xlP8pUCp2+AA8Pm2TrUvO9CmbzZDmtjwojltqGp5ial0lPW9zf9uUEZ+VidAzPddvuVbwaLphB+aSw2FJiv/o/KCW5Od9TQlQWC9lbeDXx2y0/4=
+	t=1712334924; cv=none; b=EgHovN/bQnN/tFTyyBVzhlzDcw9257+LTizQBQTf0Vdh/cldgpprU54kEUlcMIKQnQ0zHcKkN1x+wz0Y53S01XMnxFODC3RWHTanlzI/oDtN6colL/1BJ8Ci3a/GA6MsDqPWqEK06I54Ja/ImI7g1aDv9VQ21teblC3KbuxfKRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712334643; c=relaxed/simple;
-	bh=mZAO0eGvkxHG2mpyu+CTArarNbr1y0UO3cO2sRLcGX4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OxjLca9fBhtZ6GJgdDfG3fra9VEflFt9wsOdTMYjFpspoIrZJNKB1s2wyLSFhoVtpBQ4tNMS8nxccuOl41l6HzX7cIE9BTFDa82WyOSZXby6iyr9GhrLb50Q0arRKHUoVnBtlTX0Tm9pvp0Ew5IwLlrURu2jlOOt0ePQ10RHSBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0Cfaaa53; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1712334924; c=relaxed/simple;
+	bh=r2JEnIeEVbwGtC9tEMxO8GqFwygLQGa0QI6Dn5KBEQw=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=EX59+uVfWWTX5eIYjYX/bZMIPmMjaOrnAMl/xa4lyCWlq7KWlaAURQ23CscNUOwEZBUoiTcq3H1BgoUtThJoCgknowkeTSMB6TjMGLrFfikHISlNjlWQ2SUowvIoe1ETBupCtlBAwmTabBeI3BBzEmbi6EueVkxT/lzMYpnkCs0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GxxbUr23; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0Cfaaa53"
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-56beb6e68aeso13842a12.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Apr 2024 09:30:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712334640; x=1712939440; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mZAO0eGvkxHG2mpyu+CTArarNbr1y0UO3cO2sRLcGX4=;
-        b=0Cfaaa53DzmmjnfbvYyIM/VTyn2u1ZkXnBM0g/B1Rh/NmHcw8hiB8N3Co73zN6ttNo
-         XX1QUzoX0vpMeOAyPdx6E4Twyc9MZAMffCxS4UTW9mpUFyMif+Fy5KPVosanUSm5LEaA
-         XEcofDgRlsBQzAmhimWNxWCzeRhb6XhhPgT3gLTPagFxdKSJ9igQjPsUmrCQuoI15S7o
-         2W3jsaF/29a3pgwJrQCKgN5MHubNYqB/pojcTjiJkcQEd60RuVC/n2g7ytl3w8i8OKkY
-         Fg6tT205xQ5MI9C9vU6Gyqr5a8cmywld2pNWEgfMRLhRSGgEQ9ie+tJ1VoN8pHGwkxZX
-         g2jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712334640; x=1712939440;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mZAO0eGvkxHG2mpyu+CTArarNbr1y0UO3cO2sRLcGX4=;
-        b=T8SnoCX3rjaXdis9Gto4wjjOK90qgngi/U5Yljg38nYt6RcwpBDIjJlej9a6A2IyMU
-         Lk0KYOmjAnyW81S8Vd4ge9QriT6oXLr3zFE+AK1UKWOBBvru+xINoZbm0dFIVbVQwDq7
-         Mw2OM4DW5lQmEX1uDt6rG3J5ovue52bXvxd/I8pxB6ztDEnqV4dJsJ7BQbrimI9OwbH+
-         CnUCnn3qLv/5GdhVeHhjMnm+zYOnozruq5rA+ntFYiAYtvyA/aBhUv8hOI69KJsrplEu
-         kwaOPJ+BXKbq/EL2ltlPemLQcgU0W7IcGOdLFPqoHFyMPSEt6V0UP6zQ21yO08PYIAlP
-         ApZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUnKVMeFBgNiEHKPrjYRfbzZU31iMKCPfUciQMGVOrzXPP7wUIwh34bJKTLX0lInujxzoTlFpD5AhVFRvuiDYgEVe6V2PJMZF1hC9BhugR6
-X-Gm-Message-State: AOJu0YyoIy+hKX2U13nRWpH9eXevx9qBtjmI2An3ePmv0AJ6JHOR0yJ7
-	0GRacNAF3xTLd9pXu3rujTPqLffHbB5qh5qvxpHka0DTYaLMcYP4J13bcgSo57N5x41F0W/xCRF
-	pP7wW7Dd5a2UpenSMZn905OPD1RCm5v/39ggz
-X-Google-Smtp-Source: AGHT+IFIxTt/47oN4xzxy7w2j/J2GRzOa4Y/2PA00jhLgiVN1DOFojIjGH5/gYJ9pa8ukyqCNzixRZgQzN3Sa197xBE=
-X-Received: by 2002:a05:6402:2035:b0:56e:2b67:a2f8 with SMTP id
- ay21-20020a056402203500b0056e2b67a2f8mr239524edb.7.1712334639671; Fri, 05 Apr
- 2024 09:30:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GxxbUr23"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 59C77C433B2
+	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Apr 2024 16:35:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712334924;
+	bh=r2JEnIeEVbwGtC9tEMxO8GqFwygLQGa0QI6Dn5KBEQw=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=GxxbUr23K4J3XZGUUjwvs0GkaZraLQLNa4lU2bpaAf3Whf9knYCRcfwcK5IJ8ZQ87
+	 lIZNOjMaWHGhyHvV8uzLRWwudQ5cgWsqJn1Zdd5IOOm/JyOtcXNy1OPyUrv57gm8bV
+	 qTWGO1wLQX2FddNTgr9zgoZediQXp8hfwrVs23q3A77aze84TFkb7AUnLAMJZCM3HO
+	 CPfh9dwldCQH8R8AZQwOFz1Uz0WLRNHgL+UE4pNJie+6cBM2nGAX3yJc6Rm7idORBz
+	 qW1fgkmnUMpdsjCeG/jCezQUmB6BE0/KR4O36lC3fss0eUqccvpXCFaA386Fp6K6xI
+	 mKeNaRP502flA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 521AAC4332E; Fri,  5 Apr 2024 16:35:24 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 218651] kernel 6.8.2 - Bluetooth bug/dump at boot
+Date: Fri, 05 Apr 2024 16:35:21 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: kbugreports@disroot.org
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-218651-62941-bg2sSmtT69@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-218651-62941@https.bugzilla.kernel.org/>
+References: <bug-218651-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240404123602.2369488-1-edumazet@google.com> <CABBYNZJB+n7NN2QkBt5heDeWq0wbyE1Y4CUyK9Ne7vBRnmuWaw@mail.gmail.com>
- <CANn89iLweXJRLdn=v6WbqtvW6q0yLz_Dox87+GAnZUmx0WevKA@mail.gmail.com>
- <CABBYNZK08zDX07N9BTcFku=RSzc=W_74K2n2ky5f+qSexSLM+g@mail.gmail.com>
- <CANn89iLO9hO9QqQtNh=qEmLy+tE2Dr7fe9Nuj2dxYrG-z0Cy5g@mail.gmail.com> <CABBYNZ+F44x3aYK1kKUi8vLJT04QF48ONzrW06YJz=aq_oSHzA@mail.gmail.com>
-In-Reply-To: <CABBYNZ+F44x3aYK1kKUi8vLJT04QF48ONzrW06YJz=aq_oSHzA@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 5 Apr 2024 18:30:26 +0200
-Message-ID: <CANn89iJzJc+qNgwnEuzGReXqp6Gs7hWnex0_+f2CP9eTuohZyA@mail.gmail.com>
-Subject: Re: [PATCH net] Bluetooth: validate setsockopt( BT_PKT_STATUS /
- BT_DEFER_SETUP) user input
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	syzbot <syzkaller@googlegroups.com>, Marcel Holtmann <marcel@holtmann.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 5, 2024 at 6:24=E2=80=AFPM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-ave used this so far (without risking a kernel bug)
->
-> Fair enough, if we don't really have any risk of breaking the API
-> (would result in using uninitialized memory) then I propose we do
-> something like this:
->
-> https://gist.github.com/Vudentz/c9092e8a3cb1e7e6a8fd384a51300eee
->
-> That said perhaps copy_from_sockptr shall really take into account
-> both source and destination lengths so it could incorporate the check
-> e.g. if (dst_size > src_size) but that might result in changing every
-> user of copy_from_sockptr thus I left it to be specific to bluetooth.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218651
 
-Make sure to return -EINVAL if the user provided length is too small,
-not -EFAULT.
+--- Comment #25 from kbugreports@disroot.org ---
+Kernel v6.6.25 works fine on my system regarding the bug that was in v6.6.2=
+3.
+Thanks for the fix!
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
