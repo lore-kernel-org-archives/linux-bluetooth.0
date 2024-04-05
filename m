@@ -1,65 +1,60 @@
-Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
+Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com [209.85.217.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B8FC1C6A8
-	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Apr 2024 20:48:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37F981DA32
+	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Apr 2024 21:11:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712350120; cv=none; b=a2repXyYtMf2wPbTcwshBwbGv7uy8JxsOLgNYhwJGPmoy5pM1gm+h7YkCQ23RBAftg3YZXqTtIKd0/6s7uw0++Hhqeo4dqV6xofiX0nY3UETkOTMF7BEBpz9SzdBStbWqyJjb9DpdUjBITOkmecGBXFyyFtsvViFewJNE/dElLw=
+	t=1712351510; cv=none; b=ETLxujK921rpOuWodTKwXqzsPmUNPmoFUPVMRV/6tFJL6A4ZtH1Kyp4MrJwx6tiAzM1apk4LDD71ytp3rtf4sKyZjMdiyucgsuJlxcejRbcH7j42SO0mhgh8hNSKiwUlyd9Fh1QoZtEubpOLho67JmO0HeIapk8j9ICZETyzBho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712350120; c=relaxed/simple;
-	bh=z8ZBwjeIXrRw07mNy+A8R9cQ54jR79d7glQoja4OIcE=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YB33zFnoLVd7617Cibw16NTFso5uCjz0Hc55iEAn4/40oyXv89VzeHWw8eQnqW0HK3SiFHTFR/IwD58M8cOiw/3XR5a3DporACzJ5Zj+UJmz3pr3qVKiuAyw4AxsBJ4qNE7ZkOXCgbZgu1B6EsXDfSYIg4yXfmycAtYy4/T4WbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kdS740+0; arc=none smtp.client-ip=209.85.221.169
+	s=arc-20240116; t=1712351510; c=relaxed/simple;
+	bh=jc27TBSDxlljRPF07T3OnDVRGhlpgDIJWgSIqWSiYiM=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=MR55tUddJ5jycliccdjewy2v5D1xxjphqtQ/TBUU5iliP0sUBFZ4sFWCf9TQMDpIGr8gvMhVSw7Bew3uRsYNF576PxdMihBSwlmuHn8TZqFeljiT1OhL8GVUr8BmkvELU+s28wjgRqhnuErC1UmuNgewHf8IXSsLlt0aqi/eAKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N3qgATBY; arc=none smtp.client-ip=209.85.217.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kdS740+0"
-Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-4daa8466d6fso699567e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Apr 2024 13:48:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N3qgATBY"
+Received: by mail-vs1-f54.google.com with SMTP id ada2fe7eead31-479e57ff63bso167327137.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Apr 2024 14:11:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712350117; x=1712954917; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gEl/NKTGQ+goyt2u6Uu6Fkz+Gbi0fKWM7UDj1mD+wHk=;
-        b=kdS740+0/v5AHP7Nvni3EZIzwNUY8y/OdP3Ebsy8d0/x+eakUZH/qT3YQkbQF3XS5f
-         2rowAE1ZZPlq8VsemHlkWvtutQrdQ6arA3+IFJLHk0poz4BAQczvIuCie/lJ8fHA57il
-         llh2bVu7x6ViWAh1AY4V1InEU0WhE/aO7YnPh94/oHAOVU7DTRGRv7VHclz3K/iPgl1M
-         KZPWWzPEbT2FpeYIMhVo4TsGMIHgpeCRTbuijBNjhEK7t5OH8ygGUnnghgWlcXGNuj+a
-         wugG5lFxSfzk+hrKv6l/04uTAyoGTJ4cX+aIEJNIrNa42rBRpMd48ahDMW26p3gipJcg
-         FTkw==
+        d=gmail.com; s=20230601; t=1712351507; x=1712956307; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cXA+oiwz2b8EHFOBjQLtlpM7ubcXnMrzwUHSkgQ2sUk=;
+        b=N3qgATBYyUgWjGgwF2CBAr39oKBsVEadn36cNMt9pyU038nguPJP1SgAU/Cx7oEik+
+         M5DFHnPzHH8Pl7S9f5KIQniYjpXKfKXuhuZfk80WpoFTEqyj3qRcfV/rvPuuWhHmGOiz
+         SI0HQDbySUowVnNYREWBHY0frItIGpx+mNkQ3I5QjWeyTFFCZ9gKl98ZOBcH4vKglQde
+         eQGbFjZX6TwQDmlvRzoENuZPodubII1z3042cYi6wUGtTLaG6Pne09PfydeH8COc4woM
+         odlB7hHHH5GbcEA7Dp+IBCRD5LzR5HR1f3wb4O1Z95UNM0HDpPo1D5tC0bhmyPrg9tXw
+         WIMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712350117; x=1712954917;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gEl/NKTGQ+goyt2u6Uu6Fkz+Gbi0fKWM7UDj1mD+wHk=;
-        b=vk3G7Itj1vPkoRBfhIFUbFC48jkt6e6npElTmwTVrCeuN4NeiOgAe9rhmtwkyC72F+
-         /K9OktDzEjbUghg4CwwvIpK4wfQuXwlZ4R2qenM4uSW6Tf/pu8FQ9tNVM9Q3e/NEBQil
-         l0CiZMRtPEv23SkNemsnji/34MrZSXBZ8kIbLpy9hiUB/tBAS5PUyDxJxPuKni8oZ3W6
-         Jqw54PWsczNKATBA0E1PfgxJBHD+iX6ORyhTZ836p0BZQ7BrMKGsYcGy/LeB3g8lKfUF
-         edk1J7WUSqL5PSLmWH2mUV8hwKGHFtsSasNsnzgTVJZsqpZ2N1rIbnI7WLzpMEMrAU3j
-         lwXw==
-X-Gm-Message-State: AOJu0YycczFkn1x6q0QtQNH9gcLwrHVda07jdaK9eH7wKfNQJo6VMGAi
-	35vxBgtmf2MSSdIHT0EvaHdsuiXvk+w/od7wqykEGr/ytk0QahTtzv2cfzTM
-X-Google-Smtp-Source: AGHT+IFOUfWG2m2MANXP38UkAhcyGhL6eOg801rhPngbdbE0eLqkkW44auMCZ4JnLrzC2JOozxNKRQ==
-X-Received: by 2002:a05:6122:a0b:b0:4d3:36b9:2c26 with SMTP id 11-20020a0561220a0b00b004d336b92c26mr2936268vkn.14.1712350117304;
-        Fri, 05 Apr 2024 13:48:37 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1712351507; x=1712956307;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cXA+oiwz2b8EHFOBjQLtlpM7ubcXnMrzwUHSkgQ2sUk=;
+        b=R+0LzXCDtgEDvjXmI199W6vUA4NFl+4ekdIn+EFVWVKBFzdP2Ic1oaSDYZtBaQYOup
+         5KjO71+mIDvCrdAb0iJIS5HyOhHZlcS1MqOP6Helx4IACMBTKxSN6EDbFbggjMrU80CD
+         bO7qyYJ6mLa4oDmd78QEFtAwq/hWHduSPySOcgw+FOdX/sjZ/69Eaaf4D6hxr+40xC6b
+         VXKFa3evdk/bI+11eGItioc6eoyK2VJUXM9DupmlZbqbtkm7tQElA7ITvVMkytbRr8dZ
+         nz8odwn7fgbdkfgxfk3MxEoe+zjUKXaEHFX+vqn0akzvAfXyTcoAEcnWxtreQnxyRKRc
+         iLUA==
+X-Gm-Message-State: AOJu0YyBfbHV3ucNaTYPikRI4YsqyW1by6icA9wOqzeKjjcKACcelXZQ
+	0dvEQlDu7lQAcmhW+iQeCxQCeG8dCKEhdEr5SJaKaeLxiAz6d7Iaq2oI1qME
+X-Google-Smtp-Source: AGHT+IHuuYN+3moh7vrMn2KCJiPpqtA0Nw0zCzuJmbXs1NYW8QarrieBc2DHBtISh2CVnW2S785bOA==
+X-Received: by 2002:a05:6102:4703:b0:478:406a:cbf8 with SMTP id ei3-20020a056102470300b00478406acbf8mr2179966vsb.35.1712351506817;
+        Fri, 05 Apr 2024 14:11:46 -0700 (PDT)
 Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id y72-20020a1f7d4b000000b004d8a496db23sm336004vkc.1.2024.04.05.13.48.35
+        by smtp.gmail.com with ESMTPSA id dx26-20020a056130291a00b007e3d1347195sm306723uab.3.2024.04.05.14.11.45
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Apr 2024 13:48:36 -0700 (PDT)
+        Fri, 05 Apr 2024 14:11:46 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 5/5] Bluetooth: hci_sock: Fix not validating setsockopt user input
-Date: Fri,  5 Apr 2024 16:48:27 -0400
-Message-ID: <20240405204827.3458726-5-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v6 1/3] input/device: Fix not handling IdleTimeout when uhid is in use
+Date: Fri,  5 Apr 2024 17:11:43 -0400
+Message-ID: <20240405211145.3463154-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240405204827.3458726-1-luiz.dentz@gmail.com>
-References: <20240405204827.3458726-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -70,71 +65,178 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Check user input length before copying data.
-
-Fixes: 09572fca7223 ("Bluetooth: hci_sock: Add support for BT_{SND,RCV}BUF")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+When uhid is in use IdleTimeout was not taking any effect, this also
+attempt to force the destroy the input device node to make it useful
+for users that don't want to keep the input node forever.
 ---
- net/bluetooth/hci_sock.c | 21 ++++++++-------------
- 1 file changed, 8 insertions(+), 13 deletions(-)
+ profiles/input/device.c   | 86 +++++++++++++++++++++++++++------------
+ profiles/input/input.conf |  2 +-
+ 2 files changed, 61 insertions(+), 27 deletions(-)
 
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 4ee1b976678b..703b84bd48d5 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -1946,10 +1946,9 @@ static int hci_sock_setsockopt_old(struct socket *sock, int level, int optname,
+diff --git a/profiles/input/device.c b/profiles/input/device.c
+index 1b28cdc174b1..b622ee8cd681 100644
+--- a/profiles/input/device.c
++++ b/profiles/input/device.c
+@@ -77,6 +77,7 @@ struct input_device {
+ 	unsigned int		report_req_timer;
+ 	uint32_t		report_rsp_id;
+ 	bool			virtual_cable_unplug;
++	unsigned int		idle_timer;
+ };
  
- 	switch (optname) {
- 	case HCI_DATA_DIR:
--		if (copy_from_sockptr(&opt, optval, sizeof(opt))) {
--			err = -EFAULT;
-+		err = bt_copy_from_sockptr(&opt, sizeof(opt), optval, len);
-+		if (err)
- 			break;
--		}
+ static int idle_timeout = 0;
+@@ -139,6 +140,9 @@ static void input_device_free(struct input_device *idev)
+ 		g_free(idev->req);
+ 	}
  
- 		if (opt)
- 			hci_pi(sk)->cmsg_mask |= HCI_CMSG_DIR;
-@@ -1958,10 +1957,9 @@ static int hci_sock_setsockopt_old(struct socket *sock, int level, int optname,
- 		break;
++	if (idev->idle_timer)
++		timeout_remove(idev->idle_timer);
++
+ 	if (idev->reconnect_timer > 0)
+ 		timeout_remove(idev->reconnect_timer);
  
- 	case HCI_TIME_STAMP:
--		if (copy_from_sockptr(&opt, optval, sizeof(opt))) {
--			err = -EFAULT;
-+		err = bt_copy_from_sockptr(&opt, sizeof(opt), optval, len);
-+		if (err)
- 			break;
--		}
+@@ -156,8 +160,54 @@ static void virtual_cable_unplug(struct input_device *idev)
+ 	idev->virtual_cable_unplug = false;
+ }
  
- 		if (opt)
- 			hci_pi(sk)->cmsg_mask |= HCI_CMSG_TSTAMP;
-@@ -1979,11 +1977,9 @@ static int hci_sock_setsockopt_old(struct socket *sock, int level, int optname,
- 			uf.event_mask[1] = *((u32 *) f->event_mask + 1);
- 		}
+-static bool hidp_send_message(GIOChannel *chan, uint8_t hdr,
+-					const uint8_t *data, size_t size)
++static int uhid_disconnect(struct input_device *idev, bool force)
++{
++	int err;
++
++	if (!bt_uhid_created(idev->uhid))
++		return 0;
++
++	/* Only destroy the node if virtual cable unplug flag has been set */
++	if (!idev->virtual_cable_unplug && !force)
++		return 0;
++
++	bt_uhid_unregister_all(idev->uhid);
++
++	err = bt_uhid_destroy(idev->uhid);
++	if (err < 0) {
++		error("bt_uhid_destroy: %s", strerror(-err));
++		return err;
++	}
++
++	return err;
++}
++
++static bool input_device_idle_timeout(gpointer user_data)
++{
++	struct input_device *idev = user_data;
++
++	idev->idle_timer = 0;
++
++	DBG("path=%s", idev->path);
++
++	uhid_disconnect(idev, true);
++	connection_disconnect(idev, 0);
++
++	return false;
++}
++
++static void input_device_idle_reset(struct input_device *idev)
++{
++	timeout_remove(idev->idle_timer);
++
++	if (idle_timeout)
++		idev->idle_timer = timeout_add_seconds(idle_timeout,
++					input_device_idle_timeout, idev,
++					NULL);
++}
++
++static bool hidp_send_message(struct input_device *idev, GIOChannel *chan,
++				uint8_t hdr, const uint8_t *data, size_t size)
+ {
+ 	int fd;
+ 	ssize_t len;
+@@ -191,6 +241,8 @@ static bool hidp_send_message(GIOChannel *chan, uint8_t hdr,
+ 		return false;
+ 	}
  
--		len = min_t(unsigned int, len, sizeof(uf));
--		if (copy_from_sockptr(&uf, optval, len)) {
--			err = -EFAULT;
-+		err = bt_copy_from_sockptr(&uf, sizeof(uf), optval, len);
-+		if (err)
- 			break;
--		}
++	input_device_idle_reset(idev);
++
+ 	return true;
+ }
  
- 		if (!capable(CAP_NET_RAW)) {
- 			uf.type_mask &= hci_sec_filter.type_mask;
-@@ -2042,10 +2038,9 @@ static int hci_sock_setsockopt(struct socket *sock, int level, int optname,
- 			goto done;
- 		}
+@@ -200,13 +252,13 @@ static bool hidp_send_ctrl_message(struct input_device *idev, uint8_t hdr,
+ 	if (hdr == (HIDP_TRANS_HID_CONTROL | HIDP_CTRL_VIRTUAL_CABLE_UNPLUG))
+ 		idev->virtual_cable_unplug = true;
  
--		if (copy_from_sockptr(&opt, optval, sizeof(opt))) {
--			err = -EFAULT;
-+		err = bt_copy_from_sockptr(&opt, sizeof(opt), optval, len);
-+		if (err)
- 			break;
--		}
+-	return hidp_send_message(idev->ctrl_io, hdr, data, size);
++	return hidp_send_message(idev, idev->ctrl_io, hdr, data, size);
+ }
  
- 		hci_pi(sk)->mtu = opt;
- 		break;
+ static bool hidp_send_intr_message(struct input_device *idev, uint8_t hdr,
+ 					const uint8_t *data, size_t size)
+ {
+-	return hidp_send_message(idev->intr_io, hdr, data, size);
++	return hidp_send_message(idev, idev->intr_io, hdr, data, size);
+ }
+ 
+ static bool uhid_send_get_report_reply(struct input_device *idev,
+@@ -297,6 +349,8 @@ static bool hidp_recv_intr_data(GIOChannel *chan, struct input_device *idev)
+ 		return true;
+ 	}
+ 
++	input_device_idle_reset(idev);
++
+ 	hdr = data[0];
+ 	if (hdr != (HIDP_TRANS_DATA | HIDP_DATA_RTYPE_INPUT)) {
+ 		DBG("unsupported HIDP protocol header 0x%02x", hdr);
+@@ -313,28 +367,6 @@ static bool hidp_recv_intr_data(GIOChannel *chan, struct input_device *idev)
+ 	return true;
+ }
+ 
+-static int uhid_disconnect(struct input_device *idev, bool force)
+-{
+-	int err;
+-
+-	if (!bt_uhid_created(idev->uhid))
+-		return 0;
+-
+-	/* Only destroy the node if virtual cable unplug flag has been set */
+-	if (!idev->virtual_cable_unplug && !force)
+-		return 0;
+-
+-	bt_uhid_unregister_all(idev->uhid);
+-
+-	err = bt_uhid_destroy(idev->uhid);
+-	if (err < 0) {
+-		error("bt_uhid_destroy: %s", strerror(-err));
+-		return err;
+-	}
+-
+-	return err;
+-}
+-
+ static gboolean intr_watch_cb(GIOChannel *chan, GIOCondition cond, gpointer data)
+ {
+ 	struct input_device *idev = data;
+@@ -520,6 +552,8 @@ static bool hidp_recv_ctrl_message(GIOChannel *chan, struct input_device *idev)
+ 		return true;
+ 	}
+ 
++	input_device_idle_reset(idev);
++
+ 	hdr = data[0];
+ 	type = hdr & HIDP_HEADER_TRANS_MASK;
+ 	param = hdr & HIDP_HEADER_PARAM_MASK;
+diff --git a/profiles/input/input.conf b/profiles/input/input.conf
+index 00a34eb63de1..fc20c58b6b32 100644
+--- a/profiles/input/input.conf
++++ b/profiles/input/input.conf
+@@ -6,7 +6,7 @@
+ 
+ # Set idle timeout (in minutes) before the connection will
+ # be disconnect (defaults to 0 for no timeout)
+-#IdleTimeout=30
++#IdleTimeout=0
+ 
+ # Enable HID protocol handling in userspace input profile
+ # Defaults to true (Use UHID instead of kernel HIDP)
 -- 
 2.44.0
 
