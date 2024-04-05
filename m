@@ -1,59 +1,48 @@
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AA2233993;
-	Fri,  5 Apr 2024 11:39:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0006B1370;
+	Fri,  5 Apr 2024 12:59:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712317148; cv=none; b=k4Kg9hinQPwwi4It1rICh1uHxNHThuA84EjGOsW8VQDEYcLTaTR5DfeP83Aori1qPZYcXp0LMGyfJOzqABnVBzbJs+O45TLciAkxmpDuZdAhDGA6Lg5qc9tZCBv2zzEgtstQxKYmEQvxFxDdUF/BDmmvByDWLOBGytUt3FfDPVE=
+	t=1712321994; cv=none; b=JOK/Tut9Hz978L4FpXqNK692Ab5wHiXtYyxdixgC7nHya7Wu6rbokEvDo8wZHl+26Q2SnMC4mwaifRHOLTJTo1SQWOEZQwauTv/edeDHgX30xzrMghnlmlly4JYMzEt86N8Jd+8uOPY9u1XoENDuakhtl4gxN9rpmWuIc5TdUag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712317148; c=relaxed/simple;
-	bh=pgAWf/UK0ViUl4tlABjZek6EdyuooN2XyOdISvJAJEg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qQ74jE8wyejeERo0ryJoQS7H3fdp2ui/I8L5NQYplH+cL9lK21s+Qryq/QDQfzHLg4jZePjiu+/Hlv/cOKbsnqakd/+Xt9QP3ixwrgkAh4/q0HVUzO/NDlaKG4xs8FqMo3kvjDdi8WABStMlu6p7Iz1eIS3fQZk4A2MhQvKZFIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A9iAWFpX; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1712321994; c=relaxed/simple;
+	bh=z9Lb3ykWE8H09IJ/I9FXYGfPtjqJ4RV8VJuKRCP4KpQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=r6c3OdDyVwXXHvpHvSt8YeLJf2KoLvDCmyxvAEWx4T0ARXBV3mFgHBdURicbA+eYyIAuPzREoVA8F0nAXe7UDhxaYaR9sdBccOnqumetfC16fOWGMHhCOiCG6vurHz14b63/J17a6qFg3cKlN77mdT4BDuBnMnj14CLLN88SWjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=EWcttb8w; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A9iAWFpX"
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2d84a5f4a20so4566411fa.1;
-        Fri, 05 Apr 2024 04:39:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712317144; x=1712921944; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=j0t6RB1T6H6KDkvTfVfey5J6t4MwPgPr68GDvsqnUf0=;
-        b=A9iAWFpXuWEGpMdtGSNXtH0QIjd3LKzccax1rMq0HEariwl4xDpWU0qo4/IzvywYpR
-         ipyHvwyLa2ovJ+ZhVZ+yb40aRi33ZdWznU+CpUS590mXus6458T7Xc3GvzSmMxNVO/zk
-         NPWV3zIBZEuQLi40NNNLzqhxkyvRuSk+J950z11ItGpOUr/TWG7Xw2Y/668miC6IcLNs
-         JV13E/T5IaWdtM+DJxtuSHH5RdnGtKc1JYdSQaoWWCdi0wabZzQLo+XfwbZ3G6yTWbbN
-         Z7+eZNP0TRhZZeQ1SyQlmTUv+SSxjx6Lw5zBoLGrVjXJXRh0kDgYrOXIb7FKnZHA2OzT
-         SV5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712317144; x=1712921944;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=j0t6RB1T6H6KDkvTfVfey5J6t4MwPgPr68GDvsqnUf0=;
-        b=OvVmS5ZXVY6s1BB1E0Vp+zyFc6j6dc5I390qcj7d7JMpQfEA40iHZRazWaVUSKXuxQ
-         u2UKsLAza3Tg2qdq067y7s2q7kvSgibhhVUSN3+SUIkxMIPtK88KgrJAeVhaGHppqMqW
-         qKYvu7YrKEpNObGBAtGqoGb/kk2+Vaw1zMeAtv1WbslO+J474oggefZOi0jUzgP7PUHL
-         ht/tGtJmiktozSXGLlhA5DFLVw7asao+o8OW3bpyzQkbshbJoPo1PwJK8jdO6LGvsGIf
-         Th+3liauMAatQa0jqc7+n/WmZodrNnAztYDDCvK5E03d2sAc8pvVBCbZkpTBED5bKBl9
-         wlig==
-X-Forwarded-Encrypted: i=1; AJvYcCUhTqaF3aomZ1KjgqL2xeR0H7Kh0EAQk3fcwEvOfLX2nYOMroWzIl6p6Vmk1epRF19/X9SzmSc/lB2BiEOzm3cVeeeTOIYjyYCir4Y/w4cmUgmIjJIWkN5slfB34J4a7kcXqafrovLqpGN/zYit
-X-Gm-Message-State: AOJu0Yy5NpsGY6MlJn1GY5+IvoGhUeW5EhgrAED2cBl9w+VtZA8z7rkt
-	8tz3UcDHiBYODNw4ARhwOl1ZCBFl1kro89ZxidEUsaDpci/NssR35tn8f45Y
-X-Google-Smtp-Source: AGHT+IFFvZgEmBvRLdjW9wbUzrUrg/N0Mgs0why89U67SHWeFVH5yrhHYoCV8YkfKJYKGobxVebzzA==
-X-Received: by 2002:a2e:3619:0:b0:2d6:93fa:ce20 with SMTP id d25-20020a2e3619000000b002d693face20mr965811lja.0.1712317144349;
-        Fri, 05 Apr 2024 04:39:04 -0700 (PDT)
-Received: from [10.0.0.4] ([37.174.58.205])
-        by smtp.gmail.com with ESMTPSA id s14-20020a05600c45ce00b004162ef30447sm2023038wmo.18.2024.04.05.04.39.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Apr 2024 04:39:03 -0700 (PDT)
-Message-ID: <32f25edc-4b4e-49b8-a9a4-50ed9da258bf@gmail.com>
-Date: Fri, 5 Apr 2024 13:39:02 +0200
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="EWcttb8w"
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 435Audrw028270;
+	Fri, 5 Apr 2024 12:59:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=fd8DOtUsyPM6Q9LJuFL7QRfdTSp8hN3e+g2pkjdFoNg=; b=EW
+	cttb8wvdCwHCj7yrGmzoG80oydhXV2EtcRZ161hPtboU23qiZz6eC2d7lAtzlcbx
+	XXXKSAOidShRD5faTbJ9Iu3JVolJIXtgAZbGu/HX86uci3vQps9PxBxFF/Nos4UU
+	SxZqI/49adGUyUA0Y9P+TwXuCsZq3SL/3F+BxHnCnRrAnD2ZtVw9LbsqKGdjcD0b
+	RaJA6p/aQMpfNUbFVIrwEVy1Dy49ecl2UAA6nu9mDxdG4B5d9msV3ygQByolBigN
+	ajSjFG6AAEX17bT0xKyTWlEceYnkeA7/0MB1vMN0Ay+upO0ZP0hgAwo20xdfUzQh
+	l6N1luWIZDavM+Ao32eQ==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xa8fc1684-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 05 Apr 2024 12:59:47 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 435CxkCp027700
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 5 Apr 2024 12:59:46 GMT
+Received: from [10.218.29.219] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 5 Apr 2024
+ 05:59:43 -0700
+Message-ID: <b7d5c2ac-2278-4ccc-be2a-7c7d9936581a@quicinc.com>
+Date: Fri, 5 Apr 2024 18:29:39 +0530
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -61,117 +50,196 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net/socket: the length value of the input socket option
- parameter is too small
+Subject: Re: [PATCH] Revert "Bluetooth: hci_qca: Set BDA quirk bit if fwnode
+ exists in DT"
 Content-Language: en-US
-To: Edward Adam Davis <eadavis@qq.com>,
- syzbot+d4ecae01a53fd9b42e7d@syzkaller.appspotmail.com
-Cc: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org,
- syzkaller-bugs@googlegroups.com, edumazet@google.com
-References: <000000000000b9b20e061553f06e@google.com>
- <tencent_7A77E9664E3C953694964A37444AF474AF09@qq.com>
-From: Eric Dumazet <eric.dumazet@gmail.com>
-In-Reply-To: <tencent_7A77E9664E3C953694964A37444AF474AF09@qq.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Johan Hovold <johan@kernel.org>
+CC: Johan Hovold <johan+linaro@kernel.org>, <luiz.dentz@gmail.com>,
+        <marcel@holtmann.org>, <linux-bluetooth@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>,
+        <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>
+References: <20240314084412.1127-1-johan+linaro@kernel.org>
+ <171146704035.9961.13096206001570615153.git-patchwork-notify@kernel.org>
+ <124a7d54-5a18-4be7-9a76-a12017f6cce5@quicinc.com>
+ <ZgWLeo5KSLurLDhK@hovoldconsulting.com>
+ <c03abbbd-faa5-4fdc-b7c3-5554a90c3419@quicinc.com>
+ <Zg1KmcFQ3bAJa8qJ@hovoldconsulting.com>
+From: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+In-Reply-To: <Zg1KmcFQ3bAJa8qJ@hovoldconsulting.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: R2-j96xfNO8Kqxhdm6vMGJt9B4rvuqGT
+X-Proofpoint-ORIG-GUID: R2-j96xfNO8Kqxhdm6vMGJt9B4rvuqGT
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-05_10,2024-04-05_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
+ malwarescore=0 mlxlogscore=999 bulkscore=0 suspectscore=0 clxscore=1015
+ priorityscore=1501 adultscore=0 phishscore=0 impostorscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2404010003
+ definitions=main-2404050092
 
 
-On 4/5/24 12:16, Edward Adam Davis wrote:
-> [Syzbot reported]
-> BUG: KASAN: slab-out-of-bounds in copy_from_sockptr_offset include/linux/sockptr.h:49 [inline]
-> BUG: KASAN: slab-out-of-bounds in copy_from_sockptr include/linux/sockptr.h:55 [inline]
-> BUG: KASAN: slab-out-of-bounds in rfcomm_sock_setsockopt_old net/bluetooth/rfcomm/sock.c:632 [inline]
-> BUG: KASAN: slab-out-of-bounds in rfcomm_sock_setsockopt+0x893/0xa70 net/bluetooth/rfcomm/sock.c:673
-> Read of size 4 at addr ffff8880209a8bc3 by task syz-executor632/5064
+
+On 4/3/2024 5:54 PM, Johan Hovold wrote:
+> On Fri, Mar 29, 2024 at 12:55:40PM +0530, Janaki Ramaiah Thota wrote:
+>> On 3/28/2024 8:53 PM, Johan Hovold wrote:
+>>> On Thu, Mar 28, 2024 at 08:25:16PM +0530, Janaki Ramaiah Thota wrote:
+> 
+>>>> We made this change to configure the device which supports persistent
+>>>> memory for the BD-Address
+>>>
+>>> Can you say something more about which devices support persistent
+>>> storage for the address? Is that all or just some of the chip variants?
+> 
+>> Most of the devices support persistent storage, and bd-address storage
+>> is chosen based on the OEM and Target.
+> 
+> Can you be more specific about which devices support it (or say which do
+> not)?
+> 
+
+We know below BT chipsets supports persistent storage(OTP) for BDA
+WCN7850, WCN6855, WCN6750
+
+> Is the address stored in some external eeprom or similar which the OEM
+> can choose to populate?
 >
-> CPU: 0 PID: 5064 Comm: syz-executor632 Not tainted 6.8.0-syzkaller-08951-gfe46a7dd189e #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-> Call Trace:
->   <TASK>
->   __dump_stack lib/dump_stack.c:88 [inline]
->   dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
->   print_address_description mm/kasan/report.c:377 [inline]
->   print_report+0x169/0x550 mm/kasan/report.c:488
->   kasan_report+0x143/0x180 mm/kasan/report.c:601
->   copy_from_sockptr_offset include/linux/sockptr.h:49 [inline]
->   copy_from_sockptr include/linux/sockptr.h:55 [inline]
->   rfcomm_sock_setsockopt_old net/bluetooth/rfcomm/sock.c:632 [inline]
->   rfcomm_sock_setsockopt+0x893/0xa70 net/bluetooth/rfcomm/sock.c:673
->   do_sock_setsockopt+0x3af/0x720 net/socket.c:2311
->   __sys_setsockopt+0x1ae/0x250 net/socket.c:2334
->   __do_sys_setsockopt net/socket.c:2343 [inline]
->   __se_sys_setsockopt net/socket.c:2340 [inline]
->   __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2340
->   do_syscall_64+0xfb/0x240
->   entry_SYSCALL_64_after_hwframe+0x6d/0x75
-> RIP: 0033:0x7f36ff898dc9
-> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 91 18 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007ffe010c2208 EFLAGS: 00000246 ORIG_RAX: 0000000000000036
-> RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f36ff898dc9
-> RDX: 0000000000000003 RSI: 0000000000000012 RDI: 0000000000000006
-> RBP: 0000000000000006 R08: 0000000000000002 R09: 0000000000000000
-> R10: 00000000200000c0 R11: 0000000000000246 R12: 0000555567399338
-> R13: 000000000000000e R14: 0000000000000000 R15: 0000000000000000
->   </TASK>
->
-> Allocated by task 5064:
->   kasan_save_stack mm/kasan/common.c:47 [inline]
->   kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
->   poison_kmalloc_redzone mm/kasan/common.c:370 [inline]
->   __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:387
->   kasan_kmalloc include/linux/kasan.h:211 [inline]
->   __do_kmalloc_node mm/slub.c:3966 [inline]
->   __kmalloc+0x233/0x4a0 mm/slub.c:3979
->   kmalloc include/linux/slab.h:632 [inline]
->   __cgroup_bpf_run_filter_setsockopt+0xd2f/0x1040 kernel/bpf/cgroup.c:1869
->   do_sock_setsockopt+0x6b4/0x720 net/socket.c:2293
->   __sys_setsockopt+0x1ae/0x250 net/socket.c:2334
->   __do_sys_setsockopt net/socket.c:2343 [inline]
->   __se_sys_setsockopt net/socket.c:2340 [inline]
->   __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2340
->   do_syscall_64+0xfb/0x240
->   entry_SYSCALL_64_after_hwframe+0x6d/0x75
->
-> The buggy address belongs to the object at ffff8880209a8bc0
->   which belongs to the cache kmalloc-8 of size 8
-> The buggy address is located 1 bytes to the right of
->   allocated 2-byte region [ffff8880209a8bc0, ffff8880209a8bc2)
-> [Fix]
-> The optlen value passed by syzbot to _sys_setsockopt() is 2, which results in
-> only 2 bytes being allocated when allocating memory to kernel_optval, and the
-> optval size passed when calling the function copy_from_sockptr() is 4 bytes.
-> Here, optlen is determined uniformly in the entry function __sys_setsockopt().
-> If its value is less than 4, the parameter is considered invalid.
->
-> Reported-by: syzbot+d4ecae01a53fd9b42e7d@syzkaller.appspotmail.com
-> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+  
+This persistent storage is One Time Programmable (OTP) reserved memory
+which resides in the BT chip.
+
+>>>> So to make device functional in both scenarios we are adding a new
+>>>> property in dts file to distinguish persistent and non-persistent
+>>>> support of BD Address and set HCI_QUIRK_USE_BDADDR_PROPERTY bit
+>>>> accordingly
+>>>
+>>> Depending on the answer to my questions above, you may be able to infer
+>>> this from the compatible string and/or you can read out the address from
+>>> the device and only set the quirk if it's set to the default address.
+>>>
+>>> You should not need to add a new property for this.
+> 
+>> As per my understanding, altering the compatible string may cause duplicate
+>> configuration, right ?
+> 
+
+Yes, we are correct.
+
+> If it's the same device and just a different configuration then we can't
+> use the compatible string for this.
+> 
+> It seems we need a patch like the below to address this. But please
+> provide some more details (e.g. answers to the questions above) so I can
+> determine what the end result should look like.
+> 
+> Johan
+> 
+> 
+>  From 9719effe80fcc17518131816fdfeb1824cfa08b6 Mon Sep 17 00:00:00 2001
+> From: Johan Hovold <johan+linaro@kernel.org>
+> Date: Thu, 20 Apr 2023 14:10:55 +0200
+> Subject: [PATCH] Bluetooth: btqca: add invalid device address check
+> 
+> Some Qualcomm Bluetooth controllers lack persistent storage for the
+> device address and therefore end up using the default address
+> 00:00:00:00:5a:ad.
+> 
+> Apparently this depends on how the controller has been integrated so we
+> can not use the device type alone to determine when the address is
+> valid.
+> 
+> Instead read back the address during setup() and only set the
+> HCI_QUIRK_USE_BDADDR_PROPERTY flag when needed.
+> 
+> Fixes: de79a9df1692 ("Bluetooth: btqcomsmd: use HCI_QUIRK_USE_BDADDR_PROPERTY")
+> Fixes: e668eb1e1578 ("Bluetooth: hci_core: Don't stop BT if the BD address missing in dts")
+> Fixes: 6945795bc81a ("Bluetooth: fix use-bdaddr-property quirk")
+> Cc: stable@vger.kernel.org	# 6.5
+> Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
 > ---
->   net/socket.c | 3 +++
->   1 file changed, 3 insertions(+)
->
-> diff --git a/net/socket.c b/net/socket.c
-> index e5f3af49a8b6..ac8fd4f6ebfe 100644
-> --- a/net/socket.c
-> +++ b/net/socket.c
-> @@ -2327,6 +2327,9 @@ int __sys_setsockopt(int fd, int level, int optname, char __user *user_optval,
->   	int err, fput_needed;
->   	struct socket *sock;
+>   drivers/bluetooth/btqca.c   | 33 +++++++++++++++++++++++++++++++++
+>   drivers/bluetooth/hci_qca.c |  2 --
+>   2 files changed, 33 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+> index 19cfc342fc7b..15124157372c 100644
+> --- a/drivers/bluetooth/btqca.c
+> +++ b/drivers/bluetooth/btqca.c
+> @@ -15,6 +15,8 @@
 >   
-> +	if (optlen < sizeof(int))
-> +		return -EINVAL;
+>   #define VERSION "0.1"
+>   
+> +#define QCA_BDADDR_DEFAULT (&(bdaddr_t) {{ 0xad, 0x5a, 0x00, 0x00, 0x00, 0x00 }})
 > +
+>   int qca_read_soc_version(struct hci_dev *hdev, struct qca_btsoc_version *ver,
+>   			 enum qca_btsoc_type soc_type)
+>   {
+> @@ -612,6 +614,35 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+>   }
+>   EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
+>   
+> +static void qca_check_bdaddr(struct hci_dev *hdev)
+> +{
+> +	struct hci_rp_read_bd_addr *bda;
+> +	struct sk_buff *skb;
+> +	int err;
+> +
+> +	if (bacmp(&hdev->public_addr, BDADDR_ANY))
+> +		return;
+> +
+> +	skb = __hci_cmd_sync(hdev, HCI_OP_READ_BD_ADDR, 0, NULL,
+> +			     HCI_INIT_TIMEOUT);
+> +	if (IS_ERR(skb)) {
+> +		err = PTR_ERR(skb);
+> +		bt_dev_err(hdev, "Failed to read device address (%d)", err);
+> +		return;
+> +	}
+> +
+> +	if (skb->len != sizeof(*bda)) {
+> +		bt_dev_err(hdev, "Device address length mismatch");
+> +		goto free_skb;
+> +	}
+> +
+> +	bda = (struct hci_rp_read_bd_addr *)skb->data;
+> +	if (!bacmp(&bda->bdaddr, QCA_BDADDR_DEFAULT))
+> +		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
+> +free_skb:
+> +	kfree_skb(skb);
+> +}
+> +
+>   static void qca_generate_hsp_nvm_name(char *fwname, size_t max_size,
+>   		struct qca_btsoc_version ver, u8 rom_ver, u16 bid)
+>   {
+> @@ -818,6 +849,8 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>   		break;
+>   	}
+>   
+> +	qca_check_bdaddr(hdev);
+> +
+>   	bt_dev_info(hdev, "QCA setup on UART is completed");
+>   
+>   	return 0;
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index b266db18c8cc..b621a0a40ea4 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -1908,8 +1908,6 @@ static int qca_setup(struct hci_uart *hu)
+>   	case QCA_WCN6750:
+>   	case QCA_WCN6855:
+>   	case QCA_WCN7850:
+> -		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
+> -
+>   		qcadev = serdev_device_get_drvdata(hu->serdev);
+>   		if (qcadev->bdaddr_property_broken)
+>   			set_bit(HCI_QUIRK_BDADDR_PROPERTY_BROKEN, &hdev->quirks);
 
+Thanks for the patch. This change looks fine and it will resolve the current OTP issue.
 
-Please cc netdev@ for core networking patches.
-
-This patch is not good, please fix net/bluetooth/rfcomm/sock.c instead
-
-I think I did this yesterday already :
-
-https://lore.kernel.org/netdev/20240404124723.2429464-1-edumazet@google.com/T/
-
-
->   	sock = sockfd_lookup_light(fd, &err, &fput_needed);
->   	if (!sock)
->   		return err;
+--
+Thanks,
+JanakiRam
