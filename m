@@ -1,385 +1,329 @@
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 658FC1FDD
-	for <linux-bluetooth@vger.kernel.org>; Sat,  6 Apr 2024 20:50:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F71917573
+	for <linux-bluetooth@vger.kernel.org>; Sun,  7 Apr 2024 11:33:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712436660; cv=none; b=ifTnhB8klKmWz34b45vofhuPtcr0SfaITTE3Jbma8RF2KIR64arlGO2KW77IMydgGmd1BXgN1dfnXIQhKXfp2dyk4hSH1be1sM7INMtTaRWj/BhfBfro1SkdgSfG41YX+Un6hbxbWlLVhMByXn/BZJO+LW1aQKA5bIbO4wkVmtk=
+	t=1712489612; cv=none; b=P/NCj4N6O13YtE5Y/6dclU+4ndwJIcPaxcBoYjH3B5WgP+4WVnB4Xlkol7CVuq5mCn9XrtBJsCC2tulaefKPm/njsjN8a9wQemmjRlVz0rZXeozZywalCbZ0yZUmkeP3TO6KmxV34U8BQ3zNh5JnbD1AiSyUaSpN3UvHY3Fkugs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712436660; c=relaxed/simple;
-	bh=c2fWp/iF3PaB5Qn0+YMkAshIHswOqlCh0s/qE0GzHvE=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
-	 In-Reply-To:Content-Type; b=Y7jGhLmOllTyr3VBhLmqw5qZJqNt01UUFPdfzQVO4+t60xzQvfpN3+dRDIqkr4pLIuFiUiQuu25DCTJ2Jk5qqZwT+XpcThA2qg6O9Lgfk4BaT1UjeXRileYtzTVoTvDw1k+KtAUWFGIW/eRhtV9rfQwurLqDKxEwaFFx2yQ8LF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=PVQGQuU2; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=penguintechs.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="PVQGQuU2"
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2a484f772e2so967197a91.3
-        for <linux-bluetooth@vger.kernel.org>; Sat, 06 Apr 2024 13:50:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=penguintechs.org; s=google; t=1712436657; x=1713041457; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:references:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EwcLv+IoUPZ+WLmS6saJqvPRqplpWnxkGgPT2zfuETA=;
-        b=PVQGQuU2LktVB9kZH73JjqX1f5odpuNZ8yO4NAZcxAlgnLClCVRt0YuaGMfJLBlEuK
-         csKXf+JRhEBeGMQ73zkxoDgjjROeet4InRt6WhskSSdA8+vxw1is03btCzI1NLkypdOd
-         Ll/vEFkkBBAVTsWG0nj+0iFT1S61vCXL+x1/Y=
+	s=arc-20240116; t=1712489612; c=relaxed/simple;
+	bh=dPY3Jv21nNGa2gRiql46WJTs4r4yPnfluuq+QvLh8uI=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=YSkh2wYbT32g0PLZ+KHecqCaKBt2oXD5Mj6SqUoLcAWpLtTgBGn9lQjd4AkkUPJqlKvJb1ZA33ZOOvAjTv9sXzOzg/kMNMOFxXfcYdzKJ+eAvaFQoi/PWLZHXVTIteTEj8eBlKtb77AkSDrIaBwXIIK7gW4zd+v+Nlv4rknKOpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7cc7a6a043bso388158939f.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 07 Apr 2024 04:33:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712436657; x=1713041457;
-        h=content-transfer-encoding:in-reply-to:references:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EwcLv+IoUPZ+WLmS6saJqvPRqplpWnxkGgPT2zfuETA=;
-        b=mg2BAcmaVoRMdjXHTExjdgp/ujaYqx/qFgJOSm34/RqNI+ecaUumkByinVAdOGdEyY
-         eQFFYXMDX1gzf7IZv+PAYyYpEQRHJsdp/4XOsDkMcdf5xWJMDaprGw5/wHrCgYr96Ksc
-         ka1NqcGSqUpNUmIGQgVxAiHZIAJZXzTxcX5QxWPFQFeTK2SMCy2jqHjcfhQqlfVV4al5
-         U0TDS4sVY2aYABXZgyfg6ykNKDZL85BSSQiWPKuOGXYyYrrNOnw8jRJl29y6QGBG0qkt
-         VJ1N0wHqGVSndH/n1MHjpNLBapavAxthVKdw3fUO3dmAE2rsVf19f+RbgBde7eHQPuDg
-         I8Zg==
-X-Forwarded-Encrypted: i=1; AJvYcCVhS3RbX8+wIC2EnsEtHHMOl4p9zFoc03MslitW7Epd1ltkgPUBHLhjUSA5lJA7KSEGdx6vTSbOID//Pgegu9MbCrNZ5fLIU9C+5/C3DmXb
-X-Gm-Message-State: AOJu0Yw9BW8ZjD3LJt1m/+tNdquuNNq6NvaCfBlPCLojatb67Z9R/lW5
-	zHE2GcMSzPFiz92go76EBaMizOwQstahK4N0HenA9hOX9WIthmDwoAbHluuI9A==
-X-Google-Smtp-Source: AGHT+IHAjqnm/E14vScRpdXFO0XJsAynw8VjOBnh8YAJUwN7kAz3sko1Pz8YcauDgoD8sGaZOAf8uA==
-X-Received: by 2002:a17:902:bd43:b0:1e2:61c9:85de with SMTP id b3-20020a170902bd4300b001e261c985demr4795927plx.4.1712436657411;
-        Sat, 06 Apr 2024 13:50:57 -0700 (PDT)
-Received: from [172.16.102.235] (c-98-45-34-39.hsd1.ca.comcast.net. [98.45.34.39])
-        by smtp.gmail.com with ESMTPSA id d6-20020a17090ae28600b002a0187d84f0sm3593602pjz.20.2024.04.06.13.50.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 06 Apr 2024 13:50:56 -0700 (PDT)
-Message-ID: <64cfac06-d9d8-4a69-9bd7-3a38fe03b5d8@penguintechs.org>
-Date: Sat, 6 Apr 2024 13:50:55 -0700
+        d=1e100.net; s=20230601; t=1712489609; x=1713094409;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vAjeFSt8ewWD/qIAIZIQZ1c+J0tmvpT96cSatIM076Y=;
+        b=jS0+iXUgbhMODhxODRiSB5m5IrmkSRbiG/pzvpXoPBRqjEy474Lyr3OZj8HnhRlFWn
+         C6hFJ+fvcPsalJ1wfw+ctnHB/BZM4zcz9ZgpRsvgKwIbnezeHf52X5C1iqLz3L96mVG5
+         dKIZxPZrWZff7Ctnpj1QAhU8/gOWdRYZERzW9nMd1UthkHIawWdlIA0HY3Mrgr5qQxEX
+         ubN6LbHJmbdhkIwKg4G4pNIE436ZU3WTWaWf+fNPmQDVCkstNyLMfOgG3nXQVZ2kGJFb
+         0Lt1MFc4CRtykSszGVqya2R46ujR8NNelhS9ZM+ZWUhA7bU2tzMFaZCa6w1CRb6+gni0
+         eBYw==
+X-Forwarded-Encrypted: i=1; AJvYcCUikb2Mv/1o+zfJhZxPZYxtVfJiV7HZtZY6inJw1GINQKCRequ5ub14ZtKTcmpF7RphytYeLhCBji9TYZNpLi2ug1tUHZJw0rWuDJsxTGAM
+X-Gm-Message-State: AOJu0YynumfNcyxs94EJxAFjjaVf4hZElW4VdtxOb5QsmDUABbyUQkfA
+	YVPhUmOYhj0xEHT15Q24ac0kv9yGvwUOvJK+cP8TUCSNkMT6J/ZBmq3RrOWXiURUhsh3OY6A4++
+	Y303bRrwoJCKZmzW9gUM7sZkVAl1cujSh7K6vBjzAqC7Id0TgRpO9WGg=
+X-Google-Smtp-Source: AGHT+IFIEnXW9vyYYnlOzuU7p04q4/4jN9Iq8prQhPJTF9290yZybEJQc7yBG5R7cUMoAv9uLRSFjVT9WOCu2ltETrPeg+obT8Ps
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: QCA6390 bluetooth doesn't work after warm boot or
- disable/reenable
-Content-Language: en-US
-From: Wren Turkal <wt@penguintechs.org>
-To: ath11k@lists.infradead.org, linux-bluetooth@vger.kernel.org,
- Kalle Valo <kvalo@kernel.org>, Ben Young Tae Kim <ytkim@qca.qualcomm.com>
-References: <a03dace1-ca0f-41d6-8e2c-636e3b053a3a@penguintechs.org>
- <31bb6e18-ecee-49b3-87d7-50ab53e07447@penguintechs.org>
- <1b3d3937-6679-491e-a5c6-818ae8ac639a@penguintechs.org>
- <43820685-4960-4801-bd5d-f1b5e41ec033@penguintechs.org>
-In-Reply-To: <43820685-4960-4801-bd5d-f1b5e41ec033@penguintechs.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6602:14ce:b0:7d5:d9ec:2ea1 with SMTP id
+ b14-20020a05660214ce00b007d5d9ec2ea1mr76935iow.4.1712489609653; Sun, 07 Apr
+ 2024 04:33:29 -0700 (PDT)
+Date: Sun, 07 Apr 2024 04:33:29 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000dd84650615800e67@google.com>
+Subject: [syzbot] [bluetooth?] BUG: sleeping function called from invalid
+ context in hci_le_create_big_complete_evt
+From: syzbot <syzbot+2fb0835e0c9cefc34614@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 4/6/24 1:29 PM, Wren Turkal wrote:
-> +Ben Young Tae Kim, current maintainer of btqca
-> 
-> On 4/6/24 1:27 PM, Wren Turkal wrote:
->> +Kalle Valo since you have the same laptop
->>
->> On 4/6/24 1:16 PM, Wren Turkal wrote:
->>> Sorry for the double send on the original message. I am still hoping 
->>> to get some help. I have added additional info below.
->>>
->>> On 4/4/24 12:14 PM, Wren Turkal wrote:
->>>> Hey there ath11k/bluetooth folks,
->>>>
->>>> I am having a pretty major problem with QCA6930 for some time (maybe 
->>>> a year or two). I have this bluetooth device:
->>>>
->>>> 72:00.0 Unassigned class [ff00]: Qualcomm Technologies, Inc QCA6390 
->>>> Wireless Network Adapter
->>>>
->>>> This device appears to be driven by the ath11k module and others. I 
->>>> hope I am pinging the right lists.
->>>>
->>>> I am using Fedora Rawhide. Fully updated yesterday. My uname reports 
->>>> this:
->>>>
->>>> Linux braindead.localdomain 
->>>> 6.9.0-0.rc2.20240402git026e680b0a08.24.fc41.x86_64 #1 SMP 
->>>> PREEMPT_DYNAMIC Tue Apr  2 17:51:18 UTC 2024 x86_64 GNU/Linux
->>>
->>> Updated today. Here's the new uname:
->>>
->>> Linux braindead.localdomain 
->>> 6.9.0-0.rc2.20240405git8cb4a9a82b21.27.fc41.x86_64 #1 SMP 
->>> PREEMPT_DYNAMIC Fri Apr  5 16:48:07 UTC 2024 x86_64 GNU/Linux
->>>
->>> I also noticed a new version of bluez. Here is the RPM package 
->>> version: bluez-5.73-3.fc41.x86_64
->>>
->>>> My main bluetooth device is  a Logitech MX 3 Mac mouse that uses 
->>>> bluetooth. When bluetooth fails, so does the mouse. I have power 
->>>> cycle my laptop when that happens. I'd love to help find a fix for 
->>>> this.
->>>>
->>>> The problem is that I cannot disable and re-enable the bluetooth on 
->>>> my system. Bluetooth also doesn't work after a warm boot. I have to 
->>>> power cycle my laptop to recover bluetooth funcitonality. I have 
->>>> tried the following:
->>>>
->>>> * logging into KDE Plasma (bluetooth stops working)
->>>> * logging into GNOME (works on cold boot, fails on warm boot)
->>>
->>> I did notice that the mouse seems to work in Plasma until a few sec 
->>> after I see the background image appears. I suspect that Plasma is 
->>> disabling and reenabling the bluetooth where Gnome does not do that.
->>>
->>>> After logging into GNOME during a cold boot, I have also done 
->>>> "systemctl restart bluetooth.service". I get these journal logs 
->>>> during the stop;
->>>>
->>>> ➜  bt_kernel_bug cat journal-stop-bluetooth-service.log
->>>> Apr 04 10:14:41 braindead.localdomain NetworkManager[1120]: <info> 
->>>> [1712250881.7060] device (F0:5C:77:F2:60:FC): state change: 
->>>> disconnected -> unmanaged (reason 'removed', sys-iface-state: 
->>>> 'removed')
->>>> Apr 04 10:14:41 braindead.localdomain systemd[1]: Starting 
->>>> systemd-rfkill.service - Load/Save RF Kill Switch Status...
->>>> Apr 04 10:14:41 braindead.localdomain systemd[1]: Started 
->>>> systemd-rfkill.service - Load/Save RF Kill Switch Status.
->>>> Apr 04 10:14:41 braindead.localdomain audit[1]: SERVICE_START pid=1 
->>>> uid=0 auid=4294967295 ses=4294967295 
->>>> subj=system_u:system_r:init_t:s0 msg='unit=systemd-rfkill 
->>>> comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? 
->>>> terminal=? res=success'
->>>> Apr 04 10:14:46 braindead.localdomain systemd[1]: 
->>>> systemd-rfkill.service: Deactivated successfully.
->>>> Apr 04 10:14:46 braindead.localdomain audit[1]: SERVICE_STOP pid=1 
->>>> uid=0 auid=4294967295 ses=4294967295 
->>>> subj=system_u:system_r:init_t:s0 msg='unit=systemd-rfkill 
->>>> comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? 
->>>> terminal=? res=success'
->>>>
->>>> I get these journal logs during start:
->>>>
->>>> Apr 04 10:15:05 braindead.localdomain kernel: Bluetooth: hci0: 
->>>> setting up ROME/QCA6390
->>>> Apr 04 10:15:05 braindead.localdomain systemd[1]: Starting 
->>>> systemd-rfkill.service - Load/Save RF Kill Switch Status...
->>>> Apr 04 10:15:05 braindead.localdomain systemd[1]: Started 
->>>> systemd-rfkill.service - Load/Save RF Kill Switch Status.
->>>> Apr 04 10:15:05 braindead.localdomain audit[1]: SERVICE_START pid=1 
->>>> uid=0 auid=4294967295 ses=4294967295 
->>>> subj=system_u:system_r:init_t:s0 msg='unit=systemd-rfkill 
->>>> comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? 
->>>> terminal=? res=success'
->>>> Apr 04 10:15:05 braindead.localdomain kernel: Bluetooth: hci0: QCA 
->>>> Product ID   :0x00000010
->>>> Apr 04 10:15:05 braindead.localdomain kernel: Bluetooth: hci0: QCA 
->>>> SOC Version  :0x400a0200
->>>> Apr 04 10:15:05 braindead.localdomain kernel: Bluetooth: hci0: QCA 
->>>> ROM Version  :0x00000200
->>>> Apr 04 10:15:05 braindead.localdomain kernel: Bluetooth: hci0: QCA 
->>>> Patch Version:0x00003ac0
->>>> Apr 04 10:15:05 braindead.localdomain kernel: Bluetooth: hci0: QCA 
->>>> controller version 0x02000200
->>>> Apr 04 10:15:05 braindead.localdomain kernel: Bluetooth: hci0: QCA 
->>>> Downloading qca/htbtfw20.tlv
->>>> Apr 04 10:15:06 braindead.localdomain kernel: Bluetooth: hci0: QCA 
->>>> Failed to send TLV segment (-110)
->>>> Apr 04 10:15:06 braindead.localdomain kernel: Bluetooth: hci0: QCA 
->>>> Failed to download patch (-110)
->>>> Apr 04 10:15:06 braindead.localdomain kernel: Bluetooth: hci0: Retry 
->>>> BT power ON:0
->>>> Apr 04 10:15:08 braindead.localdomain kernel: Bluetooth: hci0: 
->>>> command 0xfc00 tx timeout
->>>> Apr 04 10:15:08 braindead.localdomain kernel: Bluetooth: hci0: 
->>>> Reading QCA version information failed (-110)
->>>> Apr 04 10:15:08 braindead.localdomain kernel: Bluetooth: hci0: Retry 
->>>> BT power ON:1
->>>> Apr 04 10:15:10 braindead.localdomain systemd[1]: 
->>>> systemd-rfkill.service: Deactivated successfully.
->>>> Apr 04 10:15:10 braindead.localdomain audit[1]: SERVICE_STOP pid=1 
->>>> uid=0 auid=4294967295 ses=4294967295 
->>>> subj=system_u:system_r:init_t:s0 msg='unit=systemd-rfkill 
->>>> comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? 
->>>> terminal=? res=success'
->>>> Apr 04 10:15:10 braindead.localdomain kernel: Bluetooth: hci0: 
->>>> command 0xfc00 tx timeout
->>>> Apr 04 10:15:10 braindead.localdomain kernel: Bluetooth: hci0: 
->>>> Reading QCA version information failed (-110)
->>>> Apr 04 10:15:10 braindead.localdomain kernel: Bluetooth: hci0: Retry 
->>>> BT power ON:2
->>>> Apr 04 10:15:13 braindead.localdomain bluetoothd[986]: Failed to set 
->>>> mode: Authentication Failed (0x05)
->>>> Apr 04 10:15:13 braindead.localdomain kernel: Bluetooth: hci0: 
->>>> command 0xfc00 tx timeout
->>>> Apr 04 10:15:13 braindead.localdomain kernel: Bluetooth: hci0: 
->>>> Reading QCA version information failed (-110)
->>>> Apr 04 10:15:15 braindead.localdomain chronyd[1065]: Selected source 
->>>> 204.17.205.8 (2.fedora.pool.ntp.org)
->>>> Apr 04 10:15:22 braindead.localdomain systemd[1687]: Created slice 
->>>> background.slice - User Background Tasks Slice.
->>>> Apr 04 10:15:22 braindead.localdomain systemd[1687]: Starting 
->>>> systemd-tmpfiles-clean.service - Cleanup of User's Temporary Files 
->>>> and Directories...
->>>> Apr 04 10:15:22 braindead.localdomain systemd[1687]: Finished 
->>>> systemd-tmpfiles-clean.service - Cleanup of User's Temporary Files 
->>>> and Directories.
->>>> Apr 04 10:15:38 braindead.localdomain audit: BPF prog-id=86 op=LOAD
->>>> Apr 04 10:15:38 braindead.localdomain systemd[1]: Starting 
->>>> plocate-updatedb.service - Update the plocate database...
->>>> Apr 04 10:15:41 braindead.localdomain systemd[1687]: Started 
->>>> vte-spawn-21527424-cb2d-479f-af17-22251e2b37a0.scope - VTE child 
->>>> process 5144 launched by gnome-terminal-server process 4668.
->>>> Apr 04 10:15:53 braindead.localdomain systemd[1]: 
->>>> plocate-updatedb.service: Deactivated successfully.
->>>> Apr 04 10:15:53 braindead.localdomain systemd[1]: Finished 
->>>> plocate-updatedb.service - Update the plocate database.
->>>> Apr 04 10:15:53 braindead.localdomain systemd[1]: 
->>>> plocate-updatedb.service: Consumed 6.802s CPU time.
->>>> Apr 04 10:15:53 braindead.localdomain audit[1]: SERVICE_START pid=1 
->>>> uid=0 auid=4294967295 ses=4294967295 
->>>> subj=system_u:system_r:init_t:s0 msg='unit=plocate-updatedb 
->>>> comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? 
->>>> terminal=? res=success'
->>>> Apr 04 10:15:53 braindead.localdomain audit[1]: SERVICE_STOP pid=1 
->>>> uid=0 auid=4294967295 ses=4294967295 
->>>> subj=system_u:system_r:init_t:s0 msg='unit=plocate-updatedb 
->>>> comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? 
->>>> terminal=? res=success'
->>>> Apr 04 10:15:54 braindead.localdomain audit: BPF prog-id=86 op=UNLOAD
->>>> Apr 04 10:16:13 braindead.localdomain baloo_file_extractor[5251]: 
->>>> kf.idletime: Could not find any system poller plugin
->>>> Apr 04 10:16:13 braindead.localdomain baloo_file_extractor[5251]: 
->>>> qt.core.qobject.connect: QObject::connect(KAbstractIdleTimePoller, 
->>>> KIdleTime): invalid nullptr parameter
->>>> Apr 04 10:16:13 braindead.localdomain baloo_file_extractor[5251]: 
->>>> qt.core.qobject.connect: QObject::connect(KAbstractIdleTimePoller, 
->>>> KIdleTime): invalid nullptr parameter
->>>>
->>>> There's a bunch of errors in those logs starting with these two 
->>>> seemingly important lines:
->>>>
->>>> Apr 04 10:15:06 braindead.localdomain kernel: Bluetooth: hci0: QCA 
->>>> Failed to send TLV segment (-110)
->>>> Apr 04 10:15:06 braindead.localdomain kernel: Bluetooth: hci0: QCA 
->>>> Failed to download patch (-110)
+Hello,
 
-I narrowed down how to cause the bad logs a bit, if I do the following:
+syzbot found the following issue on:
 
-1. stop the bluetooth service
-2. unload the hci_uart and btqca modules
-3. restart the bluetooth service
-4. reload those modules
+HEAD commit:    480e035fc4c7 Merge tag 'drm-next-2024-03-13' of https://gi..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=12154da9180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=1e5b814e91787669
+dashboard link: https://syzkaller.appspot.com/bug?extid=2fb0835e0c9cefc34614
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14136223180000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11ee2e75180000
 
-I get these log messages:
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/5f73b6ef963d/disk-480e035f.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/46c949396aad/vmlinux-480e035f.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/e3b4d0f5a5f8/bzImage-480e035f.xz
 
-Apr 06 13:42:43 braindead.localdomain sudo[11047]:       wt : TTY=pts/0 
-; PWD=/home/wt ; USER=root ; COMMAND=/usr/sbin/modprobe hci_uart
-Apr 06 13:42:43 braindead.localdomain audit[11047]: USER_CMD pid=11047 
-uid=1000 auid=1000 ses=3 
-subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 
-msg='cwd="/home/wt" cmd=6D>
-Apr 06 13:42:43 braindead.localdomain audit[11047]: CRED_REFR pid=11047 
-uid=1000 auid=1000 ses=3 
-subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 
-msg='op=PAM:setcred grant>
-Apr 06 13:42:43 braindead.localdomain sudo[11047]: 
-pam_unix(sudo:session): session opened for user root(uid=0) by wt(uid=1000)
-Apr 06 13:42:43 braindead.localdomain audit[11047]: USER_START pid=11047 
-uid=1000 auid=1000 ses=3 
-subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 
-msg='op=PAM:session_open>
-Apr 06 13:42:43 braindead.localdomain kernel: Bluetooth: HCI UART driver 
-ver 2.3
-Apr 06 13:42:43 braindead.localdomain kernel: Bluetooth: HCI UART 
-protocol H4 registered
-Apr 06 13:42:43 braindead.localdomain kernel: Bluetooth: HCI UART 
-protocol BCSP registered
-Apr 06 13:42:43 braindead.localdomain kernel: Bluetooth: HCI UART 
-protocol LL registered
-Apr 06 13:42:43 braindead.localdomain kernel: Bluetooth: HCI UART 
-protocol ATH3K registered
-Apr 06 13:42:43 braindead.localdomain kernel: Bluetooth: HCI UART 
-protocol Three-wire (H5) registered
-Apr 06 13:42:43 braindead.localdomain kernel: Bluetooth: HCI UART 
-protocol Intel registered
-Apr 06 13:42:43 braindead.localdomain kernel: Bluetooth: HCI UART 
-protocol Broadcom registered
-Apr 06 13:42:43 braindead.localdomain kernel: Bluetooth: HCI UART 
-protocol QCA registered
-Apr 06 13:42:43 braindead.localdomain kernel: Bluetooth: HCI UART 
-protocol AG6XX registered
-Apr 06 13:42:43 braindead.localdomain kernel: Bluetooth: HCI UART 
-protocol Marvell registered
-Apr 06 13:42:43 braindead.localdomain kernel: Bluetooth: hci0: setting 
-up ROME/QCA6390
-Apr 06 13:42:43 braindead.localdomain sudo[11047]: 
-pam_unix(sudo:session): session closed for user root
-Apr 06 13:42:43 braindead.localdomain audit[11047]: USER_END pid=11047 
-uid=1000 auid=1000 ses=3 
-subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 
-msg='op=PAM:session_close >
-Apr 06 13:42:43 braindead.localdomain audit[11047]: CRED_DISP pid=11047 
-uid=1000 auid=1000 ses=3 
-subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 
-msg='op=PAM:setcred grant>
-Apr 06 13:42:43 braindead.localdomain systemd[1666]: Reached target 
-bluetooth.target - Bluetooth.
-Apr 06 13:42:43 braindead.localdomain systemd[1]: Starting 
-systemd-rfkill.service - Load/Save RF Kill Switch Status...
-Apr 06 13:42:43 braindead.localdomain systemd[1]: Reached target 
-bluetooth.target - Bluetooth Support.
-Apr 06 13:42:43 braindead.localdomain systemd[1]: Started 
-systemd-rfkill.service - Load/Save RF Kill Switch Status.
-Apr 06 13:42:43 braindead.localdomain audit[1]: SERVICE_START pid=1 
-uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 
-msg='unit=systemd-rfkill comm="systemd" exe>
-Apr 06 13:42:45 braindead.localdomain kernel: Bluetooth: hci0: command 
-0xfc00 tx timeout
-Apr 06 13:42:45 braindead.localdomain kernel: Bluetooth: hci0: Reading 
-QCA version information failed (-110)
-Apr 06 13:42:45 braindead.localdomain kernel: Bluetooth: hci0: Retry BT 
-power ON:0
-Apr 06 13:42:48 braindead.localdomain kernel: Bluetooth: hci0: command 
-0xfc00 tx timeout
-Apr 06 13:42:48 braindead.localdomain kernel: Bluetooth: hci0: Reading 
-QCA version information failed (-110)
-Apr 06 13:42:48 braindead.localdomain kernel: Bluetooth: hci0: Retry BT 
-power ON:1
-Apr 06 13:42:48 braindead.localdomain systemd[1]: 
-systemd-rfkill.service: Deactivated successfully.
-Apr 06 13:42:48 braindead.localdomain audit[1]: SERVICE_STOP pid=1 uid=0 
-auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 
-msg='unit=systemd-rfkill comm="systemd" exe=>
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+2fb0835e0c9cefc34614@syzkaller.appspotmail.com
 
-Do any of y'all see anything that helps?
+BUG: sleeping function called from invalid context at kernel/locking/mutex.c:585
+in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid: 5070, name: kworker/u9:2
+preempt_count: 0, expected: 0
+RCU nest depth: 1, expected: 0
+4 locks held by kworker/u9:2/5070:
+ #0: ffff888015be3948 ((wq_completion)hci0#2){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3229 [inline]
+ #0: ffff888015be3948 ((wq_completion)hci0#2){+.+.}-{0:0}, at: process_scheduled_works+0x8e0/0x1770 kernel/workqueue.c:3335
+ #1: ffffc90003b6fd00 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3230 [inline]
+ #1: ffffc90003b6fd00 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_scheduled_works+0x91b/0x1770 kernel/workqueue.c:3335
+ #2: ffff8880665d0078 (&hdev->lock){+.+.}-{3:3}, at: hci_le_create_big_complete_evt+0xcf/0xae0 net/bluetooth/hci_event.c:6914
+ #3: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
+ #3: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
+ #3: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: hci_le_create_big_complete_evt+0xdb/0xae0 net/bluetooth/hci_event.c:6915
+CPU: 0 PID: 5070 Comm: kworker/u9:2 Not tainted 6.8.0-syzkaller-08073-g480e035fc4c7 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+Workqueue: hci0 hci_rx_work
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
+ __might_resched+0x5d4/0x780 kernel/sched/core.c:10187
+ __mutex_lock_common kernel/locking/mutex.c:585 [inline]
+ __mutex_lock+0xc1/0xd70 kernel/locking/mutex.c:752
+ hci_connect_cfm include/net/bluetooth/hci_core.h:2004 [inline]
+ hci_le_create_big_complete_evt+0x3d9/0xae0 net/bluetooth/hci_event.c:6939
+ hci_event_func net/bluetooth/hci_event.c:7514 [inline]
+ hci_event_packet+0xa53/0x1540 net/bluetooth/hci_event.c:7569
+ hci_rx_work+0x3e8/0xca0 net/bluetooth/hci_core.c:4171
+ process_one_work kernel/workqueue.c:3254 [inline]
+ process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
+ worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
+ kthread+0x2f0/0x390 kernel/kthread.c:388
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+ </TASK>
 
->>>
->>> Logs are mostly unchanges when restarting the bluetooth service after 
->>> a cold boot with the bluetooth originally working.
->>>
->>>> FWIW, I get similar logs after logging into KDE Plasma. I also get 
->>>> similar logs after a warm boot.
->>>>
->>>> This appears to be some kind of bug in the initialization of the 
->>>> hardware. Is there any additional information I can provide to help 
->>>> troubleshoot this problem.
->>>
->>> I will also say that the bluetooth appears to work throught a 
->>> suspend/resume cycle as long as I don't restart the bluetooth service.
->>>
->>> Oh, and my laptop is a Dell 9310 if that helps.
->>
->> Kalle, I noticed that you reported having a Dell 9310 in 2021 in a 
->> message on this very mailing list. Do you happen to still have that 
->> laptop? If so, so you still test on that laptop at all? I am curious 
->> if it is having the same issue I am experiencing?
->>
->>> Is there any other info I could collect that might be useful?
->>>
->>> I'm pretty new to troubleshooting a problem like this and would be 
->>> happy to have any advice anyone might want to share.
->>>
->>> Thanks,
->>> wt
->>>
->>
-> 
+=============================
+[ BUG: Invalid wait context ]
+6.8.0-syzkaller-08073-g480e035fc4c7 #0 Tainted: G        W         
+-----------------------------
+kworker/u9:2/5070 is trying to lock:
+ffffffff8f4f5aa8 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_connect_cfm include/net/bluetooth/hci_core.h:2004 [inline]
+ffffffff8f4f5aa8 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_le_create_big_complete_evt+0x3d9/0xae0 net/bluetooth/hci_event.c:6939
+other info that might help us debug this:
+context-{4:4}
+4 locks held by kworker/u9:2/5070:
+ #0: ffff888015be3948 ((wq_completion)hci0#2){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3229 [inline]
+ #0: ffff888015be3948 ((wq_completion)hci0#2){+.+.}-{0:0}, at: process_scheduled_works+0x8e0/0x1770 kernel/workqueue.c:3335
+ #1: ffffc90003b6fd00 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3230 [inline]
+ #1: ffffc90003b6fd00 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_scheduled_works+0x91b/0x1770 kernel/workqueue.c:3335
+ #2: ffff8880665d0078 (&hdev->lock){+.+.}-{3:3}, at: hci_le_create_big_complete_evt+0xcf/0xae0 net/bluetooth/hci_event.c:6914
+ #3: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
+ #3: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
+ #3: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: hci_le_create_big_complete_evt+0xdb/0xae0 net/bluetooth/hci_event.c:6915
+stack backtrace:
+CPU: 0 PID: 5070 Comm: kworker/u9:2 Tainted: G        W          6.8.0-syzkaller-08073-g480e035fc4c7 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+Workqueue: hci0 hci_rx_work
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
+ print_lock_invalid_wait_context kernel/locking/lockdep.c:4751 [inline]
+ check_wait_context kernel/locking/lockdep.c:4821 [inline]
+ __lock_acquire+0x1507/0x1fd0 kernel/locking/lockdep.c:5087
+ lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
+ __mutex_lock_common kernel/locking/mutex.c:608 [inline]
+ __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
+ hci_connect_cfm include/net/bluetooth/hci_core.h:2004 [inline]
+ hci_le_create_big_complete_evt+0x3d9/0xae0 net/bluetooth/hci_event.c:6939
+ hci_event_func net/bluetooth/hci_event.c:7514 [inline]
+ hci_event_packet+0xa53/0x1540 net/bluetooth/hci_event.c:7569
+ hci_rx_work+0x3e8/0xca0 net/bluetooth/hci_core.c:4171
+ process_one_work kernel/workqueue.c:3254 [inline]
+ process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
+ worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
+ kthread+0x2f0/0x390 kernel/kthread.c:388
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+ </TASK>
+==================================================================
+BUG: KASAN: slab-use-after-free in hci_le_create_big_complete_evt+0x383/0xae0
+Read of size 8 at addr ffff88807cb1c000 by task kworker/u9:2/5070
 
--- 
-You're more amazing than you think!
+CPU: 0 PID: 5070 Comm: kworker/u9:2 Tainted: G        W          6.8.0-syzkaller-08073-g480e035fc4c7 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+Workqueue: hci0 hci_rx_work
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
+ print_address_description mm/kasan/report.c:377 [inline]
+ print_report+0x169/0x550 mm/kasan/report.c:488
+ kasan_report+0x143/0x180 mm/kasan/report.c:601
+ hci_le_create_big_complete_evt+0x383/0xae0
+ hci_event_func net/bluetooth/hci_event.c:7514 [inline]
+ hci_event_packet+0xa53/0x1540 net/bluetooth/hci_event.c:7569
+ hci_rx_work+0x3e8/0xca0 net/bluetooth/hci_core.c:4171
+ process_one_work kernel/workqueue.c:3254 [inline]
+ process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
+ worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
+ kthread+0x2f0/0x390 kernel/kthread.c:388
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+ </TASK>
+
+Allocated by task 5070:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ poison_kmalloc_redzone mm/kasan/common.c:370 [inline]
+ __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:387
+ kasan_kmalloc include/linux/kasan.h:211 [inline]
+ kmalloc_trace+0x1db/0x360 mm/slub.c:3997
+ kmalloc include/linux/slab.h:628 [inline]
+ kzalloc include/linux/slab.h:749 [inline]
+ hci_conn_add+0xc7/0x13a0 net/bluetooth/hci_conn.c:914
+ hci_le_big_sync_established_evt+0x1cf/0xb90 net/bluetooth/hci_event.c:6980
+ hci_event_func net/bluetooth/hci_event.c:7514 [inline]
+ hci_event_packet+0xa53/0x1540 net/bluetooth/hci_event.c:7569
+ hci_rx_work+0x3e8/0xca0 net/bluetooth/hci_core.c:4171
+ process_one_work kernel/workqueue.c:3254 [inline]
+ process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
+ worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
+ kthread+0x2f0/0x390 kernel/kthread.c:388
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+
+Freed by task 5070:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:579
+ poison_slab_object+0xa6/0xe0 mm/kasan/common.c:240
+ __kasan_slab_free+0x37/0x60 mm/kasan/common.c:256
+ kasan_slab_free include/linux/kasan.h:184 [inline]
+ slab_free_hook mm/slub.c:2106 [inline]
+ slab_free mm/slub.c:4280 [inline]
+ kfree+0x14a/0x380 mm/slub.c:4390
+ device_release+0x99/0x1c0
+ kobject_cleanup lib/kobject.c:689 [inline]
+ kobject_release lib/kobject.c:720 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x22f/0x480 lib/kobject.c:737
+ hci_conn_cleanup net/bluetooth/hci_conn.c:176 [inline]
+ hci_conn_del+0x900/0xc80 net/bluetooth/hci_conn.c:1126
+ hci_le_create_big_complete_evt+0x619/0xae0 net/bluetooth/hci_event.c:6941
+ hci_event_func net/bluetooth/hci_event.c:7514 [inline]
+ hci_event_packet+0xa53/0x1540 net/bluetooth/hci_event.c:7569
+ hci_rx_work+0x3e8/0xca0 net/bluetooth/hci_core.c:4171
+ process_one_work kernel/workqueue.c:3254 [inline]
+ process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
+ worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
+ kthread+0x2f0/0x390 kernel/kthread.c:388
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+
+The buggy address belongs to the object at ffff88807cb1c000
+ which belongs to the cache kmalloc-8k of size 8192
+The buggy address is located 0 bytes inside of
+ freed 8192-byte region [ffff88807cb1c000, ffff88807cb1e000)
+
+The buggy address belongs to the physical page:
+page:ffffea0001f2c600 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x7cb18
+head:ffffea0001f2c600 order:3 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+ksm flags: 0xfff00000000840(slab|head|node=0|zone=1|lastcpupid=0x7ff)
+page_type: 0xffffffff()
+raw: 00fff00000000840 ffff888014c42280 ffffea0001f2cc00 dead000000000003
+raw: 0000000000000000 0000000080020002 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd2040(__GFP_IO|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 4524, tgid 4524 (S10udev), ts 19996984719, free_ts 17455903844
+ set_page_owner include/linux/page_owner.h:31 [inline]
+ post_alloc_hook+0x1ea/0x210 mm/page_alloc.c:1533
+ prep_new_page mm/page_alloc.c:1540 [inline]
+ get_page_from_freelist+0x33ea/0x3580 mm/page_alloc.c:3311
+ __alloc_pages+0x256/0x680 mm/page_alloc.c:4569
+ __alloc_pages_node include/linux/gfp.h:238 [inline]
+ alloc_pages_node include/linux/gfp.h:261 [inline]
+ alloc_slab_page+0x5f/0x160 mm/slub.c:2175
+ allocate_slab mm/slub.c:2338 [inline]
+ new_slab+0x84/0x2f0 mm/slub.c:2391
+ ___slab_alloc+0xc73/0x1260 mm/slub.c:3525
+ __slab_alloc mm/slub.c:3610 [inline]
+ __slab_alloc_node mm/slub.c:3663 [inline]
+ slab_alloc_node mm/slub.c:3835 [inline]
+ kmalloc_trace+0x269/0x360 mm/slub.c:3992
+ kmalloc include/linux/slab.h:628 [inline]
+ kzalloc include/linux/slab.h:749 [inline]
+ tomoyo_print_bprm security/tomoyo/audit.c:26 [inline]
+ tomoyo_init_log+0x11ce/0x2050 security/tomoyo/audit.c:264
+ tomoyo_supervisor+0x38a/0x11f0 security/tomoyo/common.c:2089
+ tomoyo_audit_env_log security/tomoyo/environ.c:36 [inline]
+ tomoyo_env_perm+0x178/0x210 security/tomoyo/environ.c:63
+ tomoyo_environ security/tomoyo/domain.c:672 [inline]
+ tomoyo_find_next_domain+0x1384/0x1cf0 security/tomoyo/domain.c:878
+ tomoyo_bprm_check_security+0x115/0x180 security/tomoyo/tomoyo.c:102
+ security_bprm_check+0x65/0x90 security/security.c:1185
+ search_binary_handler fs/exec.c:1765 [inline]
+ exec_binprm fs/exec.c:1819 [inline]
+ bprm_execve+0xa56/0x1790 fs/exec.c:1871
+ do_execveat_common+0x553/0x700 fs/exec.c:1978
+ do_execve fs/exec.c:2052 [inline]
+ __do_sys_execve fs/exec.c:2128 [inline]
+ __se_sys_execve fs/exec.c:2123 [inline]
+ __x64_sys_execve+0x92/0xb0 fs/exec.c:2123
+page last free pid 1 tgid 1 stack trace:
+ reset_page_owner include/linux/page_owner.h:24 [inline]
+ free_pages_prepare mm/page_alloc.c:1140 [inline]
+ free_unref_page_prepare+0x968/0xa90 mm/page_alloc.c:2346
+ free_unref_page+0x37/0x3f0 mm/page_alloc.c:2486
+ free_contig_range+0x9e/0x160 mm/page_alloc.c:6547
+ destroy_args+0x8a/0x890 mm/debug_vm_pgtable.c:1036
+ debug_vm_pgtable+0x4be/0x550 mm/debug_vm_pgtable.c:1416
+ do_one_initcall+0x238/0x830 init/main.c:1241
+ do_initcall_level+0x157/0x210 init/main.c:1303
+ do_initcalls+0x3f/0x80 init/main.c:1319
+ kernel_init_freeable+0x435/0x5d0 init/main.c:1550
+ kernel_init+0x1d/0x2a0 init/main.c:1439
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+
+Memory state around the buggy address:
+ ffff88807cb1bf00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff88807cb1bf80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>ffff88807cb1c000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                   ^
+ ffff88807cb1c080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88807cb1c100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
