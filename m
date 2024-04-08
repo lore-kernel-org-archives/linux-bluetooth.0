@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38C79146D74
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Apr 2024 21:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29012148854;
+	Mon,  8 Apr 2024 22:11:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712613028; cv=none; b=qO6Zm3xDg41Rpzgwxd2QFY9IZIDNVEKFXOzmo1jw/glmXFPQ5VL/3Wo52k62H/ubd48VBqBKb/BFyEVD+RjjtIpFJ+YIC8RoYrokPrjVkHaJxlAt/iTuzcJVnWg8GGxIFAYoAQL5l3lwAm9qab71BYmZJ4Tt4G/hf32UoTu5DEQ=
+	t=1712614283; cv=none; b=WtxAAkq299LvakwtkWicOJbhMLQD86H32aMimrkQpbsO5dSQTQHKhusjI5fnVSuHiCfBcAV5mTZky/FNV4TjHwOHsPdti9iRzrDa+LAhSsM4cXaHXOzKjOS8va69fRGLUqbzIX0JNSDjVkEiSGdVNFRaCqfPg+lxlVyClcMjqpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712613028; c=relaxed/simple;
-	bh=cTxFFEQxuuuh+MV3EAtQgTVtdNqYnh0Hbqx03IUk2vs=;
+	s=arc-20240116; t=1712614283; c=relaxed/simple;
+	bh=M+7+KQVwhiqPNuvfHKPLnOm/SA4WqubKPW0axuhY5A0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=kkoXo2/8rbq3dhyfcrLeW6USUSKqrVT46j1Uju4tMReZnWXh8kMEJ4nZ4EWxGai7CvohDxZQHWJQZ1rqZc5L0hTe33MjtmDRtv9OseE+0buufnbCyc+U5HEuq6Tgo9myaVMfA9YGtRdofdnL50CKJjaZh+6SGV7IQCKlUuWhJqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MHouSynV; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=V3FBMjypX4ZGA+k4vktV/mQo/pHtGwQ6sJJ9o06NR2wSen+ZJXdC99xpAX25ocQm7nusRsjclnfLv22J9z5t2K8OIIYcivzH6m3E/TlmjoiHx84ZwX4Uyb/qJrorX2UNvfKxdn6AWf6mddrsvdQDHkOso2kjBDr2hFEfu35Jc18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PbJfojfz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MHouSynV"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C34F8C43390;
-	Mon,  8 Apr 2024 21:50:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PbJfojfz"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CD6CCC43394;
+	Mon,  8 Apr 2024 22:11:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712613027;
-	bh=cTxFFEQxuuuh+MV3EAtQgTVtdNqYnh0Hbqx03IUk2vs=;
+	s=k20201202; t=1712614282;
+	bh=M+7+KQVwhiqPNuvfHKPLnOm/SA4WqubKPW0axuhY5A0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MHouSynVAZjnYvKHCER3wL4mY4qnNwdR5IexJ83yC50drjVT07C5i4a2NcFxk2w87
-	 kvp468KuEPLM+mPm+l+x3LTrB2LGbrCblyafQjrqs7VzjGmhB4Rauk+EsKs4zS5PNm
-	 bS91rap+5eGx898ygZMZiBkT3T5o6BdTD4X1UvSRZwMVy9Li/wUpFqYwE6GczsSCgR
-	 lJTOL11JS8uTyzR7pmLEDrvpOcnxv4noQ6HHN/o3xl6UQG+/rZl/RmS7oJ243OIkbo
-	 lS3nyNcrMlhYoZyQTC0dnUt5Q1KL3i9DjUoM9jw9dTtJBIUPipNwckddP1IWccdCc2
-	 ckgmi6mqmXS3w==
+	b=PbJfojfzWlk/Qtq8DAhlSZtkTOIllt7oq5At11ltkRYvulTkWCu/r80zXL1y+8vRZ
+	 tpMCTj1XNg8aDAWyFmrg6T8GTKvKB0SmEQ8kTRSD6rbi/K7QXIpz6zMGZC9jeTgmsX
+	 qdhSup3dW5T0aTqAPClq/VkDCP7dd78cbPXuf+etbmLQqIRqYQaxwR+xq+nl9XediL
+	 awznD7snyhkOh4Gll9Um7Fq3KFwW/V+eXvKiJy+ifww3Ll94/qvfFZtCDTWeWV6hzr
+	 xkM3zaohpkyYT+rSVwmyUbVJeKm9IB/9inxPoA8kgmxF43isMH6+yrrJr5GLceeyFQ
+	 2scbkglCqkHtA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B6897C54BD3;
-	Mon,  8 Apr 2024 21:50:27 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BE566C54BD3;
+	Mon,  8 Apr 2024 22:11:22 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,49 +37,36 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 1/5] Bluetooth: SCO: Fix not validating setsockopt user
- input
+Subject: Re: pull request: bluetooth 2024-03-29
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <171261302774.18719.10072615300794191048.git-patchwork-notify@kernel.org>
-Date: Mon, 08 Apr 2024 21:50:27 +0000
-References: <20240405204827.3458726-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240405204827.3458726-1-luiz.dentz@gmail.com>
+ <171261428277.29448.7091180261233651072.git-patchwork-notify@kernel.org>
+Date: Mon, 08 Apr 2024 22:11:22 +0000
+References: <20240329140453.2016486-1-luiz.dentz@gmail.com>
+In-Reply-To: <20240329140453.2016486-1-luiz.dentz@gmail.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+This pull request was applied to bluetooth/bluetooth-next.git (master)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri,  5 Apr 2024 16:48:23 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Fri, 29 Mar 2024 10:04:53 -0400 you wrote:
+> The following changes since commit 0ba80d96585662299d4ea4624043759ce9015421:
 > 
-> syzbot reported sco_sock_setsockopt() is copying data without
-> checking user input length.
+>   octeontx2-af: Fix issue with loading coalesced KPU profiles (2024-03-29 11:45:42 +0000)
 > 
-> BUG: KASAN: slab-out-of-bounds in copy_from_sockptr_offset
-> include/linux/sockptr.h:49 [inline]
-> BUG: KASAN: slab-out-of-bounds in copy_from_sockptr
-> include/linux/sockptr.h:55 [inline]
-> BUG: KASAN: slab-out-of-bounds in sco_sock_setsockopt+0xc0b/0xf90
-> net/bluetooth/sco.c:893
-> Read of size 4 at addr ffff88805f7b15a3 by task syz-executor.5/12578
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-03-29
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,1/5] Bluetooth: SCO: Fix not validating setsockopt user input
-    https://git.kernel.org/bluetooth/bluetooth-next/c/82f018d9ae0e
-  - [v2,2/5] Bluetooth: RFCOMM: Fix not validating setsockopt user input
-    https://git.kernel.org/bluetooth/bluetooth-next/c/05dcb647b289
-  - [v2,3/5] Bluetooth: L2CAP: Fix not validating setsockopt user input
-    https://git.kernel.org/bluetooth/bluetooth-next/c/d10a75a2b47c
-  - [v2,4/5] Bluetooth: ISO: Fix not validating setsockopt user input
-    https://git.kernel.org/bluetooth/bluetooth-next/c/723cf24d84c1
-  - [v2,5/5] Bluetooth: hci_sock: Fix not validating setsockopt user input
-    https://git.kernel.org/bluetooth/bluetooth-next/c/f3ab06000608
+  - pull request: bluetooth 2024-03-29
+    https://git.kernel.org/bluetooth/bluetooth-next/c/365af7ace014
 
 You are awesome, thank you!
 -- 
