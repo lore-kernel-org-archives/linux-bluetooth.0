@@ -1,373 +1,152 @@
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1928143880
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Apr 2024 17:27:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D518143C59
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Apr 2024 17:44:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712597277; cv=none; b=OnvZYn6qFqyJM6orUWkRe8rTbaLiCNBlJW05o0PZyCsgIB7v0Q0Ewmt/71PPkbJqVMK1Zon205goexhVkeeuOyT8ldBAT0wvgwQJaKOX3XyVS/9m/n1sL/kHVx/JZtGWScaHc01gzuqFzzvcfkngQfAnjiDO2mhP73QBsUK25go=
+	t=1712598241; cv=none; b=JEMWTmKJ+rtlCO8ILd2A1RPMEsa+j56zg/UGqpeDJM1DUGo5P7908sKAeducC4E6OjGDV/NkodU2/kl+QXwYznQRx9ClXxP7/TnwJlB33MAMxAVnWLs8nSZXSOvYUpSdCdQiinC5aBOdbfYnpbBluxKnmA0HOMV2y/GJSOsnY9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712597277; c=relaxed/simple;
-	bh=NWBkc6Xk6zGtP4bEpZjv7P92wP3z2pgLtCmEI/+Hrhc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oDaGvvRrUBTP246gkP/IfcDx6VUHrYlPttUPWw2BmvKzQrNU2Z4IfV7X33tuYRhqyqmMuovrDWR4wSVDe0orsxrdN7yYh1B4DXptldbUqYto7P8KQdsuhSUj0v4oK3NHQWUXL6l3HGPioncUKp/gKLAs2HAxG9cjuzQzrh9fw/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B5ouJwm0; arc=none smtp.client-ip=209.85.208.182
+	s=arc-20240116; t=1712598241; c=relaxed/simple;
+	bh=ULOFLbBoVDVTPgrXvpqGFjXcNCNl8o+8sejM01Qmf/4=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=OwFnQOznINMqxatjIK1koz7oSyAkb6NGP8SlwvEjAAy+rOezz2ieAXHHJxa8uL2J8P6/mVSQqP6qmSuof9VKjkoxXKrJ60Sd8BK4wY4xplK1z+iKWQdsxlaeO/HSe75lohez8DOdgIJm1w0+kU6x/jtxjWhDh4ywwgY40Ctd42k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BZnZLmsd; arc=none smtp.client-ip=209.85.128.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B5ouJwm0"
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2d109e82bd0so50594641fa.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Apr 2024 10:27:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BZnZLmsd"
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-61495e769bdso39378177b3.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Apr 2024 10:44:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712597272; x=1713202072; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fzuFW01f8Z3yY1cJcPvY+2D2ewiHnOvGfswWNqi4cTk=;
-        b=B5ouJwm0nZViRJJtRlGBPpAiy/TUXNUt/qvjKzsuK918IkHrzi9FQIqLe53NkKWG4X
-         RbSFudCrG6hFwY9HR2/ZFDlBj2OLC+RWzjckvaX6L+bzUhxSPHJm/xnBhkuR8j9W5/0F
-         73FbVwwGr3C7KV5sA9VkRW6vFqMr/TkfvaklQ+BO6f8OP08/1qDLqN4fqSkqd/8N1jae
-         l5HuDEfDMYQw2KOAa4sPijSVTSBuWuG7YEAa/3a8m0eH1UC4ewkzPb3HDc8cnNtaDFKM
-         jpmCY0i7MPVuuidFRnNSUO12CJcDoI+KCX3UEQhG6PTAGtabcmELU8AYi4J1fOkOyzZg
-         Mm8w==
+        d=gmail.com; s=20230601; t=1712598239; x=1713203039; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=L7+S05Xg25hDYaYCxDG+yjWqJnSHchQvmdtkMvb0Lek=;
+        b=BZnZLmsdg0/YIeLCI6qtJWAbH3ef+E/gpYtFqO248hi0AAlHWNxn176MZBUfHbz39r
+         npaCsuB6XdlSTZmXzzBL3GA0g2FU9dl5jOwi0B+asqtcpbZB3FIHSixBrb9Dzmrr107X
+         wEhZIflSj6oph9EooBC8eGmKIOewBAFYyRPEIIOP1PzcZ+FSHfCNAW7IJAC+2GXx3XoN
+         Sv9LYK1ytNv5Lk1HM5DQSSR+QNcbZyKbeJk5YwRnz69VYEw09ipp/sfpYHJou3sRp86S
+         cAZdRRTIZLHwIkwEoEnRSHG5+NXGG98K7sOvrMFWXTBQfR58v4A6YiABsYrWFfkvbarl
+         PanA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712597272; x=1713202072;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fzuFW01f8Z3yY1cJcPvY+2D2ewiHnOvGfswWNqi4cTk=;
-        b=rWMpH2lN3mDoUVzpVpH/bJGIpIo/diQq0RhiC5HcrMX5RerS+hm3b28HuWJ97/mCWN
-         8MQ+Guiwwjx2lAf8F/cKvCOq56KhK8tQEnfSnrZD32ABAe2HgqNCZRfEetyVFsXQFqUo
-         rilNXJ9JhxRGb9bVF/4coG0n9HddoDWqukmvvpOYu0jfQjeO8bT/a6NRSSLGTyoJnhGV
-         byUE8f8Ev2lEK/15ovRYc9Q+IvXn2sLTQugbB3b9fpxpx80doTw9b4zuvCU4CMSP9odt
-         PwOB2i1ML2eLINEd4KGO8IFQeGdBGDH9cS9X6UAOP0R9EOETQL1ylF7E0T5eYGTJ7zh8
-         3q2w==
-X-Gm-Message-State: AOJu0YzYH0//9NyuF3e14msPYpgObV/t+dG+wQiYqze/YnK4F6KNjd0P
-	ZznmvMubkIF1GqntiD0uRmOCBW9BAOmHgWibFdSCBqorjiIw7RvLBW6HMgz673ieSxfxN05vR5F
-	Vd3s+fDBPl7fR7hTEqz7M3kn3Sps=
-X-Google-Smtp-Source: AGHT+IF5R/176eDxbqGcGfsUaN0jxOtBojSQv5MjyrOIRFz2KtcDQzYvvmgJdU5SS0Z14VPtQiOZfp12KtDecjPi++Y=
-X-Received: by 2002:a2e:8903:0:b0:2d7:1805:1079 with SMTP id
- d3-20020a2e8903000000b002d718051079mr6402551lji.7.1712597271334; Mon, 08 Apr
- 2024 10:27:51 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1712598239; x=1713203039;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=L7+S05Xg25hDYaYCxDG+yjWqJnSHchQvmdtkMvb0Lek=;
+        b=XVYoGeXKJniCchecUiBt5KaSpsub/1B3XquI6LMC4xOcVYXSJp5+OkeQ+2AD3RY3/o
+         LiXVKnxIEEJ3SWJoOgcqa7KUozuRdVQskDKvVCcDFdE889mCqqMQ2pnkP/gIdnAvZdeE
+         Yg5W6q7CT9eakUrJlgI5h6BeMcUzMapWE9gjcdHrpVVIxc1aMvncO18bTtOqkAIl4cBt
+         UAzhEFWMTufaY4RVQlZfLY9Ev4H+ymU9JIt/ilALpTJWAVLSkEbuIDmsr6LFWfFvD5Jj
+         KAC8s0SVv1txs4DJL5lVv/Jpr6P9tERIHXcpk6PmfD/GKSlgkFN5vZv83hfPzZPMI7Er
+         Cd2A==
+X-Gm-Message-State: AOJu0YwSOcHwI45qzgtPp+nsnUhL+9vaw7iTvlE/ZFCjIep8VUxW0kTI
+	fQQLdbwLxsByHvVfkKSCigS44cE9t9u0nJs23mmu8EbK6ydGVwgTRSQKyXyV
+X-Google-Smtp-Source: AGHT+IEG3Tppf3KUshacMv3QrYlIjLptEi6uk3vfMmGmIjHDzlx4fSfeb34IB/sZDXqKkvBfc/NaZg==
+X-Received: by 2002:a05:6902:f81:b0:dcb:aa26:50f9 with SMTP id ft1-20020a0569020f8100b00dcbaa2650f9mr8761667ybb.46.1712598238995;
+        Mon, 08 Apr 2024 10:43:58 -0700 (PDT)
+Received: from [172.17.0.2] ([40.84.37.208])
+        by smtp.gmail.com with ESMTPSA id kk29-20020a056214509d00b006994aae00e9sm2628697qvb.7.2024.04.08.10.43.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Apr 2024 10:43:58 -0700 (PDT)
+Message-ID: <66142cde.050a0220.ef703.daa5@mx.google.com>
+Date: Mon, 08 Apr 2024 10:43:58 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7327204384837557460=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240408142724.12511-1-vlad.pruteanu@nxp.com> <20240408142724.12511-2-vlad.pruteanu@nxp.com>
-In-Reply-To: <20240408142724.12511-2-vlad.pruteanu@nxp.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 8 Apr 2024 13:27:38 -0400
-Message-ID: <CABBYNZ+qmKUyAn6Ui67QL4VJ4rs4xktXWBmjmgB1te4wDwN+9Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/1] bap: Replace global bcast_pa_requests with a
- queue for each adapter
-To: Vlad Pruteanu <vlad.pruteanu@nxp.com>
-Cc: linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com, 
-	mihai-octavian.urzica@nxp.com, silviu.barbulescu@nxp.com, 
-	iulia.tanasescu@nxp.com, andrei.istodorescu@nxp.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1] shared/gatt-db: Fix gatt_db_service_insert_characteristic
+In-Reply-To: <20240408155949.3622429-1-luiz.dentz@gmail.com>
+References: <20240408155949.3622429-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Vlad,
+--===============7327204384837557460==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Mon, Apr 8, 2024 at 10:28=E2=80=AFAM Vlad Pruteanu <vlad.pruteanu@nxp.co=
-m> wrote:
->
-> This patch replaces the old global implementation of the bcast_pa_request=
-s
-> queue with one that stores the queue per adapter. The pa_timer has also
-> been modified to be per adapter. The timer is now stopped when the queue =
-is
-> empty. The bcast_pa_requests queue, along with the pa_timer_id are now
-> stored in the bap_data structure. Each adapter already has a coresponding
-> entry in the sessions queue. Operations on the old bcast_pa_requests have
-> been modified to be made on the appropriate bap_data entry.
->
-> The bap_bcast_remove function has also been updated to remove from the
-> queue entries of devices that were freed.
-> ---
->  profiles/audio/bap.c | 109 +++++++++++++++++++++++++++++++------------
->  1 file changed, 79 insertions(+), 30 deletions(-)
->
-> diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-> index db0af7e7c..82c6cf313 100644
-> --- a/profiles/audio/bap.c
-> +++ b/profiles/audio/bap.c
-> @@ -107,6 +107,8 @@ struct bap_data {
->         struct queue *snks;
->         struct queue *bcast;
->         struct queue *streams;
-> +       struct queue *bcast_pa_requests;
-> +       unsigned int pa_timer_id;
->         GIOChannel *listen_io;
->         int selecting;
->         void *user_data;
-> @@ -127,8 +129,6 @@ struct bap_bcast_pa_req {
->  };
->
->  static struct queue *sessions;
-> -static struct queue *bcast_pa_requests;
-> -static unsigned int pa_timer_id;
->
->  /* Structure holding the parameters for Periodic Advertisement create sy=
-nc.
->   * The full QOS is populated at the time the user selects and endpoint a=
-nd
-> @@ -965,15 +965,25 @@ static DBusMessage *set_configuration(DBusConnectio=
-n *conn, DBusMessage *msg,
->         return NULL;
->  }
->
-> +static bool match_adapter_entry(const void *data, const void *match_data=
-)
-> +{
-> +       const struct bap_data *bdata =3D data;
-> +       const struct btd_adapter *adapter =3D match_data;
-> +
-> +       return (bdata->user_data =3D=3D adapter) && (bdata->device =3D=3D=
- NULL);
-> +}
-> +
->  static void iso_bcast_confirm_cb(GIOChannel *io, GError *err, void *user=
-_data)
->  {
->         struct bap_bcast_pa_req *req =3D user_data;
->         struct bap_setup *setup =3D req->data.setup;
-> +       struct bap_data *bap_data =3D queue_find(sessions,
-> +                       match_adapter_entry, setup->ep->data->adapter);
+This is automated email and please do not reply to this email!
 
-These lookups sound suspicious, couldn't you just store the bap_data
-in the pa_req?
+Dear submitter,
 
->         int fd;
->
->         DBG("BIG Sync completed");
->
-> -       queue_remove(bcast_pa_requests, req);
-> +       queue_remove(bap_data->bcast_pa_requests, req);
->
->         /* This device is no longer needed */
->         btd_service_connecting_complete(setup->ep->data->service, 0);
-> @@ -1109,6 +1119,7 @@ static void iso_pa_sync_confirm_cb(GIOChannel *io, =
-void *user_data)
->         GError *err =3D NULL;
->         struct bap_bcast_pa_req *pa_req =3D user_data;
->         struct bap_data *data =3D btd_service_get_user_data(pa_req->data.=
-service);
-> +       struct bt_bap *bap =3D data->bap;
->         struct bt_iso_base base;
->         struct bt_iso_qos qos;
->
-> @@ -1130,12 +1141,13 @@ static void iso_pa_sync_confirm_cb(GIOChannel *io=
-, void *user_data)
->         g_io_channel_unref(data->listen_io);
->         g_io_channel_shutdown(io, TRUE, NULL);
->         data->listen_io =3D NULL;
-> -       queue_remove(bcast_pa_requests, pa_req);
-> +       data =3D queue_find(sessions, match_adapter_entry, data->adapter)=
-;
-> +       queue_remove(data->bcast_pa_requests, pa_req);
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=842520
 
-Ditto.
+---Test result---
 
->
->         /* Analyze received BASE data and create remote media endpoints f=
-or each
->          * BIS matching our capabilities
->          */
-> -       parse_base(data->bap, &base, bap_debug);
-> +       parse_base(bap, &base, bap_debug);
->  }
->
->  static bool match_data_bap_data(const void *data, const void *match_data=
-)
-> @@ -2015,25 +2027,37 @@ static void pa_and_big_sync(struct bap_bcast_pa_r=
-eq *req);
->
->  static gboolean pa_idle_timer(gpointer user_data)
->  {
-> -       struct bap_bcast_pa_req *req =3D user_data;
-> +       struct bap_data *bap_data =3D user_data;
-> +       struct bap_bcast_pa_req *req =3D
-> +                               queue_peek_head(bap_data->bcast_pa_reques=
-ts);
->         bool in_progress =3D FALSE;
->
-> +       /* If the queue is empty, stop the timer. It will be started,late=
-r on,
-> +        * if any new requests arrive.
-> +        */
-> +       if (req =3D=3D NULL) {
-> +               /* Set the adapter's pa_timer id to 0. This will later be
-> +                * used to check if the timer is on or off.
-> +                */
-> +               bap_data->pa_timer_id =3D 0;
-> +               /* Stop the adapter's pa_timer by returning FALSE */
-> +               return FALSE;
-> +       }
-> +
->         /* Handle timer if no request is in progress */
-> -       queue_foreach(bcast_pa_requests, check_pa_req_in_progress,
-> +       queue_foreach(bap_data->bcast_pa_requests, check_pa_req_in_progre=
-ss,
->                         &in_progress);
->         if (in_progress =3D=3D FALSE) {
-> -               req =3D queue_peek_head(bcast_pa_requests);
-> -               if (req !=3D NULL)
-> -                       switch (req->type) {
-> -                       case BAP_PA_SHORT_REQ:
-> -                               DBG("do short lived PA Sync");
-> -                               short_lived_pa_sync(req);
-> -                               break;
-> -                       case BAP_PA_BIG_SYNC_REQ:
-> -                               DBG("do PA Sync and BIG Sync");
-> -                               pa_and_big_sync(req);
-> -                               break;
-> -                       }
-> +               switch (req->type) {
-> +               case BAP_PA_SHORT_REQ:
-> +                       DBG("do short lived PA Sync");
-> +                       short_lived_pa_sync(req);
-> +                       break;
-> +               case BAP_PA_BIG_SYNC_REQ:
-> +                       DBG("do PA Sync and BIG Sync");
-> +                       pa_and_big_sync(req);
-> +                       break;
-> +               }
->         }
->
->         return TRUE;
-> @@ -2043,15 +2067,25 @@ static void setup_accept_io_broadcast(struct bap_=
-data *data,
->                                         struct bap_setup *setup)
->  {
->         struct bap_bcast_pa_req *pa_req =3D new0(struct bap_bcast_pa_req,=
- 1);
-> +       struct bap_data *bap_data =3D queue_find(sessions,
-> +               match_adapter_entry, data->adapter);
+Test Summary:
+CheckPatch                    PASS      0.52 seconds
+GitLint                       PASS      0.31 seconds
+BuildEll                      PASS      24.58 seconds
+BluezMake                     PASS      1681.37 seconds
+MakeCheck                     PASS      13.38 seconds
+MakeDistcheck                 PASS      174.59 seconds
+CheckValgrind                 PASS      250.29 seconds
+CheckSmatch                   WARNING   353.90 seconds
+bluezmakeextell               PASS      118.80 seconds
+IncrementalBuild              PASS      1477.58 seconds
+ScanBuild                     WARNING   985.63 seconds
 
-Wait, you do have bap_data already passed to this function, why do you
-need to lookup for another?
-
-> +
-> +       /* Timer could be stopped if all the short lived requests were tr=
-eated.
-> +        * Check the state of the timer and turn it on so that this reque=
-sts
-> +        * can also be treated.
-> +        */
-> +       if (bap_data->pa_timer_id =3D=3D 0)
-> +               bap_data->pa_timer_id =3D g_timeout_add_seconds(
-> +               PA_IDLE_TIMEOUT, pa_idle_timer, bap_data);
->
->         /* Add this request to the PA queue.
-> -        * We don't need to check the queue here and the timer, as we can=
-not
-> -        * have BAP_PA_BIG_SYNC_REQ before a short PA (BAP_PA_SHORT_REQ)
-> +        * We don't need to check the queue here, as we cannot have
-> +        * BAP_PA_BIG_SYNC_REQ before a short PA (BAP_PA_SHORT_REQ)
->          */
->         pa_req->type =3D BAP_PA_BIG_SYNC_REQ;
->         pa_req->in_progress =3D FALSE;
->         pa_req->data.setup =3D setup;
-> -       queue_push_tail(bcast_pa_requests, pa_req);
-> +       queue_push_tail(bap_data->bcast_pa_requests, pa_req);
->  }
->
->  static void setup_create_ucast_io(struct bap_data *data,
-> @@ -2878,6 +2912,8 @@ static int bap_bcast_probe(struct btd_service *serv=
-ice)
->  {
->         struct btd_device *device =3D btd_service_get_device(service);
->         struct btd_adapter *adapter =3D device_get_adapter(device);
-> +       struct bap_data *bap_data =3D queue_find(sessions,
-> +                                               match_adapter_entry, adap=
-ter);
-
-Don't we store the bap_data into the server user_data?
-
->         struct bap_bcast_pa_req *pa_req =3D
->                         new0(struct bap_bcast_pa_req, 1);
->
-> @@ -2886,12 +2922,10 @@ static int bap_bcast_probe(struct btd_service *se=
-rvice)
->                 return -ENOTSUP;
->         }
->
-> -       /* First time initialize the queue and start the idle timer */
-> -       if (bcast_pa_requests =3D=3D NULL) {
-> -               bcast_pa_requests =3D queue_new();
-> -               pa_timer_id =3D g_timeout_add_seconds(PA_IDLE_TIMEOUT,
-> -                                       pa_idle_timer, NULL);
-> -       }
-> +       /* Start the PA timer if it isn't active */
-> +       if (bap_data->pa_timer_id =3D=3D 0)
-> +               bap_data->pa_timer_id =3D g_timeout_add_seconds(
-> +               PA_IDLE_TIMEOUT, pa_idle_timer, bap_data);
->
->         /* Enqueue this device advertisement so that we can do short-live=
-d
->          */
-> @@ -2899,17 +2933,31 @@ static int bap_bcast_probe(struct btd_service *se=
-rvice)
->         pa_req->type =3D BAP_PA_SHORT_REQ;
->         pa_req->in_progress =3D FALSE;
->         pa_req->data.service =3D service;
-> -       queue_push_tail(bcast_pa_requests, pa_req);
-> +       queue_push_tail(bap_data->bcast_pa_requests, pa_req);
->
->         return 0;
->  }
->
-> +static bool remove_service(const void *data, const void *match_data)
-> +{
-> +       struct bap_bcast_pa_req *pa_req =3D (struct bap_bcast_pa_req *)da=
-ta;
-> +
-> +       if (pa_req->type =3D=3D BAP_PA_SHORT_REQ &&
-> +               pa_req->data.service =3D=3D match_data)
-> +               return true;
-> +       return false;
-> +}
-> +
->  static void bap_bcast_remove(struct btd_service *service)
->  {
->         struct btd_device *device =3D btd_service_get_device(service);
-> -       struct bap_data *data;
-> +       struct btd_adapter *adapter =3D device_get_adapter(device);
-> +       struct bap_data *data =3D queue_find(sessions,
-> +                                               match_adapter_entry, adap=
-ter);
-
-Ditto.
-
->         char addr[18];
->
-> +       queue_remove_if(data->bcast_pa_requests, remove_service, service)=
-;
-
-Not really sure what this would be doing, aren't you supposed to clean
-up if there is pa_req pending for the given service/device and stop
-the pa_sync if it is in progress? It seems you just remove it from the
-list but it is not free/cancel after this point.
-
->         ba2str(device_get_address(device), addr);
->         DBG("%s", addr);
->
-> @@ -3035,6 +3083,7 @@ static int bap_adapter_probe(struct btd_profile *p,
->
->         data->bap =3D bt_bap_new(btd_gatt_database_get_db(database),
->                                         btd_gatt_database_get_db(database=
-));
-> +       data->bcast_pa_requests =3D queue_new();
->         if (!data->bap) {
->                 error("Unable to create BAP instance");
->                 free(data);
-> --
-> 2.40.1
->
+Details
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+monitor/att.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+src/shared/gatt-client.c:451:21: warning: Use of memory after it is freed
+        gatt_db_unregister(op->client->db, op->db_id);
+                           ^~~~~~~~~~
+src/shared/gatt-client.c:696:2: warning: Use of memory after it is freed
+        discovery_op_complete(op, false, att_ecode);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:996:2: warning: Use of memory after it is freed
+        discovery_op_complete(op, success, att_ecode);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:1102:2: warning: Use of memory after it is freed
+        discovery_op_complete(op, success, att_ecode);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:1294:2: warning: Use of memory after it is freed
+        discovery_op_complete(op, success, att_ecode);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:1359:2: warning: Use of memory after it is freed
+        discovery_op_complete(op, success, att_ecode);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:1634:6: warning: Use of memory after it is freed
+        if (read_db_hash(op)) {
+            ^~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:1639:2: warning: Use of memory after it is freed
+        discover_all(op);
+        ^~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:2143:6: warning: Use of memory after it is freed
+        if (read_db_hash(op)) {
+            ^~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:2151:8: warning: Use of memory after it is freed
+                                                        discovery_op_ref(op),
+                                                        ^~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:3240:2: warning: Use of memory after it is freed
+        complete_write_long_op(req, success, 0, false);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:3262:2: warning: Use of memory after it is freed
+        request_unref(req);
+        ^~~~~~~~~~~~~~~~~~
+12 warnings generated.
 
 
---=20
-Luiz Augusto von Dentz
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7327204384837557460==--
