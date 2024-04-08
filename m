@@ -1,152 +1,94 @@
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D518143C59
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Apr 2024 17:44:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5AC91119A
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Apr 2024 18:35:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712598241; cv=none; b=JEMWTmKJ+rtlCO8ILd2A1RPMEsa+j56zg/UGqpeDJM1DUGo5P7908sKAeducC4E6OjGDV/NkodU2/kl+QXwYznQRx9ClXxP7/TnwJlB33MAMxAVnWLs8nSZXSOvYUpSdCdQiinC5aBOdbfYnpbBluxKnmA0HOMV2y/GJSOsnY9Y=
+	t=1712601352; cv=none; b=sy7TvzOWmKtqNLVQv1XRIMep4zbFjRckNEI/AFyLE9zeiiuV45bUTJtjQmOoHiAkBSSXfww+0heNdv48CArauDlPfW53tb92i3hFwD2CbwQF5hXvXqgWX52GoeGiCT53wmpFluEK7O2xE9f2px6ZDf6YD8wcPKf+wGkVyYf39bw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712598241; c=relaxed/simple;
-	bh=ULOFLbBoVDVTPgrXvpqGFjXcNCNl8o+8sejM01Qmf/4=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=OwFnQOznINMqxatjIK1koz7oSyAkb6NGP8SlwvEjAAy+rOezz2ieAXHHJxa8uL2J8P6/mVSQqP6qmSuof9VKjkoxXKrJ60Sd8BK4wY4xplK1z+iKWQdsxlaeO/HSe75lohez8DOdgIJm1w0+kU6x/jtxjWhDh4ywwgY40Ctd42k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BZnZLmsd; arc=none smtp.client-ip=209.85.128.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1712601352; c=relaxed/simple;
+	bh=fsr82+X0HB4nrPlRbD7u+9xerOPWF4UuOixB9nbtbxw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mlfrGBA3y7cVEH2wE6XSGpjfXpu8E+wjJyz96BBOLnqi/8bcB+VA4Ncu3ShWVdbeKnvNVvCD7EjlRQphtFmc3XTjpAwQww/KSFrrh5ZL2hjKY38RkR+zPKpQSGC4poV+F7ozmu/G0ucIb94CfTGasW/5PifLVSYsGqewDKDJdDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=fd3w8MP2; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=penguintechs.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BZnZLmsd"
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-61495e769bdso39378177b3.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Apr 2024 10:44:00 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="fd3w8MP2"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1e3ca546d40so23102115ad.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Apr 2024 11:35:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712598239; x=1713203039; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=L7+S05Xg25hDYaYCxDG+yjWqJnSHchQvmdtkMvb0Lek=;
-        b=BZnZLmsdg0/YIeLCI6qtJWAbH3ef+E/gpYtFqO248hi0AAlHWNxn176MZBUfHbz39r
-         npaCsuB6XdlSTZmXzzBL3GA0g2FU9dl5jOwi0B+asqtcpbZB3FIHSixBrb9Dzmrr107X
-         wEhZIflSj6oph9EooBC8eGmKIOewBAFYyRPEIIOP1PzcZ+FSHfCNAW7IJAC+2GXx3XoN
-         Sv9LYK1ytNv5Lk1HM5DQSSR+QNcbZyKbeJk5YwRnz69VYEw09ipp/sfpYHJou3sRp86S
-         cAZdRRTIZLHwIkwEoEnRSHG5+NXGG98K7sOvrMFWXTBQfR58v4A6YiABsYrWFfkvbarl
-         PanA==
+        d=penguintechs.org; s=google; t=1712601350; x=1713206150; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nm8t/x2uwmSp1PQu1GfRMMntuaVcapxgFKyhLMy4YmY=;
+        b=fd3w8MP2LXW5XQ2dYj4rk8JWQsTZGK1f30btAzsZplAIqY8Yz0pHjSyf8Rg8nwk8Ac
+         IVRAHxUrfASAqLsV0lM5ZYK4aIwTGrvSVIrXxFieZSHyrTv4VYCmJWRDvRikkMiIzhwC
+         qcNUVyh9as4ZWXG5OFspIWN+/w/dKKesapNrA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712598239; x=1713203039;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=L7+S05Xg25hDYaYCxDG+yjWqJnSHchQvmdtkMvb0Lek=;
-        b=XVYoGeXKJniCchecUiBt5KaSpsub/1B3XquI6LMC4xOcVYXSJp5+OkeQ+2AD3RY3/o
-         LiXVKnxIEEJ3SWJoOgcqa7KUozuRdVQskDKvVCcDFdE889mCqqMQ2pnkP/gIdnAvZdeE
-         Yg5W6q7CT9eakUrJlgI5h6BeMcUzMapWE9gjcdHrpVVIxc1aMvncO18bTtOqkAIl4cBt
-         UAzhEFWMTufaY4RVQlZfLY9Ev4H+ymU9JIt/ilALpTJWAVLSkEbuIDmsr6LFWfFvD5Jj
-         KAC8s0SVv1txs4DJL5lVv/Jpr6P9tERIHXcpk6PmfD/GKSlgkFN5vZv83hfPzZPMI7Er
-         Cd2A==
-X-Gm-Message-State: AOJu0YwSOcHwI45qzgtPp+nsnUhL+9vaw7iTvlE/ZFCjIep8VUxW0kTI
-	fQQLdbwLxsByHvVfkKSCigS44cE9t9u0nJs23mmu8EbK6ydGVwgTRSQKyXyV
-X-Google-Smtp-Source: AGHT+IEG3Tppf3KUshacMv3QrYlIjLptEi6uk3vfMmGmIjHDzlx4fSfeb34IB/sZDXqKkvBfc/NaZg==
-X-Received: by 2002:a05:6902:f81:b0:dcb:aa26:50f9 with SMTP id ft1-20020a0569020f8100b00dcbaa2650f9mr8761667ybb.46.1712598238995;
-        Mon, 08 Apr 2024 10:43:58 -0700 (PDT)
-Received: from [172.17.0.2] ([40.84.37.208])
-        by smtp.gmail.com with ESMTPSA id kk29-20020a056214509d00b006994aae00e9sm2628697qvb.7.2024.04.08.10.43.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Apr 2024 10:43:58 -0700 (PDT)
-Message-ID: <66142cde.050a0220.ef703.daa5@mx.google.com>
-Date: Mon, 08 Apr 2024 10:43:58 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7327204384837557460=="
+        d=1e100.net; s=20230601; t=1712601350; x=1713206150;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nm8t/x2uwmSp1PQu1GfRMMntuaVcapxgFKyhLMy4YmY=;
+        b=cL4ivAsBpLUxJ1ZzTdHG2S95I2GKRnoBIGqisnqze1uRU8Qy+fglyufmRJ0iuYARZh
+         pm7Ly+nesyXBby3iAn0zk8ws8wgrA7Dwbv+7LB57WhQhs3yKo9hweravc1zojQeHQ+it
+         HAAgfajjmfl5MbMixFwfxJSh/JHXp3YSwdcwcD/WkU8zXaRSWeShYMIx0f+C8Y2P7klQ
+         ugt/Qq/2Bk4amWGFUAiUh2VxZUtzWwQYwBIdIU8nfG8EOntZX4KBb4WbT5F5iDcxCg7C
+         kHy7hRbnlfaS2Z/atW4wi2H0kT91AAMBvyhoe+qD3AauUmw0vqyXxFROaR3tYARBS2Z5
+         Z1uA==
+X-Forwarded-Encrypted: i=1; AJvYcCUJpvSrS5xxJc/4HEAb+hKu1sr1YBZluuNEQF/xMLPRHcjDhHgOv0IrqiUemYf2tx/pv5ifufnoc5H17d9UX0V/C3eGlcgkhH7+emV7syib
+X-Gm-Message-State: AOJu0YwxslId0ucB0mi8vDdy8quLcnsrgeuBAf3NwFwii4htstolIMsa
+	/WWzwh+RwjWkOj6csHgblTybuzf7MI+QgNPWYm5MgxctitOGTAWvLgDmQ6fdDQ==
+X-Google-Smtp-Source: AGHT+IFfnkAR7C9SXUsEI1m9SG5HvTsx7iGg0BYwfHhXYsFcaNk5AN/AUuIyVkavDJsczeKsWxqukg==
+X-Received: by 2002:a17:902:a386:b0:1e3:dfdd:21c0 with SMTP id x6-20020a170902a38600b001e3dfdd21c0mr5723950pla.27.1712601349724;
+        Mon, 08 Apr 2024 11:35:49 -0700 (PDT)
+Received: from ?IPV6:2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08? ([2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08])
+        by smtp.gmail.com with ESMTPSA id kj8-20020a17090306c800b001dd69aca213sm7340841plb.270.2024.04.08.11.35.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Apr 2024 11:35:48 -0700 (PDT)
+Message-ID: <99e404ee-81ca-4dcc-811f-9c55fc52c551@penguintechs.org>
+Date: Mon, 8 Apr 2024 11:35:47 -0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1] shared/gatt-db: Fix gatt_db_service_insert_characteristic
-In-Reply-To: <20240408155949.3622429-1-luiz.dentz@gmail.com>
-References: <20240408155949.3622429-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============7327204384837557460==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: QCA6390 bluetooth doesn't work after warm boot or
+ disable/reenable
+To: Kalle Valo <kvalo@kernel.org>
+Cc: ath11k@lists.infradead.org, linux-bluetooth@vger.kernel.org
+References: <a03dace1-ca0f-41d6-8e2c-636e3b053a3a@penguintechs.org>
+ <31bb6e18-ecee-49b3-87d7-50ab53e07447@penguintechs.org>
+ <1b3d3937-6679-491e-a5c6-818ae8ac639a@penguintechs.org>
+ <87sezwjums.fsf@kernel.org>
+Content-Language: en-US
+From: Wren Turkal <wt@penguintechs.org>
+In-Reply-To: <87sezwjums.fsf@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-This is automated email and please do not reply to this email!
+Thanks for letting me know. The wifi is working great. Thank you for 
+your work on that.
 
-Dear submitter,
+I doubt you will have time, but if you do have a chance to test it, that 
+would be amazing. I would love to make sure that I am not the only 
+person having this issue, if possible.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=842520
+Thanks,
+wt
 
----Test result---
+On 4/7/24 10:22 PM, Kalle Valo wrote:
+> Yes, I still have that laptop and I use it as my daily driver. But I
+> don't use Bluetooth and I don't even have the Bluetooth enabled in my
+> .config.
+> 
+> BTW ath11k is a Wi-Fi driver so most likely it isn't affecting your
+> problem.
 
-Test Summary:
-CheckPatch                    PASS      0.52 seconds
-GitLint                       PASS      0.31 seconds
-BuildEll                      PASS      24.58 seconds
-BluezMake                     PASS      1681.37 seconds
-MakeCheck                     PASS      13.38 seconds
-MakeDistcheck                 PASS      174.59 seconds
-CheckValgrind                 PASS      250.29 seconds
-CheckSmatch                   WARNING   353.90 seconds
-bluezmakeextell               PASS      118.80 seconds
-IncrementalBuild              PASS      1477.58 seconds
-ScanBuild                     WARNING   985.63 seconds
-
-Details
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-monitor/att.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.
-##############################
-Test: ScanBuild - WARNING
-Desc: Run Scan Build
-Output:
-src/shared/gatt-client.c:451:21: warning: Use of memory after it is freed
-        gatt_db_unregister(op->client->db, op->db_id);
-                           ^~~~~~~~~~
-src/shared/gatt-client.c:696:2: warning: Use of memory after it is freed
-        discovery_op_complete(op, false, att_ecode);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:996:2: warning: Use of memory after it is freed
-        discovery_op_complete(op, success, att_ecode);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:1102:2: warning: Use of memory after it is freed
-        discovery_op_complete(op, success, att_ecode);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:1294:2: warning: Use of memory after it is freed
-        discovery_op_complete(op, success, att_ecode);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:1359:2: warning: Use of memory after it is freed
-        discovery_op_complete(op, success, att_ecode);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:1634:6: warning: Use of memory after it is freed
-        if (read_db_hash(op)) {
-            ^~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:1639:2: warning: Use of memory after it is freed
-        discover_all(op);
-        ^~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:2143:6: warning: Use of memory after it is freed
-        if (read_db_hash(op)) {
-            ^~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:2151:8: warning: Use of memory after it is freed
-                                                        discovery_op_ref(op),
-                                                        ^~~~~~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:3240:2: warning: Use of memory after it is freed
-        complete_write_long_op(req, success, 0, false);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:3262:2: warning: Use of memory after it is freed
-        request_unref(req);
-        ^~~~~~~~~~~~~~~~~~
-12 warnings generated.
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7327204384837557460==--
+-- 
+You're more amazing than you think!
