@@ -1,74 +1,100 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out203-205-251-36.mail.qq.com (out203-205-251-36.mail.qq.com [203.205.251.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93DD912A160
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Apr 2024 12:18:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F7C512A14A;
+	Tue,  9 Apr 2024 12:21:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.251.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712665105; cv=none; b=NWvPV/ioaRGsjk038moBIE9/A2st6JIkWVoGqtSS9nOH9xtwoMWX5nlfiGIVcfqqvaDK1V2djhuChEF2O56ZIyumjMme/FLV1qGnazDZrWSgR2LfOBHGassQB0gqHeeVOOFQ8XXhKJMIK21UXEZrzo5h7mq9jzI8dEbJg3i0jhI=
+	t=1712665270; cv=none; b=jBy7s7ECE3lmwFx2FQrcK63/szidOfA53bK8wVht6wWuEnwTPIxwvtcB4UtGn5KUAA2nqZGFqcrwQCk0TX41ATMc4If6nrCFMDcXeqi+1fD7VLmQHPuU6ruom7GXdLfP5c7sufhTBQ9tLaISowlsuf2xUR2tqbpxpCc/al/o0to=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712665105; c=relaxed/simple;
-	bh=+TQ+59fwzO3OIG4T3xQcb+9EhkWv3V9Z7cMBnQWhFXU=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=eRwpbmGJ6h9Bx1oFpR+NqxSraoZ9LYRNb0iotAHvDYopBPn7Q6l/yHY+PhFNnj0V8s353Wk6aZ7CgR8ggnFGqpoxbIMVsxwTSKd8hxBcRMr+KExl49fTvv81tr+UglODLvL7p2ir3T/DaNKpM160czmIXCq/Idq6qs/yEt/s4dk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uFhk3H7X; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1712665270; c=relaxed/simple;
+	bh=jrEVmurNChR635/98zUzfrOEmqHwm6pz2Gs4BB4fM/U=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=awbG4Oshwxl7s0iU8L4+Zxrc7HRkSlgaZ0TR+eSWqs07nSReEXauQul+2WKQM9HoI9SAoLrgxC1o0h5xrdC3QTfzBz2V35Z3pZA8rkGkStICp3/NRW+ynQRl/vpXEDcnIThR2o4qhpWZcvzD7w7sz8V8UKmPA/nNXhuqYymQCVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=TED4AZaz; arc=none smtp.client-ip=203.205.251.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uFhk3H7X"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 298EBC43390
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Apr 2024 12:18:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712665105;
-	bh=+TQ+59fwzO3OIG4T3xQcb+9EhkWv3V9Z7cMBnQWhFXU=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=uFhk3H7Xpg9wWCBb5HLanFEf68dpkcFFZHdYLJ0AXX4JsiQrNgVolQgJA0/KPw4Xe
-	 2FAzmM/hM795OXc3XD/8smnUbDm1GjMxuTDSW2/+BCSj2GgYUweL3Q87I64wO1WfEY
-	 dNSzjNKfh/az63GcK/mtCku8NJ9aFeQamh+u5ixf+J+DUYc6owVoWHHEEmrrMd4mxj
-	 7zgc1cwM98Mpa6xJLtQDJbajYovWL9uLPZVesfgp5MjnKqNJGQ877PigM05LpFk7rp
-	 opQGwjPdBxlhLMPCaxjYscglpitm8//4c6u1ui1XmaG7yD+X9XCNv8T+LVbHsdTIMv
-	 xjxtLZzh02kBA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 132BFC4332E; Tue,  9 Apr 2024 12:18:25 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 218416] hci0: command 0xfc05 tx timeout in kernel 6.7.1
-Date: Tue, 09 Apr 2024 12:18:24 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: jugoslav.gacas@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-218416-62941-Ic0PDFANve@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218416-62941@https.bugzilla.kernel.org/>
-References: <bug-218416-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="TED4AZaz"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1712664955; bh=m7LPkZgpaLXkeV+NlINHfY4LTk6VgwNuhgIGOECBU/Q=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=TED4AZazadVmz02KoBj9mLpeTYvnEHFfTP8iTBVACg688gtmXlteo8M91K0WkE+1Q
+	 HWJcFy6mPs5O4JW98HZ3BMbR/ipDkp6DCjlFF9pbDzaHxqcToYINQvLGeaMC6jQyoE
+	 qYUmdJoqByqDc3557fBAie9tqG3UxI1SlqsNIxyk=
+Received: from pek-lxu-l1.wrs.com ([111.198.228.153])
+	by newxmesmtplogicsvrszc5-1.qq.com (NewEsmtp) with SMTP
+	id 3F42CEE6; Tue, 09 Apr 2024 20:15:52 +0800
+X-QQ-mid: xmsmtpt1712664952t56msp9an
+Message-ID: <tencent_15CA920ADD9ADDCA19654FBE8DB5A5B88D07@qq.com>
+X-QQ-XMAILINFO: M/NR0wiIuy70cja9QE9nCnfHiWUrmFrx6SyJ6zXMlwqNTeLWeP3YgIknp56w7q
+	 JaCfxar0ZIijJg+R38JDABsQpREo2ny8FmA++eunPiHn3wd1f9X+DN8NieKe4181Uwdrv7STZfCx
+	 mUySDtHLdAAJS5IWMVWyrgJCKOwL7Kz5liwDAjE2t9lleBP39qER6ARP9Z2JUnQ1moUl5IrGyMs6
+	 VRk1ZSyJ0iZJyBD/YSKnyH+1HgHN2XSOvn3lDh2BLVWhSMLq2WlNnKaBZgwQ0wy/yVxK3nFFbGZa
+	 CcF0VY0Siw7kGhHQunsrWl+nM+60zyXMuMaHSC9sPLVGO5qjKJpqhQZmCBoXqqSKJaQH3kT5ZTHH
+	 m5Gx2u3MTuG8pSQ3Zp9DObbouzrPBO9Yz+uFFPcn01lywH3f6WCNnHMfyIx0IsF+A1oHthWKi3oq
+	 53gYYu5kSTJfZG7C+3vtkn4eLKzpWj2Adt/si0TLhweklUBDS5CN0RyBVPa1Z6ZmcVuFbmJpb0MT
+	 FL5tsQylDQ3F6mI1Sw6fQhFpT1GgUR66E5KA68Z2rPXFYRDM0TjGDu/CEm80Ld21reoYvT1g4vS+
+	 qMM0QJz2vD7omVG3R/rfud8vZ7UqpbN++6/+bS3bV1v17oGN1Kb1XkxmP1svc8J0iFH6oxNgEc9c
+	 zLtcMEK4rd34V6ATnDbgkUz1YRXxJVhRwPwMyxetq/eW458H84yXR5x70J6cr0D5fnmR3/c6Mv2r
+	 opl4LEHypk/XtdvCAaQIUDq/BM/Afqk+38Y1JsJyq9+r/8oWxbIy+Raqrt1o3HynpC9wsaH9tgfK
+	 83TiVjxXNbURyLp1ilnPGyWm8Yw1slm8si/t18J0M/GU4Bo9/FZxYG9w/uv5p6PHCNOYNEgKd7/T
+	 vImOuyCNyJrgmBRDiX/UZBTE62Pk1RYBDuMPDFlG154/z0la5/K85nJIs1KDkqp0+qzRBO8t5yKJ
+	 NEQVpHh+MzkQ5CzIgRSU7666VU04hT0suaGsGCCZ4QJGe5GwvdKj74yd6JoDxcz4Dkw7VG6lw=
+X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
+From: Edward Adam Davis <eadavis@qq.com>
+To: pmenzel@molgen.mpg.de
+Cc: netdev@vger.kernel.org,
+	eadavis@qq.com,
+	johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	luiz.dentz@gmail.com,
+	marcel@holtmann.org,
+	syzbot+d4ecae01a53fd9b42e7d@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com
+Subject: [PATCH] net/socket: Ensure length of input socket option param >= sizeof(int)
+Date: Tue,  9 Apr 2024 20:15:53 +0800
+X-OQ-MSGID: <20240409121552.4098965-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <234da60a-709f-4430-b594-386b7c2b65f5@molgen.mpg.de>
+References: <234da60a-709f-4430-b594-386b7c2b65f5@molgen.mpg.de>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218416
+The optlen value passed by syzbot to _sys_setsockopt() is 2, which results in
+only 2 bytes being allocated when allocating memory to kernel_optval, and the
+optval size passed when calling the function copy_from_sockptr() is 4 bytes.
+Here, optlen is determined uniformly in the entry function __sys_setsockopt(). 
+If its value is less than 4, the parameter is considered invalid.
 
---- Comment #18 from Jugoslav Gacas (jugoslav.gacas@gmail.com) ---
-The issue has been fixed for me after upgrading to kernel 6.8.4-arch1-1 on
-Arch-linux.
+Reported-by: syzbot+837ba09d9db969068367@syzkaller.appspotmail.com
+Reported-by: syzbot+b71011ec0a23f4d15625@syzkaller.appspotmail.com
+Reported-by: syzbot+d4ecae01a53fd9b42e7d@syzkaller.appspotmail.com
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+ net/socket.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
---=20
-You may reply to this email to add a comment.
+diff --git a/net/socket.c b/net/socket.c
+index e5f3af49a8b6..ac8fd4f6ebfe 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -2327,6 +2327,9 @@ int __sys_setsockopt(int fd, int level, int optname, char __user *user_optval,
+ 	int err, fput_needed;
+ 	struct socket *sock;
+ 
++	if (optlen < sizeof(int))
++		return -EINVAL;
++
+ 	sock = sockfd_lookup_light(fd, &err, &fput_needed);
+ 	if (!sock)
+ 		return err;
+-- 
+2.43.0
 
-You are receiving this mail because:
-You are the assignee for the bug.=
