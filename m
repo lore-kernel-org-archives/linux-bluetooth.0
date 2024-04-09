@@ -1,104 +1,118 @@
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2942917BDA
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Apr 2024 00:35:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3284B127B4E;
+	Tue,  9 Apr 2024 11:45:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712622906; cv=none; b=ZT6EAE4OQ1St1rMo78ked5XJD0LuF1tfo9mPxPVFj9jvcHT4SpQBnn+7wja4RmzG2nWWTcqY9WxMWyi97Epry46ns5WHM79HIwAnrcmzJyZDWcuQ7LymCvG+2bkBXwH/6Di7NA5TExN86tHyvrdlrNlYB8FGzUYN3ECod5+xJV8=
+	t=1712663153; cv=none; b=njl/IZizOHf9Oy2AvUpkEgQLImugWOneEnneYLjndQlNeObg/eiCozv7bhqOyYEBjt+QMCAXbclZhfJaiwmb+P7Yr70WZ/zYkJ5QyUw7rPf7X8hobtFPj/0935KPeCmBDhCU98C4x2T950AlV69bSUdyUXqP7ClOFme8nHd/+FM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712622906; c=relaxed/simple;
-	bh=7ze/lbu1heRTRvzuvLhahjAkIhGrSrNGm+hLMseAJXw=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=lH8t1I01VXSlOvFh2mNcBPEOtLdo0MVeouaWECncufBQQeBoiyAZdZoXpgda4mGwXpAdZ1/o0gJ0Kk6RaWNH4r6D/O8kicbT5AK/6OL/XzfOeZPH1ro5sV2zjt3ei23EVGGzNjdJ28Ah/AqJmsxoKlgkx7aP1rpHvQLnTbMNHGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cAHIYkTt; arc=none smtp.client-ip=209.85.219.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1712663153; c=relaxed/simple;
+	bh=GFjr+qUI/xJlRfC49pDYbbQ+5mOHCUk/2gN5wZX0VPA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=lBIR1ZzgNFAiDhBZgiwFTJ1Hjbtgxh5r2XlqjC9uK91LBmTo0zonDD0RFLMilwlSPXoKVCFuu7RFValzVMoe7lSmHU/wR3KLx2txQVIah3cPmVakFvodIiyvfOU99UkKhMWn7HIsMlQWeYtdowO9yUrUIx5A89DElmMUefkbEi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.de; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Re2MZHX5; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cAHIYkTt"
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6962e6fbf60so40571566d6.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Apr 2024 17:35:04 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Re2MZHX5"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712622904; x=1713227704; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=VV/mCmxlohJveqf9kMhulaT/FXcfpYCRiRNRFaMSO2I=;
-        b=cAHIYkTtgUcBwjLDMWFk3FFaAWTPOKrNQqXvWuIhatoD1HlQ0ihLFjKJWSZqv8AsOw
-         qc4sfJ7Z5OOtZoWthGfE0pH6ozYkR82c/e2f1yiy1M/jezpSNSX0uIyHNIqUvMrya4+J
-         3jaJtw3lvz5GuP6gBO2LmH4Js4vDx9JN3isoJa/bmROllEgmu80re23H+FDtl4pq4xZH
-         3xnr3Lbyg0vow/ZFF2XUG25kaDyWP1BQOC5Eb+ctwABywsbbDYSV2/OypRN4HcWAnLFm
-         1SWB19c6RodRCzp6pky1B7hZ1Cpfv7SeEA1j/QXVScsnTt+PBz2KzFhRTAQqWAlMJKcD
-         aJ3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712622904; x=1713227704;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VV/mCmxlohJveqf9kMhulaT/FXcfpYCRiRNRFaMSO2I=;
-        b=EVD/y+DlnFxulcf8i5vbi6BzalTcPD0mjOEe4nD72dyDMYgZbmnxA2o7fzHfXvZF35
-         brFxggBJ7BzHEfcv/AJTUYRJyMpfmPa4pWZ22Ap+vzmDsR2zvVP0h6Ezs6YjlHRHGw/0
-         OefVeyUnyU8EyB0OUoqlGSvUfKdzgvvJvsvav/NR5ORi/J1URADUlfAADQC8Us/Q/nvG
-         b8ocRKTqGLHtO1YIYSJVMXkaQXhONL1bs9eNVs5lhWZlGQdws+1Sso+iUtSo9CED6nFl
-         N2dfV8F+8XI/rBT08fVc+goEwXp+nYRsRz1+qFnARrE2sgJFYANwUHgp5dx73rfuyAW3
-         3IEQ==
-X-Gm-Message-State: AOJu0YwMWpZT2WiQQs8fC4WXEjMBWAD5SYVglht8VqIRYDleNDDIZxvm
-	VIwTFosFseHKjN6h9qUmWM1PTtR5L20OFljq68M7ZJFWqvMvKca93vLx4FxZ
-X-Google-Smtp-Source: AGHT+IFuW9kzMb/1vKusyHt/fns7YliCMcB6SD3VgDjyI1b5t5Vp2ANAuszgjRqMB96whWDa5AROjQ==
-X-Received: by 2002:a05:6214:62d:b0:69b:2aa8:dc56 with SMTP id a13-20020a056214062d00b0069b2aa8dc56mr207111qvx.36.1712622904039;
-        Mon, 08 Apr 2024 17:35:04 -0700 (PDT)
-Received: from [172.17.0.2] ([20.109.36.214])
-        by smtp.gmail.com with ESMTPSA id ev6-20020a0562140a8600b0069aae04b06esm2626412qvb.85.2024.04.08.17.35.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Apr 2024 17:35:03 -0700 (PDT)
-Message-ID: <66148d37.050a0220.242a9.cb6b@mx.google.com>
-Date: Mon, 08 Apr 2024 17:35:03 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1982110841674603790=="
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1712663151; x=1744199151;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=GFjr+qUI/xJlRfC49pDYbbQ+5mOHCUk/2gN5wZX0VPA=;
+  b=Re2MZHX5GydCM8B6KilkbcXlSGPSLv0DHVNAFcmqvWsd0IZ1NH+wl46p
+   jp+rvzqYg9VvAX9wn3JpJghaHuXQWE2yPEhE8P08rq+2tVNxto7uD3tbV
+   QrLFtsNiMvuJGKG0kOuG7Rz2NIhkvDaaqqVhKqvF/2RhKVIbglEWBhS4x
+   g=;
+X-IronPort-AV: E=Sophos;i="6.07,189,1708387200"; 
+   d="scan'208";a="650727234"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2024 11:45:43 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:49900]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.27.169:2525] with esmtp (Farcaster)
+ id 3f52ccb2-10c8-4639-a2de-4651f9e21034; Tue, 9 Apr 2024 11:45:42 +0000 (UTC)
+X-Farcaster-Flow-ID: 3f52ccb2-10c8-4639-a2de-4651f9e21034
+Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Tue, 9 Apr 2024 11:45:38 +0000
+Received: from [0.0.0.0] (10.253.83.51) by EX19D020UWC004.ant.amazon.com
+ (10.13.138.149) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.28; Tue, 9 Apr
+ 2024 11:45:22 +0000
+Message-ID: <7c82670e-6063-4b0f-9bbf-805a0d949d84@amazon.com>
+Date: Tue, 9 Apr 2024 13:45:18 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1,1/3] shared/uhid: Add support for bt_uhid_replay
-In-Reply-To: <20240408214253.3758319-1-luiz.dentz@gmail.com>
-References: <20240408214253.3758319-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 15/25] misc: nsm: drop owner assignment
+Content-Language: en-US
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, "Michael S. Tsirkin"
+	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Xuan Zhuo
+	<xuanzhuo@linux.alibaba.com>, Jonathan Corbet <corbet@lwn.net>, "David
+ Hildenbrand" <david@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Richard
+ Weinberger" <richard@nod.at>, Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>, Paolo Bonzini
+	<pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe
+	<axboe@kernel.dk>, Marcel Holtmann <marcel@holtmann.org>, "Luiz Augusto von
+ Dentz" <luiz.dentz@gmail.com>, Olivia Mackall <olivia@selenic.com>, Herbert
+ Xu <herbert@gondor.apana.org.au>, Amit Shah <amit@kernel.org>, Arnd Bergmann
+	<arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gonglei
+	<arei.gonglei@huawei.com>, "David S. Miller" <davem@davemloft.net>, "Sudeep
+ Holla" <sudeep.holla@arm.com>, Cristian Marussi <cristian.marussi@arm.com>,
+	Viresh Kumar <vireshk@kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>, David Airlie <airlied@redhat.com>,
+	Gurchetan Singh <gurchetansingh@chromium.org>, Chia-I Wu <olvaffe@gmail.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard
+	<mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, Daniel Vetter
+	<daniel@ffwll.ch>, Jean-Philippe Brucker <jean-philippe@linaro.org>, "Joerg
+ Roedel" <joro@8bytes.org>, Will Deacon <will@kernel.org>, Robin Murphy
+	<robin.murphy@arm.com>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Eric Van Hensbergen
+	<ericvh@kernel.org>, Latchesar Ionkov <lucho@ionkov.net>, Dominique Martinet
+	<asmadeus@codewreck.org>, Christian Schoenebeck <linux_oss@crudebyte.com>,
+	Stefano Garzarella <sgarzare@redhat.com>, Kalle Valo <kvalo@kernel.org>, "Dan
+ Williams" <dan.j.williams@intel.com>, Vishal Verma
+	<vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>, Ira Weiny
+	<ira.weiny@intel.com>, "Pankaj Gupta" <pankaj.gupta.linux@gmail.com>, Bjorn
+ Andersson <andersson@kernel.org>, Mathieu Poirier
+	<mathieu.poirier@linaro.org>, "James E.J. Bottomley" <jejb@linux.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Vivek Goyal
+	<vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>, "Anton Yakovlev"
+	<anton.yakovlev@opensynergy.com>, Jaroslav Kysela <perex@perex.cz>, Takashi
+ Iwai <tiwai@suse.com>
+CC: <virtualization@lists.linux.dev>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-um@lists.infradead.org>,
+	<linux-block@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
+	<linux-crypto@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-gpio@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
+	<iommu@lists.linux.dev>, <netdev@vger.kernel.org>, <v9fs@lists.linux.dev>,
+	<kvm@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
+	<nvdimm@lists.linux.dev>, <linux-remoteproc@vger.kernel.org>,
+	<linux-scsi@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+	<alsa-devel@alsa-project.org>, <linux-sound@vger.kernel.org>
+References: <20240331-module-owner-virtio-v2-0-98f04bfaf46a@linaro.org>
+ <20240331-module-owner-virtio-v2-15-98f04bfaf46a@linaro.org>
+From: Alexander Graf <graf@amazon.com>
+In-Reply-To: <20240331-module-owner-virtio-v2-15-98f04bfaf46a@linaro.org>
+X-ClientProxiedBy: EX19D035UWA002.ant.amazon.com (10.13.139.60) To
+ EX19D020UWC004.ant.amazon.com (10.13.138.149)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 
---===============1982110841674603790==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Ck9uIDMxLjAzLjI0IDEwOjQ0LCBLcnp5c3p0b2YgS296bG93c2tpIHdyb3RlOgo+IHZpcnRpbyBj
+b3JlIGFscmVhZHkgc2V0cyB0aGUgLm93bmVyLCBzbyBkcml2ZXIgZG9lcyBub3QgbmVlZCB0by4K
+Pgo+IFNpZ25lZC1vZmYtYnk6IEtyenlzenRvZiBLb3psb3dza2kgPGtyenlzenRvZi5rb3psb3dz
+a2lAbGluYXJvLm9yZz4KCgpSZXZpZXdlZC1ieTogQWxleGFuZGVyIEdyYWYgPGdyYWZAYW1hem9u
+LmNvbT4KCgpBbGV4CgoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIEdlcm1hbnkgR21iSApL
+cmF1c2Vuc3RyLiAzOAoxMDExNyBCZXJsaW4KR2VzY2hhZWZ0c2Z1ZWhydW5nOiBDaHJpc3RpYW4g
+U2NobGFlZ2VyLCBKb25hdGhhbiBXZWlzcwpFaW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFy
+bG90dGVuYnVyZyB1bnRlciBIUkIgMTQ5MTczIEIKU2l0ejogQmVybGluClVzdC1JRDogREUgMjg5
+IDIzNyA4NzkKCgo=
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=842597
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.45 seconds
-GitLint                       PASS      0.97 seconds
-BuildEll                      PASS      24.41 seconds
-BluezMake                     PASS      1687.33 seconds
-MakeCheck                     PASS      13.17 seconds
-MakeDistcheck                 PASS      175.32 seconds
-CheckValgrind                 PASS      245.15 seconds
-CheckSmatch                   PASS      348.43 seconds
-bluezmakeextell               PASS      119.26 seconds
-IncrementalBuild              PASS      4739.97 seconds
-ScanBuild                     PASS      1039.68 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============1982110841674603790==--
