@@ -1,86 +1,103 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14DF212DDAC
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Apr 2024 13:04:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 418D8129E7A;
+	Tue,  9 Apr 2024 13:07:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712667883; cv=none; b=AbhJc0PqqrxCeaHDzGxV7VzK+Hd99cdbNO8avbF6C00VE/LroavFHZ2Q01JxbwGiY868SrBLh2D2ppqNvHZieKquXrOvqZUNz3YqpXJ7W7T0K0mfgzoZ0rxvZ3/QNJ+yMJQZvRsjF9l94oFAkcbFF14W7jhN6fQaXWWgVWXbVi0=
+	t=1712668066; cv=none; b=gWiQttspZRLNLMvIlOEU3Uttru78keRRH/wQNzpOurxcn8qFtU5mFxdeO3+eJV0xDEIWkwx+BjvKCDh1ifMVmcN9E233GRJrRWeTTvvdCz5xlH+bBmgmrBUqIM7TwP8HcIVnnCxrG5Nw9ff9j3Bn1hYSArblEpYXIJYpV2av4d4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712667883; c=relaxed/simple;
-	bh=5/gc1ZUs8Vj1ZSEU8C0VOuSBQfHzSnqj+AuWr289CdI=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=qiiOao8RSIpiKzw+OOjRBwCrm8QFjWJhsFWQNtcc/BD+UXIyYlwr/Eq0G5ngbZJsnDhSzpE09k7XG6bVzRbeNhKM1+osMTgcAvf2c5RHrQ823yBIVh2mfCLNZeBzBrMO6NpzCblUp9P2puHLswk1PFFHdavyHNMu+GoLCkhIvag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sQIO7WhV; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1712668066; c=relaxed/simple;
+	bh=JN/xRVfnG75kasVUTn1o2Nlnh37spjVebvIOlAwrxH0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=E0hnZk+MMRk/lrhesxyEffQas72ZSE787RhyLXseNfDI/q6SBs/hv8EKMVpuVE+FTSVyEvCwCVliuw0BsipD+Iu5bQCfW2fY0QWIsMWh2UaVNSoPCzWccvbxzEuEsLaXc6/L0W7z9i3XSmEqI4xkyT1/6hLpt8TfAfn1WQl6Hzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kJuO/K7/; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sQIO7WhV"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A6174C43330
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Apr 2024 13:04:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712667882;
-	bh=5/gc1ZUs8Vj1ZSEU8C0VOuSBQfHzSnqj+AuWr289CdI=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=sQIO7WhVb3MDC1wIiujciu0LWPbDMJDUfFBJ2uzV17iL2zukoBrDhALfnrwhbhhlB
-	 Gq50XjRs+7vAoq0Q8cJZDOgn+zg+PyC91LOEwZgWzqG6c9hEyqoFlJv16V/BATb218
-	 TVs6UgaW/u8/Co9T3KSH+oaMRMvyboYACsQglOnJlAEfQKpc0/MtugUS9ZJVMryRWB
-	 zwwe2ASupuOIRixN57bxGvZbsWEsMAjX5d+9CBpN7XiY28OV59ffQu0y59Mv/lpdt7
-	 cZyZvKyX/GRCU9lTwfMe374yIUFtxn+3/O56F1wTGfl1NRap/SpLT1XqZvqyL8O2Z3
-	 +QU5/BMKfzMIA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 9F16DC53BD6; Tue,  9 Apr 2024 13:04:42 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 218416] hci0: command 0xfc05 tx timeout in kernel 6.7.1
-Date: Tue, 09 Apr 2024 13:04:42 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: contact@odelierre.fr
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-218416-62941-NL8Abnv9kl@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218416-62941@https.bugzilla.kernel.org/>
-References: <bug-218416-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kJuO/K7/"
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-343cb97e7f5so958908f8f.0;
+        Tue, 09 Apr 2024 06:07:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712668064; x=1713272864; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JN/xRVfnG75kasVUTn1o2Nlnh37spjVebvIOlAwrxH0=;
+        b=kJuO/K7/szUnYQsQNShZu7idzfdbc+Lrc/gPdS6Mmi7zeWdIkRzJax5b8ob98biInU
+         YVmrtdBlyo2iX4AsAop0MOC5nmdY+H9hA82S279QYNoSb7+eOr341ABX7sMopE/vWbFE
+         40S8dXZ/toRJhZxTfqxTD/bzK5IBXldghxV31BiNLzmeXP7Y/vgUmDj6arjqLzgKUtwV
+         0fDXgtOhnPIZPy1EvuPPC10ihz8hMNW+Hi13Ip15jCOWRCbam5x1UAnAEHtk3r1C7ReH
+         8RWtu9QLZdC2yoL+4OY6PUYI5y6ms399DN6Bid1+apgXI0BiDPdjR9Osu2weAUI0LTVX
+         n+ew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712668064; x=1713272864;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JN/xRVfnG75kasVUTn1o2Nlnh37spjVebvIOlAwrxH0=;
+        b=ToYArFEk/dmX1xh/UWgDUK+SwTT1s5yzi10IEyIpwE2j0oUAOyyXiKf0Yo2Vlgl+rM
+         HmcAicYVB/xSogOz4PW4Nt2zoZlGfugd8mhO9vCTUhukpYskxIQ6MBFVFPCa0T8cRuRL
+         Bg47DTpy2y4H1wJSx6it5rz/B0WRUC/JnXWr7jX0wxafliAaE6mKn7hs5CJPTps6FLgA
+         Q8s4jdzcMmFNpqbu1uSUExjjE3fwdLW3ALQbePWGegYATJp7YMn5um/WDY4nqEDFVxmF
+         bMLR+rBq0MPZ4WQDUrWKvCp5REYbN4ZVrPPOXxqdwkEVMe2u9jzPxQUO450WV9vHUuQd
+         Ly5A==
+X-Forwarded-Encrypted: i=1; AJvYcCX5kJBe11mxogpLVnU+ubWUYUni6AjA4B3aYtpvfeJ7ZVTlj4uLMRSbD7IYR9Mg2VJsaQEwbk9eY7h5QaT+ERpdxqDz2P8kIrE7YoDgF9druYJa0kCuhIlqPZE8+LUMuAn3pM1+Ngy2UjTs45l+
+X-Gm-Message-State: AOJu0YwCn4ITO/MjvLXx97NGbAhrOsflkRzk/HR0hVTopRv78mSyLeFu
+	VawRT+sYZCquz7PbSaJmVDAfC9ePuwn58SAfzN0ix2Kw+zojT5TV
+X-Google-Smtp-Source: AGHT+IEJ4LqPNVe5bdubUNjQU1zcwKWQfnQH+JHUZHlf6Tzq5XQT1zxrBbrh2JKSy2BHLndJQoK9EA==
+X-Received: by 2002:a5d:628f:0:b0:343:760d:29c8 with SMTP id k15-20020a5d628f000000b00343760d29c8mr8067527wru.1.1712668063342;
+        Tue, 09 Apr 2024 06:07:43 -0700 (PDT)
+Received: from [10.0.0.4] ([37.170.252.166])
+        by smtp.gmail.com with ESMTPSA id dm14-20020a0560000bce00b003437a76565asm11409760wrb.25.2024.04.09.06.07.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Apr 2024 06:07:42 -0700 (PDT)
+Message-ID: <7cf0848b-f44c-42ad-848a-369a249bff77@gmail.com>
+Date: Tue, 9 Apr 2024 15:07:41 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net/socket: Ensure length of input socket option param >=
+ sizeof(int)
+To: Edward Adam Davis <eadavis@qq.com>, pmenzel@molgen.mpg.de,
+ edumazet@google.com
+Cc: netdev@vger.kernel.org, johan.hedberg@gmail.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ luiz.dentz@gmail.com, marcel@holtmann.org,
+ syzbot+d4ecae01a53fd9b42e7d@syzkaller.appspotmail.com,
+ syzkaller-bugs@googlegroups.com
+References: <234da60a-709f-4430-b594-386b7c2b65f5@molgen.mpg.de>
+ <tencent_15CA920ADD9ADDCA19654FBE8DB5A5B88D07@qq.com>
+Content-Language: en-US
+From: Eric Dumazet <eric.dumazet@gmail.com>
+In-Reply-To: <tencent_15CA920ADD9ADDCA19654FBE8DB5A5B88D07@qq.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218416
 
---- Comment #19 from Olivier Delierre (contact@odelierre.fr) ---
-(In reply to Jugoslav Gacas from comment #18)
-> The issue has been fixed for me after upgrading to kernel 6.8.4-arch1-1 on
-> Arch-linux.
+On 4/9/24 14:15, Edward Adam Davis wrote:
+> The optlen value passed by syzbot to _sys_setsockopt() is 2, which results in
+> only 2 bytes being allocated when allocating memory to kernel_optval, and the
+> optval size passed when calling the function copy_from_sockptr() is 4 bytes.
+> Here, optlen is determined uniformly in the entry function __sys_setsockopt().
+> If its value is less than 4, the parameter is considered invalid.
+>
+> Reported-by: syzbot+837ba09d9db969068367@syzkaller.appspotmail.com
+> Reported-by: syzbot+b71011ec0a23f4d15625@syzkaller.appspotmail.com
+> Reported-by: syzbot+d4ecae01a53fd9b42e7d@syzkaller.appspotmail.com
+> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
 
-Can confirm. Upgraded kernel to 6.8.4-arch1-1, removed btusb from the module
-loading blacklist, powered-off the PC and powering it on again, bluetooth w=
-as
-working.
 
-Tried several things such as rebooting, rebooting on my Windows drive,
-rebooting to Archlinux again, powering-off: no power-off hanging, and bluet=
-ooth
-was working immediately after each start-up, without having to deal with
-modprobe anyhow.
+I think I gave my feedback already.
 
---=20
-You may reply to this email to add a comment.
+Please do not ignore maintainers feedback.
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+This patch is absolutely wrong.
+
+Some setsockopt() deal with optlen == 1 just fine, thank you very much.
+
+
