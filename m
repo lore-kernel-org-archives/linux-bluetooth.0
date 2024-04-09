@@ -1,201 +1,112 @@
-Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEEDD12F5A3
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Apr 2024 14:09:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFF5A12F5A0;
+	Tue,  9 Apr 2024 14:12:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712671785; cv=none; b=ihK4a6MCcqyYq7325MagwE7WHgOSvoW7ceJgP//38GrJSWd3lR+L05qkvIbZkDplbDstVF8nhhyT5aMDgYRprVJUZEJCYvyuUki9AbFEeBp4HWWQQdWHCk26IYrxy8OJmC/c1AqPnFIVnKsGciTzk6MKzvNrNYh0mG9BD3E2NE0=
+	t=1712671926; cv=none; b=mN/nbAPjQPckq5qeKxkOS8i4wxaar6mmSC6l6Zv+R/wyVBMq/ANK8wnhml5oFQXJxPQtl7QvpvLFtnVek5XJnH7PgYMUl9DN5bW2QjWYCKRzDvCYiaEj0bOgf+nN8sOwiAom49dfrSPEbxx7qtsF01+L/0jmxt0cv0MTQTMupmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712671785; c=relaxed/simple;
-	bh=7cruCXvQ0TEEm2Cfb65ldopgK5E7Wk8dd8UvBChZaAs=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=DB7eBGl4FNQnrw7NrpsHy3hgUtZYbb8gukyTFgrtVBvFTeBy1GqLlShHhdEyPdKxGNE2da3cNeWnddxT3LLIJPAGP3o2YDcLsXTpunLGnmIwpGIDLCkVIkmbFhAtyG0Muc5wJFVM9w/cJDS4n7lHJTT8/89/9l7G75fG/PVe1ZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ctD4sAbt; arc=none smtp.client-ip=209.85.160.49
+	s=arc-20240116; t=1712671926; c=relaxed/simple;
+	bh=Pb3U8o0znOa+FZrFMgY8KaP+XUwl/EDu8Wcwfm7QUUM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EtZLSueHVd5UqTYXBW4A75YnnFFAtBbnR+jmfk0fvp6U1x33JJcvGHI1shFC+BnlzN/XDuJNlVtGvjtSRedSIv98fEY6250am/AqEvAd3hzddVGDZLNRuHAfWF/5WvIrA2aqlheeTjzyo/73yLCkDHIqgCssOeqpC7/MJ0UYVnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LBuRzoDW; arc=none smtp.client-ip=209.85.208.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ctD4sAbt"
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-22a96054726so4945605fac.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Apr 2024 07:09:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LBuRzoDW"
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2d8a24f8a3cso12861491fa.1;
+        Tue, 09 Apr 2024 07:12:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712671782; x=1713276582; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=oDibxSAWWAP7CiizZ+VQ6iWwap8kl7b405UZALQbb70=;
-        b=ctD4sAbt3aJyT5RipuqCy84X2+UBsSgnovH/vKWKAIPQbrYKw1kt2ItvOQERJeFg/P
-         mme5LJXoqkLDMZt7QoGVr3QD/qVinAv7DDa22DSI5diciK76YX0eMRvQ++ZiGtrt8FIQ
-         Zz8ejcFNYFAasbt1BaJe+Ify6DTRSZ0t6KWm3Z4wE8YZKOEeFUoCHL5mbE+9189NWTAo
-         ItQ9WzKCz6LLsXKZcFYO8aYohG94Rw31BiNmCyLr4bZEUFiY0q0Q2dxQDaoWtI9Hyi7z
-         I+6aRLxI4JtVDbtVBv86EMCnKcWCj3XVhXZOSqldJ/Yd2Vuzmk5cTrP7RtWiHaQ5vaRM
-         a/GQ==
+        d=gmail.com; s=20230601; t=1712671923; x=1713276723; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Yq7Ve/MoVtY976kXQjQT0Gp8ZXknYj2h3YGm3jklcHo=;
+        b=LBuRzoDWuSO277Om9dbcVaTEPdeuJoUlgB4e7qKErAO0vWtCvEQmM/sowiY0saXUMo
+         GVyrRKSBE06/Yd0b03rVmKrtpqm5QhsO8hYz91ix631/nfW+usRz3H6qiyFq+ixhcnJz
+         iyFb+D8px5TRzRuJcl4KxS2rb5ZMjS/08oUHgaFvhWhyKLEFliUm9QlEmMxufgGqnHkq
+         7rpbMJVlRFgubjSOQF8CD2cGvBm8Y+mCwvzPcQYTS6IUDTd9He3Z6Jhg4QwejQyUHJpu
+         ZFDlrCtFwUodPLPBrvi71VL0zwNkRP2E1HTEJWCnD9sWnUgGF4cKYFRbiWiS9H7POsjm
+         HHOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712671782; x=1713276582;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oDibxSAWWAP7CiizZ+VQ6iWwap8kl7b405UZALQbb70=;
-        b=D9Wfs9wqgu3ou8AXK3uaOtxDWnLOVt9Kgl8NtQA8wDoney5PSKY28vPYo0bjSRT2+X
-         rIjO4cDmQvv8BHO6ZUyIEJLxHo2L2yOU2Olbw4LSwtzS/rmx7bvYJjdO5N5YFljnGjGk
-         5w4XzdEqjV3kcX9PERShCgHEnxljoCGS1zOJvjauCwXO5xcvXHLjuHe1mW9QysR15mR5
-         um5ysuBqu/n9LSj0lg4vxk4nEfKDUa01f4TFYJ75YKWD8tD54+XENGboglHFnrLVNDWb
-         C+wTJB1SbB+7/LtymC1iFloK8bUxFN4Ug9CruJo050hpRnYbGgVuoGIkT3lxd4P6RFY8
-         EqUg==
-X-Gm-Message-State: AOJu0YwgBt3CFsGtF+sEPbmQHrS/YWLqytlY3AclPrpumGjNHQ3uaem0
-	8TUCZVDzocej7tbKGHz3qNSKelG8zJoAQfJflN/GZX9zrDZUB/8MkqF5H17+
-X-Google-Smtp-Source: AGHT+IFiVE58DPdvnxwHUcadLQ8ZSFRjGctUHz8PPSlyQlsMcTCH3xpXHGiWlj4rnK6az1a+YmTEng==
-X-Received: by 2002:a05:6871:5b1c:b0:22e:c1ff:303c with SMTP id op28-20020a0568715b1c00b0022ec1ff303cmr12930011oac.37.1712671782127;
-        Tue, 09 Apr 2024 07:09:42 -0700 (PDT)
-Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id v13-20020a056102330d00b004784cc400f4sm1704270vsc.3.2024.04.09.07.09.40
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Apr 2024 07:09:40 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: btintel: Attempt to reset if Read Version fail during setup
-Date: Tue,  9 Apr 2024 10:09:39 -0400
-Message-ID: <20240409140939.3855573-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.44.0
+        d=1e100.net; s=20230601; t=1712671923; x=1713276723;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Yq7Ve/MoVtY976kXQjQT0Gp8ZXknYj2h3YGm3jklcHo=;
+        b=fKc0kuDoEtG/NHXlxoUb9QiQQCU9Z5ViyMK/5GxqSnIIo9p2/RTJhw8SuXcFhBzNDz
+         iY6yP17yjmOJYiBaJIbGPmTlEjGVd5g6KbnSlh/OPm17R/F1FX4csLbYh/ubLcKdR5o5
+         PGg7czQII8Nr+t9rYe6spMMzYyVaiMajtMBDysDrBPhCTpBZPNAglQ4wGmLgGIhm6AGX
+         LEXh7N2a2hstSg7gpM27m+tt0R37l7pHx5cFpLXXoUfc7PuitwMsD8rE9DQfIMX4t3z0
+         pIZMCTo+pHbYdglxiqonT1wBEvV0VjltRc17TOIrWQ7oFbBGYR2iWhCrPMoS/esRwzXb
+         1sBg==
+X-Forwarded-Encrypted: i=1; AJvYcCVeN2pod8QLBs7mqvk8BrndHyYsO1OymGRbKgAn3+xzdTf7Lh+dsCBsq8/Fs3NHbhia0eZMKC5uvIO/9I5sUm5fJKHGZJzfWJm+MjVoKxvSB69uMSycSYFUPsoZm9tY1EprqMYjs/yuelVDZDdyfhxNPrIkLEvlO0cCnIZYYDSac/hJtjX+
+X-Gm-Message-State: AOJu0YzPxtpfoPF03aW7e0Kf6vLiqSz734VnpmKMOaXUtLlrJfseVnln
+	ZqadjUYic09RVsc2ZIEM7I8p/LpS7fOpWvBdgkisc5uYgN1VKCCqAUo1pBe+1Y5t8P4hrwRqAMX
+	5wL+pLsBxVxSuDLsvVy+mR4fs9Ao=
+X-Google-Smtp-Source: AGHT+IEbW1mmDB2SJKlZlyubQTwI+ixEezwvqOpNrsOBopPAXAxjksYWvJ7cuiCIlWgNkVvgZu+Z+14EdCJbAfxHdOY=
+X-Received: by 2002:a2e:9602:0:b0:2d8:1267:3202 with SMTP id
+ v2-20020a2e9602000000b002d812673202mr7627397ljh.10.1712671922638; Tue, 09 Apr
+ 2024 07:12:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <7cf0848b-f44c-42ad-848a-369a249bff77@gmail.com> <tencent_FE3C6F369E968237444B7E74BD7625670A09@qq.com>
+In-Reply-To: <tencent_FE3C6F369E968237444B7E74BD7625670A09@qq.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 9 Apr 2024 10:11:50 -0400
+Message-ID: <CABBYNZ+4x2XxgL2eGYU0dd1+83quVajEk-bAqt3FG7wPx+=nFg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: fix oob in rfcomm_sock_setsockopt
+To: Edward Adam Davis <eadavis@qq.com>
+Cc: eric.dumazet@gmail.com, edumazet@google.com, johan.hedberg@gmail.com, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	marcel@holtmann.org, netdev@vger.kernel.org, pmenzel@molgen.mpg.de, 
+	syzbot+d4ecae01a53fd9b42e7d@syzkaller.appspotmail.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Edward,
 
-During setup callback the code would attempt to send Read Version which
-sometimes can fail due to ncmd being set to 0 which would block any
-command from being send which is why INTEL_BROKEN_INITIAL_NCMD was
-introduced.
+On Tue, Apr 9, 2024 at 9:36=E2=80=AFAM Edward Adam Davis <eadavis@qq.com> w=
+rote:
+>
+> If optlen < sizeof(u32) it will trigger oob, so take the min of them.
+>
+> Reported-by: syzbot+d4ecae01a53fd9b42e7d@syzkaller.appspotmail.com
+> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+> ---
+>  net/bluetooth/rfcomm/sock.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+> index b54e8a530f55..42c55c756b51 100644
+> --- a/net/bluetooth/rfcomm/sock.c
+> +++ b/net/bluetooth/rfcomm/sock.c
+> @@ -629,7 +629,7 @@ static int rfcomm_sock_setsockopt_old(struct socket *=
+sock, int optname,
+>
+>         switch (optname) {
+>         case RFCOMM_LM:
+> -               if (copy_from_sockptr(&opt, optval, sizeof(u32))) {
+> +               if (copy_from_sockptr(&opt, optval, min_t(int, sizeof(u32=
+), optlen))) {
+>                         err =3D -EFAULT;
+>                         break;
+>                 }
+> --
+> 2.43.0
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- drivers/bluetooth/btintel.c | 70 ++++++++++++++++++++++++-------------
- 1 file changed, 45 insertions(+), 25 deletions(-)
+This has been dealt with already:
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index a19ebe47bd95..b787540a1031 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -430,18 +430,18 @@ int btintel_set_event_mask_mfg(struct hci_dev *hdev, bool debug)
- }
- EXPORT_SYMBOL_GPL(btintel_set_event_mask_mfg);
- 
-+static struct sk_buff *btintel_read_version_skb(struct hci_dev *hdev,
-+						u32 plen, const char *param)
-+{
-+	return __hci_cmd_sync(hdev, 0xfc05, plen, param, HCI_CMD_TIMEOUT);
-+}
-+
- int btintel_read_version(struct hci_dev *hdev, struct intel_version *ver)
- {
- 	struct sk_buff *skb;
- 
--	skb = __hci_cmd_sync(hdev, 0xfc05, 0, NULL, HCI_CMD_TIMEOUT);
--	if (IS_ERR(skb)) {
--		bt_dev_err(hdev, "Reading Intel version information failed (%ld)",
--			   PTR_ERR(skb));
--		return PTR_ERR(skb);
--	}
--
--	if (!skb || skb->len != sizeof(*ver)) {
-+	skb = btintel_read_version_skb(hdev, 0, NULL);
-+	if (IS_ERR(skb) || skb->len != sizeof(*ver)) {
- 		bt_dev_err(hdev, "Intel version event size mismatch");
- 		kfree_skb(skb);
- 		return -EILSEQ;
-@@ -655,12 +655,9 @@ static int btintel_read_version_tlv(struct hci_dev *hdev,
- 	struct sk_buff *skb;
- 	const u8 param[1] = { 0xFF };
- 
--	if (!version)
--		return -EINVAL;
--
--	skb = __hci_cmd_sync(hdev, 0xfc05, 1, param, HCI_CMD_TIMEOUT);
-+	skb = btintel_read_version_skb(hdev, sizeof(param), param);
- 	if (IS_ERR(skb)) {
--		bt_dev_err(hdev, "Reading Intel version information failed (%ld)",
-+		bt_dev_err(hdev, "Intel Read Version command failed (%ld)",
- 			   PTR_ERR(skb));
- 		return PTR_ERR(skb);
- 	}
-@@ -672,12 +669,44 @@ static int btintel_read_version_tlv(struct hci_dev *hdev,
- 		return -EIO;
- 	}
- 
--	btintel_parse_version_tlv(hdev, version, skb);
-+	if (version)
-+		btintel_parse_version_tlv(hdev, version, skb);
- 
- 	kfree_skb(skb);
- 	return 0;
- }
- 
-+static struct sk_buff *btintel_read_version_setup(struct hci_dev *hdev)
-+{
-+	int err;
-+	struct sk_buff *skb;
-+	const u8 param[1] = { 0xFF };
-+
-+	skb = btintel_read_version_skb(hdev, sizeof(param), param);
-+	if (!IS_ERR(skb))
-+		goto done;
-+
-+	/* Attempt to reset if the command times out since this could be
-+	 * because the ncmd is set to 0 therefore no command will be able to be
-+	 * sent.
-+	 */
-+	err = hci_reset_sync(hdev);
-+	if (err)
-+		return ERR_PTR(err);
-+
-+	skb = btintel_read_version_skb(hdev, sizeof(param), param);
-+	if (IS_ERR(skb))
-+		return skb;
-+
-+done:
-+	if (skb->data[0]) {
-+		kfree_skb(skb);
-+		return ERR_PTR(-EIO);
-+	}
-+
-+	return skb;
-+}
-+
- /* ------- REGMAP IBT SUPPORT ------- */
- 
- #define IBT_REG_MODE_8BIT  0x00
-@@ -2821,7 +2850,6 @@ static void btintel_print_fseq_info(struct hci_dev *hdev)
- 
- static int btintel_setup_combined(struct hci_dev *hdev)
- {
--	const u8 param[1] = { 0xFF };
- 	struct intel_version ver;
- 	struct intel_version_tlv ver_tlv;
- 	struct sk_buff *skb;
-@@ -2862,18 +2890,10 @@ static int btintel_setup_combined(struct hci_dev *hdev)
- 	 * command has a parameter and returns a correct version information.
- 	 * So, it uses new format to support both legacy and new format.
- 	 */
--	skb = __hci_cmd_sync(hdev, 0xfc05, 1, param, HCI_CMD_TIMEOUT);
-+	skb = btintel_read_version_setup(hdev);
- 	if (IS_ERR(skb)) {
--		bt_dev_err(hdev, "Reading Intel version command failed (%ld)",
-+		bt_dev_err(hdev, "Intel Read Version command failed (%ld)",
- 			   PTR_ERR(skb));
--		return PTR_ERR(skb);
--	}
--
--	/* Check the status */
--	if (skb->data[0]) {
--		bt_dev_err(hdev, "Intel Read Version command failed (%02x)",
--			   skb->data[0]);
--		err = -EIO;
- 		goto exit_error;
- 	}
- 
--- 
-2.44.0
+https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
+t/commit/?id=3Dee77912bc0bbd78fceb785a81cc9108fa954982f
 
+
+--=20
+Luiz Augusto von Dentz
