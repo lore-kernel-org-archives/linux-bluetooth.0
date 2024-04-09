@@ -1,129 +1,118 @@
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A596712F5A3
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Apr 2024 14:17:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33DEF12FF63;
+	Tue,  9 Apr 2024 14:23:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712672280; cv=none; b=m2kxm2kgDJYOZ8zScFTgL+H7UEAOgJMKw2MloRQZdjohQlTjtvCH1Yv5kgQKGxnTc9cZUOzlkURoKGwTSY8LQNU33ujDzG54IlPRcl8PI4xAkfu5RLimI3PedpFVr+P71wLtOaJmdJORllseCAiot93QLC/pv8fwXwTgIQWWPFU=
+	t=1712672619; cv=none; b=NIC0N5a6Ikdb6al2nB59EaCT+cLtlDiVGafw5XYWq3og7bciWFfXEzovCQtkn6E7MGxBgCqfSOg201aOTquk8pCxWwdS8jipDw7pHyaw5EUwzb1JWNXNijCU6PYuhfpU8FMOctdHqtuxJBRHVPIVYLpjDcgkAB129SadcHEKu5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712672280; c=relaxed/simple;
-	bh=CQJJ+EXkS8vzXDSQGCdhZzOcQSnJl9LGsjKU2h6iW4g=;
+	s=arc-20240116; t=1712672619; c=relaxed/simple;
+	bh=Ty2f8pnPcBEyF3m2q3oawb8ksrgM+TTBnxPTrXpEtjM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qFq9wdBLtKG9+HDMpMleoA8oH2J8rZ654kUjJMUCnnbqIElD7zFBq66zTLj1keYjmi4jLPGTmxbOCwtwwXH/c7OXqAEBZrybqYOLGYKs5f4QsKKjhJprDQqcAlJ+ZlFxrgpJkWhUs/ATWkArpcUV+obMxxMNQh8LV0KsHoeytSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g5m0cUey; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 To:Cc:Content-Type; b=IMMYhvkpwIfmj5eslW1qVK/HnIrpmcyljTQebxHR2D4d1AKpZzktleCLvyVynCSZHCi40ScpqdDDV0hPKpuM163NLl2AE0NkplTarBG4LAu6Icnacew3v1cRu7naH1T1V7GM2LA68SWVDu44TRIPE5Q4KN757zYpwyjoIBqcqQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gj1lWbvN; arc=none smtp.client-ip=209.85.208.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g5m0cUey"
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-56e5bba0908so12383a12.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Apr 2024 07:17:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gj1lWbvN"
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2d4979cd8c8so52954501fa.0;
+        Tue, 09 Apr 2024 07:23:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712672277; x=1713277077; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1712672616; x=1713277416; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VmZzs0VOF7pCa24C6qKP0DzgKs89B6zI1lNihOdcCC8=;
-        b=g5m0cUeyt3OPmYkjeSaCYLiqKCKoOiiJTSs8Hmnilp+hftyUFIBS1fVNM/3U1waNh1
-         jufjXbupOQXE7izYYd2czwgvfM+BH8UiDEnRT6+891cKMjOLoJF6C7tGfkz4A3Kn7/yn
-         FAF1Spp8EgkxJ/B/UNYkXLq4F11OdyBLFTD26Ejp/vbnqjqOc0Y51THJ94qjUs5s7bT1
-         Nzgwn3/2S6/2LdD8G/5xS8Y59feo2Mvj2fRQeoju8BmsHHvYUULBLbVmypi458U+FmNE
-         3wQ+UUU+//UXMxgFXw+QdH6D/CcAddYcSkk106wULLqMkvVgvarBxFak6a9OG/LVXzfy
-         Douw==
+        bh=BhWsMOQgYV9auXE9rRgSy5tpt3ezoTRv+HC7Wl6JmUg=;
+        b=gj1lWbvNdywQTL/j2YqPf5CG2bUrE7QKzbbwR07vFhInamUAgCW6T8OHJK2PH1WXCD
+         goEB3M/7cAElahKj50ucy+HFe9SjMcvoN4/IFS36xHKRjAya92el3MwQA+X3bpGDzAX4
+         lIE0CbkKj4zX7rt+QHH7MaOdz3Qe5HqUzqpELHQaoeCZCIBVIeKqyz6/qhPd0lDUn0de
+         yYvj9xezjANNX7kUqCguTd1+yXh4rubFj3A4K/8ptPG+66JfYhXi3HYwBCNPJNdsQEf3
+         EQi5lNfVUxFmBEI7liV+eV8o8gqLNyNHK1iYa5iFgvECukI32K0o0o7KmhQR1FNNbcHf
+         vxbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712672277; x=1713277077;
+        d=1e100.net; s=20230601; t=1712672616; x=1713277416;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=VmZzs0VOF7pCa24C6qKP0DzgKs89B6zI1lNihOdcCC8=;
-        b=WmFM8M+xqNHQ2hvuV9hRyrJC9quzjxhND3LaEOMLKeyHhbx8QXCZvqfEjfCbXUQtpN
-         Oj9MalNd750z1+d8Eh6S+5TNLWoO7scCZYCaxZX59buGnDbwyzXyLdYecEkiBS0x1kO5
-         00Q2G4vDffTM0/Lsi+F3Jk9I5chDL3aGvc7nugPi+huQq2CVcEmDHdW4qjRs1WaRMm3c
-         2rsRs1Gqf2QUBTdllNdIDP5oRusxj0E18y/8HgBXFoEwnNfRSWIkB+jgmPmjjOLoME0+
-         RpkdjkCNJOrMByhQp+IZo3Ni49SKTRECnzxSp+BGVw+AvTIf+hFtEOriZGMyROO6mnXh
-         s1Kw==
-X-Forwarded-Encrypted: i=1; AJvYcCVkEXDZgoenQsy76h04yZ0l6oqQBOVjn0tYm4fqYx9wV29j4mdKzq/BKcUVNXI4Yd7yELueyEJyxTEXWWAOQ3e2N9/fH361kORKeuYSjFOA
-X-Gm-Message-State: AOJu0YxRarZ7ETorjbAH5HKZKEVQgwBvjKvx5IDND6yauM46PDD4cnBO
-	B7CMrv40GEbVX5VMPlKuMktdJbO2qbAa2HsEivtJKpmemZ0neaBTTeRUjLVOtaz76QDVGvGXnOQ
-	+0CvHNFWUawzuWYhunS9cuHmgDTCaUJCRdGyv
-X-Google-Smtp-Source: AGHT+IEotRWbGGi6bZ2X7QllsriEs5XuAfrmYSsR3+QQhN3IykwUSZgSv9+89fLvM1ymkT3RaeWYlpR5hL6VjU0ap8U=
-X-Received: by 2002:a05:6402:40cc:b0:56e:72a3:e5a8 with SMTP id
- z12-20020a05640240cc00b0056e72a3e5a8mr161277edb.3.1712672276490; Tue, 09 Apr
- 2024 07:17:56 -0700 (PDT)
+        bh=BhWsMOQgYV9auXE9rRgSy5tpt3ezoTRv+HC7Wl6JmUg=;
+        b=pOWs92eg667NofbAWt9BfrzYcmb+tSDTrrwcpB/j4RsbcpVz1B4811fNDJ9ws7+xuU
+         CeITR3Osz74I0CSyKrxS0zdNp2hk2nI64Ohiw7FkyXAxM4D2Rv3NkiN3aHsnaoM36XIE
+         UFsMUZaZhhcRuYnFAtiGi7lVuc3k2+FQ8fp5OCi5s1R3dD3hHCc6LnUbhQOU9U7kXyEz
+         2q5tk/bcg8sb9rnpl1QYNFvYSFzMF47fb1Of/eVpg7NQCT9kk5ukWEmgh9eln6A70OJD
+         iiA+cHFEZLrkQ7vPaSwu47eRT/F1ssz+Wgpo9xLfvyLSgdt8/3GqbUP8vK9MtSRZESMw
+         YiXA==
+X-Forwarded-Encrypted: i=1; AJvYcCUrQr+KJU4GwVSMX/YL+OA/iqi9dSFkiOUWZCtxJ/Uxi74+JZYoxDkkeEbj9nRocj5J4WFTRyDrHAW74vq9QdcePbbVEkRXUZj72YCaDLLR6lnUUxlzFU54rvQW5DxlQGv4LclaW3pscqnqyATo
+X-Gm-Message-State: AOJu0Yyfgg1e4pwiMcC/pkJUJQoGh2CeJQwH8NQuN38tcLd0nn+sRaiY
+	BG4JUtIxXyLgy7b/MNz78og1faoxHz5XlZ2BO+YeSv7LCmxh98ztqlLFs6o52MMvduN1uAdAKmE
+	b2R2IQOHOhuN17RshkFwK+FZPope/edS3VRE=
+X-Google-Smtp-Source: AGHT+IGz1jFaS6SRwv5iWAR2VPLNxDGE3/BU8tCAxZQ+8qGx7loUh+88mJoj8KZrkQFz1WMtEzF4mVP/Vjk6KnqQ9AM=
+X-Received: by 2002:a2e:b16f:0:b0:2d4:79ff:5573 with SMTP id
+ a15-20020a2eb16f000000b002d479ff5573mr881657ljm.20.1712672616060; Tue, 09 Apr
+ 2024 07:23:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <7cf0848b-f44c-42ad-848a-369a249bff77@gmail.com> <tencent_88401767377846C9736D0363C96C23BB4405@qq.com>
-In-Reply-To: <tencent_88401767377846C9736D0363C96C23BB4405@qq.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 9 Apr 2024 16:17:42 +0200
-Message-ID: <CANn89iJAyCKbL1Gx9mbBMuEvDB7nr-Ao6vB7KbtOK5D0UhiQNQ@mail.gmail.com>
-Subject: Re: [PATCH] net/socket: Ensure length of input socket option param >= sizeof(int)
-To: Edward Adam Davis <eadavis@qq.com>
-Cc: eric.dumazet@gmail.com, johan.hedberg@gmail.com, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org, 
-	pmenzel@molgen.mpg.de, syzbot+d4ecae01a53fd9b42e7d@syzkaller.appspotmail.com, 
-	syzkaller-bugs@googlegroups.com
+References: <20240408123459.66504-1-wse@tuxedocomputers.com>
+In-Reply-To: <20240408123459.66504-1-wse@tuxedocomputers.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 9 Apr 2024 10:23:23 -0400
+Message-ID: <CABBYNZ+DNkb4bC8eSQaxcDFEuA4hWJMgk00r6+YKc+BH953x+w@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: btintel: Add devices to HCI_QUIRK_BROKEN_LE_CODED
+To: Werner Sembach <wse@tuxedocomputers.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Christoffer Sandberg <cs@tuxedo.de>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 9, 2024 at 4:02=E2=80=AFPM Edward Adam Davis <eadavis@qq.com> w=
-rote:
+Hi Werner,
+
+On Mon, Apr 8, 2024 at 8:35=E2=80=AFAM Werner Sembach <wse@tuxedocomputers.=
+com> wrote:
 >
-> On Tue, 9 Apr 2024 15:07:41 +0200, Eric Dumazet wrote:
-> > > The optlen value passed by syzbot to _sys_setsockopt() is 2, which re=
-sults in
-> > > only 2 bytes being allocated when allocating memory to kernel_optval,=
- and the
-> > > optval size passed when calling the function copy_from_sockptr() is 4=
- bytes.
-> > > Here, optlen is determined uniformly in the entry function __sys_sets=
-ockopt().
-> > > If its value is less than 4, the parameter is considered invalid.
-> > >
-> > > Reported-by: syzbot+837ba09d9db969068367@syzkaller.appspotmail.com
-> > > Reported-by: syzbot+b71011ec0a23f4d15625@syzkaller.appspotmail.com
-> > > Reported-by: syzbot+d4ecae01a53fd9b42e7d@syzkaller.appspotmail.com
-> > > Signed-off-by: Edward Adam Davis <eadavis@qq.com>
-> >
-> >
-> > I think I gave my feedback already.
-> >
-> > Please do not ignore maintainers feedback.
-> >
-> > This patch is absolutely wrong.
-> >
-> > Some setsockopt() deal with optlen =3D=3D 1 just fine, thank you very m=
-uch.
-> It's better to use evidence to support your claim, rather than your "main=
-tainer" title.
+> From: Christoffer Sandberg <cs@tuxedo.de>
+>
+> For HW variants 0x17, 0x18 and 0x19 LE Coded PHY causes scan and
+> connection issues when enabled. This patch disables it through
+> the existing quirk.
 
-I will answer since you ask so nicely,
-but if you plan sending linux kernel patches, I suggest you look in
-the source code.
+Perhaps the following could be a proper fix for that:
 
-Look at do_ip_setsockopt(), which is one of the most used setsockopt()
-in the world.
+https://patchwork.kernel.org/project/bluetooth/patch/20240405204037.3451091=
+-1-luiz.dentz@gmail.com/
 
-The code is at least 20 years old.
+If you manage to test it please reply and add Tested-by to its thread.
 
-It even supports optlen =3D=3D 0
+> Signed-off-by: Christoffer Sandberg <cs@tuxedo.de>
+> Signed-off-by: Werner Sembach <wse@tuxedocomputers.com>
+> Cc: <stable@vger.kernel.org>
+> ---
+>  drivers/bluetooth/btintel.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+> index cdc5c08824a0a..9f9c4696d082a 100644
+> --- a/drivers/bluetooth/btintel.c
+> +++ b/drivers/bluetooth/btintel.c
+> @@ -2881,6 +2881,9 @@ static int btintel_setup_combined(struct hci_dev *h=
+dev)
+>         case 0x17:
+>         case 0x18:
+>         case 0x19:
+> +               /* 0x17, 0x18 and 0x19 have issues when LE Coded PHY is e=
+nabled */
+> +               set_bit(HCI_QUIRK_BROKEN_LE_CODED, &hdev->quirks);
+> +               fallthrough;
+>         case 0x1b:
+>         case 0x1c:
+>                 /* Display version information of TLV type */
+> --
+> 2.34.1
+>
 
-               if (optlen >=3D sizeof(int)) {
-                       if (copy_from_sockptr(&val, optval, sizeof(val)))
-                               return -EFAULT;
-               } else if (optlen >=3D sizeof(char)) {
-                       unsigned char ucval;
 
-                       if (copy_from_sockptr(&ucval, optval, sizeof(ucval))=
-)
-                               return -EFAULT;
-                       val =3D (int) ucval;
-               }
-       }
-
-       /* If optlen=3D=3D0, it is equivalent to val =3D=3D 0 */
+--=20
+Luiz Augusto von Dentz
