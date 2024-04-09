@@ -1,91 +1,97 @@
-Received: from out162-62-63-194.mail.qq.com (out162-62-63-194.mail.qq.com [162.62.63.194])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9751812F378;
-	Tue,  9 Apr 2024 13:44:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.63.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC6DB12C531
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Apr 2024 13:45:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712670268; cv=none; b=Y/Jm2Ryd/ojaqsciFzqOAYTNa5X5BR3vXlCK+7jLoCcDntIIADPOGsKeHZXn97/rUp6fsnVd3E6aICH/kjIk/NeWrb8J/oVaPc0VxCfHScIRC3eCUMnp/f3CZMvmRYkAsFWQkU5FhSBscd+4BwhcHy2D5UpYOyWSrgmmO+XMmg0=
+	t=1712670344; cv=none; b=CCpdLQxgpiaIxig53JNWJ8h3kE6oJxLFPXjvLNF5RYkZ+6mycnieBAlwQzqV3xU4FQWamyfVGnarufU2xsKNTksjKc4PRaAYbggkeNdWjRbAG4cDpVtHlutFwWHPM8XFjb8xl5JgvogQgFD8r1MKFq+Cekyc4tZ4hXUYp9rCan0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712670268; c=relaxed/simple;
-	bh=/kxZXr+rwuZWsLpAl0SSYwp1srPD3nqS4ULZVWAuf8k=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=dIt76et7EEqLBftYxYnbsX7KnKajy5nB1wWjnE45bCGk/AJTdjvCoQ1hSfV5hhfYq/TbJnSMeeC5yK7BvlsLTWPkFbIMgJlSFZTo8G49G8vJNe+4d6WaSTAPAyzXqh6IfGEuKlTAlVO2RA2szjHC/GVlbEoNUQRDOhkj6SZ0SIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=Td6C2W+p; arc=none smtp.client-ip=162.62.63.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+	s=arc-20240116; t=1712670344; c=relaxed/simple;
+	bh=XQpz2CXMrdVdvbxwHpvms1nyuxH7Qma4dMfeGnvYuRE=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=NRqW1mDmen6J2scD3oJDK3v4duhBnmqHFHzRop+X8etTZ81GWEtzCu6xnfc1LsyvQr5ASN/YDzkwSQ+p5uRg4/KU2RtZWrJvRfLI7aXF8Q0sRN8tripaYdwKP8ZMMsG69i2tJOpA99x6jPQXb4339Nil433uNpqzgAnC4orIYjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sy4y7kMg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="Td6C2W+p"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1712670258; bh=mV+2uXEU0mxyaFTSC+dqJ7oImfFIcAAupTtNJvfgJYA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Td6C2W+pebgIe4I12hp+cKrXcRfD/tNrb6/WJ0wRlrtl5RwOT+TsnPky8kEafErPQ
-	 fCzNkZ47jO19lUSEqk+vJE9MswA68HnGSzY6w0rLmO0PfSPrCoZYM5J9SOYNZyDuwG
-	 //j0JlKmq406vNRMAgosdznENIhY5hIAOH7X7leU=
-Received: from pek-lxu-l1.wrs.com ([111.198.228.153])
-	by newxmesmtplogicsvrszc5-0.qq.com (NewEsmtp) with SMTP
-	id AB23389E; Tue, 09 Apr 2024 21:42:50 +0800
-X-QQ-mid: xmsmtpt1712670170tkjmb0sae
-Message-ID: <tencent_EDCC88A7DB46D3D2F7C64449976EC56EE006@qq.com>
-X-QQ-XMAILINFO: OCYbvBDBNb9rerlANBwTUHLlLdyj8SmQAzuXuPK9Ob3UVeMTOUlb2KXNa0+x5z
-	 CriuoSgInpV8P2aXGt1YyYfx154hu2f1Yvlydw6FtioPyI9zqjDX7GfWc6eCcYz88908p6Sn5al2
-	 bsnAegt/UzKNcGgnYJyiHzszdulrN2bIfan6CEK2brvGFI8AKYGffxhlLLgSvljvPbogo3HdKE2g
-	 bkCeVoeGCF5wnTK9NkLVUhPnLOAy8hAnbzMQC5imHkST880ZuwsqCFT86XnKRYpuLdvbl65piPrA
-	 iH4I/80v3ALIHlCI/zdisN+cTQyyKOLt4axc2v7GevNjzluOjamKO8gxjC/tYO1qKUOHA7jYAm3J
-	 t8heAypBDIdCLKlrBy8yqajqfkZQjIlsv98Rqx1WQGcRfF5j9NqPuxIXsHre22hnTX6zArERnmi4
-	 o4hrfC3j2daxLqTgwNR/3NmpuqI95ICUa8rc3uqj5FyQwfhOYHklKbxxBje3dv+dEzRh5PD7uwiD
-	 pAKRsXDHlTl69FssNHh9xQrPHoR3MaTUtkhxWqDVl151sK1HH7lRqjvzxj+Yza5KhoHCOJS4fmP0
-	 KuemLKhoi6X6Hede9Pag0GlEsZxbSZtVIcL6oXth27WyXTU8Thncq9K4u620biye4mOADV3Rffok
-	 OZOGhmLz14NEY9+hEQVGluKVONp1KhMmQDEfUJCzUij2osiB/WLsqpxO3qawDOexVgFquXeDGYYV
-	 hpXuLwstk2JAOUV+HIzBHHRkhiHdUWyrc0gJYDFLMpQ/GY8e2q56iJJtPZxQ3uxAp676Tfjyr3V/
-	 v/0wDr1qScqyah7gCUeAgHoewwDNc2PDGd/SRQ0imyaFqSltV+7cqIiZtR351mZFMbEXQOqgETk/
-	 v4bYcMGTWKm5GvB7jOkjejHb0zKtG8XX/ZOnlDnJL/pVU+a8C330cIGs0NinTbNqoFuuV8PcYh4A
-	 bQPfsAuc6VSjSSivdBuZlPSuP5BSZm0C+sdLhmCp5SDxs5GYdJZM3RKvodBZLS
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-From: Edward Adam Davis <eadavis@qq.com>
-To: syzbot+837ba09d9db969068367@syzkaller.appspotmail.com
-Cc: johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	luiz.dentz@gmail.com,
-	marcel@holtmann.org,
-	syzkaller-bugs@googlegroups.com,
-	netdev@vger.kernel.org
-Subject: [PATCH] Bluetooth: fix oob in hci_sock_setsockopt
-Date: Tue,  9 Apr 2024 21:42:51 +0800
-X-OQ-MSGID: <20240409134250.1414-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <0000000000007558ae061553f41b@google.com>
-References: <0000000000007558ae061553f41b@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sy4y7kMg"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 321E5C433B1
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Apr 2024 13:45:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712670344;
+	bh=XQpz2CXMrdVdvbxwHpvms1nyuxH7Qma4dMfeGnvYuRE=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=Sy4y7kMg4ZBpkVHGVuDsBzygDEuDxmZQOTWDqaBtFh8MmSczdn4HrljHHzIAedhwj
+	 ujCwlyhHaXQUcUFqebpiaFx1+avRrUASgSr/Uu9y2B4nT6nr5muWABgOV03V+UvtQx
+	 rqk4VenH6meQSi3hjDFQaDxAdJcLacdf0lsmt1bsulkZ9EembXbfwDiffiL+HikD10
+	 CdEKIAIWUHQDn7zIWoxdatXsA0wg+Pr9o2FP1IPqxpKU2p5OC6r226pwj5+Zc4Vp71
+	 AEaSy71la5zdM8/SFX0zQUD8JwzBAWJfV2XYYDJuzpCfVj7CZ/RdeyQ4I0Py0hO8qr
+	 sQbs4UK8f+YVg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 269DFC53BD6; Tue,  9 Apr 2024 13:45:44 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 218416] hci0: command 0xfc05 tx timeout in kernel 6.7.1
+Date: Tue, 09 Apr 2024 13:45:43 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: nickolas@gupton.xyz
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-218416-62941-5J6OBtCkZH@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-218416-62941@https.bugzilla.kernel.org/>
+References: <bug-218416-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-If len < sizeof(opt) it will trigger oob, so take the min of them.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218416
 
-Reported-by: syzbot+837ba09d9db969068367@syzkaller.appspotmail.com
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
----
- net/bluetooth/hci_sock.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+--- Comment #20 from Nickolas Gupton (nickolas@gupton.xyz) ---
+I am on kernel 6.8.4 and using firmware 20242312, but Bluetooth is still not
+working for me:
 
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 4ee1b976678b..cee7ec1adbd2 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -1946,7 +1946,7 @@ static int hci_sock_setsockopt_old(struct socket *sock, int level, int optname,
- 
- 	switch (optname) {
- 	case HCI_DATA_DIR:
--		if (copy_from_sockptr(&opt, optval, sizeof(opt))) {
-+		if (copy_from_sockptr(&opt, optval, min_t(int, sizeof(opt), len))) {
- 			err = -EFAULT;
- 			break;
- 		}
--- 
-2.43.0
+$ uname -a
+Linux andromeda 6.8.4-arch1-1 #1 SMP PREEMPT_DYNAMIC Fri, 05 Apr 2024 00:14=
+:23
++0000 x86_64 GNU/Linux
 
+$ journalctl -b | grep -E -i bluetooth
+Apr 09 07:01:20 andromeda kernel: Bluetooth: Core ver 2.22
+Apr 09 07:01:20 andromeda kernel: NET: Registered PF_BLUETOOTH protocol fam=
+ily
+Apr 09 07:01:20 andromeda kernel: Bluetooth: HCI device and connection mana=
+ger
+initialized
+Apr 09 07:01:20 andromeda kernel: Bluetooth: HCI socket layer initialized
+Apr 09 07:01:20 andromeda kernel: Bluetooth: L2CAP socket layer initialized
+Apr 09 07:01:20 andromeda kernel: Bluetooth: SCO socket layer initialized
+Apr 09 07:01:21 andromeda systemd[1]: Reached target Bluetooth Support.
+Apr 09 07:01:21 andromeda NetworkManager[794]: <info>  [1712664081.1498] Lo=
+aded
+device plugin: NMBluezManager
+(/usr/lib/NetworkManager/1.46.0-2/libnm-device-plugin-bluetooth.so)
+Apr 09 07:01:23 andromeda kernel: Bluetooth: hci0: Reading Intel version
+command failed (-110)
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
