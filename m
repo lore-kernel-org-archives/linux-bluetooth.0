@@ -1,68 +1,60 @@
-Received: from out203-205-221-247.mail.qq.com (out203-205-221-247.mail.qq.com [203.205.221.247])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F097275809;
-	Tue,  9 Apr 2024 14:08:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.247
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEEDD12F5A3
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Apr 2024 14:09:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712671686; cv=none; b=jKFA6Xb39jHt9TItvG7bVcmGEgxL3W5J+nSNdswb6HIGWmaZE1qvybtS32Kne45Z+5XXEglrb8FpJfRXAcA/YL6XM7Nxjk72zVO+ufRWFgutusK7iUg/wZqaYZrCWPE9bl55UfT5gkMB7EH7Wv2QI/FUpQgLD37DUI+RiAUXIKk=
+	t=1712671785; cv=none; b=ihK4a6MCcqyYq7325MagwE7WHgOSvoW7ceJgP//38GrJSWd3lR+L05qkvIbZkDplbDstVF8nhhyT5aMDgYRprVJUZEJCYvyuUki9AbFEeBp4HWWQQdWHCk26IYrxy8OJmC/c1AqPnFIVnKsGciTzk6MKzvNrNYh0mG9BD3E2NE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712671686; c=relaxed/simple;
-	bh=aZ3VspYYkKY1SKuWGstld2SVTKAJS1fjt3YHHePeFqk=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=hv953NuHCJfBi/JSskVfRPCK3di5fyvtxgQZLZf23qYB6degIL5t8tiJsEyoN3QhNHtNmeIAno+mnu0GLIQrowoWpj3t595ruzXivjvfJXWchNmJincwKufmfljzYrOe/1nircYknIlIMzrrXz+ZuNRtFF/kmi1eExl45xtVchk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=QbA/vVeH; arc=none smtp.client-ip=203.205.221.247
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+	s=arc-20240116; t=1712671785; c=relaxed/simple;
+	bh=7cruCXvQ0TEEm2Cfb65ldopgK5E7Wk8dd8UvBChZaAs=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=DB7eBGl4FNQnrw7NrpsHy3hgUtZYbb8gukyTFgrtVBvFTeBy1GqLlShHhdEyPdKxGNE2da3cNeWnddxT3LLIJPAGP3o2YDcLsXTpunLGnmIwpGIDLCkVIkmbFhAtyG0Muc5wJFVM9w/cJDS4n7lHJTT8/89/9l7G75fG/PVe1ZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ctD4sAbt; arc=none smtp.client-ip=209.85.160.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="QbA/vVeH"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1712671681; bh=Nq7x37qnBv79sD920Br4gJu3bwEbV/pMCm95FU3naDk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=QbA/vVeHqGIdL6GIN5Aabs8VRYJcnKVkyAEZpqoJnTbrE+UVVtFogERdirJS5TTx8
-	 8G41AnRxLXGdb6W3TwtTKbx+kbcpxmqur6/OwhdRBnGuDTY0qFCrC6zqJUsAypWzLU
-	 /IGMoU2dERkECnOmypwBuOt+zb9j+HKt0j9kAjm8=
-Received: from pek-lxu-l1.wrs.com ([111.198.228.153])
-	by newxmesmtplogicsvrsza1-0.qq.com (NewEsmtp) with SMTP
-	id 6D16000; Tue, 09 Apr 2024 22:01:45 +0800
-X-QQ-mid: xmsmtpt1712671305t2hlw4hd1
-Message-ID: <tencent_88401767377846C9736D0363C96C23BB4405@qq.com>
-X-QQ-XMAILINFO: MXFwphgysCmN7alFT54dUzQwy3Yf4UCiwHgtXIu9oHZ6X2/XiOTaFGgsyzuF2u
-	 BWJEbWMOcQXfFTLTOQpeeXrdVWRtoapk4/0M7AQRhNgbeFb62N+u9liwhKDDAHWWegr8w8OkiBw1
-	 ioQ42KrhMBTgM52VRYhCcNhjT4eab7Zsq92OHoTtzRqZHHkpu5No+MlG+0E4yudhDgiKQWivQCKg
-	 cLqEuj5DtRR+UPU9xjL3DQNckNqMF2Wi9kWe83m8eezRIloBb2d4mfQdO80iVoFBRwLBj4HMfSM9
-	 dkS5QOzS5BNfLV6I7gqEpiwVwgjbN7DAxqWwh8UB20bZXEaeVPthNVidYI4DZKsuobSzErjlGuVv
-	 l5HOy4xpNztv22onDE10Y6EhZ0rGXIYr9I+oNN9P0eRCyjl/EA1/sknQaqjxgNNA3mFAdbmXeBCB
-	 oNCUYgStbGpWPDYCK2hOTACTrgwcBPOomlREYsuS0LRiKE2CSdDEW+6PLLo80ZbPN0PO27xVP3HU
-	 kqpKiIiSLoIuE+rrA0tuSRF1HwBLvxsn++9qD4eiOL6hZHuR25pC8vxyAUprvIM4lyAvq5lU6T2T
-	 O7A+PresvyPjUyIroSypXsB7xBe0ZXlVG7M4HuU7kZOvc/96/nH/tbCT3BS12yK4WqtoHBIPPkQs
-	 h5dD73wlRTamZCMYrcNlii3Gt35JL8MsVTCoK1jQ0HWWJ0UnQPG+HXBQqt0Jw6qIIyhmaRXf25qQ
-	 acGhHoF63hZfbTa5e8U4yTLVykNw+cm5V7CZ1GJHydpZs4+5/Pu/24cqwCXntRla5HTup+ONOEHt
-	 WNsGEcTuFVELID/U1nLr9wVtfi1HCGt6eO8AbsVSFPJEGquYzhg3RTBVYBEM3HcCEWv7dafBhvjO
-	 0onQLX5QebODGDtWpSmG6KGNNOjlaeWIAOIyCtKkPo7aSTeBSc8Nr+edtaTYlaBjRH6ZENX1Y501
-	 R831j7dHsTX5gaL/RILH+sbcR5GSJlRQBRqGD2x1CiSAGxI5NYWPHhrv4tKSRNps4pxkx2INMbGW
-	 7V3eDBB9LsqkXRQj4a8WTCnxd6wjQ4gjNKdwHTIAdNuzNfSSYGM/A6zhg0F4hUQgHjb9R9kgk28Y
-	 zyKEdW
-X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
-From: Edward Adam Davis <eadavis@qq.com>
-To: eric.dumazet@gmail.com
-Cc: eadavis@qq.com,
-	edumazet@google.com,
-	johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	luiz.dentz@gmail.com,
-	marcel@holtmann.org,
-	netdev@vger.kernel.org,
-	pmenzel@molgen.mpg.de,
-	syzbot+d4ecae01a53fd9b42e7d@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH] net/socket: Ensure length of input socket option param >= sizeof(int)
-Date: Tue,  9 Apr 2024 22:01:45 +0800
-X-OQ-MSGID: <20240409140144.28412-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <7cf0848b-f44c-42ad-848a-369a249bff77@gmail.com>
-References: <7cf0848b-f44c-42ad-848a-369a249bff77@gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ctD4sAbt"
+Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-22a96054726so4945605fac.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Apr 2024 07:09:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712671782; x=1713276582; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=oDibxSAWWAP7CiizZ+VQ6iWwap8kl7b405UZALQbb70=;
+        b=ctD4sAbt3aJyT5RipuqCy84X2+UBsSgnovH/vKWKAIPQbrYKw1kt2ItvOQERJeFg/P
+         mme5LJXoqkLDMZt7QoGVr3QD/qVinAv7DDa22DSI5diciK76YX0eMRvQ++ZiGtrt8FIQ
+         Zz8ejcFNYFAasbt1BaJe+Ify6DTRSZ0t6KWm3Z4wE8YZKOEeFUoCHL5mbE+9189NWTAo
+         ItQ9WzKCz6LLsXKZcFYO8aYohG94Rw31BiNmCyLr4bZEUFiY0q0Q2dxQDaoWtI9Hyi7z
+         I+6aRLxI4JtVDbtVBv86EMCnKcWCj3XVhXZOSqldJ/Yd2Vuzmk5cTrP7RtWiHaQ5vaRM
+         a/GQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712671782; x=1713276582;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oDibxSAWWAP7CiizZ+VQ6iWwap8kl7b405UZALQbb70=;
+        b=D9Wfs9wqgu3ou8AXK3uaOtxDWnLOVt9Kgl8NtQA8wDoney5PSKY28vPYo0bjSRT2+X
+         rIjO4cDmQvv8BHO6ZUyIEJLxHo2L2yOU2Olbw4LSwtzS/rmx7bvYJjdO5N5YFljnGjGk
+         5w4XzdEqjV3kcX9PERShCgHEnxljoCGS1zOJvjauCwXO5xcvXHLjuHe1mW9QysR15mR5
+         um5ysuBqu/n9LSj0lg4vxk4nEfKDUa01f4TFYJ75YKWD8tD54+XENGboglHFnrLVNDWb
+         C+wTJB1SbB+7/LtymC1iFloK8bUxFN4Ug9CruJo050hpRnYbGgVuoGIkT3lxd4P6RFY8
+         EqUg==
+X-Gm-Message-State: AOJu0YwgBt3CFsGtF+sEPbmQHrS/YWLqytlY3AclPrpumGjNHQ3uaem0
+	8TUCZVDzocej7tbKGHz3qNSKelG8zJoAQfJflN/GZX9zrDZUB/8MkqF5H17+
+X-Google-Smtp-Source: AGHT+IFiVE58DPdvnxwHUcadLQ8ZSFRjGctUHz8PPSlyQlsMcTCH3xpXHGiWlj4rnK6az1a+YmTEng==
+X-Received: by 2002:a05:6871:5b1c:b0:22e:c1ff:303c with SMTP id op28-20020a0568715b1c00b0022ec1ff303cmr12930011oac.37.1712671782127;
+        Tue, 09 Apr 2024 07:09:42 -0700 (PDT)
+Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id v13-20020a056102330d00b004784cc400f4sm1704270vsc.3.2024.04.09.07.09.40
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Apr 2024 07:09:40 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: btintel: Attempt to reset if Read Version fail during setup
+Date: Tue,  9 Apr 2024 10:09:39 -0400
+Message-ID: <20240409140939.3855573-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -71,25 +63,139 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-On Tue, 9 Apr 2024 15:07:41 +0200, Eric Dumazet wrote:
-> > The optlen value passed by syzbot to _sys_setsockopt() is 2, which results in
-> > only 2 bytes being allocated when allocating memory to kernel_optval, and the
-> > optval size passed when calling the function copy_from_sockptr() is 4 bytes.
-> > Here, optlen is determined uniformly in the entry function __sys_setsockopt().
-> > If its value is less than 4, the parameter is considered invalid.
-> >
-> > Reported-by: syzbot+837ba09d9db969068367@syzkaller.appspotmail.com
-> > Reported-by: syzbot+b71011ec0a23f4d15625@syzkaller.appspotmail.com
-> > Reported-by: syzbot+d4ecae01a53fd9b42e7d@syzkaller.appspotmail.com
-> > Signed-off-by: Edward Adam Davis <eadavis@qq.com>
-> 
-> 
-> I think I gave my feedback already.
-> 
-> Please do not ignore maintainers feedback.
-> 
-> This patch is absolutely wrong.
-> 
-> Some setsockopt() deal with optlen == 1 just fine, thank you very much.
-It's better to use evidence to support your claim, rather than your "maintainer" title.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+
+During setup callback the code would attempt to send Read Version which
+sometimes can fail due to ncmd being set to 0 which would block any
+command from being send which is why INTEL_BROKEN_INITIAL_NCMD was
+introduced.
+
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ drivers/bluetooth/btintel.c | 70 ++++++++++++++++++++++++-------------
+ 1 file changed, 45 insertions(+), 25 deletions(-)
+
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index a19ebe47bd95..b787540a1031 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -430,18 +430,18 @@ int btintel_set_event_mask_mfg(struct hci_dev *hdev, bool debug)
+ }
+ EXPORT_SYMBOL_GPL(btintel_set_event_mask_mfg);
+ 
++static struct sk_buff *btintel_read_version_skb(struct hci_dev *hdev,
++						u32 plen, const char *param)
++{
++	return __hci_cmd_sync(hdev, 0xfc05, plen, param, HCI_CMD_TIMEOUT);
++}
++
+ int btintel_read_version(struct hci_dev *hdev, struct intel_version *ver)
+ {
+ 	struct sk_buff *skb;
+ 
+-	skb = __hci_cmd_sync(hdev, 0xfc05, 0, NULL, HCI_CMD_TIMEOUT);
+-	if (IS_ERR(skb)) {
+-		bt_dev_err(hdev, "Reading Intel version information failed (%ld)",
+-			   PTR_ERR(skb));
+-		return PTR_ERR(skb);
+-	}
+-
+-	if (!skb || skb->len != sizeof(*ver)) {
++	skb = btintel_read_version_skb(hdev, 0, NULL);
++	if (IS_ERR(skb) || skb->len != sizeof(*ver)) {
+ 		bt_dev_err(hdev, "Intel version event size mismatch");
+ 		kfree_skb(skb);
+ 		return -EILSEQ;
+@@ -655,12 +655,9 @@ static int btintel_read_version_tlv(struct hci_dev *hdev,
+ 	struct sk_buff *skb;
+ 	const u8 param[1] = { 0xFF };
+ 
+-	if (!version)
+-		return -EINVAL;
+-
+-	skb = __hci_cmd_sync(hdev, 0xfc05, 1, param, HCI_CMD_TIMEOUT);
++	skb = btintel_read_version_skb(hdev, sizeof(param), param);
+ 	if (IS_ERR(skb)) {
+-		bt_dev_err(hdev, "Reading Intel version information failed (%ld)",
++		bt_dev_err(hdev, "Intel Read Version command failed (%ld)",
+ 			   PTR_ERR(skb));
+ 		return PTR_ERR(skb);
+ 	}
+@@ -672,12 +669,44 @@ static int btintel_read_version_tlv(struct hci_dev *hdev,
+ 		return -EIO;
+ 	}
+ 
+-	btintel_parse_version_tlv(hdev, version, skb);
++	if (version)
++		btintel_parse_version_tlv(hdev, version, skb);
+ 
+ 	kfree_skb(skb);
+ 	return 0;
+ }
+ 
++static struct sk_buff *btintel_read_version_setup(struct hci_dev *hdev)
++{
++	int err;
++	struct sk_buff *skb;
++	const u8 param[1] = { 0xFF };
++
++	skb = btintel_read_version_skb(hdev, sizeof(param), param);
++	if (!IS_ERR(skb))
++		goto done;
++
++	/* Attempt to reset if the command times out since this could be
++	 * because the ncmd is set to 0 therefore no command will be able to be
++	 * sent.
++	 */
++	err = hci_reset_sync(hdev);
++	if (err)
++		return ERR_PTR(err);
++
++	skb = btintel_read_version_skb(hdev, sizeof(param), param);
++	if (IS_ERR(skb))
++		return skb;
++
++done:
++	if (skb->data[0]) {
++		kfree_skb(skb);
++		return ERR_PTR(-EIO);
++	}
++
++	return skb;
++}
++
+ /* ------- REGMAP IBT SUPPORT ------- */
+ 
+ #define IBT_REG_MODE_8BIT  0x00
+@@ -2821,7 +2850,6 @@ static void btintel_print_fseq_info(struct hci_dev *hdev)
+ 
+ static int btintel_setup_combined(struct hci_dev *hdev)
+ {
+-	const u8 param[1] = { 0xFF };
+ 	struct intel_version ver;
+ 	struct intel_version_tlv ver_tlv;
+ 	struct sk_buff *skb;
+@@ -2862,18 +2890,10 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+ 	 * command has a parameter and returns a correct version information.
+ 	 * So, it uses new format to support both legacy and new format.
+ 	 */
+-	skb = __hci_cmd_sync(hdev, 0xfc05, 1, param, HCI_CMD_TIMEOUT);
++	skb = btintel_read_version_setup(hdev);
+ 	if (IS_ERR(skb)) {
+-		bt_dev_err(hdev, "Reading Intel version command failed (%ld)",
++		bt_dev_err(hdev, "Intel Read Version command failed (%ld)",
+ 			   PTR_ERR(skb));
+-		return PTR_ERR(skb);
+-	}
+-
+-	/* Check the status */
+-	if (skb->data[0]) {
+-		bt_dev_err(hdev, "Intel Read Version command failed (%02x)",
+-			   skb->data[0]);
+-		err = -EIO;
+ 		goto exit_error;
+ 	}
+ 
+-- 
+2.44.0
 
