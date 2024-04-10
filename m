@@ -1,81 +1,116 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2917A15ADB0
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Apr 2024 15:30:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 696CE16E881
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Apr 2024 15:32:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712763029; cv=none; b=EbJcqiRO+L8rqra5TlektljKs5zxvAOQd35HmkdLSxSkPBoK7q0Ryr01c/8h5lIDWwgRc+VO/zmhtMorVo/v69LKqltqrxYktvJJqSw2susOiaFodJFNwOYTs4WO0am2kvHOTkUDsuYbS8jsXPX+73Jk15l2Bh1mIGNMCKc6ivY=
+	t=1712763134; cv=none; b=lir4NL4rpDo3oktSLwDGRJ7YKWdqyQs6ni2jhjciMd2O3A1pZpZvxi2XxyC4wiPTCw380HYqTNAYqXFOxyoi20znq4qivgE+EszXnrlnE7X82LsMEP6HC10H4JVZ9bSZCuM+AcbOcGVnmh0V1IXIIf22pWPKjFjjzj/FH5lkkgo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712763029; c=relaxed/simple;
-	bh=bVgalM/7k0Gw3Q0e03FCEv5zH7x//COKUWJNol7lB9A=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LAOcA0/CJVJnyw7WJvsmvm+/kNkNDdvM1SHF0aCypfYrm+7ExT2HdlgMZ7j5Czyjg8UAKYD6m0gsUPok82JuO0Fj/n7CO33pas+Ce/ygBSSidRFuNo4DvbtCakwC6O59RB9b7Z0dZpjqrwGm3tpPLON3KfHtsdStlEIc6e8wHCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u88R+Nig; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1712763134; c=relaxed/simple;
+	bh=07KacDf1WvmwdrJ16qdMf9HkulWT+Xu6agotCnbQM9Y=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=EnpOW+xnfmjsTdLl2rWpxj5LN7Lu9nX+jD42DqY+Cgn4NS7CnjXz/QwLHOebiSOMGbaFnulGy4d5JeFi4mYKE9Al90RERP/SvVKpI//rN/JnF4Gfi4GBW0YNpoRCWpoQ2RDE9WK9EO5PxsJ+fD6m7In+FMNN8ZPjgzKu3Y9cbT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Eyxar4Jc; arc=none smtp.client-ip=192.30.252.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u88R+Nig"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B77D2C433F1;
-	Wed, 10 Apr 2024 15:30:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712763028;
-	bh=bVgalM/7k0Gw3Q0e03FCEv5zH7x//COKUWJNol7lB9A=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=u88R+Nigsm8CZwdkmmMeliqjgIbhZlBSqf9QfOZ3aLmuj9N7FV1IGoHz0h7vySw/w
-	 G6lVLwwAYIKumds/uOyfiOPV/jcN7R0GZFh5sLxEri6XsrEIy+OsjEGknjgf+navnV
-	 w1MuSJSlkOv0SBFPSKkDb575P3a3t8ZzFqAhq01MXXBkPx8b3MHF1GUyVeu7/ozwrQ
-	 Bqzb/NpGqvNUMWo6NAXUhpURY6WemwBgVvt/6dgXGjfTOQ+mBaHBv7CDD8YWnROsYU
-	 8JwYEH13z45A22cWZCR6W1LG/sImSu4wTBNbQC25KM29wb3XZcE6es/2SlkzHK1p5x
-	 tsgA3aR2KLBcQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A6581D6030E;
-	Wed, 10 Apr 2024 15:30:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Eyxar4Jc"
+Received: from github.com (hubbernetes-node-15cc446.va3-iad.github.net [10.48.139.39])
+	by smtp.github.com (Postfix) with ESMTPA id 638F74E0C62
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Apr 2024 08:32:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1712763132;
+	bh=fM/0cll7p64H1sgClFKZK6nKMazcvD/eF/TGkH070Pw=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=Eyxar4JcSSnBfKRavstwUuu/ovA3r301s+rJjBTT37LCn7JH9XKAlUqLQ5CkoSP7F
+	 /3/jJgavaXBKgBLPrGSGr/C44UeP5gFTpE7iJxprpZKbm18FYZS3X1iJZHLvdyPv5f
+	 v2xMGjypV7PrxvUb6E2VCuSuAzESSjwc3TA0Ed4A=
+Date: Wed, 10 Apr 2024 08:32:12 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/7604a5-b163e2@github.com>
+Subject: [bluez/bluez] 991ec8: shared/uhid: Add support for bt_uhid_replay
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v3 1/4] shared/uhid: Add support for bt_uhid_replay
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <171276302867.30825.12868319147858515466.git-patchwork-notify@kernel.org>
-Date: Wed, 10 Apr 2024 15:30:28 +0000
-References: <20240410140205.4056047-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240410140205.4056047-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 991ec8e2e088dbfeb954b6fe003e4188d516ba5a
+      https://github.com/bluez/bluez/commit/991ec8e2e088dbfeb954b6fe003e4188d516ba5a
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-04-10 (Wed, 10 Apr 2024)
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M src/shared/uhid.c
+    M src/shared/uhid.h
 
-On Wed, 10 Apr 2024 10:02:02 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This adds support for bt_uhid_replay which enablind replaying
-> GET/SET_REPORT messages stored during the first time a device is
-> created.
-> ---
->  src/shared/uhid.c | 123 ++++++++++++++++++++++++++++++++++++++++++++++
->  src/shared/uhid.h |   1 +
->  2 files changed, 124 insertions(+)
+  Log Message:
+  -----------
+  shared/uhid: Add support for bt_uhid_replay
 
-Here is the summary with links:
-  - [BlueZ,v3,1/4] shared/uhid: Add support for bt_uhid_replay
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=991ec8e2e088
-  - [BlueZ,v3,2/4] hog-lib: Make use of bt_uhid_replay
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=a78c839b5d85
-  - [BlueZ,v3,3/4] input/device: Make use of bt_uhid_replay
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=528f5a8c7d76
-  - [BlueZ,v3,4/4] hog-lib: Destroy uHID device if there is traffic while disconnected
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b163e2bd0303
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+This adds support for bt_uhid_replay which enablind replaying
+GET/SET_REPORT messages stored during the first time a device is
+created.
 
 
+  Commit: a78c839b5d8546e660c4a382ab1c5c1d3a2a16a6
+      https://github.com/bluez/bluez/commit/a78c839b5d8546e660c4a382ab1c5c1d3a2a16a6
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-04-10 (Wed, 10 Apr 2024)
+
+  Changed paths:
+    M profiles/input/hog-lib.c
+
+  Log Message:
+  -----------
+  hog-lib: Make use of bt_uhid_replay
+
+This makes use of bt_uhid_replay to replay the GET/SET_REPORT messages
+recorded during the first time the device is created.
+
+
+  Commit: 528f5a8c7d76a77ba6aa95b425986315cbecf3b3
+      https://github.com/bluez/bluez/commit/528f5a8c7d76a77ba6aa95b425986315cbecf3b3
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-04-10 (Wed, 10 Apr 2024)
+
+  Changed paths:
+    M profiles/input/device.c
+    M src/shared/uhid.c
+
+  Log Message:
+  -----------
+  input/device: Make use of bt_uhid_replay
+
+This makes use of bt_uhid_replay to replay the GET/SET_REPORT messages
+recorded as it offer the same functionality as hidp_replay.
+
+
+  Commit: b163e2bd03034cfbdbf449f85144917497bb1799
+      https://github.com/bluez/bluez/commit/b163e2bd03034cfbdbf449f85144917497bb1799
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-04-10 (Wed, 10 Apr 2024)
+
+  Changed paths:
+    M profiles/input/hog-lib.c
+
+  Log Message:
+  -----------
+  hog-lib: Destroy uHID device if there is traffic while disconnected
+
+This attempts to destroy input device if there is an attempt to
+communicate with it while disconnected.
+
+
+Compare: https://github.com/bluez/bluez/compare/7604a577c9d7...b163e2bd0303
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
