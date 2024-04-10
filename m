@@ -1,115 +1,124 @@
-Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC5E1802CF;
-	Wed, 10 Apr 2024 19:16:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A022B1836E7
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Apr 2024 22:00:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712776575; cv=none; b=B6J/Nk3NSz6Zl0oF4+JGKKRqc1PU1ff116luUV31G8JOb0rWc2IbLt0z0UQV7lWXMq7tT+bR0V+TvwGLQBQxhBiWFa9sUUhK+uUE6XZN1ACr1iOZZ23cbVYFzCQNybiMhaozkjfZeD3A6WbMHbSa+3jbp+kbWqHhlAMrobA6VYQ=
+	t=1712786427; cv=none; b=n+gw1cK/rwwbAaPywKn/Eh3UIrZsoHdlMloUC/e4+T5xBJF98Vccl2u0earzcOGN0pnwItXZzQjTrx6l4CeScnW9LYsl9u1HvOkg8AdP0aiaLfDvzF5PPkPbJxeAP5laO3zAqig46G68qL/8ZmNDtO5kGHbSoB8uNwJfEnExNBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712776575; c=relaxed/simple;
-	bh=N3eMWVi75+MA86c+aJe5TeWSasUakhFVRf4PZ2GV+P8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OHUzyGpNBJdwnBlpR7Bmmv3f/HQlN22pszrwWCDkrGvLLlUh3Ihhbx6GRkMfayx8IuuxSopFJDdRs86HW5hjGDPfNPlmBMythrhFyDISf2UEp/xuhcAoPuUc2OFaWEuvwZ8c8belRpGcJR/gHbqttBrvSNmQURa4UxhmMMu9d9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QWh3ApwF; arc=none smtp.client-ip=209.85.221.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1712786427; c=relaxed/simple;
+	bh=Zx3CCcxHs3OpXONxdTcKg4mWTKcPJHXGOtZ4a6Iow1Y=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=toPmorgBDaMQd4Do0HrjUPycblZtbj340yGnespJW7HLnPPNXeW11a/KX4C7tzE1Jav8J/r6TkrjhFSQfZya1rgICGZOkYwz62/xvzVY5hu9k1LVl3aPw/OH2L9LITXzkgoJ2/2mfQhhOVW7oZzuoMxSygTYOxy3FA2v0Y89zic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=b93ti7JF; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=penguintechs.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QWh3ApwF"
-Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-4da702e48e0so3033828e0c.0;
-        Wed, 10 Apr 2024 12:16:13 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="b93ti7JF"
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6ecfeefe94cso213246b3a.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Apr 2024 15:00:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712776573; x=1713381373; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=BpSOzU15LzKweAegnrAsIh5K/sd1ekTGfCpD+wWSpac=;
-        b=QWh3ApwFb02bdqcOF8zTKLtwoZUo/Fw93sZIPZlOwwkFFRb2L9IsPox2LqpJVqhau6
-         jLyisMvW6WrZZNOzL3IJ9k1rNmaLqEZXuNBuTV8RAMgxG6caKD2/ieg/G9pVKDshMiqw
-         dF7v5EXKnyltxjMJOLChBJlpna9hpMbkYR03ZywiNcCpIHkv91XJKWTJX49+xOLh0Iql
-         bQCpjRbaPK27+GgL4Eenw94xhpJVhMlT2FfmEl/WiaUGHkFAsnW3WzqGaf9chrga7Wol
-         3FyRAZ4v6FUnwThtrfgJ8v6+t6k8bQknjEH/GT3AFTx4dtvH29Qt8040jlsB1IdfQ0gL
-         6v6w==
+        d=penguintechs.org; s=google; t=1712786425; x=1713391225; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=xBagYfSF2VpuPkFqS5FJ8XAb1CielWua0CPGtB5IEPE=;
+        b=b93ti7JFPfoefx2zPRcblCBaXHWUdLSiFE4f5mgb9lqDFGQIlrcM/NkhJN6yAVAOQO
+         CbCvIQo7joIy7ZrWBUMg6vICPGRqqMKKC5SfBxzb104IAqCrxGyg96es2nOppZqYThtJ
+         i7eV/wtzzCHscXMDEBBQzJ9ApSezazWCX9coQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712776573; x=1713381373;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BpSOzU15LzKweAegnrAsIh5K/sd1ekTGfCpD+wWSpac=;
-        b=QpiBhwgGLvjjyzcGIEgIAc9Ze8GA199YZZRwpCKrVpKo/DLAa23WfJ6a+jVHfsjlb9
-         VNcAbndxYbZmCng/wrbSFoTq/PZfAQleACAdYtj1/MlmIRASk2j3uWr3gdkVQyze5SB/
-         IMc5zP2R504awKNbQ3PowTU9j4B0b4c7guNSObvH7gWM0QD3W+UzbMNS9XKrxehAYVVx
-         C8fYERiUrkqEOMOCwaFWSzHLHMJPHzW9BYFc0H6/KRiEtfuaKgu5NomQUmVrJdW+I+ez
-         yFweY3GdMD3z8yGf5VZY+5gbPtmH8Xn4iC6Auuv7fbObk0wEEB63Jz3OoYKw1A3FedG7
-         sY7w==
-X-Forwarded-Encrypted: i=1; AJvYcCX/M8KBdCpoiA2Bjo3pjmg97GXab9FIQw+trDoJFq0GkeHTBOd1hF/lE15SKKirhFlGH9umcc3YyKfUu5jL89ZvhVeiRUFb
-X-Gm-Message-State: AOJu0YzPJw7Q8BCfn/T4SJ+jwE5JnKolh9DtEoleJSjmX/lbnNcdtmS3
-	tzqsOutHP8UoWpSPjkpLRQdeOE5Y5kW0aKzKHp7s5GPJFaPXNLKh
-X-Google-Smtp-Source: AGHT+IFHRjFkE9KByYgCvObvf3f7ksWVv9j/dH67V+lePm8YK7b2QA5nG9xG4KTV7kAEgN44mPt06g==
-X-Received: by 2002:a05:6122:1795:b0:4d8:797b:94df with SMTP id o21-20020a056122179500b004d8797b94dfmr4261683vkf.2.1712776572666;
-        Wed, 10 Apr 2024 12:16:12 -0700 (PDT)
-Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id eq15-20020a056122398f00b004d895c72d56sm1524223vkb.50.2024.04.10.12.16.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 12:16:12 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: pull request: bluetooth 2024-04-10
-Date: Wed, 10 Apr 2024 15:16:10 -0400
-Message-ID: <20240410191610.4156653-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.44.0
+        d=1e100.net; s=20230601; t=1712786425; x=1713391225;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xBagYfSF2VpuPkFqS5FJ8XAb1CielWua0CPGtB5IEPE=;
+        b=KFlwsWni3aPQzDPdIP99Z2vRQ9oxxXMjyTkeO0Gns/aprd4RNH0hJ2K8ZoLCN6kd+0
+         6rB/SJweQbooP0xCrAlPx/dfEYzabVmx7xSd8DoGHzfEaFma6LOYTIuphqi9s6GQAvo6
+         xdwGWvZauR8b9b29HMLgX1Xu9IztLiZl1TiecqJizk5CDQYWkn0MebFvNmtzs6n87raw
+         2cJmNJfUcHV4VgILWJD4zUtDLogLrAtq8tIrHFg9AkqJtSr3xR3OqFRP2qIBJxipy7bV
+         D1KqQidiB/xZerx24GYfa5gWA3jnXq9Mp1kGDyI84t2IEAoli5ucUu4cfPJEwluZ7q4o
+         Nq/w==
+X-Forwarded-Encrypted: i=1; AJvYcCU7xeZFXL54h0TcDYO1U9I6mC9K4jjTRCXDqlKHZ2NrEmO0Moxz24tMi+KPoXBzHrIbRJQBukj/OtKgpMV4Yg19fn1rb97QPtL0DDXXKNvk
+X-Gm-Message-State: AOJu0YzlG/rg4WYqJgSjrMIYvkkJnF13tvy350kzi5cy4VxH3jX0cL1R
+	AUJU8Cw0qz3S25Gzniza6xOSx/465Llcn9foW5IKi4wY49UxFr7fDga2AYHWrw==
+X-Google-Smtp-Source: AGHT+IE7tJUtmyDmEfT88K4d36972vBAPniKC9dO38yf4Vy4usYUldMNxrpkF6RJSBtYWrcfp9uU+A==
+X-Received: by 2002:a05:6a00:9394:b0:6ed:21d5:fbdb with SMTP id ka20-20020a056a00939400b006ed21d5fbdbmr1115316pfb.8.1712786424445;
+        Wed, 10 Apr 2024 15:00:24 -0700 (PDT)
+Received: from ?IPV6:2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08? ([2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08])
+        by smtp.gmail.com with ESMTPSA id n3-20020aa78a43000000b006ed0d0307aasm131148pfa.70.2024.04.10.15.00.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 Apr 2024 15:00:23 -0700 (PDT)
+Message-ID: <02400664-2d23-42d3-b49b-0c59f606d298@penguintechs.org>
+Date: Wed, 10 Apr 2024 15:00:22 -0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: QCA6390 bluetooth doesn't work after warm boot or
+ disable/reenable
+From: Wren Turkal <wt@penguintechs.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>
+Cc: ath11k@lists.infradead.org, linux-bluetooth@vger.kernel.org,
+ Kalle Valo <kvalo@kernel.org>
+References: <a03dace1-ca0f-41d6-8e2c-636e3b053a3a@penguintechs.org>
+ <31bb6e18-ecee-49b3-87d7-50ab53e07447@penguintechs.org>
+ <1b3d3937-6679-491e-a5c6-818ae8ac639a@penguintechs.org>
+ <b592d037-41ed-42e8-8c3c-286eb1a68ceb@penguintechs.org>
+ <68a31d6a-8eb8-4d78-819b-fb67367cc41d@penguintechs.org>
+ <CABBYNZJQUy37fxWuCXV1OgM+DNnOr7V0h_rkgcSdw-5hF7iauQ@mail.gmail.com>
+ <fca46585-c1ed-4a60-91b5-6da39a5bbdec@penguintechs.org>
+Content-Language: en-US
+In-Reply-To: <fca46585-c1ed-4a60-91b5-6da39a5bbdec@penguintechs.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The following changes since commit 19fa4f2a85d777a8052e869c1b892a2f7556569d:
++Johan since he's a former BT drivers maintainer.
 
-  r8169: fix LED-related deadlock on module removal (2024-04-10 10:44:29 +0100)
+On 4/9/24 1:11 PM, Wren Turkal wrote:
+> On 4/9/24 1:03 PM, Luiz Augusto von Dentz wrote:
+>> 5.19 seems a little too old, imo, or has it been broken for that long,
+>> did you at least tried with bluetooth-next? Try contacting the people
+>> who actually wrote the driver.
+> 
+> Sorry, I didn't answer your question. Yes, I do think it's been broken 
+> for longer than that, but I wanted to confirm.
 
-are available in the Git repository at:
+Okay, so I tried 6.9-rc3 and every main release 5.19-6.8.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-04-10
+I have found the following:
 
-for you to fetch changes up to 600b0bbe73d3a9a264694da0e4c2c0800309141e:
+* older kernels (6.3 and before) seem to be far less likely to kill on a 
+cycling the bluetooth service.
+* 6.8/6.9-rcs consistently destroy bluetooth when stopping and 
+restarting the service
+* If I destroy the bluetooth service with a BT service restart in 
+6.9-rc3 and warm reboot into any release back to 5.19, bluetooth does 
+not work
+* cold boot works in all cases assuming I give the laptop about 5s 
+between power off/on
 
-  Bluetooth: l2cap: Don't double set the HCI_CONN_MGMT_CONNECTED bit (2024-04-10 15:10:16 -0400)
+So, I suspsect that the process of closing out the hardware may be 
+leaving it in a state that the reset cannot handle (and probably never 
+could handle).
 
-----------------------------------------------------------------
-bluetooth pull request for net:
+I also found that qualcomm has docs here: 
+https://www.qualcomm.com/products/technology/wi-fi/fastconnect/fastconnect-6800#Documentation
 
-  - L2CAP: Don't double set the HCI_CONN_MGMT_CONNECTED bit
-  - Fix memory leak in hci_req_sync_complete
-  - hci_sync: Fix using the same interval and window for Coded PHY
-  - Fix not validating setsockopt user input
+However, I am not a member of a Qualcomm verified company (mentioned in 
+the doc links). Luiz, Marcel, or Johan, do you have any contacts that 
+might be able to help me in getting info about the technical docs for 
+this hardware? I would love to see if I can find any issues in how the 
+hardware is being reset.
 
-----------------------------------------------------------------
-Archie Pusaka (1):
-      Bluetooth: l2cap: Don't double set the HCI_CONN_MGMT_CONNECTED bit
+As an independent dev, I don't even know what it takes to get that kind 
+of access. I would welcome any help here. Hey Qualcomm, are you hiring? :P
 
-Dmitry Antipov (1):
-      Bluetooth: Fix memory leak in hci_req_sync_complete()
-
-Luiz Augusto von Dentz (7):
-      Bluetooth: ISO: Don't reject BT_ISO_QOS if parameters are unset
-      Bluetooth: hci_sync: Fix using the same interval and window for Coded PHY
-      Bluetooth: SCO: Fix not validating setsockopt user input
-      Bluetooth: RFCOMM: Fix not validating setsockopt user input
-      Bluetooth: L2CAP: Fix not validating setsockopt user input
-      Bluetooth: ISO: Fix not validating setsockopt user input
-      Bluetooth: hci_sock: Fix not validating setsockopt user input
-
- include/net/bluetooth/bluetooth.h |  9 +++++++
- net/bluetooth/hci_request.c       |  4 ++-
- net/bluetooth/hci_sock.c          | 21 ++++++----------
- net/bluetooth/hci_sync.c          |  6 ++---
- net/bluetooth/iso.c               | 46 +++++++++++++++-------------------
- net/bluetooth/l2cap_core.c        |  3 +--
- net/bluetooth/l2cap_sock.c        | 52 +++++++++++++++------------------------
- net/bluetooth/rfcomm/sock.c       | 14 ++++-------
- net/bluetooth/sco.c               | 23 ++++++++---------
- 9 files changed, 79 insertions(+), 99 deletions(-)
+wt
+-- 
+You're more amazing than you think!
