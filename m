@@ -1,135 +1,272 @@
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B84E15B979
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Apr 2024 12:47:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38FCC154BE7
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Apr 2024 13:09:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712753240; cv=none; b=EIVY7uxlJoYTYM7EaiKkeZGdHGK/owimC7isFy7JQztLvH7ypR0/kYLXEC20m/Qvike+JI6d3zFjlphGgJ6CBNkR/KA3VuxRchk12TxBIy/AQ8IzwBmSqAstB0McbpTPFPYrcGyiy+/G0+7YGtGYy7FN/9+rfPz+JYESTWGV33Q=
+	t=1712754599; cv=none; b=JZ7fLutpDgV0zb2Kk58anudXZIsF3F6oE7ugtuMZh/cfLuoCjA8nKj9eu8VTdA0g8IL/mdnKyoMOekObnMFsga1i2NMBmlVnXSp+M+0RE1EmBVUXgzxI+grYxlm0q6IdMafjN1AGag/Ox26FzdbemLGdIzvmOW93xaBU3PecJfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712753240; c=relaxed/simple;
-	bh=nYwGcUeSu2lOGz0Fbu3qFb7BX7DjJR5EiBYQwBjfl1E=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=SDFV+qa75khGFukI/gPJifl0XSsUCNPPipV96ecEJdIcko9hsQhawgHbKJi6E8w7MMNljFh3xyAhLfX4jpfghvhDxF7Ay00oJtF5FLCD8yWpDVd0Okp6kRltPMxrMkSGt41pVUO9wXe3Th7t1/XQkj4O/F+xffv7toJAdgF7D30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=H5Li0XwV; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+	s=arc-20240116; t=1712754599; c=relaxed/simple;
+	bh=zSJWuHQTJoTx2818wlMK1YC229+wQmbrERk6B+aG32w=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=ZhRuxq437wvukw1kzHXSfNopWJE37CpvEYxHfhTjgFt3za5APHlWl118gw3lIr+IEUmOzJIKozzwvAbgc62sk/YnttY6CYZ8sSRqZN3XI2Q7Krxw6axnyc/MRXNunrFBngX4CqcuBxx8kk19rD7FMKyaluFCMhrOJCND3KiQAF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tb+KzUkN; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="H5Li0XwV"
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-41551639550so46313375e9.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Apr 2024 05:47:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tb+KzUkN"
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-434899d6d2bso13427951cf.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Apr 2024 06:09:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1712753234; x=1713358034; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5q7lk+2TIXEIJZSxUoCWXqCmqzprQnmyhj7L+zSgmo8=;
-        b=H5Li0XwVjeSHqbCIPNY5fzFSvaUuyaZzq+g6CHLT/phZKFa0FFKaPeg6hRLMiN3nYc
-         d6ZIoYhF6FPUhta9HgzwHzZ/foERyjbgAC7bVPjSKYQc4mK/r0vU51JFPwL4xfkhQ6Y5
-         vAtKDxSne7JOi8aVU/9G61eEStXoOxYGFJgOA6g+6BsffdvEEGNpvFDt54RQ49j1u+RP
-         qEfmq0j4dayWS/yyk7ZWP4aRhvD/q2MMP00l9qzHPP1lU6cuguJGqFS4EfHWhYDiClDF
-         erwR7IG73muufV16nDEj2d/EFa9C66RuClbELBHxvs6XwnhQV94sZr7GY8cAffjKLZnO
-         QDqg==
+        d=gmail.com; s=20230601; t=1712754596; x=1713359396; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=xQAbiBm3c3w9GOcNrCExAKBeBxXTtq/KWAxs+T2GHQY=;
+        b=Tb+KzUkN42sATkF2F4hGUdVWk73esiWKdykFXiLLpR7gaKC/25/BY54fl2XJnv1SGq
+         GSMmg1okXMAITAKMHyKPKUIwGw+h/js4C1W7O9SmMmB7hiHYoJPrlhZDJA0nY9l0Qr7R
+         WlsLVPvqU15UubVoc207Szx72C3nY6tGymYVGoVwoanJdBvxvJtkreCui0nGGngKBYon
+         aJkstQHruYtxWWQw7vMa++A930n6u3NBBSWWivYGKvcSzZBAN//mIwO2h56o+hbMZK5P
+         4uJWv5lZAhAfzjkUjioY10ylkVfSy8sfRajHuLVGVaecTiHv1x/b0SGS9cVSqwRWgKXC
+         lm9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712753234; x=1713358034;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5q7lk+2TIXEIJZSxUoCWXqCmqzprQnmyhj7L+zSgmo8=;
-        b=UfaAfB13V27kb0hGDfIX1rAmtqX1q4FdtwyC1d2EsPhdibGMNoZDNUdl9PPq1Xkki8
-         Lqj7V9RXFf6MLVIEbGFv/M83mL9hxeTaHX+qlLwfd0hmkCscN8w/fAHPD7dvzAmhCRrX
-         eUpMxHlYDyvKb06uS5/+G+kBz/tRPZ5i18cskzzGcI3TIeeEm8tIAcxPTcp1uFWS1bH/
-         MCHeKXDas8LWdacGoLMe1WqgW8AesR2peNY+wXWYejr/j5y6/ehOZJ7b+R/PAMzEk0Pa
-         Xl5myYlG0NH2WvQKFtAiGHerXcf7owK5R97qH/saH5xvPayOGD5euyQWaEQ0xENqfxdg
-         xTXw==
-X-Gm-Message-State: AOJu0YyFCJsFNtL5zp3EN42j7pNMmWUm0YEUN28kOeqrfnh4gtoaWGmA
-	5iyWa7ocL/RBHKaBpcvqQ2qdBAxH0nUVv5ODNdsg/WiE+YXYgVwIc7XYpGOMRxc=
-X-Google-Smtp-Source: AGHT+IGzNBVq2J4oXhJNVxf0m4Uq3S1m1LfJNb/cYzPTpCQQKQUTLV3uj9tFyoTEBHLmuaJd+/h9VA==
-X-Received: by 2002:a05:600c:1d24:b0:414:63c6:8665 with SMTP id l36-20020a05600c1d2400b0041463c68665mr2268143wms.2.1712753234433;
-        Wed, 10 Apr 2024 05:47:14 -0700 (PDT)
-Received: from brgl-uxlite.home ([2a01:cb1d:75a:e000:6908:7e99:35c9:d585])
-        by smtp.gmail.com with ESMTPSA id v13-20020a05600c444d00b0041663450a4asm2150929wmn.45.2024.04.10.05.47.13
+        d=1e100.net; s=20230601; t=1712754596; x=1713359396;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xQAbiBm3c3w9GOcNrCExAKBeBxXTtq/KWAxs+T2GHQY=;
+        b=AfMQx+2rtoZHzDpYo9uy76JvPA2zKWqUsXwQ7VWgnrL/1fkaHhoOgXhh5d0K2hULd2
+         K8l00Jh4Cow4raET7jk/89GnFtJjHQH80zogsgYdXqpgbH3TbFCwec/miNKsQHV8dST2
+         yMk2a+kHYKEJccF7z758X2hc58PQxNDcy9GRaJtMJkkNeWl5jCiDBqHhJRMXMDts2tO/
+         h9DFZ9D3X9Q4q9/PpTf5DHN32y+3FidSWJACmaUOEbR/3mTl8ikjA0B/Zy27ey48qNRn
+         cCv079BgyIiMSnkzJi44jPk/+O/edRk189IOGZc4hwYuvzqMlH4aPKSMlKjhb8ItMkWz
+         l4Iw==
+X-Gm-Message-State: AOJu0YwuVKcKB3kHCqf0LBuVJHxviF1j5m1LDbnQpLHgTDC6R/hDk2o4
+	GHir7QBgLJ+iVhkW0TE705gNy7QAj8LNIQJB7XMbWzv7PTcTs0dZE8XIlCqq
+X-Google-Smtp-Source: AGHT+IHnx31LkWMWPcT+Dd1GFNGXCzrna9EruZ13O/2pnEvWkZlycZvoPeRz7Spj4uUnKH3VGkQasQ==
+X-Received: by 2002:ac8:7d43:0:b0:434:9855:dc79 with SMTP id h3-20020ac87d43000000b004349855dc79mr2381541qtb.12.1712754595634;
+        Wed, 10 Apr 2024 06:09:55 -0700 (PDT)
+Received: from [172.17.0.2] ([20.81.46.145])
+        by smtp.gmail.com with ESMTPSA id q13-20020ac8734d000000b00434e990098bsm1412485qtp.77.2024.04.10.06.09.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 05:47:14 -0700 (PDT)
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Kalle Valo <kvalo@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	Saravana Kannan <saravanak@google.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Alex Elder <elder@linaro.org>,
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Abel Vesa <abel.vesa@linaro.org>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Lukas Wunner <lukas@wunner.de>,
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-	Amit Pundir <amit.pundir@linaro.org>,
-	Xilin Wu <wuxilin123@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-pci@vger.kernel.org,
-	linux-pm@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: [PATCH v7 16/16] PCI/pwrctl: add a PCI power control driver for power sequenced devices
-Date: Wed, 10 Apr 2024 14:46:28 +0200
-Message-Id: <20240410124628.171783-17-brgl@bgdev.pl>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240410124628.171783-1-brgl@bgdev.pl>
-References: <20240410124628.171783-1-brgl@bgdev.pl>
+        Wed, 10 Apr 2024 06:09:55 -0700 (PDT)
+Message-ID: <66168fa3.c80a0220.7312b.59f2@mx.google.com>
+Date: Wed, 10 Apr 2024 06:09:55 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7327757627076139032=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, brgl@bgdev.pl
+Subject: RE: power: sequencing: implement the subsystem and add first users
+In-Reply-To: <20240410124628.171783-2-brgl@bgdev.pl>
+References: <20240410124628.171783-2-brgl@bgdev.pl>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+--===============7327757627076139032==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Add a PCI power control driver that's capable of correctly powering up
-devices using the power sequencing subsystem. The first user of this
-driver is the ath11k module on QCA6390.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
----
- drivers/pci/pwrctl/Kconfig             |  9 +++
- drivers/pci/pwrctl/Makefile            |  2 +
- drivers/pci/pwrctl/pci-pwrctl-pwrseq.c | 89 ++++++++++++++++++++++++++
- 3 files changed, 100 insertions(+)
- create mode 100644 drivers/pci/pwrctl/pci-pwrctl-pwrseq.c
+Dear submitter,
 
-diff --git a/drivers/pci/pwrctl/Kconfig b/drivers/pci/pwrctl/Kconfig
-index 96195395af69..eb126225eb9f 100644
---- a/drivers/pci/pwrctl/Kconfig
-+++ b/drivers/pci/pwrctl/Kconfig
-@@ -5,4 +5,13 @@ menu "PCI Power control drivers"
- config PCI_PWRCTL
- 	tristate
- 
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=843230
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      16.93 seconds
+GitLint                       FAIL      8.77 seconds
+SubjectPrefix                 FAIL      2.19 seconds
+BuildKernel                   PASS      30.45 seconds
+CheckAllWarning               PASS      32.94 seconds
+CheckSparse                   PASS      40.05 seconds
+CheckSmatch                   FAIL      35.10 seconds
+BuildKernel32                 PASS      29.13 seconds
+TestRunnerSetup               PASS      522.11 seconds
+TestRunner_l2cap-tester       PASS      18.32 seconds
+TestRunner_iso-tester         PASS      30.89 seconds
+TestRunner_bnep-tester        PASS      4.70 seconds
+TestRunner_mgmt-tester        PASS      114.43 seconds
+TestRunner_rfcomm-tester      PASS      7.31 seconds
+TestRunner_sco-tester         PASS      14.99 seconds
+TestRunner_ioctl-tester       PASS      7.73 seconds
+TestRunner_mesh-tester        PASS      5.79 seconds
+TestRunner_smp-tester         PASS      7.01 seconds
+TestRunner_userchan-tester    PASS      4.84 seconds
+IncrementalBuild              PASS      96.94 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v7,01/16] regulator: dt-bindings: describe the PMU module of the QCA6390 package
+WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+#151: 
+new file mode 100644
+
+total: 0 errors, 1 warnings, 151 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13624277.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[v7,05/16] dt-bindings: net: wireless: describe the ath12k PCI module
+WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+#149: 
+new file mode 100644
+
+total: 0 errors, 1 warnings, 99 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13624281.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[v7,06/16] arm64: dts: qcom: sm8550-qrd: add the Wifi node
+WARNING: DT compatible string vendor "pci17cb" appears un-documented -- check ./Documentation/devicetree/bindings/vendor-prefixes.yaml
+#227: FILE: arch/arm64/boot/dts/qcom/sm8550-qrd.dts:891:
++		compatible = "pci17cb,1107";
+
+total: 0 errors, 1 warnings, 137 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13624282.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[v7,07/16] arm64: dts: qcom: sm8650-qrd: add the Wifi node
+WARNING: DT compatible string vendor "pci17cb" appears un-documented -- check ./Documentation/devicetree/bindings/vendor-prefixes.yaml
+#230: FILE: arch/arm64/boot/dts/qcom/sm8650-qrd.dts:915:
++		compatible = "pci17cb,1107";
+
+total: 0 errors, 1 warnings, 123 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13624283.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[v7,08/16] arm64: dts: qcom: qrb5165-rb5: add the Wifi node
+WARNING: DT compatible string vendor "pci17cb" appears un-documented -- check ./Documentation/devicetree/bindings/vendor-prefixes.yaml
+#225: FILE: arch/arm64/boot/dts/qcom/qrb5165-rb5.dts:800:
++		compatible = "pci17cb,1101";
+
+total: 0 errors, 1 warnings, 143 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13624284.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[v7,12/16] PCI/pwrctl: add PCI power control core code
+WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+#188: 
+new file mode 100644
+
+total: 0 errors, 1 warnings, 213 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13624288.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[v7,13/16] power: sequencing: implement the pwrseq core
+WARNING: ENOSYS means 'invalid syscall nr' and nothing else
+#1330: FILE: include/linux/pwrseq/consumer.h:31:
++	return ERR_PTR(-ENOSYS);
+
+WARNING: ENOSYS means 'invalid syscall nr' and nothing else
+#1340: FILE: include/linux/pwrseq/consumer.h:41:
++	return ERR_PTR(-ENOSYS);
+
+WARNING: ENOSYS means 'invalid syscall nr' and nothing else
+#1345: FILE: include/linux/pwrseq/consumer.h:46:
++	return -ENOSYS;
+
+WARNING: ENOSYS means 'invalid syscall nr' and nothing else
+#1350: FILE: include/linux/pwrseq/consumer.h:51:
++	return -ENOSYS;
+
+total: 0 errors, 4 warnings, 1234 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13624290.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[v7,14/16] power: pwrseq: add a driver for the PMU module on the QCom WCN chipsets
+WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+#185: 
+new file mode 100644
+
+total: 0 errors, 1 warnings, 360 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13624289.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[v7,16/16] PCI/pwrctl: add a PCI power control driver for power sequenced devices
+WARNING: please write a help paragraph that fully describes the config symbol
+#157: FILE: drivers/pci/pwrctl/Kconfig:8:
 +config PCI_PWRCTL_PWRSEQ
 +	tristate "PCI Power Control driver using the Power Sequencing subsystem"
 +	select POWER_SEQUENCING
@@ -139,112 +276,112 @@ index 96195395af69..eb126225eb9f 100644
 +	  Enable support for the PCI power control driver for device
 +	  drivers using the Power Sequencing subsystem.
 +
- endmenu
-diff --git a/drivers/pci/pwrctl/Makefile b/drivers/pci/pwrctl/Makefile
-index 52ae0640ef7b..d308aae4800c 100644
---- a/drivers/pci/pwrctl/Makefile
-+++ b/drivers/pci/pwrctl/Makefile
-@@ -2,3 +2,5 @@
- 
- obj-$(CONFIG_PCI_PWRCTL)		+= pci-pwrctl-core.o
- pci-pwrctl-core-y			:= core.o
-+
-+obj-$(CONFIG_PCI_PWRCTL_PWRSEQ)		+= pci-pwrctl-pwrseq.o
-diff --git a/drivers/pci/pwrctl/pci-pwrctl-pwrseq.c b/drivers/pci/pwrctl/pci-pwrctl-pwrseq.c
-new file mode 100644
-index 000000000000..c7a113a76c0c
---- /dev/null
-+++ b/drivers/pci/pwrctl/pci-pwrctl-pwrseq.c
-@@ -0,0 +1,89 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2024 Linaro Ltd.
-+ */
-+
-+#include <linux/device.h>
-+#include <linux/mod_devicetable.h>
-+#include <linux/module.h>
-+#include <linux/of.h>
-+#include <linux/pci-pwrctl.h>
-+#include <linux/platform_device.h>
-+#include <linux/pwrseq/consumer.h>
-+#include <linux/slab.h>
-+#include <linux/types.h>
-+
-+struct pci_pwrctl_pwrseq_data {
-+	struct pci_pwrctl ctx;
-+	struct pwrseq_desc *pwrseq;
-+};
-+
-+static void devm_pci_pwrctl_pwrseq_power_off(void *data)
-+{
-+	struct pwrseq_desc *pwrseq = data;
-+
-+	pwrseq_power_off(pwrseq);
-+}
-+
-+static int pci_pwrctl_pwrseq_probe(struct platform_device *pdev)
-+{
-+	struct pci_pwrctl_pwrseq_data *data;
-+	struct device *dev = &pdev->dev;
-+	int ret;
-+
-+	data = devm_kzalloc(dev, sizeof(*data), GFP_KERNEL);
-+	if (!data)
-+		return -ENOMEM;
-+
-+	data->pwrseq = devm_pwrseq_get(dev, of_device_get_match_data(dev));
-+	if (IS_ERR(data->pwrseq))
-+		return dev_err_probe(dev, PTR_ERR(data->pwrseq),
-+				     "Failed to get the power sequencer\n");
-+
-+	ret = pwrseq_power_on(data->pwrseq);
-+	if (ret)
-+		return dev_err_probe(dev, ret,
-+				     "Failed to power-on the device\n");
-+
-+	ret = devm_add_action_or_reset(dev, devm_pci_pwrctl_pwrseq_power_off,
-+				       data->pwrseq);
-+	if (ret)
-+		return ret;
-+
-+	data->ctx.dev = dev;
-+
-+	ret = devm_pci_pwrctl_device_set_ready(dev, &data->ctx);
-+	if (ret)
-+		return dev_err_probe(dev, ret,
-+				     "Failed to register the pwrctl wrapper\n");
-+
-+	return 0;
-+}
-+
-+static const struct of_device_id pci_pwrctl_pwrseq_of_match[] = {
-+	{
-+		/* ATH11K in QCA6390 package. */
-+		.compatible = "pci17cb,1101",
-+		.data = "wlan",
-+	},
-+	{
-+		/* ATH12K in WCN7850 package. */
-+		.compatible = "pci17cb,1107",
-+		.data = "wlan",
-+	},
-+	{ }
-+};
-+MODULE_DEVICE_TABLE(of, pci_pwrctl_pwrseq_of_match);
-+
-+static struct platform_driver pci_pwrctl_pwrseq_driver = {
-+	.driver = {
-+		.name = "pci-pwrctl-pwrseq",
-+		.of_match_table = pci_pwrctl_pwrseq_of_match,
-+	},
-+	.probe = pci_pwrctl_pwrseq_probe,
-+};
-+module_platform_driver(pci_pwrctl_pwrseq_driver);
-+
-+MODULE_AUTHOR("Bartosz Golaszewski <bartosz.golaszewski@linaro.org>");
-+MODULE_DESCRIPTION("Generic PCI Power Control module for power sequenced devices");
-+MODULE_LICENSE("GPL");
--- 
-2.40.1
 
+WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+#178: 
+new file mode 100644
+
+WARNING: DT compatible string vendor "pci17cb" appears un-documented -- check ./Documentation/devicetree/bindings/vendor-prefixes.yaml
+#248: FILE: drivers/pci/pwrctl/pci-pwrctl-pwrseq.c:66:
++		.compatible = "pci17cb,1101",
+
+WARNING: DT compatible string vendor "pci17cb" appears un-documented -- check ./Documentation/devicetree/bindings/vendor-prefixes.yaml
+#253: FILE: drivers/pci/pwrctl/pci-pwrctl-pwrseq.c:71:
++		.compatible = "pci17cb,1107",
+
+total: 0 errors, 4 warnings, 107 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13624292.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v7,01/16] regulator: dt-bindings: describe the PMU module of the QCA6390 package
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (81>80): "[v7,01/16] regulator: dt-bindings: describe the PMU module of the QCA6390 package"
+15: B1 Line exceeds max length (85>80): " create mode 100644 Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml"
+[v7,02/16] regulator: dt-bindings: describe the PMU module of the WCN7850 package
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (81>80): "[v7,02/16] regulator: dt-bindings: describe the PMU module of the WCN7850 package"
+[v7,03/16] dt-bindings: net: bluetooth: qualcomm: describe regulators for QCA6390
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (81>80): "[v7,03/16] dt-bindings: net: bluetooth: qualcomm: describe regulators for QCA6390"
+[v7,04/16] dt-bindings: net: wireless: qcom,ath11k: describe the ath11k on QCA6390
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (82>80): "[v7,04/16] dt-bindings: net: wireless: qcom,ath11k: describe the ath11k on QCA6390"
+[v7,05/16] dt-bindings: net: wireless: describe the ath12k PCI module
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+13: B1 Line exceeds max length (83>80): " create mode 100644 Documentation/devicetree/bindings/net/wireless/qcom,ath12k.yaml"
+[v7,11/16] PCI/pwrctl: create platform devices for child OF nodes of the port node
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (82>80): "[v7,11/16] PCI/pwrctl: create platform devices for child OF nodes of the port node"
+[v7,14/16] power: pwrseq: add a driver for the PMU module on the QCom WCN chipsets
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (82>80): "[v7,14/16] power: pwrseq: add a driver for the PMU module on the QCom WCN chipsets"
+[v7,16/16] PCI/pwrctl: add a PCI power control driver for power sequenced devices
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (81>80): "[v7,16/16] PCI/pwrctl: add a PCI power control driver for power sequenced devices"
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
+
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7327757627076139032==--
