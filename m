@@ -1,154 +1,141 @@
-Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CE2520EB;
-	Wed, 10 Apr 2024 03:53:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=206.189.21.223
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EF1538C
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Apr 2024 04:33:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712721205; cv=none; b=SNn5LraKHAsx5Kk6vHlmgK8SzPttVwl8H5FxcSqaOYBCJucQEP4iCbKJUw/Ruct7oCE0fBqbNMdvZ0ei18I5Lg03Gm45ZEetHbcnH/Kd2FNXPnte7oY0tJdNizVFkvWeTEW0UX4TWZkbK+63ZhnRuSP89m5wJVzynOcTAWvo1gg=
+	t=1712723636; cv=none; b=Rgy28nLz+yTR2CwXY2k0Z4Y1NV/9JDcu/6n0MHHl8AKKCiQEqQSk1FGAQKVCJhIRgMLitCfbrAgxw/BoPuibdCfFclBSh/4Ol2xlLAi/7BFbY6a1DwUoilUg/RsNwVnNkl5rhRYJ8oaFq+1lVsQWSqq7Uv/8RIxp68SpONWUXFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712721205; c=relaxed/simple;
-	bh=VY1r65IiB4CyR69n168a92EjuLdXbUDvXcgwt9yvfQ4=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=MzNoqnk44WdFdtB4GJ/xJ79VbpJP2jaxupIYtXj4kUVhXy+Yew3Cd7y+YQCFf9eEGhiBHzxKql1UwaFTVVGY5NMCQvb+N9NWpAh+XKs5Fco0oF1L/JaSkGPTYJsstC6D7G6ryXKGR5BJhIbShAiHxkfJumzjJHq/aRW6dAZnf5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=206.189.21.223
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from ubuntu.localdomain (unknown [218.12.17.105])
-	by mail-app3 (Coremail) with SMTP id cC_KCgBnOu0dDRZmZEGBAA--.65136S2;
-	Wed, 10 Apr 2024 11:53:07 +0800 (CST)
-From: Duoming Zhou <duoming@zju.edu.cn>
-To: linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	luiz.dentz@gmail.com,
-	johan.hedberg@gmail.com,
-	marcel@holtmann.org,
-	Duoming Zhou <duoming@zju.edu.cn>
-Subject: [PATCH v2] Bluetooth: Fix use-after-free bug caused by hci_cmd_timeout
-Date: Wed, 10 Apr 2024 11:53:00 +0800
-Message-Id: <20240410035300.21160-1-duoming@zju.edu.cn>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:cC_KCgBnOu0dDRZmZEGBAA--.65136S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxJFy3XF48JF4kuF1DJr13Arb_yoW5tr4Dpr
-	Z09ryfArWkXry2yr4xJa18trykuFsIvr9rGrZ2qr1fAwsxK3yjya4jka4jqF17uFyvyFyU
-	WF1DXr9rXFs8Kw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4U
-	JVW0owA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AKxVWU
-	AVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkG
-	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-	0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4U
-	MIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUjuHq7UUUU
-	U==
-X-CM-SenderInfo: qssqjiasttq6lmxovvfxof0/1tbiAwIGAWYVR5sEWQBQsk
+	s=arc-20240116; t=1712723636; c=relaxed/simple;
+	bh=OmTtvRqmTn/zoRxvkWq8zIX510a0x+niYN8e0enc+Bw=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=rjcrRM2or/xMP75jSJzfaS0X/otKXG0NQlcRbIhkOSNrWMdTZ64b4yvv47nJL4PoyJykDR4pyzgkXlP9qKFIuRRNhvsNYHGZQJGoSfx/Ph0muRruans8v0+5DS9yoIyM0MQhIgATpQkxj/ZbnYNMM2Gdox3udQjmBumBTJ9rV+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dyHhuSpx; arc=none smtp.client-ip=209.85.222.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dyHhuSpx"
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-78d723c0d9fso80588285a.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Apr 2024 21:33:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712723633; x=1713328433; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=wATASWWtvtieBRGyzF9jz5KvnDM913oBlNHdFIixY98=;
+        b=dyHhuSpxMFNgmPXow11cGfQpX6Na69S1noh97FBLHIwvmYQ0hrDbMjYC2huj2EfLU9
+         BQ9YdgIyXBSqhbh+BhpaKkM+cZlO8BiKJFDb7x8MehgZaBdZq0qC1pOjrmh90wZ1e+DC
+         RSyyQ0BbD/LTiR8iqUJY4oMW4jCed775H0EFoOO3g50120RQFzogOo9VkP4i5hi1wV6e
+         ancBhxkK2kVfiT4phhZFtJCJwjA4gkCiFVzs9qxyTD9q4DLsaARijEKCVwtpkq3gLJgR
+         n8RC7o3spjH9FQW7T0gFK35wXMXD4GYv9CvMBgn5gsnDUj4H/1OCC42OnMrf84JhMVuw
+         3Vrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712723633; x=1713328433;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wATASWWtvtieBRGyzF9jz5KvnDM913oBlNHdFIixY98=;
+        b=uxyrIUXVxquFbMzyhcCFR+aS2eITc4aF9hW18DIrbpLF0HPWG7KRwQhCa+LgzZdNS1
+         LrqeXbttl/HS/et74tYTQ98obLj6LzkxMTRjq6cnTEuQ3ck9GdFH+eeD5BHN5cMMBAWG
+         3qosH49hpewFXUY0dohdo4dUWNL7VHnhpcfga9PYpx7uwgoxT1gQch5fadhIkgmooBYT
+         /fDla7sqQXkmlP3uzFLXLtUCnkTjUZurzrp9/+fuNvo7TpraqW3mH5RAljVvAkrEUU6v
+         F9BRQRjsrkJgj178aW48vEB4PzZUR4qiyToBOaTQ7obvaJk+H1PkCKhbXNWtZ779yesV
+         Hxkg==
+X-Gm-Message-State: AOJu0YzCcJ9gLstSrXpalBBiTHzVyusnrGkb9z0gtJRtLU24Ev4FdmD7
+	b2o/MUuYC6wPufHgr64V88n/xMTOWrq8T8CaiKotBXoc8uBSZPtDFqxmd2BI
+X-Google-Smtp-Source: AGHT+IGJ1yVqj1jA3ba5GAi5QXCPNE9RLp8YzFnSiJSag4GvCzHjZZavFe6n9BEguZBFEQgc7u3rfw==
+X-Received: by 2002:a05:620a:46a5:b0:78e:b9a8:a0c5 with SMTP id bq37-20020a05620a46a500b0078eb9a8a0c5mr19698qkb.67.1712723633336;
+        Tue, 09 Apr 2024 21:33:53 -0700 (PDT)
+Received: from [172.17.0.2] ([20.109.39.180])
+        by smtp.gmail.com with ESMTPSA id b11-20020a05620a088b00b0078d3b54eb76sm4756365qka.78.2024.04.09.21.33.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Apr 2024 21:33:53 -0700 (PDT)
+Message-ID: <661616b1.050a0220.7963a.9b86@mx.google.com>
+Date: Tue, 09 Apr 2024 21:33:53 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1414485021191414069=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, duoming@zju.edu.cn
+Subject: RE: [v2] Bluetooth: Fix use-after-free bug caused by hci_cmd_timeout
+In-Reply-To: <20240410035300.21160-1-duoming@zju.edu.cn>
+References: <20240410035300.21160-1-duoming@zju.edu.cn>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-When the kernel send a command to the hci device, the hdev->cmd_timer
-will be scheduled to judge whether is command is timeout.
+--===============1414485021191414069==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Meanwhile, the user space program uses ioctl(..., HCI_INQUIRY) to inquiry
-the status of the command, it will wait the reply of the command until
-the command is timeout. If it is timeout, the req_skb will be deallocated,
-but req_skb could be dereferenced in hci_cmd_timeout() as well.
+This is automated email and please do not reply to this email!
 
-As a result, the use-after-free bug will happen. One of the scenarios
-that could trigger the bug is shown below:
+Dear submitter,
 
-     thread 1                       thread2
-hci_sock_ioctl()             | hci_sock_sendmsg()
- hci_inquiry()               |  queue_work(...,&hdev->cmd_work)
-  hci_req_sync()             |   hci_cmd_work()
-   __hci_req_sync()          |    queue_delayed_work(...,&hdev->cmd_timer)
-    kfree_skb(hdev->req_skb) |     hci_cmd_timeout()
-                             |      hci_skb_opcode(hdev->req_skb)
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=843066
 
-The KASan report for such a POC is shown below:
+---Test result---
 
- ==================================================================
- BUG: KASAN: slab-use-after-free in hci_cmd_timeout+0x3c/0x110
- Read of size 2 at addr ffff8880087a1c78 by task kworker/u21:0/131
- ...
- Workqueue: hci0 hci_cmd_timeout
- Call Trace:
-  <TASK>
-  dump_stack_lvl+0x84/0xc0
-  print_address_description+0x78/0x440
-  print_report+0x11b/0x220
-  ? pfn_valid+0xe4/0x140
-  ? __virt_addr_valid+0x7c/0x90
-  ? hci_cmd_timeout+0x3c/0x110
-  kasan_report+0xc7/0x100
-  ? hci_cmd_timeout+0x3c/0x110
-  hci_cmd_timeout+0x3c/0x110
-  process_one_work+0x2df/0x610
-  worker_thread+0x72f/0x870
-  ? pr_cont_work+0x280/0x280
-  kthread+0x18a/0x1b0
-  ? kthread_blkcg+0x50/0x50
-  ret_from_fork+0x34/0x50
-  ? kthread_blkcg+0x50/0x50
-  ret_from_fork_asm+0x11/0x20
-  </TASK>
+Test Summary:
+CheckPatch                    PASS      0.65 seconds
+GitLint                       PASS      0.31 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      30.68 seconds
+CheckAllWarning               PASS      33.50 seconds
+CheckSparse                   PASS      38.47 seconds
+CheckSmatch                   FAIL      34.98 seconds
+BuildKernel32                 PASS      29.46 seconds
+TestRunnerSetup               PASS      528.64 seconds
+TestRunner_l2cap-tester       PASS      18.47 seconds
+TestRunner_iso-tester         FAIL      35.00 seconds
+TestRunner_bnep-tester        PASS      4.72 seconds
+TestRunner_mgmt-tester        PASS      107.82 seconds
+TestRunner_rfcomm-tester      PASS      7.34 seconds
+TestRunner_sco-tester         PASS      14.96 seconds
+TestRunner_ioctl-tester       PASS      7.83 seconds
+TestRunner_mesh-tester        PASS      5.83 seconds
+TestRunner_smp-tester         PASS      6.81 seconds
+TestRunner_userchan-tester    PASS      4.87 seconds
+IncrementalBuild              PASS      28.58 seconds
 
- Allocated by task 131 on cpu 1 at 45.611537s:
-  kasan_save_track+0x32/0x90
-  __kasan_slab_alloc+0x4b/0x60
-  kmem_cache_alloc+0xcb/0x240
-  skb_clone+0x117/0x170
-  hci_cmd_work+0x19c/0x2a0
-  process_one_work+0x2df/0x610
-  worker_thread+0x72f/0x870
-  kthread+0x18a/0x1b0
-  ret_from_fork+0x34/0x50
-  ret_from_fork_asm+0x11/0x20
+Details
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
 
- Freed by task 135 on cpu 2 at 47.671850s:
-  kasan_save_track+0x32/0x90
-  kasan_save_free_info+0x40/0x50
-  poison_slab_object+0x118/0x180
-  __kasan_slab_free+0x12/0x30
-  kmem_cache_free+0x92/0x200
-  __hci_req_sync+0x2e2/0x350
-  hci_req_sync+0x73/0x90
-  hci_inquiry+0x1c1/0x350
-  sock_do_ioctl+0x50/0x1a0
-  sock_ioctl+0x2ea/0x3b0
-  __se_sys_ioctl+0x89/0xd0
-  do_syscall_64+0xc4/0x1b0
-  entry_SYSCALL_64_after_hwframe+0x62/0x6a
-  ...
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+Total: 121, Passed: 120 (99.2%), Failed: 1, Not Run: 0
 
-In order to mitigate the bug, add cancel_delayed_work_sync() in
-__hci_req_sync() to cancel the cmd_timer before the req_skb is
-deallocated when the command is timeout.
+Failed Test Cases
+ISO Connect Suspend - Success                        Failed       4.183 seconds
 
-Fixes: 9afee94939e3 ("Bluetooth: Fix memory leak at end of hci requests")
-Signed-off-by: Duoming Zhou <duoming@zju.edu.cn>
+
 ---
-Changes in v2:
-  - Call cancel_delayed_work_sync() only if the command is timeout.
+Regards,
+Linux Bluetooth
 
- net/bluetooth/hci_request.c | 1 +
- 1 file changed, 1 insertion(+)
 
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 00e02138003..0b002f01816 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -174,6 +174,7 @@ int __hci_req_sync(struct hci_dev *hdev, int (*func)(struct hci_request *req,
- 
- 	default:
- 		err = -ETIMEDOUT;
-+		cancel_delayed_work_sync(&hdev->cmd_timer);
- 		if (hci_status)
- 			*hci_status = HCI_ERROR_UNSPECIFIED;
- 		break;
--- 
-2.17.1
-
+--===============1414485021191414069==--
