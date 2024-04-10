@@ -1,57 +1,56 @@
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11D8B4C94
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Apr 2024 22:40:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5551F79CF
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Apr 2024 23:01:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712788837; cv=none; b=bQRIEDkGwVeNCwxLR/bi6iznCm76jRwM1q4JT+gz1/nuo7eV1lhI/rfundDWplzX1qHpQTY4lB8bbmd9mbFntNirP6dVj7eBdnG1RyA/JIfzDDD/z7skCgdEFvjff/v//WBkissZ7i1AVaYGtgMdb441m7kDnecBlnETDY1EjMo=
+	t=1712790072; cv=none; b=B/w7WQDHDFhoPS4lAEfd3my4ihzCEjJRetjPpTO2+r6vSId/yBbNQPjYgoMa9bfi/bvInwPSOICmSrNGdV5RhfC8PsHZWoTWBf3c1CoHt7NxNSnsUMT1ZbmksWND1BmUpvEBJZQdbYwWHkWcFFu+R3CDVGSk+x8lfZp7aQoH6bc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712788837; c=relaxed/simple;
-	bh=Dk/k8coIJuxws2Ts0tamfDKSyZTA0mAmU752Cbww7t4=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=rY1xrR9mcb2gvbe6asXXBm33QK7wkSKMwIiV26d0rMTBbmqDB3sGcJYTCPwQ4UleVxXq7gdGvKi6aDHgTFHx0pDPFL+UXMFsaRv4fW/eavZElH30/lnlnqhvX8UOIGviqJHfkDnFuQ5kHOzhopD89ZFHXzc/T+2MES/LIVKzjLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=EviDFuD/; arc=none smtp.client-ip=209.85.210.175
+	s=arc-20240116; t=1712790072; c=relaxed/simple;
+	bh=ilLFD4vOBSIwNehXlfwZt7AygpzZEnRLF5H30ksXejo=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
+	 In-Reply-To:Content-Type; b=XM+RL48aD1V613JvpQ8Esc2hIwtP4Rp82uf3pfbBNYnwS2WeOK05jh4c0ISY8JEZzu0sBK7gInqbE7EYGrLt/oQ8AaPQVQVkIbeJNT/eFoUWvN6NKG1xJsAXtKR6IUB06EIjoEBPVHQA4bRUdCVq8tnB1CuTAm2ZGR+lJK7JgFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=OyNwtBKe; arc=none smtp.client-ip=209.85.210.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=penguintechs.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="EviDFuD/"
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6ed01c63657so4921711b3a.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Apr 2024 15:40:34 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="OyNwtBKe"
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6ed627829e6so2826862b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Apr 2024 16:01:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=penguintechs.org; s=google; t=1712788834; x=1713393634; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=soEZM/3jVaj/ItjpFqCPn2azxLmCK0C35uqBfBYWbaU=;
-        b=EviDFuD/5TBKV0wG1QUe/6yMJNzVVer4xHCe4+cwqFEXiM3UymLlMy0/uKqumqMlo2
-         QcF7ecjo53iDLRQUNj9qZhYw8q+0EwgRcjlTujGolS7T3B7rJvaaesgvltoN6UOP4GXP
-         vPH6rLn4d81mqHbSZdWMTOhxHFola3kivnvco=
+        d=penguintechs.org; s=google; t=1712790068; x=1713394868; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:references:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=N9atpKvibNMMPDU/p/6YOaCxNbIU+vS/gVjEm2gnxV4=;
+        b=OyNwtBKeHcH2DT9UryR2joUjUbArMnWEB95II1UCJFyyq5KwvaSt8NuGRER+infDCJ
+         OP5fXPfqfA6ZyTlTQR0xbnRTmVc8U2b+LZZq0QHjPO7685BHeGlSy3j3dttcMrU61UpI
+         jN+2spMcomdlF/IujWcyKL7EngHW3FDtlgibM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712788834; x=1713393634;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1712790068; x=1713394868;
+        h=content-transfer-encoding:in-reply-to:references:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=soEZM/3jVaj/ItjpFqCPn2azxLmCK0C35uqBfBYWbaU=;
-        b=UBOpdIMYh39bipqaHT68uJO0DQZO7fi01r+9piAsYuMdmhMpg4dLw2DpvEXYCyIMC/
-         zc1cShQ9amAYi4vEyw4JKir4kc//B2qY//FqA6BYrLZ2mzDW5Tp57hTT4hlU3ws57xof
-         eRf1pGaFm8UTGv/0q7tHcSJDsLlqnkgG4PuAjifSqLJdqEJW7+dJH3y10d2FaNZjFeTw
-         0JlMo7Lf/8Pa832b02Z9DZu/w33kT3hruHvflXu82VYnoifKE+NAzzLL4wxfCrOkknCa
-         /FsKhdMAIWLiMFnWI6gz7Xn0q+u2SJ6aV2suoxElsrWsLBmMZTtF1YVVumDvw+usvFaY
-         W9ug==
-X-Forwarded-Encrypted: i=1; AJvYcCUSLfWTuhxW1CqBXS1Dh9ZVqjEmZqsZuH1xeP85DRC8G7Ciz43nVadI+ahSDLShc7g5bZZP3WIXALDvuVPPiyxvxN801aIy4xBV2YDTcf/s
-X-Gm-Message-State: AOJu0Yw8FYc636b7OL1QLt7EmJ+qFCbj6xce+IcM4Jf6UtuDb+SK/MKs
-	EqCktUM7pYYI2nQBrgQ+Gj7p+FUPsYEuI/qBloolFPFgiTh95zgdoRjw20gFPDjfFosyLd6MCYo
-	Ekg==
-X-Google-Smtp-Source: AGHT+IF7/I+UW2aRd7T6Ky1OR8EPkbbZg4FHEpxyZnPDrN6EZpxIopUpklml4CBddN9rW7g+uAfZLA==
-X-Received: by 2002:a05:6a00:803:b0:6eb:40:6bff with SMTP id m3-20020a056a00080300b006eb00406bffmr4730839pfk.14.1712788833990;
-        Wed, 10 Apr 2024 15:40:33 -0700 (PDT)
+        bh=N9atpKvibNMMPDU/p/6YOaCxNbIU+vS/gVjEm2gnxV4=;
+        b=XwxqidtjNpvDIER13na5GRD/PJoMHTfTj+4gzUc9B04eWbDn02xcQl6OQr0Ck0ivkO
+         cTs8uDv3+gROzGz4+seSRPHZhu6cE9kpErDpXrA9GkujhczK3uKmYhTbyIpfXYSJCkNf
+         9SHoFtS+TA9RnuQy52pszLYJHVs8qQOMqpyYI7TGh4agwZNEmA5JNLmGxWNy36vA7j7m
+         FXlewhBbkHZUudyaaKJ1ORb8xQqkuG7zsSGsvvxFnI+GYyegCS0f3W/TYSln+dk6z19P
+         P+oYwMaDEKPUPor589OQ3FSC/RrlY1EzoafpN3du5ShLRwEBK1okkzuE/YWe5J4Mu7Az
+         I9QQ==
+X-Gm-Message-State: AOJu0YyLYGo/dmuU9OdCh/r0o4SUhsJchEdMXblzY/3nS7ay7Wj7LGcp
+	cM3cGqmOPam9KBXD6KIX2tak/Y/1O7AKQ3bOYmhp0541nhWuCcbLO1W6mulWbWT9xHyuOHUrElP
+	Xlw==
+X-Google-Smtp-Source: AGHT+IEtv0ybuu5yXi0HbR/ZSFNpWnPLHZCH7C2nLUP4kN5ai4Xvgkx4B/ORFnISO39yrTnaPIjKyg==
+X-Received: by 2002:a05:6a00:4b55:b0:6ea:bf1c:9dfd with SMTP id kr21-20020a056a004b5500b006eabf1c9dfdmr4423849pfb.27.1712790068485;
+        Wed, 10 Apr 2024 16:01:08 -0700 (PDT)
 Received: from ?IPV6:2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08? ([2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08])
-        by smtp.gmail.com with ESMTPSA id bw36-20020a056a0204a400b005dc507e8d13sm40322pgb.91.2024.04.10.15.40.32
+        by smtp.gmail.com with ESMTPSA id go16-20020a056a003b1000b006e64ddfa71asm172349pfb.170.2024.04.10.16.01.07
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Apr 2024 15:40:33 -0700 (PDT)
-Message-ID: <8162d6c7-d968-465e-bb8f-3c939eb8d783@penguintechs.org>
-Date: Wed, 10 Apr 2024 15:40:31 -0700
+        Wed, 10 Apr 2024 16:01:07 -0700 (PDT)
+Message-ID: <3f2591c7-2523-47cc-817d-1f67630c8784@penguintechs.org>
+Date: Wed, 10 Apr 2024 16:01:06 -0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -59,77 +58,45 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: QCA6390 bluetooth doesn't work after warm boot or
- disable/reenable
-From: Wren Turkal <wt@penguintechs.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>
-Cc: ath11k@lists.infradead.org, linux-bluetooth@vger.kernel.org,
- Kalle Valo <kvalo@kernel.org>
-References: <a03dace1-ca0f-41d6-8e2c-636e3b053a3a@penguintechs.org>
- <31bb6e18-ecee-49b3-87d7-50ab53e07447@penguintechs.org>
- <1b3d3937-6679-491e-a5c6-818ae8ac639a@penguintechs.org>
- <b592d037-41ed-42e8-8c3c-286eb1a68ceb@penguintechs.org>
- <68a31d6a-8eb8-4d78-819b-fb67367cc41d@penguintechs.org>
- <CABBYNZJQUy37fxWuCXV1OgM+DNnOr7V0h_rkgcSdw-5hF7iauQ@mail.gmail.com>
- <fca46585-c1ed-4a60-91b5-6da39a5bbdec@penguintechs.org>
- <02400664-2d23-42d3-b49b-0c59f606d298@penguintechs.org>
+Subject: Re: dead link for subscribing to mailing list on bluez website
 Content-Language: en-US
-In-Reply-To: <02400664-2d23-42d3-b49b-0c59f606d298@penguintechs.org>
+From: Wren Turkal <wt@penguintechs.org>
+To: linux-bluetooth@vger.kernel.org,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Marcel Holtmann <marcel@holtmann.org>
+References: <980ac002-efb7-4ed7-92ac-fb0caca41b59@penguintechs.org>
+In-Reply-To: <980ac002-efb7-4ed7-92ac-fb0caca41b59@penguintechs.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 4/10/24 3:00 PM, Wren Turkal wrote:
-> +Johan since he's a former BT drivers maintainer.
-> 
-> On 4/9/24 1:11 PM, Wren Turkal wrote:
->> On 4/9/24 1:03 PM, Luiz Augusto von Dentz wrote:
->>> 5.19 seems a little too old, imo, or has it been broken for that long,
->>> did you at least tried with bluetooth-next? Try contacting the people
->>> who actually wrote the driver.
->>
->> Sorry, I didn't answer your question. Yes, I do think it's been broken 
->> for longer than that, but I wanted to confirm.
-> 
-> Okay, so I tried 6.9-rc3 and every main release 5.19-6.8.
-> 
-> I have found the following:
-> 
-> * older kernels (6.3 and before) seem to be far less likely to kill on a 
-> cycling the bluetooth service.
-> * 6.8/6.9-rcs consistently destroy bluetooth when stopping and 
-> restarting the service
-> * If I destroy the bluetooth service with a BT service restart in 
-> 6.9-rc3 and warm reboot into any release back to 5.19, bluetooth does 
-> not work
-> * cold boot works in all cases assuming I give the laptop about 5s 
-> between power off/on
+Adding Luiz and Marcel in hopes that they may know the answer.
 
-I just did another experiment on 6.9-rc3. I blacklisted relevant 
-bluetooth modules and then warm booted without the blacklist. I did this 
-for both the "bluetooth" and "btqca" modules. In both cases, I cold 
-booted with and appropriate "module_blacklist" kernel arg. After the 
-boot, I verified the module was not loaded. I then warm booted without 
-the blacklist, and the bluetooth works, so bluetooth only seems to fail 
-when the linux module code for closing the device is run before a warm boot.
+On 4/4/24 12:03 PM, Wren Turkal wrote:
+> The link to the mailing list subscription at 
+> https://www.bluez.org/development/lists/ is dead. I was hoping someone 
+> could update that or point me to a git repo that I can send an MR for.
+> 
+> If someone here wants to do it, the correct current link appears to be 
+> https://subspace.kernel.org/vger.kernel.org.html. There aren't html 
+> anchors on that page that I see on that page, so I can't find a link 
+> directly to the linux-bluetooth list entry in the large list of mailing 
+> lists.
+> 
+> However there is an option for a link to directly highlight the 
+> linux-bluetooth text that only works in chrome:
+> https://subspace.kernel.org/vger.kernel.org.html#:~:text=449-,linux%2Dbluetooth,-Linux%20bluetooth%20development
+> 
+> Firefox will not jump to the highlight with that link, but will load the 
+> page fine. Maybe use that link instead of the bare one to make it better 
+> for those that have chrome with no apparent costs to other browsers?
+> 
+> FWIW, I am not subscribed to this list. Please keep me on any threads if 
+> that helps.
 
-> So, I suspsect that the process of closing out the hardware may be 
-> leaving it in a state that the reset cannot handle (and probably never 
-> could handle).
-> 
-> I also found that qualcomm has docs here: 
-> https://www.qualcomm.com/products/technology/wi-fi/fastconnect/fastconnect-6800#Documentation
-> 
-> However, I am not a member of a Qualcomm verified company (mentioned in 
-> the doc links). Luiz, Marcel, or Johan, do you have any contacts that 
-> might be able to help me in getting info about the technical docs for 
-> this hardware? I would love to see if I can find any issues in how the 
-> hardware is being reset.
-> 
-> As an independent dev, I don't even know what it takes to get that kind 
-> of access. I would welcome any help here. Hey Qualcomm, are you hiring? :P
-> 
+I am not sure where the repo for this website is. I'm happy to submit a 
+patch if you share where the website repo is.
+
+> Thanks,
 > wt
 
 -- 
