@@ -1,77 +1,115 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB00B134CC2
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Apr 2024 18:59:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC5E1802CF;
+	Wed, 10 Apr 2024 19:16:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712775582; cv=none; b=dTx42AlADXTGOxM7g8e1d7tNTrrkeo0ZpJXxUTdhb15dqKoGIxzoRUIuaBqC5MqUvbTU4HTeERqWa9l7I8/z4fbsYm+fyJSlE1EOfHE2sWceasR8tGYVVkGDrgtFhU8bSXYK9P8EtmOUxJgk8ye4+5GhrwAQeTjyrhP0VuybVpw=
+	t=1712776575; cv=none; b=B6J/Nk3NSz6Zl0oF4+JGKKRqc1PU1ff116luUV31G8JOb0rWc2IbLt0z0UQV7lWXMq7tT+bR0V+TvwGLQBQxhBiWFa9sUUhK+uUE6XZN1ACr1iOZZ23cbVYFzCQNybiMhaozkjfZeD3A6WbMHbSa+3jbp+kbWqHhlAMrobA6VYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712775582; c=relaxed/simple;
-	bh=mVE7ddUyDTQa8u9xGHRPrx4Y2RE0l6vh1KhRd85k2ro=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=TcWl2VaWFbgr/B1AFhAFv5LVIDDF6JVY6CTIc69n5CJMLKqWya2HfrmPJWKfRDK286zJLEtMDhsYR05xpma62RU1bQMA9xpVxH+QeoyKHXcrbgFtjl6uvxyvqyRlutFkVDjYcCuUp3mDDOFPPAbK7q/5TFtpk7YMhGmbBFVrSrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s7mJ1z/7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1712776575; c=relaxed/simple;
+	bh=N3eMWVi75+MA86c+aJe5TeWSasUakhFVRf4PZ2GV+P8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OHUzyGpNBJdwnBlpR7Bmmv3f/HQlN22pszrwWCDkrGvLLlUh3Ihhbx6GRkMfayx8IuuxSopFJDdRs86HW5hjGDPfNPlmBMythrhFyDISf2UEp/xuhcAoPuUc2OFaWEuvwZ8c8belRpGcJR/gHbqttBrvSNmQURa4UxhmMMu9d9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QWh3ApwF; arc=none smtp.client-ip=209.85.221.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s7mJ1z/7"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 752FAC43399
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Apr 2024 18:59:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712775582;
-	bh=mVE7ddUyDTQa8u9xGHRPrx4Y2RE0l6vh1KhRd85k2ro=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=s7mJ1z/7xbTg/wWjtwXBfXgJpZHi5tAux0MchapC7J+pe342cEC1loa1Cc4hQz8lT
-	 Dj2hhjMilNJS2XbIB7mE01uRvVelfJWJHhMCLgLacTEkqdKnFOvSJGtlly5BomLRMz
-	 GaByRtyfkppErbD0eUICqgbmuCUN7vaa5A7oudkXnNz06W80XTuMP7QspAV2pofxOl
-	 lkrV1623MX8p9KhVT5QwoeeCCIiUpiMFTMd0KoG1vtXHEX9wDIfJzLaWpurrAT3GWh
-	 UfJoVZiBb9Lm1GrRvPExVl1DOmxgNrSR8MwIFBlv2hRp2VdgUc/cZzkod3a3+V7qiv
-	 fecFqC1oTOUUA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 6521FC53BD3; Wed, 10 Apr 2024 18:59:42 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 218680] bluetooth connected status not shown in KDE desktop
- GUIs
-Date: Wed, 10 Apr 2024 18:59:42 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: luiz.dentz@gmail.com
-X-Bugzilla-Status: CLOSED
-X-Bugzilla-Resolution: CODE_FIX
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-218680-62941-RUYuwOc9v8@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218680-62941@https.bugzilla.kernel.org/>
-References: <bug-218680-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QWh3ApwF"
+Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-4da702e48e0so3033828e0c.0;
+        Wed, 10 Apr 2024 12:16:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712776573; x=1713381373; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=BpSOzU15LzKweAegnrAsIh5K/sd1ekTGfCpD+wWSpac=;
+        b=QWh3ApwFb02bdqcOF8zTKLtwoZUo/Fw93sZIPZlOwwkFFRb2L9IsPox2LqpJVqhau6
+         jLyisMvW6WrZZNOzL3IJ9k1rNmaLqEZXuNBuTV8RAMgxG6caKD2/ieg/G9pVKDshMiqw
+         dF7v5EXKnyltxjMJOLChBJlpna9hpMbkYR03ZywiNcCpIHkv91XJKWTJX49+xOLh0Iql
+         bQCpjRbaPK27+GgL4Eenw94xhpJVhMlT2FfmEl/WiaUGHkFAsnW3WzqGaf9chrga7Wol
+         3FyRAZ4v6FUnwThtrfgJ8v6+t6k8bQknjEH/GT3AFTx4dtvH29Qt8040jlsB1IdfQ0gL
+         6v6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712776573; x=1713381373;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BpSOzU15LzKweAegnrAsIh5K/sd1ekTGfCpD+wWSpac=;
+        b=QpiBhwgGLvjjyzcGIEgIAc9Ze8GA199YZZRwpCKrVpKo/DLAa23WfJ6a+jVHfsjlb9
+         VNcAbndxYbZmCng/wrbSFoTq/PZfAQleACAdYtj1/MlmIRASk2j3uWr3gdkVQyze5SB/
+         IMc5zP2R504awKNbQ3PowTU9j4B0b4c7guNSObvH7gWM0QD3W+UzbMNS9XKrxehAYVVx
+         C8fYERiUrkqEOMOCwaFWSzHLHMJPHzW9BYFc0H6/KRiEtfuaKgu5NomQUmVrJdW+I+ez
+         yFweY3GdMD3z8yGf5VZY+5gbPtmH8Xn4iC6Auuv7fbObk0wEEB63Jz3OoYKw1A3FedG7
+         sY7w==
+X-Forwarded-Encrypted: i=1; AJvYcCX/M8KBdCpoiA2Bjo3pjmg97GXab9FIQw+trDoJFq0GkeHTBOd1hF/lE15SKKirhFlGH9umcc3YyKfUu5jL89ZvhVeiRUFb
+X-Gm-Message-State: AOJu0YzPJw7Q8BCfn/T4SJ+jwE5JnKolh9DtEoleJSjmX/lbnNcdtmS3
+	tzqsOutHP8UoWpSPjkpLRQdeOE5Y5kW0aKzKHp7s5GPJFaPXNLKh
+X-Google-Smtp-Source: AGHT+IFHRjFkE9KByYgCvObvf3f7ksWVv9j/dH67V+lePm8YK7b2QA5nG9xG4KTV7kAEgN44mPt06g==
+X-Received: by 2002:a05:6122:1795:b0:4d8:797b:94df with SMTP id o21-20020a056122179500b004d8797b94dfmr4261683vkf.2.1712776572666;
+        Wed, 10 Apr 2024 12:16:12 -0700 (PDT)
+Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id eq15-20020a056122398f00b004d895c72d56sm1524223vkb.50.2024.04.10.12.16.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Apr 2024 12:16:12 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: pull request: bluetooth 2024-04-10
+Date: Wed, 10 Apr 2024 15:16:10 -0400
+Message-ID: <20240410191610.4156653-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218680
+The following changes since commit 19fa4f2a85d777a8052e869c1b892a2f7556569d:
 
---- Comment #5 from Luiz Von Dentz (luiz.dentz@gmail.com) ---
-(In reply to max from comment #4)
-> Working for me too! Can this patch please be submitted to the stable tree?
+  r8169: fix LED-related deadlock on module removal (2024-04-10 10:44:29 +0100)
 
-Will do that later today.
+are available in the Git repository at:
 
---=20
-You may reply to this email to add a comment.
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-04-10
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+for you to fetch changes up to 600b0bbe73d3a9a264694da0e4c2c0800309141e:
+
+  Bluetooth: l2cap: Don't double set the HCI_CONN_MGMT_CONNECTED bit (2024-04-10 15:10:16 -0400)
+
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+  - L2CAP: Don't double set the HCI_CONN_MGMT_CONNECTED bit
+  - Fix memory leak in hci_req_sync_complete
+  - hci_sync: Fix using the same interval and window for Coded PHY
+  - Fix not validating setsockopt user input
+
+----------------------------------------------------------------
+Archie Pusaka (1):
+      Bluetooth: l2cap: Don't double set the HCI_CONN_MGMT_CONNECTED bit
+
+Dmitry Antipov (1):
+      Bluetooth: Fix memory leak in hci_req_sync_complete()
+
+Luiz Augusto von Dentz (7):
+      Bluetooth: ISO: Don't reject BT_ISO_QOS if parameters are unset
+      Bluetooth: hci_sync: Fix using the same interval and window for Coded PHY
+      Bluetooth: SCO: Fix not validating setsockopt user input
+      Bluetooth: RFCOMM: Fix not validating setsockopt user input
+      Bluetooth: L2CAP: Fix not validating setsockopt user input
+      Bluetooth: ISO: Fix not validating setsockopt user input
+      Bluetooth: hci_sock: Fix not validating setsockopt user input
+
+ include/net/bluetooth/bluetooth.h |  9 +++++++
+ net/bluetooth/hci_request.c       |  4 ++-
+ net/bluetooth/hci_sock.c          | 21 ++++++----------
+ net/bluetooth/hci_sync.c          |  6 ++---
+ net/bluetooth/iso.c               | 46 +++++++++++++++-------------------
+ net/bluetooth/l2cap_core.c        |  3 +--
+ net/bluetooth/l2cap_sock.c        | 52 +++++++++++++++------------------------
+ net/bluetooth/rfcomm/sock.c       | 14 ++++-------
+ net/bluetooth/sco.c               | 23 ++++++++---------
+ 9 files changed, 79 insertions(+), 99 deletions(-)
