@@ -1,168 +1,133 @@
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 155FF15EFA0
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Apr 2024 14:40:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5979D1591E1;
+	Wed, 10 Apr 2024 15:27:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712760060; cv=none; b=X996ieV/IaezsdRk5hzeVWcYc1SB++tds7LqTxl2PwniZDUwE9YF5xoZzqG4ehLu0W/NBZZXEScDhb/C2cLQLEYSbF1XcT3eXTgfuG1GTKsFzFI3NJZyuj8G4GuGp5SW8v9Us4Bc1qqtNyeaHE5I6GybLcbbvYl6gkxrF6oLD0Y=
+	t=1712762861; cv=none; b=NWidxYlPHSnMdJEFE7OeK2PNFYl7/bjiBIbg8zUdwkqsNe78KwQ0e/D97cOgl+McVAu06xN1wJ5f0pnYXIg38SmQUX2ALY9TCoqiM+IFCHIgH2tQ49756w7tkZFGxkW8etscol5zjjA9Z4jKu5PDm2HTCULw4nlkK9y+VS0z+5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712760060; c=relaxed/simple;
-	bh=1Grbk6ysEsRRbHzjGMEZZQxb8tyblX5Rf9kl67KAEdk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rQe27QgoS4tZpPHM6M2RynvAHE0PIYm+3nvs760Ws6fntR9pp0vIPpq6Y7E+7hMswGrmP2VpO2qc5A1qONj6sQmvIfXkCHCm0TYZC60hzYMAWscPWdC1i6REmg80GatgexxBoroQ44RzJs931tBUlFvmzHLMAMGFAv9ri+WH2TY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lieL8ALE; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1712762861; c=relaxed/simple;
+	bh=yaqHM0962MfpM+OFdQda8fXPe0R1wO7c3AlNIHOVwdc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=cIDr9b+TXaDzq5eq0ksIiA5LVmLWXAL58VAPt8bPBT3w2Lp5ptcZt8K1cJEot2DdXJ3ZHUQemGHmuSecBTA7AXhXPlN0qm0PEMop62C+J9yTcBqnLuD/AvZI5AbjTIKRvXHuWID3lh/GmRj4O/5b3B4A1rcFzaHvSVRZEpjeZtg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=QMVx+iIj; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lieL8ALE"
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2d8129797fcso92378631fa.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Apr 2024 07:40:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712760056; x=1713364856; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=k8y+/mJ215Nd7c77xSXbdERWO3/7zXbLSBwFV2Ljzfk=;
-        b=lieL8ALEHSXOUyKZ/1mYMftTg359x8el+InMQKq1JEpT9Mi5q0uFTAwA1fGP1FABcO
-         I0lXCsW7LRyRKktEbD8FZfRLLYPdTaK3psDwYDnSCid56fLhqQ+bj6j0GwSscxzwu3qe
-         Fvfavi1mI9nI89ZpDlQlDgD5wzYY8BrO0udBS/7VOoumWXvVp2KXzFi8rNOj8hbA1jN6
-         m85Z4tgcdHqLm9PHCYZAlG02fwxpuXIDNt5JNdtxNZtPD2sljA/R9H8XbeoN/A+u0IPq
-         WP935o8IdkqBuicHV+ef67TqapgkGxwN4LLDZdvaZcG5Vhg7vsqvEIb2HHysPzs2RFV+
-         z51w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712760056; x=1713364856;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=k8y+/mJ215Nd7c77xSXbdERWO3/7zXbLSBwFV2Ljzfk=;
-        b=H16kn5BZqyVFVhyM4NGRNvbZX5kk/7wVxf9oWG1fDgl2Jel5LKJsDVby7lealb0YoH
-         trAcjLA8Y1VhaKISXTiKsQUr1Z+QBq/HHIRjQqYNJqkWxhDeREjx+4YvQvfB3FoEqgfp
-         Vq8BdmUHp0ZGLW7H55c1eiXwjhC6Vethkww50IzikK1NlOz2QpH1H8aq7am9cF+s8ZH4
-         oyWzpTBz59ApxSQ3p0AzCZQy8ESQOWBImAfdntNbmyzhSyGkKiglQnjl7kbd2ki035kL
-         Vp+NFplDXWt5kUpn0XfoUcPAlbtNA6VigjNkfvMOoQTrjY6pqllkJrrdVdtsCyHWqob3
-         Om7A==
-X-Gm-Message-State: AOJu0YzT1E4biYmEF7bajJcehCMlbXA4n30ZqOSk8rLCZVX04GvniqJk
-	I+pmer0ouEYVHJuATnFHId7nWThDNTYPTeEOvi8s3g7MNjNNfaTfKZeVOQIMoIGSzphX+9PEPfy
-	KakxyvJXFc6MeZ8hC9frcI2crfP/KlGz3
-X-Google-Smtp-Source: AGHT+IEC/wgsbc47ahOpoJFLx7sfKlAv5AKpppITb4Z0HnOVgGqKTcvsfwG7a+bVOsbVNSXTpTaGIW7w2Fflvzqdt8c=
-X-Received: by 2002:a2e:a7c2:0:b0:2d8:3cd3:35d with SMTP id
- x2-20020a2ea7c2000000b002d83cd3035dmr2342838ljp.33.1712760056150; Wed, 10 Apr
- 2024 07:40:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="QMVx+iIj"
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 43A8bUQZ020430;
+	Wed, 10 Apr 2024 15:27:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=SeKInDMchgVr+fW9WAo6YizzoIlylrKBtPkpDrYflGc=; b=QM
+	Vx+iIjNoBxgbQhbk47P1pSkvCBi6kiaSSZFteiH8PqXWUF0Y7UYSWrwJ3USY+xai
+	GpMzaeDLZwM3AoGqxqUV9+ueya3RJGxE95WUHnvgCDFs5MzZP+Djd3mUZ8JzAwe0
+	6S2YEqGQJdphdetr8iOfJZaaPyjM5230lKtCzNV8IrViCObX5p7tH3axnILjKVCn
+	HrHWFKU22mBrjW0gJUsF1fI2uYWOU0hgzhaQSDLoYsE+Jpvut0geIRe/ud4DPPSJ
+	8fggfL5TrmQ7pfWvB/7hPSNjCQTZ3E7PVA4IghTfCh3TrgZ3LycX2IH7oruboSQa
+	QCfwL5e2a4lspc6371dA==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xdnqtjn3f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Apr 2024 15:27:09 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43AFR8Ts012315
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Apr 2024 15:27:08 GMT
+Received: from [10.110.37.144] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 10 Apr
+ 2024 08:27:06 -0700
+Message-ID: <d440d38f-f805-4c85-96b3-ae0b5ad2bbdc@quicinc.com>
+Date: Wed, 10 Apr 2024 08:27:05 -0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240408125806.12682-1-surban@surban.net> <6613f1f7.170a0220.836c.1ac6@mx.google.com>
-In-Reply-To: <6613f1f7.170a0220.836c.1ac6@mx.google.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 10 Apr 2024 10:40:44 -0400
-Message-ID: <CABBYNZJsojUqyYc-ywcASyRZ2_NWyO_54t0o4Sk8dMuT9KbzbA@mail.gmail.com>
-Subject: Re: [v5] Bluetooth: compute LE flow credits based on recvbuf space
-To: linux-bluetooth@vger.kernel.org
-Cc: surban@surban.net
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 05/16] dt-bindings: net: wireless: describe the ath12k
+ PCI module
+Content-Language: en-US
+To: Bartosz Golaszewski <brgl@bgdev.pl>,
+        Marcel Holtmann
+	<marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David
+ S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>, Kalle Valo <kvalo@kernel.org>,
+        Bjorn
+ Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
+        Catalin
+ Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Bjorn
+ Helgaas <bhelgaas@google.com>,
+        Saravana Kannan <saravanak@google.com>,
+        Geert
+ Uytterhoeven <geert+renesas@glider.be>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Neil
+ Armstrong <neil.armstrong@linaro.org>,
+        Marek Szyprowski
+	<m.szyprowski@samsung.com>,
+        Alex Elder <elder@linaro.org>,
+        Srini Kandagatla
+	<srinivas.kandagatla@linaro.org>,
+        Greg Kroah-Hartman
+	<gregkh@linuxfoundation.org>,
+        Abel Vesa <abel.vesa@linaro.org>,
+        Manivannan
+ Sadhasivam <mani@kernel.org>,
+        Lukas Wunner <lukas@wunner.de>,
+        Dmitry
+ Baryshkov <dmitry.baryshkov@linaro.org>,
+        Amit Pundir
+	<amit.pundir@linaro.org>, Xilin Wu <wuxilin123@gmail.com>
+CC: <linux-bluetooth@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-wireless@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-pci@vger.kernel.org>,
+        <linux-pm@vger.kernel.org>,
+        Bartosz Golaszewski
+	<bartosz.golaszewski@linaro.org>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski@linaro.org>
+References: <20240410124628.171783-1-brgl@bgdev.pl>
+ <20240410124628.171783-6-brgl@bgdev.pl>
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+In-Reply-To: <20240410124628.171783-6-brgl@bgdev.pl>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: Wx5pfsg1IEL3FNsbq-QxsVprddWodQtT
+X-Proofpoint-GUID: Wx5pfsg1IEL3FNsbq-QxsVprddWodQtT
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-10_04,2024-04-09_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 suspectscore=0
+ lowpriorityscore=0 mlxscore=0 adultscore=0 impostorscore=0 phishscore=0
+ bulkscore=0 priorityscore=1501 malwarescore=0 spamscore=0 mlxlogscore=826
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2404010003
+ definitions=main-2404100112
 
-Hi Sebastian,
+On 4/10/2024 5:46 AM, Bartosz Golaszewski wrote:
+[...]
+> +description:
+> +  Qualcomm Technologies IEEE 802.11ax PCIe devices.
 
-On Mon, Apr 8, 2024 at 10:05=E2=80=AFAM <bluez.test.bot@gmail.com> wrote:
->
-> This is automated email and please do not reply to this email!
->
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=3D842=
-452
->
-> ---Test result---
->
-> Test Summary:
-> CheckPatch                    PASS      1.01 seconds
-> GitLint                       PASS      0.22 seconds
-> SubjectPrefix                 PASS      0.07 seconds
-> BuildKernel                   PASS      30.65 seconds
-> CheckAllWarning               PASS      34.59 seconds
-> CheckSparse                   PASS      39.10 seconds
-> CheckSmatch                   FAIL      35.16 seconds
-> BuildKernel32                 PASS      29.28 seconds
-> TestRunnerSetup               PASS      528.76 seconds
-> TestRunner_l2cap-tester       FAIL      22.63 seconds
-> TestRunner_iso-tester         PASS      30.74 seconds
-> TestRunner_bnep-tester        PASS      4.67 seconds
-> TestRunner_mgmt-tester        FAIL      110.12 seconds
-> TestRunner_rfcomm-tester      PASS      7.26 seconds
-> TestRunner_sco-tester         PASS      14.97 seconds
-> TestRunner_ioctl-tester       PASS      7.62 seconds
-> TestRunner_mesh-tester        PASS      5.77 seconds
-> TestRunner_smp-tester         PASS      6.78 seconds
-> TestRunner_userchan-tester    PASS      4.93 seconds
-> IncrementalBuild              PASS      28.60 seconds
->
-> Details
-> ##############################
-> Test: CheckSmatch - FAIL
-> Desc: Run smatch tool with source
-> Output:
->
-> Segmentation fault (core dumped)
-> make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error=
- 139
-> make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
-> make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
-> make[2]: *** [scripts/Makefile.build:485: net] Error 2
-> make[2]: *** Waiting for unfinished jobs....
-> Segmentation fault (core dumped)
-> make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Er=
-ror 139
-> make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
-> make[4]: *** Waiting for unfinished jobs....
-> make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
-> make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
-> make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
-> make: *** [Makefile:240: __sub-make] Error 2
-> ##############################
-> Test: TestRunner_l2cap-tester - FAIL
-> Desc: Run l2cap-tester with test-runner
-> Output:
-> Total: 55, Passed: 51 (92.7%), Failed: 4, Not Run: 0
->
-> Failed Test Cases
-> L2CAP LE Server - Success                            Failed       0.099 s=
-econds
-> L2CAP Ext-Flowctl Server - Success                   Failed       0.103 s=
-econds
-> L2CAP LE EATT Server - Success                       Failed       0.103 s=
-econds
-> L2CAP LE EATT Server - Reject                        Failed       0.091 s=
-econds
+if you respin, nit: s/11ax/11be/
 
-We need to fix these tests as soon as we apply these changes, afaik
-you said they are expected to change because the credit changes, so we
-need to update it with the new credit logic. Also it would be great to
-add a test case that covers the broken behavior where we dropped
-packets.
-
-> ##############################
-> Test: TestRunner_mgmt-tester - FAIL
-> Desc: Run mgmt-tester with test-runner
-> Output:
-> Total: 492, Passed: 489 (99.4%), Failed: 1, Not Run: 2
->
-> Failed Test Cases
-> LL Privacy - Add Device 7 (AL is full)               Failed       0.195 s=
-econds
->
->
-> ---
-> Regards,
-> Linux Bluetooth
->
-
-
---=20
-Luiz Augusto von Dentz
