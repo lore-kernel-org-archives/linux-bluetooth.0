@@ -1,118 +1,94 @@
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B74045789E
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Apr 2024 18:28:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72F2A205E11
+	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Apr 2024 20:03:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712860116; cv=none; b=X7NU2Z5B4FZjFUZeLerODkJ2JSxRiMwi6/CReUqnykeHALzDpdQqSxmf0gGqKWUCWFWxrWKAL2kjppmD96antboR3rLUV4SRuYAJhKq92YLNYXh0AVk9tuwwbgJScOZYPv9qyghgoYsPY8tKLAp7uwZBfWKc5GRhpatlXEqCj4s=
+	t=1712865790; cv=none; b=Sm7r47NN0PaA1EzZ2NwOu8hLkcO6FFYRAQIyRZr7sJjxkJiTwFzx4T2+HbT+FQPF7hpAsZH9bOzA2o5HH1H7nFR1JdkepMdO1yTrbWgkb4rRwQXN0+GTO03UOBj1507DpT5BtHB97/b4/YI6Lqt2Ja0217oJl18sQmr6eVpmYvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712860116; c=relaxed/simple;
-	bh=oIUPR6TePrTRXMbTsCtY1Xk/LXvp5M/ByQGyMitGDtM=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=o0lcxoVSXzIGfJ54g8komhfHGic9fsuqf9FVy5JVtoqx5PvNPFZS9KP4FTUkQT49T9pLtxQZf3GxPkNvvITNv3yU/8Gvyxia1B8hIlQz3vs8ZZ5YbnzMde2jmWyUZubGUn3nCYQ3I37leo0jlZFVqhE9JC7QD8XG9DaUSS4ui/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WzQdAguA; arc=none smtp.client-ip=209.85.160.180
+	s=arc-20240116; t=1712865790; c=relaxed/simple;
+	bh=2zd2aErHG1lZPkrmYGGNWy8rR9E2GG4suFCJDjI8SaE=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=N0HpxaPSVXM63LSzNpD83k/y/i/BW0jA7OQ3An/aPl38e6tCzJad47iMsA04d1NQaLIeFydu2q5lXG5qSuTw/xZF+BiOHhcjuJhz5TPt3/GBdfXWpta2wje7y/Qvy2TGShJjYDe9nbPUPFYmrUbrxFgy2lWNKA+dfH4vXnC4W/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q9M7ZKk5; arc=none smtp.client-ip=209.85.167.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WzQdAguA"
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-434a6024e2fso1264021cf.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Apr 2024 11:28:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q9M7ZKk5"
+Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-3c3aeef1385so99937b6e.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Apr 2024 13:03:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712860113; x=1713464913; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=W7m9hhlXoL5AGL5Fdk2FdEDSzSCzZFTAPZLJDSL9R+0=;
-        b=WzQdAguAiheunh8ckOk52/hAQbhYspYPy9tGYVsBTYPP72QB7fHM7w7Jd6mYGLACUk
-         riUIcZVvqwMhnltPjudQJmS0gjScmpcaH1zGuH6BKM+BOQdXX6TcvCazl/XspMUd6al6
-         KhviXKdZTLVHB0a+Qg3kkhJaFDLzRzBwdy6Kcj/0t0ppUVk1TXtF3/EUXsHgvPPhpB0w
-         1fKdqSghflQTHKczuLYDqvpANAV6QAs91gJ7vIOwxXDxVFK5xHeBEzn3Apmo2w4bJLZY
-         C330I8IP0K1QN6nP6wzw6TLuKMoEaBJJEP0KTHu6Bi61qbdEqarr5abEyPdNECO1+KQn
-         hVCA==
+        d=gmail.com; s=20230601; t=1712865787; x=1713470587; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+hANOqpWi5mccCXObOolBPcIhoSeVd6fCezYfr1BhRY=;
+        b=Q9M7ZKk5DQl6Gm703zjtwpIeCfFnN2j7pzhh1bdGu4DjEm85Nn1m7L5u4ApVnGV3ES
+         0VxKAzjm/EYA4K706fbOe0mogxOJr4L0ig118hx3V/tX81IoUVibQL3x8HrBumTfu95/
+         uatJIes7ayd/K9/AIOZ299BrdHSF5D8Fi+lcQ5UdlhBUaLDbrPvdBiu3MPfTlR+oKozn
+         BS9nYRlCR/vNt8WLTfkHZ0NSB3Uoo1mlaCikBb67Zx4B23h/N3Xb921gtHULsEzWOkJs
+         IdrT0xZ434gjfXA8hh7Eumel9vnjbeWvJDQPBcALyjhwuxklmSwYC0ET2vbYrPnu07y9
+         bd9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712860113; x=1713464913;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=W7m9hhlXoL5AGL5Fdk2FdEDSzSCzZFTAPZLJDSL9R+0=;
-        b=Cu5WU8wrdF27HLw+bK7z2krYNdXN88HKX40a0V+9vVbcaPSk1+hkhsdw3GYPYpL8GN
-         634NDyEKLgMd9GUEMq1xg0XUgu1emXVmAoz+9+hqVMvFMwvFTYsvfTMT2G4RDmysyhFa
-         7N/ZSAr4FcV/Icyh+MSsE/rguRlRg9y5zV575JikCW7J/h8qpMYYgDZ0EPnsVuSezGor
-         n8N/zhXEqVRX7GjCI0n7Dq/jodpomg+Nh8LPglW4J+jiTRhYsjVB+Bh7g370q9bZEcL9
-         jpR5W3XBkVf+cYnv1xlO/PtWyZ+OIdmwmO5Xpis95H9gMhKj7gXLGqw3hRzdds5Y4BLu
-         qNpg==
-X-Gm-Message-State: AOJu0YzebFBFRlIvNVPvkBPhffEPxzMHLVNR2N3KsymWU6d9lITnveAi
-	pqsmu7HNyqSnIPVqsd6QVhw5H2uupsTyhYyKWLuCheROT7YtvWTFm9PprQ==
-X-Google-Smtp-Source: AGHT+IEPXV5P2m7Zo0yHqWak5ltc6xOVRNKJsnYRMD2kH7StoBGw00DYOpvLSD3M9EscSsr56J/nsA==
-X-Received: by 2002:a05:622a:1ba3:b0:434:ec3d:dbc7 with SMTP id bp35-20020a05622a1ba300b00434ec3ddbc7mr5955631qtb.27.1712860113532;
-        Thu, 11 Apr 2024 11:28:33 -0700 (PDT)
-Received: from [172.17.0.2] ([20.102.46.246])
-        by smtp.gmail.com with ESMTPSA id kq1-20020ac86181000000b00434c31fa60csm1202472qtb.92.2024.04.11.11.28.33
+        d=1e100.net; s=20230601; t=1712865787; x=1713470587;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+hANOqpWi5mccCXObOolBPcIhoSeVd6fCezYfr1BhRY=;
+        b=PIhojlzph3eEnAZGDfnpwPxJbZKDSrE8AGUaTBUC5ECdiCI2jYMGvhPoGuzN1T1r0r
+         oOhDTAg3N2LYGUfPVobyfsIChl56NfQfKS6ni5R3gaYxhq2zhL9Kh5uVTjcOPOXCPfR+
+         9No/B3gFmnttdhktvXPMQx1q3WRpooGcaVX54ZB6+WHObitx4bGosv02NU//Oe+da45S
+         CJP8w1sBJ4Om6xhGFA4qeMn1Ckw/zGxjsXoOo+we0euW6/x2x0XjUDR0N36EndgIWhM8
+         werJEsjg4q4hZJ8hU4xMz3HLRkd/X15WQrO+iyo1NB2lcjV46RBNn3qX762cm8NU/tfF
+         r+0w==
+X-Gm-Message-State: AOJu0YwcJWM9UhIjdg799XWmDOCtOF4Ce4lapZ4qnGkwouq8wHlVjF2Z
+	68zt+92DZEzIEioORslgwUV76olKVIFFriBMDE7hFh2FMnnmZn8yjCfJDg==
+X-Google-Smtp-Source: AGHT+IFtoXe/JDVRycB7lxZydUtF79qRWyzDkTXMg5ERwvzwpZtCdjAOrlvntGQakl0xz7c/FPig4g==
+X-Received: by 2002:a05:6808:1b22:b0:3c6:efac:56e8 with SMTP id bx34-20020a0568081b2200b003c6efac56e8mr595371oib.48.1712865787454;
+        Thu, 11 Apr 2024 13:03:07 -0700 (PDT)
+Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id da2-20020a056130230200b007e6b31e535asm268110uab.29.2024.04.11.13.03.06
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Apr 2024 11:28:33 -0700 (PDT)
-Message-ID: <66182bd1.c80a0220.89ee0.2d04@mx.google.com>
-Date: Thu, 11 Apr 2024 11:28:33 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5459818635130473334=="
+        Thu, 11 Apr 2024 13:03:06 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v4 1/4] shared/bap: Fix not updating location
+Date: Thu, 11 Apr 2024 16:03:02 -0400
+Message-ID: <20240411200305.183703-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v2,1/2] shared/bap: Fix not updating location
-In-Reply-To: <20240411163041.130214-1-luiz.dentz@gmail.com>
-References: <20240411163041.130214-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============5459818635130473334==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=843708
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.92 seconds
-GitLint                       FAIL      0.82 seconds
-BuildEll                      PASS      24.57 seconds
-BluezMake                     PASS      1687.02 seconds
-MakeCheck                     PASS      13.66 seconds
-MakeDistcheck                 PASS      180.23 seconds
-CheckValgrind                 PASS      248.45 seconds
-CheckSmatch                   WARNING   352.66 seconds
-bluezmakeextell               PASS      119.77 seconds
-IncrementalBuild              PASS      3011.52 seconds
-ScanBuild                     PASS      1027.39 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ,v2,2/2] shared/bap: Make bt_bap_select fallback in case of no channel allocation
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T1 Title exceeds max length (87>80): "[BlueZ,v2,2/2] shared/bap: Make bt_bap_select fallback in case of no channel allocation"
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/shared/bap.c:282:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:282:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:282:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:282:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:282:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:282:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structures
-
-
+Fix not updating map.location when selecting.
 ---
-Regards,
-Linux Bluetooth
+ src/shared/bap.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index f553096dfcc6..b452461ac715 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -5163,12 +5163,10 @@ int bt_bap_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
+ 
+ 			/* Check if there are any channels left to select */
+ 			map.count &= ~(map.count & rc->count);
+-			if (!map.count)
+-				break;
+-
+ 			/* Check if there are any locations left to select */
+ 			map.location &= ~(map.location & rc->location);
+-			if (!map.location)
++
++			if (!map.count || !map.location)
+ 				break;
+ 
+ 			/* Check if device require AC*(i) settings */
+-- 
+2.44.0
 
---===============5459818635130473334==--
