@@ -1,65 +1,35 @@
-Received: from mail-ua1-f46.google.com (mail-ua1-f46.google.com [209.85.222.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D42214D456
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Apr 2024 13:39:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7732DD518;
+	Thu, 11 Apr 2024 14:39:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712842778; cv=none; b=h/3EAEpDSGDLg7O4rw0A8lLTS13KEeDcsnrS95DBF0Kqcn6Ie3O6qWJdjtXuR98TwFrmoIYPHEan5gAich3munbPdL4o5VE9TVMs4hY2NKvyv4GgrcrD/zws00efKd9fUBpm0oi0TZqpngoR1trSJadABCgWJET9B0RIWpkHN9M=
+	t=1712846383; cv=none; b=I8F4ENRWgOsI3RpNWRpNyZXyx4MhpV6kSVqzag8t3vbQBzjBK/UA8NwP5QU4pOansUbQq8+ijHf1EglbUroRG+s5dlU64M40BLq5yzCwzB1dqGSVzka+U0+FlZK3jMfrekpp3A0AfN1JfkUJ4ishBqAP/Ka/KUXet7u1b7e/7b0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712842778; c=relaxed/simple;
-	bh=uGW8/FMRWXjE/nAQfYCQHNRcHQmpZXnzVrVpRregbSk=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mAOEBCQUEdtoQ7hUeL/afLvz4wPml0XbA9dfD5fwTVLxtPm+wauN9CRFQyjZfOLvqPUCu82l+xsiP/pW+pQ37KJdVyxPbuKhTrClnZXpiW0rZJv1oaWjOguBDUWYc0T1mxlm76KUs1gWFGRmTro9zsolbGHARy9ptuMj4Iz60uE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=USnvDfIE; arc=none smtp.client-ip=209.85.222.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1712846383; c=relaxed/simple;
+	bh=HYiF5RVgmWfeB2q5YS1rVM15Tb6+J3pcTtrzx/qL7YA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=aak4ioRJXBrmqa+EUxbscrJz9HeGLy9tqgc738Tky+zJwlW4QrsRHYseMS+Z39rbPoQe2+ptX4AzLpd8fT+B48cYTlX73BihuYg1rXsQ4stAAGu9oR9yAwwEDVVqtXAgoyW8sNRfkae+RlhNDvWjXVh8kj78Lqo2/0QNucGEFXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i6/S8A8b; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="USnvDfIE"
-Received: by mail-ua1-f46.google.com with SMTP id a1e0cc1a2514c-7e6cbbc20deso1429271241.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Apr 2024 06:39:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712842775; x=1713447575; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mEicXI2HW1zpP9FBpdDgWncBq7v9rc6WBL/5xRW3AEY=;
-        b=USnvDfIEDZXuxLzJnA4FyKAKdNrs9o4JdhOZ1yTpfXH6yCfrWqz3peLusqpYgC5ipJ
-         3oLGlWu0IvXZmBwd9iRNwZA1+E7koDCJsF8sDIG7pDiNZ6WvmY4LW9IaAV1+9psf080F
-         AtQguOqFIkTpGZEaq5FzJ0wvGoUA9L3K4uR1zjKxpJRNTZGlc0w6y2o+O94K2tepDFVK
-         lvHKuwLPID0tMEQTJBkvmKL3NMh3uRJcLNZHHhWXUA3c3ZmR9Jk4GfahDHDdo5pTuv6J
-         dgLQqh5n4yNuihfoR1W/u+Pjv8rcLderH0Y1AGin12hbKjGhESayzKHlFrKtE7BWto/Q
-         Crng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712842775; x=1713447575;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mEicXI2HW1zpP9FBpdDgWncBq7v9rc6WBL/5xRW3AEY=;
-        b=iaPqSxD5nSSSa1aZFRVWab10eHrgCsYAd/bqlI4tDSH9ggFo/H5AYSUYn43ksRP1pE
-         wbOYXQIiNkFZ7mQek0QN+WeYDLWHaFZ5xcd+WhowcsImgcecV7YAtxxsjzY1L/gCZwxm
-         SvphUtBnULAbDfVRkllOu7h1fewodBnu8B81LHfIAU1ap6q6ADZ7pzvEtHqOHuQlznCl
-         Z0HHqRahRWupI2iTT/C16lk6BhLsjnm3w1u0EzclDr2ue0AGQLgCazKol0FwX2h+6wh6
-         FR9TEAElV7u1DCwV6z1oxZNz8kHUUKSCJiw4ZXzhbNvoDDbQQMiRZnGXp4O0byDYKMst
-         Ysbg==
-X-Gm-Message-State: AOJu0YzrmFE0vvFa9z68L1comevBsfwSvktOwWCnyX3A27kLKSgBoeID
-	FkJbg4Os2WbAjOFmph33j1sg9/DnJ0uoVOLVe9zuUM89yfvZGU756mgW5Q==
-X-Google-Smtp-Source: AGHT+IH7xFlWt/oi6NX9Cu71gT0K2odltgngCXR5nAKrsKjIGp0q6YU51Ewg1aY3xw/tKiEhubgH6g==
-X-Received: by 2002:a05:6102:2ad3:b0:47a:38b0:79f0 with SMTP id eh19-20020a0561022ad300b0047a38b079f0mr1649087vsb.14.1712842774960;
-        Thu, 11 Apr 2024 06:39:34 -0700 (PDT)
-Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id dd2-20020a056102568200b0046d2de55f2csm217918vsb.15.2024.04.11.06.39.33
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Apr 2024 06:39:33 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 2/2] shared/bap: Make bt_bap_select fallback in case of no channel allocation
-Date: Thu, 11 Apr 2024 09:39:30 -0400
-Message-ID: <20240411133930.96265-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240411133930.96265-1-luiz.dentz@gmail.com>
-References: <20240411133930.96265-1-luiz.dentz@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i6/S8A8b"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5052FC2BD10;
+	Thu, 11 Apr 2024 14:39:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712846383;
+	bh=HYiF5RVgmWfeB2q5YS1rVM15Tb6+J3pcTtrzx/qL7YA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=i6/S8A8bTGR+/yvGoSEMsFzMc3SDFPyIcz7MVXzsI0mE+HlMOkMHlf+/HetMJnANR
+	 oXT1H1DE2utRxYKEbHL66S1AyyUraB/Qa8DLoz0qDXRI0WoYD2ItdUATJeXC476g3l
+	 yh/mxKvAiWl4kq6pstH9+oH0YIH8Ii8xYh6sUvLrhasoTFT/3zzxSSihWSftzzvVy/
+	 WHvOizJES3haTKNglUJ/wGxyFVbteZj/6GFHVquN8nct6RAGCh08wfi5nBQDCTGrFs
+	 xaTTEiIWBWUYTjo3tjY8VVokU0Hb8oB7BWpNI2AyU15UbxP8XZRAXxItBBKyJplpP8
+	 fF3IH+BqY7IBw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3EF45C433F2;
+	Thu, 11 Apr 2024 14:39:43 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -67,57 +37,43 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [RESEND. PATCH v2] Bluetooth: btusb: Add Realtek RTL8852BE support ID
+ 0x0bda:0x4853
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <171284638325.18150.6436513987613825530.git-patchwork-notify@kernel.org>
+Date: Thu, 11 Apr 2024 14:39:43 +0000
+References: <883A1BECA61AB8B7+20240329023440.191799-1-wangyuli@uniontech.com>
+In-Reply-To: <883A1BECA61AB8B7+20240329023440.191799-1-wangyuli@uniontech.com>
+To: WangYuli <wangyuli@uniontech.com>
+Cc: Larry.Finger@lwfinger.net, marcel@holtmann.org, luiz.dentz@gmail.com,
+ gustavo@padovan.org, johan.hedberg@gmail.com, guanwentao@uniontech.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hello:
 
-If channel allocation could not be matched attempt to call .select
-without a channel allocation as the device might require a different
-matching algorithm.
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Fixes: https://github.com/bluez/bluez/issues/793
----
- src/shared/bap.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+On Fri, 29 Mar 2024 10:34:39 +0800 you wrote:
+> Add the support ID(0x0bda, 0x4853) to usb_device_id table for
+> Realtek RTL8852BE.
+> 
+> Without this change the device utilizes an obsolete version of
+> the firmware that is encoded in it rather than the updated Realtek
+> firmware and config files from the firmware directory. The latter
+> files implement many new features.
+> 
+> [...]
 
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index b452461ac715..5368115565fa 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -5116,6 +5116,7 @@ int bt_bap_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
- 			void *user_data)
- {
- 	const struct queue_entry *lchan, *rchan;
-+	int selected = 0;
- 
- 	if (!lpac || !rpac || !func)
- 		return -EINVAL;
-@@ -5158,8 +5159,7 @@ int bt_bap_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
- 						rc->location, &rpac->qos,
- 						func, user_data,
- 						lpac->user_data);
--			if (count)
--				(*count)++;
-+			selected++;
- 
- 			/* Check if there are any channels left to select */
- 			map.count &= ~(map.count & rc->count);
-@@ -5175,6 +5175,16 @@ int bt_bap_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
- 		}
- 	}
- 
-+	/* Fallback to no channel allocation since none could be matched. */
-+	if (!selected) {
-+		lpac->ops->select(lpac, rpac, 0, &rpac->qos, func, user_data,
-+					lpac->user_data);
-+		selected++;
-+	}
-+
-+	if (count)
-+		*count = selected;
-+
- 	return 0;
- }
- 
+Here is the summary with links:
+  - [RESEND.,v2] Bluetooth: btusb: Add Realtek RTL8852BE support ID 0x0bda:0x4853
+    https://git.kernel.org/bluetooth/bluetooth-next/c/cf396a443d37
+
+You are awesome, thank you!
 -- 
-2.44.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
