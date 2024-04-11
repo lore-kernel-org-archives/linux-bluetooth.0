@@ -1,206 +1,133 @@
-Received: from mail-vs1-f42.google.com (mail-vs1-f42.google.com [209.85.217.42])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FCF713AE2
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Apr 2024 14:42:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A28B7DF6C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Apr 2024 15:06:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712846541; cv=none; b=ZPexMoJHgZUvBCfemLRgKPflZtt5BMBt2YOD3XzIqSAjfoM0IRn0W1W7wV74S7cdrLWqgLIxMI5szxBfMPyhrldzzRNrllXtZjnRcK2+KO7KYyL+Ozx096dZInf3lOewd0t2YMBgwaaqRVuet3Es+Xh4/wg/TRd+TI/01+uvzSc=
+	t=1712848017; cv=none; b=Le2WsQ+TZe5Ez6YdeS+sr6Gm0mbKVPHn9fnb1pMKqhc7JT3RkCp5oONU05ha+UlSmHe8rRhJZCHmXmPxPV4Qe5BvlfWSZByVTl+lARxlKj9K2uEZB9NmlSNXrXvJTaZ5aYYmdJCGOWy8PvcjuvpqUO8ZZJgNB8+Gr3iSv/6vKOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712846541; c=relaxed/simple;
-	bh=7cruCXvQ0TEEm2Cfb65ldopgK5E7Wk8dd8UvBChZaAs=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Dc7MHOM7Q1lSyuSDL6OiJKX9Lh301wirCK+4KHoOxyCiUFDbQ+D+L/28aEoAo84f3oD9jQowqIXbXFPlnis6rrBaXNhm+dQaPiN+RJDXj+HeKN7c4Nfklx3tIgPZ1X/+IaHPb3WG+ape+bim7c2xXglEWRq046EwxGukeVpFggk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TlnoUeKx; arc=none smtp.client-ip=209.85.217.42
+	s=arc-20240116; t=1712848017; c=relaxed/simple;
+	bh=xAA+IkqN8aMV+SpeRLmMWmELCN/ADIT20HJOrX9FTtM=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=UsEkapnM11kZyuJMWQjuavpZ7NOrBSbUDsVarmIClab0vdZsRu9fACeTyh9GY98F2iiWuB0/PrxeY/SXxDngWKWv2FoppKRpOjSaibwKKoMI/YBHKkCWEw9E1XRcA0dZNIItllx5rg1LO8EnmhkYLU6JXp+zKp1yn4YSX2Pd52k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LfrvNKN1; arc=none smtp.client-ip=209.85.210.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TlnoUeKx"
-Received: by mail-vs1-f42.google.com with SMTP id ada2fe7eead31-479c8f43ca5so2657783137.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Apr 2024 07:42:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LfrvNKN1"
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6ed112c64beso4286678b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Apr 2024 08:06:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712846538; x=1713451338; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oDibxSAWWAP7CiizZ+VQ6iWwap8kl7b405UZALQbb70=;
-        b=TlnoUeKxAxgy/TgBX7CETiyMHC1c5PBLRWVKOi+lNGegtPs8ovAQG94SpucDy2LiRp
-         xsOmv3kPiGy+bfVQe6jr8vE4ckQOJzY7MXd144ifmhD/CtJyHmqN2D3k971oZ9ms+tif
-         ul9FMuvCfcgUF3TNabwYjfyr/q0jCK0Xh1wx30LykR3Cj/bNdwnvaU79zCfaverQ/Kko
-         76LCfrY8wMyaz9ZekI2tnGtEp1MDKcJbo+8UmhYnWu1HdrdsyQ1zX6K208I903PFrSW7
-         JigJhInaLJ/2qbGn3LHWtrZ5pzKLOFeplL0rQeylx9D+iFcMcFXnZz6mU3QU9DTZFAK6
-         bQlw==
+        d=gmail.com; s=20230601; t=1712848016; x=1713452816; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=/3x9k5GA23wqDIdFgP2zUtyfP9y4DEqYI8IXOo/DtOY=;
+        b=LfrvNKN1Ghl0zBf0GgH7Tluw/CWhVGvrAYGFQ3M0ZvW5rdzee+dDXGGcU2bbLICUVn
+         ALh8yayFgqgRF8JLDfXLd3MHEegMiJrJFZwXs/9+cUC4zw9x3kniRFwH57qwaiu0t52Z
+         K5poNmwjJ4YaXSGlIaMYUrNktzZ1OLSsVai0yNDzVYMV8e93sv6O9qcerS/gENtTNcIh
+         3/Vlz6jvV9hbVMLzARaRlHMWu1L+49GXPuXZsrgtyUbgn9NZ3ceI320ptZ+7RS1rpLhJ
+         mcEim2nNU512yAh4sb/R+w5khfxrZikAwnCrmhohSbuT1ddBDe+Dghhg60zRX5tey1Kc
+         WoQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712846538; x=1713451338;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oDibxSAWWAP7CiizZ+VQ6iWwap8kl7b405UZALQbb70=;
-        b=ZRoDcn37ZucZqfTeoaYS9PKY1WdKyVW6ratbQw23ZepfeDIWKjAqSiMlmadQrnRJRr
-         v2ipiN62/SWJ2WLKVjG6j+udkQzVXn8jCWK85DcYts3TLhp3KhfdaOY7V/KhijL5TuNs
-         LyArKu69qG0GxHtVh7HOmlk2dujwdf/SBWaqp2bVyKfkCeB6+0X9pmE2vHKU9xiR3uWA
-         OgmFi/AUzZ1ye7Eak2W9PwWkhEfLW2ZYqfJu68t4s0wgox4TFV5OOWF0zPLtIWGdj326
-         eNO1dDLJEyZRGe6WXoqB/enMH1/j75aVzqkiqzksYzyQTsl8hPJMEfHinG6KZ9q4cnf8
-         NoaA==
-X-Gm-Message-State: AOJu0Yzd2t/sB+BZrbuZKO3ErrfTgb4hMyEfzIrgg7RuZvKVXKEZo0CD
-	OG0mcwqtZvAWVA+bW88zk+2dVMHQNAhoyTZfUnNXwYmuVrYViySWDXvtow==
-X-Google-Smtp-Source: AGHT+IEoV/KgCPVr0NxoOzwwYkT0H5BQO0honeidUlMimcRkA/iiisynpwLAzTb9d8OfIICsVP8t7A==
-X-Received: by 2002:a05:6102:c0a:b0:47a:2a66:e66c with SMTP id x10-20020a0561020c0a00b0047a2a66e66cmr19209vss.4.1712846538245;
-        Thu, 11 Apr 2024 07:42:18 -0700 (PDT)
-Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id p2-20020ab05482000000b007e818706332sm93535uaa.30.2024.04.11.07.42.17
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1712848016; x=1713452816;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/3x9k5GA23wqDIdFgP2zUtyfP9y4DEqYI8IXOo/DtOY=;
+        b=pZl3A58m+MmEORVSuvdu757SYWVBWYajP5FS+b8E3J800w67lWzUONyMdv8XUGbXfV
+         W5+a6+YPI0TUETeWBy0zgHaOQ9wL1vHIxgLJmcIGJg7EfX1kzjjowOLDf/jc+zCmyAqY
+         nQxpBhAdw4vK+UOG6tskFDGgcJvXNOTKdUegoZ4olcQg1xSl3gIzz3zaLuBx2JQ/SHDp
+         232HlS469I5RC2y8GHO7+8YLgp9t4Sa31eurjzBjTbVXdTESk0VrPtmqMKp4UC0GDY04
+         V0GUGBfdcAcXYMNnIK0sMllQH0WzE2Legwvs/iv2+RTKfvB8nPOsSTTRMAilcl8wN489
+         JqQQ==
+X-Gm-Message-State: AOJu0YwheRct5F/H/5IBTn2M0fArc7ons8p8k/JQEpngy20ZP9MR43XR
+	zvyopnyxaNGCZM7G2KVbLdkACH0MjzuVYB529XaRBXq7nUTOoskVMhuylg==
+X-Google-Smtp-Source: AGHT+IGtKhZG92yHUaNJhZ+K+ZMJchyaXOZNEeAgAtSVcEMmmfJkCq5GoiSHG1A3Pi3FLJhmR0nlwg==
+X-Received: by 2002:a05:6a20:1044:b0:1a7:a412:c881 with SMTP id gt4-20020a056a20104400b001a7a412c881mr66397pzc.30.1712848015657;
+        Thu, 11 Apr 2024 08:06:55 -0700 (PDT)
+Received: from [172.17.0.2] ([52.238.24.176])
+        by smtp.gmail.com with ESMTPSA id u18-20020a632352000000b005cfb6e7b0c7sm1199247pgm.39.2024.04.11.08.06.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Apr 2024 07:42:17 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 2/2] Bluetooth: btintel: Attempt to reset if Read Version fail during setup
-Date: Thu, 11 Apr 2024 10:42:14 -0400
-Message-ID: <20240411144214.109478-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240411144214.109478-1-luiz.dentz@gmail.com>
-References: <20240411144214.109478-1-luiz.dentz@gmail.com>
+        Thu, 11 Apr 2024 08:06:55 -0700 (PDT)
+Message-ID: <6617fc8f.630a0220.6d858.3330@mx.google.com>
+Date: Thu, 11 Apr 2024 08:06:55 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2066525851052256688=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v3,1/2] Bluetooth: hci_sync: Add EXPORT_SYMBOL to hci_reset_sync
+In-Reply-To: <20240411144214.109478-1-luiz.dentz@gmail.com>
+References: <20240411144214.109478-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============2066525851052256688==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-During setup callback the code would attempt to send Read Version which
-sometimes can fail due to ncmd being set to 0 which would block any
-command from being send which is why INTEL_BROKEN_INITIAL_NCMD was
-introduced.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=843648
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.01 seconds
+GitLint                       PASS      0.58 seconds
+SubjectPrefix                 PASS      0.11 seconds
+BuildKernel                   PASS      30.69 seconds
+CheckAllWarning               PASS      32.86 seconds
+CheckSparse                   PASS      38.69 seconds
+CheckSmatch                   FAIL      35.00 seconds
+BuildKernel32                 PASS      28.81 seconds
+TestRunnerSetup               PASS      518.19 seconds
+TestRunner_l2cap-tester       PASS      18.29 seconds
+TestRunner_iso-tester         PASS      30.92 seconds
+TestRunner_bnep-tester        PASS      4.67 seconds
+TestRunner_mgmt-tester        PASS      110.54 seconds
+TestRunner_rfcomm-tester      PASS      7.22 seconds
+TestRunner_sco-tester         PASS      14.90 seconds
+TestRunner_ioctl-tester       PASS      7.60 seconds
+TestRunner_mesh-tester        PASS      5.77 seconds
+TestRunner_smp-tester         PASS      6.72 seconds
+TestRunner_userchan-tester    PASS      4.78 seconds
+IncrementalBuild              PASS      32.82 seconds
+
+Details
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
+
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+
+
 ---
- drivers/bluetooth/btintel.c | 70 ++++++++++++++++++++++++-------------
- 1 file changed, 45 insertions(+), 25 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index a19ebe47bd95..b787540a1031 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -430,18 +430,18 @@ int btintel_set_event_mask_mfg(struct hci_dev *hdev, bool debug)
- }
- EXPORT_SYMBOL_GPL(btintel_set_event_mask_mfg);
- 
-+static struct sk_buff *btintel_read_version_skb(struct hci_dev *hdev,
-+						u32 plen, const char *param)
-+{
-+	return __hci_cmd_sync(hdev, 0xfc05, plen, param, HCI_CMD_TIMEOUT);
-+}
-+
- int btintel_read_version(struct hci_dev *hdev, struct intel_version *ver)
- {
- 	struct sk_buff *skb;
- 
--	skb = __hci_cmd_sync(hdev, 0xfc05, 0, NULL, HCI_CMD_TIMEOUT);
--	if (IS_ERR(skb)) {
--		bt_dev_err(hdev, "Reading Intel version information failed (%ld)",
--			   PTR_ERR(skb));
--		return PTR_ERR(skb);
--	}
--
--	if (!skb || skb->len != sizeof(*ver)) {
-+	skb = btintel_read_version_skb(hdev, 0, NULL);
-+	if (IS_ERR(skb) || skb->len != sizeof(*ver)) {
- 		bt_dev_err(hdev, "Intel version event size mismatch");
- 		kfree_skb(skb);
- 		return -EILSEQ;
-@@ -655,12 +655,9 @@ static int btintel_read_version_tlv(struct hci_dev *hdev,
- 	struct sk_buff *skb;
- 	const u8 param[1] = { 0xFF };
- 
--	if (!version)
--		return -EINVAL;
--
--	skb = __hci_cmd_sync(hdev, 0xfc05, 1, param, HCI_CMD_TIMEOUT);
-+	skb = btintel_read_version_skb(hdev, sizeof(param), param);
- 	if (IS_ERR(skb)) {
--		bt_dev_err(hdev, "Reading Intel version information failed (%ld)",
-+		bt_dev_err(hdev, "Intel Read Version command failed (%ld)",
- 			   PTR_ERR(skb));
- 		return PTR_ERR(skb);
- 	}
-@@ -672,12 +669,44 @@ static int btintel_read_version_tlv(struct hci_dev *hdev,
- 		return -EIO;
- 	}
- 
--	btintel_parse_version_tlv(hdev, version, skb);
-+	if (version)
-+		btintel_parse_version_tlv(hdev, version, skb);
- 
- 	kfree_skb(skb);
- 	return 0;
- }
- 
-+static struct sk_buff *btintel_read_version_setup(struct hci_dev *hdev)
-+{
-+	int err;
-+	struct sk_buff *skb;
-+	const u8 param[1] = { 0xFF };
-+
-+	skb = btintel_read_version_skb(hdev, sizeof(param), param);
-+	if (!IS_ERR(skb))
-+		goto done;
-+
-+	/* Attempt to reset if the command times out since this could be
-+	 * because the ncmd is set to 0 therefore no command will be able to be
-+	 * sent.
-+	 */
-+	err = hci_reset_sync(hdev);
-+	if (err)
-+		return ERR_PTR(err);
-+
-+	skb = btintel_read_version_skb(hdev, sizeof(param), param);
-+	if (IS_ERR(skb))
-+		return skb;
-+
-+done:
-+	if (skb->data[0]) {
-+		kfree_skb(skb);
-+		return ERR_PTR(-EIO);
-+	}
-+
-+	return skb;
-+}
-+
- /* ------- REGMAP IBT SUPPORT ------- */
- 
- #define IBT_REG_MODE_8BIT  0x00
-@@ -2821,7 +2850,6 @@ static void btintel_print_fseq_info(struct hci_dev *hdev)
- 
- static int btintel_setup_combined(struct hci_dev *hdev)
- {
--	const u8 param[1] = { 0xFF };
- 	struct intel_version ver;
- 	struct intel_version_tlv ver_tlv;
- 	struct sk_buff *skb;
-@@ -2862,18 +2890,10 @@ static int btintel_setup_combined(struct hci_dev *hdev)
- 	 * command has a parameter and returns a correct version information.
- 	 * So, it uses new format to support both legacy and new format.
- 	 */
--	skb = __hci_cmd_sync(hdev, 0xfc05, 1, param, HCI_CMD_TIMEOUT);
-+	skb = btintel_read_version_setup(hdev);
- 	if (IS_ERR(skb)) {
--		bt_dev_err(hdev, "Reading Intel version command failed (%ld)",
-+		bt_dev_err(hdev, "Intel Read Version command failed (%ld)",
- 			   PTR_ERR(skb));
--		return PTR_ERR(skb);
--	}
--
--	/* Check the status */
--	if (skb->data[0]) {
--		bt_dev_err(hdev, "Intel Read Version command failed (%02x)",
--			   skb->data[0]);
--		err = -EIO;
- 		goto exit_error;
- 	}
- 
--- 
-2.44.0
 
+--===============2066525851052256688==--
