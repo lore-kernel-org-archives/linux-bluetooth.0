@@ -1,35 +1,60 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f46.google.com (mail-ua1-f46.google.com [209.85.222.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD939E567
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Apr 2024 14:39:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91D3BC147
+	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Apr 2024 14:42:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712846383; cv=none; b=WxxMPO9Nd/yF3WHqc2Z79u8VFPr2FE9P3OUWDSTyvuW4CLk5ssPPYe4r7/UA8nLIf3KcvtgV3qcnw+Q+gkgyByvF0WPd9Zu0mdzhzQl/rppOILbX8AkFTTWXoznC4IcuxyrFPTDy0OAB8P9ss1xEUb4ydv/xVM3uMdYSv26QdAs=
+	t=1712846540; cv=none; b=CJfhPMwEWX+HX62q9Ewd5NNrTdk49IONasp0K/cYb+ZaAMIQ6iJNgBsVsOpn8+Y5sIzudVItBqUhZoJIqr7mZp/mJXWZpkp3NvSdgjkAfTZJYIndOAUsHJNqimM6FBiXwdWKOXjvcPPWqg2qK4DtPLgoN5wRay44pWjyk54HFiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712846383; c=relaxed/simple;
-	bh=/G9F22GLxBImnccCBrpfKxClX++u9MHAGT/YPI+EgdY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=UagXwJq18RKTCPCkOvuNqS4mpoHkH2HXabtO4/LvxUeaOWhyZMiZGb7QyMwhfTeWe67tlBZzYlVBII2teOHacvqg6+rTlUKyx2qJmGqSBjj7VHrKymmDwEYV9GUuahJsKfTO3uzZ0fOREUjh8Yy7YanVKfQKwE7Eo4s9nfq6LAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hXeP4fhc; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1712846540; c=relaxed/simple;
+	bh=z2tx8sW1CtMy/8L9ZNiITaD6OOUGKZvcmbqse8xrOUA=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=CwYWixJmG4jV4sR2Im/6PmnjKdMiwzEO/SF1DkRcGFBP3vmx9neGv+vCEIkRKSQmcL3kFYVXCJ+uPw35jjtx64Sy3YGb4xSOQVuZeIYml/jxelmjL+muHX1wION2DtH9z5wH/UNjyy4t0o4TxcCSDrVtu70DGSnWpu2ywwxjcL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LRAkJXar; arc=none smtp.client-ip=209.85.222.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hXeP4fhc"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4C587C072AA;
-	Thu, 11 Apr 2024 14:39:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712846383;
-	bh=/G9F22GLxBImnccCBrpfKxClX++u9MHAGT/YPI+EgdY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hXeP4fhcogkTRJp+PVRkyd38DDtQNAMulegJ128fPiihSmrJvS4RLq4epbvteWPzP
-	 1ohxp2W7/yztcoHOE7HFEGamOuo0IKC2AE8LHLg8DMAMGkuMEHcTcgobc8Ha7VZ+AD
-	 n8sMHtctyAciN9/A6AnNB2uDd/+/O2LBZd7drOZgwCuv82Hmrac4BVo9ZH43UpInY7
-	 rGjYfj/NX+pP4co4pX0woH1fT2T4hQ+XJk+mPuRNAZSeCtim8u5YpPjBH7HP0bdLbW
-	 gNfPePESHfYcEwZIgKLm2X1MJcDXymo87UMal+dnSzV9lGKxLu07xMY0E1c4vpaSrx
-	 YwNL17+jkr1nA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 37FA6C4339F;
-	Thu, 11 Apr 2024 14:39:43 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LRAkJXar"
+Received: by mail-ua1-f46.google.com with SMTP id a1e0cc1a2514c-7e7cf5cc1d0so535023241.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Apr 2024 07:42:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712846538; x=1713451338; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=WAzam7+xxR9ClMOmOyhrwQjSSR+VlXAULEGHlqEZeM8=;
+        b=LRAkJXarCyR3WNE7/IPBd+SUnTXvDVVmt3iyUR9f5/g3j3xa3o5DlDu0g2JfgSSjdI
+         1dZ7feiFUC0Bi24VuY5+z/LvEXjD1j0SQjdMFbOygNPGYEMF7/M0Khw7Bd3MYGF5XcWy
+         GuuYag4eEQBBKI4ThmBL2m9gJAHq2sE1gDwkfyvHTPIRcbQEYzPwg2qg5lE0cG0LdMx2
+         Kfg7bOfYyAE55juaUl36MVH/RTjWOvoyP/DGvUGw2+jf70ChDdvKq4+l0bbh4Q40RoT6
+         fbrJRmWK3wqzpBBCxps6G5KCZ0uy5y89P924D/ZLrhatOr+2rlLEyFaTgjZFyggVVMaO
+         23Eg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712846538; x=1713451338;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WAzam7+xxR9ClMOmOyhrwQjSSR+VlXAULEGHlqEZeM8=;
+        b=QF9TJIP+Lpq1RTJCzlHALaL0/JUrMRzeudyUOjqOZAlLRPWS1OGrYzml9sH6h8+kSL
+         Vegm+UkVZK0aL2K/suu3p4vldURPJ987/WiNjatKpxcVT8Gbaq0Q3FdPl1pxaYcF2dB/
+         SuTRrCa5Kead1D/7ukPApsBmKfQRUPW80IfoyxbNnPO1T5FBu3s9bquPWM7OMNLNVO0n
+         xVBNAeDizaN9TWNUXXFHwbwRtWmogKLnKXqBfiYsPUfM9KnNF5HkljXWSHmBq7yzzTor
+         hxCg/o5uC51+2SQBVWazYM2qRya4ws2ay8XPbobTYQhqvJV9DzPax6oee/WT0xBMDj74
+         lUGg==
+X-Gm-Message-State: AOJu0Yw/FlnNxyXAOc9kqyscADSC/8VmVeqFVfzw2nlF28AfNuVKpJmq
+	0KHvqtPXTRyqnDHxksiop60MeyfVk0N5psNNUuxZUKDvBp6FzNWv+HSd7g==
+X-Google-Smtp-Source: AGHT+IHLRmHDsoHKQ63qOhKlhiGg+o2aKHq8d2a3lw4I9OruJJjqvxcbYL96eUT33aojxt24Cep4ig==
+X-Received: by 2002:a67:c487:0:b0:479:f383:1927 with SMTP id d7-20020a67c487000000b00479f3831927mr2464004vsk.6.1712846536818;
+        Thu, 11 Apr 2024 07:42:16 -0700 (PDT)
+Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id p2-20020ab05482000000b007e818706332sm93535uaa.30.2024.04.11.07.42.15
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Apr 2024 07:42:15 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3 1/2] Bluetooth: hci_sync: Add EXPORT_SYMBOL to hci_reset_sync
+Date: Thu, 11 Apr 2024 10:42:13 -0400
+Message-ID: <20240411144214.109478-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -37,40 +62,28 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 RESEND] Bluetooth: btusb: Fix triggering coredump
- implementation for QCA
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <171284638322.18150.7773628914846691694.git-patchwork-notify@kernel.org>
-Date: Thu, 11 Apr 2024 14:39:43 +0000
-References: <1711354309-27605-1-git-send-email-quic_zijuhu@quicinc.com>
-In-Reply-To: <1711354309-27605-1-git-send-email-quic_zijuhu@quicinc.com>
-To: Zijun Hu <quic_zijuhu@quicinc.com>
-Cc: luiz.dentz@gmail.com, marcel@holtmann.org, linux-bluetooth@vger.kernel.org
 
-Hello:
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+This adds EXPORT_SYMBOL to hci_reset_sync so it can be used by modules.
 
-On Mon, 25 Mar 2024 16:11:49 +0800 you wrote:
-> btusb_coredump_qca() uses __hci_cmd_sync() to send a vendor-specific
-> command to trigger firmware coredump, but the command does not
-> have any event as its sync response, so it is not suitable to use
-> __hci_cmd_sync(), fixed by using __hci_cmd_send().
-> 
-> Fixes: 20981ce2d5a5 ("Bluetooth: btusb: Add WCN6855 devcoredump support")
-> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> 
-> [...]
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/hci_sync.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Here is the summary with links:
-  - [v2,RESEND] Bluetooth: btusb: Fix triggering coredump implementation for QCA
-    https://git.kernel.org/bluetooth/bluetooth-next/c/e00fc2700a3f
-
-You are awesome, thank you!
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 4c707eb64e6f..908de8df5599 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -3486,6 +3486,7 @@ int hci_reset_sync(struct hci_dev *hdev)
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL(hci_reset_sync);
+ 
+ static int hci_init0_sync(struct hci_dev *hdev)
+ {
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.44.0
 
