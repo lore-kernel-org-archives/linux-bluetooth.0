@@ -1,125 +1,118 @@
-Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E25E3137926
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Apr 2024 18:07:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B74045789E
+	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Apr 2024 18:28:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712858853; cv=none; b=crEhlxTG1kcntwtjFLVtC73Ou+KxwmAMVu703Fivzj7imwK6tM9/p9rcgS2NINELa/FLJndNF5lM/3YsaTSJA3x245+waSDRDDSuTK32oyoQqpV1bH8IPPYnCAsaQMyAY1xxYpQVnFtWdsZFj/LVY3R4BtCGKIkoTP8z1HkA54c=
+	t=1712860116; cv=none; b=X7NU2Z5B4FZjFUZeLerODkJ2JSxRiMwi6/CReUqnykeHALzDpdQqSxmf0gGqKWUCWFWxrWKAL2kjppmD96antboR3rLUV4SRuYAJhKq92YLNYXh0AVk9tuwwbgJScOZYPv9qyghgoYsPY8tKLAp7uwZBfWKc5GRhpatlXEqCj4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712858853; c=relaxed/simple;
-	bh=kJ4h6rOJ9cgq2Pg3uwNNmPoC9V7YFE295QXlFUvb8yc=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IolufmuzfDQm4miU3EiKCuUi5CR287xiLVeVEsJ5poMhdiv9xrph4hDzt7eHyVWr5SbgxwRe1wqyP9HBKSiiudq22hbCvSoySQ9KL92+OZxxJryVcYGBo7N+QgEQIrpwU82Wzf8HFpmplP02EpxDQ/vTW2YmTuj/bxpm01q2d1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TuSC0A4h; arc=none smtp.client-ip=209.85.210.52
+	s=arc-20240116; t=1712860116; c=relaxed/simple;
+	bh=oIUPR6TePrTRXMbTsCtY1Xk/LXvp5M/ByQGyMitGDtM=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=o0lcxoVSXzIGfJ54g8komhfHGic9fsuqf9FVy5JVtoqx5PvNPFZS9KP4FTUkQT49T9pLtxQZf3GxPkNvvITNv3yU/8Gvyxia1B8hIlQz3vs8ZZ5YbnzMde2jmWyUZubGUn3nCYQ3I37leo0jlZFVqhE9JC7QD8XG9DaUSS4ui/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WzQdAguA; arc=none smtp.client-ip=209.85.160.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TuSC0A4h"
-Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-6ea26393116so127033a34.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Apr 2024 11:07:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WzQdAguA"
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-434a6024e2fso1264021cf.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Apr 2024 11:28:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712858850; x=1713463650; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wOI/F8iDtBdBhXssjS1UcW44VcPujPo0VyuOuDxcVF8=;
-        b=TuSC0A4h9wtx1FedbMTv6YROJyHS1v1lNv+p7B9fZvWWi/V5xo3+fRMF4MomHgZVLk
-         dwCE+MqUScyStbjAZU7KwSC1uw1k6a0uvz+WJdqcLmIDluRR9Akjbv7D3SaXzAB3+kV6
-         qCOkC2XNgUJGUJ1HIZmuK5/UQfKrmiKgr7kVRPhdwatbHcoYrsdM4r3XWNUnBbWU0khX
-         C/INhrDjc3JWZSDJhe3Y1cd3c5KqfW1lOByqwXgLF01hd87wr9pbed0UPR7ztogaCBpO
-         GS26l6wSp4BA8NtFihk24GG/zVYt6Ix5XBq1bEREmM8uKD78n2cmGASV7QiDL73GVwKG
-         wxVQ==
+        d=gmail.com; s=20230601; t=1712860113; x=1713464913; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=W7m9hhlXoL5AGL5Fdk2FdEDSzSCzZFTAPZLJDSL9R+0=;
+        b=WzQdAguAiheunh8ckOk52/hAQbhYspYPy9tGYVsBTYPP72QB7fHM7w7Jd6mYGLACUk
+         riUIcZVvqwMhnltPjudQJmS0gjScmpcaH1zGuH6BKM+BOQdXX6TcvCazl/XspMUd6al6
+         KhviXKdZTLVHB0a+Qg3kkhJaFDLzRzBwdy6Kcj/0t0ppUVk1TXtF3/EUXsHgvPPhpB0w
+         1fKdqSghflQTHKczuLYDqvpANAV6QAs91gJ7vIOwxXDxVFK5xHeBEzn3Apmo2w4bJLZY
+         C330I8IP0K1QN6nP6wzw6TLuKMoEaBJJEP0KTHu6Bi61qbdEqarr5abEyPdNECO1+KQn
+         hVCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712858850; x=1713463650;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wOI/F8iDtBdBhXssjS1UcW44VcPujPo0VyuOuDxcVF8=;
-        b=E0bsVfroUlXwtnuO4xX91a6TH4C4XGGgDZ7sWPRLE9pMd2wSr7Nd07BfDrAJSUDvU8
-         ZbjUNu2mN40ySzllatwIOPtDz+sE1egc9HXmn3dGEChLk804tEWiHau42fsQvssMggRJ
-         NwnkU53PldJlTWkZi2WJKm6U3M1UqZUbFOp51a/0Kk1JztHl0xDxz6509vZTJW46+RGA
-         nfJPJV7hbM125DP9Q9K0lqkz+krRJ/JEuSdny+jhsfvliCVMTUY5QtCSLoH4HssJKWX7
-         9m/IoV0lfYiVKCbiUZmI3Xu5qIIhecuuVeD/zazbWr7FHTZwBqWnAHYq/z5WVwkAPejE
-         LK8Q==
-X-Gm-Message-State: AOJu0YyoUY2ioLjbzdcKRYSzeoxcFkFs969TgPJHlWaUbYuEys5lLfm0
-	QFJAjhiq8DM53qz/GrmBG2Y/x/X39hY4lpFCFmyexof9KgerA/v2RwU+/w==
-X-Google-Smtp-Source: AGHT+IHuHga23Mh0bnaIHLSwCO1Z5yzZXs6VvO0dZrWZ2UvEBNXRhwUuAR5QqJstylppzFJq2J5agQ==
-X-Received: by 2002:a05:6808:2b0e:b0:3c3:d80c:ee5f with SMTP id fe14-20020a0568082b0e00b003c3d80cee5fmr301432oib.51.1712858850043;
-        Thu, 11 Apr 2024 11:07:30 -0700 (PDT)
-Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id z4-20020ab02244000000b007e7b2f8e0b5sm225711uan.13.2024.04.11.11.07.27
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1712860113; x=1713464913;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=W7m9hhlXoL5AGL5Fdk2FdEDSzSCzZFTAPZLJDSL9R+0=;
+        b=Cu5WU8wrdF27HLw+bK7z2krYNdXN88HKX40a0V+9vVbcaPSk1+hkhsdw3GYPYpL8GN
+         634NDyEKLgMd9GUEMq1xg0XUgu1emXVmAoz+9+hqVMvFMwvFTYsvfTMT2G4RDmysyhFa
+         7N/ZSAr4FcV/Icyh+MSsE/rguRlRg9y5zV575JikCW7J/h8qpMYYgDZ0EPnsVuSezGor
+         n8N/zhXEqVRX7GjCI0n7Dq/jodpomg+Nh8LPglW4J+jiTRhYsjVB+Bh7g370q9bZEcL9
+         jpR5W3XBkVf+cYnv1xlO/PtWyZ+OIdmwmO5Xpis95H9gMhKj7gXLGqw3hRzdds5Y4BLu
+         qNpg==
+X-Gm-Message-State: AOJu0YzebFBFRlIvNVPvkBPhffEPxzMHLVNR2N3KsymWU6d9lITnveAi
+	pqsmu7HNyqSnIPVqsd6QVhw5H2uupsTyhYyKWLuCheROT7YtvWTFm9PprQ==
+X-Google-Smtp-Source: AGHT+IEPXV5P2m7Zo0yHqWak5ltc6xOVRNKJsnYRMD2kH7StoBGw00DYOpvLSD3M9EscSsr56J/nsA==
+X-Received: by 2002:a05:622a:1ba3:b0:434:ec3d:dbc7 with SMTP id bp35-20020a05622a1ba300b00434ec3ddbc7mr5955631qtb.27.1712860113532;
+        Thu, 11 Apr 2024 11:28:33 -0700 (PDT)
+Received: from [172.17.0.2] ([20.102.46.246])
+        by smtp.gmail.com with ESMTPSA id kq1-20020ac86181000000b00434c31fa60csm1202472qtb.92.2024.04.11.11.28.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Apr 2024 11:07:27 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 3/3] shared/bap: Fix not resuming reading source/sink locations
-Date: Thu, 11 Apr 2024 14:07:21 -0400
-Message-ID: <20240411180721.157181-3-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240411180721.157181-1-luiz.dentz@gmail.com>
-References: <20240411180721.157181-1-luiz.dentz@gmail.com>
+        Thu, 11 Apr 2024 11:28:33 -0700 (PDT)
+Message-ID: <66182bd1.c80a0220.89ee0.2d04@mx.google.com>
+Date: Thu, 11 Apr 2024 11:28:33 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5459818635130473334=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v2,1/2] shared/bap: Fix not updating location
+In-Reply-To: <20240411163041.130214-1-luiz.dentz@gmail.com>
+References: <20240411163041.130214-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============5459818635130473334==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-If there is and unexpected disconnect and the source/sink locations
-where left uninitialized this attempts to resume reading them once a
-new session is attached.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=843708
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.92 seconds
+GitLint                       FAIL      0.82 seconds
+BuildEll                      PASS      24.57 seconds
+BluezMake                     PASS      1687.02 seconds
+MakeCheck                     PASS      13.66 seconds
+MakeDistcheck                 PASS      180.23 seconds
+CheckValgrind                 PASS      248.45 seconds
+CheckSmatch                   WARNING   352.66 seconds
+bluezmakeextell               PASS      119.77 seconds
+IncrementalBuild              PASS      3011.52 seconds
+ScanBuild                     PASS      1027.39 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,v2,2/2] shared/bap: Make bt_bap_select fallback in case of no channel allocation
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (87>80): "[BlueZ,v2,2/2] shared/bap: Make bt_bap_select fallback in case of no channel allocation"
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+src/shared/bap.c:282:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:282:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:282:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:282:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:282:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:282:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structures
+
+
 ---
- src/shared/bap.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index cc1fa1ffbe32..79d9345d9161 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -4703,6 +4703,18 @@ clone:
- 			}
- 		}
- 
-+		/* Resume reading sink locations if supported */
-+		if (pacs->sink && pacs->sink_loc && !pacs->sink_loc_value) {
-+			if (gatt_db_attribute_get_char_data(pacs->sink_loc,
-+							NULL, &value_handle,
-+							NULL, NULL, NULL)) {
-+				bt_gatt_client_read_value(bap->client,
-+							value_handle,
-+							read_sink_pac_loc,
-+							bap, NULL);
-+			}
-+		}
-+
- 		/* Resume reading sources if supported */
- 		if (pacs->source && queue_isempty(bap->rdb->sources)) {
- 			if (gatt_db_attribute_get_char_data(pacs->source,
-@@ -4715,6 +4727,19 @@ clone:
- 			}
- 		}
- 
-+		/* Resume reading source locations if supported */
-+		if (pacs->source && pacs->source_loc &&
-+				!pacs->source_loc_value) {
-+			if (gatt_db_attribute_get_char_data(pacs->source_loc,
-+							NULL, &value_handle,
-+							NULL, NULL, NULL)) {
-+				bt_gatt_client_read_value(bap->client,
-+							value_handle,
-+							read_source_pac_loc,
-+							bap, NULL);
-+			}
-+		}
-+
- 		queue_foreach(bap->remote_eps, bap_endpoint_foreach, bap);
- 
- 		bap_cp_attach(bap);
--- 
-2.44.0
 
+--===============5459818635130473334==--
