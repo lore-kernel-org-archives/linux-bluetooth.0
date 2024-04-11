@@ -1,241 +1,118 @@
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8284E1B806
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Apr 2024 20:30:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8424317C6D
+	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Apr 2024 20:34:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712867409; cv=none; b=jjDTSrqJCqKmFdMS5M0/vR0NrMLpBvv/V/qzD9ImIPvQC3E+23ptTH9DmTjIS1vOVagHU6qZiM+qzAcmwRCzs8bdL0VU3uQHa+Ybp9Eh/fPDv8+HB3IJeLxOqZgN8GC+prGU3e4YDkDklDh8G3rRSqc3MKc+Ac4DBUsRr1VCKyI=
+	t=1712867675; cv=none; b=PHVGpP0fOv462gSlfk1P13a4K856/lbDipzP6XR+96mpCnCB2A9Yw6Pt/WjQJzIvNI3/OHujai9Ta1U16hW8MQPGwMNj+aFJn3nKGvd84isS6CFf/5RPtrRCeFNanCunHHXrMxdFOVeWl5HcQNeE5gINXKsfhf9bmV1an0eYpX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712867409; c=relaxed/simple;
-	bh=Bm3PaRE9UvcSGg7iC+afgXm5Nt3YUbj+q5Z0r64GDds=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=da0mkC2ZfvEzVL8vnVK1EiPxdwNf0FJuFCqADn90Q1WmAsD1zhp2W4kQbuj39AgfH0I+iyVInzLe3hi5J/bKmdZ4wcsH4casW3OZvxgDlWomL01WxK1YpgRvwVXmD5f07CH0XuHA60ZvKrougHVb3x7AOgivQZj7MLj8YqMtUXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=kbDEUXds; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=penguintechs.org
+	s=arc-20240116; t=1712867675; c=relaxed/simple;
+	bh=J4lA4bQQKe0wMafxwsrF8oEI8ZTunCirG5+JUDsnRzM=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=DFfj6mQB6jcWzaptOIU875M0MSnkjTjrbgm68KEjytNMd3Ttk8Zg+mQ8xbQfITn+7jDBM8oefjmT6xk4bJTfhmRSpM7i9wNeJcpLxJkzGXyRxFTf/eEfhN3HJMCQ0gAeZZrKnkIA/JlVnAZXhWUq3J8lE5VxywpCylI4Aqcvnvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WIpqNCij; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="kbDEUXds"
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6ece8991654so270464b3a.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Apr 2024 13:30:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WIpqNCij"
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4347bcc2b47so745881cf.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Apr 2024 13:34:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=penguintechs.org; s=google; t=1712867407; x=1713472207; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=kant6ExXxMhn1K+TXO6ZqixqBe/nxHRJd4hsjbsMF8Q=;
-        b=kbDEUXdsxViovbOkXmnyKK1n65onNvVJyxwBmEMNftkDK9TKWnq9NabNqWFU51PCss
-         3U+H4zACeSmP+EpFv9gTCua5JEkn5ewq4eTVnEETzblTFLWrs/c0a8e76CiBcTgQ3g4+
-         XGOd49Cma36cs8UD5+7TPymyiv2wTMBTetIzs=
+        d=gmail.com; s=20230601; t=1712867672; x=1713472472; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=6d5/zZMetxz2E749x7yHPar+sSYn1Z1a3Yy6ctoBmUU=;
+        b=WIpqNCij7bOnOulKSuFlJIYB4GrKl9m+FBZoWm12jnEykbBz7n405DGnpceaSliQKc
+         olpzLIp0vIxILbFbuEC20nt6Asu0qin2NyS/kZOgGA3IIGlOSvint9LwV98WKJWOL+2L
+         7YHBsMVEsNuCJLVHLwSElIUoYGqYwppO6qESI1J8q07g/UrSEEg4QfmyKomXGIXnwDI2
+         iLZEDfTI3/ih/nwbaJp7nq7Bs9KxpNpzgHF2r/RxB3rhR4GtegFItNLVU7nkplByxVwc
+         by3Nbr94OlXbbLxHknFdykaBoGgYgjA5ZgSLk6tSMWjgZ/ss7UyYWQNiqj1EnPwi449C
+         Loig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712867407; x=1713472207;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kant6ExXxMhn1K+TXO6ZqixqBe/nxHRJd4hsjbsMF8Q=;
-        b=SctCrx8C0T3PYDAToDvpbn6AQg4Kn93s1QObrLCb/SYBX+ti/lNOjnEj1JoWMYbzmD
-         E9nnD6EDwULuitUe8XfLVKIaZ1H0GjnRjYbTCkOO+MRYKD39N3fi7KDA1UyT9zwkqwr6
-         KAVrv4G6mM1JaXNNWxCUqUQvYg78vlGMxonSx056RnZgKoaFuW3EszI2fwgjR3D/sZso
-         aCCiqyhQlWBqzgRDqWfqTT+0XrUZz/7lP1M03NvUsvFJ7Jq61/2P57SrMDdWVKgFEMX1
-         Y7s+fyMXw/r2oUtSSHsmPwnfgNIBlEZ6bh9bMss/3pKa+OS4n2u80vp9Rol7359Nurtp
-         KB7w==
-X-Forwarded-Encrypted: i=1; AJvYcCXGmHzRYYTf7glhdPQL1fKNEyMn35giMLHrCcKtC7AaX9gyMtT7slU1YEeOec76xM85Q1lupZPeGwFeDufYeh3FBpiadOtKwIG7xKNTS30Y
-X-Gm-Message-State: AOJu0YySuPIl+Z6mKPy+48qbIwtrAOS5IQdbZXziaYXyuwo6OQr78Hjj
-	6eCfRNXWIi5smL6iR5rmsEZGIJAnjrkqtRVqCWsJPuwrjcMT46RzkZYrkwn6Vg==
-X-Google-Smtp-Source: AGHT+IH1rikuhNj0OquZ0S4r6mxoySZdUb7e8LauZUYkkEk1Nvrw/QkINkPPRL6SyC28CWMObjni5A==
-X-Received: by 2002:a05:6a21:3993:b0:1a7:a1e6:70cb with SMTP id ad19-20020a056a21399300b001a7a1e670cbmr1324093pzc.8.1712867406535;
-        Thu, 11 Apr 2024 13:30:06 -0700 (PDT)
-Received: from ?IPV6:2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08? ([2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08])
-        by smtp.gmail.com with ESMTPSA id l16-20020a170902f69000b001e29c4b7bd2sm1571747plg.240.2024.04.11.13.30.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Apr 2024 13:30:06 -0700 (PDT)
-Message-ID: <f7a24b54-9a1f-41f4-8706-d7199a4a84e8@penguintechs.org>
-Date: Thu, 11 Apr 2024 13:30:04 -0700
+        d=1e100.net; s=20230601; t=1712867672; x=1713472472;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6d5/zZMetxz2E749x7yHPar+sSYn1Z1a3Yy6ctoBmUU=;
+        b=NxQXn70MNXyR6P138fmi4bPhajkntXGSr5nkwJVxP7tPLdM2WtFsW/8K4UkFj01cXg
+         FkSsGWMgceKmW8zX4EM0/vFj+kAy7hbDBCIeQZWN12roSzy02J0DMObcgjVGRhVF8nma
+         vKfRc4vfTHH/XxJKi4skpVQvMS4n0cIHhYl9SIzyGxq/Wi9Cewlbuc/55PPvoKoVt5bv
+         TMUQWtawQIQDRudDNmkaoS1X7CnmS4h8EQHf1+oiJRIagxrz5iekRMid9oGIAGMYxAjt
+         ZckAxLgiXK2eiu8xfgeCiZM9oJC1t5n9ulpaOQY/dEoazGG6/7WR9fYmChn2hC4/b5DG
+         iz0A==
+X-Gm-Message-State: AOJu0YwtD/JPc1FP0DkTerLiV51MgeCsoAH63z4eg/fRiK7Y9o0qlVUm
+	H/bHLrnkp2uhof1rfPTHuH0uM2dNdXglUnONAOpu961AzVp4ZUsAtLHokQ==
+X-Google-Smtp-Source: AGHT+IEleYeRHtesPK9GSCZpQuf2JrjM9fRAB1YM3tA8vcf1CQhc+2tsPyRC6MDjq27Hh1WRTRGy+A==
+X-Received: by 2002:ac8:5f95:0:b0:434:ffff:698c with SMTP id j21-20020ac85f95000000b00434ffff698cmr718976qta.35.1712867672266;
+        Thu, 11 Apr 2024 13:34:32 -0700 (PDT)
+Received: from [172.17.0.2] ([20.102.210.214])
+        by smtp.gmail.com with ESMTPSA id s11-20020ac8528b000000b0043476c7f668sm1334202qtn.5.2024.04.11.13.34.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Apr 2024 13:34:31 -0700 (PDT)
+Message-ID: <66184957.c80a0220.5236e.346f@mx.google.com>
+Date: Thu, 11 Apr 2024 13:34:31 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2186040712180123369=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Wren Turkal <wt@penguintechs.org>
-Subject: Re: QCA6390 bluetooth doesn't work after warm boot or
- disable/reenable
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>
-Cc: ath11k@lists.infradead.org, linux-bluetooth@vger.kernel.org,
- Kalle Valo <kvalo@kernel.org>
-References: <a03dace1-ca0f-41d6-8e2c-636e3b053a3a@penguintechs.org>
- <31bb6e18-ecee-49b3-87d7-50ab53e07447@penguintechs.org>
- <1b3d3937-6679-491e-a5c6-818ae8ac639a@penguintechs.org>
- <b592d037-41ed-42e8-8c3c-286eb1a68ceb@penguintechs.org>
- <68a31d6a-8eb8-4d78-819b-fb67367cc41d@penguintechs.org>
- <CABBYNZJQUy37fxWuCXV1OgM+DNnOr7V0h_rkgcSdw-5hF7iauQ@mail.gmail.com>
- <fca46585-c1ed-4a60-91b5-6da39a5bbdec@penguintechs.org>
- <02400664-2d23-42d3-b49b-0c59f606d298@penguintechs.org>
- <8162d6c7-d968-465e-bb8f-3c939eb8d783@penguintechs.org>
-Content-Language: en-US
-In-Reply-To: <8162d6c7-d968-465e-bb8f-3c939eb8d783@penguintechs.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v3,1/3] shared/bap: Fix not updating location
+In-Reply-To: <20240411180721.157181-1-luiz.dentz@gmail.com>
+References: <20240411180721.157181-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============2186040712180123369==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-On 4/10/24 3:40 PM, Wren Turkal wrote:
-> On 4/10/24 3:00 PM, Wren Turkal wrote:
->> +Johan since he's a former BT drivers maintainer.
->>
->> On 4/9/24 1:11 PM, Wren Turkal wrote:
->>> On 4/9/24 1:03 PM, Luiz Augusto von Dentz wrote:
->>>> 5.19 seems a little too old, imo, or has it been broken for that long,
->>>> did you at least tried with bluetooth-next? Try contacting the people
->>>> who actually wrote the driver.
->>>
->>> Sorry, I didn't answer your question. Yes, I do think it's been 
->>> broken for longer than that, but I wanted to confirm.
->>
->> Okay, so I tried 6.9-rc3 and every main release 5.19-6.8.
->>
->> I have found the following:
->>
->> * older kernels (6.3 and before) seem to be far less likely to kill on 
->> a cycling the bluetooth service.
->> * 6.8/6.9-rcs consistently destroy bluetooth when stopping and 
->> restarting the service
->> * If I destroy the bluetooth service with a BT service restart in 
->> 6.9-rc3 and warm reboot into any release back to 5.19, bluetooth does 
->> not work
->> * cold boot works in all cases assuming I give the laptop about 5s 
->> between power off/on
-> 
-> I just did another experiment on 6.9-rc3. I blacklisted relevant 
-> bluetooth modules and then warm booted without the blacklist. I did this 
-> for both the "bluetooth" and "btqca" modules. In both cases, I cold 
-> booted with and appropriate "module_blacklist" kernel arg. After the 
-> boot, I verified the module was not loaded. I then warm booted without 
-> the blacklist, and the bluetooth works, so bluetooth only seems to fail 
-> when the linux module code for closing the device is run before a warm 
-> boot.
+This is automated email and please do not reply to this email!
 
-And another experiment. I disabled the bluetooth.service and 
-bluetooth.target with systemctl. I then shutdown and cold booted. After 
-logging into GNOME, starting the service. Similar failures show up in 
-the kernel logs as after the failure during a warm boot:
+Dear submitter,
 
-Apr 11 13:17:54 braindead.localdomain bluetoothd[4408]: Bluetooth 
-management interface 1.22 initialized
-Apr 11 13:17:54 braindead.localdomain bluetoothd[4408]: 
-src/adapter.c:reset_adv_monitors_complete() Failed to reset Adv 
-Monitors: Failed (0x03)
-Apr 11 13:17:54 braindead.localdomain bluetoothd[4408]: Battery Provider 
-Manager created
-Apr 11 13:17:54 braindead.localdomain kernel: Bluetooth: MGMT ver 1.22
-Apr 11 13:17:54 braindead.localdomain bluetoothd[4408]: 
-src/device.c:device_set_wake_support() Unable to set wake_support 
-without RPA resolution
-Apr 11 13:17:54 braindead.localdomain bluetoothd[4408]: Failed to clear 
-UUIDs: Failed (0x03)
-Apr 11 13:17:54 braindead.localdomain bluetoothd[4408]: Failed to add 
-UUID: Failed (0x03)
-Apr 11 13:17:54 braindead.localdomain bluetoothd[4408]: Failed to add 
-UUID: Failed (0x03)
-Apr 11 13:17:54 braindead.localdomain bluetoothd[4408]: Failed to add 
-UUID: Failed (0x03)
-Apr 11 13:17:54 braindead.localdomain wireplumber[2139]: 
-org.bluez.GattManager1.RegisterApplication() failed: 
-GDBus.Error:org.freedesktop.DBus.Error.UnknownMethod: Invalid method call
-Apr 11 13:17:54 braindead.localdomain wireplumber[2139]: 
-org.bluez.GattManager1.RegisterApplication() failed: 
-GDBus.Error:org.freedesktop.DBus.Error.UnknownMethod: Invalid method call
-Apr 11 13:17:54 braindead.localdomain kernel: Bluetooth: hci0: setting 
-up ROME/QCA6390
-Apr 11 13:17:54 braindead.localdomain kernel: Bluetooth: RFCOMM TTY 
-layer initialized
-Apr 11 13:17:54 braindead.localdomain kernel: Bluetooth: RFCOMM socket 
-layer initialized
-Apr 11 13:17:54 braindead.localdomain kernel: Bluetooth: RFCOMM ver 1.11
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=843744
 
-... skip some logs about registering modules in the bluetoothd ...
+---Test result---
 
-Apr 11 13:17:54 braindead.localdomain kernel: Bluetooth: hci0: QCA 
-Product ID   :0x00000010
-Apr 11 13:17:54 braindead.localdomain kernel: Bluetooth: hci0: QCA SOC 
-Version  :0x400a0200
-Apr 11 13:17:54 braindead.localdomain kernel: Bluetooth: hci0: QCA ROM 
-Version  :0x00000200
-Apr 11 13:17:54 braindead.localdomain kernel: Bluetooth: hci0: QCA Patch 
-Version:0x00003ac0
-Apr 11 13:17:54 braindead.localdomain kernel: Bluetooth: hci0: QCA 
-controller version 0x02000200
-Apr 11 13:17:54 braindead.localdomain kernel: Bluetooth: hci0: QCA 
-Downloading qca/htbtfw20.tlv
-Apr 11 13:17:54 braindead.localdomain kernel: Bluetooth: hci0: QCA 
-Failed to send TLV segment (-110)
-Apr 11 13:17:54 braindead.localdomain kernel: Bluetooth: hci0: QCA 
-Failed to download patch (-110)
-Apr 11 13:17:54 braindead.localdomain kernel: Bluetooth: hci0: Retry BT 
-power ON:0
-Apr 11 13:17:57 braindead.localdomain kernel: Bluetooth: hci0: command 
-0xfc00 tx timeout
-Apr 11 13:17:57 braindead.localdomain kernel: Bluetooth: hci0: Reading 
-QCA version information failed (-110)
-Apr 11 13:17:57 braindead.localdomain kernel: Bluetooth: hci0: Retry BT 
-power ON:1
-Apr 11 13:17:59 braindead.localdomain kernel: Bluetooth: hci0: command 
-0xfc00 tx timeout
-Apr 11 13:17:59 braindead.localdomain kernel: Bluetooth: hci0: Reading 
-QCA version information failed (-110)
-Apr 11 13:17:59 braindead.localdomain kernel: Bluetooth: hci0: Retry BT 
-power ON:2
-Apr 11 13:18:01 braindead.localdomain bluetoothd[4408]: Failed to set 
-mode: Authentication Failed (0x05)
-Apr 11 13:18:01 braindead.localdomain kernel: Bluetooth: hci0: command 
-0xfc00 tx timeout
-Apr 11 13:18:01 braindead.localdomain kernel: Bluetooth: hci0: Reading 
-QCA version information failed (-110)
-Apr 11 13:18:01 braindead.localdomain bluetoothd[4408]: Failed to add 
-UUID: Failed (0x03)
-Apr 11 13:18:01 braindead.localdomain bluetoothd[4408]: Failed to add 
-UUID: Failed (0x03)
-Apr 11 13:18:01 braindead.localdomain bluetoothd[4408]: Too small Add 
-Device complete event
-Apr 11 13:18:01 braindead.localdomain bluetoothd[4408]: Failed to add 
-UUID: Failed (0x03)
-Apr 11 13:18:01 braindead.localdomain bluetoothd[4408]: Failed to add 
-UUID: Failed (0x03)
-Apr 11 13:18:01 braindead.localdomain bluetoothd[4408]: Failed to add 
-UUID: Failed (0x03)
-Apr 11 13:18:01 braindead.localdomain bluetoothd[4408]: Failed to add 
-UUID: Failed (0x03)
-Apr 11 13:18:01 braindead.localdomain bluetoothd[4408]: Failed to add 
-UUID: Failed (0x03)
-Apr 11 13:18:01 braindead.localdomain bluetoothd[4408]: Failed to add 
-UUID: Failed (0x03)
+Test Summary:
+CheckPatch                    PASS      1.25 seconds
+GitLint                       FAIL      1.06 seconds
+BuildEll                      PASS      24.37 seconds
+BluezMake                     PASS      1666.15 seconds
+MakeCheck                     PASS      13.36 seconds
+MakeDistcheck                 PASS      180.32 seconds
+CheckValgrind                 PASS      253.00 seconds
+CheckSmatch                   WARNING   350.35 seconds
+bluezmakeextell               PASS      118.67 seconds
+IncrementalBuild              PASS      4594.81 seconds
+ScanBuild                     PASS      1021.15 seconds
 
-It looks like the firmware is failing to load. Is there some kind of 
-time limit on loading the firmware after the module is loaded?
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,v3,2/3] shared/bap: Make bt_bap_select fallback in case of no channel allocation
 
-Why would this work if I allow the service to be started on boot, but 
-not if I wait until after logging into GNOME?
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (87>80): "[BlueZ,v3,2/3] shared/bap: Make bt_bap_select fallback in case of no channel allocation"
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+src/shared/bap.c:282:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:282:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:282:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:282:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:282:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:282:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:282:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:282:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:282:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structures
 
->> So, I suspsect that the process of closing out the hardware may be 
->> leaving it in a state that the reset cannot handle (and probably never 
->> could handle).
->>
->> I also found that qualcomm has docs here: 
->> https://www.qualcomm.com/products/technology/wi-fi/fastconnect/fastconnect-6800#Documentation
->>
->> However, I am not a member of a Qualcomm verified company (mentioned 
->> in the doc links). Luiz, Marcel, or Johan, do you have any contacts 
->> that might be able to help me in getting info about the technical docs 
->> for this hardware? I would love to see if I can find any issues in how 
->> the hardware is being reset.
->>
->> As an independent dev, I don't even know what it takes to get that 
->> kind of access. I would welcome any help here. Hey Qualcomm, are you 
->> hiring? :P
->>
->> wt
-> 
 
--- 
-You're more amazing than you think!
+---
+Regards,
+Linux Bluetooth
+
+
+--===============2186040712180123369==--
