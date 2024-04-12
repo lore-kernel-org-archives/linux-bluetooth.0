@@ -1,205 +1,141 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01F52148FE6
-	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Apr 2024 16:28:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7BE438DC8
+	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Apr 2024 16:56:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712939286; cv=none; b=AhNLVUthghVkqy17ge5xl8F24HMs5Ml32FIYuV84vyOcPJE9C4sGS/yC2Qjoxu52gXIDDjuhpqzWR6RSzikJuOvSkkyL1nltU/FAs0J/DYcvc0OwYGgSwKRQgW4MWnkTfqwKgfBqsGlDOLOH3mocqr/5T5Sm4BFP/9aEn6kmp+o=
+	t=1712941012; cv=none; b=WdmjL04a8GVzEuvsT7Z/j+rgXKR7c08c4/tbw4VqR8TO4mMS/wUwIOe8ojaV8t4YiPh+PmYCQyt7rpqZw6xbOD/mL1nJ39qtp9GsMhYNlhOhpb4lh9p0bYT0XNeJD64UKRHA6Xdl3fE05QjUqpQm4KJ7yB8UXLfKjDRIaw2jntE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712939286; c=relaxed/simple;
-	bh=Ji53xIb1oJLgi13FbeqdllcwUsq+ukpei4/aHZza1Yc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pQPjT30kRwrMRTt9myMLCL/AcllcTaAohgvRCqp6KM4VL4pligg35/gnAzFJ2z0354/WHIrVwUNNv0mFJ5rnWXxV0iC/8mt40JNnVGloAQE+OBlUwWmPSF3aMcj/kHZNql302OX62T2iW+m8ax4GKjP57YLaQjJ4OP5BMW485ME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=PJ7wkuZ+; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1712941012; c=relaxed/simple;
+	bh=SqI4fmFqxK3UEKzIzXFl4RtloKdyKTFdWhqVYJplXEE=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=HsNFFIpO5oie18uUe9alcijvyPg+LC79puKiBDu9T+eeDpxaHHdjNO/B8Uds1IKv/kFBkhAcinoD04KvbdmOqFjIPmyowCQUGrIszVwBN9w8lUlGsW4wUovafQ084GKlj9ZyNlsB/qlhdwK5vWmYvQLRetods+psDAHMbV81vrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K7KudxsD; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="PJ7wkuZ+"
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 43CEK2wX011563;
-	Fri, 12 Apr 2024 16:27:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-type; s=qcppdkim1; bh=rr3i0fGyQmBeiuP/qcwi
-	asMzCm31H9+1jc4tCFA79x4=; b=PJ7wkuZ+GsaS+ZZL241CXzRAzDHIHHC/nr1c
-	OesG8XqC7+mdOBbhy9HLRA/++Ky+JgKP173G4VgfZDKGZid9x/b5LsUyH/CylPxr
-	aQcBTP6AymsyS6EylidWb6hYXA2vLDkcMofPv/CFc2mDXg0nvhICmjtUMPqyUudd
-	COs6OEd3lizttaRvg2UgHWIfSIieygis0I2K+atCIbYqbrlNXlP1B8RqUl+CjSXc
-	DYK1JX+OKDYJwDQF+4dEevLG0mRloTZWyFw//1zLqor7r59R0s7Vi6tBw5mY0Ln1
-	8amJfoMVTh6/sFbCMAURLl4sr7w5MnjkqejA0APeEnmytoGKhA==
-Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xf6khr8e5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 12 Apr 2024 16:27:59 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43CGRwdt014051
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 12 Apr 2024 16:27:58 GMT
-Received: from zijuhu-gv.qualcomm.com (10.80.80.8) by
- nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Fri, 12 Apr 2024 09:27:57 -0700
-From: Zijun Hu <quic_zijuhu@quicinc.com>
-To: <luiz.dentz@gmail.com>, <marcel@holtmann.org>, <jiangzp@google.com>
-CC: <linux-bluetooth@vger.kernel.org>, <quic_zijuhu@quicinc.com>
-Subject: [PATCH BlueZ v1] tools/btattach: Add support for more QCA soc types
-Date: Sat, 13 Apr 2024 00:26:28 +0800
-Message-ID: <1712939188-25529-5-git-send-email-quic_zijuhu@quicinc.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1712939188-25529-1-git-send-email-quic_zijuhu@quicinc.com>
-References: <1710914907-30012-1-git-send-email-quic_zijuhu@quicinc.com>
- <1712939188-25529-1-git-send-email-quic_zijuhu@quicinc.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K7KudxsD"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1e2232e30f4so10331865ad.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Apr 2024 09:56:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712941010; x=1713545810; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=IDMIUKhW/Lx/laloezdC5ylh8RFVeGXV/DJLgXiWAGY=;
+        b=K7KudxsD3t1eorlYzIJVKRXvmwNCVPVd33Y/T8M1Si4vxD36HZ7mXcQwfGYMo1OzIh
+         t2QCd/OfmHs6rW5OhsZ7SApMB0oYOq4oWkzPy9orRWp9nJ/2wAybaysXhvxQABnsFLUz
+         HmH3J2ciNYxu2WemicdwsEMCnvgxwDSNpzbajp5FtzF5qq6zzG7h9POrCgFURDQzaX69
+         SU83AMmbK4S7t084tJGsP9252V4YruLVUXdfoGFhtpDfpZn2iSJ2ISgjYZoWNYYiaajB
+         19oy+EVCgllOR8okserbm+K6b4G0FdzLYxhpjAlWEILGBReaPUwzHlqpzwDeixnS/cGB
+         dLeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712941010; x=1713545810;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IDMIUKhW/Lx/laloezdC5ylh8RFVeGXV/DJLgXiWAGY=;
+        b=JCavDFPpxezaPDqT4MKhHwfq2Kke0T12Dw7zyRrNPQ07b6YeZLPTziXquW/ulubM9H
+         ELQHZQAoD6EBCXELIO2mNzD7un65gbZejPI1y2BcrQ4eT9ed23u/CEerfKgwIX5pMaJf
+         pqh9uADamb2N9cOoYn/JR/vg/rRKWSf/UjyLMpPsy5fNlozA1O3cNkxH2ZrXkaIHO2pc
+         G9rbPbeotHtMJbVLs1OOzFjZYXnU/5ogwc/pRZdPjNb7lQBIY/AYSJ5HezJELmyN1bRV
+         pm93XkZCtVe3lrZZiyQ4s+T75dXnY6vmOArzQ9gLII3hlDalsCQyX99HE11Gh/GdxW0n
+         Xd0A==
+X-Gm-Message-State: AOJu0YwJLLIdsV5zUJvW0cnSV7qoofdPQttMV8Y3S3NiPUgd0Cgb0RGK
+	NdmLE15H7dK4JuyAFF+O3pLMebT2ni13ZGnqgtBLdZCM3/qaJ85FnW7j6w==
+X-Google-Smtp-Source: AGHT+IF4fXf/tWIEaeG8Qpm/F343+6nYN10LRTqcdCTYQ1Sc3+L0Z8GMQ4PvFZips5PHD+/WTdg23A==
+X-Received: by 2002:a17:902:a510:b0:1e1:3300:702b with SMTP id s16-20020a170902a51000b001e13300702bmr2427648plq.15.1712941009789;
+        Fri, 12 Apr 2024 09:56:49 -0700 (PDT)
+Received: from [172.17.0.2] ([52.225.77.111])
+        by smtp.gmail.com with ESMTPSA id u22-20020a1709026e1600b001e2ba8605dfsm1666896plk.150.2024.04.12.09.56.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Apr 2024 09:56:49 -0700 (PDT)
+Message-ID: <661967d1.170a0220.ee0a.48f8@mx.google.com>
+Date: Fri, 12 Apr 2024 09:56:49 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1361719723172477657=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: JupBVmgHvKY58ibsECo_Fy6ftMvHo9yB
-X-Proofpoint-GUID: JupBVmgHvKY58ibsECo_Fy6ftMvHo9yB
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-12_12,2024-04-09_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
- priorityscore=1501 malwarescore=0 phishscore=0 lowpriorityscore=0
- adultscore=0 mlxlogscore=741 bulkscore=0 clxscore=1015 impostorscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2404010003 definitions=main-2404120120
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, quic_zijuhu@quicinc.com
+Subject: RE: Fix 2 tool btattach issues for QCA controllers
+In-Reply-To: <1712939188-25529-2-git-send-email-quic_zijuhu@quicinc.com>
+References: <1712939188-25529-2-git-send-email-quic_zijuhu@quicinc.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Tool btattach currently only supports QCA default soc type
-QCA_ROME, this change adds support for all other QCA soc types
-by adding a option to specify soc type.
+--===============1361719723172477657==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=844120
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.73 seconds
+GitLint                       PASS      0.56 seconds
+SubjectPrefix                 PASS      0.17 seconds
+BuildKernel                   PASS      29.94 seconds
+CheckAllWarning               PASS      32.59 seconds
+CheckSparse                   PASS      37.83 seconds
+CheckSmatch                   FAIL      34.84 seconds
+BuildKernel32                 PASS      28.64 seconds
+TestRunnerSetup               PASS      519.51 seconds
+TestRunner_l2cap-tester       PASS      18.38 seconds
+TestRunner_iso-tester         PASS      32.85 seconds
+TestRunner_bnep-tester        PASS      4.64 seconds
+TestRunner_mgmt-tester        PASS      108.95 seconds
+TestRunner_rfcomm-tester      PASS      7.20 seconds
+TestRunner_sco-tester         PASS      14.86 seconds
+TestRunner_ioctl-tester       PASS      9.88 seconds
+TestRunner_mesh-tester        FAIL      5.85 seconds
+TestRunner_smp-tester         PASS      6.65 seconds
+TestRunner_userchan-tester    PASS      4.80 seconds
+IncrementalBuild              PASS      40.47 seconds
+
+Details
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
+
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 9 (90.0%), Failed: 1, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Failed       0.100 seconds
+
+
 ---
- tools/btattach.c   | 29 ++++++++++++++++++++++++-----
- tools/btattach.rst |  2 ++
- tools/hciattach.h  |  2 ++
- 3 files changed, 28 insertions(+), 5 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/tools/btattach.c b/tools/btattach.c
-index 4ce1be78d69c..024b0c7a289c 100644
---- a/tools/btattach.c
-+++ b/tools/btattach.c
-@@ -97,7 +97,8 @@ static void local_version_callback(const void *data, uint8_t size,
- }
- 
- static int attach_proto(const char *path, unsigned int proto,
--			unsigned int speed, bool flowctl, unsigned int flags)
-+			unsigned int speed, bool flowctl, unsigned int flags,
-+			unsigned long soc_type)
- {
- 	int fd, dev_id;
- 
-@@ -111,6 +112,16 @@ static int attach_proto(const char *path, unsigned int proto,
- 		return -1;
- 	}
- 
-+	if ((proto == HCI_UART_QCA) && (soc_type > 0)) {
-+		if (ioctl(fd, HCIUARTSETPROTODATA, soc_type) < 0) {
-+			fprintf(stderr,
-+				"Failed to set soc_type(%lu) for protocol qca\n",
-+				soc_type);
-+			close(fd);
-+			return -1;
-+		}
-+	}
-+
- 	if (ioctl(fd, HCIUARTSETPROTO, proto) < 0) {
- 		perror("Failed to set protocol");
- 		close(fd);
-@@ -181,6 +192,7 @@ static void usage(void)
- 		"\t-A, --amp <device>     Attach AMP controller\n"
- 		"\t-P, --protocol <proto> Specify protocol type\n"
- 		"\t-S, --speed <baudrate> Specify which baudrate to use\n"
-+		"\t-T, --type <soc_type>  Specify soc_type for protocol qca\n"
- 		"\t-N, --noflowctl        Disable flow control\n"
- 		"\t-h, --help             Show help options\n");
- }
-@@ -190,6 +202,7 @@ static const struct option main_options[] = {
- 	{ "amp",      required_argument, NULL, 'A' },
- 	{ "protocol", required_argument, NULL, 'P' },
- 	{ "speed",    required_argument, NULL, 'S' },
-+	{ "type",     required_argument, NULL, 'T' },
- 	{ "noflowctl",no_argument,       NULL, 'N' },
- 	{ "version",  no_argument,       NULL, 'v' },
- 	{ "help",     no_argument,       NULL, 'h' },
-@@ -221,12 +234,13 @@ int main(int argc, char *argv[])
- 	bool flowctl = true, raw_device = false;
- 	int exit_status, count = 0, proto_id = HCI_UART_H4;
- 	unsigned int speed = B115200;
-+	unsigned long soc_type = 0;
- 
- 	for (;;) {
- 		int opt;
- 
--		opt = getopt_long(argc, argv, "B:A:P:S:NRvh",
--						main_options, NULL);
-+		opt = getopt_long(argc, argv, "B:A:P:S:T:NRvh",
-+				  main_options, NULL);
- 		if (opt < 0)
- 			break;
- 
-@@ -237,6 +251,9 @@ int main(int argc, char *argv[])
- 		case 'A':
- 			amp_path = optarg;
- 			break;
-+		case 'T':
-+			soc_type = strtoul(optarg, NULL, 0);
-+			break;
- 		case 'P':
- 			proto = optarg;
- 			break;
-@@ -298,7 +315,8 @@ int main(int argc, char *argv[])
- 		if (raw_device)
- 			flags = (1 << HCI_UART_RAW_DEVICE);
- 
--		fd = attach_proto(bredr_path, proto_id, speed, flowctl, flags);
-+		fd = attach_proto(bredr_path, proto_id, speed, flowctl, flags,
-+				  soc_type);
- 		if (fd >= 0) {
- 			mainloop_add_fd(fd, 0, uart_callback, NULL, NULL);
- 			count++;
-@@ -317,7 +335,8 @@ int main(int argc, char *argv[])
- 		if (raw_device)
- 			flags = (1 << HCI_UART_RAW_DEVICE);
- 
--		fd = attach_proto(amp_path, proto_id, speed, flowctl, flags);
-+		fd = attach_proto(amp_path, proto_id, speed, flowctl, flags,
-+				  soc_type);
- 		if (fd >= 0) {
- 			mainloop_add_fd(fd, 0, uart_callback, NULL, NULL);
- 			count++;
-diff --git a/tools/btattach.rst b/tools/btattach.rst
-index 787d5c49e3bb..4aad3b915641 100644
---- a/tools/btattach.rst
-+++ b/tools/btattach.rst
-@@ -62,6 +62,8 @@ OPTIONS
- 
- -S baudrate, --speed baudrate       Specify wich baudrate to use
- 
-+-T soc_type, --type soc_type        Specify soc_type for protocol qca
-+
- -N, --noflowctl            Disable flow control
- 
- -v, --version              Show version
-diff --git a/tools/hciattach.h b/tools/hciattach.h
-index dfa4c1e7abe7..998a2a9a8460 100644
---- a/tools/hciattach.h
-+++ b/tools/hciattach.h
-@@ -19,6 +19,8 @@
- #define HCIUARTGETDEVICE	_IOR('U', 202, int)
- #define HCIUARTSETFLAGS		_IOW('U', 203, int)
- #define HCIUARTGETFLAGS		_IOR('U', 204, int)
-+#define HCIUARTSETPROTODATA    _IOW('U', 205, unsigned long)
-+
- 
- #define HCI_UART_H4	0
- #define HCI_UART_BCSP	1
--- 
-2.7.4
 
+--===============1361719723172477657==--
