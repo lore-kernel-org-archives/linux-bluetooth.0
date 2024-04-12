@@ -1,124 +1,116 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 946D8139D0F
-	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Apr 2024 15:37:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 625A91487E4
+	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Apr 2024 16:27:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712936251; cv=none; b=TUe/a1Grj4k777LZ4JIfHbbAWIokDIkmENeXFRjI9DPHF6+wupUo7XWchF5hVzKGGxP3ukTJC175VaYSfDfmekHUOFhB8tfjExEUwR0VZ1LOLeYOXPUu9N2uANQe2vGNf/3dK3iybDtSs/QJaq+hqYeE8XV6hyxBFive+pLTnnY=
+	t=1712939242; cv=none; b=FZyOTTmCO4LY2EO7MfdoFckGOlLMXtDCtCWfRJrd/DLCgFl8KE/tvrHvWfYrOEhjy08Dyk2pJ/CW6xZgy35UWn9vQ9Ps8gkAl24ar7UO6OJYy0r8p3z3YjQrQH/xPuF/MqrMVGsAiGubBTcZiAZVf6KLuaGThJujRpPJSpqeIDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712936251; c=relaxed/simple;
-	bh=uPhtGRLKjd7gk74v12X9Utpl+NSn8lYPFn2j2nU4guE=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=RF68pUvSnGoPgZ+fV8ZNlNZj3+L4HsGhdHgGeODTkzxhtltWx+oLYsT2KKVA002rxK+AQUbRZPJKSy48HmBjwUrRE1h7clE4MMeSrLgyespWmFWONZoc87QL7+XhIWM0eSr5azbnBdMxSttaYAZwAUAwVzEfhC1+e+xkQzSbcz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V6w4WdMU; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1712939242; c=relaxed/simple;
+	bh=IaWTs3foOVJYe67XxUfQPiOK48fr7V/D20gbTH4kUX4=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jrIouHfpzGl8gAcZj5Gab2fWm6UoDhk6UXPrChbGvovyUazEsiAL5WbZssuERmbI9GpEoNaVZAdx/7It2c7UqAJ7UlGN48zLqh0HaDohihStRyx7cyDQF7QU6K2h1ZB0uT+5VyHBeUGxCF4Q+iIBpZtlMdqeCzaIY2nfYms5/hE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=FeK6m+c5; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V6w4WdMU"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2EAA3C3277B
-	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Apr 2024 15:37:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712936250;
-	bh=uPhtGRLKjd7gk74v12X9Utpl+NSn8lYPFn2j2nU4guE=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=V6w4WdMUTDp2rN1sL/NFIug0yBqbWWRLVTRtuMOI1sZlVPjEk+Tob6sQNUv6/N+Sh
-	 oHjYvMSFZQHOfFpP9nwhjJLEMv5QCN6y0ihQRgbesnC6aO0bPrCGn3x8weD0jX0b5h
-	 U2baTcAtNaAb0z5noPg5EnuEZOzDH3VAf1WZNXoweAQ1nzQjUClUPtsazVK9d3Zi+s
-	 ESGR0MibGfyHIvYoBMebOHARGhQeyo6+r7Td8rKzqTYjW2Zo0YKpWmoSh6CpOM5s5U
-	 0HW/+/vTzhh+KrxAG8g0Rn5KdU0bD0sm+ubZkCgNg8eUWfUfocTsgAdoSknAXcDnaG
-	 5axCPw6Gkggcw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 21084C433E5; Fri, 12 Apr 2024 15:37:30 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 216936] First attempt to upload firmware for Intel Bluetooth
- fails (a timing issue?)
-Date: Fri, 12 Apr 2024 15:37:29 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: aros@gmx.com
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: CODE_FIX
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-216936-62941-on7439OWmw@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-216936-62941@https.bugzilla.kernel.org/>
-References: <bug-216936-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="FeK6m+c5"
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 43CFuo6r029422;
+	Fri, 12 Apr 2024 16:27:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-type; s=qcppdkim1; bh=umG5tSiOKH2/Q3/cgGRZ
+	nBFa1Zanj7XVsR/VsaA0pd8=; b=FeK6m+c5VDqdLF8qUk+5vCjaEEcCCYswSeuQ
+	s4XjCs8J94sxz8hRz43RK3ZqyUYeJTyProjddiPpWZDZZY9LQRFwWhkDJrR9QkcK
+	Eb0dra5vI6RzWIp7yWkbbt+MYsDONwx7/OD2eeV4o2jVOneUxPJvk+UMEDrftXxw
+	ovUeMUEEOU4hU5EGx4pVWRYjP/K29rpvrZB5X6+pmbkrFbzUvWNe8Ag2avVWahJL
+	uFAXBfCngyNG59yhzmhGOWNxi11nUTbfVEwjSkml20DCbSLBpDAakPH1tR5M+Zpz
+	fc6/905L8Ms/sST4uezHSJVfaErHHL6O8Qz/JEL8dlwAPWLq4Q==
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xewr39drc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 12 Apr 2024 16:27:15 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43CGREYr007189
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 12 Apr 2024 16:27:14 GMT
+Received: from zijuhu-gv.qualcomm.com (10.80.80.8) by
+ nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Fri, 12 Apr 2024 09:27:13 -0700
+From: Zijun Hu <quic_zijuhu@quicinc.com>
+To: <luiz.dentz@gmail.com>, <marcel@holtmann.org>, <jiangzp@google.com>
+CC: <linux-bluetooth@vger.kernel.org>, <quic_zijuhu@quicinc.com>
+Subject: [PATCH v1 0/3] Fix 2 tool btattach issues for QCA controllers
+Date: Sat, 13 Apr 2024 00:26:24 +0800
+Message-ID: <1712939188-25529-1-git-send-email-quic_zijuhu@quicinc.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1710914907-30012-1-git-send-email-quic_zijuhu@quicinc.com>
+References: <1710914907-30012-1-git-send-email-quic_zijuhu@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: 6VNgx0w40FokejvnWdu-2vVkqqNP3GUd
+X-Proofpoint-GUID: 6VNgx0w40FokejvnWdu-2vVkqqNP3GUd
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-12_12,2024-04-09_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ malwarescore=0 phishscore=0 spamscore=0 lowpriorityscore=0 mlxscore=0
+ bulkscore=0 clxscore=1011 adultscore=0 mlxlogscore=758 suspectscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2404010003 definitions=main-2404120120
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216936
+There are many QCA soc types defined by drivers/bluetooth/btqca.h
+enum qca_btsoc_type {
+        QCA_INVALID = -1,
+        QCA_AR3002,
+        QCA_ROME,
+        QCA_WCN3988,
+        QCA_WCN3990,
+        QCA_WCN3998,
+        QCA_WCN3991,
+        QCA_QCA2066,
+        QCA_QCA6390,
+        QCA_WCN6750,
+        QCA_WCN6855,
+        QCA_WCN7850,
+        QCA_MAX,
+};
+and every soc type stands for a kind of QCA BT controller, this patch
+series are to solve below 2 tool btattach issues for QCA soc types:
+1) tool btattach will cause kernel crash when used for QCA_ROME
+2) tool btattach does not support any other soc type except QCA_ROME
 
---- Comment #20 from Artem S. Tashkinov (aros@gmx.com) ---
-This is still reproducible in 6.8.5:
+For hci_uart derived from tool btattach, it is allocated by hci_ldisc
+and is Non-serdev device, its @serdev is NULL and its soc type is
+currenlty hard coded as QCA_ROME.
 
-dmesg -t | grep -i blue
-Bluetooth: Core ver 2.22
-NET: Registered PF_BLUETOOTH protocol family
-Bluetooth: HCI device and connection manager initialized
-Bluetooth: HCI socket layer initialized
-Bluetooth: L2CAP socket layer initialized
-Bluetooth: SCO socket layer initialized
-Bluetooth: hci0: Found device firmware: intel/ibt-18-16-1.sfi
-Bluetooth: hci0: Boot Address: 0x40800
-Bluetooth: hci0: Firmware Version: 173-5.24
-Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-Bluetooth: BNEP socket layer initialized
-Bluetooth: hci0: FW download error recovery failed (-19)
-Bluetooth: hci0: sending frame failed (-19)
-Bluetooth: hci0: Reading supported features failed (-19)
-Bluetooth: hci0: Error reading debug features
-Bluetooth: hci0: HCI LE Coded PHY feature bit is set, but its usage is not
-supported.
-Bluetooth: hci0: sending frame failed (-19)
-Bluetooth: hci0: Failed to read MSFT supported features (-19)
-Bluetooth: hci0: Bootloader revision 0.1 build 42 week 52 2015
-Bluetooth: hci0: Device revision is 2
-Bluetooth: hci0: Secure boot is enabled
-Bluetooth: hci0: OTP lock is enabled
-Bluetooth: hci0: API lock is enabled
-Bluetooth: hci0: Debug lock is disabled
-Bluetooth: hci0: Minimum firmware build 1 week 10 2014
-Bluetooth: hci0: Found device firmware: intel/ibt-18-16-1.sfi
-Bluetooth: hci0: Boot Address: 0x40800
-Bluetooth: hci0: Firmware Version: 173-5.24
-Bluetooth: hci0: Waiting for firmware download to complete
-Bluetooth: hci0: Firmware loaded in 1129749 usecs
-Bluetooth: hci0: Waiting for device to boot
-Bluetooth: hci0: Device booted in 14839 usecs
-Bluetooth: hci0: Malformed MSFT vendor event: 0x02
-Bluetooth: hci0: Found Intel DDC parameters: intel/ibt-18-16-1.ddc
-Bluetooth: hci0: Applying Intel DDC parameters completed
-Bluetooth: hci0: Firmware revision 0.1 build 173 week 5 2024
-Bluetooth: hci0: HCI LE Coded PHY feature bit is set, but its usage is not
-supported.
-Bluetooth: MGMT ver 1.22
-Bluetooth: ISO socket layer initialized
-Bluetooth: RFCOMM TTY layer initialized
-Bluetooth: RFCOMM socket layer initialized
-Bluetooth: RFCOMM ver 1.11
+The 1st issue is caused by dereferencing nullptr hu->serdev, in order to
+solve the 2nd issue, a new ioctl is introduced for user to specify soc
+type by a new added tool btattach option.
 
-No timings, btintel just tries to load the firmware when it's already there=
- (if
-you're rebooting from Windows).
+Zijun Hu (3):
+  Bluetooth: qca: Fix crash caused by tool btattach for QCA_ROME
+  Bluetooth: hci_ldisc: Add a ioctl HCIUARTSETPROTODATA
+  Bluetooth: qca: Fix wrong soc type returned for tool btattach
 
---=20
-You may reply to this email to add a comment.
+ drivers/bluetooth/btqca.h     |  1 +
+ drivers/bluetooth/hci_ldisc.c | 10 ++++++++++
+ drivers/bluetooth/hci_qca.c   | 10 ++++++++--
+ drivers/bluetooth/hci_uart.h  |  3 +++
+ 4 files changed, 22 insertions(+), 2 deletions(-)
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+-- 
+2.7.4
+
