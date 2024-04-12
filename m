@@ -1,112 +1,102 @@
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A16491B81F
-	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Apr 2024 08:24:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44E7053378;
+	Fri, 12 Apr 2024 08:43:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712910253; cv=none; b=QrViJvNF5h8u3nAQ36QRhFnYsbj6qNEoG5D79FNP0H8I/wxGdhVBzhQvRjZmdPqXw+n2+rDTIOO6J0kcBsIQXPipfnevuRtJGoSG2Ev4FaF8CXqE6fL98rgvy7IJoIGoRKmmGFx+hW4tHu6c212+3jmUeRnGtWbQR2DDCasUuVM=
+	t=1712911411; cv=none; b=PsZfiwda4RpZaXGgq+SCZdPUgBJDs/5trAgAWADUrifZXWlV9c9I6BG+xJaxi3vnSJf9fCIBjieCo/aIf+fQoFvvKfzfp28TT8dGSKgOL/EyBLL64JjG5JIHQ7S83bhkxVvbvwHdv2Jj86TVpdTRh3RMdsehE1k6DywdUeo4a/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712910253; c=relaxed/simple;
-	bh=+s6cMQQxp001mjfbrb31iAlVPsr9RuAORJw8X9ToNMg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ssHdWt5km3Lz46wi/LLH220zdTUeOSnOLqqHytzmEA3paKVjg157bOyWDnB9UxtOB/fOmQQ1gqvCWGUnPdCAXPAs3vtCTdlxhlX6C5xIl7+IQguqCYd3Nv/SKPTAK5kfhWOrdpU3GsppQYBUH3MjvS2tbJQNcOifbcFDwysUf9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WM1AX8NB; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1712911411; c=relaxed/simple;
+	bh=XLLxwOTa3tQ3ISUxUVT9CbxaZ2yDkfYTv7tVnzSV7YU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nDAUD0FPRpOrOVSHbsq1TLMOej2WK0Z3qEfQvwjRxl8Sooa4BaHjMdeTFrroh5OHK/sNCMtu+wZWDt9X4AFuAyJ6WNODzvW0rWeWTIA+aAO5CnIJW66Emdr4PRsMOADmg7RrKWzlr3Td7jH9xthjGWkKfoEPDh54PaQ6zD2PoDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=BMi3DoLc; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WM1AX8NB"
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-56e477db7fbso877178a12.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Apr 2024 01:24:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712910250; x=1713515050; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DuNdQAtLkWYGN0fPqcE7t0xY1JsPEeGxT6N0aOA+6o8=;
-        b=WM1AX8NBFBcnj9IJ1WwQwglrBrSnzkF3jQe4C6ZgmZR1uCQOpWXLJ00e8JxrVfLVGJ
-         Tua34t+zlxsMZ3yXXXjSTQ4Wt4g4I0ca2SwIyXUbjYONgdFslNqxz/It4MYKnDatEBY/
-         kAJzFRJAudlSu9i2Ta9AYa07TaAfjIMNzY+BT+YqDUsZVIg438tB/kdTHqeYToBf2Tzj
-         6hCbMq4KrEh2TForga3bnt5JFyeAti1WcCdyATBsxbZtnI02am+4E9DV77nr2/bfui+H
-         I+71uxa6LnuJ7DQmHctvmgyklilnZBeNxfLKC7unKR4JbIp9299gm3zmhXpSXeeX9ySP
-         KZ9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712910250; x=1713515050;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DuNdQAtLkWYGN0fPqcE7t0xY1JsPEeGxT6N0aOA+6o8=;
-        b=QyHluVbfTW6ba7vQ5l+5Bc/QDoFLbf3eNiYT8AyYN0tEt+QFDUvX+x3wDZBQF/dRtX
-         tnBE8VUNok6cuZujceQmjed4ncxQCTn1ePev2+fC7vkI+/qFmuCFLdXZGygCR3gOewoJ
-         tc/vsmiN8Fa92LePVfxjepbRg3qwR0SbFv0E3fPS3Hsvrmk3DLMPSNpoay3LYq0CalxV
-         cjW8UX4P5nmoJrGhpBnOBTVXF135wHOakwz5hvOcHpGYY1SKAhOUiBSiY1USLKVlrZhI
-         mblXE3iZP3xEgT/w0vIvhquScvYdpMLZ5O0DmrG0E6RTOHwhjFkgi+gfLyPGtY89SXjq
-         Y9hg==
-X-Gm-Message-State: AOJu0Ywf0wKqge9g73BeaKqZoyjkGo9Nt/ngNt/sfCN8/chSf0M7b/0O
-	PdubMFsv0mE7NZ8Ko8O+mbKuMBRPtC+eykGjoP7vYLwQNiUjCUfJCFAaoQ==
-X-Google-Smtp-Source: AGHT+IHp2SEYeMWudLac+xBLELn/sY4A+gmlWy9peOUr1C6W+dtj5+7HLL5uHMFD/BGPlDCpD7kx7w==
-X-Received: by 2002:a50:d54f:0:b0:56d:fbea:40ae with SMTP id f15-20020a50d54f000000b0056dfbea40aemr1361387edj.23.1712910249398;
-        Fri, 12 Apr 2024 01:24:09 -0700 (PDT)
-Received: from raspberrypi.home (46.205.194.2.nat.ftth.dynamic.t-mobile.pl. [46.205.194.2])
-        by smtp.gmail.com with ESMTPSA id t13-20020a056402240d00b00568afb0e731sm1440807eda.63.2024.04.12.01.24.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Apr 2024 01:24:08 -0700 (PDT)
-From: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-Subject: [PATCH BlueZ v2] advertising: Do not crash in case of adv update failure
-Date: Fri, 12 Apr 2024 10:23:51 +0200
-Message-Id: <20240412082351.930802-1-arkadiusz.bokowy@gmail.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240403171236.853491-1-arkadiusz.bokowy@gmail.com>
-References: <20240403171236.853491-1-arkadiusz.bokowy@gmail.com>
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="BMi3DoLc"
+X-UUID: b7bc68faf8a811eeb8927bc1f75efef4-20240412
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=jHEqw9CX7F4B20BaWp50RaqOd08fKHGUHPcZwH22cL8=;
+	b=BMi3DoLcJ/kuscBxIPQw9KOF5egJ8YYAZ8tMNCmJrICpYwdid7AG46Dm8ECrQrdW5mVBVLBb5/ZSiOhY/DJX2fJQa7rdghzUffRE3lKB2iavtw3lBV+awPYV6kRd7NW83bTNk4vgwQQ84VR3E6CNK2ZUDLWG57E06tq1Dm9LB+g=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.37,REQID:2ea2a19c-4d6b-43ca-9b56-dde2376464db,IP:0,U
+	RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-5
+X-CID-META: VersionHash:6f543d0,CLOUDID:c392d5fa-ed05-4274-9204-014369d201e8,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+	RL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,
+	SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: b7bc68faf8a811eeb8927bc1f75efef4-20240412
+Received: from mtkmbs11n2.mediatek.inc [(172.21.101.187)] by mailgw01.mediatek.com
+	(envelope-from <hao.qin@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 818051881; Fri, 12 Apr 2024 16:43:21 +0800
+Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
+ mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Fri, 12 Apr 2024 16:43:19 +0800
+Received: from mhfsdcap04.gcn.mediatek.inc (10.17.3.154) by
+ mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Fri, 12 Apr 2024 16:43:18 +0800
+From: Hao Qin <hao.qin@mediatek.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
+CC: Sean Wang <sean.wang@mediatek.com>, Deren Wu <deren.Wu@mediatek.com>,
+	Aaron Hou <aaron.hou@mediatek.com>, Chris Lu <chris.lu@mediatek.com>, "Steve
+ Lee" <steve.lee@mediatek.com>, linux-bluetooth
+	<linux-bluetooth@vger.kernel.org>, linux-kernel
+	<linux-kernel@vger.kernel.org>, linux-mediatek
+	<linux-mediatek@lists.infradead.org>, Hao Qin <hao.qin@mediatek.com>
+Subject: [PATCH] Bluetooth: btusb: mediatek: Add usb reset for firmware setup failure
+Date: Fri, 12 Apr 2024 16:41:28 +0800
+Message-ID: <20240412084128.24452-1-hao.qin@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TM-AS-Product-Ver: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-AS-Result: No-10--5.461600-8.000000
+X-TMASE-MatchedRID: k8Cd32tj8sGpk9YSiEd5IhWCVBr+Ay98DCe/LOiZlC3fUZT83lbkENPi
+	u9NSfhOYea+2R4F2ox/m2sRd5hAfQvm9WstcRwZxngIgpj8eDcBpkajQR5gb3savT21DsLD/UEh
+	Wy9W70AHCttcwYNipX6hYR7f40RGparKy8U17xnr71TnEQ1lbWMAvK1rVMcxdDBtPVrlqt3BWXG
+	vUUmKP2w==
+X-TM-AS-User-Approved-Sender: No
+X-TM-AS-User-Blocked-Sender: No
+X-TMASE-Result: 10--5.461600-8.000000
+X-TMASE-Version: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-SNTS-SMTP: DEEDB11A550F2C3488F2A62C3699A130331335E8C69700B5B9B735E150EFFC022000:8
 
-The refresh_extended_adv() is used in case of direct advertising
-request from the client or in case of advertising properties update
-or configured advertising timeout. In the two latter cases it is not
-possible to prepare reply D-Bus message, because there is no request
-message to begin with.
+Add usb reset to recover BT device from a firmware setup failure,
+it will restore the device to its original state and attempt setup
+firmware again.
 
-bluetoothd: ../src/advertising.c:add_client_complete() Failed to add
-            advertisement: Busy (0x0a)
-dbus: arguments to dbus_message_get_no_reply() were incorrect, assertion
-"message != NULL" failed in file ../../../dbus/dbus-message.c line 3235.
-This is normally a bug in some application using the D-Bus library.
+Signed-off-by: Hao Qin <hao.qin@mediatek.com>
 ---
- src/advertising.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ drivers/bluetooth/btusb.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/src/advertising.c b/src/advertising.c
-index 7f55a20e3..ad28f6f77 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -1259,9 +1259,18 @@ static void add_client_complete(struct btd_adv_client *client, uint8_t status)
- {
- 	DBusMessage *reply;
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 4c0cc13adb47..c5aab361795e 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3160,6 +3160,9 @@ static int btusb_mtk_setup(struct hci_dev *hdev)
+ 						btusb_mtk_hci_wmt_sync);
+ 		if (err < 0) {
+ 			bt_dev_err(hdev, "Failed to set up firmware (%d)", err);
++			btusb_stop_traffic(data);
++			usb_kill_anchored_urbs(&data->tx_anchor);
++			usb_queue_reset_device(data->intf);
+ 			return err;
+ 		}
  
--	if (status) {
-+	if (status)
- 		error("Failed to add advertisement: %s (0x%02x)",
- 						mgmt_errstr(status), status);
-+
-+	/* If the advertising request was not started by a direct call from
-+	 * the client, but rather by a refresh due to properties update or
-+	 * our internal timer, there is nothing to reply to.
-+	 */
-+	if (client->reg == NULL)
-+		return;
-+
-+	if (status) {
- 		reply = btd_error_failed(client->reg,
- 					"Failed to register advertisement");
- 		queue_remove(client->manager->clients, client);
 -- 
-2.39.2
+2.18.0
 
