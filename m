@@ -1,134 +1,260 @@
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 779A579DC;
-	Fri, 12 Apr 2024 04:41:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D568C8BF6
+	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Apr 2024 04:44:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712896876; cv=none; b=iMqe8qdc2F7U9X4dU6kDa+tUQR2PeHLgSSthoFtD0t9BmYuwsFQ9UrN5SkfSXulSiO8Oa9lkL/c8mNso+t376x8JhV8u1lHcYmlIBU9+Ufug9Tg260SAR85S6Sx9up6V5ZpIXoRHyxLohBChWV7OjTHcDsto1xHPSezIgXvb1+4=
+	t=1712897059; cv=none; b=TAPUVdJx5IA66Qq0ALX2EYGc/mqcnmW3nQJrEhmbDPM5gSnMH2rNnfR0frQlc/61zu45+FtQ/BvDbH1OIkR75SoD6wuP89UOKZNsE/REcfQRULITvuv0rdrHKxiDcYgNJeFamLQKFBYCUGjVnxB8CDgwyFOnpHOZVy0+PHjHgUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712896876; c=relaxed/simple;
-	bh=WPO8n9qrmjV3oIlzUN3sx1z2euZj7OmKF9/zjWgWLTU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BDTE+WySQ3TkJIpzhsClUTatsanM5VId6nko6Aez+P1N+tvJYJawF4gVdKf6c8hT4nR8AhWC8CS0AlH423xfw3SgtEpjJSEZ+WT6mBrlquOscOxRGQmD8PzNOvT6r8DZ9mNojFjfoUqfw3qFehGxaODmaOEXZY8yfCoc1NV+5iM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=pDs+lfgj; arc=none smtp.client-ip=210.61.82.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="pDs+lfgj"
-X-UUID: e00acd14f88611ee935d6952f98a51a9-20240412
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=AHtnJtdMxlm/qSQvC3Y1Pd0k4znF4PfxFEt7WefX3mY=;
-	b=pDs+lfgjEevkP5Wu0l1MvaVIooRCx1EpMabCrEbYRqLakirK0Z3U6zmaeko/wpZGS8Y87hAJM5ZonUHvIJfRSJ4WrS2Nr4I5oMFV5s/Q4KrWzY1FUvO8cnZe4c6shV2+zhKhghgduWLHfqTklA1VN1rayP8565NwCNFVGqSGi8Q=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.37,REQID:c3d8b4ab-9e6a-41bc-8787-f40f8b15a2b6,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:6f543d0,CLOUDID:4dc7d2fa-ed05-4274-9204-014369d201e8,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
-	RL:11|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
-	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
-X-UUID: e00acd14f88611ee935d6952f98a51a9-20240412
-Received: from mtkmbs10n1.mediatek.inc [(172.21.101.34)] by mailgw02.mediatek.com
-	(envelope-from <jiande.lu@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 1897558184; Fri, 12 Apr 2024 12:41:06 +0800
-Received: from mtkmbs13n2.mediatek.inc (172.21.101.108) by
- mtkmbs11n1.mediatek.inc (172.21.101.185) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Fri, 12 Apr 2024 12:41:05 +0800
-Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
- mtkmbs13n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Fri, 12 Apr 2024 12:41:05 +0800
-From: Jiande Lu <jiande.lu@mediatek.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
-CC: Sean Wang <sean.wang@mediatek.com>, Chris Lu <chris.lu@mediatek.com>,
-	Deren Wu <deren.Wu@mediatek.com>, Aaron Hou <aaron.hou@mediatek.com>, Steve
- Lee <steve.lee@mediatek.com>, linux-bluetooth
-	<linux-bluetooth@vger.kernel.org>, linux-kernel
-	<linux-kernel@vger.kernel.org>, linux-mediatek
-	<linux-mediatek@lists.infradead.org>, jiande.lu <jiande.lu@mediatek.com>
-Subject: [PATCH v3] Bluetooth: btusb: Add USB HWID to usb_device_id table for MT7921/MT7922/MT7925.
-Date: Fri, 12 Apr 2024 12:40:57 +0800
-Message-ID: <20240412044057.25055-1-jiande.lu@mediatek.com>
-X-Mailer: git-send-email 2.18.0
+	s=arc-20240116; t=1712897059; c=relaxed/simple;
+	bh=FhvTXwUAai1hqoc4Lk63Cx/KnDPdGaH5T8GcEZysPVw=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=XKI8P895Mdc+9ecTNe7WNP3hJ131xq5GUMzWYYT2/1slXxoNxTlSTH8ItkGxBGKa3YGn+4DJbqu3uMIcdObZcZ6ZqcJQrNXMt5KLpFIT/C2db8d4iBk4nZJZRpPGn4XMJjgS7aFjqBj9GPFSTOI0GRAcUfjOFL5kEMVxAQgsCdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-36a0d9d820cso5545365ab.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Apr 2024 21:44:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712897057; x=1713501857;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HAhQIXfW8xBEuSdDsNQsYph3pDu0nc5My/lHfZx4wT8=;
+        b=ZO4GTN9ARfNCyu2ZcLvSZ/qaahgiWf6lbNoooAm+PKSaBtmN5K/pwlSL4if2fEYRv5
+         1Y6AZ4yJbgs4dCp6/u35yguEcLyrgzwIjjKgwrlCCE7BzN+Cy4XA8XCX6wXhJaFE6UZo
+         rW/TUjKVmRswPAaE7I2pAiafEfZWLCYRmoISdQ52XdzbbCu2Et7POhjXcJFwOK0fN8X1
+         /hdHeXnkFS2tq+yrf6hm0U5/dzUTN6gS1QzzxgNBuF9ipVK1h8GzDGRkyrhfNa0q8B/7
+         YtVybRnnYJS73kBU6ZQwKgEn3yM+pXnRgfYSlbXFd1kjexqqOJm+EHOeRopq8UybJDHx
+         JAaw==
+X-Forwarded-Encrypted: i=1; AJvYcCU5peCrD1GpcaYkJbUIzim/g6LvYi8xByoU1HQ42RaBVPQ/dt08bceVIBQdXPNOCm/gW8UGvNtX2xVPxmMaAR/9H/n+U9ST/4woU5jjA7Sk
+X-Gm-Message-State: AOJu0YyDuDkz9wj/C1prNtD3oVacG360coqut2oC0PBq7RnSVOPSdWLu
+	OE0J+HB0UusFwOFjdJcylawqxca7oEOq6lBQsSlJ2TT9qSZ1ct+ollSnShhFS/1oicfUWmyjy0C
+	VylqSQ5spfoSxThhYT5Wor6K79DBVp0UxzlHoqbdvwlUxQ6XOfs9K4HE=
+X-Google-Smtp-Source: AGHT+IF6alcoFvLfVNjbSasjdrR1MuCme+6gYfCXpS05IZbrn+Nf5nfybhkMdPBUJm1+oTrceUbFfj/aT+OlmrAVzWWcyZzYMiHD
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MTK: N
+X-Received: by 2002:a92:ca0d:0:b0:36b:214:bc2f with SMTP id
+ j13-20020a92ca0d000000b0036b0214bc2fmr88964ils.3.1712897057088; Thu, 11 Apr
+ 2024 21:44:17 -0700 (PDT)
+Date: Thu, 11 Apr 2024 21:44:17 -0700
+In-Reply-To: <0000000000001e41e20615824081@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000009ffb1d0615deec6b@google.com>
+Subject: Re: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in __hci_req_sync
+From: syzbot <syzbot+27209997e4015fb4702e@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: "jiande.lu" <jiande.lu@mediatek.com>
+syzbot has found a reproducer for the following issue on:
 
-This commit add HWID for wireless modules specific to Acer
-notebook models to ensure proper recongnition and functionality
+HEAD commit:    00dcf5d862e8 Merge tag 'acpi-6.9-rc4' of git://git.kernel...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=15f84c93180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=285be8dd6baeb438
+dashboard link: https://syzkaller.appspot.com/bug?extid=27209997e4015fb4702e
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=179a3b4d180000
 
-Https://acer.com/tw-zh/support/product-support/
-SFE16-42/NX.KH5TA.0.01/downloads
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-00dcf5d8.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/7a72277e36da/vmlinux-00dcf5d8.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/5c529702b5e0/bzImage-00dcf5d8.xz
 
-Signed-off-by: jiande.lu <jiande.lu@mediatek.com>
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+27209997e4015fb4702e@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: slab-use-after-free in instrument_atomic_read include/linux/instrumented.h:68 [inline]
+BUG: KASAN: slab-use-after-free in atomic_read include/linux/atomic/atomic-instrumented.h:32 [inline]
+BUG: KASAN: slab-use-after-free in refcount_read include/linux/refcount.h:136 [inline]
+BUG: KASAN: slab-use-after-free in skb_unref include/linux/skbuff.h:1227 [inline]
+BUG: KASAN: slab-use-after-free in __kfree_skb_reason net/core/skbuff.c:1224 [inline]
+BUG: KASAN: slab-use-after-free in kfree_skb_reason+0x36/0x210 net/core/skbuff.c:1251
+Read of size 4 at addr ffff88801d9c3b24 by task syz-executor.2/5302
+
+CPU: 3 PID: 5302 Comm: syz-executor.2 Not tainted 6.9.0-rc3-syzkaller-00189-g00dcf5d862e8 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:114
+ print_address_description mm/kasan/report.c:377 [inline]
+ print_report+0xc3/0x620 mm/kasan/report.c:488
+ kasan_report+0xd9/0x110 mm/kasan/report.c:601
+ check_region_inline mm/kasan/generic.c:183 [inline]
+ kasan_check_range+0xef/0x1a0 mm/kasan/generic.c:189
+ instrument_atomic_read include/linux/instrumented.h:68 [inline]
+ atomic_read include/linux/atomic/atomic-instrumented.h:32 [inline]
+ refcount_read include/linux/refcount.h:136 [inline]
+ skb_unref include/linux/skbuff.h:1227 [inline]
+ __kfree_skb_reason net/core/skbuff.c:1224 [inline]
+ kfree_skb_reason+0x36/0x210 net/core/skbuff.c:1251
+ kfree_skb include/linux/skbuff.h:1262 [inline]
+ __hci_req_sync+0x61d/0x980 net/bluetooth/hci_request.c:184
+ hci_req_sync+0x97/0xd0 net/bluetooth/hci_request.c:206
+ hci_dev_cmd+0x653/0x9c0 net/bluetooth/hci_core.c:790
+ hci_sock_ioctl+0x4f3/0x8e0 net/bluetooth/hci_sock.c:1153
+ sock_do_ioctl+0x116/0x280 net/socket.c:1222
+ sock_ioctl+0x22e/0x6c0 net/socket.c:1341
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:904 [inline]
+ __se_sys_ioctl fs/ioctl.c:890 [inline]
+ __x64_sys_ioctl+0x193/0x220 fs/ioctl.c:890
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x260 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f98e227dbcb
+Code: 00 48 89 44 24 18 31 c0 48 8d 44 24 60 c7 04 24 10 00 00 00 48 89 44 24 08 48 8d 44 24 20 48 89 44 24 10 b8 10 00 00 00 0f 05 <89> c2 3d 00 f0 ff ff 77 1c 48 8b 44 24 18 64 48 2b 04 25 28 00 00
+RSP: 002b:00007fff8983d770 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f98e227dbcb
+RDX: 00007fff8983d7e8 RSI: 00000000400448dd RDI: 0000000000000003
+RBP: 0000555556cf6430 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000008 R11: 0000000000000246 R12: 0000000000000003
+R13: 0000000000000003 R14: 0000000000000001 R15: 00000000fffffff1
+ </TASK>
+
+Allocated by task 5308:
+ kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
+ kasan_save_track+0x14/0x30 mm/kasan/common.c:68
+ unpoison_slab_object mm/kasan/common.c:312 [inline]
+ __kasan_slab_alloc+0x89/0x90 mm/kasan/common.c:338
+ kasan_slab_alloc include/linux/kasan.h:201 [inline]
+ slab_post_alloc_hook mm/slub.c:3798 [inline]
+ slab_alloc_node mm/slub.c:3845 [inline]
+ kmem_cache_alloc+0x136/0x320 mm/slub.c:3852
+ skb_clone+0x190/0x3f0 net/core/skbuff.c:2063
+ hci_send_cmd_sync net/bluetooth/hci_core.c:4220 [inline]
+ hci_cmd_work+0x66a/0x710 net/bluetooth/hci_core.c:4240
+ process_one_work+0x9a9/0x1ac0 kernel/workqueue.c:3254
+ process_scheduled_works kernel/workqueue.c:3335 [inline]
+ worker_thread+0x6c8/0xf70 kernel/workqueue.c:3416
+ kthread+0x2c1/0x3a0 kernel/kthread.c:388
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+Freed by task 5308:
+ kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
+ kasan_save_track+0x14/0x30 mm/kasan/common.c:68
+ kasan_save_free_info+0x3b/0x60 mm/kasan/generic.c:579
+ poison_slab_object mm/kasan/common.c:240 [inline]
+ __kasan_slab_free+0x11d/0x1a0 mm/kasan/common.c:256
+ kasan_slab_free include/linux/kasan.h:184 [inline]
+ slab_free_hook mm/slub.c:2106 [inline]
+ slab_free mm/slub.c:4280 [inline]
+ kmem_cache_free+0x12e/0x380 mm/slub.c:4344
+ kfree_skbmem+0x10e/0x200 net/core/skbuff.c:1159
+ __kfree_skb net/core/skbuff.c:1217 [inline]
+ kfree_skb_reason+0x13a/0x210 net/core/skbuff.c:1252
+ kfree_skb include/linux/skbuff.h:1262 [inline]
+ hci_req_sync_complete+0x16c/0x270 net/bluetooth/hci_request.c:109
+ hci_event_packet+0x963/0x1170 net/bluetooth/hci_event.c:7604
+ hci_rx_work+0x2c4/0x1610 net/bluetooth/hci_core.c:4171
+ process_one_work+0x9a9/0x1ac0 kernel/workqueue.c:3254
+ process_scheduled_works kernel/workqueue.c:3335 [inline]
+ worker_thread+0x6c8/0xf70 kernel/workqueue.c:3416
+ kthread+0x2c1/0x3a0 kernel/kthread.c:388
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+The buggy address belongs to the object at ffff88801d9c3a40
+ which belongs to the cache skbuff_head_cache of size 240
+The buggy address is located 228 bytes inside of
+ freed 240-byte region [ffff88801d9c3a40, ffff88801d9c3b30)
+
+The buggy address belongs to the physical page:
+page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1d9c2
+head: order:1 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+flags: 0xfff80000000840(slab|head|node=0|zone=1|lastcpupid=0xfff)
+page_type: 0xffffffff()
+raw: 00fff80000000840 ffff888015b8e000 dead000000000122 0000000000000000
+raw: 0000000000000000 0000000000190019 00000001ffffffff 0000000000000000
+head: 00fff80000000840 ffff888015b8e000 dead000000000122 0000000000000000
+head: 0000000000000000 0000000000190019 00000001ffffffff 0000000000000000
+head: 00fff80000000001 ffffea0000767081 dead000000000122 00000000ffffffff
+head: 0000000200000000 0000000000000000 00000000ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 1, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 5314, tgid 5314 (kworker/u33:8), ts 1081717469726, free_ts 1081659697828
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x2d4/0x350 mm/page_alloc.c:1534
+ prep_new_page mm/page_alloc.c:1541 [inline]
+ get_page_from_freelist+0xa28/0x3780 mm/page_alloc.c:3317
+ __alloc_pages+0x22b/0x2460 mm/page_alloc.c:4575
+ __alloc_pages_node include/linux/gfp.h:238 [inline]
+ alloc_pages_node include/linux/gfp.h:261 [inline]
+ alloc_slab_page mm/slub.c:2175 [inline]
+ allocate_slab mm/slub.c:2338 [inline]
+ new_slab+0xcc/0x3a0 mm/slub.c:2391
+ ___slab_alloc+0x66d/0x1790 mm/slub.c:3525
+ __slab_alloc.constprop.0+0x56/0xb0 mm/slub.c:3610
+ __slab_alloc_node mm/slub.c:3663 [inline]
+ slab_alloc_node mm/slub.c:3835 [inline]
+ kmem_cache_alloc+0x2e9/0x320 mm/slub.c:3852
+ skb_clone+0x190/0x3f0 net/core/skbuff.c:2063
+ hci_send_cmd_sync net/bluetooth/hci_core.c:4220 [inline]
+ hci_cmd_work+0x66a/0x710 net/bluetooth/hci_core.c:4240
+ process_one_work+0x9a9/0x1ac0 kernel/workqueue.c:3254
+ process_scheduled_works kernel/workqueue.c:3335 [inline]
+ worker_thread+0x6c8/0xf70 kernel/workqueue.c:3416
+ kthread+0x2c1/0x3a0 kernel/kthread.c:388
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+page last free pid 5294 tgid 5294 stack trace:
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ free_pages_prepare mm/page_alloc.c:1141 [inline]
+ free_unref_page_prepare+0x527/0xb10 mm/page_alloc.c:2347
+ free_unref_page+0x33/0x3c0 mm/page_alloc.c:2487
+ qlink_free mm/kasan/quarantine.c:163 [inline]
+ qlist_free_all+0x4e/0x140 mm/kasan/quarantine.c:179
+ kasan_quarantine_reduce+0x192/0x1e0 mm/kasan/quarantine.c:286
+ __kasan_slab_alloc+0x69/0x90 mm/kasan/common.c:322
+ kasan_slab_alloc include/linux/kasan.h:201 [inline]
+ slab_post_alloc_hook mm/slub.c:3798 [inline]
+ slab_alloc_node mm/slub.c:3845 [inline]
+ kmalloc_trace+0x147/0x330 mm/slub.c:3992
+ kmalloc include/linux/slab.h:628 [inline]
+ kzalloc include/linux/slab.h:749 [inline]
+ tomoyo_print_bprm security/tomoyo/audit.c:26 [inline]
+ tomoyo_init_log+0xcb6/0x2180 security/tomoyo/audit.c:264
+ tomoyo_supervisor+0x30c/0xea0 security/tomoyo/common.c:2089
+ tomoyo_audit_env_log security/tomoyo/environ.c:36 [inline]
+ tomoyo_env_perm+0x193/0x210 security/tomoyo/environ.c:63
+ tomoyo_environ security/tomoyo/domain.c:672 [inline]
+ tomoyo_find_next_domain+0xef9/0x2020 security/tomoyo/domain.c:878
+ tomoyo_bprm_check_security security/tomoyo/tomoyo.c:102 [inline]
+ tomoyo_bprm_check_security+0x12e/0x1d0 security/tomoyo/tomoyo.c:92
+ security_bprm_check+0x65/0xb0 security/security.c:1191
+ search_binary_handler fs/exec.c:1766 [inline]
+ exec_binprm fs/exec.c:1820 [inline]
+ bprm_execve fs/exec.c:1872 [inline]
+ bprm_execve+0x642/0x19b0 fs/exec.c:1848
+ do_execveat_common.isra.0+0x5cb/0x750 fs/exec.c:1979
+ do_execve fs/exec.c:2053 [inline]
+ __do_sys_execve fs/exec.c:2129 [inline]
+ __se_sys_execve fs/exec.c:2124 [inline]
+ __x64_sys_execve+0x8c/0xb0 fs/exec.c:2124
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x260 arch/x86/entry/common.c:83
+
+Memory state around the buggy address:
+ ffff88801d9c3a00: fc fc fc fc fc fc fc fc fa fb fb fb fb fb fb fb
+ ffff88801d9c3a80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff88801d9c3b00: fb fb fb fb fb fb fc fc fc fc fc fc fc fc fc fc
+                               ^
+ ffff88801d9c3b80: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88801d9c3c00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fc fc
+==================================================================
+
+
 ---
-v3: Fix patch fail
----
-v2: Update commit description and fix typo
----
----
- drivers/bluetooth/btusb.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index c391e612b83b..b71efca2af73 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -616,6 +616,9 @@ static const struct usb_device_id quirks_table[] = {
- 	{ USB_DEVICE(0x0e8d, 0x0608), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH |
- 						     BTUSB_VALID_LE_STATES },
-+	{ USB_DEVICE(0x13d3, 0x3606), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
- 
- 	/* MediaTek MT7922 Bluetooth devices */
- 	{ USB_DEVICE(0x13d3, 0x3585), .driver_info = BTUSB_MEDIATEK |
-@@ -662,11 +665,32 @@ static const struct usb_device_id quirks_table[] = {
- 	{ USB_DEVICE(0x35f5, 0x7922), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH |
- 						     BTUSB_VALID_LE_STATES },
-+	{ USB_DEVICE(0x13d3, 0x3614), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
-+	{ USB_DEVICE(0x13d3, 0x3615), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
-+	{ USB_DEVICE(0x04ca, 0x38e4), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
-+	{ USB_DEVICE(0x13d3, 0x3605), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
-+	{ USB_DEVICE(0x13d3, 0x3607), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
- 
- 	/* Additional MediaTek MT7925 Bluetooth devices */
-+	{ USB_DEVICE(0x0489, 0xE113), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
- 	{ USB_DEVICE(0x13d3, 0x3602), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH |
- 						     BTUSB_VALID_LE_STATES },
-+	{ USB_DEVICE(0x13d3, 0x3603), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
- 
- 	/* Additional Realtek 8723AE Bluetooth devices */
- 	{ USB_DEVICE(0x0930, 0x021d), .driver_info = BTUSB_REALTEK },
--- 
-2.18.0
-
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
