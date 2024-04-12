@@ -1,135 +1,78 @@
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8588E12D1FD
-	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Apr 2024 14:24:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67554145339
+	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Apr 2024 14:50:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712931844; cv=none; b=FhXOR6FyN9rX5nOALy/iRf/I+8zvIhnwAkhG9yLbfb6MTgLyG0GQLhhVxakBqO9Lq0PM6DPekbK8AdzAy3Mq3hhWMpQiRmYdDtSjgkFjeiFYt+YskBE7YnCgXMJhPUJNpWzuIJus0IbMzIvpEOGdMXNstNwtiujAenaMBBw92To=
+	t=1712933429; cv=none; b=AkR0mA5hzQ43tDLFvXVWKua05fw+zVzwo6ara/VbOS00DxFvLhp83Jpi7yKJQt60xduoMWhi3dfFguuFIcoKInSZUOMdzyAGoCToi2DFk0WVgf1aI+Ajc0WAdoLdgiR1ICxkRmgzCcDe+3Wg2iwXNI+248BFyIyygZj+Ka6q0fo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712931844; c=relaxed/simple;
-	bh=xPJfvrJkroHWen1V+x+kRG0Fv8xPw4I9S3y/eqOkAa0=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
-	 References:In-Reply-To; b=KI5ms/at72mXGiU9bsiSGFmibHABqLolsxyb2ZbUFdNpmIUf62IQQ0yqMy6qBy3PHHgPgEbGFoLsY3xXCjMiE40XT2yPkd9FBuRiKgVd39K4xn7nb6VL5bp+haTjEagqmfReCWADIzDiWjcw817kxpPNYmTMVkoUmbkLji3WtBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fairphone.com; spf=pass smtp.mailfrom=fairphone.com; dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b=lfhlR26B; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fairphone.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fairphone.com
+	s=arc-20240116; t=1712933429; c=relaxed/simple;
+	bh=dJ1kBQo0vIhiGLGUWWyrw9rUCf0g3ZN2t0PTbYKuLPA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=U+F8tKiwriBblqbo1ro4TZsi1+YnmkVcNGZEJyUJ87CrCsk9ujzx0l9bX8rf0DhI28zmVVvlQbOeI7juR9rygZ7GUzAKpU5BPvB/Cv6vZhBDYsgHTBnyI1Am5ASS5HbVOb28izAiIxk9NocaCBqnq6EB0oEOHF2wOXYBoMdgKdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XI8RCZ4t; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="lfhlR26B"
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a4715991c32so122715366b.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Apr 2024 07:24:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fairphone.com; s=fair; t=1712931841; x=1713536641; darn=vger.kernel.org;
-        h=in-reply-to:references:subject:cc:to:from:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kGGpBuMkk3rcfY7clPvu4R5GEYInWk7ZpVaUvi+LAPw=;
-        b=lfhlR26B1CJ7iMkal+tk28o3iwUeAhLMtmPTXj9rzkjBwh69ghHQzEZ7Eg607QRIfL
-         FkWxkNvk4HO+TALIUDsynEUeJunJf/POFcSaVHdCJXkWGnJk5p1rK4uzUDFk2S0YBC5a
-         Wv9GQVwrpPPPGxuSZ4/hH+qMo94eCVlDf+OZ223sa+Ed9wgleQSF/kHni83zSwAReP/v
-         qRSpgfKh6l9lPw34ab34kqBYfPozrlXgquzrlxK0FHKCmVWpmQksxAGucDGyx2DpVIAj
-         vsjYjb+v1txV7Tm79qkLeUepvq+0SbeAHPZfWs2JdEtbqlwtnEZAABvCKmnujP+nOCrC
-         w+yg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712931841; x=1713536641;
-        h=in-reply-to:references:subject:cc:to:from:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=kGGpBuMkk3rcfY7clPvu4R5GEYInWk7ZpVaUvi+LAPw=;
-        b=m9GHQ5O5pdjfXsh98Gga00LUYycv8g867RKSDmPTtqjJBbnE5k40Fx9ZzGU+mt0di7
-         YH6FhNzA4P+YU22nJnqCV0xRyh07Xc6RakC+mX/kDtoBn1tl7ipT5zlAJ8ELvRWoV7Ut
-         AIa7VtxVg/XCGSTi3Qvpk5YIhmFzSF9ss+0CQoDcBh5CMpXbBUhHZXwAJI3v5QT6msW5
-         +l7EQebg//O4z5HI4A4qpaP1nKUIazVgpx/GG7ZyS/I1ZPaUkIgZJW2/fQoq2AnVQXMM
-         HyH3dFZchzffcLzzYjMQzTo+f/9JijzIa3rqninGwib5IhV5VEFHkazByY4pcoYuyBeW
-         RTVw==
-X-Forwarded-Encrypted: i=1; AJvYcCUKh1FNthOABZMPVVTQ4n3/I1GHPc7wknFcJCE6T+4CAulzb24bVirDYlUANKzivaUAaCu+Wn0F5o09+FAuM+h11eZ8md7belySdwZxwgqc
-X-Gm-Message-State: AOJu0Ywr00HcJMOD9MXLEcgjeJWL6DZ6MJeQX0CVYeu5WwRs1zDZ7uer
-	z0AxuSFwg6iRjHdQX65OBsS+JtJAloxYyZxnebYBCbTSjhisod7krZz/Bw2Uw9w=
-X-Google-Smtp-Source: AGHT+IFRwnYmNxoacwMYfZHwJlXDTXp4RSdWCA1aODz1NYxwf5Bx9Aehjl/icfWlQ/9r67E/c8s6qw==
-X-Received: by 2002:a17:907:25c1:b0:a51:d7c8:300c with SMTP id ae1-20020a17090725c100b00a51d7c8300cmr2369381ejc.17.1712931840880;
-        Fri, 12 Apr 2024 07:24:00 -0700 (PDT)
-Received: from localhost (144-178-202-138.static.ef-service.nl. [144.178.202.138])
-        by smtp.gmail.com with ESMTPSA id hg20-20020a1709072cd400b00a5225c87f65sm1563965ejc.56.2024.04.12.07.24.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Apr 2024 07:24:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XI8RCZ4t"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 07E7AC113CC;
+	Fri, 12 Apr 2024 14:50:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712933429;
+	bh=dJ1kBQo0vIhiGLGUWWyrw9rUCf0g3ZN2t0PTbYKuLPA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=XI8RCZ4tBQxWGFRAR+ZhRFqMd7P3/FtO9CKxi4Otb0WZDbEIYA83ATJ3vemKL1XEb
+	 YIZbDzQPMcloSphyu+x6HrXeF8xQW7GditrcS8nf3WLSJvYaJsiZa2FWbwIMBXhxcj
+	 4hC/J30v55HnDJC5ZIlxAhuGE2JIYEAM0tk0AxTj9yvY+psiDM6h1ShEIvOKqM+v5E
+	 4RI95SE6Jq08TcTqFgFX6yKEOlqLKLl9z7cPDcrgVIYU3sHItaozu5TuV9/YiQPmZg
+	 j8Li+oL7pFaaWBxCTgOLjL1S5uugvf1Ynmu32kOclqz6IwyUTt/HgZJOVq56THWJ2l
+	 TJNGx/tDu2SNg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F34B0DF7858;
+	Fri, 12 Apr 2024 14:50:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 12 Apr 2024 16:23:59 +0200
-Message-Id: <D0I7NRQQGOSJ.3JB82F1X4GIQM@fairphone.com>
-From: "Luca Weiss" <luca.weiss@fairphone.com>
-To: "Luca Weiss" <luca.weiss@fairphone.com>, "Marcel Holtmann"
- <marcel@holtmann.org>, "Johan Hedberg" <johan.hedberg@gmail.com>, "Luiz
- Augusto von Dentz" <luiz.dentz@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>
-Cc: <~postmarketos/upstreaming@lists.sr.ht>,
- <linux-bluetooth@vger.kernel.org>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <phone-devel@vger.kernel.org>
-Subject: Re: [PATCH] Bluetooth: Add more Bluetooth version defines
-X-Mailer: aerc 0.17.0
-References: <20240216-bluetooth-defines-v1-1-6c39aacc66a8@fairphone.com>
-In-Reply-To: <20240216-bluetooth-defines-v1-1-6c39aacc66a8@fairphone.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v4 1/4] shared/bap: Fix not updating location
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <171293342899.19443.3273017720408697686.git-patchwork-notify@kernel.org>
+Date: Fri, 12 Apr 2024 14:50:28 +0000
+References: <20240411200305.183703-1-luiz.dentz@gmail.com>
+In-Reply-To: <20240411200305.183703-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-On Fri Feb 16, 2024 at 2:22 PM CET, Luca Weiss wrote:
-> Add the various Bluetooth version identifiers found in the "Assigned
-> Numbers" document[0] from the Bluetooth SIG.
->
-> [0] https://www.bluetooth.com/specifications/assigned-numbers/
+Hello:
 
-Hi all,
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Is there any interest in this patch? Would be nice to get at least a
-positive or negative reaction to it.
-
-Regards
-Luca
-
->
-> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
+On Thu, 11 Apr 2024 16:03:02 -0400 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> Fix not updating map.location when selecting.
 > ---
-> To be clear, I don't have a use case for these extra defines myself but
-> some time ago when working on Bluetooth I came across this and thought
-> it would be interesting to have the list complete. No other motives.
-> ---
->  include/net/bluetooth/bluetooth.h | 9 +++++++++
->  1 file changed, 9 insertions(+)
->
-> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bl=
-uetooth.h
-> index 7ffa8c192c3f..818eb142eda3 100644
-> --- a/include/net/bluetooth/bluetooth.h
-> +++ b/include/net/bluetooth/bluetooth.h
-> @@ -39,11 +39,20 @@
->  #endif
-> =20
->  /* Bluetooth versions */
-> +#define BLUETOOTH_VER_1_0B	0
->  #define BLUETOOTH_VER_1_1	1
->  #define BLUETOOTH_VER_1_2	2
->  #define BLUETOOTH_VER_2_0	3
->  #define BLUETOOTH_VER_2_1	4
-> +#define BLUETOOTH_VER_3_0	5
->  #define BLUETOOTH_VER_4_0	6
-> +#define BLUETOOTH_VER_4_1	7
-> +#define BLUETOOTH_VER_4_2	8
-> +#define BLUETOOTH_VER_5_0	9
-> +#define BLUETOOTH_VER_5_1	10
-> +#define BLUETOOTH_VER_5_2	11
-> +#define BLUETOOTH_VER_5_3	12
-> +#define BLUETOOTH_VER_5_4	13
-> =20
->  /* Reserv for core and drivers use */
->  #define BT_SKB_RESERVE	8
->
-> ---
-> base-commit: 841c35169323cd833294798e58b9bf63fa4fa1de
-> change-id: 20240216-bluetooth-defines-b810ce543191
->
-> Best regards,
+>  src/shared/bap.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+
+Here is the summary with links:
+  - [BlueZ,v4,1/4] shared/bap: Fix not updating location
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=be79cd19c5c5
+  - [BlueZ,v4,2/4] shared/bap: Make bt_bap_select fallback in case of no channel allocation
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c7dcd064057f
+  - [BlueZ,v4,3/4] shared/bap: Fix not resuming reading attributes
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7db85520b76d
+  - [BlueZ,v4,4/4] bap: Update properties of endpoints
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9be5d8018dd1
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
