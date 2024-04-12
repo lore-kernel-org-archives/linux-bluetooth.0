@@ -1,102 +1,144 @@
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44E7053378;
-	Fri, 12 Apr 2024 08:43:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF5A4D58E
+	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Apr 2024 09:32:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712911411; cv=none; b=PsZfiwda4RpZaXGgq+SCZdPUgBJDs/5trAgAWADUrifZXWlV9c9I6BG+xJaxi3vnSJf9fCIBjieCo/aIf+fQoFvvKfzfp28TT8dGSKgOL/EyBLL64JjG5JIHQ7S83bhkxVvbvwHdv2Jj86TVpdTRh3RMdsehE1k6DywdUeo4a/Y=
+	t=1712914353; cv=none; b=tBrgrnl0qI3Vj8j0hUk00HEc8isBb0taWTVP5hcJP5N+s4BhVLS0b/JnsodoyDLXSu4Rz9soF3l6tmov1yli+6jWyYjImcW5Nu6hCco9Fe1p10x7FEbTLG8pJX/Rejrb0H4o2MaiY5txPI1Emt+CR1ldhbP4rqXO1C+E4V0ZU2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712911411; c=relaxed/simple;
-	bh=XLLxwOTa3tQ3ISUxUVT9CbxaZ2yDkfYTv7tVnzSV7YU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nDAUD0FPRpOrOVSHbsq1TLMOej2WK0Z3qEfQvwjRxl8Sooa4BaHjMdeTFrroh5OHK/sNCMtu+wZWDt9X4AFuAyJ6WNODzvW0rWeWTIA+aAO5CnIJW66Emdr4PRsMOADmg7RrKWzlr3Td7jH9xthjGWkKfoEPDh54PaQ6zD2PoDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=BMi3DoLc; arc=none smtp.client-ip=60.244.123.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+	s=arc-20240116; t=1712914353; c=relaxed/simple;
+	bh=LaOscbDYbTgmRdupleu45y13itE4JnRtftnVkWkJWck=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=UVAsRWMTP8ekHKf5P40Vy0XVEy6yc0J7pZ/4y6dIjwa5gdg/GbwUcaXM0OMp6FGwybiV3OIJlT26Tx1xMVA661uuIGAuqQoRW4ZeElK9QTdlSPAoMpubN3sSu4cSMdT9ZzCtLccM9vVL813DNLNlSEiTvTXd0Cd7XKfK/GsrLSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NRj70MTD; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="BMi3DoLc"
-X-UUID: b7bc68faf8a811eeb8927bc1f75efef4-20240412
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=jHEqw9CX7F4B20BaWp50RaqOd08fKHGUHPcZwH22cL8=;
-	b=BMi3DoLcJ/kuscBxIPQw9KOF5egJ8YYAZ8tMNCmJrICpYwdid7AG46Dm8ECrQrdW5mVBVLBb5/ZSiOhY/DJX2fJQa7rdghzUffRE3lKB2iavtw3lBV+awPYV6kRd7NW83bTNk4vgwQQ84VR3E6CNK2ZUDLWG57E06tq1Dm9LB+g=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.37,REQID:2ea2a19c-4d6b-43ca-9b56-dde2376464db,IP:0,U
-	RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:-5
-X-CID-META: VersionHash:6f543d0,CLOUDID:c392d5fa-ed05-4274-9204-014369d201e8,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
-	RL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,
-	SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-UUID: b7bc68faf8a811eeb8927bc1f75efef4-20240412
-Received: from mtkmbs11n2.mediatek.inc [(172.21.101.187)] by mailgw01.mediatek.com
-	(envelope-from <hao.qin@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 818051881; Fri, 12 Apr 2024 16:43:21 +0800
-Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
- mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Fri, 12 Apr 2024 16:43:19 +0800
-Received: from mhfsdcap04.gcn.mediatek.inc (10.17.3.154) by
- mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Fri, 12 Apr 2024 16:43:18 +0800
-From: Hao Qin <hao.qin@mediatek.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
-CC: Sean Wang <sean.wang@mediatek.com>, Deren Wu <deren.Wu@mediatek.com>,
-	Aaron Hou <aaron.hou@mediatek.com>, Chris Lu <chris.lu@mediatek.com>, "Steve
- Lee" <steve.lee@mediatek.com>, linux-bluetooth
-	<linux-bluetooth@vger.kernel.org>, linux-kernel
-	<linux-kernel@vger.kernel.org>, linux-mediatek
-	<linux-mediatek@lists.infradead.org>, Hao Qin <hao.qin@mediatek.com>
-Subject: [PATCH] Bluetooth: btusb: mediatek: Add usb reset for firmware setup failure
-Date: Fri, 12 Apr 2024 16:41:28 +0800
-Message-ID: <20240412084128.24452-1-hao.qin@mediatek.com>
-X-Mailer: git-send-email 2.18.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NRj70MTD"
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-43492c1a8a4so3205881cf.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Apr 2024 02:32:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712914351; x=1713519151; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=H9b5D3ylhYcoa3srBzDHhItyEjpRalRCW5krXKxDzI4=;
+        b=NRj70MTDL99Bnwl0yCSxtwpJCPAVtV845A++xaIFw2cyfm1lEUwPNsN075V8eb+su6
+         D7aiqJKL7rjo86n2oy3gNraNKohShZTrxkPTZljjKKcVC/Fh6qKFxGBlQeTNppqTYnnC
+         +EGynCksP5tyk4zn6PoUslrLkyONYqfI7RBo/Oz0CnBZn4pm03rCO/XPTnfUXCnBlEIh
+         lNli/MuobbZuXsTLLaLRGse+9X3CzR5cK9xdOPr+Ih/i9JYi421OlPVD1HHVWoMfkeA/
+         ic4Fn0t3+5kPgsDo3ygpRAHXruI9174uGOQsZ6Y/CMD4zgKfwgA3Ygv/j3+zhEPqgZyI
+         MMtA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712914351; x=1713519151;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=H9b5D3ylhYcoa3srBzDHhItyEjpRalRCW5krXKxDzI4=;
+        b=ollaaB6VIs7/Cn8S5OKNeuKcJivnIwqDQWa5pf01yWrMSPpfCR1Cnh73nAoIKGp9J6
+         AWSjpFQAr5eA4LReyCJs/wl+f+PsLxyQJYrrVKdGPhzih71++hU3aRt6QpEuus77ASBx
+         VhLGh4LJVCesSP1fJcvjX7j5TnuHTC8v+ed4jnBTBUlnD/wGA5oMe7PIUb67+OShNrDj
+         yyg01tdZp/rhXAAn89ocG9BHqUteVSBAuiT7VjJ9NPf7rbBk5zP6UyGtj/jNxsHy4CzW
+         gtUii3E4EkoY60MWzHxZdjtzYR9vF5KuqsP+aAHK24qtvLMH6Yn7FpH+YBp01AaB8Z7B
+         bJfA==
+X-Gm-Message-State: AOJu0YwK6xE+0SSgYKKBSVlvvVMTyPDnsjnKVh41r1oingWJ+3Kl2HJ7
+	K0iRTWdf772hofBfZgFaa0GCQghurvLLpAXQXqsg2fOiXJ7MmhodfjN/VQ==
+X-Google-Smtp-Source: AGHT+IEViXTkzc9dU/2Ee7fCOzO2FVtATWYrUZxkK6SBapgzuuihOes7gYFB94i5cirdwrZ4YzNhLg==
+X-Received: by 2002:a05:622a:24b:b0:434:3ee2:8e3c with SMTP id c11-20020a05622a024b00b004343ee28e3cmr2200967qtx.29.1712914351145;
+        Fri, 12 Apr 2024 02:32:31 -0700 (PDT)
+Received: from [172.17.0.2] ([20.49.54.3])
+        by smtp.gmail.com with ESMTPSA id dn2-20020a05622a470200b004348513d0dbsm2014769qtb.31.2024.04.12.02.32.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Apr 2024 02:32:30 -0700 (PDT)
+Message-ID: <6618ffae.050a0220.b8e75.4590@mx.google.com>
+Date: Fri, 12 Apr 2024 02:32:30 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5728670431534811900=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-Product-Ver: SMEX-14.0.0.3152-9.1.1006-23728.005
-X-TM-AS-Result: No-10--5.461600-8.000000
-X-TMASE-MatchedRID: k8Cd32tj8sGpk9YSiEd5IhWCVBr+Ay98DCe/LOiZlC3fUZT83lbkENPi
-	u9NSfhOYea+2R4F2ox/m2sRd5hAfQvm9WstcRwZxngIgpj8eDcBpkajQR5gb3savT21DsLD/UEh
-	Wy9W70AHCttcwYNipX6hYR7f40RGparKy8U17xnr71TnEQ1lbWMAvK1rVMcxdDBtPVrlqt3BWXG
-	vUUmKP2w==
-X-TM-AS-User-Approved-Sender: No
-X-TM-AS-User-Blocked-Sender: No
-X-TMASE-Result: 10--5.461600-8.000000
-X-TMASE-Version: SMEX-14.0.0.3152-9.1.1006-23728.005
-X-TM-SNTS-SMTP: DEEDB11A550F2C3488F2A62C3699A130331335E8C69700B5B9B735E150EFFC022000:8
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, hao.qin@mediatek.com
+Subject: RE: Bluetooth: btusb: mediatek: Add usb reset for firmware setup failure
+In-Reply-To: <20240412084128.24452-1-hao.qin@mediatek.com>
+References: <20240412084128.24452-1-hao.qin@mediatek.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Add usb reset to recover BT device from a firmware setup failure,
-it will restore the device to its original state and attempt setup
-firmware again.
+--===============5728670431534811900==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Hao Qin <hao.qin@mediatek.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=843929
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.64 seconds
+GitLint                       PASS      0.31 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      29.48 seconds
+CheckAllWarning               PASS      34.55 seconds
+CheckSparse                   PASS      37.69 seconds
+CheckSmatch                   FAIL      35.40 seconds
+BuildKernel32                 PASS      28.54 seconds
+TestRunnerSetup               PASS      512.68 seconds
+TestRunner_l2cap-tester       PASS      18.44 seconds
+TestRunner_iso-tester         PASS      28.77 seconds
+TestRunner_bnep-tester        PASS      4.85 seconds
+TestRunner_mgmt-tester        PASS      109.71 seconds
+TestRunner_rfcomm-tester      PASS      7.43 seconds
+TestRunner_sco-tester         PASS      15.11 seconds
+TestRunner_ioctl-tester       PASS      7.75 seconds
+TestRunner_mesh-tester        FAIL      6.00 seconds
+TestRunner_smp-tester         PASS      6.90 seconds
+TestRunner_userchan-tester    PASS      5.06 seconds
+IncrementalBuild              PASS      27.50 seconds
+
+Details
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
+
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bpa10x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bpa10x.o'
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 9 (90.0%), Failed: 1, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 2                               Failed       0.094 seconds
+
+
 ---
- drivers/bluetooth/btusb.c | 3 +++
- 1 file changed, 3 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 4c0cc13adb47..c5aab361795e 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -3160,6 +3160,9 @@ static int btusb_mtk_setup(struct hci_dev *hdev)
- 						btusb_mtk_hci_wmt_sync);
- 		if (err < 0) {
- 			bt_dev_err(hdev, "Failed to set up firmware (%d)", err);
-+			btusb_stop_traffic(data);
-+			usb_kill_anchored_urbs(&data->tx_anchor);
-+			usb_queue_reset_device(data->intf);
- 			return err;
- 		}
- 
--- 
-2.18.0
 
+--===============5728670431534811900==--
