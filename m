@@ -1,136 +1,129 @@
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E905646450;
-	Fri, 12 Apr 2024 06:43:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A661550243
+	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Apr 2024 07:30:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712904205; cv=none; b=Z186fAPHR91gsCuOSM/w4HRVKPCa+jBryv7MUaCAvtcuVxuXyqn7bEEgFn/u7V/7xLzX393ERXpNQlIrlsHV9zT5UPuv0i4TlF555dglJP6OGLjcAVfOwm8g+P5CnRhsixqxtdxH2i9etbXjth1IQjCOYMKf9prIAkzV9Z56JLY=
+	t=1712907057; cv=none; b=AWMIZoFUY5ajL3D+epsboKdMIliTpLeDNjyFMP2FvezTnYs7i8Y7QQw8D4KQ26UNFTqLqI9MRcxZXSOKYLl/1m/+JfpcCpuSB9UJ+dozfKADzEx1p4E+dKmj/P9n+xooRFJIjVxP/T1LxPmzOnu+fllUD5vfekyXZlEqfuA0hEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712904205; c=relaxed/simple;
-	bh=u1DUpuZIf1cHaATNXC0BfQ/ieyaZsvgNa9BHrlNKuhQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=iL6M9GGsMqoJXlRHxV4AEGxoyWenIiAts2799rDCW0No389ZsCBKHWVBJsmCXowJ0W0WEgp8OhqppK2nRd4frqDHRccdPyx+4c0F0K0Zd0+jAItuCppcsqgL68N+6sdpgWxnpztpT7ltmiBeg8gVwCGO+9IX9RuBZGqefYp6+U4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=etxUmD8X; arc=none smtp.client-ip=210.61.82.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+	s=arc-20240116; t=1712907057; c=relaxed/simple;
+	bh=ELyJ+CJCoG1IVqX5X75YSbhALkKqT4a5dFGLgQ4/ZnY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VXUCoXf2UnlTOfecQ6Q5FOygn3QUdc+DegjoFYOpcqbpgaglwUcHkGrfed6Su8ITr5gelNcOQPGSwOv1hcJt5itHPUnFAcZcRXDGUEUCEi/j+QzsM/CVr4EHW73dJdoMMA/IsQsSYrn1kvfARlmVUHKGaqhyWK6SDK7wm/mlUNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=AORJLYS/; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="etxUmD8X"
-X-UUID: f0fea260f89711ee935d6952f98a51a9-20240412
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=06WfUsb0IlPcjdnssz9QtISR8ugzcDwrAua5HTmW7ok=;
-	b=etxUmD8XhKDANtswcuFDYWbf+mEihPpyE4QUWQTEz4jY6tME5zs5lq+UxmfIOsU+Ay/9Pxz85JQS85+DTtB90/eZPwOUkNi/HXVHDTmKAEog+ymcogUmmOYns2L2tzBhqln/aAf469B11c13n8R0UczE5EjUn7itAll7FUr4RFc=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.37,REQID:b77d9382-b19a-44d5-a3cd-4d94ca4a1599,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:6f543d0,CLOUDID:9d209782-4f93-4875-95e7-8c66ea833d57,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
-	RL:11|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
-	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_ULN,TF_CID_SPAM_SNR
-X-UUID: f0fea260f89711ee935d6952f98a51a9-20240412
-Received: from mtkmbs09n2.mediatek.inc [(172.21.101.94)] by mailgw02.mediatek.com
-	(envelope-from <jiande.lu@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 607389679; Fri, 12 Apr 2024 14:43:16 +0800
-Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
- mtkmbs11n1.mediatek.inc (172.21.101.185) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Fri, 12 Apr 2024 14:43:15 +0800
-Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
- mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Fri, 12 Apr 2024 14:43:15 +0800
-From: Jiande Lu <jiande.lu@mediatek.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
-CC: Sean Wang <sean.wang@mediatek.com>, Chris Lu <chris.lu@mediatek.com>,
-	Deren Wu <deren.Wu@mediatek.com>, Aaron Hou <aaron.hou@mediatek.com>, Steve
- Lee <steve.lee@mediatek.com>, linux-bluetooth
-	<linux-bluetooth@vger.kernel.org>, linux-kernel
-	<linux-kernel@vger.kernel.org>, linux-mediatek
-	<linux-mediatek@lists.infradead.org>, jiande.lu <jiande.lu@mediatek.com>
-Subject: [PATCH v4] Bluetooth: btusb: Add USB HWID to usb_device_id table for Acer NB
-Date: Fri, 12 Apr 2024 14:43:07 +0800
-Message-ID: <20240412064307.6478-1-jiande.lu@mediatek.com>
-X-Mailer: git-send-email 2.18.0
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="AORJLYS/"
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-6ece8991654so637070b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Apr 2024 00:30:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1712907055; x=1713511855; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0kD8JSa/wlHNA1KdEJbBxgwZ9LZz09AqTXMn/5iB0iI=;
+        b=AORJLYS/dU7fiuNfY1ETrdUwSLycDelJzn+mTsKDfbxyLAJLph9H4SvFMzzPZAaZzd
+         zXDOb1GbJ6gGbUo++HWnu3mwBFMod1FhB7zya0NmI6kNi9Of6yA3YGgep1spOmwJdAhK
+         SDetk1ghfShTvJRWYQs0wWq/IJuEMrz8JpIWs=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712907055; x=1713511855;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0kD8JSa/wlHNA1KdEJbBxgwZ9LZz09AqTXMn/5iB0iI=;
+        b=E4WBtX3Kt480bdKTgAbUhQ0zgVOS3wTi17JY4Huv+6ETMyAXV6ekpBPsU+4KUNhmV3
+         dScwxy4aG02PkokLuW2MqYoCZ5LOLPZPs8UIYpJpXBnR00hSoN5SmGmRiR4qj0JxAyPw
+         IMwIaTbaKEQ3m2KFSIF1OPzGWbh0ecnvx2br+3KpMRxdnN70AkiEpt3AQy5H5/A5am1l
+         5PAY0PP2EynGyHTOCeAD0ntLxdDvOuJYn27Lc1fnBEmCrUKwan7LCngJUjp8sm5kiJmG
+         T+ss7lBnWKwVKRIvu7idAtfTMQmnaLs0vohBRKSQixhtJ2+ZePVVSzz+Yguut7+9u/xh
+         kyUA==
+X-Forwarded-Encrypted: i=1; AJvYcCW0rac0okdobPWBW6pu2LDwrcLhxT3PKKLYqa7ky1zc88I+RPpKvK2Rvq1kHH1DNBjsUA8NE1vQPRl+CUavjULC9fc8dwV2SDcpn0C8pABL
+X-Gm-Message-State: AOJu0YzUpOfNuFprtKrJwjbQSmdjgDKhWdNmVpnmOaScqdDFnU0Cx9BX
+	+gQE/JLmhqtlyg4GYez1/vpQs6CVzvofEhiMo4/xtZz6iLhMmRTRl5fGsld7NQ==
+X-Google-Smtp-Source: AGHT+IH9TJ0GU71I2lqJVSkEubfs2YUSVV/7k6TyMcFaUg5ykPaPZHNJ1QhyNg9VCsr2/J7KXJRL0w==
+X-Received: by 2002:a05:6a00:3d44:b0:6ea:e841:5889 with SMTP id lp4-20020a056a003d4400b006eae8415889mr2368095pfb.33.1712907054781;
+        Fri, 12 Apr 2024 00:30:54 -0700 (PDT)
+Received: from wenstp920.tpe.corp.google.com ([2401:fa00:1:10:e3c8:6e1:dcfa:3e8c])
+        by smtp.gmail.com with ESMTPSA id d6-20020a637346000000b005d3bae243bbsm2149609pgn.4.2024.04.12.00.30.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Apr 2024 00:30:54 -0700 (PDT)
+From: Chen-Yu Tsai <wenst@chromium.org>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: Chen-Yu Tsai <wenst@chromium.org>,
+	Sean Wang <sean.wang@mediatek.com>,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
+	devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3 0/2] bluetooth: mt7921s: Add binding and fixup existing dts
+Date: Fri, 12 Apr 2024 15:30:41 +0800
+Message-ID: <20240412073046.1192744-1-wenst@chromium.org>
+X-Mailer: git-send-email 2.44.0.683.g7961c838ac-goog
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MTK: N
+Content-Transfer-Encoding: 8bit
 
-From: "jiande.lu" <jiande.lu@mediatek.com>
+Hi everyone,
 
-This commit add HWID for wireless modules specific to Acer
-notebook models to ensure proper recongnition and functionality
+This is v3 of my MT7921S Bluetooth binding series.
 
-Https://acer.com/tw-zh/support/product-support/
-SFE16-42/NX.KH5TA.0.01/downloads
+Changes since v2:
+- Expand description and commit message to clearly state that WiFi and
+  Bluetooth are separate SDIO functions, and that each function should
+  be a separate device node, as specified by the MMC binding.
+- Change 'additionalProperties' to 'unevaluatedProperties'
+- Add missing separating new line
+- s/ot/to/
 
-Signed-off-by: jiande.lu <jiande.lu@mediatek.com>
----
-v4: Update title
----
-v3: Fix patch fail
----
-v2: Update commit description and fix typo
----
----
- drivers/bluetooth/btusb.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+Changes since v1:
+- Reworded descriptions in binding
+- Moved binding maintainer section before binding description
+- Added missing reference to bluetooth-controller.yaml
+- Added missing GPIO header to example
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index c391e612b83b..b71efca2af73 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -616,6 +616,9 @@ static const struct usb_device_id quirks_table[] = {
- 	{ USB_DEVICE(0x0e8d, 0x0608), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH |
- 						     BTUSB_VALID_LE_STATES },
-+	{ USB_DEVICE(0x13d3, 0x3606), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
- 
- 	/* MediaTek MT7922 Bluetooth devices */
- 	{ USB_DEVICE(0x13d3, 0x3585), .driver_info = BTUSB_MEDIATEK |
-@@ -662,11 +665,32 @@ static const struct usb_device_id quirks_table[] = {
- 	{ USB_DEVICE(0x35f5, 0x7922), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH |
- 						     BTUSB_VALID_LE_STATES },
-+	{ USB_DEVICE(0x13d3, 0x3614), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
-+	{ USB_DEVICE(0x13d3, 0x3615), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
-+	{ USB_DEVICE(0x04ca, 0x38e4), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
-+	{ USB_DEVICE(0x13d3, 0x3605), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
-+	{ USB_DEVICE(0x13d3, 0x3607), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
- 
- 	/* Additional MediaTek MT7925 Bluetooth devices */
-+	{ USB_DEVICE(0x0489, 0xE113), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
- 	{ USB_DEVICE(0x13d3, 0x3602), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH |
- 						     BTUSB_VALID_LE_STATES },
-+	{ USB_DEVICE(0x13d3, 0x3603), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
- 
- 	/* Additional Realtek 8723AE Bluetooth devices */
- 	{ USB_DEVICE(0x0930, 0x021d), .driver_info = BTUSB_REALTEK },
+This short series adds a binding document for the MT7921S SDIO Bluetooth
+controller. The MT7921S is a SDIO-based WiFi/Bluetooth combo. WiFi and
+Bluetooth are separate SDIO functions. The chip has extra per-subsystem
+reset lines that can reset only WiFi or Bluetooth cores.
+
+Patch 1 documents the SDIO function and the reset line, based on
+existing device tree and driver usage. I listed Sean Wang, the original
+driver author and maintainer, as the maintainer of the binding.
+
+Patch 2 fixes up the sole existing usage of the compatible string by
+making it a proper SDIO function node.
+
+Please take a look. Not sure which tree patch 1 should be merged
+through? I suppose with proper acks it could go through the soc/mediatek
+tree together with patch 2.
+
+
+Regards
+ChenYu
+
+
+Chen-Yu Tsai (2):
+  dt-bindings: net: bluetooth: Add MediaTek MT7921S SDIO Bluetooth
+  arm64: dts: mediatek: mt8183-pico6: Fix bluetooth node
+
+ .../bluetooth/mediatek,mt7921s-bluetooth.yaml | 55 +++++++++++++++++++
+ MAINTAINERS                                   |  1 +
+ .../mediatek/mt8183-kukui-jacuzzi-pico6.dts   |  3 +-
+ 3 files changed, 58 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml
+
 -- 
-2.18.0
+2.44.0.683.g7961c838ac-goog
 
