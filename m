@@ -1,118 +1,85 @@
-Received: from mail-vs1-f53.google.com (mail-vs1-f53.google.com [209.85.217.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 454A682487
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Apr 2024 17:43:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C282156665
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Apr 2024 19:38:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713203023; cv=none; b=RQU8rOr69sWXKummO+jA+2btg6yXYvzHmZtGee4b56znVDRk3M2uP8cYlcjQG/G3c29qAVTTkywAxz4WdHsaOXUcvTqF6MwPVrjvNncZi/R0DC6/QHKjPtAr47dHdNLsOFsRfQwRf3Q4d9bYYu9tzOgP4VpHhYSKA56A384/1/4=
+	t=1713209930; cv=none; b=EJwzKB1JrlhWt8KqQmQkqUAgzKqvZq6BOgZEhXx+HoOP4ncbPKfWuoe0d7N2dzkxdLC6RBCkRqj0Wa/jSyeLrJDvylxeWW0M+IbiudNnvzQN94ZDDr50Yb+V75SUC1Zrcqj2McNGcqMBeGmeAUnre5N85FYKXG9gdQpi8axXmXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713203023; c=relaxed/simple;
-	bh=Af43eejuMN+h5b6F4cOLFa8RKu4JM1r1iCBSA48/qnM=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=peke4RUTjWhCwugSyjJNmn3hJcpgRAsK+VT8aOmdw8bqzjsLMikaBU7+nBq7Z/ozse3NKzCXlcaCbMlaAxHuIGS57DlywWaDWk+xIoCP2bpsh+NL7yduihHRAO5tCnDiLgOrDZKjBFvlIaZXdyl17mZ0bbGKEKWFruzJmdQiZWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZNtlcTjB; arc=none smtp.client-ip=209.85.217.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1713209930; c=relaxed/simple;
+	bh=wuruRGx31+AHvrRlwgzWlZsasGOAgRqqNqv2M5lf4eU=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=KZgX+mvG4U64AAarYsi1IocmqXfdRh0gmBf3UR26BYRr/bxlPdIUbftGCcAbC8vDAgISqw/S0nawX1Bxoh621ZF1rDgcLnx1tAhn4Ql6jjoe8rYoqiE8Swk6qQGMy7JSu19c4VhaTQ/C0J7JT/9lvj+IBQ9lix4P+gwn0YePXAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PLQJGgo6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZNtlcTjB"
-Received: by mail-vs1-f53.google.com with SMTP id ada2fe7eead31-479d6a85be8so1241881137.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Apr 2024 10:43:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713203020; x=1713807820; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4kTZAwtH3rPNVRMJtzibWPmJUeAL5wStpC0zPV1QHG8=;
-        b=ZNtlcTjB5YgiwSgu8QEa/dNBMWqoBs5gmIfrrbrfLS+g4lrQ8+qVl3uRMDFVtH8kpX
-         LRwOe9nak0c6nhN9lVzHJrTEVYJu4Ki+uRvjN2lp7aog6niRIXJjGRX/6OIdY9/bCfTr
-         BHxbUl8ZTpohTGBYdTISs9wT24d9JgE25IkPOoBRR6HoCC4xUcCYBNPnz2xQLd2zb414
-         3kbrJGVHa9al0cYeIbqhh9UeQ4JdNdAW6FZL8CMZrFuGkt/HE9c7cxoxWN6JSQe7xbv3
-         i1GaRcPZuYS5lgLbHWXKkurlLQrm0LvVd4oNvwgGSSOANbNqwCJlp0tPP6IDHKtNVMMZ
-         ObVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713203020; x=1713807820;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4kTZAwtH3rPNVRMJtzibWPmJUeAL5wStpC0zPV1QHG8=;
-        b=Qfy7XfmRKVSwHS1oJ/ccHfVLKN6BY7l1cyaOYi1rHxSXREt9+WzvcJHSB1Bv6WCQsV
-         2KHVC/7BXl+vnDFs+6HRyeNGf6MFJD5wDzWRn3f1tB4G2pdLe80Ox1Sukkt0c4HEGbdN
-         HJjJg3T4DExpbWpuxucBuf5VTpOGYDvew3zYtR+2fVK3bLSIxkiSOar2uQrt5DNCdNSD
-         qFPx4pQF9LAT50LLNvVhQE4pJOTWD/XVvNF8gRtB/9faxJVy845JUYKhby08UbH3W3EI
-         fbL8hFHsE9o5k+Ge/NaUXf+dRjq4C+4cbveyBBSAn3wZEIVl7rIUPFP4Vkqb//HtrIAW
-         LW3Q==
-X-Gm-Message-State: AOJu0Ywu6rNoYmFVbriah8/mPwU85qX3u7Bwt6obo7+uioptqy5lfHek
-	JQoJIZPs3FFI2+ecI0MvQwQ3h1GBviZFFPquPOpQ50X7uep0JL9mWWL0Mg==
-X-Google-Smtp-Source: AGHT+IEixX7iFLGxB/5iyumVlwzgpAT03JG1sZ4OD05Go5cvrFv9KfDrez/R496QelF1dl27crW9jg==
-X-Received: by 2002:a05:6102:3714:b0:47a:3f72:d81 with SMTP id s20-20020a056102371400b0047a3f720d81mr11871702vst.6.1713203020106;
-        Mon, 15 Apr 2024 10:43:40 -0700 (PDT)
-Received: from lvondent-mobl4.. ([107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id s20-20020ab07654000000b007ead959a4ccsm386208uaq.27.2024.04.15.10.43.38
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Apr 2024 10:43:39 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PLQJGgo6"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2AA8CC113CC
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Apr 2024 19:38:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713209930;
+	bh=wuruRGx31+AHvrRlwgzWlZsasGOAgRqqNqv2M5lf4eU=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=PLQJGgo6xlsUAC1iPlIeML1FmMocjgterG0YM8dAj4lrgIgUGo49YcJFAnmoKC5ZF
+	 S80YtIJFUro/TJ+fA0IOpdujVC+IoGyPXdEYmcghfpQEsyXixPhHM6DhM/tpfwMYsR
+	 O6K1dZ3+p932isWKAwVV5/ydWNY8IvbTKzthUqzc2Nu6AVrD7G0ggCJEwzfoV0FDg6
+	 dg4nA7v0mbHTitpWvx3DI4R2HVvfrl9LE0MY9m7iPZ4fw4YvPNMpMEpej0MT/LW5W3
+	 qVSutlIGIqCW8XFTsrHPEmQVpS255io/WdYPYbn1Ue0DGRE5MEs3AJKlEUlPL0zyBe
+	 4gD29hoFE8yPg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 1A1DDC433E2; Mon, 15 Apr 2024 19:38:50 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v1] Bluetooth: hci_event: Fix sending HCI_OP_READ_ENC_KEY_SIZE
-Date: Mon, 15 Apr 2024 13:43:38 -0400
-Message-ID: <20240415174338.896084-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.44.0
+Subject: [Bug 218726] qca6390 bluetooth fails after disabling/re-enabling
+ bluetooth
+Date: Mon, 15 Apr 2024 19:38:49 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: wt@penguintechs.org
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-218726-62941-z69RA1RGkC@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-218726-62941@https.bugzilla.kernel.org/>
+References: <bug-218726-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218726
 
-The code shall always check if HCI_QUIRK_BROKEN_READ_ENC_KEY_SIZE has
-been set before attempting to use HCI_OP_READ_ENC_KEY_SIZE.
+--- Comment #8 from Wren Turkal (wt@penguintechs.org) ---
+In the first log (after cold boot), I only captures shortly before toggling=
+ the
+bluetooth. In the second lot (after warm boot), I enabled them with the ker=
+nel
+args. I definitely see a message from your patch in the second log.
 
-Fixes: c569242cd492 ("Bluetooth: hci_event: set the conn encrypted before conn establishes")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- include/net/bluetooth/hci_core.h | 4 ++++
- net/bluetooth/hci_event.c        | 5 ++---
- 2 files changed, 6 insertions(+), 3 deletions(-)
+Do you want to capture additional logging?
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index f0e1f1ae39c5..94bae125ac11 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1918,6 +1918,10 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- #define privacy_mode_capable(dev) (use_ll_privacy(dev) && \
- 				   (hdev->commands[39] & 0x04))
- 
-+#define read_key_size_capable(dev) \
-+	((dev)->commands[20] & 0x10 && \
-+	 !test_bit(HCI_QUIRK_BROKEN_READ_ENC_KEY_SIZE, &hdev->quirks))
-+
- /* Use enhanced synchronous connection if command is supported and its quirk
-  * has not been set.
-  */
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 539bbbe26176..9a38e155537e 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3217,7 +3217,7 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
- 			if (key) {
- 				set_bit(HCI_CONN_ENCRYPT, &conn->flags);
- 
--				if (!(hdev->commands[20] & 0x10)) {
-+				if (!read_key_size_capable(hdev)) {
- 					conn->enc_key_size = HCI_LINK_KEY_SIZE;
- 				} else {
- 					cp.handle = cpu_to_le16(conn->handle);
-@@ -3665,8 +3665,7 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, void *data,
- 		 * controller really supports it. If it doesn't, assume
- 		 * the default size (16).
- 		 */
--		if (!(hdev->commands[20] & 0x10) ||
--		    test_bit(HCI_QUIRK_BROKEN_READ_ENC_KEY_SIZE, &hdev->quirks)) {
-+		if (!read_key_size_capable(hdev)) {
- 			conn->enc_key_size = HCI_LINK_KEY_SIZE;
- 			goto notify;
- 		}
--- 
-2.44.0
+I am applying and trying your new patchset. I am applying it on to of the
+logging patches. I will then use the kernel arg and try to capture as much =
+as I
+can on a cold boot.
 
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
