@@ -1,104 +1,157 @@
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CA165FBB2
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Apr 2024 11:37:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5BB41FA1;
+	Mon, 15 Apr 2024 12:31:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713181072; cv=none; b=cg/lHfdSX0ZW6odEmHp5vk/CBJOViB2ZT66nyzbuxcjVkVF1pPJz6EUBfodbHvkxXczsh5Dwfv12HXCU8oZM0PAolK6oct+L0A4UFXiU5mmk2zhgOr3LUHRTZG/LFymI9D4Op+XkbiT7jd9jwNDuR55GRHwWnUrAUW7fS8Lwy38=
+	t=1713184264; cv=none; b=ikY2jOCXWEqLyNN3zAS2ZH/y2QLqKMP2n0312QK53V/Lp6scPUrUL/OPjC+DmgXzBxyoHyDLDZfbMaPFlM+RhTsf4JLHPFsCIrEGeh/rt/83WF1CsFKMdUHxaLaYqNGxhEDdbIKGaHXuVqrhN8xW4NXV1+MhYqmX8rJ2YiV/LT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713181072; c=relaxed/simple;
-	bh=jeE5pHmzpnW13ura6n6yNGzp0QzgncKmWdPKsjsee84=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=tZ4o0SY6YZSfzEWsL/kSjkdi4z4CVgzp1bdsV1W+ip4+kBpTd6pvvM0FqjNLtDQIJZl3yV2DYxVH+ZYZpEFrWto+it3BWskThmumVpnMP2tJ1odWpnQeINvUCXQJ86GCetKBs53al2tJCyVXevk0cKGvo81v+Jx4UGZdgmZJhNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L9m1RQxl; arc=none smtp.client-ip=209.85.128.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1713184264; c=relaxed/simple;
+	bh=bPep+N9XIwW1XB+4tjXi7DEWWpImBvt7KLF6vBWpfKw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=o/AIYZFxi/WUIMQTE3dWxJHo2OKq7be7Ujwd6vATXF/kiHhXhYtLogz7ULEp8bvGeYgA1KtF2hMk2rTsmagYSTfkMFW1QlllRAEHyCEBGTNHUOFvyRis9Elx4HE1KEINhmaRiam52gUICt8MIfEWyUEcDc5zIXyv81xzgJHi/nQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=uaUeMkCI; arc=none smtp.client-ip=80.237.130.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L9m1RQxl"
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-617d25b2bc4so34631267b3.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Apr 2024 04:37:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713181070; x=1713785870; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=QqJJ51diYZHxadqQM+hnlTVVgdEsj45t8lBFmKWpdxg=;
-        b=L9m1RQxlTwNfVkSP0gMZPRjxsRv3LYCVQCfsOoDO2gILoIi8Ya+sRsGKBd4c3em0Vc
-         qa6BIVKf/GL4xmqkJD65ws/kGIbq9v4phLkvKYE4vEU6F7ekjAHVliZpHw8GmczLIdVR
-         BwkcxLMXh1Pjtl8k55QTFrpPEJ9CtyIthjn+az6rrBPm/Vl+xY36HG+hCLmKE1NiK8fM
-         AY5jHdq8CKMT+sS9fopF9VcGS8LHDx5+hLOo0zEIYNHvksMPcEDuLttVyIKgZ/21vfy1
-         N6F3XaiBjirntqxAZ5nExvQ7AnivwBZ/J3kKEeEOBEombdEW2Moa5zE+vX/0CYKrmEE7
-         EpUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713181070; x=1713785870;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QqJJ51diYZHxadqQM+hnlTVVgdEsj45t8lBFmKWpdxg=;
-        b=fVov274V7nSBbJ9AQVmb//nbkzWrqyPjiI3PpvFB5F6gCUrWc+LhSW5hQ1JKouPjCx
-         kCc1a4m0ObQrGa1a2SnA4YG8aQpq2DVXiT0C63C8ogpptsn5o5u7HOZzk9jsi2OgJwgw
-         lDSowDANyKJvdNwddul0NzF42K3Vw+25Tyx1jovwxNIMmtMkHTQ1mD6PLnHNC8kSNvvP
-         psU6PkVEUYn4VbHmdtWuLI3sbgxCJfSnR601I1PHFavfgbKuMP9Ng4wi3SmCvbreO8dn
-         I23DCisdo6nZDqTsDRcWJaGIxXPK1/Kz2RCFDhOuzxCotL8ReORlExuvm/6xm81RUiKt
-         oUMQ==
-X-Gm-Message-State: AOJu0YyZ92RIUvOExVB3p26Gi1WfUcUz+4vMbsZPUHiMSt/56URosk2t
-	g0JklxLCMrSS6ZnRexcYxUFkWaK7Gw5Ay1OU07Jsgcim2izytcD4oBB7bQ==
-X-Google-Smtp-Source: AGHT+IH9GL4DSTYacbk/fIarQSc4AFvWyu1bGib6pJQyChrtLFBMzIdDhiZJzgR/KPyW0pTJ9ePY1w==
-X-Received: by 2002:a81:848b:0:b0:618:1ce6:b618 with SMTP id u133-20020a81848b000000b006181ce6b618mr9203597ywf.12.1713181070045;
-        Mon, 15 Apr 2024 04:37:50 -0700 (PDT)
-Received: from [172.17.0.2] ([172.183.82.201])
-        by smtp.gmail.com with ESMTPSA id r3-20020a0dec43000000b0061893269739sm1148258ywn.31.2024.04.15.04.37.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Apr 2024 04:37:49 -0700 (PDT)
-Message-ID: <661d118d.0d0a0220.9430e.531a@mx.google.com>
-Date: Mon, 15 Apr 2024 04:37:49 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7747965040195525268=="
+	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="uaUeMkCI"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:Reply-To:MIME-Version:Date:
+	Message-ID:From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:
+	Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
+	In-Reply-To:References; bh=StS4x0S3//04l7wNyiAlQ2KElGTWLVjD4MZApYb4baA=;
+	t=1713184260; x=1713616260; b=uaUeMkCI+6lJ+Bywz0JGb7PBEJwH35F/1ao/Wtb4I25MzA6
+	aekZmpzm2FwBSYyseiVRxRURMQi+5UH/gmoeO5vWz4UQRhd5XdFiMlHWnvhKWKhGBW4gqR8zUoNku
+	j0Nu2Es1ZCUmG18zgrrgEfNYmRHQAd7HnATrpjAwp/SbPQwhioxm7MqKE4Sm/yp6ULk2nCDJqnVX1
+	80w4Q7VdISCFmRf3L/kxcRlZMQhjerPb5YwxN+2zil/G7V16cRGixxGz1at8pT8GaMB7vLgyDTWmx
+	VYYvjyGQYiPBVzikv9xef2qApLNbn6NhAiJefjteHQAnmWEPD/uIUwTt3KkpbzOg==;
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+	id 1rwLU4-0001A5-KM; Mon, 15 Apr 2024 14:30:52 +0200
+Message-ID: <5c0ce057-992b-4200-bb74-b84826974860@leemhuis.info>
+Date: Mon, 15 Apr 2024 14:30:51 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, jpalus@fastmail.com
-Subject: RE: [BlueZ] build: list new tools/tester.h header in sources
-In-Reply-To: <20240415094440.5820-1-jpalus@fastmail.com>
-References: <20240415094440.5820-1-jpalus@fastmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
+Subject: Re: [PATCH] [PATCH] Bluetooth: btusb: Add support Mediatek MT7920
+To: =?UTF-8?B?RGVyZW4gV3UgKOatpuW+t+S7gSk=?= <Deren.Wu@mediatek.com>,
+ "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
+ =?UTF-8?B?UGV0ZXIgVHNhbyAo5pu554+G5b2wKQ==?= <Peter.Tsao@mediatek.com>,
+ "mike@fireburn.co.uk" <mike@fireburn.co.uk>
+Cc: "marcel@holtmann.org" <marcel@holtmann.org>,
+ "linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ =?UTF-8?B?Q2hyaXMgTHUgKOmZuOeomuazkyk=?= <Chris.Lu@mediatek.com>,
+ "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+ "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
+ =?UTF-8?B?U3RldmUgTGVlICjmnY7oppboqqAp?= <steve.lee@mediatek.com>,
+ Sean Wang <Sean.Wang@mediatek.com>, =?UTF-8?B?QWFyb24gSG91ICjkvq/kv4rku7Ap?=
+ <Aaron.Hou@mediatek.com>, "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>
+References: <20240304144844.2042-1-peter.tsao@mediatek.com>
+ <20240401144424.1714-1-mike@fireburn.co.uk>
+ <CAHbf0-FqUqoDty81OH9_Et7MTWFikYYhEvP7SBVGyeXO-R94_A@mail.gmail.com>
+ <2d822b6c-8b55-443d-ad9e-03e97ce7b99b@leemhuis.info>
+ <11f098c7cc3a063fd20c02f1a66372e3444cb272.camel@mediatek.com>
+From: "Linux regression tracking (Thorsten Leemhuis)"
+ <regressions@leemhuis.info>
+Content-Language: en-US, de-DE
+In-Reply-To: <11f098c7cc3a063fd20c02f1a66372e3444cb272.camel@mediatek.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1713184260;30b9f5a3;
+X-HE-SMSGID: 1rwLU4-0001A5-KM
 
---===============7747965040195525268==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On 05.04.24 11:15, Deren Wu (武德仁) wrote:
+> 
+> Thanks for the note. We are looking for solution for this issue. Peter
+> would post the new patch. :)
 
-This is automated email and please do not reply to this email!
+Anyone still working on this, as that afaics did not happen -- or was
+there progress and I just missed it?
 
-Dear submitter,
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+--
+Everything you wanna know about Linux kernel regression tracking:
+https://linux-regtracking.leemhuis.info/about/#tldr
+If I did something stupid, please tell me, as explained on that page.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=844541
+#regzbot poke
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.45 seconds
-GitLint                       PASS      0.30 seconds
-BuildEll                      PASS      24.28 seconds
-BluezMake                     PASS      1673.78 seconds
-MakeCheck                     PASS      25.25 seconds
-MakeDistcheck                 PASS      177.30 seconds
-CheckValgrind                 PASS      247.45 seconds
-CheckSmatch                   PASS      349.47 seconds
-bluezmakeextell               PASS      119.19 seconds
-IncrementalBuild              PASS      1418.20 seconds
-ScanBuild                     PASS      996.73 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7747965040195525268==--
+> On Fri, 2024-04-05 at 10:34 +0200, Linux regression tracking (Thorsten
+> Leemhuis) wrote:
+>> [CCing the regression list, as it should be in the loop for
+>> regressions:
+>>
+> https://urldefense.com/v3/__https://docs.kernel.org/admin-guide/reporting-regressions.html__;!!CTRNKA9wMg0ARbw!n9OQDQtfMiQdddzNLvMEOMLnnEHhw12KRY5W5YPscQJTiNQtuIVuJufNc2UYpy-rUlRtMUwZsL5NDERIf1CoGox8J2I$
+>>  ]
+>>
+>> On 01.04.24 17:20, Mike Lothian wrote:
+>>> On Mon, 1 Apr 2024 at 15:44, Mike Lothian <mike@fireburn.co.uk>
+>>> wrote:
+>>>>
+>>>> I think this patch is causing issues with older firmware
+>>>>
+>>>> Bus 003 Device 002: ID 13d3:3563 IMC Networks Wireless_Device
+>>>>
+>>>> [    0.315064] Bluetooth: Core ver 2.22
+>>>> [    0.315064] NET: Registered PF_BLUETOOTH protocol family
+>>>> [    0.315064] Bluetooth: HCI device and connection manager
+>>>> initialized
+>>>> [    0.315064] Bluetooth: HCI socket layer initialized
+>>>> [    0.315064] Bluetooth: L2CAP socket layer initialized
+>>>> [    0.315064] Bluetooth: SCO socket layer initialized
+>>>> [    4.670811] Bluetooth: RFCOMM TTY layer initialized
+>>>> [    4.671029] Bluetooth: RFCOMM socket layer initialized
+>>>> [    4.671790] Bluetooth: RFCOMM ver 1.11
+>>>> [    4.673416] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+>>>> [    4.673659] Bluetooth: BNEP filters: protocol multicast
+>>>> [    4.673895] Bluetooth: BNEP socket layer initialized
+>>>> [    4.674125] Bluetooth: HIDP (Human Interface Emulation) ver
+>>>> 1.2
+>>>> [    4.674360] Bluetooth: HIDP socket layer initialized
+>>>> [    5.016365] bluetooth hci0: Direct firmware load for
+>>>> mediatek/BT_RAM_CODE_MT7961_1a_2_hdr.bin failed with error -2
+>>>> [    5.017163] Bluetooth: hci0: Failed to load firmware file (-2)
+>>>> [    5.017557] Bluetooth: hci0: Failed to set up firmware (-2)
+>>>> [    5.018129] Bluetooth: hci0: HCI Enhanced Setup Synchronous
+>>>> Connection command is advertised, but not supported.
+>>>>
+>>>> The correct name should be
+>>>> mediatek/BT_RAM_CODE_MT7961_1_2_hdr.bin
+>>>>
+>>>> Reverting this patch fixes things
+>>>
+>>> If it helps, the device ID is 0x7961 and the fw_flavour is 24 or
+>>> 0x18 in hex
+>>
+>> Thanks for the report!
+>>
+>> Peter, did you look into this?
+>>
+>> Anyway: To be sure the issue doesn't fall through the cracks
+>> unnoticed,
+>> I'm adding it to regzbot, the Linux kernel regression tracking bot:
+>>
+>> #regzbot report:
+>>
+> https://lore.kernel.org/all/20240401144424.1714-1-mike@fireburn.co.uk/
+>> #regzbot introduced: 1cb63d80fff6c4
+>> #regzbot title: net: Bluetooth: firmware loading problems with older
+>> firmware
+>> #regzbot ignore-activity
+>>
+>> Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker'
+>> hat)
+>> --
+>> Everything you wanna know about Linux kernel regression tracking:
+>>
+> https://urldefense.com/v3/__https://linux-regtracking.leemhuis.info/about/*tldr__;Iw!!CTRNKA9wMg0ARbw!n9OQDQtfMiQdddzNLvMEOMLnnEHhw12KRY5W5YPscQJTiNQtuIVuJufNc2UYpy-rUlRtMUwZsL5NDERIf1CoQcaol0s$
+>>  
+>> That page also explains what to do if mails like this annoy you.
