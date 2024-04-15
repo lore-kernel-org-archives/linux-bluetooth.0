@@ -1,82 +1,118 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from wfhigh2-smtp.messagingengine.com (wfhigh2-smtp.messagingengine.com [64.147.123.153])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCE9C446AD
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Apr 2024 09:34:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B47F74E1D0
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Apr 2024 09:45:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713173658; cv=none; b=DO1mGkF6SvGqH633klnlt+zGPiCUYFGdstUlSHH9wfOjyLuqHcTg81lLdOJDRjLLq9yODskRZ4FdJZ4oQSgIwZ3Xm4Z7FhsC5G4Mdsq2SSx+vFhEeb31LKPslxnsixzAudOegHQr+N1pbTX4t4ksqtKN9Lc809gYX1vAhoMzOwU=
+	t=1713174302; cv=none; b=LHNXWeadNAP+NIfjSw77pgCLZ68f9lR1l4LcxNLajQM0iVTMgXx0pOzQOFmRQW9rbH2c43nQBk4qKO6MvlR+Hd5fkjvDzhuKbUuCfxT4QDVYqS5urCr/nXzWPJh7B0Ul6IAdhqRNEqahKw23Pa2YD+nPd8/ZyCfG1kQaXBTT4ck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713173658; c=relaxed/simple;
-	bh=96eFGPVH/QouQocOZSYM/RzkciTDYaHfk5QG3bgbIws=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Qmcl5NX68EhMdVVChAC15MSSVKEUcE41tS/fmzo5R5rdvKo3RMQOx7yh6n6M7awWv9ovCQq3moZfIgLWqthPGU4oEl0AVWG+KbjqgTKJkDOBJquD+/5q9sFVZ6Ikfa9cbon2uq8michCtudhMHUXRd3whJgBQwRIzBNQ/fJueEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AY4aLfRd; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713174302; c=relaxed/simple;
+	bh=RV3PLP1lUN/DEj7hsNzxhzYAic48eSzloEooL+DFT8I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hq6lKigZdEm34V//MgA49qR0NYrm6Jd69RaJtgDzsNsOlfUoOVAPq++5cXZkwMQnkOfb+pp0YZI2vDvZizIJgn3WpGDqMQvTtztn9MmWnkZBFJZnScCBmDJhqS4ojqltdX+/G+LBmC0y6+ZAQs/oAy+XRd8pXBs6yjeQqAnvRVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.com; spf=pass smtp.mailfrom=fastmail.com; dkim=pass (2048-bit key) header.d=fastmail.com header.i=@fastmail.com header.b=AVLS4tLy; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ktbLvylz; arc=none smtp.client-ip=64.147.123.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AY4aLfRd"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 60C78C2BD11
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Apr 2024 09:34:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713173658;
-	bh=96eFGPVH/QouQocOZSYM/RzkciTDYaHfk5QG3bgbIws=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=AY4aLfRdsBd7jkuOKDakagUdVJSneT0m28Mpzapvxnz8kNWlXhu0ArrJeCgOLD+f/
-	 kyL5sv5q//0XZhfx8mo4IoqpZjc0cIoHV44tbE0CugzQXPcqPwtmSNE2+5yn9REtis
-	 C7SvO/0MDbqc8SA0cAgG8kQvGN+8w6NBVVVvqzKFqVgGipWZ/mZhm60EQWkaNcqePH
-	 hqKN0dyGPdHvbPX2rK5KscbaO2xvRSBmzpcvys2xo0viNEfHpHPAdw24UNqfQOX0P4
-	 SMXcBIhIVhVvBd3PRxEJAmE+qsQBsmE8okzU1vPR7fDYGWWmc2yraUvZwFhyt6gbc5
-	 g/kkTO3hyJ0Mw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 54A14C433E3; Mon, 15 Apr 2024 09:34:18 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
+	dkim=pass (2048-bit key) header.d=fastmail.com header.i=@fastmail.com header.b="AVLS4tLy";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ktbLvylz"
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+	by mailfhigh.west.internal (Postfix) with ESMTP id A1B5718000FF;
+	Mon, 15 Apr 2024 05:44:59 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute2.internal (MEProxy); Mon, 15 Apr 2024 05:44:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm2; t=1713174299; x=1713260699; bh=m0Ck6IMqNZcjwbD12su6k
+	qAlAx79t3rG0VyxaFTxXCM=; b=AVLS4tLyjsU+AayB1GZ/naPfAvpq/gLpliD90
+	Zju7ZZASJjfwSY+xGVlBV2pObELa4h8KAMTp6ZM3VJLAFVc1j3BUyo8b5oHs3WqK
+	7BsSPBq1I4YdQKyC8PXqRoNUaQplV5EV9brkLRYz5K2nQgyGL2D0jYRIfhyAsQPN
+	G4uNT5A4XHE/oZJDU6ZrAc442ErNNsCEhz1g7ixxFVTZpmEutIhyQxmO1LVWBcXD
+	ko3yiGNAzktnTaYvdFtlWhsPJ6jCTC2GJ2pdRfoGwA7PCe93LRESksNRucOk+GDa
+	fiPgG9+7WIlmJ2nodX6dm2E1CtKFGkHJF6fjq4uHUdSxuIMbA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1713174299; x=1713260699; bh=m0Ck6IMqNZcjwbD12su6kqAlAx79
+	t3rG0VyxaFTxXCM=; b=ktbLvylzfcrSbItyZp0tod+2RaQyzuwXuoF4asenoK3c
+	Huv3yhuF+TnzVpNuTYDAc6dsT6wc1fZk5O5O+p0cm3/AU6YBuVj7e8vX0fzUXui7
+	DhE7cQ/WgUYbsdmzM6h9NcKw0RrDO7DyOoeSH6Aa3G79lEBkiov0VFT7XLjjtvAs
+	rXxq6+8G9h/5wGGafku34+MgEqpBi+sJGVFpPu9qvZ3OEllguoPmvQancAYSCHBv
+	IUXHYcq0dxP8VuAfoNo0Lm8XsyY2J+e5i98OcmMTFPfOtrQJHcEdrxaMzmCU4+i+
+	LRRhSTE/IQe2OR98IHeiTpj87f+ChXkw/nH2t41tuA==
+X-ME-Sender: <xms:G_ccZqtVnfmPSQGnHjEMj9CxA7I-lRX3XDToI7gzDufZXuZCguza9g>
+    <xme:G_ccZvc3jy7amvSToIWEpCwHmbLE0Khl-1isaC9QMVTnGtiDDVTrFEHs3Kd0UeW4s
+    2VT6NHg8J-ZOSLV6g>
+X-ME-Received: <xmr:G_ccZlwWV0AIlc7eLAPusuJ0tSTNl7KhcZJrjK4SKYppztO1AXP9PjFKp57BgbocxvwyXSfknzZxfkRAqXSbxo7-tgnXAZA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudejvddgvddtucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucenucfjughrpefhvfevufffkffoggfgsedtkeertd
+    ertddtnecuhfhrohhmpeflrghnucfrrghluhhsuceojhhprghluhhssehfrghsthhmrghi
+    lhdrtghomheqnecuggftrfgrthhtvghrnhephfekvddvgeekhfejudeiveeuiefhudekhe
+    ejhfelheduhffhleeggfettdetuedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghr
+    rghmpehmrghilhhfrhhomhepjhhprghluhhssehfrghsthhmrghilhdrtghomh
+X-ME-Proxy: <xmx:G_ccZlOZ3kw28rZXznYsxyFfGyU2tq44EeBxVbJBKuZ7pt2I5izaHw>
+    <xmx:G_ccZq-eT0f5rlkAaQMh3lEX1R-xuPNGvmPfEMiW1d6uqyV7EjdJ4g>
+    <xmx:G_ccZtVmsnHdHYG0twDZPbo5mAb8FCi5NUrLLdkHkM85yGXaBRa34A>
+    <xmx:G_ccZje4UqZgGY7LDr52bM629et9xiwRGJbNMR6xVGDLmv_s-vj4WQ>
+    <xmx:G_ccZsIy6AENcVTZp-pukihdY_ZY7m_yqI-U7ipGv_n3usHaa_DQUF_E>
+Feedback-ID: i01894241:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 15 Apr 2024 05:44:58 -0400 (EDT)
+From: Jan Palus <jpalus@fastmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 218726] qca6390 bluetooth fails after disabling/re-enabling
- bluetooth
-Date: Mon, 15 Apr 2024 09:34:18 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: quic_zijuhu@quicinc.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-218726-62941-henc7rSvhs@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218726-62941@https.bugzilla.kernel.org/>
-References: <bug-218726-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Cc: Jan Palus <jpalus@fastmail.com>
+Subject: [PATCH BlueZ] build: list new tools/tester.h header in sources
+Date: Mon, 15 Apr 2024 11:44:40 +0200
+Message-ID: <20240415094440.5820-1-jpalus@fastmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218726
+fix dist tarballs missing the header
+---
+ Makefile.tools | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Zijun Hu (quic_zijuhu@quicinc.com) changed:
+diff --git a/Makefile.tools b/Makefile.tools
+index 27a753762..679c914bf 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -135,7 +135,7 @@ tools_mesh_tester_SOURCES = tools/mesh-tester.c monitor/bt.h \
+ tools_mesh_tester_LDADD = lib/libbluetooth-internal.la \
+ 				src/libshared-glib.la $(GLIB_LIBS)
+ 
+-tools_l2cap_tester_SOURCES = tools/l2cap-tester.c monitor/bt.h \
++tools_l2cap_tester_SOURCES = tools/l2cap-tester.c tools/tester.h monitor/bt.h \
+ 				emulator/hciemu.h emulator/hciemu.c \
+ 				emulator/vhci.h emulator/vhci.c \
+ 				emulator/btdev.h emulator/btdev.c \
+@@ -182,7 +182,7 @@ tools_gap_tester_LDADD =  lib/libbluetooth-internal.la \
+ 				src/libshared-glib.la \
+ 				$(GLIB_LIBS) $(DBUS_LIBS)
+ 
+-tools_sco_tester_SOURCES = tools/sco-tester.c monitor/bt.h \
++tools_sco_tester_SOURCES = tools/sco-tester.c tools/tester.h monitor/bt.h \
+ 				emulator/hciemu.h emulator/hciemu.c \
+ 				emulator/vhci.h emulator/vhci.c \
+ 				emulator/btdev.h emulator/btdev.c \
+@@ -203,7 +203,7 @@ tools_userchan_tester_SOURCES = tools/userchan-tester.c monitor/bt.h \
+ tools_userchan_tester_LDADD = lib/libbluetooth-internal.la \
+ 				src/libshared-glib.la $(GLIB_LIBS)
+ 
+-tools_iso_tester_SOURCES = tools/iso-tester.c monitor/bt.h \
++tools_iso_tester_SOURCES = tools/iso-tester.c tools/tester.h monitor/bt.h \
+ 				emulator/hciemu.h emulator/hciemu.c \
+ 				emulator/vhci.h emulator/vhci.c \
+ 				emulator/btdev.h emulator/btdev.c \
+-- 
+2.44.0
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |quic_zijuhu@quicinc.com
-
---- Comment #5 from Zijun Hu (quic_zijuhu@quicinc.com) ---
-it will not print below logs if the patches are applied successfully.
-Apr 12 00:30:05 braindead.localdomain kernel: Bluetooth: hci0: setting up
-ROME/QCA6390
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
