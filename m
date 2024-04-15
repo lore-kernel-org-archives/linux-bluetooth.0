@@ -1,92 +1,85 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A937156256
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Apr 2024 19:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C456713AA31
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Apr 2024 19:59:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713210627; cv=none; b=T9VLAB2RhssNNAfOddjIOh08jC4HqoIrDW9v7mfTdTyCJUpgdShTq2oqnDde/LFrOWbXB6x3iHbm8s6w0sTQKQkulJa07Izecaf8lp/T2kCyo5tWGvapwOnKKxsWz/Y2CLg15EPC5Cu69vO2kY/Yo+Lu2sjc0L6UyWDUYYgrmSM=
+	t=1713211199; cv=none; b=Rz3VpF+ifO136+1iCUdHRT46g+oJVxlxHSELWOqAgeMxJh422vfzripwwW2GrZlcIbS9gzBcBVv1FxaM92/gtyHGdnwrEjn6MytQ1/tlMhQglh6bFukJQb+CaE4Eu8cLs4dStNVHH0SFm838AR+NyvgzVCR8ezh51/TMvLOhoHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713210627; c=relaxed/simple;
-	bh=ZqhBKaDpU1AurItmL/clZv1xvGdMlNCyHDHK4YLrOjw=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Oq7aMDClxLc/CQfD2riDNybAXaCUMGNBSsArF9NGes/vDk7Zurj/4MEbUFOpzKQi/lsoxpr7ji8XsZgSAV8LU3bz1gfSIdaw5/0/HR9mogvgTJtB1MdUcqvzMITRmDGGpqKlrZnIzY1htMKR85Y6zLHZHN39qMSytelROnvG+UY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Juuv5K+T; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713211199; c=relaxed/simple;
+	bh=nTK1hCioaWx76VN69QEAm162Tedp2TBL2nq3I2E0jMY=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=f7mrWxrpnYybhQq/rlTrvNQ/H41vEaLVK2UUMT7gUtpNBAqB8+XAnjKdMVPYhSnzbCsXJF7Ar89uH+ivR57JjZNun/6PlJNAsif6YrUoyUb4erKEBVgCCTV+cSYSPXCjWJDDUI4K7w+9mW/5lw8WhxYp1z6mh9p+iA182WjxYjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=swg4CG6h; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Juuv5K+T"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E9A9AC32781;
-	Mon, 15 Apr 2024 19:50:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="swg4CG6h"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 67116C2BD11
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Apr 2024 19:59:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713210626;
-	bh=ZqhBKaDpU1AurItmL/clZv1xvGdMlNCyHDHK4YLrOjw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Juuv5K+TNyMoHumKJQa1kHre3VfUI+oztjhb+JKM4H6O1Tyz1tYPTkfMq9LNEXTqF
-	 E/jwjN/gEwIgA982UzaW5+qD+TKLebbIrc8veFfgOGduFWZfb424mkXimsZzwwpQkR
-	 RuLir58o6DPS8MKYvdan3mwDe6gHxpKbpcdtFGKThTLPVAkDRkw72Q3iahBZmjpvZZ
-	 qH+k1twxs6j5r7M6Aby+aF15fHhVza60i21yxhBOXHTIP6wOsD5IFhFhb7dRfLtvQM
-	 XLdzFyp5ihPj7PkAIdTtwWo1sqEahwk77t+Nh7fsUQYK3dTe1G4CdvZpiRQD9ARwDe
-	 vzxzwGVUoSESA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D7525C43153;
-	Mon, 15 Apr 2024 19:50:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1713211199;
+	bh=nTK1hCioaWx76VN69QEAm162Tedp2TBL2nq3I2E0jMY=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=swg4CG6hKfOw5J9YmnfflH2tVf8mJFpwc9+N1OJEq9KdTsGm57+lDVu+Mln23bboj
+	 7t1Tvjq9F6C06ZP4Zz83jLXc15mnLZ2XrYvDV63cFEbJkEj86mVjCOldHg/djq0uoi
+	 UsMl+yDC061+J1O6+1cG2IcDRxgervldrJkZku3M+bK7Hxv0ysGQ0L5aL0BP4vOT18
+	 WtvDoZlslIqPSyRZkaZZuN9Te4LoBb9ZCr6f/vg3HRHkdVZuU8FtV6bimPwxmjdZt9
+	 3sThCYA+7E5EcJ4XNsvANBBajStKvAfWhwRHoxqVDunPUoKWBy15Gd+UhWLc9fnSkz
+	 HfnENOSixeWqw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 4FD09C433E2; Mon, 15 Apr 2024 19:59:59 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 218726] qca6390 bluetooth fails after disabling/re-enabling
+ bluetooth
+Date: Mon, 15 Apr 2024 19:59:59 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: wt@penguintechs.org
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-218726-62941-OHOLPC8apv@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-218726-62941@https.bugzilla.kernel.org/>
+References: <bug-218726-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1] shared/uhid: Fix crash if bt_uhid_destroy free
- replay structure
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <171321062687.2386.3115334938013550773.git-patchwork-notify@kernel.org>
-Date: Mon, 15 Apr 2024 19:50:26 +0000
-References: <20240415145444.857497-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240415145444.857497-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
 
-Hello:
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218726
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+--- Comment #9 from Wren Turkal (wt@penguintechs.org) ---
+(In reply to Zijun Hu from comment #7)
+> the new patchset is
+> https://patchwork.kernel.org/project/bluetooth/patch/1713175927-13093-1-g=
+it-
+> send-email-quic_zijuhu@quicinc.com/
 
-On Mon, 15 Apr 2024 10:54:44 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> Id replay structured has been allocated it shall be set back to NULL
-> after calling uhid_replay_free otherwise it may cause the following
-> crash:
-> 
-> Invalid read of size 1
->    at 0x1D8FC4: bt_uhid_record (uhid.c:116)
->    by 0x1D912C: uhid_read_handler (uhid.c:158)
->    by 0x201A64: watch_callback (io-glib.c:157)
->    by 0x48D4198: g_main_dispatch.lto_priv.0 (gmain.c:3344)
->    by 0x49333BE: UnknownInlinedFun (gmain.c:4152)
->    by 0x49333BE: g_main_context_iterate_unlocked.isra.0 (gmain.c:4217)
->    by 0x48D4DC6: g_main_loop_run (gmain.c:4419)
->    by 0x2020F4: mainloop_run (mainloop-glib.c:66)
->    by 0x20254B: mainloop_run_with_signal (mainloop-notify.c:188)
->    by 0x12D6D4: main (main.c:1456)
->  Address 0x53ae9c0 is 0 bytes inside a block of size 40 free'd
->    at 0x48468CF: free (vg_replace_malloc.c:985)
->    by 0x1D8E19: uhid_replay_free (uhid.c:68)
->    by 0x1D8E19: uhid_replay_free (uhid.c:59)
->    by 0x1D8E19: bt_uhid_destroy (uhid.c:509)
->    by 0x1591F5: uhid_disconnect (device.c:183)
-> 
-> [...]
+This patchset does not apply to an upstream commit on Linus' tree, and I see
+context that differs on the files that the patch changes. What is the paren=
+t of
+your commit? It also does not apply to the bluetooth-next repo master branc=
+h?
+What is the parent of this commit?
 
-Here is the summary with links:
-  - [BlueZ,v1] shared/uhid: Fix crash if bt_uhid_destroy free replay structure
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b94f1be656f3
+--=20
+You may reply to this email to add a comment.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+You are receiving this mail because:
+You are the assignee for the bug.=
