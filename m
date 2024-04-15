@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C5C545BE2
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Apr 2024 10:14:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF9E72E83C
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Apr 2024 10:18:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713176093; cv=none; b=XMAUzqtn0ICHHouyK6wPWmmS9lm/u8zgwjytl6bc2P77R8B+Y4qYNy5OOcQlMSbQbv2Lbt+edAlL5IyNNGBOwxX6UXL878gky0IYgVTei2SLOV7T9SngiUjbFAj9+cIF0mGltivSC5qHFUOhtQrhhpTJeBxd/rhaH27Ogl1Kp5M=
+	t=1713176284; cv=none; b=Tnzp6hA7UCrBKMdG0JkdREzUkGrKgdBncnZDhlWrlR8G/w0U2fS57p+OqXkilzk+N1sHhz/lpBKRWCrzvS8mEmDkui97zsZfmVYg8dNptCQx2kMd6yx1NF0T52cU0HRALCMcWsxUbpxokdEymIT5YMwWr2xNpPjMjvNVa7OgGOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713176093; c=relaxed/simple;
-	bh=w7w5RDBesbTGPd2UN/KwNshwesknO8aZYLRQD4zsqHk=;
+	s=arc-20240116; t=1713176284; c=relaxed/simple;
+	bh=oLDlnEoUzLd1kbT1Zj5f1yD46yev/uUQpYqr3sOL8hg=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=eHJH6+UNkZySg2KcBzXxfcsYUCINDrp/WTy1YmffWevkkGwt2D5JchE+kfYsI7PQTSwqaFvQV6U/6+XIdXC2XsbtyYT3uMMQ/+dNSMo2440OVk83Lv+juNT2ple7JS0pbVm8VXXomHrhut6S4gyVMhKtMr2YaD1jFtykoPNUpoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oUO6pag/; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=P7dK16GoBx8zIc5dfsA1tOjILIARR+9ebhlRwCsW/sasU+nLmvAFKE6BmVBxRd4wbNu+RhUCTyq8q4DVQ6Dnj6Ci8rijk12qixXs75YNI7SiVXgxAmpYYFhj4aOFStm/SmA/smfpzxdE6+n20NOXyejHQ9u07s8K4W4IFG4Zyh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r05VxjxW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oUO6pag/"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B0E81C2BD11
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Apr 2024 10:14:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r05VxjxW"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3F0C9C2BD11
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Apr 2024 10:18:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713176092;
-	bh=w7w5RDBesbTGPd2UN/KwNshwesknO8aZYLRQD4zsqHk=;
+	s=k20201202; t=1713176284;
+	bh=oLDlnEoUzLd1kbT1Zj5f1yD46yev/uUQpYqr3sOL8hg=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=oUO6pag/ilPrCSSkJMmffdSxJ15+UYrO/PhIj0B48MYU68xiZPPau1rnJxLBWsRMK
-	 W9Dd180xXB5Y/M+KYvXPyG67W83S+vBQEyK8eKeBmD5seUmgtk13OwnlkTldCY0s/5
-	 t8NJx53mLOtI3UsN4B0tDUMp9sEOq5IQyV/oT01OsEaKsUDasATNDF3xROXnB62+rb
-	 NWSOgH4l6OTvzCMvskZYF3SPAA0paHxwOgJQ6GN3XBqiJi8XndCbKYJDGccOW3TAxP
-	 hywvu8/XfQRQZWVDgcza7frvbPAPcw2aGxAX7gy2RL1ns6EutbEbJw0YUTsG8pkvLT
-	 eBVQh3ehbKWEw==
+	b=r05VxjxW2mJKLQBVvmv/0teZgtrknG9cjiPgequqK/cYy8wHUqzMkRGPQL7DiEkDQ
+	 iJJ075dUO6GfaxLrcZTPYaDWdub8xTlfLKsNoMpbfSXaKXiXChQdCigYZNE+84odFa
+	 lqjLv0rJeO3nrq/t0drA8YNMr5tkn78FSfbf+AbaUoCY6ON4HYGHrXIe4uLTq0BWj9
+	 M4iwY5/FvY7Mkv94lw07xPKIa6R97xUUdChU4FtabofPV7KnejIlSU5wio3r9S2Y/F
+	 NyndTGCwXtkLNO6R1b1vBEFFroH0/rNjxwKNtnACGuNcnRwLUw6mdOhQNeTk2FvzDB
+	 RYElT+Y6m2P5w==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 9F0ECC433E3; Mon, 15 Apr 2024 10:14:52 +0000 (UTC)
+	id 2F88FC433E2; Mon, 15 Apr 2024 10:18:04 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 218726] qca6390 bluetooth fails after disabling/re-enabling
  bluetooth
-Date: Mon, 15 Apr 2024 10:14:52 +0000
+Date: Mon, 15 Apr 2024 10:18:04 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -48,7 +48,7 @@ X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-218726-62941-7h1OkAKtSz@https.bugzilla.kernel.org/>
+Message-ID: <bug-218726-62941-zJ2T0MhJtu@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-218726-62941@https.bugzilla.kernel.org/>
 References: <bug-218726-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -64,10 +64,10 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D218726
 
---- Comment #6 from Zijun Hu (quic_zijuhu@quicinc.com) ---
-have reverted below commit and update a new patchset
-Fixes: 56d074d26c58 ("Bluetooth: hci_qca: don't use IS_ERR_OR_NULL() with
-gpiod_get_optional()")
+--- Comment #7 from Zijun Hu (quic_zijuhu@quicinc.com) ---
+the new patchset is
+https://patchwork.kernel.org/project/bluetooth/patch/1713175927-13093-1-git=
+-send-email-quic_zijuhu@quicinc.com/
 
 --=20
 You may reply to this email to add a comment.
