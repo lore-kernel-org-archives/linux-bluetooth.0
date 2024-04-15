@@ -1,161 +1,192 @@
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B6F78C82
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Apr 2024 15:33:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13D4A78C77
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Apr 2024 15:40:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713195193; cv=none; b=NSRtKE2xfLynsV8iaxxBzCIhe9yaVMpHOcSVlCLPkkuqheTHVD4l/gy1Z39rppi7r2FbAIgLGPhu5k8MuW6oIAP885W7uUiaDsXZ8PK0C64YF5TNTRBEWFQaZY4xpXbfSSe4TPsExkWEzKh74CRI6knm2W3W08hHl4FFEVsAYhQ=
+	t=1713195617; cv=none; b=rPIEOAklginDxtpkN2CcpKUUbIxcZzEaq6KuAdGI8J2Jg2qj1Kn5N5Fne4qek5KT4DreSzA0dfAAGbzfm3nNXdIolVqiJEpQ+bn8h+aCBKsDU0djByiDwTCWi+fs2zNgFhKMMriGtyNr1XgPgf3vrvDnTFfekkwHpsxKXLJ71FE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713195193; c=relaxed/simple;
-	bh=Jw0Fn+4YxScOEoGuahMCNDnq0o5n+o5tdJkAHeYHTZ0=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=gi1RiUXLFumyvUjqhZKp1kfYFZfiD1/yeM5SNdpCyJaX3rKPM8ni9gC/lur83xNuaw+51Y2SCmOFgDcPoFEPV9+em4gzkwFWNrW+itWZiRUzo7wv1xXdrJVuwIFQPPfoobRCyk7AgaFyw8PVaG4MBO2l1JDAfm1JzPRGjuYYg8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VB6IND3s; arc=none smtp.client-ip=209.85.219.54
+	s=arc-20240116; t=1713195617; c=relaxed/simple;
+	bh=jZyvmZnRydCJOoVt3gmE+y6KHhkY/gX1aPFrxiTs86M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=c9vnhs1XLJe2c3779QUI64uQ2GCdhLa4zMt3vFowWjoV8Ze7YMNURT2gl2Jo9H3NuGnpKFb5PuH6N0agwfCQBrQu3vhpBQ3vFMNiamsoYng7kyTW2JWG2FIV/1dB/8woIgBh19VJKrqgx7A3OOZ0onp9sPJNKGq7pwogHsXVc4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iiYOGP9c; arc=none smtp.client-ip=209.85.208.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VB6IND3s"
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-69b40061bbeso18450126d6.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Apr 2024 08:33:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iiYOGP9c"
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2da68af6c6fso17022891fa.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Apr 2024 08:40:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713195190; x=1713799990; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=7/M93aK10AMP5cx4H/+MRO5nvqA2NnOWQGt/PT6FyR0=;
-        b=VB6IND3sfQvTueA6wvxxpuNs7zZMQBxS7KtOd4rsv3Rahkr2wdA36RnHWVkgsqqdie
-         sH1jkSn4+HhbeFvJcfBCI1R620CyY5pt33bU8D9dwG45Lf4ihz9P4o4Pl4UDWSR/0Czg
-         nK6Xvmz+5meAJWho40h2Lwd8oaoC85adWywJ2siOM5FRndci4Umx2jzHghdQV6rq4+8L
-         CJ6qvjzuFXyd2LnG0ELTk4YGTYgoL2YULj1LjoQEqbIkI2akqR0+wfFHNf1P9OD2W9TB
-         0i2hzcx/7F4QvyO4R9LZtRGW5GZoxMIoHtkd1C3Graxi1fy5JO2D+JW/XaWFFWR+dibx
-         kyjg==
+        d=gmail.com; s=20230601; t=1713195614; x=1713800414; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rabRSDRGz2ka0OSKSPVR7Njpy9wM18fSoKOnRfgaEMI=;
+        b=iiYOGP9cKQ21QnRHsPJMXzuFvHQF4Sa3iNEmmvfMzyoptBlUxougt503Dnkq3ks+qN
+         0PkyhOmlk2zysjVwUO8+9zs2CWBcOeq8HCaOJ7ubAGtL4JadhAqnLYfO0IWqFqco0vqq
+         IoZcJ7eTnbTabdex/JTFsULGLNMApwbrpjfgJcd0lK8j40GlQR5fA/3wouusnLzbdWRq
+         krAvRJT4/3Pu+dYV5XtdkO/grq3r5NOq7/DbLc25scu4DBwMKymhvs2HxoAVcMgWCATq
+         1Mp49cOqjS2pg4TdmG0YQ2g3OSWFogV8DDkJVDmgR1AwFW+cDP/ULLVFYCl+gzFaK9VC
+         NQ6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713195190; x=1713799990;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7/M93aK10AMP5cx4H/+MRO5nvqA2NnOWQGt/PT6FyR0=;
-        b=eSV18QJaroyCa7rtLUsqO+MwN4ueKRnSHGWXEqYezxyNmRPRjlmVxzUO9r/LHXq8IR
-         FJ/Yab3WCGQaAH04IKvGsDfTI+7oQHtcaPSO/EcbT0ex8Vg7jFPySmjWiQWiGnei52k1
-         ljNWUTPry7uGwUs7zUjCkvyVaGIv98lz1tmiX1JCJavnqHT5Vb8zT3x2G5fpKxTR8hXE
-         POuQx7YKqtaOokUwQbaVkQJWirriV1LUcQ17q33wO0A5PzMeQPpPUl5gCfkWVRplX4eu
-         ddV4hJic4O4MZhdwJODEhx3cbQYDRnUUsOm1Sc7/ODJs+86Np/0rBq5wmvW3UWpRVCQb
-         G05g==
-X-Gm-Message-State: AOJu0YxTptiY/cw3VV5s/zzuOBJjIDSfLWha8CegwW/CYNOdwZrO5dHv
-	Y7lGZ2TG8acQw1A5AbwazQ7aq+tCinlQJp7MaYFn5RMaY/GWfNXG1V0k0w==
-X-Google-Smtp-Source: AGHT+IGzxH3GbCuwpz40T3a5YU5Jxr2QFo54EgXGO+nlF3Z1MoPq35TrhauLXPingZQRa4vsdmQrCA==
-X-Received: by 2002:a0c:fb08:0:b0:699:3025:566f with SMTP id c8-20020a0cfb08000000b006993025566fmr11218740qvp.38.1713195190281;
-        Mon, 15 Apr 2024 08:33:10 -0700 (PDT)
-Received: from [172.17.0.2] ([40.76.238.221])
-        by smtp.gmail.com with ESMTPSA id j2-20020a0ce6a2000000b0069b61cda71esm3875742qvn.84.2024.04.15.08.33.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Apr 2024 08:33:10 -0700 (PDT)
-Message-ID: <661d48b6.0c0a0220.12969.772d@mx.google.com>
-Date: Mon, 15 Apr 2024 08:33:10 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2307628980710187087=="
+        d=1e100.net; s=20230601; t=1713195614; x=1713800414;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rabRSDRGz2ka0OSKSPVR7Njpy9wM18fSoKOnRfgaEMI=;
+        b=VPrEOO6QNxm5NIGlUa91qEByge6QsUNDMHkxT/DWx5w7pPIYyLtnu54pA97Hzim41J
+         A36ynrpbHmpLClOo0XRRWFsCNfdxGuK4Z6chDVlsX6VfYf6/x7jTr53H3dB2HQ0zVwG0
+         zpb+Y3Og8XKX4RV8v8+S2IRbJFsNh7Z7sSDj5zHBLoEzWnRIo6wv2u3/nr40LBLWnXCw
+         T2cUUeXALzEPVEhz1Ts4v/zCP/sjlYAW/pUaksILEgU6atCV0alf91BAmt9fsCYsdosk
+         LFTlhs/tZHEZOOR3n6ZsuNli1wAy7m3q7bQIANJLS+LgWAaQlQdKD92Y7xYIa0nf0Kd0
+         7Xkw==
+X-Gm-Message-State: AOJu0Yy2OP8glhhPw8cAvPW41umB6gkejAv371ceW+HA6x2obIgCi8fF
+	wxOQ/u9EQUf4D3iiJLYP6mQEcSw/dIBRDQVC5yx5Pg6UDKPwagBKpXAqdCAXH0wker4p8G66Zss
+	Gu9sn6cY67oHof9hUm5VrfDeRoG0=
+X-Google-Smtp-Source: AGHT+IE83yhWUXTEFfTpDIu7ZfmaKACs2ZolsG2a0uFrr7t5qO2SZLyJpNGGHjn4qdjNoDwdEDN7+PQLUFoI+/b+ESU=
+X-Received: by 2002:a05:651c:205:b0:2da:78fc:6418 with SMTP id
+ y5-20020a05651c020500b002da78fc6418mr1938217ljn.19.1713195613831; Mon, 15 Apr
+ 2024 08:40:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, vlad.pruteanu@nxp.com
-Subject: RE: Bluetooth: hci_event: Fix setting of unicast qos interval
-In-Reply-To: <20240415144430.34450-2-vlad.pruteanu@nxp.com>
-References: <20240415144430.34450-2-vlad.pruteanu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <PAXPR08MB6399418D53ED76246B32164998092@PAXPR08MB6399.eurprd08.prod.outlook.com>
+ <PAXPR08MB639971AE2D6FB75937F92D2C98092@PAXPR08MB6399.eurprd08.prod.outlook.com>
+In-Reply-To: <PAXPR08MB639971AE2D6FB75937F92D2C98092@PAXPR08MB6399.eurprd08.prod.outlook.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 15 Apr 2024 11:40:00 -0400
+Message-ID: <CABBYNZ+0XmS5EYmoEKXzRxFHJEoGsTj8ghmVreX9VSt3tTymrg@mail.gmail.com>
+Subject: Re: Bluetooth from Windows to Linux using BlueZ
+To: Peter Mortier <peter.mortier@outlook.be>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============2307628980710187087==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Peter,
 
-This is automated email and please do not reply to this email!
+On Mon, Apr 15, 2024 at 11:19=E2=80=AFAM Peter Mortier <peter.mortier@outlo=
+ok.be> wrote:
+>
+> Dear all,
+> I want to set up a simple bluetooth connection between 2 PC=E2=80=99s, cl=
+ient running Windows and server running Linux.
+> There is no need for a lot of overhead such as pairing.
+> I am running the server software on Linux Ubuntu with the following code:
+>
+>     int serverSocket, clientSocket;
+>     struct sockaddr_rc serverAddr =3D {0}, clientAddr=3D{0};
+>
+>     socklen_t clientAddrSize =3D sizeof(sockaddr_rc);
+>
+>     // Create Bluetooth socket
+>     serverSocket=3Dsocket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+>     if (serverSocket<0)
+>     {
+>       perror("socket creation failed: ");
+>       return false;
+>     }
+>     bdaddr_t  bdaddr_any=3D{{0,0,0,0,0,0}};
+>
+>   // Bind the socket to any local Bluetooth adapter
+>     serverAddr.rc_family =3D AF_BLUETOOTH;
+>     serverAddr.rc_bdaddr =3D bdaddr_any; // bind to any local Bluetooth a=
+dapter
+>     serverAddr.rc_channel =3D 25;
+>
+>     if (bind(serverSocket,(struct sockaddr*)&serverAddr,sizeof(serverAddr=
+))<0)
+>     {
+>       perror("Bind failed");
+>       close(serverSocket);
+>       exit(EXIT_FAILURE);
+>     }
+>
+>     // listen for incoming connections
+>     if (listen(serverSocket,1) <0)
+>     {
+>       perror("Listen failed");
+>       close(serverSocket);
+>       exit(EXIT_FAILURE);
+>     };
+>
+>     while (true)
+>     {
+>       wxPrintf("Waiting for incoming Bluetooth connections...\n");
+>
+>       // Accept incoming connection
+>       clientSocket =3D accept(serverSocket, (struct sockaddr*) &clientAdd=
+r,&clientAddrSize);
+>       if (clientSocket<0)
+>       {
+>         perror("accept failed");
+>         continue;
+>       }
+>
+> I am running the client software on Windows 10 with the following code:
+>
+>     // Create a Bluetooth socket
+>     m_serverSocket =3D socket(AF_BTH, SOCK_STREAM, BTHPROTO_RFCOMM);
+>     SOCKADDR_BTH serverAddr =3D { 0 };
+>     if (m_serverSocket =3D=3D INVALID_SOCKET) {
+>       return false;
+>     }
+>
+>     // Set the address of the remote Bluetooth device to connect to
+>     serverAddr.addressFamily =3D AF_BTH;
+>     serverAddr.btAddr =3D *reinterpret_cast<BTH_ADDR*>(&m_Server.Address.=
+ullLong); // this is the addres found by function BluetoothFindFirstDevice(=
+)
+>     serverAddr.serviceClassId =3D RFCOMM_PROTOCOL_UUID;  // I also tried =
+GUID_NULL
+>     serverAddr.port =3D 25; // I also tried 0
+>
+>     // Connect to the remote Bluetooth device
+>     if (connect(m_serverSocket, reinterpret_cast<SOCKADDR*>(&serverAddr),=
+ sizeof(serverAddr)) =3D=3D SOCKET_ERROR) {
+>        std::cout << "error: " << WSAGeLastError() << std::endl;
+>       return false;
+>     }
+>
+> The Linux server is listening on port 25 while the Windows client tries t=
+o connect to the same port. The client first searches for the server with B=
+luetoothFindFirstDevice and BluetoothFindNextDevice, finds the server bluet=
+oooth address and uses that address to connect.
+> The connection on the client then fails with error code 10051 (or sometim=
+es 10060)
+>
+> On Linux there is no firewall installed, using bluetoothclt I see it is r=
+egistered and pairable. The bluetooth dongle is plugged into a USB port and=
+ is seen as USB2.0-BT. I have tried different ports without success.
+>
+> I've done some testing with my code. It seems bluetooth is working well w=
+ith code above in the following circumstances :
+> - windows =E2=86=92 windows
+> - linux =E2=86=92 linux
+> - linux =E2=86=92 windows
+> The only thing that doesn't work is: windows =E2=86=92 linux
+>
+> I am told the problem lies in the BlueZ library, but I find this hard to =
+believe. My guesses are I am doing something wrong.
 
-Dear submitter,
+We probably need to HCI trace to tell what is going on, no idea what
+are the errors that windows stack is throwing, besides if you manage
+to connect Linux to Linux I assume the server is listening, but
+perhaps  there is a different problem, anyway I would recommend using
+rctest instead before attempting to write your own version of it:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=844684
+https://github.com/bluez/bluez/blob/master/tools/rctest.rst
 
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      0.90 seconds
-GitLint                       PASS      0.31 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      29.88 seconds
-CheckAllWarning               PASS      32.46 seconds
-CheckSparse                   WARNING   38.05 seconds
-CheckSmatch                   FAIL      36.47 seconds
-BuildKernel32                 PASS      28.89 seconds
-TestRunnerSetup               PASS      519.60 seconds
-TestRunner_l2cap-tester       PASS      18.36 seconds
-TestRunner_iso-tester         PASS      30.67 seconds
-TestRunner_bnep-tester        PASS      4.69 seconds
-TestRunner_mgmt-tester        PASS      113.50 seconds
-TestRunner_rfcomm-tester      PASS      7.36 seconds
-TestRunner_sco-tester         PASS      14.93 seconds
-TestRunner_ioctl-tester       PASS      7.60 seconds
-TestRunner_mesh-tester        PASS      5.72 seconds
-TestRunner_smp-tester         PASS      6.76 seconds
-TestRunner_userchan-tester    PASS      4.86 seconds
-IncrementalBuild              PASS      27.83 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[1/1] Bluetooth: hci_event: Fix setting of unicast qos interval
-ERROR: Missing Signed-off-by: line(s)
-
-total: 1 errors, 0 warnings, 0 checks, 10 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13630191.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+> Any help is much appreciated!
+>
+> Best regards,
+> Peter
 
 
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-##############################
-Test: CheckSmatch - FAIL
-Desc: Run smatch tool with source
-Output:
 
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
-make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
-make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: net] Error 2
-make[2]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
-make[4]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bpa10x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bpa10x.o'
-make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
-make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
-make: *** [Makefile:240: __sub-make] Error 2
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============2307628980710187087==--
+--=20
+Luiz Augusto von Dentz
