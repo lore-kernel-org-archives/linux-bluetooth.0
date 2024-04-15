@@ -1,82 +1,96 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DF95155A24
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Apr 2024 20:28:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F72B156977;
+	Mon, 15 Apr 2024 23:05:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713212923; cv=none; b=HfaP92z3uavwyHw8o/wGJ0H1ONzBm5r1B5weJTJXXpbwCS1TFPoeR+79Jtx35j1DVz60Xc0kFjLbOY2IVsDRXODQAJB/5gRmlQExCVab4rhHR2oxBOCxLw3IXutavhQLbsfoKmF5jVwXcSbKEtbuk33mvLPNkvDacYSRDZcYbjg=
+	t=1713222334; cv=none; b=VrT5N84XiJtBY9BnuGtb48cQ2KnJkEceWeUQh9M4QYSdGncoM9OdomXt/dlpIz1dOkUrYYEUtLmsx60B+eas/0N2doTgHXMrN9j1DcfSeEIbYdMol3bmw4FqFr7Yf9hp00fgoDjOa8SrvmwLVmspDrVTeNlRlgbg61UVxyhEI3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713212923; c=relaxed/simple;
-	bh=9ocx91g0cw/+JjaVAkqw4Kub9IKLeiRT4BiXAd/L/6M=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=GioeMWWUDLVBUz8QaPazlwAsaB009QKbFFxoqwezVSD18ysbAgBmudAPYr4nOWFDeub3gwcdZCA+iJRwVFumepwRteFpbv8OsDbIZl0XsfApoIVBVveYRHp5LeDwF08v6BMKxXuSIUGVJ6Xq8FoO85cFjCOVh1Dx7Ybl496NLSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UwiGtp2+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713222334; c=relaxed/simple;
+	bh=ujka/03jMUb0XAncsAq1DSp6vUMODs+NmGkGQhLYg68=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=APnU3uLh8EBtDFJLXntWat0Rma+Jiqn3jhrTnFZx+dVEGXObSgiNQIlknZeKjg4h4Hwjazs/28YOPw1o/RH38CRAAldTdff9W3MccXF1LtWtFXHshicZ7L0Djr1lk+zWbP+3tuaH2ZV/9sudiTRsxuPGAYqUTdOMBDFp8iMUDVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gx6d951X; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UwiGtp2+"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9096EC113CC
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Apr 2024 20:28:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gx6d951X"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39EA4C113CC;
+	Mon, 15 Apr 2024 23:05:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713212922;
-	bh=9ocx91g0cw/+JjaVAkqw4Kub9IKLeiRT4BiXAd/L/6M=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=UwiGtp2+EbjnfszybGJZcIrkMqswyuPlJh9nzSyx9egli204/aOGzOsjCXH0+lIka
-	 KyOLPhb5EPky9O6gkORmKvfovfiAcbuLfgIc371kLLZj7jh+2NvfZH0E65l9HnL3mZ
-	 USn+9f2U1JpEYlNLz41DiSIgpegW840XSJ0CInZN+12id93rCmzVfuf/Zs74w4x4cO
-	 MMk/r3dXWJPHoH+v7YQyeoZw/wQZZdDC62L+8Ed0BX8OTLJ9JtJdnIIh19W0Ev6Alk
-	 qSFQt1Aqpsho6l2AYMOMYLloBU/Xf5UURHZvtlIQVdNyHK3Aw3L8tOZKAWJnAvDbDA
-	 vWmEVVbS8s62A==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 7F221C433DE; Mon, 15 Apr 2024 20:28:42 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 218726] qca6390 bluetooth fails after disabling/re-enabling
- bluetooth
-Date: Mon, 15 Apr 2024 20:28:42 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: wt@penguintechs.org
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-218726-62941-oHatMs9jEs@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218726-62941@https.bugzilla.kernel.org/>
-References: <bug-218726-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=k20201202; t=1713222333;
+	bh=ujka/03jMUb0XAncsAq1DSp6vUMODs+NmGkGQhLYg68=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Gx6d951XUcnisiPltyGh2R86ooQuEYTrxs3fuuz33iLrsJZKIr4Yh7kIEhpgZYT0u
+	 +cscArqD1yK5tD3G0VQc+Ap7mBDtsJdrKBNrU1S3p32nkeZGHxgvSM3TImP1L3AnT+
+	 F1Nn6ThGM/Nxfr+vuJQoaLTePGQ8EfFhYr8JHlpahucJC6/h2JaGVs/KfAy6oNyMOG
+	 N+dAJk9Pas+V8JpKU1LFAZJsJJQ8Z4hWi+pQzAMfGyvrh+MkM1rVX2dbNMvB1H0UsB
+	 9dOhkk3jUFJLdhWOMw6dCldHzd9gEp8IhUOIXELJODAGnL83vI0TUDlFCajFJHVR0y
+	 /+aHDeMK9aFHg==
+Date: Mon, 15 Apr 2024 18:05:30 -0500
+From: Rob Herring <robh@kernel.org>
+To: Chen-Yu Tsai <wenst@chromium.org>
+Cc: Matthias Brugger <matthias.bgg@gmail.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	devicetree@vger.kernel.org,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-bluetooth@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
+	netdev@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
+	linux-arm-kernel@lists.infradead.org,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, linux-kernel@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
+	Conor Dooley <conor+dt@kernel.org>
+Subject: Re: [PATCH v3 1/2] dt-bindings: net: bluetooth: Add MediaTek MT7921S
+ SDIO Bluetooth
+Message-ID: <171322232789.252337.16326980700188367647.robh@kernel.org>
+References: <20240412073046.1192744-1-wenst@chromium.org>
+ <20240412073046.1192744-2-wenst@chromium.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240412073046.1192744-2-wenst@chromium.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218726
 
---- Comment #10 from Wren Turkal (wt@penguintechs.org) ---
-So, I tried just reverting the commit (56d074d26c58) you mentioned on the
-mailing list. That seems to have worked. I am building with that revert.
-However, you debug messages patch conflicts, so I do not have the extra log=
-ging
-now. It's just mainline + the revert of the commit.
+On Fri, 12 Apr 2024 15:30:42 +0800, Chen-Yu Tsai wrote:
+> The MediaTek MT7921S is a WiFi/Bluetooth combo chip that works over
+> SDIO. WiFi and Bluetooth are separate SDIO functions within the chip.
+> While the Bluetooth SDIO function is fully discoverable, the chip has
+> a pin that can reset just the Bluetooth core, as opposed to the full
+> chip. This should be described in the device tree.
+> 
+> Add a device tree binding for the Bluetooth SDIO function of the MT7921S
+> specifically to document the reset line. This binding is based on the MMC
+> controller binding, which specifies one device node per SDIO function.
+> 
+> Cc: Sean Wang <sean.wang@mediatek.com>
+> Signed-off-by: Chen-Yu Tsai <wenst@chromium.org>
+> ---
+> Changes since v2:
+> - Expand description and commit message to clearly state that WiFi and
+>   Bluetooth are separate SDIO functions, and that each function should
+>   be a separate device node, as specified by the MMC binding.
+> - Change 'additionalProperties' to 'unevaluatedProperties'
+> - Add missing separating new line
+> - s/ot/to/
+> 
+> Angelo's reviewed-by was not picked up due to the above changes.
+> 
+> Changes since v1:
+> - Reworded descriptions
+> - Moved binding maintainer section before description
+> - Added missing reference to bluetooth-controller.yaml
+> - Added missing GPIO header to example
+> ---
+>  .../bluetooth/mediatek,mt7921s-bluetooth.yaml | 55 +++++++++++++++++++
+>  MAINTAINERS                                   |  1 +
+>  2 files changed, 56 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml
+> 
 
-Is this what you were asking me to try? If so, please confirm. If not, what=
- did
-you actually want me to try?
+Reviewed-by: Rob Herring <robh@kernel.org>
 
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
