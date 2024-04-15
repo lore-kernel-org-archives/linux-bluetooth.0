@@ -1,48 +1,104 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EC3178C91
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Apr 2024 16:32:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C67178C90
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Apr 2024 16:42:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713198731; cv=none; b=oqcV+veRJWfNeldsfFiuTRxVnW3WQq+P92ymKfj+2aVV1rziAJSI2cv5jBpJ8nLr8QTgbUP5xKg6Edw916jx4Zou9NLBOcCE70/O8MWLS23JxnPbYEd6KvSvjzb1cAX0A0baf85og6sNspZ0cLOBjFIDzmwTfQPUKv0jZF5uUvc=
+	t=1713199380; cv=none; b=lWZhg6RVSnrbw5fc7epHgnbtw8QWfP9XyFQHPqzvv9i5jgLjryUXgir+QKhPLaMgLKYn8OPywxQbJJdz/9DOv83RCFGeTNR/9c6RhZncjWQ6IvqZ+wAnr4oLAhFGxMgTfS2ZptV2slijGSbIr7AFXdmMGoNBGs1vlySLMid7XuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713198731; c=relaxed/simple;
-	bh=DGxpXgQtjBFrGeR5qX1L6PTm4C2RN7LUDcUchE/cSj4=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=i0GNHr+8SgsZtEjD1TKPXOPhCjxxURr0FU57DBmh2iwn+lE5vgNz1bnAx35rFVbn3Rv/GSBIDCZrsz5mQQqkSGZdm2fYGIKs9Xf6zmY7zL5kGWc2J2dRLJRZZMg2ytY1H4jnwC82FI6wO00wPb5Z2mQRVnfo12pU2Q/CMwLOynY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=fMEo5vv5; arc=none smtp.client-ip=192.30.252.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1713199380; c=relaxed/simple;
+	bh=NPPu+eNjbmyO9i92TnPkr8OpaYUcvfNFUplP8gEBP08=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=ECma6aFNsCrPp4JtyociMgNtCDERJWeOZwDERufKyV563tmCS76QMRRC8C1oJNy6CuXAUGzlvJAegXpJzCFLp6d+z6JWLT92uujy4XofJTSpWExVrgWfkyWgzthYsCiYlka3V1AfZB1rz2+221PF/79BaTAweJwQFOZWqsWhJPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N7C0+xt8; arc=none smtp.client-ip=209.85.161.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="fMEo5vv5"
-Received: from github.com (hubbernetes-node-cb5844f.ac4-iad.github.net [10.52.12.64])
-	by smtp.github.com (Postfix) with ESMTPA id 9270F700CC6
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Apr 2024 09:32:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1713198728;
-	bh=v+Wn/ZXHnOYQMcKF2JadfXpAqmUMgyDEzem9DDH5ftY=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=fMEo5vv5aAzBRUZS0ny23iAtJaJNNaoyt4CHyZJUS8H7X5FYc+pR7VxTXL22VtAOI
-	 XUiHLZB/KqtQ5VnGUKEd4+c3v7/6Z+SVMilVDI/Q4wULvss4kmXQDMdF28BwfWc+Ds
-	 lzM1mW70Wt0LGl5SVg+qSQI/PMJo1hrxxkYiZl5s=
-Date: Mon, 15 Apr 2024 09:32:08 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/tags/5.75/000000-79c02c@github.com>
-Subject: [bluez/bluez]
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N7C0+xt8"
+Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-5aa3af24775so2597352eaf.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Apr 2024 09:42:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713199378; x=1713804178; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=BvEooATo4JbmaHAxDrygD6QP7rEXfwEszsi1XEKxNU0=;
+        b=N7C0+xt8Rt5NuA19STn7Zs+qLjn7hXH38s6GAzj+7+y0GY71GfcrKPqPFLtnZxJfoV
+         D8Pf30sdI8TZQwEQh0U8SYero7nNSLMZgGn7rduovBTpSbHwnd+eCbEd4cbepxdFGeJE
+         yDC4BmkW9La3co3T52KCzCR+1njAGl9+VeYpCyDxV2MCYvtU4on+qDswKzg0MNtOSCbb
+         c2/jG8UAdRkn/vxT615sH5WVhYC07IRSLLsFWZ5Q9guA4S5ETcZR1RZxD3dD5BiWY5eq
+         EYOCr8dH3Zv+6Yzg4WSIkG0TxtJdEaLoBhmzH1KTiV4k2aNlFRv7sTJgcosT2ofWNo2r
+         7f9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713199378; x=1713804178;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BvEooATo4JbmaHAxDrygD6QP7rEXfwEszsi1XEKxNU0=;
+        b=AW6Efz2nmk1lqR8uBsaR4rt6yUxmmR8Ouh/DKlms4lbkwugpMtBX12PNmlx7dNsgCL
+         v+vBClnd/oJh2LS8ulz5wm7bO/3aaxjZlAw4Iak1SRtntl0MdHUn9sC3Xq1u2gE0iBxa
+         zwZY6W4NOUM/iMxSlrAzYypRvNjj0zPKLjlwedGfvxfjYL6IBAy+T80l3BXZAnxAdoek
+         TQidCdmb5SZEQqZ58Bpyf8AoZTUu8g+aC8JSjcnloqw7MUiO1kX99KiwUy/DsQHVHq/H
+         u650PBjOrMu1ENHRGPbn9zehDMgdKTufMfJOwot32mWfTpJn8f2Fm5+7qOYfaEyiloYc
+         UdMg==
+X-Gm-Message-State: AOJu0YyopqHBKsZ04n6VoaLyuE6ruwzWfvZ4L0Q0g6IybVzdTQZoiEt5
+	b9O48TqC3W0iwTcvC+bPlVlZw9vhqKYRpyRRPF2khbsuvUpKf9YO13S+og==
+X-Google-Smtp-Source: AGHT+IH1Ef5lU8TQRocj0uzgjTpV5nPMDaPHdmnfyFzTyKHDTGjgn2nxoQ/9QszJzZd/QHQgkbJ/ww==
+X-Received: by 2002:a05:6358:9617:b0:183:e72e:ce04 with SMTP id a23-20020a056358961700b00183e72ece04mr10908456rwb.16.1713199378419;
+        Mon, 15 Apr 2024 09:42:58 -0700 (PDT)
+Received: from [172.17.0.2] ([13.91.68.210])
+        by smtp.gmail.com with ESMTPSA id h23-20020a656397000000b005e838b99c96sm6296304pgv.80.2024.04.15.09.42.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Apr 2024 09:42:58 -0700 (PDT)
+Message-ID: <661d5912.650a0220.919bf.1152@mx.google.com>
+Date: Mon, 15 Apr 2024 09:42:58 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3447701506021128218=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1] shared/uhid: Fix crash if bt_uhid_destroy free replay structure
+In-Reply-To: <20240415145444.857497-1-luiz.dentz@gmail.com>
+References: <20240415145444.857497-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============3447701506021128218==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/tags/5.75
-  Home:   https://github.com/bluez/bluez
+This is automated email and please do not reply to this email!
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=844685
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.25 seconds
+GitLint                       PASS      0.20 seconds
+BuildEll                      PASS      25.20 seconds
+BluezMake                     PASS      1763.91 seconds
+MakeCheck                     PASS      12.94 seconds
+MakeDistcheck                 PASS      181.38 seconds
+CheckValgrind                 PASS      250.57 seconds
+CheckSmatch                   PASS      357.15 seconds
+bluezmakeextell               PASS      121.63 seconds
+IncrementalBuild              PASS      1502.12 seconds
+ScanBuild                     PASS      1039.94 seconds
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============3447701506021128218==--
