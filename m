@@ -1,75 +1,98 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70E4AEEB7;
-	Tue, 16 Apr 2024 09:20:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03B1E5A10B
+	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Apr 2024 09:24:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713259218; cv=none; b=DALwESeTSj9VW5nvkZynwWdSf/TJDR7TPfiujPSdfciWtTApD0r3OOwPJvyfSL/NTk4/9EL9Pmvp5yvaUNYCW/LKxk4S1jvxjZISmX3ajm5comR9ocJNPSbrQ9QvBpgtQn6mLFYyaCZhZAF2eKX7pO5UfqD+3LwSix91EfKKdUk=
+	t=1713259474; cv=none; b=mP2Z7ykLBQhCFRguk319ttiGYbR4VGRH+I4dIM+DuIIDKM5NIBvk/e/hw4G9xDeR7IT7uxLVatXQvg+Lwo881ZW7YmQxNrmKZTru6DCI2NaJcikndJVJIHwOcttU3akJ0ELVzHM9929PMpgh6yz3y2avkotTCGgOE+QP+p0BXqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713259218; c=relaxed/simple;
-	bh=JdkdEMs0VGgDEoGPH/7l1eo9YTIzttLE89QjVzLRvf4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PUcB8G+9ebdqeWusINybPiCQMZftMwcP2GZlKUfmL4n0zLP7Z3CyjJkjWKv34OxBP0hOBb9bB2nxXlypvpjxDg2UCP8pJ1sRMrXB19AyMxUDi77lwdobpw8spkACDt9aex8MVdUOUxnJeeQAvVgQZsQAR4vihrWqHBbyi9YBHaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iz5DZxJY; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713259474; c=relaxed/simple;
+	bh=EAM82pOGpVSQSe325hey0tns9zpGQJpgkVpsXHCZXGI=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=HSVnugHniTlfuKzlqSv8vdBOHp/a2NjQsaA2yuzt26Q3WNYdvZGJ+3IFJeb8D7eeMn4r522nlgrYEqlawJQYky8VJxsfT8A5hkEjfomVZZziBn4zCVMbdPSQBkhtxu3fC9w/9LycA4VfoD8bmhXE0hS5pDJ3RXTpV0Q+aJ7662g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=im8ro7CG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iz5DZxJY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF73DC113CE;
-	Tue, 16 Apr 2024 09:20:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="im8ro7CG"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 92B98C113CE
+	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Apr 2024 09:24:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713259218;
-	bh=JdkdEMs0VGgDEoGPH/7l1eo9YTIzttLE89QjVzLRvf4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iz5DZxJYMjV/lqJEkIxmwYC2umpExhi9LHj3r85tw1WUdJ7ikmNGxWtGvyoehA+rl
-	 BwAzPgmU67jka6mn+Vpwk8e47i/mooNw0Udz79pT5R5c/bctwBlhDMXKghwK72JlyV
-	 1WoMHvIqBuNGMV0o9O+9kVa2A1b+h16cdSe3Uj+t7E8Lo4aQsJPV9SRZEZK6+cyg6Q
-	 Af8HiklxwUg/nbskPkkU/wL7CVvF/ychv4a4x95Hgx9Z7k1EiWW8xTFeZUxVZ2Jr7c
-	 YdnB1jRenNIqDNxz71aMxRGgrBnxyWPN9w/8ToLPcTwI+AQVRbGOKHQ5f5uUIlpaA9
-	 FY80xEVQvL0RQ==
-Received: from johan by xi.lan with local (Exim 4.97.1)
-	(envelope-from <johan@kernel.org>)
-	id 1rwezA-000000005IR-3diI;
-	Tue, 16 Apr 2024 11:20:16 +0200
-Date: Tue, 16 Apr 2024 11:20:16 +0200
-From: Johan Hovold <johan@kernel.org>
-To: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
-Cc: Johan Hovold <johan+linaro@kernel.org>, luiz.dentz@gmail.com,
-	marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-	quic_mohamull@quicinc.com, quic_hbandi@quicinc.com
-Subject: Re: [PATCH] Revert "Bluetooth: hci_qca: Set BDA quirk bit if fwnode
- exists in DT"
-Message-ID: <Zh5C0OjVoJaX-GGg@hovoldconsulting.com>
-References: <20240314084412.1127-1-johan+linaro@kernel.org>
- <171146704035.9961.13096206001570615153.git-patchwork-notify@kernel.org>
- <124a7d54-5a18-4be7-9a76-a12017f6cce5@quicinc.com>
- <ZgWLeo5KSLurLDhK@hovoldconsulting.com>
- <c03abbbd-faa5-4fdc-b7c3-5554a90c3419@quicinc.com>
- <Zg1KmcFQ3bAJa8qJ@hovoldconsulting.com>
- <b7d5c2ac-2278-4ccc-be2a-7c7d9936581a@quicinc.com>
- <f72d83fd-9576-4017-bcf9-c50ce94d85ec@quicinc.com>
- <Zh0NhA4GBxIAM-ZI@hovoldconsulting.com>
+	s=k20201202; t=1713259473;
+	bh=EAM82pOGpVSQSe325hey0tns9zpGQJpgkVpsXHCZXGI=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=im8ro7CGo4yM1/47PvQgRYN5aJkjqYSFil3Mct8LYCWgsy/SIVOJ4aSafRsytYbKi
+	 vYt1sxBDAx9j1P9aEhQbfOYdwuaxd9kszA0pZzHf9z5Xl8xWbEzkjzRueEy4mEkvtt
+	 rFBoWnC4zl4UYuGgepgUzEDubHeQ9GsGxq8bqJn9dBvKAKeRb9G7sx0MPC3s53ebZd
+	 pmh1rGThvLZCYElGfFpE5JdLay+df6FPgyLV4dEnXYS3KNRelW+IT4Qo4XJDv5NWFQ
+	 ubXVCK7e+YxB42ExdDVOmuUvIfoi+8Ggc0QKR5uwIrfHMyhX+aNE0mL0vN11V6XfZR
+	 zyojoQiXf2j7Q==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 7CFEFC433DE; Tue, 16 Apr 2024 09:24:33 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 218726] qca6390 bluetooth fails after disabling/re-enabling
+ bluetooth
+Date: Tue, 16 Apr 2024 09:24:33 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: wt@penguintechs.org
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-218726-62941-bCDangZrYK@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-218726-62941@https.bugzilla.kernel.org/>
+References: <bug-218726-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zh0NhA4GBxIAM-ZI@hovoldconsulting.com>
 
-On Mon, Apr 15, 2024 at 01:20:36PM +0200, Johan Hovold wrote:
-> On Mon, Apr 15, 2024 at 04:22:51PM +0530, Janaki Ramaiah Thota wrote:
-> 
-> > Are you planing to merge your below patch ?
-> 
-> Yes, sorry about the delay. Was busy with other things last week.
-> 
-> I'll revisit and post it shortly.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218726
 
-For the record, I've now posted a fix for this here:
+--- Comment #18 from Wren Turkal (wt@penguintechs.org) ---
+Okay. so I applied your patches you linked above to the tip of the
+bluetooth-next repo master branch. That appears to not include all the chan=
+ges
+from Linus' master branch. When booting into that kernel, bluetooth works w=
+hen
+I login to GNOME. However, bluetooth disable/enable does not work.
 
-	https://lore.kernel.org/r/20240416091509.19995-1-johan+linaro@kernel.org
+I also have the previous kernel that I built that was essentially 6.9.0-rc4
+with the revert of 56d074d26c5828773 (git revert ...). Bluetooth works afte=
+r a
+cold boot after I login to GNOME. This kernel allows disable/re-enable to w=
+ork
+multiple times. However, warm boots do not work.
 
-Johan
+So now I have some questions:
+* Are there fixes in Linus' kernel that are not in the bluetooth-next/master
+kernel?
+* Considering the only functional difference between my revert and your pat=
+ch
+is the bottom hunk of the second patch you linked
+(https://patchwork.kernel.org/project/bluetooth/patch/1713175927-13093-1-gi=
+t-send-email-quic_zijuhu@quicinc.com/),
+does that the difference between disable/re-enable working have something t=
+o do
+with the quirk added by that hunk?
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
