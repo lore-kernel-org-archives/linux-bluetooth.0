@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10364523D
-	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Apr 2024 02:01:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D84696AB9
+	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Apr 2024 02:18:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713232913; cv=none; b=F19O2z6P64jtkaa5OhZ7mzfJvGHPKVJDhh89p6x9kf0XT8uUbs3JHrWWi4Xx9mmBX3ZcNt7VT6t/2/caDdxeQ5MR7AzwvxGZ2hbO1nE8HhLsbHE3aO/1XPbRosG4jJt+6JaBaUcEQFMMOCDByRdhymwxrOhL2K+d2OvyIiJmz+0=
+	t=1713233937; cv=none; b=IKXBAS8h5stoNpRd6jHoGKNSS1yOcLf3elJuLDcjoZUifb6vzplbnYJbDu0YRURPaSXH1kMk1Y6FSz5WA8PA3b/ADeMF23y9Co3sVG7y5jA/HWGpunJKdsB+8hSh81wVgPyNQOsslIOntI5t9JhR4+89aCsmR3TvlIooAwh4dT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713232913; c=relaxed/simple;
-	bh=qZ296bH+h/cQVQT3j+BRRQWWNEvS7dBBJZ2ylk11ojE=;
+	s=arc-20240116; t=1713233937; c=relaxed/simple;
+	bh=p/Bwk6dFnafsoxZimkWx56W3kXjvEEX5PQGl9TTLl9w=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=P3j2Xg3XGabTk58+Q9wAcIppp2EuBMyRcEthLurwpbsL+Plec2Y21hlUxRRRr/4ktSfUMlLVEJTXUMijM2EH3PowFJfW6Jst/9NGgE3nZbDlh6VXUXDHbtlfJZHSLIsf0ootlggXKc4Lj1djVwIDPBaohWySWgjzC8NdTv7YVvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y9wG7bv+; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=H3p5RmokCBBHGeRvx4yfs5zwqrpfkthPGb6SBEVSH3YcXl6UwoAxPqWsQQVPB1dYeZsJ4uZ++7vARzkQgPZy/68r6M2ZQGrxfssTirXEuiFieo6c6oBdLQbQznO08907alFRtQ9jNJc8agQ3N72S5CCVsn8YfA9JDOu+Rm9B69I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z8zlpDun; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y9wG7bv+"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7C042C3277B
-	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Apr 2024 02:01:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z8zlpDun"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4C45DC113CC
+	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Apr 2024 02:18:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713232912;
-	bh=qZ296bH+h/cQVQT3j+BRRQWWNEvS7dBBJZ2ylk11ojE=;
+	s=k20201202; t=1713233937;
+	bh=p/Bwk6dFnafsoxZimkWx56W3kXjvEEX5PQGl9TTLl9w=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=Y9wG7bv+9LDdcnvo3FWEKwD63A3IvE+JXI4YiSJIPmHaL9mJKWuOtPpp1vW7l/dOo
-	 XeryebmFYlTSj/tIIc5aeOoS88QhLKi3BeT964bemIJXn4PGSDjJESD1VEXYhWlTIi
-	 5qpLic3M7a5jYy3WpQFVwh6jhqTBnmYou9BQmzyZYOatOGNGn+oozV05IeK/0Blkn3
-	 UvMOG38i2W1pO4oE7Yy7PTqvMG1LMXDdzefzuNPXdalhra+ofelR/mL/mKWWPn7cbc
-	 TEZTzAsTPPtsWzyj/KCAoH2tiznChDfOTqTMpSb1vyeCnoK8olSOVaLudWLPwd5h4b
-	 CHGu/CpyYuV7Q==
+	b=Z8zlpDunbSFz+gDRcCRQgfG8sAv1nsMS7RKzXOUsMoyk5HrYzad25oLuCvia1Knoa
+	 h2SJBiQqzmxdovoW9Ir5m0SU0k6MFTSHV43ZmQO9FSIVydwnpE6y3dtkIcJ/8QAVD+
+	 01rvJ2GOL70x256eex80NIlGIBD36xELVygjsYOZKDh5OAaGk4smp4cO4UUq8KgEuY
+	 Tr8wPNvqttH2spwPmXuaIwiOHj044uH2V2q1SUgn0UsH+xKl7e6v6ch1sYSYO9JQ4w
+	 Asb8vdPuWTq/LUhMG2Ik2PHRkufEopDJ3ENTKlS8NKwSTCxTR4dIpP4g06MAqViveA
+	 SM1GVHRgj4Saw==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 5F430C433E2; Tue, 16 Apr 2024 02:01:52 +0000 (UTC)
+	id 3BB0EC433E2; Tue, 16 Apr 2024 02:18:57 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 218726] qca6390 bluetooth fails after disabling/re-enabling
  bluetooth
-Date: Tue, 16 Apr 2024 02:01:52 +0000
+Date: Tue, 16 Apr 2024 02:18:57 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -41,14 +41,14 @@ X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: normal
-X-Bugzilla-Who: wt@penguintechs.org
+X-Bugzilla-Who: quic_zijuhu@quicinc.com
 X-Bugzilla-Status: NEW
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: attachments.created
-Message-ID: <bug-218726-62941-hh1pYtwWx0@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-218726-62941-OIsa7pbYxq@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-218726-62941@https.bugzilla.kernel.org/>
 References: <bug-218726-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -64,22 +64,30 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D218726
 
---- Comment #12 from Wren Turkal (wt@penguintechs.org) ---
-Created attachment 306160
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D306160&action=3Dedit
-commit cef27048e5 + revert 56d074d26c5828773 after warm boot
+--- Comment #13 from Zijun Hu (quic_zijuhu@quicinc.com) ---
+you maybe apply below two changes over the tip of bluetooth-next tree, i sh=
+ould
+have not conflict, then test by following the steps shared
 
-Bluetooth does not work after a warm boot.
+// it have no change compared with the orignial patch
+https://patchwork.kernel.org/project/bluetooth/patch/1713095825-4954-2-git-=
+send-email-quic_zijuhu@quicinc.com/
 
-This log is after a warm boot. Unfortunately, the following kernel arg didn=
-'t
-seem to enable the logs for the hci_uart and btqca args like I thought it
-would:
-dyndbg=3D"module hci_uart +pft; module btqca +pft"
+// it has contained the change reverting commit 56d074d26c58  compared with=
+ the
+origninal patch
+https://patchwork.kernel.org/project/bluetooth/patch/1713175927-13093-1-git=
+-send-email-quic_zijuhu@quicinc.com/
 
-I am trying to figure out how to turn the debug logs on as soon as the modu=
-les
-are loaded.
+
+you maybe firstly apply above two changes, then perform a power off then po=
+wer
+on.
+then test disable/enable or warm reboot.
+
+please share logs if any cases are not working fine.
+
+thanks
 
 --=20
 You may reply to this email to add a comment.
