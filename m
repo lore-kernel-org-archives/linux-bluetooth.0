@@ -1,229 +1,184 @@
-Received: from inva021.nxp.com (inva021.nxp.com [92.121.34.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4422012C485;
-	Tue, 16 Apr 2024 13:52:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD16D12CD91
+	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Apr 2024 14:19:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713275580; cv=none; b=aNtXncmdYxZ8IIjstfW6QCVCPHrMtvGyScsn7D1dcJ7OBZ0SK78eutS7fxCmagRViZDz/w2gjr4w8qna7wegnugtEQEYDRTquAPsU5Q1yskenm1NR3ALLLcOpCgnvb1iL8lz0t0Is9sz7rZ5lfHHM7x0kfmT/aJSjo5mMgr0JqU=
+	t=1713277150; cv=none; b=Ga0PcfwLVvUfIPvk98L8A4dUbkzUqNssh0U28VkizvrygGV0EPdWAdXcjcGABINGHyuLZoyJ1/q1jJY9pw8qEb7vbA3bhQZt4q5QZNw7sS/A20WADr7QZwVYGo2afvSKNg45QP9zyoQzIoGPKo7QqnmGpA4AW9gfTwlilIwpOi4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713275580; c=relaxed/simple;
-	bh=NN54LCiYrthfpWaZhsY+IvmcD+W0kOhftlOotbjNN2M=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KVRGrTiTbXfPiK4r2RYA6Roxxg14m6t2I5zhZx2KxiwsRc0Uor/+IqYfbk8Ifghntvr3f61Dnh64eorZbJMDgS8QF7oIWB/1mNgPh47qB5EK6ZMyXDLmudzuuKQ85OSA72+N+MpoY1HmAZV3t4lsLnFQe2uCa2niOF0fLrJH0TI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; arc=none smtp.client-ip=92.121.34.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-Received: from inva021.nxp.com (localhost [127.0.0.1])
-	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id D6E8B200EE6;
-	Tue, 16 Apr 2024 15:52:50 +0200 (CEST)
-Received: from aprdc01srsp001v.ap-rdc01.nxp.com (aprdc01srsp001v.ap-rdc01.nxp.com [165.114.16.16])
-	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 49D972001A0;
-	Tue, 16 Apr 2024 15:52:50 +0200 (CEST)
-Received: from pe-lt8779.in-pnq01.nxp.com (pe-lt8779.in-pnq01.nxp.com [10.17.104.141])
-	by aprdc01srsp001v.ap-rdc01.nxp.com (Postfix) with ESMTP id 74E391802200;
-	Tue, 16 Apr 2024 21:52:48 +0800 (+08)
-From: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	amitkumar.karwar@nxp.com,
-	rohit.fule@nxp.com,
-	neeraj.sanjaykale@nxp.com,
-	sherry.sun@nxp.com,
-	ziniu.wang_1@nxp.com,
-	haibo.chen@nxp.com,
-	LnxRevLi@nxp.com,
-	guillaume.legoupil@nxp.com,
-	salim.chebbo@nxp.com
-Subject: [PATCH v2] Bluetooth: btnxpuart: Enable status prints for firmware download
-Date: Tue, 16 Apr 2024 19:22:28 +0530
-Message-Id: <20240416135228.902973-1-neeraj.sanjaykale@nxp.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1713277150; c=relaxed/simple;
+	bh=1FBNTL5fUpeM2HLSZTmpUVEwkVR5jSE8R/qx8PoWLlU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hX5shE2P/4hxHtWrio7kwxBfLvgibJIsdbih9JIaGJu98FqIxgj1lVhWOnSpk7NbmuEo5zBX+8w9TpRoqmlaxQAWEUcVjirRYz3W4pWBpDQ4l81A5+YxBp2Lf0efm98o0yZNjNr5LdODwM6wD+zV5hTTE5ICsCbU0aXktcKk43E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mpbZMWMe; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mpbZMWMe"
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2dac77cdf43so15442541fa.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Apr 2024 07:19:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713277144; x=1713881944; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tiEihCupVgpva7ZjRACXxPhOWCHQAzXeeOX7FJDM+SE=;
+        b=mpbZMWMe7IZh4fD0xlnz5VUmtIoeAdZELZiYb0nMEoG+Anu6NnEewIOT1VjiD5mONx
+         KQ/mhaHQ6hWy4vsMUOmOoqlOIFIB0v0H84FGje9ZqPDtSdQlqPxtrO8ftZ9e8k6vYIP4
+         7n/ja0R+LVgGwbhbQFDLNj1p11ndYvh1Q/QwkwN4HQUEK6hz+rWUyaw7ZD1/rXiV0SBc
+         WieA/2efYj47pUCBymkHbS44fp6dyuOS2q9Qrb7l/c6oW7TSiYMy+sZ+seOXup+eNCuq
+         FMAmh0KU1pDb98jdz9BlLOxRr7M1AXiLjMNB7zbN23nQAIbCEpRU0if03xBtuRxzRxt5
+         nHJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713277144; x=1713881944;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tiEihCupVgpva7ZjRACXxPhOWCHQAzXeeOX7FJDM+SE=;
+        b=rwvV4DMFz98xE+2iP4E8tblBco4kKaxl60DA9RFUl6TLaceq/GRS+WluUPRH6ZQOtf
+         PIbbdNJ+O43rKfFIQpjvJUU/bKcxUe+uQ3ZIqDvWOeDp8uYKBcDtcx+x3yMpLQCm1OeM
+         2EJHpH81hKtvUc5Myg2axOtoV+gr21ZDuGLepI4HtDF2zA2cyLKk1SPGI5IIN2by87SU
+         eoZ6akQtHxWHsyYsFOAWgc1fUmOVL53MiC/hrjj1J9N3Q+kxl90uLkpbvfL35eGSzswy
+         FmnNG7wMOoCyPmPmYAnjHlkHhUcWs/ZXjBSU2YBJ3JYPzzrdhDUhF/m9xxbdq4NCaw3t
+         2XDg==
+X-Gm-Message-State: AOJu0YxsFsoELHHT6jvr75Fzq0DV6c8XlI4OxydYu7iRwZi2T+5hQs82
+	czA4AzvuogN1UT2dL/HTF22JurvM2+1bhVka4m4bRVPmnPiNp1jK8R/+nt0mLBYKppbh2HcmZV0
+	vvaHpWpVtA1QDzSgpfZCwWxYX1ce1pg==
+X-Google-Smtp-Source: AGHT+IGF2vORN1UpAWctNfFpjXygo5ICOHpO0Rp/DrpNnYiGFLCQompRRA2LcmH2HR8bGnHc7IsI5fQ6eB46lRHLasU=
+X-Received: by 2002:a05:651c:1027:b0:2da:b35b:eafb with SMTP id
+ w7-20020a05651c102700b002dab35beafbmr2715834ljm.29.1713277143614; Tue, 16 Apr
+ 2024 07:19:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: ClamAV using ClamSMTP
+References: <20240415144430.34450-1-vlad.pruteanu@nxp.com> <20240415144430.34450-2-vlad.pruteanu@nxp.com>
+ <CABBYNZ+DXQf6UF-uHSwY4RSA5NjKaFZjEeQvjHWjj5zYL1OdJw@mail.gmail.com> <VI1PR04MB53899910065D0817F54C5868FE082@VI1PR04MB5389.eurprd04.prod.outlook.com>
+In-Reply-To: <VI1PR04MB53899910065D0817F54C5868FE082@VI1PR04MB5389.eurprd04.prod.outlook.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 16 Apr 2024 10:18:50 -0400
+Message-ID: <CABBYNZLR9OBako_bBpJFx1A5nV-GYyzVczRb64vOcey2m_X2sw@mail.gmail.com>
+Subject: Re: [EXT] Re: [PATCH 1/1] Bluetooth: hci_event: Fix setting of
+ unicast qos interval
+To: Vlad Pruteanu <vlad.pruteanu@nxp.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, 
+	Claudia Cristina Draghicescu <claudia.rosu@nxp.com>, 
+	Mihai-Octavian Urzica <mihai-octavian.urzica@nxp.com>, 
+	Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>, Iulia Tanasescu <iulia.tanasescu@nxp.com>, 
+	Andrei Istodorescu <andrei.istodorescu@nxp.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This enables prints for firmware download which can help automation
-tests to verify firmware download functionality.
+Hi Vlad,
 
-A new flag BTNXPUART_FW_DOWNLOAD_ABORT is added which handles the
-situation where driver is removed while firmware download is in
-progress.
+On Tue, Apr 16, 2024 at 6:22=E2=80=AFAM Vlad Pruteanu <vlad.pruteanu@nxp.co=
+m> wrote:
+>
+> Hello Luiz,
+>
+> > -----Original Message-----
+> > From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+> > Sent: Monday, April 15, 2024 6:07 PM
+> > To: Vlad Pruteanu <vlad.pruteanu@nxp.com>
+> > Cc: linux-bluetooth@vger.kernel.org; Claudia Cristina Draghicescu
+> > <claudia.rosu@nxp.com>; Mihai-Octavian Urzica <mihai-
+> > octavian.urzica@nxp.com>; Silviu Florian Barbulescu
+> > <silviu.barbulescu@nxp.com>; Iulia Tanasescu <iulia.tanasescu@nxp.com>;
+> > Andrei Istodorescu <andrei.istodorescu@nxp.com>
+> > Subject: [EXT] Re: [PATCH 1/1] Bluetooth: hci_event: Fix setting of uni=
+cast qos
+> > interval
+> >
+> > Caution: This is an external email. Please take care when clicking link=
+s or
+> > opening attachments. When in doubt, report the message using the 'Repor=
+t
+> > this email' button
+> >
+> >
+> > Hi Vlad,
+> >
+> > On Mon, Apr 15, 2024 at 10:45=E2=80=AFAM Vlad Pruteanu
+> > <vlad.pruteanu@nxp.com> wrote:
+> > >
+> > > qos->ucast interval reffers to the SDU interval, and should not
+> > > be set to the interval value reported by the LE CIS Established
+> > > event since the latter reffers to the ISO interval. These two
+> > > interval are not the same thing:
+> > >
+> > > BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 6, Part G
+> > >
+> > > Isochronous interval:
+> > > The time between two consecutive BIS or CIS events (designated
+> > > ISO_Interval in the Link Layer)
+> > >
+> > > SDU interval:
+> > > The nominal time between two consecutive SDUs that are sent or
+> > > received by the upper layer.
+> >
+> > I assume they are not the same because the ISO interval can have more
+> > than one subevents, but otherwise if BN=3D1 then it shall be aligned, s=
+o
+> > we are probably missing the BN component here.
+> >
+> I don't think that there's any need for setting the SDU Interval of the q=
+os
+> here since it has already been set by the host prior to issuing the LE Se=
+t
+> CIG Parameters command, so the controller will have to respect that
+> value. Since the it has been set by the host, to be used by the controlle=
+r,
+> to me, it seems a little bit redundant to derive the SDU Interval
+> once again based on parameters received on this event. I think that
+> continuing to use the initial value set by the Host should suffice.
 
-Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-Tested-by: Guillaume Legoupil <guillaume.legoupil@nxp.com>
----
-v2: Handle firmware download abort scenario. (Guillaume Legoupil)
----
- drivers/bluetooth/btnxpuart.c | 66 +++++++++++++++++++++++------------
- 1 file changed, 44 insertions(+), 22 deletions(-)
+Yeah but how about the receiver case? Or you expected that we set the
+QoS settings as a server as well? We need to confirm that this works
+in both directions or actually I don't think this would work with the
+likes of iso-test/isotester because there is no BAP layer seating
+above it to configure the SDU interval it really needs to come from
+the ISO socket itself.
 
-diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
-index 0b93c2ff29e4..523c0ee8959a 100644
---- a/drivers/bluetooth/btnxpuart.c
-+++ b/drivers/bluetooth/btnxpuart.c
-@@ -29,6 +29,7 @@
- #define BTNXPUART_CHECK_BOOT_SIGNATURE	3
- #define BTNXPUART_SERDEV_OPEN		4
- #define BTNXPUART_IR_IN_PROGRESS	5
-+#define BTNXPUART_FW_DOWNLOAD_ABORT	6
- 
- /* NXP HW err codes */
- #define BTNXPUART_IR_HW_ERR		0xb0
-@@ -159,6 +160,7 @@ struct btnxpuart_dev {
- 	u8 fw_name[MAX_FW_FILE_NAME_LEN];
- 	u32 fw_dnld_v1_offset;
- 	u32 fw_v1_sent_bytes;
-+	u32 fw_dnld_v3_offset;
- 	u32 fw_v3_offset_correction;
- 	u32 fw_v1_expected_len;
- 	u32 boot_reg_offset;
-@@ -550,6 +552,7 @@ static int nxp_download_firmware(struct hci_dev *hdev)
- 	nxpdev->fw_v1_sent_bytes = 0;
- 	nxpdev->fw_v1_expected_len = HDR_LEN;
- 	nxpdev->boot_reg_offset = 0;
-+	nxpdev->fw_dnld_v3_offset = 0;
- 	nxpdev->fw_v3_offset_correction = 0;
- 	nxpdev->baudrate_changed = false;
- 	nxpdev->timeout_changed = false;
-@@ -564,14 +567,23 @@ static int nxp_download_firmware(struct hci_dev *hdev)
- 					       !test_bit(BTNXPUART_FW_DOWNLOADING,
- 							 &nxpdev->tx_state),
- 					       msecs_to_jiffies(60000));
-+
-+	release_firmware(nxpdev->fw);
-+	memset(nxpdev->fw_name, 0, sizeof(nxpdev->fw_name));
-+
- 	if (err == 0) {
--		bt_dev_err(hdev, "FW Download Timeout.");
-+		bt_dev_err(hdev, "FW Download Timeout. offset: %d",
-+				nxpdev->fw_dnld_v1_offset ?
-+				nxpdev->fw_dnld_v1_offset :
-+				nxpdev->fw_dnld_v3_offset);
- 		return -ETIMEDOUT;
- 	}
-+	if (test_bit(BTNXPUART_FW_DOWNLOAD_ABORT, &nxpdev->tx_state)) {
-+		bt_dev_err(hdev, "FW Download Aborted");
-+		return -EINTR;
-+	}
- 
- 	serdev_device_set_flow_control(nxpdev->serdev, true);
--	release_firmware(nxpdev->fw);
--	memset(nxpdev->fw_name, 0, sizeof(nxpdev->fw_name));
- 
- 	/* Allow the downloaded FW to initialize */
- 	msleep(1200);
-@@ -693,7 +705,7 @@ static int nxp_request_firmware(struct hci_dev *hdev, const char *fw_name)
- 	if (!strlen(nxpdev->fw_name)) {
- 		snprintf(nxpdev->fw_name, MAX_FW_FILE_NAME_LEN, "%s", fw_name);
- 
--		bt_dev_dbg(hdev, "Request Firmware: %s", nxpdev->fw_name);
-+		bt_dev_info(hdev, "Request Firmware: %s", nxpdev->fw_name);
- 		err = request_firmware(&nxpdev->fw, nxpdev->fw_name, &hdev->dev);
- 		if (err < 0) {
- 			bt_dev_err(hdev, "Firmware file %s not found", nxpdev->fw_name);
-@@ -781,7 +793,7 @@ static int nxp_recv_fw_req_v1(struct hci_dev *hdev, struct sk_buff *skb)
- 	}
- 
- 	if (!len) {
--		bt_dev_dbg(hdev, "FW Downloaded Successfully: %zu bytes",
-+		bt_dev_info(hdev, "FW Download Complete: %zu bytes",
- 			   nxpdev->fw->size);
- 		if (nxp_data->helper_fw_name && !nxpdev->helper_downloaded) {
- 			nxpdev->helper_downloaded = true;
-@@ -934,7 +946,7 @@ static int nxp_recv_fw_req_v3(struct hci_dev *hdev, struct sk_buff *skb)
- 	}
- 
- 	if (req->len == 0) {
--		bt_dev_dbg(hdev, "FW Downloaded Successfully: %zu bytes",
-+		bt_dev_info(hdev, "FW Download Complete: %zu bytes",
- 			   nxpdev->fw->size);
- 		clear_bit(BTNXPUART_FW_DOWNLOADING, &nxpdev->tx_state);
- 		wake_up_interruptible(&nxpdev->fw_dnld_done_wait_q);
-@@ -954,8 +966,9 @@ static int nxp_recv_fw_req_v3(struct hci_dev *hdev, struct sk_buff *skb)
- 		goto free_skb;
- 	}
- 
--	serdev_device_write_buf(nxpdev->serdev, nxpdev->fw->data + offset -
--				nxpdev->fw_v3_offset_correction, len);
-+	nxpdev->fw_dnld_v3_offset = offset - nxpdev->fw_v3_offset_correction;
-+	serdev_device_write_buf(nxpdev->serdev, nxpdev->fw->data +
-+				nxpdev->fw_dnld_v3_offset, len);
- 
- free_skb:
- 	kfree_skb(skb);
-@@ -1037,7 +1050,7 @@ static int nxp_setup(struct hci_dev *hdev)
- 		if (err < 0)
- 			return err;
- 	} else {
--		bt_dev_dbg(hdev, "FW already running.");
-+		bt_dev_info(hdev, "FW already running.");
- 		clear_bit(BTNXPUART_FW_DOWNLOADING, &nxpdev->tx_state);
- 	}
- 
-@@ -1253,8 +1266,10 @@ static int btnxpuart_close(struct hci_dev *hdev)
- 	ps_wakeup(nxpdev);
- 	serdev_device_close(nxpdev->serdev);
- 	skb_queue_purge(&nxpdev->txq);
--	kfree_skb(nxpdev->rx_skb);
--	nxpdev->rx_skb = NULL;
-+	if (!IS_ERR_OR_NULL(nxpdev->rx_skb)) {
-+		kfree_skb(nxpdev->rx_skb);
-+		nxpdev->rx_skb = NULL;
-+	}
- 	clear_bit(BTNXPUART_SERDEV_OPEN, &nxpdev->tx_state);
- 	return 0;
- }
-@@ -1269,8 +1284,10 @@ static int btnxpuart_flush(struct hci_dev *hdev)
- 
- 	cancel_work_sync(&nxpdev->tx_work);
- 
--	kfree_skb(nxpdev->rx_skb);
--	nxpdev->rx_skb = NULL;
-+	if (!IS_ERR_OR_NULL(nxpdev->rx_skb)) {
-+		kfree_skb(nxpdev->rx_skb);
-+		nxpdev->rx_skb = NULL;
-+	}
- 
- 	return 0;
- }
-@@ -1385,16 +1402,21 @@ static void nxp_serdev_remove(struct serdev_device *serdev)
- 	struct btnxpuart_dev *nxpdev = serdev_device_get_drvdata(serdev);
- 	struct hci_dev *hdev = nxpdev->hdev;
- 
--	/* Restore FW baudrate to fw_init_baudrate if changed.
--	 * This will ensure FW baudrate is in sync with
--	 * driver baudrate in case this driver is re-inserted.
--	 */
--	if (nxpdev->current_baudrate != nxpdev->fw_init_baudrate) {
--		nxpdev->new_baudrate = nxpdev->fw_init_baudrate;
--		nxp_set_baudrate_cmd(hdev, NULL);
-+	if (is_fw_downloading(nxpdev)) {
-+		set_bit(BTNXPUART_FW_DOWNLOAD_ABORT, &nxpdev->tx_state);
-+		clear_bit(BTNXPUART_FW_DOWNLOADING, &nxpdev->tx_state);
-+		wake_up_interruptible(&nxpdev->check_boot_sign_wait_q);
-+	} else {
-+		/* Restore FW baudrate to fw_init_baudrate if changed.
-+		 * This will ensure FW baudrate is in sync with
-+		 * driver baudrate in case this driver is re-inserted.
-+		 */
-+		if (nxpdev->current_baudrate != nxpdev->fw_init_baudrate) {
-+			nxpdev->new_baudrate = nxpdev->fw_init_baudrate;
-+			nxp_set_baudrate_cmd(hdev, NULL);
-+		}
-+		ps_cancel_timer(nxpdev);
- 	}
--
--	ps_cancel_timer(nxpdev);
- 	hci_unregister_dev(hdev);
- 	hci_free_dev(hdev);
- }
--- 
-2.34.1
+> > > ---
+> > >  net/bluetooth/hci_event.c | 4 ----
+> > >  1 file changed, 4 deletions(-)
+> > >
+> > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > > index 868ffccff773..83cf0e8a56cf 100644
+> > > --- a/net/bluetooth/hci_event.c
+> > > +++ b/net/bluetooth/hci_event.c
+> > > @@ -6824,10 +6824,6 @@ static void hci_le_cis_estabilished_evt(struct
+> > hci_dev *hdev, void *data,
+> > >
+> > >         pending =3D test_and_clear_bit(HCI_CONN_CREATE_CIS, &conn->fl=
+ags);
+> > >
+> > > -       /* Convert ISO Interval (1.25 ms slots) to SDU Interval (us) =
+*/
+> > > -       qos->ucast.in.interval =3D le16_to_cpu(ev->interval) * 1250;
+> >
+> > This most likely needs to be le16_to_cpu(ev->interval) * 1250 *
+> > ev->bn, anyway it probably makes sense to indicate what the BN is
+> > causing this problem.
+> >
+> > > -       qos->ucast.out.interval =3D qos->ucast.in.interval;
+> > >
+> > >         switch (conn->role) {
+> > >         case HCI_ROLE_SLAVE:
+> > >                 /* Convert Transport Latency (us) to Latency (msec) *=
+/
+> > > --
+> > > 2.40.1
+> > >
+> >
+> >
+> > --
+> > Luiz Augusto von Dentz
 
+
+
+--=20
+Luiz Augusto von Dentz
