@@ -1,86 +1,175 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECC2C15A48B
-	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Apr 2024 08:08:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698C684E0A;
+	Tue, 16 Apr 2024 09:16:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713254910; cv=none; b=BD+f10WLGaxtb9scg1HnPPdGsNXxa0sIZWpDdWMxbyE8O2mM60RC1ovrcsHR0EvKRO0f4z8pKIrl1vxQGopvQMbtgQvlPPN8SUOunNXTicR1q3ayutFBfZpraAFzc0x3t/TP3tL6sqSaeZqi4nf+un/4qygvY+2MQ6vxnIg3mVc=
+	t=1713259018; cv=none; b=YY0yCf1o7PAqKAn5Hxztj2zViDyVScL+AGYDuA0RCXkygg5UMw8fheFO33R0+e5+cC5dlb14lZmbXiDWWCSVCYZ/ZsR+lRUrhNJ8b92RuSQUdUGl8E0oW1WkrJpwtDY9P1jbg0/IcWejL3FCRZAAneM2kS0OLkW1/6pqfeukoNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713254910; c=relaxed/simple;
-	bh=E2zIiT9du6LA9b+olwX489gADkqaJfisLeBRlNh+lVQ=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=KIbYoLAncGdRaRxa4YFI2WlyS56G3rlc/7kQjyRpLZYpCNVX6F5eiENfcVXtOoD00wdfEsNVtswHk1yvXiSbEKg7fd6thtiiXfcKDqr/DF1uHGG8WWJGIX+ShJm71Y9x2ATTF9vNMWk38fomIyOznuU/XrcUP+fNwuZJ+SPd9ck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KM3pgEZg; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713259018; c=relaxed/simple;
+	bh=Et/xGVRO67Io7N9eFsHAPc1PlNaNznIJ/8e09IRteZI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bMup2jcnQj9kfUqOmLeisnapjzVAkQzTWxCg0OGDvwoh8CgZd8gl94kgJWyRovK6mgXdFYRyIQ7wuk1UF8ez6Lhw02E/MOTNEdJ2xnaUWmsKVuXWeyKp1CXuwSKQwBSFn8UJyDvu9nwCC2d76ERfpWavbTui12V87rZHbzbdEZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kr55DqIc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KM3pgEZg"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8CA0CC2BD10
-	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Apr 2024 08:08:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kr55DqIc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED8FAC113CE;
+	Tue, 16 Apr 2024 09:16:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713254909;
-	bh=E2zIiT9du6LA9b+olwX489gADkqaJfisLeBRlNh+lVQ=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=KM3pgEZg4M4vgS5Fjs4ibITTg9gBl1j86ian9Tl0g+F7JhMsSRXFBbZ/Kh7eePzhe
-	 7UBEIo/qIZY39U7ms9Q64l6b5VCJItC4J82ZshtFMfGsNsSkD93LmHzQMXayoTPwF+
-	 aBn1/aqORwYZgppusxb4gVCuhqKcYxXbu6Tc/pnqxfCdYwfzBs69hrI0XRVJbs2cYu
-	 ePBq6hni05wLdJo+YjmTWIPPJBUX1Pfb4tCfl18675mhT1KQjmx5cNwHVds+fcVAKS
-	 yvKwdwPQU93YaUKhN6TssRQpOqyQEVXzWtpVCWZV/SCL2d5u5Jqn73NDh4CWLPsqBy
-	 F2hQVM0YZhkPg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 78D91C433E2; Tue, 16 Apr 2024 08:08:29 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 218726] qca6390 bluetooth fails after disabling/re-enabling
- bluetooth
-Date: Tue, 16 Apr 2024 08:08:29 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: quic_zijuhu@quicinc.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-218726-62941-iEWoBJR0ty@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218726-62941@https.bugzilla.kernel.org/>
-References: <bug-218726-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=k20201202; t=1713259018;
+	bh=Et/xGVRO67Io7N9eFsHAPc1PlNaNznIJ/8e09IRteZI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=kr55DqIcHpqG3Al2mrRmGyIOmA4znqmdkhqdJdezTxhEHudatB8Ikl7Y+j+jJMtzo
+	 zi7LAgPZuwxs7XbFlmWgr+8l1vcKHyrnC3yfCs8gsBkge8aHl64dg37Rdm6wXdeYVN
+	 Jp7rXByi6LJHd3qaR7H5e8DK5Wwv8y0PhsW5VQaHyurV4utsW/u6tJdWKXS6xa4mf8
+	 JzzUXmg7dN9kiIBhrAfoNhClXOyOQ61ZW44vj94JwOxljoM+TNmesGkbBoX3pstXMO
+	 MC+zdMNU4KKca8c0X2cFDZU8Sxph5ax53S6jFbMMm+sJUFWJuMvMb0olo5EZkdmzbV
+	 +x3sf90R5CNQg==
+Received: from johan by xi.lan with local (Exim 4.97.1)
+	(envelope-from <johan+linaro@kernel.org>)
+	id 1rwevu-000000005EL-3yOS;
+	Tue, 16 Apr 2024 11:16:55 +0200
+From: Johan Hovold <johan+linaro@kernel.org>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Matthias Kaehlcke <mka@chromium.org>,
+	Doug Anderson <dianders@chromium.org>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Johan Hovold <johan+linaro@kernel.org>,
+	Janaki Ramaiah Thota <quic_janathot@quicinc.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] Bluetooth: qca: fix invalid device address check
+Date: Tue, 16 Apr 2024 11:15:09 +0200
+Message-ID: <20240416091509.19995-1-johan+linaro@kernel.org>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218726
+Qualcomm Bluetooth controllers may not have been provisioned with a
+valid device address and instead end up using the default address
+00:00:00:00:5a:ad.
 
---- Comment #17 from Zijun Hu (quic_zijuhu@quicinc.com) ---
-it is great.thank you.
-not sure if other cases will trigger this feature.
+This was previously believed to be due to lack of persistent storage for
+the address but it may also be due to integrators opting to not use the
+on-chip OTP memory and instead store the address elsewhere (e.g. in
+storage managed by secure world firmware).
 
-I think this regression issue is related to below two fixes. will sumbmit
-formal patches to fix it when have spare time.
+According to Qualcomm, at least WCN6750, WCN6855 and WCN7850 have
+on-chip OTP storage for the address.
 
-// it will cause disable/enable failure.
-Fixes: 56d074d26c58 ("Bluetooth: hci_qca: don't use IS_ERR_OR_NULL() with
-gpiod_get_optional()")
+As the device type alone cannot be used to determine when the address is
+valid, instead read back the address during setup() and only set the
+HCI_QUIRK_USE_BDADDR_PROPERTY flag when needed.
 
-// it maybe cause BT enable failure after reboot.
-Fixes: 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on closed
-serdev")
+This specifically makes sure that controllers that have been provisioned
+with an address do not start as unconfigured.
 
---=20
-You may reply to this email to add a comment.
+Reported-by: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+Link: https://lore.kernel.org/r/124a7d54-5a18-4be7-9a76-a12017f6cce5@quicinc.com/
+Fixes: 5971752de44c ("Bluetooth: hci_qca: Set HCI_QUIRK_USE_BDADDR_PROPERTY for wcn3990")
+Fixes: e668eb1e1578 ("Bluetooth: hci_core: Don't stop BT if the BD address missing in dts")
+Fixes: 6945795bc81a ("Bluetooth: fix use-bdaddr-property quirk")
+Cc: stable@vger.kernel.org	# 6.5
+Cc: Matthias Kaehlcke <mka@chromium.org>
+Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
+---
+ drivers/bluetooth/btqca.c   | 38 +++++++++++++++++++++++++++++++++++++
+ drivers/bluetooth/hci_qca.c |  2 --
+ 2 files changed, 38 insertions(+), 2 deletions(-)
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+
+Matthias and Doug,
+
+As Chromium is the only known user of the 'local-bd-address' property,
+could you please confirm that your controllers use the 00:00:00:00:5a:ad
+address by default so that the quirk continues to be set as intended?
+
+Johan
+
+
+
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index 19cfc342fc7b..216826c31ee3 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -15,6 +15,8 @@
+ 
+ #define VERSION "0.1"
+ 
++#define QCA_BDADDR_DEFAULT (&(bdaddr_t) {{ 0xad, 0x5a, 0x00, 0x00, 0x00, 0x00 }})
++
+ int qca_read_soc_version(struct hci_dev *hdev, struct qca_btsoc_version *ver,
+ 			 enum qca_btsoc_type soc_type)
+ {
+@@ -612,6 +614,38 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+ }
+ EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
+ 
++static int qca_check_bdaddr(struct hci_dev *hdev)
++{
++	struct hci_rp_read_bd_addr *bda;
++	struct sk_buff *skb;
++	int err;
++
++	if (bacmp(&hdev->public_addr, BDADDR_ANY))
++		return 0;
++
++	skb = __hci_cmd_sync(hdev, HCI_OP_READ_BD_ADDR, 0, NULL,
++			     HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		err = PTR_ERR(skb);
++		bt_dev_err(hdev, "Failed to read device address (%d)", err);
++		return err;
++	}
++
++	if (skb->len != sizeof(*bda)) {
++		bt_dev_err(hdev, "Device address length mismatch");
++		kfree_skb(skb);
++		return -EIO;
++	}
++
++	bda = (struct hci_rp_read_bd_addr *)skb->data;
++	if (!bacmp(&bda->bdaddr, QCA_BDADDR_DEFAULT))
++		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
++
++	kfree_skb(skb);
++
++	return 0;
++}
++
+ static void qca_generate_hsp_nvm_name(char *fwname, size_t max_size,
+ 		struct qca_btsoc_version ver, u8 rom_ver, u16 bid)
+ {
+@@ -818,6 +852,10 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 		break;
+ 	}
+ 
++	err = qca_check_bdaddr(hdev);
++	if (err)
++		return err;
++
+ 	bt_dev_info(hdev, "QCA setup on UART is completed");
+ 
+ 	return 0;
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index ecbc52eaf101..92fa20f5ac7d 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1905,8 +1905,6 @@ static int qca_setup(struct hci_uart *hu)
+ 	case QCA_WCN6750:
+ 	case QCA_WCN6855:
+ 	case QCA_WCN7850:
+-		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
+-
+ 		qcadev = serdev_device_get_drvdata(hu->serdev);
+ 		if (qcadev->bdaddr_property_broken)
+ 			set_bit(HCI_QUIRK_BDADDR_PROPERTY_BROKEN, &hdev->quirks);
+-- 
+2.43.2
+
