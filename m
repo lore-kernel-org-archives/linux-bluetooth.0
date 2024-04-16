@@ -1,162 +1,133 @@
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27DC61CAA6
-	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Apr 2024 14:32:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8DA920B35
+	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Apr 2024 14:32:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713277933; cv=none; b=qss1CFVFh//slNGCdcslKKPXiY4vfwpLD5lvr6ABgdX0uUdwgDwtwR+crVs+BQzyFe8z9J0E0Jgzm0eAPMQiH8bs2hycC/nyOHW5+sFlTS1XpYqMOZmeEyfET0vnSxjJid9sIE5PVyLgpXoEvc00xRFhtUuL2s91sWrbbIlyvqs=
+	t=1713277955; cv=none; b=GNdDGPTuCBz+enNgYNzR4RQz/pcie9TRBALq+Fi6gnWm/a3fDoNYUkGyvcX02GXhOw6cTcICtoGqYvbepDnlDxJsLDAJ19CLdZafOnAZ9YmblRSfgCiLCKxMzKO8lF0tPRQe1yS+cJniy8D/9yYYC/cUG1u57lQB0GX1eRvPU9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713277933; c=relaxed/simple;
-	bh=5fqxAsj7q+hgP0UJnNcquPnE9yZAB6GLv01RlUHziG8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=r/ugaibOSk8cqdrIZqIRH/09GCXRyK0FbTOLOPGsQ6YjLXXHqcQSRsarlJ3/tx9XE7UzREGdeQbuIIPq3VhArqMWFhDOV0A+GIrnxJ8gP24ncAsWQqEMrOmi3Wjcgu4HTWf6ceMfPW4doI8sq+qWKIFqttG27fuvN76OQdUltWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SePwANvn; arc=none smtp.client-ip=209.85.208.180
+	s=arc-20240116; t=1713277955; c=relaxed/simple;
+	bh=09u/HNXHjrelhpLLWxaNbgy8yyJva6MmRIK3VMQhvmE=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=TX69argkYAA6H8wpLWGyIn1ab6nT6+Q+OAE6Yijezu9203aE3Zm2y2c1EFXbLoTq16hRgN+up24QhiLxDNIdUuFq/Wnkjg5Bbg2yywcaXTNYl3KcYtBeeob7+d0K8SGOMb9FgFgsaMsF5pEda0qP/5WfRIg6I07bwR4Nv9ZdLsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CCda417f; arc=none smtp.client-ip=209.85.219.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SePwANvn"
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2da0f8f7b24so34661341fa.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Apr 2024 07:32:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CCda417f"
+Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-dcc7cdb3a98so4245224276.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Apr 2024 07:32:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713277926; x=1713882726; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/6+bQWOPS8ReOYqU2kI7X0CZRsFWEYkg0DaAMT2DOYA=;
-        b=SePwANvnA64jVCotK1K8DZbmHcuh7/m7l50ys3JYQh8rLhqzpp7Ke6YyLXFawA7Lje
-         joDQrWt5W2CAHPxIJuRuOqZXq43BXVMhyERLpG+HHXv91NfcWuGEQRKcpdXppch0zhIZ
-         L4YCKt6J0GjDiUK5kU1SG9qjaYcoBEYDG5UbO0xPPoYn1L8vbvmPBAL2G+ILumUkCY5D
-         G/mTO0lB3NoymY+FuguRzyMJ8n6YuccBe7S2CNLsEuLwFYlM83NIUC8QAnQD9eu0kZpE
-         TE6ImxEroLCiCNnPYaQ3p8+A6/785dWobSZqmB+F2QJpkQYPy9WapnrbA9vQtwxL3DRc
-         u1wQ==
+        d=gmail.com; s=20230601; t=1713277953; x=1713882753; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=4Oie7gw9a6FSBWBqe8zRghAcfyCxpgYbIPsh57qGIFY=;
+        b=CCda417fXVn8rLhzUM9lYC75YRyfiai7ZrHzvB8eHNMGcvXCzOqSt7obwGBLFalTk+
+         Qpk2os9SVLzpvT7IGxbttTcAY2aSoS/54ofkyfVMghZv127iF0uDUu6VA5Hg0viGQR2G
+         BkEFmGfLpt1g5bfO/yChFRLS60D6ABUy5S5M5HiDqR4L9cZuIu9osD1/g08q7KYAUxdL
+         0cKii4beySkm3lazmszbdiaWA3CFQvNVdwpY+vCKHq8nHVEqKAUe4b6S8aSmXDayfluN
+         w41darof3XeS+PEISokuHlU6TJrWoev0KHXG8hQXC4P8zvlgdo2FKjt2URHsL0gqnEjp
+         dfrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713277926; x=1713882726;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/6+bQWOPS8ReOYqU2kI7X0CZRsFWEYkg0DaAMT2DOYA=;
-        b=X2ajYiFD0RrnFaItk/JaPRZkbLI4t4g4KWCuRIW/8wsdh53mabG0JXufvKRoxII6h0
-         bzIdyuub2jNB8wxsMLZKv2QlN7FT573DygQkiiwAJ/4SIGZTmBQvmzd4A65W4+HNJW65
-         Do2D7W7eM0NupFVNob5xlGqeeOAUkWy3l6vY9MDAt3QpZwej/RGGzc55W71uTqgSzGyd
-         lMC9GCLJpFjDW6910cKN5mb9Z2mWsA5J9qjXrK7UmVgjJs8e0lzh17bAYPYKJk6gUJfP
-         2mMpOEYpvKBirnnn1o8QCNrpllHvulbg8hAy7CD/fuYSY/5TiyRs2Hpzwhh733pueFMS
-         ILCA==
-X-Gm-Message-State: AOJu0YwtfnxeR+2W/rT+qgw2nZAUabhQHJQz3FWhGoMQc0FPREQi9BXF
-	ZF8O6mF5YqMAXkcWAva1R4PNTqTn8DJv2/4W/eUXtrdwermxwS1f7ZCJsa9HNGU5LxotXoTrJ/C
-	8uIR9u/JLCUy9RE2PDuK83RERysCtlQ==
-X-Google-Smtp-Source: AGHT+IEk9IZwUzXgM5W0lIuMjbcD3vtCO54UbQTYbJU9goHpsCWW8R9Ib8I8r3a2u9u4lSUR1LJhH2I75BeQN8zXkGg=
-X-Received: by 2002:a2e:9c46:0:b0:2d8:bf1e:154f with SMTP id
- t6-20020a2e9c46000000b002d8bf1e154fmr715178ljj.8.1713277926132; Tue, 16 Apr
- 2024 07:32:06 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713277953; x=1713882753;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4Oie7gw9a6FSBWBqe8zRghAcfyCxpgYbIPsh57qGIFY=;
+        b=SsZatxR+wZj60eNk2YYnl4J8/5OyWT6qR4RPZ9a/FgEJvVHnxbltH2VkF2QycW49Ko
+         LsTPnrVG525I6SXy3Rw5gis7SedW4m9b37E6blxUwTpWYyKfgqMyx9L9XA4Bdyee8YMd
+         ylgIp3jBQODJwjqOA1lLytHJo3gUXBoAMWdHUc9qsQLtaTTN0CZz4slNNGET4oDgfxh5
+         nGg0JSbXMUEjBdsx16H3esXkecXdSe2/h6ZZUikamCiWhXAyX3bahwLP2Pgpi7XDXOa2
+         jZ4tZ48Bco9kTA9OY96fDO77hSSfZjKP/twosHe2UJKrDFydpnkmN7q+unUpik+fGt42
+         PO8g==
+X-Gm-Message-State: AOJu0YxepklhRcOG3kjpcP4JntVwtXn+LSnwEZAS6smCj0O3/7n2n8+K
+	+1VUdxQS8nHq1jH5/lpAscJ/xJQcN+LOAd78+VygStpx4/U5W7erEMoXkQ==
+X-Google-Smtp-Source: AGHT+IGzvG0UKFgkrH4zvAj8Yp+XHXHf8hIbSheVCJWdy0OmmjsJJGqjVoCltFLE9i6CDhuFm4Q19w==
+X-Received: by 2002:a05:690c:70b:b0:61a:bfab:8328 with SMTP id bs11-20020a05690c070b00b0061abfab8328mr6047831ywb.11.1713277952612;
+        Tue, 16 Apr 2024 07:32:32 -0700 (PDT)
+Received: from [172.17.0.2] ([172.183.32.41])
+        by smtp.gmail.com with ESMTPSA id i188-20020a8191c5000000b006183cfc614csm2529990ywg.42.2024.04.16.07.32.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Apr 2024 07:32:32 -0700 (PDT)
+Message-ID: <661e8c00.810a0220.ab2ac.cab1@mx.google.com>
+Date: Tue, 16 Apr 2024 07:32:32 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6765805893392541585=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240416102501.42996-1-vlad.pruteanu@nxp.com> <20240416102501.42996-2-vlad.pruteanu@nxp.com>
-In-Reply-To: <20240416102501.42996-2-vlad.pruteanu@nxp.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 16 Apr 2024 10:31:53 -0400
-Message-ID: <CABBYNZJ_4ekgf03fUDTKyQzz1Ucg=7JJbh=PtaGSJjqsrtz0NA@mail.gmail.com>
-Subject: Re: [PATCH 1/1] Bluetooth: hci_event: Fix setting of broadcast qos
- interval and latency
-To: Vlad Pruteanu <vlad.pruteanu@nxp.com>
-Cc: linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com, 
-	mihai-octavian.urzica@nxp.com, silviu.barbulescu@nxp.com, 
-	iulia.tanasescu@nxp.com, andrei.istodorescu@nxp.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, neeraj.sanjaykale@nxp.com
+Subject: RE: [v2] Bluetooth: btnxpuart: Enable status prints for firmware download
+In-Reply-To: <20240416135228.902973-1-neeraj.sanjaykale@nxp.com>
+References: <20240416135228.902973-1-neeraj.sanjaykale@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Vlad,
+--===============6765805893392541585==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Tue, Apr 16, 2024 at 6:25=E2=80=AFAM Vlad Pruteanu <vlad.pruteanu@nxp.co=
-m> wrote:
->
-> The latency parameter of the broadcast qos is calculated wrongly.
->
-> BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 6, Part G
->
-> For framed PDUs:
-> Transport_Latency_BIG =3D BIG_Sync_Delay + PTO x (NSE / BN -
-> IRC) * ISO_Interval + ISO_Interval + SDU_Interval
->
-> For unframed PDUs:
-> Transport_Latency =3D BIG_Sync_Delay + (PTO x (NSE / BN - IRC) +
-> 1) x ISO_Interval - SDU_Interval
->
-> For broadcast sink the latency should be taken directly from the
-> BIG Sync Established event and for the source it should be taken
-> from the Create BIG Complete event.
->
-> The interval parameter of the broadcast qos reffers to the SDU
-> Interval and shouldn't be set based on the latency. The Host will
-> read this value from the BASE.
->
-> Signed-off-by: Vlad Pruteanu <vlad.pruteanu@nxp.com>
-> ---
->  net/bluetooth/hci_event.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
->
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 868ffccff773..dff4bedc3e9b 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -6983,6 +6983,8 @@ static void hci_le_create_big_complete_evt(struct h=
-ci_dev *hdev, void *data,
->
->                 if (!ev->status) {
->                         conn->state =3D BT_CONNECTED;
-> +                       conn->iso_qos.bcast.out.latency =3D
-> +                               DIV_ROUND_CLOSEST(get_unaligned_le24(ev->=
-transport_delay), 1000);
+This is automated email and please do not reply to this email!
 
-You should probably add comments quoting the spec, also you quoted in
-the description that framed vs unframed but then the code does not
-attempt to differentiate, so perhaps that is not really important and
-then we can remove it, the important part is what shall be used as
-transport latency.
+Dear submitter,
 
->                         set_bit(HCI_CONN_BIG_CREATED, &conn->flags);
->                         rcu_read_unlock();
->                         hci_debugfs_create_conn(conn);
-> @@ -7029,7 +7031,6 @@ static void hci_le_big_sync_established_evt(struct =
-hci_dev *hdev, void *data,
->
->         for (i =3D 0; i < ev->num_bis; i++) {
->                 u16 handle =3D le16_to_cpu(ev->bis[i]);
-> -               __le32 interval;
->
->                 bis =3D hci_conn_hash_lookup_handle(hdev, handle);
->                 if (!bis) {
-> @@ -7044,11 +7045,10 @@ static void hci_le_big_sync_established_evt(struc=
-t hci_dev *hdev, void *data,
->                         set_bit(HCI_CONN_PA_SYNC, &bis->flags);
->
->                 bis->iso_qos.bcast.big =3D ev->handle;
-> -               memset(&interval, 0, sizeof(interval));
-> -               memcpy(&interval, ev->latency, sizeof(ev->latency));
-> -               bis->iso_qos.bcast.in.interval =3D le32_to_cpu(interval);
-> -               /* Convert ISO Interval (1.25 ms slots) to latency (ms) *=
-/
-> -               bis->iso_qos.bcast.in.latency =3D le16_to_cpu(ev->interva=
-l) * 125 / 100;
-> +               /* Convert Transport Latency (us) to Latency (msec) */
-> +               bis->iso_qos.bcast.in.latency =3D
-> +                       DIV_ROUND_CLOSEST(get_unaligned_le24(ev->latency)=
-,
-> +                                         1000);
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=845060
 
-Ditto as above.
+---Test result---
 
->                 bis->iso_qos.bcast.in.sdu =3D le16_to_cpu(ev->max_pdu);
->
->                 if (!ev->status) {
-> --
-> 2.40.1
->
+Test Summary:
+CheckPatch                    PASS      0.64 seconds
+GitLint                       PASS      0.28 seconds
+SubjectPrefix                 PASS      0.10 seconds
+BuildKernel                   PASS      30.13 seconds
+CheckAllWarning               PASS      33.24 seconds
+CheckSparse                   PASS      39.31 seconds
+CheckSmatch                   FAIL      35.38 seconds
+BuildKernel32                 PASS      29.44 seconds
+TestRunnerSetup               PASS      527.41 seconds
+TestRunner_l2cap-tester       PASS      20.60 seconds
+TestRunner_iso-tester         PASS      33.63 seconds
+TestRunner_bnep-tester        PASS      4.81 seconds
+TestRunner_mgmt-tester        PASS      118.04 seconds
+TestRunner_rfcomm-tester      PASS      7.47 seconds
+TestRunner_sco-tester         PASS      15.17 seconds
+TestRunner_ioctl-tester       PASS      7.94 seconds
+TestRunner_mesh-tester        PASS      6.22 seconds
+TestRunner_smp-tester         PASS      7.15 seconds
+TestRunner_userchan-tester    PASS      5.19 seconds
+IncrementalBuild              PASS      28.44 seconds
+
+Details
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
+
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
 
 
---=20
-Luiz Augusto von Dentz
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6765805893392541585==--
