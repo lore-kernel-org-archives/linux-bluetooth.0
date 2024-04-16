@@ -1,76 +1,101 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75C4833FE
-	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Apr 2024 02:28:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA3168468
+	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Apr 2024 05:26:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713234526; cv=none; b=YmgdU2TU6OlnhS+5DTIhABlVGycdi1de5rwNNpzgiw4t8rBwXF9wzFCj/Hy4Rugj/LadxgQnJ02RUsD9aoL4BamWxFAU+kq3iTUJS2ukwUC0MMYCuEf94mQU+ZXdcYFavt0cAMqx3WKC6wOUuOuqqcY+zotLsieIGLXnKNopLnw=
+	t=1713245202; cv=none; b=d9m1m+CMf9utI1F5f0OJV1sy+15j9L98E6uUCVaBiXBTim478Uk4vg2FxXvrj10K9f1RbPvXHmjWY+3fI7tPvsgCNNowkRx69CK2dO2JGFOYjeRv3bPXoW2jQytyIHwP4vVvNJvpkw/RTpy48ae6w8kVcR4zG+wn1iSxvBNaT9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713234526; c=relaxed/simple;
-	bh=4cvb5FA9/AqiDuMPjMLvmCAC5HQUpVtbWlEmcg6dYII=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=llpi58z7yRI+SMxiycxveM+zpRDiDhloJ2cE1VuwcDtw/AR0U0XsLfdRtALxryi9AxzMuk/GIgN7OUkF7pRUHM+5mljpCcBR+fBkcI0e94r/OIUchWtwbdGziw3qS4AK98XNaNzYVatCOgpw7IlcywjmuTEbCsJZZbJ0zE8UJf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hlqpICZt; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713245202; c=relaxed/simple;
+	bh=NirOeKcMxQYuVwaG52VBorQgFOfeVW0zEq5cnf7Noew=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iqExXcTexNgkAd92+Oe9TbbUo9U2RzRUfKTKxV3Zr1Ht8OmsAaqbe7q8a3PCDcqSzqhnQjuvgTT90uanUZxbHaHN6Y8lDx4vxrc+bzBUg6noM0leufZ9jDs/wMvNS5zCk+AewFRK6mVyIkAhZIpyHzueK3KqMCeEF8v62b5YQQE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=polynomial-c@gmx.de header.b=GU+hdbqH; arc=none smtp.client-ip=212.227.15.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hlqpICZt"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 695EDC113CC
-	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Apr 2024 02:28:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713234525;
-	bh=4cvb5FA9/AqiDuMPjMLvmCAC5HQUpVtbWlEmcg6dYII=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=hlqpICZtliAqDCZGL/fG9ntSASUnvD9nKjim/5wt0YAis6g7Xox2/jwk8PG2pfBXa
-	 6zJwJSkoq0msGr/jSW4VnQr0AMBu+eNtrv0dcwwvaFM9igRzM5Xus/o77Ygh4KRURJ
-	 6LlGf3FDfVINaL6fTosdQSrSN3HJGFcEKz6qW44EHoNwu7gdqvX1oKdXBuZ0ZySshT
-	 VlDDu4t/KrgnB4aB1v0/J8PYIifayOjfaslPTSDcn32FxIhXUJf0owVKuD1jmEv5i8
-	 7eX5Zz8R1diILG1fbE6B9OLW4DlsRt9wycs/rVRDNWPrwYox3J7X0Ij/wTIiBP16i9
-	 WQJ/GZCHHicNg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 5E151C433DE; Tue, 16 Apr 2024 02:28:45 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
+	dkim=pass (2048-bit key) header.d=gmx.de header.i=polynomial-c@gmx.de header.b="GU+hdbqH"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
+	s=s31663417; t=1713245197; x=1713849997; i=polynomial-c@gmx.de;
+	bh=TMcvITuF6Zs2czMxlMG13D25IKIKexFFMX2+F/jyMHE=;
+	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:
+	 MIME-Version:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=GU+hdbqHMOCgNpM7F8TXeZ6Huh3q+RixCZQwxXbpNzDbooU95vx2hbJZMRQ2/AxX
+	 0/Co6ShikKN7HasJP29RMU1bNwH0oA3EOqiv2iKavpv4XeIf9xGb4CIKyZDdIFdxO
+	 4JEY4HUzCtFLCoXUBoX5tCTtT5UhqQMh52z5YiKvq7fBTsJtHt1t50h/X/FgIsqLq
+	 jkOkfl10Wc6lZqiQMhaHmnB3Rh7yOCve/Yp9IAjSIQFDE7cU20JtBKWLZAhh8/rpd
+	 ay5Sbvqu0ffTeKp2BuJdfaYfFKQDJxBkxCZFS2CYtX6TqHOv9Rap4PtuRuwMYv6pH
+	 cQN6i5B42DGw2LhN0g==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from localhost ([84.169.215.76]) by mail.gmx.net (mrgmx005
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1Mirna-1sQRyr2niu-00eqlG; Tue, 16
+ Apr 2024 07:26:37 +0200
+From: Lars Wendler <polynomial-c@gmx.de>
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 218726] qca6390 bluetooth fails after disabling/re-enabling
- bluetooth
-Date: Tue, 16 Apr 2024 02:28:45 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: quic_zijuhu@quicinc.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-218726-62941-gkL6lV8Dp5@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218726-62941@https.bugzilla.kernel.org/>
-References: <bug-218726-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Cc: Lars Wendler <polynomial-c@gmx.de>
+Subject: [bluez/bluez] configure.ac: Fix --disable-cups
+Date: Tue, 16 Apr 2024 07:26:04 +0200
+Message-ID: <20240416052603.4373-2-polynomial-c@gmx.de>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:qzaG+8YY6BYzebUG0ZpTJJEsRrAg9lYTrQ870n5Nf25A78+PGxo
+ wZ5Btb+O8pqcyESUtgcuck3yNJ2w5JzTMyH/V2WqbMKU6/wdmCaSw30W9pHyPEBgccvZdTO
+ 1t4SEHT5oyMamExtP69xhCBREfc7jbOkFtAYoikC+Fp5dqMDU1lsvAbdI+Ktnk0TDNk27k+
+ XzULHgVtt7vk6YIW22x/Q==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:GeLWMCc3Dlw=;jsRzDT6O/rFK7BYfscLMm6q9DMM
+ iIBQyVhfSQdgT+2MixTU784FeQsnSoKKGQvRc/NC1/TICG4eF0pIX3U6neVy+abHhkx7Rl1T8
+ pygnyttc1sOg1i4su0VboXx/6mC7Ektyu0fSr15rzMfe400c+VpSr2M/xILtaZ3gc9Er1FNIx
+ pArDv7WMAz5Cl/wGTqEM69tqZo6m8XhcIYMn/0IRCgr24u/mIbEX5k7Isk8sjM/N/arufoFWh
+ DNCz5I7Uld4gi+NABuShi6jdRDU3KDVqLdD8W8B8XzibeJlO8y0wOUvXBlzc6HtCGWLyq0vcf
+ iA0qocCxi05t8kIhOyHvi2BlBCW3kr5k5UbJKWR8w3H4xiIGtVz6w7OQnZSkT25P17o1c2e2+
+ tZGvy9ba5NNKLwbLuZqBblzb1e5C93nGpS5TekIPbep99nLS0qsoaujOTi8IVHJOReVuDKEih
+ ORSvhwzSbfmwk35UbGeldYPcqFBGDiZt/cpkgzOklWYKZXQ7J5rqb+e6MRVycGsoBTy5Pp6pT
+ tDHAv8cLOhtdIRHaAL2wI+e7ntG5rAxtOM/y9lhuzpjM+VVpqZqwNTR4zqvw/hXhrCO8Vac9p
+ J0YkrXGsBOaSMgpf6tSHNnUxhsaRTRx0xGngpm4niIXRxIhRbjaDVzAX10XZkPdkg9HS9V7ov
+ bplAMhg6QGVh8CQDGiFdcmlDNizrJUUSN3mPmB51niQg+AFGLHZMVzKysbL3THNMhADZV9TEZ
+ TOAcTveErpxZ+0uk5V4r0DOxJUrmqRqNbtFUiy/UQ0R1dgavvHnsCJkFgyZF4yLwDSkqNaamD
+ TFbmsY10hngZ2zXydE33pW9nXrOHunRbEWR7vyTdFyuDw=
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218726
+or else we get:
+  configure: error: conditional "CUPS_SERVERBIN" was never defined.
+  Usually this means the macro was only invoked conditionally.
 
---- Comment #14 from Zijun Hu (quic_zijuhu@quicinc.com) ---
-for issue "Bluetooth does not work after a warm boot.", we need to log of
-function
-qca_serdev_shutdown(). it is called by the shutdown phase of reboot.
+Fixes: https://github.com/bluez/bluez/issues/773
+=2D--
+ configure.ac | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
---=20
-You may reply to this email to add a comment.
+diff --git a/configure.ac b/configure.ac
+index 9ebc250cf..047ec1a7f 100644
+=2D-- a/configure.ac
++++ b/configure.ac
+@@ -249,12 +249,12 @@ AM_CONDITIONAL(CUPS, test "${enable_cups}" !=3D "no"=
+)
+ if (test "${enable_cups}" !=3D "no"); then
+ 	AC_MSG_CHECKING([cups directory])
+ 	cups_serverbin=3D`$PKG_CONFIG cups --variable=3Dcups_serverbin`
+-	AM_CONDITIONAL(CUPS_SERVERBIN, test "${cups_serverbin}" !=3D "")
+-	if (test "${cups_serverbin}" !=3D ""); then
+-		AC_SUBST(CUPS_SERVERBIN, ${cups_serverbin})
+-	fi
+ 	AC_MSG_RESULT([${cups_serverbin}])
+ fi
++AM_CONDITIONAL(CUPS_SERVERBIN, test "${cups_serverbin}" !=3D "")
++AS_IF([test "${cups_serverbin}" !=3D ""],[
++	AC_SUBST(CUPS_SERVERBIN, ${cups_serverbin})
++])
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+ AC_ARG_ENABLE(mesh, AS_HELP_STRING([--enable-mesh],
+ 		[enable Mesh profile support]), [enable_mesh=3D${enableval}])
+=2D-
+2.44.0
+
