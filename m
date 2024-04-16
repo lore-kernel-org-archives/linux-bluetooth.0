@@ -1,175 +1,182 @@
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-22.smtp.github.com (out-22.smtp.github.com [192.30.252.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0503B130A43
-	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Apr 2024 15:16:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FC8E130492
+	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Apr 2024 15:32:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713280594; cv=none; b=bKPk5+uXXQFCtT5bN24AWdbWb3sC1hmQhqYvgVpDs4wWk5sUqTsNdJg7N7yUeOismGrUdksBX72OirV17JVGcLNSPGuXznFm3KdMUaINbzsC8oe2xPr2jZuUakG7NSXefrBUW8JdLu/gFAnUJbTB+iLtnFWyjbZovnqdaoh04SI=
+	t=1713281524; cv=none; b=tlJ83g7UFX4GDyLCZ8Z2P3/FbzyjMemT9yDczgl1SJNe+0SJgYKbHlCteNzuk/3MTGLbK1/iO9rY26HkxAFRhWcCWjcfhSTuFKOZxV3yU4xwcTIVIs3HYxSaSv2f1Sk6tnLaZ1MoRCjDcxhLhpiGgqpMU4p0AT/q+Mz+Ayzv+8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713280594; c=relaxed/simple;
-	bh=5whnXbFtyACQo8hyIdodxdvFjfiSbyGsJMqSv8FVSf0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=i+r/wsIY9mAzDn+EPVC6l4nl5RqtLTXpXdnxiaWhie2pPMLEVF71Jm8PloB9xQysjZxgLZDX6EI01OzyvC0cCsDvVWL7+lbk6IPDHM1gFHFIB67kso1Jll1uP80r57AWyZF/o38sXmvjPGYBgAYdZUvOyN6hzbHdyS2JupSDZw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dN2D7036; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1713281524; c=relaxed/simple;
+	bh=lbz18IGmehc15EZYcltT3YWI4eSF1ULZxqb6P0iDm+U=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=LbxM5zrRTHAvFYLOl0kmwiEb41xFtPYqWlEAaUaNYG+wFRPy6arU6qg1bzbCKaWoXfsyHT8FdCANLmXCw3l1un+Cg5IBRhpA7MCTdf3MGJd2W06Q1GRz+nZgZvzGLWf6iz4B5UUSrYCziSn87oZeRXuMrjlujmf4tSI8ylkJyDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=V5uz5lGP; arc=none smtp.client-ip=192.30.252.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dN2D7036"
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2dac77cdf43so16557481fa.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Apr 2024 08:16:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713280590; x=1713885390; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QCRblIzbp9DopdoCO3x5DzIKWFiVzaiLpSF4dFmHWSQ=;
-        b=dN2D7036m76FA27RPiJ1KVDpICxx9v+M3YvFsa2lZaY1ifGMsNwXhNeHskzTGTBu7l
-         L/6/L0l9ufdGDNSbBacmPQkEJ9lZN+kDMY4NOgcPvrXyzl84FveFxuzjKs53Q2ukFTZb
-         Tt9NgLVf6elNPILoCwVwx5s+QXcrculnTCGtYgcyCvk6DLTKmbLgJuL/HQvKhZf/Ejv3
-         rBnKYIqUlP1pTmOffwQPcqSbfSfmIvtj9v6etBBteMIOueT0PmlxLQ3RCUPoZvtyOgOC
-         HMFkHYJx5Ev2eWm18qtmnPo5w2GAT0/RO+8EJmJ2xMcHLdk72ViEEn1A2RuWptatUT/R
-         S/2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713280590; x=1713885390;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QCRblIzbp9DopdoCO3x5DzIKWFiVzaiLpSF4dFmHWSQ=;
-        b=g+SYzmKITt+7cUdeMjWh2LEXDvpTmyaaVvW8AuvmNK//MEGTLHii5uZ0xSvQVU+PFz
-         ebmXPh9nXGrdB+q6TJr5Z9wTjLYbCo3b+xP/vfVlPCzWQgYCeJasCub+qp1Gw1VhUh3B
-         PNfzTXe4GpbjN9CeGrabX3+KsqNsmkW0AIqrDV7ElMmptGdcof1S3uuf04uOKsEklTP2
-         1J/Y8JCxmZvZUAXeZnWR1jjFYn2jmyeOyPsOp6xht8qO0n0X4/6cV11jzaUolxC1zW4p
-         ibtLwZfiffRtLdrWyI7fUb6d0hQFugNer1dz9yxYYegBzYlkj6wKXImKMxqZq1pwow3m
-         ZKdQ==
-X-Gm-Message-State: AOJu0YyitHa8+REP3gPtx2+W+GQN2y8LNq7J5MjRxugHEbtYQy6wUPoi
-	6X29O0yANcF3oKGLhYyqrNq6HRd6V3SreF7uQWzWR16DfEOXySf0pXbUrK95x2Oi1xU4tefeJRF
-	/AJokDvxM7mWQ47MwaBe2rmnfDum5IA==
-X-Google-Smtp-Source: AGHT+IF/cdyNSA5er7eaHNDwfhEGdI7bVHloWiTnC6FrsVyI70lG2klvHpZ7ZAWScLEz8M3stisMoppGkJ6UutR50w0=
-X-Received: by 2002:a05:651c:1027:b0:2da:b35b:eafb with SMTP id
- w7-20020a05651c102700b002dab35beafbmr2841098ljm.29.1713280589952; Tue, 16 Apr
- 2024 08:16:29 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="V5uz5lGP"
+Received: from github.com (hubbernetes-node-b5859dc.ac4-iad.github.net [10.52.141.32])
+	by smtp.github.com (Postfix) with ESMTPA id 9BD9D5E0808
+	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Apr 2024 08:32:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1713281522;
+	bh=N4hhHCjlL0jqPalG0vEgDrp89dwOemD1a1epnGuukqE=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=V5uz5lGPIhLToF6kUjcZNUFr8badHStsmuDLZF1zKQ0Mb9kal9NiDqZLdexSZfS2Y
+	 eA7w6tPPzWGcUUZ70MNO9drBeUrFYCoXcJV2ok7eLtz6z6TuxnYSGguHI1xt1hN9a+
+	 XE5LKbxzKO/XIuddN8ULF7WIcQPbXNDz7zpYCwGY=
+Date: Tue, 16 Apr 2024 08:32:02 -0700
+From: Pauli Virtanen <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/b94f1b-b411b9@github.com>
+Subject: [bluez/bluez] f78e63: shared/bap: clean up requests for a stream
+ before ...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <d52ddf4759720a2879677fca0129d3fd1a32dda0.1712951445.git.pav@iki.fi>
-In-Reply-To: <d52ddf4759720a2879677fca0129d3fd1a32dda0.1712951445.git.pav@iki.fi>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 16 Apr 2024 11:16:17 -0400
-Message-ID: <CABBYNZLHfS95O=0QWbitCpQRhcn8smez0wEAXzouonPFsra5nw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] shared/bap: clean up requests for a stream
- before freeing it
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hi Pauli,
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: f78e639f810cb9b7469ad55af0af1dc930ac8502
+      https://github.com/bluez/bluez/commit/f78e639f810cb9b7469ad55af0af1dc930ac8502
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2024-04-16 (Tue, 16 Apr 2024)
 
-On Fri, Apr 12, 2024 at 3:58=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote:
->
-> Cancel stream's queued requests before freeing the stream.
->
-> As the callbacks may do some cleanup on error, be sure to call them
-> before removing the requests.
->
-> Fixes:
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> ERROR: AddressSanitizer: heap-use-after-free on address 0x60d000013430
-> READ of size 8 at 0x60d000013430 thread T0
->     #0 0x89cb9f in stream_stop_complete src/shared/bap.c:1211
->     #1 0x89c997 in bap_req_complete src/shared/bap.c:1192
->     #2 0x8a105f in bap_process_queue src/shared/bap.c:1474
->     #3 0x93c93f in timeout_callback src/shared/timeout-glib.c:25
-> ...
-> freed by thread T0 here:
->     #1 0x89b744 in bap_stream_free src/shared/bap.c:1105
->     #2 0x89bac8 in bap_stream_detach src/shared/bap.c:1122
->     #3 0x89dbfc in bap_stream_state_changed src/shared/bap.c:1261
->     #4 0x8a2169 in bap_ucast_set_state src/shared/bap.c:1554
->     #5 0x89e0d5 in stream_set_state src/shared/bap.c:1291
->     #6 0x8a78b6 in bap_ucast_release src/shared/bap.c:1927
->     #7 0x8d45bb in bt_bap_stream_release src/shared/bap.c:5516
->     #8 0x8ba63f in remove_streams src/shared/bap.c:3538
->     #9 0x7f23d0 in queue_foreach src/shared/queue.c:207
->     #10 0x8bb875 in bt_bap_remove_pac src/shared/bap.c:3593
->     #11 0x47416c in media_endpoint_destroy profiles/audio/media.c:185
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> ---
->  src/shared/bap.c | 27 +++++++++++++++++++++++++++
->  1 file changed, 27 insertions(+)
->
-> diff --git a/src/shared/bap.c b/src/shared/bap.c
-> index 5fee7b4c5..ccde26431 100644
-> --- a/src/shared/bap.c
-> +++ b/src/shared/bap.c
-> @@ -1105,6 +1105,9 @@ static void bap_stream_free(void *data)
->         free(stream);
->  }
->
-> +static void bap_abort_stream_req(struct bt_bap *bap,
-> +                                               struct bt_bap_stream *str=
-eam);
+  Changed paths:
+    M src/shared/bap.c
 
-Normally we suggest just to move up the function definitions to avoid
-forward declarations like the above.
+  Log Message:
+  -----------
+  shared/bap: clean up requests for a stream before freeing it
 
->  static void bap_stream_detach(struct bt_bap_stream *stream)
->  {
->         struct bt_bap_endpoint *ep =3D stream->ep;
-> @@ -1114,6 +1117,8 @@ static void bap_stream_detach(struct bt_bap_stream =
-*stream)
->
->         DBG(stream->bap, "stream %p ep %p", stream, ep);
->
-> +       bap_abort_stream_req(stream->bap, stream);
-> +
->         queue_remove(stream->bap->streams, stream);
->         bap_stream_clear_cfm(stream);
->
-> @@ -1477,6 +1482,28 @@ static bool bap_process_queue(void *data)
->         return false;
->  }
->
-> +static bool match_req_stream(const void *data, const void *match_data)
-> +{
-> +       const struct bt_bap_req *pend =3D data;
-> +
-> +       return pend->stream =3D=3D match_data;
-> +}
-> +
-> +static void bap_req_abort(void *data)
-> +{
-> +       struct bt_bap_req *req =3D data;
-> +       struct bt_bap *bap =3D req->stream->bap;
-> +
-> +       DBG(bap, "req %p", req);
-> +       bap_req_complete(req, NULL);
-> +}
-> +
-> +static void bap_abort_stream_req(struct bt_bap *bap,
-> +                                               struct bt_bap_stream *str=
-eam)
-> +{
-> +       queue_remove_all(bap->reqs, match_req_stream, stream, bap_req_abo=
-rt);
-> +}
-> +
->  static bool bap_queue_req(struct bt_bap *bap, struct bt_bap_req *req)
->  {
->         struct bt_bap_req *pend;
-> --
-> 2.44.0
->
->
+Cancel stream's queued requests before freeing the stream.
+
+As the callbacks may do some cleanup on error, be sure to call them
+before removing the requests.
+
+Fixes:
+=======================================================================
+ERROR: AddressSanitizer: heap-use-after-free on address 0x60d000013430
+READ of size 8 at 0x60d000013430 thread T0
+    #0 0x89cb9f in stream_stop_complete src/shared/bap.c:1211
+    #1 0x89c997 in bap_req_complete src/shared/bap.c:1192
+    #2 0x8a105f in bap_process_queue src/shared/bap.c:1474
+    #3 0x93c93f in timeout_callback src/shared/timeout-glib.c:25
+...
+freed by thread T0 here:
+    #1 0x89b744 in bap_stream_free src/shared/bap.c:1105
+    #2 0x89bac8 in bap_stream_detach src/shared/bap.c:1122
+    #3 0x89dbfc in bap_stream_state_changed src/shared/bap.c:1261
+    #4 0x8a2169 in bap_ucast_set_state src/shared/bap.c:1554
+    #5 0x89e0d5 in stream_set_state src/shared/bap.c:1291
+    #6 0x8a78b6 in bap_ucast_release src/shared/bap.c:1927
+    #7 0x8d45bb in bt_bap_stream_release src/shared/bap.c:5516
+    #8 0x8ba63f in remove_streams src/shared/bap.c:3538
+    #9 0x7f23d0 in queue_foreach src/shared/queue.c:207
+    #10 0x8bb875 in bt_bap_remove_pac src/shared/bap.c:3593
+    #11 0x47416c in media_endpoint_destroy profiles/audio/media.c:185
+=======================================================================
 
 
---=20
-Luiz Augusto von Dentz
+  Commit: d3a6a6459cbda91693106fb8d43de319b334a3a4
+      https://github.com/bluez/bluez/commit/d3a6a6459cbda91693106fb8d43de319b334a3a4
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2024-04-16 (Tue, 16 Apr 2024)
+
+  Changed paths:
+    M profiles/audio/bap.c
+
+  Log Message:
+  -----------
+  bap: cancel stream operation before freeing setup
+
+Before freeing setup, cancel any ongoing stream operations, and indicate
+failure for pending DBus replies.
+
+Fixes:
+=======================================================================
+ERROR: AddressSanitizer: heap-use-after-free on address 0x60d000004758
+WRITE of size 4 at 0x60d000004758 thread T0
+    #0 0x557159 in qos_cb profiles/audio/bap.c:753
+    #1 0x89c38f in bap_req_complete src/shared/bap.c:1191
+    #2 0x8cb7fc in bap_req_detach src/shared/bap.c:4789
+    #3 0x8cb9bb in bt_bap_detach src/shared/bap.c:4801
+    #4 0x571e25 in bap_disconnect profiles/audio/bap.c:3011
+    ...
+freed by thread T0 here:
+    #1 0x558f2b in setup_free profiles/audio/bap.c:890
+    #2 0x7f34e8 in queue_remove_all src/shared/queue.c:341
+    #3 0x7f0105 in queue_destroy src/shared/queue.c:60
+    #4 0x55cdc8 in ep_free profiles/audio/bap.c:1167
+=======================================================================
+
+
+  Commit: b411b98bf4f51c18c77626f786a4f2b8cdc28982
+      https://github.com/bluez/bluez/commit/b411b98bf4f51c18c77626f786a4f2b8cdc28982
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2024-04-16 (Tue, 16 Apr 2024)
+
+  Changed paths:
+    M src/set.c
+    M src/set.h
+
+  Log Message:
+  -----------
+  set: don't modify input sirk key in btd_set_add_device()
+
+Currently, btd_set_add_device decrypts the sirk in-place, modifying the
+key passed to it.
+
+This causes store_sirk() later on to save the wrong (decrypted) key
+value, resulting to invalid duplicate device set.
+
+It also allows devices->sirk list to contain same set multiple times,
+which crashes later on as sirks-set are assumed to be 1-to-1 in
+btd_set_add/remove_device().
+
+Fixes:
+=======================================================================
+ERROR: AddressSanitizer: heap-use-after-free on address 0x60600001c068
+READ of size 8 at 0x60600001c068 thread T0
+    #0 0x762721 in btd_set_remove_device src/set.c:347
+    #1 0x7341e7 in remove_sirk_info src/device.c:7145
+    #2 0x7f2cee in queue_foreach src/shared/queue.c:207
+    #3 0x734499 in btd_device_unref src/device.c:7159
+    #4 0x719f65 in device_remove src/device.c:4788
+    #5 0x682382 in adapter_remove src/adapter.c:6959
+    ...
+0x60600001c068 is located 40 bytes inside of 56-byte region [0x60600001c040,0x60600001c078)
+freed by thread T0 here:
+    #1 0x7605a6 in set_free src/set.c:170
+    #2 0x7d4eff in remove_interface gdbus/object.c:660
+    #3 0x7dcbb3 in g_dbus_unregister_interface gdbus/object.c:1394
+    #4 0x762990 in btd_set_remove_device src/set.c:362
+    #5 0x7341e7 in remove_sirk_info src/device.c:7145
+    #6 0x7f2cee in queue_foreach src/shared/queue.c:207
+    #7 0x734499 in btd_device_unref src/device.c:7159
+    #8 0x719f65 in device_remove src/device.c:4788
+    #9 0x682382 in adapter_remove src/adapter.c:6959
+    ...
+previously allocated by thread T0 here:
+    #1 0x7f5429 in util_malloc src/shared/util.c:46
+    #2 0x7605f1 in set_new src/set.c:178
+    #3 0x7625b9 in btd_set_add_device src/set.c:324
+    #4 0x6f8fc8 in add_set src/device.c:1916
+    #5 0x7f2cee in queue_foreach src/shared/queue.c:207
+    #6 0x6f982c in device_set_ltk src/device.c:1940
+    #7 0x667b97 in load_ltks src/adapter.c:4478
+    ...
+=======================================================================
+
+
+Compare: https://github.com/bluez/bluez/compare/b94f1be656f3...b411b98bf4f5
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
