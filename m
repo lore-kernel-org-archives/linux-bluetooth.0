@@ -1,124 +1,235 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from inva021.nxp.com (inva021.nxp.com [92.121.34.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7862617F7
-	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Apr 2024 07:49:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3D547D088;
+	Wed, 17 Apr 2024 08:15:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713340188; cv=none; b=hqvRqMLhakp0vqZ+PZczfi3ZSB+hqkW1VH6Q92b+cpFEQ9TLyfYLBm/chnKz9G9qurGlbq/q0skij8aTUkWoOyScIz2vP6bZy7FfpYNJQlaOPO6TkJCDJN3QmvocxuOESD0pI2SCh3MIb69bRYc4lw8CkD3mDI3tjAZ29e1jJ+M=
+	t=1713341739; cv=none; b=I5iRnp9vFH/EpE5gvKJ+4b53urcJAmgXRzuZvn16lcblT2izRCw2tSYpLSHYhQNQdh+FF2g4Og9AkS4K2K2HAcogA/vpgbpqCYUmJ6N9dDTX+QpvZ+sYaaSSeXbQpDzdMdSZdcmgUC4o0gJf6S7SJvyOSMIAeZJahF7flHQplhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713340188; c=relaxed/simple;
-	bh=Z/B/n4Mr69KRvMQejwVMwe5vhhTE/L1+SUp151nfCkw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZFkLHev6ItZDRyyrnHxCz+Z0e6EPPXBMWIkKUZVbr27l2lQjYMXanOIGvp8guHzAw7+jrM/NLi3sDWZwelTEZjOomXy0kAKfVQIj1rY1qYXLCWUuLKjj2R6iAKYGaidHioOmRZJnfWLHbR9ssZtunlrb6MYlDI1kRwV6xPu16ew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=hBPeSVv6; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="hBPeSVv6"
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 43H4GUlb024492;
-	Wed, 17 Apr 2024 07:49:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	from:to:cc:subject:date:message-id:mime-version:content-type; s=
-	qcppdkim1; bh=6lJAwLYw5KTyAZp5Ox0Lj/3z5h1/l4Tfli2zRWKmm44=; b=hB
-	PeSVv6dKZfGSr9OdahiLPljVPF4B1HLr63PFR/WMOFB5uj9YoIHYckhb4JsX81PS
-	emCTOnUpSEgUfPODhUhzi704i7MDpfuMDey4WPLpUEOkT5XFXYSCQLCbYjdh09BZ
-	Y4FWveiw7H8Acpi0TAlU1spe/cGTa5r26p+rUjT69Z23kMfyyqaT5NtF0TXi1QWF
-	QcDTm7DoEMQgnM3SpJrVn3R+bNF8ZIOot/x4Dgw5KKl2xculLW2fM6Q2vv2xsdwc
-	M/om4W5pEzTZPUxJ0YvQ4VHrRDeM4Fs67BtQ00f1rz+Q+Zhn+yLgTpkOepxdNciR
-	MTe9u0R395OPQJYHEkZg==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xj78h8ea7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 17 Apr 2024 07:49:42 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43H7nf4C015987
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 17 Apr 2024 07:49:41 GMT
-Received: from zijuhu-gv.qualcomm.com (10.80.80.8) by
- nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Wed, 17 Apr 2024 00:49:39 -0700
-From: Zijun Hu <quic_zijuhu@quicinc.com>
-To: <luiz.dentz@gmail.com>, <luiz.von.dentz@intel.com>, <marcel@holtmann.org>
-CC: <linux-bluetooth@vger.kernel.org>, Zijun Hu <quic_zijuhu@quicinc.com>
-Subject: [PATCH] Bluetooth: qca: Support downloading board id specific NVM for WCN7850
-Date: Wed, 17 Apr 2024 15:49:34 +0800
-Message-ID: <1713340174-1304-1-git-send-email-quic_zijuhu@quicinc.com>
-X-Mailer: git-send-email 2.7.4
+	s=arc-20240116; t=1713341739; c=relaxed/simple;
+	bh=dZABI6dQ1NnoPldp7QkmBTIMZLnEPFxbymhBVXPnaQs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tNayvzXG9a+/DxVC+0qkrnq0BHzM3ClQLTZoPrksvFhIAauqS5fi8cEq8BGDyBhM3gtFlU+bzdi6JLqwckXGVURaXFqK5am24bLsq+5mdJkcbs02olxGnGU09AIxVwV2T947oZX1H9Xc2RYfNg125Y2OjagqSvO8bRMLZdPVXio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; arc=none smtp.client-ip=92.121.34.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+Received: from inva021.nxp.com (localhost [127.0.0.1])
+	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 33D44201205;
+	Wed, 17 Apr 2024 10:15:36 +0200 (CEST)
+Received: from aprdc01srsp001v.ap-rdc01.nxp.com (aprdc01srsp001v.ap-rdc01.nxp.com [165.114.16.16])
+	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 1C4B9200459;
+	Wed, 17 Apr 2024 10:15:35 +0200 (CEST)
+Received: from pe-lt8779.in-pnq01.nxp.com (pe-lt8779.in-pnq01.nxp.com [10.17.104.141])
+	by aprdc01srsp001v.ap-rdc01.nxp.com (Postfix) with ESMTP id 6C6EE183ACAE;
+	Wed, 17 Apr 2024 16:15:32 +0800 (+08)
+From: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	amitkumar.karwar@nxp.com,
+	rohit.fule@nxp.com,
+	neeraj.sanjaykale@nxp.com,
+	sherry.sun@nxp.com,
+	ziniu.wang_1@nxp.com,
+	haibo.chen@nxp.com,
+	LnxRevLi@nxp.com,
+	guillaume.legoupil@nxp.com,
+	salim.chebbo@nxp.com
+Subject: [PATCH v3] Bluetooth: btnxpuart: Enable status prints for firmware download
+Date: Wed, 17 Apr 2024 13:45:17 +0530
+Message-Id: <20240417081517.920454-1-neeraj.sanjaykale@nxp.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: tER-S5fl4Msb4xYFNlUFNaSO0OsYs3dT
-X-Proofpoint-ORIG-GUID: tER-S5fl4Msb4xYFNlUFNaSO0OsYs3dT
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-17_06,2024-04-16_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
- adultscore=0 suspectscore=0 priorityscore=1501 clxscore=1015
- lowpriorityscore=0 impostorscore=0 mlxlogscore=999 malwarescore=0
- spamscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2404010003 definitions=main-2404170053
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: ClamAV using ClamSMTP
 
-Download board id specific NVM instead of default for WCN7850 if board id
-is available.
+This enables prints for firmware download which can help automation
+tests to verify firmware download functionality.
 
-Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+A new flag BTNXPUART_FW_DOWNLOAD_ABORT is added which handles the
+situation where driver is removed while firmware download is in
+progress.
+
+This also adds a check before freeing the rx->skb in flush and close
+functions to handle the kernel crash seen in case of firmware download
+timeout.
+
+Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+Tested-by: Guillaume Legoupil <guillaume.legoupil@nxp.com>
 ---
- drivers/bluetooth/btqca.c | 18 +++++++++++++++---
- 1 file changed, 15 insertions(+), 3 deletions(-)
+v2: Handle firmware download abort scenario. (Guillaume Legoupil)
+v3: Minor corrections. Add details to commit message.
+---
+ drivers/bluetooth/btnxpuart.c | 67 +++++++++++++++++++++++------------
+ 1 file changed, 45 insertions(+), 22 deletions(-)
 
-diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-index 19cfc342fc7b..3ff1d3f99d7b 100644
---- a/drivers/bluetooth/btqca.c
-+++ b/drivers/bluetooth/btqca.c
-@@ -629,6 +629,19 @@ static void qca_generate_hsp_nvm_name(char *fwname, size_t max_size,
- 		snprintf(fwname, max_size, "qca/hpnv%02x%s.%x", rom_ver, variant, bid);
- }
+diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
+index 0b93c2ff29e4..7aed5298ee6f 100644
+--- a/drivers/bluetooth/btnxpuart.c
++++ b/drivers/bluetooth/btnxpuart.c
+@@ -29,6 +29,7 @@
+ #define BTNXPUART_CHECK_BOOT_SIGNATURE	3
+ #define BTNXPUART_SERDEV_OPEN		4
+ #define BTNXPUART_IR_IN_PROGRESS	5
++#define BTNXPUART_FW_DOWNLOAD_ABORT	6
  
-+static inline void qca_get_nvm_name_generic(struct qca_fw_config *cfg,
-+					    const char *stem, u8 rom_ver, u16 bid)
-+{
-+	if (bid == 0x0)
-+		snprintf(cfg->fwname, sizeof(cfg->fwname), "qca/%snv%02x.bin", stem, rom_ver);
-+	else if (bid & 0xff00)
-+		snprintf(cfg->fwname, sizeof(cfg->fwname),
-+			 "qca/%snv%02x.b%x", stem, rom_ver, bid);
-+	else
-+		snprintf(cfg->fwname, sizeof(cfg->fwname),
-+			 "qca/%snv%02x.b%02x", stem, rom_ver, bid);
-+}
+ /* NXP HW err codes */
+ #define BTNXPUART_IR_HW_ERR		0xb0
+@@ -159,6 +160,7 @@ struct btnxpuart_dev {
+ 	u8 fw_name[MAX_FW_FILE_NAME_LEN];
+ 	u32 fw_dnld_v1_offset;
+ 	u32 fw_v1_sent_bytes;
++	u32 fw_dnld_v3_offset;
+ 	u32 fw_v3_offset_correction;
+ 	u32 fw_v1_expected_len;
+ 	u32 boot_reg_offset;
+@@ -550,6 +552,7 @@ static int nxp_download_firmware(struct hci_dev *hdev)
+ 	nxpdev->fw_v1_sent_bytes = 0;
+ 	nxpdev->fw_v1_expected_len = HDR_LEN;
+ 	nxpdev->boot_reg_offset = 0;
++	nxpdev->fw_dnld_v3_offset = 0;
+ 	nxpdev->fw_v3_offset_correction = 0;
+ 	nxpdev->baudrate_changed = false;
+ 	nxpdev->timeout_changed = false;
+@@ -564,14 +567,23 @@ static int nxp_download_firmware(struct hci_dev *hdev)
+ 					       !test_bit(BTNXPUART_FW_DOWNLOADING,
+ 							 &nxpdev->tx_state),
+ 					       msecs_to_jiffies(60000));
 +
- int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 		   enum qca_btsoc_type soc_type, struct qca_btsoc_version ver,
- 		   const char *firmware_name)
-@@ -709,7 +722,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 	/* Give the controller some time to get ready to receive the NVM */
- 	msleep(10);
++	release_firmware(nxpdev->fw);
++	memset(nxpdev->fw_name, 0, sizeof(nxpdev->fw_name));
++
+ 	if (err == 0) {
+-		bt_dev_err(hdev, "FW Download Timeout.");
++		bt_dev_err(hdev, "FW Download Timeout. offset: %d",
++				nxpdev->fw_dnld_v1_offset ?
++				nxpdev->fw_dnld_v1_offset :
++				nxpdev->fw_dnld_v3_offset);
+ 		return -ETIMEDOUT;
+ 	}
++	if (test_bit(BTNXPUART_FW_DOWNLOAD_ABORT, &nxpdev->tx_state)) {
++		bt_dev_err(hdev, "FW Download Aborted");
++		return -EINTR;
++	}
  
--	if (soc_type == QCA_QCA2066)
-+	if (soc_type == QCA_QCA2066 || soc_type == QCA_WCN7850)
- 		qca_read_fw_board_id(hdev, &boardid);
+ 	serdev_device_set_flow_control(nxpdev->serdev, true);
+-	release_firmware(nxpdev->fw);
+-	memset(nxpdev->fw_name, 0, sizeof(nxpdev->fw_name));
  
- 	/* Download NVM configuration */
-@@ -751,8 +764,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 				 "qca/hpnv%02x.bin", rom_ver);
- 			break;
- 		case QCA_WCN7850:
--			snprintf(config.fwname, sizeof(config.fwname),
--				 "qca/hmtnv%02x.bin", rom_ver);
-+			qca_get_nvm_name_generic(&config, "hmt", rom_ver, boardid);
- 			break;
+ 	/* Allow the downloaded FW to initialize */
+ 	msleep(1200);
+@@ -693,7 +705,7 @@ static int nxp_request_firmware(struct hci_dev *hdev, const char *fw_name)
+ 	if (!strlen(nxpdev->fw_name)) {
+ 		snprintf(nxpdev->fw_name, MAX_FW_FILE_NAME_LEN, "%s", fw_name);
  
- 		default:
+-		bt_dev_dbg(hdev, "Request Firmware: %s", nxpdev->fw_name);
++		bt_dev_info(hdev, "Request Firmware: %s", nxpdev->fw_name);
+ 		err = request_firmware(&nxpdev->fw, nxpdev->fw_name, &hdev->dev);
+ 		if (err < 0) {
+ 			bt_dev_err(hdev, "Firmware file %s not found", nxpdev->fw_name);
+@@ -781,7 +793,7 @@ static int nxp_recv_fw_req_v1(struct hci_dev *hdev, struct sk_buff *skb)
+ 	}
+ 
+ 	if (!len) {
+-		bt_dev_dbg(hdev, "FW Downloaded Successfully: %zu bytes",
++		bt_dev_info(hdev, "FW Download Complete: %zu bytes",
+ 			   nxpdev->fw->size);
+ 		if (nxp_data->helper_fw_name && !nxpdev->helper_downloaded) {
+ 			nxpdev->helper_downloaded = true;
+@@ -934,7 +946,7 @@ static int nxp_recv_fw_req_v3(struct hci_dev *hdev, struct sk_buff *skb)
+ 	}
+ 
+ 	if (req->len == 0) {
+-		bt_dev_dbg(hdev, "FW Downloaded Successfully: %zu bytes",
++		bt_dev_info(hdev, "FW Download Complete: %zu bytes",
+ 			   nxpdev->fw->size);
+ 		clear_bit(BTNXPUART_FW_DOWNLOADING, &nxpdev->tx_state);
+ 		wake_up_interruptible(&nxpdev->fw_dnld_done_wait_q);
+@@ -954,8 +966,9 @@ static int nxp_recv_fw_req_v3(struct hci_dev *hdev, struct sk_buff *skb)
+ 		goto free_skb;
+ 	}
+ 
+-	serdev_device_write_buf(nxpdev->serdev, nxpdev->fw->data + offset -
+-				nxpdev->fw_v3_offset_correction, len);
++	nxpdev->fw_dnld_v3_offset = offset - nxpdev->fw_v3_offset_correction;
++	serdev_device_write_buf(nxpdev->serdev, nxpdev->fw->data +
++				nxpdev->fw_dnld_v3_offset, len);
+ 
+ free_skb:
+ 	kfree_skb(skb);
+@@ -1037,7 +1050,7 @@ static int nxp_setup(struct hci_dev *hdev)
+ 		if (err < 0)
+ 			return err;
+ 	} else {
+-		bt_dev_dbg(hdev, "FW already running.");
++		bt_dev_info(hdev, "FW already running.");
+ 		clear_bit(BTNXPUART_FW_DOWNLOADING, &nxpdev->tx_state);
+ 	}
+ 
+@@ -1253,8 +1266,10 @@ static int btnxpuart_close(struct hci_dev *hdev)
+ 	ps_wakeup(nxpdev);
+ 	serdev_device_close(nxpdev->serdev);
+ 	skb_queue_purge(&nxpdev->txq);
+-	kfree_skb(nxpdev->rx_skb);
+-	nxpdev->rx_skb = NULL;
++	if (!IS_ERR_OR_NULL(nxpdev->rx_skb)) {
++		kfree_skb(nxpdev->rx_skb);
++		nxpdev->rx_skb = NULL;
++	}
+ 	clear_bit(BTNXPUART_SERDEV_OPEN, &nxpdev->tx_state);
+ 	return 0;
+ }
+@@ -1269,8 +1284,10 @@ static int btnxpuart_flush(struct hci_dev *hdev)
+ 
+ 	cancel_work_sync(&nxpdev->tx_work);
+ 
+-	kfree_skb(nxpdev->rx_skb);
+-	nxpdev->rx_skb = NULL;
++	if (!IS_ERR_OR_NULL(nxpdev->rx_skb)) {
++		kfree_skb(nxpdev->rx_skb);
++		nxpdev->rx_skb = NULL;
++	}
+ 
+ 	return 0;
+ }
+@@ -1385,16 +1402,22 @@ static void nxp_serdev_remove(struct serdev_device *serdev)
+ 	struct btnxpuart_dev *nxpdev = serdev_device_get_drvdata(serdev);
+ 	struct hci_dev *hdev = nxpdev->hdev;
+ 
+-	/* Restore FW baudrate to fw_init_baudrate if changed.
+-	 * This will ensure FW baudrate is in sync with
+-	 * driver baudrate in case this driver is re-inserted.
+-	 */
+-	if (nxpdev->current_baudrate != nxpdev->fw_init_baudrate) {
+-		nxpdev->new_baudrate = nxpdev->fw_init_baudrate;
+-		nxp_set_baudrate_cmd(hdev, NULL);
++	if (is_fw_downloading(nxpdev)) {
++		set_bit(BTNXPUART_FW_DOWNLOAD_ABORT, &nxpdev->tx_state);
++		clear_bit(BTNXPUART_FW_DOWNLOADING, &nxpdev->tx_state);
++		wake_up_interruptible(&nxpdev->check_boot_sign_wait_q);
++		wake_up_interruptible(&nxpdev->fw_dnld_done_wait_q);
++	} else {
++		/* Restore FW baudrate to fw_init_baudrate if changed.
++		 * This will ensure FW baudrate is in sync with
++		 * driver baudrate in case this driver is re-inserted.
++		 */
++		if (nxpdev->current_baudrate != nxpdev->fw_init_baudrate) {
++			nxpdev->new_baudrate = nxpdev->fw_init_baudrate;
++			nxp_set_baudrate_cmd(hdev, NULL);
++		}
++		ps_cancel_timer(nxpdev);
+ 	}
+-
+-	ps_cancel_timer(nxpdev);
+ 	hci_unregister_dev(hdev);
+ 	hci_free_dev(hdev);
+ }
 -- 
-2.7.4
+2.34.1
 
