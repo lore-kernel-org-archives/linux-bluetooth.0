@@ -1,61 +1,136 @@
-Received: from out-22.smtp.github.com (out-22.smtp.github.com [192.30.252.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA9BB64CD1
-	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Apr 2024 20:32:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3AA68F4A;
+	Wed, 17 Apr 2024 21:18:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713385929; cv=none; b=tTjn0V7p/fphv4+u+owccnxJn0CYy+WgOERTKumxfME9bHVQ9vX5KvmcbRzwD4d4uIRsdgiyg5OWI1wFbtbYArm8cFDXK9Pof31fiv7Q9IpT1CuDEiZH+GmN/aawD2i6w/Nfxyg0nC2UCJDsXvXXusDYNpg5CxixvrPBJ4XM02I=
+	t=1713388687; cv=none; b=LnuZegQlxbWfbhpIi2WJ3de4ejQsGt4SP2hVWSpvaeyXgS74RxKI459EVrxZh8omFckhgPfP2fHVC0NEznRD7ldEQR8LtixNGUa5tnsuMQ2tKzs3hLZMAFMSm07YpEFdKmT2JGrpKW5XI+yCnD5ESylPJ9nGPqKIe5dKEGVgzcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713385929; c=relaxed/simple;
-	bh=F/nk7qm+UCHNOvVA2gpW+G404xcOpmOGwopYQrIFl9g=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=WKIhKAkPGEMW5FaUxy9RmBni0kOyIqpFIGEX9fPvIJ+9o9xiX2uBxfxgcvhND2gRumhlfEc746SBTwEckODA7btP8f6IaqtGaIosTHIS5tx4x6b6S1VK5NERV6kmXl5XU5prXL1gnh4dHAGBiq+N8/CV/tFV8vPbIxBvrbSif/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=l5JFFem+; arc=none smtp.client-ip=192.30.252.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1713388687; c=relaxed/simple;
+	bh=fV/GBBG8Y1zKgQp11Kn4djvNyTsBgHc++2ZKipKlH/8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=J4rmhq+ywRXcyOY1YTCirhTKaOK0hb8++V4lK3Sm3h5sTxa8uZcsHIpGku0/FBdnHCXgj+nVArPBVXIlrex84YOYVG5VcDFRcRbokwnTzKZr8bNjKbSvQqCkEJl+K+N7xK5UtHZ0h68RQwIbm49SZ/uetkG4brbeZ6SmAuMh+Bc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j8S6ewoQ; arc=none smtp.client-ip=209.85.208.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="l5JFFem+"
-Received: from github.com (hubbernetes-node-f28a972.ac4-iad.github.net [10.52.125.45])
-	by smtp.github.com (Postfix) with ESMTPA id C1CB45E08F0
-	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Apr 2024 13:32:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1713385926;
-	bh=WtMbNcJU1ETy9LHDrL3W3f6gUrbyoirP0tKDIVpdVXk=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=l5JFFem+IPGJ0vcaikCU1FZXvbyhUwfF6hWJkJDubKNgdGiCPlYCK+KAIUWgKqxs6
-	 /gjTmL1jhTPCFqJYQOmoYPZVHc7OHCwn4Xv2TyFl+jMGyxBxb/k/8fvIl3rttCkkCZ
-	 ObUBFM+6jMK6kzXWhZc0/E+2GgLb+H72+TeXc30c=
-Date: Wed, 17 Apr 2024 13:32:06 -0700
-From: Preston Hunt <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/b411b9-89cb88@github.com>
-Subject: [bluez/bluez] 89cb88: monitor: fix spelling typo
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j8S6ewoQ"
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2da01cb187cso3485431fa.0;
+        Wed, 17 Apr 2024 14:18:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713388684; x=1713993484; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MBkaCbNjydmVkpZXUhiI4uQ6IPkbRea+BjBhJXBTlwg=;
+        b=j8S6ewoQGak6o5Rk1OGQgZ6JGPd00pUJSgF4CvNwiuJwPJ7NsVzKV3OrqiXbq0E2t7
+         mIe33LIy4zA50Eyan2NvMyeKRg/MvGBQ+ZjSUn7zWP4dR5TFvWOtDNcT4YGjHxciGQOW
+         SKCqVC8w4rhyq73wBUmhuaz5MHVURZj5mn4DXkwJFM80bNWEs/7X2x41GepVPitj4QzY
+         cvMRFWZcPUvZzfx+k96ux944E3CiGNcnXTD3kyrtpJVqa3ANmYlKrIILTEamIWDQGiOm
+         Oy5LQitTI7cDZNRzAYkfFpS1RHoeYvovyM1ocnjxrEIuYpWFK1cHY//SRDmEg9kyxjFC
+         pXYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713388684; x=1713993484;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MBkaCbNjydmVkpZXUhiI4uQ6IPkbRea+BjBhJXBTlwg=;
+        b=ZH6/qC9HzzTffDrcPnL6pKadCoD9K9nGE6dpXrPQhVnUZ7R1dVeLwhvdbVg5CHAJ29
+         sAk9JFEExrUgMvaogwaKfGjaB6dbyG6ANnwnNU5RfY9zuf/DDZ3EAQmkixZ5pTzvQyAQ
+         4HDJUP1/lvDIDSupRk+1AYWdrQALlG21Kimo72I/7jMVBG1RPwd6iQjZI67dbqZUYMc0
+         IE5/mJDXBYrVsaM1W7tHt7qKv8InczaopsWJzJFzWukG85nTyloj53wDp+rVmk+LS+S6
+         tIjMAK+ahW1h3LXMOu9Zl4b9F0LEqU/YkCof55zINE4PsTV7MQeFfdo3oDz4mjIg1w4f
+         Cy8g==
+X-Forwarded-Encrypted: i=1; AJvYcCXRohGprz6CWHLkyAoXCBcX2a2QbbSrlL+7d4Se6lxvpCaf5+Vu/iC4YOiz9BoDRHjAkUZ6AAztHXPhvXlDnthHODilPGCH06d6U3ZlaKhhPnpAqKblTB7WRZQb90mSRaM8X7JY5GIN2UWrndmm
+X-Gm-Message-State: AOJu0Yza1WeLB8fN2pKfO9D2ZYjqwMTGNK89GfIoB+yyFFKcgMXMSH60
+	JWsTfCV5/oWKOpu3Vyu9aJK4b2mxSyz0AHRn0oFExImqnqQgWUjMehk4q/DVbiiPfJzbzQrOA/C
+	alOJ8z4jxz7Dmq9tdC61m41nZtEw=
+X-Google-Smtp-Source: AGHT+IFtlAXpGYCpv+bg5gy1IxslsA0lmrPId3jvSe88OrBfqoz0X5D3GoSobh3u3Kz2TE2SrAf/xB9p3nkmG0nVIiw=
+X-Received: by 2002:a2e:92d7:0:b0:2d8:6a04:3bcd with SMTP id
+ k23-20020a2e92d7000000b002d86a043bcdmr312813ljh.3.1713388683280; Wed, 17 Apr
+ 2024 14:18:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+References: <20240412095713.25641-1-hao.qin@mediatek.com>
+In-Reply-To: <20240412095713.25641-1-hao.qin@mediatek.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 17 Apr 2024 17:17:50 -0400
+Message-ID: <CABBYNZJ-rvMuqHjFmQuxhmWv_K5fGFktAk-CeZfx8rw36L-Etg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btusb: mediatek: Support auto revert for MT7922
+To: Hao Qin <hao.qin@mediatek.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Sean Wang <sean.wang@mediatek.com>, Deren Wu <deren.Wu@mediatek.com>, 
+	Aaron Hou <aaron.hou@mediatek.com>, Chris Lu <chris.lu@mediatek.com>, 
+	Steve Lee <steve.lee@mediatek.com>, linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	linux-mediatek <linux-mediatek@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 89cb88b0f030cd1b4dc96cfd1760332122957ec3
-      https://github.com/bluez/bluez/commit/89cb88b0f030cd1b4dc96cfd1760332122957ec3
-  Author: Preston Hunt <me@prestonhunt.com>
-  Date:   2024-04-17 (Wed, 17 Apr 2024)
+Hi,
 
-  Changed paths:
-    M monitor/packet.c
+On Fri, Apr 12, 2024 at 5:57=E2=80=AFAM Hao Qin <hao.qin@mediatek.com> wrot=
+e:
+>
+> Add support for auto reverting MT7922 during reset process.
 
-  Log Message:
-  -----------
-  monitor: fix spelling typo
+Need some more information of what auto reverting means in this
+context and what problem does it solves?
+
+>
+> Signed-off-by: Hao Qin <hao.qin@mediatek.com>
+> ---
+>  drivers/bluetooth/btusb.c | 14 +++++++++++++-
+>  1 file changed, 13 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 4c0cc13adb47..0ad96ec8d31d 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -3032,7 +3032,16 @@ static int btusb_mtk_reset(struct hci_dev *hdev, v=
+oid *rst_data)
+>         usb_kill_anchored_urbs(&data->tx_anchor);
+>         mediatek =3D hci_get_priv(hdev);
+>
+> -       if (mediatek->dev_id =3D=3D 0x7925) {
+> +       if (mediatek->dev_id =3D=3D 0x7922) {
+> +               btusb_mtk_uhw_reg_read(data, MTK_BT_SUBSYS_RST, &val);
+> +               val |=3D 0x00002020;
+> +               btusb_mtk_uhw_reg_write(data, MTK_BT_SUBSYS_RST, val);
+> +               btusb_mtk_uhw_reg_write(data, MTK_EP_RST_OPT, 0x00010001)=
+;
+> +               btusb_mtk_uhw_reg_read(data, MTK_BT_SUBSYS_RST, &val);
+> +               val |=3D BIT(0);
+> +               btusb_mtk_uhw_reg_write(data, MTK_BT_SUBSYS_RST, val);
+> +               msleep(100);
+> +       } else if (mediatek->dev_id =3D=3D 0x7925) {
+>                 btusb_mtk_uhw_reg_read(data, MTK_BT_RESET_REG_CONNV3, &va=
+l);
+>                 val |=3D (1 << 5);
+>                 btusb_mtk_uhw_reg_write(data, MTK_BT_RESET_REG_CONNV3, va=
+l);
+> @@ -3072,6 +3081,9 @@ static int btusb_mtk_reset(struct hci_dev *hdev, vo=
+id *rst_data)
+>         if (err < 0)
+>                 bt_dev_err(hdev, "Reset timeout");
+>
+> +       if (mediatek->dev_id =3D=3D 0x7922)
+> +               btusb_mtk_uhw_reg_write(data, MTK_UDMA_INT_STA_BT, 0x0000=
+00FF);
+> +
+>         btusb_mtk_id_get(data, 0x70010200, &val);
+>         if (!val)
+>                 bt_dev_err(hdev, "Can't get device id, subsys reset fail.=
+");
+> --
+> 2.18.0
+>
 
 
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--=20
+Luiz Augusto von Dentz
