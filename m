@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 462495D8F6
-	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Apr 2024 08:20:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A749142A9E
+	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Apr 2024 08:22:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713342011; cv=none; b=T2Dy+cE3GZeLJq47jxxQyDSYbxGd5pi16iwBoRWhtQV1oqCW1kx4Mht+hqKrmUSW7In+zV/mbhqBbdmxbRvAVLvCEswstn9mQmAhE3Z4Lqd7C6wiUxq61G0fuGKBr1EDswj8l1QWoZGgPUSNTp2JKEepPZHD0Rs/GuT7MY5r8Gg=
+	t=1713342132; cv=none; b=euJ0M8oHUtrkdUYVPCsQsw5U/xvWS/alvJaBVHCMi1v6NfWtd9eLLsOdJ47VDLlxau2LhXtfA73nEoYYysS1VJAJ4m0o3PW6SO4TA5TtzYqZxrjs8U/xo+yytvPajr13ImLyaxpZt7X10SjLzraqNOkpH5E9VOx6t6PWl44GAqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713342011; c=relaxed/simple;
-	bh=7Kjz4PnutNXJPnTsFLIUGNcTlAYp1RmRDqwVfl07YbU=;
+	s=arc-20240116; t=1713342132; c=relaxed/simple;
+	bh=sKpkHbMOKoS3nPFW1PbE2F0ptCDrcc2110PIHx9WMww=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ewiChkyZ2Y34l3XlzzS3HK6q1dIOXEYz0esmdFEpmVQr3RG+Sds9ruSCZka5JwYs5FtBs9J+f0KY9jOVv8sFzdn9rdnAT/ovCYIyEKnH3eQcAJDq/MIIReU9ahUEPE7G7SL2biF1ZpfCEkgJgJtAhFFozbkeYWsZgAWWZfmmE8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F4zYgWhl; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=FyERfLnQDLU0XRnikwIAOKXNfBCMr5benWVQgZZipAcJMdq8Mp3Zv0VTow+olJue5lKThfXk/e18RQRE1ZCPpb/Ntxv4sF9SPziyqNQ0/UBQVaymDY2yBn23udQeVDL0SoPw6wG7PdGl0EQJe7I42qKN0oJliLqCy8CegW5La10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n2AseH0i; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F4zYgWhl"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C44F1C072AA
-	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Apr 2024 08:20:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n2AseH0i"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 89111C32781
+	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Apr 2024 08:22:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713342010;
-	bh=7Kjz4PnutNXJPnTsFLIUGNcTlAYp1RmRDqwVfl07YbU=;
+	s=k20201202; t=1713342132;
+	bh=sKpkHbMOKoS3nPFW1PbE2F0ptCDrcc2110PIHx9WMww=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=F4zYgWhlTkMW8HIG5AmqxI0GtV21b6pSHdoVKq30CZ2xRJupgIDVTc4SHdF2ZHJ2g
-	 UBIojgbzQRrHe7oTiCBKfnVyg5pJlaUi/DcbJalcFg+IB0TADkqCurctTx+XKQCTQf
-	 rmXqVT9mktoYIdpGAOCdlnV3CmicbNg1xGT07o3joe+Huae4NREQAVlKk3HGUjtTbU
-	 ZbiRWkHeEfBzmF4/SUK4XYtcwTSMCBpvPzAcBmLWk5rQ99DLHUxpEJvfa8IG4fEIwj
-	 9f2mwmObxA4K/ZgTvYQpr0WovntSX9EavxYacwo/v3IT3Abei2jFGbvDgZ3YMatiOV
-	 NvDYespxNwErA==
+	b=n2AseH0ifHtNEsOMdEdaBmCiqGd3tJeCQRrkSvGrVOvU1lkkBCTUm2OvYox715jaW
+	 ysep6xyMWGsIvmA0fsg6pR00PE4BEd1QR5tQi5pdddQVV4I0gPVuLlKOh3f6f+s+c5
+	 GuRpwHf17gsyF01ZQwZhcngtMcEycW1t2robpC9ms/a/caEjNMJTEk6na8Z9B+erQ6
+	 cS0oP1Pe7UGfhgLFF6RjAgSbVEeEl1skyGC2VrgkLCeP5ZgHwNZplzoXwDHDJJQPGa
+	 A3aozbEk6UH9BaafMBol6cPxJqKJOGf8m208Op2rK+V1R8XwoUP7rzBtFbNEQx+8UZ
+	 jQ89vIn46rY/w==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id BA627C433DE; Wed, 17 Apr 2024 08:20:10 +0000 (UTC)
+	id 7A9D5C433E2; Wed, 17 Apr 2024 08:22:12 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 218726] qca6390 bluetooth fails after disabling/re-enabling
  bluetooth
-Date: Wed, 17 Apr 2024 08:20:10 +0000
+Date: Wed, 17 Apr 2024 08:22:12 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -48,7 +48,7 @@ X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: attachments.created
-Message-ID: <bug-218726-62941-Qcf1OgPKfA@https.bugzilla.kernel.org/>
+Message-ID: <bug-218726-62941-9uECS2C17U@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-218726-62941@https.bugzilla.kernel.org/>
 References: <bug-218726-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -64,13 +64,14 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D218726
 
---- Comment #26 from Wren Turkal (wt@penguintechs.org) ---
-Created attachment 306172
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D306172&action=3Dedit
-00567f70051a41 + Zijun's 2 patches + cold_boot
+--- Comment #27 from Wren Turkal (wt@penguintechs.org) ---
+Created attachment 306173
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D306173&action=3Dedit
+00567f70051a41 + Zijun's 2 patches + warm boot after working cold boot
 
 This is a log from startup to shutdown of bluetooth-next/master + Zijin's
-patches after a cold boot. Then I restart (for a warm boot next).
+patches after a warm boot that was restarted from a working cold boot.
+Bluetooth does not work. Then I shutdown.
 
 --=20
 You may reply to this email to add a comment.
