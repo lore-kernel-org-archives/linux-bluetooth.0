@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7267E524D4
-	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Apr 2024 09:18:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F15225338F
+	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Apr 2024 09:18:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713345503; cv=none; b=tIvPzHLzTOXJf0zLr/VkCuulZtM9VxR7IRolC6STCXrPE5D1/vHGkiHK15To7iDLLxk+vTXxy6+5Zaxy+/qULchitcbivL2zBGznj5voAoZTvNxPVLz7qgpcHz3yASNIQRu9HDm5asuSzvROP5Oo7MSsIchoEtln244cliaIrHo=
+	t=1713345529; cv=none; b=W0AVWnqDnIIq1tNAXriWQpBYmBylVm4lRAiqANOWKlQCaW20BPLpi5ewsk7DRxNvuoqG7NfT8SXdBx/65JSwjwUQaoI+Np39xAzr+M6vZtABoVGBP009oN+hh2PcnderZqYQPHAq8bw22s2/6RNd6WdaLnkY0p0KBiQWmrCI1GQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713345503; c=relaxed/simple;
-	bh=lF6nxXXEGp1UBR3Gmxbt1zRZt0HhxWYH1wIFpPJMy0k=;
+	s=arc-20240116; t=1713345529; c=relaxed/simple;
+	bh=Ap5xjOPFNOmTZx9+LMY9m99EcpUrBTohKFvBid1wu+A=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=LiqBmD5Fp3SyWO9zfiZGK5wFNbw8picRR5Xs2Nkx6US34U9oPlZEhk9N2fkjJEYqIUi+szDoy45JL35tPuZ9CvlIEZIBQZs6BHrx8jffz8UoAMhiU9HzMuNhRf1wR7PzpFH4nmAdedf7qrm8cU3H3IWMl8zGyOQ4aCaegOpEPCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jeCoP8jG; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=Ti5L20r4knK/QV139I27idaTWYnthFtZByRT5wjlSW52C0XEB0V3nJEKQFQTxgwPhtI1nvXMXGQzQaLLeANquJFeCk3iD26L/8B2tVrCnQZ9G+iSps63Fd+erQq+ZxU+14MppXIraiQ7WuWV8j017Lf38L3qvCejBc7HpN8J0Do=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UE7h5UxN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jeCoP8jG"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 000F1C072AA
-	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Apr 2024 09:18:22 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UE7h5UxN"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 80ACDC072AA
+	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Apr 2024 09:18:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713345503;
-	bh=lF6nxXXEGp1UBR3Gmxbt1zRZt0HhxWYH1wIFpPJMy0k=;
+	s=k20201202; t=1713345528;
+	bh=Ap5xjOPFNOmTZx9+LMY9m99EcpUrBTohKFvBid1wu+A=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=jeCoP8jGVXD4Mp1yMbHJiiRsjTfy+C4mI67WekfAG2KmZafbv4Idc/bx2vtVaHX72
-	 1QlkFZ/pADoQZwuhgOwLA0EIMzf7loa87TVHxLqnoQuNzMGXZ65bEWoFsc3JDrn0DY
-	 QP+wQmbCgy8dbDMgX4Gg3Q/+UzrYZfzw4cEapHKHiO0ODoF0dMulwQNIa3NMY89YsA
-	 1aepFOL2sGKTMFqx0dlSmYVomRL/lhzecnoDYSCjnbXzjkVm65xJjinpSsvn50mQBL
-	 DblrN+/uae7JSw3w9raImTEdTvkgwqPUtP+vIECgCbQHssyXf17xIPPvzETS1mg9GG
-	 CM4I+KAyO3VZA==
+	b=UE7h5UxNrfg/kufUQMrCG+B9CPHY5Zc9jpXyMcU1rBqcZTfZXDBgiQNnk2DX5fReE
+	 UUKf2ih4xEANIFFgs0e5ptQJc+spbnlcvsEJsQJt8n+yf6dMo3txznZrvNcg758uIn
+	 MRG3KjkgJyrA5FsT7NYrBQ5PKWHkTmmSA6/NmoKLz7cWzFDAG5++UmRkQ1LPJUrzgb
+	 YGv9zNu79PhabNMmak6ib/mWUwjYuHkt5osNatFz52RNfUNwcjGcUyDPSwI9J3tJZL
+	 lKNXz3l0Ty1IV5VBgfOYXkFBTTqsi7mGC1oWuibb9zhHozq6XxecQCreAHhxEz9lA7
+	 oVhnF0xF9cYtw==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id E4B7CC433DE; Wed, 17 Apr 2024 09:18:22 +0000 (UTC)
+	id 77C57C433DE; Wed, 17 Apr 2024 09:18:48 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 218726] qca6390 bluetooth fails after disabling/re-enabling
  bluetooth
-Date: Wed, 17 Apr 2024 09:18:22 +0000
+Date: Wed, 17 Apr 2024 09:18:48 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -48,7 +48,7 @@ X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-218726-62941-TVtPj6RkZ3@https.bugzilla.kernel.org/>
+Message-ID: <bug-218726-62941-tEXKcpMvfY@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-218726-62941@https.bugzilla.kernel.org/>
 References: <bug-218726-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -64,11 +64,12 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D218726
 
---- Comment #30 from Wren Turkal (wt@penguintechs.org) ---
-Just so you know, I added the following parameters to my kernel boot:
-btqca.dyndbg=3D"+pmft" hci_uart.dyndbg=3D"+pmft"
+--- Comment #31 from Wren Turkal (wt@penguintechs.org) ---
+(In reply to Zijun Hu from comment #29)
+> thank you, Wren, for help verification and capturing logs.
+> will check logs today later.
 
-Does this get you all the logging you were looking for?
+Okay, cool. Thx.
 
 --=20
 You may reply to this email to add a comment.
