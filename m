@@ -1,78 +1,142 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F15225338F
-	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Apr 2024 09:18:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E6BE13C3EA
+	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Apr 2024 09:39:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713345529; cv=none; b=W0AVWnqDnIIq1tNAXriWQpBYmBylVm4lRAiqANOWKlQCaW20BPLpi5ewsk7DRxNvuoqG7NfT8SXdBx/65JSwjwUQaoI+Np39xAzr+M6vZtABoVGBP009oN+hh2PcnderZqYQPHAq8bw22s2/6RNd6WdaLnkY0p0KBiQWmrCI1GQ=
+	t=1713346751; cv=none; b=aBrCHN059hf1m5x5B0kJm5bVM6nOW9UZUZxK2ewKd8WrlggJHcp9b3K9lRTHUMG/K6uzIFCv18uNI3RmjXlHiu+vq6EIrxHNyDQApWFcy+V2cVhAZgk3XZTf4JSCMFj9u3zOT15UwpJAdYEr9BYSF+vIVaWa3kodtE6o2a6DZIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713345529; c=relaxed/simple;
-	bh=Ap5xjOPFNOmTZx9+LMY9m99EcpUrBTohKFvBid1wu+A=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Ti5L20r4knK/QV139I27idaTWYnthFtZByRT5wjlSW52C0XEB0V3nJEKQFQTxgwPhtI1nvXMXGQzQaLLeANquJFeCk3iD26L/8B2tVrCnQZ9G+iSps63Fd+erQq+ZxU+14MppXIraiQ7WuWV8j017Lf38L3qvCejBc7HpN8J0Do=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UE7h5UxN; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713346751; c=relaxed/simple;
+	bh=wcho9fj0eyfK4kmysvJFmqL4fJ5qnd0ytBlOblVddJM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=nW+6y4gmar72uvkamV1Z87z3sgAEXMs+vMjN933M+HvNDVvG2RYDZ6gIMyCoQwnxdi0pZfADyap4C7brLKPd1uusNm8/Zvkf5xhT+1EBt6tAjkaE8QACpWhFYgFNFpdLTQ4Y/agCzIrxoaxh4YvUCNrLBVSKHIz5tl72P8puTNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=hDTGxLAe; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UE7h5UxN"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 80ACDC072AA
-	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Apr 2024 09:18:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713345528;
-	bh=Ap5xjOPFNOmTZx9+LMY9m99EcpUrBTohKFvBid1wu+A=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=UE7h5UxNrfg/kufUQMrCG+B9CPHY5Zc9jpXyMcU1rBqcZTfZXDBgiQNnk2DX5fReE
-	 UUKf2ih4xEANIFFgs0e5ptQJc+spbnlcvsEJsQJt8n+yf6dMo3txznZrvNcg758uIn
-	 MRG3KjkgJyrA5FsT7NYrBQ5PKWHkTmmSA6/NmoKLz7cWzFDAG5++UmRkQ1LPJUrzgb
-	 YGv9zNu79PhabNMmak6ib/mWUwjYuHkt5osNatFz52RNfUNwcjGcUyDPSwI9J3tJZL
-	 lKNXz3l0Ty1IV5VBgfOYXkFBTTqsi7mGC1oWuibb9zhHozq6XxecQCreAHhxEz9lA7
-	 oVhnF0xF9cYtw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 77C57C433DE; Wed, 17 Apr 2024 09:18:48 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 218726] qca6390 bluetooth fails after disabling/re-enabling
- bluetooth
-Date: Wed, 17 Apr 2024 09:18:48 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: wt@penguintechs.org
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-218726-62941-tEXKcpMvfY@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218726-62941@https.bugzilla.kernel.org/>
-References: <bug-218726-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="hDTGxLAe"
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 43H8FYN9013274;
+	Wed, 17 Apr 2024 09:39:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=WNraPd0/H3Vjzig9yF9quPNcioedHhPHPGsYz4xdei0=; b=hD
+	TGxLAeV0HYnNZLZ8cXaSOeAeimh48dVYK5ix8CqVXwkatTqREaSVE7/G//bEPxvp
+	9FGYFFkKtK83nn8F2PK2FoxjXXSfbJCkGRCxUpAWrj0DPZKL3da72lDxaHgF4moL
+	CIE4I0Cwp5cpYVaUzvFf6NNmC0Mb92hzzJbuQ4BGWriSbLN8+tiOs7xOxh5r75Qi
+	dT7+1G4be81WAftK9JBE9+g1aX7jKgDhTVQsT17g0XZkSF5gxRd3nh2wuNNWDASU
+	2MCH1IsmYii3HarJ/MZd5CiKEKl+x+FbJDwZA8c1pepxC7q4RBXBasta4K8RtiUB
+	73cclN5D+7GhvIP+QSJA==
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xjarpg5xw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 17 Apr 2024 09:39:05 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43H9d4K6031704
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 17 Apr 2024 09:39:04 GMT
+Received: from [10.253.9.153] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 17 Apr
+ 2024 02:39:02 -0700
+Message-ID: <4313bcc9-8fbf-477d-90f2-013681cdebb9@quicinc.com>
+Date: Wed, 17 Apr 2024 17:38:59 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: qca: Fix nullptr dereference for non-serdev
+ devices
+To: Johan Hovold <johan@kernel.org>
+CC: <luiz.dentz@gmail.com>, <marcel@holtmann.org>,
+        <linux-bluetooth@vger.kernel.org>, <johan+linaro@kernel.org>
+References: <1713325792-17181-1-git-send-email-quic_zijuhu@quicinc.com>
+ <Zh9saGbOl-fXP6SD@hovoldconsulting.com>
+ <5e4e62c8-d17f-45fd-9212-088eb026dc7b@quicinc.com>
+ <Zh91zq13nZvH3-Yj@hovoldconsulting.com>
+ <4dac0caa-629d-4b4d-ad54-f6ab15268524@quicinc.com>
+ <Zh-JNzlskY6ZvsSm@hovoldconsulting.com>
+Content-Language: en-US
+From: quic_zijuhu <quic_zijuhu@quicinc.com>
+In-Reply-To: <Zh-JNzlskY6ZvsSm@hovoldconsulting.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: -9fH_gA0jpwuwaLhVE8Ms9TI_F6U-PAd
+X-Proofpoint-ORIG-GUID: -9fH_gA0jpwuwaLhVE8Ms9TI_F6U-PAd
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-17_08,2024-04-16_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
+ malwarescore=0 mlxlogscore=999 phishscore=0 adultscore=0 impostorscore=0
+ priorityscore=1501 lowpriorityscore=0 spamscore=0 mlxscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2404010003
+ definitions=main-2404170066
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218726
+On 4/17/2024 4:32 PM, Johan Hovold wrote:
+> Again, make sure wrap you replies at 72 cols and trim unnecessary
+> context:
+> 
+>   https://docs.kernel.org/process/submitting-patches.html#use-trimmed-interleaved-replies-in-email-discussions
+> 
+> On Wed, Apr 17, 2024 at 03:32:51PM +0800, quic_zijuhu wrote:
+>> On 4/17/2024 3:10 PM, Johan Hovold wrote:
+>>> On Wed, Apr 17, 2024 at 02:51:38PM +0800, quic_zijuhu wrote:
+> 
+>>>> i have submitted below patches to add supports for all other
+>>>> non-serdev controllers.
+>>>
+>>>> https://patchwork.kernel.org/project/bluetooth/list/?series=844120
+>>>
+>>> Ok, you need it for some future changes, but I'm afraid that adding new
+>>> random vendor specific ioctls like you do in that is series is a no-go.
+> 
+>> it is a generic ioctl, for QCA, it is used to specific soc_type. it
+>> maybe be used by other vendor driver to set user specified info.
+> 
+> In it's current form it's a vendor specific hack that is never going to
+> make it upstream.
+>
+no, i don't think so.
 
---- Comment #31 from Wren Turkal (wt@penguintechs.org) ---
-(In reply to Zijun Hu from comment #29)
-> thank you, Wren, for help verification and capturing logs.
-> will check logs today later.
+1)
+ioctl()'s designed purpose is to complete such non-standard config.
 
-Okay, cool. Thx.
+2) present ioctl HCIUARTGETPROTO which is not exported is used to specify which vendor protocol is used
+ is it a a vendor specific hack?
 
---=20
-You may reply to this email to add a comment.
+3)
+hci_ldisc driver don't touch user specified settings and pass it into vendor driver directly
+does it has any problem?
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+4)
+for tool btattach. it does NOT get any board config info from DT|ACPI compared with
+formal BT driver. so i introduce a new ioctl to supplement such info when possible
+to make btattach work.
+
+ 
+> For a start, you don't even make sure that the types becomes part of the
+> ABI, which means that passing, say, type 5 can mean different things
+> depending on the kernel version.
+>it is specified by user and ONLY be parsed by vendor device driver.
+it is user's responsibility to specify the right value. 
+so i also don't check and care about its value and it don't need to change any code
+for further added any new soc_types.
+
+moreover, tool attach is mainly used before the final product phase. namely, its is mainly used
+by developer and customer's evaluation.
+ 
+> Can't you just retrieve the device type from the device itself? If it's
+> already powered, you should not need to know this beforehand1) it is the simplest and lowest risk fix
+2) different soc_types have different responses when read its IDS as shown by qca_read_soc_version().
+3) the way you mentioned will involve many changes and it also means high risks for many current soc types.
+> Johan
+
