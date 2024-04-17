@@ -1,75 +1,86 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62FAB7D07E
-	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Apr 2024 08:28:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E82355D8F6
+	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Apr 2024 08:32:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713342536; cv=none; b=Hr5wwPT9/l+pC9/uuiUkcVwYhbci7KjI6WQl0162uNTrb4OfOigNfBDp7Y7hcmCXj6y/aJWDI6qxL7p2zLnB4AtOjvXs+200uZrjL0v0SEMwhI2gVVPrpNx5Wk9KOaOcxOygyju3D3G06ZYdY69uystFsnirmWNxvQ5XRxvoAwc=
+	t=1713342778; cv=none; b=YUdD9nHOWQZdb9rF9biOd0L6OwZZ/WNFEbSY3A90sT92nlZ8v+t+EOP5npKjZhdlKgcaPfB+lcM4kSfcpTAV9TQ152zy2Dk6z02HuVLcg7V/EpBTcdgqkztoWCVtKTq7y1X1HP3i6IroV+0wdZDFtPtYJrTaFwa/3IeZa/uf0N4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713342536; c=relaxed/simple;
-	bh=Q2Pu09lHoG4kZlU4auF90uNZtpLOuvrwxkZjwKAgqCc=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=pWhMSdJi5CcpGYbQ5Bn9PJO0NT7QaRv/cCVXXBmXnXaVDtGCByugAAqgEp/CGWDLT8x15gLARVOOJEKRAYNtTwDcnOVmpTaD8t5Peb8J89scwXTEiVeimFO/hHKxqanvqKH2trMQZB4TZg7uAnhun8wLZEJKlNfDBR4EIrPSxRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=coNHuSjy; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713342778; c=relaxed/simple;
+	bh=UuKCGZDfBb+rnhrXIbZN/cR/ZQTWM20t989TnEUTvFE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gWavOL27az94hvnHQkZN+zwDkAYzm3+uiIlnywti9o7DAxXKHtN9YU0Elkqw3r9HGsGxQrc3fTVUTod22qTFKcZXxwKb1s7WWf4tq05bfxgCZdR/jGkxfN7RFF0GV0AECgfFbaKkRPPMibNtCvRVaaLB2oSq6rRtR80wDFXdrRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mHOyC78w; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="coNHuSjy"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4162EC072AA
-	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Apr 2024 08:28:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mHOyC78w"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76DB0C072AA;
+	Wed, 17 Apr 2024 08:32:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713342536;
-	bh=Q2Pu09lHoG4kZlU4auF90uNZtpLOuvrwxkZjwKAgqCc=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=coNHuSjyDJhKCvlbAhYR+3wThkuuRREB6WlF8OQ8T2hbqK2AakKTrZmEACki8fpHW
-	 pxAl+WmSSqwvPhte7ybeumMKkS3nz6UPi33nReBaCyh1zT8bnK3Hc6U0vWhfMdhg8O
-	 AHQ1qTVUIZQN2TzgtaiEVFUvyk665hhcwm1C9fpKOOfez3zHTMsnG01DwAUMOt8KCw
-	 WI8g+bu/Cl7mCN3zVjoSarAMky1W9JkGAQ9r3EtJRoA1AKUBVdb4oib2dxPb5Clogy
-	 w9leHUC9Y6phBnHTGbZb57MBjgkLwWkPJdLC0xFNRkAfhT6WtRa55o4x/xuRQKaI5N
-	 gU5vsazR+7nkw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 3AD1BC433E3; Wed, 17 Apr 2024 08:28:56 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 218726] qca6390 bluetooth fails after disabling/re-enabling
- bluetooth
-Date: Wed, 17 Apr 2024 08:28:56 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: quic_zijuhu@quicinc.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-218726-62941-reqfwd8BGh@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218726-62941@https.bugzilla.kernel.org/>
-References: <bug-218726-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=k20201202; t=1713342777;
+	bh=UuKCGZDfBb+rnhrXIbZN/cR/ZQTWM20t989TnEUTvFE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mHOyC78wcx5xAycMXkJLkZhqXwkFoOjSHyLDDTWx/wBKLeYvdPJs2DCiAJpfVzvMF
+	 HICDK61uk5WH1h/ua3G02ws2hRkxaSaPBYGTljhkCJeJdeRT/QhukxfYbb8jfHhG+R
+	 Eiqdwn0SoZe69bP42qp8trPvqPKl+6qk4U2NN0o40uuOOIpi1MT1rlwQX5JDETKg/M
+	 nir/rVAkPGgpe3Jy8qNM13niLh+qtdHwMyiqJofqZHld371dg10ZBw7hbNkZ74YL6X
+	 T7cyBvK7Nj6SQlOOqc3uk2L4uPBlpYAnOGTAVX0j+EvmvRYRBg7UEhYwRz7BDdUTe2
+	 en+JX05kLT7dg==
+Received: from johan by xi.lan with local (Exim 4.97.1)
+	(envelope-from <johan@kernel.org>)
+	id 1rx0it-00000000849-44fj;
+	Wed, 17 Apr 2024 10:32:56 +0200
+Date: Wed, 17 Apr 2024 10:32:55 +0200
+From: Johan Hovold <johan@kernel.org>
+To: quic_zijuhu <quic_zijuhu@quicinc.com>
+Cc: luiz.dentz@gmail.com, marcel@holtmann.org,
+	linux-bluetooth@vger.kernel.org, johan+linaro@kernel.org
+Subject: Re: [PATCH] Bluetooth: qca: Fix nullptr dereference for non-serdev
+ devices
+Message-ID: <Zh-JNzlskY6ZvsSm@hovoldconsulting.com>
+References: <1713325792-17181-1-git-send-email-quic_zijuhu@quicinc.com>
+ <Zh9saGbOl-fXP6SD@hovoldconsulting.com>
+ <5e4e62c8-d17f-45fd-9212-088eb026dc7b@quicinc.com>
+ <Zh91zq13nZvH3-Yj@hovoldconsulting.com>
+ <4dac0caa-629d-4b4d-ad54-f6ab15268524@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4dac0caa-629d-4b4d-ad54-f6ab15268524@quicinc.com>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218726
+Again, make sure wrap you replies at 72 cols and trim unnecessary
+context:
 
---- Comment #29 from Zijun Hu (quic_zijuhu@quicinc.com) ---
-thank you, Wren, for help verification and capturing logs.
-will check logs today later.
+  https://docs.kernel.org/process/submitting-patches.html#use-trimmed-interleaved-replies-in-email-discussions
 
---=20
-You may reply to this email to add a comment.
+On Wed, Apr 17, 2024 at 03:32:51PM +0800, quic_zijuhu wrote:
+> On 4/17/2024 3:10 PM, Johan Hovold wrote:
+> > On Wed, Apr 17, 2024 at 02:51:38PM +0800, quic_zijuhu wrote:
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+> >> i have submitted below patches to add supports for all other
+> >> non-serdev controllers.
+> > 
+> >> https://patchwork.kernel.org/project/bluetooth/list/?series=844120
+> > 
+> > Ok, you need it for some future changes, but I'm afraid that adding new
+> > random vendor specific ioctls like you do in that is series is a no-go.
+
+> it is a generic ioctl, for QCA, it is used to specific soc_type. it
+> maybe be used by other vendor driver to set user specified info.
+
+In it's current form it's a vendor specific hack that is never going to
+make it upstream.
+
+For a start, you don't even make sure that the types becomes part of the
+ABI, which means that passing, say, type 5 can mean different things
+depending on the kernel version.
+
+Can't you just retrieve the device type from the device itself? If it's
+already powered, you should not need to know this beforehand.
+  
+Johan
