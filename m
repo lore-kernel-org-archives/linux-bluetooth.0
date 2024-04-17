@@ -1,80 +1,205 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5085B13BAFB
-	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Apr 2024 14:08:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D45EB13D260
+	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Apr 2024 14:24:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713362931; cv=none; b=DzCZrEbiUBEsYGe5SKi5ZufcjCI2yNtTpljh0OGCpL4vlYosamQbTi8dJ1NGddbAxR94lvSzO/fSGoLRwRRuMv6CDRDht1C8+tnaf00EBlTcfOVj4xXCf3BmfuZ5qOVc0tXpK3G/Blud/5QRSCpTpoBU1Smh+FASYIY39KhvWaI=
+	t=1713363893; cv=none; b=ew1JCQ5KAM80xppCQHn7toXqRLQA4V5rjwbtPcWTyw30Uxp7xBKF8SCoKGxf1jUg1GncI/RD32vwjN03JHAq5J1olIRXyxufLoq53U8JlHOGv7dot3fXVgRd86b5S0o9REJKdtGA7NuaXE5X+oeTTS29shoVrD/1OWu8KGxILc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713362931; c=relaxed/simple;
-	bh=uyvMjGT1BbWAAiapZ21vI3RqVcdkyltztetr9sG87sQ=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=TujoLkOOfncR+ppjCuCMk2kHAL3nhKU1ApNPjAJRvyI7YGIWBkpDfyvm8k+UQw9dF2ZEuvEqt2VTArK5UautfXJEJqjbiYHC1U1bnO+aJ23yFw2kODHgM2bYFNKVXIBvticFIgRDcxHFjUnMuGv4XarwwFRzyMFyLD5qICcIG8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AryMLpXE; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713363893; c=relaxed/simple;
+	bh=6yR0I7FhS9YQbVM5ucI2p4EvNZiRgDbeeULTgSclRUI=;
+	h=Date:From:To:Cc:Subject:Message-ID; b=PR69HEbTn9DyvH1zuwQi/po87FFE94qNh6W0KMBU62hwymZ83aZxZPdtu+TFLIgqDT6wjTpeKOXUiIantwYOXmrGPC2fTYRxiS+bL1K2OyrzVTgzCD3tczqtU+DNtx775SJCItAmRh2GRI4ebFRf1fWUtXlyO3d3jO/xVek+GX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Dep+UvjZ; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AryMLpXE"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D81D2C116B1
-	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Apr 2024 14:08:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713362930;
-	bh=uyvMjGT1BbWAAiapZ21vI3RqVcdkyltztetr9sG87sQ=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=AryMLpXEaJrseU3Pd606Ll6B2yH1jg2PO10l4S2fpNJfp2KusHXaG6panvA1LQflh
-	 hf0ksyG5oioLiRPI+DOBFDkUEOXziHe4+c7j5bVhIXtTY/8y1tJlMpvGcRLrIN2hlf
-	 QUQjvZ7U53UI6zQBhfqBlp5dSX8xVrqb7ssidzX/8aiS8QxnURwOH5GKp1u1noRckN
-	 FBTjzsh6gFH+rTkA76SZK3InHx63VX/uMFIc9PDhrx3/NhzQwOFCsLdTxXSnH0Dr6G
-	 q0gwe3AgKNwAS0L7eUslmf915BdywToJp8NxOKaFbi5vHL5Vvgs4leLEY2+Y7Bh//7
-	 jI008ded6Y01g==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id C8677C433E2; Wed, 17 Apr 2024 14:08:50 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 218726] qca6390 bluetooth fails after disabling/re-enabling
- bluetooth
-Date: Wed, 17 Apr 2024 14:08:50 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: quic_zijuhu@quicinc.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-218726-62941-SCQYhnU0uO@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218726-62941@https.bugzilla.kernel.org/>
-References: <bug-218726-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Dep+UvjZ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713363891; x=1744899891;
+  h=date:from:to:cc:subject:message-id;
+  bh=6yR0I7FhS9YQbVM5ucI2p4EvNZiRgDbeeULTgSclRUI=;
+  b=Dep+UvjZmRZeVl8FYNPaPfvK9ySbqaunZi/SGJkkslsv6xjP4e0E1+t3
+   Vresme+0Z5epbYk0ZIrM+Gk1Htm+pDxRJ6GtxcV44n2zY4qCtD7OroI4r
+   Oals/nIrDoO2NgxPu94/z58cxwqgc/qUrUSuT4lsxrPEJPWsYA2dAOVRE
+   rY9lJE8r/dnA/LvsAu34D/U9PKJTaDD3BM7iEONU6YYf8IudPQKcQPtzj
+   tFvdH+Y1Mr8zZ3urRiAQGYKoeEdiC5EtPVHoOWY1adyYKS6jN/lBAqrS+
+   bZypziKIhkBnfz8orf9owVuamGYFToygAagLmKjQNIfei/RxfQFuQmOE7
+   Q==;
+X-CSE-ConnectionGUID: tvzrTLlSQzCWVrFooJY0zQ==
+X-CSE-MsgGUID: QLvYXpdBQYe7glxUJ90tvw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11046"; a="9027362"
+X-IronPort-AV: E=Sophos;i="6.07,209,1708416000"; 
+   d="scan'208";a="9027362"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2024 07:24:41 -0700
+X-CSE-ConnectionGUID: CRfGohhWRm+F4Xxnzkl32Q==
+X-CSE-MsgGUID: ygNMMdeST367mjUJ9Rbm9Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,209,1708416000"; 
+   d="scan'208";a="45938617"
+Received: from unknown (HELO 23c141fc0fd8) ([10.239.97.151])
+  by fmviesa002.fm.intel.com with ESMTP; 17 Apr 2024 07:24:38 -0700
+Received: from kbuild by 23c141fc0fd8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rx6DE-0006fs-06;
+	Wed, 17 Apr 2024 14:24:36 +0000
+Date: Wed, 17 Apr 2024 22:23:50 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 00567f70051a41c2323dbce1c8fc22514202bd26
+Message-ID: <202404172248.yMxtqA5E-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218726
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 00567f70051a41c2323dbce1c8fc22514202bd26  Bluetooth: qca: fix invalid device address check
 
---- Comment #33 from Zijun Hu (quic_zijuhu@quicinc.com) ---
-(In reply to Wren Turkal from comment #30)
-> Just so you know, I added the following parameters to my kernel boot:
-> btqca.dyndbg=3D"+pmft" hci_uart.dyndbg=3D"+pmft"
->=20
-> Does this get you all the logging you were looking for?
+elapsed time: 1398m
 
-yes. the debugging logs are turned on successfully by you.
+configs tested: 128
+configs skipped: 4
 
---=20
-You may reply to this email to add a comment.
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+tested configs:
+alpha                             allnoconfig   gcc  
+alpha                            allyesconfig   gcc  
+alpha                               defconfig   gcc  
+arc                              allmodconfig   gcc  
+arc                               allnoconfig   gcc  
+arc                              allyesconfig   gcc  
+arc                                 defconfig   gcc  
+arc                   randconfig-001-20240417   gcc  
+arc                   randconfig-002-20240417   gcc  
+arm                              allmodconfig   gcc  
+arm                               allnoconfig   clang
+arm                              allyesconfig   gcc  
+arm                                 defconfig   clang
+arm                   randconfig-001-20240417   clang
+arm                   randconfig-002-20240417   clang
+arm64                            allmodconfig   clang
+arm64                             allnoconfig   gcc  
+arm64                               defconfig   gcc  
+csky                             allmodconfig   gcc  
+csky                              allnoconfig   gcc  
+csky                             allyesconfig   gcc  
+csky                                defconfig   gcc  
+hexagon                          allmodconfig   clang
+hexagon                           allnoconfig   clang
+hexagon                          allyesconfig   clang
+hexagon                             defconfig   clang
+i386                             allmodconfig   gcc  
+i386                              allnoconfig   gcc  
+i386                             allyesconfig   gcc  
+i386         buildonly-randconfig-001-20240417   clang
+i386         buildonly-randconfig-002-20240417   gcc  
+i386         buildonly-randconfig-003-20240417   clang
+i386         buildonly-randconfig-004-20240417   gcc  
+i386         buildonly-randconfig-005-20240417   gcc  
+i386         buildonly-randconfig-006-20240417   gcc  
+i386                                defconfig   clang
+i386                  randconfig-001-20240417   clang
+i386                  randconfig-002-20240417   gcc  
+i386                  randconfig-003-20240417   gcc  
+i386                  randconfig-004-20240417   clang
+i386                  randconfig-005-20240417   clang
+i386                  randconfig-006-20240417   clang
+i386                  randconfig-011-20240417   gcc  
+i386                  randconfig-012-20240417   gcc  
+i386                  randconfig-013-20240417   clang
+i386                  randconfig-014-20240417   gcc  
+i386                  randconfig-015-20240417   gcc  
+i386                  randconfig-016-20240417   clang
+loongarch                        allmodconfig   gcc  
+loongarch                         allnoconfig   gcc  
+loongarch                           defconfig   gcc  
+m68k                             allmodconfig   gcc  
+m68k                              allnoconfig   gcc  
+m68k                             allyesconfig   gcc  
+m68k                                defconfig   gcc  
+microblaze                       allmodconfig   gcc  
+microblaze                        allnoconfig   gcc  
+microblaze                       allyesconfig   gcc  
+microblaze                          defconfig   gcc  
+mips                              allnoconfig   gcc  
+mips                             allyesconfig   gcc  
+nios2                            allmodconfig   gcc  
+nios2                             allnoconfig   gcc  
+nios2                            allyesconfig   gcc  
+nios2                               defconfig   gcc  
+openrisc                          allnoconfig   gcc  
+openrisc                         allyesconfig   gcc  
+openrisc                            defconfig   gcc  
+parisc                           allmodconfig   gcc  
+parisc                            allnoconfig   gcc  
+parisc                           allyesconfig   gcc  
+parisc                              defconfig   gcc  
+parisc64                            defconfig   gcc  
+powerpc                          allmodconfig   gcc  
+powerpc                           allnoconfig   gcc  
+powerpc                          allyesconfig   clang
+riscv                             allnoconfig   gcc  
+riscv                            allyesconfig   clang
+riscv                               defconfig   clang
+s390                             allmodconfig   clang
+s390                              allnoconfig   clang
+s390                             allyesconfig   gcc  
+s390                                defconfig   clang
+sh                               allmodconfig   gcc  
+sh                                allnoconfig   gcc  
+sh                               allyesconfig   gcc  
+sh                                  defconfig   gcc  
+sparc                            allmodconfig   gcc  
+sparc                             allnoconfig   gcc  
+sparc                               defconfig   gcc  
+sparc64                          allmodconfig   gcc  
+sparc64                          allyesconfig   gcc  
+sparc64                             defconfig   gcc  
+um                               allmodconfig   clang
+um                                allnoconfig   clang
+um                               allyesconfig   gcc  
+um                                  defconfig   clang
+um                             i386_defconfig   gcc  
+um                           x86_64_defconfig   clang
+x86_64                            allnoconfig   clang
+x86_64                           allyesconfig   clang
+x86_64       buildonly-randconfig-001-20240417   clang
+x86_64       buildonly-randconfig-002-20240417   gcc  
+x86_64       buildonly-randconfig-003-20240417   clang
+x86_64       buildonly-randconfig-004-20240417   clang
+x86_64       buildonly-randconfig-005-20240417   clang
+x86_64       buildonly-randconfig-006-20240417   gcc  
+x86_64                              defconfig   gcc  
+x86_64                randconfig-001-20240417   gcc  
+x86_64                randconfig-002-20240417   gcc  
+x86_64                randconfig-003-20240417   gcc  
+x86_64                randconfig-004-20240417   clang
+x86_64                randconfig-005-20240417   clang
+x86_64                randconfig-006-20240417   gcc  
+x86_64                randconfig-011-20240417   clang
+x86_64                randconfig-012-20240417   clang
+x86_64                randconfig-013-20240417   clang
+x86_64                randconfig-014-20240417   gcc  
+x86_64                randconfig-015-20240417   clang
+x86_64                randconfig-016-20240417   clang
+x86_64                randconfig-071-20240417   gcc  
+x86_64                randconfig-072-20240417   clang
+x86_64                randconfig-073-20240417   gcc  
+x86_64                randconfig-074-20240417   clang
+x86_64                randconfig-075-20240417   clang
+x86_64                randconfig-076-20240417   clang
+x86_64                          rhel-8.3-rust   clang
+xtensa                            allnoconfig   gcc  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
