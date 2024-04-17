@@ -1,54 +1,55 @@
 Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE64C3D72
-	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Apr 2024 12:52:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3424F13D2BD
+	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Apr 2024 12:53:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713358378; cv=none; b=N0XDw37iSjNGBk020WLUr7dXxwx1fa/A20ZS0XDdztFiq4PUHQB61cB+cVoIcKrgCym5+dbYS63pAacvj9oRF+fFBl6f4BLmNAbDThKuGzR3/coqAl9nY+yMX2oGjjmxx62Sf/2xLC8L7aJf+ep4pRT/BejcPd6JkSV3o6pULVE=
+	t=1713358385; cv=none; b=K6hIQZtSkZTiK0i61ZFOdD1LUMQQr4CgJcR6VDJfC/6EfgpGp/psLXx28ggvDcy+wweZlUl0Pc2b3Am2yRop5bgajS+z/b4iSSxJOVAvl1b2j0CCWmHsVn8EDm3G3pA06hwz3DeUyyxshPPWFcE2NUFPsz/h7SGL0KDZbOQataQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713358378; c=relaxed/simple;
-	bh=w8YQS5mT+rKI0opeUDO5W4CYsfM4yrMUGgduJNi2uQ8=;
+	s=arc-20240116; t=1713358385; c=relaxed/simple;
+	bh=2/0X7FRfyjGBCSToTSuA//BVfSa1LcfsCK7DeLXmxdE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HwkMy2ndhLQAdtZO3+zVRpYorNpdr0jXQK2G8R8rAR2/0yIymKmfv6kkZvkT9+ieBO1YEH1P4BRA/RdZDC2WfSLP2qLFvutHC9olgnNPxqGc3M08nIeOhtEkqseh2ewGjB00xSH/bpoFeb6kED6RJt6B9aBVkrwjtnwm9Bh+H7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=WIONhiac; arc=none smtp.client-ip=205.220.180.131
+	 MIME-Version:Content-Type; b=PPwpZf1d5K7xNUyidYoMttJ6Zpii08MfLa2noIo7tOtIdtkzsS/86pp6o9a4J7GkA6VDu1TJVPlRhSeM+VniERNKkdLpo+HP38T6uwAFBiDGUT+kMTEQpNRNTq6xSiq466uPE+I2BH4wlu8qAwBds6tKTD9HBeXO2FshKI5Ssnw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=duDCsISu; arc=none smtp.client-ip=205.220.180.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="WIONhiac"
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 43H77qJZ008077;
-	Wed, 17 Apr 2024 12:52:52 GMT
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="duDCsISu"
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 43H6tKAS018492;
+	Wed, 17 Apr 2024 12:53:00 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
 	from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-type; s=qcppdkim1; bh=ETUSX80kD8gMNDXPqGy/
-	hIQkxGtSwRGjMSzgY8dlk3E=; b=WIONhiac+DOW8ab8xaAQ8Jvz9EpBKsJ/egWT
-	wVwn2pnPVU6N42CVjmj+ItpO3RZrFh/CPFrPnsOCLcBz8TJQmLtGkSCg7HS/iwEw
-	YtXMkdTpluqAsMtTCsDiZytk18hAxTCObLx6zUvSPNSYoRDGYXH8WJzfB7RH+6+F
-	+sBmMatqrV5C0Rhf6nvaMIppg6oJSHtRn40V7NxI5dh733smOw0pLKsoVhLcIijP
-	CAjd0HMlAq/YQZccqdrcom114sh95bD5POFbWlPFwS8r7Ok1uog3hzGg+qmPn7yY
-	Ur3CszbajSsWse5roI9BPHLBqUjuqLfrYkqAXtxsHP5sJ2X4EA==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xj9rm8rfs-1
+	:mime-version:content-type; s=qcppdkim1; bh=vNjJi2eQTlb9I4zDZ4Gx
+	mioq7hosmZFnhGoavP4qz+Q=; b=duDCsISuacv9fD+K51HI8uzlpTDqgphr7nqc
+	Q9u1EkHBchuE8U5GYEtwOeKjzVG9G9X/zk587xoaxs/Wly3aCP9b1Jpzlb99lVAG
+	BLP/DNSudHPGXbvNLiLlf9al8odo/UsrdGP5CNkQA8QgAN44Wx6Y2XiTDPvzPWET
+	aRGfQ9K1S/NaXhJ9jZ9GtMq8QAuPo5XWU1rfoQ6qKQrLL/jSTLUCmX3bStXiWc+N
+	naJRehhVTIKq9nzIH1bdNDL1D1sF6vptnJPu2N0hOjR5qUeUYXO3/yyJJhzGzN1r
+	SJJiC9UU9+65zI/uywiiJgg21aB9J0gnwm0YCRkuhAFTvByZBg==
+Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xj8auryd8-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 17 Apr 2024 12:52:52 +0000 (GMT)
+	Wed, 17 Apr 2024 12:53:00 +0000 (GMT)
 Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43HCqpPv021046
+	by NASANPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43HCqxpe012346
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 17 Apr 2024 12:52:51 GMT
+	Wed, 17 Apr 2024 12:52:59 GMT
 Received: from zijuhu-gv.qualcomm.com (10.80.80.8) by
  nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Wed, 17 Apr 2024 05:52:50 -0700
+ 15.2.1544.9; Wed, 17 Apr 2024 05:52:57 -0700
 From: Zijun Hu <quic_zijuhu@quicinc.com>
 To: <luiz.dentz@gmail.com>, <luiz.von.dentz@intel.com>, <marcel@holtmann.org>
-CC: <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH v2 0/4] Fix 2 tool btattach issues for QCA controllers
-Date: Wed, 17 Apr 2024 20:52:12 +0800
-Message-ID: <1713358336-29619-1-git-send-email-quic_zijuhu@quicinc.com>
+CC: <linux-bluetooth@vger.kernel.org>, Zijun Hu <quic_zijuhu@quicinc.com>
+Subject: [PATCH v2 1/4] Bluetooth: qca: Fix crash caused by tool btattach for QCA_ROME
+Date: Wed, 17 Apr 2024 20:52:13 +0800
+Message-ID: <1713358336-29619-2-git-send-email-quic_zijuhu@quicinc.com>
 X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1710914907-30012-1-git-send-email-quic_zijuhu@quicinc.com>
+In-Reply-To: <1713358336-29619-1-git-send-email-quic_zijuhu@quicinc.com>
 References: <1710914907-30012-1-git-send-email-quic_zijuhu@quicinc.com>
+ <1713358336-29619-1-git-send-email-quic_zijuhu@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -60,67 +61,74 @@ X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
  nasanex01a.na.qualcomm.com (10.52.223.231)
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: GTZwgDprpIikNAL4bJkRcfkpjYhnVtG6
-X-Proofpoint-GUID: GTZwgDprpIikNAL4bJkRcfkpjYhnVtG6
+X-Proofpoint-ORIG-GUID: 4bEKLhcT1mJYBEeLipAcX1kQtkPEJoA7
+X-Proofpoint-GUID: 4bEKLhcT1mJYBEeLipAcX1kQtkPEJoA7
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2024-04-17_10,2024-04-16_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
- malwarescore=0 bulkscore=0 mlxscore=0 adultscore=0 suspectscore=0
- mlxlogscore=793 priorityscore=1501 clxscore=1015 spamscore=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
+ bulkscore=0 priorityscore=1501 mlxlogscore=999 clxscore=1015 mlxscore=0
+ suspectscore=0 adultscore=0 impostorscore=0 malwarescore=0
  lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.19.0-2404010003 definitions=main-2404170087
 
-BT chip vendor and customer often needs to use tool btattach to perform
-various development,verification and evaluation test for vendor's BT
-module, but tool btattach is not working fine for any QCA BT controller
-currently, this patch series are to solve this issue.
+A kernel crash will happen when use tool btattach for a BT controller
+with soc type QCA_ROME, and it is caused by dereferencing nullptr
+hu->serdev, fixed by null check before access.
 
-There are many QCA soc types defined by drivers/bluetooth/btqca.h
-enum qca_btsoc_type {
-        QCA_INVALID = -1,
-        QCA_AR3002,
-        QCA_ROME,
-        QCA_WCN3988,
-        QCA_WCN3990,
-        QCA_WCN3998,
-        QCA_WCN3991,
-        QCA_QCA2066,
-        QCA_QCA6390,
-        QCA_WCN6750,
-        QCA_WCN6855,
-        QCA_WCN7850,
-        QCA_MAX,
-};
-and every soc type stands for a kind of QCA BT controller, this patch
-series are to solve below 2 tool btattach issues for QCA soc types:
-1) tool btattach will cause kernel crash when used for QCA_ROME
-2) tool btattach does not support any other soc type except QCA_ROME
+sudo btattach -B /dev/ttyUSB0 -P qca
+Bluetooth: hci1: QCA setup on UART is completed
+BUG: kernel NULL pointer dereference, address: 00000000000002f0
+......
+Workqueue: hci1 hci_power_on [bluetooth]
+RIP: 0010:qca_setup+0x7c1/0xe30 [hci_uart]
+......
+Call Trace:
+ <TASK>
+ ? show_regs+0x72/0x90
+ ? __die+0x25/0x80
+ ? page_fault_oops+0x154/0x4c0
+ ? srso_alias_return_thunk+0x5/0xfbef5
+ ? kmem_cache_alloc+0x16b/0x310
+ ? do_user_addr_fault+0x330/0x6e0
+ ? srso_alias_return_thunk+0x5/0xfbef5
+ ? exc_page_fault+0x84/0x1b0
+ ? asm_exc_page_fault+0x27/0x30
+ ? qca_setup+0x7c1/0xe30 [hci_uart]
+ hci_uart_setup+0x5c/0x1a0 [hci_uart]
+ hci_dev_open_sync+0xee/0xca0 [bluetooth]
+ hci_dev_do_open+0x2a/0x70 [bluetooth]
+ hci_power_on+0x46/0x210 [bluetooth]
+ process_one_work+0x17b/0x360
+ worker_thread+0x307/0x430
+ ? __pfx_worker_thread+0x10/0x10
+ kthread+0xf7/0x130
+ ? __pfx_kthread+0x10/0x10
+ ret_from_fork+0x46/0x70
+ ? __pfx_kthread+0x10/0x10
+ ret_from_fork_asm+0x1b/0x30
+ </TASK>
 
-For hci_uart derived from tool btattach, it is allocated by hci_ldisc
-and is Non-serdev device, its @serdev is NULL and its soc type is
-currenlty hard coded as QCA_ROME.
+Fixes: 03b0093f7b31 ("Bluetooth: hci_qca: get wakeup status from serdev device handle")
+Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+Tested-by: Zijun Hu <quic_zijuhu@quicinc.com>
+---
+ drivers/bluetooth/hci_qca.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The 1st issue is caused by dereferencing nullptr hu->serdev, in order to
-solve the 2nd issue, a new ioctl is introduced for user to specify soc
-type by a new added tool btattach option.
-
-Changes v1 -> v2
- - Add patch 2/4
- - Correct cover letter 
- 
-Zijun Hu (4):
-  Bluetooth: qca: Fix crash caused by tool btattach for QCA_ROME
-  Bluetooth: qca: Fix nullptr dereference for non-serdev devices
-  Bluetooth: hci_ldisc: Add a ioctl HCIUARTSETPROTODATA
-  Bluetooth: qca: Fix wrong soc type returned for tool btattach
-
- drivers/bluetooth/btqca.h     |  1 +
- drivers/bluetooth/hci_ldisc.c | 10 ++++++++++
- drivers/bluetooth/hci_qca.c   | 19 +++++++++++++------
- drivers/bluetooth/hci_uart.h  |  3 +++
- 4 files changed, 27 insertions(+), 6 deletions(-)
-
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 92fa20f5ac7d..fdaf83d817af 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1955,7 +1955,7 @@ static int qca_setup(struct hci_uart *hu)
+ 		qca_debugfs_init(hdev);
+ 		hu->hdev->hw_error = qca_hw_error;
+ 		hu->hdev->cmd_timeout = qca_cmd_timeout;
+-		if (device_can_wakeup(hu->serdev->ctrl->dev.parent))
++		if (hu->serdev && device_can_wakeup(hu->serdev->ctrl->dev.parent))
+ 			hu->hdev->wakeup = qca_wakeup;
+ 	} else if (ret == -ENOENT) {
+ 		/* No patch/nvm-config found, run with original fw/config */
 -- 
 2.7.4
 
