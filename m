@@ -1,197 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 923048563C;
-	Wed, 17 Apr 2024 23:04:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 838DBFC1F;
+	Wed, 17 Apr 2024 23:27:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713395056; cv=none; b=CIEk5DIi5cNIISgQOhlWR9zQbL33RPV79Q1VvYzNvc+Dw4azw2ETqAc8977YBQzEkHqxhXtin2JIS7fmQWkJbBhNs15kZNpohkIr9QpDKJ/5cm/3ggDPxEDx24Ovu3ou7UbNOMF+2dhFRG26GDp8ld9cRg+/SO3FSuL48FBEhP4=
+	t=1713396468; cv=none; b=INi+AzzD/bhtP0k/hogZMPFKQKjNIDIbJpZkljMGoWrXeHOTONiSpRv9ZasRZ6q1AhcOffJzpr/zyyjY7Tp6K01ktnlmUJkQbnp/vTdP0MLUJ5b6Qc0s/dhE48H8ny3Nl+FbCqCHgDIq9U9zUInij1ZzjqPu5L7VsMraj5BwGvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713395056; c=relaxed/simple;
-	bh=DleZPmzIjopdcwuK5ScXde4KztmrAG+BSDTdahj4F34=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fWReTn63Aby50qvM/MrrZG/30m9jSOlGJcZyCymy/YGJVPw2Gg9+flcTZyp4E39LNl6D6JnWaJY2ZNVSb842PLmb9bCLl9IFaEAz/SvQnXfeeZE/WwRKw+md1dfJGJdu7Tr9+wMQyIbncGyrSXIxN4X1dlUJlLU2ltNMLDFumVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KUvqalSF; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KUvqalSF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30C76C32786;
-	Wed, 17 Apr 2024 23:04:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713395056;
-	bh=DleZPmzIjopdcwuK5ScXde4KztmrAG+BSDTdahj4F34=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=KUvqalSFcV7qWl7RPj4p2dAkP/ZOE6htLrjxrb2m0xtesPjAe9AGjsdAf/e8gdlh9
-	 2n+mYf8ezjDn8uv/EPeEQBJv07PBMJdceCeuoRZSpYO9oRHNdk9YD+jF5WMgdKkaVK
-	 M1ckHynpWJhOrhmQ2gZL22DrtoGLRrt3e5sDPXG/8trJnobsdOl8ybkWTfdeiC6iMI
-	 U0u1isSfwpqkWSpy/4+KGRsQv2SA4nYmIKChisqswmIqB00MPbzA/8Jl/vlXmOw8qp
-	 qa6z+ljwKUoQf7Y0efhRhv0mP1YBFpxmW/8BmeiIIPhafgKyF9NiiyJV1pdoq4Cw4/
-	 l1KZ78OyuGztA==
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-516d8764656so47041e87.1;
-        Wed, 17 Apr 2024 16:04:16 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWYYLY8L62q81DIGuL+i/gKUl07G61vBS1DvGn/O2faXG5pLdYeQJdiJfjg4gnQXKcPw0LuAKhNXrPZ8Vby/RABHc0cvZuKtZn2EnnbMszvE8eePvIDIfTkPfm9DcbhqOgDPwxg7c8R3Vnuh6ST1Fl/1/a5GOpDxU22fG8yDlAiQO0ZN8gXksM9345o7Bmku9nsXT2KO2nohKlmcs98/T0xjQ==
-X-Gm-Message-State: AOJu0Ywar3TTneXVE8e4BaLrPVBXv3cuRwgR+i4CnsJhunMPABFLdjYE
-	P7jndSvl6aNvwv1bRAHKGN3QX2NVsolg8MZax5idm7W8vb15w2NtsU/ELcCJJEGCnVU5Zej4vsK
-	n/593K9i13mMnvm7r6sPo0nwOUHM=
-X-Google-Smtp-Source: AGHT+IFynaJ23hI7LhBWah3AipQ/kHcj/2JC6nvWkyzyNtZt6uqnI9CxfUUV/FX4nKwOeNmYWCU+4a78uhTwgWEFRTk=
-X-Received: by 2002:ac2:51bc:0:b0:519:592d:adcd with SMTP id
- f28-20020ac251bc000000b00519592dadcdmr335876lfk.3.1713395054395; Wed, 17 Apr
- 2024 16:04:14 -0700 (PDT)
+	s=arc-20240116; t=1713396468; c=relaxed/simple;
+	bh=5UVlu9occiDwBRGiitQP3mupRzJhLkxhOOPiHCK9Abs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lqTLiT/cZgaj0trfuu9+nZpmEOnJU70yFlkSpGY11U0pIJ6Q1kBRtxg+jGlOXnHfkC8qj8GQ+wx9/+aStwufvih0bSuDh4n5tCv8hmsz21uTLclQVxI3f+CWdHOvuiJJapq0GsjPiQkQGvT3xdtr2Tf6zn5i2sl+1pIEXq9FmbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.166.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-36b00f8fbedso4905ab.0;
+        Wed, 17 Apr 2024 16:27:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713396466; x=1714001266;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kQzDJkz2ShC6jD7BVo0uLIszI5IpreqEnXzr4s/NGaQ=;
+        b=JZFYc7OGg6MCpG5BM42PoeS2Sdn2mALRkY2qpSMghpl3Rdkp4229dg6+W2Tzis/JtP
+         vynQ2qTAWs2FZy4WI2L7h0XiZ/I/bLozH2D2UNteiumORJjeX+qgSCy6ceXNCDTGUBiv
+         h1Wjd1XMLytjhD5MXOg7JmEh61RW3onoC3OJ7Ok97olYGwyKYEYnHwkjGdQsUMRW+gBJ
+         UsD8KM3pOlrhEuqP8V9QFfxQ6Ntp4Ivcpa5UElo5HHtfawEFo7ojuMC4fcJ5/j1xlgxC
+         +uhBzQ5gtSUMdhtIKcF8k7twp+hBrth/IUEsqQfvmJXDjUywzh/4UXNIvKxa6nfOxWJx
+         1ZYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVQUl/B8tO9TrYh3TXcW7spWcBse95G2XMDZfg5YnyWiNz3SszJsuFGa37Hm3SD7N2kBx16cxl4nsyRNJUaiMvVlyBARhiKiFwFR1I1JEX+psJJBVNMXJPJR/+tLnUukDsby5ZzL9HsNgEtj+Kl
+X-Gm-Message-State: AOJu0YyGBc0lqMBu2AhDLpP92DdWmdsCP1SfOcp6frndoEWqdIVOF6cO
+	dj0gFQXL3MwOCXNqKn/St3cTn4f3RFHvJed9b8tpM8TbYlglNGu9M16BuA==
+X-Google-Smtp-Source: AGHT+IHL12Ajqijo9myETQvpt8lM0eXfIcwvisdIpqkdziFih0gh9xV5GzluCrEZV4FK+iWxNsCX/A==
+X-Received: by 2002:a92:c561:0:b0:36b:2ff9:9275 with SMTP id b1-20020a92c561000000b0036b2ff99275mr1319293ilj.2.1713396466596;
+        Wed, 17 Apr 2024 16:27:46 -0700 (PDT)
+Received: from sean-ThinkPad-T450s.hsd1.ca.comcast.net ([2601:646:8002:f344:5981:35f1:46e:37bc])
+        by smtp.gmail.com with ESMTPSA id r8-20020a63fc48000000b005dbd0facb4dsm149695pgk.61.2024.04.17.16.27.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Apr 2024 16:27:45 -0700 (PDT)
+From: sean.wang@kernel.org
+To: luiz.dentz@gmail.com,
+	marcel@holtmann.org,
+	johan.hedberg@gmail.com
+Cc: sean.wang@mediatek.com,
+	chris.lu@mediatek.com,
+	Deren.Wu@mediatek.com,
+	jsiuda@google.com,
+	frankgor@google.com,
+	abhishekpandit@google.com,
+	michaelfsun@google.com,
+	mmandlik@google.com,
+	abhishekpandit@chromium.org,
+	mcchou@chromium.org,
+	shawnku@google.com,
+	linux-bluetooth@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH RESEND] Bluetooth: btusb: medaitek: fix double free of skb in coredump
+Date: Wed, 17 Apr 2024 16:27:38 -0700
+Message-Id: <da0859c4b24d314d9ff38179c26a58ee7e3f16d6.1713395895.git.sean.wang@kernel.org>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240412073046.1192744-1-wenst@chromium.org> <20240412073046.1192744-2-wenst@chromium.org>
-In-Reply-To: <20240412073046.1192744-2-wenst@chromium.org>
-From: Sean Wang <sean.wang@kernel.org>
-Date: Wed, 17 Apr 2024 16:04:02 -0700
-X-Gmail-Original-Message-ID: <CAGp9Lzp=MKNYc70ZeGCAEgWfFVPOAOZQQ86BXukk+EQQM_C+OA@mail.gmail.com>
-Message-ID: <CAGp9Lzp=MKNYc70ZeGCAEgWfFVPOAOZQQ86BXukk+EQQM_C+OA@mail.gmail.com>
-Subject: Re: [PATCH v3 1/2] dt-bindings: net: bluetooth: Add MediaTek MT7921S
- SDIO Bluetooth
-To: Chen-Yu Tsai <wenst@chromium.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Sean Wang <sean.wang@mediatek.com>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-mediatek@lists.infradead.org, 
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Chen-Yu,
+From: Sean Wang <sean.wang@mediatek.com>
 
-On Fri, Apr 12, 2024 at 12:31=E2=80=AFAM Chen-Yu Tsai <wenst@chromium.org> =
-wrote:
->
-> The MediaTek MT7921S is a WiFi/Bluetooth combo chip that works over
-> SDIO. WiFi and Bluetooth are separate SDIO functions within the chip.
-> While the Bluetooth SDIO function is fully discoverable, the chip has
-> a pin that can reset just the Bluetooth core, as opposed to the full
-> chip. This should be described in the device tree.
->
-> Add a device tree binding for the Bluetooth SDIO function of the MT7921S
-> specifically to document the reset line. This binding is based on the MMC
-> controller binding, which specifies one device node per SDIO function.
->
-> Cc: Sean Wang <sean.wang@mediatek.com>
-> Signed-off-by: Chen-Yu Tsai <wenst@chromium.org>
-> ---
-> Changes since v2:
-> - Expand description and commit message to clearly state that WiFi and
->   Bluetooth are separate SDIO functions, and that each function should
->   be a separate device node, as specified by the MMC binding.
-> - Change 'additionalProperties' to 'unevaluatedProperties'
-> - Add missing separating new line
-> - s/ot/to/
->
-> Angelo's reviewed-by was not picked up due to the above changes.
->
-> Changes since v1:
-> - Reworded descriptions
-> - Moved binding maintainer section before description
-> - Added missing reference to bluetooth-controller.yaml
-> - Added missing GPIO header to example
-> ---
->  .../bluetooth/mediatek,mt7921s-bluetooth.yaml | 55 +++++++++++++++++++
->  MAINTAINERS                                   |  1 +
->  2 files changed, 56 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/bluetooth/media=
-tek,mt7921s-bluetooth.yaml
->
-> diff --git a/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7=
-921s-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/media=
-tek,mt7921s-bluetooth.yaml
-> new file mode 100644
-> index 000000000000..67ff7caad599
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bl=
-uetooth.yaml
-> @@ -0,0 +1,55 @@
-> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/bluetooth/mediatek,mt7921s-blueto=
-oth.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: MediaTek MT7921S Bluetooth
-> +
-> +maintainers:
-> +  - Sean Wang <sean.wang@mediatek.com>
-> +
-> +description:
-> +  MT7921S is an SDIO-attached dual-radio WiFi+Bluetooth Combo chip; each
-> +  function is its own SDIO function on a shared SDIO interface. The chip
-> +  has two dedicated reset lines, one for each function core.
-> +  This binding only covers the Bluetooth SDIO function, with one device
-> +  node describing only this SDIO function.
-> +
-> +allOf:
-> +  - $ref: bluetooth-controller.yaml#
-> +
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - mediatek,mt7921s-bluetooth
-> +
-> +  reg:
-> +    const: 2
-> +
-> +  reset-gpios:
-> +    maxItems: 1
-> +    description:
-> +      An active-low reset line for the Bluetooth core; on typical M.2
-> +      key E modules this is the W_DISABLE2# pin.
-> +
+hci_devcd_append() would free the skb on error so the caller don't
+have to free it again otherwise it would cause the double free of skb.
 
-Thanks for adding the new setup for the MT7921S devices. They look good to =
-me.
-Sometimes, the MT7921S might be set up to wake up the host when it's
-asleep using a sideband signal.
-This might need an extra pin called "wakeup" to make it happen. Can
-you help add this pin to the settings in the same update, or should I
-do it later?
+Fixes: 0b7015132878 ("Bluetooth: btusb: mediatek: add MediaTek devcoredump support")
+Reported-by : Dan Carpenter <dan.carpenter@linaro.org>
+Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+---
+ drivers/bluetooth/btmtk.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-> +required:
-> +  - compatible
-> +  - reg
-> +
-> +unevaluatedProperties: false
-> +
-> +examples:
-> +  - |
-> +    #include <dt-bindings/gpio/gpio.h>
-> +
-> +    mmc {
-> +        #address-cells =3D <1>;
-> +        #size-cells =3D <0>;
-> +
-> +        bluetooth@2 {
-> +            compatible =3D "mediatek,mt7921s-bluetooth";
-> +            reg =3D <2>;
-> +            reset-gpios =3D <&pio 8 GPIO_ACTIVE_LOW>;
-> +        };
-> +    };
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 88981d9f3958..218bc2a21207 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -13818,6 +13818,7 @@ M:      Sean Wang <sean.wang@mediatek.com>
->  L:     linux-bluetooth@vger.kernel.org
->  L:     linux-mediatek@lists.infradead.org (moderated for non-subscribers=
-)
->  S:     Maintained
-> +F:     Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-=
-bluetooth.yaml
->  F:     Documentation/devicetree/bindings/net/mediatek-bluetooth.txt
->  F:     drivers/bluetooth/btmtkuart.c
->
-> --
-> 2.44.0.683.g7961c838ac-goog
->
->
+diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+index ac8ebccd3507..812fd2a8f853 100644
+--- a/drivers/bluetooth/btmtk.c
++++ b/drivers/bluetooth/btmtk.c
+@@ -380,8 +380,10 @@ int btmtk_process_coredump(struct hci_dev *hdev, struct sk_buff *skb)
+ 	switch (data->cd_info.state) {
+ 	case HCI_DEVCOREDUMP_IDLE:
+ 		err = hci_devcd_init(hdev, MTK_COREDUMP_SIZE);
+-		if (err < 0)
++		if (err < 0) {
++			kfree_skb(skb);
+ 			break;
++		}
+ 		data->cd_info.cnt = 0;
+ 
+ 		/* It is supposed coredump can be done within 5 seconds */
+@@ -407,9 +409,6 @@ int btmtk_process_coredump(struct hci_dev *hdev, struct sk_buff *skb)
+ 		break;
+ 	}
+ 
+-	if (err < 0)
+-		kfree_skb(skb);
+-
+ 	return err;
+ }
+ EXPORT_SYMBOL_GPL(btmtk_process_coredump);
+-- 
+2.25.1
+
