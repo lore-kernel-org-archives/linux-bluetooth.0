@@ -1,91 +1,110 @@
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07F4F13A41B
-	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Apr 2024 23:12:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0D69812
+	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Apr 2024 01:02:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713309163; cv=none; b=X79TaIawCS1BCtTl56KEsoXmreWyYQg9XVB4v2VkUP04dgP/ILbyhIta6oSlR7rIEdw0/PVJAAakeLcwT+Ksld7sJii7wiXHQNMdJdBt2P9iMQEwg8hJyqw5Ep0iXi2AqbYLUYO1UnBVraLDmf8hgif95obnPB8SIMApjOfFPeI=
+	t=1713315733; cv=none; b=SAC1ij30wCVwaO6/V1LUzF4BXVEPjRHh1fPp+nY4DlV3zIPNNcGpa6V1T13CmqoLSYyd/ohe+nO4hdr9pj8P+0ay3cwz334jp2+fE9R0DmOCBQmM3ABrRCUOEDbSJj/Ey49AdKXstg0rpRvPLsAtwO39BkX6NCLdti0a2j01rCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713309163; c=relaxed/simple;
-	bh=1TKspkYf+9F6y2j8Kg1/KNzdB7ymYeiCHLLoObFx4Bk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BeokL8dzKdiV/jtltVXF9g11tJ02Ixz6AOJKKzsdbswHJ4HgpgwiMpIhSTkiJaRT1hpHtlnMvnpY5X8ZG2mOCSQhJ1TTugOW3n8dj1zche9e1jpwArHEBq/xYzJh6Bzr56PrNV22r3Z/ETR3qNKVOK6c/N4KL2TTfTm9uYnt9DM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=prestonhunt.com; spf=pass smtp.mailfrom=prestonhunt.com; dkim=pass (2048-bit key) header.d=prestonhunt-com.20230601.gappssmtp.com header.i=@prestonhunt-com.20230601.gappssmtp.com header.b=nOIiwwqd; arc=none smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=prestonhunt.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prestonhunt.com
+	s=arc-20240116; t=1713315733; c=relaxed/simple;
+	bh=hsrJp75rqMwfxfSNB9+ZaeFe5u8m7CzACplgY0AYMes=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=onkdHeJRPR8lEKXQKYgMtkwtpwEjXKwjos4G5GpGh1I7q+tbqQo+jXkK57caJQsJo8OJZbr5ghGK5r8wQ/qJWEO0x/m4Dk6xi2XTW6D0J3AANpMyNMle2nCyBDRW8Z9WpVVLGY3l3WaY8cjiuENLYz4xD4UP3qF0FOfdIt6GHTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NZ4gqw+l; arc=none smtp.client-ip=209.85.161.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=prestonhunt-com.20230601.gappssmtp.com header.i=@prestonhunt-com.20230601.gappssmtp.com header.b="nOIiwwqd"
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2a2d0ca3c92so191613a91.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Apr 2024 16:12:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NZ4gqw+l"
+Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-5aa2551d33dso3215762eaf.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Apr 2024 18:02:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=prestonhunt-com.20230601.gappssmtp.com; s=20230601; t=1713309161; x=1713913961; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ol4WJWFSVmNN5OVYbKYuEN7Zk/kbba76aARUjvkVMxc=;
-        b=nOIiwwqdEOJZedarZtfFQm7LToHjfXGzeFDuEnuGJYU2I0UK/JRg7joy6FhFjsWW8w
-         RjQ4Kip9Fvz6/0moYo++/IQZV/PA1r6ViMaUnBw1JHJWPtLaGRPsAbr3O8y/ydVxsilc
-         MQDr4UQeQrFeNGqepG7lZPnCV0W75OM4ZKlpYrxOXHTPFcGZfqP9noh18z9hre/9y0om
-         x867taXGGDhTfUrz6bpuf7So6di3i/4Fy7yrfFn+Byb1RPQDfYBbPzWHEmNkHZTKMWAr
-         xfxcl8TnSBzEk1Csxbv1wyicrRdHzWGVAwpU17da24zGRIwfJvlTTvOWzKVQdpjZykj9
-         JScw==
+        d=gmail.com; s=20230601; t=1713315731; x=1713920531; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=P/Gqz5bfH0pH5zXq104dS21tjF3iv2kMG85BQkZcLDo=;
+        b=NZ4gqw+lY0YoPt/vD1jW0ugw8rtj5Ffm0j2on2tJfYdyYMHmenCWsbo7d65wgdLaQX
+         lBE+1Mxm9PH8puk7Tj16bPPDMTlpuePgNrWomphN2pEFEkOv7VyU/p4rwjA2Wa48ELJB
+         7O5Dt9F8TIldhtHufWvcCgreJvrtSppvfVuo0XboHr0dJZ2sd+5b3z2QstjK5Wb49WMj
+         VOuZQhqeSAheE9G6Mko+exrvH0liaq1hcfAKmb4U3/50i1tdjNBefxYFrDEjoVN4zMaZ
+         +28LD6sr5Q/dhvxT5vg9EIkIUkAd/ptIss0/lpVvmq50kz46pwb25Cv8Zo5lSXxUyF9G
+         eTqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713309161; x=1713913961;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ol4WJWFSVmNN5OVYbKYuEN7Zk/kbba76aARUjvkVMxc=;
-        b=gyddgXeRBYEJEPmJRWWreRVla5got/sT2TfAkS8zXZUfGGFjuE6LXBei77zi6kXJ/2
-         m4Qago8JWKYlMjj1iRfl38xZEXHf8IXr7+m+KaXi3ntt8B9GBTyeeypj/qCOHx1DbJa0
-         NHKihv9n/9lEWgL21dQ8dZFtmesEWHfDLig8R/tswlVNh1fBnjQBtE9LUkEagtywI06A
-         B/FAiBOJ45H4hZlMaHG+k5qQ/z7qioqjsToSvYvNUmVIbAb1LwFabGpAWz5duyqICWlb
-         WyvLv/Fb6L94Lh7fBSWmytTnTDsx21ToQ38V4CzbenAHIevhaVb7pJKjX1qufjU6pj7o
-         TLtw==
-X-Gm-Message-State: AOJu0YwdM0VEF1akGFI3aF4FaFVTGuAOrPfMnwHc7houVX0JAMz4TfxX
-	BS20dXv6sBzp7uGMu7UzxNFIRepU21FLvfCdt62jVONYig2wwL8xWVxxSQEGGXtMydYdKfFUn0J
-	I
-X-Google-Smtp-Source: AGHT+IEWgPvXeUW3iUA32HCaEfPQoeh+GfLVYviyeCN/8SNddj25Gmv31WDFuKNfe8d5Sb6s5qcVkw==
-X-Received: by 2002:a17:90b:1054:b0:2a5:506f:161c with SMTP id gq20-20020a17090b105400b002a5506f161cmr4960868pjb.4.1713309160700;
-        Tue, 16 Apr 2024 16:12:40 -0700 (PDT)
-Received: from localhost.localdomain (97-115-102-176.ptld.qwest.net. [97.115.102.176])
-        by smtp.gmail.com with ESMTPSA id b9-20020a17090a010900b002a67079c3absm160081pjb.42.2024.04.16.16.12.40
+        d=1e100.net; s=20230601; t=1713315731; x=1713920531;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=P/Gqz5bfH0pH5zXq104dS21tjF3iv2kMG85BQkZcLDo=;
+        b=dAKHNHBOUOtyMkiuOGno67krwco7TPJE403vMd499eci4AJhbIF/XQplwk5jNtBQgx
+         8Xcb92Xrn12t523dTKeCAg8dZevIuj58oWWy/c3/f2hP59JK38ffm+YJU8LGX0yTWDDS
+         /ktTfhcFfYq0sxUAJ309W2hQ6XtOomC1JBNTlk1U3HkXGQwQrfciNXs4abN1DE+R4ryL
+         nqyYGRV0/XecEYbcjVojxRwZGQd6cvHiCYzx1ztjZ7hyVSuk/Dy18Jb6WUFgtjf9VqQo
+         CttmgTMwfV4jCsiqjzuM+7xMxwm6Egw57SVeHsMYH/r8jBbpqwDwwGPj5l5Ls9/Dylze
+         aTHw==
+X-Gm-Message-State: AOJu0YyCMz++Uvi+mNCa9w7vsvBVhQ0XxbCsCyRfZjN3mBuE2U54ppBt
+	yXPJvOuljaSPQmPifUqqJMBWLwVLUzR4tbxEuREowBg9U4x2nrl+kdQj8g==
+X-Google-Smtp-Source: AGHT+IH7YpUL3SzXRIfDSTsRMxNxo6iB+tRX43oJSJHqMYbVwH14jo8AV09UUnXY2FMUIZsOt3XhJw==
+X-Received: by 2002:a05:6358:2884:b0:17c:308e:2154 with SMTP id n4-20020a056358288400b0017c308e2154mr10305412rwb.18.1713315731364;
+        Tue, 16 Apr 2024 18:02:11 -0700 (PDT)
+Received: from [172.17.0.2] ([172.183.50.146])
+        by smtp.gmail.com with ESMTPSA id j13-20020a05620a000d00b0078d54a6bb76sm7962049qki.117.2024.04.16.18.02.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Apr 2024 16:12:40 -0700 (PDT)
-From: Preston Hunt <me@prestonhunt.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Preston Hunt <me@prestonhunt.com>
-Subject: [PATCH BlueZ 1/1] monitor: fix spelling typo
-Date: Tue, 16 Apr 2024 16:12:05 -0700
-Message-ID: <20240416231205.2116175-2-me@prestonhunt.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20240416231205.2116175-1-me@prestonhunt.com>
-References: <20240416231205.2116175-1-me@prestonhunt.com>
+        Tue, 16 Apr 2024 18:02:11 -0700 (PDT)
+Message-ID: <661f1f93.050a0220.54454.6773@mx.google.com>
+Date: Tue, 16 Apr 2024 18:02:11 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3332362318863743856=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, me@prestonhunt.com
+Subject: RE: Fix spelling in monitor
+In-Reply-To: <20240416231205.2116175-2-me@prestonhunt.com>
+References: <20240416231205.2116175-2-me@prestonhunt.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============3332362318863743856==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=845239
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.39 seconds
+GitLint                       PASS      0.28 seconds
+BuildEll                      PASS      24.75 seconds
+BluezMake                     PASS      1709.71 seconds
+MakeCheck                     PASS      13.37 seconds
+MakeDistcheck                 PASS      176.67 seconds
+CheckValgrind                 PASS      246.91 seconds
+CheckSmatch                   WARNING   349.49 seconds
+bluezmakeextell               PASS      118.76 seconds
+IncrementalBuild              PASS      1478.40 seconds
+ScanBuild                     PASS      987.57 seconds
+
+Details
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+monitor/packet.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c:1867:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3606:52: warning: array of flexible structuresmonitor/bt.h:3594:40: warning: array of flexible structures
+
 
 ---
- monitor/packet.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index 48fff2ba6..5abf164eb 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -3779,7 +3779,7 @@ static void print_transport_data(const uint8_t *data, uint8_t len)
- 		print_field("      Provider Only");
- 		break;
- 	case 0x03:
--		print_field("      Both Seeker an Provider");
-+		print_field("      Both Seeker and Provider");
- 		break;
- 	}
- 
--- 
-2.42.0
 
+--===============3332362318863743856==--
