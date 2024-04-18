@@ -1,134 +1,146 @@
-Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76BF6181B90
-	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Apr 2024 19:47:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3E0D16C69F
+	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Apr 2024 20:34:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713469648; cv=none; b=gyckwycdobjUSzFg8KABDhEIwdY/ANVIPU0YvENI5OH8A0Orzax4Xv3pYFr+OXWb1M+QaAiDhL4umcG7sYOzkq9WgmC3hJzj/xz9nrMN1I/dVZffXZAkKUIr2sdI5amonHCgnwVPoSC8gi/vEFmneW4Fx0i20ZqWvLcXyCVk7dg=
+	t=1713472492; cv=none; b=O5UPiotg4XeSCOUyMMX2VgkoUHYUnErxmAXH7t6IQ3ayLaA98OXZm5+RoDjxQchNLkHHdz5CemQAIWt5BO/tPH+/9NXV+PT7sPrGftA8lB7NjJxy5c35xE+eymz7cj5xdUZCfihYUXSrPyx9fn01fI3oMOlJc/AJQeZjiXf35/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713469648; c=relaxed/simple;
-	bh=QS7/7E8PZ5Vd8XOhb5KdSEXRpRo3qg8eq5R1LuE97uM=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Agnr/6CMRMzEcwz5iIvY8hO5sbK7HxevKvYVpM6IYpALPPbfsTRx8yRQrgSCEbNi6m9Fg37dozEdCUP4LOwITix0gnfqwDmpUpidO/zNAyeWwbmh3EjsP7Y20pZGVnbYvNsCTUApvLLH+NuR0iCu4WrqR7UfKTVxjeGDg06wrjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fxcow7vP; arc=none smtp.client-ip=209.85.222.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1713472492; c=relaxed/simple;
+	bh=zoE4923V0PsclUGsE4gf9VUBFNqe0bWDhW7lN2YUWUM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=mxrqCRCnVD20J6gsFGs05wuFezPaSOCzhAiWIx0+hd/ITjC9QF/xaub9dLv8BfHAnTcYxB+CgnNcLy8JKaiAebGSZilicTmqIH4DrUfG1d16Sjo6S8o3//DEG7ARVAdqtEWhkZ3n7Yahg5+dUB1/Pie182X/rXo/Ix5PuW1v/mQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Lyyari9A; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fxcow7vP"
-Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-7eb9cb7b657so287000241.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Apr 2024 12:47:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713469646; x=1714074446; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZhCN9k/iYBz1KZ4MDFKNAVXFgSDdmQhmySicXxZ2jIQ=;
-        b=Fxcow7vPUS1NYi48kpQQa/ldcR5JFnNoHnlV+zgzW+abNaYPoB9poaytPiI1n+SAMt
-         bywKGfDMmsTsNliFg9vwMm6Hm5z1iMBJCs7I0P+h8z4ZBKgv9MSrEqVGYkt37KxAY2SX
-         MvyNo0mksUyVms5sF52YDw5/UAqfaGvaX4zgyGKzk+rB/rkCxVUro+quq2Qk3Mt/VgWv
-         Wa1JJwttAV38YV915/HsNrT9iiQPYwZTr4w1WUtZhbZmIlPdqkhmQFuy8Isl0SFf+R7l
-         QFJ6aynmr3s6jKuAsB3Bl35MapvFjFpBmiakxqY0C54xfeTSlK55RM5f8EqcliCOsTzl
-         slSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713469646; x=1714074446;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZhCN9k/iYBz1KZ4MDFKNAVXFgSDdmQhmySicXxZ2jIQ=;
-        b=IuzbVTFhNDLeGN5KfRSOVl4rZFcCrQpj6v5eh5NkI89Q/t4FE8QG7/ly+z2HKzmfWE
-         Po0JKJ549D/5OWerLNqlq5vDf20/Mzhz5u9vWXXo45McFANEO13s/nVgKYKXLJ9MdujE
-         d0joATN/vTMarkwy2VzAjJrgVeD4GoOz1/VP4sLehfpnBgi6rvxa8e00R3rRuR3cLKlS
-         oZZ0sV+J1UrbyL/PjO0Nb0hCL6NED0VCgFbXacfqk+6xTojdhxyFZn2HT3dfXPDzgf+/
-         14k4FLkGvf3lGeR1PIfOptjSPKHC9rYSBzFFZZoynim+ilt4Xss0ly7cRDEF1uRG//hc
-         VO/g==
-X-Gm-Message-State: AOJu0YxW9fO8ZsQjNo7WndwT9fDQ1LeTO0Sri+RtrvU7P8nytnfMN+XY
-	gbSnXIYU6aheuDpqKdpDrY2holHA2lsATTOAShnX8Wb1Aws1e5XDIZxjVA==
-X-Google-Smtp-Source: AGHT+IGXUDl2Jo4crKSU8cn/WFeZsThDkDpdDQYu2BlGNbCdTgNK061mXP/YfWLcdY1/MNbc7H0Bhg==
-X-Received: by 2002:a05:6102:2041:b0:47a:4138:dc1e with SMTP id q1-20020a056102204100b0047a4138dc1emr4220421vsr.20.1713469645605;
-        Thu, 18 Apr 2024 12:47:25 -0700 (PDT)
-Received: from lvondent-mobl4.. ([107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id ij22-20020a0561025e9600b00479f9f9da85sm306191vsb.18.2024.04.18.12.47.24
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Apr 2024 12:47:24 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1] gatt-database: Fix sending notification to all devices
-Date: Thu, 18 Apr 2024 15:47:23 -0400
-Message-ID: <20240418194723.1440686-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.44.0
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Lyyari9A"
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 43IK8tOu020366;
+	Thu, 18 Apr 2024 20:34:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=bSOOhzXeLO0DS/P6KPCknfdyn2ALQY8xM75gr/qNgok=; b=Ly
+	yari9AzXVZMReyUb/nuzvCixmYfKjJBPK3WBDvL0FObuOo7Pt3MUTSIrhMuMfgEc
+	bx48R1bmtJszPv+90DQcWO0QNFmOUPYqqiXYuIBAA2DHl3movpw6xIZi/Pg4H73H
+	nQYnjiInG77fw2ml30o8JQ02PZQ46iAz0jreDJxLvXRzmn886VgzpEGLuXMD+g0m
+	lX7ecEgQ3jpZhfq5yX6ppB0wNFGsrf7MeFzmmla72SKZM1HTIqmF+I9Qp7ACKu34
+	6F7KSdNiixw9TcYXa1GDlA0W+qA0IsW+VehRtLcBWa/+08ah/1yOgwAwGmU1zJ2v
+	VLrWCJVJ05pcKlDTy2sQ==
+Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xka6rr200-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 18 Apr 2024 20:34:43 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43IKYg2c008719
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 18 Apr 2024 20:34:42 GMT
+Received: from [10.253.9.141] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 18 Apr
+ 2024 13:34:39 -0700
+Message-ID: <8751981b-3063-4228-bbec-f36bd544e0fb@quicinc.com>
+Date: Fri, 19 Apr 2024 04:34:37 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 2/2] Bluetooth: qca: Fix BT enable failure for
+ QCA_QCA6390 after disable then warm reboot
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        <luiz.dentz@gmail.com>, <luiz.von.dentz@intel.com>,
+        <marcel@holtmann.org>
+CC: <linux-bluetooth@vger.kernel.org>, <wt@penguintechs.org>,
+        <bartosz.golaszewski@linaro.org>
+References: <1713449192-25926-1-git-send-email-quic_zijuhu@quicinc.com>
+ <1713449192-25926-3-git-send-email-quic_zijuhu@quicinc.com>
+ <7cd6f395-1f1b-4a73-840f-d70fff5da220@linaro.org>
+Content-Language: en-US
+From: quic_zijuhu <quic_zijuhu@quicinc.com>
+In-Reply-To: <7cd6f395-1f1b-4a73-840f-d70fff5da220@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: SibjTcPWesfSKvnyNriCwAyasLaq1NOO
+X-Proofpoint-GUID: SibjTcPWesfSKvnyNriCwAyasLaq1NOO
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-18_18,2024-04-17_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
+ impostorscore=0 mlxlogscore=999 mlxscore=0 lowpriorityscore=0 adultscore=0
+ priorityscore=1501 malwarescore=0 spamscore=0 phishscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2404010003
+ definitions=main-2404180149
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-If notifications where setup with GATT application that implements
-AcquireNotify the code will attempt to setup a dedicate fd/io for each
-device so when receiving a notification over the fd/io it is only meant
-to be send to the device only.
-
-Fixes: https://github.com/bluez/bluez/issues/820
----
- src/gatt-database.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
-
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index 6c11027a79ed..7ca2f94222c6 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -112,6 +112,7 @@ struct external_profile {
- 
- struct client_io {
- 	struct bt_att *att;
-+	struct external_chrc *chrc;
- 	unsigned int disconn_id;
- 	struct io *io;
- };
-@@ -2588,7 +2589,8 @@ static bool sock_hup(struct io *io, void *user_data)
- 
- static bool sock_io_read(struct io *io, void *user_data)
- {
--	struct external_chrc *chrc = user_data;
-+	struct client_io *client = user_data;
-+	struct external_chrc *chrc = client->chrc;
- 	uint8_t buf[512];
- 	int fd = io_get_fd(io);
- 	ssize_t bytes_read;
-@@ -2597,12 +2599,8 @@ static bool sock_io_read(struct io *io, void *user_data)
- 	if (bytes_read <= 0)
- 		return false;
- 
--	send_notification_to_devices(chrc->service->app->database,
--				gatt_db_attribute_get_handle(chrc->attrib),
--				buf, bytes_read,
--				gatt_db_attribute_get_handle(chrc->ccc),
--				conf_cb,
--				chrc->proxy);
-+	gatt_notify_cb(chrc->attrib, chrc->ccc, buf, bytes_read, client->att,
-+				client->chrc->service->app->database);
- 
- 	return true;
- }
-@@ -2652,6 +2650,7 @@ client_io_new(struct external_chrc *chrc, int fd, struct bt_att *att)
- 
- 	client = new0(struct client_io, 1);
- 	client->att = bt_att_ref(att);
-+	client->chrc = chrc;
- 	client->disconn_id = bt_att_register_disconnect(att, att_disconnect_cb,
- 							client, NULL);
- 	client->io = sock_io_new(fd, chrc);
-@@ -2809,7 +2808,7 @@ client_notify_io_get(struct external_chrc *chrc, int fd, struct bt_att *att)
- 
- 	client = client_io_new(chrc, fd, att);
- 
--	io_set_read_handler(client->io, sock_io_read, chrc, NULL);
-+	io_set_read_handler(client->io, sock_io_read, client, NULL);
- 
- 	if (!chrc->notify_ios)
- 		chrc->notify_ios = queue_new();
--- 
-2.44.0
+On 4/19/2024 12:48 AM, Krzysztof Kozlowski wrote:
+> On 18/04/2024 16:06, Zijun Hu wrote:
+>> From: Zijun Hu <zijuhu@qti.qualcomm.com>
+>>
+>> Commit 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on closed
+>> serdev") will cause regression issue for QCA_QCA6390 if BT reset pin is
+>> not configured by DT or ACPI, the regression issue is that BT can't be
+>> enabled after disable then warm reboot, fixed by correcting conditions
+>> for sending the VSC reset controller within qca_serdev_shutdown().
+> 
+> I have trouble understanding what is the bug. Can you rephrase it?
+> 
+Think about below sequences:
+cold reboot(power off then power on) -> Enable BT -> Disable BT -> Warm reboot -> Enable BT again ...
+BT is failed to be enabled after warm reboot.
+>>
+>> Fixes: 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on closed serdev")
+>> Reported-by: Wren Turkal <wt@penguintechs.org>
+>> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=218726
+>> Signed-off-by: Zijun Hu <zijuhu@qti.qualcomm.com>
+>> Tested-by: Wren Turkal <wt@penguintechs.org>
+>> ---
+>>  drivers/bluetooth/hci_qca.c | 12 +++++++++---
+>>  1 file changed, 9 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>> index 160175a23a49..2a47a60ecc25 100644
+>> --- a/drivers/bluetooth/hci_qca.c
+>> +++ b/drivers/bluetooth/hci_qca.c
+>> @@ -2437,15 +2437,21 @@ static void qca_serdev_shutdown(struct device *dev)
+>>  	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
+>>  	struct hci_uart *hu = &qcadev->serdev_hu;
+>>  	struct hci_dev *hdev = hu->hdev;
+>> -	struct qca_data *qca = hu->priv;
+>>  	const u8 ibs_wake_cmd[] = { 0xFD };
+>>  	const u8 edl_reset_soc_cmd[] = { 0x01, 0x00, 0xFC, 0x01, 0x05 };
+>>  
+>>  	if (qcadev->btsoc_type == QCA_QCA6390) {
+>> -		if (test_bit(QCA_BT_OFF, &qca->flags) ||
+>> -		    !test_bit(HCI_RUNNING, &hdev->flags))
+>> +		if (test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
+>> +			BT_INFO("QCA do not need to send EDL_RESET_REQ");
+>>  			return;
+>> +		}
+>> +
+>> +		if (hci_dev_test_flag(hdev, HCI_SETUP)) {
+> 
+> Commit msg does not help me at all to understand why you are changing
+> the test bits.
+it is test bits not changing bits.
+> 
+>> +			BT_INFO("QCA do not send EDL_RESET_REQ");
+>> +			return;
+>> +		}
+>>  
+>> +		BT_INFO("QCA start to send EDL_RESET_REQ");
+> 
+> Why debugging info is part of the fix?
+> 
+they are reserved intentionally to print critical info.
+> Best regards,
+> Krzysztof
+> 
 
