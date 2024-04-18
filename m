@@ -1,75 +1,90 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout.web.de (mout.web.de [212.227.15.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02C9615A4BD
-	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Apr 2024 09:11:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9469D15B98B;
+	Thu, 18 Apr 2024 09:41:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713431468; cv=none; b=NqYz9pQS7jeAiY4KZWpKbd5lu3f/PpzwBll49c4UcTopLWJfSPPr0U/lcGAG5qgs3yVLtP5yvNbJKE58UeQEsC+MFUXCitJlWxBSNEeTL2eKizbdFgqrZNdG8JkWBkxB+JVmHs+/rPTi/O660ghyyRaicQNbUDFZwR4nyJjrvbU=
+	t=1713433272; cv=none; b=a0/Mf1cVq13CuOP/W7zWQS/UyYkkMahew3laPpK3cc5G43ahKUGwBoryqZO6dA31XuIhocuCQ4/EL5r0ir4iY+lw0AudeYoSsuMILSLkPZUMst1/P2mGpfVcPPvTAEJCax96efkucDzZsD4nZtvNWXWhicIcjeSF4ksv8L8xuas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713431468; c=relaxed/simple;
-	bh=u0u7A5oXeR7bEkGJROSl0tf3byPyl1NUWNfKhfDvwFQ=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=I1RbZTa+hcPY0TjzyF99GRNHfJM/uM221C9cfwyDxtLuOWmCdyCRbtRa6bOXB+Z+ba12lHLvakYd5TPH4+48zbxPMm58r0Ls+/EZ1PHhekva9biAcKaAKuXk8biupDXP8TLGHQyG/cauxA7nox5qJhFcSKU8fxA2C/cWJ3D527Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EKv6s2XA; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713433272; c=relaxed/simple;
+	bh=AdahcIlgWLXAJKCG0JqEYzoHe+XLbYJ/FlvNan0T5gk=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=N32R0yevh8isoiaZZ06oylB1NJnnZBHmflr4RYugF4iBPbKdYhwrIhj+5OVyd7lwJiL7cmNaEnVX22g8gufykroM6ckHHK+k4RcP0Hz3MQGC54I4XwEoWHDh9VTXbRZIQdoXUhfUnJwH1z2qQTMbIPNcJprhsw2EGUf7aSyFIFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=JPtVj3UW; arc=none smtp.client-ip=212.227.15.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EKv6s2XA"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 75EA8C3277B
-	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Apr 2024 09:11:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713431467;
-	bh=u0u7A5oXeR7bEkGJROSl0tf3byPyl1NUWNfKhfDvwFQ=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=EKv6s2XA6OT/NGRwWjwNBe8/AGoqTskzsFF4sfMfnz5woDMaSBRdyTXK3rINwKH+2
-	 irNr9z8x3E0CyaGer78AKElKDtmZvmPu1XlwzNib3NQueHbnTdESrVymrKrasmrvzC
-	 oRNWMoX1lgJRLtrhxSGw3e6+hx9vU2xe76y2yw1IEjuo+wvBQd2nAVLjwqj2omBX58
-	 QtkjF1ZviKIRgGUxkGaa1OruUfQFPLRJOLmFJ+eNjVIo3SoquGYdEHP1qGfTEh5QPQ
-	 mREIWlo+bQMGIiTQ1oaPH2QYZkp9cZEfaxq6Oers+BGBiMc3AEheMqRJwpBIAQ6fwv
-	 JdaCPJt9EG9Gg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 5C22FC433E2; Thu, 18 Apr 2024 09:11:07 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 218726] qca6390 bluetooth fails after disabling/re-enabling
- bluetooth
-Date: Thu, 18 Apr 2024 09:11:07 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: wt@penguintechs.org
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-218726-62941-5R0ROQs1I5@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218726-62941@https.bugzilla.kernel.org/>
-References: <bug-218726-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="JPtVj3UW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1713433236; x=1714038036; i=markus.elfring@web.de;
+	bh=AdahcIlgWLXAJKCG0JqEYzoHe+XLbYJ/FlvNan0T5gk=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=JPtVj3UWRH/zitJgTYSWJ+X7L03KL9m8sCF6aMYs+2ZvKbh09iQ2dkfMjsHQ8xCK
+	 gjvci9uB1nxKSsluB4hxX2LkEiovi/0u4ySHwsCHPqkGvKj9ijCn8hOThfKJB4nEq
+	 9LMOtAEKK5EFVW5MHxHIQ+UTw/04wknLuqpEB/PhKh2vFhZUlhsVTW4ZQrnF9OK+Q
+	 gKHFLYah3X4Ac3+Y4E+41UzcV/jFNK0VlUleWib5oRwZdCzddZr4dCGocurRnGetp
+	 IaO4gTL8h7IDPTTJInDxD9623zbwHyx9OphQ5HozNLF60H7z2XOXHvrBOSqii3SW1
+	 0UTBDtuhKwXw6wb5nQ==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.85.95]) by smtp.web.de (mrweb006
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MODiX-1sLnxd2OXB-00OavU; Thu, 18
+ Apr 2024 11:40:36 +0200
+Message-ID: <cb593f2a-7dbe-44aa-b9ff-7fc57a4bd70a@web.de>
+Date: Thu, 18 Apr 2024 11:40:26 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+To: Sean Wang <sean.wang@mediatek.com>, linux-bluetooth@vger.kernel.org,
+ linux-mediatek@lists.infradead.org, kernel-janitors@vger.kernel.org,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Von Dentz <luiz.dentz@gmail.com>, Marcel Holtmann <marcel@holtmann.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, Sean Wang <sean.wang@kernel.org>,
+ Chris Lu <chris.lu@mediatek.com>, Dan Carpenter <dan.carpenter@linaro.org>,
+ Deren Wu <deren.wu@mediatek.com>,
+ Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+ Manish Mandlik <mmandlik@google.com>, Miao-chen Chou <mcchou@chromium.org>,
+ Michael Sun <michaelfsun@google.com>, shawnku@google.com,
+ frankgor@google.com, jsiuda@google.com
+References: <da0859c4b24d314d9ff38179c26a58ee7e3f16d6.1713395895.git.sean.wang@kernel.org>
+Subject: Re: [PATCH RESEND] Bluetooth: btusb: medaitek: fix double free of skb
+ in coredump
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <da0859c4b24d314d9ff38179c26a58ee7e3f16d6.1713395895.git.sean.wang@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:h60MNVHZTjz4/QmEHPXP1WbPwsusvY2fbKtPn9WCziwqPyptPlc
+ ber44onTYjIxTlQrcfVbWexacjHT3eiioX3yg37VqYA/7nnuaSxwjFeHrhE74xvoYT64tc2
+ 3Bx7x0020sHYynWpPs7rIOean2NNYeeYHgu9W3V01FD3Ay/7lpgcnd4zXRE3rnBDqHddr7i
+ JELSN8JHpN9EF8kXS488g==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:41/oj+AA2Xs=;BgPgrSRQrxZusn4FIjnNLvOq+Zn
+ Way5JznIXv0bGOXGZANPoP33fZwEyhiP+DOSSF0yK0z8jJqbR3cX9AChIL3SrlXTFm4DAcF9/
+ tFk2IVrY5rnCwoxd5x2HigKs9h5/nX2uAYP52ITODcNEikAGbTQ4aAZIy8G1CX1eyHh9DelrR
+ 4nynCbeFHXqBLiB+yXNHLUBNWnOqgNJGVxLk03of5/Mk4WAkVAXUjogHa8J86rr7K9Eq8Whyr
+ YapxCrQDUXJiHMUwKnJ3RuCugV7Ri5epnCKIXTY69hZoCKZ3tOaHAtiL7JvBsv/SGH+BCWwh6
+ lEn9fBWqiLN5rkO5pKNUlzMCR01jJESrS2ct2uFraGLwYryaw7wD3YmrvSgl5LThotXpeQ/Hi
+ FKwefg4ucDvQUrWqnLOTj1ANy8bLeQ4nTpN5GNxtNHAkIpOKqLAcI7P61Xsg1rNWfIkQcg7cc
+ urlooCIzuygFbycqHrOB/XbPhyb4KuAJtuMpRJew4GaN9F/iOCHR1MP2v4TyHrdBp/C4lPIRT
+ Jrk5o/Z0CQFBlIa01eGMNPwKA6j8TBDk9yyjWstfNhcppz3ylybstDNOtb4ae50fcDpF5vb6R
+ BeN0GXDGYIzMietT+DZpVUicx1nnQFo9gZHvQjDZY2ntgUZTn9CVoGA7x7Vr/uarJTicehone
+ PljgWkykcNWS5ph6B8uytPnv7tzNcRMpxaXBN0Wux4qziUggrqWsZhYLPYDC3b3rt+tdrDOiU
+ A6HJhsAjKoGnvjYabnleJ+B3pvP/2ieQmU4d+mtuSzI9rf/a9cb8AcotaKHy/J1wqbbDAt+5A
+ 4FZhxvoQC0XbQrhJex5/2wk1KLUbc/lHwC8a4fD2CYjDU=
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218726
+> hci_devcd_append() would free the skb on error so the caller don't
+> have to free it again otherwise it would cause the double free of skb.
 
---- Comment #45 from Wren Turkal (wt@penguintechs.org) ---
-BTW, I ported the revert patch to Linus' latest. I can confirm that it works
-there as well.
+I hope that a typo will be avoided in the subsystem specification
+for the final commit.
 
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+Regards,
+Markus
