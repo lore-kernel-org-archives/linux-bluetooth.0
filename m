@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0930D7D08A
-	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Apr 2024 08:14:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34DEB7D413
+	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Apr 2024 08:26:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713428054; cv=none; b=XBQ+ewdgv5JeORNDg6iWe1aRL6KtxX7QK0WjB3jcxvCM9zjpStSs6DjVTVoJf+aq1Ccu+uOJSHjzUXDDreX5/W5W3cxTfxncEKxuiY1Ly3fiAetYGAkR7vhvemIauhihfIn963xkzyZOEComw7ziChIBA1YJIStJpTfTQ5/W0y4=
+	t=1713428775; cv=none; b=eodM0+eJyOeQP7ZaeDBj/aYEYuIIm6qt1rdl3LDU8P6Us8EYUvRZ9bStLRPkGQD4TwHSxD9AtiJQuWenWp13Z4M5NXLE+tSWet+FWNEz/7KYN11VDAwkdn+uDPhoQLpql5hiE4wtKxoG7S7i07gnbRY73Y67STetuP1MKGXclFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713428054; c=relaxed/simple;
-	bh=rABg72g5xbyuX4BifkPkfpKTNXGiudrvaARSUX9/g1M=;
+	s=arc-20240116; t=1713428775; c=relaxed/simple;
+	bh=3pWfaJjgSL20TYs8o9X3otUS1jSrqlFGn2PAdIF0xvo=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=cAm0MLOt2M8/RF63gAsbIdXX0g8GZpdcKxRlIR2sq5AZBpjNLImmXcFJpyabFqH+OY/KX8xMfaWIoXCbK/1ywhvnKDsvu4odRUHV85RTzkNcDiiGjcCmKaXONRpDAL3n8mXiFmSPpBTG4UVI9zrseDQ0XwGfBdCOFrtAeKokrfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G3k/tS76; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=nWYn1F6A3PXYGT/snoXqS4WXCNVRGpjftMDPJ3fvJWuFlubqWx7oCfCVpxrMAbTvjwzv+zk5u+LjPcaOj4IMWtO/Ppcs5vMURnaFmZxdso4V4HIBMDB6jdhLw+IJ0LHe7P8VwLx6Hl1GOEYYyOPQEIBwpwMrmwQEMocIxDkgYyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R6R5VeL2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G3k/tS76"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6FF8FC113CC
-	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Apr 2024 08:14:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R6R5VeL2"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D1A11C116B1
+	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Apr 2024 08:26:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713428053;
-	bh=rABg72g5xbyuX4BifkPkfpKTNXGiudrvaARSUX9/g1M=;
+	s=k20201202; t=1713428774;
+	bh=3pWfaJjgSL20TYs8o9X3otUS1jSrqlFGn2PAdIF0xvo=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=G3k/tS76Tz7ArGXgAjh9cFN7dnqtEhOQaUgfUqGDn7JCa3eCaAhLbaRJJkDj0u+wm
-	 Obq8yeN/lxER6S9BZtTiGw1KaQmkhuFTPEeVRGaoRqDgQ2fnZb5BzAyt74nu9R8io5
-	 TFRRzl2W0d2I5IMB+dmHa2G/ykF1cXAnMJvNfcfj0eZtokONaLI9yPrlm+oLdUWGHr
-	 IFH7Ll7N8xiTB2XSHz7ibJSoWnh0VHufNCjrBBkjm3zmabrm36o+0yswH2tgqwwuU2
-	 2EPUGQeDqEa3XCoIyEn73cPGlULYybMjdIb52lEHdxcL9/Z6Nz9Td/OVyT1caYGDwR
-	 ly1QR3CAZIjqg==
+	b=R6R5VeL2Q9welzQmvT8kHgQbJhpkNulPUSD8b1ulzRuSXwunmEiNDRYu385SrLrtm
+	 1z94bSfBTb6W4EuEIW3qJSiLTQ689VqDKLyRhPu+TX8eqBYlw0rtuPoA+3Ql7b2eXG
+	 HGwe0ZAyJJdcbppHhx1/7Kh55LkpMDKFqHlqsj7wJ+i2U/GOZJqhyDXmExmEKKM0JG
+	 gf59u5E9mu2+x6cBXaocvs6J+HtM7sXqIkkn2e5RUZo+STncX4eb7R6nWPfmNXpqJu
+	 cGl+X9nLbk4mFS7U6X9lAoR43UlyxObeU+T0ZWMtUFKVFivPXR+vgO1fa0WePbCtMt
+	 5UD829gpuqdHQ==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 5D539C433DE; Thu, 18 Apr 2024 08:14:13 +0000 (UTC)
+	id BAEAAC433E3; Thu, 18 Apr 2024 08:26:14 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 218726] qca6390 bluetooth fails after disabling/re-enabling
  bluetooth
-Date: Thu, 18 Apr 2024 08:14:13 +0000
+Date: Thu, 18 Apr 2024 08:26:14 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -41,14 +41,14 @@ X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: normal
-X-Bugzilla-Who: wt@penguintechs.org
+X-Bugzilla-Who: quic_zijuhu@quicinc.com
 X-Bugzilla-Status: NEW
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-218726-62941-0FWL9qxgGF@https.bugzilla.kernel.org/>
+Message-ID: <bug-218726-62941-GpAEwAVTAl@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-218726-62941@https.bugzilla.kernel.org/>
 References: <bug-218726-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -64,10 +64,19 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D218726
 
---- Comment #40 from Wren Turkal (wt@penguintechs.org) ---
-I know this is a total newb question. How do I add the footer properly for =
-the
-purposes of the log? Do you handle it or is there something I need to do?
+--- Comment #41 from Zijun Hu (quic_zijuhu@quicinc.com) ---
+(In reply to Wren Turkal from comment #40)
+> I know this is a total newb question. How do I add the footer properly for
+> the purposes of the log? Do you handle it or is there something I need to=
+ do?
+
+they are added by fixes submitter. yes. nothing need to do for  you current=
+ly.=20
+i will submit new patchset and add them for you based on the changes which =
+take
+effect actually.=20
+
+thanks
 
 --=20
 You may reply to this email to add a comment.
