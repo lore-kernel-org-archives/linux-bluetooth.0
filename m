@@ -1,182 +1,81 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E25815D5A6
-	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Apr 2024 10:49:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FEF915E7FE
+	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Apr 2024 11:29:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713437392; cv=none; b=Sbz7khLurHdxT2YP6anigtZwmisei7nUqc/2QiCsXiPs0jVG0uARFPmnWeFgYXVS4lsqUC2GZn5aHmwlQy+r0XCAu9v1g53AhRjCzoBxccufn099LikJNdrT6/PULcvXIRV+kbwBsXHzPNBSfVlWrXN0vY1+C7NqQNqAz4lbcWo=
+	t=1713439776; cv=none; b=jWw5R3wTy/B2tHJwHz5ombYs7pvAKjfd8H7j/Jg5h+WhGLuDZBzrUejA9eM0/FSn7XBVglmhp4T67GPVHocYLnz9+F4QmW8fFH9/K/VcJH0WMd4K7JVd4hCxcSMi3rjTkPEHHgTl+O4Qgco28jo9FOHt9QOhz2YKxa1nC5acM90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713437392; c=relaxed/simple;
-	bh=2iPWB97DomGuREEuH7FLQGpp2o4s9sjuSCEmpWFikcw=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=KxpWJj/WqKJJAINVW4XQFd7svLqo3nYOCMENElQkciyCMieQn44Alw2SN0VnWkJJ6TLRNtoAEhJZi38Q3AdkKMum4bQSFVLpTIyH6GIqhAQW9QQB3BQHTRcY9YF8UE2y9aAOgR28dcbbQNmPe08BsevpRayUGA1z+PKnam036Ko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MNgxVxfm; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1713439776; c=relaxed/simple;
+	bh=JNUNqgQ/kRBfMijV40P7Laiw69ULEFMGZ0tpP1bfCm0=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=klxvLbolU81NKD3hcQJZ2k2BP3dl8sgUG1Ryp02ZgkyX7lfP+NX0Vd7K06E1EkY13Hxv2jJg1AoQXNW7JJdn59eVeYSiMpBF5EX2Y1wil2Vr9QXLMWEk72pwep+8Q+MuKqlBmolJlR5SlFPc40Qd0nirZSVqdL37hG0j7wHfNCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pG74MAg5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MNgxVxfm"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713437391; x=1744973391;
-  h=date:from:to:cc:subject:message-id;
-  bh=2iPWB97DomGuREEuH7FLQGpp2o4s9sjuSCEmpWFikcw=;
-  b=MNgxVxfmU7DTl51QoPS0R86a6JYxyq+E1HdU3F3KOHQSH282EbbvE3e1
-   MaUnZhC1Zg6t+NNQhY1N/PwdZD9YYF86FPelBwed86Twge44at5b5TiiT
-   0QsWFF8ju2AoRLXDDiIADLzjxAn+Mh+Z7Ue00gAmxCggDyc5Gi//JuTEi
-   PHRXimUtXRcOPY+YRIL6xf0U9mchLpY5g+7sstQYT/8ggcvvbBpDDWTRD
-   1JPd3KuG83h1/rRs61X0XaRDixmRu3CoEyxINfDis8hj8bswZDtq1apSz
-   OvOGfM/dEd2dT6cUSoMO5M3wPcopq2koKGtYw4YllVERbPhhfLiCfUAiL
-   w==;
-X-CSE-ConnectionGUID: QWaG68zXQTm/a/hs+Q2OwQ==
-X-CSE-MsgGUID: kRbwADqYR8CEO0FxIM8OhQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11047"; a="9198275"
-X-IronPort-AV: E=Sophos;i="6.07,212,1708416000"; 
-   d="scan'208";a="9198275"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 03:49:51 -0700
-X-CSE-ConnectionGUID: 8zVVIeUPQ+OXyo5FtYx6vQ==
-X-CSE-MsgGUID: le+yGgNXTLiO4V7A1ENceQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,212,1708416000"; 
-   d="scan'208";a="27576372"
-Received: from unknown (HELO 23c141fc0fd8) ([10.239.97.151])
-  by fmviesa004.fm.intel.com with ESMTP; 18 Apr 2024 03:49:49 -0700
-Received: from kbuild by 23c141fc0fd8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rxPKt-0007Vq-0e;
-	Thu, 18 Apr 2024 10:49:47 +0000
-Date: Thu, 18 Apr 2024 18:49:45 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 0b4bd88b3b94616c0c89db396e094e12af26d069
-Message-ID: <202404181842.gYv9ZdqY-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pG74MAg5"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E51D0C2BD11
+	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Apr 2024 11:29:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713439775;
+	bh=JNUNqgQ/kRBfMijV40P7Laiw69ULEFMGZ0tpP1bfCm0=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=pG74MAg5AAqWqPU6KaJzsoLssmq8Bta3gt4diOwzsE6IGGrwtElBtTd1qxwWpMTx5
+	 ya071gOV+BfxiiaGX4NFrYzgNHsfwMf7HJ8f6vAsut0ea9vPQF0l2Kv+9NhPTYml22
+	 ctVrpJhqc23ZigrSMKOVQ+jpHwsETr1Qnw3kVYFEXQvk7ODdF8aO8sR7mWlpH2MyYU
+	 vaR7/6FKxJP/L4q0XZcuWNGyGXUzJn3idvkwIoGrv1oUBZQwgseUc87Y/T+b4OrSJI
+	 w4K90RIU10Gh/HBPMZ33niBQhE1D0Zvy81Rm9F3XOdVDA9S5hgND++gt9vMc58ammH
+	 8pfLbdL1s8DPA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id DBCCFC43230; Thu, 18 Apr 2024 11:29:35 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 217870] ATS2851 chipset for Baseus BA07 Bluetooth does not
+ connect, no bluetooth device connects, adapter does not turn on
+Date: Thu, 18 Apr 2024 11:29:35 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: painterrer@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-217870-62941-4muSAId4we@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-217870-62941@https.bugzilla.kernel.org/>
+References: <bug-217870-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 0b4bd88b3b94616c0c89db396e094e12af26d069  Bluetooth: MGMT: Fix failing to MGMT_OP_ADD_UUID/MGMT_OP_REMOVE_UUID
+https://bugzilla.kernel.org/show_bug.cgi?id=3D217870
 
-elapsed time: 740m
+painterrer@gmail.com changed:
 
-configs tested: 105
-configs skipped: 3
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |painterrer@gmail.com
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+--- Comment #3 from painterrer@gmail.com ---
+Fedora 39 6.8.6-200.fc39.x86_64
+It is finally fixed and works flawlessly!
 
-tested configs:
-alpha                             allnoconfig   gcc  
-alpha                            allyesconfig   gcc  
-alpha                               defconfig   gcc  
-arc                              allmodconfig   gcc  
-arc                               allnoconfig   gcc  
-arc                              allyesconfig   gcc  
-arc                                 defconfig   gcc  
-arc                   randconfig-001-20240418   gcc  
-arc                   randconfig-002-20240418   gcc  
-arm                              allmodconfig   gcc  
-arm                               allnoconfig   clang
-arm                              allyesconfig   gcc  
-arm                                 defconfig   clang
-arm                   randconfig-001-20240418   gcc  
-arm                   randconfig-002-20240418   gcc  
-arm64                            allmodconfig   clang
-arm64                             allnoconfig   gcc  
-arm64                               defconfig   gcc  
-csky                             allmodconfig   gcc  
-csky                              allnoconfig   gcc  
-csky                             allyesconfig   gcc  
-csky                                defconfig   gcc  
-hexagon                          allmodconfig   clang
-hexagon                           allnoconfig   clang
-hexagon                          allyesconfig   clang
-hexagon                             defconfig   clang
-i386                             allmodconfig   gcc  
-i386                              allnoconfig   gcc  
-i386                             allyesconfig   gcc  
-i386         buildonly-randconfig-001-20240418   gcc  
-i386         buildonly-randconfig-002-20240418   gcc  
-i386         buildonly-randconfig-003-20240418   clang
-i386         buildonly-randconfig-004-20240418   gcc  
-i386         buildonly-randconfig-005-20240418   clang
-i386         buildonly-randconfig-006-20240418   clang
-i386                                defconfig   clang
-i386                  randconfig-001-20240418   gcc  
-i386                  randconfig-002-20240418   gcc  
-i386                  randconfig-003-20240418   clang
-i386                  randconfig-004-20240418   gcc  
-i386                  randconfig-005-20240418   gcc  
-i386                  randconfig-006-20240418   gcc  
-i386                  randconfig-011-20240418   clang
-i386                  randconfig-012-20240418   clang
-i386                  randconfig-013-20240418   gcc  
-i386                  randconfig-014-20240418   gcc  
-i386                  randconfig-015-20240418   gcc  
-i386                  randconfig-016-20240418   clang
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch                           defconfig   gcc  
-m68k                             allmodconfig   gcc  
-m68k                              allnoconfig   gcc  
-m68k                             allyesconfig   gcc  
-m68k                                defconfig   gcc  
-microblaze                       allmodconfig   gcc  
-microblaze                        allnoconfig   gcc  
-microblaze                       allyesconfig   gcc  
-microblaze                          defconfig   gcc  
-mips                              allnoconfig   gcc  
-mips                             allyesconfig   gcc  
-nios2                            allmodconfig   gcc  
-nios2                             allnoconfig   gcc  
-nios2                            allyesconfig   gcc  
-nios2                               defconfig   gcc  
-openrisc                          allnoconfig   gcc  
-openrisc                         allyesconfig   gcc  
-openrisc                            defconfig   gcc  
-parisc                           allmodconfig   gcc  
-parisc                            allnoconfig   gcc  
-parisc                           allyesconfig   gcc  
-parisc                              defconfig   gcc  
-parisc64                            defconfig   gcc  
-powerpc                          allmodconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc                          allyesconfig   clang
-riscv                            allmodconfig   clang
-riscv                             allnoconfig   gcc  
-riscv                            allyesconfig   clang
-riscv                               defconfig   clang
-s390                             allmodconfig   clang
-s390                              allnoconfig   clang
-s390                             allyesconfig   gcc  
-s390                                defconfig   clang
-sh                               allmodconfig   gcc  
-sh                                allnoconfig   gcc  
-sh                               allyesconfig   gcc  
-sh                                  defconfig   gcc  
-sparc                            allmodconfig   gcc  
-sparc                             allnoconfig   gcc  
-sparc                               defconfig   gcc  
-sparc64                          allmodconfig   gcc  
-sparc64                          allyesconfig   gcc  
-sparc64                             defconfig   gcc  
-um                               allmodconfig   clang
-um                                allnoconfig   clang
-um                               allyesconfig   gcc  
-um                                  defconfig   clang
-um                             i386_defconfig   gcc  
-um                           x86_64_defconfig   clang
-x86_64                            allnoconfig   clang
-x86_64                           allyesconfig   clang
-x86_64                              defconfig   gcc  
-x86_64                          rhel-8.3-rust   clang
-xtensa                            allnoconfig   gcc  
+--=20
+You may reply to this email to add a comment.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+You are receiving this mail because:
+You are the assignee for the bug.=
