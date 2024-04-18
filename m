@@ -1,189 +1,199 @@
-Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F05C9382
-	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Apr 2024 22:42:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE7C64A20
+	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Apr 2024 23:04:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713480146; cv=none; b=cIRNCS9+65LIbqHmfFON0i2lxbSJg/nktNKwmpmScJzKGSgXXUO9/TK3e6k8a4GYfiFzLCgtnhDQFnd79Kt4sgUqVX+jfk8tj0xvhQ3vIBcVxUJUsjtyay7KaieBrf/HyHpm0A/1qCt3Hj/NYEK8rcE2Ilp0tv4G85LXxiaCeK4=
+	t=1713481467; cv=none; b=nFMnYBskRfzQvO3d5c3BX/qrQB/CuNv7LrA0yo+Kc+ae7D7f08ckweXrCYxYnejbcQLrOtSzFP8RLt2sgw3RAiMAd6ZQg7ZwIAcHYXfEZDdSQYjxuaiA4efsI0LEuhmGAXCXNU3MVL1jlC+DGbW84gEcyps6zcUhD/MfkQrl2dg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713480146; c=relaxed/simple;
-	bh=5ZZjnf4R7D6z0h/Jvshc73SfEjkxffQ0YBV8zgfj9KU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dMB51Ztf0YuI4RYL46gQr9KH87v2Ji/BDaoMoEzO+d3EB/pxYwUunbkyv0isxr+O7LtY4fSpsemXdzvFsuyMTizQPXQXz63izm+HVKQkKMVD3b5J345GgEdh+TKiLPZa61TPE7O1zWR/XavWHzGQpHpLcXBxe9v0YlJi5U4nzCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=MA9CPR5P; arc=none smtp.client-ip=209.85.219.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1713481467; c=relaxed/simple;
+	bh=J+4vm6OOg0/rGJ+6h6PorAtsgdOpSGYE0VajhbVixJE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=hCTs2R+K1DAf6qpd75vWX4IpS6UW7cksCT4g1Be7wvY/W0NTUFv+LW2AfkMR5bhFLDpUI+uAiv8H9UYfOYcHVVpI62Vz/zgoIQ/4Z8QB+edUlNq578NT2uqeCEdn/LGSNWX0siJfVSJ6Wdbb6O727RsZpZVPVj0iR0fwozL57E8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=FxWXG2kK; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MA9CPR5P"
-Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-dc25e12cc63so2445906276.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Apr 2024 15:42:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1713480144; x=1714084944; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=bKfUSYksKTj72yPLq/023/BuzyeQn6Zc0JBtcx79h2Q=;
-        b=MA9CPR5PX7rdz2OoyMP+tsuTJwv2SLKru+4qubFWNSVvP8cgv1u54PA7zq63T8UigL
-         cNsLR6+KO1rsKVPGZ8hSthePt2Wqg0YtkBWvuY8RIBFkADioeJ8dSYdBUWAIJffxzRyr
-         Uefxr/q6b+qGbHIIlUjbbpaS0Il19V1Ry8u4ztAQ1R7vqJvNXN6aWmsJwFvjroAi7t27
-         hvFyZHWozdUnAeqUtew2Rbsa92SsHC1YOyWyCkpCPcbb+xkJMWQkZuiYxZdVseHVpPDZ
-         xAHv/iGThuYtGs2qvT7niGu7giVAZcwBmxAXA/QqpNbRtISnxZuYndrjqX1rAYUIxtdV
-         7eRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713480144; x=1714084944;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bKfUSYksKTj72yPLq/023/BuzyeQn6Zc0JBtcx79h2Q=;
-        b=OUncMBpO3PFxr5djlANyVnfg9TMDQLdkqgLwM/3FPPMbzQ023wy/SGY6WzsL6ZgEVv
-         q41FtpmZZUnz7Jml7TTsGCWkq5mj3hrsMtYSp6cT57iM/oF8VYPyVgg0XecTxC8k2Hxc
-         n6YwC05M4bS2JqN2H1uurOEvpz6jnY9C25yE0URz3k5BLfUdWiO5YyZ2YYdWzI+2NwfS
-         7XoCWJ5okhtjB20qWjvklQa9SXGDHlCyj8iw1+sClYf7/w1shAJrU3YAIS8Mdm3v1JBg
-         1JA50LkiPwtnxdBrTucZ4PW4N9f4/mj06lt/pFf7rvddy1biIw/TbIqq1iUarp7T3You
-         mKqA==
-X-Forwarded-Encrypted: i=1; AJvYcCVhJDN8HhssqdzyQS/KweZB7Gb/nSPPSsy4FFtiFOcHk4n+UwzjPGGI7ERiGiiiAl/a5Y4asZQQ344WbgMEQEZchdZQs7xTZhPDX9rWJhi5
-X-Gm-Message-State: AOJu0Yw9A6MgDKbMEVpnTOv56+tQhJYwnbSvhkjU2M7ZnKxwhv44BO/m
-	JDWxJp8uPWYYaqf4mASGZ9oBFJa9y6Wy/ZXEeqN9MJbIQo5xn0cPCwuRDyh2c/8l6aquw4YMsRx
-	G+soSHacufdHWYL8ra14/AHCQiYpuWYlijxBGbw==
-X-Google-Smtp-Source: AGHT+IE501Opkla3+OHERZIp0Z9co6uiQD9dymo4DInnWrpTqsW954tkBO2gFG/UQM45GJPReGCcd8qjQFCq6Fn7M/E=
-X-Received: by 2002:a25:c78f:0:b0:de0:ee2c:b828 with SMTP id
- w137-20020a25c78f000000b00de0ee2cb828mr488631ybe.25.1713480143715; Thu, 18
- Apr 2024 15:42:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="FxWXG2kK"
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 43IMPfOB001965;
+	Thu, 18 Apr 2024 23:04:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=nfk41/oOakmv8uKbheo7zSIoXIDMpuKTuCJB2PDo4CI=; b=Fx
+	WXG2kKlK76/uIoZURN102PS10xXVjwdzseEvfzH1IwRKaFoGqMNuSa/g74QTUsb6
+	orbK+owvzq3EZnpQHr7weW4339KUBcrzYeX9LX2n2MbM8v6AgPkGpwtgu3HCEGCP
+	l2yWTX+L53wa/akakDbvj78jhARG9JVVP/M4FaUto4NH7zcoP9Ij36x3D+jrBN4O
+	WqO4hZ8ll6V0oJ0q3Bw1JewDOWHMJc1bq0NEgNvJEubaAK8L+kYqi8ehSI0e0FVC
+	lJolzEO54xbWGeSoCci8VmZsV4xPGfFyEjoh0niATLyLAeaQ5FPwVQXsFH9Mj3IJ
+	J2U0lS/9UB6+BEigCRNw==
+Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xk06n1ukf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 18 Apr 2024 23:04:16 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43IN4FI4019978
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 18 Apr 2024 23:04:15 GMT
+Received: from [10.253.9.141] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 18 Apr
+ 2024 16:04:14 -0700
+Message-ID: <fbe5722b-1e45-4ccb-a050-20a473a823c8@quicinc.com>
+Date: Fri, 19 Apr 2024 07:04:11 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1713449192-25926-1-git-send-email-quic_zijuhu@quicinc.com>
- <1713449192-25926-2-git-send-email-quic_zijuhu@quicinc.com>
- <CACMJSevfE3wLhaz1z6A977JL5gOH62NThYWzybVqmHyR7pru=w@mail.gmail.com> <1ab7e6fd-68f2-4952-b5d5-bc244b8b7eb3@quicinc.com>
-In-Reply-To: <1ab7e6fd-68f2-4952-b5d5-bc244b8b7eb3@quicinc.com>
-From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Date: Fri, 19 Apr 2024 00:42:12 +0200
-Message-ID: <CACMJSeuTkC=Sho29HLada3eTPoasZguObhC1FwmgtJ0dqj=Ykw@mail.gmail.com>
-Subject: Re: [PATCH v1 1/2] Revert "Bluetooth: hci_qca: don't use
- IS_ERR_OR_NULL() with gpiod_get_optional()"
-To: quic_zijuhu <quic_zijuhu@quicinc.com>
-Cc: luiz.dentz@gmail.com, luiz.von.dentz@intel.com, marcel@holtmann.org, 
-	linux-bluetooth@vger.kernel.org, wt@penguintechs.org, 
-	krzysztof.kozlowski@linaro.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: qca: Fix nullptr dereference for non-serdev
+ devices
+To: Johan Hovold <johan@kernel.org>
+CC: <luiz.dentz@gmail.com>, <marcel@holtmann.org>,
+        <linux-bluetooth@vger.kernel.org>, <johan+linaro@kernel.org>
+References: <1713325792-17181-1-git-send-email-quic_zijuhu@quicinc.com>
+ <Zh9saGbOl-fXP6SD@hovoldconsulting.com>
+ <5e4e62c8-d17f-45fd-9212-088eb026dc7b@quicinc.com>
+ <Zh91zq13nZvH3-Yj@hovoldconsulting.com>
+ <4dac0caa-629d-4b4d-ad54-f6ab15268524@quicinc.com>
+ <Zh-JNzlskY6ZvsSm@hovoldconsulting.com>
+ <4313bcc9-8fbf-477d-90f2-013681cdebb9@quicinc.com>
+ <ZiFDWeW_-PpI38GQ@hovoldconsulting.com>
+Content-Language: en-US
+From: quic_zijuhu <quic_zijuhu@quicinc.com>
+In-Reply-To: <ZiFDWeW_-PpI38GQ@hovoldconsulting.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: Kmw4f-QZZPGK7xGtHywERxpBr7hIBGWk
+X-Proofpoint-GUID: Kmw4f-QZZPGK7xGtHywERxpBr7hIBGWk
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-18_20,2024-04-17_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ spamscore=0 priorityscore=1501 impostorscore=0 mlxlogscore=999
+ adultscore=0 clxscore=1015 malwarescore=0 lowpriorityscore=0 phishscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2404010003 definitions=main-2404180165
 
-On Thu, 18 Apr 2024 at 23:43, quic_zijuhu <quic_zijuhu@quicinc.com> wrote:
->
-> On 4/19/2024 1:00 AM, Bartosz Golaszewski wrote:
-> > On Thu, 18 Apr 2024 at 16:06, Zijun Hu <quic_zijuhu@quicinc.com> wrote:
-> >>
-> >> This reverts commit 56d074d26c5828773b00b2185dd7e1d08273b8e8.
-> >>
-> >> Commit 56d074d26c58 ("Bluetooth: hci_qca: don't use IS_ERR_OR_NULL()
-> >> with gpiod_get_optional()") will cause serious regression issue for
-> >> several QCA controllers such as QCA_WCN6750,QCA_WCN6855,QCA_ROME,
-> >> QCA_QCA6390 and QCA_QCA2066, the regression issue is that BT can't be
-> >> enabled any more once BT is disabled if BT reset pin is not configured
-> >> by DT or ACPI.
-> >>
-> >> if BT reset pin is not configured, devm_gpiod_get_optional() will return
-> >> NULL, and we should NOT set quirk HCI_QUIRK_NON_PERSISTENT_SETUP, but the
-> >> reverted commit SET the quirk since NULL is not a error case, and cause
-> >> qca_setup() call failure triggered by the 2nd and later BT enable
-> >> operations since there are no available BT reset pin to clear BT firmware
-> >> downloaded by the 1st enable operation, fixed by reverting the commit.
-> >>
-> >> Fixes: 56d074d26c58 ("Bluetooth: hci_qca: don't use IS_ERR_OR_NULL() with gpiod_get_optional()")
-> >> Reported-by: Wren Turkal <wt@penguintechs.org>
-> >> Link: https://bugzilla.kernel.org/show_bug.cgi?id=218726
-> >> Link: https://lore.kernel.org/linux-bluetooth/ea20bb9b-6b60-47fc-ae42-5eed918ad7b4@quicinc.com/T/#m73d6a71d2f454bb03588c66f3ef7912274d37c6f
-> >> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> >> Tested-by: Wren Turkal <wt@penguintechs.org>
-> >> ---
-> >>  drivers/bluetooth/hci_qca.c | 6 +++---
-> >>  1 file changed, 3 insertions(+), 3 deletions(-)
-> >>
-> >> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> >> index 92fa20f5ac7d..160175a23a49 100644
-> >> --- a/drivers/bluetooth/hci_qca.c
-> >> +++ b/drivers/bluetooth/hci_qca.c
-> >> @@ -2323,7 +2323,7 @@ static int qca_serdev_probe(struct serdev_device *serdev)
-> >>
-> >>                 qcadev->bt_en = devm_gpiod_get_optional(&serdev->dev, "enable",
-> >>                                                GPIOD_OUT_LOW);
-> >> -               if (IS_ERR(qcadev->bt_en) &&
-> >> +               if (IS_ERR_OR_NULL(qcadev->bt_en) &&
-> >>                     (data->soc_type == QCA_WCN6750 ||
-> >>                      data->soc_type == QCA_WCN6855)) {
-> >>                         dev_err(&serdev->dev, "failed to acquire BT_EN gpio\n");
-> >> @@ -2332,7 +2332,7 @@ static int qca_serdev_probe(struct serdev_device *serdev)
-> >>
-> >>                 qcadev->sw_ctrl = devm_gpiod_get_optional(&serdev->dev, "swctrl",
-> >>                                                GPIOD_IN);
-> >> -               if (IS_ERR(qcadev->sw_ctrl) &&
-> >> +               if (IS_ERR_OR_NULL(qcadev->sw_ctrl) &&
-> >>                     (data->soc_type == QCA_WCN6750 ||
-> >>                      data->soc_type == QCA_WCN6855 ||
-> >>                      data->soc_type == QCA_WCN7850))
-> >> @@ -2354,7 +2354,7 @@ static int qca_serdev_probe(struct serdev_device *serdev)
-> >>         default:
-> >>                 qcadev->bt_en = devm_gpiod_get_optional(&serdev->dev, "enable",
-> >>                                                GPIOD_OUT_LOW);
-> >> -               if (IS_ERR(qcadev->bt_en)) {
-> >> +               if (IS_ERR_OR_NULL(qcadev->bt_en)) {
-> >>                         dev_warn(&serdev->dev, "failed to acquire enable gpio\n");
-> >>                         power_ctrl_enabled = false;
-> >>                 }
-> >> --
-> >> 2.7.4
-> >>
-> >
-> > I told you under your yesterday's submission that you should instead
-> > consider bailing out from probe() if gpiod_get_optional() returns an
-> > error as right now if it returns EPROBE_DEFER (enable-gpios is there
-> > but the controller is not up yet), you will act like the GPIO was not
-> > even specified.
-> >
-> > gpiod_get_optional() returns NULL if the GPIO property is not there or
-> > an error if anything else goes wrong. In the latter case, you should
-> > abort probe.
-> >
->
-> 1) do you meet the case that EPROBE_DEFER is returned ?
->
+On 4/18/2024 11:59 PM, Johan Hovold wrote:
+> For the third time, wrap your replies at 72 cols.
+> 
+> I've reflown your reply below manually again, but you need to fix mail
+> setup and habits so you can communicate with upstream using the mailing
+> lists.
+> 
+thanks for your reminder. will do it for further mail.
+> On Wed, Apr 17, 2024 at 05:38:59PM +0800, quic_zijuhu wrote:
+>> On 4/17/2024 4:32 PM, Johan Hovold wrote:
+> 
+>>>>>> https://patchwork.kernel.org/project/bluetooth/list/?series=844120
+> 
+>>> In it's current form it's a vendor specific hack that is never going to
+>>> make it upstream.
+> 
+>> 1)
+>> ioctl()'s designed purpose is to complete such non-standard config.
+> 
+> That's irrelevant.
+> 
+>> 2) present ioctl HCIUARTGETPROTO which is not exported is used to
+>> specify which vendor protocol is used is it a a vendor specific hack?
+> 
+> That's an existing interface, that's ABI and has clearly defined
+> semantics, unlike what you are proposing.
+> 
+> Those protocol values can never change once they've been added.
+>  
+for new introduced ioctl, who use it will define semantics and ensure it has
+unchanged value as HCIUARTGETPROTO.
 
-It doesn't matter. It's about correct usage of a programming interface.
+for QCA protocol, it specify soc_type and soc_type is defined clearly.
 
-> 2) does the reverted change solve above issue you mentioned?
->
+hope i can find some present usage or example from kernel.
+>> 3)
+>> hci_ldisc driver don't touch user specified settings and pass it into
+>> vendor driver directly does it has any problem?
+> 
+> No, because the protocol values will never change, unlike the random
+> data you're shuffling into the driver.
+>  
+for new introduced ioctl, it is not random value. it is soc_type.
+hci_qca driver will check its availability.
+>> 4) for tool btattach. it does NOT get any board config info from
+>> DT|ACPI compared with formal BT driver. so i introduce a new ioctl to
+>> supplement such info when possible to make btattach work.
+> 
+> I understand why you want this. I still think it's the wrong approach
+> and in any case the interface in it's current form is not acceptable.
+> 
+do you have any better propose for how to specify driver specific settings ?
 
-What?
+>>> For a start, you don't even make sure that the types becomes part of the
+>>> ABI, which means that passing, say, type 5 can mean different things
+>>> depending on the kernel version.
+> 
+>> it is specified by user and ONLY be parsed by vendor device driver.
+>> it is user's responsibility to specify the right value. 
+>> so i also don't check and care about its value and it don't need to
+>> change any code for further added any new soc_types.
+> 
+> That's not how Linux works, sorry. We never break user space so your
+> type data would have to be well-defined and can never change (you can
+> only add new types).
+> 
+>> moreover, tool attach is mainly used before the final product phase.
+>> namely, its is mainly used by developer and customer's evaluation.
+> 
+> Also irrelevant. You still don't get to add random new ioctl() that
+> violates the Linux ABI contract.
+> 
+>>> Can't you just retrieve the device type from the device itself? If it's
+>>> already powered, you should not need to know this beforehand
+> 
+>> 1) it is the simplest and lowest risk fix
+> 
+> No, it's a quick and dirty hack.
+this solution maybe look ugly. but it actually is the simplest and the lowest
+risky fix.
+> 
+>> 2) different soc_types have different responses when read its IDS as
+>> shown by qca_read_soc_version().
+> 
+> I'm sure that can be managed. You claim that these device have a common
+> protocol (qca) so it should be possible to probe for such differences.
+> 
+>> 3) the way you mentioned will involve many changes and it also means
+>> high risks for many current soc types.
+> 
+> There's no risk as hardly anyone uses the line discipline interface
+> anymore and it can currently only be used for the old ROME devices.
+> Just make sure ROME still works after your change.
+> 
+no, as explained in cover letter. tool btattch is very useful,
+vendor and customer often need to use it even if it still use ldisc interfaces.
 
-> 3) does the reverted change solve any functionality issue you actually meet ?
->
+vendor and customer often need to attach vendor's BT module to generic linux
+machine, then use tool btattach to enable BT and  complete many tasks. as explained
+by
+https://lore.kernel.org/all/5bcf5034-fea4-43c6-ac7d-db6f24b88512@quicinc.com/
 
-What?
+so i need to add tool btattach support for many other QCA soc types.
 
-> 4) BT still is able to work fine by clearing the quirk even if getting preferred H/W reset way failure, why do we need to bail-out and return dev_err_probe() ?
->
+> Probing the device type should result in a better user experience, which
+> I'm sure your customers will appreciate.
+>i agree with you. as you known, soc type is embedded in everywhere of
+hci_qca driver. since i ever considered auto detection soc_type and it will
+involve many of changes and perhaps introduce high ricky broken for present
+many qca BT socs. so i drop the solution. let me try to go back auto detection
+solution.
+thanks
+> Johan
 
-The only acceptable "failure" for gpiod_get_optional() is when it
-returns NULL. I should have fixed it when I sent the patch you're
-reverting but I didn't spot it right away. Proceeding on any other
-error makes no sense and will result in inconsistent behavior.
-
-> we will fix it by right way if EPROBE_DEFER is reported.
->
-
-What?
-
-> this change is to solve the issue mentioned by commit message regardless other issues.
-> it is not possible for every commit to fix any other potential issues as long as the fix
-> doesn't introduce new issue.
->
-
-What I mean is: don't revert a logically sound commit. Instead:
-improve the situation on top of it. In this case: bail out on error.
-And like Krzysztof said: right now the GPIO is required according to
-bindings so using gpiod_get_optional() doesn't even make sense as far
-as bindings go.
-
-Bart
