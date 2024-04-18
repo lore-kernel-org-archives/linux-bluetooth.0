@@ -1,51 +1,51 @@
 Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B90544F1E4
-	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Apr 2024 03:12:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2191D52F7D
+	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Apr 2024 03:12:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713409935; cv=none; b=JaphFLziWa26fbjo+W1iG/LMU4RnLHVLExL569VMLNcOnXMTBDfuVgl+0w2mT7XElc0qtk0xENXodjZKDUYkeUeh7sntbUQFv7jGuoXVyLU4tS5g91dVQsGoy3LJy2Zo4ZCDJmrO1zA9UGn8Obg2ai+/0Vxs+BML+BuYgnsaLLs=
+	t=1713409937; cv=none; b=BOt0cEysLg++xOs7W8bKLyOxljMdIzm/7fmJZuAvzsoZVC0aRT8iTfw0c3+FtII40rOAzGUcbcVFyNMv6FY5lQhtTG+9qwU1z8CkFOc98kOp4uHn76DL5G8shUkebdrfNOPPov3zIytzxdQ0hnINGcGeXLVlw7BGtAl/4EJv430=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713409935; c=relaxed/simple;
-	bh=zjjNUY5zEgxlr+XaqfhTEQ/BTaSPRRcX+Dpu77cqKKQ=;
+	s=arc-20240116; t=1713409937; c=relaxed/simple;
+	bh=jvdviXRTEYKOwSh9B+7MQhVwK2YaJeko9Uxqkbfnxng=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YL0UNq+5gFSJ+aXM9qWUjfACDQ+XZtBNdwpvN5cPi3mIWlbbfexrypYSQNJkw2PVxKhDkrPepLK50ra285e4zBztQ+VA36VyC9ijoS3M6Gpt/h3R4RZjXZ6XQaMRPJtDUSV/JXyYfrYsBdMVd5Jx33QmQQP+7NLsWdy9+z4/v1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=ZYksuvRO; arc=none smtp.client-ip=205.220.180.131
+	 MIME-Version:Content-Type; b=aONioHyvor0b7EERa0zViFqOYisgi7SRM7k3SJL/9mk1tIOtZiYQUPMvHvVj1p0z3KEzavQR8lsJrdn12T9s+F5dIoKhR06M71Rpg4Jd/JMCynhPMF/pvNeEk1PlIImn6M8QuAdFPhjfn6P7bqBLKVh1TjJYfW008vu3EbcWZNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=D3Z0xJzk; arc=none smtp.client-ip=205.220.180.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="ZYksuvRO"
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 43I1aamZ028691;
-	Thu, 18 Apr 2024 03:12:10 GMT
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="D3Z0xJzk"
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 43HMbtGO013268;
+	Thu, 18 Apr 2024 03:12:12 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
 	from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-type; s=qcppdkim1; bh=RFq5ecCEP3q85c1BN2iF
-	zK8JqwCVOInWfClSJc0Wp54=; b=ZYksuvRO7Wa3LY0MR+XIXy8n9HRtf5pGebVS
-	+h0KnYflThpNT28wJDdKVs8nbz73Kpt8VEjMcrwVvDfoinWos8FnRh9GWpqyZJyG
-	K5jnD5y2+Fdl9qSyE5owucMHtZanmqjr8vVWeIDwnu9XUgV+u74Fh9SE5U+OZRF9
-	0XJNhoPTj/h6q3VnRcsn3A5P56qDUacppAelxOHeFy0e5OoYFk5pqk6PBs6Gm1b/
-	cgvU+vehwQ9OEHeJB2KyLi8KDGYkxe798gL1zeqNdKtsUtZJjp59Q+EJleQDYnJE
-	Uzf5XIS1qX3nvLoe4KSG46GX4b4417CWy8EELMumyiNP9DAymg==
+	:mime-version:content-type; s=qcppdkim1; bh=IeGdeT0OgTSlhFkGrdHH
+	x2BXOgKvrIZZ2TLuZbaW/tw=; b=D3Z0xJzkbB4sHXiagtasuOiOie7PlmCuoGsx
+	SInNDkNtghOMVLqYTCqZPeNXj+3duuWveTnsDfdrTCGapSQoq1ILiwQgopP6So7c
+	f2970k1zTjbCfHp317tsKp6yFSDcoacysD6U16Y9RMR8WCh8Qpk/6DntU+SHnADO
+	k2rNJqzrbY9kox356mRyRc9VRt9+UMv0jnyNeDZTSwme2+64G8lcIK9ntu1aqQFD
+	6XoW0AmEoMG8jjaC6U3IsvKIEzvefBxpLOwBsW9NegY+ixg5dJdCjdy+qKC8n0Qv
+	035aeK/ce6T8u0F6Pvu0nD6aza8YrfdLt0GIobgb2gYRRblU9g==
 Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xjrdbghpy-1
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xjqcurn2t-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 18 Apr 2024 03:12:09 +0000 (GMT)
+	Thu, 18 Apr 2024 03:12:12 +0000 (GMT)
 Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43I3C8Pc026643
+	by NASANPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43I3CBda026665
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 18 Apr 2024 03:12:08 GMT
+	Thu, 18 Apr 2024 03:12:11 GMT
 Received: from zijuhu-gv.qualcomm.com (10.80.80.8) by
  nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Wed, 17 Apr 2024 20:12:06 -0700
+ 15.2.1544.9; Wed, 17 Apr 2024 20:12:09 -0700
 From: Zijun Hu <quic_zijuhu@quicinc.com>
 To: <luiz.dentz@gmail.com>, <luiz.von.dentz@intel.com>, <marcel@holtmann.org>
 CC: <linux-bluetooth@vger.kernel.org>, <quic_zijuhu@quicinc.com>
-Subject: [PATCH v3 3/4] Bluetooth: hci_ldisc: Add a ioctl HCIUARTSETPROTODATA
-Date: Thu, 18 Apr 2024 11:11:52 +0800
-Message-ID: <1713409913-13042-4-git-send-email-quic_zijuhu@quicinc.com>
+Subject: [PATCH v3 4/4] Bluetooth: qca: Support more soc types for non-serdev devices
+Date: Thu, 18 Apr 2024 11:11:53 +0800
+Message-ID: <1713409913-13042-5-git-send-email-quic_zijuhu@quicinc.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1713409913-13042-1-git-send-email-quic_zijuhu@quicinc.com>
 References: <1713358336-29619-1-git-send-email-quic_zijuhu@quicinc.com>
@@ -61,76 +61,71 @@ X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
  nasanex01a.na.qualcomm.com (10.52.223.231)
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: aSpYFXjr-ibA2VobBJqpYyUVK8ya6Nwr
-X-Proofpoint-ORIG-GUID: aSpYFXjr-ibA2VobBJqpYyUVK8ya6Nwr
+X-Proofpoint-GUID: B4_VAFVQuMJMQBWRy9jnm5XvT7nhIN5Y
+X-Proofpoint-ORIG-GUID: B4_VAFVQuMJMQBWRy9jnm5XvT7nhIN5Y
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2024-04-18_02,2024-04-17_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
- bulkscore=0 lowpriorityscore=0 clxscore=1015 adultscore=0 malwarescore=0
- spamscore=0 priorityscore=1501 suspectscore=0 mlxlogscore=999 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2404010003
- definitions=main-2404180021
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 adultscore=0
+ lowpriorityscore=0 impostorscore=0 suspectscore=0 spamscore=0
+ priorityscore=1501 phishscore=0 mlxscore=0 bulkscore=0 clxscore=1015
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2404010003 definitions=main-2404180021
 
-HCIUARTSETPROTODATA is introduced to specify protocol specific settings
-prior to HCIUARTSETPROTO, for protocal QCA, it is used by tool btattch
-to specify soc type.
+For non-serdev devices which are derived from tool btattach, only
+default soc type QCA_ROME is supported currently since there are no
+way to get soc type from DT or ACPI, this change supports more soc
+types by using user specified soc type for non-serdev devices.
 
 Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
 ---
- drivers/bluetooth/hci_ldisc.c | 10 ++++++++++
- drivers/bluetooth/hci_uart.h  |  3 +++
- 2 files changed, 13 insertions(+)
+ drivers/bluetooth/btqca.h   | 1 +
+ drivers/bluetooth/hci_qca.c | 8 +++++++-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index a26367e9fb19..4be09c61bae5 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -506,6 +506,7 @@ static int hci_uart_tty_open(struct tty_struct *tty)
- 	/* disable alignment support by default */
- 	hu->alignment = 1;
- 	hu->padding = 0;
-+	hu->proto_data = 0;
+diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+index dc31984f71dc..a148d4c4e1bd 100644
+--- a/drivers/bluetooth/btqca.h
++++ b/drivers/bluetooth/btqca.h
+@@ -153,6 +153,7 @@ enum qca_btsoc_type {
+ 	QCA_WCN6750,
+ 	QCA_WCN6855,
+ 	QCA_WCN7850,
++	QCA_MAX,
+ };
  
- 	INIT_WORK(&hu->init_ready, hci_uart_init_work);
- 	INIT_WORK(&hu->write_work, hci_uart_write_work);
-@@ -795,6 +796,15 @@ static int hci_uart_tty_ioctl(struct tty_struct *tty, unsigned int cmd,
- 		err = hu->hdev_flags;
- 		break;
+ #if IS_ENABLED(CONFIG_BT_QCA)
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index c04b97332bca..7c3577a4887c 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -238,12 +238,17 @@ static void qca_dmp_hdr(struct hci_dev *hdev, struct sk_buff *skb);
  
-+	case HCIUARTSETPROTODATA:
-+		if (test_bit(HCI_UART_PROTO_SET, &hu->flags)) {
-+			err = -EBUSY;
-+		} else {
-+			hu->proto_data = arg;
-+			BT_DBG("HCIUARTSETPROTODATA %lu okay.", arg);
-+		}
-+		break;
-+
- 	default:
- 		err = n_tty_ioctl_helper(tty, cmd, arg);
- 		break;
-diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-index 68c8c7e95d64..fc35e9bd4398 100644
---- a/drivers/bluetooth/hci_uart.h
-+++ b/drivers/bluetooth/hci_uart.h
-@@ -18,6 +18,8 @@
- #define HCIUARTGETDEVICE	_IOR('U', 202, int)
- #define HCIUARTSETFLAGS		_IOW('U', 203, int)
- #define HCIUARTGETFLAGS		_IOR('U', 204, int)
-+/* Used prior to HCIUARTSETPROTO */
-+#define HCIUARTSETPROTODATA	_IOW('U', 205, unsigned long)
+ static enum qca_btsoc_type qca_soc_type(struct hci_uart *hu)
+ {
++	/* For Non-serdev device, hu->proto_data records soc type
++	 * set by ioctl HCIUARTSETPROTODATA.
++	 */
++	int proto_data = (int)hu->proto_data;
+ 	enum qca_btsoc_type soc_type;
  
- /* UART protocols */
- #define HCI_UART_MAX_PROTO	12
-@@ -71,6 +73,7 @@ struct hci_uart {
- 	struct work_struct	init_ready;
- 	struct work_struct	write_work;
+ 	if (hu->serdev) {
+ 		struct qca_serdev *qsd = serdev_device_get_drvdata(hu->serdev);
+-
+ 		soc_type = qsd->btsoc_type;
++	} else if ((proto_data > 0) && (proto_data < QCA_MAX)) {
++		soc_type = (enum qca_btsoc_type)proto_data;
+ 	} else {
+ 		soc_type = QCA_ROME;
+ 	}
+@@ -2281,6 +2286,7 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+ 		return -ENOMEM;
  
-+	unsigned long proto_data;
- 	const struct hci_uart_proto *proto;
- 	struct percpu_rw_semaphore proto_lock;	/* Stop work for proto close */
- 	void			*priv;
+ 	qcadev->serdev_hu.serdev = serdev;
++	qcadev->serdev_hu.proto_data = 0;
+ 	data = device_get_match_data(&serdev->dev);
+ 	serdev_device_set_drvdata(serdev, qcadev);
+ 	device_property_read_string(&serdev->dev, "firmware-name",
 -- 
 2.7.4
 
