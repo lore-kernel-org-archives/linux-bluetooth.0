@@ -1,100 +1,66 @@
-Received: from mout.web.de (mout.web.de [212.227.15.14])
+Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 684D5A23;
-	Fri, 19 Apr 2024 19:57:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB9AA10A03
+	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Apr 2024 20:07:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713556651; cv=none; b=pozvm8iG8pMYRTgzG0eKm0hA+hMI+PWdhvXaXcxdvXD6AJSXwoobCgrM46rIT5m7PlrRwnp+HVTMO944IbL0Gfl7+ZL6b5sA3Z0vw/5N8C6dn0yeyYM3uQZsjrrLUIpA2IndDpn7IVHDqi6hW/JRHcRkRDFSKUin/5iFm+i88NM=
+	t=1713557258; cv=none; b=F2bCmobg/80yS0gUPuFqeM21jZKsZUqG91jaFIH24jhJ3F1Is6jcZJf0/ziac1AmmVAAaYajx4aW7d7r9fD0pLbr32Fwg/v2/PN7vB6RidC+t3Um/fhbaDgv8GLEcYPLh3RO/lB8XGB4XaPYjPAe22T+ZpZt+doL/1PdApHnqM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713556651; c=relaxed/simple;
-	bh=6Slvd9WP7U67G3VLT+aHOxvttY9ZS+l7ClciTen+Yuc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CCUbTZ31aeHj1RlhgEBhXwgENEsuZ3xa8D6Dp+zZt/9qEN7ClSMtUwtJG+UCi+UKarsDj3V6N17WLAiBrChuwAkjFYNW5cCv5jF4hHkaQLmn+yz573A9wn1HyWDNjgQ4vf79I+d4QtThLT7wi3h/gYVdJ8X7j2E0jNigKCaYbb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=CLbRyo9d; arc=none smtp.client-ip=212.227.15.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+	s=arc-20240116; t=1713557258; c=relaxed/simple;
+	bh=xzs/DdOYm0zuw3lKSWIYWoopCbDluCQPUKdwSy0I+rY=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=cVSseqYku5oneSlI9ueMqr/MMB1iqMYqMeF1QheExAvLBhkiZUwYNAhKmnHXSnqeGTCnKaQA6ZuQXz8vOUDD7p4baaDKN/B63ukvEI8uGARmL99zTElBcqwCAmWxG9osOJOZvVSXMeC17nJrhHteI9ArrQjagEmi0d41HHwQgd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=gdv6dkk6; arc=none smtp.client-ip=192.30.252.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="CLbRyo9d"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1713556618; x=1714161418; i=markus.elfring@web.de;
-	bh=6Slvd9WP7U67G3VLT+aHOxvttY9ZS+l7ClciTen+Yuc=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=CLbRyo9dzVNhQ3oFILxFVfdLxwMaG3MUlxRpvJgCTD1G9ABfqDyZAaKKlca6DWgF
-	 sUH440ZnySvzqm3nJtym8DEy0RYN0RnysfrYqmQFYQQ2FUNZak8cf43dZpbEU/bGr
-	 VmzjnhSdI2yhmn+UpUdL/4LwsthQOrGwY62rWUTijMI7POVNa0bug5XwMvdQJe61z
-	 rTOxqYltHt5eV/V6oKrIXMcAThdlRjAFsvSWgLhhOJ98EuDaafNAK1rFGqHQpvhZD
-	 tgeFAz2X3LrfV+/HFE1+8Fen7LoGUnt3hpY+0v9VMgPNzhWvqCrQ1IHBHLijk2X89
-	 D/+Re9p4sJeT8oC19w==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.85.95]) by smtp.web.de (mrweb006
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MHVaf-1rtptb2Crx-00DV2a; Fri, 19
- Apr 2024 21:56:58 +0200
-Message-ID: <0460d898-689f-4e9a-bd2a-a812ca54acc4@web.de>
-Date: Fri, 19 Apr 2024 21:56:56 +0200
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="gdv6dkk6"
+Received: from github.com (hubbernetes-node-7c42e0d.ash1-iad.github.net [10.56.200.81])
+	by smtp.github.com (Postfix) with ESMTPA id BFFB0340416
+	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Apr 2024 13:07:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1713557255;
+	bh=IVdpubNAYJyqgb4bxUQsf+DnTCSJr8VvMoHYIMEuzJg=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=gdv6dkk6jT3fURGEM/YODQf+k2L25xbMK3lhRaLjWlMQqTYe5Hg7W/C2Q6Gm29k+8
+	 60h7gH4JW2EOkiIQdskFhFIBOX2eBxWzOV5xsPHPgsITGn3/oLN1Rvmbbku8dxovqz
+	 S5UnifOiN98V8oAITQ6/xK/eLz6G5axpHTEfSfB0=
+Date: Fri, 19 Apr 2024 13:07:35 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/89cb88-4dea3f@github.com>
+Subject: [bluez/bluez] 4dea3f: client/advertising: Add flag to mark if data is
+ valid
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Bluetooth: btusb: medaitek: fix double free of skb in coredump
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, linux-bluetooth@vger.kernel.org,
- linux-mediatek@lists.infradead.org, kernel-janitors@vger.kernel.org
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
- Marcel Holtmann <marcel@holtmann.org>, LKML <linux-kernel@vger.kernel.org>,
- Sean Wang <sean.wang@kernel.org>, Chris Lu <chris.lu@mediatek.com>,
- Dan Carpenter <dan.carpenter@linaro.org>, Deren Wu <deren.wu@mediatek.com>,
- Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
- Manish Mandlik <mmandlik@google.com>, Miao-chen Chou <mcchou@chromium.org>,
- Michael Sun <michaelfsun@google.com>, shawnku@google.com,
- frankgor@google.com, jsiuda@google.com
-References: <da0859c4b24d314d9ff38179c26a58ee7e3f16d6.1713395895.git.sean.wang@kernel.org>
- <cb593f2a-7dbe-44aa-b9ff-7fc57a4bd70a@web.de>
- <CABBYNZL1=RyzuXcDpAwcXyOe_8Bh4gJtDzKdS55-3ZF4rZRj7A@mail.gmail.com>
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <CABBYNZL1=RyzuXcDpAwcXyOe_8Bh4gJtDzKdS55-3ZF4rZRj7A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:S8WVsoPLtqYG/ykvrpdfXwxTb9GQ6ddC7R7zsOQbPfIOAPVg5bH
- cMPj7nuSOAH+vCBx5OH4wb42KGMA6DWS72RdGxaVQ6GogDsV6zx1u9KXKVPQ6WDqKqmppbs
- vxrwA7C9+GYDicbVt/kTg85dLhkoRSq0ycv2rJslHIS1PtxilV0j5WC27ds1+k8kIdd178e
- Uw04abQuIawH3E6PHXxXg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:0SfpuT7Zf8o=;uZUyp+Nr+hFB7lgbCA8xf5U6SOd
- G6jAFLKGPouMeLYW4ECJ9Nj3ptXypcKX5dsGcaY4cgMYcFcjmm1XlEuevFyYL99tscs8ucgsb
- 2TCitR49unAcRFalK8OpUepLM+sxcAp8D85ZpEeiQjzGsQ09JyVdC7K3bOOX9azTYS+NJLuTH
- 2QS0weenCJIYoUNbGo5ibW5MTm57SYaxyqTbbzPw03xkWt3Ocl5Ggl6GhNVhsusXSbuBZvK1D
- /edJ3mSUaeEwXQm+2slS9GfpYmCm4HQS/MCt8/1thcYEF7urQCd7pJNfYag4CpESUib3cwygn
- GE/kqPk41/7ldFc4gUhfLRce35yrIzXg9W44EfjQVkPsxYTdEBWxV68yshYOo+pfr6GVsTFbC
- h6mxd3WUJx3j7rZUIykxOLFxoVSFL2bTDPMdyhlstEV+IaxoW5fxKe4RCJKBmNi4qgxuHq6RA
- JqtZkeI80XrK5wiEb0KLHj/uapL9LgO/JTh8dVBNkRr0F+qnAnRtepTQpMODMIAEv+ovtVv5c
- kdqZJ7u/YqZflNTruCf63ZvkjsvDyel/8TqnZ496NZNXTft8Rb+zflWEzJgOOXmxACrI7kvoB
- 7FidVNYsshtC2l+ebPjq7MB7ubEzlRtbIn6J86VKKkV2ST6v/fYbABAV47XHi1fHLg1X+EzPm
- ekgotMOoGSVlHZet9dCO4ydT7+Vc/dmku7qn2wBEV9r+sL3eV3L1XepaoYD4Yw8avZBtzV3VF
- ttrwDx8L+s3sQWwPHOOHeNgLe6LhEmT0YtDfRmwxl2b4yr7U9KHv4jv92Y25a3sbysuYYRbf/
- NNcKcS6YOo/M7ZUFUzPuFUuc4XphAToefC6dayaYh+mzw=
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
->> I hope that a typo will be avoided in the subsystem specification
->> for the final commit.
->
-> Are you talking about medaitek
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 4dea3fb932f815b0b1be470cc0aaa213d82bf213
+      https://github.com/bluez/bluez/commit/4dea3fb932f815b0b1be470cc0aaa213d82bf213
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-04-19 (Fri, 19 Apr 2024)
 
-Yes.
+  Changed paths:
+    M client/advertising.c
 
-Do you prefer references for mediatek here?
+  Log Message:
+  -----------
+  client/advertising: Add flag to mark if data is valid
+
+This allows the use of type 0x00 which otherwise could not be selected
+since the property would not be exposed even though the data could be
+set.
 
 
-> or is there another typo?
 
-Not yet.
-
-Regards,
-Markus
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
