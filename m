@@ -1,82 +1,100 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout.web.de (mout.web.de [212.227.15.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11297139CE8;
-	Fri, 19 Apr 2024 19:50:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 684D5A23;
+	Fri, 19 Apr 2024 19:57:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713556229; cv=none; b=LyiiLQKqaagKRDEBSzwS8eMUIrxru4ynTmYiDldhkUmrJcAMhNNoysROLIJDwDJHK41WCYsW9BizTWDNwJVUtEg+N4xphEQp/R3s2PZguhz4f+M4IX6IRe/zlrZXDzY0yrt9U3c2X7cKJirnscr1oMx84CCDowTQUOT5vqKhJE4=
+	t=1713556651; cv=none; b=pozvm8iG8pMYRTgzG0eKm0hA+hMI+PWdhvXaXcxdvXD6AJSXwoobCgrM46rIT5m7PlrRwnp+HVTMO944IbL0Gfl7+ZL6b5sA3Z0vw/5N8C6dn0yeyYM3uQZsjrrLUIpA2IndDpn7IVHDqi6hW/JRHcRkRDFSKUin/5iFm+i88NM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713556229; c=relaxed/simple;
-	bh=x65GC0z98wTskh1l/wQIaNPdpvTmTWBoTgqMEUh8VgI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ElsiDA5urlSyg9f+5/b9leJTNZL9WniMzh89huY/YomrOHaI85Kif6b4RxZJl8aglebdu9rkw3l9Q2O+dGb3A3n+ekzWrY7ZvdPJUAaXbnktEZ/kGKcSDz0ZsrrwJtELieQ3XGtRjgPFVAWsF6a7eMpjG//XL+sjunbOwg0qQXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bUvR2KTl; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713556651; c=relaxed/simple;
+	bh=6Slvd9WP7U67G3VLT+aHOxvttY9ZS+l7ClciTen+Yuc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CCUbTZ31aeHj1RlhgEBhXwgENEsuZ3xa8D6Dp+zZt/9qEN7ClSMtUwtJG+UCi+UKarsDj3V6N17WLAiBrChuwAkjFYNW5cCv5jF4hHkaQLmn+yz573A9wn1HyWDNjgQ4vf79I+d4QtThLT7wi3h/gYVdJ8X7j2E0jNigKCaYbb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=CLbRyo9d; arc=none smtp.client-ip=212.227.15.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bUvR2KTl"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9BA63C2BD11;
-	Fri, 19 Apr 2024 19:50:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713556228;
-	bh=x65GC0z98wTskh1l/wQIaNPdpvTmTWBoTgqMEUh8VgI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=bUvR2KTlwI0I5MlLSJBpJhei/zHRCUBNLss9x0eWamMcK2+V+jhLoKwvL5Mzq6yNB
-	 7dO/TBaVHUDla3aregIl0rtjUoY71QPxKGHNbqQIxI5VAmfayqp6oopTVv76rzrKpc
-	 UfAHNkxu8PrRcaZQxXlr4veHAZtdL1Dle150bQhA2+0R/XOoOZC1hxpPW0sZ8klc70
-	 V6MsTq/CHF9NYEJj+s0aJhScInyFiWdaO5T0NroIFYuHyynKF8/KFyfx9xItV0z4NJ
-	 cfTcrysGnH4az2uejPqUtjwITLPA1RgO3x73g1Q6oKEjpbTF6ZBIrzakNIe1SMoqlI
-	 utxJnHgx7sYqQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8B967C43618;
-	Fri, 19 Apr 2024 19:50:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="CLbRyo9d"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1713556618; x=1714161418; i=markus.elfring@web.de;
+	bh=6Slvd9WP7U67G3VLT+aHOxvttY9ZS+l7ClciTen+Yuc=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=CLbRyo9dzVNhQ3oFILxFVfdLxwMaG3MUlxRpvJgCTD1G9ABfqDyZAaKKlca6DWgF
+	 sUH440ZnySvzqm3nJtym8DEy0RYN0RnysfrYqmQFYQQ2FUNZak8cf43dZpbEU/bGr
+	 VmzjnhSdI2yhmn+UpUdL/4LwsthQOrGwY62rWUTijMI7POVNa0bug5XwMvdQJe61z
+	 rTOxqYltHt5eV/V6oKrIXMcAThdlRjAFsvSWgLhhOJ98EuDaafNAK1rFGqHQpvhZD
+	 tgeFAz2X3LrfV+/HFE1+8Fen7LoGUnt3hpY+0v9VMgPNzhWvqCrQ1IHBHLijk2X89
+	 D/+Re9p4sJeT8oC19w==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.85.95]) by smtp.web.de (mrweb006
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MHVaf-1rtptb2Crx-00DV2a; Fri, 19
+ Apr 2024 21:56:58 +0200
+Message-ID: <0460d898-689f-4e9a-bd2a-a812ca54acc4@web.de>
+Date: Fri, 19 Apr 2024 21:56:56 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH RESEND] Bluetooth: btusb: medaitek: fix double free of skb in
- coredump
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <171355622856.26355.12127979464027120079.git-patchwork-notify@kernel.org>
-Date: Fri, 19 Apr 2024 19:50:28 +0000
+User-Agent: Mozilla Thunderbird
+Subject: Re: Bluetooth: btusb: medaitek: fix double free of skb in coredump
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, linux-bluetooth@vger.kernel.org,
+ linux-mediatek@lists.infradead.org, kernel-janitors@vger.kernel.org
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+ Marcel Holtmann <marcel@holtmann.org>, LKML <linux-kernel@vger.kernel.org>,
+ Sean Wang <sean.wang@kernel.org>, Chris Lu <chris.lu@mediatek.com>,
+ Dan Carpenter <dan.carpenter@linaro.org>, Deren Wu <deren.wu@mediatek.com>,
+ Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+ Manish Mandlik <mmandlik@google.com>, Miao-chen Chou <mcchou@chromium.org>,
+ Michael Sun <michaelfsun@google.com>, shawnku@google.com,
+ frankgor@google.com, jsiuda@google.com
 References: <da0859c4b24d314d9ff38179c26a58ee7e3f16d6.1713395895.git.sean.wang@kernel.org>
-In-Reply-To: <da0859c4b24d314d9ff38179c26a58ee7e3f16d6.1713395895.git.sean.wang@kernel.org>
-To: Sean Wang <sean.wang@kernel.org>
-Cc: luiz.dentz@gmail.com, marcel@holtmann.org, johan.hedberg@gmail.com,
- sean.wang@mediatek.com, chris.lu@mediatek.com, Deren.Wu@mediatek.com,
- jsiuda@google.com, frankgor@google.com, abhishekpandit@google.com,
- michaelfsun@google.com, mmandlik@google.com, abhishekpandit@chromium.org,
- mcchou@chromium.org, shawnku@google.com, linux-bluetooth@vger.kernel.org,
- linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
+ <cb593f2a-7dbe-44aa-b9ff-7fc57a4bd70a@web.de>
+ <CABBYNZL1=RyzuXcDpAwcXyOe_8Bh4gJtDzKdS55-3ZF4rZRj7A@mail.gmail.com>
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <CABBYNZL1=RyzuXcDpAwcXyOe_8Bh4gJtDzKdS55-3ZF4rZRj7A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:S8WVsoPLtqYG/ykvrpdfXwxTb9GQ6ddC7R7zsOQbPfIOAPVg5bH
+ cMPj7nuSOAH+vCBx5OH4wb42KGMA6DWS72RdGxaVQ6GogDsV6zx1u9KXKVPQ6WDqKqmppbs
+ vxrwA7C9+GYDicbVt/kTg85dLhkoRSq0ycv2rJslHIS1PtxilV0j5WC27ds1+k8kIdd178e
+ Uw04abQuIawH3E6PHXxXg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:0SfpuT7Zf8o=;uZUyp+Nr+hFB7lgbCA8xf5U6SOd
+ G6jAFLKGPouMeLYW4ECJ9Nj3ptXypcKX5dsGcaY4cgMYcFcjmm1XlEuevFyYL99tscs8ucgsb
+ 2TCitR49unAcRFalK8OpUepLM+sxcAp8D85ZpEeiQjzGsQ09JyVdC7K3bOOX9azTYS+NJLuTH
+ 2QS0weenCJIYoUNbGo5ibW5MTm57SYaxyqTbbzPw03xkWt3Ocl5Ggl6GhNVhsusXSbuBZvK1D
+ /edJ3mSUaeEwXQm+2slS9GfpYmCm4HQS/MCt8/1thcYEF7urQCd7pJNfYag4CpESUib3cwygn
+ GE/kqPk41/7ldFc4gUhfLRce35yrIzXg9W44EfjQVkPsxYTdEBWxV68yshYOo+pfr6GVsTFbC
+ h6mxd3WUJx3j7rZUIykxOLFxoVSFL2bTDPMdyhlstEV+IaxoW5fxKe4RCJKBmNi4qgxuHq6RA
+ JqtZkeI80XrK5wiEb0KLHj/uapL9LgO/JTh8dVBNkRr0F+qnAnRtepTQpMODMIAEv+ovtVv5c
+ kdqZJ7u/YqZflNTruCf63ZvkjsvDyel/8TqnZ496NZNXTft8Rb+zflWEzJgOOXmxACrI7kvoB
+ 7FidVNYsshtC2l+ebPjq7MB7ubEzlRtbIn6J86VKKkV2ST6v/fYbABAV47XHi1fHLg1X+EzPm
+ ekgotMOoGSVlHZet9dCO4ydT7+Vc/dmku7qn2wBEV9r+sL3eV3L1XepaoYD4Yw8avZBtzV3VF
+ ttrwDx8L+s3sQWwPHOOHeNgLe6LhEmT0YtDfRmwxl2b4yr7U9KHv4jv92Y25a3sbysuYYRbf/
+ NNcKcS6YOo/M7ZUFUzPuFUuc4XphAToefC6dayaYh+mzw=
 
-Hello:
+>> I hope that a typo will be avoided in the subsystem specification
+>> for the final commit.
+>
+> Are you talking about medaitek
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+Yes.
 
-On Wed, 17 Apr 2024 16:27:38 -0700 you wrote:
-> From: Sean Wang <sean.wang@mediatek.com>
-> 
-> hci_devcd_append() would free the skb on error so the caller don't
-> have to free it again otherwise it would cause the double free of skb.
-> 
-> Fixes: 0b7015132878 ("Bluetooth: btusb: mediatek: add MediaTek devcoredump support")
-> Reported-by : Dan Carpenter <dan.carpenter@linaro.org>
-> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-> 
-> [...]
-
-Here is the summary with links:
-  - [RESEND] Bluetooth: btusb: medaitek: fix double free of skb in coredump
-    https://git.kernel.org/bluetooth/bluetooth-next/c/6764ab72237d
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Do you prefer references for mediatek here?
 
 
+> or is there another typo?
+
+Not yet.
+
+Regards,
+Markus
