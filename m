@@ -1,75 +1,100 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7817AA23
-	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Apr 2024 19:40:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8611425740;
+	Fri, 19 Apr 2024 19:42:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713555629; cv=none; b=Gol0lDQF3MBZOhChSGTbNaQvp2lh2YBx3CJug2XH6xnTeiw2J2lGCUQXtdS/TaFuzJMyg++9/zjHycjNFb2YXT/IajmfqD/64SFiL4vmttXruCg6ifs7EcZc4lyK7BZAggT+RY5X9TAVpwGcvlUjnfLWEZlnsSq0lPHHBxABaTg=
+	t=1713555736; cv=none; b=TnCgna6bvkHDB3owRexXiRte+y8WshN1OAjzPpChpTnMLUvjyBqRPg2qJwR7/oNiqnZewmJAoqXCtv4NAfoqGO/9WPKSf2jc2i44UNGl3rCWIfulzYeIEL/hKYk7+GXUPUpjghuZl8/F2Hsbz/UIjXxEYnMK6/6GTMgY0vnB5QU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713555629; c=relaxed/simple;
-	bh=GGOxMYfUyz5mBNzV8xQPw5hgJqfGZNBqhOzyJ74RBsU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=M1FkaCQVTOS3VmEI0SZT9DfH9HqQd+9+6F31cMxaGyXH9XuIrbwGmI2cAXW2qQRkuDPZH7zclPpbBLAuASmFIAVLNwQf0zVsENtxcwUlEq4osqWnV78Cb+m+S/x4/+Q8CxGZpGFEgWmMuohDxMHe6aUeRY3ArM4jY1d7bMNYMFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=af0G9hBb; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713555736; c=relaxed/simple;
+	bh=uyMz+5agVBSVEi4Ga+1h11jGQlr5IOfzTQGb7A2+i6c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oMSW9k3TK8Gct5hS0vK7iu1DO/IYnHONEtleJ27K5/hMnZ3Bb4jvB13QWgk4ZmuLWzXEEWaXRvLC1fFI/GtWy1OUXJ3gSdRkNamMNE7ZkbBJjHKZ/kbSwJl0rIHbbYpy5qFAvb+PAhl6U7Hd8GKbVhb/8i0SXjx9OsDuWNYOhjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YooUtFDp; arc=none smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="af0G9hBb"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E5FE9C072AA;
-	Fri, 19 Apr 2024 19:40:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713555628;
-	bh=GGOxMYfUyz5mBNzV8xQPw5hgJqfGZNBqhOzyJ74RBsU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=af0G9hBbQkbWX2wNiZ0ov4QMAD2eXNIfi34pL42WDjLoNrwQzZcfbZLTQicw+CqGo
-	 Mmmy8qCvsMnO8KTb2FO4MPpLIN7qBYxk1KNr4RKwr1+UO/qoGDsEAUMA94kjzMFD8l
-	 nX5tjSiPE7SQZrKwj9F1In8OdHSQhM5BAjXEoXN9VsMCZSRuYqcJyGFeNuTJaerOwh
-	 VVa9gA9ZzyyQrpGtRT7a4r6VeSN5FraufsQPUE2lqkq+Mp3P5igIkBudO3+zhGIYr1
-	 jeLXJbXwXrJ2aFuZmo/yZdfwJYvXpxz/aSOzZbakuRmMHckrCtwpW0KB41uhesbwZj
-	 DlJN+fqTBStvw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DDB69C433E9;
-	Fri, 19 Apr 2024 19:40:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YooUtFDp"
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2db6f5977e1so32478141fa.2;
+        Fri, 19 Apr 2024 12:42:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713555732; x=1714160532; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uyMz+5agVBSVEi4Ga+1h11jGQlr5IOfzTQGb7A2+i6c=;
+        b=YooUtFDpnmMqJfbzYtfkP+FB0ik/r0q2tAHtx39qLyDau4IqMcAVcQxvkNKTrL7Ae+
+         O+nCgBlL6Lh/qfayPTkbCipb1SnrI0T7f1eahcn8CxxZJVYr7mPqhwgy02wql6L91Fsv
+         YAzYd0ASIV6tzCD+v8dwi/OoowjMHicIJMwOCRuiywy3ZhbL5yIFfPit2DVM0d81wDAm
+         VQjgSPbcqa3ZMaaHnQ9vn9HPaAY+5vi5iDfoChJ0erKKhLIk3xHIeVd9AxJ5GXtpun2K
+         TZuOaXV3iIrjS3xrvM8LwzEuzluRJzAHhFBXi1rN1uy+KYOypAi+dGCL2McNNG4YvrZ6
+         HyoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713555732; x=1714160532;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uyMz+5agVBSVEi4Ga+1h11jGQlr5IOfzTQGb7A2+i6c=;
+        b=MxAIhMtGlC97uGD+XFvVJUKitsSX1AmRBbvkyPxNYA0vFuzMDfJcwlItehJKV+/cO4
+         uApN3emU0kvs8OGe2kI3biUMPUwtoCmx2rFOyiNe6fwwO8XMDr1w0+GS33freqa4Uy4N
+         m6EI/A77yA6/4jjDfFgAC63ZGQ/s4ql2WysOd/h45lswOnY4gt15MGpkyzRoNtt4iV16
+         xWefm09i/Qo08rgJCXTa94K4hU4kA6vJfl0R/b2mrEYFo5osqnfh2Qsya2US9lW7ckM9
+         AISo+VLqJ6db/MPuV26w+DXMz6vuYPn/7zI3SkB8GFW9foPUrBWchw4i+NHwTZ+f9AWH
+         LIVA==
+X-Forwarded-Encrypted: i=1; AJvYcCWdzjc3I5/uDtb2yqp5AYs24P8Kb++UFv2riiWsNf/LwTXJW2WmQNwnGazCVliAaOQIG077TMyVIOdNd0qsyEkxu5K90G1cIM5FNv0t+OiMRuPj+qrtQfhT2lqhPBi3dy8uRBS1W0m3Cy0a8l8+APUN/25Ga1wnEGjt8Se5ju+Vkm1pCUcKpI4PvWQBwdNH
+X-Gm-Message-State: AOJu0Yyownk1XenY8+r6oBjpG1xqiXjIQ9dO4vQw/+acYUySJnPKpJ6w
+	PB2us4IJdMCkLQvBK9bPSbtBMvXjACjyllrisufMYoL38EfcC174SvY8ymPMzGWU93rVLVuo/HA
+	XEIcVOAfjS+anbGe5M0DKbWe8mJc=
+X-Google-Smtp-Source: AGHT+IHLNy/Po1edLygtZJom4CsUlR5CbZo3KM1lH6iARm4i+Imm8HaxPbs6daWiXd49JGyav9kIvcytqWm3A2N6lPs=
+X-Received: by 2002:a2e:bc19:0:b0:2da:6b4:8b16 with SMTP id
+ b25-20020a2ebc19000000b002da06b48b16mr2152099ljf.29.1713555732487; Fri, 19
+ Apr 2024 12:42:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1] client/advertising: Add flag to mark if data is
- valid
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <171355562890.20392.7629648603176993309.git-patchwork-notify@kernel.org>
-Date: Fri, 19 Apr 2024 19:40:28 +0000
-References: <20240419144117.1554291-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240419144117.1554291-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+References: <da0859c4b24d314d9ff38179c26a58ee7e3f16d6.1713395895.git.sean.wang@kernel.org>
+ <cb593f2a-7dbe-44aa-b9ff-7fc57a4bd70a@web.de>
+In-Reply-To: <cb593f2a-7dbe-44aa-b9ff-7fc57a4bd70a@web.de>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 19 Apr 2024 15:42:00 -0400
+Message-ID: <CABBYNZL1=RyzuXcDpAwcXyOe_8Bh4gJtDzKdS55-3ZF4rZRj7A@mail.gmail.com>
+Subject: Re: [PATCH RESEND] Bluetooth: btusb: medaitek: fix double free of skb
+ in coredump
+To: Markus Elfring <Markus.Elfring@web.de>
+Cc: Sean Wang <sean.wang@mediatek.com>, linux-bluetooth@vger.kernel.org, 
+	linux-mediatek@lists.infradead.org, kernel-janitors@vger.kernel.org, 
+	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
+	LKML <linux-kernel@vger.kernel.org>, Sean Wang <sean.wang@kernel.org>, 
+	Chris Lu <chris.lu@mediatek.com>, Dan Carpenter <dan.carpenter@linaro.org>, 
+	Deren Wu <deren.wu@mediatek.com>, 
+	Abhishek Pandit-Subedi <abhishekpandit@chromium.org>, Manish Mandlik <mmandlik@google.com>, 
+	Miao-chen Chou <mcchou@chromium.org>, Michael Sun <michaelfsun@google.com>, shawnku@google.com, 
+	frankgor@google.com, jsiuda@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+Hi Markus,
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+On Thu, Apr 18, 2024 at 5:40=E2=80=AFAM Markus Elfring <Markus.Elfring@web.=
+de> wrote:
+>
+> > hci_devcd_append() would free the skb on error so the caller don't
+> > have to free it again otherwise it would cause the double free of skb.
+>
+> I hope that a typo will be avoided in the subsystem specification
+> for the final commit.
 
-On Fri, 19 Apr 2024 10:41:17 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This allows the use of type 0x00 which otherwise could not be selected
-> since the property would not be exposed even though the data could be
-> set.
-> ---
->  client/advertising.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
-
-Here is the summary with links:
-  - [BlueZ,v1] client/advertising: Add flag to mark if data is valid
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=4dea3fb932f8
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Are you talking about medaitek or is there another typo?
 
 
+> Regards,
+> Markus
+
+
+
+--=20
+Luiz Augusto von Dentz
