@@ -1,100 +1,82 @@
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8611425740;
-	Fri, 19 Apr 2024 19:42:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11297139CE8;
+	Fri, 19 Apr 2024 19:50:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713555736; cv=none; b=TnCgna6bvkHDB3owRexXiRte+y8WshN1OAjzPpChpTnMLUvjyBqRPg2qJwR7/oNiqnZewmJAoqXCtv4NAfoqGO/9WPKSf2jc2i44UNGl3rCWIfulzYeIEL/hKYk7+GXUPUpjghuZl8/F2Hsbz/UIjXxEYnMK6/6GTMgY0vnB5QU=
+	t=1713556229; cv=none; b=LyiiLQKqaagKRDEBSzwS8eMUIrxru4ynTmYiDldhkUmrJcAMhNNoysROLIJDwDJHK41WCYsW9BizTWDNwJVUtEg+N4xphEQp/R3s2PZguhz4f+M4IX6IRe/zlrZXDzY0yrt9U3c2X7cKJirnscr1oMx84CCDowTQUOT5vqKhJE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713555736; c=relaxed/simple;
-	bh=uyMz+5agVBSVEi4Ga+1h11jGQlr5IOfzTQGb7A2+i6c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oMSW9k3TK8Gct5hS0vK7iu1DO/IYnHONEtleJ27K5/hMnZ3Bb4jvB13QWgk4ZmuLWzXEEWaXRvLC1fFI/GtWy1OUXJ3gSdRkNamMNE7ZkbBJjHKZ/kbSwJl0rIHbbYpy5qFAvb+PAhl6U7Hd8GKbVhb/8i0SXjx9OsDuWNYOhjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YooUtFDp; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1713556229; c=relaxed/simple;
+	bh=x65GC0z98wTskh1l/wQIaNPdpvTmTWBoTgqMEUh8VgI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ElsiDA5urlSyg9f+5/b9leJTNZL9WniMzh89huY/YomrOHaI85Kif6b4RxZJl8aglebdu9rkw3l9Q2O+dGb3A3n+ekzWrY7ZvdPJUAaXbnktEZ/kGKcSDz0ZsrrwJtELieQ3XGtRjgPFVAWsF6a7eMpjG//XL+sjunbOwg0qQXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bUvR2KTl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YooUtFDp"
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2db6f5977e1so32478141fa.2;
-        Fri, 19 Apr 2024 12:42:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713555732; x=1714160532; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uyMz+5agVBSVEi4Ga+1h11jGQlr5IOfzTQGb7A2+i6c=;
-        b=YooUtFDpnmMqJfbzYtfkP+FB0ik/r0q2tAHtx39qLyDau4IqMcAVcQxvkNKTrL7Ae+
-         O+nCgBlL6Lh/qfayPTkbCipb1SnrI0T7f1eahcn8CxxZJVYr7mPqhwgy02wql6L91Fsv
-         YAzYd0ASIV6tzCD+v8dwi/OoowjMHicIJMwOCRuiywy3ZhbL5yIFfPit2DVM0d81wDAm
-         VQjgSPbcqa3ZMaaHnQ9vn9HPaAY+5vi5iDfoChJ0erKKhLIk3xHIeVd9AxJ5GXtpun2K
-         TZuOaXV3iIrjS3xrvM8LwzEuzluRJzAHhFBXi1rN1uy+KYOypAi+dGCL2McNNG4YvrZ6
-         HyoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713555732; x=1714160532;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uyMz+5agVBSVEi4Ga+1h11jGQlr5IOfzTQGb7A2+i6c=;
-        b=MxAIhMtGlC97uGD+XFvVJUKitsSX1AmRBbvkyPxNYA0vFuzMDfJcwlItehJKV+/cO4
-         uApN3emU0kvs8OGe2kI3biUMPUwtoCmx2rFOyiNe6fwwO8XMDr1w0+GS33freqa4Uy4N
-         m6EI/A77yA6/4jjDfFgAC63ZGQ/s4ql2WysOd/h45lswOnY4gt15MGpkyzRoNtt4iV16
-         xWefm09i/Qo08rgJCXTa94K4hU4kA6vJfl0R/b2mrEYFo5osqnfh2Qsya2US9lW7ckM9
-         AISo+VLqJ6db/MPuV26w+DXMz6vuYPn/7zI3SkB8GFW9foPUrBWchw4i+NHwTZ+f9AWH
-         LIVA==
-X-Forwarded-Encrypted: i=1; AJvYcCWdzjc3I5/uDtb2yqp5AYs24P8Kb++UFv2riiWsNf/LwTXJW2WmQNwnGazCVliAaOQIG077TMyVIOdNd0qsyEkxu5K90G1cIM5FNv0t+OiMRuPj+qrtQfhT2lqhPBi3dy8uRBS1W0m3Cy0a8l8+APUN/25Ga1wnEGjt8Se5ju+Vkm1pCUcKpI4PvWQBwdNH
-X-Gm-Message-State: AOJu0Yyownk1XenY8+r6oBjpG1xqiXjIQ9dO4vQw/+acYUySJnPKpJ6w
-	PB2us4IJdMCkLQvBK9bPSbtBMvXjACjyllrisufMYoL38EfcC174SvY8ymPMzGWU93rVLVuo/HA
-	XEIcVOAfjS+anbGe5M0DKbWe8mJc=
-X-Google-Smtp-Source: AGHT+IHLNy/Po1edLygtZJom4CsUlR5CbZo3KM1lH6iARm4i+Imm8HaxPbs6daWiXd49JGyav9kIvcytqWm3A2N6lPs=
-X-Received: by 2002:a2e:bc19:0:b0:2da:6b4:8b16 with SMTP id
- b25-20020a2ebc19000000b002da06b48b16mr2152099ljf.29.1713555732487; Fri, 19
- Apr 2024 12:42:12 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bUvR2KTl"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9BA63C2BD11;
+	Fri, 19 Apr 2024 19:50:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713556228;
+	bh=x65GC0z98wTskh1l/wQIaNPdpvTmTWBoTgqMEUh8VgI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=bUvR2KTlwI0I5MlLSJBpJhei/zHRCUBNLss9x0eWamMcK2+V+jhLoKwvL5Mzq6yNB
+	 7dO/TBaVHUDla3aregIl0rtjUoY71QPxKGHNbqQIxI5VAmfayqp6oopTVv76rzrKpc
+	 UfAHNkxu8PrRcaZQxXlr4veHAZtdL1Dle150bQhA2+0R/XOoOZC1hxpPW0sZ8klc70
+	 V6MsTq/CHF9NYEJj+s0aJhScInyFiWdaO5T0NroIFYuHyynKF8/KFyfx9xItV0z4NJ
+	 cfTcrysGnH4az2uejPqUtjwITLPA1RgO3x73g1Q6oKEjpbTF6ZBIrzakNIe1SMoqlI
+	 utxJnHgx7sYqQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8B967C43618;
+	Fri, 19 Apr 2024 19:50:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH RESEND] Bluetooth: btusb: medaitek: fix double free of skb in
+ coredump
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <171355622856.26355.12127979464027120079.git-patchwork-notify@kernel.org>
+Date: Fri, 19 Apr 2024 19:50:28 +0000
 References: <da0859c4b24d314d9ff38179c26a58ee7e3f16d6.1713395895.git.sean.wang@kernel.org>
- <cb593f2a-7dbe-44aa-b9ff-7fc57a4bd70a@web.de>
-In-Reply-To: <cb593f2a-7dbe-44aa-b9ff-7fc57a4bd70a@web.de>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 19 Apr 2024 15:42:00 -0400
-Message-ID: <CABBYNZL1=RyzuXcDpAwcXyOe_8Bh4gJtDzKdS55-3ZF4rZRj7A@mail.gmail.com>
-Subject: Re: [PATCH RESEND] Bluetooth: btusb: medaitek: fix double free of skb
- in coredump
-To: Markus Elfring <Markus.Elfring@web.de>
-Cc: Sean Wang <sean.wang@mediatek.com>, linux-bluetooth@vger.kernel.org, 
-	linux-mediatek@lists.infradead.org, kernel-janitors@vger.kernel.org, 
-	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
-	LKML <linux-kernel@vger.kernel.org>, Sean Wang <sean.wang@kernel.org>, 
-	Chris Lu <chris.lu@mediatek.com>, Dan Carpenter <dan.carpenter@linaro.org>, 
-	Deren Wu <deren.wu@mediatek.com>, 
-	Abhishek Pandit-Subedi <abhishekpandit@chromium.org>, Manish Mandlik <mmandlik@google.com>, 
-	Miao-chen Chou <mcchou@chromium.org>, Michael Sun <michaelfsun@google.com>, shawnku@google.com, 
-	frankgor@google.com, jsiuda@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <da0859c4b24d314d9ff38179c26a58ee7e3f16d6.1713395895.git.sean.wang@kernel.org>
+To: Sean Wang <sean.wang@kernel.org>
+Cc: luiz.dentz@gmail.com, marcel@holtmann.org, johan.hedberg@gmail.com,
+ sean.wang@mediatek.com, chris.lu@mediatek.com, Deren.Wu@mediatek.com,
+ jsiuda@google.com, frankgor@google.com, abhishekpandit@google.com,
+ michaelfsun@google.com, mmandlik@google.com, abhishekpandit@chromium.org,
+ mcchou@chromium.org, shawnku@google.com, linux-bluetooth@vger.kernel.org,
+ linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
 
-Hi Markus,
+Hello:
 
-On Thu, Apr 18, 2024 at 5:40=E2=80=AFAM Markus Elfring <Markus.Elfring@web.=
-de> wrote:
->
-> > hci_devcd_append() would free the skb on error so the caller don't
-> > have to free it again otherwise it would cause the double free of skb.
->
-> I hope that a typo will be avoided in the subsystem specification
-> for the final commit.
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Are you talking about medaitek or is there another typo?
+On Wed, 17 Apr 2024 16:27:38 -0700 you wrote:
+> From: Sean Wang <sean.wang@mediatek.com>
+> 
+> hci_devcd_append() would free the skb on error so the caller don't
+> have to free it again otherwise it would cause the double free of skb.
+> 
+> Fixes: 0b7015132878 ("Bluetooth: btusb: mediatek: add MediaTek devcoredump support")
+> Reported-by : Dan Carpenter <dan.carpenter@linaro.org>
+> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+> 
+> [...]
 
+Here is the summary with links:
+  - [RESEND] Bluetooth: btusb: medaitek: fix double free of skb in coredump
+    https://git.kernel.org/bluetooth/bluetooth-next/c/6764ab72237d
 
-> Regards,
-> Markus
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
---=20
-Luiz Augusto von Dentz
