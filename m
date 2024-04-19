@@ -1,60 +1,65 @@
-Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
+Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2124712BE93
-	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Apr 2024 20:23:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BEF312BE93
+	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Apr 2024 20:23:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713558226; cv=none; b=rgrgjDCvk0ihPrUBmTacOQ0J1e/nEOCPdZkXc8cp5Gq0BimUwbau50nyXdjt8uRs/zA8AFxeVK4NMeSrkknSnpE8OQGBskznXDGoghzRN0LCJedhCNaQRkWRGp0BSFfz1VJO68EJ8PppYrhUbpzg4eVVFFB//IBNgdo1bC/XJf8=
+	t=1713558228; cv=none; b=rg6Ru0+vvMLnZH4jM8ueaK4X7I0zzF1zkzFdN5WrW2JGoZUvF5PeGPprvpPIeN9IFw0ZVKAMa5d950T4+/JzNumsOhXDH8PzcVUyzlCCLaN77DTRMuDfdaLo3Zhengq7eeHYKRZSv+CNUO2AsatwE3JhQKHRe3ezONkk0L251NY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713558226; c=relaxed/simple;
-	bh=mzWCx/AqdSzGS5oV0fY4XebMhHKEgNlAWPQ80m3ivCo=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=K/emjoqVRnMpg7ZRkZqL5SmonBdRpVf5A9yzFRH+Hwz+3g9tdXU2U8M9cmW3ms7Djg9LACxN886K0GhTKNgugeyfiEPwY4C63dK/GvATwTqdvFj8o6YS8TnWE7jYx3YPu8Oh9szkvaJUGzfYDRj1agAWkCYdPuo+h07c2iado3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xl/H6emU; arc=none smtp.client-ip=209.85.221.182
+	s=arc-20240116; t=1713558228; c=relaxed/simple;
+	bh=yuUE75OBmec4Ehvw78aZRx58MHJWs2pBJgtDeL1g8PI=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=XP4ffvjdgzjkrwWSzkM1psPRpzBVEJi7Fj/xkS49QQ9ioNVZJTbEMb2zLhBZcrPnF9ACzxQ5+J+VwcclgBpR4v4kkHlJLi1i2y9BypjlTgCAxV8dRSMr49vYYWwTYFB2KmYe1dM+bqAuMdpC1kv9AEe3tRZ8qb2U/2un6MR7Sh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=czuu4qQ6; arc=none smtp.client-ip=209.85.221.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xl/H6emU"
-Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-4dac112e142so717294e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Apr 2024 13:23:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="czuu4qQ6"
+Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-4dcceac3ae1so762483e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Apr 2024 13:23:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713558223; x=1714163023; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ns/QWSfCcQ2qeMzOP7FTDn5CaYPpr3H9iBes5TfM/7M=;
-        b=Xl/H6emU2+sESxvPc4KLqUpsRIUZ/tVfdi23Cgwto5RjQMU9YrX/Gls0CRaGMBiVv2
-         XHgwnYq6WSq21o8xNxM8xc4JAGvxCR5eSWMjDwV0ac3aSYnEXl/Yp+5yz2gWrxGisWVy
-         TOF924+QWhrw1Z53RbiuX5iDNhI8/kCLfHj0nr1mHi6FYkLp2iO7XyxqTer1HMwwOC1/
-         OS+dmY9KTN+9W4Q6fVoZA2dBmYw1aECP5QgEzskZRFJZz0RJdJ3vBV5T47MGqSo/PK9n
-         AVLxydOXtzHHZm9p25A6SBoG8CkSUJv1lgJ6rlU2nV9dsdHPkJDkzPrCkM3Mkz0M10PB
-         SXPw==
+        d=gmail.com; s=20230601; t=1713558225; x=1714163025; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mxk7W+/13YVXMokNPGV0pgKi7UgZ2RJlF54G65r32QA=;
+        b=czuu4qQ6abSZb2nmaQ+hp6mA7jzZj8fEDir9vWZFkZeaLUGG9WnHlWXK6yfwcM5Q/M
+         UMvhZswMWnqLe1NljMui6dCUt6PuiQ+HoVD3dXEEwByHy10gJbnV3YxTqwCSI9r+0HV+
+         8dSZfm7UrcNC0Ps8NsjxoF3KjOgzbQwHEbENTID+E0KVh7affyeQVMxXT0EUvvj6Tk6b
+         fUiL2b+Fg7uA5bxA9LjjQ89fy9qFo3fOZpxawIRxguLi+A5ZneBuGwmuZg5tFJjv+5Rg
+         +qbkFU0/sKNA1xhyG+/57Rnjbc1Fprkip3U8zz7WOkeEibgtt/6r3gxftywPofnGro4+
+         EfiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713558223; x=1714163023;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ns/QWSfCcQ2qeMzOP7FTDn5CaYPpr3H9iBes5TfM/7M=;
-        b=YvlW8PzXhBGnu8k4ItDLEEj+N2kiJqAOHeq5eMtk7AR2P0uzSdtwjVPUXjjAb4m5sP
-         xXso+2ll/ynWk14oUk4jSXnIWbNL+ro+4fhiorB8P1CtkwIe7c2/qWJXKm90DAPY74u0
-         JTCoZMOR3mDe6lLxYiaSXzplK2ne9wDByCqm8fbpiUihMqvA5nsg52OLHQb9Fl+f9D1g
-         ioXvT3SL+nYP8XRKLfg4jGH8J+jJsKeUg4Fqx1mmkeZxANGQrMasMfULMshTRGSVDHUk
-         wYuJEg9lx06kOmBoYJABHNmhT1/yPbx9yZyrtzvLQcoI5RDsx+kUA4WGbhzLk/C2XMJP
-         o2mg==
-X-Gm-Message-State: AOJu0YyLC5h3zHuaM2d+xhz8ByOtVL9AbFDIzwbOm2EPFSJ5md/0R8/2
-	WT7yCtKfGiOnGbLWenfYsBad5LH0IcWw2FGTMFJ1mvYDQ7cmggqMSPsYDw==
-X-Google-Smtp-Source: AGHT+IGFZVlKAppP3X65wIj+P0AmTEuiCC8UjIOKdh9Tq5FUWvYHoJEmzU229qgz6ZnJlubQwDrcRA==
-X-Received: by 2002:a05:6122:222a:b0:4c8:8d45:5325 with SMTP id bb42-20020a056122222a00b004c88d455325mr3621963vkb.7.1713558222914;
-        Fri, 19 Apr 2024 13:23:42 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713558225; x=1714163025;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mxk7W+/13YVXMokNPGV0pgKi7UgZ2RJlF54G65r32QA=;
+        b=CR+IzQOMkmHje1l1GauwY4t3cFigkM+E8UE0M52U+9o6xHb/molpgqUzkGo02spRNL
+         WqqdqfyqI55CqOiY5JQVYk6TvuuhJ06q2IYpakUR5RoJY0ri7m18j8BeQAKvHVOjP+PI
+         NgeBiKbONwoPfvNkN2aVlAFC1yhi1gaiXiblsvwrhBLXdiODFFmAYOo1qe5NIPSvys4g
+         ElkwrrBxIhxOJ1N6GCwpndtAUJCXvR43478K+NWp06+wUNGkewo3JJjNNdTQbUneXW3I
+         5jg9anPVE8OZyP7WISTIIa0Vts2mt/9fxOxjw31cTGJXFRsHr74UyF394RqLsF5kcFYe
+         O7yA==
+X-Gm-Message-State: AOJu0YzBanTd8ZSRt5cb85CB7IT3jPWDMLxZNoTllvLY28dJhV6+1d9W
+	i/XM9JZ8+AB7L2gjjMFlccKayo4VKnNllgP7OxOpt40XIj0xCX/ITRa7Kw==
+X-Google-Smtp-Source: AGHT+IHmhzeIPgk9pPa0PYlKxCgJDJBtn4fZ1kgtdaRd91uiRQmUQJXgry6dvNQDSdjQ7XbdW6BVlg==
+X-Received: by 2002:a05:6122:3286:b0:4d3:4aad:1b9c with SMTP id cj6-20020a056122328600b004d34aad1b9cmr3513676vkb.0.1713558225044;
+        Fri, 19 Apr 2024 13:23:45 -0700 (PDT)
 Received: from lvondent-mobl4.. ([107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id r2-20020ab03302000000b007ec900d958fsm195833uao.7.2024.04.19.13.23.41
+        by smtp.gmail.com with ESMTPSA id r2-20020ab03302000000b007ec900d958fsm195833uao.7.2024.04.19.13.23.43
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Apr 2024 13:23:42 -0700 (PDT)
+        Fri, 19 Apr 2024 13:23:43 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 1/2] client/player: Fix calculation of number of packet
-Date: Fri, 19 Apr 2024 16:23:40 -0400
-Message-ID: <20240419202341.1635591-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 2/2] client/player: Fix using unicast QoS for broadcast
+Date: Fri, 19 Apr 2024 16:23:41 -0400
+Message-ID: <20240419202341.1635591-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.44.0
+In-Reply-To: <20240419202341.1635591-1-luiz.dentz@gmail.com>
+References: <20240419202341.1635591-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -65,37 +70,104 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The calculation shall attempt to round to number of packets to the
-closest integer otherwise it can result in 0 packets to be sent at each
-latency.
+The code needs to identify first if the parameters refers to a broadcast
+stream or unicast.
 ---
- client/player.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ client/player.c | 34 ++++++++++++++++++++++------------
+ 1 file changed, 22 insertions(+), 12 deletions(-)
 
 diff --git a/client/player.c b/client/player.c
-index 1f56bfd270f6..65f771039258 100644
+index 65f771039258..6b70e9ed3f9d 100644
 --- a/client/player.c
 +++ b/client/player.c
-@@ -63,6 +63,7 @@
- #define NSEC_USEC(_t) (_t / 1000L)
- #define SEC_USEC(_t)  (_t  * 1000000L)
- #define TS_USEC(_ts)  (SEC_USEC((_ts)->tv_sec) + NSEC_USEC((_ts)->tv_nsec))
-+#define ROUND_CLOSEST(_x, _y) (((_x) + (_y / 2)) / (_y))
+@@ -34,6 +34,7 @@
  
- #define EP_SRC_LOCATIONS 0x00000003
- #define EP_SNK_LOCATIONS 0x00000003
-@@ -5031,8 +5032,9 @@ static bool transport_timer_read(struct io *io, void *user_data)
+ #include "lib/bluetooth.h"
+ #include "lib/uuid.h"
++#include "lib/iso.h"
+ 
+ #include "profiles/audio/a2dp-codecs.h"
+ #include "src/shared/lc3.h"
+@@ -143,6 +144,7 @@ struct transport {
+ 	struct io *io;
+ 	uint32_t seq;
+ 	struct io *timer_io;
++	int num;
+ };
+ 
+ static void endpoint_unregister(void *data)
+@@ -5008,7 +5010,6 @@ static bool transport_timer_read(struct io *io, void *user_data)
+ 	struct bt_iso_qos qos;
+ 	socklen_t len;
+ 	int ret, fd;
+-	uint32_t num;
+ 	uint64_t exp;
+ 
+ 	if (transport->fd < 0)
+@@ -5032,11 +5033,7 @@ static bool transport_timer_read(struct io *io, void *user_data)
  		return false;
  	}
  
--	/* num of packets = latency (ms) / interval (us) */
--	num = (qos.ucast.out.latency * 1000 / qos.ucast.out.interval);
-+	/* num of packets = ROUND_CLOSEST(latency (ms) / interval (us)) */
-+	num = ROUND_CLOSEST(qos.ucast.out.latency * 1000,
-+				qos.ucast.out.interval);
- 
- 	ret = transport_send_seq(transport, transport->fd, num);
+-	/* num of packets = ROUND_CLOSEST(latency (ms) / interval (us)) */
+-	num = ROUND_CLOSEST(qos.ucast.out.latency * 1000,
+-				qos.ucast.out.interval);
+-
+-	ret = transport_send_seq(transport, transport->fd, num);
++	ret = transport_send_seq(transport, transport->fd, transport->num);
  	if (ret < 0) {
+ 		bt_shell_printf("Unable to send: %s (%d)\n",
+ 					strerror(-ret), ret);
+@@ -5052,7 +5049,7 @@ static bool transport_timer_read(struct io *io, void *user_data)
+ }
+ 
+ static int transport_send(struct transport *transport, int fd,
+-					struct bt_iso_qos *qos)
++					struct bt_iso_io_qos *qos)
+ {
+ 	struct itimerspec ts;
+ 	int timer_fd;
+@@ -5070,14 +5067,15 @@ static int transport_send(struct transport *transport, int fd,
+ 		return -errno;
+ 
+ 	memset(&ts, 0, sizeof(ts));
+-	ts.it_value.tv_nsec = qos->ucast.out.latency * 1000000;
+-	ts.it_interval.tv_nsec = qos->ucast.out.latency * 1000000;
++	ts.it_value.tv_nsec = qos->latency * 1000000;
++	ts.it_interval.tv_nsec = qos->latency * 1000000;
+ 
+ 	if (timerfd_settime(timer_fd, TFD_TIMER_ABSTIME, &ts, NULL) < 0)
+ 		return -errno;
+ 
+ 	transport->fd = fd;
+-
++	/* num of packets = ROUND_CLOSEST(latency (ms) / interval (us)) */
++	transport->num = ROUND_CLOSEST(qos->latency * 1000, qos->interval);
+ 	transport->timer_io = io_new(timer_fd);
+ 
+ 	io_set_read_handler(transport->timer_io, transport_timer_read,
+@@ -5131,8 +5129,20 @@ static void cmd_send_transport(int argc, char *argv[])
+ 			bt_shell_printf("Unable to getsockopt(BT_ISO_QOS): %s",
+ 							strerror(errno));
+ 			err = transport_send(transport, fd, NULL);
+-		} else
+-			err = transport_send(transport, fd, &qos);
++		} else {
++			struct sockaddr_iso addr;
++			socklen_t optlen;
++
++			err = getpeername(transport->sk, &addr, &optlen);
++			if (!err) {
++				if (!(bacmp(&addr.iso_bdaddr, BDADDR_ANY)))
++					err = transport_send(transport, fd,
++							     &qos.bcast.out);
++				else
++					err = transport_send(transport, fd,
++							     &qos.ucast.out);
++			}
++		}
+ 
+ 		if (err < 0) {
+ 			bt_shell_printf("Unable to send: %s (%d)",
 -- 
 2.44.0
 
