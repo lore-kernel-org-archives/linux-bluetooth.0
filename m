@@ -1,224 +1,328 @@
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D4A52563
-	for <linux-bluetooth@vger.kernel.org>; Sat, 20 Apr 2024 11:14:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713611642; cv=none; b=T8xyRosjlE3NCCGOh0PZLOsMWu++1uBMw96mIE1CZZWGoeyhASl3pb7+udEFhB+7asVMfjRIyT6/X92t5jOz/tSA9Zs0NdlGFlpAE+5rSb19IIrLWOx1I8n50o4FAWXN5Ysn3TR0Wy7Rd7QUlpMohCOmBAXPHS8aKEiyeoFdclE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713611642; c=relaxed/simple;
-	bh=RppZEGV/ccSUfwt8cxXV9ey8UXG91HSJotMChd5giyY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LPee0tHgdO9NvRJAXTsHHNLXxCCCLm9TZYqSxJ8EowqaqkDr9BZrsFAWKHS+OyhknSL+hUMdJWyci/iKPfMc9L2p3xcwzkD8nr8QgVvBDOLmyvyzZWi2tOcuJiWcYC8I0PfpMRuJmNxaBpkpAS4C88ROi6cBzu8ERWc+pPU71/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=NhuiMAie; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 398F6219E2
+	for <linux-bluetooth@vger.kernel.org>; Sat, 20 Apr 2024 12:43:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713616990; cv=pass; b=rEs1hxSuk+8+cHV7GGrO0NOee4xhCefq/jDtO68moqI6YObUya4dRvblHEhJZdjDE8qiXzLYdYWdYNEARdwKlR0kJ7tz+uBaHMhJSYPTD6T7ZQAil9XusWW1+cD3CB3XU/rf76/I73PZup15SPPxxtCXjPblCpXbws825pUicHA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713616990; c=relaxed/simple;
+	bh=LwFbDNOJiYBys9ph6tDsvwa0A+NRiTJSgekBjCX8M9k=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=HV0ZPjavrHvuTNLpr97T/S8AsEanylhfGPPYBzq3ol0LCFROmRE8GWYRwNeMBlm6GoUJaLgrcyqP6WNPG2rGuai27N6BI7Asuokprvbr0yKFgl6+zKhSaCc//OmgEiTqxTNYStSTB+Z0mGgM3dRBAAfESCdAvNGwegU67lgH5xw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=T5iijE/z; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NhuiMAie"
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-344047ac7e4so2339638f8f.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 20 Apr 2024 04:14:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1713611639; x=1714216439; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=RpaCBLRwVUaHxyixxxO4YLcvdiQBR/wSVK4Af+7Ypjo=;
-        b=NhuiMAie14eGocopTv9uosSsS6GqAm/62qPnctglJede9cTZmMT0Mmu/GFZkRXINwE
-         WjfSaLs46PkIyGozgswdFrv0HmL9gGIGUuq0mXsJMlUM7Jh9T+ljthoM2NjLe885x86M
-         oSoI4tD9xUYY/q27rP9adHNTaEJErWiIC+R2ywze7Cz/cxjt92EkruCpdlMeC51OZ8+E
-         OHk70RwQ3ojPRbgxrkKrzV6Ax0XcS6RQX561UI+25nP7BDHGnaatx4JICa5K4PyWSDi4
-         b4O1rd2JhYdCoT5w/dzSi7o3uO5E0XYcFbtFEZ9hRyk+hK3LKw6sSD5n3bsmlVSrJtDp
-         P/5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713611639; x=1714216439;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RpaCBLRwVUaHxyixxxO4YLcvdiQBR/wSVK4Af+7Ypjo=;
-        b=rR1GXpEq4fLSJZKcb0uMFmGgHn2KhG6tJNzY9PL5I9CBdSjVn45iweKIlJC8MQsK5m
-         rE3xsda+blZVkI/fEEWZmRrc6dDbwt2TuF3ce94m36vmKDD8yLSR6Ebx4vvyNUWt1zTZ
-         /Ku/L2i46s3NXGngPtfeVCXHhrKeMTkc8+cHrTYPovz43nWzfoAvsvUHrqoq5VCs5c7B
-         mpi0hVc/XugBeM+uUsuQxMKcntG6TAb8DXqVoiz7hESXnesqu+7qR389Y/UHFl3weXs5
-         G6VZHdUrhHYPlw1DgRkdvdqCmybISGZ5vhX2bf05DFGFdp2VFF48md+XC1BQBWjt/q75
-         OzCg==
-X-Gm-Message-State: AOJu0YwRfnb8OJI8MXoWoCi5LI2XBq6WqBRNtknClmq6G7W8mupO6sma
-	DrwskzoW228TJ0WXZFOdu54rkCXT1LxidMKHSmQqlp73DwIZ5X3Kgw6IyPQN9Qw=
-X-Google-Smtp-Source: AGHT+IH1t6QHvvfCXDANhOc1olr/YG2gMPevTSnDuD58D+Mtdx67w6z/M6stgqfiJ+9Dmq/+ywxYkw==
-X-Received: by 2002:adf:f68c:0:b0:341:b5ca:9e9c with SMTP id v12-20020adff68c000000b00341b5ca9e9cmr3170711wrp.25.1713611639262;
-        Sat, 20 Apr 2024 04:13:59 -0700 (PDT)
-Received: from [10.236.36.88] ([88.128.88.151])
-        by smtp.gmail.com with ESMTPSA id bf7-20020a0560001cc700b003439d2a5f99sm6632775wrb.55.2024.04.20.04.13.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 20 Apr 2024 04:13:58 -0700 (PDT)
-Message-ID: <2166fc66-9340-4e8c-8662-17a19a7d8ce6@linaro.org>
-Date: Sat, 20 Apr 2024 13:13:57 +0200
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="T5iijE/z"
+Received: from [192.168.1.195] (unknown [IPv6:2a0c:f040:0:2790::a01d])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4VMB4k67Vwz49Q12;
+	Sat, 20 Apr 2024 15:43:02 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1713616984;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=e038Tz7qoIY0cFWI9Q0Vg0FpMtbO95FDk0lu0u5kApI=;
+	b=T5iijE/zsYWWgyf5cglz6UQ75TlaUXR9semukuJ62GBBrOtUUDYFRxsB+0IJA2aAAxsaSn
+	srxWwxrX0AjCdKECog+7Xr/jWhoD0LrHqEOC/nFPqCZlUk/AfgadPgIlVOG0Aawg8bFC4k
+	YiNVJrgTCnKmBU04E/2k994j4tcjIVof31f5CaMZ1LrY9Dhx2trWIiFO5is66XDuUmdQIu
+	TMHq4vkKyHTkzxGOUuRMfUVHbnK1FoWHKHqlxTdItVa0o5qfHWrKaJ4uxKSyYeblgZspVu
+	4h4iRBurkdPM4zLDe8vWp8V18dGTau0Xo0zRwpL3kM2Kmbl6oUb/lTpIFPBVCQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1713616984;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=e038Tz7qoIY0cFWI9Q0Vg0FpMtbO95FDk0lu0u5kApI=;
+	b=dJvw/FlwHHlWkpkFzintsTbduKg3oC5HfI7ZEVNGgBRVMikPN8VOIfAReNO18sM0/rcyY6
+	/MiDPrbDLjAzqcu1QZPWz9ngzeiA6wtnW8soaTL3og1omga3vtd/nE2Iicwoh4/P/A3OZO
+	n2n+8cEJno7A08XTYUM3m/IgCOJ3UPK0qoO6P/u20S/b2n1kBqrK53rYXP7mGhEhMwWzbt
+	Xe7ZSoKpmZh7HfvYLQyOAsamYivvtsbjHtqYvD53XlpoUcMrbcnu6PqR04kROh9ALhvlM4
+	6nQoU2MUXAdUxeJUiTGw6Tkfmq0K2rStoBP1C4aABxfzqQ4erlMkSZ1YSINKfw==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1713616984; a=rsa-sha256;
+	cv=none;
+	b=PjjRk1ccjGlVKy5+QRhywRcDR+8fQsFV45LkhtPkm7EKwOJpJa/H8BoixD0sf18j3bXvak
+	1WRrxZ87kAvK3yYYN+JAs3sfe2+EzB0Orj0vRjQHWuzLthanfsBwo5SBWH2WIZqx44NwcW
+	kFmY13NtHMk8OUv2BHpgYAyPx8oegU+2BWI7B24f6AdQtaTey7qloFTmiothjOp6dJdK57
+	CkjPU0sQRCUXL6xuAwfsOr8py0WI60r/8udJBvaiLEOSId+46lwvL2NY0ls2xHwQY0Lh1r
+	ZVd5i+AQIzlq75GD67O8bbwTW40Y4BegknKKO913UT0wTUx10WWlsTjHx3hm+Q==
+Message-ID: <b356c9360b6491c77b8ae83072d19b8097d1f955.camel@iki.fi>
+Subject: Re: [PATCH BlueZ v2 1/1] client/player: Fix transport.send
+ command's transfer of packets
+From: Pauli Virtanen <pav@iki.fi>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Vlad Pruteanu
+	 <vlad.pruteanu@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Sat, 20 Apr 2024 15:42:58 +0300
+In-Reply-To: <CABBYNZ+SLy72-Tc-bDCYWRtin1y9VtQmKS-5vCYsdqDjSEfF8w@mail.gmail.com>
+References: <20240419145805.46263-1-vlad.pruteanu@nxp.com>
+	 <20240419145805.46263-2-vlad.pruteanu@nxp.com>
+	 <CABBYNZKAa5FHSxSByjp1OEFAJS_dTSnOdjEA3PoxcjbtH3aSLw@mail.gmail.com>
+	 <CABBYNZ+SLy72-Tc-bDCYWRtin1y9VtQmKS-5vCYsdqDjSEfF8w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 1/2] Revert "Bluetooth: hci_qca: don't use
- IS_ERR_OR_NULL() with gpiod_get_optional()"
-To: quic_zijuhu <quic_zijuhu@quicinc.com>, luiz.dentz@gmail.com,
- luiz.von.dentz@intel.com, marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org, wt@penguintechs.org,
- bartosz.golaszewski@linaro.org
-References: <1713449192-25926-1-git-send-email-quic_zijuhu@quicinc.com>
- <1713449192-25926-2-git-send-email-quic_zijuhu@quicinc.com>
- <83a1c837-e403-4da2-83c6-ee3dedbc1fe0@linaro.org>
- <7c5b85ca-e897-4798-97e7-955478c57d12@quicinc.com>
- <52394d97-04c3-4f77-aaae-f1e152cd5632@linaro.org>
- <0dca7c9b-6a97-4171-9b0c-5b806a4e8a60@quicinc.com>
- <4e4d8ee0-fbbe-4dc7-b40b-b983f9f39539@linaro.org>
- <01677a26-ea91-47cc-bdc4-283cf313d8e4@quicinc.com>
-Content-Language: en-US
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
- cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
- JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
- gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
- J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
- NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
- BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
- vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
- Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
- TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzTRLcnp5c3p0b2Yg
- S296bG93c2tpIDxrcnp5c3p0b2Yua296bG93c2tpQGxpbmFyby5vcmc+wsGUBBMBCgA+FiEE
- m9B+DgxR+NWWd7dUG5NDfTtBYpsFAmI+BxMCGwMFCRRfreEFCwkIBwIGFQoJCAsCBBYCAwEC
- HgECF4AACgkQG5NDfTtBYptgbhAAjAGunRoOTduBeC7V6GGOQMYIT5n3OuDSzG1oZyM4kyvO
- XeodvvYv49/ng473E8ZFhXfrre+c1olbr1A8pnz9vKVQs9JGVa6wwr/6ddH7/yvcaCQnHRPK
- mnXyP2BViBlyDWQ71UC3N12YCoHE2cVmfrn4JeyK/gHCvcW3hUW4i5rMd5M5WZAeiJj3rvYh
- v8WMKDJOtZFXxwaYGbvFJNDdvdTHc2x2fGaWwmXMJn2xs1ZyFAeHQvrp49mS6PBQZzcx0XL5
- cU9ZjhzOZDn6Apv45/C/lUJvPc3lo/pr5cmlOvPq1AsP6/xRXsEFX/SdvdxJ8w9KtGaxdJuf
- rpzLQ8Ht+H0lY2On1duYhmro8WglOypHy+TusYrDEry2qDNlc/bApQKtd9uqyDZ+rx8bGxyY
- qBP6bvsQx5YACI4p8R0J43tSqWwJTP/R5oPRQW2O1Ye1DEcdeyzZfifrQz58aoZrVQq+innR
- aDwu8qDB5UgmMQ7cjDSeAQABdghq7pqrA4P8lkA7qTG+aw8Z21OoAyZdUNm8NWJoQy8m4nUP
- gmeeQPRc0vjp5JkYPgTqwf08cluqO6vQuYL2YmwVBIbO7cE7LNGkPDA3RYMu+zPY9UUi/ln5
- dcKuEStFZ5eqVyqVoZ9eu3RTCGIXAHe1NcfcMT9HT0DPp3+ieTxFx6RjY3kYTGLOwU0EVUNc
- NAEQAM2StBhJERQvgPcbCzjokShn0cRA4q2SvCOvOXD+0KapXMRFE+/PZeDyfv4dEKuCqeh0
- hihSHlaxTzg3TcqUu54w2xYskG8Fq5tg3gm4kh1Gvh1LijIXX99ABA8eHxOGmLPRIBkXHqJY
- oHtCvPc6sYKNM9xbp6I4yF56xVLmHGJ61KaWKf5KKWYgA9kfHufbja7qR0c6H79LIsiYqf92
- H1HNq1WlQpu/fh4/XAAaV1axHFt/dY/2kU05tLMj8GjeQDz1fHas7augL4argt4e+jum3Nwt
- yupodQBxncKAUbzwKcDrPqUFmfRbJ7ARw8491xQHZDsP82JRj4cOJX32sBg8nO2N5OsFJOcd
- 5IE9v6qfllkZDAh1Rb1h6DFYq9dcdPAHl4zOj9EHq99/CpyccOh7SrtWDNFFknCmLpowhct9
- 5ZnlavBrDbOV0W47gO33WkXMFI4il4y1+Bv89979rVYn8aBohEgET41SpyQz7fMkcaZU+ok/
- +HYjC/qfDxT7tjKXqBQEscVODaFicsUkjheOD4BfWEcVUqa+XdUEciwG/SgNyxBZepj41oVq
- FPSVE+Ni2tNrW/e16b8mgXNngHSnbsr6pAIXZH3qFW+4TKPMGZ2rZ6zITrMip+12jgw4mGjy
- 5y06JZvA02rZT2k9aa7i9dUUFggaanI09jNGbRA/ABEBAAHCwXwEGAEKACYCGwwWIQSb0H4O
- DFH41ZZ3t1Qbk0N9O0FimwUCYDzvagUJFF+UtgAKCRAbk0N9O0Fim9JzD/0auoGtUu4mgnna
- oEEpQEOjgT7l9TVuO3Qa/SeH+E0m55y5Fjpp6ZToc481za3xAcxK/BtIX5Wn1mQ6+szfrJQ6
- 59y2io437BeuWIRjQniSxHz1kgtFECiV30yHRgOoQlzUea7FgsnuWdstgfWi6LxstswEzxLZ
- Sj1EqpXYZE4uLjh6dW292sO+j4LEqPYr53hyV4I2LPmptPE9Rb9yCTAbSUlzgjiyyjuXhcwM
- qf3lzsm02y7Ooq+ERVKiJzlvLd9tSe4jRx6Z6LMXhB21fa5DGs/tHAcUF35hSJrvMJzPT/+u
- /oVmYDFZkbLlqs2XpWaVCo2jv8+iHxZZ9FL7F6AHFzqEFdqGnJQqmEApiRqH6b4jRBOgJ+cY
- qc+rJggwMQcJL9F+oDm3wX47nr6jIsEB5ZftdybIzpMZ5V9v45lUwmdnMrSzZVgC4jRGXzsU
- EViBQt2CopXtHtYfPAO5nAkIvKSNp3jmGxZw4aTc5xoAZBLo0OV+Ezo71pg3AYvq0a3/oGRG
- KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
- fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <01677a26-ea91-47cc-bdc4-283cf313d8e4@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-On 20/04/2024 07:25, quic_zijuhu wrote:
-> On 4/19/2024 9:49 PM, Krzysztof Kozlowski wrote:
-> 
-> Hi Krzysztof,bartosz,
-> 
-> let me summarize our discussion here in order to reduce unneccessary
-> disagreements here.
-> 
-> 1) i only revert your change IS_ERR() to my change IS_ERR_OR_NULL.
-> 
-> 2) your change will cause serious regression issues for many lunched
-> products
+Hi,
 
-Instead of repeating every time "serious regression" can you actually
-explain the problem?
-None of commit messages from v3 help there.
+pe, 2024-04-19 kello 14:16 -0400, Luiz Augusto von Dentz kirjoitti:
+> Hi Pauli,
+>=20
+> On Fri, Apr 19, 2024 at 11:24=E2=80=AFAM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> >=20
+> > Hi Vlad,
+> >=20
+> > On Fri, Apr 19, 2024 at 10:58=E2=80=AFAM Vlad Pruteanu <vlad.pruteanu@n=
+xp.com> wrote:
+> > >=20
+> > > The transport.send command sends a number num of packets at intervals=
+ of
+> > > transport latency.
+> > >=20
+> > > Num is defined as qos.ucast.out.latency * 1000 / qos.ucast.out.interv=
+al.
+> > >=20
+> > > Since this latency could be smaller than the SDU interval, the result=
+ing
+> > > num could be 0, causing the file transfer to stop after the first pac=
+ket.
+> > > In this case num will be set to 1 so that at least 1 packet is always=
+ sent.
+> > >=20
+> > > It the transport send timer is set to a value smaller than that of SD=
+U
+> > > interval, the available buffers for ISO Data will eventually become f=
+ull.
+> > > Thus, if a packet can't be sent due to resource temporarily being
+> > > unavailable decrease the fd offset so that next time the same packet =
+will
+> > > be sent.
+> > >=20
+> > > This patch is a temporary fix until the appropriate solution that use=
+s
+> > > number of completed packets to control the flow of ISO Data packets i=
+s
+> > > implemented.
+> > >=20
+> > > Since both Unicast and Broadcast scenarios use the same transport fun=
+ctions
+> > > differentiate between the 2 cases when accessing the qos structures t=
+o get
+> > > the transport latency.
+> > > ---
+> > >  client/player.c | 55 +++++++++++++++++++++++++++++++++++++++++++----=
+--
+> > >  1 file changed, 49 insertions(+), 6 deletions(-)
+> > >=20
+> > > diff --git a/client/player.c b/client/player.c
+> > > index 1f56bfd27..ca169e58f 100644
+> > > --- a/client/player.c
+> > > +++ b/client/player.c
+> > > @@ -34,6 +34,7 @@
+> > >=20
+> > >  #include "lib/bluetooth.h"
+> > >  #include "lib/uuid.h"
+> > > +#include "lib/iso.h"
+> > >=20
+> > >  #include "profiles/audio/a2dp-codecs.h"
+> > >  #include "src/shared/lc3.h"
+> > > @@ -4972,11 +4973,23 @@ static int transport_send_seq(struct transpor=
+t *transport, int fd, uint32_t num)
+> > >                 }
+> > >=20
+> > >                 ret =3D send(transport->sk, buf, ret, 0);
+> > > +               /* If send failed due to the resource being temporari=
+ly
+> > > +                * unavailable the controller's ISO data buffers are
+> > > +                * full. Try sending the same packet next time.
+> > > +                */
+> > >                 if (ret <=3D 0) {
+> > > -                       bt_shell_printf("send failed: %s (%d)",
+> > > +                       if (errno =3D=3D EAGAIN) {
+> > > +                               /* Decrease the fd's offset so that t=
+he same
+> > > +                                * packet is sent next time.
+> > > +                                */
+> > > +                               offset =3D lseek(fd, -transport->mtu[=
+1],
+> > > +                                                               SEEK_=
+CUR);
+> >=20
+> > Not really sure why you think this is a good idea, ISO already has
+> > retransmission support and if that is failing then there is no reason
+> > to retry here, beside this could loop causing the same data to be
+> > retried forever.
+> >=20
+> > > +                       } else {
+> > > +                               bt_shell_printf("send failed: %s (%d)=
+",
+> > >                                                         strerror(errn=
+o), errno);
+> > > -                       free(buf);
+> > > -                       return -errno;
+> > > +                               free(buf);
+> > > +                               return -errno;
+> > > +                       }
+> > >                 }
+> > >=20
+> > >                 elapsed_time(!transport->seq, &secs, &nsecs);
+> > > @@ -5033,7 +5046,15 @@ static bool transport_timer_read(struct io *io=
+, void *user_data)
+> > >=20
+> > >         /* num of packets =3D latency (ms) / interval (us) */
+> > >         num =3D (qos.ucast.out.latency * 1000 / qos.ucast.out.interva=
+l);
+> > > -
+> > > +       if (num < 1)
+> > > +               /* The latency could be smaller than the interval res=
+ulting in
+> > > +                * num being 0. If this is the case, set it to 1 so t=
+hat packets
+> > > +                * will still be sent.
+> > > +                */
+> > > +               num =3D 1;
+> >=20
+> > Perhaps we should be looking into rounding closest sort of logic.
+> >=20
+> > > +       /* TODO: replace this timer based implementation with one tha=
+t
+> > > +        * uses the number of completed packets reports.
+> > > +        */
+>=20
+> Regarding this TODO item, Im planning to introduce something like the
+> following to io.h:
+>=20
+> +bool io_set_tx_complete_handler(struct io *io, io_tx_complete_func_t cal=
+lback,
+> +                               int flags, int pool_interval,
+> +                               void *user_data, io_destroy_func_t destro=
+y);
+>=20
+> The problem is that if we do schedule new packets on tx_complete
+> callback that doesn't account for the time it takes to process such
+> event, so over time this will accumulate and at some point we could
+> perhaps miss an interval, @Pauli Virtanen or perhaps you are not
+> really doing the flow control based on the TX timestamp/complete? That
+> perhaps depends if the controller is generating the events as soon as
+> the packet is submitted or at the exact moment of the event interval,
+> in any case the general idea is that we keep the controller buffers
+> full as much as possible to prevent missing intervals.
 
-> 
-> 3) we only need to discuss how to handle devm_gpiod_get_optional(...,
-> "enable", ...) returning NULL since this is only difference between your
-> change and mine.
-> 
-> 4) your change doesn't solve any actual issue and the reason you
-> submitted is that "The optional variants for the gpiod_get() family of
-> functions return NULL if the GPIO in question is not associated with
-> this device, and should not treat it as error".
-> 
-> code applet of your merged change is shown by below link
-> https://patchwork.kernel.org/project/bluetooth/patch/20240208164017.26699-1-brgl@bgdev.pl/#25705104
-> 
-> qcadev->bt_en = devm_gpiod_get_optional(&serdev->dev, "enable",
->  					       GPIOD_OUT_LOW);
-> -		if (IS_ERR_OR_NULL(qcadev->bt_en)) {
-> +		if (IS_ERR(qcadev->bt_en)) {
->  			dev_warn(&serdev->dev, "failed to acquire enable gpio\n");
->  			power_ctrl_enabled = false;
->  		}
-> 
-> 5) Original BT driver design agree with your point mentioned at 4), so
-> for case "qcadev->bt_en == nullptr", qca_serdev_probe() don't do error
-> return for this scenario and use dev_warn() instead of dev_err() to give
-> user prompt.
-> 
-> 6) your wrong fix changes flag power_ctrl_enabled set logic and will
-> cause serious BT regression issue, hope you will realize this point.
+Pipewire is currently not using the TX timestamps for flow control like
+that.
 
-Sorry, not realized and you did not explain it. Neither above nor in
-commit msg.
+The running min--max range of sendmsg-to-NCP event latency of each CIS
+is monitored, and if they are not in sync then packets are dropped to
+realign the CIS. Similarly, packets are dropped if latencies become
+larger than a defined threshold.
 
-> 
-> 
-> i would like to give below extra comments even if these comments are
-> irrelevant to the critical point of this issue mentioned at above 3)
-> 
-> A) you need to investigate it is a) the prompting approach or message
->  error or b) the if condition error even if if dev_err() is used to give
-> prompt instead of dev_warn() in above 4).
+Otherwise, one sendmsg() per CIS is done on every SDU_Interval based on
+a timer. This is from rt prio thread, so there's less timing jitter on
+our side. Earlier I experimented with explicitly pushing more data to
+keep buffers filled but this did not seem to really matter.
 
-What?
+One probably could try to do something smarter here, e.g. indeed trying
+to use the TX timestamp events to track how many packets are
+uncompleted, and then try to keep the number at a constant.
 
-> 
-> B) don't talk about how about devm_gpiod_get_optional() returning error
-> case since it is meaningless as explained by above 3). also don't
-> require a fix to fix another unreported issue. a fix is a good fix
-> if it fix the issue in question and don't introduce new issue.
+However, I don't see the Core specification saying much about the HCI
+ISO flow control. E.g. it's not so clear you can queue SDUs for next
+SDU_Intervals if you are not providing time stamps:
 
-What?
+BLUETOOTH CORE SPECIFICATION Version 5.4 | Vol 6, Part G page 3079
 
-> 
-> C) per DTS property enable-gpios of BT, different soc types have
-> different requirements, many are required and another many are NOT
-> mandatory as shown be below link.
-> https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/tree/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml.
-> 
-> for a soc type which are attached to 3rd platform, customer doesn't
-> would like to or are not able to congfig BT reset pin within DTS for QCA
-> driver even if QC strongly suggest customer config it and also be marked
-> as required within above DTS bindings spec link. i often meet this
-> scenario. there are many of such lunched products.
+3.3 TIME STAMP FOR SDU
+...
+When an HCI ISO Data packet sent by the Host does not contain a
+Time_Stamp or the Time_Stamp value is not based on the Controller's
+clock, the Controller should determine the CIS or BIS event to be used
+to transmit the SDU contained in that packet based on the time of
+arrival of that packet.
+...
 
-So where is it documented? Where is it explained? Which binding or which
-commit msg?
+>=20
+> > >         ret =3D transport_send_seq(transport, transport->fd, num);
+> > >         if (ret < 0) {
+> > >                 bt_shell_printf("Unable to send: %s (%d)\n",
+> > > @@ -5052,6 +5073,8 @@ static bool transport_timer_read(struct io *io,=
+ void *user_data)
+> > >  static int transport_send(struct transport *transport, int fd,
+> > >                                         struct bt_iso_qos *qos)
+> > >  {
+> > > +       struct sockaddr_iso addr;
+> > > +       socklen_t optlen;
+> > >         struct itimerspec ts;
+> > >         int timer_fd;
+> > >=20
+> > > @@ -5068,8 +5091,28 @@ static int transport_send(struct transport *tr=
+ansport, int fd,
+> > >                 return -errno;
+> > >=20
+> > >         memset(&ts, 0, sizeof(ts));
+> > > -       ts.it_value.tv_nsec =3D qos->ucast.out.latency * 1000000;
+> > > -       ts.it_interval.tv_nsec =3D qos->ucast.out.latency * 1000000;
+> > > +       /* Need to know if the transport on which data is sent is
+> > > +        * broadcast or unicast so that the correct qos structure
+> > > +        * can be accessed. At this point in code there's no other
+> > > +        * way of knowing this besides checking the peer address.
+> > > +        * Broadcast will use BDADDR_ANY, while Unicast will use
+> > > +        * the connected peer's actual address.
+> > > +        */
+> > > +       memset(&addr, 0, sizeof(addr));
+> > > +       optlen =3D sizeof(addr);
+> > > +
+> > > +       if (getpeername(transport->sk, &addr, &optlen) < 0)
+> > > +               return -errno;
+> > > +
+> > > +       if (!(bacmp(&addr.iso_bdaddr, BDADDR_ANY))) {
+> > > +               /* Interval is measured in ms, multiply by 1000000 to=
+ get ns */
+> > > +               ts.it_value.tv_nsec =3D qos->bcast.out.latency * 1000=
+000;
+> > > +               ts.it_interval.tv_nsec =3D qos->bcast.out.latency * 1=
+000000;
+> > > +       } else {
+> > > +               /* Interval is measured in ms, multiply by 1000000 to=
+ get ns */
+> > > +               ts.it_value.tv_nsec =3D qos->ucast.out.latency * 1000=
+000;
+> > > +               ts.it_interval.tv_nsec =3D qos->ucast.out.latency * 1=
+000000;
+> > > +       }
+> >=20
+> > This is a different fix, please send it as a separate patch.
+> >=20
+> > >         if (timerfd_settime(timer_fd, TFD_TIMER_ABSTIME, &ts, NULL) <=
+ 0)
+> > >                 return -errno;
+> > > --
+> > > 2.40.1
+> > >=20
+> >=20
+> >=20
+> > --
+> > Luiz Augusto von Dentz
+>=20
+>=20
+>=20
 
-> 
-> i will try to fix this issue due your change product by product in new
-> patch thread based on this DTS comment.
-> 
-> D) you maybe ping me offline about this issue if you are a member of QC
-> since you known "go/upstream"
-
-Please keep all discussions public, unless your customer requires some
-sort of confidentiality. Although even then I would argue that you can
-hide company secrets and discuss about hardware.
-
-Best regards,
-Krzysztof
-
+--=20
+Pauli Virtanen
