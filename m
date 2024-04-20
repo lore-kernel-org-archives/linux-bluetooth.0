@@ -1,196 +1,179 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C840028DCA
-	for <linux-bluetooth@vger.kernel.org>; Sat, 20 Apr 2024 11:05:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79819D51C
+	for <linux-bluetooth@vger.kernel.org>; Sat, 20 Apr 2024 11:07:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713611110; cv=none; b=TdSave2EI8kEHoBWMDptCFBnwzim7Ixw5Cj7KyDXuJnfZ/Ed4BIwT0FxTYvUz8An1AKoSN891EVG4d1d2dEVAOxkNaO9BuciSF40lRiaaw2KpBseGLfageGfcikGAmDQqpfGQ/V2lnvrv168kRw33HpQbRy7ypRYeHLIq6dFpHI=
+	t=1713611250; cv=none; b=C6kW1NtAHU/O/FKCfdxgtNzIKHtheNu8NLR2ginAKMrsgIgc80o0LKbJijdigOTotsAlYvbgZNpcTkPyt0yvGeuINSyOyI3ne9BVvyZEGemZvwNVcR7Gk/jyhmbSGNLRJqzImKmd45j61tqdp8oXyFUNW95Imm3M//zyzNv42OI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713611110; c=relaxed/simple;
-	bh=+u6oFdLV4BVjJ5AEsElmr4rpHjWeaFYzO+7MCCrwcmM=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=KWkEs+KpuMLfuaspaf8x3WUpe6BuWBWizuEI4nBQ3goTrQP0d3poaw5XRYzsqtZr6Ym5zuHys+oYqzHcAaXEXG54WT3Y+CZ1rqQH4SSCbapHppYpnxUEiVHHhJhNPato9AV94HPltdb/NlDjZxDAVyMdBohug5D/dFhQ4wAAzto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ehk2KFGe; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1713611250; c=relaxed/simple;
+	bh=dcW6W541cjLlLnbUpd3lLRGLVMDIgEMRWZZlYdifHNQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mK0Ti+MoB3JR1n4jprLARbPvM7Bme3UFTLv/DcUr5bxdU811hvCQMK+s/vN8thV+4ejQlhAw1hmNlo14ONcLSK1lR+oAALCNwncNR1ol7oIexOaYXPBv7zcHK7pZ5djpiGKFeT4l/HzmQ1ap8uTHqmKUMZPkSVYZM95vD9CUIVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Qx9hY8dl; arc=none smtp.client-ip=209.85.208.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ehk2KFGe"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713611109; x=1745147109;
-  h=date:from:to:cc:subject:message-id;
-  bh=+u6oFdLV4BVjJ5AEsElmr4rpHjWeaFYzO+7MCCrwcmM=;
-  b=Ehk2KFGe/vLaK3n0qBo7I1o4MES4pPKBBsLYPcAVHCmwm4Px38fpczPG
-   xa9qazOKooV939M+Fwz+XqdY1jIhTMJ0PJRwn5FeMfBxBnk4Y1bb6BjEr
-   cgeMeb1GVUj0h5AZNMJcjvUmoUMdvzcRG7URzR6/dFsNA/aqlvLGx9T4L
-   Rm3+vegMvKPcyC0LCiLC8qc5OeqON8TcgE0vp2cXxHHLR5oPYzmX8Q4n/
-   PdjSILQvz0CLw4KprSU0HmkaGZ/gksY7IQ6/cAh06qvSq0lfeI3FAMyag
-   EOCMRuiEWV7WlBn2NmmE2cMDqlU+Qzqc4mThA2XqGnt244mqhDUKYm4AJ
-   Q==;
-X-CSE-ConnectionGUID: fHsmkKzWT2KUAgQppU68TQ==
-X-CSE-MsgGUID: 7d2Q00RUS3SDnfh2cypSTQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11049"; a="9069326"
-X-IronPort-AV: E=Sophos;i="6.07,216,1708416000"; 
-   d="scan'208";a="9069326"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Apr 2024 04:05:08 -0700
-X-CSE-ConnectionGUID: OJoiShqTRLeFnE61sdCIrw==
-X-CSE-MsgGUID: 6fRqbr5qROWC0WR6fj4cJQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,216,1708416000"; 
-   d="scan'208";a="28234103"
-Received: from unknown (HELO 23c141fc0fd8) ([10.239.97.151])
-  by fmviesa004.fm.intel.com with ESMTP; 20 Apr 2024 04:05:07 -0700
-Received: from kbuild by 23c141fc0fd8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1ry8Wm-000Aya-2Z;
-	Sat, 20 Apr 2024 11:05:04 +0000
-Date: Sat, 20 Apr 2024 19:04:38 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 6764ab72237de0338b979361651748d8523bf16f
-Message-ID: <202404201935.9Y9VD9Te-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Qx9hY8dl"
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2dd19c29c41so4634521fa.3
+        for <linux-bluetooth@vger.kernel.org>; Sat, 20 Apr 2024 04:07:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1713611247; x=1714216047; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=70EAjH1mEPJsSZtzQGTYG3z9ROiGq6xc+NqESZ9kKzE=;
+        b=Qx9hY8dlToW+VcoJp/6/mek+VrCyhnVm48QqhpNtfFqUUdUEUNbuaflj39knNMAlKx
+         7ZTsvQ8OL9A8ppP6sI4NoFY1ZTozNUlaoRdDtHjbvqnLwwaxapjHnDHBhPo7W7KxI7+o
+         SPcTIjnI4cNcddiKaUAs3D3aLbRiXuGvGWdwBuQlTcBEhhBsewasPpiCf0fr9336fwAs
+         B2xKPRvI67FAHgtNy/YSgeEA+oz/d5ovMugiLu4LZrbFUzDoZPsVU9MUpdhVeVqknInr
+         06IUbL0qr/o1NRU9iWx1KC/wnRLSVNcqIyo7ESYMB4GyviVwAMZdienhPkdlsqFQFtE7
+         sy2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713611247; x=1714216047;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=70EAjH1mEPJsSZtzQGTYG3z9ROiGq6xc+NqESZ9kKzE=;
+        b=hX6ngTEd3n/97WBa3hHKW3iFx3IYCL1KS0P7rLysqtP3klKkUUNpscToCCx2WV+yLt
+         BLE3SwRwARltq03DqMIdRW1QHmdqY+8R2Ao8vKz607Db7v3yki9fZDDEwMudxyh3eW6U
+         gBUofKRyxvjoVyOOLYPEpvyRIgEGjHI/QToU03cTUvQc2oBmoFb7k6Rk9A8YBrnGtWLo
+         uIy5Dq9pouK77pXCCOmLAoKSIDhpxhl6hBLDIUzgnlV4IprUVhNaeOzHySYjAkGc29i+
+         VY8tP+slZJwrDfaeNqS13pR8yEudB+cJI1H53+xRv+Yd7Njk4yfW43Rl7atw6f8jonRo
+         nIpw==
+X-Gm-Message-State: AOJu0YxeyIYRDP9s8lMS7MI9u5UBL/6G3YcESrH2PFVn59I7uUZwwmrB
+	pwCUg6Pbn3ALSwfpIYJAaZZcWrCbXTs3O68REm12pt3cgt6j3WTk0mkseGUwk1YuZa81qbrTkNm
+	/W0J2oA==
+X-Google-Smtp-Source: AGHT+IGUMfG4KUYlOGX63zoLLlLm/XtH1SiAn+er2ONxrMOw/cBMDGkbS1h/wRyR8lDLFq9gu2NOPA==
+X-Received: by 2002:a05:651c:622:b0:2d8:5fb1:4b80 with SMTP id k34-20020a05651c062200b002d85fb14b80mr2619187lje.24.1713611246615;
+        Sat, 20 Apr 2024 04:07:26 -0700 (PDT)
+Received: from [10.236.36.88] ([88.128.88.151])
+        by smtp.gmail.com with ESMTPSA id bg5-20020a05600c3c8500b00419f419236fsm1433804wmb.41.2024.04.20.04.07.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 20 Apr 2024 04:07:26 -0700 (PDT)
+Message-ID: <63772c3f-eab7-4be0-8b1c-0cebea361eae@linaro.org>
+Date: Sat, 20 Apr 2024 13:07:25 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 2/2] Bluetooth: qca: Fix BT enable failure for
+ QCA_QCA6390 after disable then warm reboot
+To: Zijun Hu <quic_zijuhu@quicinc.com>, luiz.dentz@gmail.com,
+ luiz.von.dentz@intel.com, marcel@holtmann.org
+Cc: linux-bluetooth@vger.kernel.org, bartosz.golaszewski@linaro.org,
+ wt@penguintechs.org
+References: <1713449192-25926-1-git-send-email-quic_zijuhu@quicinc.com>
+ <1713564212-21725-1-git-send-email-quic_zijuhu@quicinc.com>
+ <1713564212-21725-3-git-send-email-quic_zijuhu@quicinc.com>
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <1713564212-21725-3-git-send-email-quic_zijuhu@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 6764ab72237de0338b979361651748d8523bf16f  Bluetooth: btusb: mediatek: Fix double free of skb in coredump
+On 20/04/2024 00:03, Zijun Hu wrote:
+> From: Zijun Hu <zijuhu@qti.qualcomm.com>
+> 
+> Commit 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on closed
+> serdev") will cause below regression issue:
+> 
+> BT can't be enabled after below steps:
+> cold boot -> enable BT -> disable BT -> warm reboot -> BT enable failure
+> if BT reset pin is not configured within DT|ACPI for QCA_QCA6390.
 
-elapsed time: 877m
+Please mention if QCA6390 requires reset pin, according to datasheet or
+some hardware guideline.
 
-configs tested: 119
-configs skipped: 3
+> 
+> Fixed by sending the VSC to reset controller within qca_serdev_shutdown()
+> once BT was ever enabled.
+> 
+> Fixes: 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on closed serdev")
+> Reported-by: Wren Turkal <wt@penguintechs.org>
+> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=218726
+> Signed-off-by: Zijun Hu <zijuhu@qti.qualcomm.com>
+> Tested-by: Wren Turkal <wt@penguintechs.org>
+> ---
+>  drivers/bluetooth/hci_qca.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index 0934e74112a6..3f5173f1180b 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -2438,13 +2438,12 @@ static void qca_serdev_shutdown(struct device *dev)
+>  	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
+>  	struct hci_uart *hu = &qcadev->serdev_hu;
+>  	struct hci_dev *hdev = hu->hdev;
+> -	struct qca_data *qca = hu->priv;
+>  	const u8 ibs_wake_cmd[] = { 0xFD };
+>  	const u8 edl_reset_soc_cmd[] = { 0x01, 0x00, 0xFC, 0x01, 0x05 };
+>  
+>  	if (qcadev->btsoc_type == QCA_QCA6390) {
+> -		if (test_bit(QCA_BT_OFF, &qca->flags) ||
+> -		    !test_bit(HCI_RUNNING, &hdev->flags))
+> +		if (test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks) ||
+> +		    hci_dev_test_flag(hdev, HCI_SETUP))
+>  			return;
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+I am sorry, but why do we need to perform shutdown procedure now if
+device is off?
 
-tested configs:
-alpha                             allnoconfig   gcc  
-alpha                            allyesconfig   gcc  
-alpha                               defconfig   gcc  
-arc                              allmodconfig   gcc  
-arc                               allnoconfig   gcc  
-arc                              allyesconfig   gcc  
-arc                                 defconfig   gcc  
-arc                   randconfig-001-20240420   gcc  
-arc                   randconfig-002-20240420   gcc  
-arm                              allmodconfig   gcc  
-arm                               allnoconfig   clang
-arm                              allyesconfig   gcc  
-arm                                 defconfig   clang
-arm                   randconfig-001-20240420   gcc  
-arm                   randconfig-002-20240420   gcc  
-arm                   randconfig-003-20240420   clang
-arm                   randconfig-004-20240420   gcc  
-arm64                            allmodconfig   clang
-arm64                             allnoconfig   gcc  
-arm64                               defconfig   gcc  
-arm64                 randconfig-001-20240420   clang
-arm64                 randconfig-002-20240420   clang
-arm64                 randconfig-003-20240420   gcc  
-arm64                 randconfig-004-20240420   clang
-csky                             allmodconfig   gcc  
-csky                              allnoconfig   gcc  
-csky                             allyesconfig   gcc  
-csky                                defconfig   gcc  
-csky                  randconfig-001-20240420   gcc  
-csky                  randconfig-002-20240420   gcc  
-hexagon                          allmodconfig   clang
-hexagon                           allnoconfig   clang
-hexagon                          allyesconfig   clang
-hexagon                             defconfig   clang
-hexagon               randconfig-001-20240420   clang
-hexagon               randconfig-002-20240420   clang
-i386                             allmodconfig   gcc  
-i386                              allnoconfig   gcc  
-i386                             allyesconfig   gcc  
-i386         buildonly-randconfig-001-20240420   gcc  
-i386         buildonly-randconfig-002-20240420   clang
-i386         buildonly-randconfig-003-20240420   gcc  
-i386         buildonly-randconfig-004-20240420   gcc  
-i386         buildonly-randconfig-005-20240420   gcc  
-i386         buildonly-randconfig-006-20240420   gcc  
-i386                                defconfig   clang
-i386                  randconfig-001-20240420   clang
-i386                  randconfig-002-20240420   gcc  
-i386                  randconfig-003-20240420   gcc  
-i386                  randconfig-004-20240420   gcc  
-i386                  randconfig-005-20240420   clang
-i386                  randconfig-006-20240420   gcc  
-i386                  randconfig-011-20240420   clang
-i386                  randconfig-012-20240420   clang
-i386                  randconfig-013-20240420   clang
-i386                  randconfig-014-20240420   clang
-i386                  randconfig-015-20240420   clang
-i386                  randconfig-016-20240420   clang
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch                           defconfig   gcc  
-loongarch             randconfig-001-20240420   gcc  
-loongarch             randconfig-002-20240420   gcc  
-m68k                             allmodconfig   gcc  
-m68k                              allnoconfig   gcc  
-m68k                             allyesconfig   gcc  
-m68k                                defconfig   gcc  
-microblaze                       allmodconfig   gcc  
-microblaze                        allnoconfig   gcc  
-microblaze                       allyesconfig   gcc  
-microblaze                          defconfig   gcc  
-mips                              allnoconfig   gcc  
-mips                             allyesconfig   gcc  
-nios2                            allmodconfig   gcc  
-nios2                             allnoconfig   gcc  
-nios2                            allyesconfig   gcc  
-nios2                               defconfig   gcc  
-nios2                 randconfig-001-20240420   gcc  
-nios2                 randconfig-002-20240420   gcc  
-openrisc                          allnoconfig   gcc  
-openrisc                         allyesconfig   gcc  
-openrisc                            defconfig   gcc  
-parisc                           allmodconfig   gcc  
-parisc                            allnoconfig   gcc  
-parisc                           allyesconfig   gcc  
-parisc                              defconfig   gcc  
-parisc64                            defconfig   gcc  
-powerpc                          allmodconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc                          allyesconfig   clang
-riscv                            allmodconfig   clang
-riscv                             allnoconfig   gcc  
-riscv                            allyesconfig   clang
-riscv                               defconfig   clang
-s390                             allmodconfig   clang
-s390                              allnoconfig   clang
-s390                             allyesconfig   gcc  
-s390                                defconfig   clang
-sh                               allmodconfig   gcc  
-sh                                allnoconfig   gcc  
-sh                               allyesconfig   gcc  
-sh                                  defconfig   gcc  
-sparc                            allmodconfig   gcc  
-sparc                             allnoconfig   gcc  
-sparc                               defconfig   gcc  
-sparc64                          allmodconfig   gcc  
-sparc64                          allyesconfig   gcc  
-sparc64                             defconfig   gcc  
-um                               allmodconfig   clang
-um                                allnoconfig   clang
-um                               allyesconfig   gcc  
-um                                  defconfig   clang
-um                             i386_defconfig   gcc  
-um                           x86_64_defconfig   clang
-x86_64                            allnoconfig   clang
-x86_64                           allyesconfig   clang
-x86_64                              defconfig   gcc  
-x86_64                          rhel-8.3-rust   clang
-xtensa                            allnoconfig   gcc  
+I raised questions about this and I still don't understand. Not much got
+better comparing to previous version. Actually, I have no clue what
+changed. Where is the changelog?
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+
+Best regards,
+Krzysztof
+
