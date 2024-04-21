@@ -1,55 +1,48 @@
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 197303232
-	for <linux-bluetooth@vger.kernel.org>; Sun, 21 Apr 2024 07:44:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 735543232
+	for <linux-bluetooth@vger.kernel.org>; Sun, 21 Apr 2024 09:30:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713685496; cv=none; b=rcuLenX3s5g/PizE4weETK61ox2lzd0ZwD3xwW1HUTzJJ8K4036/KV3hpocYkPIFRvvvOrvEMIys8ZBy/cU3LrJQOJj0RjQurRMhZbY5Vt69IQlblSVgNsDhuc4/DShyCkGggNeTUqqN6X92qY1vPoFE+qRQvyEBACctSOx2/hY=
+	t=1713691836; cv=none; b=h06c9RqAZgV86ftq7LAxY4vRDMHfjuYsiJdsz8nU1XNVrORGa++Z2sWEXiuo6owQ4i+d/7lzqkbildkitcONgo9WEoIbjl8M54LhSIGFconRSU00DwWBQwMml/XvznKdQYYMtH4oaEP5uQjfsw9o6g9Ub63tYbI+STn+xh5IC8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713685496; c=relaxed/simple;
-	bh=J3UBzWO5a/g05IN3/k7Rrapz2xKBTUeR9LuSUETnV5A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SL0l8fKbc4vGR64KagQ6Lcdhh4KPY2XSOG/CEAPAnFP0eNNn96oIESuLzJpbr01rlx6iubXP9ZKdgznnhFFaUrD6O2RKlbP9PN9WAbMjKyMfTsUx6UP1kN7rTpbdMKS0sKpK4T/CD4hMmNTSzp7mI3yY+IS6cLdAnEvicGfnVtQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=IveHc/F9; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=penguintechs.org
+	s=arc-20240116; t=1713691836; c=relaxed/simple;
+	bh=YnJwEz5nCa4WeQV5wKasjzZaVk9PTqffYKFvSl6dotI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=R7gPrBXOfn0h661DViyZidnuQbvTYWkXTHj3jK4H0CifXqYRLJcZEEB+O4pKeOwHpctTLQ1eF+tGBRRSzobo3eKSI/fU4/Vvaggld+qjpOo7nbMp5davY4AmV6hDYzBC1r9V1sbaWWFUfUNM23IPxhc7mz5M1CktVRdiOl2JtVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=mk/Ew6eJ; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="IveHc/F9"
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-5d8b519e438so2645923a12.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 21 Apr 2024 00:44:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=penguintechs.org; s=google; t=1713685493; x=1714290293; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZOH34XVLgutMmsA0ijOMbxhDgR/YlGuWtIEtferIMpI=;
-        b=IveHc/F9TdKOkcV0R4w5Hbry/6rRiqN2z++xbsdHXS/sVXtzfeKs+Emb6HS8UuT/i3
-         nX28pwQiLAlLnogVHrPeDUoVOkZygYGQFdOvD6OyS8Xb7r6dyXiqzoVlhXqU9jWAqjz2
-         8oiV9vr0570C0PMOOkmKxibaqCt0j9+GCoaYU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713685493; x=1714290293;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZOH34XVLgutMmsA0ijOMbxhDgR/YlGuWtIEtferIMpI=;
-        b=F9WC6cFTXEfpA0tbY6bUOLp4MLNc0HmhPacCJNlHayoV45v79tJLIrPZtSBxUCbt1M
-         gKagOSMDk95gDW4bxSobVNjLevLLUQe8u+gw21fz4sIdzzuJyMPt9GdGbEQeeQfmeR23
-         HNw7HCxJZdpVXWxU/dXqXwY40X3NRnAguLTFqvzzMDrOqMQ+t64z+u01DLUHG/pSN43n
-         500Kf7zqgRCreRjGTF3AIPDUwrUwxciUk2NrqZM2jiqB2pJm6wdGMpaOkUVVy+UcsML+
-         Pu6xL+HmNt/7DUBUTEII7jMFG0eZjSIyyImA6EWg3XLJB8eEXourbi7uAn76LoBL6aJ2
-         NgYw==
-X-Gm-Message-State: AOJu0Yza9Fl5ixmr9CqqmJMIvd4KG/GaNVmg5eT9943q3h36CLqISwFQ
-	BMzIYP7GkcoZEU+qhBty/Mr2+m24ggjxM6MEqdJYYaKuRj+54tbIRcCKALlGzg==
-X-Google-Smtp-Source: AGHT+IEGSE2FkSkQVp2SqjB2LomicpyMaVdITBO04iho5Fny6/uxs1VlTXDQuTt7rhL7tVMAAVtI+Q==
-X-Received: by 2002:a17:902:e543:b0:1e5:5c8c:67ec with SMTP id n3-20020a170902e54300b001e55c8c67ecmr8685047plf.5.1713685493274;
-        Sun, 21 Apr 2024 00:44:53 -0700 (PDT)
-Received: from ?IPV6:2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08? ([2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08])
-        by smtp.gmail.com with ESMTPSA id e8-20020a17090301c800b001e0f5034e95sm5918798plh.288.2024.04.21.00.44.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 21 Apr 2024 00:44:52 -0700 (PDT)
-Message-ID: <369512e2-f091-4370-bce5-9ac32178dc4d@penguintechs.org>
-Date: Sun, 21 Apr 2024 00:44:51 -0700
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="mk/Ew6eJ"
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 43L9EclA013539;
+	Sun, 21 Apr 2024 09:30:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=ZaIxilT4jMpwjexiqLIjD2yxUoZjIPfhy7ClvN+oNa8=; b=mk
+	/Ew6eJUGG34Vgy+aLYh/uE0tBEuAMzaVwSYE5KqZ8YZcD4wm6MDDORJlIK1Cvsth
+	0v2MtyM3AVt/mRSnJPrwGk0G8xNG3/cEfUFADKL8C0daFqO2DUU7Ir1XbwsqcFfM
+	5g3rJlosswYV/zmZrijsrrufwUEHkDSngY/w8qKhrz42E+oGtacvr9YPEpgEEkLm
+	Uh5LrBgzIbKDSoq6htQwD+KxCjLm3a/unhfoGhIjn9IxisJ4hWmWSN83n94gSEFq
+	vJ/hloeJWxf48aRI0nQV1/EQMdAcMMqEo9wf4pYuOrfAvCG0EOIpBiNae3GIcy6p
+	FUMzpvrIF1Z99wfCzqIw==
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xm4wx21y3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 21 Apr 2024 09:30:27 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43L9UQ5d026909
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 21 Apr 2024 09:30:26 GMT
+Received: from [10.253.76.25] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Sun, 21 Apr
+ 2024 02:30:24 -0700
+Message-ID: <892ceba6-b38c-4d0d-a98a-b6eb5f2e6269@quicinc.com>
+Date: Sun, 21 Apr 2024 17:30:21 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -58,43 +51,63 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v4 0/2] Fix two regression issues for QCA controllers
-Content-Language: en-US
-To: Zijun Hu <quic_zijuhu@quicinc.com>, luiz.dentz@gmail.com,
- luiz.von.dentz@intel.com, marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org, bartosz.golaszewski@linaro.org,
- krzysztof.kozlowski@linaro.org
+To: Wren Turkal <wt@penguintechs.org>, <luiz.dentz@gmail.com>,
+        <luiz.von.dentz@intel.com>, <marcel@holtmann.org>
+CC: <linux-bluetooth@vger.kernel.org>, <bartosz.golaszewski@linaro.org>,
+        <krzysztof.kozlowski@linaro.org>
 References: <1713564212-21725-1-git-send-email-quic_zijuhu@quicinc.com>
  <1713650800-29741-1-git-send-email-quic_zijuhu@quicinc.com>
-From: Wren Turkal <wt@penguintechs.org>
-In-Reply-To: <1713650800-29741-1-git-send-email-quic_zijuhu@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+ <369512e2-f091-4370-bce5-9ac32178dc4d@penguintechs.org>
+Content-Language: en-US
+From: quic_zijuhu <quic_zijuhu@quicinc.com>
+In-Reply-To: <369512e2-f091-4370-bce5-9ac32178dc4d@penguintechs.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: GhmQ_sgCaNv6ujbxnk1fgh7Lz8wDgXD8
+X-Proofpoint-ORIG-GUID: GhmQ_sgCaNv6ujbxnk1fgh7Lz8wDgXD8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-21_08,2024-04-19_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
+ lowpriorityscore=0 clxscore=1015 mlxscore=0 priorityscore=1501
+ suspectscore=0 malwarescore=0 impostorscore=0 spamscore=0 mlxlogscore=983
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2404010003 definitions=main-2404210060
 
-On 4/20/24 3:06 PM, Zijun Hu wrote:
-> This patch series are to fix below 2 regression issues for QCA controllers
-> 1) BT can't be enabled once BT was ever enabled for QCA_QCA6390
-> 2) BT can't be enabled after disable then warm reboot for QCA_QCA6390
-
-@Zijun @Krzysztof and @Bartosz Would it be helpful for me to test these 
-to ensure they fix the issues I reported?
-
-> the links for these issues are shown below:
-> https://bugzilla.kernel.org/show_bug.cgi?id=218726
-> https://lore.kernel.org/linux-bluetooth/ea20bb9b-6b60-47fc-ae42-5eed918ad7b4@quicinc.com/T/#m73d6a71d2f454bb03588c66f3ef7912274d37c6f
+On 4/21/2024 3:44 PM, Wren Turkal wrote:
+> On 4/20/24 3:06 PM, Zijun Hu wrote:
+>> This patch series are to fix below 2 regression issues for QCA
+>> controllers
+>> 1) BT can't be enabled once BT was ever enabled for QCA_QCA6390
+>> 2) BT can't be enabled after disable then warm reboot for QCA_QCA6390
 > 
-> Changes:
-> V3 -> V4: Correct code stype and commit message
-> V2 -> V3: Wrong patch sets are sent
-> V1 -> V2: Remove debugging logs
+> @Zijun @Krzysztof and @Bartosz Would it be helpful for me to test these
+> to ensure they fix the issues I reported?
 > 
-> Zijun Hu (2):
->    Bluetooth: qca: Fix BT enable failure for QCA_QCA6390
->    Bluetooth: qca: Fix BT enable failure for QCA_QCA6390 after disable
->      then warm reboot
+Hi Wren,
+for QCA6390. this updated patch sets is the same as the patch sets you
+ever tested.
+sure. if you would like to test this one.
+>> the links for these issues are shown below:
+>> https://bugzilla.kernel.org/show_bug.cgi?id=218726
+>> https://lore.kernel.org/linux-bluetooth/ea20bb9b-6b60-47fc-ae42-5eed918ad7b4@quicinc.com/T/#m73d6a71d2f454bb03588c66f3ef7912274d37c6f
+>>
+>> Changes:
+>> V3 -> V4: Correct code stype and commit message
+>> V2 -> V3: Wrong patch sets are sent
+>> V1 -> V2: Remove debugging logs
+>>
+>> Zijun Hu (2):
+>>    Bluetooth: qca: Fix BT enable failure for QCA_QCA6390
+>>    Bluetooth: qca: Fix BT enable failure for QCA_QCA6390 after disable
+>>      then warm reboot
+>>
+>>   drivers/bluetooth/hci_qca.c | 7 ++++---
+>>   1 file changed, 4 insertions(+), 3 deletions(-)
 > 
->   drivers/bluetooth/hci_qca.c | 7 ++++---
->   1 file changed, 4 insertions(+), 3 deletions(-)
+> 
 
-
--- 
-You're more amazing than you think!
