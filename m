@@ -1,33 +1,28 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2162B18637
-	for <linux-bluetooth@vger.kernel.org>; Sun, 21 Apr 2024 18:41:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 947351E53A
+	for <linux-bluetooth@vger.kernel.org>; Sun, 21 Apr 2024 21:01:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713724880; cv=none; b=nOtYvn7hIn6+yHoDno/W4WQl0esiiNl4tn2uJbj7QBVUqL5z7NWy+9y/YspBgo9EX7TBI0e3xZ++dMayiyb8JFUrnJQlwN+FQ1gUNg59WpEMrj4qyZBrh+4DBbbtnssQiNvlU/uzAgRTdR2vfd9f6wU6t9HfvoRQsNoEJ78FJq8=
+	t=1713733275; cv=none; b=PxkTRigKIERUnIdKtFg1zFVnZUg9gcUnsRpmT0ZCexqsOTkmlFVGmxJWr1IaEWQF4PaCkuUqoaTCk17Sh+2V6JhGGc4zOofo/scLJmShXxQ8kuPmqZPdtIvKtttJEmsTknbQ5t6SS85qMYpHyJ9+cu028aIWyV8HwcKkw1Fbz4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713724880; c=relaxed/simple;
-	bh=LJK9kz8kBnRTPBuNFBB8iNRhs3plrYSiP2IPTJxw4mE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Mrmz5k5NTRa3uXasnVwYBTuV5dWGxDG4rd6AOUv98pB4XF39My+raczBvHaKpwMGW39RW7dswPDfI8mNBpK9f3QCVUqjhm2T2bi++nMrzoJ/v8Li9XjqLFt/UvghAQk9uEFMEIYhgaaNWJrbMSWdgMvr5lpPj9qNDswl04BUXmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Txlh1EDx; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Txlh1EDx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BFA3C113CE;
-	Sun, 21 Apr 2024 18:41:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713724879;
-	bh=LJK9kz8kBnRTPBuNFBB8iNRhs3plrYSiP2IPTJxw4mE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Txlh1EDx+etRp63tzoZde6QpDO0JXQGuFgD+uFlcV8sr7GgsZA6u3NakdkT6XvWaC
-	 Syl25/iNE3U3ny+aHiGrznE0mDcrAW2vbvHIhS2+otGzeAP8voCZA3J3Dvfo1+ulkK
-	 Kw24mM4u1AYbYRfYlW3MDnj80+9uZCWR2G/tSxkxTMJEORcJwdsWi+maACysrbeirD
-	 pnNbJAmZ9F0KZ5+e6TjdN57SzrjiTx3TY6MkNaeH1y+HxefaKWaZCBDrMIJ87MjmWO
-	 YxAbCcmGGqU+zJfVeeZE7hlIoIgUqp6B9zB3sGw+7RHZjP4ZHvpsuk7YWCaF/qYl3X
-	 utyT56F66Nygg==
-Message-ID: <a6ae69ad-b602-4cfc-9f76-8932f357d30b@kernel.org>
-Date: Sun, 21 Apr 2024 20:41:14 +0200
+	s=arc-20240116; t=1713733275; c=relaxed/simple;
+	bh=WEzcw0bsNdbQiVJCh2cyN4ebxDXiBmsodAnyG3QSU0o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=NGnKsXxXy1DBZTtDz4a77Dzen3Kg59oxA6Cf7oKXTyNR0dLDIqoXdPCJ0kHW7tL4F3wGPLJTCP7Yo5BuNlMoFhCpJG/y5qq+7XmC7OIDkUAOZ8O/GQUyilZ1Hw0KRv4dFWlUNfVwq8UQELA/0fY01W78qePsjp68o6O8Zy1i08w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.6] (ip5f5af37f.dynamic.kabel-deutschland.de [95.90.243.127])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id E0FEB61E5FE05;
+	Sun, 21 Apr 2024 23:00:52 +0200 (CEST)
+Message-ID: <8eeb980a-f04a-4e94-8065-25566cfef4dd@molgen.mpg.de>
+Date: Sun, 21 Apr 2024 23:00:51 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -35,93 +30,105 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 0/2] Fix two regression issues for QCA controllers
-To: Wren Turkal <wt@penguintechs.org>, Zijun Hu <quic_zijuhu@quicinc.com>,
- luiz.dentz@gmail.com, luiz.von.dentz@intel.com, marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org, bartosz.golaszewski@linaro.org
-References: <1713564212-21725-1-git-send-email-quic_zijuhu@quicinc.com>
- <1713650800-29741-1-git-send-email-quic_zijuhu@quicinc.com>
- <369512e2-f091-4370-bce5-9ac32178dc4d@penguintechs.org>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: Bluetooth kernel BUG with Intel AX211 (regression in 6.1.83)
+To: =?UTF-8?Q?Jeremy_Lain=C3=A9?= <jeremy.laine@m4x.org>
+References: <CADRbXaDqx6S+7tzdDPPEpRu9eDLrHQkqoWTTGfKJSRxY=hT5MQ@mail.gmail.com>
 Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <369512e2-f091-4370-bce5-9ac32178dc4d@penguintechs.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Cc: linux-bluetooth@vger.kernel.org, regressions@lists.linux.dev
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <CADRbXaDqx6S+7tzdDPPEpRu9eDLrHQkqoWTTGfKJSRxY=hT5MQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 21/04/2024 09:44, Wren Turkal wrote:
-> On 4/20/24 3:06 PM, Zijun Hu wrote:
->> This patch series are to fix below 2 regression issues for QCA controllers
->> 1) BT can't be enabled once BT was ever enabled for QCA_QCA6390
->> 2) BT can't be enabled after disable then warm reboot for QCA_QCA6390
+#regzbot introduced: v6.1.82..v6.1.83
+
+
+Dear Jeremy,
+
+
+Am 21.04.24 um 15:54 schrieb Jeremy Lainé:
+
+> After upgrading my kernel to Debian's latest version (6.1.85), I
+> started encountering systematic kernel BUGs at boot, making the
+> bluetooth stack unusable. I initially reported this to Debian's bug
+> tracker:
 > 
-> @Zijun @Krzysztof and @Bartosz Would it be helpful for me to test these 
-> to ensure they fix the issues I reported?
+> https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1069301
 > 
+> .. but have since confirmed that this is reproducible with vanilla
+> kernels, including the latest 6.1.y version (6.1.87).
 
-I look forward to someone testing these on other hardware, not yours. On
-the hardware where the original issues were happening leading to this
-changes, e.g. RB5.
+Thank you for reporting this and taking the time to pinpoint the version.
 
-Anyway, the problem here is poor explanation of the problem which did
-not improve in v3 and v4. Instead I receive explanations like:
+> I tried various kernel versions (straight from kernel.org) to pinpoint
+> when the problem started occurring and the resultats are:
+> 
+> - linux 6.1.80 => OK
+> - linux 6.1.82 => OK
+> - linux 6.1.83 => BUG
+> - linux 6.1.85 => BUG
+> - linux 6.1.87 => BUG
+> 
+> I have included a trace below, and full system details are available
+> in the Debian bug listed above. Can you suggest any other tests I can
+> perform to help diagnose the origin of the problem?
 
-"this is shutdown of serdev and not hdev's shutdown."
-Not related...
+Would you be so kind to go the extra mail, and bisect the commit between 
+6.1.82 and 6.1.83 [1]?
 
-"now. you understood why your merged change as shown link of 4) have
-problems and introduced our discussed issue, right?"
+> [   22.660847] list_del corruption, ffff94d9f6302000->prev is LIST_POISON2 (dead000000000122)
+> [   22.660887] ------------[ cut here ]------------
+> [   22.660890] kernel BUG at lib/list_debug.c:56!
+> [   22.660907] invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
+> [   22.660917] CPU: 10 PID: 139 Comm: kworker/u25:0 Not tainted 6.1.0-20-amd64 #1  Debian 6.1.85-1
+> [   22.660929] Hardware name: Dell Inc. XPS 9315/00KRKP, BIOS 1.19.1 03/14/2024
+> [   22.660936] Workqueue: hci0 hci_cmd_sync_work [bluetooth]
+> [   22.661128] RIP: 0010:__list_del_entry_valid.cold+0x4b/0x6f
+> [   22.661147] Code: fe ff 0f 0b 48 89 f2 48 89 fe 48 c7 c7 48 18 7a 9f e8 14 a1 fe ff 0f 0b 48 89 fe 48 89 ca 48 c7 c7 10 18 7a 9f e8 00 a1 fe ff <0f> 0b 48 89 fe 48 c7 c7 d8 17 7a 9f e8 ef a0 fe ff 0f 0b 48 89 fe
+> [   22.661156] RSP: 0000:ffffae0e406efde0 EFLAGS: 00010246
+> [   22.661164] RAX: 000000000000004e RBX: ffff94d9f6302000 RCX: 0000000000000027
+> [   22.661172] RDX: 0000000000000000 RSI: 0000000000000001 RDI: ffff94dfaf8a03a0
+> [   22.661177] RBP: ffff94d859392000 R08: 0000000000000000 R09: ffffae0e406efc78
+> [   22.661182] R10: 0000000000000003 R11: ffffffff9fed4448 R12: ffff94d859392000
+> [   22.661187] R13: ffff94d859392770 R14: ffff94d858cb9800 R15: dead000000000100
+> [   22.661194] FS:  0000000000000000(0000) GS:ffff94dfaf880000(0000) knlGS:0000000000000000
+> [   22.661202] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [   22.661208] CR2: 00007f423c024038 CR3: 0000000799c04000 CR4: 0000000000750ee0
+> [   22.661214] PKRU: 55555554
+> [   22.661218] Call Trace:
+> [   22.661225]  <TASK>
+> [   22.661232]  ? __die_body.cold+0x1a/0x1f
+> [   22.661246]  ? die+0x2a/0x50
+> [   22.661257]  ? do_trap+0xc5/0x110
+> [   22.661268]  ? __list_del_entry_valid.cold+0x4b/0x6f
+> [   22.661279]  ? do_error_trap+0x6a/0x90
+> [   22.661289]  ? __list_del_entry_valid.cold+0x4b/0x6f
+> [   22.661298]  ? exc_invalid_op+0x4c/0x60
+> [   22.661307]  ? __list_del_entry_valid.cold+0x4b/0x6f
+> [   22.661316]  ? asm_exc_invalid_op+0x16/0x20
+> [   22.661328]  ? __list_del_entry_valid.cold+0x4b/0x6f
+> [   22.661337]  hci_conn_del+0x136/0x3e0 [bluetooth]
+> [   22.661466]  hci_abort_conn_sync+0xaa/0x230 [bluetooth]
+> [   22.661632]  ? abort_conn_sync+0x3d/0x70 [bluetooth]
+> [   22.661751]  hci_cmd_sync_work+0x9f/0x150 [bluetooth]
+> [   22.661915]  process_one_work+0x1c4/0x380
+> [   22.661929]  worker_thread+0x4d/0x380
+> [   22.661940]  ? rescuer_thread+0x3a0/0x3a0
+> [   22.661950]  kthread+0xd7/0x100
+> [   22.661959]  ? kthread_complete_and_exit+0x20/0x20
+> [   22.661969]  ret_from_fork+0x1f/0x30
+> [   22.661984]  </TASK>
 
-No. I did not understand and I feel I am wasting here time.
+You can pipe the output through `scripts/decodecode` and it should show 
+more information.
 
-Code could be correct, could be wrong. Especially second patch looks
-suspicious. But the way Zijun Hu explains it and the way Zijun Hu
-responds is not helping at all.
+[…]
 
-Sorry, with such replies to review, it is not worth my time.
 
-Best regards,
-Krzysztof
+Kind regards,
 
+Paul
+
+
+[1]: 
+https://docs.kernel.org/admin-guide/verify-bugs-and-bisect-regressions.html
