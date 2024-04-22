@@ -1,124 +1,100 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB856482CA;
-	Mon, 22 Apr 2024 07:32:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 801A82233A
+	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Apr 2024 07:38:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713771184; cv=none; b=FkRCOM9+qRrMoZ1jXpdIrz6jkZIgKNN64bcs599V1LOyj8Epwbj1LCXpTgLJXK9xDT2hqxcFur8jNsEd6kJVM86cvRV4Ki1Fex5XHrRNmclBT2arEOQawuy/dPZ6cDDfvc0GNnx5MSCPrONbOVQT95m0y6uvbJlvUZpVyNIkxBU=
+	t=1713771513; cv=none; b=UruPCI+Ho/4S6fqseSea08Ykwza9YVPIk++A93Wi/jf+e3BkLLtspXF6fUyFzdaFPtjy/1WS6zZxvXonTD7+ggKAgZO+v5AUuNSGNsrq2KY9BkgTBl8F96K+7ftz2NZ5lNKzZFboixj5m4swbuJyyD7pWdKJeLBLxSZDhWpBblc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713771184; c=relaxed/simple;
-	bh=aypG6bs6Wzxn78bIcan0Wy8naV63+hfk5083L3Gs2nA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QfBSovpsKpWkN9JvWp49AgHCnfBT4q0FprUIycg8TjvK4tTA34pDrvg6t8ny7ccD4WD68nJjLbnC7WIHor4vhz2h5EBUy2mHE3dA3/9pW9M6QQ5jADwvszZND6Y7146XKLjf4Mta0m4g2dZOg5e7ZwdMCm90HQFDtfZqnWUo3DE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.6] (unknown [95.90.245.229])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 561E861E5FE04;
-	Mon, 22 Apr 2024 09:32:48 +0200 (CEST)
-Message-ID: <687c8f6a-d5d6-4918-bfd5-93d4b04da086@molgen.mpg.de>
-Date: Mon, 22 Apr 2024 09:32:47 +0200
+	s=arc-20240116; t=1713771513; c=relaxed/simple;
+	bh=gb9hQcL6bYHU0rWieFXOhuwb6AThMlQLtenW2LMvxZQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uVwXeZZx5DqpwWCcX8Dk0LjN2BDygeUggsZk3D3yoRWDMMtuz+ZPXPFPQijxhUpYhHFgi2y3UNZRFlsCmIj7ZxvbQ2LRNKGaz8GGk0sZf9nvN5zyJy3A0DAzaylJVnxTE8CeTaMsmcW2lVB1NwqvCW4q3VFPBQGeVPmkmY1lOUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=OuzmnDAD; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="OuzmnDAD"
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 43M4hLDX013143;
+	Mon, 22 Apr 2024 07:38:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-type; s=qcppdkim1; bh=TwkxB1uMs/xEoT/J51Q5
+	/3pUv19KFpVncsKIro/ltyA=; b=OuzmnDADkbBVagvX5udPpV1FLXKZc5TfUKMx
+	N3FCPqtLrwz3zIygQlCzKjY1+XDGHAkTw8uYlROf8cvMlPjXzDmXqGScKQbb/XJE
+	kkDAgJKlUp2282/7EHlNRj8lgOe1t/ZPWFbL0kbKOJTh1YLDPn+Hx2wWp1A4bb1p
+	xuzGPyZnqBZtIGUIZxlp9OdPG+qGDsM6aw2OU5NKts6qYaz4bxkRtUCU9BZSMLPR
+	SOystuBjwfT/Nmf5YINcIDeM2YnWkvV8XqTNAG0AkjF3ZzNM8dEYG/VwFWnqtS+E
+	zBWzMMipn9gv5gtaIU34Xa8q+ic8znexEG9r8ak1tw3Gmlgt5g==
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xm4qdbp31-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 22 Apr 2024 07:38:25 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43M7cOOv031819
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 22 Apr 2024 07:38:24 GMT
+Received: from zijuhu-gv.qualcomm.com (10.80.80.8) by
+ nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Mon, 22 Apr 2024 00:38:21 -0700
+From: Zijun Hu <quic_zijuhu@quicinc.com>
+To: <luiz.dentz@gmail.com>, <luiz.von.dentz@intel.com>, <marcel@holtmann.org>
+CC: <quic_zijuhu@quicinc.com>, <linux-bluetooth@vger.kernel.org>,
+        <bartosz.golaszewski@linaro.org>, <krzysztof.kozlowski@linaro.org>,
+        <wt@penguintechs.org>, <regressions@lists.linux.dev>
+Subject: [PATCH v5 0/2] Fix two regression issues for QCA controllers
+Date: Mon, 22 Apr 2024 15:38:15 +0800
+Message-ID: <1713771497-5733-1-git-send-email-quic_zijuhu@quicinc.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1713650800-29741-1-git-send-email-quic_zijuhu@quicinc.com>
+References: <1713650800-29741-1-git-send-email-quic_zijuhu@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: Populate hci_set_hw_info for Intel and Realtek
-To: Archie Pusaka <apusaka@google.com>, Archie Pusaka <apusaka@chromium.org>
-Cc: linux-bluetooth@vger.kernel.org,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Marcel Holtmann <marcel@holtmann.org>,
- chromeos-bluetooth-upstreaming@chromium.org,
- Abhishek Pandit-Subedi <abhishekpandit@google.com>,
- linux-kernel@vger.kernel.org
-References: <20240422152413.1.Ib96985e197f3db620a127a84aa20f3f3017aaf57@changeid>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20240422152413.1.Ib96985e197f3db620a127a84aa20f3f3017aaf57@changeid>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 6j4FMfI_azKmRUq7qUXAstDpT8zNLq2_
+X-Proofpoint-ORIG-GUID: 6j4FMfI_azKmRUq7qUXAstDpT8zNLq2_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-22_04,2024-04-19_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 impostorscore=0 lowpriorityscore=0 mlxscore=0 adultscore=0
+ mlxlogscore=914 bulkscore=0 suspectscore=0 malwarescore=0 clxscore=1015
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2404010003 definitions=main-2404220034
 
-Dear Archie,
+This patch series are to fix below 2 regression issues for QCA_QCA6390
+1) BT can't be enabled any more after below steps:
+cold boot -> enable BT -> disable BT -> BT enable failure
+if property enable-gpios is not configured within DT|ACPI for QCA_QCA6390.
 
+2) BT can't be enabled after below steps:
+cold boot -> enable BT -> disable BT -> warm reboot -> BT enable failure
+if property enable-gpios is not configured within DT|ACPI for QCA_QCA6390.
 
-Thank you for your patch.
+Changes:
+V4 -> V5: Correct commit message
+V3 -> V4: Correct code stype and commit message
+V1 -> V3: Remove debugging logs
 
-Am 22.04.24 um 09:24 schrieb Archie Pusaka:
-> From: Archie Pusaka <apusaka@chromium.org>
-> 
-> The hardware information surfaced via debugfs might be usable by the
-> userspace to set some configuration knobs. This patch sets the hw_info
-> for Intel and Realtek chipsets.
+Zijun Hu (2):
+  Bluetooth: qca: Fix BT enable failure for QCA_QCA6390
+  Bluetooth: qca: Fix BT enable failure for QCA_QCA6390 after disable
+    then warm reboot
 
-Could you please add an example paste to the commit message?
+ drivers/bluetooth/hci_qca.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-> Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@google.com>
-> 
-> ---
-> 
->   drivers/bluetooth/btintel.c | 9 +++++++++
->   drivers/bluetooth/btrtl.c   | 7 +++++++
->   2 files changed, 16 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-> index a19ebe47bd951..dc48352166a52 100644
-> --- a/drivers/bluetooth/btintel.c
-> +++ b/drivers/bluetooth/btintel.c
-> @@ -2956,6 +2956,11 @@ static int btintel_setup_combined(struct hci_dev *hdev)
->   			err = -EINVAL;
->   		}
->   
-> +		hci_set_hw_info(hdev,
-> +				"INTEL platform=%u variant=%u revision=%u",
-> +				ver.hw_platform, ver.hw_variant,
-> +				ver.hw_revision);
-> +
->   		goto exit_error;
->   	}
->   
-> @@ -3060,6 +3065,10 @@ static int btintel_setup_combined(struct hci_dev *hdev)
->   		break;
->   	}
->   
-> +	hci_set_hw_info(hdev, "INTEL platform=%u variant=%u",
-> +			INTEL_HW_PLATFORM(ver_tlv.cnvi_bt),
-> +			INTEL_HW_VARIANT(ver_tlv.cnvi_bt));
-> +
+-- 
+2.7.4
 
-Why does it need to be added at two places?
-
->   exit_error:
->   	kfree_skb(skb);
->   
-> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-> index cc50de69e8dc9..4f1e37b4f7802 100644
-> --- a/drivers/bluetooth/btrtl.c
-> +++ b/drivers/bluetooth/btrtl.c
-> @@ -1339,6 +1339,13 @@ int btrtl_setup_realtek(struct hci_dev *hdev)
->   
->   	btrtl_set_quirks(hdev, btrtl_dev);
->   
-> +	hci_set_hw_info(hdev,
-> +			"RTL lmp_subver=%u hci_rev=%u hci_ver=%u hci_bus=%u",
-> +			btrtl_dev->ic_info->lmp_subver,
-> +			btrtl_dev->ic_info->hci_rev,
-> +			btrtl_dev->ic_info->hci_ver,
-> +			btrtl_dev->ic_info->hci_bus);
-> +
->   	btrtl_free(btrtl_dev);
->   	return ret;
->   }
-
-
-Kind regards,
-
-Paul
