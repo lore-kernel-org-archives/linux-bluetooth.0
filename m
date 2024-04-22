@@ -1,54 +1,54 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F26B51C52
-	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Apr 2024 07:24:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827314AEFA
+	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Apr 2024 07:25:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713770678; cv=none; b=LfqUqGtAErEeNrp3dwZRSYBKNyGFt0ojmPZt26VrxAMIW6xxRFa6HkaAHF+EnEWVwUIMLLaVjSOWl3cR2ACXuBa9rwfapkxsa3irda90Q29B/dJUHiua7hEoaaCBbdbXRk9TCgCxgQW87ITwL/ox+vdTgEbOxC7PSOu4XzxdNkQ=
+	t=1713770717; cv=none; b=GH8acWhr6kRPBiJ7F9RnMbL3QQgk5+XAHJIcEfHUIm84BRnpvr9u4JqsqeyoguASMQayzFJ5YuwBnWiM2OyRZhiGW20Dpw0GqOVqZ9WWGrO/PrSUmfQwVHqzjq74th4NavtCOKT96qCEDsJdUBUX92eUGxcS95/Ka02aE4NKfLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713770678; c=relaxed/simple;
-	bh=dpgOmQJHRrHOsYFgWaLnsjp9j6Ut9V7hlwOOQWs5FWQ=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=pNgzYdaigqOfX+/WngK2hhibAhMFJ8zvh9wX9GVDGBvCLIjcMKWIZOotF3WT5ctnYYVmH7EEuNAUJNOB/N0FXiITXOArA9pAlvyoL4HhMB20LXVQ+cnMulXRxvBqG3kbcTQfS71G3/xs26Qq5b0MhwRldwjUMmGqTHz3imtO5h8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--apusaka.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RL8CBo9E; arc=none smtp.client-ip=209.85.219.202
+	s=arc-20240116; t=1713770717; c=relaxed/simple;
+	bh=EDcOlr+IXSRQzC67CmMiUWrT6tgVWB6LEzOR9zHRnqg=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=c6y2pkMmcY0OrhI2ekTdSjAoFzfDzganPH4lErbQqyhVODIATUWfhntE47lAdjRl0d5Hz2W7xQQgFS4Qma26wQBWytS4l6pfbJUJuEUBUxLyTs3LJ7ePWD+Hs7xqoya2SHxyKn4AzUwa4AMKQWu4RwZxIyP+El2XxnyjmzQk4cI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--apusaka.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FVMy6d43; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--apusaka.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RL8CBo9E"
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-de468af2b73so8332327276.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Apr 2024 00:24:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FVMy6d43"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-618596c23b4so71232647b3.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Apr 2024 00:25:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713770676; x=1714375476; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1713770715; x=1714375515; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=i9wOGbBfat1hzQwTRQUOOQ0qZfxZpdbfky7UyfMjHY0=;
-        b=RL8CBo9ESvvBEBmUy5HVNnW1d1umQxu+ZB4iQ2x3VpRAPEFC9wb8C3/2v4JAnSCHMP
-         ZdbrPtXLS+/FemPXQiY2z586oSZ8ayiAkizy6buffwUV7n9HA+Mu2TwmrlPOy+95BHYB
-         9lD4T4CsdQPdminAwivWiXZPFumwRnGjMCVF/uUErruhTVg4kO8eUPj75awZb1TlflkX
-         2M+Wg8YZKiWXXjmt5yYTifm6JO8gTuKIeWb3+T6qmAj3lAhFRVInCwPnBcuZ0fNYGzns
-         QczV1YDs5MbNlD/wMCHgv43vGhJXOqRNnco/NMVinihogTfViaHCzqO32lFda//wqBlq
-         yx+w==
+        bh=GFcyxEC9zbVLPap6Ey9gG9OoDKAWEGSfij/agCtqgRs=;
+        b=FVMy6d43K6gnbRNYkqijdJdtK0/iyqlLPjSJmTK16pVT4vLJv1ySiOvikzHufk2/0s
+         tM8FDaf7ghlObrm85vA57+RM21bvQcTzD7NFHuw1tOcH5pI9B0+vmfh45HGZlRjXSipc
+         rUojJk6idHABZe4K0Hox63xBEd7cUrwtK3pHR4mne5xFAevzsw//bopOG8jmUsN/E7EB
+         H+yA5fDnJrrL31MOIN1jcPdskamNl/reSOZzVFK0HxHsHbzFrNuHMIzLWc7lV+WUkUm0
+         YXlQ1S0Hb4t/evVywnEglFEyXenoRRJ5MJhsnPr5R+6zDlOTyT5EWA83oz7q735JdgQ+
+         ivDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713770676; x=1714375476;
+        d=1e100.net; s=20230601; t=1713770715; x=1714375515;
         h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=i9wOGbBfat1hzQwTRQUOOQ0qZfxZpdbfky7UyfMjHY0=;
-        b=BE/pU87lCsra6rrdb/3Qk1Js+sZa1ex9IsG5WzPliRHAfHLC6jx9Ojgu/QltOyLsDd
-         EgL7qfQQD2RqsFZDIwbwu2GwMMOTEBLQnoIlOWWnwQLyQe+jhwzbYrKr3gYl4ge5psXl
-         +15JVWU3sUpfsk8pL/+7FU26VBN3qxAH5lML9iXBZXvw5zhf3FYiEtGvV5xNYRRw/mXO
-         +XqxK8RYABMIT4VttofJ+13tB5iNwogzYnVlJrK9Rm5nIukB5k0bbY+rDZNTusAf61az
-         X8kO7qjuzW39hFJYDUhoL9VSjHh/ByVjAAgM9yd79ye+xeRjoiKGjyzm1a/BOMvQcUTW
-         sR9Q==
-X-Gm-Message-State: AOJu0YyYliFTQ1DoiZPEnzwP5NHQC71+GguET7MD8g7RCa4MrejFmeks
-	RHvoiNIpJ7Q2hGEnvXSLYMWG+tuN6EgNAfasX2dtCV2wf1ppmHlO0IqTo1xFFtERZPF9ubanHwj
-	p4mtQ9OQKc7peqjHMozQvgKLiA9n8Z2dJsrAPs9wXFOD9zLHg9ngHSmPa8ryHURFMYlca8kEFTJ
-	filYsEDaLb+BrwWrKiPixwLRweR0eRtIj5rcgzYJCQWYEUBBGjWw==
-X-Google-Smtp-Source: AGHT+IE/hTCb8Slwze2loKhFJ/zmVV1DW7WbkF5OHZy4fac2xvijx0KJZp+i9C6xdb+Gib9KNLezOi0V4aQV
+        bh=GFcyxEC9zbVLPap6Ey9gG9OoDKAWEGSfij/agCtqgRs=;
+        b=ccdE5frb5L5WlLXJmxMvYrfhdnQl465s97VowwCIx0WvB7zzsNEJ7AFNPiMLeF9RUY
+         OeSbMtqlstu8k2buUwiYsVvzGaruQK3DYSE7D/LYa8s05lnJ65AbZ2sF/DWn9Y81a0qN
+         DLXJSAMaJgnJNx1eef5LMTWG/mORF22WijqvI3RdNOtL94+V4dWLZSd2QoY7Gb1tblaJ
+         7uOg0WJzGWLThrz/8jltrKyRCdOsCZQp6SCaaSz/eXAw6AB979E4sF/x/wstfQy7t52g
+         k7iwgiK1cxLjlhwnIZp3hGeGoJtt3p2JDtVA//bvljYFXHKaLB/hIR9G+LEGDfgPGhO5
+         8xdg==
+X-Gm-Message-State: AOJu0YwvmiJh/56Pfi9LpVlIgdvwo0TDg3GlN7j8VnM7a0HwoD3uzFUL
+	6Nm7FHsn0ccaqNy3L4Y6O4fpuvBooylMcaDImOXz9yOr4BjGxjD1fK8GuIkIEdK44dw08NYaUhm
+	ePxu8kKqgOxynCyOZg5RZWpkonwQSgTfPIila3Dy+1PeX0ecpLVAuM73wldMxDCOZAFiTf+CGg/
+	sg4HKZ6OYrclzWfcaUI8JvodqUHj8l0Nqd0mZe/Qegx1rwx6Kg9g==
+X-Google-Smtp-Source: AGHT+IEGFEdCCHbuaKhEU3U0OHmIQH6peL/wCW0VUPpxDYeKYiIvQgjR3u+Zdc6yZaJTLiExsft4+JYTrTah
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:17:59d7:73d5:a990:d869])
- (user=apusaka job=sendgmr) by 2002:a05:6902:c0a:b0:de5:2694:45ba with SMTP id
- fs10-20020a0569020c0a00b00de5269445bamr759614ybb.0.1713770676156; Mon, 22 Apr
- 2024 00:24:36 -0700 (PDT)
-Date: Mon, 22 Apr 2024 15:24:14 +0800
+ (user=apusaka job=sendgmr) by 2002:a05:6902:725:b0:dbe:30cd:8fcb with SMTP id
+ l5-20020a056902072500b00dbe30cd8fcbmr735816ybt.0.1713770714905; Mon, 22 Apr
+ 2024 00:25:14 -0700 (PDT)
+Date: Mon, 22 Apr 2024 15:25:01 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -56,8 +56,8 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
-Message-ID: <20240422152413.1.Ib96985e197f3db620a127a84aa20f3f3017aaf57@changeid>
-Subject: [PATCH] Bluetooth: Populate hci_set_hw_info for Intel and Realtek
+Message-ID: <20240422152500.1.I8939e49084a6fef78496eb73edafdf3c2c4afbf4@changeid>
+Subject: [PATCH] Bluetooth: btusb: Add debugfs to force toggling remote wakeup
 From: Archie Pusaka <apusaka@google.com>
 To: linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Johan Hedberg <johan.hedberg@gmail.com>, 
@@ -69,64 +69,62 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Archie Pusaka <apusaka@chromium.org>
 
-The hardware information surfaced via debugfs might be usable by the
-userspace to set some configuration knobs. This patch sets the hw_info
-for Intel and Realtek chipsets.
+Sometimes we want the controller to not wake the host up, e.g. to
+save the battery. Add some debugfs knobs to force the wake by BT
+behavior.
 
 Signed-off-by: Archie Pusaka <apusaka@chromium.org>
 Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@google.com>
 
 ---
 
- drivers/bluetooth/btintel.c | 9 +++++++++
- drivers/bluetooth/btrtl.c   | 7 +++++++
- 2 files changed, 16 insertions(+)
+ drivers/bluetooth/btusb.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index a19ebe47bd951..dc48352166a52 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -2956,6 +2956,11 @@ static int btintel_setup_combined(struct hci_dev *hdev)
- 			err = -EINVAL;
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 8bede0a335668..846b15fc3c04c 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -873,6 +873,9 @@ struct btusb_data {
+ 	unsigned cmd_timeout_cnt;
+ 
+ 	struct qca_dump_info qca_dump;
++
++	bool force_enable_remote_wake;
++	bool force_disable_remote_wake;
+ };
+ 
+ static void btusb_reset(struct hci_dev *hdev)
+@@ -4596,6 +4599,10 @@ static int btusb_probe(struct usb_interface *intf,
+ 
+ 	debugfs_create_file("force_poll_sync", 0644, hdev->debugfs, data,
+ 			    &force_poll_sync_fops);
++	debugfs_create_bool("force_enable_remote_wake", 0644, hdev->debugfs,
++			    &data->force_enable_remote_wake);
++	debugfs_create_bool("force_disable_remote_wake", 0644, hdev->debugfs,
++			    &data->force_disable_remote_wake);
+ 
+ 	return 0;
+ 
+@@ -4702,6 +4709,18 @@ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
  		}
- 
-+		hci_set_hw_info(hdev,
-+				"INTEL platform=%u variant=%u revision=%u",
-+				ver.hw_platform, ver.hw_variant,
-+				ver.hw_revision);
-+
- 		goto exit_error;
  	}
  
-@@ -3060,6 +3065,10 @@ static int btintel_setup_combined(struct hci_dev *hdev)
- 		break;
- 	}
- 
-+	hci_set_hw_info(hdev, "INTEL platform=%u variant=%u",
-+			INTEL_HW_PLATFORM(ver_tlv.cnvi_bt),
-+			INTEL_HW_VARIANT(ver_tlv.cnvi_bt));
++	if (!PMSG_IS_AUTO(message)) {
++		if (data->force_enable_remote_wake) {
++			data->udev->do_remote_wakeup = 1;
++			if (test_bit(BTUSB_WAKEUP_AUTOSUSPEND, &data->flags))
++				data->udev->reset_resume = 0;
++		} else if (data->force_disable_remote_wake) {
++			data->udev->do_remote_wakeup = 0;
++			if (test_bit(BTUSB_WAKEUP_AUTOSUSPEND, &data->flags))
++				data->udev->reset_resume = 1;
++		}
++	}
 +
- exit_error:
- 	kfree_skb(skb);
- 
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index cc50de69e8dc9..4f1e37b4f7802 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -1339,6 +1339,13 @@ int btrtl_setup_realtek(struct hci_dev *hdev)
- 
- 	btrtl_set_quirks(hdev, btrtl_dev);
- 
-+	hci_set_hw_info(hdev,
-+			"RTL lmp_subver=%u hci_rev=%u hci_ver=%u hci_bus=%u",
-+			btrtl_dev->ic_info->lmp_subver,
-+			btrtl_dev->ic_info->hci_rev,
-+			btrtl_dev->ic_info->hci_ver,
-+			btrtl_dev->ic_info->hci_bus);
-+
- 	btrtl_free(btrtl_dev);
- 	return ret;
+ 	return 0;
  }
+ 
 -- 
 2.44.0.769.g3c40516874-goog
 
