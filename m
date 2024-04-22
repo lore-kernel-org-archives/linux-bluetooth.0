@@ -1,96 +1,110 @@
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F346314A0AC
-	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Apr 2024 13:02:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2127214A09E;
+	Mon, 22 Apr 2024 13:05:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713790972; cv=none; b=Z8Q4JNVujaQxBiblyoArE1ykr9Y+0MxDkOApdKI2iHPHIRCVuK8sj6ykl6JnBnK/L5BaeheK3uLXiN8JoDlvHL+aKZPhom+/k4KKeW5buvCIZR1hV5a69oJ7duOn2279OMzakbKeo0hjT+AxJTDm2m27pDEkeBkCYBhGbLe4cVk=
+	t=1713791116; cv=none; b=AMi8mTRlCGvQNscEJSWKKxEGeOV3zepOQ1QtIYL67qwU3lr+FNcGDZckQ7GbKaQZOxc9YNNtCk9ikNGdqAOj3pPZDT/eWhBKo8YGNYTYppRmkYXTUhGCZFmcxVYN5aXPeGz+/UMNR8MTuGZPmgizsTU/kYOD1Dfu4TPssjWVV+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713790972; c=relaxed/simple;
-	bh=+Cq4aokMbWo87EMNuSZpHsDDMzRKgaUub2cLGzrZNZ8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=csLXEk22U3XkhS5AILrDmome0LIDXOGgMyyhI78ixPj3BhTFKQqHU2vi3nPeFtdVVw/aURE4v7B1maXSBUeS1A6JLNgZ4dMXht4ZFzb23AGwbMpjQIt39oOp23nJfSemygZoCcwUAjKBF5WNLZssiAqYia0lQbFke0r8Bnks4N4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=OaCydT8y; arc=none smtp.client-ip=209.85.128.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1713791116; c=relaxed/simple;
+	bh=AYXYdSjrS60uqFRFCctj2ZvuCU8r3kYG/nyJjGjXGJ0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=WsF+FXsfyaakXiBsd/cboBj7NUO7cJTyFRpyZYhAF8CFRUaA88BllahRyBwFcpD01eic73shBu+MVMzHwLGm+/lGzNEb078JxjxtBicoZz7UEEtBjm+0BOCUQiIIFyWx2REfIxXJVAQW3P5N/euZH84mymQvIGBBDyWd1UMFAvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=MPefd/YC; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OaCydT8y"
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-61ac183ee82so43860267b3.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Apr 2024 06:02:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1713790968; x=1714395768; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=+Cq4aokMbWo87EMNuSZpHsDDMzRKgaUub2cLGzrZNZ8=;
-        b=OaCydT8y3xYyejJrQ4QW2Ov05xsZves46V0IvLdhs6QZzPAqKeMWzjcvs7hSoD4hiA
-         tDnwDymEuZR4yCrqvKWLmikZN7cJN+0LVbreSUUkshc6slvnFHx9ORjFaoDkhUZulemg
-         u2mZLNBqeYD9TArqE6cRCqow9XS7Cfny/5o7QfAX1QQ6erWlaL7GxgkCjaZrom10y8CB
-         gxld2QFo0e12JyC20rjnHANufWUyqkRaskG/OnrtM2VBLZDprfMm1wwIrhAhbG4gSQe8
-         SvsCbQglnTu5T+XMz43WModRhZ708vPTTR6mebPerXNbkxtPrCyO99r3dno8F9bL1+IU
-         zXAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713790968; x=1714395768;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+Cq4aokMbWo87EMNuSZpHsDDMzRKgaUub2cLGzrZNZ8=;
-        b=PBX9s3v4M1VZL+nmI0LrACM8QpgjIFZ3zvSzWWDlcwv1RgglqwlbbwfIJLgTfizrTe
-         0oOaAH4ayjHZTuvaqB5c67rtP4cNz3v8USjB5exhGz+vKqTmodYIJBOLtl89+eSyj0cB
-         l4TatXjxppTtkj4zXX0nHS9FFQmc9XHIrrXkiegzEU7yMomro0dDG59MUOPPHPJzksCV
-         qA7aUzo0icMG3+KcKHN2TrsOKfoSn5coQmzjEmZ4ICxQBekqZGRZp9SwXR04upMR7uPJ
-         Ueftvki9s2BwBv/kQBJBO8GNHQ/1If9PYKnmhA/KRDyoBluRAoUunN3s8qGQ5olrB/E8
-         olPw==
-X-Forwarded-Encrypted: i=1; AJvYcCVLZU30q/YszDKQOwfhHjttfjeX6E+71k4N/JVLxheUjeEGn0efxg4UJbXyX8oyUpu5Qc5dLQdO32HtL2AKDhVY0A1W0FcGgKby6qvqlS+w
-X-Gm-Message-State: AOJu0YwxVH3mmusD148m3MEvcLPjgpUbzuacGaZHDZxuztXP0HipKBUV
-	u9Igcr8HlMlfj2EENj+eTZVEFW/u3Gs4opzV9D1EYH+TFDEAVzOOtb8qGfTJhUEGAs+CoSpuU6w
-	nczLfn9lPNfaxwG323kRMiAL7oGpwnUB/Cs0UyA==
-X-Google-Smtp-Source: AGHT+IHerH6GOkHsD8OHWFPyVWXygrWO3rG6LpK6SV9ja2GjSfh6qAzzo2Cj7TtuGSpU6sBRx/BRBRdxUbdN9pELSjQ=
-X-Received: by 2002:a25:8051:0:b0:dc6:f0ac:6b53 with SMTP id
- a17-20020a258051000000b00dc6f0ac6b53mr8238555ybn.15.1713790968038; Mon, 22
- Apr 2024 06:02:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="MPefd/YC"
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 43M823do002911;
+	Mon, 22 Apr 2024 13:05:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=ovWSv3B+H61oCuvCm9t/WxM2ikWw4yKO6zzZ6kbn6us=; b=MP
+	efd/YC4mStE/VFjrFv7AQ5/g9JmootfCIgScSvJ3qiEoUIbZPOb4WBXbURHytVTQ
+	KJ/1IA4HcVLrO74nfMg34pO7VotS+b0BNWy8lah9lnQ/sEPMije8XUt5JdaUIEF/
+	K+wj1upWCyY3vCGhE0BE0GfOtMEvCblSZTSdnP3yIEGNIS6SJMIzX7eQ9ai7FqgM
+	ClvftXve3UDz8XvlXSkD7kLgc+Bsf4hV9jn3cBb2mfN+gELm94RXNoU7Ym77qtbk
+	WSK8s4VXGvJ8BgWrfjjXuYgF75SJnCyEk2D7IZYdpm34k0WM6vPMuU/xvkWDca5j
+	P/6AswBTYFIUiYZ4y6Rg==
+Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xnm1bgr9u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 22 Apr 2024 13:05:04 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43MD52l4016431
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 22 Apr 2024 13:05:02 GMT
+Received: from [10.253.37.80] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 22 Apr
+ 2024 06:05:01 -0700
+Message-ID: <438844e9-47e8-486e-9611-ae524d6974b3@quicinc.com>
+Date: Mon, 22 Apr 2024 21:04:58 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1713564212-21725-1-git-send-email-quic_zijuhu@quicinc.com>
- <1713650800-29741-1-git-send-email-quic_zijuhu@quicinc.com>
- <369512e2-f091-4370-bce5-9ac32178dc4d@penguintechs.org> <a6ae69ad-b602-4cfc-9f76-8932f357d30b@kernel.org>
- <c0f7036d-c129-400b-85a2-1414ec3d2622@quicinc.com> <dc17aea1-9399-4c2b-8775-fa0a7f602035@penguintechs.org>
- <CACMJSevocRot6J06uvridRw9MZFftJrkCyYBgXhLnwfapVPnCw@mail.gmail.com> <5da9ecae-35c7-4968-9f16-3f10e04c2b1a@penguintechs.org>
-In-Reply-To: <5da9ecae-35c7-4968-9f16-3f10e04c2b1a@penguintechs.org>
-From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Date: Mon, 22 Apr 2024 15:02:37 +0200
-Message-ID: <CACMJSetZ14Pm=m9e1ka+m9pUbSwCfV2agcaWBd7aWJu2ngWmbA@mail.gmail.com>
-Subject: Re: [PATCH v4 0/2] Fix two regression issues for QCA controllers
-To: Wren Turkal <wt@penguintechs.org>
-Cc: quic_zijuhu <quic_zijuhu@quicinc.com>, Krzysztof Kozlowski <krzk@kernel.org>, luiz.dentz@gmail.com, 
-	luiz.von.dentz@intel.com, marcel@holtmann.org, 
-	linux-bluetooth@vger.kernel.org, regressions@lists.linux.dev
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/2] Bluetooth: qca: fix NULL-deref on non-serdev setup
+To: Johan Hovold <johan@kernel.org>,
+        Luiz Augusto von Dentz
+	<luiz.dentz@gmail.com>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+        Zhengping Jiang
+	<jiangzp@google.com>,
+        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20240319154611.2492-1-johan+linaro@kernel.org>
+ <ZiZdag8fw8H1haCb@hovoldconsulting.com>
+Content-Language: en-US
+From: quic_zijuhu <quic_zijuhu@quicinc.com>
+In-Reply-To: <ZiZdag8fw8H1haCb@hovoldconsulting.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 4nbmb7XqAGuKelga_czZbGHYiJEazCxq
+X-Proofpoint-ORIG-GUID: 4nbmb7XqAGuKelga_czZbGHYiJEazCxq
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-22_09,2024-04-22_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ priorityscore=1501 mlxlogscore=658 lowpriorityscore=0 impostorscore=0
+ mlxscore=0 phishscore=0 suspectscore=0 bulkscore=0 malwarescore=0
+ clxscore=1011 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2404010003 definitions=main-2404220058
 
-On Mon, 22 Apr 2024 at 12:42, Wren Turkal <wt@penguintechs.org> wrote:
->
-> On 4/22/24 1:51 AM, Bartosz Golaszewski wrote:
-> >
-> > This all sounds plausible. However just reverting this patch is a
-> > waste of time as checking IS_ERR_OR_NULL() on the return value of
-> > gpiod_get_optional() and continuing on error is wrong as I explained
-> > several times under Ziju's emails already. I provided a suggestion:
-> > bail out on error returned from gpiod_get_optional() even if the
-> > driver could technically continue in some cases. I don't want to have
-> > to argue this anymore.
->
-> I'm not trying to argue. I am trying to find a path forward as a
-> concerned user. I am also trying to figure out if there is any way I can
-> help resolve this. I am not a kernel developer, but I would really like
-> to contribute in some way, if possible.
->
-
-Can you test the patch[1] I just sent?
-
-Bart
-
-[1] https://lore.kernel.org/linux-bluetooth/20240422130036.31856-1-brgl@bgdev.pl/
+On 4/22/2024 8:51 PM, Johan Hovold wrote:
+> Hi Luiz,
+> 
+> On Tue, Mar 19, 2024 at 04:46:09PM +0100, Johan Hovold wrote:
+>> Qualcomm Bluetooth controllers can be registered either from a serdev
+>> driver or from the Bluetooth line discipline. In the latter case, the
+>> HCI UART serdev pointer is NULL, something which the driver needs to
+>> handle without crashing.
+>>
+>> This series fixes one such issue at setup() time which incidentally
+>> masked a similar crash at suspend. Fix this in two separate patches so
+>> that the latter issue is address in pre-6.2 stable kernels.
+> 
+>> Johan Hovold (2):
+>>   Bluetooth: qca: fix NULL-deref on non-serdev suspend
+>>   Bluetooth: qca: fix NULL-deref on non-serdev setup
+> 
+> Could you pick these up for 6.9 or 6.10?
+> 
+> The patches are marked for stable backport and only privileged users can
+> set the N_HCI line discipline these days (even if I'm not sure about
+> pre-5.14 kernels...) so it may be fine to wait for 6.10 if you prefer.
+> 
+> Johan
+> 
+Hi johan,
+could you share the patch links for me to review. i can
+'t find them now
