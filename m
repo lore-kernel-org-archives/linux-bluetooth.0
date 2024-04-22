@@ -1,184 +1,152 @@
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC6685028B
-	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Apr 2024 14:00:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63F721509A9;
+	Mon, 22 Apr 2024 14:15:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713794441; cv=none; b=JXpaZ5ROzVWynpVi6hPciiw9d+zR5ghbgd3tu7q+rMykOEPuIGRNwHRUNCZs1fFYVbC2k2YH8oheNSOkkWRuE0IBnDproR2cc7VXap8LD+mf9t9F4ebIY7vGU7DsbHuiM/4OPorqn8mbzmaDIgvKmFKAkB4wQoNjyfxfgBlAFho=
+	t=1713795345; cv=none; b=LHaqwBUML1I/urwLaYVQwq6oq3sBn+dVIPWEXy7cVgziSURN3+HyIOWoqYnYlhmxYzTAKyeHclpgtEhjDIBbWg/16uVcSdzeXvwb4u94LOBq4EGETNF9+RJDR6XXVVEzC7XmcDmPvysDjLMuRkkHUtvPn3WuaRVqcM7/7/6Ivr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713794441; c=relaxed/simple;
-	bh=rvLTwPVL2eye591GV+V4jOeqhvBheRAR4e6OBbOKGoE=;
+	s=arc-20240116; t=1713795345; c=relaxed/simple;
+	bh=hEvNS87p39Z1frzI0wCQ9B0ZqbVWadl24hmpRMpTSYU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tkwC2YzQI3Lo3IZ4BS1oa7Bx4l4QKFBJqGMdVItTNhQEbusjFaj4tFARAsDVHeH2/Sx8Ka5qzgmnhDWpnVE01WeZGpX4PULeOUOIVM8aEPt4wVwzAedxEB+MWUxm+COA2o9/es+AhjDE6HrgM42Qyx6kSYC2uzWY0VfZcGenmT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tlb4caKC; arc=none smtp.client-ip=209.85.208.182
+	 To:Cc:Content-Type; b=bKRLcqwS8oCeEJ+1n944hdvEVV80yOCq6ojYg+JwlRv5gBWcOfoNcS8R1QDymn78qE9bgX5qvQgAkNrhrgrRjvCR7C+lq0Ua++mCw/JBa7oQpoOeEZKBEki1XfWXer1TmbRwezM4pJzPnm1O2EtaWPNWSC+586JX8wKFtbiMq1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FkZT/ouS; arc=none smtp.client-ip=209.85.208.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tlb4caKC"
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2d895e2c6efso67178551fa.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Apr 2024 07:00:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FkZT/ouS"
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2d8a24f8a3cso55875511fa.1;
+        Mon, 22 Apr 2024 07:15:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713794437; x=1714399237; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1713795341; x=1714400141; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HnLof2JqIu2jM1NdTS6ifu4tMrnRrSQ6Mqm7+AcL31o=;
-        b=Tlb4caKCF9zFEon7AAMoyz88yyIJua77AVFt7H8rX3qNapCkaMMtx2axFCoQmK7nFG
-         LKSCok1al4YDAbP7ggP0OSBUKAZry01BoHen/50/moBnXEnbYoxd6cB52WduFALv66Ma
-         w6XOaAcYQrG+08NRaQKBjqyW8lHz8beZmKw8u2MSI/xrZudNBcBOQgCuJhELhUoUKmQZ
-         O4uc0oybk012fpywEnn+ZBeSJH67N2IEtSX+fs66a00H+84Xf3N2LKXJv2xwbjpNLpp2
-         n4UqpM2J2pJRJVryBD4ezrzL8ZIEQhUKTs1SahD/XxL5kTHZDN/xVvXe53WsdWP1pCgt
-         hXcw==
+        bh=iCVaFWgYPulgT/NxtvZ6t6tkYKya9dvfI35PAROfzCM=;
+        b=FkZT/ouSsch4YhaxwSAkOTptoo8K6jTIQfv8sz/+MFwNvG9MeMnVv413ggH8YTaGa9
+         mYlCWbn9NMNhqCrhH/Zao1A14RMlabYh31l/gx+Fpwx48H82dXlmgf6iIzyTuVR2wjtY
+         EaAJIhC92RVtHsHHtu3IEk8CRnX92cVDg8TVk63A1SadMlnNanxKWH39P0nAov6tNx/d
+         7KMoirS5vjgPWVRkJwCmxWw5QyqCWlVk4g4t7M7f0qASeaJigq4eGI32VSYaKhUFmw2D
+         x5uhcl+fFNmm5zyzhD3KZPPGBG1gqDkrHhKQ94+QTHCyyCKagcWWuFF5MMzz/hSFb052
+         IgLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713794437; x=1714399237;
+        d=1e100.net; s=20230601; t=1713795341; x=1714400141;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HnLof2JqIu2jM1NdTS6ifu4tMrnRrSQ6Mqm7+AcL31o=;
-        b=HoifRuC7pyMHiPAtNlN4c3ApZtY+18pv43/LXxC1R+Qf7OQrllHNABAnBlfFrtxqw8
-         rxNYWfqCiKdEJzsvZG01CRu9eHVycrnkijqWjCSYCY6VE+GEQYm8jSMiuEv0rjoxQ1S+
-         5xJCrSBLQL3vmpINIFjwVDOiK4njipJ5boBrZgKUzrtehZYPnu7s1nt4zYF0UfRpR6rK
-         f5fcwipO7uUzyjQrBfCqdESQA02sppKPe8FzZKnsqPShAvcIywV++1zuYHd7bv2LrU+Z
-         MSwMnuFRNGApGfVk7HvvfYvZBwy2RmqX1tJY6jTHWd19jD/wmnAGyVF5cRhAVckuXIjK
-         NeAg==
-X-Gm-Message-State: AOJu0YxSIuQa27rYBASFMmttT/8VRjL1ZYjV7+OmvsLHarDq7o1TsvtD
-	BO3lqZRjVXcBskW4gmfnTSMZDFOS/U9P0Xqj45JbEVLOTq5Q1v+AkTj4MSvvIG1hxFKCwQUabk2
-	hTzZhD/xuJFAOq7lzNkC/VnKsaUbisA==
-X-Google-Smtp-Source: AGHT+IEGQgqu2ktq0b0x6mj4RFUUzu2EpRxpXJzx3YPwXSbu+TQ3VqLfJfYGL455fX88UmmDaXkWMOGOT5jAtL/JmBQ=
-X-Received: by 2002:a2e:8903:0:b0:2da:6f70:56e6 with SMTP id
- d3-20020a2e8903000000b002da6f7056e6mr6091095lji.24.1713794437077; Mon, 22 Apr
- 2024 07:00:37 -0700 (PDT)
+        bh=iCVaFWgYPulgT/NxtvZ6t6tkYKya9dvfI35PAROfzCM=;
+        b=AGKxuXdaQM/vFZZdcXgB7NBBBwuvxCOUIc2SDizggF1t6TOtcDULYAl/+iHnTNZODh
+         bZ3Qaokhaz2/61viy1nOhcA2S5lZyAnvFvtDeyd3j7y3gPnWVoTmeOdmidDymBIVPFvJ
+         VUTVk0nnQ18hM2ul3CTdnwh6i8TfTCmCIe2Fd+bOUKDN/2QsI0STS3N3X0DKnltAG3GT
+         K9NHI+3r5sEnK9PHNXPiLrmo21565CCY56iUpdMhzPoOq/ZIEw7f777/rTYpQjbBfRrU
+         P5kQ/1L1vk6ysGj9Y4ut3PYHcEYJYqTEX4X0UC8hGkI8yR+I+fNEydFOMsmVICE9YdcA
+         ZI4A==
+X-Forwarded-Encrypted: i=1; AJvYcCW9wNlZyafES1xJMjsthfXHBUTPURKm9xwnl2IqPAzQsMCeNhLDhF9Rh2Ez1tLLtUTFMw+YTttmmVRiBDgwuCdD07yFs6xBdkiljpM/bOUbfksMZ/lBI3z12sysiSdcjb4n+9bQ9d3hroW+IAel
+X-Gm-Message-State: AOJu0YyAKI160Q04zgpOzV//WlK+tHS6CCMZfvszN8jv2oyBOhLnW9yo
+	4xJMJrdfnkZt6iiKE/ErwuyHOJppT2wGqXGzHl23WijWL9qpRuIMQ/JMe/KS1bVOw/rCjVrRDbp
+	oblS5SoJ8QKJkjdsKEaVH+HPWpzY=
+X-Google-Smtp-Source: AGHT+IFbunRwSULX50t4Llpy7z9GbWeejxW1hudmJ11M2jBxAl6OxpCx/iw4uAPw2QnXpaAGy6vwFQFPQJCYpuptJpA=
+X-Received: by 2002:a2e:90d0:0:b0:2dc:d7e7:d676 with SMTP id
+ o16-20020a2e90d0000000b002dcd7e7d676mr5917610ljg.19.1713795341256; Mon, 22
+ Apr 2024 07:15:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240408125806.12682-1-surban@surban.net> <6613f1f7.170a0220.836c.1ac6@mx.google.com>
- <CABBYNZJsojUqyYc-ywcASyRZ2_NWyO_54t0o4Sk8dMuT9KbzbA@mail.gmail.com>
-In-Reply-To: <CABBYNZJsojUqyYc-ywcASyRZ2_NWyO_54t0o4Sk8dMuT9KbzbA@mail.gmail.com>
+References: <20240319154611.2492-1-johan+linaro@kernel.org>
+ <ZiZdag8fw8H1haCb@hovoldconsulting.com> <438844e9-47e8-486e-9611-ae524d6974b3@quicinc.com>
+ <ZiZkK4BAoqxNg7yG@hovoldconsulting.com> <472b9f60-d68e-47ee-9ca9-f71a9ba86a1a@quicinc.com>
+ <ZiZpg4lyp-LcpV8l@hovoldconsulting.com> <3e170e40-c143-4e3b-8696-b661cac56f00@quicinc.com>
+In-Reply-To: <3e170e40-c143-4e3b-8696-b661cac56f00@quicinc.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 22 Apr 2024 10:00:24 -0400
-Message-ID: <CABBYNZL2q90Ggq=U26AvhUKu00RSHkbdCi3-pa43MhTWrQc6yg@mail.gmail.com>
-Subject: Re: [v5] Bluetooth: compute LE flow credits based on recvbuf space
-To: linux-bluetooth@vger.kernel.org
-Cc: surban@surban.net
+Date: Mon, 22 Apr 2024 10:15:29 -0400
+Message-ID: <CABBYNZKpR8ZqUHmLg0RLq1Yqtk4qDEYj9UuDLYrZsthSPao-dg@mail.gmail.com>
+Subject: Re: [PATCH 0/2] Bluetooth: qca: fix NULL-deref on non-serdev setup
+To: quic_zijuhu <quic_zijuhu@quicinc.com>
+Cc: Johan Hovold <johan@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	Zhengping Jiang <jiangzp@google.com>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Sebastian,
+Hi Quic_zijuhu,
 
-On Wed, Apr 10, 2024 at 10:40=E2=80=AFAM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
+On Mon, Apr 22, 2024 at 9:53=E2=80=AFAM quic_zijuhu <quic_zijuhu@quicinc.co=
+m> wrote:
 >
-> Hi Sebastian,
+> On 4/22/2024 9:43 PM, Johan Hovold wrote:
+> > On Mon, Apr 22, 2024 at 09:30:28PM +0800, quic_zijuhu wrote:
+> >> On 4/22/2024 9:20 PM, Johan Hovold wrote:
+> >>> On Mon, Apr 22, 2024 at 09:04:58PM +0800, quic_zijuhu wrote:
+> >>>> On 4/22/2024 8:51 PM, Johan Hovold wrote:
+> >>>>> On Tue, Mar 19, 2024 at 04:46:09PM +0100, Johan Hovold wrote:
+> >>>
+> >>>>>> Johan Hovold (2):
+> >>>>>>   Bluetooth: qca: fix NULL-deref on non-serdev suspend
+> >>>>>>   Bluetooth: qca: fix NULL-deref on non-serdev setup
+> >>>>>
+> >>>>> Could you pick these up for 6.9 or 6.10?
+> >>>>>
+> >>>>> The patches are marked for stable backport and only privileged user=
+s can
+> >>>>> set the N_HCI line discipline these days (even if I'm not sure abou=
+t
+> >>>>> pre-5.14 kernels...) so it may be fine to wait for 6.10 if you pref=
+er.
+> >>>
+> >>>> could you share the patch links for me to review. i can
+> >>>> 't find them now
+> >>>
+> >>> Sure, but you should bookmark lore.kernel.org in your browser as you =
+can
+> >>> search the archives there yourself:
+> >>>
+> >>>     https://lore.kernel.org/lkml/20240319154611.2492-1-johan+linaro@k=
+ernel.org/
+> >
+> >> NAK for your [PATCH 1/2] since the null checking is redundant with you=
+r
+> >> [PATCH 2/2].
+> >
+> > I explained in the cover letter why it is split up like this. If you
+> > don't bother reading, then we will not bother listening to you.
+> >
+> >> NAK for your [PATCH 2/2], since it is same with my earlier fix
+> >> https://lore.kernel.org/all/1704960978-5437-1-git-send-email-quic_ziju=
+hu@quicinc.com/
+> >> my new patchset for btattach tool still has this change.
+> >
+> > The fix does not depend on your btattach series, which has also been
+> > rejected.
+> >
+> these my v1 and v2 for this issue which are earlier then yours.
+> they are not rejected but not responded.
 >
-> On Mon, Apr 8, 2024 at 10:05=E2=80=AFAM <bluez.test.bot@gmail.com> wrote:
-> >
-> > This is automated email and please do not reply to this email!
-> >
-> > Dear submitter,
-> >
-> > Thank you for submitting the patches to the linux bluetooth mailing lis=
-t.
-> > This is a CI test results with your patch series:
-> > PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=3D8=
-42452
-> >
-> > ---Test result---
-> >
-> > Test Summary:
-> > CheckPatch                    PASS      1.01 seconds
-> > GitLint                       PASS      0.22 seconds
-> > SubjectPrefix                 PASS      0.07 seconds
-> > BuildKernel                   PASS      30.65 seconds
-> > CheckAllWarning               PASS      34.59 seconds
-> > CheckSparse                   PASS      39.10 seconds
-> > CheckSmatch                   FAIL      35.16 seconds
-> > BuildKernel32                 PASS      29.28 seconds
-> > TestRunnerSetup               PASS      528.76 seconds
-> > TestRunner_l2cap-tester       FAIL      22.63 seconds
-> > TestRunner_iso-tester         PASS      30.74 seconds
-> > TestRunner_bnep-tester        PASS      4.67 seconds
-> > TestRunner_mgmt-tester        FAIL      110.12 seconds
-> > TestRunner_rfcomm-tester      PASS      7.26 seconds
-> > TestRunner_sco-tester         PASS      14.97 seconds
-> > TestRunner_ioctl-tester       PASS      7.62 seconds
-> > TestRunner_mesh-tester        PASS      5.77 seconds
-> > TestRunner_smp-tester         PASS      6.78 seconds
-> > TestRunner_userchan-tester    PASS      4.93 seconds
-> > IncrementalBuild              PASS      28.60 seconds
-> >
-> > Details
-> > ##############################
-> > Test: CheckSmatch - FAIL
-> > Desc: Run smatch tool with source
-> > Output:
-> >
-> > Segmentation fault (core dumped)
-> > make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Err=
-or 139
-> > make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
-> > make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
-> > make[2]: *** [scripts/Makefile.build:485: net] Error 2
-> > make[2]: *** Waiting for unfinished jobs....
-> > Segmentation fault (core dumped)
-> > make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] =
-Error 139
-> > make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
-> > make[4]: *** Waiting for unfinished jobs....
-> > make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
-> > make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
-> > make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
-> > make: *** [Makefile:240: __sub-make] Error 2
-> > ##############################
-> > Test: TestRunner_l2cap-tester - FAIL
-> > Desc: Run l2cap-tester with test-runner
-> > Output:
-> > Total: 55, Passed: 51 (92.7%), Failed: 4, Not Run: 0
-> >
-> > Failed Test Cases
-> > L2CAP LE Server - Success                            Failed       0.099=
- seconds
-> > L2CAP Ext-Flowctl Server - Success                   Failed       0.103=
- seconds
-> > L2CAP LE EATT Server - Success                       Failed       0.103=
- seconds
-> > L2CAP LE EATT Server - Reject                        Failed       0.091=
- seconds
+> https://lore.kernel.org/all/bf74d533-c0ff-42c6-966f-b4b28c5e0f60@molgen.m=
+pg.de/
+> https://lore.kernel.org/all/1704970181-30092-1-git-send-email-quic_zijuhu=
+@quicinc.com/
 >
-> We need to fix these tests as soon as we apply these changes, afaik
-> you said they are expected to change because the credit changes, so we
-> need to update it with the new credit logic. Also it would be great to
-> add a test case that covers the broken behavior where we dropped
-> packets.
+> > You clearly have some learning to do on how to interact with the kernel
+> > community and to write proper commit messages and patches. If you start
+> > listening to feedback and try not to piss everyone off perhaps you can
+> > even get your patches merged one day. [1][2]
+> >
+> > Johan
+> >
+> > [1] https://lore.kernel.org/linux-bluetooth/fbe5722b-1e45-4ccb-a050-20a=
+473a823c8@quicinc.com/T/#m8e495666a71eb0e7ae54c82554dfff1fc96983e7
+> > [2] https://lore.kernel.org/linux-bluetooth/1713563327-19694-1-git-send=
+-email-quic_zijuhu@quicinc.com/T/#med0610646a8fd8b3c8586abca9895b124b2d2534
+>
 
-Do you need some more feedback regarding these changes? Looks like you
-stop responding for some time, I do think this is very important to
-have it fixed.
-
-> > ##############################
-> > Test: TestRunner_mgmt-tester - FAIL
-> > Desc: Run mgmt-tester with test-runner
-> > Output:
-> > Total: 492, Passed: 489 (99.4%), Failed: 1, Not Run: 2
-> >
-> > Failed Test Cases
-> > LL Privacy - Add Device 7 (AL is full)               Failed       0.195=
- seconds
-> >
-> >
-> > ---
-> > Regards,
-> > Linux Bluetooth
-> >
->
->
-> --
-> Luiz Augusto von Dentz
-
-
+They probably need to be resend as well, you have so many sets pending
+that makes it hard to know which should go first, next time please
+wait until each set is merged before sending the next since I can't
+know if they are really independent of each other or not.
 
 --=20
 Luiz Augusto von Dentz
