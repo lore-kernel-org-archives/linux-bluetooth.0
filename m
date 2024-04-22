@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1261F1534EB;
-	Mon, 22 Apr 2024 15:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5580B153513
+	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Apr 2024 15:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713799829; cv=none; b=DV8VM0QI4KLiKswwdMiHSTC9onS5vU2cP+WX8NSV7+N3bNjdSZmEcI5pLiqwojWZc1qiMC+03Pkeh3TFQQjj0j4v0wa7F3/8cQp8MZ1YQGwXdpzMGyQVQyvgbNMW3V5nPcqr+bjIdYZfdnA4bLrMIx08USrBSDVaRY3hf4sudRI=
+	t=1713799829; cv=none; b=jng4IHmssOQhOiXFASyR0xY3M4HzGf5u5fkph1J7lBGyrlT0jA0njI0oTXiuVSRsB7b0lwYLImFpgazCsTIUy85w34wcRvQV64uh5up81Dhv/Xrfg3EoSymKfgYLskXLRuwWAD4TdzMx9t1PzrI61va9yYVZDsuA4GUAHxOcbgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1713799829; c=relaxed/simple;
-	bh=kBOdztBuRx3LyBj/ka6DXaMiCnKJ+c2up6OXDtfALQg=;
+	bh=smlU8gDCuBtp7jPPmCMeClCuCOErUb+LAgnra16IgTc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ZapLorEV7CKZCH5Ak8dgdhfcA2xRkX24Hs2wD1C1BoPzZXgi1z1+FVt3z8F8jwhVBlY1ulYodx9X/zq4vqVc7uHFqfrVCpKXOAapGpVFF7ccwfHdwI/V42KIBrT8Q5CPGbYsM7B+QqBO3adOJNlryes9YoaBS0IkBO93LJ0KqVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VsByQft0; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=RDMT5yvRLEtR05tN5JNIwu9QnTgMsBKvInRRgcXpW+5T5u+aa5goBwD3LABhjXtq9AMZmHQbFte96YICtS0B35CGG1MhQhI6VswY9+4/FyIxd3e2P12D83m3Ly2Xn8LO4uFKQrGK96uotnbJe+QjTlvj2vckuS+aOivoUZs//Xc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m9hs8+7T; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VsByQft0"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E3D8BC4AF09;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m9hs8+7T"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E8A5FC4AF0B;
 	Mon, 22 Apr 2024 15:30:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1713799828;
-	bh=kBOdztBuRx3LyBj/ka6DXaMiCnKJ+c2up6OXDtfALQg=;
+	bh=smlU8gDCuBtp7jPPmCMeClCuCOErUb+LAgnra16IgTc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=VsByQft0K9J5inVAsL7BWPEW0omu/N0N2cmpV7gVRutXaO01+Bidl3LtrFceJuX8+
-	 9ysl3inBH/gCyrgoVx53EwQSWKgzUTyw6FJIh968pT6JPv5X32ICwwhb7gJI7+aKGQ
-	 s/Yu6Q3+yUOqxCx1bh5sVQO4O8HhTdcj8Ashovaui6N1AWS3u4VZZ9oJoB0eTQjBKM
-	 q3i3RQsh8p87oqFswzXV6PhDkbe8hSgS3dXdbmg7NnlMNXUqtqSIU+IOkYGnRdHLa3
-	 r666z73wyUhUFR1QpJexflj839/VV/Gl3ffHNC0Up0nvCeyfbwLCecbAvl/wVcmWad
-	 7DWL30YUTRL0g==
+	b=m9hs8+7T68p6tJTew1p6cRuFQi48ZF1cPZ4pWn7ehHXNxcdNpco4wYDT4jD6lGxnL
+	 LX19hZDs6YOfqi7LozTFUyVGv7gDrizHv5XOXR2e6rmnceCaW60LvoeHU01t0lVu5e
+	 dKJJ7Y4C7qKRnzeKVOmhAaNYO5q/f6D7l02rmgFI+EhbMPC4R8NeurW4wPfdhpTv1d
+	 6bfLtd/0i5g37b6Jb7Ekt9vIEXI+xMoHFizNsqVjlQyVhY1xRkkqsjvrGCZ6jeUy51
+	 N+sm0MfrwlwdBGMED3HtwKdbUqcAr43I+caxZbMk6x0qsJ6qKK+AFkNQBFqHCcDqgY
+	 myiR/KH3Z6beQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D8678C433A2;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DF21FC43443;
 	Mon, 22 Apr 2024 15:30:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -37,39 +37,36 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH RESEND 0/2] Bluetooth: qca: fix NULL-deref on non-serdev setup
+Subject: Re: [PATCH v1 RESEND] Bluetooth: btusb: Correct timeout macro argument
+ used to receive control message
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <171379982888.28518.5007665871256276343.git-patchwork-notify@kernel.org>
+ <171379982891.28518.15878891828308361794.git-patchwork-notify@kernel.org>
 Date: Mon, 22 Apr 2024 15:30:28 +0000
-References: <20240422135748.23081-1-johan+linaro@kernel.org>
-In-Reply-To: <20240422135748.23081-1-johan+linaro@kernel.org>
-To: Johan Hovold <johan+linaro@kernel.org>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, jiangzp@google.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1713797830-24600-1-git-send-email-quic_zijuhu@quicinc.com>
+In-Reply-To: <1713797830-24600-1-git-send-email-quic_zijuhu@quicinc.com>
+To: quic_zijuhu <quic_zijuhu@quicinc.com>
+Cc: luiz.dentz@gmail.com, luiz.von.dentz@intel.com, marcel@holtmann.org,
+ linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluetooth-next.git (master)
+This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon, 22 Apr 2024 15:57:46 +0200 you wrote:
-> Qualcomm Bluetooth controllers can be registered either from a serdev
-> driver or from the Bluetooth line discipline. In the latter case, the
-> HCI UART serdev pointer is NULL, something which the driver needs to
-> handle without crashing.
+On Mon, 22 Apr 2024 22:57:10 +0800 you wrote:
+> USB driver defines macro @USB_CTRL_SET_TIMEOUT for sending control message
+> timeout and @USB_CTRL_GET_TIMEOUT for receiving, but usb_control_msg()
+> uses wrong macro @USB_CTRL_SET_TIMEOUT as argument to receive control
+> message, fixed by using @USB_CTRL_GET_TIMEOUT to receive message.
 > 
-> This series fixes one such issue at setup() time which incidentally
-> masked a similar crash at suspend. Fix this in two separate patches so
-> that the latter issue is addressed in pre-6.2 stable kernels.
+> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [RESEND,1/2] Bluetooth: qca: fix NULL-deref on non-serdev suspend
-    https://git.kernel.org/bluetooth/bluetooth-next/c/8185331e953d
-  - [RESEND,2/2] Bluetooth: qca: fix NULL-deref on non-serdev setup
-    https://git.kernel.org/bluetooth/bluetooth-next/c/9201f29be2c9
+  - [v1,RESEND] Bluetooth: btusb: Correct timeout macro argument used to receive control message
+    https://git.kernel.org/bluetooth/bluetooth-next/c/927927f2471f
 
 You are awesome, thank you!
 -- 
