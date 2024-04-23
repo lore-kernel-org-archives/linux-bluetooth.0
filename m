@@ -1,60 +1,65 @@
-Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
+Received: from mail-ua1-f44.google.com (mail-ua1-f44.google.com [209.85.222.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 543D81C6BE
-	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Apr 2024 22:46:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B7031F947
+	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Apr 2024 22:46:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713912369; cv=none; b=li3ubQ7oGus+IW4xxx0UMj4oa1SmPjcfrzyYp0zv1MfFGrhfQ8elici2WDVce9QpsL5INbQPI53UY5k/VXrAywnCdNciHfPgX83if0WmfF/TDfh7n6xF3auI60CnlyUf1IeirPvjKtTA0axPYW809gXYtMCL9sjyZrQrgkhdSqo=
+	t=1713912371; cv=none; b=BAfYl73TxDNoP5Pjb6fH6z1sa4ROkb3RRpmMwjeNRd8cxH2bgPygx6eGCgF52gmHxqMX0EMwjKUT2fqoczuvhtI5D33yg0IJ/AINd2yB3cWyWh9Zya4XOu/zKuUz/RgHbKWAV8CpMv5MpR5gxvVd5fkDAjny01xRTc029XiyTjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713912369; c=relaxed/simple;
-	bh=8zzL+YorLdTupfWty8DAlRNEvHb92NK+t3Md+ROTeiA=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=j8D4qEfi3JwPZzqQVB35phJTN8zvQc2i18S+4pIsMLadt62Fh4Cr29sainftE0oAZsl2DwecFLjC3+4gCe4pAEo0TArRegjhTn/7E03IdtWnfgIOhtsmL67YPekmMk/TerbgWR4pr7ExlM4kvacFfcEtBq0Pa2pMo9Jf9DxzlY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OeP2oxEV; arc=none smtp.client-ip=209.85.222.49
+	s=arc-20240116; t=1713912371; c=relaxed/simple;
+	bh=hGv6lpur6yHGzPm2teF5ClJLw+Pt7IwH2iVPlsyny6U=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=lMqwOL83/lyxEgfnRgiOJ0BXlNh/p/oWFtvDcC655Dyl2ck8eNrjdTadG7rpivRtf4funDLC6wAx+pjSmCtg7MPSUUvumBXQ7wqL1agyoO7yG0MFISdVRrDJ39RHkAVw6sWlg6xQlIHXUTM4OJIRz+cC64lD6IAhvQde6I2NO1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U8fnh2jP; arc=none smtp.client-ip=209.85.222.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OeP2oxEV"
-Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-7e978e12390so1622826241.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Apr 2024 15:46:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U8fnh2jP"
+Received: by mail-ua1-f44.google.com with SMTP id a1e0cc1a2514c-7eb89aa9176so1859571241.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Apr 2024 15:46:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713912366; x=1714517166; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=aJBFb5PmsKrQZkqLRjnvOTfrso1ZVWn55h9+2y2Dxrc=;
-        b=OeP2oxEVCCJxa+MrkvO8bLB23BBilZUv+qklN/UOzwsAdrMybvMSeiuDZ9yXwKDvsc
-         uNq6IRATS8dIIoHbqyM3u7PlfGb/4q8X12XcB9JyTaYNY5WSsLrNQge2OXMFTC3LNqSt
-         xugGhtS3v82163DACUNMWp+gKesH6s575dVDBiW2GlgwXeXdwqChK3XeKFTdGjYEFIGk
-         D10M6PtSVHhVF84jDZFBNNXqfiswrpnq1Djjufs2tLTF7QTmR4cku+MfzeIuJNF+5hvD
-         Lo1l5pUyLrttAxbUYDDhPMgkdjYUMdTqq3FAjqdSosN4q4UhyJfzy5CEcLRpjuMKCmZI
-         yMkA==
+        d=gmail.com; s=20230601; t=1713912368; x=1714517168; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=f1TV2ozXrfwimFjaiULTv7hkVmhN4GQs0KfbR61aHnw=;
+        b=U8fnh2jP1f180y44do1t+nD16AssnJVSWIhOCp0ubjYm/3WUdCjVWZUyDvXl8JgBt9
+         hBV1umDO0l/SlInU7fQp1sRmLeB+0CUBH+iiMZwKFYol4UMYtkbsMKs/eklfn5roxyiP
+         Blr2NacT+mebNVWms2Kty5TV1yRL5b8pywEvR0dfX5OZPmsBFnzRI7xfodTSJX69JE2o
+         5pJT5eP9wOeerqSaHhSbpwm08t2DAzPbV0fPLHHZawpyJHhQcE7qvKJWVCodM+QSwV6Y
+         rYoVcL0Tzsl7UCebXi2wSztPjZk/z7gam9ZBFC8u/LrDpcm4hEYFfCDiHl0+hFGfravr
+         gLOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713912366; x=1714517166;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aJBFb5PmsKrQZkqLRjnvOTfrso1ZVWn55h9+2y2Dxrc=;
-        b=tb9wWjvtDsR9NGvOVuR3tHlwyBgLk0C9kJIVtEZPo6bXTt8eXdqC+tq0RoWousr1JU
-         zrHIpNmTKnQxwHKDHysedaRgq9UyqCeUptSY7vGhjfdlsfVaCSveOtGY4fFrSAniCdIK
-         yFMsEqXrqtDFMC6mnf7wQRg6EQaXtPWCMBqSus9/Byxh5B7Eu7CQrcNq8o/4jGiV6t6O
-         E0N6xvYeaxdSx0PBHu1OBrHZ9YBSIhNJomqlYzmV6azgUakOixF9BPG/wlvF+MUzZr3C
-         H6fEI0jj09aORf12CukcSJcg8RzDjH6YEi4F7Yb1J2Xne281nMb123BGacvjf0WtsD/6
-         B/bQ==
-X-Gm-Message-State: AOJu0Yzz/wUsAYh5QOe3ZH0t3t6y0hG0j0uCkP4J0rjD5x546FU8sZir
-	UohVl1sOEXIr8m8n5ipFZYuHArHa7lL8Hcll7Q3zdyW9sFfT/oxtgsgvDA==
-X-Google-Smtp-Source: AGHT+IEF3FcL10ydo6R3OcwufYTN+qISdSLQyxTCfvNLnG/GPpcUqTe9uN0hBJwraPlxhf6vS7wtjQ==
-X-Received: by 2002:a05:6102:44e:b0:47a:71fc:bf78 with SMTP id e14-20020a056102044e00b0047a71fcbf78mr896952vsq.16.1713912366416;
-        Tue, 23 Apr 2024 15:46:06 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713912368; x=1714517168;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=f1TV2ozXrfwimFjaiULTv7hkVmhN4GQs0KfbR61aHnw=;
+        b=VAaF7Cn+b4C75Awgr+39xwOZe8w5HbfdX6wEv6Hp4udjap1nuJEtUSKvDHgPWRTCx0
+         iXong9kVc7rYe7MrtA69b+f5GRH1A2GXpRqHLsnE9g1ASScl4NsmkkqNwc2Jgky3nNqO
+         hJb7J99kvyMEcvVo/QA59d0trTzfUP+RitcGIyRQGO8DnKKzKeAayds+3mzurnJot602
+         yn7SGMmGGLKWwUCz4EntVuaxO3nGrI9+Bx7cmoibG00UG/+ptA5o0frWP4UwQMV+w1gy
+         GfWJQYjpR6h+ieFHisp31lVjQiHlCIbg5shajka+RidfNHoRP0wYTKyAidoIt/aSx5DS
+         qK/Q==
+X-Gm-Message-State: AOJu0YxFyd2maRn5jbif+L+TjEyi1KOsRSAptWMJLCXD2cULeMqLTkqf
+	cF4EsJVHc3vrUX/BgQOrCPO8eQUvVgJtd9vXbtzbVkZW+5uHQVbur5UsTQ==
+X-Google-Smtp-Source: AGHT+IH3lA28XZKT2Xg6XuWTVnTjuOfZrKRXR2QtF0VobnIYPlkzhb2LcdHIvHNMAT67FyFf2AFtwg==
+X-Received: by 2002:a67:e441:0:b0:47b:c963:3f96 with SMTP id n1-20020a67e441000000b0047bc9633f96mr921909vsm.12.1713912368261;
+        Tue, 23 Apr 2024 15:46:08 -0700 (PDT)
 Received: from lvondent-mobl4.. ([107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id g20-20020a05610209d400b0047b8ee9674dsm2196056vsi.1.2024.04.23.15.46.04
+        by smtp.gmail.com with ESMTPSA id g20-20020a05610209d400b0047b8ee9674dsm2196056vsi.1.2024.04.23.15.46.06
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Apr 2024 15:46:05 -0700 (PDT)
+        Tue, 23 Apr 2024 15:46:07 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 1/3] gdbus: Add testing flags
-Date: Tue, 23 Apr 2024 18:46:01 -0400
-Message-ID: <20240423224603.2124790-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 2/3] main.conf: Add support for testing interfaces
+Date: Tue, 23 Apr 2024 18:46:02 -0400
+Message-ID: <20240423224603.2124790-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.44.0
+In-Reply-To: <20240423224603.2124790-1-luiz.dentz@gmail.com>
+References: <20240423224603.2124790-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -65,193 +70,137 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds testing flags which are similar to experimental but are only
-available for testing.
+This adds support for D-Bus testing interfaces and testing profile
+drivers.
 ---
- gdbus/gdbus.h  | 23 +++++++++++++++++++++++
- gdbus/object.c | 36 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 59 insertions(+)
+ src/bluetoothd.rst.in | 9 +++++++--
+ src/btd.h             | 1 +
+ src/main.c            | 8 ++++++++
+ src/main.conf         | 4 ++++
+ src/profile.c         | 6 ++++++
+ src/profile.h         | 5 +++++
+ 6 files changed, 31 insertions(+), 2 deletions(-)
 
-diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
-index 28b80229646c..6fe09b743221 100644
---- a/gdbus/gdbus.h
-+++ b/gdbus/gdbus.h
-@@ -72,6 +72,7 @@ typedef void (* GDBusSecurityFunction) (DBusConnection *connection,
+diff --git a/src/bluetoothd.rst.in b/src/bluetoothd.rst.in
+index 7a0fa1b24469..0b998f621595 100644
+--- a/src/bluetoothd.rst.in
++++ b/src/bluetoothd.rst.in
+@@ -64,8 +64,13 @@ OPTIONS
  
- enum GDBusFlags {
- 	G_DBUS_FLAG_ENABLE_EXPERIMENTAL = (1 << 0),
-+	G_DBUS_FLAG_ENABLE_TESTING      = (1 << 1),
- };
+ -C, --compat        Provide deprecated command line interfaces.
  
- enum GDBusMethodFlags {
-@@ -79,16 +80,19 @@ enum GDBusMethodFlags {
- 	G_DBUS_METHOD_FLAG_NOREPLY      = (1 << 1),
- 	G_DBUS_METHOD_FLAG_ASYNC        = (1 << 2),
- 	G_DBUS_METHOD_FLAG_EXPERIMENTAL = (1 << 3),
-+	G_DBUS_METHOD_FLAG_TESTING      = (1 << 4),
- };
- 
- enum GDBusSignalFlags {
- 	G_DBUS_SIGNAL_FLAG_DEPRECATED   = (1 << 0),
- 	G_DBUS_SIGNAL_FLAG_EXPERIMENTAL = (1 << 1),
-+	G_DBUS_SIGNAL_FLAG_TESTING      = (1 << 2),
- };
- 
- enum GDBusPropertyFlags {
- 	G_DBUS_PROPERTY_FLAG_DEPRECATED   = (1 << 0),
- 	G_DBUS_PROPERTY_FLAG_EXPERIMENTAL = (1 << 1),
-+	G_DBUS_PROPERTY_FLAG_TESTING      = (1 << 2),
- };
- 
- enum GDBusSecurityFlags {
-@@ -186,6 +190,20 @@ struct GDBusSecurityTable {
- 	.function = _function, \
- 	.flags = G_DBUS_METHOD_FLAG_ASYNC | G_DBUS_METHOD_FLAG_EXPERIMENTAL
- 
-+#define GDBUS_TESTING_METHOD(_name, _in_args, _out_args, _function) \
-+	.name = _name, \
-+	.in_args = _in_args, \
-+	.out_args = _out_args, \
-+	.function = _function, \
-+	.flags = G_DBUS_METHOD_FLAG_TESTING
+--E, --experimental  Enable experimental interfaces. Those interfaces are not
+-                    guaranteed to be compatible or present in future releases.
++-E, --experimental  Enable D-Bus experimental interfaces.
++    These interfaces are not guaranteed to be compatible or present in future
++    releases.
 +
-+#define GDBUS_TESTING_ASYNC_METHOD(_name, _in_args, _out_args, _function) \
-+	.name = _name, \
-+	.in_args = _in_args, \
-+	.out_args = _out_args, \
-+	.function = _function, \
-+	.flags = G_DBUS_METHOD_FLAG_ASYNC | G_DBUS_METHOD_FLAG_TESTING
++-T, --testing  Enable D-Bus testing interfaces.
++    These interfaces are only meant for test validation of the internals of
++    bluetoothd and shall not never be used by anything other than that.
+ 
+ -K, --kernel=<uuid1>,<uuid2>,...
+     Enable Kernel experimental features. Kernel experimental features are
+diff --git a/src/btd.h b/src/btd.h
+index 8c80059ac1d8..383bd7c19600 100644
+--- a/src/btd.h
++++ b/src/btd.h
+@@ -128,6 +128,7 @@ struct btd_opts {
+ 	bool		fast_conn;
+ 	bool		refresh_discovery;
+ 	bool		experimental;
++	bool		testing;
+ 	struct queue	*kernel;
+ 
+ 	uint16_t	did_source;
+diff --git a/src/main.c b/src/main.c
+index 78831ad02520..23af6781d931 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -87,6 +87,7 @@ static const char *supported_options[] = {
+ 	"TemporaryTimeout",
+ 	"RefreshDiscovery",
+ 	"Experimental",
++	"Testing",
+ 	"KernelExperimental",
+ 	"RemoteNameRequestRetryDelay",
+ 	NULL
+@@ -1034,6 +1035,8 @@ static void parse_general(GKeyFile *config)
+ 	parse_secure_conns(config);
+ 	parse_config_bool(config, "General", "Experimental",
+ 						&btd_opts.experimental);
++	parse_config_bool(config, "General", "Testing",
++						&btd_opts.testing);
+ 	parse_kernel_exp(config);
+ 	parse_config_u32(config, "General", "RemoteNameRequestRetryDelay",
+ 					&btd_opts.name_request_retry_delay,
+@@ -1344,6 +1347,8 @@ static GOptionEntry options[] = {
+ 				"Provide deprecated command line interfaces" },
+ 	{ "experimental", 'E', 0, G_OPTION_ARG_NONE, &btd_opts.experimental,
+ 				"Enable experimental D-Bus interfaces" },
++	{ "testing", 'T', 0, G_OPTION_ARG_NONE, &btd_opts.testing,
++				"Enable testing D-Bus interfaces" },
+ 	{ "kernel", 'K', G_OPTION_FLAG_OPTIONAL_ARG, G_OPTION_ARG_CALLBACK,
+ 				parse_kernel_experimental,
+ 				"Enable kernel experimental features" },
+@@ -1410,6 +1415,9 @@ int main(int argc, char *argv[])
+ 	if (btd_opts.experimental)
+ 		gdbus_flags = G_DBUS_FLAG_ENABLE_EXPERIMENTAL;
+ 
++	if (btd_opts.testing)
++		gdbus_flags |= G_DBUS_FLAG_ENABLE_TESTING;
 +
- #define GDBUS_NOREPLY_METHOD(_name, _in_args, _out_args, _function) \
- 	.name = _name, \
- 	.in_args = _in_args, \
-@@ -207,6 +225,11 @@ struct GDBusSecurityTable {
- 	.args = _args, \
- 	.flags = G_DBUS_SIGNAL_FLAG_EXPERIMENTAL
+ 	g_dbus_set_flags(gdbus_flags);
  
-+#define GDBUS_TESTING_SIGNAL(_name, _args) \
-+	.name = _name, \
-+	.args = _args, \
-+	.flags = G_DBUS_SIGNAL_FLAG_EXPERIMENTAL
+ 	if (adapter_init() < 0) {
+diff --git a/src/main.conf b/src/main.conf
+index 49864b5c35f5..bea94640e627 100644
+--- a/src/main.conf
++++ b/src/main.conf
+@@ -126,6 +126,10 @@
+ # Possible values: true or false
+ #Experimental = false
+ 
++# Enables D-Bus testing interfaces
++# Possible values: true or false
++#Testing = false
 +
- void g_dbus_set_flags(int flags);
- int g_dbus_get_flags(void);
+ # Enables kernel experimental features, alternatively a list of UUIDs
+ # can be given.
+ # Possible values: true,false,<UUID List>
+diff --git a/src/profile.c b/src/profile.c
+index ea188f36b6dd..c62224af9dd8 100644
+--- a/src/profile.c
++++ b/src/profile.c
+@@ -781,6 +781,12 @@ int btd_profile_register(struct btd_profile *profile)
+ 		return -ENOTSUP;
+ 	}
  
-diff --git a/gdbus/object.c b/gdbus/object.c
-index f7c8c2be5d87..72d2d46e30ef 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -14,6 +14,7 @@
- 
- #include <stdio.h>
- #include <string.h>
-+#include <stdbool.h>
- 
- #include <glib.h>
- #include <dbus/dbus.h>
-@@ -115,6 +116,14 @@ static gboolean check_experimental(int flags, int flag)
- 	return !(global_flags & G_DBUS_FLAG_ENABLE_EXPERIMENTAL);
++	if (profile->testing && !(g_dbus_get_flags() &
++					G_DBUS_FLAG_ENABLE_TESTING)) {
++		DBG("D-Bus testing not enabled");
++		return -ENOTSUP;
++	}
++
+ 	profiles = g_slist_append(profiles, profile);
+ 	return 0;
  }
+diff --git a/src/profile.h b/src/profile.h
+index 6871f2f0d7d8..424ce55ad657 100644
+--- a/src/profile.h
++++ b/src/profile.h
+@@ -33,6 +33,11 @@ struct btd_profile {
+ 	 */
+ 	bool experimental;
  
-+static bool check_testing(int flags, int flag)
-+{
-+	if (!(flags & flag))
-+		return false;
++	/* Indicates the profile for testing only and shall only be registered
++	 * when testing has been enabled (see: main.conf:Testing).
++	 */
++	bool testing;
 +
-+	return !(global_flags & G_DBUS_FLAG_ENABLE_TESTING);
-+}
-+
- static void generate_interface_xml(GString *gstr, struct interface_data *iface)
- {
- 	const GDBusMethodTable *method;
-@@ -126,6 +135,9 @@ static void generate_interface_xml(GString *gstr, struct interface_data *iface)
- 					G_DBUS_METHOD_FLAG_EXPERIMENTAL))
- 			continue;
+ 	int (*device_probe) (struct btd_service *service);
+ 	void (*device_remove) (struct btd_service *service);
  
-+		if (check_testing(method->flags, G_DBUS_METHOD_FLAG_TESTING))
-+			continue;
-+
- 		g_string_append_printf(gstr, "<method name=\"%s\">",
- 								method->name);
- 		print_arguments(gstr, method->in_args, "in");
-@@ -146,6 +158,9 @@ static void generate_interface_xml(GString *gstr, struct interface_data *iface)
- 					G_DBUS_SIGNAL_FLAG_EXPERIMENTAL))
- 			continue;
- 
-+		if (check_testing(signal->flags, G_DBUS_SIGNAL_FLAG_TESTING))
-+			continue;
-+
- 		g_string_append_printf(gstr, "<signal name=\"%s\">",
- 								signal->name);
- 		print_arguments(gstr, signal->args, NULL);
-@@ -163,6 +178,10 @@ static void generate_interface_xml(GString *gstr, struct interface_data *iface)
- 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL))
- 			continue;
- 
-+		if (check_testing(property->flags,
-+					G_DBUS_PROPERTY_FLAG_TESTING))
-+			continue;
-+
- 		g_string_append_printf(gstr, "<property name=\"%s\""
- 					" type=\"%s\" access=\"%s%s\">",
- 					property->name,	property->type,
-@@ -518,6 +537,9 @@ static void append_properties(struct interface_data *data,
- 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL))
- 			continue;
- 
-+		if (check_testing(p->flags, G_DBUS_PROPERTY_FLAG_TESTING))
-+			continue;
-+
- 		if (p->get == NULL)
- 			continue;
- 
-@@ -749,6 +771,9 @@ static inline const GDBusPropertyTable *find_property(const GDBusPropertyTable *
- 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL))
- 			break;
- 
-+		if (check_testing(p->flags, G_DBUS_PROPERTY_FLAG_TESTING))
-+			break;
-+
- 		return p;
- 	}
- 
-@@ -1061,6 +1086,9 @@ static DBusHandlerResult generic_message(DBusConnection *connection,
- 					G_DBUS_METHOD_FLAG_EXPERIMENTAL))
- 			return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
- 
-+		if (check_testing(method->flags, G_DBUS_METHOD_FLAG_TESTING))
-+			return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-+
- 		if (g_dbus_args_have_signature(method->in_args,
- 							message) == FALSE)
- 			continue;
-@@ -1190,18 +1218,26 @@ static gboolean add_interface(struct generic_data *data,
- 		if (!check_experimental(method->flags,
- 					G_DBUS_METHOD_FLAG_EXPERIMENTAL))
- 			goto done;
-+
-+		if (!check_testing(method->flags, G_DBUS_METHOD_FLAG_TESTING))
-+			goto done;
- 	}
- 
- 	for (signal = signals; signal && signal->name; signal++) {
- 		if (!check_experimental(signal->flags,
- 					G_DBUS_SIGNAL_FLAG_EXPERIMENTAL))
- 			goto done;
-+		if (!check_testing(signal->flags, G_DBUS_SIGNAL_FLAG_TESTING))
-+			goto done;
- 	}
- 
- 	for (property = properties; property && property->name; property++) {
- 		if (!check_experimental(property->flags,
- 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL))
- 			goto done;
-+		if (!check_testing(property->flags,
-+					G_DBUS_PROPERTY_FLAG_TESTING))
-+			goto done;
- 	}
- 
- 	/* Nothing to register */
 -- 
 2.44.0
 
