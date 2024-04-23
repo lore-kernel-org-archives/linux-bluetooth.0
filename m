@@ -1,235 +1,1423 @@
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A7CB1DDC5
-	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Apr 2024 18:32:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63E8A1422BB
+	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Apr 2024 20:07:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713897125; cv=none; b=qLh2B2nETFCkln+ArWf9aHt1Qdr1iRnw+X3tFnqyYKvxZM1kIIlRA64R1xdlhBcRXHrgfQG1MbP2MQCe29d+NQ1vTulOs7LO0kvzaXY/HTip0pLsJhKp9l+ZntFgM2GG+wlX7DeMDCEq6H3tOYvgQxhHYLZJ57IFRKr/yM1eEOc=
+	t=1713902868; cv=none; b=b70KtVTbH9YOMrmrhOMX6gIcgs7xyw4eRWtDy1djLH34u2ATSSPsiJljX/tf3hfTqrQ785KJswu9DR/LgUUiq5p/Qbgzbme4VllGP5KCN//rV/22SDQjjiRcptrMKX3DOojsAJOsXQbWGHVnbckAl508++51ipCzQPx4ckPwXIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713897125; c=relaxed/simple;
-	bh=Pw43090l/bIcyrwfTUfhwi0aGR7UJJJq8wsfNR3V4Yw=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=OMhPZYumFCmTvaL43MKmFd2xchP5uHip7EhRNTVKuaDwu60C8rH5px6cYhY8oljBHMLCSYG825CW6BZU88SyQJWtoocsllhg1LlIz7rA3zjA39QpcqYGS8d9fzjMgfNjR4VmM/KPWnkItjCQ/Bo9cn4Rva9QpDc13I+1tjNVDvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m6iEHH3w; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m6iEHH3w"
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-436ce50b199so20556921cf.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Apr 2024 11:32:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713897121; x=1714501921; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Pw43090l/bIcyrwfTUfhwi0aGR7UJJJq8wsfNR3V4Yw=;
-        b=m6iEHH3ww83ldLvqeXJB85elFLehjGlflPeXfnX1KS9HUUWlQPDXNSsw9lFj5KHkob
-         Rb0VGsZUN+FqMBMMmEdiT3t1NCCeUUKb8SiVQaqvxBR/nfslG1VnPEc+pO+ofoTnB7Hq
-         CJICOUuWqoqmivNzCAc/iyjCBhVjdwyGr/WlyJxbfdk5nRoyJY0HdSlFJltsFBahCZar
-         2eHtrH1PEdj2Zw1GMFnxY4ktMA+zpjIUiT1lotlUXVtEuh1RtWOsOYTtP6/16e03NIR8
-         QWzyfCN7rLRIctUv3vLHeENhD9hARmhpd2TXnmhxoxHP8VZRtEsoVVI5+tj2JeiVMsgX
-         0e1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713897121; x=1714501921;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Pw43090l/bIcyrwfTUfhwi0aGR7UJJJq8wsfNR3V4Yw=;
-        b=mVzuEQD41McgXNbuwSv+wZwoQpZJ/1Ul64smu6EHj5l92CHcbUAsId9TVWxMN+H71q
-         vp1nFOKgqGfyc0uOgzvV6aHKl1MBm8gTmDWrfgn+lIBucIG4UsTWoTQQBJgqkmhscY7D
-         4lGArO7Jzbq6xgqOrxjZ5bKzXSOJFJBj7x2EMR6MbEaoSA6CvIuMmy9kgOhimjqFy6tL
-         DDumPv4R0lwFXuvFDQtWzhVw1Ml0esTTAlMtafmZXy7aoxTX3gqC5cHAkJpI1rlRMLjn
-         CIlWK02xrS5Ninv8BFNlsIe/fvOFkEDGjr2VmGzvpKebHdCAjntp+hnSiqqYu21lopn7
-         +gtw==
-X-Gm-Message-State: AOJu0YxokUSWt+hMQuGNq2GP9jTUx89a8n/PLGEnXeeiwj3VYrcCQrzB
-	oBmWbHd0pYgoVwMnlD6zk+9k+ZHQVpIeHUEUlT7J0YQy1g+/kdinU6sDSw==
-X-Google-Smtp-Source: AGHT+IEyC32Zdh0RYaHANpzy58yqiEgPSfnXp03E9Dc3Pfg2WuFapEUt8ye019mEnyB0cScrNjQa0Q==
-X-Received: by 2002:a05:622a:56:b0:439:84eb:e0ab with SMTP id y22-20020a05622a005600b0043984ebe0abmr286997qtw.44.1713897121432;
-        Tue, 23 Apr 2024 11:32:01 -0700 (PDT)
-Received: from [172.17.0.2] ([20.51.159.33])
-        by smtp.gmail.com with ESMTPSA id g6-20020ac870c6000000b004347627f12esm5383182qtp.11.2024.04.23.11.32.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Apr 2024 11:32:01 -0700 (PDT)
-Message-ID: <6627fea1.c80a0220.363fd.8528@mx.google.com>
-Date: Tue, 23 Apr 2024 11:32:01 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1626017217293270810=="
+	s=arc-20240116; t=1713902868; c=relaxed/simple;
+	bh=MWbJfl7LgTAWw5gPKb+FeBiSQSVAz4njdL7xWgu+emM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=eqsjeYvY7QXx189TMgPUckT2brWoMhjOd7pTHkXkNhHjd99m2z+qr/rKrF4hmmU378IKvA1dqg1xrbKeo7ZGzk/n6pOZrOXHMfc6JLWd7en4r2rE9/4eNrU4qen6jHVZulb2wk+HPt15o+Zi5Wv6UFkp5Er0lOy1A1eYAdbQS+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.6] (ip5f5af379.dynamic.kabel-deutschland.de [95.90.243.121])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id E577A61E5FE05;
+	Tue, 23 Apr 2024 22:07:25 +0200 (CEST)
+Message-ID: <f46264a9-009f-4f7f-9b1a-bb1a07e37bb0@molgen.mpg.de>
+Date: Tue, 23 Apr 2024 22:07:25 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, ajay.k.v@intel.com
-Subject: RE: [v1] bluetoothctl: CCP client interface for bluetoothctl
-In-Reply-To: <20240423232622.1142256-1-ajay.k.v@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] bluetoothctl: CCP client interface for bluetoothctl
+To: Ajay KV <ajay.k.v@intel.com>
 References: <20240423232622.1142256-1-ajay.k.v@intel.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Language: en-US
+Cc: linux-bluetooth@vger.kernel.org
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20240423232622.1142256-1-ajay.k.v@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
---===============1626017217293270810==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Dear Ajay,
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9ODQ3MTMyCgotLS1U
-ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
-ICBGQUlMICAgICAgMS40MSBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
-U1MgICAgICAwLjMyIHNlY29uZHMKQnVpbGRFbGwgICAgICAgICAgICAgICAgICAgICAgUEFTUyAg
-ICAgIDI0LjYyIHNlY29uZHMKQmx1ZXpNYWtlICAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAg
-IDE5LjQzIHNlY29uZHMKTWFrZUNoZWNrICAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDM2
-Ljk5IHNlY29uZHMKTWFrZURpc3RjaGVjayAgICAgICAgICAgICAgICAgUEFTUyAgICAgIDE3Ny41
-MyBzZWNvbmRzCkNoZWNrVmFsZ3JpbmQgICAgICAgICAgICAgICAgIEZBSUwgICAgICAxNi4yNiBz
-ZWNvbmRzCkNoZWNrU21hdGNoICAgICAgICAgICAgICAgICAgIEZBSUwgICAgICAyNC40OCBzZWNv
-bmRzCmJsdWV6bWFrZWV4dGVsbCAgICAgICAgICAgICAgIEZBSUwgICAgICAxNC40MSBzZWNvbmRz
-CkluY3JlbWVudGFsQnVpbGQgICAgICAgICAgICAgIEZBSUwgICAgICAxOS43OSBzZWNvbmRzClNj
-YW5CdWlsZCAgICAgICAgICAgICAgICAgICAgIEZBSUwgICAgICA1MzcuNjAgc2Vjb25kcwoKRGV0
-YWlscwojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tQYXRjaCAtIEZB
-SUwKRGVzYzogUnVuIGNoZWNrcGF0Y2gucGwgc2NyaXB0Ck91dHB1dDoKW3YxXSBibHVldG9vdGhj
-dGw6IENDUCBjbGllbnQgaW50ZXJmYWNlIGZvciBibHVldG9vdGhjdGwKRVJST1I6SU5JVElBTElT
-RURfU1RBVElDOiBkbyBub3QgaW5pdGlhbGlzZSBzdGF0aWNzIHRvIE5VTEwKIzE4ODogRklMRTog
-Y2xpZW50L3RlbGVwaG9ueV9jbGllbnQuYzozMDoKK3N0YXRpYyBHREJ1c1Byb3h5ICpkZWZhdWx0
-X2NhbGwgPSBOVUxMOwoKRVJST1I6SU5JVElBTElTRURfU1RBVElDOiBkbyBub3QgaW5pdGlhbGlz
-ZSBzdGF0aWNzIHRvIE5VTEwKIzE4OTogRklMRTogY2xpZW50L3RlbGVwaG9ueV9jbGllbnQuYzoz
-MToKK3N0YXRpYyBHTGlzdCAqY2FsbExpc3QgPSBOVUxMOwoKRVJST1I6SU5JVElBTElTRURfU1RB
-VElDOiBkbyBub3QgaW5pdGlhbGlzZSBzdGF0aWNzIHRvIE5VTEwKIzE5MDogRklMRTogY2xpZW50
-L3RlbGVwaG9ueV9jbGllbnQuYzozMjoKK3N0YXRpYyBHREJ1c0NsaWVudCAqY2xpZW50ID0gTlVM
-TDsKCi9naXRodWIvd29ya3NwYWNlL3NyYy9zcmMvMTM2NDA1MTkucGF0Y2ggdG90YWw6IDMgZXJy
-b3JzLCAwIHdhcm5pbmdzLCAxMjM4IGxpbmVzIGNoZWNrZWQKCk5PVEU6IEZvciBzb21lIG9mIHRo
-ZSByZXBvcnRlZCBkZWZlY3RzLCBjaGVja3BhdGNoIG1heSBiZSBhYmxlIHRvCiAgICAgIG1lY2hh
-bmljYWxseSBjb252ZXJ0IHRvIHRoZSB0eXBpY2FsIHN0eWxlIHVzaW5nIC0tZml4IG9yIC0tZml4
-LWlucGxhY2UuCgovZ2l0aHViL3dvcmtzcGFjZS9zcmMvc3JjLzEzNjQwNTE5LnBhdGNoIGhhcyBz
-dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4KCk5PVEU6IElnbm9yZWQgbWVzc2FnZSB0eXBl
-czogQ09NTUlUX01FU1NBR0UgQ09NUExFWF9NQUNSTyBDT05TVF9TVFJVQ1QgRklMRV9QQVRIX0NI
-QU5HRVMgTUlTU0lOR19TSUdOX09GRiBQUkVGRVJfUEFDS0VEIFNQRFhfTElDRU5TRV9UQUcgU1BM
-SVRfU1RSSU5HIFNTQ0FORl9UT19LU1RSVE8KCk5PVEU6IElmIGFueSBvZiB0aGUgZXJyb3JzIGFy
-ZSBmYWxzZSBwb3NpdGl2ZXMsIHBsZWFzZSByZXBvcnQKICAgICAgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlIENIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoKIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjClRlc3Q6IEJsdWV6TWFrZSAtIEZBSUwKRGVzYzogQnVpbGQgQmx1ZVoKT3V0
-cHV0OgoKc3JjL3NoYXJlZC9jY3AuYzo1NDk6MTM6IGVycm9yOiDigJhjY3BfY2Jfbm90aWZ54oCZ
-IGRlZmluZWQgYnV0IG5vdCB1c2VkIFstV2Vycm9yPXVudXNlZC1mdW5jdGlvbl0KICA1NDkgfCBz
-dGF0aWMgdm9pZCBjY3BfY2Jfbm90aWZ5KHVpbnQxNl90IHZhbHVlX2hhbmRsZSwgY29uc3QgdWlu
-dDhfdCAqdmFsdWUsCiAgICAgIHwgICAgICAgICAgICAgXn5+fn5+fn5+fn5+fgpjYzE6IGFsbCB3
-YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjg2
-NDA6IHNyYy9zaGFyZWQvbGlic2hhcmVkX21haW5sb29wX2xhLWNjcC5sb10gRXJyb3IgMQptYWtl
-WzFdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgptYWtlOiAqKiogW01ha2Vm
-aWxlOjQ2NjA6IGFsbF0gRXJyb3IgMgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVz
-dDogTWFrZUNoZWNrIC0gRkFJTApEZXNjOiBSdW4gQmx1ZXogTWFrZSBDaGVjawpPdXRwdXQ6Cgpz
-cmMvc2hhcmVkL2NjcC5jOjU0OToxMzogZXJyb3I6IOKAmGNjcF9jYl9ub3RpZnnigJkgZGVmaW5l
-ZCBidXQgbm90IHVzZWQgWy1XZXJyb3I9dW51c2VkLWZ1bmN0aW9uXQogIDU0OSB8IHN0YXRpYyB2
-b2lkIGNjcF9jYl9ub3RpZnkodWludDE2X3QgdmFsdWVfaGFuZGxlLCBjb25zdCB1aW50OF90ICp2
-YWx1ZSwKICAgICAgfCAgICAgICAgICAgICBefn5+fn5+fn5+fn5+CmNjMTogYWxsIHdhcm5pbmdz
-IGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6ODQwMjogc3Jj
-L3NoYXJlZC9saWJzaGFyZWRfZ2xpYl9sYS1jY3AubG9dIEVycm9yIDEKbWFrZTogKioqIFtNYWtl
-ZmlsZToxMjIxNjogY2hlY2tdIEVycm9yIDIKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-ClRlc3Q6IENoZWNrVmFsZ3JpbmQgLSBGQUlMCkRlc2M6IFJ1biBCbHVleiBNYWtlIENoZWNrIHdp
-dGggVmFsZ3JpbmQKT3V0cHV0OgoKc3JjL3NoYXJlZC9jY3AuYzo1NDk6MTM6IGVycm9yOiDigJhj
-Y3BfY2Jfbm90aWZ54oCZIGRlZmluZWQgYnV0IG5vdCB1c2VkIFstV2Vycm9yPXVudXNlZC1mdW5j
-dGlvbl0KICA1NDkgfCBzdGF0aWMgdm9pZCBjY3BfY2Jfbm90aWZ5KHVpbnQxNl90IHZhbHVlX2hh
-bmRsZSwgY29uc3QgdWludDhfdCAqdmFsdWUsCiAgICAgIHwgICAgICAgICAgICAgXn5+fn5+fn5+
-fn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAq
-KiogW01ha2VmaWxlOjg2NDA6IHNyYy9zaGFyZWQvbGlic2hhcmVkX21haW5sb29wX2xhLWNjcC5s
-b10gRXJyb3IgMQptYWtlWzFdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgpt
-YWtlOiAqKiogW01ha2VmaWxlOjEyMjE2OiBjaGVja10gRXJyb3IgMgojIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tTbWF0Y2ggLSBGQUlMCkRlc2M6IFJ1biBzbWF0Y2gg
-dG9vbCB3aXRoIHNvdXJjZQpPdXRwdXQ6CgpzcmMvc2hhcmVkL2NyeXB0by5jOjI3MToyMTogd2Fy
-bmluZzogVmFyaWFibGUgbGVuZ3RoIGFycmF5IGlzIHVzZWQuCnNyYy9zaGFyZWQvY3J5cHRvLmM6
-MjcyOjIzOiB3YXJuaW5nOiBWYXJpYWJsZSBsZW5ndGggYXJyYXkgaXMgdXNlZC4Kc3JjL3NoYXJl
-ZC9nYXR0LWhlbHBlcnMuYzo3Njg6MzE6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBp
-cyB1c2VkLgpzcmMvc2hhcmVkL2dhdHQtaGVscGVycy5jOjgzMDozMTogd2FybmluZzogVmFyaWFi
-bGUgbGVuZ3RoIGFycmF5IGlzIHVzZWQuCnNyYy9zaGFyZWQvZ2F0dC1oZWxwZXJzLmM6MTMyMzoz
-MTogd2FybmluZzogVmFyaWFibGUgbGVuZ3RoIGFycmF5IGlzIHVzZWQuCnNyYy9zaGFyZWQvZ2F0
-dC1oZWxwZXJzLmM6MTM1NDoyMzogd2FybmluZzogVmFyaWFibGUgbGVuZ3RoIGFycmF5IGlzIHVz
-ZWQuCnNyYy9zaGFyZWQvZ2F0dC1zZXJ2ZXIuYzoyNzg6MjU6IHdhcm5pbmc6IFZhcmlhYmxlIGxl
-bmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2dhdHQtc2VydmVyLmM6NjIxOjI1OiB3YXJu
-aW5nOiBWYXJpYWJsZSBsZW5ndGggYXJyYXkgaXMgdXNlZC4Kc3JjL3NoYXJlZC9nYXR0LXNlcnZl
-ci5jOjcyMDoyNTogd2FybmluZzogVmFyaWFibGUgbGVuZ3RoIGFycmF5IGlzIHVzZWQuCnNyYy9z
-aGFyZWQvYmFwLmM6MjgyOjI1OiB3YXJuaW5nOiBhcnJheSBvZiBmbGV4aWJsZSBzdHJ1Y3R1cmVz
-CnNyYy9zaGFyZWQvYmFwLmM6IG5vdGU6IGluIGluY2x1ZGVkIGZpbGU6Ci4vc3JjL3NoYXJlZC9h
-c2NzLmg6ODg6MjU6IHdhcm5pbmc6IGFycmF5IG9mIGZsZXhpYmxlIHN0cnVjdHVyZXMKc3JjL3No
-YXJlZC9zaGVsbC5jOiBub3RlOiBpbiBpbmNsdWRlZCBmaWxlICh0aHJvdWdoIC91c3IvaW5jbHVk
-ZS9yZWFkbGluZS9yZWFkbGluZS5oKToKL3Vzci9pbmNsdWRlL3JlYWRsaW5lL3JsdHlwZWRlZnMu
-aDozNToyMzogd2FybmluZzogbm9uLUFOU0kgZnVuY3Rpb24gZGVjbGFyYXRpb24gb2YgZnVuY3Rp
-b24gJ0Z1bmN0aW9uJwovdXNyL2luY2x1ZGUvcmVhZGxpbmUvcmx0eXBlZGVmcy5oOjM2OjI1OiB3
-YXJuaW5nOiBub24tQU5TSSBmdW5jdGlvbiBkZWNsYXJhdGlvbiBvZiBmdW5jdGlvbiAnVkZ1bmN0
-aW9uJwovdXNyL2luY2x1ZGUvcmVhZGxpbmUvcmx0eXBlZGVmcy5oOjM3OjI3OiB3YXJuaW5nOiBu
-b24tQU5TSSBmdW5jdGlvbiBkZWNsYXJhdGlvbiBvZiBmdW5jdGlvbiAnQ1BGdW5jdGlvbicKL3Vz
-ci9pbmNsdWRlL3JlYWRsaW5lL3JsdHlwZWRlZnMuaDozODoyOTogd2FybmluZzogbm9uLUFOU0kg
-ZnVuY3Rpb24gZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24gJ0NQUEZ1bmN0aW9uJwpzcmMvc2hhcmVk
-L2NjcC5jOjU0OToxMzogZXJyb3I6IOKAmGNjcF9jYl9ub3RpZnnigJkgZGVmaW5lZCBidXQgbm90
-IHVzZWQgWy1XZXJyb3I9dW51c2VkLWZ1bmN0aW9uXQogIDU0OSB8IHN0YXRpYyB2b2lkIGNjcF9j
-Yl9ub3RpZnkodWludDE2X3QgdmFsdWVfaGFuZGxlLCBjb25zdCB1aW50OF90ICp2YWx1ZSwKICAg
-ICAgfCAgICAgICAgICAgICBefn5+fn5+fn5+fn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRy
-ZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6ODY0MDogc3JjL3NoYXJlZC9s
-aWJzaGFyZWRfbWFpbmxvb3BfbGEtY2NwLmxvXSBFcnJvciAxCm1ha2VbMV06ICoqKiBXYWl0aW5n
-IGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDY2MDogYWxsXSBF
-cnJvciAyCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBibHVlem1ha2VleHRl
-bGwgLSBGQUlMCkRlc2M6IEJ1aWxkIEJsdWV6IHdpdGggRXh0ZXJuYWwgRUxMCk91dHB1dDoKCnNy
-Yy9zaGFyZWQvY2NwLmM6NTQ5OjEzOiBlcnJvcjog4oCYY2NwX2NiX25vdGlmeeKAmSBkZWZpbmVk
-IGJ1dCBub3QgdXNlZCBbLVdlcnJvcj11bnVzZWQtZnVuY3Rpb25dCiAgNTQ5IHwgc3RhdGljIHZv
-aWQgY2NwX2NiX25vdGlmeSh1aW50MTZfdCB2YWx1ZV9oYW5kbGUsIGNvbnN0IHVpbnQ4X3QgKnZh
-bHVlLAogICAgICB8ICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn4KY2MxOiBhbGwgd2FybmluZ3Mg
-YmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTogKioqIFtNYWtlZmlsZTo4NjQwOiBzcmMv
-c2hhcmVkL2xpYnNoYXJlZF9tYWlubG9vcF9sYS1jY3AubG9dIEVycm9yIDEKbWFrZVsxXTogKioq
-IFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZTogKioqIFtNYWtlZmlsZTo0NjYw
-OiBhbGxdIEVycm9yIDIKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IEluY3Jl
-bWVudGFsQnVpbGQgLSBGQUlMCkRlc2M6IEluY3JlbWVudGFsIGJ1aWxkIHdpdGggdGhlIHBhdGNo
-ZXMgaW4gdGhlIHNlcmllcwpPdXRwdXQ6Clt2MV0gYmx1ZXRvb3RoY3RsOiBDQ1AgY2xpZW50IGlu
-dGVyZmFjZSBmb3IgYmx1ZXRvb3RoY3RsCgpzcmMvc2hhcmVkL2NjcC5jOjU0OToxMzogZXJyb3I6
-IOKAmGNjcF9jYl9ub3RpZnnigJkgZGVmaW5lZCBidXQgbm90IHVzZWQgWy1XZXJyb3I9dW51c2Vk
-LWZ1bmN0aW9uXQogIDU0OSB8IHN0YXRpYyB2b2lkIGNjcF9jYl9ub3RpZnkodWludDE2X3QgdmFs
-dWVfaGFuZGxlLCBjb25zdCB1aW50OF90ICp2YWx1ZSwKICAgICAgfCAgICAgICAgICAgICBefn5+
-fn5+fn5+fn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2Vb
-MV06ICoqKiBbTWFrZWZpbGU6ODY0MDogc3JjL3NoYXJlZC9saWJzaGFyZWRfbWFpbmxvb3BfbGEt
-Y2NwLmxvXSBFcnJvciAxCm1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMu
-Li4uCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDY2MDogYWxsXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBTY2FuQnVpbGQgLSBGQUlMCkRlc2M6IFJ1biBTY2FuIEJ1
-aWxkCk91dHB1dDoKCnNyYy9zaGFyZWQvZ2F0dC1jbGllbnQuYzo0NTE6MjE6IHdhcm5pbmc6IFVz
-ZSBvZiBtZW1vcnkgYWZ0ZXIgaXQgaXMgZnJlZWQKICAgICAgICBnYXR0X2RiX3VucmVnaXN0ZXIo
-b3AtPmNsaWVudC0+ZGIsIG9wLT5kYl9pZCk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgIF5+
-fn5+fn5+fn4Kc3JjL3NoYXJlZC9nYXR0LWNsaWVudC5jOjY5NjoyOiB3YXJuaW5nOiBVc2Ugb2Yg
-bWVtb3J5IGFmdGVyIGl0IGlzIGZyZWVkCiAgICAgICAgZGlzY292ZXJ5X29wX2NvbXBsZXRlKG9w
-LCBmYWxzZSwgYXR0X2Vjb2RlKTsKICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+CnNyYy9zaGFyZWQvZ2F0dC1jbGllbnQuYzo5OTY6Mjogd2FybmluZzog
-VXNlIG9mIG1lbW9yeSBhZnRlciBpdCBpcyBmcmVlZAogICAgICAgIGRpc2NvdmVyeV9vcF9jb21w
-bGV0ZShvcCwgc3VjY2VzcywgYXR0X2Vjb2RlKTsKICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4Kc3JjL3NoYXJlZC9nYXR0LWNsaWVudC5jOjExMDI6
-Mjogd2FybmluZzogVXNlIG9mIG1lbW9yeSBhZnRlciBpdCBpcyBmcmVlZAogICAgICAgIGRpc2Nv
-dmVyeV9vcF9jb21wbGV0ZShvcCwgc3VjY2VzcywgYXR0X2Vjb2RlKTsKICAgICAgICBefn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4Kc3JjL3NoYXJlZC9nYXR0LWNs
-aWVudC5jOjEyOTQ6Mjogd2FybmluZzogVXNlIG9mIG1lbW9yeSBhZnRlciBpdCBpcyBmcmVlZAog
-ICAgICAgIGRpc2NvdmVyeV9vcF9jb21wbGV0ZShvcCwgc3VjY2VzcywgYXR0X2Vjb2RlKTsKICAg
-ICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4Kc3JjL3No
-YXJlZC9nYXR0LWNsaWVudC5jOjEzNTk6Mjogd2FybmluZzogVXNlIG9mIG1lbW9yeSBhZnRlciBp
-dCBpcyBmcmVlZAogICAgICAgIGRpc2NvdmVyeV9vcF9jb21wbGV0ZShvcCwgc3VjY2VzcywgYXR0
-X2Vjb2RlKTsKICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn4Kc3JjL3NoYXJlZC9nYXR0LWNsaWVudC5jOjE2MzQ6Njogd2FybmluZzogVXNlIG9mIG1l
-bW9yeSBhZnRlciBpdCBpcyBmcmVlZAogICAgICAgIGlmIChyZWFkX2RiX2hhc2gob3ApKSB7CiAg
-ICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn4Kc3JjL3NoYXJlZC9nYXR0LWNsaWVudC5jOjE2Mzk6
-Mjogd2FybmluZzogVXNlIG9mIG1lbW9yeSBhZnRlciBpdCBpcyBmcmVlZAogICAgICAgIGRpc2Nv
-dmVyX2FsbChvcCk7CiAgICAgICAgXn5+fn5+fn5+fn5+fn5+fgpzcmMvc2hhcmVkL2dhdHQtY2xp
-ZW50LmM6MjE0Mzo2OiB3YXJuaW5nOiBVc2Ugb2YgbWVtb3J5IGFmdGVyIGl0IGlzIGZyZWVkCiAg
-ICAgICAgaWYgKHJlYWRfZGJfaGFzaChvcCkpIHsKICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+
-fgpzcmMvc2hhcmVkL2dhdHQtY2xpZW50LmM6MjE1MTo4OiB3YXJuaW5nOiBVc2Ugb2YgbWVtb3J5
-IGFmdGVyIGl0IGlzIGZyZWVkCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgZGlzY292ZXJ5X29wX3JlZihvcCksCiAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+
-fn4Kc3JjL3NoYXJlZC9nYXR0LWNsaWVudC5jOjMyNDA6Mjogd2FybmluZzogVXNlIG9mIG1lbW9y
-eSBhZnRlciBpdCBpcyBmcmVlZAogICAgICAgIGNvbXBsZXRlX3dyaXRlX2xvbmdfb3AocmVxLCBz
-dWNjZXNzLCAwLCBmYWxzZSk7CiAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fgpzcmMvc2hhcmVkL2dhdHQtY2xpZW50LmM6MzI2MjoyOiB3YXJuaW5n
-OiBVc2Ugb2YgbWVtb3J5IGFmdGVyIGl0IGlzIGZyZWVkCiAgICAgICAgcmVxdWVzdF91bnJlZihy
-ZXEpOwogICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fgoxMiB3YXJuaW5ncyBnZW5lcmF0ZWQuCnNy
-Yy9zaGFyZWQvY2NwLmM6NTQ5OjEzOiBlcnJvcjog4oCYY2NwX2NiX25vdGlmeeKAmSBkZWZpbmVk
-IGJ1dCBub3QgdXNlZCBbLVdlcnJvcj11bnVzZWQtZnVuY3Rpb25dCiAgNTQ5IHwgc3RhdGljIHZv
-aWQgY2NwX2NiX25vdGlmeSh1aW50MTZfdCB2YWx1ZV9oYW5kbGUsIGNvbnN0IHVpbnQ4X3QgKnZh
-bHVlLAogICAgICB8ICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn4KY2MxOiBhbGwgd2FybmluZ3Mg
-YmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTogKioqIFtNYWtlZmlsZTo4NjQwOiBzcmMv
-c2hhcmVkL2xpYnNoYXJlZF9tYWlubG9vcF9sYS1jY3AubG9dIEVycm9yIDEKbWFrZVsxXTogKioq
-IFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZTogKioqIFtNYWtlZmlsZTo0NjYw
-OiBhbGxdIEVycm9yIDIKCgotLS0KUmVnYXJkcywKTGludXggQmx1ZXRvb3RoCgo=
 
---===============1626017217293270810==--
+Thank you for your patch.
+
+I believe you should add BlueZ to the tag. It’d be also great if you 
+made the commit message summary a statement by adding a verb in 
+imperative mood. (The second bluetoothctl is also redundant.) Maybe:
+
+bluetoothctl: Add CCP clien interface
+
+Am 24.04.24 um 01:26 schrieb Ajay KV:
+> Allows bluetoothctl to send CCP client call control
+> commands like answer/reject call
+
+For such a big diff, it’d be great if you elaborated. Where can the 
+specification be found? What is CCP, and give some example commands, and 
+state how you tested it.
+
+> ---
+>   Makefile.plugins           |   3 +-
+>   Makefile.tools             |   4 +-
+>   client/main.c              |   4 +-
+>   client/telephony_client.c  | 213 +++++++++++++++++++++++++++++++
+>   client/telephony_client.h  |  12 ++
+>   profiles/audio/ccp.c       | 150 ++++++++++++++++++----
+>   profiles/audio/telephony.c | 173 ++++++++++++++++++++++++++
+>   profiles/audio/telephony.h |  65 ++++++++++
+>   src/shared/ccp.c           | 249 +++++++++++++++++++++++--------------
+>   src/shared/ccp.h           |  19 ++-
+>   10 files changed, 765 insertions(+), 127 deletions(-)
+>   create mode 100644 client/telephony_client.c
+>   create mode 100644 client/telephony_client.h
+>   create mode 100644 profiles/audio/telephony.c
+>   create mode 100644 profiles/audio/telephony.h
+> 
+> diff --git a/Makefile.plugins b/Makefile.plugins
+> index 4aa2c9c92854..7c0e0bb23560 100644
+> --- a/Makefile.plugins
+> +++ b/Makefile.plugins
+> @@ -46,7 +46,8 @@ builtin_modules += avrcp
+>   builtin_sources += profiles/audio/control.h profiles/audio/control.c \
+>   			profiles/audio/avctp.h profiles/audio/avctp.c \
+>   			profiles/audio/avrcp.h profiles/audio/avrcp.c \
+> -			profiles/audio/player.h profiles/audio/player.c
+> +			profiles/audio/player.h profiles/audio/player.c\
+> +			profiles/audio/telephony.c profiles/audio/telephony.h
+>   endif
+>   
+>   if NETWORK
+> diff --git a/Makefile.tools b/Makefile.tools
+> index 27a753762d1c..e21f6e8e478e 100644
+> --- a/Makefile.tools
+> +++ b/Makefile.tools
+> @@ -13,7 +13,9 @@ client_bluetoothctl_SOURCES = client/main.c \
+>   					client/gatt.h client/gatt.c \
+>   					client/admin.h client/admin.c \
+>   					client/player.h client/player.c \
+> -					client/mgmt.h client/mgmt.c
+> +					client/mgmt.h client/mgmt.c \
+> +					client/telephony_client.c \
+> +					client/telephony_client.h
+>   client_bluetoothctl_LDADD = lib/libbluetooth-internal.la \
+>   			gdbus/libgdbus-internal.la src/libshared-glib.la \
+>   			$(GLIB_LIBS) $(DBUS_LIBS) -lreadline
+> diff --git a/client/main.c b/client/main.c
+> index 51d08a67aa1a..438c45bb9c24 100644
+> --- a/client/main.c
+> +++ b/client/main.c
+> @@ -34,7 +34,7 @@
+>   #include "admin.h"
+>   #include "player.h"
+>   #include "mgmt.h"
+> -
+> +#include "telephony_client.h"
+
+Shoudl the blank line stay?
+
+>   /* String display constants */
+>   #define COLORED_NEW	COLOR_GREEN "NEW" COLOR_OFF
+>   #define COLORED_CHG	COLOR_YELLOW "CHG" COLOR_OFF
+> @@ -3199,6 +3199,7 @@ int main(int argc, char *argv[])
+>   
+>   	admin_add_submenu();
+>   	player_add_submenu();
+> +	telephony_add_submenu();
+>   	mgmt_add_submenu();
+>   
+>   	client = g_dbus_client_new(dbus_conn, "org.bluez", "/org/bluez");
+> @@ -3216,6 +3217,7 @@ int main(int argc, char *argv[])
+>   
+>   	admin_remove_submenu();
+>   	player_remove_submenu();
+> +	telephony_remove_submenu();
+>   	mgmt_remove_submenu();
+>   
+>   	g_dbus_client_unref(client);
+> diff --git a/client/telephony_client.c b/client/telephony_client.c
+> new file mode 100644
+> index 000000000000..121255920dd0
+> --- /dev/null
+> +++ b/client/telephony_client.c
+> @@ -0,0 +1,213 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2024  Intel Corporation. All rights reserved.
+> + *
+> + */
+> +
+> +#ifdef HAVE_CONFIG_H
+> +#include <config.h>
+> +#endif
+> +
+> +#define _GNU_SOURCE
+> +#include <stdio.h>
+> +#include <stdlib.h>
+> +#include "gdbus/gdbus.h"
+> +#include "lib/bluetooth.h"
+> +#include "src/shared/shell.h"
+> +#include "print.h"
+> +#include "telephony_client.h"
+> +
+> +/* String display constants */
+> +#define COLORED_NEW	COLOR_GREEN "NEW" COLOR_OFF
+> +#define COLORED_CHG	COLOR_YELLOW "CHG" COLOR_OFF
+> +
+> +#define BLUEZ_TELEPHONY_INTERFACE "org.bluez.telephonyCtrl"
+> +
+> +static DBusConnection *dbus_conn;
+> +static GDBusProxy *default_call = NULL;
+> +static GList *callList = NULL;
+> +static GDBusClient *client = NULL;
+> +
+> +static char *proxy_description(GDBusProxy *proxy, const char *title,
+> +			       const char *description)
+> +{
+> +	const char *path;
+> +
+> +	path = g_dbus_proxy_get_path(proxy);
+> +	return g_strdup_printf("%s%s%s%s %s ",
+> +					description ? "[" : "",
+> +					description ? : "",
+> +					description ? "] " : "",
+> +					title, path);
+> +}
+> +
+> +static void print_info(void *data, void *user_data)
+> +{
+> +	GDBusProxy *proxy = data;
+> +	const char *description = user_data;
+> +	char *str;
+> +
+> +	str = proxy_description(proxy, "Telephony", description);
+> +
+> +	bt_shell_printf("%s%s\n", str,
+> +			default_call == proxy ? "[default]" : "");
+> +
+> +	g_free(str);
+> +}
+> +
+> +static void call_reject_reply(DBusMessage *message, void *user_data)
+> +{
+> +	DBusError error;
+> +
+> +	dbus_error_init(&error);
+> +
+> +	if (dbus_set_error_from_message(&error, message) == TRUE) {
+> +		bt_shell_printf("Failed to reject call: %s\n", error.name);
+> +		dbus_error_free(&error);
+> +		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +	}
+> +
+> +	bt_shell_printf("operation completed\n");
+> +
+> +	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> +}
+> +
+> +static void cmd_reject(int argc, char *argv[])
+> +{
+> +	if (!default_call) {
+> +		bt_shell_printf("No active calls present\n");
+> +		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +	}
+> +
+> +	if (g_dbus_proxy_method_call(default_call, "reject", NULL,
+> +				     call_reject_reply, NULL, NULL) == FALSE) {
+> +		bt_shell_printf("Failed to reject call\n");
+> +		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +	}
+> +
+> +}
+> +
+> +static void call_answer_reply(DBusMessage *message, void *user_data)
+> +{
+> +	DBusError error;
+> +
+> +	dbus_error_init(&error);
+> +
+> +	if (dbus_set_error_from_message(&error, message) == TRUE) {
+> +		bt_shell_printf("Failed to answer call: %s\n", error.name);
+> +		dbus_error_free(&error);
+> +		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +	}
+> +
+> +	bt_shell_printf("operation completed\n");
+> +
+> +	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> +}
+> +
+> +static void cmd_answer(int argc, char *argv[])
+> +{
+> +	if (!default_call)
+> +		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +
+> +	if (g_dbus_proxy_method_call(default_call, "answer", NULL,
+> +				     call_answer_reply, NULL, NULL) == FALSE) {
+> +		bt_shell_printf("Failed to answer the call\n");
+> +		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +	}
+> +}
+> +
+> +static const struct bt_shell_menu call_menu = {
+> +	.name = "telephony",
+> +	.desc = "telephony Settings Submenu",
+> +	.entries = {
+> +	{ "answer", NULL, cmd_answer, "answer the active call" },
+> +	{ "reject", NULL, cmd_reject, "reject the active call" },
+
+Should the elements be indented?
+
+> +	{} },
+> +};
+> +
+> +static void call_added(GDBusProxy *proxy)
+
+Why not `ccp_add_call()` or `add_call()`?
+
+> +{
+> +	bt_shell_printf("[CHG] Telephony caller Added\n");
+
+Lowercase: added. (Also below.)
+
+> +	callList = g_list_append(callList, proxy);
+> +
+> +	if (!default_call)
+> +		default_call = proxy;
+> +
+> +	print_info(proxy, COLORED_NEW);
+> +}
+> +
+> +static void call_removed(GDBusProxy *proxy)
+> +{
+> +	bt_shell_printf("[CHG] Telephony caller Removed\n");
+> +
+> +	if (default_call == proxy)
+> +		default_call = NULL;
+> +
+> +	callList = g_list_remove(callList, proxy);
+> +}
+> +
+> +static void proxy_added(GDBusProxy *proxy, void *user_data)
+> +{
+> +	const char *interface;
+> +
+> +	interface = g_dbus_proxy_get_interface(proxy);
+> +
+> +	if (!strcmp(interface, BLUEZ_TELEPHONY_INTERFACE))
+> +		call_added(proxy);
+> +}
+> +
+> +static void proxy_removed(GDBusProxy *proxy, void *user_data)
+> +{
+> +	const char *interface;
+> +
+> +	interface = g_dbus_proxy_get_interface(proxy);
+> +
+> +	if (!strcmp(interface, BLUEZ_TELEPHONY_INTERFACE))
+> +		call_removed(proxy);
+> +}
+> +
+> +static void telephony_property_changed(GDBusProxy *proxy, const char *name,
+> +				       DBusMessageIter *iter)
+> +{
+> +	char *str;
+> +
+> +	str = proxy_description(proxy, "Telephony", COLORED_CHG);
+> +	print_iter(str, name, iter);
+> +	g_free(str);
+> +
+> +	bt_shell_printf("[CHG] Telephony property : %s\n", name);
+> +}
+> +
+> +static void property_changed(GDBusProxy *proxy, const char *name,
+> +			     DBusMessageIter *iter, void *user_data)
+> +{
+> +	const char *interface;
+> +
+> +	interface = g_dbus_proxy_get_interface(proxy);
+> +
+> +	if (!strcmp(interface, BLUEZ_TELEPHONY_INTERFACE))
+> +		telephony_property_changed(proxy, name, iter);
+> +}
+> +
+> +void telephony_add_submenu(void)
+> +{
+> +	bt_shell_add_submenu(&call_menu);
+> +
+> +	dbus_conn = bt_shell_get_env("DBUS_CONNECTION");
+> +	if (!dbus_conn || client)
+> +		return;
+> +
+> +	client = g_dbus_client_new(dbus_conn, "org.bluez", "/org/bluez");
+> +
+> +	g_dbus_client_set_proxy_handlers(client, proxy_added, proxy_removed,
+> +					 property_changed, NULL);
+> +	g_dbus_client_set_disconnect_watch(client, NULL, NULL);
+> +}
+> +
+> +void telephony_remove_submenu(void)
+> +{
+> +	g_dbus_client_unref(client);
+> +}
+> diff --git a/client/telephony_client.h b/client/telephony_client.h
+> new file mode 100644
+> index 000000000000..15c73f0051e0
+> --- /dev/null
+> +++ b/client/telephony_client.h
+> @@ -0,0 +1,12 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2024 Intel Corporation. All rights reserved.
+> + *
+> + *
+> + */
+> +
+> +void telephony_add_submenu(void);
+> +void telephony_remove_submenu(void);
+> diff --git a/profiles/audio/ccp.c b/profiles/audio/ccp.c
+> index fe678de9fede..21f98cfbcfb7 100644
+> --- a/profiles/audio/ccp.c
+> +++ b/profiles/audio/ccp.c
+> @@ -40,7 +40,6 @@
+>   #include "src/shared/gatt-db.h"
+>   #include "src/shared/gatt-client.h"
+>   #include "src/shared/gatt-server.h"
+> -#include "src/shared/ccp.h"
+>   
+>   #include "btio/btio.h"
+>   #include "src/plugin.h"
+> @@ -51,6 +50,8 @@
+>   #include "src/service.h"
+>   #include "src/log.h"
+>   #include "src/error.h"
+> +#include "src/shared/ccp.h"
+> +#include "telephony.h"
+>   
+>   #define GTBS_UUID_STR "0000184C-0000-1000-8000-00805f9b34fb"
+>   
+> @@ -58,9 +59,132 @@ struct ccp_data {
+>   	struct btd_device *device;
+>   	struct btd_service *service;
+>   	struct bt_ccp *ccp;
+> -	unsigned int state_id;
+> +	unsigned int call_state_id;
+> +	struct telephony_ctrl *tc;
+>   };
+>   
+> +static int ct_call_answer(struct telephony_ctrl *tc, void *user_data)
+
+What does ct mean?
+
+> +{
+> +	struct bt_ccp *ccp = user_data;
+> +
+> +	DBG(" status %d index %d", tc->call_status, tc->call_index);
+> +
+> +	if (tc->call_status == CALL_DISCONNECTED)
+> +		return -1;
+> +
+> +	return bt_ccp_call_answer(ccp, tc->call_index);
+> +}
+> +
+> +static int ct_call_reject(struct telephony_ctrl *tc, void *user_data)
+> +{
+> +	struct bt_ccp *ccp = user_data;
+> +
+> +	DBG(" status %d  index %d", tc->call_status, tc->call_index);
+> +
+> +	if (tc->call_status == CALL_DISCONNECTED)
+> +		return -1;
+> +
+> +	return bt_ccp_call_reject(ccp, tc->call_index);
+> +}
+> +
+> +static const struct telephony_control_callback ct_cbs = {
+> +	.call_answer = &ct_call_answer,
+> +	.call_reject = &ct_call_reject,
+> +};
+> +
+> +static void cb_call_list_update(struct bt_ccp *ccp,  const uint8_t *buf,
+> +				uint16_t length)
+> +{
+> +	struct telephony_ctrl *tc = bt_ccp_get_user_data(ccp);
+> +	struct ccp_call_list_evt *evt;
+> +
+> +	DBG("");
+> +
+> +	if (length < sizeof(struct ccp_call_list_evt))
+> +		return;
+> +
+> +	evt = (struct ccp_call_list_evt *)buf;
+> +	tc->call_index = evt->index;
+> +	tc->call_status = evt->state;
+> +
+> +	DBG(" status %d  index %d", tc->call_status, tc->call_index);
+> +
+> +	telephony_update_call_Info(tc);
+> +}
+> +
+> +static void cb_incoming_call(struct bt_ccp *ccp,  const uint8_t *buf,
+> +			     uint16_t length)
+> +{
+> +	struct ccp_incoming_call_evt *evt;
+> +	struct telephony_ctrl *tc = bt_ccp_get_user_data(ccp);
+> +
+> +	DBG("");
+> +
+> +	if (length < sizeof(struct ccp_incoming_call_evt))
+> +		return;
+> +
+> +	evt = (struct ccp_incoming_call_evt *)buf;
+> +	tc->call_index = evt->index;
+> +	tc->call_status = INCOMING_CALL;
+> +
+> +	DBG(" status %d  index %d", tc->call_status, tc->call_index);
+> +
+> +	telephony_update_call_Info(tc);
+> +}
+> +
+> +static void cb_terminate_call(struct bt_ccp *ccp,  const uint8_t *buf,
+> +			      uint16_t length)
+> +{
+> +	struct ccp_call_terminate_evt *evt;
+> +	struct telephony_ctrl *tc = bt_ccp_get_user_data(ccp);
+> +
+> +	DBG("");
+> +
+> +	if (length < sizeof(struct ccp_call_terminate_evt))
+> +		return;
+> +
+> +	evt = (struct ccp_call_terminate_evt *)buf;
+> +	tc->call_index = evt->index;
+> +	tc->call_status = CALL_DISCONNECTED;
+> +
+> +	DBG(" status %d  index %d", tc->call_status, tc->call_index);
+> +
+> +	telephony_update_call_Info(tc);
+> +}
+> +
+> +static const struct bt_ccp_event_callback cbs = {
+> +	.incoming_call =  cb_incoming_call,
+> +	.terminate_call =  cb_terminate_call,
+> +	.call_list_update = cb_call_list_update
+> +};
+> +
+> +static int ccp_accept(struct btd_service *service)
+> +{
+> +	struct btd_device *device = btd_service_get_device(service);
+> +	struct bt_gatt_client *client = btd_device_get_gatt_client(device);
+> +	struct ccp_data *data = btd_service_get_user_data(service);
+> +	char addr[18];
+> +
+> +	ba2str(device_get_address(device), addr);
+> +	DBG("%s", addr);
+> +
+> +	bt_ccp_attach(data->ccp, client);
+> +
+> +	data->tc = telephony_create_device(device_get_path(device), 0);
+> +	if (!data->tc) {
+> +		DBG("Unable to create telephony device object");
+> +		data->tc = NULL;
+> +		return -EINVAL;
+> +	}
+> +
+> +	telephony_set_callbacks(data->tc, &ct_cbs, data->ccp);
+> +	bt_ccp_set_user_data(data->ccp, data->tc);
+> +	bt_ccp_set_event_callbacks(data->ccp, &cbs, data->tc);
+> +	btd_service_connecting_complete(service, 0);
+> +
+> +	return 0;
+> +}
+> +
+>   static void ccp_debug(const char *str, void *user_data)
+>   {
+>   	DBG_IDX(0xffff, "%s", str);
+> @@ -140,28 +264,6 @@ static void ccp_remove(struct btd_service *service)
+>   	ccp_data_remove(data);
+>   }
+>   
+> -static int ccp_accept(struct btd_service *service)
+> -{
+> -	struct btd_device *device = btd_service_get_device(service);
+> -	struct bt_gatt_client *client = btd_device_get_gatt_client(device);
+> -	struct ccp_data *data = btd_service_get_user_data(service);
+> -	char addr[18];
+> -
+> -	ba2str(device_get_address(device), addr);
+> -	DBG("%s", addr);
+> -
+> -	if (!bt_ccp_attach(data->ccp, client)) {
+> -		error("CCP unable to attach");
+> -		return -EINVAL;
+> -	}
+> -
+> -	/* TODO: register telephony operations here */
+> -
+> -	btd_service_connecting_complete(service, 0);
+> -
+> -	return 0;
+> -}
+> -
+>   static int ccp_connect(struct btd_service *service)
+>   {
+>   	struct btd_device *device = btd_service_get_device(service);
+> diff --git a/profiles/audio/telephony.c b/profiles/audio/telephony.c
+> new file mode 100644
+> index 000000000000..68f27b5471cc
+> --- /dev/null
+> +++ b/profiles/audio/telephony.c
+> @@ -0,0 +1,173 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2024  Intel Corporation
+> + *
+> + */
+> +
+> +#ifdef HAVE_CONFIG_H
+> +#include <config.h>
+> +#endif
+> +
+> +#define _GNU_SOURCE
+> +#include <stdlib.h>
+> +#include <stdint.h>
+> +#include <inttypes.h>
+> +#include <stdbool.h>
+> +#include <errno.h>
+> +#include <unistd.h>
+> +#include <string.h>
+> +
+> +#include <glib.h>
+> +#include <dbus/dbus.h>
+> +#include "gdbus/gdbus.h"
+> +
+> +#include "src/log.h"
+> +#include "src/dbus-common.h"
+> +#include "src/error.h"
+> +#include "telephony.h"
+> +
+> +#define BLUEZ_TELEPHONY_INTERFACE "org.bluez.telephonyCtrl"
+> +
+> +struct call_callback {
+> +	const struct telephony_control_callback *cbs;
+> +	void *user_data;
+> +};
+> +
+> +void telephony_update_call_Info(struct telephony_ctrl *tc)
+> +{
+> +	DBG("");
+> +	g_dbus_emit_property_changed(btd_get_dbus_connection(), tc->path,
+> +				     BLUEZ_TELEPHONY_INTERFACE, "call_state");
+> +}
+> +
+> +static DBusMessage *telephony_answer_call(DBusConnection *conn,
+> +					  DBusMessage *msg, void *data)
+> +{
+> +	struct telephony_ctrl *tc = data;
+> +	struct call_callback *cb = tc->cb;
+> +	int err;
+> +
+> +	DBG("");
+> +	if (!cb->cbs->call_answer)
+> +		return btd_error_not_supported(msg);
+> +
+> +	err = cb->cbs->call_answer(tc, cb->user_data);
+> +	if (err < 0)
+> +		return btd_error_failed(msg, strerror(-err));
+> +
+> +	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+> +}
+> +
+> +static DBusMessage *telephony_reject_call(DBusConnection *conn,
+> +					  DBusMessage *msg, void *data)
+> +{
+> +	struct telephony_ctrl *tc = data;
+> +	struct call_callback *cb = tc->cb;
+> +	int err;
+> +
+> +	DBG("");
+> +
+> +	if (!cb->cbs->call_reject)
+> +		return btd_error_not_supported(msg);
+> +
+> +	err = cb->cbs->call_reject(tc, cb->user_data);
+> +	if (err < 0)
+> +		return btd_error_failed(msg, strerror(-err));
+> +
+> +	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+> +}
+> +
+> +static gboolean ccp_get_index(const GDBusPropertyTable *property,
+> +			      DBusMessageIter *iter, void *data)
+> +{
+> +	struct telephony_ctrl *tc = data;
+> +	uint32_t index = tc->call_index;
+> +
+> +	DBG("");
+> +
+> +	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT32, &index);
+> +
+> +	return TRUE;
+> +}
+> +
+> +static const GDBusSignalTable telephony_signals[] = {
+> +};
+> +
+> +/* methods exposed to client to perform call operations */
+> +static const GDBusMethodTable telephony_methods[] = {
+> +	{ GDBUS_METHOD("answer", NULL, NULL, telephony_answer_call) },
+> +	{ GDBUS_METHOD("reject", NULL, NULL, telephony_reject_call) },
+> +	{ }
+> +};
+> +
+> +/*
+> + * Inform registered clients on property changed events
+> + * use g_dbus_emit_property_changed() API
+> + */
+> +static const GDBusPropertyTable telephony_properties[] = {
+> +	{ "call_state", "u", ccp_get_index, NULL, NULL },
+> +	{ }
+> +};
+> +
+> +void telephony_destroy_device(struct telephony_ctrl *tc)
+> +{
+> +	DBG("%s", tc->path);
+> +
+> +	g_dbus_unregister_interface(btd_get_dbus_connection(),
+> +				    tc->path, BLUEZ_TELEPHONY_INTERFACE);
+> +
+> +	if (tc->path)
+> +		g_free(tc->cb);
+> +	if (tc->path)
+> +		g_free(tc->path);
+> +	if (tc->device)
+> +		g_free(tc->device);
+> +
+> +	if (tc)
+> +		g_free(tc);
+> +}
+> +
+> +struct telephony_ctrl *telephony_create_device(const char *path, uint16_t id)
+> +{
+> +	struct telephony_ctrl *tc;
+> +
+> +	DBG("");
+> +	tc = g_new0(struct telephony_ctrl, 1);
+> +	tc->device = g_strdup(path);
+> +	tc->path = g_strdup_printf("%s/Caller%u", path, id);
+> +
+> +	if (!g_dbus_register_interface(btd_get_dbus_connection(),
+> +				       tc->path, BLUEZ_TELEPHONY_INTERFACE,
+> +				       telephony_methods,
+> +				       telephony_signals,
+> +				       telephony_properties, tc, NULL)) {
+> +		error("D-Bus failed to register %s path", tc->path);
+> +		telephony_destroy_device(tc);
+> +		return NULL;
+> +	}
+> +
+> +	DBG("%s", tc->path);
+> +
+> +	return tc;
+> +}
+> +
+> +void telephony_set_callbacks(struct telephony_ctrl *tp,
+> +			     const struct telephony_control_callback *cbs,
+> +			     void *user_data)
+> +{
+> +	struct call_callback *cb;
+> +
+> +	DBG("");
+> +
+> +	if (tp->cb)
+> +		g_free(tp->cb);
+> +
+> +	cb = g_new0(struct call_callback, 1);
+> +	cb->cbs = cbs;
+> +	cb->user_data = user_data;
+> +
+> +	tp->cb = cb;
+> +}
+> diff --git a/profiles/audio/telephony.h b/profiles/audio/telephony.h
+> new file mode 100644
+> index 000000000000..e321fb881beb
+> --- /dev/null
+> +++ b/profiles/audio/telephony.h
+> @@ -0,0 +1,65 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2024  Intel Corporation
+> + *
+> + */
+> +
+> +struct telephony_ctrl {
+> +	char	*device;	/* Device path */
+> +	char	*path;		/* Telephony object path */
+> +	char    *status;
+> +	uint8_t	call_status;   /* call status of active call*/
+> +	uint8_t call_index;    /* call index of active call */
+> +	struct  call_callback	*cb;
+> +};
+> +
+> +struct telephony_control_callback {
+> +	int (*call_answer)(struct telephony_ctrl *tc, void *user_data);
+> +	int (*call_reject)(struct telephony_ctrl *tc, void *user_data);
+> +};
+> +
+> +struct telephony_ctrl *telephony_create_device(const char *path, uint16_t id);
+> +
+> +void telephony_set_callbacks(struct telephony_ctrl *tc,
+> +			     const struct telephony_control_callback *cbs,
+> +			     void *user_data);
+> +
+> +void telephony_destroy_device(struct telephony_ctrl *tc);
+> +
+> +void telephony_set_incom_call_settings(struct telephony_ctrl *tc,
+> +				       const char *key, void *data, size_t len);
+> +void telephony_set_call_termination(struct telephony_ctrl *tc,
+> +				    const char *key, void *data, size_t len);
+> +
+> +void telephony_update_call_Info(struct telephony_ctrl *tc);
+> +
+> +struct ccp_call_list_evt {
+> +	uint8_t length;
+> +	uint8_t index;
+> +	uint8_t state;
+> +	uint8_t flag;
+> +};
+> +
+> +struct ccp_incoming_call_evt {
+> +	uint8_t length;
+> +	uint8_t index;
+> +};
+> +
+> +struct ccp_call_terminate_evt {
+> +	uint8_t length;
+> +	uint8_t index;
+> +	uint8_t reason;
+> +};
+> +
+> +enum call_state {
+> +	INCOMING_CALL = 0,
+> +	DIALLING_CALL,
+> +	ALERTING_CALL,
+> +	ACTIVE_CALL,
+> +	LOCAL_HOLD,
+> +	REMOTE_HOLD,
+> +	CALL_DISCONNECTED = 10
+> +};
+> diff --git a/src/shared/ccp.c b/src/shared/ccp.c
+> index 8e1b0b58f93b..25bb39713a13 100644
+> --- a/src/shared/ccp.c
+> +++ b/src/shared/ccp.c
+> @@ -3,7 +3,7 @@
+>    *
+>    *  BlueZ - Bluetooth protocol stack for Linux
+>    *
+> - *  Copyright (C) 2022  Intel Corporation. All rights reserved.
+> + *  Copyright (C) 2023  Intel Corporation. All rights reserved.
+>    *
+>    */
+>   
+> @@ -112,6 +112,55 @@ struct bt_ccs {
+>   };
+>   
+>   static struct queue *ccp_db;
+> +static struct bt_ccs *ccp_get_ccs(struct bt_ccp *ccp)
+> +{
+> +	if (!ccp)
+> +		return NULL;
+> +
+> +	if (ccp->rdb->ccs)
+> +		return ccp->rdb->ccs;
+> +
+> +	ccp->rdb->ccs = new0(struct bt_ccs, 1);
+> +	ccp->rdb->ccs->mdb = ccp->rdb;
+> +
+> +	return ccp->rdb->ccs;
+> +}
+> +
+> +static unsigned int ccp_send(struct bt_ccp *ccp, uint8_t index,
+> +			     uint8_t operation)
+> +{
+> +	int ret;
+> +	uint16_t handle;
+> +	uint8_t cmd[2];
+> +	struct bt_ccs *ccs = ccp_get_ccs(ccp);
+> +
+> +	cmd[0] = operation;
+> +	cmd[1] = index;
+> +
+> +	if (!ccp->client)
+> +		return -1;
+> +
+> +	if (!gatt_db_attribute_get_char_data(ccs->call_ctrl_point, NULL,
+> +					     &handle, NULL, NULL, NULL))
+> +		return -1;
+> +
+> +	ret = bt_gatt_client_write_without_response(ccp->client, handle, false,
+> +						    cmd, 2);
+> +	if (!ret)
+> +		return -1;
+> +
+> +	return 0;
+> +}
+> +
+> +unsigned int bt_ccp_call_answer(struct bt_ccp *ccp, uint8_t index)
+> +{
+> +	return ccp_send(ccp, index, 0);
+> +}
+> +
+> +unsigned int bt_ccp_call_reject(struct bt_ccp *ccp, uint8_t index)
+> +{
+> +	return ccp_send(ccp, index, 1);
+> +}
+>   
+>   static void ccp_debug(struct bt_ccp *ccp, const char *format, ...)
+>   {
+> @@ -429,20 +478,6 @@ static struct bt_ccs *ccs_new(struct gatt_db *db)
+>   	return ccs;
+>   }
+>   
+> -static struct bt_ccs *ccp_get_ccs(struct bt_ccp *ccp)
+> -{
+> -	if (!ccp)
+> -		return NULL;
+> -
+> -	if (ccp->rdb->ccs)
+> -		return ccp->rdb->ccs;
+> -
+> -	ccp->rdb->ccs = new0(struct bt_ccs, 1);
+> -	ccp->rdb->ccs->mdb = ccp->rdb;
+> -
+> -	return ccp->rdb->ccs;
+> -}
+> -
+>   static void ccp_pending_destroy(void *data)
+>   {
+>   	struct bt_ccp_pending *pending = data;
+> @@ -503,6 +538,8 @@ static void ccp_cb_register(uint16_t att_ecode, void *user_data)
+>   {
+>   	struct bt_ccp *ccp = user_data;
+>   
+> +	DBG(ccp, "");
+> +
+>   	if (att_ecode)
+>   		DBG(ccp, "ccp cb notification failed: 0x%04x", att_ecode);
+>   
+> @@ -515,27 +552,41 @@ static void ccp_cb_notify(uint16_t value_handle, const uint8_t *value,
+>   	 /* TODO: generic handler for non-mandatory CCP notifications */
+>   }
+>   
+> -static void ccp_cb_status_flag_register(uint16_t att_ecode, void *user_data)
+> +static void ccp_tc_update_call_list(struct bt_ccp *ccp,
+> +				    const uint8_t *value, uint16_t length)
+>   {
+> -	struct bt_ccp *ccp = user_data;
+> +	struct event_callback *cb = ccp->cb;
+>   
+> -	if (att_ecode)
+> -		DBG(ccp, "ccp cb notification failed: 0x%04x", att_ecode);
+> +	DBG(ccp, " ");
+> +
+> +	if (cb && cb->cbs && cb->cbs->call_list_update)
+> +		cb->cbs->call_list_update(ccp, value, length);
+>   }
+>   
+> -static void ccp_cb_status_flag_notify(uint16_t value_handle,
+> -				      const uint8_t *value,
+> -				      uint16_t length, void *user_data)
+> +static void ccp_tc_handle_incoming_call(struct bt_ccp *ccp,
+> +					const uint8_t *value, uint16_t length)
+>   {
+> -	struct bt_ccp *ccp = user_data;
+> +	struct event_callback *cb = ccp->cb;
+>   
+> -	DBG(ccp, "");
+> +	DBG(ccp, " ");
+>   
+> -	if (!length)
+> -		return;
+> +	if (cb && cb->cbs && cb->cbs->incoming_call)
+> +		cb->cbs->incoming_call(ccp, value, length);
+>   }
+>   
+> -static void ccp_cb_terminate_register(uint16_t att_ecode, void *user_data)
+> +static void ccp_tc_handle_terminate_call(struct bt_ccp *ccp,
+> +					 const uint8_t *value, uint16_t length)
+> +{
+> +	struct event_callback *cb = ccp->cb;
+> +
+> +	DBG(ccp, " ");
+> +
+> +	if (cb && cb->cbs && cb->cbs->terminate_call)
+> +		cb->cbs->terminate_call(ccp, value, length);
+> +}
+> +
+> +/* callback registered function */
+> +static void ccp_cb_status_flag_register(uint16_t att_ecode, void *user_data)
+>   {
+>   	struct bt_ccp *ccp = user_data;
+>   
+> @@ -543,20 +594,15 @@ static void ccp_cb_terminate_register(uint16_t att_ecode, void *user_data)
+>   		DBG(ccp, "ccp cb notification failed: 0x%04x", att_ecode);
+>   }
+>   
+> -static void ccp_cb_terminate_notify(uint16_t value_handle, const uint8_t *value,
+> -				    uint16_t length, void *user_data)
+> +static void ccp_cb_terminate_register(uint16_t att_ecode, void *user_data)
+>   {
+>   	struct bt_ccp *ccp = user_data;
+>   
+> -	DBG(ccp, "");
+> -
+> -	if (!length)
+> -		return;
+> -
+> -	/* TODO: update call state in Local context */
+> +	if (att_ecode)
+> +		DBG(ccp, "ccp cb notification failed: 0x%04x", att_ecode);
+>   }
+>   
+> -static void ccp_cb_bearer_name_register(uint16_t att_ecode, void *user_data)
+> +static void ccp_cb_call_list_register(uint16_t att_ecode, void *user_data)
+>   {
+>   	struct bt_ccp *ccp = user_data;
+>   
+> @@ -566,21 +612,17 @@ static void ccp_cb_bearer_name_register(uint16_t att_ecode, void *user_data)
+>   		DBG(ccp, "ccp cb notification failed: 0x%04x", att_ecode);
+>   }
+>   
+> -static void ccp_cb_bearer_name_notify(uint16_t value_handle,
+> -				      const uint8_t *value,
+> -				      uint16_t length, void *user_data)
+> +static void ccp_cb_call_state_register(uint16_t att_ecode, void *user_data)
+>   {
+>   	struct bt_ccp *ccp = user_data;
+>   
+>   	DBG(ccp, "");
+>   
+> -	if (!length)
+> -		return;
+> -
+> -	/* TODO: update call details in Local context */
+> +	if (att_ecode)
+> +		DBG(ccp, "ccp cb notification failed: 0x%04x", att_ecode);
+>   }
+>   
+> -static void ccp_cb_call_list_register(uint16_t att_ecode, void *user_data)
+> +static void ccp_cb_incom_call_register(uint16_t att_ecode, void *user_data)
+>   {
+>   	struct bt_ccp *ccp = user_data;
+>   
+> @@ -590,51 +632,52 @@ static void ccp_cb_call_list_register(uint16_t att_ecode, void *user_data)
+>   		DBG(ccp, "ccp cb notification failed: 0x%04x", att_ecode);
+>   }
+>   
+> -static void ccp_cb_call_list_notify(uint16_t value_handle, const uint8_t *value,
+> -				    uint16_t length, void *user_data)
+> +static void ccp_cb_bearer_name_register(uint16_t att_ecode, void *user_data)
+>   {
+>   	struct bt_ccp *ccp = user_data;
+>   
+>   	DBG(ccp, "");
+>   
+> -	if (!length)
+> -		return;
+> -
+> -	 /* TODO: update call list in Local context */
+> +	if (att_ecode)
+> +		DBG(ccp, "ccp cb notification failed: 0x%04x", att_ecode);
+>   }
+>   
+> -static void ccp_cb_call_state_register(uint16_t att_ecode, void *user_data)
+> +static void ccp_cb_status_flag_notify(uint16_t value_handle,
+> +				      const uint8_t *value,
+> +				      uint16_t length, void *user_data)
+>   {
+>   	struct bt_ccp *ccp = user_data;
+> +	DBG(ccp, "length  %d", length);
+>   
+> -	DBG(ccp, "");
+> -
+> -	if (att_ecode)
+> -		DBG(ccp, "ccp cb notification failed: 0x%04x", att_ecode);
+> +	if (!length)
+> +		return;
+>   }
+>   
+> -static void ccp_cb_call_state_notify(uint16_t value_handle,
+> -				     const uint8_t *value,
+> -				     uint16_t length, void *user_data)
+> +static void ccp_cb_terminate_notify(uint16_t value_handle,
+> +				    const uint8_t *value,
+> +				    uint16_t length, void *user_data)
+>   {
+>   	struct bt_ccp *ccp = user_data;
+>   
+> -	DBG(ccp, "");
+> +	DBG(ccp, "length  %d", length);
+>   
+>   	if (!length)
+>   		return;
+>   
+> -	/* TODO: update call state in Local context */
+> +	ccp_tc_handle_terminate_call(ccp, value, length);
+>   }
+>   
+> -static void ccp_cb_incom_call_register(uint16_t att_ecode, void *user_data)
+> +static void ccp_cb_call_list_notify(uint16_t value_handle, const uint8_t *value,
+> +				    uint16_t length, void *user_data)
+>   {
+>   	struct bt_ccp *ccp = user_data;
+>   
+> -	DBG(ccp, "");
+> +	DBG(ccp, "length  %d", length);
+>   
+> -	if (att_ecode)
+> -		DBG(ccp, "ccp cb notification failed: 0x%04x", att_ecode);
+> +	if (!length)
+> +		return;
+> +
+> +	ccp_tc_update_call_list(ccp, value, length);
+>   }
+>   
+>   static void ccp_cb_incom_call_notify(uint16_t value_handle,
+> @@ -643,12 +686,12 @@ static void ccp_cb_incom_call_notify(uint16_t value_handle,
+>   {
+>   	struct bt_ccp *ccp = user_data;
+>   
+> -	DBG(ccp, "");
+> +	DBG(ccp, "length  %d", length);
+>   
+>   	if (!length)
+>   		return;
+>   
+> -	/* TODO: Handle incoming call notofiation, Answer/reject etc */
+> +	ccp_tc_handle_incoming_call(ccp, value, length);
+>   }
+>   
+>   static void bt_ccp_incom_call_attach(struct bt_ccp *ccp)
+> @@ -691,7 +734,7 @@ static void bt_ccp_call_state_attach(struct bt_ccp *ccp)
+>   		bt_gatt_client_register_notify(ccp->client,
+>   					       value_handle,
+>   					       ccp_cb_call_state_register,
+> -					       ccp_cb_call_state_notify, ccp,
+> +					       NULL, ccp,
+>   					       NULL);
+>   }
+>   
+> @@ -735,7 +778,7 @@ static void bt_ccp_name_attach(struct bt_ccp *ccp)
+>   		bt_gatt_client_register_notify(ccp->client,
+>   					       value_handle,
+>   					       ccp_cb_bearer_name_register,
+> -					       ccp_cb_bearer_name_notify, ccp,
+> +					       NULL, ccp,
+>   					       NULL);
+>   }
+>   
+> @@ -799,7 +842,7 @@ static void bt_ccp_uci_attach(struct bt_ccp *ccp)
+>   	ccp->bearer_uci_id = bt_gatt_client_register_notify(ccp->client,
+>   							    value_handle,
+>   							    ccp_cb_register,
+> -							    ccp_cb_notify, ccp,
+> +							    NULL, ccp,
+>   							    NULL);
+>   }
+>   
+> @@ -820,7 +863,7 @@ static void bt_ccp_technology_attach(struct bt_ccp *ccp)
+>   	ccp->bearer_technology_id =
+>   		bt_gatt_client_register_notify(ccp->client,
+>   					       value_handle, ccp_cb_register,
+> -					       ccp_cb_notify, ccp, NULL);
+> +					       NULL, ccp, NULL);
+>   }
+>   
+>   static void bt_ccp_strength_attach(struct bt_ccp *ccp)
+> @@ -839,7 +882,7 @@ static void bt_ccp_strength_attach(struct bt_ccp *ccp)
+>   
+>   	ccp->signal_strength_id =
+>   		bt_gatt_client_register_notify(ccp->client, value_handle,
+> -					       ccp_cb_register, ccp_cb_notify,
+> +					       ccp_cb_register, NULL,
+>   					       ccp, NULL);
+>   }
+>   
+> @@ -859,7 +902,7 @@ static void bt_ccp_ccid_attach(struct bt_ccp *ccp)
+>   	ccp->ccid_id = bt_gatt_client_register_notify(ccp->client,
+>   						      value_handle,
+>   						      ccp_cb_register,
+> -						      ccp_cb_notify, ccp, NULL);
+> +						      NULL, ccp, NULL);
+>   }
+>   
+>   static void bt_ccp_tar_uri_attach(struct bt_ccp *ccp)
+> @@ -879,7 +922,7 @@ static void bt_ccp_tar_uri_attach(struct bt_ccp *ccp)
+>   	ccp->target_bearer_uri_id =
+>   		bt_gatt_client_register_notify(ccp->client,
+>   					       value_handle, ccp_cb_register,
+> -					       ccp_cb_notify, ccp,
+> +					       NULL, ccp,
+>   					       NULL);
+>   }
+>   
+> @@ -900,7 +943,7 @@ static void bt_ccp_ctrl_point_attach(struct bt_ccp *ccp)
+>   	ccp->call_control_pt_id =
+>   		bt_gatt_client_register_notify(ccp->client,
+>   					       value_handle, ccp_cb_register,
+> -					       ccp_cb_notify, ccp, NULL);
+> +					       NULL, ccp, NULL);
+>   }
+>   
+>   static void bt_ccp_ctrl_opcode_attach(struct bt_ccp *ccp)
+> @@ -920,7 +963,7 @@ static void bt_ccp_ctrl_opcode_attach(struct bt_ccp *ccp)
+>   	ccp->call_control_opt_opcode_id =
+>   		bt_gatt_client_register_notify(ccp->client,
+>   					       value_handle, ccp_cb_register,
+> -					       ccp_cb_notify, ccp, NULL);
+> +					       NULL, ccp, NULL);
+>   }
+>   
+>   static void bt_ccp_friendly_name_attach(struct bt_ccp *ccp)
+> @@ -940,7 +983,7 @@ static void bt_ccp_friendly_name_attach(struct bt_ccp *ccp)
+>   	ccp->friendly_name_id =
+>   		bt_gatt_client_register_notify(ccp->client,
+>   					       value_handle, ccp_cb_register,
+> -					       ccp_cb_notify, ccp, NULL);
+> +					       NULL, ccp, NULL);
+>   }
+>   
+>   static void bt_ccp_signal_intrvl_attach(struct bt_ccp *ccp)
+> @@ -960,7 +1003,7 @@ static void bt_ccp_signal_intrvl_attach(struct bt_ccp *ccp)
+>   	ccp->signal_reporting_intrvl_id =
+>   		bt_gatt_client_register_notify(ccp->client,
+>   					       value_handle, ccp_cb_register,
+> -					       ccp_cb_notify, ccp, NULL);
+> +					       NULL, ccp, NULL);
+>   }
+>   
+>   static void bt_ccp_uri_list_attach(struct bt_ccp *ccp)
+> @@ -980,7 +1023,7 @@ static void bt_ccp_uri_list_attach(struct bt_ccp *ccp)
+>   	ccp->bearer_uri_schemes_list_id =
+>   		bt_gatt_client_register_notify(ccp->client,
+>   					       value_handle, ccp_cb_register,
+> -					       ccp_cb_notify, ccp, NULL);
+> +					       NULL, ccp, NULL);
+>   }
+>   
+>   static void foreach_ccs_char(struct gatt_db_attribute *attr, void *user_data)
+> @@ -988,7 +1031,8 @@ static void foreach_ccs_char(struct gatt_db_attribute *attr, void *user_data)
+>   	struct bt_ccp *ccp = user_data;
+>   	struct bt_ccs *ccs;
+>   	uint16_t value_handle;
+> -	bt_uuid_t uuid;
+> +	bt_uuid_t uuid, uuid16;
+
+Would be nice to make this a separate commit.
+
+
+Kind regards,
+
+Paul
+
+
+> +	uint16_t be16;
+>   
+>   	if (!gatt_db_attribute_get_char_data(attr, NULL, &value_handle,
+>   					     NULL, NULL, &uuid))
+> @@ -998,105 +1042,122 @@ static void foreach_ccs_char(struct gatt_db_attribute *attr, void *user_data)
+>   	if (!ccs || ccs->call_state)
+>   		return;
+>   
+> -	if (bt_uuid16_cmp(&uuid, BEARER_PROVIDER_NAME_CHRC_UUID)) {
+> +	uuid16.type  =  uuid.type;
+> +
+> +	if (uuid.type == BT_UUID16) {
+> +		DBG(ccp, "uuid %x", uuid.value.u16);
+> +		uuid16.value.u16 = uuid.value.u16;
+> +	} else if (uuid.type == BT_UUID128) {
+> +		DBG(ccp, "uuid is u128 ");
+> +		uuid16.type = BT_UUID16;
+> +		memcpy(&be16, &uuid.value.u128.data[2], 2);
+> +		uuid16.value.u16 = htons(be16);
+> +	} else {
+> +		DBG(ccp, "unexpected uuid type %d", uuid16.type);
+> +		return;
+> +	}
+> +
+> +	DBG(ccp, "uuid read from gatt database %x", uuid16.value.u16);
+> +
+> +	if (bt_uuid16_cmp(&uuid16, BEARER_PROVIDER_NAME_CHRC_UUID)) {
+>   		DBG(ccp, "Found Bearer Name, handle 0x%04x", value_handle);
+>   
+>   		ccs->bearer_name = attr;
+>   		bt_ccp_name_attach(ccp);
+>   	}
+>   
+> -	if (bt_uuid16_cmp(&uuid, BEARER_UCI_CHRC_UUID)) {
+> +	if (bt_uuid16_cmp(&uuid16, BEARER_UCI_CHRC_UUID)) {
+>   		DBG(ccp, "Found Bearer Uci, handle 0x%04x", value_handle);
+>   
+>   		ccs->bearer_uci = attr;
+>   		bt_ccp_uci_attach(ccp);
+>   	}
+>   
+> -	if (bt_uuid16_cmp(&uuid, BEARER_TECH_CHRC_UUID)) {
+> +	if (bt_uuid16_cmp(&uuid16, BEARER_TECH_CHRC_UUID)) {
+>   		DBG(ccp, "Found Bearer Technology, handle %x", value_handle);
+>   
+>   		ccs->bearer_technology = attr;
+>   		bt_ccp_technology_attach(ccp);
+>   	}
+>   
+> -	if (bt_uuid16_cmp(&uuid, BEARER_SIGNAL_STR_CHRC_UUID)) {
+> +	if (bt_uuid16_cmp(&uuid16, BEARER_SIGNAL_STR_CHRC_UUID)) {
+>   		DBG(ccp, "Found Signal Strength, handle 0x%04x", value_handle);
+>   
+>   		ccs->signal_strength = attr;
+>   		bt_ccp_strength_attach(ccp);
+>   	}
+>   
+> -	if (bt_uuid16_cmp(&uuid, BEARER_SIGNAL_INTRVL_CHRC_UUID)) {
+> +	if (bt_uuid16_cmp(&uuid16, BEARER_SIGNAL_INTRVL_CHRC_UUID)) {
+>   		DBG(ccp, "Found Signal Interval, handle 0x%04x", value_handle);
+>   
+>   		ccs->signal_reporting_intrvl = attr;
+>   		bt_ccp_signal_intrvl_attach(ccp);
+>   	}
+>   
+> -	if (bt_uuid16_cmp(&uuid, CALL_STATUS_FLAG_CHRC_UUID)) {
+> +	if (bt_uuid16_cmp(&uuid16, CALL_STATUS_FLAG_CHRC_UUID)) {
+>   		DBG(ccp, "Found Status Flag, handle 0x%04x", value_handle);
+>   
+>   		ccs->status_flag = attr;
+>   		bt_ccp_status_attach(ccp);
+>   	}
+>   
+> -	if (bt_uuid16_cmp(&uuid, BEARER_URI_SCHEME_CHRC_UUID)) {
+> +	if (bt_uuid16_cmp(&uuid16, BEARER_URI_SCHEME_CHRC_UUID)) {
+>   		DBG(ccp, "Found URI Scheme, handle 0x%04x", value_handle);
+>   
+>   		ccs->bearer_uri_schemes_list = attr;
+>   		bt_ccp_uri_list_attach(ccp);
+>   	}
+>   
+> -	if (bt_uuid16_cmp(&uuid, CURR_CALL_LIST_CHRC_UUID)) {
+> +	if (bt_uuid16_cmp(&uuid16, CURR_CALL_LIST_CHRC_UUID)) {
+>   		DBG(ccp, "Found Call List, handle 0x%04x", value_handle);
+>   
+>   		ccs->current_call_list = attr;
+>   		bt_ccp_call_list_attach(ccp);
+>   	}
+>   
+> -	if (bt_uuid16_cmp(&uuid, BEARER_CCID_CHRC_UUID)) {
+> +	if (bt_uuid16_cmp(&uuid16, BEARER_CCID_CHRC_UUID)) {
+>   		DBG(ccp, "Found CCID, handle 0x%04x", value_handle);
+>   
+>   		ccs->ccid = attr;
+>   		bt_ccp_ccid_attach(ccp);
+>   	}
+>   
+> -	if (bt_uuid16_cmp(&uuid, INCOM_CALL_TARGET_URI_CHRC_UUID)) {
+> +	if (bt_uuid16_cmp(&uuid16, INCOM_CALL_TARGET_URI_CHRC_UUID)) {
+>   		DBG(ccp, "Found Bearer Uri, handle 0x%04x", value_handle);
+>   
+>   		ccs->target_bearer_uri = attr;
+>   		bt_ccp_tar_uri_attach(ccp);
+>   	}
+>   
+> -	if (bt_uuid16_cmp(&uuid, CALL_CTRL_POINT_CHRC_UUID)) {
+> +	if (bt_uuid16_cmp(&uuid16, CALL_CTRL_POINT_CHRC_UUID)) {
+>   		DBG(ccp, "Found Control Point, handle 0x%04x", value_handle);
+>   
+>   		ccs->call_ctrl_point = attr;
+>   		bt_ccp_ctrl_point_attach(ccp);
+>   	}
+>   
+> -	if (bt_uuid16_cmp(&uuid, CALL_CTRL_POINT_OPT_OPCODE_CHRC_UUID)) {
+> +	if (bt_uuid16_cmp(&uuid16, CALL_CTRL_POINT_OPT_OPCODE_CHRC_UUID)) {
+>   		DBG(ccp, "Found Control opcode, handle 0x%04x", value_handle);
+>   
+>   		ccs->call_ctrl_opt_opcode = attr;
+>   		bt_ccp_ctrl_opcode_attach(ccp);
+>   	}
+>   
+> -	if (bt_uuid16_cmp(&uuid, TERMINATION_REASON_CHRC_UUID)) {
+> +	if (bt_uuid16_cmp(&uuid16, TERMINATION_REASON_CHRC_UUID)) {
+>   		DBG(ccp, "Found Termination Reason, handle %x", value_handle);
+>   
+>   		ccs->termination_reason = attr;
+>   		bt_ccp_term_reason_attach(ccp);
+>   	}
+>   
+> -	if (bt_uuid16_cmp(&uuid, INCOMING_CALL_CHRC_UUID)) {
+> +	if (bt_uuid16_cmp(&uuid16, INCOMING_CALL_CHRC_UUID)) {
+>   		DBG(ccp, "Found Incoming call, handle 0x%04x", value_handle);
+>   
+>   		ccs->incoming_call = attr;
+>   		bt_ccp_incom_call_attach(ccp);
+>   	}
+>   
+> -	if (bt_uuid16_cmp(&uuid, CALL_FRIENDLY_NAME_CHRC_UUID)) {
+> +	if (bt_uuid16_cmp(&uuid16, CALL_FRIENDLY_NAME_CHRC_UUID)) {
+>   		DBG(ccp, "Found Friendly name, handle 0x%04x", value_handle);
+>   
+>   		ccs->friendly_name = attr;
+> diff --git a/src/shared/ccp.h b/src/shared/ccp.h
+> index 28b8b034ece3..3298abe9014c 100644
+> --- a/src/shared/ccp.h
+> +++ b/src/shared/ccp.h
+> @@ -3,7 +3,7 @@
+>    *
+>    *  BlueZ - Bluetooth protocol stack for Linux
+>    *
+> - *  Copyright (C) 2020  Intel Corporation. All rights reserved.
+> + *  Copyright (C) 2023  Intel Corporation. All rights reserved.
+>    *
+>    */
+>   
+> @@ -18,14 +18,18 @@ struct bt_ccp;
+>   struct bt_ccp_db;
+>   struct bt_ccp_session_info;
+>   
+> -typedef void (*bt_ccp_debug_func_t)(const char *str, void *user_data);
+> -typedef void (*bt_ccp_destroy_func_t)(void *user_data);
+> -
+>   struct bt_ccp_event_callback {
+> -	void (*call_state)(struct bt_ccp *ccp,  const uint8_t *value,
+> -			   uint16_t length);
+> +	void (*incoming_call)(struct bt_ccp *ccp,
+> +			      const uint8_t *value, uint16_t len);
+> +	void (*terminate_call)(struct bt_ccp *ccp,
+> +			       const uint8_t *value, uint16_t len);
+> +	void (*call_list_update)(struct bt_ccp *ccp,
+> +				 const uint8_t *value, uint16_t len);
+>   };
+>   
+> +typedef void (*bt_ccp_debug_func_t)(const char *str, void *user_data);
+> +typedef void (*bt_ccp_destroy_func_t)(void *user_data);
+> +
+>   void bt_ccp_set_event_callbacks(struct bt_ccp *ccp,
+>   				const struct bt_ccp_event_callback *cbs,
+>   				void *user_data);
+> @@ -43,3 +47,6 @@ void bt_ccp_unref(struct bt_ccp *ccp);
+>   
+>   bool bt_ccp_set_user_data(struct bt_ccp *ccp, void *user_data);
+>   void *bt_ccp_get_user_data(struct bt_ccp *ccp);
+> +
+> +unsigned int bt_ccp_call_answer(struct bt_ccp *ccp, uint8_t index);
+> +unsigned int bt_ccp_call_reject(struct bt_ccp *ccp, uint8_t index);
