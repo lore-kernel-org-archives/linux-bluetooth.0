@@ -1,112 +1,87 @@
-Received: from mail-vs1-f49.google.com (mail-vs1-f49.google.com [209.85.217.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDB592D61B
-	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Apr 2024 22:46:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A55923EA95
+	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Apr 2024 23:52:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713912373; cv=none; b=ROXkQt/MXkG3CspY2X/hzGueBDGv8bquIbkWRsWpz96WM9RVqD3S//nVOaSkfdEuCXDqyAcgyeVBVwfv4HDzrPIPFyY7GIwOOe2153cDqYse/VKmD3nfjw1EIATMCGNs6UUbd/g82C0R580IfOPfrVJM0zz2dNC6bgIxaavOiOY=
+	t=1713916373; cv=none; b=J6UxT2xIrG4jC4+8W3MYn7Qbc5OaWR8sF5sLXxid8cjRV5M9qS+Ejs4hRMQLa4DbWS89agS935i9UbO9u/feWBVbKmpIhzCdsQ56yf/frk8eaACjzLI57VBKYzKbz4YhCjGrkD8J4X3RvDTrkMOfguhpa+3C/NTTQ/XVYp7wxlA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713912373; c=relaxed/simple;
-	bh=q7O3opaKZiloL4BV7jWllO9aFNEXHI70CAKgGQENyjU=;
+	s=arc-20240116; t=1713916373; c=relaxed/simple;
+	bh=9b+S5jl/jKsVQ27cZ8nY4u44EGfr32p8LTVLO/fmInU=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=I8AtZycB6FOdTVr8PBAED3P5ENhqeKU8HarZSIOZht+y4FBTyA0BJ5JjlxrWONiw8Tr0bTjEaQX1Edp7uXU9neGXgpcfLupXyDjI0E579M3F4PG+r1aXtJ/FNHJafjDjN96dqv4OEmSWksf0yUgsej2xmQ5WOcFlBk7HlfoVVPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jwQM7192; arc=none smtp.client-ip=209.85.217.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 Content-Type:MIME-Version; b=u64869xDeIU7JwfCu3Sr606TRISlU8ou9+AzPze1xUBb5/+wLV+maya1NsFI00LpD0v8/7fvMeE5G30Ci6BKe7W4oEE03Sr/AjXwkWtiPSL7eNgh4LwNw0fe95A2x6u3DUepS4VYQiu+6pNJ/S3lcpXe1glI5zaXCjdF33zFxko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pEaWR3ha; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jwQM7192"
-Received: by mail-vs1-f49.google.com with SMTP id ada2fe7eead31-479e12bde9fso2203849137.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Apr 2024 15:46:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713912370; x=1714517170; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UGu6LD9Br94m9KixDZLCSWUebSOfnN0Y/Udkomcju9c=;
-        b=jwQM7192VPqMfaKR2I+OA8efVIaa/FhEGHvrrEUXLOFup1lwjJ6qAwS6EgxfjXa7iR
-         1e+eNasNMmKvmaEmzFOIShHWQMAjgQhtVSzcaM8UQbOwvASfnv7P2gSBE1teocoAu06b
-         ajcrjDPVRrMEki8rhn+CCBrLlg01UOJTrbm6Y4zXQ7OfCfJcvu3rqjGVEvvQD16vbQC/
-         NuPJI/QdrWO7qUMsL1ySw6NawABxOkO9qNGtdjISi5o1wZZ2sp+YRT3CDa3/K8tbNeB7
-         mnknMTYAiZ5uTN5QEwSIS8xw7AYBN2gHk7FBYM8/7zbxYvD4eoZvWISpruEsMPqSpnUU
-         sR8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713912370; x=1714517170;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UGu6LD9Br94m9KixDZLCSWUebSOfnN0Y/Udkomcju9c=;
-        b=sGhWOLySzy2pnjQXVH9x5EKQR6P02kZ2CH57XL8zy1690vomDM+qRc8UbJZ+mvtQTQ
-         jnWHXqfhyk51BL93fFhZJusZH+XzWsBfy5cSy/0QafeR8VpOBdp4PjZPprFYlyciGyN2
-         vRar0aJnagh4aRCfGFbsfh3Gl8unpMPmMtAn/kD5xC0eXco791ffjVphUkjKnagHuEqF
-         zZfpy2nPQPqCgYABc8zB8tTAjxc+luScc/VHQW2QiResRZdHowxwef7rK9BJT9NbczE2
-         ibSOLDx/No+smi7WmsYM4a6rrmYU2fI3ENP1VsCbQ1fYMc5L9kWuELiWRBdIOTa8Afuq
-         nNoQ==
-X-Gm-Message-State: AOJu0Ywedq+X3n1S5JUmv8gMlYqNR9CEuNiTWYlsDxOtrFHwQ+P8eHtS
-	9A71KHZqsMWl2VSJF05EfW3/0n9MuSr6Uevg7ciOiJGjJwsiW2vo5sY+AA==
-X-Google-Smtp-Source: AGHT+IGoS2mK3XBcDRAz1w4Nmlm7jBjVNv0iFAT6dHBDrTUERm1mrscFqEsgjTIsczRNd1AbW8E/YA==
-X-Received: by 2002:a67:bc0c:0:b0:47b:d7ef:243f with SMTP id t12-20020a67bc0c000000b0047bd7ef243fmr864689vsn.26.1713912370053;
-        Tue, 23 Apr 2024 15:46:10 -0700 (PDT)
-Received: from lvondent-mobl4.. ([107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id g20-20020a05610209d400b0047b8ee9674dsm2196056vsi.1.2024.04.23.15.46.08
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Apr 2024 15:46:08 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pEaWR3ha"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 38114C32782
+	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Apr 2024 23:52:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713916373;
+	bh=9b+S5jl/jKsVQ27cZ8nY4u44EGfr32p8LTVLO/fmInU=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=pEaWR3hayUd5OdKXM1APFTIk0Hc1xFE8RxRGmkKFW68TFtlfO59Jz4is3jgoLoQm4
+	 IaBREKmW+cRRJDpvFd+YyrPGhNiwiIrPfwAh7n66syWhNMDDj2bZfchgPg1YsyY2bC
+	 6spkHwL+Q1FN2pfLXEpaLyZDP0a6TmqSr3i3oQo+HstrwbWzsIyP+y7LmTKQw9l5Vv
+	 +il+sTJnrtQ7MNZeebGoMFbI9OWrcSYX6WcYpqzjpZATeLIMupcg3BcETZoO8OjsDP
+	 B6g/ELSJFo9/X3EL4AwMfgPK/0QCOIx+0cTIjfzzVA7xgaq/IWDjR7G4X8hBoWD4sQ
+	 S1AK6bfFmyZBw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 2914FC16A72; Tue, 23 Apr 2024 23:52:53 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 3/3] ccp: Mark plugin for testing
-Date: Tue, 23 Apr 2024 18:46:03 -0400
-Message-ID: <20240423224603.2124790-3-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240423224603.2124790-1-luiz.dentz@gmail.com>
-References: <20240423224603.2124790-1-luiz.dentz@gmail.com>
+Subject: [Bug 218726] qca6390 bluetooth fails after disabling/re-enabling
+ bluetooth
+Date: Tue, 23 Apr 2024 23:52:52 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: quic_zijuhu@quicinc.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-218726-62941-WvibfxHuiq@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-218726-62941@https.bugzilla.kernel.org/>
+References: <bug-218726-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218726
 
-This makes ccp plugin for testing only rather than experimental since
-it is only meant for test validation as platforms shall integrate CCP
-directly into their telephony stack.
----
- profiles/audio/ccp.c | 14 ++++++--------
- 1 file changed, 6 insertions(+), 8 deletions(-)
+--- Comment #46 from Zijun Hu (quic_zijuhu@quicinc.com) ---
+this issue was discucced at below link before it was reported to bugzilla.
 
-diff --git a/profiles/audio/ccp.c b/profiles/audio/ccp.c
-index fe678de9fede..ae17a31f7ed3 100644
---- a/profiles/audio/ccp.c
-+++ b/profiles/audio/ccp.c
-@@ -206,19 +206,17 @@ ccp_server_remove(struct btd_profile *p,
- }
- 
- static struct btd_profile ccp_profile = {
--	.name			= "ccp",
--	.priority		= BTD_PROFILE_PRIORITY_MEDIUM,
-+	.name		= "ccp",
-+	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
- 	.remote_uuid	= GTBS_UUID_STR,
- 	.device_probe	= ccp_probe,
- 	.device_remove	= ccp_remove,
--	.accept			= ccp_accept,
--	.connect		= ccp_connect,
--	.disconnect		= ccp_disconnect,
--
-+	.accept		= ccp_accept,
-+	.connect	= ccp_connect,
-+	.disconnect	= ccp_disconnect,
- 	.adapter_probe	= ccp_server_probe,
- 	.adapter_remove = ccp_server_remove,
--
--	.experimental	= true,
-+	.testing	= true,
- };
- 
- static int ccp_init(void)
--- 
-2.44.0
+https://lore.kernel.org/linux-bluetooth/ea20bb9b-6b60-47fc-ae42-5eed918ad7b=
+4@quicinc.com/T/#m73d6a71d2f454bb03588c66f3ef7912274d37c6f
 
+as commented at Commented 37.
+
+it is verified by applied apply fix debugging changes over below bluetoot-n=
+ext
+tree commit:
+e00fc2700a3f Bluetooth: btusb: Fix triggering coredump implementation for Q=
+CA
+
+it is verified by the reported device a Dell XPS 13 9310.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
