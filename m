@@ -1,142 +1,162 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E59F44366
-	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Apr 2024 23:49:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFBC91CFB2
+	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Apr 2024 06:49:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713829796; cv=none; b=rF+ytplSWlLr1mdiEl4zQLpCC3zBmpsWgC0v93tKh0gfSu7WF7dRMlh+CtFspLvF5cIa4L78bMIP2t/F4CLKq3tyUqFglWRYEgTVtbe5h1Whz59xn4lJuTx/nKo/62lJtw/ZO14VXBJ5gr7VNDvB4gpueBg0XfkaMngS5CmyoKM=
+	t=1713854955; cv=none; b=D5JpJFeu04e2NA5V+zoVeisSxDpkqWwiHAV3ZXPAecj0G+xPAlP08/eJP1AMpRIY24erUEoGBRkljNFhNcH1cshJ33oPImVySiQk7IUsrLGJQ4H5idALT7v6lEeLLdXs7XYQb3URuaiwbbjWmi5q9w6je9wVxjaX+PP4TXGcLtM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713829796; c=relaxed/simple;
-	bh=sMCwF9hgcbPW7oSPR33WMu7u0HFqTNMMbe4r3T7PUE8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cK3aGkzaDbWyoGWRnWlF3pcG4gpTYcud0OO3c9FqWba+yAzQKEGxshdPVZX+1jn38IYbjvcUZ5e9C3C9QjjNNLxEuHUHDOKV2Yxa+AirNKXe1vgDNnWQC197QlqghSNg7I/iyvkqXingOsmRtn77D5QWmg0lpnI/rJG7sBoQ8ZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=theori.io; spf=pass smtp.mailfrom=theori.io; dkim=pass (1024-bit key) header.d=theori.io header.i=@theori.io header.b=IqJ67Tg+; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=theori.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=theori.io
+	s=arc-20240116; t=1713854955; c=relaxed/simple;
+	bh=rbT8zW5NQLcJQyMGY+L84RuXoNTDBXFC8MF2NSDQSdQ=;
+	h=Date:From:To:Cc:Subject:Message-ID; b=aNKWoYwoz4L1NjjYicEKbc4ElYyRUpuq8UWicyZY9h904RxzYfFpSRjUCKVVQUGxJkSUbP+NM5AziVvCqY1Rfek/s2+q7WYJe23HTYCjSBvPHeFKxSnLbbq3g2ujhITnRLHf28E+52JyuUK3CiENBjKIyx+XQJfNQBZwSNdSreM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=j+1HgL5t; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=theori.io header.i=@theori.io header.b="IqJ67Tg+"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1e411e339b8so38410365ad.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Apr 2024 16:49:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=theori.io; s=google; t=1713829794; x=1714434594; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=uJSH/ta9tvvkfnz23V89jeS4FG3TLnawoqYHXMY2eZc=;
-        b=IqJ67Tg+gbqdoezACA3Yg9s+1f80KioLkZ0RaDIMEWk8lt9h1giJmEtAD6Tojy5K6S
-         /M2Eh8T+KbRRkOvB9qSBteDcN/iFgDLf9ok4fYUjEQAOjZk4ZUOQYfvh1fY6QMwkImUN
-         ZNOd2SaFhLFwT8CIITC72Ht0/qaxO5KeZKAZg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713829794; x=1714434594;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uJSH/ta9tvvkfnz23V89jeS4FG3TLnawoqYHXMY2eZc=;
-        b=OeeHvfIq/T29QjS60b8aL9oCHxaRbOHnGtG5fXDF+PWnpPjelUCgMtv5p9pHq7fx63
-         hUMH6RVIa1sd7JdXj/AwBjYzrXHW3XKRSDalbN3FNWQzMX8IBFdmIDenOjr7mj5jgWNR
-         htjh3dAMnXmyOvnjzRyU/HUzD4w/Z0ukUL/5T5QeaMVeP7Jd6qMcWnPvzkmmJLsAcz5w
-         zy1walwBnb/0QmX6nkauh6Cr0Di+e0nrON1umOJzUhy8hKHMB/Oug9hh9okYvgyofZ5M
-         NjmZCJxZG9mfuBKznLa/FdWiWciG09RCMBoHn1lzurlDvv30NNQyOEACCxH+OEyFAEZ4
-         +Cgw==
-X-Forwarded-Encrypted: i=1; AJvYcCWq4lCstw+i/el7BNDS3qoC+8SC/mJo4bGQqvepDHEhPG3c3buBRdscgB/PSfvvcMRqzOUR3qFQITYgstUfhsHhZ4v9Q1oGqFSNHi1fEDrI
-X-Gm-Message-State: AOJu0YxT2gSvZsXF/vT4makFjB8li13ujHkQ4LK7UxRAVNfwiMBO3RzE
-	aCBzK3c1h/B3rtRYZj105mIc4avJPupP6lANSDJUpwRbFRm8uEnSskHdbKA1P3E=
-X-Google-Smtp-Source: AGHT+IE/KLW4V/oa2kX7nQ+u+B/+SvFu5Ac9dOPRHbfjOChoKwHFOfkeD7XHaP74dN0bN5X6Ab9CrA==
-X-Received: by 2002:a17:902:720b:b0:1e4:b16e:7f10 with SMTP id ba11-20020a170902720b00b001e4b16e7f10mr10810750plb.33.1713829793728;
-        Mon, 22 Apr 2024 16:49:53 -0700 (PDT)
-Received: from v4bel-B760M-AORUS-ELITE-AX ([211.219.71.65])
-        by smtp.gmail.com with ESMTPSA id q1-20020a170902dac100b001e0ea5c910dsm8729730plx.18.2024.04.22.16.49.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Apr 2024 16:49:53 -0700 (PDT)
-Date: Mon, 22 Apr 2024 19:49:49 -0400
-From: Hyunwoo Kim <v4bel@theori.io>
-To: Martyn Welch <martyn.welch@collabora.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, imv4bel@gmail.com,
-	johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
-	v4bel@theori.io
-Subject: Re: [PATCH v2] Bluetooth: af_bluetooth: Fix Use-After-Free in
- bt_sock_recvmsg
-Message-ID: <Zib3nSvQZHcVS8l5@v4bel-B760M-AORUS-ELITE-AX>
-References: <20231209105518.GA408904@v4bel-B760M-AORUS-ELITE-AX>
- <8dad5b42-a843-4935-a31e-91a2eadf0c72@collabora.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="j+1HgL5t"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713854953; x=1745390953;
+  h=date:from:to:cc:subject:message-id;
+  bh=rbT8zW5NQLcJQyMGY+L84RuXoNTDBXFC8MF2NSDQSdQ=;
+  b=j+1HgL5tnWgTud2BvetpL2Y9dmoU5N2R8IbQfxpMdPXKqL0+ygqvA4MP
+   OTOoSRcJQrkK8aReFLvmrO5eLJ8Cd3MUctrum5juzh2yZ7BzXrNi05l8u
+   NgYexJcTPUm0cRPC6LR8LjHfG47ZTct7hL5CJRcej/UYB9BfnLMqQpkt4
+   ek2AS8i7uhYDxQPkn1PG+GjG7sN25v7gP1u5Fq9FZnYQVDDKcrEs00nuZ
+   MY75meD7mjbN/p/19C7cvd29wLFoyYu7m/OmVVcSj+Ov+fwt08z8G0QB5
+   9YBaC4/JLT9+rARqJdJ8MoOiNt8eL0fWQ9ifgy1TToYAtd+XSDQ7Wsvzq
+   A==;
+X-CSE-ConnectionGUID: UMDGZ9nCQJGWtLyyfpduKQ==
+X-CSE-MsgGUID: B6xE+Qg+SBGnAnq6yIPRGw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11052"; a="20573654"
+X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
+   d="scan'208";a="20573654"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2024 23:49:12 -0700
+X-CSE-ConnectionGUID: vZb6S8+FSMSUqPNKKq/Ovw==
+X-CSE-MsgGUID: u32qmZzOR+OSFg2jfm+KBA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
+   d="scan'208";a="55204192"
+Received: from lkp-server01.sh.intel.com (HELO 01437695816f) ([10.239.97.150])
+  by orviesa002.jf.intel.com with ESMTP; 22 Apr 2024 23:49:11 -0700
+Received: from kbuild by 01437695816f with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rz9xk-0000Ys-1T;
+	Tue, 23 Apr 2024 06:49:08 +0000
+Date: Tue, 23 Apr 2024 14:49:05 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 958efeeef2d3b90461e7e6a2eac80333c80812fa
+Message-ID: <202404231400.gMQ92kGv-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8dad5b42-a843-4935-a31e-91a2eadf0c72@collabora.com>
 
-Dear Martyn Welch,
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 958efeeef2d3b90461e7e6a2eac80333c80812fa  Bluetooth: Remove 3 repeated macro definitions
 
-I apologize for the long delay in responding.
+elapsed time: 868m
 
+configs tested: 85
+configs skipped: 3
 
-On Thu, Feb 22, 2024 at 11:23:05AM +0000, Martyn Welch wrote:
-> Hi Hyunwoo,
-> 
-> I've been looking into a few CVEs, the one of interest in this case is
-> CVE-2024-21803.
-> 
-> There seems to be little publicly available information about this CVE,
-> however the title of this patch and the affected kernel range suggest this
-> may be a fix for this CVE.
-This patch is for CVE-2023-51779. 
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-> 
-> Would you be able to clarify whether this is a fix for CVE-2024-21803?
-IMO, CVE-2024-21803 appears to be the same vulnerability as CVE-2023-51779. 
-It appears to be a duplicate CVE that was registered due to an unknown reporter's mistake.
+tested configs:
+alpha                             allnoconfig   gcc  
+alpha                            allyesconfig   gcc  
+alpha                               defconfig   gcc  
+arc                              allmodconfig   gcc  
+arc                               allnoconfig   gcc  
+arc                              allyesconfig   gcc  
+arc                                 defconfig   gcc  
+arm                              allmodconfig   gcc  
+arm                               allnoconfig   clang
+arm                              allyesconfig   gcc  
+arm                                 defconfig   clang
+arm64                            allmodconfig   clang
+arm64                             allnoconfig   gcc  
+arm64                            allyesconfig   clang
+arm64                               defconfig   gcc  
+csky                             allmodconfig   gcc  
+csky                              allnoconfig   gcc  
+csky                             allyesconfig   gcc  
+csky                                defconfig   gcc  
+hexagon                          allmodconfig   clang
+hexagon                           allnoconfig   clang
+hexagon                          allyesconfig   clang
+hexagon                             defconfig   clang
+i386                             allmodconfig   gcc  
+i386                              allnoconfig   gcc  
+i386                             allyesconfig   gcc  
+i386                                defconfig   clang
+loongarch                        allmodconfig   gcc  
+loongarch                         allnoconfig   gcc  
+loongarch                           defconfig   gcc  
+m68k                             allmodconfig   gcc  
+m68k                              allnoconfig   gcc  
+m68k                             allyesconfig   gcc  
+m68k                                defconfig   gcc  
+microblaze                       allmodconfig   gcc  
+microblaze                        allnoconfig   gcc  
+microblaze                       allyesconfig   gcc  
+microblaze                          defconfig   gcc  
+mips                              allnoconfig   gcc  
+mips                             allyesconfig   gcc  
+nios2                            allmodconfig   gcc  
+nios2                             allnoconfig   gcc  
+nios2                            allyesconfig   gcc  
+nios2                               defconfig   gcc  
+openrisc                          allnoconfig   gcc  
+openrisc                         allyesconfig   gcc  
+openrisc                            defconfig   gcc  
+parisc                           allmodconfig   gcc  
+parisc                            allnoconfig   gcc  
+parisc                           allyesconfig   gcc  
+parisc                              defconfig   gcc  
+parisc64                            defconfig   gcc  
+powerpc                          allmodconfig   gcc  
+powerpc                           allnoconfig   gcc  
+powerpc                          allyesconfig   clang
+riscv                            allmodconfig   clang
+riscv                             allnoconfig   gcc  
+riscv                            allyesconfig   clang
+riscv                               defconfig   clang
+s390                             allmodconfig   clang
+s390                              allnoconfig   clang
+s390                             allyesconfig   gcc  
+s390                                defconfig   clang
+sh                               allmodconfig   gcc  
+sh                                allnoconfig   gcc  
+sh                               allyesconfig   gcc  
+sh                                  defconfig   gcc  
+sparc                            allmodconfig   gcc  
+sparc                             allnoconfig   gcc  
+sparc                               defconfig   gcc  
+sparc64                          allmodconfig   gcc  
+sparc64                          allyesconfig   gcc  
+sparc64                             defconfig   gcc  
+um                               allmodconfig   clang
+um                                allnoconfig   clang
+um                               allyesconfig   gcc  
+um                                  defconfig   clang
+um                             i386_defconfig   gcc  
+um                           x86_64_defconfig   clang
+x86_64                            allnoconfig   clang
+x86_64                           allyesconfig   clang
+x86_64                              defconfig   gcc  
+x86_64                          rhel-8.3-rust   clang
+x86_64                               rhel-8.3   gcc  
+xtensa                            allnoconfig   gcc  
 
-
-Best Regards,
-Hyunwoo Kim
-> 
-> Thanks,
-> 
-> Martyn
-> 
-> On 09/12/2023 10:55, Hyunwoo Kim wrote:
-> > This can cause a race with bt_sock_ioctl() because
-> > bt_sock_recvmsg() gets the skb from sk->sk_receive_queue
-> > and then frees it without holding lock_sock.
-> > A use-after-free for a skb occurs with the following flow.
-> > ```
-> > bt_sock_recvmsg() -> skb_recv_datagram() -> skb_free_datagram()
-> > bt_sock_ioctl() -> skb_peek()
-> > ```
-> > Add lock_sock to bt_sock_recvmsg() to fix this issue.
-> > 
-> > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> > Signed-off-by: Hyunwoo Kim <v4bel@theori.io>
-> > ---
-> > v1 -> v2: Remove duplicate release_sock()s
-> > ---
-> >   net/bluetooth/af_bluetooth.c | 7 ++++++-
-> >   1 file changed, 6 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-> > index 336a76165454..b93464ac3517 100644
-> > --- a/net/bluetooth/af_bluetooth.c
-> > +++ b/net/bluetooth/af_bluetooth.c
-> > @@ -309,11 +309,14 @@ int bt_sock_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
-> >   	if (flags & MSG_OOB)
-> >   		return -EOPNOTSUPP;
-> > +	lock_sock(sk);
-> > +
-> >   	skb = skb_recv_datagram(sk, flags, &err);
-> >   	if (!skb) {
-> >   		if (sk->sk_shutdown & RCV_SHUTDOWN)
-> > -			return 0;
-> > +			err = 0;
-> > +		release_sock(sk);
-> >   		return err;
-> >   	}
-> > @@ -343,6 +346,8 @@ int bt_sock_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
-> >   	skb_free_datagram(sk, skb);
-> > +	release_sock(sk);
-> > +
-> >   	if (flags & MSG_TRUNC)
-> >   		copied = skblen;
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
