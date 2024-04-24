@@ -1,48 +1,55 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C521415ADB8;
-	Wed, 24 Apr 2024 12:59:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C6D715B150
+	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 13:10:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713963589; cv=none; b=tcz7eZYSfw3LbuEDGoub7LgCsC8X76erwq8QPSjbQI3jXDpS2l2we86bK+RQqOO/TLeGaHksne/YIif/wrXi3+tiFz3towEnRXYuDD6bM9p8qEHhwf2jfkenUbDlKN68dADMsOrsX6snWfyNdLRt8yeb9apAsTl0Sk4fYo5Lfio=
+	t=1713964226; cv=none; b=J8Lplb3WpQBKBW2KRb7X5P8BzSvrgNORSNf4W3QzUfmCOBjGbEUEeCspP0TiY7NRbNvwk/7k3OL/NBVV/6/aFAknuz/3/c6IuEuPaSWIpj8g+RryROukC5CmrzJwNkeTDTsjPn3fT6tM3R+K0rbJz6NBReZEF5sfVgfaSmEzcHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713963589; c=relaxed/simple;
-	bh=nYaJwBHScwcf8mZ+65pvV+Cbut1NnlCU/Umn54RReB8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=HDOHuX0xNuAEDZi73/TCC7//Xm5O+UZidoDHryfFc8Pn377o2EOs5f2t6edW/s5Qa7MN3FLGuy5GQHTGAw4SskKG6aYu7IwtBPxBNl37Q8q4t8wF29XIUe8QBaX+C/b5QZcD2AuxpNuaDx56YZnq0VCZi6wtge3Qsbuo04ivD4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=avol3+KF; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1713964226; c=relaxed/simple;
+	bh=OefCvQ2x2IZXcgNdABhPCAcs1PW3cTeYzxWmJEpDiw8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rvDjKoHvjhuxUP8SLGpQY16M8EVA97IV4v06SyFTJWo3eeepuXgkexbNvOSmR59pwuk0+wo3ADgxxNsY/+v2G6ZOb06V8PQO5gOdsjuLcm6DFauIEo3pTkkCqaRdrngUpsXEJuqi+yIJG6CxpGy7CbJUhUTjhfeDk/kExMVwXQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=PRM3mWPy; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=penguintechs.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="avol3+KF"
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 43OBd8Id027237;
-	Wed, 24 Apr 2024 12:59:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=f20yqpl+kz5jwmAiKMXqy19f1liqCLMYGbmBPOR+394=; b=av
-	ol3+KFGx8hrnnaDm4e4fmWebokluWlX9A4YCqlYe+QQDWUwtpw+OXrv1z2HKZj7f
-	dDyR2r0pxY8j9bB4161zBZpEbiibo+27AiE06XIQfjKi9EyrY1baO5OiZhmdn77S
-	JosA8rHCSuXhGBWnBcb9UWQ+17oE2b+jSJZsy7TMpdStLZjViHe6WQivfgeXnMAp
-	0+jgDvs8noXZcHQafMnPyUlOJAn+qaRE/dmp3g8eIliW3dMEpmxqZwGFBUVjf1hu
-	+YfxZspKhpvaog+brNK1pgXN2N+EufQDWPqujFGW3afAhBoK6Enoa0E2nrcgcJsb
-	GIgIFcXpUed9Yju5weCA==
-Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xpv9g8uck-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 24 Apr 2024 12:59:40 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43OCxdto002521
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 24 Apr 2024 12:59:39 GMT
-Received: from [10.253.14.221] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 24 Apr
- 2024 05:59:37 -0700
-Message-ID: <2d3823bd-bc30-4e3f-a350-eb9a718261aa@quicinc.com>
-Date: Wed, 24 Apr 2024 20:59:35 +0800
+	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="PRM3mWPy"
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1e4f341330fso57727605ad.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 06:10:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=penguintechs.org; s=google; t=1713964223; x=1714569023; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Sydl+4yFYinKXmdPTE5nn5HGpzz6QFMBENvh2i5loOE=;
+        b=PRM3mWPy+3RVNeSsfGkMdvomu9dVjir3bEAaNWBpOxmRpHfR9XKZnX6qlKGvRTevTj
+         6BXvzPBAdbrNa7QfMoBDzico67O3DRUvT+Z/mr8gwSYObHgDuFjoPBCR9UrExEAxLmQW
+         pdZmfex7QDQ7/o7vhgUoYJqKaiJDqqpD/PItY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713964223; x=1714569023;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Sydl+4yFYinKXmdPTE5nn5HGpzz6QFMBENvh2i5loOE=;
+        b=HwjnnYQ69thg1PM7kMBREyRpadNOaJTCgKMblIXgdUYmu0Ie2AYnnU0wb95QWG2PKf
+         E5mlLe41cxja+McSfN1HKra7O6crM9T+JwR5NngoA1EKeNNA9wIBQOR3Si9Fi2SDJb1c
+         0kGBSAx+UL+XhvhPo9sE24dx/p8tAOC6K33GSRz8ZVHDAMg8tPn/8OmtsTRhC1+2a1K2
+         B2VVzI+lzp9ycBjepXt48TJ/XQBk3ogFJ9F1cCWb15WNLBgtCrhp9gkecsFsKLbWSgVs
+         VZUJUkMbkOVzPaw/Mc/g0p4Bpt6mN8VZ3smXdh9x7s/0ZgdHgd9es+CbReAhdthGaBcG
+         /rmQ==
+X-Gm-Message-State: AOJu0YxU5aPyRH74ki1VF8H5smHTTlEg44CnALfCKflQmX8NZSJZ1RSi
+	vPiV3fFVC4hVfOeZeQIZtgKVrr/2I6ApymzDGK2XG9CAqDSMA3XcKYerqSWJzQ==
+X-Google-Smtp-Source: AGHT+IENMZx7a5JN5bQLy2lo1eJGSELBdY0Fm2u/7eAZkB+kc4140yF/vjh6YqzxR99qe6U0lTo0vQ==
+X-Received: by 2002:a17:902:ecc6:b0:1e9:214a:4175 with SMTP id a6-20020a170902ecc600b001e9214a4175mr2782600plh.22.1713964223368;
+        Wed, 24 Apr 2024 06:10:23 -0700 (PDT)
+Received: from ?IPV6:2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08? ([2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08])
+        by smtp.gmail.com with ESMTPSA id jj1-20020a170903048100b001e2526a5cc3sm11830928plb.307.2024.04.24.06.10.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 Apr 2024 06:10:22 -0700 (PDT)
+Message-ID: <ba9b0e6e-3601-4460-ab5c-a02eb7708a4f@penguintechs.org>
+Date: Wed, 24 Apr 2024 06:10:21 -0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -52,39 +59,21 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v2] Bluetooth: qca: set power_ctrl_enabled on NULL
  returned by gpiod_get_optional()
-To: Bartosz Golaszewski <brgl@bgdev.pl>,
-        Marcel Holtmann
-	<marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-CC: <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Bartosz
- Golaszewski <bartosz.golaszewski@linaro.org>,
-        Wren Turkal
-	<wt@penguintechs.org>
-References: <20240424122932.79120-1-brgl@bgdev.pl>
 Content-Language: en-US
-From: quic_zijuhu <quic_zijuhu@quicinc.com>
+To: Bartosz Golaszewski <brgl@bgdev.pl>, Marcel Holtmann
+ <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+ Zijun Hu <quic_zijuhu@quicinc.com>
+References: <20240424122932.79120-1-brgl@bgdev.pl>
+From: Wren Turkal <wt@penguintechs.org>
 In-Reply-To: <20240424122932.79120-1-brgl@bgdev.pl>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: F4kwVAATKcRsWYNE87LArXDTUMGAAx9o
-X-Proofpoint-GUID: F4kwVAATKcRsWYNE87LArXDTUMGAAx9o
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-04-24_10,2024-04-24_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
- suspectscore=0 clxscore=1015 mlxlogscore=999 malwarescore=0 adultscore=0
- mlxscore=0 phishscore=0 lowpriorityscore=0 spamscore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2404010003
- definitions=main-2404240046
 
-On 4/24/2024 8:29 PM, Bartosz Golaszewski wrote:
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+On 4/24/24 5:29 AM, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski<bartosz.golaszewski@linaro.org>
 > 
 > Any return value from gpiod_get_optional() other than a pointer to a
 > GPIO descriptor or a NULL-pointer is an error and the driver should
@@ -95,86 +84,17 @@ On 4/24/2024 8:29 PM, Bartosz Golaszewski wrote:
 > While at it: also bail-out on error returned when trying to get the
 > "swctrl" GPIO.
 > 
-> Reported-by: Wren Turkal <wt@penguintechs.org>
-> Reported-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> Closes: https://lore.kernel.org/linux-bluetooth/1713449192-25926-2-git-send-email-quic_zijuhu@quicinc.com/
+> Reported-by: Wren Turkal<wt@penguintechs.org>
+> Reported-by: Zijun Hu<quic_zijuhu@quicinc.com>
+> Closes:https://lore.kernel.org/linux-bluetooth/1713449192-25926-2-git-send-email-quic_zijuhu@quicinc.com/
 > Fixes: 56d074d26c58 ("Bluetooth: hci_qca: don't use IS_ERR_OR_NULL() with gpiod_get_optional()")
-> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-is it really reviewed-by Krzysztof?
-suggest reviewer give explicit review-by tag by public way, then you add
-this tag.
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> ---
-> v1 -> v2:
-> - also restore the previous behavior for QCA6390 and other models that
->   fall under the default: label in the affected switch case
-> - bail-out on errors when getting the swctrl GPIO too
-> 
->  drivers/bluetooth/hci_qca.c | 18 +++++++++++++-----
->  1 file changed, 13 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index 92fa20f5ac7d..0e98ad2c0c9d 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -2327,16 +2327,21 @@ static int qca_serdev_probe(struct serdev_device *serdev)
->  		    (data->soc_type == QCA_WCN6750 ||
->  		     data->soc_type == QCA_WCN6855)) {
->  			dev_err(&serdev->dev, "failed to acquire BT_EN gpio\n");
-> -			power_ctrl_enabled = false;
-> +
-think about what will happen for present lunched products if this type
-error really happens.
-BT don't work at all with your change. BT can be used mostly without
-your change.
-			return PTR_ERR(qcadev->bt_en);
->  		}
->  
-> +		if (!qcadev->bt_en)
-> +			power_ctrl_enabled = false;
-> +
-you don't answer me how to treat a required enable is not configured by user
->  		qcadev->sw_ctrl = devm_gpiod_get_optional(&serdev->dev, "swctrl",
->  					       GPIOD_IN);
->  		if (IS_ERR(qcadev->sw_ctrl) &&
->  		    (data->soc_type == QCA_WCN6750 ||
->  		     data->soc_type == QCA_WCN6855 ||
-> -		     data->soc_type == QCA_WCN7850))
-> -			dev_warn(&serdev->dev, "failed to acquire SW_CTRL gpio\n");
-> +		     data->soc_type == QCA_WCN7850)) {
-> +			dev_err(&serdev->dev, "failed to acquire SW_CTRL gpio\n");
-> +			return PTR_ERR(qcadev->sw_ctrl);have the same question as above.
-> +		}
->  
->  		qcadev->susclk = devm_clk_get_optional(&serdev->dev, NULL);
->  		if (IS_ERR(qcadev->susclk)) {
-> @@ -2355,10 +2360,13 @@ static int qca_serdev_probe(struct serdev_device *serdev)
->  		qcadev->bt_en = devm_gpiod_get_optional(&serdev->dev, "enable",
->  					       GPIOD_OUT_LOW);
->  		if (IS_ERR(qcadev->bt_en)) {
-> -			dev_warn(&serdev->dev, "failed to acquire enable gpio\n");
-> -			power_ctrl_enabled = false;
-> +			dev_err(&serdev->dev, "failed to acquire enable gpio\n");
-> +			return PTR_ERR(qcadev->bt_en);
->  		}
-> 
-have the same question as above.
-is it right for such prompt ?
-> +		if (!qcadev->bt_en)
-> +			power_ctrl_enabled = false;
-> +
->  		qcadev->susclk = devm_clk_get_optional(&serdev->dev, NULL);
->  		if (IS_ERR(qcadev->susclk)) {
->  			dev_warn(&serdev->dev, "failed to acquire clk\n");
-have the same question as above.
+> Reviewed-by: Krzysztof Kozlowski<krzysztof.kozlowski@linaro.org>
+> Signed-off-by: Bartosz Golaszewski<bartosz.golaszewski@linaro.org>
 
-how do you known the root cause of the issue reported without my earlier
-debugging and fix?
-
-do my fix regarding the issue i concerned have any  fault?
-
-NAK by me.
+Tested-by: "Wren Turkal" <wt@penguintechs.org>
 
 
-
-
+Like this?
+wt
+-- 
+You're more amazing than you think!
