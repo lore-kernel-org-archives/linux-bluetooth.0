@@ -1,55 +1,56 @@
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F87A15AADC
-	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 12:09:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E35B415ADBD
+	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 12:17:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713960546; cv=none; b=goKxq3AED55EzaEzNiCnt68f5xMkO0tzt6yQq2jwr6RRC1h5hxfOQhaPTl4q7AaoYmypJ0ZaZggqRscOImzulY5+sEHde9ayZimG8s0ysvYZK+eUlixWTa0pScklXrvV6CAoYKkZcg1vPd32NJzDkgAJSd24rrkX7Gl8Egongo8=
+	t=1713961065; cv=none; b=QL54SKnh+jLby/LzGreygPctEIDRHI4fR/avS94j9HtfM6TDP6fxWICRNr6ZQDUKXyA6rq9pI8Db/d5KTDEkN93daXNdCIk4y+R2ZQKQ/tIjRm+w1gmpzAUSyeqCvFQklvK8Ip0dC3rXJjbgY5x6pASCX1GwdceIFuglyJoW3sc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713960546; c=relaxed/simple;
-	bh=52KjXxQlothyD4xprqVtVoLLSPB94MV2Pp7tmkfirFE=;
+	s=arc-20240116; t=1713961065; c=relaxed/simple;
+	bh=PxQ+wYkcEmeQVwBCgLwFCF/d6G+Ti5It4I4uaWx1W0Q=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TI2ldjYtX7/uv2vTuaWvGvOyvzfUC85estcyOz5iEu4cPEy5vxzTzfbaYf5IZup4QLoQKKLFGogStZ/UN0nR+YpEgWYoYHqIflennFZPY2i+VShtPqWnz0N7kqqhs8cLolQF3GYAzA6MjV3Jxno8jQXL/xr3Y4opm3hKvferxNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=kDREl58w; arc=none smtp.client-ip=209.85.210.177
+	 In-Reply-To:Content-Type; b=fAYhBLdzQucPABGXEjXjtdHBdZg0t81AxZ8gVJ1N3fXtO/JhsvCv0/dB43AMqYpax30/ReCnWuSJnDR8Rlp9sF/eUZZZx9TeSehWhK2+aKgD3STso41g9iwzej2SQYvgSgPKEawCoANoOTGWs28g4fR3YIFfzF+uEH+5qsyU8Tk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=X+ojHJ96; arc=none smtp.client-ip=209.85.214.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=penguintechs.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="kDREl58w"
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-6f0b9f943cbso4658415b3a.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 05:09:05 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="X+ojHJ96"
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1e9320c2ef6so29444395ad.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 05:17:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=penguintechs.org; s=google; t=1713960545; x=1714565345; darn=vger.kernel.org;
+        d=penguintechs.org; s=google; t=1713961063; x=1714565863; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=znsyJuQoNLo0qiO8ZilKT4EJeX5sYMfLiF0BBqCk6Wc=;
-        b=kDREl58wK3fyNkIbcZ6RqN1pWxnEhjV1BSiwMLiZxW5FLiZe6V/psG2CtuMHanJkBn
-         V1TA89JzVCOwk+H4BGPDlzjrK7powMf2a7keFDJMRi4Bm5AVd3Z20Lmb8ubN3F5GkTM4
-         /DEsoaAwu47FGxyeGCP6L8OH0CmVcFH7s4XQc=
+        bh=rIBkvQVMMmmWfMpfrnBMQsoHy1wIAPYh1MyN9fB34kg=;
+        b=X+ojHJ96VlzgI77GVwkkp7qq8lGbRLYxexOMUki2Aux7CB7Helyzae5LplM3j+26Sd
+         9LyzMAtY88fnLtf+d+ZKs0kXYoEiGZA1q1HV+5ym29hC6OdipX0S3A7C8gUA/9Cip3bC
+         N6DF4L+qA4n0QtmHi8rEzRzthnvR8Tw0EyEvE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713960545; x=1714565345;
+        d=1e100.net; s=20230601; t=1713961063; x=1714565863;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=znsyJuQoNLo0qiO8ZilKT4EJeX5sYMfLiF0BBqCk6Wc=;
-        b=OVF+i1qwsIskPoltwOwvySU+RBUQkYG1Eg7lTolsE8Y66kOHdQNkDDw/nASCET0FBX
-         ImRb+4eXL0WzA5m4DDBZn2aJaSsBTAuOzHU3eZlSNbZ8VTrz+038LYp+xAAnziTQa5W9
-         AxOIPxpSlesT1neXddMVO9FB/VNsBNuOvnpDZftTBJjiHF/Ue6vm7f9q8Lfu7t+Ck64G
-         hrTMBJNt06lkcOQmUb5eSZXUYu9H2LOAKenpxHhdWGtxarE73MMYN26RkRrZedx7dIsQ
-         YOIorAhRu5+JPbRagEGjL5mJYkxAdiDMXxdlgw3SbZpkZvPQkT6SM5o2YnKVs1gEAM5q
-         ggtQ==
-X-Gm-Message-State: AOJu0YyII94EVvSOdG4A4uPFf8dIkPvaJjHqz14CVq7Zuo+3muAwnFyN
-	aEyIa3/YyopTfAlaOMkKyPKDarMmo2LIUnYogZs9T65BT08M7TXfqWui4mE3ng==
-X-Google-Smtp-Source: AGHT+IFeVOF9Xq7BV/1lu/eWDxBBt0FpQyQswmdg/BvQlTgta0ZdVo5eTD/m/qcg8g9kZLOP5hItkg==
-X-Received: by 2002:a05:6a20:5650:b0:1ac:e0fa:fb24 with SMTP id is16-20020a056a20565000b001ace0fafb24mr2009997pzc.29.1713960544628;
-        Wed, 24 Apr 2024 05:09:04 -0700 (PDT)
+        bh=rIBkvQVMMmmWfMpfrnBMQsoHy1wIAPYh1MyN9fB34kg=;
+        b=v11UJrt9WgDylcciDJ+NPdGSTqsLOHyPVpNEBHcz8NGa0OKZRRV4VTJ25LbYNtTpNm
+         QfoFETbFA9rFGWZQGO/vxTW7ET1GMGJWEHWcA2oqC1HZIkfHqCpHsS1MRJWVW4+MppUF
+         2C5Daqq1MXTPXKTcTSd+17ws86f5fjQczv6EJrutBG9A9wwTYgzo0PMFedbiD05NKBjl
+         iyAOUE51FAr9zacQtAymzoIsppXXCM8PXqyV39/6X1z0wcRFi5tjxWeCdOWyhMxG5pzh
+         PCJwn8Gn4QzzDXE8QvkV2J8DuyuaDeSIkbT35UurBnTWkLuYlikYuxDORDieMBoJ8Qtn
+         A/CA==
+X-Gm-Message-State: AOJu0YwONQTPzNwcvAaP+lkBaE4EFBdB/QOLjJ9b9ZKhvw/ZjfkPpygI
+	2p7V9ZYKzRDI958p7vufe2+XSuabSCyp+pifXVZCh2Ne/UqtSTlbkNNlGVxoNI4a8PcUbCiOpJo
+	hcqk8
+X-Google-Smtp-Source: AGHT+IFIxPfddfQhuY9GSa7z70gpc6/K91NbvwPtqxZMuz80dAHQ4TeIKP6XwnHXuGVukijr/kjbaw==
+X-Received: by 2002:a17:902:c405:b0:1e6:36cc:5c65 with SMTP id k5-20020a170902c40500b001e636cc5c65mr2937321plk.0.1713961062928;
+        Wed, 24 Apr 2024 05:17:42 -0700 (PDT)
 Received: from ?IPV6:2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08? ([2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08])
-        by smtp.gmail.com with ESMTPSA id j14-20020a62e90e000000b006edec30bbc2sm11289323pfh.49.2024.04.24.05.09.03
+        by smtp.gmail.com with ESMTPSA id p3-20020a170902780300b001e3e09690c6sm12000465pll.199.2024.04.24.05.17.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Apr 2024 05:09:04 -0700 (PDT)
-Message-ID: <4cbd8c10-6abf-4c10-a16c-62573ae1945d@penguintechs.org>
-Date: Wed, 24 Apr 2024 05:09:02 -0700
+        Wed, 24 Apr 2024 05:17:42 -0700 (PDT)
+Message-ID: <2371f538-ec53-4037-b171-c62bf4e06eb1@penguintechs.org>
+Date: Wed, 24 Apr 2024 05:17:39 -0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -117,16 +118,16 @@ On 4/24/24 4:56 AM, Bartosz Golaszewski wrote:
 > 
 > Zijun didn't bail out on errors which is the issue the original patch
 > tried to address and this one preserves.
-
-Ah, I see that. Yeah, Zijun's 1/2 doesn't have the returns.
-
+> 
 >> However, since this patch doesn't include the quirk fix from Zijun's
 >> patchset (patch 2/2), bluetooth fails to work after a warm boot.
 >>
 > 
 > That's OK, we have the first part right. Let's now see if we can reuse
 > patch 2/2 from Zijun.
-> 
+
+I'm compiling it right now. Be back soon.
+
 >> @Zijun, this patch looks more idiomatic when I look at the surrounding
 >> code than your patch 1/2. Notice how it doesn't use the "else if"
 >> construct. It does the NULL test separately after checking for errors.
