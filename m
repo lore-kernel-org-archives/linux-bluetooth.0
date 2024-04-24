@@ -1,95 +1,174 @@
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F181A23D0
-	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 01:52:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76CC629429
+	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 02:40:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713923545; cv=none; b=tLNFrdIFeezIuAURaTBURi/V1JN2J3HiIUJaiFnvhC1/9862slqOavZ1JdowhLvTsvLHwop0sHug01pkKsWCbRHBpO/2k2XUM3AIrUFFV468kwmO66FRroKWLaz/V8nT9chL6dq/T/vuvmeUjpbUxw9RnU7udJMlTIhTRLKCUGo=
+	t=1713926416; cv=none; b=KyIq1rwQyOihuTd1ijkOUaRnHSYxYeUFCL/fpBIJVREnd5GKJ5M3kxjWPAx+5fXZwXE4e+5mV48atFczAvaGfaOGmeVptqNoSbAlM7rbf2GNUWhDWSkHw0ai5SPc8k8oFn+PeRtUxh/2MGtMI5vk8ZIgL0LEerHSwCRauh7LHI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713923545; c=relaxed/simple;
-	bh=v2huvPt4AaL2sQUDIqDv11dm8B5mLhIYWfT6KUF/yW0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=e4BeQbZPrIti8IGafnIjYNYD7kmmwkEMZT97j5nhWwe2vZOQLQnFBq12ECGfU3Ny95VVUwZ27hGhqFc7BFuCQkNTx0Ew62Nx6wEMt42Xsa/LeDWZawTmkPmbgPclYB54DOkdtqscN0p7KRll8+MytibeFzOmTovadRT/9pEoM1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=KAusK5ro; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=penguintechs.org
+	s=arc-20240116; t=1713926416; c=relaxed/simple;
+	bh=TMA+BIYJpA/vwVv+1rADFYX/N1+G+M4KbS5KP9THjjA=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=rapwb0YcsO1wFuckCBFogZj8Kacv44jLxc5iXTEXxEF2++XPB0Lg+rDNjb51AlV602QPDOZ4Vy6Z2QCK0ESZV4wrOXfv5eyQRJzwrthkTR2XzvB41k3S3Y4g7j34cVomXGw+MxGBhqoRUReb013sVAtTmPxc0GT37WS9Hx46GDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d4sGNd8Q; arc=none smtp.client-ip=209.85.219.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="KAusK5ro"
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2a55a3d0b8eso336264a91.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Apr 2024 18:52:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d4sGNd8Q"
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-69b24162dd6so32247516d6.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Apr 2024 19:40:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=penguintechs.org; s=google; t=1713923543; x=1714528343; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=W8m4U4ObkEYQm9F9towWfztGMNa9exH10VioCW9ZML4=;
-        b=KAusK5rokhFVX9jPVEsCzMdiol3wQAUH5qTNCQZqcdB/ZPS86voRg9Y1laxDTgUqsb
-         oH6kHCXnK8PcfFBnDzrzxoYr8fLEM4S4Ke7QATsNpkZRFgXTCtMrtSrU+poYu6a227tn
-         6qkAjyuy1IHL98FKzqf4iHZxffd2DxrMitBHU=
+        d=gmail.com; s=20230601; t=1713926413; x=1714531213; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=6JJKZvvlRclgklQaHx/OyHmQe3e7rg4F1P6Lhcto+q0=;
+        b=d4sGNd8QaNxhWvmTiyWwy92gRwORwHMOYmXikEpHkdvveP+hVTWww4sTDrKxl/40Jt
+         NrUbiwbyOMLMzpN8a0NvxHjvh5JD0xLaLI/mJzQsrLfCgJmtf9PkVzDB2HVCB+wgsCfa
+         5IS+0nCLCK30gM6AWNQof+8HiLRG2TqNSanc+WHkUW2vK0hg8S7bLp9sZxj0d1wwlKEI
+         VxKi6A3c7OaIdD5ZMrl9sgYHM7wwY9dI0juU1SI7ME94cu2a0mWf6lF6voFKY2d0bGVF
+         zf6j6BnuwBWekPU0uFTExd1zL1v0PVnSvKTnqBm7ijGDCrRtJxvFB74wJawS5/7JBc4H
+         Jhxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713923543; x=1714528343;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W8m4U4ObkEYQm9F9towWfztGMNa9exH10VioCW9ZML4=;
-        b=EUZ9bCas2O/BOdyrvliHbLxlnMHBYCU/8IUi4C8pqjYg640hU1EFd2qJWWSXvstXDq
-         Nz7p/71zQH8rec+okrs84y/7D7Q5NBqR1njoGy6E3oVJGyDpfBradICErxZPP749NeGT
-         TkLVynAxd3x0YykpuEvZrvOvaOQimPAKRU/oOfqa+PY0kTnioo+eMmR45VgHi4rHzRTP
-         KCffb6RVDEiYDWiP26fIMPVK1C145G5aiVQzNdExtA/QWWBuhUUM85IO6lkj2F9AXFhk
-         W+zV1kElaGUvU0tgdVCuqvoF6ARv3yKdY4tynemt9O86jWESATPZXmrOjEc/zAN2I8lT
-         jrfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUoYWt1lkryZvKZL5/nJzM9k0zsSIj0qgAQAN+fkJA2ZFHTfLaBNvl5vi3lndjyYjOp1BCIGReB/yMrcWamMmYDu0gmE7A9vI5eVwE1b+6E
-X-Gm-Message-State: AOJu0YxEff75lh4jA1EKMUacVfFzmaTZX0bKttzJ9JagMtayi+1kOvGl
-	7IoEl3LeIWVNF+SNXQpQsslNVlJJEGbZhLCFHYoA+pct0HHcHqqv5nBRsRIqZH3z999ZoLkgVxE
-	QjA==
-X-Google-Smtp-Source: AGHT+IHTZVy+ZZQefmF+h21RjSsKaH9d9KLKbHDNlfaqpNcNhxIwRxpSvi31KdoTboCK9Puy0ucd9A==
-X-Received: by 2002:a17:90a:77cb:b0:2a5:5f9f:6733 with SMTP id e11-20020a17090a77cb00b002a55f9f6733mr5515449pjs.20.1713923543017;
-        Tue, 23 Apr 2024 18:52:23 -0700 (PDT)
-Received: from ?IPV6:2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08? ([2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08])
-        by smtp.gmail.com with ESMTPSA id w4-20020a17090aaf8400b002a5e1f837ebsm11837468pjq.46.2024.04.23.18.52.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Apr 2024 18:52:22 -0700 (PDT)
-Message-ID: <41a893b5-8cc9-4533-a58b-cee0099fd61a@penguintechs.org>
-Date: Tue, 23 Apr 2024 18:52:20 -0700
+        d=1e100.net; s=20230601; t=1713926413; x=1714531213;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6JJKZvvlRclgklQaHx/OyHmQe3e7rg4F1P6Lhcto+q0=;
+        b=OniigVQSsTBrEdFhoIu5QyXCOljWXlDrH46Ur3bnmdz4L4A4kyT+z0pIxnhioqSUIQ
+         ROl64CFtkyf44nACd1+8njSb0qPxtXUI2P65Z1pLGStFjRVNJItBhU5XO5GDEDdp+RR2
+         PPtH6nm1BwxcPkVBx+LkZS2G+7NEAbPRU8GwTcMIgw5v7WYUdkqAwScP0HVRJ6Hm9cLt
+         RG9Ss7CA7Hp1R208TtEdaSmtHK/RFBTLg514OgozBcibfVb6OrHF8MYkEt9gbx3rJJJb
+         Akx0y2yBhp8afRuQ4Y6taaGFFEMFCyiTaye/ddjnkXP9e4Btg7PPq7BFhpq1TbpvyLYx
+         gtcQ==
+X-Gm-Message-State: AOJu0YxAtGRJim6BQ5vrKK8MbiSSSEnXnKEFNsJOH40OTyhG+GgbCaDA
+	HkOe1g1Q2ZfYnjFD3ZXrx4EZGitdybkDTS728nMkN02qnxBEd2RFF93v6A==
+X-Google-Smtp-Source: AGHT+IE9/6UcwKZL1z5Ondgm8Yo2RMh7HwwA2M3XltUOUs/nNzHLu27KNYqTuHlgsEL1wvs4/r3+Iw==
+X-Received: by 2002:ad4:58a9:0:b0:6a0:5673:e50e with SMTP id ea9-20020ad458a9000000b006a05673e50emr1008121qvb.53.1713926413172;
+        Tue, 23 Apr 2024 19:40:13 -0700 (PDT)
+Received: from [172.17.0.2] ([172.183.82.195])
+        by smtp.gmail.com with ESMTPSA id y18-20020a0c9a92000000b0069b5ec80687sm5706204qvd.62.2024.04.23.19.40.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Apr 2024 19:40:13 -0700 (PDT)
+Message-ID: <6628710d.0c0a0220.4a939.a190@mx.google.com>
+Date: Tue, 23 Apr 2024 19:40:13 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0899978661227844354=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 0/2] Fix two regression issues for QCA controllers
-To: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Cc: quic_zijuhu <quic_zijuhu@quicinc.com>,
- Krzysztof Kozlowski <krzk@kernel.org>, luiz.dentz@gmail.com,
- luiz.von.dentz@intel.com, marcel@holtmann.org,
- linux-bluetooth@vger.kernel.org, regressions@lists.linux.dev
-References: <1713564212-21725-1-git-send-email-quic_zijuhu@quicinc.com>
- <1713650800-29741-1-git-send-email-quic_zijuhu@quicinc.com>
- <369512e2-f091-4370-bce5-9ac32178dc4d@penguintechs.org>
- <a6ae69ad-b602-4cfc-9f76-8932f357d30b@kernel.org>
- <c0f7036d-c129-400b-85a2-1414ec3d2622@quicinc.com>
- <dc17aea1-9399-4c2b-8775-fa0a7f602035@penguintechs.org>
- <CACMJSevocRot6J06uvridRw9MZFftJrkCyYBgXhLnwfapVPnCw@mail.gmail.com>
- <5da9ecae-35c7-4968-9f16-3f10e04c2b1a@penguintechs.org>
- <CACMJSetZ14Pm=m9e1ka+m9pUbSwCfV2agcaWBd7aWJu2ngWmbA@mail.gmail.com>
-Content-Language: en-US
-From: Wren Turkal <wt@penguintechs.org>
-In-Reply-To: <CACMJSetZ14Pm=m9e1ka+m9pUbSwCfV2agcaWBd7aWJu2ngWmbA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, quic_zijuhu@quicinc.com
+Subject: RE: Fix two BT regression issues for QCA6390
+In-Reply-To: <1713919602-5812-2-git-send-email-quic_zijuhu@quicinc.com>
+References: <1713919602-5812-2-git-send-email-quic_zijuhu@quicinc.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============0899978661227844354==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-On 4/22/24 6:02 AM, Bartosz Golaszewski wrote:
-> Can you test the patch[1] I just sent?
+This is automated email and please do not reply to this email!
 
-I am doing this now. Just to be clear, I am testing the patch I found in 
-the thread with subject "[PATCH] Bluetooth: qca: set power_ctrl_enabled 
-on NULL returned by gpiod_get_optional()". If that isn't the one you're 
-referring to, please let me know.
+Dear submitter,
 
-I will reply back to that patch after testing.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=847233
 
-wt
--- 
-You're more amazing than you think!
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      1.47 seconds
+GitLint                       FAIL      0.73 seconds
+SubjectPrefix                 PASS      0.18 seconds
+BuildKernel                   PASS      30.08 seconds
+CheckAllWarning               PASS      32.38 seconds
+CheckSparse                   PASS      37.95 seconds
+CheckSmatch                   FAIL      35.95 seconds
+BuildKernel32                 PASS      28.92 seconds
+TestRunnerSetup               PASS      520.94 seconds
+TestRunner_l2cap-tester       PASS      20.19 seconds
+TestRunner_iso-tester         PASS      30.42 seconds
+TestRunner_bnep-tester        PASS      4.68 seconds
+TestRunner_mgmt-tester        PASS      116.79 seconds
+TestRunner_rfcomm-tester      PASS      7.24 seconds
+TestRunner_sco-tester         PASS      14.86 seconds
+TestRunner_ioctl-tester       PASS      7.60 seconds
+TestRunner_mesh-tester        PASS      5.75 seconds
+TestRunner_smp-tester         PASS      6.64 seconds
+TestRunner_userchan-tester    PASS      4.81 seconds
+IncrementalBuild              PASS      33.01 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v6,1/2] Bluetooth: qca: Fix BT enable failure for QCA6390
+WARNING: Reported-by: should be immediately followed by Closes: with a URL to the report
+#119: 
+Reported-by: Wren Turkal <wt@penguintechs.org>
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=218726
+
+total: 0 errors, 1 warnings, 8 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13640915.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v6,1/2] Bluetooth: qca: Fix BT enable failure for QCA6390
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+16: B3 Line contains hard tab characters (\t): "  	dev_warn(&serdev->dev, "failed to acquire enable gpio\n");"
+17: B3 Line contains hard tab characters (\t): "	power_ctrl_enabled = false;"
+24: B1 Line exceeds max length (139>80): "Link: https://lore.kernel.org/linux-bluetooth/ea20bb9b-6b60-47fc-ae42-5eed918ad7b4@quicinc.com/T/#m73d6a71d2f454bb03588c66f3ef7912274d37c6f"
+30: B2 Line has trailing whitespace: "V1 -> V3: Don't revert the whole wrong commit but focus on impacted device "
+[v6,2/2] Bluetooth: qca: Fix BT enable failure for QCA6390 after disable then warm reboot
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (89>80): "[v6,2/2] Bluetooth: qca: Fix BT enable failure for QCA6390 after disable then warm reboot"
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
+
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bpa10x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bpa10x.o'
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0899978661227844354==--
