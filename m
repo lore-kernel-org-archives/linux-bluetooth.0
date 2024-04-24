@@ -1,80 +1,165 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8652A13DBB2;
-	Wed, 24 Apr 2024 14:20:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA43515B996
+	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 14:25:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713968429; cv=none; b=h9Pk0k8Wzn5wqV04EW1ir1RWkeM7/2FF5YFPngIEHBORG34B7D8trNGNEdVHST3nhkXBW4vCvEhhMDqTmdR8MaQukt465y4TOlnGDPgJo4d2oBEu8Aeu25FXgpBeSM7eQvFGYxBtnUwEcGVKSotaedyMoiAbgAH/G+yPoNyC5uo=
+	t=1713968730; cv=none; b=BO60pPDmNPS6c3KGUWyrx+rqkwxK79V1AccshHVY/0uFmg0ITkbtxvOGL+/LhLEA9H/mQCm1PeqRnfEov/UOwVZQQm3VEhJWJJD1XRu+M4GCQisBZJ9OKwY4oiWGeaFj8ykXhjbLtrSBXUJ2wpOPC2Ho/im3cCGcuXdtBGVrKpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713968429; c=relaxed/simple;
-	bh=zUvh5JMg5W5A98seb6x9t39N35QqYFAWXIiE9H/DkAY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=WEefeXheHOFDlbtB/yNL/0ORZoNftVRmJUBXRBVbh+WUHfc8AuJQdQX4lelgJR/8Ag/nWvhEUq+UbjskXtFmV9tq+YGjqc/y9MdHhdSCj0eAB8DXKS/ETmDx+PEFwgDoNcMu8o58xjadBnBwKSQVxJa5LdGEO09Hrei85R2njWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K6URCNb9; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713968730; c=relaxed/simple;
+	bh=AKyfTfpOL+0RT3hrKuvytltOpsrdNFX9auR+VKtPbe4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=YcecrID3xMzKaoIhEfInSdNryMbOoeDv+jhygdC+YRTUo/eN99oFcVPpTl4uh1aSgUguG+/nKqL4VTdbeZ6W5neeuZURX7jUuWqJQs1sryalR1FI1jq8VwmdjpH5cxAm+z6Uy2B2Qh+bMaLLCsLAJ3+R6i0g4lviybMNzjpc3Do=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Ykfkbatu; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K6URCNb9"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 45B7BC2BD10;
-	Wed, 24 Apr 2024 14:20:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713968429;
-	bh=zUvh5JMg5W5A98seb6x9t39N35QqYFAWXIiE9H/DkAY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=K6URCNb9XdAk5tD81G0iqRuxZRpLk0sYkghdE0fWWQVonccimhXOTLtRvN6pLM9LP
-	 3v60KZvYA3reuzfxsKnHDAwAFuUVJu92wx4YBxy5bOmLkHQTVME7U3CNR3lJdXKH3v
-	 H52H4LDqu67h6iYz1TWusmTE9ysfElB/AdWTJk5R2rnkrsviGP01gwd4zgS2tVBCOK
-	 JLPkrdzLd+Xm9Sj1Z1yfB5N7Jeb3sUVv54mkgsJK9sBOmsm2GCnr3WgoPGto63JGYi
-	 +KPYXQY+xngxPhuzlgJVzVvUASCSfSUsmDf1G3KFQDfch7LCrujcK1/0NBvweC2cNv
-	 vcKqaV+4g0OuA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 36EB0C595CE;
-	Wed, 24 Apr 2024 14:20:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Ykfkbatu"
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 43ODpbWe007918;
+	Wed, 24 Apr 2024 14:25:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=YOMMg1Ljiv/pSB3j/ObfRHGImFpRw8lpRljFGQEIA94=; b=Yk
+	fkbatunaWXrk+4tMIyyxSzimfVQ4SMjXrdSJBNF4E/aOeZHtdJwpLVToGa+USdFB
+	j8UUlJ8vRf5BPxwmMOj1gNE+lRy9g6LllJgaNuQOyYzLHqgcq5KOCdCL/plYYTwZ
+	r6SzxWDXjZCcWSulJP5O7+x5O6oUp2rk6B8Y4HzNHbvCdBDKIWF8IgBU6d88UdoB
+	sHeZX0FsJNq2elEVFPU1JtSCA01lP0hW9rOypUOnjcFj8RK7byYA4NLz1QIkunEI
+	fWi+oSTFaSHppzATTrSakOmsQeUaJrG9LsYR25hBF5TgMohKDRJhZjHSNpMhfglu
+	dIw+RTbyDHc7Voy2uzGg==
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xpv9ph38s-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 24 Apr 2024 14:25:19 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43OEPIMO020979
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 24 Apr 2024 14:25:18 GMT
+Received: from [10.253.14.221] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 24 Apr
+ 2024 07:25:12 -0700
+Message-ID: <2805ad96-6383-45b3-9b68-66578461bb5f@quicinc.com>
+Date: Wed, 24 Apr 2024 22:25:10 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 1/2] Bluetooth: qca: Fix BT enable failure for QCA6390
+To: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+        "Luiz Augusto von
+ Dentz" <luiz.dentz@gmail.com>
+CC: Wren Turkal <wt@penguintechs.org>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski@linaro.org>,
+        <luiz.von.dentz@intel.com>, <marcel@holtmann.org>,
+        <linux-bluetooth@vger.kernel.org>, <regressions@lists.linux.dev>,
+        <kernel@quicinc.com>
+References: <1713919602-5812-1-git-send-email-quic_zijuhu@quicinc.com>
+ <1713919602-5812-2-git-send-email-quic_zijuhu@quicinc.com>
+ <349b27a5-d2d3-46f1-b002-44f81e0cedef@linaro.org>
+ <e8cd122d-e342-45c2-b078-a4ca2d8dcfff@quicinc.com>
+ <dfe18768-f6da-4c60-880d-deeae3c3b04d@linaro.org>
+ <8ae32009-5f5e-49a1-88a1-e330f0614f60@quicinc.com>
+ <5e363318-c6e4-4874-8026-7940b434d583@linaro.org>
+ <2020a858-c3d9-48a7-ad59-3691c6b98fb2@penguintechs.org>
+ <CABBYNZJLCPaLTaFEfeTEn+2FpxLS8Z-W2kT1ry4jKB_W=XYNjA@mail.gmail.com>
+ <CACMJSeuWQE4t2KDCRP7n-DeHN9Ndn1bE_KCRc-X2kmM9L2i7_Q@mail.gmail.com>
+ <38736db8-eec4-4ebd-b4c4-4b404cea6e42@quicinc.com>
+ <CACMJSev8=gBCw9o-ur87fMMj9K=ZWY-ECzxZjyvERYQ8P=VS7A@mail.gmail.com>
+ <CABBYNZ+PvZb6azHoXAbO2czqK2zQnZ1ddcKRb_YX-zGSVfy+KQ@mail.gmail.com>
+ <CACMJSeue3kM-G1UvO0REEAJbhU9vOqbeEzy0Qny5udKLB97e8g@mail.gmail.com>
+Content-Language: en-US
+From: quic_zijuhu <quic_zijuhu@quicinc.com>
+In-Reply-To: <CACMJSeue3kM-G1UvO0REEAJbhU9vOqbeEzy0Qny5udKLB97e8g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: Populate hci_set_hw_info for Intel and Realtek
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <171396842922.29186.2152578622770434073.git-patchwork-notify@kernel.org>
-Date: Wed, 24 Apr 2024 14:20:29 +0000
-References: <20240422172027.v2.1.Ib96985e197f3db620a127a84aa20f3f3017aaf57@changeid>
-In-Reply-To: <20240422172027.v2.1.Ib96985e197f3db620a127a84aa20f3f3017aaf57@changeid>
-To: Archie Pusaka <apusaka@google.com>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
- johan.hedberg@gmail.com, marcel@holtmann.org,
- chromeos-bluetooth-upstreaming@chromium.org, apusaka@chromium.org,
- abhishekpandit@google.com, linux-kernel@vger.kernel.org
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 73XuiRfE1QRwz2WfIdGxuAMRYiOf_uSg
+X-Proofpoint-ORIG-GUID: 73XuiRfE1QRwz2WfIdGxuAMRYiOf_uSg
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-04-24_11,2024-04-24_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ priorityscore=1501 spamscore=0 mlxscore=0 mlxlogscore=999 clxscore=1015
+ adultscore=0 malwarescore=0 bulkscore=0 impostorscore=0 phishscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2404010003 definitions=main-2404240052
 
-Hello:
-
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Mon, 22 Apr 2024 17:20:28 +0800 you wrote:
-> From: Archie Pusaka <apusaka@chromium.org>
+On 4/24/2024 10:19 PM, Bartosz Golaszewski wrote:
+> On Wed, 24 Apr 2024 at 16:08, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>>
+>> Hi Bartosz,
+>>
+>> On Wed, Apr 24, 2024 at 10:00 AM Bartosz Golaszewski
+>> <bartosz.golaszewski@linaro.org> wrote:
+>>>
+>>> On Wed, 24 Apr 2024 at 15:53, quic_zijuhu <quic_zijuhu@quicinc.com> wrote:
+>>>>
+>>>>>>>
+>>>>>>> Please slow down here. Zijun's patch works and Bartosz's patch does not.
+>>>>>>> I don't think Zijun means any ill intent. I am replying to Bartosz's
+>>>>>>> patch right now.
+>>>>>>
+>>>>>> Ok, that is great feedback, so I might be picking up the Zijun v7 set
+>>>>>> if we don't find any major problems with it.
+>>>>>>
+>>>>>
+>>>>> Luiz,
+>>>>>
+>>>>> Please consider my alternative[1] also tested by Wren. Zijun's usage
+>>>>> of GPIO API is wrong.
+>>>>>
+>>>> why is it wrong ?
+>>>>
+>>>
+>>> I have already told you that at least three times. But whatever, let
+>>> me repeat again: gpiod_get_optional() returns NULL if the given GPIO
+>>> is not assigned to the device in question OR a pointer to a valid GPIO
+>>> descriptor. Anything else returned by it is an error and the driver
+>>> must abort probe().
+>>
+>> Ok, but there are other fixes on top of it:
+>>
+>> https://patchwork.kernel.org/project/bluetooth/patch/1713932807-19619-3-git-send-email-quic_zijuhu@quicinc.com/
+>>
+>> I guess that could go in but it would really help if you guys could
+>> work together so we don't have more competing solutions.
+>>
 > 
-> The hardware information surfaced via debugfs might be usable by the
-> userspace to set some configuration knobs. This patch sets the hw_info
-> for Intel and Realtek chipsets.
+> These threads with their 7 patch versions from Zijun within 2 days or
+> so have become very chaotic. Let me summarize: there are two
+> regressions: one caused by my commit 6845667146a2 ("Bluetooth:
+> hci_qca: Fix NULL vs IS_ERR_OR_NULL check in qca_serdev_probe") and a
+> second caused by Krzysztof's commit 272970be3dab ("Bluetooth: hci_qca:
+> Fix driver shutdown on closed serdev"). The patch I linked here is how
+> I propose to fix my regression only. These fixes don't seem to
+> conflict with one another.
 > 
-> Below are some possible output of the hardware_info debugfs file.
-> INTEL platform=55 variant=24
-> RTL lmp_subver=34898 hci_rev=10 hci_ver=11 hci_bus=1
+it is not conflict issue, from my perspective, you fix are wrong.
+do you see my patch change log?
+
+> We (Krzysztof and I) have provided feedback to Zijun but he refused to
+> address it and instead kept on resending his patches every couple
+> hours. Zijun's patch 1/2 proposed to revert my commit 6845667146a2. I
+> disagreed and proposed a way forward by fixing the regression. This
+> fix was incorrect as pointed out by Wren, so I submitted v2 which
+> works.
 > 
-> [...]
+v2 is not right from my point as i commented with your solution.
 
-Here is the summary with links:
-  - [v2] Bluetooth: Populate hci_set_hw_info for Intel and Realtek
-    https://git.kernel.org/bluetooth/bluetooth-next/c/46d8da86787b
+you don't answer my questions commented within your solution.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+what is your question i don't answer?
 
+> Bartosz
 
