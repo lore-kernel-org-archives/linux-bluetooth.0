@@ -1,56 +1,56 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ADAD15CD7C
-	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 22:09:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF8FA15FA70
+	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 22:17:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713996600; cv=none; b=J2iuFqkn2sVTOlszFAlIsUWYAS9p+D1+ERpEt3UYpDQYYLGPvb0hdZbPAD5lkp54HdhLqoGl4r3Vn+kQmdeaPei2OUhoHdI+0EPJtnYcCGSqy2OWiSNxQBq7T4NIDv975oD1/GJAxWSsjymn4rCZCAl7JLSCi2zKA+42f6Ti838=
+	t=1713997049; cv=none; b=CWzr/zeM4VI+H/g/ZcsaRzxUXQJFGzigJMymsIB3YK4P/4N2kP44AtqU3d+RGtLHyM3iWkDGdXPgNHyNVyIpFMjiJWlCLHBGmshd5KNlszSgH3DppJ464WPx5MkYTIS7xqi6REzFG/bsYOLcyrv5+xKGiTUfJ93GB9kVpXQ3FVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713996600; c=relaxed/simple;
-	bh=Z+LSPiitJ4S+OIF6sYqersJWnLa0MGFekPKWhQgZaXo=;
+	s=arc-20240116; t=1713997049; c=relaxed/simple;
+	bh=GE8/DfGkNpeccnn7ctlLW9aQh1xnvrJHQprFymjvhgA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tqwvAhN92aEqo4wxRkvO8KuEubbEASiu7GZ2k1fKS+p3tiI3oUTC9qdKihi/Pn1ulTtHgBpXiZYXMK+/v8FLKxUAKuPzgQcn+clmcelg6W3d4N+0/2rjQBWPMmW8NuLR58Oj6Y2rVFlWocCObyMrc4d+BENZU9NP307Ia0dUimQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=bpWQbUM/; arc=none smtp.client-ip=209.85.214.175
+	 In-Reply-To:Content-Type; b=AF7cDB8qZPJY0gQJMhJC078o2qRlvacMjn+/+DytdOFf3gtkTqv/JNixoAerRBgULUtrj/SjQwv5R8OginGAcUWsnkA30Pa3hnEivihRIjp1WrtCVDH22pQu2pl6R6oTAu/aN8AbptnbIsq4G7GuMcOjs/bdyqKf7bPYr0bw0as=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=ksOCj8nx; arc=none smtp.client-ip=209.85.210.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=penguintechs.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="bpWQbUM/"
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1e455b630acso2396455ad.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 15:09:57 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="ksOCj8nx"
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6f103b541aeso365724b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 15:17:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=penguintechs.org; s=google; t=1713996597; x=1714601397; darn=vger.kernel.org;
+        d=penguintechs.org; s=google; t=1713997046; x=1714601846; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=3Q+R04e89x8DmATWRxK3KA/duXsCdtrQ9p6q/LToE94=;
-        b=bpWQbUM/pkspqUt5xc7bD93CYOOhuVgc+5I93P/fCmEZHkeNCIwq9iZ8TD5D70pj0j
-         Dq1fH3O2OyAjAPNZcJsLXmzMGHbZr/gwHUep/0NaBMIhdnw8gMkwDEj+BHBKqHU/XrXo
-         hLZmDyQpKvDZjxdSpq4z6f342qHOJhhZ3x17E=
+        bh=+87ElqgV6reNQU5hAVnWYAATmj8Ga4df6MNiPH7XWCI=;
+        b=ksOCj8nxgMh9WDFWfBztYD0TKHOYXAL4Ify3uPzqCyEafbLVte2mV9AaMIg6du+v76
+         FnTno9iMtu+jqqE4fU/DGh/NzPjWRfsQV39PPMnLIYzbZ9dDBB8thlCzosCw+IJnbL0N
+         eNW5HtQc0Yj5hX1kLadNTBNN0vTSOlgref3EA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713996597; x=1714601397;
+        d=1e100.net; s=20230601; t=1713997046; x=1714601846;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3Q+R04e89x8DmATWRxK3KA/duXsCdtrQ9p6q/LToE94=;
-        b=M5PvtXgL3EWPBlkXuYiVZn8NQE3tkKV8vs88Hzj2aEx/wk8WvVoZudWfDfejwwugme
-         Haq9xgIcJU9Rp8nQYY+n0KZMmdegqomdygwgDCxez9bvp2D7KiRnnEfmtufUKQPKYnVZ
-         4NlueGd2hXwvYv3STFgt3Z431EJx8cYY6H4uxYxoQGRRQ45aQVRhleW5DAf/1a5DRD/u
-         dffyglTZJ9AfTkQjYgtG8mRfjdF841ZsSnGpt0ENP3V8JxSqkzbv2XBUqcKMrnzs1QY6
-         DlvBu6ZC6XgI6gew4DyEEUCRz26a1IatArZVeGzlDxSko4MjM0UHi2jlrij/bhvUV6zm
-         CiEg==
-X-Forwarded-Encrypted: i=1; AJvYcCUpOVKoWhODqeeTWDOE2jizQR6HNc9qffdDMNO8bAYdoZbZ9mv4hXHjCbXSglFkIPHUhV4/yVm91AeTA2zNCdZmNz1ZSMx/mhrv5PQIScYN
-X-Gm-Message-State: AOJu0YzVqUu8sv98k3PnU65gI+dcUImNbfLH9Gw0zqEYgL2JPWaf2TQL
-	WM/03o8q5BkZAQuFCjWqQ/SU6lRKnCjlZrYlUClg223cJospwLXEQ0NGAweNJw==
-X-Google-Smtp-Source: AGHT+IER+N7HlfUCJTNSkoZIJesGbmJ8vnU3SkoCF0xpzSIoJdmy+q5LOQkj17tXPQJf91AvR9lVQQ==
-X-Received: by 2002:a17:90b:1e0b:b0:2ac:5ac2:8c28 with SMTP id pg11-20020a17090b1e0b00b002ac5ac28c28mr3623775pjb.31.1713996597338;
-        Wed, 24 Apr 2024 15:09:57 -0700 (PDT)
+        bh=+87ElqgV6reNQU5hAVnWYAATmj8Ga4df6MNiPH7XWCI=;
+        b=TF1wN5uDK87jbYqWocbE2v6f3SUZUi18jOPV2hJ3y/41sUyDZ0Ey/b6wpZSkv+fEJH
+         IKqn1DyZNBsY4gtNrnRp0Qb34M6xrpejqUpqvyQ3h8v14pIsPdHo2E7tur+doiRBHsfJ
+         GCEIN95gX7fhL1O29cyGTq2N+Nolru/M5kAIPbTY/YCcuQ1F+7ypx/UJLq4OzfdmT/Ss
+         a1lweNfO5myWReQ6/p2+zWKn9/4/+8pCv2KyX0biawnS5Bfs9yzK1IipOahlNng4DGmO
+         952UWDwxaF4mAOZ4sdBIYsxOTKDO79AI5n6Neu0l7F2mQuLmldQLEXhi+D9ZIP5Lfkwl
+         HHGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUWvJon2OoJ3ZpOXX4JteaNoezsS46+VnIEVwXYFep1deeCKLlhVjAIAJx4PkeoW7a0ZufvewfBSS00A31bXUMg/+N0J31Y6IYSwQd2C8wl
+X-Gm-Message-State: AOJu0YwjEjGOnHsocs4XKTxZU8L/c7qPsRQdm1Ijd1TrZwlGHSmz7QIS
+	Z1ByRGwNgTSey2R88Jek0igxFXJt0ylL5rhiVwzhLUXz/2RofbbbCH2aal9axQ==
+X-Google-Smtp-Source: AGHT+IF37PCqcFYIP47bLz+LqfAcHhY/dxAFdY0Det+52UZ3kWJyXu++W2djITgeCIx3Fs7wN+D7MA==
+X-Received: by 2002:a05:6a21:1798:b0:1a9:c2da:f2ab with SMTP id nx24-20020a056a21179800b001a9c2daf2abmr3817988pzb.0.1713997046078;
+        Wed, 24 Apr 2024 15:17:26 -0700 (PDT)
 Received: from ?IPV6:2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08? ([2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08])
-        by smtp.gmail.com with ESMTPSA id ev16-20020a17090aead000b002ae2579ffeesm5418632pjb.19.2024.04.24.15.09.55
+        by smtp.gmail.com with ESMTPSA id kv13-20020a17090328cd00b001e0a28f61d0sm12401265plb.70.2024.04.24.15.17.24
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Apr 2024 15:09:56 -0700 (PDT)
-Message-ID: <aca9dc3c-a916-48d1-8a00-459d4e7d584a@penguintechs.org>
-Date: Wed, 24 Apr 2024 15:09:54 -0700
+        Wed, 24 Apr 2024 15:17:25 -0700 (PDT)
+Message-ID: <aea85118-060a-4451-a1f1-d8e634f1aab7@penguintechs.org>
+Date: Wed, 24 Apr 2024 15:17:23 -0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -61,10 +61,10 @@ User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] Bluetooth: qca: set power_ctrl_enabled on NULL returned
  by gpiod_get_optional()
 Content-Language: en-US
-To: quic_zijuhu <quic_zijuhu@quicinc.com>, Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- Marcel Holtmann <marcel@holtmann.org>,
+To: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Cc: quic_zijuhu <quic_zijuhu@quicinc.com>, Bartosz Golaszewski
+ <brgl@bgdev.pl>, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
  Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
  Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 References: <20240422130036.31856-1-brgl@bgdev.pl>
@@ -79,20 +79,20 @@ References: <20240422130036.31856-1-brgl@bgdev.pl>
  <CAMRc=MeDQFHX9r-sHNxqkfpi=LkHoRSL7i6dWokB-J+J03rBEg@mail.gmail.com>
  <93e15ecf-252f-4789-a23b-a28280f6aa84@quicinc.com>
  <e64b89b3-a8f5-44e7-ae7f-fc4298841f1c@penguintechs.org>
- <dbc3495e-5f12-4928-afa3-fb8886d276c2@quicinc.com>
+ <CACMJSet1wjEive0-Z=0_eiY7umBoSF_VX3QvVgiwqxhTSDZg6g@mail.gmail.com>
 From: Wren Turkal <wt@penguintechs.org>
-In-Reply-To: <dbc3495e-5f12-4928-afa3-fb8886d276c2@quicinc.com>
+In-Reply-To: <CACMJSet1wjEive0-Z=0_eiY7umBoSF_VX3QvVgiwqxhTSDZg6g@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 4/24/24 6:30 AM, quic_zijuhu wrote:
-> On 4/24/2024 9:26 PM, Wren Turkal wrote:
+On 4/24/24 6:53 AM, Bartosz Golaszewski wrote:
+> On Wed, 24 Apr 2024 at 15:26, Wren Turkal <wt@penguintechs.org> wrote:
+>>
 >> On 4/24/24 6:12 AM, quic_zijuhu wrote:
 >>> On 4/24/2024 8:27 PM, Bartosz Golaszewski wrote:
 >>>> On Wed, Apr 24, 2024 at 2:24 PM Wren Turkal <wt@penguintechs.org> wrote:
 >>>>>>>>
->>>>>>>> That's OK, we have the first part right. Let's now see if we can
->>>>>>>> reuse
+>>>>>>>> That's OK, we have the first part right. Let's now see if we can reuse
 >>>>>>>> patch 2/2 from Zijun.
 >>>>>>>
 >>>>>>> I'm compiling it right now. Be back soon.
@@ -130,31 +130,52 @@ On 4/24/24 6:30 AM, quic_zijuhu wrote:
 >> --- a/drivers/bluetooth/hci_qca.c
 >> +++ b/drivers/bluetooth/hci_qca.c
 >> @@ -2456,6 +2456,10 @@ static void qca_serdev_shutdown(struct device *dev)
->>                      !test_bit(HCI_RUNNING, &hdev->flags))
->>                          return;
+>>                       !test_bit(HCI_RUNNING, &hdev->flags))
+>>                           return;
 >>
->> +               if (test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP,
+>> +               if (test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP,
 >> &hdev->quirks) ||
->> +                   hci_dev_test_flag(hdev, HCI_SETUP))
->> +                       return;
+>> +                   hci_dev_test_flag(hdev, HCI_SETUP))
+>> +                       return;
 >> +
->>                  serdev_device_write_flush(serdev);
->>                  ret = serdev_device_write_buf(serdev, ibs_wake_cmd,
->>                                                sizeof(ibs_wake_cmd));
+>>                   serdev_device_write_flush(serdev);
+>>                   ret = serdev_device_write_buf(serdev, ibs_wake_cmd,
+>>                                                 sizeof(ibs_wake_cmd));
 >>
 >>> he maybe be a DTS expert but not BT from his present fix history for
 >>> bluetooth system.
 >>
 >>
-> Hi Wren,
-> i think i don't need to care about why wrong condition cause wrong results.
+> 
+> Did you test it? Does it work? If so, please consider sending it
+> upstream for review.
+> 
+> You can keep Zijun's authorship but add your own SoB tag at the end
+> and mention what you did. Something like this:
+> 
+> [Wren: kept Krzysztof's fix]
+> Signed-off-by: Wren...
+> 
+> Bartosz
 
-I can't speak the intellectual purity of this patch. However, I can say 
-that the patch works for my hardware. I am able to disable/enable on 
-cold boot and on warm boot.
+@Bartosz, I have tested this, and it works functionally for my setup. I 
+cannot detect a difference between this and Zijun's logic when I compile 
+a kernel with this patch.
 
-@Zijun, Functionally, it seems incorporate your new logic without 
-reverting Krzysztof's. Are you saying this is incorrect logic?
+@Zijun, I think you have objections to this patch. I would like to make 
+sure I hear your concern. Can you please take through it like I'm a 5 
+year old who barely knows C? In retrospect, I guess that I would be a 
+pretty precocious 5 year old. LOL.
+
+In all seriousness, @Zijun, I really appreciate the work you did on 
+this. I would like to understand why you assert that removing the logic 
+of Krzysztof is appropriate. Again, I am not a kernel developer, so this 
+stuff is really outside my wheelhouse. Having said that, by my reading, 
+which may very well be worng, it seems like you are just adding another 
+case that is orthogonal to K's conditions. I'd like to truly understand 
+you position to know if the patch I am suggesting is somehow harmful. 
+This is an earnest question. I really want to respect your expertise 
+here, and I really want you to know how much I appreciate your work.
 
 wt
 -- 
