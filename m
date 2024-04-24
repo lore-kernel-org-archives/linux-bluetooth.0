@@ -1,118 +1,144 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC1B3158A1D
-	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 09:22:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77B63158D88
+	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 09:32:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713950548; cv=none; b=IR7j0dDahHzE5Xdo+0pEMleJxYmnhJ+yZLLKAX29FD3kqPA6vAXtisPmjs9LpgKw5IwxSD78rZMm0rVqe9DI3HrC+uLyY7LsX/BDdCeSolf2a5MmrTnHIPYUkbKej7SiRoCd15v4HRtRSMJ1frpyxM5MOqmNoGxxjClBAhepqYg=
+	t=1713951156; cv=none; b=jALqevvDkQVTChhS2WechhLNYUTlWFBxpVdNS/IM601zLmxexiWwMnlpsxCoSO4+CuAdX8WcXvBz2BIBJRztAEwXazYgexZR8urUV5MN6RtXk+ncB+Mjx4XiVEaGRTxVG4kBlHr9+BVA/YgbbZYzR3hIU6OY9dz85uEHbIUV5X8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713950548; c=relaxed/simple;
-	bh=StDUdojlwo1qWzZBipNVZoiR4DT4qoXbymf91IDx0K0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=pzZvk6/dvjbLl4hQ4diSiy/AgM2LdHOOh4iLZj8KMs/J1OL4d882NLlZzhmLCFgnm8ZKiQbPEMnYfVrhL6fS9Gxazj3/ZcZvAHjyECLz7rKtIH59MLOzs3HVo9SjVraXJPCuPoZ2VT3921BJAbjIU/+aF6mlRuzozp1VMLNl320=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=WjvzfY7M; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1713951156; c=relaxed/simple;
+	bh=psBW16JWPdsleZ7LTc+QrvMpsjoaeZLqxWfAgG3gblU=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=EmOElKvfW9qSTbHWly6UL1X4QpmCIbrlN0kVRgQgY7I032gSuyJ6p5jhZXiKzL64jVdX0a7/+kCQLnSVLfUBSFysc+aICkmKFRnSx//loZV16PeKyzvofhtB75PooEiQR9M3I8mGXP080pyPrTMxGeezP+5l4Ew7nfgl0FG7clA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KWCa9oCv; arc=none smtp.client-ip=209.85.128.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="WjvzfY7M"
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 43O6gVdX003342;
-	Wed, 24 Apr 2024 09:22:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=5m1FHQepmOLUWPDnWSjuGQElwwZ3TIwLVPZ82IzZtGA=; b=Wj
-	vzfY7Mfv71NJy+PLPwgffFPhk2+aueM7Zobrpe6VF2GbiNI8g0WccLRLojQrabLA
-	3rPko4F3kvyVJB46LBlnYHLLO6zmcRlPoHsnPpFDT/UD94FbEOoIm5J7MZDIcQcU
-	M1P+PP/z48Fsj+mhrjZsBInHDPE/JQxZZ5iwsPPlvzjsKylT0r9NCp3ZgmVS9PFr
-	xpWZwX8JJ6G2aLG5SOtopnMV6gBoGKI+47lHUZ7zNJmYWAfsGhCmqNKJogtHnkx+
-	lJ5CDsidXTUKqV1MyZlw3vjO/aUNoSznxTx1BqZ+WfAHdfAL1jEMrQp/yUMoVcgm
-	HdtIEt1yNfPIgrCKsRdg==
-Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xpv9e0dxr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 24 Apr 2024 09:22:18 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43O9MICA026123
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 24 Apr 2024 09:22:18 GMT
-Received: from [10.253.14.221] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 24 Apr
- 2024 02:22:12 -0700
-Message-ID: <0cba3838-917b-48af-ba8b-2ef60714943a@quicinc.com>
-Date: Wed, 24 Apr 2024 17:22:10 +0800
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KWCa9oCv"
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-61804067da0so65561197b3.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 02:32:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713951154; x=1714555954; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=fdnCB0aW6fdlcvMchecxxhWpHNIBGNUoZyZbniuM+nQ=;
+        b=KWCa9oCvfh/CdMTnwmM/k9jZNJVD+3SB4/2XYdvzCoaNBcj1GfshQK2G9q10ZGj9Pl
+         F9tLWCM+bsYuvC3aqyxw/eZ6N1Ywh+UNzzLNjh5YoeccOQ5WzK8r+Ly/TXosefKsP/Kz
+         nffkIfHzY3JmB3aaHCEuQ/xH+2GxfGQNaCd95af6Oox7YCioudhdUva4qCXARonT2sJr
+         SRJulYN8ZzFHphknHKlto1Yv5wbsQ6Y9devlH4dZNpvfQGxBoT8/Ej/xDMLkAJLufDWF
+         i5u1fr1JFWVbcGb79jFINlRqqpwN9n4Cr2yRLDq3WzNEl9h9ZFqbfL5bZvGkbVBFbR6h
+         IYyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713951154; x=1714555954;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fdnCB0aW6fdlcvMchecxxhWpHNIBGNUoZyZbniuM+nQ=;
+        b=PHclx5x7GkPULoH9jUQsZjOXqPeKIXARP4DhEx3Gu3YBN/+qQCJCQVRkDkL/kQ27zx
+         FvUiHu8HLZ2f9+0IjmI+rosvxsZeApnRy3UDyTImkLWqm57UkQmnwa/VAfsEziih8y+Z
+         k4Ru9hzwTd3db1ROm/qMiMcweVVN90RV10WsLG9ER5ndCnJKrKShLOlJFTOWEMIVFxsl
+         FWutrPAvnGCoKSac8QMz0w/qhf3QX1se4iazBaamjI2wpoOuUDPeNvmQjmu7mLbLB0Li
+         TCon1WlEWKPB4tzU5fBuOfioflUhiELoVpqpIgzHapDEAHqWr/RgAoCxYRDUf2WlmrKP
+         8QCg==
+X-Gm-Message-State: AOJu0Yzog95ZIsYeLy/2k5rc+gy/kpIGIpwpNK8tJtzsYQ9ZxLri/bmS
+	AtGUfYEmqn4JojSsPjIWPJlukYvOGybBj1G36F7uA8WM9CM8F0CXUdUklw==
+X-Google-Smtp-Source: AGHT+IHH1YojEgKqFwR7jwYY0c3sNtr1Ho0efmPXPF44xYnZSLODBpj3v00SgtM3yzUeVMG8CoDraw==
+X-Received: by 2002:a05:690c:6202:b0:61a:da7e:1f66 with SMTP id hl2-20020a05690c620200b0061ada7e1f66mr2425489ywb.2.1713951154105;
+        Wed, 24 Apr 2024 02:32:34 -0700 (PDT)
+Received: from [172.17.0.2] ([172.183.98.99])
+        by smtp.gmail.com with ESMTPSA id t20-20020a81b514000000b0061ad6e89bdesm2892772ywh.108.2024.04.24.02.32.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Apr 2024 02:32:33 -0700 (PDT)
+Message-ID: <6628d1b1.810a0220.5bec3.e38a@mx.google.com>
+Date: Wed, 24 Apr 2024 02:32:33 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7771317159873514956=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] Bluetooth: qca: Correct property enable-gpios handling
- logic for WCN6750 and WCN6855
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        <luiz.dentz@gmail.com>, <luiz.von.dentz@intel.com>,
-        <marcel@holtmann.org>
-CC: <linux-bluetooth@vger.kernel.org>, <bartosz.golaszewski@linaro.org>,
-        <wt@penguintechs.org>, <kernel@quicinc.com>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, quic_zijuhu@quicinc.com
+Subject: RE: [v1] Bluetooth: qca: Correct property enable-gpios handling logic for WCN6750 and WCN6855
+In-Reply-To: <1713947712-4307-1-git-send-email-quic_zijuhu@quicinc.com>
 References: <1713947712-4307-1-git-send-email-quic_zijuhu@quicinc.com>
- <af004bcd-0649-4a82-8f09-36d6addd0e1e@linaro.org>
-Content-Language: en-US
-From: quic_zijuhu <quic_zijuhu@quicinc.com>
-In-Reply-To: <af004bcd-0649-4a82-8f09-36d6addd0e1e@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============7771317159873514956==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: RTsKe1EfRN14klZZor3YlYFRyhMwZbq3
-X-Proofpoint-ORIG-GUID: RTsKe1EfRN14klZZor3YlYFRyhMwZbq3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-04-24_06,2024-04-23_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
- priorityscore=1501 malwarescore=0 mlxscore=0 phishscore=0 mlxlogscore=999
- clxscore=1015 spamscore=0 adultscore=0 lowpriorityscore=0 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2404010003
- definitions=main-2404240040
 
-On 4/24/2024 4:44 PM, Krzysztof Kozlowski wrote:
-> On 24/04/2024 10:35, Zijun Hu wrote:
->> Commit 56d074d26c58 ("Bluetooth: hci_qca: don't use IS_ERR_OR_NULL()
->> with gpiod_get_optional()") has wrong logic for below case:
->>
->> property enable-gpios is not configured for WCN6750 and WCN6855
-> 
-> As I said before, bindings say this property is required. I already
-> asked you to provide rationale describing hardware and update the
-> bindings if they bindings are not correct.
-> 
-1)
-you ever given below reply at below link
-https://lore.kernel.org/linux-bluetooth/52394d97-04c3-4f77-aaae-f1e152cd5632@linaro.org/
+This is automated email and please do not reply to this email!
 
-"The pin is required on 6750, 6855 and maybe others. You cannot not have
-the GPIO"
+Dear submitter,
 
-2) for property enable-gpios, they are required for WCN6750 and WCN6855
-in my opinion,  i am a member of BT team.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=847360
 
-3) only care about the case property enable-gpios is not configured,
-the original BT driver design logic indeed matches with binging spec's
-requirements before bartosz's wrong change
+---Test result---
 
-4) please ask dts owner for help if you suspect current bindings spec
-has something wrong. it is not my responsibility for providing such
-info, that maybe involve CCI.
+Test Summary:
+CheckPatch                    PASS      0.58 seconds
+GitLint                       FAIL      0.49 seconds
+SubjectPrefix                 PASS      0.09 seconds
+BuildKernel                   PASS      30.11 seconds
+CheckAllWarning               PASS      32.36 seconds
+CheckSparse                   PASS      38.10 seconds
+CheckSmatch                   FAIL      36.30 seconds
+BuildKernel32                 PASS      28.81 seconds
+TestRunnerSetup               PASS      527.55 seconds
+TestRunner_l2cap-tester       PASS      18.31 seconds
+TestRunner_iso-tester         PASS      29.06 seconds
+TestRunner_bnep-tester        PASS      4.72 seconds
+TestRunner_mgmt-tester        PASS      113.75 seconds
+TestRunner_rfcomm-tester      PASS      7.22 seconds
+TestRunner_sco-tester         PASS      15.00 seconds
+TestRunner_ioctl-tester       PASS      7.72 seconds
+TestRunner_mesh-tester        PASS      5.74 seconds
+TestRunner_smp-tester         PASS      6.72 seconds
+TestRunner_userchan-tester    PASS      4.87 seconds
+IncrementalBuild              PASS      28.20 seconds
 
-5) gentle reminder, please realize that there are many lunched products
-already when you try to change some important logic, i don't suggest
-change important logic or setting if there are no actual issue reported.
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v1] Bluetooth: qca: Correct property enable-gpios handling logic for WCN6750 and WCN6855
 
-> Best regards,
-> Krzysztof
-> 
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (89>80): "[v1] Bluetooth: qca: Correct property enable-gpios handling logic for WCN6750 and WCN6855"
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
 
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bpa10x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bpa10x.o'
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7771317159873514956==--
