@@ -1,156 +1,78 @@
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9FCA208B0;
-	Wed, 24 Apr 2024 19:05:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7514C20DC4
+	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 19:10:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713985515; cv=none; b=YdVfvj2vwPWMyBTQUeHS5hcaPi/oGjjHo4rQxCZJ2WOgr1Oh7vab6cELJkqw/URqTHqoQ9YzBf1z1/qRKWkuDpVM6pbrkYRRbTClmkNgEXLWQ2rBAFz+IEqyqbXl1cOFrk3DW/4cF2DCLrNfG7So4p/fy+k4w4dpl+4xSrISvNk=
+	t=1713985830; cv=none; b=oTBHs8Dm7KgreTriMmAzUF1IaoupY3tRWPVYoENsIflLrN0AWAIHe13a1pqfSgGJa2sL9mmEISryYYM5rqsaLtxgQ+CBf2KLinQ2a68U/eRWrUrt669fRgNHTvD32gLIq3ZPYjvVE/kN0TQ9wN6JGev8BjV/4oYjkwTZWye4vz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713985515; c=relaxed/simple;
-	bh=rXMYAkcTOmCIaTakogyziSvnbvX0R6wAK4SyomHQRmk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tvqcfzzQO5KbfchrLxkqWMbnYtU6aZBoAdCeBv2UU5BMkTJ+NCsZ3qLjvFJWZSi+x1gcYtnR+gsvbC7PPQ4VbdtcAU/7fSEVANsO2T4jYKA+Pbpl1iAtpIbk0Z8kAcvGS6lZL3q1J937byyRKqid9PjHaReeLWyqX9d3Z8xxRYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SZBhBEPm; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1713985830; c=relaxed/simple;
+	bh=7yApn7scpvqMZjVUqef4mf/JOvKbrZ2ZB73TNWyACU0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=a1n405AtjiITJwV14tW4D5jE4cfN37c37SHfmFgY6yslinNDHHDT0UeIOgrLzP6oJYr/bIyVpn/S195zt+2jXpmAozIWCtR673V/ZRJgXq3//gF6KLUvs4T1ZU423PewOhWgZDBCCmuWM1tupudx2KIF7ojgmVFojO8sDAaho+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SpHP4E4c; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SZBhBEPm"
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-51967f75763so161266e87.2;
-        Wed, 24 Apr 2024 12:05:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713985512; x=1714590312; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fY699gCEhynPaWUFEKfZ9aS/PGgH5FiL9RmKn4mJCZw=;
-        b=SZBhBEPm3FYD33nrX3NtRLm7WTc5FPt4EZq+0iAtDV3eC7dIVvej5pLtwxYJadx/JC
-         h4pB/3t+xPhcCgac+sGiUMAn04M8AqU0drJJCJ8U1gKG5RgBosdNobT2BKH9yeXyQ3QS
-         SoPbII7l9tWfQzXHAPsuqtTB6PpFKKEWS/aHRTmrNfFFT5XIdxd+H+sFhhxqIQjPZLN2
-         y7ibjL26bORMASzD6ut2fXH5FkzIgw/JYAj5zDa0GmG56k7na5UCR/YsnL5g93dQZaTA
-         XDj4sMHybgwYy6jk6SqneST5wNAYRm8hiq4bAwo9EwNRJC1ASFPl8kdS2fCnNOdDyt3V
-         tdmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713985512; x=1714590312;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fY699gCEhynPaWUFEKfZ9aS/PGgH5FiL9RmKn4mJCZw=;
-        b=QfawYBEQZDwO+C8ywVolMC8mSpVhQ+/OUkGL7H10RKTMBGvWnT+CsFjFww8LiIYEjB
-         EaEVe1S2qjqfirnaTPyM0f1en+fsZC9yTpEOWUvo8Hxs959hmzEsOLxXKvNtFtNY5ZIS
-         9wblKzv9GEr39eAXo0Psb0X4D89uC2sjM8qsmpKfYJvCYtOJ+aKzPfmgRHqTMEsydyZR
-         KWjbAmK/r9CyEIzOZbFP36LHp7oRpKyhnysUj5PzwMWFstSRg5Befwu7EkjxuaNUDiQq
-         OmYGfyuVis5Jid9jUNH5oCkeeaVuHZ31FWmpsfCPQhPUDx94xtpAfzCykIY7Tucu2hnl
-         qCGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWg9W5lKvCNP5TkXLkMEL3d1Q2J6j/Y3Tk1C2Uo51cSU4DIsttSLE++z9sQ7YNfZu7CKX6F8MdcIZLOY8Mpyj17JiBncMCGUQ2jpbds
-X-Gm-Message-State: AOJu0Yzvh5AncYnQb/hPqhwbDWQHoFm8z53Yz2tSPNGSKrdPB9R1VX2O
-	+Z39urLhPpSAoPOhnwZqG/7VrniuctTXLdgxsWea7UKTHtA7HeuLwYkhsOiqKudgeNR3UWsTWgU
-	dJnt6wHoSDk5e7q0ptGAkq1N/m8ZcxuI9
-X-Google-Smtp-Source: AGHT+IH54uBm6xB4qd4mIQScBnYR04boUJPUc7CxoR5q704mKXqSD7x1Z5MAIoECKMz4vvzJaXQ7VEVG4R0X2p1MMus=
-X-Received: by 2002:a2e:a305:0:b0:2d8:5b46:788c with SMTP id
- l5-20020a2ea305000000b002d85b46788cmr2005902lje.17.1713985511503; Wed, 24 Apr
- 2024 12:05:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SpHP4E4c"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 20B22C2BD10;
+	Wed, 24 Apr 2024 19:10:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713985830;
+	bh=7yApn7scpvqMZjVUqef4mf/JOvKbrZ2ZB73TNWyACU0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=SpHP4E4cUIgq83Pl9x8Oa1Fqx1AfruV1XUVSQPsuZvhzdrwiff+kVZsUp1uXmJw+p
+	 3TwJmQX+vWX6ZNgfqt8CJrB9VQZaDL423IatuJFm7c7j8OZJVE/bQOGxt7rNm7koQ/
+	 EBTsJ7RX0yUkEqVRZsNJlYRm7eMa2fqoVxIV5teKefaBAQ5f/rEnk4PvJpQ0pvHcgK
+	 +G1+JmT0CnmJpsOFPZ8a1hTEotQjJBinVy4YvtIDwga9os9qkNBVIginummAVYLKS5
+	 yPndJMYwcE4HJ9K/FYOaclUi6LR3Vtx5dJeOjnAqXE1xjm23JzkdHtbxJbiRgGw0/0
+	 zWGPkq82kAnFA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0E531C43614;
+	Wed, 24 Apr 2024 19:10:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240422152500.1.I8939e49084a6fef78496eb73edafdf3c2c4afbf4@changeid>
-In-Reply-To: <20240422152500.1.I8939e49084a6fef78496eb73edafdf3c2c4afbf4@changeid>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 24 Apr 2024 15:04:58 -0400
-Message-ID: <CABBYNZLCjrJUiVzNf53XYM-ZHWL6TZD4yFNtNGOuYi=6s5Q+OA@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: btusb: Add debugfs to force toggling remote wakeup
-To: Archie Pusaka <apusaka@google.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
-	CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>, 
-	Archie Pusaka <apusaka@chromium.org>, Abhishek Pandit-Subedi <abhishekpandit@google.com>, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v1 1/3] gdbus: Add testing flags
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <171398583005.8080.17570797656586220655.git-patchwork-notify@kernel.org>
+Date: Wed, 24 Apr 2024 19:10:30 +0000
+References: <20240423224603.2124790-1-luiz.dentz@gmail.com>
+In-Reply-To: <20240423224603.2124790-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+Hello:
 
-On Mon, Apr 22, 2024 at 3:25=E2=80=AFAM Archie Pusaka <apusaka@google.com> =
-wrote:
->
-> From: Archie Pusaka <apusaka@chromium.org>
->
-> Sometimes we want the controller to not wake the host up, e.g. to
-> save the battery. Add some debugfs knobs to force the wake by BT
-> behavior.
->
-> Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@google.com>
->
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Tue, 23 Apr 2024 18:46:01 -0400 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This adds testing flags which are similar to experimental but are only
+> available for testing.
 > ---
->
->  drivers/bluetooth/btusb.c | 19 +++++++++++++++++++
->  1 file changed, 19 insertions(+)
->
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 8bede0a335668..846b15fc3c04c 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -873,6 +873,9 @@ struct btusb_data {
->         unsigned cmd_timeout_cnt;
->
->         struct qca_dump_info qca_dump;
-> +
-> +       bool force_enable_remote_wake;
-> +       bool force_disable_remote_wake;
->  };
->
->  static void btusb_reset(struct hci_dev *hdev)
-> @@ -4596,6 +4599,10 @@ static int btusb_probe(struct usb_interface *intf,
->
->         debugfs_create_file("force_poll_sync", 0644, hdev->debugfs, data,
->                             &force_poll_sync_fops);
-> +       debugfs_create_bool("force_enable_remote_wake", 0644, hdev->debug=
-fs,
-> +                           &data->force_enable_remote_wake);
-> +       debugfs_create_bool("force_disable_remote_wake", 0644, hdev->debu=
-gfs,
-> +                           &data->force_disable_remote_wake);
->
->         return 0;
->
-> @@ -4702,6 +4709,18 @@ static int btusb_suspend(struct usb_interface *int=
-f, pm_message_t message)
->                 }
->         }
->
-> +       if (!PMSG_IS_AUTO(message)) {
-> +               if (data->force_enable_remote_wake) {
-> +                       data->udev->do_remote_wakeup =3D 1;
-> +                       if (test_bit(BTUSB_WAKEUP_AUTOSUSPEND, &data->fla=
-gs))
-> +                               data->udev->reset_resume =3D 0;
-> +               } else if (data->force_disable_remote_wake) {
-> +                       data->udev->do_remote_wakeup =3D 0;
-> +                       if (test_bit(BTUSB_WAKEUP_AUTOSUSPEND, &data->fla=
-gs))
-> +                               data->udev->reset_resume =3D 1;
-> +               }
-> +       }
-> +
->         return 0;
->  }
->
-> --
-> 2.44.0.769.g3c40516874-goog
+>  gdbus/gdbus.h  | 23 +++++++++++++++++++++++
+>  gdbus/object.c | 36 ++++++++++++++++++++++++++++++++++++
+>  2 files changed, 59 insertions(+)
 
-There is a D-Bus interface available to overwrite the wakeup setting:
+Here is the summary with links:
+  - [BlueZ,v1,1/3] gdbus: Add testing flags
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d8f3a3fa497f
+  - [BlueZ,v1,2/3] main.conf: Add support for testing interfaces
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e7578f9ddd07
+  - [BlueZ,v1,3/3] ccp: Mark plugin for testing
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=02ade13c439f
 
-https://github.com/bluez/bluez/blob/master/doc/org.bluez.Device.rst#boolean=
--wakeallowed-readwrite
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Or do you want a master switch for it? On the other hand aren't we
-getting into the rfkill area if you really want to switch off radio
-activity while suspended? That seems like a better idea then just
-disable remote wakeup.
 
---=20
-Luiz Augusto von Dentz
