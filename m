@@ -1,59 +1,59 @@
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 162B2158DC0
-	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 09:48:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ACC11E4A9
+	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 09:50:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713952088; cv=none; b=Od/41p8BO7SftowwbtJI5LX+PQRdGH918gZ0IXYbuWEtGpZ/CY3mJA3m3v50nRI0pqZkUiIgV0Lv3crZnJ1euc/0hZ0EYkxSMiI7/y4V5VcitJn7bMnoRub2T8WV2V9CiYcgiHCcu6k5bVxmPL/y/VgUYwAr7PmvlIPfRvEwv0o=
+	t=1713952221; cv=none; b=r3m/1fdM6z0ouN4nc+vsD+WEOvy0umpGDDuC+sQP1EBJ+qGt5jlXE4cnHJtxHjPPalCp1fOIIrF0lJN55QS61pS1/eWj2PaqjZ4pOBgWiys7/4kfZ8x40/dSJEQa609n4rBZiYPenid9a5vuRN4GTbFJ5fb05B9ZWVquM9AcZuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713952088; c=relaxed/simple;
-	bh=xFZVwNSUbyYVxOCP0imNdccoHJMfl4t38ZoiVS7hHUI=;
+	s=arc-20240116; t=1713952221; c=relaxed/simple;
+	bh=OE4+MtgDFV/x9TPVmJld+nuyU1JQaj6r+uaSviQCUGw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SX8fZaayR00i0U6mpEW9HhooIOI2AbY6arPXmNdPSXcYXEM4fsezBX9iSwDEuHKInujO4i2P/t4eCMnWE3wsiMzLvZd7bhmKg/Gja3ua7YKCyta3RzTcJkWqKKR3HMdjdyetgEsFvGMlFszhMw0OSTJc3UYNtrW4FOpqUmTTznI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=D3kUaUPS; arc=none smtp.client-ip=209.85.218.43
+	 In-Reply-To:Content-Type; b=aM8+JYkZD/2XOXD/Amx/XUXU6WX5gGHDKOboGhJGvJvkhaoKlSSUKztLmGr/NPrXcIwsC6UMaR8EW1ToUkdFb/zN0pYxdAG2322HzPBfn+kOamtUxNFK0OeNehJI/TRe60uXqVuf4HAayN2qXq+7hnDcQ3gZu5qs2zexFdr9RMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=B8PuP6rt; arc=none smtp.client-ip=209.85.167.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="D3kUaUPS"
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a55b78510bbso360154366b.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 02:48:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B8PuP6rt"
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-518a56cdc03so8177871e87.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 02:50:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1713952085; x=1714556885; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1713952218; x=1714557018; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=dBMhN6tSTtjNRSH1RVubQtWgZkTS86F6MB7x5+O8QBM=;
-        b=D3kUaUPS1x7KZ/rFWMdeIQ6g0jGhi5rqNkMBSQ1XBM9sD8tjOL+td8KkX7Qrm1ekrc
-         15Up5/g94FtMLqL6E6O0tnbewo8739hUMLLPB+NZOn2dwVaAsd5pdocz6qCH0yXxYRXy
-         BFgOflaQe5Wzv3bdGN/hrgRFIWrzB3gTiHQoNQKoG8u/IS5cHCfjxE0k98qJ6JQFgFqA
-         RNCq4BlIL6fnUEK50gnSZ/cNK2CgSXVLTEfpdSP7rP3V3fJSi5LmhMreuKPJLIFYMQAd
-         m5AEjP3UNQDU+7ZRXDfiywfjLO3UxFy1uGjdU6s26BnCeHTRO5igQ7k5dxIOHdDUf++J
-         qFPg==
+        bh=qkkNo0T4k/vPc6RiPBQsA3Jo1HLwOL4Jh/4Wlzwp3b4=;
+        b=B8PuP6rtEUdHGvjiV3ULkGHIHSUTQWBkcVXUz9ajtzbjTvErMzmeEMrjenGRnDtX4F
+         HwbCRCQDe2ZL6SuWpj12hzfmz7iBaAT+q/ETjo9ju4w2feGTJHvH0WG/vdVWHhKZtZ9V
+         cHrE2DY505LQovWMaCd0sJNRFTKU2QQsKe/PAZaqmN/XhZwV45OBpbxFik+FAGwX6WYv
+         haNTD6X72iHgTh7AnmPeaUaNvqBaNs6DCUz2cYs8xV+n2yS0+YkSYgs13cBtJLJm+tyR
+         i21mwrdTHuK58g+D4rL+O67MYcRvYNdi1TBId4yqCC3T46Ho/QJG4BBq1ne+Cl9629ez
+         zcqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713952085; x=1714556885;
+        d=1e100.net; s=20230601; t=1713952218; x=1714557018;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=dBMhN6tSTtjNRSH1RVubQtWgZkTS86F6MB7x5+O8QBM=;
-        b=lh+jfAVmbUV4QxSRE7jXjZHCqJaxM7+EXUCpmDE6CiGEauCrc40pSFmXbD/wmuB4/h
-         M69rkQ/JlllLJ+26Q+KhMDQ1+v55bBnOFAV3jKA693uR+nrV/QiVakW4wDE6V6vpf2R8
-         MPr+I2815FQSf3pV6mS5wapqP93uPYU7+H4l6G0szMMocxXZ6ZAbcXYxRXFCH6p5rV0k
-         FlDQGoZBC9qC765jOiNcRRYVUZMKhjLDeskCDNeXzehPz5+lSwsHwnGs6cvSnrO+BjEO
-         nOeEqR0YIfC750iqq7ttdPicOH1qvLRt+gs45vHl4oi/0Pz8rZRFOp818SJ9ztPzJzW0
-         11DA==
-X-Gm-Message-State: AOJu0Yy6c/E+/UiP52KGJ4mLKpJqx5tDQ3za+jrQs8LglBcJitgzZXaV
-	vVl6RRoHpxRNx9mrVicd8HeYz3R2IYFEpwV8lUBJMJQbZPsC0kLURVDpymPFV/g=
-X-Google-Smtp-Source: AGHT+IGMegTBrEoK3B5XDbr+9+PF7FrMuGc66Z1Oq6WOqpIPvAmRmcQ7aAK4zK9xDf0IJ2thtqnFbg==
-X-Received: by 2002:a17:906:a447:b0:a52:62a2:d727 with SMTP id cb7-20020a170906a44700b00a5262a2d727mr1177365ejb.52.1713952085192;
-        Wed, 24 Apr 2024 02:48:05 -0700 (PDT)
+        bh=qkkNo0T4k/vPc6RiPBQsA3Jo1HLwOL4Jh/4Wlzwp3b4=;
+        b=WvQfwPuQnw1CBYy8OudxRL13XsjsB3enZvlqimo9JJvIWJf4Z9091RTDnHftVPfjpc
+         0x52Ql9hDCZdX5xpfAxb4kapNO8y2kZxedsqSe1Q232H1j2o6hGSPV84fsHZyy+FXMkg
+         H+EzOBxIMJ5uR6zZYKC2yg9PjJVNI+jbwgz4aLnG9FPFNPTh7LsL65WAbAbdMbQIL6te
+         SxstLnKcMfMREA3aILwSKsiCWMDXooS9ZMAD7//z4UmXqCmzDxu6CQKzytyfZPx/Zro3
+         B3DPTdbsUSE1vKKnKpoql2MSHkZUieL2/NyQKntUTVPpDF+n0r/lTJJqoj071pKqNFgt
+         f1Aw==
+X-Gm-Message-State: AOJu0YwhC3fHyMuryx09r/FgN806CSuzOzySOYbZjKW6/AUTqAEKDiW4
+	R0tTzwqpRqMqq04O9+cmIFdssGtQS9TtWpiqQK/1LRCjkbuf5LHVg7yio5ii6Uw=
+X-Google-Smtp-Source: AGHT+IGAFUf0JcRz0GX5s36HQG4PVbcUKadJh+By3FOzb/j8qZ7E50n00W8LJsgnSnBA2y//OZkwwg==
+X-Received: by 2002:a05:6512:10cb:b0:516:d002:47cb with SMTP id k11-20020a05651210cb00b00516d00247cbmr1710582lfg.43.1713952218088;
+        Wed, 24 Apr 2024 02:50:18 -0700 (PDT)
 Received: from [192.168.1.20] ([178.197.223.16])
-        by smtp.gmail.com with ESMTPSA id gf16-20020a170906e21000b00a526fe5ac61sm8082895ejb.209.2024.04.24.02.48.03
+        by smtp.gmail.com with ESMTPSA id a14-20020a1709065f8e00b00a559bbe8a00sm5373647eju.100.2024.04.24.02.50.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Apr 2024 02:48:04 -0700 (PDT)
-Message-ID: <9e8e8607-dc12-4371-af4e-16786b13a13e@linaro.org>
-Date: Wed, 24 Apr 2024 11:48:03 +0200
+        Wed, 24 Apr 2024 02:50:17 -0700 (PDT)
+Message-ID: <0554309a-f810-47a1-9047-43d09caf533a@linaro.org>
+Date: Wed, 24 Apr 2024 11:50:16 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -61,21 +61,18 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 1/2] Bluetooth: qca: Fix BT enable failure for QCA6390
-To: quic_zijuhu <quic_zijuhu@quicinc.com>, Wren Turkal <wt@penguintechs.org>,
- luiz.dentz@gmail.com, luiz.von.dentz@intel.com, marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org, bartosz.golaszewski@linaro.org,
- regressions@lists.linux.dev, kernel@quicinc.com, gregkh@linuxfoundation.org,
- stable@vge.kernel.org
-References: <1713932807-19619-1-git-send-email-quic_zijuhu@quicinc.com>
- <1713932807-19619-2-git-send-email-quic_zijuhu@quicinc.com>
- <a8a7e3df-44c6-4fa6-a576-da384c02e9ac@linaro.org>
- <067db05d-56bc-4ca3-aef1-bc3bae47667c@quicinc.com>
- <c1fc9c28-25df-4d41-9ae6-c5d079ea805d@penguintechs.org>
- <0db77c30-5be2-41b5-adf0-fb4436b9107b@quicinc.com>
- <c9bf22a3-2549-4cf1-898e-8a9adcd2f0f6@penguintechs.org>
- <d77455b2-4fb9-4ffc-acf9-c24b5a0f4a45@quicinc.com>
- <b3d8e1de-3beb-46a2-817d-ee0fdd614b0a@quicinc.com>
+Subject: Re: [PATCH] Bluetooth: qca: set power_ctrl_enabled on NULL returned
+ by gpiod_get_optional()
+To: quic_zijuhu <quic_zijuhu@quicinc.com>, Bartosz Golaszewski
+ <brgl@bgdev.pl>, Wren Turkal <wt@penguintechs.org>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+References: <20240422130036.31856-1-brgl@bgdev.pl>
+ <99242a7c-53bf-4227-9623-7bc092f564b3@penguintechs.org>
+ <CAMRc=MepDwUbAKrWgm0CXKObqy8=igtug0QDgo-CgwxjZCAC2Q@mail.gmail.com>
+ <7b3dc952-d202-4377-9bb6-e7598e28de97@quicinc.com>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Content-Language: en-US
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
@@ -122,98 +119,93 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <b3d8e1de-3beb-46a2-817d-ee0fdd614b0a@quicinc.com>
+In-Reply-To: <7b3dc952-d202-4377-9bb6-e7598e28de97@quicinc.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 24/04/2024 11:39, quic_zijuhu wrote:
-> On 4/24/2024 2:01 PM, quic_zijuhu wrote:
->> On 4/24/2024 1:49 PM, Wren Turkal wrote:
->>> On 4/23/24 10:46 PM, quic_zijuhu wrote:
->>>> On 4/24/2024 1:37 PM, Wren Turkal wrote:
->>>>> On 4/23/24 10:02 PM, quic_zijuhu wrote:
->>>>>> On 4/24/2024 12:30 PM, Krzysztof Kozlowski wrote:
->>>>>>> On 24/04/2024 06:26, Zijun Hu wrote:
->>>>>>>> Commit 56d074d26c58 ("Bluetooth: hci_qca: don't use IS_ERR_OR_NULL()
->>>>>>>> with gpiod_get_optional()") will cause below serious regression
->>>>>>>> issue:
->>>>>>>>
->>>>>>>> BT can't be enabled any more after below steps:
->>>>>>>> cold boot -> enable BT -> disable BT -> BT enable failure
->>>>>>>> if property enable-gpios is not configured within DT|ACPI for
->>>>>>>> QCA6390.
->>>>>>>>
->>>>>>>> The commit wrongly changes flag @power_ctrl_enabled set logic for
->>>>>>>> this
->>>>>>>> case as shown by its below code applet and causes this serious issue.
->>>>>>>> qcadev->bt_en = devm_gpiod_get_optional(&serdev->dev, "enable",
->>>>>>>>                                                  GPIOD_OUT_LOW);
->>>>>>>> - if (IS_ERR_OR_NULL(qcadev->bt_en)) {
->>>>>>>> + if (IS_ERR(qcadev->bt_en)) {
->>>>>>>>         dev_warn(&serdev->dev, "failed to acquire enable gpio\n");
->>>>>>>>      power_ctrl_enabled = false;
->>>>>>>>     }
->>>>>>>>
->>>>>>>> Fixed by reverting the mentioned commit for QCA6390.
->>>>>>>>
->>>>>>>> Fixes: 56d074d26c58 ("Bluetooth: hci_qca: don't use IS_ERR_OR_NULL()
->>>>>>>> with gpiod_get_optional()")
->>>>>>>> Cc: stable@vge.kernel.org
->>>>>>>> Reported-by: Wren Turkal <wt@penguintechs.org>
->>>>>>>> Link: https://bugzilla.kernel.org/show_bug.cgi?id=218726
->>>>>>>> Link:
->>>>>>>> https://lore.kernel.org/linux-bluetooth/ea20bb9b-6b60-47fc-ae42-5eed918ad7b4@quicinc.com/T/#m73d6a71d2f454bb03588c66f3ef7912274d37c6f
->>>>>>>> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
->>>>>>>> Tested-by: Wren Turkal <wt@penguintechs.org>
->>>>>>>> ---
->>>>>>>> Changes:
->>>>>>>> V6 -> V7: Add stable tag
->>>>>>>
->>>>>>> Stop sending multiple pathchsets per day. I already asked you to first
->>>>>>> finish discussion and then send new version. You again start sending
->>>>>>> something while previous discussion is going.
->>>>>>> you concern is wrong and i am sure it don't block me sending new patch
->>>>>> sets to solve other issue. so i send this v7.
->>>>>>
->>>>>> i have give reply for Bartosz' patch.
->>>>>>
->>>>>> i hop you as DTS expert to notice my concern about DTS in the reply.
->>>>>
->>>>> Are you saying here (1) that you identified a problem in the DTs that
->>>>> you hope Krzysztof notices or (2) that you want Krzysztof to notice how
->>>>> your description of way that DT declares the gpio as required affects
->>>>> your proposed change. As a native American English speaker, I am finding
->>>>> your text hard to follow.
->>>>>
->>>> 1) is my purpose. i have given my concern about DTS for Bartosz' patch
->>>> and hope DTS expert notice the concern.
+On 24/04/2024 11:32, quic_zijuhu wrote:
+> On 4/24/2024 5:04 PM, Bartosz Golaszewski wrote:
+>> On Wed, 24 Apr 2024 07:07:05 +0200, Wren Turkal <wt@penguintechs.org> said:
+>>> On 4/22/24 6:00 AM, Bartosz Golaszewski wrote:
+>>>> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 >>>>
->>>> my change don't have any such concern about DTS usage. that is why i
->>>> changed my fix from original reverting the whole wrong commit to now
->>>> focusing on QCA6390.
+>>>> Any return value from gpiod_get_optional() other than a pointer to a
+>>>> GPIO descriptor or a NULL-pointer is an error and the driver should
+>>>> abort probing. That being said: commit 56d074d26c58 ("Bluetooth: hci_qca:
+>>>> don't use IS_ERR_OR_NULL() with gpiod_get_optional()") no longer sets
+>>>> power_ctrl_enabled on NULL-pointer returned by
+>>>> devm_gpiod_get_optional(). Restore this behavior but bail-out on errors.
 >>>
->>> Let me try to parse this. If #1 is the correct interpretation, does that
->>> mean that the DTs are wrong and need to be changed? Do you expect K to
->>> do that since he's the "DTS expert"?
+>>> Nack. This patch does fixes neither the disable/re-enable problem nor
+>>> the warm boot problem.
 >>>
->> for your 1) question, NO
->> for your 2) question, need DTS expert notice or suggest how to handle
->> case that a DTS property is marked as required but not be configed by user.
->>
->>>>> I think you are saying #2.
->>>>>
->>>>> I just want to make sure I am following the discussion here.
->>>>>
->>>>> wt
->>>>
+>>> Zijun replied to this patch also with what I think is the proper
+>>> reasoning for why it doesn't fix my setup.
 >>>
 >>
-> Hi Krzysztof, bartosz.
-> 
-> do you have any concern for this patch serials?
+>> Indeed, I only addressed a single issue here and not the code under the
+>> default: label of the switch case. Sorry.
+>>
+>> Could you give the following diff a try?
+>>
+>> Bart
+>>
+>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>> index 92fa20f5ac7d..0e98ad2c0c9d 100644
+>> --- a/drivers/bluetooth/hci_qca.c
+>> +++ b/drivers/bluetooth/hci_qca.c
+>> @@ -2327,16 +2327,21 @@ static int qca_serdev_probe(struct
+>> serdev_device *serdev)
+>>  		    (data->soc_type == QCA_WCN6750 ||
+>>  		     data->soc_type == QCA_WCN6855)) {
+>>  			dev_err(&serdev->dev, "failed to acquire BT_EN gpio\n");
+>> -			power_ctrl_enabled = false;
+>> +			return PTR_ERR(qcadev->bt_en);
+>>  		}
+>>
+>> +		if (!qcadev->bt_en)
+>> +			power_ctrl_enabled = false;
+>> +
+>>  		qcadev->sw_ctrl = devm_gpiod_get_optional(&serdev->dev, "swctrl",
+>>  					       GPIOD_IN);
+>>  		if (IS_ERR(qcadev->sw_ctrl) &&
+>>  		    (data->soc_type == QCA_WCN6750 ||
+>>  		     data->soc_type == QCA_WCN6855 ||
+>> -		     data->soc_type == QCA_WCN7850))
+>> -			dev_warn(&serdev->dev, "failed to acquire SW_CTRL gpio\n");
+>> +		     data->soc_type == QCA_WCN7850)) {
+>> +			dev_err(&serdev->dev, "failed to acquire SW_CTRL gpio\n");
+>> +			return PTR_ERR(qcadev->sw_ctrl);
+>> +		}
+>>
+>>  		qcadev->susclk = devm_clk_get_optional(&serdev->dev, NULL);
+>>  		if (IS_ERR(qcadev->susclk)) {
+>> @@ -2355,10 +2360,13 @@ static int qca_serdev_probe(struct
+>> serdev_device *serdev)
+>>  		qcadev->bt_en = devm_gpiod_get_optional(&serdev->dev, "enable",
+>>  					       GPIOD_OUT_LOW);
+>>  		if (IS_ERR(qcadev->bt_en)) {
+>> -			dev_warn(&serdev->dev, "failed to acquire enable gpio\n");
+>> -			power_ctrl_enabled = false;
+>> +			dev_err(&serdev->dev, "failed to acquire enable gpio\n");
+>> +			return PTR_ERR(qcadev->bt_en);
+>>  		}
+>>
+>> +		if (!qcadev->bt_en)
+>> +			power_ctrl_enabled = false;
+>> +
+>>  		qcadev->susclk = devm_clk_get_optional(&serdev->dev, NULL);
+>>  		if (IS_ERR(qcadev->susclk)) {
+>>  			dev_warn(&serdev->dev, "failed to acquire clk\n");
+> i suggest stop here and request you code review for my changes, i found
+> the issue and given fix for my concern.
 
-What? Amount of noise coming with this constant ping and dispersed
-discussions is really annoying.
+What are you answering to? What the heck are you implying here?
+
+I think this crosses some threshold of ridiculous mailings.
+
+Please get your managers or colleagues to review your patches and
+process you follow.
 
 Best regards,
 Krzysztof
