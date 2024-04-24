@@ -1,143 +1,118 @@
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BB2315886E
-	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 09:04:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC1B3158A1D
+	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 09:22:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713949448; cv=none; b=iqjl8pGt/L0j6FrMZSkI7E52uV0UZu42kKBDusu0LF/zmgRkcUk4zp/doP1PQqLA2dO0s/X9/eRANZTxYDdedwGtJ8J47hOo0pMNlv6piI1F4EgCZ/P17jFA9tZtv+aT9IqD0XUykRbCRC5ltZ/7do+Th0DRHzBd3/p3G6DOyR0=
+	t=1713950548; cv=none; b=IR7j0dDahHzE5Xdo+0pEMleJxYmnhJ+yZLLKAX29FD3kqPA6vAXtisPmjs9LpgKw5IwxSD78rZMm0rVqe9DI3HrC+uLyY7LsX/BDdCeSolf2a5MmrTnHIPYUkbKej7SiRoCd15v4HRtRSMJ1frpyxM5MOqmNoGxxjClBAhepqYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713949448; c=relaxed/simple;
-	bh=Y2wzOvQe5awl2YyrzbxpkVss7E7jaSjDhA6vqXjHISs=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Csmoo/XTkb0/hc7gfLelAvmE7FWfRJNkZ81uCesOB8ft8AiiK4bbeFTXG52ulD9baSWLgVUq1yNM2ucyB9SWZaJFZvbzzZTw6tTw9AiFwh2zggMSQvIgiIdSrg0+//V2NeRJ+ybBBs035pcpCdX+2Jb7JJGr5UmEJYqgdXhN/fc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=fOLfqlIy; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+	s=arc-20240116; t=1713950548; c=relaxed/simple;
+	bh=StDUdojlwo1qWzZBipNVZoiR4DT4qoXbymf91IDx0K0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=pzZvk6/dvjbLl4hQ4diSiy/AgM2LdHOOh4iLZj8KMs/J1OL4d882NLlZzhmLCFgnm8ZKiQbPEMnYfVrhL6fS9Gxazj3/ZcZvAHjyECLz7rKtIH59MLOzs3HVo9SjVraXJPCuPoZ2VT3921BJAbjIU/+aF6mlRuzozp1VMLNl320=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=WjvzfY7M; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="fOLfqlIy"
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-516d6c1e238so8329785e87.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 02:04:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1713949443; x=1714554243; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:references:mime-version:in-reply-to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=pG9za8GIt2C4BOKtDqST70eWWIAaa++7qoZuka22atU=;
-        b=fOLfqlIyZjW5NIDsjunXrf5zQeecKGfECk1Ut0zAaoXNQaqoYT1Od8bBgbAdUY4J+b
-         oAMyqqAiDH+z2wPtikd1QoVvSzGiMRwzX9ulXWrh3iGFknUibZ7fUT9rOGFBpbjuCAdS
-         PoNu6hm2/LXgd4mk7oaSCDm6k96HsOqTQCEsp51qnyihrHJu5DcFeeim621432QuiQd5
-         JYmxm+TEa0GjbbQf5vWKb0fKYyLWPMY2R/6561e1rHlQFxe1He5MZElaDxyvZaUtm5Qk
-         WFpWeoAHVVgeojypTFH6UpBUlZFpihTSUiJ/cVXHmmr5FsVzagTNOyVfi274v0N2Zbsr
-         8PFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713949443; x=1714554243;
-        h=cc:to:subject:message-id:date:references:mime-version:in-reply-to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pG9za8GIt2C4BOKtDqST70eWWIAaa++7qoZuka22atU=;
-        b=vp04W987ZX2vSla+EuCNX6skuj3PZlxBP2efDZjimQQ4O3LWpSTmRseieQSRRM20OK
-         PdnLG7BoTTU1XdTbvlnUG2ys9TJtOvPb/TV0AOJ/EkVuelYlUvTpo0wUHWjIupqyCvGw
-         nZnJOSRM29l4bBO8hQcIjNPh6seD2En0Wu41gVw17TZLo8gvIUSAWLdMT6277Prgr4BG
-         XCXjEqsEcMEdqOGQy+u+Jjqi0zg65oQ5VxNcIj+k2oofuVpJ2KjB5zvGkNOxHZeWqHUy
-         aVpZnMkrz7BBsAKqB7obyIIWOZYo9eU7c4wVDRih/D6SEkpCZHHesZsUYxF/xwLix5pd
-         dz/Q==
-X-Gm-Message-State: AOJu0YzLW6P+LdIzN6N7Dw8SGI2ANb0evzhxQtoOueLgD1Jt0+oKtIy6
-	6Iv0D3739JOLjxf93q9bSNtkPZdGUiQqEm5ltaB9+AiBMfAH8NSyobKVGj8r98fiNH+Ht3lh0mK
-	P09MLhPzWQhaIuzBl67yB0DTTvAMoBkrd0hcv/g==
-X-Google-Smtp-Source: AGHT+IHihMiLWi4mS+U9MLzHnIRW71T0GNRhjdzDm651UOR7kxLQWwQJbUNXRKm+ie/OljuDvauLwUYFyWyyLZUYUGA=
-X-Received: by 2002:a05:6512:925:b0:51a:ca97:66d6 with SMTP id
- f5-20020a056512092500b0051aca9766d6mr1164489lft.67.1713949442827; Wed, 24 Apr
- 2024 02:04:02 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Wed, 24 Apr 2024 05:04:02 -0400
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-In-Reply-To: <99242a7c-53bf-4227-9623-7bc092f564b3@penguintechs.org>
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="WjvzfY7M"
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 43O6gVdX003342;
+	Wed, 24 Apr 2024 09:22:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=5m1FHQepmOLUWPDnWSjuGQElwwZ3TIwLVPZ82IzZtGA=; b=Wj
+	vzfY7Mfv71NJy+PLPwgffFPhk2+aueM7Zobrpe6VF2GbiNI8g0WccLRLojQrabLA
+	3rPko4F3kvyVJB46LBlnYHLLO6zmcRlPoHsnPpFDT/UD94FbEOoIm5J7MZDIcQcU
+	M1P+PP/z48Fsj+mhrjZsBInHDPE/JQxZZ5iwsPPlvzjsKylT0r9NCp3ZgmVS9PFr
+	xpWZwX8JJ6G2aLG5SOtopnMV6gBoGKI+47lHUZ7zNJmYWAfsGhCmqNKJogtHnkx+
+	lJ5CDsidXTUKqV1MyZlw3vjO/aUNoSznxTx1BqZ+WfAHdfAL1jEMrQp/yUMoVcgm
+	HdtIEt1yNfPIgrCKsRdg==
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xpv9e0dxr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 24 Apr 2024 09:22:18 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43O9MICA026123
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 24 Apr 2024 09:22:18 GMT
+Received: from [10.253.14.221] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 24 Apr
+ 2024 02:22:12 -0700
+Message-ID: <0cba3838-917b-48af-ba8b-2ef60714943a@quicinc.com>
+Date: Wed, 24 Apr 2024 17:22:10 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240422130036.31856-1-brgl@bgdev.pl> <99242a7c-53bf-4227-9623-7bc092f564b3@penguintechs.org>
-Date: Wed, 24 Apr 2024 05:04:02 -0400
-Message-ID: <CAMRc=MepDwUbAKrWgm0CXKObqy8=igtug0QDgo-CgwxjZCAC2Q@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: qca: set power_ctrl_enabled on NULL returned
- by gpiod_get_optional()
-To: Wren Turkal <wt@penguintechs.org>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Zijun Hu <quic_zijuhu@quicinc.com>, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] Bluetooth: qca: Correct property enable-gpios handling
+ logic for WCN6750 and WCN6855
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        <luiz.dentz@gmail.com>, <luiz.von.dentz@intel.com>,
+        <marcel@holtmann.org>
+CC: <linux-bluetooth@vger.kernel.org>, <bartosz.golaszewski@linaro.org>,
+        <wt@penguintechs.org>, <kernel@quicinc.com>
+References: <1713947712-4307-1-git-send-email-quic_zijuhu@quicinc.com>
+ <af004bcd-0649-4a82-8f09-36d6addd0e1e@linaro.org>
+Content-Language: en-US
+From: quic_zijuhu <quic_zijuhu@quicinc.com>
+In-Reply-To: <af004bcd-0649-4a82-8f09-36d6addd0e1e@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: RTsKe1EfRN14klZZor3YlYFRyhMwZbq3
+X-Proofpoint-ORIG-GUID: RTsKe1EfRN14klZZor3YlYFRyhMwZbq3
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-04-24_06,2024-04-23_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
+ priorityscore=1501 malwarescore=0 mlxscore=0 phishscore=0 mlxlogscore=999
+ clxscore=1015 spamscore=0 adultscore=0 lowpriorityscore=0 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2404010003
+ definitions=main-2404240040
 
-On Wed, 24 Apr 2024 07:07:05 +0200, Wren Turkal <wt@penguintechs.org> said:
-> On 4/22/24 6:00 AM, Bartosz Golaszewski wrote:
->> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+On 4/24/2024 4:44 PM, Krzysztof Kozlowski wrote:
+> On 24/04/2024 10:35, Zijun Hu wrote:
+>> Commit 56d074d26c58 ("Bluetooth: hci_qca: don't use IS_ERR_OR_NULL()
+>> with gpiod_get_optional()") has wrong logic for below case:
 >>
->> Any return value from gpiod_get_optional() other than a pointer to a
->> GPIO descriptor or a NULL-pointer is an error and the driver should
->> abort probing. That being said: commit 56d074d26c58 ("Bluetooth: hci_qca:
->> don't use IS_ERR_OR_NULL() with gpiod_get_optional()") no longer sets
->> power_ctrl_enabled on NULL-pointer returned by
->> devm_gpiod_get_optional(). Restore this behavior but bail-out on errors.
->
-> Nack. This patch does fixes neither the disable/re-enable problem nor
-> the warm boot problem.
->
-> Zijun replied to this patch also with what I think is the proper
-> reasoning for why it doesn't fix my setup.
->
+>> property enable-gpios is not configured for WCN6750 and WCN6855
+> 
+> As I said before, bindings say this property is required. I already
+> asked you to provide rationale describing hardware and update the
+> bindings if they bindings are not correct.
+> 
+1)
+you ever given below reply at below link
+https://lore.kernel.org/linux-bluetooth/52394d97-04c3-4f77-aaae-f1e152cd5632@linaro.org/
 
-Indeed, I only addressed a single issue here and not the code under the
-default: label of the switch case. Sorry.
+"The pin is required on 6750, 6855 and maybe others. You cannot not have
+the GPIO"
 
-Could you give the following diff a try?
+2) for property enable-gpios, they are required for WCN6750 and WCN6855
+in my opinion,  i am a member of BT team.
 
-Bart
+3) only care about the case property enable-gpios is not configured,
+the original BT driver design logic indeed matches with binging spec's
+requirements before bartosz's wrong change
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 92fa20f5ac7d..0e98ad2c0c9d 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -2327,16 +2327,21 @@ static int qca_serdev_probe(struct
-serdev_device *serdev)
- 		    (data->soc_type == QCA_WCN6750 ||
- 		     data->soc_type == QCA_WCN6855)) {
- 			dev_err(&serdev->dev, "failed to acquire BT_EN gpio\n");
--			power_ctrl_enabled = false;
-+			return PTR_ERR(qcadev->bt_en);
- 		}
+4) please ask dts owner for help if you suspect current bindings spec
+has something wrong. it is not my responsibility for providing such
+info, that maybe involve CCI.
 
-+		if (!qcadev->bt_en)
-+			power_ctrl_enabled = false;
-+
- 		qcadev->sw_ctrl = devm_gpiod_get_optional(&serdev->dev, "swctrl",
- 					       GPIOD_IN);
- 		if (IS_ERR(qcadev->sw_ctrl) &&
- 		    (data->soc_type == QCA_WCN6750 ||
- 		     data->soc_type == QCA_WCN6855 ||
--		     data->soc_type == QCA_WCN7850))
--			dev_warn(&serdev->dev, "failed to acquire SW_CTRL gpio\n");
-+		     data->soc_type == QCA_WCN7850)) {
-+			dev_err(&serdev->dev, "failed to acquire SW_CTRL gpio\n");
-+			return PTR_ERR(qcadev->sw_ctrl);
-+		}
+5) gentle reminder, please realize that there are many lunched products
+already when you try to change some important logic, i don't suggest
+change important logic or setting if there are no actual issue reported.
 
- 		qcadev->susclk = devm_clk_get_optional(&serdev->dev, NULL);
- 		if (IS_ERR(qcadev->susclk)) {
-@@ -2355,10 +2360,13 @@ static int qca_serdev_probe(struct
-serdev_device *serdev)
- 		qcadev->bt_en = devm_gpiod_get_optional(&serdev->dev, "enable",
- 					       GPIOD_OUT_LOW);
- 		if (IS_ERR(qcadev->bt_en)) {
--			dev_warn(&serdev->dev, "failed to acquire enable gpio\n");
--			power_ctrl_enabled = false;
-+			dev_err(&serdev->dev, "failed to acquire enable gpio\n");
-+			return PTR_ERR(qcadev->bt_en);
- 		}
+> Best regards,
+> Krzysztof
+> 
 
-+		if (!qcadev->bt_en)
-+			power_ctrl_enabled = false;
-+
- 		qcadev->susclk = devm_clk_get_optional(&serdev->dev, NULL);
- 		if (IS_ERR(qcadev->susclk)) {
- 			dev_warn(&serdev->dev, "failed to acquire clk\n");
