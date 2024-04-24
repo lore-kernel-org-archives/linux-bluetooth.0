@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8657515CD6E
-	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 14:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8652A13DBB2;
+	Wed, 24 Apr 2024 14:20:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713968429; cv=none; b=FdDouW/83lMK2a1WtzvYu8/ZPsCG3XGO1wCKWs9tG17BoujG4cGDBzx3c6p7B65KWMVNqWqguqplnbudAtE83b3KNZpR2r0SsJbHsG3cWho1ep24LNjJo3XjoUgPNcDSOghkf74qGAIlZJFWR2Z7JmmMTM41J9GbXdqvQP8i4rM=
+	t=1713968429; cv=none; b=h9Pk0k8Wzn5wqV04EW1ir1RWkeM7/2FF5YFPngIEHBORG34B7D8trNGNEdVHST3nhkXBW4vCvEhhMDqTmdR8MaQukt465y4TOlnGDPgJo4d2oBEu8Aeu25FXgpBeSM7eQvFGYxBtnUwEcGVKSotaedyMoiAbgAH/G+yPoNyC5uo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1713968429; c=relaxed/simple;
-	bh=1XTHE73kVJ5uRy8eHWe1dmq/nhWhqvcBUnU334Bkl8g=;
+	bh=zUvh5JMg5W5A98seb6x9t39N35QqYFAWXIiE9H/DkAY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=roXdjUdmXkjh/GY/2NY10q1Xvhp7J/E++WgD2LRrBKIgihXCfwRQMuFEhGSH3lPzj8IfL5QVL1B6pNFqYCYv3jei5FNONDccWVJHH9q9wtTuWJpF0yIweUvGbYKWFWlkKwJSf+B7riXMHvPi0lamYq+qTJtXSIincbKB4Zi3gro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KRMMyl05; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=WEefeXheHOFDlbtB/yNL/0ORZoNftVRmJUBXRBVbh+WUHfc8AuJQdQX4lelgJR/8Ag/nWvhEUq+UbjskXtFmV9tq+YGjqc/y9MdHhdSCj0eAB8DXKS/ETmDx+PEFwgDoNcMu8o58xjadBnBwKSQVxJa5LdGEO09Hrei85R2njWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K6URCNb9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KRMMyl05"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 417FBC113CE;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K6URCNb9"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 45B7BC2BD10;
 	Wed, 24 Apr 2024 14:20:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1713968429;
-	bh=1XTHE73kVJ5uRy8eHWe1dmq/nhWhqvcBUnU334Bkl8g=;
+	bh=zUvh5JMg5W5A98seb6x9t39N35QqYFAWXIiE9H/DkAY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KRMMyl05x/Vjpk99M7n+Qy4uKwkd+Qhps1rf/PkqXJ5XSQ4lbDaXp0dQfNmiAZ+Ca
-	 VyYK+SBOyPI9lEjfDbkKGjipcS2aCJAUPjsWeXCOjKcgVaCYg8g70a9OMLTwFLAzR8
-	 qYoKhm6e3nbvvsHeTpbBw7uc+UfVZIFkAjsQJpztHU3I1YKry+Pco3QEk4PmKVOKZV
-	 LkxXpiEUdTOv57Hba5lcgLwgxQHGCogCXhDamgyeYDj94cd3kqvPvDtqhRSAR+0hXi
-	 92P98NLmpZ1vnB9kgzPPYAdH5Ui91jNStat6yBxJf9j9irzoFpfTyYBRw98jHlgw13
-	 bRv4/PUhIxYMQ==
+	b=K6URCNb9XdAk5tD81G0iqRuxZRpLk0sYkghdE0fWWQVonccimhXOTLtRvN6pLM9LP
+	 3v60KZvYA3reuzfxsKnHDAwAFuUVJu92wx4YBxy5bOmLkHQTVME7U3CNR3lJdXKH3v
+	 H52H4LDqu67h6iYz1TWusmTE9ysfElB/AdWTJk5R2rnkrsviGP01gwd4zgS2tVBCOK
+	 JLPkrdzLd+Xm9Sj1Z1yfB5N7Jeb3sUVv54mkgsJK9sBOmsm2GCnr3WgoPGto63JGYi
+	 +KPYXQY+xngxPhuzlgJVzVvUASCSfSUsmDf1G3KFQDfch7LCrujcK1/0NBvweC2cNv
+	 vcKqaV+4g0OuA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3072EC595D2;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 36EB0C595CE;
 	Wed, 24 Apr 2024 14:20:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -37,35 +37,40 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: qca: Support downloading board id specific NVM for
- WCN7850
+Subject: Re: [PATCH v2] Bluetooth: Populate hci_set_hw_info for Intel and Realtek
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <171396842919.29186.18002017736788488212.git-patchwork-notify@kernel.org>
+ <171396842922.29186.2152578622770434073.git-patchwork-notify@kernel.org>
 Date: Wed, 24 Apr 2024 14:20:29 +0000
-References: <1713340174-1304-1-git-send-email-quic_zijuhu@quicinc.com>
-In-Reply-To: <1713340174-1304-1-git-send-email-quic_zijuhu@quicinc.com>
-To: quic_zijuhu <quic_zijuhu@quicinc.com>
-Cc: luiz.dentz@gmail.com, luiz.von.dentz@intel.com, marcel@holtmann.org,
- linux-bluetooth@vger.kernel.org
+References: <20240422172027.v2.1.Ib96985e197f3db620a127a84aa20f3f3017aaf57@changeid>
+In-Reply-To: <20240422172027.v2.1.Ib96985e197f3db620a127a84aa20f3f3017aaf57@changeid>
+To: Archie Pusaka <apusaka@google.com>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
+ johan.hedberg@gmail.com, marcel@holtmann.org,
+ chromeos-bluetooth-upstreaming@chromium.org, apusaka@chromium.org,
+ abhishekpandit@google.com, linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed, 17 Apr 2024 15:49:34 +0800 you wrote:
-> Download board id specific NVM instead of default for WCN7850 if board id
-> is available.
+On Mon, 22 Apr 2024 17:20:28 +0800 you wrote:
+> From: Archie Pusaka <apusaka@chromium.org>
 > 
-> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> ---
->  drivers/bluetooth/btqca.c | 18 +++++++++++++++---
->  1 file changed, 15 insertions(+), 3 deletions(-)
+> The hardware information surfaced via debugfs might be usable by the
+> userspace to set some configuration knobs. This patch sets the hw_info
+> for Intel and Realtek chipsets.
+> 
+> Below are some possible output of the hardware_info debugfs file.
+> INTEL platform=55 variant=24
+> RTL lmp_subver=34898 hci_rev=10 hci_ver=11 hci_bus=1
+> 
+> [...]
 
 Here is the summary with links:
-  - Bluetooth: qca: Support downloading board id specific NVM for WCN7850
-    https://git.kernel.org/bluetooth/bluetooth-next/c/39844750bddf
+  - [v2] Bluetooth: Populate hci_set_hw_info for Intel and Realtek
+    https://git.kernel.org/bluetooth/bluetooth-next/c/46d8da86787b
 
 You are awesome, thank you!
 -- 
