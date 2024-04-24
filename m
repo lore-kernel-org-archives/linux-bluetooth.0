@@ -1,132 +1,96 @@
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB37015A49E
-	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 11:56:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C727B15A48B
+	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 11:59:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713959781; cv=none; b=c8RIXWTF16d91WBd99PN50htBLcFhaXL2IXtXPXhmPGKhgP2l/YjnYFd4hP2Ve+MIKB0WtPsrtPQCdx6i4PjQT/HOxfT3hbgflIWDO3mG38sJ0rTexLzWawzOP7X2pUSppUbst10wdO7UrgvnbGCdgIErtLwgN5eEgHZVdroqgo=
+	t=1713959982; cv=none; b=GBWNthT4NeRlrtljcKJbbUOlYkHFk+lcmAA0GGSZ+Oa7RnR8M34iR74dCJW9JaFOtuoqE64bGj7RHB/A7yWHgXsRqR6o9Ub3QM4XId+l6S6pTPVWimu+/7vwHBIu3azF0bmjyT6Y6Z0hmvMoNcHzGXPa2nPpDC015oog7YHA+ms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713959781; c=relaxed/simple;
-	bh=E1j8D+z+VDjM0jA1xb7bQtZFFSEdkHgBaKagxKEiWBI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CLHA7ogyMJHfN8/PSzWyu/1rMQZ2RSvJbYAGEzmRaXrLvi4pUMsXb+mAUKVAcXEYTeww71xHWivo5JOjHXOg6F9j6YU81W3/isGVgdvtp/72JCkQgoN4vy9ohErpsUoo3cv5tv8qsOgy7f4aQwX/9C9i2ob44xrUX5SdC1kW48k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=WLCmnJl4; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+	s=arc-20240116; t=1713959982; c=relaxed/simple;
+	bh=/97R6QIg34AwQeVF34CbTFga/OXPyR0JSnF2W1DuNMQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=B6aX58bD4enRu2sR17tLzo0sZb13iX61dpeOEaz6YDysEoYWgjTqT03GVYMxba0QyEl0PklNitpq4yHzYRCtcI5qGaIP6pOoU++JivsfTeWNAOTJZ35vJ1ZsTeyUK/spnofYt5bGGHoeBRwGXPJ4XbncXLlfnvzKA+/qBJBeLHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=gvKW3VJF; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=penguintechs.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="WLCmnJl4"
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-51b526f0fc4so4062203e87.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 04:56:19 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="gvKW3VJF"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1e8b03fa5e5so46350995ad.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 04:59:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1713959778; x=1714564578; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E1j8D+z+VDjM0jA1xb7bQtZFFSEdkHgBaKagxKEiWBI=;
-        b=WLCmnJl4amCHJ8C5fwnsPKfQeSmOAFhmZWG1eoiCCO22RugspXJXHM0hgXFezREFDz
-         VX6yGcpLooi0I9GG3h2DDEvlqWQI3vdzGEYUIrABH1HBvkQdvG3HHIPtzR8X5Kw8WmDp
-         WU/8oko4ffmJsdp1KrO7rB8TIVIjtu5FOssr4/OBcMxjoe5fqbgmyovPuABAj6puOtEJ
-         kGK/suNK9ug0mxZ5wJRxHLcjhnGBJeOCyYRKvhg9X/hQtu1Nh3PyxonUqGGTUCben/16
-         5x1GYhPqJLqqhWENOjVe+HTSk22auqapkopXki7l/vxeMPwji7rN1a8/C7MX8E53bznK
-         ULUA==
+        d=penguintechs.org; s=google; t=1713959980; x=1714564780; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=A5052Z6jLpMWL6uEOrZWPgMF67wALF8EuBjYHXYfOto=;
+        b=gvKW3VJFBlAZj6IcaE3Uo2Pc9P7Wqx/V1Kxg89VMD7mzVnjjWtYf3E7oZGWYc8FU3e
+         F/NZs2orjfgLQY2GWFSY7ODrAccAfTJBVhJYrXXGmlk9Zc5uccJ9IPdLYJwrRN79Im/U
+         sPxFcPCywDA9gxSEy9hWfjhHHmL5ReQ4Voa4A=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713959778; x=1714564578;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=E1j8D+z+VDjM0jA1xb7bQtZFFSEdkHgBaKagxKEiWBI=;
-        b=lIc3OH7SEd0WfRRvMXtzRBGUOVkyMbeMk5vI2r792XCbCUnxspCQ0MU538XVG1ah2B
-         5TuLIdStOXUUnFh0Uk5OW2/QHFqvR4+X/FRXNwCLakjoMwYEsRbwDONYyh5tdm8IvhZT
-         nJUS5WCviGczo7yQe+v6tSjCvV6ZEgplvlYhZsomZQIMT2NHXJYl3OKvvXGXrIeRXK0y
-         HUuhvKDrvOYs8E7saVd6uN8N3gC/8uzURORzqVw1bKL4x7rLlNByFrWt+dUMIvGcnija
-         PorIJBhSzjtFKMxRihqrKIYxo0AemMYLo76ncBonIshNkh5tcGNSa79dU7R98riXC6Jp
-         /i+g==
-X-Gm-Message-State: AOJu0YzxIyMP/g8F+WUsSBAcxY+ZzODjbPJH1ne0fPAa0tWW7OghRkrv
-	RUhQy3X8Ut8vyjzOMFwYjHZR5DphbstPSpq2jU8cc1kmMxOUVglzcpgAGpyK8LAqVQt9JpcwZcF
-	ontt6CIWH2Kn1Nnm7OaqNb85w5UJ96Xr3EFurdg==
-X-Google-Smtp-Source: AGHT+IGn2nOjGynSGGs86KzRli27o88A8Q0fLdg3mlD0Wzx4QSFJ+wXo2KW1LOEP2Tcgo/VJYD78wFE891jDnM6jmBU=
-X-Received: by 2002:ac2:4daa:0:b0:516:d448:b42a with SMTP id
- h10-20020ac24daa000000b00516d448b42amr1567023lfe.26.1713959777778; Wed, 24
- Apr 2024 04:56:17 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713959980; x=1714564780;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=A5052Z6jLpMWL6uEOrZWPgMF67wALF8EuBjYHXYfOto=;
+        b=k2wC3P96IEZfEXHn4RA65mU515ckI6jHc1g8kHxMeGWvcW+PWHZIspvXJTTs8EDVfZ
+         psw3uCxMt00JsgFgav5xDV+qlwVpmzWVHrEmEmQ3Jf70t3IJe2WHex0Ncm22MeFBivf4
+         lg9+M4jeahEbzK3WfxrpqCowu7rItT6xHRP0P1E11tyLD+q0QLMopQ4u05W3349q+VED
+         MrHV+9tve7sWEsdrELw6Y+PNJt6c4g8qOThx9cVe13FzZ8NwJvWVGSTB9OFRuerKaWAS
+         w8v8FHHi4Y9B4jR/JOyGotg1TojoMWLfx90U3eN8pj+1i0D2z7ocf/H3rXrVbaZMMLu/
+         oaBg==
+X-Gm-Message-State: AOJu0YxD1VU7swwXakqCxAPs6Km5UC/a4EOVVkeQmxAB6BdJS6UR3G+D
+	c3N7MRNpJXDyMOX8NcArKK51zzKBp3Ht2+wOuOplbtCuGm2es0wD0kXxPO3iJg==
+X-Google-Smtp-Source: AGHT+IFmdf+Gc+hmnEBImZPnmw5Z2cSjZpUVIvaJI84mAtrF1e03mwiYI7pASnI90qBpVQDshtHJuw==
+X-Received: by 2002:a17:902:cf09:b0:1e4:a667:5528 with SMTP id i9-20020a170902cf0900b001e4a6675528mr3243172plg.3.1713959979732;
+        Wed, 24 Apr 2024 04:59:39 -0700 (PDT)
+Received: from ?IPV6:2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08? ([2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08])
+        by smtp.gmail.com with ESMTPSA id o24-20020a170902779800b001e5119c0f9asm11756768pll.66.2024.04.24.04.59.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 Apr 2024 04:59:39 -0700 (PDT)
+Message-ID: <6433c145-a448-45dd-a982-8b5df0ca5c16@penguintechs.org>
+Date: Wed, 24 Apr 2024 04:59:37 -0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240422130036.31856-1-brgl@bgdev.pl> <99242a7c-53bf-4227-9623-7bc092f564b3@penguintechs.org>
- <CAMRc=MepDwUbAKrWgm0CXKObqy8=igtug0QDgo-CgwxjZCAC2Q@mail.gmail.com>
- <b982b73d-0540-409c-a6e2-0e03ecb11715@penguintechs.org> <0381f39c-38ba-4a2b-915c-f14c5f911eb9@penguintechs.org>
-In-Reply-To: <0381f39c-38ba-4a2b-915c-f14c5f911eb9@penguintechs.org>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Wed, 24 Apr 2024 13:56:07 +0200
-Message-ID: <CAMRc=MfnEct7ThQhCA3AoY7hxq8j1mmFLNNkK17+RSvJxs67XQ@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] Bluetooth: qca: set power_ctrl_enabled on NULL returned
  by gpiod_get_optional()
-To: Wren Turkal <wt@penguintechs.org>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Zijun Hu <quic_zijuhu@quicinc.com>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+ Zijun Hu <quic_zijuhu@quicinc.com>, Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+References: <20240422130036.31856-1-brgl@bgdev.pl>
+ <99242a7c-53bf-4227-9623-7bc092f564b3@penguintechs.org>
+ <CAMRc=MepDwUbAKrWgm0CXKObqy8=igtug0QDgo-CgwxjZCAC2Q@mail.gmail.com>
+ <06217256-8a13-4ebf-a282-9782a91793e4@penguintechs.org>
+ <CAMRc=Mfwa2WSOLaUMaEM1czTcx31jynGqgxzLdCh7ROktQ_Vag@mail.gmail.com>
+From: Wren Turkal <wt@penguintechs.org>
+In-Reply-To: <CAMRc=Mfwa2WSOLaUMaEM1czTcx31jynGqgxzLdCh7ROktQ_Vag@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Apr 24, 2024 at 1:53=E2=80=AFPM Wren Turkal <wt@penguintechs.org> w=
-rote:
->
-> On 4/24/24 4:16 AM, Wren Turkal wrote:
-> > On 4/24/24 2:04 AM, Bartosz Golaszewski wrote:
-> >> On Wed, 24 Apr 2024 07:07:05 +0200, Wren Turkal<wt@penguintechs.org>
-> >> said:
-> >>> On 4/22/24 6:00 AM, Bartosz Golaszewski wrote:
-> >>>> From: Bartosz Golaszewski<bartosz.golaszewski@linaro.org>
-> >>>>
-> >>>> Any return value from gpiod_get_optional() other than a pointer to a
-> >>>> GPIO descriptor or a NULL-pointer is an error and the driver should
-> >>>> abort probing. That being said: commit 56d074d26c58 ("Bluetooth:
-> >>>> hci_qca:
-> >>>> don't use IS_ERR_OR_NULL() with gpiod_get_optional()") no longer set=
-s
-> >>>> power_ctrl_enabled on NULL-pointer returned by
-> >>>> devm_gpiod_get_optional(). Restore this behavior but bail-out on
-> >>>> errors.
-> >>> Nack. This patch does fixes neither the disable/re-enable problem nor
-> >>> the warm boot problem.
-> >>>
-> >>> Zijun replied to this patch also with what I think is the proper
-> >>> reasoning for why it doesn't fix my setup.
-> >>>
-> >> Indeed, I only addressed a single issue here and not the code under th=
-e
-> >> default: label of the switch case. Sorry.
-> >>
-> >> Could you give the following diff a try?
-> >
-> > I had a feeling that was what was going on. I'll give the patch a shot.
-> >
-> > wt
->
-> Considering this patch is basically equivalent to patch 1/2 from Zijun,
-> I am not surprised that is works similarly. I.e. on a cold boot, I can
-> disable/re-enable bluetooth as many time as I want.
->
+On 4/24/24 4:53 AM, Bartosz Golaszewski wrote:
+> This must be your email client wrapping lines over a certain limit.
+> Try and get the diff from lore[1], it should be fine.
+> 
+> Bart
+> 
+> [1]https://lore.kernel.org/lkml/CAMRc=MepDwUbAKrWgm0CXKObqy8=igtug0QDgo-CgwxjZCAC2Q@mail.gmail.com/
 
-Zijun didn't bail out on errors which is the issue the original patch
-tried to address and this one preserves.
+I don't think it's my client. The extra newlines are right there in the 
+lore link.
 
-> However, since this patch doesn't include the quirk fix from Zijun's
-> patchset (patch 2/2), bluetooth fails to work after a warm boot.
->
+Look at the line that starts with "@@". That line is wrapped. The 
+following line ("serdev_device *serdev)") should be at the end of the 
+previous line. The same thing happened on the second "@@" line as well.
 
-That's OK, we have the first part right. Let's now see if we can reuse
-patch 2/2 from Zijun.
-
-> @Zijun, this patch looks more idiomatic when I look at the surrounding
-> code than your patch 1/2. Notice how it doesn't use the "else if"
-> construct. It does the NULL test separately after checking for errors.
->
-> --
-> You're more amazing than you think!
-
-Bart
+wt
+-- 
+You're more amazing than you think!
