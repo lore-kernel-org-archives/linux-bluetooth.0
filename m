@@ -1,175 +1,157 @@
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2047.outbound.protection.outlook.com [40.107.105.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC10B15B986
-	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 14:02:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713967379; cv=none; b=exHm8Z7DOXqRw0EDzq3vXSKeoAUMy+BzZU3F1U3RXVOUD21tQYDCwUmPtIbAwFWm8CqtBSHO2J/fI52ScR2q3ZNc9ZUoxXXlKLS+2dEwU+MEk2km7t5TccXebDnINEDP+ypJpgtJFagmWwP1a8mw6229Rgy0QNabT43M5l2n3mE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713967379; c=relaxed/simple;
-	bh=T3dsrVXvM1BzpCdkc7fICVJHK0ny7JNkxS2SkwBDyiQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=V0pnho0s6n131KZqbXYezMxH2Xg8zfuiARTWAQGBa30oyg7e5E/QSKpeQJbXAa86EvKuoXdjNeKV1svk+zMYKRM81YnphNXB0YcPsDUe+bcGMCBiaP+wp2kwiD2y2CAcHs9F9jCGrxJvLAsvJ39W7Gi8rDLNK8rW3bQq/SuV20E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GW3FmOcN; arc=none smtp.client-ip=209.85.208.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D22C415B996
+	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 14:08:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.105.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713967686; cv=fail; b=TN73089+W5SoslGwZYWkZyDuKerrK0RJpjc389D9ne7YsWrOeA5uJZ7K1NPdSPRWY0L9UY7RZouGv2p5aNs0sZEog9RaYiFUd3sNs1Ve9ftoHy3atsZRRNHo2O3mGTraa99oa4ujTfCCRJ/sggFeIS1srqGFibnlPgZcQ2bU4Dw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713967686; c=relaxed/simple;
+	bh=iejaXdpErS8cMi952+n4L1J+dFtl5tzX6Q2QWlG2LGQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=kIAaJ80vIZU8wIXE7D7IowmFRCb/TCyHwTZu4aFWjb6zMu2BP48jTAk5ycuSR+Jp8GLy9i6L3NyeLInCa6OT+IX+mjkpheKEkG+QIfF0YxtRrUIWoMi3Tf4pjYnydJXKRp5JWBiLx9FgqVFTJGHQPiD1DApSWs0b067BxppQU10=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=EvlzF2mx; arc=fail smtp.client-ip=40.107.105.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GW3FmOcN"
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2d858501412so93230531fa.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 07:02:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713967374; x=1714572174; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Rzo5Rc1BtV9rx2z4n0U4/4xN9Y5TF6zpjFkVOhcV8BY=;
-        b=GW3FmOcNnTcHbTmHZZTg+E6nh5qLKxtqtW81LH4Q3DjIxT+IJxr+dT9bVCS8iyXody
-         OrkCfB4gr5/nCg0I3eaGE3dfG0uSnIphdiIPcj3sMquFVpmvdCvfUvIBjSS2THX+faL6
-         2M9fwfV+kkzP1iBkOrvHOu35aZeBCPISlXQyR9FOKA/nfLo0LzaiD2jPDVD8GRd9qKxA
-         mMOKwHqPhYgJszTn4gkgTXebBJGcRcnFQcsDqgLnZbZK3sqExNfCnxr8GMJ+OPpRmYxL
-         vfuow5hVFK7vojj2V/SAic1N8VcxIauRN3ySq9N91WZbjZy3CuoiuegjJpt+bO/ogFab
-         mCjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713967374; x=1714572174;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Rzo5Rc1BtV9rx2z4n0U4/4xN9Y5TF6zpjFkVOhcV8BY=;
-        b=FT7yYtYsH8gcqJujzKeJO2YW5yl777Pi9nCwSnDeZGT4iCSSrpEqAUi5pDDHllQocN
-         sGm6pw8XOIJhK4DJ/dm7SXSQ+5O3zMBDDYn4t2q3RtEYGIBmydhl5DQV89n1f6aGnMmt
-         s1CV6B59hiImgWVF6dYsbHPEhzVsP+0IiM6+xanNuDBUeKaZ96kXEzXtCIrvSxw3nUpm
-         yYEov+QOqXpXh/yhaFVv4mxubBtyLSkMGxmw3MCY/i2Rd6YkbgLH9gFsrmoaCnqnqK/2
-         KdB3GtwMD/JvOHo9x214X0f9797g8TToSpmYoZx1Snqppo6XlZL8lQ30oM4BMwaIistj
-         c6Aw==
-X-Forwarded-Encrypted: i=1; AJvYcCXR25+r9JqEM8VTxEZrtvx1Yk/YXm4tgFcwOpCAL4vFiTwLjXeF6j2p+jRgsPJ6My4hRPJ29IAdAOSoZPI90ZeNR8rikKUajs6gWhzv3x5f
-X-Gm-Message-State: AOJu0YzHa9WtBfemIJjq/Gpt9UTGdF2uh7M5ocsqeG1n+sQAAdJ1Dtup
-	4m2dHYamXsfMOoyIhtwitOcCXnxaqpVfQaDi6rbzkAfGYaca14qIxdQULdt6M9IOWOLN/ChCYl3
-	67hEF/VlU2gfFhGJX06OBe8p+4I4=
-X-Google-Smtp-Source: AGHT+IGGWhiCP32oDBI+bfuJqIEUZrp4Qg6QUVTcbWqcN86p8P+m/Fq+VM54Yc1MDire/bBiZZeV7WZjgbs0XliijJc=
-X-Received: by 2002:a05:651c:1046:b0:2d8:6561:72ca with SMTP id
- x6-20020a05651c104600b002d8656172camr1623297ljm.19.1713967373471; Wed, 24 Apr
- 2024 07:02:53 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="EvlzF2mx"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=d5JXD7gtEnm3qMQMDNB/M1zTCq6MG/UzqOZWERwnqCYqFNK8DhqN/Vc1KHlHDTNI5CfxPbNmQyWcRNbVcPGV/tydVghNnQW8NxWAV+iTwNJc2u6rpY8yjMezyn5+qb6d5eNDfi8VC7uxTF2qIe+CVKkBc24nTw7Doygu3bjs+jY58FQ7LxCQMLwYhv3GzL7AciY+TQhnCxIUg97bbHAUYHNJeG+DIMEmmnILkG5uxxjwM54MfWW8JEEB9xlKS3GF2wvL0/wH9F2VxL3esJLVct9gEBEazUIORRWJybtmeJjJmkBNpOGGp++hfJcKHGw21dywl7BmRAYznpFRV9AwOg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jjKUjS2DjXbb8BnhsSsQvjunkn0xpQJhSNuX0l07wdY=;
+ b=cREil+jKMdnEFOG/yVEVNsxX9Dwf375AL4YQo6HzHNa9hrLOxlGT9trDLToq9Sa+khfqwiLTWvfc8DF6qiieh9lMM/6iSdowb8mKlvm6CGzVPtPryn0P6+WFhDxT4hBXe/kC3W3t4ATMXoHXONnkB/aqQl8XWJu3kvajn6I/mPkUP7n6r3spIjEChjXYRPDhJAygWgR6aVccFi67ltyN4B91LlwAx0/dKUmsnyxogrvM780Zb0YKLhhH3Vm3RItP67xdbAeA80OWYUP988gtZQes8aHb+EO/P2aKh39h8HOvTMh3KNZDag9ktCQLcpfihouKsn76dycVmws9wmR9nw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jjKUjS2DjXbb8BnhsSsQvjunkn0xpQJhSNuX0l07wdY=;
+ b=EvlzF2mxAEAGhxGwcVbSmwZAdMuBOFG12OXRo1xbeMG0X3ZklKButys52cuGyxWfln6JPakV4CbeoLjj1Mn0GXgmZkmaMbXbOgqvHruPnsvqvVputdJ1y+PLbDDwwUtsw1WIFkex4fkDSdB7+7ccoy2X5INWmSAlnIzAJ+oMvaM=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM6PR04MB5384.eurprd04.prod.outlook.com (2603:10a6:20b:2b::17)
+ by DU2PR04MB8582.eurprd04.prod.outlook.com (2603:10a6:10:2d9::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.44; Wed, 24 Apr
+ 2024 14:08:02 +0000
+Received: from AM6PR04MB5384.eurprd04.prod.outlook.com
+ ([fe80::ab73:5047:a22:9439]) by AM6PR04MB5384.eurprd04.prod.outlook.com
+ ([fe80::ab73:5047:a22:9439%4]) with mapi id 15.20.7472.044; Wed, 24 Apr 2024
+ 14:08:02 +0000
+From: Vlad Pruteanu <vlad.pruteanu@nxp.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: claudia.rosu@nxp.com,
+	mihai-octavian.urzica@nxp.com,
+	silviu.barbulescu@nxp.com,
+	iulia.tanasescu@nxp.com,
+	andrei.istodorescu@nxp.com,
+	luiz.dentz@gmail.com,
+	Vlad Pruteanu <vlad.pruteanu@nxp.com>
+Subject: [PATCH BlueZ v2 0/4] bap: Replace the global bcast_pa_requests with a per adapter queue
+Date: Wed, 24 Apr 2024 17:07:37 +0300
+Message-Id: <20240424140741.73899-1-vlad.pruteanu@nxp.com>
+X-Mailer: git-send-email 2.40.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AS4PR09CA0026.eurprd09.prod.outlook.com
+ (2603:10a6:20b:5d4::9) To AM6PR04MB5384.eurprd04.prod.outlook.com
+ (2603:10a6:20b:2b::17)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1713919602-5812-1-git-send-email-quic_zijuhu@quicinc.com>
- <1713919602-5812-2-git-send-email-quic_zijuhu@quicinc.com>
- <349b27a5-d2d3-46f1-b002-44f81e0cedef@linaro.org> <e8cd122d-e342-45c2-b078-a4ca2d8dcfff@quicinc.com>
- <dfe18768-f6da-4c60-880d-deeae3c3b04d@linaro.org> <8ae32009-5f5e-49a1-88a1-e330f0614f60@quicinc.com>
- <5e363318-c6e4-4874-8026-7940b434d583@linaro.org> <2020a858-c3d9-48a7-ad59-3691c6b98fb2@penguintechs.org>
- <CABBYNZJLCPaLTaFEfeTEn+2FpxLS8Z-W2kT1ry4jKB_W=XYNjA@mail.gmail.com> <CACMJSeuWQE4t2KDCRP7n-DeHN9Ndn1bE_KCRc-X2kmM9L2i7_Q@mail.gmail.com>
-In-Reply-To: <CACMJSeuWQE4t2KDCRP7n-DeHN9Ndn1bE_KCRc-X2kmM9L2i7_Q@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 24 Apr 2024 10:02:40 -0400
-Message-ID: <CABBYNZLBx4yYy4V2H1jQErXi=UaQLFRbox3FkxHFNCf8Zj0+RA@mail.gmail.com>
-Subject: Re: [PATCH v6 1/2] Bluetooth: qca: Fix BT enable failure for QCA6390
-To: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Cc: Wren Turkal <wt@penguintechs.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, quic_zijuhu <quic_zijuhu@quicinc.com>, 
-	luiz.von.dentz@intel.com, marcel@holtmann.org, 
-	linux-bluetooth@vger.kernel.org, regressions@lists.linux.dev, 
-	kernel@quicinc.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM6PR04MB5384:EE_|DU2PR04MB8582:EE_
+X-MS-Office365-Filtering-Correlation-Id: 20478885-5ad5-45ab-0c6a-08dc6467f376
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?9mX/2r63THx5S/4hoHgENP41+OU77qJV5mQg3VTuV6oZ6inRd4rVFFXpPCby?=
+ =?us-ascii?Q?0WKr6p0+jXAHMCduDOhhmVd4M9Mk5xjCbF4HMwul5HuapgGfwMXDW17wF0Sq?=
+ =?us-ascii?Q?UHcNYGkVtpDhXvnPEYNpHtHMo6YTirWuSurP81OOkvB+lj/tPImmJFj1XFn9?=
+ =?us-ascii?Q?z3Hqu2Opbq/aMyrksgVLrW0QQFTpafgHbLTd6mghDOWzVG3GYm/XpozWaeL+?=
+ =?us-ascii?Q?0QgANFX1t9IyuHHqEDLyQKThhN3b4toPpFISACdTmXABqu+7JaC7vejx3tZb?=
+ =?us-ascii?Q?KTICxkfVNABxVEXoM252eYGC2KnPSsYG9lOtIZQsmAts3DGUUSZHs4tK+glh?=
+ =?us-ascii?Q?ljLArloHC5uUXlJ9QkvGJSgA97GTUcF2ab3JW7Ak7rz5jkXxnmzIp2qpZY8w?=
+ =?us-ascii?Q?cNuGUnTMDW9IUSJdBIKjFJtBGNMXZkpPg5xwZjgC666HLPTyKEAAEkjm4eAc?=
+ =?us-ascii?Q?VxPZ6cYBN63JdOov/5CAJhM0BzlcBUbL7WlKLBqgXObvZFRe2Vv/KIHlx079?=
+ =?us-ascii?Q?vjeZhelCP8lQ1GG3i/n5XuHjk8rr1ZLaqpugEbdMUA5g5wMM8E1445Bih81u?=
+ =?us-ascii?Q?nm5BIn0CTp2NctsN+3SCy1EPJ9EbEDLQQZUdjwlyA7BxHsHGHaV4dSz3xfXu?=
+ =?us-ascii?Q?Acr6AKixNg8jaReqrNSkD5AL3QMfKckId0VIL3nuE6MlyF/0fQUPZJV5rPJ0?=
+ =?us-ascii?Q?NUdyLMeoBHdWoQ+XMMUDA/kn1akxGLSNemLi8PIP6EphIdhA1cxAMfbm2zCr?=
+ =?us-ascii?Q?bdBxg9pp4b9p2e3UelsMzr8eU5MjEXKme/H6XEdbl6clxGAd6zBfIAjjs6pG?=
+ =?us-ascii?Q?BfNej+4rNnllFQLJB0rKMG5PE8lbZLftuK/A7AXgU0fb1JwpngklQR1buRJp?=
+ =?us-ascii?Q?cv4KS9prugNFvj4jDWDZM+MyaqUzoqr1GpejRWIOsGHbBs0vzUlMXKHP8DEz?=
+ =?us-ascii?Q?cZOKJlepXozTWeN3GeQ/ZK+oBWYZit2Y5NvYppAv50vyHzS3c68jPIaI9WI1?=
+ =?us-ascii?Q?+YnUzHc2uhhilqAPx2t10sJzg6KlS8ZBImQvPIT5WTOttg/f2/HTTgbKctra?=
+ =?us-ascii?Q?3F5C19qjBB05i19c5ekXoKoVsHS8gPrp87ibf/McsScqHx+hjdCiagUo216R?=
+ =?us-ascii?Q?N6/xvg2PMURfD9ZsiYy1NTcHdUVciigRWF/VldZZOgOel7bhkUEQ2xY9clfu?=
+ =?us-ascii?Q?GzUWjrk8f36LA300l0HgSsEM1/gfj0cvJmM273wPhWKEr//rkDg/guEMBjAM?=
+ =?us-ascii?Q?magS1TotyBlMv3MtByLQBp7GgwTMj15eNgYRca3BoDssk3lHjsulNrEBvfQF?=
+ =?us-ascii?Q?Jsdhh63MYbZWN/GNa8btoBajEQhGg9p9z5j5FWb06H6n2Q=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM6PR04MB5384.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007)(52116005)(38350700005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?9V2j4c2jU0mRf8Hlql4tuGWCZ50VkSczEVm4wLxbyHMPkosiweZVpM4XJXUF?=
+ =?us-ascii?Q?SL1WVEngovL3MPmMP64wTl5n0i/GUhMUJj1iIgC5wi9yy4iZlPkiQ3guE/uH?=
+ =?us-ascii?Q?kl4wsCGMbg337G8g23grBXYw4i68Rjoxqht5KPwp/JLcfpnq1mu8ZSyduU7Y?=
+ =?us-ascii?Q?v+pgmp9l2TgwqSJGvVwyDVrebY9DY2cq2ECMoAltAOVRcNdOzXV5Szdk9vBV?=
+ =?us-ascii?Q?NTyxQJL1cROkgDB3kHbXm5R/Vn/+JCgfFT+04oO5LSuQM1FMazNIAX5E+TpC?=
+ =?us-ascii?Q?aHJFbs0mFI3en6H/GJMPGNn8PxvsrBPjcsdaIl82G3sfju7dcg1AFzO8nS4H?=
+ =?us-ascii?Q?6ZxXYaxDifMw2FbfQ8kbQpA6uCxa3ImkFJmuxo6SrBSeq0wZIvbQg/jJiGgf?=
+ =?us-ascii?Q?tsaQ3NPimtInIVmWmKvZTrqCOQLPRhtp+SrKbmp0kTOXKkKSP3wsO/2b7x60?=
+ =?us-ascii?Q?ledFAiqwYYekjQTkKs8RGIvPOJ0TPhOM/+uIUtqXMUCxTKM003pIPjxwBR1J?=
+ =?us-ascii?Q?9Pldg2hFHAaUxDXJ6lAA8Pmy0m1FF1lClQ9jtRciEc+0gqDCEBb9AvLzXtS4?=
+ =?us-ascii?Q?X9D20/Ug72HgBw/o0L/sN0xQ0/mV4FyKltidsFMvASAJXmYRDBNoX47oh0qn?=
+ =?us-ascii?Q?wRATKvUE4mVwK4+BReFr/sqY6WZYprAhWnQDBsfF40MVM1hjxIilH+J8MLPq?=
+ =?us-ascii?Q?t2OOZe1X9l/KXH5XxMLynwCS2R6opDvswjDjf7FLnWSWip3IRnvWBUoitp2h?=
+ =?us-ascii?Q?jTiIEJ5uJcv1YSMP11KZ3dAFjvSSdE5sKpWUsBqKiiSCFBCBf7eMneSNTCFB?=
+ =?us-ascii?Q?H6j66HnBdJO7JRkdilK7C6IDKJmqexM3om2CinxQ83kBoW80+GJHKpFP32Ro?=
+ =?us-ascii?Q?PjZ2SFcy6SfIEaVyu9w4dBpcFWog8e0yp13Od1R/5cVCioTVpeCtshVXBv88?=
+ =?us-ascii?Q?eshpgWcljOAb77bBee60g+gma10EcdcISyHXmSPCJSJbnOMe4wLdXpMvs9au?=
+ =?us-ascii?Q?zdcPXtWomYO3SZF2zM2WOSiC7DN5wYDAPaLXSGmMLu1ppmnJNyzynvm0MrxJ?=
+ =?us-ascii?Q?1+1pDflWQEOAZxME+cammE9QOsIn+8j/uaf6aJGxlMg80q7FZhLCkpjV1aiy?=
+ =?us-ascii?Q?ebJmJnyJsV+mcGGwciSa0l7aNXAfDpVGFSdZoj9IRpxIn7bR0h4d4PQjf8Ui?=
+ =?us-ascii?Q?RFyOYB0yoliQyJ1eiMDj+H0Yav7iCKsT6lSzaVkD798b0ztM29XwwQxEK8IW?=
+ =?us-ascii?Q?Iu9gfXfwpP9TN1oeREOnoS/8bLAyRY6jgh1zG+oaEMtKG0Yr0I+xeuDgjVil?=
+ =?us-ascii?Q?BWTSXxll5Jlmchf56vchqort8uBq6qhzoncZlY+5eUdM6BnDASXGcpKpRmof?=
+ =?us-ascii?Q?TisbH7zyF7Y+x9pTbPnsL3A+Y8Cnh9KW7wcwFcC2nTLtZdr5WwtGcZPROjU1?=
+ =?us-ascii?Q?gRHJ3rJeEJmXbjbE8lz6A1OPbo9gCLQZdJp7T/3UWe3xk1CBq/UsEwib00sZ?=
+ =?us-ascii?Q?fSx0pSRfrvkBDsjCShm37OvnoPY4YicGsktjPdPKBkvLjzLJdXkqeM1LyT4v?=
+ =?us-ascii?Q?/I38lDSoC1vhnXHzGEfzrBaxrISOnDK3f5rwg7YT?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 20478885-5ad5-45ab-0c6a-08dc6467f376
+X-MS-Exchange-CrossTenant-AuthSource: AM6PR04MB5384.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2024 14:08:01.6240
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: s+L6jxlsQk5VDSB+cB2hI31JwkPX2xIOUYthIQWs9lyQkddJEuFKyEDNB4rRwCBS6IFB0AYdCEDbuP970UHoUg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR04MB8582
 
-Hi Bartosz,
+This replaces the current implementation that uses a global
+bcast_pa_requestsqueue with one that runs on a per adapter basis. In order
+to implement this the btd_adapter field of bap_data has been replaced by a
+new struct, bap_adapter, which includes btd_adapter, bcast_pa_req queue
+and pa_timer_id.
 
-On Wed, Apr 24, 2024 at 9:52=E2=80=AFAM Bartosz Golaszewski
-<bartosz.golaszewski@linaro.org> wrote:
->
-> On Wed, 24 Apr 2024 at 15:49, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Wren,
-> >
-> > On Wed, Apr 24, 2024 at 1:04=E2=80=AFAM Wren Turkal <wt@penguintechs.or=
-g> wrote:
-> > >
-> > > On 4/23/24 9:31 PM, Krzysztof Kozlowski wrote:
-> > > > On 24/04/2024 06:18, quic_zijuhu wrote:
-> > > >> On 4/24/2024 12:10 PM, Krzysztof Kozlowski wrote:
-> > > >>> On 24/04/2024 06:07, quic_zijuhu wrote:
-> > > >>>> On 4/24/2024 12:06 PM, Krzysztof Kozlowski wrote:
-> > > >>>>> On 24/04/2024 02:46, Zijun Hu wrote:
-> > > >>>>>> Commit 56d074d26c58 ("Bluetooth: hci_qca: don't use IS_ERR_OR_=
-NULL()
-> > > >>>>>> with gpiod_get_optional()") will cause below serious regressio=
-n issue:
-> > > >>>>>>
-> > > >>>>>> BT can't be enabled any more after below steps:
-> > > >>>>>> cold boot -> enable BT -> disable BT -> BT enable failure
-> > > >>>>>> if property enable-gpios is not configured within DT|ACPI for =
-QCA6390.
-> > > >>>>>>
-> > > >>>>>> The commit wrongly changes flag @power_ctrl_enabled set logic =
-for this
-> > > >>>>>> case as shown by its below code applet and causes this serious=
- issue.
-> > > >>>>>> qcadev->bt_en =3D devm_gpiod_get_optional(&serdev->dev, "enabl=
-e",
-> > > >>>>>>                                                 GPIOD_OUT_LOW)=
-;
-> > > >>>>>> - if (IS_ERR_OR_NULL(qcadev->bt_en)) {
-> > > >>>>>> + if (IS_ERR(qcadev->bt_en)) {
-> > > >>>>>>          dev_warn(&serdev->dev, "failed to acquire enable gpio=
-\n");
-> > > >>>>>>  power_ctrl_enabled =3D false;
-> > > >>>>>>    }
-> > > >>>>>>
-> > > >>>>>> Fixed by reverting the mentioned commit for QCA6390.
-> > > >>>>>>
-> > > >>>>>> Fixes: 56d074d26c58 ("Bluetooth: hci_qca: don't use IS_ERR_OR_=
-NULL() with gpiod_get_optional()")
-> > > >>>>>> Reported-by: Wren Turkal <wt@penguintechs.org>
-> > > >>>>>> Link: https://bugzilla.kernel.org/show_bug.cgi?id=3D218726
-> > > >>>>>> Link: https://lore.kernel.org/linux-bluetooth/ea20bb9b-6b60-47=
-fc-ae42-5eed918ad7b4@quicinc.com/T/#m73d6a71d2f454bb03588c66f3ef7912274d37c=
-6f
-> > > >>>>>> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> > > >>>>>> Tested-by: Wren Turkal <wt@penguintechs.org>
-> > > >>>>>
-> > > >>>>> No, Bartosz' patch should go.
-> > > >>>>>
-> > > >>>> what is Bartosz' patch.
-> > > >>>
-> > > >>> Srsly? You were Cc'ed on it. How many upstream patches on upstrea=
-m
-> > > >>> mailing lists do you receive that you lost track of them?
-> > > >>>
-> > > >> Bartosz' patch have basic serious mistook and logic error and have=
- no
-> > > >> any help for QCA6390, and it is not suitable regarding DTS usage.
-> > > >
-> > > > Really? Why you did not respond with comments then? Considering how
-> > > > imprecise and vague you are in describing real issues, I have doubt=
-s in
-> > > > your judgment here as well.
-> > >
-> > > Please slow down here. Zijun's patch works and Bartosz's patch does n=
-ot.
-> > > I don't think Zijun means any ill intent. I am replying to Bartosz's
-> > > patch right now.
-> >
-> > Ok, that is great feedback, so I might be picking up the Zijun v7 set
-> > if we don't find any major problems with it.
-> >
->
-> Luiz,
->
-> Please consider my alternative[1] also tested by Wren. Zijun's usage
-> of GPIO API is wrong.
->
-> Bart
->
-> [1] https://lore.kernel.org/linux-bluetooth/CAMRc=3DMfJ1v3pAB+Wvu1ahJAUvD=
-fk3OsN5nieA-EYgTXPwMzqyg@mail.gmail.com/T/#mbf94795476d21df0a24441470ce02de=
-f9d2970a7
+Vlad Pruteanu (4):
+  bap: Initialize bap_data for scanned device in bap_bcast_probe
+  bap: Replace adapter in bap_data with bap_adapter
+  bap: Improve handling of pa_req timer
+  bap: Remove deleted devices from pa_req queue
 
-@Wren Turkal How did you test this, what patches did you have?
+ profiles/audio/bap.c | 196 +++++++++++++++++++++++++++++--------------
+ 1 file changed, 131 insertions(+), 65 deletions(-)
 
---=20
-Luiz Augusto von Dentz
+-- 
+2.40.1
+
