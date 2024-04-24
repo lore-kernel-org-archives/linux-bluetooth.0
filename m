@@ -1,274 +1,141 @@
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24B5C13A401
-	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 20:48:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08548156F46
+	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 22:01:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713991698; cv=none; b=Dv7HZ2QK7ScaRwXY3eIVsRWMCCJ1dncUzks/8U5zNgjCPmBb15yduOf5WTxSa6JAxZBpcP2Z9XUvyUA+I28dAp8hvMyvYsS8nn7Snk33t0amCd4hLYcli10gHOJYduf2tFSPe2aakf1e5WCJvWIUKG20w0anEatzQjLDCIyLr0M=
+	t=1713996084; cv=none; b=Uqs2TWN+z47LzFn+o7EUQw/3JetUKDS4Wx727avmFG++SUDdIeFbmw84nwaEml38ME4RcgUhigV8AsG9ddL6Zi9xrrwx2OiOMG+yWR9UGLbuU8ppImd03s3oDVAX3kmRN2c4UoGhXfhsHZDHCTAUXJz9EdW2zBgqfeBwjbjjJQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713991698; c=relaxed/simple;
-	bh=APvvGfjt6M4RGHG68kcPHxSbyBNeXdPdp01IWBW2Xh8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CXhsJJNFwSN92abQM4sUVCEPDqeu9c53Mcec+uqFPIM9CMTXSV3pwgYVEj4uY+C+WdWrKCHogJE1I/Vg7FmGzNoiNB4tcvHH4LJGpTrz0Bh4KwIS68Wb85gQl0+uuvDC6hnxBu5CRULBG3nf34YenwKAlSEh2HEjukjc2tmsRAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=iUb7cQHR; arc=none smtp.client-ip=209.85.128.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1713996084; c=relaxed/simple;
+	bh=IqXWrvySnnW0Zd7k0NFNn2ct0HS1XSy7dAS7pNfWT9M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Gx3e7ZrD45hxL1k2NY8yiWT6NDND+FeYVJh8aioJ44cOwhrfWPUbFEuW8toGnnPwIQSxupRzySH2Zhz5qUWuhDkI0YUErBtuNXYD2PP0Bw9LjoS+tSLuMBBy1g9Y5wmO4wifYZE8FZg7ZaU3hi/Q4MfUDVkssDeQ9OGPM46KbuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=VVCAHnmX; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=penguintechs.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iUb7cQHR"
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-61865eed63dso11149377b3.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 13:48:15 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="VVCAHnmX"
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1e3c9300c65so3005585ad.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 15:01:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1713991695; x=1714596495; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=l1pZWiUWl1nMefgATaw3YsOhf+pqCV2nzomHBQjDgDo=;
-        b=iUb7cQHRdPzSnLuOtQ10HQPxCXShHqlw84cVDllBYOK9PLxLXNpUcxPkGcxvBUu73J
-         hUmjPh0vxM8sawc1ymMSsanW8e05vYq5DQYUDciIRe4XmvrQaH38QOyruo0CWffkX4En
-         mZB0xm5MDcAx31d278omLoglYOBSzYO+dK1pSLTLH3AOtKqmDv9fIJ9Hh6yeLwA6jWxC
-         QEyVY8wJ1E4VhNsls+RKbnKQEA1F8ElpoSn75M4+2nTj9K7MhfyuVpjDPncxY0ydFrZ8
-         +eb1VbadOtXSSLQzh/s59jVAaQ9N5JNW2u5VFl8+ByPR3FPM26Am5gp3ADe0Vplq8JhC
-         9W6w==
+        d=penguintechs.org; s=google; t=1713996081; x=1714600881; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sB+VS/wyDAPAusCDTHXLUrI6NwR8DPK8aFqLy1Xw/SE=;
+        b=VVCAHnmX5IZn2yM5EK3DfDlJFgB2HJrW8/mT7s79s3/NgWzfIxlbGs8P7EHc3BspOx
+         R3zTQADRCpyVxhtoEiPn+1JdcgPmniS+XxC4llfp3p0gJPxnh+FwdRbBggZ+BQJ2qXIm
+         51utypW9/99QOBxurbwK61ZbGAMZS1Pwqsmy4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713991695; x=1714596495;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=l1pZWiUWl1nMefgATaw3YsOhf+pqCV2nzomHBQjDgDo=;
-        b=vohVIjyTPaxuAxG8Ske3QtBTW0gKSW9WyrrfrhArckCdN6exXdphEKRLL/JWsek6j/
-         smE+yRr1L3LiKMUrNyrEYgIZTcy+jhy03BX1bv2O3nx+41qRTpsFPVoScPgnlkOPfmrk
-         2adNYJsYpLoyufLKyNcFVv29wJ7bAPtE8AM8ji2z9UcZF/At0UomvQnmmhZBxKAtH0Xa
-         zhhngLrgMul/N9CIVaMPtWY2QeVP4p4f9mXtJ3nmFArKNwU6i/yOBQLPU0t06haErMf5
-         jUp01n1oz5/n2qIv636pM8CBCpJ5KddmDhBR4gwyZ0MI/VX4cJQnmHsVbO3GMaF/wbFL
-         Ukug==
-X-Forwarded-Encrypted: i=1; AJvYcCV7or3UWC7ttXHd2PiNegNNkfRpn1oeNMK5UfNYM7BB5p3nwxfKRAsXRKmZFfj5y1H3BQF+kacBPh5xOeXvOivGFzlZLYo3TtSmiAGjJ2Nz
-X-Gm-Message-State: AOJu0YzwtOxg1j0qvs2QE6dOt3WNsvOIR2gZNjLokoKXdDDhami2FKfo
-	vK7llRK1FsgiPrCf44u4yqqqTk0UqikLUGdOA9Tbcu/eqqJGSUNDYZc00IZFBx/IhIS+MQknK3G
-	mz59ZWz7IOLUX1tt24wxoDipRZcY/07HQhfu4rA==
-X-Google-Smtp-Source: AGHT+IFoGSJUlBELzEJjb2GiElbJgSl6N/By/Nucv+WQf0ab/sVj/6V4J/pp7hLNpClrwGLOjUJdwEmao5p/n9i55u8=
-X-Received: by 2002:a25:ae85:0:b0:dcc:623e:1b5d with SMTP id
- b5-20020a25ae85000000b00dcc623e1b5dmr621667ybj.31.1713991695065; Wed, 24 Apr
- 2024 13:48:15 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713996081; x=1714600881;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sB+VS/wyDAPAusCDTHXLUrI6NwR8DPK8aFqLy1Xw/SE=;
+        b=X0wvjMlY0Q+ovDbYB2o8X18kieILVTfcI+mlvbgjTwD883qx+JILRsIB5L7PA/IjI7
+         TaVCuNQRGBCj6we1GeQMJKMRRGwTO8USb+hmNlJYJgb/+J8hBGEe59+TW3+gC6qWWj9v
+         p9eE096MOCjQ5Vs/w7NJFXhiMI4AewBro9ra0yE8R6ZiWOga5/rvwyCSVgZ/LoO8rRmJ
+         d3qs595EUmLO2T0urj/x5jYIcQwVyX2JQsAjDJOtDJ238tFcqkeWVe7tb/htkLGj4nvg
+         FdI75GG2VII1mDF2J7F9Lj7rZghvxGlLfdMsAthxF690wehArxRzGUHZ9k2kIxe1swHN
+         OltA==
+X-Gm-Message-State: AOJu0Yxkua/uTmjjtOOmSxdEqDDFkcvPR7InhDFXd9DS6UowNJvLtdBO
+	KYc/ftaczm0iRM0v8mHv0gO+lsSJYr0U5hc0Tu/IhrJh5C2A3swiXdVt7z0n3Q==
+X-Google-Smtp-Source: AGHT+IHphh/jDs4EOysHcsZZFXxFiZ/bOzSs55uoIIDoctH8OoFwMt1NsR3PGgoXOHIL1FY8wfmjqg==
+X-Received: by 2002:a17:902:ecd2:b0:1ea:9596:11eb with SMTP id a18-20020a170902ecd200b001ea959611ebmr1846447plh.60.1713996080941;
+        Wed, 24 Apr 2024 15:01:20 -0700 (PDT)
+Received: from ?IPV6:2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08? ([2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08])
+        by smtp.gmail.com with ESMTPSA id ba5-20020a170902720500b001e2b4f513e1sm12380328plb.106.2024.04.24.15.01.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 Apr 2024 15:01:20 -0700 (PDT)
+Message-ID: <c1632816-f754-42c6-8448-2daff8221b58@penguintechs.org>
+Date: Wed, 24 Apr 2024 15:01:18 -0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240410124628.171783-1-brgl@bgdev.pl> <20240410124628.171783-2-brgl@bgdev.pl>
-In-Reply-To: <20240410124628.171783-2-brgl@bgdev.pl>
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Date: Wed, 24 Apr 2024 23:48:03 +0300
-Message-ID: <CAA8EJpq81Z4YH1apTidntwcfpsL3YjgMM_y+G0=waaoPjRL-Cw@mail.gmail.com>
-Subject: Re: [PATCH v7 01/16] regulator: dt-bindings: describe the PMU module
- of the QCA6390 package
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Kalle Valo <kvalo@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konrad.dybcio@linaro.org>, Liam Girdwood <lgirdwood@gmail.com>, 
-	Mark Brown <broonie@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Saravana Kannan <saravanak@google.com>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Arnd Bergmann <arnd@arndb.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Alex Elder <elder@linaro.org>, 
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
-	Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, Amit Pundir <amit.pundir@linaro.org>, 
-	Xilin Wu <wuxilin123@gmail.com>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-pci@vger.kernel.org, linux-pm@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] Bluetooth: qca: Correct property enable-gpios handling
+ logic for WCN6750 and WCN6855
+Content-Language: en-US
+To: Krzysztof Kozlowski <krzk@kernel.org>,
+ quic_zijuhu <quic_zijuhu@quicinc.com>,
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, luiz.dentz@gmail.com,
+ luiz.von.dentz@intel.com, marcel@holtmann.org
+Cc: linux-bluetooth@vger.kernel.org, bartosz.golaszewski@linaro.org,
+ kernel@quicinc.com
+References: <1713947712-4307-1-git-send-email-quic_zijuhu@quicinc.com>
+ <af004bcd-0649-4a82-8f09-36d6addd0e1e@linaro.org>
+ <0cba3838-917b-48af-ba8b-2ef60714943a@quicinc.com>
+ <49cf0a3d-5f52-41a1-9858-692f48d06b88@kernel.org>
+From: Wren Turkal <wt@penguintechs.org>
+In-Reply-To: <49cf0a3d-5f52-41a1-9858-692f48d06b88@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, 10 Apr 2024 at 15:46, Bartosz Golaszewski <brgl@bgdev.pl> wrote:
->
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->
-> The QCA6390 package contains discreet modules for WLAN and Bluetooth. They
-> are powered by the Power Management Unit (PMU) that takes inputs from the
-> host and provides LDO outputs. This document describes this module.
->
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> Acked-by: Mark Brown <broonie@kernel.org>
-> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> ---
->  .../bindings/regulator/qcom,qca6390-pmu.yaml  | 151 ++++++++++++++++++
->  1 file changed, 151 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml
->
-> diff --git a/Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml b/Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml
-> new file mode 100644
-> index 000000000000..9d39ff9a75fd
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml
-> @@ -0,0 +1,151 @@
-> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/regulator/qcom,qca6390-pmu.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Qualcomm Technologies, Inc. QCA6390 PMU Regulators
-> +
-> +maintainers:
-> +  - Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> +
-> +description:
-> +  The QCA6390 package contains discreet modules for WLAN and Bluetooth. They
-> +  are powered by the Power Management Unit (PMU) that takes inputs from the
-> +  host and provides LDO outputs. This document describes this module.
-> +
-> +properties:
-> +  compatible:
-> +    const: qcom,qca6390-pmu
-> +
-> +  vddaon-supply:
-> +    description: VDD_AON supply regulator handle
-> +
-> +  vddpmu-supply:
-> +    description: VDD_PMU supply regulator handle
-> +
-> +  vddrfa0p95-supply:
-> +    description: VDD_RFA_0P95 supply regulator handle
-> +
-> +  vddrfa1p3-supply:
-> +    description: VDD_RFA_1P3 supply regulator handle
-> +
-> +  vddrfa1p9-supply:
-> +    description: VDD_RFA_1P9 supply regulator handle
-> +
-> +  vddpcie1p3-supply:
-> +    description: VDD_PCIE_1P3 supply regulator handle<S-Del>
-> +
-> +  vddpcie1p9-supply:
-> +    description: VDD_PCIE_1P9 supply regulator handle
-> +
-> +  vddio-supply:
-> +    description: VDD_IO supply regulator handle
-> +
-> +  wlan-enable-gpios:
-> +    maxItems: 1
-> +    description: GPIO line enabling the ATH11K WLAN module supplied by the PMU
-> +
-> +  bt-enable-gpios:
-> +    maxItems: 1
-> +    description: GPIO line enabling the ATH11K Bluetooth module supplied by the PMU
+On 4/24/24 12:12 PM, Krzysztof Kozlowski wrote:
+> On 24/04/2024 11:22, quic_zijuhu wrote:
+>> On 4/24/2024 4:44 PM, Krzysztof Kozlowski wrote:
+>>> On 24/04/2024 10:35, Zijun Hu wrote:
+>>>> Commit 56d074d26c58 ("Bluetooth: hci_qca: don't use IS_ERR_OR_NULL()
+>>>> with gpiod_get_optional()") has wrong logic for below case:
+>>>>
+>>>> property enable-gpios is not configured for WCN6750 and WCN6855
+>>>
+>>> As I said before, bindings say this property is required. I already
+>>> asked you to provide rationale describing hardware and update the
+>>> bindings if they bindings are not correct.
+>>>
+>> 1)
+>> you ever given below reply at below link
+>> https://lore.kernel.org/linux-bluetooth/52394d97-04c3-4f77-aaae-f1e152cd5632@linaro.org/
+>>
+>> "The pin is required on 6750, 6855 and maybe others. You cannot not have
+>> the GPIO"
+>>
+>> 2) for property enable-gpios, they are required for WCN6750 and WCN6855
+>> in my opinion,  i am a member of BT team.
+> 
+> If they are required, then your commit msg is not precise and code looks
+> incorrect.
+> 
+>>
+>> 3) only care about the case property enable-gpios is not configured,
+>> the original BT driver design logic indeed matches with binging spec's
+>> requirements before bartosz's wrong change
+> 
+> What? There is no such case according to bindings. I told you already
+> two times: Either change bindings or this is not valid.
 
-As a side node, I think we should also steal swctrl pin from the
-bluetooth device node. It represents the status of the PMU and as such
-it is not BT-specific.
+@krzysztof, I'm curious. There is no entry in the binding specifically 
+for qca6390. Should there be?
 
-> +
-> +  regulators:
-> +    type: object
-> +    description:
-> +      LDO outputs of the PMU
-> +
-> +    patternProperties:
-> +      "^ldo[0-9]$":
-> +        $ref: regulator.yaml#
-> +        type: object
-> +        unevaluatedProperties: false
-> +
-> +    additionalProperties: false
-> +
-> +required:
-> +  - compatible
-> +  - regulators
-> +
-> +allOf:
-> +  - if:
-> +      properties:
-> +        compatible:
-> +          contains:
-> +            const: qcom,qca6390-pmu
-> +    then:
-> +      required:
-> +        - vddaon-supply
-> +        - vddpmu-supply
-> +        - vddrfa0p95-supply
-> +        - vddrfa1p3-supply
-> +        - vddrfa1p9-supply
-> +        - vddpcie1p3-supply
-> +        - vddpcie1p9-supply
-> +        - vddio-supply
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    #include <dt-bindings/gpio/gpio.h>
-> +    pmu {
-> +        compatible = "qcom,qca6390-pmu";
-> +
-> +        pinctrl-names = "default";
-> +        pinctrl-0 = <&bt_en_state>, <&wlan_en_state>;
-> +
-> +        vddaon-supply = <&vreg_s6a_0p95>;
-> +        vddpmu-supply = <&vreg_s2f_0p95>;
-> +        vddrfa0p95-supply = <&vreg_s2f_0p95>;
-> +        vddrfa1p3-supply = <&vreg_s8c_1p3>;
-> +        vddrfa1p9-supply = <&vreg_s5a_1p9>;
-> +        vddpcie1p3-supply = <&vreg_s8c_1p3>;
-> +        vddpcie1p9-supply = <&vreg_s5a_1p9>;
-> +        vddio-supply = <&vreg_s4a_1p8>;
-> +
-> +        wlan-enable-gpios = <&tlmm 20 GPIO_ACTIVE_HIGH>;
-> +        bt-enable-gpios = <&tlmm 21 GPIO_ACTIVE_HIGH>;
-> +
-> +        regulators {
-> +            vreg_pmu_rfa_cmn: ldo0 {
-> +                regulator-name = "vreg_pmu_rfa_cmn";
-> +            };
-> +
-> +            vreg_pmu_aon_0p59: ldo1 {
-> +                regulator-name = "vreg_pmu_aon_0p59";
-> +            };
-> +
-> +            vreg_pmu_wlcx_0p8: ldo2 {
-> +                regulator-name = "vreg_pmu_wlcx_0p8";
-> +            };
-> +
-> +            vreg_pmu_wlmx_0p85: ldo3 {
-> +                regulator-name = "vreg_pmu_wlmx_0p85";
-> +            };
-> +
-> +            vreg_pmu_btcmx_0p85: ldo4 {
-> +                regulator-name = "vreg_pmu_btcmx_0p85";
-> +            };
-> +
-> +            vreg_pmu_rfa_0p8: ldo5 {
-> +                regulator-name = "vreg_pmu_rfa_0p8";
-> +            };
-> +
-> +            vreg_pmu_rfa_1p2: ldo6 {
-> +                regulator-name = "vreg_pmu_rfa_1p2";
-> +            };
-> +
-> +            vreg_pmu_rfa_1p7: ldo7 {
-> +                regulator-name = "vreg_pmu_rfa_1p7";
-> +            };
-> +
-> +            vreg_pmu_pcie_0p9: ldo8 {
-> +                regulator-name = "vreg_pmu_pcie_0p9";
-> +            };
-> +
-> +            vreg_pmu_pcie_1p8: ldo9 {
-> +                regulator-name = "vreg_pmu_pcie_1p8";
-> +            };
-> +        };
-> +    };
-> --
-> 2.40.1
->
-
+> 
+>>
+>> 4) please ask dts owner for help if you suspect current bindings spec
+>> has something wrong. it is not my responsibility for providing such
+>> info, that maybe involve CCI.
+> 
+> What?
+> 
+> What or who is DTS owner?
+> 
+> I do not suspect bindings are wrong. You are implying it. Anyway, if
+> making driver correct according to bindings is not your responsibility,
+> then this patch is just bogus.
+> 
+>>
+>> 5) gentle reminder, please realize that there are many lunched products
+>> already when you try to change some important logic, i don't suggest
+>> change important logic or setting if there are no actual issue reported.
+> 
+> What?
+> 
+> Best regards,
+> Krzysztof
+> 
 
 -- 
-With best wishes
-Dmitry
+You're more amazing than you think!
