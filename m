@@ -1,97 +1,118 @@
-Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D7B81598E6
-	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 12:01:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45C711598E6
+	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 12:05:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713960099; cv=none; b=bjLCJb7X3UDciFV5Kcp8hOM64agGBNpus+eAcsglbF1rI1F1mTDprhtR0KOvWB+tueXYc7WdwV8J6eQNOQmyPruLttsYuIT85uWE3XMZdsESzzTt/llaHPtFwuMnH8zF9rwNXJvMEKN1gDn3CvlC2N1h0im1u+WwYKeOs9fx2Xs=
+	t=1713960350; cv=none; b=WF6Y1oBQYhPPeBtcYXQhyO8XFM71WArblQ+jQf09wC0N/+baCMmeBxTyOF/NmuAI2wS2k5MUXIxr7Yjh9p9ZvqhmMUTNBEfdh2p2cO6tHwhLol17zdEIuZ+n0Fsie3a9YCQAimuosdIZJEUu997DKNWRqLPQZJtAzsdpO4v9XVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713960099; c=relaxed/simple;
-	bh=0CvXLMHM5mvieJKsaX+p+mu975Ln9+UEW3V4OyydHIw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=U3usfTA9PQkuns49As0LzesTZwi/CCEcGbrXjyPdFRXvvQT0f/3TPYK3TY4yQloA3AeNm8TPwkJCDgHkBPnb76yplRrA1z4D1a5PclNfoaAzjm1gTMPFsPKcR7sL4+pblkcx+pRQ6QpcRPVDTFtIhbNKFZKXBA6nTYuikbdkzIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=tmfjRh9W; arc=none smtp.client-ip=209.85.219.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1713960350; c=relaxed/simple;
+	bh=O9Y9XW9Bf8tQwBetsJd8cr2rhoDDnWiPSv3Wv8RVtfQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UKXjTRUxpIUheaeagfDN7l8E7hF8IJ+8rTt+j5Z62XPehjZJxcz2gn3pvThPIwtCHe5jKHrh4J3ZmDsnQePAlDm4Wme68BpfvhEu7r61KzgXBnZC+R8u6PPOdO4p4XGHOE/Orc4otgxo4B04epspxAJBG7w2cDsuTItusMD6rPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=ks8YkGwZ; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=penguintechs.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tmfjRh9W"
-Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-de5809cd7b0so54601276.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 05:01:34 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="ks8YkGwZ"
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6ed32341906so6503036b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 05:05:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1713960094; x=1714564894; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=0CvXLMHM5mvieJKsaX+p+mu975Ln9+UEW3V4OyydHIw=;
-        b=tmfjRh9WA0Gim+MnjfLeMq6a+z6+t7/PoXocOAzy57tNcXm7MC4AkgITeQPBCgtX1l
-         dGQA05mIOtl559U1U+vgqcljQp/jVzHYxjKyf7K0boxeYS+TelG6aS6JVfV2C/+VWAig
-         y4xxi26AzN7/payAGJA3aJtp47TRYDB+xU27ht8Puj8Rnq7QIQczyfCfeNvUfbhHEny3
-         OWDZ/mV151DA3Yed6m+IRfHi9vp3HLTSl/UGvEW9rmhk/55lGpLkHyBsrvLzE9z+TGSk
-         0LCUlRjO7SpThDjPoouXc+aOw3JU2qYVv31Zz5DrUM2zu+8tXPCWGdHjZ/JCTP2kBmEW
-         49Bw==
+        d=penguintechs.org; s=google; t=1713960347; x=1714565147; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=S+FykyxhMPJPKFfFxIzTojGiVzkxju+/n6mO5lG++54=;
+        b=ks8YkGwZ9WesyzVattAimXAcqCXuDwuIXOeyFFfXrHFX1VP/HoVeKcvg3OpNMJsZNX
+         8ZQFqtSmLbqNcchZooELgEkTRGJK5r5wiiBUYVPJ16vLJea4DBLGAELveKrAvORdNW1S
+         TuH42TSmw7tZSRsAdjOtXOZeqG2FiyV6rxQIE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713960094; x=1714564894;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0CvXLMHM5mvieJKsaX+p+mu975Ln9+UEW3V4OyydHIw=;
-        b=o1AzFDlb9L8G7lPMq3/Biq0NmRWgFiL9hwHQZyRRfDLsgwlcc7ocm09pbv/7k2VLJI
-         BgKxmsokz/dwVjKsgYvfOpkNT1zfxublhmCc1heMCMCwY96Mo2U/OoslHmiuNba6S4YB
-         OvkOWW8ZFQEitm+pfvcP8ZIxPuiRfzp0urDoXMmgVEx/TwGrMp6qMICoII3FKnWwm+W2
-         oGqPBdhUn71ckTgOeqYM8VqxrH0lJTRR0aht+zFrMAoVtw+wYa6egfMzuuaY8cdquuU+
-         xmqjHI/njnBPtiQUpWx1YlRHLPa6n2j540AVkpRgEiDMKngXjopBifXPsVCQIwYMNfme
-         0L+A==
-X-Forwarded-Encrypted: i=1; AJvYcCWwpuE7QIIxiHuYinxaEkPE/WIfIwa0tuog2aoWoRQxlCiET/NR8WnOyzGuIsuGNy2fNyLQvHvk5f3OfOigLVI1bIn7QHuFkalwhYn+juwP
-X-Gm-Message-State: AOJu0YzT8/qH6nYwXDKGUXcyR03Vmnp1lVZmm+B3uwMZ+aXvsSvn9PWL
-	sx63EBmMx5M8jkWvoOIJKBAyYaoqVOtxD21LP+Jc3ewHDBwava+afb5EuyF44fCk+iKzyNf9Ng4
-	/8+RBThD32Yf+RlJ/kmQm7u0yBI70zXDh/m/G4w==
-X-Google-Smtp-Source: AGHT+IHzZo4Ut6gU9UO63GhCLg1BvH9isGdACES/j0J9GVRMC/W9uMmUWJy79G52Yy/44lup2sqppkr+3ipIco497iw=
-X-Received: by 2002:a25:2fd1:0:b0:de4:6efa:debd with SMTP id
- v200-20020a252fd1000000b00de46efadebdmr2514071ybv.29.1713960093802; Wed, 24
- Apr 2024 05:01:33 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713960347; x=1714565147;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=S+FykyxhMPJPKFfFxIzTojGiVzkxju+/n6mO5lG++54=;
+        b=gHhotpeVIBs46UbvxrEs4yL3E/KXPuMLQQ1FnwsWykOAAVpKqZOD/VevFGsxtVDDnz
+         mJlt6aGVrUwMQvz6L/+DsFBseR4mJoRQ0fadZEF2nu9AQDItuCmvmvhIge4MSakrzLEl
+         bE2r1gzhaDViw30BcDB/23iuvxVZ72pJwNquEP8SZlXE4zq+/+v/DTPDff20XWI78anh
+         dG9K+CqGx16bTV7SPheSwrJFfetOGuCFcYraRnvIjrOSPvvf8sEXSp8fPpkDmM+4h6ku
+         R2YgG7vk36H5l0wkQ7twTKZiNZQiMFzDyC+AadS4EPAydIvRxhhKg+SLArk7XGH92chb
+         zXxA==
+X-Forwarded-Encrypted: i=1; AJvYcCU4zJ1R5Uc/Ynwe7jee4RmxLCXcnJNIq3i8WuGKqVefPXL/XROT+n1nJnk636upqD9hIzCrBz845N/W3S1X67PY2F4tTsf0KZvKCp0tJZUY
+X-Gm-Message-State: AOJu0YwzAinNbaC70jdqSbDwc0xn1AJnY6lp1UylAYGDZfYmmz4ReP+f
+	7bWqh7ko6Y198IzQFA48mad6PETRFwEMu/YT/n2otzy3R1EQBPj1MnQTvuBR4A==
+X-Google-Smtp-Source: AGHT+IEXVBByB7qMgyM2JwnpcF1ugnJgAAgMtOW169Er0h+ZLNEaK8zxB1N1x9RTjArZnauZ8RRf7A==
+X-Received: by 2002:a17:902:e809:b0:1e3:e137:d3af with SMTP id u9-20020a170902e80900b001e3e137d3afmr2745775plg.9.1713960347458;
+        Wed, 24 Apr 2024 05:05:47 -0700 (PDT)
+Received: from ?IPV6:2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08? ([2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08])
+        by smtp.gmail.com with ESMTPSA id w5-20020a1709029a8500b001e435350a7bsm11722255plp.259.2024.04.24.05.05.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 Apr 2024 05:05:46 -0700 (PDT)
+Message-ID: <51a660cc-4562-42d7-a6fa-0f6f7e3f47b6@penguintechs.org>
+Date: Wed, 24 Apr 2024 05:05:45 -0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240422130036.31856-1-brgl@bgdev.pl> <99242a7c-53bf-4227-9623-7bc092f564b3@penguintechs.org>
- <CAMRc=MepDwUbAKrWgm0CXKObqy8=igtug0QDgo-CgwxjZCAC2Q@mail.gmail.com>
- <06217256-8a13-4ebf-a282-9782a91793e4@penguintechs.org> <CAMRc=Mfwa2WSOLaUMaEM1czTcx31jynGqgxzLdCh7ROktQ_Vag@mail.gmail.com>
- <6433c145-a448-45dd-a982-8b5df0ca5c16@penguintechs.org>
-In-Reply-To: <6433c145-a448-45dd-a982-8b5df0ca5c16@penguintechs.org>
-From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Date: Wed, 24 Apr 2024 14:01:22 +0200
-Message-ID: <CACMJSetnNDwVuRksjE2k=OJYoaa0i89kWxd1WB9RmTcpz78haA@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] Bluetooth: qca: set power_ctrl_enabled on NULL returned
  by gpiod_get_optional()
-To: Wren Turkal <wt@penguintechs.org>
-Cc: Bartosz Golaszewski <brgl@bgdev.pl>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+To: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Cc: Bartosz Golaszewski <brgl@bgdev.pl>, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+References: <20240422130036.31856-1-brgl@bgdev.pl>
+ <99242a7c-53bf-4227-9623-7bc092f564b3@penguintechs.org>
+ <CAMRc=MepDwUbAKrWgm0CXKObqy8=igtug0QDgo-CgwxjZCAC2Q@mail.gmail.com>
+ <06217256-8a13-4ebf-a282-9782a91793e4@penguintechs.org>
+ <CAMRc=Mfwa2WSOLaUMaEM1czTcx31jynGqgxzLdCh7ROktQ_Vag@mail.gmail.com>
+ <6433c145-a448-45dd-a982-8b5df0ca5c16@penguintechs.org>
+ <CACMJSetnNDwVuRksjE2k=OJYoaa0i89kWxd1WB9RmTcpz78haA@mail.gmail.com>
+From: Wren Turkal <wt@penguintechs.org>
+In-Reply-To: <CACMJSetnNDwVuRksjE2k=OJYoaa0i89kWxd1WB9RmTcpz78haA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, 24 Apr 2024 at 13:59, Wren Turkal <wt@penguintechs.org> wrote:
->
-> On 4/24/24 4:53 AM, Bartosz Golaszewski wrote:
-> > This must be your email client wrapping lines over a certain limit.
-> > Try and get the diff from lore[1], it should be fine.
-> >
-> > Bart
-> >
-> > [1]https://lore.kernel.org/lkml/CAMRc=MepDwUbAKrWgm0CXKObqy8=igtug0QDgo-CgwxjZCAC2Q@mail.gmail.com/
->
-> I don't think it's my client. The extra newlines are right there in the
-> lore link.
->
-> Look at the line that starts with "@@". That line is wrapped. The
-> following line ("serdev_device *serdev)") should be at the end of the
-> previous line. The same thing happened on the second "@@" line as well.
->
+On 4/24/24 5:01 AM, Bartosz Golaszewski wrote:
+> On Wed, 24 Apr 2024 at 13:59, Wren Turkal <wt@penguintechs.org> wrote:
+>>
+>> On 4/24/24 4:53 AM, Bartosz Golaszewski wrote:
+>>> This must be your email client wrapping lines over a certain limit.
+>>> Try and get the diff from lore[1], it should be fine.
+>>>
+>>> Bart
+>>>
+>>> [1]https://lore.kernel.org/lkml/CAMRc=MepDwUbAKrWgm0CXKObqy8=igtug0QDgo-CgwxjZCAC2Q@mail.gmail.com/
+>>
+>> I don't think it's my client. The extra newlines are right there in the
+>> lore link.
+>>
+>> Look at the line that starts with "@@". That line is wrapped. The
+>> following line ("serdev_device *serdev)") should be at the end of the
+>> previous line. The same thing happened on the second "@@" line as well.
+>>
+> 
+> Indeed. I just noticed that it applies fine with git apply and figured
+> the output must be right. Anyway, this is not a proper patch, I will
+> send one once I adapt Zijun's code.
+> 
+> Bart
 
-Indeed. I just noticed that it applies fine with git apply and figured
-the output must be right. Anyway, this is not a proper patch, I will
-send one once I adapt Zijun's code.
+Weird. Git apply failed for me. That's how I noticed it.
 
-Bart
+ From my terminal:
+➜  linux git:(my_master) ✗ git apply ../blah.diff
+error: corrupt patch at line 6
+
+
+FWIW, I also tried pasting it into stdin by running `git apply` as well.
+
+wt
+-- 
+You're more amazing than you think!
