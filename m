@@ -1,164 +1,116 @@
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAF7315D5C7
-	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 13:56:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2648E15CD7F;
+	Wed, 24 Apr 2024 13:59:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713966978; cv=none; b=WH/1FCPw3C/3n/rHEOgUkno4Rk7mqBS+mto0Abx1BS7v3H3pSrYdrrOlLVLl8ixhBcVFnsw/+eiuX0gi7scDmN5VZya/Dx/7RuYB0Hp42hcmVg67RbXs/GHee7TfLD4VrtqrVbmnJp/p67dD3KK/tH+yVui7FTxdpmPgXv+eWhE=
+	t=1713967151; cv=none; b=L/YCupRyDSvQCsScj6sQxmfASxT1UVPozZmMFm6DwC6DhTdXOa5dKFVcluEB2VvVFvADPNzjFokW3XgbtbytLMOsJyCSRwZtUIZzYIsYImeL5b7uKf2tNLWQU2F6gKIbc7PUEKVAdTV+VedivoUSqKGDPZOINCWyo05taP7HJFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713966978; c=relaxed/simple;
-	bh=25nDsIMgZ2HeG8QMinIGq2/PgGv73H9aW1N1Y9zUInk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uEoSlvl6PQOIsi+0Q56Ssm+xSz6RZTaPwh1yqsUxjA64aqKfLDpWAc05OtZ+MFZGyZMhukor4JgHXib8X1kTzPIPdX+iJRC2DKdwVkKtXBBI4ez1coIcOvUVLmg/zs9UQAL4rFSXWTrxP03uwl/mNCWAalujkwcNGJ9Lu8xPYSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eGNnaQpb; arc=none smtp.client-ip=209.85.208.173
+	s=arc-20240116; t=1713967151; c=relaxed/simple;
+	bh=36CNnFWY8oKhWu6nHOETa4usiZ+wFiqJ0a8d/Z3N+OA=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=lLUFVphKmTcm8j++loycGUN/fP0L203XZCgRE1Xv2Adex0bGWjqYWnI/xNzNM9m4s4fjz04WMKiou65kmJm0P9SX+Y7+3kfUdXc6OHwUGdz/fUBDaINLDCyCj5PYwySSUvEpIlfBBuT6nAjTsuZ07UhjPreRe/v3Igm/tiTL+XE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tc5eYssj; arc=none smtp.client-ip=209.85.128.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eGNnaQpb"
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2db2f6cb312so118695421fa.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 06:56:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tc5eYssj"
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-41b21ed1aaaso1659025e9.1;
+        Wed, 24 Apr 2024 06:59:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713966975; x=1714571775; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1713967148; x=1714571948; darn=vger.kernel.org;
+        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qV0CXA+ylMXkr9COBOzretOakNx5+NjvGyfHdPO4aZE=;
-        b=eGNnaQpbNg1evp2OIQOuYqUd8IzFynosInIq49KObkt9cN4nbklJJOecgu0AE8rk5P
-         ja+NOH9/Q5gRp7JqUzzkxSCwqY2uNCPCeVMrOXPWL5zm38C7hxTQgici7wcDLlMgJq8F
-         4m4PqqW+lGJLMjFP2BTc3/lXAyitR7jfH1kCMMN08j042AwlpdvJWQIJ/lpgrVaDjBvA
-         mGWaAIDI4hEbavqp5PdbgcT400J1qp5NSZEoksptHa36roi6XZwEB1h5LMkPBaP9ijmU
-         nNnn9pIO5aumcyORy61Il1rbwZl+TVCTvB3/p5vK7V1XQSdcqtTyBQxTmrAVx45HXei7
-         vrxA==
+        bh=PJSK88kKSjWjJrR7QciaX7Rkw9NhMfGWUv/hxrWYKfY=;
+        b=Tc5eYssjcgo4UcD4h6cZwPD6MeYdvko4zm5bqPEuVT6kvtSMxPiQxtW9TGjYS0gC1w
+         E55MvgJlG3AQ5OIRROt1MtI2nm9xvM5/vxjcCQ9vMVeD+Vr/PzeWeqOCQ7G9ODdLYb53
+         FsEoYDyGk52fbUQy1bdXfPE1DOi1Ho77pf7nexC1hfrMYJ+DYSacUflZP5udPHHDkpEB
+         0K5sP+i2eoDfjEN2RUf2djcDzJ8WBbDebvK/15ZmRl/v+SwtLPCb8b0AvClYenUhCNDc
+         kdzeuChj0auD1D66kl8G4sclJXLw/jNSbwz6BvO4p5w42L9VC2Wi31IhKYw7JQVMvTac
+         j8CA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713966975; x=1714571775;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1713967148; x=1714571948;
+        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qV0CXA+ylMXkr9COBOzretOakNx5+NjvGyfHdPO4aZE=;
-        b=T9rtvzxC5g312xn6ZOwEsWiUbyNaLpsKdvpdHNHTCxhckJ6JAO0nUfvWzDKxyAlWrl
-         GaQ6he0MKE6wcDSSyRaPt0t2wxZLvYmeX5Dlr/X1oUsv/llR3pVPsR+kWEPUSsokMRma
-         qf2bg82b1IcpNwXwB3grOuUiwjeXQP1Y4GIdmHrPzKeCabTin+FsKrpfDxl/5iYRMgfi
-         eqRR0B7o6Adh0anxtWj3Hq2Flg6vSJaeDpcaxkheD+iGXVt9SjDDLF/XnNzEuKzK2htO
-         OOdVAoKwj734nusF9ShtDTOKOK2mQU2nrD6f7Gb0ESs0L2AL3umgwV0ADmCzfv6YxOqU
-         5tkA==
-X-Forwarded-Encrypted: i=1; AJvYcCVwd1IYwlI7D7Se3NJnYh9HD2hQBDr8c9F+MMoW8Ezvtvu5sbgSJ3asZ6CiXWCRrdAuuy+jAUtqsdxT8JeG4t0JxbByrF1+aBjRubgMuGXF
-X-Gm-Message-State: AOJu0YymK9rXZ7gU0L93S/A0bQml7XWmvNGijoXVhHCexK8W9JvgR6oU
-	dY82OasSrXB+pfPKhwcMiM/odxPSFh7NBcwwC8HTdWHIZoZRhGdMmamWvpjoCoWZxK4FCKg9yhz
-	dzz192HkmHbpIWaidkYInXnjJ9IpLyQ==
-X-Google-Smtp-Source: AGHT+IEJhNzcywJPU2XvXQGqzs4wqHlyZJPGQcXUfVhLkzMvYBYCqpR1klo8PifVf10EtjFqFwAMyXGl/d1j/rZ3wOo=
-X-Received: by 2002:a2e:3a0f:0:b0:2de:22b2:ab3d with SMTP id
- h15-20020a2e3a0f000000b002de22b2ab3dmr2219301lja.7.1713966974687; Wed, 24 Apr
- 2024 06:56:14 -0700 (PDT)
+        bh=PJSK88kKSjWjJrR7QciaX7Rkw9NhMfGWUv/hxrWYKfY=;
+        b=aPxYEt6rf3JMzVrs9UmnPznaRDUFCjc7+wdz+2K5DAh5b/EgvmazDgOOiVJ6NOE6Bk
+         vU3pDwb1JxKYGlO5aRj0o2sET3cZV8aWMhi0zHNpcllXI+GC9ZhITxvvxU5gZR+bvjBs
+         gX2ErNBE1ntsr0sbsvRLN3aYzYw2vRV60+2Nys9IQ3cZZOnfesewghpkn4VoK4iwZmZn
+         5Zc+K4XV5GeK4EOssGvi5gwsJko/q2rY/ilHuXVlyLKt7nN7isOxD8dQnn4UnACjpIv5
+         E/S+YNXPbhq16+7pIgYg1dPRFX5YvuBP1r/J0xzVVV72b/fXdI+MhNtKKJNpCAjLM1fO
+         w7gQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXyyEe0uArehrtQsiXUnQXsEgbGwxX5jgxv/LtFLGWM/eVeI2XCiAzIz6jwFWDyGR9v3hIJN0FOgTj2lV0EUI3lBX20aDr9cggfoLGLfHXPLqFbh129ILFeKGpvtio3/Gbx59fQvdC+jKlYrdJd
+X-Gm-Message-State: AOJu0YzbtldBEUGVYNE2SiBXG9bPujGGhLJUv3MISTz2mRk8Nqt2TNdu
+	kBgOi9uobBP9PCVIUDrxvy/Rt4wNJE1YBvpGtCZNQtQqC+GA99m/
+X-Google-Smtp-Source: AGHT+IGvI1V9iSHdj1mECtIufQi6jTuMKHCWJZBW4U55pxqw7G0QMcwowWKepL8LvTuog96mciWVig==
+X-Received: by 2002:a05:600c:1c09:b0:418:d58e:4bea with SMTP id j9-20020a05600c1c0900b00418d58e4beamr1898909wms.16.1713967148231;
+        Wed, 24 Apr 2024 06:59:08 -0700 (PDT)
+Received: from linux-l9pv.suse (226.red-176-80-67.dynamicip.rima-tde.net. [176.80.67.226])
+        by smtp.gmail.com with ESMTPSA id g18-20020a05600c4ed200b00418729383a4sm23716687wmq.46.2024.04.24.06.59.06
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 24 Apr 2024 06:59:07 -0700 (PDT)
+From: "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
+X-Google-Original-From: "Lee, Chun-Yi" <jlee@suse.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: Manish Mandlik <mmandlik@google.com>,
+	Archie Pusaka <apusaka@chromium.org>,
+	Miao-chen Chou <mcchou@chromium.org>,
+	linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	Chun-Yi Lee <jlee@suse.com>
+Subject: [PATCH] Bluetooth: hci_sync: Using hci_cmd_sync_submit when removing Adv Monitor
+Date: Wed, 24 Apr 2024 21:59:03 +0800
+Message-Id: <20240424135903.24169-1-jlee@suse.com>
+X-Mailer: git-send-email 2.12.3
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <1713919602-5812-1-git-send-email-quic_zijuhu@quicinc.com>
- <1713919602-5812-2-git-send-email-quic_zijuhu@quicinc.com>
- <349b27a5-d2d3-46f1-b002-44f81e0cedef@linaro.org> <e8cd122d-e342-45c2-b078-a4ca2d8dcfff@quicinc.com>
- <dfe18768-f6da-4c60-880d-deeae3c3b04d@linaro.org> <8ae32009-5f5e-49a1-88a1-e330f0614f60@quicinc.com>
- <5e363318-c6e4-4874-8026-7940b434d583@linaro.org> <2020a858-c3d9-48a7-ad59-3691c6b98fb2@penguintechs.org>
- <053f51ae-1eb7-4ea8-bb04-38bfa1e0b8f5@quicinc.com>
-In-Reply-To: <053f51ae-1eb7-4ea8-bb04-38bfa1e0b8f5@quicinc.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 24 Apr 2024 09:56:01 -0400
-Message-ID: <CABBYNZKt0B9bKfAsP+wUJAeSoc93Otm8NFpos15AgoLV0hwrCA@mail.gmail.com>
-Subject: Re: [PATCH v6 1/2] Bluetooth: qca: Fix BT enable failure for QCA6390
-To: quic_zijuhu <quic_zijuhu@quicinc.com>
-Cc: Wren Turkal <wt@penguintechs.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, luiz.von.dentz@intel.com, 
-	marcel@holtmann.org, linux-bluetooth@vger.kernel.org, 
-	bartosz.golaszewski@linaro.org, regressions@lists.linux.dev, 
-	kernel@quicinc.com, Greg KH <gregkh@linuxfoundation.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Quic_zijuhu,
+From: Chun-Yi Lee <jlee@suse.com>
 
-On Wed, Apr 24, 2024 at 1:33=E2=80=AFAM quic_zijuhu <quic_zijuhu@quicinc.co=
-m> wrote:
->
-> On 4/24/2024 1:04 PM, Wren Turkal wrote:
-> > On 4/23/24 9:31 PM, Krzysztof Kozlowski wrote:
-> >> On 24/04/2024 06:18, quic_zijuhu wrote:
-> >>> On 4/24/2024 12:10 PM, Krzysztof Kozlowski wrote:
-> >>>> On 24/04/2024 06:07, quic_zijuhu wrote:
-> >>>>> On 4/24/2024 12:06 PM, Krzysztof Kozlowski wrote:
-> >>>>>> On 24/04/2024 02:46, Zijun Hu wrote:
-> >>>>>>> Commit 56d074d26c58 ("Bluetooth: hci_qca: don't use IS_ERR_OR_NUL=
-L()
-> >>>>>>> with gpiod_get_optional()") will cause below serious regression
-> >>>>>>> issue:
-> >>>>>>>
-> >>>>>>> BT can't be enabled any more after below steps:
-> >>>>>>> cold boot -> enable BT -> disable BT -> BT enable failure
-> >>>>>>> if property enable-gpios is not configured within DT|ACPI for
-> >>>>>>> QCA6390.
-> >>>>>>>
-> >>>>>>> The commit wrongly changes flag @power_ctrl_enabled set logic for
-> >>>>>>> this
-> >>>>>>> case as shown by its below code applet and causes this serious
-> >>>>>>> issue.
-> >>>>>>> qcadev->bt_en =3D devm_gpiod_get_optional(&serdev->dev, "enable",
-> >>>>>>>                                                 GPIOD_OUT_LOW);
-> >>>>>>> - if (IS_ERR_OR_NULL(qcadev->bt_en)) {
-> >>>>>>> + if (IS_ERR(qcadev->bt_en)) {
-> >>>>>>>        dev_warn(&serdev->dev, "failed to acquire enable gpio\n");
-> >>>>>>>     power_ctrl_enabled =3D false;
-> >>>>>>>    }
-> >>>>>>>
-> >>>>>>> Fixed by reverting the mentioned commit for QCA6390.
-> >>>>>>>
-> >>>>>>> Fixes: 56d074d26c58 ("Bluetooth: hci_qca: don't use
-> >>>>>>> IS_ERR_OR_NULL() with gpiod_get_optional()")
-> >>>>>>> Reported-by: Wren Turkal <wt@penguintechs.org>
-> >>>>>>> Link: https://bugzilla.kernel.org/show_bug.cgi?id=3D218726
-> >>>>>>> Link:
-> >>>>>>> https://lore.kernel.org/linux-bluetooth/ea20bb9b-6b60-47fc-ae42-5=
-eed918ad7b4@quicinc.com/T/#m73d6a71d2f454bb03588c66f3ef7912274d37c6f
-> >>>>>>> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> >>>>>>> Tested-by: Wren Turkal <wt@penguintechs.org>
-> >>>>>>
-> >>>>>> No, Bartosz' patch should go.
-> >>>>>>
-> >>>>> what is Bartosz' patch.
-> >>>>
-> >>>> Srsly? You were Cc'ed on it. How many upstream patches on upstream
-> >>>> mailing lists do you receive that you lost track of them?
-> >>>>
-> >>> Bartosz' patch have basic serious mistook and logic error and have no
-> >>> any help for QCA6390, and it is not suitable regarding DTS usage.
-> >>
-> >> Really? Why you did not respond with comments then? Considering how
-> >> imprecise and vague you are in describing real issues, I have doubts i=
-n
-> >> your judgment here as well.
-> >
-> > Please slow down here. Zijun's patch works and Bartosz's patch does not=
-.
-> > I don't think Zijun means any ill intent. I am replying to Bartosz's
-> > patch right now.
-> >
-> this is reporter's latest verification results. actually i don't have
-> much time for kernel upstream. i really hope my fix is able to merged
-> ASAP, it will help us to solve other possible impacted QCA controllers.
+Since the d883a4669a1de be introduced in v6.4, bluetooth daemon
+got the following failed message of MGMT_OP_REMOVE_ADV_MONITOR
+command when controller is power-off:
 
-Well I really hope we get some more support upstream because things
-don't look quite clean right now and it should be a lesson that you
-guys need to spend more time reviewing what goes upstream otherwise
-things escalate since there isn't much documentation about your
-hardware we can rely on.
+bluetoothd[20976]:
+src/adapter.c:reset_adv_monitors_complete() Failed to reset Adv
+Monitors: Failed>
 
-> >>
-> >> Best regards,
-> >> Krzysztof
-> >>
-> >
->
+Normally this situation is happened when the bluetoothd deamon
+be started manually after system booting. Which means that
+bluetoothd received MGMT_EV_INDEX_ADDED event after kernel
+runs hci_power_off().
 
+Base on doc/mgmt-api.txt, the MGMT_OP_REMOVE_ADV_MONITOR command
+can be used when the controller is not powered. This patch changes
+the code in remove_adv_monitor() to use hci_cmd_sync_submit()
+instead of hci_cmd_sync_queue().
 
---=20
-Luiz Augusto von Dentz
+Fixes: d883a4669a1de ("Bluetooth: hci_sync: Only allow hci_cmd_sync_queue if running")
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: Manish Mandlik <mmandlik@google.com>
+Cc: Archie Pusaka <apusaka@chromium.org>
+Cc: Miao-chen Chou <mcchou@chromium.org>
+Signed-off-by: Chun-Yi Lee <jlee@suse.com>
+---
+ net/bluetooth/mgmt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 32ed6e9245a3..21962969411d 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -5475,7 +5475,7 @@ static int remove_adv_monitor(struct sock *sk, struct hci_dev *hdev,
+ 		goto unlock;
+ 	}
+ 
+-	err = hci_cmd_sync_queue(hdev, mgmt_remove_adv_monitor_sync, cmd,
++	err = hci_cmd_sync_submit(hdev, mgmt_remove_adv_monitor_sync, cmd,
+ 				 mgmt_remove_adv_monitor_complete);
+ 
+ 	if (err) {
+-- 
+2.35.3
+
