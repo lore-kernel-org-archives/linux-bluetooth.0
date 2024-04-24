@@ -1,37 +1,33 @@
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3443D15696D;
-	Wed, 24 Apr 2024 06:06:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B5DB26AC6
+	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 07:38:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713938807; cv=none; b=Ybf7p0s0P0vh7jT/E3Yac9SRT1egQrlkVUODFHH7Tr/3FF3AlomzKt5hoTipnB7pLCYTulXipp30obIbqSrnaWLxE9iDMJsmT5WopsFTeh7gLpB/jZnlhUpyIBjBB+1/DbeOGKCGjAXwtxT8fy0dcDgCydId/S36i/1OXjDbMVM=
+	t=1713944299; cv=none; b=Ro+uiXk0+yDz26NPsixQwagQ3VZB50BjPkl14BY38/Pjyb7lcNfswqSeYqZY9T9XSmjeCjqFP4fSryXSsXIe2HV0L3FmjpKJxrcryeeZK0ch+BRaNHaZopP4js+FhxFZnnNu+t2HtlpCXEGV7D7FvRpKJk2CHyMwCYjvYS0h0/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713938807; c=relaxed/simple;
-	bh=j1+muzAkVHfWGaUVDfWnppU1cbHnW27Ru5LKk7vTw1U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
-	 In-Reply-To:Content-Type; b=DX5Vaw5gv7X8jRb/RrWcB36g9NHej7FZ489W8XPMDVZYhhhoeDvYNg/AEZZgHpB++PVpifjb6zqfgQNkRw/fZA9rkIZJldPVNJbFKSlzHWDnQ0jq+G/o8x/H2fxj4Djo+770RvNv14Vv0hNWrOLLYbWxPNi54qw7+qeS+SFzkFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=ayCZNf++; arc=none smtp.client-ip=80.237.130.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+	s=arc-20240116; t=1713944299; c=relaxed/simple;
+	bh=RBeYQkS82TZ1RDRvckRxJGpf8zWFjnW2isrwzirnEY4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ds6oMRyhUOjU/LFOVcdb/CVd318Y8g+Z7ONm79lcuBvuLY3diaSU+33NorSAfNQwgLz52WfyznmfVxueD/6h6cc8fo/LEWD5V0AAbGiknw6RHbf5fvKBqElrsJeJjNYeuRsi+qyqNUjLHEtwY+Sda7An/kjr9OCpgiqhh9SDS2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GSU9hTUL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="ayCZNf++"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:Cc:From:References:To:Subject:Reply-To:MIME-Version:Date:
-	Message-ID:From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:
-	Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
-	In-Reply-To:References; bh=BjWj3bvgshQkX0ic9F8zq8at9TWgUDpFINVtQ3l7b5c=;
-	t=1713938805; x=1714370805; b=ayCZNf++3DexYoMawSOlruJ1XI9KWtWkFEa1OsAMKFXCap6
-	Is6IJSYfF2OuLPcInqOvVmWM4JQGjKw3QL+nOCp4Bme7Wjy6vCBBAMYyWl7FRTWwSUyQNGUrqMSoe
-	lwhTPmte3J4S6gdGlmRFMlgAfbgX2aglUrA4Hxc/bP64A5hviYFYITdIdKxtqP9rwHebej1aLlWzn
-	dcZhi5QM0qpiW80Z8z1JWtu0O5Yr/olFLbUy4I3k5DUZk0+fBrF0s0D0Du4Lk9jClOAlDKxcF4HKR
-	0OrgV+jSMn1Kx0LJCZMU8/NSaxYgG3Z+cJysgxNOnFSOco2oKG5u5p2hVdxgghUw==;
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1rzVm7-0006ig-5J; Wed, 24 Apr 2024 08:06:35 +0200
-Message-ID: <3b983390-110e-4c68-a825-6e811de78919@leemhuis.info>
-Date: Wed, 24 Apr 2024 08:06:34 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GSU9hTUL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E73BC113CE;
+	Wed, 24 Apr 2024 07:38:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713944299;
+	bh=RBeYQkS82TZ1RDRvckRxJGpf8zWFjnW2isrwzirnEY4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=GSU9hTULYuYJix014N12T7I44jvwa4n6ftzoTeF6ThQoT5Ojac1jBIYyr7sD6qRzT
+	 17aqDDpP9Xd4qia2WhPYslU1HaoCydSJ8P/ne4KaOQ9XndQtqQjuygJK6M/w7MtN+x
+	 nI68iTcB0qTcXtL/NOc8/2RuFblnYIO5uh2PMD5ih/cDxjEmxMchqUzsXdPZDxqsDu
+	 6GzShXr/kVfX8214yaUxJA+WSJREJ+mrnejvGsCsSU3+egGmw70WrwbPu6fykGMEOf
+	 dBQe15aetmD+Xvbn9w6kbJ11RVhxRprCE7LqTo66n9L5S6JqiixgeeDkNTKkrRtH24
+	 N5dVPckqxbkoA==
+Message-ID: <11cf74a5-317c-4276-8a59-ff11ddf5825f@kernel.org>
+Date: Wed, 24 Apr 2024 09:38:14 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -39,50 +35,82 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-Subject: Re: BT_RAM_CODE_MT7961_1a_2_hdr.bin is missing in the firmware tree
-To: "Artem S. Tashkinov" <aros@gmx.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- chris.lu@mediatek.com, deren.wu@mediatek.com,
- Peter Tsao <peter.tsao@mediatek.com>
-References: <6574fc0f-8a24-4aff-8a1b-dbf960b6375d@gmx.com>
-From: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-Content-Language: en-US, de-DE
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
- Linux kernel regressions list <regressions@lists.linux.dev>,
- linux-mediatek <linux-mediatek@lists.infradead.org>
-In-Reply-To: <6574fc0f-8a24-4aff-8a1b-dbf960b6375d@gmx.com>
+Subject: Re: [PATCH] Bluetooth: qca: Support downloading board id specific NVM
+ for WCN7850
+To: quic_zijuhu <quic_zijuhu@quicinc.com>, luiz.dentz@gmail.com,
+ luiz.von.dentz@intel.com, marcel@holtmann.org
+Cc: linux-bluetooth@vger.kernel.org
+References: <1713340174-1304-1-git-send-email-quic_zijuhu@quicinc.com>
+ <362984a6-7567-4d06-920f-18a6fc8a4908@quicinc.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <362984a6-7567-4d06-920f-18a6fc8a4908@quicinc.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1713938805;e32e74d3;
-X-HE-SMSGID: 1rzVm7-0006ig-5J
 
-On 23.04.24 12:23, Artem S. Tashkinov wrote:
+On 19/04/2024 09:04, quic_zijuhu wrote:
+>>  	/* Download NVM configuration */
+>> @@ -751,8 +764,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>>  				 "qca/hpnv%02x.bin", rom_ver);
+>>  			break;
+>>  		case QCA_WCN7850:
+>> -			snprintf(config.fwname, sizeof(config.fwname),
+>> -				 "qca/hmtnv%02x.bin", rom_ver);
+>> +			qca_get_nvm_name_generic(&config, "hmt", rom_ver, boardid);
+>>  			break;
+>>  
+>>  		default:
 > 
-> Could you please push this firmware ASAP?
-> 
-> It's been reported to be missing:
-> https://bugzilla.kernel.org/show_bug.cgi?id=218757
+> Hi luiz, marcel,
+> could you code review for this change since a new product needs this
+> change ?
 
-FWIW, that can't be the only solution for that problem, as
-Documentation/driver-api/firmware/firmware-usage-guidelines.rst clearly
-states:
+What does your internal guide (go/upstream) tell you about pinging after
+two days?
 
-"""
-Users switching to a newer kernel should *not* have to install newer
-firmware files to keep their hardware working.
-"""
+Best regards,
+Krzysztof
 
-Could anyone from mediatek please confirm that this rule is adhered?
-
-Side note: I wonder if Peter's patch
-https://lore.kernel.org/all/20240415141922.25055-1-peter.tsao@mediatek.com/
-("Bluetooth: btusb: Fix the patch for MT7920 the affected to MT7921") is
-relevant for this.
-
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
---
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-If I did something stupid, please tell me, as explained on that page.
