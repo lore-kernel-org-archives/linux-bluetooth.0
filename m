@@ -1,124 +1,112 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 731E067A1A;
-	Thu, 25 Apr 2024 07:56:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC6DB1E892
+	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Apr 2024 08:30:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714031763; cv=none; b=PGckPVOi1WSQy2bwE/StrM+XHWjh2g2xwNOR9BRhFrRWFp/dUtNRbMXyFHi/7bXImH8NRg6Gzqzm/HKW8IfDrQluJJR8Yj5167CVXbK/BtTNZW7VLQVkO3Nke5qAB5Su2Q5OZVK8X6zICxjwSsbYvjTwdkwfqOHzb1ZBFa6qb1U=
+	t=1714033825; cv=none; b=NpdDoBG8t1Qq/e3WyO70KKDDOKYdkRfDfVLJ5oUVFQKw8htdue7IOHH8fj5cV8+btLkD0vlyDR9huo3XCGewitxrkhAw0qYCA0DdenvglsG3IPDrjWdIdYD5flaic5EXNqy82Iwpzu/4zJK5EVx9pZ/qSH2tU3q0FA4AJes0fHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714031763; c=relaxed/simple;
-	bh=FbilVvwlenLgeiFq6bKzJ8zy6ljmHZoUoBSejCx9WMg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=P/uaanyTB/YKlv28BmSyZg1sFN8dNeJFKVCwVwLA+Khe7pBR1nPDKvhXB/oNeQGE2KJ1jBBviJpNOohQWuTFW9JodhOT2qB91h7FLngYsf7mO/eE8L0kEfxZMTrwqMj8XRRTkHQAUxI639h8UerNvX2mhFPFbc0my2a/bgSAAbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pctJuYQ8; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1714033825; c=relaxed/simple;
+	bh=RDk21kKYvU1WGp0zBpBg5fsvRfDWWG2feqziSMNsqOs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HWjb3BRg/8YgXdF6zZul0HnMbqRus9uSxECS+vFyQ4qRHhYXf5NfM+aDfFuDixjU08HTEgOfj6LaL3PKsxG0LPVUgw6VKVv7BEeaTEHMAqrFsqVugqN0I8dHstFfauo47FcW2K8yEkKSwLz9huVK3iIMF2o4gv9uiX+XGcXBsPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=B8hnXsrl; arc=none smtp.client-ip=209.85.219.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pctJuYQ8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 520FCC113CC;
-	Thu, 25 Apr 2024 07:56:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714031762;
-	bh=FbilVvwlenLgeiFq6bKzJ8zy6ljmHZoUoBSejCx9WMg=;
-	h=From:To:Cc:Subject:Date:From;
-	b=pctJuYQ8pjN/iOl9OiJoGq/5tMceS3K58mDHUL2521Sko39SPcBrT4oTNNROs3NGa
-	 28KY82pxVQGtSoZgMpUuddTdjpjEhSGktT3uegc//Nuaq84yTOw5OtBiYEmgUk++D6
-	 O3zI09xrPaSrmk6sw2+nRxQ0xzej4ZXkd47/xCLrGHsKuwrCiRRY+E2euNPWr9N1ck
-	 ESUoA6t8nBQFGy756uMBALGFDBuWlkmbYd0Bbxq7RCV79kSBo177kaphMdWFGFCPhb
-	 RXaDDivf5E8e3EyDNOkbc4LsW/haQitICqSgP4i6/Ey9c2xMJgVhtJ8lrSPqdwJR6C
-	 Qv4WPlPzVzgcw==
-Received: from johan by xi.lan with local (Exim 4.97.1)
-	(envelope-from <johan+linaro@kernel.org>)
-	id 1rztxZ-000000006Lk-32dS;
-	Thu, 25 Apr 2024 09:56:01 +0200
-From: Johan Hovold <johan+linaro@kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Johan Hovold <johan+linaro@kernel.org>,
-	stable@vger.kernel.org,
-	Doug Anderson <dianders@chromium.org>,
-	Janaki Ramaiah Thota <quic_janathot@quicinc.com>
-Subject: [PATCH] Bluetooth: qca: fix wcn3991 device address check
-Date: Thu, 25 Apr 2024 09:55:03 +0200
-Message-ID: <20240425075503.24357-1-johan+linaro@kernel.org>
-X-Mailer: git-send-email 2.43.2
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B8hnXsrl"
+Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-de54c2a4145so911839276.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Apr 2024 01:30:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1714033823; x=1714638623; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=RDk21kKYvU1WGp0zBpBg5fsvRfDWWG2feqziSMNsqOs=;
+        b=B8hnXsrloYdciGFpwzSdBylKgCbUgayjZtkhZ8+m1t0HsDwdd2+CzeQ3H5RQkSGIpU
+         vNZvu/0mDu4+p4SqCLyTx03jfnPr2hO7XwifjHvoWMYikYzCA7ITHAqmXNdc4SHIM6wR
+         29TMN/EIEi6q839grZo2fvFjby3skRNaSvbUg2pG2oOdN0jt+XFGvhWn9lmlmoQBauZo
+         1mVW2xc+33BrWAHT+8/HlU16ZujSvTpyrNyCBfm72+ftR0GG3CtECG4g3h2zHrYBRMw9
+         EnFO7FOC6qyvmLFYAp4fR3YtpxOSC+MpJAIm3eR5FUhybR+EUPwutN5miFl02LkAE9ww
+         FPGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714033823; x=1714638623;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RDk21kKYvU1WGp0zBpBg5fsvRfDWWG2feqziSMNsqOs=;
+        b=jaWtkEjwCL+cbIfVgquUl4wxSinQXumUEv6Qu6IfGOwIjrQubu7KdCj9UzcyyYiC0g
+         hhNOAtxDb/2BRKyAdLDooVJlsfmkSdJrqZ8s+h4K4YHKOT0yMCnG9k/8Nqci+LIHXFX9
+         pA5zqW0Gxm8NCwfMlOXZ9tuJpQCxKYNqDGrj2cXUextUiFSLKWk4ojLeTK+1sYu1knGl
+         K4ch32qKAmPuemGMTvUjGi6HHJyCO+sxquUXVQQuHfo3VgTSh7wPcitrUQ/143lV+Tvm
+         oOXkYClxEfZlocaK8ZIhDt93WYbwKBmRWMly4VTEcl2XwQXg8hg/ZryoGSLz9W+Ly3CF
+         UfkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUCoW7IJBSI8A1JhyPf2ubaJUk8jnyaEkVA2GUrd5BabG7iZ933b4lyJ5+lpxQAmziRP5BHFj2RIKNMiWqO1x6SW38eaxKQIY1hoFyONRY1
+X-Gm-Message-State: AOJu0YxYgdaWym99gKHuGVRvCcWE5YhTnFfTLf7KMB5XIQLmN11FJ5A3
+	fEqeELNYaxZF06RSPN5ZzK1PHcdjXET+lQXEmhqIbMCEzbjLDM1+tBKSxBLGxFgjsO+kXgoiR3z
+	VBI8JpBtSA5uxpMkc9EAU+loBlPyOJiZ0cM0bmw==
+X-Google-Smtp-Source: AGHT+IHKM4YPDpuevFQJfqgtbpCZPQXsU1jskA/YJSC/utcG0tynd+yjkQ+LkYUW7fS9XqJqghwLH65UgNSKnn5ssvg=
+X-Received: by 2002:a25:2643:0:b0:de5:5572:6236 with SMTP id
+ m64-20020a252643000000b00de555726236mr5573879ybm.4.1714033822947; Thu, 25 Apr
+ 2024 01:30:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <1713947712-4307-1-git-send-email-quic_zijuhu@quicinc.com>
+ <af004bcd-0649-4a82-8f09-36d6addd0e1e@linaro.org> <0cba3838-917b-48af-ba8b-2ef60714943a@quicinc.com>
+ <49cf0a3d-5f52-41a1-9858-692f48d06b88@kernel.org> <c1632816-f754-42c6-8448-2daff8221b58@penguintechs.org>
+ <368e70e0-edc2-44fd-a9a2-72efa0d9f864@linaro.org> <f372c661-d82a-4f6f-b2de-8dd241d6b107@penguintechs.org>
+In-Reply-To: <f372c661-d82a-4f6f-b2de-8dd241d6b107@penguintechs.org>
+From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Date: Thu, 25 Apr 2024 10:30:12 +0200
+Message-ID: <CACMJSesk+DYFDwM7hUoPs9Xy+i1q8w+5CFu4_RdreUXudk18zw@mail.gmail.com>
+Subject: Re: [PATCH v1] Bluetooth: qca: Correct property enable-gpios handling
+ logic for WCN6750 and WCN6855
+To: Wren Turkal <wt@penguintechs.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>, quic_zijuhu <quic_zijuhu@quicinc.com>, luiz.dentz@gmail.com, 
+	luiz.von.dentz@intel.com, marcel@holtmann.org, 
+	linux-bluetooth@vger.kernel.org, kernel@quicinc.com
+Content-Type: text/plain; charset="UTF-8"
 
-Qualcomm Bluetooth controllers may not have been provisioned with a
-valid device address and instead end up using the default address
-00:00:00:00:5a:ad.
+On Thu, 25 Apr 2024 at 08:30, Wren Turkal <wt@penguintechs.org> wrote:
+>
+> On 4/24/24 11:05 PM, Krzysztof Kozlowski wrote:
+> > On 25/04/2024 00:01, Wren Turkal wrote:
+> >>>>
+> >>>> 3) only care about the case property enable-gpios is not configured,
+> >>>> the original BT driver design logic indeed matches with binging spec's
+> >>>> requirements before bartosz's wrong change
+> >>>
+> >>> What? There is no such case according to bindings. I told you already
+> >>> two times: Either change bindings or this is not valid.
+> >>
+> >> @krzysztof, I'm curious. There is no entry in the binding specifically
+> >> for qca6390. Should there be?
+> >
+> > qca6390 is documented in the bindings, but you are right that it lacks
+> > if:then: entry narrowing/choosing specific supplies and pins. It should
+> > have one, indeed.
+>
+> Would creating an entry for the qca6390 hardware fix the issue you are
+> worried about?
+>
+> Again, sorry for all the, what I assume are, basic questions. I am so
+> far out of my depth here. I am just trying to figure out how to move
+> forward. I really do appreciate your guidance here.
+>
 
-This address is now used to determine if a controller has a valid
-address or if one needs to be provided through devicetree or by user
-space before the controller can be used.
+Wren, Krzysztof: I cannot stop you from doing this but I'm afraid this
+will complicate the power sequencing work unnecessarily. The QCA6390
+PMU bindings I'm proposing[1] are consumers of the BT enable GPIOs. In
+my series I also create an entry for QCA6390 Bluetooth[2] but without
+enable-gpios and with the inputs from the PMU, not host. Please
+consider that if you decide to go with this.
 
-It turns out that the WCN3991 controllers used in Chromium Trogdor
-machines use a different default address, 39:98:00:00:5a:ad, which also
-needs to be marked as invalid so that the correct address is fetched
-from the devicetree.
+Bartosz
 
-Qualcomm has unfortunately not yet provided any answers as to whether
-the 39:98 encodes a hardware id and if there are other variants of the
-default address that needs to be handled by the driver.
-
-For now, add the Trogdor WCN3991 default address to the device address
-check to avoid having these controllers start with the default address
-instead of their assigned addresses.
-
-Fixes: 00567f70051a ("Bluetooth: qca: fix invalid device address check")
-Cc: stable@vger.kernel.org      # 6.5
-Cc: Doug Anderson <dianders@chromium.org>
-Cc: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
-Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
----
- drivers/bluetooth/btqca.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-
-Luiz and Doug,
-
-As the offending commit is now on its way into 6.9, let's just add the
-default address that the Trogdor machines uses to the address check.
-
-We can always amend this when/if Qualcomm provides some more details,
-or, in the worst case, when users report that they need to re-pair their
-Bluetooth gadgets if there are further variations of the default
-address.
-
-Johan
-
-
-
-diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-index 216826c31ee3..cfa71708397b 100644
---- a/drivers/bluetooth/btqca.c
-+++ b/drivers/bluetooth/btqca.c
-@@ -16,6 +16,7 @@
- #define VERSION "0.1"
- 
- #define QCA_BDADDR_DEFAULT (&(bdaddr_t) {{ 0xad, 0x5a, 0x00, 0x00, 0x00, 0x00 }})
-+#define QCA_BDADDR_WCN3991 (&(bdaddr_t) {{ 0xad, 0x5a, 0x00, 0x00, 0x98, 0x39 }})
- 
- int qca_read_soc_version(struct hci_dev *hdev, struct qca_btsoc_version *ver,
- 			 enum qca_btsoc_type soc_type)
-@@ -638,8 +639,10 @@ static int qca_check_bdaddr(struct hci_dev *hdev)
- 	}
- 
- 	bda = (struct hci_rp_read_bd_addr *)skb->data;
--	if (!bacmp(&bda->bdaddr, QCA_BDADDR_DEFAULT))
-+	if (!bacmp(&bda->bdaddr, QCA_BDADDR_DEFAULT) ||
-+	    !bacmp(&bda->bdaddr, QCA_BDADDR_WCN3991)) {
- 		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
-+	}
- 
- 	kfree_skb(skb);
- 
--- 
-2.43.2
-
+[1] https://lore.kernel.org/linux-arm-kernel/20240410124628.171783-2-brgl@bgdev.pl/
+[2] https://lore.kernel.org/linux-arm-kernel/20240410124628.171783-4-brgl@bgdev.pl/
