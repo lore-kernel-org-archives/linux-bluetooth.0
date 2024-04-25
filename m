@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C444714BF8D;
-	Thu, 25 Apr 2024 16:22:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A6C21E877;
+	Thu, 25 Apr 2024 16:30:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714062129; cv=none; b=kHNS09lien1WFYrEexYO9EChZCiQadf6rXODu9pHjw0upKX9Hr21tuRTx07aFCSc1jt9/PlQoaxt6dLKFAOX0OZOnVxePRf6CSMZ8XOHlbkgpdGIcOQZwlJwyvrH8Z5bgG8yKinEUGdwTkKr/vWD+r27TzvyXsSsKE6NlyAENx8=
+	t=1714062633; cv=none; b=fgx9kiQSXgXiHTVy6JadD5EBrMmdTW4ChCEctwYDClHObvtmb1H/8t9C2rTP0ir2xyiURCCti/iBrrCTJLkMq+FJSjav/NiUp0HSho8/8hgedd1GkRmYw68kpiSt9aST084WrDDHYjN5vOTCvAJxU28l4k0SY+zUmuzh0a9Ojec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714062129; c=relaxed/simple;
-	bh=X4cjljSj2oP4HKzuQcIM+oLzC0lzyqL4NgM6FzS7d0k=;
+	s=arc-20240116; t=1714062633; c=relaxed/simple;
+	bh=BHCta2OxYcR8v7BuTv23WDtpEtEmrdZZfulRSy8cqDo=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=UkqK2n43GqqmP3M8SdNeyJ/XzIihyWU6tAGS9NawqzBoPBIt95/+g9Z9yfKwe4RAvpnsMbUnIQT+1tZPN7LChqNV/2wAMM/IZuSopjHijtjsqLBw1FswUg5xDb7Fx98RkhjIMe14eJhq2pogsPtgNfxz6d7e5zDZrF6ciHod1vk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A6ndcdWM; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=hD6Nx4sX38eJcOtD1dHUC/u0gP5xbQAhpP5wXU18M2TW9F6z66dznyQEV4osS+jar3lCL7h0BIRaCj+dkssiAQ6CSPA0QgIXpT83tRvmOYZ1s5KBrUp9oCicJvfxLz6vVp7VCNulX8PVbp6AxarE2haWT3fSd44IcJZxR2jI+2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eQDmqIgI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A6ndcdWM"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 44789C113CC;
-	Thu, 25 Apr 2024 16:22:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eQDmqIgI"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1B61CC2BD11;
+	Thu, 25 Apr 2024 16:30:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714062129;
-	bh=X4cjljSj2oP4HKzuQcIM+oLzC0lzyqL4NgM6FzS7d0k=;
+	s=k20201202; t=1714062633;
+	bh=BHCta2OxYcR8v7BuTv23WDtpEtEmrdZZfulRSy8cqDo=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=A6ndcdWMb7lmg7yJQmeFcZxgAWQBBKKp0nP5RMaGW2zofQXvekurrF6AXb4KAs0+m
-	 eb0Zh8iGVAkJwFtf3/rb12X8ysbqfDu4DTIR2rMsu40ZRAKxYbtBbdpGv+fqZccCC+
-	 6VFLziO4GFsuA7qle4IF0Dh6X/IVqbvThBH5S6VGwUPelXisJtPnyOxk4h8WJ9ovSS
-	 z7hvC4/9xh3c+UGTBixEV5Ry6Pa/4j48ST+IGYjPjwOI32FzkS+AT6G80f+rA7hqWU
-	 mC4O9PzFXe0e42s3pyCkp9E007ESTrbgkVxoAbzqwtRgFu1oPA/bEw8HVdFydev22i
-	 AKyQBveSJifyg==
+	b=eQDmqIgIMgq3ofNEMQUolGl4aNgGsMCSYY77LXfM0Esf+oHkpYUFXPQJ0MQzaiWz4
+	 tmSHtiOR0M1ixGr2vvEGGQJEw59VxB3NcZOV+Yu23gWAoltnonwpDp7wK+mbasaFuG
+	 /eLMrUAwASwu+BUC4SkwFhlMGaIFxPpletAtbGlNXqHGczYkjgFhOxfSFWrE7DVTgQ
+	 ywk5V5eSs7BgWGPAPp7+7PgeklYkf2051ZQHgpjcX28E4f+17MewZW6wmpjPnho/lt
+	 FDbXQ2b1JwxMVvVMQ/5V6Zw4pyd/t10oE0KDLckHp2gmu+YwR8y9YFQzVhko9jZJEx
+	 23onaOBuH68fQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3AFD4C43140;
-	Thu, 25 Apr 2024 16:22:09 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 04A54CF21C2;
+	Thu, 25 Apr 2024 16:30:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,36 +37,40 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: pull request: bluetooth 2024-04-10
+Subject: Re: [PATCH] Bluetooth: HCI: fix slab-use-after-free in cmd_sync_work
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <171406212923.4535.14406498714713066534.git-patchwork-notify@kernel.org>
-Date: Thu, 25 Apr 2024 16:22:09 +0000
-References: <20240410191610.4156653-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240410191610.4156653-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
+ <171406263301.12899.1823558479194537202.git-patchwork-notify@kernel.org>
+Date: Thu, 25 Apr 2024 16:30:33 +0000
+References: <20240425041128.3093970-1-iam@sung-woo.kim>
+In-Reply-To: <20240425041128.3093970-1-iam@sung-woo.kim>
+To: Sungwoo Kim <iam@sung-woo.kim>
+Cc: daveti@purdue.edu, marcel@holtmann.org, johan.hedberg@gmail.com,
+ luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This pull request was applied to bluetooth/bluetooth-next.git (master)
-by Paolo Abeni <pabeni@redhat.com>:
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed, 10 Apr 2024 15:16:10 -0400 you wrote:
-> The following changes since commit 19fa4f2a85d777a8052e869c1b892a2f7556569d:
+On Thu, 25 Apr 2024 00:11:28 -0400 you wrote:
+> Hello, could you review the UAF bug and its fix?
+> The stack trace is at the bottom.
 > 
->   r8169: fix LED-related deadlock on module removal (2024-04-10 10:44:29 +0100)
+> mgmt sync cmd could be used after freed in this scenario:
 > 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-04-10
+> set_local_name()       ... cmd is allocated, set_name_complete() is
+>                            queued in cmd_sync_work.
+> hci_error_reset()      ... hci device reset.
+>   hci_dev_close_sync() ... close hdev, at this point, cmd is freed.
+> set_name_complete()    ... callback from cmd_sync_work. cmd->param causes UAF.
 > 
 > [...]
 
 Here is the summary with links:
-  - pull request: bluetooth 2024-04-10
-    https://git.kernel.org/bluetooth/bluetooth-next/c/fe3eb406723c
+  - Bluetooth: HCI: fix slab-use-after-free in cmd_sync_work
+    https://git.kernel.org/bluetooth/bluetooth-next/c/37dd04e4d594
 
 You are awesome, thank you!
 -- 
