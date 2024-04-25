@@ -1,172 +1,243 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3C14757E1
-	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Apr 2024 09:14:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714036487; cv=none; b=edVbPZYGLOAQCvb/TrfREmSExXXX2g9Wv+QJ9oavem7V6n3lFo4ncXm43Ys6usR/zYsz9v8cJ1kQdYuElSPOnBLr90KgAqAWEuF7CnaLUpe4Q86Za1wbRnzC6/b8i97nwH3cmpuabwNPDLf3bV7WC5jqmCaJV5ZE4EZ5ixf624g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714036487; c=relaxed/simple;
-	bh=w8vkJ13wQnR6P5vkZuaf65m9YP32eb8GUkuIYdr5qs4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=V40mi4ncmgbppvBALXMC9rjfz3puzqWITiz7wz+HbjIwfYC28KWQUxu1opTsxRYUYUiStI+kCscu17MpTY9h1iw8Tjtq4zb5ZqsgI1xqQhNKZNEauHxczPu9yh1X+p/dpPm2GjDXcZSJm7iR7dd3Hv38RjMCH/kXDT/exmOu53Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=daV4t5AK; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A5A284D11
+	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Apr 2024 10:09:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714039799; cv=fail; b=Vu6p7hXqUNj0AosWsthlF2mjhV8GtqsKw8W78CxMgjM6M0eRAM86VCOkkUYxPTJGxxQ+Kn63AR+rqIpl7R0tJjkF97bWCIPmjXz5X3r3lCCsPK5DM6AQqmQjRg8aDCtB3LTdRhbQGZnsZURr2x4DBWLlQCeFA5ah/BGXUhpZCvE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714039799; c=relaxed/simple;
+	bh=ZHED+051hYC9buKw/mlIB4VUn4kT8S9Y5msPpiIGg5A=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=uKgxJ7mpqHwFVEIoLEDQInjLq9yUh1tmnZEwW3qbmYwUfAqkir3GlkaU1QSHiswPbjDHwX+NpChaF5MvJMmmZip5Ers5TncoiroxYsI1jh47yWDKJYYO5xxjJEf1B+sPFDBRNjAsUDC39cea7wjWaY818V5XTvS8Y7rT+MBtFEw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OGq+6xeW; arc=fail smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="daV4t5AK"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-41a72f3a1edso6240795e9.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Apr 2024 02:14:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1714036484; x=1714641284; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=aMFlUt03OrSGQ9jcV4gNJQ98yi8IaKLhIUTcQkXPpi0=;
-        b=daV4t5AKBKZPlqDQajBo+dI1VfzRn+wT/YoTSMajsaOPWPJusI8d45WnuyMoF6H/yx
-         twe9O6/zBWKY/7YGFMEiudg5D6u+4WqZbAkhJ5MJlcFBSl2jYFuHN3A3F/cO0sodJgMa
-         Jw8BsSIRq243DmYVHOLrtUU7XYuZcxXEUbZHGCoPLcZ+SozXSms8eYNk0I6SW+G+NaZB
-         hIE4MIiKLDKuwiZJ/78XgyepZu5j4R0mXTJgNTCAToWXKXW8s+aTBWQl/V2MfMRUBEb2
-         KkRGneE0b9XJ6S/woQ5FUn2CjHiKCX5tMobWCOaD6yVzoaWBKi6GYM88dZ/kjc0NS0Z1
-         ufXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714036484; x=1714641284;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=aMFlUt03OrSGQ9jcV4gNJQ98yi8IaKLhIUTcQkXPpi0=;
-        b=xEwgUXeDdKGZZBl1aCuRjm83MCEmFNRM58uhQ2+CRH6RM/3ds+uDY4CtElzf8L9Yo/
-         eagwL/3aBCwEVu7iOX/OCv0rjwSKKrfxuvEhFNAvGRm4b1Q6Zbr+2SuYHOo70dFHfejA
-         k40T6cPDlzQ4RGhavlDIT65zZHn+y8L9G82F5HI/3bFhth7WX05FFSFFtFeQYs7nWqUi
-         wykHsV2KDeou4m8GkxNGpbQub/Z9qW6aa8EHXvw3GmnKa9SyELK5HBBi1ucXIhsVw3h7
-         nfJNy7HGBevP7l6U48Eu53tjoRVGHc6UQBV2COkaUPsSesXT+KG+lB/ZAN8dG2nLX/1o
-         2Ouw==
-X-Forwarded-Encrypted: i=1; AJvYcCU+j25GtafOHp79JdrduoM+Fl8dzYmt0HiyYP8HrSr2KBkvk0nCkhbyr9DMNq5q274Ld3kAiu3Ef6pXz7gS5pe5XKyUWCr2p7J4tejj1k6x
-X-Gm-Message-State: AOJu0Yz6UlIGK7vnc8Rhympr1/4nLDsyApGeWEIs7mBBuBpQGO/9300d
-	w0KDlTnVE8Xyg72pA9BvRJaavZiMd8JeGSqVKwSkxpfPIw9/chxoIyO2vSotizg=
-X-Google-Smtp-Source: AGHT+IEh9vN416an1viEDE+3BBMNVgorLOiQmy4wGxaJBs/xQnJfsWwMxxA42W9kbiXKVB10awJzYQ==
-X-Received: by 2002:a05:600c:4590:b0:418:f991:713f with SMTP id r16-20020a05600c459000b00418f991713fmr3793864wmo.23.1714036484262;
-        Thu, 25 Apr 2024 02:14:44 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.223.16])
-        by smtp.gmail.com with ESMTPSA id g9-20020a05600c310900b0041aa79f27a0sm9676218wmo.38.2024.04.25.02.14.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Apr 2024 02:14:43 -0700 (PDT)
-Message-ID: <d4c65299-d3af-4741-adc8-aafc1ab34369@linaro.org>
-Date: Thu, 25 Apr 2024 11:14:42 +0200
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OGq+6xeW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1714039797; x=1745575797;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=ZHED+051hYC9buKw/mlIB4VUn4kT8S9Y5msPpiIGg5A=;
+  b=OGq+6xeWkhblQwkiTZbrEJiicIfs3qNmiKDK0zrGOrgEKlxZ/4yYaqTI
+   CnyBVoMogJR323/l2KbxkH0zd0uamWEc2tyJSFS2qsFck2otAjdwuDYib
+   JvoiCnXmXVshrmxS97AdTVrZWfvpWaVS1WB2NUPBnFXzwRgtuMwF0ggCu
+   EzamgzYICgOWLlZFj3P5xdJYcE/CBet+xxpIUFdYjx2JC+maoNBVPK8lS
+   zLwAdsSFRi/4At4JgZgNQOqfmPAvewLtX9KgCW5kQXtBY7tXs2oBm7P5t
+   cfmqysco3hNhd+iF/3z2IzV7TJjLZwDAW8o1fGX6Ffg3m0qbQqdrUdpjD
+   w==;
+X-CSE-ConnectionGUID: x2pXQn6BTwCNlOV5nYnjDg==
+X-CSE-MsgGUID: Azf5l+J9SSiDRPUJZ9TnOw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11054"; a="35110517"
+X-IronPort-AV: E=Sophos;i="6.07,229,1708416000"; 
+   d="scan'208";a="35110517"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2024 03:09:56 -0700
+X-CSE-ConnectionGUID: RzsoGVImRtGg+YBhO2IIBQ==
+X-CSE-MsgGUID: f3En9wg8QF+GE8B2fQp+nw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,229,1708416000"; 
+   d="scan'208";a="29650390"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 25 Apr 2024 03:09:56 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 25 Apr 2024 03:09:55 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 25 Apr 2024 03:09:55 -0700
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.40) by
+ edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 25 Apr 2024 03:09:55 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=k5nJ0GbwKefdl8RKJV92FFAcDgJqq3YgiPa7226xlw9x5aMP+ltz2XPZ+A2VVOO2S7FRoOZ+Qgq9NnZQw/52b+r5kP6WkseZ8LmQkD0g6HX3VmhWbU75SIUB2wIiYhS6MKRzhyKFaAcLbcv0N7aBvFl3CKUfTTM0mM/cTkkK6ppH06+roNjwVEKDpKkjy/Jz2F/Yn37wszk8mjC7+FQQZ62hE3YP9y4urjySG70V+BVJ2AyjdLWq794gLZ8bM+StHRkbCNjm6ezhVk4IzZYKjSYiS4C20mgnH7NnwhFCVbWfetH2WW7VW6YCMwPS9g8KmIdRifqzK0cnG5Bf8wi2Cw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9tTkFNNe53UEuR59cFE4BQQXrukZgjw4Xlg6pY2RvF4=;
+ b=NNjTny1clxPObfbV+WqHMU1g3aT/718H4OKRtfl9SelCgTGVxFVEadoat/q35I9QRZhDPpUEaaVChFXJZ53UfY4jL5nnx9cSGTkcJRCH+P/KZ2JcrDkorL0nc913NTJ1UtcvUHnzroGJtNtzk5ObvNCJGqRBadxJvwWg29uvlXj0JukWkxFnTxXotVZXPNSF3UazwBWdTAg30o5fWMGQGnk3x6+pCD0Xy4C2AE6v6KhhzPn0TCT7sIdbS49LOAkp2WgNq2NBZMaEhZ0sQ/7far03xX7ZI3BJkj/cOqR6DcTpL726RGn2457JwdP0A+Ad8SI+3JfgTzM8HSJYRnn65A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH0PR11MB7585.namprd11.prod.outlook.com (2603:10b6:510:28f::10)
+ by PH8PR11MB7000.namprd11.prod.outlook.com (2603:10b6:510:220::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.22; Thu, 25 Apr
+ 2024 10:09:53 +0000
+Received: from PH0PR11MB7585.namprd11.prod.outlook.com
+ ([fe80::d6c2:e80d:7256:8a15]) by PH0PR11MB7585.namprd11.prod.outlook.com
+ ([fe80::d6c2:e80d:7256:8a15%6]) with mapi id 15.20.7519.021; Thu, 25 Apr 2024
+ 10:09:53 +0000
+From: "K, Kiran" <kiran.k@intel.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>, "Tumkur Narayan,
+ Chethan" <chethan.tumkur.narayan@intel.com>
+Subject: RE: [PATCH v2 1/2] Bluetooth: btintel: Dump exception event
+Thread-Topic: [PATCH v2 1/2] Bluetooth: btintel: Dump exception event
+Thread-Index: AQHahC3og6997VpueE6hOnBn9WtO1LF46NNw
+Date: Thu, 25 Apr 2024 10:09:53 +0000
+Message-ID: <PH0PR11MB75854FFF8E6088A0E7BB9B80F5172@PH0PR11MB7585.namprd11.prod.outlook.com>
+References: <20240401122559.1097489-1-kiran.k@intel.com>
+In-Reply-To: <20240401122559.1097489-1-kiran.k@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR11MB7585:EE_|PH8PR11MB7000:EE_
+x-ms-office365-filtering-correlation-id: c5ae61e0-1f7b-4b01-dad3-08dc650fda24
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230031|376005|1800799015|366007|38070700009;
+x-microsoft-antispam-message-info: =?us-ascii?Q?LQmcZy00ZMbPbtbLRRYgtk217UEabqfTqrpHS8MZOVJvFZxjNVWh+RCu7MbI?=
+ =?us-ascii?Q?hn55jwam8QfwhA9RtU/+cnJ4zroRt+wlknCWf0nN9Dn5aafx3FNqYoa2UrLB?=
+ =?us-ascii?Q?btS2zCj4BGPYFgVWMlt9ot5rxZ3jfmsj8f6uKM9phCj9niyxksrhX7NS6TW5?=
+ =?us-ascii?Q?FhRUpq9pUdO4S1JbdRo8/RA3vLBsmLX+BbGTpYaXOUTqgfWJTTUWlGca926u?=
+ =?us-ascii?Q?FaIVoJuLuuz3amTCq/enggjbcZ0aJcKqtcMw0WrLsiLVh+s0v+/gGFENo9Bw?=
+ =?us-ascii?Q?Uqu4G9ycVJpdYm1H3qf1dfmjtp1jkSo5K5FeMElGZODoI+e+aBP+kQOa31e6?=
+ =?us-ascii?Q?PKj1zka4rVBf/ftjMysWBAviX7cqAFHu8t8ezIya9Nhvkozp1QRZCOVVavY7?=
+ =?us-ascii?Q?AHaLlKQoKK74P40tx29aNBu2O8DLZYuM1lM2ML2BT8bLZy0f8FgVIl/RMJV4?=
+ =?us-ascii?Q?tTV89cBoOuaLWCeiTZtWy2k0fx4SW8UA+btr71PgMczYXpxMfiB8r7FaDt4p?=
+ =?us-ascii?Q?Zhxe2iRYoyA1x4CpRcjG+OV5nKuIEb7xWf3XTC/3C7v0UzqJirfVu4jIwOIo?=
+ =?us-ascii?Q?4SEhOphS6HfiR8zAc4DZp5V61F9kyFKIGQ+qdHWURafIZ8BOtCpEuasYHHDA?=
+ =?us-ascii?Q?9DvcEnOvblK6r/NhfiDqto2F4iixK1E3iOq9CPq4VlzyNV0HKzrJ4JnjWhUh?=
+ =?us-ascii?Q?LHJOSU2dgv67mk2nqdR124krGC0vDARH63mC7YXDnoO/Xn51V36medIFc7F6?=
+ =?us-ascii?Q?iV/qfYypbuBXDIiOFaHauGAWnltq0AGAzCR5gSWWvwHPZNmwd5gAR+Nbneli?=
+ =?us-ascii?Q?DVzV8TEd9LE57gqe/JRQdaOoknc2VMlVMx4wh9YQx+1iSK52A+G3qTKz/AT5?=
+ =?us-ascii?Q?eRV4XJGBTikRKmbU1mceFLDCUy60NE1tZ0pzsIqFHdkqCkolkn4PJzSjPIxX?=
+ =?us-ascii?Q?eZyHIbsqUVr9ySkWIXX5M/ucU7hv4xS20G0Pk/bnD93XG1ptgHle9z5iRF9v?=
+ =?us-ascii?Q?9QmuZR+RRzBXpGDV3f0w3WcblbP7tVSke6rTl6rMbzzJP8gBR2mS9wEhEyR2?=
+ =?us-ascii?Q?ExMzle/KFd3s8VJ2I9kUQE1Sxajd5vIXZx2Fa4PMwSSiznerjG+/uvOe7C08?=
+ =?us-ascii?Q?L8tv0mw3ez73lGDmoHjR4HBs46f/aK0D8H5hhAfJ3heRfnKh5KfBu63NEsPx?=
+ =?us-ascii?Q?GBOGtBpp2IJ3hWWvGDGWxWATG+KW6vMkQSj+MbryPBOS4QtL5Sh0KhfBM6ad?=
+ =?us-ascii?Q?9v1+OsG2nNvwLD7Z14ljjvF2TH4/OxTij9VGAaf6JhzDh5hELPs2gCDBoSm2?=
+ =?us-ascii?Q?B0QRYrO4vTdsKiImXiFQDdUHiM5srybkFHxtejeERiqKvw=3D=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB7585.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?8BKYodA6/ZCpPeenpc7VBuLPbAS38bN1W3IoPhYzBfXnsm1TWUJOP+wnZvMZ?=
+ =?us-ascii?Q?txkJm5vgyfFYDsVBU74WC3xKfRkWwuqO4cWV9meHRnh+nMQOdWN/j3Q2c/JX?=
+ =?us-ascii?Q?MbNxC3qGm4pNp+x6ZeyOsIRYCtxU8V+DToruSXj2RuOYlCAcaRdwkY3DExo/?=
+ =?us-ascii?Q?OVmi1htoac6+swnnBforQf4pUW6QptUz169nvJLIqI9lSyDQBTVlk3GYE4Bf?=
+ =?us-ascii?Q?QOOBkIj6NOdqgkKSWjC/fhJo3x9U/3kv9kruPhtL7U9bb2Y15XvwVJeRDSw4?=
+ =?us-ascii?Q?WqwkaxmUMdJameOyN6dWJNNBgC5VWJ5GXCfPQLW24zTK/6DoAj9ZG9BCtM8K?=
+ =?us-ascii?Q?6Nm0mpQk8C/sYhgxyyRWF3dM4+umRD85sOxELPf3MvxgqmlzSKU5G0ujt7xU?=
+ =?us-ascii?Q?pov6FmYsxxH1x3q7GGaKO7NcPHjY68wjOOOJF2ymKezV9fcSHxXugYx/2txI?=
+ =?us-ascii?Q?PwI5Jql6Ck/hUpl7AGfVqVTsJwLVBt11c+tDMK28EnF6u2fZyuN4wYyzw7QR?=
+ =?us-ascii?Q?AJAwzdItPzSZ/tZuXGh7M4Z33YWplbGVcAtdvrVANyB32YjMQHvvgNrincXA?=
+ =?us-ascii?Q?kJLY3PW9x1Cp7zodq9XFyJUx0GX+pIIq6etw1X6lueuJ1lCZwZ526FUCjtsP?=
+ =?us-ascii?Q?phMi0rZ/Tsjo80pld2ZZx2xkpnhC0gbak9E4xqDzrtDI97IiQKrunIEVmCox?=
+ =?us-ascii?Q?41AjtE0E7t11Uu+Kk1Kt+AAXrWCAJaaYmD3MRrylE54bt+5r0Qbe4wBARCQ1?=
+ =?us-ascii?Q?L3TLjqK54p7k+rdT1FKarF7ke7Hzz2zTwmdimZQXvUJYIsxHbhcnzhSEV0jD?=
+ =?us-ascii?Q?oAeherp+CEunfUP5NAO1jeq0F2F2fmS47MN4H1oMqGUhoVm/aG9TXXSZQYFB?=
+ =?us-ascii?Q?++Y9wIS1nuG3QMqaEjBREEXlHOpRS3tANNDNKOCWmMm+q4yaBZaKM+0IcKXW?=
+ =?us-ascii?Q?oswd6vo9/YNCHB8Jlz4JiIbJPDQpdC2IfQJbQipHkx4i1/oSOZxzp6A0yBtK?=
+ =?us-ascii?Q?Kv9Kw1i+d/xnPn0+gUSe6e/BCdUWlbsedYVLKVFrJZ+BYB3Y9zku8iZkpYmr?=
+ =?us-ascii?Q?bd9imIJ1lEnTLvJb/opCpfFCZQfItSSN7VOotLUl5HcH6tXyKGmj69NI4opm?=
+ =?us-ascii?Q?8/qDwbtwQ3W2GAAORWOeLKT1rfHTl+TKTpXJsN3HemA+tOEoGCZf4JI0w0q4?=
+ =?us-ascii?Q?VDW7sD/N51c7l3ISjUS6f9Y/cpVR/cn0elKUq/D1blI6WLFsNnNqFUlFKNAT?=
+ =?us-ascii?Q?EG3EfQp7db3dfSC1oHtANpNhOkl/tOsatLHT3H/53CAuCRk7DLuTwa7t3CdP?=
+ =?us-ascii?Q?tp6XNlmjuO0fzRFmnkmXq9THkPyMGvWgSNP9TdhTtq/erkJaDW9tbxuDvvpm?=
+ =?us-ascii?Q?OWfpiNVdqEfrVcsKD91xgO6It+O0kFhW91OWzJrTmghngKbx0fdlzhJGioGX?=
+ =?us-ascii?Q?VT4y1YwtWV684zL25+6+Mu+eHyAyI0DITwipKvLe60kl76ZcgRWb8xRMCY8c?=
+ =?us-ascii?Q?F6JiQqIBfu45Dyg2k7iBV3YjDN1sjlJ1MLPdZzucSfDT3lEytqr5G25OaJLC?=
+ =?us-ascii?Q?tKGfPh4WPDPiSPXiCKE=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] Bluetooth: qca: Correct property enable-gpios handling
- logic for WCN6750 and WCN6855
-To: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
- Wren Turkal <wt@penguintechs.org>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>,
- quic_zijuhu <quic_zijuhu@quicinc.com>, luiz.dentz@gmail.com,
- luiz.von.dentz@intel.com, marcel@holtmann.org,
- linux-bluetooth@vger.kernel.org, kernel@quicinc.com
-References: <1713947712-4307-1-git-send-email-quic_zijuhu@quicinc.com>
- <af004bcd-0649-4a82-8f09-36d6addd0e1e@linaro.org>
- <0cba3838-917b-48af-ba8b-2ef60714943a@quicinc.com>
- <49cf0a3d-5f52-41a1-9858-692f48d06b88@kernel.org>
- <c1632816-f754-42c6-8448-2daff8221b58@penguintechs.org>
- <368e70e0-edc2-44fd-a9a2-72efa0d9f864@linaro.org>
- <f372c661-d82a-4f6f-b2de-8dd241d6b107@penguintechs.org>
- <CACMJSesk+DYFDwM7hUoPs9Xy+i1q8w+5CFu4_RdreUXudk18zw@mail.gmail.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Content-Language: en-US
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <CACMJSesk+DYFDwM7hUoPs9Xy+i1q8w+5CFu4_RdreUXudk18zw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB7585.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c5ae61e0-1f7b-4b01-dad3-08dc650fda24
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Apr 2024 10:09:53.8478
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: gjUmKrDnnVn8TLcrNidNsVztQAT+OFuTr+5zCEutV7wyqYy3im5U0qXd9c6hNh5B+/pp+1mV5+uIPLoUdECg2g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB7000
+X-OriginatorOrg: intel.com
 
-On 25/04/2024 10:30, Bartosz Golaszewski wrote:
-> On Thu, 25 Apr 2024 at 08:30, Wren Turkal <wt@penguintechs.org> wrote:
->>
->> On 4/24/24 11:05 PM, Krzysztof Kozlowski wrote:
->>> On 25/04/2024 00:01, Wren Turkal wrote:
->>>>>>
->>>>>> 3) only care about the case property enable-gpios is not configured,
->>>>>> the original BT driver design logic indeed matches with binging spec's
->>>>>> requirements before bartosz's wrong change
->>>>>
->>>>> What? There is no such case according to bindings. I told you already
->>>>> two times: Either change bindings or this is not valid.
->>>>
->>>> @krzysztof, I'm curious. There is no entry in the binding specifically
->>>> for qca6390. Should there be?
->>>
->>> qca6390 is documented in the bindings, but you are right that it lacks
->>> if:then: entry narrowing/choosing specific supplies and pins. It should
->>> have one, indeed.
->>
->> Would creating an entry for the qca6390 hardware fix the issue you are
->> worried about?
->>
->> Again, sorry for all the, what I assume are, basic questions. I am so
->> far out of my depth here. I am just trying to figure out how to move
->> forward. I really do appreciate your guidance here.
->>
-> 
-> Wren, Krzysztof: I cannot stop you from doing this but I'm afraid this
-> will complicate the power sequencing work unnecessarily. The QCA6390
-> PMU bindings I'm proposing[1] are consumers of the BT enable GPIOs. In
-> my series I also create an entry for QCA6390 Bluetooth[2] but without
-> enable-gpios and with the inputs from the PMU, not host. Please
-> consider that if you decide to go with this.
+Hi Luiz,
 
-I don't have a near plan to describe QCA6390 supplies and pins, so don't
-worry. I also don't think Qualcomm BT understand what are bindings, so I
-don't expect patches from them.
+Friendly reminder.
 
-Best regards,
-Krzysztof
+> -----Original Message-----
+> From: K, Kiran <kiran.k@intel.com>
+> Sent: Monday, April 1, 2024 5:56 PM
+> To: linux-bluetooth@vger.kernel.org
+> Cc: Srivatsa, Ravishankar <ravishankar.srivatsa@intel.com>; Tumkur Naraya=
+n,
+> Chethan <chethan.tumkur.narayan@intel.com>; K, Kiran <kiran.k@intel.com>
+> Subject: [PATCH v2 1/2] Bluetooth: btintel: Dump exception event
+>=20
+> Having exception event dump in kernel log helps debugging the use cases
+> where snoop traces are not available.
+>=20
+> dmesg:
+>=20
+> [27.032666] Bluetooth: hci0: Exception occurred - type: 0xde [27.032703]
+> Bluetooth: hci0: ff 4f 87 80 03 01 01 de 07 01 de 06 1c ef be ad [27.0327=
+29]
+> Bluetooth: hci0: de ef be ad de ef be ad de ef be ad de ef be ad [27.0327=
+53]
+> Bluetooth: hci0: de ef be ad de ef be ad de 05 14 ef be ad de ef [27.0327=
+78]
+> Bluetooth: hci0: be ad de ef be ad de ef be ad de ef be ad de 43 [27.0328=
+03]
+> Bluetooth: hci0: 10 ef be ad de ef be ad de ef be ad de ef be ad [27.0328=
+27]
+> Bluetooth: hci0: de
+>=20
+> Signed-off-by: Kiran K <kiran.k@intel.com>
+> ---
+>  drivers/bluetooth/btintel.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+>=20
+> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c in=
+dex
+> a19ebe47bd95..c0dbbd1a2032 100644
+> --- a/drivers/bluetooth/btintel.c
+> +++ b/drivers/bluetooth/btintel.c
+> @@ -3119,6 +3119,7 @@ EXPORT_SYMBOL_GPL(btintel_configure_setup);
+>  static int btintel_diagnostics(struct hci_dev *hdev, struct sk_buff *skb=
+)  {
+>  	struct intel_tlv *tlv =3D (void *)&skb->data[5];
+> +	char prefix[64];
+>=20
+>  	/* The first event is always an event type TLV */
+>  	if (tlv->type !=3D INTEL_TLV_TYPE_ID)
+> @@ -3129,6 +3130,12 @@ static int btintel_diagnostics(struct hci_dev *hde=
+v,
+> struct sk_buff *skb)
+>  	case INTEL_TLV_FATAL_EXCEPTION:
+>  	case INTEL_TLV_DEBUG_EXCEPTION:
+>  	case INTEL_TLV_TEST_EXCEPTION:
+> +		bt_dev_err(hdev, "Exception occurred - type: 0x%2.2x",
+> +			   tlv->val[0]);
+> +		snprintf(prefix, sizeof(prefix), "Bluetooth: %s: ",
+> +			 bt_dev_name(hdev));
+> +		print_hex_dump(KERN_ERR, prefix, DUMP_PREFIX_NONE, 16,
+> 1,
+> +			       skb->data, skb->len, false);
+>  		/* Generate devcoredump from exception */
+>  		if (!hci_devcd_init(hdev, skb->len)) {
+>  			hci_devcd_append(hdev, skb);
+> --
+> 2.34.1
+
+Thanks,
+Kiran
+
 
