@@ -1,106 +1,124 @@
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52AD4139B
-	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Apr 2024 06:30:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 731E067A1A;
+	Thu, 25 Apr 2024 07:56:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714026659; cv=none; b=VXiHIsIn8RLLEZsHr8ZAi3b1SP0vWjHdQ4QGAc5FLmWB3BV51Kzg6QpGLC/HDbQzPpwVxpdSr1Na+N9Qfgu9y+VmQvZ6QJXHiY/dLaCp2ojmFc4gWQr5aMkN0FFUWZwu1t0/dWH2OZTF1DecKgwtDG3JPs/yHArJAMAcMGdMnVk=
+	t=1714031763; cv=none; b=PGckPVOi1WSQy2bwE/StrM+XHWjh2g2xwNOR9BRhFrRWFp/dUtNRbMXyFHi/7bXImH8NRg6Gzqzm/HKW8IfDrQluJJR8Yj5167CVXbK/BtTNZW7VLQVkO3Nke5qAB5Su2Q5OZVK8X6zICxjwSsbYvjTwdkwfqOHzb1ZBFa6qb1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714026659; c=relaxed/simple;
-	bh=fZySohFOzN8lvBGKvs2I8G7aMQM3CLhKmCqThfl/Osc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MdfX2qjfpSTVSltfOjz1+/mFCA7pnKtADAnDp3EmPFBnxfP05VFAjr79bz1VY1TOIOlRxInHvEJVVC0CnDor9JUqJrMoreTGzS22lvGpe95JuQ/B2IsuJSqsSFMk5TCcvA5/SX8DRyE+xo4SYCjkcjdt6GQiROZwqtuvrXa64po=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=C857dEAu; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=penguintechs.org
+	s=arc-20240116; t=1714031763; c=relaxed/simple;
+	bh=FbilVvwlenLgeiFq6bKzJ8zy6ljmHZoUoBSejCx9WMg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=P/uaanyTB/YKlv28BmSyZg1sFN8dNeJFKVCwVwLA+Khe7pBR1nPDKvhXB/oNeQGE2KJ1jBBviJpNOohQWuTFW9JodhOT2qB91h7FLngYsf7mO/eE8L0kEfxZMTrwqMj8XRRTkHQAUxI639h8UerNvX2mhFPFbc0my2a/bgSAAbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pctJuYQ8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="C857dEAu"
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2ae229e9176so595699a91.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Apr 2024 23:30:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=penguintechs.org; s=google; t=1714026656; x=1714631456; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lJV9LN/GwonATrn269FCewxa9i0hjR59JrMNdw1xZpw=;
-        b=C857dEAu77N5L1mVBYB1wtJ6qBg1gG/EbaqunB9n9ndjrBrGkMs8ZAz/fKVjlj/a2G
-         mvK+PsZIGZ7e3+KIm4tCYIQHBruosYvWQ1WyooSxODrZYD0FDZBX3fiFm7wibXZYpS3s
-         lDFhFpvwJmlHG61IQha2ZTkH97Obc6RCDPdLI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714026656; x=1714631456;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lJV9LN/GwonATrn269FCewxa9i0hjR59JrMNdw1xZpw=;
-        b=lTt97EeN6vSnbQydp380pA2tzLNPvml0BV0R6AJd75lI0oEsU6LA6jLSod/y7Egoo8
-         lmZiaWvPopx9huhjpj2uT5T9HUUE2LvolM5I8TB7jHhvqeFVXffgYT9LYGwPacSySXqV
-         ixHZkeSNxxXxL/3xq2l9bgWNpTHeOJODb1n3rNBfniWt6FSm0C93cLf3UL5y6D/fm139
-         Akt6Tjzt5sFsaFGiWB0j/lu79hGhEh5vkQq7c3ttGveCRHJmCNm12OThabuwesNjrzY7
-         5ypgj3BBdaUFt9DbxKYYqlA2tvyZnseCA20GQhef2+mlh8knMiSzoUEgYjz/PT8X+0Kc
-         A4Gw==
-X-Gm-Message-State: AOJu0YzDKRVhLyl6eDqJtooPpYtFZSCOxxKjmTQmRwLoPKbtdr/oW8zf
-	qrK1itr6bPfitf0eRbV28YicTRlxMua8D/evp3iT+ulOjKkeNjRE5d+F8uxDEB+dGMt4+VC5+r6
-	dF6hv
-X-Google-Smtp-Source: AGHT+IGhJjr420trLgR9hJMFAM9Bru5zuMN5d4FeLGhKAHpQ2vB0UtlRJt8nsDxaWH6hpOVA7q5VEQ==
-X-Received: by 2002:a17:90a:588e:b0:2b0:eb:f65a with SMTP id j14-20020a17090a588e00b002b000ebf65amr69895pji.16.1714026656219;
-        Wed, 24 Apr 2024 23:30:56 -0700 (PDT)
-Received: from ?IPV6:2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08? ([2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08])
-        by smtp.gmail.com with ESMTPSA id qa2-20020a17090b4fc200b002abb8a187dbsm12503544pjb.4.2024.04.24.23.30.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Apr 2024 23:30:55 -0700 (PDT)
-Message-ID: <f372c661-d82a-4f6f-b2de-8dd241d6b107@penguintechs.org>
-Date: Wed, 24 Apr 2024 23:30:54 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pctJuYQ8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 520FCC113CC;
+	Thu, 25 Apr 2024 07:56:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714031762;
+	bh=FbilVvwlenLgeiFq6bKzJ8zy6ljmHZoUoBSejCx9WMg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=pctJuYQ8pjN/iOl9OiJoGq/5tMceS3K58mDHUL2521Sko39SPcBrT4oTNNROs3NGa
+	 28KY82pxVQGtSoZgMpUuddTdjpjEhSGktT3uegc//Nuaq84yTOw5OtBiYEmgUk++D6
+	 O3zI09xrPaSrmk6sw2+nRxQ0xzej4ZXkd47/xCLrGHsKuwrCiRRY+E2euNPWr9N1ck
+	 ESUoA6t8nBQFGy756uMBALGFDBuWlkmbYd0Bbxq7RCV79kSBo177kaphMdWFGFCPhb
+	 RXaDDivf5E8e3EyDNOkbc4LsW/haQitICqSgP4i6/Ey9c2xMJgVhtJ8lrSPqdwJR6C
+	 Qv4WPlPzVzgcw==
+Received: from johan by xi.lan with local (Exim 4.97.1)
+	(envelope-from <johan+linaro@kernel.org>)
+	id 1rztxZ-000000006Lk-32dS;
+	Thu, 25 Apr 2024 09:56:01 +0200
+From: Johan Hovold <johan+linaro@kernel.org>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Johan Hovold <johan+linaro@kernel.org>,
+	stable@vger.kernel.org,
+	Doug Anderson <dianders@chromium.org>,
+	Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+Subject: [PATCH] Bluetooth: qca: fix wcn3991 device address check
+Date: Thu, 25 Apr 2024 09:55:03 +0200
+Message-ID: <20240425075503.24357-1-johan+linaro@kernel.org>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] Bluetooth: qca: Correct property enable-gpios handling
- logic for WCN6750 and WCN6855
-Content-Language: en-US
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
- Krzysztof Kozlowski <krzk@kernel.org>, quic_zijuhu
- <quic_zijuhu@quicinc.com>, luiz.dentz@gmail.com, luiz.von.dentz@intel.com,
- marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org, bartosz.golaszewski@linaro.org,
- kernel@quicinc.com
-References: <1713947712-4307-1-git-send-email-quic_zijuhu@quicinc.com>
- <af004bcd-0649-4a82-8f09-36d6addd0e1e@linaro.org>
- <0cba3838-917b-48af-ba8b-2ef60714943a@quicinc.com>
- <49cf0a3d-5f52-41a1-9858-692f48d06b88@kernel.org>
- <c1632816-f754-42c6-8448-2daff8221b58@penguintechs.org>
- <368e70e0-edc2-44fd-a9a2-72efa0d9f864@linaro.org>
-From: Wren Turkal <wt@penguintechs.org>
-In-Reply-To: <368e70e0-edc2-44fd-a9a2-72efa0d9f864@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 4/24/24 11:05 PM, Krzysztof Kozlowski wrote:
-> On 25/04/2024 00:01, Wren Turkal wrote:
->>>>
->>>> 3) only care about the case property enable-gpios is not configured,
->>>> the original BT driver design logic indeed matches with binging spec's
->>>> requirements before bartosz's wrong change
->>>
->>> What? There is no such case according to bindings. I told you already
->>> two times: Either change bindings or this is not valid.
->>
->> @krzysztof, I'm curious. There is no entry in the binding specifically
->> for qca6390. Should there be?
-> 
-> qca6390 is documented in the bindings, but you are right that it lacks
-> if:then: entry narrowing/choosing specific supplies and pins. It should
-> have one, indeed.
+Qualcomm Bluetooth controllers may not have been provisioned with a
+valid device address and instead end up using the default address
+00:00:00:00:5a:ad.
 
-Would creating an entry for the qca6390 hardware fix the issue you are 
-worried about?
+This address is now used to determine if a controller has a valid
+address or if one needs to be provided through devicetree or by user
+space before the controller can be used.
 
-Again, sorry for all the, what I assume are, basic questions. I am so 
-far out of my depth here. I am just trying to figure out how to move 
-forward. I really do appreciate your guidance here.
+It turns out that the WCN3991 controllers used in Chromium Trogdor
+machines use a different default address, 39:98:00:00:5a:ad, which also
+needs to be marked as invalid so that the correct address is fetched
+from the devicetree.
 
+Qualcomm has unfortunately not yet provided any answers as to whether
+the 39:98 encodes a hardware id and if there are other variants of the
+default address that needs to be handled by the driver.
+
+For now, add the Trogdor WCN3991 default address to the device address
+check to avoid having these controllers start with the default address
+instead of their assigned addresses.
+
+Fixes: 00567f70051a ("Bluetooth: qca: fix invalid device address check")
+Cc: stable@vger.kernel.org      # 6.5
+Cc: Doug Anderson <dianders@chromium.org>
+Cc: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
+---
+ drivers/bluetooth/btqca.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+
+Luiz and Doug,
+
+As the offending commit is now on its way into 6.9, let's just add the
+default address that the Trogdor machines uses to the address check.
+
+We can always amend this when/if Qualcomm provides some more details,
+or, in the worst case, when users report that they need to re-pair their
+Bluetooth gadgets if there are further variations of the default
+address.
+
+Johan
+
+
+
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index 216826c31ee3..cfa71708397b 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -16,6 +16,7 @@
+ #define VERSION "0.1"
+ 
+ #define QCA_BDADDR_DEFAULT (&(bdaddr_t) {{ 0xad, 0x5a, 0x00, 0x00, 0x00, 0x00 }})
++#define QCA_BDADDR_WCN3991 (&(bdaddr_t) {{ 0xad, 0x5a, 0x00, 0x00, 0x98, 0x39 }})
+ 
+ int qca_read_soc_version(struct hci_dev *hdev, struct qca_btsoc_version *ver,
+ 			 enum qca_btsoc_type soc_type)
+@@ -638,8 +639,10 @@ static int qca_check_bdaddr(struct hci_dev *hdev)
+ 	}
+ 
+ 	bda = (struct hci_rp_read_bd_addr *)skb->data;
+-	if (!bacmp(&bda->bdaddr, QCA_BDADDR_DEFAULT))
++	if (!bacmp(&bda->bdaddr, QCA_BDADDR_DEFAULT) ||
++	    !bacmp(&bda->bdaddr, QCA_BDADDR_WCN3991)) {
+ 		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
++	}
+ 
+ 	kfree_skb(skb);
+ 
 -- 
-You're more amazing than you think!
+2.43.2
+
