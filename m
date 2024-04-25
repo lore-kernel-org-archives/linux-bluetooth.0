@@ -1,164 +1,248 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A87D14D6F5
-	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Apr 2024 17:38:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714066687; cv=none; b=VvDeQkwI/JVM/e4NxtUQzdkCNHgZTb2dU73NXTdOm4BIyHB0V3AvnYPVCPoncPkVi8L8lZNnHKIVSgCT4LvPT9DobSRY8rFvrZhfrx5pfLTrLY+EtGXDcJ8jnoyLTPfHBTGCf8S3ohfKSGY9tvhNIkxLC/EQt7iH5oxEEYC5YWw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714066687; c=relaxed/simple;
-	bh=eVrm14LJI6/NlUMvRfCFch7fvuEcidXh0mDJ1Ws1fS0=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LTCu4ADUG2IR+FC2XQ484sp0QsnOrqPX8t04OcBOikWe31kHv28DSgda4H++8HDVpQ3ag/Tvwit3qatyiMjycU1AaNtZg3QABjV/FPXBokLToXnbpxUZmUMCRmiuv2ty8XHTwRH62Dea+u1PCTHIF1XKY+6yMbRHi+LTd2J4NIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=PQDo/IgS; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE44C14BF9B;
+	Thu, 25 Apr 2024 20:59:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714078768; cv=fail; b=EFzHHkWZjcHFyz7+CR8P0Yb0a1rmYGFOX04Zg9aZq2miSqOt6lr2J+SuZMBj/Tp2M9pxMoVVmyIiOvk3UWCe+l0qwKhTG8IRLkoLdMYgtW4CCACnSaITBCIk+g9o2pU1/rVjb3mMktfDMzYiWNMIff2bVH4Td0wF55U0AMNftKg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714078768; c=relaxed/simple;
+	bh=ad6+sb9BGBwAXehYW3z4es0bpiKnw8BSr7KBTi8bx/0=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=IekGiwJ74LB8FjsAluPHPUX6dzk6QqA0MGZbNcwS7SJ7NGbbDkkCBrUQQBnhXhO2NzpEqLLzIkG3hxPFAHaMPPdHTXjv5O/+z4ARAMve+1Lrwzj2K4ySl5xRmGHxv7zsPKtfH1J2iPfLnW/zo4yv0M6K4gIiHPLpcYRmt9SucFA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eTuD6Uqk; arc=fail smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="PQDo/IgS"
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 43PFpwE9007950;
-	Thu, 25 Apr 2024 17:37:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	date:from:to:cc:subject:message-id:references:mime-version
-	:content-type:content-transfer-encoding:in-reply-to; s=
-	qcppdkim1; bh=XCaaLfkNdmV+ohup7y5ZirZ4guoDakFJAiZ39Psf44o=; b=PQ
-	Do/IgSkYVM1DI1CmS/ZFviDgRTRax7P4EQA6tvEN8+WAvVmnG8vXk3fOUkUZwT9a
-	IOMJXZP28owZmfcAI3WDvJIPjbnMzTBXu/7KPI04Al7XdjpmlnmS/6Qbuy0KFDXm
-	L9en/HdaBZy4OSCGUcGWFJIGU7d+e43tWEiTzwq33ezSfTlHFnn6NuCVGWccWbEn
-	iwFTOIpPs8NuGpNuwNQV+CshWaS1CJV/Bjwqp9KAN/yCuzYekEVu1xs7rmznwgfx
-	8J9ZWAbG5RZAGH8Oi2PgfuKtsXBAP940aShxSI3iPOJxFYaDHKrVAc4fGzq+hs5b
-	3uIuDK/7Q8rwCmj+BDZw==
-Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xqengkb9s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 25 Apr 2024 17:37:54 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43PHbrMD011214
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 25 Apr 2024 17:37:53 GMT
-Received: from hu-eberman-lv.qualcomm.com (10.49.16.6) by
- nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eTuD6Uqk"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1714078766; x=1745614766;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=ad6+sb9BGBwAXehYW3z4es0bpiKnw8BSr7KBTi8bx/0=;
+  b=eTuD6UqkdFs2713f9w2V3F8pTae7rqWsaKf+yFQ18tDzgg6aW6/2rpuo
+   J2UlxmH6Bn6MMlpZ1qQHKPhy/NIOeCwsX1Y6nIel6xBUftv82v5fBMCgg
+   qze6iFW+QTPpNzyyhXKKPHYBwHfxt8QgXqHFMf8kIwcUlDAxIV1U6rrFu
+   es57VfMO1sdVDGHu4RkN8HvjzOc3yajWyuqAEItMNJ2v6m1qSuD8Uhqzg
+   X/BpBaLOYc/xXJqiBwSzDlClSVju/Qqfyz5J6zDL5kXECdLaj7jSm3l5o
+   pUgEbljVsYZBkkCytcmIV4dVWqx/l9EMmzDZN4TXIgOwc65bDppggpe7m
+   w==;
+X-CSE-ConnectionGUID: U9J8X2kvTNmx78w1v2Yd8Q==
+X-CSE-MsgGUID: 805gISkjTy+5wCGZ+DTkhQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11055"; a="35186881"
+X-IronPort-AV: E=Sophos;i="6.07,230,1708416000"; 
+   d="scan'208";a="35186881"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2024 13:59:24 -0700
+X-CSE-ConnectionGUID: rpsyjb1RQUig6bkdj/tEdA==
+X-CSE-MsgGUID: uyPFEYKUR2yVpQFnrkyj2A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,230,1708416000"; 
+   d="scan'208";a="29849700"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 25 Apr 2024 13:59:24 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 25 Apr 2024 13:59:23 -0700
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 25 Apr 2024 13:59:23 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 25 Apr 2024 13:59:23 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.168)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Thu, 25 Apr 2024 10:37:50 -0700
-Date: Thu, 25 Apr 2024 10:37:49 -0700
-From: Elliot Berman <quic_eberman@quicinc.com>
-To: quic_zijuhu <quic_zijuhu@quicinc.com>
-CC: Wren Turkal <wt@penguintechs.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski@linaro.org>,
-        <luiz.dentz@gmail.com>, <luiz.von.dentz@intel.com>,
-        <marcel@holtmann.org>, <linux-bluetooth@vger.kernel.org>,
-        <bartosz.golaszewski@linaro.org>, <regressions@lists.linux.dev>,
-        <kernel@quicinc.com>, Greg KH
-	<gregkh@linuxfoundation.org>,
-        Trilok Soni <quic_tsoni@quicinc.com>,
-        "Bjorn
- Andersson" <andersson@kernel.org>
-Subject: Re: [PATCH v6 1/2] Bluetooth: qca: Fix BT enable failure for QCA6390
-Message-ID: <20240425103329807-0700.eberman@hu-eberman-lv.qualcomm.com>
-References: <1713919602-5812-1-git-send-email-quic_zijuhu@quicinc.com>
- <1713919602-5812-2-git-send-email-quic_zijuhu@quicinc.com>
- <349b27a5-d2d3-46f1-b002-44f81e0cedef@linaro.org>
- <e8cd122d-e342-45c2-b078-a4ca2d8dcfff@quicinc.com>
- <dfe18768-f6da-4c60-880d-deeae3c3b04d@linaro.org>
- <8ae32009-5f5e-49a1-88a1-e330f0614f60@quicinc.com>
- <5e363318-c6e4-4874-8026-7940b434d583@linaro.org>
- <2020a858-c3d9-48a7-ad59-3691c6b98fb2@penguintechs.org>
- <053f51ae-1eb7-4ea8-bb04-38bfa1e0b8f5@quicinc.com>
+ 15.1.2507.35; Thu, 25 Apr 2024 13:59:23 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BwkjZJofZXmzYHTqY6R4TPyjeLA9XcGmtqUzDWss/2grK8o6QLtXN4W3Rm8gUlJjK97ZnXkRuEs6zAiZe3tUBQHBVbXefNn13peKXykeBo48O4ysfijlVXrOiCkXkq7vnv81+SsgBSQZXXRM5o6ag/kLA/bHGfE/y1N6sTGoFNfqGtBKAEILVs3U1erttPw7jUKHKjHciUgAoK1LYKc6qk28oSI7qGGAS7k1LKa1wdzqs4kEj1MXN3/yKlINp5dIuC6UfW8r0ie3e05PPckH31J/gRl9TMrwszxfJGCdZaUj2gLgztaWa2S1LoMGc29WHjrpIhgMl0dmcLHzODr0Ag==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=UtnnUUtpRLPE1JKhMifN/g9LnRUjDmKhaP1b8NExrdM=;
+ b=TccY8FCswQMqCTj16oSTkc+DNAjJghY/KJdzY01PZ0x5PIKY31oBGZyW4G6hhNh9JavVtOwi/6+zw7EBz/8bx6QI65LS3UfRykx/vFZ4ZnuG3oK4+fDmutm36myYTm2+PdWvbuNIJl9q20JewTXn2L8E7yhype3gukEnxJhDPFFjOLcDtipRChjI2dgXu5bRj5tqvc6lXu9PJk161RKUlyruwpqtFt/ZJKf1dHf7F3imGOQRdYNyMeU8qjbFQRkbMfCgh996cKexaKBGEMUE8fpJEqRvnNLfWnhmZeBaRf+n0EyuFgx1VdAKArzlyXLr1LcJ45rDMgHha3oBUX/eOw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SA1PR11MB6733.namprd11.prod.outlook.com (2603:10b6:806:25c::17)
+ by SJ2PR11MB8586.namprd11.prod.outlook.com (2603:10b6:a03:56e::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.22; Thu, 25 Apr
+ 2024 20:59:20 +0000
+Received: from SA1PR11MB6733.namprd11.prod.outlook.com
+ ([fe80::d543:d6c2:6eee:4ec]) by SA1PR11MB6733.namprd11.prod.outlook.com
+ ([fe80::d543:d6c2:6eee:4ec%4]) with mapi id 15.20.7519.020; Thu, 25 Apr 2024
+ 20:59:20 +0000
+Date: Thu, 25 Apr 2024 13:59:09 -0700
+From: Ira Weiny <ira.weiny@intel.com>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, "Michael S. Tsirkin"
+	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Xuan Zhuo
+	<xuanzhuo@linux.alibaba.com>, Jonathan Corbet <corbet@lwn.net>, "David
+ Hildenbrand" <david@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Richard
+ Weinberger" <richard@nod.at>, Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>, Paolo Bonzini
+	<pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe
+	<axboe@kernel.dk>, Marcel Holtmann <marcel@holtmann.org>, "Luiz Augusto von
+ Dentz" <luiz.dentz@gmail.com>, Olivia Mackall <olivia@selenic.com>, "Herbert
+ Xu" <herbert@gondor.apana.org.au>, Amit Shah <amit@kernel.org>, Arnd Bergmann
+	<arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gonglei
+	<arei.gonglei@huawei.com>, "David S. Miller" <davem@davemloft.net>, "Sudeep
+ Holla" <sudeep.holla@arm.com>, Cristian Marussi <cristian.marussi@arm.com>,
+	Viresh Kumar <vireshk@kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>, David Airlie <airlied@redhat.com>,
+	Gurchetan Singh <gurchetansingh@chromium.org>, Chia-I Wu <olvaffe@gmail.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard
+	<mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, Daniel Vetter
+	<daniel@ffwll.ch>, Jean-Philippe Brucker <jean-philippe@linaro.org>, "Joerg
+ Roedel" <joro@8bytes.org>, Will Deacon <will@kernel.org>, Robin Murphy
+	<robin.murphy@arm.com>, Alexander Graf <graf@amazon.com>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Eric Van Hensbergen <ericvh@kernel.org>, "Latchesar
+ Ionkov" <lucho@ionkov.net>, Dominique Martinet <asmadeus@codewreck.org>,
+	Christian Schoenebeck <linux_oss@crudebyte.com>, Stefano Garzarella
+	<sgarzare@redhat.com>, Kalle Valo <kvalo@kernel.org>, Dan Williams
+	<dan.j.williams@intel.com>, Vishal Verma <vishal.l.verma@intel.com>, "Dave
+ Jiang" <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>, Pankaj Gupta
+	<pankaj.gupta.linux@gmail.com>, Bjorn Andersson <andersson@kernel.org>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>, "James E.J. Bottomley"
+	<jejb@linux.ibm.com>, "Martin K. Petersen" <martin.petersen@oracle.com>,
+	Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>, "Anton
+ Yakovlev" <anton.yakovlev@opensynergy.com>, Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>
+CC: <virtualization@lists.linux.dev>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-um@lists.infradead.org>,
+	<linux-block@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
+	<linux-crypto@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-gpio@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
+	<iommu@lists.linux.dev>, <netdev@vger.kernel.org>, <v9fs@lists.linux.dev>,
+	<kvm@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
+	<nvdimm@lists.linux.dev>, <linux-remoteproc@vger.kernel.org>,
+	<linux-scsi@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+	<alsa-devel@alsa-project.org>, <linux-sound@vger.kernel.org>, "Krzysztof
+ Kozlowski" <krzysztof.kozlowski@linaro.org>
+Subject: Re: [PATCH v2 21/25] nvdimm: virtio_pmem: drop owner assignment
+Message-ID: <662ac41d1655a_108a3c294c0@iweiny-mobl.notmuch>
+References: <20240331-module-owner-virtio-v2-0-98f04bfaf46a@linaro.org>
+ <20240331-module-owner-virtio-v2-21-98f04bfaf46a@linaro.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240331-module-owner-virtio-v2-21-98f04bfaf46a@linaro.org>
+X-ClientProxiedBy: BYAPR01CA0039.prod.exchangelabs.com (2603:10b6:a03:94::16)
+ To SA1PR11MB6733.namprd11.prod.outlook.com (2603:10b6:806:25c::17)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <053f51ae-1eb7-4ea8-bb04-38bfa1e0b8f5@quicinc.com>
-X-ClientProxiedBy: nalasex01b.na.qualcomm.com (10.47.209.197) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: nVljuTGqyhT2WXHjeKSnkzWzUu4kEMGA
-X-Proofpoint-ORIG-GUID: nVljuTGqyhT2WXHjeKSnkzWzUu4kEMGA
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-04-25_17,2024-04-25_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 bulkscore=0
- mlxlogscore=999 phishscore=0 malwarescore=0 mlxscore=0 impostorscore=0
- lowpriorityscore=0 adultscore=0 priorityscore=1501 clxscore=1011
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2404010003 definitions=main-2404250127
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA1PR11MB6733:EE_|SJ2PR11MB8586:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4a1e0950-9458-48d9-541b-08dc656a93d9
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|1800799015|376005|7416005|366007|921011;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?p4Pyvc1s10sc+1IhRVCgrka7N17JI8shpKV9e+qyo0zoB5fQBt09qhs/sKrY?=
+ =?us-ascii?Q?E2+mMbn2LeGPlwtKggkfSUJWmwlPSZuPRp1J6Jue9X1dR74+/AyxHAjobEH0?=
+ =?us-ascii?Q?WQGt3AiJM9GYXGDc23KiyG9FA6iqGOSXvJT2B7lk4IwKfd1DP2EaCUrlPzje?=
+ =?us-ascii?Q?XDfveANJWNuO9Gy7+XeQLWg7g8nKveuVWNOmnPx3iUgCpFN0A1smk8d7v1Nh?=
+ =?us-ascii?Q?Xkw5QspejlB+puqNeXnYrbMMHqHbyx3FnQ0QTCb5sjPTvK2EulzgN1mzuJCu?=
+ =?us-ascii?Q?asj+PD1MPLZFkKHD3JxdXa1PUxMF1KlGKwEDHSjaI9o8SwCNMSwKUV0kPoF8?=
+ =?us-ascii?Q?UyIsbaV0Q2NenIHOPrPAORzYXPno3jn1sV1OWN9nD6wGugDyScBB24A0UPAK?=
+ =?us-ascii?Q?Xl1Yw7vlZBfnhDOZrVHr4K0mFt/VUqdn5BgKDgmK6s8MSlm7FD+fr0Kg2VCZ?=
+ =?us-ascii?Q?/3H2W0xBSg2+LiHhbRiP63m1gi492rwD21Y/AxuHTfVkZGTRXD7PtcS+R1E2?=
+ =?us-ascii?Q?mg9IquTiLx9NJOXC8xb0SuG+KxgLTpQIQdCz1FegVg8c/85/kQcbhK570UHn?=
+ =?us-ascii?Q?oL4gj815Xf4bdBEhjrtuuMkUA/U0fkMeXSPZ0W+KGHAjwV/Z77LAzIVTdb34?=
+ =?us-ascii?Q?zFwwvW3hmxwch129QmUrtnH0HegY9iikAxAZrI47mteg5YT6xCHcCn+0LAoZ?=
+ =?us-ascii?Q?Vh1uRKxwaYciv5KUAaeopaLjzAdK2UnMAqSl7mFTa2XhHVAcoeW5SZfqQ6mI?=
+ =?us-ascii?Q?Ef9Ou6sjsJRNRMAqlHZDc+BU91w89febeyepipwh2E5j4Y0qQvKnBgInNg4Q?=
+ =?us-ascii?Q?1szmwA78wF7RUHF4mnzHXV+qOOnFPsp4pT9IPyEyk8WfQLYXyU2+G8k3NYYU?=
+ =?us-ascii?Q?LzUiz+kJEaq18cA9QUumZ3x6qZiOVCkytIg9nvY/7JMxRRhGvmNq10pLFS3I?=
+ =?us-ascii?Q?yxU843oCFnMIrPsomQnj9a6XVOxEUAPzV2a8m37ac7p6lFIC0f0nZGTaMdpN?=
+ =?us-ascii?Q?gjBOU9wQgHETI3EP20RewReN6Twd4KRZc6gHju/IVnyFRQG/a0ZdmcLUg589?=
+ =?us-ascii?Q?8DLFAKiGv4W0hJe7AsE3U70wX/MNSh0BCXvsy1nTqn9q2yt5OJrdKmxt2aEG?=
+ =?us-ascii?Q?RLTTyPIf2cnNonmNlnzhsO30KOSG/B0m3e7O6w00kVsw1x6EpKjGnQpue6k/?=
+ =?us-ascii?Q?3FiSlZKerTZdGeDvrR+yvsN/C/wzUXxaWd4u8CT5wDx2mB/F8dxLColXv/2B?=
+ =?us-ascii?Q?O8nhvq2PsisgGZ1csGP9/hKUZNKzSD4fYRrYmZbM+iTXei8aeRxqJZmkiqSY?=
+ =?us-ascii?Q?p7ccIMK+w/ETQCT56Po+IwHc?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR11MB6733.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(7416005)(366007)(921011);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?wsgct7QwEtK35653A630MZZbe6OGEV6cvtUwSO58Z1F4ZjIxu8O/C3XQG/oy?=
+ =?us-ascii?Q?k/U3l3549wv24vu4Vn5YpLE/1R7HZd6yFj3K8xZunc5DwDNSqOoTnbZZWH2r?=
+ =?us-ascii?Q?9/u9Anm4StTkF6qIoUQuWF/Ok7zggCKO6Mkcc6Nbf+JYqkc4NW6YpVlAvNkZ?=
+ =?us-ascii?Q?Z8J39CEZFlKD1P6iFpxIr7NdSpW6rbdV6kqpsjhLzzMD7d03nvQdfd558bPn?=
+ =?us-ascii?Q?JOtIpqweL4Yp5UnYGXXPGkn2XosYvlK9obqtRSuwLHpvkTazk8L7RFL4gvTS?=
+ =?us-ascii?Q?r2822/0umLruRmyU5zMrMiExe6kpLm5NH/bCiLz+mb3qRH5B2e6RfKps4CX0?=
+ =?us-ascii?Q?cz8Q7s2FU7+YeBts744pBuioAihe7xZ2jC4U6mLqhKpLH+fEz55MoYeHsWot?=
+ =?us-ascii?Q?3phklxO5JZmIs54B26n76OOFdj4UqEEZxkGn7QPEoJBSfbpyklYcuik8y3RG?=
+ =?us-ascii?Q?6AvDNcI4ICU3LJ4VMY5cSZhpey4npddVqOPdiKKsOgqE+2Enxo23RpSwdlzG?=
+ =?us-ascii?Q?SCvHVf1vTDtOudUyrZolDF3tVPDZ5Bt1UsvJme9ckKVwO0GF/g+uooeprli6?=
+ =?us-ascii?Q?e8tnPUkhMSH9a5wmPiaoKCxuOnftMSRFgyE1cRMudoUwEM3UoIUAO8pu0Ne+?=
+ =?us-ascii?Q?iZkGaYiEmTY60BOHtguH5Iyu/75zXnd6s8PBaBlsa11hyyB/cpfVoeTo6Rnw?=
+ =?us-ascii?Q?p+0gX+vv4uzPytF+Q4oUTPDmxA4tImSFm3y7GH4QmMf6RpAVbBDuEMUYMM1E?=
+ =?us-ascii?Q?X7J3ZLS5CXgP+Yci6/COyMUgiqQiahNxfoTjBOxdkj1/HhKr0UfCPkwPweh7?=
+ =?us-ascii?Q?4Te3N0yxJY/yB0Ica2AePGO0ifByjOEH211v0P6jblkpSGCdC4q1PDnw68zM?=
+ =?us-ascii?Q?dFxDVNBShwQd8XwctHY07gYzecJsGLApVnXVnH2aJ7J94uU/iMtGA/Be2zGe?=
+ =?us-ascii?Q?4rHSo5GpPtqrm4lvw7yN420p7GFaiJR+DjLgaMX6pVhFXYChGvk1Se2qlMcH?=
+ =?us-ascii?Q?orXZmmAam0Io/XqqIReWh4DBg7uXkHQW2pbO3RqCGbeFO9+OsTBH6/3PGpvv?=
+ =?us-ascii?Q?NkKapXF/nYaZ4KoBzwmA2W0LjG7dgTvo1emYmZ8NM1BihO3K1qHbPOSdBF5n?=
+ =?us-ascii?Q?7iL/9m5JQacbQIGvpprGmc/b0drCTmhB12TGqeVntk59CuZh66N5BRGQaX6v?=
+ =?us-ascii?Q?B4IsB60HU9xFc6B5RquFclB43lTkiTI/jYxtZFBs2w7se2XR/7i7pitm+HwD?=
+ =?us-ascii?Q?+HhjfxciHg7FRXDQH1j8EYOYnlWGd3oIqoudOoBiQaVhblKR3XEeJ2piNVWZ?=
+ =?us-ascii?Q?wIrVdxzdN3iUGh/3TCwCYq5a3uJOVvZuYwoP6tgG/Y4TT4YDIeEEWsIEa4v4?=
+ =?us-ascii?Q?Qn8HUIgJat4puxTyG78/wKuyCBj/tY5GTO1D5k+w2mlHatjA/GveypbBn7Dy?=
+ =?us-ascii?Q?5Hbdn2EGydBcORjF9HoPyIEN3Zc0MTZlmS9Zz138CGq0ze9X+c+zWWpTZSFU?=
+ =?us-ascii?Q?4Xzm9KH6bCV05PLlC9L8gxl43enHlypa+H6a2tOEeUxslfEjaqpFeQQlIoNP?=
+ =?us-ascii?Q?BvYLfmniArrPmDLga8Wojh+vlOeQjwwu5vbMg2N+?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4a1e0950-9458-48d9-541b-08dc656a93d9
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR11MB6733.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Apr 2024 20:59:20.2948
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: px3Eb8ILOwKiaQoVN8oktVBLNHHqIyrhbL4GczJuNngr6LtPzi8db4gjyL2OGxCp8pY2FlscDiwIlQqVIPv2wg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB8586
+X-OriginatorOrg: intel.com
 
-Hi Zijun,
+Krzysztof Kozlowski wrote:
+> virtio core already sets the .owner, so driver does not need to.
+> 
+> Acked-by: Dave Jiang <dave.jiang@intel.com>
 
-On Wed, Apr 24, 2024 at 01:33:50PM +0800, quic_zijuhu wrote:
-> On 4/24/2024 1:04 PM, Wren Turkal wrote:
-> > On 4/23/24 9:31 PM, Krzysztof Kozlowski wrote:
-> >> On 24/04/2024 06:18, quic_zijuhu wrote:
-> >>> On 4/24/2024 12:10 PM, Krzysztof Kozlowski wrote:
-> >>>> On 24/04/2024 06:07, quic_zijuhu wrote:
-> >>>>> On 4/24/2024 12:06 PM, Krzysztof Kozlowski wrote:
-> >>>>>> On 24/04/2024 02:46, Zijun Hu wrote:
-> >>>>>>> Commit 56d074d26c58 ("Bluetooth: hci_qca: don't use IS_ERR_OR_NULL()
-> >>>>>>> with gpiod_get_optional()") will cause below serious regression
-> >>>>>>> issue:
-> >>>>>>>
-> >>>>>>> BT can't be enabled any more after below steps:
-> >>>>>>> cold boot -> enable BT -> disable BT -> BT enable failure
-> >>>>>>> if property enable-gpios is not configured within DT|ACPI for
-> >>>>>>> QCA6390.
-> >>>>>>>
-> >>>>>>> The commit wrongly changes flag @power_ctrl_enabled set logic for
-> >>>>>>> this
-> >>>>>>> case as shown by its below code applet and causes this serious
-> >>>>>>> issue.
-> >>>>>>> qcadev->bt_en = devm_gpiod_get_optional(&serdev->dev, "enable",
-> >>>>>>>                                                 GPIOD_OUT_LOW);
-> >>>>>>> - if (IS_ERR_OR_NULL(qcadev->bt_en)) {
-> >>>>>>> + if (IS_ERR(qcadev->bt_en)) {
-> >>>>>>>        dev_warn(&serdev->dev, "failed to acquire enable gpio\n");
-> >>>>>>>     power_ctrl_enabled = false;
-> >>>>>>>    }
-> >>>>>>>
-> >>>>>>> Fixed by reverting the mentioned commit for QCA6390.
-> >>>>>>>
-> >>>>>>> Fixes: 56d074d26c58 ("Bluetooth: hci_qca: don't use
-> >>>>>>> IS_ERR_OR_NULL() with gpiod_get_optional()")
-> >>>>>>> Reported-by: Wren Turkal <wt@penguintechs.org>
-> >>>>>>> Link: https://bugzilla.kernel.org/show_bug.cgi?id=218726
-> >>>>>>> Link:
-> >>>>>>> https://lore.kernel.org/linux-bluetooth/ea20bb9b-6b60-47fc-ae42-5eed918ad7b4@quicinc.com/T/#m73d6a71d2f454bb03588c66f3ef7912274d37c6f
-> >>>>>>> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> >>>>>>> Tested-by: Wren Turkal <wt@penguintechs.org>
-> >>>>>>
-> >>>>>> No, Bartosz' patch should go.
-> >>>>>>
-> >>>>> what is Bartosz' patch.
-> >>>>
-> >>>> Srsly? You were Cc'ed on it. How many upstream patches on upstream
-> >>>> mailing lists do you receive that you lost track of them?
-> >>>>
-> >>> Bartosz' patch have basic serious mistook and logic error and have no
-> >>> any help for QCA6390, and it is not suitable regarding DTS usage.
-> >>
-> >> Really? Why you did not respond with comments then? Considering how
-> >> imprecise and vague you are in describing real issues, I have doubts in
-> >> your judgment here as well.
-> > 
-> > Please slow down here. Zijun's patch works and Bartosz's patch does not.
-> > I don't think Zijun means any ill intent. I am replying to Bartosz's
-> > patch right now.
-> > 
-> this is reporter's latest verification results. actually i don't have
-> much time for kernel upstream. i really hope my fix is able to merged
-> ASAP, it will help us to solve other possible impacted QCA controllers.
+Acked-by: Ira Weiny <ira.weiny@intel.com>
 
-I saw you were planning to slow down for a minute. When you're ready to
-work on these patches again, let's get them reviewed internally first.
-Please check go/upstream for some helpful hints.
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> ---
+> 
+> Depends on the first patch.
+> ---
+>  drivers/nvdimm/virtio_pmem.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/drivers/nvdimm/virtio_pmem.c b/drivers/nvdimm/virtio_pmem.c
+> index 4ceced5cefcf..c9b97aeabf85 100644
+> --- a/drivers/nvdimm/virtio_pmem.c
+> +++ b/drivers/nvdimm/virtio_pmem.c
+> @@ -151,7 +151,6 @@ static struct virtio_driver virtio_pmem_driver = {
+>  	.feature_table		= features,
+>  	.feature_table_size	= ARRAY_SIZE(features),
+>  	.driver.name		= KBUILD_MODNAME,
+> -	.driver.owner		= THIS_MODULE,
+>  	.id_table		= id_table,
+>  	.validate		= virtio_pmem_validate,
+>  	.probe			= virtio_pmem_probe,
+> 
+> -- 
+> 2.34.1
+> 
 
-Thanks,
-Elliot
 
