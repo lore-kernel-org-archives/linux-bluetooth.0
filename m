@@ -1,112 +1,144 @@
-Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC6DB1E892
-	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Apr 2024 08:30:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5AA614A82
+	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Apr 2024 08:34:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714033825; cv=none; b=NpdDoBG8t1Qq/e3WyO70KKDDOKYdkRfDfVLJ5oUVFQKw8htdue7IOHH8fj5cV8+btLkD0vlyDR9huo3XCGewitxrkhAw0qYCA0DdenvglsG3IPDrjWdIdYD5flaic5EXNqy82Iwpzu/4zJK5EVx9pZ/qSH2tU3q0FA4AJes0fHM=
+	t=1714034099; cv=none; b=UftT0N8+wROiSEvo5H3eT3qHq9mNQ8qEn7C/z0+ooOSY93hnN6WO5xodifzNCUK/3JROJaRMjQaRd5QEVdH4rOgsQUFMcexvqkeoXyfKWippyxEyjzrGMkMH4tosdmN57GbEGjMPZHibHnYU8eUj3L9GC3KVA/NpnxQUZxDoX0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714033825; c=relaxed/simple;
-	bh=RDk21kKYvU1WGp0zBpBg5fsvRfDWWG2feqziSMNsqOs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HWjb3BRg/8YgXdF6zZul0HnMbqRus9uSxECS+vFyQ4qRHhYXf5NfM+aDfFuDixjU08HTEgOfj6LaL3PKsxG0LPVUgw6VKVv7BEeaTEHMAqrFsqVugqN0I8dHstFfauo47FcW2K8yEkKSwLz9huVK3iIMF2o4gv9uiX+XGcXBsPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=B8hnXsrl; arc=none smtp.client-ip=209.85.219.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1714034099; c=relaxed/simple;
+	bh=rl4y3vtO+ShNm2TVGWrDLc6jxeieQdj0ihHwkKcmzvk=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=p8TfaykOBVUuSnvJ4JMdz6iXoD+jffHxBKcrDqsoor/xV9EgKu39mYV4TJIGTw7EGZXDFV8KjFrRHcjMYlOKNMY7mH0bn7ylWIGTcjNMb5RM3Do3vSuH9gmFU1AhmUiFzFc7pQ1pY99gVhFYYiJSdoV0wDu29HuEDNbcI/g4mgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l5lqp//v; arc=none smtp.client-ip=209.85.222.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B8hnXsrl"
-Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-de54c2a4145so911839276.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Apr 2024 01:30:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l5lqp//v"
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-78ef9ce897bso46569185a.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Apr 2024 01:34:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1714033823; x=1714638623; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=RDk21kKYvU1WGp0zBpBg5fsvRfDWWG2feqziSMNsqOs=;
-        b=B8hnXsrloYdciGFpwzSdBylKgCbUgayjZtkhZ8+m1t0HsDwdd2+CzeQ3H5RQkSGIpU
-         vNZvu/0mDu4+p4SqCLyTx03jfnPr2hO7XwifjHvoWMYikYzCA7ITHAqmXNdc4SHIM6wR
-         29TMN/EIEi6q839grZo2fvFjby3skRNaSvbUg2pG2oOdN0jt+XFGvhWn9lmlmoQBauZo
-         1mVW2xc+33BrWAHT+8/HlU16ZujSvTpyrNyCBfm72+ftR0GG3CtECG4g3h2zHrYBRMw9
-         EnFO7FOC6qyvmLFYAp4fR3YtpxOSC+MpJAIm3eR5FUhybR+EUPwutN5miFl02LkAE9ww
-         FPGg==
+        d=gmail.com; s=20230601; t=1714034096; x=1714638896; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=FNQzbyU1f1Q0F5sWSs7p+21/x7mc0ixMTkKW1afAqxE=;
+        b=l5lqp//veg/jINr5iLw2rmlNn7mau+Mc5v59Qroo62wdbBJrrUWJFpYjacbAMX9TTH
+         AybFcJr0eWlrVJ0+I+jy/75MIrwymqPoRPhHialWuFAdGeAprmcD92jtYZyXBvpwB6MC
+         AwRagPyzfPVqCEx0ipR51/3J0S7ScpHDxmVcvdHJhbDVsvnG0SEqHsc6ADQPE/YtvJYm
+         rz3aHWOc52sLjLMv7G/LcMIXCWXZTWd2EfDnIdXdulQDx/2i50waLQw5IT3TdyhXwDuc
+         PwAbxJTKNwv0Ery1TcM4LzrBhVLJOXopSbfBtTBUShRXgjeH4cwmArfomYtKHLu0FF7m
+         Osew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714033823; x=1714638623;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1714034096; x=1714638896;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=RDk21kKYvU1WGp0zBpBg5fsvRfDWWG2feqziSMNsqOs=;
-        b=jaWtkEjwCL+cbIfVgquUl4wxSinQXumUEv6Qu6IfGOwIjrQubu7KdCj9UzcyyYiC0g
-         hhNOAtxDb/2BRKyAdLDooVJlsfmkSdJrqZ8s+h4K4YHKOT0yMCnG9k/8Nqci+LIHXFX9
-         pA5zqW0Gxm8NCwfMlOXZ9tuJpQCxKYNqDGrj2cXUextUiFSLKWk4ojLeTK+1sYu1knGl
-         K4ch32qKAmPuemGMTvUjGi6HHJyCO+sxquUXVQQuHfo3VgTSh7wPcitrUQ/143lV+Tvm
-         oOXkYClxEfZlocaK8ZIhDt93WYbwKBmRWMly4VTEcl2XwQXg8hg/ZryoGSLz9W+Ly3CF
-         UfkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUCoW7IJBSI8A1JhyPf2ubaJUk8jnyaEkVA2GUrd5BabG7iZ933b4lyJ5+lpxQAmziRP5BHFj2RIKNMiWqO1x6SW38eaxKQIY1hoFyONRY1
-X-Gm-Message-State: AOJu0YxYgdaWym99gKHuGVRvCcWE5YhTnFfTLf7KMB5XIQLmN11FJ5A3
-	fEqeELNYaxZF06RSPN5ZzK1PHcdjXET+lQXEmhqIbMCEzbjLDM1+tBKSxBLGxFgjsO+kXgoiR3z
-	VBI8JpBtSA5uxpMkc9EAU+loBlPyOJiZ0cM0bmw==
-X-Google-Smtp-Source: AGHT+IHKM4YPDpuevFQJfqgtbpCZPQXsU1jskA/YJSC/utcG0tynd+yjkQ+LkYUW7fS9XqJqghwLH65UgNSKnn5ssvg=
-X-Received: by 2002:a25:2643:0:b0:de5:5572:6236 with SMTP id
- m64-20020a252643000000b00de555726236mr5573879ybm.4.1714033822947; Thu, 25 Apr
- 2024 01:30:22 -0700 (PDT)
+        bh=FNQzbyU1f1Q0F5sWSs7p+21/x7mc0ixMTkKW1afAqxE=;
+        b=B69nU5mekzZXXCDfOMAIeJsCO4YpxhipXZijVF6RIVKQpBwuIDzkhE/srwWXCE2Ulu
+         9AMoXykyMJbk7E9sLevatLeer1Ijb6DwPNmov2Nu+KLQfptn/NjGyAgDDRekKUDhWhHd
+         gv8y4/rvPz4KOQtmuhO2w4xxbnRfJXHbldsMdNZcBiiN8xNEpF3b4X8DO+cCaWu9OXmz
+         5CQrLjnKfw2KjtdKd96NtA/7GOInaDGobyngYkKOO8fpKgL0OK2nuLxX+76WH2he+j4m
+         bcIaqhQRPOw3UTcZBTZ+CRqDd/Wmgk34P8qfZ3/oSvrusOu19gaIrEt3gXt51onjqq6I
+         HmQQ==
+X-Gm-Message-State: AOJu0YyHnPkAiY5gKEzxXqKYeJWF48JJl5D2ODqy/yW407wA0dzp+Hq5
+	bWZHUvj5msqWR9Sxp0DJlkuNG/JpduXxC0ZsDa60nLpzkOscPZHUx/1kew==
+X-Google-Smtp-Source: AGHT+IHn9fYk+SX4CvAsL+Zt0kYlyFRgJpikAF2qWRX2WpOqPxBSyvXNoM+Q77J4BZkdoh5y1Yl1IQ==
+X-Received: by 2002:a05:620a:5e4c:b0:78e:e4ea:8acb with SMTP id ya12-20020a05620a5e4c00b0078ee4ea8acbmr5030689qkn.73.1714034096486;
+        Thu, 25 Apr 2024 01:34:56 -0700 (PDT)
+Received: from [172.17.0.2] ([20.81.159.78])
+        by smtp.gmail.com with ESMTPSA id yf9-20020a05620a3bc900b0078efe9e1f50sm6831425qkn.82.2024.04.25.01.34.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Apr 2024 01:34:56 -0700 (PDT)
+Message-ID: <662a15b0.050a0220.eedd9.0f3f@mx.google.com>
+Date: Thu, 25 Apr 2024 01:34:56 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5676621281307582517=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1713947712-4307-1-git-send-email-quic_zijuhu@quicinc.com>
- <af004bcd-0649-4a82-8f09-36d6addd0e1e@linaro.org> <0cba3838-917b-48af-ba8b-2ef60714943a@quicinc.com>
- <49cf0a3d-5f52-41a1-9858-692f48d06b88@kernel.org> <c1632816-f754-42c6-8448-2daff8221b58@penguintechs.org>
- <368e70e0-edc2-44fd-a9a2-72efa0d9f864@linaro.org> <f372c661-d82a-4f6f-b2de-8dd241d6b107@penguintechs.org>
-In-Reply-To: <f372c661-d82a-4f6f-b2de-8dd241d6b107@penguintechs.org>
-From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Date: Thu, 25 Apr 2024 10:30:12 +0200
-Message-ID: <CACMJSesk+DYFDwM7hUoPs9Xy+i1q8w+5CFu4_RdreUXudk18zw@mail.gmail.com>
-Subject: Re: [PATCH v1] Bluetooth: qca: Correct property enable-gpios handling
- logic for WCN6750 and WCN6855
-To: Wren Turkal <wt@penguintechs.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>, quic_zijuhu <quic_zijuhu@quicinc.com>, luiz.dentz@gmail.com, 
-	luiz.von.dentz@intel.com, marcel@holtmann.org, 
-	linux-bluetooth@vger.kernel.org, kernel@quicinc.com
-Content-Type: text/plain; charset="UTF-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, johan+linaro@kernel.org
+Subject: RE: Bluetooth: qca: fix wcn3991 device address check
+In-Reply-To: <20240425075503.24357-1-johan+linaro@kernel.org>
+References: <20240425075503.24357-1-johan+linaro@kernel.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Thu, 25 Apr 2024 at 08:30, Wren Turkal <wt@penguintechs.org> wrote:
->
-> On 4/24/24 11:05 PM, Krzysztof Kozlowski wrote:
-> > On 25/04/2024 00:01, Wren Turkal wrote:
-> >>>>
-> >>>> 3) only care about the case property enable-gpios is not configured,
-> >>>> the original BT driver design logic indeed matches with binging spec's
-> >>>> requirements before bartosz's wrong change
-> >>>
-> >>> What? There is no such case according to bindings. I told you already
-> >>> two times: Either change bindings or this is not valid.
-> >>
-> >> @krzysztof, I'm curious. There is no entry in the binding specifically
-> >> for qca6390. Should there be?
-> >
-> > qca6390 is documented in the bindings, but you are right that it lacks
-> > if:then: entry narrowing/choosing specific supplies and pins. It should
-> > have one, indeed.
->
-> Would creating an entry for the qca6390 hardware fix the issue you are
-> worried about?
->
-> Again, sorry for all the, what I assume are, basic questions. I am so
-> far out of my depth here. I am just trying to figure out how to move
-> forward. I really do appreciate your guidance here.
->
+--===============5676621281307582517==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Wren, Krzysztof: I cannot stop you from doing this but I'm afraid this
-will complicate the power sequencing work unnecessarily. The QCA6390
-PMU bindings I'm proposing[1] are consumers of the BT enable GPIOs. In
-my series I also create an entry for QCA6390 Bluetooth[2] but without
-enable-gpios and with the inputs from the PMU, not host. Please
-consider that if you decide to go with this.
+This is automated email and please do not reply to this email!
 
-Bartosz
+Dear submitter,
 
-[1] https://lore.kernel.org/linux-arm-kernel/20240410124628.171783-2-brgl@bgdev.pl/
-[2] https://lore.kernel.org/linux-arm-kernel/20240410124628.171783-4-brgl@bgdev.pl/
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=847735
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.67 seconds
+GitLint                       PASS      0.32 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      30.02 seconds
+CheckAllWarning               PASS      32.43 seconds
+CheckSparse                   PASS      38.00 seconds
+CheckSmatch                   FAIL      36.16 seconds
+BuildKernel32                 PASS      28.87 seconds
+TestRunnerSetup               PASS      519.69 seconds
+TestRunner_l2cap-tester       PASS      18.30 seconds
+TestRunner_iso-tester         PASS      30.96 seconds
+TestRunner_bnep-tester        PASS      4.69 seconds
+TestRunner_mgmt-tester        FAIL      111.19 seconds
+TestRunner_rfcomm-tester      PASS      7.19 seconds
+TestRunner_sco-tester         PASS      10.92 seconds
+TestRunner_ioctl-tester       PASS      7.60 seconds
+TestRunner_mesh-tester        PASS      5.72 seconds
+TestRunner_smp-tester         PASS      6.72 seconds
+TestRunner_userchan-tester    PASS      4.87 seconds
+IncrementalBuild              PASS      27.66 seconds
+
+Details
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
+
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bpa10x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bpa10x.o'
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 492, Passed: 489 (99.4%), Failed: 1, Not Run: 2
+
+Failed Test Cases
+LL Privacy - Add Device 7 (AL is full)               Failed       0.198 seconds
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============5676621281307582517==--
