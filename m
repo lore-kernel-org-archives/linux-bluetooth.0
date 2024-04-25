@@ -1,184 +1,172 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8F097E59F;
-	Thu, 25 Apr 2024 08:40:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3C14757E1
+	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Apr 2024 09:14:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714034423; cv=none; b=b8XkpnkLxTx2LoXaamPH63TabhCcexcV34jlvaAYsVqoY1p4IrALmLgRrrq8NNm6bZK+3q0eRhxOsVUjMIqeU6b6Aa9KYbTsTXV6zSBZOM5L2jsJ4ngRnQ9zfstAj99S/rEerr4xvbB0sccDc0dJXFYnyTlNmcoZtBifjwt8tXs=
+	t=1714036487; cv=none; b=edVbPZYGLOAQCvb/TrfREmSExXXX2g9Wv+QJ9oavem7V6n3lFo4ncXm43Ys6usR/zYsz9v8cJ1kQdYuElSPOnBLr90KgAqAWEuF7CnaLUpe4Q86Za1wbRnzC6/b8i97nwH3cmpuabwNPDLf3bV7WC5jqmCaJV5ZE4EZ5ixf624g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714034423; c=relaxed/simple;
-	bh=RMDuqvFO7/7Q9NiAuMf/yHRmFRq++Fy+RMe2Sg9URLU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LhogI60msJC0LexrlJwtVzIy0XPfl8m+4T7U2nPjcPEjy6Q+29DGNEY1qYugrebR7FqAFj4Ar8eHzQMhR7cAmKItMQY7lOXK8bQv8NHm+qAyh1/uegFRew/090eamoBmR69FYmgUZNjisAqvyoB7O/KPPlWh13oZL3NQj5TQRZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o6V3kCL/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1714036487; c=relaxed/simple;
+	bh=w8vkJ13wQnR6P5vkZuaf65m9YP32eb8GUkuIYdr5qs4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=V40mi4ncmgbppvBALXMC9rjfz3puzqWITiz7wz+HbjIwfYC28KWQUxu1opTsxRYUYUiStI+kCscu17MpTY9h1iw8Tjtq4zb5ZqsgI1xqQhNKZNEauHxczPu9yh1X+p/dpPm2GjDXcZSJm7iR7dd3Hv38RjMCH/kXDT/exmOu53Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=daV4t5AK; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o6V3kCL/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 513E8C113CC;
-	Thu, 25 Apr 2024 08:40:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714034422;
-	bh=RMDuqvFO7/7Q9NiAuMf/yHRmFRq++Fy+RMe2Sg9URLU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=o6V3kCL/PuQPWmBEYYidX6qJmFsaPflYw4eDVCtdeywnIqBBtF/m9aqMrJ2r5acS9
-	 gh19cAiQSkmPQ9PbmFpmnad+DwkRwYupx1WCfKY47xi8Pe8xg19zJqW2PLxYtnveAD
-	 6NwLkW4DWta3PWXUWLMJzmQU1/t3thxv2Vr0Ty3MX+NQ8Nt6DEVTRRLMGoEmnu+R+N
-	 mCsXk/TrmFHmanUUNkS1Kinm7XcTqfPVsqo+LSAuu76ws/b1geeR2GrT18XEXWj2mj
-	 YZAMSEbFflMqN65atM1fLOQmWu1sD1L0hmj4E2bx1uAIjRHBmofpbPPM+2qf4V02A+
-	 G9oWGYSsyqmRQ==
-Received: from johan by xi.lan with local (Exim 4.97.1)
-	(envelope-from <johan@kernel.org>)
-	id 1rzueS-0000000070M-2S2B;
-	Thu, 25 Apr 2024 10:40:21 +0200
-Date: Thu, 25 Apr 2024 10:40:20 +0200
-From: Johan Hovold <johan@kernel.org>
-To: Doug Anderson <dianders@chromium.org>
-Cc: Janaki Ramaiah Thota <quic_janathot@quicinc.com>,
-	Johan Hovold <johan+linaro@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Matthias Kaehlcke <mka@chromium.org>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org, Stephen Boyd <swboyd@chromium.org>
-Subject: Re: [PATCH] Bluetooth: qca: fix invalid device address check
-Message-ID: <ZioW9IDT7B4sas4l@hovoldconsulting.com>
-References: <20240416091509.19995-1-johan+linaro@kernel.org>
- <CAD=FV=UBHvz2S5bd8eso030-E=rhbAypz_BnO-vmB1vNo+4Uvw@mail.gmail.com>
- <Zid6lfQMlDp3HQ67@hovoldconsulting.com>
- <CAD=FV=XoBwYmYGTdFNYMtJRnm6VAGf+-wq-ODVkxQqN3XeVHBw@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="daV4t5AK"
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-41a72f3a1edso6240795e9.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Apr 2024 02:14:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1714036484; x=1714641284; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=aMFlUt03OrSGQ9jcV4gNJQ98yi8IaKLhIUTcQkXPpi0=;
+        b=daV4t5AKBKZPlqDQajBo+dI1VfzRn+wT/YoTSMajsaOPWPJusI8d45WnuyMoF6H/yx
+         twe9O6/zBWKY/7YGFMEiudg5D6u+4WqZbAkhJ5MJlcFBSl2jYFuHN3A3F/cO0sodJgMa
+         Jw8BsSIRq243DmYVHOLrtUU7XYuZcxXEUbZHGCoPLcZ+SozXSms8eYNk0I6SW+G+NaZB
+         hIE4MIiKLDKuwiZJ/78XgyepZu5j4R0mXTJgNTCAToWXKXW8s+aTBWQl/V2MfMRUBEb2
+         KkRGneE0b9XJ6S/woQ5FUn2CjHiKCX5tMobWCOaD6yVzoaWBKi6GYM88dZ/kjc0NS0Z1
+         ufXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714036484; x=1714641284;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aMFlUt03OrSGQ9jcV4gNJQ98yi8IaKLhIUTcQkXPpi0=;
+        b=xEwgUXeDdKGZZBl1aCuRjm83MCEmFNRM58uhQ2+CRH6RM/3ds+uDY4CtElzf8L9Yo/
+         eagwL/3aBCwEVu7iOX/OCv0rjwSKKrfxuvEhFNAvGRm4b1Q6Zbr+2SuYHOo70dFHfejA
+         k40T6cPDlzQ4RGhavlDIT65zZHn+y8L9G82F5HI/3bFhth7WX05FFSFFtFeQYs7nWqUi
+         wykHsV2KDeou4m8GkxNGpbQub/Z9qW6aa8EHXvw3GmnKa9SyELK5HBBi1ucXIhsVw3h7
+         nfJNy7HGBevP7l6U48Eu53tjoRVGHc6UQBV2COkaUPsSesXT+KG+lB/ZAN8dG2nLX/1o
+         2Ouw==
+X-Forwarded-Encrypted: i=1; AJvYcCU+j25GtafOHp79JdrduoM+Fl8dzYmt0HiyYP8HrSr2KBkvk0nCkhbyr9DMNq5q274Ld3kAiu3Ef6pXz7gS5pe5XKyUWCr2p7J4tejj1k6x
+X-Gm-Message-State: AOJu0Yz6UlIGK7vnc8Rhympr1/4nLDsyApGeWEIs7mBBuBpQGO/9300d
+	w0KDlTnVE8Xyg72pA9BvRJaavZiMd8JeGSqVKwSkxpfPIw9/chxoIyO2vSotizg=
+X-Google-Smtp-Source: AGHT+IEh9vN416an1viEDE+3BBMNVgorLOiQmy4wGxaJBs/xQnJfsWwMxxA42W9kbiXKVB10awJzYQ==
+X-Received: by 2002:a05:600c:4590:b0:418:f991:713f with SMTP id r16-20020a05600c459000b00418f991713fmr3793864wmo.23.1714036484262;
+        Thu, 25 Apr 2024 02:14:44 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.223.16])
+        by smtp.gmail.com with ESMTPSA id g9-20020a05600c310900b0041aa79f27a0sm9676218wmo.38.2024.04.25.02.14.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 Apr 2024 02:14:43 -0700 (PDT)
+Message-ID: <d4c65299-d3af-4741-adc8-aafc1ab34369@linaro.org>
+Date: Thu, 25 Apr 2024 11:14:42 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAD=FV=XoBwYmYGTdFNYMtJRnm6VAGf+-wq-ODVkxQqN3XeVHBw@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] Bluetooth: qca: Correct property enable-gpios handling
+ logic for WCN6750 and WCN6855
+To: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+ Wren Turkal <wt@penguintechs.org>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>,
+ quic_zijuhu <quic_zijuhu@quicinc.com>, luiz.dentz@gmail.com,
+ luiz.von.dentz@intel.com, marcel@holtmann.org,
+ linux-bluetooth@vger.kernel.org, kernel@quicinc.com
+References: <1713947712-4307-1-git-send-email-quic_zijuhu@quicinc.com>
+ <af004bcd-0649-4a82-8f09-36d6addd0e1e@linaro.org>
+ <0cba3838-917b-48af-ba8b-2ef60714943a@quicinc.com>
+ <49cf0a3d-5f52-41a1-9858-692f48d06b88@kernel.org>
+ <c1632816-f754-42c6-8448-2daff8221b58@penguintechs.org>
+ <368e70e0-edc2-44fd-a9a2-72efa0d9f864@linaro.org>
+ <f372c661-d82a-4f6f-b2de-8dd241d6b107@penguintechs.org>
+ <CACMJSesk+DYFDwM7hUoPs9Xy+i1q8w+5CFu4_RdreUXudk18zw@mail.gmail.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Content-Language: en-US
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <CACMJSesk+DYFDwM7hUoPs9Xy+i1q8w+5CFu4_RdreUXudk18zw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Apr 23, 2024 at 08:09:55AM -0700, Doug Anderson wrote:
-> On Tue, Apr 23, 2024 at 2:08 AM Johan Hovold <johan@kernel.org> wrote:
-> > On Mon, Apr 22, 2024 at 10:50:33AM -0700, Doug Anderson wrote:
-> > > On Tue, Apr 16, 2024 at 2:17 AM Johan Hovold <johan+linaro@kernel.org> wrote:
-> >
-> > > > As Chromium is the only known user of the 'local-bd-address' property,
-> > > > could you please confirm that your controllers use the 00:00:00:00:5a:ad
-> > > > address by default so that the quirk continues to be set as intended?
-> > >
-> > > I was at EOSS last week so didn't get a chance to test this, but I
-> > > just tested it now and I can confirm that it breaks trogdor. It
-> > > appears that trogdor devices seem to have a variant of your "default"
-> > > address. Instead of:
-> > >
-> > > 00:00:00:00:5a:ad
-> > >
-> > > We seem to have a default of this:
-> > >
-> > > 39:98:00:00:5a:ad
-> > >
-> > > ...so almost the same, but not enough the same to make it work with
-> > > your code. I checked 3 different trogdor boards and they were all the
-> > > same, though I can't 100% commit to saying that every trogdor device
-> > > out there has that same default address...
-> > >
-> > > Given that this breaks devices and also that it's already landed and
-> > > tagged for stable, what's the plan here? Do we revert? Do we add the
-> > > second address in and hope that there aren't trogdor devices out in
-> > > the wild that somehow have a different default?
-> >
-> > This patch is currently queued for 6.10 so there should be time to get
-> > this sorted.
-> >
-> > My fallback plan was to add further (device-specific) default addresses
-> > in case this turned out to be needed (e.g. this is what the Broadcom
-> > driver does).
-
-The offending commit was just sent on to the networking tree for 6.9 so
-I went ahead and added the Trogdor default address to the address check
-for now:
-
-	https://lore.kernel.org/r/20240425075503.24357-1-johan+linaro@kernel.org/
-
-We can always amend this later if it turns out to be needed.
-
-> > I assume all Trogdor boards use the same controller, WCN3991 IIUC, but
-> > if you're worried about there being devices out there using a different
-> > address we could possibly also use the new
-> > "qcom,local-bd-address-broken" DT property as an indicator to set the
-> > bdaddr quirk.
+On 25/04/2024 10:30, Bartosz Golaszewski wrote:
+> On Thu, 25 Apr 2024 at 08:30, Wren Turkal <wt@penguintechs.org> wrote:
+>>
+>> On 4/24/24 11:05 PM, Krzysztof Kozlowski wrote:
+>>> On 25/04/2024 00:01, Wren Turkal wrote:
+>>>>>>
+>>>>>> 3) only care about the case property enable-gpios is not configured,
+>>>>>> the original BT driver design logic indeed matches with binging spec's
+>>>>>> requirements before bartosz's wrong change
+>>>>>
+>>>>> What? There is no such case according to bindings. I told you already
+>>>>> two times: Either change bindings or this is not valid.
+>>>>
+>>>> @krzysztof, I'm curious. There is no entry in the binding specifically
+>>>> for qca6390. Should there be?
+>>>
+>>> qca6390 is documented in the bindings, but you are right that it lacks
+>>> if:then: entry narrowing/choosing specific supplies and pins. It should
+>>> have one, indeed.
+>>
+>> Would creating an entry for the qca6390 hardware fix the issue you are
+>> worried about?
+>>
+>> Again, sorry for all the, what I assume are, basic questions. I am so
+>> far out of my depth here. I am just trying to figure out how to move
+>> forward. I really do appreciate your guidance here.
+>>
 > 
-> They all should use the same controller, but I'm just worried because
-> I don't personally know anything about how this address gets
-> programmed nor if there is any guarantee from Qualcomm that it'll be
-> consistent. There are a whole pile of boards in the field, so unless
-> we have some certainty that they all have the same address it feels
-> risky.
+> Wren, Krzysztof: I cannot stop you from doing this but I'm afraid this
+> will complicate the power sequencing work unnecessarily. The QCA6390
+> PMU bindings I'm proposing[1] are consumers of the BT enable GPIOs. In
+> my series I also create an entry for QCA6390 Bluetooth[2] but without
+> enable-gpios and with the inputs from the PMU, not host. Please
+> consider that if you decide to go with this.
 
-Hopefully Janaki and Qualcomm will provide some answers soon.
+I don't have a near plan to describe QCA6390 supplies and pins, so don't
+worry. I also don't think Qualcomm BT understand what are bindings, so I
+don't expect patches from them.
 
-And otherwise we have another fall back in that we can use the
-"qcom,local-bd-address-broken" property for Trogdor.
+Best regards,
+Krzysztof
 
-> > We have Qualcomm on CC here so perhaps Janaki, who should have access to
-> > the documentation, can tell us what the default address on these older
-> > controllers looks like?
-> >
-> > Janaki, are there further default addresses out there that we need to
-> > consider?
-> >
-> > Perhaps "39:98" can even be inferred from the hardware id somehow (cf.
-> > bcm4377_is_valid_bdaddr())?
-> >
-> > Doug, could you please also post the QCA version info for Trogdor that's
-> > printed on boot?
-> 
-> You want this:
-> 
-> [    9.610575] ath10k_snoc 18800000.wifi: qmi chip_id 0x320
-> chip_family 0x4001 board_id 0x67 soc_id 0x400c0000
-> [    9.620634] ath10k_snoc 18800000.wifi: qmi fw_version 0x322102f2
-> fw_build_timestamp 2021-08-02 05:27 fw_build_id
-> QC_IMAGE_VERSION_STRING=WLAN.HL.3.2.2.c10-00754-QCAHLSWMTPL-1
-> [   14.607163] ath10k_snoc 18800000.wifi: wcn3990 hw1.0 target
-> 0x00000008 chip_id 0x00000000 sub 0000:0000
- 
-> ...or this...
-> 
-> [   12.899095] Bluetooth: hci0: setting up wcn399x
-> [   13.526154] Bluetooth: hci0: QCA Product ID   :0x0000000a
-> [   13.531805] Bluetooth: hci0: QCA SOC Version  :0x40010320
-> [   13.537384] Bluetooth: hci0: QCA ROM Version  :0x00000302
-> [   13.543002] Bluetooth: hci0: QCA Patch Version:0x00000de9
-> [   13.565775] Bluetooth: hci0: QCA controller version 0x03200302
-
-Thanks, the Bluetooth driver output was what I was looking for but the
-wifi output may also provide some insight.
-
-> Just as a random guess from looking at "8" in the logs, maybe the
-> extra 8 in 3998 is the "target" above?
-
-Yeah, possibly, but it seems we won't be able to use the version info
-without further details from Qualcomm.
-
-> ...though that also makes me think that perhaps this chip doesn't
-> actually have space for a MAC address at all. Maybe they decided to
-> re-use the space to store the hardware ID and other information on all
-> of these devices?
-
-All of these controllers apparently have storage for the hardware ids so
-I'd be surprised if they didn't have room also for the address.
-
-Looking at the backstory for this, it seems like Qualcomm intentionally
-broke the bdaddr quirk so that controllers which had been provisioned
-with a valid address would continue to work back when WCN3990 was the
-only device that set the quirk. So presumably WCN3990 and later
-controllers all have OTP storage for the address (even if I guess in
-theory it could have been done just for, say, WCN3998 which was added
-just after):
-
-  5971752de44c ("Bluetooth: hci_qca: Set HCI_QUIRK_USE_BDADDR_PROPERTY for wcn3990") (2019-02-19, matthias)
-  e668eb1e1578 ("Bluetooth: hci_core: Don't stop BT if the BD address missing in dts") (2019-04-18, qcom)
-  523760b7ff88 ("Bluetooth: hci_qca: Added support for WCN3998") (2019-04-26, qcom)
-
-Johan
