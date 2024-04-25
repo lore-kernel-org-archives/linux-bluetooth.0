@@ -1,185 +1,167 @@
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [20.231.56.155])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 587CA149DFF;
-	Thu, 25 Apr 2024 14:24:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=20.231.56.155
+Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65A5C14A0A0
+	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Apr 2024 14:56:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714055047; cv=none; b=S1ZWv8yOnFQVjg4yuJlnSh6nubr42iyCAVlFJBPn+yssLz8PX5TH3d8b6fz/YmPTS/Flj59v5+qeGf28e9uXhJYUb2EGHF1v1q5Xzk4KNAjegI4SSONntt5BP45eSDtpb/ca1wbqttW/eEguUHQbDU7drnYkDxyAoZkeFWbxiVU=
+	t=1714057005; cv=none; b=Te6uCaiRDstAXe7CZtAcBehMJ+tni1p03d4JQ+WAyQsa5Csjv7ttO+hIEUHJ4rfmqBYOL+ItwvLnHlsw0SfybtyRdt7ukTdIjFOu7B2zWpM1EpzdLPOs0FFuXh0GXO0HywQkzCbYury/tE3zCcUSOe6CpacdCGJAr2N5ii6EAVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714055047; c=relaxed/simple;
-	bh=gLNgGHBuQgzzluyMUUJ+Kdz4LOLpi0EuVBnmnLiTLRk=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=qL7ziLId2MvILSJA80bOqHFd9QPvN+FILkz9PoyJK420ZyYR+eSSP6r54E+iFdn/DeCMvxyI8PIGUj5yIDAEgnMm6wKdEpb7oCt2jWUvQkVwD/6WEJb6s0SUOCewNTUK9wwRC00ILEutbi0LiTGAdP5uGo20N1hHb8yJETNMs/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=20.231.56.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from ubuntu.localdomain (unknown [106.117.97.39])
-	by mail-app2 (Coremail) with SMTP id by_KCgDnBIhxZypms8KaAQ--.38350S2;
-	Thu, 25 Apr 2024 22:23:48 +0800 (CST)
-From: Duoming Zhou <duoming@zju.edu.cn>
-To: linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	luiz.dentz@gmail.com,
-	johan.hedberg@gmail.com,
-	marcel@holtmann.org,
-	Duoming Zhou <duoming@zju.edu.cn>
-Subject: [PATCH] Bluetooth: Fix use-after-free bugs caused by sco_sock_timeout
-Date: Thu, 25 Apr 2024 22:23:45 +0800
-Message-Id: <20240425142345.47229-1-duoming@zju.edu.cn>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:by_KCgDnBIhxZypms8KaAQ--.38350S2
-X-Coremail-Antispam: 1UD129KBjvJXoW3ArWfuF4DKr4UCw4kWr1rZwb_yoW7try8pr
-	nxCayfWrW8Xry0qr4UZF4UtrW8Gr40y3Z8trs2vwnrJ3W5KF4rtryUCrWqgryUCr1jvFy7
-	AFWDAr4j9r1UJw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvv14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_
-	JF0_Jw1lc2xSY4AK67AK6ry5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r
-	4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF
-	67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2I
-	x0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2
-	z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73Uj
-	IFyTuYvjfUnBMKDUUUU
-X-CM-SenderInfo: qssqjiasttq6lmxovvfxof0/1tbiAwQCAWYpDhwZjgAIsG
+	s=arc-20240116; t=1714057005; c=relaxed/simple;
+	bh=nFez4K9yCPJT5RzNtVMz/011FtFXsflr6LqV11S2fiM=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=ObXV6D9O9+ZcYGTSnhfKU7tEIrjwoa/4puJTv2439HkepG0RRtBDhJtBGsy4lF2IvY2NQPUyygOvV4Q4QVYJ6IIGAsXCDJynBCXCe8C556fQMTFBL0B9eNVvkSHCQ2w43FZ5YYVmtMXTeJbzRRiX3SMgqZIm2cXLUqSZ6P5yaUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k3vXnuHl; arc=none smtp.client-ip=209.85.167.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k3vXnuHl"
+Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-3c749aa444fso666660b6e.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Apr 2024 07:56:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714057003; x=1714661803; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=0Bknw90UYKmXmLUAmOMEAb+u562Q2pHL/pgVlcTj8zE=;
+        b=k3vXnuHlMD5KXwljfPQNUwbjNUhAPUGTCsgcA/nJwXxkODC8/JWEeKhLp1wRyMox9L
+         HrUC+fib07oC4k0f55Z7w7jMn9KFbl4jcPndEUlxPGHJZ0qw8VY6T3MvtrWqvTka/Lvn
+         g3WK7UocLL/Xg5fpsM7faZAZM4osGOIJVw26ZVXHERTA4nJxoIBnycSupr44Vxonjmy8
+         YNjTQ6BiNNur5w2zF6jRPZ/WKLhroqsaDxFIAVIkJrYjei4Mqp3snxd/0L8FXM/QT8UG
+         u/cC8MUQCuVo7WMKNMhjmzyX67nnOUyXLScFiiZSjsBgxtoSfieMd0gSiJE+AOi4/S25
+         BqLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714057003; x=1714661803;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0Bknw90UYKmXmLUAmOMEAb+u562Q2pHL/pgVlcTj8zE=;
+        b=nrTFfNpkxm76046y9u0l+7GvzOpy7BBXn3vR1rKGeJKLXbLWKazdx9nqZx3YQnnkdx
+         hKS+hyItAEAB3IfWl7v/9J19hsJnjwKNc9DJ2GCbtqyFwt0H2KVEdnIK9862NRtbRrUD
+         hXhRCaMR8ZSRsGqjDtzKJRj2Zz1Rx84pI8KCS3S+fStlT7jl5eqq9fQY4Uw9W0gAnwKX
+         SgsTLeB/APfQr2HxQIy76sv6qA7Br8lBlrGXHrVc8OW9NjIgnx4J0XJuMnKhmWOfzTRv
+         e04Fzgsd9n/7k8EcPwdbaVCXvUIVyF+dkFj/o3+loS2IkgvQ9C8W3pwtn1DfaXqq0vqz
+         dxsg==
+X-Gm-Message-State: AOJu0YwjbXfPZUM2PMZ4aaM6ymTvmEr8o/J+zynBaKlLcRH4iQeWX060
+	iZ+AC5wwd60H9rPmPAvW+1ual8N1NcNJtUOHC7/rM1t6Sooljw7S1qE1Ng==
+X-Google-Smtp-Source: AGHT+IGAi/B45xpFCmM3wNLg+WL4JU+a9KqwN1lB+8rpGjJmXbiF8fi9Umy/VLQTva6Ne/2UnBVCPQ==
+X-Received: by 2002:a05:6808:234e:b0:3c8:4300:eed5 with SMTP id ef14-20020a056808234e00b003c84300eed5mr4984977oib.20.1714057003228;
+        Thu, 25 Apr 2024 07:56:43 -0700 (PDT)
+Received: from [172.17.0.2] ([20.84.127.98])
+        by smtp.gmail.com with ESMTPSA id k11-20020a0cf28b000000b006a053b4c3adsm6992650qvl.118.2024.04.25.07.56.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Apr 2024 07:56:43 -0700 (PDT)
+Message-ID: <662a6f2b.0c0a0220.7699f.21dc@mx.google.com>
+Date: Thu, 25 Apr 2024 07:56:43 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3833140132704632744=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, duoming@zju.edu.cn
+Subject: RE: Bluetooth: Fix use-after-free bugs caused by sco_sock_timeout
+In-Reply-To: <20240425142345.47229-1-duoming@zju.edu.cn>
+References: <20240425142345.47229-1-duoming@zju.edu.cn>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-When the sco connection is established and then, the sco socket
-is releasing, timeout_work will be scheduled to judge whether
-the sco disconnection is timeout. The sock will be deallocated
-later, but it is dereferenced again in sco_sock_timeout. As a
-result, the use-after-free bugs will happen. The root cause is
-shown below:
+--===============3833140132704632744==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-    Cleanup Thread               |      Worker Thread
-sco_sock_release                 |
-  sco_sock_close                 |
-    __sco_sock_close             |
-      sco_sock_set_timer         |
-        schedule_delayed_work    |
-  sco_sock_kill                  |    (wait a time)
-    sock_put(sk) //FREE          |  sco_sock_timeout
-                                 |    sock_hold(sk) //USE
+This is automated email and please do not reply to this email!
 
-The KASAN report triggered by POC is shown below:
+Dear submitter,
 
-[   95.890016] ==================================================================
-[   95.890496] BUG: KASAN: slab-use-after-free in sco_sock_timeout+0x5e/0x1c0
-[   95.890755] Write of size 4 at addr ffff88800c388080 by task kworker/0:0/7
-...
-[   95.890755] Workqueue: events sco_sock_timeout
-[   95.890755] Call Trace:
-[   95.890755]  <TASK>
-[   95.890755]  dump_stack_lvl+0x45/0x110
-[   95.890755]  print_address_description+0x78/0x390
-[   95.890755]  print_report+0x11b/0x250
-[   95.890755]  ? __virt_addr_valid+0xbe/0xf0
-[   95.890755]  ? sco_sock_timeout+0x5e/0x1c0
-[   95.890755]  kasan_report+0x139/0x170
-[   95.890755]  ? update_load_avg+0xe5/0x9f0
-[   95.890755]  ? sco_sock_timeout+0x5e/0x1c0
-[   95.890755]  kasan_check_range+0x2c3/0x2e0
-[   95.890755]  sco_sock_timeout+0x5e/0x1c0
-[   95.890755]  process_one_work+0x561/0xc50
-[   95.890755]  worker_thread+0xab2/0x13c0
-[   95.890755]  ? pr_cont_work+0x490/0x490
-[   95.890755]  kthread+0x279/0x300
-[   95.890755]  ? pr_cont_work+0x490/0x490
-[   95.890755]  ? kthread_blkcg+0xa0/0xa0
-[   95.890755]  ret_from_fork+0x34/0x60
-[   95.890755]  ? kthread_blkcg+0xa0/0xa0
-[   95.890755]  ret_from_fork_asm+0x11/0x20
-[   95.890755]  </TASK>
-[   95.890755]
-[   95.890755] Allocated by task 506:
-[   95.890755]  kasan_save_track+0x3f/0x70
-[   95.890755]  __kasan_kmalloc+0x86/0x90
-[   95.890755]  __kmalloc+0x17f/0x360
-[   95.890755]  sk_prot_alloc+0xe1/0x1a0
-[   95.890755]  sk_alloc+0x31/0x4e0
-[   95.890755]  bt_sock_alloc+0x2b/0x2a0
-[   95.890755]  sco_sock_create+0xad/0x320
-[   95.890755]  bt_sock_create+0x145/0x320
-[   95.890755]  __sock_create+0x2e1/0x650
-[   95.890755]  __sys_socket+0xd0/0x280
-[   95.890755]  __x64_sys_socket+0x75/0x80
-[   95.890755]  do_syscall_64+0xc4/0x1b0
-[   95.890755]  entry_SYSCALL_64_after_hwframe+0x67/0x6f
-[   95.890755]
-[   95.890755] Freed by task 506:
-[   95.890755]  kasan_save_track+0x3f/0x70
-[   95.890755]  kasan_save_free_info+0x40/0x50
-[   95.890755]  poison_slab_object+0x118/0x180
-[   95.890755]  __kasan_slab_free+0x12/0x30
-[   95.890755]  kfree+0xb2/0x240
-[   95.890755]  __sk_destruct+0x317/0x410
-[   95.890755]  sco_sock_release+0x232/0x280
-[   95.890755]  sock_close+0xb2/0x210
-[   95.890755]  __fput+0x37f/0x770
-[   95.890755]  task_work_run+0x1ae/0x210
-[   95.890755]  get_signal+0xe17/0xf70
-[   95.890755]  arch_do_signal_or_restart+0x3f/0x520
-[   95.890755]  syscall_exit_to_user_mode+0x55/0x120
-[   95.890755]  do_syscall_64+0xd1/0x1b0
-[   95.890755]  entry_SYSCALL_64_after_hwframe+0x67/0x6f
-[   95.890755]
-[   95.890755] The buggy address belongs to the object at ffff88800c388000
-[   95.890755]  which belongs to the cache kmalloc-1k of size 1024
-[   95.890755] The buggy address is located 128 bytes inside of
-[   95.890755]  freed 1024-byte region [ffff88800c388000, ffff88800c388400)
-[   95.890755]
-[   95.890755] The buggy address belongs to the physical page:
-[   95.890755] page: refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff88800c38a800 pfn:0xc388
-[   95.890755] head: order:3 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-[   95.890755] anon flags: 0x100000000000840(slab|head|node=0|zone=1)
-[   95.890755] page_type: 0xffffffff()
-[   95.890755] raw: 0100000000000840 ffff888006842dc0 0000000000000000 0000000000000001
-[   95.890755] raw: ffff88800c38a800 000000000010000a 00000001ffffffff 0000000000000000
-[   95.890755] head: 0100000000000840 ffff888006842dc0 0000000000000000 0000000000000001
-[   95.890755] head: ffff88800c38a800 000000000010000a 00000001ffffffff 0000000000000000
-[   95.890755] head: 0100000000000003 ffffea000030e201 ffffea000030e248 00000000ffffffff
-[   95.890755] head: 0000000800000000 0000000000000000 00000000ffffffff 0000000000000000
-[   95.890755] page dumped because: kasan: bad access detected
-[   95.890755]
-[   95.890755] Memory state around the buggy address:
-[   95.890755]  ffff88800c387f80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-[   95.890755]  ffff88800c388000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-[   95.890755] >ffff88800c388080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-[   95.890755]                    ^
-[   95.890755]  ffff88800c388100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-[   95.890755]  ffff88800c388180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-[   95.890755] ==================================================================
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=847884
 
-Fix this problem by adding a check protected by sco_conn_lock to judget
-whether the conn->hcon is null. Because the conn->hcon will be set to null,
-when the sock is releasing.
+---Test result---
 
-Fixes: ba316be1b6a0 ("Bluetooth: schedule SCO timeouts with delayed_work")
-Signed-off-by: Duoming Zhou <duoming@zju.edu.cn>
+Test Summary:
+CheckPatch                    PASS      0.67 seconds
+GitLint                       FAIL      0.53 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      29.97 seconds
+CheckAllWarning               PASS      32.81 seconds
+CheckSparse                   WARNING   38.27 seconds
+CheckSmatch                   FAIL      34.61 seconds
+BuildKernel32                 PASS      32.37 seconds
+TestRunnerSetup               PASS      519.21 seconds
+TestRunner_l2cap-tester       PASS      18.34 seconds
+TestRunner_iso-tester         FAIL      36.97 seconds
+TestRunner_bnep-tester        PASS      4.63 seconds
+TestRunner_mgmt-tester        PASS      110.77 seconds
+TestRunner_rfcomm-tester      PASS      7.40 seconds
+TestRunner_sco-tester         PASS      14.91 seconds
+TestRunner_ioctl-tester       PASS      7.60 seconds
+TestRunner_mesh-tester        PASS      5.80 seconds
+TestRunner_smp-tester         PASS      6.68 seconds
+TestRunner_userchan-tester    PASS      4.85 seconds
+IncrementalBuild              PASS      28.19 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+Bluetooth: Fix use-after-free bugs caused by sco_sock_timeout
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+22: B1 Line exceeds max length (81>80): "[   95.890016] =================================================================="
+88: B1 Line exceeds max length (103>80): "[   95.890755] page: refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff88800c38a800 pfn:0xc388"
+92: B1 Line exceeds max length (87>80): "[   95.890755] raw: 0100000000000840 ffff888006842dc0 0000000000000000 0000000000000001"
+93: B1 Line exceeds max length (87>80): "[   95.890755] raw: ffff88800c38a800 000000000010000a 00000001ffffffff 0000000000000000"
+94: B1 Line exceeds max length (88>80): "[   95.890755] head: 0100000000000840 ffff888006842dc0 0000000000000000 0000000000000001"
+95: B1 Line exceeds max length (88>80): "[   95.890755] head: ffff88800c38a800 000000000010000a 00000001ffffffff 0000000000000000"
+96: B1 Line exceeds max length (88>80): "[   95.890755] head: 0100000000000003 ffffea000030e201 ffffea000030e248 00000000ffffffff"
+97: B1 Line exceeds max length (88>80): "[   95.890755] head: 0000000800000000 0000000000000000 00000000ffffffff 0000000000000000"
+101: B1 Line exceeds max length (81>80): "[   95.890755]  ffff88800c387f80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc"
+102: B1 Line exceeds max length (81>80): "[   95.890755]  ffff88800c388000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb"
+103: B1 Line exceeds max length (81>80): "[   95.890755] >ffff88800c388080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb"
+105: B1 Line exceeds max length (81>80): "[   95.890755]  ffff88800c388100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb"
+106: B1 Line exceeds max length (81>80): "[   95.890755]  ffff88800c388180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb"
+107: B1 Line exceeds max length (81>80): "[   95.890755] =================================================================="
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/sco.c: note: in included file:./include/net/bluetooth/hci_core.h:150:35: warning: array of flexible structures
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
+
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+Total: 122, Passed: 121 (99.2%), Failed: 1, Not Run: 0
+
+Failed Test Cases
+ISO Connect2 Suspend - Success                       Failed       6.230 seconds
+
+
 ---
- net/bluetooth/sco.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 368e026f4d1..b19c9b0bbd8 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -83,6 +83,10 @@ static void sco_sock_timeout(struct work_struct *work)
- 	struct sock *sk;
- 
- 	sco_conn_lock(conn);
-+	if (!conn->hcon) {
-+		sco_conn_unlock(conn);
-+		return;
-+	}
- 	sk = conn->sk;
- 	if (sk)
- 		sock_hold(sk);
--- 
-2.17.1
 
+--===============3833140132704632744==--
