@@ -1,144 +1,170 @@
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96DBB14901E;
-	Fri, 26 Apr 2024 15:09:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7A19149C5E;
+	Fri, 26 Apr 2024 16:00:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714144199; cv=none; b=E+TNw3iSSHsnDmPNiNeiGNyVrKqc5g3bY3Z2Ijras2Vqr6Kf0uBsLIOrK/7VDWvadBbmiorTcQxY3aqsAixK+trkVK0kRWBzP4BSXuLTJbm3VLClo5GQKD6jHvCTT0d0M8vWbnTGBMZtc6tY6ufezCTVk36VXvzKCTmLRPqwBK0=
+	t=1714147230; cv=none; b=hdgvbJWuza/qF3bT9r62Jxyhf9MApCDShcmqDdS+UHm9VPDxUjliyBBmdyyyH+RS24w8wNB5XEZ/JW0Jbk/NDjLk881j6XLqM9KquBLHTciMzN3iZ6QDtMIIGs5fUgPPQcxt8RMZSM/iFe306nQBzwhobaePF8NWHpy1Kf7ZyQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714144199; c=relaxed/simple;
-	bh=xAg1rEdSJo2cPRDE/hmbrMFOFTdNt/KfxhhHxARRQXE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=m27ajSenVRLeMUGqi7zFdFqbG6IuGdmpLh25NWAWtn1xXV+sTpuV/RMdB2O47Ts9Icy1qT+bjAjad2SRNlj6TtS9W2n4uXAkgxQ030nTRRM3jbV++Xkzb9bzma+9BSzRJjY165wq7lrtR0wV/XxkOjFUaO02qPw7Xhe8tFpJB74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V0PQW8Kz; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1714147230; c=relaxed/simple;
+	bh=uK9h4I1j7rfKSkPKuWAlFuwzANHYKX0M1bFIxX+3AkE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cDM4TOKis2YWIYJSiVYNP0SaupY5g0fDS6HuvJG02I9RYawCdvQx/lbaIsaZgrbaBvqEF/onzxthTLx2NMGa+Q/IPzPilX0jCZ6qsdBDI3WHIuFg1ipMF9sTnfQUmAz6vVFjqMQjDfoUDUXEu2oDrl1kQIH7yMSkbSnp/aR6cx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f6eLPFEi; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V0PQW8Kz"
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2db7c6b5598so28085961fa.1;
-        Fri, 26 Apr 2024 08:09:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714144196; x=1714748996; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QM5g5oluFXmlj44Ib9JNWX1cNnZgigxMRLezmSbkjDU=;
-        b=V0PQW8KzuH3bhahxtIJpqGgqKFxTf2LLGDy82CcnHFNm6wgI/NHCh6TY+4vH0+A6NC
-         8t3MbBJl2bHZJIGewqO2VxbeuCoVg5FGdO/MT+DRN1R22qjE7lJ69EH9L1yv4Qy2+aOo
-         I5a96emB2Fl2Akq6kJkXLp/JCH8AEvMZMPFd3KZtsJKti7+28KKUZbhv9S75BRrlXXji
-         RnCtQchVdjhRs8HYZImMLwFNWWIec1dfI2LejMlZ2YKkHj8IVcqc3cgJ/JAhLC2VTLT4
-         lykmqgvIAchF0d9yRzoVcDEw/Hpwx1ZzPUuSctbpcFAQxzi69EISAj45y1JzI0e805nM
-         uc+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714144196; x=1714748996;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QM5g5oluFXmlj44Ib9JNWX1cNnZgigxMRLezmSbkjDU=;
-        b=JQXm571hLnwHCGN0fjdMGinCKMYKn+RVoy9AcqL7yCtCqIllMI7BTtDQ9W2oJGsTXl
-         yFkD0pd4/cC4uREvm18lcpqiscjzYATdRpUxTdgOSkNC9xb2uH3/ejSY/EznINFUmXHV
-         02uyCjYmb1JbPx5npVrJT7U5Z5ZqCPiQj/6Ow2yFwlU/tKAJ7bYfyNUUGNeNVN+p5+De
-         YFGjljykCD7FfkBX0lrLriGQO7zqZTK7NdeBl8oqxgAvvcB3FEDw3RIh4SYcv8NjpZEd
-         19fOTbLl7SyW6LxunO35Sn5RPlqAStOIrI/hntK1D4Ha6c4Cj0q5OdYHMdqdH36k048H
-         FZLA==
-X-Forwarded-Encrypted: i=1; AJvYcCWgBlkLKwHKsFc+zDp6YtKEhUyUiDQHL+3/WDK+TbusxLQTnhAJS/9xwXjawBl/JGyelPnTX6mCDeZGzJvXMssz+V7mXbCCVo5Gl9k7GenQsM0SFMwe8d0AofvoZx/nXZt2IUknWkX7t6nRViRJ
-X-Gm-Message-State: AOJu0YzbUcHZ7lJNKFgsZy6erjbpiw1qLMA6/xvx6kQ2/xpk26LvjGfw
-	cIyp+gNzXKB0upyXzCyL7B8831ZjLTF3r2G8T4UH97uzmVeRVG/bNp87S1BjAJbYZP70T1/5GIO
-	EpEqP252UKdleiaB+LXlZprKpIHg=
-X-Google-Smtp-Source: AGHT+IHjGA+8BSpP9IX601ErZtEjqToo4NRZRL8kUVVAJvuSuM4qoyqiqfzKsueRULrcpzPd8ls4usMH1P6ggmAVLcM=
-X-Received: by 2002:a2e:9684:0:b0:2d6:d351:78ae with SMTP id
- q4-20020a2e9684000000b002d6d35178aemr58304lji.29.1714144195629; Fri, 26 Apr
- 2024 08:09:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f6eLPFEi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59E78C113CD;
+	Fri, 26 Apr 2024 16:00:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714147229;
+	bh=uK9h4I1j7rfKSkPKuWAlFuwzANHYKX0M1bFIxX+3AkE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=f6eLPFEiZ6xNNJR3mQ6Qo5xBHM1aC6YKRza2POnm6EEgTvufM6RD2WTbKE5ZfwT4D
+	 sVfWuJBpAr8DBIyiwvZPB18cr67rmn5iMsDHpGKtuOm9+kAIE59IuQnndZwCi32kif
+	 s6Dps+UkIJP4Rvv9VSnh5zsQ1PsR4jQxbmuOG75ywi6D7vjNOizvvcjN6NwU5tUm3D
+	 SS1+FixvkAz5d/a+N20Mynix+Ma0x8+RoXBDBch3hn8cDblQgoYKzAEjes9aeLOkCt
+	 5jGDeOjmdNnbK7grD0vvInoTi9+RcNo68eD7DgSFszh5weqEQFGmLSKFf9xYyqOqh/
+	 14rjkm0Ef9Sjw==
+Received: from johan by xi.lan with local (Exim 4.97.1)
+	(envelope-from <johan+linaro@kernel.org>)
+	id 1s0Nzz-000000006c4-1Xt8;
+	Fri, 26 Apr 2024 18:00:31 +0200
+From: Johan Hovold <johan+linaro@kernel.org>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Johan Hovold <johan+linaro@kernel.org>,
+	stable@vger.kernel.org,
+	Doug Anderson <dianders@chromium.org>,
+	Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+Subject: [PATCH] Bluetooth: qca: generalise device address check
+Date: Fri, 26 Apr 2024 17:58:01 +0200
+Message-ID: <20240426155801.25277-1-johan+linaro@kernel.org>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240424122932.79120-1-brgl@bgdev.pl> <171397322792.12898.8815870206676100532.git-patchwork-notify@kernel.org>
- <CAMRc=McMMtRid6OaYsc0PO0qsS6z+Ny127YxwNcjbo7R2Mze2Q@mail.gmail.com>
-In-Reply-To: <CAMRc=McMMtRid6OaYsc0PO0qsS6z+Ny127YxwNcjbo7R2Mze2Q@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 26 Apr 2024 11:09:42 -0400
-Message-ID: <CABBYNZJOdccb4HKVBnuqK=_xVzViJ2D2+QJPSyyFGE2_Y1VXCg@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: qca: set power_ctrl_enabled on NULL
- returned by gpiod_get_optional()
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: marcel@holtmann.org, krzysztof.kozlowski@linaro.org, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	bartosz.golaszewski@linaro.org, wt@penguintechs.org, quic_zijuhu@quicinc.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Bartosz,
+The default device address apparently comes from the NVM configuration
+file and can differ quite a bit.
 
-On Fri, Apr 26, 2024 at 10:37=E2=80=AFAM Bartosz Golaszewski <brgl@bgdev.pl=
-> wrote:
->
-> On Wed, 24 Apr 2024 17:40:27 +0200, patchwork-bot+bluetooth@kernel.org sa=
-id:
-> > Hello:
-> >
-> > This patch was applied to bluetooth/bluetooth-next.git (master)
-> > by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-> >
-> > On Wed, 24 Apr 2024 14:29:32 +0200 you wrote:
-> >> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> >>
-> >> Any return value from gpiod_get_optional() other than a pointer to a
-> >> GPIO descriptor or a NULL-pointer is an error and the driver should
-> >> abort probing. That being said: commit 56d074d26c58 ("Bluetooth: hci_q=
-ca:
-> >> don't use IS_ERR_OR_NULL() with gpiod_get_optional()") no longer sets
-> >> power_ctrl_enabled on NULL-pointer returned by
-> >> devm_gpiod_get_optional(). Restore this behavior but bail-out on error=
-s.
-> >> While at it: also bail-out on error returned when trying to get the
-> >> "swctrl" GPIO.
-> >>
-> >> [...]
-> >
-> > Here is the summary with links:
-> >   - [v2] Bluetooth: qca: set power_ctrl_enabled on NULL returned by gpi=
-od_get_optional()
-> >     https://git.kernel.org/bluetooth/bluetooth-next/c/48a9e64a533b
-> >
-> > You are awesome, thank you!
-> > --
-> > Deet-doot-dot, I am a bot.
-> > https://korg.docs.kernel.org/patchwork/pwbot.html
-> >
-> >
-> >
->
-> Luiz,
->
-> I think patchwork borked when picking up this one, here's what the commit
-> trailer looks like in next:
->
->     Reported-by: Wren Turkal <wt@penguintechs.org>
->     Reported-by: Zijun Hu <quic_zijuhu@quicinc.com>
->     Closes: https://lore.kernel.org/linux-bluetooth/1713449192-25926-2-gi=
-t-send-email-quic_zijuhu@quicinc.com/
->     Fixes: 56d074d26c58 ("Bluetooth: hci_qca: don't use
-> IS_ERR_OR_NULL() with gpiod_get_optional()")
->     Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
->     Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->     Tested-by: Wren Turkal" <wt@penguintechs.org>
->     Reported-by: Wren Turkal <wt@penguintechs.org>
->     Reported-by: Zijun Hu <quic_zijuhu@quicinc.com>
->     Reviewed-by: Krzysztof Kozlowski<krzysztof.kozlowski@linaro.org>
->     Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
->     Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> Reported-by and Reviewed-by tags are duplicated. One of the RB tags is mi=
-ssing
-> a space.
+Store the default address when parsing the configuration file and use it
+to determine whether the controller has been provisioned with an
+address.
 
-Oh crap, should probably not trust patchwork would pick up the tags
-properly, that said the pull-request was already merged, not sure if
-we can do something about it now?
+This makes sure that devices without a unique address start as
+unconfigured unless a valid address has been provided in the devicetree.
 
---=20
-Luiz Augusto von Dentz
+Fixes: 00567f70051a ("Bluetooth: qca: fix invalid device address check")
+Cc: stable@vger.kernel.org      # 6.5
+Cc: Doug Anderson <dianders@chromium.org>
+Cc: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
+---
+ drivers/bluetooth/btqca.c | 21 ++++++++++++---------
+ drivers/bluetooth/btqca.h |  2 ++
+ 2 files changed, 14 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index cfa71708397b..d7a6738e4691 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -15,9 +15,6 @@
+ 
+ #define VERSION "0.1"
+ 
+-#define QCA_BDADDR_DEFAULT (&(bdaddr_t) {{ 0xad, 0x5a, 0x00, 0x00, 0x00, 0x00 }})
+-#define QCA_BDADDR_WCN3991 (&(bdaddr_t) {{ 0xad, 0x5a, 0x00, 0x00, 0x98, 0x39 }})
+-
+ int qca_read_soc_version(struct hci_dev *hdev, struct qca_btsoc_version *ver,
+ 			 enum qca_btsoc_type soc_type)
+ {
+@@ -351,6 +348,11 @@ static void qca_tlv_check_data(struct hci_dev *hdev,
+ 
+ 			/* Update NVM tags as needed */
+ 			switch (tag_id) {
++			case EDL_TAG_ID_BD_ADDR:
++				if (tag_len != sizeof(bdaddr_t))
++					break;
++				memcpy(&config->bdaddr, tlv_nvm->data, sizeof(bdaddr_t));
++				break;
+ 			case EDL_TAG_ID_HCI:
+ 				/* HCI transport layer parameters
+ 				 * enabling software inband sleep
+@@ -615,7 +617,7 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+ }
+ EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
+ 
+-static int qca_check_bdaddr(struct hci_dev *hdev)
++static int qca_check_bdaddr(struct hci_dev *hdev, const struct qca_fw_config *config)
+ {
+ 	struct hci_rp_read_bd_addr *bda;
+ 	struct sk_buff *skb;
+@@ -624,6 +626,9 @@ static int qca_check_bdaddr(struct hci_dev *hdev)
+ 	if (bacmp(&hdev->public_addr, BDADDR_ANY))
+ 		return 0;
+ 
++	if (!bacmp(&config->bdaddr, BDADDR_ANY))
++		return 0;
++
+ 	skb = __hci_cmd_sync(hdev, HCI_OP_READ_BD_ADDR, 0, NULL,
+ 			     HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+@@ -639,10 +644,8 @@ static int qca_check_bdaddr(struct hci_dev *hdev)
+ 	}
+ 
+ 	bda = (struct hci_rp_read_bd_addr *)skb->data;
+-	if (!bacmp(&bda->bdaddr, QCA_BDADDR_DEFAULT) ||
+-	    !bacmp(&bda->bdaddr, QCA_BDADDR_WCN3991)) {
++	if (!bacmp(&bda->bdaddr, &config->bdaddr))
+ 		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
+-	}
+ 
+ 	kfree_skb(skb);
+ 
+@@ -670,7 +673,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 		   enum qca_btsoc_type soc_type, struct qca_btsoc_version ver,
+ 		   const char *firmware_name)
+ {
+-	struct qca_fw_config config;
++	struct qca_fw_config config = {};
+ 	int err;
+ 	u8 rom_ver = 0;
+ 	u32 soc_ver;
+@@ -855,7 +858,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 		break;
+ 	}
+ 
+-	err = qca_check_bdaddr(hdev);
++	err = qca_check_bdaddr(hdev, &config);
+ 	if (err)
+ 		return err;
+ 
+diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+index dc31984f71dc..49ad668d0d0b 100644
+--- a/drivers/bluetooth/btqca.h
++++ b/drivers/bluetooth/btqca.h
+@@ -29,6 +29,7 @@
+ #define EDL_PATCH_CONFIG_RES_EVT	(0x00)
+ #define QCA_DISABLE_LOGGING_SUB_OP	(0x14)
+ 
++#define EDL_TAG_ID_BD_ADDR		2
+ #define EDL_TAG_ID_HCI			(17)
+ #define EDL_TAG_ID_DEEP_SLEEP		(27)
+ 
+@@ -94,6 +95,7 @@ struct qca_fw_config {
+ 	uint8_t user_baud_rate;
+ 	enum qca_tlv_dnld_mode dnld_mode;
+ 	enum qca_tlv_dnld_mode dnld_type;
++	bdaddr_t bdaddr;
+ };
+ 
+ struct edl_event_hdr {
+-- 
+2.43.2
+
