@@ -1,250 +1,125 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59AAB14EC4C
-	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Apr 2024 17:48:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7027A2907
+	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Apr 2024 20:42:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714153684; cv=none; b=n+uvXc6dY+MFdAuHVSybv54ob0/CV3Nx3NUD09SnAQZvU8HAPuDz7muMzDrPJWSiJ5EmFzlnzfva1cMnKHQYRjMn2D4RWyQj8yYhNLLUGMz+TrqU9YOEdEGoNFlp6nyNRGiN4enD8cibHQC+m+mGKBfoy2IFOh3qqBH91g0Tr24=
+	t=1714164159; cv=none; b=l6snjy3FihT9YzSKYgeRr6+eJf4b+vWuogLG+70Lw8lOfAzloh9FcFI1719A7Q4/Ravw8X8yBMdCOZeNTZdrk7iH9dR05OSLbO6euNpicBlinqhhdrC4KumKYDsjP2SbJMu8v0BJTXAOr3LYPGyNqXLOAH1uX1igsVhz5H63w6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714153684; c=relaxed/simple;
-	bh=WVUIXNttWB4ke/4vy6P7F5RJGfPqtk7WIZs/HEyUMyU=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=srIfUHQWHDKER6tFubE0bVQmREoGy8FfOppm8cuTy+6awUm9cVaAFCuA4U1DEP4vO0ohcvSV+Su6Dx3ljQVc70E6Xe4IWK5rfIFfnVPsHT92mlVxwXr/RwDfOVAGymAwOcOtqlcl9fbtJN3zhUm9yoWFtY8zf9N0/GhJdudoi4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AE8spqNL; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1714164159; c=relaxed/simple;
+	bh=Ut2/7QtHb1M2bAQEQd183O3h2QD+aXNEeV9+hYPipro=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oVkF+5insrTBcvMgX7NYPUf3zuWm02IybYFCQH6Z2QG+Jd1eNPDcFXTQG340dr62eJiDxtH5fGLsx1qYtP21Lzzld1oTPs45THMv66K0POprFyaVCXMZaTh7qjpOSX7vB4nchzBCAsvMq7yLQ0VijSP37mnPxW0V2UdSSYtD2Bg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=bo6+aveC; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=penguintechs.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AE8spqNL"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714153684; x=1745689684;
-  h=date:from:to:cc:subject:message-id;
-  bh=WVUIXNttWB4ke/4vy6P7F5RJGfPqtk7WIZs/HEyUMyU=;
-  b=AE8spqNLJzhiQeMnfQ8UfOiKTPm4iYC5JdlYjrQxSNR9GtRPyi4xxJbH
-   nAAkf+YoPMtpcEF0Dac3O5Fm8wc3jUY35Wi2ZNzGgEtEjxwdodn3n8zdI
-   4761JE33LGDEIz8awWEaJr44ekfAMvwhZjMC1DVOU04h3Uz7c+NQJ6aOC
-   na3hspmqmIICCHS1HkNuU6aOrsKGv10qeLkIgzHNpIJVPu7EwM20ak2qG
-   q8AcPYgQIivlVu84BSWg628bXmhBHDYwdKJQfzMcoYQg9z5Ny136worGC
-   ksYDSvprluAimPKSMtb8qsxLKtEUKgJgXwrJeeXE3/cSFF/apLQFX/F8P
-   w==;
-X-CSE-ConnectionGUID: jJxbXAvFQ++5JZg2Z5P56g==
-X-CSE-MsgGUID: t43nioN0QWKRBaxtWWPPNQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11056"; a="10113460"
-X-IronPort-AV: E=Sophos;i="6.07,233,1708416000"; 
-   d="scan'208";a="10113460"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2024 10:48:03 -0700
-X-CSE-ConnectionGUID: q+IC6TVvTdSW99U7hN+nRQ==
-X-CSE-MsgGUID: 1SrzcblQQMqH+NwcDdF8XQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,233,1708416000"; 
-   d="scan'208";a="25484769"
-Received: from lkp-server01.sh.intel.com (HELO e434dd42e5a1) ([10.239.97.150])
-  by fmviesa007.fm.intel.com with ESMTP; 26 Apr 2024 10:48:01 -0700
-Received: from kbuild by e434dd42e5a1 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1s0Pfz-00041y-1I;
-	Fri, 26 Apr 2024 17:47:59 +0000
-Date: Sat, 27 Apr 2024 01:47:47 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 0a0f9014b784b38279480cad066d62917d5fd203
-Message-ID: <202404270144.aJUexzue-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="bo6+aveC"
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2a484f772e2so1824973a91.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Apr 2024 13:42:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=penguintechs.org; s=google; t=1714164156; x=1714768956; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ut2/7QtHb1M2bAQEQd183O3h2QD+aXNEeV9+hYPipro=;
+        b=bo6+aveCALQzYCYe8T2ITmMyQMwfjsihSiKROoFpMYKMwJBOgy4g25++0kic7wjhEh
+         uXfJwep9ZmXrM5pNvB/lRYQG626wViJAdgMjnJLQwPB+HJLGxS54a/KcBzfol+x0gJ/4
+         ib00yboa+FIH7PJOmCBr3rDxvftCQXj1Zz6nY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714164156; x=1714768956;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ut2/7QtHb1M2bAQEQd183O3h2QD+aXNEeV9+hYPipro=;
+        b=kkLnrEWME0oTh+RkZmAuil5r/1wefHG2kYKomZceFtyqT4OjCuT6CWU+RnMICfP30F
+         Ej69ye4d/PgHKmiQafRMQ3y5BDOCF43ZxsvB60Bjyu7bTkyv5v+QChRl9xiu1VALKgFB
+         gt8zalttSC4q3lOmAw3dWEBpq04TyH0VxIk+/+W2+ObuXTpAyxHQbmZYNF8VgFVjJ7G+
+         Ht/Hf65V1hvJXVsYEawmdMu2HuIb/j3pPMDCZt9L0qtNVlcIFcGd8/uSD6NBVi89ccPS
+         FbS9PI/6q3hsCmaU8PQdoFOM5V8UuubeX6YSo/0+EQdhKLPEJGlKQS19RYIcZQ2KAu4d
+         Dp1A==
+X-Forwarded-Encrypted: i=1; AJvYcCUBl+SnpVSizBT3WSfFrL7n4eKZaMtEJRstxDiPMDpeDg+W3F9lKnmJOiWBlaCMmRfNbyGFaZkxakjvihlpTfYjcuUZrmbRWwaCYAX7cQp7
+X-Gm-Message-State: AOJu0Yw/R8iSInTMWYdRQVoQ+c9jL6So96OU7ht1cxZ2GAvgf2yN2QQo
+	kCpAmnffwAyq9/5lyZEfzSsnOadfz8SBUddxQsI+a6orlQ/7mvYKnnJwXFnveA==
+X-Google-Smtp-Source: AGHT+IEOscTEwtYTWB//iF95be8T91jBA3iUjB0TKOHlVlba448YymSeSS3FXYQvh1CygPxmaDwhbg==
+X-Received: by 2002:a17:90a:ad86:b0:2a2:5860:dea8 with SMTP id s6-20020a17090aad8600b002a25860dea8mr3784343pjq.7.1714164156414;
+        Fri, 26 Apr 2024 13:42:36 -0700 (PDT)
+Received: from braindead.localdomain ([2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08])
+        by smtp.gmail.com with ESMTPSA id 9-20020a17090a0b8900b002a2e4b593cdsm18187936pjr.51.2024.04.26.13.42.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Apr 2024 13:42:35 -0700 (PDT)
+From: Wren Turkal <wt@penguintechs.org>
+To: Zijun Hu <quic_zijuhu@quicinc.com>, linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com, luiz.von.dentz@intel.com, marcel@holtmann.org,
+ linux-bluetooth@vger.kernel.org, bartosz.golaszewski@linaro.org,
+ krzysztof.kozlowski@linaro.org, regressions@lists.linux.dev,
+ kernel@quicinc.com, stable@vge.kernel.org,
+ Greg KH <gregkh@linuxfoundation.org>
+Subject:
+ Re: [PATCH v7 2/2] Bluetooth: qca: Fix BT enable failure for QCA6390 after
+ disable then warm reboot
+Date: Fri, 26 Apr 2024 13:42:33 -0700
+Message-ID: <5600892.rdbgypaU67@braindead.localdomain>
+In-Reply-To: <2024042330-boat-launch-aaec@gregkh>
+References:
+ <1713932807-19619-1-git-send-email-quic_zijuhu@quicinc.com>
+ <1713932807-19619-3-git-send-email-quic_zijuhu@quicinc.com>
+ <2024042330-boat-launch-aaec@gregkh>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 0a0f9014b784b38279480cad066d62917d5fd203  Bluetooth: qca: fix wcn3991 device address check
+On Tuesday, April 23, 2024 9:34:43=E2=80=AFPM PDT Greg KH wrote:
+> On Wed, Apr 24, 2024 at 12:26:47PM +0800, Zijun Hu wrote:
+> > From: Zijun Hu <zijuhu@qti.qualcomm.com>
+> >=20
+> > Commit 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on closed
+> > serdev") will cause below regression issue:
+> >=20
+> > BT can't be enabled after below steps:
+> > cold boot -> enable BT -> disable BT -> warm reboot -> BT enable failure
+> > if property enable-gpios is not configured within DT|ACPI for QCA6390.
+> >=20
+> > The commit is to fix a use-after-free issue within qca_serdev_shutdown()
+> > during reboot, but also introduces this regression issue regarding above
+> > steps since the VSC is not sent to reset controller during warm reboot.
+> >=20
+> > Fixed by sending the VSC to reset controller within qca_serdev_shutdown=
+()
+> > once BT was ever enabled, and the use-after-free issue is also be fixed
+> > by this change since serdev is still opened when send to serdev.
+> >=20
+> > Fixes: 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on closed
+> > serdev") Cc: stable@vge.kernel.org
+>=20
+> That is not a valid email address :(
 
-elapsed time: 1457m
+@ziljun, can you please post this patch in a new patch series by itself? Th=
+e=20
+warm boot problem is fixed by this patch, and I think it would be better to=
+=20
+have a thread dedicated to this fix so that it doesn't get lost.
 
-configs tested: 173
-configs skipped: 3
+=46WIW, I think that this may be the correct technical change. I would like=
+ to=20
+try to help get this patch landed, and I think a clean thread for only this=
+=20
+change would help.
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+Just so everyone is aware, I am a concerned user of the hardware, and not a=
+=20
+kernel dev myself. I have tested this change. This patch on top of Linus'=20
+mainline does allow qca6390 to work after warm reboot on my laptop.
 
-tested configs:
-alpha                             allnoconfig   gcc  
-alpha                            allyesconfig   gcc  
-alpha                               defconfig   gcc  
-arc                              allmodconfig   gcc  
-arc                               allnoconfig   gcc  
-arc                              allyesconfig   gcc  
-arc                                 defconfig   gcc  
-arc                   randconfig-001-20240426   gcc  
-arc                   randconfig-002-20240426   gcc  
-arm                              allmodconfig   gcc  
-arm                               allnoconfig   clang
-arm                              allyesconfig   gcc  
-arm                                 defconfig   clang
-arm                   randconfig-001-20240426   clang
-arm                   randconfig-002-20240426   gcc  
-arm                   randconfig-003-20240426   gcc  
-arm                   randconfig-004-20240426   gcc  
-arm                             rpc_defconfig   clang
-arm                        spear3xx_defconfig   clang
-arm                        spear6xx_defconfig   clang
-arm64                            allmodconfig   clang
-arm64                             allnoconfig   gcc  
-arm64                               defconfig   gcc  
-arm64                 randconfig-001-20240426   gcc  
-arm64                 randconfig-002-20240426   gcc  
-arm64                 randconfig-003-20240426   clang
-arm64                 randconfig-004-20240426   gcc  
-csky                             allmodconfig   gcc  
-csky                              allnoconfig   gcc  
-csky                             allyesconfig   gcc  
-csky                                defconfig   gcc  
-csky                  randconfig-001-20240426   gcc  
-csky                  randconfig-002-20240426   gcc  
-hexagon                          allmodconfig   clang
-hexagon                           allnoconfig   clang
-hexagon                          allyesconfig   clang
-hexagon                             defconfig   clang
-hexagon               randconfig-001-20240426   clang
-hexagon               randconfig-002-20240426   clang
-i386         buildonly-randconfig-001-20240426   gcc  
-i386         buildonly-randconfig-002-20240426   clang
-i386         buildonly-randconfig-003-20240426   gcc  
-i386         buildonly-randconfig-004-20240426   gcc  
-i386         buildonly-randconfig-005-20240426   clang
-i386         buildonly-randconfig-006-20240426   clang
-i386                  randconfig-001-20240426   gcc  
-i386                  randconfig-002-20240426   clang
-i386                  randconfig-003-20240426   gcc  
-i386                  randconfig-004-20240426   gcc  
-i386                  randconfig-005-20240426   gcc  
-i386                  randconfig-006-20240426   clang
-i386                  randconfig-011-20240426   gcc  
-i386                  randconfig-012-20240426   clang
-i386                  randconfig-013-20240426   clang
-i386                  randconfig-014-20240426   clang
-i386                  randconfig-015-20240426   clang
-i386                  randconfig-016-20240426   clang
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch                           defconfig   gcc  
-loongarch             randconfig-001-20240426   gcc  
-loongarch             randconfig-002-20240426   gcc  
-m68k                             allmodconfig   gcc  
-m68k                              allnoconfig   gcc  
-m68k                             allyesconfig   gcc  
-m68k                                defconfig   gcc  
-m68k                        m5272c3_defconfig   gcc  
-m68k                           virt_defconfig   gcc  
-microblaze                       allmodconfig   gcc  
-microblaze                        allnoconfig   gcc  
-microblaze                       allyesconfig   gcc  
-microblaze                          defconfig   gcc  
-mips                              allnoconfig   gcc  
-mips                             allyesconfig   gcc  
-mips                 decstation_r4k_defconfig   gcc  
-nios2                         10m50_defconfig   gcc  
-nios2                            allmodconfig   gcc  
-nios2                             allnoconfig   gcc  
-nios2                            allyesconfig   gcc  
-nios2                               defconfig   gcc  
-nios2                 randconfig-001-20240426   gcc  
-nios2                 randconfig-002-20240426   gcc  
-openrisc                          allnoconfig   gcc  
-openrisc                         allyesconfig   gcc  
-openrisc                            defconfig   gcc  
-openrisc                 simple_smp_defconfig   gcc  
-parisc                           allmodconfig   gcc  
-parisc                            allnoconfig   gcc  
-parisc                           allyesconfig   gcc  
-parisc                              defconfig   gcc  
-parisc                generic-64bit_defconfig   gcc  
-parisc                randconfig-001-20240426   gcc  
-parisc                randconfig-002-20240426   gcc  
-parisc64                            defconfig   gcc  
-powerpc                          allmodconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc                          allyesconfig   clang
-powerpc                       ppc64_defconfig   clang
-powerpc               randconfig-001-20240426   clang
-powerpc               randconfig-002-20240426   gcc  
-powerpc               randconfig-003-20240426   clang
-powerpc                     sequoia_defconfig   clang
-powerpc64             randconfig-001-20240426   gcc  
-powerpc64             randconfig-002-20240426   gcc  
-powerpc64             randconfig-003-20240426   clang
-riscv                            allmodconfig   clang
-riscv                             allnoconfig   gcc  
-riscv                            allyesconfig   clang
-riscv                               defconfig   clang
-riscv                 randconfig-001-20240426   clang
-riscv                 randconfig-002-20240426   gcc  
-s390                             allmodconfig   clang
-s390                              allnoconfig   clang
-s390                             allyesconfig   gcc  
-s390                                defconfig   clang
-s390                  randconfig-001-20240426   clang
-s390                  randconfig-002-20240426   clang
-sh                               allmodconfig   gcc  
-sh                                allnoconfig   gcc  
-sh                               allyesconfig   gcc  
-sh                                  defconfig   gcc  
-sh                          landisk_defconfig   gcc  
-sh                    randconfig-001-20240426   gcc  
-sh                    randconfig-002-20240426   gcc  
-sh                           se7750_defconfig   gcc  
-sh                   sh7724_generic_defconfig   gcc  
-sh                        sh7763rdp_defconfig   gcc  
-sparc                            allmodconfig   gcc  
-sparc                             allnoconfig   gcc  
-sparc                               defconfig   gcc  
-sparc                       sparc64_defconfig   gcc  
-sparc64                          allmodconfig   gcc  
-sparc64                          allyesconfig   gcc  
-sparc64                             defconfig   gcc  
-sparc64               randconfig-001-20240426   gcc  
-sparc64               randconfig-002-20240426   gcc  
-um                               allmodconfig   clang
-um                                allnoconfig   clang
-um                               allyesconfig   gcc  
-um                                  defconfig   clang
-um                             i386_defconfig   gcc  
-um                    randconfig-001-20240426   gcc  
-um                    randconfig-002-20240426   gcc  
-um                           x86_64_defconfig   clang
-x86_64                            allnoconfig   clang
-x86_64       buildonly-randconfig-001-20240426   clang
-x86_64       buildonly-randconfig-002-20240426   gcc  
-x86_64       buildonly-randconfig-003-20240426   clang
-x86_64       buildonly-randconfig-004-20240426   clang
-x86_64       buildonly-randconfig-005-20240426   gcc  
-x86_64       buildonly-randconfig-006-20240426   gcc  
-x86_64                              defconfig   gcc  
-x86_64                randconfig-001-20240426   gcc  
-x86_64                randconfig-002-20240426   gcc  
-x86_64                randconfig-003-20240426   gcc  
-x86_64                randconfig-004-20240426   clang
-x86_64                randconfig-005-20240426   clang
-x86_64                randconfig-006-20240426   clang
-x86_64                randconfig-011-20240426   clang
-x86_64                randconfig-012-20240426   gcc  
-x86_64                randconfig-013-20240426   gcc  
-x86_64                randconfig-014-20240426   gcc  
-x86_64                randconfig-015-20240426   gcc  
-x86_64                randconfig-016-20240426   clang
-x86_64                randconfig-071-20240426   clang
-x86_64                randconfig-072-20240426   clang
-x86_64                randconfig-073-20240426   clang
-x86_64                randconfig-074-20240426   gcc  
-x86_64                randconfig-075-20240426   gcc  
-x86_64                randconfig-076-20240426   gcc  
-xtensa                            allnoconfig   gcc  
-xtensa                randconfig-001-20240426   gcc  
-xtensa                randconfig-002-20240426   gcc  
+wt
+=2D-=20
+You're more amazing than you think!
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+
+
