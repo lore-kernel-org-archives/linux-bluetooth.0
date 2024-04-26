@@ -1,170 +1,109 @@
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 795DF25605
-	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Apr 2024 09:08:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D20A713D8B5
+	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Apr 2024 09:16:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714122536; cv=none; b=KMikuWpKZhc97bKJQl60l50LWt4FyG2D6xyVqCfGQxfNvsP49hHkvpC2QUMwJZZ2tiU3OO9f/lEv3FurwJB1KAa62WoG3KVEhwkxtypHODJsDBuCBo02KAXhb8zuAetpYnGncyAqCbz/208gNHjtD6/4n8MuyR3D4AfCS916U2w=
+	t=1714123014; cv=none; b=T/x174PLQk2v2JfqCyW8EmGyu/LGNXVE9GOfQe0cw+bpV7pKyYoBC2u4vlUiFGoJdliEIhbEb7Ibs/bJDAgybvSgAmkfHwu54qeO1sjPAA9S/Sgu2KoKQxB0Uoq+FhXUpneTnQlL1TEiBZWgphlr7Nhyc3FFxTHOPdKejdWNs/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714122536; c=relaxed/simple;
-	bh=PwJip2bI3d8w1d8xY7szIeXVyb2xY9y6x9ioLdBZf+E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=W42D6vPY4H/HcueEBg/KckOZx8rjPhzQEkYPx6ywtR2iNfXTELx6YLJLdbXACqB7Ea4sc6Li9wf1abj2jyNzGn/QJDvylYKKq5+BcakRcC0LmQICEWIhRIdZHgvCL35nNFpfXix6D/A4XwSDfJd3c76vfX/I7H5WZq+Mc6g2MDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4Wr1jHtE; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1714123014; c=relaxed/simple;
+	bh=zAgKQvFrqBDTFX13F6wBlBpnyEvLpQwg/v9jaYHnoJA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kjt58qLlqwkP6r7Hvi3t7T6Jqpbx3LbkKqrCvXxIntRsfHZVzqbe4RpmHk3u9a3a3EwMGAuSIzXYnkibFQO6nfNdeKwiBgy7ol2XFd6duXiB+t2+Xg1rrEE5eR0onPPkJ/4Adc5CSA2G3oj3KdHLpMvjPWlrKliLlVKGgSVGe6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Hp9BbYGJ; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4Wr1jHtE"
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5724736770cso5821a12.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Apr 2024 02:08:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Hp9BbYGJ"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-41b5e74fa2fso8600065e9.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Apr 2024 02:16:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714122533; x=1714727333; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ja2hNeJD5lpzreFTljFzef74K+wsxiiyhKIsFU5oS/c=;
-        b=4Wr1jHtE5ZUeI4hAwB/3/w+vHyhPBxN8zJK6cxhevx94lHoZbN0Qwna2OiAPhhaiAe
-         5v6c0X5toAedPZE+eF1GPggKgB0PDKgvWQjXOrOAR/TS9YsZbV3G9EtOLLMgS0g49W3T
-         SMFTfv4erAZC1JnuKZKCCfCcxAZlQctUxu81V3PLcIRqKiup1KiZMcwx45p3KAIaCmut
-         EXvi+fNLYFzbbfCVkAwQUF3T83OBY5WLBais42PosFl6OFgZD4z7MIYMQss0pB/aCjhg
-         mAhe9hza0D0CgwlZa9r++boN0y5VNpvoNkcDK+s15XmWsZ+nik+v7VN9jHLa9GfpyxML
-         ZC6w==
+        d=linaro.org; s=google; t=1714123010; x=1714727810; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wtWpy9Lgm95m3RnkoldI8iHDQ2l7NCe3R0HbIn79igY=;
+        b=Hp9BbYGJPRO7x800A60sIDFETsZDoFNBX6PmVuwMog9X3e6ffnxUyIy4QuH81qdzvD
+         oCf98oTJ9w/XE/ZmACpdC3b0Mm4prvM0j8a7dk3jGF+t5K8wEVvkM0xei6GRQyxZ/p8g
+         ITvodSYstBr9/UyLxEYtjk9B0EUv75els85zEQ4pglfF7OCiqNGtrAMW6odKaGNpNpv5
+         DYDTqRe0uzv8jUa0jMR2GvamIaDIFPMmNqT8h0DW0STC7NbPvQKwUWrwfwjn5M+rGdo2
+         zlJ2rApm2PKoKhKRtyUNNqglFvjRGhs4cr+d6uwDfRTPaPbb/Lww+C6O2ZproN79AHSI
+         4hXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714122533; x=1714727333;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ja2hNeJD5lpzreFTljFzef74K+wsxiiyhKIsFU5oS/c=;
-        b=qDzVWOb2jFUo/5Tg0c4nn1J1HCSdkJ0p+FegTOeaa2c+Xaj5U8kcRaaAhxQf7yPApu
-         mFOudRfTssFI5LlholCw3qvzs63oQrgPPpx8DBfnQk6KhkGgTa7PQtQ8Wy2kPC8X1pM1
-         ZOLby7THsjr4p8Y8xUl3lf+w46gGXKn3AmgHW5hYGIylbPKkgZpR+aU4iDXOs9KlA37p
-         m9qGcbWU/8GVVtIkmwzNyy7mznFlVwiA+9dSaHFUDrNzVnTaw1kkSdT55ovdu50xAUd/
-         XVLkqfxf1ch3TlAN41Cmi+mf1X9Ix/EknsGhNWF/7TIUSeQeWaP97ycuxNRoyTPk0weS
-         viYA==
-X-Gm-Message-State: AOJu0YxZMC+iLMhMVbOptiF7JLO8Na0mflSxBwOclWmhdBSKclwgav+B
-	9IpFTTFCy3RcHpkIO2kWWgTIhFkTDNieJIzvzbVvLLuciV0NPINVn8i32jvQlzuzcvcBaR+yeyA
-	I4edOcNpnKvRdx6rbRdyFWdfy7mNjwWlkMN31
-X-Google-Smtp-Source: AGHT+IHujQYAqx2B45GLqCBKPuCqaju6NcYLIyZHXLX5p+QiGBrNWGqmIC64DsOoSSioYGIh1X5ZSdiYL+9ZdcrEV/w=
-X-Received: by 2002:aa7:c512:0:b0:572:5d62:7971 with SMTP id
- o18-20020aa7c512000000b005725d627971mr16853edq.0.1714122532540; Fri, 26 Apr
- 2024 02:08:52 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1714123010; x=1714727810;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wtWpy9Lgm95m3RnkoldI8iHDQ2l7NCe3R0HbIn79igY=;
+        b=RWDI5ZChFMO/6Q8pgQe6lJCkp1YdBQzAMkIRlQ6nfM58UP23yyRHJnGmNrBflotyr9
+         NgngW61/fQkLq993iJMvp+i/kvMPpmIdPjnmcaY8Kau9trcHaQrb5sB8HIXwUFogpvES
+         eaqADC09YBJApQ214HXgl4JB0e0VEbXf7/EGEPxW/4U/zrLALUx8z6Whf/WKr9lKWMOs
+         ydu9MoIPsRUvZDA5l3OkjY7B0tOtHyUW3oNDtks7WwfwdNLTIELc44uok0uXaC+3Hgd1
+         xgPTlrSEyIsHrIS9dszmSY2Rv4slODT/g1xlafm3syh9Ztgc+FcKbKt8SfQsetIsMmrL
+         S01w==
+X-Forwarded-Encrypted: i=1; AJvYcCVnF7wPujQ45NSTQR1QMyOzTajo2GUEuxEYr140S8ynYtSd22WsChu/wAq1SenhQiBD+dsFYYAeIS3lfmsN4HZ1o9wHrdIoCU47PDLz3Nf4
+X-Gm-Message-State: AOJu0YzHKB6EidNBIwtpGNSZX06lqZnaUSsGutQZwVLt5V6YGYVp5WP1
+	mPjWu2CpIcH7iZW+wVHA+mwjRDoLkd0Rixn2UIkgJyvAeKi8eeHS4bQ3bB5u8D0=
+X-Google-Smtp-Source: AGHT+IEG8i+8YqPGXE7NyAEe92XBUgHIuPaem/HnPBOUmFEDTzHhIh4tS8CKnTcfaMOX01XFtN6+Qg==
+X-Received: by 2002:a05:600c:138f:b0:41a:da4:319e with SMTP id u15-20020a05600c138f00b0041a0da4319emr1483014wmf.18.1714123009923;
+        Fri, 26 Apr 2024 02:16:49 -0700 (PDT)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id o3-20020a05600c4fc300b00418f7605249sm28153560wmq.24.2024.04.26.02.16.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Apr 2024 02:16:49 -0700 (PDT)
+Date: Fri, 26 Apr 2024 12:16:45 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Sungwoo Kim <iam@sung-woo.kim>
+Cc: daveti@purdue.edu, Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: L2CAP: Fix slab-use-after-free in
+ l2cap_send_cmd
+Message-ID: <cff764c2-a3d1-4a12-9260-54122e7a1fef@moroto.mountain>
+References: <20240426072006.358802-1-iam@sung-woo.kim>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240422152500.1.I8939e49084a6fef78496eb73edafdf3c2c4afbf4@changeid>
- <CABBYNZLCjrJUiVzNf53XYM-ZHWL6TZD4yFNtNGOuYi=6s5Q+OA@mail.gmail.com>
-In-Reply-To: <CABBYNZLCjrJUiVzNf53XYM-ZHWL6TZD4yFNtNGOuYi=6s5Q+OA@mail.gmail.com>
-From: Archie Pusaka <apusaka@google.com>
-Date: Fri, 26 Apr 2024 17:08:40 +0800
-Message-ID: <CAJQfnxHUW+MdJUp9VCrF2Nq_-JZrd7mKBR9NdDoo0SOvgH5WUQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: btusb: Add debugfs to force toggling remote wakeup
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
-	CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>, 
-	Archie Pusaka <apusaka@chromium.org>, Abhishek Pandit-Subedi <abhishekpandit@google.com>, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240426072006.358802-1-iam@sung-woo.kim>
 
-Hi Luiz,
+On Fri, Apr 26, 2024 at 03:20:05AM -0400, Sungwoo Kim wrote:
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 84fc70862..a8f414ab8 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -3953,6 +3953,9 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
+>  	if (!chan)
+>  		goto response;
+>  
+> +	l2cap_chan_hold(chan);
+> +	l2cap_chan_lock(chan);
+> +
+>  	/* For certain devices (ex: HID mouse), support for authentication,
+>  	 * pairing and bonding is optional. For such devices, inorder to avoid
+>  	 * the ACL alive for too long after L2CAP disconnection, reset the ACL
+> @@ -4041,6 +4044,11 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
+>  		chan->num_conf_req++;
+>  	}
+>  
+> +	if (chan) {
+> +		l2cap_chan_unlock(chan);
+> +		l2cap_chan_put(chan);
+> +	}
+> +
+>  	return chan;
+        ^^^^^^^^^^^^
+This doesn't fix the bug because we're returning chan.
 
-On Thu, 25 Apr 2024 at 03:05, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Archie,
->
-> On Mon, Apr 22, 2024 at 3:25=E2=80=AFAM Archie Pusaka <apusaka@google.com=
-> wrote:
-> >
-> > From: Archie Pusaka <apusaka@chromium.org>
-> >
-> > Sometimes we want the controller to not wake the host up, e.g. to
-> > save the battery. Add some debugfs knobs to force the wake by BT
-> > behavior.
-> >
-> > Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-> > Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@google.com>
-> >
-> > ---
-> >
-> >  drivers/bluetooth/btusb.c | 19 +++++++++++++++++++
-> >  1 file changed, 19 insertions(+)
-> >
-> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > index 8bede0a335668..846b15fc3c04c 100644
-> > --- a/drivers/bluetooth/btusb.c
-> > +++ b/drivers/bluetooth/btusb.c
-> > @@ -873,6 +873,9 @@ struct btusb_data {
-> >         unsigned cmd_timeout_cnt;
-> >
-> >         struct qca_dump_info qca_dump;
-> > +
-> > +       bool force_enable_remote_wake;
-> > +       bool force_disable_remote_wake;
-> >  };
-> >
-> >  static void btusb_reset(struct hci_dev *hdev)
-> > @@ -4596,6 +4599,10 @@ static int btusb_probe(struct usb_interface *int=
-f,
-> >
-> >         debugfs_create_file("force_poll_sync", 0644, hdev->debugfs, dat=
-a,
-> >                             &force_poll_sync_fops);
-> > +       debugfs_create_bool("force_enable_remote_wake", 0644, hdev->deb=
-ugfs,
-> > +                           &data->force_enable_remote_wake);
-> > +       debugfs_create_bool("force_disable_remote_wake", 0644, hdev->de=
-bugfs,
-> > +                           &data->force_disable_remote_wake);
-> >
-> >         return 0;
-> >
-> > @@ -4702,6 +4709,18 @@ static int btusb_suspend(struct usb_interface *i=
-ntf, pm_message_t message)
-> >                 }
-> >         }
-> >
-> > +       if (!PMSG_IS_AUTO(message)) {
-> > +               if (data->force_enable_remote_wake) {
-> > +                       data->udev->do_remote_wakeup =3D 1;
-> > +                       if (test_bit(BTUSB_WAKEUP_AUTOSUSPEND, &data->f=
-lags))
-> > +                               data->udev->reset_resume =3D 0;
-> > +               } else if (data->force_disable_remote_wake) {
-> > +                       data->udev->do_remote_wakeup =3D 0;
-> > +                       if (test_bit(BTUSB_WAKEUP_AUTOSUSPEND, &data->f=
-lags))
-> > +                               data->udev->reset_resume =3D 1;
-> > +               }
-> > +       }
-> > +
-> >         return 0;
-> >  }
-> >
-> > --
-> > 2.44.0.769.g3c40516874-goog
->
-> There is a D-Bus interface available to overwrite the wakeup setting:
->
-> https://github.com/bluez/bluez/blob/master/doc/org.bluez.Device.rst#boole=
-an-wakeallowed-readwrite
->
-> Or do you want a master switch for it? On the other hand aren't we
-> getting into the rfkill area if you really want to switch off radio
-> activity while suspended? That seems like a better idea then just
-> disable remote wakeup.
+As soon as you call l2cap_chan_put() then chan will be freed by in the
+other thread which is doing l2cap_conn_del() resulting in a use after
+free in the caller.
 
-Yes, the initial idea was a master switch.
-Thanks for your suggestions.
-Let me discuss it with Abhishek.
->
-> --
-> Luiz Augusto von Dentz
+regards,
+dan carpenter
 
-Thanks,
-Archie
