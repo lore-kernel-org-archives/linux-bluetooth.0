@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5EF7364A0;
-	Fri, 26 Apr 2024 22:29:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D04821101;
+	Fri, 26 Apr 2024 22:52:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714170540; cv=none; b=TnghySVUfe7BlOP8YQ9pEWdNVvUlpiQj7nBZYOE1JjybMPj7EW4teSWZfUnk2mSKT1Y5vhv78+eUVqSsYxvhlBUWStcXQJygSNuhuvUorVU2+nadprXW1tsJSYzhDoZD+21QZ/BijNP6espeB1YKDvPX3MyZ18QtjRP4AyZq7cM=
+	t=1714171970; cv=none; b=PYdAHyp+nFO/EoupNM9Tr7UWzHovnPLSQwX6ZJNpP/vs6FG686I9j3aPiF/MNPxeINXxvJ9dXPfWCW92nuGgfLWTx2Mb35ybnBLLUDRTSfHaBcYJHQ/MoOLfEFY2/ACSVaJb4yQHJnO8Niat5M5TrsBLbKrodSnLuOq77QgV/sU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714170540; c=relaxed/simple;
-	bh=ELJHySFUSowC2UOJqdXHpOw3chABBbzFVeQLrdq5PXg=;
+	s=arc-20240116; t=1714171970; c=relaxed/simple;
+	bh=GGKvZY/aR+pMIP6jcgcCcgx8wajd6k+Nq0JvOWeoq/A=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ESTurIC2NpCbgDkpR+n2mUwySBDgfbzfHcVGS1aieyurNY1pyi418Ncl4SV3sSnoEWku6UA4v1Y32gURpSE1G9oXRYQV5ZIOCYwGOhFPSxOTGYPlM8aTxGo8xohjbxP/liBOR3CsZsbpZlv6qJxVO7pdntRfxTVR8JHOb8dYOvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nC5mFa7Q; arc=none smtp.client-ip=10.30.226.201
+	 Content-Disposition; b=tZm6yY9+GpEhzq0FSIxTODenVI9Vm4abzKDlXHhmK+EYudKp4fuG8puFvkheiZWY/pJYB1lwHH16nc4M8/kSfvzfMVjf27VTj38gPkLIJlaxq9aGKGEFKEkG1V+n8e5AantGpRQ/2g8PY1g9GmFRLTafBbk8t2VMTVjyt80a3mI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YJDm2U99; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nC5mFa7Q"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BF19C32781;
-	Fri, 26 Apr 2024 22:28:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YJDm2U99"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CE99C113CD;
+	Fri, 26 Apr 2024 22:52:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714170540;
-	bh=ELJHySFUSowC2UOJqdXHpOw3chABBbzFVeQLrdq5PXg=;
+	s=k20201202; t=1714171969;
+	bh=GGKvZY/aR+pMIP6jcgcCcgx8wajd6k+Nq0JvOWeoq/A=;
 	h=Date:From:To:Cc:Subject:From;
-	b=nC5mFa7Q5ogHzSx3A4Ap/Z5255P+7ZS93HjWyIudIq5bb6xlgr9+EEHC3SNfiZjlp
-	 Jt5A1azu8HAv+yRBi1GVDVTAXJI+1XZCCZDkomrpU5hzkllXpWvsipQXCL7z1CA1wy
-	 5+gh8nq4LF5WI433zni9zKp0gHvooIZlwC7VXJv8QvF0k9s1QErDK2SSOqlPAMv+Rq
-	 UckxSsqeXZ7UtiU3+KZXMIZsoplfkrfww65/2R/suYSrb9Ty7xYK2OqUlvUqOs/Vhm
-	 LTFHGCx6TQi/ENLieFjYhKRlLM8Jlp9Ky5vhrfPh4XYtVhgNZmk3CEJcXJ+oHTC0c4
-	 GRm00MsUxJG0A==
-Date: Fri, 26 Apr 2024 16:28:57 -0600
+	b=YJDm2U9985ITJNTGGqD9z04mvBoKHm7XhoD9TMfQ1axuXVQe2yfyDLjgCLCeCNxAg
+	 kifRR3WzkdHd7olWi7Z7cq6Lb9ZKjlx3xWS8Ha7dR4GPNE+4JI+zn2f2wZD58acrLR
+	 dhbLXcwTExWFLNLXotRIy9epW87F9wRp/nl6Pe8va7yImlELjmhPne5F0MQgpBp7Dq
+	 11q0Zl3l9YVTimdHXFsuCqQDQNkvFDo8AaOHq9jIAP7dTqv0Z6ddWYGbLr7SATCli8
+	 apqF5E0ksjadwDcJAPG6xMUCDISuhHIx72Jthda+8dORes6NHpBtAIfGLJNl5KQ9Ft
+	 1QBgRtVpK774w==
+Date: Fri, 26 Apr 2024 16:52:46 -0600
 From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
@@ -38,9 +38,9 @@ Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
 	linux-hardening@vger.kernel.org
-Subject: [PATCH][next] Bluetooth: hci_sync, hci_event: Use __counted_by() in
- multiple structs and avoid -Wfamnae warnings
-Message-ID: <ZiwqqZCa7PK9bzCX@neat>
+Subject: [PATCH v2][next] Bluetooth: hci_conn, hci_sync: Use __counted_by()
+ in multiple structs and avoid -Wfamnae warnings
+Message-ID: <ZiwwPmCvU25YzWek@neat>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -71,15 +71,18 @@ accessed, falls in the interval [0, cp->num_cis), `cp->num_cis` cannot
 be decremented all the way down to zero while accessing `cp->cis[]`:
 
 net/bluetooth/hci_event.c:4310:
-4310	for (i = 0; cp->num_cis; cp->num_cis--, i++) {
-		...
-4314		handle = __le16_to_cpu(cp->cis[i].cis_handle);
+4310    for (i = 0; cp->num_cis; cp->num_cis--, i++) {
+                ...
+4314            handle = __le16_to_cpu(cp->cis[i].cis_handle);
 
 otherwise, only half (one iteration before `cp->num_cis == i`) or half
 plus one (one iteration before `cp->num_cis < i`) of the items in the
 array will be accessed before running into an out-of-bounds issue. So,
 in order to avoid this, set `cp->num_cis` to zero just after the for
 loop.
+
+Also, make use of `aux_num_cis` variable to update `cmd->num_cis` after
+a `list_for_each_entry_rcu()` loop.
 
 With these changes, fix the following warnings:
 net/bluetooth/hci_sync.c:1239:56: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
@@ -90,10 +93,16 @@ net/bluetooth/hci_sync.c:6497:45: warning: structure containing a flexible array
 Link: https://github.com/KSPP/linux/issues/202
 Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 ---
+Changes in v2:
+ - Update `cmd->num_cis` after `list_for_each_entry_rcu()` loop.
+
+v1:
+ - Link: https://lore.kernel.org/linux-hardening/ZiwqqZCa7PK9bzCX@neat/
+
  include/net/bluetooth/hci.h |  8 ++--
  net/bluetooth/hci_event.c   |  3 +-
- net/bluetooth/hci_sync.c    | 83 +++++++++++++++----------------------
- 3 files changed, 39 insertions(+), 55 deletions(-)
+ net/bluetooth/hci_sync.c    | 84 +++++++++++++++----------------------
+ 3 files changed, 40 insertions(+), 55 deletions(-)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
 index fe23e862921d..c4c6b8810701 100644
@@ -157,7 +166,7 @@ index 9a38e155537e..9a7ca084302e 100644
  	if (pending)
  		hci_le_create_cis_pending(hdev);
 diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 9092b4d59545..c9e602d7b246 100644
+index 9092b4d59545..6e15594d3565 100644
 --- a/net/bluetooth/hci_sync.c
 +++ b/net/bluetooth/hci_sync.c
 @@ -1235,31 +1235,27 @@ int hci_setup_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance)
@@ -326,19 +335,21 @@ index 9092b4d59545..c9e602d7b246 100644
  
  		if (hci_conn_check_create_cis(conn) ||
  		    conn->iso_qos.ucast.cig != cig)
-@@ -6573,9 +6557,9 @@ int hci_le_create_cis_sync(struct hci_dev *hdev)
+@@ -6573,25 +6557,25 @@ int hci_le_create_cis_sync(struct hci_dev *hdev)
  		set_bit(HCI_CONN_CREATE_CIS, &conn->flags);
  		cis->acl_handle = cpu_to_le16(conn->parent->handle);
  		cis->cis_handle = cpu_to_le16(conn->handle);
 -		cmd.cp.num_cis++;
-+		cmd->num_cis = ++aux_num_cis;
++		aux_num_cis++;
  
 -		if (cmd.cp.num_cis >= ARRAY_SIZE(cmd.cis))
-+		if (cmd->num_cis >= 0x1f)
++		if (aux_num_cis >= 0x1f)
  			break;
  	}
++	cmd->num_cis = aux_num_cis;
  
-@@ -6584,14 +6568,13 @@ int hci_le_create_cis_sync(struct hci_dev *hdev)
+ done:
+ 	rcu_read_unlock();
  
  	hci_dev_unlock(hdev);
  
