@@ -1,146 +1,214 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58C0C2B9AF;
-	Fri, 26 Apr 2024 16:45:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC6B515B15D
+	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Apr 2024 17:04:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714149921; cv=none; b=C4k2j9xUPAOr4NhhyCaQA+HfyPp8GM8sS3KaR9LLV7TXs5FshKMNm2+VDB1Iu+PTA6fSIhnXf87dlt/jmYB3kcKG5ibow1pyoJRcHdTojwSHJ1RTp872Ly+XatD2jsoa99uWiS9ENEcr8qZMSsrvtCBsrwPsx6raCl2Onqylhqg=
+	t=1714151057; cv=none; b=VvIm4uOgnKPttEV6MYSytJbYqTt6AnCybDRc9wLJHeqxXDJYMu0I3ycv+OHCx5kMFw4hEyH2aHLar/1Fm/NZ0fa5v1RWzX1uJm1xrSw0L4A8gDM06mnnjRIxOx+of1XYbbUZev0umcLDF4WYDArFC7XxZ95rV28k0g1vBF0p7Pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714149921; c=relaxed/simple;
-	bh=gPXudTVXPzAYk/IBuGVv5BUulrSGwKA4k/IvdqMV+jI=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=XcIns9jGwnwj++uSlzgq1tb3Cb7ZreTylcm/7c3a395M8KJOpOAdzNEhxUl4LIyOXBMwik5xsafh/pJvQ+DzHHhmfMJDmLe+x1FPZTvPPFrxaE0BJlRwYkt4XY5TvfZ5TfzZDY5piUsh5HO2vFotsTKuy7hvknUbqlJAvp/bMs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FT0QMFye; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1714151057; c=relaxed/simple;
+	bh=FJjXIczJaw2fI8RrGmhS8e8S0A1Jj3c6aMXGB/NNg+c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ofjyTRbYxBgd4cF545ttOA6NGXwlGd2GIIvB4HTdaBdU2EFaI7ThIhOBxm0QPn4US3PjUxii1oZtt6UitIgFpR8inC0egr52UWXZNj674IFSEhq6D+1lSBnAqOcccZ8G205O/drNAMmWnj3g0YQOTQON5MXKRoqiSCHYkTtEg3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=RZCu09z0; arc=none smtp.client-ip=209.85.161.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FT0QMFye"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D726AC113CD;
-	Fri, 26 Apr 2024 16:45:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714149921;
-	bh=gPXudTVXPzAYk/IBuGVv5BUulrSGwKA4k/IvdqMV+jI=;
-	h=Date:From:To:Cc:Subject:From;
-	b=FT0QMFyeSVc2Lx2CmRk7crSVNfJaB0pkKTvk5aoG+2MGabFQBQ5HqlIp6LG8pX/pV
-	 NmgQiygFd+jDSleYF6/O1OL+bfbUBxu3DsNubI1LEN5RaN/5u/KtTxMhosLM/VzxJP
-	 nxsk+KBjNop6Zenc6VqkwdEeZ3Wt8C80RH1l/ycne0OHmUMxy74B0MEJwzxPKMTfhk
-	 bdfZvWNdzoseDHsOAtrYU6v2VFZLTXV4ag9Z+Xgtol26uVtpTUI5IteVk5z3uhntaj
-	 7s6C4QJ8HedVi03aEmUPc9oNTUGeGx8OU1HnsionPFDfnJKqPiUF5bdRCje2+yfm77
-	 KtuxRii81zOtQ==
-Date: Fri, 26 Apr 2024 10:45:17 -0600
-From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	linux-hardening@vger.kernel.org
-Subject: [PATCH v2][next] Bluetooth: hci_conn: Use __counted_by() in struct
- hci_cp_le_big_create_sync and avoid -Wfamnae warning
-Message-ID: <ZivaHUQyDDK9fXEk@neat>
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="RZCu09z0"
+Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-5aa20adda1dso1545529eaf.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Apr 2024 10:04:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1714151055; x=1714755855; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=O73neaw7snadd4AQtFov3VpyQLi3ArC1cYm4eGifaug=;
+        b=RZCu09z0Pr95xc53EWSwLi7OhsgEpMbL0adykk2b7pZPCTbax6p0m90huwZtUY/mgH
+         uaqx/CNG/3uR7doMSkc7jPvioNqrQJIAQ7eUxQAuGYpm0Fr8qtg27F3w3Dx1SKMQGfDf
+         zulRdJhijtEJblCwJ7eT4iTfRp4Yypwlp9zJo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714151055; x=1714755855;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=O73neaw7snadd4AQtFov3VpyQLi3ArC1cYm4eGifaug=;
+        b=eNsrbqHOTjPwk9NvO0A0eiZ0YEasHtlsHd7gORBpbDxk/uOOT9Y7SjLvz57fapxzui
+         Gbtv227tiIu0xq332x0sZ+iPHs6OqoplEiDBPMWfu3VB3/xF3CKct/3sWdiMxVGluzqn
+         YGvjBTp8z9rtjzic0il7QdB+5m9jw6RpX2bMtILO4+pUG6g1ZCnmLjjs9sfuOwTl1NN5
+         sUc+4RoFUcrwhOHlxD2yTT0QcpUOdB1nsgXmX1PdASPQdBxbwJTaiIyEYavOeh1LND1i
+         olPQVOhXXOyUw0Ovh74R4xsVH+baB+axsc8UxFCVqBpz+Khm4KC2wMxrsxAbxEg/QIaH
+         6xuw==
+X-Forwarded-Encrypted: i=1; AJvYcCWrRXycsKSo/5D7v/wjUpUTZh/fH52EJIfCtr9FlDr12pgaAX7N1pkCejNUQPokjBDmA0pNr3IxXqYizpuBfsKQrfk3LBBMGE2r9ul4GiFF
+X-Gm-Message-State: AOJu0YySF6z5v28TPN1Q+UOoXPadUzDBiZjRO9ltUPR62yfbCohrUyDw
+	frPV0YVgBkjOLcwShIZLCtwKwEVbr2+uABlU+TFPerNdx/XOJd3YBE3nQ54t7OC4HvySCCwNSwc
+	eIBLb08784ySZENksaU4BXJNI3V9U5YDZdKXZ
+X-Google-Smtp-Source: AGHT+IGmZO33lhd0TFRW/gwmhL8E9MhvWFP+CEAyGcd/vM+I6/+F5+SQRa3XzoMo99SWkPpL0km9zlT/kylxrCwpaX4=
+X-Received: by 2002:a05:6358:438e:b0:17f:56be:8c95 with SMTP id
+ x14-20020a056358438e00b0017f56be8c95mr3840486rwc.25.1714151054780; Fri, 26
+ Apr 2024 10:04:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20240422152500.1.I8939e49084a6fef78496eb73edafdf3c2c4afbf4@changeid>
+ <CABBYNZLCjrJUiVzNf53XYM-ZHWL6TZD4yFNtNGOuYi=6s5Q+OA@mail.gmail.com> <CAJQfnxHUW+MdJUp9VCrF2Nq_-JZrd7mKBR9NdDoo0SOvgH5WUQ@mail.gmail.com>
+In-Reply-To: <CAJQfnxHUW+MdJUp9VCrF2Nq_-JZrd7mKBR9NdDoo0SOvgH5WUQ@mail.gmail.com>
+From: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Date: Fri, 26 Apr 2024 10:04:03 -0700
+Message-ID: <CANFp7mU2Chj_cZ_26kfM8TE1OToZzUeFKz61D7j-0ykMBQeG4A@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btusb: Add debugfs to force toggling remote wakeup
+To: Archie Pusaka <apusaka@google.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
+	CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>, 
+	Archie Pusaka <apusaka@chromium.org>, Abhishek Pandit-Subedi <abhishekpandit@google.com>, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Prepare for the coming implementation by GCC and Clang of the
-__counted_by attribute. Flexible array members annotated with
-__counted_by can have their accesses bounds-checked at run-time
-via CONFIG_UBSAN_BOUNDS (for array indexing) and CONFIG_FORTIFY_SOURCE
-(for strcpy/memcpy-family functions).
+On Fri, Apr 26, 2024 at 2:08=E2=80=AFAM 'Archie Pusaka' via ChromeOS Blueto=
+oth
+Upstreaming <chromeos-bluetooth-upstreaming@chromium.org> wrote:
+>
+> Hi Luiz,
+>
+> On Thu, 25 Apr 2024 at 03:05, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> >
+> > Hi Archie,
+> >
+> > On Mon, Apr 22, 2024 at 3:25=E2=80=AFAM Archie Pusaka <apusaka@google.c=
+om> wrote:
+> > >
+> > > From: Archie Pusaka <apusaka@chromium.org>
+> > >
+> > > Sometimes we want the controller to not wake the host up, e.g. to
+> > > save the battery. Add some debugfs knobs to force the wake by BT
+> > > behavior.
+> > >
+> > > Signed-off-by: Archie Pusaka <apusaka@chromium.org>
+> > > Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@google.com>
+> > >
+> > > ---
+> > >
+> > >  drivers/bluetooth/btusb.c | 19 +++++++++++++++++++
+> > >  1 file changed, 19 insertions(+)
+> > >
+> > > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > > index 8bede0a335668..846b15fc3c04c 100644
+> > > --- a/drivers/bluetooth/btusb.c
+> > > +++ b/drivers/bluetooth/btusb.c
+> > > @@ -873,6 +873,9 @@ struct btusb_data {
+> > >         unsigned cmd_timeout_cnt;
+> > >
+> > >         struct qca_dump_info qca_dump;
+> > > +
+> > > +       bool force_enable_remote_wake;
+> > > +       bool force_disable_remote_wake;
+> > >  };
+> > >
+> > >  static void btusb_reset(struct hci_dev *hdev)
+> > > @@ -4596,6 +4599,10 @@ static int btusb_probe(struct usb_interface *i=
+ntf,
+> > >
+> > >         debugfs_create_file("force_poll_sync", 0644, hdev->debugfs, d=
+ata,
+> > >                             &force_poll_sync_fops);
+> > > +       debugfs_create_bool("force_enable_remote_wake", 0644, hdev->d=
+ebugfs,
+> > > +                           &data->force_enable_remote_wake);
+> > > +       debugfs_create_bool("force_disable_remote_wake", 0644, hdev->=
+debugfs,
+> > > +                           &data->force_disable_remote_wake);
+> > >
+> > >         return 0;
+> > >
+> > > @@ -4702,6 +4709,18 @@ static int btusb_suspend(struct usb_interface =
+*intf, pm_message_t message)
+> > >                 }
+> > >         }
+> > >
+> > > +       if (!PMSG_IS_AUTO(message)) {
+> > > +               if (data->force_enable_remote_wake) {
+> > > +                       data->udev->do_remote_wakeup =3D 1;
+> > > +                       if (test_bit(BTUSB_WAKEUP_AUTOSUSPEND, &data-=
+>flags))
+> > > +                               data->udev->reset_resume =3D 0;
+> > > +               } else if (data->force_disable_remote_wake) {
+> > > +                       data->udev->do_remote_wakeup =3D 0;
+> > > +                       if (test_bit(BTUSB_WAKEUP_AUTOSUSPEND, &data-=
+>flags))
+> > > +                               data->udev->reset_resume =3D 1;
+> > > +               }
+> > > +       }
+> > > +
+> > >         return 0;
+> > >  }
+> > >
+> > > --
+> > > 2.44.0.769.g3c40516874-goog
+> >
+> > There is a D-Bus interface available to overwrite the wakeup setting:
+> >
+> > https://github.com/bluez/bluez/blob/master/doc/org.bluez.Device.rst#boo=
+lean-wakeallowed-readwrite
+> >
+> > Or do you want a master switch for it? On the other hand aren't we
+> > getting into the rfkill area if you really want to switch off radio
+> > activity while suspended? That seems like a better idea then just
+> > disable remote wakeup.
 
-Also, -Wflex-array-member-not-at-end is coming in GCC-14, and we are
-getting ready to enable it globally.
+This DBUS api is different from the quirk this is introducing.
 
-So, use the `DEFINE_FLEX()` helper for an on-stack definition of
-a flexible structure where the size of the flexible-array member
-is known at compile-time, and refactor the rest of the code,
-accordingly.
+The `Wake Allowed` field in D-bus controls whether we add the address
+to the Classic Event Filter (HIDP) or LE Filter Accept List (HOGP) but
+not whether we allow wake at the transport level (which is why
+hdev->wakeup exists).
 
-With these changes, fix the following warning:
-net/bluetooth/hci_conn.c:2116:50: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+This change specifically addresses a quirk with Realtek chipsets:
+RTL8822/RTL8852 will do "global shutdown" and power off Bluetooth if
+USB Remote Wake bit is not set. The USB remote_wake bit is normally
+set by the USB stack based on whether device_may_wakeup(udev) =3D=3D true.
+This means that RTL88x2 will lose power around suspend/resume if there
+are no wake capable devices connected.
 
-Link: https://github.com/KSPP/linux/issues/202
-Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
----
-Changes in v2:
- - Use `sizeof(*pdu) + num_bis` instead of `__struct_size(pdu)`
+ChromeOS decided to use idle power and resume-time to determine
+whether to allow remote wake or not for these chipsets and we want to
+move this control to userspace so that we don't have to hold CHROMIUM
+patches in the kernel applying this policy (we want udev rules
+instead). RTL8852 gets force enabled remote wake because the
+RESET_RESUME behavior of this chip would otherwise increase our resume
+time >1s which breaks one of our platform requirements.
 
-v1:
- - Link: https://lore.kernel.org/linux-hardening/ZivYcpzZsc7aIFZ5@neat/
+The end-goal of these changes:
+* We detect RTL8822 or RTL8852 with udev and apply the right policy.
+* RTL8822 gets force_disable_remote_wake (idle power consumption too
+high otherwise)
+* RTL8852 gets force_enable_remote_wake (resume time too long otherwise)
 
- include/net/bluetooth/hci.h |  2 +-
- net/bluetooth/hci_conn.c    | 26 +++++++++++---------------
- 2 files changed, 12 insertions(+), 16 deletions(-)
+Hope this provides enough context for why this change is necessary.
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 5c12761cbc0e..fe23e862921d 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -2216,7 +2216,7 @@ struct hci_cp_le_big_create_sync {
- 	__u8    mse;
- 	__le16  timeout;
- 	__u8    num_bis;
--	__u8    bis[];
-+	__u8    bis[] __counted_by(num_bis);
- } __packed;
- 
- #define HCI_OP_LE_BIG_TERM_SYNC			0x206c
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 81166a5bc034..d6daf55f0307 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -2112,13 +2112,10 @@ int hci_le_big_create_sync(struct hci_dev *hdev, struct hci_conn *hcon,
- 			   struct bt_iso_qos *qos,
- 			   __u16 sync_handle, __u8 num_bis, __u8 bis[])
- {
--	struct _packed {
--		struct hci_cp_le_big_create_sync cp;
--		__u8  bis[0x11];
--	} pdu;
-+	DEFINE_FLEX(struct hci_cp_le_big_create_sync, pdu, bis, num_bis, 0x11);
- 	int err;
- 
--	if (num_bis < 0x01 || num_bis > sizeof(pdu.bis))
-+	if (num_bis < 0x01 || num_bis > pdu->num_bis)
- 		return -EINVAL;
- 
- 	err = qos_set_big(hdev, qos);
-@@ -2128,18 +2125,17 @@ int hci_le_big_create_sync(struct hci_dev *hdev, struct hci_conn *hcon,
- 	if (hcon)
- 		hcon->iso_qos.bcast.big = qos->bcast.big;
- 
--	memset(&pdu, 0, sizeof(pdu));
--	pdu.cp.handle = qos->bcast.big;
--	pdu.cp.sync_handle = cpu_to_le16(sync_handle);
--	pdu.cp.encryption = qos->bcast.encryption;
--	memcpy(pdu.cp.bcode, qos->bcast.bcode, sizeof(pdu.cp.bcode));
--	pdu.cp.mse = qos->bcast.mse;
--	pdu.cp.timeout = cpu_to_le16(qos->bcast.timeout);
--	pdu.cp.num_bis = num_bis;
--	memcpy(pdu.bis, bis, num_bis);
-+	pdu->handle = qos->bcast.big;
-+	pdu->sync_handle = cpu_to_le16(sync_handle);
-+	pdu->encryption = qos->bcast.encryption;
-+	memcpy(pdu->bcode, qos->bcast.bcode, sizeof(pdu->bcode));
-+	pdu->mse = qos->bcast.mse;
-+	pdu->timeout = cpu_to_le16(qos->bcast.timeout);
-+	pdu->num_bis = num_bis;
-+	memcpy(pdu->bis, bis, num_bis);
- 
- 	return hci_send_cmd(hdev, HCI_OP_LE_BIG_CREATE_SYNC,
--			    sizeof(pdu.cp) + num_bis, &pdu);
-+			    sizeof(*pdu) + num_bis, pdu);
- }
- 
- static void create_big_complete(struct hci_dev *hdev, void *data, int err)
--- 
-2.34.1
-
+>
+> Yes, the initial idea was a master switch.
+> Thanks for your suggestions.
+> Let me discuss it with Abhishek.
+> >
+> > --
+> > Luiz Augusto von Dentz
+>
+> Thanks,
+> Archie
+>
+> --
+> You received this message because you are subscribed to the Google Groups=
+ "ChromeOS Bluetooth Upstreaming" group.
+> To unsubscribe from this group and stop receiving emails from it, send an=
+ email to chromeos-bluetooth-upstreaming+unsubscribe@chromium.org.
+> To post to this group, send email to chromeos-bluetooth-upstreaming@chrom=
+ium.org.
+> To view this discussion on the web visit https://groups.google.com/a/chro=
+mium.org/d/msgid/chromeos-bluetooth-upstreaming/CAJQfnxHUW%2BMdJUp9VCrF2Nq_=
+-JZrd7mKBR9NdDoo0SOvgH5WUQ%40mail.gmail.com.
