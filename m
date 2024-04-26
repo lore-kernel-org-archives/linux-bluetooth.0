@@ -1,336 +1,211 @@
-Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D161F146D5A
-	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Apr 2024 13:23:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E59401482FC
+	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Apr 2024 13:39:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714137832; cv=none; b=XaCskO7UtUby16lnvar/xZuB8ogK+6bsidT6AQwlWhcPIzLclDDqTCCnX2njtmJffZuGdmjURWUziwvHWf3o+RHXWd91bp+cICyYLJkTJndHOmLlNYDOgX5y2oTzgnMdWIv6/0quu8UieBEeJnVab1BT6dYRlGoQzyyY82VYpxk=
+	t=1714138772; cv=none; b=OAshoQn0iwAvS91cNUWVKjKfLzhflHXY4tjpeZN1NgMqb3O6G6M63DDoslXSq10GEf+JA9dUOeGaqINBoNlZeEis07stWRnFGXW5LZivSCoG0FA1/zaPXPA9N/91fUHGIiyIVWpcI5TwW1SVZYlH7u5xxSJtKMkCwDwgucNxdW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714137832; c=relaxed/simple;
-	bh=JCEMbbhrBwxO38ivJV2Hu+xMSiT1Kw4gBXX683tGnCU=;
-	h=From:To:Subject:Date:Message-Id:MIME-Version:Content-Type; b=d9RM2BQ9b5aaMZW1AOzGPyD1L4ben5cyz05+iVCeKrda4sBfmQ7b+Km94CvaB7JutfgNXmognOFalAnplPReUb9aqEho/kihQBD5EjYnsLd7piIxMpmy+vSPPHDO/eMLHRH6wlU2CEqV833HN8/qnppvRks/mcV1Alacjtrw9+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=llrEkyHh; arc=none smtp.client-ip=46.235.227.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="llrEkyHh"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1714137828;
-	bh=JCEMbbhrBwxO38ivJV2Hu+xMSiT1Kw4gBXX683tGnCU=;
-	h=From:To:Subject:Date:From;
-	b=llrEkyHhAWnNfLfC2Jp5aEJMcyqveY2AJ+ATc8UV8Xn4EqviNrzDfNkSzyz/QZYYK
-	 GCxePH/LjzS66SWeFMq6J/3OC922fiNiqTUVDGwFSa4mh9XY8x9P4cDLQ8Erx04tgZ
-	 lNhH7ZqVmY8MCgxprWhvc46i6REs1qMeBuOOPKUEYHdskgaoS+TrrBHmlhcm5NyE2w
-	 izluJ+lWza6UP+mjl7iqAQUikZj/H9fC6wUQjTlWkgHpSpFoNOgDU1reFLoN4z6MUP
-	 wOqUUO1dkwCsfUx59YUhYSQY0d71vNZDoUFXJzTjKVWe/YEVv4VXIAI2TGYpgtnYNw
-	 XjaBgHHD6L4Qg==
-Received: from fdanis-XPS-13-9370.. (cola.collaboradmins.com [195.201.22.229])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by madrid.collaboradmins.com (Postfix) with ESMTPSA id DA5A137813A4
-	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Apr 2024 13:23:47 +0000 (UTC)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC PATCH BlueZ] plugins: Add new plugin to manage wake policy
-Date: Fri, 26 Apr 2024 15:23:42 +0200
-Message-Id: <20240426132342.732682-1-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1714138772; c=relaxed/simple;
+	bh=xQG636t56irLd7QlrLgCELtUTnbIs3dPNnISC3eJ3Ak=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Tv9Y1sEMv05fqkC9KHvTpEFCb9G/Bbnmo0PsCZA0eG7KoT6Co3ghd/nO/RgcYFICNxRbD800RHGY2mzqPnWKZJ65OyUA/imC7GOlJcOb/E9SDcAEtUBahhyPxQuRWXHTWJZP8HxymOyttTGU1mUescmwrYxTcUH55Dk3+vI20p8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7d9d0936d6aso227529939f.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Apr 2024 06:39:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714138770; x=1714743570;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pYcuiD61Y2aUE9kLnvAupz925R4UqfASkhNIIITFwDs=;
+        b=gWuSXQhDb+lBO0Aej8YH4sfiGbfaTaWp3d55kmHKBYIlNx/f+uKfW+8I+7zmxHl+lm
+         FVZNj8JA4lgqIDUvjqSAH7q7fbPhN2TxDQlRtXZ6C0bR9E5IP7CiPt4tALtULJUq3gOj
+         aWma+hOHC7tx8V07/0eIxGZ8mm+ZZyRpLSAVg0FVQGS/WspAYLAxv8QWG3dwIYbNNcIN
+         q6fpdE+J3Ons0HGz+GMsfe+w+nyNc7UBi+hrNZ9rGbJdEh+WZeBhRfAJ7VidQ+QXdhfR
+         0gZM91RErYI3uUxJf4AuK7z/a0ppFX7dVy6ra+x3roufPHypP200CGadefglqUS3O2Ry
+         cBRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUeRsQwYfmDsG2OEi56gLEXd4AGXlgRKe6KpTf3P2hQkFQREKacA43BY0ufT2EpFjNBYHN3Rsv95w0hQrsqbeQqRZYVNkXAHe/pf0hIA7Kj
+X-Gm-Message-State: AOJu0YyAaEkppsmcKrADtcAmqg8mmB0zqMNY1wlr6Av1cb490ZSfsq/5
+	nvZQDm7TGUAAyR3iDBDpA/OnUBXazLLlCSEObUXJL56VCV90iOXDiRypcmVKA5/LgZBLiqAUh56
+	NdhgDJciCVp6V3p4uTzJJrbSR7Z1+Gb4YV46sUQfZQXxoqEw+2q21zVQ=
+X-Google-Smtp-Source: AGHT+IGC31garpHytpUAe7Z5+B6Ida6v6OoSp44YzCuqm7uwAQmpSOG8I+yAFDZOJkOZCIZvJFae6y50NUBmKQeNgpBf90JZA9pe
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6638:948b:b0:487:3dc3:c47f with SMTP id
+ kz11-20020a056638948b00b004873dc3c47fmr146705jab.6.1714138770206; Fri, 26 Apr
+ 2024 06:39:30 -0700 (PDT)
+Date: Fri, 26 Apr 2024 06:39:30 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000007e812306170008d1@google.com>
+Subject: [syzbot] [bluetooth?] possible deadlock in hci_dev_do_close (2)
+From: syzbot <syzbot+c55f7bc8d4809b2bad59@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-By default all class of devices providing the correct service (HID, HoG)
-are allowed to wake up the host.
-This plugin allows to choose which class of devices are allowed or not to
-do it.
+Hello,
 
-E.g. only the Peripheral class, or more specifically the Peripheral
-Joystick and Gamepad devices, could be allowed but not the other type of
-devices like e.g. the headsets.
-For the first case, all Major classes in /etc/bluetooth/wake-policy.conf
-except Peripheral should be uncommented and set to 'false', while for the
-second case Peripheral should also be uncommented and set to '01;02'.
+syzbot found the following issue on:
+
+HEAD commit:    bb7a2467e6be Add linux-next specific files for 20240426
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=1337aaa0980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=5c6a0288262dd108
+dashboard link: https://syzkaller.appspot.com/bug?extid=c55f7bc8d4809b2bad59
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/5175af7dda64/disk-bb7a2467.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/70db0462e868/vmlinux-bb7a2467.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/3217fb825698/bzImage-bb7a2467.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+c55f7bc8d4809b2bad59@syzkaller.appspotmail.com
+
+Bluetooth: hci6: Opcode 0x0c1a failed: -110
+Bluetooth: hci6: Error when powering off device on rfkill (-110)
+======================================================
+WARNING: possible circular locking dependency detected
+6.9.0-rc5-next-20240426-syzkaller #0 Not tainted
+------------------------------------------------------
+kworker/0:3/5122 is trying to acquire lock:
+ffff88805c0888d0 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: rcu_lock_acquire include/linux/rcupdate.h:329 [inline]
+ffff88805c0888d0 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
+ffff88805c0888d0 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: start_flush_work kernel/workqueue.c:4113 [inline]
+ffff88805c0888d0 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: __flush_work+0xe6/0xd00 kernel/workqueue.c:4172
+
+but task is already holding lock:
+ffff88805c089060 (&hdev->req_lock){+.+.}-{3:3}, at: hci_dev_do_close+0x28/0x90 net/bluetooth/hci_core.c:559
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #1 (&hdev->req_lock){+.+.}-{3:3}:
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
+       __mutex_lock_common kernel/locking/mutex.c:608 [inline]
+       __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
+       hci_cmd_sync_work+0x1ec/0x400 net/bluetooth/hci_sync.c:309
+       process_one_work kernel/workqueue.c:3222 [inline]
+       process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3303
+       worker_thread+0x86d/0xd70 kernel/workqueue.c:3384
+       kthread+0x2f0/0x390 kernel/kthread.c:389
+       ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+-> #0 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}:
+       check_prev_add kernel/locking/lockdep.c:3134 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3253 [inline]
+       validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
+       __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
+       touch_work_lockdep_map kernel/workqueue.c:3885 [inline]
+       start_flush_work kernel/workqueue.c:4139 [inline]
+       __flush_work+0x73c/0xd00 kernel/workqueue.c:4172
+       __cancel_work_sync+0xbc/0x110 kernel/workqueue.c:4322
+       hci_cmd_sync_clear+0x30/0x220 net/bluetooth/hci_sync.c:588
+       hci_dev_close_sync+0xbae/0x1060 net/bluetooth/hci_sync.c:5188
+       hci_dev_do_close+0x30/0x90 net/bluetooth/hci_core.c:561
+       hci_rfkill_set_block+0x232/0x300 net/bluetooth/hci_core.c:992
+       rfkill_set_block+0x1f1/0x440 net/rfkill/core.c:346
+       rfkill_epo+0x84/0x180 net/rfkill/core.c:466
+       __rfkill_handle_global_op net/rfkill/input.c:60 [inline]
+       rfkill_op_handler+0x121/0x280 net/rfkill/input.c:108
+       process_one_work kernel/workqueue.c:3222 [inline]
+       process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3303
+       worker_thread+0x86d/0xd70 kernel/workqueue.c:3384
+       kthread+0x2f0/0x390 kernel/kthread.c:389
+       ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+other info that might help us debug this:
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&hdev->req_lock);
+                               lock((work_completion)(&hdev->cmd_sync_work));
+                               lock(&hdev->req_lock);
+  lock((work_completion)(&hdev->cmd_sync_work));
+
+ *** DEADLOCK ***
+
+5 locks held by kworker/0:3/5122:
+ #0: ffff888015080948 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3197 [inline]
+ #0: ffff888015080948 ((wq_completion)events){+.+.}-{0:0}, at: process_scheduled_works+0x90a/0x1830 kernel/workqueue.c:3303
+ #1: ffffc9000387fd00 ((rfkill_op_work).work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3198 [inline]
+ #1: ffffc9000387fd00 ((rfkill_op_work).work){+.+.}-{0:0}, at: process_scheduled_works+0x945/0x1830 kernel/workqueue.c:3303
+ #2: ffffffff8f8b13e8 (rfkill_global_mutex){+.+.}-{3:3}, at: rfkill_epo+0x4f/0x180 net/rfkill/core.c:462
+ #3: ffff88805c089060 (&hdev->req_lock){+.+.}-{3:3}, at: hci_dev_do_close+0x28/0x90 net/bluetooth/hci_core.c:559
+ #4: ffffffff8e333ba0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:329 [inline]
+ #4: ffffffff8e333ba0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
+ #4: ffffffff8e333ba0 (rcu_read_lock){....}-{1:2}, at: start_flush_work kernel/workqueue.c:4113 [inline]
+ #4: ffffffff8e333ba0 (rcu_read_lock){....}-{1:2}, at: __flush_work+0xe6/0xd00 kernel/workqueue.c:4172
+
+stack backtrace:
+CPU: 0 PID: 5122 Comm: kworker/0:3 Not tainted 6.9.0-rc5-next-20240426-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+Workqueue: events rfkill_op_handler
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
+ check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2187
+ check_prev_add kernel/locking/lockdep.c:3134 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3253 [inline]
+ validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
+ __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
+ lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
+ touch_work_lockdep_map kernel/workqueue.c:3885 [inline]
+ start_flush_work kernel/workqueue.c:4139 [inline]
+ __flush_work+0x73c/0xd00 kernel/workqueue.c:4172
+ __cancel_work_sync+0xbc/0x110 kernel/workqueue.c:4322
+ hci_cmd_sync_clear+0x30/0x220 net/bluetooth/hci_sync.c:588
+ hci_dev_close_sync+0xbae/0x1060 net/bluetooth/hci_sync.c:5188
+ hci_dev_do_close+0x30/0x90 net/bluetooth/hci_core.c:561
+ hci_rfkill_set_block+0x232/0x300 net/bluetooth/hci_core.c:992
+ rfkill_set_block+0x1f1/0x440 net/rfkill/core.c:346
+ rfkill_epo+0x84/0x180 net/rfkill/core.c:466
+ __rfkill_handle_global_op net/rfkill/input.c:60 [inline]
+ rfkill_op_handler+0x121/0x280 net/rfkill/input.c:108
+ process_one_work kernel/workqueue.c:3222 [inline]
+ process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3303
+ worker_thread+0x86d/0xd70 kernel/workqueue.c:3384
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+
+
 ---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-I send this as an RFC as I'm not sure creating a wake policy plugin is the
-correct way to get it merged upstream.
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-Could it be better to move the device_set_wake_support() call from
-profiles/input/{device,hog}.c files to src/device.c:device_svc_resolved()
-which could perform Service and Class of Device checks?
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-Any advice much appreciated.
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
- Makefile.plugins         |   4 +
- plugins/wake-policy.c    | 180 +++++++++++++++++++++++++++++++++++++++
- plugins/wake-policy.conf |  21 +++++
- src/device.c             |   2 +-
- src/device.h             |   1 +
- 5 files changed, 207 insertions(+), 1 deletion(-)
- create mode 100644 plugins/wake-policy.c
- create mode 100644 plugins/wake-policy.conf
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
-diff --git a/Makefile.plugins b/Makefile.plugins
-index 4aa2c9c92..fbd4e4155 100644
---- a/Makefile.plugins
-+++ b/Makefile.plugins
-@@ -11,6 +11,10 @@ builtin_sources += plugins/autopair.c
- builtin_modules += policy
- builtin_sources += plugins/policy.c
- 
-+builtin_modules += wake_policy
-+builtin_sources += plugins/wake-policy.c
-+EXTRA_DIST += plugins/wake-policy.conf
-+
- if ADMIN
- builtin_modules += admin
- builtin_sources += plugins/admin.c
-diff --git a/plugins/wake-policy.c b/plugins/wake-policy.c
-new file mode 100644
-index 000000000..34e77c615
---- /dev/null
-+++ b/plugins/wake-policy.c
-@@ -0,0 +1,180 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2024 Frédéric Danis <frederic.danis@collabora.com>
-+ *
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdbool.h>
-+
-+#include <glib.h>
-+
-+#include "bluetooth/bluetooth.h"
-+
-+#include "src/plugin.h"
-+#include "src/adapter.h"
-+#include "src/device.h"
-+#include "src/log.h"
-+#include "src/textfile.h"
-+
-+static GKeyFile * key_file;
-+
-+static gboolean is_allowed_to_wake(const char *major, guint minor)
-+{
-+	guint *minor_list;
-+	gsize length;
-+	gboolean allowed = false;
-+	GError *gerr = NULL;
-+
-+	if (!g_key_file_has_key(key_file, "WakeAllowed", major, NULL))
-+		return true;
-+
-+	allowed = g_key_file_get_boolean(key_file, "WakeAllowed", major, &gerr);
-+	if (!gerr)
-+		return allowed;
-+
-+	g_error_free(gerr);
-+	gerr = NULL;
-+
-+	minor_list = (guint *)g_key_file_get_integer_list(key_file,
-+						"WakeAllowed",
-+						major, &length, &gerr);
-+	if (gerr) {
-+		DBG("Failed to get allowed minor list for %s", major);
-+		return false;
-+	}
-+
-+	for (gsize i = 0; i < length; i++) {
-+		if (minor_list[i] == minor) {
-+			allowed = true;
-+			break;
-+		}
-+	}
-+
-+	return allowed;
-+}
-+
-+static const struct {
-+	uint8_t val;
-+	const char *str;
-+} major_class_table[] = {
-+	{ 0x00, "Miscellaneous"	},
-+	{ 0x01, "Computer"	},
-+	{ 0x02, "Phone"		},
-+	{ 0x03, "LAN/Network"	},
-+	{ 0x04, "Audio/Video"	},
-+	{ 0x05, "Peripheral"	},
-+	{ 0x06, "Imaging"	},
-+	{ 0x07, "Wearable"	},
-+	{ 0x08, "Toy"		},
-+	{ 0x09, "Health"	},
-+	{ 0x1f, "Uncategorized"	},
-+	{ }
-+};
-+
-+static gboolean is_class_allowed_to_wake(uint32_t class)
-+{
-+	uint8_t major = (class & 0x1f00) >> 8;
-+	uint8_t minor = (class & 0x00fc) >> 2;
-+
-+	if ((major >= 0x01 && major <= 0x09) || major == 0x1f)
-+		return is_allowed_to_wake(major_class_table[major].str, minor);
-+
-+	return true;
-+}
-+
-+static void wake_policy_device_resolved(struct btd_adapter *adapter,
-+				     struct btd_device *device)
-+{
-+	char *filename;
-+	GKeyFile *device_key_file;
-+	GError *gerr = NULL;
-+
-+	if (key_file == NULL)
-+		return;
-+
-+	// Does device support to wake the host?
-+	if (!device_get_wake_support(device))
-+		return;
-+
-+	// Check if WakeAllowed has already been stored,
-+	// if yes do not change it
-+	filename = btd_device_get_storage_path(device, "info");
-+	device_key_file = g_key_file_new();
-+	if (!g_key_file_load_from_file(device_key_file, filename, 0, &gerr)) {
-+		error("Unable to load key file from %s: (%s)", filename,
-+							gerr->message);
-+		g_clear_error(&gerr);
-+	} else {
-+		if (g_key_file_has_key(device_key_file, "General",
-+					"WakeAllowed", NULL)) {
-+			DBG("%s WakeAllowed already stored",
-+				device_get_path(device));
-+			return;
-+		}
-+	}
-+	g_key_file_free(device_key_file);
-+	g_free(filename);
-+
-+	// Check if Class of Device is allowed to wake up the host
-+	if (!is_class_allowed_to_wake(btd_device_get_class(device))) {
-+		DBG("%s Force WakeAllowed to false", device_get_path(device));
-+		device_set_wake_override(device, false);
-+		device_set_wake_allowed(device, false, -1U);
-+	}
-+}
-+
-+static int wake_policy_probe(struct btd_adapter *adapter)
-+{
-+	GError *gerr = NULL;
-+
-+	DBG("");
-+	key_file = g_key_file_new();
-+	if (!g_key_file_load_from_file(key_file,
-+					CONFIGDIR "/wake-policy.conf",
-+					0,
-+					&gerr)) {
-+		error("Unable to load key file from %s: (%s)",
-+			CONFIGDIR "/wake-policy.conf",
-+			gerr->message);
-+		g_clear_error(&gerr);
-+		g_key_file_free(key_file);
-+		key_file = NULL;
-+	}
-+
-+	return 0;
-+}
-+
-+static void wake_policy_remove(struct btd_adapter *adapter)
-+{
-+	DBG("");
-+	if (key_file)
-+		g_key_file_free(key_file);
-+}
-+
-+static struct btd_adapter_driver wake_policy_driver = {
-+	.name	= "wake-policy",
-+	.probe	= wake_policy_probe,
-+	.remove	= wake_policy_remove,
-+	.device_resolved = wake_policy_device_resolved,
-+};
-+
-+static int wake_policy_init(void)
-+{
-+	return btd_register_adapter_driver(&wake_policy_driver);
-+}
-+
-+static void wake_policy_exit(void)
-+{
-+	btd_unregister_adapter_driver(&wake_policy_driver);
-+}
-+
-+BLUETOOTH_PLUGIN_DEFINE(wake_policy, VERSION, BLUETOOTH_PLUGIN_PRIORITY_LOW,
-+			wake_policy_init, wake_policy_exit)
-diff --git a/plugins/wake-policy.conf b/plugins/wake-policy.conf
-new file mode 100644
-index 000000000..e6220bad1
---- /dev/null
-+++ b/plugins/wake-policy.conf
-@@ -0,0 +1,21 @@
-+[WakeAllowed]
-+# By default each Class of Devices providing the correct service (HID, HoG) is
-+# allowed to wake up the host.
-+# The following values are used to control the default WakeAllowed value based
-+# on the Class of Device.
-+# It is still possible for the user to override the WakeAllowed value per
-+# device afterwards.
-+#
-+# Possible values for each Major Class:
-+# true,false,<Minor Class allowed list (integer separated by ;)>
-+
-+#Computer=true
-+#Phone=true
-+#LAN/Network=true
-+#Audio/Video=true
-+#Peripheral=true
-+#Imaging=true
-+#Wearable=true
-+#Toy=true
-+#Health=true
-+#Uncategorized=true
-diff --git a/src/device.c b/src/device.c
-index 1d4b8ab36..d970745f5 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1500,7 +1500,7 @@ dev_property_advertising_data_exist(const GDBusPropertyTable *property,
- 	return bt_ad_has_data(device->ad, NULL);
- }
- 
--static bool device_get_wake_support(struct btd_device *device)
-+bool device_get_wake_support(struct btd_device *device)
- {
- 	return device->wake_support;
- }
-diff --git a/src/device.h b/src/device.h
-index 5722ca9ca..f8c744baf 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -149,6 +149,7 @@ void device_set_wake_support(struct btd_device *device, bool wake_support);
- void device_set_wake_override(struct btd_device *device, bool wake_override);
- void device_set_wake_allowed(struct btd_device *device, bool wake_allowed,
- 			     guint32 id);
-+bool device_get_wake_support(struct btd_device *device);
- void device_set_refresh_discovery(struct btd_device *dev, bool refresh);
- 
- typedef void (*disconnect_watch) (struct btd_device *device, gboolean removal,
--- 
-2.34.1
-
+If you want to undo deduplication, reply with:
+#syz undup
