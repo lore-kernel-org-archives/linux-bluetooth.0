@@ -1,170 +1,451 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7A19149C5E;
-	Fri, 26 Apr 2024 16:00:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D635014AD3D
+	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Apr 2024 16:05:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714147230; cv=none; b=hdgvbJWuza/qF3bT9r62Jxyhf9MApCDShcmqDdS+UHm9VPDxUjliyBBmdyyyH+RS24w8wNB5XEZ/JW0Jbk/NDjLk881j6XLqM9KquBLHTciMzN3iZ6QDtMIIGs5fUgPPQcxt8RMZSM/iFe306nQBzwhobaePF8NWHpy1Kf7ZyQ0=
+	t=1714147517; cv=none; b=HeVn9o19YOqNz4OQwbwZQwijaVvoM3ATfyq9RG53fJJ3zYhAYUyx0/kpzlvLlkJBenfb/wffkrEdawsqmf7iMstqQFLNaNrdWprJiHHYH2QgjJWsXbUojA60bXgMMw+y5LJgNr+z5CekCN9ZMLhwWCG72bJ9IwSRBru/5HVOTLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714147230; c=relaxed/simple;
-	bh=uK9h4I1j7rfKSkPKuWAlFuwzANHYKX0M1bFIxX+3AkE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cDM4TOKis2YWIYJSiVYNP0SaupY5g0fDS6HuvJG02I9RYawCdvQx/lbaIsaZgrbaBvqEF/onzxthTLx2NMGa+Q/IPzPilX0jCZ6qsdBDI3WHIuFg1ipMF9sTnfQUmAz6vVFjqMQjDfoUDUXEu2oDrl1kQIH7yMSkbSnp/aR6cx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f6eLPFEi; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1714147517; c=relaxed/simple;
+	bh=dh1yXB5hpfakVn40WVioNc0BtrcX/GFvVeoqPlxYtn8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=J3iiiuPMx3mZtnjxPfLGKNABlTio1V/fGk86Xazg2adIFdotKe2mu4fLbUvUJe9z15l3RGkdmua45xFk60L2rpuMsPb/WKd2f0oSUgkvlbgTJsQBwrgPgFb011GkAd8+asZp4X5D7sBaQFTI6GiISDyUIKPi0uzrcQ9N+t9C34c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CPcUcfZ+; arc=none smtp.client-ip=209.85.208.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f6eLPFEi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59E78C113CD;
-	Fri, 26 Apr 2024 16:00:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714147229;
-	bh=uK9h4I1j7rfKSkPKuWAlFuwzANHYKX0M1bFIxX+3AkE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=f6eLPFEiZ6xNNJR3mQ6Qo5xBHM1aC6YKRza2POnm6EEgTvufM6RD2WTbKE5ZfwT4D
-	 sVfWuJBpAr8DBIyiwvZPB18cr67rmn5iMsDHpGKtuOm9+kAIE59IuQnndZwCi32kif
-	 s6Dps+UkIJP4Rvv9VSnh5zsQ1PsR4jQxbmuOG75ywi6D7vjNOizvvcjN6NwU5tUm3D
-	 SS1+FixvkAz5d/a+N20Mynix+Ma0x8+RoXBDBch3hn8cDblQgoYKzAEjes9aeLOkCt
-	 5jGDeOjmdNnbK7grD0vvInoTi9+RcNo68eD7DgSFszh5weqEQFGmLSKFf9xYyqOqh/
-	 14rjkm0Ef9Sjw==
-Received: from johan by xi.lan with local (Exim 4.97.1)
-	(envelope-from <johan+linaro@kernel.org>)
-	id 1s0Nzz-000000006c4-1Xt8;
-	Fri, 26 Apr 2024 18:00:31 +0200
-From: Johan Hovold <johan+linaro@kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Johan Hovold <johan+linaro@kernel.org>,
-	stable@vger.kernel.org,
-	Doug Anderson <dianders@chromium.org>,
-	Janaki Ramaiah Thota <quic_janathot@quicinc.com>
-Subject: [PATCH] Bluetooth: qca: generalise device address check
-Date: Fri, 26 Apr 2024 17:58:01 +0200
-Message-ID: <20240426155801.25277-1-johan+linaro@kernel.org>
-X-Mailer: git-send-email 2.43.2
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CPcUcfZ+"
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2d88a869ce6so29807201fa.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Apr 2024 09:05:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714147510; x=1714752310; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=X85lTzwp5ww7oBnyf0uMc2CUs6g3OUviDVbXoBtRSnQ=;
+        b=CPcUcfZ+USJ88pq6frcMORofDw73uEGBA8F+dH42ig0i5V9leT2e2KeUd+Q8gAhDwI
+         HkK1BZdRiLbBCiP+HkjwVMl6MLN02B6kk+LZx62mfxjzsYKGF6KiPm+YjaokV8EPQG5K
+         lqfcl3ul+g1kwPGJvBN1Trfc7HGXh3SERa4XXPZB7Jm0XlZVMgqrkN4LMZ+vHRD/NgD+
+         2k1DNP4/4P/wo27meS374Q57UQ3ezyMZOEEh0v52fWJDCCA3rR8C3KXs9xTKbQrFms3h
+         1qiWdnDYNdSNB8Pg/7a6OQl614jXfnvz5RJTBEMIkVzzTCEf58Yh3H4zdViFYwfBoAW3
+         LPZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714147510; x=1714752310;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=X85lTzwp5ww7oBnyf0uMc2CUs6g3OUviDVbXoBtRSnQ=;
+        b=cayp5ZMxauaMwJTQSmCIhMJ9Qr8eIAVrOs1Q63CqA0I+HS28DsBjZr/0NRKwZLSYc0
+         L1HE1ypxxnpCGAetbQzt4CpbHomJ6ojZ5hLUZdfLH3NNQz8Oy9p2niJkz643S4bBc/tK
+         3m0A7k71KSgsHefsK9iAXs15trEY/fIVQ6ewHa+yge4tRlBwj7RhA1A4UN7RAdHIrq8a
+         Vknk+tbdJWq10Jf7yd69L1TZ+w6/3YEGdxGnsQS5ZPIRlgzkhoQ9OdEppcKyzI254kwK
+         H7TXipVYph/JC4LYxW+APDIRbOD0rD9U48T7mgxdLxCcaoAZzcVcuwGTEcHG9ClOdhr3
+         pzkg==
+X-Gm-Message-State: AOJu0YzeLZA+mr7rNLj+L81sJYmSNBMk8S6bQdiLYfjTHRJx9ZLLpj4j
+	wTCu3eDDK50Cl8zB9Oyb3Rw+ISdlDIp/Fxk/TKP3zxfSTE0Rp7gt13feWMtu4JBCf5bNrUARsva
+	j3u1Xi3lnugKsdhbq3/1e1sqeNZ6NVg==
+X-Google-Smtp-Source: AGHT+IEzPqGWaXNdhZrbB3U+HbmqOxmgUOMXcF7hP9dFIxKE9oNUpg0iS6UN5OrU6JNiHON9eS2LZ0wVnyQDN+B1+7I=
+X-Received: by 2002:a2e:2204:0:b0:2de:3421:9edd with SMTP id
+ i4-20020a2e2204000000b002de34219eddmr179806lji.33.1714147509778; Fri, 26 Apr
+ 2024 09:05:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240426132342.732682-1-frederic.danis@collabora.com>
+ <CABBYNZKEfKiXZXCEzH-FyLozJgSfMUx=mFgv-go-vACUPPD=aQ@mail.gmail.com> <05ab8374-bccf-4790-8f5b-50f18678ee1a@collabora.com>
+In-Reply-To: <05ab8374-bccf-4790-8f5b-50f18678ee1a@collabora.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 26 Apr 2024 12:04:57 -0400
+Message-ID: <CABBYNZKr=BY98k+0sPys1Dua-2QzjGfT323gngNiGyAApCx=kA@mail.gmail.com>
+Subject: Re: [RFC PATCH BlueZ] plugins: Add new plugin to manage wake policy
+To: =?UTF-8?B?RnLDqWTDqXJpYyBEYW5pcw==?= <frederic.danis@collabora.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The default device address apparently comes from the NVM configuration
-file and can differ quite a bit.
+Hi Fr=C3=A9d=C3=A9ric,
 
-Store the default address when parsing the configuration file and use it
-to determine whether the controller has been provisioned with an
-address.
+On Fri, Apr 26, 2024 at 11:42=E2=80=AFAM Fr=C3=A9d=C3=A9ric Danis
+<frederic.danis@collabora.com> wrote:
+>
+> Hi Luiz,
+>
+> On 26/04/2024 17:05, Luiz Augusto von Dentz wrote:
+>
+> Hi Fr=C3=A9d=C3=A9ric,
+>
+> On Fri, Apr 26, 2024 at 9:23=E2=80=AFAM Fr=C3=A9d=C3=A9ric Danis
+> <frederic.danis@collabora.com> wrote:
+>
+> By default all class of devices providing the correct service (HID, HoG)
+> are allowed to wake up the host.
+> This plugin allows to choose which class of devices are allowed or not to
+> do it.
+>
+> E.g. only the Peripheral class, or more specifically the Peripheral
+> Joystick and Gamepad devices, could be allowed but not the other type of
+> devices like e.g. the headsets.
+> For the first case, all Major classes in /etc/bluetooth/wake-policy.conf
+> except Peripheral should be uncommented and set to 'false', while for the
+> second case Peripheral should also be uncommented and set to '01;02'.
+> ---
+>
+> I send this as an RFC as I'm not sure creating a wake policy plugin is th=
+e
+> correct way to get it merged upstream.
+>
+> Could it be better to move the device_set_wake_support() call from
+> profiles/input/{device,hog}.c files to src/device.c:device_svc_resolved()
+> which could perform Service and Class of Device checks?
+>
+> Any advice much appreciated.
+>
+> At first I didn't get what you were trying to do since we do already
+> allow to overwrite via Device.WakeAllowed property, but I guess you
+> want to generalize it so other classes, other than just input, could
+> wake up the host?
+>
+>
+> I guess I was unclear, it's the other way round, I want to prevent other =
+type of device like headsets or earphones which are providing the HID or Ho=
+G service from being able to wake up the host by default.
+>
+> In other words, I'm expecting that the default behavior for input devices=
+ (like keyboard or gamepad) is to be able to wake up the host (as currently=
+) while other classes of device should not, unless user change it using Dev=
+ice.WakeAllowed property.
+> E.g. controllers are allowed to wake, everything else defaults to WakeAll=
+owed off.
+>
+> We found this with the Steamdeck where users accidentally turn on their d=
+eck when powering on some BT headsets, e.g. Sony XM5 headphones.
 
-This makes sure that devices without a unique address start as
-unconfigured unless a valid address has been provided in the devicetree.
+hmm, does it implement HoG to do that? That said I don't think it is a
+good idea to break combo devices if they do that, so think this shall
+be handled via user preference and then the user can disable
+WakeAllowed, or perhaps we default to false in case of combo devices
+so the user has to opt-in to enable. Btw, using the class alone may
+not be enough to catch exactly what is the device behind it, beside
+that doesn't apply to LE devices where we would probably need to look
+into the appearance, still feel like the wrong thing to do to assume
+anything just based on that.
 
-Fixes: 00567f70051a ("Bluetooth: qca: fix invalid device address check")
-Cc: stable@vger.kernel.org      # 6.5
-Cc: Doug Anderson <dianders@chromium.org>
-Cc: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
-Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
----
- drivers/bluetooth/btqca.c | 21 ++++++++++++---------
- drivers/bluetooth/btqca.h |  2 ++
- 2 files changed, 14 insertions(+), 9 deletions(-)
+Another idea would be perhaps add an authorization request to ask the
+user to confirm setting wake_allowed flag when a driver request it,
+that way the user can authorize, or not, during the first time it
+connects to the device so we learn its preferences, etc.
 
-diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-index cfa71708397b..d7a6738e4691 100644
---- a/drivers/bluetooth/btqca.c
-+++ b/drivers/bluetooth/btqca.c
-@@ -15,9 +15,6 @@
- 
- #define VERSION "0.1"
- 
--#define QCA_BDADDR_DEFAULT (&(bdaddr_t) {{ 0xad, 0x5a, 0x00, 0x00, 0x00, 0x00 }})
--#define QCA_BDADDR_WCN3991 (&(bdaddr_t) {{ 0xad, 0x5a, 0x00, 0x00, 0x98, 0x39 }})
--
- int qca_read_soc_version(struct hci_dev *hdev, struct qca_btsoc_version *ver,
- 			 enum qca_btsoc_type soc_type)
- {
-@@ -351,6 +348,11 @@ static void qca_tlv_check_data(struct hci_dev *hdev,
- 
- 			/* Update NVM tags as needed */
- 			switch (tag_id) {
-+			case EDL_TAG_ID_BD_ADDR:
-+				if (tag_len != sizeof(bdaddr_t))
-+					break;
-+				memcpy(&config->bdaddr, tlv_nvm->data, sizeof(bdaddr_t));
-+				break;
- 			case EDL_TAG_ID_HCI:
- 				/* HCI transport layer parameters
- 				 * enabling software inband sleep
-@@ -615,7 +617,7 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
- }
- EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
- 
--static int qca_check_bdaddr(struct hci_dev *hdev)
-+static int qca_check_bdaddr(struct hci_dev *hdev, const struct qca_fw_config *config)
- {
- 	struct hci_rp_read_bd_addr *bda;
- 	struct sk_buff *skb;
-@@ -624,6 +626,9 @@ static int qca_check_bdaddr(struct hci_dev *hdev)
- 	if (bacmp(&hdev->public_addr, BDADDR_ANY))
- 		return 0;
- 
-+	if (!bacmp(&config->bdaddr, BDADDR_ANY))
-+		return 0;
-+
- 	skb = __hci_cmd_sync(hdev, HCI_OP_READ_BD_ADDR, 0, NULL,
- 			     HCI_INIT_TIMEOUT);
- 	if (IS_ERR(skb)) {
-@@ -639,10 +644,8 @@ static int qca_check_bdaddr(struct hci_dev *hdev)
- 	}
- 
- 	bda = (struct hci_rp_read_bd_addr *)skb->data;
--	if (!bacmp(&bda->bdaddr, QCA_BDADDR_DEFAULT) ||
--	    !bacmp(&bda->bdaddr, QCA_BDADDR_WCN3991)) {
-+	if (!bacmp(&bda->bdaddr, &config->bdaddr))
- 		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
--	}
- 
- 	kfree_skb(skb);
- 
-@@ -670,7 +673,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 		   enum qca_btsoc_type soc_type, struct qca_btsoc_version ver,
- 		   const char *firmware_name)
- {
--	struct qca_fw_config config;
-+	struct qca_fw_config config = {};
- 	int err;
- 	u8 rom_ver = 0;
- 	u32 soc_ver;
-@@ -855,7 +858,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 		break;
- 	}
- 
--	err = qca_check_bdaddr(hdev);
-+	err = qca_check_bdaddr(hdev, &config);
- 	if (err)
- 		return err;
- 
-diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
-index dc31984f71dc..49ad668d0d0b 100644
---- a/drivers/bluetooth/btqca.h
-+++ b/drivers/bluetooth/btqca.h
-@@ -29,6 +29,7 @@
- #define EDL_PATCH_CONFIG_RES_EVT	(0x00)
- #define QCA_DISABLE_LOGGING_SUB_OP	(0x14)
- 
-+#define EDL_TAG_ID_BD_ADDR		2
- #define EDL_TAG_ID_HCI			(17)
- #define EDL_TAG_ID_DEEP_SLEEP		(27)
- 
-@@ -94,6 +95,7 @@ struct qca_fw_config {
- 	uint8_t user_baud_rate;
- 	enum qca_tlv_dnld_mode dnld_mode;
- 	enum qca_tlv_dnld_mode dnld_type;
-+	bdaddr_t bdaddr;
- };
- 
- struct edl_event_hdr {
--- 
-2.43.2
+> I hope I am a little bit more understandable :)
+>
+> In that case I would suggest doing it directly via main.conf and
+> perhaps allow something using a UUIDs:
+>
+> WakeAllowed=3Dtrue/false/uuid1, uuid2...
+>
+> That said we might need to introduce support for flagging driver that
+> do really support setting wakeallowed property otherwise
+> WakeAllowed=3Dtrue may have a bad impact if users try to enable it for
+> everything including SDP for example, or we could just got with the
+> uuid list and default to HID and HoG for now and in case it is set
+> empty than it disables but there is no way to simply enable to
+> everything, thoughts?
+>
+>  Makefile.plugins         |   4 +
+>  plugins/wake-policy.c    | 180 +++++++++++++++++++++++++++++++++++++++
+>  plugins/wake-policy.conf |  21 +++++
+>  src/device.c             |   2 +-
+>  src/device.h             |   1 +
+>  5 files changed, 207 insertions(+), 1 deletion(-)
+>  create mode 100644 plugins/wake-policy.c
+>  create mode 100644 plugins/wake-policy.conf
+>
+> diff --git a/Makefile.plugins b/Makefile.plugins
+> index 4aa2c9c92..fbd4e4155 100644
+> --- a/Makefile.plugins
+> +++ b/Makefile.plugins
+> @@ -11,6 +11,10 @@ builtin_sources +=3D plugins/autopair.c
+>  builtin_modules +=3D policy
+>  builtin_sources +=3D plugins/policy.c
+>
+> +builtin_modules +=3D wake_policy
+> +builtin_sources +=3D plugins/wake-policy.c
+> +EXTRA_DIST +=3D plugins/wake-policy.conf
+> +
+>  if ADMIN
+>  builtin_modules +=3D admin
+>  builtin_sources +=3D plugins/admin.c
+> diff --git a/plugins/wake-policy.c b/plugins/wake-policy.c
+> new file mode 100644
+> index 000000000..34e77c615
+> --- /dev/null
+> +++ b/plugins/wake-policy.c
+> @@ -0,0 +1,180 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2024 Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabor=
+a.com>
+> + *
+> + *
+> + */
+> +
+> +#ifdef HAVE_CONFIG_H
+> +#include <config.h>
+> +#endif
+> +
+> +#include <stdbool.h>
+> +
+> +#include <glib.h>
+> +
+> +#include "bluetooth/bluetooth.h"
+> +
+> +#include "src/plugin.h"
+> +#include "src/adapter.h"
+> +#include "src/device.h"
+> +#include "src/log.h"
+> +#include "src/textfile.h"
+> +
+> +static GKeyFile * key_file;
+> +
+> +static gboolean is_allowed_to_wake(const char *major, guint minor)
+> +{
+> +       guint *minor_list;
+> +       gsize length;
+> +       gboolean allowed =3D false;
+> +       GError *gerr =3D NULL;
+> +
+> +       if (!g_key_file_has_key(key_file, "WakeAllowed", major, NULL))
+> +               return true;
+> +
+> +       allowed =3D g_key_file_get_boolean(key_file, "WakeAllowed", major=
+, &gerr);
+> +       if (!gerr)
+> +               return allowed;
+> +
+> +       g_error_free(gerr);
+> +       gerr =3D NULL;
+> +
+> +       minor_list =3D (guint *)g_key_file_get_integer_list(key_file,
+> +                                               "WakeAllowed",
+> +                                               major, &length, &gerr);
+> +       if (gerr) {
+> +               DBG("Failed to get allowed minor list for %s", major);
+> +               return false;
+> +       }
+> +
+> +       for (gsize i =3D 0; i < length; i++) {
+> +               if (minor_list[i] =3D=3D minor) {
+> +                       allowed =3D true;
+> +                       break;
+> +               }
+> +       }
+> +
+> +       return allowed;
+> +}
+> +
+> +static const struct {
+> +       uint8_t val;
+> +       const char *str;
+> +} major_class_table[] =3D {
+> +       { 0x00, "Miscellaneous" },
+> +       { 0x01, "Computer"      },
+> +       { 0x02, "Phone"         },
+> +       { 0x03, "LAN/Network"   },
+> +       { 0x04, "Audio/Video"   },
+> +       { 0x05, "Peripheral"    },
+> +       { 0x06, "Imaging"       },
+> +       { 0x07, "Wearable"      },
+> +       { 0x08, "Toy"           },
+> +       { 0x09, "Health"        },
+> +       { 0x1f, "Uncategorized" },
+> +       { }
+> +};
+> +
+> +static gboolean is_class_allowed_to_wake(uint32_t class)
+> +{
+> +       uint8_t major =3D (class & 0x1f00) >> 8;
+> +       uint8_t minor =3D (class & 0x00fc) >> 2;
+> +
+> +       if ((major >=3D 0x01 && major <=3D 0x09) || major =3D=3D 0x1f)
+> +               return is_allowed_to_wake(major_class_table[major].str, m=
+inor);
+> +
+> +       return true;
+> +}
+> +
+> +static void wake_policy_device_resolved(struct btd_adapter *adapter,
+> +                                    struct btd_device *device)
+> +{
+> +       char *filename;
+> +       GKeyFile *device_key_file;
+> +       GError *gerr =3D NULL;
+> +
+> +       if (key_file =3D=3D NULL)
+> +               return;
+> +
+> +       // Does device support to wake the host?
+> +       if (!device_get_wake_support(device))
+> +               return;
+> +
+> +       // Check if WakeAllowed has already been stored,
+> +       // if yes do not change it
+> +       filename =3D btd_device_get_storage_path(device, "info");
+> +       device_key_file =3D g_key_file_new();
+> +       if (!g_key_file_load_from_file(device_key_file, filename, 0, &ger=
+r)) {
+> +               error("Unable to load key file from %s: (%s)", filename,
+> +                                                       gerr->message);
+> +               g_clear_error(&gerr);
+> +       } else {
+> +               if (g_key_file_has_key(device_key_file, "General",
+> +                                       "WakeAllowed", NULL)) {
+> +                       DBG("%s WakeAllowed already stored",
+> +                               device_get_path(device));
+> +                       return;
+> +               }
+> +       }
+> +       g_key_file_free(device_key_file);
+> +       g_free(filename);
+> +
+> +       // Check if Class of Device is allowed to wake up the host
+> +       if (!is_class_allowed_to_wake(btd_device_get_class(device))) {
+> +               DBG("%s Force WakeAllowed to false", device_get_path(devi=
+ce));
+> +               device_set_wake_override(device, false);
+> +               device_set_wake_allowed(device, false, -1U);
+> +       }
+> +}
+> +
+> +static int wake_policy_probe(struct btd_adapter *adapter)
+> +{
+> +       GError *gerr =3D NULL;
+> +
+> +       DBG("");
+> +       key_file =3D g_key_file_new();
+> +       if (!g_key_file_load_from_file(key_file,
+> +                                       CONFIGDIR "/wake-policy.conf",
+> +                                       0,
+> +                                       &gerr)) {
+> +               error("Unable to load key file from %s: (%s)",
+> +                       CONFIGDIR "/wake-policy.conf",
+> +                       gerr->message);
+> +               g_clear_error(&gerr);
+> +               g_key_file_free(key_file);
+> +               key_file =3D NULL;
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+> +static void wake_policy_remove(struct btd_adapter *adapter)
+> +{
+> +       DBG("");
+> +       if (key_file)
+> +               g_key_file_free(key_file);
+> +}
+> +
+> +static struct btd_adapter_driver wake_policy_driver =3D {
+> +       .name   =3D "wake-policy",
+> +       .probe  =3D wake_policy_probe,
+> +       .remove =3D wake_policy_remove,
+> +       .device_resolved =3D wake_policy_device_resolved,
+> +};
+> +
+> +static int wake_policy_init(void)
+> +{
+> +       return btd_register_adapter_driver(&wake_policy_driver);
+> +}
+> +
+> +static void wake_policy_exit(void)
+> +{
+> +       btd_unregister_adapter_driver(&wake_policy_driver);
+> +}
+> +
+> +BLUETOOTH_PLUGIN_DEFINE(wake_policy, VERSION, BLUETOOTH_PLUGIN_PRIORITY_=
+LOW,
+> +                       wake_policy_init, wake_policy_exit)
+> diff --git a/plugins/wake-policy.conf b/plugins/wake-policy.conf
+> new file mode 100644
+> index 000000000..e6220bad1
+> --- /dev/null
+> +++ b/plugins/wake-policy.conf
+> @@ -0,0 +1,21 @@
+> +[WakeAllowed]
+> +# By default each Class of Devices providing the correct service (HID, H=
+oG) is
+> +# allowed to wake up the host.
+> +# The following values are used to control the default WakeAllowed value=
+ based
+> +# on the Class of Device.
+> +# It is still possible for the user to override the WakeAllowed value pe=
+r
+> +# device afterwards.
+> +#
+> +# Possible values for each Major Class:
+> +# true,false,<Minor Class allowed list (integer separated by ;)>
+> +
+> +#Computer=3Dtrue
+> +#Phone=3Dtrue
+> +#LAN/Network=3Dtrue
+> +#Audio/Video=3Dtrue
+> +#Peripheral=3Dtrue
+> +#Imaging=3Dtrue
+> +#Wearable=3Dtrue
+> +#Toy=3Dtrue
+> +#Health=3Dtrue
+> +#Uncategorized=3Dtrue
+> diff --git a/src/device.c b/src/device.c
+> index 1d4b8ab36..d970745f5 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -1500,7 +1500,7 @@ dev_property_advertising_data_exist(const GDBusProp=
+ertyTable *property,
+>         return bt_ad_has_data(device->ad, NULL);
+>  }
+>
+> -static bool device_get_wake_support(struct btd_device *device)
+> +bool device_get_wake_support(struct btd_device *device)
+>  {
+>         return device->wake_support;
+>  }
+> diff --git a/src/device.h b/src/device.h
+> index 5722ca9ca..f8c744baf 100644
+> --- a/src/device.h
+> +++ b/src/device.h
+> @@ -149,6 +149,7 @@ void device_set_wake_support(struct btd_device *devic=
+e, bool wake_support);
+>  void device_set_wake_override(struct btd_device *device, bool wake_overr=
+ide);
+>  void device_set_wake_allowed(struct btd_device *device, bool wake_allowe=
+d,
+>                              guint32 id);
+> +bool device_get_wake_support(struct btd_device *device);
+>  void device_set_refresh_discovery(struct btd_device *dev, bool refresh);
+>
+>  typedef void (*disconnect_watch) (struct btd_device *device, gboolean re=
+moval,
+> --
+> 2.34.1
+>
+>
+>
+>
+> --
+> Fr=C3=A9d=C3=A9ric Danis
+> Senior Software Engineer
+>
+> Collabora Ltd.
+> Platinum Building, St John's Innovation Park, Cambridge CB4 0DS, United K=
+ingdom
+> Registered in England & Wales, no. 5513718
 
+
+
+--=20
+Luiz Augusto von Dentz
