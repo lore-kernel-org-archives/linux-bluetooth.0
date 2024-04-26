@@ -1,156 +1,184 @@
-Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7937F180A82
-	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Apr 2024 17:23:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24F0716F0CD
+	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Apr 2024 17:23:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714152202; cv=none; b=Jf4DwYFtL9N9HnG5/0iuFFapgRtGULqcWEgP9T1y3pIU58F2e4OIKuW4I3d0yQ9B4kuAeH/nAJFoyXD2mOtksBYvRengqmG0ZPtAnrQyIItAjhggIT5es3tiVKFp9WR29Lz3+fva6AeLHEzRbHVziDXauylwQlOXUUiVOSlqMD0=
+	t=1714152217; cv=none; b=lEj+Uk6IVrcguQeFrm7AKZ6ADUDM1DwXla6KtMCPJRyQXNF6ZyrIT6/8ZKJ4XT5qWppVeYD1vwelduLz5gr7EbCv4ANHMR5vZ1ucM/xBmd4DUtcR/gbY/tNJwswO6FIVNHt4lkAVG97UGmgiwqg1ywfUNxk65exHx+TE+NWDilg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714152202; c=relaxed/simple;
-	bh=TbAqAZMa48AEaJa5lPdAp3ni2GqN7/ZGJWpLUJXyUQ4=;
+	s=arc-20240116; t=1714152217; c=relaxed/simple;
+	bh=DoeVH595qsmuQPIQOHZlMJzQnEWVUckuQY6sXPiNVxo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T7MOjZmTuuZ9WP7yGvkwzF9o9CH6gqBnvWqOsc81bc/KUjds3WdZblWFSPcQJesKDq8l4xeM/GpjZ26SocJ2dGFA3mog8eF+bJLs8M/ZvYdrK5mGJmji5EzndY5SKYf70Ec+ksU9IWhnZY2CBDDbO6mXNjBUSKMTaV8sF/daWws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=CX2YRQHZ; arc=none smtp.client-ip=209.85.219.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	 To:Cc:Content-Type; b=cxtv/r8ww5qZhkP4CiAtxbt9yItf8Opb8h95fG+WK2ArvP0f5zB/aDVrTkY9BCVd6hNxdYx3AsPB329JhllF2D5bjOtPVAOgNMgGKp/GOiGpRvlpYpgdR5Ts681m92K2MG7DMeqArxYs7dpeGkrz+XfJwUhIa3C0we4dMTuQKDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=fBqviliE; arc=none smtp.client-ip=209.85.219.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CX2YRQHZ"
-Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-de46da8ced2so2713713276.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Apr 2024 10:23:20 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="fBqviliE"
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-69b4454e2f1so11618006d6.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Apr 2024 10:23:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1714152199; x=1714756999; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1714152213; x=1714757013; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4UJceFXtAj6qD9Iyu1pCp/3Owr12F1F0llf1/MqSjXo=;
-        b=CX2YRQHZ0XnZ0z6mL4+jRpPpju8zmhm6gWj9wVptAfmANvhZHZg2Wvs+FuFGedK88b
-         HAYyS4busKpDaLfqHFTST4GPkzDGSdNv0t9vYv4xKiJXHHvbVfRqi9EhgqtnCSQDP0ZE
-         pKHJ3vteVcbVjdjuvCq+tcrfHjxLBi/l6J+ijtk9QSLn0aZ/rZzZ36gc0+0NkYUDITf/
-         pYKtKjC9m6532FLREOlMmCbWqyRvoLnug8KF6CTYDuQTCO4ruwRIbU6SW7bdh9vCOtXK
-         KYxYDS3OCgMmdfi4F13r28MQWxm4tWXZG9vB2xddRZJfVY2/1Z4fFAhDjy2RqIpClWtZ
-         IXgQ==
+        bh=BgXARGPALUa9HNkXZ7dJ4KGZjVGqNQ8BWrBEfj+sA+g=;
+        b=fBqviliE2ur33q/zidQcPI+y1dcba0ss4jaVUAICPGmx0exFlJPLayfwsBtXJQstGP
+         NgYLusF4EYISkZ1FmUpuVA/wVeTqhN0y9WSw2BUT/xsRaQEKrN7Lz1D02oEVM5eP6gae
+         G09MM7bmqQjoFgVWSrcLsI8rTWTx0WZaAbvLQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714152199; x=1714756999;
+        d=1e100.net; s=20230601; t=1714152213; x=1714757013;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4UJceFXtAj6qD9Iyu1pCp/3Owr12F1F0llf1/MqSjXo=;
-        b=SYXSHSal4FeT25jv6BgK/XODHuBUUI0zWO+y0ht/oiF6CmmCvPbgsaK+g7xdUrxsku
-         s8TUSaAgob/8mzbeR6V2UPLbPy7N/lyUqNeOLr3LZ8NGKPNl1lOjL3U5/3FU1BNwzItd
-         rGhXN9s75n31Vr+qulpq94dGPm19fcXMoJBHXzt/No7oto2DeKLFUpvUomK8qC1c111R
-         4yMN4SQUHZ2cRmk1UsmuK9obt87QvTZ9P8zAVf06XYaMpJ8DdBgMFgDk3CasspRtqYRQ
-         I01an5+7WtmRbQTew4ZDtjTRpJp0tWU/l5MG1qX87N3ha1NzhSJGPJ84anHx1fW7UWx5
-         7d5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXBZ9R2zciBbDk93JUBUnTESQjhPhCM8787XYoyyqbncrDMkbXaOPiFJUZBTZpimyPl9/UJc0oVDfuLmZ9d4blRCavtrX4lUNq7yoUEP3WZ
-X-Gm-Message-State: AOJu0YxQTUv0ZT0eEcQmO1agywcWfuUbM6PfOuVRsieWsU2iRuFlLJA6
-	zumwqtophC+la1Ry5GEKCtvlC+YqvF4OK287RQ0PmOBsXWczL68gqNX0z7LmbIeFqQyQqu40i74
-	1Hh5uWFMG7MFkOb9FgjgHr9BX+EZFD7xXwzbnaA==
-X-Google-Smtp-Source: AGHT+IGDmBlE4gfNnmV7uJbF2QRoEiDRzqeAQnXvvB4EdKVF0e4x8T6P8C28xhKLIKrDnt4aQk1wZKmN320JvvxlSfQ=
-X-Received: by 2002:a05:6902:4cb:b0:dc6:6307:d188 with SMTP id
- v11-20020a05690204cb00b00dc66307d188mr3324902ybs.25.1714152199442; Fri, 26
- Apr 2024 10:23:19 -0700 (PDT)
+        bh=BgXARGPALUa9HNkXZ7dJ4KGZjVGqNQ8BWrBEfj+sA+g=;
+        b=X1LVATq4GRhNnB3CGdXGvfOq5H05UrFBPH5Bmv5NiyEYnFw87oTMHLmk10qBzdbJkF
+         YuydeVzRxOxOvrqYk9Hh9h6ofxiefXp20X5Mhp9bbMFelmTBH0u8xOkA43ii3v0mf9a0
+         Lc9Y57VoxuMBNyyTkWzg94TyV3JY1iRkpAr10gDk/RCJjMEVD/HIaIrzd7LXD2o8Iuva
+         3dwxuHI8fQ2mmy9MU9zF5/tm58F2S1lVMZxskmI2295caSaykpTIcVPMWP8dgXUkwOjh
+         Vdz9c/9Nael3N4ST5Eqe1o2OoFot4nSakfDQX0jV7Lspsd/Z9ltn9xmXbs5dGrAkpVOK
+         e3mw==
+X-Forwarded-Encrypted: i=1; AJvYcCUFkGjjHgzG1uDzE/eWc4Iu2cxfPFlCiiset6VQMGEKTA0TCMYpag9IiJllndlkfK9I+IkhgC098dwJJTjRNIkdVN6OGMSmFaq60zoUXP7Q
+X-Gm-Message-State: AOJu0YzNFR73JekwX21AajQtxuat9C9w+4QmJZ34am6XkrhtEKn44xaw
+	G/05I+iGzvXDFk9xSMAEuNahQJOPDVFOJc2AXPUNiuFboVIH1BSH6vWUbHEVzA1d3wRGTtJ7aEs
+	=
+X-Google-Smtp-Source: AGHT+IFIFUkTfutsNpYhaFeP0Slo7elj+bN5VIdif6xj81eUtsp1himE4bAQflQMWlB/EAjxxV/+fA==
+X-Received: by 2002:ad4:5d6a:0:b0:69b:3a49:106f with SMTP id fn10-20020ad45d6a000000b0069b3a49106fmr5501378qvb.15.1714152212955;
+        Fri, 26 Apr 2024 10:23:32 -0700 (PDT)
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com. [209.85.160.177])
+        by smtp.gmail.com with ESMTPSA id w17-20020a056214013100b0069b57111a98sm7155829qvs.79.2024.04.26.10.23.31
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 26 Apr 2024 10:23:31 -0700 (PDT)
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-439b1c72676so24641cf.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Apr 2024 10:23:31 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVbgQnDtF4TtlzPNTziOP3H8+jRuyoDag0K7tAkWE/R7OjHEwP4+fNwqf7hcmbpkTHf4arvbHGG//Ta95JSQFlNpb+eJze3pGES5chhcfS1
+X-Received: by 2002:ac8:7493:0:b0:439:891f:bbd2 with SMTP id
+ v19-20020ac87493000000b00439891fbbd2mr373509qtq.28.1714152211256; Fri, 26 Apr
+ 2024 10:23:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240424122932.79120-1-brgl@bgdev.pl> <171397322792.12898.8815870206676100532.git-patchwork-notify@kernel.org>
- <CAMRc=McMMtRid6OaYsc0PO0qsS6z+Ny127YxwNcjbo7R2Mze2Q@mail.gmail.com> <CABBYNZJOdccb4HKVBnuqK=_xVzViJ2D2+QJPSyyFGE2_Y1VXCg@mail.gmail.com>
-In-Reply-To: <CABBYNZJOdccb4HKVBnuqK=_xVzViJ2D2+QJPSyyFGE2_Y1VXCg@mail.gmail.com>
-From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Date: Fri, 26 Apr 2024 19:23:08 +0200
-Message-ID: <CACMJSetqjsu=zcS9GvtgDnODB__s21FfFxfK7_kVkCLvbKy49Q@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: qca: set power_ctrl_enabled on NULL
- returned by gpiod_get_optional()
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Bartosz Golaszewski <brgl@bgdev.pl>, marcel@holtmann.org, krzysztof.kozlowski@linaro.org, 
+References: <20240426155801.25277-1-johan+linaro@kernel.org>
+In-Reply-To: <20240426155801.25277-1-johan+linaro@kernel.org>
+From: Doug Anderson <dianders@chromium.org>
+Date: Fri, 26 Apr 2024 10:23:15 -0700
+X-Gmail-Original-Message-ID: <CAD=FV=V-pG9+5fLonNvydmjS=ziUFUHAyF8T7YTkEHiO405aSA@mail.gmail.com>
+Message-ID: <CAD=FV=V-pG9+5fLonNvydmjS=ziUFUHAyF8T7YTkEHiO405aSA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: qca: generalise device address check
+To: Johan Hovold <johan+linaro@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
 	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	wt@penguintechs.org, quic_zijuhu@quicinc.com
+	stable@vger.kernel.org, Janaki Ramaiah Thota <quic_janathot@quicinc.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 26 Apr 2024 at 17:09, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Bartosz,
->
-> On Fri, Apr 26, 2024 at 10:37=E2=80=AFAM Bartosz Golaszewski <brgl@bgdev.=
-pl> wrote:
-> >
-> > On Wed, 24 Apr 2024 17:40:27 +0200, patchwork-bot+bluetooth@kernel.org =
-said:
-> > > Hello:
-> > >
-> > > This patch was applied to bluetooth/bluetooth-next.git (master)
-> > > by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-> > >
-> > > On Wed, 24 Apr 2024 14:29:32 +0200 you wrote:
-> > >> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> > >>
-> > >> Any return value from gpiod_get_optional() other than a pointer to a
-> > >> GPIO descriptor or a NULL-pointer is an error and the driver should
-> > >> abort probing. That being said: commit 56d074d26c58 ("Bluetooth: hci=
-_qca:
-> > >> don't use IS_ERR_OR_NULL() with gpiod_get_optional()") no longer set=
-s
-> > >> power_ctrl_enabled on NULL-pointer returned by
-> > >> devm_gpiod_get_optional(). Restore this behavior but bail-out on err=
-ors.
-> > >> While at it: also bail-out on error returned when trying to get the
-> > >> "swctrl" GPIO.
-> > >>
-> > >> [...]
-> > >
-> > > Here is the summary with links:
-> > >   - [v2] Bluetooth: qca: set power_ctrl_enabled on NULL returned by g=
-piod_get_optional()
-> > >     https://git.kernel.org/bluetooth/bluetooth-next/c/48a9e64a533b
-> > >
-> > > You are awesome, thank you!
-> > > --
-> > > Deet-doot-dot, I am a bot.
-> > > https://korg.docs.kernel.org/patchwork/pwbot.html
-> > >
-> > >
-> > >
-> >
-> > Luiz,
-> >
-> > I think patchwork borked when picking up this one, here's what the comm=
-it
-> > trailer looks like in next:
-> >
-> >     Reported-by: Wren Turkal <wt@penguintechs.org>
-> >     Reported-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> >     Closes: https://lore.kernel.org/linux-bluetooth/1713449192-25926-2-=
-git-send-email-quic_zijuhu@quicinc.com/
-> >     Fixes: 56d074d26c58 ("Bluetooth: hci_qca: don't use
-> > IS_ERR_OR_NULL() with gpiod_get_optional()")
-> >     Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> >     Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> >     Tested-by: Wren Turkal" <wt@penguintechs.org>
-> >     Reported-by: Wren Turkal <wt@penguintechs.org>
-> >     Reported-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> >     Reviewed-by: Krzysztof Kozlowski<krzysztof.kozlowski@linaro.org>
-> >     Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> >     Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> >
-> > Reported-by and Reviewed-by tags are duplicated. One of the RB tags is =
-missing
-> > a space.
->
-> Oh crap, should probably not trust patchwork would pick up the tags
-> properly, that said the pull-request was already merged, not sure if
-> we can do something about it now?
->
+Hi,
 
-Nope, if it's gone upstream then it's too late.
+On Fri, Apr 26, 2024 at 9:00=E2=80=AFAM Johan Hovold <johan+linaro@kernel.o=
+rg> wrote:
+>
+> The default device address apparently comes from the NVM configuration
+> file and can differ quite a bit.
+>
+> Store the default address when parsing the configuration file and use it
+> to determine whether the controller has been provisioned with an
+> address.
+>
+> This makes sure that devices without a unique address start as
+> unconfigured unless a valid address has been provided in the devicetree.
+>
+> Fixes: 00567f70051a ("Bluetooth: qca: fix invalid device address check")
+> Cc: stable@vger.kernel.org      # 6.5
+> Cc: Doug Anderson <dianders@chromium.org>
+> Cc: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+> Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
+> ---
+>  drivers/bluetooth/btqca.c | 21 ++++++++++++---------
+>  drivers/bluetooth/btqca.h |  2 ++
+>  2 files changed, 14 insertions(+), 9 deletions(-)
+>
+> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+> index cfa71708397b..d7a6738e4691 100644
+> --- a/drivers/bluetooth/btqca.c
+> +++ b/drivers/bluetooth/btqca.c
+> @@ -15,9 +15,6 @@
+>
+>  #define VERSION "0.1"
+>
+> -#define QCA_BDADDR_DEFAULT (&(bdaddr_t) {{ 0xad, 0x5a, 0x00, 0x00, 0x00,=
+ 0x00 }})
+> -#define QCA_BDADDR_WCN3991 (&(bdaddr_t) {{ 0xad, 0x5a, 0x00, 0x00, 0x98,=
+ 0x39 }})
+> -
+>  int qca_read_soc_version(struct hci_dev *hdev, struct qca_btsoc_version =
+*ver,
+>                          enum qca_btsoc_type soc_type)
+>  {
+> @@ -351,6 +348,11 @@ static void qca_tlv_check_data(struct hci_dev *hdev,
+>
+>                         /* Update NVM tags as needed */
+>                         switch (tag_id) {
+> +                       case EDL_TAG_ID_BD_ADDR:
+> +                               if (tag_len !=3D sizeof(bdaddr_t))
+> +                                       break;
+> +                               memcpy(&config->bdaddr, tlv_nvm->data, si=
+zeof(bdaddr_t));
+> +                               break;
+>                         case EDL_TAG_ID_HCI:
 
-BTW As a fresh b4 convert I highly recommend it for managing patches. :)
+nit: blank line after "break" ?
 
-Bart
+Also note that on my firmware I never see this tag and thus your patch
+breaks trogdor. Specifically I put a printout here and it never gets
+hit.
 
-> --
-> Luiz Augusto von Dentz
+I printed all the tags/lengths:
+
+[   17.961087] DOUG: id 0xde02, len 0x0010
+[   17.965081] DOUG: id 0x0000, len 0x0000
+[   17.969050] DOUG: id 0x0000, len 0x0011
+[   17.973025] DOUG: id 0x0000, len 0x0a00
+[   17.976991] DOUG: id 0x0303, len 0x0303
+[   17.981066] DOUG: id 0x0033, len 0x1001
+
+Probably EDL_TAG_ID_BD_ADDR should have been 0xde02, not just 2.
+...but then the size is wrong? When I print out the bytes in ID 0xde02
+I see the address you're looking for 4 bytes in...
+
+[   17.663602] DOUG: 0x00
+[   17.666132] DOUG: 0x00
+[   17.668638] DOUG: 0x00
+[   17.671237] DOUG: 0x00
+[   17.673689] DOUG: 0xad
+[   17.676120] DOUG: 0x5a
+[   17.678551] DOUG: 0x00
+[   17.680980] DOUG: 0x00
+[   17.683409] DOUG: 0x98
+[   17.685846] DOUG: 0x39
+[   17.688278] DOUG: 0x08
+[   17.690704] DOUG: 0x00
+[   17.693137] DOUG: 0x08
+[   17.693139] DOUG: 0x00
+[   17.693139] DOUG: 0x00
+[   17.693140] DOUG: 0x00
+
+
+> @@ -624,6 +626,9 @@ static int qca_check_bdaddr(struct hci_dev *hdev)
+>         if (bacmp(&hdev->public_addr, BDADDR_ANY))
+>                 return 0;
+>
+> +       if (!bacmp(&config->bdaddr, BDADDR_ANY))
+> +               return 0;
+
+The above test feels non-obvious enough to deserve a comment. Could
+you add one? That would also help alleviate my confusion since I
+_think_ your if test is unneeded and maybe wrong? Let's say that the
+firmware didn't have a default address stored in it. It still seems
+like we could try to read the address and then if the firmware gave
+back BDADDR_ANY (0) we should set the `HCI_QUIRK_USE_BDADDR_PROPERTY`
+property, right?
