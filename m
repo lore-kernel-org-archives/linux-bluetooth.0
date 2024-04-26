@@ -1,153 +1,150 @@
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BA3F142E97
-	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Apr 2024 10:25:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7913977F30;
+	Fri, 26 Apr 2024 10:42:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714127102; cv=none; b=BiS71jUEWq2KMiAi3wtfKkneJ85Lex63YmYjO0VdJ9WbVn6mUkELwZoJr0q5kisen5HO5OC/6BXtUSv14EPZuWAg5Gs52pjw7OXQ0aN2RCTYH0HKy9WDw+2AfdE0S9Ctje4t6vvMDXcE55wr69FBrB9lCxCtQUB9vmrC9om1XzY=
+	t=1714128157; cv=none; b=sYLmdIERL7rd1EFmwzNcuMK22RPUIPFPgvdRXnVxkek46C1NMHVaaBp+TMESgx84woJmtPZGFojK8vCg0xw+Q0GkwxTN/fHcyq9kRAJHDHtXtCNScu61qWECG+qMmvZnKTR2qLw5OrWET6uhvAiPqf7HkMDuWBDkzgYGif2NJzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714127102; c=relaxed/simple;
-	bh=JUtYLcijeqtGgZ8mfyDZQwp8GVzEzE3g72PvSnGWSH8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=II90clQHFu45BIl2RVeCyzsAGDNs5W6SmtImhs+s3atfxHjbJgmf4cSCF0sa8hS3O8X28HG9HsptASIRyCmp+qiEdmj863LeFZHoRTOp4ihag784sv0BiZ9bRir1jzTs6uRhHUq7Zmk6Hv5AUWydXqwVoVSVFUa73HJ2slvNqb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Oe53OgAY; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1714128157; c=relaxed/simple;
+	bh=5jZaOy2PhOKuK73pSktlLzYYq/UWVVx/cSl8pNjughE=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=K8zmsSAH3Uklt+sRIlNmcwm0Bsg2WLN1DnYKqPSKcB4svKT6hLYikVx6fVRs6NISN9Z/bUxcx3IwCi+a1qeZv6HMgfgHXbHwU+GPhknQBWbI2EFG9KP9HpHbaZ70P0VjGC8RsaWgGx7npoCxYVTj9MfXyfSXXrOTptg2IH2MhAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=BMYqoYBg; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Oe53OgAY"
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2dd6c160eaaso24556841fa.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Apr 2024 03:25:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1714127099; x=1714731899; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=GjocIOOFPslcP8Raryx3+Znst2AiVINzNQa4zeiKjOg=;
-        b=Oe53OgAY+dB0aXmMA7c9ZnzbLT+ZZfBtAGQFgZHOFqsmy/39RCYZOlZ9VL5ovYe7bt
-         CbQ0uR93upWke5g/2PaCpGPwYvzZXvbTlpxfkkVTADtGgZzHa1B8aNJj30Tb6efB8VY5
-         fh+RHx3axB0EKzVtJaFMBITK2NnTZagmK7Lhc/ce7K1q78EJ49LnBmSQdCV8cm+wvCLQ
-         kVe6HJVbfxav6YPvR9qCs+IicS9xIR9ACk5JFDaGTlsM0HnaTQkoq4VvO8n/XfBXy8kv
-         62EIQWOq8Y7Q0auHE30gU8tVwz/hiWu/xC1XZJLFvVuYRqrnVkzdb7JJzMpztYdcB3KZ
-         JGNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714127099; x=1714731899;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GjocIOOFPslcP8Raryx3+Znst2AiVINzNQa4zeiKjOg=;
-        b=GPcDHIK4Vu69PEI8NxOsoDy4N+KNS/FsQfSqp2Q/kHTvefhpycfPkr2H1uHP96z4Ca
-         h3eov7OP1PaGsJzh49CdLtmx34gymxHkAkvyvoYjOWAFhX5e4omtfZX4+Mfe+AYn/WA3
-         xhjN+V/AxIjWD8C2cdEMkkFpf/lfxFlGLeW6YNF/z/fK3JIZi42cw8XIYxAXWTCqYRYA
-         C1Ogp6NshM/0NFrVweEGkJaGyzo+Z7DzVlnyV0k+G73MffcfZIcHfGLNh995pjP2Dx+H
-         SEXqc38nuwuHbZWpn+V0wdd5uRkOH/DtpyUyZNW7rXnyWIDiX44+dJHKUE2geZKsciSI
-         SjXA==
-X-Forwarded-Encrypted: i=1; AJvYcCUBu8/gYySKAAwedhEvMj55q4Y+HUbHY/1EWYx/6ZePmT1O2YRmQbgUFDhM8f5hfOMooVIeScu4F9KNTymt8oWKJddE3OIKD5dTKqjd6RS8
-X-Gm-Message-State: AOJu0YzpmiMeyD1AkaMaT+N2H9CzCGfeoSt8SEIH5YVl1zAF8MPAhTtt
-	+7aYfTAbs2S1srofcjcR3RL6oq+p8jPFEtYOQcf6pvbVZaJZippA76TDwBpCGok=
-X-Google-Smtp-Source: AGHT+IGgmAfjUIVoeeYSKxjoNIsQG/xY+gLn8l7W0TLaues56cOcGo5fz9ODPKIQ+ni+nA+iuZuBZA==
-X-Received: by 2002:a2e:9792:0:b0:2d8:5e8b:7de4 with SMTP id y18-20020a2e9792000000b002d85e8b7de4mr1773028lji.6.1714127098593;
-        Fri, 26 Apr 2024 03:24:58 -0700 (PDT)
-Received: from localhost ([102.222.70.76])
-        by smtp.gmail.com with ESMTPSA id m15-20020a05600c460f00b0041a964b55ddsm1133147wmo.1.2024.04.26.03.24.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Apr 2024 03:24:58 -0700 (PDT)
-Date: Fri, 26 Apr 2024 13:24:54 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Sungwoo Kim <iam@sung-woo.kim>
-Cc: daveti@purdue.edu, Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: L2CAP: Fix slab-use-after-free in
- l2cap_send_cmd
-Message-ID: <5639ab86-2d12-45ce-864c-80fbc0c79094@moroto.mountain>
-References: <20240426072006.358802-1-iam@sung-woo.kim>
- <cff764c2-a3d1-4a12-9260-54122e7a1fef@moroto.mountain>
- <CAJNyHp+eCq1p_gTbxAJBKouAw-oQ=j5xwyjk5o-91pf_hGdrAg@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="BMYqoYBg"
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 43Q5dPXV021276;
+	Fri, 26 Apr 2024 10:42:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:from:to:cc:references
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=y2MVu4mhZFEgMJCbHWI/1+jaRluiMvPd1GS4dy8pZOk=; b=BM
+	YqoYBgh6NVvdOvYfTbMTxTdk3uvrtuOWlz3A45bNkksfyk5xGgf5PuytrLpp0+OW
+	nTjwJpGeqg0P+6c4SMtVxoQ3PF6PZJIQzgFJH6S63EBrpEfzcR+rKHt8kHekjBLb
+	WcW+bzzXKSXVPW2gY+Wza9Ze6BPb2oTAcdv3vvUJDXvM45nCygw2abFXXtGBu1Yz
+	WUwmSoJWef1uSfVFRxEAhiZ/o3kaU003+iTzB0t6BRabSpH8/wgp99r9Yalcv28C
+	8LHKUzR1NTPgueKqsZbz6/tTVExju5cXpMuDdt/h5WcWqs0AvbsG/xl2s2zB6APw
+	Ykg3xjbe2x3Wxil/MFiA==
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xr1ne9r4j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 26 Apr 2024 10:42:22 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43QAgLDZ018475
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 26 Apr 2024 10:42:21 GMT
+Received: from [10.216.47.179] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 26 Apr
+ 2024 03:42:13 -0700
+Message-ID: <c10c94c4-5239-46d3-9b41-95e3c943e969@quicinc.com>
+Date: Fri, 26 Apr 2024 16:12:07 +0530
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: qca: fix invalid device address check
+Content-Language: en-US
+From: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+To: Johan Hovold <johan@kernel.org>
+CC: Doug Anderson <dianders@chromium.org>,
+        Johan Hovold
+	<johan+linaro@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        "Luiz
+ Augusto von Dentz" <luiz.dentz@gmail.com>,
+        Matthias Kaehlcke
+	<mka@chromium.org>,
+        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <stable@vger.kernel.org>, Stephen Boyd
+	<swboyd@chromium.org>,
+        <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>
+References: <20240416091509.19995-1-johan+linaro@kernel.org>
+ <CAD=FV=UBHvz2S5bd8eso030-E=rhbAypz_BnO-vmB1vNo+4Uvw@mail.gmail.com>
+ <Zid6lfQMlDp3HQ67@hovoldconsulting.com>
+ <CAD=FV=XoBwYmYGTdFNYMtJRnm6VAGf+-wq-ODVkxQqN3XeVHBw@mail.gmail.com>
+ <ZioW9IDT7B4sas4l@hovoldconsulting.com>
+ <c9ea5867-2db2-4f64-a1e3-f6c2836dd45d@quicinc.com>
+ <Zip9vMHa2x-uW-pf@hovoldconsulting.com>
+ <bb0e1baf-7e64-463a-8638-d403c7a29317@quicinc.com>
+In-Reply-To: <bb0e1baf-7e64-463a-8638-d403c7a29317@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJNyHp+eCq1p_gTbxAJBKouAw-oQ=j5xwyjk5o-91pf_hGdrAg@mail.gmail.com>
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: MLPPBesPkqd5KEe_zglqxKt6jhGKWm84
+X-Proofpoint-GUID: MLPPBesPkqd5KEe_zglqxKt6jhGKWm84
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-04-26_09,2024-04-26_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 spamscore=0
+ priorityscore=1501 impostorscore=0 adultscore=0 bulkscore=0
+ lowpriorityscore=0 mlxscore=0 mlxlogscore=999 malwarescore=0 phishscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2404010003 definitions=main-2404260070
 
-On Fri, Apr 26, 2024 at 05:35:01AM -0400, Sungwoo Kim wrote:
-> > > +
-> > >       return chan;
-> >         ^^^^^^^^^^^^
-> > This doesn't fix the bug because we're returning chan.
-> >
-> > As soon as you call l2cap_chan_put() then chan will be freed by in the
-> > other thread which is doing l2cap_conn_del() resulting in a use after
-> > free in the caller.
+
+Hi Johan,
+
+Please note BDA values listed below are in the firmware (FW) data
+order, but the actual BDA value should be in the reverse of that order.
+
+On 4/26/2024 11:53 AM, Janaki Ramaiah Thota wrote:
 > 
-> Thank you for pointing this out.
-> No caller uses the return value of l2cap_connect() if the kernel
-> versions >= v6.9.
-> So, l2cap_connect() can return void.
 > 
-> One caller uses the return value of l2cap_connect() in v4.19 <= the
-> kernel versions <= v6.8.
-> In this case, the caller should unlock and put a channel.
+> On 4/25/2024 9:28 PM, Johan Hovold wrote:
+>> Hi Janaki,
+>>
+>> On Thu, Apr 25, 2024 at 08:31:50PM +0530, Janaki Ramaiah Thota wrote:
+>>
+>>> Apologies for the delay. As of now, we have observed the following
+>>> values in the upstream firmware files for default BD addresses.
+>>> We will confirm ASAP if there are any changes.
+>>>
+>>> ---------------------------------------------------------
+>>> |   BDA            |      Chipset                       |
+>>> ---------------------------------------------------------
+>>> | 20 00 00 10 80 39  | WCN3988 with ROM Version 0x0200    |
+>>> ---------------------------------------------------------
+>>> | 00 08 74 12 80 39  |  WCN3988 with ROM Version 0x0201    |
+>>> ---------------------------------------------------------
+>>> | 00 07 64 21 90 39  |  WCN3990                    |
+>>> ---------------------------------------------------------
+>>
+>> Thanks a lot for these. I see now that the default Trogdor address Doug
+>> reported (39:98:00:00:5a:ad) appears to comes from the fw too:
+>>
+>>     $ od -x crnv32.bin | grep 5aad
+>>
+>>     0000020 0000 0000 5aad 0000 3998 0008 0008 0000
+>>
+>> which means that patch I sent this morning should be all that is needed
+>> for those machines at least.
+>>
 > 
-> Question: Can different patches be applied for different versions like
-> the above?
+> Yes correct, it will work for Trogdor
+> 
+>> Can you please confirm that all the WCN39xx have OTP storage for an
+>> address that an OEM can choose to use?
+>>
+> 
+> We are checking with internal FW team, will confirm on it.
+> 
+>> If that's not the case then we could simplify things by always marking
+>> their addresses as invalid, but I assume that they all have address
+>> storage.
+>>
+>> Johan
+> 
+> -Janakiram
 
-Ah...  Very good.  I assumed it was used.  The the commit which stopped
-using the return value, commit e7b02296fb40 ("Bluetooth: Remove BT_HS"),
-has been back ported to earlier kernels as well.
-
-Generally, we just write code against the latest kernel and worry about
-backports as a separate issue.  We sometimes re-write patches slightly
-if that's necessary for the backport.
-
-I'm not an expert in bluetooth, but I think your patch seems correct.
-Let's make l2cap_connect() void as well.  Wait for a day or two for
-other comments and then send a v2 patch.
-https://staticthinking.wordpress.com/2022/07/27/how-to-send-a-v2-patch/
-
-Here is how you write the commit message:
-========================================================================
-
-[PATCH v2] Bluetooth: L2CAP: Fix slab-use-after-free in l2cap_connect()
-
-KASAN detected a use after free in l2cap_send_cmd().
-BUG: KASAN: slab-use-after-free in l2cap_send_cmd+0x5dc/0x830 net/bluetooth/l2cap_core.c:968
-
-[free]
-l2cap_conn_del
-┌ mutex_lock(&conn->chan_lock);
-│ foreach chan in conn->chan_l:            ... (2)
-│   l2cap_chan_put(chan);
-│     l2cap_chan_destroy
-│       kfree(chan)                        ... (3)  <-- chan freed
-└ mutex_unlock(&conn->chan_lock);
-
-[use]
-l2cap_bredr_sig_cmd
-  l2cap_connect
-  ┌ mutex_lock(&conn->chan_lock);
-  │ chan = pchan->ops->new_connection(pchan);  <-- allocates chan
-  │ __l2cap_chan_add(conn, chan);
-  │   l2cap_chan_hold(chan);
-  │   list_add(&chan->list, &conn->chan_l);  ... (1)
-  └ mutex_unlock(&conn->chan_lock);
-    chan->conf_state			     ... (4)  <-- use after free
-
-To fix this, this patch holds and locks the l2cap channel.
-
-Also make the l2cap_connect() return type void.  Nothing is using the
-returned value but it is ugly to return a potentially freed pointer.
-Making it void will help with backports because earlier kernels did use
-the return value.  Now the compile will break for kernels where this
-patch is not a complete fix.
-
-Fixes: 73ffa904b782 ("Bluetooth: Move conf_{req,rsp} stuff to struct l2cap_chan")
-Signed-off-by:
-
-
+-Janaki Ram
