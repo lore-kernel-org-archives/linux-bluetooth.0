@@ -1,267 +1,197 @@
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CC3E42052
-	for <linux-bluetooth@vger.kernel.org>; Sat, 27 Apr 2024 07:44:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F39A91DA53;
+	Sat, 27 Apr 2024 09:51:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714203858; cv=none; b=JsJfKp1AptEgyB7WwiUet3AhMk/cxNX5f/kMO7gyx0Gbz8vCfxnfBlM5gU5LIV1IKw5B0qLU9+boAPenojZ7P3KDizQmRd4OQrijCuWFb9VZq6JT+AKgrS4qh4nJK1mfp62Zf9WQJhYqRFhd8DMhNBw3X9zzoBvfwrQx18s0QXE=
+	t=1714211482; cv=none; b=U+HsMI+YOH3pnWKAymd83g3+dvK3t8C1ZetcDXBsPrPLKQcP6YmHpIFLe0wmBVxrj0i+yocgoM+bXrnsZU0UQKbr1MM5qSHxflSHBWNu3jJRrDnPeB7Ay2E23wLYvG/0J365skylQrKztR3/hBaIgT53OKQAYvLxzC/ThngPVMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714203858; c=relaxed/simple;
-	bh=bjZmVcTDEnNXCR5XjaMeOuY1Qflnsmipj61fzC62U5I=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ELPMFC8NgeXYEbSej6jRN2gKa5D98aizVlIy47HEqz2zFx9Dnqw1QI2nS9KNXdHncSD9ToH9azsl7WGqOJQMi/3xqjPoPinoT9bVCh7aRnpL6nlAdARZryVgHX6JDkEYi41Z0Gr2a9/TZEvW8UTv10IPAMr7qBVYM9w2uM6iFAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-36afb9ef331so31986795ab.1
-        for <linux-bluetooth@vger.kernel.org>; Sat, 27 Apr 2024 00:44:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714203855; x=1714808655;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pwb4eLQhu+E9phBOZbX7TcdQUIpjytF2MxYWpRktvxI=;
-        b=vpGqXHj7oewxzcdYGCcYMND+LzdQN9gBgmOsxMay4qq8OKo6QmQKaxBo7NwUi3KeYS
-         jgqybd7v48dCylsW4cvT0rkq1yrK7z3Nf7PRfBqp4V+oODGrZijROu3SWd6LWtyHNcU3
-         w6QFRvcv8Rgdtr2wOzCEjU481Nt4Ya2QLMB6QGjDobsi1077o7EdjmFCaT2TbBshkQJj
-         GFtyvf237HO+zmSel+p78layWMbWHb3qKDnlz6huw61tPmvpKCOoqhlHrpiy249264dP
-         1GOGp0crl70lCAu6aBvHshvFPT//sLTZYXlgIBxszhRNal8UeOXiW0SJjXi9C7XOXpNt
-         1vpA==
-X-Forwarded-Encrypted: i=1; AJvYcCX9O5r2Xkzwx57xDJ2c+UecaLcQSlmM935kz4v9T5qhArPkHfgY/pL3nzTEiqKN9CWE8bxvjE6rq/ot8FVod+8QnflrkQj7C44N3+rzbzHo
-X-Gm-Message-State: AOJu0YyN8mXnCq384hJodvJQ6u5IrgFs4e/g3hn2jt4SCNWwIS8juXao
-	GjhFDVH6q6wXW/qXfz9BueoaODvJWVTpKX3rJDOvGG2FAFaHBmsZXMIfFJtM94WXGVlR8dQOEz5
-	VfhzOvY/w20/XgKKgW/cT1GA04XJHSNn6l8WBFNaJXhVx/trOU2kcpjo=
-X-Google-Smtp-Source: AGHT+IGSzMAz8EpfPqpwUtsE5zhTSGQxjAAWASpm2YVyZHYPFhmYkfmoNihjL/1nwCT1ruGEFluirxb88/P3HtkjU8yL6uAjkNR6
+	s=arc-20240116; t=1714211482; c=relaxed/simple;
+	bh=+9jHW4K9f03QSUVl2W7YEhTYJug9zNGMkpMyfCOygP0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=a2z2NdNQJskYgnVmoAe3alKaHe9TF1IuqOPJN2GSWdhOlg9r9rCpnAjWqRwUl9ZVSRyNEnCwsOu5aljHhThCxmvOmVdEKeeUNxeCPLU9NWI+x4LpXFa/GN/iIexcH+6wya0RI3mirfT8hr4+P3wvQWWpeHYk2tJ2LGM+lxbkgPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p2FWgJaI; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p2FWgJaI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 775E5C113CE;
+	Sat, 27 Apr 2024 09:51:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714211481;
+	bh=+9jHW4K9f03QSUVl2W7YEhTYJug9zNGMkpMyfCOygP0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=p2FWgJaIfciwCvq/aIPFu3JfseSHblixqx3DxRboReHmvIprimvCfu4+DHbPq9jyl
+	 uJULBzCVRtvAgdqAe13RZSYUBhv4enfc5mFs1ElKuqIJQgaYDl93q4LEv2Jus/SeqC
+	 p+eOThYmjfasvhu7CuTTO8vjZimNthpsIy/24VqPQfkJQA6JCFpcugmxJf/XhjC2YM
+	 pPbIyrBq/mP6z8HSdA9nnGQQq64i9M8jbhF87ECSd3B3HPCZZNh8Q5UqrkGHFrxCS3
+	 1yLnu/srAxWbT7rNAmg6/FSILV53ALP5xSLDcYASRN/f7EP8fnoUf+ez3T9uJqYLyw
+	 EA0dL//xze00Q==
+Received: from johan by xi.lan with local (Exim 4.97.1)
+	(envelope-from <johan@kernel.org>)
+	id 1s0eiI-000000006Sa-48Ux;
+	Sat, 27 Apr 2024 11:51:23 +0200
+Date: Sat, 27 Apr 2024 11:51:22 +0200
+From: Johan Hovold <johan@kernel.org>
+To: Doug Anderson <dianders@chromium.org>
+Cc: Johan Hovold <johan+linaro@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+Subject: Re: [PATCH] Bluetooth: qca: generalise device address check
+Message-ID: <ZizKmtcUIYAMpvOQ@hovoldconsulting.com>
+References: <20240426155801.25277-1-johan+linaro@kernel.org>
+ <CAD=FV=V-pG9+5fLonNvydmjS=ziUFUHAyF8T7YTkEHiO405aSA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:cd88:0:b0:36a:3fb0:c96b with SMTP id
- r8-20020a92cd88000000b0036a3fb0c96bmr166042ilb.1.1714203855693; Sat, 27 Apr
- 2024 00:44:15 -0700 (PDT)
-Date: Sat, 27 Apr 2024 00:44:15 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000e43c5106170f2fb4@google.com>
-Subject: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in l2cap_recv_frame
-From: syzbot <syzbot+5c915dc5dd417b83b348@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAD=FV=V-pG9+5fLonNvydmjS=ziUFUHAyF8T7YTkEHiO405aSA@mail.gmail.com>
 
-Hello,
+On Fri, Apr 26, 2024 at 10:23:15AM -0700, Doug Anderson wrote:
+> On Fri, Apr 26, 2024 at 9:00 AM Johan Hovold <johan+linaro@kernel.org> wrote:
+> >
+> > The default device address apparently comes from the NVM configuration
+> > file and can differ quite a bit.
+> >
+> > Store the default address when parsing the configuration file and use it
+> > to determine whether the controller has been provisioned with an
+> > address.
+> >
+> > This makes sure that devices without a unique address start as
+> > unconfigured unless a valid address has been provided in the devicetree.
 
-syzbot found the following issue on:
+> >  int qca_read_soc_version(struct hci_dev *hdev, struct qca_btsoc_version *ver,
+> >                          enum qca_btsoc_type soc_type)
+> >  {
+> > @@ -351,6 +348,11 @@ static void qca_tlv_check_data(struct hci_dev *hdev,
+> >
+> >                         /* Update NVM tags as needed */
+> >                         switch (tag_id) {
+> > +                       case EDL_TAG_ID_BD_ADDR:
+> > +                               if (tag_len != sizeof(bdaddr_t))
+> > +                                       break;
+> > +                               memcpy(&config->bdaddr, tlv_nvm->data, sizeof(bdaddr_t));
+> > +                               break;
+> >                         case EDL_TAG_ID_HCI:
+> 
+> nit: blank line after "break" ?
 
-HEAD commit:    4d2008430ce8 Merge tag 'docs-6.9-fixes2' of git://git.lwn...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=14555ae7180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=98d5a8e00ed1044a
-dashboard link: https://syzkaller.appspot.com/bug?extid=5c915dc5dd417b83b348
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=176f9880980000
+Possibly, the driver isn't really consistent here and only two case
+statements have such a newline after break.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/5670e5771b96/disk-4d200843.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/03314e6c8879/vmlinux-4d200843.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/41aca7a9505a/bzImage-4d200843.xz
+> Also note that on my firmware I never see this tag and thus your patch
+> breaks trogdor. Specifically I put a printout here and it never gets
+> hit.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+5c915dc5dd417b83b348@syzkaller.appspotmail.com
+Thanks for the quick test. As the parser is modifying the configuration
+file I assumed it was correct and tested...
+ 
+> I printed all the tags/lengths:
+> 
+> [   17.961087] DOUG: id 0xde02, len 0x0010
+> [   17.965081] DOUG: id 0x0000, len 0x0000
+> [   17.969050] DOUG: id 0x0000, len 0x0011
+> [   17.973025] DOUG: id 0x0000, len 0x0a00
+> [   17.976991] DOUG: id 0x0303, len 0x0303
+> [   17.981066] DOUG: id 0x0033, len 0x1001
+> 
+> Probably EDL_TAG_ID_BD_ADDR should have been 0xde02, not just 2.
 
-==================================================================
-BUG: KASAN: slab-use-after-free in l2cap_connect net/bluetooth/l2cap_core.c:3920 [inline]
-BUG: KASAN: slab-use-after-free in l2cap_connect_req net/bluetooth/l2cap_core.c:4061 [inline]
-BUG: KASAN: slab-use-after-free in l2cap_bredr_sig_cmd net/bluetooth/l2cap_core.c:4759 [inline]
-BUG: KASAN: slab-use-after-free in l2cap_sig_channel net/bluetooth/l2cap_core.c:5533 [inline]
-BUG: KASAN: slab-use-after-free in l2cap_recv_frame+0x19ca/0x107c0 net/bluetooth/l2cap_core.c:6793
-Read of size 8 at addr ffff88802ab26000 by task kworker/u9:7/5103
+No, the parser is apparently broken and fails to consider an extra
+four-byte header found in some NVM files and just happily parses and
+potentially modifies (sic!) random bytes.
 
-CPU: 0 PID: 5103 Comm: kworker/u9:7 Not tainted 6.9.0-rc5-syzkaller-00007-g4d2008430ce8 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-Workqueue: hci3 hci_rx_work
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
- print_address_description mm/kasan/report.c:377 [inline]
- print_report+0x169/0x550 mm/kasan/report.c:488
- kasan_report+0x143/0x180 mm/kasan/report.c:601
- l2cap_connect net/bluetooth/l2cap_core.c:3920 [inline]
- l2cap_connect_req net/bluetooth/l2cap_core.c:4061 [inline]
- l2cap_bredr_sig_cmd net/bluetooth/l2cap_core.c:4759 [inline]
- l2cap_sig_channel net/bluetooth/l2cap_core.c:5533 [inline]
- l2cap_recv_frame+0x19ca/0x107c0 net/bluetooth/l2cap_core.c:6793
- hci_acldata_packet net/bluetooth/hci_core.c:3939 [inline]
- hci_rx_work+0x50f/0xca0 net/bluetooth/hci_core.c:4176
- process_one_work kernel/workqueue.c:3254 [inline]
- process_scheduled_works+0xa10/0x17c0 kernel/workqueue.c:3335
- worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
- kthread+0x2f0/0x390 kernel/kthread.c:388
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
+I've fixed the parser so that it works also on configuration files with
+the extra header (apnv??.bin, crnv??[u].bin) and can read out the
+default address for all NVM files in linux-firmware that have one
+(otherwise all-zeroes is printed below):
 
-Allocated by task 5096:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- poison_kmalloc_redzone mm/kasan/common.c:370 [inline]
- __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:387
- kasan_kmalloc include/linux/kasan.h:211 [inline]
- kmalloc_trace+0x1db/0x360 mm/slub.c:3997
- kmalloc include/linux/slab.h:628 [inline]
- kzalloc include/linux/slab.h:749 [inline]
- l2cap_conn_add+0xa9/0x9c0 net/bluetooth/l2cap_core.c:6836
- l2cap_connect_cfm+0x136/0x1220 net/bluetooth/l2cap_core.c:7227
- hci_connect_cfm include/net/bluetooth/hci_core.h:2007 [inline]
- hci_remote_features_evt+0x68b/0xa70 net/bluetooth/hci_event.c:3778
- hci_event_func net/bluetooth/hci_event.c:7542 [inline]
- hci_event_packet+0xac0/0x1540 net/bluetooth/hci_event.c:7594
- hci_rx_work+0x3e8/0xca0 net/bluetooth/hci_core.c:4171
- process_one_work kernel/workqueue.c:3254 [inline]
- process_scheduled_works+0xa10/0x17c0 kernel/workqueue.c:3335
- worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
- kthread+0x2f0/0x390 kernel/kthread.c:388
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+bluetooth hci0: bd_addr = 39:80:10:00:00:20 (qca/apnv10.bin)
+bluetooth hci0: bd_addr = 39:80:12:74:08:00 (qca/apnv11.bin)
+bluetooth hci0: bd_addr = 39:90:21:64:07:00 (qca/crnv21.bin)
+bluetooth hci0: bd_addr = 39:98:00:00:5a:ad (qca/crnv32.bin)
+bluetooth hci0: bd_addr = 39:98:00:00:5a:ad (qca/crnv32u.bin)
+bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/hpnv21.301)
+bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/hpnv21.302)
+bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/hpnv21.309)
+bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/hpnv21.bin)
+bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/hpnv21.bin)
+bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/hpnv21g.301)
+bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/hpnv21g.302)
+bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/hpnv21g.309)
+bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/hpnv21g.bin)
+bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/htnv20.bin)
+bluetooth hci0: bd_addr = 64:90:00:00:5a:ad (qca/msnv11.b09)
+bluetooth hci0: bd_addr = 64:90:00:00:5a:ad (qca/msnv11.b0a)
+bluetooth hci0: bd_addr = 64:90:00:00:5a:ad (qca/msnv11.bin)
+bluetooth hci0: bd_addr = 61:47:aa:31:22:14 (qca/nvm_00130300.bin)
+bluetooth hci0: bd_addr = 61:47:aa:32:44:07 (qca/nvm_00130302.bin)
 
-Freed by task 5102:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:579
- poison_slab_object+0xa6/0xe0 mm/kasan/common.c:240
- __kasan_slab_free+0x37/0x60 mm/kasan/common.c:256
- kasan_slab_free include/linux/kasan.h:184 [inline]
- slab_free_hook mm/slub.c:2106 [inline]
- slab_free mm/slub.c:4280 [inline]
- kfree+0x153/0x3a0 mm/slub.c:4390
- l2cap_connect_cfm+0x11f/0x1220 net/bluetooth/l2cap_core.c:7223
- hci_connect_cfm include/net/bluetooth/hci_core.h:2007 [inline]
- hci_conn_failed+0x1f6/0x340 net/bluetooth/hci_conn.c:1230
- hci_abort_conn_sync+0x583/0xde0 net/bluetooth/hci_sync.c:5567
- hci_cmd_sync_work+0x22b/0x400 net/bluetooth/hci_sync.c:310
- process_one_work kernel/workqueue.c:3254 [inline]
- process_scheduled_works+0xa10/0x17c0 kernel/workqueue.c:3335
- worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
- kthread+0x2f0/0x390 kernel/kthread.c:388
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+bluetooth hci0: bd_addr = 00:00:00:00:00:00 (qca/nvm_00230302.bin)
 
-Last potentially related work creation:
- kasan_save_stack+0x3f/0x60 mm/kasan/common.c:47
- __kasan_record_aux_stack+0xac/0xc0 mm/kasan/generic.c:541
- insert_work+0x3e/0x330 kernel/workqueue.c:2248
- __queue_work+0xc24/0xef0 kernel/workqueue.c:2400
- call_timer_fn+0x18e/0x650 kernel/time/timer.c:1793
- expire_timers kernel/time/timer.c:1839 [inline]
- __run_timers kernel/time/timer.c:2418 [inline]
- __run_timer_base+0x695/0x8e0 kernel/time/timer.c:2429
- run_timer_base kernel/time/timer.c:2438 [inline]
- run_timer_softirq+0xb7/0x170 kernel/time/timer.c:2448
- __do_softirq+0x2c6/0x980 kernel/softirq.c:554
+bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_00440302.bin)
+bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_00440302_eu.bin)
+bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_00440302_i2s_eu.bin)
 
-Second to last potentially related work creation:
- kasan_save_stack+0x3f/0x60 mm/kasan/common.c:47
- __kasan_record_aux_stack+0xac/0xc0 mm/kasan/generic.c:541
- insert_work+0x3e/0x330 kernel/workqueue.c:2248
- __queue_work+0xb00/0xef0 kernel/workqueue.c:2404
- queue_work_on+0x14f/0x250 kernel/workqueue.c:2435
- queue_work include/linux/workqueue.h:605 [inline]
- l2cap_conn_ready net/bluetooth/l2cap_core.c:1613 [inline]
- l2cap_connect_cfm+0xec2/0x1220 net/bluetooth/l2cap_core.c:7268
- hci_connect_cfm include/net/bluetooth/hci_core.h:2007 [inline]
- hci_remote_features_evt+0x68b/0xa70 net/bluetooth/hci_event.c:3778
- hci_event_func net/bluetooth/hci_event.c:7542 [inline]
- hci_event_packet+0xac0/0x1540 net/bluetooth/hci_event.c:7594
- hci_rx_work+0x3e8/0xca0 net/bluetooth/hci_core.c:4171
- process_one_work kernel/workqueue.c:3254 [inline]
- process_scheduled_works+0xa10/0x17c0 kernel/workqueue.c:3335
- worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
- kthread+0x2f0/0x390 kernel/kthread.c:388
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+bluetooth hci0: bd_addr = 00:00:00:00:00:00 (qca/nvm_usb_00000200.bin)
+bluetooth hci0: bd_addr = 00:00:00:00:00:00 (qca/nvm_usb_00000201.bin)
+bluetooth hci0: bd_addr = 00:00:00:00:00:00 (qca/nvm_usb_00000300.bin)
+bluetooth hci0: bd_addr = 00:00:00:00:00:00 (qca/nvm_usb_00000302.bin)
+bluetooth hci0: bd_addr = 00:00:00:00:00:00 (qca/nvm_usb_00000302_eu.bin)
 
-The buggy address belongs to the object at ffff88802ab26000
- which belongs to the cache kmalloc-1k of size 1024
-The buggy address is located 0 bytes inside of
- freed 1024-byte region [ffff88802ab26000, ffff88802ab26400)
+bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130200_0104.bin)
+bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130200_0105.bin)
+bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130200_0106.bin)
+bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130200_0107.bin)
+bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130200_0109.bin)
+bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130200_0110.bin)
+bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130200.bin)
+bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130201_010a.bin)
+bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130201_010b.bin)
+bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130201_0303.bin)
+bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130201.bin)
+bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130201_gf_010a.bin)
+bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130201_gf_010b.bin)
+bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130201_gf_0303.bin)
+bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130201_gf.bin)
+bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00190200.bin)
 
-The buggy address belongs to the physical page:
-page: refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff88802ab27000 pfn:0x2ab20
-head: order:3 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-flags: 0xfff80000000a40(workingset|slab|head|node=0|zone=1|lastcpupid=0xfff)
-page_type: 0xffffffff()
-raw: 00fff80000000a40 ffff888015041dc0 ffffea0000b7c210 ffffea00008af410
-raw: ffff88802ab27000 000000000010000e 00000001ffffffff 0000000000000000
-head: 00fff80000000a40 ffff888015041dc0 ffffea0000b7c210 ffffea00008af410
-head: ffff88802ab27000 000000000010000e 00000001ffffffff 0000000000000000
-head: 00fff80000000003 ffffea0000aac801 ffffea0000aac848 00000000ffffffff
-head: 0000000800000000 0000000000000000 00000000ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 1, tgid -1362480974 (swapper/0), ts 1, free_ts 0
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x1ea/0x210 mm/page_alloc.c:1534
- prep_new_page mm/page_alloc.c:1541 [inline]
- get_page_from_freelist+0x3410/0x35b0 mm/page_alloc.c:3317
- __alloc_pages+0x256/0x6c0 mm/page_alloc.c:4575
- __alloc_pages_node include/linux/gfp.h:238 [inline]
- alloc_pages_node include/linux/gfp.h:261 [inline]
- alloc_slab_page+0x5f/0x160 mm/slub.c:2175
- allocate_slab mm/slub.c:2338 [inline]
- new_slab+0x84/0x2f0 mm/slub.c:2391
- ___slab_alloc+0xc73/0x1260 mm/slub.c:3525
- __slab_alloc mm/slub.c:3610 [inline]
- __slab_alloc_node mm/slub.c:3663 [inline]
- slab_alloc_node mm/slub.c:3835 [inline]
- kmalloc_trace+0x269/0x360 mm/slub.c:3992
- kmalloc include/linux/slab.h:628 [inline]
- kzalloc include/linux/slab.h:749 [inline]
- fqdir_init+0x59/0x170 net/ipv4/inet_fragment.c:192
- lowpan_frags_init_net+0x33/0x310 net/ieee802154/6lowpan/reassembly.c:453
- ops_init+0x352/0x610 net/core/net_namespace.c:136
- __register_pernet_operations net/core/net_namespace.c:1243 [inline]
- register_pernet_operations+0x2cb/0x660 net/core/net_namespace.c:1312
- register_pernet_subsys+0x28/0x40 net/core/net_namespace.c:1353
- lowpan_net_frag_init+0xb2/0x100 net/ieee802154/6lowpan/reassembly.c:538
- lowpan_init_module+0x10/0x90 net/ieee802154/6lowpan/core.c:250
- do_one_initcall+0x248/0x880 init/main.c:1245
- do_initcall_level+0x157/0x210 init/main.c:1307
-page_owner free stack trace missing
+It looks like we're being lucky and the parser is at least not
+corrupting the configuration files with the extra header currently in
+linux-firmware, but if it ever interprets a random 0x0011 or 0x001b word
+as a tag it would.
 
-Memory state around the buggy address:
- ffff88802ab25f00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff88802ab25f80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->ffff88802ab26000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                   ^
- ffff88802ab26080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff88802ab26100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
+Fixing the parser means that we would start modifying the configuration
+also for files with the extra header. This involves configuring the baud
+rate and enabling a deep sleep feature.
 
+Presumably this is something that should be done also on Trogdor, but
+this would obviously have to be tested first. I guess we can keep
+skipping this step until it has been verified and just read out the
+address for now.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+> > @@ -624,6 +626,9 @@ static int qca_check_bdaddr(struct hci_dev *hdev)
+> >         if (bacmp(&hdev->public_addr, BDADDR_ANY))
+> >                 return 0;
+> >
+> > +       if (!bacmp(&config->bdaddr, BDADDR_ANY))
+> > +               return 0;
+> 
+> The above test feels non-obvious enough to deserve a comment. Could
+> you add one? That would also help alleviate my confusion since I
+> _think_ your if test is unneeded and maybe wrong? Let's say that the
+> firmware didn't have a default address stored in it. It still seems
+> like we could try to read the address and then if the firmware gave
+> back BDADDR_ANY (0) we should set the `HCI_QUIRK_USE_BDADDR_PROPERTY`
+> property, right?
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+You're right. I'll drop this check when revisiting this next week.
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Johan
