@@ -1,197 +1,214 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from EUR02-AM0-obe.outbound.protection.outlook.com (mail-am0eur02olkn2066.outbound.protection.outlook.com [40.92.49.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F39A91DA53;
-	Sat, 27 Apr 2024 09:51:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714211482; cv=none; b=U+HsMI+YOH3pnWKAymd83g3+dvK3t8C1ZetcDXBsPrPLKQcP6YmHpIFLe0wmBVxrj0i+yocgoM+bXrnsZU0UQKbr1MM5qSHxflSHBWNu3jJRrDnPeB7Ay2E23wLYvG/0J365skylQrKztR3/hBaIgT53OKQAYvLxzC/ThngPVMQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714211482; c=relaxed/simple;
-	bh=+9jHW4K9f03QSUVl2W7YEhTYJug9zNGMkpMyfCOygP0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a2z2NdNQJskYgnVmoAe3alKaHe9TF1IuqOPJN2GSWdhOlg9r9rCpnAjWqRwUl9ZVSRyNEnCwsOu5aljHhThCxmvOmVdEKeeUNxeCPLU9NWI+x4LpXFa/GN/iIexcH+6wya0RI3mirfT8hr4+P3wvQWWpeHYk2tJ2LGM+lxbkgPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p2FWgJaI; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3834C1E521
+	for <linux-bluetooth@vger.kernel.org>; Sat, 27 Apr 2024 15:57:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.49.66
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714233481; cv=fail; b=QaJCi82ppTwyGHyRghXMckYuLH0ZDWqH3m0cO8kUL7kfSUloBGWJtwIeSlQiIqapbQAeFvkGObj/hh26iXVE8pjFKwYB4qVxFLiixStNBXciM1VMr/2R9PEusEkpadezeePVUYJwEpPlPHu/mrwF9cs+Q7PgHc40x62ZRUIi41U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714233481; c=relaxed/simple;
+	bh=TBhbSTCqb8kzYOQVybgARhuHNJOZf7wDMfOCPLFzVIc=;
+	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=ZNI9clmgYeKWERf8+6yKsBZquPdhibRz5zWIe7RgZjNJcCrb12FHGhkMYmqam6GJHGxjOzrjHfANXRf66amhyfsmgLqyIpvVBpFOn8dVpU/kgMCW7MVBpv+4KQ5quhitrZXNW2dgsIWL+Whua0P4CIwkHouNfekU5Uz8VLZ0tks=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.be; spf=pass smtp.mailfrom=outlook.be; dkim=pass (2048-bit key) header.d=OUTLOOK.BE header.i=@OUTLOOK.BE header.b=Zda9RCOq; arc=fail smtp.client-ip=40.92.49.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.be
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p2FWgJaI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 775E5C113CE;
-	Sat, 27 Apr 2024 09:51:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714211481;
-	bh=+9jHW4K9f03QSUVl2W7YEhTYJug9zNGMkpMyfCOygP0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=p2FWgJaIfciwCvq/aIPFu3JfseSHblixqx3DxRboReHmvIprimvCfu4+DHbPq9jyl
-	 uJULBzCVRtvAgdqAe13RZSYUBhv4enfc5mFs1ElKuqIJQgaYDl93q4LEv2Jus/SeqC
-	 p+eOThYmjfasvhu7CuTTO8vjZimNthpsIy/24VqPQfkJQA6JCFpcugmxJf/XhjC2YM
-	 pPbIyrBq/mP6z8HSdA9nnGQQq64i9M8jbhF87ECSd3B3HPCZZNh8Q5UqrkGHFrxCS3
-	 1yLnu/srAxWbT7rNAmg6/FSILV53ALP5xSLDcYASRN/f7EP8fnoUf+ez3T9uJqYLyw
-	 EA0dL//xze00Q==
-Received: from johan by xi.lan with local (Exim 4.97.1)
-	(envelope-from <johan@kernel.org>)
-	id 1s0eiI-000000006Sa-48Ux;
-	Sat, 27 Apr 2024 11:51:23 +0200
-Date: Sat, 27 Apr 2024 11:51:22 +0200
-From: Johan Hovold <johan@kernel.org>
-To: Doug Anderson <dianders@chromium.org>
-Cc: Johan Hovold <johan+linaro@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Janaki Ramaiah Thota <quic_janathot@quicinc.com>
-Subject: Re: [PATCH] Bluetooth: qca: generalise device address check
-Message-ID: <ZizKmtcUIYAMpvOQ@hovoldconsulting.com>
-References: <20240426155801.25277-1-johan+linaro@kernel.org>
- <CAD=FV=V-pG9+5fLonNvydmjS=ziUFUHAyF8T7YTkEHiO405aSA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=OUTLOOK.BE header.i=@OUTLOOK.BE header.b="Zda9RCOq"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=V7ePItJnvO/uMoTHCA4SEUK/8TBs6dnrja+9hLn10MPoOOqXkf4for4xHrYsfW6BAGcmxOwoJW0w1NsXpHj/hcOdHr38ChUYrUUaB5z8pRFF5A7gSFHq92xtwHD26vWjF5P4Aw2/PoqQaHqSEKTLusLtE41AIC6AzImwC+ukzfSHSEI0zb9Kmbi26y1OjHB5G6BVJ+WCTVqP6GT64v02511vaebZfVIRKAislKtaQtlZnpVNv44as7n3p2l2HOVf9x+Xt0HX/OBVI4GYy8dowgKuZQXp9rV8d5cFQdLe6STQEpFNikDVXjcE6/77SIMNYkBYUbxrCAXsIKba2jfrvw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TBhbSTCqb8kzYOQVybgARhuHNJOZf7wDMfOCPLFzVIc=;
+ b=ci/0c7FXt5C116PdyOIUPJ4b4T8yaeCkPxUCMBp41okzcGNSuV2zKkjt/gGNYcnBd3l6UzpTY0w8eVJWDQqn1IbiBW4ckoGruNMQ4SMLBt/MmHR5evlX4SSr1NSp/S3LjMGJBd9fpDayjS9iV8BHAJ4rjJAnx/qoCZblD17HkFWSMrcWztljJMMfEzpjeoL0OuNjx+JLoLwu60BGGb+EsazNgidc7jyHj0C7jBh0zjXPEHTbwGzRTv7eqnKklZyRjpL3JrdHS7GWw862deilL+bBzszsaisiB9L4W8EILevPRALUlKE+qmsW7/bF/YSFe4KyH1BUrbe9XKykecMIrQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=OUTLOOK.BE;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TBhbSTCqb8kzYOQVybgARhuHNJOZf7wDMfOCPLFzVIc=;
+ b=Zda9RCOqqLDT1sue35TU6BD4dOQepaAd2cLSJFKsbU0gSXYSCIxqqFXZE8DJA8n2ILoxnkzN3FZ2+bSlojNa7MKIs9zwm/UrrH7hQVuNhZSBXsCLL6bOxuKHerhhfLZ/EGGkiUN47ah17WYP1HvJKa/3GwXbO5YAMLFrMFaD/iJ1jH90WECUvinqaeZhm/2y+gWKEKMt6aHUFxIKmDXi/42v2ST+KtQyXX/hOQg+138F1W4uea+0lbpvJKVTgwvg9wA/wRzNs5dL3m4t/jerCsp6AIO/J9yiEbhdS+gFLwpaiIJKOUe6zJ9bLb+ZWZ5jzSHfaJysIydiY/JrDfnbZA==
+Received: from PAXPR08MB6399.eurprd08.prod.outlook.com (2603:10a6:102:158::20)
+ by AS8PR08MB6070.eurprd08.prod.outlook.com (2603:10a6:20b:290::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.31; Sat, 27 Apr
+ 2024 15:57:56 +0000
+Received: from PAXPR08MB6399.eurprd08.prod.outlook.com
+ ([fe80::f658:361f:b679:8b3f]) by PAXPR08MB6399.eurprd08.prod.outlook.com
+ ([fe80::f658:361f:b679:8b3f%7]) with mapi id 15.20.7519.031; Sat, 27 Apr 2024
+ 15:57:56 +0000
+From: Peter Mortier <peter.mortier@outlook.be>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: Bluetooth from Windows to Linux using BlueZ
+Thread-Topic: Bluetooth from Windows to Linux using BlueZ
+Thread-Index: AQHaj0g14qgvKTq53k6fANofPVUUyrFpd8kAgBLasmA=
+Date: Sat, 27 Apr 2024 15:57:56 +0000
+Message-ID:
+ <PAXPR08MB639918C9ED9980C2012DA42098152@PAXPR08MB6399.eurprd08.prod.outlook.com>
+References:
+ <PAXPR08MB6399418D53ED76246B32164998092@PAXPR08MB6399.eurprd08.prod.outlook.com>
+ <PAXPR08MB639971AE2D6FB75937F92D2C98092@PAXPR08MB6399.eurprd08.prod.outlook.com>
+ <CABBYNZ+0XmS5EYmoEKXzRxFHJEoGsTj8ghmVreX9VSt3tTymrg@mail.gmail.com>
+In-Reply-To:
+ <CABBYNZ+0XmS5EYmoEKXzRxFHJEoGsTj8ghmVreX9VSt3tTymrg@mail.gmail.com>
+Accept-Language: nl-BE, en-US
+Content-Language: nl-NL
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-bromium-msgid: e2782753-2b59-4d1d-a597-8a15d59e861d
+x-tmn:
+ [mhzIkzGvPuQGKSEOgxwGHRRBSBwMGJcvh0tjXmlGQbnBIdf/RwqNC2Ga9bUPMTS1E8O+QQEJZqo=]
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR08MB6399:EE_|AS8PR08MB6070:EE_
+x-ms-office365-filtering-correlation-id: 7d343582-a047-420d-26fd-08dc66d2ce37
+x-microsoft-antispam:
+ BCL:0;ARA:14566002|461199019|1602099003|3412199016|440099019|102099023;
+x-microsoft-antispam-message-info:
+ XeJZ7hvavFNFuSGQVFhJc0kINOAbY58JKC317uWG9czWfEbVdyx9zcmJqKCC4Z80IhnOjQAD3NkJgwsyJKB4rg+WCbM8jDCC4mRdtKimbIujZtTI+7Y+stLBe7bOe0l5Qs2mB1/6XYG1/fklPS+lKTgVb2KgNSfx7XxkLCAkgA/SEJC9Z+m8wSpm2zuLO8sH1CMYaPICLFAA+Fyn4OoFvtiFds8UGnT7VrGblxgsFByB7wayzTS98DlRUSp5aM/GOtl5fqVdch7iOfoaI2OVwHfN3zLfMBHp/0A+n7QQrZBJcDeljA+tjOghO932NixLIJ2YzZ1Tr0+NM/n/aU5Wlhw0sXgIz83spDI7MZcoHhDIwGQRs3HNThC/Qk2a4vrJHRr6Me+nO0W2d4wuT/jPqERCETGf9l1JAcZQ1/AmS6tYbY2dVkgrQ16aHJlVkz3iR0zFyzYpMu/92Xs/qk0OHBE2EvrlIeCcg02HTWszSl404AhxvN/5nK3JsBMUWCA3NTGp+fZ5qz00rf87eQGoDsPuxoDbY5z4XzJrFLOVsoQup4PLoVy1RJPXPAd0hMVVvKiIowPCCwo2gN7Ni63WEjBrZu4OoUXqBNcirBHUWAjoTlwp7nr5tX6C9MtMnXTduDdaZuHnyeNu6YAU9TZhYWQVOm5ejrzFPsgUJGACxUE=
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?bHRNaWxJWGFsN0MrajFnNG9aU243cXpyV2FFN2FXeGJNZEM4S3FwR01CaVFS?=
+ =?utf-8?B?S3dwWXh3YVYyUTVXRTJUd01TWnE2N1BXeWR0QXFZRnpCNFpXVWVFdU9NSGJX?=
+ =?utf-8?B?ekZ1MDZsQVEwR004SGxQNWVUbTVzUUlSU1BlYzlJazV5S3pJUURObjhNVGUz?=
+ =?utf-8?B?QUcrcHBESEdzbW95T3ZBSVlEVDZINFZ4Yng4ZkdTUVh2VkNjVkdRcHpVZE5C?=
+ =?utf-8?B?MThiVERXODIzaUtJdnBMQVRvLzR2TUxZd0VKT3RyS3RrK3dNcERoN3Q3OGpw?=
+ =?utf-8?B?RDhQTk1rSW05YzE3b1dqUElmaEhzaGtUN2NOMERpMTFSMW9hd01BNkpYNm9v?=
+ =?utf-8?B?dzFwTlFOMjRYaU1ZWEl6TkI0V1JPUDVMQU0zVEp2Y25Ob0VTV2gwNWUwVkJK?=
+ =?utf-8?B?VTUrTlFvR3lEM2FMaXd6VjhuV3dxZEhXWWlwcUY0TGpndWlDOTVQeVk2SkJi?=
+ =?utf-8?B?WERwM2dnbWtGVkJXY3lmZjc4T0ZjekxxeTJlTmVMUXROVm1HNVVhdGxLWXpP?=
+ =?utf-8?B?QjI1MWdZbWpBYjI0bU5idmxMbjB3RGpCYU9xM3k1dmlwVGdTb3pHRmZvdUM2?=
+ =?utf-8?B?TkdjZkMzcnZ5eWpZSGRQK2RnRStiZU5nK2U0NHZ3NzRMajdVeG5Hcko1eVpG?=
+ =?utf-8?B?N1JMNlpFM05ybnorVTA2YVA3WUFPRlhBRE5kRDZMbUhYSHVIZ2RLNTVYaW9h?=
+ =?utf-8?B?c1NZdTYrd2NVVlFYRGNNZlM2QU5PN0J3amhwVkNtMDdlWURCSUdvcm40MzVz?=
+ =?utf-8?B?U3Yxbkw3MTc4Tmhyd0w4VFFJbWNubVFjcW84M1U5Q0NJcmZVYkZqdHJJbzVH?=
+ =?utf-8?B?UmlEL3AyL3R6ZWZXbU1JRk1saUZ6WFVzY2JKalBSM3h2enI0TmxpRlpkUGhK?=
+ =?utf-8?B?a1JQVDBWRHRGMFl4SUdBZXc0MU4zemZxMnU3UGIzc2JoaUxuWHRUUm8zOEZT?=
+ =?utf-8?B?c2p5ajJ4anVXWTM1d3pqNGdWdzYxYkFhc1lZamVhNUpJbG8rV0FDVnZPOU1h?=
+ =?utf-8?B?MVQxazZJSGtVQ0FNVW5HOGljdGNHZkxXazJsQVZiWjRjT3VHQXAzMVV5ejVp?=
+ =?utf-8?B?MmZmRHdhWHRFM05CVVVPZXBPUFZmaUxCNUVhdUE0V1ZWZ3FweEVmVG9FUWRH?=
+ =?utf-8?B?eG5lSkJvRmdYbHFWdHZlUHdkaVM2R0R3eHFza0UxOENpVXZaMmR2Q0ppVWtV?=
+ =?utf-8?B?cWI4M3BocHBYSEpYUWlaYnlxYnJRZUNrenQvZjAyakdSdndwNU1DK2pIS1px?=
+ =?utf-8?B?dU9ZNXBDeTVGaXJxaWJ2TDRDclFDcy9hbXBUMzdLdE0xRlpPNm5YM1lUNU8w?=
+ =?utf-8?B?TFVhMmxjK0oxUGJoRFJKMFNENDJnSGtPekpEbU5pRnJvQnVDWnNsMFZMT1Bj?=
+ =?utf-8?B?REdlK3BEa2ppODByd3ZXNGVnRDFHK2VYWkVVSHFVdCtUYVZpTGtEWmFDYUxF?=
+ =?utf-8?B?bDhGQmV0VDY4TXo3TWx6MlQrUVk3cXRSYU8xazdaM3BaYm5YNURXdmJ5OFIx?=
+ =?utf-8?B?VDUvbFZyMmtaMloyVmlvODJ2cTVqTWNENlV2Y2thRE95QUR4TnQvWDFPQWZi?=
+ =?utf-8?B?TVIrWURaSmRwNGhqSHliTnRZVzU3UVh6NU5TYXdOR3lqOVRGcFYzYi9WRUhM?=
+ =?utf-8?B?TGV2L1YxWlJ6b0ZOTDFvYTBYdlhlMGdVbE9saVVweVhoT1pEdFlPQjJNc2hZ?=
+ =?utf-8?B?ZWl1SWMrSXNVWlZyZFo2b3JZVjZqc1R6c1NmWEdaQnU1QTQ4dkJPaWZFanAz?=
+ =?utf-8?Q?2ovFZkK18Pmm2haQug=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAD=FV=V-pG9+5fLonNvydmjS=ziUFUHAyF8T7YTkEHiO405aSA@mail.gmail.com>
+X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-37dd7.templateTenant
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR08MB6399.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7d343582-a047-420d-26fd-08dc66d2ce37
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Apr 2024 15:57:56.8421
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB6070
 
-On Fri, Apr 26, 2024 at 10:23:15AM -0700, Doug Anderson wrote:
-> On Fri, Apr 26, 2024 at 9:00 AM Johan Hovold <johan+linaro@kernel.org> wrote:
-> >
-> > The default device address apparently comes from the NVM configuration
-> > file and can differ quite a bit.
-> >
-> > Store the default address when parsing the configuration file and use it
-> > to determine whether the controller has been provisioned with an
-> > address.
-> >
-> > This makes sure that devices without a unique address start as
-> > unconfigured unless a valid address has been provided in the devicetree.
-
-> >  int qca_read_soc_version(struct hci_dev *hdev, struct qca_btsoc_version *ver,
-> >                          enum qca_btsoc_type soc_type)
-> >  {
-> > @@ -351,6 +348,11 @@ static void qca_tlv_check_data(struct hci_dev *hdev,
-> >
-> >                         /* Update NVM tags as needed */
-> >                         switch (tag_id) {
-> > +                       case EDL_TAG_ID_BD_ADDR:
-> > +                               if (tag_len != sizeof(bdaddr_t))
-> > +                                       break;
-> > +                               memcpy(&config->bdaddr, tlv_nvm->data, sizeof(bdaddr_t));
-> > +                               break;
-> >                         case EDL_TAG_ID_HCI:
-> 
-> nit: blank line after "break" ?
-
-Possibly, the driver isn't really consistent here and only two case
-statements have such a newline after break.
-
-> Also note that on my firmware I never see this tag and thus your patch
-> breaks trogdor. Specifically I put a printout here and it never gets
-> hit.
-
-Thanks for the quick test. As the parser is modifying the configuration
-file I assumed it was correct and tested...
- 
-> I printed all the tags/lengths:
-> 
-> [   17.961087] DOUG: id 0xde02, len 0x0010
-> [   17.965081] DOUG: id 0x0000, len 0x0000
-> [   17.969050] DOUG: id 0x0000, len 0x0011
-> [   17.973025] DOUG: id 0x0000, len 0x0a00
-> [   17.976991] DOUG: id 0x0303, len 0x0303
-> [   17.981066] DOUG: id 0x0033, len 0x1001
-> 
-> Probably EDL_TAG_ID_BD_ADDR should have been 0xde02, not just 2.
-
-No, the parser is apparently broken and fails to consider an extra
-four-byte header found in some NVM files and just happily parses and
-potentially modifies (sic!) random bytes.
-
-I've fixed the parser so that it works also on configuration files with
-the extra header (apnv??.bin, crnv??[u].bin) and can read out the
-default address for all NVM files in linux-firmware that have one
-(otherwise all-zeroes is printed below):
-
-bluetooth hci0: bd_addr = 39:80:10:00:00:20 (qca/apnv10.bin)
-bluetooth hci0: bd_addr = 39:80:12:74:08:00 (qca/apnv11.bin)
-bluetooth hci0: bd_addr = 39:90:21:64:07:00 (qca/crnv21.bin)
-bluetooth hci0: bd_addr = 39:98:00:00:5a:ad (qca/crnv32.bin)
-bluetooth hci0: bd_addr = 39:98:00:00:5a:ad (qca/crnv32u.bin)
-bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/hpnv21.301)
-bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/hpnv21.302)
-bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/hpnv21.309)
-bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/hpnv21.bin)
-bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/hpnv21.bin)
-bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/hpnv21g.301)
-bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/hpnv21g.302)
-bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/hpnv21g.309)
-bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/hpnv21g.bin)
-bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/htnv20.bin)
-bluetooth hci0: bd_addr = 64:90:00:00:5a:ad (qca/msnv11.b09)
-bluetooth hci0: bd_addr = 64:90:00:00:5a:ad (qca/msnv11.b0a)
-bluetooth hci0: bd_addr = 64:90:00:00:5a:ad (qca/msnv11.bin)
-bluetooth hci0: bd_addr = 61:47:aa:31:22:14 (qca/nvm_00130300.bin)
-bluetooth hci0: bd_addr = 61:47:aa:32:44:07 (qca/nvm_00130302.bin)
-
-bluetooth hci0: bd_addr = 00:00:00:00:00:00 (qca/nvm_00230302.bin)
-
-bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_00440302.bin)
-bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_00440302_eu.bin)
-bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_00440302_i2s_eu.bin)
-
-bluetooth hci0: bd_addr = 00:00:00:00:00:00 (qca/nvm_usb_00000200.bin)
-bluetooth hci0: bd_addr = 00:00:00:00:00:00 (qca/nvm_usb_00000201.bin)
-bluetooth hci0: bd_addr = 00:00:00:00:00:00 (qca/nvm_usb_00000300.bin)
-bluetooth hci0: bd_addr = 00:00:00:00:00:00 (qca/nvm_usb_00000302.bin)
-bluetooth hci0: bd_addr = 00:00:00:00:00:00 (qca/nvm_usb_00000302_eu.bin)
-
-bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130200_0104.bin)
-bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130200_0105.bin)
-bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130200_0106.bin)
-bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130200_0107.bin)
-bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130200_0109.bin)
-bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130200_0110.bin)
-bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130200.bin)
-bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130201_010a.bin)
-bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130201_010b.bin)
-bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130201_0303.bin)
-bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130201.bin)
-bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130201_gf_010a.bin)
-bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130201_gf_010b.bin)
-bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130201_gf_0303.bin)
-bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130201_gf.bin)
-bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00190200.bin)
-
-It looks like we're being lucky and the parser is at least not
-corrupting the configuration files with the extra header currently in
-linux-firmware, but if it ever interprets a random 0x0011 or 0x001b word
-as a tag it would.
-
-Fixing the parser means that we would start modifying the configuration
-also for files with the extra header. This involves configuring the baud
-rate and enabling a deep sleep feature.
-
-Presumably this is something that should be done also on Trogdor, but
-this would obviously have to be tested first. I guess we can keep
-skipping this step until it has been verified and just read out the
-address for now.
-
-> > @@ -624,6 +626,9 @@ static int qca_check_bdaddr(struct hci_dev *hdev)
-> >         if (bacmp(&hdev->public_addr, BDADDR_ANY))
-> >                 return 0;
-> >
-> > +       if (!bacmp(&config->bdaddr, BDADDR_ANY))
-> > +               return 0;
-> 
-> The above test feels non-obvious enough to deserve a comment. Could
-> you add one? That would also help alleviate my confusion since I
-> _think_ your if test is unneeded and maybe wrong? Let's say that the
-> firmware didn't have a default address stored in it. It still seems
-> like we could try to read the address and then if the firmware gave
-> back BDADDR_ANY (0) we should set the `HCI_QUIRK_USE_BDADDR_PROPERTY`
-> property, right?
-
-You're right. I'll drop this check when revisiting this next week.
-
-Johan
+SGkgTHVpeiwNCkkgcnVuIHRoZSByY3Rlc3QgKGRvX2xpc3Rlbikgb24gbXkgTGludXggbWFjaGlu
+ZSBhbmQgdHJ5IHRvIG1ha2UgYSBjb25uZWN0aW9uIHdpdGggbXkgV2luZG93cyBtYWNoaW5lLCBy
+ZXN1bHRpbmcgaW4gdGhlIHNhbWUgZXJyb3JzIG9uIFdpbmRvd3MgMHgxMDA1MSAoV1NBRU5FVFVO
+UkVBQ0gpIG9yIDB4MTAwNjAgKFdTQUVUSU1FRE9VVCkuDQpJIGRvIHNlZSBhdHRlbXB0cyBpbiBX
+aXJlc2hhcmsgb24gdGhlIGJsdWV0b290aCBjaGFubmVsLCBidXQgaGF2ZSBubyBpZGVhIHdoZXJl
+IHRoaW5ncyBnbyB3cm9uZy4NCg0KSSBhc2tlZCB0aGlzIHF1ZXN0aW9uIG9uIFN0YWNrb3ZlcmZs
+b3cgKGh0dHBzOi8vc3RhY2tvdmVyZmxvdy5jb20vcXVlc3Rpb25zLzc4MjYxOTI2L3Byb2JsZW0t
+d2l0aC1ibHVldG9vdGgtcnVubmluZy10aGUtc2VydmVyLW9uLWxpbnV4LWFuZC10aGUtY2xpZW50
+LW9uLXdpbmRvd3MtdXNpKS4NClRoZSBzaW5nbGUgYW5zd2VyIChQZXR6dmFsKSBJIGdvdCB3YXMg
+IlNlZW1zIHRvIGJlIGEgcGVyc2lzdGVudCBwcm9ibGVtIC0gdGhlIGZhaWx1cmUgb2YgdGhpcyBD
+IGNvZGUgdW5kZXIgYmx1ZXouIiBhbmQgIkl0IHNlZW1zIHdlIGhhdmUgdG8gY29uY2x1ZGUgdGhh
+dCB0aGlzIGNvZGUsIHdoaWNoIHVzZWQgdG8gd29yayB1bmRlciBibHVleiwganVzdCBkb2Vzbid0
+IGFueSBtb3JlIi4NCg0KQW55b25lIGFueSBzdWdnZXN0aW9ucz8NCg0KQmVzdCByZWdhcmRzLA0K
+UGV0ZXINCg0KDQotLS0tLU9vcnNwcm9ua2VsaWprIGJlcmljaHQtLS0tLQ0KVmFuOiBMdWl6IEF1
+Z3VzdG8gdm9uIERlbnR6IDxsdWl6LmRlbnR6QGdtYWlsLmNvbT4gDQpWZXJ6b25kZW46IG1hYW5k
+YWcgMTUgYXByaWwgMjAyNCAxNzo0MA0KQWFuOiBQZXRlciBNb3J0aWVyIDxwZXRlci5tb3J0aWVy
+QG91dGxvb2suYmU+DQpDQzogbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZw0KT25kZXJ3
+ZXJwOiBSZTogQmx1ZXRvb3RoIGZyb20gV2luZG93cyB0byBMaW51eCB1c2luZyBCbHVlWg0KDQpI
+aSBQZXRlciwNCg0KT24gTW9uLCBBcHIgMTUsIDIwMjQgYXQgMTE6MTnigK9BTSBQZXRlciBNb3J0
+aWVyIDxwZXRlci5tb3J0aWVyQG91dGxvb2suYmU+IHdyb3RlOg0KPg0KPiBEZWFyIGFsbCwNCj4g
+SSB3YW50IHRvIHNldCB1cCBhIHNpbXBsZSBibHVldG9vdGggY29ubmVjdGlvbiBiZXR3ZWVuIDIg
+UEPigJlzLCBjbGllbnQgcnVubmluZyBXaW5kb3dzIGFuZCBzZXJ2ZXIgcnVubmluZyBMaW51eC4N
+Cj4gVGhlcmUgaXMgbm8gbmVlZCBmb3IgYSBsb3Qgb2Ygb3ZlcmhlYWQgc3VjaCBhcyBwYWlyaW5n
+Lg0KPiBJIGFtIHJ1bm5pbmcgdGhlIHNlcnZlciBzb2Z0d2FyZSBvbiBMaW51eCBVYnVudHUgd2l0
+aCB0aGUgZm9sbG93aW5nIGNvZGU6DQo+DQo+ICAgICBpbnQgc2VydmVyU29ja2V0LCBjbGllbnRT
+b2NrZXQ7DQo+ICAgICBzdHJ1Y3Qgc29ja2FkZHJfcmMgc2VydmVyQWRkciA9IHswfSwgY2xpZW50
+QWRkcj17MH07DQo+DQo+ICAgICBzb2NrbGVuX3QgY2xpZW50QWRkclNpemUgPSBzaXplb2Yoc29j
+a2FkZHJfcmMpOw0KPg0KPiAgICAgLy8gQ3JlYXRlIEJsdWV0b290aCBzb2NrZXQNCj4gICAgIHNl
+cnZlclNvY2tldD1zb2NrZXQoQUZfQkxVRVRPT1RILCBTT0NLX1NUUkVBTSwgQlRQUk9UT19SRkNP
+TU0pOw0KPiAgICAgaWYgKHNlcnZlclNvY2tldDwwKQ0KPiAgICAgew0KPiAgICAgICBwZXJyb3Io
+InNvY2tldCBjcmVhdGlvbiBmYWlsZWQ6ICIpOw0KPiAgICAgICByZXR1cm4gZmFsc2U7DQo+ICAg
+ICB9DQo+ICAgICBiZGFkZHJfdCAgYmRhZGRyX2FueT17ezAsMCwwLDAsMCwwfX07DQo+DQo+ICAg
+Ly8gQmluZCB0aGUgc29ja2V0IHRvIGFueSBsb2NhbCBCbHVldG9vdGggYWRhcHRlcg0KPiAgICAg
+c2VydmVyQWRkci5yY19mYW1pbHkgPSBBRl9CTFVFVE9PVEg7DQo+ICAgICBzZXJ2ZXJBZGRyLnJj
+X2JkYWRkciA9IGJkYWRkcl9hbnk7IC8vIGJpbmQgdG8gYW55IGxvY2FsIEJsdWV0b290aCBhZGFw
+dGVyDQo+ICAgICBzZXJ2ZXJBZGRyLnJjX2NoYW5uZWwgPSAyNTsNCj4NCj4gICAgIGlmIChiaW5k
+KHNlcnZlclNvY2tldCwoc3RydWN0IHNvY2thZGRyKikmc2VydmVyQWRkcixzaXplb2Yoc2VydmVy
+QWRkcikpPDApDQo+ICAgICB7DQo+ICAgICAgIHBlcnJvcigiQmluZCBmYWlsZWQiKTsNCj4gICAg
+ICAgY2xvc2Uoc2VydmVyU29ja2V0KTsNCj4gICAgICAgZXhpdChFWElUX0ZBSUxVUkUpOw0KPiAg
+ICAgfQ0KPg0KPiAgICAgLy8gbGlzdGVuIGZvciBpbmNvbWluZyBjb25uZWN0aW9ucw0KPiAgICAg
+aWYgKGxpc3RlbihzZXJ2ZXJTb2NrZXQsMSkgPDApDQo+ICAgICB7DQo+ICAgICAgIHBlcnJvcigi
+TGlzdGVuIGZhaWxlZCIpOw0KPiAgICAgICBjbG9zZShzZXJ2ZXJTb2NrZXQpOw0KPiAgICAgICBl
+eGl0KEVYSVRfRkFJTFVSRSk7DQo+ICAgICB9Ow0KPg0KPiAgICAgd2hpbGUgKHRydWUpDQo+ICAg
+ICB7DQo+ICAgICAgIHd4UHJpbnRmKCJXYWl0aW5nIGZvciBpbmNvbWluZyBCbHVldG9vdGggY29u
+bmVjdGlvbnMuLi5cbiIpOw0KPg0KPiAgICAgICAvLyBBY2NlcHQgaW5jb21pbmcgY29ubmVjdGlv
+bg0KPiAgICAgICBjbGllbnRTb2NrZXQgPSBhY2NlcHQoc2VydmVyU29ja2V0LCAoc3RydWN0IHNv
+Y2thZGRyKikgJmNsaWVudEFkZHIsJmNsaWVudEFkZHJTaXplKTsNCj4gICAgICAgaWYgKGNsaWVu
+dFNvY2tldDwwKQ0KPiAgICAgICB7DQo+ICAgICAgICAgcGVycm9yKCJhY2NlcHQgZmFpbGVkIik7
+DQo+ICAgICAgICAgY29udGludWU7DQo+ICAgICAgIH0NCj4NCj4gSSBhbSBydW5uaW5nIHRoZSBj
+bGllbnQgc29mdHdhcmUgb24gV2luZG93cyAxMCB3aXRoIHRoZSBmb2xsb3dpbmcgY29kZToNCj4N
+Cj4gICAgIC8vIENyZWF0ZSBhIEJsdWV0b290aCBzb2NrZXQNCj4gICAgIG1fc2VydmVyU29ja2V0
+ID0gc29ja2V0KEFGX0JUSCwgU09DS19TVFJFQU0sIEJUSFBST1RPX1JGQ09NTSk7DQo+ICAgICBT
+T0NLQUREUl9CVEggc2VydmVyQWRkciA9IHsgMCB9Ow0KPiAgICAgaWYgKG1fc2VydmVyU29ja2V0
+ID09IElOVkFMSURfU09DS0VUKSB7DQo+ICAgICAgIHJldHVybiBmYWxzZTsNCj4gICAgIH0NCj4N
+Cj4gICAgIC8vIFNldCB0aGUgYWRkcmVzcyBvZiB0aGUgcmVtb3RlIEJsdWV0b290aCBkZXZpY2Ug
+dG8gY29ubmVjdCB0bw0KPiAgICAgc2VydmVyQWRkci5hZGRyZXNzRmFtaWx5ID0gQUZfQlRIOw0K
+PiAgICAgc2VydmVyQWRkci5idEFkZHIgPSAqcmVpbnRlcnByZXRfY2FzdDxCVEhfQUREUio+KCZt
+X1NlcnZlci5BZGRyZXNzLnVsbExvbmcpOyAvLyB0aGlzIGlzIHRoZSBhZGRyZXMgZm91bmQgYnkg
+ZnVuY3Rpb24gQmx1ZXRvb3RoRmluZEZpcnN0RGV2aWNlKCkNCj4gICAgIHNlcnZlckFkZHIuc2Vy
+dmljZUNsYXNzSWQgPSBSRkNPTU1fUFJPVE9DT0xfVVVJRDsgIC8vIEkgYWxzbyB0cmllZCBHVUlE
+X05VTEwNCj4gICAgIHNlcnZlckFkZHIucG9ydCA9IDI1OyAvLyBJIGFsc28gdHJpZWQgMA0KPg0K
+PiAgICAgLy8gQ29ubmVjdCB0byB0aGUgcmVtb3RlIEJsdWV0b290aCBkZXZpY2UNCj4gICAgIGlm
+IChjb25uZWN0KG1fc2VydmVyU29ja2V0LCByZWludGVycHJldF9jYXN0PFNPQ0tBRERSKj4oJnNl
+cnZlckFkZHIpLCBzaXplb2Yoc2VydmVyQWRkcikpID09IFNPQ0tFVF9FUlJPUikgew0KPiAgICAg
+ICAgc3RkOjpjb3V0IDw8ICJlcnJvcjogIiA8PCBXU0FHZUxhc3RFcnJvcigpIDw8IHN0ZDo6ZW5k
+bDsNCj4gICAgICAgcmV0dXJuIGZhbHNlOw0KPiAgICAgfQ0KPg0KPiBUaGUgTGludXggc2VydmVy
+IGlzIGxpc3RlbmluZyBvbiBwb3J0IDI1IHdoaWxlIHRoZSBXaW5kb3dzIGNsaWVudCB0cmllcyB0
+byBjb25uZWN0IHRvIHRoZSBzYW1lIHBvcnQuIFRoZSBjbGllbnQgZmlyc3Qgc2VhcmNoZXMgZm9y
+IHRoZSBzZXJ2ZXIgd2l0aCBCbHVldG9vdGhGaW5kRmlyc3REZXZpY2UgYW5kIEJsdWV0b290aEZp
+bmROZXh0RGV2aWNlLCBmaW5kcyB0aGUgc2VydmVyIGJsdWV0b29vdGggYWRkcmVzcyBhbmQgdXNl
+cyB0aGF0IGFkZHJlc3MgdG8gY29ubmVjdC4NCj4gVGhlIGNvbm5lY3Rpb24gb24gdGhlIGNsaWVu
+dCB0aGVuIGZhaWxzIHdpdGggZXJyb3IgY29kZSAxMDA1MSAob3IgDQo+IHNvbWV0aW1lcyAxMDA2
+MCkNCj4NCj4gT24gTGludXggdGhlcmUgaXMgbm8gZmlyZXdhbGwgaW5zdGFsbGVkLCB1c2luZyBi
+bHVldG9vdGhjbHQgSSBzZWUgaXQgaXMgcmVnaXN0ZXJlZCBhbmQgcGFpcmFibGUuIFRoZSBibHVl
+dG9vdGggZG9uZ2xlIGlzIHBsdWdnZWQgaW50byBhIFVTQiBwb3J0IGFuZCBpcyBzZWVuIGFzIFVT
+QjIuMC1CVC4gSSBoYXZlIHRyaWVkIGRpZmZlcmVudCBwb3J0cyB3aXRob3V0IHN1Y2Nlc3MuDQo+
+DQo+IEkndmUgZG9uZSBzb21lIHRlc3Rpbmcgd2l0aCBteSBjb2RlLiBJdCBzZWVtcyBibHVldG9v
+dGggaXMgd29ya2luZyB3ZWxsIHdpdGggY29kZSBhYm92ZSBpbiB0aGUgZm9sbG93aW5nIGNpcmN1
+bXN0YW5jZXMgOg0KPiAtIHdpbmRvd3Mg4oaSIHdpbmRvd3MNCj4gLSBsaW51eCDihpIgbGludXgN
+Cj4gLSBsaW51eCDihpIgd2luZG93cw0KPiBUaGUgb25seSB0aGluZyB0aGF0IGRvZXNuJ3Qgd29y
+ayBpczogd2luZG93cyDihpIgbGludXgNCj4NCj4gSSBhbSB0b2xkIHRoZSBwcm9ibGVtIGxpZXMg
+aW4gdGhlIEJsdWVaIGxpYnJhcnksIGJ1dCBJIGZpbmQgdGhpcyBoYXJkIHRvIGJlbGlldmUuIE15
+IGd1ZXNzZXMgYXJlIEkgYW0gZG9pbmcgc29tZXRoaW5nIHdyb25nLg0KDQpXZSBwcm9iYWJseSBu
+ZWVkIHRvIEhDSSB0cmFjZSB0byB0ZWxsIHdoYXQgaXMgZ29pbmcgb24sIG5vIGlkZWEgd2hhdCBh
+cmUgdGhlIGVycm9ycyB0aGF0IHdpbmRvd3Mgc3RhY2sgaXMgdGhyb3dpbmcsIGJlc2lkZXMgaWYg
+eW91IG1hbmFnZSB0byBjb25uZWN0IExpbnV4IHRvIExpbnV4IEkgYXNzdW1lIHRoZSBzZXJ2ZXIg
+aXMgbGlzdGVuaW5nLCBidXQgcGVyaGFwcyAgdGhlcmUgaXMgYSBkaWZmZXJlbnQgcHJvYmxlbSwg
+YW55d2F5IEkgd291bGQgcmVjb21tZW5kIHVzaW5nIHJjdGVzdCBpbnN0ZWFkIGJlZm9yZSBhdHRl
+bXB0aW5nIHRvIHdyaXRlIHlvdXIgb3duIHZlcnNpb24gb2YgaXQ6DQoNCmh0dHBzOi8vZ2l0aHVi
+LmNvbS9ibHVlei9ibHVlei9ibG9iL21hc3Rlci90b29scy9yY3Rlc3QucnN0DQoNCj4gQW55IGhl
+bHAgaXMgbXVjaCBhcHByZWNpYXRlZCENCj4NCj4gQmVzdCByZWdhcmRzLA0KPiBQZXRlcg0KDQoN
+Cg0KLS0NCkx1aXogQXVndXN0byB2b24gRGVudHoNCg==
