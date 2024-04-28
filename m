@@ -1,329 +1,213 @@
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04olkn2014.outbound.protection.outlook.com [40.92.74.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8645F33DF;
-	Sun, 28 Apr 2024 05:43:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714283013; cv=none; b=QJb+MQ6KDWj8xn+uAgfWlko85Q4IlDyFRJMzVcmNoOmUvrGxeVQ9MeeFkJLs+eWKFw6qtwr9fqvbbvw70Pnanw6wMhYyLLalMgRxFEfXtEWUW7WLlHo/Js/A0nqh0pG/tYHHDleW7Uh7zmlo6LNhLU3GKEVs/dE1NlIzcXqpsqw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714283013; c=relaxed/simple;
-	bh=yMsCNuwPFY0Fw5AmZTd2moSMyXbtQcD9yl1aC7ExeE4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=EUFWUMkHeofylPQgP22RTuT3DmVq6pm0GUOFyNHxfhpiNxM9Qs/D9kzuC0vrl51Ns55CVap2Ag+hELf1ekhlcNpB9AUI8hdlbKvHPXv3WjqS9zGFtsIwFT0Yna0hmPGMuDmYm+2XnndDxHOlnzJiAH62ZkFJHK2jcwpIFjnN+ak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-78f056f0a53so235297585a.1;
-        Sat, 27 Apr 2024 22:43:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714283009; x=1714887809;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HpxGmTH8+/K+4NFwDFhXZtxUOTfL6buX1v9TIMBJn+w=;
-        b=K4rDotU5Imqy0jjCi3E5gei3L0pGSOKLJEd/Ok4+1McHR3eRsNbWqgLb7oXV1HCEyD
-         KUgOx72UlL9AJmYtiggF/6n+nXUTuIsDOtDFeVbe0jw9e94Rh0/9H3oDQ1d3OgCUmVXu
-         PEf1Ul9jWfkOKEkqcMCFcKKPuSeItg1so3Gl132bAIBQS2J9B0Zs+vI6liCSvEo12eN+
-         Q1q5Rj82KDOxcHPeX+lYWvoX6j/D8yp7uZLuQJMb0B72CKQdunA5646hO3RzaqJS8mwI
-         d9nH6DPSQ2ZUqU3HA1a7oIfWMAeFJTYzN1i6t5z6M6ULX/RVVm1x6oELqV6Dti7OiDPM
-         +2TA==
-X-Forwarded-Encrypted: i=1; AJvYcCUDeFh9Dp8pOaxjP6tXwnCcjXsyckmxP7OTuqZOYULroXgkEIOfLK9EKOL2oQ4BHf1f9vUJeDtx1L8IuscigVdiMiVTSPtVqaYFxgxJUhhQXc4pFDUg1V9XYaC45tWN7IXS0v6k0vz3QSPXwU9D
-X-Gm-Message-State: AOJu0YzttBTu/N02JgvFXmWA+30Bx+OLICd64CQV/I0R+qwluOkdUU92
-	0jdsocqQvHVtodyuHxyOMjmzmNGlr+THwjOzezAKyap7ZrmGn3wf
-X-Google-Smtp-Source: AGHT+IF2Vg477pszzAJ/5svMse7qtURlGeug5OYRkvL11QHnQm5FB0tEnhOzR36T70c98mdBUMDlyw==
-X-Received: by 2002:ad4:5dcc:0:b0:6a0:b3cc:ee0e with SMTP id m12-20020ad45dcc000000b006a0b3ccee0emr6827804qvh.49.1714283009447;
-        Sat, 27 Apr 2024 22:43:29 -0700 (PDT)
-Received: from tofu.cs.purdue.edu ([128.210.0.165])
-        by smtp.gmail.com with ESMTPSA id w5-20020a0c9c45000000b0069b27dad8c7sm9440906qve.101.2024.04.27.22.43.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 27 Apr 2024 22:43:29 -0700 (PDT)
-From: Sungwoo Kim <iam@sung-woo.kim>
-To: 
-Cc: daveti@purdue.edu,
-	Sungwoo Kim <iam@sung-woo.kim>,
-	Marcel Holtmann <marcel@holtmann.org>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 584203A1DA;
+	Sun, 28 Apr 2024 13:29:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.74.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714310996; cv=fail; b=guJ2O/KnvKkyXk0fgESCaSpZGASLgJIbQuXo1fFl21ZHwQ6n1p5DACNXH7eFqKacECYU69/xkiuwG17DWwKrcun5k4GYKR4/bnwqNwJHY45nYX4FcPv9v1Cx+Qh8g9lfunwX7Qb7RqnxxqsHQlIzUL//F/GFInI7lE9bkwZWP+g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714310996; c=relaxed/simple;
+	bh=2GdtkHHfs3fQ7RyxlHn4MvnJa5Q3HyDRyxq83kBBU5c=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=Yb+ayNmAU2Z1xZVB0eIUkHuuDjfxeAmrGzPtTZUP78v8z2z+1rjflryOlkeaRnj44YATVj4SDq6vrQTqnhHiYE/XcHrxZwiSCBqgzVHnSuvaDTZS6BThiOzMvVfCIQSthgzjplwDRYv5VGmWZ5L33F5XdBzBCrNCPJASGquJ90U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=Zdc8RS37; arc=fail smtp.client-ip=40.92.74.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="Zdc8RS37"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DZ5Jz9Cth8JdbWumcCHXW8igXf9zZwameAltdIduqCAInqU6UQmubHRzOQBba162SbBa4IBwzZT1JTqjPZElQefs1SdcF5fpDgyvEHslgdFLt2mVRUhI8r/9U45DcUtRlVNKqNC5n8cYQY8SiMIRrHM5qgsQbiLilequ4X+h4N348Aw7Dwad9YkIkhB84JHA6tgsuDOd5SqJ9Q30OA8zu+qwMJNvnB1DWsUKgUgVo2QpRQC2haEuMWLBBcKaaUeIzLKyg7ghioVkup0wC2J47YPWQawt+5Fk6e7Cj7jliMNmWfpiTJx4YkW/6Yeb/m6coSn4RfuoC0ABARzGprqIxg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=S9T3Nttw6v2pB7HfhuJuOBEYWpUI8RZlV2rDfkkEoJY=;
+ b=R/g/E77YCT4uIxCSrQ2fL+n/bI96DB5xpP4saWtl0lhoa5iDysPbf0D3Ko6ixyjOL/W7aezE+LDh4u9igzwJLBuJ7J7IgWrAu00djBAhKF90B0RX/Nd26q8zUrpytJ8ei82lx5/qB8abo7NUid+yXRyj4f3s3u3vuGnO6Gc6oAWxcnu/3hLYUutZXBcQF/v41hXN5DEuAV6UR0IBisH3SMeKMY3SafQrb6+0pl40PTARVBJ64f6vCnmTjOpnBqTLBa6ZJYMrjdXoeryzl4/pRzZIv3p9SW83NqG+mqBztCCOuSgjiIgq3vDQxjU8jsQdMxOCRK4p84ng+6sYTDJzcw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=S9T3Nttw6v2pB7HfhuJuOBEYWpUI8RZlV2rDfkkEoJY=;
+ b=Zdc8RS37hvQtGimxfyeB7fQUB8PTd19CCJNGYmukvt+tPggdMiSOghppiSwlacVaE+WGSNyZ3gqUSPX0BuqS5TAs6KcbxlEVSfs+zDfZANTYAhnNY6jKWiZ3+/NKzfEuu1z2+DYfgylGqR89nSms+gnxpSRAaFq9+Rha7BVEoq07l92zWWLUO34YxEY2CHZnWTWJHkCbRiWL3w6MKOlzZeAijPbx5gtcMGKj2CigKpBou0ToBpKem2oLhWlSDb+29UkwgtipdqO5INpRSKLdbok8jhWnl1JPGmgcEhJzpjTo3x90s18rUHnYD+pmVugdyY1kcBFEHjzxQiPUryo3Jg==
+Received: from AS8PR02MB7237.eurprd02.prod.outlook.com (2603:10a6:20b:3f1::10)
+ by DB8PR02MB5881.eurprd02.prod.outlook.com (2603:10a6:10:112::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.34; Sun, 28 Apr
+ 2024 13:29:51 +0000
+Received: from AS8PR02MB7237.eurprd02.prod.outlook.com
+ ([fe80::409b:1407:979b:f658]) by AS8PR02MB7237.eurprd02.prod.outlook.com
+ ([fe80::409b:1407:979b:f658%5]) with mapi id 15.20.7519.031; Sun, 28 Apr 2024
+ 13:29:51 +0000
+From: Erick Archer <erick.archer@outlook.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: L2CAP: Fix div-by-zero in l2cap_le_flowctl_init()
-Date: Sun, 28 Apr 2024 01:43:08 -0400
-Message-Id: <20240428054307.1178347-1-iam@sung-woo.kim>
-X-Mailer: git-send-email 2.34.1
+	"Jiri Slaby (SUSE)" <jirislaby@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Erick Archer <erick.archer@outlook.com>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Kees Cook <keescook@chromium.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Justin Stitt <justinstitt@google.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH] tty: rfcomm: prefer struct_size over open coded arithmetic
+Date: Sun, 28 Apr 2024 15:29:34 +0200
+Message-ID:
+ <AS8PR02MB723725E0069F7AE8F64E876E8B142@AS8PR02MB7237.eurprd02.prod.outlook.com>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [8VR3A6dZ/Zsj5Bzsu8twxvGEjUH9I3wJ]
+X-ClientProxiedBy: MA4P292CA0007.ESPP292.PROD.OUTLOOK.COM
+ (2603:10a6:250:2d::12) To AS8PR02MB7237.eurprd02.prod.outlook.com
+ (2603:10a6:20b:3f1::10)
+X-Microsoft-Original-Message-ID:
+ <20240428132935.7030-1-erick.archer@outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS8PR02MB7237:EE_|DB8PR02MB5881:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9dc2b8d6-612b-4473-bd15-08dc67874877
+X-Microsoft-Antispam:
+	BCL:0;ARA:14566002|461199019|440099019|3412199016|1602099003|1710799017;
+X-Microsoft-Antispam-Message-Info:
+	Y3foDXSVctMrVnFx0Y9YAcKO/4yvkGpf8dyhFBSYFdbyCRgaaI7mlkajAUNj2uvISKDn2bblkK82iJTqrCkHe+ypi/xoftUZztXA7k9Q5SpJimnkEvBtS8vRTN/5VPrvOPgeF/kjRVszsiKtihgMjZGu1rzgR2vk9lBcBNxk7LxNjrAagIhfHJidxfaUh+70hSMYbMw6k1AReL4bsu+y83uCHihj1Ew72k4PkDOHNSrUdfSuNhfz3yyX9prxr0B9Z3ttFVvpFbzKp0NvGgjbSfEjIFMOXE4PrqtxJIV5i7vWxAEO/0w0VLnyXc4F/nDXAv83Kl2TJJmbCd5sggOEoloPB7kjLLX4+JjxDkB40ohTR/LsVk+CelFXdXDjKvXXzAYHQYLxUpejBoTtEjJQq1G6ZyUINES6WP1Y3bli4QsK8BX6X6h7g9I3WIE1CHJE7yRQ5n75wJHZ72fhDQFIswQx+i1V4Io6RaFwhAz9RLjAHEpTfyXMdXwtWfnaY0rmEU5xpNF00kgatM4f/3GiKRVNgiOIjrLO9rZBeKsnF3C1ATlXKJwQFqordKukk3tgL70cPrjsGgprLlyi+etT9Vpxyt5BJ2kf28reShELtVPiCUQupxbf9nLvlRtJQx01gjkpPeZ3enQDIBQJK7Q7wxt4bZ5Bsd7M4arMuippwLsAZJXUyq/Uw1lSP2rdOJ52+ApYUJlw//0WOapM7zSEJA==
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?IIyKyu0jI7GEp/QsFRaid2zvm2OcKj+h/1FO0JUExzI4gk3mAf49Hby3B649?=
+ =?us-ascii?Q?cxxwCM0fBmdDJdoqXGrMjDRaHWGcgoU0+qV0wnJTszjStGGkFtcpU5GRqs2r?=
+ =?us-ascii?Q?/qzXm710DLLUoJHI4ICWNKMdFD/UB47YFPdivO5ONGMrY1pwtFaf2zbOT67H?=
+ =?us-ascii?Q?uaVA1WyuaNQqMOlQFMAFALWjIlcl0kWneFbxRKXOO3LSkFy5lwNlv581wFyQ?=
+ =?us-ascii?Q?Js40HE0irWdVFywTi0chNZb8nUbFGdHjORUejXgE4/E5uhARU0jx/RAs6RL1?=
+ =?us-ascii?Q?hhYsklvnoIITTUd6N5cp9nZWs7Qv50cEAfavM+xdLH7ItLmWDMMRQrDB0+rN?=
+ =?us-ascii?Q?1rnXlg0fQLH2BQEXg9O1Gs+Ibq8L4n75/XDPka/C0BY6vwSUQH/JWX8/gWxr?=
+ =?us-ascii?Q?EpO12/Uldbo5j9ZoCvGZnNo61SNmoeRBfDw+VZTdg+9vrXj690qBOf8LUFyO?=
+ =?us-ascii?Q?iBcxpqGcXAArFyVLZm4/ZFl9PAzS+7744d0JvzG9gdawbiA2jlmG1nZSIzs8?=
+ =?us-ascii?Q?PgeJvdaXIWYtkFag0/OwQcXpDbeB1kivAgQlRrfnQNFtrBvYXnNk8VWKTGSs?=
+ =?us-ascii?Q?hpp0znjkI/GuHQcPtXJKSuMrs1fw1ty3m0IAJcaPOQCHj1Kw9afWfjfDcA/O?=
+ =?us-ascii?Q?xA/MtplpiNAl1AXjatBH07bT8K6XhDQyrtQkH0/GcuQxf8Gs9e3CKIxuHi93?=
+ =?us-ascii?Q?QJkqBcUXBU0PCPHCRCgwKJDMwbcuF8rk47oeJfUSPEyvJu0sKK3d0L4Uu54c?=
+ =?us-ascii?Q?EEz1xV7ZVkzzHjea8noQM4XpDEiB5jH2G+egfa9WnT8CUojqrmxxvVdj8EoZ?=
+ =?us-ascii?Q?zZDg3fdiPUOGK5n5dx+1pzKwj+aHCfORzHDyMlF/aRRXVpSA+hwyaZi/ATTu?=
+ =?us-ascii?Q?xMcPNe1GBou3eHLOT+ycU1xvsJkJq6Fy5MX7Pfnv2CFT9mGDRKa0CiixYpEV?=
+ =?us-ascii?Q?1ocaMdh/N0irs/rq2MHjgcCK/rVNtVfMBMuGkHMNEJyO5iAIosQRlOhcqiDY?=
+ =?us-ascii?Q?agsue3Zsyz82ZNB024C2zGcdDOQCOE6hJsLU84HDHcwartLE+LRJr+cociNf?=
+ =?us-ascii?Q?9Ghtir97Maz6i1kHFkyy6CG6GuEo8NoNzeLJb49fbBjhud6boLA1804pM4DO?=
+ =?us-ascii?Q?u5pK6z1+xHzJf9werMsTDZyNsamH0YHhxysZxe6YXlpowVAv0Jm20KqxHE4N?=
+ =?us-ascii?Q?X65ERSVkxCKog/BxpXVxjOD9ej4Mjz3p29dZpp0zjNCnGmoy22legTDWtOc7?=
+ =?us-ascii?Q?uM55ksEOMFHBf7GZjXS7?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9dc2b8d6-612b-4473-bd15-08dc67874877
+X-MS-Exchange-CrossTenant-AuthSource: AS8PR02MB7237.eurprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Apr 2024 13:29:51.6722
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR02MB5881
 
-Hello, could you review this bug and its patch?
+This is an effort to get rid of all multiplications from allocation
+functions in order to prevent integer overflows [1][2].
 
-l2cap_le_flowctl_init() can cause both div-by-zero and an integer overflow.
+As the "dl" variable is a pointer to "struct rfcomm_dev_list_req" and
+this structure ends in a flexible array:
 
-l2cap_le_flowctl_init()
-  chan->mps = min_t(u16, chan->imtu, chan->conn->mtu - L2CAP_HDR_SIZE);
-  chan->rx_credits = (chan->imtu / chan->mps) + 1;  <- div-by-zero
+struct rfcomm_dev_list_req {
+	[...]
+	struct   rfcomm_dev_info dev_info[];
+};
 
-Here, mtu could be less than or equal to L2CAP_HDR_SIZE (4). If mtu is 4, it
-causes div-by-zero. If mtu is less than 4, it causes an integer overflow.
+the preferred way in the kernel is to use the struct_size() helper to
+do the arithmetic instead of the calculation "size + count * size" in
+the kzalloc() and copy_to_user() functions.
 
-How mtu could have such low value:
+At the same time remove the "size" variable as it is no longer needed.
+This way, the code is more readable and safer.
 
-hci_cc_le_read_buffer_size()
-  hdev->le_mtu = __le16_to_cpu(rp->le_mtu);
+This code was detected with the help of Coccinelle, and audited and
+modified manually.
 
-l2cap_conn_add()
-  conn->mtu = hcon->hdev->le_mtu;
-
-As shown, mtu is an input from an HCI device. So, any HCI device can
-set mtu value to any value, such as lower than 4.
-
-To fix this, this patch adds a validation before subtractions. If MTU is
-too small, the corresponding value will set by 0, and a warning message
-will show up.
-
-However, I'm not sure that 0-ing the value is the best. It'd be great if
-you could comment on this.
-
-Thank you,
-Sungwoo.
-
-divide error: 0000 [#1] PREEMPT SMP KASAN NOPTI
-CPU: 0 PID: 67 Comm: kworker/u5:0 Tainted: G        W          6.9.0-rc5+ #20
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
-Workqueue: hci0 hci_rx_work
-RIP: 0010:l2cap_le_flowctl_init+0x19e/0x3f0 net/bluetooth/l2cap_core.c:547
-Code: e8 17 17 0c 00 66 41 89 9f 84 00 00 00 bf 01 00 00 00 41 b8 02 00 00 00 4c 89 fe 4c 89 e2 89 d9 e8 27 17 0c 00 44 89 f0 31 d2 <66> f7 f3 89 c3 ff c3 4d 8d b7 88 00 00 00 4c 89 f0 48 c1 e8 03 42
-RSP: 0018:ffff88810bc0f858 EFLAGS: 00010246
-RAX: 00000000000002a0 RBX: 0000000000000000 RCX: dffffc0000000000
-RDX: 0000000000000000 RSI: ffff88810bc0f7c0 RDI: ffffc90002dcb66f
-RBP: ffff88810bc0f880 R08: aa69db2dda70ff01 R09: 0000ffaaaaaaaaaa
-R10: 0084000000ffaaaa R11: 0000000000000000 R12: ffff88810d65a084
-R13: dffffc0000000000 R14: 00000000000002a0 R15: ffff88810d65a000
-FS:  0000000000000000(0000) GS:ffff88811ac00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020000100 CR3: 0000000103268003 CR4: 0000000000770ef0
-PKRU: 55555554
-Call Trace:
- <TASK>
- l2cap_le_connect_req net/bluetooth/l2cap_core.c:4902 [inline]
- l2cap_le_sig_cmd net/bluetooth/l2cap_core.c:5420 [inline]
- l2cap_le_sig_channel net/bluetooth/l2cap_core.c:5486 [inline]
- l2cap_recv_frame+0xe59d/0x11710 net/bluetooth/l2cap_core.c:6809
- l2cap_recv_acldata+0x544/0x10a0 net/bluetooth/l2cap_core.c:7506
- hci_acldata_packet net/bluetooth/hci_core.c:3939 [inline]
- hci_rx_work+0x5e5/0xb20 net/bluetooth/hci_core.c:4176
- process_one_work kernel/workqueue.c:3254 [inline]
- process_scheduled_works+0x90f/0x1530 kernel/workqueue.c:3335
- worker_thread+0x926/0xe70 kernel/workqueue.c:3416
- kthread+0x2e3/0x380 kernel/kthread.c:388
- ret_from_fork+0x5c/0x90 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-
-Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
+Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#open-coded-arithmetic-in-allocator-arguments [1]
+Link: https://github.com/KSPP/linux/issues/160 [2]
+Signed-off-by: Erick Archer <erick.archer@outlook.com>
 ---
- net/bluetooth/l2cap_core.c | 94 +++++++++++++++++++++++++++++---------
- 1 file changed, 73 insertions(+), 21 deletions(-)
+Hi,
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 84fc70862..472ddfb2e 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -541,10 +541,17 @@ static void l2cap_le_flowctl_init(struct l2cap_chan *chan, u16 tx_credits)
- 	chan->sdu_last_frag = NULL;
- 	chan->sdu_len = 0;
- 	chan->tx_credits = tx_credits;
--	/* Derive MPS from connection MTU to stop HCI fragmentation */
--	chan->mps = min_t(u16, chan->imtu, chan->conn->mtu - L2CAP_HDR_SIZE);
--	/* Give enough credits for a full packet */
--	chan->rx_credits = (chan->imtu / chan->mps) + 1;
-+
-+	if (chan->conn->mtu < L2CAP_HDR_SIZE) {
-+		BT_WARN("mtu is too small (mtu %d < %d)", chan->conn->mtu, L2CAP_HDR_SIZE);
-+		chan->mps = 0;
-+		chan->rx_credits = 0;
-+	} else {
-+		/* Derive MPS from connection MTU to stop HCI fragmentation */
-+		chan->mps = min_t(u16, chan->imtu, chan->conn->mtu - L2CAP_HDR_SIZE);
-+		/* Give enough credits for a full packet */
-+		chan->rx_credits = (chan->imtu / chan->mps) + 1;
-+	}
+The Coccinelle script used to detect this code pattern is the following:
+
+virtual report
+
+@rule1@
+type t1;
+type t2;
+identifier i0;
+identifier i1;
+identifier i2;
+identifier ALLOC =~ "kmalloc|kzalloc|kmalloc_node|kzalloc_node|vmalloc|vzalloc|kvmalloc|kvzalloc";
+position p1;
+@@
+
+i0 = sizeof(t1) + sizeof(t2) * i1;
+...
+i2 = ALLOC@p1(..., i0, ...);
+
+@script:python depends on report@
+p1 << rule1.p1;
+@@
+
+msg = "WARNING: verify allocation on line %s" % (p1[0].line)
+coccilib.report.print_report(p1[0],msg)
+
+Regards,
+Erick
+---
+ net/bluetooth/rfcomm/tty.c | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
+
+diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+index 69c75c041fe1..bdc64c8fb85b 100644
+--- a/net/bluetooth/rfcomm/tty.c
++++ b/net/bluetooth/rfcomm/tty.c
+@@ -504,7 +504,7 @@ static int rfcomm_get_dev_list(void __user *arg)
+ 	struct rfcomm_dev *dev;
+ 	struct rfcomm_dev_list_req *dl;
+ 	struct rfcomm_dev_info *di;
+-	int n = 0, size, err;
++	int n = 0, err;
+ 	u16 dev_num;
  
- 	skb_queue_head_init(&chan->tx_q);
- }
-@@ -2222,7 +2229,12 @@ static struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan,
- 	BT_DBG("chan %p psm 0x%2.2x len %zu", chan,
- 	       __le16_to_cpu(chan->psm), len);
+ 	BT_DBG("");
+@@ -515,9 +515,7 @@ static int rfcomm_get_dev_list(void __user *arg)
+ 	if (!dev_num || dev_num > (PAGE_SIZE * 4) / sizeof(*di))
+ 		return -EINVAL;
  
--	count = min_t(unsigned int, (conn->mtu - hlen), len);
-+	if (conn->mtu < hlen) {
-+		count = 0;
-+		BT_WARN("mtu is too small (mtu %d < len %d)", conn->mtu, hlen);
-+	} else {
-+		count = min_t(unsigned int, (conn->mtu - hlen), len);
-+	}
+-	size = sizeof(*dl) + dev_num * sizeof(*di);
+-
+-	dl = kzalloc(size, GFP_KERNEL);
++	dl = kzalloc(struct_size(dl, dev_info, dev_num), GFP_KERNEL);
+ 	if (!dl)
+ 		return -ENOMEM;
  
- 	skb = chan->ops->alloc_skb(chan, hlen, count,
- 				   msg->msg_flags & MSG_DONTWAIT);
-@@ -2253,7 +2265,12 @@ static struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan,
+@@ -542,9 +540,7 @@ static int rfcomm_get_dev_list(void __user *arg)
+ 	mutex_unlock(&rfcomm_dev_lock);
  
- 	BT_DBG("chan %p len %zu", chan, len);
+ 	dl->dev_num = n;
+-	size = sizeof(*dl) + n * sizeof(*di);
+-
+-	err = copy_to_user(arg, dl, size);
++	err = copy_to_user(arg, dl, struct_size(dl, dev_info, n));
+ 	kfree(dl);
  
--	count = min_t(unsigned int, (conn->mtu - L2CAP_HDR_SIZE), len);
-+	if (conn->mtu < L2CAP_HDR_SIZE) {
-+		BT_WARN("mtu is too small (mtu %d < %d)", conn->mtu, L2CAP_HDR_SIZE);
-+		count = 0;
-+	} else {
-+		count = min_t(unsigned int, (conn->mtu - L2CAP_HDR_SIZE), len);
-+	}
- 
- 	skb = chan->ops->alloc_skb(chan, L2CAP_HDR_SIZE, count,
- 				   msg->msg_flags & MSG_DONTWAIT);
-@@ -2295,7 +2312,12 @@ static struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan,
- 	if (chan->fcs == L2CAP_FCS_CRC16)
- 		hlen += L2CAP_FCS_SIZE;
- 
--	count = min_t(unsigned int, (conn->mtu - hlen), len);
-+	if (conn->mtu < hlen) {
-+		BT_WARN("mtu is too small (mtu %d < len %d)", conn->mtu, hlen);
-+		count = 0;
-+	} else {
-+		count = min_t(unsigned int, (conn->mtu - hlen), len);
-+	}
- 
- 	skb = chan->ops->alloc_skb(chan, hlen, count,
- 				   msg->msg_flags & MSG_DONTWAIT);
-@@ -2412,7 +2434,12 @@ static struct sk_buff *l2cap_create_le_flowctl_pdu(struct l2cap_chan *chan,
- 	if (sdulen)
- 		hlen += L2CAP_SDULEN_SIZE;
- 
--	count = min_t(unsigned int, (conn->mtu - hlen), len);
-+	if (conn->mtu < hlen) {
-+		BT_WARN("mtu is too small (mtu %d < len %d)", conn->mtu, hlen);
-+		count = 0;
-+	} else {
-+		count = min_t(unsigned int, (conn->mtu - hlen), len);
-+	}
- 
- 	skb = chan->ops->alloc_skb(chan, hlen, count,
- 				   msg->msg_flags & MSG_DONTWAIT);
-@@ -3225,6 +3252,7 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data, size_t data
- 	void *ptr = req->data;
- 	void *endptr = data + data_size;
- 	u16 size;
-+	int hlen;
- 
- 	BT_DBG("chan %p", chan);
- 
-@@ -3275,14 +3303,19 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data, size_t data
- 		break;
- 
- 	case L2CAP_MODE_ERTM:
-+		hlen = L2CAP_EXT_HDR_SIZE + L2CAP_SDULEN_SIZE + L2CAP_FCS_SIZE;
- 		rfc.mode            = L2CAP_MODE_ERTM;
- 		rfc.max_transmit    = chan->max_tx;
- 
- 		__l2cap_set_ertm_timeouts(chan, &rfc);
- 
--		size = min_t(u16, L2CAP_DEFAULT_MAX_PDU_SIZE, chan->conn->mtu -
--			     L2CAP_EXT_HDR_SIZE - L2CAP_SDULEN_SIZE -
--			     L2CAP_FCS_SIZE);
-+		if (chan->conn->mtu < hlen) {
-+			BT_WARN("mtu is too small (mtu %d < len %d)", chan->conn->mtu, hlen);
-+			size = 0;
-+		} else {
-+			size = min_t(u16, L2CAP_DEFAULT_MAX_PDU_SIZE, chan->conn->mtu - hlen);
-+		}
-+
- 		rfc.max_pdu_size = cpu_to_le16(size);
- 
- 		l2cap_txwin_setup(chan);
-@@ -3310,6 +3343,7 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data, size_t data
- 		break;
- 
- 	case L2CAP_MODE_STREAMING:
-+		hlen = L2CAP_EXT_HDR_SIZE + L2CAP_SDULEN_SIZE + L2CAP_FCS_SIZE;
- 		l2cap_txwin_setup(chan);
- 		rfc.mode            = L2CAP_MODE_STREAMING;
- 		rfc.txwin_size      = 0;
-@@ -3317,9 +3351,12 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data, size_t data
- 		rfc.retrans_timeout = 0;
- 		rfc.monitor_timeout = 0;
- 
--		size = min_t(u16, L2CAP_DEFAULT_MAX_PDU_SIZE, chan->conn->mtu -
--			     L2CAP_EXT_HDR_SIZE - L2CAP_SDULEN_SIZE -
--			     L2CAP_FCS_SIZE);
-+		if (chan->conn->mtu < hlen) {
-+			BT_WARN("mtu is too small (mtu %d < len %d)", chan->conn->mtu, hlen);
-+			size = 0;
-+		} else {
-+			size = min_t(u16, L2CAP_DEFAULT_MAX_PDU_SIZE, chan->conn->mtu - hlen);
-+		}
- 		rfc.max_pdu_size = cpu_to_le16(size);
- 
- 		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
-@@ -3351,7 +3388,7 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
- 	void *endptr = data + data_size;
- 	void *req = chan->conf_req;
- 	int len = chan->conf_len;
--	int type, hint, olen;
-+	int type, hint, olen, hlen;
- 	unsigned long val;
- 	struct l2cap_conf_rfc rfc = { .mode = L2CAP_MODE_BASIC };
- 	struct l2cap_conf_efs efs;
-@@ -3496,6 +3533,7 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
- 			break;
- 
- 		case L2CAP_MODE_ERTM:
-+			hlen = L2CAP_EXT_HDR_SIZE + L2CAP_SDULEN_SIZE + L2CAP_FCS_SIZE;
- 			if (!test_bit(CONF_EWS_RECV, &chan->conf_state))
- 				chan->remote_tx_win = rfc.txwin_size;
- 			else
-@@ -3503,9 +3541,15 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
- 
- 			chan->remote_max_tx = rfc.max_transmit;
- 
--			size = min_t(u16, le16_to_cpu(rfc.max_pdu_size),
--				     chan->conn->mtu - L2CAP_EXT_HDR_SIZE -
--				     L2CAP_SDULEN_SIZE - L2CAP_FCS_SIZE);
-+			if (chan->conn->mtu < hlen) {
-+				BT_WARN("mtu is too small (mtu %d < len %d)",
-+					chan->conn->mtu, hlen);
-+				size = 0;
-+			} else {
-+				size = min_t(u16, le16_to_cpu(rfc.max_pdu_size),
-+					     chan->conn->mtu - hlen);
-+			}
-+
- 			rfc.max_pdu_size = cpu_to_le16(size);
- 			chan->remote_mps = size;
- 
-@@ -3534,9 +3578,17 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
- 			break;
- 
- 		case L2CAP_MODE_STREAMING:
--			size = min_t(u16, le16_to_cpu(rfc.max_pdu_size),
--				     chan->conn->mtu - L2CAP_EXT_HDR_SIZE -
--				     L2CAP_SDULEN_SIZE - L2CAP_FCS_SIZE);
-+			hlen = L2CAP_EXT_HDR_SIZE + L2CAP_SDULEN_SIZE + L2CAP_FCS_SIZE;
-+
-+			if (chan->conn->mtu < hlen) {
-+				BT_WARN("mtu is too small (mtu %d < len %d)",
-+					chan->conn->mtu, hlen);
-+				size = 0;
-+			} else {
-+				size = min_t(u16, le16_to_cpu(rfc.max_pdu_size),
-+					     chan->conn->mtu - hlen);
-+			}
-+
- 			rfc.max_pdu_size = cpu_to_le16(size);
- 			chan->remote_mps = size;
- 
+ 	return err ? -EFAULT : 0;
 -- 
-2.34.1
+2.25.1
 
