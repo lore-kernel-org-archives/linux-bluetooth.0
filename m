@@ -1,55 +1,54 @@
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF03812B75;
-	Sat, 27 Apr 2024 17:44:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E03B810E3;
+	Sun, 28 Apr 2024 02:03:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714239898; cv=none; b=Gnh2UJgFo69b97DtaI11pFUqN+r2VEM8agcZi08saB/VwmpXD0Apo1gd97uiHRtoIQ/WRLX92JEIdkbIQ/eaLuiLWE53ZlMH/6iS+b6sVTGv/d3lwvCHuWRWJHtbd0iHMV3cpslKAIq1tLU0RJg09x0B303oQ6wZN9pBq1qhKSU=
+	t=1714269800; cv=none; b=QrQSlsK+uQ6GE6FyjfnKl5dDWuIkYMQDF6qLJ4SPe4DbpxbEgXIJOmh+bjqbZbNKYzmBciRMx+q2wmJyZHdc1EIHHm82PqArDSEkh1FL4S/CLDGCotFW5I2aBwH00/Z+dlcSpnrhebszkJ7qXrJDv9uar6sECIQRNH44utOWZL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714239898; c=relaxed/simple;
-	bh=v+w1XSNzRiJCHarnE3KPWdKOCtHwseSrLnyxVzYQljs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=ExbiNoQQX+o6a4+qKMFj2fxtVYbkWMf7Pb3/QVSwocgOwuRnLknyt8D4zc16htIC27MThGOs8sRzgmk36HQUZIkuZJxbhD3dptczIysFxYm30L7l7wGHZhb2nTrAcC6cAXlOfxLIq0b+7G9rQpM2cJ4DY+rYTgzrRKjT3NxiICc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.181
+	s=arc-20240116; t=1714269800; c=relaxed/simple;
+	bh=A5tV/ynWUd4/ncK1qSXgsOeweLbLvHjnSDb8d10BjA8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nglEQG/uoWaoGEuXesTi4ixkuCHZUV+wId0482f/vqEersOgbwWWS7yAw78+25Ju9jBfOn0mkxkeTtIeL3I1F9r87K4xsUmv00vO2eyCpHUmnX1+TujQiOQUbQULgZgCqCbIxsbXOQSiSzclwu/yNM1y3ucjanzCbt7oJI9e1WU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.160.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-78f05035f56so215573785a.3;
-        Sat, 27 Apr 2024 10:44:56 -0700 (PDT)
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-436ce50b199so13747601cf.3;
+        Sat, 27 Apr 2024 19:03:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714239896; x=1714844696;
+        d=1e100.net; s=20230601; t=1714269798; x=1714874598;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=tVwHFjP3dpqwH6JSPl11eVl29KJCyNCQ2GOP51xUw2A=;
-        b=XNqJcFoWSrHmc5fcMyGzGAQQhy2L1cChYHGh1HcWL2mQ5DZ9mKyjUEt8p+shxtBlcN
-         hV1Xtbt7ZTtAluVTqZKOiFw3cMbFLaNjcSVPdKSRaOJGhnxUsaUJ81QTcEbI+k/Gy+3b
-         A2ZQGBKQmJ4MLKbUyfICo06ps9ly9Qp1YIJ+lrBIghOxb2/oqj7DELtDobYiXWEdNTJw
-         pSCIkf+eANUcFyxNQ8T4A0tiB2w/bhkESChue+PsWGVv1Ie1qO4hqngTFfudejAm63ZW
-         xIJUvubtRG7daOcLTKjskEJuL1YrWxihWYMtwZdrzBskt93jL7NJ1w2/wcfI7qgfSf9m
-         85GA==
-X-Forwarded-Encrypted: i=1; AJvYcCVQ/8+QOXJRh/m/en8DkNh7Z0klTx6v/PnOyPqL4TlDQh2fQvXIHeSYCVN496Ftwa3oTbtmrAlEgsE3/iUL7zuLQDmMe6yQnzlpqVVZ0D4FXqQpQcknOF/NK8BvXwxzlMQ6YynbyC+ujMKWgs3V
-X-Gm-Message-State: AOJu0YzdWW0J7J49YAW4Pdmb25cKdJwHaajtdoTAX4YeJzJbDP3Kd6eo
-	XUM64v4hcx1pNjj5Xvj+yLtJICmntdwjHYb9x9pkpCeBH/nIK9p6
-X-Google-Smtp-Source: AGHT+IEUjy/2KbG2uXcmZGGrB38i66lA7kXt6CZYsgBCMUmY8OUiZtQcdJd3SZmOdljJhMaYpENAOw==
-X-Received: by 2002:a37:de08:0:b0:78d:6649:4c79 with SMTP id h8-20020a37de08000000b0078d66494c79mr7640627qkj.70.1714239895507;
-        Sat, 27 Apr 2024 10:44:55 -0700 (PDT)
+        bh=zACXJBhPHRjpGlObU+xanmlur7Mbvdup0ew83MO6ouQ=;
+        b=LWi0JDOV2+mDIKtsCDtJ+TA5H0e8wWmXifqIz7zyF6KvXN8OTBHp7uyYviCvK+UVKV
+         8BFz7NeO8wpgBntP3luAHFBrgP6vbkkmo2wjYQsvLliLKzNnGpaeuA8NGPerL6Gb5gQn
+         F7+Iq2BkvEHCQXuylnL6+5tM1wC7qT9v7zY8V6EulIh6ZznMCadIjb6wrmbBiHPHAvWN
+         s65/KSoMzStfl3/oCEeNlhPzTDJl3dpSmPRVan3PcEesFsWHY2GkfxO8jSuT9gH/u/mM
+         ZgHmT9ATx+q1jM8xFUvXtyh6qEdj3bLFS+DL21CpqBczu/BSE8yXiSCgXApkbrXEeVpU
+         UW7w==
+X-Forwarded-Encrypted: i=1; AJvYcCWLbnhp0xPuEg/QoZCwQ1MmKnDhV0AAdKGekacJivOUT7A/LKLFvLleM48jRDFw230klH1+MdwKzuChRWIheO/fizkMbCQZcjw9Chpvw+cmZCQcy7GMIyDt4ZXiV9zkpaP4o4yZfztya1mfUIqt
+X-Gm-Message-State: AOJu0Yzdtmm9OV7/CIOK8fRuf/KgIEDQltXlhmSS7tCVG18wRLJWecdm
+	HjIKRpmFxBhcQqqeJDmbNdHOAlvcwQCzIGfoyP8zueAGflNhFyyP
+X-Google-Smtp-Source: AGHT+IHAmeNh51GmyJ+QxNF9o2e8RcqFbiqqxihwKL+rlP8LnQGLSr0u90GNqaJLzMNlpf6aRJa5KA==
+X-Received: by 2002:a05:622a:5cd:b0:439:884b:859a with SMTP id d13-20020a05622a05cd00b00439884b859amr7741370qtb.21.1714269797554;
+        Sat, 27 Apr 2024 19:03:17 -0700 (PDT)
 Received: from tofu.cs.purdue.edu ([128.210.0.165])
-        by smtp.gmail.com with ESMTPSA id wx37-20020a05620a5a6500b0078eebee6a49sm7400250qkn.85.2024.04.27.10.44.54
+        by smtp.gmail.com with ESMTPSA id p9-20020ac84089000000b00437a996ca44sm8925767qtl.21.2024.04.27.19.03.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 27 Apr 2024 10:44:54 -0700 (PDT)
+        Sat, 27 Apr 2024 19:03:17 -0700 (PDT)
 From: Sungwoo Kim <iam@sung-woo.kim>
 To: 
 Cc: daveti@purdue.edu,
-	dan.carpenter@linaro.org,
 	Sungwoo Kim <iam@sung-woo.kim>,
 	Marcel Holtmann <marcel@holtmann.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: L2CAP: Fix slab-use-after-free in l2cap_connect()
-Date: Sat, 27 Apr 2024 13:43:34 -0400
-Message-Id: <20240427174333.457156-1-iam@sung-woo.kim>
+Subject: [PATCH v2] Bluetooth: msft: fix slab-use-after-free in msft_do_close()
+Date: Sat, 27 Apr 2024 21:58:35 -0400
+Message-Id: <20240428015834.2485653-1-iam@sung-woo.kim>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -57,197 +56,455 @@ List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Add an hold and lock the channel at l2cap_connect() to avoid use after free.
-Also make the l2cap_connect() return type void. Nothing is using the
-returned value but it is ugly to return a potentially freed pointer.
-Making i void will help with backports because earlier kernels did use
-the return value. Now the compile will break for kernels where this
-patch is not a complete fix.
+Hi, could you review this patch?
+Now *not static* msft functions hold and put hdev->msft_data.
+It prevents from potential and real use-after-free bugs.
 
-Thank you for your help, Dan.
-
-Call stack summary:
+How msft is used after freed:
 
 [use]
-l2cap_bredr_sig_cmd
-  l2cap_connect
-  ┌ mutex_lock(&conn->chan_lock);
-  │ chan = pchan->ops->new_connection(pchan); <- alloc chan
-  │ __l2cap_chan_add(conn, chan);
-  │   l2cap_chan_hold(chan);
-  │   list_add(&chan->list, &conn->chan_l);   ... (1)
-  └ mutex_unlock(&conn->chan_lock);
-    chan->conf_state              ... (4) <- use after free
+msft_do_close()
+  msft = hdev->msft_data;
+  if (!msft)                      ...(1) <- passed.
+    return;
+  mutex_lock(&msft->filter_lock); ...(4) <- used after freed.
 
 [free]
-l2cap_conn_del
-┌ mutex_lock(&conn->chan_lock);
-│ foreach chan in conn->chan_l:            ... (2)
-│   l2cap_chan_put(chan);
-│     l2cap_chan_destroy
-│       kfree(chan)               ... (3) <- chan freed
-└ mutex_unlock(&conn->chan_lock);
+msft_unregister()
+  msft = hdev->msft_data;
+  hdev->msft_data = NULL;         ...(2)
+  kfree(msft);                    ...(3) <- msft is freed.
 
 ==================================================================
-BUG: KASAN: slab-use-after-free in instrument_atomic_read include/linux/instrumented.h:68 [inline]
-BUG: KASAN: slab-use-after-free in _test_bit include/asm-generic/bitops/instrumented-non-atomic.h:141 [inline]
-BUG: KASAN: slab-use-after-free in l2cap_connect+0xa67/0x11a0 net/bluetooth/l2cap_core.c:4260
-Read of size 8 at addr ffff88810bf040a0 by task kworker/u3:1/311
+BUG: KASAN: slab-use-after-free in __mutex_lock_common kernel/locking/mutex.c:587 [inline]
+BUG: KASAN: slab-use-after-free in __mutex_lock+0x8f/0xc30 kernel/locking/mutex.c:752
+Read of size 8 at addr ffff888106cbbca8 by task kworker/u5:2/309
 
-CPU: 0 PID: 311 Comm: kworker/u3:1 Not tainted 6.8.0+ #61
+CPU: 0 PID: 309 Comm: kworker/u5:2 Not tainted 6.9.0-rc5+ #5
 Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
-Workqueue: hci0 hci_rx_work
+Workqueue: hci4 hci_error_reset
 Call Trace:
  <TASK>
  __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x85/0xb0 lib/dump_stack.c:106
+ dump_stack_lvl+0xcd/0x140 lib/dump_stack.c:114
  print_address_description mm/kasan/report.c:377 [inline]
- print_report+0x18f/0x560 mm/kasan/report.c:488
- kasan_report+0xd7/0x110 mm/kasan/report.c:601
- kasan_check_range+0x262/0x2f0 mm/kasan/generic.c:189
- __kasan_check_read+0x15/0x20 mm/kasan/shadow.c:31
- instrument_atomic_read include/linux/instrumented.h:68 [inline]
- _test_bit include/asm-generic/bitops/instrumented-non-atomic.h:141 [inline]
- l2cap_connect+0xa67/0x11a0 net/bluetooth/l2cap_core.c:4260
- l2cap_bredr_sig_cmd+0x17fe/0x9a70
- l2cap_sig_channel net/bluetooth/l2cap_core.c:6539 [inline]
- l2cap_recv_frame+0x82e/0x86a0 net/bluetooth/l2cap_core.c:7818
- l2cap_recv_acldata+0x379/0xbe0 net/bluetooth/l2cap_core.c:8536
- hci_acldata_packet net/bluetooth/hci_core.c:3876 [inline]
- hci_rx_work+0x64b/0xcb0 net/bluetooth/hci_core.c:4111
- process_one_work kernel/workqueue.c:2633 [inline]
- process_scheduled_works+0x6b9/0xdc0 kernel/workqueue.c:2706
- worker_thread+0xb2b/0x13d0 kernel/workqueue.c:2787
- kthread+0x2a9/0x340 kernel/kthread.c:388
+ print_report+0x191/0x560 mm/kasan/report.c:488
+ kasan_report+0xe2/0x120 mm/kasan/report.c:601
+ __asan_report_load8_noabort+0x18/0x20 mm/kasan/report_generic.c:381
+ __mutex_lock_common kernel/locking/mutex.c:587 [inline]
+ __mutex_lock+0x8f/0xc30 kernel/locking/mutex.c:752
+ mutex_lock_nested+0x1f/0x30 kernel/locking/mutex.c:804
+ msft_do_close+0x292/0x700 net/bluetooth/msft.c:694
+ hci_dev_close_sync+0x906/0xf10 net/bluetooth/hci_sync.c:5168
+ hci_dev_do_close net/bluetooth/hci_core.c:554 [inline]
+ hci_error_reset+0x152/0x410 net/bluetooth/hci_core.c:1091
+ process_one_work kernel/workqueue.c:3254 [inline]
+ process_scheduled_works+0x90f/0x1530 kernel/workqueue.c:3335
+ worker_thread+0x926/0xe70 kernel/workqueue.c:3416
+ kthread+0x2e3/0x380 kernel/kthread.c:388
  ret_from_fork+0x5c/0x90 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1b/0x30 arch/x86/entry/entry_64.S:243
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
  </TASK>
 
-Allocated by task 311:
+Allocated by task 7328:
  kasan_save_stack mm/kasan/common.c:47 [inline]
  kasan_save_track+0x30/0x70 mm/kasan/common.c:68
- kasan_save_alloc_info+0x3c/0x50 mm/kasan/generic.c:575
+ kasan_save_alloc_info+0x3c/0x50 mm/kasan/generic.c:565
  poison_kmalloc_redzone mm/kasan/common.c:370 [inline]
  __kasan_kmalloc+0xa2/0xc0 mm/kasan/common.c:387
  kasan_kmalloc include/linux/kasan.h:211 [inline]
- kmalloc_trace+0x1c9/0x390 mm/slub.c:4012
- kmalloc include/linux/slab.h:590 [inline]
- kzalloc include/linux/slab.h:711 [inline]
- l2cap_chan_create+0x59/0xc80 net/bluetooth/l2cap_core.c:466
- l2cap_sock_alloc net/bluetooth/l2cap_sock.c:1849 [inline]
- l2cap_sock_new_connection_cb+0x14d/0x2a0 net/bluetooth/l2cap_sock.c:1457
- l2cap_connect+0x329/0x11a0 net/bluetooth/l2cap_core.c:4176
- l2cap_bredr_sig_cmd+0x17fe/0x9a70
- l2cap_sig_channel net/bluetooth/l2cap_core.c:6539 [inline]
- l2cap_recv_frame+0x82e/0x86a0 net/bluetooth/l2cap_core.c:7818
- l2cap_recv_acldata+0x379/0xbe0 net/bluetooth/l2cap_core.c:8536
- hci_acldata_packet net/bluetooth/hci_core.c:3876 [inline]
- hci_rx_work+0x64b/0xcb0 net/bluetooth/hci_core.c:4111
- process_one_work kernel/workqueue.c:2633 [inline]
- process_scheduled_works+0x6b9/0xdc0 kernel/workqueue.c:2706
- worker_thread+0xb2b/0x13d0 kernel/workqueue.c:2787
- kthread+0x2a9/0x340 kernel/kthread.c:388
- ret_from_fork+0x5c/0x90 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1b/0x30 arch/x86/entry/entry_64.S:243
+ kmalloc_trace+0x20c/0x3e0 mm/slub.c:3997
+ kmalloc include/linux/slab.h:628 [inline]
+ kzalloc include/linux/slab.h:749 [inline]
+ msft_register+0x66/0x1d0 net/bluetooth/msft.c:760
+ hci_register_dev+0x85e/0x9a0 net/bluetooth/hci_core.c:2737
+ __vhci_create_device drivers/bluetooth/hci_vhci.c:438 [inline]
+ vhci_create_device+0x390/0x720 drivers/bluetooth/hci_vhci.c:480
+ vhci_get_user drivers/bluetooth/hci_vhci.c:537 [inline]
+ vhci_write+0x39b/0x460 drivers/bluetooth/hci_vhci.c:617
+ call_write_iter include/linux/fs.h:2110 [inline]
+ new_sync_write fs/read_write.c:497 [inline]
+ vfs_write+0x8eb/0xb50 fs/read_write.c:590
+ ksys_write+0x106/0x1f0 fs/read_write.c:643
+ __do_sys_write fs/read_write.c:655 [inline]
+ __se_sys_write fs/read_write.c:652 [inline]
+ __x64_sys_write+0x84/0xa0 fs/read_write.c:652
+ x64_sys_call+0x271a/0x2ce0 arch/x86/include/generated/asm/syscalls_64.h:2
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x9c/0x130 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
-Freed by task 66:
+Freed by task 7332:
  kasan_save_stack mm/kasan/common.c:47 [inline]
  kasan_save_track+0x30/0x70 mm/kasan/common.c:68
- kasan_save_free_info+0x44/0x50 mm/kasan/generic.c:589
+ kasan_save_free_info+0x44/0x50 mm/kasan/generic.c:579
  poison_slab_object+0x11a/0x190 mm/kasan/common.c:240
  __kasan_slab_free+0x3b/0x60 mm/kasan/common.c:256
  kasan_slab_free include/linux/kasan.h:184 [inline]
- slab_free_hook mm/slub.c:2121 [inline]
- slab_free mm/slub.c:4299 [inline]
- kfree+0x106/0x2e0 mm/slub.c:4409
- l2cap_chan_destroy net/bluetooth/l2cap_core.c:509 [inline]
- kref_put include/linux/kref.h:65 [inline]
- l2cap_chan_put+0x1e7/0x2b0 net/bluetooth/l2cap_core.c:533
- l2cap_conn_del+0x38e/0x5f0 net/bluetooth/l2cap_core.c:1929
- l2cap_connect_cfm+0xc2/0x11e0 net/bluetooth/l2cap_core.c:8254
- hci_connect_cfm include/net/bluetooth/hci_core.h:1986 [inline]
- hci_conn_failed+0x202/0x370 net/bluetooth/hci_conn.c:1289
- hci_abort_conn_sync+0x913/0xae0 net/bluetooth/hci_sync.c:5359
- abort_conn_sync+0xda/0x110 net/bluetooth/hci_conn.c:2988
- hci_cmd_sync_work+0x20d/0x3e0 net/bluetooth/hci_sync.c:306
- process_one_work kernel/workqueue.c:2633 [inline]
- process_scheduled_works+0x6b9/0xdc0 kernel/workqueue.c:2706
- worker_thread+0xb2b/0x13d0 kernel/workqueue.c:2787
- kthread+0x2a9/0x340 kernel/kthread.c:388
- ret_from_fork+0x5c/0x90 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1b/0x30 arch/x86/entry/entry_64.S:243
+ slab_free_hook mm/slub.c:2106 [inline]
+ slab_free mm/slub.c:4280 [inline]
+ kfree+0x13c/0x330 mm/slub.c:4390
+ msft_unregister+0x9d/0x120 net/bluetooth/msft.c:785
+ hci_unregister_dev+0x1d9/0x520 net/bluetooth/hci_core.c:2771
+ vhci_release+0x8c/0xe0 drivers/bluetooth/hci_vhci.c:674
+ __fput+0x36f/0x750 fs/file_table.c:422
+ ____fput+0x1e/0x30 fs/file_table.c:450
+ task_work_run+0x1da/0x280 kernel/task_work.c:180
+ exit_task_work include/linux/task_work.h:38 [inline]
+ do_exit+0x856/0x2210 kernel/exit.c:878
+ do_group_exit+0x201/0x2c0 kernel/exit.c:1027
+ get_signal+0x12ff/0x1380 kernel/signal.c:2911
+ arch_do_signal_or_restart+0x3b/0x650 arch/x86/kernel/signal.c:310
+ exit_to_user_mode_loop kernel/entry/common.c:111 [inline]
+ exit_to_user_mode_prepare include/linux/entry-common.h:328 [inline]
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
+ syscall_exit_to_user_mode+0xcc/0x2a0 kernel/entry/common.c:218
+ do_syscall_64+0xa8/0x130 arch/x86/entry/common.c:89
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
-The buggy address belongs to the object at ffff88810bf04000
- which belongs to the cache kmalloc-1k of size 1024
-The buggy address is located 160 bytes inside of
- freed 1024-byte region [ffff88810bf04000, ffff88810bf04400)
+The buggy address belongs to the object at ffff888106cbbc00
+ which belongs to the cache kmalloc-256 of size 256
+The buggy address is located 168 bytes inside of
+ freed 256-byte region [ffff888106cbbc00, ffff888106cbbd00)
 
 The buggy address belongs to the physical page:
-page:00000000567b7faa refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x10bf04
-head:00000000567b7faa order:2 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-anon flags: 0x17ffffc0000840(slab|head|node=0|zone=2|lastcpupid=0x1fffff)
+page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x106cba
+head: order:1 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+flags: 0x17ffffe0000840(slab|head|node=0|zone=2|lastcpupid=0x3fffff)
 page_type: 0xffffffff()
-raw: 0017ffffc0000840 ffff888100041dc0 0000000000000000 0000000000000001
-raw: 0000000000000000 0000000080080008 00000001ffffffff 0000000000000000
+raw: 0017ffffe0000840 ffff888100042040 ffffea00042de590 ffffea00041b3e10
+raw: 0000000000000000 00000000000a000a 00000001ffffffff 0000000000000000
+head: 0017ffffe0000840 ffff888100042040 ffffea00042de590 ffffea00041b3e10
+head: 0000000000000000 00000000000a000a 00000001ffffffff 0000000000000000
+head: 0017ffffe0000001 ffffea00041b2e81 dead000000000122 00000000ffffffff
+head: 0000000200000000 0000000000000000 00000000ffffffff 0000000000000000
 page dumped because: kasan: bad access detected
 
 Memory state around the buggy address:
- ffff88810bf03f80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff88810bf04000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff88810bf04080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                               ^
- ffff88810bf04100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff88810bf04180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff888106cbbb80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff888106cbbc00: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff888106cbbc80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                  ^
+ ffff888106cbbd00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff888106cbbd80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
 ==================================================================
 
-Fixes: 73ffa904b782 ("Bluetooth: Move conf_{req,rsp} stuff to struct l2cap_chan")
+Fixes: 9e14606d8f38 ("Bluetooth: disable advertisement filters during suspend")
 Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
 ---
-V1 -> V2:
-Make l2cap_connect() return void.
-Fix a wrong stack trace attached.
+v2: Move BT_DBG after null checking in msft_data_hold_unless_zero()
 
- net/bluetooth/l2cap_core.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ net/bluetooth/msft.c | 124 ++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 99 insertions(+), 25 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 84fc70862..e7c18267c 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -3902,7 +3902,7 @@ static inline int l2cap_command_rej(struct l2cap_conn *conn,
+diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
+index 9612c5d1b..1f79e7980 100644
+--- a/net/bluetooth/msft.c
++++ b/net/bluetooth/msft.c
+@@ -132,10 +132,45 @@ struct msft_data {
+ 	__u8 filter_enabled;
+ 	/* To synchronize add/remove address filter and monitor device event.*/
+ 	struct mutex filter_lock;
++	struct kref	kref;
+ };
+ 
++static void msft_data_free(struct kref *kref);
++
++static struct msft_data *msft_data_hold_unless_zero(struct msft_data *msft)
++{
++	if (!msft)
++		return NULL;
++
++	BT_DBG("msft %p orig refcnt %u", msft, kref_read(&msft->kref));
++	
++	if (!kref_get_unless_zero(&msft->kref))
++		return NULL;
++
++	return msft;
++}
++
++static void msft_data_put(struct msft_data *msft)
++{
++	BT_DBG("msft %p orig refcnt %u", msft, kref_read(&msft->kref));
++
++	kref_put(&msft->kref, msft_data_free);
++}
++
++static void msft_data_free(struct kref *kref)
++{
++	struct msft_data *msft = container_of(kref, struct msft_data, kref);
++
++	BT_DBG("msft %p", msft);
++
++	kfree(msft->evt_prefix);
++	mutex_destroy(&msft->filter_lock);
++	kfree(msft);
++}
++
+ bool msft_monitor_supported(struct hci_dev *hdev)
+ {
++	/* msft_get_features() holds and put hdev->msft_data */
+ 	return !!(msft_get_features(hdev) & MSFT_FEATURE_MASK_LE_ADV_MONITOR);
+ }
+ 
+@@ -449,12 +484,17 @@ static int msft_remove_monitor_sync(struct hci_dev *hdev,
+ /* This function requires the caller holds hci_req_sync_lock */
+ int msft_suspend_sync(struct hci_dev *hdev)
+ {
+-	struct msft_data *msft = hdev->msft_data;
++	struct msft_data *msft;
+ 	struct adv_monitor *monitor;
+ 	int handle = 0;
+ 
+-	if (!msft || !msft_monitor_supported(hdev))
++	msft = msft_data_hold_unless_zero(hdev->msft_data);
++	if (!msft)
+ 		return 0;
++	if (!msft_monitor_supported(hdev)) {
++		msft_data_put(msft);
++		return 0;
++	}
+ 
+ 	msft->suspending = true;
+ 
+@@ -471,6 +511,7 @@ int msft_suspend_sync(struct hci_dev *hdev)
+ 	/* All monitors have been removed */
+ 	msft->suspending = false;
+ 
++	msft_data_put(msft);
  	return 0;
  }
  
--static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
-+static void l2cap_connect(struct l2cap_conn *conn,
- 					struct l2cap_cmd_hdr *cmd,
- 					u8 *data, u8 rsp_code, u8 amp_id)
+@@ -608,11 +649,17 @@ static void reregister_monitor(struct hci_dev *hdev)
+ /* This function requires the caller holds hci_req_sync_lock */
+ int msft_resume_sync(struct hci_dev *hdev)
  {
-@@ -3953,6 +3953,9 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
- 	if (!chan)
- 		goto response;
+-	struct msft_data *msft = hdev->msft_data;
++	struct msft_data *msft;
  
-+	l2cap_chan_hold(chan);
-+	l2cap_chan_lock(chan);
-+
- 	/* For certain devices (ex: HID mouse), support for authentication,
- 	 * pairing and bonding is optional. For such devices, inorder to avoid
- 	 * the ACL alive for too long after L2CAP disconnection, reset the ACL
-@@ -4041,7 +4044,10 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
- 		chan->num_conf_req++;
- 	}
+-	if (!msft || !msft_monitor_supported(hdev))
++	msft = msft_data_hold_unless_zero(hdev->msft_data);
++	if (!msft)
+ 		return 0;
  
--	return chan;
-+	if (chan) {
-+		l2cap_chan_unlock(chan);
-+		l2cap_chan_put(chan);
++	if (!msft_monitor_supported(hdev)) {
++		msft_data_put(msft);
++		return 0;
 +	}
++
+ 	hci_dev_lock(hdev);
+ 
+ 	/* Clear already tracked devices on resume. Once the monitors are
+@@ -625,17 +672,19 @@ int msft_resume_sync(struct hci_dev *hdev)
+ 
+ 	reregister_monitor(hdev);
+ 
++	msft_data_put(msft);
+ 	return 0;
  }
  
- static int l2cap_connect_req(struct l2cap_conn *conn,
+ /* This function requires the caller holds hci_req_sync_lock */
+ void msft_do_open(struct hci_dev *hdev)
+ {
+-	struct msft_data *msft = hdev->msft_data;
++	struct msft_data *msft;
+ 
+ 	if (hdev->msft_opcode == HCI_OP_NOP)
+ 		return;
+ 
++	msft = msft_data_hold_unless_zero(hdev->msft_data);
+ 	if (!msft) {
+ 		bt_dev_err(hdev, "MSFT extension not registered");
+ 		return;
+@@ -650,8 +699,7 @@ void msft_do_open(struct hci_dev *hdev)
+ 	msft->features = 0;
+ 
+ 	if (!read_supported_features(hdev, msft)) {
+-		hdev->msft_data = NULL;
+-		kfree(msft);
++		msft_data_put(msft);
+ 		return;
+ 	}
+ 
+@@ -663,15 +711,17 @@ void msft_do_open(struct hci_dev *hdev)
+ 		 */
+ 		reregister_monitor(hdev);
+ 	}
++	msft_data_put(msft);
+ }
+ 
+ void msft_do_close(struct hci_dev *hdev)
+ {
+-	struct msft_data *msft = hdev->msft_data;
++	struct msft_data *msft;
+ 	struct msft_monitor_advertisement_handle_data *handle_data, *tmp;
+ 	struct msft_monitor_addr_filter_data *address_filter, *n;
+ 	struct adv_monitor *monitor;
+ 
++	msft = msft_data_hold_unless_zero(hdev->msft_data);
+ 	if (!msft)
+ 		return;
+ 
+@@ -705,6 +755,8 @@ void msft_do_close(struct hci_dev *hdev)
+ 	hdev->advmon_pend_notify = false;
+ 	msft_monitor_device_del(hdev, 0, NULL, 0, true);
+ 
++	msft_data_put(msft);
++
+ 	hci_dev_unlock(hdev);
+ }
+ 
+@@ -767,6 +819,7 @@ void msft_register(struct hci_dev *hdev)
+ 	INIT_LIST_HEAD(&msft->address_filters);
+ 	hdev->msft_data = msft;
+ 	mutex_init(&msft->filter_lock);
++	kref_init(&msft->kref);
+ }
+ 
+ void msft_unregister(struct hci_dev *hdev)
+@@ -779,10 +832,7 @@ void msft_unregister(struct hci_dev *hdev)
+ 	bt_dev_dbg(hdev, "Unregister MSFT extension");
+ 
+ 	hdev->msft_data = NULL;
+-
+-	kfree(msft->evt_prefix);
+-	mutex_destroy(&msft->filter_lock);
+-	kfree(msft);
++	msft_data_put(msft);
+ }
+ 
+ /* This function requires the caller holds hdev->lock */
+@@ -1068,10 +1118,11 @@ static void msft_monitor_device_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ void msft_vendor_evt(struct hci_dev *hdev, void *data, struct sk_buff *skb)
+ {
+-	struct msft_data *msft = hdev->msft_data;
++	struct msft_data *msft;
+ 	u8 *evt_prefix;
+ 	u8 *evt;
+ 
++	msft = msft_data_hold_unless_zero(hdev->msft_data);
+ 	if (!msft)
+ 		return;
+ 
+@@ -1081,21 +1132,21 @@ void msft_vendor_evt(struct hci_dev *hdev, void *data, struct sk_buff *skb)
+ 	if (msft->evt_prefix_len > 0) {
+ 		evt_prefix = msft_skb_pull(hdev, skb, 0, msft->evt_prefix_len);
+ 		if (!evt_prefix)
+-			return;
++			goto done;
+ 
+ 		if (memcmp(evt_prefix, msft->evt_prefix, msft->evt_prefix_len))
+-			return;
++			goto done;
+ 	}
+ 
+ 	/* Every event starts at least with an event code and the rest of
+ 	 * the data is variable and depends on the event code.
+ 	 */
+ 	if (skb->len < 1)
+-		return;
++		goto done;
+ 
+ 	evt = msft_skb_pull(hdev, skb, 0, sizeof(*evt));
+ 	if (!evt)
+-		return;
++		goto done;
+ 
+ 	hci_dev_lock(hdev);
+ 
+@@ -1112,13 +1163,24 @@ void msft_vendor_evt(struct hci_dev *hdev, void *data, struct sk_buff *skb)
+ 	}
+ 
+ 	hci_dev_unlock(hdev);
++
++done:
++	msft_data_put(msft);
+ }
+ 
+ __u64 msft_get_features(struct hci_dev *hdev)
+ {
+-	struct msft_data *msft = hdev->msft_data;
++	struct msft_data *msft;
++	unsigned long long features;
++
++	msft = msft_data_hold_unless_zero(hdev->msft_data);
++	if (!msft)
++		return 0;
++
++	features = msft->features;
+ 
+-	return msft ? msft->features : 0;
++	msft_data_put(msft);
++	return features;
+ }
+ 
+ static void msft_le_set_advertisement_filter_enable_cb(struct hci_dev *hdev,
+@@ -1152,37 +1214,48 @@ static void msft_le_set_advertisement_filter_enable_cb(struct hci_dev *hdev,
+ /* This function requires the caller holds hci_req_sync_lock */
+ int msft_add_monitor_pattern(struct hci_dev *hdev, struct adv_monitor *monitor)
+ {
+-	struct msft_data *msft = hdev->msft_data;
++	struct msft_data *msft;
++	int err;
+ 
++	msft = msft_data_hold_unless_zero(hdev->msft_data);
+ 	if (!msft)
+ 		return -EOPNOTSUPP;
+ 
+-	if (msft->resuming || msft->suspending)
++	if (msft->resuming || msft->suspending) {
++		msft_data_put(msft);
+ 		return -EBUSY;
++	}
+ 
+-	return msft_add_monitor_sync(hdev, monitor);
++	err = msft_add_monitor_sync(hdev, monitor);
++	msft_data_put(msft);
++	return err;
+ }
+ 
+ /* This function requires the caller holds hci_req_sync_lock */
+ int msft_remove_monitor(struct hci_dev *hdev, struct adv_monitor *monitor)
+ {
+-	struct msft_data *msft = hdev->msft_data;
++	struct msft_data *msft;
++	int err;
+ 
++	msft = msft_data_hold_unless_zero(hdev->msft_data);
+ 	if (!msft)
+ 		return -EOPNOTSUPP;
+ 
+ 	if (msft->resuming || msft->suspending)
+ 		return -EBUSY;
+ 
+-	return msft_remove_monitor_sync(hdev, monitor);
++	err = msft_remove_monitor_sync(hdev, monitor);
++	msft_data_put(msft);
++	return err;
+ }
+ 
+ int msft_set_filter_enable(struct hci_dev *hdev, bool enable)
+ {
+ 	struct msft_cp_le_set_advertisement_filter_enable cp;
+-	struct msft_data *msft = hdev->msft_data;
++	struct msft_data *msft;
+ 	int err;
+ 
++	msft = msft_data_hold_unless_zero(hdev->msft_data);
+ 	if (!msft)
+ 		return -EOPNOTSUPP;
+ 
+@@ -1193,6 +1266,7 @@ int msft_set_filter_enable(struct hci_dev *hdev, bool enable)
+ 
+ 	msft_le_set_advertisement_filter_enable_cb(hdev, &cp, err);
+ 
++	msft_data_put(msft);
+ 	return 0;
+ }
+ 
 -- 
 2.34.1
 
