@@ -1,95 +1,329 @@
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79E5823BB
-	for <linux-bluetooth@vger.kernel.org>; Sun, 28 Apr 2024 03:48:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8645F33DF;
+	Sun, 28 Apr 2024 05:43:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714276117; cv=none; b=rjMoAbIBAuvjOtCDzK7GoY5Wy0PQDX+nbrz08w5hoiW2bmQQspmidNVC+oaSub2Oq7XlwpSfQ2SGX+pHRm66qj5Ykcj3Ho+zeKyORVcx9fQfYzDPjp893kRfX6v/jPdZ+fZmXNzo6D19EQgeaGxvWvRBlc51Cl2KQ8JLwjUh4cQ=
+	t=1714283013; cv=none; b=QJb+MQ6KDWj8xn+uAgfWlko85Q4IlDyFRJMzVcmNoOmUvrGxeVQ9MeeFkJLs+eWKFw6qtwr9fqvbbvw70Pnanw6wMhYyLLalMgRxFEfXtEWUW7WLlHo/Js/A0nqh0pG/tYHHDleW7Uh7zmlo6LNhLU3GKEVs/dE1NlIzcXqpsqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714276117; c=relaxed/simple;
-	bh=T9aAS6gjprJFrjRsVKMX+gzE3b6ZZkshttqPSxfH9OY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 Cc:Content-Type; b=NQm8e6QJlo4OiMua8IJHc5TN4gp1Mf5F2m+/c3mI14xDdzEoP9PzzJaMfmpXVBBM7eln+6RUhPPAHa8QEIs0UnsTCPd4ogAb8wuidwiUDcnnMi655wxRBgr9Ub76GXG+aUeUBXwKdQ1wR2PiLE3w6mMPvlM5wLekVM/kljVLbb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.170
+	s=arc-20240116; t=1714283013; c=relaxed/simple;
+	bh=yMsCNuwPFY0Fw5AmZTd2moSMyXbtQcD9yl1aC7ExeE4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=EUFWUMkHeofylPQgP22RTuT3DmVq6pm0GUOFyNHxfhpiNxM9Qs/D9kzuC0vrl51Ns55CVap2Ag+hELf1ekhlcNpB9AUI8hdlbKvHPXv3WjqS9zGFtsIwFT0Yna0hmPGMuDmYm+2XnndDxHOlnzJiAH62ZkFJHK2jcwpIFjnN+ak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2dd041acff1so38641251fa.1
-        for <linux-bluetooth@vger.kernel.org>; Sat, 27 Apr 2024 20:48:35 -0700 (PDT)
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-78f056f0a53so235297585a.1;
+        Sat, 27 Apr 2024 22:43:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714276113; x=1714880913;
-        h=content-transfer-encoding:cc:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DYPrh4DHdmH+zyt0A/i+XtVcAopST5l2VEcQ5Ak5hpQ=;
-        b=jv8BjnbaaxlViQbAU1+Rp+RjDT96tZUsLKQqckp+xVlaDn90zT7aGj59l9gYEwjLRi
-         deqNHgm2/I9drnKYDEVG0GRanpbo8GqmuTfoP+dMKM5vxif+d6ltP2osGoTcOd6rB3gR
-         EVb4bx6KwdSb1SDBRlqKgmVfIHvFJK4dJtTpEvsg49AuYehVbC8BY2ku2hEfHOLK16m7
-         eDbFCfSbYj8XnizHGrLSC3X6zAZfSmt2C5nmwj8GjWM+OkhTlVLK4K72QbXK9bZNqE+j
-         AEKHkXJ5vfLobHnhHxFceT7UXuDVpcDQizWBrztqLCoyUGf/W4d/oedTlcdC4ekNRidR
-         a+9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVYCa1cNtJ8sLGcbcdcyEkSuO+HKHKqedhbYmdcYj41O7B4wzmEeJ34JcPqwFsNwC6LBFq2UVOwXEgnPZ9ZVTuGS6j26vF0xKjh3str4XXE
-X-Gm-Message-State: AOJu0YxOShrzbTrUFVvHIlf9n80fMdcpp6b81RUm7vYs/1Ijl82drzak
-	mx19iHxSt9pjnyyEVna6bVa3q+DTQq4KNiKdQfGI7yYLICRrK0Zr/EqECbVqIsY=
-X-Google-Smtp-Source: AGHT+IHAJ4CcFlc6B3zFNGjXiAt9raTf+WBLe7uUgiwmroMPATGXkx9BOBkS44xrW1eZkTBYZd+oPg==
-X-Received: by 2002:a2e:8703:0:b0:2dd:1802:a1ee with SMTP id m3-20020a2e8703000000b002dd1802a1eemr3748803lji.0.1714276113187;
-        Sat, 27 Apr 2024 20:48:33 -0700 (PDT)
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com. [209.85.167.46])
-        by smtp.gmail.com with ESMTPSA id d5-20020a2e96c5000000b002df6de7283asm647378ljj.126.2024.04.27.20.48.32
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 27 Apr 2024 20:48:33 -0700 (PDT)
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-51aa6a8e49aso4001080e87.3
-        for <linux-bluetooth@vger.kernel.org>; Sat, 27 Apr 2024 20:48:32 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVkCMKAjRS4Y368wuJmkbUguaYTrDckSGIEKOSeotWEiDtlEc61m8F9jtAZiaSEJdZQdgZv5LpLs9HES/VofMJmNuqToPh/aawgIPQ2OrPY
-X-Received: by 2002:a19:7708:0:b0:51b:d3a2:9d85 with SMTP id
- s8-20020a197708000000b0051bd3a29d85mt3212757lfc.9.1714276112649; Sat, 27 Apr
- 2024 20:48:32 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1714283009; x=1714887809;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HpxGmTH8+/K+4NFwDFhXZtxUOTfL6buX1v9TIMBJn+w=;
+        b=K4rDotU5Imqy0jjCi3E5gei3L0pGSOKLJEd/Ok4+1McHR3eRsNbWqgLb7oXV1HCEyD
+         KUgOx72UlL9AJmYtiggF/6n+nXUTuIsDOtDFeVbe0jw9e94Rh0/9H3oDQ1d3OgCUmVXu
+         PEf1Ul9jWfkOKEkqcMCFcKKPuSeItg1so3Gl132bAIBQS2J9B0Zs+vI6liCSvEo12eN+
+         Q1q5Rj82KDOxcHPeX+lYWvoX6j/D8yp7uZLuQJMb0B72CKQdunA5646hO3RzaqJS8mwI
+         d9nH6DPSQ2ZUqU3HA1a7oIfWMAeFJTYzN1i6t5z6M6ULX/RVVm1x6oELqV6Dti7OiDPM
+         +2TA==
+X-Forwarded-Encrypted: i=1; AJvYcCUDeFh9Dp8pOaxjP6tXwnCcjXsyckmxP7OTuqZOYULroXgkEIOfLK9EKOL2oQ4BHf1f9vUJeDtx1L8IuscigVdiMiVTSPtVqaYFxgxJUhhQXc4pFDUg1V9XYaC45tWN7IXS0v6k0vz3QSPXwU9D
+X-Gm-Message-State: AOJu0YzttBTu/N02JgvFXmWA+30Bx+OLICd64CQV/I0R+qwluOkdUU92
+	0jdsocqQvHVtodyuHxyOMjmzmNGlr+THwjOzezAKyap7ZrmGn3wf
+X-Google-Smtp-Source: AGHT+IF2Vg477pszzAJ/5svMse7qtURlGeug5OYRkvL11QHnQm5FB0tEnhOzR36T70c98mdBUMDlyw==
+X-Received: by 2002:ad4:5dcc:0:b0:6a0:b3cc:ee0e with SMTP id m12-20020ad45dcc000000b006a0b3ccee0emr6827804qvh.49.1714283009447;
+        Sat, 27 Apr 2024 22:43:29 -0700 (PDT)
+Received: from tofu.cs.purdue.edu ([128.210.0.165])
+        by smtp.gmail.com with ESMTPSA id w5-20020a0c9c45000000b0069b27dad8c7sm9440906qve.101.2024.04.27.22.43.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 27 Apr 2024 22:43:29 -0700 (PDT)
+From: Sungwoo Kim <iam@sung-woo.kim>
+To: 
+Cc: daveti@purdue.edu,
+	Sungwoo Kim <iam@sung-woo.kim>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: L2CAP: Fix div-by-zero in l2cap_le_flowctl_init()
+Date: Sun, 28 Apr 2024 01:43:08 -0400
+Message-Id: <20240428054307.1178347-1-iam@sung-woo.kim>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240427051934.879051-1-iam@sung-woo.kim>
-In-Reply-To: <20240427051934.879051-1-iam@sung-woo.kim>
-From: Sungwoo Kim <iam@sung-woo.kim>
-Date: Sat, 27 Apr 2024 23:47:53 -0400
-X-Gmail-Original-Message-ID: <CAJNyHpJjRoJNUY25MrsAhxdsCVZJVu2AXcstO_t31_xtLWFGJw@mail.gmail.com>
-Message-ID: <CAJNyHpJjRoJNUY25MrsAhxdsCVZJVu2AXcstO_t31_xtLWFGJw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: msft: fix slab-use-after-free in msft_do_close()
-Cc: daveti@purdue.edu, Marcel Holtmann <marcel@holtmann.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hello,
+Hello, could you review this bug and its patch?
 
-Could you not apply this? I found an error.
+l2cap_le_flowctl_init() can cause both div-by-zero and an integer overflow.
 
-On Sat, Apr 27, 2024 at 1:19=E2=80=AFAM Sungwoo Kim <iam@sung-woo.kim> wrot=
-e:
->
-> +
-> +static struct msft_data *msft_data_hold_unless_zero(struct msft_data *ms=
-ft)
-> +{
-> +       BT_DBG("msft %p orig refcnt %u", msft, kref_read(&msft->kref));
+l2cap_le_flowctl_init()
+  chan->mps = min_t(u16, chan->imtu, chan->conn->mtu - L2CAP_HDR_SIZE);
+  chan->rx_credits = (chan->imtu / chan->mps) + 1;  <- div-by-zero
 
-Here, msft could be NULL. &msft->kref causes a null-ptr-deref error.
-I already sent a v2 patch fixing this.
+Here, mtu could be less than or equal to L2CAP_HDR_SIZE (4). If mtu is 4, it
+causes div-by-zero. If mtu is less than 4, it causes an integer overflow.
 
-> +
-> +       if (!msft)
-> +               return NULL;
-> +
-> +       if (!kref_get_unless_zero(&msft->kref))
-> +               return NULL;
-> +
-> +       return msft;
-> +}
-> +
+How mtu could have such low value:
 
-Thanks,
+hci_cc_le_read_buffer_size()
+  hdev->le_mtu = __le16_to_cpu(rp->le_mtu);
+
+l2cap_conn_add()
+  conn->mtu = hcon->hdev->le_mtu;
+
+As shown, mtu is an input from an HCI device. So, any HCI device can
+set mtu value to any value, such as lower than 4.
+
+To fix this, this patch adds a validation before subtractions. If MTU is
+too small, the corresponding value will set by 0, and a warning message
+will show up.
+
+However, I'm not sure that 0-ing the value is the best. It'd be great if
+you could comment on this.
+
+Thank you,
 Sungwoo.
+
+divide error: 0000 [#1] PREEMPT SMP KASAN NOPTI
+CPU: 0 PID: 67 Comm: kworker/u5:0 Tainted: G        W          6.9.0-rc5+ #20
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Workqueue: hci0 hci_rx_work
+RIP: 0010:l2cap_le_flowctl_init+0x19e/0x3f0 net/bluetooth/l2cap_core.c:547
+Code: e8 17 17 0c 00 66 41 89 9f 84 00 00 00 bf 01 00 00 00 41 b8 02 00 00 00 4c 89 fe 4c 89 e2 89 d9 e8 27 17 0c 00 44 89 f0 31 d2 <66> f7 f3 89 c3 ff c3 4d 8d b7 88 00 00 00 4c 89 f0 48 c1 e8 03 42
+RSP: 0018:ffff88810bc0f858 EFLAGS: 00010246
+RAX: 00000000000002a0 RBX: 0000000000000000 RCX: dffffc0000000000
+RDX: 0000000000000000 RSI: ffff88810bc0f7c0 RDI: ffffc90002dcb66f
+RBP: ffff88810bc0f880 R08: aa69db2dda70ff01 R09: 0000ffaaaaaaaaaa
+R10: 0084000000ffaaaa R11: 0000000000000000 R12: ffff88810d65a084
+R13: dffffc0000000000 R14: 00000000000002a0 R15: ffff88810d65a000
+FS:  0000000000000000(0000) GS:ffff88811ac00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020000100 CR3: 0000000103268003 CR4: 0000000000770ef0
+PKRU: 55555554
+Call Trace:
+ <TASK>
+ l2cap_le_connect_req net/bluetooth/l2cap_core.c:4902 [inline]
+ l2cap_le_sig_cmd net/bluetooth/l2cap_core.c:5420 [inline]
+ l2cap_le_sig_channel net/bluetooth/l2cap_core.c:5486 [inline]
+ l2cap_recv_frame+0xe59d/0x11710 net/bluetooth/l2cap_core.c:6809
+ l2cap_recv_acldata+0x544/0x10a0 net/bluetooth/l2cap_core.c:7506
+ hci_acldata_packet net/bluetooth/hci_core.c:3939 [inline]
+ hci_rx_work+0x5e5/0xb20 net/bluetooth/hci_core.c:4176
+ process_one_work kernel/workqueue.c:3254 [inline]
+ process_scheduled_works+0x90f/0x1530 kernel/workqueue.c:3335
+ worker_thread+0x926/0xe70 kernel/workqueue.c:3416
+ kthread+0x2e3/0x380 kernel/kthread.c:388
+ ret_from_fork+0x5c/0x90 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+
+Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
+---
+ net/bluetooth/l2cap_core.c | 94 +++++++++++++++++++++++++++++---------
+ 1 file changed, 73 insertions(+), 21 deletions(-)
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 84fc70862..472ddfb2e 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -541,10 +541,17 @@ static void l2cap_le_flowctl_init(struct l2cap_chan *chan, u16 tx_credits)
+ 	chan->sdu_last_frag = NULL;
+ 	chan->sdu_len = 0;
+ 	chan->tx_credits = tx_credits;
+-	/* Derive MPS from connection MTU to stop HCI fragmentation */
+-	chan->mps = min_t(u16, chan->imtu, chan->conn->mtu - L2CAP_HDR_SIZE);
+-	/* Give enough credits for a full packet */
+-	chan->rx_credits = (chan->imtu / chan->mps) + 1;
++
++	if (chan->conn->mtu < L2CAP_HDR_SIZE) {
++		BT_WARN("mtu is too small (mtu %d < %d)", chan->conn->mtu, L2CAP_HDR_SIZE);
++		chan->mps = 0;
++		chan->rx_credits = 0;
++	} else {
++		/* Derive MPS from connection MTU to stop HCI fragmentation */
++		chan->mps = min_t(u16, chan->imtu, chan->conn->mtu - L2CAP_HDR_SIZE);
++		/* Give enough credits for a full packet */
++		chan->rx_credits = (chan->imtu / chan->mps) + 1;
++	}
+ 
+ 	skb_queue_head_init(&chan->tx_q);
+ }
+@@ -2222,7 +2229,12 @@ static struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan,
+ 	BT_DBG("chan %p psm 0x%2.2x len %zu", chan,
+ 	       __le16_to_cpu(chan->psm), len);
+ 
+-	count = min_t(unsigned int, (conn->mtu - hlen), len);
++	if (conn->mtu < hlen) {
++		count = 0;
++		BT_WARN("mtu is too small (mtu %d < len %d)", conn->mtu, hlen);
++	} else {
++		count = min_t(unsigned int, (conn->mtu - hlen), len);
++	}
+ 
+ 	skb = chan->ops->alloc_skb(chan, hlen, count,
+ 				   msg->msg_flags & MSG_DONTWAIT);
+@@ -2253,7 +2265,12 @@ static struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan,
+ 
+ 	BT_DBG("chan %p len %zu", chan, len);
+ 
+-	count = min_t(unsigned int, (conn->mtu - L2CAP_HDR_SIZE), len);
++	if (conn->mtu < L2CAP_HDR_SIZE) {
++		BT_WARN("mtu is too small (mtu %d < %d)", conn->mtu, L2CAP_HDR_SIZE);
++		count = 0;
++	} else {
++		count = min_t(unsigned int, (conn->mtu - L2CAP_HDR_SIZE), len);
++	}
+ 
+ 	skb = chan->ops->alloc_skb(chan, L2CAP_HDR_SIZE, count,
+ 				   msg->msg_flags & MSG_DONTWAIT);
+@@ -2295,7 +2312,12 @@ static struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan,
+ 	if (chan->fcs == L2CAP_FCS_CRC16)
+ 		hlen += L2CAP_FCS_SIZE;
+ 
+-	count = min_t(unsigned int, (conn->mtu - hlen), len);
++	if (conn->mtu < hlen) {
++		BT_WARN("mtu is too small (mtu %d < len %d)", conn->mtu, hlen);
++		count = 0;
++	} else {
++		count = min_t(unsigned int, (conn->mtu - hlen), len);
++	}
+ 
+ 	skb = chan->ops->alloc_skb(chan, hlen, count,
+ 				   msg->msg_flags & MSG_DONTWAIT);
+@@ -2412,7 +2434,12 @@ static struct sk_buff *l2cap_create_le_flowctl_pdu(struct l2cap_chan *chan,
+ 	if (sdulen)
+ 		hlen += L2CAP_SDULEN_SIZE;
+ 
+-	count = min_t(unsigned int, (conn->mtu - hlen), len);
++	if (conn->mtu < hlen) {
++		BT_WARN("mtu is too small (mtu %d < len %d)", conn->mtu, hlen);
++		count = 0;
++	} else {
++		count = min_t(unsigned int, (conn->mtu - hlen), len);
++	}
+ 
+ 	skb = chan->ops->alloc_skb(chan, hlen, count,
+ 				   msg->msg_flags & MSG_DONTWAIT);
+@@ -3225,6 +3252,7 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data, size_t data
+ 	void *ptr = req->data;
+ 	void *endptr = data + data_size;
+ 	u16 size;
++	int hlen;
+ 
+ 	BT_DBG("chan %p", chan);
+ 
+@@ -3275,14 +3303,19 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data, size_t data
+ 		break;
+ 
+ 	case L2CAP_MODE_ERTM:
++		hlen = L2CAP_EXT_HDR_SIZE + L2CAP_SDULEN_SIZE + L2CAP_FCS_SIZE;
+ 		rfc.mode            = L2CAP_MODE_ERTM;
+ 		rfc.max_transmit    = chan->max_tx;
+ 
+ 		__l2cap_set_ertm_timeouts(chan, &rfc);
+ 
+-		size = min_t(u16, L2CAP_DEFAULT_MAX_PDU_SIZE, chan->conn->mtu -
+-			     L2CAP_EXT_HDR_SIZE - L2CAP_SDULEN_SIZE -
+-			     L2CAP_FCS_SIZE);
++		if (chan->conn->mtu < hlen) {
++			BT_WARN("mtu is too small (mtu %d < len %d)", chan->conn->mtu, hlen);
++			size = 0;
++		} else {
++			size = min_t(u16, L2CAP_DEFAULT_MAX_PDU_SIZE, chan->conn->mtu - hlen);
++		}
++
+ 		rfc.max_pdu_size = cpu_to_le16(size);
+ 
+ 		l2cap_txwin_setup(chan);
+@@ -3310,6 +3343,7 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data, size_t data
+ 		break;
+ 
+ 	case L2CAP_MODE_STREAMING:
++		hlen = L2CAP_EXT_HDR_SIZE + L2CAP_SDULEN_SIZE + L2CAP_FCS_SIZE;
+ 		l2cap_txwin_setup(chan);
+ 		rfc.mode            = L2CAP_MODE_STREAMING;
+ 		rfc.txwin_size      = 0;
+@@ -3317,9 +3351,12 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data, size_t data
+ 		rfc.retrans_timeout = 0;
+ 		rfc.monitor_timeout = 0;
+ 
+-		size = min_t(u16, L2CAP_DEFAULT_MAX_PDU_SIZE, chan->conn->mtu -
+-			     L2CAP_EXT_HDR_SIZE - L2CAP_SDULEN_SIZE -
+-			     L2CAP_FCS_SIZE);
++		if (chan->conn->mtu < hlen) {
++			BT_WARN("mtu is too small (mtu %d < len %d)", chan->conn->mtu, hlen);
++			size = 0;
++		} else {
++			size = min_t(u16, L2CAP_DEFAULT_MAX_PDU_SIZE, chan->conn->mtu - hlen);
++		}
+ 		rfc.max_pdu_size = cpu_to_le16(size);
+ 
+ 		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
+@@ -3351,7 +3388,7 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
+ 	void *endptr = data + data_size;
+ 	void *req = chan->conf_req;
+ 	int len = chan->conf_len;
+-	int type, hint, olen;
++	int type, hint, olen, hlen;
+ 	unsigned long val;
+ 	struct l2cap_conf_rfc rfc = { .mode = L2CAP_MODE_BASIC };
+ 	struct l2cap_conf_efs efs;
+@@ -3496,6 +3533,7 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
+ 			break;
+ 
+ 		case L2CAP_MODE_ERTM:
++			hlen = L2CAP_EXT_HDR_SIZE + L2CAP_SDULEN_SIZE + L2CAP_FCS_SIZE;
+ 			if (!test_bit(CONF_EWS_RECV, &chan->conf_state))
+ 				chan->remote_tx_win = rfc.txwin_size;
+ 			else
+@@ -3503,9 +3541,15 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
+ 
+ 			chan->remote_max_tx = rfc.max_transmit;
+ 
+-			size = min_t(u16, le16_to_cpu(rfc.max_pdu_size),
+-				     chan->conn->mtu - L2CAP_EXT_HDR_SIZE -
+-				     L2CAP_SDULEN_SIZE - L2CAP_FCS_SIZE);
++			if (chan->conn->mtu < hlen) {
++				BT_WARN("mtu is too small (mtu %d < len %d)",
++					chan->conn->mtu, hlen);
++				size = 0;
++			} else {
++				size = min_t(u16, le16_to_cpu(rfc.max_pdu_size),
++					     chan->conn->mtu - hlen);
++			}
++
+ 			rfc.max_pdu_size = cpu_to_le16(size);
+ 			chan->remote_mps = size;
+ 
+@@ -3534,9 +3578,17 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
+ 			break;
+ 
+ 		case L2CAP_MODE_STREAMING:
+-			size = min_t(u16, le16_to_cpu(rfc.max_pdu_size),
+-				     chan->conn->mtu - L2CAP_EXT_HDR_SIZE -
+-				     L2CAP_SDULEN_SIZE - L2CAP_FCS_SIZE);
++			hlen = L2CAP_EXT_HDR_SIZE + L2CAP_SDULEN_SIZE + L2CAP_FCS_SIZE;
++
++			if (chan->conn->mtu < hlen) {
++				BT_WARN("mtu is too small (mtu %d < len %d)",
++					chan->conn->mtu, hlen);
++				size = 0;
++			} else {
++				size = min_t(u16, le16_to_cpu(rfc.max_pdu_size),
++					     chan->conn->mtu - hlen);
++			}
++
+ 			rfc.max_pdu_size = cpu_to_le16(size);
+ 			chan->remote_mps = size;
+ 
+-- 
+2.34.1
+
