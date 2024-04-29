@@ -1,70 +1,68 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53156127E1E
-	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Apr 2024 18:02:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76108127E24
+	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Apr 2024 18:16:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714413738; cv=none; b=qlh7/12V//RXJyjjuhMdLZz8iM1ilPlOG5KXddH0WHrttfZVR0bnI6gID6Sm98//eRuOPs/8eN4HdE2gn9uLm5xaySnSeH0szlhqzAmBTdJhoh49eZTiUb2a+FcJqt2bLjd3o+MSDzCvytGhub0O60zpE4GvIEQV8dPcZ+gk4vI=
+	t=1714414574; cv=none; b=Gux4DZn9QvNwJwTrPaKgyvE5khsF5zbP7pEySZKmxeU7r/exM1SDyuMsh/crXt9ml6aH+9pWNlWQ2M4JkiA24cJYrfqYCxInW+Ng1vkGvVVifP/VOpvpcmL0NDNmbydh2nnXfV0gWhowGj2pFGmS1DQ/lHKyo/Fm9WHtFJ2bd2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714413738; c=relaxed/simple;
-	bh=gL0+tSE89ipQmrWrMcQPeqHsy334PXTO2zO/FIm0++Q=;
+	s=arc-20240116; t=1714414574; c=relaxed/simple;
+	bh=WcXW/buP9MAu0vMBF5Js5v7YGSUnlUAbpElCKfwLszc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UV287wVj/WZ5POntdwssn2DoxxoMOxSYAyYYx9UPnnEJO8l5HGkmwTIsdAf1fV9sToyjZqnlqZ7wUFw5Yb+Ud3p84peIDvE3FeGIers8GZV8HTdSrhGKmmoomFaYrWcwb50JhzGNObcZU+EkrTddJozBDak0xEvKHQn7saf+rFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=O8Eud+ar; arc=none smtp.client-ip=209.85.214.173
+	 Content-Type:Content-Disposition:In-Reply-To; b=FIGX5nUMtPzNse0xblwLBgvRmMBFanCltxzVtZGZhOrxV6dyRKtZRKBX0kD76rZjoEpb0y7g6pd8MOZN6oRzOhMlInpKIHp1MdrYP6Fe+yOOBTSoFYNYzsQqGeYe+yWepDDT7YLzZLDgMTyifZ+toWQfUHtXzpcR+WxKS0GW150=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=nl6h1rwq; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="O8Eud+ar"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1e65b29f703so42336265ad.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Apr 2024 11:02:17 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="nl6h1rwq"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1e3ff14f249so36684745ad.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Apr 2024 11:16:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1714413737; x=1715018537; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1714414573; x=1715019373; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6x8lt/QnOXVC9VHXwmVhKmm/O95+/YfUgqH6Mk9eoek=;
-        b=O8Eud+areymLQ6RfxXaAKYQHRxQwptIhRkSw8cmzyViLIs/0kO7x6313rCCkivWKtR
-         zq7LrwpZ2qfM2Xaooj4OwGaWbrrExAknNAQp/FJDpYK5mdPuH45vWjuSAwL1g9Vqdcjs
-         l6ZfM3jonFTNh7akYf3WwKcxyM/fTotV/SYB8=
+        bh=OnZ1vLukMpdqrqD0r/VM8L5RpjpCprM81qtpwZ8cNP0=;
+        b=nl6h1rwq3iLZfIjRmHtoR1qqzAcLmll+mg0FsLNREaFSsDODhKtJ7QFSou821XFhTx
+         OwNqRW5epiElYi7zNZ6RXxyKWoEfuS6Jn/axupB5fxPOrAOloqoE+RNH+MLLTTkFpT8w
+         K8IvudBhrFEfLYsEn1LZqQ0j+KDmDoDBBPRfI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714413737; x=1715018537;
+        d=1e100.net; s=20230601; t=1714414573; x=1715019373;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6x8lt/QnOXVC9VHXwmVhKmm/O95+/YfUgqH6Mk9eoek=;
-        b=myquveaEaBtqG4wKL1pEuFPNgtiHf77lX8N9DKwpQt9Z7UPItVScR2WoukdQwwk8KK
-         /ACw7a1hs3WyU01Zkds7J8ArCjaJ4X5Vz+DojvhJHXTE62l/PEtvKT79McNwAAHaheYu
-         54nSucuBytnVA/5jJfwC6sIJzE5A1nVaGr5dD57vsgW+xo0QqJCIhAKBEYE48vrltKzp
-         RMGu1IMo+VTfxNCgBXJVUj87gJo7nqOXxWkubk/vjI5wLvsxhm8hA+gUSJAWSURO4j1e
-         IYexVsWd97IXm5zPnemJf/rDicHdDlU6LZWfbZkdkm4C/qjNDJ1mygoIR4m9tI/Rd2iD
-         yJEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXSWF+U0otaFjw5i5z6Vr3y2ja4/6ZVymezuZTwvk15Z0/fUY4c1cNLGJyA0uTQJN5uX0jelvuO6PnRhBZHM9kSflp8HL7icCz0/r+VeXS7
-X-Gm-Message-State: AOJu0YxRPbuwKUPSkLrWSA6gUeRNgfIWv0maXLsUDynsw1C0AKZPGUpb
-	UYwoHTMeNqPiP0CwYdsiSxGcw/V/fCnd80KICbpD8y8g1wq9o6n+Ag93hT/2vg==
-X-Google-Smtp-Source: AGHT+IEQfk9lL1aOUOkf//WozQck3LaV69Zfa5tOr6Oj+f6mKhEF0gk04YzTIOrNwRmpzUEbItTyoQ==
-X-Received: by 2002:a17:902:d487:b0:1e2:1df:449b with SMTP id c7-20020a170902d48700b001e201df449bmr14900464plg.69.1714413736574;
-        Mon, 29 Apr 2024 11:02:16 -0700 (PDT)
+        bh=OnZ1vLukMpdqrqD0r/VM8L5RpjpCprM81qtpwZ8cNP0=;
+        b=PmmGf3nHzwvNc0uWKYO504tejOfbSG+052ieF3C+9ZedLR+82IbKHU5dteN8PA7lNv
+         DWcxYEgT+6Zt/kNQF0DGgwju/q6FliPevgOU6UJnO6PmPdfEBTdF7BTxH6u+iPGBS3/S
+         0zKUft5rOQbUwXFRSPvwIqbCmFVOaQymRRKC3deXGW8UB1OPD9StQVPTUmuLPN2Mw6f/
+         Ho+pDlvDdCkEKxLFSq9wWeJfAEj/lf67SoXki1WUbkeHK+z5xcEz/GYD3+hQPXekGlRS
+         MGhVkPieRiFjmHiLCpDlPdxgdWuizzJREkMN/oHM3w2ZrCy96puyJtvIc+Mx5oMuE//q
+         Wm7g==
+X-Forwarded-Encrypted: i=1; AJvYcCVOx28VZ4j36NyYX/4wdYNcwndCmg47pecP+ngftiV0x6DHmtmYDJ0ynMNc5ZMPGtcuCV9n55YS4VTapDJ2DuOqvutd/enPE6nyRVh30Z6M
+X-Gm-Message-State: AOJu0Ywi5xhXAN21vhKxKjWmxD7csgHrY9MPY0HN+K8shMyVQXLlX/Rg
+	E5mrzP6IhEwTxUS7UiveBIblG8iI+PyZokE8uS/o+CPpDQz7ulgIZaZHfWtlNQ==
+X-Google-Smtp-Source: AGHT+IFHuanPGgh9O4MDAeEUubDx/pf+02lBFuayRPoTqeON76gFZdZ04TBnnFcYIylPNzk4FROTQQ==
+X-Received: by 2002:a17:903:1c8:b0:1e4:320b:4311 with SMTP id e8-20020a17090301c800b001e4320b4311mr562818plh.34.1714414572641;
+        Mon, 29 Apr 2024 11:16:12 -0700 (PDT)
 Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id ix19-20020a170902f81300b001e895c9ec6asm20207649plb.152.2024.04.29.11.02.15
+        by smtp.gmail.com with ESMTPSA id u17-20020a17090341d100b001eb3d459143sm5154929ple.48.2024.04.29.11.16.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Apr 2024 11:02:16 -0700 (PDT)
-Date: Mon, 29 Apr 2024 11:02:15 -0700
+        Mon, 29 Apr 2024 11:16:11 -0700 (PDT)
+Date: Mon, 29 Apr 2024 11:16:11 -0700
 From: Kees Cook <keescook@chromium.org>
-To: Erick Archer <erick.archer@outlook.com>
+To: "Gustavo A. R. Silva" <gustavoars@kernel.org>
 Cc: Marcel Holtmann <marcel@holtmann.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"Jiri Slaby (SUSE)" <jirislaby@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Justin Stitt <justinstitt@google.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] tty: rfcomm: prefer struct_size over open coded
- arithmetic
-Message-ID: <202404291047.B08E8BE759@keescook>
-References: <AS8PR02MB723725E0069F7AE8F64E876E8B142@AS8PR02MB7237.eurprd02.prod.outlook.com>
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v2][next] Bluetooth: hci_conn, hci_sync: Use
+ __counted_by() in multiple structs and avoid -Wfamnae warnings
+Message-ID: <202404291110.6159F7EA5@keescook>
+References: <ZiwwPmCvU25YzWek@neat>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -73,144 +71,187 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <AS8PR02MB723725E0069F7AE8F64E876E8B142@AS8PR02MB7237.eurprd02.prod.outlook.com>
+In-Reply-To: <ZiwwPmCvU25YzWek@neat>
 
-On Sun, Apr 28, 2024 at 03:29:34PM +0200, Erick Archer wrote:
-> This is an effort to get rid of all multiplications from allocation
-> functions in order to prevent integer overflows [1][2].
+On Fri, Apr 26, 2024 at 04:52:46PM -0600, Gustavo A. R. Silva wrote:
+> Prepare for the coming implementation by GCC and Clang of the
+> __counted_by attribute. Flexible array members annotated with
+> __counted_by can have their accesses bounds-checked at run-time
+> via CONFIG_UBSAN_BOUNDS (for array indexing) and CONFIG_FORTIFY_SOURCE
+> (for strcpy/memcpy-family functions).
 > 
-> As the "dl" variable is a pointer to "struct rfcomm_dev_list_req" and
-> this structure ends in a flexible array:
+> Also, -Wflex-array-member-not-at-end is coming in GCC-14, and we are
+> getting ready to enable it globally.
 > 
-> struct rfcomm_dev_list_req {
-        u16      dev_num;
-> 	struct   rfcomm_dev_info dev_info[];
-> };
-
-Similar to before, this should gain __counted_by(), and the logic using
-dev_info[] refactored slightly to gain coverage.
-
+> So, use the `DEFINE_FLEX()` helper for multiple on-stack definitions
+> of a flexible structure where the size of the flexible-array member
+> is known at compile-time, and refactor the rest of the code,
+> accordingly.
 > 
-> the preferred way in the kernel is to use the struct_size() helper to
-> do the arithmetic instead of the calculation "size + count * size" in
-> the kzalloc() and copy_to_user() functions.
+> Notice that, due to the use of `__counted_by()` in `struct
+> hci_cp_le_create_cis`, the for loop in function `hci_cs_le_create_cis()`
+> had to be modified. Once the index `i`, through which `cp->cis[i]` is
+> accessed, falls in the interval [0, cp->num_cis), `cp->num_cis` cannot
+> be decremented all the way down to zero while accessing `cp->cis[]`:
 > 
-> At the same time remove the "size" variable as it is no longer needed.
-> This way, the code is more readable and safer.
+> net/bluetooth/hci_event.c:4310:
+> 4310    for (i = 0; cp->num_cis; cp->num_cis--, i++) {
+>                 ...
+> 4314            handle = __le16_to_cpu(cp->cis[i].cis_handle);
 > 
-> This code was detected with the help of Coccinelle, and audited and
-> modified manually.
+> otherwise, only half (one iteration before `cp->num_cis == i`) or half
+> plus one (one iteration before `cp->num_cis < i`) of the items in the
+> array will be accessed before running into an out-of-bounds issue. So,
+> in order to avoid this, set `cp->num_cis` to zero just after the for
+> loop.
 > 
-> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#open-coded-arithmetic-in-allocator-arguments [1]
-> Link: https://github.com/KSPP/linux/issues/160 [2]
-> Signed-off-by: Erick Archer <erick.archer@outlook.com>
+> Also, make use of `aux_num_cis` variable to update `cmd->num_cis` after
+> a `list_for_each_entry_rcu()` loop.
+> 
+> With these changes, fix the following warnings:
+> net/bluetooth/hci_sync.c:1239:56: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+> net/bluetooth/hci_sync.c:1415:51: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+> net/bluetooth/hci_sync.c:1731:51: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+> net/bluetooth/hci_sync.c:6497:45: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+> 
+> Link: https://github.com/KSPP/linux/issues/202
+> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 > ---
-> Hi,
+> Changes in v2:
+>  - Update `cmd->num_cis` after `list_for_each_entry_rcu()` loop.
 > 
-> The Coccinelle script used to detect this code pattern is the following:
+> v1:
+>  - Link: https://lore.kernel.org/linux-hardening/ZiwqqZCa7PK9bzCX@neat/
 > 
-> virtual report
+>  include/net/bluetooth/hci.h |  8 ++--
+>  net/bluetooth/hci_event.c   |  3 +-
+>  net/bluetooth/hci_sync.c    | 84 +++++++++++++++----------------------
+>  3 files changed, 40 insertions(+), 55 deletions(-)
 > 
-> @rule1@
-> type t1;
-> type t2;
-> identifier i0;
-> identifier i1;
-> identifier i2;
-> identifier ALLOC =~ "kmalloc|kzalloc|kmalloc_node|kzalloc_node|vmalloc|vzalloc|kvmalloc|kvzalloc";
-> position p1;
-> @@
-> 
-> i0 = sizeof(t1) + sizeof(t2) * i1;
-> ...
-> i2 = ALLOC@p1(..., i0, ...);
-> 
-> @script:python depends on report@
-> p1 << rule1.p1;
-> @@
-> 
-> msg = "WARNING: verify allocation on line %s" % (p1[0].line)
-> coccilib.report.print_report(p1[0],msg)
-> 
-> Regards,
-> Erick
-> ---
->  net/bluetooth/rfcomm/tty.c | 10 +++-------
->  1 file changed, 3 insertions(+), 7 deletions(-)
-> 
-> diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-> index 69c75c041fe1..bdc64c8fb85b 100644
-> --- a/net/bluetooth/rfcomm/tty.c
-> +++ b/net/bluetooth/rfcomm/tty.c
-> @@ -504,7 +504,7 @@ static int rfcomm_get_dev_list(void __user *arg)
->  	struct rfcomm_dev *dev;
->  	struct rfcomm_dev_list_req *dl;
->  	struct rfcomm_dev_info *di;
-> -	int n = 0, size, err;
-> +	int n = 0, err;
->  	u16 dev_num;
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index fe23e862921d..c4c6b8810701 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -2026,7 +2026,7 @@ struct hci_cp_le_set_ext_adv_data {
+>  	__u8  operation;
+>  	__u8  frag_pref;
+>  	__u8  length;
+> -	__u8  data[];
+> +	__u8  data[] __counted_by(length);
+>  } __packed;
+
+I noticed some of the other structs here aren't flexible arrays, so it
+made me go take a look at these ones. I see that the only user of struct
+hci_cp_le_set_ext_adv_data uses a fixed-size array:
+
+        struct {
+                struct hci_cp_le_set_ext_adv_data cp;
+                u8 data[HCI_MAX_EXT_AD_LENGTH];
+        } pdu;
+
+Let's just change this from a flex array to a fixed-size array?
+
 >  
->  	BT_DBG("");
-> @@ -515,9 +515,7 @@ static int rfcomm_get_dev_list(void __user *arg)
->  	if (!dev_num || dev_num > (PAGE_SIZE * 4) / sizeof(*di))
->  		return -EINVAL;
+>  #define HCI_OP_LE_SET_EXT_SCAN_RSP_DATA		0x2038
+> @@ -2035,7 +2035,7 @@ struct hci_cp_le_set_ext_scan_rsp_data {
+>  	__u8  operation;
+>  	__u8  frag_pref;
+>  	__u8  length;
+> -	__u8  data[];
+> +	__u8  data[] __counted_by(length);
+>  } __packed;
+
+Same for this one:
+
+        struct {
+                struct hci_cp_le_set_ext_scan_rsp_data cp;
+                u8 data[HCI_MAX_EXT_AD_LENGTH];
+        } pdu;
+
 >  
-> -	size = sizeof(*dl) + dev_num * sizeof(*di);
+>  #define HCI_OP_LE_SET_EXT_ADV_ENABLE		0x2039
+> @@ -2061,7 +2061,7 @@ struct hci_cp_le_set_per_adv_data {
+>  	__u8  handle;
+>  	__u8  operation;
+>  	__u8  length;
+> -	__u8  data[];
+> +	__u8  data[] __counted_by(length);
+>  } __packed;
 
-Luckily, "size" can't overflow. Max value seems to be around 1834980,
-but I'd rather this be in struct_size() as you have it below. Good!
+And this one. :P
 
-> -
-> -	dl = kzalloc(size, GFP_KERNEL);
-> +	dl = kzalloc(struct_size(dl, dev_info, dev_num), GFP_KERNEL);
->  	if (!dl)
->  		return -ENOMEM;
+        struct {
+                struct hci_cp_le_set_per_adv_data cp;
+                u8 data[HCI_MAX_PER_AD_LENGTH];
+        } pdu;
 
-When you add __counted_by, this will need to be added here:
-
-	dl->dev_num = dev_num;
-
-
-Continuing...
-
-        di = dl->dev_info;
-	...
-        list_for_each_entry(dev, &rfcomm_dev_list, list) {
-                if (!tty_port_get(&dev->port))
-                        continue;
-                (di + n)->id      = dev->id;
-                (di + n)->flags   = dev->flags;
-                (di + n)->state   = dev->dlc->state;
-                (di + n)->channel = dev->channel;
-                bacpy(&(di + n)->src, &dev->src);
-                bacpy(&(di + n)->dst, &dev->dst);
-                tty_port_put(&dev->port);
-                if (++n >= dev_num)
-                        break;
-        }
-
-Hmpf. I'd rather this code use di[n] instead of (di + n) -- that's much
-more idiomatic.
-
-> @@ -542,9 +540,7 @@ static int rfcomm_get_dev_list(void __user *arg)
->  	mutex_unlock(&rfcomm_dev_lock);
 >  
->  	dl->dev_num = n;
-
-And this reset of dl->dev_num can stay as-is, since it's reducing the
-number of valid entries, in can &rfcomm_dev_list is smaller than the
-dev_num count userspace offered.
-
-> -	size = sizeof(*dl) + n * sizeof(*di);
-> -
-> -	err = copy_to_user(arg, dl, size);
-> +	err = copy_to_user(arg, dl, struct_size(dl, dev_info, n));
->  	kfree(dl);
+>  #define HCI_OP_LE_SET_PER_ADV_ENABLE		0x2040
+> @@ -2162,7 +2162,7 @@ struct hci_cis {
 >  
+>  struct hci_cp_le_create_cis {
+>  	__u8    num_cis;
+> -	struct hci_cis cis[];
+> +	struct hci_cis cis[] __counted_by(num_cis);
+>  } __packed;
 
-Otherwise looks good!
+This one isn't as obvious, so I'd say keep your changes for this one.
 
--Kees
+>  
+>  #define HCI_OP_LE_REMOVE_CIG			0x2065
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 9a38e155537e..9a7ca084302e 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -4307,7 +4307,7 @@ static void hci_cs_le_create_cis(struct hci_dev *hdev, u8 status)
+>  	hci_dev_lock(hdev);
+>  
+>  	/* Remove connection if command failed */
+> -	for (i = 0; cp->num_cis; cp->num_cis--, i++) {
+> +	for (i = 0; i < cp->num_cis; i++) {
+>  		struct hci_conn *conn;
+>  		u16 handle;
+>  
+> @@ -4323,6 +4323,7 @@ static void hci_cs_le_create_cis(struct hci_dev *hdev, u8 status)
+>  			hci_conn_del(conn);
+>  		}
+>  	}
+> +	cp->num_cis = 0;
+
+Yeah, this loop never leaves early, and if it did, it processing the
+array forward, so having num_cis reduced during the loop iteration
+doesn't make sense. What you have looks right to me!
+
+
+>  
+>  	if (pending)
+>  		hci_le_create_cis_pending(hdev);
+> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> index 9092b4d59545..6e15594d3565 100644
+> --- a/net/bluetooth/hci_sync.c
+> +++ b/net/bluetooth/hci_sync.c
+> @@ -1235,31 +1235,27 @@ int hci_setup_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance)
+>  
+>  static int hci_set_ext_scan_rsp_data_sync(struct hci_dev *hdev, u8 instance)
+>  {
+> -	struct {
+> -		struct hci_cp_le_set_ext_scan_rsp_data cp;
+> -		u8 data[HCI_MAX_EXT_AD_LENGTH];
+> -	} pdu;
+> +	DEFINE_FLEX(struct hci_cp_le_set_ext_scan_rsp_data, pdu, data, length,
+> +		    HCI_MAX_EXT_AD_LENGTH);
+>  	u8 len;
+>  	struct adv_info *adv = NULL;
+>  	int err;
+>  
+> -	memset(&pdu, 0, sizeof(pdu));
+
+These become much easier, just:
+
+	struct hci_cp_le_set_ext_scan_rsp_data cp = { };
+
+etc...
+
 
 -- 
 Kees Cook
