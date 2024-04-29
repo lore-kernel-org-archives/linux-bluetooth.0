@@ -1,37 +1,51 @@
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+Received: from omta34.uswest2.a.cloudfilter.net (omta34.uswest2.a.cloudfilter.net [35.89.44.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB4AD13AA20;
-	Mon, 29 Apr 2024 18:46:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E931411E1
+	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Apr 2024 19:50:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.89.44.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714416367; cv=none; b=qY2KV0gaSgFwGkdo+kSR/1+1Sh5hS3nZBIzpndUV7bph3mi7eJZTuz1Y6YgzfhivtBmB3FQP26QpdXMNjIhp6FzF8H5ECWzve1MV8RsMFwwEBgcRBe2E1xMTY2NQrA8lYxjbMMYA8D7VPWFQNgQmRt04sz+pC3UcWD8wMPVtn3s=
+	t=1714420257; cv=none; b=g0yRmAlM5flLiWw09prh69ujRjSqq+9o8waLCeZoJTR+k++FGGKSPeCrhyC3eHPaQ0fpzRnvwKIwDG5lcIrRN7dNQhwda4eMtRNrMRlvWO0/vtBmYIg1SXtxjStQ1kfaygH7AdoN2sq32u4q1zJzdwMI0Hr5e23IVTB6GL0jIW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714416367; c=relaxed/simple;
-	bh=3LH0ATCDUz78r2Tey+5bXVs+rUczTd3e47hk9qUT2uA=;
+	s=arc-20240116; t=1714420257; c=relaxed/simple;
+	bh=ajQDmJ0WWFzPXvoP2mmAy+LuxbIewe2/xsExrL6XISQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ulpn8ns6Z3JGQXVFDc+0W7pKQiUkOIDS01+1+aW8PsIV5UBQgPH0Rv71hVfTkM+uCc2tIOFW1aC/RNVm6UBG03WtFklDb/PbOJeagAM7aZS67sT3IXIjUrhoFaJOr24llcIvtiS0Lhcqya8HlI6XUdLaCYDb7kwtP7qg1ZXvSKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=mMqrnJ+F; arc=none smtp.client-ip=80.237.130.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+	 In-Reply-To:Content-Type; b=cDHG7DUmtF8Hxy7fiqUofSdjYR1ziggXt/+dnXHXImiW7IaXJAHD8iZF13gGl5+X8J7TvOCm4xlVGSt/MNdXeMjFG6VPDCmBbiufn6gnqhHEAk8F6VZDshH3PoB6emqOv7UwbMqSN1cCpK5KXn41crVuKUoXhqTO1ZUUyaSD+QE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=rEuAK03c; arc=none smtp.client-ip=35.89.44.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="mMqrnJ+F"
+	dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="rEuAK03c"
+Received: from eig-obgw-5010a.ext.cloudfilter.net ([10.0.29.199])
+	by cmsmtp with ESMTPS
+	id 1TsqsWvlkFfFD1X1WscZZk; Mon, 29 Apr 2024 19:50:50 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id 1X1VseJmWUjoW1X1VssLC8; Mon, 29 Apr 2024 19:50:49 +0000
+X-Authority-Analysis: v=2.4 cv=Btqbw5X5 c=1 sm=1 tr=0 ts=662ffa19
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=zXgy4KOrraTBHT4+ULisNA==:17
+ a=IkcTkHD0fZMA:10 a=raytVjVEu-sA:10 a=wYkD_t78qR0A:10
+ a=GnIobxVeLkNF-WZzOA8A:9 a=QEXdDO2ut3YA:10
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:
-	Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
-	In-Reply-To:References; bh=ZkJzNvR/m4pjy1+DgD6tXtFggu8kp9OwAo85IxPakxg=;
-	t=1714416364; x=1714848364; b=mMqrnJ+FhZXdK5FEOih/T4F32qHzR2uAmg+7T27fDijNOlP
-	2HrrSBmYOaMVb9btdat2GHy+fsfJnlUOdi6GKad0ToGfTXwoJMJ3KVE4vy4ajTrW0B7fylikChbg+
-	ehjWazipG4om9YLyitMEIcvf0rRTeTkPKvfD7su/10CioE4Oh8IEKlIp9+G8P3NgLxFcmrkh4Lge9
-	4tr4n0Iz3TOk5JfJ2tHchZj8VV/0QnLSYrqt/eX61J4JoJCpGLTJ7ZD3VlvMNhGUvUSZUBGYZE4DW
-	UpTsOefxSDXaTJ3YEsPdYW6fD2U57Dky2A1+k9VDPYH97hFx/f2q81pESJ66oKIA==;
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1s1W0o-0000lq-9l; Mon, 29 Apr 2024 20:46:02 +0200
-Message-ID: <8e8ca7a6-1511-4794-a214-2b75326e5484@leemhuis.info>
-Date: Mon, 29 Apr 2024 20:46:00 +0200
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=2FeBCJhrHyDzm6ziA3QCmTVmkMK5M89ts1JS18ctx0c=; b=rEuAK03cGdyk9JpPDMHFIOHuB3
+	yaa5QHKXfz1v4NbbnH5VYAiFdRJe8wZGP6b67svjvwC8epGhVqbsYNbo2zDB9C/gnDE7g1wZCuVYu
+	n6ged8xunX4hdg33PLMAOjytXZjcqByYDcHISnCcAG0G/iQp6urAu7YelT5xg803cDDGa0pVWgjxE
+	HHwq4XhBERPYHCHZQyH3liUj3xD0XytWpURKR+PGSrKtSu888+wZIYsa9+IYnhsfr8QQ3FBFeSKq9
+	W8xWkro+UYkY7lv6P0IEO2tD7pXtKmaFpwPLMeRP9Ay98xo8Rq9lBh/TEv1BXiRia2I59yO2jscy3
+	pPZdkjXA==;
+Received: from [201.172.173.147] (port=53420 helo=[192.168.15.10])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96.2)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1s1X1U-003pzP-24;
+	Mon, 29 Apr 2024 14:50:48 -0500
+Message-ID: <b09450f9-c42f-41f8-a2f6-eea3515eaa2f@embeddedor.com>
+Date: Mon, 29 Apr 2024 13:50:46 -0600
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -39,49 +53,71 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Bluetooth kernel BUG with Intel AX211 (regression in 6.1.83)
-To: =?UTF-8?Q?Jeremy_Lain=C3=A9?= <jeremy.laine@m4x.org>,
- Linux regressions mailing list <regressions@lists.linux.dev>
-Cc: "stable@vger.kernel.org" <stable@vger.kernel.org>,
- Marcel Holtmann <marcel@holtmann.org>,
+Subject: Re: [PATCH v2][next] Bluetooth: hci_conn, hci_sync: Use
+ __counted_by() in multiple structs and avoid -Wfamnae warnings
+To: Kees Cook <keescook@chromium.org>,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
  Johan Hedberg <johan.hedberg@gmail.com>,
  Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- linux-bluetooth@vger.kernel.org, Paul Menzel <pmenzel@molgen.mpg.de>,
- Greg KH <gregkh@linuxfoundation.org>, Sasha Levin <sashal@kernel.org>
-References: <CADRbXaDqx6S+7tzdDPPEpRu9eDLrHQkqoWTTGfKJSRxY=hT5MQ@mail.gmail.com>
- <1de62bb7-93bb-478e-8af4-ba9abf5ae330@leemhuis.info>
- <4bf3497d-0ede-4e05-a432-e88e9cbc10b4@leemhuis.info>
- <CADRbXaBkkGmqnibGvcAF2YH5CjLRJ2bnnix1xKozKdw_Hv3qNg@mail.gmail.com>
-From: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-Content-Language: en-US, de-DE
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <CADRbXaBkkGmqnibGvcAF2YH5CjLRJ2bnnix1xKozKdw_Hv3qNg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1714416364;7c17985c;
-X-HE-SMSGID: 1s1W0o-0000lq-9l
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+References: <ZiwwPmCvU25YzWek@neat> <202404291110.6159F7EA5@keescook>
+Content-Language: en-US
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <202404291110.6159F7EA5@keescook>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 201.172.173.147
+X-Source-L: No
+X-Exim-ID: 1s1X1U-003pzP-24
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: ([192.168.15.10]) [201.172.173.147]:53420
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 4
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfOwxWzzY2/dBe9tWmLOQId0sNAsbcVN/5wjl4fcHLisRiysIP+nYkrv13mWKnZXU7jqSGpVcf1bZu2NpVBJFgItufBIK6sTZlysh/Rhp7PhA3JsSCfJI
+ zCc3YGEDHvjvyF5Zv1kw3Kh9F+KwS0jNshvLUW3/YvbI75KHHOfzYfjJ8z6w95nufdsYdkj+MVXCjJ4wiLJ+7Ryv+sJhp+rG9xHf4prU8QgOKuUUp4xvCmvH
 
-On 29.04.24 20:28, Jeremy Lainé wrote:
-> 
-> On Mon, Apr 29, 2024 at 12:24 PM Linux regression tracking (Thorsten
-> Leemhuis) <regressions@leemhuis.info> wrote:
->>
->> So we either need to find the cause (likely a missing backport) through
->> some other way or maybe revert the culprit in the 6.1.y series. Jeremy,
->> did you try if the latter is an option? If not: could you do that
->> please? And could you also try cherry-pikcing c7eaf80bfb0c8c
->> ("Bluetooth: Fix hci_link_tx_to RCU lock usage") [v6.6-rc5] into 6.1.y
->> helps? It's just a wild guess, but it contains a Fixes: tag for the
->> commit in question.
-> 
-> I gave it a try, and sadly I'm still hitting the exact same bug when I
-> cherry-pick the patch you mentioned on top of 6.1.y (at tag v6.1.87).
-> 
-> Thanks for trying, is there any other patch that looks like a good candidate?
 
-Well, did you try what I suggested earlier (see above) and check if a
-revert of 6083089ab00631617f9eac678df3ab050a9d837a ontop of latest 6.1.y
-helps?
+>> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+>> index fe23e862921d..c4c6b8810701 100644
+>> --- a/include/net/bluetooth/hci.h
+>> +++ b/include/net/bluetooth/hci.h
+>> @@ -2026,7 +2026,7 @@ struct hci_cp_le_set_ext_adv_data {
+>>   	__u8  operation;
+>>   	__u8  frag_pref;
+>>   	__u8  length;
+>> -	__u8  data[];
+>> +	__u8  data[] __counted_by(length);
+>>   } __packed;
+> 
+> I noticed some of the other structs here aren't flexible arrays, so it
+> made me go take a look at these ones. I see that the only user of struct
+> hci_cp_le_set_ext_adv_data uses a fixed-size array:
+> 
+>          struct {
+>                  struct hci_cp_le_set_ext_adv_data cp;
+>                  u8 data[HCI_MAX_EXT_AD_LENGTH];
+>          } pdu;
+> 
+> Let's just change this from a flex array to a fixed-size array?
 
-Ciao, Thorsten
+mmh... not sure about this. It would basically mean reverting this commit:
+
+c9ed0a707730 ("Bluetooth: Fix Set Extended (Scan Response) Data")
+
+--
+Gustavo
