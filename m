@@ -1,78 +1,87 @@
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D35467A14
-	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Apr 2024 18:37:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB4AD13AA20;
+	Mon, 29 Apr 2024 18:46:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714415825; cv=none; b=F6R2l+x4PZhcyNv2kGqmnRV8gj/aX9HPUZQSl2s1+oUwJefTDhZARZse4bKmFXY0xt7874xtO+2ptZ/Zk/rGXFbWo53fSCesHipyvyOdbR7vxr4weCeYLcvrzsqZXKWAO4aBei+wHEfx7DrrxAfqR6bTZeMBU5KHjljKezI6M9o=
+	t=1714416367; cv=none; b=qY2KV0gaSgFwGkdo+kSR/1+1Sh5hS3nZBIzpndUV7bph3mi7eJZTuz1Y6YgzfhivtBmB3FQP26QpdXMNjIhp6FzF8H5ECWzve1MV8RsMFwwEBgcRBe2E1xMTY2NQrA8lYxjbMMYA8D7VPWFQNgQmRt04sz+pC3UcWD8wMPVtn3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714415825; c=relaxed/simple;
-	bh=VtpWIt2Cg10SpMJg2TSidcDR0e8buD5s+hNLaTrQo9o=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=GsfCOWwf+9mW1hR9pufUHpoo4RB5qfCg/Jt6LAoVy3EpyiPNO3XYKFoJjxUp5sDZZn7blv7imI60dCloMg9P3+JHTohfKBNuRpIXqekKpM8CcGhIINcgknZBqBHpso8JGiYe19iOKTCf/9c3SRqtCeh8KnSeciDKKRIxBRgAdfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-36b2eee85edso55260815ab.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Apr 2024 11:37:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714415824; x=1715020624;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MujhuQRr+Zfbg9mAy/KHY5eP40BaRZQ7dzpBhYWyEFM=;
-        b=HWoukj+iGXhUO4NQj0xsmYSwofgB60iTZZUNLlqXDTyjTtiVPwIkqli4R4Fbf+I/GC
-         URQpoTYQuFQseIEF83JCK8f5Y/nS3DoCy2xVUWdjcDvQxTlnjhDRe+qnHngzxuF0x9pT
-         ZFwR01rwiFdsOACsNvohcDIvEq3dkdbWaAqvcgs+zCggzffoBOtvqUBPu6S2KfJDQRww
-         TUKwNrFSU+JoQkO+1bDSqz5BLI1cH6AeKwKu2I4Qwyg+bMpC2gibZbwD8WQbnt10zBNJ
-         PYkvtPxPxRj85nnmvCgP5RFbS8tHnLytnSlGmMYVBo3rrXxgS8E750WKBLxebxd9KZRG
-         6T4g==
-X-Forwarded-Encrypted: i=1; AJvYcCXdEh/50BgNnQih5IWp8zGWre7MhSZokUH2ePumuEi7i9wPLfN3iwNhVaHTPWGyTLIil+CXauJ9yJRN/Q6gXYd12kcHz6wsE+xA4T1L467X
-X-Gm-Message-State: AOJu0YwQQtq+J+pIPUBDKJP8k7d0mRmCEE86plPwL9RZjKo4BMkIimw2
-	5s5LzcfGYfIopyM/i6rc4jPuqjDgl8vVs7wIB7TK/MeqKp2LTmd2sN198ZZf9o6/mL3rU3Kk4c1
-	YqVIt2uLOed/Xg955dMT14UOZ9h8H13UHgUoe0Mx2gVozEIvQSrJnX4g=
-X-Google-Smtp-Source: AGHT+IGz26Ea8EVfxmD7CYD1EYjaqOZ0tv4UBwYEaCP+dicgzHzlyyAYT0+U65N/8UcdrEHzAZFVltcTlujTmNGdSCUHHDgVF6KP
+	s=arc-20240116; t=1714416367; c=relaxed/simple;
+	bh=3LH0ATCDUz78r2Tey+5bXVs+rUczTd3e47hk9qUT2uA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ulpn8ns6Z3JGQXVFDc+0W7pKQiUkOIDS01+1+aW8PsIV5UBQgPH0Rv71hVfTkM+uCc2tIOFW1aC/RNVm6UBG03WtFklDb/PbOJeagAM7aZS67sT3IXIjUrhoFaJOr24llcIvtiS0Lhcqya8HlI6XUdLaCYDb7kwtP7qg1ZXvSKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=mMqrnJ+F; arc=none smtp.client-ip=80.237.130.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="mMqrnJ+F"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:
+	Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
+	In-Reply-To:References; bh=ZkJzNvR/m4pjy1+DgD6tXtFggu8kp9OwAo85IxPakxg=;
+	t=1714416364; x=1714848364; b=mMqrnJ+FhZXdK5FEOih/T4F32qHzR2uAmg+7T27fDijNOlP
+	2HrrSBmYOaMVb9btdat2GHy+fsfJnlUOdi6GKad0ToGfTXwoJMJ3KVE4vy4ajTrW0B7fylikChbg+
+	ehjWazipG4om9YLyitMEIcvf0rRTeTkPKvfD7su/10CioE4Oh8IEKlIp9+G8P3NgLxFcmrkh4Lge9
+	4tr4n0Iz3TOk5JfJ2tHchZj8VV/0QnLSYrqt/eX61J4JoJCpGLTJ7ZD3VlvMNhGUvUSZUBGYZE4DW
+	UpTsOefxSDXaTJ3YEsPdYW6fD2U57Dky2A1+k9VDPYH97hFx/f2q81pESJ66oKIA==;
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+	id 1s1W0o-0000lq-9l; Mon, 29 Apr 2024 20:46:02 +0200
+Message-ID: <8e8ca7a6-1511-4794-a214-2b75326e5484@leemhuis.info>
+Date: Mon, 29 Apr 2024 20:46:00 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:4117:b0:487:31da:eaf1 with SMTP id
- ay23-20020a056638411700b0048731daeaf1mr628996jab.1.1714415823840; Mon, 29 Apr
- 2024 11:37:03 -0700 (PDT)
-Date: Mon, 29 Apr 2024 11:37:03 -0700
-In-Reply-To: <0000000000007e812306170008d1@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000002d7a7f0617408af1@google.com>
-Subject: Re: [syzbot] [bluetooth?] possible deadlock in hci_dev_do_close (2)
-From: syzbot <syzbot+c55f7bc8d4809b2bad59@syzkaller.appspotmail.com>
-To: hdanton@sina.com, iam@sung-woo.kim, johan.hedberg@gmail.com, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, luiz.von.dentz@intel.com, marcel@holtmann.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: Bluetooth kernel BUG with Intel AX211 (regression in 6.1.83)
+To: =?UTF-8?Q?Jeremy_Lain=C3=A9?= <jeremy.laine@m4x.org>,
+ Linux regressions mailing list <regressions@lists.linux.dev>
+Cc: "stable@vger.kernel.org" <stable@vger.kernel.org>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ linux-bluetooth@vger.kernel.org, Paul Menzel <pmenzel@molgen.mpg.de>,
+ Greg KH <gregkh@linuxfoundation.org>, Sasha Levin <sashal@kernel.org>
+References: <CADRbXaDqx6S+7tzdDPPEpRu9eDLrHQkqoWTTGfKJSRxY=hT5MQ@mail.gmail.com>
+ <1de62bb7-93bb-478e-8af4-ba9abf5ae330@leemhuis.info>
+ <4bf3497d-0ede-4e05-a432-e88e9cbc10b4@leemhuis.info>
+ <CADRbXaBkkGmqnibGvcAF2YH5CjLRJ2bnnix1xKozKdw_Hv3qNg@mail.gmail.com>
+From: "Linux regression tracking (Thorsten Leemhuis)"
+ <regressions@leemhuis.info>
+Content-Language: en-US, de-DE
+Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
+In-Reply-To: <CADRbXaBkkGmqnibGvcAF2YH5CjLRJ2bnnix1xKozKdw_Hv3qNg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1714416364;7c17985c;
+X-HE-SMSGID: 1s1W0o-0000lq-9l
 
-syzbot has bisected this issue to:
+On 29.04.24 20:28, Jeremy Lainé wrote:
+> 
+> On Mon, Apr 29, 2024 at 12:24 PM Linux regression tracking (Thorsten
+> Leemhuis) <regressions@leemhuis.info> wrote:
+>>
+>> So we either need to find the cause (likely a missing backport) through
+>> some other way or maybe revert the culprit in the 6.1.y series. Jeremy,
+>> did you try if the latter is an option? If not: could you do that
+>> please? And could you also try cherry-pikcing c7eaf80bfb0c8c
+>> ("Bluetooth: Fix hci_link_tx_to RCU lock usage") [v6.6-rc5] into 6.1.y
+>> helps? It's just a wild guess, but it contains a Fixes: tag for the
+>> commit in question.
+> 
+> I gave it a try, and sadly I'm still hitting the exact same bug when I
+> cherry-pick the patch you mentioned on top of 6.1.y (at tag v6.1.87).
+> 
+> Thanks for trying, is there any other patch that looks like a good candidate?
 
-commit 37dd04e4d59487c928bf3561e4bd3a045762eabc
-Author: Sungwoo Kim <iam@sung-woo.kim>
-Date:   Thu Apr 25 04:11:28 2024 +0000
+Well, did you try what I suggested earlier (see above) and check if a
+revert of 6083089ab00631617f9eac678df3ab050a9d837a ontop of latest 6.1.y
+helps?
 
-    Bluetooth: HCI: fix slab-use-after-free in cmd_sync_work
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14457fd8980000
-start commit:   bb7a2467e6be Add linux-next specific files for 20240426
-git tree:       linux-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=16457fd8980000
-console output: https://syzkaller.appspot.com/x/log.txt?x=12457fd8980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=5c6a0288262dd108
-dashboard link: https://syzkaller.appspot.com/bug?extid=c55f7bc8d4809b2bad59
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1590bcf8980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1349ee9b180000
-
-Reported-by: syzbot+c55f7bc8d4809b2bad59@syzkaller.appspotmail.com
-Fixes: 37dd04e4d594 ("Bluetooth: HCI: fix slab-use-after-free in cmd_sync_work")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Ciao, Thorsten
