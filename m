@@ -1,194 +1,250 @@
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62E3ED271
-	for <linux-bluetooth@vger.kernel.org>; Sun, 28 Apr 2024 22:35:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57F0129421;
+	Mon, 29 Apr 2024 10:04:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714343730; cv=none; b=c0FVushyfNYHQIOa7wZinAeYW3CzMlot4TiEPmiXR4K8UJhcSBTxvaMDjbNH6UlHOxZid4GTuzVOVYWJG1k7qroOUklJpwdIj6AHT61Ku9pBPPFc5cMsx78KytXd9L9kOCl126tyWX0GS9Zd2QruXstFv9hz+RWBAF6FVM2kDS0=
+	t=1714385092; cv=none; b=dT1jX1/ZpzRgJdb8EPwazAfZqAQhXSXVRUfmE4tsZMJv8lZo9T6+Tqib8BpMrYqXHwy9NujOqNVPyAdBMoHwZCQKarL73e8MLyBJa/Pp8UyxcsA2vJ2QDky+r4lR7T92Zd2lqjBq5HV+n0IpFLjqFv/Tc5EimGAOlpXUHqkQ6FQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714343730; c=relaxed/simple;
-	bh=8Jo1RShjteksnEB4+jo8ht85tb2ANBTXBETSvlVt/1w=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=cHtnYySt9ITwUPTcTY018WLd2MqcB0nR/0TkVYJjEkK4xSIDsWShDrmY0hFytBa9yhiRePmR5U2J0ve5dmdUn+aLi9NVvdisucneDrgd3J1e3EAOf0RBdZfzmLw5xeC08pDUArDjXo3LP0bNpZz5O5CkVvrfoQIduOSOd6VdMF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7da41c44da7so477029739f.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 28 Apr 2024 15:35:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714343728; x=1714948528;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qMIv9xHavZypaGzX7F87Hk5huAY3FS4SvdQBRrW3QXE=;
-        b=B2E7b+JcmEmqFi5rPbnOz0MC+P6CzVdUDIrrzRko3yZKgkoBgAE438mRx7sdANylwB
-         iXwdnBTOoOI9fBQrQsXf77/9cNSuGd+TLZwWS9d2uIoHZh/V+VRZ3PyfhTYZRKcyQVLZ
-         mEXh+eKptWUiLoBYhPeJAkx0xBn9WchuuOCjtJ4soy/fW/9cwGK7zQRE+RaC62SVTasN
-         eIjReMNmLiP0G0f4XDaO1HcJMAaC0qzOephhz9tWkeJwckDUVVxe/mdg4NhB2b2GkC3v
-         tSafBZlWxMCG2pzNyVqon9PPdeV/W0iLGjKpGTEEgivogFftE7Qw6q3dOS9KLs/RbSdg
-         AfiA==
-X-Forwarded-Encrypted: i=1; AJvYcCVyX1mYikjTLFaXBCq7S+Y1D/87dP/t0jj3FX1MmmxjDPopC4ytnzZD0EEdczWidxWpYXNgAW3FfpGBXTFLB0BqIiA8CY1c1a2zlV9l8h/7
-X-Gm-Message-State: AOJu0Yzt8ka6sy/NUx25aLYjAD+TNaVB0crsQAmUW08gcfajN8aEY3Aa
-	wdlMsg568QlKuthzRdoQHQqsAIR2jiQxxFnvcv1BofZSlbD2Y0mab8aDui5QJZVRm+jkASsw5X9
-	QSWHBZxPDuoeglwR5P3xNA7xa7LtcWGH5ZnbQA8d4BZ1c/hiYIb4K4cw=
-X-Google-Smtp-Source: AGHT+IETouaKHH/n4AvjJCt4Dsf7WQMcpa/O6j55qJ3B+sOdMAk+12aSPdVFKe2xKuOooxKLV+ZZ6nVzWsyl1Vg+oecaYnahZRR2
+	s=arc-20240116; t=1714385092; c=relaxed/simple;
+	bh=XloVz6SjAYBjj8hsQhN9PyWmFZ8hnRoziDNS+XyHw5U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=ans1lj+8vxM88fJCXqDOD9hbMEwRlyWhAD9+FRed4855etZQgawWiVmWbtJWdVXunm6HlLA4r2f1Ej4Tbkze7hONm4IUUqX9waSncWhq3TFbssmgJ8rA76EJvylSNPzhxroEQbjyELhlW/MHQGyWp0CEwm8iU7WS1DbLNWvV06Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=c3PMmtld; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="c3PMmtld"
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 43T5bQDi028296;
+	Mon, 29 Apr 2024 10:04:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=tlt+h52eWNPOl/smXsT03fDM28AglVKlMlKmCWW4Oww=; b=c3
+	PMmtld/b93y4TsfZqbb8Emv4bsKVpM7xygqfl0qxR1gyhyTWdNVkjFk6RrqSS8av
+	7B00uj4YxiMdmkpM4kYNrsdssTm+xVzSBzq0kG0CW8LnlTy+GbfAJ4pgohxUzvHe
+	B2qePvkiTyrBY++AxbbbgmcPEFlKrfsMXITyIchyYj/9ysdVeM1M8l/bWYyMW6BG
+	ohx7fVueDp8qYepJGhj6ftXmYJcNNI71CwXPfTjVxX7uHXMzPMzbcGhVaqoxb0gv
+	NZLZozu1zmcnH7KbA1iFU02lRnEaTvF8ks/DbtBthcD5SoSsEqTqs1NOzFABXK70
+	+8OCQQe3/knGdRzzHeCw==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xrq2k3g1y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 29 Apr 2024 10:04:41 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43TA4eCl020550
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 29 Apr 2024 10:04:40 GMT
+Received: from [10.218.29.219] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 29 Apr
+ 2024 03:04:36 -0700
+Message-ID: <dbba45d2-f955-4d3a-aeab-26b0900d5823@quicinc.com>
+Date: Mon, 29 Apr 2024 15:34:32 +0530
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:154e:b0:36c:2976:3012 with SMTP id
- j14-20020a056e02154e00b0036c29763012mr358151ilu.2.1714343727960; Sun, 28 Apr
- 2024 15:35:27 -0700 (PDT)
-Date: Sun, 28 Apr 2024 15:35:27 -0700
-In-Reply-To: <0000000000007e812306170008d1@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000eda1e806172fc058@google.com>
-Subject: Re: [syzbot] [bluetooth?] possible deadlock in hci_dev_do_close (2)
-From: syzbot <syzbot+c55f7bc8d4809b2bad59@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: qca: generalise device address check
+To: Johan Hovold <johan@kernel.org>, Doug Anderson <dianders@chromium.org>
+CC: Johan Hovold <johan+linaro@kernel.org>,
+        Marcel Holtmann
+	<marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <stable@vger.kernel.org>, <quic_mohamull@quicinc.com>,
+        <quic_hbandi@quicinc.com>, <quic_anubhavg@quicinc.com>
+References: <20240426155801.25277-1-johan+linaro@kernel.org>
+ <CAD=FV=V-pG9+5fLonNvydmjS=ziUFUHAyF8T7YTkEHiO405aSA@mail.gmail.com>
+ <ZizKmtcUIYAMpvOQ@hovoldconsulting.com>
+Content-Language: en-US
+From: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+In-Reply-To: <ZizKmtcUIYAMpvOQ@hovoldconsulting.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: L9V8vXWhbYOPBM9yAwcGJN1SccE9-D7D
+X-Proofpoint-GUID: L9V8vXWhbYOPBM9yAwcGJN1SccE9-D7D
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-04-29_07,2024-04-26_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
+ impostorscore=0 adultscore=0 malwarescore=0 mlxscore=0 priorityscore=1501
+ suspectscore=0 phishscore=0 lowpriorityscore=0 clxscore=1015 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2404010003
+ definitions=main-2404290063
 
-syzbot has found a reproducer for the following issue on:
+Hi Johan,
 
-HEAD commit:    bb7a2467e6be Add linux-next specific files for 20240426
-git tree:       linux-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=16b60228980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=5c6a0288262dd108
-dashboard link: https://syzkaller.appspot.com/bug?extid=c55f7bc8d4809b2bad59
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1590bcf8980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1349ee9b180000
+Having a default BDA list from NVM BDA tag value will prevent developers
+from using the device if there is no user space app(In Fluoride) to set
+the BDA. Therefore, we are requesting to use default address check patch,
+so that developer can change the NVM BDA to make use of the device.
+  
+  List Of default Addresses:
+  ---------------------------------------------------------
+|       BDA          |      Chipset                       |
+  ---------------------------------------------------------
+| 39 80 10 00 00 20  |  WCN3988 with ROM Version 0x0200   |
+  ---------------------------------------------------------
+| 39 80 12 74 08 00  |  WCN3988 with ROM Version 0x0201   |
+  ---------------------------------------------------------
+| 39 90 21 64 07 00  |  WCN3990                           |
+  ---------------------------------------------------------
+| 39 98 00 00 5A AD  |  WCN3991                           |
+  ---------------------------------------------------------
+| 00 00 00 00 5A AD  |  QCA DEFAULT                       |
+  ---------------------------------------------------------
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/5175af7dda64/disk-bb7a2467.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/70db0462e868/vmlinux-bb7a2467.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/3217fb825698/bzImage-bb7a2467.xz
+On 4/27/2024 3:21 PM, Johan Hovold wrote:
+> On Fri, Apr 26, 2024 at 10:23:15AM -0700, Doug Anderson wrote:
+>> On Fri, Apr 26, 2024 at 9:00 AM Johan Hovold <johan+linaro@kernel.org> wrote:
+>>>
+>>> The default device address apparently comes from the NVM configuration
+>>> file and can differ quite a bit.
+>>>
+>>> Store the default address when parsing the configuration file and use it
+>>> to determine whether the controller has been provisioned with an
+>>> address.
+>>>
+>>> This makes sure that devices without a unique address start as
+>>> unconfigured unless a valid address has been provided in the devicetree.
+> 
+>>>   int qca_read_soc_version(struct hci_dev *hdev, struct qca_btsoc_version *ver,
+>>>                           enum qca_btsoc_type soc_type)
+>>>   {
+>>> @@ -351,6 +348,11 @@ static void qca_tlv_check_data(struct hci_dev *hdev,
+>>>
+>>>                          /* Update NVM tags as needed */
+>>>                          switch (tag_id) {
+>>> +                       case EDL_TAG_ID_BD_ADDR:
+>>> +                               if (tag_len != sizeof(bdaddr_t))
+>>> +                                       break;
+>>> +                               memcpy(&config->bdaddr, tlv_nvm->data, sizeof(bdaddr_t));
+>>> +                               break;
+>>>                          case EDL_TAG_ID_HCI:
+>>
+>> nit: blank line after "break" ?
+> 
+> Possibly, the driver isn't really consistent here and only two case
+> statements have such a newline after break.
+> 
+>> Also note that on my firmware I never see this tag and thus your patch
+>> breaks trogdor. Specifically I put a printout here and it never gets
+>> hit.
+> 
+> Thanks for the quick test. As the parser is modifying the configuration
+> file I assumed it was correct and tested...
+>   
+>> I printed all the tags/lengths:
+>>
+>> [   17.961087] DOUG: id 0xde02, len 0x0010
+>> [   17.965081] DOUG: id 0x0000, len 0x0000
+>> [   17.969050] DOUG: id 0x0000, len 0x0011
+>> [   17.973025] DOUG: id 0x0000, len 0x0a00
+>> [   17.976991] DOUG: id 0x0303, len 0x0303
+>> [   17.981066] DOUG: id 0x0033, len 0x1001
+>>
+>> Probably EDL_TAG_ID_BD_ADDR should have been 0xde02, not just 2.
+> 
+> No, the parser is apparently broken and fails to consider an extra
+> four-byte header found in some NVM files and just happily parses and
+> potentially modifies (sic!) random bytes.
+> 
+> I've fixed the parser so that it works also on configuration files with
+> the extra header (apnv??.bin, crnv??[u].bin) and can read out the
+> default address for all NVM files in linux-firmware that have one
+> (otherwise all-zeroes is printed below):
+> 
+> bluetooth hci0: bd_addr = 39:80:10:00:00:20 (qca/apnv10.bin)
+> bluetooth hci0: bd_addr = 39:80:12:74:08:00 (qca/apnv11.bin)
+> bluetooth hci0: bd_addr = 39:90:21:64:07:00 (qca/crnv21.bin)
+> bluetooth hci0: bd_addr = 39:98:00:00:5a:ad (qca/crnv32.bin)
+> bluetooth hci0: bd_addr = 39:98:00:00:5a:ad (qca/crnv32u.bin)
+> bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/hpnv21.301)
+> bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/hpnv21.302)
+> bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/hpnv21.309)
+> bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/hpnv21.bin)
+> bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/hpnv21.bin)
+> bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/hpnv21g.301)
+> bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/hpnv21g.302)
+> bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/hpnv21g.309)
+> bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/hpnv21g.bin)
+> bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/htnv20.bin)
+> bluetooth hci0: bd_addr = 64:90:00:00:5a:ad (qca/msnv11.b09)
+> bluetooth hci0: bd_addr = 64:90:00:00:5a:ad (qca/msnv11.b0a)
+> bluetooth hci0: bd_addr = 64:90:00:00:5a:ad (qca/msnv11.bin)
+> bluetooth hci0: bd_addr = 61:47:aa:31:22:14 (qca/nvm_00130300.bin)
+> bluetooth hci0: bd_addr = 61:47:aa:32:44:07 (qca/nvm_00130302.bin)
+> 
+> bluetooth hci0: bd_addr = 00:00:00:00:00:00 (qca/nvm_00230302.bin)
+> 
+> bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_00440302.bin)
+> bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_00440302_eu.bin)
+> bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_00440302_i2s_eu.bin)
+> 
+> bluetooth hci0: bd_addr = 00:00:00:00:00:00 (qca/nvm_usb_00000200.bin)
+> bluetooth hci0: bd_addr = 00:00:00:00:00:00 (qca/nvm_usb_00000201.bin)
+> bluetooth hci0: bd_addr = 00:00:00:00:00:00 (qca/nvm_usb_00000300.bin)
+> bluetooth hci0: bd_addr = 00:00:00:00:00:00 (qca/nvm_usb_00000302.bin)
+> bluetooth hci0: bd_addr = 00:00:00:00:00:00 (qca/nvm_usb_00000302_eu.bin)
+> 
+> bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130200_0104.bin)
+> bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130200_0105.bin)
+> bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130200_0106.bin)
+> bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130200_0107.bin)
+> bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130200_0109.bin)
+> bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130200_0110.bin)
+> bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130200.bin)
+> bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130201_010a.bin)
+> bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130201_010b.bin)
+> bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130201_0303.bin)
+> bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130201.bin)
+> bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130201_gf_010a.bin)
+> bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130201_gf_010b.bin)
+> bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130201_gf_0303.bin)
+> bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00130201_gf.bin)
+> bluetooth hci0: bd_addr = 00:00:00:00:5a:ad (qca/nvm_usb_00190200.bin)
+> 
+> It looks like we're being lucky and the parser is at least not
+> corrupting the configuration files with the extra header currently in
+> linux-firmware, but if it ever interprets a random 0x0011 or 0x001b word
+> as a tag it would.
+> 
+> Fixing the parser means that we would start modifying the configuration
+> also for files with the extra header. This involves configuring the baud
+> rate and enabling a deep sleep feature.
+> 
+> Presumably this is something that should be done also on Trogdor, but
+> this would obviously have to be tested first. I guess we can keep
+> skipping this step until it has been verified and just read out the
+> address for now.
+> 
+>>> @@ -624,6 +626,9 @@ static int qca_check_bdaddr(struct hci_dev *hdev)
+>>>          if (bacmp(&hdev->public_addr, BDADDR_ANY))
+>>>                  return 0;
+>>>
+>>> +       if (!bacmp(&config->bdaddr, BDADDR_ANY))
+>>> +               return 0;
+>>
+>> The above test feels non-obvious enough to deserve a comment. Could
+>> you add one? That would also help alleviate my confusion since I
+>> _think_ your if test is unneeded and maybe wrong? Let's say that the
+>> firmware didn't have a default address stored in it. It still seems
+>> like we could try to read the address and then if the firmware gave
+>> back BDADDR_ANY (0) we should set the `HCI_QUIRK_USE_BDADDR_PROPERTY`
+>> property, right?
+> 
+> You're right. I'll drop this check when revisiting this next week.
+> 
+> Johan
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+c55f7bc8d4809b2bad59@syzkaller.appspotmail.com
-
-Bluetooth: hci0: Opcode 0x0c1a failed: -110
-Bluetooth: hci0: Error when powering off device on rfkill (-110)
-======================================================
-WARNING: possible circular locking dependency detected
-6.9.0-rc5-next-20240426-syzkaller #0 Not tainted
-------------------------------------------------------
-syz-executor143/5093 is trying to acquire lock:
-ffff88807643c8d0 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: rcu_lock_acquire include/linux/rcupdate.h:329 [inline]
-ffff88807643c8d0 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
-ffff88807643c8d0 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: start_flush_work kernel/workqueue.c:4113 [inline]
-ffff88807643c8d0 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: __flush_work+0xe6/0xd00 kernel/workqueue.c:4172
-
-but task is already holding lock:
-ffff88807643d060 (&hdev->req_lock){+.+.}-{3:3}, at: hci_dev_do_close+0x28/0x90 net/bluetooth/hci_core.c:559
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #1 (&hdev->req_lock){+.+.}-{3:3}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
-       __mutex_lock_common kernel/locking/mutex.c:608 [inline]
-       __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
-       hci_cmd_sync_work+0x1ec/0x400 net/bluetooth/hci_sync.c:309
-       process_one_work kernel/workqueue.c:3222 [inline]
-       process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3303
-       worker_thread+0x86d/0xd70 kernel/workqueue.c:3384
-       kthread+0x2f0/0x390 kernel/kthread.c:389
-       ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
--> #0 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}:
-       check_prev_add kernel/locking/lockdep.c:3134 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3253 [inline]
-       validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
-       __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
-       touch_work_lockdep_map kernel/workqueue.c:3885 [inline]
-       start_flush_work kernel/workqueue.c:4139 [inline]
-       __flush_work+0x73c/0xd00 kernel/workqueue.c:4172
-       __cancel_work_sync+0xbc/0x110 kernel/workqueue.c:4322
-       hci_cmd_sync_clear+0x30/0x220 net/bluetooth/hci_sync.c:588
-       hci_dev_close_sync+0xbae/0x1060 net/bluetooth/hci_sync.c:5188
-       hci_dev_do_close+0x30/0x90 net/bluetooth/hci_core.c:561
-       hci_rfkill_set_block+0x232/0x300 net/bluetooth/hci_core.c:992
-       rfkill_set_block+0x1f1/0x440 net/rfkill/core.c:346
-       rfkill_fop_write+0x5bb/0x790 net/rfkill/core.c:1305
-       do_loop_readv_writev fs/read_write.c:764 [inline]
-       vfs_writev+0x733/0xbe0 fs/read_write.c:973
-       do_writev+0x1b1/0x350 fs/read_write.c:1018
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&hdev->req_lock);
-                               lock((work_completion)(&hdev->cmd_sync_work));
-                               lock(&hdev->req_lock);
-  lock((work_completion)(&hdev->cmd_sync_work));
-
- *** DEADLOCK ***
-
-3 locks held by syz-executor143/5093:
- #0: ffffffff8f8b13e8 (rfkill_global_mutex){+.+.}-{3:3}, at: rfkill_fop_write+0x1a9/0x790 net/rfkill/core.c:1297
- #1: ffff88807643d060 (&hdev->req_lock){+.+.}-{3:3}, at: hci_dev_do_close+0x28/0x90 net/bluetooth/hci_core.c:559
- #2: ffffffff8e333ba0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:329 [inline]
- #2: ffffffff8e333ba0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
- #2: ffffffff8e333ba0 (rcu_read_lock){....}-{1:2}, at: start_flush_work kernel/workqueue.c:4113 [inline]
- #2: ffffffff8e333ba0 (rcu_read_lock){....}-{1:2}, at: __flush_work+0xe6/0xd00 kernel/workqueue.c:4172
-
-stack backtrace:
-CPU: 0 PID: 5093 Comm: syz-executor143 Not tainted 6.9.0-rc5-next-20240426-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
- check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2187
- check_prev_add kernel/locking/lockdep.c:3134 [inline]
- check_prevs_add kernel/locking/lockdep.c:3253 [inline]
- validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
- __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
- touch_work_lockdep_map kernel/workqueue.c:3885 [inline]
- start_flush_work kernel/workqueue.c:4139 [inline]
- __flush_work+0x73c/0xd00 kernel/workqueue.c:4172
- __cancel_work_sync+0xbc/0x110 kernel/workqueue.c:4322
- hci_cmd_sync_clear+0x30/0x220 net/bluetooth/hci_sync.c:588
- hci_dev_close_sync+0xbae/0x1060 net/bluetooth/hci_sync.c:5188
- hci_dev_do_close+0x30/0x90 net/bluetooth/hci_core.c:561
- hci_rfkill_set_block+0x232/0x300 net/bluetooth/hci_core.c:992
- rfkill_set_block+0x1f1/0x440 net/rfkill/core.c:346
- rfkill_fop_write+0x5bb/0x790 net/rfkill/core.c:1305
- do_loop_readv_writev fs/read_write.c:764 [inline]
- vfs_writev+0x733/0xbe0 fs/read_write.c:973
- do_writev+0x1b1/0x350 fs/read_write.c:1018
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f22b080b5d9
-Code: 48 83 c4 28 c3 e8 47 1d 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fff7aee1ff8 EFLAGS: 00000246 ORIG_RAX: 0000000000000014
-RAX: ffffffffffffffda RBX: 00007f22b085b468 RCX: 00007f22b080b5d9
-RDX: 0000000000000001 RSI: 00000000200000c0 RDI: 0000000000000003
-RBP: 00007fff7aee20f0 R08: 00007f2200000001 R09: 00007f2200000001
-R10: 00007f2200000001 R11: 0000000000000246 R12: 0000000000000003
-R13: 00007fff7aee20c0 R14: 0000000000000001 R15: 00007fff7aee20f0
- </TASK>
-
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+-Janaki Ram
