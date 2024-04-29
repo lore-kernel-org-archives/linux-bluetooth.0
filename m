@@ -1,106 +1,82 @@
-Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB37E8249D
-	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Apr 2024 15:07:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A15391272D6;
+	Mon, 29 Apr 2024 15:10:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714403262; cv=none; b=I4AtpYSHKl8VIBKXS6Szq4gu/HSyQnWnOHGYn27Ay3/vKMkHcH4qrUqarnHPtjo/J9cZ9XksW0QVaCh1SeaF4dzca2MVl9h3gGWMLbzSoXsH78G2a/AX15Z9liqTxYapVQbOzsAmD64FD+sZnYJKZrte7StnivFbgd5YaF4FuPo=
+	t=1714403450; cv=none; b=uEP40IpQvb8Os7FWcql1W6Z1ndnh5qpcrALo4stIiPYiqRSakYsw6MpfhgWgCmuwJgtv6koV4vQuMqxDe40F0KbEFgSrcXdDTWsS9RKGSLqXrTjbDqa6/SvuaOi2rGOWYQB2GxO2OrP3gmLPdeZsNmhM/F15p0V1AgoEHtaqoPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714403262; c=relaxed/simple;
-	bh=I9gpa/xXWUcM89zG6A29dTWHMzs/PWOn1ZtsSPp/V3s=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=H4X+LqUFvnYQ2DsZsAZ0iTSw1R/t6HznR1vD/Bvj9yo5mGTqzrzhl3osKIGmhMu/sYdMS2pGrGx4Hg5n7I/S4YHWeVJhbBaOxyZjPov9vP9rP3VrPmZQh48Qt42kHi6pc8+9f+4oQpu8pkF7stwrMZ2w4oYhDxS/P1XdoqSfBUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=AuQxq7tS; arc=none smtp.client-ip=192.30.252.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1714403450; c=relaxed/simple;
+	bh=8L8NBC0tuW5E0IO/qcCgf442V11CmQ8oFUvg3oL+A30=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aPRdgvWWcNlZvfaczbELaQENNqxHCqE1zmznAabIGggPLJWInWLhsCFCYDa0h90+BwmoI2x6/mo45BkdWeIY5Tf1zKENH6gZ5P/z5CHfbhu9i7igC0q4M4QHtyoXlFNQEVLx3SVEt7zaVKx/xOV7Y+3BBypjLYvvmdi43O4j9EA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=LT8pKSHm; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="AuQxq7tS"
-Received: from github.com (hubbernetes-node-98f0704.va3-iad.github.net [10.48.135.30])
-	by smtp.github.com (Postfix) with ESMTPA id BA706E0C4D
-	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Apr 2024 08:07:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1714403259;
-	bh=G7YpO4znSKt0UsiKX4gu7uST5EWUHY4k6BEVta4EO6Y=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=AuQxq7tSRevDjxzq00SHCXs9/9TmM/OYJ3ikJC5+4cel8PZRD93MuqcSwh1XP6uDV
-	 xFjFeo+5dC1ShZStG5LwQnyPerhwTe9DkWy3t4MtBMgMcoPnWUzXyR795/JWjWXUCF
-	 jMbhGArGrOzIkBv6wnSfAzQjHvgbHSc7Ap+UQfsc=
-Date: Mon, 29 Apr 2024 08:07:39 -0700
-From: BajajSarv <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/c42702-d2a2aa@github.com>
-Subject: [bluez/bluez] 129b19: org.bluez.Gatt: Add
- org.bluez.Error.ImproperlyConf...
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="LT8pKSHm"
+Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 8094788155;
+	Mon, 29 Apr 2024 17:10:44 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1714403445;
+	bh=qHYA/D1msUd7p69S7hlOfXNJ8AvqD4n0cCmw28Z+mks=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=LT8pKSHmWio28RlZ2qybtunuy0ffJhJCqXw6r+ACq5XvDIcAA4PjGC0P0EgewZ8m6
+	 qxxnsURhudhbCZLOabRTdlvoWD79Vf/czuSs0zx+Ig+aGv9701a1ZKhtHuNHOH+fW8
+	 fe6ldB0A37NHEKBpZPPQWvSdjxZpxsntZH0xeAYyMA9kpHybB9osBp3Johoksbgsr0
+	 nWyIpIomYPGJ8830MNUjYWUKxRLlnqw4uFth4QspQgME4QcnBlDKieeM1ZKO8YwpbF
+	 T5l1aTDsHwTETIDmvvWqizO2z0DdtB1Vnow0L+EpHcbdpLh3R5+qYAKLnfbC9GZJHm
+	 HjkYm+zIi4v0A==
+Message-ID: <93eeb045-b2a3-41d7-a3f2-1df89c588bfd@denx.de>
+Date: Mon, 29 Apr 2024 17:10:43 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] dt-bindings: net: broadcom-bluetooth: Add CYW43439 DT
+ binding
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+ linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Conor Dooley <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+ devicetree@vger.kernel.org, netdev@vger.kernel.org
+References: <20240319042058.133885-1-marex@denx.de>
+ <97eeb05d-9fb4-4c78-8d7b-610629ed76b3@linaro.org>
+Content-Language: en-US
+From: Marek Vasut <marex@denx.de>
+In-Reply-To: <97eeb05d-9fb4-4c78-8d7b-610629ed76b3@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 129b19166304d40073a424d8b9ac28d3802b52f7
-      https://github.com/bluez/bluez/commit/129b19166304d40073a424d8b9ac28d3802b52f7
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-04-26 (Fri, 26 Apr 2024)
+On 3/19/24 6:41 AM, Krzysztof Kozlowski wrote:
+> On 19/03/2024 05:20, Marek Vasut wrote:
+>> CYW43439 is a Wi-Fi + Bluetooth combo device from Infineon.
+>> The Bluetooth part is capable of Bluetooth 5.2 BR/EDR/LE .
+>> This chip is present e.g. on muRata 1YN module.
+>>
+>> Extend the binding with its DT compatible using fallback
+>> compatible string to "brcm,bcm4329-bt" which seems to be
+>> the oldest compatible device. This should also prevent the
+>> growth of compatible string tables in drivers. The existing
+>> block of compatible strings is retained.
+>>
+>> Signed-off-by: Marek Vasut <marex@denx.de>
+> 
+> Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-  Changed paths:
-    M doc/org.bluez.GattCharacteristic.rst
-    M doc/org.bluez.GattDescriptor.rst
-
-  Log Message:
-  -----------
-  org.bluez.Gatt: Add org.bluez.Error.ImproperlyConfigured error to
-WriteValue
-
-Some attributes may require to generate
-BT_ERROR_CCC_IMPROPERLY_CONFIGURED when its CCC is not properly
-configured so this adds the possibility to generate it by replying with
-org.bluez.Error.ImproperlyConfigured error to WriteValue.
-
-
-  Commit: 9b29784717f4682ca527c76c81b5ba92ba00c313
-      https://github.com/bluez/bluez/commit/9b29784717f4682ca527c76c81b5ba92ba00c313
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-04-26 (Fri, 26 Apr 2024)
-
-  Changed paths:
-    M src/gatt-database.c
-
-  Log Message:
-  -----------
-  gatt-database: Implement support to org.bluez.Error.ImproperlyConfigured
-
-This implements support for handling when applications reply with
-org.bluez.Error.ImproperlyConfigured the code will translate it to
-BT_ERROR_CCC_IMPROPERLY_CONFIGURED.
-
-Fixes: https://github.com/bluez/bluez/issues/827
-
-
-  Commit: d2a2aabee646c4e95655bc5dc93c323efa5fc588
-      https://github.com/bluez/bluez/commit/d2a2aabee646c4e95655bc5dc93c323efa5fc588
-  Author: Sarveshwar Bajaj <sarveshwar.bajaj@nxp.com>
-  Date:   2024-04-29 (Mon, 29 Apr 2024)
-
-  Changed paths:
-    M src/shared/bap.c
-
-  Log Message:
-  -----------
-  Fix null pointer deference in bap_get_ascs()
-
-Ensure that bap and rdb pointers are valid before accessing or
-allocating memory for ascs. Added  null check to prevent potential
-crash
-
-
-Compare: https://github.com/bluez/bluez/compare/c42702cfc48e...d2a2aabee646
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+Is there any action necessary from me to get this applied ?
