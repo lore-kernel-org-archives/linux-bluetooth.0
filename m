@@ -1,116 +1,85 @@
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B678A1E886;
-	Mon, 29 Apr 2024 20:57:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C07D85C6C
+	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Apr 2024 21:38:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714424269; cv=none; b=c02YlnM7ps2lKursE80d0/EG/BKkBIM82GNxyn0vgW5n4huhS350ZT8gNg50NTkV6scSM2YR2J4mUkjbgDCqoJ/x9PnoKBvev1e/g94D7YT2JhmdB6PMFo1RCkP2sV01hYtzAkb+p1VIzIrOije1Rw8B5WbihI24nIXArHsbvss=
+	t=1714426739; cv=none; b=YpbT+0hRb3RiBq9WOrtmAC/sZZx/MzdOhXqV/iYtuPFSb72molzF8v20KblyIev9hUproxNbNZk+bGwem7HQL/AJPHq1IgyD0hlA/P4CKcvQKTJjS+gI6SVYIZlT7T4V0Jg2Iy3ySzvGFj+pEKEcbVLkkMkhCSxMh5tvwYGTjrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714424269; c=relaxed/simple;
-	bh=dJtsrE2v3jaKw5VkxelZkA6Wz54/g/h4cLRiepnTIdE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CAZd9Km7GMXRryrcC+WRkR/otFbSz/PRBAIUjJBcqBR4kxCkAzBJ2ugISa3XP9eP/2XxN0d4V0O+dAj/wq1A0jzOSWbYLnOCV5GlKir4XOUEtpI+a22Bf52U2YgrKQYU3kacfUBzRcR2/3wBP2yFGfUxU4UsPuP+IdofSINBftA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BKNMTFb0; arc=none smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1714426739; c=relaxed/simple;
+	bh=KlG5lcjXqsYjAnGoUN7scqqD74lSpk8JMvOummwOHww=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=XukaXYw2TJlqlbuV+88ka3Z0dh8pCTgnACHj7HGlx9uhZuYQL2ji24kzpczJ7DkcMf+WLLLAjxXk/26AY3hyIHfukRNxqLLAOPslpH7NfMkNqjspqwyYFYsY9jIrQjXFsK/CmtaCfJbZLPJo89bHR4NhQ92qc4g6JVwM2qQ9Zk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ign7N9CK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BKNMTFb0"
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2dfb4ea2bbfso29649101fa.2;
-        Mon, 29 Apr 2024 13:57:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714424266; x=1715029066; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dJtsrE2v3jaKw5VkxelZkA6Wz54/g/h4cLRiepnTIdE=;
-        b=BKNMTFb0NgSBYXh7DYem/OV783M/6eEuYf5w2EZz9wXDS84BuOfbTI+6lST8n2WSb/
-         Nj0n/UFH7yMFqbsJtZicgCPhOW2H/AXFf6Vuv7S/gLbKCfxNnLT/sabb4LqJN2270S3o
-         GUyDRO6DAhKy+0ZUB5JX2dzn8fj4IByjY6M+wMkd6/iTVIJR/2tHpT5yoOtFfq9cYGOd
-         69ISsuLuNIlGvgOZtMiK27EQZIIDZjzCuVpqOFI0citvUIOGTGP4LHlVe2ul+BIyBpQx
-         qNTyDCqdC/zT29kizyqBZnZaS/rz87jB6pbaOwM+Qcig/lQc9vgR+guofbUgG6Fupgqn
-         k90g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714424266; x=1715029066;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dJtsrE2v3jaKw5VkxelZkA6Wz54/g/h4cLRiepnTIdE=;
-        b=XaUhjeob572QiiuYubK8adWRMV4fxg2Y38vSAB2yzU/5fEbZ3X1gVtf9FwhHCUkkCZ
-         kDHastA9KPqWIvkM2M/XM1OraMv/rY/V8L9fjGQHkPEP3/ALjoDu+tH5wX4BlzN6EZFy
-         czj1N3hc0Eq/hZGEkqHUuziWsUOO48w7Y4CYnqKyddvzhPUaoKB4k2COLWz+afe7HbTz
-         g+DML3GFmf69mphKwNfeX5tkIfVERJ4rDtISnAw7iIGkRaXrlrLFb+TI1fvuVsUq/75B
-         8OyylawtKOstl47X1BXJ62S/CTIddF26gqTWC7OPq6Q8ocwaGG0CnD89ZDmuSucsbxNv
-         S6mA==
-X-Forwarded-Encrypted: i=1; AJvYcCU/IQi4gazsQ4XF9mY/M31E3tBpPQU95Gw+q8kBsnIN+UEpaoqmQ09mLWCOOZX7RudmxacWOIE+chsElLeiBwUt5mvoYrs/zPS8P4uOiz8eKIZJ3ocCQj9nDYalGHs8Qk6bFq6bRIDEb+IYi5txdiy1Xc/gdQeEdIOVf6hSVSquyRo7Iw==
-X-Gm-Message-State: AOJu0Ywi5nxlG7o3m9SXh4IONXCAgX7eFrxiWeo4rMd/A9sSJLAJ7z4+
-	1PYQ6CyVAMGqpKRe2orv6ZjZq4bLT17kqJO6pK2O5F9Spjam4pGWomd2g2K4eBKryWxigXuQHbM
-	fdqdzSvP4ABW+s5pKC4jfq5rStg8=
-X-Google-Smtp-Source: AGHT+IGQJk2euqsn10YsIrACnj0l2e7c2HREXcW0k86OgPB1dFwqNRU0nLUxm8tatoL1HdNT8yu2SUbnyyzcwIm+48E=
-X-Received: by 2002:a2e:928a:0:b0:2d9:eb66:6d39 with SMTP id
- d10-20020a2e928a000000b002d9eb666d39mr6832573ljh.19.1714424265554; Mon, 29
- Apr 2024 13:57:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ign7N9CK"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BE806C4AF17
+	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Apr 2024 21:38:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714426738;
+	bh=KlG5lcjXqsYjAnGoUN7scqqD74lSpk8JMvOummwOHww=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=ign7N9CKapTrNdBv+KPO1WmQJwN5sBErbtKI+SvRmldrnZVUv4B9XnOhS1zwf9BjN
+	 P0vpernqXDGQGlDshD6otc4Uwcdl6da+U4JkQUpLLqV5emXRN60xF91Lt3InDkdcvK
+	 RX+VH0eWoRHU2wEzh4zFie9RUB2xwKMDXHJ6mSUGNAxhMnXOAU3CHk75t7AF8xm1Vs
+	 +QSDsYV4x6eavhDFM68krAIdaNWaoktUWyi73HSGFu/nAnDABMeRqZdBH1k5Oej7CH
+	 CdwFDqT/jQAlwx6nDJcA7HGArJFRQuAwUeYJlyRzh7K51qii24iwhEYAQcf/4bsE/O
+	 jO4oFMUHjYPag==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id B1DFEC53B6B; Mon, 29 Apr 2024 21:38:58 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 215197] Memory leaks show up when using Edimax Wi-Fi N150
+ Bluetooth/Wireless USB Adapter (RTL8XXXU)
+Date: Mon, 29 Apr 2024 21:38:58 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: network-wireless
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: erhard_f@mailbox.org
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: OBSOLETE
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_status resolution
+Message-ID: <bug-215197-62941-7msEhzrxgw@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-215197-62941@https.bugzilla.kernel.org/>
+References: <bug-215197-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240319042058.133885-1-marex@denx.de> <97eeb05d-9fb4-4c78-8d7b-610629ed76b3@linaro.org>
- <93eeb045-b2a3-41d7-a3f2-1df89c588bfd@denx.de> <793d016d-2bde-407a-8300-f42182431eb1@linaro.org>
- <c21823f2-4dd7-490a-8b76-7cab422428ba@denx.de>
-In-Reply-To: <c21823f2-4dd7-490a-8b76-7cab422428ba@denx.de>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 29 Apr 2024 16:57:33 -0400
-Message-ID: <CABBYNZJk33ZcKc9EPi+Hmqb-pq3vSSzB3wkS4nJ45dxG6dBMUw@mail.gmail.com>
-Subject: Re: [PATCH v2] dt-bindings: net: broadcom-bluetooth: Add CYW43439 DT binding
-To: Marek Vasut <marex@denx.de>
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, linux-bluetooth@vger.kernel.org, 
-	Marcel Holtmann <marcel@holtmann.org>, "David S. Miller" <davem@davemloft.net>, 
-	Conor Dooley <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-	Linus Walleij <linus.walleij@linaro.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Marek,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215197
 
-On Mon, Apr 29, 2024 at 4:44=E2=80=AFPM Marek Vasut <marex@denx.de> wrote:
->
-> On 4/29/24 8:22 PM, Krzysztof Kozlowski wrote:
-> > On 29/04/2024 17:10, Marek Vasut wrote:
-> >> On 3/19/24 6:41 AM, Krzysztof Kozlowski wrote:
-> >>> On 19/03/2024 05:20, Marek Vasut wrote:
-> >>>> CYW43439 is a Wi-Fi + Bluetooth combo device from Infineon.
-> >>>> The Bluetooth part is capable of Bluetooth 5.2 BR/EDR/LE .
-> >>>> This chip is present e.g. on muRata 1YN module.
-> >>>>
-> >>>> Extend the binding with its DT compatible using fallback
-> >>>> compatible string to "brcm,bcm4329-bt" which seems to be
-> >>>> the oldest compatible device. This should also prevent the
-> >>>> growth of compatible string tables in drivers. The existing
-> >>>> block of compatible strings is retained.
-> >>>>
-> >>>> Signed-off-by: Marek Vasut <marex@denx.de>
-> >>>
-> >>> Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> >>
-> >> Is there any action necessary from me to get this applied ?
-> >
-> > I recommend resending with proper PATCH prefix matching net-next
-> > expectations.
->
-> I don't think bluetooth is net-next , it has its own ML and its own
-> 'Bluetooth:' subject prefix. Its patchwork.k.o project also doesn't seem
-> to contain many patches with 'net'/'net-next' prefix. Also DT bindings
-> do not seem to use it per 'git log
-> Documentation/devicetree/bindings/net/bluetooth/'. But the bot is
-> complaining about the prefix. Hence my confusion.
+Erhard F. (erhard_f@mailbox.org) changed:
 
-Well usually we require Bluetooth: prefix to indicate this patch is
-for bluetooth/bluetooth-next trees, or you can do via subject e.g.
-[bluetooth-next v1...] otherwise it could be merged via other trees.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+             Status|NEW                         |RESOLVED
+         Resolution|---                         |OBSOLETE
+
+--- Comment #13 from Erhard F. (erhard_f@mailbox.org) ---
+Seems the fix has found upstream meanwhile. At least I can no longer reprod=
+uce
+the issue on current kernels.
+
+Closing as obsolete.
 
 --=20
-Luiz Augusto von Dentz
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
