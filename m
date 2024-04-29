@@ -1,67 +1,67 @@
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF13D84D2A;
-	Mon, 29 Apr 2024 15:15:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B89BD84D15;
+	Mon, 29 Apr 2024 16:43:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714403745; cv=none; b=VT4vT+SEAp++bDCuRPAd+m5YNkUkWg+F+RZv2EEbtOTRCyWfZviiwsoSuXwNn5NS6d6nOHy59lqYPMmO4Ohq5hhuKOWXwC0IKJ/MXgKV7ehGnFihPmtXgmGSpbzxzszWTlXCdZpxL39c1pkH7XewDLhH4S1L2qKWwmabtsZGkBY=
+	t=1714409040; cv=none; b=EC3FdJewUIVZZiZyU6gw0H9yyNvzh6ot71JWjEx5yGx451HCFxF8tUCKtc94JxXec6YOLsLv3wvi4q4v+6uI3D8o5fn4N0f7A9wLT4QYvxtub2eYK4aq5nGerO+xH2wQSuVnAHF3/gbRBc0FkiTHsLXRYjAF0wnlL2HcrfEwsR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714403745; c=relaxed/simple;
-	bh=x78mlTOSNCeKuhBeSLrp8lTJqci7URpsTUsfLD+c7bw=;
+	s=arc-20240116; t=1714409040; c=relaxed/simple;
+	bh=jcv857ShOo4zGdaSLGtIM4z3J8ECJR7Qbmj44XBbb4w=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qoYSWQY5P8y4lns5zktlK98vyIjlwDeUDvZfh6c4y2wfbiAkuh4zZE7UsKq4EAXCmOnM3onnswq2lqRbj+Uk6/zlIZ+CdnQPMjbRFiziMbbb4v8HG9cYqhFub123LGIEOdvA/v75HKMOlvi5vGyQg18ii20zmxuEoA7WkubforQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aDm2bpgg; arc=none smtp.client-ip=209.85.208.175
+	 To:Cc:Content-Type; b=o6Y+MUCmqwULJHEHfUDwcnAgk4R4EmsDcz1/o4mUhJrcFfvI5mA7fgMizBcYOpw40j5DaSwcTk6Rqrj/6KirVjXxgiBGIvqGNHkV5eS0LxxfCw+m9cYzwwE3GtI/Of11TCsk3yE74QWmhGODGiqJNS5la7znhneG/XecB6lm0l0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kFUmUcvT; arc=none smtp.client-ip=209.85.208.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aDm2bpgg"
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2dd041acff1so52798391fa.1;
-        Mon, 29 Apr 2024 08:15:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kFUmUcvT"
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2d858501412so60708911fa.0;
+        Mon, 29 Apr 2024 09:43:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714403742; x=1715008542; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1714409037; x=1715013837; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3UWb+wjXyFhA+z+YN1Lsjts+67pUWWgwlP3uOwoNAkY=;
-        b=aDm2bpggUeiGc3GEcf06EnmVB/EnQNwWzeHAcXmvYCEetC5QP3dnFhUM/ElKUTvUtk
-         HXmmrQMiK4lpygpBP8Ugx/f2nAGZWV8yVgJ7EaEwmGVNPoDxL0Rdwtl5O8yk6we4BTSW
-         SingdCnH9wfYZ97yxm0lL8DLCy2HWceuHpZEXxoTgjT/xX15WZGNTKiGC4opCnGkvOGD
-         xpTv8dAdGMdTHT1CSc6WyZh/C6C0RBTEXIpqXBOXvCQcA5oOVWrl2U43tKGOUcEIqAWT
-         8BTuz5B34yQUJPrvako9nKezq2R+jUwWCSYZ8f8wiEs2ePrVqhNL+2hw5YdG1/NS9wXP
-         kE/g==
+        bh=7svURKdW4GzuQRx0yhus8dw0reWGyvGRlfYY7JNosfM=;
+        b=kFUmUcvTsU7YAWmrdZ7LwKN66CWqQVs0LfQ/Edh8zk6C+rq1zWjDJwKyxhGBr2uIfg
+         BXgaqM7pzcxdq/Ha2dZHmbj/hKCbLGHH8uH+KywOOWXbh7bugGGtlsN2qFl4nTndG8yb
+         TVcu8Yx+469psWLlBhN/A+Z1KTLApO5nzpSqpxcQ7OA0uWR08/Sd/Pgr/+caF+SvdcHr
+         OlHZCJbZDGTjEoecRKwCx6R49MDA230LBIfHgfeyngVXWwm0BWXNckH0D/MYC/PSUeUv
+         MpkR2oXOVgRg9HTmatdJ+23RZgqAtST9tH9aQM3Zvn3aaSuUQTxuXoTp1hriQEhE/tc0
+         gXNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714403742; x=1715008542;
+        d=1e100.net; s=20230601; t=1714409037; x=1715013837;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3UWb+wjXyFhA+z+YN1Lsjts+67pUWWgwlP3uOwoNAkY=;
-        b=Fo33UI0fZjvoSD4g1HjdYGTJko/OSGotzUUek62DOq5TdXKHGecGMkariEJwz8Dbpw
-         CrDQDfXCVPnI7XfWfICpM3NYhFu3qJ5CiGNbaNpcp+FkodnLova2uOHUaW0opxjVlZC0
-         mnMs25XuZxkIgDWdG36vn7PmbrDZELEzCWf0C5SHENoFhYjk37fs0qKVNH9zsPiF9V5J
-         Aan/4vJN4RwRGfbJscuCsrSlsTzLUmN97RLpZhtadndO7a/CU3si48tjGvsGBnwj7vjr
-         KPEwVY73Z3NVbBltO7D6QTdDpO9/04C5UT/8yvV75OuyNncAjYbLWbcM784B80vcuQ01
-         DcUg==
-X-Forwarded-Encrypted: i=1; AJvYcCUYWbyJYkjULzsgn9TQt+me3NZyCwwmuofsR1FmZcXcozKMmmIZVWtfpvz9v/RfNCEL5ulDlVIpQlt0fzQfU5xLBU6DclEr5dYoobHn/uCsLrrdCV2db2PFRYcilSwa+N0bqMZbsvLEtUEBXjOo
-X-Gm-Message-State: AOJu0YwJJtv2kjwem2XjwdBU2uJg2brO+JaKFpNUDpOqwQmyN9oeDpnN
-	1Vy0bmdzCjYJFkXKXef9nG59CJEwUUVc/GdxRTBjmp7iMkJgP3dfavXQZF0wBQp/KEMFuNygMb0
-	zdKnsa6kbLMFdi3NowXc7W6slUqOjlg==
-X-Google-Smtp-Source: AGHT+IF06A4f1GlmDffVTuIeToSJZQBy3Y+dnpJ5qD62Jmrsw/hDK8txoOny0lpB+VnAmUWyLNNRX2q/DhI+yjefJsI=
-X-Received: by 2002:a2e:9c12:0:b0:2e0:3c3f:1d38 with SMTP id
- s18-20020a2e9c12000000b002e03c3f1d38mr2576578lji.30.1714403741655; Mon, 29
- Apr 2024 08:15:41 -0700 (PDT)
+        bh=7svURKdW4GzuQRx0yhus8dw0reWGyvGRlfYY7JNosfM=;
+        b=LCX4yNEF0QJF4TFklQ3R3exUd2zPXndBaXnzpSRQvznwcJg+RXGADFVxBK2t6o2gtc
+         q7VZjZ40yCZ3c8JKZI8zruCv5JJrtN3XefQDy0NDxuUgI6SHg0pBgX88IvjcG6Eru0HB
+         5Y58rdNtXpZCJD+tFvg5oKLIrRyCuLRS2uJzeaQ+YwqAR8qW/e+rlTNlR2eLY271TeIb
+         bmVFE9tB+JUA4Kd38d5jRnYVmSjGCFRbbeBQHs/oKbwefis/03JFwh1zb3DkMpeZvkJh
+         9ize60C9DXaqsRU4HJWjyfXq+HQpF82zCaRHaecbgZ+hm4vMWXnpq4xJrJtVnSyjJXn5
+         AC4A==
+X-Forwarded-Encrypted: i=1; AJvYcCVuK1hHjRxFZMS/Lqz4VWy5YDDABqcRTR7BHQt7fnzyyqDFvNhi5Bhxe3RuIawvhIdIvzUAUT84I8jawK6MTUwjQ9l02BS6RP2o4h2YXUSBXaj7sqPUGpAhdRnBOljMrVNTDIznw2nDznX/DBoe
+X-Gm-Message-State: AOJu0Yz+MqpIgWNWw02ecj1dC/NlYXP7M/MS2IvaCBOEho3TXNx1nr7Y
+	BzwzF+zS5dwNYDFDCFTT/too/FJVUuPj1fhPMJy/Mjew6dziFP2ukf755f+kY3vbAk8Sj3cy/iD
+	fTagJTvFSL+RopYQl4yDAS95MVLs=
+X-Google-Smtp-Source: AGHT+IGWGz0sHSlaLlMlh2q1sOIMuosnUxkK1gjn9q/cTQkGUhlhEEXMheMOGE/50o05k5/t0V8VVd74fM38G8S3QM0=
+X-Received: by 2002:a2e:97c6:0:b0:2e0:37be:b70f with SMTP id
+ m6-20020a2e97c6000000b002e037beb70fmr189706ljj.26.1714409036518; Mon, 29 Apr
+ 2024 09:43:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240428054307.1178347-1-iam@sung-woo.kim>
-In-Reply-To: <20240428054307.1178347-1-iam@sung-woo.kim>
+References: <20240428015834.2485653-1-iam@sung-woo.kim>
+In-Reply-To: <20240428015834.2485653-1-iam@sung-woo.kim>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 29 Apr 2024 11:15:29 -0400
-Message-ID: <CABBYNZKDouOrxG1XcSq2me0WW3A3yAbfdtonw2XJ54VZ8+Nbfg@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: L2CAP: Fix div-by-zero in l2cap_le_flowctl_init()
+Date: Mon, 29 Apr 2024 12:43:43 -0400
+Message-ID: <CABBYNZJ21uzmWiksD6CLDBuEe2pfPzFGsbn5quZ4edz3W0Wv=g@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: msft: fix slab-use-after-free in msft_do_close()
 To: Sungwoo Kim <iam@sung-woo.kim>
 Cc: daveti@purdue.edu, Marcel Holtmann <marcel@holtmann.org>, 
 	Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org, 
@@ -71,84 +71,56 @@ Content-Transfer-Encoding: quoted-printable
 
 Hi Sungwoo,
 
-On Sun, Apr 28, 2024 at 1:43=E2=80=AFAM Sungwoo Kim <iam@sung-woo.kim> wrot=
-e:
+On Sat, Apr 27, 2024 at 10:03=E2=80=AFPM Sungwoo Kim <iam@sung-woo.kim> wro=
+te:
 >
-> Hello, could you review this bug and its patch?
+> Hi, could you review this patch?
+> Now *not static* msft functions hold and put hdev->msft_data.
+> It prevents from potential and real use-after-free bugs.
 >
-> l2cap_le_flowctl_init() can cause both div-by-zero and an integer overflo=
-w.
+> How msft is used after freed:
 >
-> l2cap_le_flowctl_init()
->   chan->mps =3D min_t(u16, chan->imtu, chan->conn->mtu - L2CAP_HDR_SIZE);
->   chan->rx_credits =3D (chan->imtu / chan->mps) + 1;  <- div-by-zero
+> [use]
+> msft_do_close()
+>   msft =3D hdev->msft_data;
+>   if (!msft)                      ...(1) <- passed.
+>     return;
+>   mutex_lock(&msft->filter_lock); ...(4) <- used after freed.
 >
-> Here, mtu could be less than or equal to L2CAP_HDR_SIZE (4). If mtu is 4,=
- it
-> causes div-by-zero. If mtu is less than 4, it causes an integer overflow.
-
-That is because it is not valid to have hdev->le_mtu < 0x001b (the
-range is 0x001b to 0xffff), so we should really look into checking
-that conn->mtu is actually valid.
-
-> How mtu could have such low value:
+> [free]
+> msft_unregister()
+>   msft =3D hdev->msft_data;
+>   hdev->msft_data =3D NULL;         ...(2)
+>   kfree(msft);                    ...(3) <- msft is freed.
 >
-> hci_cc_le_read_buffer_size()
->   hdev->le_mtu =3D __le16_to_cpu(rp->le_mtu);
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> BUG: KASAN: slab-use-after-free in __mutex_lock_common kernel/locking/mut=
+ex.c:587 [inline]
+> BUG: KASAN: slab-use-after-free in __mutex_lock+0x8f/0xc30 kernel/locking=
+/mutex.c:752
+> Read of size 8 at addr ffff888106cbbca8 by task kworker/u5:2/309
 >
-> l2cap_conn_add()
->   conn->mtu =3D hcon->hdev->le_mtu;
-
-Yeah this assignment is incorrect and in fact we don't do that if
-le_mtu is zero so we probably should do some checks e.g. le_mtu >
-0x001a, or perhaps we need to move the MTU directly to hci_conn so it
-can check there are enough buffers to serve the link so we stop the
-connection procedure earlier.
-
-> As shown, mtu is an input from an HCI device. So, any HCI device can
-> set mtu value to any value, such as lower than 4.
->
-> To fix this, this patch adds a validation before subtractions. If MTU is
-> too small, the corresponding value will set by 0, and a warning message
-> will show up.
->
-> However, I'm not sure that 0-ing the value is the best. It'd be great if
-> you could comment on this.
->
-> Thank you,
-> Sungwoo.
->
-> divide error: 0000 [#1] PREEMPT SMP KASAN NOPTI
-> CPU: 0 PID: 67 Comm: kworker/u5:0 Tainted: G        W          6.9.0-rc5+=
- #20
+> CPU: 0 PID: 309 Comm: kworker/u5:2 Not tainted 6.9.0-rc5+ #5
 > Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/0=
 1/2014
-> Workqueue: hci0 hci_rx_work
-> RIP: 0010:l2cap_le_flowctl_init+0x19e/0x3f0 net/bluetooth/l2cap_core.c:54=
-7
-> Code: e8 17 17 0c 00 66 41 89 9f 84 00 00 00 bf 01 00 00 00 41 b8 02 00 0=
-0 00 4c 89 fe 4c 89 e2 89 d9 e8 27 17 0c 00 44 89 f0 31 d2 <66> f7 f3 89 c3=
- ff c3 4d 8d b7 88 00 00 00 4c 89 f0 48 c1 e8 03 42
-> RSP: 0018:ffff88810bc0f858 EFLAGS: 00010246
-> RAX: 00000000000002a0 RBX: 0000000000000000 RCX: dffffc0000000000
-> RDX: 0000000000000000 RSI: ffff88810bc0f7c0 RDI: ffffc90002dcb66f
-> RBP: ffff88810bc0f880 R08: aa69db2dda70ff01 R09: 0000ffaaaaaaaaaa
-> R10: 0084000000ffaaaa R11: 0000000000000000 R12: ffff88810d65a084
-> R13: dffffc0000000000 R14: 00000000000002a0 R15: ffff88810d65a000
-> FS:  0000000000000000(0000) GS:ffff88811ac00000(0000) knlGS:0000000000000=
-000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000020000100 CR3: 0000000103268003 CR4: 0000000000770ef0
-> PKRU: 55555554
+> Workqueue: hci4 hci_error_reset
 > Call Trace:
 >  <TASK>
->  l2cap_le_connect_req net/bluetooth/l2cap_core.c:4902 [inline]
->  l2cap_le_sig_cmd net/bluetooth/l2cap_core.c:5420 [inline]
->  l2cap_le_sig_channel net/bluetooth/l2cap_core.c:5486 [inline]
->  l2cap_recv_frame+0xe59d/0x11710 net/bluetooth/l2cap_core.c:6809
->  l2cap_recv_acldata+0x544/0x10a0 net/bluetooth/l2cap_core.c:7506
->  hci_acldata_packet net/bluetooth/hci_core.c:3939 [inline]
->  hci_rx_work+0x5e5/0xb20 net/bluetooth/hci_core.c:4176
+>  __dump_stack lib/dump_stack.c:88 [inline]
+>  dump_stack_lvl+0xcd/0x140 lib/dump_stack.c:114
+>  print_address_description mm/kasan/report.c:377 [inline]
+>  print_report+0x191/0x560 mm/kasan/report.c:488
+>  kasan_report+0xe2/0x120 mm/kasan/report.c:601
+>  __asan_report_load8_noabort+0x18/0x20 mm/kasan/report_generic.c:381
+>  __mutex_lock_common kernel/locking/mutex.c:587 [inline]
+>  __mutex_lock+0x8f/0xc30 kernel/locking/mutex.c:752
+>  mutex_lock_nested+0x1f/0x30 kernel/locking/mutex.c:804
+>  msft_do_close+0x292/0x700 net/bluetooth/msft.c:694
+>  hci_dev_close_sync+0x906/0xf10 net/bluetooth/hci_sync.c:5168
+>  hci_dev_do_close net/bluetooth/hci_core.c:554 [inline]
+>  hci_error_reset+0x152/0x410 net/bluetooth/hci_core.c:1091
 >  process_one_work kernel/workqueue.c:3254 [inline]
 >  process_scheduled_works+0x90f/0x1530 kernel/workqueue.c:3335
 >  worker_thread+0x926/0xe70 kernel/workqueue.c:3416
@@ -156,252 +128,444 @@ connection procedure earlier.
 >  ret_from_fork+0x5c/0x90 arch/x86/kernel/process.c:147
 >  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
 >  </TASK>
-> Modules linked in:
-> ---[ end trace 0000000000000000 ]---
 >
+> Allocated by task 7328:
+>  kasan_save_stack mm/kasan/common.c:47 [inline]
+>  kasan_save_track+0x30/0x70 mm/kasan/common.c:68
+>  kasan_save_alloc_info+0x3c/0x50 mm/kasan/generic.c:565
+>  poison_kmalloc_redzone mm/kasan/common.c:370 [inline]
+>  __kasan_kmalloc+0xa2/0xc0 mm/kasan/common.c:387
+>  kasan_kmalloc include/linux/kasan.h:211 [inline]
+>  kmalloc_trace+0x20c/0x3e0 mm/slub.c:3997
+>  kmalloc include/linux/slab.h:628 [inline]
+>  kzalloc include/linux/slab.h:749 [inline]
+>  msft_register+0x66/0x1d0 net/bluetooth/msft.c:760
+>  hci_register_dev+0x85e/0x9a0 net/bluetooth/hci_core.c:2737
+>  __vhci_create_device drivers/bluetooth/hci_vhci.c:438 [inline]
+>  vhci_create_device+0x390/0x720 drivers/bluetooth/hci_vhci.c:480
+>  vhci_get_user drivers/bluetooth/hci_vhci.c:537 [inline]
+>  vhci_write+0x39b/0x460 drivers/bluetooth/hci_vhci.c:617
+>  call_write_iter include/linux/fs.h:2110 [inline]
+>  new_sync_write fs/read_write.c:497 [inline]
+>  vfs_write+0x8eb/0xb50 fs/read_write.c:590
+>  ksys_write+0x106/0x1f0 fs/read_write.c:643
+>  __do_sys_write fs/read_write.c:655 [inline]
+>  __se_sys_write fs/read_write.c:652 [inline]
+>  __x64_sys_write+0x84/0xa0 fs/read_write.c:652
+>  x64_sys_call+0x271a/0x2ce0 arch/x86/include/generated/asm/syscalls_64.h:=
+2
+>  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>  do_syscall_64+0x9c/0x130 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>
+> Freed by task 7332:
+>  kasan_save_stack mm/kasan/common.c:47 [inline]
+>  kasan_save_track+0x30/0x70 mm/kasan/common.c:68
+>  kasan_save_free_info+0x44/0x50 mm/kasan/generic.c:579
+>  poison_slab_object+0x11a/0x190 mm/kasan/common.c:240
+>  __kasan_slab_free+0x3b/0x60 mm/kasan/common.c:256
+>  kasan_slab_free include/linux/kasan.h:184 [inline]
+>  slab_free_hook mm/slub.c:2106 [inline]
+>  slab_free mm/slub.c:4280 [inline]
+>  kfree+0x13c/0x330 mm/slub.c:4390
+>  msft_unregister+0x9d/0x120 net/bluetooth/msft.c:785
+>  hci_unregister_dev+0x1d9/0x520 net/bluetooth/hci_core.c:2771
+>  vhci_release+0x8c/0xe0 drivers/bluetooth/hci_vhci.c:674
+>  __fput+0x36f/0x750 fs/file_table.c:422
+>  ____fput+0x1e/0x30 fs/file_table.c:450
+>  task_work_run+0x1da/0x280 kernel/task_work.c:180
+>  exit_task_work include/linux/task_work.h:38 [inline]
+>  do_exit+0x856/0x2210 kernel/exit.c:878
+>  do_group_exit+0x201/0x2c0 kernel/exit.c:1027
+>  get_signal+0x12ff/0x1380 kernel/signal.c:2911
+>  arch_do_signal_or_restart+0x3b/0x650 arch/x86/kernel/signal.c:310
+>  exit_to_user_mode_loop kernel/entry/common.c:111 [inline]
+>  exit_to_user_mode_prepare include/linux/entry-common.h:328 [inline]
+>  __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
+>  syscall_exit_to_user_mode+0xcc/0x2a0 kernel/entry/common.c:218
+>  do_syscall_64+0xa8/0x130 arch/x86/entry/common.c:89
+>  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>
+> The buggy address belongs to the object at ffff888106cbbc00
+>  which belongs to the cache kmalloc-256 of size 256
+> The buggy address is located 168 bytes inside of
+>  freed 256-byte region [ffff888106cbbc00, ffff888106cbbd00)
+>
+> The buggy address belongs to the physical page:
+> page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x106c=
+ba
+> head: order:1 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+> flags: 0x17ffffe0000840(slab|head|node=3D0|zone=3D2|lastcpupid=3D0x3fffff=
+)
+> page_type: 0xffffffff()
+> raw: 0017ffffe0000840 ffff888100042040 ffffea00042de590 ffffea00041b3e10
+> raw: 0000000000000000 00000000000a000a 00000001ffffffff 0000000000000000
+> head: 0017ffffe0000840 ffff888100042040 ffffea00042de590 ffffea00041b3e10
+> head: 0000000000000000 00000000000a000a 00000001ffffffff 0000000000000000
+> head: 0017ffffe0000001 ffffea00041b2e81 dead000000000122 00000000ffffffff
+> head: 0000000200000000 0000000000000000 00000000ffffffff 0000000000000000
+> page dumped because: kasan: bad access detected
+>
+> Memory state around the buggy address:
+>  ffff888106cbbb80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>  ffff888106cbbc00: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> >ffff888106cbbc80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>                                   ^
+>  ffff888106cbbd00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>  ffff888106cbbd80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+> Fixes: 9e14606d8f38 ("Bluetooth: disable advertisement filters during sus=
+pend")
 > Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
 > ---
->  net/bluetooth/l2cap_core.c | 94 +++++++++++++++++++++++++++++---------
->  1 file changed, 73 insertions(+), 21 deletions(-)
+> v2: Move BT_DBG after null checking in msft_data_hold_unless_zero()
 >
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 84fc70862..472ddfb2e 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -541,10 +541,17 @@ static void l2cap_le_flowctl_init(struct l2cap_chan=
- *chan, u16 tx_credits)
->         chan->sdu_last_frag =3D NULL;
->         chan->sdu_len =3D 0;
->         chan->tx_credits =3D tx_credits;
-> -       /* Derive MPS from connection MTU to stop HCI fragmentation */
-> -       chan->mps =3D min_t(u16, chan->imtu, chan->conn->mtu - L2CAP_HDR_=
-SIZE);
-> -       /* Give enough credits for a full packet */
-> -       chan->rx_credits =3D (chan->imtu / chan->mps) + 1;
+>  net/bluetooth/msft.c | 124 ++++++++++++++++++++++++++++++++++---------
+>  1 file changed, 99 insertions(+), 25 deletions(-)
+>
+> diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
+> index 9612c5d1b..1f79e7980 100644
+> --- a/net/bluetooth/msft.c
+> +++ b/net/bluetooth/msft.c
+> @@ -132,10 +132,45 @@ struct msft_data {
+>         __u8 filter_enabled;
+>         /* To synchronize add/remove address filter and monitor device ev=
+ent.*/
+>         struct mutex filter_lock;
+> +       struct kref     kref;
+
+NAK, the lifetime of this object should be tied to hdev which already
+has a kref.
+
+>  };
+>
+> +static void msft_data_free(struct kref *kref);
 > +
-> +       if (chan->conn->mtu < L2CAP_HDR_SIZE) {
-> +               BT_WARN("mtu is too small (mtu %d < %d)", chan->conn->mtu=
-, L2CAP_HDR_SIZE);
-> +               chan->mps =3D 0;
-> +               chan->rx_credits =3D 0;
-> +       } else {
-> +               /* Derive MPS from connection MTU to stop HCI fragmentati=
-on */
-> +               chan->mps =3D min_t(u16, chan->imtu, chan->conn->mtu - L2=
-CAP_HDR_SIZE);
-> +               /* Give enough credits for a full packet */
-> +               chan->rx_credits =3D (chan->imtu / chan->mps) + 1;
-> +       }
->
->         skb_queue_head_init(&chan->tx_q);
+> +static struct msft_data *msft_data_hold_unless_zero(struct msft_data *ms=
+ft)
+> +{
+> +       if (!msft)
+> +               return NULL;
+> +
+> +       BT_DBG("msft %p orig refcnt %u", msft, kref_read(&msft->kref));
+> +
+> +       if (!kref_get_unless_zero(&msft->kref))
+> +               return NULL;
+> +
+> +       return msft;
+> +}
+> +
+> +static void msft_data_put(struct msft_data *msft)
+> +{
+> +       BT_DBG("msft %p orig refcnt %u", msft, kref_read(&msft->kref));
+> +
+> +       kref_put(&msft->kref, msft_data_free);
+> +}
+> +
+> +static void msft_data_free(struct kref *kref)
+> +{
+> +       struct msft_data *msft =3D container_of(kref, struct msft_data, k=
+ref);
+> +
+> +       BT_DBG("msft %p", msft);
+> +
+> +       kfree(msft->evt_prefix);
+> +       mutex_destroy(&msft->filter_lock);
+> +       kfree(msft);
+> +}
+> +
+>  bool msft_monitor_supported(struct hci_dev *hdev)
+>  {
+> +       /* msft_get_features() holds and put hdev->msft_data */
+>         return !!(msft_get_features(hdev) & MSFT_FEATURE_MASK_LE_ADV_MONI=
+TOR);
 >  }
-> @@ -2222,7 +2229,12 @@ static struct sk_buff *l2cap_create_connless_pdu(s=
-truct l2cap_chan *chan,
->         BT_DBG("chan %p psm 0x%2.2x len %zu", chan,
->                __le16_to_cpu(chan->psm), len);
 >
-> -       count =3D min_t(unsigned int, (conn->mtu - hlen), len);
-> +       if (conn->mtu < hlen) {
-> +               count =3D 0;
-> +               BT_WARN("mtu is too small (mtu %d < len %d)", conn->mtu, =
-hlen);
-> +       } else {
-> +               count =3D min_t(unsigned int, (conn->mtu - hlen), len);
+> @@ -449,12 +484,17 @@ static int msft_remove_monitor_sync(struct hci_dev =
+*hdev,
+>  /* This function requires the caller holds hci_req_sync_lock */
+>  int msft_suspend_sync(struct hci_dev *hdev)
+>  {
+> -       struct msft_data *msft =3D hdev->msft_data;
+> +       struct msft_data *msft;
+>         struct adv_monitor *monitor;
+>         int handle =3D 0;
+>
+> -       if (!msft || !msft_monitor_supported(hdev))
+> +       msft =3D msft_data_hold_unless_zero(hdev->msft_data);
+> +       if (!msft)
+>                 return 0;
+> +       if (!msft_monitor_supported(hdev)) {
+> +               msft_data_put(msft);
+> +               return 0;
 > +       }
 >
->         skb =3D chan->ops->alloc_skb(chan, hlen, count,
->                                    msg->msg_flags & MSG_DONTWAIT);
-> @@ -2253,7 +2265,12 @@ static struct sk_buff *l2cap_create_basic_pdu(stru=
-ct l2cap_chan *chan,
+>         msft->suspending =3D true;
 >
->         BT_DBG("chan %p len %zu", chan, len);
+> @@ -471,6 +511,7 @@ int msft_suspend_sync(struct hci_dev *hdev)
+>         /* All monitors have been removed */
+>         msft->suspending =3D false;
 >
-> -       count =3D min_t(unsigned int, (conn->mtu - L2CAP_HDR_SIZE), len);
-> +       if (conn->mtu < L2CAP_HDR_SIZE) {
-> +               BT_WARN("mtu is too small (mtu %d < %d)", conn->mtu, L2CA=
-P_HDR_SIZE);
-> +               count =3D 0;
-> +       } else {
-> +               count =3D min_t(unsigned int, (conn->mtu - L2CAP_HDR_SIZE=
-), len);
+> +       msft_data_put(msft);
+>         return 0;
+>  }
+>
+> @@ -608,11 +649,17 @@ static void reregister_monitor(struct hci_dev *hdev=
+)
+>  /* This function requires the caller holds hci_req_sync_lock */
+>  int msft_resume_sync(struct hci_dev *hdev)
+>  {
+> -       struct msft_data *msft =3D hdev->msft_data;
+> +       struct msft_data *msft;
+>
+> -       if (!msft || !msft_monitor_supported(hdev))
+> +       msft =3D msft_data_hold_unless_zero(hdev->msft_data);
+> +       if (!msft)
+>                 return 0;
+>
+> +       if (!msft_monitor_supported(hdev)) {
+> +               msft_data_put(msft);
+> +               return 0;
+> +       }
+> +
+>         hci_dev_lock(hdev);
+>
+>         /* Clear already tracked devices on resume. Once the monitors are
+> @@ -625,17 +672,19 @@ int msft_resume_sync(struct hci_dev *hdev)
+>
+>         reregister_monitor(hdev);
+>
+> +       msft_data_put(msft);
+>         return 0;
+>  }
+>
+>  /* This function requires the caller holds hci_req_sync_lock */
+>  void msft_do_open(struct hci_dev *hdev)
+>  {
+> -       struct msft_data *msft =3D hdev->msft_data;
+> +       struct msft_data *msft;
+>
+>         if (hdev->msft_opcode =3D=3D HCI_OP_NOP)
+>                 return;
+>
+> +       msft =3D msft_data_hold_unless_zero(hdev->msft_data);
+>         if (!msft) {
+>                 bt_dev_err(hdev, "MSFT extension not registered");
+>                 return;
+> @@ -650,8 +699,7 @@ void msft_do_open(struct hci_dev *hdev)
+>         msft->features =3D 0;
+>
+>         if (!read_supported_features(hdev, msft)) {
+> -               hdev->msft_data =3D NULL;
+> -               kfree(msft);
+> +               msft_data_put(msft);
+>                 return;
+>         }
+>
+> @@ -663,15 +711,17 @@ void msft_do_open(struct hci_dev *hdev)
+>                  */
+>                 reregister_monitor(hdev);
+>         }
+> +       msft_data_put(msft);
+>  }
+>
+>  void msft_do_close(struct hci_dev *hdev)
+>  {
+> -       struct msft_data *msft =3D hdev->msft_data;
+> +       struct msft_data *msft;
+>         struct msft_monitor_advertisement_handle_data *handle_data, *tmp;
+>         struct msft_monitor_addr_filter_data *address_filter, *n;
+>         struct adv_monitor *monitor;
+>
+> +       msft =3D msft_data_hold_unless_zero(hdev->msft_data);
+>         if (!msft)
+>                 return;
+>
+> @@ -705,6 +755,8 @@ void msft_do_close(struct hci_dev *hdev)
+>         hdev->advmon_pend_notify =3D false;
+>         msft_monitor_device_del(hdev, 0, NULL, 0, true);
+>
+> +       msft_data_put(msft);
+> +
+>         hci_dev_unlock(hdev);
+>  }
+>
+> @@ -767,6 +819,7 @@ void msft_register(struct hci_dev *hdev)
+>         INIT_LIST_HEAD(&msft->address_filters);
+>         hdev->msft_data =3D msft;
+>         mutex_init(&msft->filter_lock);
+> +       kref_init(&msft->kref);
+>  }
+>
+>  void msft_unregister(struct hci_dev *hdev)
+> @@ -779,10 +832,7 @@ void msft_unregister(struct hci_dev *hdev)
+>         bt_dev_dbg(hdev, "Unregister MSFT extension");
+>
+>         hdev->msft_data =3D NULL;
+> -
+> -       kfree(msft->evt_prefix);
+> -       mutex_destroy(&msft->filter_lock);
+> -       kfree(msft);
+> +       msft_data_put(msft);
+>  }
+>
+>  /* This function requires the caller holds hdev->lock */
+> @@ -1068,10 +1118,11 @@ static void msft_monitor_device_evt(struct hci_de=
+v *hdev, struct sk_buff *skb)
+>
+>  void msft_vendor_evt(struct hci_dev *hdev, void *data, struct sk_buff *s=
+kb)
+>  {
+> -       struct msft_data *msft =3D hdev->msft_data;
+> +       struct msft_data *msft;
+>         u8 *evt_prefix;
+>         u8 *evt;
+>
+> +       msft =3D msft_data_hold_unless_zero(hdev->msft_data);
+>         if (!msft)
+>                 return;
+>
+> @@ -1081,21 +1132,21 @@ void msft_vendor_evt(struct hci_dev *hdev, void *=
+data, struct sk_buff *skb)
+>         if (msft->evt_prefix_len > 0) {
+>                 evt_prefix =3D msft_skb_pull(hdev, skb, 0, msft->evt_pref=
+ix_len);
+>                 if (!evt_prefix)
+> -                       return;
+> +                       goto done;
+>
+>                 if (memcmp(evt_prefix, msft->evt_prefix, msft->evt_prefix=
+_len))
+> -                       return;
+> +                       goto done;
+>         }
+>
+>         /* Every event starts at least with an event code and the rest of
+>          * the data is variable and depends on the event code.
+>          */
+>         if (skb->len < 1)
+> -               return;
+> +               goto done;
+>
+>         evt =3D msft_skb_pull(hdev, skb, 0, sizeof(*evt));
+>         if (!evt)
+> -               return;
+> +               goto done;
+>
+>         hci_dev_lock(hdev);
+>
+> @@ -1112,13 +1163,24 @@ void msft_vendor_evt(struct hci_dev *hdev, void *=
+data, struct sk_buff *skb)
+>         }
+>
+>         hci_dev_unlock(hdev);
+> +
+> +done:
+> +       msft_data_put(msft);
+>  }
+>
+>  __u64 msft_get_features(struct hci_dev *hdev)
+>  {
+> -       struct msft_data *msft =3D hdev->msft_data;
+> +       struct msft_data *msft;
+> +       unsigned long long features;
+> +
+> +       msft =3D msft_data_hold_unless_zero(hdev->msft_data);
+> +       if (!msft)
+> +               return 0;
+> +
+> +       features =3D msft->features;
+>
+> -       return msft ? msft->features : 0;
+> +       msft_data_put(msft);
+> +       return features;
+>  }
+>
+>  static void msft_le_set_advertisement_filter_enable_cb(struct hci_dev *h=
+dev,
+> @@ -1152,37 +1214,48 @@ static void msft_le_set_advertisement_filter_enab=
+le_cb(struct hci_dev *hdev,
+>  /* This function requires the caller holds hci_req_sync_lock */
+>  int msft_add_monitor_pattern(struct hci_dev *hdev, struct adv_monitor *m=
+onitor)
+>  {
+> -       struct msft_data *msft =3D hdev->msft_data;
+> +       struct msft_data *msft;
+> +       int err;
+>
+> +       msft =3D msft_data_hold_unless_zero(hdev->msft_data);
+>         if (!msft)
+>                 return -EOPNOTSUPP;
+>
+> -       if (msft->resuming || msft->suspending)
+> +       if (msft->resuming || msft->suspending) {
+> +               msft_data_put(msft);
+>                 return -EBUSY;
 > +       }
 >
->         skb =3D chan->ops->alloc_skb(chan, L2CAP_HDR_SIZE, count,
->                                    msg->msg_flags & MSG_DONTWAIT);
-> @@ -2295,7 +2312,12 @@ static struct sk_buff *l2cap_create_iframe_pdu(str=
-uct l2cap_chan *chan,
->         if (chan->fcs =3D=3D L2CAP_FCS_CRC16)
->                 hlen +=3D L2CAP_FCS_SIZE;
+> -       return msft_add_monitor_sync(hdev, monitor);
+> +       err =3D msft_add_monitor_sync(hdev, monitor);
+> +       msft_data_put(msft);
+> +       return err;
+>  }
 >
-> -       count =3D min_t(unsigned int, (conn->mtu - hlen), len);
-> +       if (conn->mtu < hlen) {
-> +               BT_WARN("mtu is too small (mtu %d < len %d)", conn->mtu, =
-hlen);
-> +               count =3D 0;
-> +       } else {
-> +               count =3D min_t(unsigned int, (conn->mtu - hlen), len);
-> +       }
+>  /* This function requires the caller holds hci_req_sync_lock */
+>  int msft_remove_monitor(struct hci_dev *hdev, struct adv_monitor *monito=
+r)
+>  {
+> -       struct msft_data *msft =3D hdev->msft_data;
+> +       struct msft_data *msft;
+> +       int err;
 >
->         skb =3D chan->ops->alloc_skb(chan, hlen, count,
->                                    msg->msg_flags & MSG_DONTWAIT);
-> @@ -2412,7 +2434,12 @@ static struct sk_buff *l2cap_create_le_flowctl_pdu=
-(struct l2cap_chan *chan,
->         if (sdulen)
->                 hlen +=3D L2CAP_SDULEN_SIZE;
+> +       msft =3D msft_data_hold_unless_zero(hdev->msft_data);
+>         if (!msft)
+>                 return -EOPNOTSUPP;
 >
-> -       count =3D min_t(unsigned int, (conn->mtu - hlen), len);
-> +       if (conn->mtu < hlen) {
-> +               BT_WARN("mtu is too small (mtu %d < len %d)", conn->mtu, =
-hlen);
-> +               count =3D 0;
-> +       } else {
-> +               count =3D min_t(unsigned int, (conn->mtu - hlen), len);
-> +       }
+>         if (msft->resuming || msft->suspending)
+>                 return -EBUSY;
 >
->         skb =3D chan->ops->alloc_skb(chan, hlen, count,
->                                    msg->msg_flags & MSG_DONTWAIT);
-> @@ -3225,6 +3252,7 @@ static int l2cap_build_conf_req(struct l2cap_chan *=
-chan, void *data, size_t data
->         void *ptr =3D req->data;
->         void *endptr =3D data + data_size;
->         u16 size;
-> +       int hlen;
+> -       return msft_remove_monitor_sync(hdev, monitor);
+> +       err =3D msft_remove_monitor_sync(hdev, monitor);
+> +       msft_data_put(msft);
+> +       return err;
+>  }
 >
->         BT_DBG("chan %p", chan);
+>  int msft_set_filter_enable(struct hci_dev *hdev, bool enable)
+>  {
+>         struct msft_cp_le_set_advertisement_filter_enable cp;
+> -       struct msft_data *msft =3D hdev->msft_data;
+> +       struct msft_data *msft;
+>         int err;
 >
-> @@ -3275,14 +3303,19 @@ static int l2cap_build_conf_req(struct l2cap_chan=
- *chan, void *data, size_t data
->                 break;
+> +       msft =3D msft_data_hold_unless_zero(hdev->msft_data);
+>         if (!msft)
+>                 return -EOPNOTSUPP;
 >
->         case L2CAP_MODE_ERTM:
-> +               hlen =3D L2CAP_EXT_HDR_SIZE + L2CAP_SDULEN_SIZE + L2CAP_F=
-CS_SIZE;
->                 rfc.mode            =3D L2CAP_MODE_ERTM;
->                 rfc.max_transmit    =3D chan->max_tx;
+> @@ -1193,6 +1266,7 @@ int msft_set_filter_enable(struct hci_dev *hdev, bo=
+ol enable)
 >
->                 __l2cap_set_ertm_timeouts(chan, &rfc);
+>         msft_le_set_advertisement_filter_enable_cb(hdev, &cp, err);
 >
-> -               size =3D min_t(u16, L2CAP_DEFAULT_MAX_PDU_SIZE, chan->con=
-n->mtu -
-> -                            L2CAP_EXT_HDR_SIZE - L2CAP_SDULEN_SIZE -
-> -                            L2CAP_FCS_SIZE);
-> +               if (chan->conn->mtu < hlen) {
-> +                       BT_WARN("mtu is too small (mtu %d < len %d)", cha=
-n->conn->mtu, hlen);
-> +                       size =3D 0;
-> +               } else {
-> +                       size =3D min_t(u16, L2CAP_DEFAULT_MAX_PDU_SIZE, c=
-han->conn->mtu - hlen);
-> +               }
-> +
->                 rfc.max_pdu_size =3D cpu_to_le16(size);
->
->                 l2cap_txwin_setup(chan);
-> @@ -3310,6 +3343,7 @@ static int l2cap_build_conf_req(struct l2cap_chan *=
-chan, void *data, size_t data
->                 break;
->
->         case L2CAP_MODE_STREAMING:
-> +               hlen =3D L2CAP_EXT_HDR_SIZE + L2CAP_SDULEN_SIZE + L2CAP_F=
-CS_SIZE;
->                 l2cap_txwin_setup(chan);
->                 rfc.mode            =3D L2CAP_MODE_STREAMING;
->                 rfc.txwin_size      =3D 0;
-> @@ -3317,9 +3351,12 @@ static int l2cap_build_conf_req(struct l2cap_chan =
-*chan, void *data, size_t data
->                 rfc.retrans_timeout =3D 0;
->                 rfc.monitor_timeout =3D 0;
->
-> -               size =3D min_t(u16, L2CAP_DEFAULT_MAX_PDU_SIZE, chan->con=
-n->mtu -
-> -                            L2CAP_EXT_HDR_SIZE - L2CAP_SDULEN_SIZE -
-> -                            L2CAP_FCS_SIZE);
-> +               if (chan->conn->mtu < hlen) {
-> +                       BT_WARN("mtu is too small (mtu %d < len %d)", cha=
-n->conn->mtu, hlen);
-> +                       size =3D 0;
-> +               } else {
-> +                       size =3D min_t(u16, L2CAP_DEFAULT_MAX_PDU_SIZE, c=
-han->conn->mtu - hlen);
-> +               }
->                 rfc.max_pdu_size =3D cpu_to_le16(size);
->
->                 l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
-> @@ -3351,7 +3388,7 @@ static int l2cap_parse_conf_req(struct l2cap_chan *=
-chan, void *data, size_t data
->         void *endptr =3D data + data_size;
->         void *req =3D chan->conf_req;
->         int len =3D chan->conf_len;
-> -       int type, hint, olen;
-> +       int type, hint, olen, hlen;
->         unsigned long val;
->         struct l2cap_conf_rfc rfc =3D { .mode =3D L2CAP_MODE_BASIC };
->         struct l2cap_conf_efs efs;
-> @@ -3496,6 +3533,7 @@ static int l2cap_parse_conf_req(struct l2cap_chan *=
-chan, void *data, size_t data
->                         break;
->
->                 case L2CAP_MODE_ERTM:
-> +                       hlen =3D L2CAP_EXT_HDR_SIZE + L2CAP_SDULEN_SIZE +=
- L2CAP_FCS_SIZE;
->                         if (!test_bit(CONF_EWS_RECV, &chan->conf_state))
->                                 chan->remote_tx_win =3D rfc.txwin_size;
->                         else
-> @@ -3503,9 +3541,15 @@ static int l2cap_parse_conf_req(struct l2cap_chan =
-*chan, void *data, size_t data
->
->                         chan->remote_max_tx =3D rfc.max_transmit;
->
-> -                       size =3D min_t(u16, le16_to_cpu(rfc.max_pdu_size)=
-,
-> -                                    chan->conn->mtu - L2CAP_EXT_HDR_SIZE=
- -
-> -                                    L2CAP_SDULEN_SIZE - L2CAP_FCS_SIZE);
-> +                       if (chan->conn->mtu < hlen) {
-> +                               BT_WARN("mtu is too small (mtu %d < len %=
-d)",
-> +                                       chan->conn->mtu, hlen);
-> +                               size =3D 0;
-> +                       } else {
-> +                               size =3D min_t(u16, le16_to_cpu(rfc.max_p=
-du_size),
-> +                                            chan->conn->mtu - hlen);
-> +                       }
-> +
->                         rfc.max_pdu_size =3D cpu_to_le16(size);
->                         chan->remote_mps =3D size;
->
-> @@ -3534,9 +3578,17 @@ static int l2cap_parse_conf_req(struct l2cap_chan =
-*chan, void *data, size_t data
->                         break;
->
->                 case L2CAP_MODE_STREAMING:
-> -                       size =3D min_t(u16, le16_to_cpu(rfc.max_pdu_size)=
-,
-> -                                    chan->conn->mtu - L2CAP_EXT_HDR_SIZE=
- -
-> -                                    L2CAP_SDULEN_SIZE - L2CAP_FCS_SIZE);
-> +                       hlen =3D L2CAP_EXT_HDR_SIZE + L2CAP_SDULEN_SIZE +=
- L2CAP_FCS_SIZE;
-> +
-> +                       if (chan->conn->mtu < hlen) {
-> +                               BT_WARN("mtu is too small (mtu %d < len %=
-d)",
-> +                                       chan->conn->mtu, hlen);
-> +                               size =3D 0;
-> +                       } else {
-> +                               size =3D min_t(u16, le16_to_cpu(rfc.max_p=
-du_size),
-> +                                            chan->conn->mtu - hlen);
-> +                       }
-> +
->                         rfc.max_pdu_size =3D cpu_to_le16(size);
->                         chan->remote_mps =3D size;
+> +       msft_data_put(msft);
+>         return 0;
+>  }
 >
 > --
 > 2.34.1
->
 
+Looks at the current code I do wonder if the order is incorrect since we do=
+:
+
+    msft_unregister(hdev);
+
+    hci_dev_do_close(hdev);
+
+Anyway msft_unregister shall probably be renamed to msft_release and
+then called from hci_release_dev instead since that is where we free
+fields of hdev, not on unregister.
 
 --=20
 Luiz Augusto von Dentz
