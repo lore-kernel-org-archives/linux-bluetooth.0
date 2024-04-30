@@ -1,82 +1,244 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09EE6770E0;
-	Tue, 30 Apr 2024 14:20:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 541BC17278D;
+	Tue, 30 Apr 2024 14:21:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714486831; cv=none; b=EuAzsGufyc+KJM629DByPTkwwUI81bWXshR9d0B300UdeymNuM6xStvn+1T2fwhQrs6ef4wJzbSR1pBIWP2DyNPhmEmQVP9LAMBE4WOI2UnQekgm0EE6n2KpUFMLahDnA0KswKsLbRdx5g8LtzdRtZGTEg7I8y7a4HnxGi+p4k4=
+	t=1714486914; cv=none; b=K12Jfbu0L55DCz/PDIWMpxxH1cM1nBidj9Xq4Z+iqiOdNTqBuGuSZIveAIdXim0N/uBT2JdWvLE0DCeEZa1awyk16RYaL/aWaov0Ue0iRfyYxHaNS9ihB+My1aRxs0m5o0UzrE3vDIgWFJjueENXjH6JIAsWcDyyA6+KrEPG5FE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714486831; c=relaxed/simple;
-	bh=33rST+o+Aup5/KOnLxqpLJYDmZ5AhQI7F5lPxcmCn2A=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=tqxJNwYNujh4Rm+c2OojHEx6f3PPTHAXS0g2GNVwCIgngDNETXk2TmMUaDJg048aHPa7iMPIarnKlo0GVMHUcSimFqNZ9Qbi6DjApWFOMzWZKCOg3JZsP9Nujt+KYddvwnXR7PIK9NnIR3iBgc6HAzSxRiSRGZ02lgbHaBi0BUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jf5vMd9w; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1714486914; c=relaxed/simple;
+	bh=aJkTXFdiDDIRnJh37eZO9dtbGQoBiM0P46Smeiszvg4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RN4JKl6l2nQeRybvCfeBQwr2awPheWOsE6+YvkqV2/Go50Z6zkgED3u9a8kdW+DebrXfi2edZYGj1O9R7Y5g0EixFfOMJwszNcCi7Dh+33bMYGieAU7O8fbXLS+RsDMfVTtaHliQ01gc6koyyNJN6/p+9E53fzOt3OB3+RkFgP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RWQepjgq; arc=none smtp.client-ip=209.85.208.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jf5vMd9w"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8064FC4AF19;
-	Tue, 30 Apr 2024 14:20:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714486830;
-	bh=33rST+o+Aup5/KOnLxqpLJYDmZ5AhQI7F5lPxcmCn2A=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=jf5vMd9wSd9wfuoKB08ZvJeXpuSdKWiiIxvpss7+//dxyS8PqwJOPOBu7dVZdia4i
-	 Vlv5y2kfojArp5fn9BPaeozwXRQBNlBTE/Jr47u4umEG5DmiF+ycos9Yq99GqnUsdu
-	 6Mn86TiUDlFXL5vpD6R4fT81Q433pjnabSy1BGE6Yd7lylXW1xSFEc76FhOHh7eCqe
-	 hVkgJ2njMZcXKP1OG2gpNaiCVRGwTJ+BGuM4t5Z0sWRwU48D5yO/9x0Gh/PG5und/2
-	 pSJnuW9kyAxCsQSnimwyE2lGsRUaTUTfRNnW1NKLmc63tsnirjrfrKJ8BEqASUX5Cy
-	 yIgF0rMRlirTw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 696AAC43616;
-	Tue, 30 Apr 2024 14:20:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RWQepjgq"
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2dd7e56009cso74850401fa.3;
+        Tue, 30 Apr 2024 07:21:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714486910; x=1715091710; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nNLtSQWQ+pUdMr4er7Ppah+nn4cfdZN22MtBKL7h/00=;
+        b=RWQepjgqz1lwNDJIfMroam0/6RIqPDizlqaBWoULDESIhCXTcmjt6/38tHbh1F5E8R
+         KzQ/5eh1YT9+uoDNc2C1BWG4bXlWnqMhuly1jws385sV+1LwcKWgYKFdrWmxsfy7F7IS
+         mwgvTmN6ERyFu5CGPz7Aac0gMXtNVRuag1oPwVU1aIfezUEg2KGEG9MxpY3V1CjscQ5n
+         /i2f8BEWUWvajnebHhCqcpBWGRSAW6bhIpHXsTpaMVxr4LgVoUxzSqsC3gkQM1T927Ey
+         OUeIWg6OWTGgAjUq01HN+PRNqP5Y1O0kucnUGIC+VW5TfC7sSqkEgZhUM1+X9drY8qbC
+         RspA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714486910; x=1715091710;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nNLtSQWQ+pUdMr4er7Ppah+nn4cfdZN22MtBKL7h/00=;
+        b=Xhk/ZA5alitsH8c3Rg+mn52ywuW93spY/VKcI2pkTeHKduD4oihEDuz9BZ2oVGP/6c
+         NCzUlFZxQ8KIg8AKzKX6NstqDoDlIOPLsfTD+FsFDTkNIzKWW4oiYv5yylT17ztBbh6+
+         P2/vKhprBZmKHrAuqAs7v5UDggNkbtV+V5WLTF4DWBBmBq4DM/vSFOhUMTB3Hp4gKY2y
+         Zn/8l88Q2fgufNwwGUsBBCdRND4p83IjGHDwWP03xu5HNaVNQuDzOL7WIYVGx7bs3qOd
+         qRMGs/xY5wCiz/vBENaj3skd6LHpqoKER+SX+qyVcTP8mT000T1XfUPW+8jV5LKKleGu
+         MmoA==
+X-Forwarded-Encrypted: i=1; AJvYcCVRkeNQl3isA4H3Yjg+mykQA/H3b6fWmAuAGcP3AQ1govUW6aG9Ivv9Nbe9ex3Mi9f5Iv6U9FTxcJWJHxh1IPB1lx+WIMriRPMkKvKPK5SoR7vZR+7Bg8tIM3FZhO2V3xzbMS2GHNvjM86LlklNsTn9IoHSadOFVrcR0II/ktNQ21YlLVjj
+X-Gm-Message-State: AOJu0YxrV7a8+4WUCE+dub+d1E/kP/r7dxWInu7UtdHr7Rrv8IiwpuRM
+	m85FTfCFBDLJOauvQ8hfjdWL9RhN2WInBMhN+hosQgw9lR2nfgi4Esvj66yJnsh6B/6eOpn14K0
+	NwEl6joqfjioHLNgrxmS6YZo1QVM=
+X-Google-Smtp-Source: AGHT+IHTCS7gq5KRR3pfsSVkeAJrvhfopA+NEKyyLw2ElLjVgelXnMdwQQOGkXfLsu5N4H4RDfZBLvJ/HCfXzpYbniU=
+X-Received: by 2002:a2e:a28f:0:b0:2df:6e6d:2c22 with SMTP id
+ k15-20020a2ea28f000000b002df6e6d2c22mr9310394lja.47.1714486910189; Tue, 30
+ Apr 2024 07:21:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [bluetooth-next PATCH v3] dt-bindings: net: broadcom-bluetooth: Add
- CYW43439 DT binding
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <171448683042.20667.15080644752869073034.git-patchwork-notify@kernel.org>
-Date: Tue, 30 Apr 2024 14:20:30 +0000
-References: <20240430010914.110179-1-marex@denx.de>
-In-Reply-To: <20240430010914.110179-1-marex@denx.de>
-To: Marek Vasut <marex@denx.de>
-Cc: linux-bluetooth@vger.kernel.org, krzysztof.kozlowski@linaro.org,
- davem@davemloft.net, conor+dt@kernel.org, edumazet@google.com,
- kuba@kernel.org, krzysztof.kozlowski+dt@linaro.org, linus.walleij@linaro.org,
- luiz.dentz@gmail.com, marcel@holtmann.org, pabeni@redhat.com,
- robh@kernel.org, devicetree@vger.kernel.org, netdev@vger.kernel.org
+References: <20240426155801.25277-1-johan+linaro@kernel.org>
+ <CAD=FV=V-pG9+5fLonNvydmjS=ziUFUHAyF8T7YTkEHiO405aSA@mail.gmail.com> <ZizKmtcUIYAMpvOQ@hovoldconsulting.com>
+In-Reply-To: <ZizKmtcUIYAMpvOQ@hovoldconsulting.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 30 Apr 2024 10:21:37 -0400
+Message-ID: <CABBYNZ+pPTTOSzb2HpStRo273EPsLYgwMFRPJTaJP9Xk038nwQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: qca: generalise device address check
+To: Johan Hovold <johan@kernel.org>
+Cc: Doug Anderson <dianders@chromium.org>, Johan Hovold <johan+linaro@kernel.org>, 
+	Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
+	Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+Hi Johan,
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+On Sat, Apr 27, 2024 at 5:51=E2=80=AFAM Johan Hovold <johan@kernel.org> wro=
+te:
+>
+> On Fri, Apr 26, 2024 at 10:23:15AM -0700, Doug Anderson wrote:
+> > On Fri, Apr 26, 2024 at 9:00=E2=80=AFAM Johan Hovold <johan+linaro@kern=
+el.org> wrote:
+> > >
+> > > The default device address apparently comes from the NVM configuratio=
+n
+> > > file and can differ quite a bit.
+> > >
+> > > Store the default address when parsing the configuration file and use=
+ it
+> > > to determine whether the controller has been provisioned with an
+> > > address.
+> > >
+> > > This makes sure that devices without a unique address start as
+> > > unconfigured unless a valid address has been provided in the devicetr=
+ee.
+>
+> > >  int qca_read_soc_version(struct hci_dev *hdev, struct qca_btsoc_vers=
+ion *ver,
+> > >                          enum qca_btsoc_type soc_type)
+> > >  {
+> > > @@ -351,6 +348,11 @@ static void qca_tlv_check_data(struct hci_dev *h=
+dev,
+> > >
+> > >                         /* Update NVM tags as needed */
+> > >                         switch (tag_id) {
+> > > +                       case EDL_TAG_ID_BD_ADDR:
+> > > +                               if (tag_len !=3D sizeof(bdaddr_t))
+> > > +                                       break;
+> > > +                               memcpy(&config->bdaddr, tlv_nvm->data=
+, sizeof(bdaddr_t));
+> > > +                               break;
+> > >                         case EDL_TAG_ID_HCI:
+> >
+> > nit: blank line after "break" ?
+>
+> Possibly, the driver isn't really consistent here and only two case
+> statements have such a newline after break.
+>
+> > Also note that on my firmware I never see this tag and thus your patch
+> > breaks trogdor. Specifically I put a printout here and it never gets
+> > hit.
+>
+> Thanks for the quick test. As the parser is modifying the configuration
+> file I assumed it was correct and tested...
+>
+> > I printed all the tags/lengths:
+> >
+> > [   17.961087] DOUG: id 0xde02, len 0x0010
+> > [   17.965081] DOUG: id 0x0000, len 0x0000
+> > [   17.969050] DOUG: id 0x0000, len 0x0011
+> > [   17.973025] DOUG: id 0x0000, len 0x0a00
+> > [   17.976991] DOUG: id 0x0303, len 0x0303
+> > [   17.981066] DOUG: id 0x0033, len 0x1001
+> >
+> > Probably EDL_TAG_ID_BD_ADDR should have been 0xde02, not just 2.
+>
+> No, the parser is apparently broken and fails to consider an extra
+> four-byte header found in some NVM files and just happily parses and
+> potentially modifies (sic!) random bytes.
+>
+> I've fixed the parser so that it works also on configuration files with
+> the extra header (apnv??.bin, crnv??[u].bin) and can read out the
+> default address for all NVM files in linux-firmware that have one
+> (otherwise all-zeroes is printed below):
+>
+> bluetooth hci0: bd_addr =3D 39:80:10:00:00:20 (qca/apnv10.bin)
+> bluetooth hci0: bd_addr =3D 39:80:12:74:08:00 (qca/apnv11.bin)
+> bluetooth hci0: bd_addr =3D 39:90:21:64:07:00 (qca/crnv21.bin)
+> bluetooth hci0: bd_addr =3D 39:98:00:00:5a:ad (qca/crnv32.bin)
+> bluetooth hci0: bd_addr =3D 39:98:00:00:5a:ad (qca/crnv32u.bin)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:5a:ad (qca/hpnv21.301)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:5a:ad (qca/hpnv21.302)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:5a:ad (qca/hpnv21.309)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:5a:ad (qca/hpnv21.bin)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:5a:ad (qca/hpnv21.bin)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:5a:ad (qca/hpnv21g.301)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:5a:ad (qca/hpnv21g.302)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:5a:ad (qca/hpnv21g.309)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:5a:ad (qca/hpnv21g.bin)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:5a:ad (qca/htnv20.bin)
+> bluetooth hci0: bd_addr =3D 64:90:00:00:5a:ad (qca/msnv11.b09)
+> bluetooth hci0: bd_addr =3D 64:90:00:00:5a:ad (qca/msnv11.b0a)
+> bluetooth hci0: bd_addr =3D 64:90:00:00:5a:ad (qca/msnv11.bin)
+> bluetooth hci0: bd_addr =3D 61:47:aa:31:22:14 (qca/nvm_00130300.bin)
+> bluetooth hci0: bd_addr =3D 61:47:aa:32:44:07 (qca/nvm_00130302.bin)
+>
+> bluetooth hci0: bd_addr =3D 00:00:00:00:00:00 (qca/nvm_00230302.bin)
+>
+> bluetooth hci0: bd_addr =3D 00:00:00:00:5a:ad (qca/nvm_00440302.bin)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:5a:ad (qca/nvm_00440302_eu.bin)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:5a:ad (qca/nvm_00440302_i2s_eu.bi=
+n)
+>
+> bluetooth hci0: bd_addr =3D 00:00:00:00:00:00 (qca/nvm_usb_00000200.bin)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:00:00 (qca/nvm_usb_00000201.bin)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:00:00 (qca/nvm_usb_00000300.bin)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:00:00 (qca/nvm_usb_00000302.bin)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:00:00 (qca/nvm_usb_00000302_eu.bi=
+n)
+>
+> bluetooth hci0: bd_addr =3D 00:00:00:00:5a:ad (qca/nvm_usb_00130200_0104.=
+bin)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:5a:ad (qca/nvm_usb_00130200_0105.=
+bin)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:5a:ad (qca/nvm_usb_00130200_0106.=
+bin)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:5a:ad (qca/nvm_usb_00130200_0107.=
+bin)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:5a:ad (qca/nvm_usb_00130200_0109.=
+bin)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:5a:ad (qca/nvm_usb_00130200_0110.=
+bin)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:5a:ad (qca/nvm_usb_00130200.bin)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:5a:ad (qca/nvm_usb_00130201_010a.=
+bin)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:5a:ad (qca/nvm_usb_00130201_010b.=
+bin)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:5a:ad (qca/nvm_usb_00130201_0303.=
+bin)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:5a:ad (qca/nvm_usb_00130201.bin)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:5a:ad (qca/nvm_usb_00130201_gf_01=
+0a.bin)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:5a:ad (qca/nvm_usb_00130201_gf_01=
+0b.bin)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:5a:ad (qca/nvm_usb_00130201_gf_03=
+03.bin)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:5a:ad (qca/nvm_usb_00130201_gf.bi=
+n)
+> bluetooth hci0: bd_addr =3D 00:00:00:00:5a:ad (qca/nvm_usb_00190200.bin)
+>
+> It looks like we're being lucky and the parser is at least not
+> corrupting the configuration files with the extra header currently in
+> linux-firmware, but if it ever interprets a random 0x0011 or 0x001b word
+> as a tag it would.
+>
+> Fixing the parser means that we would start modifying the configuration
+> also for files with the extra header. This involves configuring the baud
+> rate and enabling a deep sleep feature.
+>
+> Presumably this is something that should be done also on Trogdor, but
+> this would obviously have to be tested first. I guess we can keep
+> skipping this step until it has been verified and just read out the
+> address for now.
+>
+> > > @@ -624,6 +626,9 @@ static int qca_check_bdaddr(struct hci_dev *hdev)
+> > >         if (bacmp(&hdev->public_addr, BDADDR_ANY))
+> > >                 return 0;
+> > >
+> > > +       if (!bacmp(&config->bdaddr, BDADDR_ANY))
+> > > +               return 0;
+> >
+> > The above test feels non-obvious enough to deserve a comment. Could
+> > you add one? That would also help alleviate my confusion since I
+> > _think_ your if test is unneeded and maybe wrong? Let's say that the
+> > firmware didn't have a default address stored in it. It still seems
+> > like we could try to read the address and then if the firmware gave
+> > back BDADDR_ANY (0) we should set the `HCI_QUIRK_USE_BDADDR_PROPERTY`
+> > property, right?
+>
+> You're right. I'll drop this check when revisiting this next week.
 
-On Tue, 30 Apr 2024 03:08:42 +0200 you wrote:
-> CYW43439 is a Wi-Fi + Bluetooth combo device from Infineon.
-> The Bluetooth part is capable of Bluetooth 5.2 BR/EDR/LE .
-> This chip is present e.g. on muRata 1YN module.
-> 
-> Extend the binding with its DT compatible using fallback
-> compatible string to "brcm,bcm4329-bt" which seems to be
-> the oldest compatible device. This should also prevent the
-> growth of compatible string tables in drivers. The existing
-> block of compatible strings is retained.
-> 
-> [...]
+I assume you will spin another version then?
 
-Here is the summary with links:
-  - [bluetooth-next,v3] dt-bindings: net: broadcom-bluetooth: Add CYW43439 DT binding
-    https://git.kernel.org/bluetooth/bluetooth-next/c/25acde2bb2fa
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+--=20
+Luiz Augusto von Dentz
