@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CB401B96B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CB8117164E;
 	Tue, 30 Apr 2024 17:08:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714496931; cv=none; b=s6eNr2cWybE/S1Kt+9wGLomNbydpUS9Y22saTyG6xqUDpBD83RpMjIenR/OBZ3tqDuO55dBPR3Os6OuDlNHCLr1lDIl0w3UbxyoSl2QEKYSbM0cOkYjhTQPs82/Cpy5sHFYCXH3823c3wbPIU18VRhqqD48KtcURPXgSsCrTGDY=
+	t=1714496931; cv=none; b=qdWCy35DgAeW4XC+w2tPVSLlBxPsKw5oZl9k7zzyi+uatIUoTAsOgmtawNJNKZMEGnwnyLiDeUCYm11vXLXbdlh1XEiQnD9xY6H6z9yGoQfg5u9BPB4DwheS60aL5vvMe/TNoDySGCdPHSVcH/82J/W64oMq+wtXdnQWqanh5SA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1714496931; c=relaxed/simple;
-	bh=FhLIyQvkEOjvJXNcLofvpaDIzcF1HD78LcwNNGOv7dk=;
+	bh=e0/6a8zI7qlfmUzhIdgSTDIhViQTmWLkZY4lOE8TrGY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ODJwCSiFx7+qexWsk0BCIYVLeefBRUscu95fA+VQaf9gTVK7Qf7erA5Smxqx/Eq3iNA2tBDtvuE/G9vpmEjBeaYCMArgI+7Kp+1SnhckkiznkXjAR1spaMbZHJxM6KEHbppSxzIPO82GUx8g1s8QmIwTEpk++83NYmnDs1a12UM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IO8L19Ia; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=LVEOm1DV17EyKeqDWlr4mCh7OI4ytta3xu9YDnL9pV9ZOrfTJwRieSv8VqKlZ5YiTnfqriwmcuOEbXEXkwoVEszV5n29nHoVGMgMHhZIF/Yhi8yQUjeiJSOfoVdEvNeHeF32KpBcaCsDiW/yoSzr8WYzMIA8gwiv3ilm8I9vSfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aMygWH51; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IO8L19Ia"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8830C4AF17;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aMygWH51"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3808C4AF14;
 	Tue, 30 Apr 2024 17:08:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1714496930;
-	bh=FhLIyQvkEOjvJXNcLofvpaDIzcF1HD78LcwNNGOv7dk=;
+	bh=e0/6a8zI7qlfmUzhIdgSTDIhViQTmWLkZY4lOE8TrGY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IO8L19Ias5sbXwBSDTvyl2itz5MfUrW0Nqsshuhh7cO6nrL8IpJXa7tDKl0swpU86
-	 bR9Q2Tn2lY2T2sn/oG/UiZMrB18hSSkfSDq1Lz5VZjI618bf9VOHGnsyJtr4irQ1fD
-	 8vug0yCAAVchNOe9+3CAInzdl3EBSMVarHvMAauAgyVDtEU2pw54UIqqs46m6r/H/M
-	 z2q/Cz7uhIL5Z/pjqZvZSGuUSlRj75KOh11mpncUB8hmYpZgGHgXGGfIjgv5Ovrgxk
-	 wtsclV7YshM4cuV4R0s1B3ahwicsU7rcWw6sLvNgULSaJIrxNZ7dthqFYp705HsnZ8
-	 yvjWO/d5nwJ6w==
+	b=aMygWH51AQDO8JXpP9CSUNV6DlRygTjpidNiAX95vt9fPYWmcW2VGeJCvQQP+vfwx
+	 IkkRBDO2ZS3h+KAdV1XyvUw+64syEd9VQCdoeqqBYFH3bNf7618NeQqXDDBgQ57ZZ+
+	 rMRsehAI3u0bj0kAmBE07NkeAz/RqcHOL81GyirCnLHo4f8XXurmfsj/xkbkzRfudC
+	 GjfM7Uoe4l10c0DZmDgav5K1H1lqB2uR4MGPD7PhshUabmoopkdTpkxCcDxQozKD5A
+	 t0irnv0wek/qE7m5a6lqyImPfE9ZeCoyIXT0xOjHuhUIC+u/dxeuEYJukdDPZwRGMg
+	 EqAAV9uwnuOqg==
 Received: from johan by xi.lan with local (Exim 4.97.1)
 	(envelope-from <johan+linaro@kernel.org>)
-	id 1s1qyK-0000000047c-3YZG;
+	id 1s1qyK-0000000047S-2qZF;
 	Tue, 30 Apr 2024 19:08:52 +0200
 From: Johan Hovold <johan+linaro@kernel.org>
 To: Marcel Holtmann <marcel@holtmann.org>,
@@ -39,9 +39,9 @@ Cc: Doug Anderson <dianders@chromium.org>,
 	linux-kernel@vger.kernel.org,
 	Johan Hovold <johan+linaro@kernel.org>,
 	stable@vger.kernel.org
-Subject: [PATCH v2 3/3] Bluetooth: qca: generalise device address check
-Date: Tue, 30 Apr 2024 19:07:41 +0200
-Message-ID: <20240430170741.15742-4-johan+linaro@kernel.org>
+Subject: [PATCH v2 1/3] Bluetooth: qca: add missing firmware sanity checks
+Date: Tue, 30 Apr 2024 19:07:39 +0200
+Message-ID: <20240430170741.15742-2-johan+linaro@kernel.org>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <20240430170741.15742-1-johan+linaro@kernel.org>
 References: <20240430170741.15742-1-johan+linaro@kernel.org>
@@ -53,114 +53,132 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The default device address apparently comes from the NVM configuration
-file and can differ quite a bit between controllers.
+Add the missing sanity checks when parsing the firmware files before
+downloading them to avoid accessing and corrupting memory beyond the
+vmalloced buffer.
 
-Store the default address when parsing the configuration file and use it
-to determine whether the controller has been provisioned with an
-address.
-
-This makes sure that devices without a unique address start as
-unconfigured unless a valid address has been provided in the devicetree.
-
-Fixes: 00567f70051a ("Bluetooth: qca: fix invalid device address check")
-Cc: stable@vger.kernel.org      # 6.5
-Cc: Doug Anderson <dianders@chromium.org>
-Cc: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+Fixes: 83e81961ff7e ("Bluetooth: btqca: Introduce generic QCA ROME support")
+Cc: stable@vger.kernel.org	# 4.10
 Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
 ---
- drivers/bluetooth/btqca.c | 21 ++++++++++++---------
- drivers/bluetooth/btqca.h |  2 ++
- 2 files changed, 14 insertions(+), 9 deletions(-)
+ drivers/bluetooth/btqca.c | 38 ++++++++++++++++++++++++++++++++------
+ 1 file changed, 32 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-index f6c9f89a6311..c6b2dd4d1716 100644
+index cfa71708397b..6743b0a79d7a 100644
 --- a/drivers/bluetooth/btqca.c
 +++ b/drivers/bluetooth/btqca.c
-@@ -15,9 +15,6 @@
+@@ -268,9 +268,10 @@ int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
+ }
+ EXPORT_SYMBOL_GPL(qca_send_pre_shutdown_cmd);
  
- #define VERSION "0.1"
- 
--#define QCA_BDADDR_DEFAULT (&(bdaddr_t) {{ 0xad, 0x5a, 0x00, 0x00, 0x00, 0x00 }})
--#define QCA_BDADDR_WCN3991 (&(bdaddr_t) {{ 0xad, 0x5a, 0x00, 0x00, 0x98, 0x39 }})
--
- int qca_read_soc_version(struct hci_dev *hdev, struct qca_btsoc_version *ver,
- 			 enum qca_btsoc_type soc_type)
+-static void qca_tlv_check_data(struct hci_dev *hdev,
++static int qca_tlv_check_data(struct hci_dev *hdev,
+ 			       struct qca_fw_config *config,
+-		u8 *fw_data, enum qca_btsoc_type soc_type)
++			       u8 *fw_data, size_t fw_size,
++			       enum qca_btsoc_type soc_type)
  {
-@@ -387,6 +384,14 @@ static int qca_tlv_check_data(struct hci_dev *hdev,
+ 	const u8 *data;
+ 	u32 type_len;
+@@ -286,6 +287,9 @@ static void qca_tlv_check_data(struct hci_dev *hdev,
  
+ 	switch (config->type) {
+ 	case ELF_TYPE_PATCH:
++		if (fw_size < 7)
++			return -EINVAL;
++
+ 		config->dnld_mode = QCA_SKIP_EVT_VSE_CC;
+ 		config->dnld_type = QCA_SKIP_EVT_VSE_CC;
+ 
+@@ -294,6 +298,9 @@ static void qca_tlv_check_data(struct hci_dev *hdev,
+ 		bt_dev_dbg(hdev, "File version      : 0x%x", fw_data[6]);
+ 		break;
+ 	case TLV_TYPE_PATCH:
++		if (fw_size < sizeof(struct tlv_type_hdr) + sizeof(struct tlv_type_patch))
++			return -EINVAL;
++
+ 		tlv = (struct tlv_type_hdr *)fw_data;
+ 		type_len = le32_to_cpu(tlv->type_len);
+ 		tlv_patch = (struct tlv_type_patch *)tlv->data;
+@@ -333,6 +340,9 @@ static void qca_tlv_check_data(struct hci_dev *hdev,
+ 		break;
+ 
+ 	case TLV_TYPE_NVM:
++		if (fw_size < sizeof(struct tlv_type_hdr))
++			return -EINVAL;
++
+ 		tlv = (struct tlv_type_hdr *)fw_data;
+ 
+ 		type_len = le32_to_cpu(tlv->type_len);
+@@ -341,17 +351,26 @@ static void qca_tlv_check_data(struct hci_dev *hdev,
+ 		BT_DBG("TLV Type\t\t : 0x%x", type_len & 0x000000ff);
+ 		BT_DBG("Length\t\t : %d bytes", length);
+ 
++		if (fw_size < length + (tlv->data - fw_data))
++			return -EINVAL;
++
+ 		idx = 0;
+ 		data = tlv->data;
+-		while (idx < length) {
++		while (idx < length - sizeof(struct tlv_type_nvm)) {
+ 			tlv_nvm = (struct tlv_type_nvm *)(data + idx);
+ 
+ 			tag_id = le16_to_cpu(tlv_nvm->tag_id);
+ 			tag_len = le16_to_cpu(tlv_nvm->tag_len);
+ 
++			if (length < idx + sizeof(struct tlv_type_nvm) + tag_len)
++				return -EINVAL;
++
  			/* Update NVM tags as needed */
  			switch (tag_id) {
-+			case EDL_TAG_ID_BD_ADDR:
-+				if (tag_len != sizeof(bdaddr_t))
+ 			case EDL_TAG_ID_HCI:
++				if (tag_len < 3)
 +					return -EINVAL;
 +
-+				memcpy(&config->bdaddr, tlv_nvm->data, sizeof(bdaddr_t));
+ 				/* HCI transport layer parameters
+ 				 * enabling software inband sleep
+ 				 * onto controller side.
+@@ -367,6 +386,9 @@ static void qca_tlv_check_data(struct hci_dev *hdev,
+ 				break;
+ 
+ 			case EDL_TAG_ID_DEEP_SLEEP:
++				if (tag_len < 1)
++					return -EINVAL;
 +
-+				break;
-+
- 			case EDL_TAG_ID_HCI:
- 				if (tag_len < 3)
- 					return -EINVAL;
-@@ -661,7 +666,7 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
- }
- EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
+ 				/* Sleep enable mask
+ 				 * enabling deep sleep feature on controller.
+ 				 */
+@@ -375,14 +397,16 @@ static void qca_tlv_check_data(struct hci_dev *hdev,
+ 				break;
+ 			}
  
--static int qca_check_bdaddr(struct hci_dev *hdev)
-+static int qca_check_bdaddr(struct hci_dev *hdev, const struct qca_fw_config *config)
- {
- 	struct hci_rp_read_bd_addr *bda;
- 	struct sk_buff *skb;
-@@ -685,10 +690,8 @@ static int qca_check_bdaddr(struct hci_dev *hdev)
- 	}
- 
- 	bda = (struct hci_rp_read_bd_addr *)skb->data;
--	if (!bacmp(&bda->bdaddr, QCA_BDADDR_DEFAULT) ||
--	    !bacmp(&bda->bdaddr, QCA_BDADDR_WCN3991)) {
-+	if (!bacmp(&bda->bdaddr, &config->bdaddr))
- 		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
--	}
- 
- 	kfree_skb(skb);
- 
-@@ -716,7 +719,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 		   enum qca_btsoc_type soc_type, struct qca_btsoc_version ver,
- 		   const char *firmware_name)
- {
--	struct qca_fw_config config;
-+	struct qca_fw_config config = {};
- 	int err;
- 	u8 rom_ver = 0;
- 	u32 soc_ver;
-@@ -901,7 +904,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+-			idx += (sizeof(u16) + sizeof(u16) + 8 + tag_len);
++			idx += sizeof(struct tlv_type_nvm) + tag_len;
+ 		}
  		break;
+ 
+ 	default:
+ 		BT_ERR("Unknown TLV type %d", config->type);
+-		break;
++		return -EINVAL;
  	}
++
++	return 0;
+ }
  
--	err = qca_check_bdaddr(hdev);
-+	err = qca_check_bdaddr(hdev, &config);
- 	if (err)
- 		return err;
+ static int qca_tlv_send_segment(struct hci_dev *hdev, int seg_size,
+@@ -532,7 +556,9 @@ static int qca_download_firmware(struct hci_dev *hdev,
+ 	memcpy(data, fw->data, size);
+ 	release_firmware(fw);
  
-diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
-index dc31984f71dc..49ad668d0d0b 100644
---- a/drivers/bluetooth/btqca.h
-+++ b/drivers/bluetooth/btqca.h
-@@ -29,6 +29,7 @@
- #define EDL_PATCH_CONFIG_RES_EVT	(0x00)
- #define QCA_DISABLE_LOGGING_SUB_OP	(0x14)
+-	qca_tlv_check_data(hdev, config, data, soc_type);
++	ret = qca_tlv_check_data(hdev, config, data, size, soc_type);
++	if (ret)
++		return ret;
  
-+#define EDL_TAG_ID_BD_ADDR		2
- #define EDL_TAG_ID_HCI			(17)
- #define EDL_TAG_ID_DEEP_SLEEP		(27)
- 
-@@ -94,6 +95,7 @@ struct qca_fw_config {
- 	uint8_t user_baud_rate;
- 	enum qca_tlv_dnld_mode dnld_mode;
- 	enum qca_tlv_dnld_mode dnld_type;
-+	bdaddr_t bdaddr;
- };
- 
- struct edl_event_hdr {
+ 	segment = data;
+ 	remain = size;
 -- 
 2.43.2
 
