@@ -1,181 +1,93 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout.web.de (mout.web.de [212.227.15.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F5501BF20;
-	Tue, 30 Apr 2024 07:07:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1039714AA9;
+	Tue, 30 Apr 2024 07:33:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714460860; cv=none; b=WuxTwYcEeSZ9migh7l1zcaQnaUvnEPv+kqeIRN+LhTVxzSU8f71WUeAvtRS2oDryRB38z+ccHLd/Mdgm57rhjv19z/GaCrdKhqytw0PTZSMrF5tqGv1y9GswIMuapLhR+LWbqKQJNgOxxGJvSzSxhdvSwHvgXGM51sJewB6mDHo=
+	t=1714462427; cv=none; b=NxMJy6ve49iirmDnnZFsbEY588yuJarvk4AbuCKVFlL6g+iGLdmJnDQ+Zj8ymqiveno6mkeMyyjxAMG2LkHmX9C7gYObBx5GgCNf3W1uUfQuEp9ELBRrw2rtHCWHWCWRulPvCXiRepokNs+tIEydN4XJ0NHn/YGBd8ODdxu/vEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714460860; c=relaxed/simple;
-	bh=TxxoVyNCTc8zKzy9eUibWwwSsZ9EVbgR21o1ZrGuGEc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WTeSWrXjzYxryTbiEpBBema+uTh9jmW6uLPXf3pj7cNWzYKJShOPMR46NjOyj8x7c/HA7qmtGgFlX+++f1VrqmS2vk2HjUoQ3oH4sj7uImWnsatrhyIPVVViX+mEb4mgpj5Up3XAKh3hnYQ+IOb7HG/Y/BZlq22EACVml7Yy+HM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xp02gZOu; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1714462427; c=relaxed/simple;
+	bh=7dyCd+XT/wrQkCsgsqTU/+v+pFnIA0EzpEmxVk6QQ7Y=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=Fjl+Y1hPqlp2FmEFY2yLLBLaZ33eVKAe5VRYCwGyuJctRVb63BpuuM8oPWe/DIHv+9sBYzJFIDchAaSCg831sSmxF+f8OUevCmAFCD5t5Ek4L0fOaySWMzU/lEwXH76Dz5tN3cDVZGzRueoeCfDloerNgqZ+gLji0k+3Zv7vzrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=W8siq2RI; arc=none smtp.client-ip=212.227.15.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xp02gZOu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC6B9C2BBFC;
-	Tue, 30 Apr 2024 07:07:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714460859;
-	bh=TxxoVyNCTc8zKzy9eUibWwwSsZ9EVbgR21o1ZrGuGEc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Xp02gZOuaCjcoryLVoJCy0y7IiN90uQXlnQ1kWz3gvaxiT03THk2OtyM1+FYr4SbQ
-	 Yfzat1QYHu7zWQn8P/dN50FB69HOlQ4MzhEqgc2cuievryMl9tZ9NFwoPkL6xja3Q7
-	 gsQ6m+CIndtJLJ/cP4L3RUh7kad5yEFTdLABCY/fqiW4UJ4bMEqvOjtF6QiR7eisuM
-	 JYBUyJzHcnwt9e8qKvfoX5Oadz3bpzi//Mm82cNKQBfHeu6NMSFxcptB3TPKKu6L60
-	 aEkGEj+tSC8VdVmSRjmviTZDy2ebVr5f7aSb+k6btejZ+/F6e+2T3Lcl8bFEIXlyyW
-	 T5XY6CzBMGg4g==
-Received: from johan by xi.lan with local (Exim 4.97.1)
-	(envelope-from <johan@kernel.org>)
-	id 1s1haV-000000001Uw-2oBY;
-	Tue, 30 Apr 2024 09:07:40 +0200
-Date: Tue, 30 Apr 2024 09:07:39 +0200
-From: Johan Hovold <johan@kernel.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Janaki Ramaiah Thota <quic_janathot@quicinc.com>,
-	Doug Anderson <dianders@chromium.org>,
-	Johan Hovold <johan+linaro@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org, quic_mohamull@quicinc.com,
-	quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com
-Subject: Re: [PATCH] Bluetooth: qca: generalise device address check
-Message-ID: <ZjCYu2pc8376rjXk@hovoldconsulting.com>
-References: <20240426155801.25277-1-johan+linaro@kernel.org>
- <CAD=FV=V-pG9+5fLonNvydmjS=ziUFUHAyF8T7YTkEHiO405aSA@mail.gmail.com>
- <ZizKmtcUIYAMpvOQ@hovoldconsulting.com>
- <dbba45d2-f955-4d3a-aeab-26b0900d5823@quicinc.com>
- <Zi-ohCWv58d2h5VM@hovoldconsulting.com>
- <CABBYNZJyqrNKebwPPPqjOAdrkpBJ0fqHyD2iVtypeQKCDcL+AQ@mail.gmail.com>
- <CABBYNZJyRR9FA7TYN4+aWMtG9FPUBWMvCtMNUfvaEzxVcYOt-g@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="W8siq2RI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1714462412; x=1715067212; i=markus.elfring@web.de;
+	bh=7dyCd+XT/wrQkCsgsqTU/+v+pFnIA0EzpEmxVk6QQ7Y=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=W8siq2RIuAF9aG5uFEjllD1snUDaT/M9pQ8Ok9h+rku2TmMh6KVg3YF+Gpm5cE2C
+	 X8m2UDjP6GEVUSOOVcXas/i6arH+8SfxGzhqdByJbExVLm2Hog1nS6CLACd8XZjh/
+	 dFXTy1rzwvC0q7ef7YNomfofgXEPUSAq0V29na13JPrEWtuTBXpu6GZrN6In7O01f
+	 hHrnHcr/C1X6pFJb6AfllU0xhL3L6hWYBufcStG9+K+DjaYRLOJjUSWzDTFtUkiV+
+	 nz3iM3YnlyptKA7O3mWEudwLpFoBzPtbxhqcA7AbpmbaWimoE/4wjkh4WhU1mGUmf
+	 kwMJPTsOmeBujuhHtQ==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.85.95]) by smtp.web.de (mrweb006
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MPrLL-1sFmbX1LT1-00McyD; Tue, 30
+ Apr 2024 09:33:32 +0200
+Message-ID: <8b274e8b-ca1b-47a6-90f9-eb2c9d4a538e@web.de>
+Date: Tue, 30 Apr 2024 09:33:14 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABBYNZJyRR9FA7TYN4+aWMtG9FPUBWMvCtMNUfvaEzxVcYOt-g@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+To: Sungwoo Kim <iam@sung-woo.kim>, linux-bluetooth@vger.kernel.org
+Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org,
+ Dan Carpenter <dan.carpenter@linaro.org>,
+ "Dave (Jing) Tian" <daveti@purdue.edu>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Marcel Holtmann <marcel@holtmann.org>
+References: <20240430063209.584244-1-iam@sung-woo.kim>
+Subject: Re: [PATCH v3] Bluetooth: L2CAP: Fix slab-use-after-free in
+ l2cap_connect()
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20240430063209.584244-1-iam@sung-woo.kim>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:QvHTTJRCPvNgpxwGrd1n/gHVdpelP5AGgJB+Cx7Am88MdC5hGOo
+ 2mwAeUwHGVS+XCPonspE35PEzsPaApe94hAcBynnJ7GCfp/vT0s7xsasBEI0AS5SelaID1s
+ aDo70ATno5bAcOMhAHGHe4BRViDwq5d5vKfb14rWiBb1X6gL73xbjim2FvCVpHEe69TPrGJ
+ lIKBSzzCAMsWETn80R8Eg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:SDzHgZwpg38=;uxcivH2DTMrR2XSBCJLrLol/OUT
+ lHdQ/sOmsEO7kKMCaOu6SbuLXpdTX4aNSpvMOSswlXqIML8PRrdsmLgJr/XmLvVfQAEU3GTUi
+ W0ersz6ZMJNGqH5A4olwFWo+SHcTjgjFA1NKwxxCRq/z1KqZivm3J7vD+tsyWFOolhV0T0BZ4
+ DxYtm2pyoijArs3Y3WMZ+tgI2ER178eaPd2Yl9W3J8aMvVjnXG+z2on1J+dVoBXefvNGVMWzb
+ Xd291QhjI5+UCMzJG4ZwrDxh+ygxDai3WiI3iKAh0lPQ0xQ9QNpd3eJtTP3GryjPnP9b266hy
+ LJbz5tjpUomPjSkBB/2Qx/ilo4vFjWR6TWY9jtlguqdCC4q6lIgMzu3xlE8f0XEx/pzIIlgtT
+ xFTln/MTv3urzrQlY8yS74EyTJxv0RxfIqaVwt/zg+N+Qsqq59ZJxyr7/25OtF2WmHdQ8Knj+
+ pClv2Z2dG4f8WDOXwh2Ss08f/FWwzPBXErxkHED05JcXYm2D+19uDiNbLhF5AhHSO+de3fusN
+ OUDsB3G2wgQkfNEmRjLMKveAEMdDPuDQk+1kYLovVBRSQfgxekWLRaK+y+md2c6qysrqRAX18
+ wfwcSl4KMuRei5rlX4+7sPWmm0+p08nh5FDrdxhi9FkFXlc89pqlX/mHd4xC51dr+yc0jLQ2E
+ p+TPndSp3cUWHCskGEBT2tbltHuMH11QvNNFBINBtS81frCnGpammjaNy3XUi3dLSyXmuHjmv
+ bHu/OPs+VEUs2McE8Mh94qAU+UcEXyx8dfuUAkJHCRwIc1N2aZgxM1tArnaTgXivcMKUCilCY
+ hN0ft07K9i5t/OUXZr1QpDPKbjsNfvtv+628aOa+YKgno=
 
-On Mon, Apr 29, 2024 at 01:31:53PM -0400, Luiz Augusto von Dentz wrote:
-> On Mon, Apr 29, 2024 at 1:12 PM Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> > On Mon, Apr 29, 2024 at 10:02 AM Johan Hovold <johan@kernel.org> wrote:
-> > > On Mon, Apr 29, 2024 at 03:34:32PM +0530, Janaki Ramaiah Thota wrote:
+> Extend a critical section to prevent chan from early freeing.
+=E2=80=A6
 
-> > > > Having a default BDA list from NVM BDA tag value will prevent developers
-> > > > from using the device if there is no user space app(In Fluoride) to set
-> > > > the BDA. Therefore, we are requesting to use default address check patch,
-> > > > so that developer can change the NVM BDA to make use of the device.
-> > >
-> > > But a developer on such an old platform that can patch and replace the
-> > > NVM configuration file should also be able to just disable the check in
-> > > the driver right (e.g. by commenting out the call to
-> > > qca_check_bdaddr())?
-> > >
-> > > >   List Of default Addresses:
-> > > >   ---------------------------------------------------------
-> > > > |       BDA          |      Chipset                       |
-> > > >   ---------------------------------------------------------
-> > > > | 39 80 10 00 00 20  |  WCN3988 with ROM Version 0x0200   |
-> > > >   ---------------------------------------------------------
-> > > > | 39 80 12 74 08 00  |  WCN3988 with ROM Version 0x0201   |
-> > > >   ---------------------------------------------------------
-> > > > | 39 90 21 64 07 00  |  WCN3990                           |
-> > > >   ---------------------------------------------------------
-> > > > | 39 98 00 00 5A AD  |  WCN3991                           |
-> > > >   ---------------------------------------------------------
-> > > > | 00 00 00 00 5A AD  |  QCA DEFAULT                       |
-> > > >   ---------------------------------------------------------
-> > >
-> > > What about WCN6750 and 64:90:00:00:5a:ad?
-> > >
-> > > And then there's currently also:
-> > >
-> > > > > bluetooth hci0: bd_addr = 61:47:aa:31:22:14 (qca/nvm_00130300.bin)
-> > > > > bluetooth hci0: bd_addr = 61:47:aa:32:44:07 (qca/nvm_00130302.bin)
-> > >
-> > > Which controllers use these configurations?
-> >
-> > These are not unique addresses though, we can't just have addresses by
-> > chipset address mapping logic as that would cause address clashes over
-> > the air, e.g. if there are other devices with the same chipset in the
-> > vicinity.
-> 
-> I see where this is going now, the firmware actually contain these
-> duplicated addresses which then are checked and cause
-> HCI_QUIRK_USE_BDADDR_PROPERTY then the tries
-> hci_dev_get_bd_addr_from_property which loads the local-bd-address
-> property from the parente device (SOC?), btw that could also have an
-> invalid/duplicated address.
+Such a data processing improvement is nice.
 
-Right, the expectation is that vendors don't abuse this and leave the
-address in the devicetree as all-zero unless the boot firmware has
-access to a unique address.
 
-HCI_QUIRK_USE_BDADDR_PROPERTY effectively implies
-HCI_QUIRK_INVALID_BDADDR, that is, both quirks marks the controller
-address as invalid. The only difference is that the former also goes out
-and checks if there's an address in the devicetree that can be used
-instead.
+Will an other distribution of email addresses over recipient lists be more=
+ helpful?
 
-The 'local-bd-address' property is used on boards where the boot
-firmware has access to some storage for the address and updates the
-devicetree with the board-specific address before passing the DT to the
-kernel.
+Can you imagine that the usage of the message field =E2=80=9CTo=E2=80=9D w=
+ould occasionally be
+more appropriate for subsequent patch communication?
 
-As I've mentioned before, we should probably just drop
-HCI_QUIRK_USE_BDADDR_PROPERTY eventually and always look for an address
-in the devicetree when HCI_QUIRK_INVALID_BDADDR is set instead.
-
-We could take that one step further and always let the devicetree
-override the controller address as Doug suggested, but I'm not sure
-that's what we want to do generally.
-
-Either way, these are later questions.
-
-> Anyway the fact that firmware loading itself is programming a
-> potentially duplicated address already seems wrong enough to me,
-> either it shall leave it as 00... or set a valid address otherwise we
-> always risk missing yet another duplicate address being introduced and
-> then used over the air causing all sorts of problems for users.
-> 
-> So to be clear, QCA firmware shall never attempt to flash anything
-> other than 00:00:00:00:00:00 if you don't have a valid and unique
-> identity address, so we can get rid of this table altogether.
-
-Nothing is being flashed, but when the controller has not been
-provisioned with an address, the address in the NVM configuration file
-is used.
-
-And we need to handle this in some way, as the configuration files are
-already out there (e.g. in linux-firmware) and are honoured by the QCA
-firmware.
-
-My patch reads out the default address from the configuration file
-before downloading it during setup() so that no matter what address is
-set this way, it will be treated as non-unique and invalid.
-
-This way we don't need to maintain any table in the kernel and we don't
-risk any regressions if the address is ever changed in a later firmware
-update.
-
-The only downside is that developers on old platforms that don't have
-any user space tools to set a valid address (e.g. btmgmt) cannot set
-an address by patching the firmware file.
-
-But I don't think we need to care about that. I assume that in most
-cases those developers all just use the default address, with the risk
-of collisions that that implies.
-
-We have a standard APIs for configuring the address, just use that.
-
-> ps: If the intention is to have these addresses for testing then these
-> firmwares files shall probably be kept private, since as explained
-> above the use of duplicated addresses will cause problems to users who
-> have no idea they have to be changed.
-
-Johan
+Regards,
+Markus
