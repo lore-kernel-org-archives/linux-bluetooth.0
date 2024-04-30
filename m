@@ -1,67 +1,47 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF1FE13CFA0;
-	Tue, 30 Apr 2024 12:52:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E811242AA5;
+	Tue, 30 Apr 2024 13:07:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714481563; cv=none; b=e92u3gAi4XPAAAnJYi+4OJehIwJ+/zORq6YMZodv5z1KKJbf7VtwfS7JBWBpCaie+KFLjFLdEr2dsdL5Vie2gAwIa+NjfjsJOXHp0AEJC5RSrT/PSlrLLbj6ldLM+KmLkIE/rfRDRbhir4G1uV1A4qoBwEooSm9CJif5c4EBUIo=
+	t=1714482446; cv=none; b=QJrXMxJK2dzyrJThXq6b/wjq3iqj0ISTKDPYT8IlP5qLDIdqG+d9I+tacWhHMpo8cy6B5uwSIyVnrIJlqxwnwOQwsFZf1DA/lippVoI/gaLdneBdO3WyMLw/dzfX7qh7+tqTZUOE9sVuBTPrgQqi3mTwspmW90abfIDVLDcq1OM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714481563; c=relaxed/simple;
-	bh=OxU85oAy558PwYwZTQ517FVyJ7ZT+kivOq/1XLeyhe0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=FcJTSHY0Ky1g7SFlg8ui1dmJeCOnnW+osoyB+QSyRPZ7bL2WPzUzHz5OmQv628wMQDH1IYtNcfPUr2JcxgPNd24MJfuug3s2Y2HBHuhGU2hS4QDSAChov2XF8BHiPo5KVUA/ISWfVz0BV+ISI/nVT7NnYJrJ1sD5XWhSnlqu17I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=FHvCyF2Y; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1714482446; c=relaxed/simple;
+	bh=qiB8b8aLGWUB+eW++cRid6E+04uq3CftdA6/Q44apIo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MbbfRYT6A986sTUlDX/L8xuQgRDpUVSEgylVxeCVJQOGFS+w4Q+M2xozDFI3apvvuPscYspkyze8gTOYb2H9E1vpcx7C7gvi7QGwOnPGJ3Ac5XuRD8DV89j8uxQE4KuOF5bPdak5LoY3S8+4oEtO5XvT2AKBjso4VD/BcCyN01s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UBJeq0bb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="FHvCyF2Y"
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 43U4TgG2000719;
-	Tue, 30 Apr 2024 12:52:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=8ztRiSBS+igx3HdOPHfVKiPYqMExuVhtHedHDRPhPuo=; b=FH
-	vCyF2Y7MhZ2BCpVNZK/fvB+lkOpiceXmWveC0hXax/SSI0oouCWtH14uFTZwWagR
-	bzJE1nF38ifLY3QjWWDhC+E9h3Y1GMdVMYlYWP5NcS4MwcxogH4rYH5+PZXPDZ2O
-	pF1feNEfGzqDAMNE2yGIwO9eZC86vRpdn5sis6o9f3/RoP68J9lqJs9PPpcXnrHV
-	+hmETgw6x3NJAfGyP5rQ5u5BUuU1Vfw1Ai1DsOZycYNQDnXrucmfDuIMMiYcpCQN
-	ZYoTOfQylIH9odKZ0bQ/lG5j6Xuv9eQkR478nFwgu94tR9XzHx6uM+B4nZoQsS2i
-	yiGd5WWUjXXD85l+K3jQ==
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xtsnm98se-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 30 Apr 2024 12:52:34 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43UCqXKc002616
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 30 Apr 2024 12:52:33 GMT
-Received: from [10.218.29.219] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 30 Apr
- 2024 05:52:30 -0700
-Message-ID: <9eebd77b-c070-4260-a979-9b97f14eb5b1@quicinc.com>
-Date: Tue, 30 Apr 2024 18:22:26 +0530
-Precedence: bulk
-X-Mailing-List: linux-bluetooth@vger.kernel.org
-List-Id: <linux-bluetooth.vger.kernel.org>
-List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UBJeq0bb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 751C5C2BBFC;
+	Tue, 30 Apr 2024 13:07:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714482445;
+	bh=qiB8b8aLGWUB+eW++cRid6E+04uq3CftdA6/Q44apIo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UBJeq0bbPN317U9uxx2fIaIucH6xI2Fc7aKbxOwOVV6pLDIovvHFJjiwY9CiiKt0k
+	 cMFeGHF/xDFlqhnZISR8MnYp74hPGMrvGK1f67KZC4iCpAtkDYR2QQSvREBPtFphs0
+	 RKeM8Qr85mIh2L33tfOFplIUlzyWOi5TWdJXeU/wCJX9Nr/HM/0viGOTQ7Ohj1VMVL
+	 pBbKyNxXASVF42DCSYtwuhTieLO2zyBAwgbzdGCjx5s+EFT1ME4VoUf6M9bEB/9xdE
+	 N5Ke11VPDfWk6rUgWK7H0DUmuV/2BNe7QcbuPGY52qi3qCR12fmruRszx9fWUqILfP
+	 gGMkL0VEqKaBA==
+Received: from johan by xi.lan with local (Exim 4.97.1)
+	(envelope-from <johan@kernel.org>)
+	id 1s1nCf-000000007Ur-3g1n;
+	Tue, 30 Apr 2024 15:07:26 +0200
+Date: Tue, 30 Apr 2024 15:07:25 +0200
+From: Johan Hovold <johan@kernel.org>
+To: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Doug Anderson <dianders@chromium.org>,
+	Johan Hovold <johan+linaro@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org, quic_mohamull@quicinc.com,
+	quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com
 Subject: Re: [PATCH] Bluetooth: qca: generalise device address check
-Content-Language: en-US
-To: Johan Hovold <johan@kernel.org>,
-        Luiz Augusto von Dentz
-	<luiz.dentz@gmail.com>
-CC: Doug Anderson <dianders@chromium.org>,
-        Johan Hovold
-	<johan+linaro@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <stable@vger.kernel.org>, <quic_mohamull@quicinc.com>,
-        <quic_hbandi@quicinc.com>, <quic_anubhavg@quicinc.com>
+Message-ID: <ZjDtDRCHT3z-3nHh@hovoldconsulting.com>
 References: <20240426155801.25277-1-johan+linaro@kernel.org>
  <CAD=FV=V-pG9+5fLonNvydmjS=ziUFUHAyF8T7YTkEHiO405aSA@mail.gmail.com>
  <ZizKmtcUIYAMpvOQ@hovoldconsulting.com>
@@ -70,120 +50,55 @@ References: <20240426155801.25277-1-johan+linaro@kernel.org>
  <CABBYNZJyqrNKebwPPPqjOAdrkpBJ0fqHyD2iVtypeQKCDcL+AQ@mail.gmail.com>
  <CABBYNZJyRR9FA7TYN4+aWMtG9FPUBWMvCtMNUfvaEzxVcYOt-g@mail.gmail.com>
  <ZjCYu2pc8376rjXk@hovoldconsulting.com>
-From: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
-In-Reply-To: <ZjCYu2pc8376rjXk@hovoldconsulting.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: CzvRTJBPBTe-3yKPIP7ecTTIDXaqcRCQ
-X-Proofpoint-ORIG-GUID: CzvRTJBPBTe-3yKPIP7ecTTIDXaqcRCQ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-04-30_06,2024-04-30_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
- suspectscore=0 malwarescore=0 spamscore=0 lowpriorityscore=0
- impostorscore=0 adultscore=0 mlxlogscore=999 phishscore=0 bulkscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2404010003 definitions=main-2404300091
+ <9eebd77b-c070-4260-a979-9b97f14eb5b1@quicinc.com>
+Precedence: bulk
+X-Mailing-List: linux-bluetooth@vger.kernel.org
+List-Id: <linux-bluetooth.vger.kernel.org>
+List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9eebd77b-c070-4260-a979-9b97f14eb5b1@quicinc.com>
 
-Hi Johan and Luiz,
+On Tue, Apr 30, 2024 at 06:22:26PM +0530, Janaki Ramaiah Thota wrote:
+> On 4/30/2024 12:37 PM, Johan Hovold wrote:
+> > On Mon, Apr 29, 2024 at 01:31:53PM -0400, Luiz Augusto von Dentz wrote:
 
-On 4/30/2024 12:37 PM, Johan Hovold wrote:
-> On Mon, Apr 29, 2024 at 01:31:53PM -0400, Luiz Augusto von Dentz wrote:
->> On Mon, Apr 29, 2024 at 1:12 PM Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> On Mon, Apr 29, 2024 at 10:02 AM Johan Hovold <johan@kernel.org> wrote:
->>>> On Mon, Apr 29, 2024 at 03:34:32PM +0530, Janaki Ramaiah Thota wrote:
+> >> Anyway the fact that firmware loading itself is programming a
+> >> potentially duplicated address already seems wrong enough to me,
+> >> either it shall leave it as 00... or set a valid address otherwise we
+> >> always risk missing yet another duplicate address being introduced and
+> >> then used over the air causing all sorts of problems for users.
+> >>
+> >> So to be clear, QCA firmware shall never attempt to flash anything
+> >> other than 00:00:00:00:00:00 if you don't have a valid and unique
+> >> identity address, so we can get rid of this table altogether.
+> > 
 > 
->>>
->>> These are not unique addresses though, we can't just have addresses by
->>> chipset address mapping logic as that would cause address clashes over
->>> the air, e.g. if there are other devices with the same chipset in the
->>> vicinity.
->>
->> I see where this is going now, the firmware actually contain these
->> duplicated addresses which then are checked and cause
->> HCI_QUIRK_USE_BDADDR_PROPERTY then the tries
->> hci_dev_get_bd_addr_from_property which loads the local-bd-address
->> property from the parente device (SOC?), btw that could also have an
->> invalid/duplicated address.
-> 
-> Right, the expectation is that vendors don't abuse this and leave the
-> address in the devicetree as all-zero unless the boot firmware has
-> access to a unique address.
-> 
-> HCI_QUIRK_USE_BDADDR_PROPERTY effectively implies
-> HCI_QUIRK_INVALID_BDADDR, that is, both quirks marks the controller
-> address as invalid. The only difference is that the former also goes out
-> and checks if there's an address in the devicetree that can be used
-> instead.
-> 
-> The 'local-bd-address' property is used on boards where the boot
-> firmware has access to some storage for the address and updates the
-> devicetree with the board-specific address before passing the DT to the
-> kernel.
-> 
-> As I've mentioned before, we should probably just drop
-> HCI_QUIRK_USE_BDADDR_PROPERTY eventually and always look for an address
-> in the devicetree when HCI_QUIRK_INVALID_BDADDR is set instead.
-> 
-> We could take that one step further and always let the devicetree
-> override the controller address as Doug suggested, but I'm not sure
-> that's what we want to do generally.
-> 
-> Either way, these are later questions.
-> 
->> Anyway the fact that firmware loading itself is programming a
->> potentially duplicated address already seems wrong enough to me,
->> either it shall leave it as 00... or set a valid address otherwise we
->> always risk missing yet another duplicate address being introduced and
->> then used over the air causing all sorts of problems for users.
->>
->> So to be clear, QCA firmware shall never attempt to flash anything
->> other than 00:00:00:00:00:00 if you don't have a valid and unique
->> identity address, so we can get rid of this table altogether.
-> 
+> Yes agree with this point.
+> BD address should be treated as invalid if it is 00:00:00:00:00:00.
 
-Yes agree with this point.
-BD address should be treated as invalid if it is 00:00:00:00:00:00.
-NVM Tag 2: bd address is default BD address (other than 0), should be
-configured as valid address and as its not unique address and it will
-be same for all devices so mark it is configured but still allow
-user-space to change the address.
+We all agree on that.
 
-> Nothing is being flashed, but when the controller has not been
-> provisioned with an address, the address in the NVM configuration file
-> is used.
-> 
-> And we need to handle this in some way, as the configuration files are
-> already out there (e.g. in linux-firmware) and are honoured by the QCA
-> firmware.
-> 
-> My patch reads out the default address from the configuration file
-> before downloading it during setup() so that no matter what address is
-> set this way, it will be treated as non-unique and invalid.
-> 
-> This way we don't need to maintain any table in the kernel and we don't
-> risk any regressions if the address is ever changed in a later firmware
-> update.
-> 
-> The only downside is that developers on old platforms that don't have
-> any user space tools to set a valid address (e.g. btmgmt) cannot set
-> an address by patching the firmware file.
-> 
-> But I don't think we need to care about that. I assume that in most
-> cases those developers all just use the default address, with the risk
-> of collisions that that implies.
-> 
-> We have a standard APIs for configuring the address, just use that.
-> 
->> ps: If the intention is to have these addresses for testing then these
->> firmwares files shall probably be kept private, since as explained
->> above the use of duplicated addresses will cause problems to users who
->> have no idea they have to be changed.
-> 
-> Johan
--Janaki Ram
+> NVM Tag 2: bd address is default BD address (other than 0), should be
+> configured as valid address and as its not unique address and it will
+> be same for all devices so mark it is configured but still allow
+> user-space to change the address.
+
+But here we disagree. A non-unique address is not a valid one as it will
+cause collisions if you have more than one such controller.
+
+I understand that this may be convenient/good enough for developers in
+some cases, but this can hurt end users that do not realise why things
+break.
+
+And a developer can always configure an address manually or patch the
+driver as needed for internal use.
+
+Are there any other reasons that makes you want to keep the option to
+configure the device address through NVM files? I'm assuming you're not
+relying on patching NVM files to provision device-specific addresses
+after installation on target?
+
+Johan
