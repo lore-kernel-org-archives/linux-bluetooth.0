@@ -1,148 +1,149 @@
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73682172762
-	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Apr 2024 13:32:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0BF4770FC;
+	Tue, 30 Apr 2024 14:04:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714483934; cv=none; b=h9FOAiOGc7dWb9HNt0QKVdDm0VDxi/DgQQz2XQN5hbu0q0sFmrYO1sGd6LywR4PHu49flDArGVtfG9bWJDebssS/w1Qo4WxYudDcIuizMwD0rh9xA6lhATGSo2Yrq/wUi61c5lenxobaTAIG9YXn9/2bvy47ek/Z9hQsEbyJReE=
+	t=1714485861; cv=none; b=uC6m/akKqyzT7LiIUAr7HOTIJuhl8gLA5UPv59T90Fgyu4K1aLxU2aR1KU+TlSyb13sC5PONjeVycSH3gVlBmYgYlMjfpv6fSEJvZifZb0ppY425I/XahldBCJeiVY49sTgBgHweDz8qHCPB9N2NNLNFV3v2dOw7vB3uakTyFsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714483934; c=relaxed/simple;
-	bh=0DWyrocco/+AIOLFyMurUsXDtQ24NUHWx5kSDtdkjbw=;
+	s=arc-20240116; t=1714485861; c=relaxed/simple;
+	bh=56t2+Ew9OfwDvnVrXTcXYDJr1lI7iCCB7vtMImxlk7Q=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oCDFmdTVg5ASYWXQE58GAr/fgnqqsM+WmJQ5yZkFcVi8bi9kAFabiEXx/DfN2ZIPUqe9IjDnHF9bdcEd2svgg/qjTfiruBcrcmIGUp04IE2zaq0OOyckgSTIRXESmqD2ajtaZBWeY5WXXVZS0++M4pE/TGXJHsnQessrEbYAkF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=atjwLhMy; arc=none smtp.client-ip=209.85.208.182
+	 To:Cc:Content-Type; b=ZVb+3+rGArWNePd69zyjV3YXUVxVEiMo+wRblhaau7mTKYOnddO8SxLUJ/luWAPTyUcQKIpaRs72oUJge1zT4l2Ez+fq9cvTvhNGDYgx3qOJPTOrPA2h/aJIzKzrMhCO1TNIj9ecII5ozgQt+6a7LWTGZbczV5yrkXtj8BabPPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JUphrbgv; arc=none smtp.client-ip=209.85.208.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="atjwLhMy"
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2e10b6e2bacso5427901fa.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Apr 2024 06:32:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JUphrbgv"
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2dac77cdf43so73026661fa.2;
+        Tue, 30 Apr 2024 07:04:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714483930; x=1715088730; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1714485858; x=1715090658; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ox9t7JV9a8VxxAYHr7qj94QPJmEyq6wU538YZaqru4M=;
-        b=atjwLhMyy9h6itOK0Jgc73rY8ldR+hJGyWBYLoNHFPN01QNGy9fWha2LwWnKVIWbPm
-         VWvTIzQmbYNcXv4p9vzioKvF/VvEcbUwnhbtRfOP/SKL+2c0vYHgM0koYSZO1hqjZXAX
-         YGz+wQx1KNtE46AiVUHH9HkC0MI8uIVtS3DaBY4JNgN5lF1Oq8farC+VVlWpTbVP25sV
-         o1tPhd7pYy1Quu4SpeRbRcjxeRScJVKfrOdyfjfVv4ymnIwl5BjrxrZAAK7TjZscV7+B
-         y/wyCuKamF3hoZe1u7K7trEmB3Pv3dYw9/d7r0//Z6T38cf/52PqvquO71UFV4zPVoW8
-         jLiw==
+        bh=56t2+Ew9OfwDvnVrXTcXYDJr1lI7iCCB7vtMImxlk7Q=;
+        b=JUphrbgvJRj5yewENT5dVWLb8yiNevloKM5oluyrkQlD8C/LL+BApZ6m3cJjXkeEDt
+         cIDY+xHh0hVwJaYJdY6iu2kICwdxA4+utXhEHJk2MXeeE+g28ulgpn4yg7moSa5rE//v
+         t058xI++wPK3wwdDIQVM2ZO1fEzHeizA4iIp6MbB7cifyr2Lzp8SPLTvTF7FHvLgKqO4
+         V84j8IA4ejYWxu6cY86Xe60q/6VC/e/ITY2ApR6+fUZQaHQePAPSdMjKilH5tTIF0fWz
+         +o863Y/Hm0uh7cDsSgecTHXN9NspVieF4GdzzfmhFcKDU2hALQgyNsrC3B5bT65MA7Vp
+         ic3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714483930; x=1715088730;
+        d=1e100.net; s=20230601; t=1714485858; x=1715090658;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Ox9t7JV9a8VxxAYHr7qj94QPJmEyq6wU538YZaqru4M=;
-        b=hBfrpPcldFssDq4Y+3JDH1FkEPfhez3nTypD/oQtM6vIOYHGax2CD3ahjOHjXcBzG1
-         JezpCV3MO96aUSMKged0/DP40BX8cT6zToEh7hbiY4htXkmcGxlKPztOi508XVw4UDjy
-         mJgoMazjI6sBRMnYPVZUnB8vwpGirjGfLmj3doqUG+xr++gfO3Fnzo0P40tkPIMw9iEo
-         quJprOd8rVt48o4jY/h1W1ROB/qEpWRyxRNLIAZTa5TuIIiiGVE4h45cJaa3vAwfrWk6
-         JxGlB7ubBlJXuYd8EdCfdt14TDPjnaXilpZY1guhpKJF4Gv5H3CfOSu51pk1NxbYzTt3
-         8CpQ==
-X-Gm-Message-State: AOJu0YwiYQsV5zOvIdrjfJWtZyACD+dnNH08fkI5Cwc9f4oPo+a8jspc
-	zYVoKD/c9eTvCkBOxP/X5fBjStY/sCtpzBvYnvgG40IUv3F7eV+jJPvE0fiXQuF3O+hxrCW5PaH
-	t/pf9YYQWvL+TiSpkDEbJiNpl5RDqHg==
-X-Google-Smtp-Source: AGHT+IHxqsSPwJEZPMFeIHJjVawIu89jqkxUjRXWfcUB27aUVDDceOElhO9UiCn0UvSYnNhBtbDmUSabWFq08A8DuZo=
-X-Received: by 2002:a2e:b6d4:0:b0:2df:49b:27d6 with SMTP id
- m20-20020a2eb6d4000000b002df049b27d6mr8051366ljo.38.1714483929319; Tue, 30
- Apr 2024 06:32:09 -0700 (PDT)
+        bh=56t2+Ew9OfwDvnVrXTcXYDJr1lI7iCCB7vtMImxlk7Q=;
+        b=pe5xaFngcoOIkGtryGeyiCGa3I0PhpYgPgLuhgu2pvhRVUSlUVtqcdrbUdYyCvDBtT
+         gsAP09jl/zxPXpMnXw+J9RMN3z0DCt4RGABTpmODvyU77eWjvcmUVsPlZq8JREyL7C9p
+         kIddZeJ/iwo+GXuIoe5F2xPeL4+SGevdh/DS0O7NOpMDayAuWNYBH0d6ZrWboAkYb7sy
+         zMNaIOIrwS8j+NsZ5T6ZuDpzqb3uYe3ac0YQoMNrmiJfsTjOzOCrJ/quPIps+KdcmPWm
+         017I5Q7gO/xTiGD5csDk06c3NuWWmrS4nYkdxqfLuJAzb28gJ7JR5xR4MC8BlwRE1Rll
+         y/+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUqjgtfIarEKxn7qdGc5HTHbZguXrbCPEU72WuMipxOlwsl66GTsyq3u7BPaGQWfCP6lH7l4VaZqAXzLNEA8dU4Oqk2Yrg4ORZXgGz3IiDYS96vSobY1LZo5Dkb5rjUrUgYP9RneHQ/qQkczLb/wHFx2+oYHiQ6oY7k0xi/+DK8K56B/bDr
+X-Gm-Message-State: AOJu0Yyawp3BjYt4uvoFWGKFaG/naHSFRbs6l6zAX9BTBuLWKsQXSb7R
+	D85O2LXtyyoQXlG+0Ak2s9mKn3kU/hX2V8YumjKTs9Lks0igCu9zlGhDIgijg1c7GC0WxW3Ba/W
+	ZzCUt3jlyW7zo6etqeIIfgkS/Hk8=
+X-Google-Smtp-Source: AGHT+IGI+0eGY8xQlwtd+je04QG3F2m7nCFOP050A/s/nGK4Rsol3C96yicHc7QyGe5D1cbzoT+YGnYnsrGJzE09imI=
+X-Received: by 2002:a05:651c:11d1:b0:2e0:dc93:52ef with SMTP id
+ z17-20020a05651c11d100b002e0dc9352efmr1906390ljo.26.1714485857803; Tue, 30
+ Apr 2024 07:04:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240318123712.9729-1-mahesh.talewad@nxp.com> <20240318123712.9729-2-mahesh.talewad@nxp.com>
- <CABBYNZKvAmb5JjfxkPADED6CQKD+GxsRqLajHX=w0GE+imhCMA@mail.gmail.com>
- <AS5PR04MB975486834B434042CE2A693689332@AS5PR04MB9754.eurprd04.prod.outlook.com>
- <CABBYNZK5YS6paOYbx4yL6R7Wt9o+oGrtmfiQNmOaTAUo2DBfdQ@mail.gmail.com>
- <AS5PR04MB9754B55170413A2FD0A00F0A89122@AS5PR04MB9754.eurprd04.prod.outlook.com>
- <AS5PR04MB9754210A13AD74FB8C3E361D89102@AS5PR04MB9754.eurprd04.prod.outlook.com>
- <CABBYNZJJq9UTf467LXJ-7WvWbn8bcge0L6CprkGSnu4ZpopSpw@mail.gmail.com> <AS5PR04MB97540A3B63FC307F4B64F2BB891A2@AS5PR04MB9754.eurprd04.prod.outlook.com>
-In-Reply-To: <AS5PR04MB97540A3B63FC307F4B64F2BB891A2@AS5PR04MB9754.eurprd04.prod.outlook.com>
+References: <20240426155801.25277-1-johan+linaro@kernel.org>
+ <CAD=FV=V-pG9+5fLonNvydmjS=ziUFUHAyF8T7YTkEHiO405aSA@mail.gmail.com>
+ <ZizKmtcUIYAMpvOQ@hovoldconsulting.com> <dbba45d2-f955-4d3a-aeab-26b0900d5823@quicinc.com>
+ <Zi-ohCWv58d2h5VM@hovoldconsulting.com> <CABBYNZJyqrNKebwPPPqjOAdrkpBJ0fqHyD2iVtypeQKCDcL+AQ@mail.gmail.com>
+ <CABBYNZJyRR9FA7TYN4+aWMtG9FPUBWMvCtMNUfvaEzxVcYOt-g@mail.gmail.com>
+ <ZjCYu2pc8376rjXk@hovoldconsulting.com> <9eebd77b-c070-4260-a979-9b97f14eb5b1@quicinc.com>
+ <ZjDtDRCHT3z-3nHh@hovoldconsulting.com>
+In-Reply-To: <ZjDtDRCHT3z-3nHh@hovoldconsulting.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 30 Apr 2024 09:31:57 -0400
-Message-ID: <CABBYNZJ3Bcakaw12UCVRQRzM6GaPpgz7UeS3BhYdSw8bdvqdag@mail.gmail.com>
-Subject: Re: [EXT] Re: [PATCH BlueZ v1 1/1] LE Create Connection command
- timeout increased to 20 secs from 4 secs
-To: Mahesh Talewad <mahesh.talewad@nxp.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, 
-	Devyani Godbole <devyani.godbole@nxp.com>, Sarveshwar Bajaj <sarveshwar.bajaj@nxp.com>
+Date: Tue, 30 Apr 2024 10:04:05 -0400
+Message-ID: <CABBYNZLCw08oo+RRWkBYAdBLhFK5+pQi59dz-f+P1QusfYoAAw@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: qca: generalise device address check
+To: Johan Hovold <johan@kernel.org>
+Cc: Janaki Ramaiah Thota <quic_janathot@quicinc.com>, Doug Anderson <dianders@chromium.org>, 
+	Johan Hovold <johan+linaro@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com, 
+	quic_anubhavg@quicinc.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Mahesh,
+Hi Johan,
 
-On Tue, Apr 30, 2024 at 8:23=E2=80=AFAM Mahesh Talewad <mahesh.talewad@nxp.=
-com> wrote:
+On Tue, Apr 30, 2024 at 9:07=E2=80=AFAM Johan Hovold <johan@kernel.org> wro=
+te:
 >
-> Hi Luiz,
+> On Tue, Apr 30, 2024 at 06:22:26PM +0530, Janaki Ramaiah Thota wrote:
+> > On 4/30/2024 12:37 PM, Johan Hovold wrote:
+> > > On Mon, Apr 29, 2024 at 01:31:53PM -0400, Luiz Augusto von Dentz wrot=
+e:
 >
-> Thank you. This patch is working. le connection timeout successfully chan=
-ged to 20secs.
-
-Please send as a proper patch then.
-
-> Thanks and regards,
-> Mahesh Vithal Talewad
->
-> -----Original Message-----
-> From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> Sent: Thursday, April 25, 2024 1:02 AM
-> To: Mahesh Talewad <mahesh.talewad@nxp.com>
-> Cc: linux-bluetooth@vger.kernel.org; Devyani Godbole <devyani.godbole@nxp=
-.com>; Sarveshwar Bajaj <sarveshwar.bajaj@nxp.com>
-> Subject: Re: [EXT] Re: [PATCH BlueZ v1 1/1] LE Create Connection command =
-timeout increased to 20 secs from 4 secs
->
-> Caution: This is an external email. Please take care when clicking links =
-or opening attachments. When in doubt, report the message using the 'Report=
- this email' button
->
->
-> Hi Mahesh,
->
-> On Wed, Apr 24, 2024 at 9:49=E2=80=AFAM Mahesh Talewad <mahesh.talewad@nx=
-p.com> wrote:
+> > >> Anyway the fact that firmware loading itself is programming a
+> > >> potentially duplicated address already seems wrong enough to me,
+> > >> either it shall leave it as 00... or set a valid address otherwise w=
+e
+> > >> always risk missing yet another duplicate address being introduced a=
+nd
+> > >> then used over the air causing all sorts of problems for users.
+> > >>
+> > >> So to be clear, QCA firmware shall never attempt to flash anything
+> > >> other than 00:00:00:00:00:00 if you don't have a valid and unique
+> > >> identity address, so we can get rid of this table altogether.
+> > >
 > >
-> > Hi Luiz,
-> >
-> > We tried with - 6093f28402aa6342890fc3adb6be355f804b719d - with this as=
- well issue is observed.
+> > Yes agree with this point.
+> > BD address should be treated as invalid if it is 00:00:00:00:00:00.
 >
-> The lets do something like:
+> We all agree on that.
 >
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h in=
-dex 5c12761cbc0e..fbf0a6263dae 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -456,7 +456,6 @@ enum {
->  #define HCI_AUTO_OFF_TIMEOUT   msecs_to_jiffies(2000)  /* 2 seconds */
->  #define HCI_ACL_CONN_TIMEOUT   msecs_to_jiffies(20000) /* 20 seconds */
->  #define HCI_LE_CONN_TIMEOUT    msecs_to_jiffies(20000) /* 20 seconds */
-> -#define HCI_LE_AUTOCONN_TIMEOUT        msecs_to_jiffies(4000)  /* 4 seco=
-nds */
+> > NVM Tag 2: bd address is default BD address (other than 0), should be
+> > configured as valid address and as its not unique address and it will
+> > be same for all devices so mark it is configured but still allow
+> > user-space to change the address.
 >
->  /* HCI data types */
->  #define HCI_COMMAND_PKT                0x01
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c index 99=
-b4e68075f4..651e5105fdd5 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -2556,7 +2556,7 @@ struct hci_dev *hci_alloc_dev_priv(int sizeof_priv)
->         hdev->le_rx_def_phys =3D HCI_LE_SET_PHY_1M;
->         hdev->le_num_of_adv_sets =3D HCI_MAX_ADV_INSTANCES;
->         hdev->def_multi_adv_rotation_duration =3D HCI_DEFAULT_ADV_DURATIO=
-N;
-> -       hdev->def_le_autoconnect_timeout =3D HCI_LE_AUTOCONN_TIMEOUT;
-> +       hdev->def_le_autoconnect_timeout =3D HCI_LE_CONN_TIMEOUT;
->         hdev->min_le_tx_power =3D HCI_TX_POWER_INVALID;
->         hdev->max_le_tx_power =3D HCI_TX_POWER_INVALID;
+> But here we disagree. A non-unique address is not a valid one as it will
+> cause collisions if you have more than one such controller.
+>
+> I understand that this may be convenient/good enough for developers in
+> some cases, but this can hurt end users that do not realise why things
+> break.
+>
+> And a developer can always configure an address manually or patch the
+> driver as needed for internal use.
+>
+> Are there any other reasons that makes you want to keep the option to
+> configure the device address through NVM files? I'm assuming you're not
+> relying on patching NVM files to provision device-specific addresses
+> after installation on target?
 
+Exactly, a duplicated address is not a valid public/identity address.
 
+Regarding them already been in use, we will need to have it fixed one
+way or the other, so it is better to change whatever it comer within
+the firmware file to 00:00:00:00:00:00 and have it setup a proper
+address after that rather than have a table that detect the use of
+duplicated addresses since the result would be the same since
+userspace stores pairing/devices based on adapter addresses they will
+be lost and the user will need to pair its peripherals again, so my
+recommendation is that this is done via firmware update rather than
+introducing a table containing duplicate addresses.
+
+That said it seems the patch in this thread actually reads the address
+with use of EDL_TAG_ID_BD_ADDR and then proceed to check if that is
+what the controller returns as address, while that is better than
+having a table I think there is still a risk that the duplicated
+address gets used on older kernels if that is not updated in the
+firmware directly, anyway perhaps we shall be doing both so we capture
+both cases where duplicated addresses are used or when BDADDR_ANY is.
 
 --=20
 Luiz Augusto von Dentz
