@@ -1,106 +1,108 @@
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1897C1607BB
-	for <linux-bluetooth@vger.kernel.org>; Wed,  1 May 2024 19:15:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0DBBEAF6
+	for <linux-bluetooth@vger.kernel.org>; Wed,  1 May 2024 19:28:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714590934; cv=none; b=ZRuGNk4/IspJwgxXKLTRycA3IzSwm7Rhev+aYOdisGP+m5kujKX7leGCxGsd0WXb0yYV2YZouOZpctUl8PTLwkWtYjUQyzqSpy9rafs1JOw7uGesqztGbhtHM/LlGOpSF1FH0eyLCWG2mLL5r4pm/9kuyOs90Nv079pAm4mqBPM=
+	t=1714591698; cv=none; b=HEh7lhcU+xZP2XJFt+9upoNlU3dP8NkApMF2mlAB1NIFCI5ZgJSfrBVUy8/lmjX7zJrC0J4mAPPVUGVRZd2jDY19vDJzUKLg4BXLa7A8si6jwp2sZLXK4iubw1NTIyEDNRl0J3B3ep3neoZvW83mbtGwV6Fm06e/hqPS60/VkQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714590934; c=relaxed/simple;
-	bh=FjDFufbsvnrKVpq/d3f57SbbkDccuVf6Mo7zLPWNI0A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IXAatIXNGwFEJ7rQKS2EPmB8BuJ4kKjsr2lAYE58VY1cUu9jxRy6e1+wsaMsCLsHwdaKxSlItRhVVgPIbV5O0PC/muAiWEbp0zYPTtoINPcKaR1MZcMv6Dl8nG+09JpDI87AcSGau7gVi5lcHqSVhvkKdXSZxXNJxo9z8YvwaXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=JmhrKOGP; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1714591698; c=relaxed/simple;
+	bh=zI9QaBQJt0tsLxYJV766HWRS20rUZ93S+25+B4/VtGo=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Hgx0rkNJLBhT+/piP05KwcqVuYW/JfbH5qL5NhgyyiaGKYb8avQ4o/u4MeJZ0RtzvPGvqlQ+Z/G+5xLuaWWemYh3gwurpQaVTSNT9RdkOMcW8FILIVihg+g7sky9hHxXokHCI6HavxkGFR95tdzHuTYmNFBPtm2RnuJC3EC8dtk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F6l6h8BV; arc=none smtp.client-ip=209.85.222.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="JmhrKOGP"
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6ed627829e6so8414662b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 01 May 2024 12:15:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F6l6h8BV"
+Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-7f34ebbcde4so365056241.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 01 May 2024 12:28:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1714590932; x=1715195732; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZrKZAQFL0Kmixa3h9nt3N8Wwlmo9DHZavjvoHsUvpdY=;
-        b=JmhrKOGPNOqzHr8k2ATuVWV9FcWJ5q0nf6hFu8OGHjzWNdlwoQZs60KS6TQCNuqRw3
-         iNooqKTSGhjXNpn+4/uw5iJgXQe6vOLFZXXxa9eZHKE/FB6B2PCYJ/tlvS+mnB0mGtV2
-         ca2z7FQT16EvzATAzO0PKBAfY6PFOlohuX2D4=
+        d=gmail.com; s=20230601; t=1714591695; x=1715196495; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=znWRKUqT77U70qk/K6NeW74Od+GD4OvDn7YXJQKzuKg=;
+        b=F6l6h8BVHtrHXO8/WflVZLuCAo5dfrXvlebcLqFV3XIId66YZk+rgXeuM7oOX7hK0E
+         BQBFchmqjnUXgE9sEWi+ewMPV6P0jdHZ+ZDDe675jrToWfou13KeCeZ8HnEwRlhY7Odv
+         6G8Vy5ee3pFFdAGq5ILxD39GU7apH4sZWYue550khR8b/8N+LYYx5wrEe2H2rfSiUp+c
+         BpSGC9la/QY7IUNcmOMQht9QOjLmmYR3h2LkwIZRAlssvLYQkhQEljnddq4xy6c9dvMO
+         m9kJo0llFVLsTeo6XFt+U9C5XJ6Y0nh2KKRBc3yBCbiGCAjQLvL0wXCTWKdS9B/GnBdm
+         eKcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714590932; x=1715195732;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZrKZAQFL0Kmixa3h9nt3N8Wwlmo9DHZavjvoHsUvpdY=;
-        b=typ1D2fljMHrMGc9MgAHhMWCmnKyTakJDHFebnx/6YL520/MSUvJDwZ3KRB8X9XU5B
-         zdGcHPh4Mx56DrAFUQETVGdCctwaIoDTg+dEMVMskmblphmHDIHoZ3NKOT1tekOM+cH4
-         GbObCGVvOoO/dZKyqai2OzQSkGU2enGJh4HPugo6fChE/kR8T4Fvzu8LrJazcBf2m4+0
-         HHnPxS5WiERpHTSwoE8u1BeEK6zTWP03SMQ8TG7dNqMQIxVHwMpHsZAEpzk8ZvHiK3X6
-         Im4KCRA36sNHzB0oj1WclvAVPKgbru+6pQlIBXqZl9hUspEE4ADAsfxRnbXjgMMTXUrU
-         wwDA==
-X-Forwarded-Encrypted: i=1; AJvYcCWTGg4mYXCKB9eSKmqxh2eE/3nWrzaF+xamxsc7NBbhHztZ58frETxMskJLCIUd8mDbOL9maMHq1IcZRMSu8HAWMooz4UaaUJYDXMCXP4dm
-X-Gm-Message-State: AOJu0Yz7Ma+2o8ESFdjLPrMO0q8aZ9LPs/x4ExUmwO22v5ECKketu8kT
-	tm75ffjcnj044OSv/iTa+yEU0obgqNeqy2Ztd8j3U7XBaYw7yE8xFNsH0ywkAg==
-X-Google-Smtp-Source: AGHT+IEha+gO+FpGkm9o8MQRL+GDzeOY8CJgsWHInozyoylrwPFagTvr8PCPZBBqlxdqKOVB+3C9lA==
-X-Received: by 2002:a05:6a21:606:b0:1a9:c80a:bdcf with SMTP id ll6-20020a056a21060600b001a9c80abdcfmr3454424pzb.2.1714590932324;
-        Wed, 01 May 2024 12:15:32 -0700 (PDT)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id x23-20020a62fb17000000b006eac2a25631sm22896185pfm.129.2024.05.01.12.15.31
+        d=1e100.net; s=20230601; t=1714591695; x=1715196495;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=znWRKUqT77U70qk/K6NeW74Od+GD4OvDn7YXJQKzuKg=;
+        b=DzAO8OGQ1JzcDHH29cCX8Hvsu9m/03gkVLBMQKYW1FlUqNF0lZ6nqliHClZpM/StKx
+         NfLpyYqBKbaa3RxpH/RXPbvxh1Yd4OPqRH313JW+Z777mkJdGJR9Iul7TTV+S3NMdNV4
+         jyXGfcYvjHDF6KvTaDxcL4161XsnfGLbYUj0KhtLw4jc8ket16HGVWhzt70YIjKQXgUk
+         MDrFl47IJ9MJxNR5eVC80GTddde/ZKM85xxgY05SfD8NVsiuQSG6s5o4SqdZR/KrORsR
+         pZMlhTDlvsfB8wBxLg+VymXitLIqre66Ica5Kj2YGiNn9OibbZedHfssov/aJRiV26qa
+         2gAA==
+X-Gm-Message-State: AOJu0Yx+sqMWLTWIr3aNRTZubDEOP9mbrOFMaYQAticPhd3CZCxiVuaY
+	m6lhb1OpMy/3ZflOoSxIO8RwrZ5y/HlA9U70pzu1hlfrr14bu/uF0A9A3w==
+X-Google-Smtp-Source: AGHT+IElgo/xaRf0RlyZmKo7tsGRQPyyrnO5smCro+5HEiQ5+cDDuLho1h17i+pow1ky6Fekygx18w==
+X-Received: by 2002:a05:6122:3c43:b0:4d4:3621:b245 with SMTP id fv3-20020a0561223c4300b004d43621b245mr3684124vkb.16.1714591694732;
+        Wed, 01 May 2024 12:28:14 -0700 (PDT)
+Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id b7-20020ac5c747000000b004dee45c148asm1429436vkn.13.2024.05.01.12.28.13
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 May 2024 12:15:31 -0700 (PDT)
-Date: Wed, 1 May 2024 12:15:31 -0700
-From: Kees Cook <keescook@chromium.org>
-To: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH][next] Bluetooth: hci_sync: Use cmd->num_cis instead of
- magic number
-Message-ID: <202405011214.EB46DAB416@keescook>
-References: <ZjKAyg2bZNyTcT+C@neat>
+        Wed, 01 May 2024 12:28:13 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] src/shared: Make default length handle EA
+Date: Wed,  1 May 2024 15:28:12 -0400
+Message-ID: <20240501192812.3421949-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZjKAyg2bZNyTcT+C@neat>
+Content-Transfer-Encoding: 8bit
 
-On Wed, May 01, 2024 at 11:50:02AM -0600, Gustavo A. R. Silva wrote:
-> At the moment of the check, `cmd->num_cis` holds the value of 0x1f,
-> which is the max number of elements in the `cmd->cis[]` array at
-> declaration, which is 0x1f.
-> 
-> So, avoid using 0x1f directly, and instead use `cmd->num_cis`. Similarly
-> to this other patch[1].
-> 
-> Link: https://lore.kernel.org/linux-hardening/ZivaHUQyDDK9fXEk@neat/ [1]
-> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-> ---
->  net/bluetooth/hci_sync.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index 6e15594d3565..af9513f3c451 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -6559,7 +6559,7 @@ int hci_le_create_cis_sync(struct hci_dev *hdev)
->  		cis->cis_handle = cpu_to_le16(conn->handle);
->  		aux_num_cis++;
->  
-> -		if (aux_num_cis >= 0x1f)
-> +		if (aux_num_cis >= cmd->num_cis)
->  			break;
->  	}
->  	cmd->num_cis = aux_num_cis;
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Yeah, good idea. No need to repeat a hard-coded value.
+By default bt_ad was setting just BT_AD_MAX_DATA_LEN (31) which is not
+enough to handle devices advertising using EA, so this switches the
+default to be BT_EA_MAX_DATA_LEN (251) since EA is much more common
+nowadays and for those case where the it is not supported (e.g. for
+advertisers without EA support) then shall be using bt_ad_set_max_len
+to adjust the maximum length.
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
+Fixes: https://github.com/bluez/bluez/issues/832
+---
+ src/shared/ad.c | 2 +-
+ src/shared/ad.h | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
+diff --git a/src/shared/ad.c b/src/shared/ad.c
+index 2d6fc628eabc..f3fb428e25c6 100644
+--- a/src/shared/ad.c
++++ b/src/shared/ad.c
+@@ -48,7 +48,7 @@ struct bt_ad *bt_ad_new(void)
+ 	struct bt_ad *ad;
+ 
+ 	ad = new0(struct bt_ad, 1);
+-	ad->max_len = BT_AD_MAX_DATA_LEN;
++	ad->max_len = BT_EA_MAX_DATA_LEN;
+ 	ad->service_uuids = queue_new();
+ 	ad->manufacturer_data = queue_new();
+ 	ad->solicit_uuids = queue_new();
+diff --git a/src/shared/ad.h b/src/shared/ad.h
+index 820b9177562b..11900706f9ed 100644
+--- a/src/shared/ad.h
++++ b/src/shared/ad.h
+@@ -15,6 +15,7 @@
+ #include "lib/uuid.h"
+ 
+ #define BT_AD_MAX_DATA_LEN		31
++#define BT_EA_MAX_DATA_LEN		251
+ #define BT_PA_MAX_DATA_LEN		252
+ 
+ #define BT_AD_FLAGS			0x01
 -- 
-Kees Cook
+2.44.0
+
