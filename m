@@ -1,34 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6183833DD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 960041DFF7;
 	Wed,  1 May 2024 12:35:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714566914; cv=none; b=hlmd66/07AeFMvk4FsBdLbfz0GMpgVsQVHxwxNpaNppPE6y58Qk0pXqLloDyMrPVqUw5kp4+GXYejyfhFm6ORc7BdE6qklDKjdxT3fv/LtoUeXW92aub8wLvbAXY7eWhmWSNWDysHVBzHBFXZUV0bP3pg+Uo09uAKOovIbx94h8=
+	t=1714566914; cv=none; b=BO36EmpXfvdDlT91eiJXa8qpZQwTf7eC63jH1vRftCPdLE6fVmUdAwW04PbKKXtb56hzYaPG9yYg191j1W3BWtvelsmEM8XLap1mIS1US4FMQS7xMMBoDzWyCxNmtTvn7cfvT5FDhSXSiILPKuRAU7LMH52gBQp6ms48EQivalI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1714566914; c=relaxed/simple;
-	bh=tyE8gtEWWuUzatqs+r9wa2o8BkKcol3pHFv6FYtwX3I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=guy4CtI+4fJN9h056jDaBj/iNrjek4GN2gEanvLx6m3ZUQ0htq2SmNYhgDveoyDrzxwHgmlaZ1ix0pYSt1oxU1LrV/1LCP8LmHBZFtWepsiTLx+6ji7jNnypAGBBexDaQXU63K1UiivYFe4kGxd0tyt9yqQNGo0d4mg+a9iTnng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i8qBi7Mk; arc=none smtp.client-ip=10.30.226.201
+	bh=aVCy5Wv4CfQbYy32F82+h1WTcZq2oIhWZtBHkh54KtQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=uTq0Wh+4FgZjzB9f04k3yG+SRFMHPWUmB4JucK6U2+cJUTW3IjOizciMuu0+SDoNy+sdVAm3AW9jYu5WJcfZYX8vmWPd9AJWhkXYQQMnmojSa/loDbW3dg0ao/Jx/JxWskO7TQHFUZ8zvHHYpUmYgifMMH/2YVwVno6xq9j6+jA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DrpxwJis; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i8qBi7Mk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CD49C4AF14;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DrpxwJis"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29B3AC113CC;
 	Wed,  1 May 2024 12:35:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1714566914;
-	bh=tyE8gtEWWuUzatqs+r9wa2o8BkKcol3pHFv6FYtwX3I=;
-	h=From:To:Cc:Subject:Date:From;
-	b=i8qBi7Mk/qesRXwRnwsmdiKrC67xK+x4bLd9gKjWw4LumzqRQ5I+qat2IIK/PCRoQ
-	 HBybHkEyzPv+rQQMKrh6wyUebbKvbEsbV6PUcN57a+lm/dnsdBB7+vEDzHfSqxDdpB
-	 XZ2O7j6fX6KimQmXZyhQIDe1IYBe4qEsIa1Jw2ZNg657yfRfoQ2/tkBCCpz9+kf2Dw
-	 Bi1Okh8kizB0S3nI5JS82YaNC957i7TxkXjRAeP+RAf5BSuqSxY2LDEhWm49mwVEm8
-	 t8cqz3US6U5HGmt80nHN51X+4YexqvgaEyc3G0UArOPTBmWkJbmGBIQf6dXEHhIZxt
-	 J77ljFw8WXr2g==
+	bh=aVCy5Wv4CfQbYy32F82+h1WTcZq2oIhWZtBHkh54KtQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=DrpxwJis1f+ftfpR42MZljNakzzqkkNLgj3PV/jl21no13KLMOpo0APyn9xy7Da/6
+	 1H8j58v26zGajPJCZ+TeJhdMr4y66BR7U2k9aHEML67lY/pKAOtrkHpBIipYzzhIgs
+	 su1a1y0XDRO5q1v3a2z893ffk56wu0DQNsYdva/84SKtznm4+2dZ5RE3bjHGXWKrYd
+	 pZ0BswXEmtwOBwonX2O0HN1nigV2t2olGknThpzUdiWzJ7ZqP3j1ndU0xEogJx8O0+
+	 jOagorrJqWGE0qZ6GXSeqXcD4uUqiyxO4gU02cQ8Dj4Dlrys+TcoQBJ3R0x0L/o+TG
+	 nEsE219PA6rpA==
 Received: from johan by xi.lan with local (Exim 4.97.1)
 	(envelope-from <johan+linaro@kernel.org>)
-	id 1s29B6-000000001kw-0F6b;
-	Wed, 01 May 2024 14:35:16 +0200
+	id 1s29B7-000000001l3-06Gn;
+	Wed, 01 May 2024 14:35:17 +0200
 From: Johan Hovold <johan+linaro@kernel.org>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -36,10 +37,12 @@ Cc: Janaki Ramaiah Thota <quic_janathot@quicinc.com>,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Johan Hovold <johan+linaro@kernel.org>
-Subject: [PATCH 0/5] Bluetooth: qca: info leak fixes and cleanups
-Date: Wed,  1 May 2024 14:34:51 +0200
-Message-ID: <20240501123456.6712-1-johan+linaro@kernel.org>
+Subject: [PATCH 3/5] Bluetooth: qca: drop bogus edl header checks
+Date: Wed,  1 May 2024 14:34:54 +0200
+Message-ID: <20240501123456.6712-4-johan+linaro@kernel.org>
 X-Mailer: git-send-email 2.43.2
+In-Reply-To: <20240501123456.6712-1-johan+linaro@kernel.org>
+References: <20240501123456.6712-1-johan+linaro@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -48,25 +51,66 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Here are two fixes for potential info leaks in the QCA driver and a few
-cleanups.
+The skb->data pointer is never NULL so drop the bogus sanity checks when
+initialising the EDL header pointer.
 
-All of these can go into 6.10.
+Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
+---
+ drivers/bluetooth/btqca.c | 20 --------------------
+ 1 file changed, 20 deletions(-)
 
-Johan
-
-
-Johan Hovold (5):
-  Bluetooth: qca: fix info leak when fetching fw build id
-  Bluetooth: qca: fix info leak when fetching board id
-  Bluetooth: qca: drop bogus edl header checks
-  Bluetooth: qca: drop bogus module version
-  Bluetooth: qca: clean up defines
-
- drivers/bluetooth/btqca.c | 51 ++++++++++++++++----------------
- drivers/bluetooth/btqca.h | 61 +++++++++++++++++++--------------------
- 2 files changed, 55 insertions(+), 57 deletions(-)
-
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index 638074992c82..2ba1f21f0320 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -55,11 +55,6 @@ int qca_read_soc_version(struct hci_dev *hdev, struct qca_btsoc_version *ver,
+ 	}
+ 
+ 	edl = (struct edl_event_hdr *)(skb->data);
+-	if (!edl) {
+-		bt_dev_err(hdev, "QCA TLV with no header");
+-		err = -EILSEQ;
+-		goto out;
+-	}
+ 
+ 	if (edl->cresp != EDL_CMD_REQ_RES_EVT ||
+ 	    edl->rtype != rtype) {
+@@ -121,11 +116,6 @@ static int qca_read_fw_build_info(struct hci_dev *hdev)
+ 	}
+ 
+ 	edl = (struct edl_event_hdr *)(skb->data);
+-	if (!edl) {
+-		bt_dev_err(hdev, "QCA read fw build info with no header");
+-		err = -EILSEQ;
+-		goto out;
+-	}
+ 
+ 	if (edl->cresp != EDL_CMD_REQ_RES_EVT ||
+ 	    edl->rtype != EDL_GET_BUILD_INFO_CMD) {
+@@ -183,11 +173,6 @@ static int qca_send_patch_config_cmd(struct hci_dev *hdev)
+ 	}
+ 
+ 	edl = (struct edl_event_hdr *)(skb->data);
+-	if (!edl) {
+-		bt_dev_err(hdev, "QCA Patch config with no header");
+-		err = -EILSEQ;
+-		goto out;
+-	}
+ 
+ 	if (edl->cresp != EDL_PATCH_CONFIG_RES_EVT || edl->rtype != EDL_PATCH_CONFIG_CMD) {
+ 		bt_dev_err(hdev, "QCA Wrong packet received %d %d", edl->cresp,
+@@ -502,11 +487,6 @@ static int qca_tlv_send_segment(struct hci_dev *hdev, int seg_size,
+ 	}
+ 
+ 	edl = (struct edl_event_hdr *)(skb->data);
+-	if (!edl) {
+-		bt_dev_err(hdev, "TLV with no header");
+-		err = -EILSEQ;
+-		goto out;
+-	}
+ 
+ 	if (edl->cresp != EDL_CMD_REQ_RES_EVT || edl->rtype != rtype) {
+ 		bt_dev_err(hdev, "QCA TLV with error stat 0x%x rtype 0x%x",
 -- 
 2.43.2
 
