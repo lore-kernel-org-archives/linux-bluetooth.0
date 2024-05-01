@@ -1,160 +1,164 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF8B422313;
-	Wed,  1 May 2024 12:35:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AF7C12BEBE
+	for <linux-bluetooth@vger.kernel.org>; Wed,  1 May 2024 13:10:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714566914; cv=none; b=qRd07diz6iF3owWZ7hhfMwaMR8sJn6ObjBVhYK/l8BuXL0NceCqBeU9ZzmhT0AsF5R6C6hNBm2p16fD80qBJh4ifVoBXGoWaouR50HrElhUQx+8VaHZw4Ztyy8Oo/qZ7UqpIyVfahcVWV1Odp5EjvwreXOqDLRUw9pEyEld9Rsg=
+	t=1714569050; cv=none; b=pii5Up6HBLBm7pD0+1FhUNUMNr8a1cNqN51uTwXYqIhCqjtMNugJH/hbkSDJrwtyvPr6bkH06K1mPSw43vBL/fBojH7nc1YNb+9ib58Y4Ah5WFCACMlfznZvMFJM9ndkSeZf1oX1iz9w0zGzignjoul4tXFUeP5a9BAWGROY9y8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714566914; c=relaxed/simple;
-	bh=38GjNkh+bP9qOQWBippcQ8WykGLhFZV02w+RzMyVR7o=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Fiezs14/oN/dsSQNsUu5ugA0/45X2fib9gas3RjOAj8WvXzmAhSxL/Z9Lw1kSkYc/lb60rQbHzpuLipA2TeKz16+mdd4FanhoDPOebV/RUHXBVBdfBapaLQf/KxwxGIqdbUjLv6N5ZNCSkCQWPqEZxIiDg9/FW+npIjbEojt/S0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A3QKPWsC; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1714569050; c=relaxed/simple;
+	bh=RHNtsfFCxaaNxeWF7tjJn3c2hu9ZQfZnYMqG0oL+Rm8=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=rmVSFvJ0mCGKOzLmc2gRI/7FnWUAB7tH8x5wzmuThKLAMLntCC1z07Uc8unYotyCMUzKYcbvYc3X1QiJqE4kH+ULgtji2kSZt0ppp1ODFLrOhIsU+/XsCoaxWqXissJXOgIkNQcFp+J+1LBpNu9lHO86j9H3OIP68cbQ3s5+5fA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jhtaG84N; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A3QKPWsC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3485DC4AF1C;
-	Wed,  1 May 2024 12:35:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714566914;
-	bh=38GjNkh+bP9qOQWBippcQ8WykGLhFZV02w+RzMyVR7o=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=A3QKPWsCEt+N/9hYwDUIfmI03tymgX5lslI9OoJrD9pGWK1jegwFxPi7Ud11B4BJX
-	 nxJMsZGmXdpkcxkQgFWHx5HkK75pakwIq2vMnVUTc23kx2pfB6UHVLIA0piUed7klh
-	 Nk55tOh8w+M/n+87TIOPYXkG5Q4EzV/+2XJ/HyzfyueKuJB1fvxtM2OLflev+mEMqp
-	 y0KqvZUgFDmtuibhM2Y9CIg7FjA2MwsWyB3u8PhyNmItzOy7wPCZoXi8Ssouuk4vvo
-	 DRyYxgiwyDWOrK39AnptFeDnKe72k/c0CgedpFuz1pDv0jXQ2LkPflIroAAuP1FXjZ
-	 0vXbE6o0gpZxg==
-Received: from johan by xi.lan with local (Exim 4.97.1)
-	(envelope-from <johan+linaro@kernel.org>)
-	id 1s29B7-000000001l9-0iYI;
-	Wed, 01 May 2024 14:35:17 +0200
-From: Johan Hovold <johan+linaro@kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Janaki Ramaiah Thota <quic_janathot@quicinc.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Johan Hovold <johan+linaro@kernel.org>
-Subject: [PATCH 5/5] Bluetooth: qca: clean up defines
-Date: Wed,  1 May 2024 14:34:56 +0200
-Message-ID: <20240501123456.6712-6-johan+linaro@kernel.org>
-X-Mailer: git-send-email 2.43.2
-In-Reply-To: <20240501123456.6712-1-johan+linaro@kernel.org>
-References: <20240501123456.6712-1-johan+linaro@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jhtaG84N"
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6ed627829e6so7990811b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 01 May 2024 06:10:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714569048; x=1715173848; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=kp9CS6sTzIT+H+W2evts++tr/KLBHxsXqfVwck9oHKw=;
+        b=jhtaG84NhASrkSVcIrEztg7mZINQdxcW5StKlu2cFiT4DFmqLLYrn73lyxh0HIfdQD
+         sOiCjy65x5E15SebvQOecULWrP/EBn2wLfzO6oE6FnQN8/CvM9dZlAviRz+N09J+mee4
+         GBpZDCEBAZOd3Za4vQmFAt41NmobIjAIFg6llf3oEoyrXRZyGzVes2xpyJ0N9gIm51Xq
+         uGFl14cgk/NZvnc+sEPhk/YJvVlXiWu+04cMxujlTXzHuHWsFSEgXuX/+jR7ffiKz9zW
+         uKBKJ/TIZ63V2X1ZssBHtWQUvd2vJF/+AxUyY79BZkoE1XDy7MtmA4Y63ckhBRwDnU1u
+         fiOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714569048; x=1715173848;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kp9CS6sTzIT+H+W2evts++tr/KLBHxsXqfVwck9oHKw=;
+        b=YgPR1kwtO4TfH5UaF3miyMxMN26OJev3fPsr3tAul6YmCT1UxDGHZ+RJ76JOST2Vfx
+         QTcIwDYxuKKAU1vHer/OfWAPLAhUNBxsaQEexjYfdcUFi9YXYz7eHvbINsEdtv1P1qdj
+         VZ+sNqOVFffF/58olctqfQLpSSCa4/pDgpRspWoxjbBJax/TjKPTGpBQugUEk/KVvGFz
+         l99mDxq8FDVqTDMe6UQD9T3pHAWX0ZpMuOR0xs+vbsdLUpnlIJc05U1/V1IOnJLMmr8H
+         oaa/BiFTixjaAoDFdY3eotbMDWSE7VKJiE2gGnkMkL7VoN2I7ACXDGOfdrBXpf8m6ltX
+         JVtg==
+X-Gm-Message-State: AOJu0YyiOtSoFfKgy1yciaUCa+eR6a0Owym93vW0MC+A9LP+wand1LSB
+	8L1pizAASAaOkmdU74lBl1lTw1GeEGF7HKDJ0kupbVgyNtuv5n02deKjdQ==
+X-Google-Smtp-Source: AGHT+IER7JSnmlOEg38bSO8eDDOiDvfr/mq/HQsC51PtfmFFBHoWF61La9OG8jHGGg3q5ecM/SRk+Q==
+X-Received: by 2002:a05:6a21:1789:b0:1ad:27ca:6347 with SMTP id nx9-20020a056a21178900b001ad27ca6347mr2651323pzb.43.1714569048347;
+        Wed, 01 May 2024 06:10:48 -0700 (PDT)
+Received: from [172.17.0.2] ([20.171.78.147])
+        by smtp.gmail.com with ESMTPSA id r89-20020a17090a43e200b002a7e4b99752sm3170355pjg.0.2024.05.01.06.10.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 May 2024 06:10:48 -0700 (PDT)
+Message-ID: <66323f58.170a0220.e8b7c.92be@mx.google.com>
+Date: Wed, 01 May 2024 06:10:48 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3769756593729623576=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, johan+linaro@kernel.org
+Subject: RE: Bluetooth: qca: info leak fixes and cleanups
+In-Reply-To: <20240501123456.6712-2-johan+linaro@kernel.org>
+References: <20240501123456.6712-2-johan+linaro@kernel.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Clean up the QCA driver defines by dropping redundant parentheses around
-values and making sure they are aligned (using tabs only).
+--===============3769756593729623576==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=849631
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      2.80 seconds
+GitLint                       FAIL      1.45 seconds
+SubjectPrefix                 PASS      0.40 seconds
+BuildKernel                   PASS      30.14 seconds
+CheckAllWarning               PASS      32.95 seconds
+CheckSparse                   PASS      43.36 seconds
+CheckSmatch                   FAIL      36.62 seconds
+BuildKernel32                 PASS      29.42 seconds
+TestRunnerSetup               PASS      526.69 seconds
+TestRunner_l2cap-tester       PASS      20.37 seconds
+TestRunner_iso-tester         FAIL      31.41 seconds
+TestRunner_bnep-tester        PASS      4.68 seconds
+TestRunner_mgmt-tester        PASS      107.70 seconds
+TestRunner_rfcomm-tester      PASS      7.21 seconds
+TestRunner_sco-tester         PASS      15.02 seconds
+TestRunner_ioctl-tester       PASS      7.77 seconds
+TestRunner_mesh-tester        FAIL      6.02 seconds
+TestRunner_smp-tester         PASS      8.34 seconds
+TestRunner_userchan-tester    PASS      5.18 seconds
+IncrementalBuild              PASS      47.33 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[1/5] Bluetooth: qca: fix info leak when fetching fw build id
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+7: B3 Line contains hard tab characters (\t): "Cc: stable@vger.kernel.org	# 5.12"
+[2/5] Bluetooth: qca: fix info leak when fetching board id
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+6: B3 Line contains hard tab characters (\t): "Cc: stable@vger.kernel.org	# 6.7"
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
+
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bpa10x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bpa10x.o'
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+Total: 122, Passed: 121 (99.2%), Failed: 1, Not Run: 0
+
+Failed Test Cases
+ISO Connect2 Suspend - Success                       Failed       4.226 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 9 (90.0%), Failed: 1, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Failed       0.094 seconds
+
+
 ---
- drivers/bluetooth/btqca.h | 60 +++++++++++++++++++--------------------
- 1 file changed, 30 insertions(+), 30 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
-index 215433fd76a1..bb5207d7a8c7 100644
---- a/drivers/bluetooth/btqca.h
-+++ b/drivers/bluetooth/btqca.h
-@@ -5,33 +5,33 @@
-  *  Copyright (c) 2015 The Linux Foundation. All rights reserved.
-  */
- 
--#define EDL_PATCH_CMD_OPCODE		(0xFC00)
--#define EDL_NVM_ACCESS_OPCODE		(0xFC0B)
--#define EDL_WRITE_BD_ADDR_OPCODE	(0xFC14)
--#define EDL_PATCH_CMD_LEN		(1)
--#define EDL_PATCH_VER_REQ_CMD		(0x19)
--#define EDL_PATCH_TLV_REQ_CMD		(0x1E)
--#define EDL_GET_BUILD_INFO_CMD		(0x20)
--#define EDL_GET_BID_REQ_CMD			(0x23)
--#define EDL_NVM_ACCESS_SET_REQ_CMD	(0x01)
--#define EDL_PATCH_CONFIG_CMD		(0x28)
--#define MAX_SIZE_PER_TLV_SEGMENT	(243)
--#define QCA_PRE_SHUTDOWN_CMD		(0xFC08)
--#define QCA_DISABLE_LOGGING		(0xFC17)
--
--#define EDL_CMD_REQ_RES_EVT		(0x00)
--#define EDL_PATCH_VER_RES_EVT		(0x19)
--#define EDL_APP_VER_RES_EVT		(0x02)
--#define EDL_TVL_DNLD_RES_EVT		(0x04)
--#define EDL_CMD_EXE_STATUS_EVT		(0x00)
--#define EDL_SET_BAUDRATE_RSP_EVT	(0x92)
--#define EDL_NVM_ACCESS_CODE_EVT		(0x0B)
--#define EDL_PATCH_CONFIG_RES_EVT	(0x00)
--#define QCA_DISABLE_LOGGING_SUB_OP	(0x14)
-+#define EDL_PATCH_CMD_OPCODE		0xFC00
-+#define EDL_NVM_ACCESS_OPCODE		0xFC0B
-+#define EDL_WRITE_BD_ADDR_OPCODE	0xFC14
-+#define EDL_PATCH_CMD_LEN		1
-+#define EDL_PATCH_VER_REQ_CMD		0x19
-+#define EDL_PATCH_TLV_REQ_CMD		0x1E
-+#define EDL_GET_BUILD_INFO_CMD		0x20
-+#define EDL_GET_BID_REQ_CMD		0x23
-+#define EDL_NVM_ACCESS_SET_REQ_CMD	0x01
-+#define EDL_PATCH_CONFIG_CMD		0x28
-+#define MAX_SIZE_PER_TLV_SEGMENT	243
-+#define QCA_PRE_SHUTDOWN_CMD		0xFC08
-+#define QCA_DISABLE_LOGGING		0xFC17
-+
-+#define EDL_CMD_REQ_RES_EVT		0x00
-+#define EDL_PATCH_VER_RES_EVT		0x19
-+#define EDL_APP_VER_RES_EVT		0x02
-+#define EDL_TVL_DNLD_RES_EVT		0x04
-+#define EDL_CMD_EXE_STATUS_EVT		0x00
-+#define EDL_SET_BAUDRATE_RSP_EVT	0x92
-+#define EDL_NVM_ACCESS_CODE_EVT		0x0B
-+#define EDL_PATCH_CONFIG_RES_EVT	0x00
-+#define QCA_DISABLE_LOGGING_SUB_OP	0x14
- 
- #define EDL_TAG_ID_BD_ADDR		2
--#define EDL_TAG_ID_HCI			(17)
--#define EDL_TAG_ID_DEEP_SLEEP		(27)
-+#define EDL_TAG_ID_HCI			17
-+#define EDL_TAG_ID_DEEP_SLEEP		27
- 
- #define QCA_WCN3990_POWERON_PULSE	0xFC
- #define QCA_WCN3990_POWEROFF_PULSE	0xC0
-@@ -39,7 +39,7 @@
- #define QCA_HCI_CC_OPCODE		0xFC00
- #define QCA_HCI_CC_SUCCESS		0x00
- 
--#define QCA_WCN3991_SOC_ID		(0x40014320)
-+#define QCA_WCN3991_SOC_ID		0x40014320
- 
- /* QCA chipset version can be decided by patch and SoC
-  * version, combination with upper 2 bytes from SoC
-@@ -48,11 +48,11 @@
- #define get_soc_ver(soc_id, rom_ver)	\
- 	((le32_to_cpu(soc_id) << 16) | (le16_to_cpu(rom_ver)))
- 
--#define QCA_HSP_GF_SOC_ID			0x1200
--#define QCA_HSP_GF_SOC_MASK			0x0000ff00
-+#define QCA_HSP_GF_SOC_ID		0x1200
-+#define QCA_HSP_GF_SOC_MASK		0x0000ff00
- 
- enum qca_baudrate {
--	QCA_BAUDRATE_115200 	= 0,
-+	QCA_BAUDRATE_115200	= 0,
- 	QCA_BAUDRATE_57600,
- 	QCA_BAUDRATE_38400,
- 	QCA_BAUDRATE_19200,
-@@ -71,7 +71,7 @@ enum qca_baudrate {
- 	QCA_BAUDRATE_1600000,
- 	QCA_BAUDRATE_3200000,
- 	QCA_BAUDRATE_3500000,
--	QCA_BAUDRATE_AUTO 	= 0xFE,
-+	QCA_BAUDRATE_AUTO	= 0xFE,
- 	QCA_BAUDRATE_RESERVED
- };
- 
--- 
-2.43.2
 
+--===============3769756593729623576==--
