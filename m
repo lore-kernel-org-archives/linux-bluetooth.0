@@ -1,231 +1,206 @@
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88D862E3E4
-	for <linux-bluetooth@vger.kernel.org>; Wed,  1 May 2024 04:19:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86975D2E5;
+	Wed,  1 May 2024 04:32:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714537163; cv=none; b=Ly59OF7aG4UfHPELIt/Lu1qNzD/ZVtAm3LYGYh2hGA/xNnJ7PUZk2ZCqgHRwdYIAqFJOrSiwn6dMJxmXdlHm/vQlP9yyVRQyIpbnz1pa24ZmQ+R8PhnIm4ohkf6V0mZ9csZ9twg/ViThJ/jEEHA/vY74AvG4Ju8cbVkSNN8aCJU=
+	t=1714537957; cv=none; b=lp/SMW6kt7mB8XKlHUavBALKxYLBjDbyWQqJEqtB4XsoTmcdxXSvKQQ3DIr3GpvpOLgYWAvm6C/QSqeyPH439z3O4pccYQrSfOAS+gqcz/2JEwBdUS9T63yhjluElzDtxw7UxA9N5PK4sW9BzI3fInBDlkja2Bhg84YogGmMaE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714537163; c=relaxed/simple;
-	bh=gBAFypkIVlsZLqXrFgQZsrs4aDIRCsT6MPgpA1NBAOw=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=TLU2rWWQcZqgiqbonTWb4I8tdGtng6A+xt4oE6wnMX+W7jej7OcWUxR+0KzlctjJfFt0cxKRc0nvKHp3WSx6VVI/EfdSOIeIuyAYoMRrii0eGbQG3/YQF4CrvUbtVbeHh5xKMIw9qGSy4K0Q6dzDfuhWQ2IqJK23Htvlqg9FHL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7dec81b8506so379094539f.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Apr 2024 21:19:21 -0700 (PDT)
+	s=arc-20240116; t=1714537957; c=relaxed/simple;
+	bh=2JY5OY0eLf0Go09E4VV+/1JdG4dIaohPD9zFXAum5sk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kMv6ohQXWjRsYECJ948FEzlvCN1Wynpxaokj1lOBAsJ6gZ2c6oLpnnc3Si4ELebYnB7B5NcoKWoZOYrhfSBIQP3z0+GO2iBI2geApfJCqhT6tresxyRPEkn/xMND6tlNfrALOFVm/JXzXF3Q0PyRIXfq3++dSAv4lMITXQmJVL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-4dee77a2b49so1212153e0c.1;
+        Tue, 30 Apr 2024 21:32:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714537160; x=1715141960;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wphcx2dBM60sViwV3qH9IOT4i1WcdGMIdFqUDnGUGe4=;
-        b=m/MyV5p6C54dsCQc6zXkgJe9yi5G5I7izZHMWI3UayDdnaIRhxZzjHSgVMZq/3Qdvz
-         sZVUG7ZkGO7jZ9yE46oq0uufaFj6opLKxk5ocW0IID4e8MH4AzlFHzYg5QEd2oGcLw2s
-         KDfSTsbRyPgNyQFsTtxo4R2hiew+Em9HaYXvZHQt/DznzcesxesvZABe+NA5sAHleKDb
-         tGMFeqJU/d7JWGPXkHNLQUduuzXl1ayPuXKOkJcZLH5gLmt4VmMS0kXlc5p0Oiw6iWA/
-         ugkphA+rxe3rDf0C/GBizVqzKTuhAPy3hnXMHOQoGqQTZI58c6xmt04+ZPGlRBB8bmIH
-         SQMw==
-X-Forwarded-Encrypted: i=1; AJvYcCWKXJ7K7BpIRclYAxYEgiGcghBOmnb3di/wpeWdr86zW4iYyw972BoHRWkVuo5PP1GGIDeeklac4stRVaBAeRiy08w/bEsVn/pM+jl1Ghot
-X-Gm-Message-State: AOJu0YxZwZwJMw+kgN1tN8UIoaWReKedzvS4q4oEJGPwz0/FpSwdv7Ea
-	XGlRUvQ0CNONa/kpahhw2Jr9/6G03LANMLmTDU6ruA53eYhvozvlJZyXV89XxINzRwuOr/jsIhY
-	+7KyhXJ1GppDim2MOgGncUI6qJ8zY+6xeBBIK42boNR3aq+0g67apXwE=
-X-Google-Smtp-Source: AGHT+IFNQqAwWHBpX2rgoDdORl2uZ3RnkxoRqSe0ptReiQxXXRFVtWmIcZ2/O0/zdo8aUmPIM06yOu1ATIsoMvGhJLwAx5JMvELN
+        d=1e100.net; s=20230601; t=1714537954; x=1715142754;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5Z5lN9ouraph5ntmF9cLLqC94FKMgX8DNOshw4gn8zw=;
+        b=JusS84OA+OTwpPp8KwmveLTPm22mgiuGnpmpf6KAJAaTJ4nZuvz539jvj57IQZegSJ
+         7I3EqlDAXc589bq3m460sw/0S9iR6TIgkGexZDLGfhqTfl68imgW1oddJyMDOdyNm64N
+         JUIzVXhv1e/W1PppsOhtowbq2oFGEK/eEtOUNVu/A+FTxdojr/Axd3yvhLiM/nPH+gZS
+         YZAPsCc9etC0X2PFn8C5FZxKc8cZzHbpFmL1PKqjhiuFKYdtUintZaf5Ry8HjbU5k0Bd
+         fz1zh66jWWE8Atv10UgMdUV4sKtMvAhmKtt1PsSyJIWOWdp2ZPm6DCFR1GbrzYFIxc0q
+         Pb2A==
+X-Forwarded-Encrypted: i=1; AJvYcCWRKqHPccsbp7AkOu/wMEhKtXsqnjKx8L6Qu2YB4dvbJwt7cU9tLOLB8bVhfKB5jW0DI5e/n+kVjMfjXMNafew2cwdG0Ww6OHvnYLnolBu2Kv81QDVXHSuhK/EErg50J5sIAWhsNpbqVuYPnpxEKHb8F8yR2+26qoD42AtjrTwJRCfDORS8
+X-Gm-Message-State: AOJu0YzLZtxOYdGvvpjB/JWg3QaNmHO8IXaK/SNvPrdhnxRJNlpnVntf
+	AXYkYQ48iPG6jh0olP/NeMLpmFjrhuXr6oBMz+M4AJNnEdtDFujT
+X-Google-Smtp-Source: AGHT+IFEsfnWehxiAiumsg8emFvB06y8Nfu+9ZDYXnIqFHeuB3FAWBoMcAZIutFPX/7RUaCD07qFjw==
+X-Received: by 2002:a05:6122:3187:b0:4d4:1ec7:76e5 with SMTP id ch7-20020a056122318700b004d41ec776e5mr1328818vkb.16.1714537954179;
+        Tue, 30 Apr 2024 21:32:34 -0700 (PDT)
+Received: from tofu.cs.purdue.edu ([128.210.0.165])
+        by smtp.gmail.com with ESMTPSA id i1-20020ae9ee01000000b0078f12b01bbdsm11618561qkg.101.2024.04.30.21.32.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Apr 2024 21:32:33 -0700 (PDT)
+From: Sungwoo Kim <iam@sung-woo.kim>
+To: luiz.dentz@gmail.com
+Cc: daveti@purdue.edu,
+	benquike@gmail.com,
+	Sungwoo Kim <iam@sung-woo.kim>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: L2CAP: Fix div-by-zero in l2cap_le_flowctl_init()
+Date: Wed,  1 May 2024 00:29:36 -0400
+Message-Id: <20240501042936.2579739-1-iam@sung-woo.kim>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:31c9:b0:485:907:ffa with SMTP id
- n9-20020a05663831c900b0048509070ffamr118922jav.1.1714537160773; Tue, 30 Apr
- 2024 21:19:20 -0700 (PDT)
-Date: Tue, 30 Apr 2024 21:19:20 -0700
-In-Reply-To: <000000000000a0703c0616a9cf58@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000006c25b806175ccab3@google.com>
-Subject: Re: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in skb_release_head_state
-From: syzbot <syzbot+d863bc2d28ef7ff42984@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-syzbot has found a reproducer for the following issue on:
+Hi Luiz, could you review this patch?
 
-HEAD commit:    50dffbf77180 Merge tag 'for-v6.9-rc' of git://git.kernel.o..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=175cb917180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3310e643b6ef5d69
-dashboard link: https://syzkaller.appspot.com/bug?extid=d863bc2d28ef7ff42984
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10ba57bb180000
+This patch prevents a div-by-zero error and potential int overflow by
+adding a range check for MTU in hci_cc_le_read_buffer_size() and
+hci_cc_le_read_buffer_size_v2().
+Also, hci_connect_le() will refuse to allocate hcon if the MTU is not in
+the valid range.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/bee47aac5cdf/disk-50dffbf7.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/fa34e947bc0e/vmlinux-50dffbf7.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/30e0143a8439/bzImage-50dffbf7.xz
-mounted in repro: https://storage.googleapis.com/syzbot-assets/721857493545/mount_0.gz
+Bug description:
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+d863bc2d28ef7ff42984@syzkaller.appspotmail.com
+l2cap_le_flowctl_init() can cause both div-by-zero and an integer overflow.
 
-==================================================================
-BUG: KASAN: slab-use-after-free in skb_dst_drop include/net/dst.h:274 [inline]
-BUG: KASAN: slab-use-after-free in skb_release_head_state+0x283/0x2b0 net/core/skbuff.c:1185
-Read of size 8 at addr ffff88807683fa58 by task syz-executor.0/5091
+l2cap_le_flowctl_init()
+  chan->mps = min_t(u16, chan->imtu, chan->conn->mtu - L2CAP_HDR_SIZE);
+  chan->rx_credits = (chan->imtu / chan->mps) + 1;  <- div-by-zero
 
-CPU: 0 PID: 5091 Comm: syz-executor.0 Not tainted 6.9.0-rc6-syzkaller-00042-g50dffbf77180 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+Here, chan->conn->mtu could be less than or equal to L2CAP_HDR_SIZE (4).
+If mtu is 4, it causes div-by-zero. If mtu is less than 4, it causes an
+integer overflow.
+
+How mtu could have such low value:
+
+hci_cc_le_read_buffer_size()
+  hdev->le_mtu = __le16_to_cpu(rp->le_mtu);
+
+l2cap_conn_add()
+  conn->mtu = hcon->hdev->le_mtu;
+
+As shown, mtu is an input from an HCI device. So, any HCI device can
+set mtu value to any value, such as lower than 4.
+According to the spec v5.4 7.8.2 LE Read Buffer Size command, the value
+should be fall in [0x001b, 0xffff].
+
+Thank you,
+Sungwoo.
+
+divide error: 0000 [#1] PREEMPT SMP KASAN NOPTI
+CPU: 0 PID: 67 Comm: kworker/u5:0 Tainted: G        W          6.9.0-rc5+ #20
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Workqueue: hci0 hci_rx_work
+RIP: 0010:l2cap_le_flowctl_init+0x19e/0x3f0 net/bluetooth/l2cap_core.c:547
+Code: e8 17 17 0c 00 66 41 89 9f 84 00 00 00 bf 01 00 00 00 41 b8 02 00 00 00 4c 89 fe 4c 89 e2 89 d9 e8 27 17 0c 00 44 89 f0 31 d2 <66> f7 f3 89 c3 ff c3 4d 8d b7 88 00 00 00 4c 89 f0 48 c1 e8 03 42
+RSP: 0018:ffff88810bc0f858 EFLAGS: 00010246
+RAX: 00000000000002a0 RBX: 0000000000000000 RCX: dffffc0000000000
+RDX: 0000000000000000 RSI: ffff88810bc0f7c0 RDI: ffffc90002dcb66f
+RBP: ffff88810bc0f880 R08: aa69db2dda70ff01 R09: 0000ffaaaaaaaaaa
+R10: 0084000000ffaaaa R11: 0000000000000000 R12: ffff88810d65a084
+R13: dffffc0000000000 R14: 00000000000002a0 R15: ffff88810d65a000
+FS:  0000000000000000(0000) GS:ffff88811ac00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020000100 CR3: 0000000103268003 CR4: 0000000000770ef0
+PKRU: 55555554
 Call Trace:
  <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:114
- print_address_description mm/kasan/report.c:377 [inline]
- print_report+0xc3/0x620 mm/kasan/report.c:488
- kasan_report+0xd9/0x110 mm/kasan/report.c:601
- skb_dst_drop include/net/dst.h:274 [inline]
- skb_release_head_state+0x283/0x2b0 net/core/skbuff.c:1185
- skb_release_all net/core/skbuff.c:1200 [inline]
- __kfree_skb net/core/skbuff.c:1216 [inline]
- kfree_skb_reason+0xed/0x210 net/core/skbuff.c:1252
- kfree_skb include/linux/skbuff.h:1262 [inline]
- __hci_req_sync+0x61d/0x980 net/bluetooth/hci_request.c:184
- hci_req_sync+0x97/0xd0 net/bluetooth/hci_request.c:206
- hci_dev_cmd+0x653/0x9c0 net/bluetooth/hci_core.c:790
- hci_sock_ioctl+0x4f3/0x8e0 net/bluetooth/hci_sock.c:1153
- sock_do_ioctl+0x116/0x280 net/socket.c:1222
- sock_ioctl+0x22e/0x6c0 net/socket.c:1341
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:904 [inline]
- __se_sys_ioctl fs/ioctl.c:890 [inline]
- __x64_sys_ioctl+0x193/0x220 fs/ioctl.c:890
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcf/0x260 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f19e347dc0b
-Code: 00 48 89 44 24 18 31 c0 48 8d 44 24 60 c7 04 24 10 00 00 00 48 89 44 24 08 48 8d 44 24 20 48 89 44 24 10 b8 10 00 00 00 0f 05 <89> c2 3d 00 f0 ff ff 77 1c 48 8b 44 24 18 64 48 2b 04 25 28 00 00
-RSP: 002b:00007ffe54d6d580 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f19e347dc0b
-RDX: 00007ffe54d6d5f8 RSI: 00000000400448dd RDI: 0000000000000003
-RBP: 000055556149b430 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000008 R11: 0000000000000246 R12: 0000000000000001
-R13: 0000000000000001 R14: 0000000000000001 R15: 00000000fffffff1
+ l2cap_le_connect_req net/bluetooth/l2cap_core.c:4902 [inline]
+ l2cap_le_sig_cmd net/bluetooth/l2cap_core.c:5420 [inline]
+ l2cap_le_sig_channel net/bluetooth/l2cap_core.c:5486 [inline]
+ l2cap_recv_frame+0xe59d/0x11710 net/bluetooth/l2cap_core.c:6809
+ l2cap_recv_acldata+0x544/0x10a0 net/bluetooth/l2cap_core.c:7506
+ hci_acldata_packet net/bluetooth/hci_core.c:3939 [inline]
+ hci_rx_work+0x5e5/0xb20 net/bluetooth/hci_core.c:4176
+ process_one_work kernel/workqueue.c:3254 [inline]
+ process_scheduled_works+0x90f/0x1530 kernel/workqueue.c:3335
+ worker_thread+0x926/0xe70 kernel/workqueue.c:3416
+ kthread+0x2e3/0x380 kernel/kthread.c:388
+ ret_from_fork+0x5c/0x90 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
  </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
 
-Allocated by task 5109:
- kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
- kasan_save_track+0x14/0x30 mm/kasan/common.c:68
- unpoison_slab_object mm/kasan/common.c:312 [inline]
- __kasan_slab_alloc+0x89/0x90 mm/kasan/common.c:338
- kasan_slab_alloc include/linux/kasan.h:201 [inline]
- slab_post_alloc_hook mm/slub.c:3798 [inline]
- slab_alloc_node mm/slub.c:3845 [inline]
- kmem_cache_alloc+0x136/0x320 mm/slub.c:3852
- skb_clone+0x190/0x3f0 net/core/skbuff.c:2063
- hci_send_cmd_sync net/bluetooth/hci_core.c:4220 [inline]
- hci_cmd_work+0x66a/0x710 net/bluetooth/hci_core.c:4240
- process_one_work+0x9a9/0x1ac0 kernel/workqueue.c:3267
- process_scheduled_works kernel/workqueue.c:3348 [inline]
- worker_thread+0x6c8/0xf70 kernel/workqueue.c:3429
- kthread+0x2c1/0x3a0 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
-Freed by task 4472:
- kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
- kasan_save_track+0x14/0x30 mm/kasan/common.c:68
- kasan_save_free_info+0x3b/0x60 mm/kasan/generic.c:579
- poison_slab_object mm/kasan/common.c:240 [inline]
- __kasan_slab_free+0x11d/0x1a0 mm/kasan/common.c:256
- kasan_slab_free include/linux/kasan.h:184 [inline]
- slab_free_hook mm/slub.c:2106 [inline]
- slab_free mm/slub.c:4280 [inline]
- kmem_cache_free+0x12e/0x380 mm/slub.c:4344
- kfree_skbmem+0x10e/0x200 net/core/skbuff.c:1159
- __kfree_skb net/core/skbuff.c:1217 [inline]
- kfree_skb_reason+0x13a/0x210 net/core/skbuff.c:1252
- kfree_skb include/linux/skbuff.h:1262 [inline]
- hci_req_sync_complete+0x16c/0x270 net/bluetooth/hci_request.c:109
- hci_event_packet+0x963/0x1170 net/bluetooth/hci_event.c:7607
- hci_rx_work+0x2c4/0x1610 net/bluetooth/hci_core.c:4171
- process_one_work+0x9a9/0x1ac0 kernel/workqueue.c:3267
- process_scheduled_works kernel/workqueue.c:3348 [inline]
- worker_thread+0x6c8/0xf70 kernel/workqueue.c:3429
- kthread+0x2c1/0x3a0 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
-The buggy address belongs to the object at ffff88807683fa00
- which belongs to the cache skbuff_head_cache of size 240
-The buggy address is located 88 bytes inside of
- freed 240-byte region [ffff88807683fa00, ffff88807683faf0)
-
-The buggy address belongs to the physical page:
-page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x7683f
-flags: 0xfff00000000800(slab|node=0|zone=1|lastcpupid=0x7ff)
-page_type: 0xffffffff()
-raw: 00fff00000000800 ffff888018e98780 dead000000000122 0000000000000000
-raw: 0000000000000000 00000000800c000c 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 0, migratetype Unmovable, gfp_mask 0x12cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY), pid 5091, tgid -863472599 (syz-executor.0), ts 5092, free_ts 99223985895
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x2d4/0x350 mm/page_alloc.c:1534
- prep_new_page mm/page_alloc.c:1541 [inline]
- get_page_from_freelist+0xa28/0x3780 mm/page_alloc.c:3317
- __alloc_pages+0x22b/0x2460 mm/page_alloc.c:4575
- __alloc_pages_node include/linux/gfp.h:238 [inline]
- alloc_pages_node include/linux/gfp.h:261 [inline]
- alloc_slab_page mm/slub.c:2175 [inline]
- allocate_slab mm/slub.c:2338 [inline]
- new_slab+0xcc/0x3a0 mm/slub.c:2391
- ___slab_alloc+0x66d/0x1790 mm/slub.c:3525
- __slab_alloc.constprop.0+0x56/0xb0 mm/slub.c:3610
- __slab_alloc_node mm/slub.c:3663 [inline]
- slab_alloc_node mm/slub.c:3835 [inline]
- kmem_cache_alloc_node+0x10a/0x340 mm/slub.c:3888
- __alloc_skb+0x2b1/0x380 net/core/skbuff.c:658
- alloc_skb include/linux/skbuff.h:1313 [inline]
- bt_skb_alloc include/net/bluetooth/bluetooth.h:489 [inline]
- vhci_get_user drivers/bluetooth/hci_vhci.c:497 [inline]
- vhci_write+0xc7/0x470 drivers/bluetooth/hci_vhci.c:617
- call_write_iter include/linux/fs.h:2110 [inline]
- do_iter_readv_writev+0x504/0x780 fs/read_write.c:741
- vfs_writev+0x36f/0xdb0 fs/read_write.c:971
- do_writev+0x137/0x370 fs/read_write.c:1018
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcf/0x260 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-page last free pid 5076 tgid 5072 stack trace:
- reset_page_owner include/linux/page_owner.h:25 [inline]
- free_pages_prepare mm/page_alloc.c:1141 [inline]
- free_unref_page_prepare+0x527/0xb10 mm/page_alloc.c:2347
- free_unref_page+0x33/0x3c0 mm/page_alloc.c:2487
- vfree+0x181/0x7a0 mm/vmalloc.c:3340
- sel_release_policy+0xd7/0x120 security/selinux/selinuxfs.c:422
- __fput+0x270/0xb80 fs/file_table.c:422
- __fput_sync+0x47/0x50 fs/file_table.c:507
- __do_sys_close fs/open.c:1556 [inline]
- __se_sys_close fs/open.c:1541 [inline]
- __x64_sys_close+0x86/0x100 fs/open.c:1541
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcf/0x260 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Memory state around the buggy address:
- ffff88807683f900: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
- ffff88807683f980: 00 00 00 00 00 00 fc fc fc fc fc fc fc fc fc fc
->ffff88807683fa00: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                                    ^
- ffff88807683fa80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fc fc
- ffff88807683fb00: fc fc fc fc fc fc fc fc fa fb fb fb fb fb fb fb
-==================================================================
-
-
+Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
 ---
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+v1 -> v2:
+- Reply with an error code if a given MTU is not valid.
+- Refuse hcon allocation if MTU is not still valid.
+
+ include/net/bluetooth/hci.h | 6 ++++++
+ net/bluetooth/hci_conn.c    | 4 ++++
+ net/bluetooth/hci_event.c   | 6 ++++++
+ 3 files changed, 16 insertions(+)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 5c12761cb..a7bc07e9c 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1666,6 +1666,12 @@ struct hci_cp_le_set_event_mask {
+ 	__u8     mask[8];
+ } __packed;
+ 
++/* BLUETOOTH CORE SPECIFICATION Version 5.4 | Vol 4, Part E
++ * 7.8.2 LE Read Buffer Size command
++ */
++#define HCI_MIN_LE_MTU 0x001b
++#define HCI_MAX_LE_MTU 0xFFFF
++
+ #define HCI_OP_LE_READ_BUFFER_SIZE	0x2002
+ struct hci_rp_le_read_buffer_size {
+ 	__u8     status;
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 05346250f..0b86a7452 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1277,6 +1277,10 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 		return ERR_PTR(-EOPNOTSUPP);
+ 	}
+ 
++	/* Check the mtu is valid */
++	if (hdev->le_mtu < HCI_MIN_LE_MTU || HCI_MAX_LE_MTU < hdev->le_mtu)
++		return ERR_PTR(-ECONNREFUSED);
++
+ 	/* Since the controller supports only one LE connection attempt at a
+ 	 * time, we return -EBUSY if there is any connection attempt running.
+ 	 */
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 4a27e4a17..a8563cbe2 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1263,6 +1263,9 @@ static u8 hci_cc_le_read_buffer_size(struct hci_dev *hdev, void *data,
+ 
+ 	BT_DBG("%s le mtu %d:%d", hdev->name, hdev->le_mtu, hdev->le_pkts);
+ 
++	if (hdev->le_mtu < HCI_MIN_LE_MTU || HCI_MAX_LE_MTU < hdev->le_mtu)
++		return HCI_ERROR_INVALID_PARAMETERS;
++
+ 	return rp->status;
+ }
+ 
+@@ -3821,6 +3824,9 @@ static u8 hci_cc_le_read_buffer_size_v2(struct hci_dev *hdev, void *data,
+ 	BT_DBG("%s acl mtu %d:%d iso mtu %d:%d", hdev->name, hdev->acl_mtu,
+ 	       hdev->acl_pkts, hdev->iso_mtu, hdev->iso_pkts);
+ 
++	if (hdev->le_mtu < HCI_MIN_LE_MTU || HCI_MAX_LE_MTU < hdev->le_mtu)
++		return HCI_ERROR_INVALID_PARAMETERS;
++
+ 	return rp->status;
+ }
+ 
+-- 
+2.34.1
+
