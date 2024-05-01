@@ -1,141 +1,83 @@
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA4FB211C
-	for <linux-bluetooth@vger.kernel.org>; Wed,  1 May 2024 18:35:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 944CA1474B9
+	for <linux-bluetooth@vger.kernel.org>; Wed,  1 May 2024 19:12:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714588526; cv=none; b=AcoaKYCGWMZm/uOZMBgvvkHLW42sJRL0uTKR1j3MjBfugdzms1BwbTCftmNuw7sIMJfQPDUxx17+CZ16HgstSkbJ8MZjrlx9NiTmFGHLg3cXDAvxH39TYdJcmHUvjDicZWBrzItB3QUzMsaUqkz5JSJ8f1VVxZKuJsWWkHEVyo4=
+	t=1714590777; cv=none; b=aH3IwpWSb7dhuiam+eOZyJ41dcRA9vHCi3KnLCyifF20LzRhKsDePtjdwOiHYGLCxS23BnForm9iRsjhpMz5cOAV3Ah9UfZ/utUhPuZfAK0jnPB/m2nYq0AqtLROh3i+4YHxXo8txgZUZSWOLTqLhWr7SRpiee62q315ZUoxe0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714588526; c=relaxed/simple;
-	bh=FeXaiGe7u+e5gkRNAKNt14iJ3+7ddOZcd6zKWolnoVE=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Pj5kuHXzU7weBy/KnXb1KDgKs9eIS06kNxh9JUhbKZFJtZXxad4kc87Zx6ijRt2FMia3q2zqgnH43xoEEw6ZQ94L0gljE0s4YWX5sgkxMjxSuIHMbw5mBD13f5PL+HGuJcTV1saqjT/inyc6YtIALrFM5g3LYdx7rV2ZCOLQTt0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IssoPEJ4; arc=none smtp.client-ip=209.85.222.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1714590777; c=relaxed/simple;
+	bh=EwKEuDLSOMKR1jV1lR+1TeGQ2t/97k23NvQ/j0JLcjo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oTz+GinAzBhyjqRNt39xJXpW4msDz4zk+n8v6hx++B/xH4X9Dt0CT/viEyHKPitH5rFwZfUb9x8b8afrceEqazkXnT63WXe77cMgjlXeFOejVSTbGh218nMGiKNsSam6Rm3X1m5C2qlrjrS4I0QULEcezh2GnaZQnBJ12Xsn7qs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Hq7yxo+N; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IssoPEJ4"
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-790605809cbso624419185a.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 01 May 2024 11:35:24 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Hq7yxo+N"
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1eab16c8d83so57948365ad.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 01 May 2024 12:12:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714588523; x=1715193323; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=P9Koa6z+lEGl1G/g/mTlpOd7H0BwHEHUqudkG9USEhw=;
-        b=IssoPEJ4q99qWTWmiAKoMSdv6zQb7pfEuzeZujhWktO1JUTH7Hd3cAmgcgUFv3nMD5
-         SMLcoo5ohLLGKjIWzj/W/V/s+mMnCxeLa+UBAVLbr+GkteZSKlhErDKJiLl4TLzTAm+L
-         ZjMuY5xPfrA2D/4yHTRyN8GULfXjZDgLlE/dugUCFyewNU12EfXuGKaMtYI1ZHfqWfUX
-         b/F470RehRaplLTC3OYb2eoKAK+EqPEWA34b1MLRgCgVozZ4d4VoUaPZLj2lVhxXzmWc
-         sdW1SzJISNLUOWVFk3UovGNcbdxK9KBhpKySig3cIPUVgJXHrePyVTOqWdx8OS/m3MBi
-         yIaQ==
+        d=chromium.org; s=google; t=1714590776; x=1715195576; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ftc3aqw2Fz5Res4OfCV1JsnJI6jUFRSYvKQ/iKjV0XQ=;
+        b=Hq7yxo+NaW7Cm+zBacnYar2Szf0QA8VfyMW+IOmQUfLN45/uoanAj2i8NwL8Au4UEa
+         utNBUAvm5B6gN+k/8J00l9BLYDh9Xl3vcNIJaTEfpN1HymUNSc5K0ImUjsYXpm3sA7HP
+         ed11wZ2ShTkIJEzCAH3pDCA+75X6iuyCS5S7E=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714588523; x=1715193323;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=P9Koa6z+lEGl1G/g/mTlpOd7H0BwHEHUqudkG9USEhw=;
-        b=n61VqxiJ5jzuDnfH/sO+Iq1n2mAA0/7QMBffzBJ/WWltoVdXjjNhM2CEbqNHrPbw1L
-         jzK/92i1WwJ1pb0Ri+jfwuECY9OfN79gB++niyDgu2EyhJujr0SXW6pkMQOpnaDu0RXA
-         H4LxqUzjyFF2+QhIQqF1jhSwNkylVQP6taDCeG7HWuAzltMMg4QgVyAp2vseNiRiFl0F
-         cyI/ieZRAneCq2cuv200w6b2krc6FbhcftM6qXU9sh2eszKJ6GnQ/sydeph0muLMLUc8
-         y03OzhLAkr13X0XSm4DqVWdWjX0iT34OTbxmO9SJhtsjft4gpDNlcVVz5fjR3jdoyOBg
-         JHog==
-X-Gm-Message-State: AOJu0YzkiyK+9dROlcYhbun/KLN22Wcyo8dNjXhvUxTqGLAvPSLKVAnu
-	NqmtKasQv/sBSj3+p7BqPsSzAQJn725qC5h7wSCwH4pHWottjCz19s6hZA==
-X-Google-Smtp-Source: AGHT+IHWgzYZLGCeoC+4pCaIbXxuej6nADcz+xJ0yp0AZ/9Og2XNgN64YWpxn/dA1agndicWxoVh0Q==
-X-Received: by 2002:a05:620a:3b93:b0:790:98f8:955e with SMTP id ye19-20020a05620a3b9300b0079098f8955emr3420045qkn.30.1714588523457;
-        Wed, 01 May 2024 11:35:23 -0700 (PDT)
-Received: from [172.17.0.2] ([20.109.37.3])
-        by smtp.gmail.com with ESMTPSA id u10-20020ae9c00a000000b007909ec6a8cbsm5884244qkk.74.2024.05.01.11.35.23
+        d=1e100.net; s=20230601; t=1714590776; x=1715195576;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ftc3aqw2Fz5Res4OfCV1JsnJI6jUFRSYvKQ/iKjV0XQ=;
+        b=P8oX9XqICh5g5/CPS/8D21HcAyfp9MrPYAZo8fsMqRbTfJJ2E3OQFcFkY1R7x/chbk
+         8VreiFQOKV6dg76QEAduEiCBv/JpeIkuyJVW8lcA4OzFwKQtzNy6WIjJSSo7IfIKCSMa
+         LqH3KrB4TopSHtd/oUbT0zBB1fvP2FkW9+gJ019W8hRa5tbP2AJLtR9ZC6k7ur8Vp8AH
+         aFYriDD+82xjxnvVblUBE6GMYMM6Jfm8kHY4qD2kTf+wzakXquOR0hzgsu8nWwREB63p
+         7LSE6oYg+iLF9VWsQwf3z9/Sg6r4qof9ScvvQ9+PWKgKZ0SeMiXBbrpP5k9NTm5j6NVT
+         L3Kw==
+X-Forwarded-Encrypted: i=1; AJvYcCWzNmsRuOqeX4xs4a4mCU6Q+Nerq0I65MauB3W5lmXJp64ScP6M8C3iYp3BQmMrKOjMOm/LonfWi0D4tX+utNq2cNZwmIh8nKcachuf4h1c
+X-Gm-Message-State: AOJu0YzHku0IieYRUz3S44DtHamLRqrt8YJG19WlhCn6e05eLemGS0qw
+	YVzUBq7BSOMN4/4VEPVCtm+zc3KWzOIAIeoGYsG6c3zCpMbUdboeK1w0XjAIWQ==
+X-Google-Smtp-Source: AGHT+IEiiv4rwNYFZ12Yp4KZFEplJPkRZSFlARmbW5OqhUN1DFUPbsYrXnx1y8Mx4Z+i9AF52A722A==
+X-Received: by 2002:a17:902:f550:b0:1ec:659c:9604 with SMTP id h16-20020a170902f55000b001ec659c9604mr3860603plf.50.1714590775996;
+        Wed, 01 May 2024 12:12:55 -0700 (PDT)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id b8-20020a170902d50800b001eab473021fsm10057496plg.168.2024.05.01.12.12.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 May 2024 11:35:23 -0700 (PDT)
-Message-ID: <66328b6b.e90a0220.85ed0.c569@mx.google.com>
-Date: Wed, 01 May 2024 11:35:23 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3103135378171611256=="
+        Wed, 01 May 2024 12:12:54 -0700 (PDT)
+Date: Wed, 1 May 2024 12:12:54 -0700
+From: Kees Cook <keescook@chromium.org>
+To: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH][next] Bluetooth: hci_conn: Use struct_size() in
+ hci_le_big_create_sync()
+Message-ID: <202405011212.4F3C0C1D@keescook>
+References: <ZjKFWg0f9uU5jxaI@neat>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, gustavoars@kernel.org
-Subject: RE: [next] Bluetooth: hci_sync: Use cmd->num_cis instead of magic number
-In-Reply-To: <ZjKAyg2bZNyTcT+C@neat>
-References: <ZjKAyg2bZNyTcT+C@neat>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZjKFWg0f9uU5jxaI@neat>
 
---===============3103135378171611256==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Wed, May 01, 2024 at 12:09:30PM -0600, Gustavo A. R. Silva wrote:
+> Use struct_size() instead of the open-coded version. Similarly to
+> this other patch[1].
+> 
+> Link: https://lore.kernel.org/linux-hardening/ZiwwPmCvU25YzWek@neat/ [1]
+> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 
-This is automated email and please do not reply to this email!
+Reviewed-by: Kees Cook <keescook@chromium.org>
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=849713
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.69 seconds
-GitLint                       PASS      0.34 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      30.68 seconds
-CheckAllWarning               PASS      33.46 seconds
-CheckSparse                   PASS      38.84 seconds
-CheckSmatch                   FAIL      34.88 seconds
-BuildKernel32                 PASS      29.17 seconds
-TestRunnerSetup               PASS      520.92 seconds
-TestRunner_l2cap-tester       PASS      18.37 seconds
-TestRunner_iso-tester         FAIL      31.48 seconds
-TestRunner_bnep-tester        PASS      4.75 seconds
-TestRunner_mgmt-tester        PASS      113.41 seconds
-TestRunner_rfcomm-tester      PASS      7.35 seconds
-TestRunner_sco-tester         PASS      15.06 seconds
-TestRunner_ioctl-tester       PASS      7.95 seconds
-TestRunner_mesh-tester        PASS      5.95 seconds
-TestRunner_smp-tester         PASS      7.02 seconds
-TestRunner_userchan-tester    PASS      5.08 seconds
-IncrementalBuild              PASS      29.55 seconds
-
-Details
-##############################
-Test: CheckSmatch - FAIL
-Desc: Run smatch tool with source
-Output:
-
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
-make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
-make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: net] Error 2
-make[2]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
-make[4]: *** Waiting for unfinished jobs....
-make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
-make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
-make: *** [Makefile:240: __sub-make] Error 2
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-Total: 122, Passed: 121 (99.2%), Failed: 1, Not Run: 0
-
-Failed Test Cases
-ISO Connect Suspend - Success                        Failed       4.184 seconds
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============3103135378171611256==--
+-- 
+Kees Cook
