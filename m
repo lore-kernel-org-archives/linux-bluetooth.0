@@ -1,206 +1,187 @@
-Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86975D2E5;
-	Wed,  1 May 2024 04:32:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95E703FB09
+	for <linux-bluetooth@vger.kernel.org>; Wed,  1 May 2024 04:57:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714537957; cv=none; b=lp/SMW6kt7mB8XKlHUavBALKxYLBjDbyWQqJEqtB4XsoTmcdxXSvKQQ3DIr3GpvpOLgYWAvm6C/QSqeyPH439z3O4pccYQrSfOAS+gqcz/2JEwBdUS9T63yhjluElzDtxw7UxA9N5PK4sW9BzI3fInBDlkja2Bhg84YogGmMaE8=
+	t=1714539444; cv=none; b=Qyz4HeabOXjJiKdodTxhqeRp5IPIxgnQbAYYd3t2tC9GvlMMt6cOXbf4F7h4Nzy/H3v8A228rMLL1WrUaC96609IWrgkhYUQXva2In507HkxbsVm5QBW1THGNOwcRChBRLfK9WX4Nz4OqIRg5fHh1uBg7rGXoDl6QrRLSNbx4Hc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714537957; c=relaxed/simple;
-	bh=2JY5OY0eLf0Go09E4VV+/1JdG4dIaohPD9zFXAum5sk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kMv6ohQXWjRsYECJ948FEzlvCN1Wynpxaokj1lOBAsJ6gZ2c6oLpnnc3Si4ELebYnB7B5NcoKWoZOYrhfSBIQP3z0+GO2iBI2geApfJCqhT6tresxyRPEkn/xMND6tlNfrALOFVm/JXzXF3Q0PyRIXfq3++dSAv4lMITXQmJVL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim
+	s=arc-20240116; t=1714539444; c=relaxed/simple;
+	bh=tKFJjH55IHg3Q8ssQSkQdunpDp+hqOPQmSjxDLTBscE=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=WQPlcJdMi14ZcleWiT1nC9mBJLs0C5FdqU4kkfqlckbLwBQMF9rJuCPSl8gLkqMj9BhT9REL5YOB/HqFuXRp9GZH1SiyUNJKTEuT2+G3G/Bj4SeptK9rxOKGqwIp69P9utpcThJuMrHZOJqjeBFvARLByxuzOA1arsPotHyxf3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bp+qc0w1; arc=none smtp.client-ip=209.85.222.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-4dee77a2b49so1212153e0c.1;
-        Tue, 30 Apr 2024 21:32:35 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bp+qc0w1"
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-78efd1a0022so502895585a.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Apr 2024 21:57:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714539441; x=1715144241; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=oDCDJdyjNImmGyCTb9PR8Z8LgtD+uMPzDjMQCLRZv0I=;
+        b=Bp+qc0w1IASQTNZhhLrn7fFFz14QfJK95W3CdrYT7hyNCGDMsd35oZPHtLKV5dPze4
+         G8gaUc8/kdl9ncAVlhZUKtTilkDiN/Q/fQnmzUsizv/eBgDneC1SxN0UkVKWDq5pwcaO
+         JY+CtjRgtAD2raSWn92OpbHJBDT+m7sXTn67trMAPs/k32j2BQJOxQN5+J6YM/44MNBM
+         l8NuMAyIur+BWwEdUAWMlLLEFvVssfEdru1zSrtWvfG6/k0CXYTDU7SW+vx3jgSiFAda
+         e1PkvMKIfuSSLbrrehSc52hlWwj1u0jN1+3E/bp/PyMyuZNZ63gA1nLYkad8rde1u87s
+         4ftA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714537954; x=1715142754;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1714539441; x=1715144241;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=5Z5lN9ouraph5ntmF9cLLqC94FKMgX8DNOshw4gn8zw=;
-        b=JusS84OA+OTwpPp8KwmveLTPm22mgiuGnpmpf6KAJAaTJ4nZuvz539jvj57IQZegSJ
-         7I3EqlDAXc589bq3m460sw/0S9iR6TIgkGexZDLGfhqTfl68imgW1oddJyMDOdyNm64N
-         JUIzVXhv1e/W1PppsOhtowbq2oFGEK/eEtOUNVu/A+FTxdojr/Axd3yvhLiM/nPH+gZS
-         YZAPsCc9etC0X2PFn8C5FZxKc8cZzHbpFmL1PKqjhiuFKYdtUintZaf5Ry8HjbU5k0Bd
-         fz1zh66jWWE8Atv10UgMdUV4sKtMvAhmKtt1PsSyJIWOWdp2ZPm6DCFR1GbrzYFIxc0q
-         Pb2A==
-X-Forwarded-Encrypted: i=1; AJvYcCWRKqHPccsbp7AkOu/wMEhKtXsqnjKx8L6Qu2YB4dvbJwt7cU9tLOLB8bVhfKB5jW0DI5e/n+kVjMfjXMNafew2cwdG0Ww6OHvnYLnolBu2Kv81QDVXHSuhK/EErg50J5sIAWhsNpbqVuYPnpxEKHb8F8yR2+26qoD42AtjrTwJRCfDORS8
-X-Gm-Message-State: AOJu0YzLZtxOYdGvvpjB/JWg3QaNmHO8IXaK/SNvPrdhnxRJNlpnVntf
-	AXYkYQ48iPG6jh0olP/NeMLpmFjrhuXr6oBMz+M4AJNnEdtDFujT
-X-Google-Smtp-Source: AGHT+IFEsfnWehxiAiumsg8emFvB06y8Nfu+9ZDYXnIqFHeuB3FAWBoMcAZIutFPX/7RUaCD07qFjw==
-X-Received: by 2002:a05:6122:3187:b0:4d4:1ec7:76e5 with SMTP id ch7-20020a056122318700b004d41ec776e5mr1328818vkb.16.1714537954179;
-        Tue, 30 Apr 2024 21:32:34 -0700 (PDT)
-Received: from tofu.cs.purdue.edu ([128.210.0.165])
-        by smtp.gmail.com with ESMTPSA id i1-20020ae9ee01000000b0078f12b01bbdsm11618561qkg.101.2024.04.30.21.32.33
+        bh=oDCDJdyjNImmGyCTb9PR8Z8LgtD+uMPzDjMQCLRZv0I=;
+        b=lDQE2Cjgi8QRpSgepuB0Bw+NwDt29KhPFTtlfLKGIAMxSNWUoHULsj3HBsGb5jR+Z7
+         BySDiPMOfqpzUUZsj/SJpxvkLVM0Y9K3XRqm/HIuiOI11asHNG6Ocp3qBt90kterT8tP
+         tIilicR3GOa+7iWf0R0FIZbcqnDSz/JljOhCdeXijdbITXA861Z3L8RZGhx4IFOShKE7
+         8DsKueKgOYmixxomx52CPg+pjbbBJ3XxjLDfsGiJTst2HlkCtEAKtHwm5fEXmAmYLzBk
+         TUd9Q8Zh1LTToAFG0sMQgoTlhBRGYxP+DIChpsabYa/Q94SGKhC6iOZvIhn3KsXRQPPp
+         EkZQ==
+X-Gm-Message-State: AOJu0YxEAX129QL2EtdiyKU3qTu96vfa0A4lKdN9C+aoEHqokC3+9z9d
+	rnJ02imb54Z0QOE1xUHp7YwMp+myH9nJWht4gDwVHqpEmjcSbvWeSDzD1ij1
+X-Google-Smtp-Source: AGHT+IGoz249fjcqSHoL/tEalKNWv74nDk93D3VVf2rvVfhyKsMsqkAlKirtrutDfSXgnSSAjpCXXQ==
+X-Received: by 2002:a05:620a:3782:b0:790:ad27:41a8 with SMTP id pi2-20020a05620a378200b00790ad2741a8mr1167801qkn.8.1714539441208;
+        Tue, 30 Apr 2024 21:57:21 -0700 (PDT)
+Received: from [172.17.0.2] ([52.184.188.234])
+        by smtp.gmail.com with ESMTPSA id h14-20020a05620a10ae00b0078d6303c099sm12013992qkk.112.2024.04.30.21.57.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Apr 2024 21:32:33 -0700 (PDT)
-From: Sungwoo Kim <iam@sung-woo.kim>
-To: luiz.dentz@gmail.com
-Cc: daveti@purdue.edu,
-	benquike@gmail.com,
-	Sungwoo Kim <iam@sung-woo.kim>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: L2CAP: Fix div-by-zero in l2cap_le_flowctl_init()
-Date: Wed,  1 May 2024 00:29:36 -0400
-Message-Id: <20240501042936.2579739-1-iam@sung-woo.kim>
-X-Mailer: git-send-email 2.34.1
+        Tue, 30 Apr 2024 21:57:21 -0700 (PDT)
+Message-ID: <6631cbb1.050a0220.2f3d5.71ee@mx.google.com>
+Date: Tue, 30 Apr 2024 21:57:21 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3502491486361169370=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, iam@sung-woo.kim
+Subject: RE: [v2] Bluetooth: L2CAP: Fix div-by-zero in l2cap_le_flowctl_init()
+In-Reply-To: <20240501042936.2579739-1-iam@sung-woo.kim>
+References: <20240501042936.2579739-1-iam@sung-woo.kim>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Luiz, could you review this patch?
+--===============3502491486361169370==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This patch prevents a div-by-zero error and potential int overflow by
-adding a range check for MTU in hci_cc_le_read_buffer_size() and
-hci_cc_le_read_buffer_size_v2().
-Also, hci_connect_le() will refuse to allocate hcon if the MTU is not in
-the valid range.
+This is automated email and please do not reply to this email!
 
-Bug description:
+Dear submitter,
 
-l2cap_le_flowctl_init() can cause both div-by-zero and an integer overflow.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=849562
 
-l2cap_le_flowctl_init()
-  chan->mps = min_t(u16, chan->imtu, chan->conn->mtu - L2CAP_HDR_SIZE);
-  chan->rx_credits = (chan->imtu / chan->mps) + 1;  <- div-by-zero
+---Test result---
 
-Here, chan->conn->mtu could be less than or equal to L2CAP_HDR_SIZE (4).
-If mtu is 4, it causes div-by-zero. If mtu is less than 4, it causes an
-integer overflow.
+Test Summary:
+CheckPatch                    FAIL      1.30 seconds
+GitLint                       FAIL      0.52 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      29.98 seconds
+CheckAllWarning               PASS      34.78 seconds
+CheckSparse                   WARNING   41.73 seconds
+CheckSmatch                   FAIL      36.49 seconds
+BuildKernel32                 PASS      29.28 seconds
+TestRunnerSetup               PASS      525.06 seconds
+TestRunner_l2cap-tester       PASS      23.57 seconds
+TestRunner_iso-tester         PASS      31.38 seconds
+TestRunner_bnep-tester        PASS      4.79 seconds
+TestRunner_mgmt-tester        FAIL      119.48 seconds
+TestRunner_rfcomm-tester      PASS      7.26 seconds
+TestRunner_sco-tester         PASS      15.00 seconds
+TestRunner_ioctl-tester       PASS      7.70 seconds
+TestRunner_mesh-tester        FAIL      5.98 seconds
+TestRunner_smp-tester         PASS      6.85 seconds
+TestRunner_userchan-tester    PASS      4.94 seconds
+IncrementalBuild              PASS      28.88 seconds
 
-How mtu could have such low value:
-
-hci_cc_le_read_buffer_size()
-  hdev->le_mtu = __le16_to_cpu(rp->le_mtu);
-
-l2cap_conn_add()
-  conn->mtu = hcon->hdev->le_mtu;
-
-As shown, mtu is an input from an HCI device. So, any HCI device can
-set mtu value to any value, such as lower than 4.
-According to the spec v5.4 7.8.2 LE Read Buffer Size command, the value
-should be fall in [0x001b, 0xffff].
-
-Thank you,
-Sungwoo.
-
-divide error: 0000 [#1] PREEMPT SMP KASAN NOPTI
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v2] Bluetooth: L2CAP: Fix div-by-zero in l2cap_le_flowctl_init()
+WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
+#122: 
 CPU: 0 PID: 67 Comm: kworker/u5:0 Tainted: G        W          6.9.0-rc5+ #20
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
-Workqueue: hci0 hci_rx_work
-RIP: 0010:l2cap_le_flowctl_init+0x19e/0x3f0 net/bluetooth/l2cap_core.c:547
-Code: e8 17 17 0c 00 66 41 89 9f 84 00 00 00 bf 01 00 00 00 41 b8 02 00 00 00 4c 89 fe 4c 89 e2 89 d9 e8 27 17 0c 00 44 89 f0 31 d2 <66> f7 f3 89 c3 ff c3 4d 8d b7 88 00 00 00 4c 89 f0 48 c1 e8 03 42
-RSP: 0018:ffff88810bc0f858 EFLAGS: 00010246
-RAX: 00000000000002a0 RBX: 0000000000000000 RCX: dffffc0000000000
-RDX: 0000000000000000 RSI: ffff88810bc0f7c0 RDI: ffffc90002dcb66f
-RBP: ffff88810bc0f880 R08: aa69db2dda70ff01 R09: 0000ffaaaaaaaaaa
-R10: 0084000000ffaaaa R11: 0000000000000000 R12: ffff88810d65a084
-R13: dffffc0000000000 R14: 00000000000002a0 R15: ffff88810d65a000
-FS:  0000000000000000(0000) GS:ffff88811ac00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020000100 CR3: 0000000103268003 CR4: 0000000000770ef0
-PKRU: 55555554
-Call Trace:
- <TASK>
- l2cap_le_connect_req net/bluetooth/l2cap_core.c:4902 [inline]
- l2cap_le_sig_cmd net/bluetooth/l2cap_core.c:5420 [inline]
- l2cap_le_sig_channel net/bluetooth/l2cap_core.c:5486 [inline]
- l2cap_recv_frame+0xe59d/0x11710 net/bluetooth/l2cap_core.c:6809
- l2cap_recv_acldata+0x544/0x10a0 net/bluetooth/l2cap_core.c:7506
- hci_acldata_packet net/bluetooth/hci_core.c:3939 [inline]
- hci_rx_work+0x5e5/0xb20 net/bluetooth/hci_core.c:4176
- process_one_work kernel/workqueue.c:3254 [inline]
- process_scheduled_works+0x90f/0x1530 kernel/workqueue.c:3335
- worker_thread+0x926/0xe70 kernel/workqueue.c:3416
- kthread+0x2e3/0x380 kernel/kthread.c:388
- ret_from_fork+0x5c/0x90 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
 
-Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
+total: 0 errors, 1 warnings, 0 checks, 40 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13650236.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v2] Bluetooth: L2CAP: Fix div-by-zero in l2cap_le_flowctl_init()
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+44: B1 Line exceeds max length (199>80): "Code: e8 17 17 0c 00 66 41 89 9f 84 00 00 00 bf 01 00 00 00 41 b8 02 00 00 00 4c 89 fe 4c 89 e2 89 d9 e8 27 17 0c 00 44 89 f0 31 d2 <66> f7 f3 89 c3 ff c3 4d 8d b7 88 00 00 00 4c 89 f0 48 c1 e8 03 42"
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
+
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bpa10x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bpa10x.o'
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 492, Passed: 489 (99.4%), Failed: 1, Not Run: 2
+
+Failed Test Cases
+LL Privacy - Start Discovery 2 (Disable RL)          Failed       0.163 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 9 (90.0%), Failed: 1, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 2                               Failed       0.099 seconds
+
+
 ---
-v1 -> v2:
-- Reply with an error code if a given MTU is not valid.
-- Refuse hcon allocation if MTU is not still valid.
+Regards,
+Linux Bluetooth
 
- include/net/bluetooth/hci.h | 6 ++++++
- net/bluetooth/hci_conn.c    | 4 ++++
- net/bluetooth/hci_event.c   | 6 ++++++
- 3 files changed, 16 insertions(+)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 5c12761cb..a7bc07e9c 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -1666,6 +1666,12 @@ struct hci_cp_le_set_event_mask {
- 	__u8     mask[8];
- } __packed;
- 
-+/* BLUETOOTH CORE SPECIFICATION Version 5.4 | Vol 4, Part E
-+ * 7.8.2 LE Read Buffer Size command
-+ */
-+#define HCI_MIN_LE_MTU 0x001b
-+#define HCI_MAX_LE_MTU 0xFFFF
-+
- #define HCI_OP_LE_READ_BUFFER_SIZE	0x2002
- struct hci_rp_le_read_buffer_size {
- 	__u8     status;
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 05346250f..0b86a7452 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1277,6 +1277,10 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 		return ERR_PTR(-EOPNOTSUPP);
- 	}
- 
-+	/* Check the mtu is valid */
-+	if (hdev->le_mtu < HCI_MIN_LE_MTU || HCI_MAX_LE_MTU < hdev->le_mtu)
-+		return ERR_PTR(-ECONNREFUSED);
-+
- 	/* Since the controller supports only one LE connection attempt at a
- 	 * time, we return -EBUSY if there is any connection attempt running.
- 	 */
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 4a27e4a17..a8563cbe2 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1263,6 +1263,9 @@ static u8 hci_cc_le_read_buffer_size(struct hci_dev *hdev, void *data,
- 
- 	BT_DBG("%s le mtu %d:%d", hdev->name, hdev->le_mtu, hdev->le_pkts);
- 
-+	if (hdev->le_mtu < HCI_MIN_LE_MTU || HCI_MAX_LE_MTU < hdev->le_mtu)
-+		return HCI_ERROR_INVALID_PARAMETERS;
-+
- 	return rp->status;
- }
- 
-@@ -3821,6 +3824,9 @@ static u8 hci_cc_le_read_buffer_size_v2(struct hci_dev *hdev, void *data,
- 	BT_DBG("%s acl mtu %d:%d iso mtu %d:%d", hdev->name, hdev->acl_mtu,
- 	       hdev->acl_pkts, hdev->iso_mtu, hdev->iso_pkts);
- 
-+	if (hdev->le_mtu < HCI_MIN_LE_MTU || HCI_MAX_LE_MTU < hdev->le_mtu)
-+		return HCI_ERROR_INVALID_PARAMETERS;
-+
- 	return rp->status;
- }
- 
--- 
-2.34.1
-
+--===============3502491486361169370==--
