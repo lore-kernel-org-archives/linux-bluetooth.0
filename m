@@ -1,104 +1,118 @@
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B84E0537FB
-	for <linux-bluetooth@vger.kernel.org>; Wed,  1 May 2024 21:04:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 340C0D52F;
+	Wed,  1 May 2024 22:24:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714597470; cv=none; b=lRZG3o9JQpWYKiNtahcsuE/KtAHIN7Cz683OFHrerw20TB9m+7rnuGLixgWllj/1eKBHEwahHRKZwIKKiSCYG1GIfOBg73+rgaqRvScwYsbjeqyOxwTSQObApMbgEJiPNAItQPSnoL77yAEuECVxyy0QbpKlyvMGO7VZZQcY2kQ=
+	t=1714602241; cv=none; b=gg+tCv0yY1MFJzE6wtgBRrXxVHPVaGBCj/AjcRSxOF0qSIHdJBFtwTGH3x9PoZ84bXqO5ehW6tr5TJgFi4S0kOKoxiR6NGhrdmMCqqrTUXSV86T+EFXMf2K31aQR9ZyBnUzj884dvm6t916jwcF68TNznRg06K+XMBAayvUHZSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714597470; c=relaxed/simple;
-	bh=jv4j+My8JtAZjFLHLLwUOw+s39ujQ1Zquj/V05IvEWc=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=iBU+2CwrxP1vkN1RFdfAbf7BSH1X6vM2yXHUqUVIV0xIkkykhDGMcdogDWENDBFQ6YfIIgJ5aE3QgpwyKUDqBTfGdT3WDCGSe7NBGlbyIKOHFULq8vK+ozMg4uQKKHZzysFVENMqQM6fMdgRGjNQY5fBGROL7LlnLzcxB/E/X6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ko/AWoNK; arc=none smtp.client-ip=209.85.222.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1714602241; c=relaxed/simple;
+	bh=ADuypZQLrp42+wzz6dAjns3zYS9BMzA54Y1ziYzZThI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XIvbz4ZR+UcoW9RtXPY9WoRaCWDEG9Qu5IWnJkbMiE77mWNu02WDxS00avX7V7FeVK0ddSvh8DYv/HIYz/przAZzNgThwi9I55+BD3fFWHth3aFrSfUpaQ5VQ0P2ygr4o5EjW6+S7ZKgV3xycXTINt6zcKNaLSukzwq0166VltA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ko/AWoNK"
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-790f699eb2cso329958185a.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 01 May 2024 14:04:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714597467; x=1715202267; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=vSxmjdTEFo7y6HvAzt5BIuKncTQlK41Ce1zZkXTFkhc=;
-        b=Ko/AWoNKOEuCvTmeOii5RwgsoKViGRz/gtXP0gpuJ3KOa8pyAOOhbC46Z76BwGDWva
-         codSDwzyrB4f9CcEzOqBJ1qzrl+yLQTVHGbUiGciQpepT8EARrLZisbvZgIKUE9SxE/p
-         lHcF+xZxNC7JOhz4pCl8qnLvB7bYV+mSm3lNgbJTwSnSbbdcFzNu99IJCzszWoshwmGc
-         xpDlBZNnYGkyaz/vnQzFIA69tPJs26sl6eynXBvexkAHzx3Ee7lIJLuAFtgzYE1q+vXB
-         ajcBPUU6bGwwUd/G/TydY2YJqmVS1Fpy7nl7C4vlUko8vlfbVFfB4io8FAcvjOCJQ2/y
-         Ld7Q==
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-51967f75729so8770062e87.0;
+        Wed, 01 May 2024 15:23:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714597467; x=1715202267;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vSxmjdTEFo7y6HvAzt5BIuKncTQlK41Ce1zZkXTFkhc=;
-        b=HQ9RCQt+pKEllgAYKr2ASOTR1je8e9fncn/z/D1NEtxf4b7hN3YKQgwpmjhEH4XEUJ
-         TemGE5cdr8QnYSaZh+XnyvntquVOC7rtnJHa/pdsY6oUFvEdZzTL06YASlNzDDTwUnkx
-         7VYbbEA2zl0iH9Z/i74blcq/b/VzsTzf9onYyLccorY2nh1ZLsiXpyxoqPj6GQ1T4X+b
-         cZRoOO9+7BQImA4Wq7svtmiOiqvW3YJHFOutByLeG6qaoEFqfZ4gJ9IEbLfx7TO3Jrf1
-         DorPYr2/KM5B+t1L47odRtdzFjcr/SbvAgGYNSgLTfS5/IuYfuztlHQ+btsaaBA/shgf
-         NyUg==
-X-Gm-Message-State: AOJu0Ywlj1lm7R8gOau5bL7jUDGLe/z3iqyurXyZz2nM+aT6LFLYKDq/
-	TDiAaJfvpwFj72SBy/ex1t1WwwxP7hg8uArG936mkgwYG5cWxvxpEj64eQ==
-X-Google-Smtp-Source: AGHT+IGu6eRK1XbMa1R8zOGuTDDFKAL1slNglv6R1yR0UZ8zak5jhbhr1AoZtA4S7VjR6gsuXapUcQ==
-X-Received: by 2002:a05:620a:454a:b0:790:f6fb:8762 with SMTP id u10-20020a05620a454a00b00790f6fb8762mr5061799qkp.76.1714597467505;
-        Wed, 01 May 2024 14:04:27 -0700 (PDT)
-Received: from [172.17.0.2] ([172.183.35.226])
-        by smtp.gmail.com with ESMTPSA id o11-20020a05620a22cb00b007905e9c01basm11100126qki.122.2024.05.01.14.04.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 May 2024 14:04:27 -0700 (PDT)
-Message-ID: <6632ae5b.050a0220.42775.622e@mx.google.com>
-Date: Wed, 01 May 2024 14:04:27 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0875395954490530109=="
+        d=1e100.net; s=20230601; t=1714602238; x=1715207038;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=V3qrt1xRo5QCY5suOVWHp3CVjoIjT79/EgSVanPYZqA=;
+        b=dYcGljbhfdLuX6dO9hjbgJzg1rZxO9quEq0zdSlLK5ii4AkuZh8VxX4tZXc8lLeuOF
+         MdvTlNwVNaU0aymU+3AkOiFuPeksDygeZbM0R4YqfXRpNSdMO5B15wmac6azIRSccRJ3
+         y+GFwjQxRmKCSC73klhmdMnWC4ROIJGYUxtuzr95bjjE9QlzlGrd5LwTmjuDcrZ9VHWr
+         jckJYKfizfvx2HNLxcl6wMstiK2XHhmjj7PLYFlRNWJydacJpuurL/SZB2ONXyH1XZle
+         4XK7uqD4hgjQmgoQwYLjujeKlOzCwR3vQGTZ7LaHcBwKCYV8jWSz/JfDGtQdcntFIeMF
+         EetQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWy9NP2KBnflRHIAqO1aiL7oWEqK0l5q+UbCiLvEAFsSgHhmT/WPBHIpV83ligzlHjERHCV1gGwHIWKYgYWoZ+Ol29Bmkb1W7qvEjhSmbTz6qOkSfiTtVAuwhgbx3jnjFKkZtWsvkjemyZPkKsW
+X-Gm-Message-State: AOJu0YxaABtGnj6Uz1gsWw0s4uZb9TlbTsSKwZiBIlvpg7vPfHXluA+U
+	ov8BTLcKT1phjal88jtSe38Da/0dcyiBkd2DG71HNYzjbBu4N8uHMhboT/oJsBE=
+X-Google-Smtp-Source: AGHT+IFlCHAjHrJeGruvmMrNXMmEgwG6wQut/ZBB6xteIYiFm12u38mMwzCh41+6l4tjeIvC2F7cHA==
+X-Received: by 2002:a05:6512:3b8a:b0:51f:5c3:2d6e with SMTP id g10-20020a0565123b8a00b0051f05c32d6emr464517lfv.17.1714602237131;
+        Wed, 01 May 2024 15:23:57 -0700 (PDT)
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com. [209.85.167.48])
+        by smtp.gmail.com with ESMTPSA id k8-20020a05651239c800b00517746176ebsm4990611lfu.49.2024.05.01.15.23.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 May 2024 15:23:56 -0700 (PDT)
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-518931f8d23so7367866e87.3;
+        Wed, 01 May 2024 15:23:56 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUYQnk0GxK7SvpyIHb5CDUrR3VzpWDV4JgKyLTFU3NN6IZybrIdsHCFZcbHnbm3woi0iCJQ7dk6FxeKGSPSh0dG182bZ8yDZU53n3FiT1RZtBoKipljqYVFJwmJ9BzSKl/paiJ5htNIY41SEuuG
+X-Received: by 2002:ac2:44c2:0:b0:51b:3ffa:f22d with SMTP id
+ d2-20020ac244c2000000b0051b3ffaf22dmr2147374lfm.18.1714602236670; Wed, 01 May
+ 2024 15:23:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1] src/shared: Make default length handle EA
-In-Reply-To: <20240501192812.3421949-1-luiz.dentz@gmail.com>
-References: <20240501192812.3421949-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20240428054307.1178347-1-iam@sung-woo.kim> <CABBYNZKDouOrxG1XcSq2me0WW3A3yAbfdtonw2XJ54VZ8+Nbfg@mail.gmail.com>
+In-Reply-To: <CABBYNZKDouOrxG1XcSq2me0WW3A3yAbfdtonw2XJ54VZ8+Nbfg@mail.gmail.com>
+From: Sungwoo Kim <iam@sung-woo.kim>
+Date: Wed, 1 May 2024 18:23:43 -0400
+X-Gmail-Original-Message-ID: <CAJNyHpKzhFBJ3N0eF1x0icd7O1VkWbTA9k0Gkm8aCMonsagYwg@mail.gmail.com>
+Message-ID: <CAJNyHpKzhFBJ3N0eF1x0icd7O1VkWbTA9k0Gkm8aCMonsagYwg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: L2CAP: Fix div-by-zero in l2cap_le_flowctl_init()
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: daveti@purdue.edu, Marcel Holtmann <marcel@holtmann.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============0875395954490530109==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Dear Luiz,
 
-This is automated email and please do not reply to this email!
+On Mon, Apr 29, 2024 at 11:15=E2=80=AFAM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Sungwoo,
+>
+> On Sun, Apr 28, 2024 at 1:43=E2=80=AFAM Sungwoo Kim <iam@sung-woo.kim> wr=
+ote:
+> >
+> > Hello, could you review this bug and its patch?
+> >
+> > l2cap_le_flowctl_init() can cause both div-by-zero and an integer overf=
+low.
+> >
+> > l2cap_le_flowctl_init()
+> >   chan->mps =3D min_t(u16, chan->imtu, chan->conn->mtu - L2CAP_HDR_SIZE=
+);
+> >   chan->rx_credits =3D (chan->imtu / chan->mps) + 1;  <- div-by-zero
+> >
+> > Here, mtu could be less than or equal to L2CAP_HDR_SIZE (4). If mtu is =
+4, it
+> > causes div-by-zero. If mtu is less than 4, it causes an integer overflo=
+w.
+>
+> That is because it is not valid to have hdev->le_mtu < 0x001b (the
+> range is 0x001b to 0xffff), so we should really look into checking
+> that conn->mtu is actually valid.
+>
+> > How mtu could have such low value:
+> >
+> > hci_cc_le_read_buffer_size()
+> >   hdev->le_mtu =3D __le16_to_cpu(rp->le_mtu);
+> >
+> > l2cap_conn_add()
+> >   conn->mtu =3D hcon->hdev->le_mtu;
+>
+> Yeah this assignment is incorrect and in fact we don't do that if
+> le_mtu is zero so we probably should do some checks e.g. le_mtu >
+> 0x001a, or perhaps we need to move the MTU directly to hci_conn so it
+> can check there are enough buffers to serve the link so we stop the
+> connection procedure earlier.
 
-Dear submitter,
+Let's say we moved MTU directly to hci_conn and already checked enough
+buffers at the creation of hcon.
+Then, what should happen if hdev->le_mtu is updated? (by a new
+le_read_buffer_size cmd)
+Should hcon->mtu be synced with hdev->le_mtu? Or hcon->mtu can keep
+its old value?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=849727
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.40 seconds
-GitLint                       PASS      0.29 seconds
-BuildEll                      PASS      24.58 seconds
-BluezMake                     PASS      1740.81 seconds
-MakeCheck                     PASS      13.03 seconds
-MakeDistcheck                 PASS      182.12 seconds
-CheckValgrind                 PASS      249.53 seconds
-CheckSmatch                   PASS      351.21 seconds
-bluezmakeextell               PASS      119.59 seconds
-IncrementalBuild              PASS      1507.30 seconds
-ScanBuild                     PASS      993.87 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0875395954490530109==--
+Best,
+Sungwoo.
