@@ -1,60 +1,35 @@
-Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0DBBEAF6
-	for <linux-bluetooth@vger.kernel.org>; Wed,  1 May 2024 19:28:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ACF0F9EB;
+	Wed,  1 May 2024 20:00:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714591698; cv=none; b=HEh7lhcU+xZP2XJFt+9upoNlU3dP8NkApMF2mlAB1NIFCI5ZgJSfrBVUy8/lmjX7zJrC0J4mAPPVUGVRZd2jDY19vDJzUKLg4BXLa7A8si6jwp2sZLXK4iubw1NTIyEDNRl0J3B3ep3neoZvW83mbtGwV6Fm06e/hqPS60/VkQ0=
+	t=1714593633; cv=none; b=Jaw03rXGT9nz9OnDK84P9RR0n2EtIBG+Cfiokr9BN6G5mWc9c1emK7okUV1uuQXLgwEBlBvOfUqsmqq2WCaZvTx4xrisSY+CE7kS83YoSfS+wm3ukecdpXC9NEomQHMxOkvRSV6RP3SAXI7JWEzAbc3xtVUB6g09IaTFmghaR2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714591698; c=relaxed/simple;
-	bh=zI9QaBQJt0tsLxYJV766HWRS20rUZ93S+25+B4/VtGo=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Hgx0rkNJLBhT+/piP05KwcqVuYW/JfbH5qL5NhgyyiaGKYb8avQ4o/u4MeJZ0RtzvPGvqlQ+Z/G+5xLuaWWemYh3gwurpQaVTSNT9RdkOMcW8FILIVihg+g7sky9hHxXokHCI6HavxkGFR95tdzHuTYmNFBPtm2RnuJC3EC8dtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F6l6h8BV; arc=none smtp.client-ip=209.85.222.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1714593633; c=relaxed/simple;
+	bh=ih/GNLm1WfdtWekFHhQEBTY1Uux1rbHOHII15bWTT7w=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=lWnOeewhfixcaTLwXn1gsE29jL0/htW79+jJmSpMyMFRylB8EXY18NGmhqiqKH5kL4edxjXw6kFtE/ruJo0kZw5oGs7bg+fCHj7vAaUizBFeLiAmXD+V2dCdqN9rwW2/6vUpdxdgloBdfDyg3npKm+MIM9YiZ1vK3DKuwxhshSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G97bP5Ma; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F6l6h8BV"
-Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-7f34ebbcde4so365056241.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 01 May 2024 12:28:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714591695; x=1715196495; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=znWRKUqT77U70qk/K6NeW74Od+GD4OvDn7YXJQKzuKg=;
-        b=F6l6h8BVHtrHXO8/WflVZLuCAo5dfrXvlebcLqFV3XIId66YZk+rgXeuM7oOX7hK0E
-         BQBFchmqjnUXgE9sEWi+ewMPV6P0jdHZ+ZDDe675jrToWfou13KeCeZ8HnEwRlhY7Odv
-         6G8Vy5ee3pFFdAGq5ILxD39GU7apH4sZWYue550khR8b/8N+LYYx5wrEe2H2rfSiUp+c
-         BpSGC9la/QY7IUNcmOMQht9QOjLmmYR3h2LkwIZRAlssvLYQkhQEljnddq4xy6c9dvMO
-         m9kJo0llFVLsTeo6XFt+U9C5XJ6Y0nh2KKRBc3yBCbiGCAjQLvL0wXCTWKdS9B/GnBdm
-         eKcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714591695; x=1715196495;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=znWRKUqT77U70qk/K6NeW74Od+GD4OvDn7YXJQKzuKg=;
-        b=DzAO8OGQ1JzcDHH29cCX8Hvsu9m/03gkVLBMQKYW1FlUqNF0lZ6nqliHClZpM/StKx
-         NfLpyYqBKbaa3RxpH/RXPbvxh1Yd4OPqRH313JW+Z777mkJdGJR9Iul7TTV+S3NMdNV4
-         jyXGfcYvjHDF6KvTaDxcL4161XsnfGLbYUj0KhtLw4jc8ket16HGVWhzt70YIjKQXgUk
-         MDrFl47IJ9MJxNR5eVC80GTddde/ZKM85xxgY05SfD8NVsiuQSG6s5o4SqdZR/KrORsR
-         pZMlhTDlvsfB8wBxLg+VymXitLIqre66Ica5Kj2YGiNn9OibbZedHfssov/aJRiV26qa
-         2gAA==
-X-Gm-Message-State: AOJu0Yx+sqMWLTWIr3aNRTZubDEOP9mbrOFMaYQAticPhd3CZCxiVuaY
-	m6lhb1OpMy/3ZflOoSxIO8RwrZ5y/HlA9U70pzu1hlfrr14bu/uF0A9A3w==
-X-Google-Smtp-Source: AGHT+IElgo/xaRf0RlyZmKo7tsGRQPyyrnO5smCro+5HEiQ5+cDDuLho1h17i+pow1ky6Fekygx18w==
-X-Received: by 2002:a05:6122:3c43:b0:4d4:3621:b245 with SMTP id fv3-20020a0561223c4300b004d43621b245mr3684124vkb.16.1714591694732;
-        Wed, 01 May 2024 12:28:14 -0700 (PDT)
-Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id b7-20020ac5c747000000b004dee45c148asm1429436vkn.13.2024.05.01.12.28.13
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 May 2024 12:28:13 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1] src/shared: Make default length handle EA
-Date: Wed,  1 May 2024 15:28:12 -0400
-Message-ID: <20240501192812.3421949-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.44.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G97bP5Ma"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8CD74C32789;
+	Wed,  1 May 2024 20:00:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714593632;
+	bh=ih/GNLm1WfdtWekFHhQEBTY1Uux1rbHOHII15bWTT7w=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=G97bP5Ma6O1GmaFHCiLS88qaUqCoJRxYZqRJTK1ogOmwN27MRVeBqJ3pGHsyob2uw
+	 609DOXu+g1hXMWHcNi/hclKtJrxKcVww/Mlj8Jgc+aoasqExS07GdjOCsdTsMdjo/m
+	 24MtdUaIGUjzrfcQAWqHtP9eB+ccQ1zA08xJYTyp9UgSiBuOCNPIEi0Whe0HBUsyzu
+	 TJyzuj9oeOTi49q9VVcm5Xmfql+eYMIOwdO7wv1Pw+QHlDEQvUg7N22W5mZ5qRJVwh
+	 isL/IMrY4U2Go/Oz1rhwLI1DSVtfThFFWmT31rINcUmZxxlg+XvMeMUYV2n6oZqSJZ
+	 eKNOeHhfECmDA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 79D44C4339F;
+	Wed,  1 May 2024 20:00:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -62,47 +37,47 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 0/5] Bluetooth: qca: info leak fixes and cleanups
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <171459363249.6729.10986328345003471376.git-patchwork-notify@kernel.org>
+Date: Wed, 01 May 2024 20:00:32 +0000
+References: <20240501123456.6712-1-johan+linaro@kernel.org>
+In-Reply-To: <20240501123456.6712-1-johan+linaro@kernel.org>
+To: Johan Hovold <johan+linaro@kernel.org>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, quic_janathot@quicinc.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hello:
 
-By default bt_ad was setting just BT_AD_MAX_DATA_LEN (31) which is not
-enough to handle devices advertising using EA, so this switches the
-default to be BT_EA_MAX_DATA_LEN (251) since EA is much more common
-nowadays and for those case where the it is not supported (e.g. for
-advertisers without EA support) then shall be using bt_ad_set_max_len
-to adjust the maximum length.
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Fixes: https://github.com/bluez/bluez/issues/832
----
- src/shared/ad.c | 2 +-
- src/shared/ad.h | 1 +
- 2 files changed, 2 insertions(+), 1 deletion(-)
+On Wed,  1 May 2024 14:34:51 +0200 you wrote:
+> Here are two fixes for potential info leaks in the QCA driver and a few
+> cleanups.
+> 
+> All of these can go into 6.10.
+> 
+> Johan
+> 
+> [...]
 
-diff --git a/src/shared/ad.c b/src/shared/ad.c
-index 2d6fc628eabc..f3fb428e25c6 100644
---- a/src/shared/ad.c
-+++ b/src/shared/ad.c
-@@ -48,7 +48,7 @@ struct bt_ad *bt_ad_new(void)
- 	struct bt_ad *ad;
- 
- 	ad = new0(struct bt_ad, 1);
--	ad->max_len = BT_AD_MAX_DATA_LEN;
-+	ad->max_len = BT_EA_MAX_DATA_LEN;
- 	ad->service_uuids = queue_new();
- 	ad->manufacturer_data = queue_new();
- 	ad->solicit_uuids = queue_new();
-diff --git a/src/shared/ad.h b/src/shared/ad.h
-index 820b9177562b..11900706f9ed 100644
---- a/src/shared/ad.h
-+++ b/src/shared/ad.h
-@@ -15,6 +15,7 @@
- #include "lib/uuid.h"
- 
- #define BT_AD_MAX_DATA_LEN		31
-+#define BT_EA_MAX_DATA_LEN		251
- #define BT_PA_MAX_DATA_LEN		252
- 
- #define BT_AD_FLAGS			0x01
+Here is the summary with links:
+  - [1/5] Bluetooth: qca: fix info leak when fetching fw build id
+    https://git.kernel.org/bluetooth/bluetooth-next/c/cfc2a7747108
+  - [2/5] Bluetooth: qca: fix info leak when fetching board id
+    https://git.kernel.org/bluetooth/bluetooth-next/c/3e2faecb09fb
+  - [3/5] Bluetooth: qca: drop bogus edl header checks
+    https://git.kernel.org/bluetooth/bluetooth-next/c/ca8934466039
+  - [4/5] Bluetooth: qca: drop bogus module version
+    https://git.kernel.org/bluetooth/bluetooth-next/c/2684457bf2dd
+  - [5/5] Bluetooth: qca: clean up defines
+    https://git.kernel.org/bluetooth/bluetooth-next/c/f50efbe27afd
+
+You are awesome, thank you!
 -- 
-2.44.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
