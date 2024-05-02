@@ -1,127 +1,89 @@
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2073.outbound.protection.outlook.com [40.107.8.73])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F202759B4B
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 May 2024 10:17:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.8.73
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714645037; cv=fail; b=GozaRaxMI1V9V8R//mqRZaQRWXQAu9hv1747t0nv2wJkLDP7FtkHEhkdz7GZameHqnhb8V16ZycHfZvhHDLxs3oJujqjPQInORzp54gL+7tkBlXpkfGR1+OPBa9gQLKNqioxrpm75XnfreGxbj/p8wG1W8g9DOfiLBaZnR2/66M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714645037; c=relaxed/simple;
-	bh=KrEa9Sxrk8i8fzOYW5OXb8/xSywj1graOUQ6dOlBk+c=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=iyGZaWQ2FyHVkpO6Yi0Vx49RQPkj2p/O739bGmfTTURi3Uj24fVIeVyyZ8WrGMkkHSTNAIyG1IvTw4nz3xGpu/bAXHc/5MT5nUlxqivWLgS26dERoOEXRAatyKEsPAwUSIbwglo9uRXDysQaX5veoGCG866lwpEBA3RY1eY7jk0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=PNFS74pS; arc=fail smtp.client-ip=40.107.8.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6801E17984
+	for <linux-bluetooth@vger.kernel.org>; Thu,  2 May 2024 10:48:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714646891; cv=none; b=ZDuf7rw4y51QAAnksvkbnRpYEZzeAtYEoI7KY0KpHNNwRAD5oljS96rMHMVRww5rD9oX0uQo+qsj/kpXxAWj6lOlsXxMXjk/Ef6wiIGn3rCkHkc/u186jlzNTrLJOGRPjKOXvmzMssPJNITVYIxyn8J3Iqxybn+l50a3+XppBlw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714646891; c=relaxed/simple;
+	bh=o114AsTLbALxohhrrolNHw6grJ+8INXCJ8kkTiqiiPI=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=ShIH9KVV9ZfStNJB372yn9LSbFr1bq+0iajS6L9gwJ0Wdlz3eTOdcBhJwfxC/BLMgNm0YRMp0yUROMoFOrBwXY9a8IVQctusHmU1YU3frPkKpQwTWha8ev7IEG4w439gE0ZHtdT//HqEGMgNf8TZjqbXoMEs/yeG9nL/GlCPUh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=d3uCXnK+; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="PNFS74pS"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FgmpOBYFAbw+z39aMZSd1F4dRttw2qzU+sbsSBnsqGywK4Hf5YQN19dqhJbQiUDFo+Y6BHte/c5ZJZS3qPE0EOZw1NKsdhl5SQoMbsrb3m1FBKgdm/mJVS9msiNhh/yEw5N5qE7An8NOjqpJgTRD5TtUVlhC2TW2lUhQ/McpJ/d9UhrjK9mEU4mrxDt4KDu22NhJ9lndoJw2BPdqqoM+EVsJap8sVNVipk09YfCefMnXj6TTZs7xqSQETZZ1O1piDPLzY7tK2r1ANsV8JyCMusi8tng4NqoFB0NLYRWg61TAJPmjTI+igcSgIC6VZoFMvqNXAVR5fIT32PgZIl8A6g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KrEa9Sxrk8i8fzOYW5OXb8/xSywj1graOUQ6dOlBk+c=;
- b=P4aEIGOCCoZcD7G2OEix+eJmY6sNhYR5a8N6qPWa9vsxFeSqdEs920E8qRiWqdxUd3IVOoKo7thgPKIiFNvjc/9i8Nw6iMiSS8DbWnrfdnZwT2bKAhCl6En/6jSsG13Scbt5jzb8atUXPOdVrYLoYamEK1RdbALxhYKcYX9fEr8j0DFWZR15wGcNujB6bMimKoZUjfwSV2bONrHZFC1M5yGkV+fwGn8HrPqMSwpsDFiRjDTCSRNZgOv2/pB6l94gtjliL0J3ypBykK673Zx59IiUGyuI5i9l30qeCdmkovHw+u4gL8lqI6wep1L4QXDy74D+3xOCdcQroFGq+PmrZA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
- 217.111.95.7) smtp.rcpttodomain=intel.com smtp.mailfrom=arri.de; dmarc=fail
- (p=none sp=none pct=100) action=none header.from=arri.de; dkim=none (message
- not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KrEa9Sxrk8i8fzOYW5OXb8/xSywj1graOUQ6dOlBk+c=;
- b=PNFS74pSCVYlAhogwCdGSK4LgxxuPtMfsiS2Qfm3pTVxt5O0orxZeYcY786v/YtU5S6giHF/2S+5JPSZiNeRA5wTvzI4qpAo1Y250zNtLTeB1IIl1cdYYk/QEYhCLYlJ+pcVWZW5cimuRpF1Ja1v5CyELbFcG8BXDc4pRBzAGoE=
-Received: from DUZPR01CA0246.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:4b5::12) by DB9PR07MB7066.eurprd07.prod.outlook.com
- (2603:10a6:10:217::16) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.29; Thu, 2 May
- 2024 10:17:07 +0000
-Received: from DB5PEPF00014B9D.eurprd02.prod.outlook.com
- (2603:10a6:10:4b5:cafe::88) by DUZPR01CA0246.outlook.office365.com
- (2603:10a6:10:4b5::12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.29 via Frontend
- Transport; Thu, 2 May 2024 10:17:07 +0000
-X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
- smtp.mailfrom=arri.de; dkim=none (message not signed)
- header.d=none;dmarc=fail action=none header.from=arri.de;
-Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
- designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
- client-ip=217.111.95.7; helo=mta.arri.de;
-Received: from mta.arri.de (217.111.95.7) by
- DB5PEPF00014B9D.mail.protection.outlook.com (10.167.8.164) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7544.18 via Frontend Transport; Thu, 2 May 2024 10:17:07 +0000
-Received: from n9w6sw14.localnet (192.168.54.18) by mta.arri.de (10.10.18.5)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.32; Thu, 2 May
- 2024 12:17:06 +0200
-From: Christian Eggers <ceggers@arri.de>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-CC: <linux-bluetooth@vger.kernel.org>
-Subject: Reminder for Bluez5 patch
-Date: Thu, 2 May 2024 12:17:06 +0200
-Message-ID: <4582780.LvFx2qVVIh@n9w6sw14>
-Organization: Arnold & Richter Cine Technik GmbH & Co. Betriebs KG
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="d3uCXnK+"
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 442AWeY0023037
+	for <linux-bluetooth@vger.kernel.org>; Thu, 2 May 2024 10:48:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:to:from:subject:content-type
+	:content-transfer-encoding; s=qcppdkim1; bh=KV9pl9fDV+ljVD0mbzSr
+	m65WEWRiyPCBvi+j10u4WDg=; b=d3uCXnK+nRncEEdZjkK78T4aF+M5OiW/sRQi
+	pEesEdUMsXXkMo2hwUSKDgi6alOo7rfFMmyqZjrbdyCiO3xr9YNh7NnY8TShDqPd
+	22J67P/JkKh7VtSXFJ93XnI2dyghygdnsQes3yT7YyD2+iKxvag/qJ7z8o0R4vYT
+	L2T/iXP5Vv4DUfUW+Cees3eDv4H2qZ1asiFBn40xUNazFzG78wnNdV7bfbCplb6h
+	K/SjDbwoV2xkfcp4A6HSfrAPh5wRYnSYjAwWKC+2jy2srJyusrxuxFMn7pxxXIU0
+	dJT020SKUZVs/r+KG01UtX5KflkwCzWhJ8hi8Kqxard+BoMYIw==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xv3crgqtk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Thu, 02 May 2024 10:48:09 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 442Am8IW023608
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Thu, 2 May 2024 10:48:08 GMT
+Received: from [10.216.59.126] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 2 May 2024
+ 03:48:07 -0700
+Message-ID: <c14d0862-f101-46fd-8738-c877474a557a@quicinc.com>
+Date: Thu, 2 May 2024 16:18:03 +0530
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DB5PEPF00014B9D:EE_|DB9PR07MB7066:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7bdb8d16-8987-4377-ffd1-08dc6a910566
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|36860700004|376005|1800799015;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?AcXsqQTBIwdUw/bqGPR3/g3Q0z/07NbuynV96B+zRvphQVQUuRTgq/6FC2QQ?=
- =?us-ascii?Q?UeOMPvGka9+5yP750FoR6aps4Uq/JnnzD43KEr1zhb68+S+B+lttYFJ0esU2?=
- =?us-ascii?Q?SDnwpW2/yVZdzMSuqCXjVfhR2YmDXDGDF+z8sEdvsmoz/a/Yxl5klpTuLVh2?=
- =?us-ascii?Q?8Q3vDWXws/eonsdGLPlQpZMfKFeuz5Zwm207EXFxjcBrhf61ON6e2gDwMFoT?=
- =?us-ascii?Q?Fg3cUs7C21vrz+DQvcs66zZz0E9VUK1xpRuchxKk4SDPUonkOEjlbkeRmI0M?=
- =?us-ascii?Q?P5l2uEhmINS1NMZwqWEV/7Ya2YRgpjPcWLAL/LU5kpu+fTssp52+WqcQ0dtP?=
- =?us-ascii?Q?EhbjCOVo83omkpZ4nhiZNUP/S0Q0zchlxOcZNA5GOyE/eY74XrjwqAduuZtF?=
- =?us-ascii?Q?VnEuVOZn8B6nn8ULS8hXI2Xye0GsjrDAwDy+ylLmzMsrWKgPgeyMl8JgMnsr?=
- =?us-ascii?Q?uuYkUWSrsmYLpEIiIm7qG1vz1xmEoAqZEAooD37B/1OHd1/NgkatU3Hcphua?=
- =?us-ascii?Q?PQaDVMYGVRTfmaOs5D8QcqTkKoUx6TIEXxz+TKBETW8TahwqtjGfu+4N4js4?=
- =?us-ascii?Q?J2PawiffTFWZhNjWzYgGBiNQFNSYQd/dNHzQCY8GIgjx80KMH5VOUeytQDdP?=
- =?us-ascii?Q?Bb/33DNqbamljm7OQbBBU3NIj90KLl2JFe9Qart1DsAnhbA2Pa7hn0hienhV?=
- =?us-ascii?Q?GQ7GKj3PKM+jomcE9UVOASj6L/JSsBbJHFbmOkgEPVTTtUdlqc1t5DDaTtaU?=
- =?us-ascii?Q?9OldW1A8V8z6hA9QIny3vv7UZ35g+H8NjGv0fpMwgOasNqzrLhkx3Oix7ir/?=
- =?us-ascii?Q?uskr8QrRUogIN+Ed1PpbhkGrMTVCdNBsKeW3iYiSOTwT6lnJeFpU8nuqMkhe?=
- =?us-ascii?Q?eSBBTl25xCos9zbK7PPeH4HPG1flFjI3u6wSqWa5geS/QFaG0EAZ2JczQ+xD?=
- =?us-ascii?Q?Q2NhueaKcr20gzzKFTSlPN8dq3PDTNGeK4kDnxWxadmb+f1bnSVl4B/3zKMX?=
- =?us-ascii?Q?Oizq4Vz5/qVfoi78XeVOT72g3tsOaf6op+Ay+EZrocLbDUnuuewypRs7ar1H?=
- =?us-ascii?Q?oZXi1uuvSOOZvuKJdoYq16eyK2ijehpTgIaBOswUs06DnsZHQIRiClawel+M?=
- =?us-ascii?Q?R8khyLKQhSr5nR3UinvohAtenBFgdaBtemyjP8/YG4a9lBQKXZf55sjXSUUq?=
- =?us-ascii?Q?c+1Ax7wEKgwHEV4YUdQvAqrBz0sOOvpopZgVSLF7IgmGisxPT6uHV5QvIBhd?=
- =?us-ascii?Q?HkZqfKqkDPdaotbNwFhDUdERb1376+D9wbatpoLIPRToHmaYaJDLdA/b7Crl?=
- =?us-ascii?Q?EcFm79dgQjvF/Q1GwdDaNam2?=
-X-Forefront-Antispam-Report:
-	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(36860700004)(376005)(1800799015);DIR:OUT;SFP:1101;
-X-OriginatorOrg: arri.de
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 May 2024 10:17:07.1487
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7bdb8d16-8987-4377-ffd1-08dc6a910566
-X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
-X-MS-Exchange-CrossTenant-AuthSource: DB5PEPF00014B9D.eurprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR07MB7066
+User-Agent: Mozilla Thunderbird
+Content-Language: en-GB
+To: <linux-bluetooth@vger.kernel.org>
+From: Raghavender Reddy Bujala <quic_rbujala@quicinc.com>
+Subject: {Pulseaudio] Reconfiguration is not happening for HSP/HFP codec
+ during initial connection
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: IP9E67km0cYjn4qfz3BusOfVZxOEYPmF
+X-Proofpoint-ORIG-GUID: IP9E67km0cYjn4qfz3BusOfVZxOEYPmF
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-05-01_16,2024-05-02_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ impostorscore=0 spamscore=0 lowpriorityscore=0 clxscore=1011 mlxscore=0
+ mlxlogscore=742 malwarescore=0 phishscore=0 bulkscore=0 adultscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2404010003 definitions=main-2405020065
 
-Hi Luiz,
+Hi,
 
-after upgrading my embedded system to the latest Bluez version,
-I see that the following patch hasn't been applied yet:
+We have tried connecting only hfp client profile with mobile device.
+During connection source and sink cards are getting configured with CVSD 
+codec and when we try to initiate a sco connection, the codec 
+negotiation is happening with MSBC codec. But the existing cards didn't 
+reconfigure to MSBC codec and due to this audio garbled issue is heard.
 
-https://patchwork.kernel.org/project/bluetooth/patch/20220923143331.18926-1-ceggers@arri.de/
+This issue is seen only during first connection(Initial pair and connect).
+ From next connection, source and sink cards are getting unlinked and 
+during sco connection,again they are getting created with correct/proper 
+codec.
 
-regards,
-Christian
+Is there any solution to solve this issue?
 
 
-
+Raghavender
