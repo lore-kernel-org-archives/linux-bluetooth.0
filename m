@@ -1,157 +1,163 @@
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7E1E16D327
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 May 2024 16:59:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 056811E89C;
+	Thu,  2 May 2024 17:04:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714669157; cv=none; b=Ica+gx4V5t0QC1Lm/mn01gqJhBNMqRsggRxydeqJ8tJUxuXfhlNCH0zlz30n60v3tiyC/swraBXYmZwB9VrKzLqRIP8C4boKRS1Qksu+vNOFGKpl0psZkHXWn3FJH+1Ads2ML9g2+UymtQuDGzQdNE00TwJ0ZUL4ZtGI5on7kmc=
+	t=1714669446; cv=none; b=Nq04RgfMniT8JWOuvhPkYYl/nwy7xmOhBxnH3KQjNTVDYReQ2QUTOPAMwqmy0e6/4tTPuSYCKLzeSnNVUoPoLvObDM4SHixz/klXnzTVoklAImTC5h5IWuoyHgMHiYiZ+TX/N0VfiWWmOCD5cYtAfdXZsi3QBwjB3GUFZK0yqhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714669157; c=relaxed/simple;
-	bh=qIfVr/nHO58mZFQSJ7EyaNKlbtsFJ1Ts4WU75fUJfDI=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=uH95mG9xZsBIwmW1UcfYrCqLrMuCLSqnejsEJSz2RISkYIvmGvIuiHy6ZC/pXBBb+qQf7KUs6sSo35lZekN8fO2g87iDKnKrdtOlDBKm07Az66iivGEds2zDxqr9Pwe91BacwK8g7HnevGxfP5OrCZbAOafYNLKiHTcaIA4MXh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HEZgnam5; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1714669446; c=relaxed/simple;
+	bh=oB0RDrDEtIWjVLq73ce+CqrzXi7+LNH3HONQYWQccgY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=HeNO2RXTT3TCJunZZHndekwUwucVC9pzWV0OAlAamu75oxNQdSwJ2WO4NAuLpA187fBfnEMIQnVJZCC3Pl+MUj1LDkg8OXuH1roZtJOV4y+ZrafF3H6j2AuABUa+TeBUYGLzGTQ5YUjqb7kXwxOcKGcJ0JLU0Ho1pv+3jC1d9DM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=a9Ys72wr; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HEZgnam5"
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1e50a04c317so45693385ad.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 May 2024 09:59:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714669155; x=1715273955; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ILYuo2ULSW7b/er4zhUPwhiloGEnS3WrVz3220uZikY=;
-        b=HEZgnam5vkUJuMSPRQF3TqSiL26nEj97G9uTG0LUib9B2s+YqPCTzQNOUJbWDmUwp0
-         G+xV15dZqYn7Os0E0sIFdw2SUkmLLB+npxEcK6uX6aHGzYLvyXiKUFexJubNaaumQOE8
-         FepSVJCWD5qdU4EHhbR+HUkUbb+1TCHX+JrHbMZ3lWJnXB5/V5TLXy70N12+MNRZWo2X
-         pP17Sm2oXTM6vEIALLL/ep1UBFUKe/5P4v6Khsuf4M71bsZF7UToDRRKMGwEwAb7UBbn
-         +qwGN9vym5XvF19n6TRVyhK6+mD2EOBOBmK7cctVV6UxmMpAEbyrbKg1LQm4mwRzTL7v
-         txgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714669155; x=1715273955;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ILYuo2ULSW7b/er4zhUPwhiloGEnS3WrVz3220uZikY=;
-        b=A7DKEsHXO6ww/xrpZdPDxFsP+ohmN+/dMlpsZEr/lun28DoDmSIda2CT8mZb8/cQgB
-         7aQbL87Ls61ubF1voFj52Z4X+Fj4njeIBjvFcro3K47ZYZ+iU6LGX25LjWQbRvz92ihw
-         qyfhW6sVv03r50cXFAe07rVEYGfzltlporI6HRryBSfcVP+MVY9WIH4BHlRkyV3rncji
-         TSmK3hcrn1TL5zf1kTQOvAIjTg+27CT/oq8ppMIVewr7uy5txthQwyVy6nxwM02mROgD
-         h/pLZkEMd3bAhGBnQvU1m5xStBR+Kdv2ixm4TN8CjppicSDSINICCqXimMzAwVxWcbFW
-         PPLg==
-X-Gm-Message-State: AOJu0YxK+t8q22fEZbXu290v5mlYVbfl5rCOtApsABv/3hy+Ghrq6ymc
-	A4DeMgT2FrIfLTr3zpB2BEzxR2yIr8J22wBziO6LdXMz8Zb5Iv/WwAaDoQ==
-X-Google-Smtp-Source: AGHT+IHO/uwy2q0qkvOP4bEJP58eMg3Bddh3u7RaIhLEZi3TNuznqWPGQO6R/JDu/4Ux9BPU7k+7eA==
-X-Received: by 2002:a17:903:40cd:b0:1eb:4a94:ebad with SMTP id t13-20020a17090340cd00b001eb4a94ebadmr370429pld.35.1714669154767;
-        Thu, 02 May 2024 09:59:14 -0700 (PDT)
-Received: from [172.17.0.2] ([52.190.187.38])
-        by smtp.gmail.com with ESMTPSA id u9-20020a170903124900b001ea9580e6a0sm1544239plh.20.2024.05.02.09.59.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 May 2024 09:59:14 -0700 (PDT)
-Message-ID: <6633c662.170a0220.ae619.5598@mx.google.com>
-Date: Thu, 02 May 2024 09:59:14 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0013518099679516887=="
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="a9Ys72wr"
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 442CUgrn001262;
+	Thu, 2 May 2024 17:03:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=nsEoOqa3rM/YYYL2nhbF7/zMl102FfnPV6U/C/sL1V0=; b=a9
+	Ys72wrxwzaGTbIInPzwPzoWaFgFvTWR+gHwLcwXTQMzu4uiH41AWHkXg1QN7b6S2
+	m5K0aHnTYTBhu34c4Gb6+PPfAl3CQTt7tiKHkwn7iLdVDkJdj9Y01gJYdCqOZ2VX
+	7eA9dsindUYhHOoo28DlMTjgRJxQT82BQZvS07hmbH5WSEsgVPvuIi07VUyakbxo
+	EAJxHRM7LAk/vyEL7JBF9m8ZtnRFV9cU7vr8/eFvEpi5Ip+CHi5OaQh7PjvAvaPq
+	ZomJcRWxJoxdVyhIuo6Fenlin4MaDu89q2Y01Qwy1s5tM1B0U40Zp4cnm11TRJMp
+	y4h5+Igjs3nqG0s8b2zQ==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xvawbgn0y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 02 May 2024 17:03:54 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 442H3q4X007059
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 2 May 2024 17:03:52 GMT
+Received: from [10.216.32.214] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 2 May 2024
+ 10:03:48 -0700
+Message-ID: <1feddcbc-205d-4c9b-bde2-7a2daace71a9@quicinc.com>
+Date: Thu, 2 May 2024 22:33:34 +0530
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, gustavoars@kernel.org
-Subject: RE: [next] Bluetooth: hci_conn: Use __counted_by() and avoid -Wfamnae warning
-In-Reply-To: <ZjO9qCx10KUJbK6w@neat>
-References: <ZjO9qCx10KUJbK6w@neat>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============0013518099679516887==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: qca: generalise device address check
+Content-Language: en-US
+To: Johan Hovold <johan@kernel.org>
+CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Doug Anderson
+	<dianders@chromium.org>,
+        Johan Hovold <johan+linaro@kernel.org>,
+        "Marcel
+ Holtmann" <marcel@holtmann.org>,
+        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <stable@vger.kernel.org>, <quic_mohamull@quicinc.com>,
+        <quic_hbandi@quicinc.com>, <quic_anubhavg@quicinc.com>
+References: <CAD=FV=V-pG9+5fLonNvydmjS=ziUFUHAyF8T7YTkEHiO405aSA@mail.gmail.com>
+ <ZizKmtcUIYAMpvOQ@hovoldconsulting.com>
+ <dbba45d2-f955-4d3a-aeab-26b0900d5823@quicinc.com>
+ <Zi-ohCWv58d2h5VM@hovoldconsulting.com>
+ <CABBYNZJyqrNKebwPPPqjOAdrkpBJ0fqHyD2iVtypeQKCDcL+AQ@mail.gmail.com>
+ <CABBYNZJyRR9FA7TYN4+aWMtG9FPUBWMvCtMNUfvaEzxVcYOt-g@mail.gmail.com>
+ <ZjCYu2pc8376rjXk@hovoldconsulting.com>
+ <9eebd77b-c070-4260-a979-9b97f14eb5b1@quicinc.com>
+ <ZjDtDRCHT3z-3nHh@hovoldconsulting.com>
+ <a09ab4e3-699b-4eb7-bc64-44c9de6db78d@quicinc.com>
+ <ZjNm3OnJ1fdHctaZ@hovoldconsulting.com>
+From: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+In-Reply-To: <ZjNm3OnJ1fdHctaZ@hovoldconsulting.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: -baOKr0WZWNnEEIPczUwcRvzZccyNcB2
+X-Proofpoint-ORIG-GUID: -baOKr0WZWNnEEIPczUwcRvzZccyNcB2
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-05-02_08,2024-05-02_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
+ malwarescore=0 bulkscore=0 suspectscore=0 priorityscore=1501
+ impostorscore=0 lowpriorityscore=0 spamscore=0 clxscore=1015 adultscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2404010003 definitions=main-2405020111
 
-This is automated email and please do not reply to this email!
+Hi Johan,
 
-Dear submitter,
+On 5/2/2024 3:41 PM, Johan Hovold wrote:
+> On Thu, May 02, 2024 at 12:35:19PM +0530, Janaki Ramaiah Thota wrote:
+>> On 4/30/2024 6:37 PM, Johan Hovold wrote:
+> 
+>>> But here we disagree. A non-unique address is not a valid one as it will
+>>> cause collisions if you have more than one such controller.
+>>>
+>>> I understand that this may be convenient/good enough for developers in
+>>> some cases, but this can hurt end users that do not realise why things
+>>> break.
+>>>
+>>> And a developer can always configure an address manually or patch the
+>>> driver as needed for internal use.
+>>>
+>>> Are there any other reasons that makes you want to keep the option to
+>>> configure the device address through NVM files? I'm assuming you're not
+>>> relying on patching NVM files to provision device-specific addresses
+>>> after installation on target?
+> 
+>> We prefer unique address to be flashed on OTP (persistent) memory of
+>> BT-Chip, which is supported by almost all QC BT-chips.
+> 
+> Yes, that is certainly the best option for everyone.
+> 
+>> If someone is not able to do that/ does not prefer that, they still
+>> have an option to flash unique address in firmware binary (NVM)file.
+>> This does not require setting BD address from user space.
+>>
+>> Also until a developer flashes OTP/ keep unique BD-Address in NVM,
+>> he should be able to run most of the use cases from Device, that's
+>> why we want to make it as configured.
+> 
+> Ok, but a developer can still do this since they can patch the driver to
+> disable the check temporarily or, alternatively, just update the
+> devicetree with a valid unique address.
+> 
+>> In our opinion this provides best Out of box experience.
+> 
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=849960
+If a developer has to patch a code/update device-tree, that is not
+a "out of box" experience. By "out of box" we meant, things should
+work without much changes required.
 
----Test result---
+> You can also look into improving support in user space (e.g. bluez) for
+> providing a valid unique address in a simple text-based configuration
+> file.
+> 
 
-Test Summary:
-CheckPatch                    PASS      1.64 seconds
-GitLint                       FAIL      0.68 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      30.02 seconds
-CheckAllWarning               PASS      32.49 seconds
-CheckSparse                   PASS      38.56 seconds
-CheckSmatch                   FAIL      35.75 seconds
-BuildKernel32                 PASS      28.86 seconds
-TestRunnerSetup               PASS      529.44 seconds
-TestRunner_l2cap-tester       PASS      20.60 seconds
-TestRunner_iso-tester         FAIL      32.45 seconds
-TestRunner_bnep-tester        PASS      4.69 seconds
-TestRunner_mgmt-tester        FAIL      112.58 seconds
-TestRunner_rfcomm-tester      PASS      7.45 seconds
-TestRunner_sco-tester         PASS      15.15 seconds
-TestRunner_ioctl-tester       PASS      7.86 seconds
-TestRunner_mesh-tester        PASS      5.89 seconds
-TestRunner_smp-tester         PASS      6.77 seconds
-TestRunner_userchan-tester    PASS      5.07 seconds
-IncrementalBuild              PASS      28.43 seconds
+We don't think putting a must-have dependency in user space is the
+right thing to do, especially when we own a code in kernel space.
 
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[next] Bluetooth: hci_conn: Use __counted_by() and avoid -Wfamnae warning
+> That would be useful for all Linux users and not require having access
+> to Qualcomm specific tools to update the NVM configuration file (which
+> could also be in a read-only file system, e.g. on Android).
+> 
 
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-18: B1 Line exceeds max length (158>80): "net/bluetooth/hci_conn.c:669:41: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]"
-##############################
-Test: CheckSmatch - FAIL
-Desc: Run smatch tool with source
-Output:
+Having a non-unique valid address allows a developer to handle all
+scenarios where he/she is dealing with DUT + commercial device and
+in such case, default BD-Address from nvm file should also be okay.
+Only when 2/more similar devices are in the mix, they need unique
+address. In that case we are providing end developers with a NVM
+utility(part of Qcom build Not open source tool)to change this
+default BD-Address.
 
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
-make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
-make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: net] Error 2
-make[2]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
-make[4]: *** Waiting for unfinished jobs....
-make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
-make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
-make: *** [Makefile:240: __sub-make] Error 2
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-Total: 122, Passed: 121 (99.2%), Failed: 1, Not Run: 0
+> Johan
 
-Failed Test Cases
-ISO Connect Suspend - Success                        Failed       4.189 seconds
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 492, Passed: 489 (99.4%), Failed: 1, Not Run: 2
-
-Failed Test Cases
-LL Privacy - Add Device 6 (RL is full)               Failed       0.191 seconds
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0013518099679516887==--
+-Janaki Ram
