@@ -1,179 +1,103 @@
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF37916FF43;
-	Thu,  2 May 2024 17:32:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C641415B55D
+	for <linux-bluetooth@vger.kernel.org>; Thu,  2 May 2024 17:45:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714671175; cv=none; b=jWD6BQuu/mZPoG9GAERsYQP01oWPrm+xjLQFOd2a/vjI0/VrqQ3E2dOuJhzF966y5OAqPVaIghcbfk3M225h0oAkrvjkgfLAZD25OlpfMRopW9rsHGD2iBtjcWly97+p/3NeI2rrogLNZofOx070iz7k0QAGbE8JUanfLMPk3QI=
+	t=1714671948; cv=none; b=gh87nhrx5gmCWNjuszylJ0y75O/D9kY7LZdAH/Tdaz3kpDDTLZgRYgRB9noOYuW2O+CYi2HtWS58/Qw+z33PIu1JDBdYFe/j1reZXhoQXf5Qwx7viJxj6N91rLM29jvDkKb3o8LTQMUEU5mMGEOklLxgysZEZeE5G7Gh0d04ilI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714671175; c=relaxed/simple;
-	bh=hzDPMLK50g1/uZWi+ccEKF7L+IuktgQW6zVbM/w/fwo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pREBcx21CJvcs56AKLFJZ5UikxT83I/Ipwyj8Dpivwwvpp9KXUcZ14tiWYHd7N4hcGaIxcXXUEs+p5Sx3OEMozy5T1+efmgX/bHinprsMdEF3IlYVYyPuUszqNb/2ijJLRHwEbZW94sj6lBBdvvvk1PY5bwDjq+t/Um8hcK/5h4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a0Zx2djf; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1714671948; c=relaxed/simple;
+	bh=IHxGn1w7e072y8lu8XMZs77quMjYuFA4X7pRPCXprfI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=psifg5OBog0y2IIDXFEdHAdXNhLZUlGjfErWvy2Mu6mjl6gPAqshFK69+1lLnnpeP714+ESurA0WndnRVylefoSmTam7CIqDSknhSZFS1xUdVLkSpqBBR6Wfmr9K+bC1uzY0vqsc6OBBeiGl1NvxfNdAiIOt3A+trGA/Z3WXmeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=dJKf9Gtv; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a0Zx2djf"
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2dd041acff1so97866181fa.1;
-        Thu, 02 May 2024 10:32:53 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="dJKf9Gtv"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1e5715a9ebdso69588645ad.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 02 May 2024 10:45:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714671172; x=1715275972; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hzDPMLK50g1/uZWi+ccEKF7L+IuktgQW6zVbM/w/fwo=;
-        b=a0Zx2djfVXQ1Fcy23MGbzYauJ1gDChb0LIvem/m6ogLRn3HEkZ3c+tvssmBltqo0qA
-         XJLKr3AMogbNj0OhG22ng0DUns3YEogVVV6hOIfV3TtPV49G1wih8C+mvBrjg/t4Wjxl
-         7T48HKngq777iGRznTQD7zcy9xeMDP2tyllhyRJ07DWznes4+QYpa6Es94VJ4uc6Ml3R
-         a0Sgyyl70zJT6I2vA6nbyT9m/Ppx1SiRs9TYEg20BN1s4p4TXdWqnKsJ7r/jqphlvcwb
-         JfTi2xpweqDARTtQVOYwCcbHXqdaBIYifz6b5fcs2ApZmM0mMX45AV7elC6EUTpAlHSJ
-         UgZw==
+        d=chromium.org; s=google; t=1714671946; x=1715276746; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=exzo1UieylDBJQODCUVqGFbljUasMvDy96izXXeVha4=;
+        b=dJKf9Gtv/MQbi9CX6AolyH6LMBHl1/8kbKdX4OcK23Br5xTZPmJcPKhCrzZJF3Pcpa
+         bjbEND08crOLeeuwqxTT7/yilYzTRDpf1lpOE48kNoD55Ku9ex7GWNlznvWbygRz0R0S
+         BcBKNoxM1eYWlnD8DeRcqlzyixxLIJgAR00bA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714671172; x=1715275972;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hzDPMLK50g1/uZWi+ccEKF7L+IuktgQW6zVbM/w/fwo=;
-        b=kv9J02MSdJrnhfJZESiwvQ7tjjdsTkSguCcmExg3Z9D/j62Y7zUSS7jYu+Jm3RhOWz
-         jbJFSMC03dNTTEH015HPsNiJ9B7Q5sz8TsW1iak1nIg2eZdNS7WOYcIsiTtjoon4YX/u
-         h1kDCRE024qPdtZSg0tc1va7IPKTadT3XAPnDRV8poJ3W4DIYAqm+5m+fF0MPSqW21bo
-         +ZbpWKrue9Uj1hsfenCrNZClgcs09G1SpxG51IyBiPLqQyyUrnXY2NiqBwedKwqC6btd
-         T/c7IiLSFcOZTolOrw+D1BzMHsIJqTMwA2MuD2JETVwr/kolTtwDH+B0yX4FaTFmacPl
-         4pSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXyBG2BzXgjsad4hIRzerd3tvjOYDIXye8r9eP2casTpXrf5C36KsHkI7c8zRqaxNJEw4EtaCaSypxxOSqCpAdbYysajMkQlbWvvFQumsMhzSL7W/gSAJpSEcx/JO8z9Tpht/eVz42kr7yjX/DbY6AenE1DjkxzdsSWYGXqh5rlDP8Ep8tI
-X-Gm-Message-State: AOJu0YzH9qJbbr8NyNm6SOu5aIdskYWsCmD4kO9rJ6xqmJ81j3MBAu67
-	nWjsz82PjdqfzxkUpsqIiORcTIbuXuCDR4K8ITy22AMExDA0rLWx9FdU130dYx/qVAG5sNwjX/+
-	u42uyrxis9ytXl2E3ncUSPajg2i0=
-X-Google-Smtp-Source: AGHT+IFF642nCQbTBoX56+mFk3mvRUhXsAjPZu5dVafLuy3/6t2/2YpxNodcFEBkeqfLuRKrtfsp/7ctQg12LrVXQa4=
-X-Received: by 2002:a2e:7d07:0:b0:2de:809c:c67b with SMTP id
- y7-20020a2e7d07000000b002de809cc67bmr234714ljc.24.1714671171615; Thu, 02 May
- 2024 10:32:51 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1714671946; x=1715276746;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=exzo1UieylDBJQODCUVqGFbljUasMvDy96izXXeVha4=;
+        b=m1Go+IIraaSisLIE4rK6wtx0umJhGm70kZiNW/39shPOmuJq1F4HWNc5++v7042h3h
+         72/wp+7nE8Y3EFsqFPA/7QdXYQRMXhFuBBZcn6vy4LQtCCmPkqzYXBC6Nh8ZfChnCDyX
+         j8Pz/PQjJIYQsRju1Vu2aMeZFvVOX7fqXnWtEWXsI2dreShoRAg9nh0yejtf2DWB/iha
+         IChpj5Z3fmQ0THKwx/sPjMU08bZIifyA8NhZspmgE6jNUEt85v8zFHoClkgUlNyjyu9m
+         xZ9CTGbfur4fAnHvxfCN5c1GLtohVEmC5Hcj9AuNTPmxngz9OOzvfoKTT2MIXVKn6p1a
+         BiQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX6tcXojquUJjK7fITWE6sslhVdE5rNJ9GXCKFH8Fxip7FYVJbReFCsMZkzGXgJcJCghJ8E7OMe46KKzXQ6UywUzJ9+DCALny8AhgpTRze9
+X-Gm-Message-State: AOJu0Yxltp4q12DHuQ4VrQMEdUhF3ri0AvazrjfnA8TWH1DyaBlF3QpR
+	4KmN31kd1IxsLBuJhiD9YjM4m7NrZjLMKRHGvKIwo4BugYNyIJhm+vbSDdONAQ==
+X-Google-Smtp-Source: AGHT+IHJuvpvzMrm4vn0maKzGW0icLGJ4G7TA0twF54RBTausoyPGzqBnQ+KeL8WeHu9J80IQqyC1w==
+X-Received: by 2002:a17:903:1252:b0:1ea:bc:53ac with SMTP id u18-20020a170903125200b001ea00bc53acmr449268plh.44.1714671946197;
+        Thu, 02 May 2024 10:45:46 -0700 (PDT)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id s9-20020a170902c64900b001e5a5ea5287sm1588059pls.208.2024.05.02.10.45.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 May 2024 10:45:45 -0700 (PDT)
+Date: Thu, 2 May 2024 10:45:44 -0700
+From: Kees Cook <keescook@chromium.org>
+To: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH][next] Bluetooth: hci_conn: Use __counted_by() and avoid
+ -Wfamnae warning
+Message-ID: <202405021045.CEE4DCA@keescook>
+References: <ZjO9qCx10KUJbK6w@neat>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAD=FV=V-pG9+5fLonNvydmjS=ziUFUHAyF8T7YTkEHiO405aSA@mail.gmail.com>
- <ZizKmtcUIYAMpvOQ@hovoldconsulting.com> <dbba45d2-f955-4d3a-aeab-26b0900d5823@quicinc.com>
- <Zi-ohCWv58d2h5VM@hovoldconsulting.com> <CABBYNZJyqrNKebwPPPqjOAdrkpBJ0fqHyD2iVtypeQKCDcL+AQ@mail.gmail.com>
- <CABBYNZJyRR9FA7TYN4+aWMtG9FPUBWMvCtMNUfvaEzxVcYOt-g@mail.gmail.com>
- <ZjCYu2pc8376rjXk@hovoldconsulting.com> <9eebd77b-c070-4260-a979-9b97f14eb5b1@quicinc.com>
- <ZjDtDRCHT3z-3nHh@hovoldconsulting.com> <a09ab4e3-699b-4eb7-bc64-44c9de6db78d@quicinc.com>
- <ZjNm3OnJ1fdHctaZ@hovoldconsulting.com> <1feddcbc-205d-4c9b-bde2-7a2daace71a9@quicinc.com>
-In-Reply-To: <1feddcbc-205d-4c9b-bde2-7a2daace71a9@quicinc.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 2 May 2024 13:32:38 -0400
-Message-ID: <CABBYNZK7MVRoOcFq8Ea8-ZqZq_fE=46WE+5_XMoj2KPnz_ePBw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: qca: generalise device address check
-To: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
-Cc: Johan Hovold <johan@kernel.org>, Doug Anderson <dianders@chromium.org>, 
-	Johan Hovold <johan+linaro@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com, 
-	quic_anubhavg@quicinc.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZjO9qCx10KUJbK6w@neat>
 
-Hi Janaki,
+On Thu, May 02, 2024 at 10:22:00AM -0600, Gustavo A. R. Silva wrote:
+> Prepare for the coming implementation by GCC and Clang of the
+> __counted_by attribute. Flexible array members annotated with
+> __counted_by can have their accesses bounds-checked at run-time
+> via CONFIG_UBSAN_BOUNDS (for array indexing) and CONFIG_FORTIFY_SOURCE
+> (for strcpy/memcpy-family functions).
+> 
+> Also, -Wflex-array-member-not-at-end is coming in GCC-14, and we are
+> getting ready to enable it globally.
+> 
+> So, use the `DEFINE_FLEX()` helper for an on-stack definition of
+> a flexible structure where the size of the flexible-array member
+> is known at compile-time, and refactor the rest of the code,
+> accordingly.
+> 
+> With these changes, fix the following warning:
+> net/bluetooth/hci_conn.c:669:41: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+> 
+> Link: https://github.com/KSPP/linux/issues/202
+> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 
-On Thu, May 2, 2024 at 1:03=E2=80=AFPM Janaki Ramaiah Thota
-<quic_janathot@quicinc.com> wrote:
->
-> Hi Johan,
->
-> On 5/2/2024 3:41 PM, Johan Hovold wrote:
-> > On Thu, May 02, 2024 at 12:35:19PM +0530, Janaki Ramaiah Thota wrote:
-> >> On 4/30/2024 6:37 PM, Johan Hovold wrote:
-> >
-> >>> But here we disagree. A non-unique address is not a valid one as it w=
-ill
-> >>> cause collisions if you have more than one such controller.
-> >>>
-> >>> I understand that this may be convenient/good enough for developers i=
-n
-> >>> some cases, but this can hurt end users that do not realise why thing=
-s
-> >>> break.
-> >>>
-> >>> And a developer can always configure an address manually or patch the
-> >>> driver as needed for internal use.
-> >>>
-> >>> Are there any other reasons that makes you want to keep the option to
-> >>> configure the device address through NVM files? I'm assuming you're n=
-ot
-> >>> relying on patching NVM files to provision device-specific addresses
-> >>> after installation on target?
-> >
-> >> We prefer unique address to be flashed on OTP (persistent) memory of
-> >> BT-Chip, which is supported by almost all QC BT-chips.
-> >
-> > Yes, that is certainly the best option for everyone.
-> >
-> >> If someone is not able to do that/ does not prefer that, they still
-> >> have an option to flash unique address in firmware binary (NVM)file.
-> >> This does not require setting BD address from user space.
-> >>
-> >> Also until a developer flashes OTP/ keep unique BD-Address in NVM,
-> >> he should be able to run most of the use cases from Device, that's
-> >> why we want to make it as configured.
-> >
-> > Ok, but a developer can still do this since they can patch the driver t=
-o
-> > disable the check temporarily or, alternatively, just update the
-> > devicetree with a valid unique address.
-> >
-> >> In our opinion this provides best Out of box experience.
-> >
->
-> If a developer has to patch a code/update device-tree, that is not
-> a "out of box" experience. By "out of box" we meant, things should
-> work without much changes required.
->
-> > You can also look into improving support in user space (e.g. bluez) for
-> > providing a valid unique address in a simple text-based configuration
-> > file.
-> >
->
-> We don't think putting a must-have dependency in user space is the
-> right thing to do, especially when we own a code in kernel space.
->
-> > That would be useful for all Linux users and not require having access
-> > to Qualcomm specific tools to update the NVM configuration file (which
-> > could also be in a read-only file system, e.g. on Android).
-> >
->
-> Having a non-unique valid address allows a developer to handle all
-> scenarios where he/she is dealing with DUT + commercial device and
-> in such case, default BD-Address from nvm file should also be okay.
-> Only when 2/more similar devices are in the mix, they need unique
-> address. In that case we are providing end developers with a NVM
-> utility(part of Qcom build Not open source tool)to change this
-> default BD-Address.
+Nice! This looks really clean; I'll point people at this patch when they
+want to see these kinds of conversions. It has it all! :)
 
-And we don't agree with doing that, that is why the controller shall
-be marked as unconfigured when a non-unique address is used and if you
-insist in doing that I will probably have to escalate that you guys
-are intentionally using addresses that can clash over the air.
+Reviewed-by: Kees Cook <keescook@chromium.org>
 
-If the firmware is intended for developer, it shall be kept private,
-public firmware shall never use duplicate addresses, ever, and don't
-come back with arguments like that only when 2/more similar devices
-are in the mix but that would just stress even more the point that you
-are breaking stuff _on purpose_, which is pretty bad by itself, and
-then suggesting to use a non-open-source tool to fix the address is
-making things worse because end users can be affected by this, that
-really fills like you don't care if your hardware works on regular
-Linux distros and in that case I will probably move it to
-driver/staging.
-
-> > Johan
->
-> -Janaki Ram
-
-
-
---=20
-Luiz Augusto von Dentz
+-- 
+Kees Cook
