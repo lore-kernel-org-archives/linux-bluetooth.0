@@ -1,120 +1,103 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D91EC8F3;
-	Thu,  2 May 2024 14:06:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 614B012DDBF;
+	Thu,  2 May 2024 14:13:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714658806; cv=none; b=b0RheeBYyg7U5UXCf/Mt9H+W6xDqYMlw7v5NjMdlUqeZO0rWJe+WCH6LyiPLPA63+qbrosBbhS7GmGD0VcZuvVBSeMRZFuOwptWQnMPaxQRpXc0baOP6mvqZhiQTlAzMGm5oNjoHHjuWTH6/YQ6nDnyDTh+CEuqVutidKpuoU30=
+	t=1714659185; cv=none; b=muKnH/JlidNBE4tFJ3idmjX7K7SLrooLiv3cL+z7LhcGa2B/OHmbniHQ2+e/YX0u0kqhJsMAg50CjPgcwWt48i9J6S8rYWx6XaBKHAKikO53VtCLBK7baJTsrUaO8mE7N+ZpqZ949xpy2+ZcfRn64eK5WqttYfKZRGMQP0u3twI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714658806; c=relaxed/simple;
-	bh=CRwmbthABoB5jtDKEAH75hm5A5BTISlYEbt8gnYV6yU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=h+wjFTWZDEO/tOw4TCbN/NhvQccmSjPG7KKu988nh0TFmrotFCOswzL0+BTkOjP41yOwVZ7ld8qn4HKWy2Aktt/e7d/nBXANI7M2daG2Xw15mlwnjFvhQ1rLMp6lNPIHZTOEdvYga0KrLHqUqz59gmobXtHirRg7x8cudNtQ0Hc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=aZHP+zhe; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1714659185; c=relaxed/simple;
+	bh=m/+rRNq0yK5IDVK52c0pcAeG0bkgcZEPiWZQqdchowE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N/3ic6EuzuIzk/vWnQEczNqxupst9Fb64Wh4604P04lSuPumf2ONR9i3TUZzrYDZLGaUQ024UMglZ/58JYuUJZdPuFAs1REz7a5VT1oDl6qSNd1fiXn6Kkyi3W/0yRmf1TQwTuxmy1P/Qf2QS8yoBsaoFvGBR+S8rxz4f5/LTY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V6dhnwH+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="aZHP+zhe"
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 442Cp2q7015115;
-	Thu, 2 May 2024 14:06:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	from:to:cc:subject:date:message-id:mime-version:content-type; s=
-	qcppdkim1; bh=VUwnpocd+N84WkwYeyoxG5gM6+orRsfk6wD3EbsETyk=; b=aZ
-	HP+zheduFsKvekm4Y/qaEPCOLsQxTgX8Z2ZxbGDp3jfQzJcxoQeHGcaCZ8b0DZlg
-	L4uS5tnJiSC6i/g9+GQQGfLgvaMB+33w4yEG5ptTPQG8CSSyYlxvhXa80F36MvnS
-	buuzT1W3O3y80w/CFx6vHouSZ19Y/3n7zf5JCx8hyglknUgBT0LY4Oneq3Q4fCSN
-	VXSRR//C39PTtCs5QWbkXeXn4Kdr3PJMEtzOmflwecgO58sDD+ZE+OmHk+QDGAna
-	bjZqTr4+0r5utHJ/jZ564jx5zq+GiQVfVSLPYzjfJeIXXIXEXcXCpgxpSDy+PigT
-	TfPtJwiPx/Kodcm5W1Ww==
-Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xueu93dft-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 02 May 2024 14:06:37 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 442E6PrO010306
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 2 May 2024 14:06:25 GMT
-Received: from zijuhu-gv.qualcomm.com (10.80.80.8) by
- nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Thu, 2 May 2024 07:06:23 -0700
-From: Zijun Hu <quic_zijuhu@quicinc.com>
-To: <luiz.dentz@gmail.com>, <luiz.von.dentz@intel.com>, <marcel@holtmann.org>
-CC: <quic_zijuhu@quicinc.com>, <linux-bluetooth@vger.kernel.org>,
-        <wt@penguintechs.org>, <regressions@lists.linux.dev>,
-        <stable@vger.kernel.org>
-Subject: [PATCH v1] Bluetooth: qca: Fix BT enable failure again for QCA6390 after warm reboot
-Date: Thu, 2 May 2024 22:06:01 +0800
-Message-ID: <1714658761-15326-1-git-send-email-quic_zijuhu@quicinc.com>
-X-Mailer: git-send-email 2.7.4
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V6dhnwH+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0D78C113CC;
+	Thu,  2 May 2024 14:13:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714659185;
+	bh=m/+rRNq0yK5IDVK52c0pcAeG0bkgcZEPiWZQqdchowE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=V6dhnwH+Katn8gLImx8No+RInt7eA/8h67J/q6XmtDcYkdA5SeXqlZqIuR3KoLdfm
+	 zcoRMUh8eoIkR4O/WgooiFAs0N88dLp1ET69g0Ta3fQ2udgxzZfRVoGzuUsWUucENe
+	 DF7aNJCYAAf7d9s8MMEVmrfsZkB6B5CCLvvOygnnI7/TQxJ+BH+iUs1VmFsTSIZF4K
+	 3ypD3rm+FfT6aN2AFqCqGKHg0X495fyOp+rCeMp4HPMdXcvVMQWnStt1nq595mMyb/
+	 ThwZziME1Z8ciW1QZqWvaHGvirdkNtlxviMwTXVGaNPstMUFjPqXm5xrXTgCAB5ft2
+	 kHKT0OqUCzNrQ==
+Received: from johan by xi.lan with local (Exim 4.97.1)
+	(envelope-from <johan@kernel.org>)
+	id 1s2XBM-0000000061j-1leg;
+	Thu, 02 May 2024 16:13:08 +0200
+Date: Thu, 2 May 2024 16:13:08 +0200
+From: Johan Hovold <johan@kernel.org>
+To: quic_zijuhu <quic_zijuhu@quicinc.com>
+Cc: Tim Jiang <quic_tjiang@quicinc.com>,
+	Janaki Ramaiah Thota <quic_janathot@quicinc.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: QCA NVM file for the X13s (WCN6855)
+Message-ID: <ZjOfdK41yLwkH25T@hovoldconsulting.com>
+References: <ZjNxfFJmCgIyq8J6@hovoldconsulting.com>
+ <5aea3149-ba44-400f-acc6-1a3eca8a7e72@quicinc.com>
+ <ZjOUWqor4q1Efy0W@hovoldconsulting.com>
+ <f1b45d7d-27e0-4ad7-976c-670a0e0d136b@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: vrB5hJzypWftWDztL0c5YclkApIE-nb4
-X-Proofpoint-ORIG-GUID: vrB5hJzypWftWDztL0c5YclkApIE-nb4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-02_02,2024-05-02_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- mlxlogscore=999 malwarescore=0 lowpriorityscore=0 priorityscore=1501
- clxscore=1011 mlxscore=0 impostorscore=0 adultscore=0 bulkscore=0
- phishscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2404010003 definitions=main-2405020091
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f1b45d7d-27e0-4ad7-976c-670a0e0d136b@quicinc.com>
 
-Commit 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on closed
-serdev") will cause below regression issue:
+On Thu, May 02, 2024 at 09:46:38PM +0800, quic_zijuhu wrote:
+> On 5/2/2024 9:25 PM, Johan Hovold wrote:
+> > On Thu, May 02, 2024 at 08:56:12PM +0800, quic_zijuhu wrote:
+> >> On 5/2/2024 6:57 PM, Johan Hovold wrote:
 
-BT can't be enabled after below steps:
-cold boot -> enable BT -> disable BT -> warm reboot -> BT enable failure
-if property enable-gpios is not configured within DT|ACPI for QCA6390.
+> > It's WCN6855 but the Linux driver currently uses the firmware you pushed
+> > for QCA2066.
+> > 
+> >>> The current Linux driver is using the generic NVM file (hpnv21.bin) for
+> >>> WCN6855, but connectivity is quite bad and I only get 2-3 meters of
+> >>> range.
+> > 
+> >>>> Switching to the board-specific NVM configuration (hpnv21b.b8c) that
+> >> it seems hpnv21b.b8c is a wrong NVM name.
+> >> is it hpnv21g.b8c?
+> > 
+> hpnv21g.b8c is the right NVM for the machine.
 
-The commit is to fix a use-after-free issue within qca_serdev_shutdown()
-during reboot, but also introduces this regression issue regarding above
-steps since the VSC is not sent to reset controller during warm reboot.
+Ok, thanks. I'll try to find some time to test with this one as well.
 
-Fixed by sending the VSC to reset controller within qca_serdev_shutdown()
-once BT was ever enabled, and the use-after-free issue is also be fixed
-by this change since serdev is still opened when send to serdev.
+> > What is the difference between those two?
 
-Fixes: 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on closed serdev")
-Cc: stable@vger.kernel.org
-Reported-by: Wren Turkal <wt@penguintechs.org>
-Closes: https://bugzilla.kernel.org/show_bug.cgi?id=218726
-Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-Tested-by: Wren Turkal <wt@penguintechs.org>
----
- drivers/bluetooth/hci_qca.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+> i am afraid that i can't answer your question due to company CCI policy
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 0c9c9ee56592..8e35c9091486 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -2450,13 +2450,12 @@ static void qca_serdev_shutdown(struct device *dev)
- 	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
- 	struct hci_uart *hu = &qcadev->serdev_hu;
- 	struct hci_dev *hdev = hu->hdev;
--	struct qca_data *qca = hu->priv;
- 	const u8 ibs_wake_cmd[] = { 0xFD };
- 	const u8 edl_reset_soc_cmd[] = { 0x01, 0x00, 0xFC, 0x01, 0x05 };
- 
- 	if (qcadev->btsoc_type == QCA_QCA6390) {
--		if (test_bit(QCA_BT_OFF, &qca->flags) ||
--		    !test_bit(HCI_RUNNING, &hdev->flags))
-+		if (test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks) ||
-+		    hci_dev_test_flag(hdev, HCI_SETUP))
- 			return;
- 
- 		serdev_device_write_flush(serdev);
--- 
-2.7.4
+I understand.
 
+> > Exactly. It's a Lenovo machine that comes with Windows pre-installed and
+> > we're working on enabling Linux on it with some help from Lenovo.
+> > 
+> >> need customer to make a request for their requirements if the answer is
+> >> yes for above question.
+> > 
+> > Lenovo has made requests for X13s firmware from Qualcomm and pushed it
+> > to linux-firmware [1], but they have not yet been able to get Qualcomm
+> > to provide an NVM configuration file for Bluetooth (I think the problem
+> > may be finding the right person to talk to inside Qualcomm).
+> > 
+> > So I was hoping maybe you could help us with this since the difference
+> > between 'hpnv21.bin' that you pushed to linux-firmware and what came
+> > with Windows appears to be really small (e.g. just a few bytes).
+> > 
+> let me try to find out the right person who will push this task at next
+> monday.
+> there are some other internal procedures before we can push BT firmware
+> into linux-firmware.
+
+Much appreciated, thank you.
+
+Johan
