@@ -1,139 +1,102 @@
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD2CE1E481;
-	Wed,  1 May 2024 22:36:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3542D14F98;
+	Thu,  2 May 2024 02:22:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714603003; cv=none; b=qk/UNzOaxgTJ/w2Cv+gSA6irFtFgUQxJjImBpQ/MxVGhTfLuSFIaSxFCBcnSuSAXZeEY1t5lO0lCY5CbDjCc7L+YDVjEHsroWSh4OoGnv6alRnbv0K021UN4ui2XzuuxEusDw81FyibmivENzwDaQJBq6swLXZsFNJV1acc61D4=
+	t=1714616540; cv=none; b=gwbHIGMTxeAGQiLVPMG/MFZKflTQxT6G/vTDeLx0QxlS3s3RuTR8fLwo6Gx/6pGsnpQ01xd/DgmdH47AG8rjoZs+XkhKvzo0eySqnlUjgi7eG2QyTQGzJ0T3IzvjGQLNoWZPP34xAfDzx5ogAyILvpa631mtowgXBkVCug2T0qY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714603003; c=relaxed/simple;
-	bh=YV/YYgGA9K7WCW33ZoIL8lsNGMgwRz4GdkdRG3dcyvM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=o7LqjVqXj4VrLJa3Cn6hqo0uE1k96M+ooO4ksVBmBbg6Ytz8Cys292Z0m7IamdagMSDuS+t5AV+qpUZPBXioc+k9iL9sc/o1ChUyxzuNkzgJGuotv5cqZSwcrv4WtR8kR58JvmdF1F2DqR3I5WrvCOb4j0xdrRfNUYzGckoirZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WgGWzdiU; arc=none smtp.client-ip=209.85.208.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1714616540; c=relaxed/simple;
+	bh=D3RDOQ/8fxSKRWRmhYenBUYE5f5frU02XXiNz0k1se0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=APbTKt9hpewK/AGqQ9jwYGyI8JiwK/IZviacSHwcq2KSmy+C5nomdvhGfHfex537+1ZhX6UZLJSuujLgFnH18jHF/OOdx101GHHC987N197V3rrEiZhVFuF4SJtxS3Oll5YbirG0REfCouRtqbHb3AwWci1RvlTpda53/sbblYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.219.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WgGWzdiU"
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2db7c6b5598so95151921fa.1;
-        Wed, 01 May 2024 15:36:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714603000; x=1715207800; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DuaLRdO6Js2gxidW/S+ZrLyYPpQmg/450rRpegKnffI=;
-        b=WgGWzdiUgmd9tsFVfTbWFZISx3VgNUj6+ED0vXDXdnTVCSFFTexWITdCz9tzQTRR6Q
-         4hgXmKr6QOo0wl9BQhOvJNKJlCpy+G7TYzhMgwpN7o5RgThpz04PQ+m7yPP6X4Wr8P1k
-         lHcTpEY6g+7RbXxCTV+1hxtyWR3I4DJ1/hhAav9vN8DuS+x513l8B8lRNUmVMY86T2+0
-         x//hdvKjc+n9+J05IqRRS471kdPhGyCrhuOjpUSVPOpkaJTXslt9P8jLZqw4hOu7dPwx
-         qlDb6WZdXPp2SQJ8VMFsGOgMys/kSRIS/IY9TKYCGT6Ikv9bvA/3VZrQ8ybSCalmYT9M
-         sDAA==
+Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-69b10ead8f5so39353786d6.0;
+        Wed, 01 May 2024 19:22:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714603000; x=1715207800;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DuaLRdO6Js2gxidW/S+ZrLyYPpQmg/450rRpegKnffI=;
-        b=ERHNGpAs4i+ZygwFjMPHu12z8BVFb6nkir85EPYrLTHttWOwC3qnrVl/cFH4LpkXKf
-         SYeuwpFkMpFzitKNFQQQEuyHcQ/eYCIfg691Zcp89C33bVsDcd5Lqa6PUXIwzWTBxycU
-         ZJbwqs/i/ydH2udcQMKiFAgd8rd3e+wSvNRPwWb9yT3xoXstopjx5KqTIPIVwpE9syrs
-         44Ig8GzJDBYcrCuSzumreAnz0G4tGvDW/J6+EE8v9hs1Y2IBx2SN89mux2G/GqdAwQ0/
-         sK3i7UeWqcuyeRZF+lW1kyOUYGU4kSg/Ry6vN6+N9AQ/ZEHxc1GqU1FfWLQ3xK1jgQhv
-         tylA==
-X-Forwarded-Encrypted: i=1; AJvYcCVk8vw+R/qrKGXmqTmui6ZC5JJaQjjedPEhik8eQv9B9rj+ktQh7Lr/w++7SioQkVYIuATm7iLU774ZwMSn0zt2yDFoMF30lLVp0T74RnBGuL4fzaodyRl7+4zXte9yjlTohvvKlFa/TzDIC76L
-X-Gm-Message-State: AOJu0YxRNYAkdMWRYhOG00A2D/UNnXKQQisPwntzVR7lp3/vEm3/VnEa
-	jdtWaYQPKZmyLdMXuX+a2plqKPU0aI3YeYaM4qnRKANrFrx5gVVNt4p8/h+nzoMOtSyi3QD9zw7
-	UaeEbUBsuLqB6PyU1f3kGpwrGljE=
-X-Google-Smtp-Source: AGHT+IFI6cU2TyISxjTsCefjdE2CQgkkMJ3oJHSpconaHzgOnd8/y0Dk7qw2kqHP9H/1RtQDUIoawNept0jscyUmlzg=
-X-Received: by 2002:a05:651c:212a:b0:2e1:ce2b:a55f with SMTP id
- a42-20020a05651c212a00b002e1ce2ba55fmr229192ljq.53.1714602999525; Wed, 01 May
- 2024 15:36:39 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1714616538; x=1715221338;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zGjZKKiGogvWCvWU2bfw67pwUvUo4ozwuFvA3Y52JnI=;
+        b=SH6aYDL5frmieOgSPxjxoTY5Svf6OIQl1onxxCfH3mu04bcU1rHdywocg8aFqoYdUL
+         SU7i2/IHEopZlHpPZwrppS/0HbzNe0Zzl24mQtN2F1Tz2OgY+sIyuKq6zGK04q7D7p7+
+         T3ku84zquKswGNwaqG3fyX3Q2mKHE2Ip5x0fd62pvLI+Pt1j27i//AOv2GAMaq8CgLLj
+         V3pp3atstm1dehTt9ZkVbdtrMRyGddKOUCNAczQ0XBU2TMby9SHelIUBcguH0JzVR1y/
+         2dvZimLMP0fTJcYnUd5rIcDqA0dwb6/oN2MjdKvhrxjQv/0dkwJjNmnrpUfXyJRA7kth
+         IFrA==
+X-Forwarded-Encrypted: i=1; AJvYcCXQZVT8tviIHivY7fuAu0rCHbCkB9Mvf0LdulyRRBxMuIozAvouRz+2LiTM0TWuJf0J/LQar2Vskiiy2QkMhxh4NOL9+2nlNAD2IsBfqFw6B07HNQRNqj33EnmvhwWnTxqBTs+zy6ipG8c63y2R
+X-Gm-Message-State: AOJu0YzYOdjlu6xvHFY9ndNi63U+QjIeY3NfzXI9y7pyrnXpWn13W4rs
+	LOHpisW283dIm0oSni79j+1lyVQiqGk5w/QKbb1xcszgrtXifBs4
+X-Google-Smtp-Source: AGHT+IGfUS6p1ttDQH6SYMAnb1Y2lhExSXnCXqIEqoqUVOgmtfmnWeyO8sBV7lA5H9S1LxogcpN6iA==
+X-Received: by 2002:a05:6214:c86:b0:6a0:c8f7:e47f with SMTP id r6-20020a0562140c8600b006a0c8f7e47fmr4317888qvr.3.1714616537958;
+        Wed, 01 May 2024 19:22:17 -0700 (PDT)
+Received: from tofu.cs.purdue.edu ([128.210.0.165])
+        by smtp.gmail.com with ESMTPSA id a14-20020a0cefce000000b006a0fa61359asm4623qvt.41.2024.05.01.19.22.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 May 2024 19:22:17 -0700 (PDT)
+From: Sungwoo Kim <iam@sung-woo.kim>
+To: 
+Cc: daveti@purdue.edu,
+	benquike@gmail.com,
+	Sungwoo Kim <iam@sung-woo.kim>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: HCI: Fix potential null-ptr-deref
+Date: Wed,  1 May 2024 22:17:09 -0400
+Message-Id: <20240502021709.141220-1-iam@sung-woo.kim>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240428054307.1178347-1-iam@sung-woo.kim> <CABBYNZKDouOrxG1XcSq2me0WW3A3yAbfdtonw2XJ54VZ8+Nbfg@mail.gmail.com>
- <CAJNyHpKzhFBJ3N0eF1x0icd7O1VkWbTA9k0Gkm8aCMonsagYwg@mail.gmail.com>
-In-Reply-To: <CAJNyHpKzhFBJ3N0eF1x0icd7O1VkWbTA9k0Gkm8aCMonsagYwg@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 1 May 2024 18:36:26 -0400
-Message-ID: <CABBYNZ+Mr1c7UKa4Vey7Wmh-+WQaFU0P8AifBf7HDEb7G8PTJQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: L2CAP: Fix div-by-zero in l2cap_le_flowctl_init()
-To: Sungwoo Kim <iam@sung-woo.kim>
-Cc: daveti@purdue.edu, Marcel Holtmann <marcel@holtmann.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Sungwoo,
+Dear all,
+hci_le_big_sync_established_evt() has a potential null-ptr-deref bug.
 
-On Wed, May 1, 2024 at 6:23=E2=80=AFPM Sungwoo Kim <iam@sung-woo.kim> wrote=
-:
->
-> Dear Luiz,
->
-> On Mon, Apr 29, 2024 at 11:15=E2=80=AFAM Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Sungwoo,
-> >
-> > On Sun, Apr 28, 2024 at 1:43=E2=80=AFAM Sungwoo Kim <iam@sung-woo.kim> =
-wrote:
-> > >
-> > > Hello, could you review this bug and its patch?
-> > >
-> > > l2cap_le_flowctl_init() can cause both div-by-zero and an integer ove=
-rflow.
-> > >
-> > > l2cap_le_flowctl_init()
-> > >   chan->mps =3D min_t(u16, chan->imtu, chan->conn->mtu - L2CAP_HDR_SI=
-ZE);
-> > >   chan->rx_credits =3D (chan->imtu / chan->mps) + 1;  <- div-by-zero
-> > >
-> > > Here, mtu could be less than or equal to L2CAP_HDR_SIZE (4). If mtu i=
-s 4, it
-> > > causes div-by-zero. If mtu is less than 4, it causes an integer overf=
-low.
-> >
-> > That is because it is not valid to have hdev->le_mtu < 0x001b (the
-> > range is 0x001b to 0xffff), so we should really look into checking
-> > that conn->mtu is actually valid.
-> >
-> > > How mtu could have such low value:
-> > >
-> > > hci_cc_le_read_buffer_size()
-> > >   hdev->le_mtu =3D __le16_to_cpu(rp->le_mtu);
-> > >
-> > > l2cap_conn_add()
-> > >   conn->mtu =3D hcon->hdev->le_mtu;
-> >
-> > Yeah this assignment is incorrect and in fact we don't do that if
-> > le_mtu is zero so we probably should do some checks e.g. le_mtu >
-> > 0x001a, or perhaps we need to move the MTU directly to hci_conn so it
-> > can check there are enough buffers to serve the link so we stop the
-> > connection procedure earlier.
->
-> Let's say we moved MTU directly to hci_conn and already checked enough
-> buffers at the creation of hcon.
-> Then, what should happen if hdev->le_mtu is updated? (by a new
-> le_read_buffer_size cmd)
-> Should hcon->mtu be synced with hdev->le_mtu? Or hcon->mtu can keep
-> its old value?
+hci_le_big_sync_established_evt()
+  bis = hci_conn_hash_lookup_handle(hdev, handle);
+  if (!bis)
+    bis = hci_conn_add() <- could fail
+  /* ... */
+  bis = hci_conn_hash_lookup_handle(hdev, handle);
+  set_bit(HCI_CONN_BIG_SYNC_FAILED, &bis->flags); <- null-ptr-deref
 
-What now, why would we read it again? These commands are only suppose
-to be send during init phase and if you do this sort of thing as an
-event without a command then it is also against the spec and we shall
-probably just ignore it if there is no command pending.
+There is a missing check after hci_conn_hash_lookup_handle(), which can
+return NULL. Especially, if a prior hci_conn_add() fails than
+hci_conn_hash_lookup_handle() will return NULL.
 
-> Best,
-> Sungwoo.
+This patch fixes this by adding a check.
 
+Thanks,
+Sungwoo.
 
+Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
+---
+ net/bluetooth/hci_event.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
---=20
-Luiz Augusto von Dentz
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 4a27e4a17..d72d238c1 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -7037,6 +7037,8 @@ static void hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
+ 			u16 handle = le16_to_cpu(ev->bis[i]);
+ 
+ 			bis = hci_conn_hash_lookup_handle(hdev, handle);
++			if (!bis)
++				continue;
+ 
+ 			set_bit(HCI_CONN_BIG_SYNC_FAILED, &bis->flags);
+ 			hci_connect_cfm(bis, ev->status);
+-- 
+2.34.1
+
