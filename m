@@ -1,102 +1,149 @@
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3542D14F98;
-	Thu,  2 May 2024 02:22:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B3617753
+	for <linux-bluetooth@vger.kernel.org>; Thu,  2 May 2024 02:59:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714616540; cv=none; b=gwbHIGMTxeAGQiLVPMG/MFZKflTQxT6G/vTDeLx0QxlS3s3RuTR8fLwo6Gx/6pGsnpQ01xd/DgmdH47AG8rjoZs+XkhKvzo0eySqnlUjgi7eG2QyTQGzJ0T3IzvjGQLNoWZPP34xAfDzx5ogAyILvpa631mtowgXBkVCug2T0qY=
+	t=1714618797; cv=none; b=PaWC9ul9CxXmdaawRNwz2/WuLxKx8V8D85zJvRVSwkhJUix+AeE4U04h2+AvEQe4bSmL5MILtWFCZ53YMl+XKh9WZcOoe89u5jKY31zvGllqV2uQDbEenGxDEGdnqFDmQirUVGs2NYwW6uWmcbUVyDlUrrYHSgTKUKOG7B/eyIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714616540; c=relaxed/simple;
-	bh=D3RDOQ/8fxSKRWRmhYenBUYE5f5frU02XXiNz0k1se0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=APbTKt9hpewK/AGqQ9jwYGyI8JiwK/IZviacSHwcq2KSmy+C5nomdvhGfHfex537+1ZhX6UZLJSuujLgFnH18jHF/OOdx101GHHC987N197V3rrEiZhVFuF4SJtxS3Oll5YbirG0REfCouRtqbHb3AwWci1RvlTpda53/sbblYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.219.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim
+	s=arc-20240116; t=1714618797; c=relaxed/simple;
+	bh=/tR/p5mLHhlZHkmr9X/mUNbuhMJ6lxfZBGIstPEHF0Q=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=GnyCTjYwKdI0He6o2ciJvAPY8kYPM5gg4UEgleI5lxwLmaoF5uGTsy+B8PV6qc1Ryvzal+6n6cV4+/aLeF2ECH+9MCUy1hYtrSEM1lcQq3LUEXjZdqjFRTZJWpsdKgDnQhaq+48W8a+/HAbA7+P+tyPLJPG0WMndPnXQEZon86s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YJi7Jxzy; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-69b10ead8f5so39353786d6.0;
-        Wed, 01 May 2024 19:22:18 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YJi7Jxzy"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1e4c4fb6af3so10336455ad.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 01 May 2024 19:59:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714618795; x=1715223595; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=p1Gz2ZFNLaFHuJAIaG+aB0FEZQnhMUke9CSQ3dlhS74=;
+        b=YJi7JxzyekpO2QPu3DkaFm4EDDjiAAXBeLsRSwGwliIzpB3T1dvrngRrZlS8UXogc7
+         uqzn68wfT8vNf1FeJdSrgLQpn+CpGdsob+UVcgWYpaWeapwU2YRnw6EnISUd5qeieFis
+         VwkdvWfy56Xz5MCk72BmKtP+3cuHceIK1CZGQHh45tnq6etaR4gAOtBVXKG84S8J5zDg
+         c+sWs1v1JSa4jG6OtqOWt0xlxY3+JdGPiIE8ZQHFfulG4sRlv6eqtX4U1dmv04qsh3lx
+         mZtCL8GRI/KeYA4Pr/qPlY8nuiL+0iA7s+WXQGiDIfywBHKbApLn8HANKU4Ci4XafgKX
+         nkXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714616538; x=1715221338;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1714618795; x=1715223595;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=zGjZKKiGogvWCvWU2bfw67pwUvUo4ozwuFvA3Y52JnI=;
-        b=SH6aYDL5frmieOgSPxjxoTY5Svf6OIQl1onxxCfH3mu04bcU1rHdywocg8aFqoYdUL
-         SU7i2/IHEopZlHpPZwrppS/0HbzNe0Zzl24mQtN2F1Tz2OgY+sIyuKq6zGK04q7D7p7+
-         T3ku84zquKswGNwaqG3fyX3Q2mKHE2Ip5x0fd62pvLI+Pt1j27i//AOv2GAMaq8CgLLj
-         V3pp3atstm1dehTt9ZkVbdtrMRyGddKOUCNAczQ0XBU2TMby9SHelIUBcguH0JzVR1y/
-         2dvZimLMP0fTJcYnUd5rIcDqA0dwb6/oN2MjdKvhrxjQv/0dkwJjNmnrpUfXyJRA7kth
-         IFrA==
-X-Forwarded-Encrypted: i=1; AJvYcCXQZVT8tviIHivY7fuAu0rCHbCkB9Mvf0LdulyRRBxMuIozAvouRz+2LiTM0TWuJf0J/LQar2Vskiiy2QkMhxh4NOL9+2nlNAD2IsBfqFw6B07HNQRNqj33EnmvhwWnTxqBTs+zy6ipG8c63y2R
-X-Gm-Message-State: AOJu0YzYOdjlu6xvHFY9ndNi63U+QjIeY3NfzXI9y7pyrnXpWn13W4rs
-	LOHpisW283dIm0oSni79j+1lyVQiqGk5w/QKbb1xcszgrtXifBs4
-X-Google-Smtp-Source: AGHT+IGfUS6p1ttDQH6SYMAnb1Y2lhExSXnCXqIEqoqUVOgmtfmnWeyO8sBV7lA5H9S1LxogcpN6iA==
-X-Received: by 2002:a05:6214:c86:b0:6a0:c8f7:e47f with SMTP id r6-20020a0562140c8600b006a0c8f7e47fmr4317888qvr.3.1714616537958;
-        Wed, 01 May 2024 19:22:17 -0700 (PDT)
-Received: from tofu.cs.purdue.edu ([128.210.0.165])
-        by smtp.gmail.com with ESMTPSA id a14-20020a0cefce000000b006a0fa61359asm4623qvt.41.2024.05.01.19.22.16
+        bh=p1Gz2ZFNLaFHuJAIaG+aB0FEZQnhMUke9CSQ3dlhS74=;
+        b=Dz98WdkCsfibbBwOVhW5jmIXedeZ2NlkxelEkcy4Tb9Ew0eMgSe8HM41zhKQiCzvft
+         yyVNjM+iu+xXtN2xY8Rsy3FX/WTwDQMwEYICxqH5+jagsbMc0PKY9E86kAZnRfPgkvJ4
+         eKLOyiNzON79mIbJEeFQppdNTfjhmIMRh0P1YACl6FqEGAUa2yF4jvHAH0Z/CB7HQy8a
+         wHMTTR+hAGLOlGQo82spy/DCgl2teBePxj1VHB4YqHeMSNavoCLojmhem4bsivZ7Qg2C
+         LP6xy58ckWBsmMthUcm1T8hj7d+l31GDkf5ph5XNx1lgHnWXXSarwsgZ8CaEpFpKh5xl
+         e2fg==
+X-Gm-Message-State: AOJu0Yz/zQyGEJtWjgbw0PHdgecWTyk26BdRPhcAbTPvMJpnLoPtIzX7
+	r7suC9AQ2LH+jEpEz/T3B8QwIbyxuJvusKdmu1T48r0r3fbI/ErrrCvDqQ==
+X-Google-Smtp-Source: AGHT+IGX0w0CRUt00q00joDtnYW45Jax2f0PKVM9mK5NfIbsl3eiLQ6rJi9EeOxHZ7Dmotnj9h7mUg==
+X-Received: by 2002:a17:902:ecd2:b0:1e2:58f:7ed4 with SMTP id a18-20020a170902ecd200b001e2058f7ed4mr2505422plh.5.1714618794784;
+        Wed, 01 May 2024 19:59:54 -0700 (PDT)
+Received: from [172.17.0.2] ([13.83.123.180])
+        by smtp.gmail.com with ESMTPSA id k9-20020a170902c40900b001e8a90b8ac7sm76945plk.303.2024.05.01.19.59.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 May 2024 19:22:17 -0700 (PDT)
-From: Sungwoo Kim <iam@sung-woo.kim>
-To: 
-Cc: daveti@purdue.edu,
-	benquike@gmail.com,
-	Sungwoo Kim <iam@sung-woo.kim>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: HCI: Fix potential null-ptr-deref
-Date: Wed,  1 May 2024 22:17:09 -0400
-Message-Id: <20240502021709.141220-1-iam@sung-woo.kim>
-X-Mailer: git-send-email 2.34.1
+        Wed, 01 May 2024 19:59:54 -0700 (PDT)
+Message-ID: <663301aa.170a0220.cdcf5.0389@mx.google.com>
+Date: Wed, 01 May 2024 19:59:54 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7283469541552713251=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, iam@sung-woo.kim
+Subject: RE: Bluetooth: HCI: Fix potential null-ptr-deref
+In-Reply-To: <20240502021709.141220-1-iam@sung-woo.kim>
+References: <20240502021709.141220-1-iam@sung-woo.kim>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Dear all,
-hci_le_big_sync_established_evt() has a potential null-ptr-deref bug.
+--===============7283469541552713251==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-hci_le_big_sync_established_evt()
-  bis = hci_conn_hash_lookup_handle(hdev, handle);
-  if (!bis)
-    bis = hci_conn_add() <- could fail
-  /* ... */
-  bis = hci_conn_hash_lookup_handle(hdev, handle);
-  set_bit(HCI_CONN_BIG_SYNC_FAILED, &bis->flags); <- null-ptr-deref
+This is automated email and please do not reply to this email!
 
-There is a missing check after hci_conn_hash_lookup_handle(), which can
-return NULL. Especially, if a prior hci_conn_add() fails than
-hci_conn_hash_lookup_handle() will return NULL.
+Dear submitter,
 
-This patch fixes this by adding a check.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=849769
 
-Thanks,
-Sungwoo.
+---Test result---
 
-Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
+Test Summary:
+CheckPatch                    PASS      0.49 seconds
+GitLint                       PASS      0.46 seconds
+SubjectPrefix                 PASS      0.07 seconds
+BuildKernel                   PASS      30.20 seconds
+CheckAllWarning               PASS      32.72 seconds
+CheckSparse                   WARNING   38.10 seconds
+CheckSmatch                   FAIL      36.22 seconds
+BuildKernel32                 PASS      28.91 seconds
+TestRunnerSetup               PASS      519.88 seconds
+TestRunner_l2cap-tester       PASS      20.55 seconds
+TestRunner_iso-tester         PASS      29.18 seconds
+TestRunner_bnep-tester        PASS      4.64 seconds
+TestRunner_mgmt-tester        FAIL      115.50 seconds
+TestRunner_rfcomm-tester      PASS      7.17 seconds
+TestRunner_sco-tester         PASS      14.93 seconds
+TestRunner_ioctl-tester       PASS      7.61 seconds
+TestRunner_mesh-tester        PASS      8.89 seconds
+TestRunner_smp-tester         PASS      6.73 seconds
+TestRunner_userchan-tester    PASS      4.88 seconds
+IncrementalBuild              PASS      28.05 seconds
+
+Details
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
+
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bpa10x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bpa10x.o'
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 492, Passed: 489 (99.4%), Failed: 1, Not Run: 2
+
+Failed Test Cases
+LL Privacy - Remove Device 4 (Disable Adv)           Timed out    2.239 seconds
+
+
 ---
- net/bluetooth/hci_event.c | 2 ++
- 1 file changed, 2 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 4a27e4a17..d72d238c1 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -7037,6 +7037,8 @@ static void hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
- 			u16 handle = le16_to_cpu(ev->bis[i]);
- 
- 			bis = hci_conn_hash_lookup_handle(hdev, handle);
-+			if (!bis)
-+				continue;
- 
- 			set_bit(HCI_CONN_BIG_SYNC_FAILED, &bis->flags);
- 			hci_connect_cfm(bis, ev->status);
--- 
-2.34.1
 
+--===============7283469541552713251==--
