@@ -1,153 +1,121 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62B341CD31;
-	Thu,  2 May 2024 07:05:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC07722EE4
+	for <linux-bluetooth@vger.kernel.org>; Thu,  2 May 2024 07:51:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714633541; cv=none; b=insoZXoMDCjQulV1R7iiZLd5tnLEZoCXBgpbCtOVuKkCdrHe9cyW9aPrj+74tCixHZU3SdcuGb9j9FoPWok6VIwgMYukcFi3tU2tmTfu/PtcUXjfK7xqOUiODHUYVD/gJMzL2dO0JKe8W+pzbLx+VADw+rasKES5Vty85SCFdzA=
+	t=1714636299; cv=none; b=BFHFJ6a5FEBbf68srAa0HERlM8qzdpHMzGd+8SJ0FJDCuVUf8q+oh8xAqOkz9ioAP4afKGQSqZwzQ7fwVVLvg+0BqooAo3tMq8yUoBNjP9MCFaYD9g68KU70MRt4c6tEL6FB3QhqkqU/BZC7iEGNr2769w/n+BWBgJpyplRxeFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714633541; c=relaxed/simple;
-	bh=Swm/AIkknjJq70ly4WrA2HM90B2cvzebKG8zgjhUKcM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=H6jPrY9Ju8LXyLHkIUKQrBLeRE7gC8giM6Xb3syPbwlJE2Lp0evtc1FgxUXUJe2L3h7qK1VJqyvyWjFZ6NR6NvcTuJL2j+1ZAg4tcsT2uiQbgo96T74lHLacV8gqFq7G0PsIqEDDAZxvLPEWdf4orrTQsKRBFG8suMgwF122Qhc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=cGHEXHN2; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1714636299; c=relaxed/simple;
+	bh=kYoS0DMOZ9opD4qUEZZ81bljlubz2EYYFhlTXUUBuBw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=amT/GpmopFzhjSAjMrZMLb9y+WjLjiur8/cRDUcIX8SxdPVJ6hRJvDMXEipQA+6qXfD7zARoBJmd4HboaYtKoL4GxW624aeV3I63Q8LfonlRu5WYwZQBrbM1icTSDFuJVG4ObSepTi0rYkv009zoDzKf4yNzmWPJYpoO8F0ZFtw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=O4kmKZzR; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="cGHEXHN2"
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4424gNnE023082;
-	Thu, 2 May 2024 07:05:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=HbJ6FFim98AO5Npiefoicko7ZduevenIZu5p45/fpZc=; b=cG
-	HEXHN2x++W9/+5qy84G9/fulFa9IZpKvdRWe1dGEHCojjHRJfXk7IgPOcowXIV8s
-	lh/5NjPREHR4/G5gcb72yLplGX9LAWyqwP6z3SULxTx9Vqb0dXPR6JciFM973nrH
-	wkXFT2QLdDv6OGyGXHvuhdLDyrmI1vDPml4+8o4Q5lOyn0nk4JHrrueZ1CZo2PLw
-	oB1n4qNqBlfsDigWpZiSZDsPmN1hEEQQJ++T6XrZy3e/kAzikuo1FbMLA02IwF4r
-	XtWVJ9FjQ/9L57PNsEAh9Y/Mk5KRsp2rckM61GWQLKL09xakwtJLAfEV31NEtVjx
-	AesHTG4KvP9ehDx7GMMg==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xup5ksrx1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 02 May 2024 07:05:27 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 44275QrO001591
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 2 May 2024 07:05:26 GMT
-Received: from [10.218.29.219] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 2 May 2024
- 00:05:22 -0700
-Message-ID: <a09ab4e3-699b-4eb7-bc64-44c9de6db78d@quicinc.com>
-Date: Thu, 2 May 2024 12:35:19 +0530
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="O4kmKZzR"
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-51f12ccff5eso663567e87.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 02 May 2024 00:51:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1714636296; x=1715241096; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=juAuSH1JPhY7PWUJ70Ld08vmAUyCp8zbapAQIba/lj4=;
+        b=O4kmKZzR8W/uAJ8Z6XHT1oeyyWTlxcDK34bqXY55c4d/mGW0oMTgyfyj2PjlTnVJbt
+         y9ALVA7H0rKFaJjtF1Ip9N1+GfPUxwk/loFEWbCpv1mO1F6QDrtQ70BqOYPQvFVmy0om
+         rGs8tjRGTfszA35ZYV7Piz7seQGv5Af7Y1Yxo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714636296; x=1715241096;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=juAuSH1JPhY7PWUJ70Ld08vmAUyCp8zbapAQIba/lj4=;
+        b=K8+lPFnVUzVya62CMfGAvFCVQ/kTlGA0gW8H8I0IX97Xy+Dj8q6X0s8QDDIbyfmPVw
+         cR9VSyhxzTLPCUFm1nIpZgHF1BLBKpQwyNHn8jN7jF2sC7wVfBjt0HMiN4pnKo0Q8+R4
+         x/Ts+X0ORBMFcFdF9TxEwF+fqEeymaH5IhAUlS7wG8KTqwOQ77kkXGwXZNk/K9FlZmad
+         30HBOektix5SdONuqLNDlDl35SN17AegTlKsf2qqThPaPqftk4e02vHsAt9oWASTjqwx
+         5UifxnnlUGGo84QlB1v1aYoPp/j79bgA8VA9t1sk/xYVdujKPDelKiF2tAecpYbnPFQt
+         YTig==
+X-Forwarded-Encrypted: i=1; AJvYcCXidbYjc1cw54Q8OgjIDoYZgkYkgXe1vLYzau56EYBNbx4z5eb+9iZwhUJ3LJN9rLNmoEFeFT/hsDCl7zdC0Abrw8I/ltci3Tk7GzFWVURx
+X-Gm-Message-State: AOJu0YyAGmsh1gmb2yy8KMK2Xwvn8kdsAnKnNtXQTzK3TmiiDRwWrjwB
+	eLmDP7SapLGiAOSZhyr5+ijX7p8f3qGfn7biOwe/9QWsgB6kpBQhMUNQuJFrmord9Z0zqk8Kia8
+	5STne48AdeKHYG+NdVYiunZyuHst+KPY3dGOd
+X-Google-Smtp-Source: AGHT+IEAVYn1Zg5pB/+HWCfbuXWxOWUqPfY3srDAkAXrE3zW+4aKcPJ8YB092/ynCkhEGaNCe+bioePdFycOCNiVjR0=
+X-Received: by 2002:a05:6512:3108:b0:51e:12e2:2a1b with SMTP id
+ n8-20020a056512310800b0051e12e22a1bmr714499lfb.41.1714636295807; Thu, 02 May
+ 2024 00:51:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: qca: generalise device address check
-To: Johan Hovold <johan@kernel.org>
-CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Doug Anderson
-	<dianders@chromium.org>,
-        Johan Hovold <johan+linaro@kernel.org>,
-        "Marcel
- Holtmann" <marcel@holtmann.org>,
-        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <stable@vger.kernel.org>, <quic_mohamull@quicinc.com>,
-        <quic_hbandi@quicinc.com>, <quic_anubhavg@quicinc.com>
-References: <20240426155801.25277-1-johan+linaro@kernel.org>
- <CAD=FV=V-pG9+5fLonNvydmjS=ziUFUHAyF8T7YTkEHiO405aSA@mail.gmail.com>
- <ZizKmtcUIYAMpvOQ@hovoldconsulting.com>
- <dbba45d2-f955-4d3a-aeab-26b0900d5823@quicinc.com>
- <Zi-ohCWv58d2h5VM@hovoldconsulting.com>
- <CABBYNZJyqrNKebwPPPqjOAdrkpBJ0fqHyD2iVtypeQKCDcL+AQ@mail.gmail.com>
- <CABBYNZJyRR9FA7TYN4+aWMtG9FPUBWMvCtMNUfvaEzxVcYOt-g@mail.gmail.com>
- <ZjCYu2pc8376rjXk@hovoldconsulting.com>
- <9eebd77b-c070-4260-a979-9b97f14eb5b1@quicinc.com>
- <ZjDtDRCHT3z-3nHh@hovoldconsulting.com>
-Content-Language: en-US
-From: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
-In-Reply-To: <ZjDtDRCHT3z-3nHh@hovoldconsulting.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: vFA1vKsJARa1-f0RxN7CmlXTKOr_7jkX
-X-Proofpoint-GUID: vFA1vKsJARa1-f0RxN7CmlXTKOr_7jkX
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-01_16,2024-05-02_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
- priorityscore=1501 suspectscore=0 adultscore=0 clxscore=1015
- impostorscore=0 spamscore=0 mlxlogscore=999 lowpriorityscore=0 bulkscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2404010003 definitions=main-2405020039
+References: <20240412073046.1192744-1-wenst@chromium.org> <20240412073046.1192744-2-wenst@chromium.org>
+ <171322232789.252337.16326980700188367647.robh@kernel.org>
+In-Reply-To: <171322232789.252337.16326980700188367647.robh@kernel.org>
+From: Chen-Yu Tsai <wenst@chromium.org>
+Date: Thu, 2 May 2024 15:51:24 +0800
+Message-ID: <CAGXv+5GroxzyUSQZNW-r9xt6Sgy+EGv3+08Htbb_ZcSRvaBR0Q@mail.gmail.com>
+Subject: Re: [PATCH v3 1/2] dt-bindings: net: bluetooth: Add MediaTek MT7921S
+ SDIO Bluetooth
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-mediatek@lists.infradead.org, Conor Dooley <conor+dt@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-
-On 4/30/2024 6:37 PM, Johan Hovold wrote:
-> On Tue, Apr 30, 2024 at 06:22:26PM +0530, Janaki Ramaiah Thota wrote:
->> On 4/30/2024 12:37 PM, Johan Hovold wrote:
->>> On Mon, Apr 29, 2024 at 01:31:53PM -0400, Luiz Augusto von Dentz wrote:
-> 
->>>> Anyway the fact that firmware loading itself is programming a
->>>> potentially duplicated address already seems wrong enough to me,
->>>> either it shall leave it as 00... or set a valid address otherwise we
->>>> always risk missing yet another duplicate address being introduced and
->>>> then used over the air causing all sorts of problems for users.
->>>>
->>>> So to be clear, QCA firmware shall never attempt to flash anything
->>>> other than 00:00:00:00:00:00 if you don't have a valid and unique
->>>> identity address, so we can get rid of this table altogether.
->>>
->>
->> Yes agree with this point.
->> BD address should be treated as invalid if it is 00:00:00:00:00:00.
-> 
-> We all agree on that.
-> 
->> NVM Tag 2: bd address is default BD address (other than 0), should be
->> configured as valid address and as its not unique address and it will
->> be same for all devices so mark it is configured but still allow
->> user-space to change the address.
-> 
-> But here we disagree. A non-unique address is not a valid one as it will
-> cause collisions if you have more than one such controller.
-> 
-> I understand that this may be convenient/good enough for developers in
-> some cases, but this can hurt end users that do not realise why things
-> break.
-> 
-> And a developer can always configure an address manually or patch the
-> driver as needed for internal use.
-> 
-> Are there any other reasons that makes you want to keep the option to
-> configure the device address through NVM files? I'm assuming you're not
-> relying on patching NVM files to provision device-specific addresses
-> after installation on target?
+On Tue, Apr 16, 2024 at 7:05=E2=80=AFAM Rob Herring <robh@kernel.org> wrote=
+:
+> On Fri, 12 Apr 2024 15:30:42 +0800, Chen-Yu Tsai wrote:
+> > The MediaTek MT7921S is a WiFi/Bluetooth combo chip that works over
+> > SDIO. WiFi and Bluetooth are separate SDIO functions within the chip.
+> > While the Bluetooth SDIO function is fully discoverable, the chip has
+> > a pin that can reset just the Bluetooth core, as opposed to the full
+> > chip. This should be described in the device tree.
+> >
+> > Add a device tree binding for the Bluetooth SDIO function of the MT7921=
+S
+> > specifically to document the reset line. This binding is based on the M=
+MC
+> > controller binding, which specifies one device node per SDIO function.
+> >
+> > Cc: Sean Wang <sean.wang@mediatek.com>
+> > Signed-off-by: Chen-Yu Tsai <wenst@chromium.org>
+> > ---
+> > Changes since v2:
+> > - Expand description and commit message to clearly state that WiFi and
+> >   Bluetooth are separate SDIO functions, and that each function should
+> >   be a separate device node, as specified by the MMC binding.
+> > - Change 'additionalProperties' to 'unevaluatedProperties'
+> > - Add missing separating new line
+> > - s/ot/to/
+> >
+> > Angelo's reviewed-by was not picked up due to the above changes.
+> >
+> > Changes since v1:
+> > - Reworded descriptions
+> > - Moved binding maintainer section before description
+> > - Added missing reference to bluetooth-controller.yaml
+> > - Added missing GPIO header to example
+> > ---
+> >  .../bluetooth/mediatek,mt7921s-bluetooth.yaml | 55 +++++++++++++++++++
+> >  MAINTAINERS                                   |  1 +
+> >  2 files changed, 56 insertions(+)
+> >  create mode 100644 Documentation/devicetree/bindings/net/bluetooth/med=
+iatek,mt7921s-bluetooth.yaml
+> >
 >
+> Reviewed-by: Rob Herring <robh@kernel.org>
 
-We prefer unique address to be flashed on OTP (persistent) memory of
-BT-Chip, which is supported by almost all QC BT-chips.  If someone is
-not able to do that/ does not prefer that, they still have an option
-to flash unique address in firmware binary (NVM)file. This does not
-require setting BD address from user space.
+Luiz, could you pick up this patch?
 
-Also until a developer flashes OTP/ keep unique BD-Address in NVM,
-he should be able to run most of the use cases from Device, that's
-why we want to make it as configured.
+The other one is already merged in the MediaTek tree.
 
-In our opinion this provides best Out of box experience.
 
-> Johan
-
--Janaki Ram
-
+Thanks!
+ChenYu
