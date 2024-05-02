@@ -1,28 +1,48 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9B6017997
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 May 2024 05:54:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62B341CD31;
+	Thu,  2 May 2024 07:05:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714629266; cv=none; b=eD27CaLzE/F3OQv3rF6rkWwGpU1XWWEKBi9TwP6fBiq2YQWQn9aTsEquBeODmjtE03VdD9r+Op67iPNX1YBrpRVLhkeLN2phmxe+VAaGTfL9bmCOE/qjLrCfm0HSAYJB6qg0lLj1cgWQItn4IiTX3RelgS30Kt7Sa6TlxObj/Vk=
+	t=1714633541; cv=none; b=insoZXoMDCjQulV1R7iiZLd5tnLEZoCXBgpbCtOVuKkCdrHe9cyW9aPrj+74tCixHZU3SdcuGb9j9FoPWok6VIwgMYukcFi3tU2tmTfu/PtcUXjfK7xqOUiODHUYVD/gJMzL2dO0JKe8W+pzbLx+VADw+rasKES5Vty85SCFdzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714629266; c=relaxed/simple;
-	bh=e7czDcqaCio6y2ynrPUa2cdDcEHLDdxDJFsnLZD/msI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aMEyS210LKcb8wfo75O6vXCVaiwdJGfcMMRmPnvjcBR6VoBJM1Drf8liwTbxePfPSm1jjZ+c93ihWsDjNtZuSY+vyZxda/MQtzGVBN60fl6jGIi1ndFe9CqWTkzd5y6OYJ/giRwqLmicaK1iFv0TnsaK623KjFcJ4avjimCg1Fg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [10.50.1.206] (unknown [89.187.201.15])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 731C361E5FE35;
-	Thu,  2 May 2024 07:53:57 +0200 (CEST)
-Message-ID: <1d11ab52-2369-485d-a1cf-cca6ca836cb0@molgen.mpg.de>
-Date: Thu, 2 May 2024 07:53:56 +0200
+	s=arc-20240116; t=1714633541; c=relaxed/simple;
+	bh=Swm/AIkknjJq70ly4WrA2HM90B2cvzebKG8zgjhUKcM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=H6jPrY9Ju8LXyLHkIUKQrBLeRE7gC8giM6Xb3syPbwlJE2Lp0evtc1FgxUXUJe2L3h7qK1VJqyvyWjFZ6NR6NvcTuJL2j+1ZAg4tcsT2uiQbgo96T74lHLacV8gqFq7G0PsIqEDDAZxvLPEWdf4orrTQsKRBFG8suMgwF122Qhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=cGHEXHN2; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="cGHEXHN2"
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4424gNnE023082;
+	Thu, 2 May 2024 07:05:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=HbJ6FFim98AO5Npiefoicko7ZduevenIZu5p45/fpZc=; b=cG
+	HEXHN2x++W9/+5qy84G9/fulFa9IZpKvdRWe1dGEHCojjHRJfXk7IgPOcowXIV8s
+	lh/5NjPREHR4/G5gcb72yLplGX9LAWyqwP6z3SULxTx9Vqb0dXPR6JciFM973nrH
+	wkXFT2QLdDv6OGyGXHvuhdLDyrmI1vDPml4+8o4Q5lOyn0nk4JHrrueZ1CZo2PLw
+	oB1n4qNqBlfsDigWpZiSZDsPmN1hEEQQJ++T6XrZy3e/kAzikuo1FbMLA02IwF4r
+	XtWVJ9FjQ/9L57PNsEAh9Y/Mk5KRsp2rckM61GWQLKL09xakwtJLAfEV31NEtVjx
+	AesHTG4KvP9ehDx7GMMg==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xup5ksrx1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 02 May 2024 07:05:27 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 44275QrO001591
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 2 May 2024 07:05:26 GMT
+Received: from [10.218.29.219] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 2 May 2024
+ 00:05:22 -0700
+Message-ID: <a09ab4e3-699b-4eb7-bc64-44c9de6db78d@quicinc.com>
+Date: Thu, 2 May 2024 12:35:19 +0530
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -30,65 +50,104 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 1/2] Bluetooth: btintel: Add support for BlazarI
-To: Kiran K <kiran.k@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
- chethan.tumkur.narayan@intel.com, chandrashekar.devegowda@intel.com
-References: <20240502052356.2630798-1-kiran.k@intel.com>
+Subject: Re: [PATCH] Bluetooth: qca: generalise device address check
+To: Johan Hovold <johan@kernel.org>
+CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Doug Anderson
+	<dianders@chromium.org>,
+        Johan Hovold <johan+linaro@kernel.org>,
+        "Marcel
+ Holtmann" <marcel@holtmann.org>,
+        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <stable@vger.kernel.org>, <quic_mohamull@quicinc.com>,
+        <quic_hbandi@quicinc.com>, <quic_anubhavg@quicinc.com>
+References: <20240426155801.25277-1-johan+linaro@kernel.org>
+ <CAD=FV=V-pG9+5fLonNvydmjS=ziUFUHAyF8T7YTkEHiO405aSA@mail.gmail.com>
+ <ZizKmtcUIYAMpvOQ@hovoldconsulting.com>
+ <dbba45d2-f955-4d3a-aeab-26b0900d5823@quicinc.com>
+ <Zi-ohCWv58d2h5VM@hovoldconsulting.com>
+ <CABBYNZJyqrNKebwPPPqjOAdrkpBJ0fqHyD2iVtypeQKCDcL+AQ@mail.gmail.com>
+ <CABBYNZJyRR9FA7TYN4+aWMtG9FPUBWMvCtMNUfvaEzxVcYOt-g@mail.gmail.com>
+ <ZjCYu2pc8376rjXk@hovoldconsulting.com>
+ <9eebd77b-c070-4260-a979-9b97f14eb5b1@quicinc.com>
+ <ZjDtDRCHT3z-3nHh@hovoldconsulting.com>
 Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20240502052356.2630798-1-kiran.k@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+In-Reply-To: <ZjDtDRCHT3z-3nHh@hovoldconsulting.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: vFA1vKsJARa1-f0RxN7CmlXTKOr_7jkX
+X-Proofpoint-GUID: vFA1vKsJARa1-f0RxN7CmlXTKOr_7jkX
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-05-01_16,2024-05-02_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
+ priorityscore=1501 suspectscore=0 adultscore=0 clxscore=1015
+ impostorscore=0 spamscore=0 mlxlogscore=999 lowpriorityscore=0 bulkscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2404010003 definitions=main-2405020039
 
-Dear Kiran,
 
 
-Thank you for your patch.
-
-Am 02.05.24 um 07:23 schrieb Kiran K:
-> Add support for BlazarI (cnvi) bluetooth core.
-
-It’d be great if you documented the datasheet name and revision.
-
-Also, it’d help people reading the diff, if you added what the support 
-entails. In this case a note, that it’s a “standard device” and only the 
-new id needs to be added, would be nice.
-
-> Signed-off-by: Kiran K <kiran.k@intel.com>
-> ---
->   drivers/bluetooth/btintel.c | 3 +++
->   1 file changed, 3 insertions(+)
+On 4/30/2024 6:37 PM, Johan Hovold wrote:
+> On Tue, Apr 30, 2024 at 06:22:26PM +0530, Janaki Ramaiah Thota wrote:
+>> On 4/30/2024 12:37 PM, Johan Hovold wrote:
+>>> On Mon, Apr 29, 2024 at 01:31:53PM -0400, Luiz Augusto von Dentz wrote:
 > 
-> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-> index dc48352166a5..4f4bd5538b6e 100644
-> --- a/drivers/bluetooth/btintel.c
-> +++ b/drivers/bluetooth/btintel.c
-> @@ -481,6 +481,7 @@ static int btintel_version_info_tlv(struct hci_dev *hdev,
->   	case 0x19:	/* Slr-F */
->   	case 0x1b:      /* Mgr */
->   	case 0x1c:	/* Gale Peak (GaP) */
-> +	case 0x1e:	/* BlazarI (Bzr) */
->   		break;
->   	default:
->   		bt_dev_err(hdev, "Unsupported Intel hardware variant (0x%x)",
-> @@ -2698,6 +2699,7 @@ static void btintel_set_msft_opcode(struct hci_dev *hdev, u8 hw_variant)
->   	case 0x19:
->   	case 0x1b:
->   	case 0x1c:
-> +	case 0x1e:
->   		hci_set_msft_opcode(hdev, 0xFC1E);
->   		break;
->   	default:
-> @@ -3037,6 +3039,7 @@ static int btintel_setup_combined(struct hci_dev *hdev)
->   	case 0x19:
->   	case 0x1b:
->   	case 0x1c:
-> +	case 0x1e:
->   		/* Display version information of TLV type */
->   		btintel_version_info_tlv(hdev, &ver_tlv);
+>>>> Anyway the fact that firmware loading itself is programming a
+>>>> potentially duplicated address already seems wrong enough to me,
+>>>> either it shall leave it as 00... or set a valid address otherwise we
+>>>> always risk missing yet another duplicate address being introduced and
+>>>> then used over the air causing all sorts of problems for users.
+>>>>
+>>>> So to be clear, QCA firmware shall never attempt to flash anything
+>>>> other than 00:00:00:00:00:00 if you don't have a valid and unique
+>>>> identity address, so we can get rid of this table altogether.
+>>>
+>>
+>> Yes agree with this point.
+>> BD address should be treated as invalid if it is 00:00:00:00:00:00.
+> 
+> We all agree on that.
+> 
+>> NVM Tag 2: bd address is default BD address (other than 0), should be
+>> configured as valid address and as its not unique address and it will
+>> be same for all devices so mark it is configured but still allow
+>> user-space to change the address.
+> 
+> But here we disagree. A non-unique address is not a valid one as it will
+> cause collisions if you have more than one such controller.
+> 
+> I understand that this may be convenient/good enough for developers in
+> some cases, but this can hurt end users that do not realise why things
+> break.
+> 
+> And a developer can always configure an address manually or patch the
+> driver as needed for internal use.
+> 
+> Are there any other reasons that makes you want to keep the option to
+> configure the device address through NVM files? I'm assuming you're not
+> relying on patching NVM files to provision device-specific addresses
+> after installation on target?
+>
 
+We prefer unique address to be flashed on OTP (persistent) memory of
+BT-Chip, which is supported by almost all QC BT-chips.  If someone is
+not able to do that/ does not prefer that, they still have an option
+to flash unique address in firmware binary (NVM)file. This does not
+require setting BD address from user space.
 
-Kind regards,
+Also until a developer flashes OTP/ keep unique BD-Address in NVM,
+he should be able to run most of the use cases from Device, that's
+why we want to make it as configured.
 
-Paul
+In our opinion this provides best Out of box experience.
+
+> Johan
+
+-Janaki Ram
+
