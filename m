@@ -1,103 +1,136 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 614B012DDBF;
-	Thu,  2 May 2024 14:13:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D830637147
+	for <linux-bluetooth@vger.kernel.org>; Thu,  2 May 2024 14:32:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714659185; cv=none; b=muKnH/JlidNBE4tFJ3idmjX7K7SLrooLiv3cL+z7LhcGa2B/OHmbniHQ2+e/YX0u0kqhJsMAg50CjPgcwWt48i9J6S8rYWx6XaBKHAKikO53VtCLBK7baJTsrUaO8mE7N+ZpqZ949xpy2+ZcfRn64eK5WqttYfKZRGMQP0u3twI=
+	t=1714660377; cv=none; b=sH/3dhDmpodTQdLLU8rBPagkySV62gcrawa6keoTNEnGIN4cKzEjWVL3v33q0cyXx1vaZro8yrcyl0wmiKdGmWIBa3tcfXNQqWyDIHy7YqUX40JJXiaMrFjXZJ//rMIuTSKr9kdv4trnGJo8Eb0UC1w6r6lSaxTDjSZUtPczBJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714659185; c=relaxed/simple;
-	bh=m/+rRNq0yK5IDVK52c0pcAeG0bkgcZEPiWZQqdchowE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N/3ic6EuzuIzk/vWnQEczNqxupst9Fb64Wh4604P04lSuPumf2ONR9i3TUZzrYDZLGaUQ024UMglZ/58JYuUJZdPuFAs1REz7a5VT1oDl6qSNd1fiXn6Kkyi3W/0yRmf1TQwTuxmy1P/Qf2QS8yoBsaoFvGBR+S8rxz4f5/LTY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V6dhnwH+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1714660377; c=relaxed/simple;
+	bh=fqEhDpKhmF5Ewu+BjtHk8rKdRfS3FcG1uHiQ2ysSRH4=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=a7p6ElCj1qja3WNn1A2limd1oU4YIirq87xLrh7mxU5wTZBSEjRN943pldx3iXy9nTgO4GOgg5+znvo/sEiMAqnMgICQeEypocVHk5P7ODvVq7jlzodPk+AOeAS92HqkEr8ZoVweDVtabg2LNhpx6hYTn3Kck6utXSjSyHkiXuE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MWDvn+o6; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V6dhnwH+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0D78C113CC;
-	Thu,  2 May 2024 14:13:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714659185;
-	bh=m/+rRNq0yK5IDVK52c0pcAeG0bkgcZEPiWZQqdchowE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=V6dhnwH+Katn8gLImx8No+RInt7eA/8h67J/q6XmtDcYkdA5SeXqlZqIuR3KoLdfm
-	 zcoRMUh8eoIkR4O/WgooiFAs0N88dLp1ET69g0Ta3fQ2udgxzZfRVoGzuUsWUucENe
-	 DF7aNJCYAAf7d9s8MMEVmrfsZkB6B5CCLvvOygnnI7/TQxJ+BH+iUs1VmFsTSIZF4K
-	 3ypD3rm+FfT6aN2AFqCqGKHg0X495fyOp+rCeMp4HPMdXcvVMQWnStt1nq595mMyb/
-	 ThwZziME1Z8ciW1QZqWvaHGvirdkNtlxviMwTXVGaNPstMUFjPqXm5xrXTgCAB5ft2
-	 kHKT0OqUCzNrQ==
-Received: from johan by xi.lan with local (Exim 4.97.1)
-	(envelope-from <johan@kernel.org>)
-	id 1s2XBM-0000000061j-1leg;
-	Thu, 02 May 2024 16:13:08 +0200
-Date: Thu, 2 May 2024 16:13:08 +0200
-From: Johan Hovold <johan@kernel.org>
-To: quic_zijuhu <quic_zijuhu@quicinc.com>
-Cc: Tim Jiang <quic_tjiang@quicinc.com>,
-	Janaki Ramaiah Thota <quic_janathot@quicinc.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: QCA NVM file for the X13s (WCN6855)
-Message-ID: <ZjOfdK41yLwkH25T@hovoldconsulting.com>
-References: <ZjNxfFJmCgIyq8J6@hovoldconsulting.com>
- <5aea3149-ba44-400f-acc6-1a3eca8a7e72@quicinc.com>
- <ZjOUWqor4q1Efy0W@hovoldconsulting.com>
- <f1b45d7d-27e0-4ad7-976c-670a0e0d136b@quicinc.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MWDvn+o6"
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-6ece8991654so7258893b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 02 May 2024 07:32:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714660375; x=1715265175; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=93bMVuL6mpb54T4Ou+um9c0gtuFhV2NkeLP6h7+14CA=;
+        b=MWDvn+o6R5WdLS2wZH0ZisYdtEKQCJ/hzWH5jySRa7QF2M4feupato0TDbaF2D+JDW
+         BDuQCqY0UPzEfKGvtf8gcVeIAsIipVaINmqY7qkOsef/ashiVwZo0TxRf6ZGBEYHufVF
+         yaqYU6um1bVoEXWhWpyDT8DbFcNxOIbimJVCbFi4Qd4a504B0zRTPe8oAiU9hOlDXV73
+         m7u/YN0DJIP0wUtixFplWjRMCxNSpN8dxqX0J+ndWi052/W04JV45yUI7ATwB1OPXta3
+         30zX88RifUPgs31mTboW85cHSOvrbZlO1sMHPkt/gDZ3sUgt4J9Yb/qil0M01dNC44Rn
+         Ef3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714660375; x=1715265175;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=93bMVuL6mpb54T4Ou+um9c0gtuFhV2NkeLP6h7+14CA=;
+        b=DfF2ZSY+91kQ8O0iJEovus6Hd2hpr10mEu5ZyKjQVv8ElPV492e0OL2QJxige4UqoJ
+         NEDnHfRrurwDkE85nR7eTR9HOhVn+id+AM4wwiK0lhaA0V2Rq04hYjlfEkbakkRSnw3J
+         QN8Tg4sxjFfQuBOBT7aDUZpH2UkmEEX8qQCMi4fILYqhExVo39CjTlHNF/KyIA9t8zVA
+         URsOJbygAnmAehi9Wk+kw4A2vwR0/NMwAWJ7BCwFDXSvEQyGcnuIplPvYPpKAmuOsYEv
+         0JONNkg7rmesYXpXBgS3JcYv+dDnbVtj7Ao8xBaTWYIjoMEV9bT6H1VPDGgK/v0v5Qvr
+         ZHzg==
+X-Gm-Message-State: AOJu0Yy4CqxoFhILEHNT+oHeWEaClLSUU+x2eJft/NMgStSZjmQfDOcq
+	8nfYZ4AmWkQNKnNVjvoVui7EzsOwvzaS1OAXdSGijeYPRY3AYZmzFMvywA==
+X-Google-Smtp-Source: AGHT+IFiTralGpl/ZJjQJb34w+VXpiqRH1K3DKlY4LpnWS4tx6w/RhaWWZras++r89ejKmD7GPLu+g==
+X-Received: by 2002:a05:6a00:2e1d:b0:6ea:9252:435 with SMTP id fc29-20020a056a002e1d00b006ea92520435mr2852044pfb.30.1714660374954;
+        Thu, 02 May 2024 07:32:54 -0700 (PDT)
+Received: from [172.17.0.2] ([52.238.28.69])
+        by smtp.gmail.com with ESMTPSA id c26-20020aa781da000000b006eadc87233dsm1271913pfn.165.2024.05.02.07.32.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 May 2024 07:32:54 -0700 (PDT)
+Message-ID: <6633a416.a70a0220.e7a01.3244@mx.google.com>
+Date: Thu, 02 May 2024 07:32:54 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4716576393805493406=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f1b45d7d-27e0-4ad7-976c-670a0e0d136b@quicinc.com>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, quic_zijuhu@quicinc.com
+Subject: RE: [v1] Bluetooth: qca: Fix BT enable failure again for QCA6390 after warm reboot
+In-Reply-To: <1714658761-15326-1-git-send-email-quic_zijuhu@quicinc.com>
+References: <1714658761-15326-1-git-send-email-quic_zijuhu@quicinc.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Thu, May 02, 2024 at 09:46:38PM +0800, quic_zijuhu wrote:
-> On 5/2/2024 9:25 PM, Johan Hovold wrote:
-> > On Thu, May 02, 2024 at 08:56:12PM +0800, quic_zijuhu wrote:
-> >> On 5/2/2024 6:57 PM, Johan Hovold wrote:
+--===============4716576393805493406==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-> > It's WCN6855 but the Linux driver currently uses the firmware you pushed
-> > for QCA2066.
-> > 
-> >>> The current Linux driver is using the generic NVM file (hpnv21.bin) for
-> >>> WCN6855, but connectivity is quite bad and I only get 2-3 meters of
-> >>> range.
-> > 
-> >>>> Switching to the board-specific NVM configuration (hpnv21b.b8c) that
-> >> it seems hpnv21b.b8c is a wrong NVM name.
-> >> is it hpnv21g.b8c?
-> > 
-> hpnv21g.b8c is the right NVM for the machine.
+This is automated email and please do not reply to this email!
 
-Ok, thanks. I'll try to find some time to test with this one as well.
+Dear submitter,
 
-> > What is the difference between those two?
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=849912
 
-> i am afraid that i can't answer your question due to company CCI policy
+---Test result---
 
-I understand.
+Test Summary:
+CheckPatch                    PASS      0.49 seconds
+GitLint                       PASS      0.19 seconds
+SubjectPrefix                 PASS      0.06 seconds
+BuildKernel                   PASS      30.95 seconds
+CheckAllWarning               PASS      34.14 seconds
+CheckSparse                   PASS      43.14 seconds
+CheckSmatch                   FAIL      37.86 seconds
+BuildKernel32                 PASS      29.85 seconds
+TestRunnerSetup               PASS      546.06 seconds
+TestRunner_l2cap-tester       PASS      18.60 seconds
+TestRunner_iso-tester         PASS      31.83 seconds
+TestRunner_bnep-tester        PASS      4.77 seconds
+TestRunner_mgmt-tester        PASS      113.61 seconds
+TestRunner_rfcomm-tester      PASS      7.43 seconds
+TestRunner_sco-tester         PASS      15.15 seconds
+TestRunner_ioctl-tester       PASS      7.94 seconds
+TestRunner_mesh-tester        PASS      5.89 seconds
+TestRunner_smp-tester         PASS      6.74 seconds
+TestRunner_userchan-tester    PASS      4.87 seconds
+IncrementalBuild              PASS      28.61 seconds
 
-> > Exactly. It's a Lenovo machine that comes with Windows pre-installed and
-> > we're working on enabling Linux on it with some help from Lenovo.
-> > 
-> >> need customer to make a request for their requirements if the answer is
-> >> yes for above question.
-> > 
-> > Lenovo has made requests for X13s firmware from Qualcomm and pushed it
-> > to linux-firmware [1], but they have not yet been able to get Qualcomm
-> > to provide an NVM configuration file for Bluetooth (I think the problem
-> > may be finding the right person to talk to inside Qualcomm).
-> > 
-> > So I was hoping maybe you could help us with this since the difference
-> > between 'hpnv21.bin' that you pushed to linux-firmware and what came
-> > with Windows appears to be really small (e.g. just a few bytes).
-> > 
-> let me try to find out the right person who will push this task at next
-> monday.
-> there are some other internal procedures before we can push BT firmware
-> into linux-firmware.
+Details
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
 
-Much appreciated, thank you.
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bpa10x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bpa10x.o'
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
 
-Johan
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============4716576393805493406==--
