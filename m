@@ -1,176 +1,112 @@
-Received: from zg8tmja2lje4os43os4xodqa.icoremail.net (zg8tmja2lje4os43os4xodqa.icoremail.net [206.189.79.184])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFFF882498;
-	Thu,  2 May 2024 12:59:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=206.189.79.184
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 840DC83CC5;
+	Thu,  2 May 2024 13:25:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714654749; cv=none; b=tjJh/zaA8YdfseeJa1HShfRaJuxmDIz9KbxIKVx9NCWURvo39A7mLdwynH9jG+9uwbEmzyC3nM7zyfKJHWkDbhNn1feNIgNJkoASrVRoiKYZp5ipb++LoCOZBQdOIueGMh2HzW14BSp0O8oOSWxALRHsOhbIIeERT+g0qrLwIh0=
+	t=1714656344; cv=none; b=Nm7lUq51pP1+3aoMTxLTJx6ktFy3oDeGyEdn2wcpUEstQhz7nGjPiDEOVj0byMeJZ/f5KvuaBlLuN5clBQb1Z+VLCK86ahy/kBOPAMHALGFIrTAtFAgbP2qrdDEmqZznWZmqrDiYsdZoYJTxRzN2dvz4ZJh3FZGm1cX+jiRNQQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714654749; c=relaxed/simple;
-	bh=pS/I1kzqFrQdM3EmoRnGcLpZmqdgt3T3j/097XUIV2w=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=dEna8y5ymcPRRA3RxHq9PQ9/PCdDNwycOvwypXvkzq4AnWjdzH4a8TB9JF8KL57Y2O+u0zKh95XWV5Fh5GQgtKRyaJo3TvAiQ20aQfg348XcKuDfMzQQ99ss5FqPbTeJugi07IhI2Ek6jJdhyzu3DHrPZTLUOSymKsto8IbPz+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=206.189.79.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from ubuntu.localdomain (unknown [221.192.181.50])
-	by mail-app3 (Coremail) with SMTP id cC_KCgBXCOrDjTNmWJG9AQ--.60971S2;
-	Thu, 02 May 2024 20:58:01 +0800 (CST)
-From: Duoming Zhou <duoming@zju.edu.cn>
-To: linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	luiz.dentz@gmail.com,
-	johan.hedberg@gmail.com,
-	marcel@holtmann.org,
-	Duoming Zhou <duoming@zju.edu.cn>
-Subject: [PATCH] Bluetooth: l2cap: fix null-ptr-deref in l2cap_chan_timeout
-Date: Thu,  2 May 2024 20:57:36 +0800
-Message-Id: <20240502125736.28034-1-duoming@zju.edu.cn>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:cC_KCgBXCOrDjTNmWJG9AQ--.60971S2
-X-Coremail-Antispam: 1UD129KBjvJXoW3JF15Kr13CF18Jw1ftw17trb_yoWxWFy5pr
-	sxKrWSkrs5Jas5JF45Cr17Ja4DZ347AF4DWry8Ar1fJ3W8Xw1DAr1DAryUCrnrGrnrAFy3
-	t3s8Xr10kr17Gw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvv14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AKxVWU
-	AVWUtwCY02Avz4vE14v_Xr1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr
-	1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE
-	14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7
-	IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E
-	87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73Uj
-	IFyTuYvjfUn_-PUUUUU
-X-CM-SenderInfo: qssqjiasttq6lmxovvfxof0/1tbiAwIJAWYySJ0M6ABBst
+	s=arc-20240116; t=1714656344; c=relaxed/simple;
+	bh=DvfYRYHvgsxTSZyqjmlAyayx/56nh7hHtnI5bpCN+2A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=om4UT7KPRNBE4HiU9RPZBwBMsoTCf3lgvsUXnxs7gBnnY6lNc3k+UUIbowazaXtFjrRG76iAUi6KkYkifhAGsKZqsx8aHGjj5T7eiLbSH7+73i+FLAiXyHGp/NW+ubAf+xo14siJEJeZ2tUvaoOFGB3+EPNjcvuzOzFaOfNR+ug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PEdNcM2I; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PEdNcM2I"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D8FEC113CC;
+	Thu,  2 May 2024 13:25:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714656344;
+	bh=DvfYRYHvgsxTSZyqjmlAyayx/56nh7hHtnI5bpCN+2A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PEdNcM2I17MtW0rDVTMcO7IfhLLuPazC6GauJKMHdiAZqQBcSdFA0skf2gOaS/nas
+	 EUorKlh9C5JHh/w5eoEaoMM7/ANVHSZPSJH9veMQexzc7AAzpiVyeHXUoNv05x4m+U
+	 q/FCWWHMN8L/Ma9G/u9zlAsjtYiJspcrk7d5/lxPvA4gs39JjX/2Til1w2860sKdZJ
+	 7HBCWrq6lMlgLoaLyBsE/gxxZO+igJca3I/9kv7Op3gOb//YsoCR2YCLXu4HAVkOli
+	 1AtStUb1lm/u8uEUPSU90pX561aJJmodtpt97uIC4it8HeFUs4WxKfIhQsA9z0Vbi6
+	 QkH6DHAjqLRmQ==
+Received: from johan by xi.lan with local (Exim 4.97.1)
+	(envelope-from <johan@kernel.org>)
+	id 1s2WRW-000000005WP-3Swo;
+	Thu, 02 May 2024 15:25:47 +0200
+Date: Thu, 2 May 2024 15:25:46 +0200
+From: Johan Hovold <johan@kernel.org>
+To: quic_zijuhu <quic_zijuhu@quicinc.com>
+Cc: Tim Jiang <quic_tjiang@quicinc.com>,
+	Janaki Ramaiah Thota <quic_janathot@quicinc.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: QCA NVM file for the X13s (WCN6855)
+Message-ID: <ZjOUWqor4q1Efy0W@hovoldconsulting.com>
+References: <ZjNxfFJmCgIyq8J6@hovoldconsulting.com>
+ <5aea3149-ba44-400f-acc6-1a3eca8a7e72@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5aea3149-ba44-400f-acc6-1a3eca8a7e72@quicinc.com>
 
-There is a race condition between l2cap_chan_timeout() and
-l2cap_chan_del(). When we use l2cap_chan_del() to delete the
-channel, the chan->conn will be set to null. But the conn could
-be dereferenced again in the mutex_lock() of l2cap_chan_timeout().
-As a result the null pointer dereference bug will happen. The
-KASAN report triggered by POC is shown below:
+On Thu, May 02, 2024 at 08:56:12PM +0800, quic_zijuhu wrote:
+> On 5/2/2024 6:57 PM, Johan Hovold wrote:
 
-[  472.074580] ==================================================================
-[  472.075284] BUG: KASAN: null-ptr-deref in mutex_lock+0x68/0xc0
-[  472.075308] Write of size 8 at addr 0000000000000158 by task kworker/0:0/7
-[  472.075308]
-[  472.075308] CPU: 0 PID: 7 Comm: kworker/0:0 Not tainted 6.9.0-rc5-00356-g78c0094a146b #36
-[  472.075308] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu4
-[  472.075308] Workqueue: events l2cap_chan_timeout
-[  472.075308] Call Trace:
-[  472.075308]  <TASK>
-[  472.075308]  dump_stack_lvl+0x137/0x1a0
-[  472.075308]  print_report+0x101/0x250
-[  472.075308]  ? __virt_addr_valid+0x77/0x160
-[  472.075308]  ? mutex_lock+0x68/0xc0
-[  472.075308]  kasan_report+0x139/0x170
-[  472.075308]  ? mutex_lock+0x68/0xc0
-[  472.075308]  kasan_check_range+0x2c3/0x2e0
-[  472.075308]  mutex_lock+0x68/0xc0
-[  472.075308]  l2cap_chan_timeout+0x181/0x300
-[  472.075308]  process_one_work+0x5d2/0xe00
-[  472.075308]  worker_thread+0xe1d/0x1660
-[  472.075308]  ? pr_cont_work+0x5e0/0x5e0
-[  472.075308]  kthread+0x2b7/0x350
-[  472.075308]  ? pr_cont_work+0x5e0/0x5e0
-[  472.075308]  ? kthread_blkcg+0xd0/0xd0
-[  472.075308]  ret_from_fork+0x4d/0x80
-[  472.075308]  ? kthread_blkcg+0xd0/0xd0
-[  472.075308]  ret_from_fork_asm+0x11/0x20
-[  472.075308]  </TASK>
-[  472.075308] ==================================================================
-[  472.094860] Disabling lock debugging due to kernel taint
-[  472.096136] BUG: kernel NULL pointer dereference, address: 0000000000000158
-[  472.096136] #PF: supervisor write access in kernel mode
-[  472.096136] #PF: error_code(0x0002) - not-present page
-[  472.096136] PGD 0 P4D 0
-[  472.096136] Oops: 0002 [#1] PREEMPT SMP KASAN NOPTI
-[  472.096136] CPU: 0 PID: 7 Comm: kworker/0:0 Tainted: G    B              6.9.0-rc5-00356-g78c0094a146b #36
-[  472.096136] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu4
-[  472.096136] Workqueue: events l2cap_chan_timeout
-[  472.096136] RIP: 0010:mutex_lock+0x88/0xc0
-[  472.096136] Code: be 08 00 00 00 e8 f8 23 1f fd 4c 89 f7 be 08 00 00 00 e8 eb 23 1f fd 42 80 3c 23 00 74 08 48 88
-[  472.096136] RSP: 0018:ffff88800744fc78 EFLAGS: 00000246
-[  472.096136] RAX: 0000000000000000 RBX: 1ffff11000e89f8f RCX: ffffffff8457c865
-[  472.096136] RDX: 0000000000000001 RSI: 0000000000000008 RDI: ffff88800744fc78
-[  472.096136] RBP: 0000000000000158 R08: ffff88800744fc7f R09: 1ffff11000e89f8f
-[  472.096136] R10: dffffc0000000000 R11: ffffed1000e89f90 R12: dffffc0000000000
-[  472.096136] R13: 0000000000000158 R14: ffff88800744fc78 R15: ffff888007405a00
-[  472.096136] FS:  0000000000000000(0000) GS:ffff88806d200000(0000) knlGS:0000000000000000
-[  472.096136] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  472.096136] CR2: 0000000000000158 CR3: 000000000da32000 CR4: 00000000000006f0
-[  472.096136] Call Trace:
-[  472.096136]  <TASK>
-[  472.096136]  ? __die_body+0x8d/0xe0
-[  472.096136]  ? page_fault_oops+0x6b8/0x9a0
-[  472.096136]  ? kernelmode_fixup_or_oops+0x20c/0x2a0
-[  472.096136]  ? do_user_addr_fault+0x1027/0x1340
-[  472.096136]  ? _printk+0x7a/0xa0
-[  472.096136]  ? mutex_lock+0x68/0xc0
-[  472.096136]  ? add_taint+0x42/0xd0
-[  472.096136]  ? exc_page_fault+0x6a/0x1b0
-[  472.096136]  ? asm_exc_page_fault+0x26/0x30
-[  472.096136]  ? mutex_lock+0x75/0xc0
-[  472.096136]  ? mutex_lock+0x88/0xc0
-[  472.096136]  ? mutex_lock+0x75/0xc0
-[  472.096136]  l2cap_chan_timeout+0x181/0x300
-[  472.096136]  process_one_work+0x5d2/0xe00
-[  472.096136]  worker_thread+0xe1d/0x1660
-[  472.096136]  ? pr_cont_work+0x5e0/0x5e0
-[  472.096136]  kthread+0x2b7/0x350
-[  472.096136]  ? pr_cont_work+0x5e0/0x5e0
-[  472.096136]  ? kthread_blkcg+0xd0/0xd0
-[  472.096136]  ret_from_fork+0x4d/0x80
-[  472.096136]  ? kthread_blkcg+0xd0/0xd0
-[  472.096136]  ret_from_fork_asm+0x11/0x20
-[  472.096136]  </TASK>
-[  472.096136] Modules linked in:
-[  472.096136] CR2: 0000000000000158
-[  472.096136] ---[ end trace 0000000000000000 ]---
-[  472.096136] RIP: 0010:mutex_lock+0x88/0xc0
-[  472.096136] Code: be 08 00 00 00 e8 f8 23 1f fd 4c 89 f7 be 08 00 00 00 e8 eb 23 1f fd 42 80 3c 23 00 74 08 48 88
-[  472.096136] RSP: 0018:ffff88800744fc78 EFLAGS: 00000246
-[  472.096136] RAX: 0000000000000000 RBX: 1ffff11000e89f8f RCX: ffffffff8457c865
-[  472.096136] RDX: 0000000000000001 RSI: 0000000000000008 RDI: ffff88800744fc78
-[  472.096136] RBP: 0000000000000158 R08: ffff88800744fc7f R09: 1ffff11000e89f8f
-[  472.132932] R10: dffffc0000000000 R11: ffffed1000e89f90 R12: dffffc0000000000
-[  472.132932] R13: 0000000000000158 R14: ffff88800744fc78 R15: ffff888007405a00
-[  472.132932] FS:  0000000000000000(0000) GS:ffff88806d200000(0000) knlGS:0000000000000000
-[  472.132932] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  472.132932] CR2: 0000000000000158 CR3: 000000000da32000 CR4: 00000000000006f0
-[  472.132932] Kernel panic - not syncing: Fatal exception
-[  472.132932] Kernel Offset: disabled
-[  472.132932] ---[ end Kernel panic - not syncing: Fatal exception ]---
+> > I noticed that you have both submitted firmware and NVM files for
+> > QCA2066 to linux-firmware. [1][2]
+> > 
+> > I'm working on Linux support for the Lenovo ThinkPad X13s (Windows on
+> > Arm, Snapdragon), which has the related WCN6855 controller that uses the
+> > same firmware (hpbtfw21.tlv).
 
-Add a check to judge whether the conn is null in l2cap_chan_timeout()
-in order to mitigate the bug.
+> which SOC type does the machine use?  WCN6855 or QCA2066?
 
-Fixes: 3df91ea20e74 ("Bluetooth: Revert to mutexes from RCU list")
-Signed-off-by: Duoming Zhou <duoming@zju.edu.cn>
----
- net/bluetooth/l2cap_core.c | 3 +++
- 1 file changed, 3 insertions(+)
+It's WCN6855 but the Linux driver currently uses the firmware you pushed
+for QCA2066.
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 84fc70862d7..5761d37c553 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -415,6 +415,9 @@ static void l2cap_chan_timeout(struct work_struct *work)
- 
- 	BT_DBG("chan %p state %s", chan, state_to_string(chan->state));
- 
-+	if (!conn)
-+		return;
-+
- 	mutex_lock(&conn->chan_lock);
- 	/* __set_chan_timer() calls l2cap_chan_hold(chan) while scheduling
- 	 * this work. No need to call l2cap_chan_hold(chan) here again.
--- 
-2.17.1
+> > The current Linux driver is using the generic NVM file (hpnv21.bin) for
+> > WCN6855, but connectivity is quite bad and I only get 2-3 meters of
+> > range.
 
+> > > Switching to the board-specific NVM configuration (hpnv21b.b8c) that
+> it seems hpnv21b.b8c is a wrong NVM name.
+> is it hpnv21g.b8c?
+
+I've only tested with the NVM file without the "g" infix, but there
+indeed also is a 'hpnv21g.b8c' in the Windows installation.
+
+What is the difference between those two?
+
+> > came with the Windows driver make all issues go away and the range is
+> > really good, but I'm not sure if that file is fully compatible with the
+> > firmware used by the Linux driver.
+> > 
+> > Could you help us submit an NVM configuration file for the controller
+> > with board id 0x008c to linux-firmware?
+> > 
+> For Windows OS, there are relevant channel to deliver BT firmware.
+> For Linux OS, we normally upload relevant BT firmware to linux-firmware.
+> 
+> it seems customer would like to use Linux OS instead of preinstalled
+> Windows OS for the machine.
+> right?
+
+Exactly. It's a Lenovo machine that comes with Windows pre-installed and
+we're working on enabling Linux on it with some help from Lenovo.
+
+> need customer to make a request for their requirements if the answer is
+> yes for above question.
+
+Lenovo has made requests for X13s firmware from Qualcomm and pushed it
+to linux-firmware [1], but they have not yet been able to get Qualcomm
+to provide an NVM configuration file for Bluetooth (I think the problem
+may be finding the right person to talk to inside Qualcomm).
+
+So I was hoping maybe you could help us with this since the difference
+between 'hpnv21.bin' that you pushed to linux-firmware and what came
+with Windows appears to be really small (e.g. just a few bytes).
+
+Johan
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/commit/qcom?id=4ae4ae88918928e15006eb129ad981aa58216b59
