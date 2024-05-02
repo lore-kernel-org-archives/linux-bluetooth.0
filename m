@@ -1,182 +1,88 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A9C15CD40;
-	Thu,  2 May 2024 16:22:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 747D315E1EF;
+	Thu,  2 May 2024 16:28:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714666924; cv=none; b=KK2ioM2+c1r+2mB7PT7ZwmsSY1NsS0jmcCv7zHLkyBEtKL4e6nGEszrtgv4qvy3ObMaR8RkVMhsn/6YehGt7+TJPQM8jfirWOB9XVFsyyT0cqsX39KUiHc/blzAaCynCVIfCEdM+aYjV94tz7naDaY0+wPQNQR0RHhjwf07vP4s=
+	t=1714667289; cv=none; b=IyXxZ3agVpeLCP46Dz/tbUBUJHy8/DwHBHRw25MCGx/U8Xd+/rJ7ADeZxcyhr76J+6/ocvtsTsnrYaI8USY0AWs9mBZr+G7QGMmDS4lAkJnA23E4T4MGbNj5dNXn5y5oPj41tPM6LKA3vuL4AOsgVH9tYr3o1tgPVG/P957iZCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714666924; c=relaxed/simple;
-	bh=NgUrHm1d3fP/DVSv0zS8qOV1V2Le1HkNbk1ehfQZG5E=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=dp2lb8BKEU3iK8RD1kNOb+lesR9QQ5kJ1EA/hxHJdaK0/8NlrOLETHhhDY9l84zO1YtClPBUvOomUAR1lpmXY1sqI/q98XAi9o2up/uh6xPQBcOwShMb9vfTDwDbfVLo4thOgLvLvE+MhaInWxK8MPfvW1OpvRGqL42NvLhaEXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qs22RGi0; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qs22RGi0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5653C113CC;
-	Thu,  2 May 2024 16:22:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714666923;
-	bh=NgUrHm1d3fP/DVSv0zS8qOV1V2Le1HkNbk1ehfQZG5E=;
-	h=Date:From:To:Cc:Subject:From;
-	b=qs22RGi0tyXio6JUFU/Fq5arumfgrakbBtuloUhN/zXCeheNENo+BsdO9RgFcbvfg
-	 oGUHfWUsOCyS2Y8QvsfqjGnrDGwCswbsvdduuh2Tm5uBQthamRMns+QKVDL/lP5E4k
-	 VUm3HIDrWtTGiuCtjLK+2+NOAGFRVb5LWHPK4S0Ip9c4VXh/OKdejiFf5cnZIyC3Ml
-	 zqg2KA+qvdE0c9N1XxQU7OboG/esMIXykICwsRThnUn86E7aAkcyP7drXWtIIw1Oo0
-	 ROc389MEv+bRR0VrehhwVMCwmBeLWJxoAAaGn05+L4+ikRV0U/0S7I4bDc95oqPFGI
-	 APicbGx/EjgSQ==
-Date: Thu, 2 May 2024 10:22:00 -0600
-From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
+	s=arc-20240116; t=1714667289; c=relaxed/simple;
+	bh=8CN60vsDhsaBYBw8dNPoZqC4vHRsiqNxpPf+1mCw9fI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Cxh08/JO/vSjmWGIS97KCos6V2U5WbfRjmPvcOssbLFCY056N37tRdnpTmpgzwwEYHhqXdlN/5QCMTxokUbFxfqQXAe6DXAboVhJiYzH2xa0aYna2j7lBYCR/Uf42oU+aKRoaZZ+M1QEre1wTVG4tIKStidQa+NvvehTQgo4CS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-79100a90868so335646185a.2;
+        Thu, 02 May 2024 09:28:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714667286; x=1715272086;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sLr63wSRKN1zYIcrCH+ZmDq9lvkzTwxbqszK/XM362s=;
+        b=StTiWlY1ifL8W0YXYqLBwXk8/elJJQdpP3f9tdRUAFu7742SFvmYkAkT5nKdQgmXR2
+         Tq590Djp2oNQ2RMsNY5UV0lHY1VVl+MX1EsScRErGQG7XND1kOJVErJiGVuo2zjzM4Iy
+         gZLSm8xeL2vz8mkQmet4Zo0Fvu7PMiKvKgbgZ2lEaSojWBhh93q9hHjCEyX+jJ9djFqR
+         nfWnbK4X528Q8Yejh6vqriwNy1zBpYxSWsmEpqCl4Y2UizznCxdHIlIHyUHE7ze5A+U+
+         QsjlmRu88PAYIIFcO4y6tNj/m9CECphgDnNm7IjFvNAVrBOT5PJxYMYnqOLfdz68+KOm
+         UUfw==
+X-Forwarded-Encrypted: i=1; AJvYcCWYmt4ZdYS11gRuwXBauSY1p1trBf7PMnInIDJDgd+AkfpVSk8J4XZ+UiOoeKQyP+TuMUArO1rXXundUN6CI2Fv0V/riG/kGHTanaMwZveuHihIC+cT1GjK3Pdz+o2lrEPY5N7fwb1X8KNpj7z5
+X-Gm-Message-State: AOJu0Yylv4+as6tV5A7h+tm0FHzmLdYWtVZCY/RTjwvneUfd7gPaCq0F
+	2bgSFCd8GinTknABBXRyidBMiXgpv4uAD48Nfl1ZDUgFXmaY0A6cJBJdiqtxSPs=
+X-Google-Smtp-Source: AGHT+IE8O/JMsKuYSwWcU2BZsRBaUrLuaKL/7Li1OU1jCXzWkSXo3VNANI02MVjKmhk+yuspNLJFvw==
+X-Received: by 2002:ae9:f510:0:b0:78d:5c65:f2a0 with SMTP id o16-20020ae9f510000000b0078d5c65f2a0mr91478qkg.21.1714667286493;
+        Thu, 02 May 2024 09:28:06 -0700 (PDT)
+Received: from tofu.cs.purdue.edu ([128.210.0.165])
+        by smtp.gmail.com with ESMTPSA id v12-20020a05620a0a8c00b0078f1ae252c6sm483349qkg.49.2024.05.02.09.28.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 May 2024 09:28:06 -0700 (PDT)
+From: Sungwoo Kim <iam@sung-woo.kim>
+To: luiz.dentz@gmail.com
+Cc: daveti@purdue.edu,
+	benquike@gmail.com,
+	Sungwoo Kim <iam@sung-woo.kim>,
+	Marcel Holtmann <marcel@holtmann.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	linux-hardening@vger.kernel.org
-Subject: [PATCH][next] Bluetooth: hci_conn: Use __counted_by() and avoid
- -Wfamnae warning
-Message-ID: <ZjO9qCx10KUJbK6w@neat>
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: HCI: Fix potential null-ptr-deref
+Date: Thu,  2 May 2024 12:09:31 -0400
+Message-Id: <20240502160931.1135175-1-iam@sung-woo.kim>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-Prepare for the coming implementation by GCC and Clang of the
-__counted_by attribute. Flexible array members annotated with
-__counted_by can have their accesses bounds-checked at run-time
-via CONFIG_UBSAN_BOUNDS (for array indexing) and CONFIG_FORTIFY_SOURCE
-(for strcpy/memcpy-family functions).
+Fix potential null-ptr-deref in hci_le_big_sync_established_evt().
 
-Also, -Wflex-array-member-not-at-end is coming in GCC-14, and we are
-getting ready to enable it globally.
-
-So, use the `DEFINE_FLEX()` helper for an on-stack definition of
-a flexible structure where the size of the flexible-array member
-is known at compile-time, and refactor the rest of the code,
-accordingly.
-
-With these changes, fix the following warning:
-net/bluetooth/hci_conn.c:669:41: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-
-Link: https://github.com/KSPP/linux/issues/202
-Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+Fixes: f777d8827817 (Bluetooth: ISO: Notify user space about failed bis connections)
+Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
 ---
- include/net/bluetooth/hci.h |  2 +-
- net/bluetooth/hci_conn.c    | 38 ++++++++++++++++---------------------
- 2 files changed, 17 insertions(+), 23 deletions(-)
+v1 -> v2:
+- add a Fixes tag
+- make the commit message concise
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index c4c6b8810701..e6838321f4d9 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -2144,7 +2144,7 @@ struct hci_cp_le_set_cig_params {
- 	__le16  c_latency;
- 	__le16  p_latency;
- 	__u8    num_cis;
--	struct hci_cis_params cis[];
-+	struct hci_cis_params cis[] __counted_by(num_cis);
- } __packed;
+ net/bluetooth/hci_event.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 4a27e4a17..d72d238c1 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -7037,6 +7037,8 @@ static void hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
+ 			u16 handle = le16_to_cpu(ev->bis[i]);
  
- struct hci_rp_le_set_cig_params {
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index c508609be105..6e60e8287956 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -665,11 +665,6 @@ static void le_conn_timeout(struct work_struct *work)
- 	hci_abort_conn(conn, HCI_ERROR_REMOTE_USER_TERM);
- }
+ 			bis = hci_conn_hash_lookup_handle(hdev, handle);
++			if (!bis)
++				continue;
  
--struct iso_cig_params {
--	struct hci_cp_le_set_cig_params cp;
--	struct hci_cis_params cis[0x1f];
--};
--
- struct iso_list_data {
- 	union {
- 		u8  cig;
-@@ -1725,34 +1720,33 @@ static int hci_le_create_big(struct hci_conn *conn, struct bt_iso_qos *qos)
- 
- static int set_cig_params_sync(struct hci_dev *hdev, void *data)
- {
-+	DEFINE_FLEX(struct hci_cp_le_set_cig_params, pdu, cis, num_cis, 0x1f);
- 	u8 cig_id = PTR_UINT(data);
- 	struct hci_conn *conn;
- 	struct bt_iso_qos *qos;
--	struct iso_cig_params pdu;
-+	u8 aux_num_cis = 0;
- 	u8 cis_id;
- 
- 	conn = hci_conn_hash_lookup_cig(hdev, cig_id);
- 	if (!conn)
- 		return 0;
- 
--	memset(&pdu, 0, sizeof(pdu));
--
- 	qos = &conn->iso_qos;
--	pdu.cp.cig_id = cig_id;
--	hci_cpu_to_le24(qos->ucast.out.interval, pdu.cp.c_interval);
--	hci_cpu_to_le24(qos->ucast.in.interval, pdu.cp.p_interval);
--	pdu.cp.sca = qos->ucast.sca;
--	pdu.cp.packing = qos->ucast.packing;
--	pdu.cp.framing = qos->ucast.framing;
--	pdu.cp.c_latency = cpu_to_le16(qos->ucast.out.latency);
--	pdu.cp.p_latency = cpu_to_le16(qos->ucast.in.latency);
-+	pdu->cig_id = cig_id;
-+	hci_cpu_to_le24(qos->ucast.out.interval, pdu->c_interval);
-+	hci_cpu_to_le24(qos->ucast.in.interval, pdu->p_interval);
-+	pdu->sca = qos->ucast.sca;
-+	pdu->packing = qos->ucast.packing;
-+	pdu->framing = qos->ucast.framing;
-+	pdu->c_latency = cpu_to_le16(qos->ucast.out.latency);
-+	pdu->p_latency = cpu_to_le16(qos->ucast.in.latency);
- 
- 	/* Reprogram all CIS(s) with the same CIG, valid range are:
- 	 * num_cis: 0x00 to 0x1F
- 	 * cis_id: 0x00 to 0xEF
- 	 */
- 	for (cis_id = 0x00; cis_id < 0xf0 &&
--	     pdu.cp.num_cis < ARRAY_SIZE(pdu.cis); cis_id++) {
-+	     aux_num_cis < pdu->num_cis; cis_id++) {
- 		struct hci_cis_params *cis;
- 
- 		conn = hci_conn_hash_lookup_cis(hdev, NULL, 0, cig_id, cis_id);
-@@ -1761,7 +1755,7 @@ static int set_cig_params_sync(struct hci_dev *hdev, void *data)
- 
- 		qos = &conn->iso_qos;
- 
--		cis = &pdu.cis[pdu.cp.num_cis++];
-+		cis = &pdu->cis[aux_num_cis++];
- 		cis->cis_id = cis_id;
- 		cis->c_sdu  = cpu_to_le16(conn->iso_qos.ucast.out.sdu);
- 		cis->p_sdu  = cpu_to_le16(conn->iso_qos.ucast.in.sdu);
-@@ -1772,14 +1766,14 @@ static int set_cig_params_sync(struct hci_dev *hdev, void *data)
- 		cis->c_rtn  = qos->ucast.out.rtn;
- 		cis->p_rtn  = qos->ucast.in.rtn;
- 	}
-+	pdu->num_cis = aux_num_cis;
- 
--	if (!pdu.cp.num_cis)
-+	if (!pdu->num_cis)
- 		return 0;
- 
- 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_CIG_PARAMS,
--				     sizeof(pdu.cp) +
--				     pdu.cp.num_cis * sizeof(pdu.cis[0]), &pdu,
--				     HCI_CMD_TIMEOUT);
-+				     struct_size(pdu, cis, pdu->num_cis),
-+				     pdu, HCI_CMD_TIMEOUT);
- }
- 
- static bool hci_le_set_cig_params(struct hci_conn *conn, struct bt_iso_qos *qos)
+ 			set_bit(HCI_CONN_BIG_SYNC_FAILED, &bis->flags);
+ 			hci_connect_cfm(bis, ev->status);
 -- 
 2.34.1
 
