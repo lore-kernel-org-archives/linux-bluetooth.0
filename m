@@ -1,111 +1,113 @@
-Received: from mail-vs1-f44.google.com (mail-vs1-f44.google.com [209.85.217.44])
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B635F6FC7
-	for <linux-bluetooth@vger.kernel.org>; Fri,  3 May 2024 14:52:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 720AD156C41
+	for <linux-bluetooth@vger.kernel.org>; Fri,  3 May 2024 16:42:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714747965; cv=none; b=MzEF+Gv7dL24yFVh/H4G8wbjSgBmLF6bSojFF5i2pCkHBc/Y4d8S9AKcyvVaNs/Csgj9EJozfqWWkIuoRfECbl6qWHTXP6AvXkjtimi2N1B29ZSYxZSEg12pvF2SiZXcnrC1kjInWzT/IJd2sGUqzJb/KtvUlotU9S4r00EzBwQ=
+	t=1714754531; cv=none; b=tnnwjxins6+GSPEy2NM6Fn2iqolAPtHNR01xcgkFwVnnHpDSE4+k/XKxzhvBMZJ6D1F8wSTY4VdI/7f0/OeFLWEnzpRaecL4fTlTPXecEesERUBExmQE5Z43LXNtA7lAtAjbwPxCNsmEteCi6bYv8q/ONH/wNvpEtMn76YUaC9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714747965; c=relaxed/simple;
-	bh=21YXkGg/Jk7e/B4j7TJMqtu++lw3s2v42JLfjAscqkg=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=dVffTOxp1fHuk1gmwUgmt9R3yO4DWUekdkot24TILUo5wk7dyjYmUNk2yXRna897A1UWMsuLfuLLBKt1h9USSDXUwwb6Br4ZSWlNo7pIaBkXBfrfxUGiIbmIrRCqL763/C1Fa6X+sJ7TJZ2eBIguGyfnnhwQ9CV1PhzYLRuEvgA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ndQstN26; arc=none smtp.client-ip=209.85.217.44
+	s=arc-20240116; t=1714754531; c=relaxed/simple;
+	bh=AFE2vvB6MafGpVZFY9uqmB4KiVsNd3YQRsxiMp+puts=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=cW9EzNnCZYCgbYfGJ6gDIMU9aN7zv1ffK7E0v+hadhZDg+eG2C8yuqIViCXNiNHQqFIefCY0EwnaYj6ersULIiN0avHd8RivhS3+6DKd4QH/3yBu9FZGRl8WpCTj9AQFRKR8mvVX/AeDep8sNQ9pZG357AGZRAo7/KV+YHk3tIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hSXFJvGF; arc=none smtp.client-ip=209.85.128.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ndQstN26"
-Received: by mail-vs1-f44.google.com with SMTP id ada2fe7eead31-47efd8fa124so154912137.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 03 May 2024 07:52:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hSXFJvGF"
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-61e0c2b5cd2so15859087b3.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 03 May 2024 09:42:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714747962; x=1715352762; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=J2RB8XQQMJx5SNox7pgY9V6kBnScvAsuzlE8+sFEQmI=;
-        b=ndQstN26T1pQX/EafUtleMe/kMgTpjXp1VFm1E8kqa+IwpgGVyFjqmHVLKpBLZMOvJ
-         dz2pljkl+r96BxQVp50sEv9+0P+dMKmBWOF090PjyfWmpcmD/5Wo0MsF+gtbJtZg5+fS
-         sS3IWEA79mj9Pd/JACLk9a6HRDdikmT4k5T8cgpnj8hYHAgPpa5f1QIySoczU6yxKzWJ
-         P3hOn7E0j6FqNu/X7gj+DypAhHicPTKPKTLnAgphQf65CP4ZtDm7XyItZRpHVSTC2Y/8
-         KcGD/lsKiI0xSrngAMp8Zx5mcB1dbXszkbIRd/phhyLufWM+mPX5AH8Zw3NR7TDPltUZ
-         wL+g==
+        d=gmail.com; s=20230601; t=1714754529; x=1715359329; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ok1AAsEwen+7lN6ivIx42peH8e8KnVa0k+GQ3lVxQlg=;
+        b=hSXFJvGFGdU6wNqRvlPxcmtEJXBIV2WL4GNBtlrVxl4nSBktPOG7WUxO+41bQ3iexd
+         ic3nmkrD/umABRY9qfEqVT+/71A3Ph6ZIWbeqJkDV9mgLVynxnBvJ59rXwoArgM0ONff
+         BY9OKD1kvoNiWkdRCZHsCCR8w6mvOhmqWVkzwspKegiY+UpwtyxqXrlQ5YEC14oOZ1AZ
+         IE+LHCl4L8mpp0Z7RaC3dXG7r1SW0jh6kJ14K43QmGnWTJ/XM3s2OahMrRXb+NdX7Uu4
+         ExEuU6IHUicEtPNawbbVahufeZ2nAq5xftvBteDzNntVzfoH6jNtAHGyXHbVMsA9P0xD
+         8MvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714747962; x=1715352762;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=J2RB8XQQMJx5SNox7pgY9V6kBnScvAsuzlE8+sFEQmI=;
-        b=ejpMmf5i3LvdhdXkYbdsMMQnM2BQFvSd0ua7Jw6nkU5C6gwAk7T5W/e6U1q0svbMK1
-         FH0CrfV4dAGjsYjAHo7dr/1bYHIHBlyKAa8aHzvUQc8AdwkOKrDhdkN9hHMlthuPTRl9
-         9MZf+4HlaequrXPS7KuyyQDzF9M0nllWWxDdg0easGF/PQH3PJhYVZz1/ScY6/bERGKD
-         WYeptyxHleNW1veWGGnfeV3CfBl+0Stz8p2/bjsxFbiQuAID+MPNoibELn6UEzTeMI86
-         GFL2L2OQ/40dXjF7Z5iUHOYShR210Gg7bgHhTQhCS5f2FCWBZNSM8K6nfyf/cik4h3v8
-         DqxQ==
-X-Gm-Message-State: AOJu0YyLFl2fxDWoFUrBJsmGjIXYOJFNT7lBsSK71ZnD7fRjgKVP83/Q
-	KmsAyvmPdm78fY6j4zUxMnFam5HZLC6BJTDF3KErD0/QJwWcgbJBKEceRw==
-X-Google-Smtp-Source: AGHT+IHTfwn5YeOWgpT8PmGYY9HDNuQV0k+9OyC8VmEVVHlfjLoPzVWdB53Mhlgdv6j1M3F/gP+pTw==
-X-Received: by 2002:a05:6102:244a:b0:47c:1255:dc2d with SMTP id g10-20020a056102244a00b0047c1255dc2dmr3011299vss.33.1714747961502;
-        Fri, 03 May 2024 07:52:41 -0700 (PDT)
-Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id cy29-20020a0561300f9d00b007f3b48cdaeesm430216uab.18.2024.05.03.07.52.39
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1714754529; x=1715359329;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ok1AAsEwen+7lN6ivIx42peH8e8KnVa0k+GQ3lVxQlg=;
+        b=U1oQ3w675EMW/4Sf0pq5CeS91tBJMU7eQOf2yqnQwWwITsbuf0+CQrnEYAlBRLLO5X
+         apPIQT/qX8lTYH29hb4uOzVGHy1eAJtv36e8+mqgFQP0bA3iRp+paPupmx96rfgGD3On
+         3ZGVopZTXGIjiWfj7ppgNnGLhtOnm/3x6SQR3YCjvrEsrM/XfGBfR1Hw5v5H+UWVmQ5X
+         47OkZFz0eyKbM6CmI8FVV1qLb0AHsR69gYGG7hY8CjktVUdVRGzJUPllDRL0LjRrRz+7
+         GrY4m86geCu/Wyskd+vHGzZzJ59FKHpso0ugv02D5wwq/3HbvJ8oJ8E5GgOeS4HdXEtS
+         fj7Q==
+X-Gm-Message-State: AOJu0YyL1XWEVhY1mJuaSCTz0S+qtgxXj+WIIWwZJx+zI9Qx5yhvWzMv
+	IrRkXwKc/IMSvqPiUySkG4O+J1f3kovSgkDDaOSpTHeD+lCKg3wqhDoOzQ==
+X-Google-Smtp-Source: AGHT+IG3HU3EYcyMI37Ps9LmXnxzCYrvHavHs7kDQDrSwI/1ga7syxAITp3HPmf+1oE6X5DUuRbTCA==
+X-Received: by 2002:a81:dd05:0:b0:61a:db4d:cc1f with SMTP id e5-20020a81dd05000000b0061adb4dcc1fmr4514328ywn.7.1714754529305;
+        Fri, 03 May 2024 09:42:09 -0700 (PDT)
+Received: from [172.17.0.2] ([172.183.51.69])
+        by smtp.gmail.com with ESMTPSA id dg17-20020a05690c0fd100b0061adfb01cc2sm724951ywb.90.2024.05.03.09.42.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 May 2024 07:52:39 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1] gatt-database: Fix error registering characteristic with Handle 0x0000
-Date: Fri,  3 May 2024 10:52:38 -0400
-Message-ID: <20240503145238.3771921-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.44.0
+        Fri, 03 May 2024 09:42:08 -0700 (PDT)
+Message-ID: <663513e0.050a0220.55001.31ce@mx.google.com>
+Date: Fri, 03 May 2024 09:42:08 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6814002929436024139=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1] gatt-database: Fix error registering characteristic with Handle 0x0000
+In-Reply-To: <20240503145238.3771921-1-luiz.dentz@gmail.com>
+References: <20240503145238.3771921-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============6814002929436024139==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Registering a characteristic with handle 0x0000 means that the
-application wants a handles to be auto allocated but requires to be
-informed of what values they end up in the database.
+This is automated email and please do not reply to this email!
 
-Fixes: https://github.com/bluez/bluez/issues/821
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=850263
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.38 seconds
+GitLint                       FAIL      0.46 seconds
+BuildEll                      PASS      24.61 seconds
+BluezMake                     PASS      1723.27 seconds
+MakeCheck                     PASS      13.51 seconds
+MakeDistcheck                 PASS      177.39 seconds
+CheckValgrind                 PASS      246.78 seconds
+CheckSmatch                   PASS      350.84 seconds
+bluezmakeextell               PASS      118.94 seconds
+IncrementalBuild              PASS      1495.92 seconds
+ScanBuild                     PASS      1007.77 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,v1] gatt-database: Fix error registering characteristic with Handle 0x0000
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (81>80): "[BlueZ,v1] gatt-database: Fix error registering characteristic with Handle 0x0000"
+
+
 ---
- src/gatt-database.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index 5823aebcbfdb..5756eb9d17cb 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -3334,12 +3334,12 @@ static void database_add_includes(struct external_service *service)
- static bool database_add_chrc(struct external_service *service,
- 						struct external_chrc *chrc)
- {
--	uint16_t handle;
-+	uint16_t handle = 0, value_handle;
- 	bt_uuid_t uuid;
- 	char str[MAX_LEN_UUID_STR];
- 	const struct queue_entry *entry;
- 
--	if (!parse_handle(chrc->proxy, &handle)) {
-+	if (!parse_handle(chrc->proxy, &value_handle)) {
- 		error("Failed to read \"Handle\" property of characteristic");
- 		return false;
- 	}
-@@ -3354,8 +3354,11 @@ static bool database_add_chrc(struct external_service *service,
- 		return false;
- 	}
- 
-+	if (value_handle)
-+		handle = value_handle - 1;
-+
- 	chrc->attrib = gatt_db_service_insert_characteristic(service->attrib,
--						handle - 1, handle, &uuid,
-+						handle, value_handle, &uuid,
- 						chrc->perm, chrc->props,
- 						chrc_read_cb, chrc_write_cb,
- 						chrc);
--- 
-2.44.0
 
+--===============6814002929436024139==--
