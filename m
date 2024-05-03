@@ -1,231 +1,207 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08FC5139586
-	for <linux-bluetooth@vger.kernel.org>; Fri,  3 May 2024 05:13:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714713239; cv=fail; b=kONCDJH1+LoODq8F2KvCR3zzj7SkT3+MpgXlApNQ92LVq4HaHeQKx6ZLHZeTOvsr5azdsd3DfGYSBWvalE16lZqVkWNCgQMYsEWA/p552IrfurRLWij270lfXoy19l6vqwEa3MvRxEZSs/RlQRtOncPBcACXYEKwlJxXpDg6XWc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714713239; c=relaxed/simple;
-	bh=Pou1NRsCEUSx49cjIwE2qCB3R7LV7k2eoR0F4XM4FeQ=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=erirzp88onhuyZaER3vYqb56aWRazPGlQ9WW6OYTUpz9ECENT/I0rbAyKocF09YcDRLBe878UeYhWHX7GIoYs4FceZZJIkaVC1THXeBnvngo3mbrOC43EtXmRf9xQQ1/kG/2MlPoAT+bwYcShHS8fUekCIn69WktrfEC3GslhXg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=j0yDoFMl; arc=fail smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 074BC57CA8;
+	Fri,  3 May 2024 07:13:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714720384; cv=none; b=HMiC8sPwzzk1mYnFSmda6ttQkvpcRkGZqY97ibpn6gf9kUniim+Xuph7qX09uO6W8XWnIXw2cTQ1b5MIQG6H3UR7fB5wupSwqbsWxYd9kGMSy4jNIRozFAUTBr/jwmR4SunpAP4UmH14aBPvTi1phcjKdnwsqG93Lg0XxO0w6ww=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714720384; c=relaxed/simple;
+	bh=ug5DUeeXgIfBriACvk5HwLZw0Uz6zr2ZbO6b45S4weE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=myNeDwHlpwVZ3B0yk6Vvu1NoUAPtveU+99H0RcTszMKzbE3aBKzai4FtwSsxLWE9MlTWCoNEQ5SpbNI0apodvU31yfM0m0kuREu7HobVVvMFJFvc1yLNCdiznf8W2wskNDGNwQuU2hWPFKFCgNecKCujRmKlpf2glj9BK4zX8rg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=nFslo3Kz; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="j0yDoFMl"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714713237; x=1746249237;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Pou1NRsCEUSx49cjIwE2qCB3R7LV7k2eoR0F4XM4FeQ=;
-  b=j0yDoFMlyMr1KxPHkrWkKIl75MAgUurokRjDLS9UwjiiruTl6D7suIJI
-   93CbwpAD5giLgYdyan/NHAtUOpg6D9g6noH0S7VrZnsOoGXwki0jcaNpd
-   zAZqfo+kmC/JBHiuHksGQEwTNbJ6Ibc5Q2jW91dHsnNb2gygPNc6QPya8
-   Zdqc6wwVQuUxWE+B7ZMKsLjLlI54+vNhehwVobDOoH06Ejgoq753LOVdA
-   KWVvrahFSnS/cmJqzbdF6ZmdZtckBilojnyn7/o/ciN7Gi/PtW9yUwUoS
-   kd9+JUUFE5EEiex9RbGV9elzN26fOln/1h+jYV0GRPwqK/mylZeWr8TNE
-   Q==;
-X-CSE-ConnectionGUID: sdG1P/IuQcaCyAWCg57e5w==
-X-CSE-MsgGUID: CRkDNN6uQDm1UBwNfU9g/A==
-X-IronPort-AV: E=McAfee;i="6600,9927,11062"; a="28046715"
-X-IronPort-AV: E=Sophos;i="6.07,247,1708416000"; 
-   d="scan'208";a="28046715"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 May 2024 22:13:56 -0700
-X-CSE-ConnectionGUID: 36C85HilQs6ZvBafa/qOkg==
-X-CSE-MsgGUID: hyq5VEDASh24Gj2YvFZDDQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,247,1708416000"; 
-   d="scan'208";a="64797328"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 02 May 2024 22:13:56 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 2 May 2024 22:13:55 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 2 May 2024 22:13:55 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.169)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 2 May 2024 22:13:55 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=O7lk6ez9qo3up4B0IkeICrVPZpYt37FT2/3FkxneGsvBrK3E9ffVFUU1doD631Oq3mQyEZLHrTFLT50mZyMxw7lqsUFqeNS6B2viG5Ep897nRV07ofKjnQ4839YhuNDtMH+XLIPPlJgVr0baLTuGRrXMF4OaG2x7w6lRiDnP1TRsZJexZhecSUhin8nTclt0mrL7IVLs3PXNAFTbDvLl+4jZ/kBtNuB+O1yWdH0iYQyBRkhVDpeeYVNiGcSor8oewis/HE99+DktNCUYXxphd1a7cUY3RzwhyArCSmZz3ejeGMsupeMqkPWwlFYKwKiG86QGtny0RGEDPGj6OCkMNQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Pou1NRsCEUSx49cjIwE2qCB3R7LV7k2eoR0F4XM4FeQ=;
- b=m+BMD/fzZIUQWpfNdQJjAVHpn0nMkmwxEdUXo9RneZdtncaaQBRBGTA2bzS4m+EfG0+mjGtNm8o+ShokRUtTP2Qkx34XUjI/mB0kxGHCRfzLKxLGMJzBCDtaLCpoxqEiMoti6yWYXKF68w31ojpiN6StG1Odkys17XD2sTWANS/F4PoV1EcKLsCWX5zN07xljcRO1DWZcXibOUQWCmz9NGivFWYLZMynRM340EhAqq07J6gIJJad6jKDH60QXuomUhVUi7NGCq6olDtWg0X3s0YoF1zy8t2q9bouckFD0nbDllj0b9Q3YDC+//5Zxq6lwU0HeMU/Y4QCkPmTvlNqJA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from PH0PR11MB7585.namprd11.prod.outlook.com (2603:10b6:510:28f::10)
- by PH7PR11MB5817.namprd11.prod.outlook.com (2603:10b6:510:13a::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.34; Fri, 3 May
- 2024 05:13:52 +0000
-Received: from PH0PR11MB7585.namprd11.prod.outlook.com
- ([fe80::9ba4:34:81ac:5010]) by PH0PR11MB7585.namprd11.prod.outlook.com
- ([fe80::9ba4:34:81ac:5010%7]) with mapi id 15.20.7544.023; Fri, 3 May 2024
- 05:13:52 +0000
-From: "K, Kiran" <kiran.k@intel.com>
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>, "Tumkur Narayan,
- Chethan" <chethan.tumkur.narayan@intel.com>, "Devegowda, Chandrashekar"
-	<chandrashekar.devegowda@intel.com>
-Subject: RE: [PATCH v1 1/2] Bluetooth: btintel: Add support for BlazarI
-Thread-Topic: [PATCH v1 1/2] Bluetooth: btintel: Add support for BlazarI
-Thread-Index: AQHanE8AloWaYKC8FkWU+nq0paFjsLGDcZ8AgAGGgWA=
-Date: Fri, 3 May 2024 05:13:51 +0000
-Message-ID: <PH0PR11MB758556D5107ABA3811FE7E00F51F2@PH0PR11MB7585.namprd11.prod.outlook.com>
-References: <20240502052356.2630798-1-kiran.k@intel.com>
- <1d11ab52-2369-485d-a1cf-cca6ca836cb0@molgen.mpg.de>
-In-Reply-To: <1d11ab52-2369-485d-a1cf-cca6ca836cb0@molgen.mpg.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR11MB7585:EE_|PH7PR11MB5817:EE_
-x-ms-office365-filtering-correlation-id: b33bd199-09ab-4456-2e1e-08dc6b2fd296
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230031|376005|1800799015|366007|38070700009;
-x-microsoft-antispam-message-info: =?utf-8?B?RnhyaGJLOW4ydStLemFuait4QzlNNUhDbkVZcGxNZDVXcWxNRHUreGlVQkFH?=
- =?utf-8?B?YXd6aE1hY3RHRTRPM2tlRHJtZU9Uam5aR0VjYTVYZ1F2QXFNek1BTi9IdTdW?=
- =?utf-8?B?ZEtDNk1NejZYaDJjNldmQUVJUmNzQndSUWpBamxhTVB0eWFGdFl6cnY4eUZ2?=
- =?utf-8?B?QmNyRGJTeDZUZVMrZ3U4cFpqTjIvZzBRRmFRcGMxcEU4RURFU1E1TmxiVG55?=
- =?utf-8?B?OFhFMytLY2VsZG52S3hHV3l6b2c1enJLcFVROUZrRERXQ096WFBWS1UyTG9F?=
- =?utf-8?B?UEZDZDlyN0R0djd4VnFwcmJub2hWVkN4cThXWFJGTkRtd2hvOTNIeHc5emRp?=
- =?utf-8?B?WWpIU0YxOVlkK0xRbFA0c2YrMFNKaGJDTW5rZ2pBOWF4ekpWT0JEYXYwUy92?=
- =?utf-8?B?Vm5MdHNaNy9jWEt0WElJMzVDOURxLzNnNldNQVVpdG80OGNqcHFMMGx6UU9q?=
- =?utf-8?B?Q2NuVHdDUGpUcGpJN0R1Wk0zNjlXM1hKVXk2TUFMNGZQNk5QTUw1WGZ2b2RZ?=
- =?utf-8?B?S0FBeUdSaklGRit5WVp1RlNaM1QrRnZ2THQzSnpzUTluOUZLdXl5SHhacHV5?=
- =?utf-8?B?OXlTdlhlaDRVQkFyaXB5bmlQcmFnRTVjSFBxdTRvM3NGamxuVmNIL0hoMWhn?=
- =?utf-8?B?NFhGT1RwNUNiMDhjdU80aDNaSUZHT21IR0VHN2duc3pCNWJIM2tGVldBVVo5?=
- =?utf-8?B?d1c2TksxZ2dwUmNuNExzV3g4RzlJNVIvUngzUm9sdmlVUUxMU2YxVmIrMTli?=
- =?utf-8?B?WUFtZ25SU1htMFNMMG9oK21BLzhsaGFLS2RhZWlPWDJ3QTZXNHc1TFdiOTF0?=
- =?utf-8?B?b2RFcmd6N3NOV0k2c3BiOGVPUXVqRW1VN05aYU8xRm1HRWQ0eVAzbEJBVzZB?=
- =?utf-8?B?SEdlc3JQTGpBVW8vK3g4TmdsUzdscE5YRGN2OXpqSXZ1bTdaUnA4MjJaZktI?=
- =?utf-8?B?SlNheWFpMjZMdkorODljQ2p5cm9RS29lVjRHS3drVDY3cGM0UHp6WWc1S09u?=
- =?utf-8?B?RVVQV1VkL1BYSHRIejlFdmdyVEZkbW1qc3cxbnp0czc3MVgwbkdyVTJzdGcx?=
- =?utf-8?B?WVN1VldQVVdZTWZXcEFvbHlkMXFyczNVaGZVWXdSa2NBVFRhWnFiUEloWity?=
- =?utf-8?B?TllSdDI3OGFKRnpKSWtobmY3d00zVVlJSC9WVW4zSXhOL1VKbFJxeUdUdjhV?=
- =?utf-8?B?WVhDWnROZVNhdmJUOE80MGhmK0k0bFV6RnNhOU5GTVEzNmlydU1FZWdWZEx0?=
- =?utf-8?B?QjJBYTZNT1RzbVBpUEUyOE9lUUhwbktJYVhIVFBkOVVvaE1vdUlId0daZUFH?=
- =?utf-8?B?Tm5xcUc0dUt6alg2bWI3VHZ1eDdDT1JzWHFDS1JGbTd1NWhrb2QxeHhOMVEz?=
- =?utf-8?B?SU8ySHdQTGRYTVphWUh0WEpTY2s0eUJaKzB2SXZkbnNod3c5UWlIN0FsN1pQ?=
- =?utf-8?B?YVk2M1hGUVAyS1VNMVNpUDFhQk9LZWlHdU9GcFBKelJHQlhiTnFQcXNyQUow?=
- =?utf-8?B?U1dKNGRjODIwbSs4NjFkblc0WHpOaDVZa1BsUlpETlpZUE50RzUyZlVjK2Iy?=
- =?utf-8?B?QXc2eUp4WElkVU9obXNmRjVFbGZHbXJOZkUzY1B6MFptTDdlTDc1VEIzdHJz?=
- =?utf-8?B?QnF1dnA5dC8wMWNLZzhIZ2YrL2w2WGszeng1Q2R4S1RycjMzcUw1T0RqcjY5?=
- =?utf-8?B?YmUwVWhud2lwTUVDZVYwTlFOdWZVaEI2SHU3SUI0SWVFNjBSTkJFblA2ZStL?=
- =?utf-8?B?eXZMc0ZtUVk3RjA5a3NZNEdpKzF4MTEwMWlPUzE5T3llbnlTQUE5QjFmM2ZC?=
- =?utf-8?B?dHRaSzJ3RTJhZEJVYTVQdz09?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB7585.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?MUdRRm5qaUwzajFqUVk2cEpKVTFSZmFrSkFNdlNGeHpGcmk3NGJFcEZidUpL?=
- =?utf-8?B?UjVSRjlQS1pxNEg3RGt3YWExRUZqbzdqZkoxTlpUSDdBME1EVjhTN05najVI?=
- =?utf-8?B?UGpzVWt2K1FNYk5DSzM0cFF0MnhvdHNSaU1GM200c1VrNlkxdm16bzYyZ1FX?=
- =?utf-8?B?VUliQk9GbEFDcFJnOTNEZGhESjZkMmcvdHZ0RTJXYWU1VmllS3FOSktTVEpL?=
- =?utf-8?B?NFdLNGwyTXVYVmVWdHEwbkRhenk3U0xWd2tuNmppNmNGNFlrT0Q3bjFqSEZo?=
- =?utf-8?B?c29SSFMxTzh5NFNwWnY1MXF3YUtHSnRsbEhQQ2pyMmZ1NGx2Z2VaNkN3V01R?=
- =?utf-8?B?ekVaTWJxWm9KditxRU4yb1J4dXFDcU9PRlJGMnMyRldNaWt2S0RSeitOeWds?=
- =?utf-8?B?UFdUM1hkUGtsU255ZW1yc3J5MlZIR0Y5b2p4YjEvMEFvR0Zqd2EzVXlVMW14?=
- =?utf-8?B?YjZhMUN6STVEWlBZRm5XOEtiODFKZ2s2ZUhOUmJ4dU9iYTBwZFp0WHFnOUNl?=
- =?utf-8?B?OERhdEk1c2pSYkxXNCt6T29JRjY3NEpFS2xpTXBESG9FcjUrUDU0Y0JxT29Y?=
- =?utf-8?B?dGZpcS9pUjU4NWFxYWVUZGRFNEhPd28yMUFaeS9pNWRibGFIOTBidjFQMi9m?=
- =?utf-8?B?UDV4djNaMzZhRU9rQk1KVU9Vb0UrbzZ5T1RwKzZOMmF1Rm05VE9lOFA5NUR1?=
- =?utf-8?B?OWlqSHd4QXlVVnpxVGtESlpua3J4STdITFM2UHcvd1E3aUhDdmUyMXd3Yy9Q?=
- =?utf-8?B?SmNvVURZK1l5UlBtbW51cmdRZmJha0FZYUJvYzl6dUx3RFVjOTF5TFN4bFdv?=
- =?utf-8?B?T05TNmhlbTBWYjFaWGJZNXNIQ1FjS3pPUEdCVVlXVTZ0bHpjaC9uMjRmT3Za?=
- =?utf-8?B?RVg0QUo2d0VrVFN4MGhXMjJwaDdLV2ZxNzJuTzhKbFhjL3h0Y0ZzdVJoK3NL?=
- =?utf-8?B?NkpuVnExV2hhQ3l5VHlwaEFkQld5ck84cHBzZXJNbkF2ZlNVUEZBaXZ4b3Z2?=
- =?utf-8?B?SEI3S215ZUpSd1JmL0hVOSs2TjBFOWN6TVFDbHNzZGdUNEFvMGw1MVRwK1cw?=
- =?utf-8?B?cUZOTlpwNHNIUjRBa1BUVGdMUks3a3pOY1FaSzNtOFQ3UlVDdk9sZWl5M3I3?=
- =?utf-8?B?SjgrVkNxcXhucUFTR1c1NE1haldzM0JSdlEyRnFIS21ZR3U3Wk1Dc2k3Mkkv?=
- =?utf-8?B?eVFETFZzRmgzWFlrZzZDZTB3SU1WdE5sODRuV1JsQjRERDVPK0NCUmcrc25Z?=
- =?utf-8?B?R2NIRXQxM01FTy83VEpBK2dDVGRzNGxKVUJsTk1Ca1dvR0wxT0lGemtQZVNL?=
- =?utf-8?B?YjRicit3N1lpZGhSdHppTXYxZ2s3NVNjb3N1MGxwVFhjb2JSR0RIQ3ZBTGta?=
- =?utf-8?B?TEEvTW5pZG1TY2sxaGgxcml0ZW9UeUFVajdHZlluR2F0bVl4ZS9sSDFvNEFG?=
- =?utf-8?B?OEY4TjZCTExvdmQ1UWI0aFM5ZGtwOHdTc0lIUlREcHNRQjZ1RVg4TFY5Wmxu?=
- =?utf-8?B?ZXVVS0huSTkxSmFyWEMyemhjTVFPUG1CYXdJYWdndWZiZFVoMmJpVjlLbWsw?=
- =?utf-8?B?WXkycEltUFRqQ2hIVmovcjNrQWs3elhNcDFLbkdyRXk2SWNlak9jUUxIUHg5?=
- =?utf-8?B?ZHN2aHRNN1cwYjFzTCtyMnNGd1c4T0hMT0JFenRTU0tKWWo1bGEvTDBLeE12?=
- =?utf-8?B?Sml2M1NMOFdta2xmOGJ6YnhGTGlzZFVEL3E4VE1UZkhWUVFDUndDNW96V1N1?=
- =?utf-8?B?aGQxd2xIU2lXUDdSSTM3KzhPVUdPL3NRV0l2bWhLaU5wZXk0QTcwUGlVZlor?=
- =?utf-8?B?bUlydWVCSTVGTHArMTRkWGNUL1d2VkN4TlBEU3FzS1lyU2hnSVRWclIwVFlE?=
- =?utf-8?B?YkFWTDlRelMzMllXUnJXaG50OHZKQ3ZpSHpNV3laRUdGelBYNlErOVJpU3lu?=
- =?utf-8?B?NExxWmhwUXhuNTdOMlVlTjNTVDAyamx4YWdLUWxyYkhERkcwR2Mvbk4wRysy?=
- =?utf-8?B?cm4yRkdZYlhqeEJGckxGK3BkY1hEbFBZT0w3cThoOTRRRksrSDNMUHNKTzUy?=
- =?utf-8?B?N2hlelQ0QjNscEdZdXowNTJNam5EaENmQnA5L0Znam9jaE5EeGhCVlB5VTRI?=
- =?utf-8?Q?98Hc=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="nFslo3Kz"
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4433cFCA022598;
+	Fri, 3 May 2024 07:12:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=MgGOkuhaaRWeJEF5zikFjXgcs5rHfL2eelt+xFAi2EY=; b=nF
+	slo3KzKhqt83ccmpbD0LZ4c5Thw0bVQYiNDhxOeCQ7/CpimvusDudZJuV0d/oYD9
+	zFr3YDhOv3JhQa8Y91vtHkG0wzJAYzZGG51KHTZUSOAalvRe/pgwGLA7JEYpXu02
+	4PeleDhbqZCdJ4TVtbRpCqEU/5VY57m2890F2bXeeURZgM4GN9s/0gkOsIpXsl//
+	dEjYHC79Dlmq8mPWHJyl4ouuwepKoCeQU+thkQcLou3xn6+bHsY3O6ZfNIYpZHXX
+	chYPsYsh2G+NqJmD4/tG57H88S4gXvlRNZiBP5vqHzVtNlVMhlmjIgMy0Sol9/hr
+	ox+Lf7uNJD2kj/m1wzaw==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xvawbhy2x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 03 May 2024 07:12:55 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 4437CsWr007479
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 3 May 2024 07:12:54 GMT
+Received: from [10.216.14.41] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 3 May 2024
+ 00:12:50 -0700
+Message-ID: <64e3affd-e63f-4577-ac09-8abfd819ddee@quicinc.com>
+Date: Fri, 3 May 2024 12:42:46 +0530
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB7585.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b33bd199-09ab-4456-2e1e-08dc6b2fd296
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 May 2024 05:13:51.9926
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ovwcMK5Cw9FizA9l8VG/ogvoBUxtB2zE0QELnUYsmdU4TvB2p5btXrxJSCRSL7G6L6CRi4rsiW4NZ+ZB2fmYmQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB5817
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: qca: generalise device address check
+Content-Language: en-US
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: Johan Hovold <johan@kernel.org>, Doug Anderson <dianders@chromium.org>,
+        Johan Hovold <johan+linaro@kernel.org>,
+        Marcel Holtmann
+	<marcel@holtmann.org>,
+        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <stable@vger.kernel.org>, <quic_mohamull@quicinc.com>,
+        <quic_hbandi@quicinc.com>, <quic_anubhavg@quicinc.com>
+References: <CAD=FV=V-pG9+5fLonNvydmjS=ziUFUHAyF8T7YTkEHiO405aSA@mail.gmail.com>
+ <ZizKmtcUIYAMpvOQ@hovoldconsulting.com>
+ <dbba45d2-f955-4d3a-aeab-26b0900d5823@quicinc.com>
+ <Zi-ohCWv58d2h5VM@hovoldconsulting.com>
+ <CABBYNZJyqrNKebwPPPqjOAdrkpBJ0fqHyD2iVtypeQKCDcL+AQ@mail.gmail.com>
+ <CABBYNZJyRR9FA7TYN4+aWMtG9FPUBWMvCtMNUfvaEzxVcYOt-g@mail.gmail.com>
+ <ZjCYu2pc8376rjXk@hovoldconsulting.com>
+ <9eebd77b-c070-4260-a979-9b97f14eb5b1@quicinc.com>
+ <ZjDtDRCHT3z-3nHh@hovoldconsulting.com>
+ <a09ab4e3-699b-4eb7-bc64-44c9de6db78d@quicinc.com>
+ <ZjNm3OnJ1fdHctaZ@hovoldconsulting.com>
+ <1feddcbc-205d-4c9b-bde2-7a2daace71a9@quicinc.com>
+ <CABBYNZK7MVRoOcFq8Ea8-ZqZq_fE=46WE+5_XMoj2KPnz_ePBw@mail.gmail.com>
+From: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+In-Reply-To: <CABBYNZK7MVRoOcFq8Ea8-ZqZq_fE=46WE+5_XMoj2KPnz_ePBw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: aQ9K1bEKj-Q_LizVS2s9s8uqar3aMTso
+X-Proofpoint-ORIG-GUID: aQ9K1bEKj-Q_LizVS2s9s8uqar3aMTso
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-05-03_03,2024-05-03_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
+ malwarescore=0 bulkscore=0 suspectscore=0 priorityscore=1501
+ impostorscore=0 lowpriorityscore=0 spamscore=0 clxscore=1015 adultscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2404010003 definitions=main-2405030050
 
-SGkgUGF1bCwNCg0KQXBwcmVjaWF0ZSB5b3VyIGNvbW1lbnRzLg0KDQo+IC0tLS0tT3JpZ2luYWwg
-TWVzc2FnZS0tLS0tDQo+IEZyb206IFBhdWwgTWVuemVsIDxwbWVuemVsQG1vbGdlbi5tcGcuZGU+
-DQo+IFNlbnQ6IFRodXJzZGF5LCBNYXkgMiwgMjAyNCAxMToyNCBBTQ0KPiBUbzogSywgS2lyYW4g
-PGtpcmFuLmtAaW50ZWwuY29tPg0KPiBDYzogbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9y
-ZzsgU3JpdmF0c2EsIFJhdmlzaGFua2FyDQo+IDxyYXZpc2hhbmthci5zcml2YXRzYUBpbnRlbC5j
-b20+OyBUdW1rdXIgTmFyYXlhbiwgQ2hldGhhbg0KPiA8Y2hldGhhbi50dW1rdXIubmFyYXlhbkBp
-bnRlbC5jb20+OyBEZXZlZ293ZGEsIENoYW5kcmFzaGVrYXINCj4gPGNoYW5kcmFzaGVrYXIuZGV2
-ZWdvd2RhQGludGVsLmNvbT4NCj4gU3ViamVjdDogUmU6IFtQQVRDSCB2MSAxLzJdIEJsdWV0b290
-aDogYnRpbnRlbDogQWRkIHN1cHBvcnQgZm9yIEJsYXphckkNCj4gDQo+IERlYXIgS2lyYW4sDQo+
-IA0KPiANCj4gVGhhbmsgeW91IGZvciB5b3VyIHBhdGNoLg0KPiANCj4gQW0gMDIuMDUuMjQgdW0g
-MDc6MjMgc2NocmllYiBLaXJhbiBLOg0KPiA+IEFkZCBzdXBwb3J0IGZvciBCbGF6YXJJIChjbnZp
-KSBibHVldG9vdGggY29yZS4NCj4gDQo+IEl04oCZZCBiZSBncmVhdCBpZiB5b3UgZG9jdW1lbnRl
-ZCB0aGUgZGF0YXNoZWV0IG5hbWUgYW5kIHJldmlzaW9uLg0KSSBhbSBhZnJhaWQgdG8gcHJvdmlk
-ZSB0aGVzZSBkZXRhaWxzIGFzIHRoZXNlIGRhdGEgaXMgaW50ZXJuYWwuIA0KPiANCj4gQWxzbywg
-aXTigJlkIGhlbHAgcGVvcGxlIHJlYWRpbmcgdGhlIGRpZmYsIGlmIHlvdSBhZGRlZCB3aGF0IHRo
-ZSBzdXBwb3J0IGVudGFpbHMuDQo+IEluIHRoaXMgY2FzZSBhIG5vdGUsIHRoYXQgaXTigJlzIGEg
-4oCcc3RhbmRhcmQgZGV2aWNl4oCdIGFuZCBvbmx5IHRoZSBuZXcgaWQgbmVlZHMgdG8NCj4gYmUg
-YWRkZWQsIHdvdWxkIGJlIG5pY2UuDQoNCkFjay4NCj4gDQo+ID4gU2lnbmVkLW9mZi1ieTogS2ly
-YW4gSyA8a2lyYW4ua0BpbnRlbC5jb20+DQo+ID4gLS0tDQo+ID4gICBkcml2ZXJzL2JsdWV0b290
-aC9idGludGVsLmMgfCAzICsrKw0KPiA+ICAgMSBmaWxlIGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygr
-KQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0aW50ZWwuYyBiL2Ry
-aXZlcnMvYmx1ZXRvb3RoL2J0aW50ZWwuYw0KPiA+IGluZGV4IGRjNDgzNTIxNjZhNS4uNGY0YmQ1
-NTM4YjZlIDEwMDY0NA0KPiA+IC0tLSBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0aW50ZWwuYw0KPiA+
-ICsrKyBiL2RyaXZlcnMvYmx1ZXRvb3RoL2J0aW50ZWwuYw0KPiA+IEBAIC00ODEsNiArNDgxLDcg
-QEAgc3RhdGljIGludCBidGludGVsX3ZlcnNpb25faW5mb190bHYoc3RydWN0IGhjaV9kZXYNCj4g
-KmhkZXYsDQo+ID4gICAJY2FzZSAweDE5OgkvKiBTbHItRiAqLw0KPiA+ICAgCWNhc2UgMHgxYjog
-ICAgICAvKiBNZ3IgKi8NCj4gPiAgIAljYXNlIDB4MWM6CS8qIEdhbGUgUGVhayAoR2FQKSAqLw0K
-PiA+ICsJY2FzZSAweDFlOgkvKiBCbGF6YXJJIChCenIpICovDQo+ID4gICAJCWJyZWFrOw0KPiA+
-ICAgCWRlZmF1bHQ6DQo+ID4gICAJCWJ0X2Rldl9lcnIoaGRldiwgIlVuc3VwcG9ydGVkIEludGVs
-IGhhcmR3YXJlIHZhcmlhbnQNCj4gKDB4JXgpIiwgQEANCj4gPiAtMjY5OCw2ICsyNjk5LDcgQEAg
-c3RhdGljIHZvaWQgYnRpbnRlbF9zZXRfbXNmdF9vcGNvZGUoc3RydWN0IGhjaV9kZXYNCj4gKmhk
-ZXYsIHU4IGh3X3ZhcmlhbnQpDQo+ID4gICAJY2FzZSAweDE5Og0KPiA+ICAgCWNhc2UgMHgxYjoN
-Cj4gPiAgIAljYXNlIDB4MWM6DQo+ID4gKwljYXNlIDB4MWU6DQo+ID4gICAJCWhjaV9zZXRfbXNm
-dF9vcGNvZGUoaGRldiwgMHhGQzFFKTsNCj4gPiAgIAkJYnJlYWs7DQo+ID4gICAJZGVmYXVsdDoN
-Cj4gPiBAQCAtMzAzNyw2ICszMDM5LDcgQEAgc3RhdGljIGludCBidGludGVsX3NldHVwX2NvbWJp
-bmVkKHN0cnVjdCBoY2lfZGV2DQo+ICpoZGV2KQ0KPiA+ICAgCWNhc2UgMHgxOToNCj4gPiAgIAlj
-YXNlIDB4MWI6DQo+ID4gICAJY2FzZSAweDFjOg0KPiA+ICsJY2FzZSAweDFlOg0KPiA+ICAgCQkv
-KiBEaXNwbGF5IHZlcnNpb24gaW5mb3JtYXRpb24gb2YgVExWIHR5cGUgKi8NCj4gPiAgIAkJYnRp
-bnRlbF92ZXJzaW9uX2luZm9fdGx2KGhkZXYsICZ2ZXJfdGx2KTsNCj4gDQo+IA0KPiBLaW5kIHJl
-Z2FyZHMsDQo+IA0KPiBQYXVsDQoNClRoYW5rcywNCktpcmFuDQoNCg==
+Hi Luiz,
+
+On 5/2/2024 11:02 PM, Luiz Augusto von Dentz wrote:
+> Hi Janaki,
+> 
+> On Thu, May 2, 2024 at 1:03 PM Janaki Ramaiah Thota
+> <quic_janathot@quicinc.com> wrote:
+>>
+>> Hi Johan,
+>>
+>> On 5/2/2024 3:41 PM, Johan Hovold wrote:
+>>> On Thu, May 02, 2024 at 12:35:19PM +0530, Janaki Ramaiah Thota wrote:
+>>>> On 4/30/2024 6:37 PM, Johan Hovold wrote:
+>>>
+>>>>> But here we disagree. A non-unique address is not a valid one as it will
+>>>>> cause collisions if you have more than one such controller.
+>>>>>
+>>>>> I understand that this may be convenient/good enough for developers in
+>>>>> some cases, but this can hurt end users that do not realise why things
+>>>>> break.
+>>>>>
+>>>>> And a developer can always configure an address manually or patch the
+>>>>> driver as needed for internal use.
+>>>>>
+>>>>> Are there any other reasons that makes you want to keep the option to
+>>>>> configure the device address through NVM files? I'm assuming you're not
+>>>>> relying on patching NVM files to provision device-specific addresses
+>>>>> after installation on target?
+>>>
+>>>> We prefer unique address to be flashed on OTP (persistent) memory of
+>>>> BT-Chip, which is supported by almost all QC BT-chips.
+>>>
+>>> Yes, that is certainly the best option for everyone.
+>>>
+>>>> If someone is not able to do that/ does not prefer that, they still
+>>>> have an option to flash unique address in firmware binary (NVM)file.
+>>>> This does not require setting BD address from user space.
+>>>>
+>>>> Also until a developer flashes OTP/ keep unique BD-Address in NVM,
+>>>> he should be able to run most of the use cases from Device, that's
+>>>> why we want to make it as configured.
+>>>
+>>> Ok, but a developer can still do this since they can patch the driver to
+>>> disable the check temporarily or, alternatively, just update the
+>>> devicetree with a valid unique address.
+>>>
+>>>> In our opinion this provides best Out of box experience.
+>>>
+>>
+>> If a developer has to patch a code/update device-tree, that is not
+>> a "out of box" experience. By "out of box" we meant, things should
+>> work without much changes required.
+>>
+>>> You can also look into improving support in user space (e.g. bluez) for
+>>> providing a valid unique address in a simple text-based configuration
+>>> file.
+>>>
+>>
+>> We don't think putting a must-have dependency in user space is the
+>> right thing to do, especially when we own a code in kernel space.
+>>
+>>> That would be useful for all Linux users and not require having access
+>>> to Qualcomm specific tools to update the NVM configuration file (which
+>>> could also be in a read-only file system, e.g. on Android).
+>>>
+>>
+>> Having a non-unique valid address allows a developer to handle all
+>> scenarios where he/she is dealing with DUT + commercial device and
+>> in such case, default BD-Address from nvm file should also be okay.
+>> Only when 2/more similar devices are in the mix, they need unique
+>> address. In that case we are providing end developers with a NVM
+>> utility(part of Qcom build Not open source tool)to change this
+>> default BD-Address.
+> 
+> And we don't agree with doing that, that is why the controller shall
+> be marked as unconfigured when a non-unique address is used and if you
+> insist in doing that I will probably have to escalate that you guys
+> are intentionally using addresses that can clash over the air.
+> 
+> If the firmware is intended for developer, it shall be kept private,
+> public firmware shall never use duplicate addresses, ever, and don't
+> come back with arguments like that only when 2/more similar devices
+> are in the mix but that would just stress even more the point that you
+> are breaking stuff _on purpose_, which is pretty bad by itself, and
+> then suggesting to use a non-open-source tool to fix the address is
+> making things worse because end users can be affected by this, that
+> really fills like you don't care if your hardware works on regular
+> Linux distros and in that case I will probably move it to
+> driver/staging.
+> 
+
+Our intention is not to break things, instead we wanted driver should
+be sufficient to set a BD-Address, without putting a necessary
+requirement on user space/Stack to configure BD-Address.
+Other solutions ( like Android ) were approaching this
+problem in this way. Now we also agree with your point
+that we should not leave any scope for having a non-unique
+BD-Address. Current bottleneck that we see with driver creating
+and managing unique BD-Address on its own is how to ensure
+persistence on reboot. If you are aware of any mechanism with
+which we can ensure persistence in kernel across reboot please
+let us know, otherwise we will write/reuse bluez-mgmt user
+space utility to solve this problem.
+
+>>> Johan
+>>
+>> -Janaki Ram
+> 
+> 
+> -- 
+> Luiz Augusto von Dentz
+
+-Janaki Ram
