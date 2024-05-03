@@ -1,124 +1,124 @@
-Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2E4F157E6E;
-	Fri,  3 May 2024 17:19:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F3FE2E646;
+	Fri,  3 May 2024 18:50:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714756779; cv=none; b=nAgzkpjotXQYGLPmPfr9sPN7UlSLhy5rYGGa+KGoxvtsHDy12A0QGfM/Y7kgide7/0WPoMqntDGdFEcCf8pZtyRk1E3g59LaCsxg6Ln974lOj2zb8YW3jwdQf49ODSk+wJ1VN0esg5pHLyuO/lv4XgIiCDj1uy7Em6yxz44AKTE=
+	t=1714762213; cv=none; b=D9p0YjrS/rxnunb2ar4bu5Z8biF1C8BvSU8tHnxvw1j3yDc5EAegJ4+O4OfguswVfVeEkprQQd1Lim0H83yI4Zi6G9rPWnT3QxV7rht/aHmxCrWylUsJBSHKez10tj0XiYSVk6UtpyupumvtvpfE7BssFXw/XCNN+R0brlHfKC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714756779; c=relaxed/simple;
-	bh=Jl0WyjUVYDLh91oUc09kTkLDmBfQ0NagaVHtBil8jTQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=O16IWd3LONkqhKDPLGp1R+0b3fxtBtpOdSFwaFHXdOdpdDnzt/Q/spyjONmWxrPV+YuaJH53OfSg2/OXr1coMZpp+SPztVG4ikCKBO9e0tNStfEe87RjOFHacObfJyv76shETPijMJJCesLvjO5VEzqDOyI8Qvd/GDvb0ONHE1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dKRpug65; arc=none smtp.client-ip=209.85.222.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1714762213; c=relaxed/simple;
+	bh=T9yyH4IPlUtj52yTqtbjFNMjirTaNG94NKLfYu/p98Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=VbBMAC33TnAksL+yX/G0A4YK0IxZ3yc9WJFZsVooOor3gBOW4CWBGVnVOE9Z4iW2zBjHy/CRSXosZpQxbP3/ArqwHyAFaFcG73ZtAr1m7MpH8h4UbyGK9sqXHtm8a6la1KkCeZRfsz/zNxW6FLRQO8nHwanP0nJhjy4papOReSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=TjYSNkdr; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dKRpug65"
-Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-7ebe09eb289so2419943241.2;
-        Fri, 03 May 2024 10:19:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714756776; x=1715361576; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=UB1BduXGUef7BcTCi5J7npOGBWHTz8sEEOsLCvBpAUk=;
-        b=dKRpug65E0iIE4cCm8hhqQNG4vELbkZPlU++xxKcORkNKCzENPGcLMDFa9I1JgzQgL
-         40KgZXjFASVAv5kenHSNf97FAnpeF1PWSblAJu0e82u/YVEgVSufor7GQME6ZIgjoD/8
-         2hBiKPAWXV0ZV63WYyiQsojkdDnKaDVa/PySjE+4CvktHpwzzM3ti3F17k/aDCTxfW52
-         jMcbgR7BKhf9xiQI0PJc4lwy+P/nLYPsHw7TiLW7SVV+qi3xgoQrC1q8C62Qf6xokBNj
-         URVlDxdCZQkJazp8R4rqZpFuzvXVBf9WYuMbVjvyF7rOO/gQelb72AxsP0mwWLA1Ij/S
-         iBjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714756776; x=1715361576;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UB1BduXGUef7BcTCi5J7npOGBWHTz8sEEOsLCvBpAUk=;
-        b=ezgCNP1syzZy1uYyDMfHs2G27vmeE4aFGbbIiBSANIt4ogriYMAD6fLfK2/l57PmOD
-         qwR1Fc2QutrqBMKh4KcQhMqsDkf2Ublz3g9aF2h5XFzLStg/u7gaXzsn8G1/v4LfR/gP
-         +UQiji4cl1A2rzXlJb/+n+i5+LzpjH5HfIfQ3Hob4fKYve7Pvj7MeFk/8yOPnSpvPTDc
-         GKr2fUOHTnm6M43ddNUk/ac7Qu5Skhtr5rhKQaYknxYoE4aY3XteWFK2SqErQp4a6Ogt
-         1TJ5LQ/EL2UdrGv8WISM+826dq6qdx6eE+k9SNRW99gQyU9wMLWy4Cki8kN3E1xL3Y2v
-         TpVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXC5Ka6kkpYoY11DAmWlz6ctTmS+H83pz3hFsqhRsks9sd1veRTKrf1blUZlMWh/bfBXU0iG0xhbzSgtJHZ3GzYYuZcggf/
-X-Gm-Message-State: AOJu0YyZFQlnw90/Lz2SVvZ1VHSlnEZFwTHNse+POPyUA9Nq1VyOZmE+
-	VonqGcESzFalVkSuws727TXDQ+VHS7NR70BxgRw0P0CdGRz2dVeP
-X-Google-Smtp-Source: AGHT+IEAVvIVOEcZIVWGZWk1EuwnIvYIZul9Pmxp6hfKlV9IatJzCSqeh+ClkVGI3q2p1cxcfhpJ1g==
-X-Received: by 2002:a05:6122:469e:b0:4da:e777:a8e6 with SMTP id di30-20020a056122469e00b004dae777a8e6mr3738372vkb.14.1714756776572;
-        Fri, 03 May 2024 10:19:36 -0700 (PDT)
-Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id l126-20020a1ffe84000000b004d412234660sm519584vki.43.2024.05.03.10.19.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 May 2024 10:19:35 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: pull request: bluetooth 2024-05-03
-Date: Fri,  3 May 2024 13:19:33 -0400
-Message-ID: <20240503171933.3851244-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.44.0
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="TjYSNkdr"
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 443DXVwX018105;
+	Fri, 3 May 2024 18:49:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=9ObS9//9ExqshI6VNkIWIDdXgOoaGk6p+urWvswiWnU=; b=Tj
+	YSNkdra9ctYQDTZocCUcjrI6ZgJPyp3L54Mdgw5WpI6Tg0mJO3gEQAvMVPEg05eZ
+	h9EL2pI+91htaTdcewo8vlNHpVzNgx9TjXTv6N4B3lRJOks02s4ytW1SRnA/1X4S
+	su8ymGdaFFCnnJmgSjLaKog4ZhTQ4qsmvRtaWmUT5G4KzXVAjF6CbciBat03wDTZ
+	Q3dE35MoXB9iSKZ80EL5zNIQtYiWGKlrMAn7Hnlae9nNz9lLFMG/PPwAOaGBIXZf
+	aI3GalGAGfa9/jJGatIVFTLkK0xVf7wFMZckgGEZ0f9U4paRXnVAVqJ0GmYD73GG
+	ggaI1blmh3HIIcRuaq2w==
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xvtbpse8j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 03 May 2024 18:49:47 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 443Inkvg023488
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 3 May 2024 18:49:46 GMT
+Received: from [10.253.35.130] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 3 May 2024
+ 11:49:44 -0700
+Message-ID: <8f6bc1a8-a1ec-45f1-a951-0ad5a9890cc2@quicinc.com>
+Date: Sat, 4 May 2024 02:49:42 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] Bluetooth: qca: Fix BT enable failure again for
+ QCA6390 after warm reboot
+To: Krzysztof Kozlowski <krzk@kernel.org>, <luiz.dentz@gmail.com>,
+        <luiz.von.dentz@intel.com>, <marcel@holtmann.org>
+CC: <linux-bluetooth@vger.kernel.org>, <wt@penguintechs.org>,
+        <regressions@lists.linux.dev>, <stable@vger.kernel.org>
+References: <1714658761-15326-1-git-send-email-quic_zijuhu@quicinc.com>
+ <5e5e869c-da12-4818-837e-55709f0c4db9@kernel.org>
+Content-Language: en-US
+From: quic_zijuhu <quic_zijuhu@quicinc.com>
+In-Reply-To: <5e5e869c-da12-4818-837e-55709f0c4db9@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: ETf956c8RTAoRrb-gV64_u0EMkNVTx2-
+X-Proofpoint-ORIG-GUID: ETf956c8RTAoRrb-gV64_u0EMkNVTx2-
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-05-03_12,2024-05-03_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 phishscore=0
+ spamscore=0 clxscore=1015 mlxlogscore=973 lowpriorityscore=0
+ impostorscore=0 malwarescore=0 suspectscore=0 mlxscore=0 bulkscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2404010003 definitions=main-2405030131
 
-The following changes since commit f2db7230f73a80dbb179deab78f88a7947f0ab7e:
+On 5/3/2024 6:16 PM, Krzysztof Kozlowski wrote:
+> On 02/05/2024 16:06, Zijun Hu wrote:
+>> Commit 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on closed
+>> serdev") will cause below regression issue:
+>>
+>> BT can't be enabled after below steps:
+>> cold boot -> enable BT -> disable BT -> warm reboot -> BT enable failure
+>> if property enable-gpios is not configured within DT|ACPI for QCA6390.
+>>
+>> The commit is to fix a use-after-free issue within qca_serdev_shutdown()
+>> during reboot, but also introduces this regression issue regarding above
+>> steps since the VSC is not sent to reset controller during warm reboot.
+>>
+>> Fixed by sending the VSC to reset controller within qca_serdev_shutdown()
+>> once BT was ever enabled, and the use-after-free issue is also be fixed
+>> by this change since serdev is still opened when send to serdev.
+>>
+>> Fixes: 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on closed serdev")
+>> Cc: stable@vger.kernel.org
+>> Reported-by: Wren Turkal <wt@penguintechs.org>
+>> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=218726
+>> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+>> Tested-by: Wren Turkal <wt@penguintechs.org>
+>> ---
+>>  drivers/bluetooth/hci_qca.c | 5 ++---
+> 
+> I don't think this is v1. Version your patches properly and provide
+> changelog.
+> 
+i sent it as v1 to start a new and clean discussion.
+> I asked already *two times*:
+> 1. On which kernel did you test it?
+> 2. On which hardware did you test it?
+> 
+will provide such info within next commit message.
+> I am not interested in any replies like "I wrote something on bugzilla".
+> I am really fed up with your elusive, time-wasting replies, so be
+> specific here.
+> 
+are there any other concerns about this patch itself?
+> Best regards,
+> Krzysztof
+> 
 
-  tcp: Use refcount_inc_not_zero() in tcp_twsk_unique(). (2024-05-02 19:02:46 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-05-03
-
-for you to fetch changes up to 40d442f969fb1e871da6fca73d3f8aef1f888558:
-
-  Bluetooth: qca: fix firmware check error path (2024-05-03 13:05:55 -0400)
-
-----------------------------------------------------------------
-bluetooth pull request for net:
-
- - mediatek: mt8183-pico6: Fix bluetooth node
- - sco: Fix use-after-free bugs caused by sco_sock_timeout
- - l2cap: fix null-ptr-deref in l2cap_chan_timeout
- - qca: Various fixes
- - l2cap: Fix slab-use-after-free in l2cap_connect()
- - msft: fix slab-use-after-free in msft_do_close()
- - HCI: Fix potential null-ptr-deref
-
-----------------------------------------------------------------
-Chen-Yu Tsai (1):
-      arm64: dts: mediatek: mt8183-pico6: Fix bluetooth node
-
-Duoming Zhou (2):
-      Bluetooth: Fix use-after-free bugs caused by sco_sock_timeout
-      Bluetooth: l2cap: fix null-ptr-deref in l2cap_chan_timeout
-
-Johan Hovold (7):
-      Bluetooth: qca: fix wcn3991 device address check
-      Bluetooth: qca: add missing firmware sanity checks
-      Bluetooth: qca: fix NVM configuration parsing
-      Bluetooth: qca: generalise device address check
-      Bluetooth: qca: fix info leak when fetching fw build id
-      Bluetooth: qca: fix info leak when fetching board id
-      Bluetooth: qca: fix firmware check error path
-
-Sungwoo Kim (3):
-      Bluetooth: L2CAP: Fix slab-use-after-free in l2cap_connect()
-      Bluetooth: msft: fix slab-use-after-free in msft_do_close()
-      Bluetooth: HCI: Fix potential null-ptr-deref
-
- .../dts/mediatek/mt8183-kukui-jacuzzi-pico6.dts    |   3 +-
- drivers/bluetooth/btqca.c                          | 110 +++++++++++++++++----
- drivers/bluetooth/btqca.h                          |   3 +-
- net/bluetooth/hci_core.c                           |   3 +-
- net/bluetooth/hci_event.c                          |   2 +
- net/bluetooth/l2cap_core.c                         |  24 ++---
- net/bluetooth/msft.c                               |   2 +-
- net/bluetooth/msft.h                               |   4 +-
- net/bluetooth/sco.c                                |   4 +
- 9 files changed, 119 insertions(+), 36 deletions(-)
