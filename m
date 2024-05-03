@@ -1,48 +1,33 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 074BC57CA8;
-	Fri,  3 May 2024 07:13:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A75214A601;
+	Fri,  3 May 2024 10:16:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714720384; cv=none; b=HMiC8sPwzzk1mYnFSmda6ttQkvpcRkGZqY97ibpn6gf9kUniim+Xuph7qX09uO6W8XWnIXw2cTQ1b5MIQG6H3UR7fB5wupSwqbsWxYd9kGMSy4jNIRozFAUTBr/jwmR4SunpAP4UmH14aBPvTi1phcjKdnwsqG93Lg0XxO0w6ww=
+	t=1714731391; cv=none; b=s0p0UCqUfkPojXqDpM+P4mM3AlU0YAfr9kQZ0ZMeewhmEdSfHttUIyNtB2PRRPctlKuY5HINJJ+yxRYEdgGZGPHucOHMTMbb1VW6BzB+8kMax9Gwq0HLu0uv656MXXEGQXLAD3+c7ZZ8VJvMUkYs2K6C4KUnWYZH6SHDNdIzY3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714720384; c=relaxed/simple;
-	bh=ug5DUeeXgIfBriACvk5HwLZw0Uz6zr2ZbO6b45S4weE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=myNeDwHlpwVZ3B0yk6Vvu1NoUAPtveU+99H0RcTszMKzbE3aBKzai4FtwSsxLWE9MlTWCoNEQ5SpbNI0apodvU31yfM0m0kuREu7HobVVvMFJFvc1yLNCdiznf8W2wskNDGNwQuU2hWPFKFCgNecKCujRmKlpf2glj9BK4zX8rg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=nFslo3Kz; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1714731391; c=relaxed/simple;
+	bh=wtlmcuZsCA9WAT4fHTQYQoRXVnjiIwUUtJ7qWUmtrfk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XpyWdWgk9G5pdypkhn0pAeswgsAX6rDO8VYLVg4rHnHBdYE4PfRZmDaX//vXGN4mT0hJ9nbLrd0zQxqj30ElUlMfranpf71EmYEMXCP0bbsFjmtget9I30YDSDReO2U2yGTh1YQ2SPkX9L5UdBAKxGvbKmv7Sr4/BYQQwbXzNl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hLbmDHu8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="nFslo3Kz"
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4433cFCA022598;
-	Fri, 3 May 2024 07:12:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=MgGOkuhaaRWeJEF5zikFjXgcs5rHfL2eelt+xFAi2EY=; b=nF
-	slo3KzKhqt83ccmpbD0LZ4c5Thw0bVQYiNDhxOeCQ7/CpimvusDudZJuV0d/oYD9
-	zFr3YDhOv3JhQa8Y91vtHkG0wzJAYzZGG51KHTZUSOAalvRe/pgwGLA7JEYpXu02
-	4PeleDhbqZCdJ4TVtbRpCqEU/5VY57m2890F2bXeeURZgM4GN9s/0gkOsIpXsl//
-	dEjYHC79Dlmq8mPWHJyl4ouuwepKoCeQU+thkQcLou3xn6+bHsY3O6ZfNIYpZHXX
-	chYPsYsh2G+NqJmD4/tG57H88S4gXvlRNZiBP5vqHzVtNlVMhlmjIgMy0Sol9/hr
-	ox+Lf7uNJD2kj/m1wzaw==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xvawbhy2x-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 03 May 2024 07:12:55 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 4437CsWr007479
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 3 May 2024 07:12:54 GMT
-Received: from [10.216.14.41] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 3 May 2024
- 00:12:50 -0700
-Message-ID: <64e3affd-e63f-4577-ac09-8abfd819ddee@quicinc.com>
-Date: Fri, 3 May 2024 12:42:46 +0530
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hLbmDHu8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08891C116B1;
+	Fri,  3 May 2024 10:16:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714731390;
+	bh=wtlmcuZsCA9WAT4fHTQYQoRXVnjiIwUUtJ7qWUmtrfk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=hLbmDHu8i3zhYl1M+Pe0gdP6DtX89oaCBFc9emphRo0Rzm17IfsjUke1+wm9zPFcA
+	 EXC/bfHkdjC1k2FuBmNOrEsoajm4jHNep8uFH6x/UP+mZHTJnZDeAtLad7MUIeuZkT
+	 auCqL31SKFzH2TdtjEXjiVLoD6fmE/sPDwMX+2sc9i4sn2AAcWQqbTPaHHJC18i7Hc
+	 zpZGHVv1tWSxf93j3UCRbjoO8a85E7uQNM3n6AV5Hgmm+0k8jNBk0d6tdYwT49DohM
+	 ef0/JvyGGaWwdZshSt+kdZuA/Z6rRq09M4mWCaQgohMa3a+N5WMP2oOAtgZx1ISgQ0
+	 FynLUVT1OjcdA==
+Message-ID: <5e5e869c-da12-4818-837e-55709f0c4db9@kernel.org>
+Date: Fri, 3 May 2024 12:16:25 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -50,158 +35,98 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: qca: generalise device address check
+Subject: Re: [PATCH v1] Bluetooth: qca: Fix BT enable failure again for
+ QCA6390 after warm reboot
+To: Zijun Hu <quic_zijuhu@quicinc.com>, luiz.dentz@gmail.com,
+ luiz.von.dentz@intel.com, marcel@holtmann.org
+Cc: linux-bluetooth@vger.kernel.org, wt@penguintechs.org,
+ regressions@lists.linux.dev, stable@vger.kernel.org
+References: <1714658761-15326-1-git-send-email-quic_zijuhu@quicinc.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: Johan Hovold <johan@kernel.org>, Doug Anderson <dianders@chromium.org>,
-        Johan Hovold <johan+linaro@kernel.org>,
-        Marcel Holtmann
-	<marcel@holtmann.org>,
-        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <stable@vger.kernel.org>, <quic_mohamull@quicinc.com>,
-        <quic_hbandi@quicinc.com>, <quic_anubhavg@quicinc.com>
-References: <CAD=FV=V-pG9+5fLonNvydmjS=ziUFUHAyF8T7YTkEHiO405aSA@mail.gmail.com>
- <ZizKmtcUIYAMpvOQ@hovoldconsulting.com>
- <dbba45d2-f955-4d3a-aeab-26b0900d5823@quicinc.com>
- <Zi-ohCWv58d2h5VM@hovoldconsulting.com>
- <CABBYNZJyqrNKebwPPPqjOAdrkpBJ0fqHyD2iVtypeQKCDcL+AQ@mail.gmail.com>
- <CABBYNZJyRR9FA7TYN4+aWMtG9FPUBWMvCtMNUfvaEzxVcYOt-g@mail.gmail.com>
- <ZjCYu2pc8376rjXk@hovoldconsulting.com>
- <9eebd77b-c070-4260-a979-9b97f14eb5b1@quicinc.com>
- <ZjDtDRCHT3z-3nHh@hovoldconsulting.com>
- <a09ab4e3-699b-4eb7-bc64-44c9de6db78d@quicinc.com>
- <ZjNm3OnJ1fdHctaZ@hovoldconsulting.com>
- <1feddcbc-205d-4c9b-bde2-7a2daace71a9@quicinc.com>
- <CABBYNZK7MVRoOcFq8Ea8-ZqZq_fE=46WE+5_XMoj2KPnz_ePBw@mail.gmail.com>
-From: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
-In-Reply-To: <CABBYNZK7MVRoOcFq8Ea8-ZqZq_fE=46WE+5_XMoj2KPnz_ePBw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: aQ9K1bEKj-Q_LizVS2s9s8uqar3aMTso
-X-Proofpoint-ORIG-GUID: aQ9K1bEKj-Q_LizVS2s9s8uqar3aMTso
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-03_03,2024-05-03_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
- malwarescore=0 bulkscore=0 suspectscore=0 priorityscore=1501
- impostorscore=0 lowpriorityscore=0 spamscore=0 clxscore=1015 adultscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2404010003 definitions=main-2405030050
+Autocrypt: addr=krzk@kernel.org; keydata=
+ xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
+ cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
+ JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
+ gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
+ J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
+ NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
+ BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
+ vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
+ Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
+ TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
+ S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
+ FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJgPO8PBQkUX63hAAoJEBuTQ307
+ QWKbBn8P+QFxwl7pDsAKR1InemMAmuykCHl+XgC0LDqrsWhAH5TYeTVXGSyDsuZjHvj+FRP+
+ gZaEIYSw2Yf0e91U9HXo3RYhEwSmxUQ4Fjhc9qAwGKVPQf6YuQ5yy6pzI8brcKmHHOGrB3tP
+ /MODPt81M1zpograAC2WTDzkICfHKj8LpXp45PylD99J9q0Y+gb04CG5/wXs+1hJy/dz0tYy
+ iua4nCuSRbxnSHKBS5vvjosWWjWQXsRKd+zzXp6kfRHHpzJkhRwF6ArXi4XnQ+REnoTfM5Fk
+ VmVmSQ3yFKKePEzoIriT1b2sXO0g5QXOAvFqB65LZjXG9jGJoVG6ZJrUV1MVK8vamKoVbUEe
+ 0NlLl/tX96HLowHHoKhxEsbFzGzKiFLh7hyboTpy2whdonkDxpnv/H8wE9M3VW/fPgnL2nPe
+ xaBLqyHxy9hA9JrZvxg3IQ61x7rtBWBUQPmEaK0azW+l3ysiNpBhISkZrsW3ZUdknWu87nh6
+ eTB7mR7xBcVxnomxWwJI4B0wuMwCPdgbV6YDUKCuSgRMUEiVry10xd9KLypR9Vfyn1AhROrq
+ AubRPVeJBf9zR5UW1trJNfwVt3XmbHX50HCcHdEdCKiT9O+FiEcahIaWh9lihvO0ci0TtVGZ
+ MCEtaCE80Q3Ma9RdHYB3uVF930jwquplFLNF+IBCn5JRzsFNBFVDXDQBEADNkrQYSREUL4D3
+ Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
+ MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
+ OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
+ GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
+ 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
+ YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
+ 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
+ BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
+ JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
+ 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
+ YpsFAmA872oFCRRflLYACgkQG5NDfTtBYpvScw/9GrqBrVLuJoJ52qBBKUBDo4E+5fU1bjt0
+ Gv0nh/hNJuecuRY6aemU6HOPNc2t8QHMSvwbSF+Vp9ZkOvrM36yUOufctoqON+wXrliEY0J4
+ ksR89ZILRRAold9Mh0YDqEJc1HmuxYLJ7lnbLYH1oui8bLbMBM8S2Uo9RKqV2GROLi44enVt
+ vdrDvo+CxKj2K+d4cleCNiz5qbTxPUW/cgkwG0lJc4I4sso7l4XMDKn95c7JtNsuzqKvhEVS
+ oic5by3fbUnuI0cemeizF4QdtX2uQxrP7RwHFBd+YUia7zCcz0//rv6FZmAxWZGy5arNl6Vm
+ lQqNo7/Poh8WWfRS+xegBxc6hBXahpyUKphAKYkah+m+I0QToCfnGKnPqyYIMDEHCS/RfqA5
+ t8F+O56+oyLBAeWX7XcmyM6TGeVfb+OZVMJnZzK0s2VYAuI0Rl87FBFYgULdgqKV7R7WHzwD
+ uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
+ 7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
+ 5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
+In-Reply-To: <1714658761-15326-1-git-send-email-quic_zijuhu@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Luiz,
+On 02/05/2024 16:06, Zijun Hu wrote:
+> Commit 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on closed
+> serdev") will cause below regression issue:
+> 
+> BT can't be enabled after below steps:
+> cold boot -> enable BT -> disable BT -> warm reboot -> BT enable failure
+> if property enable-gpios is not configured within DT|ACPI for QCA6390.
+> 
+> The commit is to fix a use-after-free issue within qca_serdev_shutdown()
+> during reboot, but also introduces this regression issue regarding above
+> steps since the VSC is not sent to reset controller during warm reboot.
+> 
+> Fixed by sending the VSC to reset controller within qca_serdev_shutdown()
+> once BT was ever enabled, and the use-after-free issue is also be fixed
+> by this change since serdev is still opened when send to serdev.
+> 
+> Fixes: 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on closed serdev")
+> Cc: stable@vger.kernel.org
+> Reported-by: Wren Turkal <wt@penguintechs.org>
+> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=218726
+> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+> Tested-by: Wren Turkal <wt@penguintechs.org>
+> ---
+>  drivers/bluetooth/hci_qca.c | 5 ++---
 
-On 5/2/2024 11:02 PM, Luiz Augusto von Dentz wrote:
-> Hi Janaki,
-> 
-> On Thu, May 2, 2024 at 1:03 PM Janaki Ramaiah Thota
-> <quic_janathot@quicinc.com> wrote:
->>
->> Hi Johan,
->>
->> On 5/2/2024 3:41 PM, Johan Hovold wrote:
->>> On Thu, May 02, 2024 at 12:35:19PM +0530, Janaki Ramaiah Thota wrote:
->>>> On 4/30/2024 6:37 PM, Johan Hovold wrote:
->>>
->>>>> But here we disagree. A non-unique address is not a valid one as it will
->>>>> cause collisions if you have more than one such controller.
->>>>>
->>>>> I understand that this may be convenient/good enough for developers in
->>>>> some cases, but this can hurt end users that do not realise why things
->>>>> break.
->>>>>
->>>>> And a developer can always configure an address manually or patch the
->>>>> driver as needed for internal use.
->>>>>
->>>>> Are there any other reasons that makes you want to keep the option to
->>>>> configure the device address through NVM files? I'm assuming you're not
->>>>> relying on patching NVM files to provision device-specific addresses
->>>>> after installation on target?
->>>
->>>> We prefer unique address to be flashed on OTP (persistent) memory of
->>>> BT-Chip, which is supported by almost all QC BT-chips.
->>>
->>> Yes, that is certainly the best option for everyone.
->>>
->>>> If someone is not able to do that/ does not prefer that, they still
->>>> have an option to flash unique address in firmware binary (NVM)file.
->>>> This does not require setting BD address from user space.
->>>>
->>>> Also until a developer flashes OTP/ keep unique BD-Address in NVM,
->>>> he should be able to run most of the use cases from Device, that's
->>>> why we want to make it as configured.
->>>
->>> Ok, but a developer can still do this since they can patch the driver to
->>> disable the check temporarily or, alternatively, just update the
->>> devicetree with a valid unique address.
->>>
->>>> In our opinion this provides best Out of box experience.
->>>
->>
->> If a developer has to patch a code/update device-tree, that is not
->> a "out of box" experience. By "out of box" we meant, things should
->> work without much changes required.
->>
->>> You can also look into improving support in user space (e.g. bluez) for
->>> providing a valid unique address in a simple text-based configuration
->>> file.
->>>
->>
->> We don't think putting a must-have dependency in user space is the
->> right thing to do, especially when we own a code in kernel space.
->>
->>> That would be useful for all Linux users and not require having access
->>> to Qualcomm specific tools to update the NVM configuration file (which
->>> could also be in a read-only file system, e.g. on Android).
->>>
->>
->> Having a non-unique valid address allows a developer to handle all
->> scenarios where he/she is dealing with DUT + commercial device and
->> in such case, default BD-Address from nvm file should also be okay.
->> Only when 2/more similar devices are in the mix, they need unique
->> address. In that case we are providing end developers with a NVM
->> utility(part of Qcom build Not open source tool)to change this
->> default BD-Address.
-> 
-> And we don't agree with doing that, that is why the controller shall
-> be marked as unconfigured when a non-unique address is used and if you
-> insist in doing that I will probably have to escalate that you guys
-> are intentionally using addresses that can clash over the air.
-> 
-> If the firmware is intended for developer, it shall be kept private,
-> public firmware shall never use duplicate addresses, ever, and don't
-> come back with arguments like that only when 2/more similar devices
-> are in the mix but that would just stress even more the point that you
-> are breaking stuff _on purpose_, which is pretty bad by itself, and
-> then suggesting to use a non-open-source tool to fix the address is
-> making things worse because end users can be affected by this, that
-> really fills like you don't care if your hardware works on regular
-> Linux distros and in that case I will probably move it to
-> driver/staging.
-> 
+I don't think this is v1. Version your patches properly and provide
+changelog.
 
-Our intention is not to break things, instead we wanted driver should
-be sufficient to set a BD-Address, without putting a necessary
-requirement on user space/Stack to configure BD-Address.
-Other solutions ( like Android ) were approaching this
-problem in this way. Now we also agree with your point
-that we should not leave any scope for having a non-unique
-BD-Address. Current bottleneck that we see with driver creating
-and managing unique BD-Address on its own is how to ensure
-persistence on reboot. If you are aware of any mechanism with
-which we can ensure persistence in kernel across reboot please
-let us know, otherwise we will write/reuse bluez-mgmt user
-space utility to solve this problem.
+I asked already *two times*:
+1. On which kernel did you test it?
+2. On which hardware did you test it?
 
->>> Johan
->>
->> -Janaki Ram
-> 
-> 
-> -- 
-> Luiz Augusto von Dentz
+I am not interested in any replies like "I wrote something on bugzilla".
+I am really fed up with your elusive, time-wasting replies, so be
+specific here.
 
--Janaki Ram
+Best regards,
+Krzysztof
+
