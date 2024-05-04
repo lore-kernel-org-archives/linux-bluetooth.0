@@ -1,149 +1,98 @@
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9330185E
-	for <linux-bluetooth@vger.kernel.org>; Sat,  4 May 2024 01:00:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD7521946F
+	for <linux-bluetooth@vger.kernel.org>; Sat,  4 May 2024 11:25:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714784436; cv=none; b=m2Fg2W7hEPgbewfold8I6gIOYeKto1tsDy5xuCSqAyrDy1YCo9ObaMErMmDnQZMlRjEqaepYfos8ajXVLbNufwlDwIbbKts0Z8ZBsPegSSwNUOgKt/DyHx4iYB0WWhq03ks+eA8Cq+x3e+X6uCcy1W2ABFQLhFDAFnxZYYrm2ZY=
+	t=1714821953; cv=none; b=oi74AtD13HX70L03fcBpB2AWvvgSq3MrlLqWEFkqLlaZfP2xwWhndELjFTAN3CtHik+o3qYfsrTq20QQS8dTlbcxOvC9dQIvLJAPvD2C0glN49CWe6YaAjPBd8TwLeCNQgWL8rFow+DsR3xtX7KilO0hkiYaoHDcMYhmnhN9KHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714784436; c=relaxed/simple;
-	bh=rbrv/uO8x339Bf9QsPW4XI9G5+0LQ0kLO3wtEO7061s=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=NsGdG+FzmYxYTALOZMYGlpMAQpsLvIVXTlS7yoVmwh48Ahu+LijlyIsO5TcGAD5R+VgZ3SHfYVFc/nGItL3Dhl4VbNdXIAp8nzAt2dCwCoSReTI9KgmtyfBpnHo6FafspJqi5OWYKGxP5mpCjiCb/XLRyaAlK2UL7i6U9PNrNcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-36c32dff50aso2629175ab.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 03 May 2024 18:00:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714784434; x=1715389234;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+	s=arc-20240116; t=1714821953; c=relaxed/simple;
+	bh=4R6lWWk4F+MSTfFJIUE3nMNDvuJ039zVA/52AkBhpQc=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=RbEJDLX3uokfr8MxSdSn71v6lk/JlpICsPmG67/5KIlBuY/Mpq8beEYqEe5D42JDde6dzCtwXpuU/2cKhFS8CHWRNEYQ9P94txKeLTCZjAcyKNDJxX9cyLoJnOiIXyVSQk8/NmeIwoMclNFT3lJdnrdDc3nlRRUpMKUFTZfpGX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Nt7oHHwm; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Nt7oHHwm"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-41b79451153so4468365e9.2
+        for <linux-bluetooth@vger.kernel.org>; Sat, 04 May 2024 04:25:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1714821950; x=1715426750; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=13VlsOafpue+rR6MEGsLRUTp3wxvRHrbzi94eouLLSg=;
-        b=UJbB2aPutYCbkvH8y9xcF4+ImrK8SvTdHEQTUed5FLoxlvmDygfoRom84Nn0tbF6Es
-         bfA43UvdQnQhV3YiuaLya1aN2YtAfEbJqqKvUbiVdGqjxvRiSlZgw83d7sxMFyBBWLPe
-         z0Us1CrggJvauCrBDEeAAFA4Ryb/fvwThHxDdtqM7H07nrbiMGxzWU6gsCb50a67RODH
-         J7x1jFjsgXxVkKNV7NTSwX9V2eJOZYrVkhtWO1hXEfJ1Dw4XhiyYNvSXIvtkZENzeJwT
-         qxkRl8q1b5ny4kj34z4q0wx/FXcoldD1POI8FQV1k00Z260XeuyfpA+bnX7gGq6RbD4T
-         Ty2A==
-X-Forwarded-Encrypted: i=1; AJvYcCU9mAMcN21wkE4vXqmHzFnWlYEq3w1Y5+l5bKvtmyPgJ+QyeLtFfD1Ge6p7a53BcXU+2bvXE+MbQHkagvFW07dPywdSSwVamMmzpxaUpak3
-X-Gm-Message-State: AOJu0YzOHfAluBejHG/ydYSxhSlE8Ae9ihlDggkB2AvUwotVeYAsc3EU
-	g8ejACLX13V5YEKqBBdJXtfqnsj8gZptK2Qj8Yv5St7APCcGwOcYczev7MgXKYjIRN1IrKv1Dhb
-	wovYZox/fYhI73u76OLS37Nl5YjtnvhREnSZepQDpyTEVwkG7cp/+LeY=
-X-Google-Smtp-Source: AGHT+IF1qot3FEmDqiwdE7hOJsVeGwiOubmimtdkAsqCaoz9VYHcjljE8yDi5crARTexprWo/BoMXzsP1/LOplMmCKX/hvs14DRF
+        bh=xzT/pgsXlCPnmBQoa3l3jmnuAByrCDFjM0ki/8uzIUY=;
+        b=Nt7oHHwml419tXSbhTICgpcX6SusKMcAuWDs65Ww2Mz5+EW2/SvnktPeoc2iq3uYfv
+         4ZHwfGRCD+2gFqCUXpmUcgDaAxdT1+dBgUArwO4IvWQwZph5Z7ZRPs0p0xmpO/zYZDbM
+         zXNC8flE5j3FOvFapuXIcW4E3s+1m6f1pnZ0yqQW1gKVlCz0TvYG2zauFM334MOMlQNp
+         lMjAcL+apJJ/plTiEvC/Otm0pkU8Q6d1D1MpoOOp/rfUAloQ25Wrey0qoV1QSycqccZL
+         XOqY/ss0+bCoLm4Oet4ea2kMnwij4Q27RHjPlXq9SHKMh5whVHKIr9nLdyoyKoQicHGF
+         mYAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714821950; x=1715426750;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xzT/pgsXlCPnmBQoa3l3jmnuAByrCDFjM0ki/8uzIUY=;
+        b=Z8Y+PGkNH7CF+ULdNhpmNaw6nza9oTjOlf6eDcpwwO/ybWdjtio1GJ443M91e6z5AG
+         6QUEFzTylGzwh61IpP9jR6AD23eKgtVU9rFc9ITWjHG/l9IuVluQzycezTuztKaCU2jJ
+         9W8wxF2Kje4oDKlt6zxXzecgn+WHkrzp63ZjBnUMlQbuu8k9JSN2MYf5vkd6B6lEcYGr
+         imxQfLsilDD0d0N1o9ABkHU+YWZ69bs+xX0AKREOAxt2xq2tmujcSl/jRaoENQht1M3Z
+         BO3uXqLsHa7fAvMz6nKtF9PBiin5RUPADtzssiGVElospJeS4Vhw1bxaTFytNwta3umz
+         xOxg==
+X-Forwarded-Encrypted: i=1; AJvYcCXaKxFyV43SRwYkZnLhnuy1wZISLgJBac4pfBFEjDxWolTDltdFOS/hpeMam9r32cHkxw6tqovhrJ+kZMRhVzYjzHogZtr9kAQFx38FN+v2
+X-Gm-Message-State: AOJu0Yyx0jLScO/gHHqAdwHjbxOcJJlPoq1GW85J/wpzn3UoHXJi5WjW
+	VUCepLS6fzSQwOpqxFMktZdVI/nK2skf/RrNo2uE3wstNqVI8n9MUUXhhrhAgAA=
+X-Google-Smtp-Source: AGHT+IH0dtuQdk52wloIJDcyOMVhqG0Joify2yarrnZ1m/g3/dA4l8Gi9fUnltSy9j/eM5iNR6TRuA==
+X-Received: by 2002:a05:600c:5013:b0:41e:1f78:314d with SMTP id n19-20020a05600c501300b0041e1f78314dmr3578278wmr.24.1714821949781;
+        Sat, 04 May 2024 04:25:49 -0700 (PDT)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id m9-20020a05600c4f4900b0041bf7da4200sm8982436wmq.33.2024.05.04.04.25.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 04 May 2024 04:25:49 -0700 (PDT)
+Date: Sat, 4 May 2024 14:25:43 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Johan Hovold <johan+linaro@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: [PATCH] Bluetooth: qca: Fix error code in qca_read_fw_build_info()
+Message-ID: <515be96c-4c44-44d5-891f-fe57275e9f47@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:17cd:b0:36b:85e:7cdc with SMTP id
- z13-20020a056e0217cd00b0036b085e7cdcmr208245ilu.1.1714784434013; Fri, 03 May
- 2024 18:00:34 -0700 (PDT)
-Date: Fri, 03 May 2024 18:00:33 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000000e60e70617965d98@google.com>
-Subject: [syzbot] [bluetooth?] KFENCE: invalid free in __hci_req_sync
-From: syzbot <syzbot+27f0d8597a213f37c0b6@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
 
-Hello,
+Return -ENOMEM on allocation failure.  Don't return success.
 
-syzbot found the following issue on:
-
-HEAD commit:    9d1ddab261f3 Merge tag '6.9-rc5-smb-client-fixes' of git:/..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=145d5280980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=545d4b3e07d6ccbc
-dashboard link: https://syzkaller.appspot.com/bug?extid=27f0d8597a213f37c0b6
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-9d1ddab2.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/5d5ab6e818c4/vmlinux-9d1ddab2.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/cf81babb0258/bzImage-9d1ddab2.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+27f0d8597a213f37c0b6@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KFENCE: invalid free in kfree_skbmem+0x10e/0x200 net/core/skbuff.c:1159
-
-Invalid free of 0xffff88816db60f00 (in kfence-#175):
- kfree_skbmem+0x10e/0x200 net/core/skbuff.c:1159
- __kfree_skb net/core/skbuff.c:1217 [inline]
- kfree_skb_reason+0x13a/0x210 net/core/skbuff.c:1252
- kfree_skb include/linux/skbuff.h:1262 [inline]
- __hci_req_sync+0x61d/0x980 net/bluetooth/hci_request.c:184
- hci_req_sync+0x97/0xd0 net/bluetooth/hci_request.c:206
- hci_dev_cmd+0x653/0x9c0 net/bluetooth/hci_core.c:790
- hci_sock_ioctl+0x4f3/0x8e0 net/bluetooth/hci_sock.c:1153
- sock_do_ioctl+0x116/0x280 net/socket.c:1222
- sock_ioctl+0x22e/0x6c0 net/socket.c:1341
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:904 [inline]
- __se_sys_ioctl fs/ioctl.c:890 [inline]
- __x64_sys_ioctl+0x193/0x220 fs/ioctl.c:890
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcf/0x260 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-kfence-#175: 0xffff88816db60f00-0xffff88816db60fef, size=240, cache=skbuff_head_cache
-
-allocated by task 64 on cpu 2 at 217.660109s:
- skb_clone+0x190/0x3f0 net/core/skbuff.c:2063
- hci_send_cmd_sync net/bluetooth/hci_core.c:4220 [inline]
- hci_cmd_work+0x66a/0x710 net/bluetooth/hci_core.c:4240
- process_one_work+0x9a9/0x1ac0 kernel/workqueue.c:3254
- process_scheduled_works kernel/workqueue.c:3335 [inline]
- worker_thread+0x6c8/0xf70 kernel/workqueue.c:3416
- kthread+0x2c1/0x3a0 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
-freed by task 64 on cpu 2 at 217.660313s:
- kfree_skbmem+0x10e/0x200 net/core/skbuff.c:1159
- __kfree_skb net/core/skbuff.c:1217 [inline]
- kfree_skb_reason+0x13a/0x210 net/core/skbuff.c:1252
- kfree_skb include/linux/skbuff.h:1262 [inline]
- hci_req_sync_complete+0x16c/0x270 net/bluetooth/hci_request.c:109
- hci_event_packet+0x963/0x1170 net/bluetooth/hci_event.c:7604
- hci_rx_work+0x2c4/0x1610 net/bluetooth/hci_core.c:4171
- process_one_work+0x9a9/0x1ac0 kernel/workqueue.c:3254
- process_scheduled_works kernel/workqueue.c:3335 [inline]
- worker_thread+0x6c8/0xf70 kernel/workqueue.c:3416
- kthread+0x2c1/0x3a0 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
-CPU: 1 PID: 11620 Comm: syz-executor.2 Not tainted 6.9.0-rc5-syzkaller-00036-g9d1ddab261f3 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-==================================================================
-
-
+Fixes: cfc2a7747108 ("Bluetooth: qca: fix info leak when fetching fw build id")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/bluetooth/btqca.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index cc61014ffbc9..3b018ee33725 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -136,8 +136,10 @@ static int qca_read_fw_build_info(struct hci_dev *hdev)
+ 	}
+ 
+ 	build_label = kstrndup(&edl->data[1], build_lbl_len, GFP_KERNEL);
+-	if (!build_label)
++	if (!build_label) {
++		err = -ENOMEM;
+ 		goto out;
++	}
+ 
+ 	hci_set_fw_info(hdev, "%s", build_label);
+ 
+-- 
+2.43.0
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
