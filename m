@@ -1,179 +1,179 @@
-Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.17.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C8261E51E
-	for <linux-bluetooth@vger.kernel.org>; Sat,  4 May 2024 19:55:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57BD02582;
+	Sun,  5 May 2024 08:39:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714852538; cv=none; b=QYjR7WR4okmVg2ucVK3CCWL54tTSyapyL5QhcKd9JCj95pHRttTRZm0ZEBRx61KbobaiLOyC9Wz+9aoFY6CtVi8mgVpjKzxEYf4Hpu/ZSBYyiE90if+eEbreAP3WFLcQimy0yiYZYd8tu9x1iiZOQUrxfmFGFva6qljTmEMgJIE=
+	t=1714898359; cv=none; b=CgDKd7gf/QRFMDslUn1wtiJXAy8HjBD4XicDaP1f5taUmO3JxknhQrydm/y1dNxxhH0v54PUrGdHS/0q9wyHNjtl9QX4mKcWNauzOWRD9nhGK1B6xJidC+unKk+P6AiGL0av3XPm0OuG6/lkyD0vz3ai1K48EyIT0CS3+syG0mM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714852538; c=relaxed/simple;
-	bh=smRlI5Bl6TI3DU7RNq6LsqVz360gcSqAzLwXuvtWtMg=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=akDkpcpS6B2onngtamWnIpyshPyvss+PtUm/rLAKRLHzn3ag1EZof7wEpSrwhHXatZ6106nTWbqk49wqTqtvpKFcFAEGQqdtqV6b5XFChggqVzGaTX0R3p4Gqbn+wB2k9liEZTvBLfUTIBlhKUhbKyQxyChpFpSaRS3Cdfmou4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fY6oRukW; arc=none smtp.client-ip=209.85.219.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1714898359; c=relaxed/simple;
+	bh=n1mdYuAeP4uvVo+sfymUmrxvP4vV2KCkX9GBScpWDHI=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=YbTTs0xCPgGa4jZUI6FoqpWnoALqN8jqzR6LhRP6tj646GN9eBsarYqqg63xuTsop2+Y7MGRDT/uPEpblYhecafZOECpDW+/PjGFlhz0VRz0d5Vr774KA2F65kIasOVQMBMHyX+zIWACsk6VhN5A0NvLPCGUh0THGHKZG2rU6Qw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=BRcJ5W2V; arc=none smtp.client-ip=212.227.17.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fY6oRukW"
-Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-de477949644so764681276.1
-        for <linux-bluetooth@vger.kernel.org>; Sat, 04 May 2024 12:55:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714852536; x=1715457336; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=tkE02CnuD0QbDW8FbjKul8QVNArjaUkf9TXscGKx1NQ=;
-        b=fY6oRukW7pdiKzc9Eeqiu7AI/cxt72YFI2TIX86cT03eEpvI2vuTV0E1DGbkkwqPoe
-         EHWjhpAMuBhvPLou+9FyJf6FXiGSACBKueH/QjjIfe9Idr4m8kb+iUIImYkN7HvC+VNh
-         PdrP8BJH1SyvOcRfnLi+OGfkZwUTjPbZDcx0ypCm7Hoh5I9HiOYf9sTvNdQpSk/WmWRI
-         J0A5/BAFWog5GTwSyPltHWTeKTj19uvqtmtaHfaG4YsSuAMJdilqCLhzJhBPXb5OuZAW
-         es2GpAs4MklsamZRplqo/B028EgwDTRhX71pjFXBZTlvKYZMemOd1RT/isOKVBSGmqe0
-         sSlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714852536; x=1715457336;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tkE02CnuD0QbDW8FbjKul8QVNArjaUkf9TXscGKx1NQ=;
-        b=PkFMOue8pu7WnmZJtuHh/X/5jwJP4IZdWjq6DWowk1X6PC7ikuR81U4R/G1Qae4j82
-         dAf7OlVJVXfji29o46rTaRIXJAKIG9ExBS6mdKU6oXAYwIVlV67KYbJYTX4xy8WDFYYS
-         FmBEij7IvGUo5gNnfUlRK7iTFgQsaYYuwwkZz5ulkbTCj/I7KyMzpRpRF4YX29pK4jjr
-         JHu9SjusSvB3n6wtJQ7XZgKnGcIJhCBOYBR1b9E2ti83CEYmH/syP2PM7daKBK4Aq0j0
-         RIGoCklJlNH43iPBa4EZCpibwqoHOmaZMhFkSXun6VYXbbQ7VMz4+a6j5DVFOmyAU5R2
-         kNdQ==
-X-Gm-Message-State: AOJu0Ywz0GM1T3SjA1WvYcqDKkzyEyp+tzpz0nmrGI3ejBMxxGhz2yOU
-	JZ7OPnPRl9bhdsOLF/ypT+zWM/ErRdvi0e+I9DgsdEXrCF4t5FF4sS/7qg==
-X-Google-Smtp-Source: AGHT+IGd0iIAgkUNfp/MkDwGMNcc+QDp1eyDdPGKSeiqdiJS86th//qeLGJx22YWt5SQkVkonNSPcQ==
-X-Received: by 2002:a25:8711:0:b0:de5:a4e3:9d3e with SMTP id a17-20020a258711000000b00de5a4e39d3emr7397839ybl.9.1714852535934;
-        Sat, 04 May 2024 12:55:35 -0700 (PDT)
-Received: from [172.17.0.2] ([20.88.15.127])
-        by smtp.gmail.com with ESMTPSA id d125-20020a25cd83000000b00de5852c4d35sm1187900ybf.19.2024.05.04.12.55.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 04 May 2024 12:55:35 -0700 (PDT)
-Message-ID: <663692b7.250a0220.34a429.500b@mx.google.com>
-Date: Sat, 04 May 2024 12:55:35 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8466159939501898911=="
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="BRcJ5W2V"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1714898354; x=1715503154; i=markus.elfring@web.de;
+	bh=Hmm67Eh9H6ov9LhnYrM6BTLWBoQqSoIzaLVwbXrd8B4=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:From:
+	 Subject:Content-Type:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=BRcJ5W2VVGsmgIoCIqI+Sk56PveDllTGg6KYSfsK0Sjh8n9GzjNm6izFXHw3ldm2
+	 qV1eh/ZajNfQxYr8WIohMa1kdJjLGLkGX2y6RzBml7IOj5T69e3uhYR2WrVKMXW7j
+	 v4hjMlwBx8er3YA3Qsmw7gBPXzrw5fbYF6cG4yv57GprhbeBFpGPJZZuelz8H18ap
+	 JtoGDb7ZFHQvIKDLBfmah1g+CGOjn3mMKvqLtHIQ8w2qDagLQmVYOn3udzF3zPoUj
+	 zu9xUJLoSVZG/M7FJ68IWWv6dQkUnq4yaZP+0Whh6y0uxt9HOXS8ouyyPGM+VX8pl
+	 1JUZUV4dgrhuAbddPw==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.83.95]) by smtp.web.de (mrweb105
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1MidHZ-1sWYtB1hGJ-00e3zy; Sun, 05
+ May 2024 10:39:14 +0200
+Message-ID: <fd9f738e-8e78-4afb-96fd-907f72fb4e13@web.de>
+Date: Sun, 5 May 2024 10:39:02 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, iam@sung-woo.kim
-Subject: RE: [v4] Bluetooth: L2CAP: Fix div-by-zero in l2cap_le_flowctl_init()
-In-Reply-To: <20240504192329.351126-1-iam@sung-woo.kim>
-References: <20240504192329.351126-1-iam@sung-woo.kim>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+To: linux-bluetooth@vger.kernel.org, kernel-janitors@vger.kernel.org,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Marcel Holtmann <marcel@holtmann.org>
+Content-Language: en-GB
+Cc: LKML <linux-kernel@vger.kernel.org>
+From: Markus Elfring <Markus.Elfring@web.de>
+Subject: [PATCH] Bluetooth: qca: Use common error handling code in two
+ functions
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:0iNeMSH+GmRX8I7zfctCspvLyk3Uw/CSkBS/P8/9bpnr0uZPK7G
+ IAuxQmB4gsT+bMhVjantpvy4PWwtw1mNl/qDSbFYsIhYe5HWMOS6JBm2PF976kKDWuvoJMC
+ y7qOa0bdmKP1D2+gWyggCoSB7HxwpOg+UOqrHut1WhB7wDacSXoeemwdIkIfkrJd4yIumEK
+ yVHb38r0ZgVg/RjrsGzJA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:gKFNHLjIIng=;aQeYxwQH4dG1wm0nev68l75Rw38
+ 6dr1zAuiXC1aLQHo3R7uoCUMWJzyiIkLcTtlVGUUuGaEvf33EXIcQgqQJrPBmT92DGgvVMp6e
+ 7mI/kh+KKPe3cl2HxbgjW4hEmoS56kOiYpULZ9/A08bRA4dHz+DxmHe2h5qrsmdUClHSlOZ54
+ aMXul2ictR7RA33doJv/5rwz9jXmA/ONdg4rFgB121sAFXoefLsESYEpaBVC2wVXmP+I59WAL
+ RgmGzoMwQqPht9yyBO6wd13FlPY3jQnbBKm4axjzzrRPAk9MgbQd5+c3oF6bKf4A3+aO67Ucc
+ 3B7zsgy7fqAg8xug0zrPYNiTRl0IOndnDd2hO8c10cq/7J3gmvfbFTOtIDGXV++vhkP/0moTW
+ ptgNtJwzSQk1WZuyYvQ6QWA5SIWDAvm76SdXu/uOiS0swXTwNVoCRCj88NntrkJV91PGm/6r+
+ AFD4wTHKHRMu/DLtI0YgSdCfo4LVBm+1sDMVXMpCQoijwGei+9vC/zoYitaRNz5AlJ7Mu8c4k
+ JeCz+5tCcl1IL/YX8+Q9jqzfsmXKb8UqeFJmN/gbU0TOIotZMWOa5MixijdCecL7DexgUv0yP
+ 4oBUq9sHhg57gom3604PMVnGp2dN3ld98xHlASKr1YQpO0x76recJZ2ZDEntd0YdDloI9lEul
+ wFfhBDIpRnntG9yQgjQHe1Oge+7GecpSWsoJ9OGsN4BDWSguo59oZx1GcJKDflzM05I3vxMZH
+ QuCgEdBjDa4/jbgyNPxBJ+/vbbUSSOx0h3wMSwApy/xTRPI+cWps4bV/QgQ2JsfWmrAEZA4ee
+ HlrZ1QzKvM5h9XIDO6a7/G3Ze/YwK3CYa2FkWYC0HY2uB+BW4p+e5prjY6Pqlj3/fS
 
---===============8466159939501898911==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Sun, 5 May 2024 10:30:28 +0200
 
-This is automated email and please do not reply to this email!
+Add a jump target so that the setting of an error code can be better reuse=
+d
+at the end of these function implementations.
 
-Dear submitter,
+This issue was transformed by using the Coccinelle software.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=850490
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+=2D--
+ drivers/bluetooth/btqca.c | 35 +++++++++++++++++------------------
+ 1 file changed, 17 insertions(+), 18 deletions(-)
 
----Test result---
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index cc61014ffbc9..1833aaa6d87b 100644
+=2D-- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -108,10 +108,8 @@ static int qca_read_fw_build_info(struct hci_dev *hde=
+v)
+ 		return err;
+ 	}
 
-Test Summary:
-CheckPatch                    FAIL      2.01 seconds
-GitLint                       FAIL      0.50 seconds
-SubjectPrefix                 PASS      0.10 seconds
-BuildKernel                   PASS      29.25 seconds
-CheckAllWarning               PASS      31.80 seconds
-CheckSparse                   WARNING   37.26 seconds
-CheckSmatch                   FAIL      35.23 seconds
-BuildKernel32                 PASS      28.22 seconds
-TestRunnerSetup               PASS      511.11 seconds
-TestRunner_l2cap-tester       PASS      20.21 seconds
-TestRunner_iso-tester         PASS      28.19 seconds
-TestRunner_bnep-tester        PASS      4.66 seconds
-TestRunner_mgmt-tester        FAIL      108.29 seconds
-TestRunner_rfcomm-tester      PASS      7.13 seconds
-TestRunner_sco-tester         PASS      14.83 seconds
-TestRunner_ioctl-tester       PASS      7.42 seconds
-TestRunner_mesh-tester        PASS      5.68 seconds
-TestRunner_smp-tester         PASS      6.68 seconds
-TestRunner_userchan-tester    PASS      4.79 seconds
-IncrementalBuild              PASS      27.22 seconds
+-	if (skb->len < sizeof(*edl)) {
+-		err =3D -EILSEQ;
+-		goto out;
+-	}
++	if (skb->len < sizeof(*edl))
++		goto e_ilseq;
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v4] Bluetooth: L2CAP: Fix div-by-zero in l2cap_le_flowctl_init()
-WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
-#96: 
-CPU: 0 PID: 67 Comm: kworker/u5:0 Tainted: G        W          6.9.0-rc5+ #20
+ 	edl =3D (struct edl_event_hdr *)(skb->data);
 
-total: 0 errors, 1 warnings, 0 checks, 340 lines checked
+@@ -123,17 +121,13 @@ static int qca_read_fw_build_info(struct hci_dev *hd=
+ev)
+ 		goto out;
+ 	}
 
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
+-	if (skb->len < sizeof(*edl) + 1) {
+-		err =3D -EILSEQ;
+-		goto out;
+-	}
++	if (skb->len < sizeof(*edl) + 1)
++		goto e_ilseq;
 
-/github/workspace/src/src/13654104.patch has style problems, please review.
+ 	build_lbl_len =3D edl->data[0];
 
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+-	if (skb->len < sizeof(*edl) + 1 + build_lbl_len) {
+-		err =3D -EILSEQ;
+-		goto out;
+-	}
++	if (skb->len < sizeof(*edl) + 1 + build_lbl_len)
++		goto e_ilseq;
 
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+ 	build_label =3D kstrndup(&edl->data[1], build_lbl_len, GFP_KERNEL);
+ 	if (!build_label)
+@@ -145,6 +139,10 @@ static int qca_read_fw_build_info(struct hci_dev *hde=
+v)
+ out:
+ 	kfree_skb(skb);
+ 	return err;
++
++e_ilseq:
++	err =3D -EILSEQ;
++	goto out;
+ }
 
+ static int qca_send_patch_config_cmd(struct hci_dev *hdev)
+@@ -224,8 +222,7 @@ static int qca_read_fw_board_id(struct hci_dev *hdev, =
+u16 *bid)
+ 	edl =3D skb_pull_data(skb, sizeof(*edl));
+ 	if (!edl) {
+ 		bt_dev_err(hdev, "QCA read board ID with no header");
+-		err =3D -EILSEQ;
+-		goto out;
++		goto e_ilseq;
+ 	}
 
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v4] Bluetooth: L2CAP: Fix div-by-zero in l2cap_le_flowctl_init()
+ 	if (edl->cresp !=3D EDL_CMD_REQ_RES_EVT ||
+@@ -235,10 +232,8 @@ static int qca_read_fw_board_id(struct hci_dev *hdev,=
+ u16 *bid)
+ 		goto out;
+ 	}
 
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-18: B1 Line exceeds max length (199>80): "Code: e8 17 17 0c 00 66 41 89 9f 84 00 00 00 bf 01 00 00 00 41 b8 02 00 00 00 4c 89 fe 4c 89 e2 89 d9 e8 27 17 0c 00 44 89 f0 31 d2 <66> f7 f3 89 c3 ff c3 4d 8d b7 88 00 00 00 4c 89 f0 48 c1 e8 03 42"
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):net/bluetooth/sco.c: note: in included file:./include/net/bluetooth/hci_core.h:150:35: warning: array of flexible structures
-##############################
-Test: CheckSmatch - FAIL
-Desc: Run smatch tool with source
-Output:
+-	if (skb->len < 3) {
+-		err =3D -EILSEQ;
+-		goto out;
+-	}
++	if (skb->len < 3)
++		goto e_ilseq;
 
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
-make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
-make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: net] Error 2
-make[2]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
-make[4]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bpa10x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bpa10x.o'
-make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
-make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
-make: *** [Makefile:240: __sub-make] Error 2
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 492, Passed: 489 (99.4%), Failed: 1, Not Run: 2
+ 	*bid =3D (edl->data[1] << 8) + edl->data[2];
+ 	bt_dev_dbg(hdev, "%s: bid =3D %x", __func__, *bid);
+@@ -246,6 +241,10 @@ static int qca_read_fw_board_id(struct hci_dev *hdev,=
+ u16 *bid)
+ out:
+ 	kfree_skb(skb);
+ 	return err;
++
++e_ilseq:
++	err =3D -EILSEQ;
++	goto out;
+ }
 
-Failed Test Cases
-LL Privacy - Add Device 5 (2 Devices to RL)          Failed       0.154 seconds
+ int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
+=2D-
+2.44.0
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8466159939501898911==--
