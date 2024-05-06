@@ -1,96 +1,89 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03BCE13FD9E
-	for <linux-bluetooth@vger.kernel.org>; Mon,  6 May 2024 07:41:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A900381DF;
+	Mon,  6 May 2024 07:49:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714981271; cv=none; b=htD5s8xAebiLWxq79lzx77YmOhuiYHrJ8N5obKOAvtkXzWX6jlV/vnjrwCRxLVoPvohMASthrP9ockJOkGlmAmyuQQEyMfdN5YznxdVm3F3IJYHo3mNu52kC90pf0PrIccOeLpl7QL4iVHsYQN88gTkjK/pipsHLr23flIU5akM=
+	t=1714981798; cv=none; b=sRmPgB7sbcCCiNWbvY91KwOk6ri9PByvrRYcFpjupaRWI0Ah3emR4T0oyPVgzCCQtm6JG851HQxYEYhcCySLK0HPIl5Ag8I2eWLAPx0TKK79X2EhO57ljsRbZ9PLzZ+vsPjblzOmRoS8pzb+pmh4nkoSxVMy7OP9M4/qnJg1nnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714981271; c=relaxed/simple;
-	bh=OtiiaCZBUQgEU8CU41m34kPD/LLGp88NbWEksYRolbA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kL3UGe0rB5xn3hVJswNCeQSUFzCflonCccdFeDqhmQJkXXbs9OLw4OhTACB0rpBzi80GvOW84btH4Zbh1taZVhh8BNf3RIs2nNeaOxBTgZto9g8H/l4fdTv/qTh0NaBLvRoWW3Fhr0KX6rmoI2JXcIaFTTKmU/hw+ovbSsXkgU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=QTLXheFy; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1714981798; c=relaxed/simple;
+	bh=AldvdJy6yYm37EF3i71sslpEwK1DSJ9EjAmYdBn40qk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GDZRsnKtmDhbJhVzt/4iWdiesJF4QAOrFaVObHn0y7I1kTXHiCSGfUiEpvUbNMj6HO0JD7fLXeTYDaiR679C31/a3yprryeta2R5SHIF2QFYtisWcH5A58SI+Ds+wW/FzJdEhICHrR7Z737vbJSov1qvwrsMq5OMebSI57H/0PE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZNI0+H02; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="QTLXheFy"
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4465apBX025065
-	for <linux-bluetooth@vger.kernel.org>; Mon, 6 May 2024 07:41:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	from:to:cc:subject:date:message-id:mime-version:content-type; s=
-	qcppdkim1; bh=ERm++eDuVMgwhJNMy0psDMiV2eZnHtMBqKuQBs/W5KQ=; b=QT
-	LXheFypBwlRqK6qReDaE4EHaNtZ63vIli/f9jr6K5f7QR/q7Tqe8fcveYx38iTWt
-	gS6jzQdypLtuEqBA6/v8v7uRu1U1C2YZ1NB3EwxQsbBzTB0XcqOAuTY5MY4CgXjD
-	f0D0vaGWs7HZkTI33D9xaHVDzR9rp5gQtigE3RPX8Cm+7BDn+yn9tw685Mq8mCS1
-	USPNI4b0fWAKzGGrnGzqKHzh0fqKFgAgG3Sqwq6AsCkjsshlIXRdHmPPRfHuyKIJ
-	uhuuCt1OkMCQ8PjT89/46ngTUw1pXz7afEo1yhL4DD9EzZUUIwbSTHJQHkNgc3mU
-	dRjtrom98HPQV76h6JeA==
-Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xwdsmtv2g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Mon, 06 May 2024 07:41:08 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 4467f7cQ018188
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Mon, 6 May 2024 07:41:07 GMT
-Received: from hu-nakella-hyd.qualcomm.com (10.80.80.8) by
- nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Mon, 6 May 2024 00:41:05 -0700
-From: Naga Bhavani Akella <quic_nakella@quicinc.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
-        <quic_anubhavg@quicinc.com>,
-        Naga Bhavani Akella <quic_nakella@quicinc.com>
-Subject: [PATCH v1] Bluez: unregister-includes option is not working in bluetoothctl
-Date: Mon, 6 May 2024 13:10:43 +0530
-Message-ID: <20240506074043.4200-1-quic_nakella@quicinc.com>
-X-Mailer: git-send-email 2.17.1
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZNI0+H02"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F01EC116B1;
+	Mon,  6 May 2024 07:49:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714981797;
+	bh=AldvdJy6yYm37EF3i71sslpEwK1DSJ9EjAmYdBn40qk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZNI0+H02XjdjlVmR6Cx3OzWOiBtjcRpk3xgkvyOqbhDCkhMr3vHP0oh+i33tTx/Ma
+	 FV8nNda9MLbM3QZGm5z9ZtjgOTO+yw7dj7YUi9TuhDLjepQpIVJPklKABB1S6On5LW
+	 oJ5tds7uhKrQJhDZ857sGfoNTlZutt2i/iY/3cvCUzxoZS7Gngrkw54hHdt4axYBSt
+	 TU2TYdNBHJnGFHkCJMQnHXAIQdn4l+TT7XZfl1B55vuihq0/UG7H42wGAwwErVRL4n
+	 geNSjz9lviHD590Q4TJUXY1fPROtIF2HIQpsm1nanLDDA/Sy+5piOdWJ1+hdj+tU/1
+	 APz0SNhKevnhw==
+Received: from johan by xi.lan with local (Exim 4.97.1)
+	(envelope-from <johan@kernel.org>)
+	id 1s3t6k-000000007nV-09n7;
+	Mon, 06 May 2024 09:49:58 +0200
+Date: Mon, 6 May 2024 09:49:58 +0200
+From: Johan Hovold <johan@kernel.org>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Johan Hovold <johan+linaro@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: qca: Fix error code in
+ qca_read_fw_build_info()
+Message-ID: <ZjiLphwtH2RvUChu@hovoldconsulting.com>
+References: <515be96c-4c44-44d5-891f-fe57275e9f47@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: DKzc9tGWPV4xnb9ESpUUVLhoTU9sKmCj
-X-Proofpoint-ORIG-GUID: DKzc9tGWPV4xnb9ESpUUVLhoTU9sKmCj
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-06_04,2024-05-03_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- clxscore=1015 mlxlogscore=639 bulkscore=0 malwarescore=0
- lowpriorityscore=0 mlxscore=0 adultscore=0 impostorscore=0 phishscore=0
- spamscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2404010003 definitions=main-2405060050
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <515be96c-4c44-44d5-891f-fe57275e9f47@moroto.mountain>
 
-unregister includes option takes two parameters service uuid and
-included service uuid, since the space between them is missing,
-the menu option is not working.
-When two uuids separated with space is given, it is throwing error.
+On Sat, May 04, 2024 at 02:25:43PM +0300, Dan Carpenter wrote:
+> Return -ENOMEM on allocation failure.  Don't return success.
 
-Signed-off-by: Naga Bhavani Akella <quic_nakella@quicinc.com>
----
- client/main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks, Dan.
 
-diff --git a/client/main.c b/client/main.c
-index 51d08a67a..c8b0f7f1c 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -3060,7 +3060,7 @@ static const struct bt_shell_menu gatt_menu = {
- 					"Unregister application service" },
- 	{ "register-includes", "<UUID> [handle]", cmd_register_includes,
- 					"Register as Included service in." },
--	{ "unregister-includes", "<Service-UUID><Inc-UUID>",
-+	{ "unregister-includes", "<Service-UUID> <Inc-UUID>",
- 			cmd_unregister_includes,
- 				 "Unregister Included service." },
- 	{ "register-characteristic",
--- 
+Fortunately this error path is never taken due to the small allocation
+size, but if it were it would only lead to a debugfs attribute holding
+the fw build id not being created.
+
+That said, it should still be fixed of course even this can wait for
+6.10-rc1.
+
+> Fixes: cfc2a7747108 ("Bluetooth: qca: fix info leak when fetching fw build id")
+
+This one should also have a matching:
+
+Cc: stable@vger.kernel.org	# 5.12
+
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+
+Reviewed-by: Johan Hovold <johan+linaro@kernel.org>
+
+> @@ -136,8 +136,10 @@ static int qca_read_fw_build_info(struct hci_dev *hdev)
+>  	}
+>  
+>  	build_label = kstrndup(&edl->data[1], build_lbl_len, GFP_KERNEL);
+> -	if (!build_label)
+> +	if (!build_label) {
+> +		err = -ENOMEM;
+>  		goto out;
+> +	}
+>  
+>  	hci_set_fw_info(hdev, "%s", build_label);
+
+Johan
