@@ -1,365 +1,120 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 468E1158D9D
-	for <linux-bluetooth@vger.kernel.org>; Mon,  6 May 2024 18:30:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C03C613C69F
+	for <linux-bluetooth@vger.kernel.org>; Mon,  6 May 2024 19:21:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715020225; cv=none; b=Ez23Xbq25ykvfxVXQrvyshXIKsK3Wsnqi4Zdk5P4IIWoHM8CJtKhaEAD5mb5biQFdo6+EPDLKgSqIJEA104aCXqu77G+14VW5SMNUvnCgMfDC+GFz/40/qbe83et1lugOvPpT/SAUJblQ67GMbX/Ep1kPlGB3GiOwljOtBRlNRk=
+	t=1715023299; cv=none; b=eB32Wlx2hZQfBYKk20gIpBNnEs/wiBObpeOOM2tZ7+cG/J61FCsFfUe288QFtta0EwacjYnHdD5byebrfi7IS0OmnIEPveg0hLMGrm6kWdN2LNMDyOW+diNSmJjXnbppU9qIU0vuAXD6u1zmlhE05sp9LtZs555QUOp/60BsQ+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715020225; c=relaxed/simple;
-	bh=3dULno0Tr+lOcQq1CTHv0YMLDkY9SUl2xMPsi0kVfYg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=C8SHXT1Tja2g0wXSq/+wNR863yL+3HHb5x/rpCN41NHL+i1Rl3cEFfwZ7WT/IKPwkvRQzlN4x17RtaBS2IsLmmdXTXnWPHtBG0AXKuCXKE4T3dQMhcF1orf9EiPClVK25AoHm0bOXxmhhH7w+jgUVfAFkN6MA6wgzDBHHcEnwjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VsFGymEm; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1715023299; c=relaxed/simple;
+	bh=X3YwlbKHtlbgh5paaDoTp02wt/z8uJUHDrihFNIYwRk=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=TMHnOKFXn+QTH3meu58xaXKYqJx+/5JnUuIeRclcpzG9PdA+kzvMbn3Bsdy5t+vrFMoZHHYpp8a5s+EnRGNItU1a3bzCsjl+ON4A+ru+T44MgJZaolXhc0+BeAXxWb861H2I/+V++J/IIW3933IQCY22z9TTowmXTk4rqp08YeU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=EdTXT5gp; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=penguintechs.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VsFGymEm"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715020223; x=1746556223;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=3dULno0Tr+lOcQq1CTHv0YMLDkY9SUl2xMPsi0kVfYg=;
-  b=VsFGymEm2D/Jzw3kONlUy+HVw9y5hgDWeqgOHChhfMFZVYqJBHEt8BZG
-   AQYoHF8TXKJQ6kkWcgg0ateqBA/iaS0KRiJtVpYsTLvC3L+9G0idY8+Df
-   35PJAjPQCY1jGRJdKb4zlsxsAGiDijkAfsNNLoj69cXXkZyzBLIJt2eAm
-   gOrecNN8DcTDDu3iJOWAmxyf9Uj8+gY32dqmckWdFeNhHd26z/jbReXad
-   wHwOYNyni81A/kziQVR2yYTmyWWcluNJRLIFaBnfgyv19GMZNb/8nnhUi
-   Gz52c5bH5pXrIW1yoTaTN3GMKTPx9TY0WyYgfeTVV1wweCGqc6/b4pXaf
-   g==;
-X-CSE-ConnectionGUID: IDK5sNoSRxCrkg8yRDUSIg==
-X-CSE-MsgGUID: fCUVjqyUTnOJWwYKjanppQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11065"; a="13733010"
-X-IronPort-AV: E=Sophos;i="6.07,259,1708416000"; 
-   d="scan'208";a="13733010"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2024 11:30:23 -0700
-X-CSE-ConnectionGUID: 4xocfMLCTJK7EcvVEoJ/xA==
-X-CSE-MsgGUID: HGLNa3PnTr29Bhu1uNy6dw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,259,1708416000"; 
-   d="scan'208";a="32721843"
-Received: from weba0535.iind.intel.com ([10.224.186.30])
-  by fmviesa005.fm.intel.com with ESMTP; 06 May 2024 11:30:21 -0700
-From: Ajay KV <ajay.k.v@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ajay KV <ajay.k.v@intel.com>
-Subject: [PATCH BlueZ v2] bluetoothctl: Add submenu for Call control profile testing
-Date: Tue,  7 May 2024 02:56:43 +0300
-Message-Id: <20240506235643.114778-1-ajay.k.v@intel.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="EdTXT5gp"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1ecd3867556so15968415ad.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 06 May 2024 12:21:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=penguintechs.org; s=google; t=1715023295; x=1715628095; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7WvaSssL8hW+happfuz7Ifo7zzuW3z2wrCHUtE0u0Mg=;
+        b=EdTXT5gpAnzuY13UQGZI3pNeQ2jR2ddV8FAFAgWsP8N49WTi4gEHLfM22Oih8gz00z
+         1olS4BsGlt7qXUrlz8lyxil6kdX0+NimloyARipDH5pAgt8ItY/2KH+tUlrRrsoxloJ1
+         3nUlP7aK97P/zeRc+Db1z/ygN8XVvMjDQWJMA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715023295; x=1715628095;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=7WvaSssL8hW+happfuz7Ifo7zzuW3z2wrCHUtE0u0Mg=;
+        b=dbA8qiBLBmDN/Y8gIO1UinAQQY+8f4RMjymG+JoOSHJGoAtxGRuMPL/JEMMz8ARUSg
+         3EY8Eph52QtwAI8LozUq42VTbYiQ8FrPkiUODYBH5Rpjaz/3e8KdYw/brVygr4O1H8xS
+         N9qZ8bhT4VWqAWKYgDffVthTVLV+m7zPceoKbMC53CyJhcr0VOWwzoG3tJcDJYNW8GdV
+         498/B6Z5ejUhC7JXBA+Vuj+b8d1OX5tEPQiGxOX0ruXTWS3RLwBuPYtNiIDE03HuCyAC
+         6cJ6rnoA3aA3V6cfBp0H8SfNgzOttabwuLfp4PES0PWj5GDM1R8inOp+hbvmoSW0SzMo
+         f7rQ==
+X-Gm-Message-State: AOJu0YyEMWthF4hcQa0VufyzlzlNZsKL3B3JQnkckmb/7i9i51Kv2Fwv
+	wnoj5MqYLkX0YnqheN8vsFIQ1PW681XstAhAVvSb9fiXvxfdh55yUsbC82cUV/3XZgamSQse8e3
+	shQ==
+X-Google-Smtp-Source: AGHT+IHxLrSKB0zjbYT5M6RFFiD+nN0ZpTsG9KGIzmJjrtbpNTzaCW5M1t7au4K6butZNGMjVWNrxQ==
+X-Received: by 2002:a17:903:298f:b0:1eb:5222:7c5f with SMTP id lm15-20020a170903298f00b001eb52227c5fmr14309294plb.10.1715023294423;
+        Mon, 06 May 2024 12:21:34 -0700 (PDT)
+Received: from ?IPV6:2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08? ([2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08])
+        by smtp.gmail.com with ESMTPSA id x13-20020a170902ec8d00b001ecf6d3edb5sm8656820plg.241.2024.05.06.12.21.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 06 May 2024 12:21:33 -0700 (PDT)
+Message-ID: <3475f0dd-6a0f-4319-9590-379eee33f504@penguintechs.org>
+Date: Mon, 6 May 2024 12:21:32 -0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: linux-bluetooth@vger.kernel.org,
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Zijun Hu <quic_zijuhu@quicinc.com>,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+From: Wren Turkal <wt@penguintechs.org>
+Subject: path to landing patch to fix warm boot issue for qca6390
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-This adds submeu in bluetoothctl for CCP Testing with
-options like answer and reject the active call . This feature
-is tested with windows machnine as CCP server which uses Teams
-application to make calls
+Krzysztof,
 
-Signed-off-by: Ajay KV <ajay.k.v@intel.com>
----
- Makefile.tools    |   4 +-
- client/ccp_test.c | 212 ++++++++++++++++++++++++++++++++++++++++++++++
- client/ccp_test.h |  12 +++
- client/main.c     |   5 +-
- 4 files changed, 231 insertions(+), 2 deletions(-)
- create mode 100644 client/ccp_test.c
- create mode 100644 client/ccp_test.h
+I am reaching out to you as you had the most important objections to the 
+change to fix qca6390 for the warm boot/module reload bug that I am 
+experiencing.
 
-diff --git a/Makefile.tools b/Makefile.tools
-index 679c914bf8cd..a5587427f549 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -13,7 +13,9 @@ client_bluetoothctl_SOURCES = client/main.c \
- 					client/gatt.h client/gatt.c \
- 					client/admin.h client/admin.c \
- 					client/player.h client/player.c \
--					client/mgmt.h client/mgmt.c
-+					client/mgmt.h client/mgmt.c \
-+					client/ccp_test.c \
-+					client/ccp_test.h
- client_bluetoothctl_LDADD = lib/libbluetooth-internal.la \
- 			gdbus/libgdbus-internal.la src/libshared-glib.la \
- 			$(GLIB_LIBS) $(DBUS_LIBS) -lreadline
-diff --git a/client/ccp_test.c b/client/ccp_test.c
-new file mode 100644
-index 000000000000..d53fc2393c13
---- /dev/null
-+++ b/client/ccp_test.c
-@@ -0,0 +1,212 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2024  Intel Corporation. All rights reserved.
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#define _GNU_SOURCE
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include "gdbus/gdbus.h"
-+#include "lib/bluetooth.h"
-+#include "src/shared/shell.h"
-+#include "print.h"
-+#include "ccp_test.h"
-+
-+/* String display constants */
-+#define COLORED_NEW	COLOR_GREEN "NEW" COLOR_OFF
-+#define COLORED_CHG	COLOR_YELLOW "CHG" COLOR_OFF
-+
-+#define BLUEZ_CCP_TEST_INTERFACE "org.bluez.CCPTest1"
-+
-+static DBusConnection *dbus_conn;
-+static GDBusProxy *default_call;
-+static GList *callList;
-+static GDBusClient *client;
-+
-+static char *proxy_description(GDBusProxy *proxy, const char *title,
-+			       const char *description)
-+{
-+	const char *path;
-+
-+	path = g_dbus_proxy_get_path(proxy);
-+	return g_strdup_printf("%s%s%s%s %s ",
-+					description ? "[" : "",
-+					description ? : "",
-+					description ? "] " : "",
-+					title, path);
-+}
-+
-+static void print_info(void *data, void *user_data)
-+{
-+	GDBusProxy *proxy = data;
-+	const char *description = user_data;
-+	char *str;
-+
-+	str = proxy_description(proxy, "CCPTest", description);
-+
-+	bt_shell_printf("%s%s\n", str,
-+			default_call == proxy ? "[default]" : "");
-+
-+	g_free(str);
-+}
-+
-+static void call_reject_reply(DBusMessage *message, void *user_data)
-+{
-+	DBusError error;
-+
-+	dbus_error_init(&error);
-+
-+	if (dbus_set_error_from_message(&error, message) == TRUE) {
-+		bt_shell_printf("Failed to reject call: %s\n", error.name);
-+		dbus_error_free(&error);
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	bt_shell_printf("operation completed\n");
-+
-+	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+}
-+
-+static void cmd_reject(int argc, char *argv[])
-+{
-+	if (!default_call) {
-+		bt_shell_printf("No active calls present\n");
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	if (g_dbus_proxy_method_call(default_call, "reject", NULL,
-+				     call_reject_reply, NULL, NULL) == FALSE) {
-+		bt_shell_printf("Failed to reject call\n");
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+}
-+
-+static void call_answer_reply(DBusMessage *message, void *user_data)
-+{
-+	DBusError error;
-+
-+	dbus_error_init(&error);
-+
-+	if (dbus_set_error_from_message(&error, message) == TRUE) {
-+		bt_shell_printf("Failed to answer call: %s\n", error.name);
-+		dbus_error_free(&error);
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	bt_shell_printf("operation completed\n");
-+
-+	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+}
-+
-+static void cmd_answer(int argc, char *argv[])
-+{
-+	if (!default_call)
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+
-+	if (g_dbus_proxy_method_call(default_call, "answer", NULL,
-+				     call_answer_reply, NULL, NULL) == FALSE) {
-+		bt_shell_printf("Failed to answer the call\n");
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+}
-+
-+static const struct bt_shell_menu call_menu = {
-+	.name = "ccp test",
-+	.desc = "ccp test settings submenu",
-+	.entries = {
-+		    { "answer", NULL, cmd_answer, "answer the active call" },
-+		    { "reject", NULL, cmd_reject, "reject the active call" },
-+		   },
-+};
-+
-+static void ccp_add_call(GDBusProxy *proxy)
-+{
-+	bt_shell_printf("[CHG] CCP Test caller added\n");
-+	callList = g_list_append(callList, proxy);
-+
-+	if (!default_call)
-+		default_call = proxy;
-+
-+	print_info(proxy, COLORED_NEW);
-+}
-+
-+static void ccp_remove_call(GDBusProxy *proxy)
-+{
-+	bt_shell_printf("[CHG] CCP Test caller removed\n");
-+
-+	if (default_call == proxy)
-+		default_call = NULL;
-+
-+	callList = g_list_remove(callList, proxy);
-+}
-+
-+static void proxy_added(GDBusProxy *proxy, void *user_data)
-+{
-+	const char *interface;
-+
-+	interface = g_dbus_proxy_get_interface(proxy);
-+
-+	if (!strcmp(interface, BLUEZ_CCP_TEST_INTERFACE))
-+		ccp_add_call(proxy);
-+}
-+
-+static void proxy_removed(GDBusProxy *proxy, void *user_data)
-+{
-+	const char *interface;
-+
-+	interface = g_dbus_proxy_get_interface(proxy);
-+
-+	if (!strcmp(interface, BLUEZ_CCP_TEST_INTERFACE))
-+		ccp_remove_call(proxy);
-+}
-+
-+static void ccptest_property_changed(GDBusProxy *proxy, const char *name,
-+				     DBusMessageIter *iter)
-+{
-+	char *str;
-+
-+	str = proxy_description(proxy, "CCP Test", COLORED_CHG);
-+	print_iter(str, name, iter);
-+	g_free(str);
-+
-+	bt_shell_printf("[CHG] CCP Test property : %s\n", name);
-+}
-+
-+static void property_changed(GDBusProxy *proxy, const char *name,
-+			     DBusMessageIter *iter, void *user_data)
-+{
-+	const char *interface;
-+
-+	interface = g_dbus_proxy_get_interface(proxy);
-+
-+	if (!strcmp(interface, BLUEZ_CCP_TEST_INTERFACE))
-+		ccptest_property_changed(proxy, name, iter);
-+}
-+
-+void ccptest_add_submenu(void)
-+{
-+	bt_shell_add_submenu(&call_menu);
-+
-+	dbus_conn = bt_shell_get_env("DBUS_CONNECTION");
-+	if (!dbus_conn || client)
-+		return;
-+
-+	client = g_dbus_client_new(dbus_conn, "org.bluez", "/org/bluez");
-+
-+	g_dbus_client_set_proxy_handlers(client, proxy_added, proxy_removed,
-+					 property_changed, NULL);
-+	g_dbus_client_set_disconnect_watch(client, NULL, NULL);
-+}
-+
-+void ccptest_remove_submenu(void)
-+{
-+	g_dbus_client_unref(client);
-+}
-diff --git a/client/ccp_test.h b/client/ccp_test.h
-new file mode 100644
-index 000000000000..fc2ab2042bb8
---- /dev/null
-+++ b/client/ccp_test.h
-@@ -0,0 +1,12 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2024 Intel Corporation. All rights reserved.
-+ *
-+ *
-+ */
-+
-+void ccptest_add_submenu(void);
-+void ccptest_remove_submenu(void);
-diff --git a/client/main.c b/client/main.c
-index c8b0f7f1c2d8..dba6dea639d9 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -34,6 +34,7 @@
- #include "admin.h"
- #include "player.h"
- #include "mgmt.h"
-+#include "ccp_test.h"
- 
- /* String display constants */
- #define COLORED_NEW	COLOR_GREEN "NEW" COLOR_OFF
-@@ -3060,7 +3061,7 @@ static const struct bt_shell_menu gatt_menu = {
- 					"Unregister application service" },
- 	{ "register-includes", "<UUID> [handle]", cmd_register_includes,
- 					"Register as Included service in." },
--	{ "unregister-includes", "<Service-UUID> <Inc-UUID>",
-+	{ "unregister-includes", "<Service-UUID><Inc-UUID>",
- 			cmd_unregister_includes,
- 				 "Unregister Included service." },
- 	{ "register-characteristic",
-@@ -3199,6 +3200,7 @@ int main(int argc, char *argv[])
- 
- 	admin_add_submenu();
- 	player_add_submenu();
-+	ccptest_add_submenu();
- 	mgmt_add_submenu();
- 
- 	client = g_dbus_client_new(dbus_conn, "org.bluez", "/org/bluez");
-@@ -3216,6 +3218,7 @@ int main(int argc, char *argv[])
- 
- 	admin_remove_submenu();
- 	player_remove_submenu();
-+	ccptest_remove_submenu();
- 	mgmt_remove_submenu();
- 
- 	g_dbus_client_unref(client);
+For context, the problem is that the hci_uart module will send specific 
+vendor specfic commands during shutdown of the hardware under most 
+situations. These VSCs put the bluetooth device into a non-working state 
+on my Dell XPS 13 9310 with qca6390 bluetooth hardware.
+
+Zijun's proposed fix is to not send these commands when it's not 
+appropriate for the hardware. The vendor commands should be avoided when 
+the hardware does not have persistent configuration or when the device 
+is in setup state (indicating that is has never been setup and should 
+not be sent the VSCs on the shutdown path). This is what Zijun's patch 
+implements.
+
+In addition, Zijun's change removes the influence of both
+the QCA_BT_OFF qca flag and and HCI_RUNNING hdev flag. Zijun asserts 
+that those flags should not influence the sending of the VSCs in the 
+shutdown path. If I understand KK's objections properly, this is where 
+his objection is stemming from. KK, is this correct?
+
+Zijun's proposed fix can be seen here: 
+https://patchwork.kernel.org/project/bluetooth/patch/1713932807-19619-3-git-send-email-quic_zijuhu@quicinc.com/
+
+I'm wondering if we can resolve this impasse by splitting the change 
+into two changes, as follows:
+
+1. Change that removes the influence of the QCA_BT_OFF and HCI_RUNNING 
+flags in the shutdown path.
+2. Add the quirk from Zijun's patch that fixes my hardward configuration.
+
+I'm hoping that better clearer descriptions for #1 can help get that 
+landed since the logic current appears to be at odds with how the 
+hardware works.
+
+Also, I am happy to split the patches into the two patches, or (maybe 
+more ideally) just modify the commit message to better indicate the 
+reason the change. I just need guidance from maintainers so that 
+whatever work I do leads to something acceptable for y'all.
+
+So, please help me get this done. I am just a user with broken hardware 
+and a fondness for Linux. I would love to help do what's needed to get 
+this fix landed.
+
+Please help me get there,
+Wren T
 -- 
-2.34.1
-
+You're more amazing than you think!
