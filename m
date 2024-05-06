@@ -1,68 +1,76 @@
-Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A001614EC4C
-	for <linux-bluetooth@vger.kernel.org>; Mon,  6 May 2024 14:33:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 114F241C77
+	for <linux-bluetooth@vger.kernel.org>; Mon,  6 May 2024 16:30:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715006031; cv=none; b=i1vOdXJ/P5kel1umi2YJ9BQi3JsLPymCMOAvVfW8vjQJn06PPqZONeCh/5YHTNTgxOEOC8afOBCL0Jl9fO5cToFQEjYvLw3GepDNlSie3roWMCoquiOzqgefdo/Dch1Y1u904ETM77vSti3hbFSazDeQwSFm63hy9IvWymX0ZDo=
+	t=1715013029; cv=none; b=U7m4hj2sJxNebwN15bSlYVnbAePjzciC9DOEnrpcYPTW8sWsk9I107MRE2O8kTO6M6yclHTHf8a73wvjNQ006avYEuRkSN9FvqieqfEIhMtWBm6WatcTfAQKU4MAoc78hbzB9ymZNxpbPFSfUt7V2DQ++eY1P7VFeDNVdIGl1es=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715006031; c=relaxed/simple;
-	bh=mM3QrNL1UvGn4OMguEoUSB6GWFt2EJPcFi0XGq7UoME=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=W1HmyPHQdQs49HbiruFdDpkYr3IWkVZDKzFhEIcAXF3q+mKT3G7hHRbjuvofzUjF/U2n/Cj1HFedDTOfyUeKJIuz2fCP6rMMYk1gTJBj0JEeb1Ho97f1moJURhAQDfVwfOBjLLkge0bUrSc/rEj2AfFUoxsg104tfmC5tiT9NAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=mHE2MKiw; arc=none smtp.client-ip=192.30.252.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1715013029; c=relaxed/simple;
+	bh=CE5kI2bH4gBpW537WRYpPJnT8RL2CKPx2ahwVKKap04=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=N8NSsLKKxdapeX4RRFrhu1haIaZkRnLfvrJejW+LIyVHpi73y2vprjz17/UkE92hJcIBgztQyX63PKoVI0dXjs1hDrr0xKevJmPjaITSu650gknPl0z+6ysACV5VfvpmCJgMjquXPXFQTqUtIv+DkkV6DrWcBpk3nFXk6FwoZqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hyKngY2c; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="mHE2MKiw"
-Received: from github.com (hubbernetes-node-044a8d3.va3-iad.github.net [10.48.137.37])
-	by smtp.github.com (Postfix) with ESMTPA id B1361E1087
-	for <linux-bluetooth@vger.kernel.org>; Mon,  6 May 2024 07:33:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1715006029;
-	bh=Vg+MRHvzaY30Fa6ufgWWkJTmhOuJJaET/G8rgIclYdE=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=mHE2MKiwDbPAj/8IuRAGthES3ci/uV5I6Z7NtbJrEB3i3dV5WCkJ4L8gCeCXPbWCU
-	 0DHHPDMesU5ukUxhiY4DBxUW0GFDs6+C19d/g1HlpOgng+ZAFW7cDdOREdE3naUEl/
-	 X8mJThSBMO0CcyPM8k22xh3X6qq1EHKtqG9IWyXs=
-Date: Mon, 06 May 2024 07:33:49 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/14057f-f34cc1@github.com>
-Subject: [bluez/bluez] f34cc1: gatt-database: Fix error registering
- characteristi...
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hyKngY2c"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8EEEEC4AF65;
+	Mon,  6 May 2024 16:30:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715013028;
+	bh=CE5kI2bH4gBpW537WRYpPJnT8RL2CKPx2ahwVKKap04=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=hyKngY2c4gGk5fQmTepEjt6YTin7lM2DYUFAVZK2Vh1wclX7So1tw/roelaVg/3d1
+	 kfHS9ykN4zzMpqZteuKGCXOsXW0AbSH3FHsjL3XmuEZFDly0VqVKI/S+iLvH00a7rv
+	 bAoYEmXwikniPfVFtavsn4/pYCaGB8qtM2x9SN0tW8LmyTW8/F5hDMVda0WJ3/LhgE
+	 TSH1aQX1fgEgJzPRTWgoxU447at+QllfK2qyrvErzLiFwZMfr0kW96o59qdkwRnIV/
+	 uA6O5IQKauLhrS2s8xrjd+9HBMhgiczM9EBhNNQhSEbg5U1Q3a4IPg3j7Ovrh/95dw
+	 UnLDe+ydqdzYg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7CB0FC43334;
+	Mon,  6 May 2024 16:30:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v1] Bluez: unregister-includes option is not working in
+ bluetoothctl
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <171501302850.27188.16123982217544734859.git-patchwork-notify@kernel.org>
+Date: Mon, 06 May 2024 16:30:28 +0000
+References: <20240506074043.4200-1-quic_nakella@quicinc.com>
+In-Reply-To: <20240506074043.4200-1-quic_nakella@quicinc.com>
+To: Naga Bhavani Akella <quic_nakella@quicinc.com>
+Cc: linux-bluetooth@vger.kernel.org, quic_mohamull@quicinc.com,
+ quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: f34cc1da5081e1a464212dc73cde8ba4f2b79d99
-      https://github.com/bluez/bluez/commit/f34cc1da5081e1a464212dc73cde8ba4f2b79d99
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-05-03 (Fri, 03 May 2024)
+Hello:
 
-  Changed paths:
-    M src/gatt-database.c
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  gatt-database: Fix error registering characteristic with Handle 0x0000
+On Mon, 6 May 2024 13:10:43 +0530 you wrote:
+> unregister includes option takes two parameters service uuid and
+> included service uuid, since the space between them is missing,
+> the menu option is not working.
+> When two uuids separated with space is given, it is throwing error.
+> 
+> Signed-off-by: Naga Bhavani Akella <quic_nakella@quicinc.com>
+> 
+> [...]
 
-Registering a characteristic with handle 0x0000 means that the
-application wants a handles to be auto allocated but requires to be
-informed of what values they end up in the database.
+Here is the summary with links:
+  - [v1] Bluez: unregister-includes option is not working in bluetoothctl
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=78af547e94d9
 
-Fixes: https://github.com/bluez/bluez/issues/821
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
