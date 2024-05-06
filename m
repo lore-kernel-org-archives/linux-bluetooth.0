@@ -1,161 +1,365 @@
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F4F413DDD2;
-	Mon,  6 May 2024 17:25:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 468E1158D9D
+	for <linux-bluetooth@vger.kernel.org>; Mon,  6 May 2024 18:30:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715016336; cv=none; b=Jg6wjLs5jO8xS/vPX0eWUN/24zAkbisJ8UX3SFNVgkXfUd+6bd3ApHWfMqBP3WFq8m95mKbUyLU+rHucUZePyN0YYhN8QnPp6mSpAKeNhZWp03Dpy651/4QuXtyR6QQ/K9cwxKiSX6QJpHHDJYaWNHiINDRXuYeLv7aaGqpW4M0=
+	t=1715020225; cv=none; b=Ez23Xbq25ykvfxVXQrvyshXIKsK3Wsnqi4Zdk5P4IIWoHM8CJtKhaEAD5mb5biQFdo6+EPDLKgSqIJEA104aCXqu77G+14VW5SMNUvnCgMfDC+GFz/40/qbe83et1lugOvPpT/SAUJblQ67GMbX/Ep1kPlGB3GiOwljOtBRlNRk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715016336; c=relaxed/simple;
-	bh=QbjlCOhO3X6SirjjksKEpwib8y+ESglXZO/TxYTLekk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sP2l+/pyfm5ipn2v0oK1HAb5/SlfNKW5bKRCaaFn3z/wwqRGvceTRjzfV24G+D24XzhTfqdvNpJa6UdJfDusE66yuORHI7Np/sGvxcIg6uag6IJkD7SLWMSsatCTmik3VQQ1GqFe/epDImX1786pJtjiO8xUPVdU79yN5mEPUMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jx9opyvl; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1715020225; c=relaxed/simple;
+	bh=3dULno0Tr+lOcQq1CTHv0YMLDkY9SUl2xMPsi0kVfYg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=C8SHXT1Tja2g0wXSq/+wNR863yL+3HHb5x/rpCN41NHL+i1Rl3cEFfwZ7WT/IKPwkvRQzlN4x17RtaBS2IsLmmdXTXnWPHtBG0AXKuCXKE4T3dQMhcF1orf9EiPClVK25AoHm0bOXxmhhH7w+jgUVfAFkN6MA6wgzDBHHcEnwjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VsFGymEm; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jx9opyvl"
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2e3e18c240fso177441fa.0;
-        Mon, 06 May 2024 10:25:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715016333; x=1715621133; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KlSTRPnhOb9YugNVwB0fhclhKlg1U2+rfxRwVC8H+3o=;
-        b=jx9opyvlYv/OxTZztrIq+O8C7r2v6axlcOVKchfEInH1YGuNogGbXX0txJm4OXIOh/
-         a7cs89kIKTiItGldrnjN5jv65j/TwrlIPMsPDN3WdEO5VwwllCD5gv8TC5wzIpGropV4
-         G+X0Ju8c2EgiIB8yctlYFM1ztMCzbMvUf4pUtLeCnWfZl6a/02Z3E9F2tuWbe4P3W3Hj
-         xk9lHWNR83bD0rDdIZ7EAt5oxQEnu1ZbsD8b8KzQc6dSquo7b+9g9zRHTKb2+t7X/tul
-         WPNYVI8nWtwfLy94hlAb1bLhITd2Iqt4yRltDnRkn41zbraICQ9akuLzU7Abw2bV3lhx
-         eGDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715016333; x=1715621133;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KlSTRPnhOb9YugNVwB0fhclhKlg1U2+rfxRwVC8H+3o=;
-        b=D/ebVVwLLQvLh8bkP6MUjCepgiR1iDaOrKjLD6mqIPMFQ2/KzeI4FMqIVqL0QtI70L
-         wd5Gpq91HCxip9El4e28tlhuUEBqRJ0q9XhUiTY7jWksJanLVGMgExNIYBEfi4aHirVc
-         aDLhVU2vyHa4zFjds4TBsPbb0cs8Jj2t0UtYv8+jxJsxH8SZiFxy/2AOY7fVHIK9vH8y
-         M8oavfN0fwIc2AahZhMc9jaDeY+o3oEeZZSTfcgsoLbKX9/KZmaougd0+g8Q0X0zSCYj
-         tnOCsQvw6Gmqq6LOdIfSrNn6gj4SoOcld9PZiUhJhyV6S2HAByt1R9Jx7ZLpFaYYeNy1
-         /1/w==
-X-Forwarded-Encrypted: i=1; AJvYcCVWmE6c4G2cT5pz/NWW0DJs92MUf/jhn7Z9WQBYjP9CWkGfXTgRi2hYN83/2614lyniSIvFqNWz2pvGaGXzMUgBAjpFvCabBnsV2TZ6uARnVHe/5ehtOBb1RWYe1/br/+Ugvu3C2krfDbq+dio8
-X-Gm-Message-State: AOJu0Yw+kN44zhFZBOhCwEEm45bRTZ4xDpkgKY5I9wVaELLJWwpPjq7p
-	0CgvKLctt4Gq0d8I86S42h2Ap1KGPXnKrj7OhaxZ6M0Vr1XlLbx9TiAgrsN2oyus2HGKRucYrbh
-	gPI7sFIdQE4/bZETj3dC83BE/Abw=
-X-Google-Smtp-Source: AGHT+IE5IAuXqwrHSF2S6NDVOy+UTtC7fVhprycyI+gVY/X+RAwA9koL/O02RD9Mv9Y4RKVYPeP7BwOxWaYZ249mWr8=
-X-Received: by 2002:a2e:b8d2:0:b0:2da:7944:9547 with SMTP id
- s18-20020a2eb8d2000000b002da79449547mr11484426ljp.5.1715016332375; Mon, 06
- May 2024 10:25:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VsFGymEm"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715020223; x=1746556223;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=3dULno0Tr+lOcQq1CTHv0YMLDkY9SUl2xMPsi0kVfYg=;
+  b=VsFGymEm2D/Jzw3kONlUy+HVw9y5hgDWeqgOHChhfMFZVYqJBHEt8BZG
+   AQYoHF8TXKJQ6kkWcgg0ateqBA/iaS0KRiJtVpYsTLvC3L+9G0idY8+Df
+   35PJAjPQCY1jGRJdKb4zlsxsAGiDijkAfsNNLoj69cXXkZyzBLIJt2eAm
+   gOrecNN8DcTDDu3iJOWAmxyf9Uj8+gY32dqmckWdFeNhHd26z/jbReXad
+   wHwOYNyni81A/kziQVR2yYTmyWWcluNJRLIFaBnfgyv19GMZNb/8nnhUi
+   Gz52c5bH5pXrIW1yoTaTN3GMKTPx9TY0WyYgfeTVV1wweCGqc6/b4pXaf
+   g==;
+X-CSE-ConnectionGUID: IDK5sNoSRxCrkg8yRDUSIg==
+X-CSE-MsgGUID: fCUVjqyUTnOJWwYKjanppQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11065"; a="13733010"
+X-IronPort-AV: E=Sophos;i="6.07,259,1708416000"; 
+   d="scan'208";a="13733010"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2024 11:30:23 -0700
+X-CSE-ConnectionGUID: 4xocfMLCTJK7EcvVEoJ/xA==
+X-CSE-MsgGUID: HGLNa3PnTr29Bhu1uNy6dw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,259,1708416000"; 
+   d="scan'208";a="32721843"
+Received: from weba0535.iind.intel.com ([10.224.186.30])
+  by fmviesa005.fm.intel.com with ESMTP; 06 May 2024 11:30:21 -0700
+From: Ajay KV <ajay.k.v@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Ajay KV <ajay.k.v@intel.com>
+Subject: [PATCH BlueZ v2] bluetoothctl: Add submenu for Call control profile testing
+Date: Tue,  7 May 2024 02:56:43 +0300
+Message-Id: <20240506235643.114778-1-ajay.k.v@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240506022035.663102-1-iam@sung-woo.kim>
-In-Reply-To: <20240506022035.663102-1-iam@sung-woo.kim>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 6 May 2024 13:25:19 -0400
-Message-ID: <CABBYNZJPA_a0LmAArNcV4pyskhyeXzSRpe98Ksf=BSZ56ZA0zA@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: HCI: fix divide error in __get_blocks()
-To: Sungwoo Kim <iam@sung-woo.kim>
-Cc: daveti@purdue.edu, benquike@gmail.com, 
-	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi,
+This adds submeu in bluetoothctl for CCP Testing with
+options like answer and reject the active call . This feature
+is tested with windows machnine as CCP server which uses Teams
+application to make calls
 
-On Sun, May 5, 2024 at 10:21=E2=80=AFPM Sungwoo Kim <iam@sung-woo.kim> wrot=
-e:
->
-> hdev->block_len could be 0. Fix this by adding a check.
->
-> divide error: 0000 [#1] PREEMPT SMP KASAN NOPTI
-> CPU: 0 PID: 9622 Comm: kworker/u5:4 Tainted: G        W          6.9.0-rc=
-6-00001-g38e1170f515d-dirty #32
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/0=
-1/2014
-> Workqueue: hci11 hci_tx_work
-> RIP: 0010:__get_blocks net/bluetooth/hci_core.c:3618 [inline]
-> RIP: 0010:hci_sched_acl_blk net/bluetooth/hci_core.c:3766 [inline]
-> RIP: 0010:hci_sched_acl net/bluetooth/hci_core.c:3806 [inline]
-> RIP: 0010:hci_tx_work+0x73e/0x1d10 net/bluetooth/hci_core.c:3901
->
-> Fixes: b71d385a18cd ("Bluetooth: Recalculate sched HCI blk/pkt flow ctrl"=
-)
-> Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
-> ---
->  net/bluetooth/hci_core.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 0efd59760..20b1cd7f3 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -3762,7 +3762,7 @@ static void hci_sched_acl_blk(struct hci_dev *hdev)
->
->         __check_timeout(hdev, cnt, type);
->
-> -       while (hdev->block_cnt > 0 &&
-> +       while (hdev->block_len > 0 && hdev->block_cnt > 0 &&
->                (chan =3D hci_chan_sent(hdev, type, &quote))) {
->                 u32 priority =3D (skb_peek(&chan->data_q))->priority;
->                 while (quote > 0 && (skb =3D skb_peek(&chan->data_q))) {
-> --
-> 2.34.1
+Signed-off-by: Ajay KV <ajay.k.v@intel.com>
+---
+ Makefile.tools    |   4 +-
+ client/ccp_test.c | 212 ++++++++++++++++++++++++++++++++++++++++++++++
+ client/ccp_test.h |  12 +++
+ client/main.c     |   5 +-
+ 4 files changed, 231 insertions(+), 2 deletions(-)
+ create mode 100644 client/ccp_test.c
+ create mode 100644 client/ccp_test.h
 
-Hmm, this code shall probably be removed as well since
-HCI_FLOW_CTL_MODE_BLOCK_BASED was sort of tight to AMP support which
-we have removed support for, anyway this is failing late actually
-since we might have to check this during hci_conn_add with:
+diff --git a/Makefile.tools b/Makefile.tools
+index 679c914bf8cd..a5587427f549 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -13,7 +13,9 @@ client_bluetoothctl_SOURCES = client/main.c \
+ 					client/gatt.h client/gatt.c \
+ 					client/admin.h client/admin.c \
+ 					client/player.h client/player.c \
+-					client/mgmt.h client/mgmt.c
++					client/mgmt.h client/mgmt.c \
++					client/ccp_test.c \
++					client/ccp_test.h
+ client_bluetoothctl_LDADD = lib/libbluetooth-internal.la \
+ 			gdbus/libgdbus-internal.la src/libshared-glib.la \
+ 			$(GLIB_LIBS) $(DBUS_LIBS) -lreadline
+diff --git a/client/ccp_test.c b/client/ccp_test.c
+new file mode 100644
+index 000000000000..d53fc2393c13
+--- /dev/null
++++ b/client/ccp_test.c
+@@ -0,0 +1,212 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2024  Intel Corporation. All rights reserved.
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#define _GNU_SOURCE
++#include <stdio.h>
++#include <stdlib.h>
++#include "gdbus/gdbus.h"
++#include "lib/bluetooth.h"
++#include "src/shared/shell.h"
++#include "print.h"
++#include "ccp_test.h"
++
++/* String display constants */
++#define COLORED_NEW	COLOR_GREEN "NEW" COLOR_OFF
++#define COLORED_CHG	COLOR_YELLOW "CHG" COLOR_OFF
++
++#define BLUEZ_CCP_TEST_INTERFACE "org.bluez.CCPTest1"
++
++static DBusConnection *dbus_conn;
++static GDBusProxy *default_call;
++static GList *callList;
++static GDBusClient *client;
++
++static char *proxy_description(GDBusProxy *proxy, const char *title,
++			       const char *description)
++{
++	const char *path;
++
++	path = g_dbus_proxy_get_path(proxy);
++	return g_strdup_printf("%s%s%s%s %s ",
++					description ? "[" : "",
++					description ? : "",
++					description ? "] " : "",
++					title, path);
++}
++
++static void print_info(void *data, void *user_data)
++{
++	GDBusProxy *proxy = data;
++	const char *description = user_data;
++	char *str;
++
++	str = proxy_description(proxy, "CCPTest", description);
++
++	bt_shell_printf("%s%s\n", str,
++			default_call == proxy ? "[default]" : "");
++
++	g_free(str);
++}
++
++static void call_reject_reply(DBusMessage *message, void *user_data)
++{
++	DBusError error;
++
++	dbus_error_init(&error);
++
++	if (dbus_set_error_from_message(&error, message) == TRUE) {
++		bt_shell_printf("Failed to reject call: %s\n", error.name);
++		dbus_error_free(&error);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	bt_shell_printf("operation completed\n");
++
++	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++}
++
++static void cmd_reject(int argc, char *argv[])
++{
++	if (!default_call) {
++		bt_shell_printf("No active calls present\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	if (g_dbus_proxy_method_call(default_call, "reject", NULL,
++				     call_reject_reply, NULL, NULL) == FALSE) {
++		bt_shell_printf("Failed to reject call\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++}
++
++static void call_answer_reply(DBusMessage *message, void *user_data)
++{
++	DBusError error;
++
++	dbus_error_init(&error);
++
++	if (dbus_set_error_from_message(&error, message) == TRUE) {
++		bt_shell_printf("Failed to answer call: %s\n", error.name);
++		dbus_error_free(&error);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	bt_shell_printf("operation completed\n");
++
++	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++}
++
++static void cmd_answer(int argc, char *argv[])
++{
++	if (!default_call)
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++
++	if (g_dbus_proxy_method_call(default_call, "answer", NULL,
++				     call_answer_reply, NULL, NULL) == FALSE) {
++		bt_shell_printf("Failed to answer the call\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++}
++
++static const struct bt_shell_menu call_menu = {
++	.name = "ccp test",
++	.desc = "ccp test settings submenu",
++	.entries = {
++		    { "answer", NULL, cmd_answer, "answer the active call" },
++		    { "reject", NULL, cmd_reject, "reject the active call" },
++		   },
++};
++
++static void ccp_add_call(GDBusProxy *proxy)
++{
++	bt_shell_printf("[CHG] CCP Test caller added\n");
++	callList = g_list_append(callList, proxy);
++
++	if (!default_call)
++		default_call = proxy;
++
++	print_info(proxy, COLORED_NEW);
++}
++
++static void ccp_remove_call(GDBusProxy *proxy)
++{
++	bt_shell_printf("[CHG] CCP Test caller removed\n");
++
++	if (default_call == proxy)
++		default_call = NULL;
++
++	callList = g_list_remove(callList, proxy);
++}
++
++static void proxy_added(GDBusProxy *proxy, void *user_data)
++{
++	const char *interface;
++
++	interface = g_dbus_proxy_get_interface(proxy);
++
++	if (!strcmp(interface, BLUEZ_CCP_TEST_INTERFACE))
++		ccp_add_call(proxy);
++}
++
++static void proxy_removed(GDBusProxy *proxy, void *user_data)
++{
++	const char *interface;
++
++	interface = g_dbus_proxy_get_interface(proxy);
++
++	if (!strcmp(interface, BLUEZ_CCP_TEST_INTERFACE))
++		ccp_remove_call(proxy);
++}
++
++static void ccptest_property_changed(GDBusProxy *proxy, const char *name,
++				     DBusMessageIter *iter)
++{
++	char *str;
++
++	str = proxy_description(proxy, "CCP Test", COLORED_CHG);
++	print_iter(str, name, iter);
++	g_free(str);
++
++	bt_shell_printf("[CHG] CCP Test property : %s\n", name);
++}
++
++static void property_changed(GDBusProxy *proxy, const char *name,
++			     DBusMessageIter *iter, void *user_data)
++{
++	const char *interface;
++
++	interface = g_dbus_proxy_get_interface(proxy);
++
++	if (!strcmp(interface, BLUEZ_CCP_TEST_INTERFACE))
++		ccptest_property_changed(proxy, name, iter);
++}
++
++void ccptest_add_submenu(void)
++{
++	bt_shell_add_submenu(&call_menu);
++
++	dbus_conn = bt_shell_get_env("DBUS_CONNECTION");
++	if (!dbus_conn || client)
++		return;
++
++	client = g_dbus_client_new(dbus_conn, "org.bluez", "/org/bluez");
++
++	g_dbus_client_set_proxy_handlers(client, proxy_added, proxy_removed,
++					 property_changed, NULL);
++	g_dbus_client_set_disconnect_watch(client, NULL, NULL);
++}
++
++void ccptest_remove_submenu(void)
++{
++	g_dbus_client_unref(client);
++}
+diff --git a/client/ccp_test.h b/client/ccp_test.h
+new file mode 100644
+index 000000000000..fc2ab2042bb8
+--- /dev/null
++++ b/client/ccp_test.h
+@@ -0,0 +1,12 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2024 Intel Corporation. All rights reserved.
++ *
++ *
++ */
++
++void ccptest_add_submenu(void);
++void ccptest_remove_submenu(void);
+diff --git a/client/main.c b/client/main.c
+index c8b0f7f1c2d8..dba6dea639d9 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -34,6 +34,7 @@
+ #include "admin.h"
+ #include "player.h"
+ #include "mgmt.h"
++#include "ccp_test.h"
+ 
+ /* String display constants */
+ #define COLORED_NEW	COLOR_GREEN "NEW" COLOR_OFF
+@@ -3060,7 +3061,7 @@ static const struct bt_shell_menu gatt_menu = {
+ 					"Unregister application service" },
+ 	{ "register-includes", "<UUID> [handle]", cmd_register_includes,
+ 					"Register as Included service in." },
+-	{ "unregister-includes", "<Service-UUID> <Inc-UUID>",
++	{ "unregister-includes", "<Service-UUID><Inc-UUID>",
+ 			cmd_unregister_includes,
+ 				 "Unregister Included service." },
+ 	{ "register-characteristic",
+@@ -3199,6 +3200,7 @@ int main(int argc, char *argv[])
+ 
+ 	admin_add_submenu();
+ 	player_add_submenu();
++	ccptest_add_submenu();
+ 	mgmt_add_submenu();
+ 
+ 	client = g_dbus_client_new(dbus_conn, "org.bluez", "/org/bluez");
+@@ -3216,6 +3218,7 @@ int main(int argc, char *argv[])
+ 
+ 	admin_remove_submenu();
+ 	player_remove_submenu();
++	ccptest_remove_submenu();
+ 	mgmt_remove_submenu();
+ 
+ 	g_dbus_client_unref(client);
+-- 
+2.34.1
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 171a667bc991..73b9d08438fe 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -907,8 +907,16 @@ struct hci_conn *hci_conn_add(struct hci_dev
-*hdev, int type, bdaddr_t *dst,
-
-        switch (type) {
-        case ACL_LINK:
--               if (!hdev->acl_mtu)
--                       return ERR_PTR(-ECONNREFUSED);
-+               switch (hdev->flow_ctl_mode) {
-+               case HCI_FLOW_CTL_MODE_PACKET_BASED:
-+                       if (!hdev->acl_mtu)
-+                               return ERR_PTR(-ECONNREFUSED);
-+                       break;
-+               case HCI_FLOW_CTL_MODE_BLOCK_BASED:
-+                       if (!hdev->block_mtu)
-+                               return ERR_PTR(-ECONNREFUSED);
-+                       break;
-+               }
-                break;
-        case ISO_LINK:
-                if (hdev->iso_mtu)
-@@ -966,7 +974,14 @@ struct hci_conn *hci_conn_add(struct hci_dev
-*hdev, int type, bdaddr_t *dst,
-        switch (type) {
-        case ACL_LINK:
-                conn->pkt_type =3D hdev->pkt_type & ACL_PTYPE_MASK;
--               conn->mtu =3D hdev->acl_mtu;
-+               switch (hdev->flow_ctl_mode) {
-+               case HCI_FLOW_CTL_MODE_PACKET_BASED:
-+                       conn->mtu =3D hdev->acl_mtu;
-+                       break;
-+               case HCI_FLOW_CTL_MODE_BLOCK_BASED:
-+                       conn->mtu =3D hdev->block_mtu;
-+                       break;
-+               }
-                break;
-        case LE_LINK:
-                /* conn->src should reflect the local identity address */
-
---=20
-Luiz Augusto von Dentz
