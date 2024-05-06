@@ -1,89 +1,104 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A900381DF;
-	Mon,  6 May 2024 07:49:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1CDB1422D9
+	for <linux-bluetooth@vger.kernel.org>; Mon,  6 May 2024 09:44:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714981798; cv=none; b=sRmPgB7sbcCCiNWbvY91KwOk6ri9PByvrRYcFpjupaRWI0Ah3emR4T0oyPVgzCCQtm6JG851HQxYEYhcCySLK0HPIl5Ag8I2eWLAPx0TKK79X2EhO57ljsRbZ9PLzZ+vsPjblzOmRoS8pzb+pmh4nkoSxVMy7OP9M4/qnJg1nnQ=
+	t=1714988642; cv=none; b=t8F4CiJ0BsT/2dMuBKqxjvYAQdWIddIp68XVD9avrLN2vRQafGoOn6OmjEF5EJ0Tlbo/g3GnXnoWHUWoU+ZhsIAWFEAnJO0bL8+WqvRw5sTRYN/2oO22IbNulvZgDi6vOBr3ATE+xk4pzSYjxk8LpwH8iEtzV4bp4XONWD6VZi4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714981798; c=relaxed/simple;
-	bh=AldvdJy6yYm37EF3i71sslpEwK1DSJ9EjAmYdBn40qk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GDZRsnKtmDhbJhVzt/4iWdiesJF4QAOrFaVObHn0y7I1kTXHiCSGfUiEpvUbNMj6HO0JD7fLXeTYDaiR679C31/a3yprryeta2R5SHIF2QFYtisWcH5A58SI+Ds+wW/FzJdEhICHrR7Z737vbJSov1qvwrsMq5OMebSI57H/0PE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZNI0+H02; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1714988642; c=relaxed/simple;
+	bh=pdtb08AWXvOSDMJtN5nFihyWXYJ+ibN3jb5HRAInDzY=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Ei5DXlbthu8e6V2G8irCCDvgqj/v0Sg7eVBKmMlYFwIdL0tK8RoP0HYybkTUdBR88Luu/NcrUPUP5b2i5TGFKwz0Wx61oEpem/tR3EjFvcAmzVDERG3YVkoH1mLrWPlV2hC14u1+5q9IyGHWDhzze0pXPX6PAonUxIiECowzvLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gQkUOPoo; arc=none smtp.client-ip=209.85.222.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZNI0+H02"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F01EC116B1;
-	Mon,  6 May 2024 07:49:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714981797;
-	bh=AldvdJy6yYm37EF3i71sslpEwK1DSJ9EjAmYdBn40qk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZNI0+H02XjdjlVmR6Cx3OzWOiBtjcRpk3xgkvyOqbhDCkhMr3vHP0oh+i33tTx/Ma
-	 FV8nNda9MLbM3QZGm5z9ZtjgOTO+yw7dj7YUi9TuhDLjepQpIVJPklKABB1S6On5LW
-	 oJ5tds7uhKrQJhDZ857sGfoNTlZutt2i/iY/3cvCUzxoZS7Gngrkw54hHdt4axYBSt
-	 TU2TYdNBHJnGFHkCJMQnHXAIQdn4l+TT7XZfl1B55vuihq0/UG7H42wGAwwErVRL4n
-	 geNSjz9lviHD590Q4TJUXY1fPROtIF2HIQpsm1nanLDDA/Sy+5piOdWJ1+hdj+tU/1
-	 APz0SNhKevnhw==
-Received: from johan by xi.lan with local (Exim 4.97.1)
-	(envelope-from <johan@kernel.org>)
-	id 1s3t6k-000000007nV-09n7;
-	Mon, 06 May 2024 09:49:58 +0200
-Date: Mon, 6 May 2024 09:49:58 +0200
-From: Johan Hovold <johan@kernel.org>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Johan Hovold <johan+linaro@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: qca: Fix error code in
- qca_read_fw_build_info()
-Message-ID: <ZjiLphwtH2RvUChu@hovoldconsulting.com>
-References: <515be96c-4c44-44d5-891f-fe57275e9f47@moroto.mountain>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gQkUOPoo"
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-78ef9ce897bso146500185a.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 06 May 2024 02:44:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714988640; x=1715593440; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=BNFn3o4ig3m1wlIQ2tcvvd+Ebk+ma1EouhZcZk52cOU=;
+        b=gQkUOPooDgvogwqKpvEBPXz1CtqxOv2nZgNgt8X8we6ucaAtWxAGOnQ8NdzL6P63Fe
+         3E5+nxVsS8nF5PSSIa3be4kHhu/5izQmjNGq30OOiPU6dgcfvM5/cnsCa2l799QhCuXU
+         AfMu+tY09/QLM13lSQQW0P3GdC7tBnOeImAMDybF9ghWNIKpDK1I/1iZGJ5cPZakKFjX
+         NC1UhKrN53WFh3UQ6UhvWI3UE324H+ktpVy8zC+sYr6RCUogvtOUcmWbpvhSfUXOnYev
+         YzlIo54qxA7/j0+Nr/Y3LmSntC0IQVruII2X15NXsWhxI0KbkwRUGx8lSptQ6oCE2t8H
+         jHow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714988640; x=1715593440;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BNFn3o4ig3m1wlIQ2tcvvd+Ebk+ma1EouhZcZk52cOU=;
+        b=VS5RsoRJ3iV6PFUjVVkSbHKUv59IoiJMBPmX52v8eTmChEiWwOw2DDxGcsGjvPw/1S
+         EqXj0wcDLAoFTIFcIzaibGxA2Ly1GnvFeST6GVerJiwD4peOR2T1lauppTq+583yApDS
+         hO8DfqKIPPAdAPFKJCEqLAxK4rPvHbGHcAk/o2qk0xbTfftqTp8IQ9hEy36IDDTbAI7d
+         WnsUxv+2Pm0TnbRPqTKCuHKDzwmfyA3F3EeN3EUhVtS4nRRa3wnp+pvUkS0dpMBU+zDg
+         SNVzlind+UI04TMfANZPGRMuPG+y3O2tOsRydkd9gKLRjG1N+M1Nw1J+xPLS+L2o87Of
+         0Obw==
+X-Gm-Message-State: AOJu0YwZoZabfumZUQe2vjDtPWdstDM+RPjU5G3dK/8bsIq1Cw6dOZHt
+	jHxKqon+8pZWh5RXDabadtyNb1zZJG6yf8bMD8rV73Jdha+PttuB1V35hg==
+X-Google-Smtp-Source: AGHT+IGvDTAGjcy1do5IU+tvyLBuV+q8kp5RlirDdk1wBlNbNmrmvijwshparq9J7ryBLIV5LDKjww==
+X-Received: by 2002:a05:620a:ed1:b0:790:f5a4:4416 with SMTP id x17-20020a05620a0ed100b00790f5a44416mr8660959qkm.64.1714988639597;
+        Mon, 06 May 2024 02:43:59 -0700 (PDT)
+Received: from [172.17.0.2] ([172.183.130.206])
+        by smtp.gmail.com with ESMTPSA id j10-20020a05620a410a00b0079297c6be3esm907681qko.66.2024.05.06.02.43.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 May 2024 02:43:59 -0700 (PDT)
+Message-ID: <6638a65f.050a0220.d19ed.21a2@mx.google.com>
+Date: Mon, 06 May 2024 02:43:59 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7720614062698282217=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <515be96c-4c44-44d5-891f-fe57275e9f47@moroto.mountain>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, quic_nakella@quicinc.com
+Subject: RE: [v1] Bluez: unregister-includes option is not working in bluetoothctl
+In-Reply-To: <20240506074043.4200-1-quic_nakella@quicinc.com>
+References: <20240506074043.4200-1-quic_nakella@quicinc.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Sat, May 04, 2024 at 02:25:43PM +0300, Dan Carpenter wrote:
-> Return -ENOMEM on allocation failure.  Don't return success.
+--===============7720614062698282217==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Thanks, Dan.
+This is automated email and please do not reply to this email!
 
-Fortunately this error path is never taken due to the small allocation
-size, but if it were it would only lead to a debugfs attribute holding
-the fw build id not being created.
+Dear submitter,
 
-That said, it should still be fixed of course even this can wait for
-6.10-rc1.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=850695
 
-> Fixes: cfc2a7747108 ("Bluetooth: qca: fix info leak when fetching fw build id")
+---Test result---
 
-This one should also have a matching:
+Test Summary:
+CheckPatch                    PASS      0.37 seconds
+GitLint                       PASS      0.41 seconds
+BuildEll                      PASS      24.73 seconds
+BluezMake                     PASS      1695.16 seconds
+MakeCheck                     PASS      13.70 seconds
+MakeDistcheck                 PASS      184.12 seconds
+CheckValgrind                 PASS      253.21 seconds
+CheckSmatch                   PASS      353.00 seconds
+bluezmakeextell               PASS      119.61 seconds
+IncrementalBuild              PASS      1494.55 seconds
+ScanBuild                     PASS      999.77 seconds
 
-Cc: stable@vger.kernel.org	# 5.12
 
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 
-Reviewed-by: Johan Hovold <johan+linaro@kernel.org>
+---
+Regards,
+Linux Bluetooth
 
-> @@ -136,8 +136,10 @@ static int qca_read_fw_build_info(struct hci_dev *hdev)
->  	}
->  
->  	build_label = kstrndup(&edl->data[1], build_lbl_len, GFP_KERNEL);
-> -	if (!build_label)
-> +	if (!build_label) {
-> +		err = -ENOMEM;
->  		goto out;
-> +	}
->  
->  	hci_set_fw_info(hdev, "%s", build_label);
 
-Johan
+--===============7720614062698282217==--
