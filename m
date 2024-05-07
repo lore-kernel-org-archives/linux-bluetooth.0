@@ -1,104 +1,128 @@
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from air.basealt.ru (air.basealt.ru [194.107.17.39])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E8A56F525
-	for <linux-bluetooth@vger.kernel.org>; Tue,  7 May 2024 11:41:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 158046F525;
+	Tue,  7 May 2024 11:43:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.39
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715082109; cv=none; b=lDr6hSXmNHWI9JqwVbKw7ty8Nd8HcaUBx5RtazU6W9XGqFSUWFvU4jZC0SsuQpPih2/w9Uw5gHjpE7NGiIRhU5fFCCzSKsraBDCRN8f8qk9Q4rLwfJMA7LWnNFWegfGUZRisHKahuZDB4jlmIfa6Mnm/GSwSU2NDFN9nPhdwYuo=
+	t=1715082184; cv=none; b=NjoTVaABLKUkpnJ7sTkjtcb7nYv9Jmgae3egx+2PjHU8UYzkSICwCDQmOQ9WkDsaRsp/bJdcsni0miu/S3m1vFFY9bK/LTt6zMKIrBQtnephKxAJiVHyInzv7yVXKLcQ66hB24PT95vHPC60hlHFLvsy9saTnH/ChL3aAiXBYsM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715082109; c=relaxed/simple;
-	bh=EcuwrlW8W8MHWwWmRDYLBgH/Md1xuSVe45Gw2QUUZzM=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=tSePjkIye0768/uojDrXuM2/VQyxne3WVinfSBgClTD27w66ai8YKS4HpboZmm4CXrgT9MoUqmbI1Zg5FstGqPVmFEwYN1SCzFg/Do6TPapaTJRaghdHzVdX3qBOJfT0QpwiEBCTi5m122T33p6ZduGUFBvs8iYIKdAxmHkLCm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cUnIJOq5; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cUnIJOq5"
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6f460e05101so1862846b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 May 2024 04:41:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715082107; x=1715686907; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=amwfW/z5eDKNNMK4jgDweu9TkD7VT3rJGTUL26i62Ho=;
-        b=cUnIJOq5ehBvY4mBYPBH58a1u5f47YdDcw6mKpxBflYELjbiJFOQltHUpKMCvHWuLT
-         5syHDkrtFpwGh7qWyYlH0A1F76Y5MwUcW+nFaK5BMFo9hthlUxZ9c8WToYoMmf/L59hq
-         q69DM1oLjlvEr3zkUSemfCuUnSYcXK+dtSdaFfXcl/5kYeN1P5FEpKIhex5Esf80rOiQ
-         EsGix/IUBfhnfB4a+Cx7giHaEisMTNo/vGgpNNQ17hwqqQPaEPclIcpje+KSsnvWVs4P
-         EpyeGjONcF9Cq4iy5P/OJtQBkps8927urnYcyjneD1fqZvTrkfbu728xooUbb13+t/A3
-         xOoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715082107; x=1715686907;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=amwfW/z5eDKNNMK4jgDweu9TkD7VT3rJGTUL26i62Ho=;
-        b=h8r7e+Eci/t9b3t39/Ltz1y1Y3HBuiElRIUYdvXbP8psxuO0bFE/6ZlnWMgdxOlt0R
-         Q/gjuv3SkQ+RXh29xuiBAhqzimUebqinFzgtXKNV5ors8RXRJYjy83hf9u5z3nGRTFa1
-         UkR68qf0RqQXXtLtMHDF77VkeGX438Gyt3+LcyGaidhM385awh96UMpP/Kd3oLTKVK7X
-         FeOciW4+e/05S2Psd9vaxa4cbDPWiMj+AicVymsGZ1GgW2ZeIvywmnhP9FPh66PUSGA+
-         n6ZV3XoDSCmfMDFHcfrq2TvcJkahGRH7RzvzDvYCkVNZo2jq1HcuXSQ8PfPT+Nt3eK+r
-         t3rQ==
-X-Gm-Message-State: AOJu0YwDEWVX3cv6zBuOggMth/HRsQdPWWUPBs+IrdVwnYgDxsPLk15O
-	7581IDrSMDrHcxu9PDjS5N2o8DZXn7nLboH6TCXSNry2ESLOV1kDCTYGfQ==
-X-Google-Smtp-Source: AGHT+IEn1CQTvYxsyVb9GLFThV3t6Ao9/8FosIFoHaJ4UDheM43AZcxjSKfyp0yIsM/WIE5SkBp01Q==
-X-Received: by 2002:a05:6a20:a124:b0:1ad:8f18:8625 with SMTP id q36-20020a056a20a12400b001ad8f188625mr3722455pzk.28.1715082107414;
-        Tue, 07 May 2024 04:41:47 -0700 (PDT)
-Received: from [172.17.0.2] ([138.91.70.182])
-        by smtp.gmail.com with ESMTPSA id t14-20020a056a0021ce00b006f45a538b19sm5736499pfj.87.2024.05.07.04.41.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 May 2024 04:41:47 -0700 (PDT)
-Message-ID: <663a137b.050a0220.a9c9a.dfc9@mx.google.com>
-Date: Tue, 07 May 2024 04:41:47 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7302269061984832150=="
+	s=arc-20240116; t=1715082184; c=relaxed/simple;
+	bh=48MNBx4lKU8jug/3dAjRcd+PwBhYp8+m1AtXcjxvV+4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=u0EPHIIqqr0R6YiX+xWNz9/qNtck2kXXV24FA3iy76r1v3eltRqWKH0mgyVKbYRUkxRas7iAqesiIungxjZLAIH1jLKF2WPkMx6X0w2bcs8kGdz7/tWEHYHVerWGfgtpyIW6O6F5t+JeuyC776BANipRUoBOs1qA/6WYZJ7k7CE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
+Received: by air.basealt.ru (Postfix, from userid 490)
+	id 668D72F20249; Tue,  7 May 2024 11:42:52 +0000 (UTC)
+X-Spam-Level: 
+Received: from shell.ipa.basealt.ru (unknown [176.12.98.74])
+	by air.basealt.ru (Postfix) with ESMTPSA id 0DF652F20245;
+	Tue,  7 May 2024 11:42:52 +0000 (UTC)
+From: Alexander Ofitserov <oficerovas@altlinux.org>
+To: oficerovas@altlinux.org,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: lvc-project@linuxtesting.org,
+	dutyrok@altlinux.org,
+	kovalev@altlinux.org
+Subject: [PATCH] Bluetooth: RFCOMM: possible deadlock in rfcomm_dlc_exists
+Date: Tue,  7 May 2024 14:42:44 +0300
+Message-ID: <20240507114244.120751-1-oficerovas@altlinux.org>
+X-Mailer: git-send-email 2.42.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, ajay.k.v@intel.com
-Subject: RE: [BlueZ,v3] bluetoothctl: Add submenu for Call control profile testing
-In-Reply-To: <20240507150430.689504-1-ajay.k.v@intel.com>
-References: <20240507150430.689504-1-ajay.k.v@intel.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============7302269061984832150==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+This bug was found by syzkaller.
+This bug is also very similar to another RFCOMM possible deadlock
+in rfcomm_dlc_exists. Both of these bugs are present in syzbot.
+Patch fixes two of these possible dedlock errors.
+Also this particular patch was already written in march of 2023
+by Hillf Danton, but seems like it just got lost or forgotten.
+Links to these bugs and original patch on syzbot:
+Link: https://syzkaller.appspot.com/bug?extid=b69a625d06e8ece26415
+Link: https://syzkaller.appspot.com/bug?extid=d7ce59b06b3eb14fd218
+Link: https://syzkaller.appspot.com/text?tag=Patch&x=133a6835c80000
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=851094
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.30 seconds
-GitLint                       PASS      0.19 seconds
-BuildEll                      PASS      24.89 seconds
-BluezMake                     PASS      1705.55 seconds
-MakeCheck                     PASS      13.07 seconds
-MakeDistcheck                 PASS      178.77 seconds
-CheckValgrind                 PASS      249.36 seconds
-CheckSmatch                   PASS      353.04 seconds
-bluezmakeextell               PASS      120.03 seconds
-IncrementalBuild              PASS      1477.28 seconds
-ScanBuild                     PASS      1024.32 seconds
-
-
-
+Signed-off-by: Alexander Ofitserov <oficerovas@altlinux.org>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/rfcomm/core.c |  2 +-
+ net/bluetooth/rfcomm/sock.c |  2 --
+ net/bluetooth/rfcomm/tty.c  | 11 +++++++----
+ 3 files changed, 8 insertions(+), 7 deletions(-)
 
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index 1d34d849703329..d8502914e3602c 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -490,8 +490,8 @@ static int __rfcomm_dlc_close(struct rfcomm_dlc *d, int err)
+ 
+ 		rfcomm_dlc_lock(d);
+ 		d->state = BT_CLOSED;
+-		d->state_change(d, err);
+ 		rfcomm_dlc_unlock(d);
++		d->state_change(d, err);
+ 
+ 		skb_queue_purge(&d->tx_queue);
+ 		rfcomm_dlc_unlink(d);
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index 29aa07e9db9d71..cbff37b3273407 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -865,9 +865,7 @@ static int rfcomm_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned lon
+ 
+ 	if (err == -ENOIOCTLCMD) {
+ #ifdef CONFIG_BT_RFCOMM_TTY
+-		lock_sock(sk);
+ 		err = rfcomm_dev_ioctl(sk, cmd, (void __user *) arg);
+-		release_sock(sk);
+ #else
+ 		err = -EOPNOTSUPP;
+ #endif
+diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+index 69c75c041fe10a..5be21b987141fc 100644
+--- a/net/bluetooth/rfcomm/tty.c
++++ b/net/bluetooth/rfcomm/tty.c
+@@ -403,9 +403,12 @@ static int __rfcomm_create_dev(struct sock *sk, void __user *arg)
+ 		return -EPERM;
+ 
+ 	if (req.flags & (1 << RFCOMM_REUSE_DLC)) {
++		lock_sock(sk);
+ 		/* Socket must be connected */
+-		if (sk->sk_state != BT_CONNECTED)
++		if (sk->sk_state != BT_CONNECTED) {
++			release_sock(sk);
+ 			return -EBADFD;
++		}
+ 
+ 		dlc = rfcomm_pi(sk)->dlc;
+ 		rfcomm_dlc_hold(dlc);
+@@ -422,13 +425,13 @@ static int __rfcomm_create_dev(struct sock *sk, void __user *arg)
+ 	}
+ 
+ 	id = rfcomm_dev_add(&req, dlc);
+-	if (id < 0)
+-		return id;
+ 
+ 	if (req.flags & (1 << RFCOMM_REUSE_DLC)) {
+ 		/* DLC is now used by device.
+ 		 * Socket must be disconnected */
+-		sk->sk_state = BT_CLOSED;
++		if (!(id < 0))
++			sk->sk_state = BT_CLOSED;
++		release_sock(sk);
+ 	}
+ 
+ 	return id;
+-- 
+2.42.1
 
---===============7302269061984832150==--
