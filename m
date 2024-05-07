@@ -1,59 +1,59 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DA9A4A06
-	for <linux-bluetooth@vger.kernel.org>; Tue,  7 May 2024 01:45:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5559023A6
+	for <linux-bluetooth@vger.kernel.org>; Tue,  7 May 2024 01:45:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715046317; cv=none; b=mvfSey2obFAsB8FKj1gMntp+xDx1xVOIEsxDpn9TZqR8jn6EWs0KPgCq7KxNux0pfW4xJ8TBYiSaDUKvRJGvzOgYAjjnyE7yMOnq/BXbvm3To7jYmyjhskNt5B08x9fBB4tad3Qd99TNTx/vIimyqV9XCTkUt5CxWkpQbTMyEVk=
+	t=1715046319; cv=none; b=tiEhkIBEUF+P+hAjDgRNGqMdfS4Entl7pEUPZSOrcEIHhKtFqLDmUbOwYtrU3Kmve3RkoSVu8tgO/cX2Kv4zWKNeR7d5tNKTkDaFkf1FA060DtinY1pFQLB4Zl+Ri6NVPpPkg5GQJmlzerZK7udn1Nn8LJNUE87XWj4X4yFw+1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715046317; c=relaxed/simple;
-	bh=aMb6l5SzINQrDIe3A42Hv4PNu3Vya7yIjC0KscUbw7U=;
+	s=arc-20240116; t=1715046319; c=relaxed/simple;
+	bh=Pv1AQtJOYkxC1yQA8no3goFIzvaWgQo7xKQd+D4EqU8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ueAatbZHyxv5/Gv5xDBFm+X3CGoscwfDwhGBUODVVjRPMgZry9jlNdI8piIhrQ7NC7+7Q+nwkqC8ZkfrQOeYLQ9F9APW+wJSLryILCu3VVvL8pVx6n9+HnpinqHmQbCVs0h+d/hXFbXzVKgXHe3JTCQBzGnjZESKyxnBdncNh4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WCtDbXbg; arc=none smtp.client-ip=192.198.163.19
+	 Content-Type:Content-Disposition:In-Reply-To; b=EKvgnkdzzCbd7MjSfV4FJ1ls6e2n4JmndEph3oGRxfxV9jK19xfku2xBpB8UiQidZDwQe/4NYXls2gZ4CDwYIHSg/D9DYpyUAwdDn95b8PCLzft0R1ahSCjMYGfsSd7t1658C0nLqQzDSwtZZm0JyzGxRfBfpeuOm0GiJ026DVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fmWvGx8k; arc=none smtp.client-ip=192.198.163.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WCtDbXbg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fmWvGx8k"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715046315; x=1746582315;
+  t=1715046317; x=1746582317;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=aMb6l5SzINQrDIe3A42Hv4PNu3Vya7yIjC0KscUbw7U=;
-  b=WCtDbXbgrqH9XgdSZonIS+T5hflTumu++NJtr4WKn0ggSLcbsUyRN4Ys
-   BJlliIZY/J3g5I+WIubyLmCBNFjhROhalzsjo5//Vh6ZzXnycotc0oanz
-   cN6GptRy/Z9w4alseZ9FKh6xXEAMLlMadq92rznunqlQxRiFliDHdDVZX
-   kDUuATSYfJZJIFb60RfMmf7sMAH8R1KOYsH03sDrpuu04EyhnL6VrKBm6
-   bLKKBZwglqIPr3nv0aFd74j1YnTldPwEIy2Czcx2I5w1Y4oZo6/QRfMff
-   CFlToZMr9ZDTB+Hq758J7gN7AYRgL6CrlatPxU57hNjFaC6bnQYrgWCko
-   w==;
-X-CSE-ConnectionGUID: 8gfUBnfDRT+j6GKJ/qoVOA==
-X-CSE-MsgGUID: tg/RifK9QPehQwMXYFDefg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11065"; a="10692307"
+  bh=Pv1AQtJOYkxC1yQA8no3goFIzvaWgQo7xKQd+D4EqU8=;
+  b=fmWvGx8k7FVWHRdOuJE63jsJkfR/Nnqu+mo7XHY4u1uzA2/BFB0o1jMf
+   ESyNRgxZrb1My0E/+GJt2j4Zm/tkTotGtJtJRguHj9VuZNKsCXF9RTiYp
+   ZpbahbDWooej5H3Nobaa9+uzGuW7U5dX5q4DQDRA/P9UfIm9abgZJo4hW
+   BfHPg/5xRYTfQGAohqHxXpyjBLbIqkn97kxR0r2yU/ILVTTtRtdW52sIN
+   sqggbXrqpoOyIKGUiVXxgcqVuXj6JZbgS/CL3c1aGdF0wFXyyfaMXJVMD
+   hgdrq9CC2RMQ/+4tfhkczfprIoj9vbi87cApa1SLMC5e9onvTt2QPXZ/B
+   g==;
+X-CSE-ConnectionGUID: rWkci3PNQLyb0dpqk6K7pw==
+X-CSE-MsgGUID: 1PPCNi6vSxuby3+b+8CcJA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11065"; a="10692310"
 X-IronPort-AV: E=Sophos;i="6.07,260,1708416000"; 
-   d="scan'208";a="10692307"
+   d="scan'208";a="10692310"
 Received: from orviesa002.jf.intel.com ([10.64.159.142])
   by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2024 18:45:15 -0700
-X-CSE-ConnectionGUID: qkRfkDBwTGuygqt/Qz5YcA==
-X-CSE-MsgGUID: ZhA+i71gQqq+3ukEjAZrtA==
+X-CSE-ConnectionGUID: mT/Q3UGcSUejYskr7pmnHg==
+X-CSE-MsgGUID: X5fdfTvqSXaULbUPjlhPUw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,260,1708416000"; 
-   d="scan'208";a="59207568"
+   d="scan'208";a="59207567"
 Received: from lkp-server01.sh.intel.com (HELO f8b243fe6e68) ([10.239.97.150])
   by orviesa002.jf.intel.com with ESMTP; 06 May 2024 18:45:13 -0700
 Received: from kbuild by f8b243fe6e68 with local (Exim 4.96)
 	(envelope-from <lkp@intel.com>)
-	id 1s49tG-0001D7-1W;
+	id 1s49tG-0001D9-1e;
 	Tue, 07 May 2024 01:45:10 +0000
-Date: Tue, 7 May 2024 09:44:54 +0800
+Date: Tue, 7 May 2024 09:44:52 +0800
 From: kernel test robot <lkp@intel.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	linux-bluetooth@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev
 Subject: Re: [PATCH v1] Bluetooth: HCI: Remove HCI_AMP support
-Message-ID: <202405070923.rBc4Hrwx-lkp@intel.com>
+Message-ID: <202405070914.iRNrUUQb-lkp@intel.com>
 References: <20240506223758.460710-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -79,26 +79,21 @@ url:    https://github.com/intel-lab-lkp/linux/commits/Luiz-Augusto-von-Dentz/Bl
 base:   next-20240506
 patch link:    https://lore.kernel.org/r/20240506223758.460710-1-luiz.dentz%40gmail.com
 patch subject: [PATCH v1] Bluetooth: HCI: Remove HCI_AMP support
-config: arm64-defconfig (https://download.01.org/0day-ci/archive/20240507/202405070923.rBc4Hrwx-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240507/202405070923.rBc4Hrwx-lkp@intel.com/reproduce)
+config: arm-defconfig (https://download.01.org/0day-ci/archive/20240507/202405070914.iRNrUUQb-lkp@intel.com/config)
+compiler: clang version 14.0.6 (https://github.com/llvm/llvm-project.git f28c006a5895fc0e329fe15fead81e37457cb1d1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240507/202405070914.iRNrUUQb-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202405070923.rBc4Hrwx-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202405070914.iRNrUUQb-lkp@intel.com/
 
 All errors (new ones prefixed by >>):
 
-   drivers/bluetooth/btmrvl_main.c: In function 'btmrvl_register_hdev':
->> drivers/bluetooth/btmrvl_main.c:682:13: error: 'struct hci_dev' has no member named 'dev_type'
-     682 |         hdev->dev_type = priv->btmrvl_dev.dev_type;
-         |             ^~
---
-   drivers/bluetooth/btrsi.c: In function 'rsi_hci_attach':
->> drivers/bluetooth/btrsi.c:137:13: error: 'struct hci_dev' has no member named 'dev_type'
-     137 |         hdev->dev_type = HCI_PRIMARY;
-         |             ^~
+>> drivers/bluetooth/btmrvl_main.c:682:8: error: no member named 'dev_type' in 'struct hci_dev'
+           hdev->dev_type = priv->btmrvl_dev.dev_type;
+           ~~~~  ^
+   1 error generated.
 
 
 vim +682 drivers/bluetooth/btmrvl_main.c
