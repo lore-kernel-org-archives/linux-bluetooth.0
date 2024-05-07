@@ -1,138 +1,237 @@
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDB8614EC79
-	for <linux-bluetooth@vger.kernel.org>; Tue,  7 May 2024 15:32:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF881161331
+	for <linux-bluetooth@vger.kernel.org>; Tue,  7 May 2024 15:42:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715095936; cv=none; b=LXShltG71XoSoOTxO/Qvs00jVBSZAHwo5xMemBcia1Kg8ExHbJYXe5nxkEro/rEN108di6CPS8HIbchV2IcCL1s4eKSuqw4Kv40B3TevColf0jdevxcx2MIJZtd+DYNlMrAc8kkeyNjnYawtlY7lzEkHpCVV6wQa4S3Cc7tUJg0=
+	t=1715096561; cv=none; b=QUd0YkVVU22UqKRbvc+zO8o6RrY257O9yS455vQZprb7Zc4ekw4a5O8Jvj9ELJvuLTUhUMKGdMWc8QpeZd5ZG3XkqUlPoX/YafTAYEBsKaC4ngYdwqMt67mY5ilgWA9PIQjC2ZULB6IP1hua4ADqDUAhF9CLaY5SEqE7FiNvBj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715095936; c=relaxed/simple;
-	bh=d1aRwX7mll0mhAb8+L5FgSZxIppe+h7UUpEkMu3SF2Q=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=qzCipelYD9YzuCfXjUE9o+8diMEa/TEJDZowQ9bcyYzcyVjfhdzy/FUqk+QurrjTt8dyEQUcSA/eqhoHStPP/+noyi8qCYbw7nTnPKR5J4k/zwbxQblNNnvafl9e6DnqvrRx7Mt38DVEvKFIbqghUX3jcZQYuMOD5riwVKb+sD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nQuxxaad; arc=none smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1715096561; c=relaxed/simple;
+	bh=Rffl3XV8DDDFTCcf7BQZxXbkVeC011+bls3yflO8WSg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dn0cKMy2tsXgAc8CGhTx47hYY0JjoTf/bPeE+s/Paujq8yJUSVd3NMrfsZnP6T8PIuP4sq+uXaFz2cKs2b3WM0poozR4mmem5dhgyRJAZC2jrtjpnErPgqfgTZuqRvJuN8fJ8bon/CakDw1/FJxReGUry5Lgk2mULrrfn7N+DWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TjZgrgdL; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nQuxxaad"
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-79291d441fbso306130485a.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 May 2024 08:32:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715095934; x=1715700734; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=pkN9faLltL5/b4Xr4+JO98ht8UdYB1eYt7JJthXc360=;
-        b=nQuxxaadIUIBGqOuGPPKLn+ttyufu8H4DWuzx+OiEY2kyoQM4ox1934d8/MjD29rGG
-         YD4pfuPFw5zuM5QyYEEy4GrWRUdfAX65cPvOe24nw6a3bR3k4yXGkRiHcdD6iL/1Uhsd
-         GDy79Lzeziai28EbcvWkfda/TDWKpTzIo9GQDaHxAoDfGycSrf5gRagEnXfLFhUnEiOU
-         BlY6iJ6AKWjRhuh83W7xP6skwC3CGqYJ0otLo8mY6DRboAv+OPbJycL2L9KnveGBsE4t
-         FAhZTEaNgXcDA834LgeCSbwWWLonNHlKhxAWJbvtACGvau7djrZzYfGmjUsriP/VEeJr
-         FZGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715095934; x=1715700734;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pkN9faLltL5/b4Xr4+JO98ht8UdYB1eYt7JJthXc360=;
-        b=ctHeWqUNHW9q8s2+Vh06BWW3XCJ6hZEUDC24T2wRpUBERHt2oLYS9hvMiT+GNaHfoW
-         is39rEz91h872D2DFM5KnWvAtxiGlTyyLLfeNqj6+1RJu03cTag1G5i7DtM6IvV0TQd5
-         AMFdMQl6LhTU5hvsbyUA/FjZtBptuP7fGi3E8IPhD0txXkthagb/EIFstFS1DqXI6jLX
-         SU2OtsY0Tp73MBIzjAc2/+GM5wJzg0VKSnxe9q42bwxBy7+P1W0LA1Fj+naNpHBhbhy9
-         LPO9E3Q+WIfLIwAs9whl9L6BEnhXNw7/5LKqQJ4n+1Hl+u0b3rdXBqzUcJepGnLQ+oxL
-         zlyQ==
-X-Gm-Message-State: AOJu0YyaaSRcL6JJDIJxeQLO527Gry77P/n/c1XfsBFGULgGj3qzXIrp
-	AbZQr+Q94gHRk3WC6XOtxtNZvMFhvhdQ4Iv9VjqsOejE7WKxiTcJkLciHQ==
-X-Google-Smtp-Source: AGHT+IEpHsd9BhG1WICI6OFHu+U1CWVyaGgk1Ke7SM5oMrWuXDAg/r+ZEJPzXUC9lJ0oLUN5kSu5nw==
-X-Received: by 2002:a05:620a:4709:b0:790:95cf:c784 with SMTP id bs9-20020a05620a470900b0079095cfc784mr18603818qkb.78.1715095933694;
-        Tue, 07 May 2024 08:32:13 -0700 (PDT)
-Received: from [172.17.0.2] ([172.183.106.197])
-        by smtp.gmail.com with ESMTPSA id x5-20020a05620a0b4500b007929602e42asm2359580qkg.96.2024.05.07.08.32.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 May 2024 08:32:13 -0700 (PDT)
-Message-ID: <663a497d.050a0220.99cab.8529@mx.google.com>
-Date: Tue, 07 May 2024 08:32:13 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2029867690278880697=="
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TjZgrgdL"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715096560; x=1746632560;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Rffl3XV8DDDFTCcf7BQZxXbkVeC011+bls3yflO8WSg=;
+  b=TjZgrgdLrggPT+KiBMhhIiA2RBwzUQrRRXkv86+0ZISKpzgOfuzA/s9x
+   FYHaxtpHyAPmHuhEkR1XkEUJm4bPS862DeH2OglSs0IKaIGeDjGZZIsOM
+   wvbYXMJmLWvhg/jSXFISEeUj/3hCuTn5RAVTzr/JytOybAjHLUMGENXI0
+   wt6Fj+2wHZzH98PW09PGE2Q09sJoIaQZhckxKyYVYEyr74yM26LJEqYPh
+   S1jPL4Ml8+tE9cTZLQWKDqCHP6hr1FNQH8tuJx1Hef8AM8QhYdtJjnBMy
+   bHZrY3NQH5U1q8wEgaRznU3SkMaGBW+l9S7ywhJr7L8e4ejY+hBbv9BT4
+   g==;
+X-CSE-ConnectionGUID: gXxF6bRiSxOejylnxG2FLg==
+X-CSE-MsgGUID: 5uOmCbzPQFaLIcisV30ZTA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11066"; a="11026636"
+X-IronPort-AV: E=Sophos;i="6.08,142,1712646000"; 
+   d="scan'208";a="11026636"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2024 08:42:39 -0700
+X-CSE-ConnectionGUID: Hu09qzZNQbGBzFovn3SLmA==
+X-CSE-MsgGUID: 2vK8dCoETIeITKywAPF+4A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,142,1712646000"; 
+   d="scan'208";a="28647362"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by orviesa009.jf.intel.com with ESMTP; 07 May 2024 08:42:37 -0700
+From: Kiran K <kiran.k@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	chandrashekar.devegowda@intel.com,
+	helgaas@kernel.org,
+	pmenzel@molgen.mpg.de,
+	Kiran K <kiran.k@intel.com>
+Subject: [PATCH v2 1/3] Bluetooth: btintel: Export few static functions
+Date: Tue,  7 May 2024 21:26:56 +0530
+Message-Id: <20240507155658.294676-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v2] Bluetooth: HCI: Remove HCI_AMP support
-In-Reply-To: <20240507143639.539863-1-luiz.dentz@gmail.com>
-References: <20240507143639.539863-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============2029867690278880697==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Some of the functions used in btintel.c is made global so that they can
+be reused in other transport drivers apart from USB.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=851233
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      4.09 seconds
-GitLint                       PASS      0.28 seconds
-SubjectPrefix                 PASS      0.10 seconds
-BuildKernel                   PASS      30.43 seconds
-CheckAllWarning               PASS      33.26 seconds
-CheckSparse                   WARNING   39.06 seconds
-CheckSmatch                   FAIL      34.73 seconds
-BuildKernel32                 PASS      29.05 seconds
-TestRunnerSetup               PASS      523.69 seconds
-TestRunner_l2cap-tester       PASS      18.21 seconds
-TestRunner_iso-tester         PASS      31.03 seconds
-TestRunner_bnep-tester        PASS      4.70 seconds
-TestRunner_mgmt-tester        PASS      121.03 seconds
-TestRunner_rfcomm-tester      PASS      7.19 seconds
-TestRunner_sco-tester         PASS      14.93 seconds
-TestRunner_ioctl-tester       PASS      7.67 seconds
-TestRunner_mesh-tester        PASS      5.80 seconds
-TestRunner_smp-tester         PASS      6.75 seconds
-TestRunner_userchan-tester    PASS      4.84 seconds
-IncrementalBuild              PASS      27.92 seconds
-
-Details
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-##############################
-Test: CheckSmatch - FAIL
-Desc: Run smatch tool with source
-Output:
-
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
-make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
-make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: net] Error 2
-make[2]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
-make[4]: *** Waiting for unfinished jobs....
-make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
-make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
-make: *** [Makefile:240: __sub-make] Error 2
-
-
+Signed-off-by: Kiran K <kiran.k@intel.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btintel.c | 26 +++++++++++++---------
+ drivers/bluetooth/btintel.h | 43 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 59 insertions(+), 10 deletions(-)
 
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 4f4bd5538b6e..0c855c3ee1c1 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -245,7 +245,7 @@ static int btintel_set_diag_combined(struct hci_dev *hdev, bool enable)
+ 	return ret;
+ }
+ 
+-static void btintel_hw_error(struct hci_dev *hdev, u8 code)
++void btintel_hw_error(struct hci_dev *hdev, u8 code)
+ {
+ 	struct sk_buff *skb;
+ 	u8 type = 0x00;
+@@ -277,6 +277,7 @@ static void btintel_hw_error(struct hci_dev *hdev, u8 code)
+ 
+ 	kfree_skb(skb);
+ }
++EXPORT_SYMBOL_GPL(btintel_hw_error);
+ 
+ int btintel_version_info(struct hci_dev *hdev, struct intel_version *ver)
+ {
+@@ -455,8 +456,8 @@ int btintel_read_version(struct hci_dev *hdev, struct intel_version *ver)
+ }
+ EXPORT_SYMBOL_GPL(btintel_read_version);
+ 
+-static int btintel_version_info_tlv(struct hci_dev *hdev,
+-				    struct intel_version_tlv *version)
++int btintel_version_info_tlv(struct hci_dev *hdev,
++			     struct intel_version_tlv *version)
+ {
+ 	const char *variant;
+ 
+@@ -544,10 +545,11 @@ static int btintel_version_info_tlv(struct hci_dev *hdev,
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(btintel_version_info_tlv);
+ 
+-static int btintel_parse_version_tlv(struct hci_dev *hdev,
+-				     struct intel_version_tlv *version,
+-				     struct sk_buff *skb)
++int btintel_parse_version_tlv(struct hci_dev *hdev,
++			      struct intel_version_tlv *version,
++			      struct sk_buff *skb)
+ {
+ 	/* Consume Command Complete Status field */
+ 	skb_pull(skb, 1);
+@@ -649,6 +651,7 @@ static int btintel_parse_version_tlv(struct hci_dev *hdev,
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(btintel_parse_version_tlv);
+ 
+ static int btintel_read_version_tlv(struct hci_dev *hdev,
+ 				    struct intel_version_tlv *version)
+@@ -2597,8 +2600,8 @@ static void btintel_set_dsm_reset_method(struct hci_dev *hdev,
+ 	data->acpi_reset_method = btintel_acpi_reset_method;
+ }
+ 
+-static int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+-					struct intel_version_tlv *ver)
++int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
++				 struct intel_version_tlv *ver)
+ {
+ 	u32 boot_param;
+ 	char ddcname[64];
+@@ -2682,8 +2685,9 @@ static int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(btintel_bootloader_setup_tlv);
+ 
+-static void btintel_set_msft_opcode(struct hci_dev *hdev, u8 hw_variant)
++void btintel_set_msft_opcode(struct hci_dev *hdev, u8 hw_variant)
+ {
+ 	switch (hw_variant) {
+ 	/* Legacy bootloader devices that supports MSFT Extension */
+@@ -2707,6 +2711,7 @@ static void btintel_set_msft_opcode(struct hci_dev *hdev, u8 hw_variant)
+ 		break;
+ 	}
+ }
++EXPORT_SYMBOL_GPL(btintel_set_msft_opcode);
+ 
+ static void btintel_print_fseq_info(struct hci_dev *hdev)
+ {
+@@ -3078,7 +3083,7 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+ 	return err;
+ }
+ 
+-static int btintel_shutdown_combined(struct hci_dev *hdev)
++int btintel_shutdown_combined(struct hci_dev *hdev)
+ {
+ 	struct sk_buff *skb;
+ 	int ret;
+@@ -3112,6 +3117,7 @@ static int btintel_shutdown_combined(struct hci_dev *hdev)
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(btintel_shutdown_combined);
+ 
+ int btintel_configure_setup(struct hci_dev *hdev, const char *driver_name)
+ {
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index 64ab5a2860ab..1462a57420a0 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -234,6 +234,16 @@ void btintel_bootup(struct hci_dev *hdev, const void *ptr, unsigned int len);
+ void btintel_secure_send_result(struct hci_dev *hdev,
+ 				const void *ptr, unsigned int len);
+ int btintel_set_quality_report(struct hci_dev *hdev, bool enable);
++int btintel_version_info_tlv(struct hci_dev *hdev,
++			     struct intel_version_tlv *version);
++int btintel_parse_version_tlv(struct hci_dev *hdev,
++			      struct intel_version_tlv *version,
++			      struct sk_buff *skb);
++void btintel_set_msft_opcode(struct hci_dev *hdev, u8 hw_variant);
++int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
++				 struct intel_version_tlv *ver);
++int btintel_shutdown_combined(struct hci_dev *hdev);
++void btintel_hw_error(struct hci_dev *hdev, u8 code);
+ #else
+ 
+ static inline int btintel_check_bdaddr(struct hci_dev *hdev)
+@@ -330,4 +340,37 @@ static inline int btintel_set_quality_report(struct hci_dev *hdev, bool enable)
+ {
+ 	return -ENODEV;
+ }
++
++static inline int btintel_version_info_tlv(struct hci_dev *hdev,
++					   struct intel_version_tlv *version)
++{
++	return -EOPNOTSUPP;
++}
++
++static inline int btintel_parse_version_tlv(struct hci_dev *hdev,
++					    struct intel_version_tlv *version,
++					    struct sk_buff *skb)
++{
++	return -EOPNOTSUPP;
++}
++
++static inline void btintel_set_msft_opcode(struct hci_dev *hdev, u8 hw_variant)
++
++{
++}
++
++static inline int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
++					       struct intel_version_tlv *ver)
++{
++	return -ENODEV;
++}
++
++static inline int btintel_shutdown_combined(struct hci_dev *hdev)
++{
++	return -ENODEV;
++}
++
++static void btintel_hw_error(struct hci_dev *hdev, u8 code)
++{
++}
+ #endif
+-- 
+2.40.1
 
---===============2029867690278880697==--
