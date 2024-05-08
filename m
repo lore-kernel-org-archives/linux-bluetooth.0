@@ -1,86 +1,131 @@
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F74B8C1F;
-	Wed,  8 May 2024 08:34:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C036D3613C
+	for <linux-bluetooth@vger.kernel.org>; Wed,  8 May 2024 09:45:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715157247; cv=none; b=uXq7/u/PKYxmsrE6dqZfEobT/W1y4Q/ppIlmrreEr+HYYVMi7HnyJLp/Fa3aSJDO4b00u1ojOVAwr4LoXmSg0AFDDdrXP7FQy4/oQZdrxxwl+z61qokSqzJoy3wgWOGr1mGpKZY4AmlZqteMQb/yNQuaVMaXWhJRmHPvBfLf218=
+	t=1715161504; cv=none; b=nkB5NIawrM4YS8QiW6NdJUB7Qlxnz7z9vjggQLWZA8JE5DE3qL3HybPiapfXUcxxXQBgYpyhx03PQ7VGkxCPb6aLxSaLUCBxta6jilliUl2JNRJtDi6X4E7SqDd01Kp92p8j47+41CrwTYW6XclnEFt6S/Y7iT30+1U+o0mZ82k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715157247; c=relaxed/simple;
-	bh=eZo0SbgVlDwK+HUbWvKnFU4s6LwJQVx0tiQVgOF+HlE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=u1ZSbDeSABFTcJrFBsDQiuliEQi3C62NY9Crdb8b6i0XfbQ3UctDfDo+/rNo94ErRLazjHwMzwUxZH6nfpr837N2Oi+VQiSlHi/4xUoRmXa18SCxJb+49+5vBhVGo3sIjod11Eb/l9Tf/k1GMO20cP2FuSY9573ipL0kwCmFqUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=fDO6RXd9; arc=none smtp.client-ip=80.237.130.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+	s=arc-20240116; t=1715161504; c=relaxed/simple;
+	bh=2xUbuw7RH488C/jqE6ZEa+R9HjbuQ/2thRQUWOPgqpc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=o/XtsVZ4wEhRa1sCj3wNMSHbqrkocxHbO80f5djSNq1KK4L7cOl7rv5P25uUwmXyvYcCSd5qBECxtT3tnm66w55XWHBGTVybS33PSzsXauLnPEAKPLJfEja0T2D9HVsjBkp9u1On79nkWd2yTilHf+VSgDADd9mCcd3lAseEXWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dDZiNGkg; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="fDO6RXd9"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:Reply-To:MIME-Version:Date:
-	Message-ID:From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:
-	Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
-	In-Reply-To:References; bh=VYf2x8KePoKCnsFPyEO9iLMDoM/FQ8kORSg9BUE2DME=;
-	t=1715157245; x=1715589245; b=fDO6RXd9Bl1JRryVHuQUyunuXDtieEPoINtNl85v07NTRB5
-	JHZ7DDU2bP8fy0mdh6B9+WlzTSScxFtuCLfuc93qkreQDLbB79LfhYdkdhgPe8d455Cjl9vfIqHbO
-	Ws+NHqyLj/Qde74V4J0KpE8viC8kloEOlZXHDHQjb/p7esysLJ4HyrnDqWZgMxDzXGKbuXudsFIHL
-	qyaSmqytYcZMUIdAlvHtWbvmKaBVR2ENxkhmlJPXj5C4B6vtf9t2lFSTe2Lc6f1OZ7L2A512ip42a
-	IpipJvwxXK7HFUsIAXoRSlJojU2jpDgkoFXQe8SLBPCw68gl6fuEN9+D6iV1HilQ==;
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1s4ckO-0007C1-9k; Wed, 08 May 2024 10:33:56 +0200
-Message-ID: <0d59ae68-7552-454a-8d01-72c359496901@leemhuis.info>
-Date: Wed, 8 May 2024 10:33:55 +0200
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dDZiNGkg"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715161502; x=1746697502;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=2xUbuw7RH488C/jqE6ZEa+R9HjbuQ/2thRQUWOPgqpc=;
+  b=dDZiNGkglzc+fQuNssGbh9Hm+veP40Ts3DWQX5GEbCUuB3P4oP458nUR
+   MOLyNupXM0rxUSbftbCFsYoJkpfJIXJ8xhEleJTK8H4nCyt3Px/K5EWsD
+   0BpqaKd6rF8ZhbTCjaYOvNLySbaaANHLycaag7dC6CJ1siPTwko4rri+t
+   UeWl7wO9hFEcjYgxhtTN+PimJOATp8zH7hKDlHzbxjmm72t7XqxF6vXAD
+   HdrEdojme69oX2ny7GPA78M4UYwwzhwkvyHXZ8pvlbjh+ZEw1umjpo/Ry
+   1UUN+yIZiI06pTMCHwvtcqPM/+cA91k6G4+K5Y3iCoC07b9jKhGu7Qvrr
+   g==;
+X-CSE-ConnectionGUID: r12hlSqeRTCgvQfSNLFhgg==
+X-CSE-MsgGUID: fSZK3xYISM+n7hrXx+ghAQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11066"; a="22416901"
+X-IronPort-AV: E=Sophos;i="6.08,144,1712646000"; 
+   d="scan'208";a="22416901"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2024 02:45:02 -0700
+X-CSE-ConnectionGUID: Ign8QkNzSqORXw/dYv//cA==
+X-CSE-MsgGUID: XzC6pEfQQuamwWpwuR9L4w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,144,1712646000"; 
+   d="scan'208";a="33384554"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by fmviesa004.fm.intel.com with ESMTP; 08 May 2024 02:45:01 -0700
+From: Kiran K <kiran.k@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	chandrashekar.devegowda@intel.com,
+	Kiran K <kiran.k@intel.com>,
+	kernel test robot <lkp@intel.com>
+Subject: [PATCH v1 1/2] Bluetooth: btintel_pcie: Fix compiler warnings
+Date: Wed,  8 May 2024 15:29:26 +0530
+Message-Id: <20240508095927.155528-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-Subject: Re: [PATCH] Bluetooth: btusb: Fix the patch for MT7920 the affected
- to MT7921
-To: luiz.dentz@gmail.com
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, sean.wang@mediatek.com,
- deren.Wu@mediatek.com, chris.lu@mediatek.com, aaron.hou@mediatek.com,
- steve.lee@mediatek.com, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org,
- patchwork-bot+bluetooth@kernel.org, Peter Tsao <peter.tsao@mediatek.com>,
- Linux kernel regressions list <regressions@lists.linux.dev>
-References: <20240415141922.25055-1-peter.tsao@mediatek.com>
- <171328023414.16225.12939333659144302573.git-patchwork-notify@kernel.org>
-From: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-Content-Language: en-US, de-DE
-In-Reply-To: <171328023414.16225.12939333659144302573.git-patchwork-notify@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1715157245;99242499;
-X-HE-SMSGID: 1s4ckO-0007C1-9k
+Content-Transfer-Encoding: 8bit
 
-On 16.04.24 17:10, patchwork-bot+bluetooth@kernel.org wrote:
-> 
-> This patch was applied to bluetooth/bluetooth-next.git (master)
-> by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-> 
-> On Mon, 15 Apr 2024 22:19:22 +0800 you wrote:
->> Because both MT7920 and MT7921 use the same chip ID.
->> We use the 8th bit of fw_flavor to distingush MT7920.
->> The original patch made a mistake to check whole fw_flavor,
->> that makes the condition both true (dev_id == 0x7961 && fw_flavor),
->> and makes MT7921 flow wrong.
->>
->> In this patch, we correct the flow to get the 8th bit value for MT7920.
->> And the patch is verified pass with both MT7920 and MT7921.
->>
->> [...]
-> 
-> Here is the summary with links:
->   - Bluetooth: btusb: Fix the patch for MT7920 the affected to MT7921
->     https://git.kernel.org/bluetooth/bluetooth-next/c/263296438807
+Fix compiler warnings reported by kernel bot.
 
-Hi! 6.9 is only days close and this is fixing a 6.9 regression, so allow
-me to quickly ask: do you still plan to submit this for mainline merge
-soon? Or did you already and I just missed it? Ciao, Thorsten
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202405080647.VRBej6fA-lkp@intel.com/
+Signed-off-by: Kiran K <kiran.k@intel.com>
+---
+ drivers/bluetooth/btintel_pcie.c | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index e9bc4b673424..2853ab80079d 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -251,7 +251,6 @@ static void btintel_pcie_reset_bt(struct btintel_pcie_data *data)
+ static int btintel_pcie_enable_bt(struct btintel_pcie_data *data)
+ {
+ 	int err;
+-	u32 reg;
+ 
+ 	data->gp0_received = false;
+ 
+@@ -259,7 +258,7 @@ static int btintel_pcie_enable_bt(struct btintel_pcie_data *data)
+ 	btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_CI_ADDR_LSB_REG,
+ 			      data->ci_p_addr & 0xffffffff);
+ 	btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_CI_ADDR_MSB_REG,
+-			      data->ci_p_addr >> 32);
++			      (u64)data->ci_p_addr >> 32);
+ 
+ 	/* Reset the cached value of boot stage. it is updated by the MSI-X
+ 	 * gp0 interrupt handler.
+@@ -267,7 +266,7 @@ static int btintel_pcie_enable_bt(struct btintel_pcie_data *data)
+ 	data->boot_stage_cache = 0x0;
+ 
+ 	/* Set MAC_INIT bit to start primary bootloader */
+-	reg = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG);
++	btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG);
+ 
+ 	btintel_pcie_set_reg_bits(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG,
+ 				  BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_INIT);
+@@ -285,7 +284,7 @@ static int btintel_pcie_enable_bt(struct btintel_pcie_data *data)
+ 				  BTINTEL_PCIE_CSR_FUNC_CTRL_FUNC_ENA |
+ 				  BTINTEL_PCIE_CSR_FUNC_CTRL_FUNC_INIT);
+ 
+-	reg = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG);
++	btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG);
+ 
+ 	/* wait for interrupt from the device after booting up to primary
+ 	 * bootloader.
+@@ -525,7 +524,6 @@ static void btintel_pcie_msix_rx_handle(struct btintel_pcie_data *data)
+ 	u16 cr_hia, cr_tia;
+ 	struct rxq *rxq;
+ 	struct urbd1 *urbd1;
+-	struct frbd *frbd;
+ 	struct data_buf *buf;
+ 	int ret;
+ 	struct hci_dev *hdev = data->hdev;
+@@ -550,8 +548,6 @@ static void btintel_pcie_msix_rx_handle(struct btintel_pcie_data *data)
+ 		urbd1 = &rxq->urbd1s[cr_tia];
+ 		ipc_print_urbd1(data->hdev, urbd1, cr_tia);
+ 
+-		frbd = &rxq->frbds[urbd1->frbd_tag];
+-
+ 		buf = &rxq->bufs[urbd1->frbd_tag];
+ 		if (!buf) {
+ 			bt_dev_err(hdev, "RXQ: failed to get the DMA buffer for %d",
+-- 
+2.40.1
+
