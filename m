@@ -1,66 +1,62 @@
-Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE3C3127E3A
-	for <linux-bluetooth@vger.kernel.org>; Wed,  8 May 2024 15:46:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B7A41292E4
+	for <linux-bluetooth@vger.kernel.org>; Wed,  8 May 2024 15:46:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715183178; cv=none; b=m+GRDgN+cIuM/i5FwVgRdhpJZH+LmJeWdC8faKvZNi9CQB/ycQ+atyjouQq0wKbOUaRjWULsAMIZ1oT7Ik+54h0/CUTujPkNN/UjCNM414gNoSu3D013OCitRBPILFCxnMtX/1RxVOMo1LYXKQPB7fOpn3PdrMOY+jxCPvn7nvI=
+	t=1715183178; cv=none; b=GbiHjdtAjnGBhREm25E8M3iGEwJnokH1TG7FKKicwUt8ZKWmb4MppSwr36o0FwhAyq0zN7QfCdgjmvEgxYexEUHM+K0/NI1Rb+8tFXtpt9mumScIlpMMAYbs7G+VB0X9s/wTs8XhAnU65FCcW9QzRRYsm9qXDcRaPVE2BDhPXDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1715183178; c=relaxed/simple;
-	bh=DdkB3V8ZGog6weE5ByFmwUWEnknZ/OFQfZ7iKFzZSew=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JJsK6zZDkhJWPQY/FEOKU9EHPnHIRgZxPsZGQGIQ1M7fiPVp5vlHkaU1/fXFeTW/lXjmQUj8ZU++i1nxzVUG0JZbn5H/11rUaFSuvKELAwhNecE7hH8knfW1NMWWBT8Phiv6CIqkmspKA6DXmi5y2ZWuH7I2ED3831MJbUC7kgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io; spf=pass smtp.mailfrom=asymptotic.io; dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b=kXiIle86; arc=none smtp.client-ip=209.85.160.46
+	bh=7TAVVFG+yvXXVIkMlqVJ+BcyraU9juZnjsZsFlYnaw0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ce7Z+1tWre+5BblQGF5cF1r6lv8goRGmiQaYLueF0RsELT9z2oOsgQ+wtKrJvq0HRN5ckcIy77aCI9qeaaDpdbsn0hFN7cJ9R8MokWmgzeNtKbLhXpggplO5A6QwrjlqJtJnu5GxpDIZHwZqDJEuWF/1PnRfcw6tf+f5XSb5JSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io; spf=pass smtp.mailfrom=asymptotic.io; dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b=GRsAA2Zx; arc=none smtp.client-ip=209.85.160.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asymptotic.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b="kXiIle86"
-Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-22ed075a629so2548168fac.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 08 May 2024 08:46:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b="GRsAA2Zx"
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-43ca9047bd2so7380181cf.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 08 May 2024 08:46:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asymptotic.io; s=google; t=1715183175; x=1715787975; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MNMpiruIVl6YRQIpC270h59+7DyIgPoYQQZoXWQS0T4=;
-        b=kXiIle86G/zlx7pvEu2XZY6nm6sc/X6AQ9hObyZ3gC0ywgw6nh/fatvBFAYec+NPa6
-         9A4/oBR8dwo6sYwchAq9B7Ijq/eCFDZV6xb4HXAXfRii5RajOGvkqNSYy9Lhvaf5vxza
-         SDGDIxhMTWfvDmh+8x9Fc+Gnqh1OzPjVCWY8XmwoAWnPb99+5+AYGyVyxwyY72BiMEQq
-         ZXXaYab5JuZ9XHd5SWqFI+Z303p64RXWOEk0vwuWPUoIlvgV+5T/7Qd5kOb7PLRvBymF
-         PesYcZOsrARcSIn72sQJPmiZ3pdSb2PVY7FoXYMUmbYvrv8E28tggbwuWk3Mug/Q41K5
-         T2jw==
+        d=asymptotic.io; s=google; t=1715183172; x=1715787972; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5UbzPBRTRiDLhFM8NCxYxpmABq2A7M0E5WG9xInU6rY=;
+        b=GRsAA2ZxkQk3fpdtqoEwQp0J7NzL2VeYKWlKs9LeVeVPqHFKXQnhoFsm68ToLFqCgP
+         4Gwseld4F5+ZxptbZI/NUwanrDEsNyTLsvt6rLgCSKEzVKIia6Y5Zk5JirIk9HJJD1VS
+         n7/eq0G7hS1I+FQlxdbGhK8d8JOSk7FugV3/IfNnw10eEF+/VDOoR6+NwwAFVc59pqhO
+         Ztybq22yJP3ZhGzErK5kxNDXRWyzuZSKVqK+UYsnTsK78bpf8zLt22mSqxs9SyrcVfne
+         6dp/XTmgw7JqooMLO9KoPMfIgdJfR/98s4BoAMqGncvznbUUlKdYDPJ1GtZsoCdhmdnI
+         kUbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715183175; x=1715787975;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MNMpiruIVl6YRQIpC270h59+7DyIgPoYQQZoXWQS0T4=;
-        b=sLP5aJOXr+2oSUGtwBJ41c1DsmqLswDx1zBx1AoU5ALKSUjAof+xNEmlhuD3/SiHC5
-         oJUMukrAVLi/pr7WmQua6aTzKSB3JBUyHCL/+NLxPJcVZFwLYu9Ijv557VuPHzwnqiov
-         egx7ZWNnVsXdpjpR/ZmUd8jVK7AKfJ7OCgTrGK04ufTUphqzCpG14cBW1Ak99azPv/KY
-         wnNAwRGqWE856Qcrm2gW89gbQmdyUev218jyUIHQEPxjb1io6XzDyrxIB7RJWZl+tSGh
-         +BNRNK0qhLoWBrVlviDoJci4SNDjV1v4G4Z5iTT+BujQ2+16TQoCeis9fCX39CvoJfoD
-         vHYQ==
-X-Gm-Message-State: AOJu0YxJ8uINOU4eGeaAgr+8r+8EmrVxMSzhERX2+HrHlC4vGJXNyqOM
-	4ZhOoyn0ZZ8ioDudIBQnGY4qaLXn7+s8kgi9pNmtqNafMofyucJKE2cwbz49O6lp1RjLjdSDonb
-	P
-X-Google-Smtp-Source: AGHT+IHf3CzWiSU0aj3XLDv3AURZfotbmyC7LnR8jKT8xQxG2sT+zIZdLaZemXK/7CDL+AwsJInwGg==
-X-Received: by 2002:a05:6871:413:b0:23b:caff:be33 with SMTP id 586e51a60fabf-24098c7b56bmr3353682fac.49.1715183175559;
-        Wed, 08 May 2024 08:46:15 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1715183172; x=1715787972;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5UbzPBRTRiDLhFM8NCxYxpmABq2A7M0E5WG9xInU6rY=;
+        b=Bzi37lnJwb8xw0cVjB+1mK5+nYsT7HHWhlGieru2IkSt2lxzy3DvjTlnxWoJ5RxStd
+         K3JhDvFZu4mNdLqYoiYGW1mJnJT9Fz17Gm0JlFyiZAWCSCIutqcFVl2WkBl0qY/RNB+P
+         BQedJdue1msxAbNSRqHmoeD0oFEHVoAtcqOrfonapJkqT2s8GsFL4ASKAfjWzs9pKz7i
+         y2avr3deH1OOEOn0T6ECqClLEUcdPZCf4BHm3NHmo2/kUCx69twBWdUW89zcFVoeTgWK
+         NORPQByo/I61BSlhGx0LSqfbqO97qinpy/gRSSVFRGtvl3EnsRUh+SZbObDf1iwEF5dH
+         Dz8Q==
+X-Gm-Message-State: AOJu0Yw2MdavJATt1npVFMztiRWHLzeHLAqWneqUy5d48xqYehc7gNN3
+	0cdeAbOYejPq7BDN4ZIwEF4uKNxdrgJ4tQEyZCj3QIWtsNWVD2M5vAydd0lr0xb6bIuzbf21AFX
+	l
+X-Google-Smtp-Source: AGHT+IEuyxvrBtcKo2L7nRTQMdRey3rhmd4Zo7Djuu8JZvJrZdtD2oYjphJFmbXfjhpv0b/7irrp4w==
+X-Received: by 2002:ac8:5d0b:0:b0:43a:c90b:34e5 with SMTP id d75a77b69052e-43dec2a3d43mr338221cf.34.1715183172047;
+        Wed, 08 May 2024 08:46:12 -0700 (PDT)
 Received: from andromeda.lan (bras-base-toroon0359w-grc-19-74-15-47-99.dsl.bell.ca. [74.15.47.99])
-        by smtp.gmail.com with ESMTPSA id cd14-20020a05622a418e00b0043791f7d831sm7756513qtb.63.2024.05.08.08.46.14
+        by smtp.gmail.com with ESMTPSA id cd14-20020a05622a418e00b0043791f7d831sm7756513qtb.63.2024.05.08.08.46.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 May 2024 08:46:15 -0700 (PDT)
+        Wed, 08 May 2024 08:46:10 -0700 (PDT)
 From: Arun Raghavan <arun@asymptotic.io>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arun Raghavan <arun@asymptotic.io>
-Subject: [PATCH BlueZ 4/5] gitignore: Add compile_commands.json
-Date: Wed,  8 May 2024 11:46:03 -0400
-Message-ID: <20240508154604.276763-5-arun@asymptotic.io>
+Subject: [PATCH BlueZ 0/5] ASHA plugin
+Date: Wed,  8 May 2024 11:45:59 -0400
+Message-ID: <20240508154604.276763-1-arun@asymptotic.io>
 X-Mailer: git-send-email 2.45.0
-In-Reply-To: <20240508154604.276763-1-arun@asymptotic.io>
-References: <20240508154604.276763-1-arun@asymptotic.io>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -69,23 +65,54 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Handy file that can be generated with bear, and allows clang-based LSP.
----
- .gitignore | 1 +
- 1 file changed, 1 insertion(+)
+Hi folks,
+I've written an implementation of the Android specification for
+streaming to hearing aids over Bluetooth LE, ASHA[1]. This predates the
+LE audio specification, and has been supported in hearing aids for a
+while now, so I think this is worth supporting as these devices should
+continue to be in use for several years.
 
-diff --git a/.gitignore b/.gitignore
-index 9c2ac236e..6a6422379 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -183,6 +183,7 @@ android/test-ipc
- android/test-*.log
- android/test-*.trs
- 
-+compile_commands.json
- cscope.in.out
- cscope.out
- cscope.po.out
+I've reused the MediaEndpoint1 and MediaTransport1 interfaces at Luiz'
+suggestion. The flow is slightly different from A2DP and LE Audio in
+that there isn't really a negotiation step, so the endpoint and
+transport are both available on connection.
+
+Also included is a script to stream arbitrary audio to an ASHA device,
+which is handy for making sure that the implementation does work. I have
+tested this against a reference implementation on an onsemi RSL10 board.
+
+The current implementation is written with a single device in mind. My
+plan is to take this to completion along with a PipeWire implementation
+to expose a single device for playback, and then do a second pass to
+support a pair of devices.
+
+Cheers,
+Arun
+
+[1] https://source.android.com/docs/core/connect/bluetooth/asha
+
+Arun Raghavan (5):
+  profiles: Add initial code for an ASHA plugin
+  asha: Implement volume on transport
+  test: Add a script to test ASHA
+  gitignore: Add compile_commands.json
+  gitignore: Add __pycache__
+
+ .gitignore                 |   3 +
+ Makefile.plugins           |   5 +
+ configure.ac               |   4 +
+ lib/uuid.h                 |   3 +
+ profiles/audio/asha.c      | 835 +++++++++++++++++++++++++++++++++++++
+ profiles/audio/asha.h      |  38 ++
+ profiles/audio/media.c     |  28 ++
+ profiles/audio/media.h     |   2 +
+ profiles/audio/transport.c | 173 +++++++-
+ test/simple-asha           | 158 +++++++
+ 10 files changed, 1247 insertions(+), 2 deletions(-)
+ create mode 100644 profiles/audio/asha.c
+ create mode 100644 profiles/audio/asha.h
+ create mode 100755 test/simple-asha
+
 -- 
 2.45.0
 
