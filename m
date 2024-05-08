@@ -1,189 +1,100 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 371FE8174F;
-	Wed,  8 May 2024 11:23:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52C0B56742
+	for <linux-bluetooth@vger.kernel.org>; Wed,  8 May 2024 14:16:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715167412; cv=none; b=gD9e+QM5USsDSREMGIweutA+e2Q6uNMrNAK/VBwCYMoejMwMVcH5osd1Otc1ayEZ3b0lPOF6ejsmwdebK6VDnb3H4oYqK65fIOV/HGaSuJ4OX6Oxel9vJW9HZibvg5raLV/ACJY0LynL1Rq9LJcGC+ye1FtSoBP/tQu/PR8iPWo=
+	t=1715177775; cv=none; b=L5SHhV8DSqx8n+EgwjW4lQq2rZP/B5C8a2ZemQoXdPN98EK0A70Jd5+lvLCS1GRGD+CfksWJ3LBmL22H4z/enbC+Z9RHa6nizo5ztVQvc51ZzTFFY+222El/XsE5jda4AU91uBKUMm3dVybdIe4oYOulMJmdCN8+7K3jH3TE9/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715167412; c=relaxed/simple;
-	bh=Cc81Sm9+kFaTqiurwOpfbIBmuCu+bUVjuSjxcgMXyO4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=saMRYjPZBSkvBparsXsgnQyPplQMvLtMtssrYuEAbejXRjEQZEzIPrlx5+WW4jyDx8/knVddd7Fl2da6gK/dO4plTK4k4s/7teoAjB2pFO69G17KOVSArT9L23k5bwq54xgv4BQoQMuSMVngZu/kTXtRd/E8a4OxJNbVY7stc+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JSSzMdKe; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1715177775; c=relaxed/simple;
+	bh=5l/1qZpr5HERskV24d0zuIi22kZSkIFiAVk8ON7ip6U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QyhabsNWrhINvdxXXnKTlwQkC+khpMzbGVc5t2s34SZVnlJbGNoHUE1u4LL0p0RbOgrpVS54MuSjE+bvzxw1shAWoU9+ztnicXhLHB0H36e/kJP7EwHPHtDlBqQiOYK9yfnLCx2stH/aH1GEuqSSu/vSVyT950JDF7mlYe1Xxjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=loIgEGgy; arc=none smtp.client-ip=209.85.208.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JSSzMdKe"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715167410; x=1746703410;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Cc81Sm9+kFaTqiurwOpfbIBmuCu+bUVjuSjxcgMXyO4=;
-  b=JSSzMdKebr4EmKplin4OpmBXJnvnVQ8RkQDxdPdzgwf+Cz22OC4UUDAt
-   qSHGWb5HrrLEk6Ph389I0h9kNbwfZUJbERgo/Xm6oyhdndoYsmJi+ofHO
-   AKDN2QyttHqvSD5OYqd/8wGtk/ARDlpKm/0XkqCNrzoXcP0m4f+BbaJT6
-   LJpxqwnxmlUKFbl+aJm+UBly/tWppO2f7TAIXRVsoZvscoe5DMP4Z2XBL
-   VH/2IZ6wm7Fk3gdwTAooz0Oba8hEMaz4uz44KEPP4ziu4eMoR/m+7H/Yu
-   NRnFHMYaAsBnszqRnqdB5D9+6pNZsri/PuvUQRcJC7WtnzJF87KaMXh1F
-   g==;
-X-CSE-ConnectionGUID: 6HmUHXaYS0KiRtTCm4ydTQ==
-X-CSE-MsgGUID: wJ0+xoKjQQWObwgM/jSLow==
-X-IronPort-AV: E=McAfee;i="6600,9927,11066"; a="22412246"
-X-IronPort-AV: E=Sophos;i="6.08,145,1712646000"; 
-   d="scan'208";a="22412246"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2024 04:23:30 -0700
-X-CSE-ConnectionGUID: HQZM8k96QZOhQgZVyNEMJg==
-X-CSE-MsgGUID: dcpymqCtT9uJPwoz8me6EA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,145,1712646000"; 
-   d="scan'208";a="59714775"
-Received: from lkp-server01.sh.intel.com (HELO f8b243fe6e68) ([10.239.97.150])
-  by orviesa002.jf.intel.com with ESMTP; 08 May 2024 04:23:26 -0700
-Received: from kbuild by f8b243fe6e68 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1s4fOO-0003LE-0i;
-	Wed, 08 May 2024 11:23:24 +0000
-Date: Wed, 8 May 2024 19:22:54 +0800
-From: kernel test robot <lkp@intel.com>
-To: sean.wang@kernel.org, marcel@holtmann.org, johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	linux-bluetooth@vger.kernel.org, linux-mediatek@lists.infradead.org,
-	linux-kernel@vger.kernel.org, Sean Wang <sean.wang@mediatek.com>
-Subject: Re: [PATCH v4 1/5] Bluetooth: btmtk: add the function to get the fw
- name
-Message-ID: <202405081828.e6IMNKPn-lkp@intel.com>
-References: <965cd14922aea67e2750ff2c2ecad773f8ba485a.1715109394.git.sean.wang@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="loIgEGgy"
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2dcc8d10d39so49880331fa.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 08 May 2024 07:16:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715177772; x=1715782572; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xFaZjtuMgm9nkwoIXg1V2qasf+e6bnD8xZS/pyhQjN4=;
+        b=loIgEGgyi7XbKePzHgF++7SxO8fXznSL/W3Nzqqcr2JtD7a4Ws3uLnokfzyKUa7gvR
+         8HcX/FtJDfVNOl49HnXkpvFENfO8KgjaNZZWdZG3LTd+Z4d/3rjBPsunrnR4v2RaHtKI
+         wg+7j7PplNavsmjqEn+4gDroJ4hLPGu+AD0VkUj5BPXFZWj3+zhUWvJkLThwKScVoyZe
+         EzMFaFCOKvJCDBxvL/4zGSFi15OPLkKoISFFUh9y4PhJWp47xzG6ZGmTM5IFy3HfYMWF
+         YVajkpBnZUo8QxWqn5XNt4jEooVGCR04T+xWrX9FY2oPbx8E43pUshsXo2fSB/zR7G62
+         rldA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715177772; x=1715782572;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xFaZjtuMgm9nkwoIXg1V2qasf+e6bnD8xZS/pyhQjN4=;
+        b=NE4lWo5cMfVkwj6zvhJqE9aRO4AAapQ/gwQvQJXWB8NrwtUysN78AFsVGtsTRlP26O
+         XSUty/+O7/SB1SfWBaYvdJiRSpXGzZiuKmn5ASQh6PrDo2SOhRUpF8EDFGV4g3vwqOzW
+         UzleLRxGRfoytHi/PtlnGTESyuYYKDr/HLjx+JxkLQgZc/cA+D2tHaWdhYz8wfc2zAFP
+         0q48HanJnZyOHGMUrVk/O6Rz7hvFvgK6JBlvQbIviIkJ0imUD6IRTqCv2rGNke+LuBeh
+         8NvqezjZ1/cSjveyR3Kpti40xZYzhGzRPzCVzGxFom0dT7UDoUSuNF2zoS8QoUicqZiZ
+         N/0w==
+X-Gm-Message-State: AOJu0YwhBpBAOd+qdQdFDy+3M98A+oadJsGJSOUxUXsZ4kkUyJfDEsg2
+	uaVsOmxploq2He7sGZZdMRFq00kLNa3LWts1KyQcSzE06mBp9wsR15qWLgRzfeHJJPXP7Vy5Swz
+	0VQpxSqVPVK3VbH46voy9bS3+L2mgcr0/
+X-Google-Smtp-Source: AGHT+IHXtfrgru2SQ3oaGZkxjxlpMXvv8xyOGb2d1wd14XPY+/yx39SReRBSG4M/lJkZ7T0gYjVl9pDMxRoAoGLQmRA=
+X-Received: by 2002:a05:651c:105b:b0:2e1:b0e3:21f with SMTP id
+ 38308e7fff4ca-2e447699a5dmr12781861fa.40.1715177772108; Wed, 08 May 2024
+ 07:16:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <965cd14922aea67e2750ff2c2ecad773f8ba485a.1715109394.git.sean.wang@kernel.org>
+References: <SA2PR02MB782004DF03924528761D402492E52@SA2PR02MB7820.namprd02.prod.outlook.com>
+In-Reply-To: <SA2PR02MB782004DF03924528761D402492E52@SA2PR02MB7820.namprd02.prod.outlook.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 8 May 2024 10:15:58 -0400
+Message-ID: <CABBYNZK1XfX+ug9+ktSTpQKG03LBK2_h4UxUuF3w14-8k4t3gw@mail.gmail.com>
+Subject: Re: Query regarding BlueZ Stack Certification
+To: "Naga Bhavani Akella (QUIC)" <quic_nakella@quicinc.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, 
+	"Mohammed Sameer Mulla (QUIC)" <quic_mohamull@quicinc.com>, 
+	"Anubhav Gupta (QUIC)" <quic_anubhavg@quicinc.com>, "Harish Bandi (QUIC)" <quic_hbandi@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
 Hi,
 
-kernel test robot noticed the following build warnings:
+On Wed, May 8, 2024 at 2:35=E2=80=AFAM Naga Bhavani Akella (QUIC)
+<quic_nakella@quicinc.com> wrote:
+>
+> Hi Team,
+>
+> Could you please help us with these questions
+>
+> 1) We are looking for some information on BLUEZ Stack Certification.
+>      Is there any existing BlueZ stack certification ( we are using BlueZ=
+ 5.65 ) already done which we can reuse,
+>      if so can you please share QDID ?
+> 2) If someone has to do certification from the start,
+>     are there any tools or apps available on bluez which can be used to r=
+un protocol/profile test cases against PTS ?
 
-[auto build test WARNING on bluetooth/master]
-[also build test WARNING on bluetooth-next/master linus/master v6.9-rc7 next-20240508]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+You can find the previous qualifications done in the following github
+discussion, we are also discussing how we could establish a more
+generic Host Subsystem listing so feel free to contribute:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/sean-wang-kernel-org/Bluetooth-btmtk-apply-the-common-btmtk_fw_get_filename/20240508-032333
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
-patch link:    https://lore.kernel.org/r/965cd14922aea67e2750ff2c2ecad773f8ba485a.1715109394.git.sean.wang%40kernel.org
-patch subject: [PATCH v4 1/5] Bluetooth: btmtk: add the function to get the fw name
-config: hexagon-allmodconfig (https://download.01.org/0day-ci/archive/20240508/202405081828.e6IMNKPn-lkp@intel.com/config)
-compiler: clang version 19.0.0git (https://github.com/llvm/llvm-project 0ab4458df0688955620b72cc2c72a32dffad3615)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240508/202405081828.e6IMNKPn-lkp@intel.com/reproduce)
+https://github.com/orgs/bluez/discussions/817
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202405081828.e6IMNKPn-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   In file included from drivers/bluetooth/btmtk.c:8:
-   In file included from include/net/bluetooth/bluetooth.h:30:
-   In file included from include/net/sock.h:38:
-   In file included from include/linux/hardirq.h:11:
-   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/hexagon/include/asm/io.h:328:
-   include/asm-generic/io.h:547:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     547 |         val = __raw_readb(PCI_IOBASE + addr);
-         |                           ~~~~~~~~~~ ^
-   include/asm-generic/io.h:560:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     560 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
-      37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
-         |                                                   ^
-   In file included from drivers/bluetooth/btmtk.c:8:
-   In file included from include/net/bluetooth/bluetooth.h:30:
-   In file included from include/net/sock.h:38:
-   In file included from include/linux/hardirq.h:11:
-   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/hexagon/include/asm/io.h:328:
-   include/asm-generic/io.h:573:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     573 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
-      35 | #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
-         |                                                   ^
-   In file included from drivers/bluetooth/btmtk.c:8:
-   In file included from include/net/bluetooth/bluetooth.h:30:
-   In file included from include/net/sock.h:38:
-   In file included from include/linux/hardirq.h:11:
-   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/hexagon/include/asm/io.h:328:
-   include/asm-generic/io.h:584:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     584 |         __raw_writeb(value, PCI_IOBASE + addr);
-         |                             ~~~~~~~~~~ ^
-   include/asm-generic/io.h:594:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     594 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   include/asm-generic/io.h:604:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     604 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   In file included from drivers/bluetooth/btmtk.c:8:
-   In file included from include/net/bluetooth/bluetooth.h:30:
-   In file included from include/net/sock.h:46:
-   In file included from include/linux/netdevice.h:38:
-   In file included from include/net/net_namespace.h:43:
-   In file included from include/linux/skbuff.h:17:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:10:
-   In file included from include/linux/mm.h:2210:
-   include/linux/vmstat.h:522:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     522 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
->> drivers/bluetooth/btmtk.c:114:3: warning: 'snprintf' will always be truncated; specified size is 4, but format string expands to at least 41 [-Wformat-truncation]
-     114 |                 snprintf(buf, sizeof(size),
-         |                 ^
-   8 warnings generated.
+> Thanks and Regards,
+> Bhavani
+>
 
 
-vim +/snprintf +114 drivers/bluetooth/btmtk.c
-
-   105	
-   106	void btmtk_fw_get_filename(char *buf, size_t size, u32 dev_id, u32 fw_ver,
-   107				   u32 fw_flavor)
-   108	{
-   109		if (dev_id == 0x7925)
-   110			snprintf(buf, size,
-   111				 "mediatek/mt%04x/BT_RAM_CODE_MT%04x_1_%x_hdr.bin",
-   112				 dev_id & 0xffff, dev_id & 0xffff, (fw_ver & 0xff) + 1);
-   113		else if (dev_id == 0x7961 && fw_flavor)
- > 114			snprintf(buf, sizeof(size),
-   115				 "mediatek/BT_RAM_CODE_MT%04x_1a_%x_hdr.bin",
-   116				 dev_id & 0xffff, (fw_ver & 0xff) + 1);
-   117		else
-   118			snprintf(buf, size,
-   119				 "mediatek/BT_RAM_CODE_MT%04x_1_%x_hdr.bin",
-   120				 dev_id & 0xffff, (fw_ver & 0xff) + 1);
-   121	}
-   122	EXPORT_SYMBOL_GPL(btmtk_fw_get_filename);
-   123	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+--=20
+Luiz Augusto von Dentz
