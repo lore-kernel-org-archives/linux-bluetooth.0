@@ -1,96 +1,153 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 602817641D
-	for <linux-bluetooth@vger.kernel.org>; Wed,  8 May 2024 09:45:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC131818
+	for <linux-bluetooth@vger.kernel.org>; Wed,  8 May 2024 10:34:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715161506; cv=none; b=NyGQU9eG7CLgUHTJlLnYoaj43ZmT9Iqy0Qz0yHncv/tIo/IfTp9+7rFJHzYWfNOd/qsWfuRfmoQAzcFU2H4SL649vbfZCAzud0x3Bf7VOUtzRk3xcIarQM8jVxM8K0KXYqKB8MRz7MGZL7nfEAyaqh1IXHwVOuSPKm4FJ/R6YAo=
+	t=1715164449; cv=none; b=ejY1LEXwIqtcNxFSeoh/uOUaK+rkrScVSMZ3nHHsXEH4h9z+UGqM1wc/d/6ypQTjtn+ZbiCdHihOHioVvqlzCGXTS1mrZd3dCgeE7vlTZrPC+bGYfNAydQgKU/HVJJDvu8qVupI0+lqewCVJGetjpTWyFAkbCof4X5yP72Sflv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715161506; c=relaxed/simple;
-	bh=PFFV9Ctp/LRJteKIh2sMvi4vqPNVZ1Da+pJdeKDz4P0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Cxz/g0F3bY02veSn57wQXkwgHxGPK5qg6romq9TyjxuTfopXO5t3KwG1ZZB40BDgGFvgX3PrRxHuvYlX1MS5QZLt/YbkqdR0FpQtg9YdE4B53hRebk2VKdMG3TFJMli0EiOmht4CanYpd+uIEA2tVsU+EZCBNkrfiLAnkPrjyeY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g7OCIpsp; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1715164449; c=relaxed/simple;
+	bh=RanUgLYAV0KtHMRNZPpwpuV6PL3Tpr4fSpwD8mydWU0=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Txaa9XX2TwDcgeohAYZOwpHw+f25isx3F+NEXqrWhuFZXpQhDPXwcSNM0C0W3oZvasf6UhH35Zpkru3+rWO5bTvYRiNAqGgfyWq+cXSm+N5KDpK/iDj1DXQbQzNdxLBBHc5Pwar06HSlVce2Zy8/NZiGtGcpAAgpzVDZq1WTZxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N1ouawEg; arc=none smtp.client-ip=209.85.219.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g7OCIpsp"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715161504; x=1746697504;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=PFFV9Ctp/LRJteKIh2sMvi4vqPNVZ1Da+pJdeKDz4P0=;
-  b=g7OCIpspH+L+ufs7h8B9kpPg6kz0jQT5c2LSczSIwwWqh+64uyuNLm8r
-   9WMTFAEDdZqmGqnGbZrZrbt2ak9EoZWQ8D1ItIPUqAEvDo4dfM0BVna7d
-   s0DmWn3gN8StirotIyHEwjRMVSvqqezyaZncvR3VbdfBKdP/vZ+s9Cx/x
-   I3foRZvIJMJfbriGdJ4FcOg26zm37lM0W7ivZItqn8AROGb2yTGnKuz6w
-   qbYTNdsKW6+iXsmZtGUwt+DTIPg2MZ2TwanIwMZncHdRI2tfDd0ttKr+d
-   0wDVEnC7mfSPqbYrsgD+UGbq5xCLIbrD9y+mFCS6optuLR2H1fDjQbYUI
-   A==;
-X-CSE-ConnectionGUID: vQPgMVqWQLGS9XP+IOfQmw==
-X-CSE-MsgGUID: eYLNRle3SKyjMKIIyzckbQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11066"; a="22416903"
-X-IronPort-AV: E=Sophos;i="6.08,144,1712646000"; 
-   d="scan'208";a="22416903"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2024 02:45:04 -0700
-X-CSE-ConnectionGUID: jt8erLPaTWqnEOssULQCaQ==
-X-CSE-MsgGUID: aD4Tc+atT0uWPcCTik+3WQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,144,1712646000"; 
-   d="scan'208";a="33384574"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by fmviesa004.fm.intel.com with ESMTP; 08 May 2024 02:45:03 -0700
-From: Kiran K <kiran.k@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: ravishankar.srivatsa@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	chandrashekar.devegowda@intel.com,
-	Kiran K <kiran.k@intel.com>,
-	Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: [PATCH v1 2/2] Bluetooth: btintel: Fix compiler warning for multi_v7_defconfig config
-Date: Wed,  8 May 2024 15:29:27 +0530
-Message-Id: <20240508095927.155528-2-kiran.k@intel.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240508095927.155528-1-kiran.k@intel.com>
-References: <20240508095927.155528-1-kiran.k@intel.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N1ouawEg"
+Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-dc6dcd9124bso3838788276.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 08 May 2024 03:34:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715164446; x=1715769246; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=hVrH4nWDpy9303nXanJ/BAxnj/mMx1Y/GDqZVc0Fp1Y=;
+        b=N1ouawEgFvmP1UqyABleuqO7z1fVm490gHKzUaEwZxcy3l6r4/T+WsINmEvQ1My+Ba
+         Es/Za9DQ9HtlZYb62RzT5zarf1/fb+J0lszr1jm+cND0KHAQfuNa5UHuOA18e4bd2kXS
+         o60IMgCFe/WaWFNCCF/JgB8lXwjB0IZbRu7Wgt9Ph4D6d0wPJ884aMK65WJgsiPlqZEo
+         b0E75nIm9u7RawHl31KA9PQtqHGtv7WrpG/gf4PynL1vGrgfnqC28MKiK41d+CexdXt1
+         VFI9XNOFTh8UPwtsxA2IQ61idJlSTRCpP+zGl3nCl1axekDjubcv2T7m1On4aBub1csO
+         uosA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715164446; x=1715769246;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hVrH4nWDpy9303nXanJ/BAxnj/mMx1Y/GDqZVc0Fp1Y=;
+        b=fpzuXFy0jGcTpRwoUU7sL8oCP9Lf7gzIwq7r50TLuDmJatVdUX2LuUmZMqaVzSAYcS
+         fIW1d7TVAgvO1TajCoCFFnNvMFhq20Mcb+6M9Zz4D6B3yLlX1nDCLxXcjUtn5E7JisFE
+         0EDr4OVju28AQGNHLtIyRsDgqXRu12qSs9OHKJTIfqudzeGGzsBn6KQ3678GNv4f8lzh
+         frligVKiAzfEUw9Q9elYq+gpOaWNxek89343pYkY1WF0gKphTeYoLC9zgZXO9UDCMl8h
+         zFsVmjVgf26UZdXKMFbrh27gBfmVGtLzGiXe2O3YEKk50mDmm8ae9oVVnIis+NSTmxk+
+         X8pQ==
+X-Gm-Message-State: AOJu0YzbmeokuaLS6mQ2W/eBgfUfZKi8yhn5tQdjjzSjPg2uViu+cyQ2
+	9Gjk2YzIO4SwuN/ZD16dm0wm31XUnB28n+LjzWnZdzzcwsvZflAZFFkDjw==
+X-Google-Smtp-Source: AGHT+IHEfnJweDObJT0ZJQSa2dKBMG5Mng34QUkI3HLJQaLgdb+wsVMT+quR6fBzdZsssguj0pvr3Q==
+X-Received: by 2002:a25:8d8f:0:b0:de5:61d8:a21f with SMTP id 3f1490d57ef6-debb9d20f08mr2154414276.4.1715164446560;
+        Wed, 08 May 2024 03:34:06 -0700 (PDT)
+Received: from [172.17.0.2] ([20.102.199.104])
+        by smtp.gmail.com with ESMTPSA id ge16-20020a05622a5c9000b00437543e5307sm7501695qtb.40.2024.05.08.03.34.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 May 2024 03:34:06 -0700 (PDT)
+Message-ID: <663b551e.050a0220.90358.a1a5@mx.google.com>
+Date: Wed, 08 May 2024 03:34:06 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2889644770819577745=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, kiran.k@intel.com
+Subject: RE: [v1,1/2] Bluetooth: btintel_pcie: Fix compiler warnings
+In-Reply-To: <20240508095927.155528-1-kiran.k@intel.com>
+References: <20240508095927.155528-1-kiran.k@intel.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Fix the following compiler warning reported for ARCH=arm
-multi_v7_defconfig.
+--===============2889644770819577745==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-In file included from drivers/bluetooth/hci_ldisc.c:34:
-drivers/bluetooth/btintel.h:373:13: warning: 'btintel_hw_error' defined but not used [-Wunused-function]
-  373 | static void btintel_hw_error(struct hci_dev *hdev, u8 code)
-      |             ^~~~~~~~~~~~~~~~
+This is automated email and please do not reply to this email!
 
-cc: Stephen Rothwell <sfr@canb.auug.org.au>
-Signed-off-by: Kiran K <kiran.k@intel.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=851491
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.18 seconds
+GitLint                       FAIL      0.81 seconds
+SubjectPrefix                 PASS      0.20 seconds
+BuildKernel                   PASS      29.94 seconds
+CheckAllWarning               PASS      33.17 seconds
+CheckSparse                   PASS      39.02 seconds
+CheckSmatch                   FAIL      35.77 seconds
+BuildKernel32                 PASS      30.57 seconds
+TestRunnerSetup               PASS      529.60 seconds
+TestRunner_l2cap-tester       PASS      20.43 seconds
+TestRunner_iso-tester         FAIL      31.30 seconds
+TestRunner_bnep-tester        PASS      4.74 seconds
+TestRunner_mgmt-tester        PASS      110.32 seconds
+TestRunner_rfcomm-tester      PASS      7.26 seconds
+TestRunner_sco-tester         PASS      14.96 seconds
+TestRunner_ioctl-tester       PASS      7.75 seconds
+TestRunner_mesh-tester        PASS      5.86 seconds
+TestRunner_smp-tester         PASS      6.78 seconds
+TestRunner_userchan-tester    PASS      4.88 seconds
+IncrementalBuild              PASS      33.93 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v1,1/2] Bluetooth: btintel_pcie: Fix compiler warnings
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+6: B1 Line exceeds max length (82>80): "Closes: https://lore.kernel.org/oe-kbuild-all/202405080647.VRBej6fA-lkp@intel.com/"
+[v1,2/2] Bluetooth: btintel: Fix compiler warning for multi_v7_defconfig config
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+7: B1 Line exceeds max length (104>80): "drivers/bluetooth/btintel.h:373:13: warning: 'btintel_hw_error' defined but not used [-Wunused-function]"
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
+
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+Total: 122, Passed: 121 (99.2%), Failed: 1, Not Run: 0
+
+Failed Test Cases
+ISO Connect Suspend - Success                        Failed       4.180 seconds
+
+
 ---
- drivers/bluetooth/btintel.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index 5d4685b5c1fa..b5fea735e260 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -370,7 +370,7 @@ static inline int btintel_shutdown_combined(struct hci_dev *hdev)
- 	return -ENODEV;
- }
- 
--static void btintel_hw_error(struct hci_dev *hdev, u8 code)
-+static inline void btintel_hw_error(struct hci_dev *hdev, u8 code)
- {
- }
- #endif
--- 
-2.40.1
 
+--===============2889644770819577745==--
