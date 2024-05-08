@@ -1,63 +1,63 @@
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A31812836A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31B2126F39
 	for <linux-bluetooth@vger.kernel.org>; Wed,  8 May 2024 15:46:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715183177; cv=none; b=MSWyhYZDp4PflIxIefun5anzr/e01filhwvaNf1hUPFC+8jqvI+FMUmymQsb0uNrlUi6jVtA63K6fl09bNVVYFH5Q/dzlaVW73ns7BqvV8pAoihyathyFg7BYuwba3sQqbulv9HgVCirRd9R4lbWNJ7rlEoRNVrzOCZBaZY8ojA=
+	t=1715183178; cv=none; b=tTyoAHgZH+yJa8ZJInITrCn3bb1NmftXAyqWi9ctcbAyjR+6/JGlgKOUZENXMCwzVpCGqzsMndAZsJnlv3WvqDcRYAosgJBflqag4Ks4gsqBq22ApfOcza1OhMSI9ObUD4Q40uPYbx+1c2cwoVxHDW51FsFizNSyWFgdHq+EjXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715183177; c=relaxed/simple;
-	bh=qjoqmkW5BwDTnAc03MbNt7KdI8uD+mLMJxTKw9oHdLs=;
+	s=arc-20240116; t=1715183178; c=relaxed/simple;
+	bh=nNx6T8y+I4K4Gymzxivq/NvnOwRTIMdW0vn2FHy8dZw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Yj9G0O1sR1pSHqPyCrmj6sPVKKmWUUkoZ0dMhk0H/NpJ274nnvzRxY/70kO0Q5usHZifa3OOIPf9pIDxtZ//sBHAgM3HdZY1GEHrXR2aNNUgKygSaZ8xt7bdgZOegeLzBEcosxU0yXMriZRWB2ytYCS5DdXlrvtIw10tCCRkh4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io; spf=pass smtp.mailfrom=asymptotic.io; dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b=eIYTYaiH; arc=none smtp.client-ip=209.85.160.169
+	 MIME-Version; b=g1qnNS2zzgxYo1DcB9YvivuUQEU5BTHqlJ/A7nlIxDhv0LIxYS1hKI69Ak3gmVMonLUdFRt696EfB/u3vs9mgjnF+JpCPK/y5yo4Pp1R6c0Xm1CSEPoVUZ/milrxZk5l533fZIhSgI75GFOf3KT/cENwDbWa2A39f/T/Vu9hvIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io; spf=pass smtp.mailfrom=asymptotic.io; dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b=bKl43xuS; arc=none smtp.client-ip=209.85.160.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asymptotic.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b="eIYTYaiH"
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-43ae9962c17so13285591cf.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 08 May 2024 08:46:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b="bKl43xuS"
+Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-23f2996b634so2507402fac.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 08 May 2024 08:46:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asymptotic.io; s=google; t=1715183174; x=1715787974; darn=vger.kernel.org;
+        d=asymptotic.io; s=google; t=1715183175; x=1715787975; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Aipf2HOsl81RhQIqSKDgR4j/JsalsFZkCBYK1tn5rFo=;
-        b=eIYTYaiHW8QmGyCi/A0GUsfontJd0UqbBETmghHDPed+JQzH6MEt4c2zyTbxA6sHOp
-         P4NHM//+VPQKd/sEFaXUSwRmG+O9IxMm10Y8f7N6t8v8NXHlow7H0tUuDlWXKzUaDoNl
-         sjs9dRdxh+7iTWt2d7lSXe0t55mQbMIRVsLKExCdw0o7YjtT3sMzoyLxvYKYaBN/dUQN
-         +WzvxJWBVJEyTPFoFnRe9AHoD9Qv56+t73wzUcVqK2NeSgCXQ6vQfEO7RH0x8Q62Eyll
-         lc3RgaYSWXVekRYXruEeSN7xbwO6nsrcXE5Hc/sOd4Xofybi6uysrVFf1aT5JaBdHyf5
-         i1Tg==
+        bh=FMHpIX9Yw1rlh52aQZ0bbkD2dzqr65a9Vkm4Deux0RI=;
+        b=bKl43xuS0HBFiOKIan0tPIM87f8G74ufGwWTk4D8pmzh3/dV/8tJEH8bzUUL6PQtDn
+         dHhALvD0P3M5NEHyWsMUT3oVm0ocAxB+D6NNR47hsv8ecbNTtNR8kH9a10tuGUp2/jsW
+         p95F3keRo+uNPxbuRqdI1icGInJfE8pZoQNnSiYyOntZcffy5ua2mwuyyDWUFXsJcy9A
+         Xwm5PbhlGWPXzS4UnxVE91EVxoupa/KekTTr/nfMfB8C7kHADu55tGLKNEb/FqQCtyMt
+         zS/ejLph6i9KfDPGKNitxgTjAO+P4NdcF4hd5wZJQQlIo/u7PDJxcgXgZ+IsDso204xA
+         GwFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715183174; x=1715787974;
+        d=1e100.net; s=20230601; t=1715183175; x=1715787975;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Aipf2HOsl81RhQIqSKDgR4j/JsalsFZkCBYK1tn5rFo=;
-        b=oSQM1FdGWms2po8VCL9M8YeCgLIgLDQMIuLQ2SqZdHYLrYmERE0iED1HoWNoON/ug9
-         YgDICpGBCPgj0vw7+RoYyo25gjFsO9UWaL026U40yytthwe86Am2OZZvs+Lup5Ge5m+8
-         nrrMTVUqXtIt2CISkvC1uhkABrIzvgGRQnblOrQwX78GiumWbdd1/1FNvHinZxrSmk5e
-         vEUQtgvOqpfdj4nShcnm55aS/1SHomGMYy/8kv0doBpF6ZXJK/ctq9QX9Q9iUDUbspPK
-         pQYSDi9WwXJTI0KMnwS8j2Tl3XM1M5WLHnesCQeYGNLiamGagQMwqQzXkU1+JPSZhFmt
-         e+VA==
-X-Gm-Message-State: AOJu0YwpQYShuSpn8MZy2WWl9cowUxuJgLa4AieV1QPhXqrPHsqq2NNK
-	d1Odgvmmy5TcUhwOUDvDqAHsFM/yKyvuP1HHBmvksvbjG3BcQ5V+k6kGymBwRzylre2wbnpVTh+
-	v
-X-Google-Smtp-Source: AGHT+IFotrZyIAUqayZc9/YrXIBsuzz3yy0gdM/mQaw9HlldKXnM4gEzGEgGqTuJK/3P781oRRNVgQ==
-X-Received: by 2002:a05:622a:d3:b0:43a:ed55:f3a9 with SMTP id d75a77b69052e-43dbed3b59bmr33956271cf.30.1715183173855;
-        Wed, 08 May 2024 08:46:13 -0700 (PDT)
+        bh=FMHpIX9Yw1rlh52aQZ0bbkD2dzqr65a9Vkm4Deux0RI=;
+        b=Q81JvJJh50c4JXLGygMu7nXWKo5OJ9yVRgmi6vWBTmjVYGpRtb2WVFyrNB/QtfmLaC
+         /O1xd+SJprem8ZcXV/sWbp8Eyw4jRyWJffNO+YpZDH7nnJpVeDBQKhGcMKUhz30JTFy3
+         n6Kl7XIqJYlZWKky50Ov/UEWjIFWZ9lSLVcPBELorcYk3/Vc/XG0oroXYVeAwevUcDRa
+         QyWRe8cUh+Gsc471hHHqGmZVYwjv71s5h0Y6Y7Jxxvl1EdtBBp1ieSxDwzxjFy4UoSDX
+         HHjRsk/b3e6TZKayAEZQYtGtb3SntysRbqUBWccIKyCgI4PrCzeXYfRU9/ux4yEHyTPN
+         do+A==
+X-Gm-Message-State: AOJu0Yx1YjkmBAXefUtHJ3ApVNmalwUM4HTcE4c1FPdaKRMzgZvGqHCP
+	yN7reao4MSiT8BAahtuZErnMqNblf7LvtHbhVj+e7qIUjG43amO5V7LV7HXyyw6PheHVYFlRo6d
+	X
+X-Google-Smtp-Source: AGHT+IFpzkcEdf4Sh3ouP0EYhwDO22ZTYLp4F6dLYGYP2CcsPlXyczEkGxcG6Kp/HLo9oX1eJLeDKw==
+X-Received: by 2002:a05:6870:524a:b0:22e:8ed:9f7a with SMTP id 586e51a60fabf-240979c065fmr2995280fac.4.1715183174752;
+        Wed, 08 May 2024 08:46:14 -0700 (PDT)
 Received: from andromeda.lan (bras-base-toroon0359w-grc-19-74-15-47-99.dsl.bell.ca. [74.15.47.99])
         by smtp.gmail.com with ESMTPSA id cd14-20020a05622a418e00b0043791f7d831sm7756513qtb.63.2024.05.08.08.46.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 May 2024 08:46:13 -0700 (PDT)
+        Wed, 08 May 2024 08:46:14 -0700 (PDT)
 From: Arun Raghavan <arun@asymptotic.io>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arun Raghavan <arun@asymptotic.io>
-Subject: [PATCH BlueZ 2/5] asha: Implement volume on transport
-Date: Wed,  8 May 2024 11:46:01 -0400
-Message-ID: <20240508154604.276763-3-arun@asymptotic.io>
+Subject: [PATCH BlueZ 3/5] test: Add a script to test ASHA
+Date: Wed,  8 May 2024 11:46:02 -0400
+Message-ID: <20240508154604.276763-4-arun@asymptotic.io>
 X-Mailer: git-send-email 2.45.0
 In-Reply-To: <20240508154604.276763-1-arun@asymptotic.io>
 References: <20240508154604.276763-1-arun@asymptotic.io>
@@ -69,228 +69,178 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-We convert from the spec definition of the range to the DBus API range
-to make it easier for clients to not have to worry about that detail,
-and share an implementation with other uses of MediaTransport1.
+Plays out an audio file to the device. Depends on GStreamer for media
+file reading and decoding (specifically, gstreamer core,
+gst-plugins-base, gst-ffmpeg, and gst-python, or equivalent packages).
 ---
- profiles/audio/asha.c      | 88 +++++++++++++++++++++++++++++++++++---
- profiles/audio/asha.h      |  4 ++
- profiles/audio/transport.c | 28 +++++++++++-
- 3 files changed, 112 insertions(+), 8 deletions(-)
+ test/simple-asha | 158 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 158 insertions(+)
+ create mode 100755 test/simple-asha
 
-diff --git a/profiles/audio/asha.c b/profiles/audio/asha.c
-index c6769038f..a372e0db3 100644
---- a/profiles/audio/asha.c
-+++ b/profiles/audio/asha.c
-@@ -65,7 +65,9 @@ struct asha_device {
- 	struct gatt_db *db;
- 	struct gatt_db_attribute *attr;
- 	uint16_t acp_handle;
--	unsigned int notify_id;
-+	uint16_t volume_handle;
-+	unsigned int status_notify_id;
-+	unsigned int volume_notify_id;
- 
- 	uint16_t psm;
- 	bool right_side;
-@@ -75,6 +77,7 @@ struct asha_device {
- 	uint8_t hisyncid[8];
- 	uint16_t render_delay;
- 	uint16_t codec_ids;
-+	int8_t volume;
- 
- 	struct media_transport *transport;
- 	int fd;
-@@ -95,9 +98,15 @@ static struct asha_device *asha_device_new(void)
- 
- static void asha_device_reset(struct asha_device *asha)
- {
--	if (asha->notify_id)
-+	if (asha->status_notify_id) {
- 		bt_gatt_client_unregister_notify(asha->client,
--				asha->notify_id);
-+						asha->status_notify_id);
-+	}
+diff --git a/test/simple-asha b/test/simple-asha
+new file mode 100755
+index 000000000..feff9d29c
+--- /dev/null
++++ b/test/simple-asha
+@@ -0,0 +1,158 @@
++#!/usr/bin/env python3
++# SPDX-License-Identifier: LGPL-2.1-or-later
 +
-+	if (asha->volume_notify_id) {
-+		bt_gatt_client_unregister_notify(asha->client,
-+						asha->volume_notify_id);
-+	}
- 
- 	gatt_db_unref(asha->db);
- 	asha->db = NULL;
-@@ -244,6 +253,7 @@ unsigned int asha_device_start(struct asha_device *asha, asha_cb_t cb,
- 		0x01, // START
- 		0x01, // G.722, 16 kHz
- 		0,   // Unknown media type
-+		asha->volume, // Volume
- 		0,   // Other disconnected
- 	};
- 	int ret;
-@@ -290,6 +300,24 @@ unsigned int asha_device_stop(struct asha_device *asha, asha_cb_t cb,
- 	return asha->resume_id;
- }
- 
-+int8_t asha_device_get_volume(struct asha_device *asha)
-+{
-+	return asha->volume;
-+}
++import os
++import signal
++import sys
 +
-+bool asha_device_set_volume(struct asha_device *asha, int8_t volume)
-+{
-+	if (!bt_gatt_client_write_value(asha->client, asha->volume_handle,
-+				(const uint8_t *)&volume, 1, NULL, NULL,
-+				NULL)) {
-+		error("Error writing ACP start");
-+		return false;
-+	}
++import dbus
++import dbus.service
++import dbus.mainloop.glib
 +
-+	asha->volume = volume;
-+	return true;
-+}
++import gi
 +
- static char *make_endpoint_path(struct asha_device *asha)
- {
- 	char *path;
-@@ -410,6 +438,39 @@ void audio_status_notify(uint16_t value_handle, const uint8_t *value,
- 	}
- }
- 
-+static void read_volume(bool success,
-+			uint8_t att_ecode,
-+			const uint8_t *value,
-+			uint16_t length,
-+			void *user_data)
-+{
-+	struct asha_device *asha = user_data;
++gi.require_version("Gst", "1.0")
++gi.require_version("GLib", "2.0")
++from gi.repository import GLib, Gst
 +
-+	if (!success) {
-+		DBG("Reading volume failed with ATT errror: %u", att_ecode);
-+		return;
-+	}
++import bluezutils
 +
-+	if (length != 2) {
-+		DBG("Reading volume failed: unexpected length %u", length);
-+		return;
-+	}
++mainloop = None
++pipeline = None
++seqnum: int = 0
 +
-+	asha->volume = get_s8(value);
 +
-+	DBG("Got volume: %d", asha->volume);
-+}
++def signal_handler(_sig, _frame):
++    print("Got interrupt")
++    mainloop.quit()
 +
-+void volume_notify(uint16_t value_handle, const uint8_t *value,
-+					uint16_t length, void *user_data)
-+{
-+	struct asha_device *asha = user_data;
 +
-+	asha->volume = get_s8(value);
++signal.signal(signal.SIGINT, signal_handler)
 +
-+	DBG("Volume changed: %d", asha->volume);
-+}
 +
- static void handle_characteristic(struct gatt_db_attribute *attr,
- 								void *user_data)
- {
-@@ -430,16 +491,29 @@ static void handle_characteristic(struct gatt_db_attribute *attr,
- 	} if (uuid_cmp(ASHA_CHRC_READ_ONLY_PROPERTIES_UUID, &uuid)) {
- 		if (!bt_gatt_client_read_value(asha->client, value_handle,
- 					read_rops, asha, NULL))
--			DBG("Failed to send request to read battery level");
-+			DBG("Failed to send request for readonly properties");
- 	} if (uuid_cmp(ASHA_CHRC_AUDIO_CONTROL_POINT_UUID, &uuid)) {
- 		// Store this for later writes
- 		asha->acp_handle = value_handle;
-+	} if (uuid_cmp(ASHA_CHRC_VOLUME_UUID, &uuid)) {
-+		// Store this for later reads and writes
-+		asha->volume_handle = value_handle;
-+		asha->volume_notify_id =
-+			bt_gatt_client_register_notify(asha->client,
-+				value_handle, NULL, volume_notify, asha,
-+				NULL);
-+		if (!asha->status_notify_id)
-+			DBG("Failed to send request to notify volume");
-+		if (!bt_gatt_client_read_value(asha->client, value_handle,
-+					read_volume, asha, NULL))
-+			DBG("Failed to send request to volume");
- 	} if (uuid_cmp(ASHA_CHRC_AUDIO_STATUS_UUID, &uuid)) {
--		asha->notify_id = bt_gatt_client_register_notify(asha->client,
-+		asha->status_notify_id =
-+			bt_gatt_client_register_notify(asha->client,
- 				value_handle, NULL, audio_status_notify, asha,
- 				NULL);
--		if (!asha->notify_id)
--			DBG("Failed to send request to read battery level");
-+		if (!asha->status_notify_id)
-+			DBG("Failed to send request to notify AudioStatus");
- 	} else {
- 		char uuid_str[MAX_LEN_UUID_STR];
- 
-diff --git a/profiles/audio/asha.h b/profiles/audio/asha.h
-index 0fc28e8a3..20bcaa65b 100644
---- a/profiles/audio/asha.h
-+++ b/profiles/audio/asha.h
-@@ -10,6 +10,7 @@
-  *
-  */
- 
-+#include <stdbool.h>
- #include <stdint.h>
- 
- struct asha_device;
-@@ -32,3 +33,6 @@ unsigned int asha_device_start(struct asha_device *asha, asha_cb_t cb,
- 		void *user_data);
- unsigned int asha_device_stop(struct asha_device *asha, asha_cb_t cb,
- 		void *user_data);
++def usage():
++    print(f"Usage: simple-asha <remote addr> <audio file name> (optional volume 0-127)")
 +
-+int8_t asha_device_get_volume(struct asha_device *asha);
-+bool asha_device_set_volume(struct asha_device *asha, int8_t volume);
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index a104d27c0..b85d96914 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -1841,6 +1841,32 @@ static guint transport_asha_suspend(struct media_transport *transport,
- 	return ret;
- }
- 
-+static int8_t transport_asha_get_volume(struct media_transport *transport)
-+{
-+	struct asha_device *asha = transport->data;
-+	int8_t volume;
-+	int scaled_volume;
 +
-+	volume = asha_device_get_volume(asha);
++def start_playback(fd: int):
++    global mainloop, pipeline
 +
-+	// Convert -128-0 to 0-127
-+	scaled_volume = ((((int) volume) + 128) * 127) / 128;
++    outdata = bytearray(161)
 +
-+	return scaled_volume;
-+}
++    Gst.init(None)
 +
-+static int transport_asha_set_volume(struct media_transport *transport,
-+					int8_t volume)
-+{
-+	struct asha_device *asha = transport->data;
-+	int scaled_volume;
++    pipeline = Gst.parse_launch(
++        f"""
++          filesrc location="{sys.argv[2]}" ! decodebin !
++          audioconvert ! audioresample !
++          audiobuffersplit output-buffer-duration="20/1000" ! avenc_g722 !
++          appsink name=sink emit-signals=true
++    """
++    )
 +
-+	// Convert 0-127 to -128-0
-+	scaled_volume = ((((int) volume) * 128) / 127) - 128;
++    def on_new_sample(sink):
++        global seqnum
 +
-+	return asha_device_set_volume(asha, scaled_volume) ? 0 : -EIO;
-+}
++        sample = sink.emit("pull-sample")
++        buf = sample.get_buffer()
 +
- static void *transport_asha_init(struct media_transport *transport, void *data)
- {
- 	/* We just store the struct asha_device on the transport */
-@@ -1893,7 +1919,7 @@ static void *transport_asha_init(struct media_transport *transport, void *data)
- 			transport_asha_init, \
- 			transport_asha_resume, transport_asha_suspend, \
- 			NULL, NULL, NULL, \
--			NULL, NULL, \
-+			transport_asha_get_volume, transport_asha_set_volume, \
- 			NULL)
- 
- static const struct media_transport_ops transport_ops[] = {
++        with buf.map(Gst.MapFlags.READ) as info:
++            pos = 0
++
++            if info.size != 160:
++                print("Unexpected buffer size: ", info.size)
++
++            outdata[pos] = seqnum % 256
++            pos += 1
++
++            for byte in info.data:
++                outdata[pos] = byte
++                pos += 1
++
++            try:
++                n = os.write(fd, outdata)
++                if n != 161:
++                    print("Wrote less than expected: ", n)
++            except:
++                return Gst.FlowReturn.ERROR
++
++        seqnum += 1
++
++        return Gst.FlowReturn.OK
++
++    sink = pipeline.get_by_name("sink")
++    sink.connect("new-sample", on_new_sample)
++
++    pipeline.set_state(Gst.State.PLAYING)
++
++    def bus_message(_bus, message, _data) -> bool:
++        typ = message.type
++
++        if typ == Gst.MessageType.EOS:
++            print("End of stream")
++            mainloop.quit()
++        elif typ == Gst.MessageType.ERROR:
++            err, debug = message.parse_error()
++            print(f"Pipeline error: {err} ({debug})")
++            mainloop.quit()
++
++    bus = pipeline.get_bus()
++    bus.add_watch(GLib.PRIORITY_DEFAULT, bus_message, None)
++
++
++if __name__ == "__main__":
++    dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
++
++    mainloop = GLib.MainLoop()
++    bus = dbus.SystemBus()
++
++    if (len(sys.argv) == 3) or (len(sys.argv) == 4):
++        device = bluezutils.find_device(sys.argv[1])
++        if device is None:
++            print("Could not find device: ", sys.argv[1])
++            exit(255)
++    else:
++        usage()
++        sys.exit(255)
++
++    asha = bus.get_object("org.bluez", device.object_path + "/asha")
++    media = dbus.Interface(
++        bus.get_object("org.bluez", device.object_path + "/asha"),
++        "org.bluez.MediaEndpoint1",
++    )
++
++    props = asha.GetAll(
++        "org.bluez.MediaEndpoint1",
++        dbus_interface="org.freedesktop.DBus.Properties",
++    )
++    path = props["Transport"]
++
++    print("Trying to acquire", path)
++
++    transport = dbus.Interface(
++        bus.get_object("org.bluez", path),
++        "org.bluez.MediaTransport1",
++    )
++
++    # Keep default volume at 25%
++    volume = 32
++    if len(sys.argv) == 4:
++        volume = int(sys.argv[3])
++        if volume < 0 or volume > 127:
++            print("Volume must be between 0 (mute) and 127 (max)")
++
++    transport.Set(
++        "org.bluez.MediaTransport1",
++        "Volume",
++        dbus.UInt16(volume, variant_level=1),
++        dbus_interface="org.freedesktop.DBus.Properties",
++    )
++
++    (fd, imtu, omtu) = transport.Acquire()
++
++    start_playback(fd.take())
++
++    mainloop.run()
++
++    pipeline.set_state(Gst.State.NULL)
++    transport.Release()
 -- 
 2.45.0
 
