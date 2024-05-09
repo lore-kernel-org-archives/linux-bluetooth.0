@@ -1,282 +1,343 @@
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout4-smtp.messagingengine.com (fout4-smtp.messagingengine.com [103.168.172.147])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D87847F7CC
-	for <linux-bluetooth@vger.kernel.org>; Thu,  9 May 2024 19:29:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20DBC84E1B
+	for <linux-bluetooth@vger.kernel.org>; Thu,  9 May 2024 20:09:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715282947; cv=none; b=NTO0PHqiDlEWjkN5aLMRueMh2c6vSxNAORclCyWtwhPnuFmnelFMzZ8dYFJ32UNuExmQBiHNmF1YBM4OfutXFrZ1zTafTF4BRM7qI1X2fCnXxJS1Dfg4Br7rxjGS+X42lEWOfw9k7Sy4yY4u1YIx5e/AcgV8GJqJISpyCKN6BMU=
+	t=1715285368; cv=none; b=jj7wD81EAYgRuGHH0PhDaXh7HbFnoCtWk2QWKlgY+TYD8QJ3i8CpBvr6qvwa3WwHi17LXx2d4uAnPbhp23gslplGPzf/9uXV1m2O6sHZw2v+YOaRMwCD2w8jjxajPeFrGKPeQsxr5kJLCYEwZ4g/+7QmsZTEzPqCe2yuogzkQKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715282947; c=relaxed/simple;
-	bh=lygHSHaRbgSpjWs6DKaT3ke3UxVu3JanIjYDM1lWwFI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Vnw4lIF3JLtOWxYDWlUcPpQssu7uSD66U3SEknl7GwkbfFUu94qaZhTRAdV/1eKdr9OnjqR33Nj0rDoY3EnlmZMqFIFHNBuhNz0bDbUocmyCLFE6SO+6zEeB8dhGXSc/7oh4RfJ3y/UOTXKXY8fsx1ndYzmrLCGGGgNPZx5YHsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FfPtWokg; arc=none smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1715285368; c=relaxed/simple;
+	bh=QwqQWXli/hoLijv744sI2Jucp3ZvhNOP0uEqslHVW7M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ut5228GzM6V4tHwthcAZp/9N8hLzm0qMpmgSbjYoumjuPFdmKJ726I+p8Ke/1CUrMiEzpf6ACTUb3ahT7fZrXUJ8RbB3U0WIoxPJBJb+uRrxFO8eMYNx6s/KqSOXXJH0KRXaiMOltEbsoKx7/1j5IB2IQLzTuwAVm2jcEKdXna8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jannau.net; spf=pass smtp.mailfrom=jannau.net; dkim=pass (2048-bit key) header.d=jannau.net header.i=@jannau.net header.b=okMrLBL2; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=gxbWAzTn; arc=none smtp.client-ip=103.168.172.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jannau.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jannau.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FfPtWokg"
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2e34e85ebf4so11467411fa.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 09 May 2024 12:29:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715282944; x=1715887744; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PAe2GGibyfQZ+JyC6vgv47NIOM8DZ1UuVnSvz2Ybsfg=;
-        b=FfPtWokgZy8eiVXWUy8XpR1/oxVrdIPSGsA+vCOt6i/PVoodt9qpxkDGFFC1FZelXP
-         OiR7GT3C/dvIXAn3riokk6czmq0SbRdCgXJi8ssw9Lh1AboFLGOyjN4Lao1KbRTgSVdi
-         2jKlETwOU3P0ZExMnJAw3nfOhbnFBeFkdv/EkByA4Q7IHMTIsW8kyzbsyTPYF/u2PEvl
-         0ULECgq4TWwXhtO1KYxcfFg08NV9DYZervc/9x1Gn0HkJDz2U4Vi40Vz44sZ5/s4483A
-         cMPC1iq8uIWWpUnS09zwqohq7M9FtmBew7uJdsNJ3KuMrObE7ebXo14/lrAW2OnPYAr3
-         Cc8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715282944; x=1715887744;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PAe2GGibyfQZ+JyC6vgv47NIOM8DZ1UuVnSvz2Ybsfg=;
-        b=WADejEYYyB3hBwFNbT8MrB7EgJtr5pD0Tl9qLpnVDjF+kAt6TWlUJ0R8wUuy9iqve/
-         8cDQ+tCaED9s7drwIBm4x+nEhA8kcC6qSyYevcFJ3CpxnKTNt3q6uePDrfoELyZKHbPm
-         +7y2wkWAtGOEJs9pjdDfi7wypPjYUSF9SWpWeXQA6iRpOIn0MXUEuX9ltlmtOiFTNsJh
-         L2V17Nz6mboL0tU+gYuZftFkYU3I64a/K73VnBBdJUqoZzcvw9I6X0rH8L/TdqMqLM3L
-         7jdMFEhDMPGxwkD4yM59i9yqEiXIKdqpcnomlNizQ4wyRsN3EQUdYCNJrERMhktJv0cG
-         Lh6A==
-X-Gm-Message-State: AOJu0YyyszNIyyBC/rrZj+++gyo72XjqvX1eUuAxozDvL9VWWRHU5Qqj
-	jVJ7uedli/dAZSMrEoN6B9Z7tZG18+cYACpodboRn0bUgU5x+qcRNpkdSE3ere1sfxVY9/WFCtp
-	PS+o2L/gR0c66Ad6i7r4tD3A9JJGv0/X0
-X-Google-Smtp-Source: AGHT+IGP4vDQtVzNJALfW9pTAFT+SHaT1lpGbqGDJNT0dBrGDwZmPV1Jwte5le1LDB7e6WlK8BT3jduLTwoirBQw/tE=
-X-Received: by 2002:a05:651c:1033:b0:2e2:ee3c:40f9 with SMTP id
- 38308e7fff4ca-2e52039df62mr2234881fa.43.1715282943508; Thu, 09 May 2024
- 12:29:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=jannau.net header.i=@jannau.net header.b="okMrLBL2";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="gxbWAzTn"
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+	by mailfout.nyi.internal (Postfix) with ESMTP id 4AFB313815E6;
+	Thu,  9 May 2024 16:09:25 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute4.internal (MEProxy); Thu, 09 May 2024 16:09:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jannau.net; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1715285365;
+	 x=1715371765; bh=SBoNhWMV3i8OsVD2I8vL6WtiP1ci99cskA3ytAWirkA=; b=
+	okMrLBL2xcHLjkHNV7PhhhiIVSDncm5yoX0YHcRajP3VEpErEp4A1gG2PwFBSVy9
+	9b/ZH8NxNxBaxx6+36qeTpdWc8wIqNUentcidAHlNfHTgOi0Duy94dAhghUK1Ylz
+	cLdoLk+v++IhnZTTsRg9YG/6Dd0PuaSn8LaBAr6MUs/ewqWeOYy2zQDrPkgWLMJd
+	zqiKWSPacUbDY9JyeHtmCjzKQA10l/TSwPIsDOhuiOUlALHdffKIYUn3BK0H8RVl
+	2EJNLvXs21CaxUFULkVaymAVY8CaF7kZFti9ZYiRu2iPTSEiQsOKqOmrtXP5lbxy
+	ZGxwnOUL8eyUE0s9DARYVg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1715285365; x=
+	1715371765; bh=SBoNhWMV3i8OsVD2I8vL6WtiP1ci99cskA3ytAWirkA=; b=g
+	xbWAzTnDB1MEykf0Sl4/WfWyvJYyghq/XKcu+5dDef5ia3L4Zaf8jLm1TZ4RSYqA
+	Sk7F0hG0iw68WETviS04WtnLoVFzEZ6YSO+wFlJczdjVNQRWKWPPuWu21O9NUgeY
+	96NpGkl8BqpiuZhRVfswKCPBCrEGHqmtkRnNBAkUYww8aE1aruQUmXxyALpSmh7U
+	lj5xSEhnU6qruTBhr0u8s26wy8tiCO9GUOP3hQBOXHnfmJLh3Pqte6OY7IIa6Pu1
+	EjZYQePjj7aSD9FXgc88XdZrvzHMgcVY3taJbqUEdu1EPO+5O5hifGvJj+xt+HDo
+	bUvEVe7OT9hvQy/a/txmQ==
+X-ME-Sender: <xms:dC09Zn_CYZO79d3GOy2-wYJZvC4trAlUn-wq74fiNb4FiqDCTS9H0Q>
+    <xme:dC09ZjsGaEyCPIkqxpXRjDES97YEHJ7qZhNQ7PgrHYbcogPpheq4lx-A4vL4aEz1W
+    7rD489ApM_wmkl_Njs>
+X-ME-Received: <xmr:dC09ZlABqN3xjWf-cOS8oJq6jzhSNtgUDGa8fDcGMPf8yohzJYdTElpnOOOBg9PB8rrbA0ijJi7TpYPAxQf24aVWIyFtKwn7gQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrvdefvddgudegfecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpeffhffvvefukfhfgggtugfgjgesmhekreertddtjeenucfhrhhomheplfgr
+    nhhnvgcuifhruhhnrghuuceojhesjhgrnhhnrghurdhnvghtqeenucggtffrrghtthgvrh
+    hnpedtveethfehteetjeekteettdehudevleduvdekiefhgeffkefhueekleffhfeiteen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehjsehjrg
+    hnnhgruhdrnhgvth
+X-ME-Proxy: <xmx:dC09ZjfbWSwVnubVducfePFMzkpfBkqwmb9jDqb6xKJLtOUQJYaQTg>
+    <xmx:dC09ZsOELaLjnTRLg8r8m4Sx9L295TN-P_UCb3kLJL1EXIX_fuwZcQ>
+    <xmx:dC09ZllVU_FT6V1aQzt8EPt743YrZx_vazZwpay-Yg_TXrugv9H_sw>
+    <xmx:dC09Zmve0u3EyHfg3PZDqQeuoX9kmzw0qL55ZqxIK2rFuGkaMlO5lg>
+    <xmx:dS09Zpqvu484eiAkJzEwaAUziAQfm5pCa_BjxB4ILCyEd5etgREqpnUd>
+Feedback-ID: i47b949f6:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 9 May 2024 16:09:24 -0400 (EDT)
+Date: Thu, 9 May 2024 22:09:22 +0200
+From: Janne Grunau <j@jannau.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, regressions@lists.linux.dev,
+	asahi@lists.linux.dev
+Subject: Re: [PATCH v1] Bluetooth: hci_sync: Use advertised PHYs on
+ hci_le_ext_create_conn_sync
+Message-ID: <Zj0tcmseJCjR4hK2@robin>
+References: <20240405204037.3451091-1-luiz.dentz@gmail.com>
+ <Zjz0atzRhFykROM9@robin>
+ <CABBYNZLMODHp+jBu2oVDC5Pg6fyAKJugQF0N-XgarjWQJJPObg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240509231839.3005270-1-ajay.k.v@intel.com>
-In-Reply-To: <20240509231839.3005270-1-ajay.k.v@intel.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 9 May 2024 15:28:51 -0400
-Message-ID: <CABBYNZ+Xn1YsXMUSgGK+Xmmn_M3UwZAwuBG4j9vwNP-DK9tL=g@mail.gmail.com>
-Subject: Re: [PATCH v4 1/2] doc/ccpTest: Add document support for CCP test interface
-To: Ajay KV <ajay.k.v@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-Hi Ajay,
-
-On Thu, May 9, 2024 at 1:52=E2=80=AFPM Ajay KV <ajay.k.v@intel.com> wrote:
->
-> call control profile interface has been documented with
-> man page added.
-> ---
->  Makefile.am               |  6 ++-
->  doc/org.bluez.CcpTest.5   | 82 +++++++++++++++++++++++++++++++++++++++
->  doc/org.bluez.CcpTest.rst | 50 ++++++++++++++++++++++++
->  3 files changed, 136 insertions(+), 2 deletions(-)
->  create mode 100644 doc/org.bluez.CcpTest.5
->  create mode 100644 doc/org.bluez.CcpTest.rst
->
-> diff --git a/Makefile.am b/Makefile.am
-> index 05d02932f205..07019f4e1628 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -377,7 +377,8 @@ man_MANS +=3D doc/org.bluez.obex.Client.5 doc/org.blu=
-ez.obex.Session.5 \
->                 doc/org.bluez.obex.PhonebookAccess.5 \
->                 doc/org.bluez.obex.MessageAccess.5 \
->                 doc/org.bluez.obex.Message.5 \
-> -               doc/org.bluez.obex.AgentManager.5 doc/org.bluez.obex.Agen=
-t.5
-> +               doc/org.bluez.obex.AgentManager.5 doc/org.bluez.obex.Agen=
-t.5 \
-> +               doc/org.bluez.CcpTest.5
->  endif
->  manual_pages +=3D src/bluetoothd.8
->  manual_pages +=3D doc/org.bluez.Adapter.5 doc/org.bluez.Device.5 \
-> @@ -465,7 +466,8 @@ EXTRA_DIST +=3D doc/org.bluez.Adapter.rst doc/org.blu=
-ez.Device.rst \
->                 doc/org.bluez.BatteryProviderManager.rst \
->                 doc/org.bluez.BatteryProvider.rst doc/org.bluez.Battery.r=
-st \
->                 doc/org.bluez.AdminPolicySet.rst \
-> -               doc/org.bluez.AdminPolicyStatus.rst
-> +               doc/org.bluez.AdminPolicyStatus.rst\
-> +               doc/org.bluez.CcpTest.rst
->
->  EXTRA_DIST +=3D doc/org.bluez.Media.rst doc/org.bluez.MediaControl.rst \
->                 doc/org.bluez.MediaPlayer.rst doc/org.bluez.MediaFolder.r=
-st \
-> diff --git a/doc/org.bluez.CcpTest.5 b/doc/org.bluez.CcpTest.5
-> new file mode 100644
-> index 000000000000..b16097d08270
-> --- /dev/null
-> +++ b/doc/org.bluez.CcpTest.5
-
-The man page itself should be generated with rst2man so no need to commit i=
-t.
-
-> @@ -0,0 +1,82 @@
-> +.\" Man page generated from reStructuredText.
-> +.
-> +.
-> +.nr rst2man-indent-level 0
-> +.
-> +.de1 rstReportMargin
-> +\\$1 \\n[an-margin]
-> +level \\n[rst2man-indent-level]
-> +level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
-> +-
-> +\\n[rst2man-indent0]
-> +\\n[rst2man-indent1]
-> +\\n[rst2man-indent2]
-> +..
-> +.de1 INDENT
-> +.\" .rstReportMargin pre:
-> +. RS \\$1
-> +. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
-> +. nr rst2man-indent-level +1
-> +.\" .rstReportMargin post:
-> +..
-> +.de UNINDENT
-> +. RE
-> +.\" indent \\n[an-margin]
-> +.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
-> +.nr rst2man-indent-level -1
-> +.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
-> +.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
-> +..
-> +.TH "ORG.BLUEZ.CCPTEST" 5 "May 2024" "BlueZ" "Linux System Administratio=
-n"
-> +.SH NAME
-> +org.bluez.CCPTest \- BlueZ D-Bus CCPTest API documentation
-> +.SH INTERFACE
-> +.INDENT 0.0
-> +.TP
-> +.B Service
-> +org.bluez
-> +.TP
-> +.B Interface
-> +org.bluez.CCPTest1
-> +.TP
-> +.B Object path
-> +[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/CallerX
-> +.UNINDENT
-> +.SS Methods
-> +.SS void Answer()
-> +.INDENT 0.0
-> +.INDENT 3.5
-> +This method can be called to answer an incoming call in progress.
-> +.sp
-> +Possible errors:
-> +.INDENT 0.0
-> +.TP
-> +.B org.bluez.Error.Failed
-> +.TP
-> +.B org.bluez.Error.NotConnected
-> +.UNINDENT
-> +.UNINDENT
-> +.UNINDENT
-> +.SS void Reject()
-> +.INDENT 0.0
-> +.INDENT 3.5
-> +This Method can be called to reject a call, which can be an active call =
-or a call on hold state.
-> +.sp
-> +Possible errors:
-> +.INDENT 0.0
-> +.TP
-> +.B org.bluez.Error.Failed
-> +.TP
-> +.B org.bluez.Error.NotConnected
-> +.UNINDENT
-> +.UNINDENT
-> +.UNINDENT
-> +.SS Properties
-> +.SS uint32 CallState [readonly]
-> +.INDENT 0.0
-> +.INDENT 3.5
-> +call index defined by CCP profile to denote the active call.
-> +.UNINDENT
-> +.UNINDENT
-> +.\" Generated by docutils manpage writer.
-> +.
-> diff --git a/doc/org.bluez.CcpTest.rst b/doc/org.bluez.CcpTest.rst
-> new file mode 100644
-> index 000000000000..79ead19ad538
-> --- /dev/null
-> +++ b/doc/org.bluez.CcpTest.rst
-> @@ -0,0 +1,50 @@
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +org.bluez.CCPTest
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +-------------------------------------
-> +BlueZ D-Bus CCPTest API documentation
-> +-------------------------------------
-> +
-> +:Version: BlueZ
-> +:Date: May 2024
-> +:Manual section: 5
-> +:Manual group: Linux System Administration
-> +
-> +Interface
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +:Service:      org.bluez
-> +:Interface:    org.bluez.CCPTest1
-> +:Object path:  [variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/C=
-allerX
-
-I'm missing something perhaps, but it seems we need another interface
-that creates the calls and something like CCPCallTest1 for actually
-controlling the call. Perhaps we can following something similar to
-oFono interfaces in that respect:
-
-https://kernel.googlesource.com/pub/scm/network/ofono/ofono/+/refs/heads/ma=
-ster/doc/voicecallmanager-api.txt
-https://kernel.googlesource.com/pub/scm/network/ofono/ofono/+/refs/heads/ma=
-ster/doc/voicecall-api.txt
-
-> +Methods
-> +-------
-> +
-> +void Answer()
-> +``````````````
-> +
-> +       This method can be called to answer an incoming call in progress.
-> +
-> +       Possible errors:
-> +
-> +       :org.bluez.Error.Failed:
-> +       :org.bluez.Error.NotConnected:
-> +
-> +void Reject()
-> +`````````````````
-> +
-> +       This Method can be called to reject a call, which can be an activ=
-e call or a call on hold state.
-> +
-> +       Possible errors:
-> +
-> +       :org.bluez.Error.Failed:
-> +       :org.bluez.Error.NotConnected:
-> +
-> +Properties
-> +----------
-> +
-> +uint32 CallState [readonly]
-> +```````````````````````````
-> +
-> +       call index defined by CCP profile to denote the active call.
-> --
-> 2.34.1
->
->
+Content-Type: multipart/mixed; boundary="80K1noRE+tcdeRpV"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CABBYNZLMODHp+jBu2oVDC5Pg6fyAKJugQF0N-XgarjWQJJPObg@mail.gmail.com>
 
 
---=20
-Luiz Augusto von Dentz
+--80K1noRE+tcdeRpV
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+
+On Thu, May 09, 2024 at 12:30:21PM -0400, Luiz Augusto von Dentz wrote:
+> Hi Janne,
+> 
+> On Thu, May 9, 2024 at 12:06 PM Janne Grunau <j@jannau.net> wrote:
+> >
+> > Hej,
+> >
+> > On Fri, Apr 05, 2024 at 04:40:33PM -0400, Luiz Augusto von Dentz wrote:
+> > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > >
+> > > The extended advertising reports do report the PHYs so this store then
+> > > in hci_conn so it can be later used in hci_le_ext_create_conn_sync to
+> > > narrow the PHYs to be scanned since the controller will also perform a
+> > > scan having a smaller set of PHYs shall reduce the time it takes to
+> > > find and connect peers.
+> > >
+> > > Fixes: 288c90224eec ("Bluetooth: Enable all supported LE PHY by default")
+> >
+> > This commit in v6.8.9 apparently has regressed connecting to LE devices
+> > like Logitech mices with Apple/Broadcom BCM4388 devices. Those devices
+> > carry HCI_QUIRK_BROKEN_LE_CODED which became necessary after 288c90224eec
+> > ("Bluetooth: Enable all supported LE PHY by default").
+> > Tested so far only by reverting aaf06285498861d6caaff5b26d30af70dd2b819f
+> > on top of v6.8.9. Looking at the change I don't see anything obvious
+> > which would explain the breakage.
+> > I would assume v6.9-rc6 is affected as well but I haven't tested this
+> > yet.
+> 
+> Would be great if you provide the HCI trace to confirm the problem.
+
+looks like there is an issue with initiating "LE Extended Create
+Connection":
+
+| > HCI Event: LE Meta Event (0x3e) plen 26
+|       LE Extended Advertising Report (0x0d)
+|         Num reports: 1
+|         Entry 0
+|           Event type: 0x2515
+|             Props: 0x0015
+|               Connectable
+|               Directed
+|               Use legacy advertising PDUs
+|             Data status: Complete
+|             Reserved (0x2500)
+|          Legacy PDU Type: Reserved (0x2515)
+|           Address type: Random (0x01)
+|           Address: DF:F4:9E:F3:A9:72 (Static)
+|           Primary PHY: Reserved
+|           Secondary PHY: No packets
+|           SID: no ADI field (0xff)
+|           TX power: 127 dBm
+|           RSSI: -60 dBm (0xc4)
+|           Periodic advertising interval: 0.00 msec (0x0000)
+|           Direct address type: Public (0x00)
+|           Direct address: 5C:1B:F4:7F:BF:6B (Apple, Inc.)
+|           Data length: 0x00
+| < HCI Command: LE Set Extended Scan Enable (0x08|0x0042) plen 6
+|         Extended scan: Disabled (0x00)
+|         Filter duplicates: Disabled (0x00)
+|         Duration: 0 msec (0x0000)
+|         Period: 0.00 sec (0x0000)
+| > HCI Event: Command Complete (0x0e) plen 4
+|       LE Set Extended Scan Enable (0x08|0x0042) ncmd 1
+|         Status: Success (0x00)
+| < HCI Command: LE Extended Create Connection (0x08|0x0043) plen 10
+|         Filter policy: Accept list is not used (0x00)
+|         Own address type: Public (0x00)
+|         Peer address type: Random (0x01)
+|         Peer address: DF:F4:9E:F3:A9:72 (Static)
+|         Initiating PHYs: 0x00
+| > HCI Event: Command Status (0x0f) plen 4
+|       LE Extended Create Connection (0x08|0x0043) ncmd 1
+|        Status: Unsupported Feature or Parameter Value (0x11)
+
+Full trace attached
+
+Janne
+
+--80K1noRE+tcdeRpV
+Content-Type: application/octet-stream
+Content-Disposition: attachment; filename="bcm4388_v6.8.9_hci_bt_le.log"
+Content-Transfer-Encoding: base64
+
+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
+AAAAAAkAAAAAAOL1vY9jN7s=
+
+--80K1noRE+tcdeRpV--
