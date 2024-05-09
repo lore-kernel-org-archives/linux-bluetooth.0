@@ -1,377 +1,173 @@
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FB6080055
-	for <linux-bluetooth@vger.kernel.org>; Thu,  9 May 2024 21:42:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CCD11292E6
+	for <linux-bluetooth@vger.kernel.org>; Thu,  9 May 2024 22:23:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715290977; cv=none; b=sWhfX9/hPb1ouzvK4jLSF6QXbZVdjSImQiHiIO5VV9B9mjsG+Km4TdQ0L5kAySZ8J1SkS+TZIc9igOD2zQ7Yyj6xXEckgF4ohHEUJUGX6fPn+PgEschNgRfXLt5mPsQIUm+kVlqMQ6CCqvGFzpxQewxfJHg4Wt67xm6FffYav3U=
+	t=1715293412; cv=none; b=g7GXZyZzpslVP3wyDNPwo7lYSAXiPIdZxgicFDBMxzIAlH7J++oNmXnZZ9ZkTW6cAwiFGWywY7Qwr6PQQmEujG2LGRtquKmvB4h3lkLVIpQRKAfmwkuZPN8IY7xl8NFHvb6Y/PA6I+1Fwio2CO5DZkann1kcFiV3uercyzwoWsI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715290977; c=relaxed/simple;
-	bh=ep5HG7ocdmwDg+JEg8KkElUN1ZX6Newh+r5Dv/bopsI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tDdoG8+QY/g5MEN5LIAkXuk/HYp505tat3tmrIHDZ9TMm7KncengA2vb24uPOjxtBn7rtjHytg0aA7TQ8eLnxfb2pCkb2uAgCTDj8LkNGm8FrPmfTbTW/ZVwyW5uCXkDuhcCRfSYxrzEIdej9phG99r4BEkera9QBCo0MEhr7to=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=prestonhunt.com; spf=pass smtp.mailfrom=prestonhunt.com; dkim=pass (2048-bit key) header.d=prestonhunt-com.20230601.gappssmtp.com header.i=@prestonhunt-com.20230601.gappssmtp.com header.b=CnUSQ5y3; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=prestonhunt.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prestonhunt.com
+	s=arc-20240116; t=1715293412; c=relaxed/simple;
+	bh=ujtHeXGGZ+idJFPVBlDBxelVhiQm6qMxCY59RV0nu7I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QYXnCdmVHelAMx4qEPAcy9gd874z2pMOzSr37yVMGiEd9v8qxdm3TEI7ttRZ6/X9rViCQoI/3OWRSA3DR/cahIV/j+fMblMBwaQIPuTMP4+QyHVB9bQ5h+556rF2KA2+qOECyhot4wlyw0l4EKf/mNmKxaPn1orCNKDnoY5hrg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hFHsoJ6A; arc=none smtp.client-ip=209.85.208.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=prestonhunt-com.20230601.gappssmtp.com header.i=@prestonhunt-com.20230601.gappssmtp.com header.b="CnUSQ5y3"
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2b4952a1aecso1046389a91.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 09 May 2024 14:42:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hFHsoJ6A"
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2e3e18c23f9so17882771fa.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 May 2024 15:23:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=prestonhunt-com.20230601.gappssmtp.com; s=20230601; t=1715290974; x=1715895774; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1715293409; x=1715898209; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ux8Mps/K7Xuox2Zey8Eus3v2m5a77QJgt2BRbr7nCiU=;
-        b=CnUSQ5y3q7doM6T/ZlHc50yy+IRXONwlDhweMzAvHTKkM2bNv0j1kYHOjLKa4wVOQd
-         wPL8jvR9eoh3xPbRGIQUJEL3Cr73p/zdMpaGPsY1CxBxp/AO4vi+Fj34UXTgJN+ltF9Y
-         KKhcQx8MH6vHHQ9E+ddJRNpSNls8BErjuPPEKGK79AwDj3wXNjdjgMRdI/1REqB83LLe
-         yXKpLzThsyi1atiKKIu8pE8XeM1/YnIF8mCZ2jY1lEGcB992IyZUK3QuUxOW9ARJjAIT
-         sV7dF/0TQ8J8uMnRR8t9m+PSZhVv6ElNv+LpTlu4jNlaQhcjVQ4RcripOoFxmfEqQHim
-         1TZg==
+        bh=FkAPHuFAqgVKkwPXOmVKd4nEJl7twGAILgmFeDyg/14=;
+        b=hFHsoJ6Ap+uyGZocI77ONQ4N8Cag082eddbgDSYVns24hiEGjknsXaM9uRdjKSgX+K
+         kNhBs5XtS4YrNnXyxFbWY7VyRbgFOooA7AsyDqWWYJZAcF6FYmO/84l+CAQsKHZ4QsJe
+         C+t2BwsUqIX9poDAB7E3xD6Vj2g1JeoeVOivehQ3ijClQnc/7XqtzD/Pg3ksTZVcG9It
+         Dl6dQAexwzNl6mH6jWj/NdU6wWRXvGmMyQWy3OCMZXgRtG6YT/0D2dRE96E/uU+cVVOG
+         qfKtXnZ+dhBph+P4Z5qaYz28/6gv0eyIhvZ298tNM7jGUsRjZk2XsxEvdzFKKULO/cgi
+         yohw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715290974; x=1715895774;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1715293409; x=1715898209;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ux8Mps/K7Xuox2Zey8Eus3v2m5a77QJgt2BRbr7nCiU=;
-        b=BwViKmo6F43lefwI/WXmERtWyJ6k+Amc5EKATZ+PpycQUifxVB7gYiyUpjsdKQUtj3
-         aePLkFKuEPv75bpsODscSSI95FZd/Pc0lKFTzj9pVMwVQ0/pne4Mjz0lKh4FYgcJnez/
-         5V35W23RSw6WzNwo+26PgSeeU/YEgb7TbxLbs8wCL1BzyhSSYngUiZpyZbkODsdqlR3N
-         0i3Vy9eXcOSDduhNocsQxrKIZnWWKPbLxwp8hdBxT098u3TbpGBqbKalTj6xzRJ9nwnH
-         qmaIe6GAGM6AuNKgxu0XWqqCRRKzYeRakhGLBibBwM/eTn6c/McpOZ2V938VizYpA1+L
-         fjpg==
-X-Gm-Message-State: AOJu0YzeG534tFyXpYims3/qzGGn537eOJTxd8Eo3kT5Es33206BqUas
-	diHfDxHBsY2AI4TSCxQZkGFKGzo0MM+Q3eA2YbdUYNA8r4epzaewBZFIZH5IdLpAtCu8eoYKMX6
-	F
-X-Google-Smtp-Source: AGHT+IG5pn9rvN+wu4GZrrnvzihjeUnxgnu8O5j4cHYnkJcDH2ZKdSLVraK0GeJwCiF5Oqo3KiHngQ==
-X-Received: by 2002:a17:90b:3118:b0:2b2:c2dd:9cb0 with SMTP id 98e67ed59e1d1-2b6ccd85e94mr687650a91.43.1715290974196;
-        Thu, 09 May 2024 14:42:54 -0700 (PDT)
-Received: from localhost.localdomain (97-115-125-150.ptld.qwest.net. [97.115.125.150])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2b628ea59absm3817455a91.47.2024.05.09.14.42.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 May 2024 14:42:53 -0700 (PDT)
-From: Preston Hunt <me@prestonhunt.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Preston Hunt <me@prestonhunt.com>
-Subject: [PATCH BlueZ 1/1] test examples: fix python3 errors
-Date: Thu,  9 May 2024 14:42:31 -0700
-Message-ID: <20240509214231.2783781-2-me@prestonhunt.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20240509214231.2783781-1-me@prestonhunt.com>
-References: <20240509214231.2783781-1-me@prestonhunt.com>
+        bh=FkAPHuFAqgVKkwPXOmVKd4nEJl7twGAILgmFeDyg/14=;
+        b=wxUZmh7fLzu2zsIv6qUwq61uHSt/xJNtt72zB9QOmub026iQT/3f5vjjNmxZ+uoHmP
+         kmiR8cuMSSKtCNPtEbc+UqnNJeBRgqKFweM+6OSKvm5ffWtVbBI/jU8O+BpEeW4zRoFN
+         55jLlDLveIYv022WoXx+PFU1AquzovXlItDgA1d3pDKOXdb8Oqo9YobDsQ+Kd4p9qF13
+         7EoUMeu3XFLSFLOxD1l0SVsas1f+mYEcMHQ9qMGPKuvWVfo9Kd0eK9X0Xc4mYMONTQ9Q
+         SfujnxqdeSmbwxBiLHPc3oDUM7Q/kBQ9lByjyXxUVfC41+RYUObWNWMPI4WBY2OzoZJ/
+         Yp+g==
+X-Gm-Message-State: AOJu0YwFzHzQPntnHz5tTrKDBTSp/+sqJcvMTwCyREB/9M+MtS4gurWc
+	8CQ4xnldSIhEAmKSZo5PpUuXHaSS7d1wLOS+YE1ujwQR33ipflxKGIQ0rLkjSQ4TRouhsikuPmx
+	6ACn0Fe1dmT6kdyVUARTCA18XQQynIA==
+X-Google-Smtp-Source: AGHT+IGLe/J80f0oxe7aMe45qxKdLEoNXDk0U0AAhmjA3BkH7bcJsQ9vyZ7yq8lTCRIWXKTsxD3HDmYrA53UkViRG2c=
+X-Received: by 2002:a2e:9253:0:b0:2e2:a0f0:4e74 with SMTP id
+ 38308e7fff4ca-2e5203a44b5mr3717461fa.52.1715293408869; Thu, 09 May 2024
+ 15:23:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240405204037.3451091-1-luiz.dentz@gmail.com>
+ <Zjz0atzRhFykROM9@robin> <CABBYNZLMODHp+jBu2oVDC5Pg6fyAKJugQF0N-XgarjWQJJPObg@mail.gmail.com>
+ <Zj0tcmseJCjR4hK2@robin>
+In-Reply-To: <Zj0tcmseJCjR4hK2@robin>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 9 May 2024 18:23:15 -0400
+Message-ID: <CABBYNZLnYz-vPrMbtsJTsLPsyo62j+cxctSkLjRom3bWEU9N3A@mail.gmail.com>
+Subject: Re: [PATCH v1] Bluetooth: hci_sync: Use advertised PHYs on hci_le_ext_create_conn_sync
+To: Janne Grunau <j@jannau.net>
+Cc: linux-bluetooth@vger.kernel.org, regressions@lists.linux.dev, 
+	asahi@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-These scripts have "#!/usr/bin/env python3" but have python2 syntax in
-several places. Fixed by running the "2to3" utility.
----
- test/exchange-business-cards |  4 +--
- test/get-obex-capabilities   |  6 ++--
- test/list-folders            |  6 ++--
- test/sap_client.py           | 68 ++++++++++++++++++------------------
- test/simple-player           |  4 +--
- 5 files changed, 44 insertions(+), 44 deletions(-)
+Hi Janne,
 
-diff --git a/test/exchange-business-cards b/test/exchange-business-cards
-index 12d513362..f28d90e30 100755
---- a/test/exchange-business-cards
-+++ b/test/exchange-business-cards
-@@ -9,10 +9,10 @@ client = dbus.Interface(bus.get_object("org.bluez.obex", "/org/bluez/obex"),
- 					"org.bluez.obex.Client")
- 
- if (len(sys.argv) < 4):
--	print "Usage: %s <device> <clientfile> <file>" % (sys.argv[0])
-+	print("Usage: %s <device> <clientfile> <file>" % (sys.argv[0]))
- 	sys.exit(1)
- 
--print "Creating Session"
-+print("Creating Session")
- path = client.CreateSession(sys.argv[1], { "Target": "OPP" })
- opp = dbus.Interface(bus.get_object("org.bluez.obex", path),
- 					"org.bluez.obex.ObjectPush")
-diff --git a/test/get-obex-capabilities b/test/get-obex-capabilities
-index 25a996e18..c2e5710db 100755
---- a/test/get-obex-capabilities
-+++ b/test/get-obex-capabilities
-@@ -9,12 +9,12 @@ client = dbus.Interface(bus.get_object("org.bluez.obex", "/org/bluez/obex"),
- 					"org.bluez.obex.Client")
- 
- if (len(sys.argv) < 3):
--	print "Usage: %s <device> <target>" % (sys.argv[0])
-+	print("Usage: %s <device> <target>" % (sys.argv[0]))
- 	sys.exit(1)
- 
--print "Creating Session"
-+print("Creating Session")
- session_path = client.CreateSession(sys.argv[1], { "Target": sys.argv[2] })
- session = dbus.Interface(bus.get_object("org.bluez.obex", session_path),
- 					"org.bluez.obex.Session")
- 
--print session.GetCapabilities()
-+print(session.GetCapabilities())
-diff --git a/test/list-folders b/test/list-folders
-index 414bb367b..3b080e7ba 100755
---- a/test/list-folders
-+++ b/test/list-folders
-@@ -22,15 +22,15 @@ def list_folder(folder):
- 
- 	for i in ftp.ListFolder():
- 		if i["Type"] == "folder":
--			print "%s/" % (i["Name"])
-+			print("%s/" % (i["Name"]))
- 		else:
--			print "%s" % (i["Name"])
-+			print("%s" % (i["Name"]))
- 
- 
- if __name__ == '__main__':
- 
- 	if len(sys.argv) < 2:
--		print "Usage: %s <device> [folder]" % (sys.argv[0])
-+		print("Usage: %s <device> [folder]" % (sys.argv[0]))
- 		sys.exit(1)
- 
- 	folder = None
-diff --git a/test/sap_client.py b/test/sap_client.py
-index fed13aedc..2da46eee3 100644
---- a/test/sap_client.py
-+++ b/test/sap_client.py
-@@ -165,7 +165,7 @@ class SAPParam_ConnectionStatus(SAPParam):
- 
-     def __validate(self):
-         if self.value is not None and self.value not in (0x00,  0x01,  0x02,  0x03,  0x04):
--            print "Warning. ConnectionStatus value in reserved range (0x%x)" % self.value
-+            print("Warning. ConnectionStatus value in reserved range (0x%x)" % self.value)
- 
-     def deserialize(self,  buf):
-         ret = SAPParam.deserialize(self, buf)
-@@ -183,7 +183,7 @@ class SAPParam_ResultCode(SAPParam):
- 
-     def __validate(self):
-         if self.value is not None and self.value not in (0x00,  0x01,  0x02,  0x03,  0x04,  0x05,  0x06,  0x07):
--            print "Warning. ResultCode value in reserved range (0x%x)" % self.value
-+            print("Warning. ResultCode value in reserved range (0x%x)" % self.value)
- 
-     def deserialize(self,  buf):
-         ret = SAPParam.deserialize(self, buf)
-@@ -201,7 +201,7 @@ class SAPParam_DisconnectionType(SAPParam):
- 
-     def __validate(self):
-         if self.value is not None and self.value not in (0x00,  0x01):
--            print "Warning. DisconnectionType value in reserved range (0x%x)" % self.value
-+            print("Warning. DisconnectionType value in reserved range (0x%x)" % self.value)
- 
-     def deserialize(self,  buf):
-         ret = SAPParam.deserialize(self, buf)
-@@ -227,7 +227,7 @@ class SAPParam_StatusChange(SAPParam):
- 
-     def __validate(self):
-         if self.value is not None and self.value not in (0x00,  0x01,  0x02,  0x03,  0x04,  0x05):
--            print "Warning. StatusChange value in reserved range (0x%x)" % self.value
-+            print("Warning. StatusChange value in reserved range (0x%x)" % self.value)
- 
-     def deserialize(self,  buf):
-         ret = SAPParam.deserialize(self, buf)
-@@ -245,7 +245,7 @@ class SAPParam_TransportProtocol(SAPParam):
- 
-     def __validate(self):
-         if self.value is not None and self.value not in (0x00,  0x01):
--            print "Warning. TransportProtoco value in reserved range (0x%x)" % self.value
-+            print("Warning. TransportProtoco value in reserved range (0x%x)" % self.value)
- 
-     def deserialize(self,  buf):
-         ret = SAPParam.deserialize(self, buf)
-@@ -728,7 +728,7 @@ class SAPClient:
-         self.port = first_match["port"]
-         self.host = first_match["host"]
- 
--        print "SAP Service found on %s(%s)" % first_match["name"] % self.host
-+        print("SAP Service found on %s(%s)" % first_match["name"] % self.host)
- 
-     def __connectRFCOMM(self):
-         self.sock=BluetoothSocket( RFCOMM )
-@@ -739,19 +739,19 @@ class SAPClient:
-     def __sendMsg(self, msg):
-         if isinstance(msg,  SAPMessage):
-             s = msg.serialize()
--            print "\tTX: " + msg.getContent()
-+            print("\tTX: " + msg.getContent())
-             return self.sock.send(s.tostring())
- 
-     def __rcvMsg(self,  msg):
-         if isinstance(msg,  SAPMessage):
--            print "\tRX Wait: %s(id = 0x%.2x)" % (msg.name, msg.id)
-+            print("\tRX Wait: %s(id = 0x%.2x)" % (msg.name, msg.id))
-             data = self.sock.recv(self.bufsize)
-             if data:
-                 if msg.deserialize(array('B',data)):
--                    print "\tRX: len(%d) %s" % (len(data), msg.getContent())
-+                    print("\tRX: len(%d) %s" % (len(data), msg.getContent()))
-                     return msg
-                 else:
--                    print "msg: %s" % array('B',data)
-+                    print("msg: %s" % array('B',data))
-                     raise BluetoothError ("Message deserialization failed.")
-             else:
-                 raise BluetoothError ("Timeout. No data received.")
-@@ -797,8 +797,8 @@ class SAPClient:
-                     return False
-             else:
-                 return False
--        except BluetoothError , e:
--            print "Error. " +str(e)
-+        except BluetoothError as e:
-+            print("Error. " +str(e))
-             return False
- 
-     def proc_disconnectByClient(self, timeout=0):
-@@ -808,8 +808,8 @@ class SAPClient:
-             time.sleep(timeout) # let srv to close rfcomm
-             self.__disconnectRFCOMM()
-             return True
--        except BluetoothError , e:
--            print "Error. " +str(e)
-+        except BluetoothError as e:
-+            print("Error. " +str(e))
-             return False
- 
-     def proc_disconnectByServer(self, timeout=0):
-@@ -823,8 +823,8 @@ class SAPClient:
- 
-             return self.proc_disconnectByClient(timeout)
- 
--        except BluetoothError , e:
--            print "Error. " +str(e)
-+        except BluetoothError as e:
-+            print("Error. " +str(e))
-             return False
- 
-     def proc_transferAPDU(self,  apdu = "Sample APDU command"):
-@@ -832,8 +832,8 @@ class SAPClient:
-             self.__sendMsg(SAPMessage_TRANSFER_APDU_REQ(apdu))
-             params = self.__rcvMsg(SAPMessage_TRANSFER_APDU_RESP()).getParams()
-             return True
--        except BluetoothError , e:
--            print "Error. " +str(e)
-+        except BluetoothError as e:
-+            print("Error. " +str(e))
-             return False
- 
-     def proc_transferATR(self):
-@@ -841,8 +841,8 @@ class SAPClient:
-             self.__sendMsg(SAPMessage_TRANSFER_ATR_REQ())
-             params = self.__rcvMsg(SAPMessage_TRANSFER_ATR_RESP()).getParams()
-             return True
--        except BluetoothError , e:
--            print "Error. " +str(e)
-+        except BluetoothError as e:
-+            print("Error. " +str(e))
-             return False
- 
-     def proc_powerSimOff(self):
-@@ -850,8 +850,8 @@ class SAPClient:
-             self.__sendMsg(SAPMessage_POWER_SIM_OFF_REQ())
-             params = self.__rcvMsg(SAPMessage_POWER_SIM_OFF_RESP()).getParams()
-             return True
--        except BluetoothError , e:
--            print "Error. " +str(e)
-+        except BluetoothError as e:
-+            print("Error. " +str(e))
-             return False
- 
-     def proc_powerSimOn(self):
-@@ -862,8 +862,8 @@ class SAPClient:
-                 return self.proc_transferATR()
- 
-             return True
--        except BluetoothError , e:
--            print "Error. " +str(e)
-+        except BluetoothError as e:
-+            print("Error. " +str(e))
-             return False
- 
-     def proc_resetSim(self):
-@@ -874,23 +874,23 @@ class SAPClient:
-                 return self.proc_transferATR()
- 
-             return True
--        except BluetoothError , e:
--            print "Error. " +str(e)
-+        except BluetoothError as e:
-+            print("Error. " +str(e))
-             return False
- 
-     def proc_reportStatus(self):
-         try:
-             params = self.__rcvMsg(SAPMessage_STATUS_IND()).getParams()
--        except BluetoothError , e:
--            print "Error. " +str(e)
-+        except BluetoothError as e:
-+            print("Error. " +str(e))
-             return False
- 
-     def proc_transferCardReaderStatus(self):
-         try:
-             self.__sendMsg(SAPMessage_TRANSFER_CARD_READER_STATUS_REQ())
-             params = self.__rcvMsg(SAPMessage_TRANSFER_CARD_READER_STATUS_RESP()).getParams()
--        except BluetoothError , e:
--            print "Error. " +str(e)
-+        except BluetoothError as e:
-+            print("Error. " +str(e))
-             return False
- 
-     def proc_errorResponse(self):
-@@ -899,8 +899,8 @@ class SAPClient:
-             self.__sendMsg(SAPMessage_CONNECT_REQ())
- 
-             params = self.__rcvMsg(SAPMessage_ERROR_RESP()).getParams()
--        except BluetoothError , e:
--            print "Error. " +str(e)
-+        except BluetoothError as e:
-+            print("Error. " +str(e))
-             return False
- 
-     def proc_setTransportProtocol(self,  protocol = 0):
-@@ -922,8 +922,8 @@ class SAPClient:
-             else:
-                 return False
- 
--        except BluetoothError , e:
--            print "Error. " +str(e)
-+        except BluetoothError as e:
-+            print("Error. " +str(e))
-             return False
- 
- if __name__ == "__main__":
-diff --git a/test/simple-player b/test/simple-player
-index 190e047e2..8a1cb1e33 100755
---- a/test/simple-player
-+++ b/test/simple-player
-@@ -1,7 +1,7 @@
- #!/usr/bin/env python3
- # SPDX-License-Identifier: LGPL-2.1-or-later
- 
--from __future__ import print_function
-+
- 
- import os
- import sys
-@@ -119,7 +119,7 @@ class InputHandler:
- 			return True
- 
- 		try:
--			exec "self.player.%s" % s
-+			exec("self.player.%s" % s)
- 		except Exception as e:
- 			print(e)
- 			pass
--- 
-2.42.0
+On Thu, May 9, 2024 at 4:09=E2=80=AFPM Janne Grunau <j@jannau.net> wrote:
+>
+> On Thu, May 09, 2024 at 12:30:21PM -0400, Luiz Augusto von Dentz wrote:
+> > Hi Janne,
+> >
+> > On Thu, May 9, 2024 at 12:06=E2=80=AFPM Janne Grunau <j@jannau.net> wro=
+te:
+> > >
+> > > Hej,
+> > >
+> > > On Fri, Apr 05, 2024 at 04:40:33PM -0400, Luiz Augusto von Dentz wrot=
+e:
+> > > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > > >
+> > > > The extended advertising reports do report the PHYs so this store t=
+hen
+> > > > in hci_conn so it can be later used in hci_le_ext_create_conn_sync =
+to
+> > > > narrow the PHYs to be scanned since the controller will also perfor=
+m a
+> > > > scan having a smaller set of PHYs shall reduce the time it takes to
+> > > > find and connect peers.
+> > > >
+> > > > Fixes: 288c90224eec ("Bluetooth: Enable all supported LE PHY by def=
+ault")
+> > >
+> > > This commit in v6.8.9 apparently has regressed connecting to LE devic=
+es
+> > > like Logitech mices with Apple/Broadcom BCM4388 devices. Those device=
+s
+> > > carry HCI_QUIRK_BROKEN_LE_CODED which became necessary after 288c9022=
+4eec
+> > > ("Bluetooth: Enable all supported LE PHY by default").
+> > > Tested so far only by reverting aaf06285498861d6caaff5b26d30af70dd2b8=
+19f
+> > > on top of v6.8.9. Looking at the change I don't see anything obvious
+> > > which would explain the breakage.
+> > > I would assume v6.9-rc6 is affected as well but I haven't tested this
+> > > yet.
+> >
+> > Would be great if you provide the HCI trace to confirm the problem.
+>
+> looks like there is an issue with initiating "LE Extended Create
+> Connection":
+>
+> | > HCI Event: LE Meta Event (0x3e) plen 26
+> |       LE Extended Advertising Report (0x0d)
+> |         Num reports: 1
+> |         Entry 0
+> |           Event type: 0x2515
+> |             Props: 0x0015
+> |               Connectable
+> |               Directed
+> |               Use legacy advertising PDUs
+> |             Data status: Complete
+> |             Reserved (0x2500)
+> |          Legacy PDU Type: Reserved (0x2515)
+> |           Address type: Random (0x01)
+> |           Address: DF:F4:9E:F3:A9:72 (Static)
+> |           Primary PHY: Reserved
 
+Looks like broadcom is using Reserved value as primary PHY, no wonder
+it doesn't work, real piece of art that broadcom and apple manage to
+produce and it is not only the PHY that has out of the spec result
+other fields are affected as well.
+
+> |           Secondary PHY: No packets
+> |           SID: no ADI field (0xff)
+> |           TX power: 127 dBm
+> |           RSSI: -60 dBm (0xc4)
+> |           Periodic advertising interval: 0.00 msec (0x0000)
+> |           Direct address type: Public (0x00)
+> |           Direct address: 5C:1B:F4:7F:BF:6B (Apple, Inc.)
+> |           Data length: 0x00
+> | < HCI Command: LE Set Extended Scan Enable (0x08|0x0042) plen 6
+> |         Extended scan: Disabled (0x00)
+> |         Filter duplicates: Disabled (0x00)
+> |         Duration: 0 msec (0x0000)
+> |         Period: 0.00 sec (0x0000)
+> | > HCI Event: Command Complete (0x0e) plen 4
+> |       LE Set Extended Scan Enable (0x08|0x0042) ncmd 1
+> |         Status: Success (0x00)
+> | < HCI Command: LE Extended Create Connection (0x08|0x0043) plen 10
+> |         Filter policy: Accept list is not used (0x00)
+> |         Own address type: Public (0x00)
+> |         Peer address type: Random (0x01)
+> |         Peer address: DF:F4:9E:F3:A9:72 (Static)
+> |         Initiating PHYs: 0x00
+> | > HCI Event: Command Status (0x0f) plen 4
+> |       LE Extended Create Connection (0x08|0x0043) ncmd 1
+> |        Status: Unsupported Feature or Parameter Value (0x11)
+>
+> Full trace attached
+>
+> Janne
+
+
+
+--=20
+Luiz Augusto von Dentz
