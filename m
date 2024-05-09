@@ -1,106 +1,78 @@
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C582130E4B
-	for <linux-bluetooth@vger.kernel.org>; Wed,  8 May 2024 22:17:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D008A36C;
+	Thu,  9 May 2024 00:11:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715206623; cv=none; b=rTcuqX+smCbTygzXIgfk28uYMd7s30+NyJXum4ttyUJ0UvWdm0JJzc6/s8hx25ugWZrKeUTHsPCLUH28ebOuXWWZQIU8rQ2TMOHRX6bHa6rrK0L9MC1Fgj2YjFDaDl12SAOtZWXOgUdJDbPeh6OYdbyEfg0vTcGdG1/2RLrO1sM=
+	t=1715213504; cv=none; b=Ek7cPpMyhKXIVXO2nFdxdlFUkGYLfv38lFLNlPb9oOoY5FaQJdiYjS2aHpeKywnZNNyIlwl2HMkMWRMBSKVy6UpPHfGvEEWNSKQHzMdFrh+vsvjEy9Slu+blvaPtWfGUY0AEQ7q0EOOJzH6RqjaH4LDFB9dMs5+NJHiKGk+wZno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715206623; c=relaxed/simple;
-	bh=uVZpoWw82LqYKxWX7Wrq4qa3CV2sRaj6xwZnqWxJjak=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DLBv0bvQ4xoYclRDCrAUtxAwwJ3Uap7R6apkKvu9emOp3QvCFzEmOQGaJEbOn6FtUdfwZqQztwMAkjRCnaPME+0/ypMUitFgVU9WmWDsN2JsyqmceiOGQu70RqGFwDqZ3wDy/Mm0AfVRfndpoA8rrTLlVcFdNnFKWvOkIrmMfyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2df83058d48so2854041fa.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 08 May 2024 15:17:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715206620; x=1715811420;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uVZpoWw82LqYKxWX7Wrq4qa3CV2sRaj6xwZnqWxJjak=;
-        b=AClfK8DfMNPLDlKExflxxFxtM/qoZWzp4YVPoHT7LrJ4l/9G7yCP6+cnKoayQwM7lj
-         neuhZyvZASzf8MmppJ5HwKkcEzdr2CUWgbz2/pCppbrxkLTRpzkDDa2eEvwFYhTGCsLx
-         jdGMwSQZb1GRuKDskxN2vtDX3XFWI+n8uSw9SAK7Fdoa1IUquzvRVE6dfRHz07TPV6/e
-         Ea9wYaF8fRVYJZkGiDw6ayO32bTr8jXCw0Uo8iD7uPVUwbI8xti5+NhC2hLMIrToHPXe
-         D5I3TSN2kbYyCIECMTBw5wDsK8hwhG3c5CR8MM8KwGCA4somvBBzouQtW66I2dsXFHqn
-         ZzYg==
-X-Gm-Message-State: AOJu0YwGPVTccF9GB6rCbFj0H5wLv2dM1eMfWttRTLT4QeJ2EnxD9RLd
-	GZDlSDM7KsDYIntrE+FoLspnYj4K4GDnv6pmo1+y7cO7SuZFYezmez28LkU6ya0=
-X-Google-Smtp-Source: AGHT+IGSbtkOCFnKj8ztdADRcvlPL0JJBzceDOlFGeYOUfFH/XD+13jMLrqEWPrFIbCbvu8QfLi7RQ==
-X-Received: by 2002:a2e:9858:0:b0:2e2:587:4bc9 with SMTP id 38308e7fff4ca-2e4476af963mr21903041fa.40.1715206620001;
-        Wed, 08 May 2024 15:17:00 -0700 (PDT)
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com. [209.85.167.52])
-        by smtp.gmail.com with ESMTPSA id a7-20020a2e9807000000b002db98d0f2c8sm2579215ljj.85.2024.05.08.15.16.59
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 May 2024 15:16:59 -0700 (PDT)
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-51f3a49ff7dso222108e87.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 08 May 2024 15:16:59 -0700 (PDT)
-X-Received: by 2002:ac2:522e:0:b0:51b:de39:3826 with SMTP id
- 2adb3069b0e04-5217ce46c24mr2107480e87.65.1715206619650; Wed, 08 May 2024
- 15:16:59 -0700 (PDT)
+	s=arc-20240116; t=1715213504; c=relaxed/simple;
+	bh=+KPhFjLngoYnYZyMFLCInl0AWsMSJZc/VrdY+nzvKnc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IE2Co794TbZvYDqnVmvTeUoakkQnKtddKehpCTE6/XfF26gZJEYmCwACzRNBOjvq5vacfHee+PslauXw6rTrLvj1u8gUa9oKXAPl0meas/FZZuXpirRVhUgrmav2OlUsd+TvGJjJVEJkVsemwM7LPmHIDcfQYV8ON4AwrYVrpNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=PdYVeo7h; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="PdYVeo7h"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
+	:Subject; bh=T0KfQdeJdUtDz1RkJ9GIAZyjFD1/YLa59kctlv5ebos=; b=PdYVeo7hcVJjaTya
+	7fWFVguYsCPthqheYzy7e1CohSRCSyBpgB0xOazXiRaPPRLJwXccEk7dejXVj3O1wimqVlMLPK79t
+	9NZeGH+IgzUALyzy2kCd0a4UKtJoHy7A2LVdC1riAXAj1wDRV00cwL0xYKs0LMNcVUjtmiIFT2szO
+	5hUD8YYV66Q51flu9MW4DLyI9uaalk19azT9Xvl+RdN5w0klkYxsgUlT71XvTWgMtbeK5zBzXwqQy
+	vmxNCrZ9a+97V5G7JieFQ7ezntlWywDnWaYGn2XDQ6hvEK0q4G40/F4FRGBWYFI7u3rPw4eke0Wd9
+	pgfj+14GQydcSQ0KvQ==;
+Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
+	by mx.treblig.org with esmtp (Exim 4.96)
+	(envelope-from <linux@treblig.org>)
+	id 1s4rNr-00071m-2I;
+	Thu, 09 May 2024 00:11:40 +0000
+From: linux@treblig.org
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	sre@kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Dr. David Alan Gilbert" <linux@treblig.org>
+Subject: [PATCH] Bluetooth/nokia: Remove unused struct 'hci_nokia_radio_hdr'
+Date: Thu,  9 May 2024 01:11:38 +0100
+Message-ID: <20240509001138.204427-1-linux@treblig.org>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240507143639.539863-1-luiz.dentz@gmail.com> <663a497d.050a0220.99cab.8529@mx.google.com>
- <CABBYNZJ8NDv64Unsa=-j_RJhpCGBBtJf9Vvn2Fq9Vvc9OsHmwg@mail.gmail.com> <CAJNyHpL1sqNxbe_2o1Pjx_BJTka0c5NoanQBfGPU1bYit7dXVQ@mail.gmail.com>
-In-Reply-To: <CAJNyHpL1sqNxbe_2o1Pjx_BJTka0c5NoanQBfGPU1bYit7dXVQ@mail.gmail.com>
-From: Sungwoo Kim <iam@sung-woo.kim>
-Date: Thu, 9 May 2024 07:16:47 +0900
-X-Gmail-Original-Message-ID: <CAJNyHp+HZF_Vh5c9xmNuFxsc6dMmEboQH2tXx2C5KWCNe1C51A@mail.gmail.com>
-Message-ID: <CAJNyHp+HZF_Vh5c9xmNuFxsc6dMmEboQH2tXx2C5KWCNe1C51A@mail.gmail.com>
-Subject: Re: [v2] Bluetooth: HCI: Remove HCI_AMP support
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, May 8, 2024 at 5:21=E2=80=AFAM Sungwoo Kim <iam@sung-woo.kim> wrote=
-:
->
-> Hi Luiz,
->
-> On Wed, May 8, 2024 at 4:26=E2=80=AFAM Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Sungwoo,
-> >
-> > On Tue, May 7, 2024 at 11:32=E2=80=AFAM <bluez.test.bot@gmail.com> wrot=
-e:
-> > >
-> > > This is automated email and please do not reply to this email!
-> > >
-> > > Dear submitter,
-> > >
-> > > Thank you for submitting the patches to the linux bluetooth mailing l=
-ist.
-> > > This is a CI test results with your patch series:
-> > > PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=
-=3D851233
-> >
-> > Can you try reproducing the problem with the above change?
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-This bug is not reproduced under my testing environment.
-https://lore.kernel.org/linux-kernel/20240506022035.663102-1-iam@sung-woo.k=
-im/
+'hci_nokia_radio_hdr' looks like it was unused since it's
+initial commit.
 
->
-> Sure, I will.
->
-> For the patch, we can also remove HCI_FLOW_CTL_MODE_PACKET_BASED and
-> HCI_FLOW_CTL_MODE_BLOCK_BASED from hci.h as no one is using it.
->
-> One question:
-> This patch removes some HCI commands and flow control modes that are
-> still in the specification v5.4.
-> Should we remove these commands and modes from the specification also?
->
-> Thanks,
-> Sungwoo.
+Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+---
+ drivers/bluetooth/hci_nokia.c | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/drivers/bluetooth/hci_nokia.c b/drivers/bluetooth/hci_nokia.c
+index 97da0b2bfd17e..62633d9ba7c43 100644
+--- a/drivers/bluetooth/hci_nokia.c
++++ b/drivers/bluetooth/hci_nokia.c
+@@ -116,11 +116,6 @@ struct hci_nokia_neg_evt {
+ #define SETUP_BAUD_RATE		921600
+ #define INIT_BAUD_RATE		120000
+ 
+-struct hci_nokia_radio_hdr {
+-	u8	evt;
+-	u8	dlen;
+-} __packed;
+-
+ struct nokia_bt_dev {
+ 	struct hci_uart hu;
+ 	struct serdev_device *serdev;
+-- 
+2.45.0
+
