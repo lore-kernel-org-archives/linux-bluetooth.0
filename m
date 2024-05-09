@@ -1,78 +1,146 @@
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D008A36C;
-	Thu,  9 May 2024 00:11:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA65017BBF
+	for <linux-bluetooth@vger.kernel.org>; Thu,  9 May 2024 01:06:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715213504; cv=none; b=Ek7cPpMyhKXIVXO2nFdxdlFUkGYLfv38lFLNlPb9oOoY5FaQJdiYjS2aHpeKywnZNNyIlwl2HMkMWRMBSKVy6UpPHfGvEEWNSKQHzMdFrh+vsvjEy9Slu+blvaPtWfGUY0AEQ7q0EOOJzH6RqjaH4LDFB9dMs5+NJHiKGk+wZno=
+	t=1715216786; cv=none; b=uYyey+yKkYYvme1thP3VlLajB0TDHvhlkyjWIqTLfko1YE+jwyYfsIIeOOF0Z8OqezErbF2oP7uBtxLnL5R754OlyFNE7CnYin2tf2LIJ5gy1DkUDc/yZajSo152NdkyeOqLDB/AIv/Vyh1gbJbowc7l1WO3GVHEB/WzkmXWpV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715213504; c=relaxed/simple;
-	bh=+KPhFjLngoYnYZyMFLCInl0AWsMSJZc/VrdY+nzvKnc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IE2Co794TbZvYDqnVmvTeUoakkQnKtddKehpCTE6/XfF26gZJEYmCwACzRNBOjvq5vacfHee+PslauXw6rTrLvj1u8gUa9oKXAPl0meas/FZZuXpirRVhUgrmav2OlUsd+TvGJjJVEJkVsemwM7LPmHIDcfQYV8ON4AwrYVrpNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=PdYVeo7h; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+	s=arc-20240116; t=1715216786; c=relaxed/simple;
+	bh=5Jwg+45qDPKJis2CBLgPmxqjSc7kbPEDv+9Zbcf0ByI=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=iWjOEjdc997azSIwgvW9WmKzWa+eBHYaHXAQb87LeMlZRV9zE7FwVxW8JtV0zeoIJQVMFCiqR4FenhlP/lm7kRrqKXZzXyAPpOVYnnqauv7cStIQs0cj6Xo1J8KCsWry2HSMtjWMg9YORWjVid+BvAYP784o2gR4tR9Oy7trwpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CVaX0fW2; arc=none smtp.client-ip=209.85.219.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="PdYVeo7h"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=T0KfQdeJdUtDz1RkJ9GIAZyjFD1/YLa59kctlv5ebos=; b=PdYVeo7hcVJjaTya
-	7fWFVguYsCPthqheYzy7e1CohSRCSyBpgB0xOazXiRaPPRLJwXccEk7dejXVj3O1wimqVlMLPK79t
-	9NZeGH+IgzUALyzy2kCd0a4UKtJoHy7A2LVdC1riAXAj1wDRV00cwL0xYKs0LMNcVUjtmiIFT2szO
-	5hUD8YYV66Q51flu9MW4DLyI9uaalk19azT9Xvl+RdN5w0klkYxsgUlT71XvTWgMtbeK5zBzXwqQy
-	vmxNCrZ9a+97V5G7JieFQ7ezntlWywDnWaYGn2XDQ6hvEK0q4G40/F4FRGBWYFI7u3rPw4eke0Wd9
-	pgfj+14GQydcSQ0KvQ==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-	by mx.treblig.org with esmtp (Exim 4.96)
-	(envelope-from <linux@treblig.org>)
-	id 1s4rNr-00071m-2I;
-	Thu, 09 May 2024 00:11:40 +0000
-From: linux@treblig.org
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	sre@kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH] Bluetooth/nokia: Remove unused struct 'hci_nokia_radio_hdr'
-Date: Thu,  9 May 2024 01:11:38 +0100
-Message-ID: <20240509001138.204427-1-linux@treblig.org>
-X-Mailer: git-send-email 2.45.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CVaX0fW2"
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6a1548d65e0so1666416d6.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 08 May 2024 18:06:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715216783; x=1715821583; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=MD/UD0ISFKFI+mgOaXflvAn+N+vr3uqM9TJ/qeQZkaQ=;
+        b=CVaX0fW2H0/0p8M2lDMTt1J1dWIrlzjaei/1rLpEoXAkbkyCIq2Ir5LsUyDa9AIQbC
+         /RB6mlrRS9EOX1UUkMGk/P49SLB69jYIzQ+EJFOkHx8PBfHn8OSwdtDc+xzMxDvl070N
+         G2Hk6P1icXo+XAuuhR6MPsQSruiWFjzkxPZmRl/O37G6rIOsOXiIl4so7fnppVNW3BJJ
+         CTmn6/0z1TebA7Vn0cDrIoJ3r5JmhbHhosOyGzOZ/XT2+V8Ke5sffyct93Q12QLNasRQ
+         3t7X7Cmt0U+3qYR9UAkEk2V0weE72p/fhYkB3xqjgAuzB3EK7kY/X6+ahNtWWg0gfsiE
+         mrjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715216783; x=1715821583;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MD/UD0ISFKFI+mgOaXflvAn+N+vr3uqM9TJ/qeQZkaQ=;
+        b=WqbHfzbS4kLWy28gB1bwF3VSkvsw0OQOQHJYvpT1moEfpk4+UJaqI3xKoK1cQAYUwP
+         x1v9w4lsNMVwOmVbT44PisBGX4J7R4p9Wvrxq7zGqpCpcbrWgoqTN9yxDHKcXpjZFxR8
+         aA6kKmVjsBq4IvcNFA3841xKRGzgBuRVbEssPHA35hZ9xzXS+HCj1Mt+BvTzRKTW7ELo
+         UeaovRLXX3RsExeKMVhHUXg+VmVx/9nZRPHcbcHHqb2a0W6Kiu+2AKmcja1ZTgMbp56x
+         lx/H7vKUVxzTqj5YGQUHIHGgTfUUyrcnykRmVcMUYBWl5RhrtHi7abL8taIGJjYVea6L
+         y0KA==
+X-Gm-Message-State: AOJu0YxQK8inagmhgr7w2RwZl7moayarsWyoc3HrTW3NQbzhJ2eB4fGU
+	BsWEgU8VMryRlrIYFnQV7cgJhqZeXTj8bnuT//GsdkQVOiHB2aCmHnl+GQ==
+X-Google-Smtp-Source: AGHT+IH5WuBs9o4I6rykdGlsSI0FiWbSWgj6MC6NJ5ms1qvy4MVriOtbbeiCtuMTlx0JQmSb3cKc9A==
+X-Received: by 2002:a05:6214:2623:b0:6a0:c5c8:b4d1 with SMTP id 6a1803df08f44-6a151478909mr51721516d6.34.1715216783294;
+        Wed, 08 May 2024 18:06:23 -0700 (PDT)
+Received: from [172.17.0.2] ([20.75.95.254])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6a15f196bffsm1558016d6.71.2024.05.08.18.06.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 May 2024 18:06:22 -0700 (PDT)
+Message-ID: <663c218e.0c0a0220.769da.0a00@mx.google.com>
+Date: Wed, 08 May 2024 18:06:22 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8288872273413771816=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, linux@treblig.org
+Subject: RE: Bluetooth/nokia: Remove unused struct 'hci_nokia_radio_hdr'
+In-Reply-To: <20240509001138.204427-1-linux@treblig.org>
+References: <20240509001138.204427-1-linux@treblig.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
+--===============8288872273413771816==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-'hci_nokia_radio_hdr' looks like it was unused since it's
-initial commit.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=851727
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.63 seconds
+GitLint                       PASS      0.32 seconds
+SubjectPrefix                 FAIL      0.31 seconds
+BuildKernel                   PASS      29.81 seconds
+CheckAllWarning               PASS      32.29 seconds
+CheckSparse                   WARNING   37.72 seconds
+CheckSmatch                   FAIL      35.62 seconds
+BuildKernel32                 PASS      28.50 seconds
+TestRunnerSetup               PASS      516.77 seconds
+TestRunner_l2cap-tester       PASS      20.34 seconds
+TestRunner_iso-tester         PASS      30.71 seconds
+TestRunner_bnep-tester        PASS      4.67 seconds
+TestRunner_mgmt-tester        PASS      108.31 seconds
+TestRunner_rfcomm-tester      PASS      7.31 seconds
+TestRunner_sco-tester         PASS      14.94 seconds
+TestRunner_ioctl-tester       PASS      7.61 seconds
+TestRunner_mesh-tester        PASS      5.76 seconds
+TestRunner_smp-tester         PASS      6.75 seconds
+TestRunner_userchan-tester    PASS      4.88 seconds
+IncrementalBuild              PASS      28.45 seconds
+
+Details
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+drivers/bluetooth/hci_nokia.c:279:23: warning: incorrect type in assignment (different base types)drivers/bluetooth/hci_nokia.c:279:23:    expected unsigned short [usertype] bauddrivers/bluetooth/hci_nokia.c:279:23:    got restricted __le16 [usertype]drivers/bluetooth/hci_nokia.c:282:26: warning: incorrect type in assignment (different base types)drivers/bluetooth/hci_nokia.c:282:26:    expected unsigned short [usertype] sys_clkdrivers/bluetooth/hci_nokia.c:282:26:    got restricted __le16 [usertype]
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
+
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bpa10x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bpa10x.o'
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+
+
 ---
- drivers/bluetooth/hci_nokia.c | 5 -----
- 1 file changed, 5 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/hci_nokia.c b/drivers/bluetooth/hci_nokia.c
-index 97da0b2bfd17e..62633d9ba7c43 100644
---- a/drivers/bluetooth/hci_nokia.c
-+++ b/drivers/bluetooth/hci_nokia.c
-@@ -116,11 +116,6 @@ struct hci_nokia_neg_evt {
- #define SETUP_BAUD_RATE		921600
- #define INIT_BAUD_RATE		120000
- 
--struct hci_nokia_radio_hdr {
--	u8	evt;
--	u8	dlen;
--} __packed;
--
- struct nokia_bt_dev {
- 	struct hci_uart hu;
- 	struct serdev_device *serdev;
--- 
-2.45.0
 
+--===============8288872273413771816==--
